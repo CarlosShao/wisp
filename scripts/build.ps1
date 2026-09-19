@@ -132,6 +132,16 @@ $dllSource = Join-Path $RepoRoot 'third_party\sherpa-onnx'
 Copy-Item -Path (Join-Path $dllSource '*.dll') -Destination $outDir -Force
 Write-Host "build.ps1: DLLs colocated into $outDir"
 
+# --- 4b. colocate the signed C29 model manifest (ticket 14) -----------------
+# The runtime resolves <exe dir>/models/manifest.json (ResolveManifestPath);
+# the manifest + its minisign signature ship with the binary and must stay in
+# lockstep with the commit.
+$manifestDir = Join-Path $outDir 'models'
+New-Item -ItemType Directory -Force -Path $manifestDir | Out-Null
+Copy-Item -Path (Join-Path $RepoRoot 'models\manifest.json')      -Destination $manifestDir -Force
+Copy-Item -Path (Join-Path $RepoRoot 'models\manifest.json.minisig') -Destination $manifestDir -Force
+Write-Host "build.ps1: signed model manifest colocated into $manifestDir"
+
 # --- 5. SHA256SUMS ----------------------------------------------------------
 $artifacts = @('wisp.exe', 'onnxruntime.dll', 'sherpa-onnx-c-api.dll', 'sherpa-onnx-cxx-api.dll')
 $sums = @()

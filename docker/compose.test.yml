@@ -1,0 +1,35 @@
+# compose.test.yml (SPEC-01 §3, SPEC-10 §4): test-env mock services.
+# Three model-mirror tiers for the C29 acceptance cases (SPEC-04 §9):
+#   18081 good     - correct bytes
+#   18082 corrupt  - same paths, one flipped byte  -> sha256 must reject
+#   18083 missing  - empty root                    -> 404, exercises failover
+services:
+  model-mirror:
+    image: nginx:alpine
+    container_name: wisp-model-mirror
+    ports:
+      - "18081:80"
+    volumes:
+      - ./model-mirror/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./model-mirror/fixtures/good:/usr/share/nginx/html:ro
+    restart: unless-stopped
+
+  model-mirror-corrupt:
+    image: nginx:alpine
+    container_name: wisp-model-mirror-corrupt
+    ports:
+      - "18082:80"
+    volumes:
+      - ./model-mirror/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./model-mirror/fixtures/corrupt:/usr/share/nginx/html:ro
+    restart: unless-stopped
+
+  model-mirror-missing:
+    image: nginx:alpine
+    container_name: wisp-model-mirror-missing
+    ports:
+      - "18083:80"
+    volumes:
+      - ./model-mirror/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./model-mirror/fixtures/missing:/usr/share/nginx/html:ro
+    restart: unless-stopped

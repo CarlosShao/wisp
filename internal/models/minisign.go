@@ -13,15 +13,19 @@ import (
 	"golang.org/x/crypto/blake2b"
 )
 
-// keyIDFromPub derives the 8-byte minisign key id from a public key
-// (first 8 bytes of SHA-256): deterministic, so regenerated dev keys with the
-// same seed carry the same id, and the id is verified to match across pubkey
-// file and signatures.
-func keyIDFromPub(pub ed25519.PublicKey) [sizeKeyID]byte {
+// DeriveKeyID derives the 8-byte minisign key id from a public key (first 8
+// bytes of SHA-256): deterministic, so regenerated dev keys with the same
+// seed carry the same id, and the id is verified to match across pubkey file
+// and signatures. Shared with the signing tool.
+func DeriveKeyID(pub ed25519.PublicKey) [sizeKeyID]byte {
 	sum := sha256.Sum256(pub)
 	var id [sizeKeyID]byte
 	copy(id[:], sum[:sizeKeyID])
 	return id
+}
+
+func keyIDFromPub(pub ed25519.PublicKey) [sizeKeyID]byte {
+	return DeriveKeyID(pub)
 }
 
 // Hand-written minisign signature verification (C29, D17/D41e: minisign is the

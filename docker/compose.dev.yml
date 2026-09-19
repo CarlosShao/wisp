@@ -1,0 +1,18 @@
+# compose.dev.yml (SPEC-01 §3, SPEC-11 §4): dev-env mock services.
+# Ticket 14 adds the model-mirror service; other services (mock-llm on 18080,
+# ...) are appended by their own tickets.
+#
+# Model mirror = BYTES ONLY (D33/F3): point [models] mirror at
+# http://127.0.0.1:18081 in dev config. Fixtures under
+# docker/model-mirror/fixtures/<tier>/<model-id>/<file>; for real models copy
+# them into fixtures/good/<model-id>/<file> (see fixtures/README.md).
+services:
+  model-mirror:
+    image: nginx:alpine
+    container_name: wisp-model-mirror
+    ports:
+      - "18081:80"
+    volumes:
+      - ./model-mirror/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./model-mirror/fixtures/good:/usr/share/nginx/html:ro
+    restart: unless-stopped

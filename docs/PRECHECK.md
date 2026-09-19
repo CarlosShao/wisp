@@ -70,3 +70,50 @@ C27 单窗口复用（隐藏而非销毁）维持为强制设计。**
   无回退值；便携自身 blob 仍可解；非便携 → 普通 DPAPI 错误而非 P13 错误）、
   `TestPortableOverride`（三环境重定位 + `WISP_TEST_DATA_DIR` 注入优先于标记）。
 - 便携用户的推荐密钥载体即 `env:` 引用（占位值任意，CI/便携场景可用）。
+
+## P3 — 逐模型权重许可证核实（票 14 回填，2026-09-19）
+
+**结论：5/6 模型 Apache-2.0/MIT 可商用；matcha-icefall-zh-baker 确认为
+非商用（data-baker 数据集条款）→ P3 BLOCKED，manifest 记 `status=blocked-p3`，
+下载管线拒绝安装；TTS 替代模型选型升级为待决策项（见 docs/reports）。**
+
+- 逐模型判定（判定来源 = 模型卡/官方 API/随包 LICENSE，非镜像站）：
+  - **KWS zipformer wenetspeech 3.3M**：Apache-2.0（模型 README front-matter
+    `license: Apache License 2.0`，ModelScope pkufool 仓库与包内 README 一致）。
+  - **silero VAD**：MIT（上游 snakers4/silero-vad）。
+  - **streaming paraformer bilingual int8**：Apache-2.0（ModelScope API
+    `damo/speech_paraformer_asr_nat-zh-cn-16k-common-vocab8404-online`，即
+    sherpa-onnx-streaming-paraformer-bilingual-zh-en 的上游）。
+  - **SenseVoice offline int8**：Apache-2.0（ModelScope API `iic/SenseVoiceSmall`；
+    包内 LICENSE 指向 FunASR——其代码 MIT、权重按各模型卡，SenseVoiceSmall 卡为 Apache-2.0）。
+  - **CT-Punc（ct-transformer zh-en vocab272727）int8**：Apache-2.0（ModelScope API
+    `damo/punc_ct-transformer_cn-en-common-vocab471067-large`）。
+  - **matcha-icefall-zh-baker（TTS）**：⛔ **NON-COMMERCIAL**——sherpa-onnx 官方文档与
+    包内 README 均明示 "The dataset is for non-commercial use only"（data-baker
+    免费版数据集）。按 PLAN §16.6 P3 规则：**blocked-decision 登记，模型不上船**。
+    manifest 条目保留（哈希/来源齐备，供溯源与开发机测量），`status: "blocked-p3"`，
+    `Manager.Ensure` 对其一律拒绝（`TestP3BlockedModelRefused` 钉死）。
+- 后续：S2 前必须选定可商用的中文 TTS（候选需满足：onnx 可转 + 数据许可商用 +
+  sherpa-onnx 支持）；在此之前任何 TTS 模型条目不得从 blocked-p3 改回 ok，
+  变更属 L2 级安全决策（D36）。
+
+## P5 — 国内可达模型镜像调研（票 14 回填，2026-09-19）
+
+**结论：镜像方案成立——compose model-mirror（自建，18081）+ hf-mirror.com（HF 代理）
++ ghfast.top（GitHub 传输代理）；镜像只提供字节，哈希一律来自 C29 签名清单。**
+
+- 三档落地（全部在本票实测通过）：
+  - **compose model-mirror**（nginx:alpine，18081；`docker/compose.{dev,test}.yml`）：
+    dev/test 环境 `[models] mirror` 默认源，good/corrupt/missing 三档 fixture
+    （SPEC-04 §9 的 sha256 拒收 / failover 用例）。
+  - **hf-mirror.com**：HF 系模型（paraformer int8 分文件）的主源，S0 spike 与本票
+    均实测可下（tokens.txt 跨源哈希一致：hf-mirror 与 GitHub 归档内容互证）。
+    注意：部分 LFS/Xet 仓库会 401（punc 的 HF 镜像即如此）——不可依赖单一镜像，
+    故所有条目都带官方 GitHub release 兜底。
+  - **ghfast.top**：github.com release 的传输兜底（`https://ghfast.top/https://github.com/...`），
+    下载器按 `transportFallback` 自动追加，无需写进 manifest；本票经它实测下载
+    KWS（31MB）/ matcha（72MB）/ SenseVoice int8 归档（155MB）/ punc int8 归档（62MB）。
+- 哈希来源纪律（D33/F3）：以上镜像全部只当字节源；`models/manifest.json` 的
+  sha256 由本票从官方源下载后本地计算并入库签名。punc 归档哈希与 GitHub 官方
+  `checksum.txt` 互证一致（c0d5aa5f…），KWS/VAD/paraformer/vocos/matcha
+  model-steps-3 与 S0 spike 报告记录互证一致。

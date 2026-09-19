@@ -43,12 +43,25 @@ type Manifest struct {
 type ModelEntry struct {
 	ID        string     `json:"id"`
 	Purpose   string     `json:"purpose"`
+	Status    string     `json:"status,omitempty"` // "" or "ok" = shippable; "blocked-p3" = license block (P3), downloads refused
 	URLs      []string   `json:"urls"`
 	SHA256    string     `json:"sha256"`
 	SizeBytes int64      `json:"size_bytes"`
 	License   string     `json:"license"`
 	Quant     string     `json:"quant"`
 	Files     []FileSpec `json:"files,omitempty"`
+}
+
+// Entry statuses (P3: a non-commercial license finding blocks the model from
+// shipping; the entry stays in the manifest with its hashes for provenance).
+const (
+	StatusOK        = "ok"
+	StatusBlockedP3 = "blocked-p3"
+)
+
+// Shippable reports whether the model may be downloaded/installed.
+func (e *ModelEntry) Shippable() bool {
+	return e.Status == "" || e.Status == StatusOK
 }
 
 // FileSpec is one downloadable artifact of a model.
@@ -131,6 +144,9 @@ func ParseManifest(data []byte) (*Manifest, error) {
 		}
 		if !isHex64(e.SHA256) {
 			return nil, fmt.Errorf("%w: %s sha256 %q not 64 hex chars", ErrManifestInvalid, e.ID, e.SHA256)
+		}
+		if e.Status != "" && e.Status != StatusOK && e.Status != StatusBlockedP3 {
+			return nil, fmt.Errorf("%w: %s status %q not in {ok, blocked-p3}", ErrManifestInvalid, e.ID, e.Status)
 		}
 		if e.SizeBytes < 0 {
 			return nil, fmt.Errorf("%w: %s negative size", ErrManifestInvalid, e.ID)

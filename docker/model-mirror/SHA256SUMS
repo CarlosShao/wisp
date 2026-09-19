@@ -1,0 +1,4 @@
+fb043a49e248bba9881648d9362abeeb78e129a2b1fcb4f5c73340317536c54d *fixtures/good/kws-fixture/tiny-model.tar.bz2
+fb043a49e248bba9881648d9362abeeb78e129a2b1fcb4f5c73340317536c54d *fixtures/good/vad-fixture/vad.onnx
+8f05d36e927d31e5cf1dc347e19967c33579e68f8e1e3312eb6c04aad65db622 *fixtures/corrupt/kws-fixture/tiny-model.tar.bz2
+eb9a11755ab9571b244f41266f9bcbfeb685a25dc71293840ed8df4de2e2b948 *fixtures/corrupt/vad-fixture/vad.onnx

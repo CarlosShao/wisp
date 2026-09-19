@@ -23,9 +23,13 @@ var (
 )
 
 // MinisignPublicKey is the C29 update/model signing public key embedded in the
-// binary (SPEC-11 §7.3). The real keypair is generated offline when ticket C29
-// lands; key material must never be committed to the repo, hence placeholder.
-const MinisignPublicKey = "PLACEHOLDER-C29-MINISIGN-PUBLIC-KEY"
+// binary (SPEC-11 §7.3), in minisign two-line format (keyid a3c8794f3fd94fc5).
+// It is the DEV keypair generated for ticket 14: the secret key lives
+// out-of-repo at E:\work\base\wisp-minisign\wisp-models.key (never committed;
+// see docs/reports/2026-09-19-t14-dev-minisign-key.md). The PRODUCTION key
+// ceremony is ticket S8 and MUST rotate this value.
+const MinisignPublicKey = `untrusted comment: wisp models signing key (dev)
+RWSjyHlPP9lPxdEQRvWj3zFLMbc1tTEkKMwTDuVXXQDxsWRpA/m5jk9j`
 
 // EnvString resolves the effective WISP_ENV as a raw string: the environment
 // variable wins over the build-time default (SPEC-03 §5.1). Prefer ResolveEnv

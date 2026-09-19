@@ -140,6 +140,11 @@ func (m *Manager) Ensure(ctx context.Context, id string, onProgress ...func(Prog
 	if err != nil {
 		return "", err
 	}
+	// P3 gate: a license-blocked model is never downloaded or installed.
+	if !entry.Shippable() {
+		return "", observeNew(ClassModel,
+			fmt.Sprintf("model %s is P3-BLOCKED (license: %s); download refused, replacement decision pending", id, entry.License))
+	}
 	progress := func(ev ProgressEvent) {
 		if m.opts.Progress != nil {
 			m.opts.Progress(ev)

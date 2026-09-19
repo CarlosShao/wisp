@@ -26,3 +26,8 @@
 ## 阻塞项（blocked）
 
 （当前无硬阻塞。票 09 的黄金录制部分依赖 H2；其余在途/排队票均可推进。）
+- [H5] **TTS 模型选型（P3 BLOCKED：matcha-zh-baker 非商用）** — 等用户/编排者拍板 —
+  阻塞 S2 的 TTS 环节上船（管线已就绪，条目 `tts-matcha-zh-baker` 已标
+  `blocked-p3` 并被下载器拒绝）— 需选定数据许可可商用的中文 TTS（onnx 可转 +
+  sherpa-onnx 支持），详见 PRECHECK.md P3 与 docs/reports/2026-09-19-t14-dev-minisign-key.md
+  同目录的密钥登记（dev 密钥轮换归 S8）。
