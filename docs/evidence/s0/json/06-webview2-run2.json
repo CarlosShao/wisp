@@ -1,0 +1,81 @@
+{
+  "mode": "driver",
+  "children": 12,
+  "warmupChildMs_discarded": 681.2660000000001,
+  "coldMs": [
+    1084.915,
+    873.915,
+    975.159,
+    1146.367,
+    1256.356,
+    1216.107,
+    1264.427,
+    909.914,
+    1125.71,
+    899.742,
+    895.059,
+    1253.212
+  ],
+  "coldP50Ms": 1125.71,
+  "coldP95Ms": 1256.356,
+  "fullRun": {
+    "mode": "full",
+    "machine": {
+      "hostname": "DESKTOP-LVS7839",
+      "osName": "Windows 10 Pro 24H2",
+      "osVersion": "10.0",
+      "osBuild": "26100",
+      "cpuName": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+      "cpuLogical": 12,
+      "ramTotalMB": 32624,
+      "ramAvailMB": 6228,
+      "processOwner": "swq",
+      "recordedAtUtc": "2026-09-19T08:42:25Z"
+    },
+    "startedAtUtc": "2026-09-19T08:42:25Z",
+    "dataPath": "C:\\Users\\swq\\AppData\\Local\\Temp\\wisp-spike-webview2-profile",
+    "coldMs": 1163.7169999999999,
+    "coldNote": "NewWithOptions(create+show+embed) + SetHtml + first dispatch round trip",
+    "hotShowMs": [
+      39.853,
+      62.099,
+      73.837,
+      46.873,
+      52.211,
+      79.491,
+      75.585,
+      58.578,
+      76.337,
+      71.359
+    ],
+    "hotAliveMs": [
+      37.528,
+      16.612,
+      12.574,
+      4.576,
+      11.083,
+      7.776,
+      2.479,
+      16.931,
+      2.962,
+      9.037
+    ],
+    "hotShowP50Ms": 71.359,
+    "hotShowP95Ms": 79.491,
+    "hotAliveP50Ms": 37.528,
+    "recreateMs": [
+      928.652,
+      955.48,
+      836.473,
+      835.3040000000001,
+      858.95,
+      852.16,
+      839.8299999999999,
+      841.7909999999999,
+      935.7330000000001,
+      951.003
+    ],
+    "recreateP50Ms": 858.95,
+    "recreateP95Ms": 955.48
+  }
+}

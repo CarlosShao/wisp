@@ -23,6 +23,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"sort"
+	"sync/atomic"
 	"time"
 	"unsafe"
 
@@ -39,6 +40,7 @@ type fullRun struct {
 	ColdMs      float64            `json:"coldMs"`
 	ColdNote    string             `json:"coldNote"`
 	HotShowMs   []float64          `json:"hotShowMs"`
+	HotAliveMs  []float64          `json:"hotAliveMs"`
 	HotP50      float64            `json:"hotShowP50Ms"`
 	HotP95      float64            `json:"hotShowP95Ms"`
 	HotAliveP50 float64            `json:"hotAliveP50Ms"`
@@ -105,15 +107,33 @@ func pumpFor(d time.Duration) {
 }
 
 // dispatchRT measures one Dispatch round trip on the main loop (proves the
-// browser side is alive and the loop is responsive).
-func dispatchRT(w webview2.WebView, timeout time.Duration) float64 {
+// browser side executed JS and called back through the bound binding.
+// NOTE: w.Dispatch is NOT usable with a manual message pump - it posts a
+// thread message that only go-webview2's own Run() loop interprets. Bind +
+// Eval ride on window messages, which PeekMessage pumping does process.
+var pingCh atomic.Value // chan struct{}
+
+func bindPing(w webview2.WebView) {
+	w.Bind("spikePing", func() {
+		if c, ok := pingCh.Load().(chan struct{}); ok {
+			select {
+			case <-c:
+			default:
+				close(c)
+			}
+		}
+	})
+}
+
+func browserRT(w webview2.WebView, timeout time.Duration) float64 {
+	c := make(chan struct{})
+	pingCh.Store(c)
 	t0 := time.Now()
-	alive := make(chan struct{})
-	w.Dispatch(func() { close(alive) })
+	w.Eval("typeof spikePing === 'function' && spikePing()")
 	for {
 		pumpOnce()
 		select {
-		case <-alive:
+		case <-c:
 			return float64(time.Since(t0).Microseconds()) / 1000.0
 		default:
 		}
@@ -147,11 +167,12 @@ func bringUp(dataPath string) (webview2.WebView, float64, error) {
 	}
 	createMs := float64(time.Since(t0).Microseconds()) / 1000.0
 
+	bindPing(w)
 	w.SetHtml(pageHTML)
 	pumpFor(120 * time.Millisecond)
-	aliveMs := dispatchRT(w, 3*time.Second)
+	aliveMs := browserRT(w, 5*time.Second)
 	if aliveMs < 0 {
-		return w, createMs, fmt.Errorf("dispatch round trip timed out after create")
+		return w, createMs, fmt.Errorf("browser round trip timed out after create")
 	}
 	totalMs := float64(time.Since(t0).Microseconds()) / 1000.0
 	_ = totalMs
@@ -189,8 +210,9 @@ func runFull(dataPath string) fullRun {
 		pUpdateWindow.Call(hwnd)
 		pumpOnce()
 		showMs := float64(time.Since(t0).Microseconds()) / 1000.0
-		aliveMs := dispatchRT(w, 3*time.Second)
+		aliveMs := browserRT(w, 5*time.Second)
 		rep.HotShowMs = append(rep.HotShowMs, showMs)
+		rep.HotAliveMs = append(rep.HotAliveMs, aliveMs)
 		if i == 0 {
 			rep.HotAliveP50 = aliveMs
 		}
