@@ -65,6 +65,7 @@ func (e Endpoint) EndpointOptions() EndpointOptions {
 	o.Protocol = e.Protocol
 	o.BaseURL = e.BaseURL
 	o.APIKey = e.APIKey
+	o.ContextWindow = e.ContextWindow
 	o.Compat.Loose = e.Compat.Loose
 	o.Compat.AllowMissingUsage = e.Compat.AllowMissingUsage
 	o.Compat.ExtraHeaders = e.Compat.ExtraHeaders

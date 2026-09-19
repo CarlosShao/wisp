@@ -36,6 +36,13 @@ import (
 //	model                        - unknown model / context length exceeded
 //	cancelled                    - caller cancelled the context
 
+// WithCode attaches a provider code to a locally-built observe.Error and
+// returns it (fluent helper for seam call sites).
+func WithCode(e *observe.Error, code string) *observe.Error {
+	e.ProviderCode = code
+	return e
+}
+
 // Provider codes used by the seam and its adapters. They are log-safe and
 // belong in task_log.provider_code / StreamEvent.Error.
 const (

@@ -165,7 +165,9 @@ type EndpointOptions struct {
 	Protocol string
 	BaseURL  string
 	APIKey   string // resolved plaintext; never logged
-	Compat   struct {
+	// ContextWindow of the model (0 = unknown), surfaced via ProviderInfo.
+	ContextWindow int
+	Compat        struct {
 		Loose             bool
 		AllowMissingUsage bool
 		ExtraHeaders      map[string]string
