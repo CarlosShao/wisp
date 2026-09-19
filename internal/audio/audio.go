@@ -84,7 +84,7 @@ type Stats struct {
 	FramesDropped uint64 `json:"frames_dropped"`
 	BytesSent     uint64 `json:"bytes_sent"`
 	BytesDropped  uint64 `json:"bytes_dropped"`
-	Reopens       uint64 `json:"reopens"`  // hotplug re-enumerations performed
+	Reopens       uint64 `json:"reopens"` // hotplug re-enumerations performed
 	LastError     string `json:"last_error,omitempty"`
 }
 
@@ -98,14 +98,14 @@ func (s Stats) Dropped() bool { return s.FramesDropped > 0 }
 type meter struct {
 	name string // source name for log lines
 
-	mu       sync.Mutex
-	sent     uint64
-	dropped  uint64
-	bytesSent uint64
+	mu           sync.Mutex
+	sent         uint64
+	dropped      uint64
+	bytesSent    uint64
 	bytesDropped uint64
-	reopens  uint64
-	lastErr  string
-	lastWarn time.Time // monotonic reading for the 1s log throttle (D42#9)
+	reopens      uint64
+	lastErr      string
+	lastWarn     time.Time // monotonic reading for the 1s log throttle (D42#9)
 }
 
 func newMeter(name string) *meter { return &meter{name: name} }
