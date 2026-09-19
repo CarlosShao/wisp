@@ -39,12 +39,12 @@ func TestRealManifestInRepoVerifies(t *testing.T) {
 		t.Fatalf("manifest has %d models, want 6", len(m.Models))
 	}
 	want := map[string]string{
-		"kws-zipformer-wenetspeech-3.3M-2024-01-01":  "kws",
-		"vad-silero":                                 "vad",
-		"asr-streaming-paraformer-zh-en":             "asr-streaming",
-		"asr-offline-sensevoice-zh-en-ja-ko-yue":     "asr-offline",
-		"punc-ct-transformer-zh-en-vocab272727":      "punctuation",
-		"tts-matcha-zh-baker":                        "tts",
+		"kws-zipformer-wenetspeech-3.3M-2024-01-01": "kws",
+		"vad-silero":                             "vad",
+		"asr-streaming-paraformer-zh-en":         "asr-streaming",
+		"asr-offline-sensevoice-zh-en-ja-ko-yue": "asr-offline",
+		"punc-ct-transformer-zh-en-vocab272727":  "punctuation",
+		"tts-matcha-zh-baker":                    "tts",
 	}
 	for id, purpose := range want {
 		e, err := m.FindModel(id)

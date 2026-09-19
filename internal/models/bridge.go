@@ -23,10 +23,10 @@ type DownloadingBridge struct {
 	mgr     *Manager
 	machine *statemachine.Machine
 
-	mu     sync.Mutex
-	ticks  int
+	mu      sync.Mutex
+	ticks   int
 	percent float64
-	log    []statemachine.State
+	log     []statemachine.State
 }
 
 // WireDownloading attaches a Manager to a Machine.

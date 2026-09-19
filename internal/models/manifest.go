@@ -66,9 +66,9 @@ func (e *ModelEntry) Shippable() bool {
 
 // FileSpec is one downloadable artifact of a model.
 type FileSpec struct {
-	Path      string       `json:"path"`      // install path relative to models/<id>/; for archives, the archive file name
-	URLs      []string     `json:"urls"`      // candidates, tried in order (mirror failover)
-	SHA256    string       `json:"sha256"`    // of the artifact bytes as served
+	Path      string       `json:"path"`   // install path relative to models/<id>/; for archives, the archive file name
+	URLs      []string     `json:"urls"`   // candidates, tried in order (mirror failover)
+	SHA256    string       `json:"sha256"` // of the artifact bytes as served
 	SizeBytes int64        `json:"size_bytes"`
 	Archive   *ArchiveSpec `json:"archive,omitempty"`
 }

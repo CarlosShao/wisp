@@ -168,12 +168,12 @@ func newTestManager(t *testing.T, m *Manifest, mirrors []string, override map[st
 // countingServer serves static files, counts hits, records Range headers, and
 // can 404 everything or truncate the body mid-transfer (simulated kill).
 type countingServer struct {
-	srv    *httptest.Server
-	mu     sync.Mutex
-	hits   int
-	ranges []string
-	bodies map[string][]byte
-	partial int // >0: serve only this many bytes when no Range header, then drop
+	srv      *httptest.Server
+	mu       sync.Mutex
+	hits     int
+	ranges   []string
+	bodies   map[string][]byte
+	partial  int // >0: serve only this many bytes when no Range header, then drop
 	notFound bool
 }
 

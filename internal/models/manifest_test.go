@@ -47,14 +47,14 @@ func TestManifestParseMultiArtifactWithArchive(t *testing.T) {
 	m := parseOK(t, `{"manifest_version":1,"models":[{
 		"id": "kws", "purpose": "kws",
 		"urls": ["https://github.com/x/a.tar.bz2"],
-		"sha256": "` + strings.Repeat("11", 32) + `", "size_bytes": 100,
+		"sha256": "`+strings.Repeat("11", 32)+`", "size_bytes": 100,
 		"license": "Apache-2.0", "quant": "int8",
 		"files": [{
 			"path": "a.tar.bz2", "urls": ["https://github.com/x/a.tar.bz2"],
-			"sha256": "` + strings.Repeat("11", 32) + `", "size_bytes": 100,
+			"sha256": "`+strings.Repeat("11", 32)+`", "size_bytes": 100,
 			"archive": {"format": "tar.bz2", "files": [
-				{"path": "encoder.onnx", "sha256": "` + strings.Repeat("22", 32) + `", "size_bytes": 90},
-				{"path": "tokens.txt", "sha256": "` + strings.Repeat("33", 32) + `", "size_bytes": 10}
+				{"path": "encoder.onnx", "sha256": "`+strings.Repeat("22", 32)+`", "size_bytes": 90},
+				{"path": "tokens.txt", "sha256": "`+strings.Repeat("33", 32)+`", "size_bytes": 10}
 			]}
 		}]
 	}]}`)

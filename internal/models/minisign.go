@@ -61,9 +61,9 @@ const (
 
 // minisign sizes (bytes).
 const (
-	sizeAlg  = 2
+	sizeAlg   = 2
 	sizeKeyID = 8
-	sizeSig  = 64
+	sizeSig   = 64
 )
 
 // MinisignPublicKey is a parsed, format-checked minisign public key.

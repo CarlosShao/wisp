@@ -34,14 +34,14 @@ const (
 // ProgressEvent is one tick of download progress (SPEC-04 §7.1: progress ring
 // + percent). Percent is the OVERALL entry progress across artifacts.
 type ProgressEvent struct {
-	ModelID       string `json:"model_id"`
-	Phase         Phase  `json:"phase"`
-	URL           string `json:"url,omitempty"`  // candidate currently in use
-	Attempt       int    `json:"attempt"`        // 1-based attempt on the current URL
-	ArtifactIndex int    `json:"artifact_index"` // 0-based
-	ArtifactCount int    `json:"artifact_count"`
-	BytesDone     int64  `json:"bytes_done"`
-	TotalBytes    int64  `json:"total_bytes"`
+	ModelID       string  `json:"model_id"`
+	Phase         Phase   `json:"phase"`
+	URL           string  `json:"url,omitempty"`  // candidate currently in use
+	Attempt       int     `json:"attempt"`        // 1-based attempt on the current URL
+	ArtifactIndex int     `json:"artifact_index"` // 0-based
+	ArtifactCount int     `json:"artifact_count"`
+	BytesDone     int64   `json:"bytes_done"`
+	TotalBytes    int64   `json:"total_bytes"`
 	Percent       float64 `json:"percent"`
 }
 
