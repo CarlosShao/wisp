@@ -14,6 +14,7 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"time"
 	"unsafe"
 
@@ -64,8 +65,12 @@ func handleCount() uint32 {
 
 func main() {
 	stay := flag.Bool("stay", false, "interactive mode: hotkeys/tray/click live until tray Exit or Ctrl+C")
+	shotDir := flag.String("shots", "", "Go-side composite captures per state into this dir")
+	var seq int
 	state := flag.String("state", "", "show one state for 2s (name as in D43)")
 	cycleMs := flag.Int("cycle-ms", 2000, "per-state dwell for -state / full cycle")
+	posX := flag.Int("x", -1, "debug: place the ball window at this x (with -y)")
+	posY := flag.Int("y", -1, "debug: place the ball window at this y (with -x)")
 	flag.Parse()
 
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo})))
@@ -108,6 +113,9 @@ func main() {
 		fmt.Fprintf(os.Stderr, "balldebug: ball.New failed: %v\n", err)
 		os.Exit(1)
 	}
+	if *posX >= 0 && *posY >= 0 {
+		debugMoveWindow(b.DebugHWND(), int32(*posX), int32(*posY))
+	}
 	fmt.Printf("balldebug: ball up handles=%d\n", handleCount())
 
 	dwell := time.Duration(*cycleMs) * time.Millisecond
@@ -144,6 +152,10 @@ func main() {
 				b.SetBadgeText("3")
 			}
 			time.Sleep(dwell)
+			if *shotDir != "" {
+				goScreenShot(b.DebugHWND(), filepath.Join(*shotDir, fmt.Sprintf("%02d-%s.png", seq, s)))
+				seq++
+			}
 		}
 	}
 

@@ -184,18 +184,14 @@ func (b *Ball) createOnSTA(s *staThread) error {
 	// Window DPI + initial size/position (per-monitor restore). The window is
 	// MOVED while hidden, so no WM_DPICHANGED fires - the destination
 	// monitor DPI is read explicitly after the move (SPEC-08 §2).
-	// The resolve edge must equal the INITIAL state window edge, so the first
-	// applyStateLocked never shifts the restored position.
-	initialEdge := func(dpi uint32) int32 {
-		if b.opts.Initial == statemachine.StateSleeping {
-			return int32(SleepWindowEdgePx(dpi))
-		}
-		return int32(WindowEdgePx(b.opts.SizePx, dpi))
-	}
-	x, y := b.resolveInitial(initialEdge(96))
+	// The window edge is FIXED for the process lifetime (see applyStateLocked):
+	// resolve and place at that size, reading the destination monitor DPI
+	// explicitly (hidden windows get no WM_DPICHANGED).
+	edge96 := int32(WindowEdgePx(b.opts.SizePx, 96))
+	x, y := b.resolveInitial(edge96)
 	moveWindow(uintptr(b.hwnd), x, y, 1, 1)
 	dpi := getDpiForWindow(b.hwnd) // true DPI of the destination monitor
-	edge := initialEdge(dpi)
+	edge := int32(WindowEdgePx(b.opts.SizePx, dpi))
 	moveWindow(uintptr(b.hwnd), x, y, edge, edge)
 
 	var errR error
@@ -309,19 +305,11 @@ func (b *Ball) applyStateLocked(s statemachine.State) {
 		pSetTimer.Call(uintptr(b.hwnd), timerAnimID, uintptr(policy.PeriodMs), 0)
 	}
 
-	// Window sizing: Sleeping shrinks to the micro dot; everything else uses
-	// the configured orb (constant across states - no resize churn).
-	targetEdge := int32(WindowEdgePx(b.opts.SizePx, b.rend.dpi))
-	if s == statemachine.StateSleeping {
-		targetEdge = int32(SleepWindowEdgePx(b.rend.dpi))
-	}
-	if targetEdge != b.rend.w {
-		old := b.rend.w
-		var wr rect
-		pGetWindowRect.Call(uintptr(b.hwnd), unsafePtr(&wr))
-		moveWindow(uintptr(b.hwnd), wr.l+(old-targetEdge)/2, wr.t+(old-targetEdge)/2, targetEdge, targetEdge)
-		_ = b.rend.resize(targetEdge, targetEdge)
-	}
+	// Window size: FIXED for the process lifetime (the configured orb + ring
+	// margins). States render within it - the Sleeping micro dot is a 12px
+	// visual centered in the same window, and its extra margins are
+	// click-through (WM_NCHITTEST). Resizing would force a DC-render-target
+	// rebind, which empirically yields transparent frames - avoided entirely.
 
 	// Constant alpha: 255 for everything except Settling (fade target) -
 	// Warm breathing and the Settling fade ramp drive this value per tick.
@@ -618,15 +606,20 @@ func (b *Ball) wndProc(hwnd, m, wParam, lParam uintptr) uintptr {
 		return 0
 
 	case wmDPICHanged:
-		// Per-Monitor V2: re-scale to the suggested rect and rebuild the
-		// renderer geometry (S1: full rebuild - the ticket's sanctioned
-		// simplification).
+		// Per-Monitor V2: full renderer rebuild at the new DPI (S1: the
+		// ticket's sanctioned simplification - DC render targets are
+		// recreated, not rebound).
 		newDpi := uint32(wParam & 0xFFFF)
 		sug := rectFromUintptr(lParam)
 		edge := int32(WindowEdgePx(b.opts.SizePx, newDpi))
 		moveWindow(hwnd, sug.l, sug.t, edge, edge)
-		_ = b.rend.resize(edge, edge)
-		b.rend.dropAssets()
+		b.rend.release()
+		var errR error
+		b.rend, errR = newRenderer(windows.HWND(hwnd), edge, edge, newDpi)
+		if errR != nil {
+			slog.Error("ball: DPI renderer rebuild failed", "err", errR)
+			return 0
+		}
 		b.rend.setAssets(b.curVisual)
 		b.renderFrame()
 		return 0
@@ -825,3 +818,6 @@ func registerBallClass() error {
 	})
 	return classErr
 }
+
+// DebugHWND exposes the ball window handle (debug harness/evidence only).
+func (b *Ball) DebugHWND() windows.HWND { return b.hwnd }

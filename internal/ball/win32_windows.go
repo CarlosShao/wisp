@@ -298,3 +298,10 @@ func htTransparentResult() uintptr { return ^uintptr(0) }
 func rectFromUintptr(p uintptr) *rect {
 	return (*rect)(unsafe.Pointer(&p))
 }
+
+// winHeapPtr reinterprets a Windows-heap uintptr as a pointer for a bounded
+// read. The target is NOT Go memory (DIB bits): it is invisible to the GC by
+// design and the caller must keep the lifetime bound (see renderer.dumpDIB).
+func winHeapPtr(p uintptr) unsafe.Pointer {
+	return *(*unsafe.Pointer)(unsafe.Pointer(&p))
+}

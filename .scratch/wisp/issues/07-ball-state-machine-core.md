@@ -124,3 +124,21 @@ basic animations; full visual polish gate is human acceptance at 12).
   base=97 peak=366 < 600, window destroyed after Close) and TestBallLivePositionPersistence
   (persist + exact restore). Fixes: window class registration once-guarded (second New in-process),
   Esc release semantics. go vet + go test (default suite + winlive) green.
+- [2026-09-19T13:45:00Z] agent=T07-impl did=visual-evidence next=final-gates
+  Visual evidence complete: scripts/dev/ball-cycle.ps1 (builds cmd/balldebug, walks the 20 D43 states
+  at 2s dwell with overlays: AwaitingApproval badge=3, Downloading 69%+ring, Confirming countdown
+  text; Go-side BitBlt composite capture per state - SRCCOPY|CAPTUREBLT, since plain SRCCOPY screen
+  BitBlts EXCLUDE layered windows; parks the cursor and the ball on clear wallpaper away from the
+  input-method bar; verifies the harness exited OK and the handle gate). 20 screenshots in
+  docs/evidence/s1/ball-states/01-FirstRun.png .. 20-Stuck.png - human-reviewed via image reads:
+  Sleeping 12px micro-dot @0.35 (zero animation), Listening teal ring + waves + audio-lines,
+  Confirming danger ring + countdown, AwaitingApproval danger ring + white "3" badge, Speaking
+  success tint, Settling fade, Warm amber breathing tint, Conversation 2px danger ring + mic, Error
+  danger + X, Stuck warn + refresh, Downloading progress ring + percent, Queued info dot. Pixel
+  check: Listening ring RGB(137,197,187) == C21 accent #86C2B9.
+  Root cause found for the earlier transparent-frame evidence: state-dependent window resizes forced
+  ID2D1DCRenderTarget::BindDC rebinds which empirically produced transparent frames; the window edge
+  is now FIXED for the process lifetime (Sleeping renders its 12px dot inside the standard window;
+  extra margins are click-through) and WM_DPICHANGED does a full renderer rebuild instead of a
+  rebind. Also fixed en route: renderer DIB backing is allocated once at the max edge
+  (ensureDCAndDIB). Final cycle: handles 385 < 600, harness exit OK, all windows destroyed.
