@@ -14,7 +14,7 @@ $ErrorActionPreference = "Stop"
 $SpikeDir = $PSScriptRoot
 $RepoRoot = (Resolve-Path (Join-Path $SpikeDir "..\..")).Path
 $BinDir   = Join-Path $SpikeDir "bin"
-$DataDir  = Join-Path $RepoRoot "docsevidences0json"
+$DataDir  = Join-Path $RepoRoot "docs\evidence\s0\json"
 $ModelsDir = Join-Path $RepoRoot "third_party\spike-models"
 $DLLDir   = Join-Path $RepoRoot "third_party\sherpa-onnx"
 New-Item -ItemType Directory -Force -Path $BinDir | Out-Null
