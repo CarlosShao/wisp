@@ -30,7 +30,7 @@ All tickets are **vertical tracer bullets**; work the **frontier** (all blockers
 ## Dependency graph (blockers in parentheses)
 
 - **S0**: 01 build-chain ✅done · 02 s0-spike ✅done (01)
-- **S1**: 03 skeleton ✅done (01) · 04 sqlite-core (03) · 05 config-model (03) · 06 secretstore-envs (03) ·
+- **S1**: 03 skeleton ✅done (01) · 04 sqlite-core ✅done (03) · 05 config-model (03) · 06 secretstore-envs (03) ·
   07 ball-state-machine (03) · 08 observability-slo (03,07) · 09 llm-provider+mockllm (03) ·
   10 agent-loop-core (05,09) · 11 llm-adapters-rest (09) · 12 cli-text-path=S1 gate (04,07,08,10)
 - **S2**: 13 audio-capture (03) · 14 model-distribution (03) · 15 speech-engines+CER (02,13,14) ·

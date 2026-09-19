@@ -1,8 +1,8 @@
-# 04 — SQLite storage core: D35 schema v1, WAL, single writer, retention
+# 04 — SQLite storage core: D35 schema v1, WAL, single writer, retention (DONE ✅)
 
-**Status:** in-progress
+**Status:** done
 **Claimed by:** orchestrator -> sub-agent T04-impl
-**Last update:** 2026-09-19T09:52:40Z
+**Last update:** 2026-09-19T10:03:56ZT09:52:40Z
 **Blocked by:** 03-skeleton-runtime-rules
 **Parallel slots:** ≤2 sub-agents (A: schema+DAO+writer goroutine; B: RetentionJob + crash/privacy tests)
 **Spec refs:** SPEC-02 §2–§8, D35, §14.11, D20, C13, C23
@@ -52,3 +52,4 @@ delete-one) exposed as module APIs (GUI pages come in ticket 40).
 - [2026-09-19T08:54:03Z] agent=T04-impl did=handoff-to-orchestrator:8/8-acceptance-criteria-green(27-tests,suite-11.6s);DDL-introspection==SPEC02-s3-byte-exact;0-SQLITE_BUSY@2W+4R-10s;subprocess-crash-recovery-ok;CGO_ENABLED=0-ok;build.ps1-dev-green;db-writer=lazy-start+idle-exit(见注释) next=orchestrator-adversarial-review(Status unchanged; out-of-scope: L1/L2 extraction=29, grant lifecycle=49, cost policy=44, provider_health=v2/ticket-09, panel=40)
 - [2026-09-19T08:54:30Z] agent=T04-impl did=concurrency-test(2W+4R-x-10s:12359-writes,17887-reads,0-busy,wal=4190072B<=1000-page-autockpt)+crash-test(real-subprocess-kill-mid-write:47-rows-recovered,integrity-ok,wal-truncated-0) next=build.ps1-gate+handoff
 - [2026-09-19T09:52:40Z] agent=T04-impl did=adv-fixes(MAJOR-1 writer-panic-wedge: per-command-recover+tx.Rollback-on-panic+gen-guard-backstop+TestAdvPanicWedge; MAJOR-2 bufLogger-mutex-fixture, -race 2x-green; MINOR go-mod-tidy(sqlite-direct), ticket-log-reorder, drop-dead-field-writeQueue.last, tool_call-retention-COALESCE(ended,started,decided)+null-ended-boundary-tests, parseVersion-strict-digits+reject-tests) next=orchestrator-recheck (Status unchanged)
+- [2026-09-19T10:03:56Z] agent=orchestrator did=re-verification PASS (orchestrator-executed, implementer-independent): race x2 green, TestAdvPanicWedge PASS, ddlV1 BYTE-IDENTICAL vs SPEC-02 §3, go.mod sqlite direct-require confirmed, MINORs verified next=ticket DONE
