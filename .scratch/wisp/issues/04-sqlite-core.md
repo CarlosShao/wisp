@@ -1,8 +1,8 @@
 # 04 — SQLite storage core: D35 schema v1, WAL, single writer, retention
 
-**Status:** ready-for-agent
-**Claimed by:** —
-**Last update:** 2026-09-19
+**Status:** in-progress
+**Claimed by:** orchestrator -> sub-agent T04-impl
+**Last update:** 2026-09-19T08:04:51Z
 **Blocked by:** 03-skeleton-runtime-rules
 **Parallel slots:** ≤2 sub-agents (A: schema+DAO+writer goroutine; B: RetentionJob + crash/privacy tests)
 **Spec refs:** SPEC-02 §2–§8, D35, §14.11, D20, C13, C23
@@ -44,3 +44,4 @@ delete-one) exposed as module APIs (GUI pages come in ticket 40).
 - [ ] Profile LRU eviction logs (test asserts log line).
 
 ## Progress log (append-only, newest last)
+- [2026-09-19T08:04:51Z] agent=orchestrator claimed=T04-impl did=dispatched (parallel with T02 spike) next=sub-agent works through acceptance criteria
