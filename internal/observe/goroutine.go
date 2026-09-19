@@ -278,19 +278,18 @@ func (r *Registry) Spawn(name, owner string, root *Root, fn func(ctx context.Con
 	r.mu.Unlock()
 	root.addPending(1)
 
-	go r.run(h, name, owner, root, cat, fn)
+	go r.run(h, name, owner, root, fn)
 	return h
 }
 
 // run is the single sanctioned goroutine body of the codebase.
-func (r *Registry) run(h *Handle, name, owner string, root *Root, cat GoroutineCategory, fn func(context.Context)) {
+func (r *Registry) run(h *Handle, name, owner string, root *Root, fn func(context.Context)) {
 	var ctx context.Context
 	if root != nil {
 		ctx = root.Ctx
 	} else {
 		ctx = context.Background()
 	}
-	_ = cat // roster classification is recorded at Spawn/Snapshot time
 
 	defer func() {
 		var err error
