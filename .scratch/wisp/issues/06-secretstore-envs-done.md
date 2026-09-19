@@ -1,8 +1,8 @@
-# 06 — SecretStore (C28, DPAPI) + WISP_ENV environment isolation
+# 06 — SecretStore (C28, DPAPI) + WISP_ENV environment isolation (DONE ✅)
 
-**Status:** in-progress
+**Status:** done
 **Claimed by:** orchestrator -> sub-agent T06-impl
-**Last update:** 2026-09-19T09:31:25Z
+**Last update:** 2026-09-19T10:25:38ZT09:31:25Z
 **Blocked by:** 03-skeleton-runtime-rules
 **Parallel slots:** ≤2 sub-agents (A: DPAPI store + plaintext migration; B: env forks + test
 env injection)
@@ -55,3 +55,4 @@ visible env badge contract consumed by ball/panel.
 - [2026-09-19T10:15:16Z] agent=T06-impl-resume2 did=found prior "record P13 in docs/PRECHECK.md" log line inaccurate (file had only P1/P2/P11); appended P13 section (explicit ErrPortableDecrypt fallback, never plaintext, env: guidance) to docs/PRECHECK.md next=full matrix
 - [2026-09-19T10:15:16Z] agent=T06-impl-resume2 did=full matrix green: go vet ./... ok; go build ./... ok (CGO_ENABLED=1); CGO_ENABLED=0 go build ./internal/... ok (cmd/wisp excluded: pre-existing sherpa-onnx cgo binding from 10ed80d, not a 06 regression); go test ./... all ok (proc 0.344s incl. mutex-per-env Windows integration, secret 0.104s); build.ps1 -Env dev PASS (doctor WISP_ENV=dev, dev data dir, smoke ok) next=acceptance recheck + handoff
 - [2026-09-19T10:15:16Z] agent=T06-impl-resume2 did=handoff-to-orchestrator: acceptance 6/6 present and green (round-trip+blob-not-plaintext+last-4; migration+idempotent+first-backup-wins; TestLayoutForkMatrix 3-env distinct dirs/mutexes/endpoints+nested-invisibility; TestMutexNamesPerEnv real kernel mutexes; TestPortableOverride+TestPortableDecryptFailureExplicit; TestResolveEnvRef dummy values). Status left as-is next=orchestrator adversarial review
+- [2026-09-19T10:25:38Z] agent=orchestrator did=T06-adv VERDICT PASS (report docs/evidence/s0/06-adversarial-acceptance.md; orchestrated acceptance executed by orchestrator due to platform captcha failures, implementer-independent) next=ticket DONE
