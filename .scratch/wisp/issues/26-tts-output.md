@@ -14,7 +14,9 @@ engine-slot residency with ASR, half-duplex mic gating during playback, interrup
 the P7 subjective-quality gate harness.
 
 ## Key constraints
-- TTS slot via the 15 engine-slot mutex: peak = max(ASR,TTS) not sum; unload via DisposalScope;
+- TTS slot via the 15 engine-slot mutex: **Spike backfill (T02): serial switch measured P50 4726ms > 1.6s budget → D32 16.3.3 preset
+      degradation ACTIVE: TTS RESIDENT + ASR on-demand is the default Path T policy (S4 may
+      re-evaluate serial after tuning).** peak = max(ASR,TTS) not sum; unload via DisposalScope;
   measured switch latency vs "first-token→TTS-first-frame ≤800ms (loaded) / ≤1600ms (load)".
 - Half-duplex (D16, **Path T only per D47**): during playback, mic capture closed AND KWS
   inference suspended (except veto-word channel rule in 41); playback end → Speaking→Warm

@@ -31,7 +31,10 @@ and the enable gate with L2 re-confirmation.
 - VM lifecycle: lazily created per enabled plugin (D3 use-to-wake), DisposalScope teardown at
   plugin unload/session end; one plugin's crash must not affect others or host (recover +
   scope tests).
-- spike-02's goja ES conclusions recorded here: supported language level documented in plugin
+- spike-02's goja ES conclusions recorded here: **T02 results (2026-09-19, final): async/await+Promise ✓; ES modules ✗; async generators ✗ →
+      Tier-2 level = ES2020-minus-modules (module-needing plugins must bundle); Proxy/Reflect ok;
+      `vm.Interrupt()` precision P50 +0.4–0.6ms / max ~12ms → wall-clock budget ≥250ms granularity
+      safe (5s default fine).** supported language level documented in plugin
   docs stub (full SDK at 57).
 
 ## Out of scope
