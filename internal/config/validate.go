@@ -145,10 +145,18 @@ func validateAPIKeyRefs(c *Config) error {
 				"config.toml: llm.providers.%s.billing %q must be one of %s",
 				name, p.Billing, vocabList(billingModes)))
 		}
-		if p.Protocol != "" && !slices.Contains(protocols, p.Protocol) {
+		if p.Protocol != "" {
+			if !slices.Contains(protocols, p.Protocol) {
+				return observe.New(observe.ClassConfig, fmt.Sprintf(
+					"config.toml: llm.providers.%s.protocol %q must be one of %s",
+					name, p.Protocol, vocabList(protocols)))
+			}
+		} else if _, isPreset := LookupPreset(name); !isPreset {
+			// Non-preset providers must state their protocol explicitly
+			// (presets were already merged in at load time).
 			return observe.New(observe.ClassConfig, fmt.Sprintf(
-				"config.toml: llm.providers.%s.protocol %q must be one of %s",
-				name, p.Protocol, vocabList(protocols)))
+				"config.toml: llm.providers.%s.protocol must be set explicitly for a non-preset provider (one of %s)",
+				name, vocabList(protocols)))
 		}
 		for id, m := range p.Models {
 			if err := validateModelSpec(name, id, m); err != nil {
