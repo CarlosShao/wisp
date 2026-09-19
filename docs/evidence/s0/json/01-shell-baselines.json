@@ -1,0 +1,82 @@
+{
+  "program": "shell-baseline",
+  "kind": "pure-go",
+  "machine": {
+    "hostname": "DESKTOP-LVS7839",
+    "osName": "Windows 10 Pro 24H2",
+    "osVersion": "10.0",
+    "osBuild": "26100",
+    "cpuName": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+    "cpuLogical": 12,
+    "ramTotalMB": 32624,
+    "ramAvailMB": 6167,
+    "processOwner": "swq",
+    "recordedAtUtc": "2026-09-19T08:03:55Z"
+  },
+  "startedAtUtc": "2026-09-19T08:03:55Z",
+  "stages": [
+    {
+      "stage": "1-empty-go",
+      "privateWS_MB": 6.890625,
+      "sharedWS_MB": 2.9296875,
+      "totalWS_MB": 9.796875,
+      "privateCommit_MB": 13.8125,
+      "gdiObjects": 0,
+      "userObjects": 1,
+      "handles": 142,
+      "threads": 10,
+      "deltaPrev_MB": 0,
+      "minPrivateWS_MB": 6.6015625,
+      "maxPrivateWS_MB": 6.8984375,
+      "stageDurationMs": 1948
+    },
+    {
+      "stage": "4-d2d-dwrite-layered-window",
+      "privateWS_MB": 15.9453125,
+      "sharedWS_MB": 25.37109375,
+      "totalWS_MB": 41.31640625,
+      "privateCommit_MB": 68.328125,
+      "gdiObjects": 5,
+      "userObjects": 8,
+      "handles": 387,
+      "threads": 21,
+      "deltaPrev_MB": 9.0546875,
+      "minPrivateWS_MB": 15.91796875,
+      "maxPrivateWS_MB": 16.02734375,
+      "stageDurationMs": 4262
+    },
+    {
+      "stage": "5-tray-hotkey-jobobject",
+      "privateWS_MB": 15.984375,
+      "sharedWS_MB": 25.46875,
+      "totalWS_MB": 41.453125,
+      "privateCommit_MB": 68.37890625,
+      "gdiObjects": 5,
+      "userObjects": 14,
+      "handles": 407,
+      "threads": 22,
+      "deltaPrev_MB": 0.0390625,
+      "minPrivateWS_MB": 15.953125,
+      "maxPrivateWS_MB": 16.0078125,
+      "stageDurationMs": 2886
+    },
+    {
+      "stage": "5b-render-30-more-frames",
+      "privateWS_MB": 16.06640625,
+      "sharedWS_MB": 25.48046875,
+      "totalWS_MB": 41.546875,
+      "privateCommit_MB": 68.69921875,
+      "gdiObjects": 5,
+      "userObjects": 14,
+      "handles": 407,
+      "threads": 22,
+      "deltaPrev_MB": 0.12109375,
+      "minPrivateWS_MB": 16.02734375,
+      "maxPrivateWS_MB": 16.06640625,
+      "stageDurationMs": 3070
+    }
+  ],
+  "goVersion": "go1.27.1",
+  "gogc": "",
+  "note": "stages cumulative; privateWS = Task Manager private working set (QueryWorkingSetEx)"
+}

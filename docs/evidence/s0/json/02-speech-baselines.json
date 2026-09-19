@@ -1,0 +1,71 @@
+{
+  "program": "speech-baseline",
+  "kind": "cgo",
+  "machine": {
+    "hostname": "DESKTOP-LVS7839",
+    "osName": "Windows 10 Pro 24H2",
+    "osVersion": "10.0",
+    "osBuild": "26100",
+    "cpuName": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+    "cpuLogical": 12,
+    "ramTotalMB": 32624,
+    "ramAvailMB": 6134,
+    "processOwner": "swq",
+    "recordedAtUtc": "2026-09-19T08:04:07Z"
+  },
+  "startedAtUtc": "2026-09-19T08:04:07Z",
+  "sherpaVersion": "1.13.8",
+  "onnxruntimeVersion": "1.28.2",
+  "model": "sherpa-onnx-kws-zipformer-wenetspeech-3.3M-2024-01-01 (int8)",
+  "modelFilesMB": 4.792789459228516,
+  "kwsLoadMs": 4360,
+  "stages": [
+    {
+      "stage": "2-dll-mapped-no-session",
+      "privateWS_MB": 7.49609375,
+      "sharedWS_MB": 5.14453125,
+      "totalWS_MB": 12.640625,
+      "privateCommit_MB": 15.2890625,
+      "gdiObjects": 0,
+      "userObjects": 3,
+      "handles": 193,
+      "threads": 12,
+      "deltaPrev_MB": 0,
+      "minPrivateWS_MB": 7.47265625,
+      "maxPrivateWS_MB": 7.49609375,
+      "stageDurationMs": 2081
+    },
+    {
+      "stage": "3-kws-session",
+      "privateWS_MB": 48.60546875,
+      "sharedWS_MB": 14.92578125,
+      "totalWS_MB": 63.52734375,
+      "privateCommit_MB": 61.15234375,
+      "gdiObjects": 0,
+      "userObjects": 5,
+      "handles": 223,
+      "threads": 12,
+      "deltaPrev_MB": 41.109375,
+      "minPrivateWS_MB": 48.55859375,
+      "maxPrivateWS_MB": 48.6328125,
+      "stageDurationMs": 6661
+    },
+    {
+      "stage": "3b-after-dispose-freeosmemory",
+      "privateWS_MB": 21.453125,
+      "sharedWS_MB": 14.94140625,
+      "totalWS_MB": 36.36328125,
+      "privateCommit_MB": 31.69140625,
+      "gdiObjects": 0,
+      "userObjects": 5,
+      "handles": 223,
+      "threads": 12,
+      "deltaPrev_MB": -27.15234375,
+      "minPrivateWS_MB": 21.40625,
+      "maxPrivateWS_MB": 21.52734375,
+      "stageDurationMs": 2105
+    }
+  ],
+  "gogc": "",
+  "note": ""
+}

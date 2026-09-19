@@ -49,3 +49,5 @@ speech sub-process). All later memory/latency acceptance numbers come from here.
       notes if needed).
 
 ## Progress log (append-only, newest last)
+
+- [2026-09-19T08:05:00Z] agent=T02-impl did=spike-scaffold+model-download+baselines-1-to-5 (scripts/spike module, NtQSI private-WS sampler verified against Task Manager; five baseline JSONs in docs/evidence/s0/data: empty-go 6.9MB priv, +DLL 7.5MB priv/+5.1MB shared, +KWS-session 48.6MB priv, +D2D/DWrite window 16.0MB priv, +tray/hotkey/job 16.0MB priv no-leak) next=xy-verdict+goja+webview2+model-residency
