@@ -200,3 +200,67 @@ race / mockllm 模块）绿；schema DDL 与 SPEC-02 §3 经程序化 diff 逐�
 最小修复集（全部测试侧、归 T09-impl）：修复 MAJOR-1——TestMockllmGoldenByteIdenticalEvents
 累计比对两路 TextDelta/ReasoningDelta 文本（或全 JSON 逐事件比对），删除或启用 rawGolden，
 修正 sameEvent 失实注释。MINOR-1/2/4 建议顺手一并处理，不单独阻塞。
+
+---
+
+# Re-verification（2026-09-19T16:10Z 前后，T09-adv 复核）
+
+修复提交：dd698b8（test-only：比较器重写 + cancel 断言 + 429 口径 + v1 种子迁移场景）、
+728e7d6（票 09 日志）。37162ef..728e7d6 全量 diff 恰 4 文件（上列 3 + 票 09 日志）；
+`git diff 37162ef..728e7d6 -- scripts/ docs/evidence/ internal/models/` 与 `-- go.mod go.sum`
+均为空——T14 并行保护边界完好。
+
+## R1. Gates 复跑 — PASS
+
+| 命令 | 结果 |
+|---|---|
+| `go vet ./internal/llm/... ./internal/memory/...` | VET_EXIT=0 |
+| `go test -count=1 ./internal/llm/... ./internal/memory/...` | ok x4（llm 1.375s / golden 0.111s / openaichat 21.899s / memory 12.869s） |
+| mockllm 模块内 `go vet` + `go test -count=1` | 0 / ok |
+
+## R2. 新比较器审计（mockllm_integ_test.go）— PASS，无恒真残留
+
+`sameEvent` 整体删除，替换为三轴，逐轴核验：
+
+1. **raw-byte 轴**：`rawGolden`（原死代码）真实启用——`raw != string(rs[0].Body)` 即 FAIL，
+   比较的是 mockllm 原始服务字节 vs 回放器实际输入体（正是"identical input"不变式）；
+   两次 `/__control/reset` 保证游标回卷、两跑器读到同一 section。断言对全部 4 fixture 生效。
+2. **逐事件全 JSON**：`eventJSON(ev1[i]) != eventJSON(ev2[i])`——无任何按 Type 提前放真的
+   分支；Err 经 JSON 按值比较（observe.Error 的 json tag 序列化，Err 包装原因为 json:"-"，
+   分类信息在 class/provider_code/retry_after/detail 中全保留）。
+3. **累计文本轴兜底**：`textOf(ev1) != textOf(ev2)`（TextDelta+ReasoningDelta 顺序拼接）。
+
+## R3. 独立活体验证（本验收代理自做，临时目录 git archive dd698b8 变异实验）— PASS
+
+| 注入 | 结果 |
+|---|---|
+| 未变异基线 | ok（4.013s） |
+| RUN1：mockllm serveGoldenChat 服务体注入一行 `data: [ADVX]`（raw 字节分歧） | **4/4 fixture 红**，全部命中 "mockllm served bytes differ"（raw 轴先于事件轴触发，t.Fatalf） |
+| RUN2：测试侧对 runner B 首 TextDelta 追加 "X" | **4/4 子测试红**于 "event 0 differs"，diff 精确（`"Text":"Let me check."` vs `"Text":"Let me check.X"`） |
+| RUN3：篡改 fixture 文件本体（Let me check. → Let me check?） | **绿**——两跑器读同一文件，runner-identity 不变式按设计成立；与实现方登记的事实一致（fixture 对真 provider 的保真度归 H2 录制，非本测试职责） |
+
+实现方声称的活体验证独立复现成立；变异注入全部在临时目录，仓库零污染（已清理）。
+
+## R4. MINOR×4 复核 — 全部修复
+
+- **MINOR-1**：`internal/memory/migrate_v1seed_test.go` 新增 TestMigrateSeededV1DatabaseToV2
+  ——`Open(withSchemaTarget(1))` 造真 v1 库（0→1 生产链）、常规写路径种 profile+memory、
+  **前提断言 v1 无 provider_health**、重开触发 1→2、版本=2、provider_health 经 DAO 可写可读、
+  种子完整（1+1 行）、备份恰 bak-0-1 + bak-1-2。独立复跑 PASS（0.06s）。恰为原裁决要求的场景。
+- **MINOR-2**：两处 429 断言（adapter_test.go TestGoldenBackoffLadder429 与集成
+  TestMockllmFaultInjection429RetryAfter）统一为实测口径 ≥1.9s，注释说明理由（两 hint 合计
+  2s、1.9s 留调度容差；不遵守 retry-after 的退避在 5ms base 下 ~10ms 即返回）。复跑 PASS
+  （TestGoldenBackoffLadder429 2.01s）。
+- **MINOR-3**：TestGoldenCancellationMidStream 现显式断言流中**零 EvError**（sawError 分支）。
+  复跑 PASS。
+- **MINOR-4**：DEFER(d) 钉票 08——核对票 08（Observability/CI）正文第 33-36 行明文拥有
+  `test-core (ubuntu+compose)` 与 `docker/compose.test.yml skeleton with mock-llm service stub`，
+  钉定正确且与被钉票自身范围自洽。
+
+## R5. 裁决更新
+
+MAJOR-1 修复经代码审计 + 独立活体变异验证双重确认；MINOR×4 全部落地上账；修复提交
+范围干净（无 T14/脚本/证据目录卷入）；全部 gates 复跑绿。票 09 六条验收现全部 PASS
+（条 2 证据链经三轴比较器 + 活体验证补全）。
+
+**VERDICT: PASS**
