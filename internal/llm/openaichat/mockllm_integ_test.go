@@ -189,11 +189,23 @@ func TestMockllmGoldenByteIdenticalEvents(t *testing.T) {
 			}
 			rep := golden.NewReplayer(rs[:1]) // the success section only
 			srv := rep.Server()
-			defer srv.Close()
 			a1 := New(endpointOptionsFor(srv.URL, false, false))
 			ev1 := collectStream(t, a1, baseRequest())
+			srv.Close()
 
-			// Runner B: mockllm serving the same file.
+			// Raw-byte axis: mockllm must serve the fixture section bytes
+			// verbatim (this is what makes the event comparison below a
+			// statement about IDENTICAL INPUT, not two similar inputs).
+			proc.control(t, "/__control/reset", "{}")
+			raw := proc.rawGolden(t, name)
+			if want := string(rs[0].Body); raw != want {
+				t.Fatalf("mockllm served bytes differ from fixture section:\n--- served ---\n%q\n--- fixture ---\n%q", raw, want)
+			}
+			// rawGolden consumed the (single) section: rewind the cursor so
+			// runner B replays the same bytes for the event stream.
+			proc.control(t, "/__control/reset", "{}")
+
+			// Runner B: mockllm serving the same bytes.
 			a2 := New(endpointOptionsFor(proc.base+"/v1", false, false))
 			ev2 := collectStream(t, a2, &llm.Request{Model: "golden/" + name,
 				Messages: baseRequest().Messages})
@@ -201,11 +213,21 @@ func TestMockllmGoldenByteIdenticalEvents(t *testing.T) {
 			if len(ev1) != len(ev2) {
 				t.Fatalf("event counts differ: replayer=%d mockllm=%d", len(ev1), len(ev2))
 			}
+			// Strict per-event comparison (full JSON, so the Err payload is
+			// compared by value, not by pointer identity): BOTH runners
+			// consume the same fixture bytes (asserted above), and the
+			// adapter's SSE line scanner is insensitive to TCP chunk
+			// boundaries, so every event must match - text deltas included.
 			for i := range ev1 {
-				if !sameEvent(ev1[i], ev2[i]) {
+				if eventJSON(ev1[i]) != eventJSON(ev2[i]) {
 					t.Fatalf("event %d differs:\n  replayer: %s\n  mockllm:  %s",
 						i, eventJSON(ev1[i]), eventJSON(ev2[i]))
 				}
+			}
+			// Redundant text-axis check (defends the assembled-turn contract
+			// even if the per-event comparison is ever loosened).
+			if textOf(ev1) != textOf(ev2) {
+				t.Fatalf("assembled text differs:\n  replayer: %q\n  mockllm:  %q", textOf(ev1), textOf(ev2))
 			}
 		})
 	}
@@ -229,20 +251,17 @@ func eventJSON(ev llm.StreamEvent) string {
 	return string(b)
 }
 
-// sameEvent compares events with the timing-sensitive noise removed (the
-// chunk boundaries of the two runners may differ slightly, so TextDeltas are
-// compared by the accumulated text only for streams where mockllm re-chunks).
-func sameEvent(a, b llm.StreamEvent) bool {
-	// Usage, Stop, Error, ToolCall* must match exactly.
-	if a.Type != b.Type {
-		return false
+// textOf concatenates the text payload of a stream (TextDelta +
+// ReasoningDelta, in order) for the assembled-text assertion.
+func textOf(events []llm.StreamEvent) string {
+	var sb strings.Builder
+	for _, ev := range events {
+		switch ev.Type {
+		case llm.EvTextDelta, llm.EvReasoningDelta:
+			sb.WriteString(ev.Text)
+		}
 	}
-	switch a.Type {
-	case llm.EvTextDelta, llm.EvReasoningDelta:
-		return true // chunking differs between runners; assembled text compared below
-	default:
-		return eventJSON(a) == eventJSON(b)
-	}
+	return sb.String()
 }
 
 // ---------------------------------------------------------------------------
@@ -266,8 +285,12 @@ func TestMockllmFaultInjection429RetryAfter(t *testing.T) {
 	if turn.Text == "" || turn.Stop != llm.StopEndTurn {
 		t.Errorf("turn = %+v", turn)
 	}
+	// Measured threshold: the two retry-after:1 hints sum to 2s; the 1.9s
+	// threshold leaves margin for scheduling jitter while still proving the
+	// hints were honored verbatim (a non-honoring backoff would return in
+	// ~10ms with the injected 5ms base).
 	if elapsed < 1900*time.Millisecond {
-		t.Errorf("elapsed = %v, want >= 2s (two retry-after:1 honored)", elapsed)
+		t.Errorf("elapsed = %v, want >= 1.9s (two retry-after:1 hints honored)", elapsed)
 	}
 	proc.control(t, "/__control/reset", "{}")
 }

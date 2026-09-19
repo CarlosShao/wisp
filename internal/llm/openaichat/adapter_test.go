@@ -217,8 +217,12 @@ func TestGoldenBackoffLadder429(t *testing.T) {
 		t.Errorf("requests = %d, want 3", n)
 	}
 	// retry-after:1s x2 honored verbatim (well above the 5ms backoff base).
+	// Measured threshold: the two retry-after:1s hints sum to 2s; the 1.9s
+	// threshold leaves margin for scheduling jitter while still proving the
+	// hints were honored verbatim (a non-honoring backoff would return in
+	// ~10ms with the injected 5ms base).
 	if elapsed < 1900*time.Millisecond {
-		t.Errorf("elapsed = %v, want >= 2s (retry-after honored)", elapsed)
+		t.Errorf("elapsed = %v, want >= 1.9s (retry-after honored)", elapsed)
 	}
 }
 
@@ -411,15 +415,22 @@ func TestGoldenCancellationMidStream(t *testing.T) {
 	if stop.Type != llm.EvDone {
 		t.Fatalf("last event = %s, want done", stop.Type)
 	}
-	// A Stop{cancelled} must precede Done.
-	sawCancelled := false
+	// A Stop{cancelled} must precede Done, and cancellation is NOT a failure:
+	// the stream must contain no Error event at all.
+	sawCancelled, sawError := false, false
 	for _, ev := range events {
-		if ev.Type == llm.EvStop && ev.Stop == llm.StopCancelled {
+		switch {
+		case ev.Type == llm.EvStop && ev.Stop == llm.StopCancelled:
 			sawCancelled = true
+		case ev.Type == llm.EvError:
+			sawError = true
 		}
 	}
 	if !sawCancelled {
 		t.Errorf("no Stop{cancelled} in %d events", len(events))
+	}
+	if sawError {
+		t.Errorf("cancellation stream contains an Error event (must be a clean end): %v", events)
 	}
 	if len(events) >= 32 {
 		t.Errorf("stream ran to completion despite cancellation (%d events)", len(events))
