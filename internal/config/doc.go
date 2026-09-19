@@ -1,4 +1,4 @@
-// Package config owns config.toml as the single source of truth (SPEC-01 §3;
+// Package config owns config.toml as the single source of truth (SPEC-01 sec 3;
 // D6/D36, C15): schema, validation with line numbers, hot reload, migration.
 //
 // Responsibilities:
