@@ -1,0 +1,43 @@
+# 17 — risk module: C19 RiskAssessor, R1–R9 rule set, fail-closed fusion
+
+**Status:** ready-for-agent
+**Claimed by:** —
+**Last update:** 2026-09-19
+**Blocked by:** 03-skeleton-runtime-rules
+**Parallel slots:** ≤2 sub-agents (A: assessor core + fusion; B: R2–R9 rule implementations +
+test matrix)
+**Spec refs:** SPEC-06 §2–§3, D4, D31②, C19, D39 C19 table, 16.9#5
+
+## What to build
+`risk` module's central risk assessor: the ONLY authority for risk decisions. Built-in rule set
+R1–R9 is the decider; plugin/manifest declarations are inputs (R1 = lower bound, never
+conclusion); multi-assessor fusion takes max severity; any assessor panic/absence → fail-closed
+L2 (R9).
+
+## Key constraints
+- Rules exactly per SPEC-06 §3 table: R1 declared level (input-only); R2 path-in-allowlist
+  (needs 18's PathResolver — stub interface now, integrate later); R3 sensitive-path A/B
+  (interface now, real lists in 18); R4 Provenance taint-hit (interface now, real in 19);
+  R5 network target (allowlist/private-ranges/protocols); R6 shell argv meta-chars; R7 batch
+  scale ≥50 files → L2; R8 irreversibility (delete/overwrite/power/close-window/send-class);
+  R9 fail-closed L2.
+- Fusion = max severity; single rejection beats any allow. Rule-set changes = contract change
+  (human approval) — encode rule IDs as data, stable and reviewable.
+- Output type: `{level, rules_hit[], reason}` — the confirmation card (21/37) renders rules_hit
+  verbatim ("R4: 包含来自 web.fetch 的内容").
+- Pluggable assessor interface (RESERVED guardian scoring attaches here later; do NOT implement).
+- Agent-loop integration point defined: ToolProvider calls `risk.Assess(tool, params, context)`
+  before execution; loop consumes decision (loop-side wiring lands 20/21).
+- Unit tests: per rule one positive + one negative + panic-injection (R9) + fusion max.
+
+## Out of scope
+- PathResolver implementation (18); taint engine (19); approval UI/queue (21); plugin manifests.
+
+## Acceptance criteria
+- [ ] Rule matrix: each R1–R9 positive/negative/edge case passes (table-driven).
+- [ ] Panic in any sub-assessor → R9 L2 fail-closed (no decision path returns L0/L1 on error).
+- [ ] Fusion: conflicting severities → max wins; send-class via R8 overrides a declared L0.
+- [ ] Decision object includes rules_hit + human-readable reason (golden snapshots).
+- [ ] Contract-freeze note: rule IDs + semantics documented as frozen; doc committed.
+
+## Progress log (append-only, newest last)
