@@ -84,6 +84,6 @@ func cmdRun(args []string) {
 // printVersions writes the common version block (prefix used by callers).
 func printVersions(prefix string) {
 	fmt.Printf("%swisp %s (%s, built %s)\n", prefix, buildinfo.Version, buildinfo.Commit, buildinfo.BuildDate)
-	fmt.Printf("%sWISP_ENV=%s (data dir rules: SPEC-03 §5)\n", prefix, buildinfo.Env())
+	fmt.Printf("%sWISP_ENV=%s (data dir rules: SPEC-03 §5)\n", prefix, buildinfo.EnvString())
 	fmt.Printf("%ssherpa-onnx runtime version: %s\n", prefix, sherpa.GetVersion())
 }

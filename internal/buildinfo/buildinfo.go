@@ -27,9 +27,10 @@ var (
 // lands; key material must never be committed to the repo, hence placeholder.
 const MinisignPublicKey = "PLACEHOLDER-C29-MINISIGN-PUBLIC-KEY"
 
-// Env resolves the effective WISP_ENV: the environment variable wins over the
-// build-time default (SPEC-03 §5.1).
-func Env() string {
+// EnvString resolves the effective WISP_ENV as a raw string: the environment
+// variable wins over the build-time default (SPEC-03 §5.1). Prefer ResolveEnv
+// for the typed, strictly-validated form (env.go).
+func EnvString() string {
 	if e := os.Getenv("WISP_ENV"); e != "" {
 		return e
 	}

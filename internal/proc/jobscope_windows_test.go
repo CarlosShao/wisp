@@ -10,6 +10,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"golang.org/x/sys/windows"
 )
 
 // testHelper is a re-executed instance of this test binary running
@@ -64,6 +66,23 @@ func TestHelperProcess(t *testing.T) {
 		for i := 0; i < 600; i++ {
 			time.Sleep(50 * time.Millisecond)
 		}
+	case "single-instance-holder":
+		// Acquire the single-instance mutex named by the parent, print
+		// READY, wait for the activation event (max 30s), print ACTIVATED
+		// and exit - the ticket 03 second-instance acceptance.
+		si, err := AcquireSingleInstance(
+			os.Getenv("WISP_HELPER_MUTEX"), os.Getenv("WISP_HELPER_EVENT"))
+		if err != nil {
+			fmt.Printf("ACQUIRE-FAILED: %v\n", err)
+			os.Exit(3)
+		}
+		fmt.Println("READY")
+		if code, err := windows.WaitForSingleObject(si.ActivateEvent(), 30_000); err != nil || code != windows.WAIT_OBJECT_0 {
+			fmt.Printf("WAIT-FAILED: code=%d err=%v\n", code, err)
+			os.Exit(4)
+		}
+		fmt.Println("ACTIVATED")
+		_ = si.Release()
 	default:
 		t.Skip("helper process mode not set")
 	}

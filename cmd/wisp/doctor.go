@@ -40,7 +40,7 @@ func cmdDoctor() bool {
 
 	// Build identity.
 	info("wisp build", fmt.Sprintf("version=%s commit=%s built=%s WISP_ENV=%s",
-		buildinfo.Version, buildinfo.Commit, buildinfo.BuildDate, buildinfo.Env()))
+		buildinfo.Version, buildinfo.Commit, buildinfo.BuildDate, buildinfo.EnvString()))
 	info("Go runtime", fmt.Sprintf("%s (toolchain pinned by go.mod)", runtime.Version()))
 	info("C29 minisign public key", buildinfo.MinisignPublicKey+
 		" (placeholder until C29 lands; hardcoded into buildinfo per SPEC-11 §7.3)")
@@ -98,7 +98,7 @@ func cmdDoctor() bool {
 	}
 
 	// Data dir writable (SPEC-03 §5.2).
-	env := buildinfo.Env()
+	env := buildinfo.EnvString()
 	dir := resolveDataDir(env)
 	if err := probeWritable(dir); err != nil {
 		fail("data dir writable ("+env+")", dir+": "+err.Error())
@@ -257,7 +257,7 @@ func probeWritable(dir string) error {
 }
 
 func dataDirForDisplay() string {
-	return resolveDataDir(buildinfo.Env())
+	return resolveDataDir(buildinfo.EnvString())
 }
 
 func gccVersion() (string, error) {
