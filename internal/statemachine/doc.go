@@ -3,16 +3,18 @@
 //
 // Responsibilities:
 //   - the 20 BallState values (see states.go)
-//   - the authoritative D43 transition table (40 edges) and per-state timeouts
-//   - "transitions not listed are illegal" enforcement (D22 gate 3)
+//   - the authoritative D43 transition table (table.go: the 40 frozen rows
+//     plus SPEC-08 §3's appended #41/#42) and the per-state timeout table
+//     (timeouts.go)
+//   - "transitions not listed are illegal" enforcement (D22 gate 3):
+//     Machine.Dispatch rejects unknown (state, event) pairs loudly
+//   - side effects fire as Effect events on an injectable Sink; the default
+//     sink is an explicit no-op - execution belongs to later tickets
 //
 // Non-responsibilities:
-//   - no capabilities of its own: it never touches audio, LLM, tools or UI;
-//     side effects listed in D43 guards are executed by callers
+//   - no capabilities of its own: it never touches audio, LLM, tools or UI
 //   - no error-class knowledge beyond what observe defines (mapping lives in
 //     observe per D37)
 //
-// Ticket 03 only pins the State vocabulary (states.go). The Idle-only
-// placeholder is intentional: transitions and the per-state timeout table are
-// implemented by ticket 07 (D43).
+// Implemented by ticket 07; ticket 03 pinned only the State vocabulary.
 package statemachine

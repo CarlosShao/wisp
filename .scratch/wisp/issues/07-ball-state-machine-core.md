@@ -59,3 +59,16 @@ basic animations; full visual polish gate is human acceptance at 12).
 
 ## Progress log (append-only, newest last)
 - [2026-09-19T10:41:26Z] agent=orchestrator claimed=T07-impl did=dispatched (maintain 2-way concurrency floor) next=sub-agent works through acceptance criteria
+- [2026-09-19T11:20:00Z] agent=T07-impl did=statemachine-core next=ball-window-unit
+  internal/statemachine implemented (table-driven): table.go = 42 encoded rows = the 40 frozen D43
+  rows + SPEC-08 §3 appended #41 (Path C barge-in) / #42 (Conversation task intent); guard-branched
+  rows encoded as adjacent entries sharing one number. machine.go = Dispatch with mutex, loud
+  IllegalTransitionError on unknown (state,event), guard-all-fail also rejected; at most ONE runtime
+  timer, armed only for timeout-table states (Listening 15s/90s/30s by phase pinned by the entering
+  row, Confirming 3s [SPEC-06 L1 2-3s upper bound], Warm 90s, Settling 3s, AwaitingApproval 300s,
+  Error 10s); Sleeping provably zero timers (TimersAlive()==0 asserted). Effects fire as events on
+  injectable Sink, default explicit no-op. Tests: row presence 1..42, every legal edge fires
+  (state+phase+side-effect spy), full 20x37 illegal matrix rejected (>>20 rejections), timeout table
+  table-driven, Sleeping zero-timer, warm/settling/listening timer fire + stale-fire guard.
+  go vet + go test green. Note: Listening timeout phase is a machine-internal pinned by entering row
+  (#4/#7/#33 first-round, #29/#27 in-session, #28/#30/#41 conversation).
