@@ -72,3 +72,16 @@ basic animations; full visual polish gate is human acceptance at 12).
   table-driven, Sleeping zero-timer, warm/settling/listening timer fire + stale-fire guard.
   go vet + go test green. Note: Listening timeout phase is a machine-internal pinned by entering row
   (#4/#7/#33 first-round, #29/#27 in-session, #28/#30/#41 conversation).
+- [2026-09-19T11:35:00Z] agent=T07-impl did=c21-native-tokens next=ball-window-renderer
+  internal/ball foundation committed: tokens.go (C21 native palette: full dark+light tables verbatim
+  from design/assets/tokens.css; Color=straight RGBA + Premultiplied() for ULW; geometry/motion
+  consts incl. 30fps cap MinFrameMs, Warm 2.4s 0.55<->0.7 alpha-path band, Settling 260ms fade),
+  statevisual.go (VisualFor: all 20 states -> SPEC-08 §2.1 recipe; Conversation ring 2px > Confirming
+  1.5px pinned; Sleeping fixed 12px/0.35 ignoring user size), anim.go (AnimationPolicy: Sleeping =
+  AnimNone/0ms zero-timer; loops only in the 5 active states; Warm = AnimAlpha compositor path at
+  10fps; Settling = one-shot AnimFade - documented SPEC-sanctioned exceptions), hit.go (inscribed-
+  circle hit test, corners HTTRANSPARENT; DPI-injectable WindowEdgePx = orb+2*margin).
+  Cross-check table: docs/evidence/s1/c21-native-tokens.md (token <-> CSS value <-> Go symbol, both
+  themes + geometry/motion). Machine guard: TestNoHardcodedColorsInBallPackage (only tokens.go may
+  carry color literals) + token golden values + 20-state visual coverage + anim policy incl. zero
+  timer in Sleeping + hit/DPI tests. go vet/test green.

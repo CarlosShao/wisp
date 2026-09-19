@@ -1,0 +1,275 @@
+package ball
+
+// C21 DesignTokens native side (SPEC-08 §2 "所有颜色/圆角/阴影/缓动必须取自
+// C21 DesignTokens；design/assets/tokens.css 为唯一样式真相源").
+//
+// This file is the machine-checked twin of design/assets/tokens.css: every
+// value below is copied verbatim from the CSS custom properties listed in
+// docs/evidence/s1/c21-native-tokens.md (the cross-check document). Drawing
+// code in this package references ONLY these values - a hardcoded hex/rgb
+// literal in any other ball file is a review-rejecting violation (ticket 07
+// constraint; grep-audited by TestNoHardcodedColorsInBallPackage).
+//
+// Both themes ship (D29 wallpaper adaptivity): Dark is the default, Light is
+// the "白玻璃" counterpart from the [data-theme="light"] block. Tokens the
+// light block does not redefine (onSolid, ballHalo) carry the root values.
+
+// Theme selects the active palette (system theme follow lands with the
+// settings wiring; the ball API takes it as a value so the renderer stays
+// testable).
+type Theme uint8
+
+const (
+	ThemeDark Theme = iota
+	ThemeLight
+)
+
+// Color is a straight (non-premultiplied) RGBA color, 0..1 channels - the
+// D2D1_COLOR_F shape. Premultiplied forms are derived where a bitmap needs
+// them (ULW path), never stored.
+type Color struct {
+	R, G, B, A float32
+}
+
+// rgba builds a Color from 0..255 channels plus straight alpha 0..1.
+func rgba(r, g, b uint8, a float32) Color {
+	return Color{float32(r) / 255, float32(g) / 255, float32(b) / 255, a}
+}
+
+// hex builds a Color from a packed 0xRRGGBB value plus straight alpha 0..1.
+func hex(rgb uint32, a float32) Color {
+	return rgba(uint8(rgb>>16)&0xFF, uint8(rgb>>8)&0xFF, uint8(rgb)&0xFF, a)
+}
+
+// WithAlpha returns the same RGB with alpha replaced (opacity layering).
+func (c Color) WithAlpha(a float32) Color { return Color{c.R, c.G, c.B, a} }
+
+// Premultiplied returns the premultiplied form used by 32bpp ARGB bitmaps
+// (UpdateLayeredWindow expects premultiplied alpha).
+func (c Color) Premultiplied() Color {
+	return Color{c.R * c.A, c.G * c.A, c.B * c.A, c.A}
+}
+
+// Palette is the ball-relevant slice of C21, per theme. Field comments name
+// the CSS custom property; the values are the dark/light rows of
+// design/assets/tokens.css (checked against the CSS by the evidence table).
+type Palette struct {
+	// Surfaces and glass edges.
+	BGInset     Color // --bg-inset     rgba(6,8,11,.38) | rgba(20,24,28,.06)
+	BGOverlay   Color // --bg-overlay   rgba(30,36,44,.50) | rgba(255,255,255,.72)
+	GlassRing   Color // --glass-ring   rgba(255,255,255,.14) | rgba(255,255,255,.66)
+	GlassHi     Color // --glass-hi     rgba(255,255,255,.18) | rgba(255,255,255,.90)
+	GlassHiSoft Color // --glass-hi-soft rgba(255,255,255,.08) | rgba(255,255,255,.60)
+	BorderSoft  Color // --border-soft  rgba(255,255,255,.10) | rgba(16,20,24,.12)
+
+	// Text.
+	FgPrimary   Color // --fg-primary   #F2F3F5 | #17191C
+	FgSecondary Color // --fg-secondary #A6A9B0 | #55585F
+	FgTertiary  Color // --fg-tertiary  #71747C | #82858C
+
+	// Semantic colors (all low-saturation per SPEC-08 §6 rule 1).
+	Accent      Color // --accent       #86C2B9 | #3E837A
+	AccentLine  Color // --accent-line  rgba(134,194,185,.36) | rgba(62,131,122,.38)
+	Danger      Color // --danger       #E07A70 | #BC544C
+	DangerLine  Color // --danger-line  rgba(224,122,112,.38) | rgba(188,84,76,.36)
+	Warn        Color // --warn         #D9B26A | #96762C
+	WarnLine    Color // --warn-line    rgba(217,178,106,.38) | rgba(150,118,44,.36)
+	Success     Color // --success      #7DB896 | #47805F
+	SuccessLine Color // --success-line rgba(125,184,150,.38) | rgba(71,128,95,.36)
+	Info        Color // --info         #8AAAD2 | #4A6C96
+	InfoLine    Color // --info-line    rgba(138,170,210,.38) | rgba(74,108,150,.36)
+	Warm        Color // --warm         #D6B184 | #8F6E3C
+	WarmLine    Color // --warm-line    rgba(214,177,132,.38) | rgba(143,110,60,.36)
+
+	// Orb glass (SPEC-08 §2.1 base form: "自发光玻璃滴").
+	OrbHi     Color // --orb-hi     rgba(255,255,255,.90) | rgba(255,255,255,.96)
+	OrbBody   Color // --orb-body   rgba(255,255,255,.30) | rgba(255,255,255,.62)
+	OrbBody2  Color // --orb-body-2 rgba(255,255,255,.07) | rgba(255,255,255,.24)
+	OrbRim    Color // --orb-rim    rgba(255,255,255,.30) | rgba(20,24,28,.16)
+	OrbShadow Color // --orb-shadow rgba(0,0,0,.45) | rgba(20,24,28,.20)
+	BallHalo  Color // --ball-halo  rgba(255,255,255,.10) (not redefined in light)
+
+	// Per-state glow tints (v2 "核心发光色" pairs).
+	TintAccentHi   Color // --tint-accent-hi   #C4E8E2 | #7FB5AC
+	TintSuccessHi  Color // --tint-success-hi  #BFE3CF | #7FAE93
+	TintSuccessLo  Color // --tint-success-lo  #4E8A69 | #35624A
+	TintWarmHi     Color // --tint-warm-hi     #F0DCB8 | #C2A071
+	TintWarmLo     Color // --tint-warm-lo     #96794C | #6E5732
+	TintWarnHi     Color // --tint-warn-hi     #F0DCB8 | #B99A4E
+	TintWarnLo     Color // --tint-warn-lo     #8F7434 | #6B5522
+	TintDangerHi   Color // --tint-danger-hi   #F3C0BA | #C57E76
+	TintDangerLo   Color // --tint-danger-lo   #9C4A43 | #83372F
+	TintNeutralHi  Color // --tint-neutral-hi  #B9BCC4 | #9C9FA6
+	TintNeutralMid Color // --tint-neutral-mid #6A6D75 | #71747B
+	TintNeutralLo  Color // --tint-neutral-lo  #3E4148 | #4A4D54
+
+	// Foreground on solid fills (badge digits, icons on tinted orb).
+	OnSolid Color // --on-solid #FFFFFF (not redefined in light)
+}
+
+// DarkPalette returns the :root palette of tokens.css.
+func DarkPalette() Palette {
+	return Palette{
+		BGInset:     rgba(6, 8, 11, 0.38),
+		BGOverlay:   rgba(30, 36, 44, 0.50),
+		GlassRing:   rgba(255, 255, 255, 0.14),
+		GlassHi:     rgba(255, 255, 255, 0.18),
+		GlassHiSoft: rgba(255, 255, 255, 0.08),
+		BorderSoft:  rgba(255, 255, 255, 0.10),
+
+		FgPrimary:   hex(0xF2F3F5, 1),
+		FgSecondary: hex(0xA6A9B0, 1),
+		FgTertiary:  hex(0x71747C, 1),
+
+		Accent:      hex(0x86C2B9, 1),
+		AccentLine:  rgba(134, 194, 185, 0.36),
+		Danger:      hex(0xE07A70, 1),
+		DangerLine:  rgba(224, 122, 112, 0.38),
+		Warn:        hex(0xD9B26A, 1),
+		WarnLine:    rgba(217, 178, 106, 0.38),
+		Success:     hex(0x7DB896, 1),
+		SuccessLine: rgba(125, 184, 150, 0.38),
+		Info:        hex(0x8AAAD2, 1),
+		InfoLine:    rgba(138, 170, 210, 0.38),
+		Warm:        hex(0xD6B184, 1),
+		WarmLine:    rgba(214, 177, 132, 0.38),
+
+		OrbHi:     rgba(255, 255, 255, 0.90),
+		OrbBody:   rgba(255, 255, 255, 0.30),
+		OrbBody2:  rgba(255, 255, 255, 0.07),
+		OrbRim:    rgba(255, 255, 255, 0.30),
+		OrbShadow: rgba(0, 0, 0, 0.45),
+		BallHalo:  rgba(255, 255, 255, 0.10),
+
+		TintAccentHi:   hex(0xC4E8E2, 1),
+		TintSuccessHi:  hex(0xBFE3CF, 1),
+		TintSuccessLo:  hex(0x4E8A69, 1),
+		TintWarmHi:     hex(0xF0DCB8, 1),
+		TintWarmLo:     hex(0x96794C, 1),
+		TintWarnHi:     hex(0xF0DCB8, 1),
+		TintWarnLo:     hex(0x8F7434, 1),
+		TintDangerHi:   hex(0xF3C0BA, 1),
+		TintDangerLo:   hex(0x9C4A43, 1),
+		TintNeutralHi:  hex(0xB9BCC4, 1),
+		TintNeutralMid: hex(0x6A6D75, 1),
+		TintNeutralLo:  hex(0x3E4148, 1),
+
+		OnSolid: hex(0xFFFFFF, 1),
+	}
+}
+
+// LightPalette returns the [data-theme="light"] palette of tokens.css.
+func LightPalette() Palette {
+	p := DarkPalette() // values the light block does not redefine carry over
+	p.BGInset = rgba(20, 24, 28, 0.06)
+	p.BGOverlay = rgba(255, 255, 255, 0.72)
+	p.GlassRing = rgba(255, 255, 255, 0.66)
+	p.GlassHi = rgba(255, 255, 255, 0.90)
+	p.GlassHiSoft = rgba(255, 255, 255, 0.60)
+	p.BorderSoft = rgba(16, 20, 24, 0.12)
+
+	p.FgPrimary = hex(0x17191C, 1)
+	p.FgSecondary = hex(0x55585F, 1)
+	p.FgTertiary = hex(0x82858C, 1)
+
+	p.Accent = hex(0x3E837A, 1)
+	p.AccentLine = rgba(62, 131, 122, 0.38)
+	p.Danger = hex(0xBC544C, 1)
+	p.DangerLine = rgba(188, 84, 76, 0.36)
+	p.Warn = hex(0x96762C, 1)
+	p.WarnLine = rgba(150, 118, 44, 0.36)
+	p.Success = hex(0x47805F, 1)
+	p.SuccessLine = rgba(71, 128, 95, 0.36)
+	p.Info = hex(0x4A6C96, 1)
+	p.InfoLine = rgba(74, 108, 150, 0.36)
+	p.Warm = hex(0x8F6E3C, 1)
+	p.WarmLine = rgba(143, 110, 60, 0.36)
+
+	p.OrbHi = rgba(255, 255, 255, 0.96)
+	p.OrbBody = rgba(255, 255, 255, 0.62)
+	p.OrbBody2 = rgba(255, 255, 255, 0.24)
+	p.OrbRim = rgba(20, 24, 28, 0.16)
+	p.OrbShadow = rgba(20, 24, 28, 0.20)
+
+	p.TintAccentHi = hex(0x7FB5AC, 1)
+	p.TintSuccessHi = hex(0x7FAE93, 1)
+	p.TintSuccessLo = hex(0x35624A, 1)
+	p.TintWarmHi = hex(0xC2A071, 1)
+	p.TintWarmLo = hex(0x6E5732, 1)
+	p.TintWarnHi = hex(0xB99A4E, 1)
+	p.TintWarnLo = hex(0x6B5522, 1)
+	p.TintDangerHi = hex(0xC57E76, 1)
+	p.TintDangerLo = hex(0x83372F, 1)
+	p.TintNeutralHi = hex(0x9C9FA6, 1)
+	p.TintNeutralMid = hex(0x71747B, 1)
+	p.TintNeutralLo = hex(0x4A4D54, 1)
+	return p
+}
+
+// PaletteFor returns the palette of a theme.
+func PaletteFor(t Theme) Palette {
+	if t == ThemeLight {
+		return LightPalette()
+	}
+	return DarkPalette()
+}
+
+// Geometry + motion tokens (CSS lengths/ms verbatim; px at 96 DPI, scaled by
+// the per-monitor DPI before use - never rescaled at call sites).
+const (
+	// --ball-size / --ball-sm / --ball-lg (config range 44-72, default 56).
+	BallSizeDefaultPx = 56
+	BallSizeSmallPx   = 44
+	BallSizeLargePx   = 72
+	BallSizeMinPx     = 44 // [ball] size_min
+	BallSizeMaxPx     = 72 // [ball] size_max
+
+	// Sleeping micro-dot: SPEC-08 §2 - "Sleeping 态直径缩到 12px 微点
+	// (opacity 0.35)"; ball.html pins it at 12px regardless of user size.
+	SleepingDotPx = 12
+	SleepOpacity  = 0.35
+
+	// --dur-fast/base/slow. Motion budget: no duration above 300ms in UI
+	// motion; per-state animation PERIODS (2.4s breathing etc.) are loops
+	// sanctioned by SPEC-08 §2, not UI transitions.
+	DurFastMs = 120
+	DurBaseMs = 180
+	DurSlowMs = 260
+
+	// Animation periods (SPEC-08 §2.1 / ball.html).
+	WarmBreathPeriodMs   = 2400 // Warm 2.4s opacity 0.55<->0.7
+	SpeakingBreathMs     = 1600 // Speaking success breathe 1.6s
+	ListeningWaveMs      = 2400 // three staggered rings, 0.8s offsets
+	ThinkingSweepMs      = 1200 // bottom 2px light band, 1.2s
+	ConfirmingPulseMs    = 2000 // danger pulse ring 2s
+	FirstRunGuidePulseMs = 2600 // guide pulse 2.6s
+	SettlingFadeMs       = 260  // opacity 1 -> 0.35 fade (SPEC-08 §2.1)
+
+	// Warm breathing opacity band (SPEC-08 §2.1).
+	WarmOpacityLow  = 0.55
+	WarmOpacityHigh = 0.70
+
+	// Frame cap: <=30fps (ticket 07 animation discipline).
+	MaxAnimFPS    = 30
+	MinFrameMs    = 1000 / MaxAnimFPS // 33ms
+	WarmBreathFPS = 10                // compositor-friendly slow tick for Warm
+
+	// Stroke weights.
+	SlashStrokePx    = 1.5 // Muted slash (SPEC-08 §2.1)
+	IconStrokePx     = 1.5 // Lucide-style icon stroke (SPEC-08 §6 rule 10)
+	RingStrokePx     = 1.5 // Listening/Confirming ring width (ball.html)
+	ConvRingStrokePx = 2.0 // Conversation ring "不得弱于 Confirming"
+	ThinkingBandPx   = 2.0 // Thinking bottom light band height
+
+	// Badge/dot geometry (ball.html: 17px min-width badge, 9px queue dot).
+	BadgeDiameterPx = 17
+	BadgeFontPx     = 10
+	BadgeBorderPx   = 2
+	QueueDotPx      = 9
+
+	// Fonts: --font-sans family stack head + sizes used by the ball.
+	FontFamily      = "Microsoft YaHei UI" // --font-sans CJK head on Windows
+	FontSizeMonoPx  = 12.5                 // --t-mono
+	FontSizeMicroPx = 11                   // --t-micro (digits/latin only)
+	CountdownFontPx = 10                   // micro countdown digits under the ring
+)
