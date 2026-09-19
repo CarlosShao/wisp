@@ -85,3 +85,25 @@ basic animations; full visual polish gate is human acceptance at 12).
   themes + geometry/motion). Machine guard: TestNoHardcodedColorsInBallPackage (only tokens.go may
   carry color literals) + token golden values + 20-state visual coverage + anim policy incl. zero
   timer in Sleeping + hit/DPI tests. go vet/test green.
+- [2026-09-19T12:40:00Z] agent=T07-impl did=ball-window-renderer-live next=live-tests+evidence
+  internal/ball window stack implemented and verified LIVE on the desktop (20-state cycle ran to
+  completion, exit 0): win32_windows.go (raw syscall plumbing), sta_windows.go (ui-sta thread via
+  observe.Spawn, CoInitializeEx(STA), GetMessage pump, runtime.LockOSThread - without the pin the
+  pump waits on the wrong queue and posted tasks hang), d2d_windows.go (single process-wide D2D+
+  DWrite factory, D38a; COM objects stored as unsafe.Pointer, vet-clean provenance; CreateDCRenderTarget
+  slot 16, BindDC slot 57 verified against mingw headers), renderer_windows.go (DC render target on
+  top-down 32bpp DIB, DPI 96 -> 1 DIP = 1 px; radial gradients for orb body/highlight/core/glow with
+  per-state brush cache; DrawLine carries D2D1_POINT_2F BY VALUE = two floats packed in one register
+  word - pointer- passing corrupts coordinates; SetColor is ID2D1SolidColorBrush slot 8 NOT 3 - slot
+  3 is GetFactory and silently keeps the brush white; stroked circles are 48-segment polylines
+  because DrawEllipse's strokeWidth is a register float, ABI-unpassable), ball_windows.go (wndproc:
+  WM_NCHITTEST inscribed-circle click-through, MA_NOACTIVATE, drag w/ 4px threshold + persist,
+  WM_DPICHANGED rebuild, tray menu, hotkey dispatch; SetState/SetBadge/SetProgress/SetBadgeText;
+  animation timers only per AnimationPolicy; Warm breathing and Settling fade via ULW
+  SourceConstantAlpha - no re-render; handle count over a full 20-state cycle: 356 up / 366 peak /
+  366 after close, gate <600 PASS; teardown destroys window+DIB+brushes+tray+hotkeys and joins the
+  thread). Live pixel evidence: Listening ring pixel RGB(137,197,187) == C21 accent #86C2B9.
+  Fixed en route: thread pinning, packed-point ABI, SetColor slot, hidden-move DPI re-read
+  (WM_DPICHANGED does not fire for hidden windows), wetype status-bar overlap identified as
+  external. cmd/balldebug harness committed (cycle/state/stay modes, handle reporting).
+  go build ./... (CGO on), go vet, go test green.

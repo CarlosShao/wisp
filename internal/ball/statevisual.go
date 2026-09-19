@@ -38,6 +38,7 @@ type Visual struct {
 	QueueDot   bool    // bottom-left info dot (Queued overlay)
 	Progress   float32 // 0..1: downloading ring progress; <0 = no progress ring
 	BadgeText  string  // non-empty: center text override (countdown / percent)
+	Sweep      bool    // Thinking: flowing 2px band at the orb bottom
 }
 
 // stateSize returns the configured orb size clamped to the token range.
@@ -86,6 +87,7 @@ func VisualFor(p Palette, configuredPx int, s statemachine.State, fadeProgress f
 		// the band position; color fixed).
 		v.CoreColor = p.Accent
 		v.CoreAlpha = 0.35
+		v.Sweep = true
 	case statemachine.StateActing:
 		v.CoreColor = p.Accent
 		v.CoreAlpha = 0.95
