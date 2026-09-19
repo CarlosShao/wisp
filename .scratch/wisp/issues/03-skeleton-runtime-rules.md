@@ -1,8 +1,8 @@
 # 03 — Project skeleton, runtime rules, error model, goroutine registry
 
-**Status:** ready-for-agent
-**Claimed by:** —
-**Last update:** 2026-09-19
+**Status:** in-progress
+**Claimed by:** orchestrator -> sub-agent T03-impl
+**Last update:** 2026-09-19T06:32:38Z
 **Blocked by:** 01-build-chain
 **Parallel slots:** ≤2 sub-agents (A: package scaffolding + buildinfo; B: goroutine registry +
 error model + clock/instance/Job utilities)
@@ -52,3 +52,4 @@ Job Object (C30), DisposalScope (C11), and the WISP_ENV selection logic (values 
 - [ ] Second-instance test: launching twice → second exits after signalling first.
 
 ## Progress log (append-only, newest last)
+- [2026-09-19T06:32:38Z] agent=orchestrator claimed=T03-impl did=dispatched (parallel with T01-adv) next=sub-agent works through acceptance criteria
