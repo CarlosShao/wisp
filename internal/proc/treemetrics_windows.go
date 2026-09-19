@@ -94,7 +94,7 @@ func (r *TreeSampler) ReadTree() (observe.TreeMetrics, error) {
 	// into a silent 0-byte pass).
 	var snap map[uint32]sysProcSample
 	var lastErr error
-	for attempt := 0; attempt < 20; attempt++ {
+	for attempt := 0; attempt < 60; attempt++ {
 		snap, err = systemProcessSnapshot()
 		if err != nil {
 			lastErr = err
