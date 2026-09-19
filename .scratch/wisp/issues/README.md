@@ -55,6 +55,12 @@ All tickets are **vertical tracer bullets**; work the **frontier** (all blockers
   **59 p15-aec-spike (13) → 阻塞 26/28/32 的 Path C 部分与 60**；
   **60 c32-realtime-engine (16,28,44,59；门控双条件：59 通过 + 用户有 Key，缺一自动推迟登记)**。
   ⚠ 编号惯例说明：后补票用更大编号以保持文件名稳定，忽略编号与拓扑序的差异，以 Blocked by 为准。
+- **LLM 接入补充（2026-09-19 用户批准）**：
+  **61 cloud-voice-providers-C9 (16,11,05)** —— 云级联 ASR/TTS（语音模型下拉的落地层，
+  候选 StepAudio 2.5 ASR / StepAudio 3 TTS）；配套修订：票 05/09/11/40/44/60 均已注入
+  目录/能力位/计费模式/配额三层/兜底链/角色化默认/probe/限流要求；
+  SPEC-02（provider_health v2 表）、SPEC-03 §3.1、SPEC-05 §3.3a、SPEC-12 登记表（云端语音
+  DEFERRED→已采纳·提前）同步。
 
 ⚠ **Safety-incomplete period**: tickets 21–32 run with `TaskScheduler` single-task only;
 multi-task concurrency unlocks only at 47 (SPEC-12 §2).

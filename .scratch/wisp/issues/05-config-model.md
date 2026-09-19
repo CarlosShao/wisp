@@ -30,6 +30,16 @@ file-watch hot reload, schema migration with backup, and the security-section lo
 - Migration: `schema_version` key; auto-migrate + backup `config.toml.bak-<ver>`; unmigratable →
   Unconfigured + explicit guidance, never silently reset (would wipe allowlists = security bug).
 - Defaults live ONLY in struct tags; TOML is serialization (D36 rule 3).
+- **LLM catalog schema v2 (2026-09-19 user-approved supplement, SPEC-03 §3.1)**: `[llm]` carries
+  `text_chain[]` (ordered fallback), `roles.{chat,memory_extract,handoff,summarize}` (per-role
+  model+temperature+thinking_intensity), `providers.<name>` with `protocol/billing(plan|
+  pay-per-token)/plan_credit_total_micro/compat{loose,allow_missing_usage,extra_headers}/rpm/tpm`
+  and `models.<id>` with `capabilities{...}/context_window/max_output_tokens/price{...}/
+  quota_daily_micro/quota_monthly_micro`; `[voice]` carries `realtime{...}` + `cloud_asr_chain[]` +
+  `cloud_tts_chain[]` (local sherpa cascade = final fallback, never in chain). Chain elements must
+  reference existing provider/model pairs (unknown → error naming the element). Storage split:
+  catalog/quota = config.toml; probe/health = SQLite `provider_health` (SPEC-02 schema v2) —
+  enforce the boundary in the structs.
 
 ## Out of scope
 - SecretStore resolution of `api_key_ref` (06); GUI editor (39); risk enforcement (17+).
@@ -41,5 +51,10 @@ file-watch hot reload, schema migration with backup, and the security-section lo
 - [ ] Migration: v-1 fixture migrates, backup exists; corrupt fixture → Unconfigured, file untouched.
 - [ ] Hard-coded read-only fields reject writes with explicit errors.
 - [ ] Round-trip: load → marshal → load yields identical structs (GUI double-source guard).
+- [ ] Catalog tests: chain referencing unknown provider/model → error naming the element;
+      capabilities/billing/quota round-trip; voice chains validated; thinking_intensity enum
+      enforced; compat flag defaults.
+- [ ] Storage-boundary test: probe/health fields have no representation in config structs;
+      `provider_health` table exists per SPEC-02 schema v2.
 
 ## Progress log (append-only, newest last)

@@ -29,8 +29,17 @@ switching and the complete user-visible failure-semantics table (§14.2) enforce
 - No provider-specific logic may leak above the C5 interface (compile-level separation; review
   checks imports).
 
+- **Capability probe implementation (2026-09-19 supplement)**: real-request probes per capability
+  — tool_calls (minimal fc round-trip), vision (1×1 image), thinking (reasoning field present),
+  audio (only when a cloud voice provider exists, ticket 61); results → `provider_health` (SPEC-02
+  v2); "declared ✓ / measured ✗" surfaced to panel (40). **Compat flags consumption**: `compat.loose`
+  tolerates missing stream_options/usage/tool_choice per provider. **Rate-limit self-restraint**:
+  per-provider `rpm/tpm` local token bucket (before the provider 429s us); coordinates with tool
+  concurrency ≤4 (ticket 47).
+
 ## Out of scope
-- Ball/panel UI rendering of these states (ball shows via state events; panel later).
+- Ball/panel UI rendering of these states (ball shows via state events; panel later); quota
+  enforcement (44); voice providers (61).
 
 ## Acceptance criteria
 - [ ] Both adapters pass the same golden/fault test suite as OpenAI Chat (identical harness).
@@ -41,5 +50,9 @@ switching and the complete user-visible failure-semantics table (§14.2) enforce
       failure → Error(provider), ctx preserved, resumable.
 - [ ] Failure-semantics matrix: each §14.2 row has a test asserting the emitted user-visible
       event/state.
+- [ ] Probe suite: mockllm control endpoints emulate fc-capable / fc-broken / vision-capable
+      providers → probe results land in provider_health with correct ✓/✗; declared-vs-measured
+      mismatch event emitted.
+- [ ] Token bucket: rpm=10 fixture → 11th request within 60s waits locally (no 429 from server).
 
 ## Progress log (append-only, newest last)

@@ -31,7 +31,9 @@ clean handoff back to the text loop when the user asks the assistant to DO somet
   (Path T) executes the task under FULL gating; result returns via notify/TTS; realtime can
   resume. D43 #42 transition.
 - **Provider abstraction (C32 细化②)**: preset table + custom `base_url` (D8 pattern) — domestic
-  candidates (豆包 / Qwen-Omni realtime) and OpenAI Realtime (proxy) evaluated at build time;
+  candidates: **StepAudio 3 Realtime (FIRST candidate, user has StepFun account; note: it supports
+  Voice-Agent tool calls on the provider side — our ZERO-tool rule still forces it off), 豆包 /
+  Qwen-Omni realtime**, and OpenAI Realtime (proxy) evaluated at build time;
   provider differences hidden behind C32; `[voice] realtime{provider, model, api_key_ref,
   base_url}` config keys (hot/reload tiers per SPEC-03 conventions; add section row).
 - **Cost (C23)**: audio tokens metered in real time (in/out), same per-task/daily aggregation;

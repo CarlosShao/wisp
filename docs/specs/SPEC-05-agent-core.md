@@ -59,6 +59,20 @@ type ToolUsePart struct{ ID, Name string; Input json.RawMessage }
 type ToolResultPart struct{ ID string; Content []Content; IsError bool }
 ```
 
+### 3.3a Provider 目录、角色与兜底链（2026-09-19 用户批准，SPEC-03 §3.1 的运行侧）
+
+- **角色系统**：`roles.{chat, memory_extract, handoff, summarize}` 各自独立 model + temperature +
+  thinking_intensity；记忆提取/摘要允许挂便宜小模型（省钱且隔离缓存影响）。
+- **兜底链（取代单条 fallback_provider）**：`text_chain` 有序遍历——401/403/配额尽/5xx 重试耗尽
+  → 跳下一家；**配额耗尽的跳转必须产生用户可见事件**（悬浮球 + 面板），不得静默降级。
+- **voice 链**：`realtime → 云级联(C9) → 本地 sherpa 级联`；本地链零成本、永远最后（票 61/60）。
+- **限流自约束**：per-provider `rpm/tpm` → 本地令牌桶，在 provider 429 之前先自守规矩；
+  与工具并发 ≤4、任务调度协同。
+- **兼容开关**：`compat.loose` 等（SPEC-03 §3.1）由 adapter 消费——缺失字段按开关容忍或报错。
+- **探测（probe）**：tool_calls/vision/thinking/audio 逐项实测（票 11 实现）；结果写
+  `provider_health`（SPEC-02 schema v2）。「声明 ✓ 实测 ✗」必须可见。
+- `context_window` 挂在**模型条目**上（per-model，非 per-provider）——D15 全部阈值按它缩放。
+
 ### 3.4 重试与失败语义（§14.2，失败必须可见且可区分）
 
 | 情况 | 行为 | 用户看到 |
@@ -69,7 +83,7 @@ type ToolResultPart struct{ ID string; Content []Content; IsError bool }
 | 额度耗尽 | 不重试 | `Error` + 区分「网络问题」与「账户问题」 |
 | 流式中途断开 | 保留已收部分并标注不完整；未闭合 tool call 全判失败 | 面板显示部分内容 + 「响应中断」 |
 
-`fallback_provider`：`provider` 类错误重试耗尽后自动切换一次；再失败 → `Error(provider)`，
+`text_chain`（有序）：`provider` 类错误重试耗尽后切下一家，链尽 → `Error(provider)`，
 任务 ctx 保留、可从断点重试（D40#4）。
 网络细节：尊重系统代理（WinHTTP 默认）+ 支持 `HTTP(S)_PROXY`；企业 TLS 拦截时错误必须区分
 「证书不受信」与「连不上」（D42#4）。

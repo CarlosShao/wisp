@@ -27,6 +27,14 @@ summaries + budgets), plus Models and Diagnostics views.
   minimal SVG bars).
 - Models view: installed models with sizes + delete; download progress reuses Downloading
   state events; verify-signature status display (read-only).
+- **Model-management page (2026-09-19 supplement, LLM 接入)**: provider/model catalog CRUD
+  (config.toml is the truth source — page is its editor); **probe button** per model with
+  "declared ✓ / measured ✗" warnings from `provider_health`; per-model quota editing
+  (daily/monthly micro + billing mode plan/pay-per-token + plan credit total); **role assignment
+  dropdowns** (chat/memory_extract/handoff/summarize + realtime/cloud_asr/cloud_tts) filtered by
+  capability (voice roles list ONLY models with audio_in/audio_out/realtime bits); **text_chain /
+  voice chain drag-order editor**; per-provider health/last-error/latency display. All writes go
+  through `config.set` (security-section rules N/A here, hot tier).
 - Diagnostics view: export bundle button → preview checklist of included items (user reviews
   BEFORE export; §5.1) → produce bundle; "excludes audio/keys/transcripts by default" stated.
 - All pages stateless via resync; lists virtualized; empty/error/loading states per
@@ -43,6 +51,9 @@ summaries + budgets), plus Models and Diagnostics views.
 - [ ] Budget states: <80 normal, ≥80 warn, ≥100 paused (fixture by editing aggregates).
 - [ ] Diagnostics preview lists exactly the bundle contents; exported bundle verified to exclude
       audio/keys/transcript-full.
+- [ ] **Model-management: CRUD round-trip into config.toml; probe button → provider_health
+      display; capability-filtered role dropdowns (voice roles hide non-voice models); chain
+      drag-order persisted; quota edits enforced ranges.**
 - [ ] Visual sign-off vs the three design screens; zero-emoji + hex scans green.
 
 ## Progress log (append-only, newest last)

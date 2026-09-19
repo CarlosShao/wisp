@@ -27,9 +27,9 @@
 | `[ball]` | `size(int)=56`（44–72）`position{x,y,monitor}` `opacity_idle(float)=0.35` `click_through(bool)=true` `hide_on_fullscreen(bool)=true` | hot |
 | `[hotkey]` | `summon(string)` `mute(string)` `cancel(string)="Esc"`（Confirming 期间临时接管，会话结束归还）`panel(string)` | hot（须重注册） |
 | `[session]` | `warm_timeout_sec(int)=90` `settling_sec(int)=3` `conversation_idle_sec(int)=30` | hot |
-| `[voice]` | `enabled(bool)=true` `wake_word{enabled=false, keywords[]=[], thresholds[]=[], veto_words[]=["取消","停下","别"]}` `asr{provider="local-sherpa", model=<id>}` `tts{provider="local-sherpa", voice, speed(float)=1.0}` `punctuation(bool)=true` `conversation_mode(bool)=false` `aec{enabled(bool)=true, echo_ref="self-render"}` | reload（换模型）/ hot（阈值、否决词） |
+| `[voice]` | `enabled(bool)=true` `wake_word{enabled=false, keywords[]=[], thresholds[]=[], veto_words[]=["取消","停下","别"]}` `asr{provider="local-sherpa", model=<id>}` `tts{provider="local-sherpa", voice, speed(float)=1.0}` `punctuation(bool)=true` `conversation_mode(bool)=false` `aec{enabled(bool)=true, echo_ref="self-render"}` `realtime{enabled(bool)=false, provider, model, api_key_ref, base_url}`（C32，票60）`cloud_asr_chain[]=[]` `cloud_tts_chain[]=[]`（C9 云级联，票61；**本地 sherpa 级联是语音的终极兜底，不入链、永远最后**） | reload（换模型）/ hot（阈值、否决词） |
 | `[audio]` | `input_device(string)="default"` `sample_rate(int)=16000` `half_duplex(bool)=true`（**硬编码 true，只读显示，写 false 报错**）`mic_muted_default(bool)=true` | hot（须重开设备） |
-| `[llm]` | `default_provider(string)` `fallback_provider(string)` `timeout_ms(int)=60000` `retry{max(int)=3, backoff_ms(int)=1000}` `temperature(float)` `providers.<name>{base_url, model, api_key_ref, context_window(int)}` | hot（api_key_ref 变更须重新解密） |
+| `[llm]` | `text_chain[]`（**有序兜底链**，元素 `"provider/model"`，替代单条 fallback）`roles.{chat,memory_extract,handoff,summarize}{provider, model, temperature, thinking_intensity("off"\|"low"\|"medium"\|"high"), max_output_tokens}` `timeout_ms(int)=60000` `retry{max(int)=3, backoff_ms(int)=1000}` `providers.<name>{protocol("openai-chat"\|"openai-responses"\|"anthropic"), base_url, api_key_ref, billing("pay-per-token"\|"plan"), plan_credit_total_micro(int), compat{loose(bool)=false, allow_missing_usage(bool), extra_headers{}}, rpm(int), tpm(int), models.<model-id>{display, capabilities{text,vision,audio_in,audio_out,realtime,thinking,fc,stream}, context_window(int), max_output_tokens(int), thinking_levels[]=[], billing(...), price{in,out,cached,audio_in,audio_out}, quota_daily_micro(int), quota_monthly_micro(int), enabled(bool)=true}}` | hot（api_key_ref 变更须重新解密；链/角色变更 hot） |
 | `[agent]` | `max_rounds(int)=50` `token_budget(int)=200000` `per_tool_timeout_ms(int)` `loop_guard{repeat_thresholds=[3,5,8]}` `steering_enabled(bool)=true` | hot |
 | 🔒 `[risk]` | `confirm_timeout_sec(int)=300` `l1_window_sec(int)=2` `shell_enabled(bool)=false` `allow_shell_string(bool)=false` `shell_allowlist[]=[]` `blacklist_overrides[]=[]`（B 档豁免） | 🔒 放宽需 L2 重新确认 |
 | 🔒 `[fs]` | `allowed_dirs[]=[]` `reparse_point_exceptions[]=[]`（按具体路径）`delete_enabled(bool)=false` | 🔒 同上 |
@@ -42,8 +42,26 @@
 | `[models]` | `dir(string)` `mirror[]=[]` `verify_signature(bool)=true`（**不可关：写 false 报错而非生效**，C29）`local_override{}={model-id: 本地路径}` | hot |
 | `[observe]` | `level("debug"\|"info"\|"warn"\|"error")="info"` `roll{size_mb(int)=10, days(int)=7}` `slo_sample_interval_sec(int)=5` | hot |
 
-内置 LLM provider 预设（D8）：`openai` `anthropic` `deepseek` `qwen` `zhipu` `moonshot`
-`siliconflow` `openrouter` `ollama`——预设只提供 base_url/model 默认，Key 一律 `api_key_ref`。
+内置 LLM provider 预设（D8 + 2026-09-19 用户批准扩展）：`openai` `anthropic` `deepseek`
+`qwen` `zhipu` `moonshot` `siliconflow` `openrouter` `ollama` **`minimax` `mimo` `stepfun`**
+——预设提供 protocol/base_url 默认；**模型条目及其能力位/计费模式/配额由用户配置或 `/v1/models`
+自动发现导入**（OpenAI 兼容协议），Key 一律 `api_key_ref`。
+
+### 3.1 LLM 接入补充（2026-09-19 用户批准，落票 05/09/11/40/44/60/61）
+
+- **存储分界（防双状态 bug）**：模型目录/能力位/计费模式/配额/兜底链/角色指派 = `config.toml`
+  （D6 单一真相源，GUI 是编辑器）；**探测结果/健康/最近错误/延迟采样 = SQLite `provider_health`
+  （schema v2，见 SPEC-02，运行观测态不入 config）**。
+- **配额三层**：per-model（`quota_daily/monthly_micro`）→ per-provider（credit 总额，套餐模式
+  手动录入、C23 记账、余量标「估算」）→ 全局（`[cost]`）。**防负 = 派发前检查（C23 钩子）**，
+  100% 硬停并自动走兜底链，降级事件悬浮球+面板可见，不得静默。
+- **兜底链语义**：text = `text_chain` 有序遍历（401/403/配额尽/5xx 重试耗尽均触发跳下一家）；
+  voice = `realtime → cloud_asr/tts 级联 → 本地 sherpa 级联`（终极兜底零成本）。链元素必须引用
+  已存在的 `provider/model`，校验失败报错指出元素。
+- **兼容开关消费**：`compat.loose` 容忍缺失字段（stream_options/usage/tool_choice）；`rpm/tpm`
+  → llm 模块本地令牌桶（429 前先自守规矩）。
+- **probe 与目录分界**：能力位可手填，但**必须经 probe 实测**（票 11）；「声明 ✓ 实测 ✗」在
+  面板警告。新增模型默认 `capabilities` 全 false + 引导探测。
 
 ## 4. 加载、热加载与迁移
 

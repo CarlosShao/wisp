@@ -34,9 +34,16 @@ later agent tests reuse.
   `/__control/fail_next|latency|truncate|reset`. Runs via `go run` AND compose (port 18080).
   Golden file format shared with unit-test replayer (one format, two runners).
 
+- **Provider presets & catalog primitives (2026-09-19 supplement)**: preset table
+  `openai/anthropic/deepseek/qwen/zhipu/moonshot/siliconflow/openrouter/ollama/minimax/mimo/
+  stepfun` (protocol + base_url defaults; model entries user-configured or auto-discovered);
+  **auto-discovery** via OpenAI-compatible `GET /v1/models` → import with capabilities=unknown;
+  **probe primitive interface** on C5 (per-capability test request definitions: fc/vision/
+  thinking/audio — implementation in 11, results → `provider_health`, SPEC-02 v2).
+
 ## Out of scope
-- Anthropic/Responses adapters (11); agent loop (10); real provider presets config keys beyond
-  reading base_url/key-ref (05 owns config).
+- Anthropic/Responses adapters (11); agent loop (10); probe IMPLEMENTATION (11); quota
+  enforcement (44).
 
 ## Acceptance criteria
 - [ ] Golden replay tests: tool-call assembly, stopReason=max_tokens, mid-stream disconnect,
@@ -46,5 +53,8 @@ later agent tests reuse.
       error, 401 → no retry, latency injection respected.
 - [ ] Proxy tests: HTTP(S)_PROXY honored; untrusted-cert error class distinct from unreachable.
 - [ ] Usage events aggregate correctly across a multi-chunk stream.
+- [ ] Preset table covers all 12 providers with correct protocol/base_url defaults; auto-discovery
+      against mockllm `/v1/models` imports with unknown capabilities; probe primitive contract
+      test (each capability has a defined minimal request/response check).
 
 ## Progress log (append-only, newest last)
