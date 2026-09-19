@@ -47,3 +47,4 @@ visible env badge contract consumed by ball/panel.
 
 ## Progress log (append-only, newest last)
 - [2026-09-19T09:31:25Z] agent=orchestrator claimed=T06-impl did=dispatched (3-way concurrency) next=sub-agent works through acceptance criteria
+- [2026-09-19T09:50:45Z] agent=T06-impl did=env fork complete (test data dir WISP_TEST_DATA_DIR/TEMP per pid, no mutex; dev endpoints+update-off field defaults; portable.txt override; Summary/EnvBadge API; boot LayoutErr removed; mutex-per-env integration test) next=secret DPAPI store

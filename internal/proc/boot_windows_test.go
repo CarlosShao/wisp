@@ -27,15 +27,15 @@ func uniqueLayout(t *testing.T) Layout {
 }
 
 // TestBootTestEnvBootsAllPackages: the ticket-03 init-time self-checks pass
-// for the test env (no mutex, deferred layout) and shutdown walks the frozen
+// for the test env (real data dir, no mutex) and shutdown walks the frozen
 // 10-step order with the Job close executed.
 func TestBootTestEnvBootsAllPackages(t *testing.T) {
 	rt, err := Boot(buildinfo.EnvTest, WithRegistry(observe.NewRegistry()))
 	if err != nil {
 		t.Fatalf("Boot(test): %v", err)
 	}
-	if !errors.Is(rt.LayoutErr, ErrTestLayoutDeferred) {
-		t.Fatalf("LayoutErr = %v, want ErrTestLayoutDeferred", rt.LayoutErr)
+	if rt.Layout.DataDir == "" {
+		t.Fatal("test env must resolve a concrete data dir (ticket 06)")
 	}
 	if rt.Instance != nil {
 		t.Fatal("test env must not acquire a mutex")

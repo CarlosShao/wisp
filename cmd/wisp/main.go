@@ -105,11 +105,9 @@ func runResident() {
 		fmt.Printf("wisp: exited through the D38(e) shutdown order (10 steps, %d failed)\n", failed)
 	}()
 
-	if rt.LayoutErr != nil {
-		fmt.Printf("wisp: layout deferred: %v\n", rt.LayoutErr)
-	}
-	fmt.Printf("wisp: resident runtime booted (data dir = %s, job object = on, single instance = %v)\n",
-		dataDirForDisplay(), rt.Instance != nil)
+	sum := rt.Layout.Summary()
+	fmt.Printf("wisp: resident runtime booted (%s, data dir = %s, portable = %v, job object = on, single instance = %v)\n",
+		sum.EnvBadge(), sum.DataDir, sum.Portable, rt.Instance != nil)
 	fmt.Printf("wisp: empty event loop running; the floating ball arrives in ticket 07 (Ctrl+C exits cleanly)\n")
 
 	reason := rt.RunEventLoop()

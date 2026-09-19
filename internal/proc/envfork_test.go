@@ -1,7 +1,8 @@
 package proc
 
 import (
-	"errors"
+	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -26,6 +27,15 @@ func TestLayoutForProdDev(t *testing.T) {
 	if !prod.MutexEnabled || prod.ActivateEventName == "" {
 		t.Errorf("prod must register a mutex with an activation event: %+v", prod)
 	}
+	if !prod.AutoUpdateChecks {
+		t.Error("prod must default auto-update checks ON (SPEC-03 §5.2)")
+	}
+	if prod.DefaultLLMBaseURL != "" || prod.DefaultMirrorURL != "" {
+		t.Errorf("prod endpoints are user-configured, got LLM=%q mirror=%q", prod.DefaultLLMBaseURL, prod.DefaultMirrorURL)
+	}
+	if prod.Portable {
+		t.Error("fork layout must not claim portable before the override runs")
+	}
 
 	dev, err := LayoutFor(buildinfo.EnvDev, root)
 	if err != nil {
@@ -36,6 +46,15 @@ func TestLayoutForProdDev(t *testing.T) {
 	}
 	if dev.MutexName != `Local\wisp-dev-single-instance` {
 		t.Errorf("dev MutexName = %q", dev.MutexName)
+	}
+	if dev.AutoUpdateChecks {
+		t.Error("dev must default auto-update checks OFF (SPEC-03 §5.2)")
+	}
+	if dev.DefaultLLMBaseURL != DevLLMBaseURL {
+		t.Errorf("dev DefaultLLMBaseURL = %q, want %q", dev.DefaultLLMBaseURL, DevLLMBaseURL)
+	}
+	if dev.DefaultMirrorURL != DevMirrorBaseURL {
+		t.Errorf("dev DefaultMirrorURL = %q, want %q", dev.DefaultMirrorURL, DevMirrorBaseURL)
 	}
 
 	// dev and prod must be mutually invisible (SPEC-03 §5.2).
@@ -50,18 +69,196 @@ func TestLayoutForProdDev(t *testing.T) {
 	}
 }
 
-// TestLayoutForTestEnv pins what ticket 03 guarantees for the test env: no
-// mutex, and the concrete values explicitly deferred to ticket 06.
+// TestLayoutForTestEnv pins the ticket-06 test-env fork (SPEC-03 §5.2): data
+// dir from WISP_TEST_DATA_DIR or %TEMP%\wisp-test-<pid>, no mutex, no endpoint
+// defaults (the harness injects them explicitly).
 func TestLayoutForTestEnv(t *testing.T) {
-	l, err := LayoutFor(buildinfo.EnvTest, t.TempDir())
-	if !errors.Is(err, ErrTestLayoutDeferred) {
-		t.Fatalf("LayoutFor(test) err = %v, want ErrTestLayoutDeferred", err)
+	t.Run("explicit WISP_TEST_DATA_DIR", func(t *testing.T) {
+		dir := t.TempDir()
+		t.Setenv(TestDataDirEnv, dir)
+		l, err := LayoutFor(buildinfo.EnvTest, t.TempDir())
+		if err != nil {
+			t.Fatalf("LayoutFor(test): %v", err)
+		}
+		if l.DataDir != dir {
+			t.Errorf("test DataDir = %q, want the WISP_TEST_DATA_DIR injection %q", l.DataDir, dir)
+		}
+		if l.MutexEnabled || l.MutexName != "" {
+			t.Errorf("test env must not register a mutex: %+v", l)
+		}
+		if l.DefaultLLMBaseURL != "" || l.DefaultMirrorURL != "" {
+			t.Errorf("test endpoints must be injected explicitly, got %+v", l)
+		}
+		if l.AutoUpdateChecks {
+			t.Error("test env must not check for updates")
+		}
+		if l.Env != buildinfo.EnvTest {
+			t.Errorf("layout env = %q", l.Env)
+		}
+	})
+
+	t.Run("falls back to TEMP per pid", func(t *testing.T) {
+		t.Setenv(TestDataDirEnv, "")
+		l, err := LayoutFor(buildinfo.EnvTest, t.TempDir())
+		if err != nil {
+			t.Fatalf("LayoutFor(test): %v", err)
+		}
+		want := filepath.Join(os.TempDir(), fmt.Sprintf("wisp-test-%d", os.Getpid()))
+		if l.DataDir != want {
+			t.Errorf("test DataDir = %q, want %q", l.DataDir, want)
+		}
+	})
+}
+
+// TestLayoutForkMatrix is the SPEC-03 §6 environment-fork acceptance: the
+// three envs resolve to mutually distinct data dirs / mutex names / endpoint
+// defaults, and dev and prod are mutually invisible.
+func TestLayoutForkMatrix(t *testing.T) {
+	root := t.TempDir()
+	t.Setenv(TestDataDirEnv, filepath.Join(root, "injected-test-dir"))
+
+	layouts := make(map[buildinfo.Env]Layout, 3)
+	for _, env := range []buildinfo.Env{buildinfo.EnvProd, buildinfo.EnvDev, buildinfo.EnvTest} {
+		l, err := LayoutFor(env, root)
+		if err != nil {
+			t.Fatalf("LayoutFor(%s): %v", env, err)
+		}
+		layouts[env] = l
 	}
-	if l.MutexEnabled || l.MutexName != "" {
-		t.Errorf("test env must not register a mutex: %+v", l)
+
+	dirs := map[buildinfo.Env]string{}
+	for env, l := range layouts {
+		dirs[env] = l.DataDir
+		for other, otherDir := range dirs {
+			if env != other && l.DataDir == otherDir {
+				t.Errorf("%s and %s share data dir %q", env, other, l.DataDir)
+			}
+		}
 	}
-	if l.Env != buildinfo.EnvTest {
-		t.Errorf("layout env = %q", l.Env)
+	if layouts[buildinfo.EnvProd].MutexName == layouts[buildinfo.EnvDev].MutexName {
+		t.Error("prod and dev share a mutex name")
+	}
+	if layouts[buildinfo.EnvTest].MutexEnabled {
+		t.Error("test env must not register a mutex")
+	}
+	if layouts[buildinfo.EnvDev].DefaultLLMBaseURL == "" || layouts[buildinfo.EnvDev].DefaultMirrorURL == "" {
+		t.Error("dev must carry the mock-llm/mock-mirror default endpoints")
+	}
+	if layouts[buildinfo.EnvProd].DefaultLLMBaseURL != "" || layouts[buildinfo.EnvTest].DefaultLLMBaseURL != "" {
+		t.Error("prod/test endpoints must not be defaulted (user config / explicit injection)")
+	}
+
+	// Mutual invisibility, the actual property debugging depends on: no env's
+	// data dir may be nested inside another's.
+	for a, da := range dirs {
+		for b, db := range dirs {
+			if a != b && strings.HasPrefix(da, db+string(filepath.Separator)) {
+				t.Errorf("%s data dir %q is nested inside %s data dir %q", a, da, b, db)
+			}
+		}
+	}
+}
+
+// TestPortableOverride pins the SPEC-02 §6 portable rule: portable.txt next to
+// the exe relocates the data dir to the exe-relative portable dir (dev keeps
+// its own data-dev), taking precedence over the env fork dir; an explicit
+// WISP_TEST_DATA_DIR injection wins over the marker in the test env.
+func TestPortableOverride(t *testing.T) {
+	exeDir := t.TempDir()
+	root := t.TempDir()
+
+	t.Run("no marker is a no-op", func(t *testing.T) {
+		base, err := LayoutFor(buildinfo.EnvProd, root)
+		if err != nil {
+			t.Fatalf("LayoutFor: %v", err)
+		}
+		got, applied, err := ApplyPortableOverride(buildinfo.EnvProd, base, exeDir)
+		if err != nil || applied {
+			t.Fatalf("ApplyPortableOverride = (%+v, %v, %v), want unapplied", got, applied, err)
+		}
+		if got.DataDir != base.DataDir {
+			t.Errorf("data dir changed without the marker: %q", got.DataDir)
+		}
+	})
+
+	for _, tc := range []struct {
+		env      buildinfo.Env
+		wantName string
+	}{
+		{buildinfo.EnvProd, "data"},
+		{buildinfo.EnvTest, "data"},
+		{buildinfo.EnvDev, "data-dev"},
+	} {
+		base, err := LayoutFor(tc.env, root)
+		if err != nil {
+			t.Fatalf("LayoutFor(%s): %v", tc.env, err)
+		}
+		marker := filepath.Join(exeDir, PortableMarker)
+		if err := os.WriteFile(marker, nil, 0o644); err != nil {
+			t.Fatalf("write marker: %v", err)
+		}
+		got, applied, err := ApplyPortableOverride(tc.env, base, exeDir)
+		if err != nil {
+			t.Fatalf("ApplyPortableOverride(%s): %v", tc.env, err)
+		}
+		if !applied {
+			t.Fatalf("%s: portable marker not applied", tc.env)
+		}
+		if want := filepath.Join(exeDir, tc.wantName); got.DataDir != want {
+			t.Errorf("%s portable DataDir = %q, want %q", tc.env, got.DataDir, want)
+		}
+		if !got.Portable {
+			t.Errorf("%s: Portable flag not set", tc.env)
+		}
+		if err := os.Remove(marker); err != nil {
+			t.Fatalf("remove marker: %v", err)
+		}
+	}
+
+	t.Run("explicit test data dir beats the marker", func(t *testing.T) {
+		injected := t.TempDir()
+		t.Setenv(TestDataDirEnv, injected)
+		if err := os.WriteFile(filepath.Join(exeDir, PortableMarker), nil, 0o644); err != nil {
+			t.Fatalf("write marker: %v", err)
+		}
+		base, err := LayoutFor(buildinfo.EnvTest, root)
+		if err != nil {
+			t.Fatalf("LayoutFor(test): %v", err)
+		}
+		got, applied, err := ApplyPortableOverride(buildinfo.EnvTest, base, exeDir)
+		if err != nil || applied {
+			t.Fatalf("ApplyPortableOverride(test) = (%+v, %v, %v), want unapplied", got, applied, err)
+		}
+		if got.DataDir != injected {
+			t.Errorf("test DataDir = %q, want injected %q", got.DataDir, injected)
+		}
+	})
+}
+
+// TestSummaryBadge pins the env-identity contract consumed by ball/panel
+// (SPEC-03 §5.2): prod shows the bare product name, every other env carries
+// the visible "Wisp · <env>" suffix.
+func TestSummaryBadge(t *testing.T) {
+	for env, want := range map[buildinfo.Env]string{
+		buildinfo.EnvProd: "Wisp",
+		buildinfo.EnvDev:  "Wisp · dev",
+		buildinfo.EnvTest: "Wisp · test",
+	} {
+		s := Layout{Env: env}.Summary()
+		if got := s.EnvBadge(); got != want {
+			t.Errorf("EnvBadge(%s) = %q, want %q", env, got, want)
+		}
+	}
+
+	l, err := LayoutFor(buildinfo.EnvDev, t.TempDir())
+	if err != nil {
+		t.Fatalf("LayoutFor: %v", err)
+	}
+	s := l.Summary()
+	if s.Env != l.Env || s.DataDir != l.DataDir || s.MutexName != l.MutexName ||
+		s.MutexEnabled != l.MutexEnabled || s.DefaultLLMBaseURL != l.DefaultLLMBaseURL ||
+		s.AutoUpdateChecks != l.AutoUpdateChecks {
+		t.Errorf("Summary() did not project the layout: %+v vs %+v", s, l)
 	}
 }
 
@@ -69,5 +266,16 @@ func TestLayoutForTestEnv(t *testing.T) {
 func TestLayoutForUnknownEnv(t *testing.T) {
 	if _, err := LayoutFor(buildinfo.Env("staging"), t.TempDir()); err == nil {
 		t.Fatal("unknown env must fail")
+	}
+}
+
+// TestDefaultLayoutUnknownEnvFails keeps DefaultLayout from silently
+// defaulting an invalid env.
+func TestDefaultLayoutUnknownEnvFails(t *testing.T) {
+	if _, err := DefaultLayout(buildinfo.Env("nope")); err == nil {
+		t.Fatal("DefaultLayout with unknown env must fail")
+	}
+	if _, err := DefaultLayout(buildinfo.EnvTest); err != nil {
+		t.Fatalf("DefaultLayout(test): %v", err)
 	}
 }

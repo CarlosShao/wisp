@@ -26,12 +26,11 @@ import (
 // Boot returns ErrAlreadyRunning when another Wisp instance of this session
 // owns the mutex; the caller must then SignalExistingInstance and exit.
 type Runtime struct {
-	Env       buildinfo.Env
-	Layout    Layout
-	LayoutErr error // ErrTestLayoutDeferred for the test env until ticket 06
-	Job       *JobScope
-	Instance  *SingleInstance
-	Registry  *observe.Registry
+	Env      buildinfo.Env
+	Layout   Layout
+	Job      *JobScope
+	Instance *SingleInstance
+	Registry *observe.Registry
 	StartedAt time.Time // wall clock, for boot records only
 }
 
@@ -73,19 +72,15 @@ func Boot(env buildinfo.Env, opts ...BootOption) (*Runtime, error) {
 		rt.Registry = observe.Default
 	}
 
-	// Self-check: layout resolution (pure prod/dev defaults; test env defers).
+	// Self-check: layout resolution (per-env fork incl. the portable-mode
+	// override; test env resolves a real data dir and registers no mutex).
 	layout, err := DefaultLayout(env)
-	if errors.Is(err, ErrTestLayoutDeferred) {
-		rt.Layout, rt.LayoutErr = layout, err
-		slog.Warn("test env layout deferred to ticket 06 (no data dir, no mutex)", "env", string(env))
-	} else if err != nil {
+	if err != nil {
 		return nil, err
-	} else {
-		rt.Layout = layout
 	}
+	rt.Layout = layout
 	if cfg.layout != nil {
 		rt.Layout = *cfg.layout
-		rt.LayoutErr = nil
 	}
 
 	// Self-check: the Job Object opens and carries KILL_ON_JOB_CLOSE.

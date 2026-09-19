@@ -10,6 +10,7 @@ import (
 	"unsafe"
 
 	"github.com/CarlosShao/wisp/internal/buildinfo"
+	"github.com/CarlosShao/wisp/internal/proc"
 	sherpa "github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx"
 	"github.com/pelletier/go-toml/v2"
 	"golang.org/x/sys/windows"
@@ -257,6 +258,14 @@ func probeWritable(dir string) error {
 }
 
 func dataDirForDisplay() string {
+	// Prefer the real resolution order (per-env fork + portable override,
+	// ticket 06); fall back to the static fork table when env/layout
+	// resolution fails.
+	if env, err := buildinfo.ResolveEnv(); err == nil {
+		if sum, err := proc.Summarize(env); err == nil && sum.DataDir != "" {
+			return sum.DataDir
+		}
+	}
 	return resolveDataDir(buildinfo.EnvString())
 }
 

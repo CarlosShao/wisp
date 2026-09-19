@@ -10,9 +10,10 @@
 //   - shutdown sequence: the 10-step D38(e) order is executed and audited by
 //     test; the fast path (WM_QUERYENDSESSION) skips only the non-critical
 //     flushes of step 7, never steps 4/5/9
-//   - WISP_ENV typed fork: env resolution + data dir / mutex name pure
-//     functions (prod/dev defaults per SPEC-03 §5.2; test-env values and
-//     endpoint defaults are ticket 06)
+//   - WISP_ENV typed fork: env resolution + data dir / mutex name / default
+//     endpoints per SPEC-03 §5.2 (all three envs; test data dir via
+//     WISP_TEST_DATA_DIR or %TEMP%\wisp-test-<pid>), portable-mode override
+//     (SPEC-02 §6), and the env badge / data-dir summary API (tickets 07/35)
 //
 // Non-responsibilities:
 //   - no business process management (scheduler), no service/watchdog logic
