@@ -57,3 +57,5 @@ speech sub-process). All later memory/latency acceptance numbers come from here.
 - [2026-09-19T08:45:00Z] agent=T02-impl did=goja-caps (async/await+Promise.all+catch WORKS w/ native microtask drain; async generators+for-await NOT supported; import/export NOT supported; Proxy+Reflect exist; ES2020-2022 syntax battery all pass; vm.Interrupt wall-clock overshoot p50 0.4-0.6ms max ~12ms across 10-1000ms targets) next=webview2-latency+model-residency
 
 - [2026-09-19T09:05:00Z] agent=T02-impl did=webview2-cold-hot (true-cold via 12 subprocesses x2 runs: P50 880/1126ms, P95 1042/1256ms <=1500ms target PASS, no >2s blocker; hot show-hide P50 26-71ms P95 50-80ms <=200ms PASS; destroy+recreate P50 860-956ms documents what C27 single-window reuse avoids) next=model-residency+switch-latency
+
+- [2026-09-19T09:20:00Z] agent=T02-impl did=model-residency+switch (fresh-process idle residency incl ~7.5MB process baseline: KWS 48.6MB, VAD 23.6MB, ASR-int8 281.1MB, TTS-matcha 174.2MB; loads 3.5-6.0s all above D32 1-3s assumption; ASR-to-TTS serial switch P50 4726ms vs 1600ms budget FAIL -> D32 fallback TTS-resident

@@ -1,0 +1,55 @@
+{
+  "program": "model-residency",
+  "which": "kws",
+  "machine": {
+    "hostname": "DESKTOP-LVS7839",
+    "osName": "Windows 10 Pro 24H2",
+    "osVersion": "10.0",
+    "osBuild": "26100",
+    "cpuName": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+    "cpuLogical": 12,
+    "ramTotalMB": 32624,
+    "ramAvailMB": 6557,
+    "processOwner": "swq",
+    "recordedAtUtc": "2026-09-19T08:44:03Z"
+  },
+  "startedAtUtc": "2026-09-19T08:44:03Z",
+  "modelFiles": [
+    {
+      "name": "encoder-epoch-12-avg-2-chunk-16-left-64.int8.onnx",
+      "path": "third_party\\spike-models\\sherpa-onnx-kws-zipformer-wenetspeech-3.3M-2024-01-01\\encoder-epoch-12-avg-2-chunk-16-left-64.int8.onnx",
+      "bytesMB": 4.556337356567383
+    },
+    {
+      "name": "decoder-epoch-12-avg-2-chunk-16-left-64.int8.onnx",
+      "path": "third_party\\spike-models\\sherpa-onnx-kws-zipformer-wenetspeech-3.3M-2024-01-01\\decoder-epoch-12-avg-2-chunk-16-left-64.int8.onnx",
+      "bytesMB": 0.17268085479736328
+    },
+    {
+      "name": "joiner-epoch-12-avg-2-chunk-16-left-64.int8.onnx",
+      "path": "third_party\\spike-models\\sherpa-onnx-kws-zipformer-wenetspeech-3.3M-2024-01-01\\joiner-epoch-12-avg-2-chunk-16-left-64.int8.onnx",
+      "bytesMB": 0.06221961975097656
+    },
+    {
+      "name": "tokens.txt",
+      "path": "third_party\\spike-models\\sherpa-onnx-kws-zipformer-wenetspeech-3.3M-2024-01-01\\tokens.txt",
+      "bytesMB": 0.0015516281127929688
+    },
+    {
+      "name": "keywords.txt",
+      "path": "third_party\\spike-models\\sherpa-onnx-kws-zipformer-wenetspeech-3.3M-2024-01-01\\keywords.txt",
+      "bytesMB": 0.0002727508544921875
+    }
+  ],
+  "prePrivateWS_MB": 7.55859375,
+  "loadMs": 3693,
+  "idleResidencyPrivateWS_MB": 48.640625,
+  "postInferencePrivateWS_MB": 0,
+  "postInferencePrivateCommit_MB": 61.80078125,
+  "peakPrivateCommitMB_inProcess": 65.85546875,
+  "disposeMs": 19,
+  "settledMsAfterDispose": null,
+  "settled": false,
+  "sherpaVersion": "1.13.8",
+  "note": "idle residency = loaded, settled, NO inference; post-inference = after one warmup inference"
+}

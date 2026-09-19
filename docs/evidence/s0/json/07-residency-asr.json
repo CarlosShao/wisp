@@ -1,0 +1,45 @@
+{
+  "program": "model-residency",
+  "which": "asr",
+  "machine": {
+    "hostname": "DESKTOP-LVS7839",
+    "osName": "Windows 10 Pro 24H2",
+    "osVersion": "10.0",
+    "osBuild": "26100",
+    "cpuName": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+    "cpuLogical": 12,
+    "ramTotalMB": 32624,
+    "ramAvailMB": 6642,
+    "processOwner": "swq",
+    "recordedAtUtc": "2026-09-19T08:45:45Z"
+  },
+  "startedAtUtc": "2026-09-19T08:45:45Z",
+  "modelFiles": [
+    {
+      "name": "asr-encoder.int8.onnx",
+      "path": "third_party\\spike-models\\asr-encoder.int8.onnx",
+      "bytesMB": 157.79703521728516
+    },
+    {
+      "name": "asr-decoder.int8.onnx",
+      "path": "third_party\\spike-models\\asr-decoder.int8.onnx",
+      "bytesMB": 68.344651222229
+    },
+    {
+      "name": "asr-tokens.txt",
+      "path": "third_party\\spike-models\\asr-tokens.txt",
+      "bytesMB": 0.07224655151367188
+    }
+  ],
+  "prePrivateWS_MB": 7.5,
+  "loadMs": 3544,
+  "idleResidencyPrivateWS_MB": 281.1328125,
+  "postInferencePrivateWS_MB": 0,
+  "postInferencePrivateCommit_MB": 292.30859375,
+  "peakPrivateCommitMB_inProcess": 303.0625,
+  "disposeMs": 69,
+  "settledMsAfterDispose": null,
+  "settled": false,
+  "sherpaVersion": "1.13.8",
+  "note": "idle residency = loaded, settled, NO inference; post-inference = after one warmup inference"
+}

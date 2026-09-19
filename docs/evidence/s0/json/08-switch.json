@@ -1,0 +1,74 @@
+{
+  "program": "model-residency",
+  "which": "switch",
+  "machine": {
+    "hostname": "DESKTOP-LVS7839",
+    "osName": "Windows 10 Pro 24H2",
+    "osVersion": "10.0",
+    "osBuild": "26100",
+    "cpuName": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+    "cpuLogical": 12,
+    "ramTotalMB": 32624,
+    "ramAvailMB": 6680,
+    "processOwner": "swq",
+    "recordedAtUtc": "2026-09-19T08:47:27Z"
+  },
+  "startedAtUtc": "2026-09-19T08:47:27Z",
+  "modelFiles": null,
+  "prePrivateWS_MB": 7.4765625,
+  "loadMs": 0,
+  "idleResidencyPrivateWS_MB": 0,
+  "postInferencePrivateWS_MB": 0,
+  "postInferencePrivateCommit_MB": 0,
+  "peakPrivateCommitMB_inProcess": 0,
+  "disposeMs": 0,
+  "settledMsAfterDispose": null,
+  "settled": false,
+  "sherpaVersion": "1.13.8",
+  "note": "half-duplex serial: ASR fully disposed (incl FreeOSMemory) before TTS load; budget 1600ms = D32 16.3.4 'first token -\u003e first TTS audio, TTS not yet loaded'",
+  "switch": {
+    "cycles": [
+      {
+        "cycle": 1,
+        "asrDisposeMs": 56,
+        "ttsLoadMs": 4370,
+        "switchAsrToTtsMs": 4426,
+        "ttsDisposeMs": 64,
+        "asrLoadMs": 2982,
+        "switchTtsToAsrMs": 3046,
+        "wsWhileAsr_MB": 283.3984375,
+        "wsWhileTts_MB": 176.36328125
+      },
+      {
+        "cycle": 2,
+        "asrDisposeMs": 69,
+        "ttsLoadMs": 4657,
+        "switchAsrToTtsMs": 4726,
+        "ttsDisposeMs": 55,
+        "asrLoadMs": 3086,
+        "switchTtsToAsrMs": 3141,
+        "wsWhileAsr_MB": 289.5546875,
+        "wsWhileTts_MB": 177.1171875
+      },
+      {
+        "cycle": 3,
+        "asrDisposeMs": 106,
+        "ttsLoadMs": 5728,
+        "switchAsrToTtsMs": 5834,
+        "ttsDisposeMs": 71,
+        "asrLoadMs": 2960,
+        "switchTtsToAsrMs": 3031,
+        "wsWhileAsr_MB": 290.6640625,
+        "wsWhileTts_MB": 178.85546875
+      }
+    ],
+    "firstTtsLoadMs_cold": 6011,
+    "minAsrToTtsMs": 4426,
+    "p50AsrToTtsMs": 4726,
+    "maxWsDuringSwitch_MB": 290.6640625,
+    "peakCommitDuringSwitch_MB": 314.28515625,
+    "budgetMs": 1600,
+    "budgetVerdict": "P50 4726ms \u003e 1600ms budget: FAIL -\u003e D32 fallback 'TTS resident + ASR on-demand'",
+    "peakIsMaxNotSum": true
+  }
+}

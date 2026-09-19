@@ -1,0 +1,35 @@
+{
+  "program": "model-residency",
+  "which": "vad",
+  "machine": {
+    "hostname": "DESKTOP-LVS7839",
+    "osName": "Windows 10 Pro 24H2",
+    "osVersion": "10.0",
+    "osBuild": "26100",
+    "cpuName": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+    "cpuLogical": 12,
+    "ramTotalMB": 32624,
+    "ramAvailMB": 5734,
+    "processOwner": "swq",
+    "recordedAtUtc": "2026-09-19T08:44:39Z"
+  },
+  "startedAtUtc": "2026-09-19T08:44:39Z",
+  "modelFiles": [
+    {
+      "name": "silero_vad.onnx",
+      "path": "third_party\\spike-models\\silero_vad.onnx",
+      "bytesMB": 0.6140270233154297
+    }
+  ],
+  "prePrivateWS_MB": 7.49609375,
+  "loadMs": 1401,
+  "idleResidencyPrivateWS_MB": 23.5546875,
+  "postInferencePrivateWS_MB": 0,
+  "postInferencePrivateCommit_MB": 33.08984375,
+  "peakPrivateCommitMB_inProcess": 37.11328125,
+  "disposeMs": 1,
+  "settledMsAfterDispose": null,
+  "settled": false,
+  "sherpaVersion": "1.13.8",
+  "note": "idle residency = loaded, settled, NO inference; post-inference = after one warmup inference"
+}
