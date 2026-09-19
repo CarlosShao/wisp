@@ -1,0 +1,375 @@
+{
+  "program": "goja-caps",
+  "machine": {
+    "hostname": "DESKTOP-LVS7839",
+    "osName": "Windows 10 Pro 24H2",
+    "osVersion": "10.0",
+    "osBuild": "26100",
+    "cpuName": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+    "cpuLogical": 12,
+    "ramTotalMB": 32624,
+    "ramAvailMB": 6228,
+    "processOwner": "swq",
+    "recordedAtUtc": "2026-09-19T08:37:25Z"
+  },
+  "startedAtUtc": "2026-09-19T08:37:25Z",
+  "gojaVersion": "v0.0.0-20260917113740-793a2a65c13b",
+  "gojaEcmaVersion": "goja targets ES2020+ syntax; see probes",
+  "probes": [
+    {
+      "name": "es2017-async/await+promise.all+catch",
+      "pass": true,
+      "note": "native microtask draining; no host timers inside goja (setTimeout absent by design)"
+    },
+    {
+      "name": "es2018-async-generator-parse",
+      "pass": false,
+      "error": "SyntaxError: SyntaxError: Async generators are not supported yet at 1:1"
+    },
+    {
+      "name": "es2018-for-await-of",
+      "pass": false,
+      "error": "SyntaxError: SyntaxError: (anonymous): Line 1:17 Unexpected token await (and 10 more errors)",
+      "note": "if parse of async generator also failed, this probes for-await in isolation"
+    },
+    {
+      "name": "es-module-export-syntax",
+      "pass": false,
+      "error": "SyntaxError: SyntaxError: (anonymous): Line 1:1 Unexpected reserved word",
+      "note": "goja has no import/export module implementation; bundling to CJS/ES5 is the workaround"
+    },
+    {
+      "name": "es-dynamic-import",
+      "pass": false,
+      "error": "SyntaxError: SyntaxError: (anonymous): Line 1:1 Unexpected reserved word"
+    },
+    {
+      "name": "es2020-optional-chaining",
+      "pass": true
+    },
+    {
+      "name": "es2020-nullish-coalescing",
+      "pass": true
+    },
+    {
+      "name": "es2020-bigint",
+      "pass": true
+    },
+    {
+      "name": "es2021-numeric-separator",
+      "pass": true
+    },
+    {
+      "name": "es2022-class-static-block",
+      "pass": true
+    },
+    {
+      "name": "es2022-top-level-await-in-async",
+      "pass": true
+    },
+    {
+      "name": "es2015-generators",
+      "pass": true
+    },
+    {
+      "name": "es2015-template-literals",
+      "pass": true
+    },
+    {
+      "name": "es2015-destructuring",
+      "pass": true
+    },
+    {
+      "name": "es2015-spread",
+      "pass": true
+    },
+    {
+      "name": "es2015-map-set",
+      "pass": true
+    },
+    {
+      "name": "es2015-symbol",
+      "pass": true
+    },
+    {
+      "name": "es2017-async-await",
+      "pass": true
+    },
+    {
+      "name": "es2015-proxy-availability",
+      "pass": true
+    },
+    {
+      "name": "es2015-reflect-availability",
+      "pass": false,
+      "error": "got \"object\" want \"undefined\""
+    },
+    {
+      "name": "typed-arrays",
+      "pass": true
+    },
+    {
+      "name": "es2023-array-findlast",
+      "pass": true
+    },
+    {
+      "name": "es6-classes-getset",
+      "pass": true
+    }
+  ],
+  "asyncAwaitWorks": true,
+  "esModulesSupported": false,
+  "interruptPrecision": [
+    {
+      "targetMs": 10,
+      "runs": 12,
+      "elapsedMs": [
+        10.264,
+        10.305,
+        10.327,
+        10.5,
+        10.506,
+        10.523,
+        10.534,
+        10.548,
+        10.558,
+        10.601,
+        10.665,
+        10.719
+      ],
+      "minMs": 10.264,
+      "p50Ms": 10.523,
+      "p95Ms": 10.665,
+      "maxMs": 10.719,
+      "meanOvershootMs": 0.5041666666666665,
+      "maxOvershootMs": 0.7189999999999994,
+      "script": "while(true){}"
+    },
+    {
+      "targetMs": 50,
+      "runs": 12,
+      "elapsedMs": [
+        50.136,
+        50.175,
+        50.226,
+        50.267,
+        50.325,
+        50.433,
+        50.475,
+        50.554,
+        50.556,
+        50.905,
+        51.196,
+        51.74
+      ],
+      "minMs": 50.136,
+      "p50Ms": 50.433,
+      "p95Ms": 51.196,
+      "maxMs": 51.74,
+      "meanOvershootMs": 0.5823333333333339,
+      "maxOvershootMs": 1.740000000000002,
+      "script": "while(true){}"
+    },
+    {
+      "targetMs": 100,
+      "runs": 12,
+      "elapsedMs": [
+        100.151,
+        100.188,
+        100.207,
+        100.325,
+        100.336,
+        100.385,
+        100.45,
+        100.472,
+        100.473,
+        100.483,
+        100.906,
+        101.208
+      ],
+      "minMs": 100.151,
+      "p50Ms": 100.385,
+      "p95Ms": 100.906,
+      "maxMs": 101.208,
+      "meanOvershootMs": 0.4653333333333336,
+      "maxOvershootMs": 1.2079999999999984,
+      "script": "while(true){}"
+    },
+    {
+      "targetMs": 250,
+      "runs": 12,
+      "elapsedMs": [
+        250.137,
+        250.246,
+        250.25,
+        250.288,
+        250.299,
+        250.448,
+        250.46,
+        250.564,
+        250.585,
+        250.588,
+        250.601,
+        250.605
+      ],
+      "minMs": 250.137,
+      "p50Ms": 250.448,
+      "p95Ms": 250.601,
+      "maxMs": 250.605,
+      "meanOvershootMs": 0.42258333333333553,
+      "maxOvershootMs": 0.6049999999999898,
+      "script": "while(true){}"
+    },
+    {
+      "targetMs": 1000,
+      "runs": 12,
+      "elapsedMs": [
+        1000.16,
+        1000.221,
+        1000.264,
+        1000.369,
+        1000.457,
+        1000.503,
+        1000.537,
+        1000.571,
+        1000.693,
+        1002.733,
+        1002.895,
+        1008.246
+      ],
+      "minMs": 1000.16,
+      "p50Ms": 1000.503,
+      "p95Ms": 1002.895,
+      "maxMs": 1008.246,
+      "meanOvershootMs": 1.47075,
+      "maxOvershootMs": 8.245999999999981,
+      "script": "while(true){}"
+    },
+    {
+      "targetMs": 10,
+      "runs": 12,
+      "elapsedMs": [
+        10.119,
+        10.142,
+        10.197,
+        10.244,
+        10.306,
+        10.426,
+        10.517,
+        10.561,
+        10.582,
+        10.596,
+        10.61,
+        10.61
+      ],
+      "minMs": 10.119,
+      "p50Ms": 10.426,
+      "p95Ms": 10.61,
+      "maxMs": 10.61,
+      "meanOvershootMs": 0.4091666666666664,
+      "maxOvershootMs": 0.6099999999999994,
+      "script": "while(true){ String(1+1); }"
+    },
+    {
+      "targetMs": 50,
+      "runs": 12,
+      "elapsedMs": [
+        50.126,
+        50.186,
+        50.319,
+        50.32,
+        50.395,
+        50.461,
+        50.465,
+        50.51,
+        50.57,
+        50.594,
+        50.601,
+        50.619
+      ],
+      "minMs": 50.126,
+      "p50Ms": 50.461,
+      "p95Ms": 50.601,
+      "maxMs": 50.619,
+      "meanOvershootMs": 0.4305000000000003,
+      "maxOvershootMs": 0.6189999999999998,
+      "script": "while(true){ String(1+1); }"
+    },
+    {
+      "targetMs": 100,
+      "runs": 12,
+      "elapsedMs": [
+        100.065,
+        100.187,
+        100.227,
+        100.346,
+        100.361,
+        100.461,
+        100.508,
+        100.51,
+        100.517,
+        100.558,
+        100.867,
+        100.877
+      ],
+      "minMs": 100.065,
+      "p50Ms": 100.461,
+      "p95Ms": 100.867,
+      "maxMs": 100.877,
+      "meanOvershootMs": 0.45700000000000074,
+      "maxOvershootMs": 0.8769999999999953,
+      "script": "while(true){ String(1+1); }"
+    },
+    {
+      "targetMs": 250,
+      "runs": 12,
+      "elapsedMs": [
+        250.149,
+        250.227,
+        250.232,
+        250.264,
+        250.267,
+        250.312,
+        250.379,
+        250.382,
+        250.386,
+        250.443,
+        250.513,
+        250.582
+      ],
+      "minMs": 250.149,
+      "p50Ms": 250.312,
+      "p95Ms": 250.513,
+      "maxMs": 250.582,
+      "meanOvershootMs": 0.3446666666666687,
+      "maxOvershootMs": 0.5819999999999936,
+      "script": "while(true){ String(1+1); }"
+    },
+    {
+      "targetMs": 1000,
+      "runs": 12,
+      "elapsedMs": [
+        1000.069,
+        1000.086,
+        1000.095,
+        1000.102,
+        1000.198,
+        1000.212,
+        1000.281,
+        1000.408,
+        1000.454,
+        1000.493,
+        1000.539,
+        1000.826
+      ],
+      "minMs": 1000.069,
+      "p50Ms": 1000.212,
+      "p95Ms": 1000.539,
+      "maxMs": 1000.826,
+      "meanOvershootMs": 0.31358333333332666,
+      "maxOvershootMs": 0.8260000000000218,
+      "script": "while(true){ String(1+1); }"
+    }
+  ],
+  "conclusion": "filled by report; raw numbers above"
+}

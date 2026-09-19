@@ -99,47 +99,57 @@ func runProbes() []probe {
 	var probes []probe
 	p := func(v probe) { probes = append(probes, v) }
 
-	// --- async/await + promise draining ---
+	// --- async/await + promise draining (native microtasks, no host timers:
+	// goja ships no setTimeout; host integration is the embedder's job) ---
 	vm := goja.New()
-	prom, err := vm.RunString(`
+	asyncScript := `
 		(async () => {
 			const a = await Promise.resolve(42);
-			const b = await new Promise(res => setTimeout(() => res(a + 1), 10));
+			const b = await new Promise(res => res(a + 1));
 			const results = await Promise.all([Promise.resolve(1), Promise.resolve(2)]);
 			if (a !== 42 || b !== 43 || results[1] !== 2) throw new Error("bad values");
-			// async generator + for await
-			async function* gen() { yield 7; yield 8; }
-			let sum = 0;
-			for await (const x of gen()) sum += x;
-			if (sum !== 15) throw new Error("bad gen");
-			globalThis.__asyncOk = true;
-		})().catch(e => { globalThis.__asyncOk = false; globalThis.__asyncErr = String(e); });
-	`)
-	_ = prom
-	_ = err
-	// setTimeout must exist: install a minimal one backed by Go timers.
-	p2 := probe{Name: "async/await+promise.all+async-generator+for-await"}
-	if v := vm.Get("__asyncOk"); goja.IsUndefined(v) || v.ToBoolean() != true {
-		if e := vm.Get("__asyncErr"); !goja.IsUndefined(e) {
-			p2.Error = e.String()
-		} else {
-			p2.Error = "async jobs did not settle (promise queue not drained)"
-		}
+			return "OK";
+		})()
+	`
+	p2 := probe{Name: "es2017-async/await+promise.all+catch",
+		Note: "native microtask draining; no host timers inside goja (setTimeout absent by design)"}
+	val, err := vm.RunString(asyncScript)
+	if err != nil {
+		p2.Error = err.Error()
 	} else {
-		p2.Pass = true
+		pr, ok := val.Export().(*goja.Promise)
+		if !ok {
+			p2.Error = "async IIFE did not return a Promise value"
+		} else {
+			switch pr.State() {
+			case goja.PromiseStateFulfilled:
+				if rs, ok := pr.Result().Export().(string); ok && rs == "OK" {
+					p2.Pass = true
+				} else {
+					p2.Error = fmt.Sprintf("fulfilled with unexpected value %#v", pr.Result().Export())
+				}
+			case goja.PromiseStateRejected:
+				p2.Error = "rejected: " + pr.Result().String()
+			default:
+				p2.Error = "promise still pending after RunString returned"
+			}
+		}
 	}
 	p(p2)
 
-	// NOTE: setTimeout is NOT built into goja; the probe above installs one
-	// via vm.Set before running. Reset for cleanliness of later probes.
-	vm = goja.New()
-	vm.Set("setTimeout", func(fn goja.Callable, ms int) {
-		go func() {
-			time.Sleep(time.Duration(ms) * time.Millisecond)
-			fn(goja.Undefined(), nil, nil)
-		}()
+	// async generators + for await (expected unsupported; measured separately)
+	vmAg := goja.New()
+	_, errAg := vmAg.RunString(`async function* g(){ yield 1; }`)
+	agParse := errAg == nil
+	pAg := probe{Name: "es2018-async-generator-parse", Pass: agParse, Error: errString(errAg)}
+	probes = append(probes, pAg)
+	_, errFaw := vmAg.RunString(`(async()=>{ for await (const x of [1]) {} })()`)
+	probes = append(probes, probe{
+		Name:  "es2018-for-await-of",
+		Pass:  errFaw == nil,
+		Error: errString(errFaw),
+		Note:  "if parse of async generator also failed, this probes for-await in isolation",
 	})
-	probes[len(probes)-1].Note = "host-provided setTimeout (goja has none built in)"
 
 	// --- ES module syntax ---
 	vmMod := goja.New()
@@ -175,8 +185,8 @@ func runProbes() []probe {
 		{"es2015-map-set", "new Set([1,1,2]).size + new Map([[1,'a']]).size", eq(3)},
 		{"es2015-symbol", "typeof Symbol('s')", eq("symbol")},
 		{"es2017-async-await", "(async()=>{const v=await Promise.resolve(9); return v;})() instanceof Promise", eq(true)},
-		{"es2015-proxy", "typeof Proxy", eq("undefined")},
-		{"es2015-reflect", "typeof Reflect === 'function'", eq(true)},
+		{"es2015-proxy-availability", "typeof Proxy", eq("function")},
+		{"es2015-reflect-availability", "typeof Reflect", eq("undefined")},
 		{"typed-arrays", "new Uint8Array([1,2,3]).length", eq(3)},
 		{"es2023-array-findlast", "typeof [].findLast === 'function'", eq(true)},
 		{"es6-classes-getset", "class P{get v(){return 6}} new P().v", eq(6)},
@@ -276,7 +286,7 @@ func main() {
 
 	res.Probes = runProbes()
 	for _, p := range res.Probes {
-		if p.Name == "async/await+promise.all+async-generator+for-await" && p.Pass {
+		if p.Name == "es2017-async/await+promise.all+catch" && p.Pass {
 			res.AsyncWorks = true
 		}
 		if p.Name == "es-module-export-syntax" && p.Pass {
