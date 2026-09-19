@@ -8,3 +8,7 @@
 *.ico binary
 *.onnx binary
 *.sse text eol=lf
+models/manifest.json -text
+models/manifest.json.minisig -text
+*.tar.bz2 binary
+docker/model-mirror/fixtures/** binary
