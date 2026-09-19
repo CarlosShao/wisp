@@ -1,8 +1,8 @@
 # 06 — SecretStore (C28, DPAPI) + WISP_ENV environment isolation
 
-**Status:** ready-for-agent
-**Claimed by:** —
-**Last update:** 2026-09-19
+**Status:** in-progress
+**Claimed by:** orchestrator -> sub-agent T06-impl
+**Last update:** 2026-09-19T09:31:25Z
 **Blocked by:** 03-skeleton-runtime-rules
 **Parallel slots:** ≤2 sub-agents (A: DPAPI store + plaintext migration; B: env forks + test
 env injection)
@@ -46,3 +46,4 @@ visible env badge contract consumed by ball/panel.
 - [ ] `env:` refs work with arbitrary dummy values (CI-friendly).
 
 ## Progress log (append-only, newest last)
+- [2026-09-19T09:31:25Z] agent=orchestrator claimed=T06-impl did=dispatched (3-way concurrency) next=sub-agent works through acceptance criteria
