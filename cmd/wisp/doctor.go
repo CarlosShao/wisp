@@ -28,9 +28,15 @@ type check struct {
 // Returns true when no critical check failed.
 func cmdDoctor() bool {
 	var results []check
-	pass := func(name, detail string) { results = append(results, check{name: name, status: "PASS", detail: detail, critical: true}) }
-	fail := func(name, detail string) { results = append(results, check{name: name, status: "FAIL", detail: detail, critical: true}) }
-	info := func(name, detail string) { results = append(results, check{name: name, status: "INFO", detail: detail, critical: false}) }
+	pass := func(name, detail string) {
+		results = append(results, check{name: name, status: "PASS", detail: detail, critical: true})
+	}
+	fail := func(name, detail string) {
+		results = append(results, check{name: name, status: "FAIL", detail: detail, critical: true})
+	}
+	info := func(name, detail string) {
+		results = append(results, check{name: name, status: "INFO", detail: detail, critical: false})
+	}
 
 	// Build identity.
 	info("wisp build", fmt.Sprintf("version=%s commit=%s built=%s WISP_ENV=%s",
@@ -287,10 +293,10 @@ func normalizeVer(v string) string {
 // dllFileVersion reads the VS_FIXEDFILEINFO FileVersion of a PE file through
 // the Win32 version API.
 var (
-	modVersion               = windows.NewLazySystemDLL("version.dll")
-	procGetFileVersionInfoW  = modVersion.NewProc("GetFileVersionInfoW")
-	procGetFileVersionSizeW  = modVersion.NewProc("GetFileVersionInfoSizeW")
-	procVerQueryValueW       = modVersion.NewProc("VerQueryValueW")
+	modVersion              = windows.NewLazySystemDLL("version.dll")
+	procGetFileVersionInfoW = modVersion.NewProc("GetFileVersionInfoW")
+	procGetFileVersionSizeW = modVersion.NewProc("GetFileVersionInfoSizeW")
+	procVerQueryValueW      = modVersion.NewProc("VerQueryValueW")
 )
 
 type vsFixedFileInfo struct {

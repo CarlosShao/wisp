@@ -84,6 +84,10 @@ sha256sum -c SHA256SUMS   # 或 PowerShell: Get-FileHash 对表
 级证明。windowsgui 子系统切换（`-H=windowsgui`）推迟到票 07；届时如需「缺 DLL 仍能
 弹出友好错误」，应改为运行时 LoadLibrary 包装，这是那票的设计题。
 
+AttachConsole 通路已按本票代码预先验证：用 `go build -ldflags "-H=windowsgui"` 临时
+构建后，`wisp.exe version` 在调用方控制台正常输出（attach+重绑句柄路径生效），且
+`wisp.exe version > out.txt` 重定向不受影响（已有合法 stdout 时跳过 attach）。
+
 ## 5. 本票真实踩到的坑（排查手册）
 
 1. **mingw gcc「静默失败」**：`gcc.exe` 不在 PATH 时，用全路径调用也会以 exit 1 退出且
