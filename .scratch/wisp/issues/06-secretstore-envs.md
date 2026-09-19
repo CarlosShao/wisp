@@ -49,3 +49,4 @@ visible env badge contract consumed by ball/panel.
 - [2026-09-19T09:31:25Z] agent=orchestrator claimed=T06-impl did=dispatched (3-way concurrency) next=sub-agent works through acceptance criteria
 - [2026-09-19T09:50:45Z] agent=T06-impl did=env fork complete (test data dir WISP_TEST_DATA_DIR/TEMP per pid, no mutex; dev endpoints+update-off field defaults; portable.txt override; Summary/EnvBadge API; boot LayoutErr removed; mutex-per-env integration test) next=secret DPAPI store
 - [2026-09-19T10:00:33Z] agent=T06-impl did=SecretStore C28 (dpapi:/env: refs, CryptProtectData CurrentUser blobs 0600 under <data>/secrets, RedactSecret last-4, no-plaintext-in-log tests, P13 ErrPortableDecrypt explicit env: guidance) next=plaintext migration
+- [2026-09-19T10:00:54Z] agent=T06-impl did=plaintext migration (deterministic blob ids from TOML paths, config.toml.bak-plaintext first-backup-wins, atomic rewrite, slog D33 notice, idempotent) next=PRECHECK P13 + full matrix
