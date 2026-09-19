@@ -33,7 +33,7 @@ All tickets are **vertical tracer bullets**; work the **frontier** (all blockers
 - **S1**: 03 skeleton ✅done (01) · 04 sqlite-core ✅done (03) · 05 config-model ✅done (03) · 06 secretstore-envs ✅done (03) ·
   07 ball-state-machine ✅done (03) · 08 observability-slo (03,07) · 09 llm-provider+mockllm (03) ·
   10 agent-loop-core (05,09) · 11 llm-adapters-rest (09) · 12 cli-text-path=S1 gate (04,07,08,10)
-- **S2**: 13 audio-capture (03) · 14 model-distribution (03) · 15 speech-engines+CER (02,13,14) ·
+- **S2**: 13 audio-capture ✅done (03) · 14 model-distribution (03) · 15 speech-engines+CER (02,13,14) ·
   16 s2-acceptance (12,15)
 - **S3**: 17 risk-assessor C19 (03) · 18 path-resolver C26 (03) · 19 provenance C25 (17) ·
   20 host-bridge+fs-tools (17,18) · 21 approval-gates-minimal (17) · 22 web-tools+D30 (19,20) ·

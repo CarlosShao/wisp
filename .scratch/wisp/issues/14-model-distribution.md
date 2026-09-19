@@ -1,8 +1,8 @@
 # 14 — Model distribution: C29 signed manifest, mirrors, resume, Downloading state
 
-**Status:** ready-for-agent
-**Claimed by:** —
-**Last update:** 2026-09-19
+**Status:** in-progress
+**Claimed by:** orchestrator -> sub-agent T14-impl
+**Last update:** 2026-09-19T15:11:33Z
 **Blocked by:** 03-skeleton-runtime-rules
 **Parallel slots:** ≤2 sub-agents (A: manifest + minisign verify + downloader; B: state wiring +
 local_override + mirror tooling/compose)
@@ -49,3 +49,4 @@ progress/cancel, `Downloading` state wiring, local-dir escape hatch, and the com
 - [ ] manifest.json committed with license fields filled; P5 conclusion recorded in PRECHECK.
 
 ## Progress log (append-only, newest last)
+- [2026-09-19T15:11:33Z] agent=orchestrator claimed=T14-impl did=dispatched next=sub-agent works through acceptance criteria
