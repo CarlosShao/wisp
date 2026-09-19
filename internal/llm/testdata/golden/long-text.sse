@@ -1,0 +1,71 @@
+# wisp golden sse v1
+# @scenario 30 paced chunks for cancellation/latency tests
+# @latency 40
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word0 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word1 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word2 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word3 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word4 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word5 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word6 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word7 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word8 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word9 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word10 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word11 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word12 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word13 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word14 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word15 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word16 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word17 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word18 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word19 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word20 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word21 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word22 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word23 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word24 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word25 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word26 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word27 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word28 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"word29 "},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":40,"completion_tokens":31,"total_tokens":71}}
+
+data: [DONE]

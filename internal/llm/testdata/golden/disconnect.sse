@@ -1,0 +1,6 @@
+# wisp golden sse v1
+# @scenario mid-stream disconnect: stream ends without [DONE] after partial text
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"partial text kept"},"finish_reason":null}]}

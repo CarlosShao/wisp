@@ -1,0 +1,10 @@
+# wisp golden sse v1
+# @scenario complete stream without finish_reason (compat tolerance case)
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"hi"},"finish_reason":null}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":4,"completion_tokens":1,"total_tokens":5}}
+
+data: [DONE]

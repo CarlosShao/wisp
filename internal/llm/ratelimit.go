@@ -187,12 +187,17 @@ func (p *LimiterProvider) Stream(ctx context.Context, req *Request, emit func(St
 		return observe.Wrap(observe.ClassCancelled, err, "cancelled while self-throttling")
 	}
 	accounted := reserved
+	firstUsage := true
 	return p.inner.Stream(ctx, req, func(ev StreamEvent) error {
 		if ev.Type == EvUsage {
 			actual := ev.Usage.InputTokens + ev.Usage.OutputTokens
-			if actual > accounted {
-				p.limiter.Reconcile(accounted - actual) // charge the increment
+			if actual > 0 && (firstUsage || actual > accounted) {
+				// First event reconciles the pre-flight reservation with the
+				// real usage (refund or charge); later events charge only the
+				// increment (usage is monotonic across a stream).
+				p.limiter.Reconcile(accounted - actual)
 				accounted = actual
+				firstUsage = false
 			}
 		}
 		return emit(ev)

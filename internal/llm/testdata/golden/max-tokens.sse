@@ -1,0 +1,12 @@
+# wisp golden sse v1
+# @scenario finish_reason=length (max_tokens) with partial text
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"This answer is cut mid-sentence because the token budget ran"},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"length"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":10,"completion_tokens":6,"total_tokens":16}}
+
+data: [DONE]

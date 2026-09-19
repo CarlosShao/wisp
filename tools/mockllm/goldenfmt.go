@@ -100,7 +100,7 @@ func parseGolden(src []byte) ([]goldenResponse, error) {
 		}
 		ensure()
 		if strings.HasPrefix(line, "# @@") {
-			line = strings.TrimPrefix(line, "# @")
+			line = "# @" + strings.TrimPrefix(line, "# @@") // unescape: "# @@x" -> "# @x"
 		}
 		body = append(body, line)
 	}

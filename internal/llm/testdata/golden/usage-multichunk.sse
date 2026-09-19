@@ -1,0 +1,12 @@
+# wisp golden sse v1
+# @scenario usage reported twice (finish chunk + standalone chunk): aggregation keeps the max
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"Hello there"},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"stop"}],"usage":{"prompt_tokens":10,"completion_tokens":4,"total_tokens":14}}
+
+data: {"choices":[],"usage":{"prompt_tokens":10,"completion_tokens":7,"total_tokens":17}}
+
+data: [DONE]

@@ -39,9 +39,9 @@ type tableSpec struct {
 	indexes []string
 }
 
-// contractSpec mirrors SPEC-02 §3 exactly: eight tables, their columns in
-// order, and the indexes the spec declares. Any drift between schema.go and
-// the spec fails here.
+// contractSpec mirrors SPEC-02 §3 exactly: nine tables (eight D35 tables +
+// the schema-v2 provider_health), their columns in order, and the indexes the
+// spec declares. Any drift between schema.go and the spec fails here.
 //
 // notNull mirrors what PRAGMA table_info reports for THIS DDL: PRIMARY KEY
 // columns report notnull=0 in SQLite (rowid-alias and TEXT PKs alike) even
@@ -145,11 +145,27 @@ var contractSpec = map[string]tableSpec{
 			{"exe_hash", "TEXT", false, false},
 		},
 	},
+	// provider_health: schema v2 (2026-09-19 LLM access supplement, ticket 09).
+	// The composite PK columns carry explicit NOT NULL in the DDL (SQLite
+	// otherwise allows NULLs in non-INTEGER PK columns), so PRAGMA reports
+	// notnull=1 for them - unlike the v1 tables whose PKs omit NOT NULL.
+	"provider_health": {
+		cols: []colSpec{
+			{"provider", "TEXT", true, true},
+			{"model", "TEXT", true, true},
+			{"probe_json", "TEXT", true, false},
+			{"last_probe_at", "INTEGER", false, false},
+			{"last_error", "TEXT", false, false},
+			{"last_error_at", "INTEGER", false, false},
+			{"latency_ms_p50", "INTEGER", true, false},
+			{"quota_state", "TEXT", true, false},
+		},
+	},
 }
 
 var contractTableOrder = []string{
 	"schema_meta", "profile", "memory", "task_log", "tool_call",
-	"approval_grant", "cost_daily", "plugin_state",
+	"approval_grant", "cost_daily", "plugin_state", "provider_health",
 }
 
 func TestSchemaContractIntrospection(t *testing.T) {
@@ -195,21 +211,25 @@ func TestSchemaContractIntrospection(t *testing.T) {
 		t.Run("indexes/"+table, func(t *testing.T) { checkIndexes(t, db, table, spec) })
 	}
 
-	// 3. schema_version = 1 seeded.
+	// 3. schema_version = 2 seeded (v1 D35 core + v2 provider_health).
 	var v string
 	if err := db.QueryRowContext(context.Background(),
 		`SELECT value FROM schema_meta WHERE key='schema_version'`).Scan(&v); err != nil {
 		t.Fatalf("read schema_version: %v", err)
 	}
-	if v != "1" {
-		t.Errorf("schema_version = %q, want %q", v, "1")
+	if v != "2" {
+		t.Errorf("schema_version = %q, want %q", v, "2")
 	}
 
-	// 4. The DDL script round-trips through SQLite (statement splitting is
+	// 4. The DDL scripts round-trip through SQLite (statement splitting is
 	// sound: no semicolons hidden in literals/comments).
-	// 8 CREATE TABLE + 7 CREATE INDEX = exactly 15 statements in the spec DDL.
+	// v1: 8 CREATE TABLE + 7 CREATE INDEX = exactly 15 statements.
 	if n := len(splitSQLStatements(ddlV1)); n != 15 {
-		t.Errorf("splitSQLStatements produced %d statements, want 15 (8 tables + 7 indexes)", n)
+		t.Errorf("splitSQLStatements(ddlV1) produced %d statements, want 15 (8 tables + 7 indexes)", n)
+	}
+	// v2: 1 CREATE TABLE (provider_health).
+	if n := len(splitSQLStatements(ddlV2)); n != 1 {
+		t.Errorf("splitSQLStatements(ddlV2) produced %d statements, want 1", n)
 	}
 }
 
@@ -299,10 +319,10 @@ func colNames(cols []colSpec) []string {
 // Migration chain (SPEC-02 §7).
 // -----------------------------------------------------------------------------
 
-func TestMigrateFreshDatabaseCreatesV1(t *testing.T) {
+func TestMigrateFreshDatabaseCreatesCurrentVersion(t *testing.T) {
 	s := openTestStore(t)
 	// Contract test above covers content; here: reopen is a no-op (no second
-	// backup, no error) and version stays 1.
+	// round of backups, no error) and version stays at the target.
 	if err := s.Close(); err != nil {
 		t.Fatal(err)
 	}
@@ -316,17 +336,23 @@ func TestMigrateFreshDatabaseCreatesV1(t *testing.T) {
 		`SELECT value FROM schema_meta WHERE key='schema_version'`).Scan(&v); err != nil {
 		t.Fatal(err)
 	}
-	if v != "1" {
+	if v != "2" {
 		t.Errorf("schema_version after reopen = %q", v)
 	}
-	// Reopen must not have written another backup: the bak-0-1 file exists
-	// exactly once from the first open.
+	// Reopen must not have written more backups: the two migration backups
+	// (0->1 and 1->2) exist exactly once from the first open.
 	entries, err := os.ReadDir(s.backupDir)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(entries) != 1 || entries[0].Name() != "wisp.db.bak-0-1" {
-		t.Errorf("backup dir after reopen = %v, want [wisp.db.bak-0-1]", namesOf(entries))
+	wantBackups := []string{"wisp.db.bak-0-1", "wisp.db.bak-1-2"}
+	if len(entries) != len(wantBackups) {
+		t.Errorf("backup dir after reopen = %v, want %v", namesOf(entries), wantBackups)
+	}
+	for i, w := range wantBackups {
+		if i < len(entries) && entries[i].Name() != w {
+			t.Errorf("backup[%d] = %s, want %s", i, entries[i].Name(), w)
+		}
 	}
 }
 
@@ -338,16 +364,16 @@ func namesOf(entries []os.DirEntry) []string {
 	return out
 }
 
-// withTestMigration registers a test-only v1->v2 step so the chain mechanics
+// withTestMigration registers a test-only v2->v3 step so the chain mechanics
 // (backup name, single transaction, watermark update) are exercised without
-// polluting the production chain. It mutates the package chain and restores
-// it at cleanup.
+// polluting the production chain (whose v1->v2 step adds provider_health). It
+// mutates the package chain and restores it at cleanup.
 func withTestMigration(t *testing.T, next func(tx txExec) error) Option {
 	t.Helper()
 	saved := migrationChain
 	t.Cleanup(func() { migrationChain = saved })
 	return func(o *storeOptions) {
-		migrationChain = append(saved, migrationStep{from: 1, to: 2, apply: next})
+		migrationChain = append(saved, migrationStep{from: 2, to: 3, apply: next})
 	}
 }
 
@@ -373,22 +399,22 @@ func TestMigrationChainWithBackup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// 2. Reopen targeting v2 via a test-only migration that adds a table in
-	// its own transaction.
+	// 2. Reopen targeting v3 via a test-only migration that adds a table in
+	// its own transaction (on top of the production 0->1 and 1->2 steps).
 	mkV2 := withTestMigration(t, func(tx txExec) error {
 		_, err := tx.ExecContext(context.Background(),
 			`CREATE TABLE schema_probe_v2(x INTEGER NOT NULL)`)
 		return err
 	})
-	s2, err := Open(dir, mkV2, withSchemaTarget(2))
+	s2, err := Open(dir, mkV2, withSchemaTarget(3))
 	if err != nil {
-		t.Fatalf("open v2: %v", err)
+		t.Fatalf("open v3: %v", err)
 	}
 	defer s2.Close()
 
 	// 3. Backup written before the step, named per SPEC-02 §7, and it still
 	// holds the pre-migration content (v1 backup = full db copy).
-	bakPath := filepath.Join(dir, "backup", "wisp.db.bak-1-2")
+	bakPath := filepath.Join(dir, "backup", "wisp.db.bak-2-3")
 	fi, err := os.Stat(bakPath)
 	if err != nil {
 		t.Fatalf("pre-migration backup missing: %v", err)
@@ -402,8 +428,8 @@ func TestMigrationChainWithBackup(t *testing.T) {
 	if err := s2.reader.QueryRowContext(ctx, `SELECT CAST(value AS INTEGER) FROM schema_meta WHERE key='schema_version'`).Scan(&v); err != nil {
 		t.Fatal(err)
 	}
-	if v != 2 {
-		t.Errorf("schema_version = %d, want 2", v)
+	if v != 3 {
+		t.Errorf("schema_version = %d, want 3", v)
 	}
 	// Pre-existing data survived the migration.
 	var n int
@@ -448,7 +474,7 @@ func TestMigrationFailedStepIsAtomic(t *testing.T) {
 			`INSERT INTO schema_probe_v2(x) VALUES(NULL)`)
 		return err
 	})
-	_, err = Open(dir, failStep, withSchemaTarget(2))
+	_, err = Open(dir, failStep, withSchemaTarget(3))
 	if err == nil {
 		t.Fatal("Open succeeded despite failing migration step")
 	}
@@ -463,8 +489,8 @@ func TestMigrationFailedStepIsAtomic(t *testing.T) {
 	if err := db.QueryRow(`SELECT CAST(value AS INTEGER) FROM schema_meta WHERE key='schema_version'`).Scan(&v); err != nil {
 		t.Fatal(err)
 	}
-	if v != 1 {
-		t.Errorf("schema_version after failed step = %d, want 1 (atomic rollback)", v)
+	if v != 2 {
+		t.Errorf("schema_version after failed step = %d, want 2 (atomic rollback at v2, target v3)", v)
 	}
 	var probe int
 	if err := db.QueryRow(`SELECT count(*) FROM sqlite_master WHERE name='schema_probe_v2'`).Scan(&probe); err != nil {

@@ -128,6 +128,23 @@ CREATE TABLE plugin_state (
   · `last_probe_at` · `last_error` · `last_error_at` · `latency_ms_p50` · `quota_state`。
   存**运行观测态**（探测结果/健康/最近错误），与 config.toml 的目录配置（真相源）严格分界；
   由票 09 定义原语、票 11 实测写入、票 40 面板展示。
+  schema v2 迁移 DDL（与 `internal/memory/schema.go` 的 `ddlV2` 逐字节一致；票 09 已落地）：
+
+```sql
+-- provider 健康与实测能力（schema v2：LLM 接入补充，SPEC-03 §3.1；票 09 定义原语，票 11 实测写入）
+-- 存「运行观测态」（探测/健康/最近错误），与 config.toml 的目录真相源严格分界
+CREATE TABLE provider_health (
+  provider       TEXT NOT NULL,            -- 目录 provider 名
+  model          TEXT NOT NULL,            -- 目录 model id
+  probe_json     TEXT NOT NULL DEFAULT '{}', -- 实测能力位 JSON：{"text":..,"vision":..,"audio_in":..,"audio_out":..,"thinking":..,"fc":..}
+  last_probe_at  INTEGER,                  -- unix 秒；NULL = 尚未实测
+  last_error     TEXT,                     -- 最近一次失败（脱敏后细节）
+  last_error_at  INTEGER,
+  latency_ms_p50 INTEGER NOT NULL DEFAULT 0,
+  quota_state    TEXT NOT NULL DEFAULT 'ok', -- 'ok' | 'throttled' | 'exhausted' | 'unknown'
+  PRIMARY KEY (provider, model)
+);
+```
 - L2 记忆检索：【SPEC】显式记忆量级小（几十条），用 `keywords` LIKE + 最近优先排序即可；
   超过 500 条再引入 FTS5（届时登记 schema 迁移 v2）。
 - 时间戳规则：**落盘时间戳用 wall clock；一切超时/保留期计算用单调时钟**（D42#9）。

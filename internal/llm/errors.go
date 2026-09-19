@@ -211,7 +211,8 @@ func ClassifyHTTPStatus(d HTTPErrorDetail) (observe.ErrorClass, bool) {
 		// code=insufficient_quota: that is an ACCOUNT problem (no retry),
 		// not a pace problem.
 		if strings.Contains(code, "insufficient_quota") || strings.Contains(code, "quota") ||
-			strings.Contains(code, "balance") || strings.Contains(code, "arrears") {
+			strings.Contains(code, "balance") || strings.Contains(code, "arrears") ||
+			strings.Contains(code, "account") {
 			return observe.ClassBudget, false
 		}
 		return observe.ClassRateLimit, true

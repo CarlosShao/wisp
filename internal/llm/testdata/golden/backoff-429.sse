@@ -1,0 +1,16 @@
+# wisp golden sse v1
+# @scenario backoff ladder: two 429s honoring retry-after=1s, then success
+# @response 429 retry-after:1
+{"error":{"message":"Rate limited, retry later","type":"rate_limit_error","code":"rate_limit_exceeded"}}
+# @response 429 retry-after:1
+{"error":{"message":"Rate limited, retry later","type":"rate_limit_error","code":"rate_limit_exceeded"}}
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"ok after retries"},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":5,"completion_tokens":3,"total_tokens":8}}
+
+data: [DONE]

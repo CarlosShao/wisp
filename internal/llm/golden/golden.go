@@ -128,7 +128,7 @@ func Parse(src []byte) ([]Response, error) {
 		ensure()
 		// Unescape body lines that legitimately start with "# @".
 		if strings.HasPrefix(line, "# @@") {
-			line = strings.TrimPrefix(line, "# @")
+			line = "# @" + strings.TrimPrefix(line, "# @@") // unescape: "# @@x" -> "# @x"
 		}
 		bodyLines = append(bodyLines, line)
 	}

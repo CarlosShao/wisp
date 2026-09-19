@@ -6,17 +6,19 @@ import (
 	"strings"
 )
 
-// Schema v1 (D35 / SPEC-02 §3). The DDL below is CONTRACT-LEVEL: it must stay
-// byte-identical to the ```sql block of docs/specs/SPEC-02-data-storage.md §3
-// (including comments). No added or removed columns, tables, indexes or
-// constraints — the acceptance test introspects sqlite_master against the
-// same contract. Enum-shaped columns (task_log.error_class, tool_call
+// Schema v1 (D35 / SPEC-02 §3) + schema v2 (provider_health, SPEC-02 §3
+// note). The DDL below is CONTRACT-LEVEL: it must stay byte-identical to the
+// ```sql blocks of docs/specs/SPEC-02-data-storage.md §3 (including
+// comments). No added or removed columns, tables, indexes or constraints —
+// the acceptance test introspects sqlite_master against the same contract.
+// Enum-shaped columns (task_log.error_class, tool_call
 // risk_level/decision/outcome) are validated at the DAO layer
 // (observe.ValidateErrorClass and friends), NOT as SQL CHECKs, precisely so
 // this text never forks from the spec.
 //
-// provider_health (SPEC-02 §3 note) is schema v2 and belongs to ticket 09 —
-// deliberately absent here.
+// provider_health (SPEC-02 §3 note) is schema v2 and landed with ticket 09:
+// the DAO primitive lives in dao_providerhealth.go; ticket 11 writes real
+// probe results.
 const ddlV1 = `-- schema 版本与迁移水位（§14.5 的地基）
 CREATE TABLE schema_meta (
   key   TEXT PRIMARY KEY,
@@ -118,8 +120,30 @@ CREATE TABLE plugin_state (
 );`
 
 // SchemaVersionTarget is the schema version this binary produces (SPEC-02 §3:
-// builtin row ('schema_version', '1')).
-const SchemaVersionTarget = 1
+// builtin row ('schema_version', '<target>')). History:
+//
+//	v1 - D35 core tables (ticket 04).
+//	v2 - provider_health (2026-09-19 LLM access supplement, SPEC-03 §3.1 /
+//	     SPEC-02 §3 note; ticket 09): per provider+model runtime observation
+//	     state (probe results, last error, latency, quota state).
+const SchemaVersionTarget = 2
+
+// ddlV2 appends the provider_health table (SPEC-02 §3 note, schema v2). The
+// DDL below mirrors the ```sql block in docs/specs/SPEC-02-data-storage.md
+// §3 byte-for-byte (same contract rule as ddlV1).
+const ddlV2 = `-- provider 健康与实测能力（schema v2：LLM 接入补充，SPEC-03 §3.1；票 09 定义原语，票 11 实测写入）
+-- 存「运行观测态」（探测/健康/最近错误），与 config.toml 的目录真相源严格分界
+CREATE TABLE provider_health (
+  provider       TEXT NOT NULL,            -- 目录 provider 名
+  model          TEXT NOT NULL,            -- 目录 model id
+  probe_json     TEXT NOT NULL DEFAULT '{}', -- 实测能力位 JSON：{"text":..,"vision":..,"audio_in":..,"audio_out":..,"thinking":..,"fc":..}
+  last_probe_at  INTEGER,                  -- unix 秒；NULL = 尚未实测
+  last_error     TEXT,                     -- 最近一次失败（脱敏后细节）
+  last_error_at  INTEGER,
+  latency_ms_p50 INTEGER NOT NULL DEFAULT 0,
+  quota_state    TEXT NOT NULL DEFAULT 'ok', -- 'ok' | 'throttled' | 'exhausted' | 'unknown'
+  PRIMARY KEY (provider, model)
+);`
 
 // schemaMetaVersionKey is the schema_meta row holding the migration watermark.
 const schemaMetaVersionKey = "schema_version"
@@ -143,11 +167,22 @@ type txExec interface {
 // D35 schema from an empty database; later steps append (v1->v2 ...).
 var migrationChain = []migrationStep{
 	{from: 0, to: 1, apply: applyV1},
+	{from: 1, to: 2, apply: applyV2},
 }
 
 // applyV1 creates the eight D35 tables + indexes and seeds schema_version=1.
 func applyV1(tx txExec) error {
 	for _, stmt := range splitSQLStatements(ddlV1) {
+		if _, err := tx.ExecContext(context.Background(), stmt); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// applyV2 creates the provider_health table (ticket 09 primitive).
+func applyV2(tx txExec) error {
+	for _, stmt := range splitSQLStatements(ddlV2) {
 		if _, err := tx.ExecContext(context.Background(), stmt); err != nil {
 			return err
 		}
