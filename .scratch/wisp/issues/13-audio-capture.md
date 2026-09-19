@@ -1,8 +1,8 @@
 # 13 — Audio capture stack: C8 sources, WASAPI pinned thread, hotplug, permissions
 
-**Status:** ready-for-agent
-**Claimed by:** —
-**Last update:** 2026-09-19
+**Status:** in-progress
+**Claimed by:** orchestrator -> sub-agent T13-impl
+**Last update:** 2026-09-19T13:56:41Z
 **Blocked by:** 03-skeleton-runtime-rules
 **Parallel slots:** ≤2 sub-agents (A: WASAPI source + resampler + pinned thread; B: WavInjector
 + hotplug + error mapping + tests)
@@ -53,3 +53,4 @@ handling, and mic-occupied/permission-denied error mapping.
 - [ ] Half-duplex gate test: gate closed → zero frames delivered; reopen restores.
 
 ## Progress log (append-only, newest last)
+- [2026-09-19T13:56:41Z] agent=orchestrator claimed=T13-impl did=dispatched next=sub-agent works through acceptance criteria

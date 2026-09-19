@@ -1,8 +1,8 @@
 # 09 — LLM provider seam: C5/C6 core, OpenAI Chat adapter, golden replay, mockllm server
 
-**Status:** ready-for-agent
-**Claimed by:** —
-**Last update:** 2026-09-19
+**Status:** in-progress
+**Claimed by:** orchestrator -> sub-agent T09-impl
+**Last update:** 2026-09-19T13:56:41Z
 **Blocked by:** 03-skeleton-runtime-rules
 **Parallel slots:** ≤2 sub-agents (A: llm module + OpenAI Chat adapter; B: tools/mockllm server
 + golden harness + compose wiring)
@@ -58,3 +58,4 @@ later agent tests reuse.
       test (each capability has a defined minimal request/response check).
 
 ## Progress log (append-only, newest last)
+- [2026-09-19T13:56:41Z] agent=orchestrator claimed=T09-impl did=dispatched next=sub-agent works through acceptance criteria
