@@ -1,8 +1,8 @@
 # 07 — Ball shell + state machine core (20 states, 40 transitions, hotkeys, tray)
 
-**Status:** ready-for-agent
-**Claimed by:** —
-**Last update:** 2026-09-19
+**Status:** in-progress
+**Claimed by:** orchestrator -> sub-agent T07-impl
+**Last update:** 2026-09-19T10:41:26Z
 **Blocked by:** 03-skeleton-runtime-rules (soft: 02 baseline ④ for draw-path memory budget —
 build against the budget; verify in 12)
 **Parallel slots:** ≤2 sub-agents (A: Win32 layered window + D2D renderer + tokens; B:
@@ -58,3 +58,4 @@ basic animations; full visual polish gate is human acceptance at 12).
 - [ ] Multi-monitor: drag to second monitor, persist, restore; simulated detach → primary.
 
 ## Progress log (append-only, newest last)
+- [2026-09-19T10:41:26Z] agent=orchestrator claimed=T07-impl did=dispatched (maintain 2-way concurrency floor) next=sub-agent works through acceptance criteria
