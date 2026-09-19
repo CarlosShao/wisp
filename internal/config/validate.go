@@ -31,6 +31,7 @@ func validate(c *Config) error {
 		validateNet(c),
 		validateAPIKeyRefs(c),
 		validateRolesIntensity(c),
+		validateCatalog(c),
 	} {
 		if err != nil {
 			return err
