@@ -1,0 +1,27 @@
+{
+  "role": "idle-y",
+  "kind": "cgo",
+  "machine": {
+    "hostname": "DESKTOP-LVS7839",
+    "osName": "Windows 10 Pro 24H2",
+    "osVersion": "10.0",
+    "osBuild": "26100",
+    "cpuName": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+    "cpuLogical": 12,
+    "ramTotalMB": 32624,
+    "ramAvailMB": 6352,
+    "processOwner": "swq",
+    "recordedAtUtc": "2026-09-19T08:31:59Z"
+  },
+  "startedAtUtc": "2026-09-19T08:31:59Z",
+  "privateWS_MB": 16.453125,
+  "sharedWS_MB": 26.953125,
+  "totalWS_MB": 43.38671875,
+  "privateCommit_MB": 70.234375,
+  "gdiObjects": 5,
+  "userObjects": 9,
+  "handles": 413,
+  "threads": 23,
+  "shellParts": "layered window + Direct2D + DirectWrite + tray + global hotkey + job object",
+  "note": ""
+}
