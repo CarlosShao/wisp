@@ -64,7 +64,10 @@ build.ps1 流程（SPEC-11 §2.2）：
 
 ```powershell
 cd build
-.\wisp.exe                # 无参 = GUI 占位 proof-of-life：打印版本/WISP_ENV/sherpa 运行时版本
+.\wisp.exe                # 无参 = 常驻进程（票 03）：打印版本 → 引导运行时骨架
+                          #   （Job Object + 单实例 + goroutine 注册表自检）→ 空事件循环；
+                          #   Ctrl+C / 结束信号触发 D38(e) 十步关停后退出。同会话二次启动
+                          #   会激活已有实例并退出。悬浮球窗口在票 07
 .\wisp.exe run "任务文本"   # CLI 占位：回显任务文本（真实 agent 循环在票 10）
 .\wisp.exe doctor         # 自检：工具链/DLL 同目录/版本匹配 deps.toml，输出 PASS/FAIL
 sha256sum -c SHA256SUMS   # 或 PowerShell: Get-FileHash 对表

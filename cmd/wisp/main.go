@@ -2,24 +2,29 @@
 // resident process, `wisp run` and `wisp doctor` are console subcommands whose
 // output goes through AttachConsole.
 //
-// Ticket 01 scope: build-chain proof of life. No-args prints version and
-// environment to the console (the floating ball GUI is ticket 07), `wisp run`
-// echoes its task text as a placeholder (the real agent loop is ticket 10),
-// and `wisp doctor` reports the toolchain/DLL self-check.
+// Ticket 03 scope: the no-args path boots the runtime skeleton (Job Object,
+// per-session single instance, goroutine registry - the init-time self-checks)
+// and runs an empty event loop until an exit signal, then exits through the
+// frozen D38(e) 10-step shutdown order. The floating ball GUI is ticket 07.
+// `wisp run` still echoes its task text as a placeholder (agent loop: ticket
+// 10); `wisp doctor` reports the toolchain/DLL self-check (ticket 01).
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
 	"github.com/CarlosShao/wisp/internal/buildinfo"
+	"github.com/CarlosShao/wisp/internal/proc"
 	sherpa "github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx"
 )
 
 const usage = `wisp - personal voice agent for Windows
 
 Usage:
-  wisp             GUI resident process (ticket 01: proof-of-life printout)
+  wisp             GUI resident process (boots the runtime skeleton, empty
+                   event loop; the floating ball window is ticket 07)
   wisp run "task"  run a task from the command line (ticket 01: echo placeholder)
   wisp doctor      toolchain and native-DLL self-check, prints PASS/FAIL
   wisp version     print version information
@@ -31,12 +36,12 @@ Environment: WISP_ENV in {prod|dev|test}, default from build (SPEC-03 §5).
 func main() {
 	args := os.Args[1:]
 	if len(args) == 0 {
-		// GUI entry point. Ticket 01 keeps this a console proof-of-life; the
-		// floating ball window is ticket 07. Printed proof includes the
+		// GUI entry point: boot the resident runtime and park in the empty
+		// event loop until an exit signal arrives. Printed proof includes the
 		// sherpa-onnx runtime version, which can only appear if the cgo link
 		// against the sherpa-onnx C API actually works.
 		attachParentConsole()
-		runProofOfLife()
+		runResident()
 		return
 	}
 	switch args[0] {
@@ -62,12 +67,53 @@ func main() {
 	}
 }
 
-// runProofOfLife is the no-args placeholder: prove the binary, its environment
-// model, and the linked sherpa-onnx C API are alive.
-func runProofOfLife() {
+// runResident is the no-args path: boot (env layout, Job Object, single
+// instance, goroutine registry), run the empty event loop, then exit through
+// the D38(e) shutdown order. A second launch in the same session signals the
+// running instance's activation event and exits (D42#7).
+func runResident() {
 	printVersions("")
-	fmt.Printf("wisp: GUI proof-of-life (floating ball lands in ticket 07)\n")
-	fmt.Printf("wisp: data dir = %s\n", dataDirForDisplay())
+
+	env, err := buildinfo.ResolveEnv()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "wisp: %v\n", err)
+		os.Exit(2)
+	}
+
+	rt, err := proc.Boot(env)
+	if errors.Is(err, proc.ErrAlreadyRunning) {
+		layout, lerr := proc.DefaultLayout(env)
+		if lerr == nil && layout.MutexEnabled {
+			_ = proc.SignalExistingInstance(layout.ActivateEventName)
+		}
+		fmt.Println("wisp: another instance is running in this session; activated it; exiting")
+		return
+	}
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "wisp: boot failed: %v\n", err)
+		os.Exit(1)
+	}
+	defer func() {
+		records := rt.Shutdown(false)
+		failed := 0
+		for _, rec := range records {
+			if rec.Err != nil {
+				failed++
+				fmt.Printf("wisp: shutdown step %d (%s) FAILED: %v\n", rec.Step, rec.Name, rec.Err)
+			}
+		}
+		fmt.Printf("wisp: exited through the D38(e) shutdown order (10 steps, %d failed)\n", failed)
+	}()
+
+	if rt.LayoutErr != nil {
+		fmt.Printf("wisp: layout deferred: %v\n", rt.LayoutErr)
+	}
+	fmt.Printf("wisp: resident runtime booted (data dir = %s, job object = on, single instance = %v)\n",
+		dataDirForDisplay(), rt.Instance != nil)
+	fmt.Printf("wisp: empty event loop running; the floating ball arrives in ticket 07 (Ctrl+C exits cleanly)\n")
+
+	reason := rt.RunEventLoop()
+	fmt.Printf("wisp: event loop ending (%s); running the D38(e) shutdown order\n", reason)
 }
 
 // cmdRun echoes the task text. Placeholder until the agent loop (ticket 10).
