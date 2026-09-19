@@ -26,11 +26,11 @@ import (
 // Boot returns ErrAlreadyRunning when another Wisp instance of this session
 // owns the mutex; the caller must then SignalExistingInstance and exit.
 type Runtime struct {
-	Env      buildinfo.Env
-	Layout   Layout
-	Job      *JobScope
-	Instance *SingleInstance
-	Registry *observe.Registry
+	Env       buildinfo.Env
+	Layout    Layout
+	Job       *JobScope
+	Instance  *SingleInstance
+	Registry  *observe.Registry
 	StartedAt time.Time // wall clock, for boot records only
 }
 
