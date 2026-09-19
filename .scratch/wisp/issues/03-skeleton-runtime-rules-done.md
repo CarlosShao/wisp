@@ -1,8 +1,8 @@
-# 03 — Project skeleton, runtime rules, error model, goroutine registry
+# 03 — Project skeleton, runtime rules, error model, goroutine registry (DONE ✅)
 
-**Status:** in-progress
+**Status:** done
 **Claimed by:** orchestrator -> sub-agent T03-impl
-**Last update:** 2026-09-19T06:32:38Z
+**Last update:** 2026-09-19T08:01:18ZT06:32:38Z
 **Blocked by:** 01-build-chain
 **Parallel slots:** ≤2 sub-agents (A: package scaffolding + buildinfo; B: goroutine registry +
 error model + clock/instance/Job utilities)
@@ -61,3 +61,4 @@ Job Object (C30), DisposalScope (C11), and the WISP_ENV selection logic (values 
 - [2026-09-19T07:24:39Z] agent=T03-impl did=single-instance+env-fork (per-session Local mutex + activation event, cross-process two-process test: second detects/signals/exits, re-acquire after exit; buildinfo typed Env/ParseEnv/ResolveEnv, legacy Env() renamed EnvString; LayoutFor pure prod/dev defaults + test env deferred to 06) next=shutdown-order-D38e+boot
 - [2026-09-19T07:36:20Z] agent=T03-impl did=shutdown-order-D38e+boot (RunShutdownSequence frozen 10 steps + order-audit test + fast-path skips only step7 + bounded-wait abandonment; proc.Boot runtime assembly w/ self-checks + RunEventLoop + main no-args wiring; BUILD.md no-args line updated; binary smoke: boot OK, second-instance signals first and exits) next=full-suite+handoff
 - [2026-09-19T07:37:13Z] agent=T03-impl did=handoff-to-orchestrator (all ticket-03 acceptance criteria implemented and tested; full go test ./... green: 37 tests in buildinfo/observe/plugin/proc; go vet + go build green; scripts/build.ps1 green with doctor PASS; binary smoke: no-args boot + empty event loop OK, second-instance signal-and-exit OK; note: one commit b155c6b accidentally swept parallel-agent spike WIP via git add -A, untracked again in cfa4175) next=ticket-03-done-decision-belongs-to-orchestrator
+- [2026-09-19T08:01:18Z] agent=orchestrator did=T03-adv VERDICT PASS (0 BLOCKER/0 MAJOR; report docs/evidence/s0/03-adversarial-acceptance.md); MINORs: count-convention noted, disposal-worker exemption forwarded to ticket 08, CGO note already in BUILD.md; also pushed missing cnb commit 6b83e93 next=ticket DONE

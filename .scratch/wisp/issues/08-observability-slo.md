@@ -18,6 +18,10 @@ Actions PR gates.
 - Redaction (hard-coded, non-disableable): API keys → last 4; audio buffers never logged;
   `web.fetch` bodies not logged; file contents not logged; long arg strings truncated; file paths
   optionally redactable (`[privacy] redact_paths`).
+- **Roster exemption (from T03-adv, must land in the D38 roster doc at SLO time)**:
+  `disposal-worker` is a sanctioned bookkeeping goroutine name outside the D38b temporary list —
+  document it as non-product (or refactor into the temporary roster) so the goroutine SLO gate
+  does not misreport it as a leak.
 - Sampler metrics per state (Sleeping/Armed/Warm/Conversation/panel-open/work-peak):
   tree private bytes via C30 `TreePrivateBytes()`, CPU 1-min mean, GDI objects, USER objects,
   handles, goroutines, threads. Also captures state-transition timestamps.
