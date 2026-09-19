@@ -45,3 +45,4 @@ delete-one) exposed as module APIs (GUI pages come in ticket 40).
 
 ## Progress log (append-only, newest last)
 - [2026-09-19T08:04:51Z] agent=orchestrator claimed=T04-impl did=dispatched (parallel with T02 spike) next=sub-agent works through acceptance criteria
+- [2026-09-19T08:27:57Z] agent=T04-impl did=schema-v1-DDL-verbatim+open/migrate-chain(pre-backup,wal-checkstart)+db-writer-lazy-queue;contract-introspection+4-migration-tests-green(CGO_ENABLED=0) next=DAO-layer-8-tables
