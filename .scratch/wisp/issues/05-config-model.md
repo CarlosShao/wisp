@@ -59,3 +59,4 @@ file-watch hot reload, schema migration with backup, and the security-section lo
 
 ## Progress log (append-only, newest last)
 - [2026-09-19T09:20:36Z] agent=orchestrator claimed=T05-impl did=dispatched (3rd concurrent slot trial) next=sub-agent works through acceptance criteria
+- [2026-09-19T10:39:08Z] agent=T05-resume3 did=startup: read ticket+SPEC-03; verified baseline (CGO0 go test green except pre-existing cmd/wisp sherpa cgo gate, same exclusion as T06 closeout; no gcc in this sandbox - full CGO build deferred, documented at closeout); deleted untracked probe junk tmp_probe/ + cmd/tomlprobe_main.go.bak next=reconcile WIP schema/defaults/parse vs SPEC-03 §3 key-by-key
