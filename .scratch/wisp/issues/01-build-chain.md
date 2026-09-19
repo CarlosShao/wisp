@@ -43,3 +43,4 @@ for everything else: AI agents must never be able to enter toolchain trial-and-e
 ## Progress log (append-only, newest last)
 - [2026-09-19T05:33:59Z] agent=orchestrator claimed=T01-impl did=dispatched implementation sub-agent next=sub-agent works through acceptance criteria
 - [2026-09-19T06:14:17Z] agent=T01-impl did=build chain implemented: go.mod(go1.27/toolchain go1.27.1), cmd/wisp(no-args proof-of-life/run/doctor+AttachConsole), internal/buildinfo, deps.toml(sherpa-onnx 1.13.8 MT-Release sha256+per-DLL pins, go-binding v1.13.8), fetch-deps.ps1, build.ps1; local build green, doctor PASS next=BUILD.md + tamper test + clean clone
+- [2026-09-19T06:18:53Z] agent=T01-impl did=BUILD.md frozen (toolchain pins, 6 real pitfalls, MSVC fallback); deps.toml tamper tests: archive-pin and DLL-pin both fail loudly (exit 1, bad file deleted); cache bound to manifest to prevent stale-cache bypass next=clean clone simulation + handoff

@@ -112,11 +112,25 @@ if ($dllSections.Count -eq 0) {
 }
 
 # --- cache fast path: re-hash cached files against the pins -----------------
+# The cache is only valid when (a) the manifest records the exact archive pin
+# from deps.toml, and (b) every cached DLL still hashes to its pin. This keeps
+# a tampered deps.toml pin from being silently satisfied by stale cache.
 $cachedOk = $true
-foreach ($sec in $dllSections) {
-    $dest = Join-Path $targetDir ($sec -replace '^sherpa-onnx\.dll\.', '')
-    if (-not (Test-Path -LiteralPath $dest)) { $cachedOk = $false; break }
-    if ((Get-Sha256 $dest) -ne $deps[$sec]['sha256']) { $cachedOk = $false; break }
+$manifestPath = Join-Path $targetDir '.cache-manifest.json'
+if (-not (Test-Path -LiteralPath $manifestPath)) {
+    $cachedOk = $false
+} else {
+    try {
+        $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+        if ($manifest.sha256 -ne $sherpa['sha256'] -or $manifest.version -ne $sherpa['version']) { $cachedOk = $false }
+    } catch { $cachedOk = $false }
+}
+if ($cachedOk) {
+    foreach ($sec in $dllSections) {
+        $dest = Join-Path $targetDir ($sec -replace '^sherpa-onnx\.dll\.', '')
+        if (-not (Test-Path -LiteralPath $dest)) { $cachedOk = $false; break }
+        if ((Get-Sha256 $dest) -ne $deps[$sec]['sha256']) { $cachedOk = $false; break }
+    }
 }
 if ($cachedOk) {
     Write-Host "fetch-deps: cache hit - third_party/sherpa-onnx matches deps.toml (sherpa-onnx $($sherpa['version']))"
