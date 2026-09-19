@@ -29,6 +29,9 @@ block-window channel, one-key mute, and the P14 multi-keyword/threshold verifica
 - Mute: global mute key → Muted (KWS inference stopped, model retained per #8); unmute
   restores; Armed visual per SPEC-08 §2.1.
 - Wake latency: wake-word-end → Listening ≤300ms (D32) measured with fixture audio.
+- **D47 interplay: KWS belongs to the Armed→Listening path (Path T semantics). In Conversation
+  (Path C) the mic is dedicated to ASR+AEC — KWS stays OFF there (not "paused per state" but
+  structurally unused); veto words remain the Confirming-channel mechanism for Path T only.**
 - Watchdog contract honored: Armed over-limit NEVER unloads KWS (42 rule; integration test).
 
 ## Out of scope

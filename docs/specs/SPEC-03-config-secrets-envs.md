@@ -27,7 +27,7 @@
 | `[ball]` | `size(int)=56`（44–72）`position{x,y,monitor}` `opacity_idle(float)=0.35` `click_through(bool)=true` `hide_on_fullscreen(bool)=true` | hot |
 | `[hotkey]` | `summon(string)` `mute(string)` `cancel(string)="Esc"`（Confirming 期间临时接管，会话结束归还）`panel(string)` | hot（须重注册） |
 | `[session]` | `warm_timeout_sec(int)=90` `settling_sec(int)=3` `conversation_idle_sec(int)=30` | hot |
-| `[voice]` | `enabled(bool)=true` `wake_word{enabled=false, keywords[]=[], thresholds[]=[], veto_words[]=["取消","停下","别"]}` `asr{provider="local-sherpa", model=<id>}` `tts{provider="local-sherpa", voice, speed(float)=1.0}` `punctuation(bool)=true` `conversation_mode(bool)=false` | reload（换模型）/ hot（阈值、否决词） |
+| `[voice]` | `enabled(bool)=true` `wake_word{enabled=false, keywords[]=[], thresholds[]=[], veto_words[]=["取消","停下","别"]}` `asr{provider="local-sherpa", model=<id>}` `tts{provider="local-sherpa", voice, speed(float)=1.0}` `punctuation(bool)=true` `conversation_mode(bool)=false` `aec{enabled(bool)=true, echo_ref="self-render"}` | reload（换模型）/ hot（阈值、否决词） |
 | `[audio]` | `input_device(string)="default"` `sample_rate(int)=16000` `half_duplex(bool)=true`（**硬编码 true，只读显示，写 false 报错**）`mic_muted_default(bool)=true` | hot（须重开设备） |
 | `[llm]` | `default_provider(string)` `fallback_provider(string)` `timeout_ms(int)=60000` `retry{max(int)=3, backoff_ms(int)=1000}` `temperature(float)` `providers.<name>{base_url, model, api_key_ref, context_window(int)}` | hot（api_key_ref 变更须重新解密） |
 | `[agent]` | `max_rounds(int)=50` `token_budget(int)=200000` `per_tool_timeout_ms(int)` `loop_guard{repeat_thresholds=[3,5,8]}` `steering_enabled(bool)=true` | hot |

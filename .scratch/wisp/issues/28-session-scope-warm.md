@@ -19,9 +19,13 @@ registry (rows now, lifecycle at 49), and the settle/dispose cascade.
   grants expired).
 - `Warm`: models hot + mic CLOSED + faint warm breathing; next wake via click/hotkey → Listening
   with ZERO model load (assert no engine loads on re-wake — B4's whole point).
-- `Conversation` (default OFF via `[voice] conversation_mode`): continuous mic + red solid ring
-  (never fades); Speaking-end → Listening directly (#28); 30s no-speech → Warm (close mic
-  FIRST); first-ever enable → L2-grade privacy confirm (native card) + logged.
+- `Conversation` (default OFF via `[voice] conversation_mode`): **Path C full duplex (D47) —
+  mic stays OPEN through playback with AEC (ticket 59/P15-gated); barge-in mid-playback →
+  Listening (D43 #41)**; red solid ring never fades; Speaking-end → Listening directly (#28);
+  30s no-speech → Warm (close mic FIRST); first-ever enable → L2-grade privacy confirm
+  (native card) + logged. **Memory note: ASR+TTS co-residency breaks the Path-T serial
+  mitigation — Conversation budget measured in S4; approved degradation = suspend ASR during
+  playback, keep VAD+AEC for barge-in (ticket 59/15).**
 - Battery saver (D42#6): Warm 30s / Conversation 15s; KWS resident OFF.
 - Model refcount: ASR/TTS/VAD/punct/KWS acquire-release through SessionScope only (no other
   module may keep models alive); leak test: session end → all refcounts zero.
@@ -37,6 +41,9 @@ registry (rows now, lifecycle at 49), and the settle/dispose cascade.
       loads (instrumentation counter) — B4 evidence.
 - [ ] Timers: 90s Warm → Settling → dispose; 30s Conversation → Warm with mic closed FIRST
       (order asserted); battery-saver values applied.
+- [ ] **Path C full duplex (D47, blocked by 59): during Conversation playback mic stays open
+      (AEC), barge-in works (≤400ms), Conversation memory measured and budget row backfilled
+      (or degradation mode verified if over budget).**
 - [ ] Conversation first-enable → privacy confirm + log; subsequent enables no prompt.
 - [ ] Dispose cascade order test (models → panel-hide → FreeOSMemory → grants expiry) and RSS
       return ≤10s (sampler).

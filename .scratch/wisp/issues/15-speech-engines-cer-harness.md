@@ -22,8 +22,11 @@ CER measurement harness with the two committed baseline wav sets.
 - Streaming ASR: partials for ball latency, final on VAD stop → punctuation is a LATER stage
   (27) — transcript emitted unpunctuated is acceptable at this ticket; `asr` error class for
   pure-silence/too-short → one retry (D37), then user-visible 「没听清」.
-- Engine slot mutex: at most one big-model family resident (ASR xor TTS; TTS arrives 26); load/
-  unload through DisposalScope; switch latency measured and reported against the 1.6s budget.
+- Engine slot mutex: at most one big-model family resident (ASR xor TTS) — **Path T only (D47)**.
+  **Path C (Conversation) is FULL DUPLEX: ASR+TTS+AEC co-resident during playback**; serial
+  mitigation unavailable there — Conversation memory budget is filled in by S4 measurement
+  (ticket 59/32); approved degradation = suspend ASR during playback, keep VAD+AEC for barge-in
+  detection. Switch latency (Path T) measured and reported against the 1.6s budget.
 - CER harness: `testdata/asr-baseline/near_clean/` (target ≤6%) and `noisy_far/` (≤15%, non-
   blocking but must report + UI hint requirement logged); sets COMMITTED to repo; runner emits
   per-file CER + aggregate; wired to a CI script (nightly/full self-hosted per 08).

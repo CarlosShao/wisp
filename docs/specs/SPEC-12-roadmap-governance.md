@@ -17,9 +17,9 @@
 | **S1** | 最小通路：快捷键→文字输入→Agent→通知 | 打字→回复→3s 回落；空闲进程树 RSS ≤25/40MB（按 spike 判定路径）实测过；`wisp run` CLI 可用；C21 token 落地（原生侧）；网络/TLS 错误分类、单调时钟、per-session 互斥、Job Object、`notify`+`list_tools` | 语音全部、WebView 面板、门控 UI、插件抽象、记忆 |
 | **S2** | 语音输入：麦克风→VAD→流式 ASR→Agent | 说话→出文字→走 S1 通路；CER 双门禁 6%/15%（两 wav 集入库）；D26 模型分发落地（P5 阻塞本片）；音频热插拔；`Downloading` 态；`intra_op_num_threads=1` | TTS、唤醒词、AEC |
 | **S3** | 安全层 + 称职助手能力面（判据必须同时含能力项与安全项） | **能力项**：D34 表 S3 工具逐个跑通留证据 + 四场景①②脚本化验收；**安全项**：L0 直通/L1 阻止窗口/L2 强确认、C19 生效（声明 L0 的危险工具仍判 L2）、越界被拒、D30 黑名单硬拒、组合闸门生效、`failToolCallsFromTruncatedMessage` 生效、C26 四连红队、C25 四通道、C29 篡改用例、批量聚合确认（D45-1）、C7 Image 部件可用 | Tier2 goja、命令面板、并发（TaskScheduler 只许单任务——**安全不完整期约束**） |
-| **S4** | 语音输出 + L1 画像 + 会话保活 | 短结果播报、长结果落文件；画像异步提取不占感知延迟；TTS 音质 ≥7/10 门禁（P7）；标点（P4）；`Warm`/`Conversation`（C31 + D43 #26/28/29/31）；`Warm` 内二次唤起首字 P50 ≤1.5s；`reminder.*`/`memory.*` | 命令面板、GUI 配置 |
+| **S4** | 语音输出 + L1 画像 + 会话保活 + **Path C 全双工（D47）** | 短结果播报、长结果落文件；画像异步提取不占感知延迟；TTS 音质 ≥7/10 门禁（P7）；标点（P4）；`Warm`/`Conversation`（C31 + D43 #26/28/29/31）；`Warm` 内二次唤起首字 P50 ≤1.5s；**AEC barge-in：播报中说话 ≤400ms 停播转听且不自激（P15 阻塞）**；`reminder.*`/`memory.*` | 命令面板、GUI 配置 |
 | **S5** | 按需 WebView：命令/结果面板 + L2 确认卡 + 配置编辑器 | 冷 ≤1500ms/热 ≤200ms；用完销毁或隐藏；RSS 达标；TOML↔GUI 双向一致；L2 确认卡完整参数 + **无「允许」按钮**（原生侧批准指引）；CSP+净化+服务端授权三层；无面板模式原生降级卡；CSS 侧复用 C21 token（人工验收） | **常驻 WebView（禁止）** |
-| **S6** | 唤醒词 + 看门狗 + 可观测性 + 成本 | KWS 开启空闲 ≤90/110MB、CPU ≤2%；看门狗按态查表自动卸载（Armed 不卸 KWS）并留日志；诊断包不含音频/Key/转写全文；CostMeter 面板可用；D42#1#5#6#8#10 全过 | AEC/barge-in |
+| **S6** | 唤醒词 + 看门狗 + 可观测性 + 成本 + **C32 realtime 大脑（门控）** | KWS 开启空闲 ≤90/110MB、CPU ≤2%；看门狗按态查表自动卸载（Armed 不卸 KWS）并留日志；诊断包不含音频/Key/转写全文；CostMeter 面板可用；D42#1#5#6#8#10 全过；**C32 `RealtimeEngine` 首 provider（门控双条件：S4 AEC spike 通过 + 用户有 Key，缺一自动推迟并登记）** | 干活路径的全双工（Path T 半双工是设计，D47） |
 | **S7** | 并发 + 审批队列 + Tier2 goja + 生命周期收尾 | C18：并发确认按 correlationId 路由、队头单显+深度计数、超时判拒绝；C20 路径冲突排队面板可见；C22 梯度提醒触发进 Stuck；D45-2 会话授权；C24 契约测试；**端到端真插件 = lark-cli 包装插件**（含 exe_hash 篡改拒执行）；goja 按需加载卸载+加固；崩溃恢复/单实例/自启/更新/DPI/显示器拓扑/失败预演全过 | 插件 SDK 文档、registry |
 | **S8** | （开源前才启动）macOS + 签名分发 + i18n + 插件 SDK + registry | 见 `docs/DEFERRED.md` 各条完成判据；更新流程（D41b）+ N-1 回滚；卸载残留提示 | — |
 
@@ -35,7 +35,7 @@
 
 ### 4.1 契约变更流程
 
-改 C1–C31 或 D1–D46 = **人工批准**；同步更新 PLAN.md、`docs/DECISIONS.md`、受影响切片卡。
+改 C1–C32 或 D1–D47 = **人工批准**；同步更新 PLAN.md、`docs/DECISIONS.md`、受影响切片卡。
 agent 单方面改契约 = 跑歪模式 #1，对抗验收判失败。
 
 ### 4.2 未定义即停（D22 闸门③）
@@ -69,7 +69,7 @@ agent 单方面改契约 = 跑歪模式 #1，对抗验收判失败。
 | DEFERRED | 社区插件 registry | D23 | 可搜索索引+安装命令+版本兼容校验 | 插件 SDK | 只能本地路径/Git URL 安装 |
 | DEFERRED | i18n/非中文 | D23（⚠ 语音链路是中文模型，非 locale 问题；非中文用户语音功能不可用只能走文字通道） | UI 全外置+英文 locale+英文 ASR/TTS/KWS 模型过基线 | S5+英文语音模型 | 界面中文；语音仅中文 |
 | DEFERRED | 无障碍 | 未讨论遗漏后补；自用期非阻塞 | 面板过 axe 检查；悬浮球状态有非视觉等价反馈；全流程纯键盘 | S5 | 屏幕阅读器不可用面板 |
-| DEFERRED | AEC/真 barge-in | D16 | 播报期可语音打断不自激 | C8 已留 Aec 接口位 | 播报时无法语音打断 |
+| ~~DEFERRED~~ 已采纳（Path C） | AEC/barge-in（陪聊路径） | **D47 部分推翻（2026-09-19）**：陪聊全双工是 owner 硬需求，降为 S4 必做；仍 DEFERRED 的只有干活路径全双工（设计非债务） | 播报中说话 ≤400ms 停播转听；播报音频注入麦克风回路无 ASR 转写 | P15 | 干活路径播报中仍不能语音打断（设计） |
 | DEFERRED | 快捷键路径语音否决（B1） | KWS 未加载+ASR 加载 1–3s > 2–3s 窗口，物理不可能 | 快捷键会话中说「取消」能否决 L1 | AEC | Confirming 明示「语音取消不可用」 |
 | DEFERRED | 剪贴板历史（D34） | 无差别记录隐私风险过高 | 敏感内容识别+自动跳过+逐条删 | 敏感识别器 | 只有当次读写 |
 | DEFERRED | `doc.read` xlsx/OCR（D34） | 工量大/额外模型冲击内存 | OCR 模型常驻 ≤80MB 不破 700MB；xlsx 读出表格结构 | S3 的 PDF/docx | 读不了 Excel 与图片文字 |
@@ -96,18 +96,18 @@ agent 单方面改契约 = 跑歪模式 #1，对抗验收判失败。
 
 ## 6. 文档交付物清单（§12；S1 时按此生成骨架）
 
-- 人读版：`PLAN.md`（定稿）· `DECISIONS.md`（D1–D46，agent 只读）· `DEFERRED.md`（§5 表）·
-  `RISKS.md`（§9 + D42）· `PRECHECK.md`（P1–P14 及结论回填）· `ARCH.md`（D35–D38/D41）·
+- 人读版：`PLAN.md`（定稿）· `DECISIONS.md`（D1–D47，agent 只读）· `DEFERRED.md`（§5 表）·
+  `RISKS.md`（§9 + D42）· `PRECHECK.md`（P1–P15 及结论回填）· `ARCH.md`（D35–D38/D41）·
   `SEQUENCES.md`（D40 五时序）
-- Agent 执行版：**薄** `AGENTS.md`（根：D1–D46 一行摘要 + 禁止清单 + 未定义即停 + docs 索引）·
-  `docs/contracts/C1..C31.md` · `docs/STATE_MACHINE.md`（D43）· `docs/TOOLS.md`（D34）·
+- Agent 执行版：**薄** `AGENTS.md`（根：D1–D47 一行摘要 + 禁止清单 + 未定义即停 + docs 索引）·
+  `docs/contracts/C1..C32.md` · `docs/STATE_MACHINE.md`（D43）· `docs/TOOLS.md`（D34）·
   `docs/slices/S0..S8.md` · `docs/SLO.md`（D32 + 进程树口径 + 可重跑命令，阈值禁改）·
   `docs/BUILD.md`（S0 冻结）
 - 本目录 `docs/specs/`：与上列互补——spec 讲「怎么做」，契约/状态机/工具表讲「是什么」。
 - 时序视图五条（D40，落 SEQUENCES.md）：冷唤起单轮回落 · Warm 多轮 · 并发审批冲突 ·
   失败与恢复（LLM 5xx + cgo 崩溃）· 注入检出。
 
-## 7. 前置核实任务（P1–P14，阻塞关系）
+## 7. 前置核实任务（P1–P15，阻塞关系）
 
 | 任务 | 阻塞 |
 |---|---|
@@ -117,6 +117,7 @@ agent 单方面改契约 = 跑歪模式 #1，对抗验收判失败。
 | P4 标点评测 / P7 TTS 音质（门禁） | **S4** |
 | P6 WebView2 Runtime 普及 | S5 |
 | P2 goja async/ES 实测 | S7 |
+| **P15 AEC3 可行性（D47，含外部音源误触发率与跨端点漂移）** | **S4（阻塞）** |
 | P8 SignPath | S8 |
 
 ## 8. 下一步（PLAN §15 建议第 3–5 步的执行顺序）

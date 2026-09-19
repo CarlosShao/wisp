@@ -40,7 +40,8 @@ All tickets are **vertical tracer bullets**; work the **frontier** (all blockers
   23 system/window/input-tools (20) · 24 doc/search-tools (20) · 25 s3-acceptance (21,22,23,24)
 - **S4**: 26 tts-output (15) · 27 punctuation (15) · 28 session-scope Warm (07,15) ·
   29 memory-l1/l2 (04,10,28) · 30 result-routing D10 (10,26) · 31 reminders (04,30) ·
-  32 s4-acceptance scenarios ③④ (27,29,30,31)
+  32 s4-acceptance scenarios ③④ (27,29,30,31) — **26/28/32 的 Path C 部分（D47 全双工/barge-in）
+  另被 59 阻塞**
 - **S5**: 33 panel-host C27 (07,12) · 34 frontend-scaffold (01) · 35 panel-bridge C17 (33,34) ·
   36 result-history-panel (30,35) · 37 approval-ui (21,35) · 38 palette+tasks (35) ·
   39 config-editor-gui (05,35) · 40 security/privacy/cost-pages (29,35,44)
@@ -50,6 +51,10 @@ All tickets are **vertical tracer bullets**; work the **frontier** (all blockers
   49 session-grants D45-2 (04,48) · 50 tier1-manifest-plugins (20) · 51 tier2-goja (17,20) ·
   52 d46-command-plugins (50) · 53 larkcli-plugin-e2e (48,51,52) · 54 s7-acceptance (47–53)
 - **S8 (deferred, not ready-for-agent)**: 55 macos · 56 signing+dist+naming · 57 plugin-sdk+registry · 58 i18n
+- **D47 追加（2026-09-19，编号晚于 58 但入图拓扑早于被阻塞票）**：
+  **59 p15-aec-spike (13) → 阻塞 26/28/32 的 Path C 部分与 60**；
+  **60 c32-realtime-engine (16,28,44,59；门控双条件：59 通过 + 用户有 Key，缺一自动推迟登记)**。
+  ⚠ 编号惯例说明：后补票用更大编号以保持文件名稳定，忽略编号与拓扑序的差异，以 Blocked by 为准。
 
 ⚠ **Safety-incomplete period**: tickets 21–32 run with `TaskScheduler` single-task only;
 multi-task concurrency unlocks only at 47 (SPEC-12 §2).

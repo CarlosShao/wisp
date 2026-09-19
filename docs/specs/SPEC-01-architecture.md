@@ -94,7 +94,10 @@ wisp/                                  # Go module: github.com/CarlosShao/wisp�
 ```
 
 依赖白名单（D22；新增须人批准）：`sherpa-onnx` Go 绑定（cgo）· `goja`（纯 Go）· `jchv/go-webview2`
-（纯 Go）· `golang.org/x/sys` · SQLite 驱动 · TOML 解析 · `goreleaser`（打包）。
+（纯 Go）· `golang.org/x/sys` · SQLite 驱动 · TOML 解析 · `goreleaser`（打包）·
+**`webrtc-audio-processing`（AEC3，BSD-3，cgo —— 随 D47/P15 批准加入，2026-09-19：仅用于 Path C
+陪聊回声消除；许可证与绑定可用性由 P15 实测把关，不通过则本条回收、Path C barge-in 降级为
+按键/点击打断，不得复活 Path T 全双工）**。
 【SPEC】白名单类别内选型：SQLite 用 `modernc.org/sqlite`（纯 Go，不再叠加 cgo）、TOML 用
 `pelletier/go-toml/v2`、结构化日志用标准库 `log/slog`（零新依赖）。前端白名单见 SPEC-08 §5。
 明确排除：`wails`、`webview/webview_go`、任何 Node/Python/Deno **运行时**（构建期工具链除外）、

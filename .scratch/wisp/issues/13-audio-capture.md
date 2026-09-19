@@ -16,7 +16,10 @@ handling, and mic-occupied/permission-denied error mapping.
 
 ## Key constraints
 - Interface per C8: `Start(ctx, chan<- []byte)/Stop`; frames 16kHz/mono/int16; implementations:
-  WASAPIMicrophone, WavInjector, `[AecSource]` interface slot only (no implementation — DEFERRED).
+  WASAPIMicrophone, WavInjector, and **AecSource — upgraded from interface-slot to a real S4
+  implementation (D47): wraps webrtc-audio-processing (AEC3, P15-gated) using self-rendered TTS
+  PCM as reference + WASAPI render position; used ONLY on Path C (Conversation)**. Path T
+  remains half-duplex (design, not debt).
 - WASAPI: shared mode; `runtime.LockOSThread()` pinned capture thread that runs NO other Go code
   (D38a); resample device-native rate → 16k via in-module linear interpolator (no new deps).
 - Bounded channel ≤200ms of audio; overflow drops frames AND increments a counter exposed to
@@ -24,7 +27,10 @@ handling, and mic-occupied/permission-denied error mapping.
 - Half-duplex gate (D16): a mute gate the TTS side will drive (Speaking closes capture); audio
   buffers NEVER persisted/logged (D16③).
 - Hotplug (D42#2): `IMMNotificationClient::OnDefaultDeviceChanged` → re-enumerate once; failure →
-  `Error(audio_device)` naming the device; never silently keep a stale handle.
+  `Error(audio_device)` naming the device; never silently keep a stale handle. **D47 note: capture
+  and render may be DIFFERENT endpoints (Bluetooth speaker + wired mic) — clock drift between them
+  is an AEC quality input; P15 (ticket 59) measures this case; keep capture/render endpoint pair
+  queryable for the spike.**
 - Occupied/permission-denied (D42#12): open-device failures → `Error(audio_device)` with explicit
   guidance text pointing to Windows privacy settings; silent failure forbidden.
 - Mic-muted-default respected on boot (`[audio] mic_muted_default`); mute hotkey path hooks into

@@ -91,6 +91,8 @@
 | 28 | `Speaking` | 播报完（Conversation 模式） | `Listening` | 麦克风开启 + 红色常亮环 |
 | 29 | `Warm` | 单击球/快捷键 | `Listening` | **零模型加载**（B4 的解） |
 | 30 | `Warm` | 开启 Conversation | `Conversation`→`Listening` | **首次开启需 L2 级隐私确认** |
+| 41 | `Speaking` | 播报中检出用户语音（Path C，AEC） | `Listening` | 停 TTS 并释放输出，≤400ms；播报音频不得进 ASR（D47） |
+| 42 | `Conversation` | 任务意图（如「帮我做 X」） | 交回文本循环（Path T） | realtime 大脑会话挂起或结束；上下文经 C7 携带（D47） |
 | 31 | `Warm` | 90s 无交互 | `Settling` | **Dispose SessionScope**；卸 ASR/TTS；FreeOSMemory；销毁或隐藏面板 |
 | 32 | `Settling` | 3s 计时到 | `Sleeping`(KWS 关)/`Armed`(KWS 开) | **RSS 10s 内达标** |
 | 33 | `Settling` | 新唤起 | `Listening` | **取消回落**（用户意图优先） |

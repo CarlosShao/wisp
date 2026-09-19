@@ -21,6 +21,9 @@ KWS：独立于 ASR 的常驻小模型（Armed 态），命中唤醒词/否决�
   点悬浮球 / 控制词（非播报期）。
 - D16 推论（D32 16.3.3）：半双工 ⇒ ASR 与 TTS 时段互斥 ⇒ **串行加载，峰值 = max(ASR, TTS)
   而非 sum**——这是 700MB 预算成立的前提；切换延迟（加载 TTS ~300–800ms）必须实测（S0 输出⑤）。
+  ⚠ **D47 收scope（2026-09-19）：本推论仅适用 Path T**；Path C 全双工下 ASR+TTS 共存，
+  `Conversation` 内存预算由 S4 实测回填（超标降级 = 播放期挂起 ASR、保留 VAD+AEC 插话检测），
+  见 D32 16.3.3 的 D47 注。
 - 音频缓冲区**永不落盘、不写日志**（D16③）；`keep_audio` 硬编码 false（SPEC-03 §3）。
 
 ## 3. AudioSource（C8）
@@ -54,10 +57,13 @@ type AudioSource interface {
 | TTS | matcha / vits 中文（~120–300MB） | 会话起（或首播报前）→ Warm 超时 | 首帧 ≤800ms（Warm 内）；音质主观 ≥7/10 门禁（P7 落 S4） |
 
 - **一个 onnxruntime 实例复用全链路**（D5）；一律 int8 量化。
-- 串行化策略：【SPEC】`speech` 模块内建「引擎 slot 互斥」：同一时刻至多一个大模型 family
-  （ASR 或 TTS）驻留；TTS 需要而 ASR 驻留时，先 Dispose ASR scope（C11）再加载 TTS；
+- 串行化策略：【SPEC】`speech` 模块内建「引擎 slot 互斥」：**Path T** 下同一时刻至多一个大模型
+  family（ASR 或 TTS）驻留；TTS 需要而 ASR 驻留时，先 Dispose ASR scope（C11）再加载 TTS；
   若 S0 实测切换 >1.6s 预算 → 退化方案为「TTS 常驻 + ASR 按需」（TTS 更小）。
+  **Path C（D47）例外：全双工要求 ASR+TTS（+AEC）共存**，slot 互斥在 Conversation 态让位于
+  共存模式；内存预算实测回填与降级路径见上条 D47 注与 D32 16.3.3。
 - 云端 ASR/TTS provider：C9 接口位保留，实现 DEFERRED（D5/D23）；启用必须显式告知「音频将上传」。
+  ⚠ 云端 realtime S2S **另立 C32（D47）**，不属于本条 DEFERRED；本条只指级联式云端 ASR/TTS。
 
 ## 5. KWS 行为细节（B1/P14）
 
@@ -127,7 +133,10 @@ type AudioSource interface {
 
 ## 10. 不做什么
 
-- 不做 AEC/barge-in（DEFERRED，`AecSource` 仅接口位）；不做全双工。
+- **D47 裁决（2026-09-19）收scope**：半双工与本节排除**只约束干活路径（Path T）**。
+- 陪聊路径（Path C / Conversation）**全双工**：AEC 消掉播报回声（回声参考 = 自渲染 PCM，WASAPI 给渲染位置），说话即 barge-in；**S4 必做**，验收 = 播报中说话 ≤400ms 停播转听、且播报音频注入麦克风回路不得产生任何 ASR 转写（P15 阻塞）。
+- 仍 DEFERRED 的只有**干活路径的全双工**（Path T 保持半双工是设计，不是债务）。拿本节旧文「不做全双工」否决 Path C barge-in 或 realtime provider = 契约违规。
+- 云端 realtime S2S = C32 `RealtimeEngine`（D47 的 Path C 增强层）：opt-in、零工具权限、S6 门控（AEC spike 通过 + 用户有 Key）；见 PLAN §16.12。
 - 不做唤醒词训练功能（keywords 文本文件即自定义，D5）。
 - 不做英文/多语言语音模型（i18n DEFERRED；注意语音链路是中文模型，非 locale 问题）。
 - 不把 ASR/TTS 模型打进安装包（体积不可能，D24/D26）。

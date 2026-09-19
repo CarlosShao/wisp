@@ -119,7 +119,7 @@
 | ① 系统操作与文件治理 | `app.launch` `file.open` `fs.*`(含 `fs.trash`) `search.*` `system.*` `window.*` | S3 | 10 条真实指令逐条跑，风险级判定与 D34 表一致（SPEC-10 §7.1） |
 | ② 信息查询与研究 | `web.search` `web.fetch` `web.open` `doc.read` `screen.capture` | S3 | 5 条指令；截图必须真的进 LLM（SPEC-10 §7.2） |
 | ③ 口述成文 | ASR + 标点(P4) + `input.type` + `fs.write`/`clipboard.write` | S2+S3+S4 | 连续口述 300 字直达目标应用光标，标点主观 ≥8/10（SPEC-10 §7.3） |
-| ④ 陪聊 | TTS + Conversation + Warm + L1 画像 | S4 | 连续 5 轮，第 2 轮起首字 ≤1.5s，音质 ≥7/10，能记住第 1 轮事实（SPEC-10 §7.4） |
+| ④ 陪聊 | TTS + Conversation + Warm + L1 画像 + **AEC barge-in（D47）** | S4 | 连续 5 轮，第 2 轮起首字 ≤1.5s，音质 ≥7/10，能记住第 1 轮事实；**播报中说话 ≤400ms 可插话且不自激**（SPEC-10 §7.4） |
 
 ## 5. 范围边界（Out of Scope，均为 PLAN 定案，不得「补回」）
 

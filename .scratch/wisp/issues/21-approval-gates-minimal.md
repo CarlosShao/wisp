@@ -32,6 +32,9 @@ block window (2–3s countdown strip) with its four veto channels, L2 native con
   the batch to L2 (unaggregated).
 - Cancel non-atomicity surfaced: cancel/veto after start → applied-steps report (from 20).
 - Ball visuals: Confirming pulse + AwaitingApproval depth badge (depth=1 now).
+- **D47 scope note: all approval mechanics live on the TEXT loop (Path T + handoff). Path C
+  realtime brain has ZERO tool permissions — it cannot produce approval requests; if the user
+  asks it to "do X", the C32 handoff returns the task to the text loop where full gating applies.**
 
 ## Out of scope
 - Multi-task queue routing (48); panel-side card (37); session grants (49); input.type binding

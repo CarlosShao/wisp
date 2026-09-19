@@ -32,6 +32,9 @@ Wisp 是 Windows 桌面常驻应用：Win32 分层窗口 + WASAPI 音频 + WebVi
   预装（贡献者门槛）。CI 用 Actions 缓存目录。
   - `sherpa-onnx` C 库 + `onnxruntime` 动态库版本必须与编译时链接一致——版本错配的症状是
     运行时崩溃而非编译错误，故 `deps.toml` 同时是运行时自检的比对源（§7.2）。
+  - **D47 追加（2026-09-19）**：`webrtc-audio-processing`（AEC3）为 P15-gated 的第三项原生依赖
+    ——P15 通过后纳入 `deps.toml`（版本+SHA256）与 fetch-deps 流水线，DLL 同目录分发规则同上；
+    P15 不通过则不引入（Path C barge-in 降级为按键打断，SPEC-01 白名单条目回收）。
 
 ### 2.2 构建顺序（一键流程）
 
