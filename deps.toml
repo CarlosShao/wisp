@@ -1,0 +1,54 @@
+# deps.toml - pinned native dependencies (SPEC-11 §2.1).
+#
+# Single source of truth for native dependency versions and hashes. Consumed by:
+#   - scripts/fetch-deps.ps1   (build time: download, verify SHA256, cache into third_party/)
+#   - wisp doctor              (runtime self-check; build.ps1 bakes the versions below
+#                               into the binary via internal/buildinfo, SPEC-11 §7.2)
+#
+# Strategy (S0, ticket 01): the official Go bindings github.com/k2-fsa/sherpa-onnx-go
+# (+ platform module sherpa-onnx-go-windows) ship a prebuilt mingw copy of the
+# sherpa-onnx C API plus headers inside the module itself, so cgo linking works
+# with zero local C toolchain configuration. The DLLs distributed next to
+# wisp.exe come from the official sherpa-onnx Windows shared release pinned
+# below (MT = static CRT, Release): same sherpa-onnx version, same bundled
+# onnxruntime major.minor.patch, C ABI stable across the two builds.
+
+[sherpa-onnx]
+version = "1.13.8"
+license = "Apache-2.0"
+source = "https://github.com/k2-fsa/sherpa-onnx/releases/download/v1.13.8/sherpa-onnx-v1.13.8-win-x64-shared-MT-Release.tar.bz2"
+archive_type = "tar.bz2"
+sha256 = "6dffdc715a4465b989446a6105265d2cb345e7101591a17d35534b6758f6e8df"
+# Network reality: direct github.com release downloads intermittently fail TLS
+# from CN networks. fetch-deps.ps1 falls back to this mirror prefix; the
+# SHA256 pin makes any mirror trustworthy.
+mirror_prefix = "https://ghfast.top/"
+
+# DLLs extracted from the archive into third_party/sherpa-onnx/ and copied next
+# to wisp.exe by scripts/build.ps1 (colocated-DLL rule, SPEC-11 §7.1).
+# Keys are the destination file names.
+[sherpa-onnx.dll."onnxruntime.dll"]
+archive_path = "bin/onnxruntime.dll"
+sha256 = "7f66f939a881baf4f46a2216496798edf4a1429878b646d12674aa62f27d8a25"
+
+[sherpa-onnx.dll."sherpa-onnx-c-api.dll"]
+archive_path = "lib/sherpa-onnx-c-api.dll"
+sha256 = "300e0c88400903fc4cfc88be88a8ae587a24cc658653e0e1fd1c2b8dbbc68557"
+
+[sherpa-onnx.dll."sherpa-onnx-cxx-api.dll"]
+archive_path = "lib/sherpa-onnx-cxx-api.dll"
+sha256 = "02ca46060f65d7d50f3448e7e67e608b0547c9acb274cba2f5cc6936521352b0"
+
+[onnxruntime]
+version = "1.28.2"
+license = "MIT"
+note = "bundled inside the sherpa-onnx release archive above; not downloaded separately"
+
+# Go bindings for the sherpa-onnx C API (cgo). go.mod enforces the version;
+# it is repeated here so wisp doctor can cross-check the linked module version
+# against the pin ledger.
+[go-binding-sherpa-onnx]
+module = "github.com/k2-fsa/sherpa-onnx-go"
+version = "v1.13.8"
+license = "Apache-2.0"
+note = "contains the prebuilt x86_64-pc-windows-gnu C API DLLs and c-api.h used at link time"

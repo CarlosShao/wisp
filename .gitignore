@@ -11,6 +11,7 @@ vendor/
 # --- Build & deps (fetched by scripts/fetch-deps.ps1, see docs/specs/SPEC-11) ---
 third_party/
 deps/
+build/
 
 # --- Frontend (built artifacts only; frontend/ source is tracked) ---
 node_modules/
