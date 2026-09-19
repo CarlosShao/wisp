@@ -36,7 +36,9 @@ basic animations; full visual polish gate is human acceptance at 12).
   Confirming, cancel key temporarily takes Esc and MUST be returned after session (B1).
 - Tray: left-click = open panel (no-op stub), right-click menu (open panel / mute / pause wake /
   exit). Click-through transparent regions; ball body clickable; never steals focus.
-- Multi-monitor: Per-Monitor V2 DPI; position saved per monitor; off-screen → back to primary
+- Multi-monitor: Per-Monitor V2 DPI; position saved per monitor; off-screen → back to primary **Spike backfill (T02): Path Y confirmed (idle 16.5/16.6MB ≤ 25MB with cgo resident); ball
+  window stack (layered+D2D+DWrite) ≈420 handles → SLO handle gate for window-bearing states is
+  <600 (orchestrator ruling, docs/SLO.md); release path must bound non-Sleeping handle growth.**
   visible (DPI resource rebuild stubbed to full for S1).
 
 ## Out of scope
