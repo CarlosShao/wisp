@@ -1,4 +1,4 @@
-# PRECHECK — 前置验证任务结论（P1 / P2 / P11 回填）
+# PRECHECK — 前置验证任务结论（P1 / P2 / P11 / P13 回填）
 
 > 状态：S0 ticket 02 完成（2026-09-19）。三行结论对应 `docs/PLAN.md` §16.6 前置验证表；
 > 实测细节与 JSON 证据见 `docs/SLO.md` 与 `docs/evidence/s0/02-spike-report.md`。
@@ -55,3 +55,18 @@ C27 单窗口复用（隐藏而非销毁）维持为强制设计。**
   同进程销毁+重建 P50 860–956ms，即 C27 要绕开的成本）。
 - 工程注记：`w.Dispatch()` 只能配合 `w.Run()` 的事件循环（线程消息），手工 pump 消息循环
   时宿主存活探测要用 `Bind`+`Eval`（窗口消息）——票 33（PanelHost）实现时注意。
+
+## P13 — 便携模式 × DPAPI 解密失败（S1 票 06 回填）
+
+**结论：采用 SPEC 建议的显式错误回退——便携模式下 `dpapi:` 引用解密失败返回
+`ErrPortableDecrypt`（错误文本直接指引改用 `env:` 引用），绝不回退明文。**
+
+- 依据：便携安装随介质跨机器/跨用户漂移，DPAPI（CurrentUser）blob 必然解不开；
+  明文回退会让配置目录里躺着可读密钥，违反 D33 底线，故失败必须显式且可操作。
+- 落点：`internal/secret/store.go`（`ErrPortableDecrypt` + `WithPortable` 选项；
+  错误文本显式给出 `env:` 指引）；数据目录重定位复用 `internal/proc`
+  `ApplyPortableOverride`（`portable.txt` 标记，dev → `data-dev\`）。
+- 验证：`TestPortableDecryptFailureExplicit`（便携 → `ErrPortableDecrypt` + `env:` 指引 +
+  无回退值；便携自身 blob 仍可解；非便携 → 普通 DPAPI 错误而非 P13 错误）、
+  `TestPortableOverride`（三环境重定位 + `WISP_TEST_DATA_DIR` 注入优先于标记）。
+- 便携用户的推荐密钥载体即 `env:` 引用（占位值任意，CI/便携场景可用）。
