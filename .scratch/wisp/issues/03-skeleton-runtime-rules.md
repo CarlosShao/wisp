@@ -55,3 +55,4 @@ Job Object (C30), DisposalScope (C11), and the WISP_ENV selection logic (values 
 - [2026-09-19T06:32:38Z] agent=orchestrator claimed=T03-impl did=dispatched (parallel with T01-adv) next=sub-agent works through acceptance criteria
 - [2026-09-19T06:50:23Z] agent=T03-impl did=unit1-internal-skeleton (doc.go for all 19 packages 1:1 frozen module table + statemachine State vocabulary; no product features) next=error-model-D37+clock
 - [2026-09-19T06:54:59Z] agent=T03-impl did=error-model-D37-observe (17 enum classes + state mapping pinned to statemachine + retry policies + message keys + ValidateErrorClass DAO hook; monotonic Timeout + wall-clock helpers) next=goroutine-registry
+- [2026-09-19T07:01:29Z] agent=T03-impl did=goroutine-registry-observe (Spawn/root/recover-boundary/D38b roster+baseline check, race-clean tests: noop-task baseline, panic->internal+root-cancel, unknown-name leak flag, bounded Wait; bare-go-func grep regression test) next=DisposalScope-C11
