@@ -1,8 +1,8 @@
 # 01 — S0①: build chain, one-shot clean build, BUILD.md frozen
 
-**Status:** ready-for-agent
-**Claimed by:** —
-**Last update:** 2026-09-19
+**Status:** in-progress
+**Claimed by:** orchestrator -> sub-agent T01-impl
+**Last update:** 2026-09-19T05:33:59Z
 **Blocked by:** None — can start immediately
 **Parallel slots:** 1
 **Spec refs:** SPEC-11 §2, SPEC-01 §3, §14.9 (highest-risk gap), S0 done①
@@ -41,3 +41,4 @@ for everything else: AI agents must never be able to enter toolchain trial-and-e
 - [ ] BUILD.md committed and pushed to both remotes.
 
 ## Progress log (append-only, newest last)
+- [2026-09-19T05:33:59Z] agent=orchestrator claimed=T01-impl did=dispatched implementation sub-agent next=sub-agent works through acceptance criteria
