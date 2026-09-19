@@ -79,7 +79,7 @@ sha256sum -c SHA256SUMS   # 或 PowerShell: Get-FileHash 对表
 - 数据目录可写（WISP_ENV / portable.txt 规则，SPEC-03 §5.2）
 
 注意：本二进制是**直接链接** sherpa C API 的（导入表里有 `sherpa-onnx-c-api.dll` 与
-`onnxruntime.dll`），所以 DLL 不在 exe 旁时进程根本起不来（Windows 报 0xC0000135）——
+`onnxruntime.dll`；注意 onnxruntime.dll 是 sherpa-onnx-c-api.dll 的**间接**导入，并非 wisp.exe 的直接导入，但加载器解析规则相同），所以 DLL 不在 exe 旁时进程根本起不来（Windows 报 0xC0000135）——
 「doctor 打印 DLL FAIL」这一格在链接语义上由加载器兜底，doctor 打印的 PASS 即加载器
 级证明。windowsgui 子系统切换（`-H=windowsgui`）推迟到票 07；届时如需「缺 DLL 仍能
 弹出友好错误」，应改为运行时 LoadLibrary 包装，这是那票的设计题。
