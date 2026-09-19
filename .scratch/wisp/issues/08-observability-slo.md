@@ -1,8 +1,8 @@
 # 08 — Observability: logs/redaction, SLO sampler, slo-check.ps1, CI pipeline
 
-**Status:** ready-for-agent
-**Claimed by:** —
-**Last update:** 2026-09-19
+**Status:** in-progress
+**Claimed by:** orchestrator -> sub-agent T08-impl
+**Last update:** 2026-09-19T22:36:14Z
 **Blocked by:** 03-skeleton-runtime-rules, 07-ball-state-machine-core
 **Parallel slots:** ≤2 sub-agents (A: observe module + sampler; B: slo-check script + CI workflows)
 **Spec refs:** SPEC-10 §3(+3.1), §5.1, D32, §5.1 redaction, D42#10, D22 static bans, SLO gates
@@ -49,3 +49,4 @@ Actions PR gates.
 - [ ] Diagnostics: sampler data attachable to a bundle (45 completes the UX).
 
 ## Progress log (append-only, newest last)
+- [2026-09-19T22:36:14Z] agent=orchestrator claimed=T08-impl did=dispatched next=sub-agent works through acceptance criteria
