@@ -1,0 +1,203 @@
+name: ci
+
+# CI pipeline (ticket 08; SPEC-11 §6). PR gate = lint + test-core +
+# test-windows + slo-smoke; slo-full runs on the self-hosted wisp-slo runner
+# (full six-state SLO + settle + leak). Per D22 mode-6 NO job is configured
+# skippable: no `if: false`, no continue-on-error, no skip flags. Runner
+# platform limits (no interactive desktop / audio on hosted runners) are
+# handled by SUBSET choice, never by skipping a job (SPEC-10 §3).
+
+on:
+  pull_request:
+  push:
+    branches: [main, dev]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  # ---------------------------------------------------------------- lint ----
+  # gofumpt/vet/staticcheck + D22 seven-ban static scan (tools/d22scan) +
+  # zero-emoji scan over design/ and frontend/ (inside d22scan). The scan's
+  # own red-path is pinned by its seeded-violation test.
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: gofmt (gofumpt)
+        run: |
+          go install mvdan.cc/gofumpt@latest
+          OUT="$(gofumpt -l . tools/d22scan tools/mockllm)"
+          if [ -n "$OUT" ]; then
+            echo "gofumpt would reformat:"
+            echo "$OUT"
+            exit 1
+          fi
+
+      - name: go vet (module)
+        run: go vet ./...
+
+      - name: go vet (tools/d22scan module)
+        run: go vet ./...
+        working-directory: tools/d22scan
+
+      - name: staticcheck
+        run: |
+          go install honnef.co/go/tools/cmd/staticcheck@2025.1.1
+          staticcheck ./...
+
+      - name: D22 seven-ban + emoji scan (tools/d22scan)
+        run: |
+          cd tools/d22scan
+          go test ./...
+          go run . -root "${{ github.workspace }}"
+
+      - name: mockllm module vet
+        run: go vet ./...
+        working-directory: tools/mockllm
+
+  # ----------------------------------------------------------- test-core ----
+  # Pure-Go logic tests on ubuntu (SPEC-11 §6 scope) + golden replay +
+  # the compose mock-llm wiring (started, probed, used by the probe test).
+  # Windows-only packages (ball GUI, cgo speech) are out of this job's scope
+  # by platform, not skipped: they run in test-windows / slo jobs.
+  test-core:
+    runs-on: ubuntu-latest
+    env:
+      WISP_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Start compose test services (mock-llm on 18080)
+        run: docker compose -f docker/compose.test.yml --profile test up -d --build mock-llm
+
+      - name: Probe mock-llm
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:18080/v1/models > /dev/null; then
+              echo "mock-llm reachable"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "mock-llm never became reachable"
+          exit 1
+
+      - name: Portable package tests (agent/llm/config/memory/observe/secret/risk/statemachine/...)
+        run: |
+          go test ./internal/agent/... ./internal/llm/... ./internal/config/... \
+            ./internal/memory/... ./internal/observe/... ./internal/secret/... \
+            ./internal/risk/... ./internal/statemachine/... ./internal/session/... \
+            ./internal/watchdog/... ./internal/tools/... ./internal/models/... \
+            ./internal/buildinfo/... ./internal/audio/... ./internal/proc/... \
+            ./internal/panel/... -count=1
+
+      - name: Environment fork assertion (WISP_ENV=test data dir)
+        run: go test ./internal/proc/ -run TestLayoutForTestEnv -count=1 -v
+
+      - name: Stop compose services
+        if: always()
+        run: docker compose -f docker/compose.test.yml --profile test down
+
+  # -------------------------------------------------------- test-windows ----
+  # cgo build smoke (clean-clone + build.ps1, S0 done criterion) + the
+  # PathResolver junction placeholder (real cases land with tickets 18/20).
+  test-windows:
+    runs-on: windows-latest
+    env:
+      WISP_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Cache third_party (deps.toml key)
+        uses: actions/cache@v4
+        with:
+          path: third_party
+          key: wisp-third_party-${{ hashFiles('deps.toml') }}
+
+      - name: "cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)"
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+
+      - name: Portable windows tests (proc/secret/config)
+        run: go test ./internal/proc/ ./internal/secret/ ./internal/config/ -count=1
+
+      - name: "PathResolver junction placeholder (real cases tickets 18/20)"
+        run: go test ./internal/risk/ -run TestPathResolverJunctionWindows -count=1 -v
+
+  # ------------------------------------------------------------- slo-smoke --
+  # Memory/handle subset on a hosted Windows runner (no audio hardware):
+  # Sleeping + Warm sampling + settle + the leak self-test (SPEC-11 §6).
+  slo-smoke:
+    runs-on: windows-latest
+    env:
+      WISP_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Cache third_party (deps.toml key)
+        uses: actions/cache@v4
+        with:
+          path: third_party
+          key: wisp-third_party-${{ hashFiles('deps.toml') }}
+
+      - name: Build wisp.exe
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+
+      - name: SLO smoke gate
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset smoke -SecondsPerState 4
+
+      - name: Upload SLO report
+        uses: actions/upload-artifact@v4
+        with:
+          name: slo-smoke-report
+          path: build/slo/slo-report.json
+          if-no-files-found: error
+
+  # -------------------------------------------------------------- slo-full --
+  # Full six-state SLO gate + settle + leak on the self-hosted Windows runner
+  # (interactive desktop-capable machine, label wisp-slo). Same script as
+  # slo-smoke - only the subset differs (SPEC-10 §3: script identical,
+  # scope unchanged). Merges require this green locally/self-hosted.
+  slo-full:
+    runs-on: [self-hosted, wisp-slo]
+    env:
+      WISP_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      - name: Build wisp.exe (deps cached on the runner)
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
+
+      - name: SLO full gate (six states + settle + leak)
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 -Subset full -SecondsPerState 6
+
+      - name: Upload SLO report
+        uses: actions/upload-artifact@v4
+        with:
+          name: slo-full-report
+          path: build/slo/slo-report.json
+          if-no-files-found: error

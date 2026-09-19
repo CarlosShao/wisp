@@ -3,7 +3,31 @@
 #   18081 good     - correct bytes
 #   18082 corrupt  - same paths, one flipped byte  -> sha256 must reject
 #   18083 missing  - empty root                    -> 404, exercises failover
+#
+# Ticket 08 addition: the mock-llm service (SPEC-11 §4, port 18080) - the
+# test-core CI job starts it under the "test" profile and probes /v1/models;
+# golden replay tests share its grammar. Start:
+#   docker compose -f docker/compose.test.yml --profile test up -d
+name: wisp-test
+
 services:
+  mock-llm:
+    build:
+      context: ..
+      dockerfile: docker/mockllm.Dockerfile
+    image: wisp/mock-llm:dev
+    container_name: wisp-mock-llm
+    profiles: ["test"]
+    ports:
+      - "127.0.0.1:18080:18080"
+    restart: "no"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:18080/v1/models"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 5s
+
   model-mirror:
     image: nginx:alpine
     container_name: wisp-model-mirror
