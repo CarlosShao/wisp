@@ -1,0 +1,518 @@
+/* ============================================================================
+   Wisp / 一缕 — Base + 通用组件类 · v2「磨砂玻璃」
+   ----------------------------------------------------------------------------
+   依赖 tokens.css（唯一样式真相源）。本文件不得出现硬编码色值。
+   v2 的分层语言：透光率 + 内侧高光 + 环境光，1px 描边只留给「分隔」这一件事。
+   ============================================================================ */
+
+/* ---------- 重置 ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg-base);
+  color: var(--fg-primary);
+  font-family: var(--font-sans);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  font-weight: var(--fw-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.005em;
+}
+
+/* ---------- 环境光 v2.1：玻璃的背景 ----------
+   七团极大极淡的色光固定铺底，且必须覆盖整屏（含中心与左右中段）。
+   上一版只贴四角，页面中段 90% 仍是纯黑 —— 玻璃模糊一片纯黑只会得到
+   另一片纯黑，磨砂感根本无从显现。 */
+body::before {
+  content: "";
+  position: fixed; inset: 0; z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(46% 34% at 50% 44%,  var(--ambient-c) 0%, transparent 68%),
+    radial-gradient(58% 44% at 10% -8%,  var(--ambient-c) 0%, transparent 64%),
+    radial-gradient(54% 42% at 94% 6%,   var(--ambient-a) 0%, transparent 62%),
+    radial-gradient(48% 40% at -6% 52%,  var(--ambient-d) 0%, transparent 62%),
+    radial-gradient(48% 40% at 104% 56%, var(--ambient-a) 0%, transparent 62%),
+    radial-gradient(66% 54% at 80% 106%, var(--ambient-b) 0%, transparent 66%),
+    radial-gradient(50% 42% at 8% 102%,  var(--ambient-a) 0%, transparent 62%);
+}
+
+/* ---------- 磨砂颗粒 ----------
+   极淡的噪点叠在最上层，把大面积渐变的色带打散 —— 这是「磨砂」的另一半。
+   不透明度由 --grain 控制（暗 0.035 / 亮 0.028），再高就脏。 */
+body::after {
+  content: "";
+  position: fixed; inset: 0; z-index: 60;
+  pointer-events: none;
+  opacity: var(--grain);
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+img, svg { display: block; }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { background: none; border: 0; padding: 0; cursor: pointer; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-hover); }
+ul, ol { margin: 0; padding: 0; list-style: none; }
+h1, h2, h3, h4, p { margin: 0; }
+code, pre, kbd { font-family: var(--font-mono); }
+
+/* 焦点环：键盘可达性 */
+:focus-visible { outline: none; box-shadow: var(--ring); border-radius: var(--r-sm); }
+
+::selection { background: var(--accent-soft); color: var(--fg-primary); }
+
+/* 滚动条：极细，不抢视觉 */
+* { scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: var(--border-soft);
+  border-radius: var(--r-full);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover { background: var(--border-strong); background-clip: content-box; }
+
+/* ---------- 玻璃工具类 ----------
+   screens 里自定义的浮层（面板 / 原生卡 / 命令面板）加这两个类即可拿到模糊。 */
+.glass    { backdrop-filter: var(--glass-blur);    -webkit-backdrop-filter: var(--glass-blur); }
+.glass-sm { backdrop-filter: var(--glass-blur-sm); -webkit-backdrop-filter: var(--glass-blur-sm); }
+
+/* ---------- 排版工具类 ---------- */
+.t-display { font-size: var(--t-display); line-height: var(--lh-display); font-weight: var(--fw-display); letter-spacing: -0.025em; }
+.t-title   { font-size: var(--t-title);   line-height: var(--lh-title);   font-weight: var(--fw-title);   letter-spacing: -0.015em; }
+.t-sub     { font-size: var(--t-sub);     line-height: var(--lh-sub);     font-weight: var(--fw-sub);     letter-spacing: -0.005em; }
+.t-body    { font-size: var(--t-body);    line-height: var(--lh-body);    font-weight: var(--fw-body); }
+.t-small   { font-size: var(--t-small);   line-height: var(--lh-small); }
+.t-mono    { font-family: var(--font-mono); font-size: var(--t-mono); line-height: var(--lh-mono); }
+
+/* section label：micro 大写字母 + 字距 */
+.label {
+  font-size: var(--t-micro);
+  line-height: var(--lh-micro);
+  font-weight: var(--fw-micro);
+  letter-spacing: var(--ls-micro);
+  text-transform: uppercase;
+  color: var(--fg-tertiary);
+}
+
+.fg-2 { color: var(--fg-secondary); }
+.fg-3 { color: var(--fg-tertiary); }
+.fg-d { color: var(--fg-disabled); }
+.fg-accent  { color: var(--accent); }
+.fg-danger  { color: var(--danger); }
+.fg-warn    { color: var(--warn); }
+.fg-success { color: var(--success); }
+.fg-info    { color: var(--info); }
+.fg-warm    { color: var(--warm); }
+
+/* ---------- 布局 ---------- */
+.stack-1 { display: flex; flex-direction: column; gap: var(--s-1); }
+.stack-2 { display: flex; flex-direction: column; gap: var(--s-2); }
+.stack-3 { display: flex; flex-direction: column; gap: var(--s-3); }
+.stack-4 { display: flex; flex-direction: column; gap: var(--s-4); }
+.stack-5 { display: flex; flex-direction: column; gap: var(--s-5); }
+.stack-6 { display: flex; flex-direction: column; gap: var(--s-6); }
+.stack-7 { display: flex; flex-direction: column; gap: var(--s-7); }
+.row-2 { display: flex; align-items: center; gap: var(--s-2); }
+.row-3 { display: flex; align-items: center; gap: var(--s-3); }
+.row-4 { display: flex; align-items: center; gap: var(--s-4); }
+.row-5 { display: flex; align-items: center; gap: var(--s-5); }
+.spread { display: flex; align-items: center; justify-content: space-between; gap: var(--s-4); }
+.wrap { flex-wrap: wrap; }
+.grow { flex: 1 1 auto; min-width: 0; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 单行截断 + 右侧渐隐遮罩（工具 chip 的参数摘要用） */
+.fade-truncate {
+  overflow: hidden;
+  white-space: nowrap;
+  -webkit-mask-image: linear-gradient(to right, var(--mask-solid) 0, var(--mask-solid) calc(100% - 24px), transparent 100%);
+          mask-image: linear-gradient(to right, var(--mask-solid) 0, var(--mask-solid) calc(100% - 24px), transparent 100%);
+}
+
+/* 分隔线 v2：中间亮两端隐去的发丝光，比实心 1px 更「现代」 */
+.hr {
+  height: 1px; border: 0; margin: 0;
+  background: linear-gradient(to right, transparent, var(--border-soft) 12%, var(--border-soft) 88%, transparent);
+}
+
+/* ---------- 页面骨架（原型专用，非产品 UI） ---------- */
+.page { max-width: 1120px; margin: 0 auto; padding: var(--s-9) var(--s-7) var(--s-11); }
+.page-head { margin-bottom: var(--s-8); }
+.page-head .t-title { margin-bottom: var(--s-2); }
+
+.proto-note {
+  display: flex; gap: var(--s-3); align-items: flex-start;
+  padding: var(--s-4) var(--s-5);
+  background: var(--warn-soft);
+  border: 1px solid var(--warn-line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  color: var(--fg-secondary);
+  font-size: var(--t-small);
+  line-height: var(--lh-small);
+  margin-bottom: var(--s-7);
+}
+.proto-note svg { flex: none; margin-top: 1px; color: var(--warn); }
+
+.section { margin-bottom: var(--s-10); }
+.section-head {
+  display: flex; align-items: baseline; gap: var(--s-4);
+  padding-bottom: var(--s-3);
+  margin-bottom: var(--s-6);
+  background: linear-gradient(to right, var(--border-soft), transparent 70%) bottom / 100% 1px no-repeat;
+}
+.section-head .t-sub { flex: none; }
+.section-head .grow { color: var(--fg-tertiary); font-size: var(--t-small); }
+
+/* ---------- 卡片：玻璃 ---------- */
+.card {
+  background: var(--bg-raised);
+  border: 1px solid transparent;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+.card-pad { padding: var(--s-6); }
+.card-head {
+  display: flex; align-items: center; gap: var(--s-3);
+  padding: var(--s-4) var(--s-5);
+  border-bottom: 1px solid var(--border-hair);
+}
+.card-body { padding: var(--s-5); }
+
+/* 左侧色条卡片（错误 / Stuck / 注入检出） */
+.card-bar { position: relative; overflow: hidden; }
+.card-bar::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+  background: var(--bar-color, var(--border-strong));
+}
+.card-bar.is-danger::before  { --bar-color: var(--danger); }
+.card-bar.is-warn::before    { --bar-color: var(--warn); }
+.card-bar.is-info::before    { --bar-color: var(--info); }
+
+/* 顶部色条卡片（L2 不可逆操作的视觉重量） */
+.card-topbar { position: relative; overflow: hidden; }
+.card-topbar::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px;
+  background: var(--bar-color, var(--danger));
+}
+
+/* ---------- 按钮 ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
+  height: 34px; padding: 0 var(--s-4);
+  border-radius: var(--r-md);
+  border: 1px solid transparent;
+  font-size: var(--t-small); font-weight: 500;
+  transition: background var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out),
+              color var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out);
+  white-space: nowrap;
+}
+.btn svg { flex: none; }
+
+.btn-primary { background: var(--fg-primary); color: var(--bg-base); }
+.btn-primary:hover { background: var(--fg-secondary); }
+
+.btn-accent {
+  background: var(--accent); color: var(--accent-fg);
+  box-shadow: 0 4px 16px -6px var(--accent-line);
+}
+.btn-accent:hover { background: var(--accent-hover); }
+.btn-accent:active { background: var(--accent-pressed); }
+
+/* L2 允许按钮只在原生侧存在（D33/F2），故用 danger 实心底表达「不可逆」 */
+.btn-danger {
+  background: var(--danger); color: var(--on-solid);
+  box-shadow: 0 4px 16px -6px var(--danger-line);
+}
+.btn-danger:hover { filter: brightness(1.08); }
+
+/* 次级按钮 v2：一块更亮的玻璃 */
+.btn-secondary {
+  background: var(--bg-subtle);
+  border-color: var(--glass-ring);
+  box-shadow: inset 0 1px 0 var(--glass-hi-soft);
+  color: var(--fg-primary);
+}
+.btn-secondary:hover { border-color: var(--border-strong); background: var(--bg-overlay); }
+
+.btn-ghost { color: var(--fg-secondary); }
+.btn-ghost:hover { background: var(--bg-subtle); color: var(--fg-primary); }
+
+.btn-sm { height: 28px; padding: 0 var(--s-3); font-size: var(--t-small); border-radius: var(--r-sm); }
+.btn-lg { height: 42px; padding: 0 var(--s-6); font-size: var(--t-body); border-radius: var(--r-md); }
+.btn-block { width: 100%; }
+.btn[disabled] { color: var(--fg-disabled); pointer-events: none; opacity: 0.6; }
+
+/* 图标按钮 */
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: var(--r-sm);
+  color: var(--fg-tertiary);
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.icon-btn:hover { background: var(--bg-subtle); color: var(--fg-primary); }
+
+/* ---------- 徽标 / 胶囊 ---------- */
+.badge {
+  display: inline-flex; align-items: center; gap: var(--s-1);
+  height: 18px; padding: 0 var(--s-2);
+  border-radius: var(--r-full);
+  font-size: var(--t-micro); line-height: 1;
+  font-weight: var(--fw-micro); letter-spacing: var(--ls-micro);
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+  color: var(--fg-tertiary);
+  white-space: nowrap;
+}
+/* 风险级徽标：1px 描边胶囊，不填实底（§17.5） */
+.badge-l0 { color: var(--fg-tertiary); }
+.badge-l1 { color: var(--warn); }
+.badge-l2 { color: var(--danger); }
+
+.tag {
+  display: inline-flex; align-items: center; gap: var(--s-2);
+  height: 24px; padding: 0 var(--s-3);
+  border-radius: var(--r-full);
+  background: var(--bg-subtle);
+  border: 1px solid var(--glass-ring);
+  box-shadow: inset 0 1px 0 var(--glass-hi-soft);
+  font-size: var(--t-small); color: var(--fg-secondary);
+}
+
+/* 数字角标（队列深度）—— 用 HTML 圆形 + 数字，绝不用 emoji */
+.count-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 16px; height: 16px; padding: 0 var(--s-1);
+  border-radius: var(--r-full);
+  background: var(--danger); color: var(--on-solid);
+  box-shadow: 0 0 10px 0 var(--danger-line);
+  font-size: 10px; line-height: 1; font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.count-badge.is-warn { background: var(--warn); color: var(--bg-base); box-shadow: 0 0 10px 0 var(--warn-line); }
+.count-badge.is-info { background: var(--info); color: var(--bg-base); box-shadow: 0 0 10px 0 var(--info-line); }
+
+/* ---------- kbd：玻璃键帽 ---------- */
+kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 20px; height: 20px; padding: var(--s-1) var(--s-2);
+  background: var(--bg-subtle);
+  border: 1px solid var(--glass-ring);
+  border-bottom-color: var(--border-strong);
+  border-radius: var(--r-xs);
+  box-shadow: inset 0 1px 0 var(--glass-hi-soft);
+  font-family: var(--font-sans);
+  font-size: var(--t-micro); font-weight: 500;
+  color: var(--fg-secondary);
+}
+
+/* ---------- 输入 ---------- */
+.input {
+  width: 100%; height: var(--input-h);
+  padding: 0 var(--s-4);
+  background: var(--bg-inset);
+  border: 1px solid var(--glass-ring);
+  border-radius: var(--r-md);
+  box-shadow: inset 0 1px 0 var(--glass-hi-soft);
+  font-size: var(--t-body);
+  color: var(--fg-primary);
+  transition: border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+}
+.input::placeholder { color: var(--fg-tertiary); }
+.input:focus { outline: none; border-color: var(--accent-line); background: var(--bg-inset); box-shadow: inset 0 1px 0 var(--glass-hi-soft), 0 0 0 3px var(--accent-soft); }
+textarea.input { height: auto; padding: var(--s-3) var(--s-4); line-height: var(--lh-body); resize: vertical; }
+
+.field-label { display: block; margin-bottom: var(--s-2); }
+
+/* 开关（Radix Switch 的视觉等价物） */
+.switch {
+  position: relative; flex: none;
+  width: 36px; height: 22px;
+  background: var(--bg-inset);
+  border: 1px solid var(--glass-ring);
+  border-radius: var(--r-full);
+  box-shadow: inset 0 1px 0 var(--glass-hi-soft);
+  transition: background var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+}
+.switch::after {
+  content: ""; position: absolute; top: 2px; left: 2px;
+  width: 16px; height: 16px; border-radius: var(--r-full);
+  background: var(--fg-tertiary);
+  transition: transform var(--dur-base) var(--ease-out), background var(--dur-base) var(--ease-out);
+}
+.switch[aria-checked="true"] { background: var(--accent-soft); border-color: var(--accent-line); }
+.switch[aria-checked="true"]::after { transform: translateX(14px); background: var(--accent); }
+
+/* ---------- 列表行 ---------- */
+.row {
+  display: flex; align-items: center; gap: var(--s-4);
+  height: var(--row-h); padding: 0 var(--s-4);
+  border-radius: var(--r-md);
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.row:hover { background: var(--bg-subtle); }
+.row.is-selected { background: var(--accent-soft); }
+
+/* ---------- 代码块：凹陷的玻璃槽 ---------- */
+.code {
+  background: var(--bg-inset);
+  border: 1px solid var(--border-hair);
+  border-radius: var(--r-md);
+  box-shadow: inset 0 1px 0 var(--glass-hi-soft);
+  padding: var(--s-4);
+  font-family: var(--font-mono);
+  font-size: var(--t-mono); line-height: var(--lh-mono);
+  overflow-x: auto;
+  white-space: pre;
+  color: var(--fg-secondary);
+}
+/* JSON 语法着色（§17.5：键 info、字符串 success、数字 warn、布尔 accent） */
+.j-key { color: var(--info); }
+.j-str { color: var(--success); }
+.j-num { color: var(--warn); }
+.j-bool{ color: var(--accent); }
+.j-null{ color: var(--fg-tertiary); }
+.j-punc{ color: var(--fg-tertiary); }
+
+code.inline {
+  padding: var(--s-1) var(--s-2);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-hair);
+  border-radius: var(--r-xs);
+  font-size: var(--t-mono);
+  color: var(--fg-primary);
+}
+
+/* ---------- 空态 ---------- */
+.empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--s-4); padding: var(--s-11) var(--s-7);
+  text-align: center; color: var(--fg-tertiary);
+}
+.empty-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 52px; height: 52px;
+  border-radius: var(--r-lg);
+  background: var(--bg-subtle);
+  border: 1px solid var(--glass-ring);
+  box-shadow: inset 0 1px 0 var(--glass-hi-soft);
+  color: var(--fg-tertiary);
+}
+
+/* ============================================================================
+   动效
+   硬规则（§17.5 末尾）：循环动画只允许出现在非空闲态。
+     Sleeping / Warm 必须静态，或 2s 及以上的极低频呼吸，且只动 opacity（走合成器）。
+     面板关闭后不得有任何动画在跑。
+   ============================================================================ */
+
+/* 思考中：2px 高光带流动 */
+@keyframes thinking-sweep {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+.thinking-bar {
+  position: relative; overflow: hidden;
+  height: 2px; border-radius: var(--r-full);
+  background: var(--bg-subtle);
+}
+.thinking-bar::after {
+  content: ""; position: absolute; inset: 0; width: 40%;
+  background: linear-gradient(to right, transparent, var(--accent), transparent);
+  animation: thinking-sweep 1.2s var(--ease-in-out) infinite;
+}
+
+/* SSE 流式：1px × 14px 竖线光标呼吸 */
+@keyframes caret-breathe { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+.caret {
+  display: inline-block; width: 1px; height: 14px;
+  margin-left: 2px; vertical-align: -2px;
+  background: var(--accent);
+  animation: caret-breathe 1s var(--ease-in-out) infinite;
+}
+
+/* 工具运行中：14px 旋转弧 */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner { animation: spin 1s linear infinite; transform-origin: 50% 50%; }
+
+/* 审批等待：脉冲只跑一次然后静止（不无限循环） */
+@keyframes pulse-once {
+  0%   { box-shadow: 0 0 0 0 var(--warn-line); }
+  70%  { box-shadow: 0 0 0 8px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.pulse-once { animation: pulse-once 2s var(--ease-out) 1; }
+
+/* Speaking：绿色呼吸 */
+@keyframes breathe-success {
+  0%, 100% { box-shadow: 0 0 0 0 var(--success-line), 0 0 24px 0 var(--ball-halo); }
+  50%      { box-shadow: 0 0 0 6px transparent, 0 0 28px 2px var(--success-line); }
+}
+
+/* Warm：暖色极低频呼吸（2.4s，只动 opacity） */
+@keyframes breathe-warm { 0%, 100% { opacity: 0.55; } 50% { opacity: 0.70; } }
+
+/* 悬浮球 Listening：三层同心环错峰 */
+@keyframes ring-out {
+  0%   { transform: scale(1);   opacity: 0.55; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+
+/* 通用入场 */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.rise-in { animation: rise-in var(--dur-base) var(--ease-out) both; }
+
+/* 尊重系统的「减少动态效果」 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- 主题切换（原型控件，非产品 UI）----------
+   生产环境的明暗由 config.toml [app] theme 决定并跟随系统（D29 / D36）；
+   原型阶段提供一个开关，用于验证 §17.8 验收标准第 3 条：
+   每屏在明暗两套主题下都可读。 */
+.theme-toggle {
+  display: inline-flex; padding: 2px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--glass-ring);
+  border-radius: var(--r-full);
+  box-shadow: inset 0 1px 0 var(--glass-hi-soft);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+}
+.theme-toggle button {
+  display: inline-flex; align-items: center; gap: var(--s-2);
+  height: 26px; padding: 0 var(--s-3);
+  border-radius: var(--r-full);
+  font-size: var(--t-small); color: var(--fg-tertiary);
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.theme-toggle button:hover { color: var(--fg-secondary); }
+.theme-toggle button[aria-pressed="true"] {
+  background: var(--bg-overlay); color: var(--fg-primary); box-shadow: var(--shadow-inset);
+}
+.theme-fab {
+  position: fixed; right: var(--s-6); bottom: var(--s-6); z-index: 90;
+  display: flex; flex-direction: column; align-items: flex-end; gap: var(--s-2);
+}
+.theme-fab > .label { color: var(--fg-disabled); }
+.theme-fab .theme-toggle { box-shadow: var(--shadow-pop); background: var(--bg-raised); }

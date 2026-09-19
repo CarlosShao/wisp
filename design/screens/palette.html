@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>命令面板 — Wisp 原型</title>
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/base.css">
+<style>
+  .desktop {
+    min-height: 100vh;
+    padding: var(--s-8) var(--s-7) var(--s-11);
+    background:
+      radial-gradient(92% 62% at 16% -8%, var(--ambient-c) 0%, transparent 60%),
+      radial-gradient(84% 56% at 88% 4%, var(--ambient-a) 0%, transparent 58%),
+      radial-gradient(64% 46% at 50% 30%, var(--ambient-d) 0%, transparent 64%),
+      radial-gradient(72% 50% at 46% 82%, var(--ambient-b) 0%, transparent 64%),
+      radial-gradient(96% 68% at 74% 106%, var(--ambient-b) 0%, transparent 62%),
+      radial-gradient(70% 52% at 4% 92%, var(--ambient-a) 0%, transparent 60%),
+      var(--bg-base);
+    display: flex; flex-direction: column; align-items: center; gap: var(--s-6);
+  }
+  /* 模拟"面板拉起时桌面被压暗" */
+  .scrim {
+    width: var(--palette-w); border-radius: var(--r-xl);
+    padding: var(--s-9) 0;
+    background: linear-gradient(to bottom, var(--scrim), transparent 40%);
+    display: flex; justify-content: center;
+  }
+
+  .palette {
+    width: var(--palette-w);
+    background: var(--bg-raised);
+    border: 1px solid var(--glass-ring);
+    border-radius: var(--r-xl);
+    box-shadow: var(--shadow-pop);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    overflow: hidden;
+    animation: rise-in var(--dur-slow) var(--ease-out) both;
+  }
+
+  /* ---------- 输入行 ---------- */
+  .pal-input {
+    display: flex; align-items: center; gap: var(--s-4);
+    padding: var(--s-5);
+    border-bottom: 1px solid var(--border-hair);
+  }
+  .pal-input > .grow { position: relative; }
+  .pal-input input {
+    width: 100%; background: none; border: 0; padding: 0;
+    font-size: var(--t-title); line-height: var(--lh-title); font-weight: var(--fw-sub);
+    color: var(--fg-primary);
+  }
+  .pal-input input:focus { outline: none; }
+  .pal-input input::placeholder { color: var(--fg-disabled); font-weight: 400; }
+  /* 匹配高亮 */
+  .pal-input .echo {
+    position: absolute; inset: 0; pointer-events: none;
+    font-size: var(--t-title); line-height: var(--lh-title); font-weight: var(--fw-sub);
+    color: transparent; white-space: pre;
+  }
+
+  /* ---------- 分组 ---------- */
+  .pal-scroll { max-height: 460px; overflow-y: auto; padding: var(--s-3) 0; }
+  .pal-group + .pal-group { margin-top: var(--s-3); }
+  .pal-group-head {
+    display: flex; align-items: center; gap: var(--s-3);
+    padding: var(--s-2) var(--s-5);
+  }
+  .pal-group-head .grow { font-size: var(--t-micro); color: var(--fg-disabled); }
+
+  .pal-item {
+    display: flex; align-items: center; gap: var(--s-4);
+    height: var(--row-h); padding: 0 var(--s-5);
+    width: 100%; text-align: left;
+    border-left: 2px solid transparent;
+    transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+  }
+  .pal-item:hover { background: var(--bg-overlay); }
+  .pal-item.is-active { background: var(--accent-soft); border-left-color: var(--accent); }
+  .pal-ico {
+    display: flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; flex: none;
+    border-radius: var(--r-sm);
+    background: var(--bg-subtle); border: 1px solid var(--border-hair);
+    color: var(--fg-secondary);
+  }
+  .pal-item.is-active .pal-ico { background: var(--bg-raised); color: var(--accent); border-color: var(--accent-line); }
+  .pal-text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: var(--s-1); }
+  .pal-title { font-size: var(--t-body); color: var(--fg-primary); }
+  .pal-sub { font-size: var(--t-micro); line-height: 14px; color: var(--fg-tertiary); }
+  .pal-side { flex: none; display: flex; align-items: center; gap: var(--s-3); }
+  mark.hit { background: none; color: var(--accent); font-weight: 600; }
+
+  /* ---------- 底部快捷键提示 ---------- */
+  .pal-foot {
+    display: flex; align-items: center; flex-wrap: wrap;
+    gap: var(--s-3) var(--s-5);
+    padding: var(--s-3) var(--s-5);
+    border-top: 1px solid var(--border-hair);
+    background: var(--bg-subtle);
+  }
+  .pal-hint { display: flex; align-items: center; gap: var(--s-2); flex: none; white-space: nowrap; }
+
+  /* 空态 */
+  .pal-empty { padding: var(--s-9) var(--s-5); }
+</style>
+</head>
+<body>
+<div class="desktop">
+
+  <div class="proto-note" style="width:var(--palette-w);margin-bottom:0">
+    <span data-icon="info" data-size="16"></span>
+    <div>
+      命令面板由 <kbd>Ctrl</kbd><kbd>K</kbd> 或单击悬浮球唤起，是<strong style="color:var(--fg-secondary);font-weight:500">按需 WebView</strong>——
+      用完即隐藏，会话内保活（C27 单窗口复用），会话结束销毁。
+      列表里的工具项来自 D15 的<strong style="color:var(--fg-secondary);font-weight:500">两级注入</strong>：
+      常驻六类总是可见，长尾工具靠 <code class="inline">list_tools</code> 按需检索。
+    </div>
+  </div>
+
+  <div class="scrim">
+    <div class="palette" role="dialog" aria-label="命令面板">
+
+      <div class="pal-input">
+        <span data-icon="search" data-size="20" class="fg-3"></span>
+        <div class="grow">
+          <input type="text" value="pdf" aria-label="搜索指令、工具或应用" spellcheck="false">
+        </div>
+        <span class="badge" style="color:var(--info)">7 个结果</span>
+      </div>
+
+      <div class="pal-scroll">
+
+        <!-- 快捷指令 -->
+        <div class="pal-group">
+          <div class="pal-group-head">
+            <span class="label">快捷指令</span><span class="grow"></span>
+            <span class="t-micro fg-d">Slash Commands</span>
+          </div>
+
+          <button class="pal-item is-active" type="button">
+            <span class="pal-ico"><span data-icon="folder-open" data-size="16"></span></span>
+            <span class="pal-text">
+              <span class="pal-title">把下载目录里的 <mark class="hit">PDF</mark> 归到一个文件夹</span>
+              <span class="pal-sub">fs.move · 批量聚合确认 · 同盘可撤销</span>
+            </span>
+            <span class="pal-side">
+              <span class="badge badge-l1">L1</span>
+              <span data-icon="corner-down-left" data-size="14" class="fg-3"></span>
+            </span>
+          </button>
+
+          <button class="pal-item" type="button">
+            <span class="pal-ico"><span data-icon="file-text" data-size="16"></span></span>
+            <span class="pal-text">
+              <span class="pal-title">读一下这个 <mark class="hit">PDF</mark> 的第三章</span>
+              <span class="pal-sub">doc.read · 结果打污染标记 · 超 4000 token 自动落文件</span>
+            </span>
+            <span class="pal-side"><span class="badge badge-l0">L0</span></span>
+          </button>
+
+          <button class="pal-item" type="button">
+            <span class="pal-ico"><span data-icon="search" data-size="16"></span></span>
+            <span class="pal-text">
+              <span class="pal-title">在这些 <mark class="hit">PDF</mark> 里找「验收标准」</span>
+              <span class="pal-sub">search.content · 限授权目录 · 命中会标来源</span>
+            </span>
+            <span class="pal-side"><span class="badge badge-l0">L0</span></span>
+          </button>
+        </div>
+
+        <!-- 工具（两级注入） -->
+        <div class="pal-group">
+          <div class="pal-group-head">
+            <span class="label">工具</span><span class="grow"></span>
+            <span class="t-micro fg-d">D34 · 32 项，按 BM25 取前 5</span>
+          </div>
+
+          <button class="pal-item" type="button">
+            <span class="pal-ico"><span data-icon="save" data-size="16"></span></span>
+            <span class="pal-text">
+              <span class="pal-title t-mono">doc.read</span>
+              <span class="pal-sub">PDF / docx / pptx 转文本 · capability: fs.read</span>
+            </span>
+            <span class="pal-side"><span class="badge badge-l0">L0</span></span>
+          </button>
+
+          <button class="pal-item" type="button">
+            <span class="pal-ico"><span data-icon="trash-2" data-size="16"></span></span>
+            <span class="pal-text">
+              <span class="pal-title t-mono">fs.trash</span>
+              <span class="pal-sub">移入回收站 · 可撤销，所以是 L1 不是 L2</span>
+            </span>
+            <span class="pal-side"><span class="badge badge-l1">L1</span></span>
+          </button>
+
+          <button class="pal-item" type="button">
+            <span class="pal-ico"><span data-icon="list" data-size="16"></span></span>
+            <span class="pal-text">
+              <span class="pal-title t-mono">list_tools</span>
+              <span class="pal-sub">元工具 · 检索全部 32 个工具（含未注入上下文的长尾）</span>
+            </span>
+            <span class="pal-side"><span class="badge badge-l0">L0</span></span>
+          </button>
+        </div>
+
+        <!-- 最近任务 -->
+        <div class="pal-group">
+          <div class="pal-group-head">
+            <span class="label">最近任务</span><span class="grow"></span>
+            <span class="t-micro fg-d">L3 · 保留 30 天</span>
+          </div>
+
+          <button class="pal-item" type="button">
+            <span class="pal-ico"><span data-icon="clock" data-size="16"></span></span>
+            <span class="pal-text">
+              <span class="pal-title">整理 D:\Downloads 的 <mark class="hit">PDF</mark></span>
+              <span class="pal-sub">今天 09:14 · 成功 · 移动 18 个文件 · ¥0.22</span>
+            </span>
+            <span class="pal-side">
+              <span data-icon="arrow-up-right" data-size="14" class="fg-3"></span>
+            </span>
+          </button>
+        </div>
+
+      </div>
+
+      <div class="pal-foot">
+        <span class="pal-hint"><kbd><span data-icon="chevron-up" data-size="14"></span></kbd><kbd><span data-icon="chevron-down" data-size="14"></span></kbd><span class="t-micro fg-3">选择</span></span>
+        <span class="pal-hint"><kbd>Enter</kbd><span class="t-micro fg-3">执行</span></span>
+        <span class="pal-hint"><kbd>Esc</kbd><span class="t-micro fg-3">关闭</span></span>
+        <span class="pal-hint"><kbd>Ctrl</kbd><kbd>Space</kbd><span class="t-micro fg-3">改用语音</span></span>
+        <div class="grow"></div>
+        <span class="t-micro fg-d">前端无状态 · 每次显示都从 Go 侧全量重读</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ---------- 空态 ---------- -->
+  <div class="palette" style="width:var(--palette-w)" role="dialog" aria-label="命令面板 · 空态">
+    <div class="pal-input">
+      <span data-icon="search" data-size="20" class="fg-3"></span>
+      <div class="grow"><input type="text" value="zzz" aria-label="搜索" spellcheck="false"></div>
+      <span class="badge">无结果</span>
+    </div>
+    <div class="pal-empty">
+      <div class="empty" style="padding:var(--s-7) 0">
+        <div class="empty-icon"><span data-icon="search" data-size="20"></span></div>
+        <div class="stack-2" style="align-items:center">
+          <div class="t-body fg-2">没有匹配「zzz」的指令、工具或任务</div>
+          <div class="t-small fg-3">试试直接说出你想做的事，或者按 <kbd>Ctrl</kbd><kbd>Space</kbd> 用语音</div>
+        </div>
+      </div>
+    </div>
+    <div class="pal-foot">
+      <span class="pal-hint"><kbd>Enter</kbd><span class="t-micro fg-3">直接作为指令发给 Agent</span></span>
+      <div class="grow"></div>
+      <span class="t-micro fg-d">空态不是错误态 · 不用红色</span>
+    </div>
+  </div>
+
+</div>
+
+<script src="../assets/icons.js"></script>
+<script src="../assets/theme.js"></script>
+<script>
+(function () {
+  "use strict";
+  /* 键盘上下选择（原型演示） */
+  var items = Array.prototype.slice.call(document.querySelectorAll(".pal-item"));
+  var cur = 0;
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+    e.preventDefault();
+    items[cur] && items[cur].classList.remove("is-active");
+    cur = (cur + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
+    items[cur].classList.add("is-active");
+    items[cur].scrollIntoView({ block: "nearest" });
+  });
+  items.forEach(function (el, i) {
+    el.addEventListener("mouseenter", function () {
+      items[cur] && items[cur].classList.remove("is-active");
+      cur = i; el.classList.add("is-active");
+    });
+  });
+})();
+</script>
+</body>
+</html>

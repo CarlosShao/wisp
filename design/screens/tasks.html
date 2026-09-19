@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>并发任务 — Wisp 原型</title>
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/base.css">
+<style>
+  /* ==========================================================================
+     并发任务与审批队列（方案 D31 / C18 / C20 / D45）。
+     这一屏只回答一件事：被阻塞的东西在哪里、在等什么、谁拿着锁。
+     DSH 仓库第 1723 号 issue 的教训：任何被阻塞的东西必须在某个界面上可见。
+     ========================================================================== */
+
+  .task-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--s-2) var(--s-5);
+    padding: var(--s-4) var(--s-5);
+    border-radius: var(--r-md);
+    background: var(--bg-subtle);
+    box-shadow: var(--shadow-inset);
+  }
+  .task-row + .task-row { margin-top: var(--s-2); }
+  .task-row.is-blocked { background: var(--warn-soft); box-shadow: inset 0 0 0 1px var(--warn-line); }
+  .task-row.is-stuck   { background: var(--warn-soft); box-shadow: inset 0 0 0 1px var(--warn-line); }
+  .task-row.is-done    { opacity: 0.62; }
+  .task-q { color: var(--fg-primary); }
+  .task-meta {
+    display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2) var(--s-4);
+    color: var(--fg-tertiary);
+  }
+  .task-wait {
+    grid-column: 1 / -1;
+    display: flex; align-items: center; gap: var(--s-3);
+    padding-top: var(--s-2);
+    border-top: 1px solid var(--border-hair);
+    color: var(--warn);
+  }
+  .q-head-tag {
+    display: inline-flex; align-items: center; gap: var(--s-2);
+    height: 20px; padding: 0 var(--s-2);
+    border-radius: var(--r-xs);
+    background: var(--danger-soft);
+    box-shadow: inset 0 0 0 1px var(--danger-line);
+    color: var(--danger);
+    font-size: var(--t-micro); font-weight: 500; letter-spacing: var(--ls-micro);
+    text-transform: uppercase;
+  }
+  .lock-grid {
+    display: grid;
+    grid-template-columns: minmax(180px, 1.2fr) minmax(200px, 1.6fr) auto auto;
+    gap: var(--s-2) var(--s-5);
+    align-items: center;
+  }
+  .lock-grid > div { padding: var(--s-3) 0; border-top: 1px solid var(--border-hair); }
+  .lock-grid > div:nth-child(-n+4) { border-top: 0; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="page-head">
+    <div class="spread" style="margin-bottom:var(--s-3)">
+      <div class="row-4">
+        <a class="icon-btn" href="../index.html" aria-label="返回原型首页"><span data-icon="arrow-left" data-size="18"></span></a>
+        <div>
+          <div class="t-title">并发任务</div>
+          <div class="label" style="margin-top:var(--s-1)">Tasks · D31 / C18 / C20 / D45</div>
+        </div>
+      </div>
+      <div data-theme-toggle></div>
+    </div>
+  </header>
+
+  <div class="proto-note">
+    <span data-icon="layers" data-size="16"></span>
+    <div>
+      <strong style="color:var(--fg-primary);font-weight:500">被阻塞的东西必须可见。</strong>
+      审批等待不阻塞其他任务（Gemini CLI 先例），但排队的任务必须自报「在等谁」；
+      审批队列超时 300s 一律判拒绝，超时前 30s 醒目提示；拒绝后任务不取消，可一键重放（C18）。
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="t-sub">任务列表</div>
+      <div class="grow">单队列多任务 · 审批等待不阻塞其他任务</div>
+      <div class="label">Tasks</div>
+    </div>
+
+    <div class="task-row">
+      <div class="row-3">
+        <span class="t-body task-q">把下载目录里的 PDF 都归到一个文件夹</span>
+        <span class="badge badge-l1">L1</span>
+      </div>
+      <div class="row-3">
+        <span class="tag fg-warn"><span data-icon="loader" data-size="14" class="spinner"></span>Acting</span>
+        <span class="t-mono t-small fg-3">task-7f31</span>
+      </div>
+      <div class="task-meta">
+        <span data-icon="lock" data-size="14"></span>
+        <span class="t-mono">D:\Downloads</span>
+        <span>持有路径锁</span>
+        <span class="t-mono">00:41</span>
+        <span class="t-mono">8,204 tok</span>
+      </div>
+      <div class="row-3">
+        <button class="btn btn-ghost btn-sm">取消</button>
+      </div>
+    </div>
+
+    <div class="task-row is-blocked">
+      <div class="row-3">
+        <span class="t-body task-q">把下载里的 PDF 移到桌面</span>
+        <span class="badge badge-l1">L1</span>
+      </div>
+      <div class="row-3">
+        <span class="tag fg-warn"><span data-icon="timer" data-size="14"></span>Queued</span>
+        <span class="t-mono t-small fg-3">task-9ac2</span>
+      </div>
+      <div class="task-wait">
+        <span data-icon="alert-circle" data-size="14"></span>
+        <span class="t-small">在等 task-7f31 释放 <span class="t-mono">D:\Downloads</span> 的路径锁（C20 路径冲突检测）</span>
+        <button class="btn btn-ghost btn-sm" style="margin-left:auto">插队到锁释放后</button>
+      </div>
+    </div>
+
+    <div class="task-row is-blocked">
+      <div class="row-3">
+        <span class="t-body task-q">总结这个链接然后发到我的备份服务</span>
+        <span class="badge badge-l2">L2</span>
+      </div>
+      <div class="row-3">
+        <span class="tag fg-danger"><span data-icon="shield-alert" data-size="14"></span>AwaitingApproval</span>
+        <span class="t-mono t-small fg-3">task-41de</span>
+      </div>
+      <div class="task-wait">
+        <span data-icon="shield-alert" data-size="14"></span>
+        <span class="t-small">在等你批准：队列第 1 位，共 2 个。剩余 214s，超时判拒绝</span>
+        <button class="btn btn-ghost btn-sm" style="margin-left:auto">去看确认卡</button>
+      </div>
+    </div>
+
+    <div class="task-row is-stuck">
+      <div class="row-3">
+        <span class="t-body task-q">搜一下这个错误码什么意思</span>
+        <span class="badge badge-l0">L0</span>
+      </div>
+      <div class="row-3">
+        <span class="tag fg-warn"><span data-icon="refresh-cw" data-size="14"></span>Stuck</span>
+        <span class="t-mono t-small fg-3">task-0b77</span>
+      </div>
+      <div class="task-wait">
+        <span data-icon="refresh-cw" data-size="14"></span>
+        <span class="t-small"><span class="t-mono">web.fetch</span> 已连续调用 8 次，参数相同（C22 梯度刹车达上限）</span>
+        <div class="row-2" style="margin-left:auto">
+          <button class="btn btn-secondary btn-sm">继续</button>
+          <button class="btn btn-ghost btn-sm">放弃</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="task-row is-done">
+      <div class="row-3">
+        <span class="t-body task-q">当前电量多少</span>
+        <span class="badge badge-l0">L0</span>
+      </div>
+      <div class="row-3">
+        <span class="tag fg-success"><span data-icon="check" data-size="14"></span>完成</span>
+        <span class="t-mono t-small fg-3">task-2c08</span>
+      </div>
+      <div class="task-meta">
+        <span class="t-mono">09:14</span>
+        <span class="t-mono">412 tok</span>
+        <span class="t-mono">0.22 元</span>
+        <span>1 次工具调用</span>
+      </div>
+      <div class="row-3">
+        <button class="btn btn-ghost btn-sm">重放</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="t-sub">审批队列</div>
+      <div class="grow">全局 FIFO · 队头单显 · 深度计数 · 回复按 correlationId 路由</div>
+      <div class="row-3">
+        <span class="count-badge">2</span>
+        <div class="label">Queue</div>
+      </div>
+    </div>
+
+    <div class="card card-pad stack-4">
+      <div class="spread">
+        <div class="row-3">
+          <span class="q-head-tag">队头</span>
+          <span class="t-mono t-body">web.open</span>
+          <span class="badge badge-l2">L2</span>
+        </div>
+        <span class="t-mono t-small fg-3">corr c-41de-07 · 剩余 214s</span>
+      </div>
+      <div class="t-small fg-2">把含凭据片段的 URL 在浏览器打开 · 任务 task-41de</div>
+      <div class="t-small fg-3">批准只能点悬浮球或按全局快捷键；本屏只展示队列，不提供批准动作（D33 / F2）。</div>
+    </div>
+
+    <div class="card card-pad stack-4" style="opacity:0.82">
+      <div class="spread">
+        <div class="row-3">
+          <span class="tag">第 2 位</span>
+          <span class="t-mono t-body">fs.move</span>
+          <span class="badge badge-l1">L1</span>
+        </div>
+        <span class="t-mono t-small fg-3">corr c-7f31-12</span>
+      </div>
+      <div class="t-small fg-2">移动 23 个文件到 D:\work\docs\pdf · 任务 task-7f31</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="t-sub">路径锁</div>
+      <div class="grow">两任务碰同一文件 / 目录时，后者排队并提示（C20）</div>
+      <div class="label">PathLock</div>
+    </div>
+
+    <div class="card card-pad">
+      <div class="lock-grid t-small">
+        <div class="label">持有者</div>
+        <div class="label">路径模式</div>
+        <div class="label">模式</div>
+        <div class="label">持有</div>
+
+        <div class="t-mono fg-2">task-7f31</div>
+        <div class="t-mono">D:\Downloads\**</div>
+        <div><span class="tag fg-warn">写</span></div>
+        <div class="t-mono fg-3">00:41</div>
+
+        <div class="t-mono fg-2">task-2c08</div>
+        <div class="t-mono">已释放</div>
+        <div><span class="tag">读</span></div>
+        <div class="t-mono fg-3">00:02</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+<script src="../assets/icons.js"></script>
+<script src="../assets/theme.js"></script>
+</body>
+</html>

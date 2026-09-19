@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>安全 — Wisp 原型</title>
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/base.css">
+<style>
+  /* ==========================================================================
+     安全（方案 D45 作用域会话授权 / D33-F1 黑名单 / C25 污染追踪 / D35 取证）。
+     三块：生效中的授权（可一键撤销）、敏感路径黑名单、污染告警历史。
+     授权不是通行证，是 (工具, 路径模式, 会话) 三元组；会话结束即失效。
+     ========================================================================== */
+
+  .grant-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--s-2) var(--s-4);
+    padding: var(--s-4) var(--s-5);
+    border-radius: var(--r-md);
+    background: var(--bg-subtle);
+    box-shadow: var(--shadow-inset);
+  }
+  .grant-row + .grant-row { margin-top: var(--s-2); }
+  .grant-meta { display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-4); color: var(--fg-tertiary); }
+  .bl-grid { display: grid; grid-template-columns: minmax(220px, 1fr) auto; gap: var(--s-2) var(--s-5); align-items: center; }
+  .bl-grid > div { padding: var(--s-3) 0; border-top: 1px solid var(--border-hair); }
+  .bl-grid > div:nth-child(-n+2) { border-top: 0; }
+  .pol-row {
+    display: grid; grid-template-columns: auto 1fr auto; gap: var(--s-4); align-items: baseline;
+    padding: var(--s-4) 0; border-top: 1px solid var(--border-hair);
+  }
+  .pol-row:first-of-type { border-top: 0; }
+  mark.taint {
+    background: var(--danger-soft);
+    box-shadow: inset 0 0 0 1px var(--danger-line);
+    color: var(--danger);
+    border-radius: var(--r-xs);
+    padding: 0 var(--s-1);
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="page-head">
+    <div class="spread" style="margin-bottom:var(--s-3)">
+      <div class="row-4">
+        <a class="icon-btn" href="../index.html" aria-label="返回原型首页"><span data-icon="arrow-left" data-size="18"></span></a>
+        <div>
+          <div class="t-title">安全</div>
+          <div class="label" style="margin-top:var(--s-1)">Security · D45 / D33-F1 / C25 / D35</div>
+        </div>
+      </div>
+      <div data-theme-toggle></div>
+    </div>
+  </header>
+
+  <div class="proto-note">
+    <span data-icon="shield" data-size="16"></span>
+    <div>
+      <strong style="color:var(--fg-primary);font-weight:500">授权是三元组，不是通行证。</strong>
+      (工具, 路径模式, 会话) 绑定，会话结束即失效；L2 永不进入任何持久授权；
+      污染命中（C25）触发的升级不受会话授权覆盖 —— 否则「授权一次 fs.write」会变成「授权把读到的凭据写进同步盘」。
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="t-sub">生效中的会话授权</div>
+      <div class="grow">approval_grant 表 · 会话结束即失效（行保留 30 天供审计）</div>
+      <div class="row-3">
+        <span class="count-badge is-warn">3</span>
+        <div class="label">Grants</div>
+      </div>
+    </div>
+
+    <div class="grant-row">
+      <div class="row-3">
+        <span class="t-mono t-body">fs.move</span>
+        <span class="badge badge-l1">L1</span>
+        <span class="t-mono t-small fg-2">D:\Downloads\**</span>
+      </div>
+      <button class="btn btn-ghost btn-sm"><span data-icon="x" data-size="14"></span>撤销</button>
+      <div class="grant-meta">
+        <span class="t-mono">session 8c2f</span>
+        <span>本会话内有效</span>
+        <span>已使用 23 次，全部留有 tool_call 记录</span>
+      </div>
+    </div>
+
+    <div class="grant-row">
+      <div class="row-3">
+        <span class="t-mono t-body">input.type</span>
+        <span class="badge badge-l2">L2 降级</span>
+        <span class="t-mono t-small fg-2">目标进程 WINWORD.EXE</span>
+      </div>
+      <button class="btn btn-ghost btn-sm"><span data-icon="x" data-size="14"></span>撤销</button>
+      <div class="grant-meta">
+        <span class="t-mono">session 8c2f</span>
+        <span>换目标应用要重新确认（Word 到终端不共用授权）</span>
+      </div>
+    </div>
+
+    <div class="grant-row">
+      <div class="row-3">
+        <span class="t-mono t-body">shell.exec</span>
+        <span class="badge badge-l1">白名单内 L1</span>
+        <span class="t-mono t-small fg-2">git status / git diff</span>
+      </div>
+      <button class="btn btn-ghost btn-sm"><span data-icon="x" data-size="14"></span>撤销</button>
+      <div class="grant-meta">
+        <span class="t-mono">session 8c2f</span>
+        <span>白名单外仍是一律 L2</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="t-sub">敏感路径黑名单</div>
+      <div class="grow">A 档绝对禁止且不可覆盖 · B 档默认拒绝、可按文件豁免（豁免本身是一次 L2）</div>
+      <div class="label">D33-F1</div>
+    </div>
+
+    <div class="card card-pad stack-5">
+      <div class="row-3">
+        <span class="tag fg-danger"><span data-icon="lock" data-size="14"></span>A 档</span>
+        <span class="t-small fg-3">读与写都禁；任何授权、会话授权、配置放宽都无效</span>
+      </div>
+      <div class="bl-grid t-small">
+        <div class="t-mono">C:\Users\swq\.git-credentials</div>
+        <div><span class="tag fg-danger">硬拒</span></div>
+        <div class="t-mono">任意仓库的 .git\config</div>
+        <div><span class="tag fg-danger">硬拒</span></div>
+        <div class="t-mono">%APPDATA%\wisp\config.toml</div>
+        <div><span class="tag fg-danger">硬拒</span></div>
+        <div class="t-mono">~\.ssh\** 与 ~\.aws\credentials</div>
+        <div><span class="tag fg-danger">硬拒</span></div>
+        <div class="t-mono">浏览器凭据库与 DPAPI 主密钥目录</div>
+        <div><span class="tag fg-danger">硬拒</span></div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="row-3">
+        <span class="tag fg-warn"><span data-icon="unlock" data-size="14"></span>B 档</span>
+        <span class="t-small fg-3">默认拒绝；豁免必须按文件、必须由人点、必须留痕</span>
+      </div>
+      <div class="bl-grid t-small">
+        <div class="t-mono">项目内 .env*</div>
+        <div><button class="btn btn-ghost btn-sm">按文件豁免</button></div>
+        <div class="t-mono">*.pem 与 *.p12 / *.pfx</div>
+        <div><button class="btn btn-ghost btn-sm">按文件豁免</button></div>
+        <div class="t-mono">id_* 与 secrets.* 与 *credentials*.json</div>
+        <div><button class="btn btn-ghost btn-sm">按文件豁免</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="t-sub">污染告警历史</div>
+      <div class="grow">C25 粗粒度片段匹配：规范化后 8 字符以上连续片段命中即升 L2</div>
+      <div class="label">Provenance</div>
+    </div>
+
+    <div class="card card-pad">
+      <div class="pol-row t-small">
+        <span class="t-mono fg-3">09:41</span>
+        <div>
+          <div class="row-3" style="flex-wrap:wrap">
+            <span class="t-mono">web.search</span>
+            <span class="fg-2">query 命中来自 <span class="t-mono">search.content</span> 的片段</span>
+            <mark class="taint">AKIA-Q2XJ-9F31</mark>
+          </div>
+          <div class="t-small fg-3" style="margin-top:var(--s-2)">六条外泄通道之一：搜索词等于发给搜索引擎。已升 L2，用户拒绝。</div>
+        </div>
+        <span class="tag fg-danger">已拒绝</span>
+      </div>
+
+      <div class="pol-row t-small">
+        <span class="t-mono fg-3">09:12</span>
+        <div>
+          <div class="row-3" style="flex-wrap:wrap">
+            <span class="t-mono">fs.write</span>
+            <span class="fg-2">目标位于同步盘目录 OneDrive\Documents</span>
+          </div>
+          <div class="t-small fg-3" style="margin-top:var(--s-2)">写进同步盘等于自动上传到第三方，是最隐蔽的一条外泄通道。已升 L2，用户改为写到 D:\work。</div>
+        </div>
+        <span class="tag fg-warn">改道</span>
+      </div>
+
+      <div class="pol-row t-small">
+        <span class="t-mono fg-3">昨天 21:03</span>
+        <div>
+          <div class="row-3" style="flex-wrap:wrap">
+            <span class="t-mono">clipboard.write</span>
+            <span class="fg-2">内容含来自 <span class="t-mono">clipboard.read</span> 的片段</span>
+          </div>
+          <div class="t-small fg-3" style="margin-top:var(--s-2)">剪贴板写出去后任何进程都能读走。已升 L2，用户允许（留痕）。</div>
+        </div>
+        <span class="tag fg-success">已允许</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+<script src="../assets/icons.js"></script>
+<script src="../assets/theme.js"></script>
+</body>
+</html>

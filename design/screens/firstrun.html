@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>首次运行引导 — Wisp 原型</title>
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/base.css">
+<style>
+  /* ==========================================================================
+     首次运行引导（方案 §2 FirstRun 态 / D26 模型分发 / C29 签名清单 / C28 DPAPI）。
+     三步：下载并校验模型、授权目录、填 API Key。
+     每一步都给出失败形态 —— 引导只画成功路径等于没画。
+     ========================================================================== */
+
+  .fr-wrap { max-width: 560px; margin: 0 auto; }
+  .fr-rail { display: flex; align-items: center; gap: var(--s-3); margin-bottom: var(--s-7); }
+  .fr-step { display: flex; align-items: center; gap: var(--s-3); color: var(--fg-tertiary); }
+  .fr-step .num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: var(--r-full);
+    background: var(--bg-subtle);
+    box-shadow: inset 0 0 0 1px var(--glass-ring);
+    font-family: var(--font-mono); font-size: var(--t-micro); font-weight: 600;
+  }
+  .fr-step.is-done { color: var(--fg-secondary); }
+  .fr-step.is-done .num { background: var(--success-soft); box-shadow: inset 0 0 0 1px var(--success-line); color: var(--success); }
+  .fr-step.is-now { color: var(--fg-primary); }
+  .fr-step.is-now .num { background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent-line); color: var(--accent); }
+  .fr-link { flex: 1; height: 1px; background: var(--border-soft); }
+
+  .dl-row {
+    display: grid; grid-template-columns: 1fr auto; gap: var(--s-2) var(--s-4);
+    padding: var(--s-4) 0; border-top: 1px solid var(--border-hair);
+  }
+  .dl-row:first-of-type { border-top: 0; }
+  .dl-bar { grid-column: 1 / -1; height: 4px; border-radius: var(--r-full); background: var(--bg-inset); overflow: hidden; }
+  .dl-bar i { display: block; height: 100%; border-radius: var(--r-full); background: var(--accent); }
+  .dl-bar.is-bad i { background: var(--danger); }
+  .fr-actions { display: flex; justify-content: space-between; gap: var(--s-4); margin-top: var(--s-7); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="page-head">
+    <div class="spread" style="margin-bottom:var(--s-3)">
+      <div class="row-4">
+        <a class="icon-btn" href="../index.html" aria-label="返回原型首页"><span data-icon="arrow-left" data-size="18"></span></a>
+        <div>
+          <div class="t-title">首次运行引导</div>
+          <div class="label" style="margin-top:var(--s-1)">FirstRun · D26 / C29 / C28</div>
+        </div>
+      </div>
+      <div data-theme-toggle></div>
+    </div>
+  </header>
+
+  <div class="fr-wrap stack-6">
+
+    <div class="fr-rail" aria-label="引导进度">
+      <div class="fr-step is-done"><span class="num"><span data-icon="check" data-size="12"></span></span><span class="t-small">模型</span></div>
+      <div class="fr-link"></div>
+      <div class="fr-step is-now"><span class="num">2</span><span class="t-small">目录</span></div>
+      <div class="fr-link"></div>
+      <div class="fr-step"><span class="num">3</span><span class="t-small">Key</span></div>
+    </div>
+
+    <section class="card card-pad stack-4">
+      <div class="row-3">
+        <span data-icon="download" data-size="18" class="fg-accent"></span>
+        <div class="t-sub">下载模型</div>
+        <span class="tag" style="margin-left:auto">国内镜像优先 · 官方源兜底</span>
+      </div>
+      <div class="t-small fg-3">
+        哈希与签名只来自仓库内已签名清单（C29），镜像只提供字节。校验不可关闭。
+      </div>
+
+      <div class="dl-row">
+        <div class="row-3">
+          <span class="t-mono t-small">kws-zipformer-3.3M</span>
+          <span class="tag fg-success"><span data-icon="check" data-size="12"></span>sha256 通过</span>
+        </div>
+        <span class="t-mono t-small fg-3">3.1 MB</span>
+        <div class="dl-bar"><i style="width:100%"></i></div>
+      </div>
+
+      <div class="dl-row">
+        <div class="row-3">
+          <span class="t-mono t-small">paraformer-streaming-int8</span>
+          <span class="tag fg-accent"><span data-icon="loader" data-size="12" class="spinner"></span>下载中 68%</span>
+        </div>
+        <span class="t-mono t-small fg-3">224 MB · 断点续传</span>
+        <div class="dl-bar"><i style="width:68%"></i></div>
+      </div>
+
+      <div class="dl-row">
+        <div class="row-3">
+          <span class="t-mono t-small">matcha-tts-zh-int8</span>
+          <span class="tag fg-danger"><span data-icon="ban" data-size="12"></span>manifest 签名不符</span>
+        </div>
+        <span class="t-mono t-small fg-3">已拒绝加载</span>
+        <div class="dl-bar is-bad"><i style="width:100%"></i></div>
+        <div class="t-small fg-danger" style="grid-column:1 / -1">
+          该镜像返回的清单签名验签失败。已自动切换官方源重试；若仍失败请改用本地模型目录。
+        </div>
+      </div>
+
+      <div class="row-3" style="justify-content:space-between">
+        <span class="t-small fg-3">模型目录可另指（几百 MB 不必放系统盘）</span>
+        <button class="btn btn-ghost btn-sm"><span data-icon="folder-open" data-size="14"></span>选择本地目录</button>
+      </div>
+    </section>
+
+    <section class="card card-pad stack-4">
+      <div class="row-3">
+        <span data-icon="folder" data-size="18" class="fg-accent"></span>
+        <div class="t-sub">授权目录</div>
+        <span class="tag" style="margin-left:auto">fs 白名单 · 越界一律 L2</span>
+      </div>
+      <div class="row-3" style="flex-wrap:wrap">
+        <span class="tag"><span data-icon="folder" data-size="14"></span>D:\work</span>
+        <span class="tag"><span data-icon="folder" data-size="14"></span>D:\Downloads</span>
+        <button class="btn btn-ghost btn-sm"><span data-icon="plus" data-size="14"></span>添加目录</button>
+      </div>
+      <div class="t-small fg-3">
+        符号链接与 junction 默认拒绝穿过（C26）；<span class="t-mono">.git-credentials</span>、<span class="t-mono">.git/config</span>、
+        本产品自己的 <span class="t-mono">config.toml</span> 属 A 档黑名单，任何授权都覆盖不了。
+      </div>
+    </section>
+
+    <section class="card card-pad stack-4">
+      <div class="row-3">
+        <span data-icon="key-round" data-size="18" class="fg-accent"></span>
+        <div class="t-sub">API Key</div>
+        <span class="tag" style="margin-left:auto">DPAPI 加密 · 不落明文</span>
+      </div>
+      <label class="field-label" for="fr-key">default_provider 的 Key</label>
+      <div class="row-3">
+        <span class="input" style="flex:1;display:inline-flex;align-items:center;padding:0 var(--s-3);color:var(--fg-disabled)">sk- 粘贴后仅存引用，界面只显示后 4 位</span>
+        <button class="icon-btn" aria-label="显示或隐藏"><span data-icon="eye-off" data-size="16"></span></button>
+      </div>
+      <div class="t-small fg-3">
+        检测到旧版明文 <span class="t-mono">api_key</span> 字段时会自动迁移进 DPAPI 并从 TOML 删除，同时写日志告知。
+      </div>
+    </section>
+
+    <div class="fr-actions">
+      <button class="btn btn-ghost">上一步</button>
+      <button class="btn btn-primary">完成并开始</button>
+    </div>
+  </div>
+
+</div>
+<script src="../assets/icons.js"></script>
+<script src="../assets/theme.js"></script>
+</body>
+</html>

@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wisp / 一缕 — 前端原型</title>
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+  /* 仅本页使用的布局样式；颜色与尺寸一律取自 tokens.css */
+  .hero {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: var(--s-7); padding-bottom: var(--s-7);
+    border-bottom: 1px solid var(--border-hair);
+    margin-bottom: var(--s-8);
+  }
+  .hero-mark { display: flex; align-items: center; gap: var(--s-4); }
+  .hero-orb {
+    width: 44px; height: 44px; border-radius: var(--r-full); flex: none;
+    background:
+      radial-gradient(circle at 32% 24%, var(--orb-hi) 0%, transparent 46%),
+      radial-gradient(circle at 50% 50%, var(--orb-body) 0%, var(--orb-body-2) 58%, transparent 84%);
+    box-shadow:
+      inset 0 0 0 1px var(--orb-rim),
+      0 0 26px 0 var(--accent-line);
+    position: relative;
+  }
+  .hero-orb::before {
+    content: ""; position: absolute; inset: 12%; border-radius: var(--r-full);
+    background: radial-gradient(circle at 50% 44%, var(--accent) 0%, transparent 74%);
+    filter: blur(6px);
+  }
+  .hero-sub { color: var(--fg-tertiary); font-size: var(--t-small); margin-top: var(--s-2); max-width: 62ch; }
+
+  .grid-screens { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--s-4); }
+  .screen-card {
+    display: flex; flex-direction: column; gap: var(--s-3);
+    padding: var(--s-5);
+    background: var(--bg-raised);
+    border: 1px solid var(--glass-ring);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-card);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    text-decoration: none; color: inherit;
+    transition: border-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+  }
+  .screen-card:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+  .screen-top { display: flex; align-items: center; gap: var(--s-3); }
+  .screen-ico {
+    display: flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px; flex: none;
+    border-radius: var(--r-md);
+    background: var(--bg-subtle); border: 1px solid var(--border-hair);
+    color: var(--fg-secondary);
+  }
+  .screen-desc { color: var(--fg-tertiary); font-size: var(--t-small); line-height: var(--lh-small); }
+  .prio { margin-left: auto; }
+  .prio-p0 { color: var(--accent); }
+  .prio-p1 { color: var(--info); }
+  .prio-p2 { color: var(--fg-tertiary); }
+
+  /* 色板 */
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: var(--s-3); }
+  .swatch { border: 1px solid var(--border-soft); border-radius: var(--r-md); overflow: hidden; }
+  .swatch-chip { height: 52px; }
+  .swatch-meta { padding: var(--s-3); background: var(--bg-raised); }
+  .swatch-name { font-family: var(--font-mono); font-size: var(--t-micro); color: var(--fg-secondary); }
+  .swatch-val  { font-family: var(--font-mono); font-size: var(--t-micro); color: var(--fg-tertiary); margin-top: 2px; }
+
+  /* 字号阶梯 */
+  .type-row {
+    display: grid; grid-template-columns: 120px 1fr; gap: var(--s-5);
+    align-items: baseline; padding: var(--s-4) 0;
+    border-bottom: 1px solid var(--border-hair);
+  }
+  .type-row:last-child { border-bottom: 0; }
+  .type-spec { font-family: var(--font-mono); font-size: var(--t-micro); color: var(--fg-tertiary); line-height: var(--lh-micro); }
+
+  /* 间距 / 圆角 展示 */
+  .scale-row { display: flex; align-items: flex-end; gap: var(--s-4); flex-wrap: wrap; }
+  .scale-item { display: flex; flex-direction: column; align-items: center; gap: var(--s-2); }
+  .scale-bar { background: var(--accent-soft); border: 1px solid var(--accent-line); border-radius: var(--r-xs); }
+  .radius-demo { width: 56px; height: 56px; background: var(--bg-overlay); border: 1px solid var(--border-soft); }
+
+  /* 图标墙 */
+  .icon-wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: var(--s-2); }
+  .icon-cell {
+    display: flex; flex-direction: column; align-items: center; gap: var(--s-3);
+    padding: var(--s-4) var(--s-2);
+    border-radius: var(--r-md);
+    color: var(--fg-secondary);
+    transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+  }
+  .icon-cell:hover { background: var(--bg-overlay); color: var(--fg-primary); }
+  .icon-cell .t-micro { font-family: var(--font-mono); text-transform: none; letter-spacing: 0; font-weight: 400; }
+
+  /* 规则清单 */
+  .rules { counter-reset: rule; display: flex; flex-direction: column; }
+  .rule {
+    counter-increment: rule;
+    display: grid; grid-template-columns: 28px 1fr; gap: var(--s-4);
+    padding: var(--s-4) 0; border-bottom: 1px solid var(--border-hair);
+  }
+  .rule:last-child { border-bottom: 0; }
+  .rule::before {
+    content: counter(rule, decimal-leading-zero);
+    font-family: var(--font-mono); font-size: var(--t-micro);
+    color: var(--fg-tertiary); padding-top: 4px;
+  }
+  .rule-title { font-weight: 500; margin-bottom: 2px; }
+  .rule-body { color: var(--fg-tertiary); font-size: var(--t-small); line-height: var(--lh-small); }
+
+  /* .theme-toggle 已移入 assets/base.css（所有原型页共用） */
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ===================== HERO ===================== -->
+  <header class="hero">
+    <div>
+      <div class="hero-mark">
+        <div class="hero-orb" aria-hidden="true"></div>
+        <div>
+          <div class="t-display">Wisp</div>
+          <div class="label" style="margin-top:var(--s-1)">一缕 · 前端原型 · Design Prototype</div>
+        </div>
+      </div>
+      <p class="hero-sub">
+        轻量级语音 Agent 悬浮助手。本目录是<strong style="color:var(--fg-secondary);font-weight:500">纯静态视觉原型</strong>——
+        零构建、离线可用、双击即开。生产实现中悬浮球是 Win32 分层窗口 + Direct2D 自绘，
+        面板是按需拉起的 WebView2；两者共用同一份设计 token（契约 C21）。
+      </p>
+    </div>
+    <div class="theme-toggle" role="group" aria-label="主题切换">
+      <button type="button" data-set-theme="dark" aria-pressed="true">
+        <span data-icon="moon" data-size="14"></span>暗色
+      </button>
+      <button type="button" data-set-theme="light" aria-pressed="false">
+        <span data-icon="sun" data-size="14"></span>亮色
+      </button>
+    </div>
+  </header>
+
+  <div class="proto-note">
+    <span data-icon="alert-triangle" data-size="16"></span>
+    <div>
+      <strong style="color:var(--fg-primary);font-weight:500">原型阶段的边界</strong>（方案 §17.9 / M0 元要求）：
+      不接真实数据、不做路由、不做响应式（面板固定 640px）、不做无障碍树（S5 靠 Radix 拿）、不做 i18n（中文硬编码）。
+      <strong style="color:var(--fg-primary);font-weight:500">本页不含任何 emoji</strong>——
+      所有图标都是内联 SVG（§17.4），包括 agent 的思考中、流式输出、工具调用等状态。
+    </div>
+  </div>
+
+  <!-- ===================== 屏清单 ===================== -->
+  <section class="section">
+    <div class="section-head">
+      <div class="t-sub">屏清单</div>
+      <div class="grow">11 屏加本页设计系统总览，全部交付。P0 五屏定视觉方向，P1/P2 七屏铺量完成。</div>
+      <div class="label">Screens</div>
+    </div>
+
+    <div class="grid-screens">
+      <a class="screen-card" href="screens/ball.html">
+        <div class="screen-top">
+          <div class="screen-ico"><span data-icon="circle-dot" data-size="18"></span></div>
+          <div class="t-sub">悬浮球 · 20 态</div>
+          <div class="label prio prio-p0">P0</div>
+        </div>
+        <div class="screen-desc">D43 状态机全 20 态的视觉定义 + 可点击的动效节奏演示。含 Sleeping 微点、Warm 暖呼吸、Conversation 开麦红环。</div>
+      </a>
+
+      <a class="screen-card" href="screens/chat.html">
+        <div class="screen-top">
+          <div class="screen-ico"><span data-icon="message-square" data-size="18"></span></div>
+          <div class="t-sub">对话与结果流</div>
+          <div class="label prio prio-p0">P0</div>
+        </div>
+        <div class="screen-desc">agent 的 14 种工作状态全部画出来：思考中、SSE 流式、推理过程折叠、工具调用 chip、审批等待、错误、Stuck、注入检出、已取消。</div>
+      </a>
+
+      <a class="screen-card" href="screens/palette.html">
+        <div class="screen-top">
+          <div class="screen-ico"><span data-icon="command" data-size="18"></span></div>
+          <div class="t-sub">命令面板</div>
+          <div class="label prio prio-p0">P0</div>
+        </div>
+        <div class="screen-desc">Raycast / cmdk 视觉语言。快捷键唤起、模糊匹配、两级工具注入的 list_tools、快捷指令与历史任务。</div>
+      </a>
+
+      <a class="screen-card" href="screens/approval.html">
+        <div class="screen-top">
+          <div class="screen-ico"><span data-icon="shield-alert" data-size="18"></span></div>
+          <div class="t-sub">确认与审批</div>
+          <div class="label prio prio-p0">P0</div>
+        </div>
+        <div class="screen-desc">三种形态：L1 执行前阻止窗口（环形倒计时）、L2 面板确认卡（无「允许」按钮）、L2 原生降级卡（面板不可用时）。</div>
+      </a>
+
+      <a class="screen-card" href="#rules">
+        <div class="screen-top">
+          <div class="screen-ico"><span data-icon="droplet" data-size="18"></span></div>
+          <div class="t-sub">设计系统</div>
+          <div class="label prio prio-p0">P0</div>
+        </div>
+        <div class="screen-desc">本页下半部：色彩 token、字号阶梯、间距与圆角、动效规格、图标墙、八条硬规则。即 C21 DesignTokens 的参考实现。</div>
+      </a>
+
+      <a class="screen-card" href="screens/tasks.html">
+        <div class="screen-top">
+          <div class="screen-ico"><span data-icon="git-branch" data-size="18"></span></div>
+          <div class="t-sub">并发任务</div>
+          <div class="label prio prio-p1">P1</div>
+        </div>
+        <div class="screen-desc">多任务并发列表、审批队列深度与归属、路径冲突排队（C20）、「在等什么」必须可见。</div>
+      </a>
+
+      <a class="screen-card" href="screens/config.html">
+        <div class="screen-top">
+          <div class="screen-ico"><span data-icon="sliders" data-size="18"></span></div>
+          <div class="t-sub">配置编辑器</div>
+          <div class="label prio prio-p1">P1</div>
+        </div>
+        <div class="screen-desc">D36 全量 section 树、三档生效级别（hot / reload / restart）、安全节放宽需重新确认的交互。</div>
+      </a>
+
+      <a class="screen-card" href="screens/firstrun.html">
+        <div class="screen-top">
+          <div class="screen-ico"><span data-icon="download" data-size="18"></span></div>
+          <div class="t-sub">首次运行引导</div>
+          <div class="label prio prio-p1">P1</div>
+        </div>
+        <div class="screen-desc">FirstRun 三步：下载模型（含 C29 签名校验状态）、授权目录、配置 API Key（DPAPI，不落明文）。</div>
+      </a>
+
+      <a class="screen-card" href="screens/states.html">
+        <div class="screen-top">
+          <div class="screen-ico"><span data-icon="alert-circle" data-size="18"></span></div>
+          <div class="t-sub">异常与空态</div>
+          <div class="label prio prio-p1">P1</div>
+        </div>
+        <div class="screen-desc">D37 的 17 类 error_class 各自的用户可见形态；空态、无网络、未配置、看门狗告警。</div>
+      </a>
+
+      <a class="screen-card" href="screens/security.html">
+        <div class="screen-top">
+          <div class="screen-ico"><span data-icon="shield" data-size="18"></span></div>
+          <div class="t-sub">安全</div>
+          <div class="label prio prio-p2">P2</div>
+        </div>
+        <div class="screen-desc">D45 生效中的会话授权（可一键撤销）、A/B 档敏感路径黑名单、C25 污染告警历史。</div>
+      </a>
+
+      <a class="screen-card" href="screens/privacy.html">
+        <div class="screen-top">
+          <div class="screen-ico"><span data-icon="database" data-size="18"></span></div>
+          <div class="t-sub">数据与隐私</div>
+          <div class="label prio prio-p2">P2</div>
+        </div>
+        <div class="screen-desc">L1 画像 20 条逐条可删、L2 显式记忆、L3 任务日志与 tool_call 取证（虚拟化长列表）、工件目录。</div>
+      </a>
+
+      <a class="screen-card" href="screens/cost.html">
+        <div class="screen-top">
+          <div class="screen-ico"><span data-icon="activity" data-size="18"></span></div>
+          <div class="t-sub">成本</div>
+          <div class="label prio prio-p2">P2</div>
+        </div>
+        <div class="screen-desc">C23 CostMeter：每任务 token 与费用、日/月累计、预算告警。纯数字 + 极简 SVG 条形，不引入图表库。</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ===================== 八条硬规则 ===================== -->
+  <section class="section" id="rules">
+    <div class="section-head">
+      <div class="t-sub">「简约但高级」的八条硬规则</div>
+      <div class="grow">高级感来自可执行的决定，不来自「做得精致一点」。方案 §17.3。</div>
+      <div class="label">Rules</div>
+    </div>
+    <div class="card card-pad">
+      <div class="rules">
+        <div class="rule">
+          <div>
+            <div class="rule-title">低饱和配色</div>
+            <div class="rule-body">所有功能色降饱和。绝不用纯红纯绿纯蓝，也不用 Tailwind 默认的 red-500 / green-500 —— 它们在暗底上显得廉价。见下方色板。</div>
+          </div>
+        </div>
+        <div class="rule">
+          <div>
+            <div class="rule-title">靠 1px hairline 边框分层，不靠重阴影</div>
+            <div class="rule-body">三档边框（hair 0.07 / soft 0.11 / strong 0.18）承担绝大部分层级表达。box-shadow 只用于悬浮层，且必须是双层（1px 描边色 + 大范围极淡扩散）。</div>
+          </div>
+        </div>
+        <div class="rule">
+          <div>
+            <div class="rule-title">精确的间距阶梯</div>
+            <div class="rule-body">4px 网格，只用 2 / 4 / 8 / 12 / 16 / 20 / 24 / 32 / 40 / 48 / 64。不得出现 15px、18px 这类值 —— 不一致的间距是「业余感」最快的来源。</div>
+          </div>
+        </div>
+        <div class="rule">
+          <div>
+            <div class="rule-title">字体排印是主要视觉手段</div>
+            <div class="rule-body">七档字号阶梯，强对比；数字一律 tabular-nums；字重只用 400 / 500 / 600；section label 用 micro 大写字母 + 0.06em 字距 —— 这是 Raycast / Linear 那类质感的核心手法。</div>
+          </div>
+        </div>
+        <div class="rule">
+          <div>
+            <div class="rule-title">克制的动效</div>
+            <div class="rule-body">120 / 180 / 260ms 三档，单一缓动曲线 cubic-bezier(0.32, 0.72, 0, 1)。禁止 bounce、elastic、超过 300ms 的 UI 动效。循环动画只允许出现在非空闲态（SLO 约束）。</div>
+          </div>
+        </div>
+        <div class="rule">
+          <div>
+            <div class="rule-title">大量留白</div>
+            <div class="rule-body">面板固定 640px 宽，正文行高 1.6，卡片内边距不小于 16px。信息密度靠排印层级压出来，不靠把元素挤在一起。</div>
+          </div>
+        </div>
+        <div class="rule">
+          <div>
+            <div class="rule-title">零 emoji，全部内联 SVG</div>
+            <div class="rule-body">Lucide 同源 stroke 图标，24×24、stroke-width 1.5、round cap/join，尺寸只用 14/16/18/20 四档，颜色一律 currentColor。也禁用对勾、叉号、警告、箭头这类文字符号（一律换成内联 SVG），以及 sparkles / wand / brain / robot 这四个「AI 俗套」图标。</div>
+          </div>
+        </div>
+        <div class="rule">
+          <div>
+            <div class="rule-title">中文排版的两条专属约束</div>
+            <div class="rule-body">字号下限 14px（12px 中文在 Windows 上笔画粘连，micro 11px 只用于英文大写 label 与纯数字）；禁用 300 及更细字重（Windows 中文细体发虚）。忽略这两条会得到「高级但难读」。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 色彩 ===================== -->
+  <section class="section">
+    <div class="section-head">
+      <div class="t-sub">色彩 token</div>
+      <div class="grow">当前主题：<span id="theme-name" style="color:var(--fg-secondary)">暗色</span>。切换后所有色值同步更新。</div>
+      <div class="label">Color</div>
+    </div>
+    <div class="swatches" id="swatches"></div>
+  </section>
+
+  <!-- ===================== 字号 ===================== -->
+  <section class="section">
+    <div class="section-head">
+      <div class="t-sub">字号阶梯</div>
+      <div class="grow">只用这七档。micro 档只用于英文大写 label 与纯数字。</div>
+      <div class="label">Type</div>
+    </div>
+    <div class="card card-pad">
+      <div class="type-row">
+        <div class="type-spec">--t-display<br>28 / 34 / 600</div>
+        <div class="t-display">一缕 Wisp</div>
+      </div>
+      <div class="type-row">
+        <div class="type-spec">--t-title<br>17 / 26 / 600</div>
+        <div class="t-title">把下载目录里的 PDF 都归到一个文件夹</div>
+      </div>
+      <div class="type-row">
+        <div class="type-spec">--t-sub<br>15 / 24 / 500</div>
+        <div class="t-sub">找到 23 个文件，将移动到 D:\work\docs\pdf</div>
+      </div>
+      <div class="type-row">
+        <div class="type-spec">--t-body<br>14 / 22 / 400</div>
+        <div class="t-body">这是主字号。中文正文的最小可用字号是 14px —— 再小在 Windows 上笔画会粘连，看起来「精致」但读起来累。</div>
+      </div>
+      <div class="type-row">
+        <div class="type-spec">--t-small<br>12.5 / 18 / 400</div>
+        <div class="t-small fg-3">次级说明文字。用于卡片描述、提示信息、时间戳。</div>
+      </div>
+      <div class="type-row">
+        <div class="type-spec">--t-micro<br>11 / 16 / 500</div>
+        <div class="label">Section Label · Uppercase · 0.06em</div>
+      </div>
+      <div class="type-row">
+        <div class="type-spec">--t-mono<br>12.5 / 20 / 400</div>
+        <div class="t-mono">fs.trash · 12,480 tok · ¥0.31 · 1.84s</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 间距 / 圆角 / 动效 ===================== -->
+  <section class="section">
+    <div class="section-head">
+      <div class="t-sub">间距 · 圆角 · 动效</div>
+      <div class="grow">4px 网格；六档圆角；三档时长 + 单一缓动曲线。</div>
+      <div class="label">Scale</div>
+    </div>
+
+    <div class="stack-6">
+      <div class="card card-pad">
+        <div class="label" style="margin-bottom:var(--s-5)">Spacing · 4px grid</div>
+        <div class="scale-row" id="spacing"></div>
+      </div>
+
+      <div class="card card-pad">
+        <div class="label" style="margin-bottom:var(--s-5)">Radius</div>
+        <div class="scale-row" id="radius"></div>
+      </div>
+
+      <div class="card card-pad">
+        <div class="label" style="margin-bottom:var(--s-5)">Motion · 只允许这三档，禁止 bounce / elastic / &gt;300ms</div>
+        <div class="stack-4">
+          <div class="row-4">
+            <div class="t-mono fg-3" style="width:180px">--dur-fast 120ms</div>
+            <div class="grow" style="height:2px;background:var(--bg-subtle);border-radius:var(--r-full);position:relative;overflow:hidden">
+              <div class="motion-demo" data-dur="120"></div>
+            </div>
+            <div class="t-small fg-3" style="width:120px">hover / press</div>
+          </div>
+          <div class="row-4">
+            <div class="t-mono fg-3" style="width:180px">--dur-base 180ms</div>
+            <div class="grow" style="height:2px;background:var(--bg-subtle);border-radius:var(--r-full);position:relative;overflow:hidden">
+              <div class="motion-demo" data-dur="180"></div>
+            </div>
+            <div class="t-small fg-3" style="width:120px">展开 / 入场</div>
+          </div>
+          <div class="row-4">
+            <div class="t-mono fg-3" style="width:180px">--dur-slow 260ms</div>
+            <div class="grow" style="height:2px;background:var(--bg-subtle);border-radius:var(--r-full);position:relative;overflow:hidden">
+              <div class="motion-demo" data-dur="260"></div>
+            </div>
+            <div class="t-small fg-3" style="width:120px">面板 / 回落</div>
+          </div>
+        </div>
+        <div class="hr" style="margin:var(--s-6) 0"></div>
+        <div class="row-4">
+          <div class="label">缓动曲线</div>
+          <div class="t-mono fg-2">cubic-bezier(0.32, 0.72, 0, 1)</div>
+          <div class="grow"></div>
+          <div class="t-small fg-3">全程只用这一条，另有一条 in-out 供对称动效</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 组件 ===================== -->
+  <section class="section">
+    <div class="section-head">
+      <div class="t-sub">通用组件</div>
+      <div class="grow">按钮、徽标、chip、输入、代码块。所有屏共用。</div>
+      <div class="label">Components</div>
+    </div>
+
+    <div class="card card-pad stack-7">
+      <div>
+        <div class="label" style="margin-bottom:var(--s-4)">Buttons</div>
+        <div class="row-3 wrap">
+          <button class="btn btn-primary" type="button">主要操作</button>
+          <button class="btn btn-accent" type="button">强调操作</button>
+          <button class="btn btn-secondary" type="button">次要操作</button>
+          <button class="btn btn-ghost" type="button">幽灵按钮</button>
+          <button class="btn btn-danger" type="button">
+            <span data-icon="alert-triangle" data-size="14"></span>不可逆操作
+          </button>
+          <button class="btn btn-secondary btn-sm" type="button">小尺寸</button>
+          <button class="btn btn-secondary" type="button" disabled>禁用态</button>
+          <button class="icon-btn" type="button" aria-label="更多"><span data-icon="more" data-size="16"></span></button>
+        </div>
+        <p class="t-small fg-3" style="margin-top:var(--s-4)">
+          注意：<code class="inline">btn-danger</code> 只在<strong style="color:var(--fg-secondary);font-weight:500">原生侧</strong>出现。
+          面板内的 L2 卡片没有「允许」按钮 —— 方案 §15 第 6 项已定案，防 XSS 自动批准。
+        </p>
+      </div>
+
+      <div class="hr"></div>
+
+      <div>
+        <div class="label" style="margin-bottom:var(--s-4)">风险级徽标 · 1px 描边胶囊，不填实底</div>
+        <div class="row-3 wrap">
+          <span class="badge badge-l0">L0 只读</span>
+          <span class="badge badge-l1">L1 可逆写</span>
+          <span class="badge badge-l2">L2 不可逆</span>
+          <span class="tag"><span data-icon="clock" data-size="14"></span>1.84s</span>
+          <span class="tag"><span data-icon="hash" data-size="14"></span>12,480 tok</span>
+          <span class="count-badge" aria-label="队列深度 3">3</span>
+          <span class="count-badge is-warn" aria-label="队列深度 2">2</span>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div>
+        <div class="label" style="margin-bottom:var(--s-4)">Inputs</div>
+        <div class="stack-4" style="max-width:420px">
+          <div>
+            <label class="label field-label" for="demo-input">目录白名单</label>
+            <input class="input" id="demo-input" type="text" value="D:\work" placeholder="输入绝对路径">
+          </div>
+          <div class="spread">
+            <div>
+              <div class="t-body">开启唤醒词</div>
+              <div class="t-small fg-3">常驻麦克风，仅本地识别，音频不落盘</div>
+            </div>
+            <button class="switch" role="switch" aria-checked="true" aria-label="开启唤醒词" type="button"></button>
+          </div>
+          <div class="spread">
+            <div>
+              <div class="t-body">对话模式</div>
+              <div class="t-small fg-3">播报结束后麦克风保持开启，30s 无语音自动关闭</div>
+            </div>
+            <button class="switch" role="switch" aria-checked="false" aria-label="对话模式" type="button"></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div>
+        <div class="label" style="margin-bottom:var(--s-4)">Code · JSON 语法着色</div>
+        <div class="code"><span class="j-punc">{</span>
+  <span class="j-key">"tool"</span><span class="j-punc">:</span> <span class="j-str">"fs.trash"</span><span class="j-punc">,</span>
+  <span class="j-key">"paths"</span><span class="j-punc">:</span> <span class="j-punc">[</span><span class="j-str">"D:\\Downloads\\spec-v2.pdf"</span><span class="j-punc">,</span> <span class="j-str">"D:\\Downloads\\invoice-0913.pdf"</span><span class="j-punc">],</span>
+  <span class="j-key">"dest"</span><span class="j-punc">:</span> <span class="j-str">"D:\\work\\docs\\pdf"</span><span class="j-punc">,</span>
+  <span class="j-key">"dryRun"</span><span class="j-punc">:</span> <span class="j-bool">false</span><span class="j-punc">,</span>
+  <span class="j-key">"count"</span><span class="j-punc">:</span> <span class="j-num">23</span><span class="j-punc">,</span>
+  <span class="j-key">"missing"</span><span class="j-punc">:</span> <span class="j-null">null</span>
+<span class="j-punc">}</span></div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div>
+        <div class="label" style="margin-bottom:var(--s-4)">快捷键 kbd</div>
+        <div class="row-3 wrap">
+          <span class="row-2"><kbd>Ctrl</kbd><kbd>Space</kbd><span class="t-small fg-3">唤起</span></span>
+          <span class="row-2"><kbd>Esc</kbd><span class="t-small fg-3">否决 / 关闭</span></span>
+          <span class="row-2"><kbd>Ctrl</kbd><kbd>M</kbd><span class="t-small fg-3">静音</span></span>
+          <span class="row-2"><kbd>Ctrl</kbd><kbd>K</kbd><span class="t-small fg-3">命令面板</span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 图标墙 ===================== -->
+  <section class="section">
+    <div class="section-head">
+      <div class="t-sub">图标集</div>
+      <div class="grow"><span id="icon-count" class="t-mono fg-2"></span> 个内联 SVG。Lucide 同源，ISC 许可，S5 可原样替换为 lucide-react。</div>
+      <div class="label">Icons</div>
+    </div>
+    <div class="card card-pad">
+      <div class="row-4" style="margin-bottom:var(--s-5)">
+        <div class="label">尺寸档位 · 只用这四档</div>
+        <div class="row-4" style="color:var(--fg-secondary)">
+          <span data-icon="search" data-size="14"></span><span class="t-mono fg-3">14</span>
+          <span data-icon="search" data-size="16"></span><span class="t-mono fg-3">16</span>
+          <span data-icon="search" data-size="18"></span><span class="t-mono fg-3">18</span>
+          <span data-icon="search" data-size="20"></span><span class="t-mono fg-3">20</span>
+        </div>
+      </div>
+      <div class="hr" style="margin-bottom:var(--s-5)"></div>
+      <div class="icon-wall" id="icon-wall"></div>
+    </div>
+  </section>
+
+  <footer class="row-4" style="padding-top:var(--s-7);border-top:1px solid var(--border-hair);color:var(--fg-tertiary)">
+    <div class="t-small">Wisp / 一缕 · 前端原型 · 设计系统 v2.3</div>
+    <div class="grow"></div>
+    <div class="t-mono" style="font-size:var(--t-micro)">tokens.css = 契约 C21 参考实现</div>
+  </footer>
+
+</div>
+
+<script src="assets/icons.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- 主题切换 ---------- */
+  var themeName = document.getElementById("theme-name");
+  function setTheme(t) {
+    document.documentElement.setAttribute("data-theme", t);
+    var btns = document.querySelectorAll("[data-set-theme]");
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].setAttribute("aria-pressed", String(btns[i].getAttribute("data-set-theme") === t));
+    }
+    themeName.textContent = t === "light" ? "亮色" : "暗色";
+    paintSwatches();
+  }
+  var tbtns = document.querySelectorAll("[data-set-theme]");
+  for (var i = 0; i < tbtns.length; i++) {
+    tbtns[i].addEventListener("click", function () { setTheme(this.getAttribute("data-set-theme")); });
+  }
+
+  /* ---------- 色板：读 computed style，保证与主题同步 ---------- */
+  var COLOR_TOKENS = [
+    ["--bg-base", "bg-base"], ["--bg-raised", "bg-raised"], ["--bg-overlay", "bg-overlay"], ["--bg-subtle", "bg-subtle"],
+    ["--fg-primary", "fg-primary"], ["--fg-secondary", "fg-secondary"], ["--fg-tertiary", "fg-tertiary"],
+    ["--accent", "accent"], ["--danger", "danger"], ["--warn", "warn"],
+    ["--success", "success"], ["--info", "info"], ["--warm", "warm"]
+  ];
+  var swatchHost = document.getElementById("swatches");
+  function paintSwatches() {
+    var cs = getComputedStyle(document.documentElement);
+    swatchHost.innerHTML = "";
+    COLOR_TOKENS.forEach(function (pair) {
+      var val = cs.getPropertyValue(pair[0]).trim();
+      var el = document.createElement("div");
+      el.className = "swatch";
+      el.innerHTML =
+        '<div class="swatch-chip" style="background:' + val + '"></div>' +
+        '<div class="swatch-meta">' +
+          '<div class="swatch-name">' + pair[0] + '</div>' +
+          '<div class="swatch-val">' + val + '</div>' +
+        '</div>';
+      swatchHost.appendChild(el);
+    });
+  }
+
+  /* ---------- 间距 ---------- */
+  var SPACING = [["--s-1", 2], ["--s-2", 4], ["--s-3", 8], ["--s-4", 12], ["--s-5", 16],
+                 ["--s-6", 20], ["--s-7", 24], ["--s-8", 32], ["--s-9", 40], ["--s-10", 48], ["--s-11", 64]];
+  var sp = document.getElementById("spacing");
+  SPACING.forEach(function (s) {
+    var item = document.createElement("div");
+    item.className = "scale-item";
+    item.innerHTML = '<div class="scale-bar" style="width:' + s[1] + 'px;height:40px"></div>' +
+                     '<div class="t-micro fg-3" style="font-family:var(--font-mono)">' + s[1] + '</div>';
+    sp.appendChild(item);
+  });
+
+  /* ---------- 圆角 ---------- */
+  var RADII = [["--r-xs", 4], ["--r-sm", 6], ["--r-md", 8], ["--r-lg", 12], ["--r-xl", 16], ["--r-full", 999]];
+  var rd = document.getElementById("radius");
+  RADII.forEach(function (r) {
+    var item = document.createElement("div");
+    item.className = "scale-item";
+    item.innerHTML = '<div class="radius-demo" style="border-radius:' + r[1] + 'px"></div>' +
+                     '<div class="t-micro fg-3" style="font-family:var(--font-mono)">' +
+                     (r[1] === 999 ? "full" : r[1]) + '</div>';
+    rd.appendChild(item);
+  });
+
+  /* ---------- 动效演示 ---------- */
+  var demos = document.querySelectorAll(".motion-demo");
+  for (var d = 0; d < demos.length; d++) {
+    var el = demos[d];
+    el.style.cssText = "position:absolute;top:-1px;left:0;width:40%;height:4px;border-radius:999px;" +
+                       "background:var(--accent);transition:transform " + el.getAttribute("data-dur") +
+                       "ms cubic-bezier(0.32,0.72,0,1)";
+  }
+  setInterval(function () {
+    for (var k = 0; k < demos.length; k++) {
+      var cur = demos[k].style.transform === "translateX(150%)";
+      demos[k].style.transform = cur ? "translateX(0)" : "translateX(150%)";
+    }
+  }, 1400);
+
+  /* ---------- 图标墙 ---------- */
+  var wall = document.getElementById("icon-wall");
+  var names = WispIcon.names;
+  document.getElementById("icon-count").textContent = names.length;
+  names.forEach(function (n) {
+    var cell = document.createElement("div");
+    cell.className = "icon-cell";
+    cell.innerHTML = WispIcon.html(n, 20) + '<div class="t-micro">' + n + '</div>';
+    wall.appendChild(cell);
+  });
+
+  setTheme("dark");
+})();
+</script>
+</body>
+</html>

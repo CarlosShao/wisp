@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>异常与空态 — Wisp 原型</title>
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/base.css">
+<style>
+  /* ==========================================================================
+     异常与空态（方案 D37 错误模型 / D42 可靠性 / §2 状态机）。
+     原则：失败必须可见且可区分。最坏的情况是悬浮球闪了几下然后什么也没发生。
+     17 类 error_class 是有限枚举，不得自由字符串 —— 否则统计与告警全部失效。
+     ========================================================================== */
+
+  .err-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4); }
+  .err-card { padding: var(--s-5); border-radius: var(--r-md); background: var(--bg-subtle); box-shadow: var(--shadow-inset); }
+  .err-card .head { display: flex; align-items: center; gap: var(--s-3); margin-bottom: var(--s-3); }
+  .err-card .cls { font-family: var(--font-mono); font-size: var(--t-small); color: var(--fg-primary); }
+  .err-card .say { color: var(--fg-secondary); }
+  .err-card .map { display: flex; gap: var(--s-2); margin-top: var(--s-3); flex-wrap: wrap; }
+
+  .state-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-5); }
+  .state-card { padding: var(--s-6); border-radius: var(--r-lg); background: var(--bg-raised); box-shadow: var(--shadow-card); backdrop-filter: var(--glass-blur-sm); -webkit-backdrop-filter: var(--glass-blur-sm); }
+  .state-card .ico {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border-radius: var(--r-md);
+    background: var(--bg-subtle); box-shadow: inset 0 0 0 1px var(--glass-ring);
+    margin-bottom: var(--s-4);
+  }
+  .state-card.is-danger .ico { background: var(--danger-soft); box-shadow: inset 0 0 0 1px var(--danger-line); color: var(--danger); }
+  .state-card.is-warn .ico { background: var(--warn-soft); box-shadow: inset 0 0 0 1px var(--warn-line); color: var(--warn); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="page-head">
+    <div class="spread" style="margin-bottom:var(--s-3)">
+      <div class="row-4">
+        <a class="icon-btn" href="../index.html" aria-label="返回原型首页"><span data-icon="arrow-left" data-size="18"></span></a>
+        <div>
+          <div class="t-title">异常与空态</div>
+          <div class="label" style="margin-top:var(--s-1)">States · D37 / D42 / D43</div>
+        </div>
+      </div>
+      <div data-theme-toggle></div>
+    </div>
+  </header>
+
+  <div class="proto-note">
+    <span data-icon="alert-triangle" data-size="16"></span>
+    <div>
+      <strong style="color:var(--fg-primary);font-weight:500">失败必须可见且可区分。</strong>
+      用户说完话、悬浮球闪了几下、然后什么也没发生 —— 那比报错更糟，因为无法判断是「没听见」还是「坏了」。
+      每类错误都有人话文案、映射态与是否可重试；技术细节折叠在可展开区，不直接糊在脸上。
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="t-sub">17 类 error_class</div>
+      <div class="grow">有限枚举 · 落 task_log.error_class 与日志字段</div>
+      <div class="label">D37</div>
+    </div>
+
+    <div class="err-grid t-small">
+      <div class="err-card">
+        <div class="head"><span data-icon="settings-2" data-size="16" class="fg-warn"></span><span class="cls">config</span></div>
+        <div class="say">配置不完整：还缺一个 API Key。打开配置面板补上即可。</div>
+        <div class="map"><span class="tag">Unconfigured</span><span class="tag">不可重试</span></div>
+      </div>
+      <div class="err-card">
+        <div class="head"><span data-icon="key-round" data-size="16" class="fg-warn"></span><span class="cls">auth</span></div>
+        <div class="say">Key 已失效或被拒绝（401 / 403）。请重新填写。</div>
+        <div class="map"><span class="tag">Unconfigured</span><span class="tag">不重试</span></div>
+      </div>
+      <div class="err-card">
+        <div class="head"><span data-icon="wifi-off" data-size="16" class="fg-info"></span><span class="cls">network</span></div>
+        <div class="say">网络不可用。可以切文字模式继续，恢复后自动重试。</div>
+        <div class="map"><span class="tag">NoNetwork</span><span class="tag fg-info">退避重试 3 次</span></div>
+      </div>
+      <div class="err-card">
+        <div class="head"><span data-icon="timer" data-size="16" class="fg-warn"></span><span class="cls">rate_limit</span></div>
+        <div class="say">被限流（429）。服务端要求 32s 后再试；本次已花费 0.31 元。</div>
+        <div class="map"><span class="tag">Error</span><span class="tag fg-info">尊重 retry-after</span></div>
+      </div>
+      <div class="err-card">
+        <div class="head"><span data-icon="cpu" data-size="16" class="fg-warn"></span><span class="cls">provider</span></div>
+        <div class="say">服务异常（5xx）。已自动切到备用 provider 重试。</div>
+        <div class="map"><span class="tag">Error</span><span class="tag fg-info">重试</span></div>
+      </div>
+      <div class="err-card">
+        <div class="head"><span data-icon="ban" data-size="16" class="fg-danger"></span><span class="cls">model</span></div>
+        <div class="say">模型校验失败：sha256 或 manifest 签名不符，已拒绝加载。</div>
+        <div class="map"><span class="tag">Error</span><span class="tag">不可重试</span></div>
+      </div>
+      <div class="err-card">
+        <div class="head"><span data-icon="mic-off" data-size="16" class="fg-danger"></span><span class="cls">audio_device</span></div>
+        <div class="say">麦克风「Headset Earphone」被其他应用独占。去系统声音设置释放它。</div>
+        <div class="map"><span class="tag">Error</span><span class="tag fg-info">重枚举一次</span></div>
+      </div>
+      <div class="err-card">
+        <div class="head"><span data-icon="audio-lines" data-size="16" class="fg-warn"></span><span class="cls">asr</span></div>
+        <div class="say">没听清，请再说一次。</div>
+        <div class="map"><span class="tag">Listening</span><span class="tag fg-info">重试 1 次</span></div>
+      </div>
+      <div class="err-card">
+        <div class="head"><span data-icon="terminal" data-size="16" class="fg-2"></span><span class="cls">tool</span></div>
+        <div class="say">工具内部失败。已把错误回给模型让它自己纠正参数，不打断你。</div>
+        <div class="map"><span class="tag">Acting</span><span class="tag">由 Agent 决定</span></div>
+      </div>
+      <div class="err-card">
+        <div class="head"><span data-icon="shield" data-size="16" class="fg-warn"></span><span class="cls">permission_denied</span></div>
+        <div class="say">目标程序以管理员身份运行，Wisp 无法向其输入（Windows 平台限制）。</div>
+        <div class="map"><span class="tag">Acting</span><span class="tag">不可重试</span></div>
+      </div>
+      <div class="err-card">
+        <div class="head"><span data-icon="x" data-size="16" class="fg-3"></span><span class="cls">user_rejected</span></div>
+        <div class="say">已取消。任务没有结束，可以一键重放这一步。</div>
+        <div class="map"><span class="tag">Settling</span><span class="tag">可重放</span></div>
+      </div>
+      <div class="err-card">
+        <div class="head"><span data-icon="square" data-size="16" class="fg-3"></span><span class="cls">cancelled</span></div>
+        <div class="say">（静默。取消不是错误，不给红色样式。）</div>
+        <div class="map"><span class="tag">Settling</span><span class="tag">不提示</span></div>
+      </div>
+      <div class="err-card">
+        <div class="head"><span data-icon="gauge" data-size="16" class="fg-warn"></span><span class="cls">budget</span></div>
+        <div class="say">本次任务已用 200,412 token，约 5.20 元，达到单任务预算上限。</div>
+        <div class="map"><span class="tag">Stuck</span><span class="tag">明示哪一项超限</span></div>
+      </div>
+      <div class="err-card">
+        <div class="head"><span data-icon="refresh-cw" data-size="16" class="fg-warn"></span><span class="cls">loop</span></div>
+        <div class="say">web.fetch 已连续调用 8 次且参数相同，我停下来了。</div>
+        <div class="map"><span class="tag">Stuck</span><span class="tag">明示重复了什么</span></div>
+      </div>
+      <div class="err-card">
+        <div class="head"><span data-icon="shield-alert" data-size="16" class="fg-danger"></span><span class="cls">injection</span></div>
+        <div class="say">检出注入嫌疑：本次操作包含来自某网页的内容，已升为强确认。</div>
+        <div class="map"><span class="tag">Error</span><span class="tag">指明来源</span></div>
+      </div>
+      <div class="err-card">
+        <div class="head"><span data-icon="alert-circle" data-size="16" class="fg-danger"></span><span class="cls">internal</span></div>
+        <div class="say">内部错误。已记录堆栈，可导出诊断包（不含音频与 Key）。</div>
+        <div class="map"><span class="tag">Error</span><span class="tag">诊断包入口</span></div>
+      </div>
+      <div class="err-card">
+        <div class="head"><span data-icon="hard-drive" data-size="16" class="fg-warn"></span><span class="cls">resource</span></div>
+        <div class="say">磁盘剩余不足 200MB，已暂停写历史与日志；主响应不受影响。</div>
+        <div class="map"><span class="tag">WatchdogAlert</span><span class="tag">一键重启</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="t-sub">全局态与空态</div>
+      <div class="grow">与 D43 转移表一一对应 · 不得静默失败</div>
+      <div class="label">D43</div>
+    </div>
+
+    <div class="state-grid">
+      <div class="state-card">
+        <span class="ico"><span data-icon="wifi-off" data-size="20"></span></span>
+        <div class="t-sub">无网络</div>
+        <div class="t-small fg-2" style="margin-top:var(--s-2)">网络探测失败。当前任务的上下文保留着，恢复后可从断点续。</div>
+        <div class="row-3" style="margin-top:var(--s-4)">
+          <button class="btn btn-secondary btn-sm">重试</button>
+          <button class="btn btn-ghost btn-sm">切文字模式</button>
+        </div>
+      </div>
+
+      <div class="state-card is-warn">
+        <span class="ico"><span data-icon="key-round" data-size="20"></span></span>
+        <div class="t-sub">未配置</div>
+        <div class="t-small fg-2" style="margin-top:var(--s-2)">没有可用的 API Key，或配置 schema 非法。语音与文字通道都会停在这一步等你。</div>
+        <div class="row-3" style="margin-top:var(--s-4)">
+          <button class="btn btn-secondary btn-sm">打开配置面板</button>
+        </div>
+      </div>
+
+      <div class="state-card is-warn">
+        <span class="ico"><span data-icon="alert-triangle" data-size="20"></span></span>
+        <div class="t-sub">看门狗告警</div>
+        <div class="t-small fg-2" style="margin-top:var(--s-2)">连续 3 次回落失败：任务结束 10s 后进程树内存仍高于该态上限。可能是泄漏。</div>
+        <div class="row-3" style="margin-top:var(--s-4)">
+          <button class="btn btn-danger btn-sm">一键重启</button>
+          <button class="btn btn-ghost btn-sm">导出诊断包</button>
+        </div>
+      </div>
+
+      <div class="state-card">
+        <span class="ico"><span data-icon="library" data-size="20"></span></span>
+        <div class="t-sub">历史为空</div>
+        <div class="t-small fg-2" style="margin-top:var(--s-2)">还没有任务记录。任务日志保留 30 天，取证记录保留 30 天，都可逐条删。</div>
+        <div class="row-3" style="margin-top:var(--s-4)">
+          <button class="btn btn-secondary btn-sm">发起第一个任务</button>
+        </div>
+      </div>
+
+      <div class="state-card is-danger" style="grid-column:1 / -1">
+        <div class="row-4">
+          <span class="ico" style="margin-bottom:0"><span data-icon="alert-circle" data-size="20"></span></span>
+          <div style="flex:1">
+            <div class="t-sub">错误卡的标准结构</div>
+            <div class="t-small fg-2" style="margin-top:var(--s-2)">
+              左侧 2px 危险色竖条加一个人话文案；技术细节（error_class、provider code、堆栈）折叠在展开区，用等宽小字；
+              动作按钮永远是「重试 / 切文字模式 / 导出诊断包」这一组，不直接暴露 stack trace，也不只说「出错了」。
+            </div>
+          </div>
+          <div class="stack-2" style="min-width:160px">
+            <button class="btn btn-secondary btn-sm btn-block">重试</button>
+            <button class="btn btn-ghost btn-sm btn-block">展开技术细节</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+<script src="../assets/icons.js"></script>
+<script src="../assets/theme.js"></script>
+</body>
+</html>

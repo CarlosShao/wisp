@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>成本 — Wisp 原型</title>
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/base.css">
+<style>
+  /* ==========================================================================
+     成本（方案 C23 CostMeter / §14.1）。
+     自用场景的信任基础：不知道它烧了多少钱，就无法信任它。
+     纯数字 + 极简 SVG 条形；不引入图表库（§17.6 明确排除）。
+     ========================================================================== */
+
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-4); }
+  .stat {
+    padding: var(--s-5);
+    border-radius: var(--r-md);
+    background: var(--bg-subtle);
+    box-shadow: var(--shadow-inset);
+  }
+  .stat .num { font-family: var(--font-mono); font-size: var(--t-title); line-height: var(--lh-title); color: var(--fg-primary); }
+  .stat .sub { color: var(--fg-tertiary); margin-top: var(--s-1); }
+  .budget { margin-top: var(--s-5); }
+  .budget-bar { position: relative; height: 6px; border-radius: var(--r-full); background: var(--bg-inset); overflow: visible; }
+  .budget-bar i { position: absolute; inset: 0 auto 0 0; border-radius: var(--r-full); background: var(--accent); }
+  .budget-bar .mark80 { position: absolute; top: -3px; bottom: -3px; width: 2px; border-radius: 1px; background: var(--warn); }
+  .cost-grid {
+    display: grid;
+    grid-template-columns: auto 1fr repeat(3, auto) auto auto;
+    gap: var(--s-2) var(--s-5);
+    align-items: baseline;
+    padding: var(--s-4) 0;
+    border-top: 1px solid var(--border-hair);
+  }
+  .cost-grid:first-of-type { border-top: 0; }
+  .spark { display: flex; align-items: flex-end; gap: var(--s-2); height: 56px; }
+  .spark div { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: var(--s-2); height: 100%; }
+  .spark i { display: block; border-radius: var(--r-xs) var(--r-xs) 0 0; background: var(--accent-line); }
+  .spark div.is-today i { background: var(--accent); }
+  .spark span { color: var(--fg-tertiary); text-align: center; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="page-head">
+    <div class="spread" style="margin-bottom:var(--s-3)">
+      <div class="row-4">
+        <a class="icon-btn" href="../index.html" aria-label="返回原型首页"><span data-icon="arrow-left" data-size="18"></span></a>
+        <div>
+          <div class="t-title">成本</div>
+          <div class="label" style="margin-top:var(--s-1)">Cost · C23 / §14.1</div>
+        </div>
+      </div>
+      <div data-theme-toggle></div>
+    </div>
+  </header>
+
+  <div class="proto-note">
+    <span data-icon="gauge" data-size="16"></span>
+    <div>
+      <strong style="color:var(--fg-primary);font-weight:500">钱与防死循环是两层预算。</strong>
+      本页是钱：日 / 月累计与告警，达 80% 提示、达 100% 默认暂停新任务（可配为仅告警）。
+      单任务 200k token 的那条是防死循环（C22），触发进 Stuck 态并明示「本次已用 X token，约 Y 元」。
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="t-sub">累计</div>
+      <div class="grow">日聚合表 cost_daily · 400 天 · 避免每次全表扫 task_log</div>
+      <div class="label">C23</div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="label">Today</div>
+        <div class="num" style="margin-top:var(--s-3)">12,480 tok</div>
+        <div class="sub t-small">0.31 元 · 4 个任务 · 27 次工具调用</div>
+      </div>
+      <div class="stat">
+        <div class="label">This Month</div>
+        <div class="num" style="margin-top:var(--s-3)">486,204 tok</div>
+        <div class="sub t-small">12.40 元 · 86 个任务</div>
+      </div>
+      <div class="stat">
+        <div class="label">Since Install</div>
+        <div class="num" style="margin-top:var(--s-3)">1,204,882 tok</div>
+        <div class="sub t-small">31.07 元 · 自 2026-08-30</div>
+      </div>
+    </div>
+
+    <div class="budget t-small">
+      <div class="spread" style="margin-bottom:var(--s-3)">
+        <span class="fg-2">日预算 2.00 元 · 已用 15.5%</span>
+        <span class="fg-3">达 80% 提示 · 达 100% 默认暂停新任务</span>
+      </div>
+      <div class="budget-bar">
+        <i style="width:15.5%"></i>
+        <span class="mark80" style="left:80%" aria-label="80% 告警线"></span>
+      </div>
+    </div>
+
+    <div class="spark t-micro" style="margin-top:var(--s-7)" aria-label="近七日 token 用量">
+      <div><i style="height:34%"></i><span>12</span></div>
+      <div><i style="height:52%"></i><span>13</span></div>
+      <div><i style="height:21%"></i><span>14</span></div>
+      <div><i style="height:66%"></i><span>15</span></div>
+      <div><i style="height:44%"></i><span>16</span></div>
+      <div><i style="height:29%"></i><span>17</span></div>
+      <div class="is-today"><i style="height:18%"></i><span>18</span></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="t-sub">每任务明细</div>
+      <div class="grow">IN / OUT / CACHED 三个 micro label · 数字一律等宽对齐</div>
+      <div class="label">task_log</div>
+    </div>
+
+    <div class="card card-pad">
+      <div class="cost-grid t-small">
+        <span class="t-mono fg-3">09:14</span>
+        <span class="fg-2">当前电量多少</span>
+        <span class="t-mono fg-3">IN 380</span>
+        <span class="t-mono fg-3">OUT 32</span>
+        <span class="t-mono fg-3">CACHED 340</span>
+        <span class="t-mono">0.01 元</span>
+        <span class="t-mono fg-3">1.84s</span>
+      </div>
+      <div class="cost-grid t-small">
+        <span class="t-mono fg-3">08:52</span>
+        <span class="fg-2">把下载目录里的 PDF 都归到一个文件夹</span>
+        <span class="t-mono fg-3">IN 8,204</span>
+        <span class="t-mono fg-3">OUT 412</span>
+        <span class="t-mono fg-3">CACHED 6,140</span>
+        <span class="t-mono">0.31 元</span>
+        <span class="t-mono fg-3">2.84s</span>
+      </div>
+      <div class="cost-grid t-small">
+        <span class="t-mono fg-3">08:31</span>
+        <span class="fg-2">总结这个链接然后发到我的备份服务</span>
+        <span class="t-mono fg-3">IN 3,896</span>
+        <span class="t-mono fg-3">OUT 606</span>
+        <span class="t-mono fg-3">CACHED 2,048</span>
+        <span class="t-mono">0.19 元</span>
+        <span class="t-mono fg-3">4.10s</span>
+      </div>
+      <div class="cost-grid t-small">
+        <span class="t-mono fg-3">昨天 22:47</span>
+        <span class="fg-2">陪聊五轮（Warm 内二轮起首字 1.2s）</span>
+        <span class="t-mono fg-3">IN 21,308</span>
+        <span class="t-mono fg-3">OUT 1,904</span>
+        <span class="t-mono fg-3">CACHED 17,400</span>
+        <span class="t-mono">0.88 元</span>
+        <span class="t-mono fg-3">6 分 12 秒</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="t-sub">单价表</div>
+      <div class="grow">折算来自配置里的单价，换 provider 后历史不重算</div>
+      <div class="label">Pricing</div>
+    </div>
+
+    <div class="card card-pad">
+      <div class="cost-grid t-small" style="grid-template-columns:auto 1fr auto auto">
+        <span class="t-mono">deepseek-chat</span>
+        <span class="fg-3">默认 provider</span>
+        <span class="t-mono fg-3">IN 1.00 元 / M</span>
+        <span class="t-mono fg-3">OUT 2.00 元 / M</span>
+      </div>
+      <div class="cost-grid t-small" style="grid-template-columns:auto 1fr auto auto">
+        <span class="t-mono">claude-sonnet</span>
+        <span class="fg-3">fallback · 提示缓存命中按 0.1 倍计</span>
+        <span class="t-mono fg-3">IN 21.00 元 / M</span>
+        <span class="t-mono fg-3">OUT 105.00 元 / M</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+<script src="../assets/icons.js"></script>
+<script src="../assets/theme.js"></script>
+</body>
+</html>

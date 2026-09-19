@@ -1,0 +1,287 @@
+/* ============================================================================
+   Wisp / 一缕 — Design Tokens · v2「磨砂玻璃」
+   ----------------------------------------------------------------------------
+   契约 C21 `DesignTokens` 的参考实现（方案 §17.3，v2 修订见 §17.3-v2）。
+   S1 的原生侧（Direct2D / DirectWrite）与 S5 的 CSS 侧都必须以本文件为准。
+   唯一样式真相源：screens/ 下不得出现硬编码色值。
+
+   v2 的三句话：
+   1. 玻璃必须有东西可模糊 —— 所以底色不再是纯黑，而是一层极低饱和的环境光。
+   2. 分层靠「透光率 + 内侧高光」，不再靠 1px 描边堆砌。
+   3. 悬浮球是自发光玻璃滴，不是实心球 —— 但只用渐变与 alpha，
+      不用 backdrop-filter，保证 S1 的 Direct2D 能一比一复刻。
+   ============================================================================ */
+
+:root {
+  /* ---------- 底色与环境光 ----------
+     环境光是「磨砂」成立的前提：blur 一片纯黑只会得到另一片纯黑。
+     四团色光固定铺在 body 上，饱和度压到几乎只剩色温。 */
+  --bg-base:        #10141B;
+  /* 环境光 v2.3：冷调双色族（青雾 / 钢蓝 / 冷靛 / 暮紫）。
+     v2.2 的青雾+暖琥珀相混会出橄榄与褐色的脏色带 —— 那是「配色土」的根因；
+     暖色自此只作语义色（Warm 态 / L1 等待），不再进环境光。
+     玻璃模糊一片纯黑只会得到另一片纯黑 —— 色场必须覆盖整屏，磨砂才成立。 */
+  --ambient-a:      rgba(84, 148, 152, 0.36);   /* 青雾 */
+  --ambient-b:      rgba(64, 92, 146, 0.30);    /* 钢蓝 */
+  --ambient-c:      rgba(90, 106, 180, 0.34);   /* 冷靛 */
+  --ambient-d:      rgba(126, 104, 170, 0.20);  /* 暮紫，补中段 */
+  --grain:          0.04;                       /* 磨砂颗粒不透明度 */
+
+  /* ---------- 玻璃面：四档透光率 ----------
+     raised  = 卡片 / 面板主体
+     overlay = 悬浮层 / hover / 输入聚焦
+     subtle  = 次级块 / chip 底
+     inset   = 代码块 / 输入框（比主体更沉，形成凹陷感） */
+  /* 斜向高光：光从左上打到玻璃上的那道 sheen，与底色叠成一个 background 栈 */
+  --sheen:          linear-gradient(168deg,
+                      rgba(255, 255, 255, 0.09) 0%,
+                      rgba(255, 255, 255, 0.025) 34%,
+                      transparent 62%);
+  /* 透光率 v2.1：0.62 太实，底色透不出来就看不出是玻璃 */
+  --bg-raised:      var(--sheen), rgba(16, 20, 26, 0.38);
+  --bg-overlay:     var(--sheen), rgba(30, 36, 44, 0.50);
+  --bg-subtle:      rgba(255, 255, 255, 0.05);
+  --bg-inset:       rgba(6, 8, 11, 0.38);
+
+  --glass-blur:     blur(28px) saturate(1.3);
+  --glass-blur-sm:  blur(16px) saturate(1.25);
+
+  /* 玻璃的边缘光：外圈一道极淡的环 + 顶边一道高光，
+     这两条线是「玻璃」与「灰块」的全部区别 */
+  --glass-ring:     rgba(255, 255, 255, 0.14);
+  --glass-hi:       rgba(255, 255, 255, 0.18);
+  --glass-hi-soft:  rgba(255, 255, 255, 0.08);
+
+  /* ---------- 边框：降级为分隔线，不再是分层主力 ---------- */
+  --border-hair:    rgba(255, 255, 255, 0.06);
+  --border-soft:    rgba(255, 255, 255, 0.10);
+  --border-strong:  rgba(255, 255, 255, 0.18);
+
+  /* ---------- 文本：四级 ---------- */
+  --fg-primary:     #F2F3F5;
+  --fg-secondary:   #A6A9B0;
+  --fg-tertiary:    #71747C;
+  --fg-disabled:    #4C4F56;
+
+  /* ---------- 强调色：Wisp =「一缕 / 薄雾」，低饱和青雾 ---------- */
+  --accent:         #86C2B9;
+  --accent-hover:   #9BD2C9;
+  --accent-pressed: #6FA8A0;
+  --accent-soft:    rgba(134, 194, 185, 0.14);
+  --accent-line:    rgba(134, 194, 185, 0.36);
+  --accent-fg:      #0B100F;
+
+  /* ---------- 功能色：全部低饱和 ---------- */
+  --danger:         #E07A70;
+  --danger-soft:    rgba(224, 122, 112, 0.14);
+  --danger-line:    rgba(224, 122, 112, 0.38);
+
+  --warn:           #D9B26A;
+  --warn-soft:      rgba(217, 178, 106, 0.14);
+  --warn-line:      rgba(217, 178, 106, 0.38);
+
+  --success:        #7DB896;
+  --success-soft:   rgba(125, 184, 150, 0.14);
+  --success-line:   rgba(125, 184, 150, 0.38);
+
+  --info:           #8AAAD2;
+  --info-soft:      rgba(138, 170, 210, 0.14);
+  --info-line:      rgba(138, 170, 210, 0.38);
+
+  /* Warm 态专用暖色：不得复用 accent，否则分不清「就绪」与「会话保活中」 */
+  --warm:           #D6B184;
+  --warm-soft:      rgba(214, 177, 132, 0.16);
+  --warm-line:      rgba(214, 177, 132, 0.38);
+
+  /* ---------- 悬浮球 v2：自发光玻璃滴 ----------
+     只用渐变与 alpha（S1 的 Direct2D 可复刻），不用 backdrop-filter。
+     hi    = 左上高光斑
+     body  = 玻璃体两档透光
+     rim   = 边缘一圈亮线
+     glow  = 外发光（各态换色） */
+  --orb-hi:         rgba(255, 255, 255, 0.90);
+  --orb-body:       rgba(255, 255, 255, 0.30);
+  --orb-body-2:     rgba(255, 255, 255, 0.07);
+  --orb-rim:        rgba(255, 255, 255, 0.30);
+  --orb-shadow:     rgba(0, 0, 0, 0.45);
+
+  /* 兼容 v1 的球体名字：指向 v2 的对应档，screens 旧引用不必改 */
+  --ball-core:      var(--orb-hi);
+  --ball-mid:       var(--orb-body);
+  --ball-edge:      var(--orb-body-2);
+  --ball-halo:      rgba(255, 255, 255, 0.10);
+
+  /* 各态发光色（v1 的 tint 三段在 v2 收敛为「核心色 + 高光色」两档） */
+  --tint-accent-hi:   #C4E8E2;
+  --tint-success-hi:  #BFE3CF;  --tint-success-lo: #4E8A69;
+  --tint-warm-hi:     #F0DCB8;  --tint-warm-lo:    #96794C;
+  --tint-warn-hi:     #F0DCB8;  --tint-warn-lo:    #8F7434;
+  --tint-danger-hi:   #F3C0BA;  --tint-danger-lo:  #9C4A43;
+  --tint-neutral-hi:  #B9BCC4;  --tint-neutral-mid:#6A6D75;  --tint-neutral-lo: #3E4148;
+
+  /* 实心底色上的前景（角标数字、原生「允许」按钮文字、球内图标） */
+  --on-solid:       #FFFFFF;
+
+  /* 命令面板 / 模态背后的桌面压暗层 */
+  --scrim:          rgba(6, 8, 10, 0.42);
+
+  /* ---------- 阴影 v2：玻璃的投影是「一大团极淡 + 一道贴边暗线」 ---------- */
+  /* 玻璃棱边：上亮下暗两道内描边 + 一大团极淡投影 */
+  --shadow-pop:     0 0 0 1px var(--glass-ring),
+                    inset 0 1px 0 var(--glass-hi),
+                    inset 0 -1px 0 rgba(0, 0, 0, 0.30),
+                    0 32px 64px -24px rgba(0, 0, 0, 0.60),
+                    0 4px 12px rgba(0, 0, 0, 0.30);
+  --shadow-card:    0 0 0 1px var(--glass-ring),
+                    inset 0 1px 0 var(--glass-hi-soft),
+                    inset 0 -1px 0 rgba(0, 0, 0, 0.24),
+                    0 12px 32px -16px rgba(0, 0, 0, 0.45);
+  --shadow-inset:   inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  /* 遮罩用色（不是绘制色）：mask-image 需要完全不透明的颜色界定可见区 */
+  --mask-solid:     #000000;
+
+  /* ---------- 字体 ---------- */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text",
+               "Segoe UI", "PingFang SC", "Microsoft YaHei UI",
+               "Noto Sans CJK SC", "Source Han Sans SC", sans-serif;
+  --font-mono: "JetBrains Mono", "Cascadia Code", "SF Mono", "Cascadia Mono",
+               Consolas, "Liberation Mono", monospace;
+
+  /* ---------- 字号阶梯（只用这七档）----------
+     注意，中文排版陷阱：
+     · 字号下限 14px —— 中文落到 PingFang / YaHei，12px 在 Windows 上笔画粘连
+     · --t-micro (11px) 只用于英文大写 label 与纯数字，不得用于中文正文
+     · 禁用 300 及更细字重 —— Windows 中文细体发虚（无次像素抗锯齿优化） */
+  --t-display:      30px;  --lh-display: 38px;  --fw-display: 600;
+  --t-title:        18px;  --lh-title:   27px;  --fw-title:   600;
+  --t-sub:          15px;  --lh-sub:     24px;  --fw-sub:     500;
+  --t-body:         14px;  --lh-body:    22px;  --fw-body:    400;
+  --t-small:        12.5px;--lh-small:   18px;  --fw-small:   400;
+  --t-micro:        11px;  --lh-micro:   16px;  --fw-micro:   500;
+  --t-mono:         12.5px;--lh-mono:    20px;
+
+  /* micro label 的字距 */
+  --ls-micro:       0.08em;
+
+  /* ---------- 圆角 v2：整体放大一档，玻璃的边必须是润的 ---------- */
+  --r-xs:   6px;
+  --r-sm:   8px;
+  --r-md:   10px;
+  --r-lg:   16px;
+  --r-xl:   22px;
+  --r-full: 999px;
+
+  /* ---------- 间距：4px 网格，只用这些值 ---------- */
+  --s-1:  2px;
+  --s-2:  4px;
+  --s-3:  8px;
+  --s-4:  12px;
+  --s-5:  16px;
+  --s-6:  20px;
+  --s-7:  24px;
+  --s-8:  32px;
+  --s-9:  40px;
+  --s-10: 48px;
+  --s-11: 64px;
+
+  /* ---------- 动效：三档时长 + 单一缓动曲线 ----------
+     禁止 bounce / elastic / 超过 300ms 的 UI 动效。 */
+  --dur-fast: 120ms;
+  --dur-base: 180ms;
+  --dur-slow: 260ms;
+  --ease-out:    cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* ---------- 尺寸 ---------- */
+  --panel-w:      640px;   /* 结果面板固定宽度（§17.3 规则 6） */
+  --palette-w:    680px;
+  --ball-size:    56px;    /* 可配 44–72 */
+  --ball-sm:      44px;
+  --ball-lg:      72px;
+  --chip-h:       30px;
+  --row-h:        40px;    /* 列表行 / 命令面板行 */
+  --input-h:      38px;
+
+  /* ---------- 图标尺寸：只用这四档 ---------- */
+  --icon-xs: 14px;
+  --icon-sm: 16px;
+  --icon-md: 18px;
+  --icon-lg: 20px;
+
+  /* ---------- 焦点环（键盘可达性） ---------- */
+  --ring: 0 0 0 2px var(--bg-base), 0 0 0 4px var(--accent-line);
+}
+
+/* ============================================================================
+   亮色主题（对照）— D29 要求明暗双主题
+   亮色玻璃 = 白玻璃：透光率更高、模糊更重、边缘光换成纯白高光。
+   ============================================================================ */
+[data-theme="light"] {
+  --bg-base:        #E8EAED;
+  --ambient-a:      rgba(84, 148, 152, 0.34);
+  --ambient-b:      rgba(74, 102, 158, 0.28);
+  --ambient-c:      rgba(98, 114, 188, 0.32);
+  --ambient-d:      rgba(134, 112, 178, 0.18);
+  --grain:          0.03;
+
+  --sheen:          linear-gradient(168deg,
+                      rgba(255, 255, 255, 0.72) 0%,
+                      rgba(255, 255, 255, 0.28) 34%,
+                      transparent 62%);
+  --bg-raised:      var(--sheen), rgba(250, 251, 252, 0.52);
+  --bg-overlay:     var(--sheen), rgba(255, 255, 255, 0.72);
+  --bg-subtle:      rgba(20, 24, 28, 0.05);
+  --bg-inset:       rgba(20, 24, 28, 0.06);
+
+  --glass-blur:     blur(32px) saturate(1.35);
+  --glass-blur-sm:  blur(18px) saturate(1.3);
+
+  --glass-ring:     rgba(255, 255, 255, 0.66);
+  --glass-hi:       rgba(255, 255, 255, 0.90);
+  --glass-hi-soft:  rgba(255, 255, 255, 0.60);
+
+  --border-hair:    rgba(16, 20, 24, 0.08);
+  --border-soft:    rgba(16, 20, 24, 0.12);
+  --border-strong:  rgba(16, 20, 24, 0.22);
+
+  --fg-primary:     #17191C;
+  --fg-secondary:   #55585F;
+  --fg-tertiary:    #82858C;
+  --fg-disabled:    #B4B7BD;
+
+  --accent:         #3E837A;  --accent-hover:   #33706A;  --accent-pressed: #2A5F59;
+  --accent-soft:    rgba(62, 131, 122, 0.12);  --accent-line: rgba(62, 131, 122, 0.38);
+  --accent-fg:      #FFFFFF;
+
+  --danger:         #BC544C;  --danger-soft:  rgba(188, 84, 76, 0.12);  --danger-line:  rgba(188, 84, 76, 0.36);
+  --warn:           #96762C;  --warn-soft:    rgba(150, 118, 44, 0.12); --warn-line:    rgba(150, 118, 44, 0.36);
+  --success:        #47805F;  --success-soft: rgba(71, 128, 95, 0.12);  --success-line: rgba(71, 128, 95, 0.36);
+  --info:           #4A6C96;  --info-soft:    rgba(74, 108, 150, 0.12); --info-line:    rgba(74, 108, 150, 0.36);
+  --warm:           #8F6E3C;  --warm-soft:    rgba(143, 110, 60, 0.14); --warm-line:    rgba(143, 110, 60, 0.36);
+
+  /* 亮色下的球：白玻璃体 + 彩色核心 + 深色边缘光 */
+  --orb-hi:         rgba(255, 255, 255, 0.96);
+  --orb-body:       rgba(255, 255, 255, 0.62);
+  --orb-body-2:     rgba(255, 255, 255, 0.24);
+  --orb-rim:        rgba(20, 24, 28, 0.16);
+  --orb-shadow:     rgba(20, 24, 28, 0.20);
+
+  --tint-accent-hi:   #7FB5AC;
+  --tint-success-hi:  #7FAE93;  --tint-success-lo: #35624A;
+  --tint-warm-hi:     #C2A071;  --tint-warm-lo:    #6E5732;
+  --tint-warn-hi:     #B99A4E;  --tint-warn-lo:    #6B5522;
+  --tint-danger-hi:   #C57E76;  --tint-danger-lo:  #83372F;
+  --tint-neutral-hi:  #9C9FA6;  --tint-neutral-mid:#71747B;  --tint-neutral-lo: #4A4D54;
+
+  --scrim:          rgba(20, 24, 28, 0.24);
+
+  --shadow-pop:     0 0 0 1px var(--glass-ring),
+                    inset 0 1px 0 var(--glass-hi),
+                    0 32px 64px -24px rgba(24, 32, 40, 0.28),
+                    0 4px 12px rgba(24, 32, 40, 0.10);
+  --shadow-card:    0 0 0 1px var(--glass-ring),
+                    inset 0 1px 0 var(--glass-hi-soft),
+                    0 12px 32px -16px rgba(24, 32, 40, 0.18);
+  --shadow-inset:   inset 0 1px 0 rgba(255, 255, 255, 0.70);
+}

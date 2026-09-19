@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>数据与隐私 — Wisp 原型</title>
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/base.css">
+<style>
+  /* ==========================================================================
+     数据与隐私（方案 D20 三层记忆 / D35 数据模型 / §14.4 转写脱敏 / D16 隐私三件套）。
+     原则：一张用户能一眼看完、逐条可删的表不是黑盒。
+     真正危险的是「一堆自动生成的对话摘要悄悄堆积」—— 这里不允许发生。
+     ========================================================================== */
+
+  .tabs { display: flex; gap: var(--s-2); flex-wrap: wrap; margin-bottom: var(--s-6); }
+  .tabs button {
+    display: inline-flex; align-items: center; gap: var(--s-2);
+    height: 32px; padding: 0 var(--s-4);
+    border-radius: var(--r-full);
+    background: var(--bg-subtle);
+    box-shadow: inset 0 0 0 1px var(--glass-ring);
+    color: var(--fg-secondary);
+    font-size: var(--t-small);
+    transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+  }
+  .tabs button[aria-selected="true"] {
+    background: var(--bg-overlay);
+    color: var(--fg-primary);
+    box-shadow: var(--shadow-inset), inset 0 0 0 1px var(--accent-line);
+  }
+  .kv {
+    display: grid; grid-template-columns: minmax(140px, 0.8fr) 1fr auto;
+    gap: var(--s-2) var(--s-5); align-items: baseline;
+    padding: var(--s-4) 0; border-top: 1px solid var(--border-hair);
+  }
+  .kv:first-of-type { border-top: 0; }
+  .kv .slot { font-family: var(--font-mono); font-size: var(--t-small); color: var(--fg-tertiary); }
+  .quota { display: flex; align-items: center; gap: var(--s-4); }
+  .quota-bar { flex: 1; height: 4px; border-radius: var(--r-full); background: var(--bg-inset); overflow: hidden; }
+  .quota-bar i { display: block; height: 100%; background: var(--accent); border-radius: var(--r-full); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="page-head">
+    <div class="spread" style="margin-bottom:var(--s-3)">
+      <div class="row-4">
+        <a class="icon-btn" href="../index.html" aria-label="返回原型首页"><span data-icon="arrow-left" data-size="18"></span></a>
+        <div>
+          <div class="t-title">数据与隐私</div>
+          <div class="label" style="margin-top:var(--s-1)">Privacy · D20 / D35 / §14.4 / D16</div>
+        </div>
+      </div>
+      <div data-theme-toggle></div>
+    </div>
+  </header>
+
+  <div class="proto-note">
+    <span data-icon="eye-off" data-size="16"></span>
+    <div>
+      <strong style="color:var(--fg-primary);font-weight:500">默认不碰麦克风；音频永不落盘。</strong>
+      转写文本默认不进日志；任务历史是产品功能所以必须存，但在这里全量可见、可逐条删、可一键清空、可导出。
+      诊断包默认不含转写文本，导出前会展示将包含哪些条目。
+    </div>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="数据类别">
+    <button role="tab" aria-selected="true"><span data-icon="user" data-size="14"></span>L1 画像 <span class="t-mono">7 / 20</span></button>
+    <button role="tab" aria-selected="false"><span data-icon="bookmark" data-size="14"></span>L2 显式记忆 <span class="t-mono">12</span></button>
+    <button role="tab" aria-selected="false"><span data-icon="list" data-size="14"></span>L3 任务日志 <span class="t-mono">86</span></button>
+    <button role="tab" aria-selected="false"><span data-icon="hash" data-size="14"></span>tool_call 取证 <span class="t-mono">412</span></button>
+    <button role="tab" aria-selected="false"><span data-icon="folder-open" data-size="14"></span>工件 artifacts</button>
+  </div>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="t-sub">L1 用户画像</div>
+      <div class="grow">硬上限 20 条 · 全量注入系统提示词约 400 token · 满则按更新时间 LRU 淘汰并写日志</div>
+      <div class="row-3">
+        <button class="btn btn-ghost btn-sm">导出</button>
+        <button class="btn btn-ghost btn-sm fg-danger">一键清空</button>
+      </div>
+    </div>
+
+    <div class="card card-pad">
+      <div class="kv t-small">
+        <span class="slot">fact.family</span>
+        <span class="fg-2">家里三口人，猫叫芝麻</span>
+        <button class="icon-btn" aria-label="删除这一条"><span data-icon="trash-2" data-size="14"></span></button>
+      </div>
+      <div class="kv t-small">
+        <span class="slot">pref.tone</span>
+        <span class="fg-2">不喜欢被催，播报别用感叹号</span>
+        <button class="icon-btn" aria-label="删除这一条"><span data-icon="trash-2" data-size="14"></span></button>
+      </div>
+      <div class="kv t-small">
+        <span class="slot">dislikes.food</span>
+        <span class="fg-2">不吃香菜</span>
+        <button class="icon-btn" aria-label="删除这一条"><span data-icon="trash-2" data-size="14"></span></button>
+      </div>
+      <div class="kv t-small">
+        <span class="slot">habit.work_hours</span>
+        <span class="fg-2">工作日 10 点到 19 点，午休别播报</span>
+        <button class="icon-btn" aria-label="删除这一条"><span data-icon="trash-2" data-size="14"></span></button>
+      </div>
+      <div class="t-small fg-3" style="padding-top:var(--s-4)">
+        上一次淘汰：2026-09-02 移除 <span class="t-mono">pref.language</span>（最久未更新）。淘汰必须可见，否则你会觉得「它忘了我」却不知为何。
+        每条新记忆落地时悬浮球短闪「记住了：X」并给一键撤销 —— 记错比不记更伤人。
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="t-sub">L3 任务日志与取证</div>
+      <div class="grow">保留 30 天 · 转写文本按 §14.4 脱敏 · 取证列表上千行时面板侧虚拟化</div>
+      <div class="label">D35</div>
+    </div>
+
+    <div class="card card-pad">
+      <div class="kv t-small">
+        <span class="t-mono fg-3">09:14</span>
+        <span class="fg-2">当前电量多少 <span class="fg-3">（1 次工具调用 · 412 tok · 0.22 元）</span></span>
+        <div class="row-2">
+          <button class="btn btn-ghost btn-sm">查看</button>
+          <button class="icon-btn" aria-label="删除这一条"><span data-icon="trash-2" data-size="14"></span></button>
+        </div>
+      </div>
+      <div class="kv t-small">
+        <span class="t-mono fg-3">08:52</span>
+        <span class="fg-2">把下载目录里的 PDF 都归到一个文件夹 <span class="fg-3">（24 次工具调用 · 12,480 tok · 0.31 元）</span></span>
+        <div class="row-2">
+          <button class="btn btn-ghost btn-sm">查看</button>
+          <button class="icon-btn" aria-label="删除这一条"><span data-icon="trash-2" data-size="14"></span></button>
+        </div>
+      </div>
+      <div class="kv t-small">
+        <span class="t-mono fg-3">昨天 21:03</span>
+        <span class="fg-2">语音转写已按策略脱敏：只记长度与置信度 <span class="fg-3">（模式匹配脱敏是尽力而为，不作已脱敏承诺）</span></span>
+        <div class="row-2">
+          <button class="btn btn-ghost btn-sm">查看</button>
+          <button class="icon-btn" aria-label="删除这一条"><span data-icon="trash-2" data-size="14"></span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div class="t-sub">工件目录</div>
+      <div class="grow">宿主内部工件写入不经门控，但限数据目录、计配额、面板可见可删可导出（D34 的第二条注）</div>
+      <div class="label">artifacts</div>
+    </div>
+
+    <div class="card card-pad stack-4">
+      <div class="quota t-small">
+        <span class="t-mono">312 MB / 500 MB</span>
+        <div class="quota-bar"><i style="width:62%"></i></div>
+        <span class="fg-3">超配额按最久未用清理</span>
+      </div>
+      <div class="kv t-small">
+        <span class="t-mono fg-3">tool-output-7f31.txt</span>
+        <span class="fg-2">search.content 的超长结果 spill · 4,208 token</span>
+        <div class="row-2">
+          <button class="btn btn-ghost btn-sm">导出</button>
+          <button class="icon-btn" aria-label="删除这一条"><span data-icon="trash-2" data-size="14"></span></button>
+        </div>
+      </div>
+      <div class="kv t-small">
+        <span class="t-mono fg-3">result-2026-09-18-0852.md</span>
+        <span class="fg-2">长结果落文件 · 含 23 个文件的归类清单</span>
+        <div class="row-2">
+          <button class="btn btn-ghost btn-sm">导出</button>
+          <button class="icon-btn" aria-label="删除这一条"><span data-icon="trash-2" data-size="14"></span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+<script src="../assets/icons.js"></script>
+<script src="../assets/theme.js"></script>
+<script>
+(function () {
+  "use strict";
+  var tabs = document.querySelector(".tabs");
+  tabs.addEventListener("click", function (e) {
+    var btn = e.target.closest("button");
+    if (!btn) return;
+    tabs.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-selected", "false"); });
+    btn.setAttribute("aria-selected", "true");
+  });
+})();
+</script>
+</body>
+</html>

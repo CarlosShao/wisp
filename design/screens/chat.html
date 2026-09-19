@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>对话与结果流 — Wisp 原型</title>
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/base.css">
+<style>
+  /* 模拟桌面环境：面板是按需拉起的 WebView，不是常驻 */
+  .desktop {
+    min-height: 100vh;
+    padding: var(--s-8) var(--s-7) var(--s-11);
+    background:
+      radial-gradient(92% 62% at 16% -8%, var(--ambient-c) 0%, transparent 60%),
+      radial-gradient(84% 56% at 88% 4%, var(--ambient-a) 0%, transparent 58%),
+      radial-gradient(64% 46% at 50% 30%, var(--ambient-d) 0%, transparent 64%),
+      radial-gradient(72% 50% at 46% 82%, var(--ambient-b) 0%, transparent 64%),
+      radial-gradient(96% 68% at 74% 106%, var(--ambient-b) 0%, transparent 62%),
+      radial-gradient(70% 52% at 4% 92%, var(--ambient-a) 0%, transparent 60%),
+      var(--bg-base);
+    display: flex; flex-direction: column; align-items: center; gap: var(--s-6);
+  }
+
+  /* ---------- 面板外壳 ---------- */
+  .panel {
+    width: var(--panel-w);
+    background: var(--bg-raised);
+    border: 1px solid var(--glass-ring);
+    border-radius: var(--r-xl);
+    box-shadow: var(--shadow-pop);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  /* 浮在面板玻璃之上的次级块，用轻一档的模糊 */
+  .state-card, .tool-chip, .batch, .msg-user-bubble {
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+  }
+  .panel-head {
+    display: flex; align-items: center; gap: var(--s-3);
+    padding: var(--s-4) var(--s-5);
+    border-bottom: 1px solid var(--border-hair);
+    background: var(--bg-raised);
+  }
+  .panel-title { font-size: var(--t-sub); font-weight: var(--fw-sub); }
+  .panel-meta { display: flex; align-items: center; gap: var(--s-3); margin-left: auto; }
+
+  .stream {
+    padding: var(--s-6) var(--s-5);
+    display: flex; flex-direction: column; gap: var(--s-6);
+    max-height: none;
+  }
+
+  .composer {
+    display: flex; align-items: center; gap: var(--s-3);
+    padding: var(--s-4) var(--s-5);
+    border-top: 1px solid var(--border-hair);
+    background: var(--bg-subtle);
+  }
+  .composer .input { background: var(--bg-inset); }
+
+  /* ---------- 用户消息（ASR 转写） ---------- */
+  .msg-user { display: flex; flex-direction: column; align-items: flex-end; gap: var(--s-2); }
+  .msg-user-bubble {
+    max-width: 82%;
+    padding: var(--s-3) var(--s-4);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-line);
+    border-radius: var(--r-lg);
+    border-bottom-right-radius: var(--r-sm);
+    color: var(--fg-primary);
+  }
+  .msg-src { display: flex; align-items: center; gap: var(--s-2); }
+
+  /* ---------- 助手消息 ---------- */
+  .msg-agent { display: flex; flex-direction: column; gap: var(--s-3); }
+  .msg-agent-head { display: flex; align-items: center; gap: var(--s-2); }
+  .msg-body { color: var(--fg-primary); }
+  .msg-body p + p { margin-top: var(--s-3); }
+  .msg-body ul { display: flex; flex-direction: column; gap: var(--s-2); margin-top: var(--s-3); }
+  .msg-body li { display: flex; gap: var(--s-3); }
+  .msg-body li::before {
+    content: ""; flex: none; width: 4px; height: 4px; margin-top: 9px;
+    border-radius: var(--r-full); background: var(--fg-tertiary);
+  }
+  .msg-foot { display: flex; align-items: center; gap: var(--s-4); }
+
+  /* ---------- 推理过程（默认折叠） ---------- */
+  .reasoning { border-top: 1px solid var(--border-hair); }
+  .reasoning-toggle {
+    display: flex; align-items: center; gap: var(--s-2);
+    width: 100%; padding: var(--s-1) 0;
+    color: var(--fg-tertiary);
+    font-size: var(--t-micro); font-weight: var(--fw-micro);
+    letter-spacing: var(--ls-micro); text-transform: uppercase;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .reasoning-toggle:hover { color: var(--fg-secondary); }
+  .reasoning-toggle .chev { transition: transform var(--dur-base) var(--ease-out); }
+  .reasoning.is-open .reasoning-toggle .chev { transform: rotate(180deg); }
+  .reasoning-body {
+    display: none;
+    margin: var(--s-2) 0 var(--s-1);
+    padding-left: var(--s-4);
+    border-left: 1px solid var(--border-hair);
+    color: var(--fg-secondary);
+    font-size: var(--t-small); line-height: var(--lh-small);
+  }
+  .reasoning.is-open .reasoning-body { display: block; }
+
+  /* ---------- 工具调用 chip ---------- */
+  .tools { display: flex; flex-direction: column; gap: var(--s-2); }
+  .tool-chip {
+    display: flex; align-items: center; gap: var(--s-3);
+    min-height: var(--chip-h); padding: var(--s-1) var(--s-3);
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-hair);
+    border-radius: var(--r-sm);
+    transition: border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+    width: 100%; text-align: left;
+  }
+  .tool-chip:hover { border-color: var(--border-soft); background: var(--bg-overlay); }
+  .tool-ico { color: var(--fg-secondary); flex: none; display: flex; }
+  .tool-name { font-family: var(--font-mono); font-size: var(--t-mono); color: var(--fg-primary); flex: none; }
+  .tool-args { font-size: var(--t-small); color: var(--fg-tertiary); flex: 1 1 auto; min-width: 0; }
+  .tool-status { flex: none; display: flex; align-items: center; gap: var(--s-2); }
+
+  /* 审批等待：琥珀描边，脉冲只跑一次然后静止 */
+  .tool-chip.is-pending {
+    border-color: var(--warn-line);
+    background: var(--warn-soft);
+  }
+  /* 失败 */
+  .tool-chip.is-failed { border-color: var(--danger-line); }
+  /* 被拒 */
+  .tool-chip.is-denied { opacity: 0.72; }
+
+  .tool-detail { display: none; padding: var(--s-3) 0 0; }
+  .tool-group.is-open .tool-detail { display: block; }
+  .tool-detail-grid { display: grid; grid-template-columns: 1fr; gap: var(--s-3); }
+  .kv { display: flex; gap: var(--s-3); font-size: var(--t-small); }
+  .kv > .label { flex: none; width: 92px; padding-top: 2px; }
+
+  /* ---------- 批量聚合确认（D45） ---------- */
+  .batch {
+    border: 1px solid var(--warn-line);
+    background: var(--warn-soft);
+    border-radius: var(--r-md);
+    padding: var(--s-4);
+    display: flex; flex-direction: column; gap: var(--s-3);
+  }
+  .batch-head { display: flex; align-items: center; gap: var(--s-3); }
+  .batch-list {
+    background: var(--bg-inset); border: 1px solid var(--border-hair);
+    border-radius: var(--r-sm); padding: var(--s-3);
+    font-family: var(--font-mono); font-size: var(--t-micro); line-height: 18px;
+    color: var(--fg-tertiary); max-height: 96px; overflow: hidden; position: relative;
+  }
+  .batch-list::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 32px;
+    background: linear-gradient(to bottom, transparent, var(--bg-inset));
+  }
+
+  /* ---------- 状态卡片：错误 / Stuck / 注入检出 ---------- */
+  .state-card {
+    display: flex; gap: var(--s-4);
+    padding: var(--s-4);
+    background: var(--bg-raised);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-md);
+  }
+  .state-ico { flex: none; margin-top: 2px; }
+  .state-body { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: var(--s-3); }
+  .state-title { font-weight: 500; }
+  .state-detail { display: none; }
+  .state-card.is-open .state-detail { display: block; }
+  .state-actions { display: flex; gap: var(--s-2); flex-wrap: wrap; }
+
+  /* ---------- 已取消 ---------- */
+  .cancelled { display: flex; align-items: center; gap: var(--s-4); }
+  .cancelled::before, .cancelled::after { content: ""; flex: 1; height: 1px; background: var(--border-hair); }
+
+  /* ---------- 注入检出：命中片段高亮 ---------- */
+  mark.taint {
+    background: var(--danger-soft); color: var(--danger);
+    border-bottom: 1px solid var(--danger-line);
+    padding: 0 2px; border-radius: 2px;
+  }
+
+  /* ---------- 分隔：轮次 ---------- */
+  .turn-sep { display: flex; align-items: center; gap: var(--s-4); }
+  .turn-sep::before, .turn-sep::after { content: ""; flex: 1; height: 1px; background: var(--border-hair); }
+</style>
+</head>
+<body>
+<div class="desktop">
+
+  <div class="proto-note" style="width:var(--panel-w);margin-bottom:0">
+    <span data-icon="info" data-size="16"></span>
+    <div>
+      <strong style="color:var(--fg-primary);font-weight:500">这一屏是原型的重点</strong>：
+      方案 §17.5 列出的 <strong style="color:var(--fg-secondary);font-weight:500">14 种 agent 工作状态全部画在下面</strong>，
+      一个 emoji 都没有。思考中不用图标用纯动效；工具状态用 14px 的 stroke SVG；
+      等待用琥珀、错误用红、成功用绿 —— 颜色语义严格分工。
+    </div>
+  </div>
+
+  <!-- ===================== 面板 ===================== -->
+  <div class="panel">
+
+    <header class="panel-head">
+      <span data-icon="message-square" data-size="16" class="fg-accent"></span>
+      <div class="panel-title">一缕</div>
+      <span class="badge" style="color:var(--warm)">Warm · 会话保活中</span>
+      <div class="panel-meta">
+        <span class="t-mono fg-3" style="font-size:var(--t-micro)">14:32 · 4 轮</span>
+        <button class="icon-btn" type="button" aria-label="任务列表"><span data-icon="list" data-size="16"></span></button>
+        <button class="icon-btn" type="button" aria-label="设置"><span data-icon="sliders" data-size="16"></span></button>
+        <button class="icon-btn" type="button" aria-label="关闭面板"><span data-icon="x" data-size="16"></span></button>
+      </div>
+    </header>
+
+    <div class="stream">
+
+      <!-- ============ 第 1 轮：文件治理（场景 1） ============ -->
+      <div class="msg-user">
+        <div class="msg-user-bubble">把下载目录里的 PDF 都归到 work 的 docs 文件夹</div>
+        <div class="msg-src">
+          <span data-icon="mic" data-size="14" class="fg-3"></span>
+          <span class="t-micro fg-3">语音转写 · 已脱敏 · 1.4s</span>
+        </div>
+      </div>
+
+      <div class="msg-agent">
+        <div class="msg-agent-head">
+          <span class="label">Agent</span>
+          <span class="badge badge-l1">批量 L1 · 已聚合</span>
+        </div>
+
+        <!-- 状态 3：推理过程（默认折叠） -->
+        <div class="reasoning" data-collapse>
+          <button class="reasoning-toggle" type="button">
+            <span data-icon="chevron-down" data-size="14" class="chev"></span>
+            推理过程 · 2.1s
+          </button>
+          <div class="reasoning-body">
+            用户说的是「归到」，不是「删掉」，所以用 <code class="inline">fs.move</code> 而不是 <code class="inline">fs.trash</code>。
+            目标是 <code class="inline">D:\work\docs</code>，在授权目录内。源目录 <code class="inline">D:\Downloads</code>
+            也在白名单里。23 个文件属于同质 L1 操作，按 D45 聚合成一次确认，
+            且不触发 R7（未达 50 个的批量升级阈值）。跨盘移动等于复制加删除，会升到 L2 —— 需要先确认是否同盘。
+          </div>
+        </div>
+
+        <!-- 状态 4：工具调用 chip —— 四种终态并列展示 -->
+        <div class="tools">
+
+          <div class="tool-group" data-collapse>
+            <button class="tool-chip" type="button">
+              <span class="tool-ico"><span data-icon="search" data-size="16"></span></span>
+              <span class="tool-name">search.files</span>
+              <span class="tool-args fade-truncate">D:\Downloads · *.pdf · 递归</span>
+              <span class="badge badge-l0">L0</span>
+              <span class="tool-status">
+                <span class="t-micro fg-3">0.31s</span>
+                <span class="fg-success" data-icon="check" data-size="14"></span>
+              </span>
+            </button>
+            <div class="tool-detail">
+              <div class="card" style="background:var(--bg-inset);border-color:var(--border-hair)">
+                <div class="card-body stack-3">
+                  <div class="kv"><span class="label">命中</span><span class="t-mono">23 个文件 · 合计 41.2 MB</span></div>
+                  <div class="kv"><span class="label">风险判定</span><span class="t-small fg-3">C19/R2 通过（源与目标均在授权目录内，已经 C26 规范化）</span></div>
+                  <div class="kv"><span class="label">correlationId</span><span class="t-mono fg-3">tsk_9f2c·call_01</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tool-group" data-collapse>
+            <button class="tool-chip is-failed" type="button">
+              <span class="tool-ico"><span data-icon="monitor" data-size="16"></span></span>
+              <span class="tool-name">screen.capture</span>
+              <span class="tool-args fade-truncate">window · 受 DRM 保护</span>
+              <span class="badge badge-l1">L1</span>
+              <span class="tool-status">
+                <span class="t-micro fg-3">0.08s</span>
+                <span class="fg-danger" data-icon="x" data-size="14"></span>
+              </span>
+            </button>
+            <div class="tool-detail">
+              <div class="card card-bar is-danger" style="background:var(--bg-inset);border-color:var(--border-hair)">
+                <div class="card-body stack-2">
+                  <div class="t-small">目标窗口受 DRM 保护，截取到的是黑屏。这是平台行为，不是故障。</div>
+                  <div class="t-mono fg-3" style="font-size:var(--t-micro)">error_class: tool · retryable: false</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tool-group" data-collapse>
+            <button class="tool-chip is-denied" type="button">
+              <span class="tool-ico"><span data-icon="globe" data-size="16"></span></span>
+              <span class="tool-name">web.fetch</span>
+              <span class="tool-args fade-truncate">192.168.1.1 · 私有网段</span>
+              <span class="badge badge-l0">L0</span>
+              <span class="tool-status">
+                <span class="t-micro fg-3">已拒</span>
+                <span class="fg-3" data-icon="ban" data-size="14"></span>
+              </span>
+            </button>
+            <div class="tool-detail">
+              <div class="card card-bar is-danger" style="background:var(--bg-inset);border-color:var(--border-hair)">
+                <div class="card-body stack-2">
+                  <div class="t-small">私有网段一律拒绝（防 SSRF）。已把拒绝原因回给模型，它会自己换路径。</div>
+                  <div class="t-mono fg-3" style="font-size:var(--t-micro)">error_class: permission_denied · C19/R5</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 状态 6：审批等待（琥珀，脉冲一次后静止） -->
+          <div class="tool-group" data-collapse>
+            <button class="tool-chip is-pending pulse-once" type="button">
+              <span class="tool-ico" style="color:var(--warn)"><span data-icon="clock" data-size="16"></span></span>
+              <span class="tool-name">fs.move</span>
+              <span class="tool-args fade-truncate">23 个文件 <span data-icon="chevron-right" data-size="14" style="vertical-align:-2px"></span> D:\work\docs\pdf</span>
+              <span class="badge badge-l1">L1</span>
+              <span class="tool-status">
+                <span class="t-micro" style="color:var(--warn)">等待确认</span>
+                <span class="count-badge is-warn" aria-label="队列深度 2">2</span>
+              </span>
+            </button>
+            <div class="tool-detail">
+              <div class="t-small fg-3">
+                队头是这条。另一条 L2 请求属于并发任务「整理截图」，在队列里排着，
+                那个任务的其他部分仍在跑 —— 审批等待不阻塞其他任务（C20）。
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 状态 15：批量聚合确认（D45） -->
+        <div class="batch">
+          <div class="batch-head">
+            <span data-icon="folder-open" data-size="16" style="color:var(--warn)"></span>
+            <div class="grow">
+              <div class="t-body" style="font-weight:500">将移动 <span class="t-mono">23</span> 个文件</div>
+              <div class="t-small fg-3">D:\Downloads <span data-icon="chevron-right" data-size="14" style="vertical-align:-2px"></span> D:\work\docs\pdf · 同盘移动，可撤销</div>
+            </div>
+            <span class="badge badge-l1">L1 聚合</span>
+          </div>
+          <div class="batch-list">spec-v2.pdf · 4.1 MB<br>invoice-0913.pdf · 812 KB<br>合同扫描件-2026Q3.pdf · 6.8 MB<br>datasheet-tpu-v5.pdf · 2.2 MB<br>manual-zh.pdf · 11.4 MB</div>
+          <div class="spread">
+            <button class="btn btn-ghost btn-sm" type="button">
+              <span data-icon="chevron-down" data-size="14"></span>展开全部 23 项
+            </button>
+            <div class="row-2">
+              <button class="btn btn-secondary btn-sm" type="button">拒绝</button>
+              <button class="btn btn-secondary btn-sm" type="button">本会话内允许 fs.move 于 D:\Downloads</button>
+            </div>
+          </div>
+          <div class="t-small fg-3" style="border-top:1px solid var(--border-hair);padding-top:var(--s-3)">
+            L1 是「执行前阻止」窗口，不是必须回答的弹窗 —— 3s 后自动放行。
+            单击悬浮球或按 <kbd style="height:16px;min-width:16px">Esc</kbd> 可否决。
+            <strong style="color:var(--warn);font-weight:500">本次会话由快捷键唤起，KWS 未加载，语音取消不可用。</strong>
+          </div>
+        </div>
+
+        <!-- 状态 2：SSE 流式输出 -->
+        <div class="msg-body">
+          <p>已经把 23 个 PDF 移到 <code class="inline">D:\work\docs\pdf</code> 了，其中最大的三个是 <code class="inline">manual-zh.pdf</code>（11.4 MB）、<code class="inline">合同扫描件-2026Q3.pdf</code>（6.8 MB）和 <code class="inline">spec-v2.pdf</code>（4.1 MB）。<span class="caret" aria-hidden="true"></span></p>
+        </div>
+
+        <!-- 状态 10：成本 + 状态 14 的元信息行 -->
+        <div class="msg-foot">
+          <span class="t-mono fg-3" style="font-size:var(--t-micro)">
+            IN 8,204 · OUT 412 · CACHED 6,140 · 12,480 tok
+          </span>
+          <span class="t-mono fg-3" style="font-size:var(--t-micro)">¥0.31</span>
+          <span class="t-mono fg-3" style="font-size:var(--t-micro)">2.84s</span>
+          <div class="grow"></div>
+          <button class="icon-btn" type="button" aria-label="复制"><span data-icon="clipboard" data-size="14"></span></button>
+          <button class="icon-btn" type="button" aria-label="重新生成"><span data-icon="refresh-cw" data-size="14"></span></button>
+        </div>
+      </div>
+
+      <div class="turn-sep"><span class="label">Warm · 单击悬浮球继续 · 零模型加载</span></div>
+
+      <!-- ============ 第 2 轮：注入检出（场景 2） ============ -->
+      <div class="msg-user">
+        <div class="msg-user-bubble">再看看这个链接讲了什么，然后把它发到我的备份服务</div>
+        <div class="msg-src">
+          <span data-icon="mic" data-size="14" class="fg-3"></span>
+          <span class="t-micro fg-3">语音转写 · 0.9s</span>
+        </div>
+      </div>
+
+      <div class="msg-agent">
+        <div class="msg-agent-head">
+          <span class="label">Agent</span>
+        </div>
+
+        <div class="tools">
+          <div class="tool-group" data-collapse>
+            <button class="tool-chip" type="button">
+              <span class="tool-ico"><span data-icon="globe" data-size="16"></span></span>
+              <span class="tool-name">web.fetch</span>
+              <span class="tool-args fade-truncate">https://example.com/report-2026</span>
+              <span class="badge badge-l0">L0</span>
+              <span class="tool-status">
+                <span class="t-micro fg-3">1.12s</span>
+                <span class="fg-success" data-icon="check" data-size="14"></span>
+              </span>
+            </button>
+            <div class="tool-detail">
+              <div class="card" style="background:var(--bg-inset);border-color:var(--border-hair)">
+                <div class="card-body stack-2">
+                  <div class="t-small">抓到 18.4 KB 正文，已转 Markdown。<strong style="color:var(--warn);font-weight:500">响应内容已打污染标记</strong>（C25）—— 后续任何外发操作都会做片段匹配。</div>
+                  <div class="t-mono fg-3" style="font-size:var(--t-micro)">provenance: { tool: web.fetch, origin: example.com, sensitive: true }</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 状态 1：思考中（2px 光带 + 实时耗时） -->
+        <div class="stack-3">
+          <div class="thinking-bar" aria-hidden="true"></div>
+          <div class="row-3">
+            <span class="t-small fg-3">思考中</span>
+            <span class="t-mono fg-3" style="font-size:var(--t-micro)" id="elapsed">1.2s</span>
+          </div>
+        </div>
+
+        <!-- 状态 13：注入检出 -->
+        <div class="state-card card-bar is-danger" data-collapse>
+          <span class="state-ico fg-danger"><span data-icon="shield-alert" data-size="16"></span></span>
+          <div class="state-body">
+            <div>
+              <div class="state-title">已拦截：这次外发包含来自网页的内容</div>
+              <div class="t-small fg-3" style="margin-top:var(--s-2)">
+                <code class="inline">web.search</code> 的查询串里出现了
+                <strong style="color:var(--fg-secondary);font-weight:500">example.com/report-2026</strong> 的连续片段（规范化后 14 字符）。
+                按 C19/R4 升级为 <span class="badge badge-l2" style="vertical-align:1px">L2</span> 强确认。
+              </div>
+            </div>
+            <div class="state-detail">
+              <div class="code" style="font-size:var(--t-micro)">命中片段：
+  <mark class="taint">"2026 年第三季度供应链审计发现的三处异常"</mark>
+来源：web.fetch <span data-icon="chevron-right" data-size="14" style="vertical-align:-2px"></span> example.com/report-2026（污染标记 sensitive）
+通道：web.search 的 query 参数
+规则：C19/R4 能力组合闸门 · 不受会话授权覆盖</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" type="button" data-collapse-toggle>
+              <span data-icon="chevron-down" data-size="14"></span>查看命中的具体内容
+            </button>
+            <div class="state-actions">
+              <button class="btn btn-secondary btn-sm" type="button">仍然继续</button>
+              <button class="btn btn-ghost btn-sm" type="button">只总结不外发</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="msg-body">
+          <p>这份报告主要讲了三件事：第三季度供应链审计发现的三处异常、对应的整改时间表，以及两个还没定责任人的遗留项。</p>
+          <p class="t-small fg-3">外发那一步我先停下来了 —— 查询串里带了网页原文，按规则要你确认一次。</p>
+        </div>
+
+        <div class="msg-foot">
+          <span class="t-mono fg-3" style="font-size:var(--t-micro)">IN 21,880 · OUT 186 · 22,066 tok</span>
+          <span class="t-mono fg-3" style="font-size:var(--t-micro)">¥0.54</span>
+          <span class="t-mono fg-3" style="font-size:var(--t-micro)">3.41s</span>
+        </div>
+      </div>
+
+      <!-- ============ 第 3 轮：错误与恢复 ============ -->
+      <div class="turn-sep"><span class="label">第 3 轮</span></div>
+
+      <div class="msg-agent">
+        <div class="msg-agent-head"><span class="label">Agent</span></div>
+
+        <!-- 状态 8：错误 -->
+        <div class="state-card card-bar is-danger" data-collapse>
+          <span class="state-ico fg-danger"><span data-icon="alert-triangle" data-size="16"></span></span>
+          <div class="state-body">
+            <div>
+              <div class="state-title">模型服务暂时不可用，已自动切到备用</div>
+              <div class="t-small fg-3" style="margin-top:var(--s-2)">
+                主 provider 连续三次返回 503。已按指数退避重试，第三次后切到
+                <code class="inline">fallback_provider</code>。任务上下文没有丢，可以直接继续。
+              </div>
+            </div>
+            <div class="state-detail">
+              <div class="code" style="font-size:var(--t-micro)">error_class: provider
+provider_code: 503 service_unavailable
+retryable: true · attempts: 3 · backoff: 1s / 2s / 4s
+fallback: responses/claude-sonnet
+task_ctx: preserved (root ctx not cancelled)</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" type="button" data-collapse-toggle>
+              <span data-icon="chevron-down" data-size="14"></span>技术细节
+            </button>
+            <div class="state-actions">
+              <button class="btn btn-secondary btn-sm" type="button">
+                <span data-icon="refresh-cw" data-size="14"></span>重试主 provider
+              </button>
+              <button class="btn btn-ghost btn-sm" type="button">改用文字模式</button>
+              <button class="btn btn-ghost btn-sm" type="button">
+                <span data-icon="upload" data-size="14"></span>导出诊断包
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 状态 9：Stuck -->
+        <div class="state-card card-bar is-warn">
+          <span class="state-ico fg-warn"><span data-icon="refresh-cw" data-size="16"></span></span>
+          <div class="state-body">
+            <div>
+              <div class="state-title">我卡在重复动作上了</div>
+              <div class="t-small fg-3" style="margin-top:var(--s-2)">
+                <code class="inline">web.fetch</code> 已连续调用 <span class="t-mono">8</span> 次，参数完全相同，每次都超时。
+                梯度刹车在第 3 次和第 5 次提醒过我，我没换方法。
+              </div>
+            </div>
+            <div class="state-actions">
+              <button class="btn btn-secondary btn-sm" type="button">继续试</button>
+              <button class="btn btn-secondary btn-sm" type="button">换个方法</button>
+              <button class="btn btn-ghost btn-sm" type="button">放弃这一步</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 状态 11：已取消 -->
+        <div class="cancelled"><span class="label">已取消 · 你按了 Esc</span></div>
+
+        <!-- 状态 12：工具内部失败回给模型自纠（不打断用户） -->
+        <div class="tools">
+          <div class="tool-group" data-collapse>
+            <button class="tool-chip" type="button">
+              <span class="tool-ico"><span data-icon="file-text" data-size="16"></span></span>
+              <span class="tool-name">doc.read</span>
+              <span class="tool-args fade-truncate">参数不合法，已回给模型自纠</span>
+              <span class="badge badge-l0">L0</span>
+              <span class="tool-status">
+                <span class="t-micro fg-3">重试后成功</span>
+                <span class="fg-success" data-icon="check" data-size="14"></span>
+              </span>
+            </button>
+            <div class="tool-detail">
+              <div class="card" style="background:var(--bg-inset);border-color:var(--border-hair)">
+                <div class="card-body stack-3">
+                  <div class="t-small">
+                    第一次调用把 <code class="inline">pages</code> 传成了字符串 <code class="inline">"3"</code> 而不是数组。
+                    错误按 <code class="inline">error_class: tool</code> 回给模型，它自己改了参数重试 ——
+                    <strong style="color:var(--fg-secondary);font-weight:500">这类失败不打断你，也不需要你确认</strong>。
+                  </div>
+                  <div class="t-mono fg-3" style="font-size:var(--t-micro)">attempt 1: tool_error · attempt 2: ok · 1.94s</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 状态 5：工具运行中（旋转弧） -->
+          <div class="tool-group">
+            <div class="tool-chip" style="cursor:default">
+              <span class="tool-ico"><span data-icon="keyboard" data-size="16"></span></span>
+              <span class="tool-name">input.type</span>
+              <span class="tool-args fade-truncate">注入到 Word · 312 字</span>
+              <span class="badge badge-l2">L2</span>
+              <span class="tool-status">
+                <span class="fg-accent" data-icon="loader" data-size="14" data-icon-class="spinner"></span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="msg-foot">
+          <span class="t-mono fg-3" style="font-size:var(--t-micro)">本轮累计 ¥0.12</span>
+          <div class="grow"></div>
+          <span class="t-micro fg-3">今日 ¥2.84 / 预算 ¥20</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ---------- 输入区 ---------- -->
+    <footer class="composer">
+      <button class="icon-btn" type="button" aria-label="语音输入"><span data-icon="mic" data-size="18"></span></button>
+      <input class="input grow" type="text" placeholder="说点什么，或者打字（Ctrl+Space 唤起语音）">
+      <button class="icon-btn" type="button" aria-label="命令面板"><span data-icon="command" data-size="18"></span></button>
+      <button class="btn btn-accent" type="button" aria-label="发送"><span data-icon="arrow-up-right" data-size="16"></span></button>
+    </footer>
+  </div>
+
+  <!-- ---------- 图例 ---------- -->
+  <div class="card card-pad" style="width:var(--panel-w)">
+    <div class="label" style="margin-bottom:var(--s-4)">这一屏覆盖的 agent 工作状态（§17.5 全 14 种）</div>
+    <div class="row-3 wrap" style="gap:var(--s-2)">
+      <span class="tag"><span data-icon="loader" data-size="14"></span>1 思考中（光带 + 耗时）</span>
+      <span class="tag">2 SSE 流式（竖线光标）</span>
+      <span class="tag"><span data-icon="chevron-down" data-size="14"></span>3 推理过程（折叠）</span>
+      <span class="tag"><span data-icon="check" data-size="14"></span>4 工具调用 · 四终态</span>
+      <span class="tag"><span data-icon="hash" data-size="14"></span>5 工具详情 · JSON 着色</span>
+      <span class="tag"><span data-icon="clock" data-size="14"></span>6 审批等待（琥珀 + 角标）</span>
+      <span class="tag"><span data-icon="shield-alert" data-size="14"></span>7 注入检出（含命中片段）</span>
+      <span class="tag"><span data-icon="alert-triangle" data-size="14"></span>8 错误（人话 + 技术细节）</span>
+      <span class="tag"><span data-icon="refresh-cw" data-size="14"></span>9 Stuck（明示重复了什么）</span>
+      <span class="tag"><span data-icon="activity" data-size="14"></span>10 成本（纯数字）</span>
+      <span class="tag">11 已取消（分隔线，非红色）</span>
+      <span class="tag"><span data-icon="folder-open" data-size="14"></span>12 批量聚合确认（D45）</span>
+      <span class="tag"><span data-icon="keyboard" data-size="14"></span>13 工具运行中（旋转弧）</span>
+      <span class="tag"><span data-icon="mic" data-size="14"></span>14 语音转写来源标注</span>
+    </div>
+    <div class="hr" style="margin:var(--s-5) 0"></div>
+    <div class="t-small fg-3" style="line-height:var(--lh-small)">
+      L1 阻止窗口、L2 面板确认卡、L2 原生降级卡三种确认形态在
+      <a href="approval.html">确认与审批</a> 一屏；悬浮球 20 态在
+      <a href="ball.html">悬浮球</a> 一屏。
+    </div>
+  </div>
+
+</div>
+
+<script src="../assets/icons.js"></script>
+<script src="../assets/theme.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  /* 折叠：推理过程 / 工具详情 / 状态卡的技术细节 */
+  document.addEventListener("click", function (e) {
+    var trigger = e.target.closest("[data-collapse-toggle]");
+    if (trigger) {
+      var card = trigger.closest("[data-collapse]");
+      if (card) card.classList.toggle("is-open");
+      e.preventDefault();
+      return;
+    }
+    var chip = e.target.closest(".tool-group > .tool-chip, .reasoning > .reasoning-toggle");
+    if (chip) {
+      chip.parentElement.classList.toggle("is-open");
+    }
+  });
+
+  /* 思考中耗时实时走（原型示意，非真实计时） */
+  var el = document.getElementById("elapsed");
+  if (el) {
+    var t = 1.2;
+    setInterval(function () {
+      t += 0.1;
+      if (t > 4.0) t = 1.2;
+      el.textContent = t.toFixed(1) + "s";
+    }, 100);
+  }
+})();
+</script>
+</body>
+</html>
