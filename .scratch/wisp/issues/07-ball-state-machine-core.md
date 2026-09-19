@@ -142,3 +142,35 @@ basic animations; full visual polish gate is human acceptance at 12).
   extra margins are click-through) and WM_DPICHANGED does a full renderer rebuild instead of a
   rebind. Also fixed en route: renderer DIB backing is allocated once at the max edge
   (ensureDCAndDIB). Final cycle: handles 385 < 600, harness exit OK, all windows destroyed.
+- [2026-09-19T13:55:00Z] agent=T07-impl did=handoff-to-orchestrator status=implementation-complete
+  Final gates: go vet ./... clean; go test ./... 9/9 packages ok (incl. winlive live-window tests:
+  lifecycle + position persistence PASS); go build ./... OK (CGO on); scripts/build.ps1 -Env dev
+  PASS (wisp.exe + DLLs, wisp doctor PASS); handle gate 385-419 < 600 across full cycles.
+  TRANSITION TABLE RECONCILIATION: SPEC-08 §3 physically carries 42 numbered rows = the 40 frozen
+  D43 rows + appended #41 (Path C barge-in, AEC) / #42 (Conversation task intent, Path T); all 42
+  implemented as 54 table entries (guard-branched rows share one number), pinned by
+  TestAllFortyD43RowsPresent (1..42) and TestEveryLegalRowFires (line-by-line vs §3 incl. guards and
+  effect lists); full illegal matrix (20 states x 38 non-wildcard events minus legal) rejected;
+  timeouts 15/90/30/3(Confirming L1, SPEC-06 2-3s upper bound)/90/3/300/10s table-driven.
+  PORT LIST (spike -> internal/ball): COM-vtable syscalls, D2D1CreateFactory/DWriteCreateFactory,
+  tray icon, hotkey registration, window class plumbing. NEW vs spike: DC render target + ULW
+  (premultiplied ARGB), DrawLine packed-point ABI (D2D1_POINT_2F by value), SetColor slot 8, polyline
+  circles (DrawEllipse strokeWidth is a register float, ABI-unpassable), LockOSThread ui-sta, fixed
+  window edge (BindDC rebinds render transparent - do NOT resize layered DC-RT windows), ensureDCAndDIB.
+  C21 token table: internal/ball/tokens.go; cross-check doc docs/evidence/s1/c21-native-tokens.md;
+  machine rule TestNoHardcodedColorsInBallPackage.
+  VISUAL EVIDENCE: scripts/dev/ball-cycle.ps1 -> docs/evidence/s1/ball-states/01..20-<State>.png
+  (pixel-verified accent). LIVE interactive acceptance (ticket 12 will re-run with the user):
+  click=summon/veto + hotkeys + tray wired in cmd/balldebug (-stay mode); B1 takeover/return live-tested.
+  DEVIATIONS: (1) Confirming countdown 3s (SPEC-06 gives 2-3s; upper bound chosen); (2) Acting has
+  no animation timer (static visual; the whitelist allows one); (3) Settling 260ms fade via ULW
+  constant alpha (one-shot, SPEC-sanctioned visual, not a loop timer); (4) Warm breathing via ULW
+  constant alpha at 10fps (compositor-friendly path per SPEC-08 §2); (5) #30 Warm->Listening passes
+  through Conversation as side effects (single D43 row; renderer shows Conversation via direct
+  SetState); (6) NoNetwork/WatchdogAlert have no exit rows in D43 (spec-faithful; recovery lands in
+  S2/S7); (7) icons are D2D line primitives (Lucide-style geometry), not font glyphs; (8) Queued
+  renders accent core + info dot (main-state compositing lands with session wiring); (9) tray icon
+  uses the generic application icon until the brand icon lands (build ticket); (10) hotkey defaults
+  defined in-package (internal/config is T05-resume4's; wiring [hotkey] section = integration ticket).
+  Out of scope per ticket: KWS/Armed loading (41), approval badge depth source (37), panel (33),
+  Conversation privacy dialog content (28), watchdog interplay (42).
