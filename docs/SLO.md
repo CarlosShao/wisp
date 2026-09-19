@@ -155,3 +155,16 @@ TTS 增量，**由 S4 实测回填**。S0 证据给出的下限：ASR 281 + TTS 
 | `docs/evidence/s0/json/07-residency-*.json` | 四模型常驻实测 |
 | `docs/evidence/s0/json/08-switch.json` | ASR↔TTS 串行切换 |
 | `docs/evidence/s0/02-spike-report.md` | 方法学、原始数字、模型清单（URL/SHA256）、机器配置 |
+
+
+## 编排者裁定（2026-09-19，基于本 spike 实测）
+
+1. **句柄口径**：D32 16.3.2 的「句柄 <300」写于未实测期；spike ④ 实测分层窗口 + D2D + DWrite
+   栈即占 ~420 句柄。裁定：**含悬浮球窗口栈的态（Sleeping/Armed/Warm/Conversation/面板/峰值）
+   句柄上限放宽为 <600（实测 420 + 余量）**，GDI <200 与泄漏趋势断言不变；票 08 的采样脚本
+   以此为准。趋势泄漏（增幅）仍是主判据，绝对阈值是次要护栏。
+2. **回落残留义务（+15MB → Sleeping ~31MB > 25MB）**：归 **S1**——票 15（speech 引擎）与票 12
+   （S1 gate）必须包含 `debug.SetMemoryLimit`/GOGC 调优义务，S1 验收时以 25MB 线复测；
+   若调优后仍 >25MB，按 D32 16.3.5 精神上报（不得自行放宽）。
+3. **ASR↔TTS 串行切换 4.7s FAIL**：按 D32 16.3.3 预设降级激活——**「TTS 常驻 + ASR 按需」为
+   Path T 的默认策略**（票 15/26 实现口径），串行方案留作 S4 复测后再评。

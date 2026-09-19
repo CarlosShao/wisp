@@ -22,7 +22,11 @@ CER measurement harness with the two committed baseline wav sets.
 - Streaming ASR: partials for ball latency, final on VAD stop → punctuation is a LATER stage
   (27) — transcript emitted unpunctuated is acceptable at this ticket; `asr` error class for
   pure-silence/too-short → one retry (D37), then user-visible 「没听清」.
-- Engine slot mutex: at most one big-model family resident (ASR xor TTS) — **Path T only (D47)**.
+- Engine slot mutex: **Spike backfill (T02, 2026-09-19): measured ASR↔TTS serial switch P50 4726ms vs 1600ms
+      budget → D32 16.3.3 preset degradation is ACTIVE: default policy = "TTS resident + ASR
+      on-demand" (serial scheme re-evaluated only at S4). Also: settle residual obligation —
+      `debug.SetMemoryLimit`/GOGC tuning is part of this ticket's S1 scope (see ticket 12 note).**
+ at most one big-model family resident (ASR xor TTS) — **Path T only (D47)**.
   **Path C (Conversation) is FULL DUPLEX: ASR+TTS+AEC co-resident during playback**; serial
   mitigation unavailable there — Conversation memory budget is filled in by S4 measurement
   (ticket 59/32); approved degradation = suspend ASR during playback, keep VAD+AEC for barge-in

@@ -25,7 +25,10 @@ moment: type → reply → notification → memory returns to idle.
 - `list_tools` (L0): returns resident + third-party tool directory (D15② fallback path).
 - Settle: result presentation done → 3s → DisposalScope session teardown (incl. FreeOSMemory) →
   RSS back to idle cap ≤10s.
-- SLO measured with 08's sampler on a real Windows desktop session: idle tree-private ≤ spike
+- SLO measured with 08's sampler on a real Windows desktop session: **Spike backfill (T02, 2026-09-19): idle measured 16.5/16.6MB on Path Y — the 25MB gate is
+      realistic BUT session settle leaves ~+15MB residual (Sleeping ~31MB): THIS ticket must include
+      `debug.SetMemoryLimit`/GOGC tuning and re-measure against 25MB; handle cap for gate = <600
+      (orchestrator ruling in docs/SLO.md), GDI <200 unchanged.** idle tree-private ≤ spike
   verdict value; goroutines ≤6; handles <300; GDI <200; zero periodic disk writes; zero long
   network connections in idle.
 - C21 native-side token table complete (ball + future panel share); tokens doc updated.
