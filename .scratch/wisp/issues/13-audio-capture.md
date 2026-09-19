@@ -54,3 +54,4 @@ handling, and mic-occupied/permission-denied error mapping.
 
 ## Progress log (append-only, newest last)
 - [2026-09-19T13:56:41Z] agent=orchestrator claimed=T13-impl did=dispatched next=sub-agent works through acceptance criteria
+- [2026-09-19T14:16:44Z] agent=T13-impl did=c8-seam+resampler+wavinjector (AudioSource C8 seam + 16k/mono/int16 512-sample frame contract + bounded <=192ms channel w/ metered push: drop+count+rate-limited warn log (D38d); streaming fixed-point linear resampler 48k/44.1k->16k, chunk-invariant + 1-sample latency bound + SNR tested; WavInjector: RIFF PCM16/float32 parse -> mono downmix -> 16k, frame-exact replay, realtime/flood pacing, backpressure drop counter visible in logs; race-clean) next=half-duplex-gate
