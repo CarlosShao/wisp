@@ -50,3 +50,4 @@ progress/cancel, `Downloading` state wiring, local-dir escape hatch, and the com
 
 ## Progress log (append-only, newest last)
 - [2026-09-19T15:11:33Z] agent=orchestrator claimed=T14-impl did=dispatched next=sub-agent works through acceptance criteria
+- [2026-09-19T15:54:22Z] agent=T14-impl did=internal/models pipeline green: minisign verify (hand-written Ed25519+Blake2b, format-exact), C29 manifest types+signed loader (offline verify before network), Manager (mirror chain, Range resume byte-offset, retry/backoff, failover, progress events, cancel-cleans-staging, sha256 reject+delete, tar.bz2 safe extraction), local_override offline integrity, DownloadingBridge (D43 #2/#37 walk); TDD tests all pass incl -race next=real manifest 6 entries + dev key + sign + spot-check downloads
