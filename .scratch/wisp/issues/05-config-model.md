@@ -1,8 +1,8 @@
 # 05 — config.toml full model: D36 sections, three effect tiers, hot reload, migration
 
-**Status:** ready-for-agent
-**Claimed by:** —
-**Last update:** 2026-09-19
+**Status:** in-progress
+**Claimed by:** orchestrator -> sub-agent T05-impl
+**Last update:** 2026-09-19T09:20:36Z
 **Blocked by:** 03-skeleton-runtime-rules
 **Parallel slots:** ≤2 sub-agents (A: schema structs + load/validate + migration; B: hot-reload
 watch + tier semantics + security-section re-confirm gate)
@@ -58,3 +58,4 @@ file-watch hot reload, schema migration with backup, and the security-section lo
       `provider_health` table exists per SPEC-02 schema v2.
 
 ## Progress log (append-only, newest last)
+- [2026-09-19T09:20:36Z] agent=orchestrator claimed=T05-impl did=dispatched (3rd concurrent slot trial) next=sub-agent works through acceptance criteria
