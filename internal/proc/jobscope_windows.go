@@ -151,6 +151,20 @@ func (j *JobScope) TreeProcessCount() (int, error) {
 	return len(pids), nil
 }
 
+// TreePIDs returns the pids currently assigned to the Job. C30 owns the
+// memory metric; observe's D42#10 sampler needs the pid list to read the
+// per-process GDI/USER/handle/CPU/IO counters alongside it.
+func (j *JobScope) TreePIDs() ([]uint32, error) {
+	return j.pids()
+}
+
+// PrivateBytesByPID exposes the per-pid private (committed) bytes reading
+// behind TreePrivateBytes so observe's per-pid sampling shares the exact
+// same psapi call instead of duplicating the struct.
+func PrivateBytesByPID(pid uint32) (int64, bool) {
+	return privateBytesByPid(pid)
+}
+
 // Close closes the Job handle. Per KILL_ON_JOB_CLOSE the OS kills every
 // process still in the Job. Idempotent.
 func (j *JobScope) Close() error {
