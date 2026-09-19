@@ -8,17 +8,44 @@ import (
 	"fmt"
 	"log/slog"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
 	"github.com/CarlosShao/wisp/internal/observe"
 )
 
+// syncBuffer is a goroutine-safe bytes.Buffer: background goroutines that
+// also log through it (retention-job, db-writer) and the polling test
+// goroutine must not race on the underlying buffer (adversarial MAJOR-2).
+type syncBuffer struct {
+	mu  sync.Mutex
+	buf bytes.Buffer
+}
+
+func (b *syncBuffer) Write(p []byte) (int, error) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return b.buf.Write(p)
+}
+
+func (b *syncBuffer) String() string {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return b.buf.String()
+}
+
+func (b *syncBuffer) Reset() {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	b.buf.Reset()
+}
+
 // bufLogger returns a logger plus the buffer it writes to (asserting log
 // lines, e.g. the D35 profile-eviction visibility rule).
-func bufLogger(t *testing.T) (*slog.Logger, *bytes.Buffer) {
+func bufLogger(t *testing.T) (*slog.Logger, *syncBuffer) {
 	t.Helper()
-	var buf bytes.Buffer
+	var buf syncBuffer
 	h := slog.NewTextHandler(&buf, &slog.HandlerOptions{Level: slog.LevelDebug})
 	return slog.New(h), &buf
 }
@@ -488,4 +515,68 @@ func TestWriteQueueLazyLifecycle(t *testing.T) {
 	if err := s.Close(); err != nil {
 		t.Errorf("second close: %v", err)
 	}
+}
+
+// TestAdvPanicWedge is the MAJOR-1 regression: a write fn that panics must
+// surface as an internal-class error to ITS caller, and the db-writer loop
+// must keep draining afterwards (a wedged running=true would block every
+// future Store.write forever).
+func TestAdvPanicWedge(t *testing.T) {
+	logger, buf := bufLogger(t)
+	s := openTestStore(t, WithLogger(logger), WithRegistry(observe.NewRegistry()))
+	ctx := context.Background()
+
+	// 1. The panicking command fails loudly, not by hanging: bound it so a
+	// regression fails in seconds instead of deadlocking the suite.
+	panicCtx, cancel := context.WithTimeout(ctx, 3*time.Second)
+	defer cancel()
+	err := s.write(panicCtx, func(ctx context.Context, tx *sql.Tx) error {
+		panic("boom: adversarial write panic")
+	})
+	if err == nil {
+		t.Fatal("panicking write returned nil error")
+	}
+	if isTimeoutErr(err) {
+		t.Fatalf("write wedged on panic (blocked until ctx timeout): %v", err)
+	}
+	var oe *observe.Error
+	if !errors.As(err, &oe) || oe.Class != observe.ClassInternal {
+		t.Errorf("panic error = %v (%T), want observe internal-class error", err, err)
+	}
+	if !strings.Contains(buf.String(), "write command panic recovered") {
+		t.Error("panic recovery not logged")
+	}
+
+	// 2. The loop survived: a normal write succeeds immediately.
+	if _, err := s.UpsertProfile(ctx, "pref.after-panic", "alive", ProfileManual); err != nil {
+		t.Fatalf("write after panic failed: %v", err)
+	}
+
+	// 3. A second panic followed by a write: recovery is repeatable.
+	err = s.write(ctx, func(ctx context.Context, tx *sql.Tx) error {
+		panic("boom again")
+	})
+	if err == nil {
+		t.Fatal("second panicking write returned nil")
+	}
+	if _, err := s.UpsertProfile(ctx, "pref.after-panic-2", "alive", ProfileManual); err != nil {
+		t.Fatalf("write after second panic failed: %v", err)
+	}
+
+	// 4. The queue still drains to idle and the writer exits (no zombie).
+	deadline := observe.NewTimeout(2 * time.Second)
+	for !s.queue.idle() && !deadline.Expired() {
+		time.Sleep(2 * time.Millisecond)
+	}
+	if !s.queue.idle() {
+		t.Fatal("write queue never went idle after panics")
+	}
+	if got := s.reg.CountByName("db-writer"); got != 0 {
+		t.Errorf("db-writer still alive after drain: %d", got)
+	}
+}
+
+func isTimeoutErr(err error) bool {
+	return errors.Is(err, context.DeadlineExceeded) ||
+		strings.Contains(err.Error(), "context deadline exceeded")
 }

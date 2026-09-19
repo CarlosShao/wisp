@@ -147,10 +147,12 @@ func (s *Store) runRetention(ctx context.Context, c RetentionConfig) (res Retent
 		if err != nil {
 			return err
 		}
-		// tool_call ages by its start, falling back to the decision time for
-		// rows captured mid-approval.
+		// tool_call ages by the last timestamp the row actually carries:
+		// ended_at, falling back to started_at, then decided_at. Rows with a
+		// NULL ended_at (never finished) still age out via the fallback — no
+		// NULL combination may make a row immortal (adversarial MINOR-4).
 		res.ToolCallDeleted, err = deleteOlderThan(ctx, tx, "tool_call",
-			"COALESCE(started_at, decided_at)", c.TaskLogTTL, now)
+			"COALESCE(ended_at, started_at, decided_at)", c.TaskLogTTL, now)
 		if err != nil {
 			return err
 		}

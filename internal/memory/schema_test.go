@@ -556,3 +556,25 @@ func TestMigrationForeignDatabaseIsUnmigratable(t *testing.T) {
 		t.Errorf("error should name the missing watermark: %v", err)
 	}
 }
+
+// TestParseVersionStrict is the MINOR-5 regression: the watermark parser must
+// reject anything that is not a plain decimal (lenient prefix parsing would
+// read "1abc" as 1 and migrate a foreign database).
+func TestParseVersionStrict(t *testing.T) {
+	for _, ok := range []string{"0", "1", "42", " 3 "} {
+		v, err := parseVersion(ok)
+		if err != nil {
+			t.Errorf("parseVersion(%q) = %v, want accepted", ok, err)
+		} else if v != 3 && ok == " 3 " {
+			t.Errorf("parseVersion(%q) = %d", ok, v)
+		}
+	}
+	// "1\n" is accepted BY DESIGN: the value is whitespace-trimmed before the
+	// strict digit check (a stray newline from manual editing is tolerated;
+	// embedded garbage like "1abc" is not).
+	for _, bad := range []string{"", "   ", "1abc", "abc", "1.5", "-1", "+2", "1e2", "0x1"} {
+		if _, err := parseVersion(bad); err == nil {
+			t.Errorf("parseVersion(%q) accepted, want rejection", bad)
+		}
+	}
+}

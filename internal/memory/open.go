@@ -9,6 +9,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -464,13 +465,22 @@ func readSchemaVersion(db *sql.DB) (version int, fresh bool, err error) {
 	return v, false, nil
 }
 
+// parseVersion parses the schema_version watermark STRICTLY: digits only
+// (whitespace-trimmed). Lenient prefix parsing would accept garbage like
+// "1abc" as 1 and silently migrate a foreign database (adversarial MINOR-5).
 func parseVersion(raw string) (int, error) {
-	var v int
-	if _, err := fmt.Sscanf(strings.TrimSpace(raw), "%d", &v); err != nil {
-		return 0, fmt.Errorf("%q: %w", raw, err)
+	s := strings.TrimSpace(raw)
+	if s == "" {
+		return 0, fmt.Errorf("empty schema_version")
 	}
-	if v < 0 {
-		return 0, fmt.Errorf("negative schema version %q", raw)
+	for _, r := range s {
+		if r < '0' || r > '9' {
+			return 0, fmt.Errorf("non-numeric schema_version %q", raw)
+		}
+	}
+	v, err := strconv.Atoi(s)
+	if err != nil {
+		return 0, fmt.Errorf("schema_version %q out of range: %w", raw, err)
 	}
 	return v, nil
 }

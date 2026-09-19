@@ -44,6 +44,26 @@ func seedToolCallAt(t *testing.T, s *Store, taskID string, seq int64, ts time.Ti
 	}
 }
 
+// seedToolCallFull inserts a tool_call row with explicit started/ended
+// instants (hasEnded=false leaves ended_at NULL, decided_at always NULL).
+func seedToolCallFull(t *testing.T, s *Store, taskID string, seq int64, started time.Time, ended time.Time, hasEnded bool) {
+	t.Helper()
+	var endedAt any
+	if hasEnded {
+		endedAt = ended.Unix()
+	}
+	err := s.write(context.Background(), func(ctx context.Context, tx *sql.Tx) error {
+		_, err := tx.ExecContext(ctx,
+			`INSERT INTO tool_call(task_id, seq, tool, args_json, risk_level, correlation_id, started_at, ended_at)
+			 VALUES(?,?,?,?,?,?,?,?)`,
+			taskID, seq, "fs.read", "{}", RiskL0, fmt.Sprintf("corr-full-%d", seq), started.Unix(), endedAt)
+		return err
+	})
+	if err != nil {
+		t.Fatalf("seed tool_call full: %v", err)
+	}
+}
+
 // seedCostDayAt inserts a cost_daily row for an absolute day.
 func seedCostDayAt(t *testing.T, s *Store, day string) {
 	t.Helper()
@@ -107,6 +127,11 @@ func TestRetentionBoundaries(t *testing.T) {
 	seedToolCallAt(t, s, "t-29", 1, ago(29*day))
 	seedToolCallAt(t, s, "t-30", 2, ago(30*day))
 	seedToolCallAt(t, s, "t-31", 3, ago(31*day))
+	// NULL ended_at rows must still age (MINOR-4: no immortal NULLs) and
+	// finished rows age by ended_at, not the older started_at.
+	seedToolCallFull(t, s, "tc-nullended-31", 4, ago(31*day), time.Time{}, false)
+	seedToolCallFull(t, s, "tc-ended-31", 5, ago(32*day), ago(31*day), true)
+	seedToolCallFull(t, s, "tc-ended-29", 6, ago(30*day), ago(29*day), true)
 
 	seedCostDayAt(t, s, now.Add(-399*day).Format("2006-01-02"))
 	seedCostDayAt(t, s, now.Add(-400*day).Format("2006-01-02"))
@@ -127,8 +152,8 @@ func TestRetentionBoundaries(t *testing.T) {
 	if res.TaskLogDeleted != 1 {
 		t.Errorf("task_log deleted = %d, want 1 (the 31d row)", res.TaskLogDeleted)
 	}
-	if res.ToolCallDeleted != 1 {
-		t.Errorf("tool_call deleted = %d, want 1 (the 31d row)", res.ToolCallDeleted)
+	if res.ToolCallDeleted != 3 {
+		t.Errorf("tool_call deleted = %d, want 3 (31d row + NULL-ended 31d + ended-31d)", res.ToolCallDeleted)
 	}
 	if res.CostDayDeleted != 1 {
 		t.Errorf("cost_daily deleted = %d, want 1 (the 401d day)", res.CostDayDeleted)
@@ -146,8 +171,8 @@ func TestRetentionBoundaries(t *testing.T) {
 	if _, err := s.TaskLogByID(ctx, "t-31"); !errors.Is(err, ErrNotFound) {
 		t.Errorf("31d row must be deleted, got %v", err)
 	}
-	if got := countRows(t, s, "tool_call"); got != 2 {
-		t.Errorf("tool_call rows = %d, want 2 (29d+30d)", got)
+	if got := countRows(t, s, "tool_call"); got != 3 {
+		t.Errorf("tool_call rows = %d, want 3 (t-29 + t-30 + tc-ended-29)", got)
 	}
 	if got := countRows(t, s, "cost_daily"); got != 2 {
 		t.Errorf("cost_daily rows = %d, want 2 (399d+400d)", got)
