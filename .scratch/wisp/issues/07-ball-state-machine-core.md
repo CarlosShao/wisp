@@ -107,3 +107,20 @@ basic animations; full visual polish gate is human acceptance at 12).
   (WM_DPICHANGED does not fire for hidden windows), wetype status-bar overlap identified as
   external. cmd/balldebug harness committed (cycle/state/stay modes, handle reporting).
   go build ./... (CGO on), go vet, go test green.
+- [2026-09-19T13:00:00Z] agent=T07-impl did=hotkeys-tray-position-live-tests next=visual-evidence
+  Hotkeys (hotkey_windows.go): [hotkey] summon/mute/cancel/panel parse (Ctrl/Alt/Shift/Win + named
+  keys), per-binding failure is warn-and-skip, re-registration on config change (RebindHotkeys); B1
+  implemented: TakeEscForCancel binds Esc during Confirming, ReleaseEscAfterSession ALWAYS returns
+  Esc (even if the original binding is taken by another app - then cancel stays unbound with a warn)
+  and clears the takeover flag either way. Tray (tray_windows.go): left click = panel stub event,
+  right-click menu 打开面板/静音/暂停唤醒/退出 with live checkmarks, TPM_NOACTIVATE + the
+  SetForegroundWindow tray quirk handled. Position (position.go + monitors_windows.go): JSON store
+  per monitor device (temp+rename), ResolvePosition (visible-keep / clamp / monitor-default /
+  detached->primary) pure + table-tested; Per-Monitor V2 via SetProcessDpiAwarenessContext; hidden
+  windows get no WM_DPICHANGED so the destination DPI is read explicitly after the move; resolve
+  edge == initial-state window edge so the first apply never shifts the restored position.
+  Live-window tests (winlive tag, real desktop): TestBallLiveLifecycle (20 states render, timers
+  alive exactly in animated+Warm+Settling, Sleeping zero-timer, B1 takeover+release, handle gate
+  base=97 peak=366 < 600, window destroyed after Close) and TestBallLivePositionPersistence
+  (persist + exact restore). Fixes: window class registration once-guarded (second New in-process),
+  Esc release semantics. go vet + go test (default suite + winlive) green.

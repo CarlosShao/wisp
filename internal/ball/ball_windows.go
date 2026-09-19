@@ -160,16 +160,10 @@ func (b *Ball) createOnSTA(s *staThread) error {
 		return fmt.Errorf("ball: %w", err)
 	}
 
-	clsName := utf16("WispBallWindow")
-	if r, _, _ := pRegisterClassExW.Call(unsafePtr(&wndClassEx{
-		size:      uint32(unsafe.Sizeof(wndClassEx{})),
-		wndProc:   wndProcPtr,
-		instance:  windows.Handle(moduleHandle()),
-		cursor:    windows.Handle(loadArrowCursor()),
-		className: clsName,
-	})); r == 0 {
-		return fmt.Errorf("ball: RegisterClassExW failed")
+	if err := registerBallClass(); err != nil {
+		return err
 	}
+	clsName := utf16("WispBallWindow")
 
 	exStyle := uintptr(wsExLayered | wsExTopmost | wsExToolWindow | wsExNoActivate)
 	hwnd, _, err := pCreateWindowExW.Call(
@@ -190,10 +184,18 @@ func (b *Ball) createOnSTA(s *staThread) error {
 	// Window DPI + initial size/position (per-monitor restore). The window is
 	// MOVED while hidden, so no WM_DPICHANGED fires - the destination
 	// monitor DPI is read explicitly after the move (SPEC-08 §2).
-	x, y := b.resolveInitial(int32(WindowEdgePx(b.opts.SizePx, 96)))
+	// The resolve edge must equal the INITIAL state window edge, so the first
+	// applyStateLocked never shifts the restored position.
+	initialEdge := func(dpi uint32) int32 {
+		if b.opts.Initial == statemachine.StateSleeping {
+			return int32(SleepWindowEdgePx(dpi))
+		}
+		return int32(WindowEdgePx(b.opts.SizePx, dpi))
+	}
+	x, y := b.resolveInitial(initialEdge(96))
 	moveWindow(uintptr(b.hwnd), x, y, 1, 1)
 	dpi := getDpiForWindow(b.hwnd) // true DPI of the destination monitor
-	edge := int32(WindowEdgePx(b.opts.SizePx, dpi))
+	edge := initialEdge(dpi)
 	moveWindow(uintptr(b.hwnd), x, y, edge, edge)
 
 	var errR error
@@ -732,9 +734,8 @@ func (b *Ball) ReleaseEscAfterSession() {
 		if !b.escTakenOver {
 			return
 		}
-		if releaseEsc(b.hwnd, b.cancelBinding) || b.cancelBinding == "" {
-			b.escTakenOver = false
-		}
+		releaseEsc(b.hwnd, b.cancelBinding)
+		b.escTakenOver = false
 	})
 	<-done
 }
@@ -799,4 +800,28 @@ func (b *Ball) recenterAt(dpi uint32, edge int32) {
 	var wr rect
 	pGetWindowRect.Call(uintptr(b.hwnd), unsafePtr(&wr))
 	moveWindow(uintptr(b.hwnd), wr.l, wr.t, edge, edge)
+}
+
+// registerBallClass registers the ball window class once per process
+// (re-registration is an error; a second Ball in-process reuses it).
+var (
+	classOnce sync.Once
+	classErr  error
+)
+
+func registerBallClass() error {
+	classOnce.Do(func() {
+		clsName := utf16("WispBallWindow")
+		wc := wndClassEx{
+			size:      uint32(unsafe.Sizeof(wndClassEx{})),
+			wndProc:   wndProcPtr,
+			instance:  windows.Handle(moduleHandle()),
+			cursor:    windows.Handle(loadArrowCursor()),
+			className: clsName,
+		}
+		if r, _, _ := pRegisterClassExW.Call(unsafePtr(&wc)); r == 0 {
+			classErr = fmt.Errorf("ball: RegisterClassExW failed")
+		}
+	})
+	return classErr
 }

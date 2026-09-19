@@ -208,6 +208,10 @@ func takeEsc(hwnd windows.HWND) bool {
 
 // releaseEsc re-registers the configured cancel binding (B1: the Esc key
 // must be handed back when the session ends).
+// releaseEsc hands Esc back (B1): the takeover binding is ALWAYS dropped -
+// even when the configured binding cannot be re-registered (taken by
+// another app) - and true is returned only when the original binding is
+// live again. escTakenOver clears either way: Esc is no longer ours.
 func releaseEsc(hwnd windows.HWND, bind string) bool {
 	pUnregisterHotKey.Call(uintptr(hwnd), hkCancel)
 	if bind == "" {
@@ -215,8 +219,12 @@ func releaseEsc(hwnd windows.HWND, bind string) bool {
 	}
 	acc, err := ParseAccelerator(bind)
 	if err != nil {
+		slog.Warn("cancel hotkey binding unparsable; Esc returned but unbound", "hotkey", bind, "err", err)
 		return false
 	}
 	r, _, _ := pRegisterHotKey.Call(uintptr(hwnd), hkCancel, uintptr(acc.Mods), uintptr(acc.VK))
+	if r == 0 {
+		slog.Warn("cancel hotkey re-registration failed; Esc returned but unbound", "hotkey", bind)
+	}
 	return r != 0
 }
