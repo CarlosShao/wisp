@@ -3,6 +3,7 @@ package observe
 import (
 	"context"
 	"errors"
+	"fmt"
 	"runtime"
 	"runtime/debug"
 	"slices"
@@ -54,11 +55,19 @@ func (s SLOState) Valid() bool { return slices.Contains(SLOStates, s) }
 
 // TreeMetrics is one raw read of the process tree. CPU and write counters
 // are cumulative since process start; the sampler derives window deltas.
+//
+// Memory units (docs/SLO.md §7): the frozen thresholds are private working
+// set numbers (Task Manager "Memory (private working set)"), so the gate
+// metric is PrivateWorkingSetBytes; CommitBytes (C30 PrivateUsage, always
+// >= private WS) is recorded alongside for diagnostics.
 type TreeMetrics struct {
 	// PIDs is the number of processes in the tree.
 	PIDs int
-	// PrivateBytes is the tree private (committed) bytes (C30 D32 metric).
-	PrivateBytes int64
+	// PrivateWorkingSetBytes is the tree private working set - the D32 gate
+	// metric in the units docs/SLO.md was measured in.
+	PrivateWorkingSetBytes int64
+	// CommitBytes is the tree private commit charge (C30 PrivateUsage sum).
+	CommitBytes int64
 	// CPUTotalNanos is the summed user+kernel CPU time of the tree since
 	// process start (100ns units merged into nanos by the reader).
 	CPUTotalNanos int64
@@ -88,9 +97,10 @@ var ErrTreeUnsupported = errors.New("observe: process-tree metrics unavailable o
 
 // Sample is one derived sample (JSON shape of the slo output).
 type Sample struct {
-	At                string  `json:"at"` // wall RFC3339 UTC - persisted record
-	TreePrivateBytes  int64   `json:"tree_private_bytes"`
-	CPUPercent        float64 `json:"cpu_percent"` // all-core mean over the interval
+	At                string  `json:"at"`                 // wall RFC3339 UTC - persisted record
+	TreePrivateBytes  int64   `json:"tree_private_bytes"` // private working set (SLO.md §7 gate units)
+	TreeCommitBytes   int64   `json:"tree_commit_bytes"`  // C30 commit charge, recorded
+	CPUPercent        float64 `json:"cpu_percent"`        // all-core mean over the interval
 	GDIObjects        int     `json:"gdi_objects"`
 	USERObjects       int     `json:"user_objects"`
 	Handles           int     `json:"handles"`
@@ -133,16 +143,17 @@ type StateReport struct {
 	Samples      []Sample `json:"samples"`
 	SampleErrors int      `json:"sample_errors"`
 
-	MemMedianBytes int64   `json:"mem_median_bytes"`
-	CPUMeanPercent float64 `json:"cpu_mean_percent"` // exact window mean from totals
-	GDIMax         int     `json:"gdi_max"`
-	USERMax        int     `json:"user_max"`
-	HandlesMax     int     `json:"handles_max"`
-	GoroutinesMax  int     `json:"goroutines_max"`
-	ThreadsMax     int     `json:"threads_max"`
-	WriteOpsTotal  int64   `json:"write_ops_total"`
-	SelfWriteTotal int64   `json:"self_write_ops_total"`
-	TCPMax         int     `json:"tcp_max"`
+	MemMedianBytes       int64   `json:"mem_median_bytes"` // private working set median (gate units)
+	MemMedianCommitBytes int64   `json:"mem_median_commit_bytes"`
+	CPUMeanPercent       float64 `json:"cpu_mean_percent"` // exact window mean from totals
+	GDIMax               int     `json:"gdi_max"`
+	USERMax              int     `json:"user_max"`
+	HandlesMax           int     `json:"handles_max"`
+	GoroutinesMax        int     `json:"goroutines_max"`
+	ThreadsMax           int     `json:"threads_max"`
+	WriteOpsTotal        int64   `json:"write_ops_total"`
+	SelfWriteTotal       int64   `json:"self_write_ops_total"`
+	TCPMax               int     `json:"tcp_max"`
 
 	Verdicts []Verdict `json:"verdicts"`
 	Pass     bool      `json:"pass"` // all Gate verdicts pass
@@ -222,6 +233,10 @@ func (s *Sampler) SampleState(ctx context.Context, st SLOState, interval, durati
 		nowAt := time.Now()
 		if err != nil {
 			rep.SampleErrors++
+		} else if m.PrivateWorkingSetBytes <= 0 {
+			// A zero-footprint read of a live tree is an untrustworthy
+			// measurement, never a pass (fail-closed).
+			rep.SampleErrors++
 		} else {
 			sample := s.derive(prev, prevAt, m, nowAt)
 			rep.Samples = append(rep.Samples, sample)
@@ -247,6 +262,7 @@ func (s *Sampler) SampleState(ctx context.Context, st SLOState, interval, durati
 	rep.CPUMeanPercent = cpuPercent(windowStart.CPUTotalNanos, windowEnd.CPUTotalNanos, elapsed, cores)
 
 	rep.MemMedianBytes = medianInt64(samplesField(rep.Samples, func(x Sample) int64 { return x.TreePrivateBytes }))
+	rep.MemMedianCommitBytes = medianInt64(samplesField(rep.Samples, func(x Sample) int64 { return x.TreeCommitBytes }))
 	for _, sm := range rep.Samples {
 		rep.GDIMax = maxInt(rep.GDIMax, sm.GDIObjects)
 		rep.USERMax = maxInt(rep.USERMax, sm.USERObjects)
@@ -258,6 +274,15 @@ func (s *Sampler) SampleState(ctx context.Context, st SLOState, interval, durati
 		rep.SelfWriteTotal += sm.SelfWriteOpsDelta
 	}
 	rep.Verdicts = buildVerdicts(st, *rep)
+	if len(rep.Samples) == 0 {
+		// No trustworthy sample in the whole window: the report fails with
+		// its own gate verdict rather than silently passing on zeros.
+		rep.Verdicts = append(rep.Verdicts, Verdict{
+			Metric: "sampling", Measured: fmt.Sprintf("%d valid / %d errors", len(rep.Samples), rep.SampleErrors),
+			Limit: ">0 valid samples", Pass: false, Gate: true,
+			Note: "fail-closed: unmeasurable windows never pass (D22 mode-6 guard)",
+		})
+	}
 	rep.Pass = true
 	for _, v := range rep.Verdicts {
 		if v.Gate && !v.Pass {
@@ -276,7 +301,8 @@ func (s *Sampler) derive(prev TreeMetrics, prevAt time.Time, m TreeMetrics, nowA
 	cores := float64(runtime.NumCPU())
 	return Sample{
 		At:                WallTimestampUTC(nowAt),
-		TreePrivateBytes:  m.PrivateBytes,
+		TreePrivateBytes:  m.PrivateWorkingSetBytes,
+		TreeCommitBytes:   m.CommitBytes,
 		CPUPercent:        cpuPercent(prev.CPUTotalNanos, m.CPUTotalNanos, elapsed, cores),
 		GDIObjects:        m.GDIObjects,
 		USERObjects:       m.USERObjects,
@@ -393,15 +419,18 @@ func (s *Sampler) CheckSettle(ctx context.Context, target SLOState, within, inte
 		case <-t.C:
 		}
 		m, err := s.tree.ReadTree()
-		if err == nil {
+		if err == nil && m.PrivateWorkingSetBytes > 0 {
+			// Zero-footprint reads of a live tree are untrustworthy (see
+			// SampleState) and are dropped, never recorded as progress.
 			sm := Sample{
 				At:               WallTimestampUTC(time.Now()),
-				TreePrivateBytes: m.PrivateBytes,
+				TreePrivateBytes: m.PrivateWorkingSetBytes,
+				TreeCommitBytes:  m.CommitBytes,
 				Goroutines:       s.reg.Count(),
 			}
 			rep.Samples = append(rep.Samples, sm)
-			rep.FinalBytes = m.PrivateBytes
-			if m.PrivateBytes <= capBytes && rep.BackWithinCapMS < 0 {
+			rep.FinalBytes = m.PrivateWorkingSetBytes
+			if m.PrivateWorkingSetBytes <= capBytes && rep.BackWithinCapMS < 0 {
 				rep.BackWithinCapMS = time.Since(startAt).Milliseconds()
 			}
 		}

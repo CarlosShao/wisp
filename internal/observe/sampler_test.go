@@ -63,7 +63,7 @@ func TestSampleStateAllMetricsAndVerdicts(t *testing.T) {
 	// A clean skeleton tree: everything under the frozen caps.
 	ft := &fakeTree{current: func() TreeMetrics {
 		return TreeMetrics{
-			PIDs: 1, PrivateBytes: 16 << 20,
+			PIDs: 1, PrivateWorkingSetBytes: 16 << 20,
 			CPUTotalNanos: 5_000_000, GDIObjects: 5, USERObjects: 14,
 			Handles: 420, Threads: 23,
 		}
@@ -106,7 +106,7 @@ func TestSampleStateSleepingDiskWriteGateFails(t *testing.T) {
 	writes := int64(0)
 	ft := &fakeTree{current: func() TreeMetrics {
 		writes += 7 // periodic writes between reads
-		return TreeMetrics{PIDs: 1, PrivateBytes: 16 << 20, Handles: 10, WriteOps: writes}
+		return TreeMetrics{PIDs: 1, PrivateWorkingSetBytes: 16 << 20, Handles: 10, WriteOps: writes}
 	}}
 	s := NewSampler(ft, NewRegistry())
 	rep, err := s.SampleState(context.Background(), SLOSleeping, 10*time.Millisecond, 60*time.Millisecond)
@@ -125,7 +125,7 @@ func TestSampleStateSleepingDiskWriteGateFails(t *testing.T) {
 
 func TestSampleStateSleepingTCPGateFails(t *testing.T) {
 	ft := &fakeTree{current: func() TreeMetrics {
-		return TreeMetrics{PIDs: 1, PrivateBytes: 16 << 20, Handles: 10, TCPConnections: 2}
+		return TreeMetrics{PIDs: 1, PrivateWorkingSetBytes: 16 << 20, Handles: 10, TCPConnections: 2}
 	}}
 	s := NewSampler(ft, NewRegistry())
 	rep, err := s.SampleState(context.Background(), SLOSleeping, 10*time.Millisecond, 40*time.Millisecond)
@@ -140,7 +140,7 @@ func TestSampleStateSleepingTCPGateFails(t *testing.T) {
 func TestSampleStateHandleGateUsesRulingLimit(t *testing.T) {
 	// SLO.md ruling 1: <600 across all states; 640 handles = red.
 	ft := &fakeTree{current: func() TreeMetrics {
-		return TreeMetrics{PIDs: 1, PrivateBytes: 16 << 20, Handles: 640, GDIObjects: 5}
+		return TreeMetrics{PIDs: 1, PrivateWorkingSetBytes: 16 << 20, Handles: 640, GDIObjects: 5}
 	}}
 	s := NewSampler(ft, NewRegistry())
 	rep, err := s.SampleState(context.Background(), SLOWarm, 10*time.Millisecond, 40*time.Millisecond)
@@ -154,7 +154,7 @@ func TestSampleStateHandleGateUsesRulingLimit(t *testing.T) {
 
 func TestSampleStateWorkPeakMemoryIsTargetNotGate(t *testing.T) {
 	ft := &fakeTree{current: func() TreeMetrics {
-		return TreeMetrics{PIDs: 1, PrivateBytes: 690 << 20, Handles: 100, GDIObjects: 5}
+		return TreeMetrics{PIDs: 1, PrivateWorkingSetBytes: 690 << 20, Handles: 100, GDIObjects: 5}
 	}}
 	s := NewSampler(ft, NewRegistry())
 	rep, err := s.SampleState(context.Background(), SLOWorkPeak, 10*time.Millisecond, 40*time.Millisecond)
@@ -175,7 +175,7 @@ func TestSampleStateLeakFixtureFlipsRed(t *testing.T) {
 	// Forced-leak fixture contract (ticket acceptance): a 100MB allocation
 	// must flip the Sleeping memory gate to fail.
 	ft := &fakeTree{current: func() TreeMetrics {
-		return TreeMetrics{PIDs: 1, PrivateBytes: (16 + 100) << 20, Handles: 10, GDIObjects: 5}
+		return TreeMetrics{PIDs: 1, PrivateWorkingSetBytes: (16 + 100) << 20, Handles: 10, GDIObjects: 5}
 	}}
 	s := NewSampler(ft, NewRegistry())
 	rep, err := s.SampleState(context.Background(), SLOSleeping, 10*time.Millisecond, 40*time.Millisecond)
@@ -197,7 +197,7 @@ func TestSampleStateCPUTotalDrivenMean(t *testing.T) {
 	cpu := int64(0)
 	ft := &fakeTree{current: func() TreeMetrics {
 		cpu += int64(0.5 * float64(20*time.Millisecond) / float64(time.Nanosecond))
-		return TreeMetrics{PIDs: 1, PrivateBytes: 16 << 20, Handles: 10, CPUTotalNanos: cpu}
+		return TreeMetrics{PIDs: 1, PrivateWorkingSetBytes: 16 << 20, Handles: 10, CPUTotalNanos: cpu}
 	}}
 	s := NewSampler(ft, NewRegistry())
 	rep, err := s.SampleState(context.Background(), SLOWarm, 20*time.Millisecond, 100*time.Millisecond)
@@ -233,7 +233,7 @@ func TestMarkTransitionTimestamps(t *testing.T) {
 
 func TestCheckSettleVerifiesReleaseCounter(t *testing.T) {
 	ft := &fakeTree{current: func() TreeMetrics {
-		return TreeMetrics{PIDs: 1, PrivateBytes: 16 << 20, Handles: 10}
+		return TreeMetrics{PIDs: 1, PrivateWorkingSetBytes: 16 << 20, Handles: 10}
 	}}
 	s := NewSampler(ft, NewRegistry())
 
@@ -266,7 +266,7 @@ func TestCheckSettleVerifiesReleaseCounter(t *testing.T) {
 
 func TestCheckSettleNeverReachesCap(t *testing.T) {
 	ft := &fakeTree{current: func() TreeMetrics {
-		return TreeMetrics{PIDs: 1, PrivateBytes: 120 << 20, Handles: 10}
+		return TreeMetrics{PIDs: 1, PrivateWorkingSetBytes: 120 << 20, Handles: 10}
 	}}
 	s := NewSampler(ft, NewRegistry())
 	prev := debugFreeOSMemory
@@ -287,7 +287,7 @@ func TestCheckSettleNeverReachesCap(t *testing.T) {
 // not runtime.NumGoroutine (runtime workers would poison the baseline).
 func TestSamplerGoroutineAccountingFollowsRegistry(t *testing.T) {
 	reg := NewRegistry()
-	ft := &fakeTree{current: func() TreeMetrics { return TreeMetrics{PIDs: 1, PrivateBytes: 1 << 20} }}
+	ft := &fakeTree{current: func() TreeMetrics { return TreeMetrics{PIDs: 1, PrivateWorkingSetBytes: 1 << 20} }}
 	s := NewSampler(ft, reg)
 	rep, err := s.SampleState(context.Background(), SLOSleeping, 10*time.Millisecond, 30*time.Millisecond)
 	if err != nil {

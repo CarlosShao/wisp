@@ -27,6 +27,8 @@ Usage:
                    event loop; the floating ball window is ticket 07)
   wisp run "task"  run a task from the command line (ticket 01: echo placeholder)
   wisp doctor      toolchain and native-DLL self-check, prints PASS/FAIL
+  wisp slo         SLO sampling driver (ticket 08): one state per run, JSON
+                   verdict; driven by scripts/slo-check.ps1
   wisp version     print version information
   wisp help        show this help
 
@@ -53,6 +55,8 @@ func main() {
 		if !cmdDoctor() {
 			os.Exit(1)
 		}
+	case "slo":
+		os.Exit(cmdSLO(args[1:]))
 	case "version", "--version", "-v":
 		attachParentConsole()
 		printVersions("")
