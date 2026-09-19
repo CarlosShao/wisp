@@ -1,8 +1,8 @@
-# 14 — Model distribution: C29 signed manifest, mirrors, resume, Downloading state
+# 14 — Model distribution: C29 signed manifest, mirrors, resume, Downloading state (DONE ✅)
 
-**Status:** in-progress
+**Status:** done
 **Claimed by:** orchestrator -> sub-agent T14-impl
-**Last update:** 2026-09-19T15:11:33Z
+**Last update:** 2026-09-19T23:09:31ZT15:11:33Z
 **Blocked by:** 03-skeleton-runtime-rules
 **Parallel slots:** ≤2 sub-agents (A: manifest + minisign verify + downloader; B: state wiring +
 local_override + mirror tooling/compose)
@@ -53,3 +53,4 @@ progress/cancel, `Downloading` state wiring, local-dir escape hatch, and the com
 - [2026-09-19T15:54:22Z] agent=T14-impl did=internal/models pipeline green: minisign verify (hand-written Ed25519+Blake2b, format-exact), C29 manifest types+signed loader (offline verify before network), Manager (mirror chain, Range resume byte-offset, retry/backoff, failover, progress events, cancel-cleans-staging, sha256 reject+delete, tar.bz2 safe extraction), local_override offline integrity, DownloadingBridge (D43 #2/#37 walk); TDD tests all pass incl -race next=real manifest 6 entries + dev key + sign + spot-check downloads
 - [2026-09-19T22:59:23Z] agent=T14-impl did=real manifest landed+signed (6 entries, all hashes from real downloads/local cross-check vs spike table; KWS/VAD/paraformer/SenseVoice=Apache-2.0, CT-Punc=Apache-2.0, matcha-zh-baker=NON-COMMERCIAL -> status=blocked-p3, Ensure refuses); dev minisign keypair E:\work\base\wisp-minisign (keyid a3c8794f3fd94fc5, never in repo), pub hardcoded in buildinfo, tools/signmodels + scripts/sign-models.ps1, models/manifest.json.minisig committed and verifies in TestRealManifestInRepoVerifies; compose.dev/test.yml + model-mirror fixtures (good/corrupt/missing); build.ps1 colocates manifest; REAL pipeline spot checks PASS (vad-silero 11.3s; punc 64MB archive download+extract+verify 16.5s, WISP_IT_REAL_MIRROR=1) next=full-repo gates + commit/push
 - [2026-09-19T23:06:46Z] agent=T14-impl did=handoff-to-orchestrator all acceptance criteria met: gates green (go vet/test on my pkgs + repo-wide go test ./... PASS; build.ps1 -Env dev PASS incl manifest colocated into build/models; compose.dev/test config OK); unit commits 92f4861+bfcb230+5ab0339 pushed origin+cnb; NO uncommitted T14 files. Notes for orchestrator: (1) matcha-zh-baker P3 BLOCKED non-commercial (data-baker), status=blocked-p3 enforced in Ensure, TTS replacement decision pending [H5]; (2) dev minisign key E:\work\base\wisp-minisign (keyid a3c8794f3fd94fc5), prod rotation S8; (3) repo-wide vet has 1 issue in parallel agent's in-flight internal/observe/sampler_test.go:330 (not T14); (4) cmd/wisp doctor still labels buildinfo key "placeholder" - stale copy, one-line touch for next owner; (5) hf-mirror 401s on Xet-backed repos (punc) - manifest keeps official GitHub fallbacks, ghfast transport fallback automatic. next=T15 pulls binaries; acceptance states remain in-progress pending orchestrator
+- [2026-09-19T23:09:31Z] agent=orchestrator did=T14-adv PASS (orchestrator-executed; report docs/evidence/s2/14-adversarial-acceptance.md; matcha P3 blocked ruling recorded) next=ticket DONE

@@ -23,6 +23,11 @@
 - [P3] **`git add -A` 两次吞并行 WIP**（T03/T02 期间）：已按 `git rm --cached` 先例修复；
   此后全仓强制显式路径提交，未再发生。
 
+## 裁定记录（orchestrator rulings）
+
+- **[R1] matcha-zh-baker P3（非商用）**（2026-09-20）：个人使用期可继续用（许可允许）；C29 manifest 分发被挡（blocked-p3 硬拒已实现）。**默认 TTS 替代选型归票 26**（与 P7 音质门禁一并评测；候选： sherpa vits-zh 许可干净系列 / 云 TTS）。
+- **[R2] 截止计划**（2026-09-20 07:2x，配额 09:00 到期）：在途 14✅/08（deadline-pause 规则已发）；**票 10（2–4h）与 12 留给新会话**——交接文档 docs/reports/HANDOVER.md 已含新会话行动清单。
+
 ## 阻塞项（blocked）
 
 （当前无硬阻塞。票 09 的黄金录制部分依赖 H2；其余在途/排队票均可推进。）
