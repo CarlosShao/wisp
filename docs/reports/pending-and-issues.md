@@ -271,6 +271,23 @@
   ③ **优先级重排照 owner 的意思执行**：核心功能优先 ⇒ **票 12（装配）升为当前第一优先**
      （它同时消化 A8/A11/A13 三张同形遗留），票 64（球缺陷）并行，票 65 挂 blocked-on-owner 不占车队名额。
   ⚠ 今后任何读到 SPEC-08 §2 的人：那里的 INTERIM 标注**在 owner 对票 65 明确说"这次对了"之前不得摘除**。
+- **[A8 / A11 / A13 → 全部闭环（2026-09-20 12:35Z，票 12 装配 + 编排者票面对账）]** —
+  R12 所指出的"能力做完了没人接"这一族，三条同形遗留**一次消化完毕**：
+  **A13**（审批门 + 桥不可达）由 `cd011b8` 解决——`cmd/wisp/run.go` 现在同时 import
+  `internal/agent/approval` 与 `internal/tools`，这是 `cmd/` 下第一次有代码够到这两个包；
+  **A8**（真实 provider 从 DPAPI 取密钥）由 `cmd/wisp/run_test.go::TestRunTextTaskKeyResolvesInTheStore`
+  闭环，且我写进完成判据的那条变异有独立用例 `TestMissingBlobFailsUnconfiguredNeverSilently`
+  （ref 指向缺失 blob → 走 Unconfigured，**不静默成功**）；
+  **A11**（能力探针无生产调用者）由 `cmd/wisp/providers_test.go` 闭环，thinking 探测
+  **正反两向都钉**（`...MeasuredThinkingTrue` / `...False`），mockllm 侧新增 thinking 能力档。
+  守卫删除与替代**确在同一 commit**（`cbdea7c` 只含 `internal/agent/loop.go` +
+  `internal/tools/loop_approval_test.go`），且**正反两向都有测试**：无 gate 时 L1 写被拒、记
+  `L1/reject`、文件不出现 ⇒ "忘了接审批"的后果是**拒绝执行**，不是放行。
+  ⚠ **本条之所以还要单独写，是因为这三件事全部没有出现在票面上**：做它的代理跑完 165 次工具调用、
+  落了 3 个 commit，**AC 框一个没勾、Progress log 一行没写**，`Status` 停在 `ready-for-agent`
+  ⇒ 下一张读票的代理会把这 165 次调用**整个重做**。根因是我给票 12 的简报漏了"每次 commit 同步票面"这一条
+  （票 11、票 64 的简报里都有）。**教训：验收对账要以代码为准，且"票面与 commit 同步"必须写进每一份简报，
+  不能依赖代理自觉。**
   另记两处**段 2 的硬障碍**（代理上报、我已读码确认存在）：
   ①`loop.decideRisk` 在 `Execute` **之前**就拒已声明的 L1/L2 ⇒ `fs.write` 到它手里是死的，
   须等票 21 替换该函数；②`tool_call` 表**没有 `rules_hit` 列**（SPEC-02 的 DDL 是契约层的），
