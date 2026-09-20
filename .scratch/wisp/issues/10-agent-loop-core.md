@@ -1,8 +1,8 @@
 # 10 — Agent loop core: ReAct, context assembly, budgets, LoopGuard (single-task)
 
-**Status:** ready-for-agent
-**Claimed by:** —
-**Last update:** 2026-09-19
+**Status:** in-progress
+**Claimed by:** agent-ticket10-loop
+**Last update:** 2026-09-20
 **Blocked by:** 05-config-model, 09-llm-provider-openai-mockllm
 **Parallel slots:** ≤2 sub-agents (A: loop + tool plumbing + truncation rule; B: context
 assembly + spill + compression + cost hooks)
@@ -61,3 +61,4 @@ and `stopReason=length` → `failToolCallsFromTruncatedMessage`. Tool execution 
       (④ and BM25 segments last).
 
 ## Progress log (append-only, newest last)
+- [2026-09-20T02:20Z] agent=agent-ticket10-loop did=claimed next=loop-core+skeleton-tests
