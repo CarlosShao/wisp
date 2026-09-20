@@ -178,7 +178,7 @@ func TestToolExecutionRunsFourAcross(t *testing.T) {
 	if !tools.waitForInflight(MaxToolConcurrency, 5*time.Second) {
 		tools.release()
 		task.Wait()
-		t.Fatalf("only %d calls ran at once, want %d: the pool is serial, so the " +
+		t.Fatalf("only %d calls ran at once, want %d: the pool is serial, so the "+
 			"ceiling assertion in TestGoldenConcurrencyCeiling is vacuous",
 			tools.MaxConcurrent(), MaxToolConcurrency)
 	}

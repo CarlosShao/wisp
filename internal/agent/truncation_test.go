@@ -151,4 +151,3 @@ func historyHasResultID(hist []llm.Message, id string) bool {
 	}
 	return false
 }
-
