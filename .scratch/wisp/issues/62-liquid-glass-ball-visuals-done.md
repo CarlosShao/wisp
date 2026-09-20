@@ -1,7 +1,7 @@
 # 62 — 液态玻璃悬浮球视觉重做（玻璃质感 / 靠边吸附收缩 / 音频驱动液面）
 
-**Status:** ready-for-agent
-**Claimed by:** —
+**Status:** done（**临时通过：结构与可见性已批，质感未签收 → 票 65**）
+**Claimed by:** 4 个实现代理（3 次被平台杀、1 次撞 150 轮）+ orchestrator（检查点与验收）
 **Last update:** 2026-09-20
 **Blocked by:** 07-ball-state-machine-core（渲染栈与 20 态状态机）, 13-audio-capture（音频电平来源）
 **Parallel slots:** ≤2 sub-agents（A：渲染层玻璃+液态材质与着色；B：靠边吸附/悬停弹出与音频驱动）
@@ -117,3 +117,21 @@ SPEC-08 §2 的 20 态视觉表与 D43 的视觉映射列**必须改**，但顺�
   introduced no timer anywhere). Gates: gofmt clean, go vet ./internal/ball ./cmd/balldebug clean (also
   -tags winlive), go test -count=2 ./internal/ball ok, every process launched was killed and tasklist shows no
   balldebug/wisp left. next=owner-signoff (实机跑 -tour 判颜色与可见性 -> 才回填 SPEC-08 §2 -> 然后补深色桌布差分)
+- [2026-09-20T10:45Z] agent=orchestrator did=**owner 实机签收完成，判决=临时通过（质感未签收）**。
+  owner 跑了 `-tour` 并回看三张截图，原话：「可以说算是赝品吧，离我发的那种质感还是有不小差距，
+  但是先勉强用吧，以后再换样式，就先这样吧。开始阶段不能要求太高，本末倒置了就，先完成核心功能」。
+  **验收方独立复核过的部分（不采信代理自述）**：①`decideRisk` 之外我又做一次**单向 ramp 变异**——
+  把 `dockRampFrame` 改成只进不退 → 仅 `TestDockHoverPopBackWalksTheRampHome` 变红、其余 10 个仍绿
+  （正确表现：单向不影响"吸进去"），证明"弹回来"这个方向有**永不 skip** 的确定性锚；
+  ②`dock_test.go` 11 个测试、`grep -c t.Skip` = **0**；③Sleeping 差分我此前亲自跑过
+  （`timers=no cpu=0.000 privWS=11.75MB px_delta_ge8=2120`），与代理报的数一致；
+  ④`build/balldebug.exe` 我在**剥光 PATH**（只剩 System32）下验证过能起，签收命令交给 owner 前确认跑得通。
+  **SPEC-08 §2 已回填，但带 INTERIM 标注**：只改「12px 微点/0.35 → 静态玻璃体 44px」这一项，
+  理由是可证伪的（旧规格差分 0 像素变化，物理上不成像），**不是**因为质感被认可；
+  D32 的 Sleeping 零定时器纪律一条未放宽，票面批准范围写死为"尺寸/可见性/零定时器"三项。
+  **质感返工另立票 65**，且票 65 记下一个必须承认的事实：**图1/图2 从未落到磁盘**
+  （我逐个核对本会话 11 张附件：商标 4 + 托盘 1 + AnySearch 文档 1 + 代理面板 1 + 本轮 tour 3 + 小裁图 1，
+  无一为玻璃参考图）⇒ 本票四个代理的配色全部是**按文字盲做**，"赝品"判决在信息缺失下是必然的，
+  返工第一步必须是拿到图而不是再猜一次。**Status → done（临时通过）。**
+  next=票 64（球缺陷：热键接线/交互四项/零定时器实测）与票 12（装配：A8+A11+A13）解锁开工；
+  票 65 blocked-on-owner 等参考图
