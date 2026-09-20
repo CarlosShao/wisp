@@ -106,7 +106,7 @@ owner 2026-09-20 裁定：**现在插队修，不等 S3**。本票消化 registr
      `DockPos` 的切边（`work.L + off - half`，half=edgePx/2）**整条链都按 WINDOW 矩形**；有边框时
      edgePx=72 而真实绘制只有 56x33 → 切边断言会偏 (8,31)。现与绘制面重合。
      实况证据：`TestBallLiveEdgeDock`（`live_windows_test.go:338-350` 逐边算 `wr.L±half∓drawn` 与
-     `m.Work` 比切边）在边框修复**之后**实跑 PASS（本轮 `-run 'TestBallLive|TestLive'` 15 项全绿）。
+     `m.Work` 比切边）在边框修复**之后**实跑 PASS（本轮 winlive 套件 `-run 'TestBallLive|TestLive'` 14 项全绿）。
   5. `dockMoveTo`/`recenterAt`/`moveWindow`：读写同为窗口矩形，干净。
   6. `persistPosition`：存 `wr.l/wr.t`；`ResolvePosition` 用 `wr.width()`；`reclampPosition` 用窗口矩形
      与 work 区求交——三处一致。**唯一残留事实（非缺陷）**：边框时代存下的 X/Y 是"含边框窗口原点"，
@@ -129,6 +129,17 @@ owner 2026-09-20 裁定：**现在插队修，不等 S3**。本票消化 registr
   起点 369→370（+1，噪声级），Close 后回落到起点值。⇒ **不立泄漏修复票**；
   D32 的 Sleeping 零定时器未被触碰（`TestLiveSleepingZeroTimerHandles` 绿，本轮无阈值放宽）。
 - 门禁：`gofmt -l` 空、`go vet ./internal/ball/ ./cmd/balldebug/` RC0、`go vet -tags winlive ./internal/ball/` RC0、
-  `go test -count=2 ./internal/ball/` → `ok ... 0.062s`；winlive 15 项 `-run 'TestBallLive|TestLive'` 全 PASS。
+  `go test -count=2 ./internal/ball/` → `ok ... 0.062s`；winlive 14 项 `-run 'TestBallLive|TestLive'` 全 PASS。
 - **未做/未勾**：生产装配根接桥（票 12）、`Ctrl+Alt+Space` 的用户可见文档（文档冻结）、双屏实拖（硬件缺席）、
   winlive 进 CI（A3 残留半）、对抗验收（须非实现者）。
+
+- [2026-09-20T13:10Z] agent=agent-ticket64-resume did=预算内续做段 1 的余量并全部提交：`620f565` 重新落地被回退的
+  `cmd/balldebug` 桥（补写缺失的 `hotkeySummary` + `runHotkeyBridge`，三个被依赖 API 齐全、非残缺落地）、
+  `7d50e17` 记 A1 双证（winlive e2e 无 skip 分支 + `-config` 活实例 1.5s 内真 rebind）、隐形边框 9 个窗口矩形
+  消费者逐个审计（含 `dockGeometry`/`DockPos` 切边链与实况 `TestBallLiveEdgeDock`，全部干净、无补偿码）、
+  A1d 实况绿、A6 以 `-count=3` 定案为"一次性 D2D/COM 底座、非逐球泄漏 → 不立票"。D32 未碰、无阈值放宽、
+  无裸 `go func(`、未弱化任何断言；启动过的 balldebug 已确认退出（tasklist 无 balldebug/wisp/go）。
+  next=**非本票可完成**，三格各归其主：①票 12 在 `cmd/wisp` 装 `config.NewManager`+`NewHotkeyReloader` 并把
+  `Check()` 挂 watchdog tick（A1/AC#1 唯一残件，R12 已精确说明为何不能只挂 `OnReload`）；②owner 解冻 SPEC-03/08
+  或转票 39 配置 GUI，才能把 `Ctrl+Alt+Space` 写进用户可见文档（AC#3 后半）；③双屏硬件到位后跑 AC#6，
+  另需给 `enumMonitors()` 开注入接缝（A4）。若要复跑测量：桌面必须无其它 Wisp 球，前置守卫会 fail-fast。
