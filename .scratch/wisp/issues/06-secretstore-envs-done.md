@@ -43,12 +43,11 @@ visible env badge contract consumed by ball/panel.
       dirs mutually invisible.
 - [x] Mutex names per env (integration test on Windows runner).
 - [x] Portable mode: data dir relocation + dpapi-decrypt-failure → explicit error (not plaintext).
-- [ ] `env:` refs work with arbitrary dummy values (CI-friendly).
-- note: AC#6 left open — no ruling found in docs/evidence/s0/06-adversarial-acceptance.md (its 8-row
-      audit table names TestLayoutForkMatrix / envfork_mutex_windows_test / MigratesAndBacksUp /
-      ErrPortableDecrypt but never addresses `env:`-ref resolution with dummy values; row 1's
-      "全量复跑 secret ok" is generic). Candidate evidence unadjudicated at
-      internal/secret/store_test.go:131 TestResolveEnvRef
+- [x] `env:` refs work with arbitrary dummy values (CI-friendly).
+- note: AC#6 **PASS** — 见 docs/evidence/s0/06-adversarial-acceptance.md §"Addendum 裁决（2026-09-20，AC
+      补裁）" AC#6 行：store.go:90-98 对 env 值零内容校验（哑值直传），store_test.go:131
+      TestResolveEnvRef 三子例真断言（哑值逐字节等值 / 缺失报错 / 空值报错），
+      `go test ./internal/secret/ -run TestResolveEnvRef -count=2 -v` 6×PASS
 
 ## Progress log (append-only, newest last)
 - [2026-09-19T09:31:25Z] agent=orchestrator claimed=T06-impl did=dispatched (3-way concurrency) next=sub-agent works through acceptance criteria
@@ -61,4 +60,5 @@ visible env badge contract consumed by ball/panel.
 - [2026-09-19T10:15:16Z] agent=T06-impl-resume2 did=full matrix green: go vet ./... ok; go build ./... ok (CGO_ENABLED=1); CGO_ENABLED=0 go build ./internal/... ok (cmd/wisp excluded: pre-existing sherpa-onnx cgo binding from 10ed80d, not a 06 regression); go test ./... all ok (proc 0.344s incl. mutex-per-env Windows integration, secret 0.104s); build.ps1 -Env dev PASS (doctor WISP_ENV=dev, dev data dir, smoke ok) next=acceptance recheck + handoff
 - [2026-09-19T10:15:16Z] agent=T06-impl-resume2 did=handoff-to-orchestrator: acceptance 6/6 present and green (round-trip+blob-not-plaintext+last-4; migration+idempotent+first-backup-wins; TestLayoutForkMatrix 3-env distinct dirs/mutexes/endpoints+nested-invisibility; TestMutexNamesPerEnv real kernel mutexes; TestPortableOverride+TestPortableDecryptFailureExplicit; TestResolveEnvRef dummy values). Status left as-is next=orchestrator adversarial review
 - [2026-09-19T10:25:38Z] agent=orchestrator did=T06-adv VERDICT PASS (report docs/evidence/s0/06-adversarial-acceptance.md; orchestrated acceptance executed by orchestrator due to platform captcha failures, implementer-independent) next=ticket DONE
-- [2026-09-20T02:25Z] agent=agent-bookkeeping-1 did=AC boxes reconciled against docs/evidence/s0/06-adversarial-acceptance.md (8-row audit table; AC#1←row3 DPAPI 真实性, AC#2←row4 named migration tests, AC#3+AC#4←row5 TestLayoutForkMatrix/envfork_mutex_windows_test, AC#5←row6 P13+ErrPortableDecrypt; AC#6 unaddressed): 5 checked, 1 left open (reasons above) next=none
+- [2026-09-20T02:25Z] agent=agent-bookkeeping-1 did=AC boxes reconciled against docs/evidence/s0/06-adversarial-acceptance.md (8-row audit table; AC#1←row3 DPAPI 真实性, AC#2←row4 named migration tests, AC#3+AC#4←row5 TestLayoutForkMatrix/envfork_mutex_windows_test, AC#5←row6 P13+ErrPortableDecrypt;  AC#6 unaddressed): 5 checked, 1 left open (reasons above) next=none
+- [2026-09-20T11:10Z] agent=ac-addendum-auditor did=补裁 AC#6（该框原为空白裁决）：实跑 TestResolveEnvRef -count=2 全绿，并读 store.go:90-98 确认 env 分支对值内容零校验（哑值直传）、仅缺失/空值显式报错；框改勾。裁决写入 docs/evidence/s0/06-adversarial-acceptance.md §Addendum next=none

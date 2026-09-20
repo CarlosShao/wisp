@@ -23,3 +23,30 @@
 
 ## 最终裁决
 **VERDICT: PASS**
+
+## Addendum 裁决（2026-09-20，AC 补裁）
+
+> 背景：上表 8 行未裁 AC#6（`env:` refs work with arbitrary dummy values / CI-friendly），
+> 票据复核时该框留空。本节由补裁代理实跑实读后补裁。
+
+| AC | 裁决 | 证据（file:line）+ 实跑命令 + 输出尾部 |
+|---|---|---|
+| AC#6 `env:` 引用可用任意哑值解析（CI 友好） | **PASS** | 生产侧 `internal/secret/store.go:90-98`：`case RefKindEnv` 直接 `os.LookupEnv` 回传值，**对内容零校验**（无长度/字符集/形状检查），哑值天然可通；仅"未设置"（`:92-94`）与"值为空"（`:95-97`）两类返回显式错误。测试侧 `internal/secret/store_test.go:131 TestResolveEnvRef` 三个子例均为真断言：①哑值逐字节等值回传（`got != "dummy-placeholder-value-not-a-real-key"` → Errorf）②缺失变量必须报错 ③空变量必须报错。辅证 `store_test.go:110 TestStoreRejectsEnvRefsAndEmpty` 钉死"env 引用不可被 Store 落盘"（契约方向一致，非矛盾）。<br>`go test ./internal/secret/ -run 'TestResolveEnvRef' -count=2 -v` |
+
+```
+--- PASS: TestResolveEnvRef (0.00s)
+    --- PASS: TestResolveEnvRef/arbitrary_placeholder_value (0.00s)
+    --- PASS: TestResolveEnvRef/missing_variable_is_an_explicit_error (0.00s)
+    --- PASS: TestResolveEnvRef/empty_variable_is_an_explicit_error (0.00s)
+=== RUN   TestResolveEnvRef
+=== RUN   TestResolveEnvRef/arbitrary_placeholder_value
+--- PASS: TestResolveEnvRef (0.00s)
+    --- PASS: TestResolveEnvRef/arbitrary_placeholder_value (0.00s)
+    --- PASS: TestResolveEnvRef/missing_variable_is_an_explicit_error (0.00s)
+    --- PASS: TestResolveEnvRef/empty_variable_is_an_explicit_error (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/secret	0.043s
+```
+
+**补裁小结**：AC#6 PASS，票据该框改勾。本项为纯逻辑（环境变量读取），无外设/网络依赖，
+可在 CI 直接复现，与票面"CI-friendly"意图一致。
