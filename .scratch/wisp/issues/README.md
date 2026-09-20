@@ -43,7 +43,7 @@ All tickets are **vertical tracer bullets**; work the **frontier** (all blockers
   10 agent-loop-core (05,09) · 11 llm-adapters-rest (09) · 12 cli-text-path=S1 gate (04,07,08,10)
 - **S2**: 13 audio-capture ✅done (03) · 14 model-distribution ✅done (03) · 15 speech-engines+CER (02,13,14) ·
   16 s2-acceptance (12,15)
-- **S3**: 17 risk-assessor C19 ✅done (03) · 18 path-resolver C26 ✅done (03) · 19 provenance C25 (17) ·
+- **S3**: 17 risk-assessor C19 ✅done (03) · 18 path-resolver C26 ✅done (03) · 19 provenance C25 ✅done (17) ·
   20 host-bridge+fs-tools (17,18) · 21 approval-gates-minimal (17) · 22 web-tools+D30 (19,20) ·
   23 system/window/input-tools (20) · 24 doc/search-tools (20) · 25 s3-acceptance (21,22,23,24)
 - **S4**: 26 tts-output (15) · 27 punctuation (15) · 28 session-scope Warm (07,15) ·
