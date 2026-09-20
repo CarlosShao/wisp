@@ -46,3 +46,4 @@ channels, normalized ≥8-char contiguous-fragment matching, and sync-directory 
 
 ## Progress log (append-only, newest last)
 - [2026-09-20T02:20Z] agent=agent-ticket19-taint did=claimed next=engine+skeleton-tests
+- [2026-09-20T02:55Z] agent=agent-ticket19-taint did=C25-engine (internal/risk/provenance.go taint store+channel Inspect+CheckText+Detector(scope) bound to frozen TaintHit seam; taintmatch.go normalize+>=8-rune window index w/ collision-verified hashing; syncdirs.go+_windows.go P12 registry/config/default/fixture probes + fail-closed suspect fallback; 21 new tests all green incl. four-channel suite through real C19 assessor, DisposalScope non-inheritance, threshold clamp, paraphrase residual; risk vet+count=2+-race+full d22scan clean; note: go build ./... currently broken in internal/agent/ (ticket-10 untracked WIP, left untouched)) next=PRECHECK-P12+evidence+status-review
