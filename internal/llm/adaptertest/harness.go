@@ -354,6 +354,29 @@ func Serve(t *testing.T, u Unit, sc ScenarioID, pace bool) (base string, rep *go
 	return srv.URL, rep
 }
 
+// ServeFixtureByName starts the in-process replayer for an explicitly named
+// fixture (row tests that must pin a specific wire file).
+func ServeFixtureByName(t *testing.T, name string) (string, *golden.Replayer) {
+	t.Helper()
+	rs, err := golden.LoadFile(filepath.Join(GoldenDir(), name+".sse"))
+	if err != nil {
+		t.Fatalf("load golden %s: %v", name, err)
+	}
+	rep := golden.NewReplayer(rs)
+	srv := rep.Server()
+	t.Cleanup(srv.Close)
+	return srv.URL, rep
+}
+
+// ObserveErr returns the first *observe.Error in an error chain (nil if none).
+func ObserveErr(err error) *observe.Error {
+	var e *observe.Error
+	if as(err, &e) {
+		return e
+	}
+	return nil
+}
+
 // ServeBody starts the in-process replayer over inline golden source.
 func ServeBody(t *testing.T, src string) (base string, rep *golden.Replayer) {
 	t.Helper()

@@ -3,6 +3,7 @@ package llm
 import (
 	"context"
 	"math"
+	"strconv"
 	"time"
 
 	"github.com/CarlosShao/wisp/internal/observe"
@@ -36,9 +37,43 @@ type RetryOptions struct {
 	// Sleep is the wall-clock abstaining delay function (tests inject a
 	// recorder). It must respect ctx cancellation. nil = time-based sleep.
 	Sleep func(ctx context.Context, d time.Duration) error
-	// Now is the time source for Retry-After HTTP-date parsing.
+	// Now is the time source for Retry-After HTTP-date parsing AND for the
+	// retry-notice threshold. It is read twice from the SAME source and
+	// subtracted (Go monotonic reading), never against a wall-clock deadline
+	// (D42#9 / D22 ban list).
 	Now func() time.Time
+	// NoticeAfter is how long a retrying request must have been running
+	// before the user gets a "重试中 (n/3)" notice (SPEC-05 sec 3.4 / plan
+	// 14.2 row 1: the ball stays Thinking, and only past this threshold the
+	// attempt number becomes visible). Default 5s; 0 with a nil Notice
+	// disables nothing - a nil Notice simply never fires.
+	NoticeAfter time.Duration
+	// Notice receives one entry per retry that starts after the threshold has
+	// passed (and one catch-up entry when the ladder ends). May be nil.
+	Notice func(RetryNotice)
 }
+
+// RetryNotice is the structured user-visible retry progress of one request
+// (14.2 row 1). The seam emits DATA; the ball/panel own rendering it, but
+// Label() is the single frozen copy so no surface invents its own wording.
+type RetryNotice struct {
+	Attempt int                // the attempt now starting (2..Max+1)
+	Max     int                // ceiling (D37: 3 retries)
+	Class   observe.ErrorClass // the failure being retried
+	Delay   time.Duration      // how long we are waiting before it
+	Elapsed time.Duration      // monotonic time since the request began
+}
+
+// Label is the 14.2 row 1 copy: n counts RETRIES already spent (the first
+// retry is "重试中 (1/3)", matching the plan's "(2/3)" example at retry two).
+func (n RetryNotice) Label() string {
+	return "重试中 (" + strconv.Itoa(n.Attempt-1) + "/" + strconv.Itoa(n.Max) + ")"
+}
+
+// BallStateName is the state the user stays in while retrying: a retry is not
+// a terminal failure, so no transition is requested (14.2 row 1: 保持
+// Thinking). The ball keeps showing Thinking until a terminal Error arrives.
+func (n RetryNotice) BallStateName() string { return "Thinking" }
 
 func (o *RetryOptions) fill() {
 	if o.Max == 0 {
@@ -59,7 +94,13 @@ func (o *RetryOptions) fill() {
 	if o.Now == nil {
 		o.Now = time.Now
 	}
+	if o.NoticeAfter <= 0 {
+		o.NoticeAfter = defaultRetryNoticeAfter
+	}
 }
+
+// defaultRetryNoticeAfter is 14.2 row 1's "超过 5s".
+const defaultRetryNoticeAfter = 5 * time.Second
 
 func sleepCtx(ctx context.Context, d time.Duration) error {
 	if d <= 0 {
@@ -95,7 +136,21 @@ func (r *RetryingProvider) Info() ProviderInfo { return r.inner.Info() }
 // is final: a swallowed attempt's terminals are discarded, a final attempt's
 // are flushed in order, keeping the C6 contract intact for the consumer.
 func (r *RetryingProvider) Stream(ctx context.Context, req *Request, emit func(StreamEvent) error) error {
+	start := r.opts.Now()
 	attempt := 0
+	notice := func(class observe.ErrorClass, delay time.Duration) {
+		if r.opts.Notice == nil {
+			return
+		}
+		elapsed := r.opts.Now().Sub(start)
+		if elapsed < r.opts.NoticeAfter {
+			return // under the threshold: the ball just keeps Thinking
+		}
+		r.opts.Notice(RetryNotice{
+			Attempt: attempt + 1, Max: r.opts.Max, Class: class,
+			Delay: delay, Elapsed: elapsed,
+		})
+	}
 	for {
 		delivered := false
 		var terminal []StreamEvent // buffered Error/Stop/Done of this attempt
@@ -141,6 +196,7 @@ func (r *RetryingProvider) Stream(ctx context.Context, req *Request, emit func(S
 			return err
 		}
 		delay := r.delayFor(err, classOf(err), attempt)
+		notice(classOf(err), delay)
 		if serr := r.opts.Sleep(ctx, delay); serr != nil {
 			if ferr := flushTerminals(terminal, emit); ferr != nil {
 				return ferr

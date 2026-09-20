@@ -123,13 +123,23 @@ func TestResolveRoleAndFallback(t *testing.T) {
 
 func TestBuildChainReportsUnimplementedProtocol(t *testing.T) {
 	r := testResolver()
-	r.TextChain = []string{"anthropic/claude-sonnet"}
+	// A protocol this build genuinely has no adapter for (the three D8
+	// protocols all have one since ticket 11 landed).
+	r.TextChain = []string{"mockllm-alt/gemini-pro"}
+	r.Providers["mockllm-alt"] = config.Provider{
+		Protocol: "google-generativeai",
+		BaseURL:  "https://generativelanguage.googleapis.com/v1",
+		Models: map[string]config.ModelSpec{
+			"gemini-pro": {Enabled: true},
+		},
+	}
 	_, _, err := r.BuildChain(ChainBuildOptions{})
 	if err == nil {
 		t.Fatal("expected error for unimplemented protocol")
 	}
-	if classOf(err) != observe.ClassConfig || !strings.Contains(err.Error(), "ticket 11") {
-		t.Errorf("err = %v, want config class naming ticket 11", err)
+	if classOf(err) != observe.ClassConfig ||
+		!strings.Contains(err.Error(), "google-generativeai") {
+		t.Errorf("err = %v, want a config-class error naming the protocol", err)
 	}
 }
 

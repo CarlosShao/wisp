@@ -211,18 +211,22 @@ func Protocols() []string {
 }
 
 // NewProvider builds the provider for ep.Protocol. Unregistered protocols
-// yield a ClassConfig error naming the ticket that owns the adapter
-// (ticket 11 for openai-responses / anthropic) so a chain referencing a
-// not-yet-implemented protocol fails with an actionable message instead of
-// panicking.
+// yield a ClassConfig error naming the protocol and the registered ones, so a
+// chain referencing a protocol this build has no adapter for fails with an
+// actionable message instead of panicking.
 func NewProvider(ep EndpointOptions) (LlmProvider, error) {
 	regMu.RLock()
 	f, ok := registry[ep.Protocol]
+	out := make([]string, 0, len(registry))
+	for p := range registry {
+		out = append(out, p)
+	}
 	regMu.RUnlock()
+	sort.Strings(out)
 	if !ok {
 		return nil, observe.New(observe.ClassConfig, fmt.Sprintf(
-			"llm: no adapter registered for protocol %q (provider %q): openai-responses and anthropic adapters land with ticket 11",
-			ep.Protocol, ep.Provider))
+			"llm: no adapter registered for protocol %q (provider %q); registered protocols: %v (openai-chat, openai-responses and anthropic are the three D8 protocols)",
+			ep.Protocol, ep.Provider, out))
 	}
 	return f(ep)
 }

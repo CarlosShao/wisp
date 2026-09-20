@@ -41,33 +41,51 @@ type ChainRunner struct {
 	OnFailover func(FailoverEvent)
 }
 
-// Stream walks the chain.
+// Stream walks the chain. Terminal events (Error/Stop/Done) of an element that
+// is about to be failed OVER are held back: the C6 contract allows exactly one
+// terminal pair per stream, so a consumer must never see the primary's
+// Stop{error}+Done followed by the fallback's success. This mirrors what
+// RetryingProvider does per attempt (retry.go).
 func (r *ChainRunner) Stream(ctx context.Context, req *Request, emit func(StreamEvent) error) error {
 	var lastErr *observe.Error
 	for i, p := range r.Elements {
 		delivered := false
+		var terminal []StreamEvent // buffered Error/Stop/Done of THIS element
 		err := p.Stream(ctx, req, func(ev StreamEvent) error {
 			if ev.IsData() {
 				delivered = true
+				return emit(ev)
 			}
-			return emit(ev)
+			terminal = append(terminal, ev)
+			return nil
 		})
 
 		if err == nil {
-			return nil
+			return flushTerminals(terminal, emit)
 		}
+		final := i == len(r.Elements)-1
 		oe := observeErr(err)
 		if oe == nil {
 			oe = observe.Wrap(observe.ClassInternal, err, "chain element returned unclassified error")
 		}
 
 		// Consumer stopped listening or the user cancelled: stop everything.
+		// The element's own terminal pair is the true ending of this stream,
+		// so it is flushed before returning.
 		if ctx.Err() != nil || oe.Class == observe.ClassCancelled {
+			if ferr := flushTerminals(terminal, emit); ferr != nil {
+				return ferr
+			}
 			return err
 		}
 
 		lastErr = oe
-		if i == len(r.Elements)-1 {
+		if final {
+			// Nothing left to try: this element's terminal triple IS the
+			// stream's ending.
+			if ferr := flushTerminals(terminal, emit); ferr != nil {
+				return ferr
+			}
 			break // nothing left to try
 		}
 
@@ -76,6 +94,11 @@ func (r *ChainRunner) Stream(ctx context.Context, req *Request, emit func(Stream
 		// The partial turn stays (marked incomplete via its terminal Error /
 		// Stop{error} events) and no failover happens.
 		if delivered {
+			// A half-delivered turn ends the stream here; its terminals are
+			// the only valid ending.
+			if ferr := flushTerminals(terminal, emit); ferr != nil {
+				return ferr
+			}
 			return err
 		}
 

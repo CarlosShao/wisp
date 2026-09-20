@@ -250,6 +250,10 @@ type ChainBuildOptions struct {
 	HTTPClient func(ep Endpoint) *http.Client
 	// RetryBase overrides the backoff base (tests); 0 = default 1s.
 	RetryBase time.Duration
+	// RetryMax overrides the retry ceiling per element (tests); 0 = D37
+	// default of 3. It is what makes "fail_next(3) exhausts the primary"
+	// testable without a 2-second ladder per element.
+	RetryMax int
 }
 
 // BuildEndpointProvider constructs the provider stack for one endpoint:
@@ -268,7 +272,7 @@ func BuildEndpointProvider(ep Endpoint, opts ChainBuildOptions) (LlmProvider, er
 	if err != nil {
 		return nil, err
 	}
-	retry := NewRetrying(inner, RetryOptions{Base: opts.RetryBase})
+	retry := NewRetrying(inner, RetryOptions{Base: opts.RetryBase, Max: opts.RetryMax})
 	return NewLimiterProvider(retry, NewBucketLimiter(RateLimits{RPM: ep.RPM, TPM: ep.TPM})), nil
 }
 
