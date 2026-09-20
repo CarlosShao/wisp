@@ -36,9 +36,15 @@ import (
 // tool name yet (tickets 22/26 name them), so they call
 // CheckText(scope, ChTTS|ChHTTP, text) directly; and any call whose tool is
 // NOT in the channel table fail-closes to a conservative scan of every string
-// parameter. In both cases write payloads (content/data) are excepted: they
-// are only scanned when the call's path lands in a sync dir, which is the
-// spec's own rule for fs.write, not an invention.
+// parameter.
+//
+// The ONE landing-site conditional channel is ⑤ (fs.write into a sync dir);
+// channel ⑥ (HTTP POST body/URL) has no landing condition. Because a call
+// without a frozen tool name carries no authority in its key names, the write
+// gate is therefore decided by the SHAPE of the call (see writeGate), never by
+// what the caller named its payload — the previous "skip the keys called
+// content/data" rule let `{url, path, data}` through while `{url, path, body}`
+// was caught (adversarial re-verification M-7).
 //
 // Wiring to the assessor: the frozen C19 seam is TaintDetector.TaintHit(params)
 // — it carries no tool name — so callers bind it per scope:
@@ -121,13 +127,34 @@ var channelTable = map[string]struct {
 	"fs.write":        {ChSyncWrite, nil}, // special: content only when path is a sync dir
 }
 
-// writeChannelKeys are payload parameters scanned ONLY when the call's path
-// resolves into a sync dir (fs.write to a normal dir stays a plain L1 write;
-// SPEC-06 §5 makes only the sync-dir landing an exfil channel).
+// writeChannelKeys are the payload parameters of the FROZEN fs.write contract,
+// scanned ONLY when the call's path resolves into a sync dir (fs.write to a
+// normal dir stays a plain L1 write; SPEC-06 §5 makes only the sync-dir
+// landing an exfil channel). They are consulted for the named fs.write channel
+// only — the contract gives those two names a meaning; for a call without a
+// frozen name no key name grants an exemption (M-7), the exemption is decided
+// by writeGate from the shape of the call.
 var writeChannelKeys = map[string]bool{"content": true, "data": true}
 
 // pathKeys are the parameters naming the write target for the sync-dir test.
 var pathKeys = []string{"path", "file", "filepath", "dest", "destination"}
+
+// remoteSinkKeys name a parameter that addresses a REMOTE destination (channel
+// ⑥'s own wording: HTTP POST body/URL). A call carrying one is never exempted
+// from the payload scan, whichever key the body arrived in.
+var remoteSinkKeys = map[string]bool{
+	"url": true, "uri": true, "href": true, "link": true, "endpoint": true,
+	"webhook": true, "callback": true, "redirect": true, "to": true, "recipient": true,
+}
+
+// remoteSinkSuffixes catch the *_url / *_endpoint spellings of the same thing.
+var remoteSinkSuffixes = []string{"url", "uri", "endpoint", "webhook", "href"}
+
+// remoteSinkSchemes identify a remote sink by VALUE, so renaming the key cannot
+// close the gate either: a parameter whose text is an address means content in
+// the same call can leave the machine.
+var remoteSinkSchemes = []string{"http://", "https://", "ftp://", "ftps://", "sftp://",
+	"ws://", "wss://", "s3://", "webdav://", "dav://", "file://", "mailto:"}
 
 // contract defaults for the scanning budgets (overridable via ProvOptions;
 // zero/negative means "use the default", never "scan nothing").
@@ -430,10 +457,11 @@ func (p *Provenance) scopeMarks(scopeID string) ([]*taintMark, bool) {
 //
 // The channel table only LABELS parameters (adversarial report B-2): every
 // remaining parameter value — unknown key names, nested objects, arrays, byte
-// payloads — is additionally scanned under ChUnknown, so renaming `query` to
-// `q` or wrapping the payload cannot narrow the scan. Write payloads stay
-// gated on the sync-dir test (SPEC-06 §5), which is the only place the
-// contract makes landing site (not content shape) decide the channel.
+// payloads — is additionally scanned, so renaming `query` to `q` or wrapping
+// the payload cannot narrow the scan. The one exception is the sync-dir gate
+// (SPEC-06 §5 channel ⑤, the only landing-site conditional channel), which
+// writeGate derives from the shape of the call: no payload key name can open or
+// close it (adversarial re-verification M-7).
 func (p *Provenance) Inspect(scopeID, tool string, params map[string]any) (Hit, bool) {
 	marks, unbound := p.scopeMarks(scopeID)
 	if unbound {
@@ -459,29 +487,29 @@ func (p *Provenance) Inspect(scopeID, tool string, params map[string]any) (Hit, 
 		}
 	}
 
+	// The single conditional channel of SPEC-06 §5 (⑤ fs.write INTO A SYNC DIR)
+	// is decided here, from the shape of the call — never from the name the
+	// caller gave its payload (adversarial re-verification M-7).
+	gateOpen, gateCh := p.writeGate(tool, params)
 	if def, ok := channelTable[tool]; ok && def.ch == ChSyncWrite {
-		// fs.write: content/data are exfil candidates only when the target
-		// lands in a sync dir; a missing/unverifiable target fail-closes to
-		// the scan side. Path and every other parameter are scanned anyway
-		// (ChUnknown) — a taint can ride a file name or an extra field.
-		path, hasPath := firstStringParam(params, pathKeys)
-		syncGateOpen := !hasPath || p.IsSyncPath(path).Sync
+		// Named fs.write: the D34 contract gives `content`/`data` the meaning
+		// "the bytes going into the file", so those two keys are what the
+		// sync-dir rule exempts. Every other key has no defined meaning in
+		// fs.write and is scanned anyway — a taint can ride a file name or an
+		// extra field (adversarial report B-2). That asymmetry is fail-CLOSED
+		// by key name and never fail-open; it is recorded as N-8 in
+		// docs/PRECHECK.md §P12.
 		for _, k := range sortedKeys(params) {
-			if !syncGateOpen && writeChannelKeys[k] {
-				continue // non-sync body is not an exfil channel (SPEC-06 §5)
+			if !gateOpen && writeChannelKeys[k] {
+				continue // confirmed plain local write: the body is no channel
 			}
 			ch := ChUnknown
 			if writeChannelKeys[k] {
-				ch = ChSyncWrite
+				ch = gateCh
 			}
 			appendCands(k, ch)
 		}
 	} else {
-		// Write-shaped calls under any other (or no) tool name keep the same
-		// payload gate: a path param that resolves outside every sync root
-		// means the body is not an exfil channel yet.
-		path, hasPath := firstStringParam(params, pathKeys)
-		syncGateOpen := !hasPath || p.IsSyncPath(path).Sync // no path = unverifiable = fail-closed open
 		labelled := map[string]bool{}
 		if ok {
 			for _, k := range p.channel[tool] {
@@ -493,10 +521,21 @@ func (p *Provenance) Inspect(scopeID, tool string, params map[string]any) (Hit, 
 			}
 		}
 		for _, k := range sortedKeys(params) {
-			if labelled[k] || (!syncGateOpen && writeChannelKeys[k]) {
+			if labelled[k] {
 				continue
 			}
-			appendCands(k, ChUnknown)
+			if !gateOpen && !isPathKey(k) {
+				// No frozen name, and the shape of the call is a plain local
+				// write: nothing in it can carry content off the machine, so
+				// the payload is exempt WHICHEVER key carries it (M-7). The
+				// write target itself is still scanned.
+				continue
+			}
+			ch := ChUnknown
+			if gateOpen && !isPathKey(k) {
+				ch = gateCh
+			}
+			appendCands(k, ch)
 		}
 	}
 	for _, c := range cands {
@@ -565,6 +604,137 @@ func (d boundDetector) TaintHit(params map[string]any) (string, bool) {
 		return "", false
 	}
 	return h.Source(), true
+}
+
+// --- the write / sync gate (SPEC-06 §5 channel ⑤) ----------------------------
+
+// writeGate decides whether payload parameters must be scanned at all, and
+// under which channel label the scan result is reported.
+//
+// SPEC-06 §5 makes exactly ONE of the six exfil channels conditional on a
+// landing site: ⑤ fs.write INTO A SYNC DIR. Channel ⑥ (HTTP POST body/URL)
+// has no landing condition, so an exemption must never be able to travel with
+// a parameter name: the previous rule ("skip the keys called content/data
+// whenever the call has a path outside a sync dir") let
+// `{url, path:<non-sync>, data:<tainted>}` through while the same call with
+// `body` was caught (adversarial re-verification M-7 — a key-name-selected
+// fail-open).
+//
+// The gate therefore closes (payload exempt) ONLY for a call that is a plain
+// local write and nothing else:
+//
+//   - the tool is not a named channel with its own sink (web.search/notify/
+//     clipboard.write: a `path` key there is just another parameter);
+//   - a write target is present and CONFIRMED to sit outside every sync root —
+//     a missing, unresolvable or reparse-traversing target keeps the gate open
+//     (missing information produces a DENY, not a pass);
+//   - nothing in the call addresses a remote destination, neither by key name
+//     nor by a URL-shaped value, and the nesting budget did not cut that check
+//     short (unproven = open).
+//
+// Which key carries the payload is not an input to that decision, so the
+// exemption cannot be dodged — nor claimed — by naming.
+func (p *Provenance) writeGate(tool string, params map[string]any) (open bool, ch Channel) {
+	def, named := channelTable[tool]
+	if named && def.ch != ChSyncWrite {
+		return true, ChUnknown // named non-write channel: no local-write exemption
+	}
+	path, hasPath := firstStringParam(params, pathKeys)
+	if !hasPath {
+		if named {
+			// fs.write whose target cannot be verified is the shape the gate
+			// exists to protect: fail closed toward scanning.
+			return true, ChSyncWrite
+		}
+		return true, ChUnknown // nothing write-shaped: the generic scan
+	}
+	remote, cut := hasRemoteSink(params, p.maxDepth)
+	st := p.IsSyncPath(path)
+	switch {
+	case st.Sync:
+		return true, ChSyncWrite
+	case remote || cut:
+		return true, ChHTTP // a sink in the same call: the payload can leave
+	}
+	return false, ChSyncWrite // confirmed plain local write: not an exfil channel
+}
+
+// isPathKey reports whether a parameter names the write target.
+func isPathKey(k string) bool {
+	lk := strings.ToLower(strings.TrimSpace(k))
+	for _, pk := range pathKeys {
+		if lk == pk {
+			return true
+		}
+	}
+	return false
+}
+
+// hasRemoteSink reports whether one of the call's parameters addresses a remote
+// destination, by key name or by an URL-shaped value. The second result is the
+// nesting budget cutting the value check short, which the caller must treat as
+// "a sink may be hidden below the budget".
+func hasRemoteSink(params map[string]any, maxDepth int) (present, truncated bool) {
+	for _, k := range sortedKeys(params) {
+		if !isRemoteSinkKey(k) {
+			continue
+		}
+		ss, cut := collectStrings(params[k], maxDepth)
+		truncated = truncated || cut
+		for _, s := range ss {
+			if strings.TrimSpace(s) != "" {
+				present = true
+			}
+		}
+	}
+	if present {
+		return true, truncated
+	}
+	ss, cut := collectStrings(params, maxDepth)
+	truncated = truncated || cut
+	for _, s := range ss {
+		if looksRemoteSink(s) {
+			return true, truncated
+		}
+	}
+	return false, truncated
+}
+
+// isRemoteSinkKey matches the remote-sink key names (case/edge insensitive,
+// plus the *_url / *_endpoint spellings).
+func isRemoteSinkKey(k string) bool {
+	lk := strings.ToLower(strings.TrimSpace(k))
+	if remoteSinkKeys[lk] {
+		return true
+	}
+	for _, suf := range remoteSinkSuffixes {
+		if len(lk) > len(suf) && strings.HasSuffix(lk, suf) {
+			return true
+		}
+	}
+	return false
+}
+
+// looksRemoteSink reports whether a VALUE is itself the address of a sink, so
+// renaming the key cannot close the gate either. Only an address-shaped value
+// counts: a document body that merely quotes a link is not a sink (otherwise
+// every plain local write of a markdown file with URLs in it would be scanned,
+// which is the false-positive side this gate must not create).
+func looksRemoteSink(s string) bool {
+	t := strings.TrimSpace(s)
+	if t == "" || strings.ContainsAny(t, " \t\r\n") {
+		return false // not a single token -> a body, not an address
+	}
+	lower := strings.ToLower(t)
+	if len(lower) > 128 {
+		lower = lower[:128] // a scheme always sits at the head
+	}
+	for _, pre := range remoteSinkSchemes {
+		if strings.HasPrefix(lower, pre) {
+			return true
+		}
+	}
+	return false
 }
 
 // --- param walking -----------------------------------------------------------

@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -318,6 +319,59 @@ func TestSyncUnresolvablePathFailClosed(t *testing.T) {
 	// Empty/absent path spelling: unverifiable -> sync (strict side).
 	if !p.IsSyncPath("").Sync {
 		t.Fatal("empty path must fail-closed as sync")
+	}
+}
+
+// TestSyncDotDotTailFailsClosed is the N-10 hardening from the re-verification
+// (R2/R5): `link\..\x` is folded by lexical cleaning BEFORE reparseComponents
+// audits the chain, so the junction that stood where `link\..` used to be is
+// invisible to the classifier. That was only safe because Windows folds `.`
+// and `..` the same way before it opens the file — an OS property, not an
+// invariant of this code. It is now one: a spelling carrying a folded `..`
+// fails closed as sync-suspect instead of being classified from a string that
+// no longer describes the write.
+func TestSyncDotDotTailFailsClosed(t *testing.T) {
+	base := t.TempDir()
+	home := filepath.Join(base, "profile")
+	root := filepath.Join(home, "OneDrive")
+	work := filepath.Join(home, "work")
+	for _, d := range []string{root, work, filepath.Join(root, "Notes")} {
+		if err := os.MkdirAll(d, 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	p := NewProvenance(ProvOptions{NoProbe: true, HomeDir: home, SyncRoots: []SyncRoot{
+		{Provider: "OneDrive", Path: root, Source: "registry"}}})
+	if !p.SyncDetectionComplete() {
+		t.Fatal("precondition: registry-grade root confirmed, so only root membership may decide")
+	}
+	sep := string(filepath.Separator)
+	folded := filepath.Join(work, "x.md") // what the raw spelling below cleans to
+	raw := strings.Join([]string{root, "Notes", "..", "..", "work", "x.md"}, sep)
+	if filepath.Clean(raw) != folded {
+		t.Fatalf("test premise broken: %q does not clean to %q", raw, folded)
+	}
+	if st := p.IsSyncPath(folded); st.Sync {
+		t.Fatalf("precondition broken: the folded target must be a plain non-sync write: %+v", st)
+	}
+	st := p.IsSyncPath(raw)
+	if !st.Sync {
+		t.Fatalf("ESCAPIABLE (N-10): a spelling with a folded `..` was classified anyway: %+v", st)
+	}
+	if !strings.Contains(st.Why, "..") {
+		t.Errorf("Why must name the '..' hardening, got %q", st.Why)
+	}
+	// The exfil gate follows the verdict, and the plain spelling is unaffected
+	// (this is the false-positive side: a normal new-file write stays clean).
+	p.OpenScope("task-1")
+	if !p.Mark("task-1", SrcFSRead, filepath.Join(home, "secret.txt"), marker) {
+		t.Fatal("mark rejected")
+	}
+	if _, ok := p.Inspect("task-1", "fs.write", map[string]any{"path": raw, "content": marker}); !ok {
+		t.Error("ESCAPIABLE (N-10): fs.write through a folded `..` escaped the sync gate")
+	}
+	if _, ok := p.Inspect("task-1", "fs.write", map[string]any{"path": folded, "content": marker}); ok {
+		t.Error("false positive: plain new-file write flagged after the N-10 hardening")
 	}
 }
 

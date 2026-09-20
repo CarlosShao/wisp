@@ -38,7 +38,9 @@ import (
 // yet (where C26's handle query cannot run), an unresolved candidate is
 // re-anchored on its nearest existing ancestor and only then compared;
 // something the OS still cannot verify fail-closes to "sync-suspect"
-// (unverifiable = stricter side).
+// (unverifiable = stricter side). A spelling that carries a `..` component is
+// never classified at all — cleaning erases the segments the reparse audit
+// depends on, so it fails closed the same way (N-10).
 
 // SyncRoot names one detected sync location and how it was found.
 type SyncRoot struct {
@@ -210,15 +212,36 @@ func (s *syncSet) resolveTarget(raw string) (string, error) {
 		// Platforms without handle-based resolution (see the DEFERRED marker
 		// in pathresolver_other.go): the lexical form is all C26 can offer
 		// there; the ancestor chain at least is known to exist.
+		//
+		// NOTE(adversarial re-verification N-9): on POSIX this branch is
+		// currently UNREACHABLE — deepestExistingAncestor Lstats `\`-joined
+		// components, which never exist there, so the walk returns anc=="" and
+		// the caller lands in errTargetUnverified: every write is judged
+		// sync-suspect (the strict side, not a hole, but it would flag every
+		// plain local write once the engine is wired on macOS). Closing that —
+		// native separators on the walk, plus a real CloudStorage probe — is
+		// ticket 55's AC line, not this file's; compiling for darwin does NOT
+		// mean this path behaves.
 	}
 	return normPath(ares.Canonical + `\` + strings.Join(rest, `\`)), nil
 }
 
 // deepestExistingAncestor splits an absolute, lexically cleaned path into the
 // longest prefix whose components all exist on disk and the remaining (not yet
-// existing) components. Symlinks/junctions count as existing so the caller's
-// Resolve still sees them and denies the traversal; a plain file stops the
-// walk because nothing can live under it.
+// existing) components. A plain file stops the walk because nothing can live
+// under it.
+//
+// Symlinks/junctions are stepped over, and NOT for the reason one might
+// guess (adversarial re-verification N-9): every prefix here is Lstat-ed with a
+// trailing separator, and an Lstat with a trailing `\` follows a mount point,
+// so a junction stats as its TARGET directory rather than as a reparse point
+// (Go's Lstat on the same junction without the separator reports
+// isdir=false/symlink=false plus the reparse attribute bit). This walk
+// therefore never detects a reparse point at all; detection is the caller's
+// `Resolve(raw)` over the whole cleaned chain, which runs first and denies a
+// non-exempted traversal before this function is ever reached. For an
+// explicitly EXEMPTED junction stepping through is exactly what is wanted:
+// Resolve(anc) then normalizes through the mount point onto the real root.
 func deepestExistingAncestor(canon string) (string, []string) {
 	root, comps := splitPathComponents(canon)
 	if root == "" || len(comps) == 0 {
@@ -243,6 +266,21 @@ func deepestExistingAncestor(canon string) (string, []string) {
 		return "", nil // full path exists yet was not handle-resolvable
 	}
 	return strings.TrimSuffix(base, `\`), comps[n:]
+}
+
+// hasFoldedDotDot reports whether the raw spelling carries a `..` component,
+// i.e. a segment that lexical cleaning (C26's lexCanonical, and Windows' own
+// pre-parse normalization) folds away together with whatever stood before it.
+// Such a spelling cannot be classified from its cleaned form, so the caller
+// fails closed on it (adversarial re-verification N-10); ordinary fs.write
+// targets contain no `..`, so the false-positive surface is ~zero.
+func hasFoldedDotDot(raw string) bool {
+	for _, c := range strings.Split(strings.ReplaceAll(raw, "/", `\`), `\`) {
+		if c == ".." {
+			return true
+		}
+	}
+	return false
 }
 
 // splitPathComponents separates the volume/UNC root of an absolute path
@@ -313,6 +351,17 @@ func (s *syncSet) match(rawPath string) SyncStatus {
 		return SyncStatus{Sync: true,
 			Root: SyncRoot{Provider: "sync-suspect", Source: "suspect-fallback"},
 			Why:  "empty/unparseable write target; fail-closed as sync-suspect"}
+	}
+	if hasFoldedDotDot(rawPath) {
+		// N-10 hardening (adversarial re-verification R2/R5): a `..` component
+		// is removed by lexical cleaning BEFORE anything is audited, so the
+		// string the reparse-point check sees is not the string that was
+		// classified. The landing probes showed Windows folds `.`/`..` the same
+		// way before it opens the file, so this is safe *today* — but that is
+		// OS semantics, not a check in here, so make it an invariant instead.
+		return SyncStatus{Sync: true,
+			Root: SyncRoot{Provider: "sync-suspect", Source: "suspect-fallback"},
+			Why:  "write target folds a '..' component: cleaning erases the segments the reparse check audits; fail-closed as sync-suspect (N-10)"}
 	}
 	s.mu.RLock()
 	defer s.mu.RUnlock()
