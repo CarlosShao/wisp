@@ -264,3 +264,129 @@ MAJOR-1 修复经代码审计 + 独立活体变异验证双重确认；MINOR×4 
 （条 2 证据链经三轴比较器 + 活体验证补全）。
 
 **VERDICT: PASS**
+
+## 更正（A30，2026-09-20，编排者授权）
+
+本节**只追加**：上文 §2 与 R4/MINOR-3 的原文一字未删，勾框与票面 Status 未动。
+更正对象是**一处测试名引用**——它今天在树里已无定义，属"引用已失效"，不是"断言被证伪"。
+
+### ① 被更正的原句（原文照抄，两处同名）
+
+本文件第 42 行（§2 C6 契约对账，"ctx 取消 → `Stop{cancelled}` 无 Error"条）：
+
+> `TestGoldenCancellationMidStream`（adapter_test.go:389-427）独立复跑通过：首个 TextDelta 后
+> cancel → 事件流含 Stop{cancelled}、末事件 done、Stream 返回 nil、流未跑完（<32 事件）。
+
+本文件第 254 行（R4 的 MINOR-3）：
+
+> - **MINOR-3**：TestGoldenCancellationMidStream 现显式断言流中**零 EvError**（sawError 分支）。
+>   复跑 PASS。
+
+### ② 复现命令与真实输出
+
+**(a) 证明该名字在树里已无定义**（两条独立口径，都是"零命中"）：
+
+```
+$ grep -rn "TestGoldenCancellationMidStream" --include=*.go . ; echo EXIT=$?
+EXIT=1
+$ git grep -n "TestGoldenCancellationMidStream" HEAD -- '*.go' ; echo EXIT=$?
+EXIT=1
+```
+
+**(b) 它是什么时候消失的**（`git log -S`，两次命中=一次加入一次删除）：
+
+```
+$ git log --oneline -S "TestGoldenCancellationMidStream" -- internal/llm/openaichat/
+5ddedf7 feat(llm): add anthropic + openai-responses adapters on one shared golden harness (ticket 11 AC#1, AC#3)
+3b7bf24 feat(llm): golden-driven adapter tests, mockllm integration (...)
+```
+
+`5ddedf7`（2026-09-20 13:53:02 +0800）把 `adapter_test.go` 减了 274 行——协议中性的 golden 断言
+**整族搬进** `internal/llm/adaptertest` 的共享表，openai-chat 改为其中一条腿。
+`3b7bf24` 里该函数**正好**起于 389 止于 427（`git show 3b7bf24:internal/llm/openaichat/adapter_test.go |
+grep -n "func TestGoldenCancellationMidStream"` → 389；闭合 `}` → 427），
+所以 **`adapter_test.go:389-427` 在写下时是准确的，是树移动了、报告没跟上**。
+今天那份文件只有 **291 行**（`wc -l internal/llm/openaichat/adapter_test.go`）⇒ 被引用的行区间现在
+落在文件末尾**之外**，任何人照它去看会看到空处。
+
+**(c) 引用已失效 ⇒ 现名 `TestSharedGoldenSuite/cancel`**（真跑到，非按名字推断）：
+
+```
+$ go test ./internal/llm/openaichat/ -run 'TestSharedGoldenSuite/cancel' -count=1 -v
+=== RUN   TestSharedGoldenSuite
+=== RUN   TestSharedGoldenSuite/cancel
+--- PASS: TestSharedGoldenSuite (1.38s)
+    --- PASS: TestSharedGoldenSuite/cancel (1.38s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/llm/openaichat	1.414s
+EXIT=0
+```
+
+**阳性对照**（本仓库今天刚写进规则的坑：`go test -run <不匹配>` 也打 `ok`，所以"ok"本身不是凭据）。
+同一条命令换个不存在的子测试名：
+
+```
+$ go test ./internal/llm/openaichat/ -run 'TestSharedGoldenSuite/no-such-subtest-xyz' -count=1 -v
+=== RUN   TestSharedGoldenSuite
+--- PASS: TestSharedGoldenSuite (0.00s)
+testing: warning: no tests to run
+PASS
+ok  	github.com/CarlosShao/wisp/internal/llm/openaichat	0.034s [no tests to run]
+EXIT=0
+```
+
+⇒ 分辨"真跑了"与"没匹配上"的唯一凭据是**嵌套那行 `--- PASS: TestSharedGoldenSuite/cancel (1.38s)`**
+（1.38s 对 0.00s、`no tests to run` 有与无），上面 (c) 有它。
+
+**(d) 三个协议腿都跑同一张表**（今天实测，全 ok、EXIT=0）：
+
+```
+$ go test ./internal/llm/anthropic/ ./internal/llm/openairesponses/ ./internal/llm/openaichat/ -run 'TestSharedGoldenSuite/cancel' -count=1
+ok  	github.com/CarlosShao/wisp/internal/llm/anthropic        1.419s
+ok  	github.com/CarlosShao/wisp/internal/llm/openairesponses  1.422s
+ok  	github.com/CarlosShao/wisp/internal/llm/openaichat       1.423s
+EXIT=0
+```
+
+**测量条件**：以上跑于 2026-09-20T15:54Z，工作树含另一代理在途的 67 个 gofumpt 未提交 `.go` 改动；
+本更正未执行任何格式化、未 stage 任何 `.go`；无意外失败。
+
+### ③ 重新判定：等价物**存在**，且是逐字搬迁后加强，不是消失
+
+现名与位置：
+
+| 项 | 现值 |
+|---|---|
+| 测试名（openai-chat 腿） | `TestSharedGoldenSuite/cancel` |
+| 入口 | `internal/llm/openaichat/harness_golden_test.go:61` → `adaptertest.RunAll(t, unit())` |
+| 断言体 | `internal/llm/adaptertest/harness.go:579-623`（`runCancel`，由 `Run` 的 `ModeCancel` 分派，`:473`） |
+| 用例行 | `internal/llm/adaptertest/harness.go:269-271`（`ID: ScCancel, Mode: ModeCancel`，"cancellation is a clean end: Stop{cancelled}, no Error event"） |
+| 其余两腿 | `internal/llm/anthropic/suite_test.go:36`、`internal/llm/openairesponses/suite_test.go:36` |
+
+原句四项断言逐条对上（**语义 1:1，无放宽**）：
+
+| 第 42 行原句主张 | `runCancel` 里的对应 |
+|---|---|
+| Stream 返回 nil | `harness.go:601` `t.Fatalf("cancellation is a clean end, got: %v", err)` |
+| 末事件 done | `:604` `last event = %s, want done` |
+| 事件流含 `Stop{cancelled}` | `:616` `no Stop{cancelled} in %d events` |
+| 流未跑完（<32 事件） | `:622` `stream ran to completion despite cancellation (%d events)` |
+
+fixture 也同源：原来 `serveGolden(t, "long-text", true)`（40ms/块，paced），现在
+`Serve(t, u, c.ID, true)`（`harness.go:581`，paced）+ `fixtureFor(ScCancel) = "long-text"`
+（`harness_golden_test.go:53-54`，注释自证是"canonical ticket-09 name"）。
+**第 254 行 MINOR-3 的"零 EvError"断言同样在**：`harness.go:611-612` 置 `sawError`、`:619` 报
+`cancellation stream contains an Error event`。
+
+⇒ 判定：**第 42 行与第 254 行主张的事实成立且今天仍可复现**，失效的只是**引用本身**（名字与行号）。
+以后引用请写现名 `TestSharedGoldenSuite/cancel` + `internal/llm/adaptertest/harness.go:579-623`，
+不要再写 `TestGoldenCancellationMidStream` / `adapter_test.go:389-427`。
+覆盖面比原来**更大**（同一条断言现在对三个协议腿各跑一遍），这一点是对票 09 结论的加强、不是削弱。
+
+### 同族漂移（只登记，本节不裁决）
+
+本文件 §8 条 1 那句「adapter_test.go **TestGolden\*** 全经 golden 回放器真实 HTTP」如今只覆盖
+残留在 `adapter_test.go` 的 3 个 chat 专属用例（`TestGoldenNoDoneSentinel:116`、
+`TestGoldenMalformedToolIndexStrictVsLoose:150`、`TestGoldenFixturesExist:278`）；它列举的
+tool-call 组装 / max_tokens / mid-stream disconnect / cancellation / 429 梯**五条都已搬进共享表**。
+这条与上面同因（`5ddedf7` 搬迁），但改的是"家族名"而非单个断言，故仅登记。
