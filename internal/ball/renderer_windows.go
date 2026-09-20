@@ -542,11 +542,16 @@ func (r *renderer) drawGlass(v Visual, c d2d1Point2F, R, s float32) {
 	// and the summon burst widens it (flow).
 	shrink := 1 - 0.12*v.LiquidLevel
 	flow := 1 + 0.10*v.SummonFlow
+	// The edge dock squeezes the whole body along the dock axis; DockSquash is
+	// the same law DockPos places the window with, so the tab that hugs the
+	// screen edge is exactly as wide as the strip left on screen for it.
 	dockX, dockY := float32(1), float32(1)
-	if v.Dock == EdgeLeft || v.Dock == EdgeRight {
-		dockX = 1 - 0.45*v.DockProgress
-	} else if v.Dock != EdgeNone {
-		dockY = 1 - 0.45*v.DockProgress
+	switch v.Dock {
+	case EdgeLeft, EdgeRight:
+		dockX = DockSquash(v.DockProgress)
+	case EdgeTop, EdgeBottom:
+		dockY = DockSquash(v.DockProgress)
+	case EdgeNone:
 	}
 	for bi := 0; bi < 3; bi++ {
 		lay := &r.liq[bi]

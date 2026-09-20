@@ -355,6 +355,10 @@ const (
 	SummonFlowMs    = 900  // one-shot liquid flow burst on summon
 	DockAnimMs      = 160  // edge-dock squash / pop-back
 	DockOverlapFrac = 0.42 // fraction of the orb left visible when docked
+	// DockTriggerPx is how close the orb must get to a work-area edge (px at
+	// 96 DPI, scaled per monitor) before it starts squeezing: the squash is
+	// read off the gap, so no timer is needed to animate it.
+	DockTriggerPx = 16
 )
 
 // Geometry + motion tokens (CSS lengths/ms verbatim; px at 96 DPI, scaled by

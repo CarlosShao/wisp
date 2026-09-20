@@ -71,6 +71,27 @@ func monitorFromWindow(hwnd windows.HWND) string {
 	return ""
 }
 
+// monitorRectsForWindow returns the monitor (screen + WORK area, physical px)
+// the window is on, for the edge-dock geometry. The work area is what the dock
+// measures against, so a tab never ends up under the taskbar (D42#3).
+func monitorRectsForWindow(hwnd windows.HWND) (MonitorRect, bool) {
+	h, _, _ := pMonitorFromWindow.Call(uintptr(hwnd), monitorDefaultToNearest)
+	if h == 0 {
+		return MonitorRect{}, false
+	}
+	var mi monitorInfoExW
+	mi.size = uint32(unsafe.Sizeof(mi))
+	if r, _, _ := pGetMonitorInfoW.Call(h, uintptr(unsafe.Pointer(&mi))); r == 0 {
+		return MonitorRect{}, false
+	}
+	return MonitorRect{
+		Device:  windows.UTF16ToString(mi.device[:]),
+		Primary: mi.flags&1 != 0,
+		Screen:  Rect{int(mi.rcMonitor.l), int(mi.rcMonitor.t), int(mi.rcMonitor.r), int(mi.rcMonitor.b)},
+		Work:    Rect{int(mi.rcWork.l), int(mi.rcWork.t), int(mi.rcWork.r), int(mi.rcWork.b)},
+	}, true
+}
+
 // moveWindow places the window at (x, y) sized (w, h) without activation.
 func moveWindow(hwnd uintptr, x, y, w, h int32) {
 	pSetWindowPos.Call(uintptr(hwnd), 0, // HWND_TOP (keep topmost via SWP_NOZORDER? we WANT topmost retained)

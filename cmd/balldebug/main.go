@@ -85,6 +85,9 @@ func main() {
 	diffDwell := flag.Duration("diff-dwell", 6*time.Second, "time the ball stays in state before each shot")
 	level := flag.Float64("level", 0, "synthetic audio envelope 0..1 pushed to the ball at ~30fps (0 = feed nothing)")
 	diffLevel := flag.Float64("diff-level", 0, "with -diff: the -level handed to each child")
+	dock := flag.String("dock", "", "dock the ball to this edge the way a drag ending there would: "+
+		"left|right|top|bottom (no timer: the dock is carried by mouse messages)")
+	diffDock := flag.String("diff-dock", "", "with -diff: also shoot every state docked to this edge, as an extra row")
 	flag.Parse()
 
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo})))
@@ -96,6 +99,24 @@ func main() {
 		if !ball.SetLook(*look) {
 			fmt.Fprintf(os.Stderr, "balldebug: unknown -look %q (choose one of %s)\n",
 				*look, strings.Join(ball.LookNames(), ", "))
+			os.Exit(2)
+		}
+	}
+
+	// The edge-dock flag is validated up front so a typo cannot silently leave
+	// the ball floating in the middle of the screen while evidence is taken.
+	var dockEdge ball.Edge
+	if *dock != "" {
+		e, ok := ball.EdgeByName(*dock)
+		if !ok {
+			fmt.Fprintf(os.Stderr, "balldebug: unknown -dock %q (left|right|top|bottom|none)\n", *dock)
+			os.Exit(2)
+		}
+		dockEdge = e
+	}
+	if *diffDock != "" {
+		if _, ok := ball.EdgeByName(*diffDock); !ok {
+			fmt.Fprintf(os.Stderr, "balldebug: unknown -diff-dock %q (left|right|top|bottom)\n", *diffDock)
 			os.Exit(2)
 		}
 	}
@@ -116,6 +137,7 @@ func main() {
 			look:    *look,
 			frozen:  *frozen,
 			level:   *diffLevel,
+			dock:    *diffDock,
 		})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "balldebug: %v\n", err)
@@ -165,6 +187,18 @@ func main() {
 	}
 	if *posX >= 0 && *posY >= 0 {
 		debugMoveWindow(b.DebugHWND(), int32(*posX), int32(*posY))
+	}
+	// -dock docks through the very same commit path a drag ending at that edge
+	// runs, so the evidence shows the shipped behaviour and not a mock. It
+	// starts no timer, which is what the timers column of a docked row proves.
+	if *dock != "" {
+		if !b.DebugDock(dockEdge) {
+			fmt.Fprintf(os.Stderr, "balldebug: -dock %s did not dock the ball\n", *dock)
+			b.Close()
+			os.Exit(1)
+		}
+		_, p, owns := b.Docked()
+		fmt.Printf("balldebug: dock=%s owns=%v progress=%.2f handles=%d\n", *dock, owns, p, handleCount())
 	}
 	fmt.Printf("balldebug: ball up handles=%d\n", handleCount())
 

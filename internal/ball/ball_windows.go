@@ -112,6 +112,13 @@ type Ball struct {
 	lastMotion        time.Time
 	liquidTimerActive bool
 
+	// Edge dock (ticket 62 item 2). UI-thread-only, like liq, and deliberately
+	// WITHOUT a timer of its own: lastDock is the monotonic anchor of its frame
+	// budget (dockFrameDt), and every step arrives on a mouse message or a
+	// window-position event. See dock.go/dock_windows.go.
+	dock     dockMotion
+	lastDock time.Time
+
 	registeredHotkeys map[uint32]Accelerator
 	escTakenOver      bool
 	cancelBinding     string // configured cancel binding, for B1 release
@@ -234,6 +241,10 @@ func (b *Ball) createOnSTA(s *staThread) error {
 
 	// Initial state render (no animation timers in static states).
 	b.applyStateLocked(b.opts.Initial)
+	// A position restored at a work-area edge comes back as the tab the user
+	// left it in: the same evaluation a drag ending there runs, and it starts
+	// no timer (ticket 62 item 2).
+	b.dockCommit()
 	return nil
 }
 
@@ -542,6 +553,8 @@ func (b *Ball) wndProc(hwnd, m, wParam, lParam uintptr) uintptr {
 		b.dragMoved = false
 		b.dragStart = point{loSigned(lParam), hiSigned(lParam)}
 		b.mu.Unlock()
+		b.dock.supped = false // a new drag re-arms the edge dock
+		b.lastDock = time.Now()
 		pSetCapture.Call(hwnd)
 		return 0
 
@@ -567,8 +580,16 @@ func (b *Ball) wndProc(hwnd, m, wParam, lParam uintptr) uintptr {
 				pSetWindowPos.Call(hwnd, 0,
 					uintptr(wr.l+dx), uintptr(wr.t+dy), 0, 0,
 					uintptr(swpNoSize|swpNoZOrder|swpNoActivate))
+				// The push toward an edge IS the shrink animation: this message
+				// carries the frame, so the dock needs no timer (D32).
+				b.dockProximity()
 			}
+			return 0
 		}
+		// Not dragging, and the message reached us at all only because
+		// WM_NCHITTEST called this pixel part of the ball: the pointer is on a
+		// docked tab, so the orb slides back out (ticket 62 item 2).
+		b.dockHoverMove()
 		return 0
 
 	case wmLButtonUp:
@@ -579,14 +600,21 @@ func (b *Ball) wndProc(hwnd, m, wParam, lParam uintptr) uintptr {
 		b.dragMoved = false
 		b.mu.Unlock()
 		if wasDrag {
+			// Decide the dock BEFORE the position is written down, so what
+			// survives a restart is what the user ended with.
+			b.dockCommit()
 			b.persistPosition()
 			// The callback runs on the STA thread: it must be quick and
 			// non-blocking (dispatch the machine, PostTask the rest) - the
 			// message pump may not stall.
 			b.fire(b.opts.Events.OnDragEnd)
-		} else {
+		} else if !b.dockClickOut() {
 			b.fire(b.opts.Events.OnClickBall)
 		}
+		return 0
+
+	case wmMouseLeave:
+		b.dockLeave()
 		return 0
 
 	case wmCaptureChanged:
@@ -657,12 +685,16 @@ func (b *Ball) wndProc(hwnd, m, wParam, lParam uintptr) uintptr {
 			return 0
 		}
 		b.rend.setAssets(b.curVisual)
+		b.dockCommit() // tab geometry is physical px: re-derive it at the new DPI
 		b.renderFrame()
 		return 0
 
 	case wmDisplayChange:
-		// Topology change: re-clamp into the visible area.
+		// Topology change: re-clamp into the visible area, then re-decide the
+		// dock against the new work area (a detached monitor must not leave a
+		// tab stranded off-screen).
 		b.reclampPosition()
+		b.dockCommit()
 		return 0
 	}
 	r, _, _ := pDefWindowProcW.Call(hwnd, m, wParam, lParam)

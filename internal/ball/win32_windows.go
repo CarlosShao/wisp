@@ -37,6 +37,7 @@ var (
 	pReleaseCapture                = modUser32.NewProc("ReleaseCapture")
 	pSetWindowPos                  = modUser32.NewProc("SetWindowPos")
 	pGetWindowRect                 = modUser32.NewProc("GetWindowRect")
+	pTrackMouseEvent               = modUser32.NewProc("TrackMouseEvent")
 	pUpdateLayeredWindow           = modUser32.NewProc("UpdateLayeredWindow")
 	pRegisterHotKey                = modUser32.NewProc("RegisterHotKey")
 	pUnregisterHotKey              = modUser32.NewProc("UnregisterHotKey")
@@ -88,6 +89,7 @@ const (
 	wmLButtonUp      = 0x0202
 	wmRButtonUp      = 0x0205
 	wmMouseMove      = 0x0200
+	wmMouseLeave     = 0x02A3 // one-shot notification from TrackMouseEvent
 	wmCaptureChanged = 0x0215
 	wmMouseActivate  = 0x0021
 	wmLButtonUpX     = 0
@@ -222,6 +224,17 @@ type monitorInfoExW struct {
 	flags     uint32
 	device    [32]uint16
 }
+
+// trackMouseInfo is TRACKMOUSEEVENT (x64): the one-shot "tell me when the
+// pointer leaves this window" request the edge dock uses instead of a poll.
+type trackMouseInfo struct {
+	size      uint32
+	flags     uint32
+	hwndTrack windows.HWND
+	hoverTime uint32
+}
+
+const tmMouseLeave = 0x00000002 // TMMOUSELEAVE
 
 type notifyIconData struct {
 	cbSize           uint32

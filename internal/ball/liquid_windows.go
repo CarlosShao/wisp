@@ -141,6 +141,7 @@ func (b *Ball) frameVisual() Visual {
 	if b.liq.active || b.liq.summon > 0 || b.liq.ownsBorder {
 		b.liq.applyTo(&v)
 	}
+	b.stampDock(&v)
 	return v
 }
 

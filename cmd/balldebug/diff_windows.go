@@ -52,7 +52,29 @@ type diffOpts struct {
 	look      string        // liquid treatment handed to the child ("" = default)
 	frozen    bool          // measure the frozen SPEC-08 visuals, not the prototype
 	level     float64       // synthetic envelope handed to the child (-level)
+	dock      string        // also shoot each state docked here (-diff-dock)
 	killGrace time.Duration // wait for graceful exit before Kill
+}
+
+// stateVariant is one differential row: a state, optionally docked to an edge.
+type stateVariant struct {
+	state string // the -state handed to the child
+	dock  string // the -dock handed to the child ("" = free)
+	label string // the row/filename label
+}
+
+// variants expands the requested states, adding a docked row for each when
+// -diff-dock is set. "It visibly shrinks" is a measurement, not a claim: the
+// docked row's px/box columns are directly comparable with the free one.
+func (o diffOpts) variants() []stateVariant {
+	out := make([]stateVariant, 0, 2*len(o.states))
+	for _, s := range o.states {
+		out = append(out, stateVariant{state: s, label: s})
+		if o.dock != "" {
+			out = append(out, stateVariant{state: s, dock: o.dock, label: s + "-dock-" + o.dock})
+		}
+	}
+	return out
 }
 
 // procStat is one snapshot of the child's resource counters.
@@ -364,8 +386,8 @@ func runDiff(o diffOpts) error {
 		o.x, o.y, o.margin, o.sample, runtime.NumCPU(), o.amplify, o.dir)
 
 	rows := make([]stateRow, 0, len(o.states))
-	for i, s := range o.states {
-		row, err := runDiffForState(exe, o, s, i)
+	for i, v := range o.variants() {
+		row, err := runDiffForState(exe, o, v, i)
 		if err != nil {
 			_ = writeDiffTable(filepath.Join(o.dir, "diff-table.txt"), rows)
 			return err
@@ -385,18 +407,21 @@ func runDiff(o diffOpts) error {
 	return nil
 }
 
-// runDiffForState drives one state: child up, alive grab, counters, graceful
+// runDiffForState drives one row: child up, alive grab, counters, graceful
 // teardown, dead grab, diff.
-func runDiffForState(exe string, o diffOpts, state string, idx int) (stateRow, error) {
+func runDiffForState(exe string, o diffOpts, v stateVariant, idx int) (stateRow, error) {
 	var row stateRow
-	row.state = state
-	title := fmt.Sprintf("wisp62-%d-%s", os.Getpid(), state)
-	statusPath := filepath.Join(o.dir, ".status-"+state)
+	row.state = v.label
+	title := fmt.Sprintf("wisp62-%d-%s", os.Getpid(), v.label)
+	statusPath := filepath.Join(o.dir, ".status-"+v.label)
 	_ = os.Remove(statusPath)
 
-	childArgs := []string{"-state", state, "-hold", "-status", statusPath,
+	childArgs := []string{"-state", v.state, "-hold", "-status", statusPath,
 		"-x", fmt.Sprint(o.x), "-y", fmt.Sprint(o.y),
 		"-cycle-ms", fmt.Sprint(o.dwell.Milliseconds())}
+	if v.dock != "" {
+		childArgs = append(childArgs, "-dock", v.dock)
+	}
 	if o.size > 0 {
 		childArgs = append(childArgs, "-size", fmt.Sprint(o.size))
 	}
@@ -442,7 +467,7 @@ func runDiffForState(exe string, o diffOpts, state string, idx int) (stateRow, e
 	}
 	// The child writes its status file once the state is applied and rendered.
 	if !waitUntil(time.Now().Add(10*time.Second), func() bool { return fileHas(statusPath, "ready=1") }) {
-		return row, fmt.Errorf("balldebug: child never reported ready (state=%s)", state)
+		return row, fmt.Errorf("balldebug: child never reported ready (row=%s)", v.label)
 	}
 
 	parkCursor(4, 4)
@@ -463,7 +488,7 @@ func runDiffForState(exe string, o diffOpts, state string, idx int) (stateRow, e
 	row.px, row.py = int(rct.l), int(rct.t)
 	row.edge = int(rct.r - rct.l)
 
-	name := fmt.Sprintf("%02d-%s", idx+1, state)
+	name := fmt.Sprintf("%02d-%s", idx+1, v.label)
 	row.alive, row.dead, row.diff = name+"-alive.png", name+"-dead.png", name+"-diff.png"
 
 	alive, err := grab(l, t, w, h)
