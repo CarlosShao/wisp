@@ -1,8 +1,10 @@
 # wisp golden sse v1
 # @scenario agent loop: D15(3) spill through the real path. The echo tool
-# @scenario returns a 1200-byte result; with a 12000-token context window the
-# @scenario scaled spill threshold is 375 tokens (1500 bytes), so the test
-# @scenario uses a smaller window to cross it. Round 2 answers with text.
+# @scenario returns a ~1200-byte (about 300-token) result. At the 128k
+# @scenario reference window the scaled threshold is 4000 tokens, so nothing
+# @scenario spills; TestSpillThroughLoop replays this same fixture with a
+# @scenario 4096-token window, where the threshold scales to 128 tokens and the
+# @scenario identical result must spill. Round 2 answers with text.
 # @response 200
 data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
 
