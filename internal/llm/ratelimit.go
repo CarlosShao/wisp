@@ -37,9 +37,15 @@ type tokenBucket struct {
 	tokens   float64   // current level
 	refillPM float64   // tokens per minute
 	last     time.Time // monotonic reading of the last update
+	// now is the monotonic time SOURCE (D42#9). It is always the same source
+	// as `last`, so an interval is a difference of two readings from it -
+	// never a wall-clock value compared against a deadline. Production passes
+	// time.Now (whose readings carry the monotonic clock); tests pass a fake
+	// that can jump backward to prove no wall-clock math hides in here.
+	now func() time.Time
 }
 
-func newTokenBucket(perMinute int, now time.Time) *tokenBucket {
+func newTokenBucket(perMinute int, now func() time.Time) *tokenBucket {
 	if perMinute <= 0 {
 		return nil
 	}
@@ -47,7 +53,8 @@ func newTokenBucket(perMinute int, now time.Time) *tokenBucket {
 		capacity: float64(perMinute),
 		tokens:   float64(perMinute), // start full: a cold client is not throttled
 		refillPM: float64(perMinute),
-		last:     now,
+		now:      now,
+		last:     now(),
 	}
 }
 
@@ -62,7 +69,7 @@ func (b *tokenBucket) take(ctx context.Context, want int, sleep func(context.Con
 	}
 	for {
 		b.mu.Lock()
-		now := time.Now()
+		now := b.now()
 		b.refill(now)
 		if b.tokens >= wantF {
 			b.tokens -= wantF
@@ -76,6 +83,14 @@ func (b *tokenBucket) take(ctx context.Context, want int, sleep func(context.Con
 
 		if wait > 250*time.Millisecond {
 			wait = 250 * time.Millisecond // re-check periodically (ctx cancel)
+		}
+		if wait < time.Millisecond {
+			// Floor: a float remainder (e.g. need = 1e-16 tokens) truncates to
+			// 0ns, and a 0-duration sleep would busy-spin the re-check loop.
+			// Any positive deficit waits at least one millisecond - the same
+			// guard against clock granularity that the 250ms ceiling gives
+			// context cancellation.
+			wait = time.Millisecond
 		}
 		if err := sleep(ctx, wait); err != nil {
 			return err
@@ -93,7 +108,7 @@ func (b *tokenBucket) adjust(delta float64) {
 		return
 	}
 	b.mu.Lock()
-	now := time.Now()
+	now := b.now()
 	b.refill(now)
 	b.tokens += delta
 	if b.tokens > b.capacity {
@@ -105,6 +120,9 @@ func (b *tokenBucket) adjust(delta float64) {
 	b.mu.Unlock()
 }
 
+// refill accrues tokens for the elapsed interval. A non-positive interval
+// (a clock that went backward, i.e. a bogus wall-clock source) grants nothing
+// and does NOT move `last` backwards, so a clock jump can never mint tokens.
 func (b *tokenBucket) refill(now time.Time) {
 	elapsed := now.Sub(b.last)
 	if elapsed <= 0 {
@@ -126,11 +144,26 @@ type BucketLimiter struct {
 // NewBucketLimiter builds the limiter for one provider (nil-safe: limits of
 // 0 produce a limiter that never blocks).
 func NewBucketLimiter(limits RateLimits) *BucketLimiter {
-	now := time.Now()
+	return NewBucketLimiterWithClock(limits, time.Now, sleepCtx)
+}
+
+// NewBucketLimiterWithClock builds a limiter over an explicit monotonic time
+// source and wait function. Production uses NewBucketLimiter (time.Now, whose
+// readings carry the monotonic clock); tests inject a controllable clock so a
+// 60-second window can be proven without waiting 60 seconds - the pacing
+// arithmetic itself is identical.
+func NewBucketLimiterWithClock(limits RateLimits, now func() time.Time,
+	sleep func(context.Context, time.Duration) error) *BucketLimiter {
+	if now == nil {
+		now = time.Now
+	}
+	if sleep == nil {
+		sleep = sleepCtx
+	}
 	return &BucketLimiter{
 		rpm:   newTokenBucket(limits.RPM, now),
 		tpm:   newTokenBucket(limits.TPM, now),
-		sleep: sleepCtx,
+		sleep: sleep,
 	}
 }
 
@@ -165,6 +198,9 @@ type LimiterProvider struct {
 	limiter  *BucketLimiter
 	reserved int
 }
+
+// Limiter reports the pacing decorator in use (nil = unpaced).
+func (p *LimiterProvider) Limiter() *BucketLimiter { return p.limiter }
 
 // NewLimiterProvider wraps inner with limiter (nil limiter = pass-through).
 func NewLimiterProvider(inner LlmProvider, limiter *BucketLimiter) *LimiterProvider {
