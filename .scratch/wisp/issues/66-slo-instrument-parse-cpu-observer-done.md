@@ -1,9 +1,17 @@
-# 66 — SLO 判据仪器返工：解析丢末项 + CPU 门的观测者自成本（票 12 桌面跑的连带发现）
+# 66 — SLO 判据仪器返工：解析丢末项 + CPU 门的观测者自成本（票 12 桌面跑的连带发现）(DONE ✅)
 
-**Status:** in-progress
-**Claimed by:** agent-ticket66b
-**Last update:** 2026-09-20
+**Status:** done（7/7 AC 已勾；**1:1 裁决表见 `docs/evidence/s1/66-adversarial-acceptance.md`**，编排者验收）
+**Claimed by:** agent-ticket66（前 102 次调用被平台闪断杀掉）→ agent-ticket66b（收尾 AC#1–AC#7）
+**Last update:** 2026-09-20 23:56（编排者：补 README 规则 6 要求的裁决表后置 done）
 **Blocked by:** —（与票 12/20/21 无代码交集；本票只动 `internal/proc`、`internal/observe`、`cmd/wisp/slo*.go`、`scripts/slo-check.ps1`）
+
+> **残口四条（done ≠ 零残余，写在票面上免得下个会话以为这里干净）**：
+> ① `NtQuerySystemInformation: buffer never sufficient`（200 次读 1 次）**未修**，归票 71 之后的仪器批次；
+> ② **D32 六态表本身仍未测**（`-Subset full` 六态 posture 全是 skeleton），归票 15/28/33/36；
+> ③ 树内 CPU 门"无定义"依赖观测者成本可分离，改口径者须先看 `internal/observe/observer_cost_test.go` 4 条用例；
+> ④ **AC#1 的变异检验我没独立重做**（撞票 70 的全仓格式化）⇒ **票 70 落地后做一次廉价复核**：
+> 把 `WalkSystemProcesses` 顺序退回旧实现，确认 `TestParseSystemProcessesKeepsLastSnapshotEntry` 变红。
+
 **Parallel slots:** ≤1 sub-agent（**测量类独占**：本票的验收要求真机跑采样，不能与任何其他跑测的代理并发）
 **Spec refs:** D32 16.3.2（`Sleeping` 行 CPU ≤0.5% 全核，**阈值不得改动**）、C30（Job 进程树私有工作集口径）、D42#10、SPEC-10 §3
 **登记项:** A14（解析丢末项）、A15（CPU 门自成本）；证据 `docs/SLO.md` 附录 A（代理那次）+ 附录 B（编排者复跑）
