@@ -222,6 +222,19 @@ func runApproval(t *testing.T, g *approval.Gate, ctx context.Context, d tools.De
 	return out
 }
 
+// waitFor polls a condition the gate's own goroutine satisfies asynchronously
+// (event delivery after a clock advance), with a bounded real-time budget.
+func waitFor(t *testing.T, cond func() bool, msg string) {
+	t.Helper()
+	for i := 0; i < 400; i++ {
+		if cond() {
+			return
+		}
+		time.Sleep(5 * time.Millisecond)
+	}
+	t.Fatal(msg)
+}
+
 // mustAnswer waits for one gate answer with a bounded test-side wait.
 func mustAnswer(t *testing.T, ch <-chan answer) answer {
 	t.Helper()

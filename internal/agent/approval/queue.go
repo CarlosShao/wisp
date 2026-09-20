@@ -249,6 +249,18 @@ func (q *Queue) allow(corr, nonce string) error {
 	return nil
 }
 
+// revokeGrants burns every live nonce of one item without answering it. A
+// grant that surfaced on the untrusted route is treated as leaked: the honest
+// card then has to be re-displayed (which mints a fresh one), so a token that
+// passed through a compromised panel can never be spent.
+func (q *Queue) revokeGrants(corr string) {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+	if it, ok := q.byID[corr]; ok {
+		it.grants.revoke()
+	}
+}
+
 // reject closes one item as refused. No proof is required: refusing is the
 // fail-closed direction, which is why the panel may do it (SPEC-06 §9).
 func (q *Queue) reject(corr, reason string) error {

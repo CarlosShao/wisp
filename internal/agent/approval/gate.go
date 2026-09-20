@@ -590,10 +590,10 @@ func (g *Gate) DecideFromPanel(ctx context.Context, r Request) error {
 		g.logf("approval: PANEL-ALLOW-REJECTED corr=%s claimed_source=%q grant_offered=%v",
 			r.CorrelationID, r.Source, r.Grant != "")
 		if r.Grant != "" {
-			// Burn it: an offer to allow from an untrusted route is evidence of
-			// a compromised or confused panel; the nonce must not survive to be
-			// tried again somewhere else.
-			_ = g.q.allow(r.CorrelationID, r.Grant+"!burned")
+			// Burn the item's live nonces: an offer to allow from an untrusted
+			// route is evidence of a leaked or forged token, and a nonce that
+			// has been seen there must not be spendable anywhere else.
+			g.q.revokeGrants(r.CorrelationID)
 		}
 		return fmtw(ErrPanelAllow, "面板来源的「允许」被服务端 API 直接拒绝（F2 第三层），可改为拒绝或查看完整参数")
 	}
