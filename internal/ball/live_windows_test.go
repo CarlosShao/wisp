@@ -24,16 +24,9 @@ import (
 	"github.com/CarlosShao/wisp/internal/statemachine"
 )
 
-var (
-	procFindWindowW = modUser32.NewProc("FindWindowW")
-)
-
-func findBallWindow() uintptr {
-	cls := utf16("WispBallWindow")
-	h, _, _ := procFindWindowW.Call(unsafePtr(cls), 0)
-	return h
-}
-
+// handlesOfProcess is the PROCESS-LOCAL handle count (GetProcessHandleCount):
+// no other process can raise it, which is why registry A6's growth question can
+// be answered here even though registry A5's window lookup could not.
 func handlesOfProcess() uint32 {
 	var n uint32
 	procGetProcessHandleCount.Call(uintptr(windows.CurrentProcess()), uintptr(unsafe.Pointer(&n)))
@@ -43,33 +36,50 @@ func handlesOfProcess() uint32 {
 var procGetProcessHandleCount = modKernel32.NewProc("GetProcessHandleCount")
 
 // TestBallLiveLifecycle walks all 20 states on a real window and tears down.
+// Ticket 64 rewrote its window assertions to go by the test's OWN hwnd and
+// added the quiet-desktop precondition: a stray ball from another process used
+// to make this test red for the wrong reason (registry A5), and its handle
+// numbers are now logged every iteration so a leak can be classified from data
+// instead of from a guess (registry A6).
 func TestBallLiveLifecycle(t *testing.T) {
 	storePath := filepath.Join(t.TempDir(), "ballpos.json")
 	store, err := OpenPositionStore(storePath)
 	if err != nil {
 		t.Fatalf("store: %v", err)
 	}
+	requireQuietBallDesktop(t)
 	baseHandles := handlesOfProcess()
+	baseUser := uiUserObjects()
 
 	b, err := New(Options{
-		SizePx:  BallSizeDefaultPx,
-		Initial: statemachine.StateSleeping,
-		Store:   store,
-		Hotkeys: HotkeyConfig{Summon: "Ctrl+Alt+F9", Mute: "Ctrl+Alt+F10", Cancel: "Ctrl+Alt+F11", Panel: "Ctrl+Alt+F12"},
+		SizePx:      BallSizeDefaultPx,
+		Initial:     statemachine.StateSleeping,
+		Store:       store,
+		WindowTitle: liveBallTitle(t),
+		Hotkeys:     liveHotkeys(),
 	})
 	if err != nil {
 		t.Fatalf("New: %v", err)
 	}
-	defer func() {
-		b.Close()
-		if h := findBallWindow(); h != 0 {
-			t.Errorf("ball window still alive after Close")
-		}
-	}()
-
-	if findBallWindow() == 0 {
-		t.Fatal("ball window not found after New")
+	hwnd := b.DebugHWND()
+	if !windowAlive(hwnd) {
+		t.Fatalf("ball window %v is not a window after New", hwnd)
 	}
+	if got := b.HotkeyReport(); !got.AllLive() || len(got.Live()) != 4 {
+		t.Fatalf("the live ball did not register its four hotkeys: %+v", got.Bindings())
+	}
+	afterNew := handlesOfProcess()
+
+	t.Cleanup(func() {
+		b.Close()
+		if windowAlive(hwnd) {
+			t.Errorf("ball window %v still alive after Close", hwnd)
+		}
+		afterClose := handlesOfProcess()
+		t.Logf("HANDLES base=%d afterNew=%d afterClose=%d delta=%d | USER objs base=%d afterClose=%d",
+			baseHandles, afterNew, afterClose, int64(afterClose)-int64(baseHandles), baseUser, uiUserObjects())
+		requireQuietBallDesktop(t)
+	})
 
 	// All 20 states render without hanging; animated states hold a timer,
 	// static states none.
@@ -129,11 +139,14 @@ func TestBallLivePositionPersistence(t *testing.T) {
 	if err != nil {
 		t.Fatalf("store: %v", err)
 	}
+	requireQuietBallDesktop(t)
 
-	b, err := New(Options{Initial: statemachine.StateSleeping, Store: store})
+	b, err := New(Options{Initial: statemachine.StateSleeping, Store: store,
+		WindowTitle: liveBallTitle(t), Hotkeys: liveHotkeys()})
 	if err != nil {
 		t.Fatalf("New: %v", err)
 	}
+	hwnd := b.DebugHWND()
 	time.Sleep(100 * time.Millisecond)
 
 	// Simulate a drag: move the window, then persist through the same path
@@ -145,6 +158,9 @@ func TestBallLivePositionPersistence(t *testing.T) {
 	b.persistPosition()
 	dev := monitorFromWindow(b.hwnd)
 	b.Close()
+	if windowAlive(hwnd) {
+		t.Fatal("the ball window survived Close")
+	}
 	time.Sleep(100 * time.Millisecond)
 
 	got, ok := store.Get(dev)
@@ -153,11 +169,18 @@ func TestBallLivePositionPersistence(t *testing.T) {
 	}
 
 	// Re-open: the restored top-left must equal the saved position.
-	b2, err := New(Options{Initial: statemachine.StateSleeping, Store: store})
+	b2, err := New(Options{Initial: statemachine.StateSleeping, Store: store,
+		WindowTitle: liveBallTitle(t) + "-2", Hotkeys: liveHotkeys()})
 	if err != nil {
 		t.Fatalf("reopen: %v", err)
 	}
-	defer b2.Close()
+	defer func() {
+		h2 := b2.DebugHWND()
+		b2.Close()
+		if windowAlive(h2) {
+			t.Errorf("the reopened ball window %v survived Close", h2)
+		}
+	}()
 	time.Sleep(150 * time.Millisecond)
 	var wr2 rect
 	pGetWindowRect.Call(uintptr(b2.hwnd), unsafePtr(&wr2))
