@@ -261,6 +261,22 @@
   ①`loop.decideRisk` 在 `Execute` **之前**就拒已声明的 L1/L2 ⇒ `fs.write` 到它手里是死的，
   须等票 21 替换该函数；②`tool_call` 表**没有 `rules_hit` 列**（SPEC-02 的 DDL 是契约层的），
   该字段目前只随 `Decision`/审计行走，代理**没有伪造列**，这是正确处置，票 21 需显式定夺。
+- **[A13] 票 21 段 1：审批门与桥都造好了，但装配根还没有它们（R12 的第三次同形复现）** —
+  `internal/agent/approval/`（19 个用例）与 `internal/tools/`（桥）今天落地，**两者在 `cmd/wisp` 下都不可达**：
+  `internal/tools` 至今**零外部 importer**（我自己 `grep -rn "internal/tools" cmd/` 零命中）。
+  验收方独立复核过的部分：`Request.Source` 在非测试代码里**只出现在两条日志**（`claimed_source=%q`），
+  决策路径一次都不读；`PanelAPI` 没有 `Allow` 方法、`PanelItem` 没有授权字段（"面板来源结构性拒绝"
+  是**类型层面**成立，不是 if 里成立）；我的变异把面板路由改成"也接受调用方递来的 grant"，
+  `TestPanelSourcedAllowIsRejectedOnEveryForgeableAxis` **立刻变红**，而原生放行/单次使用两条仍绿。
+  实现还多做了一步我没要求的：**未受信路由上一出示 grant，就把该项的活 nonce 全部作废**（当泄漏信号）。
+  **当前残缺表现**：真机上 L1 阻断窗、L2 原生卡、批量聚合、300s 自动拒绝**一条都不会触发**，
+  因为没人构造 Gate；`fs.write` 依旧在 `loop.decideRisk`（`internal/agent/loop.go:719-738`）被执行前被拒。
+  **完成判据（票 12 承接）**：①`cmd/wisp` 组装 `Loop` 时注入 `Options.Gate` 并调用 `AdmitTextTask`；
+  ②删掉 `decideRisk` 里那段"L1/L2 先拒"的代码（代理确认有了 Gate 之后这一步**只是删除**）；
+  ③一条端到端用例证明"越出 allowlist 的 `fs.read` 真的被判 L2 并走审批支"。
+  ⚠ **A8 / A11 / A13 三条同形**，全部收敛到票 12 —— 票 12 的实质是**装配**，不是新功能。
+  （另：代理报告称 d22scan 在 `internal/llm/adaptertest/mockllm.go:68` 有一处既有命中，
+  我在 HEAD 上复跑 `tools/d22scan` 结果为 **clean**，该命中不存在，无需处理。）
 
 ## 已解决（resolved）
 
