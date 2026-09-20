@@ -49,6 +49,14 @@ owner 2026-09-20 裁定：**现在插队修，不等 S3**。本票消化 registr
       默认值已改并被 `TestDefaultSummonHotkeyIsQNotW` 钉住；**文档半边未做**：列有 `[hotkey]` 的三份文档
       （SPEC-03、SPEC-08、PLAN）对本票全部冻结，无处可写。见 Progress log。
 - [x] 交互四项各有真机测试且**不被 skip**：单击唤起、Confirming 取消、不抢焦点、透明区穿透。
+      ⚠ **MINOR-1 未闭（验收报告里的三条之一），执行步骤落在此处以免丢失**：桌面空出后跑
+      `export PATH="$PWD/third_party/sherpa-onnx:$PATH"` →
+      `go test -tags winlive -count=2 -v ./internal/ball/`，
+      把 `--- PASS` / `--- SKIP` **逐条贴进本票 Progress log**；
+      **交互四项任一走 SKIP（含 8 处 `SKIP-LOUD` 里的任意一条命中这四项）就把本框退回未勾**——
+      今天的判定是"结构成立（无静默 skip）、逐跑记录缺证"，
+      因为 `"winlive 14 项全 PASS"` 在 Go 的语义里**含 SKIP 也算 ok**，而代理只对 A1/A1d 明写了"未走 skip 分支"。
+      同一条跑顺带闭 **MINOR-2**（AC#5 的 `TestLiveSleepingZeroTimerHandles` 我今天只做了静态核）。
 - [x] Sleeping 零活动定时器句柄为**实测断言**（winlive），策略表断言保留但不作为唯一证据。
       （残留：winlive 仍不进 CI —— A3 的 CI 半边转 nightly，见 Progress log。）
 - [ ] 多显示器：真拖到第二屏验证并留证；本机无第二屏则**保持未勾**并写明所需硬件。

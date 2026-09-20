@@ -69,6 +69,19 @@ func EnablePrototypeVisuals(on bool) { prototypeVisuals = on }
     owner 未答前我只推进**不依赖它们**的部分（AC#1 已完成、AC#4 已绿）。
 - [ ] **AC#3 签收面复测（需桌面）**：翻转后跑一次 `cmd/balldebug` 的差分化像，
   证明 `Sleeping` 的 px≥8/255 与成像框**不低于** A.2 已录的 2103 像素 / 46×46，且 `timers=no` 仍成立（D32 零定时器）。
+  - **桌面空出后照此逐条跑（代理 AC#1 报告给的、与 A.2 同口径的命令集，落盘以免随上下文丢失）**：
+    1. `export PATH="$PWD/third_party/sherpa-onnx:$PATH"`
+    2. 洁净前置：`tasklist | grep -iE "wisp.exe|balldebug.exe"` **必须无输出**；
+       并确认显示器缩放是 **100%**（A.2 全部数字都是 96 DPI 下测的，否则不可比——见 A28/A29 的 DPI 不对称）
+    3. `go build -o build/balldebug.exe ./cmd/balldebug`
+    4. 自由 + 靠边两行：`build/balldebug.exe -diff build/t68-flip -diff-states Sleeping,Listening,Thinking,Acting,Speaking,Warm,Settling -diff-sample 5s -diff-dock right`
+       ⇒ 门：`Sleeping` **px≥8 ≥ 2098**、框落在 40–46 家族、`timers=no`、`cpu_all ≤0.5%`、teardown `clean`
+    5. **冻结对照（证明逃生门还活着）**：同上一条加 `-frozen` ⇒ 期望 **px≥8 = 0**、框 `0x0`
+    6. 零定时器与句柄门：`build/balldebug.exe -state Sleeping -hold`（Ctrl+C；打印 `timers=false` 与 `closed handles=` ≤600）
+    7. `go test -tags winlive -count=2 -v ./internal/ball/`
+    8. 翻转后重跑 AC#4 四道门
+  - ⚠ 第 5 条（`-frozen` 对照）**不是可选项**：逃生门若坏掉而没人知道，票 65 返工时就没有基线可比。
+  - 数字不过预算就**报 FAIL 并附全样本**；不许调阈值、不许重测到运气好的那次、不许用平均抹掉坏尾部。
   数字不过就报 FAIL 并附样本，**不许调阈值、不许重测到运气好的那次**。
 - [x] **AC#4 无桌面的半格**：`gofmt -l` 空、`go vet ./internal/ball/ ./cmd/balldebug/`、
   `go test -count=2 ./internal/ball/`、`go test -count=2 ./cmd/balldebug/`（非 winlive 部分）。贴原始输出。
