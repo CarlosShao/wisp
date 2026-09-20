@@ -7,7 +7,7 @@ package main
 // owner can put an API key into the store without it ever passing through a
 // chat UI, a shell history line or a log file.
 //
-// The two leak surfaces this ticket is responsible for, and how they are
+// The three leak surfaces this ticket is responsible for, and how they are
 // closed by construction:
 //
 //   - argv: the secret can only arrive as (a) a hidden console read or (b) the
@@ -16,11 +16,17 @@ package main
 //     TestSecretFlagsAreBoolOnly), so no argv slot can hold a value; and
 //     Get-CimInstance Win32_Process / the PEB command line of a running
 //     `wisp secret set --from-stdin` therefore shows only the blob name
-//     (pinned by TestSecretArgvCarriesNoSecret_windows).
+//     (pinned by TestSecretArgvCarriesNoSecret, which also pins the shape of
+//     that argv against a planted-value control,
+//     TestProcessCommandLineProbeDetectsAPlantedValue).
 //   - logs / error strings: everything printed or logged names the ref, the
 //     env and the field path. The only place secret material is rendered at
 //     all is secret.RedactSecret (last 4), and `--show` writing plaintext to
 //     stdout is the single sanctioned exception (it is never logged).
+//   - intermediate files: collectSecret reads stdin into one buffer and hands
+//     it straight to the store; nothing is ever written before it is encrypted
+//     (pinned by TestSecretFromStdinWritesNoIntermediateFile, which walks the
+//     data dir and the OS temp dir for the entered value).
 //
 // This command never calls proc.Boot: entering a credential must work while
 // the resident instance is running, and the store needs no mutex (the blob

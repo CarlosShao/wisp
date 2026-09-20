@@ -30,17 +30,30 @@ import (
 // is what escaped; it is not a credential.
 const fakeKey = "sk-FAKE-placeholder-not-a-real-key-0f9e8d7c"
 
+// activeCapture is the log buffer of the running test, set by captureLogs.
+// Sharing one buffer per test matters: a probe that swapped in a second
+// handler would leave the buffer a test asserts on permanently empty, which is
+// a false green - found by mutating runSet to log the plaintext.
+var activeCapture *bytes.Buffer
+
 // captureLogs installs an in-memory slog handler for the duration of the test
 // and returns the buffer every record lands in. JSON serialization is the same
 // shape the production pipeline (observe.InitLog) writes, so an attribute
 // cannot hide from the assertion by being a non-string value.
 func captureLogs(t *testing.T) *bytes.Buffer {
 	t.Helper()
-	var buf bytes.Buffer
+	buf := &bytes.Buffer{}
 	old := slog.Default()
-	slog.SetDefault(slog.New(slog.NewJSONHandler(&buf, &slog.HandlerOptions{Level: slog.LevelDebug})))
-	t.Cleanup(func() { slog.SetDefault(old) })
-	return &buf
+	slog.SetDefault(slog.New(slog.NewJSONHandler(buf, &slog.HandlerOptions{Level: slog.LevelDebug})))
+	prev := activeCapture
+	activeCapture = buf
+	t.Cleanup(func() {
+		slog.SetDefault(old)
+		if activeCapture == buf {
+			activeCapture = prev
+		}
+	})
+	return buf
 }
 
 // hiddenRecorder stands in for golang.org/x/term ReadPassword: it records the
@@ -83,7 +96,12 @@ func newProbe(t *testing.T, env buildinfo.Env, dataDir string, portable bool, st
 	p := &probe{
 		out:  &bytes.Buffer{},
 		errb: &bytes.Buffer{},
-		logs: captureLogs(t),
+	}
+	if activeCapture != nil {
+		// The test already installed a capture; write into that same buffer.
+		p.logs = activeCapture
+	} else {
+		p.logs = captureLogs(t)
 	}
 	if len(answers) > 0 {
 		p.hid = &hiddenRecorder{answers: answers}
@@ -415,6 +433,168 @@ func TestSecretValueCarryingFlagsAreRefusedAndUnechoed(t *testing.T) {
 }
 
 // ---------------------------------------------------------------------------
+// AC2, temp-file half: the entered value must never exist as a file at any
+// point, not even briefly under a name that hides it.
+// ---------------------------------------------------------------------------
+
+// walkFiles lists every regular file under root, by path relative to root.
+func walkFiles(t *testing.T, root string) []string {
+	t.Helper()
+	var out []string
+	err := filepath.Walk(root, func(p string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+		rel, rerr := filepath.Rel(root, p)
+		if rerr != nil {
+			return rerr
+		}
+		out = append(out, rel)
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("walk %s: %v", root, err)
+	}
+	return out
+}
+
+// walkPaths is walkFiles with absolute paths, ready to feed scanForPlaintext.
+func walkPaths(t *testing.T, root string) []string {
+	t.Helper()
+	rel := walkFiles(t, root)
+	abs := make([]string, len(rel))
+	for i, r := range rel {
+		abs[i] = filepath.Join(root, r)
+	}
+	return abs
+}
+
+// tempDirNames snapshots the entry names directly under the OS temp dir.
+func tempDirNames(t *testing.T) map[string]bool {
+	t.Helper()
+	root := os.TempDir()
+	entries, err := os.ReadDir(root)
+	if err != nil {
+		t.Fatalf("read %s: %v", root, err)
+	}
+	names := make(map[string]bool, len(entries))
+	for _, e := range entries {
+		names[e.Name()] = true
+	}
+	return names
+}
+
+// newTempFiles returns the regular files that appeared directly under the OS
+// temp dir since the snapshot. Bounded on purpose: a full recursive scan of
+// %TEMP% would be slow and would fail on unrelated processes' locked files,
+// while an intermediate credential file has to be created by this run.
+func newTempFiles(t *testing.T, before map[string]bool) []string {
+	t.Helper()
+	root := os.TempDir()
+	entries, err := os.ReadDir(root)
+	if err != nil {
+		t.Fatalf("read %s: %v", root, err)
+	}
+	var out []string
+	for _, e := range entries {
+		if before[e.Name()] || e.IsDir() {
+			continue
+		}
+		out = append(out, filepath.Join(root, e.Name()))
+	}
+	return out
+}
+
+// scanForPlaintext opens each path in targets (a directory is walked
+// recursively; a single file is read as-is), skipping anything larger than
+// capBytes so an unrelated file cannot slow the gate, and returns the paths
+// whose contents contain wantPresent. It is the instrument behind both the leak
+// assertion and its positive control, so the two share exactly the same eyes.
+func scanForPlaintext(t *testing.T, targets []string, wantPresent string, capBytes int64) []string {
+	t.Helper()
+	var hits []string
+	for _, target := range targets {
+		err := filepath.Walk(target, func(p string, info os.FileInfo, err error) error {
+			if err != nil {
+				// An unreadable sibling of the tree under scan is not this
+				// command's doing; every file this command creates is readable.
+				return nil
+			}
+			if info.IsDir() || info.Size() == 0 || info.Size() > capBytes {
+				return nil
+			}
+			body, rerr := os.ReadFile(p)
+			if rerr != nil {
+				return nil
+			}
+			if bytes.Contains(body, []byte(wantPresent)) {
+				hits = append(hits, p)
+			}
+			return nil
+		})
+		if err != nil {
+			t.Fatalf("scan %s: %v", target, err)
+		}
+	}
+	return hits
+}
+
+func TestSecretFromStdinWritesNoIntermediateFile(t *testing.T) {
+	dir := t.TempDir()
+
+	// Positive control first: the scanner must be able to see the value when it
+	// really is on disk, or "no file contains it" is worth nothing. The decoy
+	// lives in its own directory so it cannot be confused with the real run.
+	controlRoot := t.TempDir()
+	decoy := filepath.Join(controlRoot, "decoy")
+	if err := os.WriteFile(decoy, []byte("prefix-"+fakeKey+"-suffix"), 0o600); err != nil {
+		t.Fatalf("plant decoy: %v", err)
+	}
+	if hits := scanForPlaintext(t, []string{controlRoot}, fakeKey, 1<<20); len(hits) != 1 || hits[0] != decoy {
+		t.Fatalf("POSITIVE CONTROL FAILED: the temp-file scanner did not find the planted plaintext (hits=%v), so the assertion below is vacuous", hits)
+	}
+
+	// Everything the run could add to the real OS temp dir is detected by
+	// diffing the directory listing before and after, so the scan is bounded to
+	// what this command actually created (and unrelated churn cannot fail it:
+	// a foreign file simply does not contain the entered value).
+	before := tempDirNames(t)
+
+	// The real thing: enter the value on stdin, then look for it everywhere.
+	p := newProbe(t, buildinfo.EnvTest, dir, false, fakeKey+"\n")
+	if code := p.cmd.run([]string{"set", "no-tmp", "--from-stdin"}); code != 0 {
+		t.Fatalf("set --from-stdin: exit %d (%s)", code, p.errb)
+	}
+	files := walkFiles(t, dir)
+	if len(files) != 1 || files[0] != filepath.Join("secrets", "no-tmp") {
+		t.Errorf("the data dir holds %v after set, want only the blob secrets%c%s",
+			files, filepath.Separator, "no-tmp")
+	}
+	suspects := append(walkPaths(t, dir), newTempFiles(t, before)...)
+	if hits := scanForPlaintext(t, suspects, fakeKey, 1<<20); len(hits) > 0 {
+		t.Errorf("a file on disk carries the plaintext secret: %v", hits)
+	}
+
+	// A refused entry leaves nothing behind either: the failure paths are where
+	// a "write then validate" implementation would drop a temp file.
+	beforeRefused := tempDirNames(t)
+	q := newProbe(t, buildinfo.EnvTest, dir, false, "", fakeKey, fakeKey+"-typo")
+	if code := q.cmd.run([]string{"set", "refused"}); code == 0 {
+		t.Fatal("mismatched confirmation must fail")
+	}
+	if files := walkFiles(t, dir); len(files) != 1 {
+		t.Errorf("a refused set changed the data dir contents to %v", files)
+	}
+	suspects = append(walkPaths(t, dir), newTempFiles(t, beforeRefused)...)
+	if hits := scanForPlaintext(t, suspects, fakeKey, 1<<20); len(hits) > 0 {
+		t.Errorf("a refused set left the plaintext on disk: %v", hits)
+	}
+}
+
+// ---------------------------------------------------------------------------
 // AC2: no plaintext in any log line or error string, including failures
 // ---------------------------------------------------------------------------
 
@@ -528,6 +708,25 @@ func TestSecretFailurePathsLogAndPrintNoPlaintext(t *testing.T) {
 
 // allLogs is the whole log surface of the probe.
 func (p *probe) allLogs() string { return p.logs.String() }
+
+// auditRecordFor returns the single log record containing needle, failing
+// loudly if the shared capture holds none or several. It exists because a
+// capture is per-test, not per-subtest: an assertion about one operation's
+// audit line must name that operation rather than grep everything the test
+// ever logged.
+func auditRecordFor(t *testing.T, logs, needle string) string {
+	t.Helper()
+	var found []string
+	for _, line := range strings.Split(logs, "\n") {
+		if strings.Contains(line, needle) {
+			found = append(found, line)
+		}
+	}
+	if len(found) != 1 {
+		t.Fatalf("want exactly one log record containing %q, found %d:\n%s", needle, len(found), logs)
+	}
+	return found[0]
+}
 
 // ---------------------------------------------------------------------------
 // AC3: unset refuses while config references the blob; --force audits
@@ -649,8 +848,18 @@ api_key_ref = "dpapi:deepseek"
 		if !strings.Contains(q2.allLogs(), "dpapi:spare") {
 			t.Errorf("unreferenced deletes are audited too:\n%s", q2.allLogs())
 		}
-		if strings.Contains(q2.allLogs(), "forced=true") {
-			t.Errorf("forced=true only belongs to a forced delete:\n%s", q2.allLogs())
+		// The capture is shared by every probe in this test (see
+		// activeCapture), so the "was not forced" check is scoped to this
+		// delete's own audit record: the earlier subtest forced-deleted
+		// dpapi:deepseek and legitimately logged forced=true into the same
+		// buffer. Scoping is stricter than the whole-buffer grep it replaces,
+		// because it also requires this record to say forced=false.
+		rec := auditRecordFor(t, q2.allLogs(), "deleted dpapi:spare")
+		if !strings.Contains(rec, "forced=false") {
+			t.Errorf("an unreferenced delete must record forced=false, got: %s", rec)
+		}
+		if strings.Contains(rec, "forced=true") {
+			t.Errorf("forced=true only belongs to a forced delete: %s", rec)
 		}
 	})
 
