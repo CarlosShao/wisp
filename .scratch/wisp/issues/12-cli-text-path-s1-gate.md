@@ -54,6 +54,14 @@ moment: type → reply → notification → memory returns to idle.
       ref→`config.LoadFile`→`ProviderKeys` but issues the request with its own http client.
       Completion criterion: a red-when-broken test in this ticket's own suite; mutation = point the
       ref at a missing blob and the run must fail with the Unconfigured path, not silently succeed.
+- [ ] The capability probe is actually called from the composition root: `cmd/wisp`'s provider
+      save/discovery path invokes `llm.RunProbeSuite` (the `memoryHealthSink` in
+      `internal/llm/probe_health_test.go` is a ready-made adapter), so the 「声明 ✓ / 实测 ✗」
+      event can fire on a real machine. Handed here from ticket 11 AC#6, registered as **A11**.
+      Plus: a mockllm thinking-capability mode and a thinking probe that REQUIRES a reasoning
+      delta — today ticket 09's thinking check accepts a plain text answer, so it cannot detect a
+      broken thinker. Completion criterion: both directions pinned (capable and broken) with the
+      server's own request counters, mirroring how the fc/vision cases already work.
 - [ ] Zero emoji scan over new UI strings passes; tokens doc updated with any additions.
 - [ ] Human visual acceptance of ball states (user signs off screenshots — D29 rule).
 

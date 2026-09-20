@@ -180,6 +180,20 @@
     `toks`）。删任一条，`TestEnforceTotalTerminatesAtEveryWindow` **仍然全绿**（我实测：拆钳子 ok 0.041s）；
     两条都删才红。后果不是 bug 而是**误导**：后人若信了这句注释，会去删那行真正在兜底的 Budget 回写。
     完成判据：注释改为陈述两条保证各自的充分性，并补一个"删任一条即红"的变异锚定用例（或显式记录该冗余为有意设计）。
+- **[A11] 票 11 AC#6：探针会测量已证明，但生产装配根还没调它（转票 12，不是转 owner）** —
+  `llm.RunProbeSuite`（`internal/llm/probe_health.go`）+ 9 个用例已入库（`43f9a53`/`a355bf6` 同族），
+  验收方独立复核结论：**判据仪器没被改过**（`capability_test.go` 在 git 历史里只出现过一次，即它被新增的那次），
+  且"探针拿 config 自证"这条我用自己的变异验伪：把 `rep.Flags.Set(..., res.OK)` 改成
+  `declaredCapability(o.Declared, c)` → `MeasuresBrokenFC` / `MeasuresBrokenVision` /
+  `BrokenOnAllThreeDialects` 三红。**当前残缺表现**：没有任何生产代码调用 `RunProbeSuite`，
+  所以"声明 ✓ / 实测 ✗"这条 SPEC-05 §3.1 要求的事件在真机上永远不会发出；
+  另外 thinking 那格沿用票 09 的检查，它接受纯文本回答，**检测不出坏思考器**。
+  **完成判据（票 12 承接）**：①`cmd/wisp` 的 provider 保存/发现路径调用 `RunProbeSuite`
+  （测试里的 `memoryHealthSink` 可直接当适配器抄）；②mockllm 增一个 thinking 能力档，
+  thinking 探针要求必须出现 reasoning delta，否则判 broken。
+  ⚠ **票 12 现在同时背 A8（票 63 AC#6：真实 provider 取密钥）与 A11（本条）两张外来框**，
+  两者都属"装配根没接线"同一形状——票 12 是 S1 端到端门禁，正好一并消化。
+  实现者代理把它写成了 `next=user wires…`，**该措辞已作废**：owner 不写代码，此项由票 12 的代理完成。
 
 ## 已解决（resolved）
 
