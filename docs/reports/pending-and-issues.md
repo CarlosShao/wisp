@@ -587,6 +587,88 @@
 7. **票 21 段 2**（A19 的应答路径 + 死码隔离）→ 然后才是 S2/S3 的能力票（15/16/22+）。
 8. **票 65**：`blocked-on-owner`，等 owner 重发图1/图2 落 `design/refs/`。
 
+- **[A26] 两份**已 done 票的验收证据**里，静态门跑的是"扫描零个文件"的命令，并记成 PASS** —
+  我自己核过的原文：
+  - `docs/evidence/s1/10-adversarial-acceptance.md:95-96`：`$ cd tools/d22scan && go run .` → 记 `clean`；
+  - `docs/evidence/s3/19-adversarial-acceptance.md:20`：**同一条命令**记 PASS。
+  **问题**：不带 `-root` 时它**默认扫 `.`**，也就是**扫描器自己那个 module**——
+  里面**没有 `internal/`、没有 `cmd/`、allowlist 读不到就被当空**，
+  于是它打印 `clean` 且 **exit 0，而实际 examined 0 个文件**。
+  ⇒ **票 10 与票 19 的四项安全断言（裸 goroutine / 墙钟差超时 / `filepath.Clean` 越权 / emoji）
+  在那两次验收里等于没有门。** 我今天还在多处引用"d22scan clean"作为既有基线，那话的地基就是这两行。
+  **已修（票 67，`23ebb59`）**：`checkRoot()` 让空范围**致命退出**，输出里加 **`examined N production Go files`**
+  ——**门必须自报工作量**，这正是本条缺的东西；CI 改走 `scripts/d22scan.sh`。
+  代理还留了一条**我没让它修**的实话：ban #1 只匹配 `go func(){...}` **闭包字面量**，
+  `go probeReader()` 这种**具名函数调用扫不出来**（生产范围内实测 4 处：`internal/observe/goroutine.go:281`
+  那一条是受管的 + `cmd/balldebug/main.go:231/259/440`）⇒ 今天的 `clean` 含义是
+  "无闭包字面量裸协程"，**不是**"没有绕过 Spawn 的东西"。
+  **完成判据（剩余）**：要么把 ban #1 扩到具名调用并**由我书面**给 `internal/observe` 豁免，
+  要么在文档里把"clean"的语义写死成当前范围。**不许默默扩语义。** 归**票 70**。
+  **元教训（与 A22 同条，但更狠）**：我自己踩的是"调用方式错了所以没跑"，
+  这两份证据踩的是"调用方式对扫描器自己成立、但范围是空的"——**同一类假绿的第二种形态**。
+  今后凡是引用门禁结论，必须看到它**报出被检查的条目数**；只报"clean"的门一律不算证据。
+- **[A27] ⚠ CI 从来没绿过：最新一次完整跑 **5/5 个 job 全红**，五种不同的因** —
+  我没有推断，是直接查的（`gh run view 35517463335 --json jobs`，run 时间 2026-09-20T14:45:32Z，commit `0891907`）：
+  `test-windows / lint / slo-full / slo-smoke / test-core` 全部 `conclusion=failure`。逐 job 的失败步骤：
+
+  | job | 失败步骤 | 因 | 归属 |
+  |---|---|---|---|
+  | `lint` | `gofmt (gofumpt)` | 我用 CI 钉的 **v0.7.0** 在本地复跑 `gofumpt -l . tools/d22scan tools/mockllm` → **69 个文件**被标 | **票 70**（一次机械格式化 sweep；`f088ce3` 起就在，所以**这个 job 可能从未通过**） |
+  | `test-core` | `Portable package tests` | `internal/observe`：`TestNoBareGoFuncInProductionCode`、`TestSampleStateCPUTotalDrivenMean`；另有 `TestExistsAndDelete`、`TestBlobsListsMetadataOnly` | **票 70** 先复现再分诊（observe 那两条**可能**是票 66/67 改动带出来的，也可能是 ubuntu/Windows 平台差） |
+  | `slo-smoke` | `SLO smoke gate` | **就是 A14**（解析丢末项 → 常态 fail-closed） | **票 66**（在跑） |
+  | `slo-full` | `Build wisp.exe (deps cached on the runner)` | 自托管 runner 的依赖/构建问题，未查 | **票 70**；`ci.yml` 注释写明该 runner 需 `wisp-slo` 标签 |
+  | `test-windows` | `PathResolver junction placeholder (real cases tickets 18/20)` | 步骤名自带 **placeholder**——**这很可能是"设计上先红"的占位**，需要确认是不是该改成显式 TODO 而非失败 | **票 70** 定性；我不在确认前改它 |
+  **我这一轮又错了一次，就地更正**：14:59 我在 commit `988c833` 里写"CI lint job 九小时来第一次真绿"——
+  **错了**。我验的只是**其中一个步骤**（d22scan），而 `lint` job 里 **gofumpt 步骤排在它前面**且今天仍红。
+  **纪律：报"job 绿"之前必须逐步骤看，或直接把 `--json jobs` 的结论贴出来。**
+  已被 `gh` 实测否证的推断，我不再用"我记得"顶。
+  **本条的意义大于任何单张票**：我们把"CI 门禁"当成本仓的既有护栏写进了 HANDOVER 与各票简报，
+  而它**一次都没生效过**——所有"CI 会拦住 X"的论证都缺前提。
+- **[A28] 票 68 AC#1 顺手挖出：`SizePx` 的 DPI 处理不对称，且**我们全部证据都是在 96 DPI 下测的**（潜在 MAJOR）** —
+  代理读码（`internal/ball/statevisual.go`，`81afe3c` 的注释里记着）：DC render target 以
+  `dpiX/dpiY = 96` 创建 ⇒ 其单位**就是物理像素**，`drawFrame` 用 `R = SizePx/2` **不缩放**；
+  而**描边宽度与 ring margin 会乘 `dpi/96`、窗口边长走 `WindowEdgePx()`**。
+  ⇒ **>96 DPI 时球体保持像素尺寸、窗口却放大**（配 56 的球在 144 DPI 下画 56px 的体、装进 108px 的窗）。
+  **为什么今天没人看见**：`docs/SLO.md` §A.2 与 `docs/evidence/s1/62-*` 的差分数字全部来自
+  本机 **3440×1440 @ 96 DPI**，那里这个不对称**恰好是 no-op**。
+  ⚠ **连带影响点击命中**：`HitTest` 按窗口矩形与 `sizePx/2` 判定，体比窗小 ⇒ 高 DPI 上"看得见但点不着"
+  或"点到透明区穿帮"都可能出现，而这正是票 64 刚修过的隐形边框那一族的近亲。
+  **完成判据**：①在 >100% 缩放的显示器上实测一次差分化像 + 命中（**本机单屏 96 DPI，做不到 → 需 owner 或第二块屏**）；
+  ②或先用一条**纯函数**用例把不对称钉住（喂 `dpi=144`，断言体径==窗口径所要求的比例）；
+  ③修不修属渲染行为变更，归**票 68 AC#2 的桌面跑同一批**。
+  **另：AC#1 判定我对契约写错了一处数字**——`stateSize` 算出的静止体是
+  **56 × `SleepRestRatio`(0.62) = 34.72px**（44/48 配置还会被 `SleepingRestMinPx=30` 兜底），
+  **不是我今天在 SPEC-08 §2 INTERIM 里写的"直径 44px"**（46×46 是差分化像框，含 ring 与边缘过渡）。
+  SPEC-08 冻结、且这条是我自己写错的 ⇒ **更正文案属"修我自己的录入错误"，不是改契约意图**，
+  但我仍把它列进**待 owner 过目**清单，不悄悄改。
+
+- **[A29] 票 68 AC#1 一次性挖出四处"窗口半径 vs 态半径"混用 + 我今天写进契约的数字是错的** —
+  先记**方法论**：代理没有新测任何像素（桌面被占），它用**已录数据的可预测性**反推真值——
+  模型在非 `Sleeping` 行先验证：`SizePx=56` 预测被窗口裁切的圆盘 **4844** 像素，
+  而 `docs/SLO.md` §A.2 的 Thinking/Acting **实测正是 4844**；再用同一模型判 `Sleeping`：
+  `34.72 → 2130`（与三次实测 2098/2103/2120 差 0.5–1.5%）、`44 → 3421`（**高出 62%**，且那个 72px 窗裁不掉它）。
+  ⇒ **"44px" 被定量否证**，这是本仓少见的"用旧数据证新事实"，我按它改判。
+  - **① 我今天在 SPEC-08 §2 INTERIM 里写的「静态玻璃体 44px」是错的**：真体是
+    `56 × SleepRestRatio(0.62) = 34.72px`（配置 44/48 时被 `SleepingRestMinPx=30` 兜底）；
+    40×38 / 44×44 / 46×46 是**差分化像框**（含 halo），且框列本身在不同跑次浮动 ±6px，**px≥8 才是稳定列**。
+    `44` 最可能的来源是 `BallSizeSmallPx`/`size_min`（**最小可配置尺寸**，`tokens.go:369-371`）被误当成体径。
+    **更正契约属"修我自己在 6 小时前录入的事实错误"，不是改契约意图**；仍列入**待 owner 过目**，不悄悄改完就算。
+  - **② 停靠态与文档相反**：`DockSquash`/`DockOverlapFrac=0.42` 只压到液滴(`:561`)、高光(`:573`)、
+    rim 描边(`:577`)，而 shell/halo/caustic/折射核仍是整圆；`DockPos` 的 `orbR` 取**窗口**半径(28)、
+    体用**态**半径(17.36) ⇒ 实测露出 **≈82%，不是文档承诺的 42%**（`62-diff-signoff` 的 35×46 行佐证）。
+  - **③ 命中半径与可见半径不一致**：prototype 自由态 `HitTest` 的 r = **21px**，而可见 halo 到 **26px**
+    ⇒ **外圈看得见但点了穿**；frozen 逃生门更糟：r=**10px** 装在 72px 窗里。
+    ⚠ 这与票 64 刚修的"隐形边框把点击挪走"是**同一族**（几何消费者各用各的矩形），**同形排查应扩展到全球包**。
+  - **④ 又一条零生产调用者的实现**：`hit.go:58` 的 `SleepWindowEdgePx` **只有测试在用**
+    （`tokens_test.go:375`）⇒ **A8/A11/A12/A13/A19/A20 之后这个形状的第 7 次复现**。
+  - **⑤ `Settling` 在 prototype 下合成到 ≈0.33**：`ball_windows.go:471/474` 把 ULW `constAlpha`
+    在**两种模式**下都驱到 `SleepOpacity=0.35`，而 `applyGlassForm` 让 Settling 落到 `RestSettledOpacity=0.95`
+    ⇒ 两个 alpha 相乘。**待我裁定**（这是 `Sleeping` 相邻的契约数字，代理正确地没动）。
+  - **⑥ 已登记的地雷（翻转默认值时会炸）**：`live_windows_test.go:609`
+    `TestBallLiveAudioLiquidGate` 靠**环境默认值**断言"先测 frozen"，**没有显式 `EnablePrototypeVisuals(false)`**
+    ⇒ 票 68 AC#2 一旦翻默认，这条会**自称为 frozen 而实测 prototype**。修 AC#2 时必须同批改它。
+  **归属**：①我改契约并告知 owner；②③⑤⑥ 归**票 68 AC#2/AC#3 的桌面跑同批**；④ 与 A24-D4 一起在票 69 或票 39 认领。
+
 ## 已解决（resolved）
 
 - **[H4] `web.search` 实现路径** → 2026-09-20 用户裁定：**搜索 API**，供应商 **anysearch**（用户已持有 key）。

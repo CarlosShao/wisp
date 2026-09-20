@@ -337,3 +337,17 @@ AC 复裁：①②③⑤ PASS，**④ 由 FAIL 转 PASS**（env 级根确认 + 8
 
 **可随 DEFERRED 延后 ship（不阻塞本票转 done）**：M-5 的每候选 `[]rune` 重复转换（无时延宣称，纯优化）；N-9 的 POSIX 侧收口（票 55 AC 已挂）；N-10 的 `..` 从严硬化；N-11 的 R4 陈旧注释（票 17 文件）；LLM 改写残留（SPEC-06 §5/§12 + 16.9#1 背书，首轮 §5(a) 已裁）；`MaxSourceRunes`/`MaxScanRunes` 截断残留（已记日志）；C25 循环接线（票 10/20/21/22/26，`DEFERRED(C25-loop-wiring)` 在位且我已复核全仓 `NewProvenance(` 无生产调用点）。
 另注：**`internal/agent/` 本轮零触碰**（两次提交 `grep -c internal/agent` = 0），本复验全程未读写该目录，构建范围一律 `./internal/risk/`。
+
+---
+
+## ⚠ 事后更正（2026-09-20，编排者，registry A26）：本文件中记为 PASS 的 `d22scan` 那条**是空跑**
+
+本文件里 `cd tools/d22scan && go run .`（**不带 `-root`**）被记成 `clean` / PASS。
+实测：该形式**默认扫描 `.`，即扫描器自己那个 module** —— 里面没有 `internal/`、没有 `cmd/`，
+allowlist 读不到时被当空 ⇒ **它检查了 0 个生产文件却退出 0**。
+⇒ 本文件据此支撑的"裸 goroutine / 墙钟超时 / `filepath.Clean` 越权 / emoji"四项，
+**在当次验收中并未被这道门检查过**。原文数字与结论**一律不改写**（历史测量保留可读），
+此段为叠加更正。
+- 已由票 67（commit `23ebb59`）修好仪器本身：`checkRoot()` 让空范围致命退出，
+  输出新增 **`examined N production Go files`** ⇒ **门今后必须自报工作量**，只报 `clean` 不作为证据。
+- 当前 HEAD 用正确调用实测：`clean`，exit 0（本条是**事后**为那两个 AC 补上的真证据，不追溯证明当次验收有效）。

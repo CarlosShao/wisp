@@ -100,6 +100,12 @@ All tickets are **vertical tracer bullets**; work the **frontier** (all blockers
   **69 c21-token-table-machine-check** —— C21 表新补的 **61 行（25 几何动效 + 36 look 色）无任何机器检查**
   （`TestTokenGoldenValues` 只管 20 条配色，`TestNoHardcodedColorsInBallPackage` 管的是另一件事）⇒
   要一条**双向**表↔码一致性断言 + 变异检验。⚠ **被票 68 阻塞：两票同动 `internal/ball`，必须串行**。
+  **70 ci-actually-green** —— **本仓的 CI 门禁从未生效过**（registry A26/A27）：
+  实测 `gh run view 35517463335 --json jobs` ⇒ **`lint`/`test-core`/`test-windows`/`slo-smoke`/`slo-full`
+  5/5 全红**（gofumpt 标 **69 文件** · observe 等 4 条测试红 · junction **placeholder** 步骤 ·
+  A14 解析缺陷 · 自托管 runner 构建失败）。⚠ 硬规矩：**不加 `continue-on-error`、不删步骤、不下调阈值凑绿**
+  （D22 "no job skippable"）；格式化 sweep 与逻辑改动**永不同 commit**；判据 = **逐 job 全 pass**，
+  不是"我本地某一步过了"。**blocked-on-tree**：AC#1 全仓重写，须等票 66/68 的包空出来。
 - **状态回写（2026-09-20 复验轮）**：**10 agent-loop-core → DONE**（编排者亲自独立复验：把
   `enforceTotal` 整体退回修复前实现，被提交的终止测试 10.00s 变红，护栏为真；两处小项登记 A10-a/b）；
   **63 credential-entry-cli → DONE**，但 **AC#6 未勾、正式转票 12**（登记 A8）、**MINOR-1 未修**（登记 A9）

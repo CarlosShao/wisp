@@ -93,8 +93,7 @@ ok  	github.com/CarlosShao/wisp/internal/agent	11.796s
 exit 0   # 专挑 3 个「异步 + 取消 + 计数器」用例加压，无竞争、无 flake
 
 $ cd tools/d22scan && go run .
-d22scan: clean - no D22 ban violations, no emoji in design/ or frontend/
-exit 0
+d22scan: clean - no D22 ban violations, no emoji in design/ or frontend/exit 0
 ```
 
 探针（`internal/agent/zz_probe_adversarial_test.go`、`zz_probe2_test.go`，P1–P14，交付前已删除、未提交）：P1/P2/P3/P5/P7/P8/P9/P10/P11/P12/P13/P14 均实跑并留档于本报告各条证据。
@@ -108,3 +107,17 @@ exit 0
 - 建议：退回 `in-progress` 修 MAJOR-1 + MAJOR-2（附上述新断言），MINOR 按批处理；修完只需复跑本报告第五节的 5 条命令 + P4/P8 两个探针形状。
 
 **VERDICT: FAIL**
+
+---
+
+## ⚠ 事后更正（2026-09-20，编排者，registry A26）：本文件中记为 PASS 的 `d22scan` 那条**是空跑**
+
+本文件里 `cd tools/d22scan && go run .`（**不带 `-root`**）被记成 `clean` / PASS。
+实测：该形式**默认扫描 `.`，即扫描器自己那个 module** —— 里面没有 `internal/`、没有 `cmd/`，
+allowlist 读不到时被当空 ⇒ **它检查了 0 个生产文件却退出 0**。
+⇒ 本文件据此支撑的"裸 goroutine / 墙钟超时 / `filepath.Clean` 越权 / emoji"四项，
+**在当次验收中并未被这道门检查过**。原文数字与结论**一律不改写**（历史测量保留可读），
+此段为叠加更正。
+- 已由票 67（commit `23ebb59`）修好仪器本身：`checkRoot()` 让空范围致命退出，
+  输出新增 **`examined N production Go files`** ⇒ **门今后必须自报工作量**，只报 `clean` 不作为证据。
+- 当前 HEAD 用正确调用实测：`clean`，exit 0（本条是**事后**为那两个 AC 补上的真证据，不追溯证明当次验收有效）。
