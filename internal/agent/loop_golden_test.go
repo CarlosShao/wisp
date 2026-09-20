@@ -150,6 +150,59 @@ func TestGoldenConcurrencyCeiling(t *testing.T) {
 	if got := h.echo().MaxConcurrent(); got < 2 {
 		t.Logf("note: observed concurrency %d (scheduler did not overlap; ceiling still honored)", got)
 	}
+	// NOTE: with an instant-returning tool the check above is satisfied by a
+	// fully serial pool, so it only proves the ceiling. TestToolExecutionRunsFourAcross
+	// below holds its calls open and proves the parallelism.
+}
+
+// MINOR-6: D38d's ceiling is only half the claim - the other half is that tool
+// calls really do run four-abreast. EchoProvider returns so fast that
+// MaxConcurrent() stays 1 no matter how the pool is built, so the ceiling test
+// above cannot tell "limit 4" from "strictly serial". Here the provider holds
+// every call until the test says so, which makes four overlapping executions a
+// precondition rather than an accident: a serial implementation parks at one
+// and fails the wait below.
+func TestToolExecutionRunsFourAcross(t *testing.T) {
+	tools := newBlockingProvider()
+	t.Cleanup(tools.release)
+	h := newHarness(t, "six-tools", withTools(tools), withConfig(func(c *Config) {
+		c.PerToolTimeout = 30 * time.Second // the release ends the hold, not the brake
+	}))
+
+	task := h.loop.RunAsync(context.Background(), "六个任务并行")
+	if !h.waitForFirstRequest(5 * time.Second) {
+		task.Cancel()
+		task.Wait()
+		t.Fatal("provider never received a request")
+	}
+	if !tools.waitForInflight(MaxToolConcurrency, 5*time.Second) {
+		tools.release()
+		task.Wait()
+		t.Fatalf("only %d calls ran at once, want %d: the pool is serial, so the " +
+			"ceiling assertion in TestGoldenConcurrencyCeiling is vacuous",
+			tools.MaxConcurrent(), MaxToolConcurrency)
+	}
+	// Four of six are parked right now: the ceiling is a gate, not a hint, so
+	// not even a fifth call may have entered the provider.
+	if got := tools.MaxConcurrent(); got > MaxToolConcurrency {
+		t.Errorf("max concurrent = %d, want <= %d (D38d ceiling)", got, MaxToolConcurrency)
+	}
+	if got := tools.Started(); got > MaxToolConcurrency {
+		t.Errorf("calls entered while four were held = %d, want <= %d", got, MaxToolConcurrency)
+	}
+
+	tools.release()
+	res := task.Wait()
+	if res.Status != StatusCompleted {
+		t.Fatalf("status = %s (%s), want completed", res.Status, res.Message)
+	}
+	if got := tools.CallCount(); got != 6 {
+		t.Errorf("executions = %d, want 6", got)
+	}
+	if got := tools.MaxConcurrent(); got != MaxToolConcurrency {
+		t.Errorf("observed concurrency = %d, want exactly %d: the ceiling must be "+
+			"reached, not merely respected", got, MaxToolConcurrency)
+	}
 }
 
 // Budget exhaustion is the C22 token brake: Stuck state plus an explicit,
