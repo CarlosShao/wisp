@@ -1,8 +1,8 @@
 # 10 — Agent loop core: ReAct, context assembly, budgets, LoopGuard (single-task)
 
 **Status:** in-progress
-**Claimed by:** agent-ticket10-fix
-**Last update:** 2026-09-20
+**Claimed by:** agent-ticket10-fix2
+**Last update:** 2026-09-20T07:10Z
 **Blocked by:** 05-config-model, 09-llm-provider-openai-mockllm
 **Parallel slots:** ≤2 sub-agents (A: loop + tool plumbing + truncation rule; B: context
 assembly + spill + compression + cost hooks)
@@ -45,6 +45,8 @@ and `stopReason=length` → `failToolCallsFromTruncatedMessage`. Tool execution 
 - Anthropic/Responses adapters (11); approval gating (21) — ToolProvider contract returns
   "unclassified" risk which this ticket routes as L0-pass-through behind a flag; multi-task
   scheduler (47); memory extraction (29).
+- D11(3) force_tool/force_chat rule table — DEFERRED(D11-3), owned by the routing ticket, not
+  built here (registered explicitly so it cannot evaporate from the acceptance surface).
 
 ## Acceptance criteria
 - [x] Golden-driven loop tests: pure-text reply; single tool call; parallel tool calls; loop with
@@ -69,3 +71,4 @@ and `stopReason=length` → `failToolCallsFromTruncatedMessage`. Tool execution 
 - [2026-09-20T12:22Z] agent=agent-ticket10-loop did=AC4 compression green (compress_test.go): >12k history folds oldest, exactly last-3 (KeepRawRounds) stay verbatim as live tool_use+tool_result; every folded id survives via the never-drop ledger (asserted by id presence, not token count) incl. a model summarizer that omits ids from prose; compress trigger scales (5-round ~500tok history: 128k no-op, 4k folds); under-threshold no-op. next=AC7 prompt order
 - [2026-09-20T12:40Z] agent=agent-ticket10-loop did=AC7 prompt-order green (prompt_test.go) → ALL 7 AC families closed; asserts on BYTES: cache prefix (identity/safety/style/resident-tools) byte-identical across two turns with differing time/focus + BM25 + profile + history, volatile strings never leak into the prefix, non-trivial prefix required (no vacuous equality); canonical D39 order with ④ scene mandatory-last; suffix parts profile→BM25→scene. Full suite: 35 tests green across go test -count=2, go vet, and go test -race; status→review (awaiting adversarial acceptance). Notes for reviewer: (a) D11(3) force_tool/force_chat rule table remains DEFERRED(D11-3) — out of this ticket's scope per §Out-of-scope; (b) compression still called synchronously pre-request → DEFERRED(D28-1) (Warm-window hook owns it); (c) a cancelled task's terminal task_log/tool_call rows are written with the root's cancelled ctx and thus abandoned by memory's writer — pre-existing behaviour, spec-silent, NOT changed here (flag if acceptance wants a detached cleanup ctx).
 - [2026-09-20T05:40Z] agent=agent-ticket10-fix did=accepted FAIL verdict, starting MAJOR-1/MAJOR-2 + MINOR set next=cancelled-task-terminal-rows
+- [2026-09-20T07:10Z] agent=agent-ticket10-fix2 did=resumed after platform kill; predecessor committed fa82b60+c657f85; orchestrator reverted an uncommitted `if true` in clipToTokens — next=MAJOR-1 cancelled-task terminal rows

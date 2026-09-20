@@ -294,6 +294,12 @@ func utf8Start(b byte) bool { return b&0xC0 != 0x80 }
 
 // enforceTotal trims suffix sections until the D39 total holds; prefix
 // sections are never trimmed here because each already carries its own cap.
+//
+// Every pass must remove at least one token, so the loop terminates from any
+// starting point. Without that guarantee a window small enough that the seven
+// sections sit at their 1-token floors (their scaled budgets then sum above the
+// scaled total) left this spinning forever with nothing left to clip - the
+// task goroutine never returned. See TestEnforceTotalTerminatesAtEveryWindow.
 func enforceTotal(sections []Section, total int) {
 	over := func() int {
 		n := 0
@@ -305,26 +311,31 @@ func enforceTotal(sections []Section, total int) {
 	for over() > 0 {
 		// Shrink the largest suffix section that is not the (4) scene block
 		// (scene is mandatory-last AND tiny, so the trimming target is
-		// normally the profile or the retrieved index).
-		idx := -1
+		// normally the profile or the retrieved index). A section already at
+		// the 1-token floor is not a candidate: it has nothing left to give.
+		idx, toks := -1, 0
 		for i, s := range sections {
-			if s.CachePrefix || ApproxTokens(s.Text) == 0 {
+			t := ApproxTokens(s.Text)
+			if s.CachePrefix || t <= 1 {
 				continue
 			}
-			if idx == -1 || ApproxTokens(s.Text) > ApproxTokens(sections[idx].Text) {
-				idx = i
+			if idx == -1 || t > toks {
+				idx, toks = i, t
 			}
 		}
 		if idx == -1 {
-			return // nothing left to trim: prefix budget holds on its own
+			return // at the floor everywhere: only the prefix's own minimum is left
 		}
 		s := sections[idx]
-		newBudget := s.Budget - over()
-		if newBudget < 1 {
-			newBudget = 1
+		nb := s.Budget - over()
+		if nb > toks-1 {
+			nb = toks - 1 // strictly below where it is: this pass must bite
 		}
-		s.Text = clipToTokens(s.Text, newBudget)
-		s.Budget = newBudget
+		if nb < 1 {
+			nb = 1
+		}
+		s.Text = clipToTokens(s.Text, nb)
+		s.Budget = nb
 		sections[idx] = s
 	}
 }
