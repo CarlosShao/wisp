@@ -135,7 +135,7 @@ alpha，`hex()` 0xRRGGBB + alpha）。D2D 使用直通 alpha 的 `D2D1_COLOR_F`�
 | 描边宽 | 1.5px 斜杠 / 图标；Conversation 环 2px；Thinking 底部光带 2px | `SlashStrokePx` / `IconStrokePx` / `RingStrokePx` / `ConvRingStrokePx` / `ThinkingBandPx` | SPEC-08 §2.1（`ThinkingBandPx` 为本票补录） |
 | 角标 / 队列点 | 17px 角标、10px 数字、2px 角标描边、9px info 点 | `BadgeDiameterPx` / `BadgeFontPx` / `BadgeBorderPx` / `QueueDotPx` | ball.html（`BadgeBorderPx` 为本票补录） |
 | 字体 | `--font-sans` CJK 头 + `--t-mono` 12.5 / `--t-micro` 11；环下倒计时 10px | `FontFamily` / `FontSizeMonoPx` / `FontSizeMicroPx` / `CountdownFontPx` | DWrite 文本（`CountdownFontPx` 为本票补录） |
-| 液态斑位置（票 62，无 CSS 对应） | 半径 0.72 / 0.62 / 0.50 × 球半径；偏心 0.22 / 0.30 / 0.40 | `LiquidRadiusA..C` / `LiquidOffsetA..C` | 三枚软场叠加才读成「液体」；渲染器只旋转与胀缩，不重建 brush |
+| 液态斑位置（票 62，无 CSS 对应） | 半径 0.72 / 0.62 / 0.50 × 球半径；偏心 0.22 / 0.30 / 0.40 | `LiquidRadiusA` / `LiquidRadiusB` / `LiquidRadiusC` / `LiquidOffsetA` / `LiquidOffsetB` / `LiquidOffsetC` | 三枚软场叠加才读成「液体」；渲染器只旋转与胀缩，不重建 brush |
 | 玻璃边缘权重（票 62，无 CSS 对应） | 外缘暗环 1.2px / 内亮唇 1.0px / 焦散 0.30 / 「未说话」边框环 1.8px（96 DPI 物理 px，绘制时按 DPI 缩放） | `GlassRimPx` / `GlassLipPx` / `GlassCaustic` / `BorderRingPx` | 浅色桌布上的对比度锚点 |
 | 音频包络 → 液体运动（票 62，无 CSS 对应） | 每单位电平：偏心增益 0.55、转速增益 1.0 | `SwimLevelGain` / `SpinLevelGain` | 无分配：只改已有 brush 的几何 |
 | 边框与流动时序（票 62/64，无 CSS 对应） | 边框淡入 220ms / 收声汇聚 180ms / 唤起一次性流动 900ms | `BorderOpenMs` / `BorderCloseMs` / `SummonFlowMs` | 180ms 属 `--dur-base` 档；220ms 属 `--dur-slow` 族；900ms 是一次性动效，不受「UI 过渡 ≤300ms」预算约束（SPEC-08 §2 时长预算） |
@@ -215,6 +215,10 @@ alpha，`hex()` 0xRRGGBB + alpha）。D2D 使用直通 alpha 的 `D2D1_COLOR_F`�
   字面量与 `tokens.css` 声明逐条比对，`design/assets/tokens.css` 129 条声明中 80 条无原生对应
   （见「范围」）。核对结论：色值 78 行（明 40 + 亮 38）**与 CSS、`tokens.go` 三方逐字一致，零漂移**；
   几何/动效缺 25 个常量，本票已全部补录。
+- 票 64 的 hotkey 面**不产 token**（本票查过，免下一个代理重查）：`internal/ball/hotkey_windows.go`
+  三处 `const` 块是 Win32 修饰键/虚拟键码（`modAlt=0x0001` … `vkEscape=0x1B`）与 `HotkeyStatus`
+  枚举，既无尺寸也无颜色；`hkNames` 的用户可见文案零 emoji。票 64 进本表的只有边缘吸附三常量
+  （`DockAnimMs` / `DockOverlapFrac` / `DockTriggerPx`）。
 - **零 emoji 扫描（AC#7 前半）**：仓内唯一机器执行的 emoji 检查是 `tools/d22scan` 的 ban `emoji`
   （`tools/d22scan/main.go:71` 的 `emojiRe` + `walkEmoji`），**scope 只有 `design/` 与 `frontend/`
   两处**（`main.go:137-142`），且 `frontend/` 在当前 HEAD **不存在** ⇒ 该门今天实际只覆盖 `design/`。
