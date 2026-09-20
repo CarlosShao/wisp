@@ -302,16 +302,15 @@ go build -o build/wisp.exe ./cmd/wisp && go build -o build/balldebug.exe ./cmd/b
 # 0) 桌面洁净自检：必须无输出（有别人建的球 = 立刻停手，A5 那次假报告就是这么来的）
 tasklist | grep -iE "wisp|balldebug"
 
-# 1) tree-private 状态采样（keeper = A.4#1 的临时绕法；修好 parseSystemProcesses 后删掉中间两行）
+# 1) tree-private 状态采样。**keeper 绕法已删除**（票 66 AC#2，修复 commit 86e868d）：
+#    A.4#1 的解析缺陷修好后，无 keeper 直接跑即可采样成功；
+#    CPU 行的口径见附录 C（树外测量），树内 CPU 只作记录、不作门。
 ./build/wisp.exe slo -state Sleeping -seconds 10 -interval-ms 250 \
-  -out build/slo/t12/sleeping-1.json & w=$!
-k=""; for i in 1 2 3 4 5; do ping -n 40 127.0.0.1 >/dev/null 2>&1 & k="$k $!"; sleep 1; done
-wait $w; echo "exit=$?"; for p in $k; do kill $p 2>/dev/null; done
+  -out build/slo/verify/66-nokeeper-1.json; echo "exit=$?"
 
-# 2) settle 行（同样需要 keeper）
-./build/wisp.exe slo -settle -seconds 10 -out build/slo/t12/settle-1.json & w=$!
-k=""; for i in 1 2 3 4 5; do ping -n 40 127.0.0.1 >/dev/null 2>&1 & k="$k $!"; sleep 1; done
-wait $w; echo "exit=$?"; for p in $k; do kill $p 2>/dev/null; done
+# 2) settle 行（同样不再需要 keeper）
+./build/wisp.exe slo -settle -seconds 10 \
+  -out build/slo/verify/66-settle-1.json; echo "exit=$?"
 
 # 3) 带球的真实态（桌面独占；差分表 → docs/evidence/s1/12-ball-walk/diff-table.txt）
 ./build/balldebug.exe -diff docs/evidence/s1/12-ball-walk \

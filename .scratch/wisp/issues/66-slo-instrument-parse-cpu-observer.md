@@ -65,10 +65,10 @@
 
 ## 验收标准（AC）
 
-- [ ] **AC#1 解析末项**：`parseSystemProcesses` 顺序修正；一条**回归用例**构造「目标 pid 恰为快照链最后一项」
+- [x] **AC#1 解析末项**：`parseSystemProcesses` 顺序修正；一条**回归用例**构造「目标 pid 恰为快照链最后一项」
   的缓冲并断言它在 map 里。⚠ 必须证明这条用例咬住缺陷：把函数退回旧实现，该用例**必须转红**
   （变异检验，`docs/evidence/s1/66-mutation-*.md` 留原始输出）。
-- [ ] **AC#2 无 keeper 可用**：`wisp slo -state Sleeping -seconds 10 -interval-ms 250`
+- [x] **AC#2 无 keeper 可用**：`wisp slo -state Sleeping -seconds 10 -interval-ms 250`
   在**不启动任何 keeper 进程**的情况下 `exit≠2` 且九项门全出数；**连续 5 次**全部如此（一次成功不算，
   因为旧缺陷本来就是按进程创建顺序随机的）。把 A.6#1 里的 keeper 绕法从文档删掉。
 - [ ] **AC#3 CPU 树外口径**：`wisp slo` 获得树外测量能力（父读子 pid，复用 `cmd/balldebug/diff_windows.go`
@@ -87,5 +87,6 @@
   `-race` 同包跑一次；`tools/d22scan` 与静态禁用模式扫描 clean。
 
 ## Progress log（每次 commit 追加一行，格式 `- [ISO-Z] agent=... did=...`）
+- [2026-09-20T14:38Z] agent=agent-ticket66 did=AC#1 变异检验 + AC#2 无 keeper 连跑 5 次。变异：把 `WalkSystemProcesses` 退回「先测 `next==0` 再解码」，`go test -count=1 -v ./internal/proc/` → rc=1，3 条新用例全红（`parsed 4 of 5 snapshot entries: [1337 60060 4 4004]`／`walker delivered [100], want [100 200]`／`parsed zero entries`），包内其余 23 条仍绿；撤变异后 rc=0 全绿（grep -c MUTATION=0 已核）。原始输出 `docs/evidence/s1/66-mutation-parse-order.md`。AC#2：`./build/wisp.exe slo -state Sleeping -seconds 10 -interval-ms 250`（零 keeper）连跑 5 次 exit=1/1/1/1/1（≠2，九项门各出 9 行、40 样本、0 sample_errors），CPU 树内读数 0.6604/0.7625/0.7623/0.6356/0.6356% —— 即缺陷②本身，正是 B.3 预告的「只修① ⇒ 门随机红」，故 AC#3/#4 必须与本 commit 集同批。编排者那条 exit=2 的原 repro（`-seconds 5`）现在 exit=0（`docs/evidence/s1/66/66-repro-a1.json`）。A.6#1/#2 的 keeper 两行已从 docs/SLO.md 删掉并改为无 keeper 形态；无 keeper 的 `-settle` 复跑 exit=0（回 cap 262ms、FreeOSMemory=2、末值 8.5MB）。测量前后 `tasklist|grep -iE "wisp|balldebug"` 均为空。剩余：AC#3 树外口径（含 balldebug 改用公共快照函数）、AC#4 slo-check、AC#5 票 08 追溯 + full 子集归档、AC#6 附录 C + A14/A15 移入已解决、AC#7 门禁。
 
 - [2026-09-20T14:24Z] agent=agent-ticket66 did=AC#1 主体：`parseSystemProcesses` 改为「先解析当前项并入 map、再测 `NextEntryOffset==0`」，并把这条链的唯一解码器抽成 `internal/proc/systemprocs_windows.go::WalkSystemProcesses`（`SysProcSample`/`SystemProcessSnapshot` 一并导出，供 AC#3 的树外读取与 `cmd/balldebug` 复用，不再养第二份实现）；新增回归用例 `internal/proc/systemprocs_windows_test.go` 7 条，其中 `TestParseSystemProcessesKeepsLastSnapshotEntry` 手工构造「目标 pid 恰为链末项」的缓冲并逐项断言 handle 数/私有工作集/线程数/user+kernel 时间（不是只断言 `len(out)`）。测量：`go test -count=1 -run 'TestParseSystemProcesses|TestWalkSystemProcesses|TestSystemProcessSnapshot' ./internal/proc/` → 7/7 PASS；`go build ./...` OK；`go test -count=1 ./internal/proc/` ok 0.464s；`gofmt -l internal/proc/` 空；`go vet ./internal/proc/` 干净。剩余：变异检验（退回旧实现 → 新用例必须转红，原始输出存 `docs/evidence/s1/66-mutation-*.md`）、AC#2-AC#7 全部未动。
