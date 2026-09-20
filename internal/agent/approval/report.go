@@ -106,6 +106,13 @@ func (g *Gate) Report(d tools.Decision, res tools.Result) CancellationReport {
 		}
 	}
 	g.mu.Unlock()
+	if len(rep.AppliedSteps) > 0 {
+		// A tool that lists what it did has started, whatever the post-handoff
+		// table says (it is bounded by MaxTracked and can evict). Trusting the
+		// ledger here is what stops a call that wrote bytes from being rendered
+		// as "never entered execution" - D31's named failure.
+		rep.StartedBeforeVeto = true
+	}
 
 	rep.UnreportedSteps = rep.Vetoed && len(rep.AppliedSteps) == 0
 	rep.Text = rep.TextFor()
@@ -121,6 +128,12 @@ func (r CancellationReport) TextFor() string {
 		b.WriteString("本次调用未进入执行阶段")
 	case r.Vetoed && len(r.AppliedSteps) > 0:
 		b.WriteString("取消不是原子的（D31）：否决到达时执行已开始，以下步骤已生效，未自动回退")
+	case len(r.AppliedSteps) > 0:
+		// Steps landed with no veto on record: a task cancellation, a tool error
+		// or a timeout. Still not a clean undo, and saying 「未进入执行阶段」
+		// over a list of side effects would be the fake-clean-cancel wording D31
+		// exists to prevent, so this case gets its own sentence.
+		b.WriteString("执行已开始，以下步骤已生效，未自动回退（本次未收到否决记录）")
 	default:
 		b.WriteString("取消不是原子的（D31）：否决到达时执行已开始，但工具未上报其步骤，以下步骤可能已产生副作用")
 	}

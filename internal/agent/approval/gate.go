@@ -444,6 +444,11 @@ func (g *Gate) PendingApproval(ctx context.Context, d tools.Decision) (tools.Ans
 		return tools.AnswerReject, "审批令牌无法签发：" + err.Error()
 	}
 	corr := it.Corr
+	// D31 bookkeeping keys on the INCOMING correlation id, because that is the
+	// value the bridge's cancel bus looks a started call up by; it.Corr is the
+	// card's address in the queue, and the two are not the same string once the
+	// queue has re-issued one. Captured before d is re-stamped below.
+	incoming := orDefaultText(d.CorrelationID, d.TaskID)
 	d.CorrelationID = corr
 
 	// Armed before display, for the same reason as the L1 countdown: the C18
@@ -467,6 +472,15 @@ func (g *Gate) PendingApproval(ctx context.Context, d tools.Decision) (tools.Ans
 	for {
 		select {
 		case a := <-it.answer:
+			if a.a == tools.AnswerAllow {
+				// An approved L2 has now handed off to execution exactly like an
+				// expired L1 window, so it needs the same post-handoff record:
+				// without it, a veto arriving during the tool's own work would be
+				// reported as "never entered execution" over a call that had
+				// already written bytes (D31). Keyed on the incoming id so the
+				// bridge's bus can find it.
+				g.markStarted(incoming, d.Tool)
+			}
 			_ = g.ui.Update(ctx, Event{Kind: EventDismissed, CorrelationID: corr, Text: a.why})
 			return a.a, a.why
 
