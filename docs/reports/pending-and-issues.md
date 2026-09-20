@@ -154,6 +154,16 @@
   不能自证，故留着未勾。**当前残缺表现**：把 `api_key_ref` 接错、或 provider 侧偷偷回退读明文 config
   字段，票 63 的套件不会变红。**完成判据**已写进票 12 的新 AC 框（判据含变异检验：ref 指向不存在的
   blob 时必须走 Unconfigured 失败路径，不得静默成功）。票 12 因此从"无待消化 AC"变为"背一张外来的框"。
+- **[A9] 票 63 MINOR-1：审计轨迹断言被"收窄"开出一个假绿洞（不阻塞）** — `4477f56` 把 `unset` 的
+  "forced=true 只属于强制删除"从**整缓冲 grep** 收窄成只看 `auditRecordFor(needle)` 返回的那一条记录。
+  收窄修的是真污染（共享日志缓冲后前一个子测试的合法 forced=true 会误伤），但丢了旧断言的一种检测力：
+  把 `forced=true` 记进**另一条不含 needle 的记录**、且强制/非强制两条分支都记，
+  `go test -run TestSecretUnset ./cmd/wisp/` **0.064s 全绿**。复现补丁存在仓库外
+  `ticket63-mutation-M2.patch`（验收方替被杀的验收代理跑完实验后已 `git checkout` 还原生产文件）。
+  **当前残缺表现**：弱的是审计轨迹而非泄漏判据——明文入日志仍会红 5 处（已独立验证）。
+  **完成判据**：正半边保留 `auditRecordFor`，另加全缓冲**计数**不变式（含 `forced=true` 的记录条数
+  == 本测试实际执行的强制删除次数），且 M2 补丁重新 apply 后必须变红。归属：下次动 `cmd/wisp`
+  时顺手做，不单独立票。
 
 ## 已解决（resolved）
 

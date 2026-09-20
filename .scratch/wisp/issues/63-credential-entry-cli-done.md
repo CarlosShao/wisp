@@ -1,8 +1,8 @@
 # 63 — 凭据录入入口：`wisp secret set/get/list/unset`（隐藏输入 → DPAPI）
 
-**Status:** review
-**Claimed by:** agent-ticket63-fix2
-**Last update:** 2026-09-20T09:40Z
+**Status:** done
+**Claimed by:** agent-ticket63-fix2 (impl) + orchestrator (acceptance)
+**Last update:** 2026-09-20T07:20Z
 **Blocked by:** 06-secretstore-envs（DPAPI Store 已存在）
 **Parallel slots:** ≤1 sub-agent
 **Spec refs:** SPEC-03 §3.1（secret refs）, SPEC-06（凭据不落明文）, D22, P13 便携模式, R7
@@ -47,8 +47,10 @@ wisp secret unset <name>      # 删除 blob，并检查是否仍被 config 引�
       —— 未勾原因：`TestSecretEndToEndConfigRefResolvesAtRequestTime` 证明了 ref→`config.LoadFile`→
       `ProviderKeys`→`Authorization` 头真的上线，但发请求的是测试自己的 http client，不是
       `internal/llm` 的 provider；provider 那一段是调用方自证的（README 规则：安全判定不得由调用方选择器决定）。
-- [ ] 对抗验收由非实现者执行，报告含与本表 **1:1 的裁决表**（README 规则 6）。
-      —— 未勾原因：本票由实现者填写，验收报告尚未产出；这是复核者的格子，不是能自证的格子。
+- [x] 对抗验收由非实现者执行，报告含与本表 **1:1 的裁决表**（README 规则 6）。
+      —— 验收报告：`docs/evidence/s1/63-adversarial-acceptance.md`（编排者亲自执行：派出的验收代理
+      在 26 次工具调用后被平台连接中断杀死，它已种下的变异 M2 被我保存到仓库外、跑完、再还原生产文件）。
+      7 行裁决齐全；AC#2 的泄漏判据由验收方**独立重做变异**证明会红（5 处）；新出 MINOR-1（M2 假绿）。
 
 ## Progress log (append-only, newest last)
 - [2026-09-20T06:50Z] agent=agent-ticket63-secretcli did=claimed next=set/get/list/unset+leak-tests
@@ -57,5 +59,6 @@ wisp secret unset <name>      # 删除 blob，并检查是否仍被 config 引�
 - [2026-09-20T08:50Z] agent=agent-ticket63-fix2 did=resumed after model-connection kill (predecessor committed 722f819, 13 tests green); auditing uncommitted argv-forensics test next=finish OS-level proof then reconcile 7 boxes
 - [2026-09-20T09:20Z] agent=agent-ticket63-fix2 did=完成 OS 级 argv 取证。状态报告：前任留下的 `cmd/wisp/secret_argv_windows_test.go` 未跟踪但**可编译、原样即 PASS**（不是半成品），它缺的是"探针本身可信"这一半，不是"测试跑通"那一半。断言对象是**活着的** wisp.exe 子进程的 PEB `_RTL_USER_PROCESS_PARAMETERS.CommandLine`（amd64 偏移 0x20/0x70 + UNICODE_STRING，非 amd64/非 windows 一律 Fatal 不 skip）；此刻明文已经过 stdin 进入子进程并且子进程仍阻塞在读上，所以是在"泄漏会看得见"的时刻取证：OS 可见命令行必须逐 token 等于 `secret set argvprobe --from-stdin`（任何被追加的 token 都 FAIL），整串与中段片段都不含明文；`--value=<key>` 走真二进制=退出码 2、零 blob、不回显。新增正对照 `TestProcessCommandLineProbeDetectsAPlantedValue`：把假 key 当**参数**种进一个活子进程，要求同一个探针把它读出来——探针若是瞎的，上面所有"argv 没有明文"就都是空断言，现在这种情形会 FAIL。修 1 处谎报的失败信息（原 Fatal 声称"最后一次错误由 procCommandLine 报告"，实际并未报告；现按 pollCommandLine 返回真实 last error）。登记遗留：探针只覆盖被观察的直接子进程，Windows 无 execve，未来若 `secret set` 改为再生子进程并在其 argv 里带值，孙进程不在本票视野内；补法=活窗口内 Toolhelp32 枚举子进程并逐个跑同一 PEB 读，判据=任何读到的命令行都不含明文。next=变异检验判据仪器 + 跑门禁
 - [2026-09-20T09:40Z] agent=agent-ticket63-fix2 did=变异检验（本票唯一能证明判据仪器可信的手段）+ 门禁全绿 + 勾栏 5/7。①在 runSet 里把明文塞进 slog 属性 → 4 处断言 FAIL；把 secret_test.go 退回**已提交版**（去掉前任未提交的 activeCapture 共享缓冲）后同一变异 **0 FAIL = 假绿**，证明那份未提交改动是承重的，已随 4477f56 一并提交。②在 collectSecret 里把 stdin 明文写成 %TEMP% 一个 scratch 文件 → 新测试 `TestSecretFromStdinWritesNoIntermediateFile` FAIL 并点名该文件（它自带"先种含明文诱饵、要求扫描器找到"的正对照，否则"没有文件含明文"同样空断言）；AC2 的临时文件半边此前无人证明，现在有了。③共享缓冲暴露一个真回归：`unset` 的"forced=true 只属于强制删除"是整缓冲 grep，被同测试前一个子测试的合法 forced=true WARN 污染 → 用 `auditRecordFor` 把断言收窄到本条审计记录，并**加强**为必须出现 `forced=false`（原断言只验"别处没有 forced=true"）；未弱化任何既有断言。④门禁：`gofmt -l` 三个文件为空；`go vet ./cmd/wisp/ ./internal/secret/` RC=0；`go test ./internal/secret/ -count=2` ok 0.628s；`go test ./cmd/wisp/ -count=2` ok 12.039s；`go test ./cmd/wisp/ ./internal/secret/ -race -count=1` ok 7.353s / 1.180s；cmd/wisp 现 18 顶层测试 + 31 子测试。注意：cmd/wisp 的测试二进制链接 sherpa-onnx，跑前必须把 `third_party/sherpa-onnx` 放进 PATH，否则子进程 0xc0000135 起不来（包既有属性，非本票引入，BUILD.md 未记）。⑤AC 勾选：1/2/3/4/5 勾；6 未勾=端到端里发请求的是测试自己的 http client 而非 `internal/llm` 的 provider，provider 段属调用方自证（且现在接 internal/llm 会把本票门禁绑到另一代理在飞的编辑上）；7 未勾=对抗验收要由非实现者产出 1:1 裁决表，不是实现者可自证的格子。next=非实现者按本表 1:1 裁决
+- [2026-09-20T07:25Z] agent=orchestrator did=**对抗验收（非实现者）**。派出的验收代理 26 次工具调用后被平台连接中断杀死，且死时 `cmd/wisp/secret.go` 带着它种下的 MUTATION-M2；处置=先把补丁存到仓库外（`ticket63-mutation-M2.patch`，15 行）→ 替它把实验跑完 → `git checkout --` 还原并确认干净。验收方**独立重做**的关键判据：①在 `secret.go:326` 审计日志塞明文 → **5 处断言变红**（set/--show/失败路径/unset/端到端），证明 AC#2 的泄漏判据咬得住；②PEB 探针非空断言：正对照（`secret_argv_windows_test.go:452`）把 fakeKey 作为**真实位置参数**种进活子进程，且用的是与负断言**同一个** `pollCommandLine()`（`:463` vs `:253`）；③flag 面是**整文件** grep 13 种取值构造器，往 get/unset 加值 flag 同样会红，另有 8 种 `--value=` 运行时拒绝+不回显；④AC#4 内容级（三把不同 key→3 份不同密文，各 env 读回自己那把且断言不等于他人那把，prod 列表不得触达 dev 目录）；⑤AC#5 两条路径都断 blob 字节不含明文，静默降级会在内容上失败。**新出 MINOR-1（M2 假绿）**：`auditRecordFor` 把整缓冲 `forced=true` grep 收窄到"含 needle 的那一条记录"后，把 `forced=true` 记在**另一条不含 needle 的记录**里、且两条分支都记，套件 **0.064s 全绿**——而 `4477f56` 之前的整缓冲断言会抓到；定级 MINOR 而非 MAJOR，因为弱化的是审计轨迹断言、不是泄漏断言（后者已独立证明会红）。修法写进报告：正半边保留 `auditRecordFor`，另加"含 `forced=true` 的记录条数 == 本测试真正执行过的强制删除次数"的全缓冲计数不变式（既堵 M2 又不重开污染 bug）。AC#6 判为**合法转移**而非本票缺口，已转票 12 并登记 A8。门禁验收方复跑：gofmt 空 / vet RC 0 / `internal/secret -count=2` ok 0.195s / `cmd/wisp -count=2` ok 11.317s / 两包 `-race` ok 7.875s+1.225s。报告 `docs/evidence/s1/63-adversarial-acceptance.md`。next=MINOR-1 随 A9 排队消化（不阻塞本票 done）
 
 
