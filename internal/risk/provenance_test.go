@@ -529,6 +529,96 @@ func TestWriteGatePlainLocalWriteNotFlagged(t *testing.T) {
 	}
 }
 
+// --- C-3: the write gate must judge EVERY path-shaped parameter ---------------
+
+// TestWriteGateEveryPathTargetJudged is the orchestrator's C-3 probe made
+// permanent: writeGate used to examine only the FIRST pathKeys match, so a
+// call carrying two path-shaped parameters was judged on one of them — a
+// decoy `path` confirmed outside every sync root exempted the payload while
+// the real `dest` sat inside OneDrive (the key table's precedence order, not
+// the call's shape, decided whether the security check ran). Every path-shaped
+// parameter must now be a confirmed non-sync target, on both routes: Inspect
+// and the frozen tool-name-less seam. The 4th case is the orchestrator's
+// "single sync dest only" control, which already worked; the rest are new.
+func TestWriteGateEveryPathTargetJudged(t *testing.T) {
+	p, syncTarget, plain := m7Engine(t)
+	plain2 := filepath.Join(filepath.Dir(plain), "second-brand-new.md")
+	if p.IsSyncPath(plain2).Sync {
+		t.Fatalf("precondition: %s must be a plain non-sync target", plain2)
+	}
+	cases := []struct {
+		name   string
+		tool   string
+		params map[string]any
+	}{
+		{"decoy path + real dest", "fs.write", map[string]any{
+			"path": plain, "dest": syncTarget, "data": "leak " + marker}},
+		{"reversed order", "fs.write", map[string]any{
+			"dest": syncTarget, "path": plain, "data": "leak " + marker}},
+		{"file+destination, no tool name", "", map[string]any{
+			"file": plain, "destination": syncTarget, "data": "leak " + marker}},
+		{"three-way: path+dest non-sync, file in sync root", "fs.write", map[string]any{
+			"path": plain, "dest": plain2, "file": syncTarget, "content": "leak " + marker}},
+		{"single sync dest only", "fs.write", map[string]any{
+			"dest": syncTarget, "data": "leak " + marker}},
+		{"casing decoy: Path hides the sync target from an exact-match scan", "fs.write", map[string]any{
+			"path": plain, "Path": syncTarget, "data": "leak " + marker}},
+		{"path-shaped key with no checkable value", "fs.write", map[string]any{
+			"path": plain, "dest": map[string]any{"inner": syncTarget}, "data": "leak " + marker}},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			hit, ok := p.Inspect("task-1", c.tool, c.params)
+			if !ok {
+				t.Fatalf("ESCAPIABLE (C-3): tool=%q %v not caught", c.tool, c.params)
+			}
+			if hit.Channel != ChSyncWrite {
+				t.Errorf("channel: got %q want %q", hit.Channel, ChSyncWrite)
+			}
+			if !strings.Contains(hit.Source(), "web.fetch") {
+				t.Errorf("must name the source, got %q", hit.Source())
+			}
+			// The same shape through the frozen, tool-name-less C19 seam.
+			if src, h := p.Detector("task-1").TaintHit(c.params); !h {
+				t.Errorf("ESCAPIABLE (C-3) via the frozen seam: %v", c.params)
+			} else if !strings.Contains(src, "web.fetch") {
+				t.Errorf("seam attribution: %q", src)
+			}
+		})
+	}
+}
+
+// TestWriteGateAllPathsNonSyncStaysExempt is the no-regression guard C-3 must
+// not become a hammer: a call whose ONLY path-shaped targets are confirmed
+// non-sync and which has no remote sink is still a plain local write, so the
+// payload stays exempt whichever key carries it (multi-target copy/move shape
+// of ticket 20; the single-target shape stays pinned by
+// TestWriteGatePlainLocalWriteNotFlagged and TestSyncWriteNegative). On the
+// named fs.write channel only the two contract body keys are exempt (N-8).
+func TestWriteGateAllPathsNonSyncStaysExempt(t *testing.T) {
+	p, _, plain := m7Engine(t)
+	plain2 := filepath.Join(filepath.Dir(plain), "second-brand-new.md")
+	for _, name := range []string{"content", "data", "body", "payload", "raw"} {
+		params := map[string]any{"path": plain, "dest": plain2, "destination": plain}
+		if name == "raw" {
+			params[name] = []byte(marker)
+		} else {
+			params[name] = "local bytes " + marker
+		}
+		if hit, ok := p.Inspect("task-1", "", params); ok {
+			t.Errorf("false positive (C-3 guard): multi-target plain write flagged, payload key=%q (%+v)", name, hit)
+		}
+		if src, ok := p.Detector("task-1").TaintHit(params); ok {
+			t.Errorf("false positive (C-3 guard) via the frozen seam: payload key=%q (src=%q)", name, src)
+		}
+		if name == "content" || name == "data" {
+			if hit, ok := p.Inspect("task-1", "fs.write", params); ok {
+				t.Errorf("false positive (C-3 guard): named fs.write to confirmed non-sync targets flagged, payload key=%q (%+v)", name, hit)
+			}
+		}
+	}
+}
+
 // --- M-4: nesting budget must not be a silent miss ----------------------------
 
 func TestDeepNestingFailsClosedNotSilent(t *testing.T) {

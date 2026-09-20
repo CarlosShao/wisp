@@ -137,6 +137,9 @@ var channelTable = map[string]struct {
 var writeChannelKeys = map[string]bool{"content": true, "data": true}
 
 // pathKeys are the parameters naming the write target for the sync-dir test.
+// A call may carry SEVERAL of them at once (copy/move semantics), and the
+// write gate tests EVERY one that is present (C-3): the ordered table must
+// never decide which target the verdict rests on.
 var pathKeys = []string{"path", "file", "filepath", "dest", "destination"}
 
 // remoteSinkKeys name a parameter that addresses a REMOTE destination (channel
@@ -625,9 +628,14 @@ func (d boundDetector) TaintHit(params map[string]any) (string, bool) {
 //
 //   - the tool is not a named channel with its own sink (web.search/notify/
 //     clipboard.write: a `path` key there is just another parameter);
-//   - a write target is present and CONFIRMED to sit outside every sync root —
-//     a missing, unresolvable or reparse-traversing target keeps the gate open
-//     (missing information produces a DENY, not a pass);
+//   - a write target is present and EVERY path-shaped parameter in the call
+//     is CONFIRMED to sit outside every sync root — a missing, unresolvable
+//     or reparse-traversing target keeps the gate open (missing information
+//     produces a DENY, not a pass), and no target's verdict may be decided
+//     by looking at only one of them (adversarial re-verification C-3: a
+//     decoy non-sync `path` used to exempt a payload whose real `dest` sat
+//     inside OneDrive, because the ordered pathKeys table meant only the
+//     first match was ever examined);
 //   - nothing in the call addresses a remote destination, neither by key name
 //     nor by a URL-shaped value, and the nesting budget did not cut that check
 //     short (unproven = open).
@@ -639,7 +647,7 @@ func (p *Provenance) writeGate(tool string, params map[string]any) (open bool, c
 	if named && def.ch != ChSyncWrite {
 		return true, ChUnknown // named non-write channel: no local-write exemption
 	}
-	path, hasPath := firstStringParam(params, pathKeys)
+	targets, hasPath, unverified := pathTargets(params)
 	if !hasPath {
 		if named {
 			// fs.write whose target cannot be verified is the shape the gate
@@ -649,14 +657,28 @@ func (p *Provenance) writeGate(tool string, params map[string]any) (open bool, c
 		return true, ChUnknown // nothing write-shaped: the generic scan
 	}
 	remote, cut := hasRemoteSink(params, p.maxDepth)
-	st := p.IsSyncPath(path)
+	// C-3: the exemption must hold for EVERY path-shaped parameter, not just
+	// the first one pathKeys happens to match. One sync (or unresolvable, or
+	// reparse-traversing, or '..'-carrying) target among them keeps the gate
+	// open — IsSyncPath fail-closes on all of those.
+	for _, t := range targets {
+		if p.IsSyncPath(t).Sync {
+			return true, ChSyncWrite
+		}
+	}
 	switch {
-	case st.Sync:
-		return true, ChSyncWrite
 	case remote || cut:
 		return true, ChHTTP // a sink in the same call: the payload can leave
+	case unverified:
+		// A path-shaped key whose value is not a checkable string target: the
+		// landing site it names is unproven, so the call is not a confirmed
+		// plain local write.
+		if named {
+			return true, ChSyncWrite
+		}
+		return true, ChUnknown
 	}
-	return false, ChSyncWrite // confirmed plain local write: not an exfil channel
+	return false, ChSyncWrite // every target confirmed non-sync: not an exfil channel
 }
 
 // isPathKey reports whether a parameter names the write target.
@@ -748,13 +770,30 @@ func sortedKeys(m map[string]any) []string {
 	return ks
 }
 
-func firstStringParam(m map[string]any, keys []string) (string, bool) {
-	for _, k := range keys {
-		if s, ok := m[k].(string); ok && strings.TrimSpace(s) != "" {
-			return s, true
+// pathTargets collects EVERY path-shaped parameter of the call in sorted key
+// order (C-3 — the successor of the first-match-of-ordered-table lookup the
+// gate used to make, which let a decoy `path` decide the verdict while the
+// real `dest` pointed into a sync root). Key matching uses isPathKey, the
+// same case-insensitive predicate the parameter scan applies, so casing
+// cannot hide a second target either. Results:
+//   - targets:    every confirmed non-empty string target;
+//   - present:    at least one path-shaped key is in the call at all;
+//   - unverified: a path-shaped key whose value is not a checkable string
+//     target (nested object, []byte, empty) — the landing site it names
+//     cannot be proven, so the caller must keep the gate open.
+func pathTargets(params map[string]any) (targets []string, present, unverified bool) {
+	for _, k := range sortedKeys(params) {
+		if !isPathKey(k) {
+			continue
 		}
+		present = true
+		if s, ok := params[k].(string); ok && strings.TrimSpace(s) != "" {
+			targets = append(targets, s)
+			continue
+		}
+		unverified = true
 	}
-	return "", false
+	return targets, present, unverified
 }
 
 // collectStrings flattens nested map/slice string values down to maxDepth.
