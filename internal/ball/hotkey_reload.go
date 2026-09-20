@@ -76,7 +76,8 @@ func NewHotkeyReloader(binder HotkeyBinder, current HotkeyConfig, src HotkeySour
 
 // Check pulls the effective bindings and re-registers when they differ from
 // what is live. It returns true when a rebind happened. Safe from any
-// goroutine; the rebind itself is synchronous on the UI thread (Ball).
+// goroutine EXCEPT the ball's UI thread (the rebind is synchronous on it, so
+// calling from there would deadlock) - hosts call it from their own tick.
 func (r *HotkeyReloader) Check() (bool, HotkeyReport) {
 	if r.Refresh != nil {
 		if err := r.Refresh(); err != nil {

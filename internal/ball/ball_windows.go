@@ -121,6 +121,7 @@ type Ball struct {
 
 	registeredHotkeys map[uint32]Accelerator
 	hotkeyReport      HotkeyReport // outcome of the last registration pass (ticket 64 A1b)
+	boundCfg          HotkeyConfig // the set the last pass was given (rebind updates it)
 	escTakenOver      bool
 	cancelBinding     string // configured cancel binding, for B1 release
 
@@ -234,6 +235,7 @@ func (b *Ball) createOnSTA(s *staThread) error {
 	}
 	b.tray = t
 	b.cancelBinding = b.opts.Hotkeys.Cancel
+	b.boundCfg = b.opts.Hotkeys
 	b.hotkeyReport = registerAll(b.hwnd, b.opts.Hotkeys)
 	b.registeredHotkeys = b.hotkeyReport.Live()
 
@@ -773,6 +775,7 @@ func (b *Ball) RebindHotkeys(cfg HotkeyConfig) HotkeyReport {
 		unregisterAll(b.hwnd)
 		rep = registerAll(b.hwnd, cfg)
 		b.hotkeyReport = rep
+		b.boundCfg = cfg
 		b.registeredHotkeys = rep.Live()
 		b.cancelBinding = cfg.Cancel
 		b.escTakenOver = false
@@ -790,10 +793,15 @@ func (b *Ball) HotkeyReport() HotkeyReport {
 	return <-done
 }
 
-// ConfiguredHotkeys returns the binding set the ball was told to hold (the
-// input of the last registration pass, not its outcome - see HotkeyReport for
-// what Win32 actually accepted). opts is immutable after New.
-func (b *Ball) ConfiguredHotkeys() HotkeyConfig { return b.opts.Hotkeys }
+// ConfiguredHotkeys returns the binding set the ball was last TOLD to hold
+// (the input of the last registration pass, not its outcome - see HotkeyReport
+// for what Win32 actually accepted). Read on the UI thread, so it follows a
+// RebindHotkeys immediately and never reports the boot set after a reload.
+func (b *Ball) ConfiguredHotkeys() HotkeyConfig {
+	done := make(chan HotkeyConfig, 1)
+	b.sta.PostTask(func() { done <- b.boundCfg })
+	return <-done
+}
 
 // RegisteredHotkeys returns the id -> accelerator set Win32 actually holds
 // for us right now (the registration set the acceptance asks tests to
