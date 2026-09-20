@@ -45,19 +45,19 @@ Actions PR gates.
 - [x] slo-check.ps1 full run on Windows → JSON pass/fail matching the state table; forced leak
       fixture (allocate 100MB) flips to fail; settle check fails if FreeOSMemory counter is zero.
 - [x] CI green on PR: all four jobs; introducing a bare `go func(` or emoji fails lint.
-- [ ] Log redaction tests: seeded key/audio/fetch-body/long-arg → none appear in rolling logs.
-- [ ] Diagnostics: sampler data attachable to a bundle (45 completes the UX).
-- note: AC#4 left open — no ruling found in docs/evidence/s1/08-adversarial-acceptance.md (grep for
-      redact/脱敏/key/last-4 = zero hits; its 6 rows are 复跑/采样器口径/泄漏 fixture/CI 矩阵/compose/
-      越界). Row 1 "observe go test 全绿" covers the package suite generically but never names the
-      seeded-redaction AC, so the box is not traceable to a written ruling. Candidate evidence
-      unadjudicated at internal/observe/logging_test.go:63 TestRedactAudioBufferNeverLogged (+
-      TestRedactFetchBodyNeverLogged / TestRedactLongArgTruncated / TestRedactSecretAttrKeepsLast4Only)
-- note: AC#5 left open — no ruling found in docs/evidence/s1/08-adversarial-acceptance.md (grep for
-      diagnostics/bundle/诊断 = zero hits); diagnostics.go is only mentioned as a stub in the
-      implementer's log line and the ticket lists the bundle UX as out-of-scope (ticket 45).
-      Candidate evidence unadjudicated at
-      internal/observe/diagnostics_test.go:15 TestDiagnosticsBundleCollectsAndRedacts
+- [x] Log redaction tests: seeded key/audio/fetch-body/long-arg → none appear in rolling logs.
+- [x] Diagnostics: sampler data attachable to a bundle (45 completes the UX).
+- note: AC#4 **PASS** — 见 docs/evidence/s1/08-adversarial-acceptance.md §"Addendum 裁决（2026-09-20，AC
+      补裁）" AC#4 行：logging_test.go:30/:63/:79/:92 四类种子各为"种子串不得出现 + 占位符必须出现"
+      双向断言，且 :219 TestLogPipelineEndToEnd 经真实 rollingWriter 落盘后回读 .jsonl 断 key 不在文件内
+      （不可关闭性核实于 logging.go:86-88），`go test ./internal/observe/ -run 'TestRedact…' -count=2 -v`
+      8×PASS、全家族 15 例 ×2 `ok … 0.131s`
+- note: AC#5 **PASS** — 见同上报告 AC#5 行：diagnostics.go:153-166 把 `SLOSnapshot` 原样写入
+      `slo-snapshot.json`（为空则记 "not attached"），diagnostics_test.go:15 解包断条目齐备且两类
+      seed key 未入包，辅以 :98 fail-closed、:127 缺件留痕，
+      `go test ./internal/observe/ -run TestDiagnosticsBundleCollectsAndRedacts -count=2 -v` 2×PASS。
+      ⚠ 残余（不改裁决，属票 45）：`BuildDiagnosticsBundle` 全仓尚无生产调用者，且测试只断
+      `slo-snapshot.json` 存在、未断字节等于传入值——45 落地 UX 时补内容回读断言
 
 ## Progress log (append-only, newest last)
 - [2026-09-19T22:36:14Z] agent=orchestrator claimed=T08-impl did=dispatched next=sub-agent works through acceptance criteria
@@ -69,3 +69,4 @@ Actions PR gates.
 - [2026-09-20T01:00:00Z] agent=T08-impl did=handoff-to-orchestrator did=all-units-pushed next=CI-first-run-on-GitHub [final validation: go vet ./... clean, go test ./... all green (Windows), gofmt clean incl. pre-existing internal/audio drift fixed (format-only), ci.yml + compose.test.yml validated (pyyaml + docker compose config), d22scan self-test + repo scan green; remaining for next agent: first real CI run on GitHub (slo-smoke on windows-latest needs mingw+deps cache warm), slo-full self-hosted wisp-slo first run (leak flip + settle fully verified there - local dev sandbox intermittently hides the sampling process from SystemProcessInformation so the ps1 smoke could not complete locally; driver verified: 8.7MB private-WS Sleeping PASS, leak exit-1 flip observed, settle dispose-order bug caught+fixed), staticcheck not yet run locally (CI will), tickets 18/20 own the junction real cases]
 - [2026-09-19T23:48:48Z] agent=orchestrator did=T08-adv PASS (orchestrator-executed; report docs/evidence/s1/08-adversarial-acceptance.md; units ruling verified private-WS vs commit; first CI run = final verification point) next=ticket DONE
 - [2026-09-20T02:25Z] agent=agent-bookkeeping-1 did=AC boxes reconciled against docs/evidence/s1/08-adversarial-acceptance.md (6-row audit table; AC#1←row2 采样器口径, AC#2←row3 泄漏 fixture+CheckSettle, AC#3←row4 CI 矩阵 — note AC#2/AC#3 carry the report's own deferral "首次 CI 运行是最终验证点"; AC#4/AC#5 unaddressed): 3 checked, 2 left open (reasons above) next=none
+- [2026-09-20T11:20Z] agent=ac-addendum-auditor did=补裁 AC#4/AC#5（两框原为空白裁决）：实跑四类脱敏专测 + TestLogPipelineEndToEnd（真实 rollingWriter 落盘后回读 .jsonl 断言 seed key 不在文件内）+ 诊断包三例，`-count=2` 全绿（全家族 15 例 ok 0.131s）；核实 logging.go:86-88 脱敏无关闭开关、diagnostics.go:153-166 SLOSnapshot 直传写 zip。两框改勾。如实记残两点转票 45：BuildDiagnosticsBundle 无生产调用者、测试未断 slo-snapshot.json 字节等值。裁决写入 docs/evidence/s1/08-adversarial-acceptance.md §Addendum next=none
