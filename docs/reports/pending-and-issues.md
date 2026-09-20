@@ -153,6 +153,37 @@
   （"采样器数据可挂"目前成立在 API 契约层）；`TestDiagnosticsBundleCollectsAndRedacts` 只断
   `slo-snapshot.json` **存在于包内**，未断其字节等于传入值（等值靠 `diagnostics.go:161` 直传保证）。
   票 45 做 UX 时一并补内容回读断言。
+- **[A1–A7 票 64 消化标注（2026-09-20，逐条，不许无声消失）]** —
+  - **A1 已修（机制）**：`internal/ball/hotkey_reload.go` 桥 + `cmd/balldebug -config` 宿主；
+    winlive `TestLiveHotkeyRebindEndToEnd` 证明"真改 `[hotkey]` → `RegisteredHotkeys()` 集合真变 →
+    新键真唤起 → 旧键死"。**生产触发者仍缺 → 移交票 12**：`cmd/wisp` 只有 `config.LoadFile`
+    （`run.go:189`/`providers.go:90`）、全仓 `ball.New(` 只在 `cmd/balldebug/main.go:171`，
+    故装配根需自建 `config.NewManager`+`NewHotkeyReloader` 并把 `Check()` 挂 watchdog tick
+    （`[hotkey]` 属 HOT 档，只挂 `OnReload` 永远不会触发）。票 64 的对应 AC 框因此**保持未勾**。
+  - **A1b 已修**：`HotkeyStatus` 五分（`Live/Disabled/Unparsable/Taken/Error`）+ `Attempted()` 把
+    "被他人占用（真 1409）"与"未尝试"分开，`Problems()` 出用户可见句子；
+    实况 `TestLiveHotkeyOccupiedVsNotAttempted` 以真蹲键取真 1409 为证，默认套件
+    `TestRegisterAllSplitsFailureFamilies`（fakeRegistry）保住分类不依赖桌面。
+  - **A1c 已修（默认值）/文档半待解冻**：`DefaultHotkeys().Summon="Ctrl+Alt+Q"`（R10）+
+    `AltSummonSpace="Ctrl+Alt+Space"` 常量注释说明"可配但不作默认（中文输入法抢 Space）"；
+    用户可见文档三处（SPEC-03/SPEC-08/PLAN）对本票冻结，未改一字。
+  - **A2 已修**：交互四项成 `interaction_live_test.go` 真机行为测试并实跑全绿（单击唤起/拖动不唤起、
+    Confirming Esc+单击取消且归还 B1 Esc、`WS_EX_NOACTIVATE`+`MA_NOACTIVATE`+前台未变、透明角按 OS 自己的
+    `WindowFromPoint` 判穿透）；**这一轮跑抓出并修掉隐形边框真缺陷**（`2d063f0`：`dwStyle=0`→
+    `WS_POPUP`，此前点击落点比球心偏 8x31）。
+  - **A3 半修**：句柄/消息级实测已在 winlive（`TestLiveSleepingZeroTimerHandles`：探针先看得到 Warm 的真
+    `WM_TIMER`，再断 Sleeping 600ms 内 0 条 + UI 线程只持 1 个球窗），且 fail-fast 不静默 skip；
+    **仍待**：winlive 进 nightly CI（`go test ./...` 不覆盖），以及 slo-full 上量 Sleeping CPU≈0。
+    D32 阈值未被放宽、Sleeping 未加定时器。
+  - **A4 待硬件**：本机物理单屏（`\\.\DISPLAY4` 3440x1440），第二屏实拖**未做**，也没有拿双屏 mock 冒充；
+    `enumMonitors()` 仍无注入接缝（属票 64 范围外的接缝工作）。
+  - **A5 已修**：live 断言改按测试自身 `DebugHWND()`（`307e24e`），并有前置守卫在发现外部同窗口类球时
+    `t.Fatalf` 指名 pid/title（`live_guard_windows_test.go:165`）——A5 那两次假红从此不可能再被读成结论。
+  - **A6 已定案：非逐球泄漏**（安静桌面 `-count=3`：base/afterNew/afterClose =
+    120/363/369、369/372/370、370/372/370；USER 对象 1→6 后两轮 6→6）。第一颗球的 ~243 句柄是一次性
+    D2D/DirectWrite/COM 进程底座，原先"104→376/374"是把"建球前底座"当成"第二颗球的残留"。
+    **不立泄漏修复票**；余留观察项：Close 后那 5 个 USER 对象恒定不增长，若哪天变成逐球累加再开票。
+  - **A7 维持原判**：仍属票 45（UX）范围，票 64 未触碰诊断包。
 - **[A8] 票 63 AC#6：真实 provider 取密钥这条路还没被证明（转票 12）** — `wisp secret` 本身已证明
   ref→`config.LoadFile`→`ProviderKeys`→`Authorization` 头，但发请求的是**测试自己写的 http client**，
   不是 `internal/llm` 的 provider；按 README 规则「安全判定不得由调用方可控的选择器决定」，这一格实现者
