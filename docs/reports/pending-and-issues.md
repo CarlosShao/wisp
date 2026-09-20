@@ -204,6 +204,12 @@
     - **实测更正二：本条登记的前提"两条都删才红"不成立**。把钳子与回写**同时**中和，
       `TestEnforceTotalTerminatesAtEveryWindow` 仍 **ok 0.036s**——它压根不复现原始挂死。
       换句话说这两条冗余保证在旧套件下**一点都没被锚定**，比登记里说的更危险。
+    - **编排者独立复现（同日，我自己重跑）**：两条变异确实都落进文件后（`:357` 钳子被 `false &&` 短路、
+      `:366` 回写换成 `_ = nb`），`TestEnforceTotalTerminatesOnABelowBudgetSection` **FAIL 5.00s** 并给出
+      准确诊断，而 `TestEnforceTotalTerminatesAtEveryWindow` 在同一份双删代码下**不在失败列表里 = 仍绿**。
+      更正二成立。⚠ 附带一条方法论教训：我第一次跑这个实验时 sed 的第二条**没匹配上**却得到 `ok 0.035s`，
+      差点据此判代理说谎——**变异实验必须先 grep 证明变异真的进了文件，再跑测试**；
+      已把这条并入 [[adversarial-review-orchestration]]。
     - **做了什么**：注释重写为三条机制（各自的充分性、2/3 互为冗余、只有 1 被窗口表钉住），并在钳子与
       回写两行就地标注 guarantee 2 / guarantee 3 与"keep both"。选项上取 **(i) 的可达部分 + (ii) 的记账**：
       新增 `TestEnforceTotalTerminatesOnABelowBudgetSection`，直接喂给 `enforceTotal` 一个窗口表到不了的
@@ -235,6 +241,26 @@
   ⚠ **票 12 现在同时背 A8（票 63 AC#6：真实 provider 取密钥）与 A11（本条）两张外来框**，
   两者都属"装配根没接线"同一形状——票 12 是 S1 端到端门禁，正好一并消化。
   实现者代理把它写成了 `next=user wires…`，**该措辞已作废**：owner 不写代码，此项由票 12 的代理完成。
+- **[A12] 票 20 段 1 挖出的系统性事实：C19 风险评审器在**今天之前**没有任何生产调用者（票 17/18 的"done"名不副实）** —
+  我用 git 独立证实：在 `c9c3a6f` 的父提交上 `git grep "NewAssessor\|risk\.Assess" -- '*.go' ':!*_test.go'`
+  **命中数为 0**；`PathCanonicalizer` / `SensitiveClassifier` 两个冻结缝在票 20 之前**只有接口定义与测试桩**
+  （仅出现在 `internal/risk/` 的 4 个文件里，其中 2 个是 `_test.go`）。
+  ⇒ **R2（越出 allowlist→L2）与 R3（敏感文件）在生产里从来没有成为过真实判定**，
+  而交付它们的票 17、18 早已置 done。代码本身正确、测试也真，缺的是"有人调它"。
+  **现状（已改善但未闭环）**：`internal/tools/bridge.go` 现在是全仓第一个 C19 生产调用者
+  （`risk.NewRiskAssessor()` @ `:161`/`:529`，真实 `Assess(...)` @ `:239`），
+  但**桥自己仍无人调用**——`grep -rn "internal/tools" cmd/` 零命中，`cmd/wisp` 走不到它。
+  链路 = 评审器(票17，DONE) → 桥(票20段1，DONE 且零调用者) → **票 12 才通到装配根**。
+  **完成判据**：票 12 让 `cmd/wisp` 构造并使用 `tools.New`，并有一条**端到端**用例证明
+  "越出 allowlist 的 `fs.read` 真的被判 L2 并走审批支"（今天这条只在包内测试层成立）。
+  ⚠ 本条**不重开票 17/18**（它们的 AC 从没声称"已被生产接线"，重开属于事后加要求）；
+  它重开的是 **R12 的判断**：这不是两三次偶然，而是本仓 done 的系统性含义缺陷——
+  **"done" 只保证包内正确，不保证可达**。今后 done 前必须回答"谁调用我"，
+  答不出就在票面与 registry 各留一行，像本条一样显式登记，而不是等下一个代理挖出来。
+  另记两处**段 2 的硬障碍**（代理上报、我已读码确认存在）：
+  ①`loop.decideRisk` 在 `Execute` **之前**就拒已声明的 L1/L2 ⇒ `fs.write` 到它手里是死的，
+  须等票 21 替换该函数；②`tool_call` 表**没有 `rules_hit` 列**（SPEC-02 的 DDL 是契约层的），
+  该字段目前只随 `Decision`/审计行走，代理**没有伪造列**，这是正确处置，票 21 需显式定夺。
 
 ## 已解决（resolved）
 
