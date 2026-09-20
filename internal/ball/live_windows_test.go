@@ -13,6 +13,7 @@ package ball
 // takeover/release, per-monitor position persistence, full teardown.
 
 import (
+	"context"
 	"path/filepath"
 	"testing"
 	"time"
@@ -162,5 +163,75 @@ func TestBallLivePositionPersistence(t *testing.T) {
 	pGetWindowRect.Call(uintptr(b2.hwnd), unsafePtr(&wr2))
 	if int(wr2.l) != want.X || int(wr2.t) != want.Y {
 		t.Fatalf("restored rect (%d,%d), want (%d,%d)", wr2.l, wr2.t, want.X, want.Y)
+	}
+}
+
+// TestBallLiveAudioLiquidGate (ticket 62 wiring): the render-side audio seam
+// must animate session states and must NEVER touch Sleeping's zero-timer
+// discipline. Posts to the UI thread are FIFO, so every assertion below is
+// ordered against the levels it just pushed, not racing them.
+func TestBallLiveAudioLiquidGate(t *testing.T) {
+	restored := PrototypeVisualsEnabled()
+	t.Cleanup(func() { EnablePrototypeVisuals(restored) })
+
+	b, err := New(Options{Initial: statemachine.StateSleeping, StartHidden: true})
+	if err != nil {
+		t.Fatalf("New: %v", err)
+	}
+	defer b.Close()
+
+	// Frozen mode first: the seam is inert, levels cannot arm anything.
+	for i := 0; i < 4; i++ {
+		b.SetAudioLevel(0.9)
+	}
+	if b.DebugTimersAlive() {
+		t.Fatal("frozen mode: a level armed a timer")
+	}
+
+	EnablePrototypeVisuals(true)
+
+	// Sleeping + a hot mic: levels are dropped on the floor (D32).
+	b.SetState(statemachine.StateSleeping)
+	for i := 0; i < 6; i++ {
+		b.SetAudioLevel(0.9)
+	}
+	if b.DebugTimersAlive() {
+		t.Fatal("audio level armed a timer in Sleeping")
+	}
+
+	// Listening: the summon burst must drive the bounded liquid timer...
+	b.SetState(statemachine.StateListening)
+	b.SetAudioLevel(0.9)
+	liquid := make(chan bool, 1)
+	b.sta.PostTask(func() { liquid <- b.liquidTimerActive })
+	if !<-liquid {
+		t.Fatal("a summoned orb in Listening must run the liquid burst timer")
+	}
+
+	// ...and it must retire by itself: the model's burst ends, and with the
+	// raw feed above the silence gate the border never needs it after.
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	for {
+		select {
+		case <-ctx.Done():
+			t.Fatal("liquid timer outlived its bounded burst (must retire)")
+		default:
+		}
+		b.sta.PostTask(func() { liquid <- b.liquidTimerActive })
+		if !<-liquid {
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	// Back to Sleeping: motion parked, no timer survives the state edge.
+	b.SetState(statemachine.StateSleeping)
+	if b.DebugTimersAlive() {
+		t.Fatal("liquid timer survived the return to Sleeping")
+	}
+	b.SetAudioLevel(0.9)
+	if b.DebugTimersAlive() {
+		t.Fatal("post-Sleeping level feed re-armed a timer")
 	}
 }

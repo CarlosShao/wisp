@@ -102,6 +102,16 @@ type Ball struct {
 	animPhase       float64
 	constAlpha      uint8 // ULW SourceConstantAlpha (Warm breathing / Settling fade)
 
+	// Audio-driven liquid (ticket 62 step 3). liq is the pure model from
+	// liquid.go (UI-thread-owned, no locks); liqRaw keeps the last delivered
+	// envelope so the bounded burst timer can advance a transition between
+	// samples. Only a scalar level ever arrives here (SetAudioLevel) - no
+	// audio samples, no transcript text (C25 contamination surface).
+	liq               liquidMotion
+	liqRaw            float32
+	lastMotion        time.Time
+	liquidTimerActive bool
+
 	registeredHotkeys map[uint32]Accelerator
 	escTakenOver      bool
 	cancelBinding     string // configured cancel binding, for B1 release
@@ -299,7 +309,9 @@ func (b *Ball) SetBadgeText(s string) {
 // size, one static frame. (The name is historical: the state fields are
 // STA-thread-owned, not mutex-shared.)
 func (b *Ball) applyStateLocked(s statemachine.State) {
+	prev := b.curState
 	b.curState = s
+	b.motionStateChanged(prev, s) // liquid session start/stop on state edges
 	b.curVisual = VisualFor(pal, b.opts.SizePx, s, 0)
 	b.badge = 0
 	b.progress = -1
@@ -313,6 +325,7 @@ func (b *Ball) applyStateLocked(s statemachine.State) {
 	if b.animTimerActive {
 		pSetTimer.Call(uintptr(b.hwnd), timerAnimID, uintptr(policy.PeriodMs), 0)
 	}
+	b.syncLiquidTimer() // arms only where liquidDriven+Animated already grant motion
 
 	// Window size: FIXED for the process lifetime (the configured orb + ring
 	// margins). States render within it - the Sleeping micro dot is a 12px
@@ -349,7 +362,7 @@ func (b *Ball) renderFrame() {
 		return
 	}
 	t0 := time.Now()
-	b.rend.drawFrame(b.curVisual, b.animPhase)
+	b.rend.drawFrame(b.frameVisual(), b.animPhase)
 	if d := time.Since(t0); d > 30*time.Millisecond {
 		slog.Warn("ball: slow drawFrame", "dur", d.String(), "state", string(b.curState))
 	}
@@ -391,20 +404,21 @@ func (b *Ball) stopAnimTimer() {
 	}
 }
 
-// TimersAlive reports whether an animation timer is currently armed. The
-// consumer can assert TimersAlive()==false in Sleeping (ticket acceptance).
+// TimersAlive reports whether an animation timer (state loop, breathing, fade
+// or the bounded liquid burst) is currently armed. The consumer can assert
+// TimersAlive()==false in Sleeping (ticket acceptance).
 func (b *Ball) TimersAlive() bool {
 	b.mu.Lock()
 	defer b.mu.Unlock()
-	return b.animTimerActive
+	return b.animTimerActive || b.liquidTimerActive
 }
 
-// DebugTimersAlive reads the LIVE timer flag on the UI thread (the value the
+// DebugTimersAlive reads the LIVE timer flags on the UI thread (the value the
 // evidence harness prints). Unlike TimersAlive it is synchronised with the
 // STA thread, so it cannot report a stale value right after SetState.
 func (b *Ball) DebugTimersAlive() bool {
 	done := make(chan bool, 1)
-	b.sta.PostTask(func() { done <- b.animTimerActive })
+	b.sta.PostTask(func() { done <- b.animTimerActive || b.liquidTimerActive })
 	return <-done
 }
 
@@ -459,7 +473,7 @@ func animCycleMs(s statemachine.State) int {
 // repaintAnimated re-renders with the current overlay values (no asset
 // rebuild - the cached brushes are phase-independent).
 func (b *Ball) repaintAnimated() {
-	v := b.curVisual
+	v := b.frameVisual()
 	v.BadgeCount = b.badge
 	if b.progress >= 0 {
 		v.Progress = b.progress
@@ -584,6 +598,10 @@ func (b *Ball) wndProc(hwnd, m, wParam, lParam uintptr) uintptr {
 	case wmTimer:
 		if wParam == timerAnimID {
 			b.onAnimTick()
+			return 0
+		}
+		if wParam == timerLiquidID {
+			b.onLiquidTick()
 			return 0
 		}
 
@@ -785,6 +803,7 @@ func (b *Ball) Close() {
 	b.sta.PostTask(func() {
 		defer close(done)
 		b.stopAnimTimer()
+		b.stopLiquidTimer()
 		unregisterAll(b.hwnd, b.registeredHotkeys)
 		if b.tray != nil {
 			b.tray.remove()

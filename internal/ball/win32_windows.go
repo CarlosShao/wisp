@@ -148,8 +148,9 @@ const coinitApartmentThreaded = 0x2
 
 // Timer ids (one window, few timers).
 const (
-	timerAnimID = 1 // state animation / breathing / fade tick
-	timerFadeID = 2
+	timerAnimID   = 1 // state animation / breathing / fade tick
+	timerFadeID   = 2
+	timerLiquidID = 3 // bounded liquid transition burst (ticket 62; never armed in static states)
 )
 
 // ------------------------------------------------------------------- structs

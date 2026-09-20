@@ -51,6 +51,7 @@ type diffOpts struct {
 	size      int           // child orb size px (0 = default from the ball)
 	look      string        // liquid treatment handed to the child ("" = default)
 	frozen    bool          // measure the frozen SPEC-08 visuals, not the prototype
+	level     float64       // synthetic envelope handed to the child (-level)
 	killGrace time.Duration // wait for graceful exit before Kill
 }
 
@@ -404,6 +405,9 @@ func runDiffForState(exe string, o diffOpts, state string, idx int) (stateRow, e
 	}
 	if o.frozen {
 		childArgs = append(childArgs, "-frozen")
+	}
+	if o.level > 0 {
+		childArgs = append(childArgs, "-level", fmt.Sprint(o.level))
 	}
 
 	cmd := exec.Command(exe, childArgs...)

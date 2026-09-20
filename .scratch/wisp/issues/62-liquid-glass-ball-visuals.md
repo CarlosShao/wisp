@@ -61,3 +61,13 @@ SPEC-08 §2 的 20 态视觉表与 D43 的视觉映射列**必须改**，但顺�
 - [ ] 对抗验收由非实现者执行，验收报告含与上述 AC **1:1 的裁决表**（README 规则 6）。
 
 ## Progress log (append-only, newest last)
+- 2026-09-20 agent(62-C): did=wire the liquid model into the Ball (the stranded liquid_windows.go, rebuilt against the real struct):
+  Ball now owns `liq liquidMotion` + last raw level, `Ball.SetAudioLevel` marshals the scalar onto the UI thread via
+  sta.PostTask (C25: level only, no samples/text), a BOUNDED 33ms burst timer (timerLiquidID) runs only while
+  liquidMotion.busy() AND Animated(state), starts/stops on state entry/exit, frozen mode keeps the seam fully inert;
+  liquid stamps at draw time (frameVisual) so the base visual never compounds; renderer glow permille snapped to the
+  cached 25-step ladder (no COM creation on animated frames); balldebug gains -level/-diff-level feeder + winlive
+  TestBallLiveAudioLiquidGate. Sleeping differential re-run: timers=no cpu=0.000/0.000 privWS=12.03MB px>=8=2120
+  (baseline 2098); Listening/Speaking with 0.8 feed animate at <=0.08% 1-core. Gates: gofmt/vet clean,
+  go test -count=2 + full winlive suite pass. next=AC#4 measured with wav injection (ticket 13 C8 seam), then the
+  edge-dock wiring (item 2), then per-state evidence sweep for owner sign-off -> SPEC-08 amendment.

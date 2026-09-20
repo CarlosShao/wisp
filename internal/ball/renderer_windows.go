@@ -525,6 +525,11 @@ func (r *renderer) drawGlass(v Visual, c d2d1Point2F, R, s float32) {
 	if permille > 1000 {
 		permille = 1000
 	}
+	// Snap onto the cached 25-permille ladder (<=18 variants over the whole
+	// audio-driven range): glowBrush creates a missing key on demand, and an
+	// animated frame must not COM-create brushes (D32 CPU discipline) - after
+	// the first visit to each rung every frame is a cache hit.
+	permille -= permille % 25
 	if g := r.glowBrush(v, permille); g != nil {
 		r.fillEllipse(c, R*1.5, R*1.5, g)
 	}

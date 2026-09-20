@@ -83,6 +83,8 @@ func main() {
 	diffMargin := flag.Int("diff-margin", 120, "screenshot padding around the window rect (px)")
 	diffAmp := flag.Int("diff-amp", 6, "gain applied to the |alive-dead| diff image")
 	diffDwell := flag.Duration("diff-dwell", 6*time.Second, "time the ball stays in state before each shot")
+	level := flag.Float64("level", 0, "synthetic audio envelope 0..1 pushed to the ball at ~30fps (0 = feed nothing)")
+	diffLevel := flag.Float64("diff-level", 0, "with -diff: the -level handed to each child")
 	flag.Parse()
 
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo})))
@@ -113,6 +115,7 @@ func main() {
 			size:    *sizePx,
 			look:    *look,
 			frozen:  *frozen,
+			level:   *diffLevel,
 		})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "balldebug: %v\n", err)
@@ -164,6 +167,17 @@ func main() {
 		debugMoveWindow(b.DebugHWND(), int32(*posX), int32(*posY))
 	}
 	fmt.Printf("balldebug: ball up handles=%d\n", handleCount())
+
+	// Optional synthetic voice envelope: only the scalar level crosses into
+	// the ball (SetAudioLevel is the project's single render-side audio seam,
+	// C25). The feeder is owned by main and joined before teardown.
+	feedStop := make(chan struct{})
+	feedDone := make(chan struct{})
+	if *level > 0 {
+		go feedLevels(b, float32(*level), feedStop, feedDone)
+	} else {
+		close(feedDone)
+	}
 
 	dwell := time.Duration(*cycleMs) * time.Millisecond
 
@@ -219,6 +233,11 @@ func main() {
 		}
 	}
 
+	// Stop feeding before the zero-timer assertions so no posted level task
+	// interleaves with the final state switch.
+	close(feedStop)
+	<-feedDone
+
 	// Zero-timer assertion in Sleeping (ticket acceptance): back to Sleeping
 	// and check no animation timer survives.
 	b.SetState(statemachine.StateSleeping)
@@ -262,6 +281,35 @@ func writeStatus(path string, s statemachine.State, timers bool) {
 	body := fmt.Sprintf("state=%s ready=1 timers=%v at=%s\n", s, timers, time.Now().Format(time.RFC3339Nano))
 	if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
 		fmt.Fprintf(os.Stderr, "balldebug: -status write: %v\n", err)
+	}
+}
+
+// feedLevels pushes a syllabified synthetic envelope into Ball.SetAudioLevel
+// (the render-side audio seam) at the capture cadence, so the liquid has a
+// voice to follow. Owned by main: it returns when stop closes, and reports
+// through done. A panic here must never take the harness down with it.
+func feedLevels(b *ball.Ball, amp float32, stop <-chan struct{}, done chan<- struct{}) {
+	defer close(done)
+	defer func() {
+		if r := recover(); r != nil {
+			slog.Error("balldebug: level feeder panicked", "panic", r)
+		}
+	}()
+	tk := time.NewTicker(33 * time.Millisecond) // ~30fps, the model's cap
+	defer tk.Stop()
+	var n int
+	for {
+		select {
+		case <-stop:
+			return
+		case <-tk.C:
+			n++
+			v := amp
+			if n%12 == 0 {
+				v = amp / 4 // a breath between phrases: the border must glide in
+			}
+			b.SetAudioLevel(v)
+		}
 	}
 }
 
