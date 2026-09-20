@@ -106,6 +106,23 @@ All tickets are **vertical tracer bullets**; work the **frontier** (all blockers
   A14 解析缺陷 · 自托管 runner 构建失败）。⚠ 硬规矩：**不加 `continue-on-error`、不删步骤、不下调阈值凑绿**
   （D22 "no job skippable"）；格式化 sweep 与逻辑改动**永不同 commit**；判据 = **逐 job 全 pass**，
   不是"我本地某一步过了"。**blocked-on-tree**：AC#1 全仓重写，须等票 66/68 的包空出来。
+- **再再后补票（2026-09-20 A30 全量证据自查之后）**：
+  **71 gates-must-self-report (70)** —— 把"没报问题"与"没看"变成机器可区分的两件事（registry A22/A26/A30⑤）：
+  `cmd/balldebug -diff` **无论像素计数为何都 return nil**（一次球完全不成像的跑在 CI 眼里与理想跑同形）、
+  `go test -run <不匹配>` **打印 ok**（票 64 AC#4 的"14 项全 PASS"含 SKIP 即为此形状）、
+  `d22scan` 的 `frontend/` 作用域**实际走 0 个文件**。票 67 已给 d22scan 装了 `examined N` + `N==0` 致命退出，
+  本票把同一纪律推到其余仪器，且 **AC#2 要求一次真实的红**（阳性对照），否则不算完。
+  ⚠ 只许从严：不许为了让某次跑变绿现场调低可见性阈值（D22 精神）；`allowlist.txt` 只许变短或不变。
+  **blocked-on-70**：本票要改 `.go`，必须等全仓 gofumpt 那一次重写落地，否则每个文件都撞车。
+- **状态回写（2026-09-20 23:5x，编排者自我更正）**：**62 liquid-glass-ball-visuals：`-done` → `review`**。
+  我今天在**八个 AC 框一个都没勾**（实测 `^- [ ]`=8 / `^- [x]`=0）且 **AC#8 要求的
+  `62-adversarial-acceptance.md` 不存在**的情况下给它加了 `-done` 后缀——同时违反规则 4 与规则 6。
+  根因：我把 owner 对**票 65** 的降级放行（「算是赝品…先勉强用吧」）当成了票 62 的验收结论。
+  ⇒ 票面留了一张八行的"每条 AC 现在归谁"表（#1/#6 有证据缺裁决、#3/#4 归票 65、#5 归票 68、
+  #7 的 `62-visual-spec-draft.md` **从未写出**、#8 **从未执行**）。**新会话请勿按 AC#1 重跑实现**，
+  按那张表认领。登记为 registry **A30①**。
+  同轮：`07` 的五个未勾框补了逐条归属（其中 #4 我写下"断言不存在"后一次 grep 自我推翻，
+  真话是"断言存在、但藏在 `-tags winlive` 后面、今天是否真执行未证"）。
 - **状态回写（2026-09-20 复验轮）**：**10 agent-loop-core → DONE**（编排者亲自独立复验：把
   `enforceTotal` 整体退回修复前实现，被提交的终止测试 10.00s 变红，护栏为真；两处小项登记 A10-a/b）；
   **63 credential-entry-cli → DONE**，但 **AC#6 未勾、正式转票 12**（登记 A8）、**MINOR-1 未修**（登记 A9）
