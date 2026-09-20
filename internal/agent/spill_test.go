@@ -73,8 +73,8 @@ func TestSpillTokenBoundary(t *testing.T) {
 	dir := t.TempDir()
 	sp := NewSpiller(dir, b)
 
-	at := strings.Repeat("a", b.SpillTokens*4)      // exactly 4000 tokens
-	over := strings.Repeat("a", b.SpillTokens*4+4)  // 4001 tokens
+	at := strings.Repeat("a", b.SpillTokens*4)     // exactly 4000 tokens
+	over := strings.Repeat("a", b.SpillTokens*4+4) // 4001 tokens
 
 	s1, err := sp.Prepare("call_at", at)
 	if err != nil {

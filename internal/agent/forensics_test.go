@@ -2,9 +2,11 @@ package agent
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"log/slog"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -12,7 +14,62 @@ import (
 	"github.com/CarlosShao/wisp/internal/observe"
 )
 
-// MAJOR-1 (adversarial review of ticket 10): cancellation is one of the four
+// MINOR-2: failOpenCalls (the mid-stream-disconnect and cancellation paths) used
+// to finish the row without ever booking a decision, so the same tool_call table
+// carried two write disciplines - the max_tokens path wrote decision="reject" and
+// this one left it NULL/pending forever. Both paths make the identical
+// judgement (an unclosed call is never executed), so both must say so.
+func TestFailedTaskBooksOpenCallRowWithDecision(t *testing.T) {
+	dir := t.TempDir()
+	store, err := memory.Open(dir,
+		memory.WithLogger(slog.New(slog.NewTextHandler(io.Discard, nil))))
+	if err != nil {
+		t.Fatalf("memory.Open: %v", err)
+	}
+	defer store.Close()
+
+	h := newHarness(t, "disconnect-mid-toolcall", withJournal(store),
+		withConfig(func(c *Config) { c.ArtifactsDir = filepath.Join(dir, "artifacts") }))
+	res := h.run("慢慢说")
+	if res.Status != StatusFailed {
+		t.Fatalf("status = %s, want failed", res.Status)
+	}
+
+	rows, err := store.ListToolCallsByTask(context.Background(), res.TaskID)
+	if err != nil {
+		t.Fatalf("tool_call lookup: %v", err)
+	}
+	if len(rows) != 1 {
+		t.Fatalf("tool_call rows = %d, want 1", len(rows))
+	}
+	r := rows[0]
+	if r.Outcome != OutcomeError {
+		t.Errorf("outcome = %q, want %s", r.Outcome, OutcomeError)
+	}
+	if r.Decision != DecisionReject {
+		t.Errorf("decision = %q, want %s: an unclosed call is judged before it can "+
+			"run, and the row has to carry that gate verdict", r.Decision, DecisionReject)
+	}
+	if r.ErrorClass != string(observe.ClassNetwork) {
+		t.Errorf("error_class = %q, want %s", r.ErrorClass, observe.ClassNetwork)
+	}
+	if r.EndedAt == nil {
+		t.Error("ended_at is NULL: the row was left pending")
+	}
+	// The partial arguments are preserved verbatim for the record (and stay
+	// un-parseable, which is exactly why nothing was executed).
+	if !strings.Contains(r.ArgsJSON, "前半段") {
+		t.Errorf("args_json lost the partial arguments: %q", r.ArgsJSON)
+	}
+	if json.Valid([]byte(r.ArgsJSON)) {
+		t.Errorf("args_json = %q, want the truncated (invalid) partial arguments", r.ArgsJSON)
+	}
+	// The judgement is a refusal, not an execution: partial args never ran.
+	if n := h.echo().CallCount(); n != 0 {
+		t.Errorf("executions = %d, want 0", n)
+	}
+}
+
 // named terminal states, and the contract requires the cancelled task's
 // task_log row plus its tool_call rows to carry error_class/decision. Because
 // loop.go rebinds the task ctx to the root's cancelable ctx (the fix that let

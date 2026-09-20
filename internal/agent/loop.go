@@ -801,6 +801,11 @@ func (l *Loop) failOpenCalls(ctx context.Context, j *taskJournal, taskID string,
 			continue
 		}
 		row := j.startCall(wctx, c.ID, c.Name, c.Args, memoryRiskL0)
+		// The gate column is part of the row contract and this path made the
+		// same judgement the max_tokens path does (never execute an unclosed
+		// call), so it must book the decision too - otherwise one table ends up
+		// with two write disciplines and the row reads as "pending, forever".
+		j.decide(wctx, row, DecisionReject)
 		j.finish(wctx, c.ID, row, outcome, class)
 		text := "调用未闭合（响应中断或已取消），未执行"
 		res.ToolLog = append(res.ToolLog, ToolResultLog{CallID: c.ID, Name: c.Name,
