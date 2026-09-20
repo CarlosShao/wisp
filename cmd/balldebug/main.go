@@ -9,6 +9,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log/slog"
@@ -22,6 +23,7 @@ import (
 	"golang.org/x/sys/windows"
 
 	"github.com/CarlosShao/wisp/internal/ball"
+	"github.com/CarlosShao/wisp/internal/config"
 	"github.com/CarlosShao/wisp/internal/observe"
 	"github.com/CarlosShao/wisp/internal/statemachine"
 )
@@ -91,6 +93,8 @@ func main() {
 	tour := flag.Bool("tour", false, "guided walk for owner sign-off, in one run: liquid flow -> voice-driven "+
 		"rotation -> idle border -> static Sleeping -> docked on all four edges -> popped back -> yours to play with")
 	tourDwell := flag.Duration("tour-dwell", 5*time.Second, "with -tour: how long each numbered step holds")
+	configPath := flag.String("config", "", "drive the ball's hotkeys from a real config.toml [hotkey] "+
+		"section, live-reloaded by the ticket 64 bridge (empty = compiled defaults)")
 	flag.Parse()
 
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo})))
@@ -155,6 +159,9 @@ func main() {
 		b    *ball.Ball
 		m    *statemachine.Machine
 		errs []error
+		// Hotkey bridge teardown (only set with -config): cancel, then join.
+		stopBridge func()
+		joinBridge chan struct{}
 	)
 
 	// Tray Exit and Ctrl+C both land here; the teardown is common.
@@ -187,6 +194,43 @@ func main() {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "balldebug: ball.New failed: %v\n", err)
 		os.Exit(1)
+	}
+
+	// Every [hotkey] outcome is printed, not swallowed: "occupied by another
+	// program" and "never attempted" are different sentences for the user, and
+	// a demo harness that hides them is how ticket 64's silent failure survived
+	// a whole sign-off run (A1b).
+	for _, line := range b.HotkeyReport().Problems() {
+		fmt.Printf("balldebug: %s\n", line)
+	}
+	fmt.Printf("balldebug: hotkeys live=%d/4 %s\n", len(b.HotkeyReport().Live()), hotkeySummary(b))
+
+	// -config: drive the ball's hotkeys from a REAL config.toml through the
+	// ticket 64 bridge, so "the user edited [hotkey]" is testable on a running
+	// instance instead of being taken on trust (A1). Without -config the ball
+	// keeps the compiled defaults and no config poll runs.
+	if *configPath != "" {
+		mgr, errC := config.NewManager(*configPath, nil)
+		if errC != nil {
+			fmt.Fprintf(os.Stderr, "balldebug: config.NewManager(%s): %v\n", *configPath, errC)
+			b.Close()
+			os.Exit(1)
+		}
+		bridge := ball.NewHotkeyReloader(b, b.ConfiguredHotkeys(), func() ball.HotkeyConfig {
+			h := mgr.Config().Hotkey
+			return ball.ApplyHotkeyDefaults(ball.HotkeyConfig{
+				Summon: h.Summon, Mute: h.Mute, Cancel: h.Cancel, Panel: h.Panel})
+		})
+		bridge.Refresh = func() error { _, err := mgr.CheckAndReload(); return err }
+		mgr.OnReload = bridge.OnReload()
+		pollCtx, stopPoll := context.WithCancel(context.Background())
+		// runHotkeyBridge is panic-isolated and returns when ctx is cancelled;
+		// the join below keeps the harness free of leaked goroutines (main owns
+		// the goroutine, so stopBridge+joinBridge are its roster entry).
+		pollDone := make(chan struct{})
+		go runHotkeyBridge(bridge, pollCtx, time.Second, pollDone)
+		stopBridge, joinBridge = stopPoll, pollDone
+		fmt.Printf("balldebug: hotkey bridge polling %s\n", *configPath)
 	}
 	if *posX >= 0 && *posY >= 0 {
 		debugMoveWindow(b.DebugHWND(), int32(*posX), int32(*posY))
@@ -277,6 +321,13 @@ func main() {
 	// interleaves with the final state switch.
 	close(feedStop)
 	<-feedDone
+
+	// Stop polling the config before the final assertions: a rebind mid-flight
+	// would unregister/re-register under the zero-timer check below.
+	if stopBridge != nil {
+		stopBridge()
+		<-joinBridge
+	}
 
 	// Zero-timer assertion in Sleeping (ticket acceptance): back to Sleeping
 	// and check no animation timer survives.
@@ -553,4 +604,35 @@ func syncMachineToBall(b *ball.Ball, m *statemachine.Machine) {
 	} else {
 		b.ReleaseEscAfterSession()
 	}
+}
+
+// hotkeySummary prints one line per [hotkey] slot: the configured binding and
+// what Win32 actually made of it. The harness needs it because a ball that came
+// up with none of its four keys registered looked exactly like a working demo
+// (ticket 64 A1b): registerAll used to slog.Warn and drop the id, and nothing
+// downstream read the report.
+func hotkeySummary(b *ball.Ball) string {
+	lines := make([]string, 0, 4)
+	for _, bd := range b.HotkeyReport().Bindings() {
+		binding := bd.Binding
+		if binding == "" {
+			binding = "(unset)"
+		}
+		lines = append(lines, fmt.Sprintf("%s=%s %s", bd.Name, binding, bd.Status))
+	}
+	return strings.Join(lines, "\n  ")
+}
+
+// runHotkeyBridge is the -config poll goroutine's body. main owns it (cancel
+// through the stop func, join through done) and a panic in one tick is reported
+// instead of taking the harness down; HotkeyReloader.Run returns when ctx is
+// cancelled, so the join cannot hang.
+func runHotkeyBridge(r *ball.HotkeyReloader, ctx context.Context, every time.Duration, done chan<- struct{}) {
+	defer close(done)
+	defer func() {
+		if rec := recover(); rec != nil {
+			slog.Error("balldebug: hotkey bridge panicked; hotkeys unchanged", "panic", rec)
+		}
+	}()
+	r.Run(ctx, every)
 }
