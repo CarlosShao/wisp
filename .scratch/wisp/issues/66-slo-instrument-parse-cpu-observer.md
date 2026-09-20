@@ -1,7 +1,7 @@
 # 66 — SLO 判据仪器返工：解析丢末项 + CPU 门的观测者自成本（票 12 桌面跑的连带发现）
 
-**Status:** ready-for-agent
-**Claimed by:** —
+**Status:** in-progress
+**Claimed by:** agent-ticket66
 **Last update:** 2026-09-20
 **Blocked by:** —（与票 12/20/21 无代码交集；本票只动 `internal/proc`、`internal/observe`、`cmd/wisp/slo*.go`、`scripts/slo-check.ps1`）
 **Parallel slots:** ≤1 sub-agent（**测量类独占**：本票的验收要求真机跑采样，不能与任何其他跑测的代理并发）
@@ -87,3 +87,5 @@
   `-race` 同包跑一次；`tools/d22scan` 与静态禁用模式扫描 clean。
 
 ## Progress log（每次 commit 追加一行，格式 `- [ISO-Z] agent=... did=...`）
+
+- [2026-09-20T14:24Z] agent=agent-ticket66 did=AC#1 主体：`parseSystemProcesses` 改为「先解析当前项并入 map、再测 `NextEntryOffset==0`」，并把这条链的唯一解码器抽成 `internal/proc/systemprocs_windows.go::WalkSystemProcesses`（`SysProcSample`/`SystemProcessSnapshot` 一并导出，供 AC#3 的树外读取与 `cmd/balldebug` 复用，不再养第二份实现）；新增回归用例 `internal/proc/systemprocs_windows_test.go` 7 条，其中 `TestParseSystemProcessesKeepsLastSnapshotEntry` 手工构造「目标 pid 恰为链末项」的缓冲并逐项断言 handle 数/私有工作集/线程数/user+kernel 时间（不是只断言 `len(out)`）。测量：`go test -count=1 -run 'TestParseSystemProcesses|TestWalkSystemProcesses|TestSystemProcessSnapshot' ./internal/proc/` → 7/7 PASS；`go build ./...` OK；`go test -count=1 ./internal/proc/` ok 0.464s；`gofmt -l internal/proc/` 空；`go vet ./internal/proc/` 干净。剩余：变异检验（退回旧实现 → 新用例必须转红，原始输出存 `docs/evidence/s1/66-mutation-*.md`）、AC#2-AC#7 全部未动。

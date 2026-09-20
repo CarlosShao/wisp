@@ -92,10 +92,10 @@ func (r *TreeSampler) ReadTree() (observe.TreeMetrics, error) {
 	// sampling process itself is not a trustworthy view; retry once, then
 	// fail the read (fail-closed: an unmeasurable window must never turn
 	// into a silent 0-byte pass).
-	var snap map[uint32]sysProcSample
+	var snap map[uint32]SysProcSample
 	var lastErr error
 	for attempt := 0; attempt < 60; attempt++ {
-		snap, err = systemProcessSnapshot()
+		snap, err = SystemProcessSnapshot()
 		if err != nil {
 			lastErr = err
 			time.Sleep(100 * time.Millisecond)
@@ -124,10 +124,10 @@ func (r *TreeSampler) ReadTree() (observe.TreeMetrics, error) {
 		if !ok {
 			continue // vanished between listing and snapshot
 		}
-		m.PrivateWorkingSetBytes += si.privateWorkingSet
-		m.CPUTotalNanos += (si.kernelTime100ns + si.userTime100ns) * 100
-		m.Handles += int(si.handleCount)
-		m.Threads += int(si.threadCount)
+		m.PrivateWorkingSetBytes += si.PrivateWorkingSet
+		m.CPUTotalNanos += (si.KernelTime100ns + si.UserTime100ns) * 100
+		m.Handles += int(si.HandleCount)
+		m.Threads += int(si.ThreadCount)
 	}
 
 	// Commit charge: the C30 Job sum covers children; self is added unless
@@ -190,19 +190,24 @@ func getWriteOpCount(h windows.Handle) (int64, bool) {
 	return int64(io.WriteOperationCount), true
 }
 
-// sysProcSample is one process's entry from the system snapshot.
-type sysProcSample struct {
-	privateWorkingSet int64 // WorkingSetPrivateSize, bytes
-	kernelTime100ns   int64
-	userTime100ns     int64
-	handleCount       uint32
-	threadCount       uint32
+// SysProcSample is one process's entry from the system snapshot. It is
+// exported because the out-of-tree readers (cmd/balldebug -diff, `wisp slo`
+// -subject measurement) need the same fields from the same snapshot: one
+// decoder, one record type, no second implementation (ticket 66 / A14).
+type SysProcSample struct {
+	PrivateWorkingSet int64 // WorkingSetPrivateSize, bytes
+	KernelTime100ns   int64
+	UserTime100ns     int64
+	HandleCount       uint32
+	ThreadCount       uint32
 }
 
-// systemProcessSnapshot reads SystemProcessInformation once and extracts
-// the fields the D42#10 metric set needs per pid. Layout is the documented
-// x64 SYSTEM_PROCESS_INFORMATION (Vista/Win7 additions included).
-func systemProcessSnapshot() (map[uint32]sysProcSample, error) {
+// SystemProcessSnapshot reads SystemProcessInformation once and extracts
+// the fields the D42#10 metric set needs per pid. The scan buffer is a Go
+// slice: for the out-of-tree readers that is free (the scratch belongs to
+// the measuring process, never the subject); the in-tree reader's own
+// footprint is dominated by the image map, not this scratch.
+func SystemProcessSnapshot() (map[uint32]SysProcSample, error) {
 	size := uint32(1 << 20)
 	for attempt := 0; attempt < 6; attempt++ {
 		buf := make([]byte, size)
@@ -228,37 +233,26 @@ func systemProcessSnapshot() (map[uint32]sysProcSample, error) {
 	return nil, fmt.Errorf("NtQuerySystemInformation: buffer never sufficient (last %d bytes)", size)
 }
 
-// parseSystemProcesses walks the variable-length entries.
-func parseSystemProcesses(buf []byte) (map[uint32]sysProcSample, error) {
-	out := make(map[uint32]sysProcSample, 256)
-	offset := uintptr(0)
-	base := unsafe.Pointer(&buf[0])
-	for {
-		if offset+4 > uintptr(len(buf)) {
-			break
+// parseSystemProcesses walks the variable-length entries (through the one
+// decoder in the repo, proc.WalkSystemProcesses - see systemprocs_windows.go
+// for why the last entry must be delivered before the NextEntryOffset == 0
+// test).
+func parseSystemProcesses(buf []byte) (map[uint32]SysProcSample, error) {
+	out := make(map[uint32]SysProcSample, 256)
+	err := WalkSystemProcesses(buf, func(e SystemProcEntry) {
+		if e.PID == 0 || e.PID > 0xFFFFFFFF {
+			return // "System Idle Process" / non-pid handle values
 		}
-		next := *(*uint32)(unsafe.Add(base, offset))
-		if next == 0 {
-			break
+		out[uint32(e.PID)] = SysProcSample{
+			PrivateWorkingSet: e.PrivateWorkingSet,
+			KernelTime100ns:   e.KernelTime100ns,
+			UserTime100ns:     e.UserTime100ns,
+			HandleCount:       e.HandleCount,
+			ThreadCount:       e.ThreadCount,
 		}
-		if offset+112 > uintptr(len(buf)) {
-			return nil, fmt.Errorf("system process entry truncated at offset %d", offset)
-		}
-		var s sysProcSample
-		// Header: NextEntryOffset(+0) NumberOfThreads(+4)
-		// WorkingSetPrivateSize(+8, LARGE_INTEGER).
-		s.threadCount = *(*uint32)(unsafe.Add(base, offset+4))
-		s.privateWorkingSet = int64(*(*int64)(unsafe.Add(base, offset+8)))
-		// Times: KernelTime(+48) UserTime(+40) as LARGE_INTEGER (100ns).
-		s.userTime100ns = int64(*(*int64)(unsafe.Add(base, offset+40)))
-		s.kernelTime100ns = int64(*(*int64)(unsafe.Add(base, offset+48)))
-		// UniqueProcessId(+80, HANDLE), HandleCount(+96, ULONG).
-		pid := *(*uint64)(unsafe.Add(base, offset+80))
-		s.handleCount = *(*uint32)(unsafe.Add(base, offset+96))
-		if pid != 0 && pid <= 0xFFFFFFFF {
-			out[uint32(pid)] = s
-		}
-		offset += uintptr(next)
+	})
+	if err != nil {
+		return nil, err
 	}
 	if len(out) == 0 {
 		return nil, fmt.Errorf("system process snapshot parsed zero entries")
