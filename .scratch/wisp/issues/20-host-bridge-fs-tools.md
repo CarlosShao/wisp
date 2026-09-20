@@ -1,8 +1,9 @@
 # 20 — host bridge + first tool family: fs.*, capability checks, spill rule
 
-**Status:** in-progress (segment 1 of 2 landed; fs.write/trash/move + artifacts spill remain)
-**Claimed by:** T20-seg1-agent (host bridge + C4 registry)
-**Last update:** 2026-09-20
+**Status:** in-progress (both fs segments landed; artifacts-spill rule separation, the
+`[fs] allowed_dirs` first-use ask flow and the loop-side gate composition remain)
+**Claimed by:** T20-seg1-agent (host bridge + C4 registry), T20-seg2-agent (fs write family)
+**Last update:** 2026-09-20 (segment 2)
 **Blocked by:** 17-risk-assessor-c19, 18-path-resolver-c26
 **Parallel slots:** ≤2 sub-agents (A: host bridge + ToolProvider registry; B: fs tool family +
 artifacts spill)
@@ -40,10 +41,18 @@ from 10.
 ## Acceptance criteria
 - [x] Bridge tests: undeclared capability → reject; risk decision → gate branch (L0 pass, L1
       pending-window callback, L2 pending-approval callback); tool_call rows complete.
-- [ ] fs matrix: each action's RiskLevel asserted incl. trash=L1, overwrite=L2, cross-volume
-      move→L2, out-of-allowlist read→L2.
-- [ ] Atomic write test: kill mid-write → no partial file at target (temp+rename verified).
-- [ ] Cancel-semantics test: cancelled after N ops → "applied steps" list correct.
+- [x] fs matrix: each action's RiskLevel asserted incl. trash=L1, overwrite=L2, cross-volume
+      move→L2, out-of-allowlist read→L2. Names: `TestD34WriteMatrix` (11 subtests),
+      `TestCrossVolumeRuleIsR8` (the hardware-free layer),
+      `TestOverwriteDetectionFollowsTheCanonicalPath`.
+- [x] Atomic write test: kill mid-write → no partial file at target (temp+rename verified).
+      Name: `TestAtomicWriteKillsMidWrite` (overwrite branch: old bytes survive byte-for-byte;
+      new-file branch: nothing appears at the path; both assert no staging file is left behind).
+- [x] Cancel-semantics test: cancelled after N ops → "applied steps" list correct.
+      Names: `TestVetoAfterWorkStartedProducesAppliedSteps`,
+      `TestLateVetoRendersTheApprovalLayersAppliedStepsReport`,
+      `TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop`,
+      `TestApprovedL2ThatStopsMidWriteIsNotRenderedAsNeverStarted`.
 - [ ] Reparse/short-name target via junction → denied (18 integration).
 - [ ] Artifacts API writes only under data dir; attempting user-dir write via artifacts API →
       rejected; `fs.write` to user dir remains gated (rule separation test).
@@ -106,3 +115,76 @@ from 10.
   Also still owed to ticket 19 (N-11): `rules_gateway.go`'s R4 comment says "Dormant until ticket 19"
   while the loop wiring is what landed here; that file is FROZEN for this agent, so it was NOT
   edited — ticket 21 owns that comment.
+- [2026-09-20T12:10Z] agent=T20-seg2 did=**segment 2 (the fs write family)** — `fs.write`
+  (D31 `stageAndRename`: the staging file is created in the TARGET's directory so the final
+  `os.Rename` never crosses a volume, and the target is touched by exactly one syscall, so a death
+  before it cannot produce a partial file), `fs.trash`, `fs.move` (L1 same-volume rename / L2
+  cross-volume or occupied destination), `fs.delete` (registered ONLY when
+  `FSDeps.DeleteEnabled`, re-checked inside Execute so a roster that outlived the setting still
+  refuses). The R8 escalations reach the FROZEN rules through a new host-side `Decl.Facts` hook:
+  the bridge keeps owning `Declared` and `Paths` (a tool can neither lower its own floor nor hide a
+  target), the hook contributes the irreversibility classes, and a panicking hook contributes an
+  unknown class which R8 fail-closes to L2. Every existence probe canonicalizes through C26 first.
+  **trash is the real shell API, and how that is proven:** `SHFileOperationW` with
+  `FOF_ALLOWUNDO` + `FOF_SILENT|NOCONFIRMATION|NOERRORUI|NOCANCELLATION`, issued on a thread
+  pinned with `runtime.LockOSThread` + `CoInitializeEx` (the COM apartment is per OS thread;
+  without it shell32 deadlocks — measured, see below), and success is then CONDITIONED on finding
+  the `$I*` restore record shell32 wrote for that exact path under `<drive>\$Recycle.Bin\<SID>`
+  (`TestShellTrashLeavesARecycleBinEntryTheOSCanEnumerate` re-derives it independently of the
+  implementation's own check). An unlink cannot produce that record, and `os.Remove` appears in
+  this package only in `fs.delete` and in the cross-volume move's source removal, both of which
+  declare themselves permanent (R8 → L2). Two findings the next agent should not rediscover the
+  hard way: (1) **`SHQueryRecycleBinW` blocks forever from a Go thread** — the first version used
+  it for the item-count proof and the test binary sat in that syscall until the go-test timeout
+  killed it, i.e. a tool call that can hang a task in silence; (2) **`FOF_WANTNUKEWARNING` asks
+  shell32 for a MODAL dialog**, which is the same hang wearing a face on the user's desktop. Both
+  dropped in favour of the restore-record check. The trash tests DO place one small temp item in
+  the real Recycle Bin each run; that is the price of an honest assertion.
+  **Two D31 bugs the composition exposed (both in the fake-clean-cancel direction, both fixed
+  here):** `approval.Gate.PendingApproval` never recorded a handoff, so an approved L2 write that
+  then stopped mid-flight was rendered 「本次调用未进入执行阶段」 over a list of steps that HAD
+  landed; and `CancellationReport.TextFor` had no branch for "steps landed, no veto on record"
+  (task cancellation / tool fault), so it fell through to the 「未上报其步骤」 sentence. The
+  `markStarted` key is the INCOMING correlation id, because the queue re-stamps
+  `d.CorrelationID` with its own item id — the card's address, not the call's. The only
+  applied-steps shape in the repo is still `approval.CancellationReport`: `tools.CancelBus.Report`
+  returns an `fmt.Stringer` precisely so no second shape could be born on the way.
+  **AC#2/3/4 GREEN (test names in the AC text). AC#5 and AC#6 NOT ticked:** neither is in this
+  segment's scope — AC#5's junction-denial coverage lives in `internal/risk`
+  (`pathresolver_junction_windows_test.go`), and AC#6's artifacts-spill rule-separation test is
+  still unwritten.
+  **THE R12 ANSWER, restated because three ACs this week were left open on exactly this question:
+  who calls this in production? NOBODY YET, and it is NOT reachable from `cmd/wisp`.** Re-run the
+  判据: `grep -rln '"github.com/CarlosShao/wisp/internal/tools"' --include=*.go cmd/ internal/ |
+  grep -v _test.go` → only the four `internal/agent/approval` files;
+  `grep -rn '"github.com/CarlosShao/wisp/internal/agent"' --include=*.go cmd/ internal/ | grep -v
+  _test.go` → only `internal/tools/bridge.go`; and
+  `grep -rn "tools.New\|approval.New\|agent.New(" --include=*.go cmd/` → **zero hits**. Ticket 12
+  owns that wiring; no AC was ticked on the strength of a call path that does not exist.
+  **`decideRisk` WAS NOT TOUCHED** (`git diff HEAD -- internal/agent/loop.go` empty; the guard sits
+  at `internal/agent/loop.go:719-738`). Deliberate, per the hazard register: it refuses any call
+  whose roster entry declares L1/L2 before Execute runs, so an `fs.write` dispatched by a Loop is
+  still refused rather than gated. Replacing it means handing the loop the bridge's verdict, and
+  that replacement cannot be composed honestly inside this segment: `cmd/wisp` builds no loop and
+  no gate, so the only test proving "guard gone, gate in its place" would have to author ticket
+  12's production wiring. What IS proven here is that nothing else is missing —
+  `internal/tools/wiring_test.go` runs the real `approval.Gate` over this bridge: an L1 write
+  blocks its full 2s window and then writes, an in-window veto writes nothing, a late veto renders
+  approval's own report wording, and an L0 read opens no card.
+  **Gates (scoped to ./internal/tools/ + ./internal/agent/..., all run):** `gofmt -l` clean on
+  every file this agent touched (`internal/agent/loop_golden_test.go` and `truncation_test.go`
+  carry pre-existing drift from d6f6406, untouched here); `go vet` CLEAN;
+  `go test -count=2` ok tools 14.386s / agent 2.463s / approval 0.145s;
+  `go test -race -count=1` ok 9.982s / 2.801s / 1.131s; `tools/d22scan` → **clean** (segment 1's
+  pre-existing mockllm finding is gone). `internal/ball` + `cmd/balldebug` untouched, no GUI
+  process launched, no `-tags winlive` run, frozen files (`docs/PLAN.md`, `docs/specs/*`,
+  `internal/risk/*`) zero-diff. Commits 0986d63 + 94827e4 + e669567.
+  next=**ticket 12 (composition) or ticket 21 segment 2**: (a) build the Bridge + `approval.Gate`
+  in `cmd/wisp`, and in the SAME commit replace `decideRisk`'s roster-floor refusal with the
+  bridge's verdict while running the loop with a nil Journal so `tool_call` rows do not double;
+  (b) AC#5 bridge-level junction/reparse denial test; (c) AC#6 artifacts-spill rule-separation
+  test (`internal/agent/spill.go` is the host-internal precedent; D22 ban 7 forbids naming a gated
+  tool after it); (d) the `[fs] allowed_dirs` first-use ask flow (minimal native prompt now, full
+  GUI at 39) — note it has NO SPEC-12 §5 row, so marking it `DEFERRED` in code would break the
+  1:1 cross-check; (e) still owed to ticket 19 (N-11) the `rules_gateway.go` R4 comment, and the
+  missing `tool_call.rules_hit` column (a SPEC-02 §3 contract change, human approval required).

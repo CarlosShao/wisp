@@ -183,8 +183,6 @@ func TestLateVetoRendersTheApprovalLayersAppliedStepsReport(t *testing.T) {
 	dir := t.TempDir()
 	target := filepath.Join(dir, "half-written.txt")
 
-	var mu sync.Mutex
-	handoff := make(chan struct{})
 	// Declared first: the AtStep closure below reaches g, and a :=-declared
 	// variable is not in scope inside its own initializer.
 	var b *tools.Bridge
@@ -196,19 +194,12 @@ func TestLateVetoRendersTheApprovalLayersAppliedStepsReport(t *testing.T) {
 			if step != "write:24" {
 				return
 			}
-			mu.Lock()
-			defer mu.Unlock()
 			// The user hits 「取消」 while the write is halfway through staging:
 			// past the window, so this is a stop request and not a rewind.
 			if err := g.Veto(approval.Veto{
 				CorrelationID: "corr-wire-1", Channel: approval.ChannelEsc,
 			}); err == nil {
 				t.Errorf("a veto after handoff must be reported as non-atomic (ErrAlreadyStarted), got nil")
-			}
-			select {
-			case <-handoff:
-			default:
-				close(handoff)
 			}
 		}},
 	})
