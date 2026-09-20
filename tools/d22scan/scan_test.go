@@ -152,6 +152,88 @@ func Normalize2(p string) string {
 	}
 }
 
+// TestCheckRootRejectsBlindRoots is the ticket 67 AC#2 guard: a -root that
+// cannot contain any banned pattern must be a loud error, never a clean verdict.
+func TestCheckRootRejectsBlindRoots(t *testing.T) {
+	cases := []struct {
+		name string
+		seed func(t *testing.T, root string)
+	}{
+		{"empty dir", func(_ *testing.T, _ string) {}},
+		{"go.mod only", func(t *testing.T, root string) {
+			seedFile(t, root, "go.mod", "module x\n")
+		}},
+		// The exact shape of `cd tools/d22scan && go run .` with the default
+		// -root .: the module has its own go.mod and allowlist, so a naive
+		// existence check passes, but it holds no internal/ and no cmd/.
+		{"the d22scan module itself", func(t *testing.T, root string) {
+			seedFile(t, root, "go.mod", "module x\n")
+			seedFile(t, root, "tools/d22scan/allowlist.txt", "# empty\n")
+			seedFile(t, root, "main.go", "package main\n")
+		}},
+		// internal/ + cmd/ present but too thin to be the product tree.
+		{"repo skeleton with two go files", func(t *testing.T, root string) {
+			seedFile(t, root, "go.mod", "module x\n")
+			seedFile(t, root, "tools/d22scan/allowlist.txt", "# empty\n")
+			seedFile(t, root, "internal/a/a.go", "package a\n")
+			seedFile(t, root, "cmd/b/b.go", "package b\n")
+		}},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			root := t.TempDir()
+			c.seed(t, root)
+			files, err := checkRoot(root)
+			if err == nil {
+				t.Fatalf("mis-invocation accepted: checkRoot(%q) reported %d files, want an error", root, files)
+			}
+			if files >= minProductionGoFiles {
+				t.Errorf("error reported but file count %d already clears the floor", files)
+			}
+		})
+	}
+}
+
+// TestScanAloneIsNotAFalsifier pins WHY checkRoot exists: Scan() on a root with
+// nothing to scan returns zero findings, i.e. the old "clean" was compatible
+// with "the scanner looked at nothing". The positive control must be the pair
+// (checkRoot ok, Scan green), never Scan by itself.
+func TestScanAloneIsNotAFalsifier(t *testing.T) {
+	root := t.TempDir()
+	seedFile(t, root, "tools/d22scan/allowlist.txt", "# empty\n")
+	seedFile(t, root, "go.mod", "module x\n")
+	findings, err := Scan(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(findings) != 0 {
+		t.Fatalf("fixture unexpectedly found: %v", findings)
+	}
+	if _, err := checkRoot(root); err == nil {
+		t.Fatal("checkRoot must reject the root that Scan just declared clean")
+	}
+}
+
+// TestCheckRootAcceptsRealRepo keeps the guard from being a tautology: the same
+// predicate that rejects the blind roots must pass on the tree it guards.
+func TestCheckRootAcceptsRealRepo(t *testing.T) {
+	root, err := filepath.Abs(filepath.Join("..", ".."))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(root, "go.mod")); err != nil {
+		t.Skipf("not inside the wisp repo: %v", err)
+	}
+	files, err := checkRoot(root)
+	if err != nil {
+		t.Fatalf("real repo root rejected: %v", err)
+	}
+	if files < minProductionGoFiles {
+		t.Fatalf("real repo exposes only %d production .go files", files)
+	}
+	t.Logf("real repo production Go files in scope: %d", files)
+}
+
 func TestScannerSelfScanOfRealRepoIsGreen(t *testing.T) {
 	// Walk up from the package dir to the real repo root (the test lives at
 	// tools/d22scan/) and scan it: the lint job must be green on HEAD.

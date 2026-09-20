@@ -37,7 +37,7 @@ CI 该步**无 `continue-on-error`** ⇒ **job 红**。
   豁免只有我（编排者）能书面给，且必须写明理由；**本票的立场是这条不该豁免**。
   ⚠ 该 helper 服务于测试：**不得**为了让 spawn 好写而把 helper 改成并发不安全或丢掉 `t.Fatal` 语义；
   超时判定**禁止**用墙钟差（D22 禁令之一），沿用仓库里既有的 monotonic 做法。
-- [ ] **AC#2 门自己必须是可证伪的。** 完成判据：`cd tools/d22scan && go test ./...` 通过
+- [x] **AC#2 门自己必须是可证伪的。** 完成判据：`cd tools/d22scan && go test ./...` 通过
   （那步就是 seeded-violation 阳性对照），**且**你新加/改动的每条 ban 覆盖面都要有一条"故意种一个违规 → 扫描器必须报"的用例。
   我踩的坑不是"扫描器漏报"而是"我用的调用方式让它没跑"，所以这一格的交付物包括
   **把仓根误调用也变成不可能**：要么在 `scripts/` 加一个包装入口并在 CI 与文档里统一用它，
@@ -98,3 +98,31 @@ CI 该步**无 `continue-on-error`** ⇒ **job 红**。
   `WARN goroutine outside the D38 roster (leak symptom) goroutine=mockllm-stdout-reader owner=test`。
   消除它要往 `internal/observe/goroutine.go` 的 `TemporaryNames` 加名——那是票 66 领地，本票不动；
   也不肯借用 `disposal-worker` 之类既有名字骗过漏检器。**留给编排者裁定。**
+- [2026-09-20T15:05:00Z] agent=agent-ticket67 did=**AC#2 落地并勾选**，并**挖出第二条比票面更危险的假绿**。
+  【新发现，须登记 registry A22】`tools/d22scan` 的 `-root` 默认 `.` ⇒
+  **`cd tools/d22scan && go run .`**（不带 `-root`，正是 `docs/evidence/s1/10`、`docs/evidence/s3/19`
+  里逐字记录为 "PASS clean" 的那条命令）**扫的是 `tools/d22scan` 自己这棵树**：
+  无 `internal/`、无 `cmd/`、无 `design/`、allowlist 缺失也当空表 ⇒ **0 文件被检查、0 命中，却打印
+  `d22scan: clean` + exit 0**。票面只说了"从仓根跑会 no-op"（那条至少吐 Go 的模块错误、非零退出）；
+  **这条是打印成功的空转**，比仓根误调用更可信也更不可见。历史证据里那些 clean 行是这么来的。
+  【修法】`tools/d22scan/main.go` 加 `checkRoot()`：`-root` 必须同时有 `go.mod`、
+  `tools/d22scan/allowlist.txt`、`internal/`、`cmd/`，且 `internal/`+`cmd/` 下非测试 `.go` 文件
+  ≥ `minProductionGoFiles`（10，同 `internal/observe/nobarego_test.go` 的守卫形状），否则
+  **exit 2** 并打出该跑哪条命令；绿/红之前先打印 `examined N production Go files`，
+  让"没跑"与"没命中"在 stdout 上可分辨。allowlist 缺失从"静默当空表"变成致命。
+  【包装入口】`scripts/d22scan.sh`：从自身位置推导仓根（任何 cwd 可跑），**先** `go test ./...`
+  （阳性对照，证明门能变红）**再** `go run . -root "$root"`；`set -eu`，无 `|| true`、无 continue-on-error。
+  `.github/workflows/ci.yml` 的 "D22 seven-ban + emoji scan" 步改为 `sh scripts/d22scan.sh`
+  （同一 ubuntu/bash job，命令集合与改前逐字等价，未放宽）。调用契约同时写进 `main.go` 包注释与脚本头注释。
+  【测量】`sh scripts/d22scan.sh` → `examined 194 production Go files` + clean + exit 0；
+  三种误调用现全部非零：无 `-root` → `missing tools/d22scan/allowlist.txt` exit 2；
+  `-root ../../../` → `missing go.mod` exit 2；仓根 `go run ./tools/d22scan -root .` → Go 模块错误 exit 1
+  （这条在 `main()` 之前就被 Go 拦下，扫描器无法自截，只能靠 wrapper + 文档消除诱因）。
+  【端到端种违规】临时建 `internal/llm/adaptertest/zz_ticket67_seed.go`（裸 goroutine + `start.Sub(time.Now())`）
+  → wrapper 报 `2 finding(s)`、`examined 195`、exit 1；删除文件 → 回到 clean/194/exit 0。
+  单测侧新增 `TestCheckRootRejectsBlindRoots`（4 个盲 root 子用例，含"d22scan 模块自己"这一形状）、
+  `TestScanAloneIsNotAFalsifier`（钉住 `Scan()` 对空树返回 0 命中这一事实，防后人把 checkRoot 当冗余删掉）、
+  `TestCheckRootAcceptsRealRepo`（同一谓词必须放过真仓，194 文件）。`cd tools/d22scan && go test ./...` 全绿。
+  未做：AC#3（碰 `cmd/wisp/providers.go`，票 66 在飞，编排者裁定等其落地）、AC#4 门禁全清单复跑。
+  备注：`go run` 会把子进程任意非零退出压成 1，故"有违规(1)"与"用法错(2)"经 `go run` 后不可分辨——
+  wrapper 靠 `set -e` 兜住，但若将来有脚本想区分这两态，须直接跑编译出的二进制而非 `go run`。

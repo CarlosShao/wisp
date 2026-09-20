@@ -54,10 +54,12 @@ jobs:
           staticcheck ./...
 
       - name: D22 seven-ban + emoji scan (tools/d22scan)
-        run: |
-          cd tools/d22scan
-          go test ./...
-          go run . -root "${{ github.workspace }}"
+        # Wrapper is the supported entry point (ticket 67 AC#2): it derives the
+        # repo root from its own location, runs the seeded-violation positive
+        # control and then the scan, so "the scanner never ran" cannot read as
+        # green. tools/d22scan is its own Go module - invoking it from the repo
+        # root by path silently no-ops, which is what this step guards against.
+        run: sh scripts/d22scan.sh
 
       - name: mockllm module vet
         run: go vet ./...

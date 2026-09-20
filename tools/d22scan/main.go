@@ -21,8 +21,21 @@
 //	8 emoji               zero emoji in design/ and frontend/ (D23)
 //
 // Findings are suppressed only via allowlist.txt entries of the form
-// "ban-id<TAB>path-prefix<TAB>reason" (committed, reviewable, never wildcards
-// beyond the path prefix).
+// "ban-id<TAB>repo-relative path prefix<TAB>reason" (committed, reviewable,
+// never wildcards beyond the path prefix).
+//
+// Invocation (ticket 67 AC#2 - the shape of this command is load-bearing):
+// this package is its OWN Go module (tools/d22scan/go.mod), so from the repo
+// root `go run ./tools/d22scan` fails inside the ROOT module and this scanner
+// never starts. Worse, running it with the default `-root .` from inside
+// tools/d22scan points the walk at a tree that has no internal/ or cmd/, so
+// every ban walks zero files and the tool would print "clean" while having
+// examined nothing. Both mis-invocations are now fatal: main validates
+// -root and refuses to report a verdict it did not actually compute. Run it
+// as:
+//
+//	scripts/d22scan.sh                      # what CI's lint job calls
+//	cd tools/d22scan && go run . -root ../../
 package main
 
 import (
@@ -410,6 +423,56 @@ func isTextFile(path string) bool {
 	return false
 }
 
+// minProductionGoFiles is how many non-test .go files a real wisp root must
+// expose under internal/ + cmd/ for a clean verdict to mean anything. The
+// repo is far above this; the floor exists so a mis-pointed -root cannot walk
+// an empty tree and report "clean" (same guard shape as
+// internal/observe/nobarego_test.go).
+const minProductionGoFiles = 10
+
+// checkRoot proves root is a wisp repository the bans can actually be
+// evaluated against, and returns the number of production Go files in scope.
+// It is the falsifiability guard of ticket 67 AC#2: without it, "0 findings"
+// and "the scanner ran nowhere" are indistinguishable on stdout.
+func checkRoot(root string) (int, error) {
+	for _, required := range []string{
+		"go.mod",
+		filepath.Join("tools", "d22scan", "allowlist.txt"),
+		filepath.Join("internal"),
+		filepath.Join("cmd"),
+	} {
+		if _, err := os.Stat(filepath.Join(root, required)); err != nil {
+			return 0, fmt.Errorf("%q is not a wisp repository root: missing %s", root, filepath.ToSlash(required))
+		}
+	}
+	files := 0
+	for _, dir := range []string{filepath.Join(root, "internal"), filepath.Join(root, "cmd")} {
+		err := filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+			if d.IsDir() {
+				if d.Name() == "testdata" || d.Name() == ".git" {
+					return filepath.SkipDir
+				}
+				return nil
+			}
+			if strings.HasSuffix(path, ".go") && !strings.HasSuffix(path, "_test.go") {
+				files++
+			}
+			return nil
+		})
+		if err != nil {
+			return 0, err
+		}
+	}
+	if files < minProductionGoFiles {
+		return files, fmt.Errorf("%q has only %d production .go files under internal/ and cmd/, want >= %d: the ban scan would be a no-op",
+			root, files, minProductionGoFiles)
+	}
+	return files, nil
+}
+
 func main() {
 	root := flag.String("root", ".", "repository root to scan")
 	flag.Parse()
@@ -418,11 +481,20 @@ func main() {
 		fmt.Fprintln(os.Stderr, "d22scan:", err)
 		os.Exit(2)
 	}
+	// A green verdict must be earned by a scan that could see the code.
+	files, err := checkRoot(abs)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "d22scan:", err)
+		fmt.Fprintln(os.Stderr, "d22scan: this tool is its own Go module; run `scripts/d22scan.sh`"+
+			" or `cd tools/d22scan && go run . -root ../../` (see tools/d22scan/main.go doc comment)")
+		os.Exit(2)
+	}
 	findings, err := Scan(abs)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "d22scan:", err)
 		os.Exit(2)
 	}
+	fmt.Printf("d22scan: examined %d production Go files under internal/ and cmd/ of %s\n", files, filepath.ToSlash(abs))
 	for _, f := range findings {
 		fmt.Println(f.String())
 	}
