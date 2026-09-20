@@ -134,6 +134,16 @@ moment: type → reply → notification → memory returns to idle.
       ⚠ 这些是代理**未写进票面**、由编排者按代码与 commit 对账补记的（见 Progress log 的疏漏记录）。
 - [ ] Zero emoji scan over new UI strings passes; tokens doc updated with any additions.
 - [ ] Human visual acceptance of ball states (user signs off screenshots — D29 rule).
+- [ ] **（2026-09-20 编排者新加，registry A25）回复后 3s 回落有实测记录**：PLAN `:1424` 的 S1 第一判据原文是
+      「打字→得回复→**3s 回落**」，逐项对账后确认这是**四项里唯一从未被量过的一条**
+      （`wisp slo` 量空闲态、`balldebug -diff` 量逐态驻留，都不量"最后一个 token 之后多久进 `Settling`/`Sleeping`"）。
+      完成判据：①从"最后一个 token 送达"起算到进入 `Settling` 的耗时 **≤3000ms**，
+      **必须用单调钟**（`observe.Timeout` 那条路；墙钟差判超时是 D22 禁令 #4）；
+      ②**≥5 个样本全报**，不许用平均抹掉坏尾部、不许重测到运气好的那次，超线就录 FAIL；
+      ③机器可判的形态优先：若 D43 的回落行（`EvAfterReply`/notify→Warm 那条）没有暴露"最后 token 时间"，
+      **加一个事件钩子/接缝就是代码改动**，写进本票而不是绕过去用肉眼数秒表。
+      ⚠ 归属说明：票 28 的 AC 是 **90s Warm→Settling / 30s Conversation→Warm**，与本条**不是同一件事**，
+      已核对过不能塞给它；本条留在 S1 gate 票上，因为它是 S1 的出口判据。
 
 ## Progress log (append-only, newest last)
 - [2026-09-20T11:10Z] agent=agent-ticket12-assembly did=(据 commit 反推，代理本人未写任何 log 行) 装配根 + stopguard 替换 + A8 + A11 + AC#1/AC#4，3 个 commit：`cbdea7c`（守卫与替代同批：删 `loop.decideRisk` 的 L1/L2 先拒，同 commit 引入 `Options.AdmitTask` 与 295 行 `internal/tools/loop_approval_test.go`，正反两向都有——有 gate 时 L1 写开阻断窗约 3s 并落文件记 `fs.write/L1/allow/success`，无 gate 时同一调用被拒记 `L1/reject` 且文件不出现）、`cd011b8`（`cmd/wisp/run.go` 同时 import `internal/agent/approval` 与 `internal/tools` ⇒ **A13 打通**）、以及死前未提交的 thinking 探测半成品 next=(未写)
