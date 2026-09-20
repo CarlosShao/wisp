@@ -109,8 +109,14 @@
 - **H2** LLM API Key（阻塞真 provider 黄金录制；框架已就绪，`cmd/llmrecord` 一条命令补录）
 - **H3** P10 命名残余核查（阻塞票 56）
 - **H4** web.search 实现路径拍板（票 22 以接口先行，不返工）
-- **H5** 生产 minisign 密钥仪式（S8 前；dev 密钥已可用）
-- **H6** 票 16 真机三场景（物理拔插麦克风/隐私开关/独占占用——人工操作）
+- **H5** 默认 TTS 选型 —— **registry 权威编号下 H5 = TTS 选型，已裁定 R5（云 TTS，供应商 StepFun），
+  已移入 pending-and-issues.md「已解决」**；本项不再是待人项。（本地 matcha 条目保持 `blocked-p3` 不变。）
+- **（旧 H5 误标）生产 minisign 密钥仪式** —— registry 未给它 H 号，登记为
+  「[H5-旧编号/HANDOVER 的 minisign 项]」，按 R6 降级为发布前才需要；dev 密钥
+  （`E:\work\base\wisp-minisign\`）继续用于本地更新/模型链验证。
+- **（旧 H6 误标）票 16 真机三场景**（物理拔插麦克风/隐私开关/独占占用——人工操作）——
+  registry **无 H6 条目**；该人工件按 [B3] 补登于 pending-and-issues.md 的「完成度审计」节。
+  引用 H 号时以 registry 文本为准（本文件此前把 minisign 记作 H5、把票 16 记作 H6，与 registry 冲突，已按 registry 更正）。
 
 ## 9. 进度节奏参考（新会话据此排程）
 

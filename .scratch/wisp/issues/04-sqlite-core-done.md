@@ -2,7 +2,7 @@
 
 **Status:** done
 **Claimed by:** orchestrator -> sub-agent T04-impl
-**Last update:** 2026-09-19T10:03:56ZT09:52:40Z
+**Last update:** 2026-09-20T02:26Z
 **Blocked by:** 03-skeleton-runtime-rules
 **Parallel slots:** ≤2 sub-agents (A: schema+DAO+writer goroutine; B: RetentionJob + crash/privacy tests)
 **Spec refs:** SPEC-02 §2–§8, D35, §14.11, D20, C13, C23
@@ -54,3 +54,4 @@ delete-one) exposed as module APIs (GUI pages come in ticket 40).
 - [2026-09-19T09:52:40Z] agent=T04-impl did=adv-fixes(MAJOR-1 writer-panic-wedge: per-command-recover+tx.Rollback-on-panic+gen-guard-backstop+TestAdvPanicWedge; MAJOR-2 bufLogger-mutex-fixture, -race 2x-green; MINOR go-mod-tidy(sqlite-direct), ticket-log-reorder, drop-dead-field-writeQueue.last, tool_call-retention-COALESCE(ended,started,decided)+null-ended-boundary-tests, parseVersion-strict-digits+reject-tests) next=orchestrator-recheck (Status unchanged)
 - [2026-09-19T10:03:56Z] agent=orchestrator did=re-verification PASS (orchestrator-executed, implementer-independent): race x2 green, TestAdvPanicWedge PASS, ddlV1 BYTE-IDENTICAL vs SPEC-02 §3, go.mod sqlite direct-require confirmed, MINORs verified next=ticket DONE
 - [2026-09-20T02:25Z] agent=agent-bookkeeping-1 did=AC boxes reconciled against docs/evidence/s0/04-adversarial-acceptance.md (§9 票据对照 table: all 6 AC rows ruled PASS with 清单 cross-refs; report VERDICT was FAIL-minimal-fix-set on two non-AC defects (writer panic wedge, bufLogger fixture race) which the 09:52:40Z fix entry + 10:03:56Z orchestrator re-verification closed): 6 checked, 0 left open next=none
+- [2026-09-20T02:26Z] agent=agent-bookkeeping-1 did=audit-B MINOR (ticket-04 header) fixed — `**Last update:**` was the glued double stamp "2026-09-19T10:03:56ZT09:52:40Z" (newest-entry ts + stray ts of the 09:52:40Z adv-fixes entry); de-glued to a single ISO stamp and set to 02:26Z (this entry). NOTE for the other tickets: the same glued-header artifact exists in the headers of 01/03/05/06/07/08/09/13/14 (9 more tickets; audit-B documented only this one) and was left alone as out-of-documented-scope next=none
