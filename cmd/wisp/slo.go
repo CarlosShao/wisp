@@ -98,6 +98,14 @@ type sloRun struct {
 	// ObserverSubjectPID is the INSTRUMENTED child: the same posture with a
 	// sampler running inside it, whose self-report lands in Observer.
 	ObserverSubjectPID uint32 `json:"observer_subject_pid,omitempty"`
+	// ObserverSubjectPrivateWS is ONE out-of-tree read of the instrumented
+	// subject, taken after the window closes. It exists so a reader can tell
+	// whether the in-tree report's footprint is that process's real memory or
+	// the sampler's own scratch: an in-process ReadTree keeps a multi-megabyte
+	// SystemProcessInformation buffer on the measured tree's heap, which
+	// docs/SLO.md §7 already flagged for the spike.
+	ObserverSubjectPrivateWS int64  `json:"observer_subject_private_working_set_bytes,omitempty"`
+	ObserverSubjectErr       string `json:"observer_subject_read_error,omitempty"`
 	// Report holds the ACCEPTANCE numbers: measured out-of-tree in "state"
 	// mode (proc.ExternalSampler over the subject pid), in-process otherwise.
 	Report *observe.StateReport `json:"report,omitempty"`

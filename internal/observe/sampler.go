@@ -162,6 +162,10 @@ type StateReport struct {
 	IntervalSec  float64  `json:"interval_sec"`
 	Samples      []Sample `json:"samples"`
 	SampleErrors int      `json:"sample_errors"`
+	// LastSampleError keeps WHY the most recent read was dropped. A bare count
+	// let an instrument lose samples without saying what it lost (ticket 66:
+	// the whole point is that this instrument stops hiding things).
+	LastSampleError string `json:"last_sample_error,omitempty"`
 
 	// Basis is BasisOutOfTree or BasisInTree (ticket 66).
 	Basis string `json:"measurement_basis"`
@@ -282,10 +286,12 @@ func (s *Sampler) SampleState(ctx context.Context, st SLOState, interval, durati
 		nowAt := time.Now()
 		if err != nil {
 			rep.SampleErrors++
+			rep.LastSampleError = "read: " + err.Error()
 		} else if m.PrivateWorkingSetBytes <= 0 {
 			// A zero-footprint read of a live tree is an untrustworthy
 			// measurement, never a pass (fail-closed).
 			rep.SampleErrors++
+			rep.LastSampleError = "read returned a zero private working set for a live tree"
 		} else {
 			sample := s.derive(prev, prevAt, m, nowAt)
 			rep.Samples = append(rep.Samples, sample)
