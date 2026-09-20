@@ -25,7 +25,12 @@ const usage = `wisp - personal voice agent for Windows
 Usage:
   wisp             GUI resident process (boots the runtime skeleton, empty
                    event loop; the floating ball window is ticket 07)
-  wisp run "task"  run a task from the command line (ticket 01: echo placeholder)
+  wisp run "task"  run one task end to end through the agent loop (ticket 12:
+                   the S1 text path - streamed reply + notification + exit code
+                   that reflects the error class)
+  wisp providers   provider catalog path (ticket 12, ruling A11): discover
+                   <provider> lists /v1/models; probe <provider>/<model> runs
+                   the capability probe suite into provider_health
   wisp secret      credential entry (ticket 63): set/get/list/unset a DPAPI
                    blob without the key ever entering argv, a log line or chat
   wisp doctor      toolchain and native-DLL self-check, prints PASS/FAIL
@@ -51,7 +56,10 @@ func main() {
 	switch args[0] {
 	case "run":
 		attachParentConsole()
-		cmdRun(args[1:])
+		os.Exit(cmdRun(args[1:]))
+	case "providers":
+		attachParentConsole()
+		os.Exit(cmdProviders(args[1:], providersIO{}))
 	case "doctor":
 		attachParentConsole()
 		if !cmdDoctor() {
@@ -122,15 +130,12 @@ func runResident() {
 	fmt.Printf("wisp: event loop ending (%s); running the D38(e) shutdown order\n", reason)
 }
 
-// cmdRun echoes the task text. Placeholder until the agent loop (ticket 10).
-func cmdRun(args []string) {
-	task := "no task text given"
-	if len(args) > 0 {
-		task = args[0]
-	}
+// cmdRun is the S1 text path (ticket 12): runTextTask assembles the whole
+// stack - credential store, config, provider, approval gate, host bridge,
+// agent loop - and the exit code reflects the task's error class.
+func cmdRun(args []string) int {
 	printVersions("")
-	fmt.Printf("wisp run: task text accepted: %q\n", task)
-	fmt.Printf("wisp run: agent loop is ticket 10; this is the CLI plumbing placeholder\n")
+	return runTextTask(runSpec{argv: args, stdout: os.Stdout, stderr: os.Stderr})
 }
 
 // printVersions writes the common version block (prefix used by callers).
