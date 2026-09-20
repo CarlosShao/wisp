@@ -3,8 +3,6 @@
 package risk
 
 import (
-	"strings"
-
 	"golang.org/x/sys/windows/registry"
 )
 
@@ -17,60 +15,50 @@ const (
 	keyWow6432Key = 0x0200
 )
 
-// registryProbe reads the per-client account keys under HKCU (P12: the
-// configured roots survive client relocation, which path-string matching
-// alone cannot). Values are read with explicit access views because 32/64-bit
-// hosts spell the same layout differently; any probe error yields no roots,
-// which keeps the caller on the fail-closed suspect-fallback path.
-func registryProbe(e probeEnv) []SyncRoot {
-	var out []SyncRoot
-	// OneDrive: HKCU\Software\Microsoft\OneDrive\Accounts\<Personal|Business#>\UserFolder
-	out = append(out, oneDriveRoots()...)
-	// Dropbox installer record: HKCU\Software\Dropbox\Dropbox "Path"
-	if v := regString(registry.CURRENT_USER, `Software\Dropbox\Dropbox`, "Path"); v != "" {
-		out = append(out, SyncRoot{Provider: "Dropbox", Path: v, Source: "registry"})
-	}
-	// Nutstore (坚果云): HKCU\Software\Nutstore "InstallPath" is the client
-	// install dir, not the sync root; sync roots live in the (undocumented,
-	// version-specific) client config -> P12 residual, covered by
-	// default-location probe + suspect fallback. See docs/PRECHECK.md.
-	return out
-}
+// pathHandleVerify reports that C26 can OS-verify paths here
+// (GetFinalPathNameByHandle), so an existing-but-unverifiable write target
+// spelling is a real anomaly and fails closed as sync-suspect.
+const pathHandleVerify = true
 
-func oneDriveRoots() []SyncRoot {
-	const accounts = `Software\Microsoft\OneDrive\Accounts`
-	var out []SyncRoot
+// registryProbe runs the portable P12 registry logic (syncdirs.go
+// registryProbeFor) against HKCU. Reading with explicit access views matters:
+// 32/64-bit installers spell the same client records differently, and
+// golang.org/x/sys/windows/registry does not export the KEY_WOW64_* masks.
+// Any probe error yields no roots, which keeps the caller on the fail-closed
+// suspect-fallback path.
+func registryProbe(e probeEnv) []SyncRoot { return registryProbeFor(liveRegistry{}) }
+
+// liveRegistry is the registryValueSource over the real HKCU hive.
+type liveRegistry struct{}
+
+// subKeys enumerates both WOW64 views and returns the first non-empty list
+// (a 32-bit-only installer record is still a configured root).
+func (liveRegistry) subKeys(key string) []string {
 	for _, view := range []uint32{keyWow6464Key, keyWow6432Key} {
-		k, err := registry.OpenKey(registry.CURRENT_USER, accounts, registry.READ|view)
+		k, err := registry.OpenKey(registry.CURRENT_USER, key, registry.READ|view)
 		if err != nil {
 			continue
 		}
-		subkeys, err := k.ReadSubKeyNames(-1)
-		if err == nil {
-			for _, sk := range subkeys {
-				if !strings.EqualFold(sk, "Personal") && !strings.HasPrefix(sk, "Business") {
-					continue // unknown nodes (e.g. "ConsumingAccounts") carry no UserFolder
-				}
-				acc, err := registry.OpenKey(k, sk, registry.READ)
-				if err != nil {
-					continue
-				}
-				if v, _, err := acc.GetStringValue("UserFolder"); err == nil && v != "" {
-					out = append(out, SyncRoot{Provider: "OneDrive", Path: v, Source: "registry"})
-				}
-				acc.Close()
-			}
-		}
+		names, err := k.ReadSubKeyNames(-1)
 		k.Close()
-		if len(out) > 0 {
-			break
+		if err == nil && len(names) > 0 {
+			return names
 		}
 	}
-	return out
+	return nil
 }
 
-func regString(root registry.Key, path, name string) string {
-	k, err := registry.OpenKey(root, path, registry.READ)
+func (liveRegistry) string(key, name string) string {
+	for _, view := range []uint32{keyWow6464Key, keyWow6432Key} {
+		if v := regStringView(registry.CURRENT_USER, key, name, view); v != "" {
+			return v
+		}
+	}
+	return ""
+}
+
+func regStringView(root registry.Key, path, name string, view uint32) string {
+	k, err := registry.OpenKey(root, path, registry.READ|view)
 	if err != nil {
 		return ""
 	}

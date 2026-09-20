@@ -1,6 +1,7 @@
 package risk
 
 import (
+	"sort"
 	"strings"
 	"testing"
 )
@@ -72,24 +73,131 @@ func TestFragmentMatchCJK(t *testing.T) {
 	}
 }
 
-func TestFragmentIndexShortSourceNeverMatches(t *testing.T) {
-	// Documented residual: a source shorter than the 8-char floor cannot
-	// produce a contract-shaped fragment (e.g. a 7-char secret).
-	idx := newFragmentIndex(normalizeTaint("abc123"), contractMinFragmentChars)
-	if _, ok := idx.contains("abc123extra-not-real"); ok {
-		t.Fatal("index with zero windows must never hit")
+func TestNormalizeTaintDropsIgnorableChars(t *testing.T) {
+	// M-6: invisible characters are not whitespace, so they used to cut a
+	// fragment's contiguity — a normalization gap in the *contract* sense, not
+	// the 16.9#1 paraphrase residual. Spellings are built from code points so
+	// nothing here depends on an invisible literal surviving an editor round
+	// trip.
+	const (
+		zwsp = string(rune(0x200B)) // zero-width space
+		zwnj = string(rune(0x200C)) // zero-width non-joiner
+		zwj  = string(rune(0x200D)) // zero-width joiner
+		shy  = string(rune(0x00AD)) // soft hyphen
+		wj   = string(rune(0x2060)) // word joiner
+		bom  = string(rune(0xFEFF)) // byte-order mark (a literal is illegal in Go source)
+		mn   = string(rune(0x0301)) // combining acute (category Mn)
+	)
+	cases := []struct{ name, in, want string }{
+		{"zwsp", "ab" + zwsp + "cd", "abcd"},
+		{"zwnj+zwj", "ab" + zwnj + zwj + "cd", "abcd"},
+		{"soft hyphen", "ab" + shy + "cd", "abcd"},
+		{"word joiner", "ab" + wj + "cd", "abcd"},
+		{"bom", "ab" + bom + "cd", "abcd"},
+		{"combining marks", "ab" + mn + "c" + mn + "d", "abcd"},
+		{"full-width + ignorable mix", "ＡＢ" + shy + "cd", "abcd"},
 	}
-	if len(idx.hashes) != 0 {
-		t.Fatalf("expected empty hash set, got %d", len(idx.hashes))
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			if got := normalizeTaint(c.in); got != c.want {
+				t.Errorf("normalizeTaint(%q)=%q want %q", c.in, got, c.want)
+			}
+		})
+	}
+	// And the evasion window is closed end to end in normalized space.
+	idx := newFragmentIndex(normalizeTaint("token SUPERSECRETVALUE here"), contractMinFragmentChars)
+	for _, probe := range []string{
+		"SU" + zwsp + "PERSECRET",
+		"SUPER" + shy + "SECRETVALUE",
+		"sup" + zwsp + "er" + mn + "se" + wj + "cre" + bom + "t",
+	} {
+		if _, ok := idx.contains(normalizeTaint(probe)); !ok {
+			t.Errorf("ESCAPIABLE: invisible-character split %q did not match", probe)
+		}
 	}
 }
 
+func TestFragmentIndexShortSourceNeverMatches(t *testing.T) {
+	// Documented residual: a source shorter than the 8-char floor cannot
+	// produce a contract-shaped fragment (e.g. a 7-char secret).
+	src := normalizeTaint("abc123")
+	idx := newFragmentIndex(src, contractMinFragmentChars)
+	if len(idx.hashes) != 0 {
+		t.Fatalf("expected empty hash set, got %d", len(idx.hashes))
+	}
+	// A parameter that shares more than the source has must still not hit.
+	if _, ok := idx.contains("abc123extra-not-real"); ok {
+		t.Fatal("index with zero windows must never hit")
+	}
+	// Guard against the degenerate assertion the first version of this test
+	// was: the empty index has to be exercised against a populated one too.
+	full := newFragmentIndex(normalizeTaint("abc123abcdef tail"), contractMinFragmentChars)
+	if len(full.hashes) == 0 {
+		t.Fatal("control index must be populated")
+	}
+	if _, ok := full.contains(normalizeTaint("abc123ab")); !ok {
+		t.Fatal("control: an >=8 shared fragment must hit")
+	}
+}
+
+// N-3: this used to probe a disjoint window (a tautology). It now injects a
+// genuine hash hit for a window the source does NOT contain, i.e. a simulated
+// 64-bit collision, which is the only case the verification step can fail.
 func TestFragmentHashCollisionCannotFakeHit(t *testing.T) {
-	// Even if a hash collides, the Contains verification decides. Build an
-	// index over one source and probe a disjoint parameter that shares no
-	// 8-rune window: must not report a hit.
-	src := newFragmentIndex(normalizeTaint(strings.Repeat("x", 64)+"ONLYREALFRAGMENT"), contractMinFragmentChars)
-	if _, ok := src.contains(normalizeTaint("yyyyyyyyzzzzzzzz")); ok {
-		t.Fatal("disjoint window must not match")
+	src := normalizeTaint(strings.Repeat("x", 64) + "ONLYREALFRAGMENT")
+	idx := newFragmentIndex(src, contractMinFragmentChars)
+
+	ghost := normalizeTaint("QQQQQQQQ") // 8 runes, absent from src
+	if strings.Contains(src, ghost) {
+		t.Fatal("test premise broken: ghost window is in the source")
+	}
+	// Forge the collision: add the ghost's hash where a real 64-bit collision
+	// would have landed.
+	idx.hashes = append(idx.hashes, hashWindow([]rune(ghost)))
+	sort.Slice(idx.hashes, func(i, j int) bool { return idx.hashes[i] < idx.hashes[j] })
+
+	if _, ok := idx.contains(ghost); ok {
+		t.Fatal("hash equality alone must never create a hit")
+	}
+	// The real fragment still hits, so the forged entry did not break lookup.
+	if _, ok := idx.contains(normalizeTaint("ONLYREALFRAG")); !ok {
+		t.Fatal("real fragment must still match")
+	}
+}
+
+// --- M-5 memory/latency budget (go test -bench . -benchmem) ------------------
+
+// BenchmarkMarkFullSource measures one Mark() of a MaxSourceRunes-sized
+// tainted source: with the dead winStrs table removed the index should cost
+// ~8 bytes per window (~2 MiB for 262144 runes), not ~12 MiB.
+func BenchmarkMarkFullSource(b *testing.B) {
+	src := strings.Repeat("敏感-token-内容 ", 20000) // > MaxSourceRunes once normalized
+	p := NewProvenance(ProvOptions{NoProbe: true})
+	p.OpenScope("s")
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		p.Mark("s", SrcFSRead, "/big", src)
+		p.CloseScope("s")
+		p.OpenScope("s")
+	}
+}
+
+// BenchmarkScanOverTenSources measures the response-path cost of one Inspect
+// with a 40k-rune parameter against ten 8k-rune tainted sources.
+func BenchmarkScanOverTenSources(b *testing.B) {
+	p := NewProvenance(ProvOptions{NoProbe: true})
+	p.OpenScope("s")
+	for i := 0; i < 10; i++ {
+		p.Mark("s", SrcWebFetch, "u", strings.Repeat("filler content to index ", 500)+
+			string(rune('a'+i))+strings.Repeat(" more", 40))
+	}
+	param := strings.Repeat("unrelated body text ", 2000) // ~40k runes
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		if _, ok := p.Inspect("s", "notify", map[string]any{"text": param}); ok {
+			b.Fatal("clean param must not hit")
+		}
 	}
 }

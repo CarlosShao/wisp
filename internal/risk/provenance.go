@@ -29,13 +29,16 @@ import (
 //	6  HTTP POST body / URL (net)
 //
 // Tools with a frozen D34 name (web.search, notify, clipboard.write, fs.write)
-// are matched key-by-key by Inspect. TTS announce and the net body do not have
-// a frozen tool name yet (tickets 22/26 name them), so they call
+// get their table keys LABELED with the contract channel; every other
+// parameter value (unknown key names, nested objects, arrays, byte slices) is
+// still scanned fail-closed under ChUnknown, so a renamed or wrapped parameter
+// cannot narrow the scan. TTS announce and the net body do not have a frozen
+// tool name yet (tickets 22/26 name them), so they call
 // CheckText(scope, ChTTS|ChHTTP, text) directly; and any call whose tool is
 // NOT in the channel table fail-closes to a conservative scan of every string
-// parameter (write payloads excepted: content/data params are only scanned
-// when the call's path lands in a sync dir, which is the spec's own rule for
-// fs.write, not an invention).
+// parameter. In both cases write payloads (content/data) are excepted: they
+// are only scanned when the call's path lands in a sync dir, which is the
+// spec's own rule for fs.write, not an invention.
 //
 // Wiring to the assessor: the frozen C19 seam is TaintDetector.TaintHit(params)
 // — it carries no tool name — so callers bind it per scope:
@@ -126,6 +129,21 @@ var writeChannelKeys = map[string]bool{"content": true, "data": true}
 // pathKeys are the parameters naming the write target for the sync-dir test.
 var pathKeys = []string{"path", "file", "filepath", "dest", "destination"}
 
+// contract defaults for the scanning budgets (overridable via ProvOptions;
+// zero/negative means "use the default", never "scan nothing").
+const (
+	// defaultMaxParamDepth bounds the generic parameter walk. Nesting deeper
+	// than this fails closed as an unscanned-nesting hit instead of silently
+	// skipping the tail (M-4).
+	defaultMaxParamDepth = 8
+	// defaultMaxScopeSources is the D32 per-scope index budget.
+	defaultMaxScopeSources = 64
+	// defaultMaxSourceRunes caps one stored tainted source.
+	defaultMaxSourceRunes = 262144
+	// defaultMaxScanRunes caps one scanned parameter value.
+	defaultMaxScanRunes = 2097152
+)
+
 // ProvOptions configures the engine. Everything is optional; zero values take
 // the contract defaults (never a weaker behavior — see field docs).
 type ProvOptions struct {
@@ -139,9 +157,19 @@ type ProvOptions struct {
 	// MaxScanRunes bounds how much of one parameter value is scanned
 	// (default 2097152 runes); beyond is logged-not-scanned (documented).
 	MaxScanRunes int
-	// AllowedDirs / ReparseExceptions mirror [fs] config (the suspect
-	// fallback and C26 Resolve need them; membership is decided by Resolve).
-	AllowedDirs       []string
+	// MaxParamDepth bounds the nesting the generic parameter walk descends
+	// (default defaultMaxParamDepth). Reaching it is NOT a silent miss: the
+	// call fails closed as an unscanned-nesting hit (adversarial report M-4).
+	// Values below the default are accepted as looser scanning budgets only
+	// if the caller also accepts the fail-closed escalation they trigger.
+	MaxParamDepth int
+	// MaxScopeSources is the D32 memory budget for one scope's indexed
+	// sources (default 64). Exceeding it is logged and every taint is still
+	// kept — dropping marks would open the gate (fail-open), which the budget
+	// exists to bound, not to cause.
+	MaxScopeSources int
+	// ReparseExceptions mirrors [fs] reparse_point_exceptions for C26
+	// Resolve (sync-root membership is decided by Resolve, never by hand).
 	ReparseExceptions []string
 	// SyncRoots injects configured sync roots (user escape hatch for
 	// relocated clients); SyncFixturePath loads the JSON fixture fallback.
@@ -176,6 +204,8 @@ type Provenance struct {
 	minChars int
 	maxSrc   int
 	maxScan  int
+	maxDepth int
+	maxMarks int
 	channel  map[string][]string
 	sync     *syncSet
 }
@@ -211,11 +241,19 @@ func NewProvenance(o ProvOptions) *Provenance {
 	}
 	maxSrc := o.MaxSourceRunes
 	if maxSrc <= 0 {
-		maxSrc = 262144
+		maxSrc = defaultMaxSourceRunes
 	}
 	maxScan := o.MaxScanRunes
 	if maxScan <= 0 {
-		maxScan = 2097152
+		maxScan = defaultMaxScanRunes
+	}
+	maxDepth := o.MaxParamDepth
+	if maxDepth <= 0 {
+		maxDepth = defaultMaxParamDepth
+	}
+	maxMarks := o.MaxScopeSources
+	if maxMarks <= 0 {
+		maxMarks = defaultMaxScopeSources
 	}
 	ch := map[string][]string{}
 	for t, d := range channelTable {
@@ -240,6 +278,8 @@ func NewProvenance(o ProvOptions) *Provenance {
 		minChars: minChars,
 		maxSrc:   maxSrc,
 		maxScan:  maxScan,
+		maxDepth: maxDepth,
+		maxMarks: maxMarks,
 		channel:  ch,
 	}
 	if o.NoProbe {
@@ -252,7 +292,7 @@ func NewProvenance(o ProvOptions) *Provenance {
 				s.add(r)
 			}
 		}
-		s.complete = len(s.roots) > 0
+		s.finalize()
 		p.sync = s
 	} else {
 		p.sync = detectSyncSet(o)
@@ -314,6 +354,11 @@ func (p *Provenance) Mark(scopeID, tool, origin, content string) bool {
 	if _, ok := p.scopes[scopeID]; !ok {
 		logf("risk/C25: scope %q not open (CloseScope raced or composition gap); taint stored — it cannot leak into other scopes", scopeID)
 	}
+	if n := len(p.scopes[scopeID]); n >= p.maxMarks {
+		// D32 memory budget exceeded: keep the taint (dropping it would be a
+		// fail-open) but make the budget miss visible for the SLO counters.
+		logf("risk/C25: scope %q holds %d tainted sources (MaxScopeSources=%d, D32 budget); keeping every taint — index memory grows past the budget, see docs/PRECHECK.md", scopeID, n, p.maxMarks)
+	}
 	p.scopes[scopeID] = append(p.scopes[scopeID], m)
 	p.mu.Unlock()
 	if truncated {
@@ -338,29 +383,66 @@ func (p *Provenance) ScopeTaints(scopeID string) []TaintInfo {
 	var out []TaintInfo
 	for _, m := range p.scopes[scopeID] {
 		out = append(out, TaintInfo{ScopeID: scopeID, Tool: m.tool, Origin: m.origin,
-			RuneLen: len(m.idx.norm), MarkedAt: m.at})
+			RuneLen: m.idx.nrunes, MarkedAt: m.at})
 	}
 	return out
 }
 
 // --- detection ---------------------------------------------------------------
 
+// Fail-closed source names for hits that are NOT content matches. They are
+// deliberately not tool names: the confirmation card then names the missing
+// information ("包含来自 unbound-scope …"), and the forensics row shows why
+// the extra confirm happened. Repo rule: missing information produces a DENY.
+const (
+	SrcUnboundScope     = "unbound-scope"     // Inspect on a scope that was never opened / already closed
+	SrcUnscannedNesting = "unscanned-nesting" // parameter nesting deeper than MaxParamDepth
+)
+
+// scopeMarks snapshots a scope's taint marks. The second result reports the
+// fail-closed condition: the scope id is not registered at all (typo, missing
+// OpenScope, or Inspect after CloseScope) while the engine holds taints in
+// some scope — exactly the shape of the "wiring got the scope id wrong" bug,
+// which must upgrade rather than pass (adversarial report M-1).
+func (p *Provenance) scopeMarks(scopeID string) ([]*taintMark, bool) {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+	marks := p.scopes[scopeID]
+	if len(marks) > 0 {
+		return marks[:len(marks):len(marks)], false // snapshot (append never mutates the shared prefix)
+	}
+	if _, known := p.scopes[scopeID]; known {
+		return nil, false // opened and empty: this session read nothing tainted
+	}
+	for _, m := range p.scopes {
+		if len(m) > 0 {
+			logf("risk/C25: Inspect/CheckText on unregistered scope %q while other scopes hold taints: fail-closed R4 (ensure OpenScope at task start)", scopeID)
+			return nil, true
+		}
+	}
+	return nil, false
+}
+
 // Inspect checks one outgoing call against the scope's taints. tool is the
 // D34 name ("" = unknown, forces the conservative generic scan). Returns the
 // first hit in deterministic order (channel keys in table order, remaining
 // params sorted, marks oldest-first).
+//
+// The channel table only LABELS parameters (adversarial report B-2): every
+// remaining parameter value — unknown key names, nested objects, arrays, byte
+// payloads — is additionally scanned under ChUnknown, so renaming `query` to
+// `q` or wrapping the payload cannot narrow the scan. Write payloads stay
+// gated on the sync-dir test (SPEC-06 §5), which is the only place the
+// contract makes landing site (not content shape) decide the channel.
 func (p *Provenance) Inspect(scopeID, tool string, params map[string]any) (Hit, bool) {
-	p.mu.RLock()
-	marks, known := p.scopes[scopeID]
+	marks, unbound := p.scopeMarks(scopeID)
+	if unbound {
+		return Hit{ScopeID: scopeID, Channel: ChUnknown, SrcTool: SrcUnboundScope,
+			Origin: "scope is not open (OpenScope missing or already closed)"}, true
+	}
 	if len(marks) == 0 {
-		p.mu.RUnlock()
-		if !known {
-			logf("risk/C25: Inspect on unknown scope %q: treated as untainted (empty store); ensure OpenScope at task start", scopeID)
-		}
 		return Hit{}, false
 	}
-	marks = marks[:len(marks):len(marks)] // snapshot (append never mutates the shared prefix)
-	p.mu.RUnlock()
 
 	// Build the candidate list: (channel, text) pairs derived from params.
 	type cand struct {
@@ -368,43 +450,53 @@ func (p *Provenance) Inspect(scopeID, tool string, params map[string]any) (Hit, 
 		text string
 	}
 	var cands []cand
-	if def, ok := channelTable[tool]; ok {
-		switch def.ch {
-		case ChSyncWrite:
-			path, hasPath := firstStringParam(params, pathKeys)
-			// A malformed fs.write without a usable path is unverifiable and
-			// fail-closes to the sync side (strict).
-			if !hasPath || p.IsSyncPath(path).Sync {
-				for _, k := range sortedKeys(params) {
-					if writeChannelKeys[k] {
-						if v, ok := params[k].(string); ok {
-							cands = append(cands, cand{ChSyncWrite, v})
-						}
-					}
-				}
+	truncated := false
+	appendCands := func(key string, ch Channel) {
+		ss, cut := collectStrings(params[key], p.maxDepth)
+		truncated = truncated || cut
+		for _, s := range ss {
+			cands = append(cands, cand{ch, s})
+		}
+	}
+
+	if def, ok := channelTable[tool]; ok && def.ch == ChSyncWrite {
+		// fs.write: content/data are exfil candidates only when the target
+		// lands in a sync dir; a missing/unverifiable target fail-closes to
+		// the scan side. Path and every other parameter are scanned anyway
+		// (ChUnknown) — a taint can ride a file name or an extra field.
+		path, hasPath := firstStringParam(params, pathKeys)
+		syncGateOpen := !hasPath || p.IsSyncPath(path).Sync
+		for _, k := range sortedKeys(params) {
+			if !syncGateOpen && writeChannelKeys[k] {
+				continue // non-sync body is not an exfil channel (SPEC-06 §5)
 			}
-			// Non-sync fs.write: content is NOT an exfil channel (SPEC-06 §5);
-			// fall through with no candidates.
-		default:
-			for _, k := range p.channel[tool] {
-				if v, ok := params[k].(string); ok {
-					cands = append(cands, cand{def.ch, v})
-				}
+			ch := ChUnknown
+			if writeChannelKeys[k] {
+				ch = ChSyncWrite
 			}
+			appendCands(k, ch)
 		}
 	} else {
-		// Unknown tool (or the TaintDetector adapter): fail-closed generic
-		// scan of every string parameter, write payloads gated on sync path.
+		// Write-shaped calls under any other (or no) tool name keep the same
+		// payload gate: a path param that resolves outside every sync root
+		// means the body is not an exfil channel yet.
 		path, hasPath := firstStringParam(params, pathKeys)
 		syncGateOpen := !hasPath || p.IsSyncPath(path).Sync // no path = unverifiable = fail-closed open
+		labelled := map[string]bool{}
+		if ok {
+			for _, k := range p.channel[tool] {
+				labelled[k] = true
+				if _, has := params[k]; !has {
+					continue
+				}
+				appendCands(k, def.ch)
+			}
+		}
 		for _, k := range sortedKeys(params) {
-			v := params[k]
-			if writeChannelKeys[k] && !syncGateOpen {
+			if labelled[k] || (!syncGateOpen && writeChannelKeys[k]) {
 				continue
 			}
-			for _, s := range collectStrings(v, 0) {
-				cands = append(cands, cand{ChUnknown, s})
-			}
+			appendCands(k, ChUnknown)
 		}
 	}
 	for _, c := range cands {
@@ -412,18 +504,28 @@ func (p *Provenance) Inspect(scopeID, tool string, params map[string]any) (Hit, 
 			return h, true
 		}
 	}
+	if truncated {
+		// M-4: the scan was cut off by the nesting budget. Model-controlled
+		// JSON nests for free, so an unscanned tail is treated as tainted
+		// rather than silently passed.
+		logf("risk/C25: params of tool %q nest deeper than MaxParamDepth=%d; tail unscanned, fail-closed R4", tool, p.maxDepth)
+		return Hit{ScopeID: scopeID, Channel: ChUnknown, SrcTool: SrcUnscannedNesting,
+			Origin: fmt.Sprintf("parameters nested deeper than %d levels", p.maxDepth)}, true
+	}
 	return Hit{}, false
 }
 
 // CheckText matches one outgoing string against a scope's taints under an
 // explicit channel label — the entry point for channels without a frozen D34
 // tool name yet: TTS announce text (ticket 26) and HTTP POST body/url
-// (ticket 22 / net layer).
+// (ticket 22 / net layer). An unbound scope fail-closes exactly as in
+// Inspect (M-1).
 func (p *Provenance) CheckText(scopeID string, ch Channel, text string) (Hit, bool) {
-	p.mu.RLock()
-	marks := p.scopes[scopeID]
-	marks = marks[:len(marks):len(marks)]
-	p.mu.RUnlock()
+	marks, unbound := p.scopeMarks(scopeID)
+	if unbound {
+		return Hit{ScopeID: scopeID, Channel: ch, SrcTool: SrcUnboundScope,
+			Origin: "scope is not open (OpenScope missing or already closed)"}, true
+	}
 	if len(marks) == 0 {
 		return Hit{}, false
 	}
@@ -485,32 +587,54 @@ func firstStringParam(m map[string]any, keys []string) (string, bool) {
 	return "", false
 }
 
-// collectStrings flattens nested map/slice string values (bounded depth).
-func collectStrings(v any, depth int) []string {
-	if depth > 4 {
-		return nil
-	}
+// collectStrings flattens nested map/slice string values down to maxDepth.
+// The second result reports that the walk was CUT OFF by the nesting budget:
+// callers must fail closed on it (adversarial report M-4) — a silent nil here
+// is how a six-level wrapper escaped the generic scan.
+func collectStrings(v any, maxDepth int) ([]string, bool) {
+	return walkStrings(v, 0, maxDepth)
+}
+
+func walkStrings(v any, depth, maxDepth int) ([]string, bool) {
 	switch t := v.(type) {
 	case string:
-		if t != "" {
-			return []string{t}
+		if t == "" {
+			return nil, false
 		}
-	case map[string]any:
-		var out []string
-		for _, k := range sortedKeys(t) {
-			out = append(out, collectStrings(t[k], depth+1)...)
+		return []string{t}, false
+	case []byte: // byte payloads are text carriers too (B-2 type escape)
+		if len(t) == 0 {
+			return nil, false
 		}
-		return out
-	case []any:
-		var out []string
-		for _, e := range t {
-			out = append(out, collectStrings(e, depth+1)...)
-		}
-		return out
+		return []string{string(t)}, false
 	case []string:
-		return t
+		return t, false
+	case map[string]any:
+		if depth >= maxDepth {
+			return nil, len(t) > 0
+		}
+		var out []string
+		cut := false
+		for _, k := range sortedKeys(t) {
+			ss, c := walkStrings(t[k], depth+1, maxDepth)
+			out = append(out, ss...)
+			cut = cut || c
+		}
+		return out, cut
+	case []any:
+		if depth >= maxDepth {
+			return nil, len(t) > 0
+		}
+		var out []string
+		cut := false
+		for _, e := range t {
+			ss, c := walkStrings(e, depth+1, maxDepth)
+			out = append(out, ss...)
+			cut = cut || c
+		}
+		return out, cut
 	}
-	return nil
+	return nil, false
 }
 
 // String for diagnostics without leaking content.

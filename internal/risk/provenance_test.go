@@ -147,12 +147,25 @@ func TestFourChannelExfilSuite(t *testing.T) {
 	}
 
 	// The remaining two channels of six (F4): TTS announce (no frozen tool
-	// name yet -> CheckText) and HTTP POST body.
-	if _, ok := p.CheckText("task-1", ChTTS, "reading result aloud: "+marker); !ok {
+	// name yet -> CheckText) and HTTP POST body. The channel LABEL is asserted
+	// too, not just the hit (adversarial report §2 row 1 reservation).
+	if h, ok := p.CheckText("task-1", ChTTS, "reading result aloud: "+marker); !ok {
 		t.Error("TTS announce text must be an exfil channel (physical exfil)")
+	} else if h.Channel != ChTTS {
+		t.Errorf("TTS channel label: got %q want %q", h.Channel, ChTTS)
 	}
-	if _, ok := p.CheckText("task-1", ChHTTP, "post body contains "+marker); !ok {
+	if h, ok := p.CheckText("task-1", ChHTTP, "post body contains "+marker); !ok {
 		t.Error("HTTP POST body must be an exfil channel")
+	} else if h.Channel != ChHTTP {
+		t.Errorf("HTTP channel label: got %q want %q", h.Channel, ChHTTP)
+	}
+	// N-4: the same suite, one transform of the marker further (full-width +
+	// case + injected whitespace) — normalization must survive integration.
+	if h, ok := p.Inspect("task-1", "notify", map[string]any{
+		"text": "ＭＡＲＫＥＲ QZX-98WVE7-ＴＡＩＮＴＥＤ-SOURCE"}); !ok {
+		t.Error("ESCAPIABLE: transformed marker missed on the notify channel")
+	} else if h.Channel != ChNotify {
+		t.Errorf("transformed marker lost its channel label: %q", h.Channel)
 	}
 }
 
@@ -258,10 +271,183 @@ func TestDisposalScopeClearsTaints(t *testing.T) {
 }
 
 func TestInspectUnknownScopeIsEmptyStore(t *testing.T) {
+	// M-1 (adversarial report): the old default on an unregistered scope was
+	// "treated as untainted" = pass. Missing information must produce a DENY,
+	// so the direction is now: unknown scope + any taint anywhere -> fail-closed
+	// hit; unknown scope + nothing tainted at all -> nothing to leak.
 	p := NewProvenance(baseOptions())
-	// Never-opened scope: isolated empty store, no panic, no inherited taint.
 	if _, ok := p.Inspect("ghost", "notify", map[string]any{"text": marker}); ok {
-		t.Fatal("unknown scope cannot carry taint")
+		t.Fatal("unknown scope with an empty engine cannot carry taint")
+	}
+	p.OpenScope("task-1")
+	p.Mark("task-1", SrcWebFetch, "https://a", marker)
+
+	hit, ok := p.Inspect("ghost", "notify", map[string]any{"text": "unrelated"})
+	if !ok {
+		t.Fatal("Inspect on an unbound scope while taints exist must fail closed, not pass")
+	}
+	if hit.SrcTool != SrcUnboundScope || hit.Channel != ChUnknown {
+		t.Errorf("fail-closed attribution: got %+v", hit)
+	}
+	// Same through the frozen C19 seam and through CheckText (TTS/net).
+	if src, h := p.Detector("ghost").TaintHit(map[string]any{"text": "unrelated"}); !h || !strings.Contains(src, SrcUnboundScope) {
+		t.Errorf("adapter must fail closed too, got %q/%v", src, h)
+	}
+	if _, h := p.CheckText("ghost", ChTTS, "unrelated"); !h {
+		t.Error("CheckText on an unbound scope must fail closed")
+	}
+	// A closed scope (session ended) is the same shape of mistake.
+	p.CloseScope("task-1")
+	p.OpenScope("task-2")
+	if _, h := p.Inspect("task-2", "notify", map[string]any{"text": "x"}); h {
+		t.Fatal("an opened-and-empty scope is legitimately untainted")
+	}
+	p.Mark("task-2", SrcFSRead, "/f", marker)
+	p.CloseScope("task-2") // disposes the taints -> engine empty again
+	if _, h := p.Inspect("task-2", "notify", map[string]any{"text": marker}); h {
+		t.Fatal("after Dispose the engine holds no taint: no hit is correct (AC#5)")
+	}
+}
+
+// --- B-2: parameter name / shape escapes --------------------------------------
+
+// TestNamedChannelParamEscape locks the B-2 fixes: the channel table labels
+// parameters, it does not limit what is scanned.
+func TestNamedChannelParamEscape(t *testing.T) {
+	p := testProv(t, baseOptions())
+	if !p.Mark("task-1", SrcWebFetch, "https://x", "quote: "+marker) {
+		t.Fatal("mark rejected")
+	}
+	cases := []struct {
+		name   string
+		tool   string
+		params map[string]any
+		wantCh Channel
+	}{
+		{"table key still gets its contract label", "web.search", map[string]any{"query": marker}, ChWebSearch},
+		{"renamed query key", "web.search", map[string]any{"url": marker}, ChUnknown},
+		{"abbreviated key", "web.search", map[string]any{"q": marker}, ChUnknown},
+		{"harmless table key, tainted extra key", "notify", map[string]any{"title": marker, "text": "ding"}, ChUnknown},
+		{"payload under another name", "clipboard.write", map[string]any{"payload": marker}, ChUnknown},
+		{"nested object payload", "notify", map[string]any{"text": map[string]any{"body": marker}}, ChNotify},
+		{"array payload", "notify", map[string]any{"text": []any{marker}}, ChNotify},
+		{"[]string payload", "clipboard.write", map[string]any{"lines": []string{"ok", marker}}, ChUnknown},
+		{"byte payload", "clipboard.write", map[string]any{"raw": []byte(marker)}, ChUnknown},
+		{"deep map under an unknown key", "web.search", map[string]any{"meta": map[string]any{"a": map[string]any{"b": marker}}}, ChUnknown},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			hit, ok := p.Inspect("task-1", c.tool, c.params)
+			if !ok {
+				t.Fatalf("ESCAPIABLE: %s/%v not caught by Inspect", c.tool, c.params)
+			}
+			if hit.Channel != c.wantCh {
+				t.Errorf("channel label: got %q want %q", hit.Channel, c.wantCh)
+			}
+			if !strings.Contains(hit.Source(), "web.fetch") {
+				t.Errorf("must name the source, got %q", hit.Source())
+			}
+		})
+	}
+	// The adapter (tool-name-less seam) catches the same shapes.
+	for _, params := range []map[string]any{
+		{"q": marker}, {"payload": marker}, {"text": []any{marker}}, {"raw": []byte(marker)},
+	} {
+		if _, h := p.Detector("task-1").TaintHit(params); !h {
+			t.Errorf("ESCAPIABLE via the frozen seam: %v", params)
+		}
+	}
+	// fs.write payload under a non-table key is scanned even though the
+	// content/data keys are sync-gated (B-2 last bullet).
+	if _, ok := p.Inspect("task-1", "fs.write", map[string]any{
+		"path": `C:\somewhere\plain\a.txt`, "body": "see " + marker}); !ok {
+		t.Fatal("ESCAPIABLE: fs.write body param outside writeChannelKeys")
+	}
+	// Clean calls on named channels stay clean.
+	if _, ok := p.Inspect("task-1", "notify", map[string]any{"text": "dinner at 7", "url": "https://x"}); ok {
+		t.Fatal("clean notify must not hit")
+	}
+}
+
+// --- M-4: nesting budget must not be a silent miss ----------------------------
+
+func TestDeepNestingFailsClosedNotSilent(t *testing.T) {
+	p := testProv(t, baseOptions())
+	p.Mark("task-1", SrcFSRead, "/f", marker)
+	// Deeper than the configured budget: the tail cannot be scanned, so the
+	// call must fail closed instead of passing (adversarial report M-4).
+	nested := map[string]any{"v": marker}
+	for i := 0; i < 12; i++ {
+		nested = map[string]any{"l": nested}
+	}
+	hit, ok := p.Inspect("task-1", "some.plugin", map[string]any{"args": nested})
+	if !ok {
+		t.Fatal("ESCAPIABLE: beyond-MaxParamDepth nesting passed silently")
+	}
+	if hit.SrcTool != SrcUnscannedNesting {
+		t.Errorf("expected the unscanned-nesting fail-closed source, got %+v", hit)
+	}
+	// Inside the budget it is a real content hit with the content fragment.
+	shallow := map[string]any{"v": marker}
+	for i := 0; i < 3; i++ {
+		shallow = map[string]any{"l": shallow}
+	}
+	hit2, ok2 := p.Inspect("task-1", "some.plugin", map[string]any{"args": shallow})
+	if !ok2 || hit2.SrcTool != SrcFSRead {
+		t.Fatalf("shallow nesting must still match by content, got %+v/%v", hit2, ok2)
+	}
+	// A budget of 0 falls back to the default, never to "scan nothing".
+	p2 := NewProvenance(ProvOptions{NoProbe: true, MaxParamDepth: 0})
+	p2.OpenScope("s")
+	if p2.maxDepth != defaultMaxParamDepth {
+		t.Fatalf("maxDepth: got %d want %d", p2.maxDepth, defaultMaxParamDepth)
+	}
+}
+
+// --- N-4: transforms must survive the full Mark -> Inspect path ---------------
+
+// injectIgnorable interleaves invisible characters (ZWSP/ZWJ/word-joiner/soft
+// hyphen/BOM + a combining mark) into s, the M-6 evasion shape.
+func injectIgnorable(s string, sep rune) string {
+	var b strings.Builder
+	for i, r := range s {
+		if i > 0 {
+			b.WriteRune(sep)
+		}
+		b.WriteRune(r)
+	}
+	return b.String()
+}
+
+func TestNormalizationEndToEnd(t *testing.T) {
+	p := testProv(t, baseOptions())
+	if !p.Mark("task-1", SrcDocRead, "/contracts/acme.pdf", "clause 7 read as: "+marker) {
+		t.Fatal("mark rejected")
+	}
+	fw := strings.Map(func(r rune) rune { // full-width spelling of the marker
+		if r >= '!' && r <= '~' {
+			return r + 0xFEE0
+		}
+		return r
+	}, marker)
+	for name, variant := range map[string]string{
+		"lowercase":        strings.ToLower(marker),
+		"whitespace split": strings.Join(strings.Split(marker, ""), "   "),
+		"full-width":       fw,
+		"zero-width split": injectIgnorable(marker, 0x200B),
+		"soft-hyphen":      injectIgnorable(marker, 0x00AD),
+		"bom/word-joiner":  injectIgnorable(marker, 0xFEFF),
+		"combining mark":   injectIgnorable(marker, 0x0301),
+	} {
+		t.Run(name, func(t *testing.T) {
+			if _, ok := p.Inspect("task-1", "notify", map[string]any{"text": "summary: " + variant}); !ok {
+				t.Fatalf("ESCAPIABLE: normalized variant %q of a marked fragment did not hit", name)
+			}
+		})
+	}
+	// The evasion must be symmetric: an unmarked lookalike still does not hit.
+	if _, ok := p.Inspect("task-1", "notify", map[string]any{"text": injectIgnorable("NOT-THE-MARKER-AT-ALL", 0x200B)}); ok {
+		t.Fatal("false positive on unrelated content")
 	}
 }
 

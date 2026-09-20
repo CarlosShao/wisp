@@ -29,6 +29,21 @@ import (
 // confirms are the safe direction (16.9#1).
 const contractMinFragmentChars = 8
 
+// isIgnorableTaintRune reports the invisible characters that must be dropped
+// by normalization. U+00AD/U+200B..U+200D/U+2060/U+FEFF and the combining
+// marks (Mn) render as nothing (or as a diacritic on the previous rune) but
+// are NOT unicode.IsSpace, so leaving them in place lets an exfiltrator cut a
+// tainted fragment into sub-8-rune pieces with zero-width characters — a gap
+// in the *normalized* text the contract matches on, not the semantic
+// paraphrase residual of 16.9#1 (adversarial report M-6).
+func isIgnorableTaintRune(r rune) bool {
+	switch r {
+	case 0x00AD, 0x200B, 0x200C, 0x200D, 0x2060, 0xFEFF:
+		return true
+	}
+	return unicode.Is(unicode.Mn, r)
+}
+
 // normalizeTaint applies the contract normalization to s and returns the
 // normalized form. Runes that fold onto themselves are kept verbatim.
 func normalizeTaint(s string) string {
@@ -41,7 +56,7 @@ func normalizeTaint(s string) string {
 		if r >= 0xFF01 && r <= 0xFF5E {
 			r -= 0xFEE0
 		}
-		if unicode.IsSpace(r) {
+		if unicode.IsSpace(r) || isIgnorableTaintRune(r) {
 			continue
 		}
 		b.WriteRune(unicode.ToLower(r))
@@ -65,11 +80,17 @@ func hashWindow(w []rune) uint64 {
 // fragmentIndex holds one tainted source in normalized, indexed form.
 // Immutable after construction (built in newFragmentIndex), so concurrent
 // readers need no per-entry lock.
+//
+// Storage is the sorted hash set plus the normalized source string and nothing
+// else: an earlier revision also kept a write-only []string of window
+// spellings parallel to the hashes, which cost ~5x the index memory on a full
+// source and was never read (verification is a substring search over src).
+// Dropped per adversarial report M-5.
 type fragmentIndex struct {
-	n       int      // effective window size in runes (>=1, contract floor 8)
-	norm    []rune   // normalized source content
-	winStrs []string // norm window spellings, parallel to hashes (verification)
-	hashes  []uint64 // sorted, deduped window hashes
+	n      int      // effective window size in runes (>=1, contract floor 8)
+	src    string   // normalized source content (the verification corpus)
+	nrunes int      // rune count of src (introspection only)
+	hashes []uint64 // sorted, deduped window hashes
 }
 
 // newFragmentIndex indexes norm (already normalized) for >=n-rune substring
@@ -78,52 +99,36 @@ type fragmentIndex struct {
 // floor has no >=8-char contiguous fragment — documented residual, see
 // Provenance docs).
 func newFragmentIndex(norm string, n int) *fragmentIndex {
-	f := &fragmentIndex{n: n, norm: []rune(norm)}
+	rp := []rune(norm)
+	f := &fragmentIndex{n: n, src: norm, nrunes: len(rp)}
 	if n < 1 {
-		n = 1
-		f.n = n
+		f.n, n = 1, 1
 	}
-	rp := f.norm
 	if len(rp) < n {
 		f.hashes = nil
 		return f
 	}
-	hset := make([]uint64, 0, len(rp)-n+1)
-	ws := make([]string, 0, len(rp)-n+1)
+	hashes := make([]uint64, 0, len(rp)-n+1)
 	win := make([]rune, n)
 	for i := 0; i+n <= len(rp); i++ {
 		copy(win, rp[i:i+n])
-		hset = append(hset, hashWindow(win))
-		ws = append(ws, string(rp[i:i+n]))
+		hashes = append(hashes, hashWindow(win))
 	}
-	// Sort hashes with parallel permutation so a hit can be verified against
-	// the exact window spelling (collision-safe, keeps match semantics).
-	sort.Sort(hashWindowPairs{h: hset, s: ws})
-	// Dedupe (same hash implies same-window-length strings verified equal by
-	// the Contains check anyway, so dedup on hash keeps the set minimal).
+	sort.Slice(hashes, func(i, j int) bool { return hashes[i] < hashes[j] })
+	// Dedupe: equal hashes come from equal windows here, and even a genuine
+	// 64-bit collision is harmless because contains() re-derives the candidate
+	// window and verifies it against src (hash equality only ever costs a
+	// wasted Contains call, never a false hit).
 	k := 0
-	for i := range hset {
-		if i == 0 || hset[i] != hset[k-1] {
-			hset[k], ws[k] = hset[i], ws[i]
+	for i := range hashes {
+		if i == 0 || hashes[i] != hashes[k-1] {
+			hashes[k] = hashes[i]
 			k++
 		}
 	}
-	f.hashes = hset[:k]
-	f.winStrs = ws[:k]
+	f.hashes = hashes[:k]
 	return f
 }
-
-type hashWindowPairs struct {
-	h []uint64
-	s []string
-}
-
-func (p hashWindowPairs) Len() int { return len(p.h) }
-func (p hashWindowPairs) Swap(i, j int) {
-	p.h[i], p.h[j] = p.h[j], p.h[i]
-	p.s[i], p.s[j] = p.s[j], p.s[i]
-}
-func (p hashWindowPairs) Less(i, j int) bool { return p.h[i] < p.h[j] }
 
 // contains reports whether any window of paramNorm (a normalized candidate)
 // occurs in the indexed source, returning the matched fragment. paramNorm
@@ -136,7 +141,6 @@ func (f *fragmentIndex) contains(paramNorm string) (string, bool) {
 	if len(rp) < n || len(f.hashes) == 0 {
 		return "", false
 	}
-	src := string(f.norm)
 	win := make([]rune, n)
 	for i := 0; i+n <= len(rp); i++ {
 		copy(win, rp[i:i+n])
@@ -144,20 +148,8 @@ func (f *fragmentIndex) contains(paramNorm string) (string, bool) {
 		if j := sort.Search(len(f.hashes), func(j int) bool { return f.hashes[j] >= h }); j < len(f.hashes) && f.hashes[j] == h {
 			w := string(rp[i : i+n])
 			// Verify: hash equality is a filter, substring truth decides.
-			if strings.Contains(src, w) {
+			if strings.Contains(f.src, w) {
 				return w, true
-			}
-			// Collision on a deduped set: probe neighbours for the real
-			// entry (rare; keeps verification exact).
-			for k := j - 1; k >= 0 && f.hashes[k] == h; k-- {
-				if strings.Contains(src, w) {
-					return w, true
-				}
-			}
-			for k := j + 1; k < len(f.hashes) && f.hashes[k] == h; k++ {
-				if strings.Contains(src, w) {
-					return w, true
-				}
 			}
 		}
 	}
