@@ -295,11 +295,37 @@ func utf8Start(b byte) bool { return b&0xC0 != 0x80 }
 // enforceTotal trims suffix sections until the D39 total holds; prefix
 // sections are never trimmed here because each already carries its own cap.
 //
-// Every pass must remove at least one token, so the loop terminates from any
-// starting point. Without that guarantee a window small enough that the seven
-// sections sit at their 1-token floors (their scaled budgets then sum above the
-// scaled total) left this spinning forever with nothing left to clip - the
-// task goroutine never returned. See TestEnforceTotalTerminatesAtEveryWindow.
+// Termination rests on THREE guarantees, not one. Do not delete any of them on
+// the strength of this comment; A10-b exists because the previous version of it
+// claimed a single mechanism and so invited exactly that.
+//
+//  1. The candidate filter: a section already at the 1-token floor is not a
+//     candidate, so when every suffix section is floored - a window small
+//     enough that the seven 1-token floors themselves exceed the scaled total,
+//     i.e. there is nothing left to clip - the loop leaves through idx == -1.
+//     This is the guard ticket 10 MINOR-5 added: the old filter tested t == 0,
+//     a floored section stayed a candidate, and Sections() never returned.
+//     Reverting it to t == 0 makes TestEnforceTotalTerminatesAtEveryWindow spin
+//     and fail at window 1; it is the only one of the three the window table
+//     pins.
+//  2. The `nb > toks-1` clamp: for any section above the floor it puts nb
+//     strictly below that section's own size, and clipToTokens never returns
+//     more than nb tokens, so the pass bites and the section shrinks by at
+//     least one token.
+//  3. The `s.Budget = nb` write-back: nb is derived from Budget, so the granted
+//     budget falls by over() >= 1 every pass and necessarily drops below toks
+//     within a few passes, which makes the clip bite on its own.
+//
+// 2 and 3 are deliberately redundant defense-in-depth, and they are NOT
+// separately testable: mutation-checked, deleting either one alone keeps every
+// test green, because each by itself still forces progress (2 bites on the
+// first pass, 3 after a few). Only a pass count or a stale reported Budget
+// would tell them apart, and neither is a contract anything may depend on, so
+// pinning them individually (A10-b option (i)) was rejected rather than shipped
+// as a brittle test. What IS pinned is the pair: a suffix section smaller than
+// its own granted budget is the state where 3 cannot bite on the first pass and
+// only 2 makes the first pass change anything, and deleting both spins there -
+// see TestEnforceTotalTerminatesOnABelowBudgetSection.
 func enforceTotal(sections []Section, total int) {
 	over := func() int {
 		n := 0
@@ -329,13 +355,15 @@ func enforceTotal(sections []Section, total int) {
 		s := sections[idx]
 		nb := s.Budget - over()
 		if nb > toks-1 {
-			nb = toks - 1 // strictly below where it is: this pass must bite
+			// Guarantee 2: puts the cut strictly below where the section is, so
+			// this pass must bite. Redundant with guarantee 3 below; keep both.
+			nb = toks - 1
 		}
 		if nb < 1 {
 			nb = 1
 		}
 		s.Text = clipToTokens(s.Text, nb)
-		s.Budget = nb
+		s.Budget = nb // guarantee 3: the grant itself descends by over() >= 1
 		sections[idx] = s
 	}
 }

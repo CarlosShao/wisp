@@ -386,3 +386,58 @@ func TestEnforceTotalTerminatesAtEveryWindow(t *testing.T) {
 		}
 	}
 }
+
+// TestEnforceTotalTerminatesOnABelowBudgetSection pins the PAIR of progress
+// guarantees enforceTotal documents (2 the `nb > toks-1` clamp, 3 the
+// `s.Budget = nb` write-back) in the one state
+// TestEnforceTotalTerminatesAtEveryWindow never reaches: the largest suffix
+// section holds fewer tokens than its own granted budget. There the pass target
+// `Budget - over()` cannot bite until that budget has been walked down past the
+// section's size, so the clamp is the only thing making the first pass change
+// anything - and with both guarantees deleted nothing ever changes at all.
+//
+// This is A10-b option (i) in the only form that is not brittle: it asserts
+// termination and the resulting total, both of which hold however the loop gets
+// there. It deliberately does NOT pin either guarantee alone - mutation-checked,
+// deleting one leaves this green (each suffices on its own, which is the
+// documented redundancy), and the only observables that tell the two apart are
+// a pass count or a stale Budget field, neither of which is a contract.
+func TestEnforceTotalTerminatesOnABelowBudgetSection(t *testing.T) {
+	secs := []Section{
+		// Prefix: 8 tokens on an 8-token grant. Untouchable by design, and it
+		// is what keeps the total over budget while the suffix sits under.
+		{Kind: SecIdentity, Budget: 8, Text: strings.Repeat("i", 32), CachePrefix: true},
+		// Suffix: 10 tokens under a 64-token grant. Sections() cannot produce
+		// this shape (every section is clipped to its grant before the total
+		// trimmer runs), which is exactly why the window table above never
+		// exercises the pair of guarantees below.
+		{Kind: SecProfile, Budget: 64, Text: strings.Repeat("p", 40)},
+	}
+	const total = 12 // rendered 18, so over() = 6, and 64-6 = 58 >= 10 tokens.
+	done := make(chan int, 1)
+	go func() {
+		enforceTotal(secs, total)
+		sum := 0
+		for _, s := range secs {
+			sum += ApproxTokens(s.Text)
+		}
+		done <- sum
+	}()
+	select {
+	case sum := <-done:
+		if sum > total {
+			t.Errorf("trimmer stopped at %d tokens against a %d-token total with a suffix "+
+				"section still holding slack: no progress guarantee fired", sum, total)
+		}
+		for _, s := range secs {
+			if used := ApproxTokens(s.Text); used > s.Budget {
+				t.Errorf("section %s renders %d tokens over its reported budget %d",
+					s.Kind, used, s.Budget)
+			}
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("enforceTotal never returned from a state where the granted budget exceeds " +
+			"the section's own size: the clamp and the Budget write-back are both gone, so " +
+			"every pass re-computed the same no-op clip - see enforceTotal's guarantees 2 and 3")
+	}
+}
