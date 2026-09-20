@@ -47,13 +47,31 @@ func TestParseAccelerator(t *testing.T) {
 	}
 }
 
-// TestDefaultHotkeys pins the SPEC-03 §4 default set (cancel = Esc, B1).
+// TestDefaultHotkeys pins SPEC-03 §4 (cancel = Esc, B1) and owner ruling R10
+// (2026-09-20): the default summon key is Ctrl+Alt+Q, because Ctrl+Alt+W was
+// measured occupied on the owner's machine (the only one of 84 candidates).
+// Ctrl+Alt+Space is the documented, configurable alternative and stays NOT the
+// default (some Chinese IMEs grab ctrl/shift+space before the app can).
 func TestDefaultHotkeys(t *testing.T) {
 	d := DefaultHotkeys()
 	if d.Cancel != "Esc" {
 		t.Errorf("cancel default = %q, want Esc", d.Cancel)
 	}
-	if d.Summon == "" || d.Mute == "" || d.Panel == "" {
+	if d.Summon != "Ctrl+Alt+Q" {
+		t.Errorf("summon default = %q, want Ctrl+Alt+Q (R10)", d.Summon)
+	}
+	if d.Summon == "Ctrl+Alt+W" || d.Summon == AltSummonSpace {
+		t.Errorf("summon default regressed to %q", d.Summon)
+	}
+	if _, err := ParseAccelerator(AltSummonSpace); err != nil {
+		t.Errorf("the documented alternative %q must stay parseable: %v", AltSummonSpace, err)
+	}
+	if d.Mute == "" || d.Panel == "" {
 		t.Errorf("summon/mute/panel defaults must be non-empty: %+v", d)
+	}
+	for _, s := range []string{d.Summon, d.Mute, d.Cancel, d.Panel} {
+		if _, err := ParseAccelerator(s); err != nil {
+			t.Errorf("default %q must parse: %v", s, err)
+		}
 	}
 }

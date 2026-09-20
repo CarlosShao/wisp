@@ -120,6 +120,7 @@ type Ball struct {
 	lastDock time.Time
 
 	registeredHotkeys map[uint32]Accelerator
+	hotkeyReport      HotkeyReport // outcome of the last registration pass (ticket 64 A1b)
 	escTakenOver      bool
 	cancelBinding     string // configured cancel binding, for B1 release
 
@@ -233,7 +234,8 @@ func (b *Ball) createOnSTA(s *staThread) error {
 	}
 	b.tray = t
 	b.cancelBinding = b.opts.Hotkeys.Cancel
-	b.registeredHotkeys = registerAll(b.hwnd, b.opts.Hotkeys)
+	b.hotkeyReport = registerAll(b.hwnd, b.opts.Hotkeys)
+	b.registeredHotkeys = b.hotkeyReport.Live()
 
 	if !b.opts.StartHidden {
 		pShowWindow.Call(hwnd, swShownoactivate)
@@ -757,17 +759,57 @@ func (b *Ball) reclampPosition() {
 
 // ------------------------------------------------------------------ hotkeys
 
-// RebindHotkeys re-registers all hotkeys after a config change (hot reload).
-func (b *Ball) RebindHotkeys(cfg HotkeyConfig) {
+// RebindHotkeys re-registers all hotkeys after a config change (hot reload)
+// and returns what happened. Callers must NOT drop the report on the floor:
+// a binding that is occupied by another app is a user-visible fact, and the
+// HotkeyReloader bridge logs it (ticket 64 A1). Rebind is idempotent - same
+// bindings in, same live set out - so a host may call it on every config
+// poll; HotkeyReloader still diffs so the Win32 churn happens once per change.
+func (b *Ball) RebindHotkeys(cfg HotkeyConfig) HotkeyReport {
 	done := make(chan struct{})
+	var rep HotkeyReport
 	b.sta.PostTask(func() {
 		defer close(done)
-		unregisterAll(b.hwnd, b.registeredHotkeys)
-		b.registeredHotkeys = registerAll(b.hwnd, cfg)
+		unregisterAll(b.hwnd)
+		rep = registerAll(b.hwnd, cfg)
+		b.hotkeyReport = rep
+		b.registeredHotkeys = rep.Live()
 		b.cancelBinding = cfg.Cancel
 		b.escTakenOver = false
 	})
 	<-done
+	return rep
+}
+
+// HotkeyReport returns the outcome of the last registration pass (boot or
+// rebind). Synchronised with the UI thread, so it is authoritative the moment
+// RebindHotkeys/New return.
+func (b *Ball) HotkeyReport() HotkeyReport {
+	done := make(chan HotkeyReport, 1)
+	b.sta.PostTask(func() { done <- b.hotkeyReport })
+	return <-done
+}
+
+// ConfiguredHotkeys returns the binding set the ball was told to hold (the
+// input of the last registration pass, not its outcome - see HotkeyReport for
+// what Win32 actually accepted). opts is immutable after New.
+func (b *Ball) ConfiguredHotkeys() HotkeyConfig { return b.opts.Hotkeys }
+
+// RegisteredHotkeys returns the id -> accelerator set Win32 actually holds
+// for us right now (the registration set the acceptance asks tests to
+// assert, not a mirror of the config).
+func (b *Ball) RegisteredHotkeys() map[uint32]Accelerator {
+	done := make(chan map[uint32]Accelerator, 1)
+	b.sta.PostTask(func() { done <- cloneAccel(b.registeredHotkeys) })
+	return <-done
+}
+
+func cloneAccel(m map[uint32]Accelerator) map[uint32]Accelerator {
+	out := make(map[uint32]Accelerator, len(m))
+	for k, v := range m {
+		out[k] = v
+	}
+	return out
 }
 
 // TakeEscForCancel temporarily binds Esc as the cancel key during Confirming
@@ -836,7 +878,7 @@ func (b *Ball) Close() {
 		defer close(done)
 		b.stopAnimTimer()
 		b.stopLiquidTimer()
-		unregisterAll(b.hwnd, b.registeredHotkeys)
+		unregisterAll(b.hwnd)
 		if b.tray != nil {
 			b.tray.remove()
 		}
@@ -844,7 +886,13 @@ func (b *Ball) Close() {
 			b.rend.release()
 		}
 		if b.hwnd != 0 {
-			pDestroyWindow.Call(uintptr(b.hwnd))
+			// Ticket 64 A6: the return value used to be dropped, which made a
+			// failed destroy (and the USER/GDI handles it leaves behind)
+			// invisible. A dead window is now loud, not silent.
+			if r, _, err := pDestroyWindow.Call(uintptr(b.hwnd)); r == 0 {
+				slog.Error("ball: DestroyWindow failed; window handles stay alive in this process",
+					"hwnd", uintptr(b.hwnd), "err", err)
+			}
 			b.hwnd = 0
 		}
 		activeBall.CompareAndSwap(b, nil)
