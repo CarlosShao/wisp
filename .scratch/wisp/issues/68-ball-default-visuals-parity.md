@@ -1,7 +1,8 @@
 # 68 — 让默认构建画的就是 owner 签收的那个球（`prototypeVisuals` 默认值 + Sleeping 尺寸三方不一致）
 
-**Status:** in-progress
-**Claimed by:** agent-ticket68
+**Status:** review（AC#1 静态三列表 + AC#4 已交付并由编排者复现勾框；**AC#2/AC#3 blocked-on-owner**，见 R15 #3/#4/#5）
+**Claimed by:** agent-ticket68（报告已交；**勿重开 AC#1/AC#4**；owner 答完 R15#3/#4/#5 前**不要翻默认值**，
+否则会把"我录入错误的尺寸"或"合成到 ≈0.33 的 `Settling`"当成签收样子固化进默认构建）
 **Last update:** 2026-09-20
 **Blocked by:** —（只碰 `internal/ball/` + `cmd/balldebug/`；票 66 在 `internal/proc`/`internal/observe`/`cmd/wisp`，票 67 在 `internal/llm/adaptertest`/`tools/d22scan`，三包不相交）
 **Parallel slots:** ≤1 sub-agent；**AC#2/AC#3 需真桌面** ⇒ 若桌面被占，**只做 AC#1 与 AC#4 的静态半，其余保持未勾并写明**
@@ -41,18 +42,31 @@ func EnablePrototypeVisuals(on bool) { prototypeVisuals = on }
 
 ## 验收标准
 
-- [ ] **AC#1 尺寸真相**：以代码 + 一次实测（若桌面可得）钉死 `Sleeping` 在
+- [x] **AC#1 尺寸真相**：以代码 + 一次实测（若桌面可得）钉死 `Sleeping` 在
   ①`prototypeVisuals=false`、②`=true` 且未靠边、③`=true` 且已吸附（dock ramp 之后）三种情形下的**实际像素尺寸**，
   逐情形给出 `stateSize` 的输入与输出、以及差分化像框。**完成判据是一张三列对照表**，不是一个结论句。
   与 SPEC-08 §2 的 44px 不符的那一格**如实报不符**，由我裁定。
   ⇒ **静态半已交付**（三列表 + 逐格函数/输入/输出/消费者，见 Progress log 与 agent 报告；桌面不可得，未做新实测）。
   **三格全部与 44px 不符，待裁定**：①12px、②34.72px、③34.72px 本体（靠边只改窗口原点与液面/高光的 0.42 挤压，球壳与光晕不挤压）。
   A.2 的 `46×46 / 2103px` 经码算归属于 **②**，且 `44` 那个数是 ≥24/255 的**包围盒**、不是本体直径。
+  —— **编排者 23:16 勾框（我自己复现过，非采信自述）**：`go test ./internal/ball/ -run TestSleepingSizeTruthTable`
+  → PASS，并读了它的断言体（`tokens_test.go:214` `rest56 = BallSizeDefaultPx × SleepRestRatio // 34.72`、
+  `:218-220` 配置 44/48 落到 `SleepingRestMinPx` 下限）。**勾的是"静态三列表"这个交付物**；
+  像素级新实测**没有**做，也不得被这张勾解释成做过。
+  ⇒ **裁定已下（R15#1）**：SPEC-08 §2 的"44px"是我录入错误，已按 34.72px 更正（原文与推导留在更正块里）。
 - [ ] **AC#2 默认值翻转（需桌面复测）**：`prototypeVisuals` 默认改为 `true`，
   使**默认构建 == owner 签收的样子**；`EnablePrototypeVisuals(false)` 与 `balldebug -frozen` 保留为"对照旧冻结规格"的逃生门。
   连带把 `internal/ball` 里**断言旧默认**的测试改到位：⚠ **不得**为了让测试变绿而删除断言或放宽阈值——
   必须**逐条**把断言迁移到"新默认下应有的行为"，并在 log 里列出"这条原来断什么、现在断什么、为什么等价"。
   若某条测试的存在意义就是"钉住旧的冻结规格"，**保留它**并显式 `EnablePrototypeVisuals(false)`，别删。
+  - ⚠ **动手前必改的一条地雷（代理登记在 Progress log，这里提到 AC 正文以免漏）**：
+    `internal/ball/live_windows_test.go:609` `TestBallLiveAudioLiquidGate` 的第一段
+    以"默认即 frozen"为前提（`:618` 注释"模式冻结优先"）**却没有显式 `EnablePrototypeVisuals(false)`**
+    ⇒ 默认一翻，它会**自称在测冻结、实际在测原型**。翻转与这条修正在**同一个 commit**，不许分两批。
+  - ⛔ **AC#2 被 R15 三项挡住，未答之前不得翻转**（翻了就是照错的数字固化）：
+    **#3** `Settling` 的 alpha 今天双乘到 ≈0.33、**#4** 停靠实测露出 ≈82% 而文档承诺 42%、
+    **#5** 命中半径 21px < 可见外沿 26px。这三条都改变"被签收的样子"到底是什么，
+    owner 未答前我只推进**不依赖它们**的部分（AC#1 已完成、AC#4 已绿）。
 - [ ] **AC#3 签收面复测（需桌面）**：翻转后跑一次 `cmd/balldebug` 的差分化像，
   证明 `Sleeping` 的 px≥8/255 与成像框**不低于** A.2 已录的 2103 像素 / 46×46，且 `timers=no` 仍成立（D32 零定时器）。
   数字不过就报 FAIL 并附样本，**不许调阈值、不许重测到运气好的那次**。
