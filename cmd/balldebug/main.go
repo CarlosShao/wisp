@@ -88,6 +88,9 @@ func main() {
 	dock := flag.String("dock", "", "dock the ball to this edge the way a drag ending there would: "+
 		"left|right|top|bottom (no timer: the dock is carried by mouse messages)")
 	diffDock := flag.String("diff-dock", "", "with -diff: also shoot every state docked to this edge, as an extra row")
+	tour := flag.Bool("tour", false, "guided walk for owner sign-off, in one run: liquid flow -> voice-driven "+
+		"rotation -> idle border -> static Sleeping -> docked on all four edges -> popped back -> yours to play with")
+	tourDwell := flag.Duration("tour-dwell", 5*time.Second, "with -tour: how long each numbered step holds")
 	flag.Parse()
 
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo})))
@@ -204,10 +207,11 @@ func main() {
 
 	// Optional synthetic voice envelope: only the scalar level crosses into
 	// the ball (SetAudioLevel is the project's single render-side audio seam,
-	// C25). The feeder is owned by main and joined before teardown.
+	// C25). The feeder is owned by main and joined before teardown. In -tour
+	// the walk feeds each step on its own, so the quiet steps really are quiet.
 	feedStop := make(chan struct{})
 	feedDone := make(chan struct{})
-	if *level > 0 {
+	if *level > 0 && !*tour {
 		go feedLevels(b, float32(*level), feedStop, feedDone)
 	} else {
 		close(feedDone)
@@ -216,6 +220,8 @@ func main() {
 	dwell := time.Duration(*cycleMs) * time.Millisecond
 
 	switch {
+	case *tour:
+		runTour(b, *tourDwell, float32(*level), exit)
 	case *state != "":
 		s := statemachine.State(*state)
 		b.SetState(s)
@@ -345,6 +351,155 @@ func feedLevels(b *ball.Ball, amp float32, stop <-chan struct{}, done chan<- str
 			b.SetAudioLevel(v)
 		}
 	}
+}
+
+// runTour is the owner-facing walkthrough for ticket 62 sign-off: one run, one
+// numbered step at a time, in the order the behavior was asked for - summoned
+// liquid flow, voice-driven rotation from a synthetic level, the idle border
+// transition, the static Sleeping body, the tab on each of the four edges, the
+// pop back out - and then it leaves the ball docked so the pointer can do the
+// last step for real. Every dock and pop below goes through the shipped message
+// paths (DebugDock runs the drag-end commit, DebugPop drives the hover ramp), so
+// what the owner watches is the code that ships, not a mock.
+//
+// With -frozen the same walk shows the still-frozen SPEC-08 visuals instead:
+// the liquid and the edge-dock are prototype-only, so the steps say so rather
+// than pretending, which is what makes the two runs comparable on one desktop.
+func runTour(b *ball.Ball, dwell time.Duration, level float32, exit chan string) {
+	prototype := ball.PrototypeVisualsEnabled()
+	amp := level
+	if amp <= 0 {
+		amp = 0.7 // a default voice to follow: -level overrides it
+	}
+	n := 0
+	say := func(cue string) {
+		n++
+		fmt.Printf("\ntour %02d. %s\n", n, cue)
+		fmt.Printf("tour %02d. holding %s - tray Exit or Ctrl+C stops the walk at any time\n", n, dwell)
+	}
+	report := func(tag string) {
+		e, p, owns := b.Docked()
+		fmt.Printf("tour: %s timers=%v dock edge=%s progress=%.2f owns=%v handles=%d\n",
+			tag, b.DebugTimersAlive(), edgeLabel(e), p, owns, handleCount())
+	}
+	// feed runs the synthetic envelope for one step, owned and joined here.
+	feed := func(d time.Duration) {
+		stop := make(chan struct{})
+		done := make(chan struct{})
+		go feedLevels(b, amp, stop, done)
+		time.Sleep(d)
+		close(stop)
+		<-done
+		b.SetAudioLevel(0)
+	}
+
+	fmt.Printf("balldebug: tour start mode=%s dwell=%s level=%.2f handles=%d\n",
+		map[bool]string{true: "prototype", false: "frozen SPEC-08"}[prototype], dwell, amp, handleCount())
+
+	if !prototype {
+		for _, s := range []statemachine.State{
+			statemachine.StateSleeping, statemachine.StateArmed, statemachine.StateListening,
+			statemachine.StateSpeaking, statemachine.StateWarm, statemachine.StateError,
+		} {
+			say(fmt.Sprintf("frozen SPEC-08 look, state %s: dot + status ring, no liquid, no dock.", s))
+			b.SetState(s)
+			report(string(s))
+			time.Sleep(dwell)
+		}
+		say("end of the frozen walk. Run the same command without -frozen to see the ticket 62 prototype.")
+		waitForExit(exit)
+		return
+	}
+
+	b.SetState(statemachine.StateSleeping)
+	time.Sleep(300 * time.Millisecond)
+	say("AT REST (Sleeping). This is the ball sitting on the desktop doing nothing: a static glass orb, " +
+		"no animation, no timers. Look at how clearly you can read it against the wallpaper.")
+	report("sleeping")
+	time.Sleep(dwell)
+
+	b.SetState(statemachine.StateListening)
+	say("SUMMONED (Listening). This is what the hot key does: the liquid inside starts flowing and the ball " +
+		"brightens. Nothing is being said yet, so the flow is the model's own burst, and it retires itself.")
+	report("listening")
+	time.Sleep(dwell)
+
+	b.SetState(statemachine.StateSpeaking)
+	say(fmt.Sprintf("SPEAKING WITH A VOICE FED IN (synthetic level %.2f). The liquid rotates and swells with the "+
+		"level; every third phrase is quieter, so you can watch it follow the envelope rather than spin blindly.", amp))
+	feed(dwell)
+	report("speaking")
+
+	b.SetState(statemachine.StateListening)
+	say("STOPPED TALKING, STILL LISTENING. Nothing is being said, so instead of cutting, the liquid settles and " +
+		"the border glides in around the ball. That arriving border is the transition the owner asked for.")
+	time.Sleep(dwell * 2)
+	report("idle-border")
+
+	b.SetState(statemachine.StateSleeping)
+	say("BACK TO REST (Sleeping). The border and the liquid both release: one static frame again, zero timers. " +
+		"If this frame looks different from step 01, something is wrong.")
+	report("sleeping-again")
+	time.Sleep(dwell)
+
+	for _, name := range []string{"left", "right", "top", "bottom"} {
+		edge, _ := ball.EdgeByName(name)
+		say("DOCKED ON THE " + strings.ToUpper(name) + " EDGE. The ball has squeezed itself into a tab against " +
+			"the screen boundary - only a sliver of it is left showing, which is the part you can still hit.")
+		if !b.DebugDock(edge) {
+			fmt.Println("tour: the ball would not dock there (the monitor layout moved?) - skipping the rest of the dock steps")
+			break
+		}
+		report("docked-" + name)
+		time.Sleep(dwell)
+
+		say("POPPED BACK OUT OF THE " + strings.ToUpper(name) + " EDGE. Same ramp the pointer running over the " +
+			"tab drives, walked to its free end: the ball is round again and wholly on screen, so it can never " +
+			"leave you with a part of itself you cannot reach.")
+		if p := b.DebugPop(); p != 0 {
+			fmt.Printf("tour: the pop-out stopped short at level %v\n", p)
+		}
+		report("popped-" + name)
+		time.Sleep(dwell)
+	}
+
+	say("NOW YOUR TURN, FOR REAL. The ball is docked on the right edge as a tab: move the pointer onto the " +
+		"sliver and it pops out, move away and it closes again, click it and it stays out, drag it into the " +
+		"middle of the screen and let go and it is free.")
+	if !b.DebugDock(ball.EdgeRight) {
+		fmt.Println("tour: could not leave the ball docked for the interactive part")
+	}
+	report("yours")
+	waitForExit(exit)
+}
+
+// waitForExit blocks until the tray Exit item or Ctrl+C lands, whichever the
+// owner reaches for first.
+func waitForExit(exit chan string) {
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, os.Interrupt)
+	select {
+	case <-sig:
+		fmt.Println("exit: signal")
+	case why := <-exit:
+		fmt.Printf("exit: %s\n", why)
+	}
+	signal.Stop(sig)
+}
+
+// edgeLabel names an edge for the tour log (ball.Edge is an int with no String).
+func edgeLabel(e ball.Edge) string {
+	switch e {
+	case ball.EdgeLeft:
+		return "left"
+	case ball.EdgeRight:
+		return "right"
+	case ball.EdgeTop:
+		return "top"
+	case ball.EdgeBottom:
+		return "bottom"
+	}
+	return "none"
 }
 
 // gesture translates a ball gesture into machine events by context (the

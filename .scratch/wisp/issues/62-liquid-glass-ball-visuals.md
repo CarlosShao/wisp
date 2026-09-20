@@ -88,3 +88,32 @@ SPEC-08 §2 的 20 态视觉表与 D43 的视觉映射列**必须改**，但顺�
   winlive suite pass (Acting's frozen TimersAlive expectation kept intact by gating the whole seam off in frozen
   mode). next=item 2, the edge-dock auto-shrink (drag-near-edge docks to a tab, hover pops out, four edges, mouse
   messages only - no dock timer at all), then its differential row.
+- 2026-09-20 agent(62-E): did=made the hover direction PROVABLE without owning the cursor, and made the whole item-1/2
+  set watchable in one command. (1) dc8cd03: the ramp's step law moved out of dockStep into dockRampFrame (pure,
+  dock.go), which is the exact function dockHoverMove and dockLeave call per mouse message;
+  TestDockHoverPopBackWalksTheRampHome (dock_test.go, never skips) drives it in REVERSE - docked p=1 to popped p=0 -
+  on four edges x two monitor layouts (incl. a negative-origin secondary) and asserts monotonic walk-back, exact
+  landing (no overshoot, no 0.0001 stall), the 160ms/DockAnimMs frame budget, orb-tangent-at-every-level, the drawn
+  orb widening to a full circle, travel AWAY from the edge, the landed orb wholly inside the work area (reachable),
+  the mid-pop retreat, and both endpoints holding still (a landed ramp costs zero further frames = zero CPU).
+  Mutation check: a one-way ramp fails it at once ("primary/left: the ramp froze at p=1 with target=0"). dock_test.go
+  is now eleven deterministic tests, none skipping. The two live t.Skipf in TestBallLiveEdgeDockHover stay (the OS
+  really can refuse the pointer, and TrackMouseEvent answers a synthesised hover with an immediate WM_MOUSELEAVE) but
+  are now SKIP-LOUD: they name the deterministic layer as the proof and state that the run exercised no real event
+  path; this run took that skip branch while TestBallLiveEdgeDock PASSed. DockPop seam (DebugPop) added for evidence.
+  (2) balldebug -tour (+ -tour-dwell): a 14-step owner walkthrough in ONE run - static Sleeping -> summoned liquid ->
+  voice-driven rotation from a synthetic -level (default 0.70, breath every 12th frame) -> idle border glide-in ->
+  Sleeping again -> docked on left/right/top/bottom with the pop-back after each -> leaves the ball docked on the
+  right for the real pointer (hover / click-out / drag-free). Frozen mode still works and -frozen -tour walks the
+  still-frozen SPEC-08 §2.1 look over the same states instead, printing that liquid and dock are prototype-only, so
+  the two runs A/B on one desktop. Evidence rewritten as docs/evidence/s1/62-ball-visual-prototype.md: the exact
+  command, a 14-row "what to look at" table with the measured numbers in it, the four -look candidates (aurora
+  recommended, it is the reference family), the unverified list (图1/图2 never reached any agent, so colour fidelity
+  to owner taste is precisely what sign-off decides; dark wallpaper and 44/72px still to be looked at), and the
+  proposed SPEC-08 §2.1 wording (SPEC-08 and PLAN untouched). Differential re-run docs/evidence/s1/62-diff-signoff
+  (6 rows: Sleeping / Listening / Speaking, free and docked-right): Sleeping timers=no cpu=0.000/0.000
+  privWS=11.76MB px>=8=2120 box=44x44 teardown=clean - item-by-item identical to the proven 62-diff-glass and
+  62-diff-border rows, NO REGRESSION; the new docked-Sleeping row is also timers=no / 0.000% / 1620px (the dock
+  introduced no timer anywhere). Gates: gofmt clean, go vet ./internal/ball ./cmd/balldebug clean (also
+  -tags winlive), go test -count=2 ./internal/ball ok, every process launched was killed and tasklist shows no
+  balldebug/wisp left. next=owner-signoff (实机跑 -tour 判颜色与可见性 -> 才回填 SPEC-08 §2 -> 然后补深色桌布差分)
