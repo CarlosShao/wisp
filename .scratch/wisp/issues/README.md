@@ -87,6 +87,16 @@ All tickets are **vertical tracer bullets**; work the **frontier** (all blockers
   在树内口径下**无定义**（观测者单次读 ≈1.3ms，250ms 间隔下本身就超 0.5% 门）。
   ⚠ **两起必须一起修**：只修前者会把 `slo-check.ps1` 从"必红"变成"约一半概率随机红"。
   **测量类独占**，不与任何其他跑测的代理并发；**D32 阈值不得因本票改动**。
+  **67 d22scan-trust-mockllm-goroutine** —— 让 **D22 静态门重新可信**（registry A22/A23）：
+  `tools/d22scan` 是**独立 Go module**，编排者从仓根调用它等于**从未跑过**却读成 clean
+  ⇒ 真实命中 `internal/llm/adaptertest/mockllm.go:68` 裸 `go func(`（`78b1466`/票 11 引入、不在 allowlist）
+  ⇒ **CI lint job 自约 05:59Z 起就是红的**；且 emoji 门的 `emojiRe` 只看 `design/` 与**不存在**的 `frontend/`，
+  对 `internal/`+`cmd/` 全盲（票 12 自己的 `cd011b8` 带进 3 处 U+2713/2717）。**不许用 allowlist 豁免凑绿。**
+  **68 ball-default-visuals-parity** —— 让**默认构建画的就是 owner 签收的那个球**（争议 D1/D2）：
+  `prototypeVisuals` 默认 **false**，唯一开启者是 `cmd/balldebug/main.go:104` ⇒ 今天默认库仍画 12px 微点，
+  而我改过的 SPEC-08 §2「44px 静态玻璃体」描述的是**非默认配置**（这笔账是编排者欠的）。
+  另含 Sleeping 尺寸三方不一致（44 vs `stateSize`=34.72 vs 旧行 12，而 A.2 实测像框 46×46）。
+  ⚠ **SPEC-08 冻结：不许改文本凑数**；票 66/67 未收尾前**不得跑 winlive**（桌面被占，先交付静态半）。
 - **状态回写（2026-09-20 复验轮）**：**10 agent-loop-core → DONE**（编排者亲自独立复验：把
   `enforceTotal` 整体退回修复前实现，被提交的终止测试 10.00s 变红，护栏为真；两处小项登记 A10-a/b）；
   **63 credential-entry-cli → DONE**，但 **AC#6 未勾、正式转票 12**（登记 A8）、**MINOR-1 未修**（登记 A9）
