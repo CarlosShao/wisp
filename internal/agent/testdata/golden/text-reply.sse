@@ -1,0 +1,15 @@
+# wisp golden sse v1
+# @scenario agent loop: pure text answer, no tool call (SPEC-05 sec 2 termination
+# @scenario "no tool call + text done"). Two delta chunks, finish_reason=stop, usage block.
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"好的，"},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"已经把提醒设好了。"},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":140,"completion_tokens":9,"total_tokens":149,"prompt_tokens_details":{"cached_tokens":96}}}
+
+data: [DONE]

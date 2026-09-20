@@ -1,0 +1,93 @@
+# wisp golden sse v1
+# @scenario agent loop: the C22 duplicate-call ladder. Eight identical echo
+# @scenario calls in a row (same tool, same arguments) must inject reminders at
+# @scenario rungs 3 and 5 and drive Stuck at rung 8. The ninth text response
+# @scenario exists only to prove the loop never reaches it.
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_r0","type":"function","function":{"name":"echo","arguments":"{\"text\":\"同一份文件列表\"}"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":150,"completion_tokens":18,"total_tokens":168}}
+
+data: [DONE]
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_r1","type":"function","function":{"name":"echo","arguments":"{\"text\":\"同一份文件列表\"}"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":150,"completion_tokens":18,"total_tokens":168}}
+
+data: [DONE]
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_r2","type":"function","function":{"name":"echo","arguments":"{\"text\":\"同一份文件列表\"}"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":150,"completion_tokens":18,"total_tokens":168}}
+
+data: [DONE]
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_r3","type":"function","function":{"name":"echo","arguments":"{\"text\":\"同一份文件列表\"}"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":150,"completion_tokens":18,"total_tokens":168}}
+
+data: [DONE]
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_r4","type":"function","function":{"name":"echo","arguments":"{\"text\":\"同一份文件列表\"}"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":150,"completion_tokens":18,"total_tokens":168}}
+
+data: [DONE]
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_r5","type":"function","function":{"name":"echo","arguments":"{\"text\":\"同一份文件列表\"}"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":150,"completion_tokens":18,"total_tokens":168}}
+
+data: [DONE]
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_r6","type":"function","function":{"name":"echo","arguments":"{\"text\":\"同一份文件列表\"}"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":150,"completion_tokens":18,"total_tokens":168}}
+
+data: [DONE]
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_r7","type":"function","function":{"name":"echo","arguments":"{\"text\":\"同一份文件列表\"}"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":150,"completion_tokens":18,"total_tokens":168}}
+
+data: [DONE]
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":"不该被读到。"},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":400,"completion_tokens":4,"total_tokens":404}}
+
+data: [DONE]

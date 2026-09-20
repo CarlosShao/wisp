@@ -1,0 +1,43 @@
+# wisp golden sse v1
+# @scenario agent loop: token-budget exhaustion. Three DISTINCT echo calls (so
+# @scenario the C22 duplicate ladder stays quiet) with 170 tokens of usage each; with
+# @scenario agent.token_budget = 300 the loop must brake into Stuck after round 2 and
+# @scenario report the consumption line. The trailing text response must never be read.
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_b0","type":"function","function":{"name":"echo","arguments":"{\"text\":\"第一步\"}"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":150,"completion_tokens":20,"total_tokens":170}}
+
+data: [DONE]
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_b1","type":"function","function":{"name":"echo","arguments":"{\"text\":\"第二步\"}"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":150,"completion_tokens":20,"total_tokens":170}}
+
+data: [DONE]
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_b2","type":"function","function":{"name":"echo","arguments":"{\"text\":\"第三步\"}"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":150,"completion_tokens":20,"total_tokens":170}}
+
+data: [DONE]
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":"全部完成。"},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":150,"completion_tokens":4,"total_tokens":154}}
+
+data: [DONE]

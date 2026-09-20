@@ -1,0 +1,21 @@
+# wisp golden sse v1
+# @scenario agent loop: finish_reason=length with tool calls in the SAME
+# @scenario message - one with complete arguments, one cut mid-argument (D21
+# @scenario must-not-execute-truncated-args). ALL calls of that message must be judged
+# @scenario failed; the echo provider must see zero executions.
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"我先写一下，然后"},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_ok1","type":"function","function":{"name":"echo","arguments":""}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"function":{"arguments":"{\"text\":\"这条参数是完整的\"}"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":1,"id":"call_cut2","type":"function","function":{"name":"echo","arguments":"{\"text\":\"这条参数在输出上限处被"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"length"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":150,"completion_tokens":64,"total_tokens":214}}
+
+data: [DONE]

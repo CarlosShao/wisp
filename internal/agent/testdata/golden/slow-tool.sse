@@ -1,0 +1,23 @@
+# wisp golden sse v1
+# @scenario agent loop: per-tool timeout (C22 timeoutMs). The model asks for a
+# @scenario 400ms sleep; the loop's agent.per_tool_timeout_ms is 60, so the call must be
+# @scenario aborted cooperatively, the tool_call row booked with an error class, and the
+# @scenario result fed back so round 2 can answer.
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_t1","type":"function","function":{"name":"sleep","arguments":"{\"ms\":400}"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":150,"completion_tokens":14,"total_tokens":164}}
+
+data: [DONE]
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":"那一步超时了，我先给结论。"},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":190,"completion_tokens":10,"total_tokens":200}}
+
+data: [DONE]

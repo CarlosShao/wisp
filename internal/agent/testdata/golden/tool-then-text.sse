@@ -1,0 +1,25 @@
+# wisp golden sse v1
+# @scenario agent loop: one tool call, its result feeds the next turn, which
+# @scenario answers with text. Response 1 = tool call, response 2 = final text.
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_e1","type":"function","function":{"name":"echo","arguments":""}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"function":{"arguments":"{\"text\":\"22 摄氏度，晴\"}"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":150,"completion_tokens":14,"total_tokens":164}}
+
+data: [DONE]
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"现在是 22 摄氏度，晴。"},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":180,"completion_tokens":10,"total_tokens":190,"prompt_tokens_details":{"cached_tokens":150}}}
+
+data: [DONE]

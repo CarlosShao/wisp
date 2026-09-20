@@ -62,3 +62,4 @@ and `stopReason=length` → `failToolCallsFromTruncatedMessage`. Tool execution 
 
 ## Progress log (append-only, newest last)
 - [2026-09-20T02:20Z] agent=agent-ticket10-loop did=claimed next=loop-core+skeleton-tests
+- [2026-09-20T03:25Z] agent=agent-ticket10-loop did=loop core+budgets+inject+spill+compress+guard+journal+sink; AC1 golden loop tests green (text/single/parallel/feeds-next/budget-stuck/cancel/roster/task_log rows) next=AC2 truncation+AC3 spill+AC4 compress+AC5 guard ladder+AC6 control+AC7 prompt order

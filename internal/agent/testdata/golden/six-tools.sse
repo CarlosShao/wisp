@@ -1,0 +1,33 @@
+# wisp golden sse v1
+# @scenario agent loop: six tool calls in one message - the D38d concurrency
+# @scenario ceiling (4) must serialize the excess. Second response answers with text.
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_c0","type":"function","function":{"name":"sleep","arguments":"{\"ms\":60}"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":1,"id":"call_c1","type":"function","function":{"name":"sleep","arguments":"{\"ms\":60}"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":2,"id":"call_c2","type":"function","function":{"name":"sleep","arguments":"{\"ms\":60}"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":3,"id":"call_c3","type":"function","function":{"name":"sleep","arguments":"{\"ms\":60}"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":4,"id":"call_c4","type":"function","function":{"name":"sleep","arguments":"{\"ms\":60}"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":5,"id":"call_c5","type":"function","function":{"name":"sleep","arguments":"{\"ms\":60}"}}]},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":170,"completion_tokens":48,"total_tokens":218}}
+
+data: [DONE]
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"六个都跑完了。"},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: {"choices":[],"usage":{"prompt_tokens":230,"completion_tokens":8,"total_tokens":238}}
+
+data: [DONE]

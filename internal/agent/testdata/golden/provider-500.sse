@@ -1,0 +1,6 @@
+# wisp golden sse v1
+# @scenario one 500 response, served without the retry wrapper (retry lives
+# @scenario outside the loop, SPEC-05 sec 3.4): the loop must surface a classified,
+# @scenario user-visible provider failure and never a silent downgrade.
+# @response 500
+{"error":{"message":"upstream exploded","type":"server_error","code":"internal_error"}}
