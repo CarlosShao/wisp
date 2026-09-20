@@ -43,10 +43,17 @@ type Server struct {
 type capabilityMode struct {
 	FC     string `json:"fc"`
 	Vision string `json:"vision"`
+	// Thinking is ticket 12 / ruling A11's third mode: "broken" answers a
+	// thinking request with plain text and NO reasoning delta, which is what a
+	// model whose advertised reasoning is dead actually does. The thinking
+	// probe requires a reasoning delta, so this mode is the only way to prove
+	// the probe can detect a broken thinker at all.
+	Thinking string `json:"thinking"`
 }
 
-func (c capabilityMode) fcBroken() bool     { return c.FC == "broken" }
-func (c capabilityMode) visionBroken() bool { return c.Vision == "broken" }
+func (c capabilityMode) fcBroken() bool       { return c.FC == "broken" }
+func (c capabilityMode) visionBroken() bool   { return c.Vision == "broken" }
+func (c capabilityMode) thinkingBroken() bool { return c.Thinking == "broken" }
 
 // capability returns the current mode with defaults filled in.
 func (s *Server) capability() capabilityMode {
@@ -58,6 +65,9 @@ func (s *Server) capability() capabilityMode {
 	}
 	if c.Vision == "" {
 		c.Vision = "capable"
+	}
+	if c.Thinking == "" {
+		c.Thinking = "capable"
 	}
 	return c
 }

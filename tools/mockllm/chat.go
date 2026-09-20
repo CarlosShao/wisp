@@ -220,6 +220,11 @@ func estimateTokens(b []byte) int { return len(b) / 4 }
 
 func (s *Server) synthChat(w http.ResponseWriter, req *chatRequest, lat int, trunc int) {
 	answer, toolName, toolArgs, reasoning, finish := planChat(req)
+	if s.capability().thinkingBroken() {
+		// thinking=broken keeps the text answer and withholds the reasoning
+		// delta: the model still replies, it just cannot show its work.
+		reasoning = ""
+	}
 	if s.capability().fcBroken() && toolName != "" {
 		// fc=broken emulates a model that silently ignores a forced
 		// tool_choice: same text answer, no tool_calls block.

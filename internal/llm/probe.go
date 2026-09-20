@@ -132,23 +132,36 @@ func ProbeCases() []ProbeCase {
 		},
 		{
 			Capability:  ProbeThinking,
-			Description: "minimal thinking: intensity=low, expect reasoning delta or a text answer",
+			Description: "minimal thinking: intensity=low, expect a REASONING delta",
 			BuildRequest: func() (*Request, error) {
 				return &Request{
 					Model:             "probe",
 					ThinkingIntensity: "low",
 					Messages: []Message{{
-						Role:    RoleUser,
-						Content: []Content{TextPart{Text: "2+2=? Answer with just the number."}},
+						Role: RoleUser,
+						// "[think]" is the harness-side thinking marker
+						// (tools/mockllm honors it on all three dialects).
+						// It is needed because the normalized
+						// Request.ThinkingIntensity deliberately does NOT
+						// travel on the chat wire (internal/llm/openaichat
+						// adapter doc), so without a marker in the text a
+						// chat-route thinking probe is indistinguishable
+						// from a plain request.
+						Content: []Content{TextPart{Text: "[think] 2+2=? Answer with just the number."}},
 					}},
 				}, nil
 			},
+			// Ticket 12 / ruling A11: a text answer alone cannot tell a thinker
+			// from a parrot, so the check requires the reasoning delta itself.
+			// The old form accepted res.Text != "", which made a provider whose
+			// thinking is dead report thinking = working.
 			Validate: func(res TurnResult) error {
 				if res.Err != nil {
 					return fmt.Errorf("thinking probe failed: %v", res.Err)
 				}
-				if res.Reasoning == "" && res.Text == "" {
-					return fmt.Errorf("thinking probe: no reasoning and no text (stop=%s)", res.Stop)
+				if res.Reasoning == "" {
+					return fmt.Errorf("thinking probe: no reasoning delta (stop=%s text=%q), the advertised thinking produced nothing to think with",
+						res.Stop, res.Text)
 				}
 				return nil
 			},

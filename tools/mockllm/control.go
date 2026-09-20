@@ -88,8 +88,9 @@ func (s *Server) handleTruncate(w http.ResponseWriter, r *http.Request) {
 // nobody asked for.
 func (s *Server) handleCapability(w http.ResponseWriter, r *http.Request) {
 	var req struct {
-		FC     *string `json:"fc"`
-		Vision *string `json:"vision"`
+		FC       *string `json:"fc"`
+		Vision   *string `json:"vision"`
+		Thinking *string `json:"thinking"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeJSONError(w, http.StatusBadRequest, "capability body: "+err.Error())
@@ -105,6 +106,10 @@ func (s *Server) handleCapability(w http.ResponseWriter, r *http.Request) {
 		writeJSONError(w, http.StatusBadRequest, "capability.vision must be capable|broken")
 		return
 	}
+	if req.Thinking != nil && !valid[*req.Thinking] {
+		writeJSONError(w, http.StatusBadRequest, "capability.thinking must be capable|broken")
+		return
+	}
 	// Mutation phase: both fields are known good (or absent) by now.
 	s.mu.Lock()
 	if req.FC != nil {
@@ -113,9 +118,12 @@ func (s *Server) handleCapability(w http.ResponseWriter, r *http.Request) {
 	if req.Vision != nil {
 		s.caps.Vision = *req.Vision
 	}
+	if req.Thinking != nil {
+		s.caps.Thinking = *req.Thinking
+	}
 	s.mu.Unlock()
 	c := s.capability() // defaults filled in, read back rather than echoed
-	writeJSON(w, map[string]any{"fc": c.FC, "vision": c.Vision})
+	writeJSON(w, map[string]any{"fc": c.FC, "vision": c.Vision, "thinking": c.Thinking})
 }
 
 // POST /__control/reset clears every injection and counter.

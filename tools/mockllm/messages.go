@@ -195,6 +195,9 @@ func (s *Server) handleMessages(w http.ResponseWriter, r *http.Request) {
 	// shape of the same two honest failures a real provider produces. It runs
 	// AFTER the golden branch, so byte-pinned replay can never be disturbed.
 	caps := s.capability()
+	if caps.thinkingBroken() {
+		p.reason = ""
+	}
 	if caps.visionBroken() && p.image {
 		writeJSONError(w, http.StatusBadRequest,
 			"mockllm capability mode: vision=broken rejects image input")

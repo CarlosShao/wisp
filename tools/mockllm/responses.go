@@ -94,7 +94,9 @@ func (s *Server) handleResponses(w http.ResponseWriter, r *http.Request) {
 		answer = answer[:400]
 	}
 	reason := ""
-	if thought {
+	// thinking=broken withholds the reasoning summary item and its delta,
+	// exactly as the chat and Messages dialects do above.
+	if thought && !s.capability().thinkingBroken() {
 		reason = "thinking about: " + text
 		if len(reason) > 200 {
 			reason = reason[:200]
