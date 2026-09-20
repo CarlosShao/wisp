@@ -1,6 +1,7 @@
 package approval
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/CarlosShao/wisp/internal/tools"
@@ -137,3 +138,41 @@ func (r CancellationReport) TextFor() string {
 	}
 	return b.String()
 }
+
+// String implements fmt.Stringer over TextFor, which is how this report reaches
+// internal/tools: the bridge carries a fmt.Stringer (see tools.CancelBus)
+// instead of defining a second applied-steps shape of its own.
+func (r CancellationReport) String() string {
+	if r.Text != "" {
+		return r.Text
+	}
+	return r.TextFor()
+}
+
+// ---------------------------------------------------------------------------
+// the tools.CancelBus adapter
+// ---------------------------------------------------------------------------
+
+// ToolsCancelBus wires this gate into the bridge's D31 seam (tools.Options
+// .Cancel). The adapter lives here because internal/tools may not import this
+// package - this one imports its Decision/Result types.
+//
+// Vetoed maps onto LateVeto deliberately: a tool only ever asks after the
+// window handed off, which is precisely the case where a veto is a stop request
+// and not a rewind.
+func (g *Gate) ToolsCancelBus() tools.CancelBus { return toolsBus{g: g} }
+
+type toolsBus struct{ g *Gate }
+
+func (b toolsBus) Vetoed(corr string) bool { _, ok := b.g.LateVeto(corr); return ok }
+
+func (b toolsBus) Started(corr string) bool { return b.g.Bus().Started(corr) }
+
+func (b toolsBus) Report(d tools.Decision, res tools.Result) fmt.Stringer {
+	return b.g.Bus().Report(d, res)
+}
+
+func (b toolsBus) Complete(corr string) { b.g.Bus().Complete(corr) }
+
+// compile-time proof the adapter is the seam the bridge asks for.
+var _ tools.CancelBus = toolsBus{}

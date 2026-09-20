@@ -14,16 +14,15 @@ import (
 	"github.com/CarlosShao/wisp/internal/risk"
 )
 
-// The D34 fs family lands slice by slice. This file holds the L0 pair only:
+// The D34 fs family lands slice by slice. This file holds the L0 pair:
 //
 //	fs.read  L0 inside [fs] allowed_dirs, L2 out of scope via R2
 //	fs.list  L0 / L2, same rule, capability fs.read
 //
-// fs.write / fs.trash / fs.move (and the delete_enabled-gated fs.delete) are
-// ticket 20 segment 2: they need the D31 temp+atomic-rename writer, the
-// applied-steps report and the [fs] allowed_dirs first-use ask flow, none of
-// which the L0 pair exercises. Result.AppliedSteps and Decl.Provider are the
-// seams they attach to, so landing them does not reshape anything here.
+// The write half (fs.write / fs.trash / fs.move, plus the delete_enabled-gated
+// fs.delete) is in fs_write.go and shares this file's FSDeps: same C26
+// resolver, same caps, one registration entry point (BuiltinFSEntries). The
+// [fs] allowed_dirs first-use ask flow is still open (see doc.go).
 
 // FSDeps is what an fs tool needs from the host.
 type FSDeps struct {
@@ -37,6 +36,17 @@ type FSDeps struct {
 	MaxReadBytes int
 	// MaxListEntries caps one fs.list (default 500).
 	MaxListEntries int
+	// MaxWriteBytes caps one fs.write payload (default 2 MiB).
+	MaxWriteBytes int
+	// WriteChunk is the D31 cancel-check granularity of a staged write
+	// (default 64 KiB). Tests shrink it to prove the boundaries are real.
+	WriteChunk int
+	// DeleteEnabled mirrors [fs] delete_enabled: fs.delete is NOT REGISTERED
+	// at all unless it is true (D34), and fsDelete.Execute re-checks it so a
+	// roster that outlived the setting still refuses.
+	DeleteEnabled bool
+	// Hooks are the step-boundary test seams (nil in production).
+	Hooks Hooks
 }
 
 const (
@@ -56,6 +66,23 @@ func (d FSDeps) listCap() int {
 		return d.MaxListEntries
 	}
 	return defaultMaxListEntries
+}
+
+func (d FSDeps) writeCap() int {
+	if d.MaxWriteBytes > 0 {
+		return d.MaxWriteBytes
+	}
+	return defaultMaxWriteBytes
+}
+
+// chunkSize is the staged write's granularity, and so the distance between two
+// D31 cancel checks. The floor of one byte keeps a test that sets it to 0 from
+// turning into an infinite read loop.
+func (d FSDeps) chunkSize() int {
+	if d.WriteChunk > 0 {
+		return d.WriteChunk
+	}
+	return defaultWriteChunk
 }
 
 // open resolves a model-supplied path through C26 and hands back the canonical
@@ -288,11 +315,15 @@ func FSListDecl() Decl {
 	}
 }
 
-// BuiltinFSEntries returns the segment-1 fs entries. The composition root
-// registers them on a Registry (or hands them to NewBuiltinProvider).
+// BuiltinFSEntries returns the whole D34 fs family the configuration allows:
+// the L0 pair plus the write half (fs.write / fs.trash / fs.move), with
+// fs.delete present ONLY when [fs] delete_enabled is true (FSDeps.
+// DeleteEnabled). Callers that want the write half on its own use
+// BuiltinFSWriteEntries.
 func BuiltinFSEntries(d FSDeps) []Entry {
-	return []Entry{
+	out := []Entry{
 		{Tool: fsRead{d: d}, Decl: FSReadDecl()},
 		{Tool: fsList{d: d}, Decl: FSListDecl()},
 	}
+	return append(out, BuiltinFSWriteEntries(d)...)
 }

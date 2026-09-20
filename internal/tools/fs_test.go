@@ -6,7 +6,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/CarlosShao/wisp/internal/agent"
 	"github.com/CarlosShao/wisp/internal/risk"
 )
 
@@ -176,30 +175,65 @@ func TestSensitiveFileIsDeniedNotEscalated(t *testing.T) {
 	}
 }
 
-// TestFSRegistrationIsTheL0Pair pins scope item 5: exactly fs.read and
-// fs.list are registered in segment 1. fs.write/trash/move arriving here
-// early would mean segment 2's work got faked.
-func TestFSRegistrationIsTheL0Pair(t *testing.T) {
+// TestFSRegistrationIsTheD34Roster pins the whole family's registration shape:
+// the L0 pair plus the L1 write trio, and NO fs.delete unless
+// [fs] delete_enabled was set. Segment 1 pinned this at two entries; the third
+// and later entries are what segment 2 was, so the pin moved with the work
+// rather than being deleted (an absent fs.write here would still mean the
+// write half got faked).
+func TestFSRegistrationIsTheD34Roster(t *testing.T) {
 	paths := NewPathCanonicalizer(nil, nil)
 	entries := BuiltinFSEntries(FSDeps{Paths: paths})
-	if len(entries) != 2 {
-		t.Fatalf("segment 1 registers %d fs tools, want 2", len(entries))
+	if len(entries) != 5 {
+		t.Fatalf("the default fs roster has %d tools, want 5 (read/list/write/trash/move)", len(entries))
 	}
-	want := map[string]bool{"fs.read": true, "fs.list": true}
+	want := map[string]risk.Level{
+		"fs.read": risk.L0, "fs.list": risk.L0,
+		"fs.write": risk.L1, "fs.trash": risk.L1, "fs.move": risk.L1,
+	}
 	for _, e := range entries {
 		n := e.Tool.Name()
-		if !want[n] {
+		lvl, ok := want[n]
+		if !ok {
 			t.Errorf("unexpected fs tool %q", n)
+			continue
 		}
-		if e.Decl.Declared != risk.L0 {
-			t.Errorf("%s declared %v, want L0 (D34: read/list are the L0 pair)", n, e.Decl.Declared)
-		}
-		if len(e.Decl.Needs) != 1 || e.Decl.Needs[0] != CapFSRead {
-			t.Errorf("%s needs %v, want exactly [fs.read] (D34 capability column)", n, e.Decl.Needs)
+		if e.Decl.Declared != lvl {
+			t.Errorf("%s declared %v, want %v (D34)", n, e.Decl.Declared, lvl)
 		}
 		if e.Decl.Provider != KindBuiltin {
 			t.Errorf("%s provider = %q, want builtin", n, e.Decl.Provider)
 		}
+	}
+	for _, e := range entries {
+		if e.Tool.Name() == "fs.delete" {
+			t.Fatal("fs.delete must not be registered without [fs] delete_enabled=true")
+		}
+	}
+}
+
+// TestDeleteEnabledAddsFSDelete is the other half of the same switch: the flag
+// is what puts the tool on the roster, and it arrives as L2 (D34).
+func TestDeleteEnabledAddsFSDelete(t *testing.T) {
+	paths := NewPathCanonicalizer(nil, nil)
+	entries := BuiltinFSEntries(FSDeps{Paths: paths, DeleteEnabled: true})
+	if len(entries) != 6 {
+		t.Fatalf("with delete_enabled the roster has %d tools, want 6", len(entries))
+	}
+	var del *Decl
+	for i, e := range entries {
+		if e.Tool.Name() == "fs.delete" {
+			del = &entries[i].Decl
+		}
+	}
+	if del == nil {
+		t.Fatal("fs.delete missing with delete_enabled=true")
+	}
+	if del.Declared != risk.L2 {
+		t.Errorf("fs.delete declared %v, want L2 (D34)", del.Declared)
+	}
+	if len(del.Needs) != 1 || del.Needs[0] != CapFSWrite {
+		t.Errorf("fs.delete needs %v, want [fs.write]", del.Needs)
 	}
 }
 
@@ -211,15 +245,22 @@ func TestToolsDirectoryShape(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(dir) != 2 {
+	if len(dir) != 5 {
 		t.Fatalf("directory has %d entries: %+v", len(dir), dir)
+	}
+	// The directory carries the DECLARED level (the R1 floor), never a verdict:
+	// the write trio shows L1 while an overwrite of the same path will be
+	// judged L2 by R8 inside Execute.
+	declared := map[string]string{
+		"fs.read": "L0", "fs.list": "L0",
+		"fs.write": "L1", "fs.trash": "L1", "fs.move": "L1",
 	}
 	for _, ti := range dir {
 		if !ti.Resident {
 			t.Errorf("%s must be resident (builtin)", ti.Name)
 		}
-		if ti.RiskLevel != agent.RiskL0 {
-			t.Errorf("%s directory level = %q, want L0", ti.Name, ti.RiskLevel)
+		if want := declared[ti.Name]; ti.RiskLevel != want {
+			t.Errorf("%s directory level = %q, want the declared %q", ti.Name, ti.RiskLevel, want)
 		}
 		if len(ti.Parameters) == 0 || ti.Description == "" {
 			t.Errorf("%s: empty schema or description", ti.Name)

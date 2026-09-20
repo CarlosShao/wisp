@@ -77,6 +77,14 @@ type Decl struct {
 	// filesystem paths. The bridge, not the tool, feeds them to C19 as
 	// Facts.Paths so R2/R3 can judge them.
 	PathParams []string
+	// Facts is the host-side hook that supplies the OTHER C19 inputs a call
+	// has: R8's irreversibility classes (an overwrite, a cross-volume move) and
+	// R7's batch count. It runs before the gate, so the card already says
+	// 「覆盖已有内容」 rather than finding out after the fact. It sees the raw
+	// path parameters and must reach the disk only through the C26
+	// canonicalizer, exactly like Execute. nil means the declared floor plus
+	// the paths are the whole story, which is true for every L0 tool.
+	Facts func(ctx context.Context, params map[string]any, paths []string) risk.Facts
 	// Timeout is the C22 per-tool budget (manifest timeoutMs); zero falls
 	// back to Options.DefaultTimeout. It is honored by context deadline,
 	// never by a wall-clock comparison.

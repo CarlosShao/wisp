@@ -75,6 +75,12 @@ type Options struct {
 	// card renders RulesHit/Reason VERBATIM, so they must leave the bridge as
 	// data, not as a string a UI would have to re-parse.
 	OnDecision func(Decision)
+	// Cancel is the D31 seam (see cancel.go): the veto poll a running tool
+	// gets through the context, plus the applied-steps report the bridge adds
+	// to that tool's answer. nil means no approval layer is wired, so nothing
+	// can be vetoed mid-flight and no report can be built - which is the
+	// honest state of a bridge whose gate is NoGate.
+	Cancel CancelBus
 }
 
 // Bridge is the host bridge: the single choke point every capability flows
@@ -109,6 +115,7 @@ type Bridge struct {
 	onUpdate func(callID, tool, delta string)
 	logf     func(string, ...any)
 	onDec    func(Decision)
+	cancel   CancelBus
 
 	// classifier is shared: it is stateless over the frozen blacklist.
 	classifier risk.SensitiveClassifier
@@ -148,6 +155,7 @@ func New(o Options) *Bridge {
 		onUpdate:   o.OnUpdate,
 		logf:       o.Logf,
 		onDec:      o.OnDecision,
+		cancel:     o.Cancel,
 		classifier: NewSensitiveClassifier(),
 		seqs:       map[string]int64{},
 		scopes:     map[string]bool{},
@@ -236,10 +244,8 @@ func (b *Bridge) Execute(ctx context.Context, req agent.ToolRequest) (agent.Tool
 	// --- C19: the one risk verdict (R1..R9 over C26 paths + C25 taint) ------
 	rawPaths := pathArgs(params, entry.Decl.PathParams)
 	dec.Paths = b.displayPaths(rawPaths)
-	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params, risk.Facts{
-		Declared: entry.Decl.Declared,
-		Paths:    rawPaths,
-	})
+	verdict := b.assessorFor(req.TaskID).Assess(req.Name, params,
+		b.factsFor(ctx, entry, params, rawPaths))
 	dec.Level = verdict.Level
 	dec.RulesHit = verdict.RulesHit
 	dec.Reason = verdict.Reason
@@ -385,6 +391,13 @@ func (b *Bridge) run(ctx context.Context, req agent.ToolRequest, entry Entry,
 
 	ectx, cancel := b.execContext(ctx, timeout)
 	defer cancel()
+	// D31: the running tool's only window onto the approval layer is its own
+	// context. The handle carries the correlation id the veto is keyed on, and
+	// Complete releases the gate's post-handoff record when the call is over.
+	ectx = withCancel(ectx, cancelHandle{corr: orDefault(req.CorrelationID, req.TaskID), bus: b.cancel})
+	if b.cancel != nil {
+		defer b.cancel.Complete(orDefault(req.CorrelationID, req.TaskID))
+	}
 
 	onUpdate := func(delta string) {
 		if b.onUpdate != nil && delta != "" {
@@ -439,6 +452,19 @@ func (b *Bridge) run(ctx context.Context, req agent.ToolRequest, entry Entry,
 		kind = OutcomeKindError
 	}
 
+	// D31: a call that stopped because the user vetoed it is a cancellation,
+	// not a tool fault, and it must carry the applied-steps report. The report
+	// type belongs to the approval layer (this package deliberately keeps no
+	// second one); the bridge only appends its user-visible text so the model
+	// and the transcript both see what actually landed.
+	if txt := b.cancelText(dec, res); txt != "" {
+		out.Text = orDefault(out.Text, "调用已中止") + "\n\n" + txt
+		if kind == OutcomeKindError && b.cancel.Vetoed(orDefault(dec.CorrelationID, dec.TaskID)) {
+			kind = OutcomeKindCancelled
+			out.ErrorClass = string(observe.ClassCancelled)
+		}
+	}
+
 	// C25: a sensitive-source result is tainted from the moment it can reach
 	// the context. Marking runs on the CONTENT and only for successful
 	// results (an error text carries no user data).
@@ -481,9 +507,63 @@ func (b *Bridge) mark(dec Decision, res Result) {
 	}
 }
 
+// cancelText asks the D31 bus for one call's applied-steps report, and returns
+// "" when there is nothing to report: no bus wired, no step applied and no
+// veto recorded. A tool that applied steps WITHOUT saying so is why the bus,
+// not the bridge, owns the wording - see approval.CancellationReport.
+func (b *Bridge) cancelText(dec Decision, res Result) string {
+	if b.cancel == nil {
+		return ""
+	}
+	corr := orDefault(dec.CorrelationID, dec.TaskID)
+	if len(res.AppliedSteps) == 0 && !b.cancel.Vetoed(corr) {
+		return ""
+	}
+	rep := b.cancel.Report(dec, res)
+	if rep == nil {
+		return ""
+	}
+	txt := strings.TrimSpace(rep.String())
+	if txt == "" {
+		return ""
+	}
+	b.log("tools: d31 report corr=%s tool=%s applied=%d %s",
+		corr, dec.Tool, len(res.AppliedSteps), txt)
+	return txt
+}
+
 // ---------------------------------------------------------------------------
 // C25 scope + C19 composition helpers
 // ---------------------------------------------------------------------------
+
+// factsFor assembles one call's C19 input. Declared and Paths belong to the
+// BRIDGE - a tool must not be able to lower its own floor or hide a target from
+// the judge. Everything else (R8's irreversibility classes, R7's batch count)
+// comes from the host-side Decl.Facts hook, because only the tool can tell
+// whether the target already exists or whether a move leaves its volume: the
+// frozen rules are fed facts, not opinions. A hook that panics contributes one
+// unknown irreversibility class, which R8 fail-closes to L2 rather than letting
+// a broken judge read as "nothing to worry about".
+func (b *Bridge) factsFor(ctx context.Context, entry Entry, params map[string]any,
+	rawPaths []string) risk.Facts {
+	var f risk.Facts
+	if hook := entry.Decl.Facts; hook != nil {
+		f = safeFacts(ctx, hook, params, rawPaths)
+	}
+	f.Declared = entry.Decl.Declared
+	f.Paths = rawPaths
+	return f
+}
+
+func safeFacts(ctx context.Context, hook func(context.Context, map[string]any, []string) risk.Facts,
+	params map[string]any, rawPaths []string) (f risk.Facts) {
+	defer func() {
+		if rec := recover(); rec != nil {
+			f = risk.Facts{Irreversible: []string{fmt.Sprintf("宿主事实钩子 panic: %v", rec)}}
+		}
+	}()
+	return hook(ctx, params, rawPaths)
+}
 
 // OpenTask opens the C25 taint scope for one task - ticket 19's
 // DEFERRED(C25-loop-wiring) item (1). Idempotent; Execute opens lazily so a
