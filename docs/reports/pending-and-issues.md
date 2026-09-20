@@ -366,6 +366,12 @@
   ②`.github/workflows/ci.yml:166`（slo-smoke）与 `:196`（slo-full）**无 `continue-on-error`** ⇒ 这两处今天按进程创建顺序随机红；
   ③票 12 AC#2 的六份 A.1 样本是靠 keeper 绕法才拿到的（口径本身带偏，见 A15）。
   **完成判据 + 当前残缺表现登记在票 66**；修好前 `slo-check.ps1` **不得**被当成已通过的门引用。
+  ✅ **已解决（票 66，agent-ticket66b 复测 2026-09-20T15:06Z）**：解析顺序修复 = commit **`86e868d`**
+  （全仓只留一份走链实现 `WalkSystemProcesses`；回归用例经**第二人独立变异复测**咬住：退回旧序 ⇒ 6 红/24 绿，
+  原始输出 `docs/evidence/s1/66-mutation-parse-order.md`）。**零 keeper** 连跑 5 次 `-state Sleeping -seconds 10
+  -interval-ms 250` ⇒ `exit=0/0/0/0/0`、九门各 9 行（`docs/SLO.md` 附录 C.1，JSON `docs/evidence/s1/66/66b-nokeeper-{1..5}.json`）。
+  A.6#1 的 keeper 绕法已从文档删除。⚠ 本条修复**不足以**让 CI 变绿：它反而揭出了下面 C.4 那起聚合崩溃
+  （修好 A14 之后 `slo-check.ps1` 是「必红且无报告」，不是 B.3 预告的「随机红」）。**finding 原文照录不删。**
 
 - **[A15] D32 `Sleeping` CPU 行在树内口径下**没有定义**：观测者单次读的绝对成本就等于门限本身** —
   采样器跑在被测进程内，每次 `ReadTree` 的 CPU 被计进被测数字。**我复跑 8 个样本（票 12 那次 6 个，合计 14 个）的结论**：
@@ -380,6 +386,14 @@
   原始表数字不改写（那是当次真测），但解释以 **`docs/SLO.md` 附录 B** 为准。
   **裁定**：票 12 AC#2 保持未勾，CPU 行判「仪器未定义」（既不 PASS 也不 FAIL），产品证据以 A.2 树外 0.000% 为准；
   **D32 的 0.5% 阈值一字未动**。修法（把观测者移出树 / 或书面裁定「从门集里移除 CPU 行」）归**票 66**。
+  ✅ **已解决（票 66，commit `00bbb76`）**：CPU 行改成**树外口径**（父读子 pid，`proc.ExternalSampler`；
+  阈值与 limit 字符串两侧仍由同一个 `stateCPULimit` 生成 ⇒ 「改的是量法不是门」机器可核，
+  钉住它的是 `internal/observe/observer_cost_test.go`）。完成判据的双条件同时成立：同一 30s 窗内
+  **树外 0.0173% ≤0.5%** 而 **树内 0.7629% >0.5%**（`docs/SLO.md` 附录 C.3，JSON
+  `docs/evidence/s1/66/66-ac3-30s.json`）；五个 10s 零 keeper 跑里树内 0.5963–0.9318% 对树外 0.0000–0.0130%。
+  树内那条仍写进 JSON 并标 `observer_cost: true` + `gate: false`，pass/fail 照判。
+  **AC#4 的 5/5 exit=0**（`docs/SLO.md` C.4）依赖另一处修复：`scripts/slo-check.ps1:129` 在
+  `Set-StrictMode 2.0` 的**全过路径**上抛 `.Count` 异常，commit `cf0c050`。**finding 原文照录不删。**
 
 - **[A16] 球热键的配置值与注册 id 靠**下标 zip** 对齐，无一用例看管（票 64 验收时读码挖出，与 C-3/M-7 同族）** —
   `internal/ball/hotkey_windows.go:382-386`：
@@ -732,3 +746,29 @@
   启真球到桌面。首次实况启动记录：`handles=381`（与 SLO §2 实测 407–413 同量级）；
   ⚠ **热键 `Ctrl+Alt+W` 注册失败**（`hotkey registration failed (already taken?)`）——
   本机已有他者占用该全局热键，签收时需一并确认是否换键（属 C-契约外的默认值调整，需用户点头）。
+- **[A14] `parseSystemProcesses` 丢快照末项 ⇒ state 口径从未出数** → **已解决（票 66，AC#1+AC#2）**。
+  关闭 commit **`86e868d`**（唯一走链实现 `internal/proc/systemprocs_windows.go::WalkSystemProcesses`，
+  「先解析当前项、再测 `NextEntryOffset==0`」）。判据：回归用例经**第二人独立变异复测**咬住缺陷本身
+  （退回旧序 ⇒ `internal/proc` 6 红 / 24 绿，含真机自快照用例与两条树外采样用例）；
+  **零 keeper** 连跑 5 次 `wisp slo -state Sleeping -seconds 10 -interval-ms 250` = `exit=0/0/0/0/0`、
+  九项门每次各出 9 行。证据：`docs/SLO.md` 附录 C.1/C.2、`docs/evidence/s1/66/66b-nokeeper-{1..5}.json`、
+  `docs/evidence/s1/66-mutation-parse-order.md`。A.6#1 的 keeper 绕法已从文档删除。
+  ⚠ 上面 A14/A15 两段的 finding 原文**一字未删**（本段是叠加的结案行，不是替换）。
+- **[A15] 树内 CPU 门测的是观测者自己 ⇒ D32 `Sleeping` 行无法判定** → **已解决（票 66，AC#3）**。
+  关闭 commit **`00bbb76`**：`wisp slo` 的 state 段现在同一 Job 里起两个子进程，**被测主体由父进程树外读取**
+  （`internal/proc/externalsampler_windows.go`，复用同一份快照解码器），遗留的树内自采样降级进
+  `observer` 段并标 `observer_cost: true` + `gate: false`。**D32 的 0.5% 阈值一字未动**：
+  两侧 limit 串由同一个 `stateCPULimit` 生成，用例 `internal/observe/observer_cost_test.go` 钉住「只许 CPU 行动」。
+  判据（双条同窗成立）：30s/250ms 内 **树外 0.0173%** 且 **树内 0.7629%**；5 个 10s 零 keeper 跑内
+  树外 0.0000–0.0130% 对树内 0.5963–0.9318%。证据：`docs/SLO.md` 附录 C.1/C.3、
+  `docs/evidence/s1/66/66-ac3-30s.json`。
+- **[票 66 复跑时新挖，第三起仪器缺陷；正式编号请编排者给] `slo-check.ps1` 在「全过」路径上崩溃，
+  报告根本不写 ⇒ CI 红且无 artifact** → **已解决（票 66，AC#4）**，关闭 commit **`cf0c050`**。
+  `scripts/slo-check.ps1:129` 对 `Where-Object` 的结果取 `.Count`，而 `Set-StrictMode 2.0` 下
+  零命中是 `$null`、单命中是标量 ⇒ 恰好在所有 state 都 pass 时抛终止性异常。
+  **它是 A14 的下游**：A14 让每个 state `exit=2` 全 fail，过滤器命中 ≥2 项才拿到真数组，掩盖了这条。
+  ⇒ 编排者 B.3 的预告「只修①⇒约一半概率随机红」方向要反过来读：**只修① = 必红且没报告**。
+  判据：`-Subset smoke` 连跑 **5/5 exit=0**（`docs/SLO.md` C.4，五份日志 `docs/evidence/s1/66/66-smoke-run-{1..5}.log`，
+  崩溃原文 `66-smoke-pre-fix-crash.log`）；阳性对照 = 同一表达式在 StrictMode 下喂 0/1/2 项失败得
+  `allPass=True/False/False`，即修完仍会红。附带：`-Subset full`（六态）exit=0，但六态 `posture` **全是 skeleton** ⇒
+  不得当作 D32 六态表达标（边界写在 C.5）。
