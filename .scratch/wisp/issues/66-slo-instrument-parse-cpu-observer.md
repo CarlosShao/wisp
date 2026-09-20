@@ -1,7 +1,7 @@
 # 66 — SLO 判据仪器返工：解析丢末项 + CPU 门的观测者自成本（票 12 桌面跑的连带发现）
 
 **Status:** in-progress
-**Claimed by:** agent-ticket66
+**Claimed by:** agent-ticket66b
 **Last update:** 2026-09-20
 **Blocked by:** —（与票 12/20/21 无代码交集；本票只动 `internal/proc`、`internal/observe`、`cmd/wisp/slo*.go`、`scripts/slo-check.ps1`）
 **Parallel slots:** ≤1 sub-agent（**测量类独占**：本票的验收要求真机跑采样，不能与任何其他跑测的代理并发）
@@ -71,7 +71,7 @@
 - [x] **AC#2 无 keeper 可用**：`wisp slo -state Sleeping -seconds 10 -interval-ms 250`
   在**不启动任何 keeper 进程**的情况下 `exit≠2` 且九项门全出数；**连续 5 次**全部如此（一次成功不算，
   因为旧缺陷本来就是按进程创建顺序随机的）。把 A.6#1 里的 keeper 绕法从文档删掉。
-- [ ] **AC#3 CPU 树外口径**：`wisp slo` 获得树外测量能力（父读子 pid，复用 `cmd/balldebug/diff_windows.go`
+- [x] **AC#3 CPU 树外口径**：`wisp slo` 获得树外测量能力（父读子 pid，复用 `cmd/balldebug/diff_windows.go`
   里已验证正确的遍历顺序；**不得复制粘贴出第二份实现**，须抽公共函数）。
   完成判据：同一 30s 窗口内，树外口径的 `Sleeping` CPU 均值 ≤0.5%，**且**树内口径在相同条件下仍能测出 >0.5%
   ——两条同时成立才证明"差的就是观测者"，而不只是换了个地方读。
@@ -87,6 +87,7 @@
   `-race` 同包跑一次；`tools/d22scan` 与静态禁用模式扫描 clean。
 
 ## Progress log（每次 commit 追加一行，格式 `- [ISO-Z] agent=... did=...`）
+- [2026-09-20T15:18Z] agent=agent-ticket66b did=AC#5 追溯票 08（只追加一行事实，未碰它的 AC 勾选与 Status 字段）：逐字段读它归档的 `build/slo/slo-report.json` 原件（`generated_at 2026-09-19T23:35:49Z`）确认 `Sleeping exit_code=2 / report=null`、`Warm exit_code=2 / report=null`、`settle exit_code=1 / pass=false`、`all_pass=false` —— 即 state 口径九门当时一门都没产出样本窗，红因是仪器（A14/A15）不是预算。票 08 文件里补的那行同时交代了三处修复归属（`86e868d` / `00bbb76` / 本次 ps1 崩溃修复）与重跑数字的位置（`docs/SLO.md` 附录 C）。同批把 `**Claimed by:**` 更新为 agent-ticket66b（承接被中断的 agent-ticket66），并按已完成证据勾 AC#3（同一 30s 窗：树外 CPU **0.0173%** vs 树内 **0.7629%**，两侧都按 `<=0.5%` 判、只有树外那条当门，原始 JSON `docs/evidence/s1/66/66-ac3-30s.json`）。next=AC#4 五连跑收尾。
 - [2026-09-20T15:06Z] agent=agent-ticket66b did=AC#1 变异检验**独立复测**（编排者要求换人重做，不引用上一位代理的自述）：把 `WalkSystemProcesses` 退回「先测 `next==0` 再解码」，先 `grep -n MUTATION-66B` + `git diff --stat`（1 file changed, 6 insertions）证明变异真落盘，再 `go test -count=1 -v ./internal/proc/` → **rc=1，6 红 / 24 绿 / 1 SKIP**（比上一轮多 3 条：`TestSystemProcessSnapshotSeesSelf` 这次也红，`system snapshot does not contain the sampling process 12328 (513 entries)`；外加 AC#3 的两条树外采样用例 `system snapshot does not contain subject <pid>` —— 说明「换个地方读」并不天然免疫 A14，靠的是全仓唯一那份走链实现）。撤变异后 `grep -c MUTATION`=0、`git diff` 空、`go test ./internal/proc/ ./internal/observe/` rc=0 全绿。原始输出**追加**进 `docs/evidence/s1/66-mutation-parse-order.md`（未覆盖上一轮）。顺带完成 AC#2 复测的采样腿：`build/wisp.exe`（23:03 重建）`slo -state Sleeping -seconds 10 -interval-ms 250` **零 keeper 连跑 5 次 exit=0/0/0/0/0**，九项门每次各出 9 行、40 样本、run4 有 1 次 sample_error（39 样本，九门仍出数），主体（树外口径）CPU 0.0130 / 0.0000 / 0.0000 / 0.0000 / 0.0000%、观测者（树内，`gate:false`）0.6739 / 0.5963 / 0.6350 / 0.6872 / 0.9318%；测量前后 `tasklist|grep -iE "wisp|balldebug"` 均空。JSON 归档 `docs/evidence/s1/66/66b-nokeeper-{1..5}.json`。剩余：AC#4 slo-check 连跑 5 次、AC#5 票 08 追溯 + full 归档、AC#6 附录 C + A14/A15 移入已解决、AC#7 完整门禁。
 - [2026-09-20T15:05Z] agent=agent-ticket66 did=AC#3 代码落地（同一 30s/同间隔的双子进程拓扑）：`wisp slo -state X` 现在在 Job 里起两个子进程——被测主体（boot+settle 后什么都不做，由 `proc.ExternalSampler` 树外读取，九项门全在它身上）与被测量化主体（跑遗留的树内自采样，报告塞进 `observer`，CPU 行 `observer_cost: true` 且 `gate: false`），观测者自己不再进被测集合；`cmd/balldebug/diff_windows.go::privateWorkingSetFor` 改调 `proc.SystemProcessSnapshot`，全仓只剩一份 SYSTEM_PROCESS_INFORMATION 走链（A14 就是第二份复制的顺序错）。阈值零改动：`cpu_percent_all_core` 两侧都仍按 `<=0.5%%` 判并写 `pass/fail`，只是树内那条不再当门（`internal/observe/observer_cost_test.go` 4 条用例钉住「只许 CPU 行动、limit 字符串两侧必须相等、非 CPU 行的 gate 不许随口径变化」）。冒烟（5s/250ms，同窗口同一对主体）：树外 CPU **0.0000%%** / 树内 CPU **0.5659%%**、`exit=0`；顺带发现树内私有工作集中位 8.38MB vs 树外 4.33MB，疑似采样器 1MiB 级扫描缓冲把内存行也污染了（SLO.md §7 早年记过的坑），待 30s 正式样本核实。另：先前 `go test ./internal/observe/` 因 `internal/llm/adaptertest/mockllm.go:68` 裸 `go func(` 转红，已确认早于本票（`git show 2825f28:...` 第 68 行即命中），且已被票 67 的 `7c9256b` 修掉，本票门禁不再受阻。剩余：AC#3 正式 30s 样本、AC#4 slo-check.ps1、AC#5 票 08 追溯 + full 归档、AC#6 附录 C/A14-A15 移已解决、AC#7 完整门禁。
 - [2026-09-20T14:38Z] agent=agent-ticket66 did=AC#1 变异检验 + AC#2 无 keeper 连跑 5 次。变异：把 `WalkSystemProcesses` 退回「先测 `next==0` 再解码」，`go test -count=1 -v ./internal/proc/` → rc=1，3 条新用例全红（`parsed 4 of 5 snapshot entries: [1337 60060 4 4004]`／`walker delivered [100], want [100 200]`／`parsed zero entries`），包内其余 23 条仍绿；撤变异后 rc=0 全绿（grep -c MUTATION=0 已核）。原始输出 `docs/evidence/s1/66-mutation-parse-order.md`。AC#2：`./build/wisp.exe slo -state Sleeping -seconds 10 -interval-ms 250`（零 keeper）连跑 5 次 exit=1/1/1/1/1（≠2，九项门各出 9 行、40 样本、0 sample_errors），CPU 树内读数 0.6604/0.7625/0.7623/0.6356/0.6356% —— 即缺陷②本身，正是 B.3 预告的「只修① ⇒ 门随机红」，故 AC#3/#4 必须与本 commit 集同批。编排者那条 exit=2 的原 repro（`-seconds 5`）现在 exit=0（`docs/evidence/s1/66/66-repro-a1.json`）。A.6#1/#2 的 keeper 两行已从 docs/SLO.md 删掉并改为无 keeper 形态；无 keeper 的 `-settle` 复跑 exit=0（回 cap 262ms、FreeOSMemory=2、末值 8.5MB）。测量前后 `tasklist|grep -iE "wisp|balldebug"` 均为空。剩余：AC#3 树外口径（含 balldebug 改用公共快照函数）、AC#4 slo-check、AC#5 票 08 追溯 + full 子集归档、AC#6 附录 C + A14/A15 移入已解决、AC#7 门禁。
