@@ -1,8 +1,8 @@
 # 63 — 凭据录入入口：`wisp secret set/get/list/unset`（隐藏输入 → DPAPI）
 
-**Status:** ready-for-agent
-**Claimed by:** —
-**Last update:** 2026-09-20
+**Status:** in-progress
+**Claimed by:** agent-ticket63-secretcli
+**Last update:** 2026-09-20T06:50Z
 **Blocked by:** 06-secretstore-envs（DPAPI Store 已存在）
 **Parallel slots:** ≤1 sub-agent
 **Spec refs:** SPEC-03 §3.1（secret refs）, SPEC-06（凭据不落明文）, D22, P13 便携模式, R7
@@ -47,3 +47,6 @@ wisp secret unset <name>      # 删除 blob，并检查是否仍被 config 引�
 - [ ] 对抗验收由非实现者执行，报告含与本表 **1:1 的裁决表**（README 规则 6）。
 
 ## Progress log (append-only, newest last)
+- [2026-09-20T06:50Z] agent=agent-ticket63-secretcli did=claimed next=set/get/list/unset+leak-tests
+- [2026-09-20T07:06Z] agent=agent-ticket63-secretcli did=加 `wisp secret set/get/list/unset`（cmd/wisp/secret.go，热插拔 secretIO+readHidden seam，仅 bool flag）；internal/secret 加命令外壳所需的 Delete/Exists/Blobs/ConfigRefs（存格式零改动，blobPath 仍是唯一路径咽喉）+ctime_windows/other；gofmt/vet/secret count=2/secret -race 全绿 next=cmd/wisp 泄漏测试（argv/日志）
+

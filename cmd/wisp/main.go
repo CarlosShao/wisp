@@ -26,6 +26,8 @@ Usage:
   wisp             GUI resident process (boots the runtime skeleton, empty
                    event loop; the floating ball window is ticket 07)
   wisp run "task"  run a task from the command line (ticket 01: echo placeholder)
+  wisp secret      credential entry (ticket 63): set/get/list/unset a DPAPI
+                   blob without the key ever entering argv, a log line or chat
   wisp doctor      toolchain and native-DLL self-check, prints PASS/FAIL
   wisp slo         SLO sampling driver (ticket 08): one state per run, JSON
                    verdict; driven by scripts/slo-check.ps1
@@ -55,6 +57,8 @@ func main() {
 		if !cmdDoctor() {
 			os.Exit(1)
 		}
+	case "secret":
+		os.Exit(cmdSecret(args[1:]))
 	case "slo":
 		os.Exit(cmdSLO(args[1:]))
 	case "version", "--version", "-v":

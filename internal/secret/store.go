@@ -117,6 +117,51 @@ func (s *Store) Resolve(ref string) (string, error) {
 	}
 }
 
+// Exists reports whether a dpapi: ref has a blob file in this store. env: refs
+// are rejected (they name process state, not a file). It exists so a caller
+// can tell "not stored yet" from "unreadable" without building the blob path
+// itself - blobPath stays the single traversal choke point.
+func (s *Store) Exists(ref string) (bool, error) {
+	kind, id, err := ParseRef(ref)
+	if err != nil {
+		return false, err
+	}
+	if kind != RefKindDPAPI {
+		return false, fmt.Errorf("secret: exists: %q: env refs live in the process environment; only dpapi: refs have blob files", ref)
+	}
+	switch _, err := os.Stat(s.blobPath(id)); {
+	case err == nil:
+		return true, nil
+	case errors.Is(err, fs.ErrNotExist):
+		return false, nil
+	default:
+		return false, fmt.Errorf("secret: exists %q: %w", ref, err)
+	}
+}
+
+// Delete removes the blob file a dpapi: ref names (one file per ref, SPEC-02
+// §6 - deleting the ref's file is the whole of "forget this secret"). An
+// absent blob reports fs.ErrNotExist wrapped, so callers can distinguish
+// "already gone" from an I/O failure; env: refs are rejected because there is
+// nothing on disk to remove. The error text carries the ref and the directory,
+// never secret material (C28).
+func (s *Store) Delete(ref string) error {
+	kind, id, err := ParseRef(ref)
+	if err != nil {
+		return err
+	}
+	if kind != RefKindDPAPI {
+		return fmt.Errorf("secret: delete: %q: env refs live in the process environment; there is no blob to delete", ref)
+	}
+	if err := os.Remove(s.blobPath(id)); err != nil {
+		if errors.Is(err, fs.ErrNotExist) {
+			return fmt.Errorf("secret: delete %q: no blob file under %s: %w", ref, s.dir, err)
+		}
+		return fmt.Errorf("secret: delete %q: %w", ref, err)
+	}
+	return nil
+}
+
 // blobPath joins the id under the secrets dir. ParseRef already validated the
 // charset; this is the choke point that keeps traversal out of file paths.
 func (s *Store) blobPath(id string) string {
