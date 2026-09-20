@@ -28,7 +28,7 @@
 | 真麦克风 | Realtek，LIVE 冒烟：`WISP_LIVE_MIC=1 go test ./internal/audio/ -run TestLiveWasapiSmoke` |
 | 模型缓存 | `third_party/spike-models/`（git 忽略；URL/SHA256 见 docs/evidence/s0/json/） |
 
-## 3. 完成度（截至本文档：**11/61 done**——2026-09-20 08:0x 终版）
+## 3. 完成度（截至本文档：**13/61 done**——2026-09-20 08:4x 终版）
 
 | 票 | 内容 | 证据 |
 |---|---|---|
@@ -43,8 +43,10 @@
 | 13 ✅ | 音频采集（WASAPI 真机验证、热插拔、半双工门、重采样） | docs/evidence/s2/13-* |
 | 14 ✅ | 模型分发（C29 签名清单 6 条目、minisign 手写验证、断点续传、compose model-mirror；matcha P3 阻分发不阻自用——裁定见 reports R1） | docs/evidence/s2/14-* |
 | 08 ✅ | 可观测性（六态×七指标采样器——**门禁口径=私有工作集**（commit 假红裁定）、slo-check.ps1 泄漏 fixture、CI 五 job 矩阵 lint/test-core/test-windows/slo-smoke/slo-full(wisp-slo)、compose mock-llm 接线） | docs/evidence/s1/08-* |
+| 17 ✅ | C19 RiskAssessor（R1–R9 全实现 + R9 fail-closed + 融合 + R4 会话覆盖阻断；R2/R3/R4 接口待 18/19/20 接线） | docs/evidence/s1/17-* |
+| 18 ✅ | C26 PathResolver（junction/8.3/UNC/`\?\` 红队四连真产物全拒）+ A/B 黑名单 | docs/evidence/s1/18-* |
 
-**S0 完成；S2 前置 13✅+14✅。S1 剩两张：10（agent 循环核心）+ 12（S1 gate）——即新会话的第一件事。**
+**S0 完成；S2 前置 13✅+14✅。S1 剩两张：10（agent 循环核心）+ 12（S1 gate）——即新会话的第一件事。S3 安全地基已提前：17✅+18✅（票 19 taint 引擎、票 20 host bridge 接线是下一批）。**
 
 ## 4. 在途状态（2026-09-20 08:1x 终版：**无在途任务，全部收口**）
 
@@ -55,7 +57,8 @@
 ## 5. 下一步（新会话的行动清单，按序）
 
 1. **票 10（agent 循环核心，2–4h 大票）——新会话第一票**：被 05✅+09✅ 解锁。参考：Pi 骨架（SPEC-05 §2）、golden 回放（票 09 的 `internal/llm/golden` + mockllm 控制端点）、failToolCallsFromTruncatedMessage、D15 阈值随 context_window 缩放。
-2. **票 12（S1 gate）**：被 04✅+06✅+07✅+08✅+09✅+10 解锁。含 SLO 实测（回落调优义务——T02 发现 Settle 残留 ~31MB>25MB，`debug.SetMemoryLimit` 调优是票 12/15 的明文义务）+ 打字→回复→通知端到端 + 人工视觉项（H1）。
+2. **票 12（S1 gate）**：被 04✅+06✅+07✅+08✅+09✅+10 解锁。
+   - **票 19（taint 引擎）+ 20（host bridge+fs 工具）**已部分就绪：17/18 完成后即为自然后续，建议新会话按 10 → 19∥20 → 12 推进。含 SLO 实测（回落调优义务——T02 发现 Settle 残留 ~31MB>25MB，`debug.SetMemoryLimit` 调优是票 12/15 的明文义务）+ 打字→回复→通知端到端 + 人工视觉项（H1）。
 3. **S2 收口**：票 15（TTS 引擎——**TTS 常驻+ASR 按需为默认策略**，spike 实测串行 4.7s>1.6s 预算）、票 16（S2 验收：CER 双门禁 6%/15% + 真机冒烟三条物理场景）。
 4. **S3 批量**：17–25 九张票（安全+能力面），两并发按 17∥18 → 19/20 → 21–24 → 25 推进；每片完成跑缺口审计+对抗验收。
 5. **Key 类等待项**：真 LLM Key 到位后先跑 `cmd/llmrecord` 补录真 provider 黄金流（票 09 的 H2 DEFER）。

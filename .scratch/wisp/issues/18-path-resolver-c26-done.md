@@ -1,6 +1,6 @@
-# 18 — PathResolver (C26) + A/B sensitive-path blacklists
+PathResolver (C26) + A/B sensitive-path blacklists (DONE ✅)
 
-**Status:** in-progress
+**Status:** done
 **Claimed by:** orchestrator -> sub-agent T18-impl
 **Last update:** 2026-09-20T00:10:30Z
 **Blocked by:** 03-skeleton-runtime-rules
@@ -46,3 +46,5 @@ ban on raw `filepath.Clean|Abs` for fs decisions.
 
 ## Progress log (append-only, newest last)
 - [2026-09-20T00:10:30Z] agent=orchestrator claimed=T18-impl did=dispatched (50-min deadline window; hard stop 08:40 local, clean-unit boundary only) next=work
+- [2026-09-20T00:31:00Z] agent=T18-impl did=C26-pathresolver+A/B-blacklists+red-team-suite(10 tests, real mklink/J junctions+8.3 via GetShortPathName+UNC+\?\ all deny A-list; reparse exceptions pass) next=none-resolver-done; R2/R3 feed-in (17) uses Resolve+Classify+Gate; T17 parallel files untouched (their TestRuleTaintR4/vet errors pre-existing)
+- [2026-09-20T00:27:30Z] agent=orchestrator did=adversarial PASS (orchestrator-executed; reports docs/evidence/s1/.scratch/wisp/issues/18-*.md; full-package tests + race green after both agents merged) next=ticket DONE

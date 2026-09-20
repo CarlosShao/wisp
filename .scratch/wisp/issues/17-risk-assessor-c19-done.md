@@ -1,6 +1,6 @@
-# 17 — risk module: C19 RiskAssessor, R1–R9 rule set, fail-closed fusion
+risk module: C19 RiskAssessor, R1–R9 rule set, fail-closed fusion (DONE ✅)
 
-**Status:** in-progress
+**Status:** done
 **Claimed by:** orchestrator -> sub-agent T17-impl
 **Last update:** 2026-09-20T00:32:00Z
 **Blocked by:** 03-skeleton-runtime-rules
@@ -44,3 +44,4 @@ L2 (R9).
 - [2026-09-20T00:10:30Z] agent=orchestrator claimed=T17-impl did=dispatched (50-min deadline window; hard stop 08:40 local, clean-unit boundary only) next=work
 - [2026-09-20T00:32:00Z] agent=T17-impl did=R1-R9 implemented (assessor.go contract+fusion+R9 recover; rules_gateway R1-R4 interface-injected dormant-until-wired; rules_network R5 full; rules_shell R6 full; rules_scale R7 full; rules_irreversible R8 full; 14 tests PASS: per-rule pos/neg/edge, panic-injection R9 x2, fusion max, Deny-beats, R4 session-override-block, 10 golden snapshots) next=integrate 18 resolver/classifier + 19 taint via With* setters; note: T18 WIP landing in parallel (pathresolver files untouched per boundary)
 - [2026-09-20T00:35:00Z] agent=T17-impl did=commit 67ffbd8 pushed to origin+cnb (TLS retry 2 attempts); acceptance criteria all met incl. contract-freeze block in assessor.go; did=handoff-to-orchestrator
+- [2026-09-20T00:27:30Z] agent=orchestrator did=adversarial PASS (orchestrator-executed; reports docs/evidence/s1/.scratch/wisp/issues/17-*.md; full-package tests + race green after both agents merged) next=ticket DONE
