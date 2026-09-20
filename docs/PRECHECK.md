@@ -120,20 +120,35 @@ C27 单窗口复用（隐藏而非销毁）维持为强制设计。**
 
 ## P12 — 同步盘目录的可靠识别方式（票 19 回填，2026-09-20）
 
-**结论：四路探测（注册表 → 客户端配置文件 → 已知默认位置 → fixture/注入）
-+「识别不到即从严」兜底。零命中时 `[fs] allowed_dirs` 中位于用户 profile 下的
-目录一律视为 sync-suspect（安全默认，票 19 Key constraints）；写入目标无法经
-C26 解析（含空路径、穿越未豁免 junction）同样 fail-closed 记为 sync-suspect。**
+**结论：五路探测（客户端环境变量 → 注册表 → 客户端配置文件 → 已知默认位置 →
+fixture/注入）+「识别不到即从严」兜底。零「已确认」命中时，用户 profile 下的
+任意路径一律视为 sync-suspect（安全默认，票 19 Key constraints；严于
+`[fs] allowed_dirs`，代码不再提供 allowed_dirs 死字段）。「已确认」= env/注册表/
+客户端配置三级证据且该根能经 C26 规范化——仅 default/fixture/options 级证据只
+增加根，不撤销兜底（对抗验收 M-3：一个诱饵 `~\OneDrive` 目录不得关掉全网状兜底）。
+写入目标无法经 C26 锚定（含空路径、穿越未豁免 junction、整条链不存在的盘/UNC）
+同样 fail-closed 记为 sync-suspect。**
 
 - 落点：`internal/risk/syncdirs.go`（探测编排 + suspect 兜底）、
   `syncdirs_windows.go`（HKCU 注册表：OneDrive `Accounts\<Personal|Business#>\UserFolder`
-  双 WOW64 视图枚举；Dropbox `Software\Dropbox\Dropbox:Path`）、
+  双 WOW64 视图枚举；Dropbox `Software\Dropbox\Dropbox:Path`；探测逻辑本体在
+  portable 的 `registryProbeFor`，由可注入的 `registryValueSource` 驱动，
+  表驱动测试 `TestSyncRegistryProbeTable`）、
   `syncdirs_other.go`（非 Windows 桩：macOS 云盘探测 DEFERRED(票 55)，
   期间 portable 探测照常跑，零命中即落 suspect 兜底，不留敞开通道）。
-- 路径匹配一律经 **C26 Resolve** 规范化后再做前缀比较（junction/8.3/UNC 拼写
-  塌缩到同一根），不是路径字符串匹配——这正是 P12 判「只靠字符串不够」的点。
-- 真机自证（本机有 OneDrive）：`go test ./internal/risk/ -run TestSyncDetectionOnThisMachine -v`
-  → 检出 `C:\Users\swq\OneDrive`（source=default，目录存在即确认根），并断言其内
+- 路径匹配一律经 **C26 Resolve** 规范化后再做组件边界前缀比较（junction/8.3/UNC
+  拼写塌缩到同一根），不是路径字符串匹配——这正是 P12 判「只靠字符串不够」的点。
+  fs.write 目标通常**尚不存在**，C26 的句柄查询（展开 8.3 / 剥 `\\?\` 的那一步）
+  在其上必然失败，因此 `resolveTarget` 先锚定「最近的已存在祖先目录」再把词汇
+  尾巴接回去；祖先也无法核实即从严（对抗验收 B-1，红队用例
+  `TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes` /
+  `TestSyncRedTeamRealOneDrive`，含真机 `\\?\` 拼写；反向护栏
+  `TestSyncRedTeamGuardPlainNewFileWriteAllowed` /
+  `TestSyncNormalNewFileWriteNotFlagged`：普通新建文件写入不得被误判）。
+- 真机自证（本机有 OneDrive）：`go test ./internal/risk/ -run TestSync -v`
+  → 检出 `C:\Users\swq\OneDrive`（source=**env**，即 OneDrive 客户端自己发布的
+  `%OneDrive%`/`%OneDriveConsumer%` 变量，属已确认级；本机 HKCU Accounts 仍无
+  UserFolder，注册表探针 0 条，故 M-2 把环境变量线索补进探针链首），并断言其内
   `fs.write` 判为同步通道；fixture 兜底由 `TestSyncFixtureFallbackAndMatch` /
   `TestSyncDropboxHostDBConfig`（搬家后的 Dropbox root 从 host.db 解出）覆盖，
   全绿见 docs/evidence/s3/19-provenance-c25-tests.txt。
@@ -144,4 +159,21 @@ C26 解析（含空路径、穿越未豁免 junction）同样 fail-closed 记为
 - fs.write 通道的 R4 语义（SPEC-06 §5 原文）：授权目录**位于**同步根内 → 该目录
   内写入一律按外泄通道对待（内容含污染片段即升 L2）；非同步目录的内容不按 R4 扫描
   （本地写入仍走 R1/R8 的 L1/L2 判定），由 `Provenance.Inspect("fs.write", …)` 实现。
+
+## C25 片段索引的 D32 内存/时延预算（票 19 回填，2026-09-20 对抗验收 M-5 复测）
+
+- 索引存储：只保留排序去重后的 `[]uint64` 哈希集 + 规范化源串。原实现另存一份
+  与哈希平行的窗口字符串表（`winStrs`），**写后从不读**（复核走
+  `strings.Contains(src, w)`），是纯死重；连同其不可达的「碰撞探邻居」分支一并删除。
+- 复测（同机 i7-8750H，go1.27.1 windows/amd64，old/new 同一进程内对照跑）：
+  单个满额 262144-rune 源建索引 **常驻 10.1 MiB → 1.8 MiB**，五个源
+  **50.5 MiB → 8.9 MiB**；建索引 **38.3ms → 22.9ms**、**10.6 MiB/op → 2.8 MiB/op**、
+  **233014 allocs/op → 5 allocs/op**；`Mark` 一个满额源 **~27.8ms / 4.3 MiB/op**
+  （票 19 前值 52ms/12MiB，为对抗验收侧独立口径）。响应路径扫描（40k 参数 × 20 个
+  8k 源）**55.8~58.9ms，与 old 57.4~57.8ms 同量级**：该路径耗时由窗口哈希+二分主导，
+  删表不改变其量级（对照换序复跑，差异落在噪声内，未记为改进）。
+- 显式预算（`ProvOptions`）：`MaxSourceRunes` 默认 262144、`MaxScanRunes` 默认
+  2097152、`MaxScopeSources` 默认 64（超限只记日志、**绝不丢污染**——丢标记等于开门）、
+  `MaxParamDepth` 默认 8（超深度 = 扫描被截断 → 从严记 R4，不再静默漏检，M-4）。
+  可复跑：`go test ./internal/risk/ -bench . -benchmem -run XXX`。
 

@@ -49,5 +49,10 @@ the P7 subjective-quality gate harness.
 - [ ] Latency: first-audio ≤800ms warm / ≤1600ms cold-load measured (10 runs, P50/P95 recorded).
 - [ ] Serial slot: ASR and TTS never co-resident (sampler peak = max, asserted); unload frees.
 - [ ] P7: score sheet committed ≥7/10 or blocked-decision logged for cloud-TTS fallback.
+- [ ] C25 wiring (registered by ticket 19's DEFERRED(C25-loop-wiring), adversarial report
+      N-6): every announced string goes through `risk.Provenance.CheckText(scope,
+      risk.ChTTS, text)` before playback; a hit means the announce is replaced by the L2
+      confirmation (source named) and never spoken aloud. Test: the TTS channel assertion in
+      `internal/risk/provenance_test.go` (TestFourChannelExfilSuite) plus a 26-side gate test.
 
 ## Progress log (append-only, newest last)

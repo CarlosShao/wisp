@@ -1,0 +1,119 @@
+# 票 19（C25 provenance / taint engine）对抗验收退回后的修复轮证据（agent-ticket19-fix，2026-09-20T04:30Z 前后）
+# 被测树：dev 分支，基线 32bfa17（FAIL 判定文档）之上的修复提交
+# 环境：go1.27.1 windows/amd64，Windows 11 x64 真机；PATH=/d/work/base/go/bin:/e/work/base/msys64/mingw64/bin；GOPATH=/d/work/base/gopath
+# 并行保护：构建/测试范围一律 ./internal/risk/；未使用 git add -A；未 push。
+
+== go vet ./internal/risk/ ==
+VET=CLEAN
+
+== go test ./internal/risk/ -count=2 ==
+ok  	github.com/CarlosShao/wisp/internal/risk	5.621s
+
+== go test ./internal/risk/ -race -count=1 ==
+ok  	github.com/CarlosShao/wisp/internal/risk	1.525s
+
+== cd tools/d22scan && go run . ==
+d22scan: clean - no D22 ban violations, no emoji in design/ or frontend/
+
+== B-1 红队（真机，含真写盘门控）：go test ./internal/risk/ -run TestSyncRedTeam -v ==
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes
+    syncdirs_redteam_windows_test.go:84: sync root long  = C:\Users\swq\AppData\Local\Temp\TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes4290073206\001\profile\OneDrive Copilot Sync
+    syncdirs_redteam_windows_test.go:85: sync root 8.3   = C:\Users\swq\AppData\Local\Temp\TESTSY~1\001\profile\ONEDRI~1
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/plain_long_spelling
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/extended-length_\\?\_spelling
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/OS_8.3_short-name_spelling
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/8.3_+_\\?\_combined
+--- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes (0.02s)
+    --- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/plain_long_spelling (0.00s)
+    --- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/extended-length_\\?\_spelling (0.00s)
+    --- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/OS_8.3_short-name_spelling (0.00s)
+    --- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/8.3_+_\\?\_combined (0.00s)
+=== RUN   TestSyncRedTeamGuardPlainNewFileWriteAllowed
+    syncdirs_redteam_windows_test.go:151: non-sync dir 8.3 = C:\Users\swq\AppData\Local\Temp\TESTSY~1\001\profile\work
+--- PASS: TestSyncRedTeamGuardPlainNewFileWriteAllowed (0.01s)
+=== RUN   TestSyncRedTeamUnverifiableChainFailClosed
+--- PASS: TestSyncRedTeamUnverifiableChainFailClosed (0.00s)
+=== RUN   TestSyncRedTeamRealOneDrive
+    syncdirs_redteam_windows_test.go:214: P12 evidence: live OneDrive root via env: C:\Users\swq\OneDrive
+    syncdirs_redteam_windows_test.go:233: no 8.3 alias exists for the live root C:\Users\swq\OneDrive (name is already 8.3-clean); the \\?\ legs below still cross the boundary
+    syncdirs_redteam_windows_test.go:246: real root spelling judged sync=true root=OneDrive/env why="write target is under a detected sync root"
+    syncdirs_redteam_windows_test.go:251: R4 hit channel=fs.write.syncdir source=fs.read C:\Users\swq\contract.pdf
+    syncdirs_redteam_windows_test.go:246: real root spelling judged sync=true root=OneDrive/env why="write target is under a detected sync root"
+    syncdirs_redteam_windows_test.go:251: R4 hit channel=fs.write.syncdir source=fs.read C:\Users\swq\contract.pdf
+--- PASS: TestSyncRedTeamRealOneDrive (0.00s)
+
+== 全量测试名计数：go test ./internal/risk/ -count=1 -v ==
+top-level --- PASS : 69
+subtest  --- PASS : 37
+--- FAIL            : 0
+--- SKIP            : 1  (TestSyncRegistryProbeLive: 本机 HKCU Accounts 无 UserFolder，已 t.Skip 并说明)
+--- PASS: TestR9PanicInSubAssessorFailsClosed
+--- PASS: TestR9PanicInWiredDependencyFailsClosed
+--- PASS: TestFusionTakesMaxSeverity
+--- PASS: TestFusionSingleDenyBeatsAnyConfirm
+--- PASS: TestFusionR4BlocksSessionOverride
+--- PASS: TestDecisionGoldenSnapshots
+--- PASS: TestResolvePerCallBudget
+--- PASS: TestPathResolverJunctionWindows
+--- PASS: TestPathResolverShortNameAListDenied
+--- PASS: TestPathResolverUNCAListDenied
+--- PASS: TestPathResolverExtendedLengthPrefixAListDenied
+--- PASS: TestPathResolverCaseAndDotMixDenied
+--- PASS: TestReparseExceptionExplicitPathOnly
+--- PASS: TestAListDenyAndUnoverridable
+--- PASS: TestBListDefaultDenyAndOverride
+--- PASS: TestResolveIdempotent
+--- PASS: TestResolveExpansion
+--- PASS: TestMarkInspectSourceAttribution
+--- PASS: TestMarkNegativeNoTaintNoHit
+--- PASS: TestMarkEmptyAfterNormalization
+--- PASS: TestMarkUnknownSourceToolFailClosed
+--- PASS: TestSensitiveSourceSetComplete
+--- PASS: TestFourChannelExfilSuite
+--- PASS: TestR4EndToEndViaAssessor
+--- PASS: TestSyncWriteNegative
+--- PASS: TestDetectorUnknownToolScansEverything
+--- PASS: TestScopesNeverInherit
+--- PASS: TestDisposalScopeClearsTaints
+--- PASS: TestInspectUnknownScopeIsEmptyStore
+--- PASS: TestNamedChannelParamEscape
+--- PASS: TestDeepNestingFailsClosedNotSilent
+--- PASS: TestNormalizationEndToEnd
+--- PASS: TestFragmentThresholdClampedToContractFloor
+--- PASS: TestFragmentThresholdStricterAllowed
+--- PASS: TestResidualLimitsAreLoggedNotSilent
+--- PASS: TestConcurrentMarkInspect
+--- PASS: TestLLMParaphraseResidual
+--- PASS: TestRuleDeclaredR1
+--- PASS: TestRulePathAllowlistR2
+--- PASS: TestRuleSensitivePathR3
+--- PASS: TestRuleTaintR4
+--- PASS: TestRuleNetworkR5
+--- PASS: TestRuleShellR6
+--- PASS: TestRuleBatchScaleR7
+--- PASS: TestRuleIrreversibleR8
+--- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes
+--- PASS: TestSyncRedTeamGuardPlainNewFileWriteAllowed
+--- PASS: TestSyncRedTeamUnverifiableChainFailClosed
+--- PASS: TestSyncRedTeamRealOneDrive
+--- PASS: TestSyncDefaultLocationProbe
+--- PASS: TestSyncDropboxHostDBConfig
+--- PASS: TestSyncFixtureFallbackAndMatch
+--- PASS: TestSyncFallbackNotDisarmableByWeakRoot
+--- PASS: TestSyncUnverifiedRootKeepsFallback
+--- PASS: TestSyncEnvConfiguredRoots
+--- PASS: TestSyncRegistryProbeTable
+--- SKIP: TestSyncRegistryProbeLive
+--- PASS: TestSyncSuspectFallbackIsComponentBounded
+--- PASS: TestSyncNormalNewFileWriteNotFlagged
+--- PASS: TestSyncSuspectFallbackWhenUndetectable
+--- PASS: TestSyncUnresolvablePathFailClosed
+--- PASS: TestSyncRootsIntrospection
+--- PASS: TestSyncDetectionOnThisMachine
+--- PASS: TestNormalizeTaintContractForm
+--- PASS: TestFragmentMatchExactBoundary
+--- PASS: TestFragmentMatchAcrossTransforms
+--- PASS: TestFragmentMatchCJK
+--- PASS: TestNormalizeTaintDropsIgnorableChars
+--- PASS: TestFragmentIndexShortSourceNeverMatches
+--- PASS: TestFragmentHashCollisionCannotFakeHit

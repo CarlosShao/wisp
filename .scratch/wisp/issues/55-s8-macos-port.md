@@ -27,5 +27,12 @@ prebuilt artifacts.
 - [ ] Keychain SecretStore passes 06's test matrix ported.
 - [ ] PathResolver macOS branch (realpath + lstat) passes red-team port.
 - [ ] README platform matrix updated honestly.
+- [ ] P12/macOS sync-client probing (registered by ticket 19's DEFERRED(P12-macos),
+      adversarial report N-6): `~/Library/CloudStorage/<Provider>` plus per-client config
+      probing must yield env/registry/config-GRADE evidence — a bare `os.Stat` of a guessed
+      default directory does NOT disarm the under-profile sync-suspect fallback
+      (`gradeConfirmed` in internal/risk/syncdirs.go). Acceptance: a relocated-Dropbox and a
+      relocated-OneDrive fixture both resolve to a confirmed root, and
+      `internal/risk/syncdirs_redteam_*_test.go` spellings equivalents pass on macOS.
 
 ## Progress log (append-only, newest last)
