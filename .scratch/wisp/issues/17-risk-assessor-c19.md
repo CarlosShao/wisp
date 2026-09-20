@@ -1,8 +1,8 @@
 # 17 — risk module: C19 RiskAssessor, R1–R9 rule set, fail-closed fusion
 
-**Status:** ready-for-agent
-**Claimed by:** —
-**Last update:** 2026-09-19
+**Status:** in-progress
+**Claimed by:** orchestrator -> sub-agent T17-impl
+**Last update:** 2026-09-20T00:10:30Z
 **Blocked by:** 03-skeleton-runtime-rules
 **Parallel slots:** ≤2 sub-agents (A: assessor core + fusion; B: R2–R9 rule implementations +
 test matrix)
@@ -41,3 +41,4 @@ L2 (R9).
 - [ ] Contract-freeze note: rule IDs + semantics documented as frozen; doc committed.
 
 ## Progress log (append-only, newest last)
+- [2026-09-20T00:10:30Z] agent=orchestrator claimed=T17-impl did=dispatched (50-min deadline window; hard stop 08:40 local, clean-unit boundary only) next=work

@@ -1,8 +1,8 @@
 # 18 — PathResolver (C26) + A/B sensitive-path blacklists
 
-**Status:** ready-for-agent
-**Claimed by:** —
-**Last update:** 2026-09-19
+**Status:** in-progress
+**Claimed by:** orchestrator -> sub-agent T18-impl
+**Last update:** 2026-09-20T00:10:30Z
 **Blocked by:** 03-skeleton-runtime-rules
 **Parallel slots:** ≤2 sub-agents (A: resolver pipeline; B: blacklists + red-team test suite on
 Windows runner)
@@ -45,3 +45,4 @@ ban on raw `filepath.Clean|Abs` for fs decisions.
 - [ ] Resolver idempotence + perf: ≤1ms per call on warm handle cache (budget for ≤50 calls/task).
 
 ## Progress log (append-only, newest last)
+- [2026-09-20T00:10:30Z] agent=orchestrator claimed=T18-impl did=dispatched (50-min deadline window; hard stop 08:40 local, clean-unit boundary only) next=work
