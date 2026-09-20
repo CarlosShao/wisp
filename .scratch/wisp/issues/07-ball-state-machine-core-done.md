@@ -59,6 +59,28 @@ basic animations; full visual polish gate is human acceptance at 12).
 - note: AC#2 left open — docs/evidence/s1/07-adversarial-acceptance.md row 3 rules 视觉证据
       "PASS（人工签收挂起）"; the AC's second clause (human review vs ball.html) is still the open
       待人项 H1 in docs/reports/pending-and-issues.md, so no completion ruling exists
+- note: **接续指引（2026-09-20，编排者）** — 本票是 `-done` 但 **5 个框未勾**（`^- [ ]`=5、`^- [x]`=1），
+      这正是 audit-B 登记的"13 张 done 票普遍未勾框"。**不要为了好看去补勾**，也**不要**因此重做本票实现。
+      五个框现在真实的名词归属：
+      - **#2 Visual（20 态截图 vs `design/screens/ball.html`）**：参考图从未入库 ⇒ **阻在 owner**（R15#7），
+        工作已转**票 65**（质感返工）。
+      - **#3 Interactive（单击 Sleeping→Listening / Esc 取消 / 焦点不抢 / 透明区穿透）**：由**票 64** 消化，
+        其 winlive 逐跑记录正在补（2026-09-20 23:4x 起）。
+      - **#4 Sleeping CPU≈0 且无动画定时器**：**今天有了实测**（`docs/SLO.md` §B/§C：`timers=no`、
+        `cpu=0.000`、私有工作集口径）。本框第二句要的**代码内断言也存在**，两处：
+        `internal/ball/liquid_test.go:245`（"Sleeping must never host the transition timer"）与
+        `internal/ball/hotkey_live_test.go:292 TestLiveSleepingZeroTimerHandles`——后者还自带阳性对照
+        （"probe must SEE a timer in Warm, or the zero in Sleeping proves nothing"），写法是对的。
+        ⚠ 但 `hotkey_live_test.go` **在 `-tags winlive` 后面**，所以这条断言今天**有没有真的执行**仍未证
+        ⇒ **保持未勾**，正由票 64 的 winlive 复测给出逐跑结果；跑出来后由那张票的证据闭这一框。
+        （我把这句从"没验证过存在"改成"存在但覆盖面未证"——一次 grep 就推翻了我自己三分钟前写的话，
+        记在这里免得下一个人以为代码里缺断言。）
+
+      - **#5 Hotkeys 配置变更后重注册 / M 切 Muted**：热键部分由**票 64** 覆盖（`HotkeyTaken` 五态与
+        `Problems()` 已验），**配置变更热重载那条未验** ⇒ 归票 64 后续或票 39。
+      - **#6 Multi-monitor（拖到副屏 / 持久化 / 模拟拔出回落主屏）**：**今天没有任何代理碰过**，
+        是当前这五个框里唯一"零证据"的一条 ⇒ 需要桌面独占，登记给票 68 之后的桌面批次。
+
 - note: AC#3 **FAIL**（补裁：docs/evidence/s1/07-adversarial-acceptance.md §"Addendum 裁决（2026-09-20，AC
       补裁）" AC#3 行）— `tokens_test.go:239 TestHitTestAndDPIInjection` 只覆盖"透明区点击穿透"里
       纯函数 `HitTest()` 的几何分区那半个分句；另三分句零证据：真实点击→EvSummon→Listening 无测试
