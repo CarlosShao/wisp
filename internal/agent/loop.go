@@ -158,6 +158,15 @@ type Options struct {
 	Control ControlHandler
 	// Registry spawns tool-execution goroutines (nil = observe.Default).
 	Registry *observe.Registry
+	// AdmitTask registers a task with the host's approval layer the moment the
+	// loop knows its own task id, and returns the revocation the loop runs
+	// when the task ends. D47 says only a task the TEXT loop registered may
+	// reach a gate at all, and the task id is minted inside run(), so this is
+	// the one place the registration can honestly happen (cmd/wisp passes
+	// approval.Gate.AdmitTextTask here). Nil means the host has no approval
+	// layer, which is also what keeps decideRisk refusing declared L1/L2
+	// calls: an ungated host must never execute a write.
+	AdmitTask func(taskID string) (revoke func())
 	// Logger receives loop diagnostics (nil = slog.Default).
 	Logger *slog.Logger
 	Config
@@ -345,6 +354,16 @@ func (l *Loop) run(ctx context.Context, taskID, input string) Result {
 	defer l.setCurrent(nil)
 
 	j := newTaskJournal(l.opt.Journal, taskID, taskID) // C18: correlation == task id
+	// D47: register the task with the host's approval layer before any tool
+	// call can reach a gate. The revocation runs when the task ends, so an
+	// admitted id cannot outlive the task that earned it.
+	revokeAdmission := func() {}
+	if l.opt.AdmitTask != nil {
+		if r := l.opt.AdmitTask(taskID); r != nil {
+			revokeAdmission = r
+		}
+	}
+	defer revokeAdmission()
 	guard := NewGuard(l.guard)
 	cost := Cost{Currency: l.opt.Config.Currency}
 	res := Result{TaskID: taskID, Status: StatusCompleted}
@@ -593,11 +612,16 @@ func (l *Loop) executeCalls(ctx context.Context, root *observe.Root, j *taskJour
 		case c.Name == ToolListName && !listToolsDeclared:
 			p.local = true // D15(2) fallback answered in-loop (L0, D34 table)
 		default:
-			if ok, why := l.decideRisk(ctx, j, p.rowID, info); !ok {
+			ok, _, why := l.decideRisk(ctx, j, p.rowID, info)
+			if !ok {
 				p.skip, p.outcome, p.class, p.reason = true, OutcomeError,
 					string(observe.ClassPermissionDenied), why
 				p.reject()
 			}
+			// When ok came back for a declared L1/L2 call the loop booked no
+			// decision: this row keeps decision='' (pending in the frozen
+			// vocabulary) because the gate owns that column, and the host
+			// bridge writes the authoritative row with the ASSESSED level.
 		}
 		plans[i] = p
 	}
@@ -716,24 +740,40 @@ func (l *Loop) dispatch(ctx context.Context, j *taskJournal, rowID int64,
 	return out, err
 }
 
-// decideRisk resolves the pre-gate risk policy for one call and books the
-// decision column. Ticket 21 replaces this with the C19 assessment plus the
-// L0/L1/L2 routing; until then a declared level above L0 cannot be gated, so
-// it is refused, and an unclassified call is either passed through as L0
-// (flag on) or refused (flag off).
-func (l *Loop) decideRisk(ctx context.Context, j *taskJournal, rowID int64, info ToolInfo) (bool, string) {
+// decideRisk resolves what the LOOP may decide on its own, and books the
+// decision column. It is not the risk verdict: ToolInfo.RiskLevel carries the
+// tool's DECLARED level, i.e. the R1 lower bound only, and C19 owns the
+// conclusion. Two shapes follow from that:
+//
+//   - a declared L1/L2 call is passed through UNLESS the host registered its
+//     tasks with an approval layer (Options.AdmitTask). Where a bridge and a
+//     gate are wired, the routing below the loop does the asking, and the loop
+//     books no decision, so it never writes "allow" over a call the user is
+//     about to veto (ticket 12's assembly, ruling A13). Where none is wired the
+//     old refusal stands: an unapproved write must not run just because a host
+//     forgot its gate.
+//   - an unclassified call still obeys PassThroughUnclassifiedRisk, which is a
+//     host-level policy switch, not a verdict.
+//
+// The second result reports "booked nothing" (gate-owned routing) so the caller
+// can drop its own pending row instead of leaving one open forever.
+
+func (l *Loop) decideRisk(ctx context.Context, j *taskJournal, rowID int64, info ToolInfo) (ok, unbooked bool, why string) {
 	risk := info.RiskLevel
 	switch risk {
 	case RiskL1, RiskL2:
-		j.decide(ctx, rowID, DecisionReject)
-		return false, "该操作属于 " + risk + " 级，审批通道尚未接入（ticket 21），已拒绝执行"
+		if l.opt.AdmitTask == nil {
+			j.decide(ctx, rowID, DecisionReject)
+			return false, false, "该操作属于 " + risk + " 级，审批通道尚未接入（ticket 21），已拒绝执行"
+		}
+		return true, true, ""
 	default:
 		if !l.opt.Config.PassThroughUnclassifiedRisk {
 			j.decide(ctx, rowID, DecisionReject)
-			return false, "风险未分级且直通开关关闭，已拒绝执行"
+			return false, false, "风险未分级且直通开关关闭，已拒绝执行"
 		}
 		j.decide(ctx, rowID, DecisionAllow)
-		return true, ""
+		return true, false, ""
 	}
 }
 
