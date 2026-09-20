@@ -1,6 +1,6 @@
 # 02 — S0②③④⑤: spike measurements, X/Y topology verdict, SLO backfill (DONE ✅)
 
-**Status:** ready-for-agent
+**Status:** done
 **Claimed by:** —
 **Last update:** 2026-09-19T09:31:25Z
 **Blocked by:** 01-build-chain
