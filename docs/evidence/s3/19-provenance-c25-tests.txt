@@ -1,0 +1,19 @@
+ticket 19 — C25 provenance/taint engine evidence (2026-09-20, win32 self-hosted, dev branch)
+
+$ go test ./internal/risk/ -count=2
+ok  	github.com/CarlosShao/wisp/internal/risk	3.770s
+
+$ go test -race ./internal/risk/ -count=1
+ok  	github.com/CarlosShao/wisp/internal/risk	1.496s
+
+$ go test ./internal/risk/ -run TestSyncDetectionOnThisMachine -v   (P12 self-hosted OneDrive evidence)
+    syncdirs_test.go:133: P12 evidence: detected OneDrive root via default: C:\Users\swq\OneDrive
+    syncdirs_test.go:151: P12 evidence: OneDrive at C:\Users\swq\OneDrive flagged as sync channel
+--- PASS: TestSyncDetectionOnThisMachine (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.038s
+
+$ go run . (tools/d22scan)
+d22scan: clean - no D22 ban violations, no emoji in design/ or frontend/
+
+machine state probed: C:\Users\swq\OneDrive exists (dir); HKCU\Software\Microsoft\OneDrive\Accounts has LastUpdate value only (no account UserFolder on this host) -> root confirmed via default-location probe, not path-string guess

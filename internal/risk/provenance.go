@@ -43,6 +43,14 @@ import (
 // conservative shape-based verdict; loop code that knows the tool name should
 // prefer Inspect()/CheckText() directly (wiring lands with tickets 20/21/22/26).
 //
+// DEFERRED(C25-loop-wiring): the agent loop / tool providers (tickets 10, 20,
+// 21, 22, 26) must (1) OpenScope at task start and Defer(CloseScope) on the
+// task's DisposalScope, (2) call Mark(...) on every SPEC-06 §5 sensitive
+// source output, (3) gate outgoing calls with Inspect(scope, tool, params)
+// (or CheckText for the TTS/HTTP-body channels), and (4) record the R4 source
+// name in the tool_call forensics row via the existing DAO — Hit.Fragment
+// itself must NEVER be persisted (it is sensitive content; native card only).
+//
 // Deliberate limits (accepted residual risks, recorded in docs/PRECHECK.md):
 //   - LLM paraphrase/translation of tainted content evades fragment matching
 //     (16.9#1 rejected exact taint tracking; D30 layers 2/3/5 back-stop).

@@ -1,4 +1,4 @@
-# PRECHECK — 前置验证任务结论（P1 / P2 / P11 / P13 回填）
+# PRECHECK — 前置验证任务结论（P1 / P2 / P11 / P12 / P13 回填）
 
 > 状态：S0 ticket 02 完成（2026-09-19）。三行结论对应 `docs/PLAN.md` §16.6 前置验证表；
 > 实测细节与 JSON 证据见 `docs/SLO.md` 与 `docs/evidence/s0/02-spike-report.md`。
@@ -117,3 +117,31 @@ C27 单窗口复用（隐藏而非销毁）维持为强制设计。**
   sha256 由本票从官方源下载后本地计算并入库签名。punc 归档哈希与 GitHub 官方
   `checksum.txt` 互证一致（c0d5aa5f…），KWS/VAD/paraformer/vocos/matcha
   model-steps-3 与 S0 spike 报告记录互证一致。
+
+## P12 — 同步盘目录的可靠识别方式（票 19 回填，2026-09-20）
+
+**结论：四路探测（注册表 → 客户端配置文件 → 已知默认位置 → fixture/注入）
++「识别不到即从严」兜底。零命中时 `[fs] allowed_dirs` 中位于用户 profile 下的
+目录一律视为 sync-suspect（安全默认，票 19 Key constraints）；写入目标无法经
+C26 解析（含空路径、穿越未豁免 junction）同样 fail-closed 记为 sync-suspect。**
+
+- 落点：`internal/risk/syncdirs.go`（探测编排 + suspect 兜底）、
+  `syncdirs_windows.go`（HKCU 注册表：OneDrive `Accounts\<Personal|Business#>\UserFolder`
+  双 WOW64 视图枚举；Dropbox `Software\Dropbox\Dropbox:Path`）、
+  `syncdirs_other.go`（非 Windows 桩：macOS 云盘探测 DEFERRED(票 55)，
+  期间 portable 探测照常跑，零命中即落 suspect 兜底，不留敞开通道）。
+- 路径匹配一律经 **C26 Resolve** 规范化后再做前缀比较（junction/8.3/UNC 拼写
+  塌缩到同一根），不是路径字符串匹配——这正是 P12 判「只靠字符串不够」的点。
+- 真机自证（本机有 OneDrive）：`go test ./internal/risk/ -run TestSyncDetectionOnThisMachine -v`
+  → 检出 `C:\Users\swq\OneDrive`（source=default，目录存在即确认根），并断言其内
+  `fs.write` 判为同步通道；fixture 兜底由 `TestSyncFixtureFallbackAndMatch` /
+  `TestSyncDropboxHostDBConfig`（搬家后的 Dropbox root 从 host.db 解出）覆盖，
+  全绿见 docs/evidence/s3/19-provenance-c25-tests.txt。
+- 残余（已知、可接受）：坚果云同步根位置无稳定公开契约（其客户端配置为版本相关
+  的内部格式）→ 依赖「已知默认位置存在探测 + suspect 兜底」覆盖；Google Drive
+  新版 preference 的 root 字段加密，同上。识别不准的后果被兜底方向吃掉
+  （宁可多判一次 L2），与 D30①/16.9#1 的误报安全方向一致。
+- fs.write 通道的 R4 语义（SPEC-06 §5 原文）：授权目录**位于**同步根内 → 该目录
+  内写入一律按外泄通道对待（内容含污染片段即升 L2）；非同步目录的内容不按 R4 扫描
+  （本地写入仍走 R1/R8 的 L1/L2 判定），由 `Provenance.Inspect("fs.write", …)` 实现。
+
