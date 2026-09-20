@@ -1,0 +1,77 @@
+########## Sleeping
+balldebug: start handles=125
+balldebug: hotkeys live=4/4 summon=Ctrl+Alt+Q live
+  mute=Ctrl+Alt+M live
+  cancel=Esc live
+  panel=Ctrl+Alt+P live
+balldebug: ball up handles=380
+balldebug: state=Sleeping handles=380 timers=false
+balldebug: closed handles=381
+balldebug: OK
+exit=0
+########## Listening
+balldebug: start handles=127
+balldebug: hotkeys live=4/4 summon=Ctrl+Alt+Q live
+  mute=Ctrl+Alt+M live
+  cancel=Esc live
+  panel=Ctrl+Alt+P live
+balldebug: ball up handles=378
+balldebug: state=Listening handles=380 timers=true
+balldebug: closed handles=389
+balldebug: OK
+exit=0
+########## Thinking
+balldebug: start handles=125
+balldebug: hotkeys live=4/4 summon=Ctrl+Alt+Q live
+  mute=Ctrl+Alt+M live
+  cancel=Esc live
+  panel=Ctrl+Alt+P live
+balldebug: ball up handles=380
+balldebug: state=Thinking handles=380 timers=true
+balldebug: closed handles=389
+balldebug: OK
+exit=0
+########## Acting
+balldebug: start handles=125
+balldebug: hotkeys live=4/4 summon=Ctrl+Alt+Q live
+  mute=Ctrl+Alt+M live
+  cancel=Esc live
+  panel=Ctrl+Alt+P live
+balldebug: ball up handles=380
+balldebug: state=Acting handles=380 timers=true
+balldebug: closed handles=389
+balldebug: OK
+exit=0
+########## Speaking
+balldebug: start handles=125
+balldebug: hotkeys live=4/4 summon=Ctrl+Alt+Q live
+  mute=Ctrl+Alt+M live
+  cancel=Esc live
+  panel=Ctrl+Alt+P live
+balldebug: ball up handles=378
+balldebug: state=Speaking handles=378 timers=true
+balldebug: closed handles=389
+balldebug: OK
+exit=0
+########## Warm
+balldebug: start handles=125
+balldebug: hotkeys live=4/4 summon=Ctrl+Alt+Q live
+  mute=Ctrl+Alt+M live
+  cancel=Esc live
+  panel=Ctrl+Alt+P live
+balldebug: ball up handles=378
+balldebug: state=Warm handles=378 timers=true
+balldebug: closed handles=389
+balldebug: OK
+exit=0
+########## Settling
+balldebug: start handles=119
+balldebug: hotkeys live=4/4 summon=Ctrl+Alt+Q live
+  mute=Ctrl+Alt+M live
+  cancel=Esc live
+  panel=Ctrl+Alt+P live
+balldebug: ball up handles=382
+balldebug: state=Settling handles=382 timers=true
+balldebug: closed handles=393
+balldebug: OK
+exit=0

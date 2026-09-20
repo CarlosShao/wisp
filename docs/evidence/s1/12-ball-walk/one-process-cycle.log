@@ -1,0 +1,48 @@
+balldebug: start handles=119
+balldebug: hotkeys live=4/4 summon=Ctrl+Alt+Q live
+  mute=Ctrl+Alt+M live
+  cancel=Esc live
+  panel=Ctrl+Alt+P live
+balldebug: ball up handles=380
+balldebug: state=FirstRun handles=380
+go-shot: 00-FirstRun.png (72x72 at 3344,1296)
+balldebug: state=Sleeping handles=381
+go-shot: 01-Sleeping.png (72x72 at 3344,1296)
+balldebug: state=Armed handles=381
+go-shot: 02-Armed.png (72x72 at 3344,1296)
+balldebug: state=Muted handles=399
+go-shot: 03-Muted.png (72x72 at 3344,1296)
+balldebug: state=Listening handles=399
+go-shot: 04-Listening.png (72x72 at 3344,1296)
+balldebug: state=Thinking handles=409
+go-shot: 05-Thinking.png (72x72 at 3344,1296)
+balldebug: state=Acting handles=409
+go-shot: 06-Acting.png (72x72 at 3344,1296)
+balldebug: state=Confirming handles=417
+go-shot: 07-Confirming.png (72x72 at 3344,1296)
+balldebug: state=AwaitingApproval handles=417
+go-shot: 08-AwaitingApproval.png (72x72 at 3344,1296)
+balldebug: state=Speaking handles=417
+go-shot: 09-Speaking.png (72x72 at 3344,1296)
+balldebug: state=Settling handles=419
+go-shot: 10-Settling.png (72x72 at 3344,1296)
+balldebug: state=Warm handles=419
+go-shot: 11-Warm.png (72x72 at 3344,1296)
+balldebug: state=Conversation handles=421
+go-shot: 12-Conversation.png (72x72 at 3344,1296)
+balldebug: state=Downloading handles=421
+go-shot: 13-Downloading.png (72x72 at 3344,1296)
+balldebug: state=Error handles=421
+go-shot: 14-Error.png (72x72 at 3344,1296)
+balldebug: state=NoNetwork handles=429
+go-shot: 15-NoNetwork.png (72x72 at 3344,1296)
+balldebug: state=Unconfigured handles=429
+go-shot: 16-Unconfigured.png (72x72 at 3344,1296)
+balldebug: state=WatchdogAlert handles=439
+go-shot: 17-WatchdogAlert.png (72x72 at 3344,1296)
+balldebug: state=Queued handles=439
+go-shot: 18-Queued.png (72x72 at 3344,1296)
+balldebug: state=Stuck handles=439
+go-shot: 19-Stuck.png (72x72 at 3344,1296)
+balldebug: closed handles=439
+balldebug: OK

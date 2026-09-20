@@ -1,0 +1,9 @@
+diff: place=(1720,720) margin=120px cpu-sample=5s cores=12 amp=6x out=docs/evidence/s1/12-ball-walk
+diff: Sleeping         cpu1c= 0.000% cpuAll= 0.000% privWS= 11.79MB commit=110.84MB ws= 42.41MB handles= 358 gdi=4 user=7 timers=no    px>=3:2167/px>=8:2103/px>=24:1409 of 97344 max=194 mean=1.246 box=(133,133 46x46) clean
+diff: Listening        cpu1c= 0.034% cpuAll= 0.003% privWS= 15.05MB commit=113.80MB ws= 45.92MB handles= 376 gdi=4 user=8 timers=yes   px>=3:4919/px>=8:4853/px>=24:4524 of 97344 max=204 mean=4.932 box=(120,120 72x72) clean
+diff: Thinking         cpu1c= 0.016% cpuAll= 0.001% privWS= 14.42MB commit=114.15MB ws= 45.31MB handles= 372 gdi=4 user=7 timers=yes   px>=3:4861/px>=8:4844/px>=24:4522 of 97344 max=194 mean=4.235 box=(120,120 72x72) clean
+diff: Acting           cpu1c= 0.003% cpuAll= 0.000% privWS= 12.54MB commit=111.32MB ws= 43.43MB handles= 366 gdi=4 user=7 timers=yes   px>=3:4861/px>=8:4844/px>=24:4523 of 97344 max=197 mean=4.231 box=(120,120 72x72) clean
+diff: Speaking         cpu1c= 0.006% cpuAll= 0.001% privWS= 13.11MB commit=111.29MB ws= 44.03MB handles= 374 gdi=4 user=8 timers=yes   px>=3:4861/px>=8:4851/px>=24:4539 of 97344 max=215 mean=3.820 box=(120,120 72x72) clean
+diff: Warm             cpu1c= 0.012% cpuAll= 0.001% privWS= 13.54MB commit=112.28MB ws= 44.46MB handles= 372 gdi=4 user=7 timers=yes   px>=3:4852/px>=8:4625/px>=24:3065 of 97344 max=110 mean=2.139 box=(120,122 71x69) clean
+diff: Settling         cpu1c= 0.000% cpuAll= 0.000% privWS= 12.48MB commit=110.15MB ws= 43.39MB handles= 366 gdi=4 user=7 timers=yes   px>=3:4853/px>=8:4692/px>=24:2832 of 97344 max=69 mean=1.645 box=(123,123 66x66) clean
+diff: table -> docs\evidence\s1\12-ball-walk\diff-table.txt
