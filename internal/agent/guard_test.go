@@ -70,11 +70,12 @@ func TestLoopGuardLadderRemindersThenStuck(t *testing.T) {
 			t.Errorf("stuck message must contain %q; got event=%q result=%q", needle, st.Text, res.Message)
 		}
 	}
-	if len(h.sink.events) == 0 {
+	recorded := h.sink.Events()
+	if len(recorded) == 0 {
 		t.Fatal("sink recorded nothing")
 	}
 	reminders := 0
-	for _, e := range h.sink.events {
+	for _, e := range recorded {
 		if e.Kind == EvReminder {
 			reminders++
 			if e.RepeatLevel == 0 || e.ToolName != "echo" {

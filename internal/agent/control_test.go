@@ -3,6 +3,7 @@ package agent
 import (
 	"context"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 )
@@ -157,5 +158,35 @@ func TestSteeringDisabled(t *testing.T) {
 	h := newHarness(t, "text-reply", withConfig(func(c *Config) { c.SteeringEnabled = false }))
 	if h.loop.Steer("插一句") {
 		t.Error("Steer must report false when agent.steering_enabled is off")
+	}
+}
+
+// MINOR-9: RecordSink documented itself as single-goroutine-only, but the loop
+// really does have two publishers into one sink - an async task's own goroutine
+// and a control word handled on the caller's goroutine (this file's
+// TestDefaultControlCancelsRunningTask is exactly that shape). An unsynchronised
+// append there is a data race that -race only surfaces when the interleaving
+// happens to land, so this is the deterministic version: publisher goroutines
+// are owned by this test and joined by wg.Wait before it reads anything.
+func TestRecordSinkToleratesConcurrentPublishers(t *testing.T) {
+	const publishers, each = 8, 500
+	s := &RecordSink{}
+	var wg sync.WaitGroup
+	for p := 0; p < publishers; p++ {
+		wg.Add(1)
+		go func(kind EventKind) {
+			defer wg.Done()
+			for i := 0; i < each; i++ {
+				s.Publish(Event{Kind: kind, TaskID: "t", Text: "x"})
+			}
+		}(EvTextDelta)
+	}
+	wg.Wait()
+	if got := s.Of(EvTextDelta); got != publishers*each {
+		t.Errorf("recorded %d events, want %d: appends were lost under contention",
+			got, publishers*each)
+	}
+	if got := len(s.Events()); got != publishers*each {
+		t.Errorf("Events() = %d, want %d", got, publishers*each)
 	}
 }

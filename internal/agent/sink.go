@@ -1,6 +1,8 @@
 package agent
 
 import (
+	"sync"
+
 	"github.com/CarlosShao/wisp/internal/llm"
 	"github.com/CarlosShao/wisp/internal/observe"
 )
@@ -68,26 +70,39 @@ type NopSink struct{}
 // Publish implements Sink.
 func (NopSink) Publish(Event) {}
 
-// collector is the test/host helper that records events in order.
-type collector struct {
+// RecordSink is an in-memory Sink that records events in order.
+//
+// It is safe for concurrent publishers, which the loop can genuinely produce:
+// one task's goroutine and a second (control-word) task running on the caller's
+// goroutine both publish to the sink the harness shares, so an unsynchronised
+// append here is a data race under -race, not merely a theoretical one.
+type RecordSink struct {
+	mu     sync.Mutex
 	events []Event
 }
 
-// RecordSink is an in-memory Sink; safe for the single task goroutine that
-// publishes to it (tests use it directly).
-type RecordSink struct{ collector }
-
 // Publish implements Sink.
-func (s *RecordSink) Publish(e Event) { s.events = append(s.events, e) }
+func (s *RecordSink) Publish(e Event) {
+	s.mu.Lock()
+	s.events = append(s.events, e)
+	s.mu.Unlock()
+}
 
-// Events returns the recorded events.
-func (s *RecordSink) Events() []Event { return s.events }
+// Events returns a snapshot copy of the recorded events.
+func (s *RecordSink) Events() []Event {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	out := make([]Event, len(s.events))
+	copy(out, s.events)
+	return out
+}
 
 // LastOf returns the last event of a kind, or nil.
 func (s *RecordSink) LastOf(k EventKind) *Event {
-	for i := len(s.events) - 1; i >= 0; i-- {
-		if s.events[i].Kind == k {
-			return &s.events[i]
+	evs := s.Events()
+	for i := len(evs) - 1; i >= 0; i-- {
+		if evs[i].Kind == k {
+			return &evs[i]
 		}
 	}
 	return nil
@@ -96,7 +111,7 @@ func (s *RecordSink) LastOf(k EventKind) *Event {
 // Of counts events of a kind.
 func (s *RecordSink) Of(k EventKind) int {
 	n := 0
-	for _, e := range s.events {
+	for _, e := range s.Events() {
 		if e.Kind == k {
 			n++
 		}
