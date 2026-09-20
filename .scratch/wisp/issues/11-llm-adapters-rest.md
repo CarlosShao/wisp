@@ -1,8 +1,8 @@
 # 11 — LLM adapters: Anthropic Messages + OpenAI Responses + fallback chain
 
-**Status:** ready-for-agent
-**Claimed by:** —
-**Last update:** 2026-09-19
+**Status:** in-progress
+**Claimed by:** agent-ticket11-adapters
+**Last update:** 2026-09-20T05:05Z
 **Blocked by:** 09-llm-provider-openai-mockllm
 **Parallel slots:** ≤2 sub-agents (A: Anthropic adapter + prompt caching; B: Responses adapter +
 fallback semantics)
@@ -56,3 +56,5 @@ switching and the complete user-visible failure-semantics table (§14.2) enforce
 - [ ] Token bucket: rpm=10 fixture → 11th request within 60s waits locally (no 429 from server).
 
 ## Progress log (append-only, newest last)
+- [2026-09-20T05:05Z] agent=agent-ticket11-adapters did=claimed next=harness-parameterization+anthropic-adapter
+- [2026-09-20T07:10Z] agent=agent-ticket11-adapters did=AC#1+AC#3 GREEN: one shared harness (internal/llm/adaptertest/harness.go CaseTable+Run, 13 scenarios x 3 adapters) - openai-chat's golden assertions MOVED into it (openaichat/harness_golden_test.go), anthropic + openai-responses adapters implemented and run through the same table; cross-adapter proof TestC6EventsIdenticalAcrossAdapters (canonical trace) + TestFaultClassIsAdapterIndependent (one injected body, three protocols, one D37 class). 26 dialect fixtures added under internal/llm/testdata/golden (chat fixtures untouched); mockllm /v1/messages + /v1/responses upgraded to real dialect fidelity (flat tools, thinking/reasoning items, terminal status) + /__control/last_request body capture (recorded before the first response byte, including the fault branch). REJECTED one review instruction: 5xx -> ClassInternal would make adapters disagree on one shared classification, break retryability (observe maps only network/provider to retry) and contradict 14.2/D40#4 "Error(provider)" + ticket 09's provider-500 golden; kept the seam's ClassProvider and PINNED it with a cross-adapter test instead. next=AC#2 cache-breakpoint request-body test (mockllm last_request) then fallback chain + 14.2 matrix

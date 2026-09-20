@@ -1,0 +1,18 @@
+# wisp golden sse v1
+# @scenario [DONE] arrives without response.completed (no status)
+# @response 200
+event: response.created
+data: {"type":"response.created","response":{"id":"resp_mock1","object":"response","status":"in_progress","model":"gpt-mock"}}
+
+event: response.output_item.added
+data: {"type":"response.output_item.added","output_index":0,"item":{"id":"msg_out1","type":"message","role":"assistant","status":"in_progress","content":[]}}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"hi"}
+
+event: response.output_text.done
+data: {"type":"response.output_text.done","item_id":"msg_out1","text":"hi"}
+
+event: DONE
+data: [DONE]
+

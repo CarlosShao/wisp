@@ -1,0 +1,106 @@
+# wisp golden sse v1
+# @scenario 30 paced chunks for the cancellation case
+# @latency 40
+# @response 200
+event: response.created
+data: {"type":"response.created","response":{"id":"resp_mock1","object":"response","status":"in_progress","model":"gpt-mock"}}
+
+event: response.output_item.added
+data: {"type":"response.output_item.added","output_index":0,"item":{"id":"msg_out1","type":"message","role":"assistant","status":"in_progress","content":[]}}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word0 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word1 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word2 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word3 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word4 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word5 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word6 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word7 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word8 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word9 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word10 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word11 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word12 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word13 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word14 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word15 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word16 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word17 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word18 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word19 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word20 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word21 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word22 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word23 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word24 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word25 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word26 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word27 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word28 "}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"word29 "}
+
+event: response.completed
+data: {"type":"response.completed","response":{"id":"resp_mock1","object":"response","status":"completed","usage":{"input_tokens":6,"output_tokens":30}}}
+
+event: DONE
+data: [DONE]
+

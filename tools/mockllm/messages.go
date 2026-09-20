@@ -5,82 +5,196 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 )
 
-// POST /v1/messages - Anthropic Messages protocol, framework level (the real
-// adapter is ticket 11). Synthesis mirrors the chat endpoint: echo / vision
-// / audio / tool use, with message_start + content blocks + message_delta
-// usage semantics (cumulative output tokens).
+// POST /v1/messages - the Anthropic Messages protocol shape (ticket 11 owns
+// this endpoint's dialect fidelity: flat tool definitions, block content,
+// cache_control markers, thinking blocks). Synthesis mirrors the chat
+// endpoint with message_start + content blocks + message_delta usage
+// semantics (cumulative output tokens).
 
-func (s *Server) handleMessages(w http.ResponseWriter, r *http.Request) {
-	if f, ok := s.takeFault(); ok {
-		serveFault(w, f, "messages")
-		return
+// msgTool is an Anthropic tool declaration: flat name/input_schema (NOT the
+// chat {function:{name}} nesting).
+type msgTool struct {
+	Name        string          `json:"name"`
+	Description string          `json:"description"`
+	InputSchema json.RawMessage `json:"input_schema"`
+}
+
+// msgBlock is one Anthropic content block.
+type msgBlock struct {
+	Type      string          `json:"type"`
+	Text      string          `json:"text"`
+	CacheCtl  json.RawMessage `json:"cache_control"`
+	ID        string          `json:"id"`
+	Name      string          `json:"name"`
+	Input     json.RawMessage `json:"input"`
+	ToolUseID string          `json:"tool_use_id"`
+	Content   json.RawMessage `json:"content"`
+	IsError   bool            `json:"is_error"`
+	Source    struct {
+		Type      string `json:"type"`
+		MediaType string `json:"media_type"`
+		Data      string `json:"data"`
+	} `json:"source"`
+}
+
+type msgMessage struct {
+	Role    string     `json:"role"`
+	Content []msgBlock `json:"content"`
+	Raw     json.RawMessage
+}
+
+// Unmarshal accepts both the string and the block-array content forms.
+func (m *msgMessage) UnmarshalJSON(b []byte) error {
+	type alias struct {
+		Role    string          `json:"role"`
+		Content json.RawMessage `json:"content"`
 	}
-	body, err := io.ReadAll(io.LimitReader(r.Body, 8<<20))
-	if err != nil {
-		writeJSONError(w, http.StatusBadRequest, "read body: "+err.Error())
-		return
+	var a alias
+	if err := json.Unmarshal(b, &a); err != nil {
+		return err
 	}
-	var req struct {
-		Model      string          `json:"model"`
-		System     json.RawMessage `json:"system"`
-		Messages   []chatMessage   `json:"messages"`
-		Tools      []chatTool      `json:"tools"`
-		ToolChoice json.RawMessage `json:"tool_choice"`
-		MaxTokens  int             `json:"max_tokens"`
-		Stream     bool            `json:"stream"`
+	m.Role, m.Raw = a.Role, a.Content
+	var s string
+	if err := json.Unmarshal(a.Content, &s); err == nil {
+		m.Content = []msgBlock{{Type: "text", Text: s}}
+		return nil
 	}
-	if err := json.Unmarshal(body, &req); err != nil {
-		writeJSONError(w, http.StatusBadRequest, "messages body is not valid JSON: "+err.Error())
-		return
+	return json.Unmarshal(a.Content, &m.Content)
+}
+
+// msgPlan is the deterministic answer derived from a Messages request.
+type msgPlan struct {
+	answer   string
+	reason   string
+	toolName string
+	toolArgs string
+}
+
+func planMessagesFrom(messages []msgMessage, tools []msgTool, choice json.RawMessage) msgPlan {
+	var p msgPlan
+	text, image := "", false
+	for _, m := range messages {
+		if m.Role != "user" {
+			continue
+		}
+		text, image = "", false
+		for _, b := range m.Content {
+			switch b.Type {
+			case "text":
+				text += b.Text
+			case "image":
+				image = true
+			case "tool_result":
+				var inner []msgBlock
+				if err := json.Unmarshal(b.Content, &inner); err == nil {
+					for _, ib := range inner {
+						text += ib.Text
+					}
+				}
+			}
+		}
+	}
+	switch {
+	case image:
+		p.answer = "vision-ok"
+	default:
+		p.answer = "echo: " + text
+		if len(p.answer) > 400 {
+			p.answer = p.answer[:400]
+		}
+	}
+	if strings.Contains(text, "[think]") {
+		p.reason = "thinking about: " + text
+		if len(p.reason) > 200 {
+			p.reason = p.reason[:200]
+		}
 	}
 
-	if name := goldenName(req.Model, r.Header.Get("X-Wisp-Golden")); name != "" {
-		s.serveGoldenGeneric(w, name, "messages")
-		return
-	}
-
-	answer := "echo: " + lastUserText(req.Messages)
-	if len(answer) > 400 {
-		answer = answer[:400]
-	}
-	toolName, toolArgs := "", ""
-	if len(req.Tools) > 0 && len(req.ToolChoice) > 0 {
-		var tc string
-		if json.Unmarshal(req.ToolChoice, &tc) == nil && (tc == "any" || tc == "required") {
-			toolName = req.Tools[0].Function.Name
+	// Forced tool selection (tool_choice any | tool) with tools declared.
+	if len(tools) > 0 && len(choice) > 0 {
+		var bare string
+		if json.Unmarshal(choice, &bare) == nil && (bare == "any" || bare == "required") {
+			p.toolName = tools[0].Name
 		}
 		var obj struct {
 			Type string `json:"type"`
 			Name string `json:"name"`
 		}
-		if json.Unmarshal(req.ToolChoice, &obj) == nil && obj.Type == "tool" {
-			toolName = obj.Name
+		if json.Unmarshal(choice, &obj) == nil && obj.Type == "tool" {
+			p.toolName = obj.Name
 		}
-		if toolName != "" {
-			toolArgs = fmt.Sprintf(`{"text":%s}`, mustJSONString(lastUserText(req.Messages)))
+		if p.toolName == "" &&
+			(len(choice) == 0 || strings.Contains(string(choice), `"auto"`)) {
+			// auto: answer in text (the real protocol's default too).
+		}
+		if p.toolName != "" {
+			argText := text
+			if argText == "" {
+				argText = "ping"
+			}
+			p.toolArgs = fmt.Sprintf(`{"text":%s}`, mustJSONString(argText))
 		}
 	}
-	promptTokens, completionTokens := 12, len(answer)/4+len(toolArgs)/4
-	if completionTokens == 0 {
-		completionTokens = 1
+	return p
+}
+
+func (s *Server) handleMessages(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(io.LimitReader(r.Body, 8<<20))
+	// The body is read and recorded BEFORE any response byte is produced
+	// (ticket 11): a faulted or golden-served request must not leave the
+	// previous /__control/last_request capture in place.
+	s.recordRequest("messages", body, r.Header)
+	if err != nil {
+		writeJSONError(w, http.StatusBadRequest, "read body: "+err.Error())
+		return
 	}
+	if f, ok := s.takeFault(); ok {
+		serveFault(w, f, "messages")
+		return
+	}
+	var req struct {
+		Model     string          `json:"model"`
+		System    json.RawMessage `json:"system"`
+		Messages  []msgMessage    `json:"messages"`
+		Tools     []msgTool       `json:"tools"`
+		Choice    json.RawMessage `json:"tool_choice"`
+		MaxTokens int             `json:"max_tokens"`
+		Stream    bool            `json:"stream"`
+		Thinking  json.RawMessage `json:"thinking"`
+	}
+	if err := json.Unmarshal(body, &req); err != nil {
+		writeJSONError(w, http.StatusBadRequest, "messages body is not valid JSON: "+err.Error())
+		return
+	}
+	if name := goldenName(req.Model, r.Header.Get("X-Wisp-Golden")); name != "" {
+		s.serveGoldenGeneric(w, name, "messages")
+		return
+	}
+
+	p := planMessagesFrom(req.Messages, req.Tools, req.Choice)
+	promptTokens := 12 + len(string(body))/200
+	completionTokens := len(p.answer)/4 + len(p.toolArgs)/4 + 1
 	msgID := s.reqID("msg")
 	lat, trunc, _ := s.snapshot()
 
 	if !req.Stream {
 		content := []map[string]any{}
-		if toolName != "" {
+		if p.reason != "" {
+			content = append(content, map[string]any{"type": "thinking", "thinking": p.reason})
+		}
+		if p.toolName != "" {
 			content = append(content, map[string]any{
-				"type": "tool_use", "id": "toolu_mock_1", "name": toolName,
-				"input": json.RawMessage(toolArgs),
+				"type": "tool_use", "id": "toolu_mock_1", "name": p.toolName,
+				"input": json.RawMessage(p.toolArgs),
 			})
 		} else {
-			content = append(content, map[string]any{"type": "text", "text": answer})
+			content = append(content, map[string]any{"type": "text", "text": p.answer})
 		}
 		stop := "end_turn"
-		if toolName != "" {
+		if p.toolName != "" {
 			stop = "tool_use"
 		}
 		writeJSON(w, map[string]any{
@@ -91,79 +205,78 @@ func (s *Server) handleMessages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Stream (anthropic SSE dialect); newSSEWriter writes the status header.
+	// Stream (Anthropic SSE dialect: event: + data: per frame).
 	sse := newSSEWriter(w, lat, trunc)
-	if !sse.raw("event: message_start\n") {
-		return
+	raw := func(ev string, payload any) bool {
+		// sse.event applies /__control/truncate accounting (sse.raw does not,
+		// so a raw-only writer would make the named dialects uncuttable).
+		return sse.event(ev, payload)
 	}
-	if !sse.chunk(map[string]any{
+	idx := 0
+	if !raw("message_start", map[string]any{
 		"type": "message_start",
 		"message": map[string]any{
-			"id": msgID, "type": "message", "role": "assistant",
-			"usage": map[string]int{"input_tokens": promptTokens, "output_tokens": 0},
+			"id": msgID, "type": "message", "role": "assistant", "model": req.Model,
+			"content": []any{},
+			"usage": map[string]int{"input_tokens": promptTokens,
+				"cache_read_input_tokens": 0, "output_tokens": 0},
 		},
 	}) {
 		return
 	}
-	if toolName != "" {
-		if !sse.chunk(map[string]any{
-			"type": "content_block_start", "index": 0,
-			"content_block": map[string]any{
-				"type": "tool_use", "id": "toolu_mock_1", "name": toolName, "input": map[string]any{},
-			},
-		}) {
+	if p.reason != "" {
+		if !raw("content_block_start", map[string]any{"type": "content_block_start",
+			"index": idx, "content_block": map[string]any{"type": "thinking", "thinking": ""}}) {
 			return
 		}
-		if !sse.chunk(map[string]any{
-			"type": "content_block_delta", "index": 0,
-			"delta": map[string]any{"type": "input_json_delta", "partial_json": toolArgs},
-		}) {
+		if !raw("content_block_delta", map[string]any{"type": "content_block_delta",
+			"index": idx, "delta": map[string]any{"type": "thinking_delta", "thinking": p.reason}}) {
 			return
 		}
-		if !sse.chunk(map[string]any{"type": "content_block_stop", "index": 0}) {
+		if !raw("content_block_stop", map[string]any{"type": "content_block_stop", "index": idx}) {
 			return
 		}
-	} else {
-		if !sse.chunk(map[string]any{
-			"type": "content_block_start", "index": 0,
-			"content_block": map[string]any{"type": "text", "text": ""},
-		}) {
+		idx++
+	}
+	stop := "end_turn"
+	switch {
+	case p.toolName != "":
+		stop = "tool_use"
+		if !raw("content_block_start", map[string]any{"type": "content_block_start",
+			"index": idx, "content_block": map[string]any{
+				"type": "tool_use", "id": "toolu_mock_1", "name": p.toolName,
+				"input": map[string]any{}}}) {
 			return
 		}
-		for _, piece := range splitChunks(answer, 16) {
-			if !sse.chunk(map[string]any{
-				"type": "content_block_delta", "index": 0,
-				"delta": map[string]any{"type": "text_delta", "text": piece},
-			}) {
+		if !raw("content_block_delta", map[string]any{"type": "content_block_delta",
+			"index": idx, "delta": map[string]any{"type": "input_json_delta",
+				"partial_json": p.toolArgs}}) {
+			return
+		}
+		if !raw("content_block_stop", map[string]any{"type": "content_block_stop", "index": idx}) {
+			return
+		}
+	default:
+		if !raw("content_block_start", map[string]any{"type": "content_block_start",
+			"index": idx, "content_block": map[string]any{"type": "text", "text": ""}}) {
+			return
+		}
+		for _, piece := range splitChunks(p.answer, 16) {
+			if !raw("content_block_delta", map[string]any{"type": "content_block_delta",
+				"index": idx, "delta": map[string]any{"type": "text_delta", "text": piece}}) {
 				return
 			}
 		}
-		if !sse.chunk(map[string]any{"type": "content_block_stop", "index": 0}) {
+		if !raw("content_block_stop", map[string]any{"type": "content_block_stop", "index": idx}) {
 			return
 		}
 	}
-	stop := "end_turn"
-	if toolName != "" {
-		stop = "tool_use"
-	}
-	if !sse.chunk(map[string]any{
+	if !raw("message_delta", map[string]any{
 		"type":  "message_delta",
-		"delta": map[string]any{"stop_reason": stop},
-		"usage": map[string]int{"output_tokens": completionTokens}, // cumulative
+		"delta": map[string]any{"stop_reason": stop, "stop_sequence": nil},
+		"usage": map[string]int{"output_tokens": completionTokens},
 	}) {
 		return
 	}
-	if !sse.chunk(map[string]any{"type": "message_stop"}) {
-		return
-	}
-}
-
-// lastUserText returns the last user message's text (string or parts).
-func lastUserText(messages []chatMessage) string {
-	for i := len(messages) - 1; i >= 0; i-- {
-		if messages[i].Role == "user" {
-			return decodeChatContent(messages[i].Content).text
-		}
-	}
-	return ""
+	raw("message_stop", map[string]any{"type": "message_stop"})
 }

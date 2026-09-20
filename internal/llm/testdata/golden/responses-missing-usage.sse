@@ -1,0 +1,18 @@
+# wisp golden sse v1
+# @scenario completed response carrying no usage object
+# @response 200
+event: response.created
+data: {"type":"response.created","response":{"id":"resp_mock1","object":"response","status":"in_progress","model":"gpt-mock"}}
+
+event: response.output_item.added
+data: {"type":"response.output_item.added","output_index":0,"item":{"id":"msg_out1","type":"message","role":"assistant","status":"in_progress","content":[]}}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"hi"}
+
+event: response.completed
+data: {"type":"response.completed","response":{"id":"resp_mock1","status":"completed"}}
+
+event: DONE
+data: [DONE]
+

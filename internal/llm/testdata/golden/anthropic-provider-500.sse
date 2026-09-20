@@ -1,0 +1,12 @@
+# wisp golden sse v1
+# @scenario five 500s: initial + 3 retries all fail
+# @response 500
+{"error":{"message":"upstream exploded","type":"server_error","code":"internal_error"}}
+# @response 500
+{"error":{"message":"upstream exploded","type":"server_error","code":"internal_error"}}
+# @response 500
+{"error":{"message":"upstream exploded","type":"server_error","code":"internal_error"}}
+# @response 500
+{"error":{"message":"upstream exploded","type":"server_error","code":"internal_error"}}
+# @response 500
+{"error":{"message":"upstream exploded","type":"server_error","code":"internal_error"}}

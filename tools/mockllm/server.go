@@ -23,6 +23,18 @@ type Server struct {
 	perRoute map[string]uint64 // reset by /__control/reset
 
 	goldenCur map[string]int // golden name -> next response section index
+
+	// lastRequest keeps the most recent body per route (ticket 11: cache
+	// breakpoint / probe assertions read it back). Only routes that call
+	// recordRequest contribute; the chat route is untouched.
+	lastRequest map[string]recordedRequest
+}
+
+// recordedRequest is one captured request body plus the headers the assertions
+// need (auth scheme, anthropic-version).
+type recordedRequest struct {
+	Body   string
+	Header map[string][]string
 }
 
 // fault is one injected failure.
@@ -35,10 +47,11 @@ type fault struct {
 // NewServer builds the mock with the given golden directory and model list.
 func NewServer(goldenDir string, models []string) *Server {
 	return &Server{
-		goldenDir: goldenDir,
-		models:    models,
-		goldenCur: map[string]int{},
-		perRoute:  map[string]uint64{},
+		goldenDir:   goldenDir,
+		models:      models,
+		goldenCur:   map[string]int{},
+		perRoute:    map[string]uint64{},
+		lastRequest: map[string]recordedRequest{},
 	}
 }
 
@@ -53,6 +66,7 @@ func (s *Server) Register(mux *http.ServeMux) {
 	mux.HandleFunc("POST /__control/truncate", s.handleTruncate)
 	mux.HandleFunc("POST /__control/reset", s.handleReset)
 	mux.HandleFunc("GET /__control/state", s.handleState)
+	mux.HandleFunc("GET /__control/last_request", s.handleLastRequest)
 }
 
 // counted bumps the request counters around a handler.
@@ -96,10 +110,41 @@ func (s *Server) nextGolden(name string, sections []goldenResponse) (goldenRespo
 	return sections[i], true
 }
 
+// recordRequest captures the body of one request for /__control/last_request.
+//
+// Ordering contract (ticket 11 correction): EVERY read of the request body
+// must be followed by a recordRequest call in an error-safe order - record
+// BEFORE serving the first byte, including on the empty/failed-read path, so
+// an empty 200 body or a golden 599 never leaves the previous capture intact.
+// It is called at both sites: before golden replay (serveGoldenGeneric takes
+// the first byte before any fault hook can run) and before fault synthesis.
+func (s *Server) recordRequest(route string, body []byte, hdr http.Header) {
+	rec := recordedRequest{Body: string(body), Header: map[string][]string{}}
+	for k, vs := range hdr {
+		rec.Header[k] = append([]string(nil), vs...)
+	}
+	s.mu.Lock()
+	if s.lastRequest == nil {
+		s.lastRequest = map[string]recordedRequest{}
+	}
+	s.lastRequest[route] = rec
+	s.mu.Unlock()
+}
+
+// lastRequestBody returns the captured body for a route ("" when none - the
+// capture is cleared by /__control/reset).
+func (s *Server) lastRequestBody(route string) (recordedRequest, bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	rec, ok := s.lastRequest[route]
+	return rec, ok
+}
+
 // resetGolden clears golden cursors and counters (used by /__control/reset).
 func (s *Server) resetGolden() {
 	s.mu.Lock()
 	s.goldenCur = map[string]int{}
+	s.lastRequest = map[string]recordedRequest{}
 	s.totalReq = 0
 	s.perRoute = map[string]uint64{}
 	s.mu.Unlock()

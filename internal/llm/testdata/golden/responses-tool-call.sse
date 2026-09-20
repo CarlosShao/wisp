@@ -1,0 +1,42 @@
+# wisp golden sse v1
+# @scenario two fragmented tool calls + text + usage with cache reads
+# @response 200
+event: response.created
+data: {"type":"response.created","response":{"id":"resp_mock1","object":"response","status":"in_progress","model":"gpt-mock"}}
+
+event: response.output_item.added
+data: {"type":"response.output_item.added","output_index":0,"item":{"id":"msg_out1","type":"message","role":"assistant","status":"in_progress","content":[]}}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","item_id":"msg_out1","delta":"Let me check."}
+
+event: response.output_item.done
+data: {"type":"response.output_item.done","output_index":0,"item":{"id":"msg_out1","type":"message","role":"assistant","status":"completed","content":[{"type":"output_text","text":"Let me check."}]}}
+
+event: response.output_item.added
+data: {"type":"response.output_item.added","output_index":1,"item":{"id":"fc_1","type":"function_call","call_id":"call_a1","name":"get_weather","arguments":""}}
+
+event: response.function_call_arguments.delta
+data: {"type":"response.function_call_arguments.delta","item_id":"fc_1","delta":"{\"city\":\"Zh"}
+
+event: response.function_call_arguments.delta
+data: {"type":"response.function_call_arguments.delta","item_id":"fc_1","delta":"uhai\"}"}
+
+event: response.output_item.done
+data: {"type":"response.output_item.done","output_index":1,"item":{"id":"fc_1","type":"function_call","call_id":"call_a1","name":"get_weather","arguments":"{\"city\":\"Zhuhai\"}"}}
+
+event: response.output_item.added
+data: {"type":"response.output_item.added","output_index":2,"item":{"id":"fc_2","type":"function_call","call_id":"call_b2","name":"get_time","arguments":""}}
+
+event: response.function_call_arguments.delta
+data: {"type":"response.function_call_arguments.delta","item_id":"fc_2","delta":"{}"}
+
+event: response.output_item.done
+data: {"type":"response.output_item.done","output_index":2,"item":{"id":"fc_2","type":"function_call","call_id":"call_b2","name":"get_time","arguments":"{}"}}
+
+event: response.completed
+data: {"type":"response.completed","response":{"id":"resp_mock1","object":"response","status":"completed","usage":{"input_tokens":21,"output_tokens":9,"input_tokens_details":{"cached_tokens":8}}}}
+
+event: DONE
+data: [DONE]
+

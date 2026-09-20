@@ -1,0 +1,7 @@
+# wisp golden sse v1
+# @scenario mid-stream disconnect with an unclosed tool call
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+data: {"choices":[{"index":0,"delta":{"content":"before the tool call"},"finish_reason":null}]}
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_x1","type":"function","function":{"name":"get_weather","arguments":"{\"city\":"}}]},"finish_reason":null}]}
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"function":{"arguments":"Zh"}}]},"finish_reason":null}]}

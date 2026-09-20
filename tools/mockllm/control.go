@@ -85,6 +85,28 @@ func (s *Server) handleReset(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, map[string]any{"reset": true})
 }
 
+// GET /__control/last_request?route=messages|responses|chat
+// Answers the captured body of the most recent request on that route
+// (ticket 11: cache-breakpoint and probe assertions read the wire the
+// adapter actually sent). {present:false} after a reset.
+func (s *Server) handleLastRequest(w http.ResponseWriter, r *http.Request) {
+	route := r.URL.Query().Get("route")
+	if route == "" {
+		writeJSONError(w, http.StatusBadRequest, "last_request needs a ?route= parameter")
+		return
+	}
+	rec, ok := s.lastRequestBody(route)
+	if !ok {
+		writeJSON(w, map[string]any{"route": route, "present": false})
+		return
+	}
+	writeJSON(w, map[string]any{
+		"route": route, "present": true,
+		"body":   rec.Body,
+		"header": rec.Header,
+	})
+}
+
 // GET /__control/state
 func (s *Server) handleState(w http.ResponseWriter, r *http.Request) {
 	lat, trunc, queued := s.snapshot()

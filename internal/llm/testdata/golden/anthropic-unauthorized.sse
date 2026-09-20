@@ -1,0 +1,4 @@
+# wisp golden sse v1
+# @scenario 401: no retry, Unconfigured semantics
+# @response 401
+{"error":{"message":"Invalid API key","type":"authentication_error","code":"invalid_api_key"}}

@@ -1,0 +1,8 @@
+# wisp golden sse v1
+# @scenario reasoning_content deltas then text
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":"","reasoning_content":"Counting the dots."},"finish_reason":null}]}
+data: {"choices":[{"index":0,"delta":{"content":"four"},"finish_reason":null}]}
+data: {"choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+data: {"choices":[],"usage":{"prompt_tokens":12,"completion_tokens":8,"total_tokens":20}}
+data: [DONE]

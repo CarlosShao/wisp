@@ -59,6 +59,33 @@ func (s *sseWriter) chunk(v any) bool {
 	return !s.cut
 }
 
+// event writes one named SSE frame ("event: <name>\ndata: <json>\n\n") with
+// the SAME truncation/latency accounting as chunk: the named-dialect adapters
+// (anthropic Messages, OpenAI Responses) must be cuttable by
+// /__control/truncate exactly like the chat stream.
+func (s *sseWriter) event(name string, v any) bool {
+	if s.truncate > 0 {
+		if s.truncate == 1 {
+			s.cut = true // emit this last frame, then stop
+		}
+		s.truncate--
+	}
+	b, err := json.Marshal(v)
+	if err != nil {
+		return false
+	}
+	if _, err := fmt.Fprintf(s.w, "event: %s\ndata: %s\n\n", name, b); err != nil {
+		return false
+	}
+	if s.flusher != nil {
+		s.flusher.Flush()
+	}
+	if s.latency > 0 {
+		time.Sleep(s.latency)
+	}
+	return !s.cut
+}
+
 // raw writes one pre-formatted block (for event: prefixed lines).
 func (s *sseWriter) raw(block string) bool {
 	if _, err := fmt.Fprint(s.w, block); err != nil {
