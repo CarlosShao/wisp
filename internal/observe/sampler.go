@@ -132,7 +132,27 @@ type Verdict struct {
 	// an SLO pass; a red one never blocks.
 	Gate bool   `json:"gate"`
 	Note string `json:"note,omitempty"`
+	// ObserverCost true = the row was measured from inside the measured
+	// process tree, so the number contains the sampler's own cost. It stays
+	// in the report and stays compared against the frozen limit, but it is
+	// never an acceptance gate (ticket 66 ruling 2 / registry A15).
+	ObserverCost bool `json:"observer_cost,omitempty"`
 }
+
+// Measurement bases (ticket 66, registry A15). The basis says where the
+// observer sits relative to what it measures - it never changes a threshold,
+// only which number is allowed to gate.
+const (
+	// BasisOutOfTree: the reader measures another process (parent reads the
+	// subject pid). This is the D32 product-side basis for the CPU row.
+	BasisOutOfTree = "out-of-tree"
+	// BasisInTree: the reader runs inside the measured tree, so its own
+	// ReadTree burn lands in the measured CPU (docs/SLO.md appendix B.2:
+	// ~1.3ms of CPU per read, i.e. 0.52% all-core at a 250ms cadence - above
+	// the <=0.5% gate on its own). The CPU row stays in the report and is
+	// marked observer_cost; it must not gate (orchestrator ruling 2).
+	BasisInTree = "in-tree"
+)
 
 // StateReport aggregates one sampling window over one state.
 type StateReport struct {
@@ -142,6 +162,13 @@ type StateReport struct {
 	IntervalSec  float64  `json:"interval_sec"`
 	Samples      []Sample `json:"samples"`
 	SampleErrors int      `json:"sample_errors"`
+
+	// Basis is BasisOutOfTree or BasisInTree (ticket 66).
+	Basis string `json:"measurement_basis"`
+	// ObserverCost true means this whole report was produced from inside the
+	// measured process tree: the CPU row is the observer's own cost and is
+	// recorded, never gated.
+	ObserverCost bool `json:"observer_cost,omitempty"`
 
 	MemMedianBytes       int64   `json:"mem_median_bytes"` // private working set median (gate units)
 	MemMedianCommitBytes int64   `json:"mem_median_commit_bytes"`
@@ -166,9 +193,14 @@ type Sampler struct {
 	now    func() time.Time // wall clock, injectable for tests
 	trans  []Transition
 	volume int // max transitions retained (bounded)
+	// inTreeObserver true = this sampler runs inside the tree it measures, so
+	// its CPU row is recorded with observer_cost instead of gating (ticket 66).
+	inTreeObserver bool
 }
 
-// NewSampler builds a sampler over the given tree reader and registry.
+// NewSampler builds a sampler over the given tree reader and registry. The
+// default basis is out-of-tree (numbers gate). A sampler that measures the
+// process it lives in MUST call MarkObserverInsideTree.
 func NewSampler(tree TreeReader, reg *Registry) *Sampler {
 	if reg == nil {
 		reg = Default
@@ -179,6 +211,15 @@ func NewSampler(tree TreeReader, reg *Registry) *Sampler {
 		now:    time.Now,
 		volume: 1024,
 	}
+}
+
+// MarkObserverInsideTree declares that this sampler's reader measures the
+// process tree the sampler itself runs in. The CPU row of every report it
+// produces is then marked observer_cost and is not a gate (D32 thresholds are
+// untouched: what moves is where the product number is read from).
+func (s *Sampler) MarkObserverInsideTree() *Sampler {
+	s.inTreeObserver = true
+	return s
 }
 
 // MarkTransition records a state transition with a wall timestamp (D32:
@@ -211,7 +252,15 @@ func (s *Sampler) SampleState(ctx context.Context, st SLOState, interval, durati
 	if interval <= 0 {
 		interval = 500 * time.Millisecond
 	}
-	rep := &StateReport{State: st, StartedAt: WallTimestampUTC(s.now())}
+	rep := &StateReport{
+		State:        st,
+		StartedAt:    WallTimestampUTC(s.now()),
+		Basis:        BasisOutOfTree,
+		ObserverCost: s.inTreeObserver,
+	}
+	if s.inTreeObserver {
+		rep.Basis = BasisInTree
+	}
 	start := time.Now() // monotonic
 	windowStart, err := s.tree.ReadTree()
 	if err != nil {

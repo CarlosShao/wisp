@@ -132,22 +132,42 @@ func memVerdict(st SLOState, rep StateReport) Verdict {
 
 func cpuVerdict(st SLOState, rep StateReport) Verdict {
 	limit := stateCPULimit(st)
-	return Verdict{
+	v := Verdict{
 		Metric: "cpu_percent_all_core", Measured: fmt.Sprintf("%.3f%%", rep.CPUMeanPercent),
 		Limit: fmt.Sprintf("<=%.1f%%", limit),
 		Pass:  rep.CPUMeanPercent <= limit, Gate: true,
 	}
+	if rep.ObserverCost {
+		// Ticket 66 ruling 2: the LIMIT IS UNCHANGED to the digit - only the
+		// measurement location moves. A report produced from inside the
+		// measured tree carries the sampler's own ReadTree burn (docs/SLO.md
+		// appendix B.2: ~1.3ms CPU per read, i.e. 0.52% all-core at a 250ms
+		// cadence - above the <=0.5% gate before the subject does anything),
+		// so this row is recorded with observer_cost and never gates. The
+		// acceptance row for D32's CPU limit is the same metric read
+		// out-of-tree (proc.ExternalSampler: parent measures the subject pid).
+		v.Gate = false
+		v.ObserverCost = true
+		v.Note = "recorded, not a gate: sampled inside the measured tree, so this number is the observer's own ReadTree cost (SLO.md A.4#2 / registry A15); the gate is the out-of-tree row"
+	}
+	return v
 }
 
 func goroutineVerdict(st SLOState, rep StateReport) Verdict {
 	switch st {
 	case SLOSleeping:
-		return Verdict{
+		v := Verdict{
 			Metric: "goroutines", Measured: fmt.Sprint(rep.GoroutinesMax),
 			Limit: fmt.Sprintf("<=%d", goroutineLimitSleeping),
 			Pass:  rep.GoroutinesMax <= goroutineLimitSleeping, Gate: true,
 			Note: "D38b resident baseline",
 		}
+		if rep.Basis == BasisOutOfTree {
+			// Provenance, not a loosening: the same gate, the same limit, with
+			// an honest statement of where the number came from.
+			v.Note = "D38b resident baseline; goroutines are only readable in-process, so an out-of-tree row reports the measuring skeleton's own roster (same boot path, upper bound for the subject)"
+		}
+		return v
 	case SLOArmed:
 		return Verdict{
 			Metric: "goroutines", Measured: fmt.Sprint(rep.GoroutinesMax),

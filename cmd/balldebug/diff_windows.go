@@ -22,7 +22,6 @@ package main
 // a child it started is still alive.
 
 import (
-	"encoding/binary"
 	"fmt"
 	"image"
 	"image/color"
@@ -37,6 +36,8 @@ import (
 	"unsafe"
 
 	"golang.org/x/sys/windows"
+
+	"github.com/CarlosShao/wisp/internal/proc"
 )
 
 // diffOpts configures one differential evidence run.
@@ -291,53 +292,21 @@ func sample(pid uint32, h windows.Handle, since time.Duration) (procStat, error)
 // column, which is the D32 Sleeping gate basis (same source the ticket 02
 // spike used; QueryWorkingSetEx silently writes nothing on this machine).
 //
-// The scan buffer is a Go slice because the PARENT measures the CHILD: unlike
-// the spike's self-measurement, this scratch cannot inflate any number in the
-// table. SYSTEM_PROCESS_INFORMATION (x64, stable since Vista): +0x00
-// NextEntryOffset, +0x04 NumberOfThreads, +0x08 WorkingSetPrivateSize,
-// +0x50 UniqueProcessId.
+// Since ticket 66 the walk itself lives in internal/proc (SystemProcessSnapshot
+// over WalkSystemProcesses), so this parent-side reader and the tree sampler
+// share ONE decoder: A14 was precisely what a second copy of that walk got
+// wrong. The PARENT measures the CHILD here, so the snapshot's scan buffer
+// belongs to the observer and cannot inflate any number in the table.
 func privateWorkingSetFor(targetPID uint32) uint64 {
-	const (
-		systemProcessInformation = 5
-		statusInfoLengthMismatch = 0xC0000004
-		entryHeaderFloor         = 0xA8
-	)
-	ntdll := windows.NewLazySystemDLL("ntdll.dll")
-	pNtQSI := ntdll.NewProc("NtQuerySystemInformation")
-	for _, size := range []int{1 << 20, 4 << 20, 16 << 20, 64 << 20} {
-		buf := make([]byte, size)
-		var retLen uint32
-		r1, _, _ := pNtQSI.Call(systemProcessInformation, uintptr(unsafe.Pointer(&buf[0])), uintptr(size),
-			uintptr(unsafe.Pointer(&retLen)))
-		if r1 != 0 {
-			if uint32(r1) == statusInfoLengthMismatch && size < 64<<20 {
-				continue
-			}
-			return 0
-		}
-		if int(retLen) > size {
-			retLen = uint32(size)
-		}
-		result := uint64(0)
-		off := uint64(0)
-		for off+entryHeaderFloor <= uint64(retLen) {
-			next := uint64(binary.LittleEndian.Uint32(buf[off:]))
-			pid := binary.LittleEndian.Uint64(buf[off+0x50:])
-			private := int64(binary.LittleEndian.Uint64(buf[off+0x08:]))
-			if uint32(pid) == targetPID {
-				if private >= 0 {
-					result = uint64(private)
-				}
-				break
-			}
-			if next == 0 {
-				break
-			}
-			off += next
-		}
-		return result
+	snap, err := proc.SystemProcessSnapshot()
+	if err != nil {
+		return 0
 	}
-	return 0
+	s, ok := snap[targetPID]
+	if !ok || s.PrivateWorkingSet < 0 {
+		return 0
+	}
+	return uint64(s.PrivateWorkingSet)
 }
 
 // parkCursor moves the mouse away so the cursor sprite and any hover tooltip
