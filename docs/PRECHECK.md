@@ -159,6 +159,40 @@ fixture/注入）+「识别不到即从严」兜底。零「已确认」命中�
 - fs.write 通道的 R4 语义（SPEC-06 §5 原文）：授权目录**位于**同步根内 → 该目录
   内写入一律按外泄通道对待（内容含污染片段即升 L2）；非同步目录的内容不按 R4 扫描
   （本地写入仍走 R1/R8 的 L1/L2 判定），由 `Provenance.Inspect("fs.write", …)` 实现。
+- **同步门的判据是调用形状，不是参数名（复验 M-7 修复，`provenance.go`
+  `writeGate`）**：载荷豁免只在「这一次调用确实是纯本写」时成立——调用带
+  `path`/`file`/`filepath`/`dest`/`destination` 目标、该目标经 C26 确认落在所有同步根
+  之外、且同一调用内没有任何远端出口（`url`/`uri`/`endpoint`/`webhook`/… 键，或任一
+  个「整个值就是 http(s)/ftp/ws/s3/… 地址」的参数值）。任一条件不满足（无路径、路径
+  不可核实、目标是同步根、调用里有远端出口）→ 一律扫描。修复前的写法是「跳过名叫
+  `content`/`data` 的键」，于是 `{url, path:<非同步>, data:<污染>}` 静默放行而把同名
+  载荷改成 `body` 就被抓——安全检查跑不跑取决于调用方怎么给参数起名（通道 ⑥ 的
+  key-name 选中式 fail-open）。钉测：`TestWriteGateNotSelectedByPayloadKey`（被抓的
+  一半：7 种载荷名 × 具名/无名/冻结缝 × 键名改成 `endpointish` 的形状）、
+  `TestWriteGatePlainLocalWriteNotFlagged`（不误报的一半：普通新文件写入在 5 种载荷名
+  下都不升 L2，正文里只是引用链接的 markdown 也不算远端出口）。
+- 残余（N-8，**已接受、方向偏严**）：具名 `fs.write` 通道的豁免只覆盖契约正文键
+  `content`/`data`，因此 `fs.write{path:<非同步>, body:<污染>}` 仍会被扫 → 一次普通
+  本地写入是否要确认，在**这一个**通道上仍取决于键名（偏严方向，符合 16.9#1 误报安全；
+  由 `TestNamedChannelParamEscape` 与 `TestWriteGatePlainLocalWriteNotFlagged` 两侧钉
+  住）。票 20/21 接线时若把它当 bug 报，请对照本节：契约外的键在契约里没有定义，
+  一律扫是 B-2 的既定口径。
+- 残余（复验 R2，**已硬化为不变式**）：`..` 组件在词汇清洗时被折掉，被折掉的段恰好是
+  reparse 审计要看的那些 → 分类器看不见长在尾巴里的 junction。原安全性来自 Windows
+  在打开文件前对 `.`/`..` 的前置归一（落点探针实测与 `filepath.Clean` 逐字一致），不是
+  本仓代码里的一句检查；现在 `syncdirs.go` 对「原串里出现 `..` 组件」的写入目标直接落
+  sync-suspect（`TestSyncDotDotTailFailsClosed`），普通 fs.write 目标不带 `..`，误报面
+  近零。
+- 残余（复验 R2，**接受**）：同步判定与真正 `CreateFile` 写盘不是同一原子操作，故
+  「判定之后再建 junction/symlink」的 TOCTOU 在窗口内成立。吃掉它需要在 `Inspect` 与
+  写盘之间赢得竞态，即攻击者已是本机进程；而能建 junction 的本机进程本就能直接往同步
+  根写字节，闸门于它无意义。C25 的门禁对象是**模型自选的拼写**，那条路两步（先
+  `mklink /J` 再 `fs.write`）在写盘前重新判定即翻成 deny（复验 §R2 实测）。
+- 残余（复验 R7 C-2，**接受**）：撤销 profile 全网状兜底所需的「已确认」证据里，
+  `env` 级（`%OneDrive%` 等客户端自己发布的环境变量）可被**同一用户的进程**伪造；
+  信任边界即「同用户 = 同信任域」，与 D30 的威胁模型一致。注册表 HKCU 与客户端配置文件
+  同级（用户态可写）。真要收到「抗同用户进程」，需要机器级（HKLM/签名客户端）证据源，
+  本票不做。
 
 ## C25 片段索引的 D32 内存/时延预算（票 19 回填，2026-09-20 对抗验收 M-5 复测）
 
