@@ -1,8 +1,8 @@
 # 19 — Provenance (C25): taint marking, ≥8-char leak matching, sync-dir detection
 
-**Status:** ready-for-agent
-**Claimed by:** —
-**Last update:** 2026-09-19
+**Status:** in-progress
+**Claimed by:** agent-ticket19-taint
+**Last update:** 2026-09-20T02:20Z
 **Blocked by:** 17-risk-assessor-c19
 **Parallel slots:** ≤2 sub-agents (A: taint store + matcher; B: sync-dir detection P12 + four-
 channel exfil tests)
@@ -45,3 +45,4 @@ channels, normalized ≥8-char contiguous-fragment matching, and sync-directory 
 - [ ] Taint scoping: new session does not inherit old taints (DisposalScope test).
 
 ## Progress log (append-only, newest last)
+- [2026-09-20T02:20Z] agent=agent-ticket19-taint did=claimed next=engine+skeleton-tests
