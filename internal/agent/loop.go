@@ -633,12 +633,24 @@ func (l *Loop) executeCalls(ctx context.Context, root *observe.Root, j *taskJour
 		}
 	}
 
+	// Terminal tool_call rows are forensics of how the task ended, so this
+	// loop's writes run under a ctx detached from cancellation (see
+	// terminalWriteCtx): a task cancelled mid-execution must still book its
+	// in-flight calls instead of leaving them pending forever.
+	wctx, cancelWrites := terminalWriteCtx(ctx)
+	defer cancelWrites()
 	for i, c := range turn.ToolCalls {
 		p := plans[i]
 		log := ToolResultLog{CallID: c.ID, Name: c.Name, Rejected: p.rejected}
 		switch {
 		case p.skip:
 			log.Outcome, log.ErrorClass, log.Text = p.outcome, p.class, p.reason
+		case execErr[i] != nil && ctx.Err() != nil:
+			// The task was cancelled: an in-flight call is a cancelled call,
+			// not an internal failure (the outcome vocabulary exists for it).
+			log.Outcome = OutcomeCancelled
+			log.ErrorClass = string(observe.ClassCancelled)
+			log.Text = "任务已取消，调用被中止"
 		case execErr[i] != nil:
 			log.Outcome = OutcomeError
 			log.ErrorClass = ErrorClassOfTurnError(execErr[i])
@@ -666,7 +678,7 @@ func (l *Loop) executeCalls(ctx context.Context, root *observe.Root, j *taskJour
 			log.Truncated = log.Truncated || sp.TruncatedRaw
 		}
 
-		j.finish(ctx, c.ID, p.rowID, log.Outcome, log.ErrorClass)
+		j.finish(wctx, c.ID, p.rowID, log.Outcome, log.ErrorClass)
 		res.ToolLog = append(res.ToolLog, log)
 		res.ToolCalls++
 		l.append(toolResultMessage(c.ID, log.Text, log.Outcome != OutcomeSuccess))
@@ -774,12 +786,16 @@ func (l *Loop) failToolCallsFromTruncatedMessage(ctx context.Context, j *taskJou
 // calls are all judged failed, never executed with partial arguments).
 func (l *Loop) failOpenCalls(ctx context.Context, j *taskJournal, taskID string,
 	turn llm.TurnResult, outcome, class string, res *Result) {
+	// These rows describe how the task ENDED (cancellation included), so they
+	// are written under a ctx detached from that cancellation.
+	wctx, cancelWrites := terminalWriteCtx(ctx)
+	defer cancelWrites()
 	for _, c := range turn.ToolCalls {
 		if c.Complete {
 			continue
 		}
-		row := j.startCall(ctx, c.ID, c.Name, c.Args, memoryRiskL0)
-		j.finish(ctx, c.ID, row, outcome, class)
+		row := j.startCall(wctx, c.ID, c.Name, c.Args, memoryRiskL0)
+		j.finish(wctx, c.ID, row, outcome, class)
 		text := "调用未闭合（响应中断或已取消），未执行"
 		res.ToolLog = append(res.ToolLog, ToolResultLog{CallID: c.ID, Name: c.Name,
 			Outcome: outcome, ErrorClass: class, Text: text})
@@ -830,7 +846,14 @@ func (l *Loop) finish(ctx context.Context, root *observe.Root, j *taskJournal,
 	if summary == "" {
 		summary = msg
 	}
-	if err := j.finishTask(ctx, taskLogState(status), firstRunes(summary, 400),
+	// The terminal row is the audit record of HOW the task ended, so it must
+	// survive the very cancellation that ended it: detaching from ctx keeps
+	// memory's writer from abandoning the write (an already-dead ctx makes
+	// BeginTx fail outright). The 2s bound is a context deadline, not a
+	// wall-clock difference (D42#9).
+	wctx, cancelWrite := terminalWriteCtx(ctx)
+	defer cancelWrite()
+	if err := j.finishTask(wctx, taskLogState(status), firstRunes(summary, 400),
 		int64(cost.Usage.InputTokens), int64(cost.Usage.OutputTokens),
 		cost.Micros, errClass); err != nil {
 		l.log().Warn("agent: task_log finish failed", "err", err, "task", res.TaskID)
@@ -838,6 +861,21 @@ func (l *Loop) finish(ctx context.Context, root *observe.Root, j *taskJournal,
 	l.publish(Event{Kind: EvDone, TaskID: res.TaskID, Text: summary,
 		TokensIn: cost.Usage.InputTokens, TokensOut: cost.Usage.OutputTokens})
 	return *res
+}
+
+// terminalWriteTimeout bounds a detached forensics write. It is a context
+// deadline (D42#9 forbids wall-clock-difference timeouts).
+const terminalWriteTimeout = 2 * time.Second
+
+// terminalWriteCtx detaches a forensics write from the task's own cancellation
+// and bounds it. Cancellation is one of the four terminal states the contract
+// names, and it requires task_log/tool_call rows with error_class/decision
+// just like the clean paths do - so a cancelled task must still be able to
+// persist its ending. Without this the write is passed to memory's writer with
+// an already-cancelled ctx, BeginTx fails, and the row is stranded at
+// state="running"/ended_at=NULL.
+func terminalWriteCtx(ctx context.Context) (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.WithoutCancel(ctx), terminalWriteTimeout)
 }
 
 func (l *Loop) publishUsage(res *Result, cost Cost) {
