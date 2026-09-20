@@ -270,15 +270,16 @@ func (c *secretCmd) runSet(args []string) int {
   hidden console input, typed twice to confirm; --from-stdin reads the value
   from stdin in a single read and writes no intermediate file.`)
 	fromStdin := fs.Bool("from-stdin", false, "read the secret from stdin instead of the console")
-	if code, done := c.parseFlags(fs, args, "set"); done {
+	pos, code, done := c.parseFlags(fs, args, "set")
+	if done {
 		return code
 	}
-	if fs.NArg() != 1 {
-		fmt.Fprintf(c.sio.stderr, "wisp secret set: want exactly one <name>, got %d\n", fs.NArg())
+	if len(pos) != 1 {
+		fmt.Fprintf(c.sio.stderr, "wisp secret set: want exactly one <name>, got %d\n", len(pos))
 		fs.Usage()
 		return 2
 	}
-	name := fs.Arg(0)
+	name := pos[0]
 	ref, err := refFor(name)
 	if err != nil {
 		fmt.Fprintf(c.sio.stderr, "wisp secret set: %v\n", err)
@@ -300,8 +301,9 @@ func (c *secretCmd) runSet(args []string) int {
 		return 1
 	}
 	if err := st.Store(ref, value); err != nil {
-		// Store's errors carry the ref and the reason, never the value.
-		fmt.Fprintf(c.sio.stderr, "wisp secret set: %v\n", err)
+		// The CLI adds the ref the operation was about; Store's own errors
+		// carry the ref or the blob path and never the value.
+		fmt.Fprintf(c.sio.stderr, "wisp secret set: storing %s: %v\n", ref, err)
 		return 1
 	}
 	fmt.Fprintf(c.sio.stdout, "wisp secret set: stored %s (WISP_ENV=%s, portable=%v)\n", ref, c.env, c.portable)
@@ -325,15 +327,16 @@ func (c *secretCmd) runGet(args []string) int {
   prints the masked form (last 4 characters) by default; --show prints the
   plaintext to stdout exactly once and writes no log record.`)
 	show := fs.Bool("show", false, "print the plaintext secret to stdout")
-	if code, done := c.parseFlags(fs, args, "get"); done {
+	pos, code, done := c.parseFlags(fs, args, "get")
+	if done {
 		return code
 	}
-	if fs.NArg() != 1 {
-		fmt.Fprintf(c.sio.stderr, "wisp secret get: want exactly one <name>, got %d\n", fs.NArg())
+	if len(pos) != 1 {
+		fmt.Fprintf(c.sio.stderr, "wisp secret get: want exactly one <name>, got %d\n", len(pos))
 		fs.Usage()
 		return 2
 	}
-	ref, err := refFor(fs.Arg(0))
+	ref, err := refFor(pos[0])
 	if err != nil {
 		fmt.Fprintf(c.sio.stderr, "wisp secret get: %v\n", err)
 		return 2
@@ -369,11 +372,12 @@ func (c *secretCmd) runGet(args []string) int {
 func (c *secretCmd) runList(args []string) int {
 	fs := c.newFlagSet("wisp secret list", `Usage: wisp secret list
   lists blob ids, creation times (UTC) and refs. Never any secret content.`)
-	if code, done := c.parseFlags(fs, args, "list"); done {
+	pos, code, done := c.parseFlags(fs, args, "list")
+	if done {
 		return code
 	}
-	if fs.NArg() != 0 {
-		fmt.Fprintf(c.sio.stderr, "wisp secret list: takes no name, got %d argument(s)\n", fs.NArg())
+	if len(pos) != 0 {
+		fmt.Fprintf(c.sio.stderr, "wisp secret list: takes no name, got %d argument(s)\n", len(pos))
 		fs.Usage()
 		return 2
 	}
@@ -407,15 +411,16 @@ func (c *secretCmd) runUnset(args []string) int {
   listing the referencing fields; --force deletes anyway and writes an audit
   line.`)
 	force := fs.Bool("force", false, "delete even while config.toml references the blob (writes an audit line)")
-	if code, done := c.parseFlags(fs, args, "unset"); done {
+	pos, code, done := c.parseFlags(fs, args, "unset")
+	if done {
 		return code
 	}
-	if fs.NArg() != 1 {
-		fmt.Fprintf(c.sio.stderr, "wisp secret unset: want exactly one <name>, got %d\n", fs.NArg())
+	if len(pos) != 1 {
+		fmt.Fprintf(c.sio.stderr, "wisp secret unset: want exactly one <name>, got %d\n", len(pos))
 		fs.Usage()
 		return 2
 	}
-	name := fs.Arg(0)
+	name := pos[0]
 	ref, err := refFor(name)
 	if err != nil {
 		fmt.Fprintf(c.sio.stderr, "wisp secret unset: %v\n", err)
@@ -448,7 +453,7 @@ func (c *secretCmd) runUnset(args []string) int {
 	}
 	audit := fmt.Sprintf("wisp secret unset: deleted %s (WISP_ENV=%s, portable=%v, forced=%v, referenced_fields=%d)",
 		ref, c.env, c.portable, *force, len(fields))
-	fmt.Fprintf(c.sio.stdout, "%s\n", audit)
+	fmt.Fprintf(c.sio.stdout, "audit: %s\n", audit)
 	if len(fields) > 0 {
 		// --force on a referenced blob is the one destructive act in this
 		// ticket, so it is logged at Warn with the dangling field paths:
@@ -464,19 +469,40 @@ func (c *secretCmd) runUnset(args []string) int {
 	return 0
 }
 
-// parseFlags runs the subcommand's flag parse and reports whether the caller
-// should stop (usage error, or -h which prints and succeeds).
-func (c *secretCmd) parseFlags(fs *flag.FlagSet, args []string, sub string) (int, bool) {
-	if err := fs.Parse(args); err != nil {
+// parseFlags runs a subcommand's flag parse and returns the positional
+// arguments. Flags are accepted in any position: `wisp secret set mykey
+// --from-stdin` is the form the usage text and the ticket document, and the
+// stdlib parser would otherwise stop at the first positional and silently
+// treat --from-stdin as a name. A bare "--" ends flag parsing, so a name that
+// starts with '-' stays expressible.
+//
+// The second return is the exit code and the third says the caller must stop
+// (usage error, or -h, which prints and succeeds).
+func (c *secretCmd) parseFlags(fs *flag.FlagSet, args []string, sub string) ([]string, int, bool) {
+	var flagArgs, pos []string
+	positionsOnly := false
+	for _, a := range args {
+		switch {
+		case positionsOnly:
+			pos = append(pos, a)
+		case a == "--":
+			positionsOnly = true
+		case strings.HasPrefix(a, "-") && a != "-":
+			flagArgs = append(flagArgs, a)
+		default:
+			pos = append(pos, a)
+		}
+	}
+	if err := fs.Parse(flagArgs); err != nil {
 		if errors.Is(err, flag.ErrHelp) {
-			return 0, true
+			return nil, 0, true
 		}
 		// flag prints "flag provided but not defined: -<name>" (the name only,
 		// never the value) plus the usage above.
 		fmt.Fprintf(c.sio.stderr, "wisp secret %s: %v\n", sub, err)
-		return 2, true
+		return nil, 2, true
 	}
-	return 0, false
+	return append(fs.Args(), pos...), 0, false
 }
 
 // collectSecret obtains the plaintext from the one channel that is not argv.
@@ -492,7 +518,7 @@ func (c *secretCmd) collectSecret(fromStdin bool) (string, error) {
 		return singleLine(raw)
 	}
 	if c.sio.readHidden == nil {
-		return "", errNoTerminal
+		return "", c.wrapHidden(errNoTerminal)
 	}
 	first, err := c.sio.readHidden("secret (input hidden): ")
 	if err != nil {

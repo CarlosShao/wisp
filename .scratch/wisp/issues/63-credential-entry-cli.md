@@ -49,4 +49,6 @@ wisp secret unset <name>      # 删除 blob，并检查是否仍被 config 引�
 ## Progress log (append-only, newest last)
 - [2026-09-20T06:50Z] agent=agent-ticket63-secretcli did=claimed next=set/get/list/unset+leak-tests
 - [2026-09-20T07:06Z] agent=agent-ticket63-secretcli did=加 `wisp secret set/get/list/unset`（cmd/wisp/secret.go，热插拔 secretIO+readHidden seam，仅 bool flag）；internal/secret 加命令外壳所需的 Delete/Exists/Blobs/ConfigRefs（存格式零改动，blobPath 仍是唯一路径咽喉）+ctime_windows/other；gofmt/vet/secret count=2/secret -race 全绿 next=cmd/wisp 泄漏测试（argv/日志）
+- [2026-09-20T07:41Z] agent=agent-ticket63-secretcli did=cmd/wisp/secret_test.go 13 个测试全绿（掩码/明文 --show、名称校验、确认不一致、无控制台、bool-only flag 源码级 pin、8 种 `--value=<key>` 形态拒绝且不回显、5 条失败路径零明文入日志、unset 引用拒绝+点名字段+--force 审计行、dev/test/prod 三 blob、便携/非便携、端到端 config→request）；修两处真 bug：Go flag 在首个位置参数后停止解析（`set <name> --from-stdin` 原本失败）、Store 写失败错误未点名 ref next=OS 级 argv 取证（PEB CommandLine）
+
 
