@@ -1,7 +1,7 @@
 # 67 — 让 D22 静态门重新可信：`mockllm.go` 裸 goroutine + emoji 门看不见 Go 字符串
 
-**Status:** in-progress
-**Claimed by:** agent-ticket67
+**Status:** blocked-on-ticket:66（AC#1/AC#2 **已交付并经编排者独立验证**；AC#3 要改 `cmd/wisp/providers.go`，与票 66 同包）
+**Claimed by:** agent-ticket67（报告已交，**勿重开 AC#1/AC#2**；AC#3 等票 66 收尾后由**新代理接续**，从 Progress log 的 `next=` 起）
 **Last update:** 2026-09-20
 **Blocked by:** —（包与票 66 不相交：`internal/llm/adaptertest` + `tools/d22scan`；**AC#3 例外，须等票 66 落地**，见下）
 **Parallel slots:** ≤1 sub-agent（**不要**碰 `cmd/wisp/`、`internal/proc/`、`internal/observe/` —— 票 66 在飞）
@@ -52,9 +52,14 @@ CI 该步**无 `continue-on-error`** ⇒ **job 红**。
   **字符串字面量**（**注释不算用户可见**：另 5 处命中都在注释里，扩展时要把注释排除掉，
   不许为了少改代码就把注释也报成违规）。
   ⚠ 扩覆盖面**只许从严、不许放松**：如果扩完在别处又挖出命中，**逐个登记**而不是加豁免。
-- [ ] **AC#4 门禁**：`gofmt -l` 触及包为空、`go vet ./...`（主模块）与 `go vet ./...`（`tools/d22scan` 模块）、
-  `go test -count=2 ./internal/llm/adaptertest/`、`cd tools/d22scan && go test ./...`，
-  最后 `cd tools/d22scan && go run . -root ../..` 必须 **0 命中且 exit 0**。逐条贴原始输出。
+- [x] **AC#4 门禁（仅对已交付的 AC#1/AC#2 范围；AC#3 落地后必须重跑）**
+      —— 由编排者独立复跑确认：`cd tools/d22scan && go run . -root ../..` →
+      `clean`、**`examined 194 production Go files`**、**exit 0**；`go test ./...`（d22scan 自身 seeded-violation）通过；
+      `go test -count=2 ./internal/llm/adaptertest/` → **ok 2.900s**；`gofmt -l` 空、`go vet` 干净；
+      并核对 `allowlist.txt` **仍是 4 行、没为凑绿加豁免**（裁定 1 的要求）。
+      原判据（保留可读）：`gofmt -l` 触及包为空、`go vet ./...`（主模块）与 `go vet ./...`（`tools/d22scan` 模块）、
+      `go test -count=2 ./internal/llm/adaptertest/`、`cd tools/d22scan && go test ./...`，
+      最后 `cd tools/d22scan && go run . -root ../..` 必须 **0 命中且 exit 0** —— **六条全部逐条复现过**。
 
 ## 编排者已裁定（不要再来问）
 
@@ -153,3 +158,18 @@ CI 该步**无 `continue-on-error`** ⇒ **job 红**。
   实测计数：`grep -E '^[[:space:]]*go [a-zA-Z_(]' internal cmd`（排除 `_test.go`）= **4 处**，其中 1 处是 sanctioned、3 处待判。
   ⇒ **"d22scan clean" 的准确读法**：现有生产码里**没有以匿名闭包形式起的裸 goroutine**，
   不等于"没有绕过 `Registry.Spawn` 的裸 goroutine"。这条判据目前只对 FuncLit 形状为真。
+- [2026-09-20T15:24Z] agent=orchestrator did=**票面对账 + 勾 AC#4（独立复现，非采信自述）+ Status→blocked-on-ticket:66**。
+  ①我自己复跑 AC#4 六条：`cd tools/d22scan && go run . -root ../..` → `clean` 且自报
+  **`examined 194 production Go files`**、**exit 0**；`go test ./...`（模块内 seeded-violation 阳性对照）通过；
+  `go test -count=2 ./internal/llm/adaptertest/` → **ok 2.900s**；`gofmt -l` 空；`go vet` 干净；
+  并核对 `allowlist.txt` 仍是 4 行 ⇒ **没有为凑绿加豁免**（裁定 1 兑现）。
+  ②读改动认可三处判断（我没要求、它自发做对）：独立命名 registry 而非 `observe.Default`
+  （测试协程不该挪动产品 watchdog 读的常驻名册数字）、就绪等待走 `observe.Timeout` 单调钟（避开 D22 禁令 #4）、
+  cleanup 先于等待注册所以每条失败路径都收子进程；且它把 `h.Done()` 下的 panic 转成 `t.Fatal` 而不是静默挂 20s。
+  ③**代理替我否证了一条我自己说过的话**：它报"CI 的 lint job 还有第二个独立红因（gofumpt 标 69 个文件）"，
+  我用 CI 钉的 v0.7.0 本地复跑确认 ⇒ **我 14:59 在 `988c833` 里写的"CI lint job 第一次真绿"是错的**，
+  我只验了一个步骤。已登记 **A27**（CI 五 job 全红，实测 `gh run view --json jobs`）并开**票 70** 承接；
+  **commit message 无法改（已推），故此行为更正值。**
+  ④它另外登记了一条我没让它修的覆盖洞：**ban #1 只匹配闭包字面量**，`go probeReader()` 这类具名调用扫不出
+  （生产范围实测 4 处）⇒ 今天的 `clean` 含义是"无闭包字面量裸协程"。归票 70 AC#5，**我未默默扩语义**。
+  next=票 66 收尾后：AC#3 三步（改 `providers.go` 三处字形 → 扩 ban #8 覆盖面且**排除注释** → 只许从严）。
