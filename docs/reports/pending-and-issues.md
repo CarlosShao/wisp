@@ -346,6 +346,13 @@
   ⚠ **A8 / A11 / A13 三条同形**，全部收敛到票 12 —— 票 12 的实质是**装配**，不是新功能。
   （另：代理报告称 d22scan 在 `internal/llm/adaptertest/mockllm.go:68` 有一处既有命中，
   我在 HEAD 上复跑 `tools/d22scan` 结果为 **clean**，该命中不存在，无需处理。）
+  ⚠⚠ **本条目末尾这句"该命中不存在"是错的，撤回（2026-09-20 21:38，见 A22）**：
+  我当时在**仓根**跑 `go run ./tools/d22scan -root .`，它打印的是
+  `main module does not contain package .../tools/d22scan`（**扫描器从未执行**），我把"没有命中输出"读成了"clean"。
+  正确调用（`cd tools/d22scan && go run . -root ../..`，**与 CI 那一步逐字同形**）实跑结果：
+  **该命中真实存在**，`[bare-goroutine] bare go func( is banned (D22/D38b)`，由 `78b1466`（票 11）引入、不在 allowlist。
+  ⇒ **那位代理的报告是对的，我当众否定了一次如实报告**；根因与纪律修正记在 A22
+  （判据仪器"没报错"≠"跑过了"，采信前必须制造一次已知会红的阳性）。**票 20 的 AC#1-4 结论不受影响。**
 
 - **[A14] `parseSystemProcesses` 丢快照末项 ⇒ D32 的 state 口径 SLO 门从未产出过样本窗，且 CI 两处门坏着** —
   `internal/proc/treemetrics_windows.go:240-243` 先 `if next == 0 { break }` 再解析当前项（:247-260），
@@ -410,6 +417,88 @@
   跑红 ⇒ 证明保护是真的，本条按"文档性 MINOR"收尾；跑绿 ⇒ 我这次更正又错了一层，升级回原严重度。
   **教训同族**：与 [[adversarial-review-orchestration]] 第 5 条同形——**"grep 符号名零命中"≠"没有保护"**，
   断言可能通过别的变量名咬住同一件事；下"无人看管"的结论前必须读测试体，不能只读测试标题与 grep 命中表。
+
+- **[A17] 票 20：`Needs` 的逐条断言与它判的代码同 commit 被删（MAJOR）→ 已修** —
+  `0986d63` 把 `TestFSRegistrationIsTheL0Pair` 改名成 `TestFSRegistrationIsTheD34Roster` 时
+  删掉 `len(e.Decl.Needs)!=1 || Needs[0]!=CapFSRead`，只留下 `fs.delete` 一条。
+  **为何有牙**：`bridge.go:276-296` 的 C3 判定 `declared.missing(need)` / `authz.missing(need)`
+  取的就是 `Needs` ⇒ 少报一个能力，就等于**只被授权 `fs.read` 的机器放行一个真写盘的调用**，
+  且 `Decision.Capabilities` 记的也是错值；`registry.go:140` 的 `Capabilities ⊇ Needs` 只挡多报不挡少报。
+  **公道话**：老断言写死"五槽全 `[fs.read]`"，新增 write/trash/move 后**必须**改；
+  错的是**换成"什么都没有"**而不是换成逐条表（删守卫须与替代同批，这次替代缺席）。
+  **已修**：`fs_test.go` 补 `wantNeeds` 逐条表；**变异检验**（`fs_write.go:675` 改 `CapFSRead`）→
+  仅新断言转红、**其余全套件仍 `ok 20.600s` 全绿** ⇒ 量化了"旧套件对这个形状完全盲"。
+  证据 `docs/evidence/s1/20-needs-assertion-restored.md`。**当前无可利用缺陷**（今天六条声明都正确）。
+- **[A18] 票 20 AC#3：真·外部 kill 下的暂存文件残留未证** —
+  `TestAtomicWriteKillsMidWrite` 用的是**进程内** `Hooks.Kill`（`fs_write.go:47-53` 返回 error，**会**跑清理），
+  而真 `taskkill` 不跑 Go 的清理 ⇒ `.wisp-tmp-*`（`fs_write.go:38`）会留在用户目录，
+  测试里"不留暂存文件"那条断言（`fs_write_test.go:120-128`）在真实故障下**不可观测**。
+  ⚠ 这条是审计代理的判断，**我没复现 ⇒ 票 20 的 AC#3 框不动**（纪律：不复现不改勾），改为登记。
+  **完成判据**：①一条用真子进程 + `taskkill /F` 的用例，断言**目标文件要么完整要么不存在**（这条今天已结构性成立：
+  `fs_write.go:276` 暂存建在目标目录、`:322` 单次 `os.Rename` 落地）；②再断言遗留 `.wisp-tmp-*` 的**下次启动自愈清理**
+  或明确申报为可接受残留并写进 SPEC。**归属**：票 20 收尾批；清理器若归票 39 需书面转办。
+- **[A19] 票 21 BLOCKER：审批层有判定、没有输入设备（今天 L1 必无否决执行、L2 必 300s 自动拒）** —
+  我自己的 grep：`DecideFromNative`/`DecideFromPanel`/`.Native()`/`.Veto(` 在非测试码里**只有定义与一句注释**；
+  `cmd/wisp/run.go:257` 用 `approval.NewChannels()`（无参⇒零通道已加载），
+  而 `approval.go:163` 那个载入 Ball+Esc 的构造函数**没人调**，`SetLoaded`（`:178`）零非测试调用者。
+  **当前残缺表现**：真机上 L1 阻止窗一定到时执行（人点不了、Esc 不接、语音不接），L2 一定自动拒；
+  `consoleApprovalUI`（`run.go:500-538`）从不应答。
+  **完成判据（票 21 段 2）**：①`cmd/` 或段 2 的 winlive 里存在一条调用链真正抵达
+  `gate.Native().Allow`/`DecideFromNative`，且 `Prompt.Grant` 取自**被显示的那个面**；
+  ②一条 cmd 级用例断言 L2 请求以 **allow 结束**而非 timeout；③通道加载改走带参构造，
+  且"未加载 ⇒ 提示「语音取消不可用」"与"已加载 ⇒ 否决生效"两向都有测。
+  **⚠ 段 2 的验收重点不是美观，是「让一个真人能改变一个判定」。**
+- **[A20] 票 21 BLOCKER：D45-1 批量聚合站错了轴，且对全部在产工具恒为死码** —
+  `batch.go:35-38` 的 `Aggregate(d tools.Decision)` 要求 `len(d.Paths) >= 3`，判的是**单次调用内的路径数**；
+  契约原文（`docs/PLAN.md:1590`「批量聚合（500 个 L1 → 一次确认）」、`:1795`「批量场景 = 500 次 L1 确认」）
+  说的是**跨多次调用**。可达性我也核了：`fs.write`/`fs.trash`/`fs.delete` 各 1 个 `path`
+  （`fs_write.go:223-225/349-350/549`，且 `additionalProperties:false`），`fs.move` 2（`from`/`to`，`:415-417`）
+  ⇒ **任何生产工具单次最多 2 条路径，`Aggregate` 恒返回 nil**。
+  **当前残缺表现**：确认疲劳（B2）这一整类风险今天**没有任何缓解**，而包内 5 条 `batch_test.go` 全绿——
+  它们喂的是生产里产不出来的工具形状。
+  **完成判据**：①按契约语义改成**跨调用**聚合（窗口内合并同源 L1 确认），或书面申报 D45-1 延后并由我改 PLAN 的
+  S3 done 判据引用（改契约需 owner，D22）；②若保留 per-call 聚合，必须有一个**真在产**的多路径工具作载体，
+  并加一条桥级用例证明"该形状真会被模型产出"；③`batch_test.go` 改名或加注，说明它测的是哪种形状。
+  **归属**：PLAN `:3105` 把 D45-1 落在 **S3** ⇒ 票 21 段 2 **只登记不顺手改**。
+- **[A21] 票 21 两条 MINOR：`corr` 可猜 + 污点归属取 `Paths[0]`** —
+  `bridge.go:219` 的 corr 来自 `loop.go:640`（= taskID），`revokeGrants`/`reject`/`Veto` 直接吃它
+  ⇒ 猜中者可使诚实卡片的活 nonce 作废（**fail-closed DoS，非提权**：伪造放行仍被 bind 摘要挡住）。
+  `bridge.go:501-503` `origin = dec.Paths[0]` 是"取第一个"选择器，今天确定只因 `pathArgs` 先排序
+  ——**同族第四次**（M-7 / C-3 / A16）。**完成判据**：前者断言 corr 对模型不可得或按条目哈希；
+  后者在污点归属处**遍历全集**（任一路径带污点即整体带污点），并加一条"乱序输入 ⇒ 同一结论"的用例。
+- **[A22] ⚠ 我（编排者）的一条假绿：`d22scan` 是独立 Go module，我从仓根调用它**根本没跑起来**，我把"无输出"读成"clean"** —
+  **事实链（我今天自己复跑双方向确认）**：
+  ① 我在仓根跑 `go run ./tools/d22scan -root .` → 输出是
+  `main module (github.com/CarlosShao/wisp) does not contain package .../tools/d22scan`
+  ——**扫描器从未执行**，我却据此写下"HEAD 上 d22scan clean"。
+  ② 正确调用 `cd tools/d22scan && go run . -root ../..` → **1 条真命中**：
+  `internal/llm/adaptertest/mockllm.go:68: [bare-goroutine] bare \`go func(\` is banned (D22/D38b)`，
+  由 **`78b1466`（票 11）** 引入，`tools/d22scan/allowlist.txt` 里**没有**它。
+  ③ CI 的调用方式恰好是正确的那种（`.github/workflows/ci.yml` "D22 seven-ban + emoji scan" 步：
+  `cd tools/d22scan; go run . -root "${{ github.workspace }}"`，**无 `continue-on-error`**）
+  ⇒ **lint job 自 `78b1466`（约 05:59Z）起就是红的**。
+  **我造成的二次伤害**：票 21 的代理早前**如实报告过同一处命中**，我用自己的假绿**当众否定了一次真实报告**
+  （话留在本文件 A13 条目末尾与票 12 的 12:35Z log 行里）。**已在两处原文下追加更正，不覆盖。**
+  **元教训（进偏好，与 [[adversarial-review-orchestration]] 第 2/7 条同族）**：
+  **判据仪器"没报错"≠"跑过了"**；凡是外部扫描器，采信前必须至少制造**一次已知会红的阳性**（seeded violation）
+  或核对它的非零退出码与"我用的调用方式与 CI 里那一行逐字相同"。d22scan 自带 seeded-violation 测试
+  （CI 里那步的上一行 `go test ./...` 就是它），**我一次都没跑**。
+  **完成判据**：①`mockllm.go:68` 改走 `observe.Registry.Spawn`（命名 + owner + recover）
+  或**由我书面**加入 allowlist 并写明理由——**不许静默放宽**；②跑 `cd tools/d22scan && go test ./... && go run . -root ../..`
+  两条都过；③本条与 A13 末尾、票 12 log 的更正三处互相引用可追溯。
+  **归属**：票 11 的包（`internal/llm/adaptertest`）⇒ 开**票 67** 承接，连带票 12 的三处 UI 字形（下条）。
+- **[A23] 票 12 自己带进了三个用户可见 emoji，而 emoji 门今天根本不看 Go 源码** —
+  ①**门是瞎的**：`tools/d22scan/main.go:71` 的 `emojiRe` 只被 `walkEmoji` 用在 `design/` 与 `frontend/`
+  （`main.go:137-142`），而 **`frontend/` 在本 HEAD 不存在** ⇒ 该门今天的实际覆盖面只有 `design/`，
+  **对 `internal/`+`cmd/` 的 Go 字符串字面量完全不可见**。⇒ 票 12 AC#7 那句"zero emoji scan over new UI strings"
+  **前提是半假的**，不是"做完了"。
+  ②**真命中 3 处，且是票 12 自己的 commit 带进来的**：`cmd/wisp/providers.go:201` `verdict := U+2717`、
+  `:203` `verdict = U+2713`、`:209` 打到 stdout，另 `:41` 出现在 help 文本里；U+2713/U+2717 落在 ban #8 的
+  `2600-27BF` 区间内。引入 commit：**`cd011b8`（票 12 的装配 commit）**。
+  **我没有删它们**（改用户可见文案属 UI 变更，要签收）。**完成判据**：①把 ban #8 扩到 `internal/`+`cmd/`
+  （代码改动；先决条件是 `mockllm.go:68` 清零，否则门一直红）或改写 AC#7 措辞为"design/"——**二者都要我书面裁定**；
+  ②`providers.go` 三处字形改成 `PASS`/`FAIL` 文本（推荐，Windows 控制台字体不保证有这两个码位）
+  或书面豁免；③AC#7 的两个半边各按上面的真实覆盖面重判。 **归属**：票 67。
 
 ## 已解决（resolved）
 

@@ -191,6 +191,13 @@ func TestFSRegistrationIsTheD34Roster(t *testing.T) {
 		"fs.read": risk.L0, "fs.list": risk.L0,
 		"fs.write": risk.L1, "fs.trash": risk.L1, "fs.move": risk.L1,
 	}
+	// Needs is not decoration: Bridge.checkCaps derives the C3 requirement set
+	// from it, so an under-declared Needs makes the authz check pass for a
+	// capability the tool actually exercises.
+	wantNeeds := map[string][]Capability{
+		"fs.read": {CapFSRead}, "fs.list": {CapFSRead},
+		"fs.write": {CapFSWrite}, "fs.trash": {CapFSWrite}, "fs.move": {CapFSWrite},
+	}
 	for _, e := range entries {
 		n := e.Tool.Name()
 		lvl, ok := want[n]
@@ -203,6 +210,10 @@ func TestFSRegistrationIsTheD34Roster(t *testing.T) {
 		}
 		if e.Decl.Provider != KindBuiltin {
 			t.Errorf("%s provider = %q, want builtin", n, e.Decl.Provider)
+		}
+		wantN := wantNeeds[n]
+		if len(e.Decl.Needs) != len(wantN) || e.Decl.Needs[0] != wantN[0] {
+			t.Errorf("%s needs %v, want exactly %v (C3 requirement set)", n, e.Decl.Needs, wantN)
 		}
 	}
 	for _, e := range entries {
