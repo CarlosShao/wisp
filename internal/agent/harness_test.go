@@ -146,8 +146,16 @@ func newHarness(t *testing.T, fixture string, opts ...harnessOpt) *harness {
 }
 
 // requests is how many HTTP requests the provider made - the "mockllm request
-// count" the control-layer test asserts on.
-func (h *harness) requests() int { return len(h.rep.Requests) }
+// count" the control-layer test asserts on. It counts the bodies the handler
+// captured under h.mu rather than reading the replayer's internal slice: that
+// slice is written on the httptest handler goroutine, and a cancelled task can
+// abandon a stream before its handler has finished, which left an unsynchronised
+// read (a data race under -race) if we touched rep.Requests directly.
+func (h *harness) requests() int {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	return len(h.bodies)
+}
 
 // requestBodies returns the recorded request bodies in arrival order.
 func (h *harness) requestBodies() [][]byte {

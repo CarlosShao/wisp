@@ -290,8 +290,19 @@ func (t *RunningTask) Root() *observe.Root { return t.root }
 // Cancel requests cancellation (root ctx, honoured loop -> stream -> tool).
 func (t *RunningTask) Cancel() { t.root.Cancel() }
 
-// Wait blocks until the task finished and returns its result.
-func (t *RunningTask) Wait() Result { <-t.done; return t.result }
+// Wait blocks until the task has fully finished and returns its result. It
+// joins BOTH the result signal (t.done, closed inside the task goroutine) and
+// the registry handle (t.h.done, which the registry closes only AFTER it has
+// decremented the root's pending counter). Joining only t.done could let a
+// caller read Pending()==1 immediately after Wait() returned - a task whose
+// completion (D38e: the join counter drained) is therefore not yet observable.
+func (t *RunningTask) Wait() Result {
+	<-t.done
+	if t.h != nil {
+		<-t.h.Done()
+	}
+	return t.result
+}
 
 // Pending reports the root's undrained goroutines: 0 means the task's work is
 // fully joined (D38e: completion means the WaitGroup drained).
