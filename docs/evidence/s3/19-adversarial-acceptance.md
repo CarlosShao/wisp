@@ -133,3 +133,207 @@
 **FAIL — 退回修复。** 工程质量与文档纪律整体扎实（30 个测试全绿、race/vet/d22scan 干净、契约零越界、DEFERRED 基本诚实、残留登记有据），但 R4 污染闸门本体存在**两条已被我实测复现的 fail-open 逃逸**（B-1 同步根拼写绕过并真把字节写进同步根；B-2 具名通道参数名/类型逃逸），另有一条与「缺信息必须拒绝」硬规冲突的默认放行（M-1）和一条被 SPEC 背书范围**不覆盖**的规范化缺口（M-6）。AC 判定：①③⑤ PASS，② PASS（附缺测），④ FAIL。
 
 必改（回归前）：**B-1、B-2、M-1、M-3、M-6**；建议同批：M-2（注册表探针至少补可注入测试）、M-4、M-5（删 `winStrs` 顺带解决大半内存）、N-1..N-7。AC#4 若要判过，须给出**注册表或环境变量级**根确认（不接受只靠 `os.Stat` 猜默认目录），并补 8.3/`\?\` 两条真写盘红队用例。
+
+---
+
+## 复验（2026-09-20，第二轮）
+
+> 复验者：独立代理。**未写被测码，未写上面那份 FAIL 判定书**（判定书原文一字未改，历史即历史）。
+> 被测工件：`c091ee2`（码+测试）+ `6e2a68f`（文档/证据），基线 `8d9fd95`。
+> 环境：go1.27.1 windows/amd64，Windows 11 x64 真机（i7-8750H）；
+> `PATH=/d/work/base/go/bin:/e/work/base/msys64/mingw64/bin`，`GOPATH=/d/work/base/gopath`。
+> 并行保护：复验期间另有代理在 `internal/agent/`/`internal/llm/`/`tools/mockllm/` 在途并落了 `ddb79e2`
+> （票 10 证据，与本票无关，未触碰）；本轮所有构建/测试一律 `./internal/risk/` 范围，未 `git add -A`，未 push。
+> 方法：**不复用首轮 7 个探针**，本轮另写 5 个临时探针文件 `internal/risk/zz_reverify19{,b,c,d,e}_test.go`
+> （共 23 个探针函数：真 junction/真 hardlink/真写盘落地核验/真注册表与环境变量），
+> **跑完即删，未入树**（`git status` 已确认无 `zz_*` 残留，`C:\Users\swq\OneDrive` 与 profile 内零探针残留）。
+> 本轮首要攻击对象是**修复自带的新攻击面**：B-1 用「最近已存在祖先 + 词汇尾巴」修好之后，
+> reparse 点若长在**尾巴**里而不是祖先里，判定还看不看得见。
+
+### R1 五道闸门（本人实跑，探针删净后复跑一次，非转贴）
+
+| 命令 | 结果 | 输出尾部（原样） |
+|---|---|---|
+| `go vet ./internal/risk/` | PASS | （无诊断）本人 echo：`VET=CLEAN` |
+| `go test ./internal/risk/ -count=2` | PASS | `ok  	github.com/CarlosShao/wisp/internal/risk	4.853s` |
+| `go test ./internal/risk/ -race -count=1` | PASS | `ok  	github.com/CarlosShao/wisp/internal/risk	1.623s` |
+| `cd tools/d22scan && go run .` | PASS | `d22scan: clean - no D22 ban violations, no emoji in design/ or frontend/` |
+| `go test ./internal/risk/ -count=1 -v` | PASS | `top-level PASS: 69  SKIP: 1  FAIL: 0  subtest PASS: 37` / `ok  	github.com/CarlosShao/wisp/internal/risk	1.785s` |
+| `GOOS=darwin GOARCH=arm64 go vet ./internal/risk/` + `GOOS=linux go build ./internal/risk/` | PASS | （无诊断）新码可交叉编译（见 R5 N-9：能编不等于能在非 Windows 上按注释所述工作） |
+
+**实跑计数 vs 修复方声明**：日志（N-7 更正条目）称「68 个顶层测试 + 38 个 subtest，1 skip」。
+实测是 **70 个顶层测试函数**（69 PASS + 1 SKIP）+ **37 个 subtest**（`=== RUN` 107 行 − 70 顶层 = 37，
+无 indented SKIP/FAIL）。仍是同方向的少计（低报 2 个顶层、多报 1 个 subtest），不影响判定，但 N-7 的「更正」本身没更正准（见 R5 N-7 行）。
+
+**冻结面复验（零 diff，实跑非转贴）**：
+`git diff --stat 8d9fd95..6e2a68f -- internal/risk/assessor.go internal/risk/pathresolver{,_windows,_other,_budget_norace_test,_junction_windows_test}.go internal/risk/rules_gateway.go docs/PLAN.md docs/specs/`
+→ **空输出**。两次提交合计只碰 14 个文件：`internal/risk/` 的 5 个生产文件 + 4 个测试文件 + 票 19/26/55 + `docs/PRECHECK.md` + `docs/evidence/s3/19-adversarial-fix-round.txt`。
+`git show --name-only c091ee2 6e2a68f | grep -c internal/agent` → **0**。C26 入口 `Resolve`/`reparseComponents` 与票 18 的红队测试都在冻结面内、未被改动——这一点重要：B-1 的修法是在**消费侧**加锚定，没有去松 resolver。
+
+### R2 头条裁定：**尾巴里的 reparse 点——B-1 没有换帽子回来（判：不是 BLOCKER）**
+
+构造：沙箱 profile 内 `notsync\` 为普通目录，`notsync\sub` 用 `mklink /J` 做成指向同步根的 junction，
+写入目标 `notsync\sub\file.md`（**尚不存在**，正是 B-1 的靶形）。同步根以 registry 级注入且目录真实存在，
+故 `SyncDetectionComplete()==true` —— **profile 全网状兜底是关着的**，任何「非同步」判定只能来自根成员比较，蒙不出来。
+
+```
+Resolve(raw): err=risk: path traverses a reparse point ... resolved=false reparse=false canonical=
+reparseComponents(raw) = [...\profile\notsync\sub]
+deepestExistingAncestor(c:\...\profile\notsync\sub\file.md) -> anc=c:\...\profile\notsync\sub rest=[file.md]
+VERDICT sync=true root=sync-suspect/suspect-fallback why=write target traverses a non-exempted reparse point; fail-closed as sync-suspect
+VERDICT deep tail(notsync\sub\a\b\file.md) sync=true why=write target traverses a non-exempted reparse point; fail-closed as sync-suspect
+```
+
+真机版（指向操作者真实 `C:\Users\swq\OneDrive`，只做判定不写盘，探针目录跑完已删）：
+
+```
+live root OneDrive/env C:\Users\swq\OneDrive   complete=true
+REAL ROOT tail-junction verdict sync=true why="write target traverses a non-exempted reparse point; fail-closed as sync-suspect"
+```
+
+**为什么看不见尾巴的担心不成立（两道独立防线，均实测）**：
+1. `resolveTarget` 第一句 `Resolve(raw, excs)` 里的 `reparseComponents` 走的是**清洗后的整条词汇链**，
+   逐个组件 `GetFileAttributes`，尾巴里的 junction 同样被检出 → `ErrReparseDenied` → `match()` 落
+   「穿越未豁免 reparse 点」从严分支。祖先接尾巴那步**根本没被执行**（实测 `err` 非空即返回）。
+2. 即便走到祖先步，实测 `deepestExistingAncestor` 返回的正是 junction 本身（`anc=...\notsync\sub`）而非其父目录：
+   它 Lstat 时给每级补了尾分隔符，而带尾 `\` 的 Lstat 会**跟着 mount point 进去**（Go 对无斜杠的 junction
+   Lstat 报 `isdir=false symlink=false`+reparse 属性位——代码注释因此不准，见 R5 N-9）。于是
+   `Resolve(anc)` 要么照旧 `ErrReparseDenied`，要么（用户显式豁免该路径时）**穿透 junction 规范化到真根**：
+
+```
+Resolve(exempted): err=<nil> resolved=false reparse=true canonical=...\notsync\sub\file.md
+deepestExistingAncestor -> anc=...\notsync\sub rest=[file.md]
+resolveHandle(junction) = \\?\C:\...\profile\OneDriveRV
+VERDICT(exempted junction into sync root) sync=true root=OneDrive/registry why=write target is under a detected sync root
+VERDICT(no exception)                    sync=true why=write target traverses a non-exempted reparse point
+```
+豁免分支拿到的是**根成员归因**（不是 suspect 蒙对），方向比首轮要求的还严。
+
+**尾巴含 `..`（出圈再回圈）**：首轮没问过的形状，我按最坏情况构造了两次。判定确实会**看不见** junction——
+`Resolve` 里 `lexCanonical`（票 18 冻结的 Clean）先把 `link\..` 折掉，`reparseComponents` 便扫不到被擦掉的 `link`，
+`VERDICT sync=false root=/ why=write target is not under any sync root`。但**落点核验否定了逃逸**：
+我把同名文件在两个候选落点都预置好，再走 OS 真写盘，让 `GetFinalPathNameByHandle` 说真话：
+
+```
+raw = ...\profile\notsync\link\..\X.txt ; filepath.Clean = ...\profile\notsync\X.txt
+  ...\profile\OneDriveRV\X.txt            -> "ORIGINAL"
+  ...\profile\OneDriveRV\Notes\X.txt      -> "ORIGINAL"   <- 若 OS 跟着 junction 折 ..，该改的是这里
+  ...\profile\notsync\X.txt               -> "MODIFIED-BY-PROBE"
+OS final path for raw = \\?\...\profile\notsync\X.txt
+two-level: ...\notsync\link\..\..\Y.txt  OS-final=\\?\...\profile\Y.txt  (inside-root=false)
+hop\..\Notes\v3.md -> write failed: The system cannot find the path specified.（OS 找的是 notsync\Notes\v3.md）
+```
+即 **Windows 自己在解析前就把 `.`/`..` 做词汇归一**，落点与 `filepath.Clean` 逐字一致，分类器与真相同源，
+没有「判非同步却落进同步根」的裂口；`\\?\`+`..` 那一路 OS 直接 `ERROR_INVALID_NAME` 拒写（哪都不落）。
+⇒ **不构成 BLOCKER，B-1 保持关闭**。但这层安全性来自 OS 语义而不是代码里的一句检查，故记一条硬化残留（R5 N-10）。
+
+**尾巴 reparse 的 TOCTOU（判定之后才创建 symlink/junction）**：实测成立但判**超出本票威胁模型**，理由写实：
+
+```
+verdict before the junction exists: sync=false root=/
+（随后 mklink /J notsync\later -> root）bytes landed in root: true
+verdict re-asked after the junction exists: sync=true why=write target traverses a non-exempted reparse point
+```
+要吃下它必须在 `Inspect` 与 `CreateFile` 之间赢得一个竞态，即攻击者**已是本机进程**；而能建 junction 的本机进程
+本就能直接往 `OneDrive\` 写字节，闸门于它无意义。C25 的门禁对象是**模型自选的拼写**（B-1 的原文形状），
+而模型分两步（一次 shell `mklink /J`、下一次 `fs.write`）在这套实现里是**关得住的**：写盘前那一刻重新判定即翻成 deny
+（上面第三行）。⇒ 记为接受残留，无须整改；建议 PRECHECK 补一行说明「判定与写盘非同一原子操作」的定性。
+
+### R3 逐缺陷处置（closed / not closed / newly broken）
+
+| 缺陷 | 首轮要求 | 修复方声明 | **复验裁定（判据＝本人实跑，非读注释）** |
+|---|---|---|---|
+| **B-1** | 未存在写入目标的词汇回退绕过同步根，实测写盘成功 | 锚定最近已存在祖先 + 接词汇尾巴 | **CLOSED**。沙箱内 4 种拼写（长名/`\\?\`/OS 8.3/两者叠加）由 `GetShortPathNameW` 取回真别名并门控写盘验 0 字节；我自己另测尾巴 junction、深尾巴、豁免 junction、不可锚定链（`Q:\`、死 UNC）四种形状，全部从严；反向护栏成立（普通新文件写长名/`\\?\`/8.3 → sync=false 且字节真落地，实测 `TestSyncRedTeamGuardPlainNewFileWriteAllowed` 绿）。修法**没有**采用判定书那句 `!res.Resolved 即从严`（那会把每次正常新建写入推去 L2），并给出了理由——这条偏离我认可，因为红队用例证明它同时守住了正例与误报两侧 |
+| **B-2** | 具名通道只扫表内 key，改名/嵌套/数组即逃逸 | 表只贴标签，其余一律 `collectStrings` 以 ChUnknown 补扫 | **CLOSED（六条逃逸全实测被抓）**：`web.search{url}`/`{q}`、`notify{title}`(text 无害)、`clipboard.write{payload}`、`notify{text:{body}}`、`notify{text:[…]}`、`fs.write{"body"}` 均命中，且**归因未回归**——表内 key 保留契约标签（query→web.search.query、url/text→notify、text→clipboard.write、content→fs.write.syncdir），其余 `ChUnknown`，`hit.Source()` 仍指向 web.fetch；同形状走冻结适配器 `Detector.TaintHit` 亦抓；`[]byte`/`[]string`/深 map 都抓。写载荷仍受同步门约束：`{path:非同步, content}` 不命中、`{path:同步根, content}` 命中 ChSyncWrite、`{path:D:\plain}` 不命中（实测四条） |
+| **M-1** | 未打开/拼错 scope 默认放行，违反「缺信息必 DENY」 | scope 未注册且引擎有污染 → `SrcUnboundScope` 从严 | **CLOSED**。`TestInspectUnknownScopeIsEmptyStore` 被**原地反转**而非删除（名字保留，断言换向）；我自己独立复跑：`Inspect("ghost")` → `SrcUnboundScope`+`ChUnknown`；`CheckText("ghost",ChTTS)` 命中；`Detector("ghost").TaintHit` 命中（三条缝全覆盖）。方向也没有过冲：引擎零污染时 `Inspect("ghost")` 不命中；已注册且为空（OpenScope 后未 Mark / CloseScope 后）不命中——AC#5 的「新会话不继承」仍由 `TestDisposalScopeClearsTaints` 钉住 |
+| **M-2** | 注册表探针零覆盖，且 `%OneDrive%` 这条本机唯一线索没被读 | 探针链首加 env 级；注册表逻辑下沉可注入 `registryValueSource` | **CLOSED**。本机实测 `%OneDrive%`/`%OneDriveConsumer%` 均为 `C:\Users\swq\OneDrive`，`SyncRoots()` 给出 `OneDrive/env`、`complete=true`、真机红队归因 root=OneDrive/env——AC#4 要求的「注册表或环境变量级根确认」达成（首轮判 FAIL 的正因消解）。`registryProbeFor` 由 4 个 subtest 的表驱动测试真驱动（Personal/Business 过滤、`ConsumingAccounts` 诱饵、空 UserFolder、大小写去重、Dropbox `Path`、nil 源）。**唯一 t.Skip 诚实**：`TestSyncRegistryProbeLive` 本机返回 0 条（我独立复算同果），skip 理由与 `19-provenance-c25-tests.txt:19` 自陈一致；探针**逻辑**由注入测试覆盖，探针**存在性**由该 skip 测试记录，这个分工是可接受的 |
+| **M-3** | 兜底全有全无，一个诱饵根即可关掉 | 仅 env/registry/config 级且 C26-canonical 才撤销 | **CLOSED**。我重跑诱饵攻击：注入单个**真实存在**的无关根，source 取 `default`/`fixture`/`options`/`""` 四档 → `complete=false` 且 `~\profile\Documents\exfil.md` 仍 sync-suspect；`registry`/`config`/`env` 三档 → `complete=true` 且兜底关掉（设计意图）。`canonical` 从此**真被读**：`{registry, 不存在的路径}` → `complete=false`、兜底仍开（N-2 一并闭环）。suspect 网另经组件边界收口（`profileevil` 兄弟目录不受牵连，实测） |
+| **M-4** | depth>4 静默 nil | 预算可配（默认 8），超深 → `SrcUnscannedNesting` 从严 | **CLOSED**（12 层嵌套实测 `SrcUnscannedNesting`；3 层内仍是真内容命中 `fs.read`；`MaxParamDepth:0` 回落默认而非「不扫」；空嵌套不误触发截断） |
+| **M-5** | 死字段 `winStrs` + 内存/时延撞 D32 | 删死字段/死分支/每候选全量拷贝；**明说不宣称时延改进** | **CLOSED，且声明是诚实的**。我实跑：`BenchmarkMarkFullSource 29309800 ns/op 4319069 B/op 12 allocs/op`、`BenchmarkScanOverTenSources 30019433 ns/op 1574669 B/op 17 allocs/op` —— 与 PRECHECK 记的 27.8ms/4.3MiB、每源 ~2 MiB 哈希集自洽（262144 rune × 8 B/窗＝2.0 MiB，正是删掉 `[]string` 平行表后应有的量级）；`winStrs` 与「碰撞探邻居」分支在磁盘上确已不存在。**未宣称的改进也没有被偷偷宣称**：文档原文写「55.8~58.9ms vs old 57.4~57.8ms，差异落在噪声内，未记为改进」，与我跑出的同量级一致。残留（不影响裁定）：`contains` 每个 mark 重复做一次 `[]rune(paramNorm)`，N 个源即 N 次转换——这解释了「无时延收益」，也留了下一步的空间 |
+| **M-6** | 零宽/软连字符切断 ≥8 窗口 | 丢弃 U+00AD/200B/200C/200D/2060/FEFF + `Mn` | **CLOSED**。六个码点 + combining mark 逐一实测（候选侧与**源侧**双向）不再切断 ≥8 窗口；`TestNormalizeTaintDropsIgnorableChars` 用码点构造而非字面隐形字符（编辑器往返安全），并另在归一化空间直打 `contains`。**未过度归一**：无关串、被隐形字符注水的无关串、`MARKER`（7 rune）、`z×200`、`12345678` 全不命中；纯隐形字符源被 `Mark` 拒（返 false）。匹配器没有变成「什么都命中」 |
+| N-1 | `AllowedDirs` 死字段 | 删字段，规则定为「profile 下任意路径，严于 allowed_dirs」 | **CLOSED**（`internal/risk/` 内 `AllowedDirs` 0 命中；其余命中都是 `internal/config` 自己的 `fs.allowed_dirs`，与本票无关；PRECHECK 同步改口径） |
+| N-2 | `canonical` 设而不读 | 由 `finalize` 消费 | **CLOSED**（见 M-3 行的实测） |
+| N-3 | 碰撞测试重言式 + 死分支不可达 | 删死分支；注入 ghost 哈希制造真碰撞 | **CLOSED**（`idx.hashes` 里塞入源中不存在的窗口哈希，断 `contains` 仍 false，再断真片段仍命中——这才是碰撞语义；`TestFragmentIndexShortSourceNeverMatches` 也补了 populated 对照） |
+| N-4 | 集成层从未走归一化 | `TestNormalizationEndToEnd` + 四通道套件的变形 subcase | **CLOSED**（同一 Mark→Inspect 链路上跑大小写/全角/空白/隐形字符 7 变体，并带「不相关串不得命中」的对称断言） |
+| N-5 | 裸 `HasPrefix` 牵连兄弟目录 | 换 `isUnder` | **CLOSED**（实测 `profileevil` 不被扫进） |
+| N-6 | DEFERRED 点名的票 21/26/55 正文无承接 AC 行 | 票 26 / 票 55 各补 AC 行 | **CLOSED**（票 26 补「播报必须过 `CheckText(scope, ChTTS)`」；票 55 补 macOS 云盘探测须达 env/config **级**、明写「裸 `os.Stat` 猜默认目录不撤销兜底」——比我要求的还准）。票 21 那半我未在本轮重开（审批渲染面），首轮该行只作保留说明，不作缺陷 |
+| N-7 | 测试少计 | 更正为 68 顶层 + 38 subtest | **NOT FULLY CLOSED（无害）**：实测 70 顶层（69 PASS + 1 SKIP）+ 37 subtest。少计方向与首轮同款，无风险，但「更正」又错了一位（见 R1） |
+
+### R4 五条 AC 复裁（对照首轮）
+
+| AC | 首轮 | **复验** | 依据 |
+|---|---|---|---|
+| ① 四/六通道逐通道 L2 + 指名来源 | PASS | **PASS（未回归）** | 五 subtest 逐条断 Channel + `hit.Source()`；TTS/HTTP 两条现断 Channel 标签（首轮 §2 行 1 的保留已消）；经真 C19 的 `TestR4EndToEndViaAssessor` 仍 L2/[R4]/SessionOverrideBlocked/「包含来自 doc.read」；B-2 加宽后归因未糊 |
+| ② 归一化仍命中，<8 不命中 | PASS（附缺测） | **PASS** | N-4 补齐（集成层变形）+ M-6 双向 + 边界 8/7 仍钉 |
+| ③ LLM 改写残留（记录为限制） | PASS | **PASS（不变）** | 首轮 §5(a) 的 SPEC 背书仍成立；本轮另证 M-6 **不属**该背书范围且已闭合 |
+| ④ 已配置 OneDrive 机器上检出 + fixture 兜底 + 探针过 P12 | **FAIL** | **PASS** | 首轮列的三硬伤逐条消解：根确认来自 **env 级**（真机实测 root=OneDrive/env）；注册表探针有可注入表测试 + 诚实 skip；8.3 与 `\?\` 两条真写盘红队用例已补（含真机腿，门控 0 字节落地）；「default 探针命中即关兜底」被 M-3 反转为「default 级不关兜底」 |
+| ⑤ 作用域不继承（DisposalScope） | PASS（附 M-1） | **PASS（M-1 已闭）** | 反转后的 `TestInspectUnknownScopeIsEmptyStore` 仍保「opened-and-empty 合法不命中」与「Dispose 后引擎无污」两条，AC#5 语义没被从严改坏 |
+
+### R5 本轮新发现（首轮的 FAIL 面从未覆盖）
+
+- **M-7（MAJOR，须修或显式登记后才可 ship）**：`writeChannelKeys` 的同步门**外溢到了非 `fs.write` 的工具形状**。
+  `provenance.go:496` 的 `(!syncGateOpen && writeChannelKeys[k])` 出现在「其他工具」分支里，于是任何工具只要参数里
+  同时出现一个 `path`/`file`/`filepath`/`dest`/`destination` 字符串（解析到同步根之外）和一个叫 `content`/`data` 的键，
+  该载荷就被**静默跳过**。实测（confirmed 根、兜底关闭）：
+  `http.post{url,path:<非同步>,data:<污染>}` → **hit=false**；同一形状走**冻结适配器**
+  `Detector.TaintHit` → `hit=false src=""`；`notify{text:"ding",path:<非同步>,content:<污染>}` → **hit=false**；
+  `web.fetch{dest:<非同步>,data:<污染>}` → **hit=false**。对照：把 `data` 改名 `body` → **hit=true**；把 path 换成同步根 → **hit=true**。
+  ⇒ 命中与否由**参数名**决定，正是 B-2 的同一类，只是方向反过来（B-2 修的是「改名就扫」，这里变成「叫 content/data 就不扫」）。
+  SPEC-06 §5 里唯一有落点条件的通道是 ⑤（fs.write 落同步根）；⑥（HTTP POST body/URL）**没有**落点条件，
+  而票 19 自己在 `provenance.go:22-41` 写的是「every other parameter value is still scanned fail-closed」。
+  公平记账：**这不是本轮引入的**（`73b6057` 的未知工具分支就有同一句 `continue`；首轮 B-2 的清单也没覆盖它），
+  且今天不可达（channel ⑥ 尚无生产调用点，`NewProvenance(` 全仓仅测试里出现；net 侧推荐入口是 `CheckText(ChHTTP)`，不经此门）。
+  **一行收口**：该 skip 只保留在 `def.ch == ChSyncWrite` 那一支（fs.write 自己），其余工具把 `content`/`data` 当普通参数扫。
+  条件见 R7 C-1。
+- **N-8（MINOR，接受，建议记一行）**：M-7 的镜像——`fs.write` 写**非同步**目录时，载荷键名只要不是 `content`/`data`
+  （如 `body`）就被无条件扫 → 普通本地写也升 L2（实测 true）。方向偏严，符合 16.9#1「误报安全」，
+  但它让「一次本地写入要不要确认」取决于键名，建议在 PRECHECK 的 fs.write 段补一句，免得票 20/21 接线时当 bug 报。
+- **N-9（MINOR，注释与行为不符 + 非 Windows 死分支）**：`syncdirs.go:217-221` 断言「junction 算已存在，所以调用方的
+  Resolve 会看见并拒绝」——实测 Go 对无尾斜杠的 junction `Lstat` 报 `isdir=false mode=?rw-rw-rw-`（不带 `ModeSymlink`），
+  祖先walk 之所以穿过它靠的是补尾 `\` 后 Lstat 会跟进 mount point。结论仍安全，但**理由写错了**。
+  另：`resolveTarget` 的 `pathHandleVerify == false` 分支（`:204-213`，注释称「非 Windows 上词汇形式已是 C26 能给的全部」）
+  在 POSIX 上**到不了**：`deepestExistingAncestor` 用 `\` 拼路径去 `Lstat`（`splitPathComponents` 先把 `/` 换成 `\`），
+  Linux/macOS 上 `\home\user\…` 永不存在 → `anc=""` → `errTargetUnverified` → **每一次写入都落 sync-suspect**（方向从严，
+  非漏洞，但 macOS 票 55 会把「普通本地写全部升 L2」当新 bug）。交叉编译通过不等于该路径正确，建议随票 55 的 AC 行点一句。
+- **N-10（MINOR，硬化残留，见 R2）**：尾巴含 `..` 时分类器看不见 junction，今天**与 OS 落点一致**（实测）故不构成逃逸；
+  这份一致性来自 Windows 对 `.`/`..` 的前置归一，而非代码里的一句检查。若要把它变成不变式：候选原串里存在被折掉的 `..`
+  组件时直接落 sync-suspect（一行，误报面近乎零——正常 `fs.write` 目标不带 `..`）。登记即可，不阻塞。
+- **N-11（INFO）**：`rules_gateway.go:96-98` 的 R4 注释仍写「Dormant until ticket 19 wires the TaintDetector」，
+  而引擎侧已交付（缺的是循环接线）。属票 17 文件、本票不得触碰，仅登记给票 20/21。
+- 另：`Inspect` 在路径**无法核实**（而非确认同步）时也会把命中标成 `ChSyncWrite`（`provenance.go:473-476`）——
+  标签偏宽，不改判定方向，INFO。
+
+**新引入的洞？M-7 是本轮口径与实现之间真实不一致的一条（虽然根在旧码）**，其余为注释/计数级。
+除 M-7 外，本轮修复未打开新的 fail-open：B-1 的祖先锚定没有把 reparse 挪进盲区（R2 两路实测），
+B-2 的加宽没有冲掉归因（R3 实测），M-1 的从严没有冲掉 AC#5 的空店语义（R3 实测）。
+
+### R6 探针复现配方（5 个临时文件 / 23 个探针函数，跑完已删，未入树）
+
+`P-A` 尾巴 junction（沙箱 + **真 OneDrive** 两版）｜`P-A'` 深尾巴｜`P-B` `..`+junction 的**落点**核验（两个候选落点各预置同名文件，看谁被改 + `GetFinalPathNameByHandle` 说真话）｜`P-B'` 四种 `..` 变体 + `\\?\` 腿｜
+`P-C` TOCTOU（判后再建 junction）｜`P-D` M-3 诱饵重放（default/fixture/options/""/env + ghost 根）｜`P-E` B-2 六逃逸 + 归因 + 同步门 + M-1 三缝｜
+`P-F` M-6 六码点双向 + 反误报｜`P-G` M-4｜`4-WhichFile` OS 真值｜`4-ExemptedJunction` 豁免穿透归因｜`4-FileSymlinkTail` hardlink｜
+`5-WriteKeyGate` **M-7**（`{path,data}`/`{text,content,path}`/`{dest,data}` 三形状 × 具名工具/无名适配器）。
+重跑：把上述任一形态写成 `internal/risk/zz_reverify_test.go` 后 `go test ./internal/risk/ -run TestRV -v`。
+`mklink /J`、`mklink /H` 均无需管理员权限即可成功（实测），这直接决定了 R2 的威胁模型判断。
+计数诚实附注：23 个探针里 round-1/2 的 4 个 `..` 形状探针（`TestRVProbeDotDotAfterJunction` +
+`TestRV2DotDot{Landing,InsideSandbox,Variant}`）当时**无效**——我用 `filepath.Join` 拼原串，
+它自己先把 `..` 折掉了，等于没测到未折叠的原串；结论一律以 round-3 的字符串拼接版（`TestRV3*`）与 round-4 的
+同名文件落点版（`TestRV4WhichFileDoesTheOsOpen`）为准。另有两个探针首跑因**我的**前置条件写错而红
+（`TestRVProbeB2` 忘了把注入根真建出来 → 兜底开着，判「普通写也命中」；`TestRVProbeM6` 的负例 `marker-qzx` 本是
+marker 的前缀 → 真命中不是误报），修正前置后复绿；红的那两条不是被测码的缺陷，记此以免证据被误读。
+
+### R7 VERDICT
+
+**PASS WITH CONDITIONS — 票 19 可继续推进，但下列三条须先落地（都不需要重开 B-1/B-2 的面）。**
+
+首轮必改 **B-1、B-2、M-1、M-3、M-6 全部 CLOSED 并经我独立实测复现其正反两侧**；建议同批的 M-2/M-4/M-5/N-1..N-6 亦 CLOSED；
+AC 复裁：①②③⑤ PASS，**④ 由 FAIL 转 PASS**（env 级根确认 + 8.3/`\?\` 真写盘红队用例，正是首轮 §8 开出的判据）。
+两条首轮实测复现的 fail-open 逃逸，本轮我**用更强的形状（尾巴 reparse、`..` 出圈、TOCTOU、豁免 junction）都未能重新打开**。
+
+必须落地的条件（回归前，一行码 + 一行文档的量级）：
+- **C-1**：**M-7** 二选一——(a) 把 `content`/`data` 的同步门 skip 收回 `def.ch == ChSyncWrite` 一支；或 (b) 在 `provenance.go` 头部 DEFERRED 头与票 22 正文各写一行 AC，明说「channel ⑥ 的 body 若以 `content`/`data` 命名且同 call 带 path，不经 C25」并给出该 AC 的测试名。(a) 更可取：它同时消掉 N-8 的键名依赖。
+- **C-2**：PRECHECK 补三行残留登记（不得只留代码注释）：①「同步判定与写盘非同一原子操作，TOCTOU 不属本票威胁模型，理由见 19-adversarial-acceptance §R2」；②「`..` 折叠形状今日与 OS 归一同源故安全，硬化见 N-10」；③「env 级证据可被同用户进程伪造，撤销兜底的信任边界即此」——三者方向均为可接受，登记即免成无声技术债。
+- **C-3**：票 19 日志 N-7 行的计数按 **70 顶层（69 PASS + 1 SKIP）+ 37 subtest** 改准；`syncdirs.go:217-221` 的注释按 R5 N-9 改准（连同 `pathHandleVerify==false` 分支在 POSIX 不可达这一句，或把它交给票 55 的 AC 行点名）。
+
+**可随 DEFERRED 延后 ship（不阻塞本票转 done）**：M-5 的每候选 `[]rune` 重复转换（无时延宣称，纯优化）；N-9 的 POSIX 侧收口（票 55 AC 已挂）；N-10 的 `..` 从严硬化；N-11 的 R4 陈旧注释（票 17 文件）；LLM 改写残留（SPEC-06 §5/§12 + 16.9#1 背书，首轮 §5(a) 已裁）；`MaxSourceRunes`/`MaxScanRunes` 截断残留（已记日志）；C25 循环接线（票 10/20/21/22/26，`DEFERRED(C25-loop-wiring)` 在位且我已复核全仓 `NewProvenance(` 无生产调用点）。
+另注：**`internal/agent/` 本轮零触碰**（两次提交 `grep -c internal/agent` = 0），本复验全程未读写该目录，构建范围一律 `./internal/risk/`。
