@@ -25,7 +25,7 @@ const (
 // renderer consumes only this struct - state knowledge lives here, pixels
 // live there.
 type Visual struct {
-	SizePx     float32 // orb diameter at 96 DPI (scaled by DPI later)
+	SizePx     float32 // orb diameter in px, drawn as-is (DPI note after this struct)
 	Opacity    float32 // whole-orb opacity (Sleeping 0.35, Armed 0.6, Muted 0.4...)
 	CoreColor  Color   // inner glow color (tint hi/lo pair of the state)
 	CoreAlpha  float32 // inner glow strength (ball.html --tint-opacity)
@@ -62,6 +62,17 @@ type Visual struct {
 	DockProgress float32
 }
 
+// SizePx's DPI treatment is asymmetric, and ticket 68 AC#1 records it as found
+// rather than fixing it here (every diff number in docs/SLO.md A.2 and
+// docs/evidence/s1/62-* was measured at 96 DPI, where the asymmetry is a
+// no-op): the DC render target is created with dpiX/dpiY = 96, so its units ARE
+// physical pixels, and drawFrame uses R = SizePx/2 unscaled - while the stroke
+// widths and ring margins get the dpi/96 factor and the window edge gets
+// WindowEdgePx(). Above 96 DPI the body therefore keeps its pixel size inside a
+// window that grew (a 56 configured orb draws 56px of body in a 108px window at
+// 144 DPI). Scaling the body with the window is a rendering change, so it
+// belongs with AC#2's desktop run, not with a comment.
+
 // Edge names a screen edge the ball docks against.
 type Edge uint8
 
@@ -73,10 +84,20 @@ const (
 	EdgeBottom
 )
 
-// prototypeVisuals selects the ticket 62 liquid-glass rendering. It is OFF by
-// default: SPEC-08 §2.1 (12px/0.35 Sleeping dot etc.) is frozen until the
-// owner signs the new look, and the ball's own tests assert that table. The
-// debug harness turns it on, which is what the owner runs.
+// prototypeVisuals selects the ticket 62 liquid-glass rendering. It is still
+// OFF by default, but the reason is no longer "the owner has not signed the
+// new look": on 2026-09-20 the owner signed it PROVISIONALLY (SPEC-08 §2
+// INTERIM - "先勉强用吧"), and SPEC-08 §2's Sleeping row now describes THIS
+// mode. Flipping the default is ticket 68 AC#2, held back only because its
+// re-measurement needs a desktop that is not busy; EnablePrototypeVisuals(false)
+// and `balldebug -frozen` stay as the escape hatch back to the old frozen table.
+//
+// Two facts AC#1 established from code, both unresolved by this ticket:
+//   - the resting body is stateSize()'s 56*SleepRestRatio = 34.72px, which is
+//     NOT the "直径 44px" SPEC-08 §2 now claims (see TestSleepingSizeTruthTable
+//     for the derivation of the recorded diff boxes) - 不符, awaiting ruling;
+//   - cmd/balldebug is today the only caller that turns this on, so a library
+//     consumer (the panel, a future wisp GUI host) still gets the frozen look.
 var prototypeVisuals bool
 
 // EnablePrototypeVisuals turns on the ticket 62 liquid-glass mapping. The
@@ -87,9 +108,15 @@ func EnablePrototypeVisuals(on bool) { prototypeVisuals = on }
 func PrototypeVisualsEnabled() bool { return prototypeVisuals }
 
 // stateSize returns the configured orb size clamped to the token range.
-// Frozen contract: Sleeping is the fixed 12px micro dot (ball.html: "不随用户
-// 配置的尺寸放大"). Prototype mode replaces it with the resting glass orb -
-// the 12px dot measured 0 visible pixels on the owner's desktop.
+// While the mode is off this is the frozen SPEC-08 §2.1 reading: Sleeping is
+// the fixed 12px micro dot, independent of the user's size (ball.html: "不随用
+// 户配置的尺寸放大"). Prototype mode replaces it with the resting glass orb,
+// because the 12px dot measured 0 visible pixels on the owner's desktop:
+// configuredPx*SleepRestRatio, floored to SleepingRestMinPx - i.e. 34.72px at
+// the default 56, and 30px (the floor) for any configured size from 44 to 48.
+// The dock never enters here: a docked Sleeping orb keeps this same body size,
+// and only drawGlass's DockSquash factor plus the window's new origin change
+// what lands on screen (ticket 68 AC#1 column 3).
 func stateSize(configuredPx int, s statemachine.State) float32 {
 	if configuredPx < BallSizeMinPx {
 		configuredPx = BallSizeMinPx

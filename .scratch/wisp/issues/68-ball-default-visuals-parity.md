@@ -45,6 +45,9 @@ func EnablePrototypeVisuals(on bool) { prototypeVisuals = on }
   ①`prototypeVisuals=false`、②`=true` 且未靠边、③`=true` 且已吸附（dock ramp 之后）三种情形下的**实际像素尺寸**，
   逐情形给出 `stateSize` 的输入与输出、以及差分化像框。**完成判据是一张三列对照表**，不是一个结论句。
   与 SPEC-08 §2 的 44px 不符的那一格**如实报不符**，由我裁定。
+  ⇒ **静态半已交付**（三列表 + 逐格函数/输入/输出/消费者，见 Progress log 与 agent 报告；桌面不可得，未做新实测）。
+  **三格全部与 44px 不符，待裁定**：①12px、②34.72px、③34.72px 本体（靠边只改窗口原点与液面/高光的 0.42 挤压，球壳与光晕不挤压）。
+  A.2 的 `46×46 / 2103px` 经码算归属于 **②**，且 `44` 那个数是 ≥24/255 的**包围盒**、不是本体直径。
 - [ ] **AC#2 默认值翻转（需桌面复测）**：`prototypeVisuals` 默认改为 `true`，
   使**默认构建 == owner 签收的样子**；`EnablePrototypeVisuals(false)` 与 `balldebug -frozen` 保留为"对照旧冻结规格"的逃生门。
   连带把 `internal/ball` 里**断言旧默认**的测试改到位：⚠ **不得**为了让测试变绿而删除断言或放宽阈值——
@@ -53,7 +56,7 @@ func EnablePrototypeVisuals(on bool) { prototypeVisuals = on }
 - [ ] **AC#3 签收面复测（需桌面）**：翻转后跑一次 `cmd/balldebug` 的差分化像，
   证明 `Sleeping` 的 px≥8/255 与成像框**不低于** A.2 已录的 2103 像素 / 46×46，且 `timers=no` 仍成立（D32 零定时器）。
   数字不过就报 FAIL 并附样本，**不许调阈值、不许重测到运气好的那次**。
-- [ ] **AC#4 无桌面的半格**：`gofmt -l` 空、`go vet ./internal/ball/ ./cmd/balldebug/`、
+- [x] **AC#4 无桌面的半格**：`gofmt -l` 空、`go vet ./internal/ball/ ./cmd/balldebug/`、
   `go test -count=2 ./internal/ball/`、`go test -count=2 ./cmd/balldebug/`（非 winlive 部分）。贴原始输出。
 
 ## 编排者已裁定
@@ -65,3 +68,4 @@ func EnablePrototypeVisuals(on bool) { prototypeVisuals = on }
 ## Progress log（append-only）
 
 - [2026-09-20T14:49:27Z] agent=agent-ticket68 did=claim 票 68（Status in-progress / Claimed by）。桌面被票 66（`internal/proc`+`internal/observe`+`cmd/wisp`+`cmd/balldebug/diff_windows.go` 的 proc 迁移，工作区里正有未提交改动）与票 67 占用，按裁定 3 只做 AC#1 静态半 + AC#4；AC#2/AC#3 未跑、未勾、未改默认值。
+- [2026-09-20T14:59:41Z] agent=agent-ticket68 did=AC#1 三列尺寸真相表（纯码 + 已录证据，**零新实测**）+ AC#4 四道门全绿 + 码内纠偏（零行为改动）：`statevisual.go` 三处注释把「12px 仍是冻结契约」「SizePx 稍后按 DPI 缩放」两个假前提改成事实——渲染目标 dpiX/dpiY=96，`drawFrame` 直接用 `R=SizePx/2`，只有描边/环边距走 `dpi/96`、窗口边走 `WindowEdgePx`，所以 144 DPI 下 56 配置会画成「108px 窗口里的 56px 本体」。新增两个纯函数测试：`tokens_test.go::TestSleepingSizeTruthTable`（①12 ②34.72 ③34.72；`SleepingRestMinPx` floor 在配置 44..48 生效、49 起失效；`DockSquash(0/1)=1/0.42`、落点窗口只剩 47/72px 在屏）与 `TestRecordedSleepingDiffBoxIsNotA44pxBody`（π(1.5R)² 反证：34.72px 预测 2130 ≈ 已录 2120/2103，44px 预测 3421，故 A.2 的 46×46 是 ② 那格的 ≥24/255 **包围盒**而不是本体直径；此测试**故意**在有人改 `SleepRestRatio` 而不重测时变红）。同时在 `TestVisualForCoversAllTwentyStates` 里点名 AC#2 要逐条迁移的断言（Sleeping 尺寸/opacity、Armed 0.6、Muted 0.4、Settling 末端 0.35），一条未改、一条未删。**未跑**：AC#2 的默认值翻转与复测、AC#3 差分复测、任何 `-tags winlive` 构建、`build/balldebug.exe`/`build/wisp.exe` 的编译或启动、建窗/点击/热键注入/截屏——桌面仍被票 66/67 占着（本轮工作区里能看到 `docs/evidence/s1/66/` 与 `slo-check` 的活跃改动），等桌面。翻转本身只有 1 行，但它会让默认构建成 AC#1 判定为「与 SPEC-08 §2 的 44px 不符」的那一格（34.72px），未拿到裁定就翻等于把不一致写进默认路径，故停在报告里。

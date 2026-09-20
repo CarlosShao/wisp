@@ -1,6 +1,7 @@
 package ball
 
 import (
+	"math"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -137,7 +138,13 @@ func TestVisualForCoversAllTwentyStates(t *testing.T) {
 		}
 	}
 
-	// SPEC-08 §2.1 anchors.
+	// SPEC-08 §2.1 anchors. The Sleeping size/opacity, Armed, Muted and the
+	// Settling end-anchor below all read the mode the library DEFAULT is in
+	// today (prototypeVisuals off) - that is precisely what ticket 68 AC#2
+	// flips. AC#2 must migrate each of them to the new default's behaviour, or
+	// make them flag-explicit with EnablePrototypeVisuals(false) where their
+	// whole purpose is to pin the frozen table. Naming them is AC#1's job;
+	// moving them without the desktop re-measurement is not.
 	if v := VisualFor(p, 56, statemachine.StateSleeping, 0); v.SizePx != 12 || v.Opacity != 0.35 {
 		t.Errorf("Sleeping: want 12px @ 0.35, got %v px @ %v", v.SizePx, v.Opacity)
 	}
@@ -170,6 +177,104 @@ func TestVisualForCoversAllTwentyStates(t *testing.T) {
 	}
 	if v := VisualFor(p, 10, statemachine.StateWarm, 0); v.SizePx != BallSizeMinPx {
 		t.Errorf("size clamp low: %v", v.SizePx)
+	}
+}
+
+// TestSleepingSizeTruthTable is ticket 68 AC#1's three-column size table, read
+// off the pure mapping only (no window, no desktop, no -tags winlive):
+//
+//	① prototypeVisuals=false           stateSize -> SleepingDotPx        12px
+//	② =true, free (undocked)           configuredPx*SleepRestRatio   34.72px
+//	③ =true, docked, ramp landed       same as ②: the dock never touches size
+//
+// Column ③ is where the "it shrinks when docked" story actually lives, so the
+// table also pins the two pure laws the dock draws with - DockSquash and
+// DockPos - and records what they are computed FROM (the window's radius, not
+// the state's body), which is the third disagreement with SPEC-08 §2's 44px.
+func TestSleepingSizeTruthTable(t *testing.T) {
+	restored := PrototypeVisualsEnabled()
+	t.Cleanup(func() { EnablePrototypeVisuals(restored) })
+	p := DarkPalette()
+
+	// ① the frozen micro dot: 12px regardless of the configured size.
+	EnablePrototypeVisuals(false)
+	for _, cfg := range []int{BallSizeMinPx, BallSizeDefaultPx, BallSizeMaxPx} {
+		if got := stateSize(cfg, statemachine.StateSleeping); got != SleepingDotPx {
+			t.Errorf("① stateSize(%d, Sleeping) = %v, want the frozen %v", cfg, got, SleepingDotPx)
+		}
+		if v := VisualFor(p, cfg, statemachine.StateSleeping, 0); v.SizePx != SleepingDotPx || v.Opacity != SleepOpacity {
+			t.Errorf("① VisualFor(%d, Sleeping) = %vpx @ %v, want %vpx @ %v",
+				cfg, v.SizePx, v.Opacity, SleepingDotPx, SleepOpacity)
+		}
+	}
+
+	// ② the resting glass body at the default size, and the floor that binds
+	// for every configured size the token range allows below 49px.
+	EnablePrototypeVisuals(true)
+	const rest56 = float32(BallSizeDefaultPx) * SleepRestRatio // 34.72
+	if got := stateSize(BallSizeDefaultPx, statemachine.StateSleeping); abs32(got-rest56) > 1e-4 {
+		t.Errorf("② stateSize(56, Sleeping) = %v, want %v", got, rest56)
+	}
+	for _, cfg := range []int{44, 48} {
+		if got := stateSize(cfg, statemachine.StateSleeping); abs32(got-SleepingRestMinPx) > 1e-4 {
+			t.Errorf("② stateSize(%d, Sleeping) = %v, want the %vpx floor", cfg, got, SleepingRestMinPx)
+		}
+	}
+	if got := stateSize(49, statemachine.StateSleeping); got <= SleepingRestMinPx {
+		t.Errorf("② the floor must stop binding above 48px, got %v", got)
+	}
+	if v := VisualFor(p, BallSizeDefaultPx, statemachine.StateSleeping, 0); abs32(v.SizePx-rest56) > 1e-4 ||
+		v.Opacity != 1 || !v.Glass {
+		t.Errorf("② VisualFor(56, Sleeping) = %+v, want %vpx @ opacity 1, glass", v, rest56)
+	}
+
+	// ③ docking changes no size: stateSize has no dock input at all, so the
+	// same call still answers 34.72px after the ramp lands.
+	if got := stateSize(BallSizeDefaultPx, statemachine.StateSleeping); abs32(got-rest56) > 1e-4 {
+		t.Errorf("③ the dock must not move stateSize, got %v", got)
+	}
+	if DockSquash(0) != 1 || abs32(DockSquash(1)-DockOverlapFrac) > 1e-6 {
+		t.Errorf("③ DockSquash endpoints = %v/%v, want 1 and %v", DockSquash(0), DockSquash(1), DockOverlapFrac)
+	}
+	// What a landed tab really leaves on screen, at the 96-DPI default (window
+	// edge 72, ring margin 8, so the position law's orbR is the WINDOW's 28):
+	// edgePx/2 + int(orbR*DockSquash(1)) = 36 + 11 = 47 of 72 px. That is the
+	// geometry the 62-diff-signoff "-dock-right" rows were shot at, and because
+	// 28 is the configured radius while a Sleeping body is 17.36, the rest orb
+	// keeps ~29 of its 34.72px visible - not the 42% the name promises.
+	work := Rect{L: 0, T: 0, R: 1920, B: 1080}
+	if p1 := DockPos(work, EdgeRight, 900, 500, 72, 28, 1); work.R-p1.X != 47 {
+		t.Errorf("③ a landed tab keeps %d px on screen, want 47 (36 + int(28*%v))", work.R-p1.X, DockOverlapFrac)
+	}
+}
+
+// TestRecordedSleepingDiffBoxIsNotA44pxBody is the AC#1 arithmetic that decides
+// which of the three columns docs/SLO.md A.2 actually measured, without
+// re-measuring anything. The diff parent counts a pixel as imaged at >=8/255,
+// and the widest thing a Sleeping frame draws is its halo: drawGlass fills an
+// ellipse of radius 1.5*R while glowBrush only reaches zero alpha at 1.9*R, so
+// the >=8 count is the area of a disc of radius 1.5*SizePx/2.
+//
+// Recorded for this exact configuration (default 56, 96 DPI, window edge 72,
+// prototype on, undocked): 2120 px in
+// docs/evidence/s1/62-diff-signoff/diff-table.txt and 2103 px in docs/SLO.md
+// A.2. Column ② (34.72px) predicts 2130. A 44px body predicts 3421, unclipped
+// by that same window - so SPEC-08 §2's "直径 44px" cannot be the body of the
+// frame that produced either number. The 44 and 46 the evidence calls the
+// imaging box are the >=24/255 cut INSIDE the same halo, and they wobble by
+// 2px between runs: that box is what got read as a diameter.
+func TestRecordedSleepingDiffBoxIsNotA44pxBody(t *testing.T) {
+	// 1.5*R is drawGlass's halo fill; 34.72/2 is column ②'s radius.
+	haloPx := func(sizePx float64) float64 {
+		r := 1.5 * sizePx / 2
+		return math.Pi * r * r
+	}
+	const measured = 2120 // A.2 recorded 2103 for the same posture
+	if got := haloPx(BallSizeDefaultPx * SleepRestRatio); math.Abs(got-measured)/measured > 0.02 {
+		t.Errorf("column ② predicts %.0f imaged px, want within 2%% of the recorded %d", got, measured)
+	}
+	if got := haloPx(44); got < measured*1.5 {
+		t.Errorf("a 44px body must predict far MORE imaged px than the evidence recorded, got %.0f vs %d", got, measured)
 	}
 }
 
