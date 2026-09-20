@@ -15,9 +15,24 @@
 ③ 另：本票曾丢掉一条判据——`0986d63` 改名那个注册测试时删掉了**逐条 `Needs` 断言**，
 而 `Needs` 正是 `bridge.go:286/291` 做 C3 授权判定所依据的需求集（少报一个能力＝只授权 `fs.read`
 的机器放行真写盘调用）。**已由编排者补回并做变异检验**（registry **A17**）。
-**新发现的两个残口**：`[fs] allowed_dirs` 首次使用询问流**零实现且没有对应 AC 框**（既不能验收也不能拒绝，
-要么补框要么书面转票 39）；以及 `6a6fca2` 是一个 `docs(` commit 却删了 `wiring_test.go` 9 行
+**新发现的两个残口**：`[fs] allowed_dirs` 首次使用询问流**没有对应 AC 框**——
+23:59 我把它从"零实现"**收窄**了（原文说过头， grep 当场推翻），真实状态见下面 ④；
+以及 `6a6fca2` 是一个 `docs(` commit 却删了 `wiring_test.go` 9 行
 （经查是死代码、无断言损失，但**判据文件不许挂在 docs 名下改动**）。
+④ **`allowed_dirs` 这条到底缺什么（我逐条 grep 复现，别再重做已有部分）**：
+  - **已存在且已测**：热加载方向引擎把它登记成 🔒 键（`internal/config/manager.go:362`），
+    `internal/config/manager_test.go:162-225` 断言了 confirm hook 收到 `section="fs"` +
+    `keys=["fs.allowed_dirs"]`、**拒绝确认后 `AllowedDirs` 仍为空**、批准后才生效、以及收紧方向。
+  - **已在生产装配里被执行**：`cmd/wisp/run.go:223-227` 把 `cfg.FS.AllowedDirs` 喂给
+    `tools.NewPathCanonicalizer(allowed, cfg.FS.ReparsePointExceptions)` ⇒ **这个键不是装饰品**，
+    默认 `[]` 意味着**没有任何根可读可写**（fail-closed，与 D47 同向）。
+  - **真正缺的只有这一件**：一次工具调用因为"路径不在任何 allowed 根下"被拒时，
+    **没有任何东西把这次拒绝变成一个"要不要把这个目录加进来"的询问**。今天唯一的授权路径是
+    用户手改 TOML（那条路径本身已经过 🔒 confirm）。
+  ⇒ **安全后果：无**（缺的是"给得更多"的入口，不是"拦不住"）；**可用性后果：真实**，
+    且第 209 行已记着一条硬约束：**它在 SPEC-12 §5 里没有行**，所以**不许在代码里标 `DEFERRED`**
+    （那会打断 1:1 交叉核对）。⇒ 处置：**补一条 AC 框**（本票文末），GUI 完整版仍归票 39。
+
 **Blocked by:** 17-risk-assessor-c19, 18-path-resolver-c26
 **Parallel slots:** ≤2 sub-agents (A: host bridge + ToolProvider registry; B: fs tool family +
 artifacts spill)
@@ -70,6 +85,25 @@ from 10.
 - [ ] Reparse/short-name target via junction → denied (18 integration).
 - [ ] Artifacts API writes only under data dir; attempting user-dir write via artifacts API →
       rejected; `fs.write` to user dir remains gated (rule separation test).
+- [ ] **第 7 框（2026-09-20 23:59 编排者补，来源：本票头部 ④）`[fs] allowed_dirs` 首次使用询问流的最小子集**。
+      范围**只有这三条**，多一条就算越界（GUI 完整版归票 39，SPEC-12 §5 **没有这一行 ⇒ 代码里不许标 `DEFERRED`**）：
+      - **(a) 拒绝原因必须可区分**：因"路径不在任何 allowed 根下"而被拒时，桥必须返回一个**机器可辨的**
+        原因值，与 PathResolver 的红队拒绝（junction / 8.3 短名 / UNC / `\?\`）**不共用同一个字符串**。
+        理由：后者**绝不能**变成询问——一份被注入的文档只要抛出一个穿过 junction 的路径，
+        就能驱动我们去问用户"要不要授权这个目录"，那等于把红队门变成社工入口。
+      - **(b) 同意必须走已有的 🔒 通道**：用户批准后，追加只允许经由
+        `internal/config` 的 `fs.allowed_dirs` **方向引擎 confirm hook**（`manager.go:362` +
+        `manager_test.go:162-225` 已测：拒绝后仍为空、批准后才生效）。
+        **禁止**新增第二条授权路径、禁止直接改 `PathCanonicalizer` 的根集合、禁止"这次先放行下次再说"。
+      - **(c) 三条断言**：①(a) 的两类拒绝原因可区分；②批准 → 下一次同路径调用成功，**拒绝 → 仍被拒**；
+        ③**junction / 8.3 拒绝绝不产生询问**（这条是本 AC 的安全内核，缺它则本 AC 不成立）。
+      **归属与阻塞**：本票的框**原本就没有编号**（按位置数：共 **7 框**，当前 `grep -c "^- \[x\]"`=4、
+      `grep -c "^- \[ \]"`=**3** ⇒ 未勾的是「桥层 junction/8.3」「artifacts spill」「本框」；
+      日后做 1:1 裁决表时**按位置对齐**，别自己编号后又在别处引用错号）。
+      另有一条**不在框里**的残口：**A18** 真 `taskkill` 下的 `.wisp-tmp-*` 残留。
+      本框与 **A19**（审批层没有输入设备）同源，最小实现只能用 native prompt。
+      ⚠ **不得与票 70 的全仓格式化并发**（要改 `internal/tools`）。
+
 
 ## Progress log (append-only, newest last)
 - [2026-09-20T09:55Z] agent=T20-seg1 did=**segment 1 (scope items 1-6)** — `internal/tools/` now holds

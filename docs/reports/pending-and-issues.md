@@ -709,6 +709,22 @@
     （连同 `adapter_test.go:389-427`）在树里**已无定义**（我抽了该报告 6 个测试名，5 个仍可解析、这 1 个不能）。
     `s0/01` 的 emoji 扫描面主张已过期（同类命中今天散布 20+ 文件，见 A23）。
     `62-visual-spec-draft.md` 被票 62 的正文(`:51`)与 AC#7(`:60`)引用，**文件从未写出**（`find` 零命中）。
+    - **✅ ②④ 已于 2026-09-20 23:59 闭（提交 `a5741a2`，我逐条独立核对）**：
+      四份报告各在**文末追加**一节 `## 更正（A30…）`，`--stat` 实测 **527 insertions / 0 deletions、
+      `.go` 文件 0 个** ⇒ 原文一字未改，历史证据没有被销毁。并排贴了两条命令的真实输出
+      （仓根那条**不打印 examined 且 EXIT=1**、正确那条 **`examined 194` + clean + EXIT=0**），
+      没有拿"今天 clean"去追认"当时 clean"。
+    - **④ 的两处修正，以核对后的版本为准**（我先前那句话也偏了）：
+      (a) `TestGoldenCancellationMidStream` **不是断言丢失**——`5ddedf7` 把它逐字搬进
+      `internal/llm/adaptertest/harness.go:579 runCancel`，现名 **`TestSharedGoldenSuite/cancel`**
+      （`internal/llm/anthropic/suite_test.go:36` 等三协议腿各跑一遍），我 grep 复现了这两个位置。
+      ⇒ 受影响的只是**引用字符串与行号**（`adapter_test.go` 现在只有 291 行，427 已越界），不是覆盖面。
+      (b) `s1/18:11` 的"**allowlist 1 行豁免**"在**写下当时就失实**：`git show 3df0218:tools/d22scan/allowlist.txt`
+      非注释行 = **4**（其中属票 18 的只有 1 行）——我自己刚复跑这条命令确认 =4。
+      ⇒ 这不是"引用过期"而是"原句写错"，性质更重一档。
+    - **代理如实声明的未证实项（不要当成已证）**：三处 D22 句的**历史**状态需要 checkout 旧树才能定，
+      它按授权没做，故那些行判"无凭据"而非"当时确红"。
+
   - **⑤ 元教训：门必须自报工作量，否则"没报问题"和"没看"在输出上长得一模一样。** 本轮挖出的同类空仪器：
     `cmd/balldebug -diff` 无论像素计数为何都 `return nil`；`go test -run <不匹配>` 打印 `ok`；
     d22scan 的 `frontend/` 作用域实际走 0 个文件。票 67 已把 `examined N` + `N==0 致命退出` 落进 d22scan
