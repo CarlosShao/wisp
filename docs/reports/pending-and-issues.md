@@ -670,7 +670,6 @@
   **归属**：①我改契约并告知 owner；②③⑤⑥ 归**票 68 AC#2/AC#3 的桌面跑同批**；④ 与 A24-D4 一起在票 69 或票 39 认领。
 
 ## 待 owner 拍板（编号清单 R15，2026-09-20 23:14）
-
 规则：每项给「选项 / 我的推荐 / 不答的代价」。**1–6 全部不需要你写代码**，只回答问题或跑一条命令。
 
 | # | 问题 | 选项 | 推荐 | 不答的代价 |
@@ -689,6 +688,38 @@
   纯索引条目，避免"发现记了但没人拍板"。对应关系：R15#1/#2↔A29①，#3↔A29⑤，#4↔A29②，
   #5↔A29③，#6↔A28/A29 DPI 条；A29④（`SleepWindowEdgePx` 零调用者）与 A29⑥（winlive 地雷）
   **不需要 owner**，分别归票 69 与票 68 AC#2 同批。
+
+### 裁定 R16（23:27）：A26 剩余半——ban #1 覆盖面怎么扩，以及**我更正代理的一处计数**
+
+我读了匹配器本身（`tools/d22scan/main.go:251-252` 只对字面量 `go func(` 报警），
+并逐条看它报告的"生产范围内 4 处具名协程"。**其中一处不是违规**：
+
+| 位置 | 语句 | 判定 |
+|---|---|---|
+| `internal/observe/goroutine.go:281` | `go r.run(h, name, root, owner, fn)` | **这就是受管机制自己的实现**——禁令要禁的是"绕过 Registry 起协程"，而这一行**是** Registry 的内部实现。它不是漏网，是**唯一合法的 spawn 点** |
+| `cmd/balldebug/main.go:231` | `go runHotkeyBridge(bridge, pollCtx, time.Second, pollDone)` | 具名绕过（票 64 写的，带 owner+recover+join，**精神合规、形式不过**） |
+| `cmd/balldebug/main.go:259`、`:440` | `go feedLevels(...)` ×2 | 同上 |
+
+⇒ **代理说"4 处"应当读作"3 处要处理 + 1 处是机制本身"**。它没让我修是对的（豁免权在我），
+但它把 `observe` 那一行与 balldebug 三行并列为"命中"，会误导后来的代理去豁免真正的漏洞、
+或反过来把机制改掉。
+
+**裁定（写死，票 70 AC#5 照此执行，不要再问我）**：
+1. **豁免按"文件"而不是按"形式"**：新增 ban 匹配 `go <任意>`（含具名调用），
+   **唯一按文件路径豁免的是 `internal/observe/goroutine.go`**。
+   ⚠ **不得**用"这条是具名调用所以放过"当豁免理由——那正好把漏洞留在门上。
+2. **`cmd/balldebug` 的 3 处要改成 `observe.Registry.Spawn`**，不是加豁免。
+   理由：`balldebug` 是长期存在的调试宿主，它的协程寿命与球窗口绑定，
+   走 Registry 才能被 D38b 的名册与泄漏检查看见；现在这三条**只在人肉 review 下成立**。
+3. **输出必须自报工作量**（A26 的元教训落地）：扫描结束打印 `examined N production Go files`，
+   且 `N == 0` 时**致命退出**——这条票 67 的 `checkRoot()` 已经做了，扩展覆盖面时**不许回退**。
+4. **只许从严**：若扩展后在别处又挖出具名 spawn，**逐个登记进票 70 的 log**，
+   由我逐条判定"改码 or 按文件豁免"，**不许默默加豁免凑绿**。
+5. 这条与 `mockllm` 的 loose end 挂钩：`Spawn` 对不在名册的名字**无条件 WARN**，
+   票 67 因此每条 mockllm 测试多出一行 `WARN goroutine outside the D38 roster`。
+   抑制它需要在 `internal/observe/goroutine.go` 加 `TemporaryNames` 条目——
+   **那是票 66 的文件**，所以**等 66 收尾再做**；代理"拒绝借用现有名册名来骗过泄漏检测"的判断**是对的**，
+   骗过检测器比多一行 WARN 贵得多。
 
 ## 已解决（resolved）
 

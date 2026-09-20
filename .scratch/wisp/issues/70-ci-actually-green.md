@@ -40,10 +40,19 @@
   若确为占位，**改成显式的 TODO 步骤且**在 PLAN/HANDOVER 里留痕（改法由我定，代理先给证据）。
 - [ ] **AC#4 `slo-full` runner**：查 `Build wisp.exe` 在自托管 runner 上为何失败（deps 缓存？PATH？CGO？），
   交付**可复跑的修复步骤**或"此 runner 今天不可用"的明确结论 + 需要 owner 做什么。
-- [ ] **AC#5 ban #1 覆盖洞（A26 剩余半）**：`go probeReader()` 这类**具名调用**今天扫不出来
-  （生产范围实测 4 处：`internal/observe/goroutine.go:281` 受管 + `cmd/balldebug/main.go:231/259/440`）。
-  要么把 ban 扩到具名调用并由我**书面**给 observe 豁免，要么把"clean"的语义在输出与文档里**写死成当前范围**。
-  ⚠ 三处 `balldebug` 命中若被新覆盖面抓到，**照实报**，由我裁定归属，别自行豁免。
+- [ ] **AC#5 ban #1 覆盖洞（A26 剩余半）—— 按裁定 R16 执行，不要再问**：
+  匹配器 `tools/d22scan/main.go:251-252` 只对字面量 `go func(` 报警。我（编排者）逐条核过它说的"4 处具名协程"，
+  **更正为 3 处要处理 + 1 处是机制本身**：`internal/observe/goroutine.go:281` 的 `go r.run(...)`
+  **就是 Registry 的内部实现**，不是漏网；要改的是 `cmd/balldebug/main.go:231`（`runHotkeyBridge`）
+  与 `:259`、`:440`（`feedLevels` ×2）。
+  1. 新增 ban 匹配 `go <任意>`（**含具名调用**），**唯一按文件豁免的是 `internal/observe/goroutine.go`**；
+     ⚠ **不得**以"这条是具名调用"为豁免理由——那正好把漏洞留在门上。
+  2. `cmd/balldebug` 那 3 处**改走 `observe.Registry.Spawn`**（不是加豁免），让它们进 D38b 名册、被泄漏检查看见。
+  3. 输出必须继续自报 `examined N production Go files`，**`N==0` 致命退出**（票 67 的 `checkRoot()` 已实现，**不许回退**）。
+  4. **只许从严**：扩展后若又挖出具名 spawn，逐个登记进本票 log 由我判定，**不许默默加豁免凑绿**。
+  5. 连带 loose end：`Spawn` 对不在名册的名字无条件 WARN，票 67 的 mockllm 测试因此每条多一行
+     `WARN goroutine outside the D38 roster`。抑制它要在 `internal/observe/goroutine.go` 加 `TemporaryNames`
+     ——**那是票 66 的文件，等票 66 收尾再做**；借用现有名册名来骗过泄漏检测**禁止**（代理拒得对）。
 - [ ] **AC#6 全绿证据**：`gh run view <新 run> --json jobs` 的**逐 job 结论**贴进本票 Progress log。
   判据是**五个 job 全 pass**，不是我某一步本地过了。**`slo-smoke` 若仍红，先确认票 66 是否已合**，
   不要为了让它绿而调采样阈值（D32 的 0.5% 一字不动）。
