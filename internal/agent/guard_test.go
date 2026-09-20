@@ -1,0 +1,220 @@
+package agent
+
+import (
+	"context"
+	"io"
+	"log/slog"
+	"path/filepath"
+	"strings"
+	"testing"
+	"time"
+
+	"github.com/CarlosShao/wisp/internal/memory"
+	"github.com/CarlosShao/wisp/internal/observe"
+)
+
+// Acceptance criterion 5: the C22 gradient ladder [3,5,8] injects graduated
+// reminders, the top rung drives Stuck with an explicit user-visible message
+// (never a silent stop), and the per-tool timeout fires.
+
+func TestLoopGuardLadderRemindersThenStuck(t *testing.T) {
+	h := newHarness(t, "repeat-echo")
+	res := h.run("把目录再列一遍")
+
+	if res.Status != StatusStuck {
+		t.Fatalf("status = %s (%s), want stuck", res.Status, res.Message)
+	}
+	if res.Brake != BrakeRepeat {
+		t.Errorf("brake = %s, want %s", res.Brake, BrakeRepeat)
+	}
+	// Rungs 3 and 5 inject reminders; rung 8 stops. The ninth response (a text
+	// answer) must never be requested.
+	want := []int{3, 5, 8}
+	if len(res.ReminderLevels) != len(want) {
+		t.Fatalf("reminder levels = %v, want %v", res.ReminderLevels, want)
+	}
+	for i, lv := range want {
+		if res.ReminderLevels[i] != lv {
+			t.Errorf("level %d = %d, want %d", i, res.ReminderLevels[i], lv)
+		}
+	}
+	if h.requests() != 8 {
+		t.Errorf("requests = %d, want 8 (stopped at the top rung)", h.requests())
+	}
+	// Rounds 1..7 executed; the 8th was refused before execution.
+	if n := h.echo().CallCount(); n != 7 {
+		t.Errorf("executions = %d, want 7", n)
+	}
+
+	// The reminders really were injected into the conversation (D43 row #19
+	// side effect "agent.inject-reminder"), twice (rungs 3 and 5).
+	var injected int
+	for _, m := range h.loop.History() {
+		for _, p := range m.Content {
+			if t, ok := p.(llmText); ok && strings.HasPrefix(t.Text, "[系统提醒]") {
+				injected++
+			}
+		}
+	}
+	if injected != 2 {
+		t.Errorf("injected reminders = %d, want 2:\n%s", injected, dumpHistory(h.loop.History()))
+	}
+
+	// Stuck is visible AND names what repeated (C22 forbids a silent stop).
+	st := h.sink.LastOf(EvStuck)
+	if st == nil {
+		t.Fatal("no stuck event published")
+	}
+	for _, needle := range []string{"echo", "连续调用 8 次", "参数相同", "token"} {
+		if !strings.Contains(st.Text, needle) && !strings.Contains(res.Message, needle) {
+			t.Errorf("stuck message must contain %q; got event=%q result=%q", needle, st.Text, res.Message)
+		}
+	}
+	if len(h.sink.events) == 0 {
+		t.Fatal("sink recorded nothing")
+	}
+	reminders := 0
+	for _, e := range h.sink.events {
+		if e.Kind == EvReminder {
+			reminders++
+			if e.RepeatLevel == 0 || e.ToolName != "echo" {
+				t.Errorf("reminder event = %+v", e)
+			}
+		}
+	}
+	if reminders != 3 {
+		t.Errorf("reminder events = %d, want 3 (one per rung)", reminders)
+	}
+}
+
+// The ladder is config data, not a constant: a smaller configured ladder stops
+// earlier, which is what proves the thresholds are read from config.
+func TestLoopGuardLadderIsConfigurable(t *testing.T) {
+	h := newHarness(t, "repeat-echo", withConfig(func(c *Config) {
+		c.RepeatThresholds = []int{2}
+	}))
+	res := h.run("把目录再列一遍")
+	if res.Status != StatusStuck {
+		t.Fatalf("status = %s (%s), want stuck", res.Status, res.Message)
+	}
+	if h.requests() != 2 {
+		t.Errorf("requests = %d, want 2 (single-rung ladder fires on the 2nd repeat)", h.requests())
+	}
+	if !strings.Contains(res.Message, "连续调用 2 次") {
+		t.Errorf("message = %q", res.Message)
+	}
+}
+
+// A changed call sequence resets the counter (the brake targets *consecutive*
+// identical calls, D43 row #19 wording).
+func TestLoopGuardResetsOnDifferentCall(t *testing.T) {
+	g := NewGuard(GuardConfig{Budgets: BudgetsFor(128000)})
+	one := toolCalls("call_a", "echo", `{"text":"x"}`)
+	for i := 1; i <= 2; i++ {
+		if _, rep := g.ObserveTurn(one); rep && i < 3 {
+			t.Fatalf("rung fired early at %d", i)
+		}
+	}
+	other := toolCalls("call_b", "echo", `{"text":"y"}`)
+	if _, rep := g.ObserveTurn(other); rep {
+		t.Fatal("a different argument set must reset the repeat counter")
+	}
+	if rem, _ := g.ObserveTurn(other); rem.Level != 0 {
+		t.Fatalf("first repeat of the new call must not fire, got %+v", rem)
+	}
+	if rem, _ := g.ObserveTurn(one); rem.Level != 0 {
+		t.Fatalf("back to the old call must restart at 1, got %+v", rem)
+	}
+}
+
+func TestLoopGuardTokenBudgetScalesWithWindow(t *testing.T) {
+	big := BudgetsFor(128000)
+	if big.TokenBudget != 200000 {
+		t.Errorf("128k budget = %d, want the frozen 200k", big.TokenBudget)
+	}
+	small := BudgetsFor(4096)
+	if small.TokenBudget >= big.TokenBudget {
+		t.Errorf("4k-window budget = %d, must shrink below %d", small.TokenBudget, big.TokenBudget)
+	}
+	if got := (4096 * 200000) / 128000; small.TokenBudget != got {
+		t.Errorf("4k-window budget = %d, want the proportional %d", small.TokenBudget, got)
+	}
+	g := NewGuard(GuardConfig{Budgets: small})
+	if g.TokenBudget() != small.TokenBudget {
+		t.Errorf("guard budget = %d, want %d", g.TokenBudget(), small.TokenBudget)
+	}
+}
+
+// Per-tool timeout: the call is aborted cooperatively at timeoutMs, the row is
+// booked with a tool class, and the loop keeps going (the model is told).
+func TestPerToolTimeoutFires(t *testing.T) {
+	dir := t.TempDir()
+	store, err := memory.Open(dir, memory.WithLogger(slog.New(slog.NewTextHandler(io.Discard, nil))))
+	if err != nil {
+		t.Fatalf("memory.Open: %v", err)
+	}
+	defer store.Close()
+
+	h := newHarness(t, "slow-tool", withJournal(store),
+		withConfig(func(c *Config) {
+			c.PerToolTimeout = 60 * time.Millisecond
+			c.ArtifactsDir = filepath.Join(dir, "artifacts")
+		}))
+	started := time.Now()
+	res := h.run("慢一点也行")
+	elapsed := time.Since(started)
+
+	if res.Status != StatusCompleted {
+		t.Fatalf("status = %s (%s), want completed", res.Status, res.Message)
+	}
+	if elapsed > 2*time.Second {
+		t.Errorf("loop waited %v: the tool was not aborted at 60ms", elapsed)
+	}
+	if len(res.ToolLog) != 1 {
+		t.Fatalf("tool log = %+v", res.ToolLog)
+	}
+	l := res.ToolLog[0]
+	if l.Outcome != OutcomeError || !strings.Contains(l.Text, "超时") {
+		t.Errorf("timeout not reported to the model: %+v", l)
+	}
+	if l.ErrorClass != string(observe.ClassTool) {
+		t.Errorf("error_class = %q, want tool (self-correction class, D37)", l.ErrorClass)
+	}
+	// The result that fed round 2 carries the timeout message.
+	if !historyHasResultContaining(h.loop.History(), "超时") {
+		t.Errorf("round-2 history lacks the timeout result:\n%s", dumpHistory(h.loop.History()))
+	}
+	rows, err := store.ListToolCallsByTask(context.Background(), res.TaskID)
+	if err != nil || len(rows) != 1 {
+		t.Fatalf("tool_call rows = %+v (%v)", rows, err)
+	}
+	if rows[0].Outcome != OutcomeError {
+		t.Errorf("row outcome = %q, want error", rows[0].Outcome)
+	}
+	// The second turn answered with text, proving the loop continued.
+	if res.Text != "那一步超时了，我先给结论。" {
+		t.Errorf("final text = %q", res.Text)
+	}
+}
+
+// ---------------------------------------------------------------------------
+
+func historyHasResultContaining(hist []llmMessage, needle string) bool {
+	for _, m := range hist {
+		if m.Role != llmRoleTool {
+			continue
+		}
+		for _, p := range m.Content {
+			tr, ok := p.(llmToolResult)
+			if !ok {
+				continue
+			}
+			for _, ip := range tr.Content {
+				if t, ok := ip.(llmText); ok && strings.Contains(t.Text, needle) {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}

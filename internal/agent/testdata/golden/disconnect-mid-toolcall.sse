@@ -1,0 +1,11 @@
+# wisp golden sse v1
+# @scenario mid-stream disconnect inside a tool call: the call is started (id +
+# @scenario name + partial arguments) and the connection dies before
+# @scenario finish_reason/[DONE]. The seam leaves the call unclosed; the loop
+# @scenario must fail it instead of executing partial arguments (D21/§3.4).
+# @response 200
+data: {"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"content":"我先看一眼，"},"finish_reason":null}]}
+
+data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_open","type":"function","function":{"name":"echo","arguments":"{\"text\":\"前半段"}}]},"finish_reason":null}]}

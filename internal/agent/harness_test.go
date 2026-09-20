@@ -186,6 +186,22 @@ func (h *harness) waitForFirstRequest(within time.Duration) bool {
 }
 
 // ---------------------------------------------------------------------------
+// shared shorthands for the C7 types (test readability only)
+
+type (
+	llmMessage    = llm.Message
+	llmText       = llm.TextPart
+	llmToolResult = llm.ToolResultPart
+)
+
+const llmRoleTool = llm.RoleTool
+
+// toolCalls builds a turn's assembled calls (guard unit tests).
+func toolCalls(id, name, args string) []llm.ToolCall {
+	return []llm.ToolCall{{ID: id, Name: name, Args: []byte(args), Complete: true}}
+}
+
+// ---------------------------------------------------------------------------
 // shared assertions
 
 func mustContain(t *testing.T, label, hay, needle string) {

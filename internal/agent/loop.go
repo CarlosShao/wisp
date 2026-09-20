@@ -324,6 +324,12 @@ func (l *Loop) run(ctx context.Context, taskID, input string) Result {
 
 	root := observe.NewRootFrom(ctx, taskID)
 	defer root.Cancel()
+	// Operate under the root's own cancelable context: this is what lets the
+	// D11(1) control layer abort a running task by cancelling l.current (the
+	// default handler reaches the loop only through this root, not the caller's
+	// parent ctx). Cancellation set by the caller's parent propagates down here
+	// as well, so both paths are observed by the loop's ctx.Err() checks.
+	ctx = root.Ctx
 	l.setCurrent(root)
 	defer l.setCurrent(nil)
 
@@ -379,14 +385,14 @@ func (l *Loop) run(ctx context.Context, taskID, input string) Result {
 		res.Rounds = guard.Rounds()
 
 		if ctx.Err() != nil || turn.Stop == llm.StopCancelled {
-			l.failOpenCalls(ctx, j, turn, OutcomeCancelled, string(observe.ClassCancelled))
+			l.failOpenCalls(ctx, j, taskID, turn, OutcomeCancelled, string(observe.ClassCancelled), &res)
 			if turn.Text != "" {
 				l.append(assistantMessage(turn.Text))
 			}
 			return l.finish(ctx, root, j, guard, cost, &res, StatusCancelled, "任务已取消")
 		}
 		if turn.Err != nil {
-			l.failOpenCalls(ctx, j, turn, OutcomeError, string(turn.Err.Class))
+			l.failOpenCalls(ctx, j, taskID, turn, OutcomeError, string(turn.Err.Class), &res)
 			if turn.Text != "" {
 				l.append(assistantMessage(turn.Text)) // partial kept, marked (SPEC-05 §3.4)
 			}
@@ -676,7 +682,7 @@ func (l *Loop) dispatch(ctx context.Context, j *taskJournal, rowID int64,
 			"timeout_ms", timeout.Milliseconds())
 		return ToolOutcome{Text: fmt.Sprintf("工具 %s 超时（%dms），已协作式中止",
 			req.Name, timeout.Milliseconds()), IsError: true,
-			ErrorClass: string(observe.ClassResource)}, err
+			ErrorClass: string(observe.ClassTool)}, err
 	}
 	return out, err
 }
@@ -754,15 +760,21 @@ func (l *Loop) failToolCallsFromTruncatedMessage(ctx context.Context, j *taskJou
 
 // failOpenCalls fails every call the seam left open after a failure or a
 // cancellation (SPEC-05 §3.4: partial content is kept and marked; open tool
-// calls are all judged failed).
-func (l *Loop) failOpenCalls(ctx context.Context, j *taskJournal, turn llm.TurnResult,
-	outcome, class string) {
+// calls are all judged failed, never executed with partial arguments).
+func (l *Loop) failOpenCalls(ctx context.Context, j *taskJournal, taskID string,
+	turn llm.TurnResult, outcome, class string, res *Result) {
 	for _, c := range turn.ToolCalls {
 		if c.Complete {
 			continue
 		}
 		row := j.startCall(ctx, c.ID, c.Name, c.Args, memoryRiskL0)
 		j.finish(ctx, c.ID, row, outcome, class)
+		text := "调用未闭合（响应中断或已取消），未执行"
+		res.ToolLog = append(res.ToolLog, ToolResultLog{CallID: c.ID, Name: c.Name,
+			Outcome: outcome, ErrorClass: class, Text: text})
+		res.ToolCalls++
+		l.publish(Event{Kind: EvToolEnd, TaskID: taskID, CallID: c.ID, ToolName: c.Name,
+			Outcome: outcome, Text: text})
 	}
 }
 

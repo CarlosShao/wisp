@@ -47,15 +47,15 @@ and `stopReason=length` → `failToolCallsFromTruncatedMessage`. Tool execution 
   scheduler (47); memory extraction (29).
 
 ## Acceptance criteria
-- [ ] Golden-driven loop tests: pure-text reply; single tool call; parallel tool calls; loop with
+- [x] Golden-driven loop tests: pure-text reply; single tool call; parallel tool calls; loop with
       tool result feeding next turn; budget exhaustion → Stuck with explicit message.
-- [ ] max_tokens golden → all unclosed calls failed (assertion on tool-call statuses).
+- [x] max_tokens golden → all unclosed calls failed (assertion on tool-call statuses).
 - [ ] Spill tests: 4k-token boundary, 1MB hard cap, artifacts file content + context stub shape,
       context_window scaling (set tiny window → thresholds shrink).
 - [ ] Compression tests: >12k history → oldest compressed, last-3 raw kept, ids preserved.
-- [ ] LoopGuard: 3/5/8 ladder injects reminders; 8th → Stuck + visible message; per-tool timeout
+- [x] LoopGuard: 3/5/8 ladder injects reminders; 8th → Stuck + visible message; per-tool timeout
       fires.
-- [ ] Control-layer regex: control words short-circuit without LLM call (mockllm request count
+- [x] Control-layer regex: control words short-circuit without LLM call (mockllm request count
       = 0).
 - [ ] Prompt-section order test: assembly output has cache-prefix byte-stability across turns
       (④ and BM25 segments last).
@@ -63,3 +63,5 @@ and `stopReason=length` → `failToolCallsFromTruncatedMessage`. Tool execution 
 ## Progress log (append-only, newest last)
 - [2026-09-20T02:20Z] agent=agent-ticket10-loop did=claimed next=loop-core+skeleton-tests
 - [2026-09-20T03:25Z] agent=agent-ticket10-loop did=loop core+budgets+inject+spill+compress+guard+journal+sink; AC1 golden loop tests green (text/single/parallel/feeds-next/budget-stuck/cancel/roster/task_log rows) next=AC2 truncation+AC3 spill+AC4 compress+AC5 guard ladder+AC6 control+AC7 prompt order
+- [2026-09-20T11:30Z] agent=agent-ticket10-loop resumed=adopting prior WIP (uncommitted loop.go+control/guard/truncation tests+disconnect fixture); build ok, test-build broke on control_test.go unused `observe` import; AC2/5/6 tests present (repair forward), AC3 spill + AC4 compress + AC7 prompt tests not yet written next=fix import, verify AC2/5/6, add AC3/AC4/AC7
+- [2026-09-20T11:48Z] agent=agent-ticket10-loop did=AC2/AC5/AC6 green; repairs: removed unused observe import (control_test); loop.go run() now operates under root.Ctx so the D11(1) default handler can cancel a running task (was checking the parent ctx → control-cancels-running failed); steering test switched tool-then-text→slow-tool for a real (400ms-tool) steer window (instant-echo race lost the insert) — assertions unchanged/strengthened (requests==2 proves steering adds no round-trip); truncation asserts fail-ALL (complete+cut calls) via tool-call statuses + persisted rows next=AC3 spill+AC4 compress+AC7 prompt
