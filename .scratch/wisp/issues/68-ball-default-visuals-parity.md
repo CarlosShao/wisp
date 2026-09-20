@@ -1,7 +1,7 @@
 # 68 — 让默认构建画的就是 owner 签收的那个球（`prototypeVisuals` 默认值 + Sleeping 尺寸三方不一致）
 
-**Status:** ready-for-agent
-**Claimed by:** —
+**Status:** in-progress
+**Claimed by:** agent-ticket68
 **Last update:** 2026-09-20
 **Blocked by:** —（只碰 `internal/ball/` + `cmd/balldebug/`；票 66 在 `internal/proc`/`internal/observe`/`cmd/wisp`，票 67 在 `internal/llm/adaptertest`/`tools/d22scan`，三包不相交）
 **Parallel slots:** ≤1 sub-agent；**AC#2/AC#3 需真桌面** ⇒ 若桌面被占，**只做 AC#1 与 AC#4 的静态半，其余保持未勾并写明**
@@ -63,3 +63,5 @@ func EnablePrototypeVisuals(on bool) { prototypeVisuals = on }
 3. 若桌面被票 66/67 占着：AC#2/AC#3 **保持未勾**并写明"等桌面"，**先交付 AC#1 + AC#4**，不要为了推进而偷跑测量。
 
 ## Progress log（append-only）
+
+- [2026-09-20T14:49:27Z] agent=agent-ticket68 did=claim 票 68（Status in-progress / Claimed by）。桌面被票 66（`internal/proc`+`internal/observe`+`cmd/wisp`+`cmd/balldebug/diff_windows.go` 的 proc 迁移，工作区里正有未提交改动）与票 67 占用，按裁定 3 只做 AC#1 静态半 + AC#4；AC#2/AC#3 未跑、未勾、未改默认值。
