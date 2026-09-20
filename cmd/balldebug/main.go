@@ -15,6 +15,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"time"
 	"unsafe"
 
@@ -71,9 +72,39 @@ func main() {
 	cycleMs := flag.Int("cycle-ms", 2000, "per-state dwell for -state / full cycle")
 	posX := flag.Int("x", -1, "debug: place the ball window at this x (with -y)")
 	posY := flag.Int("y", -1, "debug: place the ball window at this y (with -x)")
+	sizePx := flag.Int("size", 0, "configured orb size px 44..72 (0 = ball default)")
+	hold := flag.Bool("hold", false, "with -state: stay in that state until Ctrl+C / tray Exit")
+	statusPath := flag.String("status", "", "write 'ready=1 timers=<bool>' to this file (used by -diff)")
+	diffDir := flag.String("diff", "", "differential evidence dir: alive-vs-dead screenshots + resource table")
+	diffStates := flag.String("diff-states", "Sleeping", "comma-separated states for -diff")
+	diffSample := flag.Duration("diff-sample", 3*time.Second, "CPU sampling window per state (ball alive)")
+	diffMargin := flag.Int("diff-margin", 120, "screenshot padding around the window rect (px)")
+	diffAmp := flag.Int("diff-amp", 6, "gain applied to the |alive-dead| diff image")
+	diffDwell := flag.Duration("diff-dwell", 6*time.Second, "time the ball stays in state before each shot")
 	flag.Parse()
 
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo})))
+
+	// -diff is the parent role: it spawns one child balldebug per state, shoots
+	// the same region alive and dead, and measures. No ball lives here.
+	if *diffDir != "" {
+		err := runDiff(diffOpts{
+			dir:     *diffDir,
+			states:  splitStates(*diffStates),
+			dwell:   *diffDwell,
+			sample:  *diffSample,
+			x:       *posX,
+			y:       *posY,
+			margin:  *diffMargin,
+			amplify: *diffAmp,
+			size:    *sizePx,
+		})
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "balldebug: %v\n", err)
+			os.Exit(1)
+		}
+		return
+	}
 
 	fmt.Printf("balldebug: start handles=%d\n", handleCount())
 
@@ -88,8 +119,9 @@ func main() {
 
 	m = statemachine.New(statemachine.Options{Initial: statemachine.StateSleeping})
 	b, err := ball.New(ball.Options{
-		SizePx:  ball.BallSizeDefaultPx,
-		Initial: statemachine.StateSleeping,
+		SizePx:      *sizePx,
+		Initial:     statemachine.StateSleeping,
+		WindowTitle: os.Getenv(envBallTitle), // private title when spawned by -diff
 		Events: ball.Events{
 			OnClickBall:    func() { gesture(b, m, ball.EvClickBall) },
 			OnSummonHotkey: func() { gesture(b, m, ball.EvSummonHotkey) },
@@ -124,7 +156,20 @@ func main() {
 	case *state != "":
 		s := statemachine.State(*state)
 		b.SetState(s)
-		time.Sleep(dwell)
+		timers := b.DebugTimersAlive() // read on the UI thread, post-apply
+		fmt.Printf("balldebug: state=%s handles=%d timers=%v\n", s, handleCount(), timers)
+		writeStatus(*statusPath, s, timers)
+		if *hold {
+			sig := make(chan os.Signal, 1)
+			signal.Notify(sig, os.Interrupt)
+			select {
+			case <-sig:
+				fmt.Println("exit: signal")
+			case <-exit:
+			}
+		} else {
+			time.Sleep(dwell)
+		}
 	case *stay:
 		// Interactive: hotkeys/tray/click live; the machine's own timeout
 		// timers drive the session tail (Warm 90s -> Settling -> ...).
@@ -163,7 +208,7 @@ func main() {
 	// and check no animation timer survives.
 	b.SetState(statemachine.StateSleeping)
 	time.Sleep(200 * time.Millisecond)
-	if b.TimersAlive() {
+	if b.DebugTimersAlive() {
 		errs = append(errs, fmt.Errorf("animation timer alive in Sleeping"))
 	}
 
@@ -180,6 +225,29 @@ func main() {
 		os.Exit(1)
 	}
 	fmt.Println("balldebug: OK")
+}
+
+// splitStates parses a comma-separated -diff-states value.
+func splitStates(s string) []string {
+	var out []string
+	for _, p := range strings.Split(s, ",") {
+		if p = strings.TrimSpace(p); p != "" {
+			out = append(out, p)
+		}
+	}
+	return out
+}
+
+// writeStatus publishes "the state is applied and rendered" to a file, which
+// is how the -diff parent synchronises with a child it cannot signal.
+func writeStatus(path string, s statemachine.State, timers bool) {
+	if path == "" {
+		return
+	}
+	body := fmt.Sprintf("state=%s ready=1 timers=%v at=%s\n", s, timers, time.Now().Format(time.RFC3339Nano))
+	if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
+		fmt.Fprintf(os.Stderr, "balldebug: -status write: %v\n", err)
+	}
 }
 
 // gesture translates a ball gesture into machine events by context (the

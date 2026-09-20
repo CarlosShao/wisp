@@ -70,6 +70,11 @@ type Options struct {
 	Registry *observe.Registry // nil = observe.Default
 	// StartHidden skips ShowWindow (tests that only need the COM stack).
 	StartHidden bool
+	// WindowTitle overrides the Win32 window title (default "Wisp"). The
+	// debug harness gives its child process a private title so evidence
+	// scripts can FindWindow the exact ball window instead of a foreign
+	// Wisp window left on the desktop by another run.
+	WindowTitle string
 }
 
 // Ball is the floating ball surface. All mutating methods are goroutine-safe
@@ -164,12 +169,16 @@ func (b *Ball) createOnSTA(s *staThread) error {
 		return err
 	}
 	clsName := utf16("WispBallWindow")
+	title := b.opts.WindowTitle
+	if title == "" {
+		title = "Wisp"
+	}
 
 	exStyle := uintptr(wsExLayered | wsExTopmost | wsExToolWindow | wsExNoActivate)
 	hwnd, _, err := pCreateWindowExW.Call(
 		exStyle,
 		unsafePtr(clsName),
-		unsafePtr(utf16("Wisp")),
+		unsafePtr(utf16(title)),
 		0,          // WS_OVERLAPPED; sized/shown below
 		0, 0, 1, 1, // placed by restorePosition
 		0, 0, uintptr(moduleHandle()), 0)
@@ -388,6 +397,15 @@ func (b *Ball) TimersAlive() bool {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	return b.animTimerActive
+}
+
+// DebugTimersAlive reads the LIVE timer flag on the UI thread (the value the
+// evidence harness prints). Unlike TimersAlive it is synchronised with the
+// STA thread, so it cannot report a stale value right after SetState.
+func (b *Ball) DebugTimersAlive() bool {
+	done := make(chan bool, 1)
+	b.sta.PostTask(func() { done <- b.animTimerActive })
+	return <-done
 }
 
 // onAnimTick runs on the STA thread from WM_TIMER.
