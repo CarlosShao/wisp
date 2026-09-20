@@ -728,12 +728,40 @@ func auditRecordFor(t *testing.T, logs, needle string) string {
 	return found[0]
 }
 
+// countRecords is the whole-buffer counterpart of auditRecordFor: it reports
+// how many log records contain needle. The two are different tools, not
+// substitutes - auditRecordFor answers "what did *this* operation audit",
+// countRecords answers "how many records in this test ever said X". A check
+// scoped to one record cannot see a needle that is logged into a *different*
+// record, so the "forced=true only belongs to a forced delete" property needs
+// both halves: the record-scoped check on the delete's own line, and a
+// whole-buffer count of forced=true lines against the forced deletes the test
+// actually performed. The count is per-test (each test owns one capture), so it
+// does not reopen the cross-subtest pollution that scoping fixed.
+func countRecords(logs, needle string) int {
+	n := 0
+	for _, line := range strings.Split(logs, "\n") {
+		if strings.Contains(line, needle) {
+			n++
+		}
+	}
+	return n
+}
+
 // ---------------------------------------------------------------------------
 // AC3: unset refuses while config references the blob; --force audits
 // ---------------------------------------------------------------------------
 
 func TestSecretUnsetRefusesWhileReferenced(t *testing.T) {
 	dir := t.TempDir()
+	// Every probe below writes into this one capture (see newProbe), so this
+	// buffer is the whole audit trail of *this test* - which is what makes a
+	// whole-buffer count meaningful: the denominator is forcedDeletes, what
+	// this test did, not something another test logged.
+	trail := captureLogs(t)
+	// forcedDeletes counts the forced deletes this test performs; the audit
+	// trail must carry exactly one forced=true record per one of them.
+	forcedDeletes := 0
 	configPath := filepath.Join(dir, "config.toml")
 	writeConfig := func(body string) {
 		t.Helper()
@@ -812,6 +840,7 @@ api_key_ref = "dpapi:deepseek"
 		if code := q.cmd.run([]string{"unset", "deepseek", "--force"}); code != 0 {
 			t.Fatalf("unset --force: exit %d (%s)", code, q.errb)
 		}
+		forcedDeletes++
 		if q.blobExists(t, "deepseek") {
 			t.Error("--force must delete the blob")
 		}
@@ -853,7 +882,9 @@ api_key_ref = "dpapi:deepseek"
 		// delete's own audit record: the earlier subtest forced-deleted
 		// dpapi:deepseek and legitimately logged forced=true into the same
 		// buffer. Scoping is stricter than the whole-buffer grep it replaces,
-		// because it also requires this record to say forced=false.
+		// because it also requires this record to say forced=false. What it
+		// cannot see is a forced=true that lands in some *other* record, which
+		// is why the buffer-wide count below is checked too.
 		rec := auditRecordFor(t, q2.allLogs(), "deleted dpapi:spare")
 		if !strings.Contains(rec, "forced=false") {
 			t.Errorf("an unreferenced delete must record forced=false, got: %s", rec)
@@ -877,6 +908,21 @@ api_key_ref = "dpapi:deepseek"
 			t.Error("blob survived unset")
 		}
 	})
+
+	// The counterweight to the record-scoped checks above, which cannot see a
+	// forced=true logged into some *other* record: over the whole audit trail
+	// of this test, the number of records saying forced=true must equal the
+	// number of forced deletes this test performed. A forced=true smuggled into
+	// a separate record - on either branch of runUnset, forced or not - breaks
+	// the count even though the scoped assertion stays green, and a forced
+	// delete that fails to report it breaks the count too. The denominator is
+	// this test's own actions, so sharing one capture across subtests (which is
+	// what a buffer-wide grep could not survive) does not skew it.
+	if got, want := countRecords(trail.String(), "forced=true"), forcedDeletes; got != want {
+		t.Errorf("audit trail carries %d records saying forced=true, this test performed %d "+
+			"forced deletes: forced=true may only ever be logged by a forced delete\n%s",
+			got, want, trail)
+	}
 }
 
 // ---------------------------------------------------------------------------
