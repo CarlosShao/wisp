@@ -214,6 +214,149 @@ func PaletteFor(t Theme) Palette {
 	return DarkPalette()
 }
 
+// ------------------------------------------------------- liquid glass looks
+
+// LiquidLook is one candidate colour treatment of the glass orb (ticket 62).
+// The owner's reference images (图1/图2) are not on disk, so several
+// treatments ship in the prototype and the owner picks on the real desktop
+// with `balldebug -stay -look <name>` instead of the code betting on one.
+//
+// Every colour is a token here: the renderer draws with these values only
+// (C21 / TestNoHardcodedColorsInBallPackage).
+type LiquidLook struct {
+	Name    string // -look flag value
+	BlobA   Color  // dominant liquid body (largest, slowest)
+	BlobB   Color  // counter-rotating body
+	BlobC   Color  // accent wisp (state tint rides on this one)
+	Deep    Color  // far-side refraction tint
+	Rim     Color  // outer edge light - the contrast anchor on a white desktop
+	Lip     Color  // inner bright lip just inside the rim
+	Hi      Color  // specular highlight
+	Caustic Color  // contact shadow / caustic under the orb
+	Glow    Color  // outer halo
+}
+
+// looks are the candidate treatments. Order is the -look cycling order.
+var looks = []LiquidLook{
+	{ // vivo 蓝心小V reference family: electric indigo / violet / cyan.
+		Name: "aurora", BlobA: hex(0x4B49FF, 0.95), BlobB: hex(0x8B5CF6, 0.90),
+		BlobC: hex(0x22D3EE, 0.85), Deep: hex(0x1E1B7A, 0.60),
+		Rim: hex(0x141A2E, 0.72), Lip: hex(0xE8ECFF, 0.75), Hi: rgba(255, 255, 255, 0.92),
+		Caustic: hex(0x1B1F3A, 0.35), Glow: hex(0x6D7CFF, 0.55),
+	},
+	{ // glacier: cyan / teal / deep blue, cooler and calmer.
+		Name: "glacier", BlobA: hex(0x22D3EE, 0.95), BlobB: hex(0x2DD4BF, 0.85),
+		BlobC: hex(0x1D4ED8, 0.90), Deep: hex(0x0B3B66, 0.60),
+		Rim: hex(0x0E2233, 0.72), Lip: hex(0xE6FBFF, 0.70), Hi: rgba(255, 255, 255, 0.92),
+		Caustic: hex(0x0B2233, 0.34), Glow: hex(0x38BDF8, 0.52),
+	},
+	{ // nebula: magenta / indigo / pink, the loud end of the range.
+		Name: "nebula", BlobA: hex(0xD946EF, 0.92), BlobB: hex(0x6366F1, 0.90),
+		BlobC: hex(0xF472B6, 0.80), Deep: hex(0x3B0764, 0.55),
+		Rim: hex(0x1A1030, 0.74), Lip: hex(0xFCE7FF, 0.70), Hi: rgba(255, 255, 255, 0.92),
+		Caustic: hex(0x241033, 0.34), Glow: hex(0xC026D3, 0.50),
+	},
+	{ // solar: amber / coral / violet, for a warm reading of "cool colour".
+		Name: "solar", BlobA: hex(0xF59E0B, 0.92), BlobB: hex(0xFB7185, 0.88),
+		BlobC: hex(0x7C3AED, 0.80), Deep: hex(0x4A1D3A, 0.55),
+		Rim: hex(0x241019, 0.72), Lip: hex(0xFFEFD6, 0.70), Hi: rgba(255, 255, 255, 0.92),
+		Caustic: hex(0x2A1206, 0.32), Glow: hex(0xFDBA74, 0.50),
+	},
+}
+
+// LookByName resolves a -look value (case-insensitive); ok=false on unknown.
+func LookByName(name string) (LiquidLook, bool) {
+	for _, l := range looks {
+		if sameName(l.Name, name) {
+			return l, true
+		}
+	}
+	return LiquidLook{}, false
+}
+
+// sameName is a case-insensitive ASCII compare (tokens.go carries no imports
+// so that it stays the plain data twin of tokens.css).
+func sameName(a, b string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := 0; i < len(a); i++ {
+		ca, cb := a[i], b[i]
+		if 'A' <= ca && ca <= 'Z' {
+			ca += 'a' - 'A'
+		}
+		if 'A' <= cb && cb <= 'Z' {
+			cb += 'a' - 'A'
+		}
+		if ca != cb {
+			return false
+		}
+	}
+	return true
+}
+
+// LookNames lists the selectable treatments (for the debug flag help).
+func LookNames() []string {
+	out := make([]string, 0, len(looks))
+	for _, l := range looks {
+		out = append(out, l.Name)
+	}
+	return out
+}
+
+// DefaultLook is the treatment used when the consumer does not choose.
+func DefaultLook() LiquidLook { return looks[0] }
+
+// activeLook is the chosen treatment (process-wide, like pal).
+var activeLook = DefaultLook()
+
+// SetLook selects the liquid treatment; a repaint must follow. Returns false
+// for an unknown name so the caller can report it.
+func SetLook(name string) bool {
+	l, ok := LookByName(name)
+	if !ok {
+		return false
+	}
+	activeLook = l
+	return true
+}
+
+// Look returns the active liquid treatment.
+func Look() LiquidLook { return activeLook }
+
+// Liquid blob placement (fractions of the orb radius; the renderer rotates
+// and swells these with the audio envelope - never re-allocates brushes).
+const (
+	// Rest orb: Sleeping keeps a real glass body instead of the 12px micro
+	// dot, but smaller than the active orb so "asleep" still reads.
+	SleepRestRatio = 0.62
+
+	// Blob radii / offsets as fractions of the orb radius. They overlap on
+	// purpose: the blend of three soft fields is what reads as liquid, and a
+	// mostly-filled orb survives a white desktop far better than a shell.
+	LiquidRadiusA = 0.72
+	LiquidRadiusB = 0.62
+	LiquidRadiusC = 0.50
+	LiquidOffsetA = 0.22
+	LiquidOffsetB = 0.30
+	LiquidOffsetC = 0.40
+
+	// Glass edge weights (physical px at 96 DPI, DPI-scaled at draw time).
+	GlassRimPx   = 1.2 // dark outer edge light (contrast on white)
+	GlassLipPx   = 1.0 // bright inner lip
+	GlassCaustic = 0.30
+	BorderRingPx = 1.8 // the "not speaking" border that fades in
+
+	// Audio envelope -> liquid motion.
+	SwimLevelGain   = 0.55 // blob offset swell per unit level
+	SpinLevelGain   = 1.0  // rotation speed gain per unit level
+	BorderOpenMs    = 220  // border fade-in (SPEC-08 dur-slow family)
+	BorderCloseMs   = 180  // liquid converge when the voice stops
+	SummonFlowMs    = 900  // one-shot liquid flow burst on summon
+	DockAnimMs      = 160  // edge-dock squash / pop-back
+	DockOverlapFrac = 0.42 // fraction of the orb left visible when docked
+)
+
 // Geometry + motion tokens (CSS lengths/ms verbatim; px at 96 DPI, scaled by
 // the per-monitor DPI before use - never rescaled at call sites).
 const (
@@ -226,8 +369,17 @@ const (
 
 	// Sleeping micro-dot: SPEC-08 §2 - "Sleeping 态直径缩到 12px 微点
 	// (opacity 0.35)"; ball.html pins it at 12px regardless of user size.
+	// Ticket 62 keeps the constants (the contract is only amended after owner
+	// sign-off) but the prototype no longer renders them: the rest body is the
+	// glass orb at SleepRestRatio, and this is its floor.
 	SleepingDotPx = 12
 	SleepOpacity  = 0.35
+
+	// SleepingRestMinPx floors the resting orb so a small user size cannot
+	// make it invisible again; RestSettledOpacity is where the Settling fade
+	// lands (the resting orb must stay readable on a white desktop).
+	SleepingRestMinPx  = 30
+	RestSettledOpacity = 0.95
 
 	// --dur-fast/base/slow. Motion budget: no duration above 300ms in UI
 	// motion; per-state animation PERIODS (2.4s breathing etc.) are loops

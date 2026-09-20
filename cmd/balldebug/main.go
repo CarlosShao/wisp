@@ -73,6 +73,8 @@ func main() {
 	posX := flag.Int("x", -1, "debug: place the ball window at this x (with -y)")
 	posY := flag.Int("y", -1, "debug: place the ball window at this y (with -x)")
 	sizePx := flag.Int("size", 0, "configured orb size px 44..72 (0 = ball default)")
+	look := flag.String("look", "", "liquid treatment: "+strings.Join(ball.LookNames(), "|")+" (empty = default)")
+	frozen := flag.Bool("frozen", false, "render the frozen SPEC-08 §2.1 visuals instead of the ticket 62 prototype")
 	hold := flag.Bool("hold", false, "with -state: stay in that state until Ctrl+C / tray Exit")
 	statusPath := flag.String("status", "", "write 'ready=1 timers=<bool>' to this file (used by -diff)")
 	diffDir := flag.String("diff", "", "differential evidence dir: alive-vs-dead screenshots + resource table")
@@ -84,6 +86,17 @@ func main() {
 	flag.Parse()
 
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo})))
+
+	// The ticket 62 prototype is what this harness exists to show; -frozen
+	// renders the still-frozen SPEC-08 §2.1 table for comparison.
+	ball.EnablePrototypeVisuals(!*frozen)
+	if *look != "" {
+		if !ball.SetLook(*look) {
+			fmt.Fprintf(os.Stderr, "balldebug: unknown -look %q (choose one of %s)\n",
+				*look, strings.Join(ball.LookNames(), ", "))
+			os.Exit(2)
+		}
+	}
 
 	// -diff is the parent role: it spawns one child balldebug per state, shoots
 	// the same region alive and dead, and measures. No ball lives here.
@@ -98,6 +111,8 @@ func main() {
 			margin:  *diffMargin,
 			amplify: *diffAmp,
 			size:    *sizePx,
+			look:    *look,
+			frozen:  *frozen,
 		})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "balldebug: %v\n", err)

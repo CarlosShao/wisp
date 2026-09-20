@@ -49,6 +49,8 @@ type diffOpts struct {
 	margin    int           // region padding around the window rect
 	amplify   int           // diff PNG gain (1 = raw delta)
 	size      int           // child orb size px (0 = default from the ball)
+	look      string        // liquid treatment handed to the child ("" = default)
+	frozen    bool          // measure the frozen SPEC-08 visuals, not the prototype
 	killGrace time.Duration // wait for graceful exit before Kill
 }
 
@@ -396,6 +398,12 @@ func runDiffForState(exe string, o diffOpts, state string, idx int) (stateRow, e
 		"-cycle-ms", fmt.Sprint(o.dwell.Milliseconds())}
 	if o.size > 0 {
 		childArgs = append(childArgs, "-size", fmt.Sprint(o.size))
+	}
+	if o.look != "" {
+		childArgs = append(childArgs, "-look", o.look)
+	}
+	if o.frozen {
+		childArgs = append(childArgs, "-frozen")
 	}
 
 	cmd := exec.Command(exe, childArgs...)

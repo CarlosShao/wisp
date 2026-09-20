@@ -41,7 +41,35 @@ type renderer struct {
 	hi   unsafe.Pointer
 	core unsafe.Pointer
 	glow map[int]unsafe.Pointer // alpha-permille -> radial glow brush
+
+	// Liquid-glass material (ticket 62). The colour blobs are pre-baked at a
+	// fixed angular ladder so an animated frame only picks an index - no COM
+	// object is created during an animation tick (D32 CPU discipline).
+	liq     [3]liquidLayer
+	caustic unsafe.Pointer // contact shadow under the orb
 }
+
+// liquidLadder is the angular resolution of the pre-baked blob positions.
+// 24 steps over a full turn is visually smooth at 30fps (a frame advances at
+// most a few steps) and costs 3*24 = 72 tiny brushes per state.
+const liquidLadder = 24
+
+// liquidLayer is one colour blob: 24 pre-baked radial gradients placed around
+// the orb centre, plus their centres (used when the envelope shrinks the
+// visible patch).
+type liquidLayer struct {
+	brushes [liquidLadder]unsafe.Pointer
+	centers [liquidLadder]d2d1Point2F
+}
+
+// per-blob motion: relative rotation rate and angular phase offset. Blob B
+// counter-rotates, which is what reads as "flowing" rather than "spinning".
+var (
+	liqRate   = [3]float64{1.0, -1.6, 0.55}
+	liqPhase  = [3]float64{0, 2.1, 4.2}
+	liqRadius = [3]float32{LiquidRadiusA, LiquidRadiusB, LiquidRadiusC}
+	liqOffset = [3]float32{LiquidOffsetA, LiquidOffsetB, LiquidOffsetC}
+)
 
 // pal is the ACTIVE C21 palette (dark by default; switched by SetTheme).
 // All renderer color reads go through it - the machine rule
@@ -175,14 +203,8 @@ func (r *renderer) resize(w, h int32) error {
 }
 
 func (r *renderer) release() {
+	r.dropAssets()
 	comRelease(&r.solid)
-	for _, b := range r.glow {
-		comRelease(&b)
-	}
-	r.glow = map[int]unsafe.Pointer{}
-	comRelease(&r.core)
-	comRelease(&r.hi)
-	comRelease(&r.body)
 	comRelease(&r.badgeFmt)
 	comRelease(&r.microFmt)
 	comRelease(&r.dcRT)
@@ -208,8 +230,8 @@ func (r *renderer) setAssets(v Visual) {
 		{0.84, colorF(mulA(pal.OrbBody2, 0))},
 	}, r.center(), d2d1Point2F{0, 0}, v.SizePx/2, v.SizePx/2)
 	r.hi = r.radialBrush([]d2d1GradientStop{
-		{0.00, colorF(mulA(pal.OrbHi, v.Opacity))},
-		{0.46, colorF(mulA(pal.OrbHi, 0))},
+		{0.00, colorF(mulA(lipOf(v), v.Opacity))},
+		{0.46, colorF(mulA(lipOf(v), 0))},
 	}, d2d1Point2F{float32(r.w) * 0.32, float32(r.h) * 0.24}, d2d1Point2F{0, 0},
 		v.SizePx*0.46, v.SizePx*0.46)
 	r.core = r.radialBrush([]d2d1GradientStop{
@@ -217,12 +239,83 @@ func (r *renderer) setAssets(v Visual) {
 		{0.74, colorF(mulA(v.CoreColor, 0))},
 	}, d2d1Point2F{r.center().x, r.center().y - v.SizePx*0.06}, d2d1Point2F{0, 0},
 		v.SizePx*0.70, v.SizePx*0.70)
+	if v.Glass {
+		r.setLiquid(v)
+	}
+}
+
+// lipOf is the specular colour: the look's highlight, which reads on top of
+// the liquid (pure white would vanish on a light desktop without it).
+func lipOf(v Visual) Color {
+	if v.Glass {
+		return activeLook.Hi
+	}
+	return pal.OrbHi
+}
+
+// setLiquid bakes the three colour blobs of the liquid at every angle of the
+// ladder. The third blob carries the STATE colour so the 20 states stay
+// distinguishable inside one material.
+func (r *renderer) setLiquid(v Visual) {
+	lk := activeLook
+	c := r.center()
+	R := v.SizePx / 2
+	colors := [3]Color{
+		mulA(lk.BlobA, v.Opacity),
+		mulA(lk.BlobB, v.Opacity),
+		mulA(v.CoreColor, v.Opacity),
+	}
+	if v.CoreAlpha <= 0 {
+		colors[2] = mulA(lk.BlobC, v.Opacity)
+	}
+	for bi := 0; bi < 3; bi++ {
+		col := colors[bi]
+		br := liqRadius[bi] * R
+		or := liqOffset[bi] * R
+		for i := 0; i < liquidLadder; i++ {
+			a := float64(i) / liquidLadder * 2 * math.Pi
+			p := d2d1Point2F{c.x + or*float32(math.Cos(a)), c.y + or*float32(math.Sin(a))}
+			r.liq[bi].centers[i] = p
+			r.liq[bi].brushes[i] = r.radialBrush([]d2d1GradientStop{
+				{0.00, colorF(col)},
+				{0.42, colorF(mulA(col, 0.72))},
+				{0.78, colorF(mulA(col, 0.18))},
+				{1.00, colorF(mulA(col, 0))},
+			}, p, d2d1Point2F{0, 0}, br, br)
+		}
+	}
+	// Contact shadow: what makes a light-coloured orb read on a white
+	// desktop. Sits under everything else, offset downward.
+	deep := mulA(lk.Caustic, v.Opacity)
+	r.caustic = r.radialBrush([]d2d1GradientStop{
+		{0.00, colorF(deep)},
+		{0.55, colorF(mulA(lk.Caustic, GlassCaustic*v.Opacity))},
+		{1.00, colorF(mulA(lk.Caustic, 0))},
+	}, d2d1Point2F{c.x, c.y + R*0.42}, d2d1Point2F{0, 0}, R*1.25, R*0.85)
+}
+
+// liquidIndex picks the ladder step of one blob at the current liquid angle.
+// The angle is accumulated by the window (audio-driven), never by a clock in
+// the renderer.
+func liquidIndex(v Visual, bi int) int {
+	a := v.LiquidAngle*liqRate[bi] + liqPhase[bi]
+	a = math.Mod(a, 2*math.Pi)
+	if a < 0 {
+		a += 2 * math.Pi
+	}
+	return int(a/(2*math.Pi)*liquidLadder) % liquidLadder
 }
 
 func (r *renderer) dropAssets() {
 	comRelease(&r.body)
 	comRelease(&r.hi)
 	comRelease(&r.core)
+	comRelease(&r.caustic)
+	for bi := 0; bi < 3; bi++ {
+		for i := 0; i < liquidLadder; i++ {
+			comRelease(&r.liq[bi].brushes[i])
+		}
+	}
 	for _, b := range r.glow {
 		comRelease(&b)
 	}
@@ -312,32 +405,23 @@ func (r *renderer) drawFrame(v Visual, phase float64) {
 	R := v.SizePx / 2
 	s := float32(r.dpi) / 96 // token px -> physical px scale
 
-	// 1. Outer glow (box-shadow 0 0 28px in ball.html). Speaking breathes the
-	// glow (success 1.6s); every other state holds a static glow.
-	permille := 850
-	if v.Icon == IconVolume {
-		permille = 775 + int(225*0.5*(1+math.Cos(phase*2*math.Pi))) // 550..1000
-	}
-	if g := r.glowBrush(v, permille); g != nil {
-		r.fillEllipse(c, R*1.5, R*1.5, g)
-	}
-
-	// 2. Glass body + 3. highlight + 4. state core tint.
-	if r.body != nil {
+	if v.Glass {
+		r.drawGlass(v, c, R, s)
+	} else {
+		// Legacy flat body (kept for non-glass visuals).
+		if g := r.glowBrush(v, 850); g != nil {
+			r.fillEllipse(c, R*1.5, R*1.5, g)
+		}
 		r.fillEllipse(c, R, R, r.body)
-	}
-	if r.hi != nil {
 		r.fillEllipse(d2d1Point2F{float32(r.w) * 0.32, float32(r.h) * 0.24},
 			v.SizePx*0.46, v.SizePx*0.46, r.hi)
+		if v.CoreAlpha > 0 && r.core != nil {
+			r.fillEllipse(d2d1Point2F{c.x, c.y - v.SizePx*0.06},
+				v.SizePx*0.70, v.SizePx*0.70, r.core)
+		}
+		r.setSolid(mulA(pal.OrbRim, v.Opacity))
+		r.circle(c, R-0.75*s, 1*s)
 	}
-	if r.core != nil && v.CoreAlpha > 0 {
-		r.fillEllipse(d2d1Point2F{c.x, c.y - v.SizePx*0.06},
-			v.SizePx*0.70, v.SizePx*0.70, r.core)
-	}
-
-	// 5. Rim (edge light line).
-	r.setSolid(mulA(pal.OrbRim, v.Opacity))
-	r.circle(c, R-0.75*s, 1*s)
 
 	// 6. State ring.
 	if v.RingColor.A > 0 {
@@ -413,6 +497,83 @@ func (r *renderer) drawFrame(v Visual, phase float64) {
 	if v.BadgeText != "" {
 		r.setSolid(mulA(pal.OnSolid, v.Opacity))
 		r.drawText(v.BadgeText, r.microFmt, d2d1RectF{c.x - R, c.y - R, c.x + R, c.y + R})
+	}
+}
+
+// drawGlass paints the liquid-glass body: contact shadow, halo, shell, the
+// three flowing colour blobs, far-side refraction, state core, specular
+// highlight, the dark rim + bright lip that make it read on a light desktop,
+// and the "not speaking" border at whatever stage its transition reached.
+//
+// Everything here is a cached brush fill or a polyline stroke: no COM object
+// is created, so an animated frame costs the same as a static one.
+func (r *renderer) drawGlass(v Visual, c d2d1Point2F, R, s float32) {
+	lk := activeLook
+
+	// 0. Contact shadow / caustic - the separation from a white wallpaper.
+	if r.caustic != nil {
+		r.fillEllipse(d2d1Point2F{c.x, c.y + R*0.30}, R*1.25, R*0.85, r.caustic)
+	}
+
+	// 1. Outer halo. Speaking/Listening breathe it (the phase comes from the
+	// window's own accumulator); other states hold a static one.
+	permille := 850
+	if v.Icon == IconVolume {
+		permille = 775 + int(225*0.5*(1+math.Cos(v.LiquidAngle*0.5))) // 550..1000
+	}
+	permille += int(150 * v.LiquidLevel)
+	if permille > 1000 {
+		permille = 1000
+	}
+	if g := r.glowBrush(v, permille); g != nil {
+		r.fillEllipse(c, R*1.5, R*1.5, g)
+	}
+
+	// 2. Glass shell (cool translucent body).
+	r.fillEllipse(c, R, R, r.body)
+
+	// 3. The liquid: three blobs at their ladder positions for this angle.
+	// A louder envelope shrinks the visible patch (the surface "gathers")
+	// and the summon burst widens it (flow).
+	shrink := 1 - 0.12*v.LiquidLevel
+	flow := 1 + 0.10*v.SummonFlow
+	dockX, dockY := float32(1), float32(1)
+	if v.Dock == EdgeLeft || v.Dock == EdgeRight {
+		dockX = 1 - 0.45*v.DockProgress
+	} else if v.Dock != EdgeNone {
+		dockY = 1 - 0.45*v.DockProgress
+	}
+	for bi := 0; bi < 3; bi++ {
+		lay := &r.liq[bi]
+		i := liquidIndex(v, bi)
+		if b := lay.brushes[i]; b != nil {
+			rr := R * liqRadius[bi] * shrink * flow
+			r.fillEllipse(lay.centers[i], rr*dockX, rr*dockY, b)
+		}
+	}
+
+	// 4. Far-side refraction: the deep tone gathering at the bottom edge.
+	if r.core != nil && v.CoreAlpha > 0 {
+		r.fillEllipse(d2d1Point2F{c.x, c.y - v.SizePx*0.06},
+			v.SizePx*0.70, v.SizePx*0.70, r.core)
+	}
+
+	// 5. Specular highlight (upper-left), the glass cue.
+	r.fillEllipse(d2d1Point2F{c.x - R*0.30, c.y - R*0.38},
+		R*0.46*dockX, R*0.36*dockY, r.hi)
+
+	// 6. Rim: dark edge light (contrast on white) + bright inner lip.
+	r.setSolid(mulA(lk.Rim, v.Opacity))
+	r.circle(c, R-0.8*s, GlassRimPx*s*dockX)
+	r.setSolid(mulA(lk.Lip, 0.85*v.Opacity))
+	r.circle(c, R-2.6*s, GlassLipPx*s)
+
+	// 7. The border that fades in when nobody speaks (owner's "丝滑引入边框").
+	if v.BorderAlpha > 0 {
+		r.setSolid(mulA(lk.Lip, v.BorderAlpha*v.Opacity))
+		r.circle(c, R+3.5*s, BorderRingPx*s)
+		r.setSolid(mulA(lk.Rim, 0.55*v.BorderAlpha*v.Opacity))
+		r.circle(c, R+5.8*s, 1*s)
 	}
 }
 
