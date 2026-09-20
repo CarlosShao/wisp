@@ -199,6 +199,80 @@ func TestPerToolTimeoutFires(t *testing.T) {
 
 // ---------------------------------------------------------------------------
 
+// MAJOR-2 / MINOR-4: the timeout above is only proven for a provider that
+// BREAKS its own contract. The ToolProvider contract (tools.go:82-85) says a
+// host failure comes back as an error, and a real host bridge (ticket 20+) will
+// therefore return ctx.Err() on a timed-out call. dispatch used to pass that
+// error alongside the structured TOOL_TIMEOUT, and executeCalls prefers a
+// non-nil error - so the model saw "context deadline exceeded" and the row was
+// booked error_class="internal". This is the assertion on the EMITTED
+// error_class for the contract-honest branch.
+func TestPerToolTimeoutOfContractHonestToolIsToolClass(t *testing.T) {
+	dir := t.TempDir()
+	store, err := memory.Open(dir, memory.WithLogger(slog.New(slog.NewTextHandler(io.Discard, nil))))
+	if err != nil {
+		t.Fatalf("memory.Open: %v", err)
+	}
+	defer store.Close()
+
+	tools := newBlockingProvider() // aborts by RETURNING ctx.Err(), as contracted
+	t.Cleanup(tools.release)
+	h := newHarness(t, "slow-tool", withJournal(store), withTools(tools),
+		withConfig(func(c *Config) {
+			c.PerToolTimeout = 60 * time.Millisecond
+			c.ArtifactsDir = filepath.Join(dir, "artifacts")
+		}))
+	res := h.run("慢一点也行")
+
+	if res.Status != StatusCompleted {
+		t.Fatalf("status = %s (%s), want completed (a timeout is not a task failure)",
+			res.Status, res.Message)
+	}
+	if len(res.ToolLog) != 1 {
+		t.Fatalf("tool log = %+v", res.ToolLog)
+	}
+	l := res.ToolLog[0]
+	if l.Outcome != OutcomeError {
+		t.Errorf("outcome = %q, want %s", l.Outcome, OutcomeError)
+	}
+	// THE decisive assertion: the tool's own error must not steal the C22 class.
+	if l.ErrorClass != string(observe.ClassTool) {
+		t.Errorf("error_class = %q, want %s (the host error must not downgrade a "+
+			"timeout to an unself-correctable class, D37)", l.ErrorClass, observe.ClassTool)
+	}
+	if !strings.Contains(l.Text, "超时") || !strings.Contains(l.Text, "sleep") {
+		t.Errorf("model-visible text = %q, want the structured TOOL_TIMEOUT naming "+
+			"the tool", l.Text)
+	}
+	if strings.Contains(l.Text, "context deadline exceeded") {
+		t.Errorf("the raw host error leaked into the model-visible text: %q", l.Text)
+	}
+	// What actually fed round 2 is the timeout line, not the ctx error.
+	if !historyHasResultContaining(h.loop.History(), "超时") {
+		t.Errorf("round-2 history lacks the timeout result:\n%s", dumpHistory(h.loop.History()))
+	}
+	if strings.Contains(dumpHistory(h.loop.History()), "context deadline exceeded") {
+		t.Errorf("conversation carries the raw host error instead of TOOL_TIMEOUT:\n%s",
+			dumpHistory(h.loop.History()))
+	}
+	rows, err := store.ListToolCallsByTask(context.Background(), res.TaskID)
+	if err != nil || len(rows) != 1 {
+		t.Fatalf("tool_call rows = %+v (%v)", rows, err)
+	}
+	if rows[0].ErrorClass != string(observe.ClassTool) {
+		t.Errorf("persisted error_class = %q, want %s", rows[0].ErrorClass, observe.ClassTool)
+	}
+	if rows[0].Outcome != OutcomeError {
+		t.Errorf("persisted outcome = %q, want %s", rows[0].Outcome, OutcomeError)
+	}
+	// The loop kept going and the second round answered.
+	if res.Text != "那一步超时了，我先给结论。" {
+		t.Errorf("final text = %q", res.Text)
+	}
+}
+
+// ---------------------------------------------------------------------------
+
 func historyHasResultContaining(hist []llmMessage, needle string) bool {
 	for _, m := range hist {
 		if m.Role != llmRoleTool {

@@ -700,12 +700,18 @@ func (l *Loop) dispatch(ctx context.Context, j *taskJournal, rowID int64,
 	out, err := l.opt.Tools.Execute(tctx, req)
 	if errors.Is(tctx.Err(), context.DeadlineExceeded) {
 		// Structured TOOL_TIMEOUT (C22): the row says timeout, the model is
-		// told the call was aborted so it can shorten its request.
+		// told the call was aborted so it can shorten its request. The tool's
+		// own error is dropped ON PURPOSE - a contract-honest host reports a
+		// timed-out call as an error (tools.go:82-85), and returning it here
+		// made executeCalls prefer it, so the model saw a bare "context
+		// deadline exceeded" and the row was booked error_class="internal"
+		// (a class the model cannot self-correct, D37) instead of "tool".
+		// The outcome below expresses the failure completely.
 		l.log().Warn("agent: tool timeout", "tool", req.Name, "task", req.TaskID,
 			"timeout_ms", timeout.Milliseconds())
 		return ToolOutcome{Text: fmt.Sprintf("工具 %s 超时（%dms），已协作式中止",
 			req.Name, timeout.Milliseconds()), IsError: true,
-			ErrorClass: string(observe.ClassTool)}, err
+			ErrorClass: string(observe.ClassTool)}, nil
 	}
 	return out, err
 }
