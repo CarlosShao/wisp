@@ -148,6 +148,12 @@
   （"采样器数据可挂"目前成立在 API 契约层）；`TestDiagnosticsBundleCollectsAndRedacts` 只断
   `slo-snapshot.json` **存在于包内**，未断其字节等于传入值（等值靠 `diagnostics.go:161` 直传保证）。
   票 45 做 UX 时一并补内容回读断言。
+- **[A8] 票 63 AC#6：真实 provider 取密钥这条路还没被证明（转票 12）** — `wisp secret` 本身已证明
+  ref→`config.LoadFile`→`ProviderKeys`→`Authorization` 头，但发请求的是**测试自己写的 http client**，
+  不是 `internal/llm` 的 provider；按 README 规则「安全判定不得由调用方可控的选择器决定」，这一格实现者
+  不能自证，故留着未勾。**当前残缺表现**：把 `api_key_ref` 接错、或 provider 侧偷偷回退读明文 config
+  字段，票 63 的套件不会变红。**完成判据**已写进票 12 的新 AC 框（判据含变异检验：ref 指向不存在的
+  blob 时必须走 Unconfigured 失败路径，不得静默成功）。票 12 因此从"无待消化 AC"变为"背一张外来的框"。
 
 ## 已解决（resolved）
 

@@ -47,6 +47,13 @@ moment: type → reply → notification → memory returns to idle.
 - [ ] Ball state walk Sleeping→Listening→Thinking→Acting→Speaking/notify→Warm→Settling→Sleeping
       matches D43 rows #4,12,15,18,26,31,32 (state log captured).
 - [ ] task_log + tool_call rows written with correlation_id; visible via sqlite query.
+- [ ] Key comes from the store, not the config: the provider that serves the `wisp run` request is
+      built by `internal/llm` from config whose `api_key_ref = "secret:<id>"` resolves through the
+      DPAPI store, and the test asserts the outbound `Authorization` header the **provider** set
+      (not one a test-written client set). Handed here from ticket 63 AC#6, whose end-to-end proves
+      ref→`config.LoadFile`→`ProviderKeys` but issues the request with its own http client.
+      Completion criterion: a red-when-broken test in this ticket's own suite; mutation = point the
+      ref at a missing blob and the run must fail with the Unconfigured path, not silently succeed.
 - [ ] Zero emoji scan over new UI strings passes; tokens doc updated with any additions.
 - [ ] Human visual acceptance of ball states (user signs off screenshots — D29 rule).
 
