@@ -38,7 +38,7 @@ progress/cancel, `Downloading` state wiring, local-dir escape hatch, and the com
 - Engine loading/inference (15); GUI model management page (40); CPU-heavy CER (15/16).
 
 ## Acceptance criteria
-- [ ] Tamper tests: flip one model byte → sha256 fail → reject+delete; tampered manifest →
+- [x] Tamper tests: flip one model byte → sha256 fail → reject+delete; tampered manifest →
       signature fail before download; `verify_signature=false` in config → hard error.
 - [ ] Resume test: kill downloader mid-transfer → restart continues (byte-offset verified),
       completes, hash passes.
@@ -46,7 +46,21 @@ progress/cancel, `Downloading` state wiring, local-dir escape hatch, and the com
       cancel leaves no partials outside staging.
 - [ ] `Downloading` state walk on ball (enter/progress/exit) asserted via state log.
 - [ ] local_override: model loaded from local path with integrity check, no network calls.
-- [ ] manifest.json committed with license fields filled; P5 conclusion recorded in PRECHECK.
+- [x] manifest.json committed with license fields filled; P5 conclusion recorded in PRECHECK.
+- note: AC#2 left open — no ruling found in docs/evidence/s2/14-adversarial-acceptance.md (its 6-row
+      audit table names only the tamper/P3/contract-field tests; row 1 "go test ./internal/models
+      -count=1 + -race 全绿" is generic). Candidate evidence unadjudicated at
+      internal/models/downloader_test.go:317 TestResumeContinuesAtByteOffset
+- note: AC#3 left open — no ruling found in docs/evidence/s2/14-adversarial-acceptance.md (searched
+      for failover/404/progress/cancel/staging). Candidate evidence unadjudicated at
+      internal/models/downloader_test.go:369 TestMirrorFailoverAndProgressEvents +
+      internal/models/downloader_test.go:399 TestCancelCleansStagingNoPartialsOutside
+- note: AC#4 left open — no ruling found in docs/evidence/s2/14-adversarial-acceptance.md (searched
+      for Downloading/state walk/D43). Candidate evidence unadjudicated at
+      internal/models/bridge_test.go:23 TestDownloadingWalkSuccess (+ :Failure/:RejectsIllegalEnter)
+- note: AC#5 left open — no ruling found in docs/evidence/s2/14-adversarial-acceptance.md (searched
+      for local_override/no-network). Candidate evidence unadjudicated at
+      internal/models/downloader_test.go:451 TestLocalOverrideIntegrityNoNetwork
 
 ## Progress log (append-only, newest last)
 - [2026-09-19T15:11:33Z] agent=orchestrator claimed=T14-impl did=dispatched next=sub-agent works through acceptance criteria
@@ -54,3 +68,4 @@ progress/cancel, `Downloading` state wiring, local-dir escape hatch, and the com
 - [2026-09-19T22:59:23Z] agent=T14-impl did=real manifest landed+signed (6 entries, all hashes from real downloads/local cross-check vs spike table; KWS/VAD/paraformer/SenseVoice=Apache-2.0, CT-Punc=Apache-2.0, matcha-zh-baker=NON-COMMERCIAL -> status=blocked-p3, Ensure refuses); dev minisign keypair E:\work\base\wisp-minisign (keyid a3c8794f3fd94fc5, never in repo), pub hardcoded in buildinfo, tools/signmodels + scripts/sign-models.ps1, models/manifest.json.minisig committed and verifies in TestRealManifestInRepoVerifies; compose.dev/test.yml + model-mirror fixtures (good/corrupt/missing); build.ps1 colocates manifest; REAL pipeline spot checks PASS (vad-silero 11.3s; punc 64MB archive download+extract+verify 16.5s, WISP_IT_REAL_MIRROR=1) next=full-repo gates + commit/push
 - [2026-09-19T23:06:46Z] agent=T14-impl did=handoff-to-orchestrator all acceptance criteria met: gates green (go vet/test on my pkgs + repo-wide go test ./... PASS; build.ps1 -Env dev PASS incl manifest colocated into build/models; compose.dev/test config OK); unit commits 92f4861+bfcb230+5ab0339 pushed origin+cnb; NO uncommitted T14 files. Notes for orchestrator: (1) matcha-zh-baker P3 BLOCKED non-commercial (data-baker), status=blocked-p3 enforced in Ensure, TTS replacement decision pending [H5]; (2) dev minisign key E:\work\base\wisp-minisign (keyid a3c8794f3fd94fc5), prod rotation S8; (3) repo-wide vet has 1 issue in parallel agent's in-flight internal/observe/sampler_test.go:330 (not T14); (4) cmd/wisp doctor still labels buildinfo key "placeholder" - stale copy, one-line touch for next owner; (5) hf-mirror 401s on Xet-backed repos (punc) - manifest keeps official GitHub fallbacks, ghfast transport fallback automatic. next=T15 pulls binaries; acceptance states remain in-progress pending orchestrator
 - [2026-09-19T23:09:31Z] agent=orchestrator did=T14-adv PASS (orchestrator-executed; report docs/evidence/s2/14-adversarial-acceptance.md; matcha P3 blocked ruling recorded) next=ticket DONE
+- [2026-09-20T02:25Z] agent=agent-bookkeeping-1 did=AC boxes reconciled against docs/evidence/s2/14-adversarial-acceptance.md (6-row audit table from the deadline-window inline acceptance; only rows 2/3/4/5 map onto ACs): 2 checked, 4 left open (reasons above — resume/failover+progress+cancel/Downloading-walk/local_override were never adjudicated by name, though their tests exist on disk) next=none

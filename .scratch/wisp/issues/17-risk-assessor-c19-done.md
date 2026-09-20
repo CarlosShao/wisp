@@ -34,14 +34,15 @@ L2 (R9).
 - PathResolver implementation (18); taint engine (19); approval UI/queue (21); plugin manifests.
 
 ## Acceptance criteria
-- [ ] Rule matrix: each R1–R9 positive/negative/edge case passes (table-driven).
-- [ ] Panic in any sub-assessor → R9 L2 fail-closed (no decision path returns L0/L1 on error).
-- [ ] Fusion: conflicting severities → max wins; send-class via R8 overrides a declared L0.
-- [ ] Decision object includes rules_hit + human-readable reason (golden snapshots).
-- [ ] Contract-freeze note: rule IDs + semantics documented as frozen; doc committed.
+- [x] Rule matrix: each R1–R9 positive/negative/edge case passes (table-driven).
+- [x] Panic in any sub-assessor → R9 L2 fail-closed (no decision path returns L0/L1 on error).
+- [x] Fusion: conflicting severities → max wins; send-class via R8 overrides a declared L0.
+- [x] Decision object includes rules_hit + human-readable reason (golden snapshots).
+- [x] Contract-freeze note: rule IDs + semantics documented as frozen; doc committed.
 
 ## Progress log (append-only, newest last)
 - [2026-09-20T00:10:30Z] agent=orchestrator claimed=T17-impl did=dispatched (50-min deadline window; hard stop 08:40 local, clean-unit boundary only) next=work
 - [2026-09-20T00:32:00Z] agent=T17-impl did=R1-R9 implemented (assessor.go contract+fusion+R9 recover; rules_gateway R1-R4 interface-injected dormant-until-wired; rules_network R5 full; rules_shell R6 full; rules_scale R7 full; rules_irreversible R8 full; 14 tests PASS: per-rule pos/neg/edge, panic-injection R9 x2, fusion max, Deny-beats, R4 session-override-block, 10 golden snapshots) next=integrate 18 resolver/classifier + 19 taint via With* setters; note: T18 WIP landing in parallel (pathresolver files untouched per boundary)
 - [2026-09-20T00:35:00Z] agent=T17-impl did=commit 67ffbd8 pushed to origin+cnb (TLS retry 2 attempts); acceptance criteria all met incl. contract-freeze block in assessor.go; did=handoff-to-orchestrator
 - [2026-09-20T00:27:30Z] agent=orchestrator did=adversarial PASS (orchestrator-executed; reports docs/evidence/s1/.scratch/wisp/issues/17-*.md; full-package tests + race green after both agents merged) next=ticket DONE
+- [2026-09-20T02:25Z] agent=agent-bookkeeping-1 did=AC boxes reconciled against docs/evidence/s1/17-adversarial-acceptance.md (rows 1-3 + 6: R1-R9 implementation, 14 named tests incl. per-rule pos/neg/edge + Deny-beats + send-overrides-L0 + 10 golden snapshots, R9 panic x2 fail-closed; AC#5 traced to the 契约冻结块 in row 1, corroborated on disk at internal/risk/assessor.go:10 "FROZEN CONTRACT — C19 rule set"): 5 checked, 0 left open next=none
