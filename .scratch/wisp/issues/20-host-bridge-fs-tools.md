@@ -1,9 +1,23 @@
 # 20 — host bridge + first tool family: fs.*, capability checks, spill rule
 
-**Status:** in-progress (both fs segments landed; artifacts-spill rule separation, the
-`[fs] allowed_dirs` first-use ask flow and the loop-side gate composition remain)
+**Status:** review（两段 fs 工具族已落地并由编排者验收：`docs/evidence/s1/20-needs-assertion-restored.md`；
+残口只有两条 —— **AC#5** junction/8.3 在**桥层**零命中（只有 `internal/risk` 层有）、
+以及 **A18** 真 `taskkill` 下的 `.wisp-tmp-*` 残留）
 **Claimed by:** T20-seg1-agent (host bridge + C4 registry), T20-seg2-agent (fs write family)
-**Last update:** 2026-09-20 (segment 2)
+**Last update:** 2026-09-20 23:32 (编排者复验轮)
+⚠ **两处过期表述以本块为准（我逐条 grep 复现后更正）**：
+① 正文里的 `who calls this in production? NOBODY YET, and it is NOT reachable from cmd/wisp`（见 §Progress）**已作废**——
+`cd011b8 feat(12)` 之后 `cmd/wisp/run.go` 真的 `tools.New`(:262) + `approval.New`(:255) + 注册全部
+`BuiltinFSEntries`，`decideRisk` 也已改成"有 `AdmitTask` 时 L1/L2 放行、无 gate 时仍拒"（`loop.go:761-774`），
+端到端证据：`cmd/wisp/run_test.go:245` `TestHostDispatchThroughTheAssembledBridge`、`:330`
+`TestComposedGateBlocksAWriteForTwoSeconds`。**⇒ 桥与 fs 工具今天在生产装配根里可达，A12/A13 那族缺陷对本票已解除。**
+② 旧 Status 里的 "the loop-side gate composition remains" **也已完成**（同上）。
+③ 另：本票曾丢掉一条判据——`0986d63` 改名那个注册测试时删掉了**逐条 `Needs` 断言**，
+而 `Needs` 正是 `bridge.go:286/291` 做 C3 授权判定所依据的需求集（少报一个能力＝只授权 `fs.read`
+的机器放行真写盘调用）。**已由编排者补回并做变异检验**（registry **A17**）。
+**新发现的两个残口**：`[fs] allowed_dirs` 首次使用询问流**零实现且没有对应 AC 框**（既不能验收也不能拒绝，
+要么补框要么书面转票 39）；以及 `6a6fca2` 是一个 `docs(` commit 却删了 `wiring_test.go` 9 行
+（经查是死代码、无断言损失，但**判据文件不许挂在 docs 名下改动**）。
 **Blocked by:** 17-risk-assessor-c19, 18-path-resolver-c26
 **Parallel slots:** ≤2 sub-agents (A: host bridge + ToolProvider registry; B: fs tool family +
 artifacts spill)
