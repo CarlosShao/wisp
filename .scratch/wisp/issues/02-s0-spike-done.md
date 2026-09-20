@@ -41,11 +41,11 @@ speech sub-process). All later memory/latency acceptance numbers come from here.
   (experiment branches allowed), but the report files are repo docs and frozen.
 
 ## Acceptance criteria
-- [ ] All five outputs produced with raw numbers + machine (CPU/RAM/OS) recorded.
-- [ ] X/Y verdict written into `docs/SLO.md` + `docs/PRECHECK.md` with the decision inputs shown.
-- [ ] `docs/SLO.md` marks 700MB work-peak as "target" until model residency confirms it.
-- [ ] goja ES + Interrupt precision conclusion recorded; go-webview2 cold/hot numbers recorded.
-- [ ] Report committed and pushed; verdict cited in tickets 07/12/15 (edited into their spec-ref
+- [x] All five outputs produced with raw numbers + machine (CPU/RAM/OS) recorded.
+- [x] X/Y verdict written into `docs/SLO.md` + `docs/PRECHECK.md` with the decision inputs shown.
+- [x] `docs/SLO.md` marks 700MB work-peak as "target" until model residency confirms it.
+- [x] goja ES + Interrupt precision conclusion recorded; go-webview2 cold/hot numbers recorded.
+- [x] Report committed and pushed; verdict cited in tickets 07/12/15 (edited into their spec-ref
       notes if needed).
 
 ## Progress log (append-only, newest last)
@@ -56,3 +56,4 @@ speech sub-process). All later memory/latency acceptance numbers come from here.
 - [2026-09-19T09:20:00Z] agent=T02-impl did=model-residency+switch (fresh-process idle residency incl ~7.5MB process baseline: KWS 48.6MB, VAD 23.6MB, ASR-int8 281.1MB, TTS-matcha 174.2MB; loads 3.5-6.0s all above D32 1-3s assumption; ASR-to-TTS serial switch P50 4726ms vs 1600ms budget FAIL -> D32 fallback TTS-resident
 - [2026-09-19T09:40:00Z] agent=T02-impl did=handoff-to-orchestrator (docs/SLO.md six-state table backfilled with measured values + model residency table + X/Y verdict path-Y + 700MB kept as target; docs/PRECHECK.md P1/P2/P11 conclusions written; report docs/evidence/s0/02-spike-report.md with methodology/raw numbers/model manifest SHA256; deviations: matcha has no int8 -> fp32 measured conservative, model-load 3.5-6s exceeds D32 1-3s assumption, ASR-to-TTS switch 4.7s vs 1600ms budget FAIL -> D32 fallback activated, post-dispose residual +15MB -> S1 SetMemoryLimit duty, handles<300 constraint conflicts with D2D window stack (~420) -> orchestrator to rule; ticket 02 Status left for orchestrator; tickets 07/12/15 spec-ref citations NOT edited per no-touch rule - orchestrator to add) next=orchestrator verdict review + S1/S2 planning
 - [2026-09-19T09:31:25Z] agent=orchestrator did=T02-adv VERDICT PASS (0 BLOCKER/0 MAJOR/7 MINOR; report docs/evidence/s0/02-adversarial-acceptance.md); MINORs: two number-authority fixes applied to SLO.md/PRECHECK.md, rest bookkeeping-accepted next=ticket DONE
+- [2026-09-20T02:25Z] agent=agent-bookkeeping-1 did=AC boxes reconciled against docs/evidence/s0/02-adversarial-acceptance.md (§7 票据对照 five-output itemization + §4 SLO/PRECHECK backfill incl. the 700MB target-not-gate annotation + §5 verdict-routing citations): 5 checked, 0 left open next=none

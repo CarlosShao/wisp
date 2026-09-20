@@ -45,17 +45,25 @@ file-watch hot reload, schema migration with backup, and the security-section lo
 - SecretStore resolution of `api_key_ref` (06); GUI editor (39); risk enforcement (17+).
 
 ## Acceptance criteria
-- [ ] Per-section valid/unknown-key/wrong-type test sets; unknown key error contains line number.
-- [ ] Hot/reload/restart matrix test: writing a file mutation applies per tier (reload emits event).
-- [ ] 🔒 loosening test: hook invoked; reject keeps old values; both directions logged.
-- [ ] Migration: v-1 fixture migrates, backup exists; corrupt fixture → Unconfigured, file untouched.
+- [x] Per-section valid/unknown-key/wrong-type test sets; unknown key error contains line number.
+- [x] Hot/reload/restart matrix test: writing a file mutation applies per tier (reload emits event).
+- [x] 🔒 loosening test: hook invoked; reject keeps old values; both directions logged.
+- [x] Migration: v-1 fixture migrates, backup exists; corrupt fixture → Unconfigured, file untouched.
 - [ ] Hard-coded read-only fields reject writes with explicit errors.
 - [ ] Round-trip: load → marshal → load yields identical structs (GUI double-source guard).
-- [ ] Catalog tests: chain referencing unknown provider/model → error naming the element;
+- [x] Catalog tests: chain referencing unknown provider/model → error naming the element;
       capabilities/billing/quota round-trip; voice chains validated; thinking_intensity enum
       enforced; compat flag defaults.
-- [ ] Storage-boundary test: probe/health fields have no representation in config structs;
+- [x] Storage-boundary test: probe/health fields have no representation in config structs;
       `provider_health` table exists per SPEC-02 schema v2.
+- note: AC#5 left open — no ruling found in docs/evidence/s1/05-adversarial-acceptance.md (its 5-row
+      audit table searched for read-only/half_duplex/keep_transcript/verify_signature; no row names
+      them). Candidate evidence exists unadjudicated at internal/config/validate_test.go:129
+      TestValidateHardcodedReadOnly — needs an addendum ruling, not new work
+- note: AC#6 left open — no ruling found in docs/evidence/s1/05-adversarial-acceptance.md (searched
+      for round-trip/marshal/往返/TestRoundTrip*; row 1 only says "go test ./internal/config ok
+      47 顶层/115 RUN"). Candidate evidence unadjudicated at
+      internal/config/boundary_test.go:188 TestRoundTripLoadMarshalLoad
 
 ## Progress log (append-only, newest last)
 - [2026-09-19T09:20:36Z] agent=orchestrator claimed=T05-impl did=dispatched (3rd concurrent slot trial) next=sub-agent works through acceptance criteria
@@ -69,3 +77,4 @@ file-watch hot reload, schema migration with backup, and the security-section lo
 - [2026-09-19T11:19:08Z] agent=T05-resume4 did=boundary+round-trip: TDD boundary_test.go - TestBoundaryNoPlaintextSecretFields (reflect walk over Config type graph: only APIKeyRef may carry key material, D36 rule 5 pinned structurally), TestBoundaryNoRuntimeObservationFields (no health/probe/latency/lasterror/verified fields - storage split; provider_health DDL deliberately NOT asserted here: ticket 09 owns it, memory schema.go documents absence), TestRoundTripLoadMarshalLoad (full every-section config incl plugins/compat/price/quotas/chains: save->load->save->load DeepEqual-identical, GUI double-source guard), TestRoundTripBytes (MarshalCanonical->decodeStrict identity), TestResolvedNeverPersists (refs verbatim in file, plaintext never); note: go-toml v2 marshals refs as literal strings api_key_ref = 'env:ACME' (single-quote form pinned); go test ./internal/config ok next=closeout (full vet/build/test matrix + handoff)
 - [2026-09-19T11:21:30Z] agent=T05-resume4 did=handoff-to-orchestrator: ticket 05 implementation COMPLETE except items explicitly deferred (see below). Closeout matrix: gofmt -l internal/ clean; go vet ./internal/... clean; non-ASCII grep over internal/config clean (only remaining non-ASCII is the VetoWords default value - data, not comments; schema.go comments were already ASCII); CGO_ENABLED=0 go test -count=1 all packages green (buildinfo config memory observe plugin proc secret statemachine) except pre-existing cmd/wisp sherpa cgo gate (same exclusion as T05-resume3/T06 closeout baselines); internal/... builds under CGO0. Coverage: 47 top-level test funcs / 115 RUN entries in internal/config - per-section unknown-key with LINE NUMBERS (loader_test asserts "line 6"/"line 2" evidence), wrong-type with position, all enums, ball.size 44-72, hard-coded read-onlys (audio.half_duplex=false / privacy.keep_transcript|keep_audio=true / models.verify_signature=false all rejected), api_key_ref grammar via secret.ParseRef (providers+realtime, plaintext/traversal rejected), catalog chains name failing element verbatim + local-sherpa ban, roles set-both-or-neither, realtime checked only when enabled, thinking_intensity/thinking_levels enum, preset inheritance, resolve hook (SecretResolver interface; *secret.Store satisfies directly; Resolved{ProviderKeys,RealtimeKey}; failure names ref), three-tier matrix (hot applies / reload applies+OnReload event / restart keeps old+OnRestartPending; app.theme hot inside restart section; voice tuning keys hot), locked sections direction engine (risk/fs/net/plugins: additions loosen, removals tighten, flips classified; loosen -> ConfirmLocked hook, nil=deny fail-closed, reject keeps old values atomically per section; BOTH directions slog-logged, captured in test), CheckAndReload mtime+size idempotent no-op (asserted), failed load keeps current config + adopts stat (no per-tick spam), missing file errors but keeps current, migration v1->v2 registry with byte-identical .bak-1 backup + dry-check-before-write + corrupt/unsupported file untouched, full round-trip (save->load->save->load DeepEqual; marshal->decode identity on every-section config incl plugins/compat/price/quota), storage boundary (no plaintext api_key field possible; no health/probe/latency fields; provider_health DDL deliberately left to ticket 09 per memory/schema.go). Commits: fe126e2 c352769 18ab82c 1fd19d4 ab638dd ae838ef 02b9a72 (all pushed origin+cnb). Deferred/notes: (1) watchdog-loop wiring of CheckAndReload into its 1s tick = ticket 42 per watchdog/doc.go DEFERRED; (2) actual L2 confirmation UI = S3/S5, hook seam ready; (3) provider_health table = ticket 09; (4) -race skipped (requires gcc/CGO on windows, sandbox has no gcc - documented at T05-resume3); (5) full CGO build not run (no gcc) - CGO0 matrix green. Ticket NOT marked done (orchestrator decides).
 - [2026-09-19T13:56:25Z] agent=orchestrator did=T05-adv PASS (orchestrator-executed; report docs/evidence/s1/05-adversarial-acceptance.md) next=ticket DONE
+- [2026-09-20T02:25Z] agent=agent-bookkeeping-1 did=AC boxes reconciled against docs/evidence/s1/05-adversarial-acceptance.md (5-row audit table; AC#8's provider_health half cross-ruled in docs/evidence/s1/09-adversarial-acceptance.md §5 schema v2 审计 PASS): 6 checked, 2 left open (reasons above) next=none

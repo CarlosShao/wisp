@@ -40,16 +40,16 @@ Job Object (C30), DisposalScope (C11), and the WISP_ENV selection logic (values 
 - Any state machine transitions beyond an Idle placeholder; config schema; SQLite; audio; UI.
 
 ## Acceptance criteria
-- [ ] Binary boots all packages (init-time self-checks pass), exits cleanly through the D38(e)
+- [x] Binary boots all packages (init-time self-checks pass), exits cleanly through the D38(e)
       10-step shutdown order — with an order-audit test asserting the actual sequence.
-- [ ] Goroutine registry test: after boot + one no-op task, count returns to resident baseline ±1.
-- [ ] Deliberate panic in a worker goroutine → process survives, error=internal logged with stack,
+- [x] Goroutine registry test: after boot + one no-op task, count returns to resident baseline ±1.
+- [x] Deliberate panic in a worker goroutine → process survives, error=internal logged with stack,
       root ctx cancelled (test).
-- [ ] JobScope: spawn a test child → child killed when parent Job closes; TreePrivateBytes returns
+- [x] JobScope: spawn a test child → child killed when parent Job closes; TreePrivateBytes returns
       sane numbers vs Task Manager.
-- [ ] DisposalScope tests: reverse order, idempotent, one fn panicking doesn't block others,
+- [x] DisposalScope tests: reverse order, idempotent, one fn panicking doesn't block others,
       3s timeout marks disposal_incomplete.
-- [ ] Second-instance test: launching twice → second exits after signalling first.
+- [x] Second-instance test: launching twice → second exits after signalling first.
 
 ## Progress log (append-only, newest last)
 - [2026-09-19T06:32:38Z] agent=orchestrator claimed=T03-impl did=dispatched (parallel with T01-adv) next=sub-agent works through acceptance criteria
@@ -62,3 +62,4 @@ Job Object (C30), DisposalScope (C11), and the WISP_ENV selection logic (values 
 - [2026-09-19T07:36:20Z] agent=T03-impl did=shutdown-order-D38e+boot (RunShutdownSequence frozen 10 steps + order-audit test + fast-path skips only step7 + bounded-wait abandonment; proc.Boot runtime assembly w/ self-checks + RunEventLoop + main no-args wiring; BUILD.md no-args line updated; binary smoke: boot OK, second-instance signals first and exits) next=full-suite+handoff
 - [2026-09-19T07:37:13Z] agent=T03-impl did=handoff-to-orchestrator (all ticket-03 acceptance criteria implemented and tested; full go test ./... green: 37 tests in buildinfo/observe/plugin/proc; go vet + go build green; scripts/build.ps1 green with doctor PASS; binary smoke: no-args boot + empty event loop OK, second-instance signal-and-exit OK; note: one commit b155c6b accidentally swept parallel-agent spike WIP via git add -A, untracked again in cfa4175) next=ticket-03-done-decision-belongs-to-orchestrator
 - [2026-09-19T08:01:18Z] agent=orchestrator did=T03-adv VERDICT PASS (0 BLOCKER/0 MAJOR; report docs/evidence/s0/03-adversarial-acceptance.md); MINORs: count-convention noted, disposal-worker exemption forwarded to ticket 08, CGO note already in BUILD.md; also pushed missing cnb commit 6b83e93 next=ticket DONE
+- [2026-09-20T02:25Z] agent=agent-bookkeeping-1 did=AC boxes reconciled against docs/evidence/s0/03-adversarial-acceptance.md (§9 票据对照 table: 6 AC rows each ruled pass with named tests): 6 checked, 0 left open next=none

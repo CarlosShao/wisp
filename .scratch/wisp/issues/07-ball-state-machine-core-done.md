@@ -46,7 +46,7 @@ basic animations; full visual polish gate is human acceptance at 12).
   privacy confirm dialog content (28 wires the transition), watchdog interplay (42).
 
 ## Acceptance criteria
-- [ ] Exhaustive transition test: every legal row fires (state+side-effect spy), every illegal
+- [x] Exhaustive transition test: every legal row fires (state+side-effect spy), every illegal
       pair rejected; per-state timeout table-driven tests.
 - [ ] Visual: 20 states rendered in a debug cycle page/window; human screenshot review vs
       design/screens/ball.html (colors/opacity/sizes per SPEC-08 §2.1).
@@ -56,6 +56,25 @@ basic animations; full visual polish gate is human acceptance at 12).
       timer handles alive in Sleeping.
 - [ ] Hotkeys registered/re-registered on config change; mute toggles Muted state.
 - [ ] Multi-monitor: drag to second monitor, persist, restore; simulated detach → primary.
+- note: AC#2 left open — docs/evidence/s1/07-adversarial-acceptance.md row 3 rules 视觉证据
+      "PASS（人工签收挂起）"; the AC's second clause (human review vs ball.html) is still the open
+      待人项 H1 in docs/reports/pending-and-issues.md, so no completion ruling exists
+- note: AC#3 left open — no ruling found in docs/evidence/s1/07-adversarial-acceptance.md (5-row
+      table searched for click/Esc/focus/click-through; row 2 only says "ball ok / statemachine ok"
+      without naming what those tests assert). Candidate evidence unadjudicated at
+      internal/ball/tokens_test.go:239 TestHitTestAndDPIInjection
+- note: AC#4 left open — no ruling found in docs/evidence/s1/07-adversarial-acceptance.md (searched
+      for Sleeping/CPU/timer/animation); the AC defers measurement to ticket 08's sampler, whose own
+      report (docs/evidence/s1/08-adversarial-acceptance.md row 2) rules the Sleeping state gates
+      PASS at 8.7MB but says nothing about animation timer handles. Candidate evidence unadjudicated
+      at internal/ball/tokens_test.go:202 TestAnimationPolicyZeroTimerInSleeping
+- note: AC#5 left open — no ruling found in docs/evidence/s1/07-adversarial-acceptance.md (searched
+      for 热键/hotkey/re-register/mute); row 5 only lists "热键默认值待 39 接线" as a registered
+      deviation, not a pass on re-registration on config change. Candidate evidence unadjudicated at
+      internal/ball/hotkey_test.go:51 TestDefaultHotkeys
+- note: AC#6 left open — no ruling found in docs/evidence/s1/07-adversarial-acceptance.md (searched
+      for 多显示器/DPI/monitor/drag/persist/restore). Candidate evidence unadjudicated at
+      internal/ball/live_windows_test.go:125 TestBallLivePositionPersistence
 
 ## Progress log (append-only, newest last)
 - [2026-09-19T10:41:26Z] agent=orchestrator claimed=T07-impl did=dispatched (maintain 2-way concurrency floor) next=sub-agent works through acceptance criteria
@@ -66,3 +85,4 @@ basic animations; full visual polish gate is human acceptance at 12).
 - [2026-09-19T13:45:00Z] agent=T07-impl did=visual-evidence next=final-gates
 - [2026-09-19T13:55:00Z] agent=T07-impl did=handoff-to-orchestrator status=implementation-complete
 - [2026-09-19T13:56:25Z] agent=orchestrator did=T07-adv PASS (orchestrator-executed; D43 #1-#40+#41/#42 table audit; report docs/evidence/s1/07-adversarial-acceptance.md; human visual sign-off pending -> docs/reports) next=ticket DONE
+- [2026-09-20T02:25Z] agent=agent-bookkeeping-1 did=AC boxes reconciled against docs/evidence/s1/07-adversarial-acceptance.md (5-row audit-item table, not a per-AC table): 1 checked (AC#1 via rows 1+2), 5 left open (reasons above) next=none

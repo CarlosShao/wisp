@@ -31,14 +31,14 @@ for everything else: AI agents must never be able to enter toolchain trial-and-e
 - Spike measurements (ticket 02); any product feature; frontend; CI workflow files (ticket 08).
 
 ## Acceptance criteria
-- [ ] Fresh clone → `scripts/build.ps1` → running `wisp.exe` (shows a placeholder console/UI proof
+- [x] Fresh clone → `scripts/build.ps1` → running `wisp.exe` (shows a placeholder console/UI proof
       of life) — verified on a clean machine/CI runner, no preinstalled toolchain assumed beyond
       what BUILD.md declares.
-- [ ] `docs/BUILD.md` written and declared frozen: toolchain versions, deps.toml hash pins,
+- [x] `docs/BUILD.md` written and declared frozen: toolchain versions, deps.toml hash pins,
       exact commands, troubleshooting of the two failure modes actually hit during this ticket.
-- [ ] `deps.toml` SHA256 mismatch test: corrupt one downloaded byte → fetch-deps fails loudly.
-- [ ] `wisp doctor` prints toolchain/DLL versions and PASS/FAIL for colocated-DLL rule.
-- [ ] BUILD.md committed and pushed to both remotes.
+- [x] `deps.toml` SHA256 mismatch test: corrupt one downloaded byte → fetch-deps fails loudly.
+- [x] `wisp doctor` prints toolchain/DLL versions and PASS/FAIL for colocated-DLL rule.
+- [x] BUILD.md committed and pushed to both remotes.
 
 ## Progress log (append-only, newest last)
 - [2026-09-19T05:33:59Z] agent=orchestrator claimed=T01-impl did=dispatched implementation sub-agent next=sub-agent works through acceptance criteria
@@ -47,3 +47,4 @@ for everything else: AI agents must never be able to enter toolchain trial-and-e
 - [2026-09-19T06:21:10Z] agent=T01-impl did=handoff-to-orchestrator (clean clone one-shot build verified prod+dev, doctor PASS, AttachConsole validated under -H=windowsgui, tamper tests green; ticket 01 implementation complete, Status left for orchestrator)
 - [2026-09-19T06:32:38Z] agent=orchestrator did=added docker/builder.Dockerfile (was in ticket constraints, impl agent deferred; Go pinned 1.27) next=T01-adv acceptance
 - [2026-09-19T06:57:25Z] agent=orchestrator did=T01-adv VERDICT PASS (0 BLOCKER/0 MAJOR/3 MINOR; report docs/evidence/s0/01-adversarial-acceptance.md); MINORs fixed (log order, BUILD.md indirect-import wording, Dockerfile deviation note) next=ticket DONE
+- [2026-09-20T02:25Z] agent=agent-bookkeeping-1 did=AC boxes reconciled against docs/evidence/s0/01-adversarial-acceptance.md (report §7 票据对照 table + §1–§6 rulings): 5 checked, 0 left open (no note lines required; every AC has an explicit PASS row with evidence) next=none

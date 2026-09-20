@@ -36,14 +36,19 @@ visible env badge contract consumed by ball/panel.
 - Mock-llm server itself (09); panel badge UI (35); update channel logic (44/56).
 
 ## Acceptance criteria
-- [ ] Round-trip: store → resolve; blob file on disk not readable as plaintext; log shows last-4 only.
-- [ ] Plaintext migration test: seeded plaintext config → migrated, field removed, backup exists,
+- [x] Round-trip: store → resolve; blob file on disk not readable as plaintext; log shows last-4 only.
+- [x] Plaintext migration test: seeded plaintext config → migrated, field removed, backup exists,
       notice logged; second run idempotent.
-- [ ] Env fork matrix test: three envs → distinct data dirs/mutex names/endpoints; dev and prod
+- [x] Env fork matrix test: three envs → distinct data dirs/mutex names/endpoints; dev and prod
       dirs mutually invisible.
-- [ ] Mutex names per env (integration test on Windows runner).
-- [ ] Portable mode: data dir relocation + dpapi-decrypt-failure → explicit error (not plaintext).
+- [x] Mutex names per env (integration test on Windows runner).
+- [x] Portable mode: data dir relocation + dpapi-decrypt-failure → explicit error (not plaintext).
 - [ ] `env:` refs work with arbitrary dummy values (CI-friendly).
+- note: AC#6 left open — no ruling found in docs/evidence/s0/06-adversarial-acceptance.md (its 8-row
+      audit table names TestLayoutForkMatrix / envfork_mutex_windows_test / MigratesAndBacksUp /
+      ErrPortableDecrypt but never addresses `env:`-ref resolution with dummy values; row 1's
+      "全量复跑 secret ok" is generic). Candidate evidence unadjudicated at
+      internal/secret/store_test.go:131 TestResolveEnvRef
 
 ## Progress log (append-only, newest last)
 - [2026-09-19T09:31:25Z] agent=orchestrator claimed=T06-impl did=dispatched (3-way concurrency) next=sub-agent works through acceptance criteria
@@ -56,3 +61,4 @@ visible env badge contract consumed by ball/panel.
 - [2026-09-19T10:15:16Z] agent=T06-impl-resume2 did=full matrix green: go vet ./... ok; go build ./... ok (CGO_ENABLED=1); CGO_ENABLED=0 go build ./internal/... ok (cmd/wisp excluded: pre-existing sherpa-onnx cgo binding from 10ed80d, not a 06 regression); go test ./... all ok (proc 0.344s incl. mutex-per-env Windows integration, secret 0.104s); build.ps1 -Env dev PASS (doctor WISP_ENV=dev, dev data dir, smoke ok) next=acceptance recheck + handoff
 - [2026-09-19T10:15:16Z] agent=T06-impl-resume2 did=handoff-to-orchestrator: acceptance 6/6 present and green (round-trip+blob-not-plaintext+last-4; migration+idempotent+first-backup-wins; TestLayoutForkMatrix 3-env distinct dirs/mutexes/endpoints+nested-invisibility; TestMutexNamesPerEnv real kernel mutexes; TestPortableOverride+TestPortableDecryptFailureExplicit; TestResolveEnvRef dummy values). Status left as-is next=orchestrator adversarial review
 - [2026-09-19T10:25:38Z] agent=orchestrator did=T06-adv VERDICT PASS (report docs/evidence/s0/06-adversarial-acceptance.md; orchestrated acceptance executed by orchestrator due to platform captcha failures, implementer-independent) next=ticket DONE
+- [2026-09-20T02:25Z] agent=agent-bookkeeping-1 did=AC boxes reconciled against docs/evidence/s0/06-adversarial-acceptance.md (8-row audit table; AC#1←row3 DPAPI 真实性, AC#2←row4 named migration tests, AC#3+AC#4←row5 TestLayoutForkMatrix/envfork_mutex_windows_test, AC#5←row6 P13+ErrPortableDecrypt; AC#6 unaddressed): 5 checked, 1 left open (reasons above) next=none
