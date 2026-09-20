@@ -26,6 +26,25 @@ package ball
 // by definition no further message is coming; that is the price of the promise
 // and it is paid on an 8-21px slide with the pointer already gone.
 
+import "time"
+
+// dockRampFrame is the ramp's step law, shared verbatim by every message path
+// that moves the tab: the hover pop-out (WM_MOUSEMOVE -> dockHoverMove ->
+// dockStep), the retreat after WM_MOUSELEAVE (dockLeave -> dockStep) and the
+// drag-end commit. It is pure - level in, level out, dt is the caller's own
+// frame-spacing measurement - so the reverse direction (docked -> popped) is
+// pinned by dock_test.go without anyone having to own the physical cursor.
+// That matters: TrackMouseEvent fires an immediate WM_MOUSELEAVE for a
+// synthesised hover, so the live test proves the WIRING only, and this function
+// is where the BEHAVIOUR is proven.
+func dockRampFrame(p, target float32, dt time.Duration) (next float32, moved bool) {
+	if dt <= 0 {
+		return p, false
+	}
+	next = clamp01(approach(p, target, float32(dt)/float32(DockAnimMs*time.Millisecond)))
+	return next, next != p
+}
+
 // DockSquash is the fraction of the orb still drawn along the dock axis at
 // ramp level p (1 = free orb, DockOverlapFrac = full tab). The renderer scales
 // the orb with it and DockPos places it, so the two always agree.

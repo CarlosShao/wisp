@@ -149,15 +149,17 @@ func (b *Ball) dockMoveTo(pos PosEntry) {
 }
 
 // dockStep advances the ramp toward its target and follows the position law.
+// The step itself is dockRampFrame, which lives in the pure package so the
+// reverse direction can be tested without a cursor.
 func (b *Ball) dockStep(dt time.Duration) {
-	if dt <= 0 || b.dock.edge == EdgeNone {
+	if b.dock.edge == EdgeNone {
 		return
 	}
-	before := b.dock.p
-	b.dock.p = clamp01(approach(b.dock.p, b.dock.target, float32(dt)/float32(DockAnimMs*time.Millisecond)))
-	if before == b.dock.p {
+	next, moved := dockRampFrame(b.dock.p, b.dock.target, dt)
+	if !moved {
 		return
 	}
+	b.dock.p = next
 	if b.dock.owns {
 		if work, edgePx, _, orbR, _, x, y, ok := b.dockGeometry(); ok {
 			b.dockMoveTo(DockPos(work, b.dock.edge, x, y, edgePx, orbR, b.dock.p))
@@ -277,6 +279,32 @@ func (b *Ball) DebugDock(e Edge) bool {
 		done <- b.dock.edge == e && b.dock.owns && b.dock.p == 1
 	})
 	return <-done
+}
+
+// DebugPop is the evidence seam for the hover direction: it walks a docked tab
+// back out to a full orb through the very ramp the WM_MOUSEMOVE hover path
+// drives (dockHoverMove -> dockStep -> dockRampFrame), one frame per loop,
+// instead of relying on a pointer this process does not own. It deliberately
+// does NOT call dockAskLeave: TrackMouseEvent answers a synthesised hover with
+// an immediate WM_MOUSELEAVE, which would retract the tab again before anyone
+// could see it. Returns the level it landed on.
+func (b *Ball) DebugPop() float32 {
+	step := func() float32 {
+		done := make(chan float32, 1)
+		b.sta.PostTask(func() {
+			b.dock.hover = true
+			b.dock.target = 0
+			b.dockStep(b.dockFrameDt())
+			done <- b.dock.p
+		})
+		return <-done
+	}
+	p := step()
+	for i := 0; i < 30 && p != 0; i++ {
+		time.Sleep(MinFrameMs * time.Millisecond)
+		p = step()
+	}
+	return p
 }
 
 // Docked reports the live dock (edge, ramp level, whether the dock owns the

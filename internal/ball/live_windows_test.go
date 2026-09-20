@@ -427,7 +427,10 @@ var (
 // the tab closes again. Every frame here came from a mouse message - the test
 // asserts no timer was ever armed while the orb sat in Sleeping the whole time.
 // If some other window owns the pixel the pointer is sent to, the hover cannot
-// be delivered and the test says so instead of failing on an occlusion.
+// be delivered and the test says so instead of failing on an occlusion - LOUDLY,
+// and only about the wiring: the pop-back behavior itself is pinned by the
+// non-skipping TestDockHoverPopBackWalksTheRampHome in dock_test.go, so a skip
+// here never leaves the direction unproven.
 func TestBallLiveEdgeDockHover(t *testing.T) {
 	restored := PrototypeVisualsEnabled()
 	t.Cleanup(func() { EnablePrototypeVisuals(restored) })
@@ -449,7 +452,12 @@ func TestBallLiveEdgeDockHover(t *testing.T) {
 		var cp point
 		procGetCursorPos.Call(uintptr(unsafe.Pointer(&cp)))
 		if cp.x != x || cp.y != y {
-			t.Skipf("SetCursorPos refused (the pointer is owned elsewhere): asked (%d,%d), at (%d,%d)",
+			t.Skipf("SKIP-LOUD: SetCursorPos refused (the pointer is owned elsewhere): asked (%d,%d), at (%d,%d). "+
+				"This run therefore did NOT exercise the real WM_MOUSEMOVE/WM_MOUSELEAVE path. "+
+				"The pop-back BEHAVIOR is proven by the non-skipping deterministic test "+
+				"TestDockHoverPopBackWalksTheRampHome in dock_test.go, which drives the same "+
+				"dockRampFrame step law the hover and leave handlers call; this test only proves the "+
+				"WIRING delivers the event, and it proved nothing this run.",
 				x, y, cp.x, cp.y)
 		}
 	}
@@ -526,7 +534,12 @@ func TestBallLiveEdgeDockHover(t *testing.T) {
 		started = waitFor(func() bool { return hovered() && settled() < 1 }, 2*time.Second)
 	}
 	if !started {
-		t.Skipf("hover undeliverable this run: tab centre (%d,%d), hovered=%v p=%v", cx, cy, hovered(), settled())
+		t.Skipf("SKIP-LOUD: hover undeliverable this run (neither the physical cursor nor a posted WM_MOUSEMOVE "+
+			"reached the tab): centre (%d,%d), hovered=%v p=%v. This run therefore did NOT exercise the real "+
+			"WM_MOUSEMOVE/WM_MOUSELEAVE path. The pop-back BEHAVIOR is still proven, by the non-skipping "+
+			"deterministic test TestDockHoverPopBackWalksTheRampHome in dock_test.go, which drives the same "+
+			"dockRampFrame step law these handlers call; what this test could not show today is the wiring.",
+			cx, cy, hovered(), settled())
 	}
 	if b.DebugTimersAlive() {
 		t.Fatal("the hover pop-out armed a timer in Sleeping")

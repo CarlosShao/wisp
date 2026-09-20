@@ -234,6 +234,208 @@ func TestDockOnSecondaryMonitorWithNegativeOrigin(t *testing.T) {
 	}
 }
 
+// dockEdgeName labels an edge for failure messages (Edge has no String method).
+func dockEdgeName(e Edge) string {
+	switch e {
+	case EdgeLeft:
+		return "left"
+	case EdgeRight:
+		return "right"
+	case EdgeTop:
+		return "top"
+	case EdgeBottom:
+		return "bottom"
+	}
+	return "none"
+}
+
+// orbAxisSpan is how much orb the screen shows along the dock axis.
+func orbAxisSpan(r Rect, e Edge) int {
+	if e == EdgeLeft || e == EdgeRight {
+		return r.R - r.L
+	}
+	return r.B - r.T
+}
+
+// awayFromEdge is the window's travel along the dock axis, positive when it moved
+// away from the boundary it was docked on.
+func awayFromEdge(now, before PosEntry, e Edge) int {
+	switch e {
+	case EdgeLeft:
+		return now.X - before.X
+	case EdgeRight:
+		return before.X - now.X
+	case EdgeTop:
+		return now.Y - before.Y
+	case EdgeBottom:
+		return before.Y - now.Y
+	}
+	return 0
+}
+
+// insideWork reports whether a rect sits wholly inside the monitor's work area,
+// taskbar line included.
+func insideWork(work, r Rect) bool {
+	return r.L >= work.L && r.T >= work.T && r.R <= work.R && r.B <= work.B
+}
+
+// orbRect is everything the screen shows of the orb at ramp level p, in physical
+// px: the drawn circle (squashed along the dock axis) as placed by DockPos. The
+// renderer scales by DockSquash and DockPos places, so this single law is what
+// both the pop-out and the retreat are judged against.
+func orbRect(pos PosEntry, edgePx, R int32, e Edge, p float32) Rect {
+	half := int(edgePx / 2)
+	cx, cy := pos.X+half, pos.Y+half
+	off := int(float32(R) * DockSquash(p))
+	switch e {
+	case EdgeLeft, EdgeRight:
+		return Rect{L: cx - off, T: cy - int(R), R: cx + off, B: cy + int(R)}
+	}
+	return Rect{L: cx - int(R), T: cy - off, R: cx + int(R), B: cy + off}
+}
+
+// TestDockHoverPopBackWalksTheRampHome is the deterministic half of "悬停 ->
+// 弹回完整球", and it never skips. The live test (TestBallLiveEdgeDockHover) can
+// only prove the WIRING: a synthesised hover is answered by an immediate
+// WM_MOUSELEAVE from TrackMouseEvent, and the OS may refuse the pointer to a
+// background process outright. Per this repo's standing rule a behavior
+// assertion must not live only in a test that can skip, so this test drives the
+// REVERSE ramp - docked tab to full orb, then back - through dockRampFrame, the
+// exact step law dockHoverMove and dockLeave call on every mouse message, and
+// asserts the tab really walks home and lands on a reachable, fully drawn orb.
+func TestDockHoverPopBackWalksTheRampHome(t *testing.T) {
+	const frame = 33 * time.Millisecond
+	e, m, R := dockTestEdge(), dockTestMargin, dockTestR()
+	tabSpan := 2 * int(float32(R)*DockOverlapFrac)
+
+	// Two monitor layouts: the primary, and a screen left of it (negative
+	// origin), so the pop-out law is pinned per-monitor and not against (0,0).
+	layouts := []struct {
+		name  string
+		work  Rect
+		edges []Edge
+	}{
+		{"primary", dockWork(), []Edge{EdgeLeft, EdgeRight, EdgeTop, EdgeBottom}},
+		{"secondary", Rect{L: -1920, T: 120, R: -120, B: 1120}, []Edge{EdgeLeft, EdgeTop}},
+	}
+
+	for _, lay := range layouts {
+		work := lay.work
+		for _, edge := range lay.edges {
+			name := lay.name + "/" + dockEdgeName(edge)
+			// Where a drag would leave the window: tangent and un-squashed,
+			// then committed to a full dock by the same law.
+			tn := DockTangent(work, edge, e, m)
+			crossX, crossY := tn.X, tn.Y
+			if edge == EdgeLeft || edge == EdgeRight {
+				crossY = work.T + (work.B-work.T-int(e))/2
+			} else {
+				crossX = work.L + (work.R-work.L-int(e))/2
+			}
+			docked := DockPos(work, edge, crossX, crossY, e, R, 1)
+
+			// 1. The docked end is a tab, not a ball - that is what the pop has
+			//    to undo, and it is still wholly on its own monitor.
+			tab := orbRect(docked, e, R, edge, 1)
+			if got := orbAxisSpan(tab, edge); got != tabSpan {
+				t.Fatalf("%s: docked tab shows %dpx, want %dpx", name, got, tabSpan)
+			}
+			if !insideWork(work, tab) {
+				t.Fatalf("%s: a docked tab must stay inside its work area: %+v in %+v", name, tab, work)
+			}
+
+			// 2. Hover: the handler orders target=0 and the ramp walks back.
+			p, target := float32(1), float32(0)
+			prevPos, prevSpan, frames := docked, tabSpan, 0
+			for p != target {
+				if frames >= 100 {
+					t.Fatalf("%s: the pop-out never landed, stuck at p=%v", name, p)
+				}
+				next, moved := dockRampFrame(p, target, frame)
+				if !moved {
+					t.Fatalf("%s: the ramp froze at p=%v with target=0", name, p)
+				}
+				if next > p {
+					t.Fatalf("%s: popping out must shrink the ramp level, %v -> %v", name, p, next)
+				}
+				p = next
+				pos := DockPos(work, edge, crossX, crossY, e, R, p)
+				span := orbAxisSpan(orbRect(pos, e, R, edge, p), edge)
+				if span < prevSpan {
+					t.Fatalf("%s: the orb must grow as it pops out: %dpx after %dpx", name, span, prevSpan)
+				}
+				if awayFromEdge(pos, prevPos, edge) < 0 {
+					t.Fatalf("%s: the pop-out moved the window back toward the edge at p=%v", name, p)
+				}
+				prevPos, prevSpan = pos, span
+				frames++
+			}
+			if want := DockAnimMs / MinFrameMs; frames < want-1 || frames > want+2 {
+				t.Fatalf("%s: the pop-out took %d frames of ~%d ms, budget is DockAnimMs=%d",
+					name, frames, MinFrameMs, DockAnimMs)
+			}
+
+			// 3. Landed: a whole orb, fully on its own monitor, so it is
+			//    reachable and there is nothing left to hide behind an edge.
+			full := orbRect(prevPos, e, R, edge, p)
+			if got := orbAxisSpan(full, edge); got != 2*int(R) {
+				t.Fatalf("%s: a popped-out orb must be round again, axis span %dpx of %dpx",
+					name, got, 2*int(R))
+			}
+			if !insideWork(work, full) {
+				t.Fatalf("%s: the popped-out orb is partly off-screen: %+v in %+v", name, full, work)
+			}
+			if got := DockSquash(p); got != 1 {
+				t.Fatalf("%s: a landed ramp must leave an unsquashed orb, got %v", name, got)
+			}
+			// The cross-axis clamp holds at the free end too: this is the
+			// position dockClickOut hands back when the user wants the ball.
+			free := DockFreePos(work, prevPos.X, prevPos.Y, e)
+			win := Rect{L: free.X, T: free.Y, R: free.X + int(e), B: free.Y + int(e)}
+			if !insideWork(work, win) {
+				t.Fatalf("%s: a clicked-out ball may not hang off its monitor: %+v", name, win)
+			}
+
+			// 4. Pointer gone mid-pop: the same law, target=1, walks back to the
+			//    tab, and one full-budget frame lands it exactly - the forced
+			//    landing dockLeave performs when no message will follow.
+			for p = float32(0.5); p != 1; {
+				next, _ := dockRampFrame(p, 1, frame)
+				if next < p {
+					t.Fatalf("%s: retreating must grow the ramp level, %v -> %v", name, p, next)
+				}
+				if orbAxisSpan(orbRect(DockPos(work, edge, crossX, crossY, e, R, next), e, R, edge, next), edge) >
+					orbAxisSpan(orbRect(DockPos(work, edge, crossX, crossY, e, R, p), e, R, edge, p), edge) {
+					t.Fatalf("%s: retreating must shrink the orb, %v -> %v", name, p, next)
+				}
+				p = next
+				if p > 1 {
+					t.Fatalf("%s: the retreat overshot the docked end: %v", name, p)
+				}
+			}
+			if landed, _ := dockRampFrame(0.5, 1, DockAnimMs*time.Millisecond); landed != 1 {
+				t.Fatalf("%s: a full-budget retreat must land the tab, got %v", name, landed)
+			}
+
+			// 5. Endpoints hold still and never overshoot: a landed ramp costs no
+			//    further frames (no jitter, no CPU) and cannot slide past either
+			//    end of the ramp.
+			if _, moved := dockRampFrame(0, 0, 250*time.Millisecond); moved {
+				t.Fatalf("%s: a popped-out ramp must hold still at 0", name)
+			}
+			if _, moved := dockRampFrame(1, 1, 250*time.Millisecond); moved {
+				t.Fatalf("%s: a docked ramp must hold still at 1", name)
+			}
+			if over, _ := dockRampFrame(0.1, 0, time.Second); over != 0 {
+				t.Fatalf("%s: the ramp must clamp at the free end, got %v", name, over)
+			}
+			if over, _ := dockRampFrame(0.9, 1, time.Second); over != 1 {
+				t.Fatalf("%s: the ramp must clamp at the docked end, got %v", name, over)
+			}
+		}
+	}
+}
+
 // TestDockRampTakesItsTokenBudget: the ramp the mouse messages carry must walk
 // DockAnimMs of frames, not land in one step - and must land exactly.
 func TestDockRampWalksItsBudget(t *testing.T) {
