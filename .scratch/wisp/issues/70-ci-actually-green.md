@@ -1,7 +1,7 @@
 # 70 — 让 CI 真的成为护栏：5 个 job 全红，逐因分诊（本仓的"门禁"从未生效过）
 
-**Status:** blocked-on-tree（**必须等票 66 与票 68 收尾**：AC#1 是全仓格式化，会重写它们正在改的包）
-**Claimed by:** —
+**Status:** in-progress
+**Claimed by:** agent-ticket70
 **Last update:** 2026-09-20
 **Blocked by:** 66（`internal/observe`/`internal/proc`/`cmd/wisp`）、68（`internal/ball`/`cmd/balldebug`）
 **Parallel slots:** ≤1 sub-agent；AC#1 落地期间**不得有第二个代理写码**
@@ -64,3 +64,4 @@
 3. 本票 AC#1 落地期间**只有它一个写码代理**，避免全仓重写与别人 WIP 相撞。
 
 ## Progress log（append-only）
+- [2026-09-20T15:39:24Z] agent=agent-ticket70 did=claim ticket70 (Status in-progress / Claimed by agent-ticket70); measured AC#1 baseline with the pinned version: gofumpt v0.7.0 -l . tools/d22scan tools/mockllm => 69 files (matches the orchestrator's count verbatim). Tree note: docs/SLO.md carries another agent's WIP edit (7+/1-) and is excluded from every commit I make (explicit paths only).
