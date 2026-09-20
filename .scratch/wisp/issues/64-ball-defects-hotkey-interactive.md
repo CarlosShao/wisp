@@ -1,7 +1,7 @@
 # 64 — 票 07 遗留缺陷修复：热键接线 / 交互四项 / Sleeping 零定时器实测 / 多显示器实拖
 
-**Status:** ready-for-agent
-**Claimed by:** —
+**Status:** review（票面工作全部落地或已显式移交；剩 4 框各归其主，见 Progress log 2026-09-20T14:19Z）
+**Claimed by:** —（已无实现代理在跑；**勿在编排者复核 MINOR-1/2 前重开本票**）
 **Last update:** 2026-09-20
 **Blocked by:** 07-ball-state-machine-core（已 done，但下列四条 AC 从未通过）
 **Parallel slots:** ≤2 sub-agents（A：热键接线与错误语义；B：交互/多显示器/零定时器断言）
@@ -55,7 +55,9 @@ owner 2026-09-20 裁定：**现在插队修，不等 S3**。本票消化 registr
       本机物理单屏（`\\.\DISPLAY4` 3440x1440），**硬件缺席**，未做任何双屏 mock。
 - [x] 测试前置：检测到外部同窗口/演示进程时 fail-fast 并提示，禁止静默 skip。
 - [x] registry A1–A7 逐条标注"已修/待硬件/移交票 xx"，不许无声消失。
-- [ ] 对抗验收由非实现者执行，报告含与本表 **1:1 的裁决表**（README 规则 6）。
+- [x] 对抗验收由非实现者执行，报告含与本表 **1:1 的裁决表**（README 规则 6）。
+      2026-09-20 由编排者执行：`docs/evidence/s1/64-adversarial-acceptance.md`（9 行 = 票面 9 框）。
+      结论 **0 BLOCKER / 0 MAJOR / 3 MINOR**；四个未勾框全部判"正确未勾"。
 
 ## Progress log (append-only, newest last)
 
@@ -143,3 +145,21 @@ owner 2026-09-20 裁定：**现在插队修，不等 S3**。本票消化 registr
   `Check()` 挂 watchdog tick（A1/AC#1 唯一残件，R12 已精确说明为何不能只挂 `OnReload`）；②owner 解冻 SPEC-03/08
   或转票 39 配置 GUI，才能把 `Ctrl+Alt+Space` 写进用户可见文档（AC#3 后半）；③双屏硬件到位后跑 AC#6，
   另需给 `enumMonitors()` 开注入接缝（A4）。若要复跑测量：桌面必须无其它 Wisp 球，前置守卫会 fail-fast。
+- [2026-09-20T14:19Z] agent=orchestrator did=**对抗验收执行完毕并勾 AC#9；`Status: ready-for-agent → review`（防重开）**。
+  报告 `docs/evidence/s1/64-adversarial-acceptance.md`，9 行与票面 9 框 1:1。①我自己实跑（非 winlive、不占桌面）：
+  `-run 'TestRegisterAllSplitsFailureFamilies|TestDefaultHotkeys|TestNoHardcodedColorsInBallPackage' -count=2`
+  → **6/6 PASS**，AC#2/AC#3 默认值半因此是**我复现过的**，不是采信自述；读码确认 `registerAllWith` 用
+  `errors.Is(..., ERROR_HOTKEY_ALREADY_REGISTERED)` 判**真 1409**、四态分流、`Problems()` 每族一句不同话。
+  ②AC#5 我读码后判定它是**本票质量最高的一格**：数的是真窗口实收 `WM_TIMER`，且自带"探针一条消息都没收到就 Fatal"
+  的反证 + "切 `Warm` 必须看得见真定时器"的正证——但**这一跑我没实跑**（桌面被票 66 独占），故只算 MINOR-2。
+  ③三条 MINOR：**MINOR-1** AC#4"不被 skip"今天是**结构成立、逐跑记录缺证**（8 处 `t.Skipf` 全带 `SKIP-LOUD`、
+  `requireQuietBallDesktop` 是 `t.Fatalf`，但代理只对 A1/A1d 写了"未走 skip 分支"，且"winlive 14 项全 PASS"在 Go 语义里**含 SKIP 也算 ok**）
+  ⇒ 桌面空出后跑 `-tags winlive -v` 逐条贴 PASS/SKIP，**交互四项任一走 SKIP 就把 AC#4 退回未勾**；
+  **MINOR-3** AC#3 文档半不许只挂"待解冻"，落点由我改挂非冻结文档 + 票 39 双轨。
+  ④**读码另挖一条潜在缺陷（转 registry A16）**：`hotkey_windows.go:382-386` 把配置值与 id **按下标 zip**
+  （`bindings[i]` vs `hkNames`），全仓**无一用例**钉住该对应；越界方向会 panic（响），但**调 `hkNames` 顺序**会
+  把 summon 的串注册成 mute 的 id 且 `Problems()` 仍报 summon live——**静默错位**，与 C-3/M-7 同族
+  （判定建立在平行数组下标恰好对齐上）。修法=合成一张具名单表，**不是**加断言保留 zip。
+  变异检验（对调 `hkNames` 前两项后全套件是否仍绿）**今天不能做**：票 66 与票 12 AC#7 两个代理正在
+  `internal/ball` 上跑 `go test`，我改源码会让它们读到我的变异 —— 已排到桌面/测试窗空出后第一件事。
+  next=桌面空出 → 复跑 winlive 逐条记 SKIP（闭 MINOR-1/2）→ 做 A16 变异检验并定修法归属
