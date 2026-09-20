@@ -14,16 +14,17 @@ package ball
 //  1. an incoming audio level (Ball.SetAudioLevel) - the capture thread pushes
 //     one envelope per 512-sample frame (~31/s at 16k), which is already the
 //     30fps cap, so speaking costs zero extra timers;
-//  2. a transition in flight (the summon burst / the border ramp), served by a
-//     BOUNDED timer that kills itself the moment liquidMotion.busy() goes false
-//     and that may only run in a state the frozen SPEC-08 animation whitelist
-//     already grants a timer to.
+//  2. a transition in flight (the summon burst / the border ramp, whether the
+//     voice or a STATE change started it), served by a BOUNDED timer that kills
+//     itself the moment liquidMotion.busy() goes false and that may only run in
+//     a state the frozen SPEC-08 animation whitelist already grants a timer to
+//     (see transitionDriven).
 //
-// Sleeping appears in neither list: liquidDriven(StateSleeping) is false, so
-// SetAudioLevel returns before it touches anything and no timer exists to arm.
-// While the frozen SPEC-08 visuals are in force (prototypeVisuals off) the
-// whole seam is inert: no motion, no timer, byte-identical to the pre-ticket
-// render paths.
+// Sleeping appears in neither list: liquidDriven(StateSleeping) and
+// transitionDriven(StateSleeping) are both false, so SetAudioLevel drops the
+// sample before it arms anything and the burst can never be armed there. While
+// the frozen SPEC-08 visuals are in force (prototypeVisuals off) the whole seam
+// is inert: no motion, no timer, byte-identical to the pre-ticket render paths.
 
 import (
 	"time"
@@ -53,8 +54,11 @@ func (b *Ball) applyLevel(level float32) {
 	}
 	b.liqRaw = level
 	if !liquidDriven(b.curState) {
-		b.liq.endSession()
-		b.stopLiquidTimer()
+		// A state outside the session family must not be animated by the mic:
+		// the scalar is recorded (a later summon starts from it) and dropped,
+		// so a hot mic can never wake Sleeping. The border ramp belongs to the
+		// STATE, not to this feed, so it is left alone (its own bounded timer
+		// serves it, and transitionDriven refuses Sleeping).
 		return
 	}
 	if !b.liq.active {
@@ -81,13 +85,22 @@ func (b *Ball) motionDt() time.Duration {
 }
 
 // onLiquidTick is the bounded transition burst: it exists only to carry the
-// summon flow and the border ramp to their end, then it retires itself.
+// summon flow and the border ramp to their end, then it retires itself. With a
+// live session it advances the whole model on the last delivered envelope;
+// without one (the orb idling in a state the frozen policy grants a timer to)
+// it advances the BORDER ONLY, so an idle orb never swirls on its own.
 func (b *Ball) onLiquidTick() {
 	if !b.liq.busy(b.curState) {
 		b.stopLiquidTimer()
 		return
 	}
-	if b.liq.pushLevel(b.liqRaw, b.motionDt()) {
+	var moved bool
+	if b.liq.active {
+		moved = b.liq.pushLevel(b.liqRaw, b.motionDt())
+	} else {
+		moved = b.liq.stepBorder(b.motionDt())
+	}
+	if moved {
 		b.renderFrame()
 	}
 	if !b.liq.busy(b.curState) {
@@ -119,12 +132,13 @@ func (b *Ball) stopLiquidTimer() {
 
 // frameVisual returns the current visual with the live liquid values stamped
 // on. The stamp is applied to a copy at draw time and only while the liquid
-// actually participates (an active session or a ramp still travelling), so
+// actually participates (an active session, a border the motion owns, or a
+// summon burst travelling), so
 // (a) applyTo's BorderAlpha multiplication never compounds into the base
 // visual, and (b) static states render exactly the committed glass frame.
 func (b *Ball) frameVisual() Visual {
 	v := b.curVisual
-	if b.liq.active || b.liq.border > 0 || b.liq.summon > 0 {
+	if b.liq.active || b.liq.summon > 0 || b.liq.ownsBorder {
 		b.liq.applyTo(&v)
 	}
 	return v
@@ -132,15 +146,24 @@ func (b *Ball) frameVisual() Visual {
 
 // motionStateChanged folds a state change into the liquid: a session entry
 // fires the summon flow burst (the owner's "调出悬浮球…液态流动"), leaving one
-// parks the liquid back to a static body.
+// parks the liquid back to a static body, and every change re-arms the border
+// transition (see liquidMotion.enterState) so the border never arrives in a
+// single frame.
 func (b *Ball) motionStateChanged(from, to statemachine.State) {
-	if !liquidDriven(to) || !prototypeVisuals {
+	if !prototypeVisuals {
+		// Frozen SPEC-08 mode: no motion, no border authority (endSession
+		// releases it), no timer. The frame is the shipped one.
 		b.liq.endSession()
 		b.stopLiquidTimer()
 		return
 	}
-	if !liquidDriven(from) || from != to {
+	switch {
+	case liquidDriven(to) && (!liquidDriven(from) || from != to):
 		b.liq.beginSession()
+	case !liquidDriven(to):
+		b.liq.endSession()
 	}
+	b.liq.enterState(to) // after beginSession: the state owns the border target
 	b.lastMotion = time.Now()
+	b.syncLiquidTimer() // border-only ramps need it even without a level feed
 }

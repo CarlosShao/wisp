@@ -166,6 +166,108 @@ func TestBallLivePositionPersistence(t *testing.T) {
 	}
 }
 
+// TestBallLiveIdleBorderTransition (ticket 62 item 1): the border must arrive
+// through a transition that STATE changes drive, with no audio in the picture,
+// and the bounded burst that carries it must retire itself and must never
+// appear in a state the frozen policy keeps static.
+func TestBallLiveIdleBorderTransition(t *testing.T) {
+	restored := PrototypeVisualsEnabled()
+	t.Cleanup(func() { EnablePrototypeVisuals(restored) })
+	EnablePrototypeVisuals(true)
+
+	b, err := New(Options{Initial: statemachine.StateSleeping, StartHidden: true})
+	if err != nil {
+		t.Fatalf("New: %v", err)
+	}
+	defer b.Close()
+
+	probe := make(chan Visual, 1)
+	readVisual := func() Visual {
+		b.sta.PostTask(func() { probe <- b.frameVisual() })
+		return <-probe
+	}
+	ask := func(f func() bool) bool {
+		done := make(chan bool, 1)
+		b.sta.PostTask(func() { done <- f() })
+		return <-done
+	}
+	timerOn := func() bool { return ask(func() bool { return b.liquidTimerActive }) }
+
+	// Sleeping: the resting frame carries no border and no motion authority.
+	b.SetState(statemachine.StateSleeping)
+	if v := readVisual(); v.BorderAlpha != 0 {
+		t.Fatalf("the Sleeping frame must carry no border: %v", v.BorderAlpha)
+	}
+	if timerOn() {
+		t.Fatal("Sleeping armed the transition timer")
+	}
+
+	// A session, then the idle states that follow it: every one of them that
+	// the frozen policy grants a timer to must GLIDE the border in, which means
+	// at least one painted frame strictly between 0 and 1.
+	for _, s := range []statemachine.State{
+		statemachine.StateListening, statemachine.StateThinking,
+		statemachine.StateActing, statemachine.StateConfirming,
+		statemachine.StateWarm, statemachine.StateSettling,
+	} {
+		b.SetState(statemachine.StateSpeaking) // a fresh session: border away
+		if v := readVisual(); v.BorderAlpha != 0 {
+			t.Fatalf("%s from Speaking: border should be out, got %v", s, v.BorderAlpha)
+		}
+		b.SetState(s)
+		var frames []float32
+		settled := false
+		for i := 0; i < 300; i++ { // <=2.4s of polls; the burst is bounded at ~1s
+			frames = append(frames, readVisual().BorderAlpha)
+			if !timerOn() {
+				settled = true
+				break
+			}
+			time.Sleep(8 * time.Millisecond)
+		}
+		if !settled {
+			t.Fatalf("%s: the border burst never retired (polled %d times)", s, len(frames))
+		}
+		// The tick that lands the border also retires the timer, and it can
+		// fire between an iteration's read and its timer probe: read once
+		// more, which is then the authoritative end value.
+		frames = append(frames, readVisual().BorderAlpha)
+		last := frames[len(frames)-1]
+		if last != borderAtRest(s) {
+			t.Fatalf("%s: the border must land at its resting level, frames=%v", s, frames)
+		}
+		mid := false
+		for _, f := range frames {
+			if f > 0 && f < 1 {
+				mid = true
+				break
+			}
+		}
+		if !mid {
+			t.Fatalf("%s: the border arrived in one frame, no transition frames: %v", s, frames)
+		}
+	}
+
+	// Static frames keep the frozen mapping and no timer, even after a border
+	// has been travelling.
+	for _, s := range []statemachine.State{statemachine.StateArmed, statemachine.StateMuted,
+		statemachine.StateConversation, statemachine.StateError} {
+		b.SetState(s)
+		if timerOn() {
+			t.Fatalf("%s armed the transition timer (frozen policy grants it none)", s)
+		}
+	}
+
+	// Back to Sleeping: nothing armed, and the frame is the committed one.
+	b.SetState(statemachine.StateSleeping)
+	if b.DebugTimersAlive() {
+		t.Fatal("a timer survived the return to Sleeping")
+	}
+	if v := readVisual(); v.BorderAlpha != 0 || !v.Glass {
+		t.Fatalf("Sleeping frame after a session: %+v", v)
+	}
+}
+
 // TestBallLiveAudioLiquidGate (ticket 62 wiring): the render-side audio seam
 // must animate session states and must NEVER touch Sleeping's zero-timer
 // discipline. Posts to the UI thread are FIFO, so every assertion below is

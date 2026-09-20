@@ -46,6 +46,14 @@ type liquidMotion struct {
 	border float32       // "not speaking" border fade 0..1 (1 = fully introduced)
 	silent time.Duration // how long the raw feed has been under the gate
 	active bool          // a session is running (Sleeping never sets this)
+
+	// Border transition inputs (ticket 62 item 1): borderState is what the
+	// current STATE asks for at rest (set by enterState, never applied in one
+	// frame) and ownsBorder says whether the motion is the authority on the
+	// frame's border at all. A state the frozen policy keeps static releases
+	// the authority and renders the frozen mapping instead.
+	borderState float32
+	ownsBorder  bool
 }
 
 // liquidDriven reports whether a state receives audio-driven motion. Only
@@ -61,6 +69,19 @@ func liquidDriven(s statemachine.State) bool {
 	return false
 }
 
+// transitionDriven reports whether a state may host the bounded transition
+// timer (the summon burst and the border ramp). It is EXACTLY the set of states
+// whose frozen animation policy already grants a timer - the SPEC-08 §2
+// animated five, plus the two sanctioned Warm-breathing/Settling-fade
+// exceptions in anim.go - so ticket 62 never arms a timer in a state ticket 07
+// left without one. Sleeping is not in the set and never can be (D32).
+func transitionDriven(s statemachine.State) bool {
+	if Animated(s) {
+		return true
+	}
+	return AnimationPolicy(s).PeriodMs > 0
+}
+
 // beginSession arms the summon flow burst: this is the "调出悬浮球" moment. The
 // border starts away and fades in as soon as the voice stops (owner: "不说话
 // 的时候…通过一个过度动画丝滑引入边框").
@@ -68,6 +89,9 @@ func (m *liquidMotion) beginSession() {
 	m.active = true
 	m.summon = 1
 	m.border = 0
+	m.silent = 0
+	m.borderState = 1
+	m.ownsBorder = true
 }
 
 // endSession drops the liquid back to a static body (the state left the
@@ -79,6 +103,84 @@ func (m *liquidMotion) endSession() {
 	m.border = 0
 	m.level = 0
 	m.silent = 0
+	m.borderState = 0
+	m.ownsBorder = false
+}
+
+// enterState folds a STATE transition into the border. It only moves the
+// target, never the value: arriving in a state where the assistant does not
+// speak glides the border in, arriving in a speaking state glides it out, and
+// in both cases the travel takes BorderOpenMs/BorderCloseMs of frames rather
+// than one (owner: "不说话的时候，语音助手会通过一个过度动画丝滑引入边框"). The
+// frames come from the bounded transition timer, which only exists where
+// transitionDriven grants it one.
+func (m *liquidMotion) enterState(s statemachine.State) {
+	m.borderState = borderAtRest(s)
+	if transitionDriven(s) || liquidDriven(s) {
+		m.ownsBorder = true
+		return
+	}
+	// A frame the frozen policy keeps static draws the frozen mapping: the
+	// motion releases the border rather than freezing it mid-travel.
+	m.ownsBorder = false
+	m.border = 0
+	m.silent = 0
+}
+
+// wantBorder is the level the border is heading to right now. Two drivers, and
+// they are ordered: the state says whether this frame carries a border at all,
+// and a live voice may only pull it DOWN (the liquid owns the orb while
+// somebody speaks).
+func (m *liquidMotion) wantBorder() float32 {
+	if m.active && m.silent < SilenceHoldMs*time.Millisecond {
+		return 0
+	}
+	return m.borderState
+}
+
+// rampBorder walks the border toward wantBorder at its token speed: open over
+// BorderOpenMs, close over BorderCloseMs.
+func (m *liquidMotion) rampBorder(dt time.Duration) {
+	target := m.wantBorder()
+	ramp := BorderCloseMs * time.Millisecond
+	if target > m.border {
+		ramp = BorderOpenMs * time.Millisecond
+	}
+	m.border = clamp01(approach(m.border, target, float32(dt)/float32(ramp)))
+}
+
+// stepBorder advances the border ramp ALONE, with no audio involved: this is
+// the state-driven half of the transition, the one that carries the border in
+// after a session ended and the orb is simply idling. It returns true when a
+// pixel can move. The liquid itself stays parked - an idle orb must not swirl
+// because a ramp happens to be travelling.
+func (m *liquidMotion) stepBorder(dt time.Duration) bool {
+	before := m.border
+	m.rampBorder(clampDt(dt))
+	return quantChanged(before, m.border)
+}
+
+// clampDt bounds one motion step: a stalled feed (a suspended process, a
+// paused device, a background window) must not fling the liquid around.
+func clampDt(dt time.Duration) time.Duration {
+	if dt < 0 {
+		return 0
+	}
+	if dt > 250*time.Millisecond {
+		return 250 * time.Millisecond
+	}
+	return dt
+}
+
+// clamp01 keeps a ramp value inside its 0..1 range.
+func clamp01(v float32) float32 {
+	if v < 0 {
+		return 0
+	}
+	if v > 1 {
+		return 1
+	}
+	return v
 }
 
 // pushLevel advances the simulation with one audio envelope sample. It returns
@@ -92,12 +194,7 @@ func (m *liquidMotion) pushLevel(raw float32, dt time.Duration) bool {
 	if raw > 1 {
 		raw = 1
 	}
-	if dt < 0 {
-		dt = 0
-	}
-	if dt > 250*time.Millisecond {
-		dt = 250 * time.Millisecond // a stalled feed cannot teleport the liquid
-	}
+	dt = clampDt(dt)
 	before := m.snapshot()
 
 	// Envelope follower: fast attack, slow release, so syllables read as
@@ -140,24 +237,9 @@ func (m *liquidMotion) pushLevel(raw float32, dt time.Duration) bool {
 		}
 	}
 
-	// Border transition, only once the voice has clearly stopped: the owner
-	// wants the border "introduced smoothly" when nobody speaks, and wants the
-	// liquid to own the orb while somebody does.
-	target := float32(0)
-	if m.silent >= SilenceHoldMs*time.Millisecond {
-		target = 1
-	}
-	ramp := BorderCloseMs * time.Millisecond
-	if target > m.border {
-		ramp = BorderOpenMs * time.Millisecond
-	}
-	m.border = approach(m.border, target, float32(dt)/float32(ramp))
-	if m.border > 1 {
-		m.border = 1
-	}
-	if m.border < 0 {
-		m.border = 0
-	}
+	// Border transition: the state's resting level, pulled down by a live
+	// voice (see wantBorder).
+	m.rampBorder(dt)
 
 	return m.changed(before)
 }
@@ -208,15 +290,20 @@ func (m *liquidMotion) changed(before motionSnapshot) bool {
 func quantChanged(a, b float32) bool { return math.Abs(float64(a-b)) > 1.0/512 }
 
 // busy reports whether the motion still has ramping left, which is the only
-// reason a frame may be drawn without an incoming level sample. The state gate
-// is the D32 belt: the burst only ticks where SPEC-08 §2 already grants an
-// animation timer, so ticket 62 never arms a timer in a state that was static
-// before it - Sleeping above all.
+// reason a frame may be drawn without an incoming level sample: a summon burst
+// in flight, or a border that has not reached the level its state asks for.
+// The state gate is the D32 belt - transitionDriven is exactly the set of
+// states the FROZEN policy already grants a timer to, so ticket 62 never arms a
+// timer in a state that was static before it, and Sleeping above all can never
+// appear there.
 func (m *liquidMotion) busy(s statemachine.State) bool {
-	if !m.active || !Animated(s) {
+	if !transitionDriven(s) {
 		return false
 	}
-	return m.summon > 0 || (m.border > MotionEpsilon && m.border < 1-MotionEpsilon)
+	if m.active && m.summon > 0 {
+		return true
+	}
+	return m.ownsBorder && m.border != m.wantBorder()
 }
 
 // applyTo stamps the live motion onto a freshly mapped visual. It is a no-op
@@ -229,7 +316,7 @@ func (m *liquidMotion) applyTo(v *Visual) {
 	v.LiquidLevel = m.level
 	v.LiquidAngle = m.angle
 	v.SummonFlow = m.summon
-	if v.Glass {
+	if v.Glass && m.ownsBorder {
 		// The border is a transition, not a constant: whatever the state
 		// mapping asked for gets multiplied by how far the fade has travelled.
 		v.BorderAlpha *= m.border

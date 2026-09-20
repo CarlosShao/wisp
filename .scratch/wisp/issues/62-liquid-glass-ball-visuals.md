@@ -71,3 +71,20 @@ SPEC-08 §2 的 20 态视觉表与 D43 的视觉映射列**必须改**，但顺�
   (baseline 2098); Listening/Speaking with 0.8 feed animate at <=0.08% 1-core. Gates: gofmt/vet clean,
   go test -count=2 + full winlive suite pass. next=AC#4 measured with wav injection (ticket 13 C8 seam), then the
   edge-dock wiring (item 2), then per-state evidence sweep for owner sign-off -> SPEC-08 amendment.
+- 2026-09-20 agent(62-D): did=item 1's idle border transition, driven by STATE changes instead of only by the voice
+  gate. liquidMotion now carries borderState (the resting border level of the current state, from the new
+  borderAtRest(), the single authority shared with applyGlassForm) + ownsBorder (who is the border authority), and
+  wantBorder() orders the two drivers: a state says whether the frame carries a border at all, a live voice may only
+  pull it DOWN. enterState() only moves the TARGET, never the value, so a border cannot arrive in one frame; the
+  travel is carried by the existing BOUNDED burst timer, widened from Animated() to transitionDriven() = exactly the
+  states whose FROZEN animation policy already grants a timer (Animated five + Warm breathing + Settling fade), so
+  ticket 62 arms no timer anywhere ticket 07 left without one and Sleeping can never appear there. An idle orb
+  ramps the border alone (stepBorder: no level, no angle), so nothing swirls after a session. Sleeping releases the
+  border authority -> the committed frame is untouched. Evidence: Sleeping differential re-run
+  docs/evidence/s1/62-diff-border/ reads timers=no cpu=0.000/0.000 privWS=11.84MB px>=8=2120 box=44x44 (identical to
+  the proven 62-diff-glass row); live winlive TestBallLiveIdleBorderTransition records the painted frames per state
+  (e.g. Settling 0 -> 0.11 -> 0.32 -> 0.53 -> 0.74 -> 0.96 -> 1) and proves the burst retires itself and never arms
+  in a static state. Gates: gofmt clean, go vet ./internal/ball ./cmd/balldebug clean, go test -count=2 + full
+  winlive suite pass (Acting's frozen TimersAlive expectation kept intact by gating the whole seam off in frozen
+  mode). next=item 2, the edge-dock auto-shrink (drag-near-edge docks to a tab, hover pops out, four edges, mouse
+  messages only - no dock timer at all), then its differential row.

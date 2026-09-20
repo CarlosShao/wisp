@@ -222,6 +222,21 @@ func VisualFor(p Palette, configuredPx int, s statemachine.State, fadeProgress f
 	return v
 }
 
+// borderAtRest is the border level a state's frame carries once its transition
+// has landed: the "not speaking" border rides every session frame, and is away
+// in the two states where it would be a lie - Sleeping (the resting body has
+// no border) and Speaking (the assistant IS the one talking, so the liquid
+// owns the orb). This single function is both the frozen prototype mapping in
+// applyGlassForm and the target the transition ramps toward, so the two can
+// never disagree about what the border should end up being.
+func borderAtRest(s statemachine.State) float32 {
+	switch s {
+	case statemachine.StateSleeping, statemachine.StateSpeaking:
+		return 0
+	}
+	return 1
+}
+
 // applyGlassForm is the ticket 62 remap: every state becomes the same glass
 // material, distinguished by its liquid colour field, its border and its
 // motion - not by the visibility of a small dot. It only ever runs in
@@ -229,7 +244,7 @@ func VisualFor(p Palette, configuredPx int, s statemachine.State, fadeProgress f
 func applyGlassForm(v *Visual, p Palette, s statemachine.State, fadeProgress float32) {
 	lk := activeLook
 	v.Glass = true
-	v.BorderAlpha = 1 // session states carry the border
+	v.BorderAlpha = borderAtRest(s) // resting level; the transition owns the travel
 	// v.SizePx is already the right body: stateSize() returned the rest orb in
 	// prototype mode and the configured size everywhere else.
 
@@ -241,16 +256,15 @@ func applyGlassForm(v *Visual, p Palette, s statemachine.State, fadeProgress flo
 		// Resting: fully opaque glass orb (the fix - the old 12px/0.35 dot
 		// measured invisible), liquid still, border away. Static frame.
 		v.Opacity = 1
-		v.BorderAlpha = 0
 		v.GlowColor = mulA(lk.Glow, 0.45)
 	case statemachine.StateArmed:
 		v.Opacity = 0.92
 	case statemachine.StateMuted:
 		v.Opacity = 0.85
 	case statemachine.StateSettling:
-		// Fades to the RESTING body, not to an invisible micro dot.
+		// Fades to the RESTING body, not to an invisible micro dot. The border
+		// is not doubled onto this fade: borderAtRest already lands it.
 		v.Opacity = 1 - fadeProgress*(1-RestSettledOpacity)
-		v.BorderAlpha = 1 - fadeProgress
 	case statemachine.StateListening, statemachine.StateSpeaking:
 		v.GlowColor = mixLook(lk, v.CoreColor)
 	}
