@@ -75,15 +75,20 @@ func (s *Spiller) CapRaw(text string) (string, bool) {
 // sanitized before it can reach a file name.
 func (s *Spiller) Prepare(callID, text string) (Spill, error) {
 	capped, rawTrunc := s.CapRaw(text)
+	// The truncation notice is context text, never artifact bytes: the file has
+	// to stay INSIDE the ceiling it announces (PLAN:432 truncates first and
+	// lands the file afterwards), and a small window's tail budget would cut a
+	// marker baked into the text right off the stub.
+	notice := ""
+	if rawTrunc {
+		notice = fmt.Sprintf(
+			"\n[truncated=true: 原始输出超过 %d 字节硬上限，已截断]", s.b.RawOutputCapBytes)
+	}
 	out := Spill{
-		Text:         capped,
+		Text:         capped + notice,
 		TotalBytes:   len(capped),
 		TotalTokens:  ApproxTokens(capped),
 		TruncatedRaw: rawTrunc,
-	}
-	if rawTrunc {
-		out.Text = capped + fmt.Sprintf(
-			"\n[truncated=true: 原始输出超过 %d 字节硬上限，已截断]", s.b.RawOutputCapBytes)
 	}
 	if ApproxTokens(out.Text) <= s.b.SpillTokens {
 		return out, nil
@@ -94,17 +99,20 @@ func (s *Spiller) Prepare(callID, text string) (Spill, error) {
 	if err := os.MkdirAll(s.dir, 0o755); err != nil {
 		return Spill{}, observe.Wrap(observe.ClassResource, err, "agent: create artifacts dir")
 	}
-	if err := writeFileExclusive(path, []byte(text)); err != nil {
+	// The capped bytes, not the raw ones: TotalBytes below is what the stub
+	// announces, so the artifact size and the announced length must agree.
+	if err := writeFileExclusive(path, []byte(capped)); err != nil {
 		return Spill{}, observe.Wrap(observe.ClassResource, err, "agent: write spill artifact")
 	}
 
-	head := takeTokens(out.Text, s.b.SpillHeadTokens)
-	tail := takeTokensLast(out.Text, s.b.SpillTailTokens)
+	head := takeTokens(capped, s.b.SpillHeadTokens)
+	tail := takeTokensLast(capped, s.b.SpillTailTokens)
 	out.KeptHead = ApproxTokens(head)
 	out.KeptTail = ApproxTokens(tail)
 	out.Text = fmt.Sprintf(
 		"%s\n[…输出已落文件：省略 %d 字符，总长 %d 字节 / 约 %d token，全文见 %s…]\n%s",
-		head, len(out.Text)-len(head)-len(tail), out.TotalBytes, out.TotalTokens, path, tail)
+		head, len(capped)-len(head)-len(tail), out.TotalBytes, out.TotalTokens, path, tail) +
+		notice
 	out.Spilled = true
 	out.Path = path
 	out.Name = name

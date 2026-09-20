@@ -232,6 +232,53 @@ func TestSpillThroughLoop(t *testing.T) {
 	}
 }
 
+// TestSpillArtifactRespectsRawCap closes the escape the review found (MINOR-1):
+// the artifact used to be written from the UNCAPPED output, so with a small
+// window (scaled ceiling) the file could be many times the hard cap while the
+// stub announced the capped length - and the truncated=true marker, baked into
+// the text, was cut away by the tail window. PLAN:432's order is truncate
+// FIRST, then land the file.
+func TestSpillArtifactRespectsRawCap(t *testing.T) {
+	dir := t.TempDir()
+	b := Budgets{RawOutputCapBytes: 200, SpillTokens: 40, SpillHeadTokens: 10, SpillTailTokens: 10}
+	sp := NewSpiller(dir, b)
+
+	full := strings.Repeat("x", 800)
+	s, err := sp.Prepare("call_cap", full)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !s.TruncatedRaw || !s.Spilled {
+		t.Fatalf("truncatedRaw=%v spilled=%v, want both true (800B over a 200B cap)",
+			s.TruncatedRaw, s.Spilled)
+	}
+	body, err := os.ReadFile(s.Path)
+	if err != nil {
+		t.Fatalf("read artifact: %v", err)
+	}
+	if len(body) > b.RawOutputCapBytes {
+		t.Errorf("artifact is %d bytes, over the %d-byte hard cap (escape reproduced)",
+			len(body), b.RawOutputCapBytes)
+	}
+	if len(body) != s.TotalBytes {
+		t.Errorf("artifact is %d bytes but the stub announces 总长 %d 字节", len(body), s.TotalBytes)
+	}
+	// The announced numbers must be the numbers in the stub text.
+	for _, needle := range []string{fmt.Sprintf("%d 字节", len(body)), fmt.Sprintf("%d 字节", s.TotalBytes)} {
+		if !strings.Contains(s.Text, needle) {
+			t.Errorf("stub missing %q:\n%s", needle, s.Text)
+		}
+	}
+	// The truncated=true marker survives a 10-token tail window: it is context
+	// text, not artifact bytes.
+	if !strings.Contains(s.Text, "truncated=true") {
+		t.Errorf("stub lost the truncated=true marker:\n%s", s.Text)
+	}
+	if !strings.Contains(s.Text, "硬上限") {
+		t.Errorf("stub must name the ceiling that cut the output:\n%s", s.Text)
+	}
+}
+
 // ---------------------------------------------------------------------------
 
 // utf8StartSafe is a small validity probe for CapRaw's rune-boundary test.
