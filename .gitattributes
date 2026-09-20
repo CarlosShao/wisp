@@ -3,6 +3,9 @@
 *.bat text eol=crlf
 *.go text eol=lf
 *.md text eol=lf
+# Shell entry points (scripts/d22scan.sh) run under sh on both the ubuntu CI
+# runner and local Git Bash; CRLF would break the shebang and `set -eu`.
+*.sh text eol=lf
 *.png binary
 *.jpg binary
 *.ico binary

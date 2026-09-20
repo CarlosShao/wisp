@@ -126,3 +126,16 @@ CI 该步**无 `continue-on-error`** ⇒ **job 红**。
   未做：AC#3（碰 `cmd/wisp/providers.go`，票 66 在飞，编排者裁定等其落地）、AC#4 门禁全清单复跑。
   备注：`go run` 会把子进程任意非零退出压成 1，故"有违规(1)"与"用法错(2)"经 `go run` 后不可分辨——
   wrapper 靠 `set -e` 兜住，但若将来有脚本想区分这两态，须直接跑编译出的二进制而非 `go run`。
+- [2026-09-20T15:14:00Z] agent=agent-ticket67 did=补 `.gitattributes`：`*.sh text eol=lf`
+  （`* text=auto` + 本地 `core.autocrlf=true` 会把 `scripts/d22scan.sh` 检出成 CRLF，
+  shebang 与 `set -eu` 在 sh 下即坏；与既有 `*.go`/`*.md` 同形钉死）。
+  `git check-attr eol -- scripts/d22scan.sh` → `lf`；`git show HEAD:scripts/d22scan.sh` 的 blob 本就读作 `\n`。
+  【AC#4 门禁——本票已完成部分逐条复跑，原始退出码】
+  `gofmt -l internal/llm/adaptertest tools/d22scan scripts` → 空；
+  `go vet ./...`（主模块，含票 66 在飞的 observe/proc/cmd 改动）→ exit 0；
+  `go vet ./...`（`tools/d22scan` 模块）→ exit 0；
+  `go test -count=2 ./internal/llm/adaptertest/` → ok 2.644s；
+  另跑 `go test -count=2 -race ./internal/llm/adaptertest/` → ok 3.684s（证明改造后的 helper 仍并发安全，未为了 Spawn 好写而变不安全）；
+  `cd tools/d22scan && go test -count=2 ./...` → ok 0.487s；
+  `cd tools/d22scan && go run . -root ../../` → `examined 194 production Go files` + `d22scan: clean`，**exit 0**（票面期望的 0 命中/exit 0 达成）。
+  未做：AC#3（等票 66 收尾后动 `cmd/wisp/providers.go`）。本票范围 AC#1/AC#2 已交完。
