@@ -101,10 +101,8 @@ func (c *Compressor) Compress(ctx context.Context, hist []llm.Message) ([]llm.Me
 		var victims []llm.Message
 		// A pre-existing summary block is re-folded in place so exactly one
 		// compressed block ever exists and it cannot grow without bound.
-		prefixSummary := !rounds[raw[0]].isSummary
 		if idx := summaryRoundIndex(rounds); idx >= 0 {
 			victims = append(victims, rounds[idx].msgs...)
-			_ = prefixSummary
 		}
 		for _, i := range fold {
 			victims = append(victims, rounds[i].msgs...)
