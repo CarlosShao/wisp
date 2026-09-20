@@ -79,6 +79,10 @@ All tickets are **vertical tracer bullets**; work the **frontier** (all blockers
   Sleeping 零定时器实测、多显示器实拖），默认唤起键 `Ctrl+Alt+W`→`Ctrl+Alt+Q`。
   ⚠ 62 与 64 的边界：64 只管"球能被唤起、配置改动能生效"，62 只管材质/动效/吸附；两票都不得
   为对方让路而放宽 D32 的 Sleeping 零定时器与 CPU ≤0.5% 纪律。
+- **状态回写（2026-09-20 复验轮）**：**10 agent-loop-core → DONE**（编排者亲自独立复验：把
+  `enforceTotal` 整体退回修复前实现，被提交的终止测试 10.00s 变红，护栏为真；两处小项登记 A10-a/b）；
+  **63 credential-entry-cli → DONE**，但 **AC#6 未勾、正式转票 12**（登记 A8）、**MINOR-1 未修**（登记 A9）
+  —— 别因为看到 `-done` 就以为它零残余。
 
 ⚠ **Safety-incomplete period**: tickets 21–32 run with `TaskScheduler` single-task only;
 multi-task concurrency unlocks only at 47 (SPEC-12 §2).

@@ -164,6 +164,22 @@
   **完成判据**：正半边保留 `auditRecordFor`，另加全缓冲**计数**不变式（含 `forced=true` 的记录条数
   == 本测试实际执行的强制删除次数），且 M2 补丁重新 apply 后必须变红。归属：下次动 `cmd/wisp`
   时顺手做，不单独立票。
+- **[A10] 票 10 复验登记两处小项（都不阻塞 done，但不得无声消失）** —
+  - **A10-a（转票 04）**：`j.startCall(ctx, …)`（`internal/agent/loop.go:585`）跑在活的 task ctx 上，
+    取消若落在 executeCalls 的预记账循环里，`InsertToolCall` 失败 → `startCall` 返回 0 →
+    `journal.finish` 找不到行 id 就什么都不写 ⇒ **被取消任务的 tool_call 行集静默比模型请求的调用数少，
+    且连一条 WARN 都没有**。票 10 已裁定"不在本票修"（本地唯一修法=给每次正常路径的工具记账加 2s 死线，
+    是在热路径上新造失败模式去补微秒级窗口），持久解 = 票 04 的 `writeQueue.exec` 在 `BeginTx` 前做
+    `context.WithoutCancel`。**附加条件（本次复验新提）**：票 04 落地时必须同时补一条 `startCall` 失败的
+    WARN，**只记事实不记内容**（避免踩 C28 日志不落明文）。
+    完成判据：一个"任务在记账循环中被取消"的用例，断言 tool_call 行数 == 模型请求的调用数，且失败时有 WARN。
+  - **A10-b（下次动 `internal/agent/prompt.go` 时改）**：`enforceTotal` 上方注释写着
+    "Every pass must remove at least one token, so the loop terminates from any starting point"。
+    **这句作为机制描述是错的**：复验用变异证明，真正的终止保证有**两条且互为冗余**——`nb > toks-1` 钳子，
+    以及 `s.Budget = nb` 回写（`nb = Budget - over()` 让 Budget 以 `over()≥1` 严格递减，数轮后必然低于
+    `toks`）。删任一条，`TestEnforceTotalTerminatesAtEveryWindow` **仍然全绿**（我实测：拆钳子 ok 0.041s）；
+    两条都删才红。后果不是 bug 而是**误导**：后人若信了这句注释，会去删那行真正在兜底的 Budget 回写。
+    完成判据：注释改为陈述两条保证各自的充分性，并补一个"删任一条即红"的变异锚定用例（或显式记录该冗余为有意设计）。
 
 ## 已解决（resolved）
 
