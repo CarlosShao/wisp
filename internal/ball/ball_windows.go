@@ -194,12 +194,23 @@ func (b *Ball) createOnSTA(s *staThread) error {
 	}
 
 	exStyle := uintptr(wsExLayered | wsExTopmost | wsExToolWindow | wsExNoActivate)
+	// WS_POPUP, not dwStyle=0: an overlapped window (which is what style 0
+	// asks for) gets WS_CAPTION+WS_BORDER from the OS, and a layered window
+	// paints no non-client area - so the frame stayed INVISIBLE while still
+	// shrinking the client rect by (8,31). Every client-coordinate rule in
+	// this package (WM_NCHITTEST's circle, the drag start point) is written
+	// against the WINDOW rect, so with that frame the clickable circle sat 8px
+	// right and 31px below the drawn orb: a real click on the middle of the
+	// ball answered HTTRANSPARENT and fell through to the desktop (found by
+	// TestLiveTransparentCornerFallsThrough / TestLiveNeverStealsFocus,
+	// ticket 64 A2). WS_POPUP has no frame: client == window, and the geometry
+	// the pure HitTest tests already pin becomes the geometry on screen.
 	hwnd, _, err := pCreateWindowExW.Call(
 		exStyle,
 		unsafePtr(clsName),
 		unsafePtr(utf16(title)),
-		0,          // WS_OVERLAPPED; sized/shown below
-		0, 0, 1, 1, // placed by restorePosition
+		uintptr(wsPopup), // no caption, no border: client rect == window rect
+		0, 0, 1, 1,       // placed by restorePosition
 		0, 0, uintptr(moduleHandle()), 0)
 	if hwnd == 0 {
 		return fmt.Errorf("ball: CreateWindowExW: %v", err)
@@ -432,9 +443,9 @@ func (b *Ball) TimersAlive() bool {
 // evidence harness prints). Unlike TimersAlive it is synchronised with the
 // STA thread, so it cannot report a stale value right after SetState.
 func (b *Ball) DebugTimersAlive() bool {
-	done := make(chan bool, 1)
-	b.sta.PostTask(func() { done <- b.animTimerActive || b.liquidTimerActive })
-	return <-done
+	var on bool
+	b.uiRun(func() { on = b.animTimerActive || b.liquidTimerActive })
+	return on
 }
 
 // onAnimTick runs on the STA thread from WM_TIMER.
@@ -715,6 +726,26 @@ func (b *Ball) fire(fn func()) {
 	}
 }
 
+// uiRun runs fn on the UI thread and waits for it to finish. A caller that is
+// ALREADY on the UI thread - which is every Events callback, and therefore
+// every consumer that mirrors a gesture into the machine and then syncs the
+// ball (the B1 "take Esc over while Confirming" law is exactly that) - runs
+// inline: post-and-wait there would deadlock the pump. This made the
+// post-and-wait API safe to call from a callback (ticket 64 A2, found while
+// writing the interaction tests).
+func (b *Ball) uiRun(fn func()) {
+	if windows.GetCurrentThreadId() == b.sta.threadID() {
+		fn()
+		return
+	}
+	done := make(chan struct{})
+	b.sta.PostTask(func() {
+		defer close(done)
+		fn()
+	})
+	<-done
+}
+
 var pScreenToClient = modUser32.NewProc("ScreenToClient")
 
 // persistPosition saves the window position keyed by its current monitor.
@@ -768,10 +799,8 @@ func (b *Ball) reclampPosition() {
 // bindings in, same live set out - so a host may call it on every config
 // poll; HotkeyReloader still diffs so the Win32 churn happens once per change.
 func (b *Ball) RebindHotkeys(cfg HotkeyConfig) HotkeyReport {
-	done := make(chan struct{})
 	var rep HotkeyReport
-	b.sta.PostTask(func() {
-		defer close(done)
+	b.uiRun(func() {
 		unregisterAll(b.hwnd)
 		rep = registerAll(b.hwnd, cfg)
 		b.hotkeyReport = rep
@@ -780,7 +809,6 @@ func (b *Ball) RebindHotkeys(cfg HotkeyConfig) HotkeyReport {
 		b.cancelBinding = cfg.Cancel
 		b.escTakenOver = false
 	})
-	<-done
 	return rep
 }
 
@@ -788,9 +816,9 @@ func (b *Ball) RebindHotkeys(cfg HotkeyConfig) HotkeyReport {
 // rebind). Synchronised with the UI thread, so it is authoritative the moment
 // RebindHotkeys/New return.
 func (b *Ball) HotkeyReport() HotkeyReport {
-	done := make(chan HotkeyReport, 1)
-	b.sta.PostTask(func() { done <- b.hotkeyReport })
-	return <-done
+	var rep HotkeyReport
+	b.uiRun(func() { rep = b.hotkeyReport })
+	return rep
 }
 
 // ConfiguredHotkeys returns the binding set the ball was last TOLD to hold
@@ -798,18 +826,18 @@ func (b *Ball) HotkeyReport() HotkeyReport {
 // for what Win32 actually accepted). Read on the UI thread, so it follows a
 // RebindHotkeys immediately and never reports the boot set after a reload.
 func (b *Ball) ConfiguredHotkeys() HotkeyConfig {
-	done := make(chan HotkeyConfig, 1)
-	b.sta.PostTask(func() { done <- b.boundCfg })
-	return <-done
+	var cfg HotkeyConfig
+	b.uiRun(func() { cfg = b.boundCfg })
+	return cfg
 }
 
 // RegisteredHotkeys returns the id -> accelerator set Win32 actually holds
 // for us right now (the registration set the acceptance asks tests to
 // assert, not a mirror of the config).
 func (b *Ball) RegisteredHotkeys() map[uint32]Accelerator {
-	done := make(chan map[uint32]Accelerator, 1)
-	b.sta.PostTask(func() { done <- cloneAccel(b.registeredHotkeys) })
-	return <-done
+	var m map[uint32]Accelerator
+	b.uiRun(func() { m = cloneAccel(b.registeredHotkeys) })
+	return m
 }
 
 func cloneAccel(m map[uint32]Accelerator) map[uint32]Accelerator {
@@ -821,11 +849,11 @@ func cloneAccel(m map[uint32]Accelerator) map[uint32]Accelerator {
 }
 
 // TakeEscForCancel temporarily binds Esc as the cancel key during Confirming
-// (B1). Idempotent.
+// (B1). Idempotent. Callable from an Events callback (see uiRun): the B1 law
+// is exactly "take Esc over when the machine enters Confirming", and that
+// verdict arrives inside a gesture callback.
 func (b *Ball) TakeEscForCancel() {
-	done := make(chan struct{})
-	b.sta.PostTask(func() {
-		defer close(done)
+	b.uiRun(func() {
 		if b.escTakenOver {
 			return
 		}
@@ -833,29 +861,25 @@ func (b *Ball) TakeEscForCancel() {
 			b.escTakenOver = true
 		}
 	})
-	<-done
 }
 
 // ReleaseEscAfterSession hands Esc back to the configured cancel binding
 // (B1: "会话结束必须归还"). Idempotent.
 func (b *Ball) ReleaseEscAfterSession() {
-	done := make(chan struct{})
-	b.sta.PostTask(func() {
-		defer close(done)
+	b.uiRun(func() {
 		if !b.escTakenOver {
 			return
 		}
 		releaseEsc(b.hwnd, b.cancelBinding)
 		b.escTakenOver = false
 	})
-	<-done
 }
 
 // EscTakenOver reports the B1 takeover state (test seam).
 func (b *Ball) EscTakenOver() bool {
-	done := make(chan bool)
-	b.sta.PostTask(func() { done <- b.escTakenOver })
-	return <-done
+	var ok bool
+	b.uiRun(func() { ok = b.escTakenOver })
+	return ok
 }
 
 // --------------------------------------------------------------------- tray

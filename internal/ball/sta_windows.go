@@ -51,6 +51,11 @@ func (s *staThread) start(create func(s *staThread) error) {
 	// never dispatched). This is the STA contract (D38a) in its literal form.
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
+	// Remember who owns this thread: a caller already on it must run inline
+	// (see Ball.uiRun) - post-and-wait from inside the pump is a deadlock.
+	s.mu.Lock()
+	s.tid = windows.GetCurrentThreadId()
+	s.mu.Unlock()
 
 	// STA init: COM apartment-threaded on this thread (D2D single-threaded
 	// factory + future WebView2 panel both want STA).
@@ -108,6 +113,14 @@ func (s *staThread) waitStarted() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.err
+}
+
+// threadID is the OS thread that owns the ball window and pump (0 until the
+// thread has started).
+func (s *staThread) threadID() uint32 {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.tid
 }
 
 // PostTask schedules fn on the STA thread. Safe from any goroutine.

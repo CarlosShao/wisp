@@ -43,6 +43,8 @@ var (
 	pKeybdEvent               = modUser32.NewProc("keybd_event")
 	pGetAsyncKeyState         = modUser32.NewProc("GetAsyncKeyState")
 	pGetGuiResources          = modUser32.NewProc("GetGuiResources")
+	pGetClientRect            = modUser32.NewProc("GetClientRect")
+	pClientToScreen           = modUser32.NewProc("ClientToScreen")
 )
 
 const (
@@ -55,6 +57,7 @@ const (
 	ballClassName  = "WispBallWindow"
 	grUserObjects  = 1
 	grGdiObjects   = 2
+	gwlpStyle      = ^uintptr(15) // GWL_STYLE (-16)
 	keyStateDownLo = 0x8000
 )
 
