@@ -42,8 +42,9 @@ type Visual struct {
 
 	// --- ticket 62 liquid-glass form (prototype mode; see
 	// EnablePrototypeVisuals). With the mode off every field below keeps the
-	// frozen SPEC-08 §2.1 reading, so the contract tests stay authoritative
-	// until the owner signs the new look (D22).
+	// frozen SPEC-08 §2.1 reading, which is the escape hatch (`balldebug
+	// -frozen`) now that the owner has signed the new look provisionally
+	// (SPEC-08 §2 INTERIM, 2026-09-20; the texture is still 赝品 - ticket 65).
 	Glass bool // draw the glass body + liquid
 	// BorderAlpha is how far the "not speaking" border has faded in (0..1).
 	BorderAlpha float32
