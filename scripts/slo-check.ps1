@@ -126,7 +126,15 @@ if (-not $leakFlipped) {
     Fail 'forced 100MB leak did NOT flip the gate red - the sampler is broken (D22 mode-6: gate must detect)'
 }
 
-$allPass = (($results | Where-Object { -not $_.pass }).Count -eq 0) -and $settlePass
+# Force the filter into an array with @(): under Set-StrictMode 2.0 (line 48)
+# a zero-match Where-Object returns $null and a one-match returns a scalar,
+# neither of which carries .Count - so the old expression threw
+# PropertyNotFoundException on exactly the ALL-PASS path, before line 141 could
+# write slo-report.json (ticket 66 AC#4). It stayed hidden while A14 made every
+# state fail closed with exit=2, because then the filter matched >=2 items.
+# The gate must be able to report the verdict it actually computed.
+$failingStates = @($results | Where-Object { -not $_.pass })
+$allPass = ($failingStates.Count -eq 0) -and $settlePass
 
 $report = [pscustomobject]@{
     generated_at = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')

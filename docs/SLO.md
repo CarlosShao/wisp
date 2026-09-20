@@ -317,7 +317,8 @@ tasklist | grep -iE "wisp|balldebug"
   -diff-states Sleeping,Listening,Thinking,Acting,Speaking,Warm,Settling \
   -diff-sample 5s -diff-dwell 6s
 
-# 4) 聚合门（A.4#1 未修前必红，留着以证明它坏着）
+# 4) 聚合门（当时：A.4#1 未修前必红，留着以证明它坏着。今天：解析末项 + C.4 的聚合崩溃
+#    都修好后 5/5 exit=0，数字与命令见附录 C.4；本行原注释按「叠加不改写」保留在此）
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 \
   -Subset smoke -SecondsPerState 10 -OutDir build/slo/t12
 
@@ -392,3 +393,185 @@ tasklist | grep -iE "wisp|balldebug"
 **不判 PASS、也不判 FAIL，判「仪器未定义」**：票 12 AC#2 保持未勾；CPU 那一行的产品侧证据以 A.2（树外、0.000%）为准，
 `wisp slo` 的树内 CPU 数字在票 66 修好前只作记录、不作门。D32 的 0.5% 阈值**一个字没动**，
 A.1/A.4 的原文**没有改写**（本附录是叠加，不是替换）。归登记项 **A14/A15**，修法与判据在**票 66**。
+
+---
+
+# 附录 C — 票 66 修好之后的复跑（agent-ticket66b，2026-09-20 22:58–23:22 本地 = 14:58–15:22Z）
+
+**本附录是叠加**：A.1/A.2/A.4/B 的原始样本表一个字都没改（那是各自当时的真测），这里只录修复后的数。
+**结论先说三句**：① A14 修好且回归用例经独立变异复测咬住（6 红 / 24 绿）；② A15 靠 `00bbb76` 的
+**树外口径**闭环——同一窗口内树外 CPU 0.0173% / 树内 CPU 0.7629%，两侧都按同一条 `<=0.5%` 判，
+只有树外那条当门 ⇒ 差的确实就是观测者自己；③ 但 AC#4 在复跑时挖出**第三起仪器缺陷**：
+`slo-check.ps1` 的聚合式在**全过路径**上崩溃，所以「A14 修完 CI 就绿」这句当时也不成立（见 C.4）。
+
+- **机器**：DESKTOP-LVS7839 · Windows 10 Pro 24H2（build 26100）· Intel i7-8750H（6C12T，12 逻辑核）· 32GB RAM。
+- **二进制**：本会话 `go build` 重建（15:03Z，非旧物）：`build/wisp.exe` 27,303,086B。
+  代码基线 = `86e868d`（A14 解析末项）+ `00bbb76`（A15 树外口径）+ `63b61ef`（插桩）+ 本票 `dabd365`。
+- **桌面独占**：每一组测量前后各跑一次 `tasklist | grep -iE "wisp|balldebug"`，**六次全部无输出**
+  （含 5 连跑 keeper 与 5 连跑 slo-check 的收尾自检；C.4 那次 `No matches found` 是同一条自检的空结果）。
+- **keeper**：**一个都没起**。A.4#1 的绕法自本附录起作废（A.6#1 已改为无 keeper 形态）。
+- **阈值**：`cpu_percent_all_core` 的 limit 在下列每张表里都写作 `<=0.5%`，与 D32 16.3.2 原文一致，未改。
+- **门集口径**：九项 = `tree_private_bytes`(≤25MB, 门) · `cpu_percent_all_core`(≤0.5%, **树外那条当门**) ·
+  `gdi_objects`(<200, 门) · `user_objects`(记录) · `handles`(<600, 门) · `goroutines`(≤6, 门) ·
+  `threads`(记录) · `disk_write_ops`(==0, 门) · `tcp_connections`(==0, 门) ⇒ 七门两记录。
+
+## C.1 AC#2：`wisp slo -state Sleeping -seconds 10 -interval-ms 250`，零 keeper，连跑 5 次
+
+原始 JSON：`docs/evidence/s1/66/66b-nokeeper-{1..5}.json`。**五个退出码逐字照录，没有重跑换样本。**
+
+| 跑 | 起测 UTC | 退出码 | 样本数( subj/obs) | sample_errors | **主体 CPU（树外，当门）** | 观测者 CPU（树内，仅记录） | 主体私有 WS 中位 | 观测者私有 WS 中位 | 句柄max | GDI | USER | gor | 写盘 | TCP | 九门出数 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 15:03:50 | **exit=0** | 40 / 40 | 0 / 0 | **0.0130%**（`0.013%` vs `<=0.5%`，pass） | 0.6739%（`0.674%`，pass=false，gate=false） | 4.39MB | 8.97MB | 189 | 0 | 1 | 1 | 0 | 0 | 9/9 |
+| 2 | 15:04:10 | **exit=0** | 40 / 40 | 0 / 0 | **0.0000%** | 0.5963%（pass=false，gate=false） | 4.35MB | 8.71MB | 183 | 0 | 1 | 1 | 0 | 0 | 9/9 |
+| 3 | 15:04:29 | **exit=0** | 40 / 40 | 0 / 0 | **0.0000%** | 0.6350%（pass=false，gate=false） | 4.31MB | 8.72MB | 183 | 0 | 1 | 1 | 0 | 0 | 9/9 |
+| 4 | 15:04:48 | **exit=0** | **39** / 40 | **1** / 0 | **0.0000%** | 0.6872%（pass=false，gate=false） | 4.27MB | 8.53MB | 189 | 0 | 1 | 1 | 0 | 0 | 9/9 |
+| 5 | 15:05:08 | **exit=0** | 40 / 40 | 0 / 0 | **0.0000%** | 0.9318%（pass=false，gate=false） | 4.21MB | 9.07MB | 189 | 0 | 1 | 1 | 0 | 0 | 9/9 |
+
+- **AC#2 判 PASS**：五次 `exit≠2`（全 0）、九项门每次各出 9 行、主体侧无一跑丢样本窗。
+  旧症状（A.4#1 的 `system snapshot does not contain the sampling process` → `exit=2`）在零 keeper 下**未复现**。
+- 第 4 次那次 `sample_error` 逐字是
+  `read: resource: proc: external system process snapshot: NtQuerySystemInformation: buffer never sufficient (last 1090464 bytes)`
+  ——`internal/proc/treemetrics_windows.go:211-233` 的快照缓冲从 1MiB 起 6 次翻倍仍不够。**不是 A14**（A14 是解析顺序），
+  是采样瞬间进程列表膨胀的偶发失败，200 次读里 1 次、被计入 `sample_errors` 且不影响该门判定。
+  ⇒ 登记为**候选新项**（本附录不擅自编号），票 66 未修。
+- 树内那 5 个 CPU 读数（0.5963–0.9318%）**全部 >0.5%**：同一台机器、同一窗口、同一对进程，
+  换到树外读就是 0.0000–0.0130%。这就是 B.2 第 2 条「单次读约 1.3ms 的绝对成本」在修复后的直接对照。
+- 与上一位代理 14:38Z 那五份 `66-nokeeper-*.json`（`00bbb76` 之前）并存：那五份主体 CPU
+  0.6356–0.7625%、`pass=false`、退出码 1，因为当时门还挂在树内。**两组都是真测，不互相覆盖。**
+
+## C.2 AC#1：变异检验由第二人独立复跑
+
+把 `WalkSystemProcesses` 退回「先测 `next==0` 再解码当前项」，先证明变异真落盘
+（`grep -n "MUTATION-66B"` → 第 76 行命中；`git diff --stat` → `1 file changed, 6 insertions(+)`），
+再 `go test -count=1 -v ./internal/proc/` → **rc=1：6 红 / 24 绿 / 1 SKIP**。
+比上一轮多红 3 条：本次链序恰好把采样者自己排在末项，于是
+`TestSystemProcessSnapshotSeesSelf`（`system snapshot does not contain the sampling process 12328 (513 entries)`）
+与 AC#3 的两条树外采样用例（`system snapshot does not contain subject <pid>`）一起转红
+⇒ 树外读取并不天然免疫 A14，它免疫是因为**全仓只有一份走链实现**。撤变异后 `grep -c MUTATION` = 0、
+`git diff` 空、`./internal/proc/ ./internal/observe/` rc=0。原始输出：`docs/evidence/s1/66-mutation-parse-order.md`（复测段追加，未覆盖）。
+
+## C.3 AC#3：同一窗口内「树外 ≤0.5% 且树内 >0.5%」双条成立
+
+| 样本 | 窗口/间隔 | 主体（树外）CPU | 观测者（树内）CPU | 主体退出 | 判据 |
+|---|---|---|---|---|---|
+| `66-ac3-30s.json` | 30s / 250ms（119 / 120 样本） | **0.0173%**（`0.017%`，gate=true，pass） | **0.7629%**（`0.763%`，pass=false，**gate=false**，`observer_cost:true`） | exit=0 | 两条同时成立 ✓ |
+| C.1 的 5 个 10s 跑 | 10s / 250ms | 0.0000–0.0130% | 0.5963–0.9318% | exit=0 | 5/5 同时成立 ✓ |
+
+树内那条 CPU 行仍按同一阈值判并写 `pass/fail`（`0.763%` 记 fail），只是 `gate:false` 不再当门；
+JSON 里带 `note` 说明它是观测者自己的 `ReadTree` 成本。产品侧口径 = 树外那条，与 A.2 的 `balldebug` 树外 0.000% 互证。
+
+## C.4 AC#4：`slo-check.ps1 -Subset smoke` 五连跑，以及复跑时挖出的第三起仪器缺陷
+
+**先记账：本票自己的第一次测量差点读成假绿。** 我把脚本调用接在 `| tee | grep` 后面，
+`$?` 取到的是 `grep` 的退出码 ⇒ 屏幕上五个「exit=0」全是假的（真退出码是 1）。
+发现方式是 `ls` 聚合报告文件根本不存在。修正后逐字重跑，退出码直接取自脚本调用、不经任何管道。
+
+**修复前的真实结果（同一条命令，正确取码）**：`REAL exit=1`，且**没有写出 `slo-report.json`**，
+而四步检查当时**全部通过**：
+
+```text
+slo-check.ps1: state Sleeping exit=0 pass=True
+slo-check.ps1: state Warm exit=0 pass=True
+slo-check.ps1: settle exit=0 pass=True
+slo-check.ps1: leak exit=1 flipped_to_fail=True
+slo-check.ps1 : The property 'Count' cannot be found on this object. Verify that the property exists.
+    + FullyQualifiedErrorId : PropertyNotFoundStrict,slo-check.ps1
+```
+
+根因（`scripts/slo-check.ps1:129`，在 `Set-StrictMode -Version 2.0` 下）：
+`($results | Where-Object { -not $_.pass }).Count` —— 零命中时 `Where-Object` 返回 `$null`、
+单命中返回标量，两者都没有 `.Count` ⇒ **恰好在「全过」那条路上抛终止性异常**，报告没写、CI 那两步
+（`.github/workflows/ci.yml:168` smoke / `:198` full，都无 `continue-on-error`，且 upload 步骤
+`if-no-files-found: error`）红。它一直没露头，是因为 A14 让每个 state 都 `exit=2` 而全 fail ⇒
+过滤器命中 ≥2 项时才有 `.Count`。⇒ **只修 A14 不会让 CI 变绿，而是让它从「随机红」变成「必红且没报告」**：
+B.3 那句预告被这次复跑加强成了另一种方向。修法见 commit（`@(...)` 强制成数组），
+阳性对照（同一条表达式在 StrictMode 下喂 0/1/2 项失败）：`failing=0 → allPass=True`、
+`failing=1 → allPass=False`、`failing=2 → allPass=False`，即修完仍会红，不是把门焊死成绿。
+
+**修复后**（`-Subset smoke`，`-SecondsPerState` 用默认 4s；五份原始 stdout+stderr 归档
+`docs/evidence/s1/66/66-smoke-run-{1..5}.log`，修复前那次崩溃的原文归档
+`docs/evidence/s1/66/66-smoke-pre-fix-crash.log`）：
+
+| 跑 | 起测 UTC | **脚本退出码** | all_pass | Sleeping | Warm | settle | leak 自检 | 主体 CPU（树外，两次都是 0.0000%） | 观测者 CPU（树内，记录） |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | 15:14:32 | **exit=0** | true | exit=0 pass | exit=0 pass | exit=0 pass | flipped=true | Sleeping 0.0000% / Warm 0.0000% | 0.3857% / 0.9603% |
+| 2 | 15:15:23 | **exit=0** | true | exit=0 pass | exit=0 pass | exit=0 pass | flipped=true | 0.0000% / 0.0000% | 0.1612% / 0.9629% |
+| 3 | 15:16:13 | **exit=0** | true | exit=0 pass | exit=0 pass | exit=0 pass | flipped=true | 0.0000% / 0.0000% | 0.5136% / 1.0322% |
+| 4 | 15:17:04 | **exit=0** | true | exit=0 pass | exit=0 pass | exit=0 pass | flipped=true | 0.0000% / 0.0000% | 0.5470% / 0.6436% |
+| 5 | 15:17:54 | **exit=0** | true | exit=0 pass | exit=0 pass | exit=0 pass | flipped=true | 0.0000% / 0.0000% | 0.5764% / 0.5802% |
+
+⇒ **AC#4 判 PASS：5/5 exit=0，无一次重跑被丢弃。** 注意树内记录里 `0.1612%` 与 `1.0322%` 并存——
+这正是 B.2 说的「树内那条门在这个口径下没有定义」，也是它现在只作记录的原因。
+
+- **「state 段不再引用树内 CPU 当门」的引用位置（给复核者的 diff）**：`scripts/slo-check.ps1` 的 state 段
+  从头到尾没出现过 CPU 字样，它唯一的判据是 `$reportJson.pass`（`slo-check.ps1:88`），而 `pass` 由
+  `internal/observe` 的九条 verdict 聚合而来（`sampler.go:343`：`if v.Gate && !v.Pass` 才判红）。
+  把 CPU 行从门上摘下来那一处是 **`internal/observe/thresholds.go:140-152`**：
+  `if rep.ObserverCost { v.Gate = false; v.ObserverCost = true }`；
+  **limit 字符串两侧仍由同一个 `stateCPULimit(st)` 生成**（`:137`），
+  所以「改的是量法、不是门」是机器可核的事实，不是口头承诺——钉住它的用例是
+  `internal/observe/observer_cost_test.go`（只许 CPU 行动、limit 串两侧必须相等、非 CPU 行的 gate 不许随口径变化）。
+
+## C.5 AC#5 的复跑腿：`-Subset full`（六态 + settle + leak），一次
+
+命令 = C.6#4 的 full 形态（`-SecondsPerState 6`，与 `ci.yml:198` 那一步同参数，只多给了 `-OutDir` 以便归档）。
+退出码 **exit=0**，`generated_at 2026-09-20T15:21:19Z`，`machine DESKTOP-LVS7839`，`all_pass=true`。
+报告原件归档：`docs/evidence/s1/66/66-full-subset-slo-report.json`（645KB，含每个 state 的**逐样本**数据）。
+
+| state | 退出码 | pass | posture | 样本(subj/obs) | 主体 CPU 树外 | 观测者 CPU 树内 | 主体私有 WS 中位 | 句柄max |
+|---|---|---|---|---|---|---|---|---|
+| `Sleeping` | 0 | true | **skeleton** | 24 / 24 | 0.0000% | 0.2370% | 4.18MB | 176 |
+| `Armed` | 0 | true | **skeleton** | 24 / 24 | 0.0000% | 0.6032% | 4.28MB | 176 |
+| `Warm` | 0 | true | **skeleton** | 24 / 24 | 0.0000% | 0.8171% | 4.25MB | 182 |
+| `Conversation` | 0 | true | **skeleton** | 24 / 24 | 0.0216% | 0.2801% | 4.26MB | 176 |
+| `PanelOpen` | 0 | true | **skeleton** | 24 / 24 | 0.0000% | 0.5385% | 4.27MB | 182 |
+| `WorkPeak` | 0 | true | **skeleton** | 24 / 24 | 0.0000% | 0.7734% | 4.23MB | 182 |
+
+⚠ **口径边界（这段是本表唯一不许被省略的部分）**：六个 state 的 `posture` **全是 `skeleton`**——
+今天的采样器不加载 KWS/ASR/TTS、不开面板、不放球。⇒ 本表的 `all_pass=true` 只证明
+**「state 口径的九项门现在跑得通、且 skeleton 形态达标」**，**不**等于 D32 16.3.2 六态表达标；
+`PanelOpen` / `WorkPeak` 两行的真数字仍挂在票 28/33/36（面板树）与票 15（模型常驻）上。
+把这张表当「六态已过」引用就是假绿，措辞请照本段抄。settle 行本次实测：peak 126.5MB → 回 cap(25MB) **261ms**、
+`free_os_memory_count=2`、结束私有 WS 8.50MB、`pass=true`（与 A.3 三次样本同量级）。
+
+## C.6 逐字重跑命令（Git Bash，本机；本附录全部数字出自这些命令）
+
+```bash
+cd "D:\work\workspace\projects plans\Wisp"
+export PATH="$PWD/third_party/sherpa-onnx:$PATH"   # 缺它测试/二进制 0xc0000135
+go build -o build/wisp.exe ./cmd/wisp
+
+# 0) 桌面洁净自检：必须无输出
+tasklist | grep -iE "wisp|balldebug"
+
+# 1) AC#2：零 keeper 连跑 5 次（退出码必须直接取，不要接管道 —— 见 C.4 的翻车记录）
+for i in 1 2 3 4 5; do
+  ./build/wisp.exe slo -state Sleeping -seconds 10 -interval-ms 250 \
+    -out build/slo/verify66b/66b-nokeeper-$i.json; echo "exit=$?"
+done
+
+# 2) AC#1 变异检验：改 internal/proc/systemprocs_windows.go 的 WalkSystemProcesses
+#    顺序 → 先 grep 证明变异落盘，再跑，再撤，再 grep -c MUTATION 必须为 0
+go test -count=1 -v ./internal/proc/          # 变异态 rc=1（6 红/24 绿/1 SKIP），撤后 rc=0
+
+# 3) AC#4：smoke 连跑 5 次（同样：退出码直接取）
+for i in 1 2 3 4 5; do
+  powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 \
+    -Subset smoke -OutDir "build\slo\ac4fix\r$i" > build/slo/ac4fix/run-$i.log 2>&1
+  echo "exit=$?"
+done
+
+# 4) AC#5 复跑腿：full（与 ci.yml:197 同形）
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/slo-check.ps1 \
+  -Subset full -SecondsPerState 6 -OutDir "build\slo\ac5full"; echo "exit=$?"
+
+# 5) 收尾自检：必须无输出
+tasklist | grep -iE "wisp|balldebug"
+```
+
+## C.7 与 A/B 的关系（免得后来人以为前文被推翻）
+
+- A.1 的六个树内样本、A.4#2 的比例说法、B.2 的八样本更正：**都照原样保留**，本附录不改写。
+- A.5 那句「CI 今天必红」在修复后应读作：缺陷①已修（无 keeper 可跑，C.1）、缺陷②改为树外口径（C.3）、
+  而 A.5 当时**没预见**的第三起（聚合崩溃）由 C.4 修掉 ⇒ 今天 `smoke` 5/5 exit=0（C.4）。
+- A14/A15 在 `docs/reports/pending-and-issues.md` 移入「已解决」，关闭 commit 见那里的引用行。

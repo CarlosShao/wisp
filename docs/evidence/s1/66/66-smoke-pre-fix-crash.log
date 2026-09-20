@@ -1,0 +1,13 @@
+slo-check.ps1: sampling state Sleeping for 4s
+slo-check.ps1: state Sleeping exit=0 pass=True
+slo-check.ps1: sampling state Warm for 4s
+slo-check.ps1: state Warm exit=0 pass=True
+slo-check.ps1: settle check (10s window)
+slo-check.ps1: settle exit=0 pass=True
+slo-check.ps1: leak fixture self-test (100MB, must FAIL)
+slo-check.ps1: leak exit=1 flipped_to_fail=True
+D:\work\workspace\projects plans\Wisp\scripts\slo-check.ps1 : The property 'Count' cannot be found on this object. Veri
+fy that the property exists.
+    + CategoryInfo          : NotSpecified: (:) [slo-check.ps1], PropertyNotFoundException
+    + FullyQualifiedErrorId : PropertyNotFoundStrict,slo-check.ps1
+ 
