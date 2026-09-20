@@ -18,8 +18,11 @@ All tickets are **vertical tracer bullets**; work the **frontier** (all blockers
 1. Before writing any code: set `Status: in-progress`, fill `Claimed by`, `Last update`,
    append a Progress-log line → **commit + push (both remotes)** in the same step.
 2. Append a Progress-log line after every meaningful unit (`- [UTC ts] agent=<id> did=… next=…`),
-   commit+push. Sub-agent lines tagged with their id. **Max 2 sub-agents per ticket**;
-   recommended overall fleet width is also 2.
+   commit+push. Sub-agent lines tagged with their id. **Max 2 sub-agents per ticket**（每张票仍按票内
+   `Parallel slots` 走，同票多写手会在同一工作树里互相踩）；**整体车队宽度 3**（R3，2026-09-20 用户批准，
+   旧值 2 是 ZCode 免费配额校准的、已失效）。附加口径：需安静测量的票（SLO 私有工作集/延迟分段/CER）
+   **独占 1 个代理**、其余排队；只读检索/审计类可放到 10+。>1 个写码代理必须 worktree 隔离
+   （`third_party` 用 junction 复用，避免每个工作树重下 1.3GB）。
 3. An `in-progress` ticket with no log update for >24h: next agent must verify on-disk state
    against the log before continuing; never reset checked boxes; append `resumed` line.
 4. Completion: check all acceptance boxes → `Status: done` → rename file `NN-slug.md` →
