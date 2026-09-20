@@ -29,6 +29,7 @@
   ②opacity 0.35→0.6 + 直径 12→16px（仍"低调"但有下限保证）；
   ③保持规格，新增"浅色/深色桌布"配色档（改动最大，票 39 配置界面正好承接）。
   现状影响：用户看不见常驻球 → 无法用单击唤起（只能靠热键，而热键另有 A 系列缺陷）。
+  **→ 2026-09-20 用户裁定：①②③全部不采用，视觉整体重做（见 R8），本条由票 62 承接关闭。**
 
 ## 平台事件记录（platform-incidents）
 
@@ -48,7 +49,25 @@
 - **[R4] H4 web.search 路径已定：搜索 API**（用户已有 **anysearch** key，2026-09-20）。票 22 的 `SearchProvider` 接口按 anysearch 兼容实现为默认 provider，抓结果页方案降为备用/离线兜底；票 22 的"OPEN decision"验收框就此可勾。
 - **[R5] 默认 TTS 走云 TTS，供应商 StepFun**（用户已有 StepFun 云 TTS 模型，2026-09-20）。R1 的替代选型不再走"换开源中文 TTS 权重"路线：票 26 的 TTS 输出层以 StepFun 云 TTS 为默认实现，与票 61（云级联 ASR/TTS C9）同源，减少一家供应商。⚠ 本地 matcha 条目**保持 `blocked-p3` 不改**（改回 ok 属 D36 级安全决策）；离线/无网场景的本地 TTS 缺口另立待决项，不在票 26 里偷偷塞。
 - **[R6] 发布类事项全部推迟（用户取向：先自己用，用好了再说别的）**：SignPath 代码签名资格（P8/票 56）、生产 minisign 密钥仪式、P10 命名/商标核查、winget/Scoop 分发 —— 个人自用阶段一律**不做**，票 56 维持 DEFERRED。dev minisign 密钥（`E:\work\base\wisp-minisign\`）继续用于本地更新/模型链验证。H3/H5 由"待人项"降级为"发布前才需要"。
-- **[R7] 凭录入方式约束（用户 2026-09-20 明确要求）**：**任何 API key 不得经对话框传递**，必须由用户自己在界面/本地隐藏输入里录入。现状核查：`internal/secret`（票 06，DPAPI）已有 `Store.Store(ref, secret)`，但**全仓没有录入入口**（无 `wisp secret` 子命令、配置 GUI 属票 39/40 即 S5）。因此 H2/anysearch/StepFun 三项凭据当前只能走「用户自己 `setx` 环境变量 + 我只引用变量名」的临时路径；已提议把最小录入入口（`wisp secret set` 隐藏输入）提前做，待用户批准。
+- **[R7] 凭录入方式约束（用户 2026-09-20 明确要求）**：**任何 API key 不得经对话框传递**，必须由用户自己在界面/本地隐藏输入里录入。现状核查：`internal/secret`（票 06，DPAPI）已有 `Store.Store(ref, secret)`，但**全仓没有录入入口**（无 `wisp secret` 子命令、配置 GUI 属票 39/40 即 S5）。因此 H2/anysearch/StepFun 三项凭据当前只能走「用户自己 `setx` 环境变量 + 我只引用变量名」的临时路径；已提议把最小录入入口（`wisp secret set` 隐藏输入）提前做，待用户批准。→ **用户已批准，落成票 63**。
+- **[R8] 悬浮球视觉整体重做，否掉"描边/投影"修补路线**（用户 2026-09-20，原话：「我也不知道你说的什么劳什子描边投影是什么东西，估计也是上不了台面的样式，按照我说的来」）。H6 的 ①②③ 三个候选**全部不采用**。新方向（参考 vivo 蓝心小V 语音球，用户附图两张）：玻璃质感外壳 + 内部蓝紫青液态色团；**靠边自动收缩半隐（"就像迅雷那种悬浮球"）**；唤起时液态流动动画；**说话时液体随音频节奏旋转**；不说话时通过过渡动画丝滑引入边框。→ 落成**票 62**。
+  ⚠ 我在票里写死的取舍：D32 规定 Sleeping 态 CPU ≤0.5% 且**零动画零定时器**，所以流动动画只允许出现在会话态，Sleeping 必须是**静态玻璃球本体**（不再是 12px 微点）——"看得见"靠本体可见性达成，不靠给 Sleeping 加动画。票 62 的 AC 已钉住这一点。
+  契约变更顺序：**先可运行原型 → 用户实机签收满意 → 才回填 SPEC-08 §2 并请签字**；签字前不得改契约文本。
+- **[R9] 外部服务端点登记（非机密，用户 2026-09-20 提供）**：
+  - **AnySearch**（票 22 `web.search`/`web.fetch` 的默认 provider）：`baseUrl = https://api.anysearch.com/v1`，
+    文档 `https://www.anysearch.com/docs/api-endpoints/v1-search`。接口面：
+    `POST /v1/search`（`query` 必选；`max_results` 1–10 默认 10；`tag` 形如 `{domain}.{sub_domain}`；
+    `zone` = `cn|intl`；`language` = `zh-CN|en`；`params` 透传 AnyMix；`format` = `json|markdown`）、
+    `GET /v1/sub-domains`、`POST /v1/extract`。认证 `Authorization: Bearer <key>`，
+    **可选**——匿名按 IP 限流并消耗每日免费额度（→ 无 key 时仍可降级工作，这条要写进票 22 的降级链）。
+  - **StepFun**（票 26 云 TTS 与票 61 云级联、H2 真 LLM 黄金流的候选）：`baseUrl = https://api.stepfun.com/step_plan/v1`。
+  - key 本身一律走 R7/票 63 录入，**不得出现在对话、argv、日志或 config 明文里**。
+- **[R10] 默认唤起热键 `Ctrl+Alt+W` → `Ctrl+Alt+Q`**（用户 2026-09-20 答"换"）。实测依据：本机 84 个候选组合中
+  **只有 `Ctrl+Alt+W` 被第三方程序占用**，其余 83 个空闲；`Ctrl+Alt+Space` 也空闲，但因部分中文输入法会抢
+  该组合，只作可配置备选、不作默认。→ 接线与错误语义拆分（"被占用" vs "未尝试"）归**票 64**。
+  ⚠ 同时修正一条误判：补裁阶段报告称"四个默认热键全部注册失败"，实为**当时我的演示球进程还在跑**、
+  占了其中三个键（`TestBallLiveLifecycle` 也因 `FindWindowW` 按类名匹配到演示球而变红）。
+  教训已入票 64 的前置断言要求：测量类测试发现外部同窗口必须 **fail-fast 并提示，禁止静默 skip**。
 
 ## 完成度审计（2026-09-20 08:58，audit-A + audit-B）
 

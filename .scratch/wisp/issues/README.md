@@ -29,6 +29,11 @@ All tickets are **vertical tracer bullets**; work the **frontier** (all blockers
    `NN-slug-done.md` → update this index → commit+push.
 5. If a decision is missing, set `Status: blocked` with the open question in the log
    (D22 闸门③: undefined = stop and ask, never assume).
+6. **置 done 前，验收报告必须含一张与 AC 编号 1:1 的裁决表**（每行 = 一条 AC 的 PASS/FAIL/PARTIAL
+   + 判定依据的 `file:line` 或实跑输出）。**缺行即 FAIL**，无论其余部分多好。
+   （2026-09-20 owner 批准新增。起因：票 07 标 DONE 时 6 条 AC 只有 1 条被书面裁决过，
+   其中"热键随配置重注册"的标的 `RebindHotkeys` 实为全仓零调用者的死代码；
+   补裁另有 2 框 FAIL、2 框 PARTIAL。旧报告不追溯改写，但 13 张已 done 票的未决框由票 64 等消化。）
 
 ## Dependency graph (blockers in parentheses)
 
@@ -64,6 +69,16 @@ All tickets are **vertical tracer bullets**; work the **frontier** (all blockers
   目录/能力位/计费模式/配额三层/兜底链/角色化默认/probe/限流要求；
   SPEC-02（provider_health v2 表）、SPEC-03 §3.1、SPEC-05 §3.3a、SPEC-12 登记表（云端语音
   DEFERRED→已采纳·提前）同步。
+
+- **后补票（2026-09-20 owner 裁定 R8/R9/R10，编号续 61 之后以保持文件名稳定）**：
+  **62 liquid-glass-ball-visuals (07,13)** —— 液态玻璃球视觉重做 + 靠边吸附收缩 + 音频驱动液面，
+  含 SPEC-08 §2 视觉表变更（**先原型、owner 实机签收后才回填契约文本并签字**）；
+  **63 credential-entry-cli (06)** —— `wisp secret set/get/list/unset` 隐藏输入→DPAPI，
+  兑现 R7「key 绝不进对话框」；
+  **64 ball-defects-hotkey-interactive (07)** —— 消化 registry A1–A7（热键接线、交互四项、
+  Sleeping 零定时器实测、多显示器实拖），默认唤起键 `Ctrl+Alt+W`→`Ctrl+Alt+Q`。
+  ⚠ 62 与 64 的边界：64 只管"球能被唤起、配置改动能生效"，62 只管材质/动效/吸附；两票都不得
+  为对方让路而放宽 D32 的 Sleeping 零定时器与 CPU ≤0.5% 纪律。
 
 ⚠ **Safety-incomplete period**: tickets 21–32 run with `TaskScheduler` single-task only;
 multi-task concurrency unlocks only at 47 (SPEC-12 §2).
