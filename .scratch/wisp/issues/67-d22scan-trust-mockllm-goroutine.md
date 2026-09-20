@@ -139,3 +139,17 @@ CI 该步**无 `continue-on-error`** ⇒ **job 红**。
   `cd tools/d22scan && go test -count=2 ./...` → ok 0.487s；
   `cd tools/d22scan && go run . -root ../../` → `examined 194 production Go files` + `d22scan: clean`，**exit 0**（票面期望的 0 命中/exit 0 达成）。
   未做：AC#3（等票 66 收尾后动 `cmd/wisp/providers.go`）。本票范围 AC#1/AC#2 已交完。
+- [2026-09-20T15:22:00Z] agent=agent-ticket67 did=**AC#2 交付后自挖出一条门覆盖面缺口，如实登记，未自行放宽/收紧**。
+  探针（种完即删，`internal/llm/adaptertest/zz_probe.go`）：禁令 #1 的 AST 规则只匹配
+  `*ast.GoStmt` 且 `Call.Fun` 是 **`*ast.FuncLit`** 的情形（`tools/d22scan/main.go` 的 `bare-goroutine` 分支），
+  所以 **`go probeReader()`（具名函数、非字面量）扫出来是 `clean` / exit 0 / 195 文件**——
+  一个同样无 name、无 owner、无 recover 边界的裸 goroutine，门**看不见**。
+  我没有把它一起修掉，理由有两条，都需要你先拍板：
+  ①把规则收紧成"任何 GoStmt"会立刻命中 `internal/observe/goroutine.go:281` 的 `go r.run(...)`，
+  那是注释里明写的**全仓唯一受 sanctioned 的一条**，必须给它加 allowlist 豁免行——
+  而裁定 1 说豁免只能你书面给；且 `internal/observe/` 是票 66 领地，我不碰。
+  ②同一条收紧会再命中 `cmd/balldebug/main.go:231/259/440`（`go runHotkeyBridge(...)`、`go feedLevels(...)` ×2），
+  即**真命中 3 处**，而 `cmd/balldebug/` 有代理在飞。
+  实测计数：`grep -E '^[[:space:]]*go [a-zA-Z_(]' internal cmd`（排除 `_test.go`）= **4 处**，其中 1 处是 sanctioned、3 处待判。
+  ⇒ **"d22scan clean" 的准确读法**：现有生产码里**没有以匿名闭包形式起的裸 goroutine**，
+  不等于"没有绕过 `Registry.Spawn` 的裸 goroutine"。这条判据目前只对 FuncLit 形状为真。
