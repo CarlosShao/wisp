@@ -300,14 +300,21 @@ func RunFaultSuite(t *testing.T, u Unit, fs FaultSuite) {
 	})
 }
 
-// StreamThroughMockllmGolden replays a golden fixture through mockllm for a
-// unit (the second runner), returning the events.
-func StreamThroughMockllmGolden(t *testing.T, u Unit, path, fixture string) []llm.StreamEvent {
+// StreamGolden replays a golden fixture through THIS mockllm for a unit (the
+// second runner), returning the events. req may be nil (then a BaseRequest is
+// used); when given, its Model is overridden with the golden selector, so a
+// test can send a REALISTIC request body (system prompt, breakpoints, tools)
+// and still control the response bytes.
+func (m *Mockllm) StreamGolden(t *testing.T, u Unit, fixture string, req *llm.Request) []llm.StreamEvent {
 	t.Helper()
-	proc := StartMockllm(t)
-	proc.Control(t, "/__control/reset", "{}")
-	p := u.New(t, proc.Base+"/v1", Options{})
-	events, _, err := Drain(t, p, GoldenRequestModel(fixture))
+	m.Reset(t)
+	p := u.New(t, m.Base+"/v1", Options{})
+	if req == nil {
+		req = GoldenRequestModel(fixture)
+	} else {
+		req.Model = "golden/" + fixture
+	}
+	events, _, err := Drain(t, p, req)
 	if err != nil {
 		t.Fatalf("mockllm golden %s: %v", fixture, err)
 	}
@@ -321,4 +328,41 @@ func ContextOf(t *testing.T) context.Context {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	t.Cleanup(cancel)
 	return ctx
+}
+
+// LastRequest returns the captured request body (raw bytes) mockllm received
+// on one route, plus its headers. Fails the test when nothing was captured
+// (a stale/missing capture must never be read as evidence).
+func (m *Mockllm) LastRequest(t *testing.T, route string) (string, http.Header) {
+	t.Helper()
+	resp, err := http.Get(m.Base + "/__control/last_request?route=" + route)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	st := m.decode("/__control/last_request", resp)
+	present, _ := st["present"].(bool)
+	if !present {
+		t.Fatalf("mockllm captured no request on route %q", route)
+	}
+	body, _ := st["body"].(string)
+	hdr := http.Header{}
+	if raw, ok := st["header"].(map[string]any); ok {
+		for k, v := range raw {
+			if list, ok := v.([]any); ok {
+				for _, s := range list {
+					if str, ok := s.(string); ok {
+						hdr.Add(k, str)
+					}
+				}
+			}
+		}
+	}
+	return body, hdr
+}
+
+// Reset clears every injection, counter and request capture.
+func (m *Mockllm) Reset(t *testing.T) {
+	t.Helper()
+	m.Control(t, "/__control/reset", "{}")
 }
