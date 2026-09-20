@@ -141,14 +141,21 @@
   **跨进程按类名匹配全桌面**：用户 H1 签收常驻的 `balldebug.exe`（PID 29844）同持该类名窗口，
   使 `TestBallLiveLifecycle` 在 `:65` 稳定假红（"ball window still alive after Close"）。
   ⇒ 该红**不可**用作泄漏证据。下一步：测试改按自身 hwnd 断言，并保证运行期桌面上无其他 Wisp 球。
-- **[A6] 未定案的句柄增长（需安静环境复跑归类）** — 同一进程内 `-count=2` 两次观测到
-  `handlesOfProcess()` 起点基线由 **104 升至 376/374**（该计数走
-  `GetProcessHandleCount(CurrentProcess())`，是**进程内**值，外部进程无法抬高，不受 A5 混淆影响），
-  ⇒ `Ball.Close()`（`ball_windows.go:762`，其中 `pDestroyWindow.Call` 返回值未检查）后本进程约 270 个
-  句柄未回落，与票面约束"release path must bound non-Sleeping handle growth"相悖。
-  **可能是真泄漏，也可能是 D2D/USER 对象待 finalizer；本次未能定案**（本机有他球常驻且不可中止用户签收）。
-  下一步：在桌面**无其他 Wisp 球**的环境跑 `go test -tags winlive ./internal/ball/ -run TestBallLiveLifecycle -count=3`
-  并记录基线是否单调增长，再决定是否立泄漏修复票（另参 D42 "GDI 泄漏"预演项）。
+- **[A6] 句柄增长 → 已定案结案（2026-09-20，票 64 接续代理 + 编排者独立复跑）** —
+  原记"同进程 `-count=2` 两次观测到基线由 104 升至 376/374，`Ball.Close()` 后约 270 个句柄不回落，
+  疑为真泄漏，本次未能定案"。**定案：不是每球泄漏。**
+  票 64 的代理把句柄数改为**每轮打点**（`live_windows_test.go:79`），我自己在安静桌面上
+  独立跑 `go test -count=3 -tags winlive -run TestBallLiveLifecycle ./internal/ball/`，三轮数据：
+  **base=114 → afterNew=363 → afterClose=369（净 +255，USER 对象 1→6）；
+  base=369 → afterNew=372 → afterClose=370（净 +1，USER 6→6）；
+  base=370 → afterNew=372 → afterClose=372（净 +2，USER 6→6）** ⇒
+  那 255 是**进程内第一次建球的 D2D/COM 初始化地板，只发生一次**；此后每轮建/销净增 1–2 个句柄、
+  USER 对象稳定持平。**不开泄漏票。**
+  ⚠ 两点如实保留：①每轮净增是 **+1/+2 而非 0**，量级远低于当初担心的 270/球，
+  但长驻进程反复建/销球时是否为 COM 缓存还是慢泄漏，**本轮数据不足以下结论**（要几百轮才看得出斜率），
+  若日后票 08 的 SLO 长跑出现句柄单调爬升再回指本条；
+  ②`Ball.Close()`（`ball_windows.go:762`）里 `pDestroyWindow.Call` 的**返回值仍未检查**——
+  这次没被证明有害，但它正是"销毁失败会静默"的那类代码，属可选加固，不单独开票。
 - **[A7] 票 08 诊断包两处残余（不阻塞，转票 45）** — `BuildDiagnosticsBundle` 全仓**无生产调用者**
   （"采样器数据可挂"目前成立在 API 契约层）；`TestDiagnosticsBundleCollectsAndRedacts` 只断
   `slo-snapshot.json` **存在于包内**，未断其字节等于传入值（等值靠 `diagnostics.go:161` 直传保证）。
