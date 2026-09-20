@@ -18,9 +18,9 @@ import (
 
 // trashDetail is what the platform backend reports about one successful call.
 type trashDetail struct {
-	ItemsBefore int64
-	ItemsAfter  int64
-	API         string
+	API    string
+	Record string
+	Bin    string
 }
 
 // recycleBinSupported is the honest platform answer.

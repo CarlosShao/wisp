@@ -441,10 +441,11 @@ func (b *Bridge) run(ctx context.Context, req agent.ToolRequest, entry Entry,
 	}
 
 	out := agent.ToolOutcome{
-		Text:      res.Text,
-		IsError:   res.IsError,
-		RiskLevel: dec.LevelString(),
-		Truncated: res.Truncated,
+		Text:         res.Text,
+		IsError:      res.IsError,
+		RiskLevel:    dec.LevelString(),
+		Truncated:    res.Truncated,
+		AppliedSteps: append([]string(nil), res.AppliedSteps...),
 	}
 	kind := OutcomeKindSuccess
 	if res.IsError {

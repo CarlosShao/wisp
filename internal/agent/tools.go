@@ -71,6 +71,12 @@ type ToolOutcome struct {
 	RiskLevel  string
 	ErrorClass string
 	Truncated  bool
+	// AppliedSteps is the D31 ledger the tool reported for itself (see
+	// tools.Result.AppliedSteps): what already landed when the call stopped
+	// early. It is DATA, not a second report type - the report wording stays
+	// approval.CancellationReport's - because a host that shows the strip, the
+	// panel or the transcript needs the list, not a re-parse of Text.
+	AppliedSteps []string
 }
 
 // ToolProvider is the loop's view of the tool host (C4).

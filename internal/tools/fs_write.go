@@ -388,14 +388,14 @@ func (t fsTrash) Execute(ctx context.Context, params json.RawMessage, onUpdate f
 		return Result{Text: "放入回收站失败：" + err.Error() + "（项目未被删除）",
 			IsError: true, AppliedSteps: se.snapshot()}, nil
 	}
-	se.record("通过 %s 将 %s 放入回收站（该卷回收站条目数 %d → %d）",
-		detail.API, target, detail.ItemsBefore, detail.ItemsAfter)
+	se.record("通过 %s 将 %s 放入回收站，并已核对还原记录 %s（位于 %s）",
+		detail.API, target, detail.Record, detail.Bin)
 	if onUpdate != nil {
 		onUpdate("fs.trash 已放入回收站")
 	}
 	return Result{
-		Text: fmt.Sprintf("已放入回收站：%s（条目数 %d → %d，可在回收站还原）",
-			target, detail.ItemsBefore, detail.ItemsAfter),
+		Text: fmt.Sprintf("已放入回收站：%s（还原记录 %s，可在回收站还原）",
+			target, detail.Record),
 		AppliedSteps: se.snapshot(),
 	}, nil
 }
