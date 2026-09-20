@@ -1,6 +1,8 @@
 package agent
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -224,19 +226,44 @@ func formatMicros(micros int64) string {
 }
 
 // turnSignature is the duplicate key of a turn: the ordered (name, args)
-// pairs. Arguments are canonicalized with encoding/json's own compaction so
-// key order/whitespace differences in equivalent objects still count as
-// repeats; non-JSON arguments fall back to the raw string.
+// pairs. JSON arguments are canonicalized with encoding/json (decoded, then
+// re-encoded, which sorts object keys and drops insignificant whitespace), so
+// equivalent objects written with a different key order or spacing count as
+// repeats. Arguments that are not a single JSON value fall back to the trimmed
+// raw string.
 func turnSignature(calls []llm.ToolCall) string {
 	if len(calls) == 0 {
 		return ""
 	}
 	var b strings.Builder
 	for _, c := range calls {
-		sig := strings.TrimSpace(string(c.Args))
-		fmt.Fprintf(&b, "%s|%s;", c.Name, sig)
+		fmt.Fprintf(&b, "%s|%s;", c.Name, canonicalArgs(c.Args))
 	}
 	return b.String()
+}
+
+// canonicalArgs is the canonicalization turnSignature promises. Decoding with
+// json.Number keeps number literals verbatim, so the rewrite cannot lose
+// precision on a big id; re-encoding is what sorts the keys.
+func canonicalArgs(raw json.RawMessage) string {
+	raw = bytes.TrimSpace(raw)
+	if len(raw) == 0 {
+		return ""
+	}
+	dec := json.NewDecoder(bytes.NewReader(raw))
+	dec.UseNumber()
+	var v any
+	if err := dec.Decode(&v); err != nil {
+		return string(raw) // not JSON: exact-text comparison is all there is
+	}
+	if dec.More() {
+		return string(raw) // trailing junk after the first value: stay literal
+	}
+	enc, err := json.Marshal(v)
+	if err != nil {
+		return string(raw)
+	}
+	return string(enc)
 }
 
 // ErrorClassOfTurnError maps a tool/host failure onto the D37 class used for

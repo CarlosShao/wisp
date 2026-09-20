@@ -271,6 +271,79 @@ func TestPerToolTimeoutOfContractHonestToolIsToolClass(t *testing.T) {
 	}
 }
 
+// MINOR-3: turnSignature's comment promised encoding/json canonicalization while
+// the code only trimmed, so equivalent calls written with a different key order
+// or spacing escaped the brake entirely (a comment reading stronger than the
+// defence). The code now matches the comment; these are both halves of that.
+func TestLoopGuardCanonicalizesEquivalentArgs(t *testing.T) {
+	g := NewGuard(GuardConfig{Budgets: BudgetsFor(128000)})
+	// Four spellings of ONE object, including a whitespace/newline variant.
+	variants := []string{
+		`{"a":1,"b":2}`,
+		`{ "b":2, "a":1 }`,
+		"{\n  \"b\": 2,\n  \"a\": 1\n}",
+		`{"b":2,"a":1}`,
+	}
+	var fired []int
+	for i, v := range variants {
+		rem, rep := g.ObserveTurn(toolCalls("call_sig", "echo", v))
+		if !rep {
+			continue
+		}
+		fired = append(fired, rem.Level)
+		if rem.Repeat != i+1 {
+			t.Errorf("turn %d (%s): repeat counter = %d, want %d - the variants must "+
+				"fold onto one signature", i, v, rem.Repeat, i+1)
+		}
+	}
+	if len(fired) != 1 || fired[0] != 3 {
+		t.Errorf("rung fired %v across four spellings of one object, want exactly [3] "+
+			"(key order/whitespace variants are the same call)", fired)
+	}
+}
+
+// The canonicalization must not collapse DIFFERENT calls into one signature:
+// that would stop a legitimately retrying model. Values, key sets and number
+// literals all have to stay distinguishable (json.Number is what keeps a big id
+// from being rounded into its neighbour).
+func TestLoopGuardKeepsDistinctArgsDistinct(t *testing.T) {
+	cases := [][2]string{
+		{`{"a":1}`, `{"a":2}`},
+		{`{"a":1,"b":2}`, `{"a":1}`},
+		{`{"id":10000000000000000000001}`, `{"id":10000000000000000000002}`},
+		{`not-json`, `not json either`},
+	}
+	for n, pair := range cases {
+		g := NewGuard(GuardConfig{Budgets: BudgetsFor(128000)})
+		for i := 0; i < 8; i++ {
+			v := pair[0]
+			if i%2 == 1 {
+				v = pair[1]
+			}
+			if rem, rep := g.ObserveTurn(toolCalls("call_d", "echo", v)); rep {
+				t.Errorf("case %d (%q vs %q) fired rung %d at turn %d: distinct calls "+
+					"were treated as repeats", n, pair[0], pair[1], rem.Level, i)
+				break
+			}
+		}
+	}
+}
+
+// Non-JSON arguments have no structure to canonicalize, so exact trimmed text is
+// the only available comparison - and it must still drive the ladder.
+func TestLoopGuardRepeatsNonJSONArgs(t *testing.T) {
+	g := NewGuard(GuardConfig{Budgets: BudgetsFor(128000)})
+	for i := 0; i < 2; i++ {
+		if _, rep := g.ObserveTurn(toolCalls("call_n", "echo", `raw-argument-text`)); rep {
+			t.Fatalf("rung fired early at %d", i)
+		}
+	}
+	rem, rep := g.ObserveTurn(toolCalls("call_n", "echo", `raw-argument-text`))
+	if !rep || rem.Level != 3 {
+		t.Errorf("identical non-JSON args not counted as repeats: rep=%v rem=%+v", rep, rem)
+	}
+}
+
 // ---------------------------------------------------------------------------
 
 func historyHasResultContaining(hist []llmMessage, needle string) bool {
