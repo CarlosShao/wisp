@@ -196,14 +196,21 @@ type ProbeResult struct {
 // RunProbe executes one capability probe against p and classifies the
 // outcome. A probe that cannot even be attempted (audio today) returns
 // OK=false with the reason in Detail - never a fake pass. Callers substitute
-// the real model id into the built request before probing.
+// the real model id into the built request before probing (RunProbeSuite does
+// that for them).
 func RunProbe(ctx context.Context, p LlmProvider, cap ProbeCapability) ProbeResult {
-	res := ProbeResult{Capability: cap, At: observe.NowWallUTC()}
 	cse, ok := ProbeCaseFor(cap)
 	if !ok {
-		res.Detail = "unknown capability"
-		return res
+		return ProbeResult{Capability: cap, At: observe.NowWallUTC(), Detail: "unknown capability"}
 	}
+	return runProbeOnModel(ctx, p, cse, "")
+}
+
+// runProbeOnModel executes one probe case; when model is non-empty it replaces
+// the case's placeholder model id, so the request names the model that is
+// actually being measured.
+func runProbeOnModel(ctx context.Context, p LlmProvider, cse ProbeCase, model string) ProbeResult {
+	res := ProbeResult{Capability: cse.Capability, At: observe.NowWallUTC()}
 	req, err := cse.BuildRequest()
 	if err != nil {
 		res.Detail = err.Error()
@@ -212,6 +219,9 @@ func RunProbe(ctx context.Context, p LlmProvider, cap ProbeCapability) ProbeResu
 	if req == nil {
 		res.Detail = "not implementable: " + cse.NotImplementable
 		return res
+	}
+	if model != "" {
+		req.Model = model
 	}
 
 	start := time.Now()

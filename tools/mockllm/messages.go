@@ -127,8 +127,20 @@ func planMessagesFrom(messages []msgMessage, tools []msgTool, choice json.RawMes
 			Type string `json:"type"`
 			Name string `json:"name"`
 		}
-		if json.Unmarshal(choice, &obj) == nil && obj.Type == "tool" {
-			p.toolName = obj.Name
+		if json.Unmarshal(choice, &obj) == nil {
+			switch obj.Type {
+			case "tool":
+				p.toolName = obj.Name
+			case "any":
+				// Anthropic spells the forced choice as the OBJECT form
+				// {"type":"any"}, which is exactly what the C5 adapter sends
+				// for tool_choice=required. A real model has to answer that
+				// with a tool_use block, so the mock has to as well - or an
+				// fc probe on this dialect could never measure "capable".
+				if p.toolName == "" {
+					p.toolName = tools[0].Name
+				}
+			}
 		}
 		if p.toolName == "" &&
 			(len(choice) == 0 || strings.Contains(string(choice), `"auto"`)) {
