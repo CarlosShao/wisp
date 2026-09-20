@@ -2,7 +2,7 @@
 
 **Status:** in-progress
 **Claimed by:** orchestrator -> sub-agent T17-impl
-**Last update:** 2026-09-20T00:10:30Z
+**Last update:** 2026-09-20T00:32:00Z
 **Blocked by:** 03-skeleton-runtime-rules
 **Parallel slots:** ≤2 sub-agents (A: assessor core + fusion; B: R2–R9 rule implementations +
 test matrix)
@@ -42,3 +42,4 @@ L2 (R9).
 
 ## Progress log (append-only, newest last)
 - [2026-09-20T00:10:30Z] agent=orchestrator claimed=T17-impl did=dispatched (50-min deadline window; hard stop 08:40 local, clean-unit boundary only) next=work
+- [2026-09-20T00:32:00Z] agent=T17-impl did=R1-R9 implemented (assessor.go contract+fusion+R9 recover; rules_gateway R1-R4 interface-injected dormant-until-wired; rules_network R5 full; rules_shell R6 full; rules_scale R7 full; rules_irreversible R8 full; 14 tests PASS: per-rule pos/neg/edge, panic-injection R9 x2, fusion max, Deny-beats, R4 session-override-block, 10 golden snapshots) next=integrate 18 resolver/classifier + 19 taint via With* setters; note: T18 WIP landing in parallel (pathresolver files untouched per boundary)
