@@ -30,7 +30,7 @@ CI 该步**无 `continue-on-error`** ⇒ **job 红**。
 
 ## 已完成判据（AC）
 
-- [ ] **AC#1 `mockllm.go:68` 的裸 goroutine 改走受管出口。** 现状：`internal/llm/adaptertest/mockllm.go:68`
+- [x] **AC#1 `mockllm.go:68` 的裸 goroutine 改走受管出口。** 现状：`internal/llm/adaptertest/mockllm.go:68`
   在 `cmd.Start()` 之后起一个 `go func()` 读 stdout 等 `MOCKLLM_ADDR=`，**无 owner、无 recover**（D22 禁令 #1）。
   改成 `observe.Registry.Spawn`（命名 + owner + recover 边界）。
   ⚠ **不许用 allowlist 豁免把它变绿**——那正是"为了让门闭眼而放宽门"。
@@ -80,3 +80,21 @@ CI 该步**无 `continue-on-error`** ⇒ **job 红**。
   已核对 `tools/d22scan/allowlist.txt` **无** mockllm 条目（4 行，均为 pathresolver/mirror-hash）。
   待办：AC#1 走 `observe.Registry.Spawn` + `observe.NewTimeout`（monotonic）；AC#2 种违规阳性对照 + 把误调用变响。
   未做：AC#3（编排者裁定须等票 66）、AC#4 门禁清单。
+- [2026-09-20T14:52:00Z] agent=agent-ticket67 did=**AC#1 落地并勾选**。
+  `internal/llm/adaptertest/mockllm.go`：读 stdout 等 `MOCKLLM_ADDR=` 的工作改走
+  `mockllmRegistry.Spawn("mockllm-stdout-reader", "test", spawnRoot, fn)`（包内私有
+  `observe.NewRegistry()`，**不**污染 `observe.Default` 的 resident 花名册计数）；
+  超时判定由 `time.After(20s)` 改为 `observe.NewTimeout(mockllmReadyBudget)` 的 monotonic 预算（禁令 #4/D42#9）；
+  `t.Cleanup` 提前到等待之前，失败路径同样 Kill+Wait 子进程，并 `spawnRoot.Wait(2s)` 断言 reader 已 drain（漏了就直接 `t.Errorf`）。
+  **未加任何 allowlist 条目**（`allowlist.txt` 仍 4 行）；`h.Done()` 分支把 recover 到的 panic 转回 `t.Fatal`，
+  不让它退化成 20s 挂死。
+  测量：`cd tools/d22scan && go run . -root ../../` → `d22scan: clean`，exit 0（原为 1 命中/exit 1）；
+  `gofmt -l internal/llm/adaptertest/` 空；`go vet ./internal/llm/adaptertest/` 过；
+  `go test -count=2 ./internal/llm/adaptertest/` ok；`cd tools/d22scan && go test ./...` ok（`TestScannerSelfScanOfRealRepoIsGreen` 由红转绿）。
+  变异自证（种完即撤，`grep MUTATION|bogus` 零残留）：①子进程启动即退 → 1.32s **快速失败**
+  `mockllm exited before printing its address`；②地址行永不匹配且子进程存活 → 21.30s 失败
+  `mockllm did not become ready in 20s`（证明 monotonic 预算真在兜底，不是永久挂死）。
+  已知副作用，如实登记：`Spawn` 对花名册外名字无条件 `slog.Warn`，故 mockllm 用例每次多一行
+  `WARN goroutine outside the D38 roster (leak symptom) goroutine=mockllm-stdout-reader owner=test`。
+  消除它要往 `internal/observe/goroutine.go` 的 `TemporaryNames` 加名——那是票 66 领地，本票不动；
+  也不肯借用 `disposal-worker` 之类既有名字骗过漏检器。**留给编排者裁定。**

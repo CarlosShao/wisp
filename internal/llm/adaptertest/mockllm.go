@@ -24,6 +24,21 @@ import (
 // adapters through them so fault behavior is proven against a live HTTP
 // server, not only against the in-process replayer.
 
+// mockllmReadyBudget is how long StartMockllm waits for the child to print
+// its address. It is spent through observe.Timeout, i.e. the monotonic clock
+// (D22 ban #4 / D42#9): no wall-clock difference decides readiness.
+const mockllmReadyBudget = 20 * time.Second
+
+// mockllmJoinBudget is how long cleanup waits for the stdout reader spawn to
+// drain once the child is gone.
+const mockllmJoinBudget = 2 * time.Second
+
+// mockllmRegistry is the named-goroutine registry for this helper's spawns
+// (D22 ban #1 / D38b). It is deliberately not observe.Default: a test-support
+// goroutine must not move the resident-roster numbers the product watchdog and
+// its tests read.
+var mockllmRegistry = observe.NewRegistry()
+
 // Mockllm is a running mockllm server subprocess.
 type Mockllm struct {
 	cmd  *exec.Cmd
@@ -64,29 +79,53 @@ func StartMockllm(t *testing.T) *Mockllm {
 	if err := proc.cmd.Start(); err != nil {
 		t.Fatalf("start mockllm: %v", err)
 	}
+	// Cleanup is registered before the readiness wait so every failure path
+	// below still reaps the child and joins the reader spawn.
+	spawnRoot := observe.NewRoot("adaptertest:mockllm")
 	ready := make(chan error, 1)
-	go func() {
-		sc := bufio.NewScanner(stdout)
-		for sc.Scan() {
-			if v, ok := strings.CutPrefix(sc.Text(), "MOCKLLM_ADDR="); ok {
-				proc.Base = "http://" + v
-				ready <- nil
-				return
+	h := mockllmRegistry.Spawn("mockllm-stdout-reader", "test", spawnRoot,
+		func(_ context.Context) {
+			sc := bufio.NewScanner(stdout)
+			for sc.Scan() {
+				if v, ok := strings.CutPrefix(sc.Text(), "MOCKLLM_ADDR="); ok {
+					proc.Base = "http://" + v
+					ready <- nil
+					return
+				}
 			}
+			ready <- fmt.Errorf("mockllm exited before printing its address")
+		})
+	t.Cleanup(func() {
+		_ = proc.cmd.Process.Kill() // without this, Wait blocks forever: mockllm is a server
+		_, _ = proc.cmd.Process.Wait()
+		if left := spawnRoot.Wait(mockllmJoinBudget); left != 0 {
+			t.Errorf("mockllm stdout reader still pending after cleanup: %d", left)
 		}
-		ready <- fmt.Errorf("mockllm exited before printing its address")
-	}()
+	})
+	budget := observe.NewTimeout(mockllmReadyBudget)
+	timer := time.NewTimer(budget.Remaining())
+	defer timer.Stop()
+
+	var startErr error
 	select {
-	case err := <-ready:
-		if err != nil {
-			_ = proc.cmd.Process.Kill()
-			t.Fatal(err)
+	case startErr = <-ready:
+	case <-h.Done():
+		// The reader exited without a clean handoff. Either its recover
+		// boundary caught a panic - which must reach the test as a failure,
+		// not as a 20s hang - or it delivered and returned in the same
+		// instant; the buffered channel tells the two apart.
+		if perr := h.Err(); perr != nil {
+			startErr = fmt.Errorf("mockllm stdout reader failed: %w", perr)
+		} else {
+			startErr = <-ready
 		}
-	case <-time.After(20 * time.Second):
-		_ = proc.cmd.Process.Kill()
-		t.Fatal("mockllm did not become ready in 20s")
+	case <-timer.C:
+		startErr = fmt.Errorf("mockllm did not become ready in %v", mockllmReadyBudget)
 	}
-	t.Cleanup(func() { _ = proc.cmd.Process.Kill(); _, _ = proc.cmd.Process.Wait() })
+	if startErr != nil {
+		_ = proc.cmd.Process.Kill()
+		t.Fatal(startErr)
+	}
 	return proc
 }
 
