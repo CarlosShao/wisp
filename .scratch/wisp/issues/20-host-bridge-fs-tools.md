@@ -179,6 +179,13 @@ from 10.
   pre-existing mockllm finding is gone). `internal/ball` + `cmd/balldebug` untouched, no GUI
   process launched, no `-tags winlive` run, frozen files (`docs/PLAN.md`, `docs/specs/*`,
   `internal/risk/*`) zero-diff. Commits 0986d63 + 94827e4 + e669567.
+  **MUTATION EVIDENCE (so AC#3/AC#4 are not read as self-certifying):** with
+  `os.CreateTemp` swapped for a direct `os.OpenFile(target, O_CREATE|O_WRONLY|O_TRUNC)` the two
+  kill tests go red (`D31 violated: after a mid-write kill the target holds N bytes…` and
+  `AC#3 violated: a partial file exists at the target`); with `fofALLOWUNDO` zeroed out (a
+  permanent shell delete, i.e. the unlink-shaped lie) both trash tests go red with
+  `回收站中没有出现任何新的还原记录（C:\$Recycle.Bin）：拒绝按已回收处理`. Both mutations were reverted;
+  `git status` is clean and every gate above was re-run against the committed tree.
   next=**ticket 12 (composition) or ticket 21 segment 2**: (a) build the Bridge + `approval.Gate`
   in `cmd/wisp`, and in the SAME commit replace `decideRisk`'s roster-floor refusal with the
   bridge's verdict while running the loop with a nil Journal so `tool_call` rows do not double;
