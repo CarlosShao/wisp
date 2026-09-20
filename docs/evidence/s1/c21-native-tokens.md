@@ -7,6 +7,19 @@
 （SPEC-08 §2）—— 该约束由 `TestNoHardcodedColorsInBallPackage` 机器执行（仅 `tokens.go` 允许
 出现 `rgba(` / 6 位 hex 字面量）。
 
+**⚠ 覆盖面限定（2026-09-20 编排者裁定，票 12 AC#7 复验挖出的争议 D3）**：上面那句"真相源是 `tokens.css`"
+**只适用于 CSS 有出处的行**。票 62 的液面/吸附配色里有 **36 个 look 色值在 `tokens.css` 里不存在**
+（表内已逐行标 `（无，原生自有）`）——它们是原生侧**首创**，不是复制。两类因此受**不同**的约束：
+
+| 类别 | 出处 | 一致性由谁保证 | 今天有无机器检查 |
+|---|---|---|---|
+| CSS 同源行（40 暗 + 38 亮 = 78 配色行） | `tokens.css` | 本表逐值对齐（2026-09-20 全表反向对账：**零漂移**） | **有**：`TestTokenGoldenValues`（20 条）+ `TestNoHardcodedColorsInBallPackage` |
+| 原生自有 look 色（36 行） | 仅 `tokens.go` | **只有本表这一个人工记录** | **无** |
+
+⇒ 上表第二行的"一致性由本表保证"是**弱保证**：表是文档，改了码不改表不会被任何东西抓到。
+这条缺口已登记为 **A24-D4**，完成判据是"新增行纳入某条机器断言，或在 SPEC-08 解冻时把 look 表升进
+`tokens.css`"。**在此之前不得把这 36 行当作契约级事实引用。**
+
 值格式：`rgba(r,g,b,a)` 为 CSS 通道；Go 列为 `tokens.go` 中的等价构造（`rgba()` 0..255 通道 +
 alpha，`hex()` 0xRRGGBB + alpha）。D2D 使用直通 alpha 的 `D2D1_COLOR_F`，premultiplied 仅在
 `UpdateLayeredWindow` 位图写出处派生（`Color.Premultiplied()`）。

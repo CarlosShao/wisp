@@ -499,6 +499,28 @@
   （代码改动；先决条件是 `mockllm.go:68` 清零，否则门一直红）或改写 AC#7 措辞为"design/"——**二者都要我书面裁定**；
   ②`providers.go` 三处字形改成 `PASS`/`FAIL` 文本（推荐，Windows 控制台字体不保证有这两个码位）
   或书面豁免；③AC#7 的两个半边各按上面的真实覆盖面重判。 **归属**：票 67。
+- **[A24] 票 12 AC#7 复验带出的 C21 token 表六处争议（D1–D6）：签收尺寸四方不一致 + 默认构建画的不是签收的样子** —
+  本条是**登记收敛**（票 68 的成立理由与票 12 的 AC#7 都指回这里），逐条给去向。
+  - **D1（=票 68 AC#1）`Sleeping` 尺寸四方对不上**：SPEC-08 §2 INTERIM 写 **44px**；
+    `internal/ball/statevisual.go::stateSize` 默认 56 基准 × `SleepRestRatio=0.62` = **34.72px**（下限 `SleepingRestMinPx=30`）；
+    token 表旧行写 **12px**；而 `docs/SLO.md` §A.2 实测差分化像框 **46×46 / 2103px≥8/255**
+    ⇒ 被量的那个跑法里 Sleeping 确实是 44px 级。**完成判据**：三列真值表（flag off / on 未吸附 / on 已吸附），
+    与契约不符的格子如实报不符。**SPEC-08 冻结：不许改文本凑数。**
+  - **D2（=票 68 AC#2）owner 签收的球不在默认构建里**：`statevisual.go:80` `var prototypeVisuals bool` 默认 **false**，
+    全仓唯一开启者是 `cmd/balldebug/main.go:104`（`EnablePrototypeVisuals(!*frozen)`）；
+    被门控的是 `dock_windows.go:90/114/176/206/229/245` + `liquid.go:313` + `liquid_windows.go:52/154`
+    ⇒ **默认库画 12px 微点**，我今天改的 SPEC-08 §2 描述的是**非默认配置**（这笔账是编排者欠的）。
+    **裁定**：翻转默认值使"默认构建 == 被签收的样子"，`-frozen` 留作对照逃生门；
+    ⚠ **迁移测试不是删测试**——钉旧冻结规格的那批要显式 `EnablePrototypeVisuals(false)` **保留**。
+  - **D3（已裁定并落文档）**：36 个 look 色**在 `tokens.css` 里无出处**（原生首创），而表头原文写"权威真相源 = `tokens.css`"。
+    已在 `docs/evidence/s1/c21-native-tokens.md` 表头加「覆盖面限定」块，把两类行的约束来源分开写死。**不改码**（设计面，等票 65/68）。
+  - **D4（新缺口，待认领）**：AC#7 代理补进表里的 **61 行（25 几何动效 + 36 look）无任何机器检查**
+    （`TestTokenGoldenValues` 只管 20 条配色）。**完成判据**：纳入某条机器断言（golden 或表↔码反向 grep），
+    否则它们只是人写的一篇作文。**归属**：单开小票，不塞给在跑的代理。
+  - **D5（已修，根因在我）**：票 12 票面出现"截断的重复 log 行"，是我用 `printf` 追加时 `%` 被当格式符、写了一半。
+    **教训：往文件写含 `%` 的长行一律用 Edit，不用 printf/echo。**
+  - **D6（范围裁定）**：`tokens.css` 129 条声明里 **80 条是面板/屏幕侧、原生侧无对应物** ⇒ 已在表内以「范围」块
+    **按名声明为域外**，而非补 80 行空 Go 列；重导命令在 `审计` 段。
 
 ## 已解决（resolved）
 
