@@ -79,6 +79,14 @@ All tickets are **vertical tracer bullets**; work the **frontier** (all blockers
   Sleeping 零定时器实测、多显示器实拖），默认唤起键 `Ctrl+Alt+W`→`Ctrl+Alt+Q`。
   ⚠ 62 与 64 的边界：64 只管"球能被唤起、配置改动能生效"，62 只管材质/动效/吸附；两票都不得
   为对方让路而放宽 D32 的 Sleeping 零定时器与 CPU ≤0.5% 纪律。
+- **再后补票（2026-09-20 票 62 签收轮与票 12 桌面跑之后）**：
+  **65 ball-glass-quality-rework** —— owner「赝品」判决在此消化，`blocked-on-owner`（缺参考图，
+  第一步是把图落到 `design/refs/`），SPEC-08 §2 的 INTERIM 标记只在本票被 owner 签收后方可移除；
+  **66 slo-instrument-parse-cpu-observer** —— SLO **判据仪器本身**返工（registry A14/A15）：
+  `parseSystemProcesses` 丢快照末项（state 口径从未出数、CI 两处 SLO 步骤坏着）+ `Sleeping` CPU 行
+  在树内口径下**无定义**（观测者单次读 ≈1.3ms，250ms 间隔下本身就超 0.5% 门）。
+  ⚠ **两起必须一起修**：只修前者会把 `slo-check.ps1` 从"必红"变成"约一半概率随机红"。
+  **测量类独占**，不与任何其他跑测的代理并发；**D32 阈值不得因本票改动**。
 - **状态回写（2026-09-20 复验轮）**：**10 agent-loop-core → DONE**（编排者亲自独立复验：把
   `enforceTotal` 整体退回修复前实现，被提交的终止测试 10.00s 变红，护栏为真；两处小项登记 A10-a/b）；
   **63 credential-entry-cli → DONE**，但 **AC#6 未勾、正式转票 12**（登记 A8）、**MINOR-1 未修**（登记 A9）

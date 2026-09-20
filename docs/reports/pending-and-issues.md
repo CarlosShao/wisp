@@ -347,6 +347,33 @@
   （另：代理报告称 d22scan 在 `internal/llm/adaptertest/mockllm.go:68` 有一处既有命中，
   我在 HEAD 上复跑 `tools/d22scan` 结果为 **clean**，该命中不存在，无需处理。）
 
+- **[A14] `parseSystemProcesses` 丢快照末项 ⇒ D32 的 state 口径 SLO 门从未产出过样本窗，且 CI 两处门坏着** —
+  `internal/proc/treemetrics_windows.go:240-243` 先 `if next == 0 { break }` 再解析当前项（:247-260），
+  于是**系统快照链上最后一个进程永远进不了 map**；新建进程恰在 `ActiveProcessLinks` 末尾 ⇒
+  「自己量自己」的 `wisp slo -state X` 常态 fail-closed `exit=2`。
+  **我自己独立复现（2026-09-20 21:44，同一二进制）**：无 keeper → `exit=2` 报
+  `system snapshot does not contain the sampling process`；加 keeper → 采样跑通。兄弟实现
+  `cmd/balldebug/diff_windows.go::privateWorkingSetFor` 顺序是对的（先比 pid 再 break）。
+  **影响面（三处，都在已 done 的东西上）**：①`build/slo/slo-report.json`（09-19T23:35Z，票 08 归档跑）
+  `Sleeping exit=2 / Warm exit=2 / all_pass=false` ⇒ **票 08 的 state 口径九个样本窗里一个都没有**；
+  ②`.github/workflows/ci.yml:166`（slo-smoke）与 `:196`（slo-full）**无 `continue-on-error`** ⇒ 这两处今天按进程创建顺序随机红；
+  ③票 12 AC#2 的六份 A.1 样本是靠 keeper 绕法才拿到的（口径本身带偏，见 A15）。
+  **完成判据 + 当前残缺表现登记在票 66**；修好前 `slo-check.ps1` **不得**被当成已通过的门引用。
+
+- **[A15] D32 `Sleeping` CPU 行在树内口径下**没有定义**：观测者单次读的绝对成本就等于门限本身** —
+  采样器跑在被测进程内，每次 `ReadTree` 的 CPU 被计进被测数字。**我复跑 8 个样本（票 12 那次 6 个，合计 14 个）的结论**：
+  ①同一绝对成本在两种间隔下都量到 —— 250ms 间隔跳动样本 0.5062–0.5276%（≈**1.28–1.32ms/次读**）、
+  2000ms 间隔 0.0649–0.0652%（≈**1.298–1.304ms/次读**）；
+  ②⇒ **在 250ms 间隔下「采样一次」本身就是 0.52% > 0.5% 门**，门与仪器最小可分辨量撞在同一数量级；
+  ③同配置重复跑 PASS/FAIL 随机翻转（我 5 个 10s/250ms 样本：0.0387% / 0.5838% / 0.5837% / 0.5053% / 0.2076%）
+  ⇒ **只修 A14 会把 CI 从「必红」变成「约一半概率红」**，比确定性地坏更糟；
+  ④产品侧清白：`iv250` 40 样本里 **37 个 CPU 恰为 0.0000**，与 A.2 树外实测球体 `Sleeping` **0.000%** 互证。
+  ⚠ 同时更正票 12 记录里的**解释形式**：A.1/A.4 的「CPU ∝ 读次数（118/60s=0.629%…每次读折 16–38ms）」
+  **不能作为已证事实引用**——我这次 40 次读反而比 5 次读更省（0.0387% vs 0.1032%），keeper 5→20 也无单向变化。
+  原始表数字不改写（那是当次真测），但解释以 **`docs/SLO.md` 附录 B** 为准。
+  **裁定**：票 12 AC#2 保持未勾，CPU 行判「仪器未定义」（既不 PASS 也不 FAIL），产品证据以 A.2 树外 0.000% 为准；
+  **D32 的 0.5% 阈值一字未动**。修法（把观测者移出树 / 或书面裁定「从门集里移除 CPU 行」）归**票 66**。
+
 ## 已解决（resolved）
 
 - **[H4] `web.search` 实现路径** → 2026-09-20 用户裁定：**搜索 API**，供应商 **anysearch**（用户已持有 key）。
