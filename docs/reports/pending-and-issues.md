@@ -160,7 +160,7 @@
   不能自证，故留着未勾。**当前残缺表现**：把 `api_key_ref` 接错、或 provider 侧偷偷回退读明文 config
   字段，票 63 的套件不会变红。**完成判据**已写进票 12 的新 AC 框（判据含变异检验：ref 指向不存在的
   blob 时必须走 Unconfigured 失败路径，不得静默成功）。票 12 因此从"无待消化 AC"变为"背一张外来的框"。
-- **[A9] 票 63 MINOR-1：审计轨迹断言被"收窄"开出一个假绿洞（不阻塞）** — `4477f56` 把 `unset` 的
+- **[A9] 票 63 MINOR-1：审计轨迹断言被"收窄"开出一个假绿洞（不阻塞）— 已解决 `ef026a4`（2026-09-20）** — `4477f56` 把 `unset` 的
   "forced=true 只属于强制删除"从**整缓冲 grep** 收窄成只看 `auditRecordFor(needle)` 返回的那一条记录。
   收窄修的是真污染（共享日志缓冲后前一个子测试的合法 forced=true 会误伤），但丢了旧断言的一种检测力：
   把 `forced=true` 记进**另一条不含 needle 的记录**、且强制/非强制两条分支都记，
@@ -170,6 +170,18 @@
   **完成判据**：正半边保留 `auditRecordFor`，另加全缓冲**计数**不变式（含 `forced=true` 的记录条数
   == 本测试实际执行的强制删除次数），且 M2 补丁重新 apply 后必须变红。归属：下次动 `cmd/wisp`
   时顺手做，不单独立票。
+  - **修法（判据逐条对齐）**：`cmd/wisp/secret_test.go` 新增 `countRecords(logs, needle)`（整缓冲计数，
+    与 `auditRecordFor` 并列成一对：前者答"本测试总共说过几次 X"，后者答"这一次操作记了什么"）；
+    `TestSecretUnsetRefusesWhileReferenced` 顶部显式 `trail := captureLogs(t)` 取得本测试自己的缓冲，
+    并在跑 `unset --force` 的那一处 `forcedDeletes++`，末了断言
+    `countRecords(trail, "forced=true") == forcedDeletes`。分母是本测试实际执行的强制删除次数，
+    所以共享缓冲不再构成污染（判据第 1 条满足）。既有断言一条未改、未弱化（含 856-862 行的
+    record-scoped 半边）。
+  - **变异复验**：重新 apply `ticket63-mutation-M2.patch` → `--- FAIL: TestSecretUnsetRefusesWhileReferenced`
+    `audit trail carries 4 records saying forced=true, this test performed 1 forced deletes`；
+    失败点只有新增的那一条，旧断言全绿，即这正是原洞。`git checkout -- cmd/wisp/secret.go` 还原后
+    `-run TestSecretUnset` 0.063s 全绿，全包 `go test -count=2 ./cmd/wisp/` ok 12.586s，
+    `go test -race ./cmd/wisp/` ok 8.319s。工作树无残留变异（`git status --porcelain` 已核）。
 - **[A10] 票 10 复验登记两处小项（都不阻塞 done，但不得无声消失）** —
   - **A10-a（转票 04）**：`j.startCall(ctx, …)`（`internal/agent/loop.go:585`）跑在活的 task ctx 上，
     取消若落在 executeCalls 的预记账循环里，`InsertToolCall` 失败 → `startCall` 返回 0 →
@@ -179,13 +191,36 @@
     `context.WithoutCancel`。**附加条件（本次复验新提）**：票 04 落地时必须同时补一条 `startCall` 失败的
     WARN，**只记事实不记内容**（避免踩 C28 日志不落明文）。
     完成判据：一个"任务在记账循环中被取消"的用例，断言 tool_call 行数 == 模型请求的调用数，且失败时有 WARN。
-  - **A10-b（下次动 `internal/agent/prompt.go` 时改）**：`enforceTotal` 上方注释写着
+  - **A10-b（下次动 `internal/agent/prompt.go` 时改）— 已解决 `c193ec7`（2026-09-20）**：`enforceTotal` 上方注释写着
     "Every pass must remove at least one token, so the loop terminates from any starting point"。
     **这句作为机制描述是错的**：复验用变异证明，真正的终止保证有**两条且互为冗余**——`nb > toks-1` 钳子，
     以及 `s.Budget = nb` 回写（`nb = Budget - over()` 让 Budget 以 `over()≥1` 严格递减，数轮后必然低于
     `toks`）。删任一条，`TestEnforceTotalTerminatesAtEveryWindow` **仍然全绿**（我实测：拆钳子 ok 0.041s）；
     两条都删才红。后果不是 bug 而是**误导**：后人若信了这句注释，会去删那行真正在兜底的 Budget 回写。
     完成判据：注释改为陈述两条保证各自的充分性，并补一个"删任一条即红"的变异锚定用例（或显式记录该冗余为有意设计）。
+    - **实测更正：终止保证是三条，不是两条**。除钳子与回写外，真正兜住小窗口死循环的是**候选过滤**
+      （`t <= 1` 的地板段不参与挑选 + `idx == -1` 退出）：把过滤条件改回修复前的 `t == 0`（钳子与回写都在），
+      窗口表在 window 1 挂死 → `FAIL … Sections() never returned` 10.035s。旧注释把功劳记错了一处。
+    - **实测更正二：本条登记的前提"两条都删才红"不成立**。把钳子与回写**同时**中和，
+      `TestEnforceTotalTerminatesAtEveryWindow` 仍 **ok 0.036s**——它压根不复现原始挂死。
+      换句话说这两条冗余保证在旧套件下**一点都没被锚定**，比登记里说的更危险。
+    - **做了什么**：注释重写为三条机制（各自的充分性、2/3 互为冗余、只有 1 被窗口表钉住），并在钳子与
+      回写两行就地标注 guarantee 2 / guarantee 3 与"keep both"。选项上取 **(i) 的可达部分 + (ii) 的记账**：
+      新增 `TestEnforceTotalTerminatesOnABelowBudgetSection`，直接喂给 `enforceTotal` 一个窗口表到不了的
+      状态（suffix 段 token 数低于其 granted budget：`Sections()` 会先把每段裁到自己的预算，所以进不去），
+      该状态下只有钳子能让首轮就咬、回写要空转几轮 → **锚定"这一对不能同时删"**。
+      变异矩阵（`-run TestEnforceTotal`）：删钳子 ok 0.037s、删回写 ok 0.034s、两条都删
+      `--- FAIL: TestEnforceTotalTerminatesOnABelowBudgetSection (5.00s)`（窗口表那一条此时仍绿，正是登记的症状）。
+    - **为何不写"删任一条即红"的两条单独锚定用例**：能区分二者的可观测量只有*轮数*（需给生产码加计数器）
+      与*回写后的 `s.Budget` 字段值*（一段 10 token 的文本挂着 64 的预算并不违反任何契约，现有断言
+      `used <= s.Budget` 两种设计都满足）。钉这两个都等于钉实现细节，任何等价的优雅重构都会误红——
+      即协调者所说的"钉一条它自己到不了的分支，负价值"。故按完成判据的后一支，把冗余显式记为
+      **deliberate defense-in-depth**，并把"删任一条仍绿、两条都删新用例挂死"写进注释，让下一个动手的人
+      拿到的是可核对的事实而不是一句错的口号。
+    - 门禁：`gofmt -l` 对四个改动文件无输出；`go vet ./cmd/wisp/ ./internal/agent/` 干净；
+      `go test -count=2 ./cmd/wisp/ ./internal/agent/` ok（wisp 12.586s / agent 2.477s）；
+      `go test -race -count=1` ok（wisp 8.319s / agent 2.886s）。所有变异均以
+      `git checkout -- <该一个文件>` 或备份文件还原，`git status --porcelain` 复核无残留。
 - **[A11] 票 11 AC#6：探针会测量已证明，但生产装配根还没调它（转票 12，不是转 owner）** —
   `llm.RunProbeSuite`（`internal/llm/probe_health.go`）+ 9 个用例已入库（`43f9a53`/`a355bf6` 同族），
   验收方独立复核结论：**判据仪器没被改过**（`capability_test.go` 在 git 历史里只出现过一次，即它被新增的那次），
