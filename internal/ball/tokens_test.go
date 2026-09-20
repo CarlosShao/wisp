@@ -256,25 +256,30 @@ func TestSleepingSizeTruthTable(t *testing.T) {
 // the >=8 count is the area of a disc of radius 1.5*SizePx/2.
 //
 // Recorded for this exact configuration (default 56, 96 DPI, window edge 72,
-// prototype on, undocked): 2120 px in
+// prototype on, undocked) by three independent runs: 2098 px in
+// docs/evidence/s1/62-diff-glass/diff-table.txt, 2120 px in
 // docs/evidence/s1/62-diff-signoff/diff-table.txt and 2103 px in docs/SLO.md
 // A.2. Column ② (34.72px) predicts 2130. A 44px body predicts 3421, unclipped
 // by that same window - so SPEC-08 §2's "直径 44px" cannot be the body of the
-// frame that produced either number. The 44 and 46 the evidence calls the
-// imaging box are the >=24/255 cut INSIDE the same halo, and they wobble by
-// 2px between runs: that box is what got read as a diameter.
+// frame that produced ANY of those rows. The 40x38, 44x44 and 46x46 the three
+// runs report as the imaging box are the >=24/255 cut INSIDE that same halo,
+// and that column is the unstable one: it moved 6px across runs that drew the
+// same frame. The frozen dot (column ①, docs/evidence/s1/62-diff-baseline) has
+// no box at all, because not one pixel moved >=8/255 (max delta 4/255).
 func TestRecordedSleepingDiffBoxIsNotA44pxBody(t *testing.T) {
 	// 1.5*R is drawGlass's halo fill; 34.72/2 is column ②'s radius.
 	haloPx := func(sizePx float64) float64 {
 		r := 1.5 * sizePx / 2
 		return math.Pi * r * r
 	}
-	const measured = 2120 // A.2 recorded 2103 for the same posture
-	if got := haloPx(BallSizeDefaultPx * SleepRestRatio); math.Abs(got-measured)/measured > 0.02 {
-		t.Errorf("column ② predicts %.0f imaged px, want within 2%% of the recorded %d", got, measured)
-	}
-	if got := haloPx(44); got < measured*1.5 {
-		t.Errorf("a 44px body must predict far MORE imaged px than the evidence recorded, got %.0f vs %d", got, measured)
+	// Every recorded px_delta_ge8 for a prototype-mode, undocked Sleeping orb.
+	for _, measured := range []float64{2098, 2103, 2120} {
+		if got := haloPx(BallSizeDefaultPx * SleepRestRatio); math.Abs(got-measured)/measured > 0.02 {
+			t.Errorf("column ② predicts %.0f imaged px, want within 2%% of the recorded %.0f", got, measured)
+		}
+		if got := haloPx(44); got < measured*1.5 {
+			t.Errorf("a 44px body must predict far MORE imaged px than the evidence recorded, got %.0f vs %.0f", got, measured)
+		}
 	}
 }
 
