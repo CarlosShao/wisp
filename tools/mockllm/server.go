@@ -24,10 +24,42 @@ type Server struct {
 
 	goldenCur map[string]int // golden name -> next response section index
 
+	// caps is the capability-emulation mode (ticket 11 AC#6): "broken" makes
+	// the synthesis honestly fail one capability (no forced tool call, 400 on
+	// image input) so the probe suite can be proven to MEASURE rather than
+	// echo. Honored on all three dialects (chat / messages / responses); the
+	// golden replay path ignores it, so ticket 09's byte pins are unaffected.
+	// Default (empty) = "capable" everywhere. Reset by /__control/reset.
+	caps capabilityMode
+
 	// lastRequest keeps the most recent body per route (ticket 11: cache
 	// breakpoint / probe assertions read it back). Only routes that call
 	// recordRequest contribute; the chat route is untouched.
 	lastRequest map[string]recordedRequest
+}
+
+// capabilityMode is the /__control/capability state. Each field is "capable"
+// (default), "broken", or "" (== capable).
+type capabilityMode struct {
+	FC     string `json:"fc"`
+	Vision string `json:"vision"`
+}
+
+func (c capabilityMode) fcBroken() bool     { return c.FC == "broken" }
+func (c capabilityMode) visionBroken() bool { return c.Vision == "broken" }
+
+// capability returns the current mode with defaults filled in.
+func (s *Server) capability() capabilityMode {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	c := s.caps
+	if c.FC == "" {
+		c.FC = "capable"
+	}
+	if c.Vision == "" {
+		c.Vision = "capable"
+	}
+	return c
 }
 
 // recordedRequest is one captured request body plus the headers the assertions
@@ -64,6 +96,7 @@ func (s *Server) Register(mux *http.ServeMux) {
 	mux.HandleFunc("POST /__control/fail_next", s.handleFailNext)
 	mux.HandleFunc("POST /__control/latency", s.handleLatency)
 	mux.HandleFunc("POST /__control/truncate", s.handleTruncate)
+	mux.HandleFunc("POST /__control/capability", s.handleCapability)
 	mux.HandleFunc("POST /__control/reset", s.handleReset)
 	mux.HandleFunc("GET /__control/state", s.handleState)
 	mux.HandleFunc("GET /__control/last_request", s.handleLastRequest)

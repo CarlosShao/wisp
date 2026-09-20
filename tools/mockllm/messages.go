@@ -71,6 +71,9 @@ type msgPlan struct {
 	reason   string
 	toolName string
 	toolArgs string
+	// image records that the last user turn carried an image block: the
+	// capability emulation reads it to answer like a non-vision model.
+	image bool
 }
 
 func planMessagesFrom(messages []msgMessage, tools []msgTool, choice json.RawMessage) msgPlan {
@@ -106,6 +109,7 @@ func planMessagesFrom(messages []msgMessage, tools []msgTool, choice json.RawMes
 			p.answer = p.answer[:400]
 		}
 	}
+	p.image = image
 	if strings.Contains(text, "[think]") {
 		p.reason = "thinking about: " + text
 		if len(p.reason) > 200 {
@@ -175,6 +179,20 @@ func (s *Server) handleMessages(w http.ResponseWriter, r *http.Request) {
 	}
 
 	p := planMessagesFrom(req.Messages, req.Tools, req.Choice)
+	// Capability emulation (ticket 11 AC#6), Messages dialect: the Anthropic
+	// shape of the same two honest failures a real provider produces. It runs
+	// AFTER the golden branch, so byte-pinned replay can never be disturbed.
+	caps := s.capability()
+	if caps.visionBroken() && p.image {
+		writeJSONError(w, http.StatusBadRequest,
+			"mockllm capability mode: vision=broken rejects image input")
+		return
+	}
+	if caps.fcBroken() && p.toolName != "" {
+		// A model without tool use silently ignores a forced tool_choice:
+		// same text answer, no tool_use block, stop_reason end_turn.
+		p.toolName, p.toolArgs = "", ""
+	}
 	promptTokens := 12 + len(string(body))/200
 	completionTokens := len(p.answer)/4 + len(p.toolArgs)/4 + 1
 	msgID := s.reqID("msg")

@@ -74,12 +74,57 @@ func (s *Server) handleTruncate(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, map[string]any{"truncate_after_chunks": req.Chunks})
 }
 
+// POST /__control/capability {"fc":"broken"|"capable", "vision":...}
+// Emulates a provider whose advertised capability is actually broken
+// (ticket 11 AC#6): fc=broken never answers a forced tool_choice with a tool
+// call (text only, on all three dialects); vision=broken 400s any request
+// carrying image input (again on all three dialects), exactly like a
+// non-vision model. Omitted fields are unchanged; golden replay is
+// byte-pinned and ignores this mode (pinned by
+// TestCapabilityModeCannotLeakIntoGoldenReplay).
+//
+// The mode is ATOMIC: every field is validated before ANY field is mutated,
+// so a rejected request can never leave the server in a capability state
+// nobody asked for.
+func (s *Server) handleCapability(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		FC     *string `json:"fc"`
+		Vision *string `json:"vision"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeJSONError(w, http.StatusBadRequest, "capability body: "+err.Error())
+		return
+	}
+	valid := map[string]bool{"capable": true, "broken": true}
+	// Validation phase: no writes to s.caps in here.
+	if req.FC != nil && !valid[*req.FC] {
+		writeJSONError(w, http.StatusBadRequest, "capability.fc must be capable|broken")
+		return
+	}
+	if req.Vision != nil && !valid[*req.Vision] {
+		writeJSONError(w, http.StatusBadRequest, "capability.vision must be capable|broken")
+		return
+	}
+	// Mutation phase: both fields are known good (or absent) by now.
+	s.mu.Lock()
+	if req.FC != nil {
+		s.caps.FC = *req.FC
+	}
+	if req.Vision != nil {
+		s.caps.Vision = *req.Vision
+	}
+	s.mu.Unlock()
+	c := s.capability() // defaults filled in, read back rather than echoed
+	writeJSON(w, map[string]any{"fc": c.FC, "vision": c.Vision})
+}
+
 // POST /__control/reset clears every injection and counter.
 func (s *Server) handleReset(w http.ResponseWriter, r *http.Request) {
 	s.mu.Lock()
 	s.faults = nil
 	s.latency = 0
 	s.truncate = 0
+	s.caps = capabilityMode{}
 	s.mu.Unlock()
 	s.resetGolden()
 	writeJSON(w, map[string]any{"reset": true})
@@ -117,6 +162,7 @@ func (s *Server) handleState(w http.ResponseWriter, r *http.Request) {
 		"queued_faults":         queued,
 		"latency_ms":            lat,
 		"truncate_after_chunks": trunc,
+		"capabilities":          s.capability(),
 	})
 }
 

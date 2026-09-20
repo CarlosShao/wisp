@@ -34,8 +34,27 @@ func (s *Server) handleChat(w http.ResponseWriter, r *http.Request) {
 		s.serveGoldenChat(w, r, name)
 		return
 	}
+	// Capability emulation (ticket 11 AC#6): a vision-broken provider 400s
+	// image input exactly like a real non-vision model does.
+	if caps := s.capability(); caps.visionBroken() && chatLastUserHasImage(&req) {
+		writeJSONError(w, http.StatusBadRequest,
+			"mockllm capability mode: vision=broken rejects image input")
+		return
+	}
 	lat, trunc, _ := s.snapshot()
 	s.synthChat(w, &req, lat, trunc)
+}
+
+// chatLastUserHasImage reports whether the most recent user turn carries an
+// image_url content part (the same view planChat answers from).
+func chatLastUserHasImage(req *chatRequest) bool {
+	last := chatContent{}
+	for _, m := range req.Messages {
+		if m.Role == "user" {
+			last = decodeChatContent(m.Content)
+		}
+	}
+	return last.image
 }
 
 type chatRequest struct {
@@ -161,16 +180,19 @@ func planChat(req *chatRequest) (answer string, toolName string, toolArgs string
 					toolName = req.Tools[0].Function.Name
 				}
 			}
-			return // bare string handled
-		}
-		var obj struct {
-			Type     string `json:"type"`
-			Function struct {
-				Name string `json:"name"`
-			} `json:"function"`
-		}
-		if err := json.Unmarshal(req.ToolChoice, &obj); err == nil && obj.Type == "function" {
-			toolName = obj.Function.Name
+			// A bare-string tool_choice must still fall through to the shared
+			// tail below (toolArgs + finish), or the probe sees a tool name
+			// with no arguments and no tool_calls finish reason.
+		} else {
+			var obj struct {
+				Type     string `json:"type"`
+				Function struct {
+					Name string `json:"name"`
+				} `json:"function"`
+			}
+			if err := json.Unmarshal(req.ToolChoice, &obj); err == nil && obj.Type == "function" {
+				toolName = obj.Function.Name
+			}
 		}
 	}
 	if toolName != "" {
@@ -198,6 +220,14 @@ func estimateTokens(b []byte) int { return len(b) / 4 }
 
 func (s *Server) synthChat(w http.ResponseWriter, req *chatRequest, lat int, trunc int) {
 	answer, toolName, toolArgs, reasoning, finish := planChat(req)
+	if s.capability().fcBroken() && toolName != "" {
+		// fc=broken emulates a model that silently ignores a forced
+		// tool_choice: same text answer, no tool_calls block.
+		toolName, toolArgs = "", ""
+		if finish == "tool_calls" {
+			finish = "stop"
+		}
+	}
 	reqID := s.reqID("chatcmpl")
 	created := time.Now().UTC().Unix()
 
@@ -247,7 +277,7 @@ func (s *Server) synthChat(w http.ResponseWriter, req *chatRequest, lat int, tru
 		}
 	}
 	// 4. text chunks
-	for _, piece := range splitChunks(answer, 16) {
+	for _, piece := range splitChunks(answer, synthTextPieceRunes) {
 		if !sse.chunk(chunkBase(reqID, created, req.Model, map[string]any{"content": piece})) {
 			return
 		}
@@ -302,6 +332,16 @@ func chatUsage(answer, toolArgs string, req *chatRequest) usageBlock {
 	u.TotalTokens = u.PromptTokens + u.CompletionTokens
 	return u
 }
+
+// synthTextPieceRunes is how many runes the CHAT synthesis puts in one
+// content delta. It is deliberately wide (a whole clause per frame) so a
+// consumer that greps the raw body without an SSE assembler - the in-module
+// capability tests, ticket 11 AC#6 - can still recognise the degraded text
+// answer; long answers stream in many deltas, which is what the
+// pacing/truncation fixtures exercise. The Messages and Responses dialects
+// keep their own 16-rune pacing: their /__control/truncate cases are pinned
+// to those event counts.
+const synthTextPieceRunes = 48
 
 // splitChunks cuts s into rune-safe pieces of about n runes.
 func splitChunks(s string, n int) []string {

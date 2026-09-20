@@ -77,6 +77,15 @@ func (s *Server) handleResponses(w http.ResponseWriter, r *http.Request) {
 
 	items := respInputItems(req.Input)
 	text, image, thought := lastRespUserText(items)
+	// Capability emulation (ticket 11 AC#6), Responses dialect: the same two
+	// honest failures a real provider produces, in this protocol's shape.
+	// Runs AFTER the golden branch, so byte-pinned replay is untouched.
+	caps := s.capability()
+	if caps.visionBroken() && image {
+		writeJSONError(w, http.StatusBadRequest,
+			"mockllm capability mode: vision=broken rejects image input")
+		return
+	}
 	answer := "echo: " + text
 	if image {
 		answer = "vision-ok"
@@ -111,6 +120,11 @@ func (s *Server) handleResponses(w http.ResponseWriter, r *http.Request) {
 			}
 			toolArgs = fmt.Sprintf(`{"text":%s}`, mustJSONString(argText))
 		}
+	}
+	if caps.fcBroken() && toolName != "" {
+		// No function-calling support: the forced tool_choice is silently
+		// ignored and the turn answers as an ordinary message item.
+		toolName, toolArgs = "", ""
 	}
 
 	inTokens := 12 + len(string(body))/200
