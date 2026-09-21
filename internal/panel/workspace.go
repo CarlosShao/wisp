@@ -61,8 +61,10 @@ func WorkspaceViewFromRoot(root string) WorkspaceView {
 	if strings.TrimSpace(root) == "" {
 		return UnsetWorkspaceView()
 	}
-	return WorkspaceView{Set: true, Canonical: root,
-		Reason: "已收窄到该工作区：范围外的路径按 R2 判定"}
+	return WorkspaceView{
+		Set: true, Canonical: root,
+		Reason: "已收窄到该工作区：范围外的路径按 R2 判定",
+	}
 }
 
 // RequestWorkspaceSwitch performs one workspace switch and audits it.

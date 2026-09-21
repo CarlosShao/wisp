@@ -162,9 +162,11 @@ func TestRefusesUnsupportedAndMasqueradingInputsLoudly(t *testing.T) {
 	t.Run("path-injection file name is refused and nothing is written", func(t *testing.T) {
 		before := f.puts
 		for _, name := range []string{`..\evil.png`, `C:\Windows\temp\evil.png`, `sub/ok.png`, `....`, `x.png.`} {
-			src := AttachmentSource{DisplayName: name, DeclaredMIME: "image/png",
+			src := AttachmentSource{
+				DisplayName: name, DeclaredMIME: "image/png",
 				SizeBytes: int64(len(pngBytes)),
-				Open:      func() (io.ReadCloser, error) { return io.NopCloser(bytes.NewReader(pngBytes)), nil }}
+				Open:      func() (io.ReadCloser, error) { return io.NopCloser(bytes.NewReader(pngBytes)), nil },
+			}
 			ref, err := b.Ingest(context.Background(), src)
 			requireRefused(t, ref, err, "裸文件名")
 		}
@@ -203,11 +205,13 @@ func TestRefusesUnsupportedAndMasqueradingInputsLoudly(t *testing.T) {
 	})
 
 	t.Run("a source lying about its size is refused mid-read, not truncated", func(t *testing.T) {
-		src := AttachmentSource{DisplayName: "liar.png", DeclaredMIME: "image/png", SizeBytes: 4,
+		src := AttachmentSource{
+			DisplayName: "liar.png", DeclaredMIME: "image/png", SizeBytes: 4,
 			Open: func() (io.ReadCloser, error) {
 				return io.NopCloser(io.MultiReader(bytes.NewReader(pngBytes), bytes.NewReader(pngBytes),
 					bytes.NewReader(pngBytes), bytes.NewReader(pngBytes))), nil
-			}}
+			},
+		}
 		// SizeBytes lies small; the broker's bound is its own max, so this must
 		// still be judged on the bytes it actually got: 64 bytes, a real png
 		// header, stored - the point of the case is that the stored size is the

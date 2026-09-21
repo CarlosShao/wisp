@@ -209,8 +209,10 @@ func TestComposerStateSurvivesPanelCloseAndReopen(t *testing.T) {
 	now := time.Date(2026, 9, 21, 12, 0, 0, 0, time.UTC)
 	state := NewComposerState(risk.ModeAskHighRisk, WorkspaceView{
 		Set: true, Spelling: `~/notes`, Canonical: `D:\work\notes`, Rewritten: true,
-	}, []AttachmentRef{{ID: "att-1", Name: "shot.png", MIME: "image/png", Kind: "image",
-		SizeBytes: 1234, Artifact: "attachment-0011223344556677.png", Stored: true}}, MaxAttachmentBytes)
+	}, []AttachmentRef{{
+		ID: "att-1", Name: "shot.png", MIME: "image/png", Kind: "image",
+		SizeBytes: 1234, Artifact: "attachment-0011223344556677.png", Stored: true,
+	}}, MaxAttachmentBytes)
 	if state.Workspace.Rewritten != true {
 		t.Fatal("fixture premise broken")
 	}
@@ -242,8 +244,10 @@ func TestComposerStateSurvivesPanelCloseAndReopen(t *testing.T) {
 // TestUnknownModeNeverRendersAsASafeOne is the fail-closed half of AC#4: when
 // native cannot read the mode, the panel must show that, not the default.
 func TestUnknownModeNeverRendersAsASafeOne(t *testing.T) {
-	s := NewSnapshot(nil, nil, ComposerState{Workspace: WorkspaceView{
-		Reason: "未选择工作区"},
+	s := NewSnapshot(nil, nil, ComposerState{
+		Workspace: WorkspaceView{
+			Reason: "未选择工作区",
+		},
 	}, time.Now())
 	if s.Composer.Mode.Current != "unknown" {
 		t.Errorf("an unreadable mode rendered as %q, want \"unknown\"", s.Composer.Mode.Current)
@@ -301,6 +305,12 @@ func TestNoGitSwitchCapabilityInThePanelSurface(t *testing.T) {
 		if strings.HasSuffix(p, "_test.go") || strings.HasSuffix(p, ".test.ts") || strings.HasSuffix(p, ".test.tsx") {
 			return false
 		}
+		// AC#7's file set is deliberately NOT widened to .js/.mjs: the acceptance
+		// round's R-92-1 is about the mode-write door, and measuring this very
+		// predicate with rendererSourceFile(p) went red on
+		// frontend/scripts/vendor-shadcn.mjs:2, a build script whose comment only
+		// mentions "git checkout". Capability entry points are pinned structurally
+		// by TestTheRendererHoldsExactlyOneDoorToTheHost, not by more prose surface.
 		return strings.HasSuffix(p, ".ts") || strings.HasSuffix(p, ".tsx") ||
 			strings.HasSuffix(p, ".css") || strings.HasSuffix(p, ".html")
 	})
@@ -345,6 +355,234 @@ func reMatchesInFile(re *regexp.Regexp, path string) []string {
 	return out
 }
 
+// rendererSourceFile is the file set the renderer can actually load: the text
+// types tools/d22scan walks under frontend/, which is wider than the trio
+// (.ts/.tsx/.css) door 2 used to open. R-92-1's first shape is a route spelled in
+// a plain .js file, a file the old filter never read at all.
+//
+// frontend/dist is excluded on purpose, not by omission: it is generated output,
+// so a gate over it would flip red and green with whether somebody re-ran
+// npm run build rather than with what the source says (this ticket has not
+// rebuilt it - see its residual 3). scripts/d22scan.sh already walks dist for
+// ban #6, and no bundle can hold a call site its own source tree did not
+// already contain, so the structural nails below reach dist without reading
+// generated text.
+func rendererSourceFile(p string) bool {
+	switch filepath.Ext(p) {
+	case ".ts", ".tsx", ".js", ".mjs", ".jsx", ".css", ".html":
+		return true
+	}
+	return false
+}
+
+// hostBridgeCallRe matches a CALL into a postMessage-style host bridge. The
+// leading dot is required, so panel.ts's own interface declaration
+// "postMessage(message: string): void;" is not counted as a call site.
+var hostBridgeCallRe = regexp.MustCompile(`\.\s*postMessage\s*\(`)
+
+// dottedJoinRe matches a name assembled at runtime out of pieces
+// (["panel","mode","set"] then parts.join(".")) - the shape no literal regex can
+// see however wide its extension set gets, so it is nailed by its own syntax.
+var dottedJoinRe = regexp.MustCompile(`\.join\(\s*["']\.["']\s*\)`)
+
+// computedSendRequestRe matches sendRequest( whose first argument is not a
+// string literal: the remaining way to route the panel's one envelope towards a
+// method the source never names.
+var computedSendRequestRe = regexp.MustCompile("sendRequest\\(\\s*(?:[A-Za-z_$][\\w$]*|`|\\[)")
+
+// routeLiteralRe pulls every "panel.<something>" string literal out of a line.
+var routeLiteralRe = regexp.MustCompile(`"panel\.[A-Za-z.]+"`)
+
+// rendererDoorReport is one run of the structural scan.
+type rendererDoorReport struct {
+	callSites []string // every host call site in the tree
+	outside   []string // ... of which: not inside src/lib/panel.ts
+	assembly  []string // route names built at runtime
+	computed  []string // sendRequest called with a non-literal route
+	unknown   []string // a "panel.*" literal the Go side does not answer
+	files     int
+}
+
+// composerRouteLiterals is the closed vocabulary the renderer may name. Growing
+// it is a two-sided change on purpose: adding a route has to touch the Go side
+// that answers it for this set to accept it.
+func composerRouteLiterals() map[string]bool {
+	return map[string]bool{
+		`"` + MethodModeRequest + `"`:      true,
+		`"` + MethodWorkspaceRequest + `"`: true,
+		`"` + MethodAttachmentAdd + `"`:    true,
+		`"` + MethodMessageSend + `"`:      true,
+		// The approval card's route, whose exact spelling is pinned by
+		// TestFrontendComposerRequestsMatchTheEnvelope.
+		`"panel.approval.request"`: true,
+	}
+}
+
+// scanRendererHostDoors runs the structural nails over one frontend/src tree. It
+// takes a directory rather than the repo root so the planted-shape case can point
+// the same instrument at a tree that is knowingly wrong.
+func scanRendererHostDoors(t *testing.T, srcDir string) rendererDoorReport {
+	t.Helper()
+	allowed := composerRouteLiterals()
+	rep := rendererDoorReport{}
+	err := filepath.WalkDir(srcDir, func(p string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			switch d.Name() {
+			case "node_modules", ".git", "dist":
+				return fs.SkipDir
+			}
+			return nil
+		}
+		if !rendererSourceFile(p) {
+			return nil
+		}
+		data, err := os.ReadFile(p)
+		if err != nil {
+			return err
+		}
+		rep.files++
+		rel := filepath.ToSlash(p)
+		if i := strings.Index(rel, "/frontend/"); i >= 0 {
+			rel = rel[i+len("/frontend/"):]
+		} else {
+			rel = filepath.Base(p)
+		}
+		inPanelLib := strings.HasSuffix(rel, "src/lib/panel.ts")
+		for i, raw := range strings.Split(string(data), "\n") {
+			line := codeOnly(raw)
+			if line == "" {
+				continue
+			}
+			at := rel + ":" + strconv.Itoa(i+1) + ": " + line
+			if hostBridgeCallRe.MatchString(line) {
+				rep.callSites = append(rep.callSites, at)
+				if !inPanelLib {
+					rep.outside = append(rep.outside, at)
+				}
+			}
+			if dottedJoinRe.MatchString(line) {
+				rep.assembly = append(rep.assembly, at)
+			}
+			if strings.Contains(line, "function sendRequest") {
+				continue
+			}
+			if computedSendRequestRe.MatchString(line) {
+				rep.computed = append(rep.computed, at)
+			}
+			for _, lit := range routeLiteralRe.FindAllString(line, -1) {
+				if !allowed[lit] {
+					rep.unknown = append(rep.unknown, at+" names "+lit)
+				}
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("walk %s: %v", srcDir, err)
+	}
+	return rep
+}
+
+// TestTheRendererHoldsExactlyOneDoorToTheHost is AC#1 nailed structurally instead
+// of lexically, and it is the answer to R-92-1: door 2 was a literal scan over
+// three extensions and the "two postMessage call sites" nail counted inside
+// panel.ts alone, so a .js file sending panel.mode.set and a route assembled at
+// runtime both walked through. What is pinned here instead is the reachability
+// set - which file may talk to the host at all, and which words it may say - so
+// neither shape survives regardless of how the method name is spelled.
+//
+//	(i)   every .postMessage( call site under frontend/src lives in lib/panel.ts,
+//	      and there are exactly two of them;
+//	(ii)  no dotted name is assembled at runtime anywhere in the renderer;
+//	(iii) sendRequest is never called with a computed route;
+//	(iv)  every "panel.*" literal is one the Go side answers.
+func TestTheRendererHoldsExactlyOneDoorToTheHost(t *testing.T) {
+	root := panelRepoRoot(t)
+	rep := scanRendererHostDoors(t, filepath.Join(root, "frontend", "src"))
+	if len(rep.outside) != 0 {
+		t.Errorf("the renderer reaches the host from outside src/lib/panel.ts; there is no second channel in this design"+
+			" (ticket 92 AC#1, R-92-1):%s", "\n  "+strings.Join(rep.outside, "\n  "))
+	}
+	if len(rep.callSites) != 2 {
+		t.Errorf("host call sites in frontend/src = %d, want 2 (the approval request and sendRequest):%s",
+			len(rep.callSites), "\n  "+strings.Join(rep.callSites, "\n  "))
+	}
+	if len(rep.assembly) != 0 {
+		t.Errorf("a dotted route name is assembled at runtime, which is a method name the source never states and no"+
+			" literal gate can judge:%s", "\n  "+strings.Join(rep.assembly, "\n  "))
+	}
+	if len(rep.computed) != 0 {
+		t.Errorf("sendRequest is called with a computed route; the envelope's method must be a literal so the"+
+			" vocabulary stays closed:%s", "\n  "+strings.Join(rep.computed, "\n  "))
+	}
+	if len(rep.unknown) != 0 {
+		t.Errorf("the renderer names a route the Go side does not answer:%s", "\n  "+strings.Join(rep.unknown, "\n  "))
+	}
+	t.Logf("renderer door held: %d files scanned, %d host call sites (all in src/lib/panel.ts), %d panel.* route literals",
+		rep.files, len(rep.callSites), len(composerRouteLiterals()))
+}
+
+// TestPlantedRendererDoorShapesGoRed is AC#1's positive nail for the two shapes
+// the acceptance round measured as GREEN under the old instruments: a
+// panel.mode.set sent from a plain .js file, and the same route assembled at
+// runtime from an array. Both are planted into a copy of the real tree, so the
+// run also shows the clean half still passes.
+func TestPlantedRendererDoorShapesGoRed(t *testing.T) {
+	root := panelRepoRoot(t)
+	real := filepath.Join(root, "frontend", "src")
+	dir := t.TempDir()
+	// Carry the honest half along, otherwise "outside panel.ts" would be red for
+	// the wrong reason (no panel.ts at all).
+	os.MkdirAll(filepath.Join(dir, "frontend", "src", "lib"), 0o755)
+	data, err := os.ReadFile(filepath.Join(real, "lib", "panel.ts"))
+	if err != nil {
+		t.Fatalf("read src/lib/panel.ts: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "frontend", "src", "lib", "panel.ts"), data, 0o644); err != nil {
+		t.Fatalf("plant panel.ts: %v", err)
+	}
+	// Shape A: the extension door 2 never opened, spelling a banned route.
+	plantA := `window.chrome.webview.postMessage(JSON.stringify({ method: "panel.mode.set", to: "auto_approve" }));`
+	// Shape B: no banned token anywhere in the text; the name is built at runtime.
+	plantB := "const parts = [\"panel\", \"mode\", \"set\"];\n" +
+		"const route = parts.join(\".\");\n" +
+		"window.chrome?.webview.postMessage(JSON.stringify({ method: route }));\n"
+	write := func(name, body string) {
+		t.Helper()
+		if err := os.WriteFile(filepath.Join(dir, "frontend", "src", name), []byte(body+"\n"), 0o644); err != nil {
+			t.Fatalf("plant %s: %v", name, err)
+		}
+	}
+	write("ac92-plant-a.js", plantA)
+	write("ac92-plant-c.ts", plantB)
+
+	rep := scanRendererHostDoors(t, filepath.Join(dir, "frontend", "src"))
+	if len(rep.outside) < 2 {
+		t.Errorf("shape A and shape B each add a host call site outside src/lib/panel.ts; the scan found %d:%s",
+			len(rep.outside), "\n  "+strings.Join(rep.outside, "\n  "))
+	}
+	if len(rep.assembly) != 1 {
+		t.Errorf("shape B's runtime-assembled route = %d hits, want 1:%s",
+			len(rep.assembly), "\n  "+strings.Join(rep.assembly, "\n  "))
+	}
+	if len(rep.unknown) != 1 || !strings.Contains(rep.unknown[0], "panel.mode.set") {
+		t.Errorf("shape A's route literal should be named once, got %v", rep.unknown)
+	}
+	// The widened door 2 must also reach a .js file now: this is the half R-92-1
+	// measured as invisible, and it is fixed by extension, not by loosening.
+	hits := scanComposerPermissionWrites(t, filepath.Join(dir, "frontend"))
+	if len(hits) == 0 {
+		t.Error("door 2 read neither plant: its extension set is still narrower than what the renderer loads")
+	} else if !strings.Contains(strings.Join(hits, "\n"), "ac92-plant-a.js") {
+		t.Errorf("door 2 must name the planted .js file, got %v", hits)
+	}
+	t.Logf("red as required: %d outside call sites, %d assembled routes, %d unknown literals, door 2 named %d line(s)",
+		len(rep.outside), len(rep.assembly), len(rep.unknown), len(hits))
+}
+
 // scanComposerPermissionWrites applies BOTH doors to one tree and returns the
 // offending lines (empty = clean).
 //
@@ -370,7 +608,7 @@ func scanComposerPermissionWrites(t *testing.T, root string) []string {
 			}
 			return nil
 		}
-		if !strings.HasSuffix(p, ".ts") && !strings.HasSuffix(p, ".tsx") && !strings.HasSuffix(p, ".css") {
+		if !rendererSourceFile(p) {
 			return nil
 		}
 		if hits := reMatchesInFile(panelDecisionIdentifierRe, p); len(hits) > 0 {
@@ -453,8 +691,10 @@ func TestComposerRenderFixtureTellsTheTruth(t *testing.T) {
 		}
 		blocks[strings.TrimSpace(name)] = body
 	}
-	for _, name := range []string{"no host attached", "workspace chosen, video stored",
-		"unsupported attachment told to the user"} {
+	for _, name := range []string{
+		"no host attached", "workspace chosen, video stored",
+		"unsupported attachment told to the user",
+	} {
 		if _, ok := blocks[name]; !ok {
 			t.Errorf("the render fixture has no block for %q - the harness and this test disagree "+
 				"about which states are evidenced", name)

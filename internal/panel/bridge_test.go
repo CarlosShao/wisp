@@ -55,8 +55,10 @@ func TestComposerEnvelopeAcceptsItsFourRequests(t *testing.T) {
 	}{
 		{MethodModeRequest, map[string]any{"to": "auto_approve"}},
 		{MethodWorkspaceRequest, map[string]any{"path": `D:\work\Wisp`}},
-		{MethodAttachmentAdd, map[string]any{"name": "a.png", "declaredMime": "image/png",
-			"sizeBytes": 16, "dataBase64": "iVBORw0KGgo="}},
+		{MethodAttachmentAdd, map[string]any{
+			"name": "a.png", "declaredMime": "image/png",
+			"sizeBytes": 16, "dataBase64": "iVBORw0KGgo=",
+		}},
 		{MethodMessageSend, map[string]any{"text": "看看这个"}},
 	}
 	for _, tc := range cases {
@@ -133,8 +135,10 @@ func TestFrontendComposerRequestsMatchTheEnvelope(t *testing.T) {
 		t.Fatalf("read frontend/src/lib/panel.ts: %v", err)
 	}
 	text := string(data)
-	for _, m := range []string{MethodModeRequest, MethodWorkspaceRequest,
-		MethodAttachmentAdd, MethodMessageSend} {
+	for _, m := range []string{
+		MethodModeRequest, MethodWorkspaceRequest,
+		MethodAttachmentAdd, MethodMessageSend,
+	} {
 		if !strings.Contains(text, `"`+m+`"`) {
 			t.Errorf("frontend never emits %q - the Go side parses a method nobody sends", m)
 		}

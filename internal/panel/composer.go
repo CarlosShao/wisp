@@ -61,7 +61,8 @@ type ResultChunk struct {
 // WebView process that dies - recovers exactly what Go holds rather than an
 // empty input row that invites the user to assume the default.
 func NewSnapshot(pending []ApprovalCardView, results []ResultChunk,
-	composer ComposerState, now time.Time) Snapshot {
+	composer ComposerState, now time.Time,
+) Snapshot {
 	if pending == nil {
 		pending = []ApprovalCardView{}
 	}
