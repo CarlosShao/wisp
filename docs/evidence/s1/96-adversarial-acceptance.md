@@ -51,7 +51,7 @@ d22scan: clean - no D22 ban violations; live scope work: ... ban #6 frontend/=37
 | 快照里 `frontend/` 下真存在 `node_modules/`/`testdata/` 目录？ | `find frontend -type d \( -name node_modules -o -name testdata \) \| wc -l` | **0**（排除集今天没有可排的东西） |
 | 后缀构成 | 同上 `find -printf "%f"` + awk | 17 `.tsx`、7 `.json`、3 `.ts`、3 `.mjs`、2 `.css`、1 `.md`、1 `.html`、1 `.go`、2 无后缀 dotfile（`.gitignore`、`dist/.gitkeep`）= **37** |
 
-⇒ 三个数（我的 git 数、我的文件系统数、两条门各自自报的数）**四路一致 = 37**。
+⇒ 四路读数（我的 git 入库数、我的 find 实数、两条门各自自报的数）**全部 = 37**。
 票面 AC#1 的"工作树 40=40"我也单独复现了（§6.4），差 3 就是 `frontend/dist/` 里未入库的构建产物，两门同时看见，与票面解释一致。
 
 ---
@@ -216,7 +216,9 @@ count := func(dir string, accept func(string) bool) int { ... filepath.WalkDir(d
   且 `verified ban #6 frontend/: 37 files` / `verified ban #8 frontend/: 37 files` 两行都打出来了）。
 - `gofmt -l tools/d22scan/` ⇒ **空**。
 - ⚠ 独立 module 那个坑我按规矩走：判定跑全部在 `tools/d22scan/` 目录里跑（`-root` 指快照根）。
-  顺手复现了一次坑本身：从仓根按包路径跑只会得到"main module does not contain package"，扫描器根本不执行。
+  并顺手复现了坑本身：在快照根跑 `go run ./tools/d22scan -root .` ⇒ 只打
+  `main module (github.com/CarlosShao/wisp) does not contain package github.com/CarlosShao/wisp/tools/d22scan`（rc=1），
+  **扫描器一字节都没读** —— 这条门的正确入口只有 `sh scripts/d22scan.sh` 或 `cd tools/d22scan`。
 
 ### 6.2 "起初那枚红"到底存在过吗 —— 我去 `5e8f87b` 的快照上看了一眼
 
@@ -284,18 +286,20 @@ d22scan: 1 finding(s); D22 bans are not negotiable
 
 **(1) 票 96 能否挂 `-done`？—— 能，六格全 PASS，可挂 `96-...-done`。**
 依据：三条独立路径的数（我的 git 数 / 我的 find 数 / 两条门自报）在纯净快照与工作树上都对得上；
-三枚编译通过的变异分别把"收窄"“漏清单""对称收窄"打出红；票面六个 AC 的每条硬读我都复现到同一数值，
+三枚编译通过的变异分别把「收窄」「漏清单」「对称收窄」打出红；票面六个 AC 的每条硬读我都复现到同一数值，
 无一处需要"允许残留"来救判据。挂 `-done` 前**不必**再动代码；§9 那几条残留是**新立的账**，不是本票的返工。
 
 **(2)"零 emoji 这条门现在真的看着面板"这句能不能对 owner 说？—— 能说，但要按下面的说法说，不能说成"两条门数相等所以安全"。**
-- **依据（可复现）：** `ban #8` 的作用域清单今天含 `frontend/`，且走的是**无后缀白名单的全文件 walk**
+- **依据（可复现）：** `ban #8` 的作用域清单今天含 `frontend/`，且走的是**不带任何后缀白名单的全文件 walk**
   （`emojiScope.everyFile`，`walkEmoji` 的 `case sc.everyFile:` 分支），计数器 `s.emojiSeen[label]++`
   是在 `os.ReadFile(path)` **成功之后**才加的 ⇒ "examined 37"就是"读过 37 个文件的字节"。
-  我自己在纯净快照上往 `.tsx` 注释 / `.md` / `.mjs` / 无后缀 / dotfile 各种一枚 emoji，**每一枚都把 CI 端成了 rc=1 并点名到行**；
+  我自己在纯净快照上往 `.tsx` 注释 / `.md` / `.mjs` / 无后缀 / dotfile 各种一枚 emoji，
+  **每一枚都让扫描器 rc=1 并点名到 `文件:行`**（另单独测了一次整条 `sh scripts/d22scan.sh` ⇒ rc=1，
+  红由第 2 步扫描器给出，见 §4 末段）；
   把 walk 退回后缀白名单，独立 walk 那条用例立刻报 `32 vs 37`；把 `frontend/` 从清单删掉，6 条用例红。
 - **一句它不覆盖什么：** 它只盯 `design/`、`frontend/`、`internal/` 的 `.go`、`cmd/` 的 `.go` 这四条作用域，
   且**在 `frontend/` 内部排除 `node_modules/` 与 `testdata/`** ⇒
-  **仓库里其余路径（根目录文件、`scripts/`、`docker/`、`docs/`、`tools/`、`models/`、`third_party/`）
+  **仓库里其余路径（仓根那些文件、仓根的 `scripts/`（不是 `frontend/scripts/`）、`docker/`、`docs/`、`tools/`、`models/`、`third_party/`）
   以及面板那棵树里的 `node_modules/`（第三方 vendored 依赖）仍然不在零 emoji 的门里**，
   那句话只能说到"我们自己的面板源码这棵树"为止；另外它只在 `sh scripts/d22scan.sh` 真跑时才有牙
   （本地那条脚本第 1 步可被 Go 测试缓存回放 = 票 99，CI 走 `runtests.sh -count=1` 不受影响）。
