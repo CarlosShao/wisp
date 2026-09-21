@@ -321,4 +321,64 @@ through the link "…\proj\esc"`。⇒ **探针 C 是两侧都红的**，不是�
 另登记：`internal/winsec/winsec.go` 此刻也是 ` M`（`"strings" imported and not used`）⇒ **工作树里 `internal/tools` 编译不过**，
 所以本轮所有跑测在 `/tmp` 纯净快照里做（HEAD 是干净的），这与"不在仓内建 worktree"不冲突。
 
+### 修法（落在 `internal/tools/paths.go`，两处都是**加条件**，没有一处放宽）
+
+1. **root 腿**：`NewPathCanonicalizer` 改写腿的确认从 `!res.Resolved && !treeOnDisk(...)` 换成
+   `!res.Resolved && !treeResolvedAsNamed(...)`（`paths.go:87`）。新函数只做三件事：`filepath.EvalSymlinks` 成功、
+   **解析结果与操作者写下的名字折叠后相等**（＝路上没跟过任何链接）、`IsDir`。不满足 ⇒ 原样进 `unusable`
+   （**票 102 那句文案 `"not confirmed on disk"` 逐字保留**，那本账的语义一个字没动）。
+   `treeOnDisk` **保留**（票 92 的 workspace 腿用它做"存在性"确认，那是收紧方向，强度对；`paths.go` 的注释里写死了
+   "要 gate 权限的新调用者必须用 `treeResolvedAsNamed`"）。
+2. **target 腿**：`InAllowlist` 在原有 `rootsContain(p.roots, f)` 之后**再加一条**（`paths.go:145-156`）：
+   `resolvedForm(canonical)` 必须解析得出来，且解析结果也 `rootsContain` 在同一个 root 下。
+   `resolvedForm` 允许尾部"还不存在"的组件（写新文件）逐级上溯再拼回，但**用 `os.Lstat` 区分"不存在"与"存在却穿不过去"**——
+   后者（Windows junction 实测就是 `ERROR_PATH_NOT_FOUND` 那张脸）一律 fail-closed。
+   ⇒ 放行侧从此**两处都要求已解析形式**，比拒绝侧更窄；两腿只补一半就是验收打回的那件事。
+
+### 修后读数（同一快照 `/c/Users/swq/AppData/Local/Temp/wisp107b-fix-107b`：`git archive HEAD` + 我的 paths.go + 探针用例 + 票 92 在飞的两个 tools 文件）
+
+- **POSIX（Docker/alpine x86_64，容器内 `ls -la /t/tools_linux.test` 自证挂载）**：`-test.v` 全量跑
+  `LINUX_RC=0`，`=== RUN`=**76**，`--- FAIL`=**0**，`--- SKIP`=**3**（`TestD34WriteMatrix`、`TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop`、
+  `TestWorkspaceSwitchRefusesAJunctionToOutside`＝票 92 自己按 GOOS 记的那条）——**是 `-v` 让它们可见，不是 `-v` 造成的**，三条都是既有 `t.Skip`。
+  三枚探针 `--- PASS`，票 102 的 `TestPathCanonicalizerAccountsForRewrittenRoots` 与票 107 第一轮两条用例同样 PASS ⇒ **红修好了，且没用放宽放行侧去修**。
+- **Windows（本机 `go test -count=1 -v ./internal/tools/`）**：`WIN_RC=0`，`=== RUN`=**112**，FAIL=**0**，SKIP=**0**，`ok ... 13.188s`。
+- **对照（探针前提在 POSIX 修后仍在，只是不再被放行）**：修后 `Roots()=[]`、`UnusableRoots()` 有 `not confirmed on disk` 那条 ⇒ 探针 A 的树**根本不再进账**。
+
+### AC#4 变异（三发，全在上面的快照里做；每发先 `go build`/`go test -c` rc=0 再跑，同链 `grep -n` 打印被改后整行；还原证 `diff -q` ⇒ `SNAP_RESTORED_IDENTICAL`）
+
+| 变异 | 落地行（同链 grep 原文） | build | 读数 |
+| --- | --- | --- | --- |
+| **①退回第一轮修法**（root 腿换回 `treeOnDisk` **且** target 腿不再解析） | `87: if !res.Resolved && !treeOnDisk(res.Canonical) {`；`152: rf, ok := canonical, bool(true)` | LIN 0 / WIN 0 | **POSIX rc=1**：`--- FAIL: TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing`＋`...ProbeC...`＋`...ProbeB...`（**探针 A 重新变成放行**＝要求的那条）；**Windows rc=1**：`--- FAIL: ...ProbeC...` |
+| **②比较放宽成任意前缀** | `170: if folded == r \|\| strings.HasPrefix(folded, r) {` | LIN 0 / WIN 0 | 两侧都 `--- FAIL: TestTicket107AllowlistBoundaryIsComponentWise`（POSIX rc=1 / WIN rc=1）⇒ 组件边界**真有牙** |
+| **③只松 root 腿**（验收点名的"把 `treeOnDisk` 换成已解析类"那一发，反向） | `87: ...treeOnDisk...`＋`152: rf, ok := resolvedForm(canonical)` | LIN 0 / WIN 0 | **POSIX rc=1**：只有 `...ProbeA...` 红（红在**新增的 `Roots()` 断言**：链接名进了授权账）；C/B 仍绿 ⇒ **两条腿各自有牙**，只做一半会被单独抓到。Windows rc=0（该腿被 `res.Resolved` 短路，如实登记） |
+
+### AC#5 门禁四数（快照内，2026-09-21 19:2x；工作树因票 92/106-108 在飞编不过，故按"纯净快照"口径跑）
+
+- `gofmt -l internal/tools internal/risk` ⇒ **空**；`$(go env GOPATH)/bin/gofumpt -l internal/tools/ internal/risk/` ⇒ **空**。
+- `go vet ./internal/tools/ ./internal/risk/` **rc=0**；`GOOS=linux go vet ./internal/tools/ ./internal/risk/` **rc=0**（按包，没碰整树那条既有坑）。
+- `go test -count=2 -v ./internal/tools/ ./internal/risk/` ⇒ **rc=0**；`^=== RUN`=**548** == 去重后 **274** 名 × 2 ✓（**口径要写清**：Go 1.27 的 `-v` 把**子测试**的 `=== RUN` 也打在 col 0，所以 274 个"名"里含 `TestX/sub` 这种子测试名；`uniq -c` 逐名核对最大重数就是 2，没有第三次跑），
+  col-0 `--- PASS`=**338**（子测试的 PASS 是缩进行，故小于 548/2）、`--- FAIL`=**0**、`--- SKIP`=**2**（`TestSyncRegistryProbeLive`×2，HEAD 既有，`-v` 只是让它可见）。`ok internal/tools 26.692s`、`ok internal/risk 6.420s`。
+  本轮**没有**复现 `TestResolvePerCallBudget` 的红（按验收的更正：那是负载假红，两条 0.730/0.524 ms/op，不当回归、不调阈值）。
+- `sh scripts/d22scan.sh`（快照）**rc=0 clean**：`bans #1-5 internal/=200, cmd/=20, ban #6 frontend/=37, ban #7 internal/tools/=18, ban #8 design/=16, frontend/=37, internal/=356, cmd/=26`，
+  `runtests.sh: PASS=21 FAIL=0 SKIP=0`；对第一轮台账（197/20/37/17/16/37/346/26）**各 scope 只增不减**（增的是票 92 的新生产文件与我这枚 `_test.go`）。
+  ban #8 覆盖注释与 `_test.go` ⇒ 本票两文件零 emoji；另用 `LC_ALL=C grep '[^ -~]'` 逐行量过：**新增行里落在可打印 ASCII 之外的字节只有制表符**
+  （第一次量这张条时我把 `-o` 截断名与 ANSI 颜色误读成"有非 ASCII"，上面的口径是 `--no-color` + `od -c` 复核后的）。
+
+
+### 落点与未做完的格子
+
+改：`internal/tools/paths.go`（`:87` 一行条件 + `InAllowlist` 加一条必要条件 + 新增 `treeResolvedAsNamed`/`resolvedForm`、保留 `treeOnDisk` 并写清强度分工）
+与新增 `internal/tools/paths_ticket107b_probes_test.go`（三枚探针）。
+**没做完**：`paths.go` 的这枚 commit 现在**还不能提**——票 92 的 `workspace` 改动仍在这同一个文件里未 commit（`git status` 的 ` M` 不是我的），
+`git commit -- internal/tools/paths.go` 会把别人未提交的 hunk 一起吞进去（A34 违例）。探针用例可以独立落地（它只依赖新函数存在）。
+⇒ **下一条命令**：等票 92 把 `internal/tools/paths.go`+`paths_workspace*.go` commit 之后，在本仓根执行
+`git add -- internal/tools/paths.go internal/tools/paths_ticket107b_probes_test.go && git diff --cached --name-only && git commit -q -F - -- internal/tools/paths.go internal/tools/paths_ticket107b_probes_test.go`（消息见本段）；
+在此之前本票的 paths.go 改动以**工作树未提交**形态交接，落点行号与全文都在上面，重放只需一次 Edit。
+
+next= 编排者：①票 92 落盘后把上面那枚 commit 提掉并 push 读 `test-core` 步级结论（AC#1 的 run id 空位仍归你补）；
+②**R-107-2 现在有了读数**（两腿强度不同、`Roots()`/`UnusableRoots()`/`RewrittenRoots()` 非测试生产消费者 0 处）⇒ 拆不拆账由你在裁决表上判，本票不静默；
+③**R-107-3 未修**（`RewrittenRoots()` 不记链接跟随）：本票把"链接 root 进不了账"变成了事实，但操作者界面仍看不到"我的 `proj` 是链到别处"，那要动 panel 侧；
+④`internal/risk/pathresolver_other.go` 的 DEFERRED realpath+lstat 仍在冻结包里（那是 POSIX 拒绝腿的正解，需另开票）。
+
+
 
