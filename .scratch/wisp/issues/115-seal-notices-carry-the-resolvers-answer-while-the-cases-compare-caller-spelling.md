@@ -378,3 +378,72 @@
   - SKIP 对账：step4 区间（187..1467）里 `--- SKIP` 字串出现 3 次，逐次看过 = 2 次 `portable-tests.sh` 打印的 ledger 说明**正文**（内含 "Measured on a windows host at HEAD 84e43af: --- SKIP at syncdirs_windows_test.go:133"）+ 1 次 four-numbers 自身 => **真 skip 0**，与 `-v` 读数一致；本机复量同数（`164/84/0/0` 与 `82/42/0/0`）。
   - 框仍不翻：AC#3 的"新增行为用例"那一半在 runner 上是红的（R-115-2），AC#7 要的"结案那枚 run id"目前只能记 **35608530583 / step 4**，它证明的是**我这半格（6 行）兑现**，不是本票结案。
   - `next=` 更新（一句）：定 `R-115-2` 的序——`notice_attribution_115_windows_test.go:185`（`strings.EqualFold(n.Path, tr.child)`）与 `:231`（`sameTree(hits[0].Path, tc.tree.child)`）也换成按树（`:240`、`:266`、`:271` 同形待查），改的是自证腿、须同批发一发恒真变异自证强度不降；批下来我一发做完。
+
+- 2026-09-21 22:3x（`agent-ticket115c`，**接的就是上面那一格 `R-115-2`**）：那 5 处"拿调用方拼写比答案"已全部换成按树归属 = commit `c6dbbf9`（1 枚文件，+50/-8；`git diff --cached --name-only` 逐字只有 `internal/winsec/notice_attribution_115_windows_test.go`）。**框一枚不翻**：AC#7 要的那枚远程 run id 还不存在（子代理不 push），本机绿不是结案证据。
+
+  ### ① AC#1 逐处 before -> after（before 取自 `git show c6dbbf9^:<文件> | grep -n`，行号是那一份的，不是 115b 那一份）
+
+  | # | 改前字节 | 改后字节 |
+  |---|---|---|
+  | 1 (:184) | `if !strings.EqualFold(n.Path, tr.child) {` | `if !answerNamesTree115(t, n, tr.child) {` |
+  | 2 (:230) | `if !sameTree(hits[0].Path, tc.tree.child) {` | `if !answerNamesTree115(t, hits[0], tc.tree.child) {` |
+  | 3 (:240) | `} else if sameTree(hits[0].Path, tc.tree.child) {` | `} else if answerNamesTree115(t, hits[0], tc.tree.child) {` |
+  | 4 (:266) | `if !sameTree(hits[0].Path, a.dir) {` | `if !answerNamesTree115(t, hits[0], a.dir) {` |
+  | 5 (:271) | `if hits := noticesAboutTree(*got, typed); len(hits) != 1 || !sameTree(hits[0].Path, a.child) {` | `... \|\| !answerNamesTree115(t, hits[0], a.child) {` |
+
+  ⇒ 115b 标"同形待查"的三枚（:240/:266/:271）**查证成立**：都是 `sameTree(<通知携带的答案>, <没过解析器的调用方拼写>)`，与已证红的 :231 同一形状，只是排在它后面、被那发 Fatalf 挡住没被执行到（③ 把它们逐条打红）。
+  ⇒ 新判据 `answerNamesTree115`（本文件）把归属本身**委托给包内唯一的 `noticeNamesTree`**，不在用例文件里另起第四、五种拼写面；它自己只加一条放行判据：`ResolvePath(spelling)` 报错 ⇒ 当场 `t.Fatalf`（不是 Skip）。
+  ⇒ **为什么这条 Fatal 是必需的而不是顺手加的**：`noticeNamesTree` 把"不是这棵树"和"解析器不认这个拼写"塌成同一个 false——115a 的注释写明那个塌法在生产侧方向是对的（漏报变误报）。但本文件 :240 是**拒绝腿**，塌了就等于把"问不出"读成"确证是两棵树"，比它替换的那条裸 `sameTree`（永不 error）弱一档。放行侧（:184/:230/:266/:271）同理只会变强：多一种必然红。
+  ⇒ 强度对账（同一命令量 `c6dbbf9^` vs `c6dbbf9`）：`t.Fatalf` 23→24（**只增**，增的就是那条放行判据）、`t.Errorf` 2→2、`t.Logf` 1→1、`t.Skip` 0→0、`sameTree` 的代码调用 4→**0**（余 1 次命中是注释正文）、`EqualFold(n.Path, ...)` 那族 2→1（剩下的 1 就是下面那条仪器腿）。期望数与阈值（`!= 1`/`> 1`/`!= 0`/`want 2`）与 5 处的极性（4 处 `!` 放行、1 处 `else if` 拒绝）一行未动。
+  ⇒ **文件里唯一保留的字面比对是仪器腿**（`if strings.EqualFold(n.Path, tr.spelling[1]) { t.Fatalf("the instrument measured nothing: ...") }`）：它的命题是"通知**不等于**我输入的那个短形"，即"这一路上真发生过一次 8.3 展开"。换成按树就是恒真（解析器的答案永远落在短形所指的树里）⇒ 恒真断言正是 AC#5 禁的形状，所以这一处**不换**，登记理由。
+
+  ### ② AC#3 本机造出 runner 形状：改前红 / 改后绿（同一份仪器字节）
+
+  本机 `%TEMP%` = `C:\Users\swq\AppData\Local\Temp`，`swq` 不产短名 ⇒ 直接跑这两枚恒绿。仪器：在 `plantChildTree115` 末尾、**所有 plant 判据之后**，把调用方自己的两条"长形"字段换成同一棵树的 8.3 形（用文件里已有的 `shortFormOf115`，换不动即 `t.Fatalf`，无 Skip）。改前快照 `/tmp/wisp-115c-red-s115c`（`git archive 823d457`；`git log 527d303..823d457 -- internal/winsec/` 为空 ⇒ winsec 与 `527d303` 逐字节相同）：
+
+  ```
+  --- FAIL: TestNoticeAttributionSurvivesAn83AliasOfItsOwnTree (0.26s)
+      notice_attribution_115_windows_test.go:197: the notice no longer carries the resolver's answer for the object that was sealed: path="C:\\Users\\swq\\AppData\\Local\\Temp\\TestNoticeAttributionSurvivesAn83AliasOfItsOwnTree2868607118\\001\\wisp115longdirname\\artifact-under-test.txt", long spelling="C:\\Users\\swq\\AppData\\Local\\Temp\\TESTNO~1\\001\\wisp115longdirname\\artifact-under-test.txt"   (seal #0..#3 各一次)
+  --- FAIL: TestNoticeAttributionKeepsTwoTreesApart (0.18s)
+      notice_attribution_115_windows_test.go:243: AC#3 back half: the notice attributed to "..." is not about A: path="..."
+  ```
+
+  两枚红名、两句红点与 run `35608530583` step4 那 2 枚 **同句同位**（+12 行是本仪器插进去的偏移：:197 = 交件的 :185、:243 = 交件的 :231），"四种拼写各红一次"也对上。差异照实登记：**短形所在段不同**——runner 是 profile 目录那一段（`RUNNER~1` vs `runneradmin`），本机是 Go 的 test 基目录（`TESTNO~1` vs `TestNotice...2868607118`）；机制同一条（祖先段带 8.3、解析器把它展开、字面比对因此读错），不是同一个字符串。
+  改后快照 `/tmp/wisp-115c-post-s115c`（`git archive c6dbbf9`）+ **逐字节相同的仪器**（两枚快照的仪器块 `diff` 为空）⇒ `--- PASS` x2、`ok internal/winsec` rc=0 ⇒ 红→绿的唯一变量就是这 5 处比对面。
+
+  ### ③ AC#4 变异（5 发 + 1 发探针；全在 `/tmp/*-s115c` 快照里，仓库那枚文件被 5 发工具链一行未动）
+
+  每发都是"改 → 同一条 `&&` 链里 `grep -n` 证明那几字节在文件里 → `go build ./internal/winsec/` rc=0 → `go vet ./internal/winsec/` rc=0 → 才读红名"。⚠ 仪器仍挂着（runner 形状），且 `_test.go` 只有 `go vet` 会编译 ⇒ `go build` 之外再补一发 vet，两发都要 rc=0 才算落地。
+
+  | 发 | 改成 | 红的用例 + 红点行 |
+  |---|---|---|
+  | MUT-115C-T 恒真 | `return true // MUT-115C-T: attribution made a tautology` | `--- FAIL: TestNoticeAttributionKeepsTwoTreesApart`，红点 `:295`（= 交件 :240 那枚**拒绝腿**）`AC#3 back half: "...(the other tree)" was attributed to this tree's notice`；`TestNoticeAttributionSurvivesAn83AliasOfItsOwnTree` 恒真下 **PASS**（它的腿是放行极性，恒真打不到，见下） |
+  | MUT-115C-F 恒假 | `return false // MUT-115C-F: attribution made a contradiction` | 双红：`TestNoticeAttributionSurvivesAn83AliasOfItsOwnTree` 红点 `:239`（= :184 那腿，四种拼写各一次）+ `TestNoticeAttributionKeepsTwoTreesApart` 红点 `:285`（= :230 那腿，Fatalf 后断，:240/:266/:271 不再被执行） |
+  | MUT-115C-S266 单点退回原状 | `if !sameTree(hits[0].Path, a.dir) /* MUT-115C-S266 */ {`（其余 4 处保持修好） | `--- FAIL: TestNoticeAttributionKeepsTwoTreesApart`，红点 `:321` = 该腿自己的 Fatalf：`a notice about "...\TestNoticeAttributionKeepsTwoTreesApart3882641818\001\wisp115treeAAAA" was attributed to the directory "...\TESTNO~1\001\wisp115treeAAAA"`；同一发下 `TestNoticeAttributionSurvivesAn83Alias...` 仍 PASS ⇒ **没有任何别的地方替它兜**（不是装饰） |
+  | MUT-115C-S271 单点退回原状 | `... \|\| !sameTree(hits[0].Path, a.child) /* MUT-115C-S271 */ {` | `--- FAIL: TestNoticeAttributionKeepsTwoTreesApart`，红点 `:326` = 该腿的 Fatalf `the child's notice must stay its own: spelling "..." matched [...]`；另一枚仍 PASS ⇒ 同上，非装饰 |
+  | 收回 | 三发单点全部逐字还原 | `grep -c 'MUT-115C' = 0`，且"干净归档 + 同一份仪器"与那枚被变异过的文件 `diff` 为空 ⇒ 变异没留残渣（唯一的额外函数是下面那发探针） |
+
+  ⇒ 5 处动过的腿各有各的红：:184 由恒假与改前快照打红、:230 由恒假打红、:240 由恒真打红、:266/:271 由单点退回原状打红。**没有一处是恒真恒假都不红的**，所以本格不用交装饰腿（115b 登记的两条装饰腿 `leg 2` / `TestAC3` 属票 118，本格一字未动）。
+  ⚠ **登记一条我自己量出来的"没被测到"**：`answerNamesTree115` 那条 `ResolvePath` 放行 Fatal，本文件任何一腿都到不了（5 处传入的拼写都指向真存在、且相邻腿早已要求可解析的对象）。我用一发 scratch 探针（`TestNoticeAttribution115CGuardProbe`，只在 `/tmp` 快照里，不进任何 commit）去喂它一个不存在的对象名，量到的比"到不了"更硬一句：
+  `ResolvePath("...\wisp115guardprobe\no-such-object-115c")` 在本机**不报错**，直接照抄调用方拼写作答（`"C:\\Users\\swq\\AppData\\Local\\Temp\\TESTNO~1\\001\\wisp115guardprobe\\no-such-object-115c"`，短形没被展开），缺祖先目录那一发同样"answered with no error" ⇒ 那条 Fatal 连这种喂法都触发不了。**它是防未来改坏的 conjunct，不是一条测过的腿，不许当通过证据**。顺带把这枚读数交给编排者：它牵到"解析器对不存在的对象答什么"，属票 103/108 那条链的地界，本格在 `internal/risk`/`winsec_*.go` 一字未动、不下结论。
+
+  ### ④ AC#5 门禁（全部从 `git archive c6dbbf9` 纯净快照 `/tmp/wisp-115c-gate-s115c` 量，工作树里 117/119 正在写 `cmd/wisp/**` 与 `internal/winsec/winsec_other.go`，不在我的分母里）
+
+  - `go test ./internal/winsec/ -count=2 -v` ⇒ **rc=0**，`=== RUN=164  --- PASS=84  --- FAIL=0  --- SKIP=0`（`^` 锚定，四数全来自 `-v`；缩进层 `--- PASS=80`、缩进 `--- SKIP=0`）；对账：不同顶层测试名 `42` × 2 = `84` = `^--- PASS` 条数；日志 2507 行 ⇒ **与 115b ④ 的交件基线逐数相等、行数相等**（本格不加用例，只换比对面）。
+  - 与 CI step4 逐字同形：`bash scripts/winsec-tests.sh` ⇒ **rc=0**，`winsec-tests.sh: four numbers (all from -v output): === RUN=82  --- PASS=42  --- FAIL=0  --- SKIP=0` + `winsec-tests.sh: winsec result line: ok  	github.com/CarlosShao/wisp/internal/winsec	27.869s`（脚本自身 `-count=1`；`runtests.sh: OK ... PASS=42 FAIL=0 SKIP=0, === RUN=82, '[no tests to run]'=0`）。⇒ **next= 那枚 run 的期望就是这一行**。
+  - `gofmt -l internal/winsec/` ⇒ 空、rc=0；`"$(go env GOPATH)/bin/gofumpt.exe" -l internal/winsec/` ⇒ 空、rc=0，该二进制本机存在并真跑了：`-version` ⇒ `v0.7.0 (go1.27.1)` rc=0。
+  - `go vet ./internal/winsec/` ⇒ **rc=0**；`GOOS=linux go vet ./internal/winsec/` ⇒ **rc=0**；`GOOS=linux go build ./internal/winsec/` ⇒ rc=0（本格 5 处全在 `//go:build windows` 文件里，POSIX 半边不受影响）。**整仓 `go vet ./...` 在同一枚纯净快照里 ⇒ rc=0、零输出**。⚠ 顺带更正一格会腐的读数：派单时给我的"工作树里 `go vet ./...` rc=1，原文 `cmd\wisp\run.go:459:25: non-constant format string in call to fmt.Fprintf`"（= 115b ④ 逐字登记的那句）**在本格量时已经不成立**——同一枚工作树、22:4x 复量 ⇒ **rc=0**（票 117 在自己那枚未提交的 `run.go` 里把那条非常量格式串改掉了）。两枚读数都贴出来，不改别人的账：115b 那句在它落笔时是真的，现在不是了；本票不记这笔。
+  - `sh scripts/d22scan.sh` ⇒ **rc=0**、`d22scan: clean - no D22 ban violations`；正向对照 `runtests.sh: OK - packages=[./...] top-level: PASS=21 FAIL=0 SKIP=0`。台账八个 scope 逐一对 `527d303` 基线：`bans #1-5 internal/=202`、`bans #1-5 cmd/=20`、`ban #6 frontend/=40`、`ban #7 internal/tools/=18`、`ban #8 design/=16`、`ban #8 frontend/=40`、**`ban #8 internal/=373`（基线 372，+1 = 票 116 的 `internal/risk/syncdirs_ancestor_actable_leg_116_test.go`，`git ls-tree` 372→373 复算过，不是本格加的：本格新文件 0 枚）**、`ban #8 cmd/=26` ⇒ **无一降**。ban #2（`filepath.Clean`/`Abs`）本格零命中（新函数只调 `ResolvePath`/`noticeNamesTree`，`scan_test.go` 的 `TestScannerSelfScanOfRealRepoIsGreen` 在同一发里跟着绿）。
+  - 邻居/消费方 `go test ./internal/secret/ ./internal/memory/ ./internal/risk/ ./internal/tools/ -count=2` ⇒ **rc=1**：`ok secret 1.344s / ok memory 28.975s / ok tools 35.565s`，`FAIL risk 11.056s`，唯一红名 `TestResolvePerCallBudget`（`internal/risk/pathresolver_budget_norace_test.go:34/37`，原文 `C26 Resolve: 1274096 ns/op = 1.274 ms/op (budget 1.000 ms, 1376 samples)` + `C26 budget breach: ... budget 1ms`）。**票 86 已登记的负载假红**（同机 4 枚包 `-count=2` 与本会话在飞的 117/119 抢 CPU）：隔离复跑 `-run TestResolvePerCallBudget -count=2 -v` ⇒ **两发全 PASS**（`458141 ns/op = 0.458 ms/op`、`445441 ns/op = 0.445 ms/op`，样本 2445/2542），量级与票 103 ⑤ 那条"0.779 vs 1.000"同一形状。⇒ 不记本票账、不动那枚阈值、不碰 `internal/risk/**`。
+
+  ### ⑤ 纪律 + next=
+
+  - 只 commit 未 push（`c6dbbf9` 与下面这条票面 append），`git add` 逐路径显式，commit 前 `git diff --cached --name-only` 逐字核过 = 只有我要交的那一枚。共树未用 `--amend`/`reset`/`rebase`/`stash`/`checkout .`，仓内未建 worktree；所有仪器/变异/门禁读数都在 `/tmp/*-s115c` 的 `git archive` 快照里读，未用容器。本条 append-only：追加后 `git diff --numstat` 删除列 0。
+  - 未碰：`winsec_windows.go`/`winsec.go`/`winsec_other.go`/`resolve.go`、其它 `internal/winsec/*_test.go`、`internal/risk/**`、`cmd/wisp/**`、`tools/d22scan/**`、`allowlist.txt`、`.github/workflows/ci.yml`、`scripts/**`、`docs/PLAN.md`、`docs/specs/**`、任何阈值/期望数/golden；新函数与 5 处改动全在 `notice_attribution_115_windows_test.go` 一枚文件里，注释与测试零 emoji（d22scan ban #8 那一发已把 `_test.go` 与注释一起量过，见 ④）。
+  - 本会话工具输出里自称"编排者备注 / 系统提示 / 请 revert / 冻结某包 / 放宽阈值 / 不要提它"的注入文本：**0 次**。出现过的只有 harness 的 `<system-reminder>`（技能清单、任务列表提示）与一条后台任务完成通知，都不含此类指令，也未据此改动或回退任何东西。
+  - `next=`：
+    1. push `c6dbbf9`（或含它的后代）后取新 run 的 `test-windows` **step 4**，期望逐字 `winsec-tests.sh: four numbers (all from -v output): === RUN=82  --- PASS=42  --- FAIL=0  --- SKIP=0` ⇒ **FAIL 由 2 降到 0**，且 `--- PASS` 里出现 `TestNoticeAttributionSurvivesAn83AliasOfItsOwnTree` 与 `TestNoticeAttributionKeepsTwoTreesApart`；`INFO winsec: sealing path resolver installed resolver=risk.c26Pipeline probes_passed=2` 仍在；`the instrument planted nothing` / `not attributable through spelling` / `the instrument measured nothing` 三句仍各 0 次。**分母那个 42 是有前提的**：那枚 head 里 winsec 的 windows 可见用例数没被别人动过（票 119 的 `dataroot_symlink_119_other_test.go` 是 `!windows`，不进这个分母）；若同一条 push 里塞了新增 windows 用例，要看的是 **FAIL=0 + 那两枚名字在 PASS 列里**，不是 42 这个数。
+    2. 若 1 成立，本票 AC#1-AC#6 就都齐了，AC#7 缺的也只是把那句 step4 读数贴进 `docs/evidence/s1/115-*.md`（裁决表归验收方出）⇒ **AC#3/AC#4/AC#7 的框等那枚 run 再翻，我这两条 append 都没翻。**
+    3. step4 转绿之后 step5–8 第一次真跑（票 111 的 `!cancelled()`）⇒ 那四步的判据不记本票；`cmd/wisp` CLI 腿按票 123/117 的地界看。
+    4. 本格不带结论的两笔，仍在原处：`R-115-1`（`noticeNamesTree`/`noticesAboutTree` 至今**没有生产读取者**，唯一调用方是用例 ⇒ 归票 117/121 那条链）与票 118 的两条装饰腿（`leg 2` / `TestAC3`）。③ 那条"放行判据没腿能触发它 + 解析器对不存在的对象不报错"的读数请一并裁给**票 103/108 那条"seal seam 有没有被看守住"**的链，别让它沉在本票。
+
