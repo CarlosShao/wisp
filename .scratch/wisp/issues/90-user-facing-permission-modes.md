@@ -1,6 +1,8 @@
 # 90 — 面向用户的**权限模式开关**（三档：只问高危 / 每步都问 / 全自动，且"全自动"也吃不到不可逆操作）
 
-**Status:** **in-progress（2026-09-21，agent-ticket90）** —— 已按 owner 定案 M1–M5 + R20 选定施工形状（见本条下面第一条 Progress log），
+**Status:** **ready-for-review（2026-09-21，agent-ticket90b 接续收尾）** —— 五框 AC#1–AC#5 现在**每一框都有可重跑的读数**，
+**AC#4 那枚此前"涂了勾没跑"的框已由 5 轮变异补上证据**（见本票最后两条 Progress log）；代码 SHA：`1d4f289`+`582b9a9`+`d5564c2`。
+**next=编排者验收**。前：**in-progress（2026-09-21，agent-ticket90）** —— 已按 owner 定案 M1–M5 + R20 选定施工形状（见本条下面第一条 Progress log），
 开始落码。前：**unblocked**（2026-09-21 17:0x，owner 已把 M1–M5 全部拍完，见裁定 **R20** 与本票末尾"owner 定案"条）。UI 落点那半（输入框显示档位 + 附件 + 工作区选择）**拆给票 92**，本票只做权限语义、持久化、切档确认与审计。
 **Type:** 安全能力 + 可用性（owner 2026-09-21 明确要求："有没有设计类似的权限切换的功能？这个也是很基本的，我希望都有"）
 **Blocks:** 票 21 的 segment 2（原生确认卡）、票 48（审批队列）、票 49（会话授权）——**这四张是同一条链**
@@ -46,19 +48,19 @@
 
 ## AC（等 M1–M5 点头后开工；先备着）
 
-- [ ] **AC#1** 模式作为**显式参数**进入决策链（`risk.Classify` 的调用方），**不许**做成包级全局变量：
+- [x] **AC#1** 模式作为**显式参数**进入决策链（`risk.Classify` 的调用方），**不许**做成包级全局变量：
       全局变量等于"任何代码路径都能改权限"，那是比没做更糟。
-- [ ] **AC#2** 三条红线各一条用例：不可逆操作 / 污染升级 / 前端代表用户批准 ⇒
+- [x] **AC#2** 三条红线各一条用例：不可逆操作 / 污染升级 / 前端代表用户批准 ⇒
       **在任何模式下都必须被拒或被拦**（`ban #6` 那条同时要有静态门）。
-- [ ] **AC#3** 切到"全自动"档要 L2 强确认 + 写审计（**审计三档都写**，只有全自动那一次要确认）。
+- [x] **AC#3** 切到"全自动"档要 L2 强确认 + 写审计（**审计三档都写**，只有全自动那一次要确认）。
       ⚠ **2026-09-21 按 R20/M3 更正本框**：原判据写的是"重启后回到默认档"，**owner 已推翻这一半** ⇒
       现在要的是**两条分开、不许合并**的用例：
       (a) **改过档位 ⇒ 重启后读回 = 那一次手动选的档**（不是默认档）；
       (b) **从未手动改过 ⇒ 重启后读回 = 默认第一档"每步都问"**。
       另见下面"owner 定案"条里新增的 **AC#3b**（会话授权**不能**跨重启，与 (a) 正好相反，两条都要在）。
-- [ ] **AC#4** 双向变异：把"模式"接进链但**去掉红线判定** ⇒ 必须有用例红；
+- [x] **AC#4** 双向变异：把"模式"接进链但**去掉红线判定** ⇒ 必须有用例红；
       把红线改成"模式优先" ⇒ 必须红。锚点=承载行为的那一行，同链 grep 自证。
-- [ ] **AC#5** 台账：`risk.Gate` 从"生产零调用点"变成**有真实调用者**，或明写它仍归票 21 未建（不许假装它存在）。
+- [x] **AC#5** 台账：`risk.Gate` 从"生产零调用点"变成**有真实调用者**，或明写它仍归票 21 未建（不许假装它存在）。
 
 ## Rules（本仓固定）
 
@@ -119,3 +121,73 @@
   8. **禁区自查**：不碰 `internal/winsec/**`、`frontend/**`、`internal/panel/`、`cmd/wisp/`、`internal/risk` 既有测试文件、
      `assessor.go`/`pathresolver*.go`/`rules_gateway.go`/`tools/d22scan/**`/`allowlist.txt`/`docs/PLAN.md`/`docs/specs/*.md`。
      ⇒ **已知代价**：`cmd/wisp/run.go` 那行 `Modes:` 注入由票 77 的文件承载，本票只把**需要的改动缩到一行**并在票面登记交接。
+
+- 2026-09-21（**agent-ticket90b，接续说明 + AC#4 落地的账**）：**我从哪一步接**：前任 `agent-ticket90` 撞 150 轮上限，
+  最后一句话是 "Now AC#4: bidirectional mutation testing in a fresh out-of-repo snapshot"，**然后就没了**。
+  ⇒ **AC#4 那个框此前为什么是勾着的：前任把框涂满了却没跑变异**（全文检索该框，票面里 "AC#4" 只出现在框本身，
+  log 里零次变异读数/红名/rc）。本条把那笔账补上（下面第二条），**不粉饰**：那一勾在此之前**没有证据支撑**。
+  接到的工作树实况：`internal/risk/mode.go`(新)、`internal/config/permmode.go`(新)、`internal/perm/`(新包)、
+  `internal/tools/mode.go`(新) 与 `bridge.go:285-292` 的 `mode := b.permissionMode(); sil := mode.Screen(verdict)` 已在，
+  测试 `internal/tools/ticket90_test.go` / `internal/perm/store_test.go` / `internal/perm/ticket90_persist_test.go` 已在
+  （已提交：`1d4f289` 落码 + `582b9a9` 落测试）。**未提交**的剩两处，我核完语义后代为落 `d5564c2`：
+  ① `ticket90_persist_test.go` 里 AC#3b 那条**自带了一段"模式确实跨重启"的对照**——**这正是 R20/M3 边界条款禁止的合并**
+  （合并 = 一条用例同时判两件事 = 会话授权那条哪天依赖上模式的机制就悄悄绿了），已删掉对照段，
+  **三条用例现在各自独立**：`TestTicket90ManualSwitchSurvivesRestart`＝AC#3(a)、
+  `TestTicket90UntouchedConfigStartsAtTheDefault`＝AC#3(b)、`TestTicket90SessionGrantDoesNotSurviveRestart`＝AC#3b，
+  三条各自 `-run` 单跑各自 PASS（`=== RUN` 3 条、0 FAIL），AC#3b 那条函数体内**再无任何 `Mode` 引用**（grep rc=1）。
+  ② `config/unwired.go` 里 `risk.blacklist_overrides` 的台账文案按实测改写（`Gate` 已有真实调用点，缺的是填 `bOverrides` 的确认记录）。
+  **依赖/调用关系复验（票 94 的教训，不照抄）**：checkpoint #1 第 1 条说 "`risk` 不引 `config` 所以不成环"——
+  `go list -deps ./internal/risk/ | grep -c wisp/internal/config` = **0**（rc=1），`internal/risk` 的仓内 import 只有
+  `observe` 与 `winsec`，`config`/`tools`/`perm` 三包各命中 risk 1 次 ⇒ **这条断言为真**（与票 94 那条"winsec→risk 无环"不同，
+  这条我实测过才留）。
+
+- 2026-09-21（**agent-ticket90b，AC#4 双向变异原始读数；全程仓外纯净快照，工作树零改动**）：
+  快照 `/tmp/wisp90b-sess90b`（`git archive HEAD | tar -x`，`git rev-parse` 确认**非 git 仓**=纯净），HEAD=`d5564c2`。
+  **变异前**：`go build ./...` rc=0。基线四包 `go test -count=1`（risk/tools/perm/config）**rc=1**，唯一红是
+  `TestResolvePerCallBudget`（C26 性能门，1.165534ms/op vs 1ms 预算，负载敏感）——单独 `-count=2` 两次 **ok**，
+  随后**未变异的 `-v` 全量跑 rc=0**（PASS 222 / SKIP 1 / FAIL 0）⇒ 判定：**与票 90 无关的性能抖动，阈值一个字没动**，
+  下面每轮都拿 222 当参照核对加减（四种假绿逐条点名：**唯一的 SKIP 是 `TestSyncRegistryProbeLive`，变异前后都是 1 条，
+  没有任何 PASS 被它冒充**）。锚点=**承载行为那一行**，每轮**同一条 `&&` 链里 grep 自证变异真的落地**，每轮 `go build ./...` 先量到 rc=0。
+  - **(i)-a 去掉"不可逆"红线**：`sed '/case R8:/{N;d}'`（`internal/risk/mode.go` `redLine()`）。
+    PROOF：`grep -n "case R8:"` rc=1（空），同函数 `case R5:`/`case R9:`/`SessionOverrideBlocked` 仍在（外科手术）。build rc=0。**test rc=1**，红名 **2**：
+    `TestTicket90IrreversibleStillAsksInEveryMode` → `ticket90_test.go:335: mode=auto_approve: irreversible call raised 0 L2 cards, want 1`；
+    `TestTicket90ScreenTable` → `store_test.go:299: R8 不可逆 under auto_approve: level = L0, want L2`（220 PASS + 2 FAIL = 222 ✓）。
+  - **(i)-b 去掉"污染升级"红线**：分两刀，因为这条红线**有两个证人**。
+    b1 只删 `if d.SessionOverrideBlocked {` 分支（`{N;N;d}`）：build rc=0，**test rc=1**，红名 **1** =
+    `TestTicket90TaintFlagAndDenyAreNeverSilenced` → `store_test.go:319: mode=auto_approve: a tainted verdict came out L0 (silenced=true); PLAN.md:1640 says no authorization - including a permission mode - covers a C25 escalation`；
+    真实链那条 `TestTicket90TaintEscalationNeverSilenced` **仍绿**——因为 `case R4:` 还在（第二个证人兜住），**这条绿是有原因的绿，不是假绿**。
+    b2 再把 `case R4:` 一起删（两证人同灭）：PROOF `grep -n "case R4:\|d.SessionOverrideBlocked {"` rc=1，build rc=0，
+    **test rc=1**，红名 **3**（+ 那条已归因的性能抖动 = 4 FAIL，218+4=222 ✓）：
+    `TestTicket90TaintEscalationNeverSilenced` → `ticket90_test.go:371: mode=auto_approve: tainted call raised 0 L2 cards, want 1`、
+    `TestTicket90ScreenTable`、`TestTicket90TaintFlagAndDenyAreNeverSilenced`。
+    ⚠ 过程诚实记账：b1/b2 **第一次尝试编译失败**（`sed {N;d}` 少删一个 `}` → `mode.go:199:2: syntax error`），
+    **编译失败不算变异**，那一轮**没有测试读数**，已还原重做并先量到 `go build ./...` rc=0 才计入上面的数。
+  - **(i)-c 去掉"前端不能代表用户批准"那条红线**（机器形状=**Deny 永不被静默**：`PLAN.md:1588`/`ban #6`；
+    一个被静默的判定**不是"允许"，是"没人被问过"**）：把 `if d.Level == Deny {` 分支的返回改成
+    `Silenced{Level: L0, Silenced: true}`。PROOF：`grep -n "Level: Deny, Kept"` rc=1，落地行 `mode.go:161` 已打印。build rc=0。
+    **test rc=1**，红名 **4**（218 PASS + 4 FAIL = 222 ✓）：票 90 的 `TestTicket90TierADenySurvivesEveryMode` →
+    `ticket90_test.go:417: mode=ask_every_step: A-tier path ran the tool 1 times, want 0`（三档全红）+
+    `TestTicket90TaintFlagAndDenyAreNeverSilenced` → `store_test.go:328: mode=ask_every_step: Deny came out as L0`，
+    **外加两条非本票的既有卫兵一起红**：`TestBridgeRefusesTheRealShortNameOfAnAListFile`、`TestSensitiveFileIsDeniedNotEscalated`
+    ⇒ A 档路径**真的被写进去了**：这条红线不是票 90 独占，链上还有旧卫兵，**双保险**。
+  - **(ii) 红线改成"模式优先"**：在 `Screen()` 的**第一句**前插 `if m == ModeAutoApprove { return Silenced{Level: L0, Silenced: true} }`
+    （"全自动"档跳过一切红线）。PROOF：`sed -n '157,163p'` 打印出插入的三行确为函数体首句，`grep -c MUT-D` = 1。build rc=0。
+    **test rc=1**，红名 **5**（217 PASS + 5 FAIL = 222 ✓）：`TestTicket90IrreversibleStillAsksInEveryMode`（`ticket90_test.go:335` 同上一句）、
+    `TestTicket90TaintEscalationNeverSilenced`（`ticket90_test.go:371`）、`TestTicket90TierADenySurvivesEveryMode`
+    （`ticket90_test.go:417: mode=auto_approve: A-tier path ran the tool 1 times, want 0`）、
+    `TestTicket90ScreenTable`（`store_test.go:299`）、`TestTicket90TaintFlagAndDenyAreNeverSilenced`（`store_test.go:319`）
+    ⇒ **三条红线各有一个以上会红的证人，两侧变异都红**，**AC#4 成立**。
+  - **还原与"没在工作树里动过手"的证据**：每轮 `cp /tmp/mode90b.orig internal/risk/mode.go` 后 `diff -q` 与快照原件**一致**，
+    末轮再 `grep -c "MUT-"` = **0** 且 `go build ./...` rc=0；工作树侧 `git diff --quiet -- internal/risk/mode.go` **rc=0**，
+    `git status --porcelain` 只剩票面与本票无关的票 91 文件（**不是我的，没碰**）。**全程未在仓内建 worktree/checkout**（A38④）。
+  - **收尾门禁（只跑本票碰的包）**：`gofmt -l` 空、`gofumpt -l` 空（`D:/work/base/gopath/bin/gofumpt.exe`）、
+    `go vet ./internal/risk/ ./internal/tools/ ./internal/perm/ ./internal/config/` rc=0、
+    `go test -count=2` 同四包 **rc=0 / 0 FAIL**、`sh scripts/d22scan.sh` **rc=0**（217 生产文件，ban #1-8 clean）。
+    ⚠ 如实登记不追：`go test ./cmd/wisp/` 本机加载期 `0xc0000135`（缺 sherpa dll，票 98 的账），本票**没跑它**。
+  - **AC#5 台账 + 交接（不扩写别人的地界）**：`risk.Gate` 的真实调用点=`internal/tools/mode.go:98`（`readBlacklist`，
+    由 `bridge.go:291-293` 在 `len(rawPaths)>0 && verdict.Level>=L1` 时调），`TestTicket90BlacklistGateIsCalledOnLivePath` 盯住。
+    **但生产组合根本还没注入模式**：`grep -rln "wisp/internal/perm\"" --include=*.go .` **零命中**、`cmd/wisp/run.go` 里**没有 `Modes:` 那一行**
+    ⇒ 前任说的"缩到一行"实际**连那一行都没落**。代价被 fail-closed 兜住：`Modes` 为 nil ⇒ `permissionMode()` 返回
+    `risk.DefaultMode()`＝最严档（`TestTicket90UnwiredModeSourceIsTheStrictestMode` 盯），所以今天的行为是"三档全问"，
+    **不会**因为没接线而变松。**交接给票 92/77**：`cmd/wisp/run.go` 里把 `perm.Store` 注进 `tools.Options.Modes`
+    （以及面板只读显示 `Mode()`/`LastSwitch()`），`run.go` 是票 77 地界，本票**不代写**。
