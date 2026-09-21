@@ -93,9 +93,80 @@ jobs:
         working-directory: tools/d22scan
 
       - name: staticcheck
+        # TICKET 85a (2026-09-21). Three changes, all of them the gate's own
+        # shape; not one finding was fixed here (that backlog is ticket 122).
+        #
+        # 1. VERSION PIN 2025.1.1 -> 2026.2.1. The cause was the CONSUMER, not
+        #    the Go toolchain: 2025.1.1 (module v0.6.1) vendors
+        #    golang.org/x/tools v0.30.0, whose internal/pkgbits decoder caps at
+        #    export data version 2 (decoder.go:86 is the error string), while
+        #    go1.27.1 WRITES version 4 (V4: generic methods as standalone
+        #    function objects). So the step died at import time on the standard
+        #    library ("cannot decode ..., export data version 4 is greater than
+        #    maximum supported version 2") and across all 121 runs that ever
+        #    built this job it produced ZERO findings (step conclusions:
+        #    skipped 93 / failure 28 / success 0 - the gate had literally never
+        #    executed to completion once). 2026.2.1 (v0.8.1, x/tools
+        #    v0.44.1-0.20260420230617-19499e7caabc) reads V4. Measured on a
+        #    pristine `git archive HEAD` snapshot at d3cc9ed: the old binary
+        #    exits 1 with 5 crash lines and 0 findings, the new one exits 1
+        #    with 34 (GOOS=linux, the CI platform shape) / 78 (GOOS=windows)
+        #    parseable findings and 0 crash lines. Go itself was NOT downgraded.
+        # 2. MODULE TRAVERSAL. The root module's `./...` structurally cannot
+        #    see tools/d22scan and tools/mockllm - they are separate go.mod
+        #    files (root `go list ./...` returns zero packages for both) - so
+        #    2 d22scan findings and 1 mockllm finding had never been looked at
+        #    by any gate. The loop checks all three modules and, per this
+        #    repo's rule that a gate must name its own denominator, the step
+        #    prints modules / packages / findings / toolchain-crash-lines: a
+        #    future export-format mismatch then reads as a non-zero crash-line
+        #    count, not as a wall of text that masks the verdict. The step
+        #    exits 1 if ANY module's staticcheck exits non-zero, and prints
+        #    every finding line itself (rc alone is never the reading).
+        # 3. UPSTREAM MASKING, the R-4 family. 93 of those 121 runs never
+        #    EXECUTED this step because a step above it was red (run 160:
+        #    `gofmt (gofumpt)`). `if: ${{ !cancelled() }}` is the one shape
+        #    ticket 85's ruling allows for an observation period: it does not
+        #    change this step's own red/green, it only makes sure the step
+        #    answers. continue-on-error is NOT used (D22 run-away mode 6,
+        #    ci.yml header). The `mockllm module vet` step below already
+        #    carries the same guard from ticket 111 and is left untouched;
+        #    R-4 (that step `skipped` as collateral damage of the staticcheck
+        #    crash, run 35600043583) closes on the first pushed run where both
+        #    steps carry their own conclusions.
+        # NO finding is suppressed by this change: no //nolint, no
+        # lint:ignore, no excluded package. The `frontend/embed.go:4` SA9009
+        # is a known false positive (prose comment that happens to start
+        # "// go:embed"; the real directive is embed.go:19) and KEEPS being
+        # reported - ticket 122 rules on it, ticket 77 AC#1 owns that comment.
+        # This step is EXPECTED RED after this pin, red on real parseable
+        # findings (37 lines across the 3 modules at d3cc9ed, linux shape);
+        # lint turning green is NOT a criterion of this ticket.
+        if: ${{ !cancelled() }}
         run: |
-          go install honnef.co/go/tools/cmd/staticcheck@2025.1.1
-          staticcheck ./...
+          go install honnef.co/go/tools/cmd/staticcheck@2026.2.1
+          rc=0
+          modcount=0
+          pkgs=0
+          findings=0
+          crashes=0
+          for mod in . tools/d22scan tools/mockllm; do
+            modcount=$((modcount+1))
+            echo "=== staticcheck module: $mod ==="
+            m_pkgs=$(cd "$mod" && go list ./... 2>/dev/null | wc -l)
+            step_rc=0
+            m_out=$(cd "${mod}" && staticcheck ./... 2>&1) || step_rc=$?
+            m_find=$(printf '%s\n' "$m_out" | grep -cE '\((SA|ST|S[0-9]|QF|U)[0-9]+\)$') || true
+            m_crash=$(printf '%s\n' "$m_out" | grep -c 'export data version') || true
+            printf '%s\n' "$m_out"
+            echo "--- module $mod: exit=$step_rc packages=$m_pkgs findings=$m_find toolchain-crash-lines=$m_crash"
+            pkgs=$((pkgs+m_pkgs))
+            findings=$((findings+m_find))
+            crashes=$((crashes+m_crash))
+            if [ "$step_rc" -ne 0 ]; then rc=1; fi
+          done
+          echo "staticcheck self-report: version=$(staticcheck --version) modules=$modcount packages=$pkgs findings=$findings toolchain-crash-lines=$crashes (step exit is $rc)"
+          exit $rc
 
       - name: mockllm module vet
         # Ticket 111 AC#5/AC#6, same shape as test-windows: this is a gate for a

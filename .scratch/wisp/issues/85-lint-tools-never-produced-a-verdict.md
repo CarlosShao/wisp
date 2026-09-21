@@ -22,7 +22,12 @@
    `27×U1000`（未使用）、`3×SA1019`（弃用 API）、`3×S1011`（**nil 解引用**）、`1×SA4006`、`1×SA4000`（比较自己）。
    ⚠ `internal/risk` **0 条**。
 
-- [ ] **AC#6（2026-09-21 由票 75 的第二验收会话挖出，编排者追加）**
+- [x] **AC#6（2026-09-21 由票 75 的第二验收会话挖出，编排者追加）**
+  <!-- 2026-09-21 21:4x 由 agent-ticket85 按 21:2x 裁定翻转：本条**闭于票 93 的重排，非本票**。
+       结案读数（今日 gh api 字段级复验，非转述）：run 35600043583 与 run 35599458439 的
+       test-core 步骤 "Environment fork assertion (WISP_ENV=test data dir)" 均 conclusion=success，
+       而其后 "Portable package tests" 均 conclusion=failure —— 即该步在红 run 里已能自报结论，
+       AC#6 的前提（"只要测试那步红，它就永不执行"）已不成立。原委见 §票面引用腐烂五处 第 5 条。 -->
   `ci.yml:136-142` 的 `Environment fork assertion (WISP_ENV=test data dir)` 那一步
   **排在 `Portable package tests` 之后且没有 `if: always()`** ⇒ **只要测试那步红，它就永不执行**。
   也就是说：**这条门在红 run 里从来没有产出过一个结论**——和 A44③ 的 D22 扫描一模一样的病，只是换了个位置。
@@ -145,4 +150,65 @@ GOOS=windows 78 条 / 21 个包；分类 linux＝`26×U1000 / 3×SA1019 / 2×S10
   票 93 正在动 `ci.yml` 的 portable 步 ⇒ **本票开工前必须先读 93 交回来的是什么形状**，别把两步的修法互相覆盖。
   next= 等写码槽位（当前 `internal/winsec`+`internal/tools`+`ci.yml`+`scripts/` 四路在飞）；
   顺序建议：**本票排在票 93 交件之后**（同文件），排在票 106/107 之后（那两条挡着 CI 转绿，本票挡的是"lint 有没有判据"）。
+
+- 2026-09-21 21:32–21:4x（agent-ticket85，**85a 交件**：只动 `ci.yml` 的 staticcheck 一步 + 本票面）：
+  基线 `date` 起手 `Mon Sep 21 21:32:07 CST 2026`；复算树 = `git archive HEAD` 纯净解出
+  `/tmp/t85-ticket85a`（开工时 HEAD 已前进到 **`d3cc9ed`**，与 `origin/dev` 同步，**未在仓内建 worktree**）；
+  两枚 staticcheck 均 `GOBIN=/tmp/t85-bin` 临时安装，**共享 gopath/bin 未被写入**。
+
+  **三件事的落地（全部在 `ci.yml` 的 `staticcheck` 一步内）**：
+  1. **钉版本 `2025.1.1` → `2026.2.1`**（= module `v0.8.1`，`go list -m honnef.co/go/tools@2026.2.1` 实读；
+     它 vendor `golang.org/x/tools v0.44.1-0.20260420230617-19499e7caabc`，`go version -m` 从二进制宜读）。
+     Go 侧不动（生产侧降线是另一笔账，票面裁定只换消费侧）。
+  2. **独立 module 纳入遍历**：同一步内 `for mod in . tools/d22scan tools/mockllm`，每进一个 module
+     打印 `exit/packages/findings/toolchain-crash-lines`，末行自报总分母。
+     制式实锤：root 的 `go list ./...` 在 `tools/` 前缀下**只返回 `tools/signmodels`**（root module 成员），
+     `tools/d22scan`/`tools/mockllm` 各 0 包 ⇒ root `./...` 结构性照不到它们（快照实测 2+1 条，见下）。
+  3. **R-4**：本步加 `if: ${{ !cancelled() }}`（裁定②批准的唯一形状；**不是** `continue-on-error`），
+     并把"崩在导入"换成"真跑完再红"。`mockllm module vet` 步的票 111 守卫**一行未动**。
+     历史 93 枚 `skipped` 里就有"gofmt 红吃掉本步"这一类（run 160）⇒ 加守卫后本步在任何上游红之下仍出自报分母。
+
+  **对照实验（同树 d3cc9ed、同机 go1.27.1，逐字）**：
+  - 旧版 `staticcheck-2025.1.1 (0.6.1)` `./...`：**rc=1、5 行崩溃、0 条 finding**，首行逐字
+    `-: internal error in importing "internal/byteorder" (cannot decode "internal/byteorder", export data version 4 is greater than maximum supported version 2); please report an issue (compile)`
+    （同形还有 internal/cpu、internal/goarch、math/bits、unicode/utf8；行数 5/6 抖动是并行导入竞态，票面已记）。
+  - 新版 `staticcheck-2026.2.1 (0.8.1)`：**0 条 `export data version` 行**；root module linux **34** / windows **78**；
+    `tools/d22scan` **2**（`main.go:96` field failAddOn unused、`main.go:103` var secretNameRe unused，均 U1000）、
+    `tools/mockllm` **1**（`chat.go:219` func estimateTokens unused，U1000）⇒ 步级自报
+    linux 形状 `modules=3 packages=34 findings=37 toolchain-crash-lines=0`，
+    windows 形状 `modules=3 packages=35 findings=81 toolchain-crash-lines=0`，两步 rc 均为 1（红在 finding 上，符合批准项①）。
+  - 分类当日值（linux root，与 21:2x 裁定段口径逐字一致）：`26 U1000 / 3 SA1019 / 2 S1011 / 1 SA9009 / 1 SA4006 / 1 SA4000`。
+    ⚠ 本机 GOOS=linux 交叉会多 1 行 `-: build constraints exclude all Go files in ...sherpa-onnx-go-linux@v1.13.8 (compile)`，
+    形状是 `(compile)` 结尾 ⇒ **不进 finding 计数**（正则 `\((SA|ST|S[0-9]|QF|U)[0-9]+\)$` 已排除）；CI 有 gcc+cgo，预期该行消失。
+
+  **票面引用腐烂五处的当日重测（AC#6 那处已见上面翻转注释）**：
+  (1) `S1011 = nil 解引用` 为错：`-list-checks` 实跑 **149 条、SA5011 命中 0**，清单逐字
+      `S1011 Use a single append to concatenate two slices`。
+  (2) 行号引用继续腐：AC#6 原文引 `ci.yml:136-142`，21:2x 段改口 `127-141` 在 `d3cc9ed` 也已过期
+      —— 本票面**此后一律用步骤名引用**（`Environment fork assertion (WISP_ENV=test data dir)`），不再钉行号，
+      且本 85a 自身就又把 lint job 加长约 75 行，任何行号从本次交件起即失效。
+  (3) "从未产出判据"措辞：本条以"产出的是 rc=1 崩溃串、finding 恒 0"为准（票面 21:2x 段已改，此处仅背书复测）。
+  (4) "35 条"当日值：**34（linux root）/ 78（windows root）**，纳入两 module 后 **37 / 81**；
+      与预做的 `3c5d1c3`/`a8f9459` 两枚 HEAD 差 = **0**（同集合，未见漂移 ⇒ **不存在"钉任何新版都更多红"的情形**，
+      `2026.2.1` 就是预做用的同一枚版本）。
+  (5) AC#6 前提失效的结案读数：今日 `gh api runs/<id>/jobs` **字段级**复验，
+      run `35600043583` 与 `35599458439` 的该步 `conclusion=success`（同 run 的 `Portable package tests` 为 `failure`
+      ⇒ "红 run 里它也能跑到"成立）。**闭于票 93 的重排，非本票。**
+
+  **门禁读数**：`bash -n`（从 `ci.yml` 逐字抽出的 24 行 step body）rc=0；
+  `ci.yml` 过 `yaml.safe_load` 且 lint job 九个步骤名逐一原样读出；
+  纯净快照 `sh scripts/d22scan.sh` **rc=0**、阳性对照先红（`TestBuiltBinaryGoesRedEndToEnd` 6 子例 PASS、
+  runtests 报 `PASS=21 FAIL=0 SKIP=0 === RUN=31`）、台账当日基线（d3cc9ed 快照，**别抄**）
+  `#1-5 internal/=202 cmd/=20、#6 frontend/=40、#7 internal/tools/=18、#8 design/=16 frontend/=40 internal/=372 cmd/=26`
+  ——本 85a 的 diff 只碰 `.github/` 与 `.scratch/`，**不在任何扫描 scope 内 ⇒ 台账不降是按构造成立**；
+  `go test -count=2` **未跑**：本次零 Go 文件改动，无"碰过的包"可言。
+  `internal/risk` 0 条 finding（linux 分布表复核），冻结包一行未动。
+  ⚠ `scripts/` 未动（三件事全部可在 `ci.yml` 一步内完成，无须登记跨票越界）。
+  ⚠ 本票之后 `lint` 仍红：**红在 37 条读得懂的 finding（linux 形状，3 module；含 1 条 `frontend/embed.go:4` SA9009 假阳性，按裁定不修）**，
+  这是裁定①批准的结果，不是失败；`gofmt (gofumpt)` 的 `@latest` 与 AC#4 的 "placeholder" 改名**不在 85a 派单的三件事内**，未顺手做。
+  next= 交编排者 push；push 之后看 `lint` job 的 `staticcheck` 步——**期望它给出**
+  `staticcheck self-report: version=staticcheck 2026.2.1 (0.8.1) modules=3 packages=<N> findings=<M> toolchain-crash-lines=0`
+  （**期望 M=37±代码漂移**），且 `mockllm module vet` 不再 `skipped` 而是带自己的 conclusion；
+  日志取数用正向形状四条（HTTP 200 + 字节数 + 首行时间戳 + `##[group]Run` 在）。取到读数后：AC#1/AC#2 的前提格才谈得上翻，
+  清账走票 122；`gofumpt` 钉版本与 AC#4 改名建议并入票 122 或另开 85c。
 
