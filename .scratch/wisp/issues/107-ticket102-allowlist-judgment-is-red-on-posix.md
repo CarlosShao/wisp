@@ -394,3 +394,10 @@ next= 编排者：①票 92 落盘后把上面那枚 commit 提掉并 push 读 `
   这是**诚实的红**、不是回归；读 CI 时请按这个前提解释。
   谁先把 `paths.go` 提上去，谁就把两件事一起提上去：commit message **必须分署**，且在 `next=` 里点名"107b 的哪几行进来了"。
   **票 107 在修复落地前保持 `rejected-needs-fix`，不挂 `-done`；后续验收必须以修复进树之后的 HEAD 为准。**
+
+- 2026-09-21 19:5x（**编排者：修复已进树，本票解除"欠落地"状态**）：`git log -S "treeResolvedAsNamed" -- internal/tools/paths.go` → **`8e10095`**
+  ⇒ 107b 的放行侧修复（root 腿 `treeResolvedAsNamed` + target 腿"解析后仍落在同一 root" + `resolvedForm`）**已在 HEAD**；
+  票头那条"HEAD 上 `internal/tools` 是诚实的红"的前提**到此结束**（后续红就是红，不再拿这条解释）。
+  ⚠ 那枚 commit **少署了 107b**（标题只有 `feat(92,...)`），更正与作者归属写在票 92 面 19:5x 那条，**两处同读**。
+  next= 派复验（以当前 HEAD 为准，**重点仍是"放行侧不许比拒绝侧宽"**：探针 A/B/C + 它自己新造的形状；
+  另注意 107b 自报"Windows 上 `EvalSymlinks` 看不见 junction ⇒ 只能靠 fail-closed"这条边界是否真守住）。
