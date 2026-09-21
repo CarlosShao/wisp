@@ -152,3 +152,15 @@ A/B 表内容、`Class` 取值、函数签名、调用点、`Resolve` 的 fail-c
 - next= 交回 owner：① 推送后按 run id + job id 读 `test-core`（AC#6，step 结论而非 job 结论，
   `jobs.total_count=0` 不算样本）；② AC#4 用上面的交接段落关闭；③ 决定要不要把 `bOverrides` 无调用方
   登记成新票。
+- 收尾复测（HEAD=`ea01b9f`，即包含本代理全部改动之后**重新跑**的同一批 Windows `-count=2`，与前面
+  第一次的数字逐字一致，证明新加的两个测试文件没有动到别人）：
+  risk junction `EXIT=0 / === RUN 20 / 顶层 PASS 20 / SKIP 0`；tools bridge junction
+  `EXIT=0 / 28 / 12 / 0`；tools staging `EXIT=0 / 8 / 8 / 0`；tools a18 kill `EXIT=0 / 8 / 2 / 0`。
+- next= **AC#6 请 owner 读的 run**：把 `dev` 推到 `HEAD=ea01b9f`（或含它的更新 sha）之后，
+  `gh run list --branch dev --workflow ci --limit 3` 取 commit 对上的那条 run id，
+  再 `gh run view <run-id> --json jobs --jq '.jobs[]|select(.name|test("test-core"))|{name,conclusion,steps:[.steps[]|{name,conclusion}]}'`
+  ——**读 `Portable package tests` 这一步的 conclusion，不读 job 状态**（A44③/A49④），
+  且该 run 的 `jobs.total_count=0`（cancelled）时**不算样本**（A40①）。要贴的回执一行是：
+  `test-core @ <run-id>/<job-id>: --- FAIL 由 4 包 47 条（`24a66b6` 取证，票 70 面上写的"about 4"是错的）→ <N> 条；
+  internal/tools 由 19+ 条 + 600s panic → 本代理 docker 实测 ok 9.345s；internal/risk 剩 8 条 = 票 55`。
+  本代理不 push，AC#6 框保持不勾直到上面这行被 run id 填实。
