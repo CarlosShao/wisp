@@ -970,6 +970,13 @@
 | **Q-13** "边框 / 液面"两个新维度要不要进 §2.1 | **只写一句总则 + 单独附表**，不逐格塞进 §2.1；并把"静止系边框单帧出现"**判为违约** | 票 62 自己禁过单帧跳变；§2.1 逐格膨胀会让表格再也无法核对 |
 | **Q-14** 窗=配置+16 ⇒ halo(42) 与波环(49) 被裁 | **先如实写"环按窗裁切"**；你要完整环再加宽窗口 | 加窗要重算成像框列并把成本进 SLO（票 66 的口径刚修好，别急着再动） |
 | **Q-15** 44/72 两档、深色桌布、>96 DPI 三个维度零实测 | **只补深色桌布**（AC#1 明文要求）+ Q-3 那条 DPI 命令；44/72 推到票 68 翻默认时一并测 | 深色是"签收看板"的必要半边，另外两条现在测了也会随默认值翻动而作废 |
+| **Q-19** `renderer_windows.go` 里仍有**没名字的裸字面量**在改像素（`liqRate{1.0,-1.6,0.55}`、`liqPhase{0,2.1,4.2}`、渐变停靠 0.42/0.78、`permille 775+225`）——**任何枚举型检查在结构上看不见它们**（票 74 缺口#1） | **与票 62/65 的真机视觉签收同批提出来变成 C21 token**（它们本来就是改视觉的动作） | 不答的代价：C21 表会继续"全绿但漏内容"，而我们刚花两张票把这类缺口定义为要收口的 |
+| **Q-20** 三家库都是 **copy-paste 进仓**（react-bits / beautifului / shadcn 都不是运行时依赖）——**vendored 源码** 还是 **npm 依赖**？ | **vendored 到 `frontend/src/components/`，每文件头注明来源+许可** | 这本就是这类库的设计意图；我们不发 npm 包，vendored 能把 **Commons Clause 的暴露面缩到具体文件**、离线可构建、ban 扫描能直接读到源码。代价：升级要手动 diff |
+| **Q-21** react-bits 许可是 **`MIT + Commons Clause`**（47.7k★，`LICENSE.md` 非纯 MIT） | **现在只登记；发布/售卖前逐组件复核并出一份清单** | 自用不受影响；Commons Clause 限制的是"把软件本身拿去卖/当竞争性服务提供"。你定的路线是**先自用再谈发布**，所以现在不是阻塞项，但必须留在文档里，别到发布前才发现 |
+| **Q-22** `design/` 11 屏原型降级为"参考、非蓝本"后，**视觉真相源是什么**？ | **你逐屏给一张目标截图/参考**（reactbits/beautifului 官网截图也行） | ⚠ 这是**票 65 的老坑重演条件**——那张票 blocked-on-owner 的原因就是"到今天没有任何代理见过参考图"。**没有参考图，代理会自己发明"好看"的定义**，再在签收环节被你打回。给图的成本远低于返工 |
+| **Q-23** L2 强确认卡（`PLAN.md:1034` 已定为 WebView）用 beautifului 的 approval 组件 + **把拒绝/批准理由上卡** | **是**——这正是 **Q-17** 的实现落点 | 一次解决两件事：卡面显示"为什么无法规范化/目标到底是什么"，且不必我们自己发明卡片。**代价**：要给 `ErrReparseDenied` 补可枚举原因 ⇒ **D22 域**（碰冻结的 `pathresolver*.go`），要你点头 |
+| **Q-24** 前端第一批落地范围 | **只做 L2 确认卡 + 面板骨架**，其余屏后面按票排 | 确认卡是安全面，且 `ban #6` 一建 `frontend/` 就武装（禁止 `approval.decide` 出现在前端）。先做它能让"放行只在原生侧"**立刻变成机器可检查的**，而不是文档里的一句话 |
+| **Q-25** CI concurrency group 要不要加 `github.sha`（让每个 push 都拿到自己的结论，不再互相取代排队 run） | **要**，但我先自己实测再定，不占你的判断 | 代价：runner 并发压力上升（self-hosted 只有一台 `wisp-selfhosted-01`）⇒ 我倾向"lint/test 按 sha 分组、slo 保持排队"。**这条我下一轮能自己测出来**，先记着别当成结论 |
 
 **不答的总代价**：票 65（质感返工）与票 68 AC#2/AC#3 全部动不了，SPEC-08 的 INTERIM"赝品"标记继续挂着。
 
@@ -1091,6 +1098,84 @@ vet: cmd/wisp/slo.go:324:49: undefined: proc.Runtime
 "门没跑"和"门跑了没问题"在 CI 输出上又一次长得一模一样，这次的成因不是路径、不是范围，是**步骤次序**。
 本 commit 已把该步与它的阳性对照（`tools/d22scan/runtests.sh -C tools/d22scan ./...`）**提到 gofmt/vet 之前**：
 不删步骤、不给任何步骤加 `continue-on-error`、不让任何步骤可跳过（D22 mode 6 未碰）。
+
+## 编排者登记 A44（2026-09-21 10:26，票 71 交回——**本项目最重要的门从来没有在 CI 上跑过一次**）
+
+- **A44① 最严重的一条**：自 `fd8f838`（**我给一个被杀代理做的检查点提交**）起，lint job 里
+  **`go vet` 步骤先失败 ⇒ 它下面的 D22 扫描步骤被 `skipped`** ⇒
+  **D22 七禁令的门从未产出过一次 CI 结论**。票 71 用调步骤顺序修好（没删步骤、没加 `continue-on-error`）。
+  **教训比本身大**："我们已经有门禁"这个信念，可以只靠"它在 CI 里存在"维持很久，而真实状态是**从未执行**。
+  ⇒ **判据（新，写死）**：**门禁必须能指出"上一次它真的跑过并给出结论"的 run id；指不出就当没有。**
+  （与 A15「没报错≠跑过了」、A16「调用方式须与 CI 逐字同形」同族——但这次被骗的是我自己。）
+- **A44② `undefined: mulA` / `proc.Runtime` 是真的、确定的、只在 Linux 红**：
+  run `35551819606` / job `106188167868`（event=push、headSha `24a66b6`）报
+  `internal/ball/statevisual.go:287:17: undefined: mulA` 与 `cmd/wisp/slo.go:324:49: undefined: proc.Runtime`；
+  今日纯净树 `GOOS=linux go vet ./internal/ball/` **逐字节复现**。
+  根因：`mulA` 只在 `renderer_windows.go:368`（`//go:build windows`）里而 `statevisual.go` **无 tag**；
+  `proc.Runtime` 同理在 `boot_windows.go:28`。**"本地不复现"只是因为本地是 windows/amd64。**
+  引入者 `fd8f838`（我的检查点）+ `00bbb76` ⇒ **开成票 78**，它同时是 A44① 的因。
+  ⇒ **判据**：带 build tag 的符号被无 tag 文件引用 = Linux 上必红的定时炸弹；`GOOS=linux go vet ./...` 要进 CI。
+- **A44③ A40②/A41 的"push run 被 cancelled"结案，结论比我当时写的更强**：那些 run
+  **`jobs.total_count = 0`**——从未派发任何 job，`cancel-in-progress` 根本没参与；真实机制是
+  GitHub 会**用新 run 取代同一 workflow+ref 里更旧的排队(pending) run**，与该键无关。
+  决定性时间线：`24a66b6` 的 job 在 **01:45:37–01:45:40Z** 启动，正是那个组空出来
+  （`35551168596` 于 01:45:35Z 结束——就是 U+26A0 造成 13 分钟 lint 红那次）**之后 2 秒**。
+  ⇒ **修正我自己 A40② 的措辞**：0 job 的 cancelled run **根本不是样本**（我说"混着测量假象"还说轻了）；
+  该窗口内真正执行过 job 的 run **全是 failure** ⇒ "CI 从没绿过"**主要是代码问题**，
+  "从没见过 tip 上的结论"才是节奏问题（我们约 1 分钟一次 push，流水线一次约 14 分钟）。
+  候选修法（group key 加 `github.sha`）在 **A43①**；票 71 没动配置（它无法在不推送的前提下观察效果）⇒ **归我，见 Q-25**。
+- **A44④ 此刻 lint 第一步在 HEAD 上为红，原因不属于票 71**：`internal/memory/artifacts_path_invariant_test.go`
+  （`d9224af`，票 76）会被 gofumpt 重排。票 71 故意不碰别人的文件（对）。⇒ 票 76 自己收，收不掉我补一发。
+  **记在这里是为了让下一个看到 lint 红的人不必再查一遍是谁的。**
+- **A44⑤ 两条独立证据链收敛到同一根因（好消息）**：`test-windows` 的 junction 步骤失败有它自己的真原因——
+  `USERPROFILE` 的 8.3 形式 `RUNNER~1` 使 A 档锚点分类成 **B、期望 ClassA**（job `106188167785`），
+  **与票 72 刚落地的 `f1033e1`（锚点必须与候选路径走同一条句柄管线）是同一类**
+  ⇒ 票 72 方向对；它验收时我专核"放行侧只认已解析形式"那条插单。
+
+## 裁定 R18（2026-09-21 10:24，**owner 直接下的指令**）：前端组件库口径 + `design/` 原型降级
+
+owner 原话要点：①前端如果要实现/已实现，**UI 重构**，动画组件用 **reactbits**、agent 组件用
+**beautifului.dev**、基础组件用 **shadcn** 那一套，"大部分就从这里面找"；
+②**"UI 这块别用原型设计那个里面的了"**——他自陈一开始没想到有成熟组件库。
+
+### 我先把事实核清楚，因为这条指令的代价比看上去小得多
+
+1. **技术栈本来就是它**：`docs/PLAN.md:981` 白纸黑字
+   "Raycast/cmdk 视觉语言 + **React + TypeScript + Tailwind + shadcn/ui**；WebView 宿主 `jchv/go-webview2`"。
+   ⇒ 所谓"重构"**不是换框架**，真正的变化只有一处：**`design/` 那 11 屏原型从"实现蓝本"降级为"参考"**。
+2. **前端其实一行没写**：仓里只有 `design/` 静态原型（`index.html` + 11 屏 + `assets/tokens.css`/`base.css`），
+   面板侧只有 `internal/panel/doc.go`；**没有 `package.json`、没有 `frontend/` 目录**。
+   ⇒ 这是**最便宜的时刻**：没有沉没成本，且 `ban #6` 的 `frontend/` 死作用域还没被激活（见 4）。
+3. **球不能搬到 web，这条不是偏好而是契约**：`PLAN.md:1032` "悬浮球**必须原生**（Direct2D + DirectWrite），
+   常驻，不能是 WebView"；`PLAN.md:1026` 更是**推翻过**我第一轮"确认全走原生"的推荐。分层是既定的：
+   **球 = 原生 / L1 可撤销提示条 = 原生 / L2 强确认卡 = WebView / 面板 = WebView**（`PLAN.md:1032-1036`）。
+   ⇒ reactbits + beautifului + shadcn **只服务后两者**。附带一条硬指标：`PLAN.md:527` 空闲
+   **CPU ≤ 0.5% / private RSS ≤ 25MB**，WebView2 常驻（`msedgewebview2.exe × 3-5`，各 ~60-120MB）
+   一旦去承载球，这两条**必破**——所以"球要不要一起重写"根本不该问。
+4. **`beautifului.dev` 正好压在我们的安全面上**（这是本轮最有用的发现）：它的自我描述是
+   "a small library of extremely crafted, **copy-paste** components for chat agents, thinking states,
+   **human-in-the-loop approvals**"；上游 `TurboKach/ai-native-react-components`，**MIT**，19 个组件，
+   含 approval flows / tool traces。**Q-17（确认卡看不见批准了什么）的自然落点就是它**，不用我们自己发明卡片。
+   ⚠ **许可不对称要登记**：react-bits 是 **47.7k★ 但许可为 `MIT + Commons Clause`**（LICENSE.md），
+   自用没问题，**一旦要卖/托管需复核**；shadcn 与 beautifului 都是 MIT。
+   ⇒ 三家都是 **copy-paste 进仓**（不是 npm 运行时依赖），这与 D23"零 emoji 图标"和 ban #8 扫描天然兼容。
+5. **建 `frontend/` 会武装两条现在空转的门**（今天的 A40④ 判据在这里直接适用）：
+   `ban #6 panel-approval`＝**禁止 `frontend/` 里出现 `approval.decide`**（放行只能发生在原生侧），
+   它的扫描面此刻是 `frontend/=0 [NOT COVERED]`；票 71 已把"声明的作用域走到 0 文件"变成 **rc=2 致命**，
+   所以 **`frontend/` 第一批文件落地必须与"ban #6 真的扫到它"同批**，否则要么门继续空转、要么 CI 当场红。
+6. **"共享设计 token"是 `PLAN.md:1038-1040` 的硬要求**（原生侧与 CSS 侧必须同一套，否则"看起来像两个东西拼的"）。
+   而票 74 刚交付的 `TestC21TableColourRowsMatchTokensCSS` 已经是**三方机器对账（`tokens.css` = 表 = `tokens.go`）**。
+   ⇒ Tailwind 一进来就会有**第二个 token 源**；正确做法不是不管，而是**把那三方检查扩成四方**
+   （Tailwind theme ← 同一份 `docs/contracts/` token 定义），否则 PLAN 这条硬要求会以"看起来很精致"的面貌静默破掉。
+
+### 这次指令牵动的既有账目（不重开已交付的 AC）
+
+- **不受影响**：票 62（液态玻璃球，原生）、票 69/74（C21 表↔码↔CSS 三方检查——反而是它的基础设施）、
+  票 20/73（工具层与清扫器）。
+- **要改口径的**：**票 65**（一直 blocked-on-owner 的"缺图1/图2"——参考对象从"我们的原型"变成"组件库现品 + owner 逐屏截图"，
+  见 Q-22）；**票 68 AC#2/AC#3**（压住的 `prototypeVisuals` 默认值翻转，问题的性质变了但**答案仍在 R15#3/#4/#5 里**）；
+  **R15#1/#2** 中凡以原型为视觉真相源的那部分，改为以组件库现品为源。
+- **新增待拍板 Q-20…Q-24**，列在下面的编号清单里。
 
 ## 编排者登记 A42（2026-09-21 10:05，票 73 验收：一次"我自己重做变异"抓出**注释与真实防线不一致**）
 

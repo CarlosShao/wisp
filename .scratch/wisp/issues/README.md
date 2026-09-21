@@ -176,3 +176,17 @@ multi-task concurrency unlocks only at 47 (SPEC-12 §2).
   然后**由我改写 `:103` 的框文本**（那张票面归我，代理只交替换句与测试名）。
   ⚠ 明令**禁止**顺手把 artifacts 改走 C26：那是冻结契约的行为变更、此处零安全收益，且会撞正在
   `internal/risk` 上跑的票 72。
+- **R18（owner 指令，2026-09-21 10:24）新建两张**：
+  **77 frontend-scaffold-reactbits-beautifului-shadcn** —— 前端**一行没写**，所以这不是"重构"而是首建；
+  栈与 `PLAN.md:981` 完全一致（React + TS + Tailwind + shadcn，宿主 `jchv/go-webview2`），
+  变化只有一处：**`design/` 11 屏原型从"实现蓝本"降级为"参考"**。球与 L1 提示条**保持原生**
+  （`PLAN.md:1032` + 空闲 CPU ≤0.5%/RSS ≤25MB 决定了 web 承载不了球）。
+  本票的**验收核心是 token 单一来源**：Tailwind theme 由 C21 定义生成，并把票 74 的三方对账扩成四方；
+  同批必须**武装 `ban #6`（禁止 `frontend/` 出现 `approval.decide`）与 `ban #8`（零 emoji）**——
+  覆盖面与它新照到的存量违规不分两批（A40④）。⚠ **开工前要先拿 Q-22 的参考图**，
+  否则就是票 65 那个"没有任何代理见过参考图"的老坑重演。
+  许可备忘：beautifului→`TurboKach/ai-native-react-components` **MIT**；**react-bits 是 `MIT + Commons Clause`**（Q-21）。
+- **A44①/A44② 新建**：**78 linux-vet-buildtags-unblocks-d22-gate** ——
+  `GOOS=linux go vet` 的两个 undefined（`mulA`、`proc.Runtime`，无 tag 文件引用 windows-only 符号）
+  自 `fd8f838` 起让 **D22 静态扫描步骤被 skipped ⇒ 那道门从未在 CI 上产出过一次结论**。
+  **禁止用零值 Linux stub 把编译错误换成假绿**；正解是补 tag 或移动符号。已派出代理。
