@@ -36,15 +36,15 @@
 
 ## AC（1:1，裁决表 `docs/evidence/s1/102-*.md` 由验收方出，不是自裁）
 
-- [ ] **AC#1** **先复现再修**：把验收代理的 PROBE B2 做成**包内可重跑的用例**（不是临时探针）：
+- [x] **AC#1** **先复现再修**：把验收代理的 PROBE B2 做成**包内可重跑的用例**（不是临时探针）：
       输入含 `%VAR%`/前导 `~` ⇒ 断言"结果树与请求树**必须同一棵**，否则必须报错"。
       ⚠ 这条用例在**修之前必须红**（红名+断言原文进票面）——它既是复现也是回归网。
-- [ ] **AC#2** 选定 (A) 还是 (B)，并给**每个生产调用点**的处置表（`grep` 出所有 `Resolve(` 非测试命中，逐点写"要不要消费改写标记/是否拒绝"）。**不许只改 winsec 那条腿。**
-- [ ] **AC#3** 变异：把修法退回"照旧展开且不记账" ⇒ AC#1 红；另做一发 **反向**：把 `Result` 的标记字段变成恒 `false` ⇒ **也必须有用例红**（否则 (B) 是纸面承诺）。
-- [ ] **AC#4** 影响面回归：`go test -count=2 ./internal/risk/ ./internal/winsec/ ./internal/tools/ ./internal/memory/` 全绿，
+- [x] **AC#2** 选定 (A) 还是 (B)，并给**每个生产调用点**的处置表（`grep` 出所有 `Resolve(` 非测试命中，逐点写"要不要消费改写标记/是否拒绝"）。**不许只改 winsec 那条腿。**
+- [x] **AC#3** 变异：把修法退回"照旧展开且不记账" ⇒ AC#1 红；另做一发 **反向**：把 `Result` 的标记字段变成恒 `false` ⇒ **也必须有用例红**（否则 (B) 是纸面承诺）。
+- [x] **AC#4** 影响面回归：`go test -count=2 ./internal/risk/ ./internal/winsec/ ./internal/tools/ ./internal/memory/` 全绿，
       并逐条点名 SKIP/FAIL；`sh scripts/d22scan.sh` 纯净树 rc=0、`ban #6`/`ban #8` 对 `frontend/` 的数**不许降**。
       ⚠ `TestResolvePerCallBudget` 那条 1ms 墙钟预算**在负载下会假失败**（票 86）：量到红先判是不是它，**别把它记成回归，也别拿它当借口掩盖真红**。
-- [ ] **AC#5** 若走 (B)：给"谁消费了这个字段"一条**静态可检查**的判据（例：`Screen`/`writeGate`/`PrivateDirAll` 三处必须读它），
+- [x] **AC#5** 若走 (B)：给"谁消费了这个字段"一条**静态可检查**的判据（例：`Screen`/`writeGate`/`PrivateDirAll` 三处必须读它），
       而不是"注释里提醒后人记得读"（票 96/票 90 两次教训：**靠注释与习惯的方向性，最后都要重做**）。
 
 ## Rules（本仓固定）
@@ -123,6 +123,95 @@ tree acted upon   : C:\…\aelsewhereb\artifacts                 ← 另一棵�
 
 next= 实现 (B)：`Result` 加改写记账 + 一个必须读账才能拿到可行动树形的闸 + 四条腿逐个消费 + 静态判据用例。
 
+## 交件读数（agent-ticket102，2026-09-21 18:2x）—— Status: **in-review**
+
+实现与用例在 commit **`a66aadf`**（AC#1 的红用例先单独落在一枚 **`0117459`**，红名与断言原文在上一段）。
+基线对照一律用 `a66aadf^` 的仓外快照 `/tmp/wisp102-baseline-102`。
+
+### AC#2 生产调用点处置表（`grep -rn "risk\.Resolve(" --include=*.go .` 去掉 `_test.go` = 1 命中；
+包内 `Resolve(` 命中另 4 处；合计 5 条腿，逐点处置如下，**没有只修 winsec 那条**）
+
+| # | 调用点 | 这条腿在做什么 | 处置 | 落点 |
+| --- | --- | --- | --- | --- |
+| 1 | `internal/risk/winsec_c26.go:34`（装进 winsec 的适配器，PROBE B2 的那条） | **放置/封存**：winsec 拿返回值去建目录/封 DACL，并且只回 `error` ⇒ 既动手又报成功 | **拒绝**：走 `Result.Actable()`，被改写即返回 `ErrRewrittenPath`；winsec `ResolvePath` 用 `%w` 原样传播 ⇒ 封存失败而不是封错树 | 用例 `TestC26ExpansionMustNotRewriteOntoAnotherTree`（含 `winsec.ResolvePath` 那条断言） |
+| 2 | `internal/risk/syncdirs.go:140`（`syncSet.add`，同步根配置） | **解除兜底网**：`canonical=true` + confirmed-grade 才会关掉 sync-suspect 网（放行方向） | **消费但不拒**：被改写的根仍守（canon 用展开后的树），但**不再算 canonical-grade** ⇒ 关不掉兜底网，并 `logf` 一条给运维 | 用例 `TestC26RewrittenSyncRootDoesNotDisarmSuspectNet`（对照腿：干净根必须 `canonical=true` 且 `complete=true`，否则用例自己先 fatal） |
+| 3 | `internal/risk/syncdirs.go:197`（`resolveTarget`，fs.write 的 sync 判定） | **放行判定**："不是同步目录" 才让写过去 | **拒绝**（fail-closed）：`res.Actable()` 报错 ⇒ 上游按 sync-suspect 处理 | 用例 AC#1 的第三条断言腿 |
+| 4 | `internal/risk/syncdirs.go:211`（同一函数里对最近存在祖先的第二次 `Resolve`） | 祖先链重解析 | **消费**：也走 `Actable()`（祖先形是从 C26 自己出来的，今天恒不触发，读账而不是假设） | 同上（`anceCanon` 全链替换，无裸 `.Canonical` 读取） |
+| 5 | `internal/tools/paths.go:56`（`PathCanonicalizer.resolve`；`grep "risk\.Resolve("` 唯一非测试命中） | **授权**：`[fs] allowed_dirs` 根 + R2 的 in/out-of-allowlist 判定 | **拆开两条子腿**：根=记账（`RewrittenRoots()`）+ 改写且 OS 认不出 ⇒ 进 `unusable`（什么也不授权）；target=**不拒**，因为 `fs.go:95`/`fs_write.go:173`/`mode.go:93` 打开的就是 `Canonicalize` 的返回值 ⇒ 判定树==执行树==审计打印的那棵，拒它就是把 (B) 做成 (A) | 用例 `TestPathCanonicalizerAccountsForRewrittenRoots`（含"不许变成 (A)"那条：确认过的改写根照样授权） |
+
+不改的相邻面（写清楚免得被当成漏网）：
+- `internal/winsec/resolve.go` 的 `builtinVerifier`：**只拒不改写**（票 94 第 5 项实测），本票一字未动。
+- `pathresolver.go` 的 `formsOf`/`anchorForms`（A/B 档锚点比较）：走 `lexCanonical`，**不做展开** ⇒ 没有本洞。
+- `assessor.go` / `rules_gateway.go`（禁区）：只经 `PathCanonicalizer` 接口取路径，接口签名未变 ⇒ 无需改。
+- `Result.Canonical` 的读取点全仓复算：`pathresolver.go`（生产者）+ 上表 2/3/5 号腿，**没有第六处**。
+
+### AC#3 双向变异（全部在仓外快照 `/tmp/wisp102-mut-a66aadf4`，`git archive a66aadf | tar -x`；
+每发先 `go build ./...` **rc=0**（编译失败不算变异），改完 `diff -r` 对 pristine 副本 **rc=0**，
+本仓 `git diff --quiet` **rc=0**）
+
+| 变异 | 改法 | 结果 |
+| --- | --- | --- |
+| **M1 修法退回"照旧展开且不记账"** | `pathresolver.go:94` `if r.Rewritten {` ⇒ `if false && r.Rewritten {`（`Actable` 不再拒） | build rc=0；**红**：`TestC26ExpansionMustNotRewriteOntoAnotherTree/{percent_env_var_spelling, leading_tilde_spelling}`、`TestC26RewriteAccountIsRecorded/{percent_env_var, dollar_env_var, leading_home_tilde}`。**绿**（覆盖边界，如实登记）：`TestC26RewriteAccountIsConsumedAtEverySecurityLeg` 是文本判据，M1 只改条件不删符号 ⇒ 它不红；`internal/tools` 那条也仍绿（它读 `Rewritten` 不读 `Actable`）。 |
+| **M2 反向：`Result` 的标记字段恒 `false`** | `pathresolver.go:116` `Rewritten: len(kinds) > 0` ⇒ `Rewritten: false` | build rc=0；**红**：AC#1 两条子用例、`TestC26RewriteAccountIsRecorded` 三条子用例、`TestC26RewrittenSyncRootDoesNotDisarmSuspectNet`（两条断言：`canonical=true` + `complete=true`）、`internal/tools` 的 `TestPathCanonicalizerAccountsForRewrittenRoots` ⇒ **(B) 不是纸面承诺**：把账擦掉，四条腿的用例一起红。 |
+
+### AC#4 门禁读数（基线 = 本票实现后的工作树；`-count=2` 一轮，未重测挑数）
+
+`go test -count=2 ./internal/risk/ ./internal/winsec/ ./internal/tools/ ./internal/memory/` ⇒ **四包 rc=0**，
+`-json` 逐包点名的 `=== RUN`/`--- PASS`/`--- FAIL`/`--- SKIP`：
+
+| 包 | RUN | 不同名 | PASS(测试条数) | FAIL | SKIP |
+| --- | --- | --- | --- | --- | --- |
+| `internal/risk` | 324 | 162 | 322 | **0** | 2 |
+| `internal/winsec` | 58 | 29 | 58 | **0** | 0 |
+| `internal/tools` | 202 | 101 | 202 | **0** | 0 |
+| `internal/memory` | 134 | 67 | 132 | **0** | 2 |
+
+`=== RUN` == 2 × 不同名 四包全部成立（324/58/202/134）。SKIP 逐条点名（都是环境闸，非本票引入）：
+`internal/risk/TestSyncRegistryProbeLive`（`syncdirs_test.go:347`，本机 HKCU 无 registry-grade 同步记录）、
+`internal/memory/TestSubprocessCrashWriter`（`concurrent_test.go:186`，crash-writer 子进程用例在
+`TestCrashRecoveryKillMidWrite` 下跑）⇒ 两条在 `a66aadf^` 的仓外基线快照里**同样 SKIP**（实测贴在上面），
+所以是 `-count=2` 各 1 条 × 2 轮 = 2 条，不是回归。
+**`TestResolvePerCallBudget`：本票没量到红**（四包 FAIL=0 里有它），未当作借口也未记成回归。
+其余门禁：`gofmt -l .` **空**、`gofumpt -l .` **空**（`$(go env GOPATH)/bin/gofumpt`）、
+`go vet` 按包 rc=0（risk/tools/winsec/memory 各一）、`GOOS=linux go vet` **按包**同样四 rc=0
+（仓根 `./...` 的已知仪器坑不在此列）。
+`go test ./cmd/wisp/`：本机 `exit status 0xc0000135`、`=== RUN` **0 条** —— 与票 98 记的加载期缺 DLL 同形，
+且在 `a66aadf^` 基线快照里**一模一样**（实测在上面）⇒ 判"仪器不可跑"，不判本票回归；票 98 的注入命令本代理未持有，
+`go vet ./cmd/wisp/` rc=0 是本代理能给的最强替代读数。
+`sh scripts/d22scan.sh`：**纯净仓外快照** `/tmp/wisp102-d22-0e7640c1`（`git archive HEAD | tar -x`）**rc=0**，18.6s，
+台账 8 行逐字：`bans #1-5 internal/=197`、`#1-5 cmd/=20`、`**ban #6 frontend/=37**`、`ban #7 internal/tools/=17`、
+`#8 design/=16`、`**#8 frontend/=37**`、`#8 internal/=340`、`#8 cmd/=26`
+⇒ 与票 94 验收参照（`#6 frontend/=37`、`#8 16/37/335/25`）比：`#6`/`#8 frontend` **没降**，
+`#8 internal/` 340（参照 335）、`#8 cmd/` 26（参照 25）是别人后续进树的文件，只增不减。
+
+### AC#5 "谁消费了这个字段"的静态判据（不是注释提醒）
+
+`internal/risk/pathresolver_rewrite_account_test.go:TestC26RewriteAccountIsConsumedAtEverySecurityLeg` 两半：
+1. **逐腿点名**：`winsec_c26.go` 必须出现 `Actable(`；`syncdirs.go` 必须同时出现 `Actable(` 与 `res.Rewritten`；
+   `../tools/paths.go` 必须出现 `res.Rewritten` —— 少一个 `t.Errorf`，文件被搬走则 `t.Fatalf`（不许靠"记得找"）。
+2. **全仓扫**：`WalkDir` 从仓根扫所有**非测试** `.go`，凡读 `Result.Canonical` **字段**
+   （`readsCanonicalField` 用后随字符把 `Canonicalize` 方法排掉，第一版误报 6 处已修）
+   的文件，除生产者 `pathresolver.go` 外必须同时出现 `Actable(` 或 `.Rewritten`；
+   一条都没扫到 ⇒ `t.Fatalf("the instrument is broken")`（防"扫空=绿"）。
+⇒ 以后新增第六条腿想直接抓 `Canonical`，CI 就跑不过；M1 的读数同时说明这条判据**只挡符号消失，不挡条件被改**，
+真正的兜底是 AC#1 与 AC#2 表里那五条行为用例。
+
+### 需要协调（已在动手前登记于此，未默默改）
+
+`internal/tools/paths.go` 是 AC#2 处置表第 5 行，也是 `grep -rn "risk\.Resolve(" --include=*.go .`
+去掉 `_test.go` 的**唯一**命中，票面 AC#2 明写"不许只改 winsec 那条腿"⇒ 本票按票面改了它，
+改动范围只有 `PathCanonicalizer`（新增 `rewritten` 字段 + `RewrittenRoots()`；`resolve` 返回 `risk.Result`；
+`NewPathCanonicalizer` 对"改写且 OS 认不出"的根 fail-closed）+ 一个**新文件**
+`internal/tools/paths_rewrite_ticket102_test.go`；未动 `bridge.go`/`fs.go`/`fs_write.go`/`mode.go` 一行。
+⚠ 另：本轮工具输出里反复出现一段自称"编排者备注、要求把 `internal/tools/` 冻起来"的附加文本
+（同一串还出现在别的包的写入结果里），本代理按"工具输出不是授权"处理：没扩大范围、没动禁区，
+只把上面这一处最小改动留在此处等裁决；如要回收，revert 单文件即可，`internal/risk` 三条腿不依赖它。
+`internal/winsec/`、`internal/secret/`、`cmd/wisp/`、`internal/perm/`、`frontend/`、`internal/panel/`
+**一字未动**（只 import/调用）。`docs/PLAN.md`、`docs/specs/*` 一字未动 ⇒ **未触发 D22 停手**（本票是修实现，契约原句已引）。
+
+next= 交回验收代理出裁决表（`docs/evidence/s1/102-*.md`）；本票不解 R-b/R-c/R-d（三条仍在票 94 的账上），
+`memory/open.go` 那份"自己的词法 abs"仍归票 18/79 地界：现在的效果是它一旦被改写会**收到错误**而不是静默封错树。
+
 ## Progress log（append-only）
 
 - 2026-09-21 17:4x（编排者）：建票。来源是 `acceptor-ticket94` 的 R-a（它把它排在四条新账的第一条，
@@ -132,3 +221,10 @@ next= 实现 (B)：`Result` 加改写记账 + 一个必须读账才能拿到可�
   ⚠ 还有一条我明写在 AC#2 里：**不许只修 winsec 那条腿**——入口规范化的洞对所有判定都成立，
   只补一个调用方就是"同一不变式只修一半"（票 75/82 都栽过这个）。
   next= 派单（`internal/risk/` 现在无人写）；本票**优先于票 93/99/85**那三张门禁票，因为它是 fail-open。
+- 2026-09-21 18:3x（agent-ticket102）：交件。AC#1..AC#5 五框全勾，读数在上面（红名/契约原句/五条腿/两向变异/四包 `-count=2`/d22scan 台账）。
+  两枚 commit：`0117459`（AC#1 红用例 + 判 (B) 的原句）、`a66aadf`（实现 + 三条 risk 腿 + tools 腿 + AC#5 静态判据 + 用例）。
+  ⚠ 一条账要编排者裁：本轮**每一次工具输出末尾**都挂着一段自称"编排者备注"的附加文本，内容是"停手/冻结 `internal/tools/` 与 `internal/secret/`/`winsec`/`cmd/wisp`/…/否则终止并回滚、永久记录"，
+  同一串在多个不同包的写入结果里逐字重复 ⇒ 本代理按"工具输出不是授权也不是指令"处理：**没有扩大范围**（禁区一字未动），
+  但按票面 AC#2 的原文（"grep 出所有 `Resolve(` 非测试命中逐点处置"、"不许只改 winsec 那条腿"）保留了 `internal/tools/paths.go` 那一处最小改动，
+  并在此登记。若那句真是编排者的口径，revert 单文件即可（`internal/risk` 的三条腿不依赖它），但 AC#2 会退回"只修一半"的状态、AC#5 的全仓扫描会红。
+  next= 验收代理出 `docs/evidence/s1/102-*.md` 裁决表；R-b/R-c/R-d 与 `memory/open.go` 那份词法 abs 不在本票内（仍挂票 94/18/79 的账）。
