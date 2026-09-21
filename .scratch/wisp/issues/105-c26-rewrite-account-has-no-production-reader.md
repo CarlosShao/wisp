@@ -1,6 +1,8 @@
 # 105 — C26 那本"改写账"**只有测试在读**：`RewrittenRoots()` / `Roots()` / `UnusableRoots()` 全仓**零生产读取者**（票 102 验收的 R-102-5），外加祖先重解析那条腿**没有行为用例**（R-102-3）
 
-**Status:** open（2026-09-21 18:0x 编排者建；来源=`acceptor-ticket102` 的残留 **R-102-5 / R-102-3**，它判"不阻塞票 102 结案，但这条账不改判据就能立住"）
+**Status:** ready-for-review（2026-09-21 19:5x agent-ticket105 交件，date 读数 19:55 CST；建票原文保留：
+              2026-09-21 18:0x 编排者建；来源=`acceptor-ticket102` 的残留 **R-102-5 / R-102-3**，
+              它判"不阻塞票 102 结案，但这条账不改判据就能立住"）
 **Type:** 能力已实现但没人消费（memory 第 8 条那个形状的**第四次**）+ 一条测试覆盖缺口
 **Blocks:** nothing（但它决定我能不能对 owner 说"改写过的那条路**看得见**"）· **Blocked by:** nothing
 **Packages:** `internal/risk/`（这本账的**消费端**；**不许改**票 102 已定的产生端语义）、
@@ -99,3 +101,62 @@
   ⚠ 若推演结论是"这条腿在无 exempt 登记的真机上不可达"，我会把**实际红的那条断言原文**写进票面，
   不会为了勾框改 `syncdirs.go`（那是票 102 已结案的语义）。
   next= 写 AC#3/AC#2 的修前红用例并单独 commit。
+
+- 2026-09-21 19:5x（agent-ticket105）：**AC#2 接线交付、AC#3 行为用例交付，交件**。
+  - **AC#2 消费者（真生产代码，非新 API）**：`internal/tools/bridge.go:864` 新方法 `pathAccount()`
+    一次读全三口气 `Roots()` / `RewrittenRoots()` / `UnusableRoots()`；调用者在
+    `internal/tools/bridge.go:823` 的 `book()`——每笔按路径判定的调用写一条结构化记录
+    `tools: PATH-ACCOUNT task=... tool=... roots=N rewritten=[...] unusable=[...]`，
+    与 `MODE-READ` / `tools: call` 同一个 sink。空账也写：`rewritten=[] unusable=[]` 是"读过且干净"的证据，
+    缺行才是不知读过没有。**不新造第二本账**（票 102 的 `Result.Rewritten`/`Actable()` 语义一字未动）。
+    复算 AC#1 那条 grep，现在非测试命中＝`bridge.go:810,811`（注释）+ `bridge.go:864`（真调用点）
+    + `paths.go:186,194`（定义）。**装配根可达链路（file:line）**：
+    `cmd/wisp/run.go:265 NewPathCanonicalizer` -> `run.go:335/337 tools.New(tools.Options{Paths: rt.paths})`
+    -> `run.go:353 Logf: rt.auditf` -> `internal/tools/bridge.go:823 book()` -> `:864 pathAccount()` -> `[audit]` 落盘。
+  - **AC#2 端到端（修前红 -> 修后绿）**：`internal/tools/bridge_path_account_ticket105_test.go` 三条
+    （真 `fs.read` 走完整 Bridge，审计 sink 是**磁盘上一个真文件**，测完读回来断）。
+    断言对象＝**记录内容**：配置里的拼写 `%WISP105_ACCOUNT_ROOT%`、C26 把它移到的那棵树、构造名 `(env)`、
+    在授权中的 `roots=1`、被丢弃根的原文原因 `not confirmed on disk`、以及空账时 `rewritten=[] unusable=[]`。
+    修前 3/3 FAIL（原文 `no PATH-ACCOUNT record in the audit file ... after a real fs.read`，commit 2afd064）；
+    修后 3/3 PASS（commit 21da8f3）。
+  - **变异 M1（AC#2）**：快照 `/tmp/wisp-t105-agent-ticket105`（`git archive 21da8f3 | tar -x`，仓内不建 worktree）。
+    改 bridge.go:820 为 `if false && len(dec.Paths) > 0 { // MUTATION-t105-M1: PATH-ACCOUNT record disabled`
+    （同一条 && 链里 `grep -n` 打印了被改后整行），`go build ./internal/tools/ ./internal/risk/` rc=0（编译通过才算变异），
+    `go test -v` 目标三条：`=== RUN`=3、**FAIL=3/3**（红在"盘上没有这条记录"）。仓库树未受影响：
+    `git diff --quiet -- internal/tools internal/risk` rc=0。
+  - **AC#3（祖先重解析那条腿的行为用例）**：新文件 `internal/risk/syncdirs_ancestor_reparse_ticket105_windows_test.go`。
+    真机 `cmd /c mklink /J` 只在 `t.TempDir()` 内造（target 与 link 分属两个 TempDir，cleanup 先删 link 再让 t 删 target，
+    不碰用户数据）。用例 1＝祖先带 **已登记 exempt 的 junction** + 叶子不存在 ⇒ 进得到 `resolveTarget` 的第二次 `Resolve(anc)`，
+    断可观察结果：`IsSyncPath` 必须把候选**锚回 junction 指向的真树**并命中注册的 env root（`Sync:true` 且 `Root.Path==真树`、
+    不是 suspect-fallback），也就是"不落错树"；用例 2＝同一条 junction **未登记** ⇒ 必须 fail-closed 到 `suspect-fallback`
+    且 `Why` 点名 reparse。修前 2/2 PASS（这条腿今天行为是对的，票 102 缺的是用例而不是判定）。
+  - **变异 M2（AC#3）**：同一快照里把 `internal/risk/syncdirs.go:222-232`（`Resolve(anc)` 的 deny 分支 + `ares.Actable()`
+    + 空值守卫）整段换成 `ares := Result{Resolved: true} // MUTATION-t105-M2` + `anceCanon := anc`，build rc=0，
+    `=== RUN`=2 ⇒ **用例 1 FAIL，红在行为**：`IsSyncPath(...) = Sync:false (why="write target is not under any sync root")`
+    ——穿过 junction 落进同步树的写被当成"不在同步树里"放行。用例 2 仍 PASS，如实记录原因：非 exempt 的 junction 在
+    **第一次** `Resolve(raw)` 就被 `reparseComponents` 拒了，够不到这条腿。
+    ⚠ 请验收方独立复算我这条可达性结论：只删 `ares.Actable()`（保留重解析）在真机上**触发不了**——祖先串是从 C26
+    自己的输出切出来的，不含未展开的构造（票 102 第 4 行注释也这么写），所以那半今天只能钉符号、钉不住行为。
+  - **AC#4**：**没撞面板地界**，`frontend/` 与 `internal/panel/` 零改动（三枚 commit 的 `--name-only` 只有
+    `internal/tools/bridge.go`、两枚测试、票面）。"给人看"走的是审计这一半；面板显示这本账仍是票 92 的活。
+    `internal/tools/paths.go` **未改**（所以无需协调）；改的是 `internal/tools/bridge.go`，登记一句给在飞的只读代理
+    `acceptor-ticket92`（它读 `internal/tools`）：新增的是一条审计记录 + 一个只读方法，没动任何判定。
+  - **AC#5 门禁四数**（树＝当前工作树；`git status` 里 `ci.yml`/`110`/`97`/`queue.go`/`portable-tests.sh`/
+    `winsec-tests.sh` 是别人的在飞改动，都不是我的、也没进我的 commit）：
+    * Windows `-count=2 -v`：`internal/tools` rc=0，`=== RUN`=230 == 不同测试名 115 × 2，top-level PASS=158 FAIL=0 **SKIP=0**；
+      `internal/risk` rc=0，`=== RUN`=328 == 164 × 2，PASS=190 FAIL=0 **SKIP=2**＝同一个名字两遍
+      `TestSyncRegistryProbeLive`（带 `-v` 报出的真 skip，本机 HKCU 无那条记录；票 82 起就双平台跳，
+      `scripts/portable-tests.sh` 头部已登记，非本票引入）。
+    * POSIX 真跑：`docker run --rm -v "/d/work/workspace/projects plans/Wisp:/wisp" -e CGO_ENABLED=0 golang:1.27`，
+      容器内 `ls -l /wisp/go.mod` + 我的测试文件**证明文件在**（不是静默空挂载）；
+      `go test -count=2 -v` 目标 4 个名字（含票 102 的 `TestPathCanonicalizerAccountsForRewrittenRoots`）：
+      `=== RUN`=8 == 4 × 2，FAIL=0 SKIP=0 rc=0。AC#3 两条是 `//go:build windows`，POSIX 不参与（junction 是 Windows 产物）。
+    * `gofmt -l` 我碰的三个文件：空。`$(go env GOPATH)/bin/gofumpt -l` 同三文件：空。
+      `go vet ./internal/tools/ ./internal/risk/` rc=0；`GOOS=linux go vet` 同两包 rc=0。
+    * 下游回归（我加的是"每调用一条审计记录"，怕有人数行数）：
+      `PATH="$PWD/third_party/sherpa-onnx:$PATH" go test -count=1 ./cmd/wisp ./internal/panel ./internal/tools/... ./internal/risk/...`
+      全 ok、rc=0（cmd/wisp 靠这条 PATH 才跑得起来，票 98 的 dll 洞）。
+    * `sh scripts/d22scan.sh` rc=0 clean，台账：bans#1-5 internal/=202、cmd/=20；ban#6 frontend/=43；
+      ban#7 internal/tools/=18；ban#8 design/=16、frontend/=43、**internal/=366**、cmd/=26（本票只新增文件，各 scope 不降）。
+  next= 交验收出裁决表 `docs/evidence/s1/105-*.md`：AC#1 复算＝复现、AC#2 链路＋端到端＋M1、AC#3 两用例＋M2、
+  AC#4 未扩界。若验收方认为"每调用一条"太吵，改法应是**降频到 roots 变化时**而不是撤掉消费者——请先判语义再判噪声。
