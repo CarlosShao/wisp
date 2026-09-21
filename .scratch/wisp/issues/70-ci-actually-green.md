@@ -194,3 +194,17 @@
   - `test-core` 的 `Environment fork assertion`（`bash tools/d22scan/runtests.sh ./internal/proc/ -run TestLayoutForTestEnv`）⇒ **`FORK_RC=0`**，`top-level: PASS=1 FAIL=0 SKIP=0, === RUN=3, '[no tests to run]'=0`。
   - ⛔ **新炸点（本条唯一"下次 push 会多一步红"的预警）**：`staticcheck ./...`。CI 钉的是 **`staticcheck@2025.1.1`**，它在 **go1.27 上根本跑不起来**：6 行 `-: internal error in importing "internal/byteorder"/"internal/cpu"/"internal/goarch"/"math/bits"/"unicode/utf8" (cannot decode ..., **export data version 4 is greater than maximum supported version 2**)` ⇒ `SC_2025_RC=1`，**0 条真实 finding**（也就是说：**这一步的 CI 判据至今一次都没产生过**，它一直被前面的失败挡着）。把工具升到 `@latest` 后能跑（`staticcheck 2026.2.1 (0.8.1)`），但会**立刻挖出 35 条真 finding、`SC_LATEST_RC=1`**：`27×U1000(未用的函数/类型) + 3×SA1019(runtime.GOROOT 已废弃) + 3×S1011 + 1×SA4006 + 1×SA4000`，散在 **15 个包**：`cmd/wisp`×5、`internal/agent`×3 + `internal/agent/approval`×4、`internal/llm`(+adaptertest/anthropic/openaichat)×6、`internal/audio`×4、`internal/ball/tokens_table_test.go`×2、`internal/tools`×4、`internal/memory`×2、`internal/observe`×2、`internal/config/parse.go:223`×1、`internal/models/archive.go`×1、`internal/proc/crossvet_test.go`×1（**`internal/risk` 一条都没有**）。**我没碰其中任何一个文件**（`cmd/wisp/**`、`internal/config`（票 80 在途）、`internal/tools`、`internal/memory/*_test` 全在禁改或别人在途的清单里），也没动 `ci.yml`（票 71 的在途文件）⇒ 只上报：**"pin 太老跑不动"与"升上去就有 35 条账"是同一件事的两面，得编排者定顺序**（先清 35 条再升 pin，还是给 staticcheck 单开一张票）。
   next=把 AC#1 的框勾上（判据正文已满足，含 v0.7.0 与 CI 实际用的 @latest v0.12.0 双版本复核），然后交回编排者：AC#2 三族红的归属、staticcheck 的 35 条、以及"lint 下一次 push 会红在 staticcheck 而不是 gofmt/vet"。
+
+- [2026-09-21T12:4xZ] agent=agent-ticket70-d did=**AC#2 的账在 15 分钟里被别人的落地改写了 ⇒ 追一条更正的数（HEAD 现在是我自己的 `c12c82f`，含票 81 的 `4683c34` 与票 83 的 `a95ee3a`）**。同一判据（`docker run golang:1.27` + `WISP_ENV=test` + `git archive HEAD` 纯净树）只重跑上面那三个红包：
+  ```
+  ok    github.com/CarlosShao/wisp/internal/agent            4.372s
+  ok    github.com/CarlosShao/wisp/internal/agent/approval   0.037s
+  ok    github.com/CarlosShao/wisp/internal/memory          39.089s
+  --- FAIL: TestWriteGateNotSelectedByPayloadKey / ...PlainLocalWriteNotFlagged / ...EveryPathTargetJudged /
+      ...AllPathsNonSyncStaysExempt / TestSyncFallbackNotDisarmableByWeakRoot / TestSyncEnvConfiguredRoots /
+      TestSyncNormalNewFileWriteNotFlagged / TestSyncDotDotTailFailsClosed      (8 条)
+  FAIL  github.com/CarlosShao/wisp/internal/risk  1.895s     RC=1
+  ```
+  ⇒ **`test-core` 在 Linux 上现在只剩 1 个包 / 8 条红，且 8 条全在 `internal/risk/**`（我的禁改区、票 72 同区、P12 的 registry/config/env 三档在 Linux 上永不 confirmed）**。上一条里我数的 `internal/agent` 与 `internal/memory` 各 1 条**已被票 81 的 `4683c34`（"derive the purge expectation from where the OS resolved each canary, not from a name list"）修掉**——修法正是 AC#2 允许的那条"平台专属期望值"，**不是** skip 也不是删断言，值得记一笔：**它证明了那两条红不需要我来动手**。
+  **AC#2 结论不变：判据（`test-core` 绿）未达成 ⇒ 框不勾**，但"未达成"的原因从"四族"收敛成"一族半"（risk 8 条 + 下面两件与 test-core 无关的 lint 侧炸点）。
+  next=交回编排者三件事：(1) `internal/risk` 那 8 条在 ubuntu 上该不该算 portable（**移出清单是编排者的判据**）；(2) `staticcheck` 的 pin 跑不动 vs 升上去 35 条 finding 的先后顺序；(3) push 之后按 AC#6 的口径重看 `lint`/`test-core` 两步——**`gofmt (gofumpt)` 这次会绿**（AC#1 的 CI 侧最后一块证据），`test-core` 预期仍红 8 条。
