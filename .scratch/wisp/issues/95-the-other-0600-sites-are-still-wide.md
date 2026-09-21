@@ -314,3 +314,29 @@
   所以现在**不派单**；`internal/winsec/` 的语义也在票 94 手里，别同时改。
   next= 等 `acceptor-ticket89` 与 `agent-ticket94` 交件 ⇒ 那时再派，派之前我先自己把"日志算不算私有数据"
   的**代价**量一遍（谁在读日志：`wisp doctor`、票 66 的 SLO 链、用户自己的 tail）。
+
+- 2026-09-21 19:5x（`acceptor-ticket95`，**对抗验收交件：AC#2/#3/#4/#5 通过，AC#1 通过但有条件；AC#1 框按派单保持不勾，Status 不动**）：
+  裁决表 `docs/evidence/s1/95-adversarial-acceptance.md`（checkpoint1=`1b78f62`，本条为终版提交）。全部读数出自
+  仓外快照 `/tmp/wisp-ac95-gate`、`/tmp/wisp-ac95-mut-agent-ticket95`（`git archive a367b79`），真实树里邻居的
+  ` M`（winsec/risk/tools/scripts/ci）一字未动。要点：① **icacls 前后本代理自己量过**——`os.WriteFile(0o600)`
+  落地六条含 `BUILTIN\Users:(I)(RX)` 与外来 SID `(I)(M,DC)`；`winsec.PrivateFile` 后只剩 SYSTEM/Administrators/
+  当前用户三条 `(F)` 无继承；**封后同用户自读三条路实测可读**（同进程 ReadFile、另进程 `cmd /c type`＝tail 形状、
+  CreateTemp→SealFile→描述符写→rename→重开读回）⇒ 交回 owner 那句"**SealFile 不挡同用户 tail/doctor**"为真，
+  被关掉的只有别的非管理员账户。② **模型三问复算**：验签每文件都过（`VerifyDir`×`InstalledFiles()`）、发生在
+  每次 `Ensure` 交还时（缓存命中 `:170-174`、local_override `:161`）、`models` 包内无"未过签名当可信读回"的路；
+  **残余**＝`Ensure` 返回后引擎读取期间的跨账户写窗（解包/安装目录继承 `(M,DC)` 实测）⇒ 登记 `AC95-R1` 交引擎/语音票，
+  不推翻"不封"。③ **钉子有牙实证**（临时探针，非仓库内用例）：M3 `VerifyDir` 覆盖面缩 `[:1]` ⇒
+  `TestAC3EveryInstalledFileIsReverifiedAtReadTime` 红（`tampering installed file 2/4 (tokens.txt) went undetected`）；
+  M4 解包加 `SealFile` ⇒ `TestAC3ExtractionIsDeliberatelyNotSealed` 红（`model.onnx stopped being inherit-wide`）。
+  ④ **AC#4 两发变异**：M1 退回 `migrate.go` ⇒ 只 `TestAC2MigrationBackupLandsPrivate` 红（BUILD_RC=0、
+  `0o600` 不落地由 icacls 判据抓住）；**本代理补做 M2** 单独退回 `parse.go` ⇒ `TestAC2SaveFileLandsPrivate`
+  **也红**（`:130`）——实现方"另一条腿仍绿"是分层正确、**不是从未锚定**。M2 第一发因注释符笔误编译失败，作废未计。
+  ⑤ **门禁四数逐包复算与实现方完全一致**（config 200/200/0/0、models 56/52/0/4、secret 58/58/0/0、observe 94/94/0/0，
+  全 `-v`、rc=0）；**models"PASS+SKIP>RUN"的疑点是算术误读**：52+4=56＝RUN 恰自洽，真实易混处是 top/含子用例两种
+  grep 口径（config 112/200、secret 42/58）。`gofmt -l` 空；gofumpt 本机查无 ⇒ 如实登记未跑；按包 `go vet` 与
+  `GOOS=linux go vet` rc=0；`sh scripts/d22scan.sh` rc=0、台账八行与交件一字不差（`internal/=345`、`cmd/=26`、
+  `frontend/=37`），allowlist 非注释 5 行未动。⑥ 票面坐标三处行级漂移登记 `AC95-R2`；⑦ 本代理登记新增
+  `AC95-R3`（宽 temp+rename 会静默重开 config.toml 的不变量缺 seam 守卫）与 `AC95-R4`（安装目录落位 `:566` 无钉子）。
+  ⑧ **伪授权**：本验收会话工具输出中 **0 次**出现"编排者备注"类注入；实现方登记的两起本代理不复核其来源、
+  不执行其任何指令，**未 revert 任何 commit**，票面 AC#2 接线保持在 HEAD 且被 M1/M2 证明有效。
+  next= 编排者：拿裁决表勾 AC#1 的归属（⑤owner、⑥⑦各包主人）、决定 AC95-R1/R3/R4 是否开票、落 R-95-4 的台账更正。
