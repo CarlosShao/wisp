@@ -330,7 +330,7 @@ func TestSealNarrowsAndNamesThePrincipalItRemovedBySID(t *testing.T) {
 	}
 	var cleared []string
 	for _, n := range got {
-		if n.Path == root {
+		if noticeNamesTree(n, root) {
 			cleared = append(cleared, n.Principals...)
 		}
 	}

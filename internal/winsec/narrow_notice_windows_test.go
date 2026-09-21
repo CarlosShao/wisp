@@ -78,7 +78,7 @@ func TestSealReportsThePrincipalsItCleared(t *testing.T) {
 	for _, p := range []string{root, child} {
 		var hit bool
 		for path, principals := range reported {
-			if strings.EqualFold(path, p) {
+			if noticeNamesTree(narrowNotice{Path: path}, p) {
 				for _, s := range principals {
 					hit = hit || namesEveryone(s)
 				}
@@ -89,7 +89,7 @@ func TestSealReportsThePrincipalsItCleared(t *testing.T) {
 		}
 	}
 	for _, n := range got {
-		if strings.EqualFold(n.Path, inherited) {
+		if noticeNamesTree(n, inherited) {
 			t.Errorf("%s held only an *inherited* copy of the foreign grant and the OS recomputed it, "+
 				"so reporting it is the noise this notice was supposed to avoid: %+v", filepath.Base(inherited), n)
 		}

@@ -79,7 +79,7 @@ func sealNotices(t *testing.T) *[]narrowNotice {
 func noticesFor(got []narrowNotice, path string) []narrowNotice {
 	var out []narrowNotice
 	for _, n := range got {
-		if strings.EqualFold(n.Path, path) {
+		if noticeNamesTree(n, path) {
 			out = append(out, n)
 		}
 	}
@@ -267,7 +267,7 @@ func TestAC2InheritedNoticeHasANoiseBound(t *testing.T) {
 		t.Logf("leg 2 (parent sealed first, then %d children): total WARN = %d (parent=%d, children=%d), per-child=%v",
 			len(kids), len(*got), parentNotices, len(*got)-parentNotices, perChild)
 		for _, k := range kids {
-			if n := perChild[strings.ToLower(k)]; n > 1 {
+			if n := len(noticesAboutTree(*got, k)); n > 1 {
 				t.Errorf("AC#2 leg 2: %s emitted %d WARN(s), the bound is 1 per child", filepath.Base(k), n)
 			}
 		}
@@ -303,7 +303,7 @@ func TestAC2InheritedNoticeHasANoiseBound(t *testing.T) {
 		}
 		t.Logf("leg 3 (parent left wide, %d children sealed singly): total WARN = %d", len(kids), len(*got))
 		for _, k := range kids {
-			if n := perChild[strings.ToLower(k)]; n != 1 {
+			if n := len(noticesAboutTree(*got, k)); n != 1 {
 				t.Errorf("AC#2 leg 3 / AC#1's shape: %s got %d WARN(s), want exactly 1: %+v", filepath.Base(k), n, *got)
 			}
 		}
