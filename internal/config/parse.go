@@ -12,6 +12,7 @@ import (
 	toml "github.com/pelletier/go-toml/v2"
 
 	"github.com/CarlosShao/wisp/internal/observe"
+	"github.com/CarlosShao/wisp/internal/winsec"
 )
 
 // Parsing and canonical serialization.
@@ -203,15 +204,24 @@ func atomicWrite(path string, data []byte) error {
 	}
 	tmpName := tmp.Name()
 	defer os.Remove(tmpName) // no-op once renamed
+	// Seal before a single content byte, not after: os.Chmod(0o600) at the end
+	// was decoration on Windows (ticket 89, A51① - the mode argument never
+	// lands, the parent directory's DACL decides), and rename carries the
+	// descriptor over, so the temp file's ACL *is* config.toml's ACL afterwards
+	// (same fact secret/migrate.go states for its own pre-rename temp). A wide
+	// empty file leaks nothing; a wide file holding the serialized config -
+	// endpoints, model paths, and on an un-migrated machine a plaintext
+	// api_key - leaks to every local account.
+	if err := winsec.SealFile(tmpName); err != nil {
+		_ = tmp.Close()
+		return observe.Wrap(observe.ClassConfig, err, "config.toml temp file seal")
+	}
 	if _, err := tmp.Write(data); err != nil {
 		tmp.Close()
 		return observe.Wrap(observe.ClassConfig, err, "config.toml write")
 	}
 	if err := tmp.Close(); err != nil {
 		return observe.Wrap(observe.ClassConfig, err, "config.toml write")
-	}
-	if err := os.Chmod(tmpName, 0o600); err != nil {
-		return observe.Wrap(observe.ClassConfig, err, "config.toml chmod")
 	}
 	if err := os.Rename(tmpName, path); err != nil {
 		return observe.Wrap(observe.ClassConfig, err, "config.toml replace")

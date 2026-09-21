@@ -2,12 +2,12 @@ package config
 
 import (
 	"fmt"
-	"os"
 	"strconv"
 
 	toml "github.com/pelletier/go-toml/v2"
 
 	"github.com/CarlosShao/wisp/internal/observe"
+	"github.com/CarlosShao/wisp/internal/winsec"
 )
 
 // Schema migration (SPEC-03 sec 4.4): a registry of per-version rewrites;
@@ -80,7 +80,17 @@ func applyMigrations(path string, raw []byte, ver int) ([]byte, error) {
 			SchemaVersionCurrent, err))
 	}
 	backup := path + ".bak-" + strconv.Itoa(from)
-	if err := os.WriteFile(backup, raw, 0o600); err != nil {
+	// The backup is the pre-migration config *verbatim*, and on a machine that
+	// has not been through D33 yet that is the one file here that still carries
+	// plaintext api_key values (secret.MigratePlaintext exists precisely because
+	// config.toml may hold them). A mode argument does not land on Windows
+	// (ticket 89, A51①), so 0o600 here was decoration: the bytes landed with
+	// whatever the parent directory's DACL hands down, which is readable by
+	// other local accounts. winsec.PrivateFile seals the handle before the first
+	// content byte and refuses the write if the seal fails; because this call
+	// rewrites an existing backup rather than skipping it, PrivateFile is also
+	// the repair path for a wide backup left by an older build.
+	if err := winsec.PrivateFile(backup, raw, 0o600); err != nil {
 		return nil, observe.Wrap(observe.ClassConfig, err, "config.toml migration backup write")
 	}
 	if err := atomicWrite(path, data); err != nil {
