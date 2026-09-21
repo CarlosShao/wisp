@@ -45,10 +45,10 @@ about any of them.
 - [x] **AC#3** Mutation proof for the new/changed assertions: pick at least 2 rows, change the code
   value, show the specific test go red by name, grep-prove the mutation landed, restore, grep-prove
   it is gone (`git diff --quiet` on both files).
-- [ ] **AC#4** Table↔`tokens.css` gap: either add the cross-check, or move this AC to a written
+- [x] **AC#4** Table↔`tokens.css` gap: either add the cross-check, or move this AC to a written
   hand-off (name the ticket). **"Deferred" without a ticket number is not an option** — the owner's
   standing rule is that postponed work must be registered with its completion criteria.
-- [ ] **AC#5** Gates: `gofmt -l internal/ball` empty, `go vet ./internal/ball/...` rc=0,
+- [x] **AC#5** Gates: `gofmt -l internal/ball` empty, `go vet ./internal/ball/...` rc=0,
   `go test ./internal/ball/... -count=2`, and `go test ./internal/ball/ -v` with **RUN count == 2×
   distinct test names and zero `SKIP` occurrences** in the log (SKIP counts as ok — that trap has
   burned this project twice).
@@ -149,3 +149,29 @@ about any of them.
   `grep -n MUTATION-74B` 零命中当场暴露——这就是"先 grep 证明落盘再跑测试"存在的理由（A24 系列第 N 次）。
   next=AC#4：`表 ↔ design/assets/tokens.css` 的第三腿要不要今天机器化（先量：CSS 129 条声明、表内 78 配色行
   声称与 CSS 同源）——能加就加，加不动就写成有名有姓的移交票；然后 AC#5 收尾门禁。
+- [2026-09-21T04:05:00Z] agent=ticket74 did=**AC#4 走了"加机器检查"那条路，没有移交**：新增
+  `TestC21TableColourRowsMatchTokensCSS`（`internal/ball/tokens_table_test.go`）把表头那句
+  "真相源是 `tokens.css`" 变成第 5 条用例：每条引用了 CSS 变量的配色行必须 **三方一致**
+  （`design/assets/tokens.css` 的声明 = 表的 `tokens.css 值` 列 = `tokens.go` 里的颜色）。
+  实测 **78/78 行通过**（:root=129、light=65 条声明被解析；36 行 look 色按定义无 CSS 出处，如实跳过并记在表头）。
+  - CSS 解析器按 `;` 分段（`--tint-success-hi` 与 `-lo` 同行打包）、剥行内注释、支持跨行声明；
+    分层背景 `--bg-overlay: var(--sheen), rgba(...)` 取**颜色分量**比对（`--sheen` 属「范围」段排除的
+    面板专用声明），并把这个读法**写进表里**：两行 `--bg-overlay` 的 CSS 列改为照抄原文 ——
+    原来只记了 rgba 那半，是同一类"记录比源码少一层"的小 A33。
+  - 顺手把 `FontFamily` 的 CSS 腿也钉上：`--font-sans` 里必须真的有 `Microsoft YaHei UI`，
+    否则表上"CJK 头"那句话就是假的。
+  - 变异检验 **M-F**（表侧）：`docs/.../c21-native-tokens.md:55` 的 `#F2F3F5` -> `#F2F3F6`（一位十六进制）
+    ⇒ 新用例 **FAIL**，报文同时点名表行与源码行："the table states --fg-primary = "#F2F3F6", but
+    design/assets/tokens.css:61 declares "#F2F3F5""。还原 `grep -c F2F3F6` = 0、复跑绿。
+    ⚠ 第一次 M-F 的 sed 打在错行号上（我插了 3 行说明，行号右移），**没落盘的变异跑出"绿"**，
+    `grep -c` 零命中才抓住 —— 与 M-B 同一次教训，先证落盘再跑测试。
+  - 表头那张"今天有无机器检查"的三分类表**如实改写**（原文写 look 色"无机器检查"，票 69 之后已不成立），
+    A24-D4 的完成判据拆成两半记账：机器断言那半已落地、"升进 `tokens.css`"那半仍待 owner 解冻 SPEC-08，
+    所以"不得把这 36 行当契约级事实引用"这条限制**保留不撤**。「审计」小节同步改成可复跑的入口命令。
+  - AC#5 门禁实测：`gofmt -l internal/ball` 空；`go vet ./internal/ball/...` rc=0；
+    `go test ./internal/ball/... -count=2` → `ok 0.462s`；`go test ./internal/ball/ -v` →
+    **RUN=55 / SKIP=0 / 顶层 PASS=49（其余 6 条是子测试）/ FAIL=0**；`-v -count=2` → **RUN=110 = 2×55 个不同名、SKIP=0**
+    （`-count=2` 与"非匹配 -run 也印 ok"两个坑都按票面要求用 `=== RUN` 计数排除）。
+    `cd tools/d22scan && go run . -root <abs>` → `clean - no D22 ban violations`，
+    唯一 `NOT COVERED` 是既有的 ban #6 `frontend/`（树不存在，属票 67/70 台账，不是本票引入）。
+  next=收尾：把 AC→commit→证据的 1:1 裁决表写进票面，确认无未归因分歧；本票不再动码。

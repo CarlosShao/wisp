@@ -21,10 +21,11 @@ package ball
 //	                are pinned by c21MotionGolden
 //
 // What is deliberately NOT asserted here, and why:
-//   - the table's `tokens.css 值` column against design/assets/tokens.css. That
-//     is ticket 12's manual three-way cross-check (A24-D6 leaves the 80
-//     panel-only CSS declarations out of scope); converting it into a machine
-//     check is a separate call, not this ticket's.
+//   - the 80 panel-only declarations of design/assets/tokens.css. Ticket 74 AC#4
+//     did machine-check the CSS leg for every row that CITES a variable
+//     (TestC21TableColourRowsMatchTokensCSS, three-way: file = table = tokens.go),
+//     but A24-D6 keeps those 80 out of the table itself, and the panel's native
+//     slice (ticket 33+) owns them.
 //   - any *default* ball value. Ticket 68 AC#2 owns flipping the prototype
 //     default, and SPEC-08 §2 is frozen. Where table and code disagree on a
 //     value, the row is reported for the owner (A24-D1..D6 precedent), never
@@ -56,12 +57,13 @@ const c21TablePath = "docs/evidence/s1/c21-native-tokens.md"
 
 // c21ColourRow is one row of the three colour tables (dark, light, look).
 type c21ColourRow struct {
-	where   string // "docs/evidence/s1/c21-native-tokens.md:41"
-	section string // "dark" | "light" | "look"
-	cssVar  string // first column, verbatim (--accent, or 无 for the look rows)
-	goRef   string // "Palette.Accent" / "looks[aurora].BlobA" (backticks off)
-	claim   string // "hex(0x86C2B9,1)" - what the table says the code holds
-	line    int
+	where    string // "docs/evidence/s1/c21-native-tokens.md:41"
+	section  string // "dark" | "light" | "look"
+	cssVar   string // first column, verbatim (--accent, or 无 for the look rows)
+	cssClaim string // second column: what the table says tokens.css declares
+	goRef    string // "Palette.Accent" / "looks[aurora].BlobA" (backticks off)
+	claim    string // "hex(0x86C2B9,1)" - what the table says the code holds
+	line     int
 }
 
 // c21GeomRow is one row of the geometry/motion table.
@@ -181,7 +183,7 @@ func c21ParseTable(t *testing.T, root string) ([]c21ColourRow, []c21GeomRow, []c
 			}
 			colour = append(colour, c21ColourRow{
 				where: where, section: section, cssVar: cells[0], line: lineNo,
-				goRef: c21TrimTicks(cells[2]), claim: c21TrimTicks(cells[3]),
+				cssClaim: c21TrimTicks(cells[1]), goRef: c21TrimTicks(cells[2]), claim: c21TrimTicks(cells[3]),
 			})
 		case "geom":
 			if len(cells) != 4 || strings.HasPrefix(cells[0], "CSS 变量") {
@@ -1341,4 +1343,229 @@ func c21FileConsts(t *testing.T, path string) []c21ConstInfo {
 		}
 	}
 	return out
+}
+
+// ------------------------------------- check 5: the tokens.css leg (ticket 74)
+
+// Ticket 12 AC#7 established the table's authority chain: design/assets/tokens.css
+// is the source, tokens.go is its native copy, and this markdown table is the
+// record of that copying (A24-D6). The machine checks covered two of the three
+// edges - table <-> tokens.go - and left the CSS leg to a human with a diff.
+// Ticket 74 AC#4 closes it: for every colour row that cites a CSS variable, all
+// three must now agree, row by row, on the same run.
+//
+// What stays out of this on purpose (the table's own 范围 block):
+//   - the 36 原生自有 look colours, whose CSS column says （无，原生自有）. They have
+//     no tokens.css citation to check, and inventing one would fake the very
+//     provenance this table exists to record.
+//   - the 80 panel-only CSS declarations the native side never copied. They are
+//     not missing rows; the panel's native slice (ticket 33+) owns them.
+
+const c21TokensCSSPath = "design/assets/tokens.css"
+
+// c21CSSValue is one custom-property declaration read out of tokens.css.
+type c21CSSValue struct {
+	value string // normalized: whitespace off, lowercase
+	raw   string // as written, for the log lines
+	line  int
+}
+
+// c21CSSDeclRe matches one custom-property declaration segment. tokens.css packs
+// several per line (--tint-success-hi and --tint-success-lo share a row), so a
+// line is split on ';' and each segment is read on its own.
+var c21CSSDeclRe = regexp.MustCompile(`^--([a-z0-9-]+)\s*:\s*(.+)$`)
+
+// c21ParseTokensCSS reads the :root and [data-theme="light"] blocks. Anything
+// outside those two selectors is not a theme block and is ignored - on purpose,
+// so a stray rule elsewhere in the file cannot satisfy a table row.
+func c21ParseTokensCSS(t *testing.T, root string) (dark, light map[string]c21CSSValue) {
+	t.Helper()
+	path := filepath.Join(root, filepath.FromSlash(c21TokensCSSPath))
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("read %s: %v - the CSS leg of this check must never skip", c21TokensCSSPath, err)
+	}
+	dark, light = map[string]c21CSSValue{}, map[string]c21CSSValue{}
+	var sel, pendingName, pendingValue string
+	flush := func(lineNo int) {
+		if pendingName == "" {
+			return
+		}
+		storeCSSDecl(dark, light, sel, pendingName, pendingValue, lineNo)
+		pendingName, pendingValue = "", ""
+	}
+	for i, raw := range strings.Split(string(data), "\n") {
+		line, lineNo := strings.TrimRight(raw, "\r"), i+1
+		trimmed := strings.TrimSpace(line)
+		if strings.HasPrefix(trimmed, "/*") || strings.HasPrefix(trimmed, "*") {
+			continue // a comment line of its own
+		}
+		if j := strings.Index(line, "/*"); j >= 0 {
+			line = line[:j] // trailing comment on a declaration line
+		}
+		if strings.HasSuffix(strings.TrimSpace(line), "{") {
+			sel = strings.TrimSpace(strings.TrimSuffix(strings.TrimSpace(line), "{"))
+			continue
+		}
+		for _, seg := range strings.Split(line, ";") {
+			seg = strings.TrimSpace(seg)
+			if seg == "" {
+				continue
+			}
+			if m := c21CSSDeclRe.FindStringSubmatch(seg); m != nil {
+				flush(lineNo) // a packed line: close the declaration before this one
+				pendingName, pendingValue = m[1], m[2]
+				continue // the ';' that ended it was consumed by the split
+			}
+			if pendingName != "" {
+				pendingValue += " " + seg // continuation of a multi-line declaration
+			}
+		}
+		// A line without a terminating ';' that carried a declaration left the
+		// segment open; a line that ends the statement closes it here.
+		if pendingName != "" && strings.Contains(line, ";") {
+			flush(lineNo)
+		}
+	}
+	flush(0)
+	if len(dark) == 0 || len(light) == 0 {
+		t.Fatalf("%s parsed to %d :root and %d [data-theme] declarations: the file shape changed and the CSS leg would pass vacuously",
+			c21TokensCSSPath, len(dark), len(light))
+	}
+	return dark, light
+}
+
+// storeCSSDecl records one declaration into the block it belongs to.
+func storeCSSDecl(dark, light map[string]c21CSSValue, sel, name, value string, line int) {
+	if inSel(sel, ":root") {
+		dark[name] = c21CSSValue{value: c21NormCSS(value), raw: strings.TrimSpace(value), line: line}
+		return
+	}
+	if inSel(sel, "data-theme") && inSel(sel, "light") {
+		light[name] = c21CSSValue{value: c21NormCSS(value), raw: strings.TrimSpace(value), line: line}
+	}
+}
+
+func inSel(sel, want string) bool { return strings.Contains(sel, want) }
+
+// c21NormCSS normalizes a CSS value for comparison: no whitespace, no comments,
+// lowercase hex. The table quotes values the way the file writes them, so this is
+// only about spacing, not about reading a different colour.
+var c21CSSCommentRe = regexp.MustCompile(`/\*.*?\*/`)
+
+func c21NormCSS(v string) string {
+	v = c21CSSCommentRe.ReplaceAllString(v, "")
+	v = strings.Join(strings.Fields(v), "")
+	return strings.ToLower(strings.Trim(v, ";"))
+}
+
+// TestC21TableColourRowsMatchTokensCSS walks the dark and light colour rows and
+// pins the third edge: what the table says tokens.css declares must be what
+// tokens.css declares, and that must be the colour tokens.go holds.
+func TestC21TableColourRowsMatchTokensCSS(t *testing.T) {
+	root := c21RepoRoot(t)
+	colour, _, _ := c21ParseTable(t, root)
+	dark, light := c21ParseTokensCSS(t, root)
+	blocks := map[string]map[string]c21CSSValue{"dark": dark, "light": light}
+
+	cited, checked := 0, 0
+	for _, r := range colour {
+		name := c21TrimTicks(r.cssVar)
+		if !strings.HasPrefix(name, "--") {
+			continue // the 原生自有 look rows cite no CSS: nothing to cross-check
+		}
+		cited++
+		key := strings.TrimPrefix(name, "--")
+		block, ok := blocks[r.section]
+		if !ok {
+			t.Errorf("%s: colour row in section %q has a CSS citation but no block to check it against", r.where, r.section)
+			continue
+		}
+		decl, declared := block[key]
+		if !declared {
+			t.Errorf("%s: the table cites --%s from the %s block, but %s declares no such variable there",
+				r.where, key, r.section, c21TokensCSSPath)
+			continue
+		}
+		// leg 1: the table's `tokens.css 值` column vs the file.
+		if c21NormCSS(r.cssClaim) != decl.value {
+			t.Errorf("%s: the table states --%s = %q, but %s:%d declares %q - the record and the source disagree",
+				r.where, key, r.cssClaim, c21TokensCSSPath, decl.line, decl.raw)
+			continue
+		}
+		// leg 2: the file vs the colour tokens.go actually holds.
+		fromCSS, err := c21EvalCSSColor(decl.raw)
+		if err != nil {
+			t.Errorf("%s: cannot read %s:%d --%s = %q: %v", r.where, c21TokensCSSPath, decl.line, key, decl.raw, err)
+			continue
+		}
+		field := strings.TrimPrefix(c21TrimTicks(r.goRef), "Palette.")
+		fromGo, ok := c21StructColour(c21PaletteOf(r.section), field)
+		if !ok {
+			t.Errorf("%s: the table's Go column %q is not a Palette.<Field> reference", r.where, r.goRef)
+			continue
+		}
+		if !colorEq(fromCSS, fromGo) {
+			t.Errorf("%s: %s declares %s but internal/ball/tokens.go's Palette.%s holds %s - the native copy drifted from the source (A24-D6)",
+				r.where, c21TokensCSSPath, c21ColourText(fromCSS), field, c21ColourText(fromGo))
+			continue
+		}
+		checked++
+	}
+	if checked == 0 {
+		t.Fatalf("only %d rows cited a CSS variable and none of them verified: the CSS leg ran empty", cited)
+	}
+	// The one string token gets the same leg: the table calls FontFamily the CJK
+	// head of --font-sans, so the family the code asks DirectWrite for must really
+	// be a member of that stack. "Microsoft YaHei UI" is not a token anybody gets to
+	// assume.
+	if fam, listed := dark["font-sans"]; listed {
+		if !strings.Contains(fam.value, c21NormCSS(FontFamily)) {
+			t.Errorf("%s's --font-sans (%s:%d) does not contain the family internal/ball/tokens.go asks for (%q): the table's \"CJK 头\" claim is false",
+				c21TokensCSSPath, c21TokensCSSPath, fam.line, FontFamily)
+		}
+	} else {
+		t.Errorf("%s declares no --font-sans in :root: FontFamily cites a variable that is not there", c21TokensCSSPath)
+	}
+	t.Logf("three-way colour check: %d/%d cited rows agree across %s, %s and internal/ball/tokens.go (:root=%d decls, light=%d)",
+		checked, cited, c21TablePath, c21TokensCSSPath, len(dark), len(light))
+}
+
+// c21EvalCSSColor reads a CSS colour literal (`rgba(r,g,b,a)` / `#RRGGBB`) with
+// the same helpers tokens.go uses, so equality means channel equality.
+//
+// A layered background value (--bg-overlay: var(--sheen), rgba(30, 36, 44, 0.50))
+// is legal here too: the native side copies the COLOUR component and has no
+// counterpart for a CSS background layer (`--sheen` is one of the 80 panel-only
+// declarations the table's 范围 block excludes). The table states such a value
+// verbatim, so that reading is recorded rather than inferred.
+func c21EvalCSSColor(v string) (Color, error) {
+	v = strings.TrimSpace(v)
+	if i := strings.LastIndex(v, "),"); i >= 0 {
+		v = strings.TrimSpace(v[i+2:])
+	}
+	if m := c21RGBARe.FindStringSubmatch(strings.ReplaceAll(v, " ", "")); m != nil {
+		var ch [3]uint8
+		for i := 0; i < 3; i++ {
+			n, err := strconv.ParseUint(m[i+1], 10, 8)
+			if err != nil {
+				return Color{}, fmt.Errorf("channel %q is not a 0..255 integer", m[i+1])
+			}
+			ch[i] = uint8(n)
+		}
+		a, err := strconv.ParseFloat(m[4], 32)
+		if err != nil {
+			return Color{}, fmt.Errorf("alpha %q is unreadable", m[4])
+		}
+		return rgba(ch[0], ch[1], ch[2], float32(a)), nil
+	}
+	m := regexp.MustCompile(`^#([0-9A-Fa-f]{6})$`).FindStringSubmatch(v)
+	if m == nil {
+		return Color{}, fmt.Errorf("neither rgba(...) nor #RRGGBB")
+	}
+	n, err := strconv.ParseUint(m[1], 16, 32)
+	if err != nil {
+		return Color{}, fmt.Errorf("hex %q is unreadable", m[1])
+	}
+	return hex(uint32(n), 1), nil
 }

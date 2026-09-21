@@ -11,18 +11,22 @@
 **只适用于 CSS 有出处的行**。票 62 的液面/吸附配色里有 **36 个 look 色值在 `tokens.css` 里不存在**
 （表内已逐行标 `（无，原生自有）`）——它们是原生侧**首创**，不是复制。两类因此受**不同**的约束：
 
-| 类别 | 出处 | 一致性由谁保证 | 今天有无机器检查 |
+| 类别 | 出处 | 一致性由谁保证 | 今天有无机器检查（2026-09-21 票 69/74 之后） |
 |---|---|---|---|
-| CSS 同源行（40 暗 + 38 亮 = 78 配色行） | `tokens.css` | 本表逐值对齐（2026-09-20 全表反向对账：**零漂移**） | **有**：`TestTokenGoldenValues`（20 条）+ `TestNoHardcodedColorsInBallPackage` |
-| 原生自有 look 色（36 行） | 仅 `tokens.go` | **只有本表这一个人工记录** | **无** |
+| CSS 同源行（40 暗 + 38 亮 = 78 配色行） | `tokens.css` | 本表逐值对齐（2026-09-20 全表反向对账：**零漂移**） | **有，且已是三方**：`TestC21TableColourRowsMatchCode`（表↔`tokens.go`，78+36 行逐值）+ `TestC21TableColourRowsMatchTokensCSS`（票 74 AC#4：`tokens.css` = 表的 CSS 列 = `tokens.go`，78/78）+ 旧的 `TestTokenGoldenValues`（20 条 CSS 抽查）与 `TestNoHardcodedColorsInBallPackage` |
+| 原生自有 look 色（36 行） | 仅 `tokens.go` | 本表 + `tokens.go` 即真相 | **有**：`TestC21TableColourRowsMatchCode` 逐行核这 36 个值并反向要求每个 look 字段都有行。**CSS 腿按定义覆盖不到它们**（`tokens.css` 里没有同名变量），所以"契约级事实"这条限制仍然成立——见下 |
 
-⇒ 上表第二行的"一致性由本表保证"是**弱保证**：表是文档，改了码不改表不会被任何东西抓到。
-这条缺口已登记为 **A24-D4**，完成判据是"新增行纳入某条机器断言，或在 SPEC-08 解冻时把 look 表升进
-`tokens.css`"。**在此之前不得把这 36 行当作契约级事实引用。**
+⇒ 上面第二行的限制（A24-D4 的完成判据）：**"纳入某条机器断言"这半已在 2026-09-21 由票 69 落地**
+（表↔码双向）并由票 74 补上表↔CSS 腿；**"或把 look 表升进 `tokens.css`"那半仍待 SPEC-08 解冻时的
+owner 裁定**。**在那之前仍不得把这 36 行当作契约级事实引用**——机器现在能保证的是"表与码一致"，
+不是"这 36 个值是设计决定"。
 
 值格式：`rgba(r,g,b,a)` 为 CSS 通道；Go 列为 `tokens.go` 中的等价构造（`rgba()` 0..255 通道 +
 alpha，`hex()` 0xRRGGBB + alpha）。D2D 使用直通 alpha 的 `D2D1_COLOR_F`，premultiplied 仅在
 `UpdateLayeredWindow` 位图写出处派生（`Color.Premultiplied()`）。
+**分层背景如实写全（票 74 AC#4）**：`--bg-overlay` 在 CSS 里是 `var(--sheen), rgba(…)` 两层背景，
+原生侧只复制其中的颜色分量（`--sheen` 属于上面「范围」列出的 80 条面板专用声明）——本表把 CSS 原文
+照抄，不再只记颜色那半，免得下一个读表的人以为 CSS 里只有一个颜色。
 
 范围（ticket 12 AC#7 对账时明确，2026-09-20；票 74 扩几何/动效一侧，2026-09-21）：本表覆盖**原生侧已
 复制的切片** —— 即 `internal/ball/tokens.go` 的 40 个 `Palette` 字段 + 全部导出的几何/动效常量。
@@ -44,7 +48,7 @@ alpha，`hex()` 0xRRGGBB + alpha）。D2D 使用直通 alpha 的 `D2D1_COLOR_F`�
 | CSS 变量 | tokens.css 值 | Go 字段 | Go 值 |
 |---|---|---|---|
 | `--bg-inset` | `rgba(6, 8, 11, 0.38)` | `Palette.BGInset` | `rgba(6,8,11,0.38)` |
-| `--bg-overlay` | `rgba(30, 36, 44, 0.50)` | `Palette.BGOverlay` | `rgba(30,36,44,0.50)` |
+| `--bg-overlay` | `var(--sheen), rgba(30, 36, 44, 0.50)` | `Palette.BGOverlay` | `rgba(30,36,44,0.50)` |
 | `--glass-ring` | `rgba(255, 255, 255, 0.14)` | `Palette.GlassRing` | `rgba(255,255,255,0.14)` |
 | `--glass-hi` | `rgba(255, 255, 255, 0.18)` | `Palette.GlassHi` | `rgba(255,255,255,0.18)` |
 | `--glass-hi-soft` | `rgba(255, 255, 255, 0.08)` | `Palette.GlassHiSoft` | `rgba(255,255,255,0.08)` |
@@ -89,7 +93,7 @@ alpha，`hex()` 0xRRGGBB + alpha）。D2D 使用直通 alpha 的 `D2D1_COLOR_F`�
 | CSS 变量 | tokens.css 值 | Go 字段 | Go 值 |
 |---|---|---|---|
 | `--bg-inset` | `rgba(20, 24, 28, 0.06)` | `Palette.BGInset` | `rgba(20,24,28,0.06)` |
-| `--bg-overlay` | `rgba(255, 255, 255, 0.72)` | `Palette.BGOverlay` | `rgba(255,255,255,0.72)` |
+| `--bg-overlay` | `var(--sheen), rgba(255, 255, 255, 0.72)` | `Palette.BGOverlay` | `rgba(255,255,255,0.72)` |
 | `--glass-ring` | `rgba(255, 255, 255, 0.66)` | `Palette.GlassRing` | `rgba(255,255,255,0.66)` |
 | `--glass-hi` | `rgba(255, 255, 255, 0.90)` | `Palette.GlassHi` | `rgba(255,255,255,0.90)` |
 | `--glass-hi-soft` | `rgba(255, 255, 255, 0.60)` | `Palette.GlassHiSoft` | `rgba(255,255,255,0.60)` |
@@ -269,15 +273,19 @@ CSS 侧消费者、接线的票），"暂未使用"不算。
 
 ## 审计
 
+- `go test ./internal/ball/ -run TestC21 -v`：**本表全部断言的入口**（票 69 建、票 74 收紧），5 条用例：
+  配色行↔`tokens.go`（114 行双向）、几何/动效行↔码（67 枚常量、**单射**值匹配、`FontFamily` 值断言）、
+  配色行↔`tokens.css`（78 行三方，票 74 AC#4）、零消费者↔「未接线豁免」双向必判、表外常量要么进表要么显式豁免。
 - `go test ./internal/ball/ -run TestNoHardcodedColorsInBallPackage`：`internal/ball` 包内除
   `tokens.go` 外任何 `.go` 文件命中 `rgba(` 或 6 位 hex 字面量即 FAIL。
 - `go test ./internal/ball/ -run TestTokenGoldenValues`：抽查上表关键值与 CSS 相等（防抄写漂移）。
-  边界（本票对账时实测）：该测试的 20 条断言全是 **`Palette` 色值**，几何/动效常量与本 look 表
-  **不在金标准覆盖内** —— 抄写漂移只靠本表人工核对。登记为发现，改断言属代码改动，本票未做。
-- 反向对账（本票 AC#7 用过，可复跑）：把 `tokens.go` 的 40 个 `Palette` 字段、全部导出几何常量的
+  边界（票 12 对账时实测，票 74 复核）：该测试的 20 条断言全是 **`Palette` 色值**，几何/动效常量与本 look 表
+  **不在它覆盖内** —— 这个空档自票 69 起由上面第一条堵上了（`TestTokenGoldenValues` 保留作 CSS 抽查的历史
+  一条，不是唯一防线）。
+- 反向对账（人肉，仍可复跑；机器版见上）：把 `tokens.go` 的 40 个 `Palette` 字段、全部导出几何常量的
   字面量与 `tokens.css` 声明逐条比对，`design/assets/tokens.css` 129 条声明中 80 条无原生对应
   （见「范围」）。核对结论：色值 78 行（明 40 + 亮 38）**与 CSS、`tokens.go` 三方逐字一致，零漂移**；
-  几何/动效缺 25 个常量，本票已全部补录。
+  几何/动效缺 25 个常量，票 12 已全部补录，票 74 再把 `hit.go`/`liquid.go` 的 11 枚提进来。
 - 票 64 的 hotkey 面**不产 token**（本票查过，免下一个代理重查）：`internal/ball/hotkey_windows.go`
   三处 `const` 块是 Win32 修饰键/虚拟键码（`modAlt=0x0001` … `vkEscape=0x1B`）与 `HotkeyStatus`
   枚举，既无尺寸也无颜色；`hkNames` 的用户可见文案零 emoji。票 64 进本表的只有边缘吸附三常量
