@@ -1,11 +1,15 @@
 # 75 — Path canonicalization emits Windows-shaped (backslash) paths on Linux, so `internal/tools` is 19 FAIL + a 600 s timeout in `test-core`
 
-**Status:** implemented，**AC#4 已由编排者用交接段落关闭（R17：修实现符合冻结契约 ≠ D22 改契约）**；
-只剩 **AC#6** 等一次 runner 可见证据 —— 见 A52①：run `35558750456`（headSha `17efc2c`）
-`test-core` 的 `Portable package tests` 步骤仍是 **failure**，但那 10 条红**没有一条是本票的账**
-（8 条 = 票 55 的 POSIX sync 探测未实现 ⇒ 票 82；2 条 = 夹具 Windows 形状 ⇒ 票 81），
-且 `internal/tools` 那 19 条 + 600s 超时**已经消失**。**验收独立复现进行中**（`acceptor-ticket75`），
-裁决表落地前本文件**不改名 `-done`**（那个后缀是编排者的重认领键）。
+**Status:** **done**（编排者验收 2026-09-21 14:1x）—— **AC#1..AC#6 六框全绿**：
+AC#4 用交接段落按 **R17** 关闭（修实现符合已冻结契约 ≠ D22 改契约；一次次序偏离已如实记），
+AC#6 由 run `35558750456` + **两份独立复现**关闭（`internal/tools` 在 ubuntu 上
+19 条 FAIL + 600s 超时 → **0 FAIL**；残留 10 条全部归族完毕，没有一条是本票的账）。
+证据：`docs/evidence/s1/75-rootcause-linux-path-shape.md`（根因）、
+`75-independent-verification.md`（Linux 全量 + 逐条归族）、`75-linux-mutation-check.md`
+（**退回无条件折叠**⇒ 新增 +32 顶层红、600s 超时原样回来、`comm -23` 证明没有旧红被洗绿）。
+**衍生缺陷一条另开票**：`approval.(*Gate).PendingApproval` 在"correlation_id 无对应待审批项"时
+**不是快速失败，而是阻塞到超时**（实测卡 4m48s，与另一条真等满 C18 300s 窗口的用例相加正好撞 600s 闹钟）
+⇒ **票 84**，登记见 **A55**。
 **Claimed by:** implementer agent（2026-09-21 10:2x）
 **Evidence:** `docs/evidence/s1/75-rootcause-linux-path-shape.md`（根因 file:line + AC#1 docker 基线 + AC#4 提案）
 **Type:** portability defect (CI-blocking)
@@ -56,9 +60,22 @@ reading you implemented and **why, in the commit message**.
   (Ticket 70 legitimately used `//go:build windows` for **DPAPI**, because C28 says DPAPI is
   Windows-only and it wrote the coverage cost down. That justification does **not** transfer here:
   path shape is not a platform-API limitation, it is our bug.)
-- [ ] **AC#6** Runner-visible proof: after landing, the next `dev` push's `test-core` job is quoted by
+- [x] **AC#6** Runner-visible proof: after landing, the next `dev` push's `test-core` job is quoted by
   run id + job id, with the FAIL count before/after in one line. **Cancelled runs do not count as evidence**
   (see A40① — three consecutive `dev` push runs had conclusion `cancelled`, which nobody has explained yet).
+  - **编排者回填（2026-09-21 14:1x）**：run **`35558750456`**（headSha `17efc2c`，status `completed`、
+    conclusion `failure` ⇒ **是真样本，不是 cancelled/未跑完**），job `test-core`，步骤
+    `Portable package tests`（在 `ci.yml:127-134`，**不是** 107-113，见 A51⑥）。
+    **一行账**：`--- FAIL` **修复前 47 条 / 修复后 10 条**，其中
+    **`internal/tools` 从"19 条 FAIL + 整包 600s panic 超时"变成 CI 与本机都 `ok`、0 FAIL**（这就是本票的判据），
+    剩下 10 条**没有一条是本票的账**（8 条 = POSIX sync 探测未实现 ⇒ 票 55/票 82；
+    2 条 = Windows 形状夹具 ⇒ 票 81，已由 `4683c34` 修掉）。
+  - **两份独立复现（都不是实现者自己）**：`docs/evidence/s1/75-independent-verification.md`（Linux 全量：
+    `tools 0 FAIL / ok 9.671s`、`risk` 残留 8 条逐条归族、3 条 SKIP 点名）与
+    `docs/evidence/s1/75-linux-mutation-check.md`（**把守卫三行退回无条件折叠**后：
+    新增红 **+32 顶层 / +16 子项**、`risk` 8→**22**、`tools` **重新 600s panic 超时**，
+    且 `comm -23` 两包皆空 ⇒ **没有任何旧红被洗绿**；还原后 md5 逐字回到 `87496d505e…`、数字回到基线）。
+    ⇒ 变异前后都给了 `go build rc=0`，**不是拿编译失败当"红"**。
 
 ## Rules (non-negotiable, learned the expensive way today)
 - Commit form: `git commit -q -F - -- <explicit paths> <<'MSGEOF'` — **quoted** heredoc (A31: an
