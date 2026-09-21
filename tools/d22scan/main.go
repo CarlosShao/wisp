@@ -163,8 +163,10 @@ func Scan(root string) ([]Finding, error) {
 // "nothing was looked at" stay distinguishable (ticket 67 AC#2 bought the same
 // property for the Go scope with checkRoot; main.go enforces it for ban #8).
 func scanWithStats(root string) (*scanner, error) {
-	s := &scanner{root: root, allow: map[string]map[string]bool{},
-		emojiSeen: map[string]int{}, examined: map[string]int{}}
+	s := &scanner{
+		root: root, allow: map[string]map[string]bool{},
+		emojiSeen: map[string]int{}, examined: map[string]int{},
+	}
 	if err := s.loadAllowlist(filepath.Join(root, "tools", "d22scan", "allowlist.txt")); err != nil {
 		return nil, err
 	}

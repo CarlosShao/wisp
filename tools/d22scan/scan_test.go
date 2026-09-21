@@ -782,5 +782,3 @@ func exeSuffix() string {
 	}
 	return ""
 }
-
-

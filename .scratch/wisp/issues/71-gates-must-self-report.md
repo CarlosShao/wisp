@@ -127,3 +127,12 @@ R16 裁定 3 **禁止回退**）。本票把同样的纪律推到**其余三类�
   （HEAD=`b551fef`）。同一棵纯净树交叉 vet 复现 `undefined: mulA` ⇒ 见 A43②（别人路径，只登记不动）。
   ⇒ next=等编排者对 ban #6 处置的裁决；把 `cmd/balldebug`（AC#1/#2 那半张票）派给能碰它的代理；
   本代理剩余额度只用于文档/票面，不再扩路径。
+- 2026-09-21 11:0x **gofumpt 自查（CI lint 第一步真实会拦的东西）**：本地装上 `gofumpt@latest` 后
+  `gofumpt -l` 点了**我自己两个文件**（`tools/d22scan/main.go` 的 composite literal 换行、`scan_test.go`
+  末尾两行空行）⇒ 已 `-w` 修掉，模块目录 `gofumpt -l .` 现为空，`go test ./...` 仍 **ok / rc=0**。
+  **同一次扫描顺手量到 HEAD 上还有一个不属于我的 gofumpt 红**：`internal/memory/artifacts_path_invariant_test.go`
+  （由 `d9224af`，票 76 的 checkpoint 引入）⇒ **不代改**（该代理正在飞，同文件并发是假并行），登记给编排者。
+  **纯净树复跑（HEAD=`8dd43d0`，含我两个 commit）**：`sh scripts/d22scan.sh`（CI 的原命令）⇒ **rc=0**，
+  8 条作用域全打数；`sh tools/d22scan/runtests.sh -C tools/d22scan ./...` ⇒ **rc=0**，
+  `PASS=18 FAIL=0 SKIP=0, === RUN=26`。⇒ next=交回编排者：ban #6 处置裁决、balldebug 半张票派活、
+  memory 的 gofumpt 红、A43② 的两个符号归属。
