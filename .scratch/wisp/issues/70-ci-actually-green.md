@@ -1,9 +1,31 @@
 # 70 — 让 CI 真的成为护栏：5 个 job 全红，逐因分诊（本仓的"门禁"从未生效过）
 
 **Status:** in-progress
-**Claimed by:** agent-ticket70
-**Last update:** 2026-09-20
-**Blocked by:** 66（`internal/observe`/`internal/proc`/`cmd/wisp`）、68（`internal/ball`/`cmd/balldebug`）
+**Claimed by:** ~~agent-ticket70~~（174 次调用撞 turn 上限而死，**票面一条 log 都没写**）→ agent-ticket70-c（接续，只做 AC#2/AC#4/AC#6）
+**Last update:** 2026-09-21 09:15（编排者：从 `git log` 重建断点，见下面那块）
+**Blocked by:** ~~66、68~~ **两条都已解除**：票 66 已闭（`-done`），票 68 是 `blocked-on-owner` 且 `internal/ball`/`cmd/balldebug` 已让出
+
+> ## 编排者重建的断点（09:15，我逐条亲自验过，**接续代理不要重做**）
+> 死掉那位**5 个 commit 全在树上、票面账目为零**，所以这里按 commit 重建：
+> - **AC#1 本地半** ✅：`f342413`（我入库前审过：`gofmt -l` 空、`go build ./...` rc=0、`go vet ./...` rc=0、
+>   `git diff -w` 只剩 literal 展开）+ `8bfd47d`（它自己补上 gofumpt **版本漂移**漏掉的 1 个文件）。
+>   **另一半"CI 的 lint job 真绿"仍要看一次真 run**，不许用"本地这步过了"替代。
+> - **AC#5（R16 五条）** ✅ **全部落地且我核过**：`3539d47` 把 `cmd/balldebug` 三处具名 spawn 改走
+>   `observe.Registry.Spawn`（HEAD 上裸 `go` 语句 **0** 处；名册名 `balldebug-hotkey-bridge`/
+>   `balldebug-level-feeder` **不借产品名**）；`38b3715` 把 ban #1 从 `go func(` 扩到 `go <任意>`；
+>   `allowlist.txt` 非注释行 4 → **5**，多出的那条**正是 R16#1 唯一授权的文件级豁免**
+>   （`internal/observe/goroutine.go`，按路径不按调用形状）。
+>   ⚠ **R16#3 的仪器没有回退**——我本来要查 `N==0` 致命是否还在，结果发现它**比裁定更强**：
+>   `main.go:509` 是"生产 `.go` 文件数低于阈值 ⇒ 报『the ban scan would be a no-op』并失败"，
+>   `:536` 仍自报 `examined N production Go files`，`go test ./tools/d22scan/` 8 条用例 `ok 0.315s`
+>   （含 `TestScanAloneIsNotAFalsifier`、`TestCheckRootRejectsBlindRoots` 两条反空跑用例）。
+> - **AC#3 → 移交票 72**（`a04d3e2` 定性为**安全分类失效**，不是占位；那张票在
+>   `.scratch/wisp/issues/72-atble-classification-runner.md`）。**本票不要再碰 `internal/risk/`。**
+> - **AC#4 配置已落**（`98fa8ae`：`slo-full` 缺 gcc 的根因是 runner 长驻进程拿的是 09-19 的旧环境，
+>   msys64 在 E 盘且只在用户 PATH；修法 = 给该 job 设它自己文档化的 `MINGW64_ROOT` 旋钮），
+>   **只剩"看一次真 run 的结果"这一步**。
+> - 剩下真正没动的只有 **AC#2 `test-core` 分诊**与 **AC#6 逐 job 全绿证据**。
+
 **Parallel slots:** ≤1 sub-agent；AC#1 落地期间**不得有第二个代理写码**
 **Spec refs:** D22（"no job skippable"）、D42#9、C19、SPEC-08 §2（冻结）
 **登记项:** A26（vacuous 静态门 + ban #1 覆盖洞）、A27（5/5 job 红）、A14/A15 的 CI 侧后果
