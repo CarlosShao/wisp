@@ -441,7 +441,7 @@ func TestJunctionInsideAnAllowedRootCannotReachAnAListFile(t *testing.T) {
 	if !out.IsError || strings.Contains(out.Text, secret) {
 		t.Fatalf("穿过 junction 读到了 A 档文件: %+v", out)
 	}
-	// ⚠ 本用例发现的真实软处（原样钉住，不顺手改）：junction 挡在 A 档目标前面时，
+	// NOTE(d22 ban #8): 本用例发现的真实软处（原样钉住，不顺手改）：junction 挡在 A 档目标前面时，
 	// 判定层给出的**不是** Deny，而是一张人可以点批准的 L2 卡——因为解析器拒绝
 	// 规范化，R3 根本没拿到长路径，只能 fail-closed。卡面上目标只显示成
 	// "<原样路径> (无法规范化: …)"，批准它的人看不到自己批准的是什么。
