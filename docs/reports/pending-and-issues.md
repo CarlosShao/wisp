@@ -1101,6 +1101,28 @@ vet: cmd/wisp/slo.go:324:49: undefined: proc.Runtime
 本 commit 已把该步与它的阳性对照（`tools/d22scan/runtests.sh -C tools/d22scan ./...`）**提到 gofmt/vet 之前**：
 不删步骤、不给任何步骤加 `continue-on-error`、不让任何步骤可跳过（D22 mode 6 未碰）。
 
+## 编排者登记 A62（2026-09-21 13:5x，**`ban #6` 真的武装上了**（A56④/A60⑤/A61② 这条待办清掉）+ owner 批了组件取舍）
+
+- **A62① 我按自己的规矩复跑了一遍才放行 push**（不采信代理的叙述）。在 `git archive HEAD` 的仓外纯净快照里：
+  `sh scripts/d22scan.sh` ⇒ **rc=0**，台账里 **`ban #6 frontend/ examined 35 text files`**（不再是 `0 [NOT COVERED]`）、
+  `bans #1-5 internal/=187`、`cmd/=20`、`#7 internal/tools/=16`。
+  `cd tools/d22scan && go test -count=1 ./...` ⇒ **ok 4.301s**（**强制 `-count=1`，不吃缓存**），
+  其中**两条是新写的、正好是我担心的两种失败模式**：
+  `armed_ban_6_goes_red_on_the_panel_violation_exits_1`（**有牙**：种子里放 `approval.decide` 必须红）与
+  `ban_6_tree_gone_while_declared_live_exits_2`（**反向也有牙**：翻牌后目录若被删掉，致命而不是静默 0）。
+  代理还纠正了我建票时的一个假设：**`isTextFile()` 那份后缀清单只服务 `ban #8` 的 `design/`**，
+  `ban #6` 走的是 `walkText(..., false)` ⇒ 不存在"过滤器不收 `.tsx` 所以永远 0"这个洞；
+  真数是 **35**，把它改成后缀白名单反而是**收窄**（R16#4 禁止），并且会被
+  `TestLedgerCountsMatchAnIndependentWalk` 抓住。**AC#1 那个"N 到底是多少"的问题就此有了答案，而且答案不是我猜的那个。**
+- **A62② 压着的 push 已放行**：`59596e8..84e4161` 推到 origin 与 cnb（含票 77 的三框、票 87 的 AC#1/AC#2、
+  票 82 的分层、票 88 的翻牌）。A61③ 那条"等票 88 就推"的时效条件已满足，**没有让本地 commit 攒成一坨没人验过的东西**。
+- **A62③ owner 批了 R19 的组件取舍，但我要更正自己给他看的一个数**：我报的是"留 5 / 缓 4 / 砍 3"，
+  而他那张表**实际只有 11 条组件** ⇒ 正确分配是 **留 5 / 缓 4 / 砍 2**（合计 11）。
+  已把这条更正连同最终口径写进票 77（13:5x 那条），并明写一句"**别为了凑够砍 3 去砍一个不在清单上的东西、
+  也别凭空发明第 12 条**"。缓的 4 个氛围层**同屏最多 1 个、首选雾球、其余届时判死**，
+  上的前提是三条用例：同屏≤1、**面板隐藏即销毁**（不是暂停渲染循环）、隐藏后 CPU 回落可测。
+  `Agentic Ball` 作为桌面球的替代品**判死**（D32 的休眠预算 WebGL 一定爆）；原生那颗一字不动。
+
 ## 编排者登记 A61（2026-09-21 16:3x，票 77 的代理撞轮数上限死了 + **我为何暂时压着 push 不走**）
 
 - **A61① 接续而非重做**：票 77 的代理死在 150 轮上限（157 次工具调用）。
