@@ -281,6 +281,57 @@ func TestSealNarrowsAndNamesThePrincipalItRemovedBySID(t *testing.T) {
 	}
 }
 
+// TestGateRefusesADescriptorThatLeavesARealGrantToAnotherAccount is AC#3 leg (a)
+// on the gate itself: a descriptor that hands a stranger a real authorization
+// next to ours is not private, whichever spelling the OS chose for the three of
+// us. The control leg (the same descriptor without the stranger) keeps this from
+// passing for an unrelated reason.
+func TestGateRefusesADescriptorThatLeavesARealGrantToAnotherAccount(t *testing.T) {
+	u, err := user.Current()
+	if err != nil {
+		t.Fatal(err)
+	}
+	private := fmt.Sprintf("D:PAI(A;;FA;;;%s)(A;;FA;;;%s)(A;;FA;;;%s)", systemSID, administrators, u.Uid)
+	widened := private + "(A;;FA;;;" + everyoneSID + ")"
+
+	base := t.TempDir()
+	control, widenedDir := filepath.Join(base, "control"), filepath.Join(base, "widened")
+	for _, d := range []string{control, widenedDir} {
+		if err := os.Mkdir(d, 0o700); err != nil {
+			t.Fatal(err)
+		}
+	}
+	plantDescriptor(t, control, private)
+	plantDescriptor(t, widenedDir, widened)
+
+	if err := verifyPrivate(control); err != nil {
+		t.Fatalf("the control descriptor - the private set and nobody else - was refused: %v (trustees %v)", err, resolvedTrustees(t, control))
+	}
+	err = verifyPrivate(widenedDir)
+	if err == nil {
+		t.Fatalf("a DACL leaving %s a real grant on the object was accepted as private: trustees %v", everyoneSID, resolvedTrustees(t, widenedDir))
+	}
+	if !strings.Contains(err.Error(), everyoneSID) {
+		t.Fatalf("the refusal did not say which principal is outside the set, by SID: %v", err)
+	}
+	// The same object read through the notice path: a stranger standing on this
+	// object's own DACL is exactly what an operator has to be told about, and the
+	// notice has to name it by the one form that cannot be another account.
+	foreign, err := explicitForeignPrincipals(widenedDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var found bool
+	for _, f := range foreign {
+		if strings.Contains(f, everyoneSID) {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatalf("the notice did not report the explicit foreign grant by its SID: %v", foreign)
+	}
+}
+
 func setKeys(m map[string]bool) []string {
 	out := make([]string, 0, len(m))
 	for k := range m {
