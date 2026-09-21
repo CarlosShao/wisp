@@ -73,3 +73,52 @@
   另记一条正向：票 103 的实现方**主动**在交件里把边界写清（"winsec 看不出善意改写与劫持改写的区别"），
   验收仍然攻破了它 —— **自陈边界不等于守住了边界**，这两件事永远要分开记。
   next= 派 `agent-ticket108`（与本票 106 在同一个包但**文件级分界已写死**）；结完再回票 103 走复验。
+
+- 2026-09-21 19:00（`agent-ticket108`）**第一枚 checkpoint = 修前红，已单独一枚 commit，未动任何生产码**。
+  **共树核对**：18:47 开工时 `git status --porcelain internal/winsec/` = `M winsec_windows.go` + `?? private_set_sid_windows_test.go`
+  （票 106 在飞，正是私有集/SID 白名单那一格 ⇒ 我一步没碰，两枚文件都由 106 自己落地）；
+  19:00 复核同一条命令只剩我这两枚 `??`，`git diff --numstat internal/winsec/winsec_windows.go` = 空 ⇒ **106 已提交，分界无碰撞**。
+  ⚠ 顺带把 106 在 `c1da933` 里登记的"108 的两枚未跟踪文件让 winsec 测试包编译红"**结掉**：那是在 106 自己的 commit 落地**之前**量的；
+  新 HEAD `3fbb46d` + 我这两枚文件 = `go vet ./internal/winsec/` rc=0、`GOOS=linux go test -c` rc=0（读数在纯净快照
+  `/tmp/wisp108-head` = `git archive HEAD | tar -x`，**仓内未建 worktree/未 checkout**）。
+  **所有红读数来自 HEAD `3fbb46d` 的纯净快照 + 我这两枚测试文件**（真树里 106 的活在飞，不按包跑就不干净）；
+  快照目录 `/tmp/wisp-agent-ticket108`（带会话后缀）。命令：
+  `go test -count=1 -v -run 'TestAC1SeamCannotBeFreedThenGivenATreeMovingFake|TestAC4TreeOwnershipIsPartOfTheConformanceContract|TestAC3PlacementFloor|TestAC2AncestorGuard' ./internal/winsec/`
+  ⇒ **rc=1、`=== RUN` 21、PASS 11、FAIL 10、SKIP 0（`-v` 量的，不是"没跑所以没 SKIP"）、gofmt -l 空**。
+  - **P1b → 红名 `TestAC1SeamCannotBeFreedThenGivenATreeMovingFake`（FAIL 1.92s）**，断言原文（逐字）：
+    `AC#1 RED: SetPathResolver(nil) detached the seam, which is what makes it one-use rather than one-way (was risk.c26Pipeline, now <floor>)` /
+    `AC#1 RED: after the nil reset the guard ACCEPTED a fake that rewrites every answer to ...\victim\sub\keep-me.txt (seam is now winsec_test.treeMovingResolver108)` /
+    `AC#1 RED: SealFile(...\data\blob.bin) returned nil while a tree-moving fake was in the seam` /
+    `AC#1 RED: S-1-1-0 (Everyone) was stripped from the foreign file, i.e. its DACL was rewritten: [S-1-5-18 S-1-5-32-544 S-1-5-21-...-1001]` /
+    `AC#1 RED: foreign file DACL changed: before=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-...-1001] after=[S-1-5-18 S-1-5-32-544 S-1-5-18 S-1-5-21-...-1001]`
+    ⇒ **`icacls` SID 级前后读数：`S-1-1-0` 由有到无**（"什么都没发生"这条判据按票面要求量的是 DACL，不是返回码）。
+  - **AC#4 → 红名 `TestAC4TreeOwnershipIsPartOfTheConformanceContract`（FAIL 0.24s）**：
+    `AC#4 RED: the seam accepted a resolver whose answers name a tree nobody called (...): the conformance probe checks spelling shape only, never tree ownership`
+    （这条在**缝本来就是空的（floor）**形状下量的，所以它红的是探针缺"树归属"这一条腿，不是红在 `nil` 那扇门上）。
+  - **P2 → 红名 `TestAC2AncestorGuardHoldsForEverySeparatorSpelling/<形状>`，逐形状结论**：
+    `native-backslash` PASS（控制腿，守卫今天有效）· `all-forward-slash` **FAIL** · `mixed-separators` **FAIL** ·
+    `trailing-separator` PASS · `doubled-separator` **FAIL** · `dot-segment` PASS · `extended-length-prefix` PASS ·
+    `volume-only-relative-tail` **FAIL**（相对拼写返回 nil，什么都没删却报成功）。红断言原文两例：
+    `AC#2 RED: RemoveUnlinked("C:/Users/.../002/data/link/sub/keep-me.txt") returned nil for a spelling that reaches the leaf through a junction` /
+    `AC#2 RED: the foreign file behind the junction is GONE after spelling "...": GetFileAttributesEx ...\victim\sub\keep-me.txt: The system cannot find the file specified.`
+    阳性对照 `TestAC2AncestorGuardStillUnlinksAPlainFile` **PASS** ⇒ 修法不许把普通回收打死，这条钉子已就位。
+  - **P3 → 红名 `TestAC3PlacementFloorHoldsForEverySeparatorSpelling/<形状>`（floor 在位，未链接 risk）**：
+    `native-backslash`/`trailing-separator`/`doubled-separator`/`dot-segment`/`extended-length-prefix`/`volume-only-relative-tail` PASS ·
+    `all-forward-slash` **FAIL** · `mixed-separators` **FAIL**，原文：
+    `AC#3 RED: SealFile("C:/.../data/link/sub/keep-me.txt") through a junction returned nil` /
+    `AC#3 RED: S-1-1-0 stripped from the foreign file by spelling "C:/.../link/sub/keep-me.txt" - the floor's reparse walk did not see the junction: [...]`
+  - **本 checkpoint 顺手量到的一条新事实（登记，不改判据）**：一枚被接受的伪造解析器会**污染整个测试二进制后续所有 seal**——
+    票面第一版 P1b 探针没写回滚时，后面 `PrivateDirAll` 报**成功却在调用方点名的位置什么都没建**
+    （`fixture: PrivateDirAll(...\002\data) reported success but it is not there`）。这正是 AC#1"缝不可解除"要防的代价，
+    也是判据为什么必须测"目录真在那儿"而不是"err==nil"。
+  - **AC#2 的 POSIX 那一半**：`ancestor_separator_108_other_test.go` 四枚钉子（反向用例"不折 `\`"+ 反 fail-open"名字里带 `\` 的链接祖先仍是祖先"
+    + slash 拼写经 symlink 必拒 + 无解析器时答案仍在点名的树里）。当前 `GOOS=linux go test -c` rc=0；**真跑（Docker/WSL2）尚未做 ⇒ AC#5 这格没做完**。
+  - **没做完的格子与下一条命令**：AC#1–AC#5 的修法**一行未动**；下一步先 `date` 取时戳，
+    然后按 AC#1 单向闩（`SetPathResolver(nil)` 在已装/已闩之后一律拒，测试回滚走 `export_test.go` 的测试期钩子，生产码零解除路径）
+    + AC#2/AC#3 共用一个**平台正确的祖先前缀切分**（Windows 认 `/` 与 `\`，POSIX 只认 `/`，前缀取输入的子串所以不折叠名字）
+    + AC#4 把票 102 的 `Rewritten`/`Actable()` **接进缝的答案类型**（`internal/risk/winsec_c26.go` 仍是唯一安装点，
+    既有静态锁 `internal/risk/pathresolver_rewrite_account_test.go:174` 要求它继续读 `Actable(` ⇒ 保留该调用）
+    + AC#4 安装期探针加"两条不同输入不许答同一个串、子答案必须落在父答案树里"这条腿。
+  - **工具输出里的非授权文本登记**：本代理至今 **0 次**看到自称"编排者备注/停手/撤回/请 revert"的文本（台账 A75②、A78③ 的监测项）。
+    19:00 收到一条系统提示 `MEMORY.md ... was modified since it was last read`，内容是记忆索引文件自身的变更通知（无指令、无 revert 要求），
+    按"不作为授权"处置，未据此改变任何判据；未撤销任何已提交 commit。
