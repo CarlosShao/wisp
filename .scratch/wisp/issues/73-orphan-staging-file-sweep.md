@@ -1,6 +1,6 @@
 # 73 — Sweep orphan `.wisp-tmp-*` staging files left by a real kill
 
-**Status:** ready-for-agent
+**Status:** in-flight (implementer) — 清扫器落地中，判据框未勾
 **Type:** defect-fix (bookkeeping of a proven leak)
 **Blocks:** nothing · **Blocked by:** nothing (the characterization test already exists)
 **Spec refs:** D31 atomic-rename, SPEC-07 §2–§3, registry **A18**
@@ -59,3 +59,16 @@ session does not accumulate litter in the user's allowed dirs:
 - Commit your first checkpoint **within your first 15 tool calls** (turn cap is ~150; a ticket that
   dies with nothing committed is a total loss). Sync the ticket face (Status + boxes + one Progress
   log line ending in `next=`) at **every** commit.
+
+## Progress log (append-only, newest last)
+
+- 2026-09-21（实现代理，checkpoint 1）：开工前只做了设计拍板，代码未落，AC 框一个都没勾。
+  **清扫时机 = 下一次写盘**（`stageAndRename`/`crossVolume` 在 `os.CreateTemp` 之前对目标目录扫一次），
+  不是桥启动时——理由：本仓 `internal/tools` 里没有"桥启动"这个可挂钩的单点（`New()` 只是构造，
+  `cmd/wisp` 不许我碰），而证据 §5 已经写明"下一次启动"在这张票的可达面上只能用"新建一套桥 + 一次成功写盘"代表，
+  正好就是 A18 用例第三条在做的事。**归属机制 = 暂存文件名自带身份**：
+  `.wisp-tmp-<owner8>-<pid>-<rand>`，owner8 = sha256(可执行文件路径 + 用户名 + tempPrefix) 前 8 位十六进制
+  （跨进程稳定 ⇒ 新进程能认死进程的文件；不同程序/不同用户 ⇒ 不同 token，前缀相同也不会互删）；
+  pid 用来判"创建者还活着吗"（活人持有的暂存文件不是孤儿）。扫到名字不合式、是 reparse point、
+  不是普通文件、创建者 pid 还活着、或删不动（重试后仍失败）的一律**跳过不删**。
+  **next=落 `internal/tools/fs_staging.go` + 平台 liveness 文件 + 翻 A18 第三条断言，然后按 AC#1 做变异检验**。
