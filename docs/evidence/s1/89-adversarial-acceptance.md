@@ -15,7 +15,7 @@ icacls = `C:\Windows\System32\icacls.exe`。本文件由**独立对抗验收代�
 
 ---
 
-## 进度总览（**全部 8 项已做完；结论在文末裁决表**）
+## 进度总览（**全部 8 项 + AC#6 的 POSIX 腿已做完；结论在文末裁决表**）
 
 | 项 | 内容 | 状态 |
 | --- | --- | --- |
@@ -296,6 +296,39 @@ HKLM…AppModelUnlock\AllowDevelopmentWithoutDevLicense = 1   ← 开发者模�
 
 ---
 
+---
+
+## 补：AC#6 的 POSIX 腿独立复现（真 Linux，本代理自己跑）
+
+票面自称"非 Windows 平台不是跳过，是测另一套机制（docker alpine:3.20，10 条具名结果、0 SKIP）"。
+本代理不采信转述，自己交叉编译 + 真跑一次：
+
+```
+$ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go test -c -o winsec.test ./internal/winsec/   # 在 0a3a445 快照
+$ docker run -d --name wisp89acc89-posix -v wisp89acc89-89vol:/d alpine:3.20 sleep 900
+$ docker exec … /d/winsec.test -test.v -test.count=1
+Linux 944184f65f48 6.6.114.1-microsoft-standard-WSL2 x86_64 GNU/Linux
+=== RUN  10   |   --- PASS 10（6 顶层 + 4 子）   |   --- FAIL 0   |   --- SKIP 0   |   RC=0
+TestAC5FailedSealRefusesTheWrite(+exclusive_artifact/replacement_write/directory_chain/seal_file_and_dir_direct)
+TestAC5FailureIsNotSwallowedByTheHappyPath / TestPOSIXPrivateFileIsReally0600 / TestPOSIXPrivateDirIsReally0700
+TestPOSIXSymlinkAtArtifactPositionIsNotRecursed / TestPOSIXMissingFileIsNotAnError
+```
+
+断言本体也读了（`internal/winsec/private_other_test.go`），不是"跑过就算"：
+`if got := info.Mode().Perm(); got != 0o600 { t.Errorf(...) }`（**传进去的是 0o644，要求出来是 0600**）、
+`!= 0o700` 对 `PrivateDirAll` 建的**两级**目录都查、符号链接那条断言 `RemoveUnlinked` 后
+`os.Stat(innocent)` **必须还在**（"TARGET DELETED - removal followed the symlink"）。
+⇒ **"显式不适用 vs 静默通过"这条：PASS**，POSIX 侧是真测量、真断言，且没有 skip 分支。
+容器与卷已清理（`0 container(s) / 0 volume(s) left`），名字带本代理会话后缀。
+
+**顺带一条被本代理第 7 项推翻的注释**：`private_other_test.go:56-59` 与 `:77` 写着
+"Windows needs a privilege for（构造符号链接）… the construction is stronger here than on Windows"。
+这台机开发者模式=1、进程未提升，`os.Symlink(dir)` 直接成功 ⇒ **这句前提在本机为假**，
+"Linux 侧更强"因此不成立；改判据时应把 Windows 侧的符号链接腿补齐（第 7 项给的方法），
+而不是继续引用这句 privilege 说法。
+
+---
+
 ## 第 8 项：`verifyPrivate` 只认 `{我, SY, BA}` —— **判：正确的严格；但票面对它后果的描述错位**
 
 本代理不猜，直接在 HEAD 快照上做了一次测量（`internal/accprobe/probe2_windows_test.go`）：
@@ -403,7 +436,7 @@ IDENTITY u.Name="Carlos Shao" u.Uid="S-1-5-21-…-1001" u.Username="DESKTOP-LVS7
 | **AC#3** 真红过的判据；替代判据 = SID 白名单 + icacls 原文 | 红→绿、0 SKIP、17 条具名 PASS | **PASS** | 第 2 项：纯净快照 `0a3a445` 自己跑 `-count=2 -v` → `=== RUN 34 / PASS 20(+14 子) / FAIL 0 / SKIP 0`，34=2×17 逐名核对。第 3 项：先红（RC=1，3 子 + AC#2）后绿，且假绿路径被独立复现、反向钉子当场变红。组里两个活账户 ⇒ 替代判据的红因落在真主体上 |
 | **AC#4** A51② 单独钉：链接不被递归、失败具名；造不出来要如实写 | junction 可造、三条全绿；符号链接"本机造不出来"故放 Linux | **PASS（结论）/ FAIL（那句"造不出来"）** | 第 7 项：`os.Remove` 删指向非空目录的 junction **返回 nil、目标 3 文件全在** ⇒ 票面 A51② 更正成立（我自己的读数）；但同一台机、同一个未提升进程 `os.Symlink(dir)` **成功**（开发者模式=1）⇒ Windows 侧符号链接那一格是**可测而未测**。票面 AC#4 自身三条用例在我的 `-count=2` 里全绿，未递归删除由 suite 覆盖 |
 | **AC#5** 失败方向只能收紧；注入一次失败 ⇒ 必须是错误 | 4/4 腿绿 + `sealError()` 归一化；票面变异 2 红 | **PASS（比票面更强）** | 第 5 项：m5 拿掉归一化 ⇒ **4/4 红**（红因 `error does not name the refusal`）；m7 拿掉 `os.Remove` ⇒ 2 红（`refused write left 0 bytes on disk`）⇒ 两条腿各自承重。口径修正：残留物本就是 0 字节，这条防的是"留下宽 ACL 空条目"，不是防内容外泄 |
-| **AC#6** 门禁：两平台、四假绿逐条点名、非 Windows 不许静默通过 | gofmt/gofumpt/vet/`GOOS=linux` vet/test 全清，POSIX 侧真测 | **允许残留（本代理不复核非 Windows 侧）** | 我只在本机 Windows 侧独立计数（第 2 项：0 SKIP、0 FAIL、逐名 2×）。POSIX/Linux 侧（票面自称 docker alpine 10 条具名结果）与 gofmt/gofumpt 死锁那条**我没跑**，也不该由我盖"已复现"的章；`--- SKIP` 通道为零这条我用了结构证据（包内 `t.Skip` 0 命中） |
+| **AC#6** 门禁：两平台、四假绿逐条点名、非 Windows 不许静默通过 | gofmt/gofumpt/vet/`GOOS=linux` vet/test 全清，POSIX 侧真测 | **PASS（Linux 侧本代理自己跑过）** | Windows 侧：0 SKIP、0 FAIL、逐名 2×；`t.Skip` 在包内 0 命中（结构证据）。**Linux 侧见下"补：AC#6 的 POSIX 腿独立复现"**。gofmt/gofumpt/vet 三项是工具门不是判据，本代理未复核、不盖章 |
 
 ### 编排者点名的八项
 
@@ -457,4 +490,6 @@ IDENTITY u.Name="Carlos Shao" u.Uid="S-1-5-21-…-1001" u.Username="DESKTOP-LVS7
   （`internal/config/`、`internal/panel/`、`cmd/wisp/`、`internal/winsec/`、`frontend/`、别人的票面一律未动）。
 * 未 `git add -A`、未 `--amend`/`reset`/`rebase`/`stash`/`checkout .`、**未 push**。
 * 未在用户真实数据目录写任何文件；junction / 符号链接全部造在 `t.TempDir()` 内并在测试内拆除。
-* 四枚变异 token 只存在于快照：`MUTATION-89ACC-3/-4/-5/-7`；仓内 `grep -rn MUTATION-89ACC --include=*.go .` = 0 命中（下条 commit 前复核）。
+* 四枚变异 token 只存在于快照：`MUTATION-89ACC-3/-4/-5/-7`；仓内 `grep -rn "MUTATION-89ACC" --include=*.go .` **= 0 命中（已复核）**，
+  且 `git diff --quiet 0a3a445 -- internal/winsec/*_test.go` 干净（工作树里的 winsec 判据与本票终态逐字相同）。
+* docker：容器 `wisp89acc89-posix` 与卷 `wisp89acc89-89vol` 跑完即删，复核读数 `0 container(s) / 0 volume(s) left`。
