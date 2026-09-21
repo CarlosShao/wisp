@@ -58,3 +58,30 @@ Windows 侧票 108 已经把"祖先链是不是链接"这把刀做出来了（�
   正向记一笔：`acceptor-ticket108` 还**自己补了一向 MUT-4**（摘掉 `RemoveUnlinked` 的 `IsAbs`）证明那格不是白加的收紧，
   并且**新造 15 枚形状**都没绕过 Windows 侧的守卫（`\\?\C:\`、`\\.\`、尾点/尾空格、混合+双分隔符、叶子本身就是链接…）。
   next= 派单（与 112 并行，文件级分界已写死）；两条都结完再回票 108 复验。
+- 2026-09-21 20:12（agent-ticket113）：**AC#1 的修前红已在容器里量到**（红先于码，单独 commit）。仪器与档位=独立复现。
+  - 快照在**仓外**：`git archive 3f00217 | tar -x -C /d/tmp/wisp113-agent-ticket113/gate113`（A38④：仓库内未建 worktree、未 checkout、未改生产码；
+    放 `/d/...` 而不是 `/tmp`，是因为这条要在 Docker 里跑，见下条挂载证明）。
+  - 用例：我的 `internal/winsec/placement_symlink_113_other_test.go`（`//go:build !windows`，9 枚顶层 + 4 枚深度子用例）**复制进快照**后跑：
+    `MSYS_NO_PATHCONV=1 docker run --rm -e CGO_ENABLED=0 -v /d/tmp/wisp113-agent-ticket113/gate113:/src -v wisp113mod:/go/pkg/mod -v wisp113build:/root/.cache/go-build -w /src golang:1.27 go test -count=1 -v -run 'TestAC1POSIX|TestAC2POSIX|TestAC3POSIX|TestAC4POSIX' ./internal/winsec/`
+  - 假绿坑#1 先躲：容器内 `ls /src/internal/winsec | wc -l` = **21**、`ls /src/internal/winsec/placement_symlink_113_other_test.go` 存在 ⇒ 挂的不是空目录；
+    读数全部来自容器内 `go test -v` 本体（**没有**用 `go test -c` 裸二进制），输出先落 `/src/113-red.log` 再计数（**没有**用 `cmd | grep x; echo $?`；本机侧一律 `set -o pipefail`）。
+  - **读数：rc=1、`=== RUN` 16 / `--- PASS` 7 / `--- FAIL` 9 / `--- SKIP` 0**（SKIP=0 是 `-v` 量的，不是"没跑所以没 SKIP"）。
+    红名 9 枚 = 5 枚顶层 + 4 枚子用例：
+    `TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone`、
+    `TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth/{link-at-depth-1,link-at-depth-2,link-at-depth-3,link-at-depth-4}`、
+    `TestAC1POSIXSealDirThroughASymlinkRefuses`、
+    `TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing`、
+    `TestAC1POSIXSealFileThroughABackslashNamedLink`。
+  - 断言原文（容器日志逐字，路径已缩）：
+    `AC#1 RED: SealFile("/tmp/TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTre4282100749/002/root/link/keep-me.txt") returned nil, i.e. it sealed through a symlink and reported success. AC#1 requires either a refusal or an action confined to the link itself.`
+    以及同发的外来树读数：
+    `AC#1 RED AC#1 the foreign tree behind the link: /tmp/.../001/foreign/keep-me.txt was mode=666 uid=0 gid=0 and is now mode=600 uid=0 gid=0, so the call acted on the foreign tree`
+  - 前后读数（`os.Stat` 的 mode + 属主，容器内是 root ⇒ uid/gid 两边都记）：外来文件 **`mode=666 uid=0 gid=0` → `mode=600 uid=0 gid=0`**；
+    `SealDir` 那发是外来目录 **`777` → `700`**（其内文件未动）；`PrivateFile` 那发在外来目录里**真写出了 `secret.txt`**
+    （`AC#1 RED: PrivateFile put bytes in the foreign tree (<nil>)`）。⇒ 属主没被动过，被动过的是 **mode 与"字节落在别人的树里"**，
+    与票 103 的 P3 / 票 108 的 R-108-1 同一结局类。四枚深度 1/2/3/4 全红 ⇒ 现状是"一条腿都没有"，不是"只漏了某一层"。
+  - 反向半边（AC#3）修前也绿，不算本票功劳：`TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree`、
+    `TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLinks`、`TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator` 3 枚 PASS
+    ⇒ 修后必须**仍**绿，否则我就是把守卫换成"拒一切"。
+  - 三门修前基线：`go build ./...` rc=0、本机 `go vet ./internal/winsec/` rc=0、`GOOS=linux go vet` rc=0、`GOOS=darwin go vet` rc=0、`gofmt -l internal/winsec/` 空。
+  next= 动码：给 `platformVerifyPlacement` 补链接腿（复用 `pathPieces` 的前缀切分 + 本文件已有的 `ancestorIsLink`，POSIX 上只认 `/`，不折 `\`）。
