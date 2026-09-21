@@ -105,7 +105,7 @@ acl_windows_test.go:455: NOT PRIVATE operator-widened-file.txt: foreign SID(s) S
 
 ---
 
-## 第 2 条：明文密钥备份 —— **接线本代理自己复现（独立仪器、同一对象前后 icacls 对照），另登记两条残留**
+## 第 2 条：明文密钥备份 —— **接线本代理自己复现（独立仪器、同一对象前后 icacls 对照），另登记四条残留与更正**
 
 本代理**不 import `internal/winsec` 的测试helper**（它们在 `winsec_test` 包里也 import 不到），
 自己写了 `internal/acc89b/mig89b_windows_test.go`（只在仓外快照里，仓内没有这个目录）：
