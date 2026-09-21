@@ -42,7 +42,6 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 // ErrNotSealable reports that a path could not be made private. Callers must
@@ -228,7 +227,19 @@ func SealDir(path string) error {
 // below, which is ticket 103's AC#2: PROBE F measured that a spelling *reaching*
 // the leaf through a junction made this call delete a file inside somebody else's
 // tree and return nil, because the only guard was on the last component.
+//
+// Because no resolver runs here, the argument has to name its own tree, so a
+// relative spelling is refused (ticket 108's per-shape reading of AC#2): it
+// resolves against wherever the process happens to be standing, which is a tree
+// no caller named, and "removed" reported for an unlink the platform answered
+// with "no such file" is the same report-success-while-doing-nothing shape this
+// repository has already booked twice. The reclaim callers all pass paths joined
+// onto a resolved data root.
 func RemoveUnlinked(path string) error {
+	if !filepath.IsAbs(path) {
+		return fmt.Errorf("%w: %s is relative, so no tree names it and this call cannot tell which one it would remove from",
+			ErrUnresolvedPath, path)
+	}
 	if link := firstLinkAncestor(path); link != "" {
 		return fmt.Errorf("%w %s: the spelling reaches it through the link at %s, and whatever lives behind that link is not this tree's data to delete",
 			ErrIsReparsePoint, path, link)
@@ -241,35 +252,14 @@ func RemoveUnlinked(path string) error {
 // where an artifact was expected is RemoveUnlinked's whole purpose, and refusing
 // on the leaf would break the reclaim route ticket 79 built.
 //
-// The prefixes are built by concatenating on the platform separator rather than
-// filepath.Join/Clean on purpose (D22 ban #2): normalizing here would collapse
-// exactly the shapes - "parent\..\something", a doubled separator - that hide a
-// link behind a lexical spelling, and the answer would then describe a different
-// tree than the one os.Remove is about to act on.
+// The prefixes come from pathPieces below, which is the whole of ticket 108's
+// AC#2: ticket 103 cut the input on filepath.Separator only, so on Windows the
+// spelling "C:\data\link/sub/keep-me.txt" looked like ONE component to the guard
+// (PROBE P2 measured it deleting a file inside somebody else's tree and
+// returning nil, as did the all-forward-slash spelling). Separator handling is
+// platform-correct rather than uniform, and pathPieces says why.
 func firstLinkAncestor(path string) string {
-	sep := string(filepath.Separator)
-	var vol, rest string
-	if v := filepath.VolumeName(path); v != "" {
-		vol, rest = v, strings.TrimPrefix(path, v)
-	} else if strings.HasPrefix(path, sep) {
-		vol, rest = sep, strings.TrimPrefix(path, sep)
-	}
-	var prefixes []string
-	cur := vol
-	for _, part := range strings.Split(rest, sep) {
-		if part == "" {
-			continue
-		}
-		switch {
-		case cur == "":
-			cur = part
-		case strings.HasSuffix(cur, sep):
-			cur += part
-		default:
-			cur += sep + part
-		}
-		prefixes = append(prefixes, cur)
-	}
+	prefixes := pathPieces(path)
 	if len(prefixes) == 0 {
 		return ""
 	}
@@ -279,6 +269,86 @@ func firstLinkAncestor(path string) string {
 		}
 	}
 	return ""
+}
+
+// pathPieces returns every prefix of path that names one more component than the
+// last, longest last, each one an *exact substring of the input*. The caller
+// treats the final element as the leaf and inspects the rest as ancestors.
+//
+// Two rules, both load-bearing:
+//
+//  1. Which characters are separators is the platform's own answer. On Windows
+//     the OS reads '/' as a separator exactly like '\', so both cut - refusing to
+//     split there is what let P2/P3 through. On POSIX only '/' cuts: a backslash
+//     is an ordinary character in a file name, so folding it into a separator
+//     would either refuse a real ancestor that is not a link (the reclaim route
+//     broken for no reason) or, once the pieces are re-joined, check "a/b" while
+//     the real ancestor is the directory named `a\b` - a link at `a\b` then goes
+//     unseen and the unlink lands in somebody else's tree. That second direction
+//     is the fail-open this repository already booked as A74(3), which is why
+//     prefixes are substrings of the input and are never rebuilt by joining.
+//  2. A volume (`C:`, and the leading separators of a UNC or extended-length
+//     spelling) is not an ancestor: Lstat("C:") names whatever directory the
+//     process happens to be standing in, which is somebody else's link to no
+//     purpose of this call.
+//
+// It never normalizes: no Clean, no Abs, no case folding (D22 ban #2, and the
+// same reasoning as ticket 103's comment above) - a doubled separator yields the
+// same ancestor twice, and a "." component yields a prefix the OS resolves to
+// the object the previous one already named, which is exactly what an Lstat is
+// allowed to be told.
+func pathPieces(path string) []string {
+	nativeIsBackslash := os.PathSeparator == '\\'
+	isSep := func(c byte) bool {
+		return c == os.PathSeparator || (nativeIsBackslash && c == '/')
+	}
+	vol := filepath.VolumeName(path)
+	var out []string
+	i := len(vol)
+	for i < len(path) && isSep(path[i]) {
+		i++
+	}
+	for i < len(path) {
+		start := i
+		for i < len(path) && !isSep(path[i]) {
+			i++
+		}
+		if i > start {
+			out = append(out, path[:i])
+		}
+		for i < len(path) && isSep(path[i]) {
+			i++
+		}
+	}
+	return out
+}
+
+// pathComponents returns the component names of path, using the same
+// platform-correct separator rule as pathPieces, so a walk that checks names for
+// trailing '.' or ' ' cannot disagree with the walk that Lstats their prefixes.
+func pathComponents(path string) []string {
+	nativeIsBackslash := os.PathSeparator == '\\'
+	isSep := func(c byte) bool {
+		return c == os.PathSeparator || (nativeIsBackslash && c == '/')
+	}
+	var out []string
+	i := len(filepath.VolumeName(path))
+	for i < len(path) && isSep(path[i]) {
+		i++
+	}
+	for i < len(path) {
+		start := i
+		for i < len(path) && !isSep(path[i]) {
+			i++
+		}
+		if i > start {
+			out = append(out, path[start:i])
+		}
+		for i < len(path) && isSep(path[i]) {
+			i++
+		}
+	}
+	return out
 }
 
 func wrapPath(path string, err error) error {

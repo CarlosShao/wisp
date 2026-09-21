@@ -43,3 +43,21 @@ func (c26Pipeline) Resolve(input string) (string, error) {
 	}
 	return res.Actable()
 }
+
+// ResolveAccounted is ticket 108's AC#4: the same call, with ticket 102's account
+// handed over instead of consumed here, so winsec can refuse a moved seal on its
+// own side of the seam too and the guarantee does not live only in this file.
+// It is the same single Result, not a second resolution and not a second ledger -
+// Actable() below is still the gate that turns the account into an error for the
+// production path, and winsec never calls both legs.
+func (c26Pipeline) ResolveAccounted(input string) (string, bool, error) {
+	res, err := Resolve(input, nil)
+	if err != nil {
+		return "", false, err
+	}
+	path, err := res.Actable()
+	if err != nil {
+		return "", res.Rewritten, err
+	}
+	return path, res.Rewritten, nil
+}

@@ -60,71 +60,125 @@ type C26Resolver interface {
 	Resolve(input string) (string, error)
 }
 
+// RewriteAccounted is what ticket 108's AC#4 adds to the seam, and the reason it
+// is an optional capability rather than a new method on C26Resolver: the account
+// this reports already exists (internal/risk's Result.Rewritten, ticket 102), it
+// simply used to stop at the install point, so winsec could see that an answer
+// was a clean spelling but never ask whether it still named the tree the caller
+// pointed at (R-103-1's second half). A resolver that cannot answer that question
+// may not be installed at all, and ResolvePath refuses to act on its answer even
+// if something got the seam past that rule.
+//
+// ResolveAccounted is the same question Resolve asks, with the ledger attached.
+// ResolvePath calls it *instead of* Resolve, never both, so the pipeline runs
+// once per seal either way; the two answers agreeing is checked where the two
+// legs can be compared (the conformance probe), not on the hot path.
+type RewriteAccounted interface {
+	ResolveAccounted(input string) (path string, rewritten bool, err error)
+}
+
 var (
 	resolverMu sync.RWMutex
 	resolver   C26Resolver
+	// seamLatched records that the seam has been given a resolver, which under
+	// ticket 108's AC#1 is a one-way door: see SetPathResolver.
+	seamLatched bool
 )
 
 // SetPathResolver installs the C26 pipeline. internal/risk calls it from init.
-// Passing nil restores the built-in verifier.
 //
-// Ticket 103's AC#1 is the reason this function is no longer a plain assignment.
-// PROBE A of ticket 94's acceptance installed, from *outside* this package, a
-// resolver that answers every hostile spelling with "yes", and winsec then
-// silently rewrote somebody else's DACL and reported success. The seam itself is
-// not the bug - winsec cannot import risk without closing a cycle (see the note
-// at the top of this file) - so the fix is three guards on the way in:
+// Ticket 103's AC#1 is the reason this function is not a plain assignment, and
+// ticket 108's AC#1 is the reason the fallback to nil is gone. Ticket 103 added
+// three guards - single use, conformance, loud refusal - and ticket 103's
+// acceptance agent walked through the first one by changing the order of calls:
+// SetPathResolver(nil) was allowed unconditionally, so "free the seam, then
+// install the fake" satisfied every rule the guard had (PROBE P1b: the fake was
+// accepted, SealFile returned nil, and an explicit S-1-1-0 grant on somebody
+// else's file was stripped - the exact outcome AC#1 claimed to prevent).
 //
-//  1. single use: while a resolver is installed it may not be replaced by a
-//     different one. Falling back to nil is always allowed, because nil means the
-//     built-in floor, which can refuse and rewrite nothing;
-//  2. conformance: the candidate must answer every hostile shape in
-//     resolverProbeShapes either by refusing it or by handing back a spelling the
-//     floor itself accepts. A pass-through rubber stamp can do neither - which is
-//     precisely why it is dangerous;
-//  3. loud refusal with an audit record: a rejected install leaves the incumbent
-//     in place and writes an ERROR-level slog record naming the candidate and the
-//     reason. A guard that fails quietly is indistinguishable from no guard.
+// So the seam is now one-way, and the only directions it can be turned are the
+// ones that can narrow it:
 //
-// It deliberately does not panic: init() order across packages means a panic here
-// would take a binary down over a wiring mistake, whereas a refusal leaves it on
-// the floor, which is only ever narrower.
+//  1. nil is refused once a resolver has ever been installed. The old comment
+//     justified the fallback with "nil means the built-in floor, which can
+//     refuse and rewrite nothing" - true on its own, and useless in sequence,
+//     because freeing the seam is exactly what re-opens it to a fake. A
+//     one-time install that can be undone is not one-time;
+//  2. single use is a latch, not a occupancy check: a *different* resolver is
+//     refused whether the slot currently reads nil or not;
+//  3. conformance: the candidate must answer every hostile shape in
+//     resolverProbeShapes by refusing it, or by handing back a spelling the floor
+//     itself accepts *and* keeping that answer inside the tree the shape names
+//     (resolverTreeOwnershipFailure, which is what a "constant" fake cannot do);
+//  4. loud refusal with an audit record: a rejected install leaves the incumbent
+//     in place and writes an ERROR-level slog record naming the candidate and
+//     the reason. A guard that fails quietly is indistinguishable from no guard.
+//
+// It deliberately does not panic: init() order across packages means a panic
+// here would take a binary down over a wiring mistake, whereas a refusal leaves
+// it on the floor, which is only ever narrower.
 //
 // What the guard cannot do is read intent, so it is not the whole story:
-// ResolvePath re-runs the floor on whatever the installed resolver answers, which
-// is what makes a fake that somehow got in inert rather than merely unlikely.
+// ResolvePath re-runs the floor on whatever the installed resolver answers and
+// refuses an answer the resolver accounts as a rewrite, which is what makes a
+// fake that somehow got in inert rather than merely unlikely. Nothing in this
+// package can undo an install; tests that need to put the seam back reach
+// SetSeamForTest in export_test.go, which is not compiled into a binary.
 func SetPathResolver(r C26Resolver) {
+	// The candidate is exercised *before* the lock is taken: probing a resolver
+	// means calling back into code this package does not own, and holding the
+	// write lock across that would let a resolver that calls ResolvePath from
+	// another goroutine block every seal in the process.
+	var reason string
+	if r != nil {
+		reason = resolverConformanceFailure(r)
+	}
+	resolverMu.Lock()
+	defer resolverMu.Unlock()
+	name := func(candidate C26Resolver) string {
+		if candidate == nil {
+			return "<floor>"
+		}
+		return fmt.Sprintf("%T", candidate)
+	}
 	if r == nil {
-		resolverMu.Lock()
-		was := fmt.Sprintf("%T", resolver)
-		resolver = nil
-		resolverMu.Unlock()
-		slog.Info("winsec: sealing path resolver reset to the built-in floor", "was", was)
+		if resolver == nil && !seamLatched {
+			slog.Info("winsec: sealing path resolver left at the built-in floor",
+				"reason", "nothing has ever been installed, so nil names no change")
+			return
+		}
+		slog.Error("winsec: refusing to release the sealing path resolver",
+			"installed", name(resolver),
+			"reason", "the seam is one-way: falling back to nil would free it for a forged resolver to install, which is ticket 103's probe P1b",
+			"consequence", "the incumbent resolver stays in place; nothing was uninstalled")
 		return
 	}
-	name := fmt.Sprintf("%T", r)
-	if reason := resolverConformanceFailure(r); reason != "" {
+	if reason != "" {
 		slog.Error("winsec: refusing to install a path resolver into the sealing seam",
-			"resolver", name,
+			"resolver", name(r),
 			"reason", reason,
 			"consequence", "the incumbent resolver, or the built-in floor, stays in place")
 		return
 	}
-	resolverMu.Lock()
-	defer resolverMu.Unlock()
-	if resolver != nil {
-		if incumbent := fmt.Sprintf("%T", resolver); incumbent != name {
+	if seamLatched {
+		if incumbent := name(resolver); incumbent != name(r) {
 			slog.Error("winsec: refusing to replace the already installed sealing path resolver",
 				"installed", incumbent,
-				"attempted", name,
-				"reason", "the seam is single-use: reset it to nil first, the only direction that can narrow")
+				"attempted", name(r),
+				"reason", "the seam is single-use and one-way: there is no order of calls that frees it")
 			return
 		}
-		slog.Debug("winsec: sealing path resolver installed again identically", "resolver", name)
+		// The identity branch ticket 103 left unpinned (R-103-4: zero coverage).
+		// Reinstalling the resolver that is already in place is a no-op that
+		// keeps the FIRST instance, which is what makes the seam idempotent in
+		// the only direction that cannot weaken it.
+		slog.Debug("winsec: sealing path resolver installed again identically",
+			"resolver", name(r), "kept", "the first instance")
 		return
 	}
 	resolver = r
-	slog.Info("winsec: sealing path resolver installed", "resolver", name,
+	seamLatched = true
+	slog.Info("winsec: sealing path resolver installed", "resolver", name(r),
 		"probes_passed", len(resolverProbeShapes()))
 }
 
@@ -136,7 +190,8 @@ func SetPathResolver(r C26Resolver) {
 // built-in floor, so the only acceptable answers are a refusal or a rewrite.
 //
 // They need no fixtures, no privilege and no filesystem mutation, which is what
-// makes it safe to run them from an init()-time setter.
+// makes it safe to run them from an init()-time setter. The tree-ownership leg
+// below is deliberately the same kind of probe: two spellings, no mkdir.
 func resolverProbeShapes() []string {
 	sep := string(filepath.Separator)
 	shapes := []string{os.TempDir() + sep + ".." + sep + "wisp-103-conformance-probe"}
@@ -149,10 +204,15 @@ func resolverProbeShapes() []string {
 // resolverConformanceFailure returns the reason r must not be installed, or ""
 // when it may.
 func resolverConformanceFailure(r C26Resolver) string {
+	if _, ok := r.(RewriteAccounted); !ok {
+		if _, isFloor := r.(builtinVerifier); !isFloor {
+			return "it cannot answer the tree-ownership question at all: without ResolveAccounted this package would have to seal whatever tree its answers name, which is ticket 103's R-103-1"
+		}
+	}
 	for _, probe := range resolverProbeShapes() {
-		out, err := r.Resolve(probe)
-		if err != nil {
-			continue // refusing a hostile shape is the job, not a failure
+		out, rewritten, err := resolveAccounted(r, probe)
+		if err != nil || rewritten {
+			continue // refusing, or honestly accounting for a move, are both jobs
 		}
 		if out == probe {
 			return fmt.Sprintf("it answered the hostile shape %q by passing it through unchanged, which is the bypass this seam exists to close", probe)
@@ -161,7 +221,85 @@ func resolverConformanceFailure(r C26Resolver) string {
 			return fmt.Sprintf("it answered %q with %q, a spelling the built-in floor itself refuses: %v", probe, out, fErr)
 		}
 	}
+	return resolverTreeOwnershipFailure(r)
+}
+
+// resolveAccounted asks one resolver the one question, preferring the leg that
+// carries ticket 102's account so the pipeline runs once per seal and not twice.
+// Something that cannot answer is reported as a move: the only way into the seam
+// is to be able to say otherwise (checked by resolverConformanceFailure), so a
+// caller reaching this helper with anything else has not earned the benefit of
+// the doubt.
+func resolveAccounted(r C26Resolver, input string) (string, bool, error) {
+	if acc, ok := r.(RewriteAccounted); ok {
+		return acc.ResolveAccounted(input)
+	}
+	if _, isFloor := r.(builtinVerifier); isFloor {
+		p, err := r.Resolve(input)
+		return p, false, err
+	}
+	return "", true, fmt.Errorf("%w: %s does not implement RewriteAccounted", ErrUnresolvedPath, resolverLabel(r))
+}
+
+// resolverTreeOwnershipFailure is AC#4's install-time leg, and the direct answer
+// to R-103-1: ticket 103's probe asked only whether an answer is a *clean
+// spelling*, so a resolver that answers every input with one fixed clean
+// absolute path walked straight through (P1b's fake). Containment is checked
+// relationally instead of against a template, so this stays an opinion about the
+// candidate's answers and not a second normalizer:
+//
+//	ask the candidate for a directory and for something inside that directory.
+//	An honest pipeline answers with the inner thing inside the outer thing, or
+//	refuses, or says "I moved it". A "constant" fake answers the same string
+//	twice, and a tree-moving fake answers something that is not inside the tree
+//	it just named for the parent.
+//
+// Refusal on either probe is acceptable, as it is everywhere in this file.
+func resolverTreeOwnershipFailure(r C26Resolver) string {
+	sep := string(filepath.Separator)
+	parent := os.TempDir()
+	child := parent + sep + "wisp-108-tree-ownership-probe"
+	childAns, childMoved, cErr := resolveAccounted(r, child)
+	if cErr != nil || childMoved {
+		return "" // refusing, or honestly accounting for a move, are both narrow
+	}
+	parentAns, parentMoved, pErr := resolveAccounted(r, parent)
+	if pErr != nil || parentMoved {
+		return ""
+	}
+	if childAns == parentAns {
+		return fmt.Sprintf("it answered %q and %q with the same single spelling %q, i.e. it does not resolve the tree the caller named at all",
+			parent, child, childAns)
+	}
+	if !answerInsideTree(childAns, parentAns) {
+		return fmt.Sprintf("it answered %q with %q, which is not inside the tree %q it answered for that path's own parent %q: the seam may not be used to move a seal into another tree",
+			child, childAns, parentAns, parent)
+	}
 	return ""
+}
+
+// answerInsideTree reports whether child names something inside parent, by
+// component, over the separator set the platform actually uses (pathPieces'
+// rule). No normalization is performed on either side, and on Windows the
+// comparison is case-insensitive because that is the platform's own rule for
+// naming an object - not because a mismatch would be treated as a rewrite.
+func answerInsideTree(child, parent string) bool {
+	childComps, parentComps := pathComponents(child), pathComponents(parent)
+	if len(childComps) <= len(parentComps) {
+		return false
+	}
+	fold := func(s string) string {
+		if os.PathSeparator == '\\' {
+			return strings.ToLower(s)
+		}
+		return s
+	}
+	for i, want := range parentComps {
+		if fold(childComps[i]) != fold(want) {
+			return false
+		}
+	}
+	return true
 }
 
 // PathResolverInstalled reports the installed pipeline, or nil when the built-in
@@ -202,7 +340,7 @@ func ResolvePath(input string) (ResolvedPath, error) {
 	if r == nil {
 		r = builtinVerifier{}
 	}
-	p, err := r.Resolve(input)
+	p, moved, err := resolveAccounted(r, input)
 	if err != nil {
 		// Propagated as-is: errors.Is against the resolver's own sentinel has to
 		// keep holding, so a refusal stays attributable to C26 rather than to
@@ -212,6 +350,15 @@ func ResolvePath(input string) (ResolvedPath, error) {
 	if p == "" {
 		return ResolvedPath{}, fmt.Errorf("winsec: refusing to seal %s: %w: resolver returned an empty path",
 			input, ErrUnresolvedPath)
+	}
+	// AC#4: ticket 102's account, now readable on this side of the seam. A
+	// resolver that says "this answer moved off the tree the caller named" is
+	// neither second-guessed nor believed - the seal is refused, the same direction
+	// internal/risk's Result.Actable() takes, but refused *here*, so it holds for
+	// whatever is installed rather than only for the wiring in internal/risk.
+	if moved {
+		return ResolvedPath{}, fmt.Errorf("winsec: refusing to seal %s: the installed %s answered %q and accounted that answer as a rewrite off the tree the caller named: %w",
+			input, resolverLabel(r), p, ErrUnresolvedPath)
 	}
 	// AC#1's second half, and the reason "the seam is guarded" is not load-bearing
 	// on the guard alone: whatever is installed, the spelling that reaches
@@ -259,24 +406,69 @@ func (builtinVerifier) Resolve(input string) (string, error) {
 	if !filepath.IsAbs(input) {
 		return "", fmt.Errorf("%w: %s is not absolute", ErrUnresolvedPath, input)
 	}
-	for _, sep := range []string{`/`, `\`} {
-		if !strings.Contains(input, sep) {
-			continue
-		}
-		for i, seg := range strings.Split(strings.Trim(input, sep), sep) {
-			switch seg {
-			case "":
-				// A doubled separator is a spelling Clean would have eaten, which
-				// is the thing being refused here: whatever the OS reads it as,
-				// this package will not act on it.
-				return "", fmt.Errorf("%w: %s has an empty path segment (index %d)", ErrUnresolvedPath, input, i)
-			case ".", "..":
-				// Collapsing ".." lexically is exactly how "seal A" becomes
-				// "modify B" behind a link: the filesystem resolves the parent
-				// pointer of the object it reached, a string does not.
-				return "", fmt.Errorf("%w: %s traverses %q", ErrUnresolvedPath, input, seg)
-			}
-		}
+	if problem, found := lexicalTraversal(input); found {
+		return "", fmt.Errorf("%w: %s %s", ErrUnresolvedPath, input, problem)
 	}
 	return platformVerifyPlacement(input)
+}
+
+// ResolveAccounted is the floor answering AC#4's question. The answer is always
+// "not moved", and it is a fact about this implementation rather than a claim it
+// makes per call: builtinVerifier has no rewrite branch at all, it hands back the
+// input unchanged or refuses (see the note at the top of this file on why the
+// floor is not a second PathResolver).
+func (b builtinVerifier) ResolveAccounted(input string) (string, bool, error) {
+	p, err := b.Resolve(input)
+	return p, false, err
+}
+
+// lexicalTraversal is the floor's portable shape check, stated over the
+// separators the platform actually uses rather than over two independent
+// string.Split passes: a run of separators inside the path is an empty segment
+// (the spelling Clean would have eaten, which is the thing being refused), and a
+// "." or ".." component is a pointer whose target only the filesystem can name.
+//
+// The separator set is the same rule pathPieces uses, and for the same reason
+// (ticket 108's AC#2): on Windows '/' is a separator the OS honours, so
+// "C:/a/../b" has to be seen; on POSIX a backslash is an ordinary character in a
+// name, so treating it as a separator would refuse the real directory named
+// `a\b` for a "." that is only a "." in a string.
+func lexicalTraversal(path string) (string, bool) {
+	nativeIsBackslash := os.PathSeparator == '\\'
+	isSep := func(c byte) bool {
+		return c == os.PathSeparator || (nativeIsBackslash && c == '/')
+	}
+	i := len(filepath.VolumeName(path))
+	leading := true
+	for i < len(path) {
+		if isSep(path[i]) {
+			if leading {
+				i++
+				continue
+			}
+			// Two separators in a run, not at the start: an empty segment.
+			j := i
+			for j < len(path) && isSep(path[j]) {
+				j++
+			}
+			if j-i > 1 {
+				return fmt.Sprintf("has an empty path segment (index %d)", i), true
+			}
+			i = j
+			continue
+		}
+		start := i
+		for i < len(path) && !isSep(path[i]) {
+			i++
+		}
+		switch seg := path[start:i]; seg {
+		case ".", "..":
+			// Collapsing ".." lexically is exactly how "seal A" becomes
+			// "modify B" behind a link: the filesystem resolves the parent
+			// pointer of the object it reached, a string does not.
+			return fmt.Sprintf("traverses %q", seg), true
+		}
+		leading = false
+	}
+	return "", false
 }

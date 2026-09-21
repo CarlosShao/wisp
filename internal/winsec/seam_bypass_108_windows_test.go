@@ -31,25 +31,34 @@ type treeMovingResolver108 struct{ fixed string }
 
 func (r treeMovingResolver108) Resolve(string) (string, error) { return r.fixed, nil }
 
+// ResolveAccounted is the fake's second lie, and the reason this probe tests
+// AC#4 rather than ticket 108's capability rule: it claims every answer stayed
+// inside the tree the caller named, so the only thing that can stop it is the
+// install-time containment check, or ResolvePath refusing to act on it.
+func (r treeMovingResolver108) ResolveAccounted(string) (string, bool, error) {
+	return r.fixed, false, nil
+}
+
+// unaccountedResolver108 answers every shape by passing it through and cannot
+// answer the tree question at all: the type-level door. It is refused for a
+// different reason than the fake above, and the two legs are pinned separately so
+// neither can quietly become the only one being tested.
+type unaccountedResolver108 struct{}
+
+func (unaccountedResolver108) Resolve(in string) (string, error) { return in, nil }
+
 // seamAt108 puts r into the sealing seam for the duration of one test and puts
 // the incumbent back afterwards.
 //
-// RED-COMMIT SHAPE: the only exported way to reach the floor today is
-// SetPathResolver(nil), and that nil branch is precisely the door ticket 108 is
-// closing (it is what lets P1b free the seam and re-install a fake). The fix
-// commit replaces this body with the test-only hook in export_test.go, so that
-// the post-fix reading of these probes does not depend on the door being open.
+// POST-FIX SHAPE: this goes through SetSeamForTest (export_test.go), not through
+// SetPathResolver's nil branch, because that branch is the door P1b used and the
+// fix welded it shut. The probes below still call the exported setter for every
+// install attempt they judge - only the test scaffolding is allowed to move the
+// seam back.
 func seamAt108(t *testing.T, r winsec.C26Resolver) {
 	t.Helper()
-	incumbent := winsec.PathResolverInstalled()
-	winsec.SetPathResolver(nil)
-	if r != nil {
-		winsec.SetPathResolver(r)
-	}
-	t.Cleanup(func() {
-		winsec.SetPathResolver(nil)
-		winsec.SetPathResolver(incumbent)
-	})
+	restore := winsec.SetSeamForTest(r)
+	t.Cleanup(restore)
 }
 
 // wideFileInOurTree is our own file carrying an explicit Everyone grant: the
@@ -80,15 +89,13 @@ func wideFileInOurTree(t *testing.T, dir, name string) string {
 // prevent, hence the rejected-needs-fix that opened this ticket.
 func TestAC1SeamCannotBeFreedThenGivenATreeMovingFake(t *testing.T) {
 	incumbent := winsec.PathResolverInstalled()
-	// RED-COMMIT SHAPE: this restore leans on SetPathResolver(nil) being allowed,
-	// which is the door ticket 108 is closing. The fix commit moves it onto the
-	// test-only hook in export_test.go. Note what the leak costs if it is missing:
-	// the accepted fake then answers every later PrivateDirAll in this binary,
-	// which reports success and creates nothing where the caller pointed.
-	t.Cleanup(func() {
-		winsec.SetPathResolver(nil)
-		winsec.SetPathResolver(incumbent)
-	})
+	// The restore has to go through the test-only hook: SetPathResolver(nil) is
+	// the very call this probe judges, and if it still worked the seam would be
+	// left holding the accepted fake for every later test in the binary - which is
+	// what the red run measured (a later PrivateDirAll then reported success and
+	// created nothing where the caller pointed).
+	restoreSeam := winsec.SetSeamForTest(incumbent)
+	t.Cleanup(restoreSeam)
 	t.Logf("incumbent before the freeing step: %s", resolverName(incumbent))
 
 	victim, innocentFile, victimSidsBefore := foreignVictimTree(t)
@@ -122,12 +129,15 @@ func TestAC1SeamCannotBeFreedThenGivenATreeMovingFake(t *testing.T) {
 		t.Errorf("AC#1 RED: the refused install left no audit record naming the fake; log was: %s", logged.String())
 	}
 
-	// Leg 3: the outcome judgement - sealing our own blob may not end up narrowing
-	// the foreign tree, and neither DACL may move.
-	if err := winsec.SealFile(blob); err == nil {
-		t.Errorf("AC#1 RED: SealFile(%s) returned nil while a tree-moving fake was in the seam", blob)
+	// Leg 3: the outcome judgement. With the fake refused, the seal has to land
+	// where the caller pointed - our own blob really does get narrowed - and
+	// nothing may happen in the tree the fake named. Judging only "err != nil"
+	// here would pass for a guard that refuses everything, which is the accidental
+	// green ticket 94's acceptance scored, so both directions are measured.
+	if err := winsec.SealFile(blob); err != nil {
+		t.Errorf("AC#1 RED: SealFile(%s) failed even though the fake was refused, so the refusal broke the seal instead of the fake: %v", blob, err)
 	} else {
-		t.Logf("SealFile through the refused/kept seam: %v", err)
+		t.Logf("SealFile through the kept seam: %v", err)
 	}
 	foreignSidsAfter, foreignNamesAfter := aclSIDs(t, foreignFile)
 	t.Logf("foreign file DACL after:  sids=%v names=%v", foreignSidsAfter, foreignNamesAfter)
@@ -142,16 +152,16 @@ func TestAC1SeamCannotBeFreedThenGivenATreeMovingFake(t *testing.T) {
 		t.Errorf("AC#1: the innocent file behind the foreign tree must be untouched: %v", err)
 	}
 	blobSidsAfter, _ := aclSIDs(t, blob)
-	victimSidsAfter, _ := aclSIDs(t, victim)
-	if !equalSIDs(victimSidsAfter, victimSidsBefore) || !containsSID(victimSidsAfter, everyoneSID) {
-		t.Errorf("AC#1 RED: the foreign tree directory's DACL moved: before=%v after=%v", victimSidsBefore, victimSidsAfter)
-	}
-	if !containsSID(blobSidsAfter, everyoneSID) {
-		t.Errorf("AC#1 RED: %s was stripped from our own wide blob too, so the fake's answer is being acted on: %v",
+	if containsSID(blobSidsAfter, everyoneSID) {
+		t.Errorf("AC#1: the seal did not narrow the file the caller actually named: %s is still in %v - the fake was refused but so was the work",
 			everyoneSID, blobSidsAfter)
 	}
 	if !equalSIDs(blobSidsAfter, blobSidsBefore) {
-		t.Errorf("AC#1 RED: our blob DACL changed: before=%v after=%v", blobSidsBefore, blobSidsAfter)
+		t.Logf("our own blob DACL changed as asked: before=%v after=%v", blobSidsBefore, blobSidsAfter)
+	}
+	victimSidsAfter, _ := aclSIDs(t, victim)
+	if !equalSIDs(victimSidsAfter, victimSidsBefore) || !containsSID(victimSidsAfter, everyoneSID) {
+		t.Errorf("AC#1 RED: the foreign tree directory's DACL moved: before=%v after=%v", victimSidsBefore, victimSidsAfter)
 	}
 	t.Logf("icacls(foreign) after:\n%s", icaclsRaw(t, foreignFile))
 	t.Logf("icacls(blob) after:\n%s", icaclsRaw(t, blob))
@@ -192,6 +202,38 @@ func TestAC4TreeOwnershipIsPartOfTheConformanceContract(t *testing.T) {
 }
 
 // ----------------------------------------------------------------- AC#3 / P3 --
+
+// TestAC4ResolverThatCannotAccountForItsTreeCannotSealAnything is the use-time
+// half of the same rule, and the reason the capability is not just an install
+// preference: the seam is put in place by the test-only hook (which production
+// code cannot reach), so the guard is not load-bearing for this judgement - the
+// answer itself is refused, on every entry point, because nothing here can tell
+// whether the tree is still the caller's.
+func TestAC4ResolverThatCannotAccountForItsTreeCannotSealAnything(t *testing.T) {
+	restore := winsec.SetSeamForTest(unaccountedResolver108{})
+	t.Cleanup(restore)
+
+	own := filepath.Join(t.TempDir(), "data")
+	if err := winsec.PrivateDirAll(own, 0o700); err == nil {
+		t.Errorf("AC#4 RED: a resolver that cannot answer the tree-ownership question was allowed to create and seal %s", own)
+	} else if !errors.Is(err, winsec.ErrUnresolvedPath) {
+		t.Errorf("AC#4: the refusal should name this package's own sentinel, got: %v", err)
+	} else {
+		t.Logf("PrivateDirAll refused as: %v", err)
+	}
+	blob := filepath.Join(t.TempDir(), "blob.bin")
+	if err := os.WriteFile(blob, []byte("x"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := winsec.SealFile(blob); err == nil {
+		t.Errorf("AC#4 RED: SealFile acted on an answer nobody could attribute to a tree")
+	} else {
+		t.Logf("SealFile refused as: %v", err)
+	}
+	if err := winsec.RemoveUnlinked(blob); err != nil {
+		t.Errorf("RemoveUnlinked does not consult the seam and must keep working on an absolute spelling: %v", err)
+	}
+}
 
 // TestAC3PlacementFloorHoldsForEverySeparatorSpelling is probe P3: the built-in
 // floor's own reparse walk (platformVerifyPlacement) cuts only on the backslash,
@@ -304,6 +346,9 @@ func TestAC2AncestorGuardHoldsForEverySeparatorSpelling(t *testing.T) {
 			if err == nil {
 				t.Errorf("AC#2 RED: RemoveUnlinked(%q) returned nil for a spelling that reaches the leaf through a junction", spell)
 			} else if !errors.Is(err, winsec.ErrIsReparsePoint) {
+				if !filepath.IsAbs(spell) && !errors.Is(err, winsec.ErrUnresolvedPath) {
+					t.Errorf("AC#2: a relative spelling must be refused because no tree names it, got: %v", err)
+				}
 				t.Logf("refused, but not with ErrIsReparsePoint: %v", err)
 			}
 			if _, statErr := os.Stat(innocentFile); statErr != nil {

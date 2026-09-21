@@ -1,6 +1,6 @@
 # 108 — 票 103 的守卫被验收代理**三枚探针当场绕过**：先 `nil` 解除再装伪造解析器（外来 `S-1-1-0` 被静默剥掉）、全 `/` 或混合分隔符让祖先检查**一个都不查**、`platformVerifyPlacement` 同错法还在（退回单）
 
-**Status:** open（2026-09-21 18:5x 编排者建；来源=`acceptor-ticket103` 的 **R-103-1 / R-103-2 / R-103-3 / R-103-4**，裁决表 `docs/evidence/s1/103-adversarial-acceptance.md`）
+**Status:** ready-for-review（2026-09-21 19:2x `agent-ticket108` 交件；原 open 于 2026-09-21 18:5x 编排者建；来源=`acceptor-ticket103` 的 **R-103-1 / R-103-2 / R-103-3 / R-103-4**，裁决表 `docs/evidence/s1/103-adversarial-acceptance.md`）
 **Type:** 安全边界（**修法自身开出的新攻击面**——票 103 修的是"没有守卫"，本票修的是"守卫可被绕过"）
 **Blocks:** 票 103 结案（我已把它标 `rejected-needs-fix`，见其票头）· **Blocked by:** nothing
 **Packages:** `internal/winsec/` 里的**缝与祖先链**：`resolve.go`（一次性守卫、`firstLinkAncestor`）、
@@ -122,3 +122,86 @@
   - **工具输出里的非授权文本登记**：本代理至今 **0 次**看到自称"编排者备注/停手/撤回/请 revert"的文本（台账 A75②、A78③ 的监测项）。
     19:00 收到一条系统提示 `MEMORY.md ... was modified since it was last read`，内容是记忆索引文件自身的变更通知（无指令、无 revert 要求），
     按"不作为授权"处置，未据此改变任何判据；未撤销任何已提交 commit。
+
+- 2026-09-21 19:30（`agent-ticket108`）**第二枚 checkpoint = 修法交件（四格 AC 全做，Status→ready-for-review）**。
+  **改的生产码一共四处**（`git diff --cached --name-only` 共 9 个路径，其余全是 `_test.go`）：
+  `internal/winsec/resolve.go`（单向闩 + 树归属两条腿 + 分隔符平台正确）、`winsec.go`（`pathPieces`/`pathComponents`/`lexicalTraversal` 的共用切分 +
+  `RemoveUnlinked` 拒绝相对拼写）、`placement_windows.go`（AC#3 走同一把切分）、`internal/risk/winsec_c26.go`（唯一安装点，把票 102 的账递过缝）。
+  **票 106 的文件一行未动**（`winsec_windows.go` 私有集/`verifyPrivate`/`Seal*` 白名单：不在上面 9 个路径里）。
+  - **AC#1 修法 = 缝单向**：`SetPathResolver(nil)` 在"已装过"之后一律**拒**（ERROR 审计 `refusing to release the sealing path resolver`），
+    一次性由 `seamLatched` 而不是"槽位当前是不是 nil"决定 ⇒ **P1b 的"先解除再装"这个顺序不存在了**；
+    测试要回滚缝只能走 `export_test.go` 的 `SetSeamForTest`（`_test.go` 不进生产二进制）⇒ **没有把守卫拆掉当修法**，缝的形状还是票 94 那条单向边。
+    恒等重装（R-103-4，修前覆盖率 0）改钉成"保留第一份实例"的用例（`countingResolver` 指针身份，不是空结构体值）。
+    P1b 修后：**`TestAC1SeamCannotBeFreedThenGivenATreeMovingFake` PASS**，`icacls` SID 级读数 ⇒
+    外来文件 `before=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-...-1001]` / `after=` **同一个列表**（`S-1-1-0` **由有到仍有**），
+    我们自己那颗故意放宽的 `blob.bin` 反而**该被收窄就收窄**（判据两边都量，防止"守卫拒一切"被当成绿）。
+  - **AC#2 修法 = 一把平台正确的切分**：`pathPieces` 在 Windows 上认 `/` 与 `\`（OS 自己认），POSIX 上只认 `/`；
+    **前缀一律取输入的子串、从不 Join 重建** ⇒ 不会把 `a\b` 折成 `a`+`b`。逐形状结论（`-v`，每行自己的判决）：
+    `native-backslash` 绿 · `all-forward-slash` **红→绿** · `mixed-separators` **红→绿** · `doubled-separator` **红→绿** ·
+    `volume-only-relative-tail` **红→绿**（`RemoveUnlinked` 现在拒相对拼写：它不走解析器，相对名意味着"进程站在那儿的那棵树"，
+    而"报成功却什么也没删"是这仓登过两次的形状）· `trailing-separator`/`dot-segment`/`extended-length-prefix` 持平绿；
+    阳性对照 `TestAC2AncestorGuardStillUnlinksAPlainFile` 绿（普通回收与独立解链没被打死）。
+    **反向用例（POSIX 不折 `\`）= 三枚**：`TestAC2POSIXDoesNotFoldABackslashIntoASeparator`、
+    `TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor`（名字里带 `\` 的链接祖先仍是祖先 = 反 fail-open）、
+    `TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink`，外加纯词法的 `pathpieces_108_test.go` 七形状逐平台表。
+  - **AC#3 修法 = 同一条切分**：`platformVerifyPlacement` 的 reparse 走查与"末尾 `.`/空格"扫描都改走 `pathPieces`/`pathComponents` ⇒ 第二条"消费解析器答案但不查"的路没有了；
+    P3 修后 `TestAC3PlacementFloorHoldsForEverySeparatorSpelling` 八个形状**全绿**（红时是 `all-forward-slash`+`mixed-separators` 两条真改掉外来 DACL）。
+    **落在我分界内**（`placement_windows.go` 不碰私有集），没有停手交回。
+  - **AC#4 修法 = 接到票 102 那本账，不新造第二本**：缝加**可选能力** `RewriteAccounted.ResolveAccounted(input) (path, rewritten bool, err)`，
+    `winsec_c26.go` 用**同一个** `Result`（`res.Actable()` 原样保留 —— 静态锁 `internal/risk/pathresolver_rewrite_account_test.go` 要求它继续读 `Actable(`，已满足）
+    并把 `res.Rewritten` 递过来；`ResolvePath` 只走这一条腿（每次密封解析一次，不是两次），`rewritten==true` ⇒ 拒并点名解析器（`ErrUnresolvedPath` 包装）。
+    安装期再加两条腿：**不实现 `ResolveAccounted` 的候选一律拒**（类型上门，`TestAC4ResolverThatCannotAccountForItsTreeCannotSealAnything` 用测试钩子硬塞进去也仍然封不动任何东西），
+    以及**关系式树归属探针**（同一个解析器答"某目录"和"该目录里的东西"，答案相同 ⇒ 拒；子答案不在父答案那棵树里 ⇒ 拒）——
+    这正是恒改写型伪造的死因，而 `risk.c26Pipeline` 在 Windows 与 Linux 上都通过（读数 `probes_passed=2`、`INFO ... resolver=risk.c26Pipeline installed`）。
+    ⚠ **写清楚的残余边界**（自陈边界≠守住边界）：探针能挡"常数答案/换了树的答案"，挡不住"每棵树都各给一个干净且互相包含的伪造答案"的解析器；
+    那种伪造今天**只能从包内塞进缝**（生产码无解除路径、无第二次安装），而票 102 的账对它的语义是"调用方点名的树 = 输入那棵树"，winsec 不自己重算 canonical（重算就是 D22 ban #2 的第二个归一化器）。
+  - **门禁四数（AC#5）**：
+    `go test -count=2 -v ./internal/winsec/ ./internal/memory/ ./internal/risk/`（**19:24 真树按三包跑，rc=0**）
+    ⇒ `=== RUN` **602 行**（=每轮 301，`-v` 量的）、`--- PASS` **602**、`--- FAIL` **0**、`--- SKIP` **4 行 = 2 个名字 ×2 轮**
+    （`TestSubprocessCrashWriter`(memory)、`TestSyncRegistryProbeLive`(risk)，都是既有环境条件用例；报 SKIP 已说明是 `-v`）；
+    三包 `ok` 分别 28.601s / 27.825s / 8.372s。**这份绿来自真树**（`internal/winsec`+`internal/risk` 是我的改动，`internal/memory` 无人在飞；
+    共树里 `frontend/`+`internal/panel/`=票 92、`internal/tools/`=票 109 的 WIP 一律没测到，因为没跑整仓）。
+    修前红那一枚的读数（HEAD `3fbb46d` 纯净快照）：`=== RUN` 21 / PASS 11 / **FAIL 10** / SKIP 0 / rc=1。
+  - **POSIX 那一半 = 真跑过，不是编译期验**（台账 A79①）：WSL 只有 docker-desktop 这个最小发行版（`execvpe(bash) failed`）⇒ 走 Docker。
+    方法一（四包整源码，最干净）：`MSYS_NO_PATHCONV=1 docker run --rm -e CGO_ENABLED=0 -v "D:/work/workspace/projects plans/Wisp:/src" -v wisp108mod:/go/pkg/mod -w /src golang:1.27 go test -count=1 -v ./internal/winsec/ ./internal/risk/ ./internal/memory/ ./internal/secret/`
+    ⇒ **LINUX_RC=0**，`ok winsec 0.073s / ok risk 4.779s / ok memory 11.850s / ok secret 0.009s`，
+    且 `TestAC2POSIXDoesNotFoldABackslashIntoASeparator`、`TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor`、
+    `TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink`、`TestAC4POSIXFloorAnswersInsideTheNamedTree`（**没 skip，Linux 上缝本来就是空的**）四枚全 `--- PASS`。
+    方法二（`GOOS=linux CGO_ENABLED=0 go test -c` + alpine 跑）也做了，但**要如实登记它的读数是假的**：
+    二进制在没有源码的目录里跑，`risk`/`memory` 各报 1 条 `open winsec_c26.go: no such file` / `parse artifacts.go: no such file`
+    ⇒ 那是仪器缺源码，不是代码缺陷；换方法一后消失。**不拿它当 Linux 结论**。
+  - **变异三向（每向点名红在哪）**，全部在仓外快照 `/tmp/mut108-agent-ticket108`（`git archive $(git write-tree) | tar -x`，**仓内未建 worktree/未 checkout**），
+    每发**同一条链里 `grep -n` 打印被改后整行** + `go build` rc=0 先量（**编译失败不算变异**）+ `go test -v` 数 `=== RUN` + 还原后 `diff -q` 证 CLEAN：
+    * **MUT-1**（把票 103 那扇门装回去：`if r == nil { resolver, seamLatched = nil, false`）⇒ build rc=0，9 RUN / 7 PASS / **2 FAIL**，
+      两条红**都在守卫上**且是断言原文：`seam_bypass_108_windows_test.go:118 AC#1 RED: SetPathResolver(nil) detached the seam (was risk.c26Pipeline, now <floor>)`、
+      `seam_guard_windows_test.go:267/277 AC#1 RED: ... one-use without one-way is bypassable by ordering` + `the seam is not single-use - narrowOnlyResolverB replaced *countingResolver`。
+    * **MUT-2**（只摘树归属探针：`return resolverTreeOwnershipFailure(r)` → `return ""`）⇒ build rc=0，9 RUN / 8 PASS / **恰 1 FAIL**，
+      红在 `TestAC4TreeOwnershipIsPartOfTheConformanceContract`（`AC#4 RED: the seam accepted a resolver whose answers name a tree nobody called`），
+      **见证腿仍绿**：`TestAC1SeamCannotBeFreedThenGivenATreeMovingFake`、`TestAC1SeamIsOneWayUseIsTheOnlyDirection`、
+      `TestAC4ResolverThatCannotAccountForItsTreeCannotSealAnything` 三条 PASS ⇒ MUT-1 的红不在噪声上，这条腿是独立增量。
+    * **MUT-3**（Windows 不再认 `/`：`nativeIsBackslash := false`）⇒ build rc=0，19 RUN / 11 PASS / **8 FAIL**，
+      红按形状点名（`AC#2 RED: RemoveUnlinked("C:/.../link/sub/keep-me.txt") returned nil`、`AC#3 RED: S-1-1-0 stripped from the foreign file by spelling "C:/..."`）
+      ⇒ P2/P3 的形状**被变异精确复现**，不是偶然红。
+    * **MUT-3b（POSIX 折叠 `\` 的反向变异，容器里真跑）**：第一发 `nativeIsBackslash := true` 在 Linux 上是**空变异**
+      （该开关只"额外认 `/`"，POSIX 本来就认 ⇒ 13 RUN/12 PASS，绿得没错但没测到东西）⇒ 如实登记并换正确形状
+      `c == os.PathSeparator || c == 0x5c || ...`：build rc=0，13 RUN / 6 PASS / **7 FAIL**，
+      红在 `TestAC2POSIXDoesNotFoldABackslashIntoASeparator` 与四行词法表 ⇒ **反向用例确实咬得住"折 `\`"这个错方向**，不是摆设。
+    还原：四发各自 `diff -q` 与 pristine 一致（`MUTx RESTORED CLEAN`），最后一次 `git status --porcelain` 真树里我的路径只有那 9 个。
+  - **静态三门**：`gofmt -l internal/winsec/ internal/risk/` 空、`$(go env GOPATH)/bin/gofumpt.exe -l` 同两处**空（本机有二进制，跑了）**、
+    `go vet` 原生三包 rc=0、`GOOS=linux go vet` 三包 rc=0、`GOOS=darwin go vet ./internal/winsec/` rc=0。
+    **`sh scripts/d22scan.sh` 在纯净快照 `/tmp/d22108-agent-ticket108` rc=0**：`bans #1-5 internal/=199 cmd/=20 | #6 frontend/=37 | #7 internal/tools/=17 | #8 design/=16 frontend/=37 internal/=356 cmd/=26`，
+    零 emoji 通过（覆盖注释与 `_test.go`）。**台账对 103 表的 197/20/40/17/16/40/346/26：internal 197→199、#8 internal 346→356（升，是我新增的 `_test.go`）；
+    `frontend/` 40→37 两处下降不是我**（我 9 个路径全在 `internal/winsec/`+`internal/risk/`，`git log -- frontend/` 显示这轮变化来自票 77 的 `14720af`/`63ef895`）⇒ 交编排者裁。
+  - **工具输出里的非授权文本登记（续）**：修后这一段仍然 **0 次**"编排者备注/停手/撤回/请 revert"。
+    新收到两类系统提示，都不是指令：①`MEMORY.md was modified since it was last read`（记忆索引自身变更通知）；
+    ②一次后台任务通知。均未据此改变判据、未 revert 任何 commit。
+  - **没做完的格子**：AC#1–#5 五格框**我一个没勾**（勾框是验收方的面）；
+    残余缺口三条**留给裁决**：(a) `R-103-6` 的 darwin 仍只有编译期读数（无 macOS runner）、(b) `R-103-7` macOS `/tmp`、`/var` 本身是 symlink 时回收会开始报"拒删"错误
+    （方向是安全的一侧，但要不要给豁免通道要编排者裁）、(c) `volume-only-relative-tail` 从"返回 nil 什么也不删"改成"报错"是对票 79 回收路由的语义收紧，
+    今天所有调用方传的都是 `filepath.Join(resolvedRoot, ...)` 绝对拼写（`internal/memory` 全绿为证），但这是一处**对外行为变化**，请复验时按契约面裁。
+    next= **票 103 复验该怎么走**：复验代理应当 (1) 在 `/tmp` 纯净快照里跑 `-count=2 -v` 四包 + 三门 + `sh scripts/d22scan.sh`；
+    (2) 按票 103 的原 AC#1/AC#2 判据**重跑它自己的 P1b/P2/P3 探针**（不是重跑本票用例），并且额外打"修法的形状"：
+    `SetPathResolver(nil)` 之后再 `SetPathResolver(伪造)`、`SetSeamForTest` 之外的任何解除尝试、恒改写伪造的**安装期**与**使用期**两条路、
+    `RemoveUnlinked`/`SealFile` 的八种分隔符拼写（含相对拼写）、以及"POSIX 折 `\`"的反向变异；
+    (3) Linux 那半**必须容器真跑**（方法一那条命令可直接复用），不接受 `go test -c` 无源码目录的读数。
+    本票交件后 HEAD 之上另有票 92/109 的 WIP 未提交，**复验请按包跑**，别跑整仓门禁。

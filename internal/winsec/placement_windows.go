@@ -38,7 +38,7 @@ func platformVerifyPlacement(path string) (string, error) {
 		return "", fmt.Errorf("%w: %s is a UNC share path, where the ACL this package writes may not be the share's own",
 			ErrUnresolvedPath, path)
 	}
-	for _, comp := range strings.Split(path, `\`) {
+	for _, comp := range pathComponents(path) {
 		if comp == "" {
 			continue
 		}
@@ -47,24 +47,24 @@ func platformVerifyPlacement(path string) (string, error) {
 				ErrUnresolvedPath, comp, string(last))
 		}
 	}
-	vol := filepath.VolumeName(path)
-	base := vol
-	for _, part := range strings.Split(strings.TrimPrefix(strings.TrimPrefix(path, vol), `\`), `\`) {
-		if part == "" {
-			continue
-		}
-		if !strings.HasSuffix(base, `\`) {
-			base += `\`
-		}
-		base += part
+	// Ticket 108's AC#3 is this loop: it used to cut the path on the backslash
+	// alone, so the same directory reached as "C:/Users/.../link/sub/x" presented
+	// exactly one component to the walk, the leaf, which is the one thing the walk
+	// does not check (privateDirAll may legitimately be about to create it).
+	// PROBE P3 measured the consequence: the seal went through the junction and
+	// rewrote a foreign DACL, and it did so in a binary that does not even link
+	// internal/risk, so no resolver was involved. pathPieces gives the walk every
+	// separator the OS honours, as an exact substring of the input, without
+	// normalizing anything.
+	for _, prefix := range pathPieces(path) {
 		// isReparsePoint is the platform's own predicate, shared with
 		// propagatePrivate above, so the walk and the seal agree on what a link
 		// is. A missing component reads as "not a link", which is also the right
 		// answer for the leg that stops here: everything below it is about to be
 		// created by this call, parent first.
-		if isReparsePoint(base) {
+		if isReparsePoint(prefix) {
 			return "", fmt.Errorf("%w: %s traverses a reparse point at %s, which is not the tree this call names",
-				ErrUnresolvedPath, path, base)
+				ErrUnresolvedPath, path, prefix)
 		}
 	}
 	return path, nil

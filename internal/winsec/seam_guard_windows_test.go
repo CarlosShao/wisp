@@ -33,6 +33,14 @@ type rubberStampResolver struct{}
 
 func (rubberStampResolver) Resolve(in string) (string, error) { return in, nil }
 
+// ResolveAccounted is what makes this fake about the *shape* leg of the probe
+// rather than about ticket 108's capability rule: it can answer the tree question
+// (it always claims "not moved", which is a lie this fake is not judged for) and
+// it is still refused because it passes a hostile spelling straight through.
+func (rubberStampResolver) ResolveAccounted(in string) (string, bool, error) {
+	return in, false, nil
+}
+
 // narrowOnlyResolver and its twin both refuse everything, so they are conforming
 // by the conformance probe's own rule; they exist to give the single-use guard
 // two *different* legitimate resolvers to refuse to swap.
@@ -42,10 +50,31 @@ func (narrowOnlyResolver) Resolve(string) (string, error) {
 	return "", errors.New("narrowOnlyResolver: refuses to answer")
 }
 
+func (narrowOnlyResolver) ResolveAccounted(string) (string, bool, error) {
+	return "", false, errors.New("narrowOnlyResolver: refuses to answer")
+}
+
 type narrowOnlyResolverB struct{}
 
 func (narrowOnlyResolverB) Resolve(string) (string, error) {
 	return "", errors.New("narrowOnlyResolverB: refuses to answer")
+}
+
+func (narrowOnlyResolverB) ResolveAccounted(string) (string, bool, error) {
+	return "", false, errors.New("narrowOnlyResolverB: refuses to answer")
+}
+
+// countingResolver is the witness for the identity-reinstall pin: it is the only
+// shape of candidate that lets a test tell "the first instance was kept" from
+// "a structurally identical value was installed", which an empty struct cannot.
+type countingResolver struct{ installs int }
+
+func (c *countingResolver) Resolve(string) (string, error) {
+	return "", errors.New("countingResolver: refuses to answer")
+}
+
+func (c *countingResolver) ResolveAccounted(string) (string, bool, error) {
+	return "", false, errors.New("countingResolver: refuses to answer")
 }
 
 func resolverName(r winsec.C26Resolver) string {
@@ -124,10 +153,8 @@ func foreignVictimTree(t *testing.T) (victim string, innocentFile string, sidsBe
 // victim's own DACL is read before and after at SID level.
 func TestAC1SeamRejectsARubberStampAndLeavesTheForeignDaclAlone(t *testing.T) {
 	incumbent := winsec.PathResolverInstalled()
-	t.Cleanup(func() {
-		winsec.SetPathResolver(nil)
-		winsec.SetPathResolver(incumbent)
-	})
+	restoreSeam := winsec.SetSeamForTest(incumbent)
+	t.Cleanup(restoreSeam)
 	t.Logf("incumbent resolver: %s", resolverName(incumbent))
 
 	victim, innocentFile, sidsBefore := foreignVictimTree(t)
@@ -207,32 +234,49 @@ func TestAC1SeamRejectsARubberStampAndLeavesTheForeignDaclAlone(t *testing.T) {
 	t.Logf("icacls(victim) after the refused install:\n%s", icaclsRaw(t, victim))
 }
 
-// TestAC1SeamIsSingleUse is the other leg of AC#1: two *conforming* resolvers may
-// not be swapped under a running seal - the second install is refused and the
-// incumbent stays in place.
-func TestAC1SeamIsSingleUse(t *testing.T) {
-	incumbent := winsec.PathResolverInstalled()
-	t.Cleanup(func() {
-		winsec.SetPathResolver(nil)
-		winsec.SetPathResolver(incumbent)
-	})
+// TestAC1SeamIsOneWayUseIsTheOnlyDirection is ticket 103's single-use guard under
+// ticket 108's AC#1: freeing it is no longer one of the directions, so the
+// "nil first, then the fake" order that produced probe P1b cannot be built at
+// all, and the identity reinstall (R-103-4, coverage 0 before this) is pinned to
+// keep the FIRST instance.
+func TestAC1SeamIsOneWayUseIsTheOnlyDirection(t *testing.T) {
+	restoreSeam := winsec.SetSeamForTest(nil)
+	t.Cleanup(restoreSeam)
 
 	logged := captureSeamLog(t)
+	// A free seam still takes a conforming resolver: the guard is not "refuse
+	// everything", and this is the leg that would go red if it were.
+	first := &countingResolver{}
+	winsec.SetPathResolver(first)
+	if got := winsec.PathResolverInstalled(); got != winsec.C26Resolver(first) {
+		t.Fatalf("AC#1: a conforming resolver was not installed onto a free seam (got %s)", resolverName(got))
+	}
+	// R-103-4: reinstalling the same resolver is a no-op that keeps the first
+	// instance. Pinned as behaviour, not as a comment.
+	winsec.SetPathResolver(first)
+	if got := winsec.PathResolverInstalled(); got != winsec.C26Resolver(first) {
+		t.Errorf("AC#1 RED: an identical reinstall replaced the incumbent with %s, which is how a counting install log gets erased", resolverName(got))
+	}
+	if !winsec.SeamLatchedForTest() {
+		t.Errorf("AC#1 RED: the seam accepted a resolver without latching, so nil could free it again")
+	}
+	// The direction P1b used: release, then install something else.
+	before := winsec.PathResolverInstalled()
 	winsec.SetPathResolver(nil)
-	if got := winsec.PathResolverInstalled(); got != nil {
-		t.Fatalf("SetPathResolver(nil) must fall back to the built-in floor, got %s", resolverName(got))
+	if got := winsec.PathResolverInstalled(); got != before {
+		t.Errorf("AC#1 RED: SetPathResolver(nil) detached the seam (was %s, now %s) - one-use without one-way is bypassable by ordering",
+			resolverName(before), resolverName(got))
 	}
-	winsec.SetPathResolver(narrowOnlyResolver{})
-	if got := resolverName(winsec.PathResolverInstalled()); got != resolverName(narrowOnlyResolver{}) {
-		t.Fatalf("a conforming resolver was not installed onto a free seam (got %s): the guard is refusing everything", got)
+	if !strings.Contains(logged.String(), "refusing to release") {
+		t.Errorf("AC#1: the refused release left no audit record; log was: %s", logged.String())
 	}
-	// Now the seam is occupied by a different legitimate resolver: a second
-	// install attempt must be refused.
+	// And a *different* conforming resolver still cannot be swapped in, latched or
+	// not, because there is no order that makes the seam free again.
 	winsec.SetPathResolver(narrowOnlyResolverB{})
-	if got := resolverName(winsec.PathResolverInstalled()); got != resolverName(narrowOnlyResolver{}) {
-		t.Errorf("AC#1 RED: the seam is not single-use - %s replaced %s after the second SetPathResolver", got, resolverName(narrowOnlyResolver{}))
+	if got := resolverName(winsec.PathResolverInstalled()); got != resolverName(first) {
+		t.Errorf("AC#1 RED: the seam is not single-use - %s replaced %s after the second SetPathResolver", got, resolverName(first))
 	}
-	if !strings.Contains(logged.String(), "already") {
+	if !strings.Contains(strings.ToLower(logged.String()), "already") {
 		t.Errorf("AC#1: the second install must leave an already-installed audit record, got: %s", logged.String())
 	}
 }
@@ -242,10 +286,8 @@ func TestAC1SeamIsSingleUse(t *testing.T) {
 // pipeline still seals clean paths and still refuses hostile ones.
 func TestAC1RefusedInstallLeavesTheSealWorking(t *testing.T) {
 	incumbent := winsec.PathResolverInstalled()
-	t.Cleanup(func() {
-		winsec.SetPathResolver(nil)
-		winsec.SetPathResolver(incumbent)
-	})
+	restoreSeam := winsec.SetSeamForTest(incumbent)
+	t.Cleanup(restoreSeam)
 	victim, _, sidsBefore := foreignVictimTree(t)
 	dataRoot := filepath.Join(t.TempDir(), "data")
 	if err := winsec.PrivateDirAll(dataRoot, 0o700); err != nil {

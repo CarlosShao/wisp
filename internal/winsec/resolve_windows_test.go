@@ -110,9 +110,12 @@ func TestAC3JunctionInputIsRefusedNotSealed(t *testing.T) {
 	})
 
 	t.Run("with only the built-in verifier", func(t *testing.T) {
-		installed := winsec.PathResolverInstalled()
-		winsec.SetPathResolver(nil)
-		t.Cleanup(func() { winsec.SetPathResolver(installed) })
+		// Ticket 108's AC#1 took the SetPathResolver(nil) door out of production,
+		// so the floor leg runs through the test-only seam hook instead. That the
+		// exported setter can no longer do this is the fix, and it is what
+		// seam_bypass_108_windows_test.go judges at icacls SID level.
+		restoreSeam := winsec.SetSeamForTest(nil)
+		t.Cleanup(restoreSeam)
 		assertRefusedAndUntouched(t, victim, link, outside, outsideBefore, victimBefore, innocent)
 		if !errors.Is(winsec.PrivateDirAll(filepath.Join(link, "spill-artifacts"), 0o700), winsec.ErrUnresolvedPath) {
 			t.Error("the built-in verifier did not name its own refusal")
