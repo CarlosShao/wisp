@@ -83,19 +83,27 @@ func PrivateFileExclusive(path string, data []byte) error {
 // writes. A seal that fails leaves no content behind: the entry is removed
 // before the error is returned, so the failure is "this artifact was not
 // written", not "this artifact is world-readable".
+//
+// The path is resolved before it is opened, not after: writing to a name the
+// filesystem reads as some other object would place private bytes in public
+// (ticket 94, same defect class as the directory leg below).
 func privateFile(path string, data []byte, flags int, perm fs.FileMode) error {
-	f, err := os.OpenFile(path, flags, perm)
+	resolved, err := resolveString(path)
+	if err != nil {
+		return err
+	}
+	f, err := os.OpenFile(resolved, flags, perm)
 	if err != nil {
 		return err
 	}
 	if err := sealHandle(f); err != nil {
 		_ = f.Close()
-		_ = os.Remove(path)
-		return sealError(path, err)
+		_ = os.Remove(resolved)
+		return sealError(resolved, err)
 	}
 	if _, err := f.Write(data); err != nil {
 		_ = f.Close()
-		_ = os.Remove(path)
+		_ = os.Remove(resolved)
 		return err
 	}
 	if err := f.Close(); err != nil {
@@ -107,7 +115,13 @@ func privateFile(path string, data []byte, flags int, perm fs.FileMode) error {
 }
 
 // SealFile narrows an existing file to the current user.
-func SealFile(path string) error { return sealError(path, sealFile(path)) }
+func SealFile(path string) error {
+	resolved, err := resolveString(path)
+	if err != nil {
+		return err
+	}
+	return sealError(resolved, sealFile(resolved))
+}
 
 // PrivateDirAll creates path and any missing parents, sealing **every level it
 // creates** before descending into it. Sealing afterwards is not enough: a
@@ -122,11 +136,28 @@ func SealFile(path string) error { return sealError(path, sealFile(path)) }
 // way through would be a far larger change than the one being asked for. An
 // existing path *is* sealed, because that is the repair path for a tree that
 // predates this package.
+//
+// path is resolved through the C26 PathResolver before any level is created or
+// sealed, and a path C26 refuses to traverse is refused here too
+// (risk.ErrReparseDenied propagates). Both halves of that sentence are the
+// point: which tree this creates and seals *is* the security decision, so it may
+// not be taken from a lexical spelling - a junction mid-path, an 8.3 short name,
+// a \\?\ prefix or a trailing dot would make "sealing A" modify B, and the wide
+// tree would then be reported to the caller as private. See resolve.go.
 func PrivateDirAll(path string, perm fs.FileMode) error {
-	abs, err := filepath.Abs(path)
+	dir, err := ResolvePath(path)
 	if err != nil {
-		return fmt.Errorf("winsec: resolve %s: %w", path, err)
+		return err
 	}
+	return privateDirAll(dir, perm)
+}
+
+// privateDirAll is the sealing walk, stated over a ResolvedPath so that no path
+// reaching os.Mkdir or SealDir here can have skipped C26: the only mint for that
+// type is ResolvePath (see resolve.go), which is what keeps a future caller from
+// quietly reintroducing filepath.Abs.
+func privateDirAll(dir ResolvedPath, perm fs.FileMode) error {
+	abs := dir.String()
 	// Climb to the first existing ancestor; everything from there down is
 	// missing and gets created + sealed in one pass, parent first.
 	var missing []string
@@ -146,7 +177,7 @@ func PrivateDirAll(path string, perm fs.FileMode) error {
 		}
 		parent := filepath.Dir(cur)
 		if parent == cur {
-			return fmt.Errorf("winsec: no existing ancestor above %s", path)
+			return fmt.Errorf("winsec: no existing ancestor above %s", abs)
 		}
 		missing = append(missing, cur)
 		cur = parent
@@ -158,16 +189,25 @@ func PrivateDirAll(path string, perm fs.FileMode) error {
 			}
 			return err
 		}
-		if err := SealDir(missing[i]); err != nil {
+		// Each level is sealed through the platform primitive directly: it is a
+		// prefix of an already-resolved path, so re-resolving would only add
+		// syscalls, and skipping the seal is the hole AC#5 refuses to leave.
+		if err := sealError(missing[i], sealDir(missing[i])); err != nil {
 			return err
 		}
 	}
-	return SealDir(abs)
+	return sealError(abs, sealDir(abs))
 }
 
 // SealDir narrows a directory to the current user, with new children inheriting
 // exactly that and nothing wider.
-func SealDir(path string) error { return sealError(path, sealDir(path)) }
+func SealDir(path string) error {
+	resolved, err := resolveString(path)
+	if err != nil {
+		return err
+	}
+	return sealError(resolved, sealDir(resolved))
+}
 
 // RemoveUnlinked deletes the entry at path without following it, so a link
 // standing where private data was expected disappears while whatever lives
@@ -177,6 +217,13 @@ func SealDir(path string) error { return sealError(path, sealDir(path)) }
 // When the entry is a link the platform refuses to unlink, the error wraps
 // ErrIsReparsePoint and names the path: a reclaim loop that cannot clear a
 // subtree must surface it rather than continue with a quota it no longer knows.
+//
+// This is the one entry point that deliberately does not resolve its argument
+// through C26. Its subject *is* the link: resolving first would deny the call on
+// the very reparse point it exists to unlink, so the entry would stay occupied
+// and the quota would keep counting a tree nobody owns. The safety comes from
+// the operation instead of from a normalized spelling - it opens with
+// FILE_FLAG_OPEN_REPARSE_POINT and never recurses.
 func RemoveUnlinked(path string) error { return removeUnlinked(path) }
 
 func wrapPath(path string, err error) error {

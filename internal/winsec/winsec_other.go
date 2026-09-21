@@ -54,6 +54,15 @@ func fstypeOf(path string) string {
 
 func sealFile(path string) error { return applyDescriptor(path, false) }
 
+// platformVerifyPlacement mirrors the DEFERRED leg of internal/risk's
+// pathresolver_other.go: on this platform C26 itself resolves lexically and does
+// not detect reparse traversal, so the floor here stops at the portable shape
+// checks in resolve.go rather than inventing a stricter rule that would make
+// production refuse paths its own PathResolver accepts (and would break a macOS
+// install whose /tmp or HOME sits behind a symlink). The gap is stated, not
+// papered over: when that DEFERRED leg lands, this function is where it plugs in.
+func platformVerifyPlacement(path string) (string, error) { return path, nil }
+
 // sealDir narrows a directory. It deliberately does not walk the existing
 // subtree the way the Windows implementation does: on POSIX a child never
 // inherited its parent's mode in the first place, so "seal the tree" here would
