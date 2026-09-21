@@ -347,9 +347,21 @@ const (
 	GlassCaustic = 0.30
 	BorderRingPx = 1.8 // the "not speaking" border that fades in
 
-	// Audio envelope -> liquid motion.
-	SwimLevelGain   = 0.55 // blob offset swell per unit level
-	SpinLevelGain   = 1.0  // rotation speed gain per unit level
+	// Audio envelope -> liquid GEOMETRY (ticket 74: these are the two factors
+	// the envelope really moves; the rotation half lives in liquid.go's
+	// Spin*RadPerS group, which the C21 table now names as well).
+	//
+	// This pair REPLACES the deleted SwimLevelGain (0.55, "blob offset swell
+	// per unit level") and SpinLevelGain (1.0, "rotation speed gain per unit
+	// level"): nothing ever read either one - git grep at 9a91398 found only
+	// their own declarations plus the table test's inventory - while the
+	// numbers that changed pixels were bare literals in renderer_windows.go.
+	// Blob offsets are not level-driven at all (they are baked once as
+	// liqOffset[bi]*R); the envelope scales the visible blob RADIUS, which is
+	// what these two tokens state.
+	LiquidGatherPerLevel = 0.12 // blob radius shrink per unit envelope level (a louder voice gathers the surface)
+	SummonFlowSpread     = 0.10 // blob radius swell per unit summon burst (flow, one-shot over SummonFlowMs)
+
 	BorderOpenMs    = 220  // border fade-in (SPEC-08 dur-slow family)
 	BorderCloseMs   = 180  // liquid converge when the voice stops
 	SummonFlowMs    = 900  // one-shot liquid flow burst on summon

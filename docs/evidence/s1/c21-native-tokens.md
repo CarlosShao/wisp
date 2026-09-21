@@ -24,8 +24,13 @@
 alpha，`hex()` 0xRRGGBB + alpha）。D2D 使用直通 alpha 的 `D2D1_COLOR_F`，premultiplied 仅在
 `UpdateLayeredWindow` 位图写出处派生（`Color.Premultiplied()`）。
 
-范围（ticket 12 AC#7 对账时明确，2026-09-20）：本表只覆盖**原生侧已复制的切片** —— 即
-`internal/ball/tokens.go` 的 40 个 `Palette` 字段 + 全部导出的几何/动效常量。`tokens.css`
+范围（ticket 12 AC#7 对账时明确，2026-09-20；票 74 扩几何/动效一侧，2026-09-21）：本表覆盖**原生侧已
+复制的切片** —— 即 `internal/ball/tokens.go` 的 40 个 `Palette` 字段 + 全部导出的几何/动效常量。
+**票 74 起几何/动效一侧不再停在 `tokens.go`**：凡是改像素的常量，无论声明在 `tokens.go`、`hit.go`
+还是 `liquid.go`，一律要么进本表、要么进 `internal/ball/tokens_table_test.go` 的 `c21OutTableExempt`
+显式豁免（写明一句理由）——机器检查 `TestC21CodeTokensAreTabledOrExempt` 与
+`TestC21GeometryRowsMatchCodeConstants` 双向锁。原 scope 只到 `tokens.go` 正是 9 条 `liquid.go`
+运动常量与 2 条 `hit.go` 边界常量长期在表外的原因（A24-D4 的 D7/D8 两族）。`tokens.css`
 共 129 条声明，其中 80 条是面板 / screens 专用、原生侧无对应字段的 token（`--bg-base`、
 `--ambient-a..d`、`--grain`、`--sheen`、`--bg-raised`、`--bg-subtle`、`--glass-blur*`、
 `--border-hair`、`--border-strong`、`--fg-disabled`、`-*-hover`/`-*-pressed`/`-*-soft`、
@@ -150,7 +155,11 @@ alpha，`hex()` 0xRRGGBB + alpha）。D2D 使用直通 alpha 的 `D2D1_COLOR_F`�
 | 字体 | `--font-sans` CJK 头 + `--t-mono` 12.5 / `--t-micro` 11；环下倒计时 10px | `FontFamily` / `FontSizeMonoPx` / `FontSizeMicroPx` / `CountdownFontPx` | DWrite 文本（`CountdownFontPx` 为本票补录） |
 | 液态斑位置（票 62，无 CSS 对应） | 半径 0.72 / 0.62 / 0.50 × 球半径；偏心 0.22 / 0.30 / 0.40 | `LiquidRadiusA` / `LiquidRadiusB` / `LiquidRadiusC` / `LiquidOffsetA` / `LiquidOffsetB` / `LiquidOffsetC` | 三枚软场叠加才读成「液体」；渲染器只旋转与胀缩，不重建 brush |
 | 玻璃边缘权重（票 62，无 CSS 对应） | 外缘暗环 1.2px / 内亮唇 1.0px / 焦散 0.30 / 「未说话」边框环 1.8px（96 DPI 物理 px，绘制时按 DPI 缩放） | `GlassRimPx` / `GlassLipPx` / `GlassCaustic` / `BorderRingPx` | 浅色桌布上的对比度锚点 |
-| 音频包络 → 液体运动（票 62，无 CSS 对应） | 每单位电平：偏心增益 0.55、转速增益 1.0 | `SwimLevelGain` / `SpinLevelGain` | 无分配：只改已有 brush 的几何 |
+| 音频包络 → 液体**几何**（票 62 建，票 74 换指向） | 每单位电平可见半径收缩 0.12 / 每单位唤起爆发扩散 0.10 | `LiquidGatherPerLevel` / `SummonFlowSpread` | 无分配：只改已有 brush 的几何。**本行此前记 `SwimLevelGain` 0.55 / `SpinLevelGain` 1.0，两个常量零消费者已删**（票 74：`git grep` 只命中声明与测试金标准）：偏心量是烘焙常量 `liqOffset[bi]*R`，不读电平；电平真正改的是可见半径，而那两个因子当时是渲染器里的裸字面量 |
+| 音频包络 → 液体**转速** rad/s（`liquid.go`，票 62，无 CSS 对应） | 基准 0.45 + 每单位电平 4.20 + 唤起爆发期 2.20 | `SpinBaseRadPerS` / `SpinLevelRadPerS` / `SpinSummonRadPerS` | 累加成 `Visual.LiquidAngle`（`omega`），渲染器按角度查预烘焙 ladder。票 74 把这三条从表外豁免提进本表：被删的 `SpinLevelGain`（1.0）与本行的 4.20 是同一个「转速增益」的两种说法，只有后者在动像素——A33「声明✓ / 实测✗」的正身 |
+| 包络门限与时间常数（`liquid.go`，票 62，无 CSS 对应） | 静默门 0.06 / 静音保持 150ms / attack 60ms / release 420ms | `SilenceLevelGate` / `SilenceHoldMs` / `LevelAttackTauMs` / `LevelReleaseTauMs` | 快攻慢放让音节读成节奏而非方波；门限 + 保持决定「收声」何时把边框淡入（`wantBorder`） |
+| 静止判据与过渡帧周期（`liquid.go`，票 62/64，无 CSS 对应） | 低于 0.0001 视为已settled / 过渡计时器周期 33ms | `MotionEpsilon` / `FrameIntervalMs` | epsilon 是数值噪声地板（不是观感量）；33ms 由本表 `MaxAnimFPS` 推导（1000 除以它），不另计一份 FPS |
+| 点击与渲染边界（`hit.go`，票 07，无 CSS 对应） | 环边距 8px / 点击容差 4px（96 DPI 物理 px，按显示器 DPI 缩放） | `RingMarginPx` / `ClickTolerancePx` | 前者定窗口边长（orb + 两侧边距，ring/glow 不被裁），后者把可点圆稍微扩到画出的环上；`ball.html` 的 inset 只是参照值不是出处 |
 | 边框与流动时序（票 62/64，无 CSS 对应） | 边框淡入 220ms / 收声汇聚 180ms / 唤起一次性流动 900ms | `BorderOpenMs` / `BorderCloseMs` / `SummonFlowMs` | 180ms 属 `--dur-base` 档；220ms 属 `--dur-slow` 族；900ms 是一次性动效，不受「UI 过渡 ≤300ms」预算约束（SPEC-08 §2 时长预算） |
 | 边缘吸附（票 64，无 CSS 对应） | 泊靠动画 160ms / 泊靠后仍露出 0.42 直径 / 距边 16px 内开始挤压（96 DPI，按显示器缩放） | `DockAnimMs` / `DockOverlapFrac` / `DockTriggerPx` | 挤压量按间隙距离读出差分，不需要定时器（D32 空闲零定时器纪律） |
 | 缓动 | `cubic-bezier(0.32,0.72,0,1)` | D2D 侧以分段线性近似（S1），周期动画用 ease-in-out 正弦近似 | 见 renderer |

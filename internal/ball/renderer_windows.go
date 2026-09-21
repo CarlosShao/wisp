@@ -539,9 +539,11 @@ func (r *renderer) drawGlass(v Visual, c d2d1Point2F, R, s float32) {
 
 	// 3. The liquid: three blobs at their ladder positions for this angle.
 	// A louder envelope shrinks the visible patch (the surface "gathers")
-	// and the summon burst widens it (flow).
-	shrink := 1 - 0.12*v.LiquidLevel
-	flow := 1 + 0.10*v.SummonFlow
+	// and the summon burst widens it (flow). Both gains are C21 tokens
+	// (LiquidGatherPerLevel / SummonFlowSpread) - ticket 74 lifted them out of
+	// here, where they were bare literals no table row named.
+	shrink := 1 - LiquidGatherPerLevel*v.LiquidLevel
+	flow := 1 + SummonFlowSpread*v.SummonFlow
 	// The edge dock squeezes the whole body along the dock axis; DockSquash is
 	// the same law DockPos places the window with, so the tab that hugs the
 	// screen edge is exactly as wide as the strip left on screen for it.

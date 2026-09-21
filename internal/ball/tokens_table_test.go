@@ -15,7 +15,10 @@ package ball
 //
 //	table -> code   every row names a token that exists, with the value stated
 //	code -> table   every Palette field, every look colour and every exported
-//	                tokens.go geometry constant is declared by exactly one row
+//	                tokens.go geometry constant is declared by exactly one row;
+//	                since ticket 74 the geometry rows may also name the constants
+//	                that live beside them (hit.go, liquid.go), and those values
+//	                are pinned by c21MotionGolden
 //
 // What is deliberately NOT asserted here, and why:
 //   - the table's `tokens.css 值` column against design/assets/tokens.css. That
@@ -252,6 +255,7 @@ func c21TableNames(colour []c21ColourRow, geom []c21GeomRow) map[string]string {
 type c21ConstInfo struct {
 	name string
 	kind string // "num" | "string" | "derived" (constant expression) | "other"
+	file string // which file of the package declares it
 }
 
 // c21TokensGoConsts enumerates the exported constants tokens.go actually declares
@@ -268,6 +272,53 @@ func c21TokensGoConsts(t *testing.T, dir string) map[string]c21ConstInfo {
 	}
 	if len(out) < 50 {
 		t.Fatalf("tokens.go enumerated only %d exported constants: the enumeration is broken, not the file", len(out))
+	}
+	return out
+}
+
+// c21PackageConsts enumerates the same surface across the WHOLE ball package,
+// i.e. every non-test file next to tokens.go. The geometry table names constants
+// that live beside the code they drive (hit.go's click margins, liquid.go's spin
+// group) since ticket 74, and a table row naming a constant nobody declares must
+// fail even when that constant is not in tokens.go. tokens.go entries win, so the
+// stricter inventory (c21GeometryGolden) keeps its meaning.
+func c21PackageConsts(t *testing.T, dir string) map[string]c21ConstInfo {
+	t.Helper()
+	out := map[string]c21ConstInfo{}
+	for _, c := range c21TokensGoConsts(t, dir) {
+		out[c.name] = c
+	}
+	for _, f := range c21DrawingFiles(t, dir) {
+		for _, c := range c21ExportedConsts(t, f) {
+			if c.kind == "enum" || c.kind == "other" {
+				continue // an enumeration member is not a design token value
+			}
+			if _, taken := out[c.name]; taken {
+				continue // tokens.go owns it
+			}
+			out[c.name] = c
+		}
+	}
+	return out
+}
+
+// c21DrawingFiles is the package's non-test, non-tokens.go Go source.
+func c21DrawingFiles(t *testing.T, dir string) []string {
+	t.Helper()
+	files, err := filepath.Glob(filepath.Join(dir, "*.go"))
+	if err != nil || len(files) == 0 {
+		t.Fatalf("glob the ball package: %v (%d files)", err, len(files))
+	}
+	var out []string
+	for _, f := range files {
+		base := filepath.Base(f)
+		if base == "tokens.go" || strings.HasSuffix(base, "_test.go") {
+			continue
+		}
+		out = append(out, f)
+	}
+	if len(out) == 0 {
+		t.Fatal("the ball package has no non-test source files: every check below would be vacuous")
 	}
 	return out
 }
@@ -311,7 +362,7 @@ func c21ExportedConsts(t *testing.T, path string) []c21ConstInfo {
 				if i < len(vs.Values) {
 					expr = vs.Values[i]
 				}
-				out = append(out, c21ConstInfo{name: id.Name, kind: c21ExprKind(expr)})
+				out = append(out, c21ConstInfo{name: id.Name, kind: c21ExprKind(expr), file: filepath.Base(path)})
 			}
 		}
 	}
@@ -359,6 +410,16 @@ func c21SortedNames(m map[string]c21ConstInfo) []string {
 	return out
 }
 
+// c21SortedKeys is the same for the float64 value inventories.
+func c21SortedKeys(m map[string]float64) []string {
+	out := make([]string, 0, len(m))
+	for k := range m {
+		out = append(out, k)
+	}
+	sort.Strings(out)
+	return out
+}
+
 // c21GeometryGolden is the test's inventory of the numeric token surface. Every
 // value here is a reference to the constant itself, so it cannot drift away from
 // tokens.go; what can drift is the NAME list, and
@@ -366,25 +427,29 @@ func c21SortedNames(m map[string]c21ConstInfo) []string {
 // enumeration of tokens.go in either direction.
 var c21GeometryGolden = map[string]float64{
 	// Liquid blob placement + glass edge weights (ticket 62).
-	"SleepRestRatio":  SleepRestRatio,
-	"LiquidRadiusA":   LiquidRadiusA,
-	"LiquidRadiusB":   LiquidRadiusB,
-	"LiquidRadiusC":   LiquidRadiusC,
-	"LiquidOffsetA":   LiquidOffsetA,
-	"LiquidOffsetB":   LiquidOffsetB,
-	"LiquidOffsetC":   LiquidOffsetC,
-	"GlassRimPx":      GlassRimPx,
-	"GlassLipPx":      GlassLipPx,
-	"GlassCaustic":    GlassCaustic,
-	"BorderRingPx":    BorderRingPx,
-	"SwimLevelGain":   SwimLevelGain,
-	"SpinLevelGain":   SpinLevelGain,
-	"BorderOpenMs":    BorderOpenMs,
-	"BorderCloseMs":   BorderCloseMs,
-	"SummonFlowMs":    SummonFlowMs,
-	"DockAnimMs":      DockAnimMs,
-	"DockOverlapFrac": DockOverlapFrac,
-	"DockTriggerPx":   DockTriggerPx,
+	"SleepRestRatio": SleepRestRatio,
+	"LiquidRadiusA":  LiquidRadiusA,
+	"LiquidRadiusB":  LiquidRadiusB,
+	"LiquidRadiusC":  LiquidRadiusC,
+	"LiquidOffsetA":  LiquidOffsetA,
+	"LiquidOffsetB":  LiquidOffsetB,
+	"LiquidOffsetC":  LiquidOffsetC,
+	"GlassRimPx":     GlassRimPx,
+	"GlassLipPx":     GlassLipPx,
+	"GlassCaustic":   GlassCaustic,
+	"BorderRingPx":   BorderRingPx,
+	// SwimLevelGain / SpinLevelGain are gone (ticket 74 family 2): declared,
+	// tabled and read by nothing, while the gains that move the liquid lived in
+	// renderer_windows.go as bare literals. The two below are those literals
+	// lifted into tokens, and liquid.go's spin group is tabled next to them.
+	"LiquidGatherPerLevel": LiquidGatherPerLevel,
+	"SummonFlowSpread":     SummonFlowSpread,
+	"BorderOpenMs":         BorderOpenMs,
+	"BorderCloseMs":        BorderCloseMs,
+	"SummonFlowMs":         SummonFlowMs,
+	"DockAnimMs":           DockAnimMs,
+	"DockOverlapFrac":      DockOverlapFrac,
+	"DockTriggerPx":        DockTriggerPx,
 
 	// Geometry + motion tokens (SPEC-08 §2 / tokens.css).
 	"BallSizeDefaultPx":    BallSizeDefaultPx,
@@ -425,6 +490,41 @@ var c21GeometryGolden = map[string]float64{
 	"CountdownFontPx":      CountdownFontPx,
 }
 
+// c21MotionGolden pins the values of the geometry/motion constants that the C21
+// table declares from OUTSIDE tokens.go (hit.go's click margins, liquid.go's
+// spin and envelope group). Ticket 74 family 1: the table's scope stopped at
+// tokens.go, so 11 constants that move pixels every frame were neither tabled nor
+// value-checked - they were only "exempt", which is a note, not a contract. Same
+// rule as the map above: every entry is a reference to the constant itself, so
+// the value cannot drift away from the code; what can drift is the NAME list, and
+// TestC21GeometryRowsMatchCodeConstants fails if it stops matching the table in
+// either direction.
+var c21MotionGolden = map[string]float64{
+	// hit.go: window sizing + the clickable circle.
+	"RingMarginPx":     RingMarginPx,
+	"ClickTolerancePx": ClickTolerancePx,
+
+	// liquid.go: what the audio envelope does to the liquid.
+	"SpinBaseRadPerS":   SpinBaseRadPerS,
+	"SpinLevelRadPerS":  SpinLevelRadPerS,
+	"SpinSummonRadPerS": SpinSummonRadPerS,
+	"SilenceLevelGate":  SilenceLevelGate,
+	"SilenceHoldMs":     SilenceHoldMs,
+	"LevelAttackTauMs":  LevelAttackTauMs,
+	"LevelReleaseTauMs": LevelReleaseTauMs,
+	"MotionEpsilon":     MotionEpsilon,
+	"FrameIntervalMs":   FrameIntervalMs,
+}
+
+// c21TabledValue looks a tabled constant's value up in either inventory.
+func c21TabledValue(name string) (float64, bool) {
+	if v, ok := c21GeometryGolden[name]; ok {
+		return v, true
+	}
+	v, ok := c21MotionGolden[name]
+	return v, ok
+}
+
 // c21StringTokens are the non-numeric tokens of the same surface. The table names
 // FontFamily's CSS source (--font-sans) but states no value for it, so there is
 // nothing numeric to compare: the name is still checked in both directions, and
@@ -439,29 +539,21 @@ var c21StringTokens = map[string]string{
 // Each entry carries the reason it is not a C21 token. A new exported constant in
 // one of these files that is neither tabled nor listed here fails the test, which
 // is the ticket's "要么进表要么显式豁免并写明理由".
+//
+// Ticket 74 emptied the two GLOW families out of this map: the 9 liquid.go motion
+// constants (D8) and the 2 hit.go boundary constants (D7) are now rows of the
+// table with their real units and pinned values, which is what A24-D4 asked for.
+// What is left genuinely is not a design token.
 var c21OutTableExempt = map[string]string{
-	// hit.go: hit-test result codes and the window maths around them.
-	"HTClient":         "Win32 hit-test return value, not a design token",
-	"HTTransparent":    "Win32 hit-test return value, not a design token",
-	"HTNowhere":        "Win32 hit-test return value, not a design token",
-	"RingMarginPx":     "GLOW 候选 D7: ring margin the window maths uses, in code but never in the table - owner call whether C21 should own it",
-	"ClickTolerancePx": "GLOW 候选 D7: click tolerance, same shape as RingMarginPx",
+	// hit.go: hit-test result codes. They are Win32 protocol, not ball geometry:
+	// the numbers come from the WM_NCHITTEST contract, and changing them changes
+	// no pixel.
+	"HTClient":      "Win32 hit-test return value, not a design token",
+	"HTTransparent": "Win32 hit-test return value, not a design token",
+	"HTNowhere":     "Win32 hit-test return value, not a design token",
 
 	// hotkey_windows.go: a keybinding string, not geometry or colour.
 	"AltSummonSpace": "Default hotkey text (SPEC-04 surface), not a C21 token",
-
-	// liquid.go: the audio-envelope motion internals ticket 62 grew next to the
-	// tabled liquid placement constants. GLOW 候选 D8: they are motion values a
-	// token table could carry, but the table's scope stops at tokens.go.
-	"SpinBaseRadPerS":   "GLOW 候选 D8: liquid spin rate, ticket 62 motion internal",
-	"SpinLevelRadPerS":  "GLOW 候选 D8: liquid spin rate gain, ticket 62 motion internal",
-	"SpinSummonRadPerS": "GLOW 候选 D8: summon spin burst, ticket 62 motion internal",
-	"SilenceLevelGate":  "GLOW 候选 D8: envelope silence gate, ticket 62 motion internal",
-	"SilenceHoldMs":     "GLOW 候选 D8: silence hold period, ticket 62 motion internal",
-	"LevelAttackTauMs":  "GLOW 候选 D8: envelope attack time constant, ticket 62 motion internal",
-	"LevelReleaseTauMs": "GLOW 候选 D8: envelope release time constant, ticket 62 motion internal",
-	"MotionEpsilon":     "GLOW 候选 D8: settle epsilon, numerical noise floor not a visual token",
-	"FrameIntervalMs":   "GLOW 候选 D8: derives from the tabled MaxAnimFPS instead of restating it",
 }
 
 // c21StructColour reads one Color field by name.
@@ -755,13 +847,15 @@ func c21MatchClaim(val float64, name string, claims []c21NumClaim) (found, exact
 }
 
 // TestC21GeometryRowsMatchCodeConstants walks the geometry/motion table row by
-// row: every constant a row names must exist in tokens.go, and the value
-// tokens.go holds must be a number the row actually states. The reverse pass
+// row: every constant a row names must exist in the ball package, and the value
+// the package holds must be a number the row actually states. The reverse pass
 // requires every exported tokens.go constant to be named by exactly one row.
 func TestC21GeometryRowsMatchCodeConstants(t *testing.T) {
 	root := c21RepoRoot(t)
+	dir := filepath.Join(root, "internal", "ball")
 	_, geom := c21ParseTable(t, root)
-	code := c21TokensGoConsts(t, filepath.Join(root, "internal", "ball"))
+	code := c21TokensGoConsts(t, dir)
+	declared := c21PackageConsts(t, dir) // tokens.go + hit.go + liquid.go + ...
 
 	// (0) the test's own inventory must be exactly tokens.go's constants, or the
 	// rows below would be checked against a stale list.
@@ -804,10 +898,41 @@ func TestC21GeometryRowsMatchCodeConstants(t *testing.T) {
 				t.Errorf("%s: %s is declared by two table rows (%s and %s): one token, one home", r.where, n, prev.where, r.where)
 			}
 			rowOf[n] = r
-			if _, ok := code[n]; !ok {
-				t.Errorf("%s: the table names %s, but tokens.go declares no such exported constant", r.where, n)
+			if _, ok := declared[n]; !ok {
+				t.Errorf("%s: the table names %s, but no file in internal/ball declares that exported constant (tokens.go and its neighbours were both enumerated)", r.where, n)
 			}
 			named++
+		}
+	}
+
+	// (a2) a row that names a constant outside tokens.go must pin its value too,
+	// or the row states a number nothing is compared against.
+	for _, name := range c21SortedKeys(c21MotionGolden) {
+		if _, ok := code[name]; ok {
+			t.Errorf("c21MotionGolden lists %s, which tokens.go declares: move it to c21GeometryGolden, the table's own scope", name)
+			continue
+		}
+		if _, ok := declared[name]; !ok {
+			t.Errorf("c21MotionGolden lists %s, which internal/ball no longer declares: it was renamed or deleted and the table row must follow", name)
+			continue
+		}
+		if _, ok := rowOf[name]; !ok {
+			t.Errorf("c21MotionGolden pins %s but no geometry-table row declares it: the value is checked against nothing", name)
+		}
+	}
+	for _, r := range geom {
+		for _, n := range r.names {
+			if _, ok := code[n]; ok {
+				continue // tokens.go's own surface: c21GeometryGolden is checked in full above
+			}
+			if _, ok := c21MotionGolden[n]; !ok {
+				home := "declared nowhere in the package"
+				if info, known := declared[n]; known {
+					home = "declared in " + info.file
+				}
+				t.Errorf("%s: the table names %s, which is %s and therefore outside tokens.go's inventory, but c21MotionGolden pins no value for it - this row compares nothing",
+					r.where, n, home)
+			}
 		}
 	}
 
@@ -826,12 +951,12 @@ func TestC21GeometryRowsMatchCodeConstants(t *testing.T) {
 		}
 		claimed := make([]bool, len(r.claims))
 		for _, n := range r.names {
-			if info, ok := code[n]; ok && info.kind == "string" {
+			if info, ok := declared[n]; ok && info.kind == "string" {
 				continue // stated by name in the row; no numeric claim to check
 			}
-			val, ok := c21GeometryGolden[n]
+			val, ok := c21TabledValue(n)
 			if !ok {
-				continue // already reported by (0)/(a)
+				continue // already reported by (0)/(a)/(a2)
 			}
 			found, exact := c21MatchClaim(val, n, r.claims)
 			if !found {
@@ -869,8 +994,8 @@ func TestC21GeometryRowsMatchCodeConstants(t *testing.T) {
 		sort.Strings(unclaimed)
 		t.Logf("NUMBERS NO NAMED CONSTANT CLAIMS (%d): %s", len(unclaimed), strings.Join(unclaimed, ", "))
 	}
-	t.Logf("checked %d constant declarations across %d geometry rows against %d exported tokens.go constants",
-		named, len(geom), len(code))
+	t.Logf("checked %d constant declarations across %d geometry rows against %d exported tokens.go constants + %d tabled from hit.go/liquid.go",
+		named, len(geom), len(code), len(c21MotionGolden))
 }
 
 func c21NumText(v float64) string {

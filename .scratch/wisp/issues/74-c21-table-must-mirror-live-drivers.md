@@ -36,7 +36,7 @@ about any of them.
   show a mutation that today passes and must fail**; otherwise record it as a gap.
 
 ## AC (1:1 verdict table required, one row per box)
-- [ ] **AC#1** `SwimLevelGain`/`SpinLevelGain`: no longer both "declared" and "unconsumed" — either
+- [x] **AC#1** `SwimLevelGain`/`SpinLevelGain`: no longer both "declared" and "unconsumed" — either
   deleted-with-replacement-in-one-commit, or the test pins them to a named consumer. Show the grep
   that proves the consumer exists (`git grep -n`).
 - [ ] **AC#2** Every constant that *changes pixels* under `internal/ball` (hit.go, liquid.go,
@@ -84,3 +84,24 @@ about any of them.
   next=一个 commit 内做完 family 2 的"删除 + 换指向"：`tokens.go` 删 `SwimLevelGain`/`SpinLevelGain`，
   表 :153 行改指 `liquid.go` 的 `Spin*RadPerS` 真实驱动，同 commit 把它们从 `c21OutTableExempt` 摘掉，
   并让几何用例在**整包**范围内解析表名（否则 liquid.go 的名字会被判"tokens.go 无此外常量"）。
+- [2026-09-21T02:40:00Z] agent=ticket74 did=**family 2 + family 1 一个 commit 落地**（AC#1 勾）。
+  删除与换指向同 commit，表没有一秒钟指向死常量：
+  ① `tokens.go` 删 `SwimLevelGain`(0.55)/`SpinLevelGain`(1.0)，同一处新增
+  `LiquidGatherPerLevel`=0.12 / `SummonFlowSpread`=0.10 —— 它们就是 `renderer_windows.go:543-544`
+  里那两个裸字面量，提出来才有名字可进表；② 表 :153 一行改两行（几何 / 转速），另加包络门限、
+  静止判据、`hit.go` 边界共 5 行，把 D7/D8 两族 **11 条**从 `c21OutTableExempt` 提进表并钉住值
+  （新增 `c21MotionGolden`，豁免表只剩 4 条真不是 token 的 Win32/热键名）；
+  ③ `tokens_table_test.go` 的名字解析从"只认 tokens.go"扩到**整包**（`c21PackageConsts`），
+  并且新加一条反空跑断言：表名了 tokens.go 之外的常量而 `c21MotionGolden` 没钉值 ⇒ 红。
+  AC#1 的 grep 证据（HEAD 工作树实测）：`git grep -n "SwimLevelGain\|SpinLevelGain" -- internal`
+  ⇒ 只剩注释与本表自述，**零 `const` 声明**；`git grep -n "LiquidGatherPerLevel\|SummonFlowSpread"`
+  ⇒ `renderer_windows.go:545-546` 两处真实像素路径；`git grep -n "Spin.*RadPerS" -- internal/ball/liquid.go`
+  ⇒ `liquid.go:224-225` 的 `omega`。
+  新行**已验真会红**（临时改码，跑完即还原）：`liquid.go:28 SpinLevelRadPerS 4.20 -> 4.35` ⇒
+  `TestC21GeometryRowsMatchCodeConstants` FAIL 并点名 `c21-native-tokens.md:159`
+  （"SpinLevelRadPerS = 4.35, but this row states no such number"）；还原后 `git diff --quiet` 空、67 条声明复绿。
+  零消费者报告 29 → **27**（少掉的就是那两条死常量），表外豁免 15 → **4**。
+  门禁：`gofmt -l internal/ball` 空、`go vet ./internal/ball/...` rc=0、
+  `go test ./internal/ball/... -count=2` ok、`go test ./internal/ball/ -v` RUN=54 / SKIP=0 / PASS=54。
+  next=family 3：在表里开「未接线豁免」小节，27 条零消费者**逐条一句理由**，并把消费者报告从
+  "只打印"改成"未归因即红"（理由放表里、由测试解析，避免理由清单本身成为第二份会漂移的真相源）。
