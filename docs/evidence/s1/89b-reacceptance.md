@@ -310,3 +310,147 @@ AUDIT GAP CONFIRMED: the child lost read access for Everyone and nothing named i
   并且 `VICTIM-INTACT the foreign file behind the link is untouched`、链接目标那条宽 DACL 原样保留。
   ⇒ **没有写穿链接**，票 94 的牙没被这两行接线卸掉。代价登记为可用性（R-89b-6）：
   备份位置上有一根既存链接 ⇒ 迁移**永久失败**（错误具名、带路径，方向是紧的）。
+
+---
+
+## 回归：纯净快照四包 `-count=2`（本代理自己的四数）
+
+快照 `/tmp/wisp89bacc-hd` = `63fc82a`（HEAD），先证 `go build ./...` **rc=0**，再跑
+`go test -count=2 -v ./internal/winsec/ ./internal/secret/ ./internal/memory/ ./internal/agent/` ⇒ **RC=0**。
+
+| 包 | 结果 | 用时 |
+| --- | --- | --- |
+| `internal/winsec` | `ok` | 10.735s |
+| `internal/secret` | `ok` | 0.361s |
+| `internal/memory` | `ok` | 28.000s |
+| `internal/agent` | `ok` | 4.268s |
+
+| 计数（全量 `-v` 输出） | 数 |
+| --- | --- |
+| `=== RUN` | **402** |
+| 顶层 `--- PASS` | **268** |
+| 缩进 `    --- PASS` | **132** |
+| `--- FAIL`（顶层+子） | **0** |
+| `--- SKIP`（顶层） | **2** |
+
+**`=== RUN` == 2 × 不同名**：distinct = **201**，`uniq -c` 后**没有任何一个名字的次数 ≠ 2**
+（`grep '^=== RUN' | sed 's/^=== RUN   //' | sort | uniq -c | awk '$1!=2'` 输出为空）。
+
+**SKIP/FAIL 逐条点名**：FAIL **0 条**；SKIP 只有**一个名字出现两行**——
+`--- SKIP: TestSubprocessCrashWriter (0.00s)` × 2，
+原因 `concurrent_test.go:186: crash-writer subprocess; runs under TestCrashRecoveryKillMidWrite`
+（`WISP_CRASH_CHILD != "1"` 时子进程入口在父进程里跳过，真腿由 `TestCrashRecoveryKillMidWrite` 带起来跑；
+`git log -1 -- internal/memory/concurrent_test.go` = `41d707c`，**票前既有**，与这三枚 commit 无关）。
+
+⚠ **(R-89b-7) 对修复者一句读数的更正**：票面收尾枚写"全量输出里 `--- SKIP` **0 条**（用 `grep -E "SKIP|FAIL"` 扫全量输出计数，不是 `head`）"。
+本代理实测：**不加 `-v` 时 `go test` 根本不印 `--- SKIP`**——
+`go test -count=2 ./internal/memory/` 的全部输出就是 `ok … 25.731s` 一行（`grep -c SKIP` = **0**），
+同一包加 `-v` 就有 **2** 行。⇒ "0 SKIP" 若是从非 `-v` 输出扫出来的，那是**仪器看不见**，不是**没有**。
+真数是 **1 个具名 helper skip × 2 轮**。这一格不判红（skip 本身良性且既有），
+但 AC#6 那句"skip 要逐条点名，不许当 ok"要求票面把它改成点名读数。
+
+工具门（本代理复核，只当门不当判据）：`gofmt -l internal/winsec internal/secret` 空、
+`$GOPATH/bin/gofumpt -l` 同两包空、`go vet` 与 `GOOS=linux go vet`（**按包作用域**，A54③）两包 rc=0。
+
+---
+
+## 票 94 的牙：修复有没有绕开 `ResolvedPath` 铸造口 —— **没有，判 PASS（并附一发攻击读数）**
+
+- **没有新增公开入口**：`git diff 01e7007^..01e7007 -- internal/winsec/winsec.go internal/winsec/resolve.go` 为空，
+  第 4 条只动 `applyDescriptorWindows`；第 2 条用的是既有公开 API `winsec.PrivateFile`/`winsec.SealFile`。
+- **密封路径上每一个会碰 OS 的入口都过了铸造口**（本代理逐个数调用点）：
+  `PrivateFile`/`PrivateFileExclusive`→`privateFile`→`resolveString`；`SealFile`/`SealDir`→`resolveString`；
+  `PrivateDirAll`→`ResolvePath` 后走 `privateDirAll(dir ResolvedPath)`；
+  `applyDescriptor` 的三个调用点分别拿 `f.Name()`（已用 resolved 拼法打开）、`sealDir(resolved)`、
+  `propagatePrivate` 里 `filepath.Join(resolved, ReadDir 的名字)`。新增的那一发
+  `windows.GetNamedSecurityInfo(path,…)` 就挂在 `applyDescriptorWindows` 里，拿的是同一个已过铸造口的 `path`。
+  唯一故意不解析的仍是 `RemoveUnlinked`（票 94 自认弱处，本三枚**未碰**）。
+- `diff 0a3a445..f801d34` 生产码里**没有**新增 `filepath.Abs` / `os.Chmod` / 裸 `os.Create`（`grep` 命中全在测试与注释里）。
+- **本代理的攻击读数**（§4.3 第二发）：把备份位置换成符号链接，让"分支判定用的未解析 `os.Stat`"与
+  "动作用的解析后拼法"不一致 ⇒ 两条腿**都拒绝**并给出 `traverses a reparse point …, which is not the tree this call names`，
+  链接后面那个别人的文件**内容未动、DACL 未动**。⇒ 铸造口在这条新接线上仍然说得过去。
+- 游走不穿链接也独立复现（§第 3 条 `WALK-DID-NOT-CROSS`）。
+- **残留（不判红）**：`migrate.go:168` 用**未解析**的 `os.Stat(backupPath)` 选分支这件事本身是"词法决定、动作解析"的错位；
+  本代理测到它目前只会走向拒绝（紧），但它是一句该写进注释的弱点，而不是该留白的巧合。
+- 另一处口径：通知把**完整路径**写进 `slog`，而日志文件今天还是 `0o644`（票 95 的账）。路径不是密钥，
+  但"哪台机器的哪个目录里有你的私有树"这件事在日志里是可 grep 的，归票 95 一起算。
+
+---
+
+## 第 4 条的变异本代理也重做了（证明那条通知是承重的）
+
+`/tmp/wisp89bacc-hd`：`applyDescriptorWindows` 里 `noticeNarrowed(narrowNotice{Path: path, Principals: before})`
+→ `_ = before // MUTATION-89BACC-SILENT`（`grep -n` 命中 144 行 = 锚点本行；变异前后 `go build ./internal/winsec/` **rc=0**）⇒
+
+- `go test -count=1 -v -run 'TestSeal' ./internal/winsec/`：**`=== RUN` 2、两条全红**，
+  `--- FAIL: TestSealReportsThePrincipalsItCleared`（`seal cleared a grant on data without reporting it; notices: []` +
+  同一发对 `shared-with-a-service-account.txt` 的同类红）、
+  `--- FAIL: TestSealNoticeIsRecordedByDefault`（`the default notifier wrote nothing auditable: ""`）
+  ⇒ 与修复者自称"两条同时红"**逐字对上**。
+- 全量 `-v` 跑同一 build：**RUN=29 / 17 顶层 PASS / 2 顶层 FAIL / 0 SKIP** ⇒ 变异**只**打到那两格，
+  其余 17 条（含 §1 的覆盖面判据、AC#4/AC#5、生产端到端）保持绿。
+- 还原：`grep -rn MUTATION-89BACC --include=*.go internal/winsec internal/secret` **0 命中**，
+  `winsec_windows.go` 与 `migrate.go` 两个被改过的文件 `diff` 对 HEAD **IDENTICAL**，还原后 `go test ./internal/winsec/` **ok 4.024s**。
+
+---
+
+## 裁决表（退回单四条 1:1 + 两个顺带项）
+
+| 项 | 修复者的主张 | 本代理裁决 | 本代理自己的依据 |
+| --- | --- | --- | --- |
+| **#1** AC#2 覆盖面判据搬进包内 | `c8d5c94` 上删 `propagatePrivate` ⇒ rc=1、唯一红名这一条、其余 14 绿 | **PASS** | §1.1 逐字复现（25 RUN/14 绿/1 红/0 SKIP + 红因原文）；§1.2 HEAD 上红两条（更强的承重证据） |
+| **#1 附判** "纯继承的孩子不区分任何事" | 注释明写它不当判据 | **诚实**，但**票面 AC#2 第 (2) 句要降半档措辞** | §1.3：无 walk 的 build 里 `Everyone:(I)(RX)` 被 OS 重算掉、`Everyone:(RX)` 留着（本代理从变异日志取的原文） |
+| **#2** 明文密钥备份接线 + repair 腿 | 同一 `.bak-plaintext` BEFORE 含 `S-1-1-0` → AFTER 只剩 SY/BA/swq；两条用例变异必红 | **PASS** | §2.1 本代理独立仪器的 BEFORE/AFTER 原文；§2.2 两发变异各红一条腿（他们的两条用例本代理也各自看到红）；`0a3a445` 上同一探针**红** ⇒ 上一轮那笔账也被本代理复现 |
+| **#2 附判** 明文是否在别处留副本 | 未主张 | **没有残留（本代理扫过）**；但登记 R-89b-2/3/4 | §2.3：全树字节扫描除备份外 **0 命中**、`.migrate-tmp` 不存在；`internal/config/migrate.go:83`+`parse.go:213` 同类站点仍敞；`MigratePlaintext` **无生产调用方** |
+| **#3** 目录符号链接真测掉 + A51② 再扩一格 | 未提权 + 开发者模式=1 ⇒ `os.Symlink` 成功；`Lstat` `Lrw-rw-rw-` + reparse 位；`os.Remove` 也能拆 | **PASS** | §第 3 条本代理自己的八行读数（`whoami /priv` 那一档本代理仪器空输出，**不计**，已在报告里点名） |
+| **#4** 静默清除改成会报出来 | 只报显式、白名单不开口；两条用例必红 | **PASS**，附**射程限定 R-89b-5** | §4.1 攻出"继承来的那份不报"（0 条 WARN，实测）；§4.2 九发对照证白名单按 SID、SY/BA/我 全静默；§"第 4 条的变异"两条同时红、其余 17 条绿；§4.3 DENY ACE 与符号链接备份位两发都干净 |
+| **回归** 四包 `-count=2` | "四包全 ok、全量输出 0 SKIP 0 FAIL" | **PASS**，读数更正一条 | 本代理：RC=0、402 RUN=2×201、FAIL 0、**SKIP 2 行 = 1 个具名 helper skip**；并测到"非 `-v` 输出根本看不见 SKIP"（R-89b-7） |
+| **票 94 的牙** | "未新增任何绕开 `ResolvedPath` 的入口" | **PASS（没有绕开）** | 调用点逐个核 + `diff` 无新增 `filepath.Abs`/裸原语 + 本代理一发"未解析 Stat vs 已解析动作"的攻击被拒 |
+
+---
+
+## 三句直答
+
+**(1) 票 89 现在能不能挂 `-done`？—— 能，但有三个"改名同时要做"的动作，都不需要再动生产码。**
+四条退回全部由本代理独立复现（三条完全干净，第 1 条附带票面措辞降半档）。挂 `-done` 的同时请编排者落三笔：
+① 票面 AC#2 第 (2) 句改成"边建边封的理由 = 不留可读窗口 + 修自带显式 ACE 的老孩子"（§1.3）；
+② R-89b-5 那条通知射程限定 + R-89b-7 那条 SKIP 读数更正（票面自己的面，不是码的面）；
+③ A51② 的 registry 更正（`:1865` 本体 + `:1453` 第二半 + 换掉 `RemoveUnlinked` 的理由句）。
+`R-89b-2/3`（`internal/config` 同类明文站点、`MigratePlaintext` 无生产调用方）**不算 89 的欠账**，
+但必须由编排者转成票 95/90 与装配根那张票的条目——否则会一直挂在"对 owner 的那句话"里说不满。
+
+**(2) "私有数据只对我可读"今天能对 owner 说到哪一步（更新后的那一句）：**
+"**这台机上，走 winsec 的那几条路——artifacts、DPAPI blob、`wisp.db`+`-wal`+`-shm`、staging、
+迁移产出的 `config.toml.bak-plaintext`（含既存那份的 repair）与迁移临时件——落盘即只有
+ `SYSTEM / Administrators / 我`；而且一处既存的老树，只要它自己 DACL 上带过显式的外来授权，
+ 下一次密封会被清掉并留一条 WARN**"。
+仍然宽、不许混进这句话的：**`internal/config` 自己的写路径与它的 `config.toml.bak-<schema>` 备份**（票 95/90）、
+**日志**（`0o644`，票 95）、**`models` 的 staging/缓存**（裁过：不按私有数据接）、`ball/position.go`、
+`cmd/wisp/*`（禁改区）；以及两条结构性边界——**只继承自父目录的那份带外授权被清时不报**（R-89b-5）、
+**`MigratePlaintext` 还没有生产调用方**（R-89b-3，所以那句话里的"迁移产出"今天只能读作"它一旦被产出"）。
+
+**(3) A51② 要不要改：要，改成"本机不复现"并换掉存在理由。**
+原文读数（`docs/reports/pending-and-issues.md:1865`）：
+"**A51② `os.Remove` 删不掉"指向目录的符号链接"** ⇒ 一个裸名 artifact 若被替换成 symlink-to-dir，
+票 79 的游离子树回收路径会清不掉它（它只用 `os.Remove`，绝不 `RemoveAll`，这个选择本身是对的…）"。
+本代理与上一轮验收**各自独立**测到它对 **junction** 与 **目录符号链接** 两类对象**都不复现**
+（本轮原文：`A51-RECHECK os.Remove(dir symlink to non-empty dir) err = <nil> ; target still there = true`；
+`JUNCTION … os.Remove` 同样 `<nil>`、目标内容全在）。
+⇒ 更正句：**"A51② 在本机 Go 1.27.1 / Win11 上不复现；`RemoveUnlinked` 继续保留，
+理由从'删不掉'换成'只可能删到链接本身、绝不把删除半径交给别人'"**——
+`A64③(1)`（`:1453`）只补了 junction 一半，另半边与理由句都还欠着。
+
+---
+
+## 本代理的破坏性检查（自证清白）
+
+* 全部变异与仪器在 `%TEMP%` 下四个快照（`wisp89bacc-89b2` / `-hd` / `-pre` / `-c1`），**仓内未建 worktree**；
+  工作树里 `internal/winsec`、`internal/secret`、`internal/memory`、`internal/agent`、`internal/risk`、`cmd/wisp`、`internal/perm`
+  与本代理**零接触**（`git diff --stat -- internal/winsec internal/secret` 空；`git status --porcelain` 里
+  只有别人的 `internal/risk/*`、`internal/tools/*` 与本报告）。
+* 未 `git add -A`、未 `--amend`/`reset`/`rebase`/`stash`/`checkout .`、**未 push**；只 commit 了
+  `docs/evidence/s1/89b-reacceptance.md` 这一个文件，且没往上一轮的 `89-adversarial-acceptance.md` 写一个字。
+* 未在 `%APPDATA%` 的真实数据目录写过任何文件；符号链接/junction/DENY ACE/宽 ACL 全造在 `t.TempDir()` 内，
+  测完由 `t.TempDir` 自清；快照目录本代理跑完即删。
+* 变异 token 只存在于快照：`MUTATION-89BACC-WALK/-MIG/-REPAIR/-SILENT`；
+  仓内 `grep -rn "MUTATION-89BACC" --include=*.go .` **0 命中**（终态复核）。
