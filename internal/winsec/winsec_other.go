@@ -3,35 +3,70 @@
 package winsec
 
 import (
+	"errors"
+	"fmt"
 	"io/fs"
 	"os"
+	"syscall"
 )
 
-// sealFile is a real mechanism here, not a decoration: POSIX enforces the mode
-// bits, which is why the repository's 0o600 looked correct for years and why
-// the Windows gap was invisible to the tests.
-func sealFile(path string) error { return os.Chmod(path, 0o600) }
+// applyDescriptor is the same seam the Windows file exposes, and it is what the
+// AC#5 failure-injection test replaces on either platform.
+//
+// On POSIX the mode argument is real, so this is not the decorative call it
+// would be on Windows - but it is still not trusted: a filesystem that stores
+// no mode bits (FAT/exFAT, some NFS exports with all_squash) accepts chmod and
+// then reports something else, and the verification below turns that into
+// ErrNotSealable instead of a false promise. That is the AC#6 requirement in
+// code: the non-Windows leg measures something, it does not skip.
+var applyDescriptor = applyDescriptorPOSIX
 
-// sealDir is the directory case of the same, and additionally checks the bits
-// landed: a filesystem that ignores them (NFS with all_squash, a FAT mount)
-// gets an error rather than a false promise.
-func sealDir(path string) error {
-	if err := os.Chmod(path, 0o700); err != nil {
-		return err
+func applyDescriptorPOSIX(path string, dir bool) error {
+	mode := fs.FileMode(0o600)
+	if dir {
+		mode = 0o700
+	}
+	if err := os.Chmod(path, mode); err != nil {
+		return wrapPath(path, err)
+	}
+	info, err := os.Stat(path)
+	if err != nil {
+		return wrapPath(path, err)
+	}
+	if got := info.Mode().Perm(); got != mode {
+		return wrapPath(path, fmt.Errorf("mode is %v, want %v (%s stores no usable permission bits)",
+			got, mode, fstypeOf(path)))
 	}
 	return nil
 }
 
-func sealHandle(f *os.File) error { return f.Chmod(0o600) }
+// sealHandle is the pre-content seal used by PrivateFile and
+// PrivateFileExclusive: same mechanism as SealFile, by name.
+func sealHandle(f *os.File) error { return applyDescriptor(f.Name(), false) }
 
-// removeUnlinked needs no special care: unlink never follows a link on POSIX,
-// so os.Remove already has the non-recursive, non-following behavior the
-// Windows implementation has to work for.
+func fstypeOf(path string) string {
+	var st syscall.Statfs_t
+	if err := syscall.Statfs(path, &st); err != nil {
+		return "unknown filesystem"
+	}
+	return fmt.Sprintf("fs type 0x%x", st.Type)
+}
+
+func sealFile(path string) error { return applyDescriptor(path, false) }
+
+// sealDir narrows a directory. It deliberately does not walk the existing
+// subtree the way the Windows implementation does: on POSIX a child never
+// inherited its parent's mode in the first place, so "seal the tree" here would
+// be a chmod over files whose permissions somebody else set on purpose, and the
+// hole being closed does not exist on this platform.
+func sealDir(path string) error { return applyDescriptor(path, true) }
+
+// removeUnlinked needs no special care on POSIX: unlink operates on the link
+// itself and never follows it, so os.Remove already has the non-recursive,
+// non-following behavior the Windows implementation has to work for.
 func removeUnlinked(path string) error {
-	if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
+	if err := os.Remove(path); err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return err
 	}
 	return nil
 }
-
-var _ fs.FileMode = 0o600

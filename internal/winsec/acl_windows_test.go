@@ -354,20 +354,24 @@ func TestAC2SealedDirCoversFilesItNeverTouched(t *testing.T) {
 	}
 	assertPrivateACL(t, untouched)
 
-	// And a level that was widened *after* sealing has to be repairable and
-	// must fail closed instead of reporting success while still wide.
-	if err := winsec.SealDir(nested); err != nil {
-		t.Fatalf("SealDir of a widened existing dir: %v", err)
+	// Sealing a directory also narrows what is already inside it: children keep
+	// the ACL they were *born* with, so a tree that predates this package (or a
+	// directory somebody widened underneath it) is only repaired if the seal
+	// propagates. Without this leg the "seal the data root once" decision in
+	// AC#2 would leave every artifact written before the upgrade wide forever.
+	// Somebody widened a directory *underneath* the sealed root (a work dir from
+	// before this package existed, an operator's share fix). Asking the public
+	// API for privacy again has to take it back - and narrow what is already
+	// inside it, because children keep the ACL they were *born* with: without
+	// propagation the "seal the data root once" decision in AC#2 would leave
+	// every artifact written before the upgrade wide forever.
+	if err := winsec.PrivateDirAll(nested, 0o700); err != nil {
+		t.Fatalf("PrivateDirAll of a widened existing dir: %v", err)
 	}
 	assertPrivateACL(t, nested)
-	// The child created while its parent was wide keeps the foreign ACE:
-	// sealing a directory does not retroactively narrow children that already
-	// inherited, so callers must seal before they write. This is the ordering
-	// fact AC#2's "先建目录还是先建文件" question turns on.
-	if sids, names := aclSIDs(t, stray); privateACLError(sids, currentSID(t)) == "" {
-		t.Errorf("expected the pre-existing child to still carry the foreign ACE (proof that seal-before-write ordering matters); got clean %v", names)
-	}
-	// Re-sealing it is winsec's job too, and must succeed.
+	assertPrivateACL(t, stray)
+	// And the per-file repair path has to work on its own, for a file nobody
+	// asks winsec to place.
 	if err := winsec.SealFile(stray); err != nil {
 		t.Fatalf("SealFile: %v", err)
 	}

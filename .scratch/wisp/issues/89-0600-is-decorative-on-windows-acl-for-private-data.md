@@ -92,9 +92,12 @@
   **`DESKTOP-LVS7839\CodexSandboxUsers` 与一个解析不出名字的别名 SID `S-1-5-21-3623186960-…-1717338598`
   对工件、DPAPI blob、数据库与 WAL 全都持有 `(M,DC)` = MODIFY（含读+写）+ DELETE CHILD**，
   全部由父目录**继承**而来。"只有我能读我的数据"在本机不是"没验证"，是**当场为假**。
-  本机主体清单（能不能算"第二账户"）：
-  本地用户: 
-  CodexSandboxUsers 成员: 
+  本机主体清单（这条判据到底能不能算"有第二账户"）：本地用户 = `Administrator, CarlosShao, CodexSandboxOffline,
+  CodexSandboxOnline, DefaultAccount, Guest, shaowq, swq, WDAGUtilityAccount, WsiAccount`；
+  `CodexSandboxUsers` 组成员 = `DESKTOP-LVS7839\CodexSandboxOffline`、`DESKTOP-LVS7839\CodexSandboxOnline`
+  ⇒ 持有我们私有数据 MODIFY 的是**两个真实存在、与 `swq` 不同的本机账户**，不是一个空泛的组名。
+  但仍**拿不到**"以那两个账户之一真的去 open() 成功/失败"的证据（`runas` 需要口令，非交互拿不到），
+  所以 AC#3 走的仍是票面允许的**替代判据**（SID 白名单 + icacls 原文比对），只是它的红因落在真账户上。
 - [x] **AC#3 判据先红**（`-count=1 -v`，`go test ./internal/winsec` rc=1）：
   `--- FAIL: TestAC3SealedWritesCarryNoForeignSID/artifact-exclusive`、`…/secret-blob`、`…/staging-temp`
   （3/3 子测试红）+ `--- FAIL: TestAC2SealedDirCoversFilesItNeverTouched`，红因全是被测代码只有 `os.Chmod`：
@@ -105,3 +108,37 @@
   现已改为剥掉路径前缀 + 数每一条 `:(` 行（注释里记了这段），且 `TestAC1BaselineForeignACEPropagatesIntoModeOnlyWrites`
   是**反向钉子**：它断言"宽父目录的 ACE 一定会传到子文件"，一旦这条不成立就红，防止判据测空气。
 - [ ] 待办：`winsec_windows.go` 换真 SetNamedSecurityInfo（PROTECTED DACL + 逐层封 + 传播），AC#4 链接、AC#5 失败注入。
+- [x] **AC#3 实现落地 + 红→绿**（同一判据、同一台机、同一份 icacls 仪器）：
+  `go test ./internal/winsec -count=2` **rc=0**；`-count=1 -v` 全名逐条：
+  `--- PASS: TestAC1BaselineProductionPaths` / `--- PASS: TestAC1BaselineForeignACEPropagatesIntoModeOnlyWrites` /
+  `--- PASS: TestAC3SealedWritesCarryNoForeignSID`（3/3 子测试）/ `--- PASS: TestAC2SealedDirCoversFilesItNeverTouched`。
+  **0 个 SKIP、0 个 FAIL**（本包没有"非 Windows 静默通过"：POSIX 那侧走真 `0600/0700` + 读回校验，见 AC#6）。
+  绿后的 icacls 原文（密封过的工件）：
+  ```
+  C:\Users\swq\AppData\Local\Temp\TestAC3SealedWritesCarryNoForeignSID2468636177\001\data\artifact-exclusive NT AUTHORITY\SYSTEM:(F)
+  BUILTIN\Administrators:(F)
+  DESKTOP-LVS7839\swq:(F)
+  
+  ```
+  以及 AC#2 覆盖面的那条（**winsec 从没碰过**的文件，只靠父目录继承）：
+  ```
+  C:\Users\swq\AppData\Local\Temp\TestAC2SealedDirCoversFilesItNeverTouched1351714451\001\data\sqlite-like-sidecar.tmp NT AUTHORITY\SYSTEM:(I)(F)
+  BUILTIN\Administrators:(I)(F)
+  DESKTOP-LVS7839\swq:(I)(F)
+  
+  ```
+  ⇒ 外来 `Everyone:(I)(RX)` 没了，`CodexSandboxUsers` 那种外来主体也没了，只剩 `SY/BA/我`。
+  **`verifyPrivate` 把这条判据搬进了运行时**：每次密封后用 OS 自己的 SDDL 读回，
+  出现任何非 `{我, SY, BA}` 主体、或 DACL 不是 `D:P`、或我自己反而没有非 inherit-only 的权 ⇒ `ErrNotSealable`。
+  ⇒ "ACE 条数"不能当判据：容器上 OS 会**materialize** `OICIIO` inherit-only 伴生 ACE（实测 3 条变 6 条），
+  第一版据此断言 `3 of 3 expected` 直接把 AC#2 打死；换成"无外来主体 + 我自己有实权"才对。
+- [x] **实现路上三个真实坑（点名，别下次再踩）**：
+  (1) `BuildSecurityDescriptor` 返回 self-relative SD，`sd.DACL()` 读回 present=false ⇒
+      报"descriptor carries no DACL"——**假失败但方向是紧的**；改用 `ACLFromEntries`(SetEntriesInAcl)。
+  (2) `SetSecurityInfo` **按 handle** 设 DACL 需要句柄带 `WRITE_DAC`，而 `os.OpenFile(O_WRONLY)` 只给了
+      GENERIC_WRITE ⇒ `Access is denied`；owner 对该对象**隐式**持有 WRITE_DAC，所以改成按**名字**设
+      （`sealHandle` 现在就是 `applyDescriptor(f.Name())`，且在文件还是空的时候调）。
+  (3) **我自己的测试重写把 `PrivateDirAll(nested)` 那次调用删掉了**，于是 AC#2 在"什么都没做"的位置上红 ——
+      那条红**不是实现缺陷**，是判据被编辑掉了；重加调用后才真绿。记这条是因为：红/绿名如果不带原文，
+      这种"测试自己坏了"的红会被当成实现的功劳或罪状。
+- [ ] 待办：AC#4（链接）、AC#5（失败注入）、把 memory/agent/secret 三条落盘路径接上 `winsec`、AC#6 的 POSIX 侧点名。
