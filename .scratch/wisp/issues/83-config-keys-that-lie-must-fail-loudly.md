@@ -62,7 +62,90 @@
 
 Status `open` ⇒ `claimed`。本轮次序：AC#1 全量同类键扫描（含间接消费排查）⇒ AC#2 校验落地 ⇒ AC#3 双向变异 ⇒ AC#5 门禁。
 零 Go 改动，纯 checkpoint。
-`next=` 读 `internal/config/` 全量，产出键 → 解析处 → 消费者 → 处置表。
+`next=` 把 AC#1 的键表全量写进本票（含间接消费排查证据），再跑双向变异与并跑门禁。
+
+### L2 — AC#1 全量同类键表（含间接消费排查）（2026-09-21）
+
+**先给仪器，再给表。** 六条检索式全部在本仓 HEAD 上跑过，命中数写在括号里：
+
+- **I-A 主仪器**：`grep -rn --include=*.go -E '\.(App|Ball|Hotkey|Session|Voice|Audio|LLM|Agent|Risk|FS|Net|Privacy|Memory|Panel|Cost|Plugins|Models|Observe)\.' internal cmd tools | grep -v '^internal/config/'`
+  ⇒ 去重后**只有 16 条键路径**被 `internal/config` 之外读到（含测试文件）：
+  `.Agent.PerToolTimeoutMS .Agent.SteeringEnabled .FS.AllowedDirs .FS.DeleteEnabled .FS.ReparsePointExceptions
+  .LLM.Providers .LLM.Retry.BackoffMS .LLM.Retry.Max .LLM.Roles .LLM.Roles.Chat .LLM.TextChain .LLM.TimeoutMS
+  .Net.Proxy.Mode .Net.Proxy.URL .Risk.ConfirmTimeoutSec .Risk.L1WindowSec`。
+- **I-B 整段被取走**（段名后不接点，防 `cfg.Risk` 整段传下去）：非注释命中只有
+  `internal/ball/hotkey_live_test.go:368` 的 `m.Config().Hotkey`（**测试**），以及
+  `internal/ball/hotkey_reload.go:15-19` 的**文档示例注释**；生产装配 `cmd/wisp/run.go` 未装这个 reloader。
+- **I-C 谁 import 了本包**：`grep -rl '"github.com/CarlosShao/wisp/internal/config"' --include=*.go`
+  ⇒ 非测试 8 个文件（`cmd/balldebug/main.go`、`cmd/wisp/{providers,run}.go`、`internal/agent/{cost,loop}.go`、
+  `internal/llm/{discover,probe_health,resolver}.go`），**逐个打开核对过**。整只 `*Config` 被传下去的只有
+  `llm.NewResolver(cfg,…)` 与 `chainOptions(cfg)` 两处 ⇒ 其字段读取逐行落到下面的 [llm] 表。
+- **I-D 间接消费①（反射按名取值）**：`grep -rn "FieldByName\|FieldByIndex" --include=*.go internal cmd` ⇒ **1 处**，
+  且它是 `parse.go:77` 对 `reflect.StructOf` 生成的解码镜像做**下标**访问，不是拿 TOML 键名去查字段。
+  `defaults.go` / `manager.go` / `parse.go` 的 reflect 只在 **Config 结构**上走默认值/深拷贝/差集，
+  **没有任何一处把配置里的字符串当字段名用**。
+- **I-E 间接消费②（按名取值的 map / 原样透传）**：`grep -rn "map\[string\]any" internal/config` ⇒
+  只有 `migrate.go:104-161`（v1→v2 重写 `[llm]` 子树）与 `parse.go:30/92/181`（`[plugins]` 动态子表吸收器）。
+  **两条都把结果重新塞回同一个强类型结构、再走同一个 `validate()`** ⇒ 没有"TOML 原样交给下游"的旁路。
+- **I-F 间接消费③（第二个 TOML 解析者）**：`grep -rn "config\.toml" --include=*.go internal cmd tools | grep -v '^internal/config/' | grep -v _test.go`
+  ⇒ 23 命中，逐条打开：全是注释与路径常量（`risk/blacklist.go:219-220` 把 `%APPDATA%\wisp\config.toml` 钉成 A 档、
+  `observe/diagnostics.go:147` 把它再脱敏导出、`secret/migrate.go:26` 的备份名）。
+  **不存在第二处 `os.ReadFile` + 自解析**。
+- **I-G 局部变量读**（I-A 的盲区）：`internal/llm/resolver.go:119-134` 用 `p.` / `spec.` 读 Provider/ModelSpec 字段，
+  I-A 数不到 ⇒ 已逐行核对并写进 [llm] 行。
+
+**仪器的闭包性（为什么"零命中"在这里够用）**：一个值要被消费，只有三条路 ——
+(a) 有人读一次 Config 字段（I-A + I-B + I-G 覆盖），(b) 有人另开一个 TOML 解析者绕过结构（I-F 排除），
+(c) 有人按名反射/按名查 map 取值（I-D + I-E 排除）。三条都堵 ⇒ 下表"无"字是有证明的，不是 grep 一次就定罪。
+
+**处置图例**：✔=有消费者 · 🛑=本票"响亮失败" · 🛑★=落地前先例（已有 guard，非本票新增） ·
+📋=已有计划接（指名票号） · 📄=保留但文档说明 · ⬜=结构容器（无键语义）
+
+| 键（config.toml 路径） | 解析处 | 消费者（无 ⇒ 指回仪器） | 处置 |
+|---|---|---|---|
+| `schema_version` | `schema.go:108` | `loader.go:44 peekSchemaVersion`（选迁移路径；键的消费者**就是**加载管线本身） | ✔ |
+| `app.language` / `app.theme` / `app.autostart` / `app.single_instance` | `schema.go:138,140,142,144` | 无（I-A：`.App.` 在包外零命中） | 📋 票 39（GUI 配置编辑器）/ 票 43（电源生命周期） |
+| `app.portable` | `schema.go:149`（`toml:"-"`） | **文件里根本不许出现**：写了就是 unknown-key 错（`schema.go:145-149` 注释钉死） | 📄 无罪 |
+| `ball.size` / `ball.position.{x,y,monitor}` / `ball.opacity_idle` / `ball.click_through` / `ball.hide_on_fullscreen` | `schema.go:165-173`、`155-159` | 无（I-A） | 📋 票 62/65/68（球体视觉）+ 票 39 |
+| `hotkey.summon` / `mute` / `cancel` / `panel` | `schema.go:180-183` | 无生产喂入；**消费侧插槽已存在**：`ball/hotkey_reload.go` + `ball/hotkey_windows.go:384` | 📋 票 64（未完成）。⚠ 与六键**同形**（半条线），但非 🔒 段、不承载放宽语义 ⇒ 不进守卫 |
+| `session.warm_timeout_sec` / `settling_sec` / `conversation_idle_sec` | `schema.go:188-190` | 无（I-A） | 📋 票 28（session scope warm） |
+| `voice.*`（`enabled`、`wake_word.*`、`asr.*`、`tts.*`、`punctuation`、`conversation_mode`、`aec.*`、`realtime.{enabled,provider,model,base_url}`、`cloud_asr_chain`、`cloud_tts_chain`） | `schema.go:244-266` | 无（I-A）；`voice.realtime.api_key_ref` 例外：`loader.go:121 resolveRefs` 在包内解析进 `Resolved.RealtimeKey`，但**生产装配未取用** | 📋 票 15/26/27/41/59/60/61 |
+| `audio.input_device` / `sample_rate` / `mic_muted_default` | `schema.go:271,272,277` | 无（I-A）；`mic_muted_default` 只被 `audio/gate.go:56` 的**注释**指名 | 📋 票 13 尾巴 / 票 26 |
+| `audio.half_duplex=false` | `schema.go:275` | `validate.go:67` 已经拒绝 | 🛑★ 先例 |
+| `llm.text_chain` / `llm.timeout_ms` / `llm.retry.{max,backoff_ms}` / `llm.roles.*` | `schema.go:411,415,306-307,297-302` | `llm/resolver.go:95-97`、`resolver.go:195-201`；`cmd/wisp/run.go:335`、`run.go:450-451` | ✔ |
+| `llm.providers.<n>.{protocol,base_url,api_key_ref,compat.{loose,allow_missing_usage,extra_headers},rpm,tpm}` / `llm.providers.<n>.models.<id>.{capabilities,context_window,max_output_tokens}` | `schema.go:379-401,348-372` | `llm/resolver.go:119-134`（I-G）、三家 adapter 的 `request.go`、`cmd/wisp/providers.go` | ✔ |
+| `llm.providers.<n>.{billing,plan_credit_total_micro}` / `models.<id>.{display,enabled,thinking_levels,billing}` / `price.{audio_in,audio_out}` / `quota_daily_micro` / `quota_monthly_micro` | `schema.go:391-392,350,371,359,361,341-342,367-368` | 无（`price.{in,out,cached}` 由 `agent/cost.go:56-61` 消费，其余零命中；`billing`/`thinking_levels` 只被枚举校验） | 📋 票 11（probe/目录选择）/ 票 44（C23 配额三层）/ 票 39（GUI） |
+| `agent.{max_rounds,token_budget,loop_guard.repeat_thresholds}` | `schema.go:431,433,425` | 无（I-A）；消费侧插槽存在但从未被生产喂值：`agent/guard.go:28-35`（注释自称来自 config） | 📋 组合根未接（票 10 已 done 的那条线尾巴） |
+| `agent.per_tool_timeout_ms` / `agent.steering_enabled` | `schema.go:436,440` | `cmd/wisp/run.go:272,325` / `run.go:327` | ✔ |
+| **`risk.shell_enabled`** | `schema.go:451` | 无：I-A 只命中 `L1WindowSec`/`ConfirmTimeoutSec`；`internal/tools` 里**没有注册任何 shell.exec 工具** | 🛑 本票守卫（SPEC-07 §3 的 S3 工具） |
+| **`risk.allow_shell_string`** | `schema.go:453` | 无：`risk.Facts.ShellString` **零生产写入者**（`grep -rn "ShellString\|ShellArgv\|ShellAllowlist" --include=*.go \| grep -v _test.go` 的全部命中是 `config/manager.go` 与 `risk` 的定义/读取处；生产唯一的 Facts 装配点 `tools/bridge.go:550-558` 只填 `Declared`/`Paths`） | 🛑 本票守卫 |
+| **`risk.shell_allowlist`** | `schema.go:455` | 无：同上，`Facts.ShellAllowlist` 零生产写入者 ⇒ `rules_shell.go:41` 的 R6 白名单分支永不执行 | 🛑 本票守卫 |
+| **`risk.blacklist_overrides`** | `schema.go:457` | 无（票 80 L2 的穷尽清单：写只有解码、读只有 `manager.go:356` 方向审计；`risk.Gate` 生产零调用点，`Classify` 签名里没有 override 形参） | 🛑 本票守卫（⇒ 票 21） |
+| `risk.confirm_timeout_sec` / `risk.l1_window_sec` | `schema.go:446,449` | `cmd/wisp/run.go:258-259` | ✔ |
+| `fs.allowed_dirs` / `fs.reparse_point_exceptions` / `fs.delete_enabled` | `schema.go:463,466,468` | `cmd/wisp/run.go:223-227,243` | ✔ |
+| **`net.allowlist`** | `schema.go:483` | 无：`risk.NetTarget.Allowlist` 零生产写入者，且今天没有任何 web/open 工具（`internal/tools/` 无 `net/http` 工具，票 22 未开工）⇒ `rules_network.go:74` 的域名门永不执行 | 🛑 本票守卫（⇒ 票 22） |
+| **`net.block_private_ranges=false`** | `schema.go:486` | 无：`rules_network.go:64` 的 `isPrivateHost` 是**无条件**判 L2，`Facts` 里根本没有承载它的字段 ⇒ 写 `false` 连"放宽"这个动作都表达不出来 | 🛑 本票守卫（要真做需 D22：SPEC-06 §6.3 钉着） |
+| `net.proxy.mode` / `net.proxy.url` | `schema.go:475,477` | `cmd/wisp/run.go:448-449 chainOptions` | ✔ |
+| `privacy.redact_paths` | `schema.go:496` | 无（I-A）；消费侧插槽 `observe/logging.go:50-51`、`redact.go:138`（注释自称 mirrors `[privacy] redact_paths`），生产装配未喂 ⇒ 半条线 | 📋 票 45（diagnostics guards） |
+| `privacy.diagnostics_opt_in` / `retention_days` | `schema.go:498,500` | 无（I-A） | 📋 票 45 / 票 08 |
+| `privacy.keep_transcript` / `keep_audio` | `schema.go:502,504` | `validate.go:78,83` 已拒绝 | 🛑★ 先例 |
+| `memory.{l1_enabled,l1_max,l3_retention_days,extract_model}` | `schema.go:509-512` | 无（I-A） | 📋 票 29（memory L1/L2） |
+| `panel.{enabled,width,height,keep_alive_in_session,scale}` | `schema.go:517-525` | 无（I-A） | 📋 票 33/34/36 |
+| `cost.{daily_budget,monthly_budget,alert_threshold,over_budget}` | `schema.go:531-535` | 无（I-A；`alert_threshold`/`over_budget` 只被枚举校验） | 📋 票 44（C23） |
+| `plugins.tier2_enabled` / `plugins.<id>.{enabled,capabilities,net_allowlist,host_api}` | `schema.go:560,543-549`、`parse.go:92 buildPlugins` | 无：`internal/plugin` **不 import 本包**（I-C），`grep -rn "\.Plugins\."` 包外零命中 | 📄 **同类、但本票不扩面**，理由见 L4，交编排者拍 |
+| `models.dir` / `models.mirror` | `schema.go:569,572` | 无（I-A） | 📋 票 14 尾巴 / 票 56 |
+| `models.verify_signature=false` | `schema.go:575` | `validate.go:92` 已拒绝（本票守卫的形状就是抄它） | 🛑★ 先例 |
+| `models.local_override` | `schema.go:577` | 无（I-A）；消费侧插槽 `models/downloader.go:65,160`，生产装配未喂 ⇒ 半条线 | 📋 票 14/56 |
+| `observe.level` / `roll.{size_mb,days}` / `slo_sample_interval_sec` | `schema.go:589,582-583,593` | 无（I-A）；`observe/logging.go:80` 读的是 `observe.Options.Level`，装配点未从 config 喂 | 📋 票 08/42/66 |
+| （非 TOML 键）`Manager.ConfirmLocked` | `manager.go:28` 声明 | **零生产赋值**：`grep -rn "ConfirmLocked" --include=*.go .` ⇒ 非测试 3 命中全在 `manager.go` 自身（声明 25-28 + 调用 239），其余 4 处是 `manager_test.go` | 📄 它不是 TOML 键 ⇒ 无法"加载报错"；`nil` 分支已是 **fail-closed 拒绝 + `slog.Warn`**（`manager.go:239-248`），即它**不说谎**，只是没人接。接线归票 21 段 2 / 票 37 |
+
+**本票没扫到的（明写扫不全的地方）**：
+`.go` 之外的东西**不在仪器覆盖内** —— 我没有验证"某个外部脚本/前端 WebView 通过 IPC 把 config 键名当字符串读出来"这类消费
+（`design/`、`scripts/`、`third_party/` 未纳入 I-A~I-F）。已做的补查：`grep -rn "blacklist_overrides|shell_enabled|shell_allowlist|allow_shell_string|block_private_ranges" --include=*.toml --include=*.md --include=*.json .`
+⇒ 除 `docs/`、`.scratch/` 的文档与本票链外**零命中**（`deps.toml` 不含这些键）。
+如果编排者知道有 GUI/IPC 侧按字符串取键的通道，本表结论要按那条通道复核。
+
+`next=` AC#3 双向变异的实测数字（写在 L3），AC#5 的并跑抖动登记（L4）。
 
 ### L1 — AC#2 校验先落地（承载体在，表随后补全）（2026-09-21）
 

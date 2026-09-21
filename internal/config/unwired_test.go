@@ -184,6 +184,19 @@ sample_rate = 48000
 max_rounds = 10
 token_budget = 1000
 
+[risk]
+confirm_timeout_sec = 60
+l1_window_sec = 5
+
+[fs]
+allowed_dirs = ["D:\\work"]
+reparse_point_exceptions = ["C:\\link"]
+delete_enabled = true
+
+[net]
+proxy.mode = "manual"
+proxy.url = "http://proxy:8080"
+
 [llm]
 text_chain = ["openai/gpt-4o-mini"]
 
