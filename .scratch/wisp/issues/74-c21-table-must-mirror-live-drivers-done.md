@@ -1,5 +1,15 @@
 # 74 — Make the C21 token table mirror the constants that actually drive the ball
 
+**Status:** **done（5/5 PASS，编排者 2026-09-21 10:17 归档；上面代理自述的 review 段整段保留在文末）**
+裁决表：`docs/evidence/s1/74-adversarial-acceptance.md`。我独立复现的两格：
+AC#3 `tokens.go:373 DockTriggerPx 16→17` ⇒ 红，报文含 "no **UNCLAIMED** number"（单射本身）；
+AC#4 `three-way colour check: 78/78 cited rows agree` ⇒ **票 69 转来的表↔CSS 缺口就地关掉，没开第三张票**。
+AC#1 用 `git show --stat 1d9ab9b` 证"删除与替代同批"。三条关不掉的缺口带落点：裸字面量 + owner 级三条并入 **Q-19**，
+数字单射剩余 36 条登记不追。
+
+
+## 代理收尾原文（保留，不覆盖）
+
 **Status:** implemented-agent-done (5/5 AC 勾，见文末裁决表) · 待编排者/owner 复验与合入决策
 **Type:** defect-fix (contract fidelity, cosmetic surface but governance-loaded: C21 is a frozen contract)
 **Blocks:** nothing · **Blocked by:** nothing — ticket 69 shipped the machine check that discovered this
