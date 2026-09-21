@@ -41,6 +41,31 @@
       `gofumpt -l` 对本轮改动文件**必须真跑并贴原始输出**（票 92 因为"没跑却说没二进制"被打回，本票不得重犯）；
       POSIX 三合包数字按 `-v` 口径报（分包/顶层说清楚，参考 `R-92-4`）。
 
+## 编排者追加（21:5x，来源=`acceptor-ticket92b` 的 `docs/evidence/s1/92b-adversarial-acceptance.md`）
+
+验收方原本建议"另开票 123 做 composer 接线"。**我并进来而不另开**——本票标题逐字就是这件事，
+再开一张只会得到两张各自半对的票。它的实测形状里**两形全绿**，这两形是本票的硬判据来源：
+
+- [ ] **AC#8**（`R-92b-1` 的正解）：**把"两边同改"从承诺变成门**——往 `knownComposerMethod`（原生侧方法白名单）
+      加一条时，**必须**同时让 `frontend/` 出现对应字面量，否则用例红。
+      现在的洞是：`sendRequest("panel"+"."+noun+"."+verb)` 在运行时等于 `panel.approval.decide`，
+      而**三枚判据各自只认字面量** ⇒ 运行时拼接**全绿穿过**（含 `sh scripts/d22scan.sh` rc=0 clean）。
+- [ ] **AC#9**（`R-92b-2`）：结构钉的**扫描根比 `ban #6` 与"渲染器实际加载的文件集合"都窄**——
+      第二形实测：把一条通道放进 `frontend/public/*.js` + 在 `index.html` 里引用它，
+      那枚钉报的是 `21 files scanned, 2 host call sites`，**一个数都没动** ⇒ 全绿。
+      ⇒ 本票要回答"**渲染器到底会加载哪些文件**"，并把可达性钉挂在**那个集合**上，不是挂在 `frontend/src` 上。
+      ⚠ 已知它不是扫描器的问题：同一位置直接写字面 `approval.decide` 时 `d22scan` 会红并点名该文件 ⇒ **漏在钉的扫描根**。
+- [ ] **AC#10**（`R-92-2` 的另一半，验收方新补）：`panel.ts` 注释自陈宿主有**两种装法**
+      （`AddHostObjectToScript` / `postMessage`），而可达性钉**只认后者**
+      ⇒ 第一种要么**显式禁用**、要么进同一枚钉。
+- [ ] **AC#11**（`R-92b-3`）：把 `npm run render:composer && git diff --exit-code` 做成 CI 一步
+      （关掉"fixture 可以手写/可以腐坏"这一格）。⚠ 动 `ci.yml` 之前先看票 111/85a 是否已让出该文件。
+
+⚠ **两条我原样带过来的诚实边界**：① 验收方复算出 `gofumpt` 那格有一条新仪器坑——
+票面那句 `export PATH="$PATH:$(go env GOPATH)/bin"` 在 Git Bash 下会被 MSYS 吃成 `\work\base\gopath/...`
+⇒ **rc=127"命令不存在"是假读数**，必须写 `.exe` 全路径；② `R-92b-7`：交件里"本轮 `frontend/` 一行未改"
+在**树级别为假**（差 1 行，实为注释 ⇒ 结论仍成立，但这种话以后要按树说）。
+
 ## Rules（本仓固定）
 
 - 只 commit 不 push；共树禁 `--amend`/`reset`/`rebase`/`stash`/`checkout .`（A34）。
