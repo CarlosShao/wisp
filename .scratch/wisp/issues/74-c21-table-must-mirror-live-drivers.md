@@ -1,6 +1,6 @@
 # 74 — Make the C21 token table mirror the constants that actually drive the ball
 
-**Status:** in-progress (agent ticket74 implementing; family 2 first, per the ticket's own priority)
+**Status:** implemented-agent-done (5/5 AC 勾，见文末裁决表) · 待编排者/owner 复验与合入决策
 **Type:** defect-fix (contract fidelity, cosmetic surface but governance-loaded: C21 is a frozen contract)
 **Blocks:** nothing · **Blocked by:** nothing — ticket 69 shipped the machine check that discovered this
 **Packages:** `internal/ball` + `docs/evidence/s1/c21-native-tokens.md` only. Do **not** touch
@@ -175,3 +175,47 @@ about any of them.
     `cd tools/d22scan && go run . -root <abs>` → `clean - no D22 ban violations`，
     唯一 `NOT COVERED` 是既有的 ban #6 `frontend/`（树不存在，属票 67/70 台账，不是本票引入）。
   next=收尾：把 AC→commit→证据的 1:1 裁决表写进票面，确认无未归因分歧；本票不再动码。
+
+## AC 裁决表（1:1，一框一行）
+
+| 框 | 裁决 | commit | 判据命令（原样可复跑） |
+|---|---|---|---|
+| **AC#1** 死常量删除并与替换同 commit | **PASS** | `1d9ab9b` | `git grep -n "SwimLevelGain\|SpinLevelGain" -- internal/ball/*.go` ⇒ 只剩 3 处**注释自述**，零 `const` 声明；`git grep -n "LiquidGatherPerLevel\|SummonFlowSpread" -- internal/ball` ⇒ `renderer_windows.go:545-546` 真实像素路径；`git grep -n "Spin.*RadPerS" -- internal/ball/liquid.go` ⇒ `:224-225` 的 `omega` |
+| **AC#2** 改像素的常量要么在表里、要么带理由豁免，未归因 0 条 | **PASS（带一条如实缺口）** | `1d9ab9b` + `cf8406e` | `go test ./internal/ball/ -run TestC21 -v` ⇒ `ZERO-CONSUMER TOKENS (27 of 116 checked; 89 are referenced by 18 non-test files)` + `未接线豁免: 24 row(s) attribute all 27 zero-consumer token(s)` ⇒ **未归因 0**；`TestC21CodeTokensAreTabledOrExempt` PASS（表外常量 15 → 4）。⚠ **缺口**：`renderer_windows.go` 的 `liqRate{1.0,-1.6,0.55}` / `liqPhase{0,2.1,4.2}` / 渐变 stop 0.42·0.78 / `permille 775+225…` 是**未命名的裸字面量**，任何按 `const` 声明枚举的检查结构上看不见它们；提出来属改绘制代码，本票未做（已写在表末段） |
+| **AC#3** ≥2 行变异检验（改值→点名红→grep 证落盘→还原→diff 证净） | **PASS（做了 6 次）** | `1d9ab9b`/`cf8406e`/`186ad31`/`ed43bc3` | M-A `sed 's/SpinLevelRadPerS   = 4.20/... = 4.35/'`→`-run TestC21GeometryRowsMatchCodeConstants` 红点名 `…:159`；M-B `hit.go ClickTolerancePx 4.0→6.0` 红点名 `…:162`；M-C `tokens.go DockTriggerPx 16→160`（**收紧前整包 ok、用例 PASS**，收紧后红 `…:164 …sharing one written digit`）；M-D `statevisual.go:132 SleepRestRatio→0.62` ⇒ `-run TestC21TokenConsumerReport` 红；M-E `FontFamily→"Segoe UI Variable Text"` 红 `…:155 never writes that string`；M-F 表侧 `#F2F3F5→#F2F3F6` ⇒ `-run TestC21TableColourRowsMatchTokensCSS` 红。**每次**：先 `grep -c MUTATION-74…` / `git diff --stat` 证落盘，还原后 `git diff --quiet` 对 4 个码文件 + 表全净，末态 `git grep -n MUTATION-74 -- internal docs` = 0 命中 |
+| **AC#4** 表↔`tokens.css`：加检查或有名有姓移交 | **PASS（未移交，加了检查）** | `ed43bc3` | `go test ./internal/ball/ -run TestC21TableColourRowsMatchTokensCSS -v` ⇒ `three-way colour check: 78/78 cited rows agree across docs/evidence/s1/c21-native-tokens.md, design/assets/tokens.css and internal/ball/tokens.go (:root=129 decls, light=65)`；36 行原生自有 look 色按定义无 CSS 出处，如实跳过并写在表头 |
+| **AC#5** 四道门禁 + RUN/SKIP 计数自证 | **PASS** | 全部 | `gofmt -l internal/ball`（空）·`go vet ./internal/ball/...`（rc=0）·`go test ./internal/ball/... -count=2`（`ok 0.360s`）·`go test ./internal/ball/ -v -count=2` ⇒ **RUN=110 = 2×55 个不同测试名、SKIP=0、FAIL=0**（`grep -c '=== RUN'` / `grep -c SKIP` / `sort -u`，不靠 `ok` 那行） |
+
+## 本票关掉的分歧 vs. 登记为豁免的
+
+**关掉（family 2，2 条死常量）**：`SwimLevelGain`、`SpinLevelGain` —— 删除并在同 commit 把表 :153 改指
+真实驱动：新增 token `LiquidGatherPerLevel`=0.12 / `SummonFlowSpread`=0.10（原为渲染器裸字面量）+ 表内
+点名 `SpinBaseRadPerS`/`SpinLevelRadPerS`/`SpinSummonRadPerS`。
+
+**关掉（family 1，11 条 in-code-never-tabled）**：`hit.go` `RingMarginPx`/`ClickTolerancePx`；
+`liquid.go` `Spin*RadPerS`×3、`SilenceLevelGate`、`SilenceHoldMs`、`LevelAttackTauMs`、`LevelReleaseTauMs`、
+`MotionEpsilon`、`FrameIntervalMs` —— 全部进表带真实单位，`c21MotionGolden` 钉值，表外豁免 15 → 4。
+
+**登记为豁免（family 3，27 条 table-only，理由在表里逐行）**：
+11 个 `Palette.Tint*` hi/lo 端点（v2 球面只读 `--tint-mid`+`--tint-opacity`，这批在 `tokens.css` 之外**连
+CSS 侧都零引用**，是死色镜像）；`FgPrimary`/`FgTertiary`/`GlassRing`/`GlassHi`/`GlassHiSoft`/`InfoLine`/
+`OrbShadow`（面板侧 CSS 有消费者，球面无对应绘制层，边缘/接地阴影由 `looks[*].Rim/Lip/Caustic` 承担）；
+`looks[*].Deep`（九字段唯一没人读的，票 65 质感返工项，删它=缩 4 行 look 表）；`BallSizeSmallPx`/`LargePx`
+（档位参照，原生只有连续尺寸 + Min/Max 钳位）；`Dur*Ms`×3（面板过渡档；原生逐态常量的 180/260 与它同值
+不同源，票 69 的 D12）；`FontSizeMonoPx`（球内不排等宽）；`CountdownFontPx`（10px 与 `BadgeFontPx` 重叠，
+**待裁定**不许悄悄改任一侧）；`FirstRunGuidePulseMs`（`anim.go:63-65` 自述 guide pulse 后补，S1 静态）。
+
+**保留的表外豁免（4 条，非 token）**：`HTClient`/`HTTransparent`/`HTNowhere`（Win32 hit-test 返回值）、
+`AltSummonSpace`（热键文案）。
+
+## 我没能关掉的（交给编排者）
+
+1. **`renderer_windows.go` 的裸字面量**（AC#2 的缺口，见上表 ⚠）：本票只能保证"有名字的常量都归了因"，
+   改像素却**没名字**的那批结构上在检查之外。完成判据建议写成：把 `liqRate`/`liqPhase`/渐变 stop 提成
+   `tokens.go` 常量并进表（属改绘制代码，需要一次真实桌面复看，因此不宜与账目修复混在一张票里）。
+2. **数字单射只做了一半**：同行内"一个数字养两枚常量"已判红；反向（"行里出现的每个数字都得有常量认领"）
+   **没做**，因为用途栏天然写着 SPEC 条款号、`96 DPI`、commit 短哈希——要做就得给表加一套数字标注语法。
+   这条边界写在检查的注释里，`NUMBERS NO NAMED CONSTANT CLAIMS` 仍是日志（今天 36 条，实测末态，全是散文数字）。
+3. **owner 级未决**（本票只登记不裁定，`docs/specs/*` 一字未动）：36 行 look 色升进 `tokens.css`（A24-D4 的另一半）；
+   `CountdownFontPx` 与 `BadgeFontPx` 同值；`SleepingDotPx`/`SleepOpacity` 在生产默认路径与 INTERIM 之间的三方
+   值漂移（表里「值漂移」段原有登记，本票未改判）。
