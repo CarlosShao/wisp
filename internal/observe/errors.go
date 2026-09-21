@@ -59,7 +59,7 @@ func (c ErrorClass) Valid() bool {
 // task_log is reserved in internal/memory and lands with the schema (ticket
 // 04); this function is the shared validator until then.
 func ValidateErrorClass(s string) error {
-	if (ErrorClass(s)).Valid() {
+	if ErrorClass(s).Valid() {
 		return nil
 	}
 	return fmt.Errorf("invalid error_class %q: must be one of the 17 D37 classes (%s)",
