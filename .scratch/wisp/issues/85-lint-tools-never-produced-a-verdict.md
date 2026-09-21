@@ -59,6 +59,66 @@
       `go vet ./...` rc=0、`sh scripts/d22scan.sh` rc=0（**逐字同 CI 那一行**，且**先看到它的阳性对照红过**）、
       `go test -count=2` 只跑你碰过的包并逐条点名 SKIP/FAIL。
 
+## 编排者裁定（21:2x，来源=`audit-85-preflight` 的 `docs/evidence/s1/85-preflight-staticcheck.md`，505 行）
+
+### 先纠正我自己在派单里写错的那半句
+
+我说 staticcheck"**跑过去了**"——**错**。它的真实历史是 **121 枚建过 job 的 run 里：`skipped` 93 / `failure` 28 / `success` 0**，
+⇒ 这道门**从来没有执行成功过一次**，而且一执行就**响亮地崩成 rc=1**。
+更要的一条：**`lint` job 在 121/121 枚 run 里全是 `failure` ⇒ 本仓的 lint 门历史上一次都没绿过。**
+⇒ 修法因此不同："跑过但假装没事"要查的是判据；"**从未跑到 / 一跑到就崩**"要修的是工具链与上游步骤依赖。
+分母也是闭合的：168 枚 run = 121 建过 job + **47 枚 `cancelled` 且 jobs 端点原样返回 `{"total_count":0,"jobs":[]}`**（121+47=168）。
+
+### 定因（两侧版本都是从命令读来的，不是转述）
+
+- 消费侧：`staticcheck --version` = `2025.1.1 (0.6.1)`，`go version -m` 显示它 vendor 了 `golang.org/x/tools v0.30.0`，
+  其 `internal/pkgbits/version.go` 常量块只有 `V0/V1/V2` ⇒ **上限 2**；报错串在该包 `decoder.go:86`。
+- 生产侧：本机 `go1.27.1`，`GOROOT/src/internal/pkgbits/version.go:37-40` 明写 `V4`（编码泛型方法）⇒ **写出 4**。
+- CI 装的是 `ci.yml:89` `staticcheck@2025.1.1` + `go-version-file: go.mod`（`go 1.27`）⇒ **runner 与本机同 Go 线，本机 18 秒逐字复现**。
+- ⚠ 派单里我写"本机可跑 `staticcheck --version`"也是错的：**本机根本没装 staticcheck**（预做代理用 `GOBIN=/tmp/a85-bin` 临时装了两枚，没污染共享 gopath/bin）。
+
+### 拆票裁定：**走 B**（85a 只修门，85b 按 checker 清账）
+
+预做代理量出的爆炸半径**不是几百条**：**GOOS=linux（CI 平台形状）34 条 / 17 个包**（其中 16 条在 `_test.go`），
+GOOS=windows 78 条 / 21 个包；分类 linux＝`26×U1000 / 3×SA1019 / 2×S1011 / 1×SA9009 / 1×SA4006 / 1×SA4000`；
+`tools/d22scan` 另有 2 条、`tools/mockllm` 1 条（**root 的 `./...` 照不到这两个 module**，这是独立一格）。
+两枚 HEAD（`3c5d1c3`→`a8f9459`）各测一遍，**finding 集合 diff 为空** ⇒ 数字是稳的。
+
+- **85a（本票现在这一张）**：只改 `ci.yml`——钉一个能读 Go 1.27 导出格式的 staticcheck/x/tools 版本、
+  把 `tools/d22scan`/`tools/mockllm` 两个 module 纳入遍历、修 R-4（`mockllm module vet` 被 staticcheck 连带 skip，**这条仍活着**）。
+  判据：**同一枚 run 里 staticcheck 步骤给出"跑了多少包、几条 finding"的读数**，而不是 rc=1 的崩溃串。
+- **85b（另开一张）**：按 checker 分批清那 34/78 条，第一批只清 3 条"有真逻辑味"的。
+  ⚠ **`SA4000` 那条是真缺陷**：`internal/observe/goroutine_test.go:106` 把 `!errors.As(err,&oe)` **写了两个**（同一表达式重复）——
+  这条不是风格问题，是"断言少了一维"，85b 优先。
+  ⚠ **`SA9009` 那条是假阳性**：真正的 `//go:embed all:dist` 在 `frontend/embed.go:19`，第 4 行只是散文注释恰好以 `// go:embed` 开头；
+  **修它会撞票 77 AC#1 的文档** ⇒ 85b 里标"不改 + 说明为什么"。
+
+**我批准的两件事（写死，别再问）**：
+① **85a 落地之后 `lint` 继续红**——从"读不懂的红"变成"34 行读得懂的红"。
+   **CI 转绿不因 85a 前进**，这不是失败；反过来说：这一步**今天本来就是红的**，
+   所以"先清完再钉版本"看似稳妥，代价是**清账全程没有门看着**——那条直觉是错的，我不走。
+② 候选 C（`continue-on-error` 先观察）**不批**：那正是 `ci.yml:5-8` 与本仓 D22 mode-6 明令禁的假修法；
+   唯一纪律相容的"观察期"形状是 `if: always()`，而它**不改本步红绿**、只是让后面的步骤能跑 ⇒ 那不算拆门，走 85a 时顺带。
+
+### 票面引用腐烂五处（预做代理当场核出；**开工先重测，别抄下面的数**）
+
+1. **`S1011 = nil 解引用` 是错的**：工具自己写作 `S1011 Use a single append to concatenate two slices`；
+   且 `-list-checks` 的 149 条里**没有 SA5011** ⇒ "可能解引用空指针"这一类**这版 staticcheck 压根不检查**。
+   这一条最要紧，因为它决定"我们以为门在防的东西"其实不在门里。
+2. `ci.yml:136-142` 已漂 ⇒ 现为 `127-141`。
+3. "从未产出判据"措辞不准 ⇒ 它产出的是 **rc=1**（崩溃也是判据）。
+4. "35 条"是当日值 ⇒ 现测 **34（linux）/78（windows）**，且票面**不抄数**，写成"开工先重测"。
+5. **AC#6 的前提已失效**：`Environment fork assertion` 在最近两枚 run 里都是 **`success`**，
+   病因被**票 93 的重排**治掉了，**不是靠 `if: always()`**。
+   ⇒ **我的处置：勾掉 AC#6，结案语写"闭于票 93 的重排（附那两枚 run 的步级读数），非本票"**；
+   同时 **R-4 保留在 85a**（`mockllm module vet` 在 run 167 确实被 staticcheck 连带 skip）——**两者不该同进退**。
+
+## Progress log 追加
+
+- 2026-09-21 21:2x（编排者）：收 `audit-85-preflight` 的预做报告并下上面这些裁定。
+  本票 **Blocked by 票 111** 这条不变（同文件 `ci.yml`）；预做代理"先派票面修订"的建议我已经用本段直接做掉了，
+  不需要另开一张只读票。
+
 ## Rules（本仓固定）
 
 15 次工具调用内交第一枚 checkpoint commit；每次 commit 同步 Status + 勾框 + 末行 `next=`；
