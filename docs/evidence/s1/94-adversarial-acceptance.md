@@ -460,7 +460,8 @@ placement_windows.go, resolve_windows_test.go, winsec.go, winsec_other.go}`）�
 不等于"二进制没 link risk"这一真实状态（本代理的 PROBE D 才是，但它在临时目录里、没进树）。
 **并且本代理实测：把 verifier 整个换成响亮拒绝，`internal/winsec` 0 条红（MUTATION-94B，第 5 项补充）
 ⇒ 它现在钉住的是"拒"，不是"存在一个只拒不改写的 verifier"，正向半句树内覆盖 = 0 条。**
-**裁决：算票 94 未闭的一条，但不必回退实现——转下张票**：在 `internal/secret` 或 `internal/memory`
+**裁决：一条没覆盖满的 AC 缺口（登记为文末 R-d），不阻塞本票 `-done`，但必须转下张票**：
+在 `internal/secret` 或 `internal/memory`
 （两者经实测**不 link risk**）加两条用例：
 (i) 数据根拼成 junction ⇒ `PrivateDirAll` 以 `winsec.ErrUnresolvedPath` 拒；
 (ii) 干净的绝对路径未接线时**能封成**且 `String()` 与输入**逐字节相同**（这才是钉住"只拒不改写"的那一半）。
