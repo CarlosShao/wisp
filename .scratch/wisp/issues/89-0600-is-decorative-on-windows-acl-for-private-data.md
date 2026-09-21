@@ -1,6 +1,6 @@
 # 89 — `0o600` 在 Windows 上是装饰品：artifact / 密钥 / 数据库**从来没真的"只有我能读"过**（A51①②）
 
-**Status:** open
+**Status:** ready-for-review（AC#1-AC#6 六框全勾；码与用例见本票 log 末段三枚 commit）
 **Type:** 安全（本机数据泄露面：同机其他用户/进程可读我们的私有数据）
 **Blocks:** nothing · **Blocked by:** nothing（`internal/memory/artifacts.go` 与 `internal/agent/spill.go` 此刻无人写）
 **Packages:** 新建一个 Windows ACL 的小工具文件（建议 `internal/acl/` 或 `internal/winsec/`，**由你定，但要在票面写理由**）
@@ -21,23 +21,23 @@
 
 ## 判据要先于实现（这票最容易"写了 API 但没测到东西"）
 
-- [ ] **AC#1** 先给**基线证据**：真机上把这四类各建一个文件（artifact / secret blob / `wisp.db` / staging 临时件），
+- [x] **AC#1** 先给**基线证据**：真机上把这四类各建一个文件（artifact / secret blob / `wisp.db` / staging 临时件），
       用 `icacls <path>` 打印**实际 ACL**，逐条贴原文。⚠ **不许用 Go 的 `FileInfo.Mode()` 当证据**——
       它给的就是那套被 Windows 忽略的假位。
-- [ ] **AC#2** 定**方向**（写进票面并说明为什么）：给**文件**逐个设 DACL，还是给 **data 根目录**设一次、
+- [x] **AC#2** 定**方向**（写进票面并说明为什么）：给**文件**逐个设 DACL，还是给 **data 根目录**设一次、
       子项继承？后者覆盖面大但要求目录已存在且早于任何写入 ⇒ **建目录与建文件的先后**必须有用例钉住。
       两条路都要保证：**继承不能把权限放大**（拿 `icacls /inheritance` 之类的显式断言，别靠默认行为）。
-- [ ] **AC#3** 实现 + **真红过的判据**：在**当前用户之外还要有第二个账户或可读探针**才算证明。
+- [x] **AC#3** 实现 + **真红过的判据**：在**当前用户之外还要有第二个账户或可读探针**才算证明。
       拿不到第二账户时的**可接受替代**：断言 ACL 里只有当前 SID 有读写、且 `SYSTEM`/`Administrators` 之外的
       任何 SID 不出现；并跑一次 `icacls` 原文比对。**"我把 `0o600` 换成了调用 SetSecurityDescriptor"不算证明**——
       那只是写了代码，没测到东西。
-- [ ] **AC#4** A51② 那条单独钉：造一个"artifact 位置是指向目录的符号链接"，
+- [x] **AC#4** A51② 那条单独钉：造一个"artifact 位置是指向目录的符号链接"，
       断言 ①**不被递归删除**（链接目标目录里的文件必须还在），②给出**具名错误**而不是静默失败。
       ⚠ 若 Windows 上普通权限无法建符号链接，**就如实写"本机无法构造"并给出 CI 侧（Linux）等价构造**
       + 说明两个平台上这条判据各自的强度。**不许**因为"造不出来"就把这条判据删掉。
-- [ ] **AC#5** 失败方向必须是**收紧**：ACL 设不上时报错并**拒绝落盘**（或退到"不落敏感数据"），
+- [x] **AC#5** 失败方向必须是**收紧**：ACL 设不上时报错并**拒绝落盘**（或退到"不落敏感数据"），
       **绝不允许**"设不上就算了、继续以宽权限写"。判据用例：模拟一次失败注入 ⇒ 必须是错误。
-- [ ] **AC#6** 门禁（只跑你碰的包）：`gofmt -l` 空、`gofumpt -l <files>` 空、`go vet <pkgs>` rc=0、
+- [x] **AC#6** 门禁（只跑你碰的包）：`gofmt -l` 空、`gofumpt -l <files>` 空、`go vet <pkgs>` rc=0、
       `GOOS=linux go vet <pkgs>` **按包作用域** rc=0（⚠ 别用 `GOOS=linux go vet ./...`，那条在 Windows 主机上
       因 CGO=0 排除 sherpa 而永远 rc=1，A54③）、`go test -count=2 <pkgs>` rc=0 且逐条点名 `--- SKIP`/`--- FAIL`。
       ⚠ **非 Windows 平台上这条能力应当"显式不适用"而不是"静默通过"**：POSIX 侧要么测真实的 `0600`，
@@ -179,3 +179,41 @@
   `icacls tool-output-call_acl.txt -> [NT AUTHORITY\SYSTEM BUILTIN\Administrators DESKTOP-LVS7839\swq]`。
   ⚠ **没接的同族**（本票落点之外，要编排者拍板）：`models/downloader.go:224/:389`（staging，AC#1 实测同样带外来 ACE）、
   `config/migrate.go:83`+`config/parse.go:213`（0o600 配置备份）、`observe/logging.go:244`（0o644 日志）、`ball/position.go:77`。
+
+- [x] **AC#6 门禁（只跑本票碰的包）**：
+  `gofmt -l internal/winsec internal/agent internal/memory internal/secret` 空；
+  `gofumpt -l . tools/d22scan tools/mockllm`（**全仓**，每次 commit 前重跑）空；
+  `go vet ./internal/winsec/ ./internal/agent/ ./internal/memory/ ./internal/secret/` rc=0；
+  `GOOS=linux go vet` 同四包（**按包作用域**，A54③）rc=0；
+  `go test -count=2` 同四包 rc=0（winsec 15.8s / agent 9.0s / memory 32.2s / secret 1.0s）。
+  **四种假绿逐条点名**：`--- SKIP` **0 条**；没有用 `-run` 过滤来交数（`-run` 只用于变异检验那两次，
+  且当时的红/绿名逐条列出）；`-count=2` 用 `-count=1 -v` 另跑一遍核对名字与条数
+  （**winsec 包 17 条具名结果**：AC#1 2、AC#2 1、AC#3 1+3 子、AC#4 3、AC#5 1+4 子、生产端到端 1、AC#5 happy-path 1……
+  全 PASS；另有 `internal/agent` 的 `TestAC3SpillArtifactLandsPrivate` 1 条走真 `Spiller.Prepare`），0 FAIL 0 SKIP；
+  没有"步骤被静默跳过"——POSIX 侧在 **Linux 真机**（docker alpine:3.20，交叉编译 `go test -c` 的二进制）跑出来：
+  `TestPOSIXPrivateFileIsReally0600` / `TestPOSIXPrivateDirIsReally0700` /
+  `TestPOSIXSymlinkAtArtifactPositionIsNotRecursed` / `TestPOSIXMissingFileIsNotAnError` **全 PASS + 真断言真 0600**，
+  `TestAC5*`（1+4 子）在 Linux 上同样 PASS ⇒ Linux 侧共 **10 条具名结果、0 SKIP**：非 Windows 平台不是"跳过"，是"测另一套机制"。
+  ⚠ 一个**格式化工具互相打架**的坑记下来：`gofumpt -w` 生成的多返回值 map 字面量缩进 `gofmt -l` 不认（两把尺子互斥），
+  本仓两把都要空 ⇒ 改成先赋值再 return 的写法，两边都满意。
+- [x] **变异检验 #2（AC#2 承载行）**：锚点 = `winsec_windows.go:53` 的
+  `windows.DACL_SECURITY_INFORMATION|windows.PROTECTED_DACL_SECURITY_INFORMATION`；
+  去掉 `PROTECTED` 后（可编译、行为改变，不是编译失败）：
+  `--- FAIL: TestAC3SealedWritesCarryNoForeignSID/{artifact-exclusive,secret-blob,staging-temp}` +
+  `--- FAIL: TestAC2SealedDirCoversFilesItNeverTouched`，红因是 OS 读回的原文自己招了：
+  `D:AI(A;;FA;;;SY)(A;;FA;;;BA)(A;;FA;;;S-1-5-21-…-1001)(A;ID;0x1200a9;;;WD)(A;ID;FA;;;BA)…`
+  ⇒ **`WD`(Everyone) 带着 `0x1200a9`（读+执行）从父目录长了进来**，"继承会放大权限"被实测出来，
+  而且运行时 `verifyPrivate` 当场拒绝落盘（失败方向=收紧）。
+  还原后 `git diff --quiet -- internal/winsec/winsec_windows.go` 干净，`grep -rn MUTATION-89 --include=*.go .` = 0 命中。
+
+**交回前还剩什么（诚实）**：本票落点之外的同族 `0o600/0o755` 站点**没有全接**：
+`models/downloader.go:224/:389`（staging，AC#1 实测带外来 ACE）、`config/migrate.go:83` +
+`config/parse.go:213`、`observe/logging.go:72/:244`（0o644 日志）、`ball/position.go:73/:77`、
+`secret/migrate.go:154/:168`、`cmd/wisp/doctor.go:248`、`cmd/wisp/slo_windows.go:559`（禁改区）。
+接线都是一行级的替换，但要有人裁决"日志/模型缓存算不算私有数据"。
+
+  next= 编排者：(1) 三枚 commit（`b994a2c`→`de15a6b`→`57bdbb2`+本次这枚）已过全部署门禁，可派验收；
+  (2) 上面那串同族站点要不要一起收（建议开一张小票，或并到票 90 的"权限模式"里）；
+  (3) A51② 需要更正登记：**本机 Go 1.27/Win11 实测 `os.Remove` 能删指向非空目录的 junction**
+  （票 79 的观察在这台机上不复现，但目标内容存活被双向断言了），目录符号链接仍受特权限制、构造放在 Linux 侧；
+  (4) 验收若要"第二账户真的读不到"的更强证据，需要一台能 `runas` 的机器（本箱拿不到那两个沙箱账户的口令）。

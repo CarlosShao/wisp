@@ -250,14 +250,13 @@ func allowedSIDStrings() (allowed, me map[string]bool, err error) {
 	if u.Uid == "" || !strings.HasPrefix(u.Uid, "S-") {
 		return nil, nil, fmt.Errorf("winsec: current user has no SID: %q", u.Uid)
 	}
-	return map[string]bool{
-			"SY": true, sidSystem: true,
-			"BA": true, sidAdmins: true,
-			u.Uid: true,
-		}, map[string]bool{
-			u.Uid: true,
-			"ME":  true,
-		}, nil
+	allowed = map[string]bool{
+		"SY": true, sidSystem: true,
+		"BA": true, sidAdmins: true,
+		u.Uid: true,
+	}
+	me = map[string]bool{u.Uid: true, "ME": true}
+	return allowed, me, nil
 }
 
 // aceGroups pulls the parenthesised ACEs out of an SDDL descriptor string.
