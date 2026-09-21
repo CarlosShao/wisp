@@ -408,6 +408,20 @@
   **完成判据**：① mutation 检验先行——把 `hkNames` 前两项对调，若默认套件与 winlive **全绿**，即证明今天无人看管，
   该记录留在 `docs/evidence/s1/64-*`；②改成具名单表后**重跑同一变异**，必须有测试转红；
   ③四项 `Problems()` 句子与 `RegisteredHotkeys()` 集合逐 id 对得上（正向断言，不只断"不 panic"）。
+  - **✅ 判据① 已于 2026-09-21 08:38 执行，结论是"有人看管"那一支**（编排者亲自跑，桌面与测试窗当时空着：
+    `tasklist` 无 `go.exe`）。变异**先证落地**（`grep -n MUTATION-A16` 出 `:35`/`:36` 两行）再跑
+    `go test -tags winlive -count=1 -v ./internal/ball/` ⇒ **`MUTATED_EXIT=1`，6 条转红**：
+    `TestLiveHotkeyRebindEndToEnd`、`TestLiveHotkeyOccupiedVsNotAttempted`、`TestLiveMuteHotkeyEndToEnd`、
+    `TestRegisterAllLiveSet`、`TestRegisterAllSplitsFailureFamilies`、`TestHotkeyReloaderRebindsOnConfigChange`
+    （64 条 `=== RUN` / 51 PASS / 6 FAIL；原始日志 `docs/evidence/s1/64-winline-retest-2026-09-21/a16-mutation-red.log`）。
+    还原后复跑 `ok 12.189s`、`grep -c MUTATION-A16`=0、`git status --short internal/ball/` 空。
+    ⇒ **我 08:35 那条自我更正（"保护是副作用而非意图"）成立**：`hkNames` 顺序被动确实会被咬，
+    咬点是"四槽状态各不相同 ⇒ 换序会把状态搬到错误的 id"这一族断言。**静默错位今天不存在**。
+  - **但这条不该被当作"已解决"**：挡住换序的是**巧合的形状**（四槽状态恰好互不相同），不是**意图**。
+    真会变静默的时刻是**加第五个热键**那天（第 5 项与第 5 个配置字段谁先忘都不一定有测试红）
+    ⇒ **判据②③ 与修法（具名单表）绑到票 39 的"第五热键"那一批**，本条保持 open 但**优先级下调**，
+    且**禁止**用"保留 zip + 补一条顺序断言"交差（原登记已写明理由：断言挡不住下一个人只改一侧）。
+
   **当前残缺表现**：今天顺序恰好对，**所以没有任何用户可见故障**；这是纯潜在缺陷，
   但在加第五个热键（票 39 配置 GUI 必然要加）之前不修，就会变成"改一处顺序、四个键悄悄串位"。
   **归属**：票 64 已 `review` 且本票声明不碰球码 ⇒ **归票 21 段 2 的同批球面改动，或独立小票**；

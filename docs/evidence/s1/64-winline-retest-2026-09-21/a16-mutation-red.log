@@ -1,0 +1,150 @@
+=== RUN   TestDockGeometryShape
+--- PASS: TestDockGeometryShape (0.00s)
+=== RUN   TestDockTangentMeansGapZero
+--- PASS: TestDockTangentMeansGapZero (0.00s)
+=== RUN   TestDockPosKeepsTheOrbTangentAtEveryRampLevel
+--- PASS: TestDockPosKeepsTheOrbTangentAtEveryRampLevel (0.00s)
+=== RUN   TestDockSquashIsMonotonicAndClamped
+--- PASS: TestDockSquashIsMonotonicAndClamped (0.00s)
+=== RUN   TestDockProgressReadsThePush
+--- PASS: TestDockProgressReadsThePush (0.00s)
+=== RUN   TestNearestDockEdgePicksTheEdgeYouPushed
+--- PASS: TestNearestDockEdgePicksTheEdgeYouPushed (0.00s)
+=== RUN   TestDockedLeavesAHittableStrip
+--- PASS: TestDockedLeavesAHittableStrip (0.00s)
+=== RUN   TestDockFreePosKeepsTheBallReachable
+--- PASS: TestDockFreePosKeepsTheBallReachable (0.00s)
+=== RUN   TestDockOnSecondaryMonitorWithNegativeOrigin
+--- PASS: TestDockOnSecondaryMonitorWithNegativeOrigin (0.00s)
+=== RUN   TestDockHoverPopBackWalksTheRampHome
+--- PASS: TestDockHoverPopBackWalksTheRampHome (0.00s)
+=== RUN   TestDockRampWalksItsBudget
+--- PASS: TestDockRampWalksItsBudget (0.00s)
+=== RUN   TestLiveHotkeyRebindEndToEnd
+    hotkey_live_test.go:78: summon registered as VK 0x4D, want 'Q' (0x51)
+--- FAIL: TestLiveHotkeyRebindEndToEnd (0.38s)
+=== RUN   TestLiveHotkeyOccupiedVsNotAttempted
+2026/09/21 08:37:47 ERROR hotkey occupied by another program, not registered hotkey=mute binding=Ctrl+Alt+U err="Hot key is already registered."
+    hotkey_live_test.go:180: squatted binding reported "live", want occupied-by-another-app
+--- FAIL: TestLiveHotkeyOccupiedVsNotAttempted (0.08s)
+=== RUN   TestLiveMuteHotkeyEndToEnd
+    hotkey_live_test.go:285: the registered Ctrl+Alt+M never reached OnMuteHotkey (fired=map[mute-cb:1 state:Muted:1])
+--- FAIL: TestLiveMuteHotkeyEndToEnd (2.10s)
+=== RUN   TestLiveSleepingZeroTimerHandles
+--- PASS: TestLiveSleepingZeroTimerHandles (1.59s)
+=== RUN   TestRegisterAllLiveSet
+    hotkey_status_test.go:82: live accelerators wrong: map[1:{Mods:16387 VK:77} 2:{Mods:16387 VK:81} 3:{Mods:16384 VK:27} 4:{Mods:16387 VK:80}]
+--- FAIL: TestRegisterAllLiveSet (0.00s)
+=== RUN   TestRegisterAllSplitsFailureFamilies
+2026/09/21 08:37:51 ERROR hotkey occupied by another program, not registered hotkey=mute binding=Ctrl+Alt+Q err="Hot key is already registered."
+2026/09/21 08:37:51 ERROR hotkey not attempted (bad binding) hotkey=panel binding=Ctrl+Alt+Bogus+ err="unknown key \"Bogus\" in hotkey \"Ctrl+Alt+Bogus+\""
+2026/09/21 08:37:51 INFO hotkey disabled (unset in config) hotkey=summon
+2026/09/21 08:37:51 INFO hotkey disabled (unset in config) hotkey=cancel
+2026/09/21 08:37:51 INFO hotkey disabled (unset in config) hotkey=panel
+    hotkey_status_test.go:122: unset mute = live, want disabled-and-not-attempted
+    hotkey_status_test.go:125: unset bindings reported live: [{Name:mute ID:2 Binding:Ctrl+Alt+Q Status:live Acc:{Mods:16387 VK:81} Err:<nil>} {Name:summon ID:1 Binding: Status:disabled (unset in config) Acc:{Mods:0 VK:0} Err:<nil>} {Name:cancel ID:3 Binding: Status:disabled (unset in config) Acc:{Mods:0 VK:0} Err:<nil>} {Name:panel ID:4 Binding: Status:disabled (unset in config) Acc:{Mods:0 VK:0} Err:<nil>}]
+--- FAIL: TestRegisterAllSplitsFailureFamilies (0.00s)
+=== RUN   TestUnregisterAllDropsKnownSlots
+--- PASS: TestUnregisterAllDropsKnownSlots (0.00s)
+=== RUN   TestHotkeyStatusString
+--- PASS: TestHotkeyStatusString (0.00s)
+=== RUN   TestHotkeyReloaderRebindsOnConfigChange
+2026/09/21 08:37:51 INFO ball: hotkeys rebound after config change summon=Ctrl+Alt+R mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=4
+    hotkey_status_test.go:226: live set still holds the old key: [{Name:mute ID:2 Binding:Ctrl+Alt+R Status:live Acc:{Mods:16387 VK:82} Err:<nil>} {Name:summon ID:1 Binding:Ctrl+Alt+M Status:live Acc:{Mods:16387 VK:77} Err:<nil>} {Name:cancel ID:3 Binding:Esc Status:live Acc:{Mods:16384 VK:27} Err:<nil>} {Name:panel ID:4 Binding:Ctrl+Alt+P Status:live Acc:{Mods:16387 VK:80} Err:<nil>}]
+--- FAIL: TestHotkeyReloaderRebindsOnConfigChange (0.00s)
+=== RUN   TestHotkeyReloaderSectionsHookIgnoresOtherSections
+2026/09/21 08:37:51 INFO ball: hotkeys rebound after config change summon=Ctrl+Alt+Q mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+J live=4
+--- PASS: TestHotkeyReloaderSectionsHookIgnoresOtherSections (0.00s)
+=== RUN   TestApplyHotkeyDefaults
+--- PASS: TestApplyHotkeyDefaults (0.00s)
+=== RUN   TestParseAccelerator
+--- PASS: TestParseAccelerator (0.00s)
+=== RUN   TestDefaultHotkeys
+--- PASS: TestDefaultHotkeys (0.00s)
+=== RUN   TestLiveClickSummonsAndDragDoesNot
+--- PASS: TestLiveClickSummonsAndDragDoesNot (0.08s)
+=== RUN   TestLiveConfirmingCancelAndEscReturned
+--- PASS: TestLiveConfirmingCancelAndEscReturned (0.10s)
+=== RUN   TestLiveNeverStealsFocus
+    interaction_live_test.go:309: SKIP-LOUD: SetCursorPos was refused, so this run did NOT click the orb with the physical pointer (asked (1720,696), pointer at (2033,662)). The NOACTIVATE style, the MA_NOACTIVATE answer and the unchanged foreground across the posted click were all asserted above.
+--- SKIP: TestLiveNeverStealsFocus (0.10s)
+=== RUN   TestLiveTransparentCornerFallsThrough
+--- PASS: TestLiveTransparentCornerFallsThrough (0.08s)
+=== RUN   TestLiquidRotationIsMonotonicInLevel
+--- PASS: TestLiquidRotationIsMonotonicInLevel (0.00s)
+=== RUN   TestLiquidConvergesAndBorderFadesInOnSilence
+--- PASS: TestLiquidConvergesAndBorderFadesInOnSilence (0.00s)
+=== RUN   TestSummonBurstIsBoundedAndRetires
+--- PASS: TestSummonBurstIsBoundedAndRetires (0.00s)
+=== RUN   TestMotionOnlyAppliesInPrototypeMode
+--- PASS: TestMotionOnlyAppliesInPrototypeMode (0.00s)
+=== RUN   TestBorderIsNeverAppliedInOneFrame
+--- PASS: TestBorderIsNeverAppliedInOneFrame (0.00s)
+=== RUN   TestBorderGlidesInAfterTheSessionEnds
+--- PASS: TestBorderGlidesInAfterTheSessionEnds (0.00s)
+=== RUN   TestSpeakingGlidesTheBorderBackOut
+--- PASS: TestSpeakingGlidesTheBorderBackOut (0.00s)
+=== RUN   TestTransitionTimerSetIsTheFrozenTimerSet
+--- PASS: TestTransitionTimerSetIsTheFrozenTimerSet (0.00s)
+=== RUN   TestSleepingFrameLosesTheBorderAuthority
+--- PASS: TestSleepingFrameLosesTheBorderAuthority (0.00s)
+=== RUN   TestLiquidDrivenStateSet
+--- PASS: TestLiquidDrivenStateSet (0.00s)
+=== RUN   TestPushLevelIsInputHardened
+--- PASS: TestPushLevelIsInputHardened (0.00s)
+=== RUN   TestRepaintIsSkippedWhenNothingChanged
+--- PASS: TestRepaintIsSkippedWhenNothingChanged (0.00s)
+=== RUN   TestBallLiveLifecycle
+    live_windows_test.go:130: handles: base=372 peak-suite=373 (gate <600)
+    live_windows_test.go:79: HANDLES base=372 afterNew=374 afterClose=372 delta=0 | USER objs base=6 afterClose=6
+--- PASS: TestBallLiveLifecycle (2.04s)
+=== RUN   TestBallLivePositionPersistence
+--- PASS: TestBallLivePositionPersistence (0.52s)
+=== RUN   TestBallLiveIdleBorderTransition
+--- PASS: TestBallLiveIdleBorderTransition (4.49s)
+=== RUN   TestBallLiveEdgeDock
+--- PASS: TestBallLiveEdgeDock (0.34s)
+=== RUN   TestBallLiveEdgeDockHover
+    live_windows_test.go:590: pop-out driven by cursor
+--- PASS: TestBallLiveEdgeDockHover (0.30s)
+=== RUN   TestBallLiveAudioLiquidGate
+--- PASS: TestBallLiveAudioLiquidGate (1.12s)
+=== RUN   TestPositionStoreRoundTrip
+--- PASS: TestPositionStoreRoundTrip (0.01s)
+=== RUN   TestResolvePosition
+=== RUN   TestResolvePosition/saved_visible_on_its_monitor:_kept
+=== RUN   TestResolvePosition/saved_partially_off_right_edge:_clamped
+=== RUN   TestResolvePosition/saved_monitor_detached:_primary_default
+=== RUN   TestResolvePosition/nothing_saved:_primary_default
+=== RUN   TestResolvePosition/saved_point_on_no_monitor:_that-monitor_default_impossible_->_primary
+=== RUN   TestResolvePosition/primary_detection_when_listed_second
+--- PASS: TestResolvePosition (0.00s)
+    --- PASS: TestResolvePosition/saved_visible_on_its_monitor:_kept (0.00s)
+    --- PASS: TestResolvePosition/saved_partially_off_right_edge:_clamped (0.00s)
+    --- PASS: TestResolvePosition/saved_monitor_detached:_primary_default (0.00s)
+    --- PASS: TestResolvePosition/nothing_saved:_primary_default (0.00s)
+    --- PASS: TestResolvePosition/saved_point_on_no_monitor:_that-monitor_default_impossible_->_primary (0.00s)
+    --- PASS: TestResolvePosition/primary_detection_when_listed_second (0.00s)
+=== RUN   TestDefaultPositionInsideWorkArea
+--- PASS: TestDefaultPositionInsideWorkArea (0.00s)
+=== RUN   TestTokenGoldenValues
+--- PASS: TestTokenGoldenValues (0.00s)
+=== RUN   TestPremultipliedDerivation
+--- PASS: TestPremultipliedDerivation (0.00s)
+=== RUN   TestNoHardcodedColorsInBallPackage
+--- PASS: TestNoHardcodedColorsInBallPackage (0.01s)
+=== RUN   TestVisualForCoversAllTwentyStates
+--- PASS: TestVisualForCoversAllTwentyStates (0.00s)
+=== RUN   TestSleepingSizeTruthTable
+--- PASS: TestSleepingSizeTruthTable (0.00s)
+=== RUN   TestRecordedSleepingDiffBoxIsNotA44pxBody
+--- PASS: TestRecordedSleepingDiffBoxIsNotA44pxBody (0.00s)
+=== RUN   TestAnimatedWhitelist
+--- PASS: TestAnimatedWhitelist (0.00s)
+=== RUN   TestAnimationPolicyZeroTimerInSleeping
+--- PASS: TestAnimationPolicyZeroTimerInSleeping (0.00s)
+=== RUN   TestHitTestAndDPIInjection
+--- PASS: TestHitTestAndDPIInjection (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/ball	13.435s
+FAIL
