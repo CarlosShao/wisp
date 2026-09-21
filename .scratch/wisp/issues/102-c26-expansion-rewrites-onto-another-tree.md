@@ -59,6 +59,70 @@
 ⚠ 共树：`internal/winsec/`+`internal/secret/` 刚被 `agent-ticket89b` 改过（验收在跑），
 `cmd/wisp/`+`internal/perm/` 刚被票 101 改过（验收在跑）⇒ **动这两个包之前先在票面登记**。
 
+## AC#1 修前红名与断言原文（复现先于任何改码；本段写于改码之前）
+
+用例：`internal/risk/pathresolver_expansion_test.go`（包内可重跑，不是临时探针）。
+命令：`go test -count=1 -v -run TestC26ExpansionMustNotRewriteOntoAnotherTree ./internal/risk/`
+读数：**`=== RUN` 3 条（1 父 + 2 子用例）· 2 子用例全 `--- FAIL` · 6 条断言红 · 0 SKIP**。
+
+红名：
+- `TestC26ExpansionMustNotRewriteOntoAnotherTree/percent_env_var_spelling`
+- `TestC26ExpansionMustNotRewriteOntoAnotherTree/leading_tilde_spelling`
+
+断言原文（helper `requireSameTreeOrRefusal`）：
+
+```
+FAIL-OPEN: <leg> acted on a tree the caller did not name and reported success (err = nil)
+  caller's spelling : %s
+  requested tree    : %s
+  tree acted upon   : %s
+  invariant         : 结果树与请求树必须同一棵，否则必须报错
+```
+
+本机实测三行（就是 PROBE B2 的形状，`err = nil`）：
+
+```
+caller's spelling : C:\…\a%WISP102PROBE_TARGET%b\artifacts
+tree acted upon   : C:\…\aelsewhereb\artifacts                 ← 另一棵树
+前导 ~           : ~\wisp102-tilde-probe\artifacts → C:\Users\swq\wisp102-tilde-probe\artifacts
+```
+
+三条生产腿各红两次（`%VAR%` 与 `~` 各一）：`c26Pipeline.Resolve`（装进 winsec 的那条适配器）、
+`winsec.ResolvePath`（封存调用方看到的"成功/失败"）、`syncSet.resolveTarget`（fs.write 的 sync 判定）。
+⚠ "请求树"用的是包内已获准的词法步 `lexCanonical`（`filepath.Abs`+`Clean` 仍只在 `pathresolver.go` 里），
+没有新增第二套规范化，也没有给 D22 添表面。
+
+## 修法判定：选 (B)；D22 未触发停手（契约确实 mandates 展开，原句在下面）
+
+契约原句（逐字，能引出来才继续动手）：
+- `docs/specs/SPEC-06-security-gatekeeping.md:50`：`展开(env / ~) → 绝对化 → Clean → 打开句柄取 GetFinalPathNameByHandle(VOLUME_NAME_DOS) 真实路径`
+- `docs/PLAN.md:2375`：**修复 = C26 `PathResolver`，唯一入口**：
+  `展开(env/~)` → `绝对化` → `Clean` → **打开句柄取 `GetFinalPathNameByHandle(VOLUME_NAME_DOS)` 得到真实路径**
+- `docs/PLAN.md:1376`：**C26** **`PathResolver`** | **唯一**的路径规范化入口：展开 → 绝对化 → 取句柄真实路径 …
+  **白名单与黑名单都必须经它**
+
+⇒ 展开是契约**明写的 pipeline 第一步**（不是实现自己加的）。(A)「入口直接拒绝 `%VAR%`/`~`」等于把
+契约的一步删掉，而且 `SPEC-06 §4.1` 的 A 档黑名单本身就用 `~/.git-credentials`、
+`%APPDATA%\wisp\config.toml` 这种拼写（`docs/specs/SPEC-06-security-gatekeeping.md:63-66`），
+入口拒绝展开会让"黑名单经 C26"这条落不了地 ⇒ **(A) 是改契约语义，本票不选，也不需要 owner 批文本**。
+选 **(B)**：展开照旧（契约要求），但**改写必须显式记账**，凡拿它做安全决定的路径必须读这个账。
+本票只动 `internal/risk/` 的实现与 `internal/tools/` 的消费侧，
+`docs/PLAN.md`、`docs/specs/*.md` **一字未动** ⇒ D22 那道闸没有把我拦住，因为这是**修实现不是改契约**。
+
+**需要谁协调：无。** `internal/winsec/`、`internal/secret/`、`cmd/wisp/`、`internal/perm/` 本票**只调用不改**
+——拒绝发生在 `internal/risk/winsec_c26.go` 这条适配器腿上，winsec 原样传播 error（`resolve.go:113-119` 的
+`%w` 包装），封存因此失败而不是"封了另一棵还报成功"；测试 import winsec 是只读引用
+（`risk → winsec` 边本来就存在，见 `winsec_c26.go:3`）。
+
+## 未勾原因：以下 AC 还在做
+
+- **AC#2** 处置表（写完实现后逐点登记，含"要不要消费改写标记/是否拒绝"）。
+- **AC#3** 双向变异（/tmp 仓外快照）。
+- **AC#4** 门禁读数。
+- **AC#5** "谁消费了这个字段"的静态判据。
+
+next= 实现 (B)：`Result` 加改写记账 + 一个必须读账才能拿到可行动树形的闸 + 四条腿逐个消费 + 静态判据用例。
+
 ## Progress log（append-only）
 
 - 2026-09-21 17:4x（编排者）：建票。来源是 `acceptor-ticket94` 的 R-a（它把它排在四条新账的第一条，
