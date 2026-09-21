@@ -170,6 +170,44 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: "Windows ACL sealing gate (internal/winsec's own tests, ticket 110)"
+        shell: bash
+        # WHY THIS STEP EXISTS (ticket 110 AC#1, read off run 35591482293): the
+        # string `ok github.com/CarlosShao/wisp/internal/winsec` appeared ZERO
+        # times in that run's logs. The windows job's two test steps covered
+        # proc/secret/config and one -run on ./internal/risk/. So the package
+        # that decides whether a path really gets an ACL - the subject of tickets
+        # 94/103/106 - has never been tested on CI in its own right; 106 read as
+        # "CI-confirmed" only because internal/secret calls into it downstream.
+        # That indirection is exactly what fails here: the bug class is the
+        # machine's own temp-dir DACL, which a developer laptop does not share
+        # (ticket 106's hole does not reproduce on the box that wrote it).
+        #
+        # WHY IT IS FIRST IN THE JOB (AC#5): Actions stops running steps after
+        # the first failed one, and this job already owns a step that has been
+        # red before (`cgo build smoke`, run 35551819606) plus a red `PathResolver
+        # junction` step documented above. A gate placed below those is a gate
+        # that never produces a verdict - the shape this repo has now been bitten
+        # by three times (A54 static scan behind `go vet`, A61 env assertion
+        # without `if: always()`, and this ticket's zero-coverage package). It
+        # needs neither third_party nor wisp.exe, so putting it above them costs
+        # nothing and no step was moved into skippability or given
+        # continue-on-error (D22 run-away mode 6).
+        #
+        # EXPECTED RED-OR-GREEN IS NOT KNOWN FROM HERE, AND NOTHING IS TUNED TO
+        # MAKE IT GREEN: on a windows dev host the package read === RUN=64 /
+        # PASS=28 / FAIL=4 / SKIP=0 at HEAD 84e43af (all four failures were
+        # ticket 108's deliberate red-before-fix probes in
+        # seam_bypass_108_windows_test.go, cured by 108 in c02c609), and
+        # === RUN=71 / PASS=35 / FAIL=0 / SKIP=0 at HEAD b878b30. Both readings
+        # are local; the runner's own temp DACL is the thing this gate exists to
+        # measure (ticket 106's hole does not reproduce on a dev laptop), so the
+        # verdict owed to this step is a CI step-level one. If it is red on its
+        # first run that is a finding to register, not something to relax: no
+        # assertion is weakened, no test is excluded by name, no
+        # continue-on-error, and the package stays in the list.
+        run: bash scripts/winsec-tests.sh
+
       - name: Cache third_party (deps.toml key)
         uses: actions/cache@v4
         with:
@@ -179,7 +217,7 @@ jobs:
       - name: "cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)"
         run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
 
-      - name: Portable windows tests (proc/secret/config)
+      - name: Portable windows tests (proc/secret/config/risk)
         # Same disease as the ubuntu step above (ticket 93): bare `go test` books
         # a SKIP as `ok`, and this scope contains one - internal/proc's
         # TestHelperProcess, the re-exec child entry point, which skips every
@@ -187,8 +225,26 @@ jobs:
         # because windows defaults to pwsh: an unaccounted SKIP here is now a
         # red step, and the one accounted case is named with its reason in the
         # log and re-verified against the compiled test binary on every run.
+        #
+        # ./internal/risk/ ADDED (ticket 110 AC#4, tightening - closes R-93-4):
+        # R-93-4 was "the windows leg has no step that really runs
+        # TestSyncRegistryProbeLive", and there is now step-level evidence for
+        # the answer. Measured on a windows host at HEAD 84e43af: the case
+        # SKIPS (`no registry-grade sync record on this machine`,
+        # syncdirs_windows_test.go:133), so putting it in the RUN denominator
+        # would be either a permanent red (runtests.sh treats SKIP as fatal, by
+        # design) or a false green (bare `go test` prints `ok`) - which is the
+        # exact byte pattern ticket 93 was created to make impossible. What the
+        # windows leg does now, and did not before, is re-verify the accounting
+        # on THIS platform: because risk is in the scope, portable-tests.sh
+        # resolves the ledger row against the compiled WINDOWS test binary via
+        # `go test -list` and prints the row with its class and reason in this
+        # step's log. Rename the test, delete it, or bury it under a build tag,
+        # and this step goes red. Widening the scope to all of internal/risk
+        # also moved 201 previously windows-untested assertions into the
+        # denominator (measured on that host: PASS=201 FAIL=0 SKIP=0, rc=0).
         shell: bash
-        run: bash scripts/portable-tests.sh ./internal/proc/ ./internal/secret/ ./internal/config/
+        run: bash scripts/portable-tests.sh ./internal/proc/ ./internal/secret/ ./internal/config/ ./internal/risk/
 
       - name: "PathResolver junction placeholder (real cases tickets 18/20)"
         # bash + runtests.sh (ticket 71 AC#3): the file that declares this test is
