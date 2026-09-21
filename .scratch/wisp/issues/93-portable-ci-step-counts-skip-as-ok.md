@@ -201,3 +201,39 @@ next=（本票留给下一手的具体命令）：
 4. 谁碰 `test-windows`：把 `-run TestSyncRegistryProbeLive` 接进 windows job（用 `runtests.sh`），
    那才是"这条只在 Windows 上参评"的真结论；今天它在 windows job 里没有任何步骤跑它。
 
+### 对抗验收段（append-only，`acceptor-93-106`，2026-09-21 19:12 CST；裁决表 `docs/evidence/s1/93-adversarial-acceptance.md`）
+
+- **总判 PASS WITH CONDITIONS。** 我不动 Status、不动任何勾框（票面 append-only ⇒ `[ ]`→`[x]` 会制造删除列），
+  下面只交**证据**，勾框由编排者落手。
+- **AC#4 的证据已具备（这条是我补的）**：run **`35591482293`**（head `440dd88`）→ job `test-core` **id=`106306750423`**
+  → **steps**（不读 job 颜色）`6|Environment fork assertion|success`、`7|Portable package tests (...)|success`。
+  该 job 日志我亲手 `gh api .../jobs/106306750423/logs` 拉的，逐字：`portable-tests.sh: platform=linux scope=[16 包]`、
+  `10 ledger entries, 7 accounted on this platform:`、`runtests.sh: OK ... top-level: PASS=540 FAIL=0 SKIP=0, === RUN=862`、
+  `four numbers: === RUN=862 --- PASS=540 --- FAIL=0 --- SKIP=0`。⇒ **新仪器在 CI 上真跑过并给过结论**（两侧：windows 腿
+  同 run 的 job `106306750494` step 6 `=== RUN=164 PASS=108 FAIL=0 SKIP=0`）。
+  ⚠ **它自己的预言要更正**：本段上方"期望读数"写的是"该步 conclusion 为 **failure** 并点名
+  `TestPathCanonicalizerAccountsForRewrittenRoots`" —— 实际 conclusion=**success**，同一条用例在该日志第 3041 行
+  `--- PASS`（被票 107 的返工在时间上超过了）⇒ 编排者勾 AC#4 时**不要去找那枚不存在的红色读数**，以上面四条原文为准。
+- **覆盖面 = 同分母**（我自己 `diff`）：`360efdf:.github/workflows/ci.yml` 的 16 个包模式 vs `scripts/portable-tests.sh`
+  的 scope 数组 **16 vs 16、diff 空**；`go list` 展开 windows **23** / linux **23** 且两侧集合相同 ⇒ 没有包被删出门禁。
+- **台账真的会红**（三发，全在 `git archive 440dd88` 的 /tmp 快照里，每发先 `go build` rc=0、同链 `grep -n` 证落地）：
+  ① 种 `t.Skip` 于 `internal/observe/clock_test.go:13` ⇒ `bash scripts/portable-tests.sh ./internal/observe/` **rc=1**，
+  四数 `RUN=47 PASS=46 FAIL=0 SKIP=1`，点名 `clock_test.go:13: ac936 seeded skip probe - not a real skip`；
+  ② 台账 no-op（`:182`）⇒ **rc=1**，红在**既有仪器** `tools/d22scan/runtests.sh`（票 71）身上、红名是**既有用例**
+  `TestSubprocessCrashWriter` + `TestSyncRegistryProbeLive`（`PASS=129 FAIL=0 SKIP=2 === RUN=230`）；
+  ③ 条目腐坏（台账里的测试改名）⇒ **rc=1** 并打印 `name NO TEST in the compiled test binary for windows`。
+  还原 `cmp` 证字节相同。
+- **`TestSyncRegistryProbeLive` 搬 tag 判"正当"**：`GOOS=linux go vet ./internal/risk/` **rc=0**、`GOOS=windows` **rc=0**、
+  `go list` 测试文件 **linux 12 / windows 15**（与本票交件段逐字对得上）、整包仍在 16 包分母里；
+  且它在 windows 侧**仍然 SKIP 并被台账第 7 条记账**（不是我 M1a 那发的红名之一 ⇒ 结论没被挡出 job）。
+- **F-1**：CI linux 腿该条现在 `--- PASS` ⇒ 本票不复现、也不背书"已修"，**归票 107**。
+  **F-2**：我判**负载假红 ⇒ 归票 86 的记账、不是回归**：同树隔离 3 样本 `0.285/0.309/0.365 ms/op`（全 PASS），
+  与四包 `-count=2` 并发加压下 `0.550 ms/op`（PASS），全部远低于 1 ms；阈值一字未动。
+- 残留（**验收期未顺手修任何缺陷**）：**R-93-1** AC#1 的 8/10 条只到"日志＋归档我抽验"档，补救=两侧窄 scope 重跑对数；
+  **R-93-2** 交件段对 AC#4 的期望读数方向写错（见上）；**R-93-3** `TestSyncRegistryProbeLive` 在 windows 腿**没有任何步骤跑它**
+  （`test-windows` 的 scope 不含 `./internal/risk/`）⇒ 票面 next=4 仍未做；**R-93-4** F-1 的 POSIX 形状未由我在容器里复现
+  （⚠ 记得 Git Bash 的 `docker run -v "C:\…"` 会静默挂空且 rc=0）。
+  **一处自纠（append-only，不改上文）**：R-93-3 那句括号里我写成了"不是我 M1a 那发的红名之一"，应为"**正是**"——
+  上面"台账真的会红"第②发已把 `TestSyncRegistryProbeLive` 列为红名；两说以②发与裁决表为准，原文保留不删。
+  next= 编排者据本段勾 AC#4；`internal/risk`/`internal/tools` 的 owner 各自搬 tag / 造第二卷后**删对应台账**（删了不会红，红的是"条目还在但测试不在"）。
+
