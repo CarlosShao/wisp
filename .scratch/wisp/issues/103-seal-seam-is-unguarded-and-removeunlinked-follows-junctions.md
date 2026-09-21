@@ -59,3 +59,36 @@
   另一个我明写的克制点：**入口展开那条（R-a）不在这张票**，它归**票 102**，因为它在冻结的 C26 实现里、
   影响面比 winsec 宽得多——放一张票会让"守卫"级别的活被"契约级"的活拖住（票 89/95 的分票理由同形）。
   next= 排 in **票 102 之后**（fail-open 优先），但可与它并行——只要不撞同一文件。
+
+- 2026-09-21 18:0x（`agent-ticket103`）开工登记 + **修前红**（本枚 commit 只含用例，生产码一行未动）：
+  `git log --oneline -5 -- internal/winsec/` 顶端是 `01e7007`（票 89 退回单#3#4），
+  `git status --porcelain internal/winsec/ internal/memory/` **空** ⇒ 没有人的未提交改动挡路，
+  我也没有覆盖任何东西；本轮只 commit 显式路径（两份新用例 + 本票面）。
+  新增用例两枚：`internal/winsec/seam_guard_windows_test.go`（`package winsec_test`，**故意放在包外**，
+  因为 AC#1 的威胁就是"包外能装"）与 `internal/memory/artifacts_junction_tripwire_windows_test.go`。
+  **实测红名 + 断言原文**（`go test -v`，`=== RUN` 5 条 winsec + 1 条 memory，全在里面）：
+  1. `TestAC1SeamRejectsARubberStampAndLeavesTheForeignDaclAlone` **FAIL（6 条 RED）**：
+     - `AC#1 leg 1 RED: a pass-through rubber stamp was installed into the sealing seam (now winsec_test.rubberStampResolver)`
+     - `AC#1 leg 1 RED: refusing the fake left no audit record naming it; log was:` （空日志）
+     - `AC#1 leg 2 RED: the refusal is not about the link, so this leg measures nothing: winsec: ...\data\link is not a directory`
+       （这条是**偶然红**的正确用法：今天 `PrivateDirAll` 确实报错，但报的是"不是目录"，与链接无关 ⇒
+       我把"拒的原因必须提到 reparse/ErrUnresolvedPath"写成断言，避免票 94 AC#3 那种"红在偶然原因"被当成绿）
+     - `AC#1 leg 3 RED: SealFile(...\data\link\sub\keep-me.txt) through a junction returned nil`
+     - `AC#1 leg 3 RED: S-1-1-0 was stripped from the foreign file, i.e. its DACL was rewritten: [S-1-5-18 S-1-5-32-544 S-1-5-21-...-1001]`
+     - `AC#1 leg 3 RED: foreign file DACL changed: before=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-...-1001] after=[S-1-5-18 S-1-5-32-544 S-1-5-21-...-1001]`
+     ⇒ **AC#1 的"什么都没发生不算绿"这一条已经能用 SID 级读数咬住**（外来文件的 `S-1-1-0` 由有到无）。
+  2. `TestAC1SeamIsSingleUse` **FAIL**：`AC#1 RED: the seam was re-installed from winsec_test.narrowOnlyResolverB ... it is not single-use`
+     （两枚**都能拒**的合法解析器之间可以随意换 ⇒ 注册口是活的读—改写。）
+  3. `TestAC2RemoveUnlinkedRefusesAPathThroughAJunction` **FAIL（2 条 RED，PROBE F 在树内复现）**：
+     - `AC#2 RED: RemoveUnlinked("...\data\link\sub\keep-me.txt") through a junction returned nil`
+     - `AC#2 RED: the foreign file behind the junction was deleted (GetFileAttributesEx ...ictim\sub\keep-me.txt: The system cannot find the file specified.)`
+     （只在临时目录里造 junction、删的是测试自己的临时文件，真数据零风险；`mklink /J` 无需特权。）
+  绿的对照组（同一次运行里点名，免得被当成"全红"）：
+  `TestAC2RemoveUnlinkedStillUnlinksAStandaloneLink` **PASS**（独立链接照旧只解链、不碰目标），
+  `TestAC1RefusedInstallLeavesTheSealWorking` **PASS**（AC#3② 要求的"必须仍有一条绿"的用例），
+  `TestAC2ReclaimWalkNeverDescendsIntoAJunction` **PASS**（tripwire 今天钉住的是
+  `WalkDir` 对 junction 只报一个条目：`walk over the junction entry reported [...rtifacts\junklink]`，
+  下降即红 ⇒ AC#3③ 的靶子）。
+  下一条命令：实现守卫（`SetPathResolver` 一次性 + 一致性探针 + 响亮审计；`ResolvePath` 对
+  resolver 的**答案**再跑一遍内置底线；`removeUnlinked` 动手前逐级查祖先链是不是链接），
+  然后跑 AC#4 的门与 AC#3 的三向变异。
