@@ -33,6 +33,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"runtime"
 	"slices"
 	"sort"
 	"strings"
@@ -48,27 +49,59 @@ type inv76Shape struct {
 	target string // absolute path the caller is naming
 }
 
-// inv76Shapes builds the four AC#1 shapes against a concrete layout:
+// inv76Sep names a nested component the way the RUNNING platform spells
+// nesting, so "a file one directory below the artifacts dir" is expressed once
+// and means the same physical thing on Windows and on Linux (ticket 81 AC#1:
+// the fixtures used to hard-code `\`, which is a directory boundary only on
+// Windows and an ordinary file-name character on Linux).
+func inv76Sep(parts ...string) string {
+	return strings.Join(parts, string(filepath.Separator))
+}
+
+// inv76Shapes builds the hostile caller-supplied components against a concrete
+// layout:
 //
-//	<root>\data\artifacts\           the store's artifacts dir
-//	<root>\data\                     the store's data dir
-//	<root>\Users\carlos\Documents\   a user dir the caller aims at
+//	<root>/data/artifacts/          the store's artifacts dir
+//	<root>/data/                    the store's data dir
+//	<root>/Users/carlos/Documents/  a user dir the caller aims at
+//
+// Every target is `filepath.Join(<dir the caller aims at>, <the name the caller
+// supplied>)`, i.e. the path the running OS actually resolves that string to —
+// that is what "the file the caller named" means, and it is the only honest
+// form on both platforms.
 func inv76Shapes(artifactsDir, dataDir, userDir string) []inv76Shape {
 	driveTarget := filepath.Join(userDir, "canary-drive-letter.txt")
 	uncOf := func(p string) string {
 		// C:\Users\... -> \\localhost\C$\Users\...
+		// A UNC path is a Windows-shaped STRING, and that is fine: the claim
+		// pinned here is "the guard refuses it", which holds identically on
+		// both platforms (validArtifactName rejects `\` and `:` outright).
 		return `\\localhost\` + string(p[0]) + `$` + p[2:]
 	}
 	return []inv76Shape{
 		{
 			sub:    "separator",
-			name:   `nested\canary-separator.txt`,
-			target: filepath.Join(artifactsDir, `nested\canary-separator.txt`),
+			name:   inv76Sep("nested", "canary-separator.txt"),
+			target: filepath.Join(artifactsDir, "nested", "canary-separator.txt"),
+		},
+		{
+			// The literal `\` spelling, KEPT ON PURPOSE. It means "nested" on
+			// Windows and "one flat file whose name contains a backslash" on
+			// Linux, and that asymmetry is itself under test — see
+			// TestArtifactsLiteralBackslashIsNotAFixedSetOfBytes.
+			sub:    "separator_backslash_literal",
+			name:   `nested-backslash\canary-literal.txt`,
+			target: filepath.Join(artifactsDir, `nested-backslash\canary-literal.txt`),
 		},
 		{
 			sub:    "dotdot",
-			name:   `..\canary-dotdot.txt`,
+			name:   inv76Sep("..", "canary-dotdot.txt"),
 			target: filepath.Join(dataDir, "canary-dotdot.txt"),
+		},
+		{
+			sub:    "dotdot_backslash_literal",
+			name:   `..\canary-dotdot-literal.txt`,
+			target: filepath.Join(artifactsDir, `..\canary-dotdot-literal.txt`),
 		},
 		{
 			sub:    "drive_letter",
@@ -441,9 +474,6 @@ func TestArtifactsContainmentByDirectoryListing(t *testing.T) {
 	if err != nil {
 		t.Fatalf("PurgeArtifacts: %v", err)
 	}
-	if n != 2 {
-		t.Errorf("purge removed %d entries, want 2 (the 1 remaining file + the stray nested dir)", n)
-	}
 	added3, removed3 := inv76Diff(before, inv76Tree(t, root))
 	if len(added3) != 0 {
 		t.Errorf("purge added %v", added3)
@@ -454,17 +484,45 @@ func TestArtifactsContainmentByDirectoryListing(t *testing.T) {
 			t.Errorf("purge removed %s, outside the artifacts dir", r)
 		}
 	}
-	wantRemoved := []string{
-		artTree + "nested",
-		artTree + "nested/canary-separator.txt",
-		artTree + "real-1.txt", // the (d) positive control, still in this diff
-		artTree + "real-2.txt",
-	}
+	// The expectation is derived from the paths the fixture actually planted,
+	// not from a hard-coded list of slash-keys that only one platform can
+	// produce: a canary the OS resolved into a subdirectory contributes that
+	// directory as well, a canary it resolved to one flat name contributes only
+	// itself. Which of those each shape is happens per-platform (see
+	// inv76Shapes), and the set equality below still has the same teeth - an
+	// unexpected removal anywhere, the DB or the data dir or the user dir,
+	// fails on the name.
+	wantRemoved := inv76ReclaimKeys(artTree,
+		inv76Rel(root, filepath.Join(artifactsDir, "real-1.txt")), // the (d) control, already gone
+		inv76Rel(root, filepath.Join(artifactsDir, "real-2.txt")),
+		inv76Rel(root, inv76ShapeNamed(t, shapes, "separator").target),
+		inv76Rel(root, inv76ShapeNamed(t, shapes, "separator_backslash_literal").target),
+	)
 	if !slices.Equal(removed3, wantRemoved) {
 		t.Errorf("purge removed %v, want exactly %v", removed3, wantRemoved)
 	}
-	if _, err := os.Stat(filepath.Join(artifactsDir, "nested")); !errors.Is(err, fs.ErrNotExist) {
-		t.Errorf("the stray nested dir survived a purge (err=%v); ticket 79 says it must not", err)
+	// PurgeArtifacts counts FILES it reclaimed, not directories: the listing
+	// already proved which entries left the tree, so the count is asserted
+	// against the file entries the fixture planted in the artifacts tree (minus
+	// the one (d) deleted), which is again derived, not hard-coded per platform.
+	wantFiles := 0
+	for k, isDir := range before {
+		if isDir || !strings.HasPrefix(k, artTree) {
+			continue
+		}
+		wantFiles++
+	}
+	if wantFiles < 3 {
+		t.Fatalf("the fixture planted only %d artifact files, the count cannot discriminate", wantFiles)
+	}
+	if n != wantFiles-1 {
+		t.Errorf("purge removed %d files, want %d (every artifact-tree file in the fixture except the one (d) deleted; entries %v)",
+			n, wantFiles-1, wantRemoved)
+	}
+	for _, sh := range []string{"nested", "nested-backslash"} {
+		if _, err := os.Stat(filepath.Join(artifactsDir, sh)); !errors.Is(err, fs.ErrNotExist) {
+			t.Errorf("the stray %q dir survived a purge (err=%v); ticket 79 says it must not", sh, err)
+		}
 	}
 	if entries, err := os.ReadDir(artifactsDir); err != nil || len(entries) != 0 {
 		t.Errorf("artifacts dir is not empty after a purge: %d entries left, err=%v", len(entries), err)
@@ -472,6 +530,78 @@ func TestArtifactsContainmentByDirectoryListing(t *testing.T) {
 	if _, err := os.Stat(dataDir); err != nil {
 		t.Errorf("the data dir must survive a purge: %v", err)
 	}
+}
+
+// TestArtifactsLiteralBackslashKeepsItsAsymmetry is ticket 81 AC#1's other half:
+// the literal-`\` fixture must STAY platform-specific, deliberately. The same
+// caller-supplied bytes are a directory boundary on Windows and an ordinary
+// character inside one file name on Linux — where ticket 79's encoder percent-
+// escapes them, so a long flat name is the CORRECT artifact of that route.
+// Pinning the asymmetry is what stops a future edit from "fixing portability" by
+// deleting the backslash case (AC#1 forbids that), and it is what stops the
+// platform-neutral separator case from quietly being the only thing measured.
+//
+// There is no build tag on this file and there must not be one: this test is the
+// proof that both platforms run it and see different, asserted, physics.
+func TestArtifactsLiteralBackslashKeepsItsAsymmetry(t *testing.T) {
+	s, _, _, _, shapes := inv76Fixture(t)
+	artifactsDir := s.ArtifactsDir()
+
+	lit := inv76ShapeNamed(t, shapes, "separator_backslash_literal")
+	neu := inv76ShapeNamed(t, shapes, "separator")
+
+	// Each shape's target is defined as "where this OS resolves the caller's
+	// string", so both must exist on both platforms — this is the part that used
+	// to be spelled with a hard-coded `\` and therefore only held on Windows.
+	for _, sh := range []inv76Shape{lit, neu} {
+		if _, err := os.Stat(sh.target); err != nil {
+			t.Fatalf("shape %q: the file the caller named is not at %s on this platform: %v",
+				sh.sub, sh.target, err)
+		}
+	}
+	// The separator shape nests on BOTH platforms; that is the whole point of
+	// building its name from filepath.Separator.
+	if d := filepath.Dir(neu.target); !strings.HasSuffix(d, "nested") {
+		t.Errorf("the platform-neutral shape resolved to %s, not one level under a nested dir", d)
+	}
+	if _, err := os.Stat(filepath.Dir(neu.target)); err != nil {
+		t.Errorf("the platform-neutral separator shape did not create a directory: %v", err)
+	}
+
+	// The literal shape nests on exactly one platform, and WHICH one is asserted
+	// from the platform's own separator rather than left to chance.
+	const litDirName = "nested-backslash" // the component before the `\`
+	entries, err := os.ReadDir(artifactsDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var sawFlatEntry bool
+	for _, e := range entries {
+		if e.IsDir() {
+			continue
+		}
+		if e.Name() == lit.name {
+			sawFlatEntry = true
+		} else if strings.Contains(e.Name(), `\`) {
+			t.Errorf("a top-level entry name contains a backslash but is not the pinned fixture: %q", e.Name())
+		}
+	}
+	_, dirErr := os.Stat(filepath.Join(artifactsDir, litDirName))
+	wantFlat := filepath.Separator != '\\'
+	if got := litDirName + `\canary-literal.txt`; got != lit.name {
+		t.Fatalf("the fixture this test pins has drifted from the spelling it asserts: %q vs %q", lit.name, got)
+	}
+	if sawFlatEntry != wantFlat {
+		t.Errorf("literal-backslash entry flat in the artifacts listing = %v, want %v (separator %q)",
+			sawFlatEntry, wantFlat, filepath.Separator)
+	}
+	if nested := dirErr == nil; nested == wantFlat {
+		t.Errorf("literal-backslash shape created a directory named %q on a platform whose separator is %q (dir present=%v, want %v)",
+			litDirName, filepath.Separator, nested, !wantFlat)
+	}
+	t.Logf("GOOS=%s separator=%q: literal-backslash name %q is %s",
+		runtime.GOOS, filepath.Separator, lit.name,
+		map[bool]string{true: "one flat file name", false: "a nested path"}[sawFlatEntry])
 }
 
 // ---------------------------------------------------------------------------
@@ -525,6 +655,57 @@ func inv76Rel(root, abs string) string {
 		return abs
 	}
 	return filepath.ToSlash(rel)
+}
+
+// inv76ShapeNamed pulls one shape out of the fixture by subtest name, so a
+// statement about a specific shape can say which one instead of re-deriving its
+// path and drifting away from inv76Shapes.
+func inv76ShapeNamed(t *testing.T, shapes []inv76Shape, sub string) inv76Shape {
+	t.Helper()
+	for _, sh := range shapes {
+		if sh.sub == sub {
+			return sh
+		}
+	}
+	t.Fatalf("fixture has no shape %q: the assertion naming it is measuring nothing", sub)
+	return inv76Shape{}
+}
+
+// inv76ReclaimKeys expands root-relative slash keys into the full set of
+// entries a recursive reclaim of exactly those paths must take away: every key
+// itself, plus every parent directory up to but not including artTree (the
+// artifacts dir itself survives a purge - ticket 79 reclaims entries under it,
+// never the root it was given).
+//
+// Deriving the expectation this way is what makes the containment claim
+// platform-neutral: on Windows the literal-backslash canary brings its
+// directory with it, on Linux it is one flat name and brings nothing, and both
+// answers fall out of the same rule rather than out of a hard-coded list.
+func inv76ReclaimKeys(artTree string, keys ...string) []string {
+	seen := map[string]bool{}
+	for _, k := range keys {
+		if !strings.HasPrefix(k, artTree) {
+			panic("inv76ReclaimKeys: key " + k + " is outside the artifacts tree")
+		}
+		for cur := k; ; {
+			seen[cur] = true
+			i := strings.LastIndex(cur, "/")
+			if i < 0 {
+				break
+			}
+			parent := cur[:i]
+			if parent+"/" == artTree || seen[parent] {
+				break // the artifacts dir itself is never reclaimed
+			}
+			cur = parent
+		}
+	}
+	out := make([]string, 0, len(seen))
+	for k := range seen {
+		out = append(out, k)
+	}
+	sort.Strings(out)
+	return out
 }
 
 func inv76Abs(root, rel string) string {

@@ -224,7 +224,10 @@ func TestSpillContainmentByDirectoryListing(t *testing.T) {
 		callerNamed = append(callerNamed, sh.callID)
 	}
 	// The nastiest accepted input: an id that, joined raw, resolves to
-	// <root>\ESCAPE-API-<n>.txt - out of the artifacts dir, out of the data dir.
+	// <root>/ESCAPE-API-<n>.txt - out of the artifacts dir, out of the data dir,
+	// on whatever platform is running. The third round is the same escape spelled
+	// with a literal backslash, which is a boundary here only on Windows; what it
+	// resolves to on Linux is asserted by the control below.
 	for i := 0; i < 3; i++ {
 		marker := "ESCAPE-API-" + string(rune('a'+i))
 		id := inv76aEscapeID(t, artifacts, root, marker)
@@ -233,6 +236,7 @@ func TestSpillContainmentByDirectoryListing(t *testing.T) {
 			errs = append(errs, fmt.Errorf("Prepare(escape id %q): %w", id, err))
 		}
 	}
+	callerNamed = append(callerNamed, inv76aEscapeIDWithSep(t, artifacts, root, "ESCAPE-LITERAL-BACKSLASH", `\`))
 	for _, e := range errs {
 		t.Error(e)
 	}
@@ -289,6 +293,48 @@ func TestSpillContainmentByDirectoryListing(t *testing.T) {
 	if err := os.Remove(unsanitized); err != nil {
 		t.Errorf("cleaning up the control file: %v", err)
 	}
+
+	// (d) THE SAME CONTROL, LITERARY-BACKSLASH SPELLING, WITH BOTH OUTCOMES
+	// ASSERTED. Ticket 81 AC#1: the `\` case is kept, not deleted, and the
+	// asymmetry is written down - on Windows it is a boundary and behaves like
+	// (c); on Linux it is an ordinary character, so the hand-rolled join cannot
+	// escape and lands as ONE flat file name inside the artifacts dir. That
+	// second outcome is the same physics ticket 79's encoder relies on, and it is
+	// the reason this file has no build tag: both platforms must be here to see
+	// their own answer.
+	lit := inv76aEscapeIDWithSep(t, artifacts, root, "CONTROL-literal", `\`)
+	litPath := filepath.Join(artifacts, "tool-output-"+lit+".txt")
+	t.Logf("literal-backslash control: id %q resolves to %q", lit, litPath)
+	if err := os.WriteFile(litPath, []byte("deliberate"), 0o644); err != nil {
+		t.Fatalf("literal-backslash control write failed (%s): %v", litPath, err)
+	}
+	afterLit := inv76aTree(t, root)
+	if filepath.Separator == '\\' {
+		if _, ok := afterLit["CONTROL-literal.txt"]; !ok {
+			t.Errorf("on Windows the literal backslash is a separator, so the control had to land outside the data dir; listing went to %q", litPath)
+		}
+	} else {
+		key := inv76aKeyOf(t, root, litPath)
+		if !strings.HasPrefix(key, "data/artifacts/") || !strings.Contains(key, `\`) {
+			t.Fatalf("on Linux the literal backslash must keep the control inside the artifacts dir as one flat name, got key %q", key)
+		}
+		if _, ok := afterLit[key]; !ok {
+			t.Errorf("the listing never saw the flat literal-backslash entry %q; keys: %v", key, inv76aSortedKeys(afterLit))
+		}
+		if _, ok := afterLit["CONTROL-literal.txt"]; ok {
+			t.Errorf("a backslash-only path escaped the data dir on a platform where that is not a separator")
+		}
+	}
+	if err := os.Remove(litPath); err != nil {
+		t.Errorf("cleaning up the literal-backslash control file: %v", err)
+	}
+	// Either way the data dir boundary held for the REAL route: nothing the
+	// controls proved reachable may exist from a Prepare call.
+	for _, m := range []string{"CONTROL-escape.txt", "CONTROL-literal.txt"} {
+		if _, err := os.Lstat(filepath.Join(root, m)); err == nil {
+			t.Errorf("the real route let something reach %s", filepath.Join(root, m))
+		}
+	}
 }
 
 // TestSpillIntoRealStoreThenDeleteStaysUnderDataDir is the two-route end to end
@@ -338,8 +384,20 @@ func TestSpillIntoRealStoreThenDeleteStaysUnderDataDir(t *testing.T) {
 
 	ctx := context.Background()
 	abs := filepath.Join(userDir, "diary.txt")
+	// A UNC path is a Windows-shaped string; on Linux it is simply a name no
+	// guard should ever build a path from, and that is what is asserted.
 	unc := `\\localhost\` + abs[:1] + "$" + abs[2:]
-	for _, bad := range []string{`nested\canary.txt`, `..\canary.txt`, abs, unc} {
+	// Each shape in both spellings: the running platform's own separator, which
+	// really does nest on either OS, and the literal backslash, which nests only
+	// on Windows. Both are refused on both platforms - ticket 81 AC#1 keeps the
+	// second one instead of deleting it.
+	for _, bad := range []string{
+		"nested" + string(filepath.Separator) + "canary.txt",
+		".." + string(filepath.Separator) + "canary.txt",
+		`nested\canary.txt`,
+		`..\canary.txt`,
+		abs, unc,
+	} {
 		if err := store.DeleteArtifact(ctx, bad); err == nil {
 			t.Errorf("DeleteArtifact(%q) accepted a caller-named path", bad)
 		}
@@ -492,7 +550,15 @@ func TestSpillAPITakesNoCallerControlledDestinationPath(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 // inv76aEscapeID builds a tool-call id that - if it ever reached a join
-// unsanitized - resolves to <root>\<marker>.txt.
+// unsanitized - resolves to <root>\<marker>.txt ON THE PLATFORM RUNNING THE TEST.
+//
+// The spelling uses filepath.Separator, not a literal backslash, because that is
+// what makes the control a control on Linux as well as on Windows: joined raw,
+// ".." + "/" pops a real component on both, while ".." + "\" pops nothing on
+// Linux and silently degrades the positive control into a file that stays put
+// (ticket 81: this exact fixture made AC#2 vacuous on ubuntu). The literal
+// spelling is still exercised, deliberately, by inv76aEscapeIDWith's caller -
+// its two different outcomes are asserted, not assumed.
 //
 // The arithmetic is measured, not assumed: artifactName glues "tool-output-"
 // onto the first "..", so that component becomes a LITERAL partial
@@ -509,17 +575,46 @@ func TestSpillAPITakesNoCallerControlledDestinationPath(t *testing.T) {
 // test should still hand to the real route.
 func inv76aEscapeID(t *testing.T, dir, root, marker string) string {
 	t.Helper()
+	return inv76aEscapeIDWithSep(t, dir, root, marker, string(filepath.Separator))
+}
+
+// inv76aEscapeIDWithSep is the same escape spelled with a separator of the
+// caller's choosing. Pass `\` to get the Windows-shaped literal: honoured as
+// nesting on Windows, an ordinary character in a single long file name on Linux.
+func inv76aEscapeIDWithSep(t *testing.T, dir, root, marker, sep string) string {
+	t.Helper()
 	rel, err := filepath.Rel(root, dir)
 	if err != nil {
 		t.Fatal(err)
 	}
 	depth := strings.Count(rel, string(filepath.Separator)) + 1
-	return strings.Repeat(`..\`, depth+2) + marker
+	return strings.Repeat(".."+sep, depth+2) + marker
 }
 
 func inv76aIsBareArtifact(rel string) bool {
 	return strings.HasPrefix(rel, "data/artifacts/") &&
 		strings.Count(strings.TrimPrefix(rel, "data/artifacts/"), "/") == 0
+}
+
+// inv76aKeyOf is how the probe names a physical path: root-relative, cleaned and
+// separator-normalised. Derived rather than written out so a Linux-only or
+// Windows-only expectation cannot creep back in.
+func inv76aKeyOf(t *testing.T, root, p string) string {
+	t.Helper()
+	rel, err := filepath.Rel(root, p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return filepath.ToSlash(filepath.Clean(rel))
+}
+
+func inv76aSortedKeys(tree map[string]bool) []string {
+	out := make([]string, 0, len(tree))
+	for k := range tree {
+		out = append(out, k)
+	}
+	sort.Strings(out)
+	return out
 }
 
 func inv76aTree(t *testing.T, root string) map[string]bool {

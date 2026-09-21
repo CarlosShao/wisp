@@ -1,6 +1,6 @@
 # 81 — 两份 containment 测试的**阳性对照是 Windows 形状**，ubuntu 上必红（票 76/79 的判据仪器在 Linux 上不自证）
 
-**Status:** open
+**Status:** in progress — AC#1 已落地（Windows 本机两侧绿），AC#2 的 Linux 侧/docker 实测、AC#3 全仓扫描、AC#4 门禁待交
 **Type:** 测试夹具的平台可移植性缺陷（不是生产洞，但**它让"防逃逸的那条判据"在 Linux 上等于没跑**）
 **Blocks:** 票 70 的 AC#2/AC#6（`test-core` 现在只剩 10 条红，其中 2 条就是本票）· **Blocked by:** nothing
 **Packages:** `internal/agent/spill_path_invariant_test.go`、`internal/memory/artifacts_path_invariant_test.go`
@@ -53,4 +53,20 @@ docker 挂载**快照**而不是工作树（别人的在飞改动会混进你的
 
 ## Progress log（append-only）
 
-（空）
+- **C1（AC#1 的代码侧）** 两份夹具改成平台无关表达，字面 `\` 一例保留并**显式钉住不对称**：
+  - `internal/memory/artifacts_path_invariant_test.go`：`inv76Shapes` 的 `separator`/`dotdot` 改用
+    `inv76Sep()`（`filepath.Separator`）拼，target 一律 `filepath.Join(被指的目录, 调用者给的名字)`
+    = "这台机器把它解析成哪儿"；新增 `separator_backslash_literal`、`dotdot_backslash_literal` 两例保留字面 `\`。
+    (e) 段原本硬编码 4 条 `data/artifacts/...` 键（Linux 上必然对不上），改为由夹具真实种下的路径经
+    `inv76ReclaimKeys` 派生（自己 + 被 OS 认可的父目录，artifacts 根本身不算）；purge 计数也不再硬编码 2，
+    改由 `before` 快照里 artifacts 树下的**文件**条数 -1 推得（`PurgeArtifacts` 的 n 只数文件，实测 Windows 6 键/3 文件）。
+    新增 `TestArtifactsLiteralBackslashKeepsItsAsymmetry`：同一串字节在 Windows 是两层、在 Linux 是一个扁平文件名，
+    两侧各自断言，并注明"加 build tag 就等于删掉这条判据"。
+  - `internal/agent/spill_path_invariant_test.go`：`inv76aEscapeID` 改用 `inv76aEscapeIDWithSep(..., string(filepath.Separator))`
+    （Linux 上 `..\` 不构成逃逸 ⇒ 阳性对照失效，这就是票面 ② 的根因）；字面 `\` 拼写保留为**第二条对照** (d)，
+    Windows 断言它落在 data dir 之外、Linux 断言它落回 artifacts 里成为一个扁平名；端到端用例的 `nested\canary.txt` /
+    `..\canary.txt` 扩成"平台分隔符 + 字面反斜杠"双拼写。
+  - Windows 本机：`gofmt -l` 空、`go vet ./internal/agent ./internal/memory` 无输出、
+    `-run 'Containment|LiteralBackslash|HostileShapes|StaysUnderDataDir|RejectsTheFour'` 两包 `ok`（0 SKIP / 0 FAIL）。
+  - AC#1 勾框**留到 Linux 侧绿了再打**——票面要的是两侧都跑，不在只测了一侧时就记完成。
+  next= docker `golang:1.27` 跑 `git archive` 快照，证明这两条在 Linux 上真跑且绿（AC#2(i)），然后做生产侧转义/守卫的变异检验
