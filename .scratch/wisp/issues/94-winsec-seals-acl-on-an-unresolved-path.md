@@ -122,6 +122,17 @@ d22scan: scope ban #8 cmd/              examined  25 Go files（含注释与 _te
 ⚠ 这条回归本身就是形状的一部分：把未接线的默认做成"响亮拒绝"会让 `internal/secret`/`internal/memory`
 两套 suite 红 **20+ 条**（它们不 link `internal/risk`），实测读数就是内置 verifier 存在的理由。
 
+**收尾全仓读数**（`/tmp/wisp94final-94` = `git archive 73cec78`，含本票三枚 commit）：
+`sh scripts/d22scan.sh` **rc=0**（墙钟 26.9s，台账与上表逐字相同：`bans #1-5 internal/=197 cmd/=20`、
+`ban #6 frontend/=37`、`#7 internal/tools/=17`、`#8 design/=16 frontend/=37 internal/=335 cmd/=25`）。
+`go test ./...` **rc=1，两条红，都不是本票引入的**（逐条归因）：
+① `cmd/wisp` `exit status 0xc0000135`（DLL 找不到）—— 同一枚红在**基线快照** `/tmp/wisp94base-94b`
+（HEAD=`15c649f`，本票动码之前）与当前工作树里**一模一样复现** ⇒ 环境/他票（`cmd/wisp/` 禁碰清单内）；
+② `internal/risk` `--- FAIL: TestResolvePerCallBudget`（30.291 ms/op vs 1 ms 预算）—— 那次读数是在
+与 `go test -count=2 -v ./internal/winsec/`（icacls/mklink 密集）+ 全树编译并发时取的；
+静默后 `go test -count=1 -run TestResolvePerCallBudget ./internal/risk/` **三次全 ok**（1.504s / 2.441s / 1.863s，多样本全报）。
+⇒ 这条是**仪器坑**（预算测试对 CPU 争用敏感），不是回归；本票没动 `pathresolver*.go` 一个字。
+
 **AC#3 变异（退回 `filepath.Abs`）的红名与证据**：锚点 = `internal/winsec/winsec.go` 的
 `dir, err := ResolvePath(path)` 那四行；同一条 `&&` 链里先 `grep -n "MUTATION-94"` 证落地、
 `go vet ./internal/winsec/` rc=0 证**不是编译失败**，然后：
