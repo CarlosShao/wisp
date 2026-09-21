@@ -176,7 +176,10 @@ func (m Mode) Screen(d Decision) Silenced {
 	}
 	// L2 and the strictest relaxed mode: high risk still asks.
 	if m == ModeAskHighRisk {
-		return Silenced{Level: L2, Mode: m}
+		return Silenced{
+			Level: L2, Mode: m,
+			Kept: "ask_high_risk 只静默 L1，本判定是 L2",
+		}
 	}
 	// auto_approve, L2. The red lines are the only thing left standing.
 	if why, immune := redLine(d); immune {
