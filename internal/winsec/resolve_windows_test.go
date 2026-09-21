@@ -44,27 +44,39 @@ func TestC26PipelineIsWiredIntoWinsec(t *testing.T) {
 }
 
 // TestAC3JunctionInputIsRefusedNotSealed is ticket 94 AC#3: a real unresolved
-// input - a data root whose component IS a junction - handed to the private
-// directory API. The promise is "either refuse, or seal the tree the filesystem
-// resolved to"; what is not allowed is sealing the tree the caller's *string*
-// pointed at, which with filepath.Abs is the tree behind the link.
+// input - a data root with a junction among its components - handed to the
+// private directory API. The promise is "either refuse, or seal the tree the
+// filesystem resolved to"; what is not allowed is sealing the tree the caller's
+// *string* pointed at, because with a lexical Abs those are different trees.
+//
+// The load-bearing leg is the one whose target ALREADY EXISTS behind the link:
+// that is where the pre-ticket-94 code silently succeeded and narrowed somebody
+// else's directory. A missing leaf is refused by the old code too, for an
+// accidental reason (Go's Lstat reports a junction as not-a-directory, so the
+// climb errored out), and an assertion that passes both before and after the fix
+// measures nothing - so it is kept as a second leg, never as the proof.
 //
 // Both resolver states are measured, because the guarantee must not depend on
 // which packages a binary links.
 func TestAC3JunctionInputIsRefusedNotSealed(t *testing.T) {
-	// Somebody else's tree, widened on purpose: after a refused seal the foreign
-	// read grant has to still be there, because "sealed" and "untouched" are only
-	// distinguishable by their difference. icacls text is the evidence this
-	// repository accepts (see acl_windows_test.go's header).
+	// Somebody else's tree, widened on purpose. Children keep the ACL they were
+	// born with, so a directory created under this parent carries the foreign
+	// read grant, which makes "it was sealed" observable as its removal - the
+	// only evidence this package accepts (see acl_windows_test.go's header).
 	outside := wideParent(t, "someone-elses-tree")
-	innocent := filepath.Join(outside, "keep-me.txt")
+	victim := filepath.Join(outside, "artifacts")
+	if err := os.Mkdir(victim, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	innocent := filepath.Join(victim, "keep-me.txt")
 	if err := os.WriteFile(innocent, []byte("not ours to seal"), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	before, _ := aclSIDs(t, outside)
-	if !containsSID(before, everyoneSID) {
-		t.Fatalf("the fixture seals nothing to refuse: no foreign grant in %v", before)
+	victimBefore, _ := aclSIDs(t, victim)
+	if !containsSID(victimBefore, everyoneSID) {
+		t.Fatalf("the fixture seals nothing to refuse: no inherited foreign grant on %v", victimBefore)
 	}
+	outsideBefore, _ := aclSIDs(t, outside)
 
 	own := filepath.Join(t.TempDir(), "data")
 	if err := winsec.PrivateDirAll(own, 0o700); err != nil {
@@ -73,54 +85,71 @@ func TestAC3JunctionInputIsRefusedNotSealed(t *testing.T) {
 	link := filepath.Join(own, "link")
 	mustJunction(t, link, outside)
 
-	// The input is what a caller actually builds: join the root onto the name the
-	// caller believes it owns, then go one level deeper that does not exist yet.
-	unresolved := filepath.Join(link, "artifacts")
-
-	t.Run("with C26 installed", func(t *testing.T) {
+	t.Run("existing directory behind the link", func(t *testing.T) {
 		if winsec.PathResolverInstalled() == nil {
 			t.Fatal("C26 is not installed, so this leg measured the fallback instead")
 		}
-		assertRefusedAndUntouched(t, unresolved, outside, before, innocent)
+		assertRefusedAndUntouched(t, victim, link, outside, outsideBefore, victimBefore, innocent)
+	})
+
+	t.Run("missing directory under the link", func(t *testing.T) {
+		if winsec.PathResolverInstalled() == nil {
+			t.Fatal("C26 is not installed, so this leg measured the fallback instead")
+		}
+		neverMade := filepath.Join(link, "spill-artifacts")
+		err := winsec.PrivateDirAll(neverMade, 0o700)
+		if !errors.Is(err, risk.ErrReparseDenied) {
+			t.Fatalf("no C26 refusal: %v", err)
+		}
+		if _, lErr := os.Lstat(neverMade); !errors.Is(lErr, os.ErrNotExist) {
+			t.Errorf("a refusal still created a directory behind the link: %v", lErr)
+		}
+		if _, sErr := os.Stat(filepath.Join(outside, "spill-artifacts")); sErr == nil {
+			t.Errorf("SEELED THE WRONG TREE: %s exists inside the link target", filepath.Join(outside, "spill-artifacts"))
+		}
 	})
 
 	t.Run("with only the built-in verifier", func(t *testing.T) {
 		installed := winsec.PathResolverInstalled()
 		winsec.SetPathResolver(nil)
 		t.Cleanup(func() { winsec.SetPathResolver(installed) })
-		err := winsec.PrivateDirAll(unresolved, 0o700)
-		if !errors.Is(err, winsec.ErrUnresolvedPath) {
-			t.Fatalf("the built-in verifier did not name its own refusal: %v", err)
+		assertRefusedAndUntouched(t, victim, link, outside, outsideBefore, victimBefore, innocent)
+		if !errors.Is(winsec.PrivateDirAll(filepath.Join(link, "spill-artifacts"), 0o700), winsec.ErrUnresolvedPath) {
+			t.Error("the built-in verifier did not name its own refusal")
 		}
-		assertRefusedAndUntouched(t, unresolved, outside, before, innocent)
 	})
 
-	// And the same tree, spelled without the link in it, still works: the refusal
-	// is about the traversal, not about the platform being unable to seal here.
-	if err := winsec.PrivateDirAll(filepath.Join(own, "artifacts-real"), 0o700); err != nil {
+	// And the same tree, spelled without the link in it, still gets sealed: the
+	// refusal is about traversing a reparse point, not about the platform being
+	// unable to make this directory private. If this leg fails, the fix above is
+	// refusing the world and the tests that passed are worth nothing.
+	if err := winsec.PrivateDirAll(victim, 0o700); err != nil {
 		t.Fatalf("PrivateDirAll of the real tree: %v", err)
 	}
-	assertPrivateACL(t, filepath.Join(own, "artifacts-real"))
+	assertPrivateACL(t, victim)
 }
 
-// assertRefusedAndUntouched is the whole AC#3 criterion in three measurements: an
-// error, nothing created behind the link, and the foreign tree still wide.
-func assertRefusedAndUntouched(t *testing.T, unresolved string, outside string, before []string, innocent string) {
+// assertRefusedAndUntouched is the AC#3 criterion in four measurements: it
+// refused, it said which resolver refused, the foreign directory kept every ACE
+// it was born with, and its contents are intact.
+func assertRefusedAndUntouched(t *testing.T, victim, link, outside string, outsideBefore, victimBefore []string, innocent string) {
 	t.Helper()
+	unresolved := filepath.Join(link, "artifacts") // the same object, reached through the junction
 	err := winsec.PrivateDirAll(unresolved, 0o700)
 	if err == nil {
-		t.Fatalf("PrivateDirAll sealed through a junction: %s", unresolved)
+		// Errorf, not Fatalf: the measurements below are the part that shows
+		// *what* it sealed, and "it returned success" alone under-reports the bug.
+		t.Errorf("PrivateDirAll returned success for a path whose tree lives behind a junction: %s", unresolved)
+	} else if !errors.Is(err, winsec.ErrUnresolvedPath) && !errors.Is(err, risk.ErrReparseDenied) {
+		t.Errorf("the refusal names neither C26 nor the built-in verifier, so it refused by accident: %v", err)
 	}
-	if _, lErr := os.Lstat(unresolved); !errors.Is(lErr, os.ErrNotExist) {
-		t.Errorf("a refusal still created the directory behind the link: %v", lErr)
+	after, afterNames := aclSIDs(t, victim)
+	if !equalSIDs(after, victimBefore) {
+		t.Errorf("WRONG TREE SEALED: %s went from %v to %v (%v)", victim, victimBefore, after, afterNames)
 	}
-	if _, sErr := os.Stat(filepath.Join(outside, "artifacts")); sErr == nil {
-		t.Errorf("SEELED THE WRONG TREE: %s\\artifacts exists inside the link target", filepath.Base(outside))
-	}
-	after, afterNames := aclSIDs(t, outside)
-	if !equalSIDs(after, before) {
-		t.Errorf("the foreign tree's descriptor changed on a call that refused it:\nbefore %v\nafter  %v (%v)",
-			before, after, afterNames)
+	afterOutside, _ := aclSIDs(t, outside)
+	if !equalSIDs(afterOutside, outsideBefore) {
+		t.Errorf("the link target's own descriptor changed: %v -> %v", outsideBefore, afterOutside)
 	}
 	if _, sErr := os.Stat(innocent); sErr != nil {
 		t.Errorf("target contents damaged: %v", sErr)
