@@ -1,0 +1,16 @@
+# Logs / editor noise
+logs
+*.log
+.DS_Store
+
+# Dependencies are never committed (npm ci restores them from package-lock.json)
+node_modules
+
+# Build output: dist/ is a product, but go:embed needs the directory to exist
+# in a clean checkout, so the single anchor file stays tracked (ticket 77 AC#1,
+# see frontend/embed.go and panel.Assets.Built()).
+dist/*
+!dist/.gitkeep
+
+# TypeScript incremental build info
+*.tsbuildinfo

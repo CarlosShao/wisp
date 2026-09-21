@@ -32,6 +32,9 @@ Usage:
   wisp secret      credential entry (ticket 63): set/get/list/unset a DPAPI
                    blob without the key ever entering argv, a log line or chat
   wisp doctor      toolchain and native-DLL self-check, prints PASS/FAIL
+  wisp panel-assets  embedded panel bundle (ticket 77): -manifest lists what the
+                   binary carries, -render <path> writes the bytes the WebView2
+                   host would serve (proof the UI needs no node and no network)
   wisp slo         SLO sampling driver (ticket 08): one state per run, JSON
                    verdict; driven by scripts/slo-check.ps1
   wisp version     print version information
@@ -67,6 +70,9 @@ func main() {
 		os.Exit(cmdSecret(args[1:]))
 	case "slo":
 		os.Exit(cmdSLO(args[1:]))
+	case "panel-assets":
+		attachParentConsole()
+		os.Exit(cmdPanelAssets(args[1:]))
 	case "version", "--version", "-v":
 		attachParentConsole()
 		printVersions("")

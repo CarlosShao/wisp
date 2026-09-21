@@ -1,0 +1,217 @@
+/* ============================================================================
+   Wisp panel theme shell (ticket 77)
+   ----------------------------------------------------------------------------
+   Two rules govern this file, and both are machine-checked by
+   internal/panel's TestC21DesignTokensFourWayAgree:
+
+     1. NO colour literal is written here. Every value is var(...) and every
+        var(...) resolves to a token that design/assets/tokens.css declares
+        (copied verbatim into tokens.generated.css by `npm run tokens`).
+        C21 is the only style truth source of this repo (SPEC-08 §2,
+        PLAN.md:1038-1040), so a second palette in frontend/ is a contract
+        break, not a styling choice.
+     2. This file may only ALIAS vocabulary. The left-hand names below are the
+        vocabulary of the vendored Beautiful UI components (surface / ink /
+        line ...); mapping them onto C21 tokens is what lets those components
+        render in Wisp's palette without importing Beautiful UI's own
+        :root block, which would have been a second source.
+   ============================================================================ */
+
+@import "./tokens.generated.css";
+@import "tailwindcss";
+
+/* ---------- Beautiful UI vocabulary -> C21 tokens (aliases only) ---------- */
+:root {
+  --page: var(--bg-base);
+  --canvas: var(--bg-inset);
+  --surface: var(--bg-raised-color);
+  --surface-overlay: var(--bg-overlay-color);
+  --inset: var(--bg-inset);
+  --hover: var(--bg-subtle);
+  --hover-2: var(--bg-overlay-color);
+  --field: var(--bg-inset);
+
+  --ink: var(--fg-primary);
+  --ink-2: var(--fg-secondary);
+  --ink-3: var(--fg-tertiary);
+  --ink-disabled: var(--fg-disabled);
+
+  --line: var(--border-hair);
+  --line-strong: var(--border-soft);
+  --edge: var(--border-strong);
+
+  --muted: var(--fg-tertiary);
+  --ok: var(--success);
+  --caution: var(--warn);
+  --stop: var(--danger);
+  --keep-warm: var(--warm);
+  --on-solid: var(--on-solid);
+  --accent-ink: var(--accent);
+}
+
+[data-theme="light"] {
+  --surface: var(--bg-raised-color);
+  --surface-overlay: var(--bg-overlay-color);
+  --canvas: var(--bg-inset);
+  --inset: var(--bg-inset);
+  --hover: var(--bg-subtle);
+  --hover-2: var(--bg-overlay-color);
+  --field: var(--bg-inset);
+  --ink: var(--fg-primary);
+  --ink-2: var(--fg-secondary);
+  --ink-3: var(--fg-tertiary);
+  --ink-disabled: var(--fg-disabled);
+  --line: var(--border-hair);
+  --line-strong: var(--border-soft);
+  --edge: var(--border-strong);
+  --muted: var(--fg-tertiary);
+  --ok: var(--success);
+  --caution: var(--warn);
+  --stop: var(--danger);
+  --keep-warm: var(--warm);
+  --accent-ink: var(--accent);
+}
+
+/* ---------- Tailwind namespaces fed by the aliases above ----------
+   radius / font stacks already come from tokens.generated.css (@theme). */
+@theme inline {
+  --color-page: var(--page);
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-overlay: var(--surface-overlay);
+  --color-inset: var(--inset);
+  --color-hover: var(--hover);
+  --color-field: var(--field);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent-ink: var(--accent-ink);
+  --color-ok: var(--ok);
+  --color-caution: var(--caution);
+  --color-stop: var(--stop);
+  --radius-control: var(--r-md);
+  --radius-chip: var(--r-sm);
+  --radius-card: var(--r-lg);
+}
+
+/* ---------- shadcn/ui vocabulary -> C21 (the vendored ui/ primitives) ------
+   button.tsx / card.tsx / badge.tsx were cut from shadcn's new-york-v4
+   registry, which speaks primary / secondary / destructive / muted / card.
+   Mapping those names onto C21 is what keeps a vendored primitive from
+   bringing its own palette in through the back door; overriding Tailwind's
+   own --radius-* scale with C21's --r-* values is the same idea for geometry,
+   so even a class written as "rounded-md" by upstream resolves to a token. */
+@theme inline {
+  --color-background: var(--bg-base);
+  --color-foreground: var(--fg-primary);
+  --color-card: var(--bg-raised-color);
+  --color-card-foreground: var(--fg-primary);
+  --color-popover: var(--bg-raised-color);
+  --color-popover-foreground: var(--fg-primary);
+  --color-primary: var(--accent);
+  --color-primary-foreground: var(--accent-fg);
+  --color-secondary: var(--bg-subtle);
+  --color-secondary-foreground: var(--fg-primary);
+  --color-muted: var(--bg-subtle);
+  --color-muted-foreground: var(--fg-secondary);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-fg);
+  --color-destructive: var(--danger);
+  --color-destructive-foreground: var(--on-solid);
+  --color-border: var(--border-hair);
+  --color-input: var(--border-soft);
+  --color-ring: var(--ring);
+  --color-on-solid: var(--on-solid);
+}
+
+
+/* ---------- glass surfaces: C21's sheen + blur are a background STACK, ----
+   ---------- which no single background-color utility can carry ---------- */
+.glass-raised {
+  background: var(--bg-raised);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-card);
+}
+.glass-overlay {
+  background: var(--bg-overlay);
+  backdrop-filter: var(--glass-blur-sm);
+  box-shadow: var(--shadow-pop);
+}
+.glass-inset {
+  background: var(--bg-inset);
+  box-shadow: var(--shadow-inset);
+}
+.glass-divider {
+  border-color: var(--border-hair);
+}
+.ring-focus:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* The desktop behind the panel is never pure black: C21's four ambient
+   lights are what makes the frost read as frost (tokens.css, "环境光 v2.3").
+   The grain layer is the noise overlay; --grain is its opacity. */
+.wisp-shell {
+  background-color: var(--bg-base);
+  background-image:
+    radial-gradient(52% 44% at 12% 8%, var(--ambient-a), transparent 70%),
+    radial-gradient(46% 40% at 88% 12%, var(--ambient-b), transparent 72%),
+    radial-gradient(58% 46% at 72% 92%, var(--ambient-c), transparent 70%),
+    radial-gradient(40% 36% at 22% 84%, var(--ambient-d), transparent 74%);
+  color: var(--fg-primary);
+  font-family: var(--font-sans);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+}
+
+/* ---------- motion vocabulary of the vendored components ---------- */
+@keyframes shimmer-text {
+  0% { background-position: 150%; }
+  to { background-position: -50%; }
+}
+@keyframes fade-up {
+  0% { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pop-in {
+  0% { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes stream-in {
+  0% { opacity: 0; filter: blur(4px); }
+  to { opacity: 1; filter: blur(0); }
+}
+@keyframes caret-blink {
+  0%, to { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Vendored from ai-native-react-components app/globals.css:148 (MIT) - the
+   caret that trails atoms/StreamText, colour taken from the alias above. */
+.stream-caret {
+  background: var(--ink);
+  vertical-align: text-bottom;
+  border-radius: 1px;
+  width: 2px;
+  height: 1.05em;
+  margin-left: 1.5px;
+  animation: caret-blink 1s step-end infinite;
+  display: inline-block;
+  translate: 0 -0.5px;
+}
+.stream-caret.is-streaming {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

@@ -1,0 +1,24 @@
+<!doctype html>
+<!--
+  Wisp panel entry document (ticket 77).
+  No runtime CDN (D29 / PLAN.md:1038): every byte this page needs is embedded
+  into wisp.exe and served by the WebView2 resource filter. The CSP below
+  enforces that - default-src 'none' with no network source at all, so a
+  dependency that tried to fetch anything would fail at load, not in review.
+  'wasm-eval' and 'blob' are deliberately NOT granted.
+-->
+<html lang="zh-CN" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; base-uri 'none'; form-action 'none'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wisp</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

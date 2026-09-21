@@ -1,6 +1,6 @@
 # 77 — Frontend scaffold: React + TS + Tailwind + shadcn, vendored react-bits / beautifului components, sharing C21 tokens
 
-**Status:** **claimed / in progress**（2026-09-21 14:0x，`agent-ticket77` 已认领并开工，
+**Status:** **in progress**（AC#1 已落 PARTIAL，见 Progress log）/ 原 claimed（2026-09-21 14:0x，`agent-ticket77` 已认领并开工，
 按 owner 拍的板：**基座 = Beautiful UI**，一期 **React Bits 零代码进树**）。
 上一状态：**unblocked**（2026-09-21 13:5x，owner 第二次指令 ⇒ 裁定 **R19**）——
 他挑完了动画组件（12 条清单在 R19 表里），并且给了**排序**：
@@ -99,3 +99,26 @@ C21、D23/§17 零 emoji 图标、D29 人工视觉签收、ban #6 / ban #8
   `.github/workflows/ci.yml`（仅新增 job 行）；**不碰 `internal/ball/**`、`internal/risk/**`、`tools/d22scan/**`**。
   `next=` AC#1 —— 立 `frontend/` 骨架（Vite+React+TS+Tailwind）+ `internal/panel` 的 `go:embed` 静态服务
   + `cmd/wisp` 新增接线文件，跑真构建与真拉起拿 exit code。
+
+- **14:5x `agent-ticket77` AC#1 落地（构建 + go:embed + 无 node 真拉起）**。
+   `npm run build`（Vite 8 + React 19 + TS 6 + Tailwind v4）rc=0：产物 index.html 1043 B、
+  assets/index-BQ3J3QdO.css 37955 B、assets/index-DIrih6dy.js 264929 B（清掉 create-vite 模板遗留的
+  两个 svg 之后重跑的最终数字；css 哈希变、js 未变）。
+  `go build -o build/wisp.exe ./cmd/wisp` rc=0（gofmt -l 空、go vet ./internal/panel/... ./cmd/wisp/... rc=0）。
+  **剥光 node/npm 的真拉起**（`PATH=/c/Windows/System32:/c/Windows:/usr/bin`，`command -v node` 为空）：
+  `wisp.exe panel-assets` rc=0 = "panel assets embedded: 4 files, entry=index.html built=true"；
+  `-manifest` rc=0 逐文件 sha256 前缀；`-render /` rc=0 输出 1043 B（引用 ./assets/...，相对路径）；
+  `-render /assets/index-DIrih6dy.js` rc=0 输出 264929 B，Content-Type text/javascript；
+  `-render ../go.mod` **rc=1 拒绝**（越界路径 fail-closed）。`wisp.exe version` rc=0。
+  ⚠ AC#1 的**未尽半**：WebView2 窗口本体是票 33 的地界（`internal/panel/doc.go` 明写 host 由票 33 交付，
+  go.mod 里至今没有 webview 依赖）。本票交付的是"二进制自带页面、无 node 可取字节"这一段，
+  **不是窗口被真的创建出来** ⇒ AC#1 按 A33 记 **PARTIAL**，勾框留着。
+  embed 接线：`frontend/embed.go`（`//go:embed all:dist`）+ `internal/panel/assets.go`
+  （Resolve/Manifest/Built，纯 Go 无平台标签）+ `cmd/wisp/panel_assets.go`（新文件）。
+  `cmd/wisp/main.go` 只加 6 行（usage 一条 + switch 一个 case），逐字理由写在 commit message 里。
+  dist 的 gitignore 口径：产物不入库，但 `go:embed` 的模式在干净树上必须可满足 ⇒
+  `frontend/.gitignore` 用 `dist/*` + `!dist/.gitkeep` 留一枚锚点，`Assets.Built()==false`
+  时主机必须显示"资源未构建"，锚点永远不可能被当成页面渲染。
+  `next=` AC#2 四方对账用例 + AC#7 `frontend/VENDORED.md`；之后 AC#4 台账
+  （**已知雷**：`frontend/` 一存在，`tools/d22scan` 的 driftedAbsentScope 就 rc=2 要求把 ban #6
+  翻成 live:true，而 `tools/d22scan/**` 不是本票能动的地方 —— 见 Progress log 下一条的数字）。

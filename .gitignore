@@ -15,7 +15,12 @@ build/
 
 # --- Frontend (built artifacts only; frontend/ source is tracked) ---
 node_modules/
-frontend/dist/
+# dist/ is a build product, but go:embed needs the directory to exist in a clean
+# checkout (ticket 77 AC#1), so one anchor file stays tracked; panel.Assets.
+# Built() reports false while the bundle is only that anchor, and the host shows
+# an "assets not built" state instead of ever rendering it.
+frontend/dist/*
+!frontend/dist/.gitkeep
 assets/web/dist/
 
 # --- Runtime data (never commit local data dirs) ---
