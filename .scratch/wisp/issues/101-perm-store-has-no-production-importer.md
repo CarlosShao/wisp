@@ -50,6 +50,23 @@
 
 ## Progress log（append-only）
 
+- 2026-09-21（**agent-ticket101 开工登记**，动 `cmd/wisp/run.go` 之前，按本票 Rules 第 49 行）：
+  ① 现场：`git status --porcelain cmd/wisp/` **空** ⇒ 此刻 `cmd/wisp/` 没有别人的未提交改动，
+  我不覆盖任何东西（工作树别处的 `internal/secret/`+`internal/winsec/`+票 89 票面属 `agent-ticket89b`，本票不碰不提交）。
+  ② 我要动 `cmd/wisp/run.go` 的哪几行、为什么：
+  - `:189` `config.LoadFile` → `config.NewManager`（同一 load 管线，1 行）：mode 的唯一真源必须是**可写回**的
+    Manager，否则 `perm.Store.Set` 没有可持久化的对象；`cfg` 改为 `mgr.Config()` 的快照。
+  - `:262` 起的 `tools.Options{…}` 增加 **`Modes: rt.modes`（1 行 = AC#4 的变异锚点）**：把档位注进决策链。
+  - `:228`/`:255` 之后新增 ~16 行：`perm.New(perm.Options{Manager, Confirm, Logf})` 与 AC#3 的响亮失败面。
+  - `agentRuntime` 加字段 `modes *perm.Store`；`runSpec` 加一个注入位 `modeConfirm`（默认实现 =
+    `approval.Gate.PendingApproval` 真实 L2 卡片，测试用来代表"原生侧点了一次允许"）。
+  - **不碰** `cmd/wisp/` 其余文件；`internal/perm`/`internal/risk`/`internal/config`/`internal/tools`
+    的语义**一行不改**（只在 `cmd/wisp/` 新增测试文件）。
+  ③ 需要谁协调：**票 92**（面板 composer 是 `Set` 的下一个生产调用者；本票只装读侧 + 把 M4 的 L2 通道接上
+  真 gate，`Set` 本身在本票只有装配根持有、无 UI 入口 ⇒ 我不会假装它有）· **票 77**（宿主）：若随后要动
+  `run.go` 同一段，以本票提交后的 `assembleRuntime` 为准，新增注入点请复用 `runSpec` 的 seam。
+  ④ 我自己钉死的边界（票面 AC#2(c) 的原因）：本票**不**给 bridge 接任何 grant 来源
+  （`tools.Options.Confirmations` 保持 nil）——从盘上读回来的只有 mode，**没有** session grant。
 - 2026-09-21 17:1x（编排者）：建票。`agent-ticket90b` 交件时把这两条写在收尾段（**它没藏**，
   还说"由票 92/77 落，代价被 fail-closed 兜住"）。我的判断：**fail-closed 兜住 ≠ 功能通**——
   兜住的是"不会意外宽松"，没兜住的是"owner 要的那条 M3 今天没生效"。

@@ -21,6 +21,13 @@ package main
 //	                -> agent.Loop(provider, bridge, AdmitTask=D47 hook)
 //	                -> streamed text + notify + task_log/tool_call rows
 //
+// Ticket 101 added one line to that chain, and it is the whole point of this
+// file's current shape: the permission mode is READ from config.toml here and
+// INJECTED into the decision chain (config.NewManager -> perm.Store ->
+// tools.Options.Modes). Ticket 90 built the storage and proved it works in its
+// own tests; an unwired capability is a capability nobody has (R20/M3 did not
+// take effect until this line existed).
+//
 // The dependency direction matters: cmd/wisp is the only package allowed to
 // know about all of these at once (internal/llm must not import storage,
 // internal/agent/approval imports internal/tools, never the reverse).
@@ -43,6 +50,7 @@ import (
 	"github.com/CarlosShao/wisp/internal/llm"
 	"github.com/CarlosShao/wisp/internal/memory"
 	"github.com/CarlosShao/wisp/internal/observe"
+	"github.com/CarlosShao/wisp/internal/perm"
 	"github.com/CarlosShao/wisp/internal/risk"
 	"github.com/CarlosShao/wisp/internal/secret"
 	"github.com/CarlosShao/wisp/internal/tools"
@@ -106,6 +114,13 @@ type runSpec struct {
 	// host-side tool call through the same bridge the loop uses, instead of
 	// rebuilding the wiring and proving nothing.
 	onRuntime func(*agentRuntime)
+	// modeConfirm is the L2 strong confirmation a switch INTO auto_approve
+	// costs (R20/M4). Production leaves it nil, which means confirmModeSwitch:
+	// one card through the same C18 gate a tool call goes through, answerable
+	// only from the native side. The end-to-end tests fill it to stand for "the
+	// operator clicked allow", because a console run has no native channel and
+	// its L2 card therefore always resolves to a reject.
+	modeConfirm perm.ConfirmFunc
 }
 
 // runTextTask executes one CLI text task and returns the process exit code.
@@ -155,6 +170,7 @@ func runTextTask(s runSpec) int {
 type agentRuntime struct {
 	spec     runSpec
 	cfg      *config.Config
+	mgr      *config.Manager
 	paths    *tools.PathCanonicalizer
 	store    *memory.Store
 	provs    []llm.LlmProvider // built chain, kept for the probe path
@@ -163,9 +179,13 @@ type agentRuntime struct {
 	gate     *approval.Gate
 	ui       *consoleApprovalUI
 	bridge   *tools.Bridge
-	notify   notifyPoster
-	stdout   io.Writer
-	stderr   io.Writer
+	// modes is the assembled owner of the permission mode (ticket 90's storage,
+	// ticket 101's wire): the read the bridge consults once per call, and the
+	// only object in this process that may change the档.
+	modes  *perm.Store
+	notify notifyPoster
+	stdout io.Writer
+	stderr io.Writer
 	// logf receives the bridge's audit lines.
 	logf func(string, ...any)
 }
@@ -186,12 +206,30 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	// resolved through LoadFile here, the provider's key would come from a
 	// map the loader filled and this ticket's credential assertion would be
 	// proving the loader instead of the provider.
-	cfg, _, err := config.LoadFile(cfgPath, nil)
+	//
+	// Manager rather than LoadFile (ticket 101): the permission mode is the one
+	// preference R20/M3 lets outlive a session, and it persists THROUGH the
+	// config file, so the assembly root needs the object that can write it back
+	// atomically (Manager.SetPermissionMode). Loading the file twice over - once
+	// read-only here, once writable elsewhere - is exactly the split state
+	// SPEC-03 §3.1 exists to prevent, so there is one Manager and one truth.
+	mgr, err := config.NewManager(cfgPath, nil)
 	if err != nil {
+		// AC#3 (ticket 101): a mode that cannot be read is a CLASSIFIED failure,
+		// never "keep the last value we saw". This process caches no mode of its
+		// own - the档's only source is the file that just failed - so the honest
+		// answer is: audit which档 a fail-closed read answers with (the
+		// strictest), refuse to assemble a decision chain at all, exit 2.
+		rt.auditModeUnreadable(cfgPath, err)
 		fmt.Fprintf(s.stderr, "wisp run: 配置未就绪（Unconfigured）：%v\n", err)
 		return rt, 2
 	}
+	// A snapshot copy: the runtime's non-mode settings stay frozen at what this
+	// boot read, while perm.Store keeps reading the live section (ticket 90's
+	// rule that the running mode always equals what the config layer concluded).
+	cfg := mgr.Config()
 	rt.cfg = cfg
+	rt.mgr = mgr
 
 	// Role -> endpoint -> provider, with the key resolved through the DPAPI
 	// store by the resolver (A8's whole point).
@@ -259,12 +297,50 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		ApprovalTimeout: time.Duration(cfg.Risk.ConfirmTimeoutSec) * time.Second,
 		Logf:            rt.auditf,
 	})
+
+	// The permission mode (ticket 90's storage, wired here by ticket 101). This
+	// is the line that makes R20/M3 real: without it the bridge reads a nil
+	// ModeSource, which answers the strictest档 for every call, and a manually
+	// chosen档 would be silently forgotten at the next start.
+	//
+	// What is deliberately NOT here: any grant source. tools.Options.Confirmations
+	// stays nil, because R20/M3 persists the MODE and nothing else - a D45
+	// session grant must not come back from disk just because something on this
+	// boot learned to read config.toml (PLAN.md:1640, pinned by AC#2(c)).
+	confirm := s.modeConfirm
+	if confirm == nil {
+		confirm = rt.confirmModeSwitch
+	}
+	modeStore, err := perm.New(perm.Options{
+		Manager: mgr,
+		Confirm: confirm,
+		Logf:    rt.auditf,
+	})
+	if err != nil {
+		rt.auditModeUnreadable(cfgPath, err)
+		fmt.Fprintf(s.stderr, "wisp run: 权限档位不可用（Unconfigured）：%v\n", err)
+		return rt, 2
+	}
+	rt.modes = modeStore
+
+	// Which posture this boot came up in has to be readable in the log, not
+	// inferred from the file afterwards. The Store keeps its startup record in
+	// its own history; the line is the assembly root's to write, because "this
+	// host started in auto_approve" is the first fact an operator reading a
+	// long-running host's audit wants, and it is also what makes a restart
+	// auditable against the mode read before it (AC#3's audit half).
+	rt.auditf("perm: MODE-READ origin=startup mode=%s source=%q",
+		modeStore.PermissionMode(), cfgPath)
+
 	rt.bridge = tools.New(tools.Options{
 		Registry: reg,
 		Paths:    rt.paths,
 		Gate:     rt.gate,
 		Cancel:   rt.gate.ToolsCancelBus(),
 		Journal:  mem,
+		// AC#1/AC#4's anchor line: the档 this boot read enters the decision
+		// chain here and nowhere else.
+		Modes: rt.modes,
 		// R4 stays dormant: probing every result for sensitive sources needs
 		// the C25 detector's own wiring (ticket 25), and a dormant R4 is the
 		// honest state, not a weakened one.
@@ -277,6 +353,59 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		Logf: rt.auditf,
 	})
 	return rt, 0
+}
+
+// modeSwitchToolName is the card's tool name for a mode switch. It is not a
+// registered C4 tool: no call route uses it, it exists so the card and the
+// audit line name what is being confirmed.
+const modeSwitchToolName = "permission.mode"
+
+// confirmModeSwitch is the production R20/M4 confirmation: exactly ONE L2 card,
+// raised through the same C18 approval gate a tool call goes through, and it can
+// only be answered from the native side (SPEC-06:1588, machine-gated by ban #6).
+//
+// A console run has no native channel, so this refuses - the card times out into
+// a reject, or the caller's context ends first and the gate abandons it. That is
+// fail-closed by construction and it is the point: the档 that removes questions
+// cannot be reached from a surface that cannot ask them. The floating ball /
+// panel hosts (tickets 77/92) hand the same card a real click.
+//
+// D47 applies to a host-initiated card as much as to a loop-initiated one: the
+// gate refuses any request whose task was never admitted, so this registers its
+// own synthetic task id for the duration of the confirmation and revokes it on
+// the way out.
+func (rt *agentRuntime) confirmModeSwitch(ctx context.Context, sw perm.Switch) error {
+	if rt.gate == nil {
+		return fmt.Errorf("审批 gate 未装配，无法为切到 %s 签发 L2 卡片", sw.To)
+	}
+	const taskID = "host:mode-switch"
+	revoke := rt.gate.AdmitTextTask(taskID)
+	defer revoke()
+	ans, why := rt.gate.PendingApproval(ctx, tools.Decision{
+		TaskID: taskID,
+		Tool:   modeSwitchToolName,
+		Level:  risk.L2,
+		Reason: fmt.Sprintf("切换到 %s 会移除本应询问的确认，需要一次 L2 强确认（R20/M4，当前档 %s）",
+			sw.To, sw.From),
+		Mode: sw.From,
+	})
+	if ans != tools.AnswerAllow {
+		if why == "" {
+			why = string(ans)
+		}
+		return fmt.Errorf("L2 强确认未通过（%s）：%s", ans, why)
+	}
+	return nil
+}
+
+// auditModeUnreadable is AC#3's loud half. It writes the same "[audit] perm:"
+// family the Store itself writes, so every mode event in the log has one shape
+// and one grep, and it names the档 a failed read answers with instead of
+// leaving that to the reader's imagination.
+func (rt *agentRuntime) auditModeUnreadable(path string, err error) {
+	rt.auditf("perm: MODE-READ-FAILED path=%q err=%v mode=%s origin=startup result=fail-closed "+
+		"detail=%q", path, err, risk.DefaultMode(),
+		"档位读不到：本进程不缓存任何上一次的宽松值，决策链不会被装配（退出码 2）")
 }
 
 // windowCount reports how many confirmation cards the composed gate displayed.
