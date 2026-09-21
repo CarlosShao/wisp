@@ -141,15 +141,13 @@ func fullConfig(t *testing.T) *Config {
 	c.Agent.SteeringEnabled = false
 	c.Risk.ConfirmTimeoutSec = 60
 	c.Risk.L1WindowSec = 5
-	c.Risk.ShellEnabled = true
-	c.Risk.AllowShellString = true
-	c.Risk.ShellAllowlist = []string{"git", "go"}
-	c.Risk.BlacklistOverrides = []string{"B-1"}
+	// The four [risk] keys below, and net.allowlist / net.block_private_ranges,
+	// are deliberately left at their defaults: unwired.go rejects a
+	// non-default value at load (ticket 83). Their serialization symmetry is
+	// still pinned by TestUnwiredKeysStillRoundTripAtTheByteLevel.
 	c.FS.AllowedDirs = []string{"D:\\x"}
 	c.FS.ReparsePointExceptions = []string{"C:\\link"}
 	c.FS.DeleteEnabled = true
-	c.Net.Allowlist = []string{"api.example.com"}
-	c.Net.BlockPrivateRanges = false
 	c.Net.Proxy = ProxyConfig{Mode: ProxyManual, URL: "http://proxy:8080"}
 	c.Privacy.RedactPaths = true
 	c.Privacy.DiagnosticsOptIn = true

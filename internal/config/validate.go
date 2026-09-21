@@ -13,7 +13,8 @@ import (
 // silently). Runs after the strict decode, on the merged defaults+file
 // Config. Structural errors (unknown keys, wrong types) are already caught
 // by decodeStrict with line numbers; this layer checks values: enums,
-// ranges, the hard-coded read-only fields and api_key_ref formats.
+// ranges, the hard-coded read-only fields, the security keys nothing consumes
+// (unwired.go) and api_key_ref formats.
 //
 // Every error is an observe.ClassConfig error naming the offending key path
 // ("section.key" or "llm.providers.<name>.key"), never a bare value.
@@ -26,6 +27,7 @@ func validate(c *Config) error {
 		validateAudio(c),
 		validatePrivacy(c),
 		validateModels(c),
+		validateUnwired(c),
 		validateCost(c),
 		validateObserve(c),
 		validateNet(c),

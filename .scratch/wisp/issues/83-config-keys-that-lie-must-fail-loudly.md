@@ -63,3 +63,32 @@
 Status `open` ⇒ `claimed`。本轮次序：AC#1 全量同类键扫描（含间接消费排查）⇒ AC#2 校验落地 ⇒ AC#3 双向变异 ⇒ AC#5 门禁。
 零 Go 改动，纯 checkpoint。
 `next=` 读 `internal/config/` 全量，产出键 → 解析处 → 消费者 → 处置表。
+
+### L1 — AC#2 校验先落地（承载体在，表随后补全）（2026-09-21）
+
+新增 `internal/config/unwired.go`：`unwiredKeys` 六行守卫表 + `validateUnwired()`，挂在 `validate()` 里
+（次序 `validateModels` 之后、`validateCost` 之前），照 `verify_signature` 的形状：
+**只在非默认值上开火**（四个 `[risk]` 键 + `net.allowlist` + `net.block_private_ranges`），
+错误文案 = 键路径 + "哪个消费者不存在"（点名到符号）+ "由谁落地"（票号 / SPEC 行 / 需 D22）。
+
+副作用次序已由用例证明：`applyMigrations` 的 dry-check 走同一个 `validate()`，
+所以一张写着 `shell_allowlist` 的 **v1** 文件被拒时 `config.toml` 逐字节未变、`.bak-1` 未生成、
+临时文件未出现（`TestUnwiredGuardFiresBeforeAnyFileWrite`）。
+
+改动面（5 个文件，全在 `internal/config/`）：
+`unwired.go`(新) `unwired_test.go`(新) `validate.go`(挂 + 一处注释) `boundary_test.go`(fullConfig 去掉 6 行非默认值)
+`migrate_test.go`(v1 fixture 的 `[risk]` 穿透断言从 `shell_allowlist` 换成 `l1_window_sec`，
+因为前者现在按定义不可加载)。
+
+用例（`unwired_test.go`）：`TestUnwiredSecurityKeysFailLoudly`(6 子例) / `TestUnwiredGuardLeavesHonestConfigsAlone`(4 子例)
+/ `TestUnwiredGuardFiresBeforeAnyFileWrite` / `TestUnwiredGuardIsScopedNotABigStick`(AC#3(ii) 的锚)
+/ `TestUnwiredKeysStillRoundTripAtTheByteLevel` / `TestEveryLockedSectionKeyIsAccountedFor`(AC#1 完整性的可执行版)。
+
+门禁实测（`gofumpt` 在 `$(go env GOPATH)/bin/gofumpt`，不在 PATH）：
+`gofmt -l internal/config` 空 rc=0；`gofumpt -l . tools/d22scan tools/mockllm` **空 rc=0**；
+`go vet ./internal/config/` rc=0；`GOOS=linux go vet ./internal/config/` rc=0；
+`go test -count=2 -v ./internal/config/` rc=0，`=== RUN` **194**（= count=1 的 97 的整 2 倍，N 倍核对通过）、
+`--- PASS` **106**、`    --- PASS` **88**、`--- SKIP` **0**、`--- FAIL` **0**，`ok ... 0.782s`。
+本轮**没有**并跑 `internal/risk` ⇒ 未复现 `TestResolvePerCallBudget` 的墙钟抖动（AC#5 里单独量一次并跑）。
+
+`next=` 把 AC#1 的键表全量写进本票（含间接消费排查证据），再跑双向变异与并跑门禁。

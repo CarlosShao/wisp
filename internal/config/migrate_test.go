@@ -24,7 +24,7 @@ theme = "dark"
 size = 60
 
 [risk]
-shell_allowlist = ["git"]
+l1_window_sec = 5
 
 [fs]
 allowed_dirs = ["D:\\keep"]
@@ -95,8 +95,8 @@ func TestMigrateV1Fixture(t *testing.T) {
 	if c.Ball.Size != 60 || c.App.Theme != "dark" {
 		t.Errorf("non-llm values must survive migration")
 	}
-	if !equalStrings(c.Risk.ShellAllowlist, []string{"git"}) {
-		t.Errorf("[risk] must pass through, got %v", c.Risk.ShellAllowlist)
+	if c.Risk.L1WindowSec != 5 {
+		t.Errorf("[risk] must pass through, got l1_window_sec=%d", c.Risk.L1WindowSec)
 	}
 
 	// A reload of the migrated file loads cleanly (idempotent).
