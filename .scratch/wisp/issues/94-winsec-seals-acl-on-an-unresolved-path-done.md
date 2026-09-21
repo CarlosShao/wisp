@@ -1,6 +1,6 @@
 # 94 — 私有数据目录的"封 ACL"用了 `filepath.Abs` 而不是 C26 PathResolver ⇒ **D22 门在 CI 之前把它拦下了**（票 89 的码，push 因此压住）
 
-**Status:** ready-for-review（agent-ticket94：AC#1-AC#5 五框自勾，代码 `7910bcd`+`20b525d`，
+**Status:** **accepted-done（条件式）**（2026-09-21 17:4x 独立对抗验收：**五枚 AC 全部由它独立复现为 PASS**，裁决表 `docs/evidence/s1/94-adversarial-acceptance.md`（568 行）。成环那件事它用 `go build` 拿到四跳 `import cycle not allowed` ⇒ **实现者推翻我的"无环"是对的**；5 个调用点逐行确认为词法、全仓非测试 `risk.Resolve(` 仅 1 处；`-count=2 ./internal/winsec/` = 44/44/0/0。⚠ **四个结案条件已全部落地**：四条新账立案为**票 102**（R-a：C26 的 `expandInput` 会把含 `%VAR%`/前导 `~` 的拼写改写到另一棵树、封它并返回 nil ⇒ **fail-open，本会话最重的一条**）与**票 103**（R-c：`SetPathResolver` 无守卫，可被装成橡皮图章后静默重写外来 DACL；R-b：`RemoveUnlinked` 可沿 junction 删别人真文件，但 PROBE W 实测今天因 `removeStray` 的 `WalkDir` 不下降而**够不到** ⇒ 只做守卫 + tripwire）；R-d 与"两句过头文案"的降级记在下面 17:4x 那条 Progress log。⚠ **"路径已解析"这句今天仍不能对 owner 原样说**，能说的那句由验收代理写在它报告文末，我在 A73② 原样转。）
 仓外纯净快照 `sh scripts/d22scan.sh` **rc=0** ⇒ **编排者的 push 可以放开了**；⚠ 留给验收方的两点写在 Progress log 末条）
 **原 Status:** in-progress（agent-ticket94 已接手；票 89 已交件 `0a3a445`，`internal/winsec/` 现在是本代理地界）
 ⚠ 第一枚 checkpoint 已落盘（见 Progress log 末条）：AC#1 判明为 **(b)**，并**推翻**本票"无循环依赖"的前提。
@@ -162,6 +162,19 @@ WRONG TREE SEALED: …\someone-elses-tree\artifacts
 15 次工具调用内交回第一枚 checkpoint；接近轮数上限主动收尾留断点。
 
 ## Progress log（append-only）
+
+- 2026-09-21 17:4x（编排者，**验收后的两句过头文案就地降级 + R-d 入账**，原文不删）：
+  - **"20+ 条"这个数实测是 49**：本票 Progress log 里"若做成未接线即拒会红 20+ 条"是**方向对、量级报小**；
+    验收代理把 verifier 换成响亮拒绝后量到 **49 条**（它同时记了一条更该记住的：
+    **winsec 自己 0 条红** ⇒ "内置 verifier 兜住了 winsec"这句话**不是被 winsec 的用例证明的**）。
+    ⇒ 归**票 103 AC#1**：守卫必须做到"伪造解析器 ⇒ winsec 自己会红"，而不是靠别人包的套件红来间接说明。
+  - **"路径已解析"这句降级为**：*封哪棵树现在走 C26 的解析结果，但 C26 自身在 `%VAR%`/前导 `~` 的拼写上
+    会把路径改写到另一棵树并返回成功（**票 102**），所以对 owner 只能说"词法拼接那一刀已堵"，
+    不能说"入口已无可改写空间"*（这句是验收代理文末的原话方向，我照搬）。
+  - **R-b（`RemoveUnlinked` 沿 junction 删真文件）**归票 103 AC#2，且**验收代理自己实测今天够不到**
+    （`removeStray` 用 `WalkDir` 且不下降进链接，PROBE W）⇒ 判据是 tripwire，不是"现在就有人踩了"。
+  - **假绿第 4 类命中一条（不是本票造的，但要记）**：`TestResolvePerCallBudget` 静默 6ok/1FAIL，
+    而本票 log 把它归因写过头了（票 86 的仪器脆弱性；已按"负载抖动 + 阈值未动"如实登记）。
 
 - 2026-09-21 15:1x（编排者）：建票并**压住 push**。我在推之前对 HEAD 做了一次门检
   （`go build ./...` rc=0 ✓，但 D22 rc≠0 + gofmt 1 文件红），命中的正是票 89 的 `winsec.go:126`。

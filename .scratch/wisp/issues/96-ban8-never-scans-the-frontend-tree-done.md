@@ -1,6 +1,6 @@
 # 96 — `ban #8`（零 emoji）**根本没扫 `frontend/`**：面板那 40 个文本文件今天是"门开着但没人看"
 
-**Status:** 交付待验收（agent-ticket96，2026-09-21 16:2x；实现 commit `5e8f87b`，只含 `tools/d22scan/` 两文件。
+**Status:** **accepted-done**（2026-09-21 17:4x 独立对抗验收判 **AC#1–AC#6 六格全 PASS**，裁决表 `docs/evidence/s1/96-adversarial-acceptance.md`。要点：相等性**不是自证**——真正承重的是 `TestLedgerCountsMatchAnIndependentWalk` 的独立 walk（两门同时收窄时，相等用例仍绿、独立 walk 红 33 vs 37）；五类种子各自 rc=1 点名到行；三枚变异按预期。⚠ 验收带回两条残留：脚本第 1 步可被缓存回放归**票 99**；`ci.yml:25` 与 `main.go:30` 两处**抄来的清单已腐烂**归票 85 的台账段（见 A73④）。）
 **AC#1..AC#6 六格全达成**（AC#6 起初因票 94 的 `winsec.go:126` 记 PARTIAL，该红源随 `7910bcd` 落地而消失，
 读数与两次的差别写在 Progress log 末两条）（2026-09-21 15:5x 编排者建；来源=票 77 接续代理交件时**点名为它 AC#4 的硬缺口**，不是它要偷工）
 **Type:** 门禁完整性（票 71 AC#4 / A44① / A54② / 票 88 的同族：**覆盖面自己会烂，而输出长得和"检查过"一模一样**）
