@@ -1,6 +1,8 @@
 # 77 — Frontend scaffold: React + TS + Tailwind + shadcn, vendored react-bits / beautifului components, sharing C21 tokens
 
-**Status:** **unblocked**（2026-09-21 13:5x，owner 第二次指令 ⇒ 裁定 **R19**）——
+**Status:** **claimed / in progress**（2026-09-21 14:0x，`agent-ticket77` 已认领并开工，
+按 owner 拍的板：**基座 = Beautiful UI**，一期 **React Bits 零代码进树**）。
+上一状态：**unblocked**（2026-09-21 13:5x，owner 第二次指令 ⇒ 裁定 **R19**）——
 他挑完了动画组件（12 条清单在 R19 表里），并且给了**排序**：
 **第一版只用 Beautiful UI 那套 agent 组件为基座（+ shadcn 基础件 + Tailwind），React Bits 二期再叠。**
 ⚠ 一期因此**不引 React Bits 的任何代码** ⇒ 它的 **MIT + Commons Clause** 许可审查推到二期
@@ -85,3 +87,15 @@ C21、D23/§17 零 emoji 图标、D29 人工视觉签收、ban #6 / ban #8
 - 不 push（编排者串行推双远程）。第一个 checkpoint commit 必须落在前 15 次工具调用内；
   每次 commit 同步票面 Status + 勾框 + 一行 `next=`（A30/A32：票面落后 HEAD 会让整票被重做）。
 - 未证明的框**留着不勾并写明原因**；`t.Skip`/放宽阈值/加豁免换绿，一律视为未完成。
+
+## Progress log（append-only）
+
+- **14:0x `agent-ticket77` 认领 + 第一枚 checkpoint**（本 commit 只改票面）。
+  现场事实核对：`frontend/` 与 `docs/contracts/` **均不存在**（票面"前提事实"仍成立）；
+  token 现状 = `design/assets/tokens.css` + `internal/ball/tokens.go` + `internal/ball/tokens_table_test.go`
+  的三方对账 `TestC21TableColourRowsMatchTokensCSS`；`internal/panel/` 只有 `doc.go`（embed 接线是空地）；
+  `cmd/wisp/` 最近 5 手 = 票 78/67/70 的 vet・ASCII・build-tag 收敛，**本票对它只加不改**。
+  领地声明：本票动 `frontend/**`、`docs/contracts/**`、`internal/panel/**`、`cmd/wisp/**`（仅新增文件）、
+  `.github/workflows/ci.yml`（仅新增 job 行）；**不碰 `internal/ball/**`、`internal/risk/**`、`tools/d22scan/**`**。
+  `next=` AC#1 —— 立 `frontend/` 骨架（Vite+React+TS+Tailwind）+ `internal/panel` 的 `go:embed` 静态服务
+  + `cmd/wisp` 新增接线文件，跑真构建与真拉起拿 exit code。
