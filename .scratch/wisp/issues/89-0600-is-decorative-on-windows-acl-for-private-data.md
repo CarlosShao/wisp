@@ -57,3 +57,20 @@
 ## Progress log（append-only）
 
 （空）
+- [x] **AC#2 方向：目录链先封、文件兜底（覆盖面靠目录，两条都要）** — 理由：
+  (1) 我们**控制不了**所有落盘点：`wisp.db-wal` / `-shm` 是 SQLite 自己建的、`spill.go` 的 `.retry` 是 rename 前的临时件，
+  逐个设 DACL 一定会漏掉一个；给父目录设**显式、不再继承自外部**的 DACL（`/inheritance:r` + 只授当前 SID），
+  之后创建的子项**继承到的就是这份**——这才真覆盖"别人替我建的文件"。
+  (2) 但"先建目录、后设权限"没用：子项继承的是**创建那一刻**的 ACL，所以必须**边建边封**——
+  `PrivateDirAll` 逐层建 + 逐层封，任何一层封不上就**整个拒绝**（AC#5）。这条先后关系有用例钉。
+  (3) 继承不能靠"应该会收窄"：判据是把父目录**故意**设成带外来 ACE（`Everyone:(OI)(CI)(RX)`），
+  再断言子项 `icacls` 原文里**不出现**该 SID；只测默认继承就是测了个空。
+  落点包名 `internal/winsec`（票面建议之一）：API 中性 + `_windows.go`/`_other.go` 分平台实现，
+  POSIX 侧走真 0600/0700，不静默跳过。
+- [ ] AC#1 基线 **icacls 原文**：下一枚 commit 给（本枚只交骨架）。基线环境：Windows 11 Pro，
+  当前 SID `S-1-5-21-1228170099-895614386-1166154857-1001`（账户 `swq`）；本机无既存 `wisp.db`（data 根尚未创建）。
+  ⚠ `internal/winsec/winsec_windows.go` 此刻是**故意的占位**（只有 `os.Chmod`，也就是仓库今天的行为），
+  所以本包判据测试**预期先红**——红完才换 SetSecurityDescriptorInfo。
+- [ ] AC#4 构造可行性：普通权限建不出符号链接（需 `SeCreateSymbolicLinkPrivilege`/开发者模式），
+  但 **junction 不需要特权**（`mklink /J`），而它正是"指向非空目录的链接"这一类，`os.Remove` 对它
+  报 `ERROR_DIR_NOT_EMPTY` ⇒ **本机可构造**，不必只靠 CI/Linux 侧等价构造。
