@@ -1,6 +1,19 @@
 # 104 — 只对单个孩子做 `SealFile` 时，它那份**继承来的**授权被静默清掉（0 条 WARN）＝票 89 第 4 条修复的射程外剩余
 
-**Status:** ready-for-review（原 open；2026-09-21 17:4x 编排者建；来源=`acceptor-ticket89b` 的复验残留 **R-89b-5**，它判"PASS 附射程限定"而不是 FAIL）
+**Status:** **accepted-done**（2026-09-21 21:0x 编排者按 `acceptor-ticket104` 的裁决表结案：
+              AC#1/AC#2/AC#3/AC#4 通过，**AC#5 当时不通过**——卡点是"票 104 没有去更正票 89 那句已被本票改掉的旧描述"，
+              那一格**归我**、不在实现方身上：更正已按 append-only 落在 `89-...-done.md` 第 157 行下面（那句原文一字未删）
+              ⇒ AC#5 的条件现在满足，本票结案。
+              **未触发退回条款**（验收方亲述）：它照最要害那条去造"清了带外授权却 0 notice"，**五枚形状全部造不出来**
+              （含 `icacls /deny <mySID>:(RX)` 那一发：`foreignPrincipals` err=nil、`SealFile` err=nil、**WARN=1**）
+              ⇒ 所以这次是合法的"附条件通过"，不是票 108 那种"被防的结局被造出来"。
+              **射程（写进结案语，别再变成第三次"残留没人管"）**：`beforeErr` 取不到与 NULL DACL 那两格**票 89 就已存在**，本票未改变它们（`R-104-4`）。
+              **本票交出来的三条新账已分别落地**：`R-104-5`（通知在生产里没人接＝**建票 117**，与票 105 的 `R-105-1` 同一根）·
+              `R-104-1`/`R-104-6`（`kind=` 无用例钉、测试拿 2 字节子串认 Everyone＝**建票 118**）·
+              `R-104-3`（只有继承来的外来 ACE 也出 1 条，偏响＝**语义账，等票 115 落定再判**，不与 115 同时动 `winsec_windows.go`）。
+              `R-104-7`：POSIX 侧**根本没有通知面**（`winsec_other.go` 没有 `noticeNarrowed`/`slog`）——验收方未跑 POSIX 判定，
+              交回我并到票 113/108 地界；本轮**不并**：票 113 正在验收，等它结论出来再决定要不要另立案。
+              —— 原 `ready-for-review`（原 open；2026-09-21 17:4x 编排者建；来源=`acceptor-ticket89b` 的复验残留 **R-89b-5**，它判"PASS 附射程限定"而不是 FAIL）
 **Type:** 安全可观察性（**修了一半的静默问题**——票 89 把"清除带外授权"改成会报警，但只覆盖了显式 ACE 那一半）
 **Blocks:** nothing · **Blocked by:** nothing（`internal/winsec/` 现在无人写；票 89 已结案）
 **Packages:** `internal/winsec/`（`applyDescriptorWindows` 的"清除检测"那一段 + `noticeNarrowed`）。
