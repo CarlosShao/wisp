@@ -1,7 +1,8 @@
 # 97 — `strict=true` 是**死参 + 一句描述不存在的调用方的注释**，而"别名买不到批准"这件事**一条用例都没钉**（票 87 验收带回）
 
-**Status:** in-progress（2026-09-21 15:4x 编排者建；**排队**：`internal/agent/` 此刻有 `agent-ticket90` 在写，同包冲突）
+**Status:** ready-for-review（2026-09-21 15:4x 编排者建；**排队**：`internal/agent/` 此刻有 `agent-ticket90` 在写，同包冲突）
               2026-09-21 19:36 `agent-ticket97` 认领并开始交件（票 90 已 `accepted-done`、票 87 已结 ⇒ 队列条件解除，本目录现归本票）
+              2026-09-21 19:44 两枚 commit 均已落（钉子先行 `766534f` + 方向上签名）⇒ 交验收，裁决表 `docs/evidence/s1/97-*.md` 由验收方出
 **Type:** 安全方向性的**表达**缺陷（今天方向是对的，但它靠的是习惯而不是机器）+ 一处说谎的注释
 **Blocks:** nothing · **Blocked by:** 票 **90** 交件（同目录 `internal/agent/approval/`，别同时写）
 **Packages:** `internal/agent/approval/`（`resolveLocked` 与那张别名索引、`Queue.reject`）。
@@ -105,3 +106,89 @@
   next= 第 2 枚 commit：`resolveLocked(name, strict bool)` ⇒ 两个具名函数（`lookupForAllowLocked` /
   `lookupForRefusalLocked`，方向上签名、无 bool），把 `queue.go:220-229` 那句 "an allow passes true"
   改成与代码一致（保留"只有拒绝方向"的推理），再跑按包门禁 + `sh scripts/d22scan.sh`，Status 翻 `ready-for-review`。
+
+- 2026-09-21 19:44（`agent-ticket97`，第 2 枚 = 方向上签名 + 注释如实）：**判定语义一行未改**，
+  只把"谁能看见别名表"从习惯改成函数名。`queue.go`：
+  `resolveLocked(name string, strict bool)` 拆成
+  `lookupForAllowLocked(corr string) *qitem`（`:231`，只读 `q.byID`，**唯一调用点是 `q.allow`（`:345`）**）与
+  `lookupForRefusalLocked(corr string) *qitem`（`:250`，`q.byID` 精确键优先、再读 `q.alias`，
+  **唯一调用点是 `q.reject`（`:395`）**）。那个方向 bool 与其零调用点分支一起删掉，
+  `q.alias` 的读者从"两处注释承诺"收敛成**一个函数体**。
+
+  **AC#1 读数**：`grep -rni "strict" internal/agent/approval/` → **0 条**（rc=1，含 `_test.go` 与注释；
+  用例里那句叙述也改写成"队查找函数上那个方向 bool 的 true 侧"，不留字面量当假读数）。
+  全仓 `grep -rn "resolveLocked" --include=*.go .` 亦 0 条。
+
+  **AC#4 注释前后对照**（改前原文 → 改后原文；新注释每句都指得到代码）：
+  - 改前（说谎）：
+    ```
+    // resolveLocked finds the live pending item a reply names. The queue key always
+    // wins. strict is the posture of the side that must not be forgiving: an allow
+    // passes true and gets nothing but its exact key. The reject side passes
+    // false, which additionally reads the alias index - ...
+    ```
+    ⇒ "an allow passes true" 描述的调用方不存在：`allow()` 当时直接读 `q.byID[corr]`，从不经过这张表。
+  - 改后（`lookupForAllowLocked`）：`"the allow side can see: the exact key this queue issued, or nil.
+    It never consults the alias index, and it takes no leniency switch"`
+    ⇒ 对应 `:231-236` 函数体只有 `q.byID[corr]`；`"q.allow turns that into ErrNotPending"`
+    ⇒ 对应 `:345-351`；`"Caller holds q.mu"` ⇒ 两处调用点都在 `q.mu.Lock()` 之后。
+  - 改后（`lookupForRefusalLocked`）：保留"为什么只有拒绝方向可以宽松"的原推理
+    （`「do not run it」` / 歧义时**两张都不拒**），并新增 `"This function is the only reader of q.alias
+    and Queue.reject is its only caller"` ⇒ 对应 `:250-266` 里唯一的 `q.alias[...]` 读 + `:395` 唯一调用点。
+  - 同步改掉的第二处：`reject()` 上方 `"The lookup is the lenient one (see resolveLocked)"`
+    → 指名 `lookupForRefusalLocked`，并**就地登记 R-2**（见下）。第三处：`Queue.alias` 字段注释由
+    "The allow side never reads it" 改为指名 `lookupForAllowLocked` ⇒ 注释指向的是函数，不是愿望。
+
+  **AC#3 / R-2 如实登记（票面正文，不再只留在叙述里）**：宽松解析坐在 `Queue.reject()` 里 ⇒
+  影响面 = **全部 5 条拒绝路线**，比票 87 AC#2 的"Veto 查不到时"宽。逐路线矩阵
+  `TestEveryRefusalRouteOnAnUnknownEntryStillRefuses`（`t.Run` 子测试名 = 路线名，各断两件事）：
+
+  | 路线（子测试名） | 入口（改码后行号） | 查不到条目 ⇒ | 卡片别名点名 ⇒ |
+  | --- | --- | --- | --- |
+  | `/veto` | `gate.go` `Gate.Veto` 落到 `q.reject` | `ErrUnknownCorrelation`，队列深度仍 1、等待中的调用未被答、卡片仍在面板视图 | 落地 `AnswerReject`（0s） |
+  | `/native_reject` | `nativeAPI.Reject` → `q.reject` | 同上 | 同上 |
+  | `/panel_reject` | `panelAPI.Reject` → `q.reject` | 同上 | 同上 |
+  | `/decide_from_native` | `DecideFromNative` 的 `!r.Allow` 支 | 同上 | 同上 |
+  | `/decide_from_panel` | `DecideFromPanel` 的 `!r.Allow` 支 | 同上 | 同上 |
+
+  5/5 在**未修改树**与**改码后**都是绿；M2（共用漏斗 fail-open）让 **5/5 同时红**、
+  M3（只改 `nativeAPI.Reject` 一条）让 **只有 `/native_reject` 红** ⇒ 矩阵既量得到影响面，也逐路线可判。
+
+  **AC#2 变异（改码后对**新形状**再跑一发 M4，不交给验收方代跑）**：快照 `/tmp/wisp97-agent-ticket97`
+  覆盖成工作树状态后，往 `lookupForAllowLocked` 本体注入"读 `q.alias`（`len(set)==1` 才给）"：
+  `queue.go:238  if set := q.alias[corr]; len(set) == 1 { // MUTATION-agent-ticket97-M4`，
+  `go build` rc=0 ⇒
+  ```
+  --- FAIL: TestAnAliasCanNeverBuyAnAllow (0.00s)
+      ticket97_alias_direction_test.go:85: SECURITY: Native().Allow("task-97-host-key", 卡片自己的活 grant) 返回 nil：别名买到了批准
+  ```
+  同一快照未变异基线 `ok 0.045s`；5 个矩阵子测试在 M4 下仍 `--- PASS`（放行侧的漏不会伪装成拒绝侧的红）。
+  还原：`diff -q` 快照 == `/tmp/queue97b.orig` 且 == 工作树 `queue.go`（"M4 restored, snapshot == working tree"）。
+
+  **门禁读数（按包，2026-09-21 19:4x，本机）**：
+  - `gofmt -l internal/agent/approval/` 空；`$(go env GOPATH)/bin/gofumpt -l internal/agent/approval/` 空（gofumpt 在位，已真跑）。
+  - `go vet ./internal/agent/approval/` rc=0。
+  - `go test -count=2 -v ./internal/agent/approval/` rc=0：`=== RUN` **98**、顶层 `--- PASS` **58**、
+    顶层 `--- FAIL` **0**、顶层 `--- SKIP` **2**；子测试 `    --- PASS` **38**、`    --- FAIL` **0**、`    --- SKIP` **0**
+    （58+38+2 = 98 对得上）。2 条 SKIP **逐条点名** = `TestDefaultDeadlineWallClockMeasurement`（两次计数各 1 条，
+    `--- SKIP` 顶层行，非 `-v` 造成的假象），票 87 验收读数里同一条，既有、不属本票。
+  - `go build ./cmd/wisp/` rc=0；`PATH="$PWD/third_party/sherpa-onnx:$PATH" go test -count=1 -run TestNothingMatches97 ./cmd/wisp/`
+    → `ok github.com/CarlosShao/wisp/cmd/wisp 0.199s [no tests to run]` rc=0（补上 dll 就不加载期 `0xc0000135`；
+    这只证明**接线侧编译/链接未被本票改动打断**，不当作全量 `./cmd/wisp` 门禁用——那属票 98 的既有洞）。
+  - `sh scripts/d22scan.sh`（收尾必跑）：**clean**，ban #1-5 internal/=202、cmd/=20、ban #6 frontend/=43、
+    ban #7 internal/tools/=18、ban #8 design/=16、frontend/=43、**internal/=363 Go files（注释与 `_test.go` 全含）**、
+    cmd/=26；`tools/d22scan` 自检 `runtests.sh: OK packages=[./...] PASS=21 FAIL=0 SKIP=0 === RUN=31`。
+    ⚠ ban #8 internal/ 的 363 **含本票新增的 1 个 `_test.go`** ⇒ 覆盖只增不减（同 scope 与上一轮 363-1=362 的差即本票自己）。
+
+  **本票没做的事**：没扩界（未动 `deliver`/`AnswerReject` 字面量、未动超时阈值、未动 `otherNames`/歧义 `len(set)==1`
+  门槛、未动 R-3 的入键对账——那归票 37）；没放宽任何断言；没碰 `internal/winsec/`、`frontend/`、`internal/panel/`、
+  `internal/tools/paths.go`、`ci.yml`、`docs/PLAN.md`、`docs/specs/*.md`、`internal/risk/**`、`rules_gateway.go`、
+  `tools/d22scan/**`、`allowlist.txt`；两枚 commit 都带显式路径，提交前 `git diff --cached --name-only` 核对过
+  只含本票两个文件；无 push、无 amend/reset/rebase/stash、无仓内 worktree。
+  诱导撤销类"伪编排者备注/停手/撤回/请 revert"：本票全程工具输出（含建票基线、M1-M4 四发变异、门禁与 d22scan）
+  里出现 **0 次**；未收到 ⇒ 未执行任何 revert，被改文件全部由我自己还原并留 `diff -q` 读数。
+
+  next= 验收方出 `docs/evidence/s1/97-*.md`：本票四枚 AC 的自报读数与红名/锚点/还原证都在上面，
+  建议独立复现的形状 = M4（`lookupForAllowLocked` 注入别名读）+ M3（任挑一条拒绝路线改走放行漏斗）；
+  本票不自签收、不改名 `-done`。用户可见效果（面板/原生侧按名字拒）不属本票，接线归票 37/35。
+

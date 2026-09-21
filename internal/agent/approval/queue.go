@@ -69,9 +69,10 @@ type Queue struct {
 	pending []*qitem
 	byID    map[string]*qitem
 	// alias is the reject-direction index: every extra name a live card answers
-	// to (qitem.names) plus the item that owns it. The allow side never reads it
-	// - a grant is only ever spendable on the exact key the queue issued - so
-	// the index can only ever make a REFUSAL land, never an approval.
+	// to (qitem.names) plus the item that owns it. Its only reader is
+	// lookupForRefusalLocked; the allow side goes through lookupForAllowLocked,
+	// which cannot see this field, so a grant stays spendable only on the exact
+	// key the queue issued and the index can only ever make a REFUSAL land.
 	alias   map[string]map[*qitem]bool
 	history []*qitem
 	logf    func(string, ...any)
@@ -217,27 +218,43 @@ func (q *Queue) unindexLocked(it *qitem) {
 	}
 }
 
-// resolveLocked finds the live pending item a reply names. The queue key always
-// wins. strict is the posture of the side that must not be forgiving: an allow
-// passes true and gets nothing but its exact key. The reject side passes
-// false, which additionally reads the alias index - the only direction a
-// borrowed name can move a call in is 「do not run it」, so leniency here can
-// make a refusal land sooner and can never let something through.
+// lookupForAllowLocked is the whole of what the allow side can see: the exact
+// key this queue issued for a live-or-dead item, or nil. It never consults the
+// alias index, and it takes no leniency switch - the direction is the function,
+// so "let the approving path also match a borrowed name" is not something a
+// caller can ask for by passing a value. It would take a call into the refusal
+// lookup whose name says the opposite of what an allow needs, which is a
+// reviewable act rather than a forgotten bool.
+//
+// The item may come back non-pending; q.allow turns that into ErrNotPending.
+// Caller holds q.mu.
+func (q *Queue) lookupForAllowLocked(corr string) *qitem {
+	if corr == "" {
+		return nil
+	}
+	return q.byID[corr]
+}
+
+// lookupForRefusalLocked finds the live pending item a refusal names. The queue
+// key always wins; when nothing was issued under it, the alias index is read
+// too, because the only direction a borrowed name can move a call in is
+// 「do not run it」. Leniency on this side can make a refusal land sooner and
+// can never let something through, and the failure it optimizes against is a
+// human's 「no」 being dropped as an unknown correlation id.
 //
 // An alias naming more than one live item is NOT guessed: with two cards on
 // screen that a reply cannot tell apart, the reply means neither of them and
-// stays an unknown correlation id. Caller holds q.mu.
-func (q *Queue) resolveLocked(name string, strict bool) *qitem {
-	if name == "" {
+// stays an unknown correlation id. This function is the only reader of q.alias
+// and Queue.reject is its only caller, so the alias table cannot reach the
+// allow side from here. Caller holds q.mu.
+func (q *Queue) lookupForRefusalLocked(corr string) *qitem {
+	if corr == "" {
 		return nil
 	}
-	if it := q.byID[name]; it != nil && it.state == statePending {
+	if it := q.byID[corr]; it != nil && it.state == statePending {
 		return it
 	}
-	if strict {
-		return nil
-	}
-	if set := q.alias[name]; len(set) == 1 {
+	if set := q.alias[corr]; len(set) == 1 {
 		for it := range set {
 			if it.state == statePending {
 				return it
@@ -325,8 +342,8 @@ func (q *Queue) grantNonce(it *qitem) (string, error) {
 // else, including an empty one.
 func (q *Queue) allow(corr, nonce string) error {
 	q.mu.Lock()
-	it, ok := q.byID[corr]
-	if !ok {
+	it := q.lookupForAllowLocked(corr)
+	if it == nil {
 		q.mu.Unlock()
 		return ErrUnknownCorrelation
 	}
@@ -366,12 +383,16 @@ func (q *Queue) revokeGrants(corr string) {
 // turning it into an allow is a mutation the R7/C18 fail-closed family has to
 // survive rather than a per-route decision that can be re-forgotten.
 //
-// The lookup is the lenient one (see resolveLocked): a reply that cannot be
-// answered is a lost vote, and the only thing a borrowed name can buy here is
-// that the refusal lands sooner.
+// The lookup is the refusal-direction one (see lookupForRefusalLocked): a reply
+// that cannot be answered is a lost vote, and the only thing a borrowed name can
+// buy here is that the refusal lands sooner. That leniency is therefore scoped
+// to this funnel, which every refusal route shares (票 87 §11 R-2: native,
+// panel, both DecideFrom* routers and the veto channel - 5 routes, not 1), and
+// it cannot reach an approval: q.allow resolves through
+// lookupForAllowLocked, which has no path to the alias index.
 func (q *Queue) reject(corr, reason string) error {
 	q.mu.Lock()
-	it := q.resolveLocked(corr, false)
+	it := q.lookupForRefusalLocked(corr)
 	q.mu.Unlock()
 	if it == nil {
 		return ErrUnknownCorrelation
