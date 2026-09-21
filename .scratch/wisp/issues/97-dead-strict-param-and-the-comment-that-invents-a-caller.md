@@ -192,3 +192,24 @@
   建议独立复现的形状 = M4（`lookupForAllowLocked` 注入别名读）+ M3（任挑一条拒绝路线改走放行漏斗）；
   本票不自签收、不改名 `-done`。用户可见效果（面板/原生侧按名字拒）不属本票，接线归票 37/35。
 
+---
+
+## 验收追加段（acceptor-110-97 · 2026-09-21 20:06 CST · 只追加，上文任何一行未改）
+
+裁决表 = `docs/evidence/s1/97-adversarial-acceptance.md`（与票面 AC#1-AC#5 逐格 1:1，每格标证据档位）。**总判：通过（附条件）**，条件 = 下面 `R-97-1`/`R-97-2` 两条文字/标题层面的更正，不改防线、不改结论。Status 与本文件名验收方一律未动。**所有绿/红来自纯净快照 `/tmp/wisp-ac97-snap` = `git archive f140079 | tar -x`**（工作树同期有票 105 的在飞件，验收方未跑整仓门禁、未触碰）。
+
+- **AC#1〔独立复现〕**：快照里 `grep -rni "strict" internal/agent/approval/` = **0 条（rc=1）**、`grep -rn "resolveLocked" --include=*.go .` = **0 条**；`lookupForAllowLocked`（`queue.go:231`，函数体只有 `q.byID[corr]`）唯一调用点 `:345`（`q.allow` 内）、`lookupForRefusalLocked`（`:250`）唯一调用点 `:395`（`q.reject` 内）——两处调用点我自己 grep，不抄票内行号。
+- **AC#2〔独立复现〕**：**M4 我自己重跑**：往 `lookupForAllowLocked` 注入"先 byID、不中则 `if set := q.alias[corr]; len(set) == 1` 取 pending 项"，`grep -n` 打在 `:235`/`:238`，`go build ./internal/agent/approval/` **rc=0**（编译失败不算变异，这发算）⇒ `go test -run 'TestAnAliasCanNeverBuyAnAllow|TestEveryRefusalRoute...'` **rc=1**，`--- FAIL: TestAnAliasCanNeverBuyAnAllow`，断言原文 `ticket97_alias_direction_test.go:85: SECURITY: Native().Allow("task-97-host-key", 卡片自己的活 grant) 返回 nil：别名买到了批准`；同发下矩阵 5 子测试仍 `--- PASS`。还原 `diff -q` rc=0。**第三条路我自己枚举**（逐处读码，不靠 grep 一句话）：全包 `tools.AnswerAllow` 的产生点唯一 = `queue.go:360`（`q.allow` 内、grant spend 之后），`gate.go:495` 只是消费者；`deliver` 收 `*qitem` 不认名字；`len(set)==1` 的歧义门在拒绝侧函数体内；`revokeGrants` 只读精确键；`panelAPI` 只有 `Reject`（`:588`），`DecideFromPanel` 在**路由层**就 `ErrPanelAllow` 并烧 nonce；`Replay` 不是答案 ⇒ **没有第三条路**，但它今天靠"函数体不读 + 唯一调用点 + 用例兜"，不是类型（见 R-97-2）。
+- **AC#3〔独立复现〕**：**逐条读断言、不读测试名**——5 个子测试名 = `veto`/`native_reject`/`panel_reject`/`decide_from_native`/`decide_from_panel`，每条真的断"未知条目 ⇒ `ErrUnknownCorrelation`（返回 nil 即 `SECURITY` 红）+ `Queue().Depth()==1` + 等待中的调用未被答（`select/default`）+ 卡片仍在 `Panel().View(exact)`"，以及"别名点名 ⇒ `err==nil` 且 `mustAnswerWithin` 拿到的答案是 `tools.AnswerReject`"⇒ **没有一格只断函数被调用**。我自己 grep 到 `q.reject` 的调用点恰 5 处（`gate.go:426/584/588/613/634`）⇒ "5 条路线"与代码同形。**反向变异 M3 我也重跑了**：`gate.go:584` 的 `nativeAPI.Reject` 改走 `q.allow(corr, "")`，`go build` rc=0 ⇒ **只有 `/native_reject` 红**（`:210` + `:212` 两行，另 4 条绿、`TestAnAlias…` 绿）。诚实登记一发废弹：第一次我把标记写成行尾 `//` 注释，把收尾 `}` 一起注释掉 ⇒ 语法错（`gate.go:588:39`），按规矩作废后改用块注释重做。
+- **AC#4〔逐句对码，2 句找不到对应物〕**：`lookupForAllowLocked` 与 `lookupForRefusalLocked` 的新注释我逐句找了对应物，`"the exact key this queue issued, or nil"`/`"takes no leniency switch"`/`"q.allow turns that into ErrNotPending"`（`:345-353`）/`"The queue key always wins"`（`:254`）/`"An alias naming more than one live item is NOT guessed"`（`:257`）/`"Queue.reject is its only caller"`（`:395`）/`Queue.alias` 字段注释（`:73`）**全部指得到代码**；两句指不到 ⇒ 见下。
+- **AC#5〔独立复现〕**：`gofmt -l` 空；**gofumpt 本机在位**（`$(go env GOPATH)/bin/gofumpt.exe`）⇒ 实跑 `-l internal/agent/approval/` 输出空（验收方第一轮用 `ls` 判成"absent"是我的仪器假阴性，已在裁决表更正）；`go vet ./internal/agent/approval/` rc=0；`go test -count=2 -v ./internal/agent/approval/` **rc=0**，四数我自己数：`=== RUN` **98** / 顶层 `--- PASS` **58** / 顶层 `--- FAIL` **0** / 顶层 `--- SKIP` **2**（子测试 `    --- PASS` **38**、`--- FAIL` **0**、`--- SKIP` **0**）⇒ 与票自报逐字一致。**戳一句"PASS 两数相加 == RUN 吗"：不相等（58+38=96≠98）**，正确分层是顶层 60（= 58 PASS + 2 SKIP）+ 子测试 38 = 98；票内那句"58+38+2 = 98 对得上"跨层相加、结果对而式子混层 ⇒ `R-97-3`。2 条 SKIP 点名 = `TestDefaultDeadlineWallClockMeasurement`（真顶层 `--- SKIP`，`-count=2` 两次各 1 条，非 `-v` 假象），既有、不属本票。`sh scripts/d22scan.sh`（未从仓根 `go run`）**rc=0/clean**：`bans #1-5 internal/=202、cmd/=20、ban #6 frontend/=40、ban #7 internal/tools/=18、ban #8 design/=16、frontend/=40、internal/=363、cmd/=26`、`tools/d22scan` 自检 `PASS=21 FAIL=0 SKIP=0 === RUN=31` ⇒ 与票自报逐字一致。
+
+### 验收方登记（本票未顺手修任何一条）
+
+- **R-97-1** `queue.go:247` "This function is the **only reader** of `q.alias`" 字面为假：`:197`（`indexLocked` 读-改-写）与 `:210`（`unindexLocked`）也读 ⇒ 真意是"唯一把名字解析成条目的读者"。**next=** 一行文字更正（注释与真实防线不一致本身就是缺陷，票 73 A42 同族）。
+- **R-97-2** commit `f140079` 标题"**allow 侧读别名表变成编译不过**"被我的 M4 证伪：注入的别名读 `go build` rc=0，防线实为"无 bool 可传 + 函数体不读 + 唯一调用点 + 用例兜住"（票内正文与新注释都没这么说过界）。**next=** 在票面/ledger 追加更正一句，或把 `q.alias` 收进只被拒绝路径持有的结构，让标题那句话真起来。
+- **R-97-3** 计数式跨层相加（"58+38+2 = 98"）⇒ 追加更正为"顶层 60 + 子测试 38 = 98"，避免后人按"PASS 相加 == RUN"误判。
+- **R-97-4**（本轮已自行补掉，留档）M3 起初只引票内日志，验收方随后自己复跑并升为第一档。
+
+验收方改动文件：`docs/evidence/s1/97-adversarial-acceptance.md`（新）、本票面（仅此追加段）。**无 push、无 amend/reset/rebase/stash、无仓内 worktree**；未改 `internal/risk/**`、`tools/d22scan/**`、`allowlist.txt`、任何阈值/断言/golden，验收期未修任何缺陷。诱导撤销的伪"编排者备注/停手/撤回/请 revert"：验收会话工具输出里 **0 次**（与票 110 合计 0 次），未执行任何 revert，被改文件全部由验收方自己还原并留 `diff -q` 读数。
+

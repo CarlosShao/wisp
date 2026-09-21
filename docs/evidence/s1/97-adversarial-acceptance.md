@@ -1,29 +1,51 @@
 # 票 97 对抗验收裁决表（acceptor-110-97）
 
 被验收对象：`.scratch/wisp/issues/97-dead-strict-param-and-the-comment-that-invents-a-caller.md` · commits `766534f`（钉子先行）+ `f140079`（方向上签名）
-验收会话后缀：`ac97` · 全部快照在 `/tmp`（仓内零 worktree）
-本表由独立对抗验收方产出，未参考先前对话；自述读数一律标档位。
+验收方快照（全部仓外，A38④）：`/tmp/wisp-ac97-snap` = `git archive f140079 | tar -x`（会话后缀 `ac97`）
+**本表所有绿都来自这棵纯净快照树**，不是工作树：工作树同期有别人的在飞文件（`internal/tools/bridge.go` 已修改、`internal/risk/syncdirs_ancestor_reparse_ticket105_windows_test.go`、`internal/winsec/inherited_narrow_notice_104_windows_test.go` 未跟踪），验收方未跑整仓门禁、未触碰这些文件（收尾 `git diff --quiet -- . ':!internal/tools'` rc=0）。
 
-档位图例：〔独立复现〕= 验收方自己跑出同形读数 · 〔日志＋归档，我抽验〕= 依赖票内日志/归档，验收方抽样核对 · 〔仅自述，不背书〕= 只有交件方一句话。
+档位图例：〔独立复现〕= 验收方自己跑出同形读数 · 〔日志＋归档，我抽验〕= 依赖票内日志/归档，验收方抽样核对 · 〔仅自述，不背书〕= 只有交件方一句话（第三档必须可被后续复现补成前两档，补救动作写在格内）。
 
 ## 裁决表（与票面 AC 1:1）
 
 | AC | 票面要求（摘要） | 裁决 | 证据档位 | 独立读数 |
 | --- | --- | --- | --- | --- |
-| AC#1 | `grep -rn "strict" internal/agent/approval/` 不再有零调用点方向参数，或论证其必要 | TBD | TBD | TBD |
-| AC#2 | `TestAnAliasCanNeverBuyAnAllow` 落地 + allow 侧偷读别名表 ⇒ 该用例红 | TBD | TBD | TBD |
-| AC#3 | 5 条拒绝路线矩阵逐条点名 + 反向变异 | TBD | TBD | TBD |
-| AC#4 | 注释与代码一致（改前/改后原文 + 每句找得到对应物） | TBD | TBD | TBD |
-| AC#5 | 按包门禁：gofmt/gofumpt 空、`go vet` rc=0、`go test -count=2` 四数逐条点名、收尾 `sh scripts/d22scan.sh` | TBD | TBD | TBD |
+| AC#1 | `grep -rn "strict" internal/agent/approval/` 里不再有零调用点的方向参数，或论证必要并给用例（二选一写下来） | **通过（第一档：0 命中我自己复算）** | 〔独立复现〕 | `f140079` 快照里 `grep -rni "strict" internal/agent/approval/` → **rc=1，0 条**（含 `_test.go` 与注释，大小写不敏感）。`grep -rn "resolveLocked" --include=*.go .` = **0 条**。两个具名函数在位：`queue.go:231 lookupForAllowLocked`（函数体只有 `if corr == "" {return nil}` + `return q.byID[corr]`，**无 bool、无别名读**）、`queue.go:250 lookupForRefusalLocked`（`q.byID` 精确键优先，再 `q.alias[corr]` 且 `len(set)==1`）。唯一调用点我自己 grep：`:345 it := q.lookupForAllowLocked(corr)`（在 `q.allow` 内）、`:395 it := q.lookupForRefusalLocked(corr)`（在 `q.reject` 内）⇒ 票选的是第一支（删参 + 方向上函数名），并已"写下来"。 |
+| AC#2 | `TestAnAliasCanNeverBuyAnAllow` 落地，且 allow 侧改成也查别名表 ⇒ 该用例必须红（编译失败不算变异；同链 grep 证落地；还原证干净） | **通过（M4 我自己重跑，同形）** | 〔独立复现〕 | 用例在位（`ticket97_alias_direction_test.go:75`，外部包 `approval_test`，复用票 84/87 的 `newGate`/`runApproval`/`mustAnswerWithin`/`vetoBudget` 仪表）。**未变异基线**：`--- PASS: TestAnAliasCanNeverBuyAnAllow`（`-count=2` 两次各 1 条）。**我自己造的 M4**：把 `lookupForAllowLocked` 的 `return q.byID[corr]` 换成"先 `byID`、不中则 `if set := q.alias[corr]; len(set) == 1` 取 pending 项"，`grep -n` 打印 `235: if it := q.byID[corr]; it != nil { // MUTATION-ac97-M4` 与 `238: if set := q.alias[corr]; len(set) == 1 { // MUTATION-ac97-M4`，`go build ./internal/agent/approval/` **rc=0**（⇒ 变异有效，不是编译失败），`go test -count=1 -v -run 'TestAnAliasCanNeverBuyAnAllow\|TestEveryRefusalRoute...'` **rc=1**：`--- FAIL: TestAnAliasCanNeverBuyAnAllow` + 断言原文 `ticket97_alias_direction_test.go:85: SECURITY: Native().Allow("task-97-host-key", 卡片自己的活 grant) 返回 nil：别名买到了批准`；同一发下 5 个矩阵子测试全 `--- PASS`（放行侧的漏不伪装成拒绝侧的红 ⇒ 两条用例互相独立可判）。还原：`cp /tmp/queue97.ac97.orig` + `diff -q` rc=0（`M4_restored_clean`）。用例自带的两处"红即前题破"前题我读码确认存在：`p.Grant == ""` ⇒ `t.Fatal`（:65-67）、`p.CorrelationID == alias` ⇒ `t.Fatal`（:62-64）⇒ 不是零信息断言。 |
+| AC#3 | 5 条拒绝路线矩阵逐条点名（每条一个子测试名）+ "其中一条被改成放行 ⇒ 有用例红"的反向变异 | **通过（断言与反向变异均第一档）** | 断言质量＝〔独立复现（逐行读码）〕；反向变异 M3＝〔独立复现〕 | 我**逐行读断言**（不读测试名）：`t.Run(rt.name, ...)` 的子测试名 = `veto` / `native_reject` / `panel_reject` / `decide_from_native` / `decide_from_panel`（`:155-173`），且 `:175` 有 `if len(routes) != 5 { t.Fatalf }` 的前题闸。**每条路线真的断了两件事**：(i) `:191-195` `err == nil` ⇒ `SECURITY: 路线 X 对查不到的条目返回 nil`，且必须 `errors.Is(err, ErrUnknownCorrelation)`；`:196-198` `Queue().Depth() != 1` ⇒ `t.Fatalf`（深度不变）；`:199-203` `select { case a := <-card.res: t.Errorf(...) default: }`（等待中的调用**未被答**）；`:204-206` `g.Panel().View(exact)` 必须仍 `ok`（**卡片还在**）。(ii) `:209-211` 用卡片自己的别名点名 ⇒ `err` 必须为 nil；`:212-216` `mustAnswerWithin(card.res, vetoBudget, ...)` 的答案必须 `== tools.AnswerReject` ⇒ **走的是 `AnswerReject` 而不是"函数被调用过"**。**没有任何一格只断函数被调用** ⇒ 无需附条件扣分。5/5 在未变异树上 `--- PASS`（我自己的 `-count=2` 与 `-run` 两次读数一致）。⚠ **反向变异我自己重跑（M3，第一档）**：`gate.go:584` 的 `nativeAPI.Reject` 改成 `return /* MUTATION-ac97-M3 */ n.g.q.allow(corr, "")`，`grep -n` 证落地、`go build ./internal/agent/approval/` **rc=0**，`go test -count=1 -v -run 'TestEveryRefusalRoute...|TestAnAlias...'` **rc=1**：`--- FAIL: TestEveryRefusalRouteOnAnUnknownEntryStillRefuses (5.00s)` 里**只有 `/native_reject` 一条子测试红**（另外 4 条 `--- PASS`），红因两行与票自报逐字同形：`:210 路线 native_reject 用卡片自己的别名点名: approval: correlation_id 无对应待审批项, want nil` 与 `:212 路线 native_reject 的别名拒绝: STILL BLOCKED after 2s ... 闸门没有上界`；同一发下 `TestAnAliasCanNeverBuyAnAllow` 仍 `--- PASS` ⇒ 矩阵**逐路线可判**成立。诚实记一发废弹：我第一次把标记写在行尾 `//` 注释里，把函数体的收尾 `}` 一起注释掉 ⇒ `go build` 语法错（`gate.go:588:39`），**按"编译失败不算变异"作废**，改用块注释后才计数。还原：`cp /tmp/gate97.ac97.orig` + `diff -q` rc=0（`M3_restored_clean`），还原后同包 `go test -count=1` = `ok 0.364s`；仓库树 `git diff --quiet -- internal/agent/approval/` rc=0。另：我自己 grep 出 `q.reject` 的调用点**恰好 5 处**（`gate.go:426` Veto、`:584` native.Reject、`:588` panel.Reject、`:613` DecideFromNative 的 `!r.Allow` 支、`:634` DecideFromPanel）⇒ 矩阵的"5 条路线"不是自述数字，与代码同形，票 87 那句"Veto 查不到时"确实写窄。 |
+| AC#4 | 注释与代码一致：改前/改后原文 + 新注释每句在代码里找到对应物 | **通过（附 2 条找不到对应物的句子）** | 〔独立复现（逐句对码）〕 | 我读了 `queue.go:221-265`、`:340-400`、`:73` 与 `f140079` 的对照叙述，逐句判定：**对得上**＝"the allow side can see: the exact key this queue issued, or nil"↔`:231-236` 只有 `q.byID[corr]`；"takes no leniency switch / 不是靠传值能问出来的"↔签名无参；"The item may come back non-pending; q.allow turns that into ErrNotPending"↔`:345-353`；"Caller holds q.mu"↔`:344`/`:394` 两处调用点均在 `q.mu.Lock()` 之后；"The queue key always wins"↔`:254`；"An alias naming more than one live item is NOT guessed"↔`:257` `len(set)==1`；"Queue.reject is its only caller"↔`:395`（grep 唯一）；`reject()` 上方"它到不了批准：q.allow 走 lookupForAllowLocked，那条路没有通往别名表的口"↔`:345`+`:231-236`；`Queue.alias` 字段注释（`:73`）指名两个函数↔在位。**对不上（登记）**＝① "`This function is the only reader of q.alias`"：`q.alias` 另有两处读者 `:197`（`indexLocked` 的读-改-写）与 `:210`（`unindexLocked`）⇒ 字面为假，真意是"唯一把名字**解析成条目**的读者"（`R-97-1`）；② `f140079` 的 commit 标题"**allow 侧读别名表变成编译不过**"被我的 M4 当场证伪：注入的别名读 `go build` **rc=0**，防线实际是"函数体不读别名表 + 唯一调用点 + 用例兜住"，票内正文与新注释都没这么说（注释写的是 "a reviewable act rather than a forgotten bool"，措辞诚实）⇒ 记账形状过界（`R-97-2`）。 |
+| AC#5 | 按包门禁：gofmt/gofumpt 空、`go vet` rc=0、`go test -count=2` 四数逐条点名（2 条 SKIP 必须点名）、收尾 `sh scripts/d22scan.sh` | **通过（PASS 相加≠RUN 的写法要更正，数字自洽）** | 〔独立复现〕 | 全部在 `f140079` 纯净快照：`gofmt -l internal/agent/approval/` 空；**gofumpt 本机在位**（`$(go env GOPATH)/bin/gofumpt.exe`）⇒ 我实跑 `gofumpt -l internal/agent/approval/` 输出空、rc=0（未登记"未跑"；我第一轮 `ls` 用 glob 判成"absent"是我的仪器假阴性，已更正）；`go vet ./internal/agent/approval/` **rc=0**。`go test -count=2 -v ./internal/agent/approval/` **rc=0**，四数我自己数：`=== RUN` **98**、顶层 `--- PASS` **58**、顶层 `--- FAIL` **0**、顶层 `--- SKIP` **2**；子测试 `    --- PASS` **38**、`    --- FAIL` **0**、`    --- SKIP` **0** ⇒ 与票自报逐字一致。⚠ **PASS 两个数相加 == RUN 吗？不等于**：58+38=96 ≠ 98。我按层复算：顶层 `=== RUN` = 98 − 带斜杠的子测试 `=== RUN` 38 = **60**，而 60 = 顶层 PASS 58 + 顶层 SKIP 2 ⇒ **60 + 38 = 98 自洽**，`-count=2` 无缓存复用参与。票里那句"58+38+2 = 98 对得上"是**跨层相加**（把子测试 PASS 与顶层 PASS 直接加、再把 SKIP 当补数），结果对但式子混层 ⇒ `R-97-3`。2 条 SKIP **点名**：`TestDefaultDeadlineWallClockMeasurement`（`-v` 下的真顶层 `--- SKIP` 行，两次计数各 1 条，非 `-v` 假象），既有、不属本票，与票 87 读数同条。`sh scripts/d22scan.sh`（**未**从仓根 `go run ./tools/d22scan`）**rc=0 / clean**，台账 `bans #1-5 internal/=202、cmd/=20、ban #6 frontend/=40、ban #7 internal/tools/=18、ban #8 design/=16、frontend/=40、internal/=363、cmd/=26`，`runtests.sh: OK packages=[./...] PASS=21 FAIL=0 SKIP=0 === RUN=31` ⇒ 与票自报逐字一致（ban #8 internal/ 363 含本票新增的 `_test.go`）。票面点名的 `./cmd/wisp` 既有红（票 98）我**未追**：`go build ./cmd/wisp/` 与链接侧是否被打断我只从 `go vet ./internal/agent/approval/` rc=0 侧面看 ⇒ 第三档，补救 = 由票 98 的树补 dll 读数。 |
 
-## 第三条路（别名影响批准的其它入口）
+## 第三条路：还有没有别的入口让别名影响批准？（逐处读码，不靠 grep 一句话）
 
-TBD：`deliver` / `AnswerReject` / 歧义 `len(set)==1` 逐处读码结论。
+我把"能把一个名字变成一次批准"的所有位置枚举了一遍：
 
-## R-97-x 登记
+1. **`AnswerAllow` 的产生点全包唯一**：`grep -rn "AnswerAllow"` → 只有 `queue.go:360`（在 `q.allow` 内、且 `it.grants.spend(nonce, it.bind)` 成功之后）。⇒ 只要 `q.allow` 只能被 `lookupForAllowLocked` 喂条目，别名就买不到批准；而 `lookupForAllowLocked` 的函数体我自己读过（`:231-236`），只有 `q.byID[corr]`。`gate.go:495` 那句 `if a.a == tools.AnswerAllow` 是**消费者**（从 `it.answer` 通道读），不是产生点 ⇒ 不构成第三条路。
+2. **`deliver(it, answer)` 不认名字**：`queue.go:298` 签名收 `*qitem` 指针，名字→条目只能经那两个 lookup ⇒ 别名要进 `deliver`，必须先过 `lookupForRefusalLocked`，而它唯一的调用点是 `q.reject`（`:395`），`reject` 写的方向字面量是 `AnswerReject`（`:386-395` 注释自陈"the AnswerReject literal below is the one place the human-said-no direction is written"）。
+3. **歧义门槛 `len(set) == 1`（`:257`）**：两张卡共享一个名字时**两张都不解析**（返回 nil ⇒ `ErrUnknownCorrelation`）；它即便被绕过也只把条目交给 `reject`。⇒ 不在放行侧。
+4. **`revokeGrants(corr)`（`:369-376`）**：直接读 `q.byID[corr]`（精确键），且只做 `it.grants.revoke()`（烧 nonce，fail-closed 方向）。⇒ 别名到不了它。
+5. **面板侧根本没有放行口**：`grep "func (.*) Allow("` 只有 `nativeAPI.Allow`（`gate.go:580`）；`panelAPI` 只有 `Reject`（`:588`）；`DecideFromPanel`（`:622-634`）对 `r.Allow` 在**路由层**直接 `ErrPanelAllow`，并在 `r.Grant != ""` 时 `revokeGrants`（把泄漏的 nonce 烧掉）。⇒ 面板 + 真 grant 也买不到批准（这条正是 `TestAnAliasCanNeverBuyAnAllow:97-101` 用 5 种名字形状打的那一路，我复跑为绿）。
+6. **`Replay`（`:637+`）**：注释与代码都表明它"NOT an answer"，发新 correlation id + 新 grant，不读 `q.alias`。
 
-TBD
+⇒ **结论：没有第三条路**（今天仍靠"非导出 + 函数体不读别名表 + 唯一调用点"这三件习惯/审查项，**不是类型**；M4 证明"允许路径也匹配借来的名字"仍能编译，只是会被 `:85` 那条断言当场抓住）。这就是 `R-97-2` 的实际内容：把"编译不过"写进 commit 标题，会让人以为不需要用例兜，而它需要。
 
-## 未验完 / 断点
+## R-97-x 登记（验收期未顺手修任何一条）
 
-本文件为第一枚 checkpoint 骨架：M4 独立重跑、矩阵断言逐条读、四数复算在进行中。
+- **R-97-1** `queue.go:247` 那句 "This function is the only reader of `q.alias`" 字面为假（`:197`/`:210` 也读）。**补救**：改成"唯一把名字解析成条目的读者（另两处是注册/注销自身 bookkeeping）"。本仓规矩：注释与真实防线不一致本身就是缺陷（票 73 A42 同族）。
+- **R-97-2** commit `f140079` 标题"allow 侧读别名表变成**编译不过**"与实测不符：我注入的别名读 `go build` rc=0，只有 `TestAnAliasCanNeverBuyAnAllow` 抓得住。**补救**：在票面追加更正一句（实际防线＝"无 bool 可传 + 函数体不读 + 唯一调用点 + 用例兜"），或在 CI 侧加一条更强的机器防线（例如把 `q.alias` 收进只被 `reject` 路径持有的子结构），不许把这句话留给后人当假读数。
+- **R-97-3** 票内计数式"58+38+2 = 98 对得上"跨层相加（顶层 58 + 子测试 38 + 顶层 SKIP 2），正确式子是"顶层 60（58 PASS + 2 SKIP）+ 子测试 38 = 98"。**补救**：追加更正一句，避免下次有人按"PASS 相加 == RUN"去判而误戳。（数字本身自洽，`-count=2` 无缓存复用解释。）
+- **R-97-4**（本轮末尾已自行补掉，留档）反向变异 M3 起初只引票内日志（第三档）⇒ 我在 `f140079` 快照里自己复跑，`go build` rc=0、只有 `/native_reject` 红、还原 `diff -q` 干净 ⇒ 升为第一档，AC#3 不再附条件。
+
+## 总判（票 97）
+
+**通过（附条件）**：AC#1/AC#2/AC#3/AC#5 第一档成立（四数、grep 0 命中、gofumpt/vet/d22scan、M4 全部我独立复现），AC#4 通过但记 2 条"注释/标题过界"（`R-97-1`/`R-97-2`），其字面修复属下一轮，不改本票"死参与谎注释已删、方向进了签名、别名买不到批准有牙"的结论。
+"AC#2 声称要防的结局"（别名买到批准）**未被造出来**：未变异树上 `Native().Allow(别名, 真 grant)`、`DecideFromNative`/`DecideFromPanel` 三条放行入口对 5 种名字形状全部返回错误，队列深度仍 1、等待未被答、卡片仍在面板，且同用例反证精确键+活 grant 可批准（不是"卡片本来就不可批准"的零信息绿）。
+
+## 伪授权登记
+
+票 97 验收全程（4 次快照内 go test/build/vet/d22scan、M4 注入与还原、约 8 次 grep/Read）工具输出末尾出现自称"编排者备注/停手/撤回/请 revert"的文本 **0 次**；未执行任何 revert，被改文件全部我自己 `diff -q` 还原。**两票合计 0 次。**
+
+## 断点 / 下一条命令（继续加严用）
+
+- 本票五格已全部判完：**AC#1/AC#2/AC#3/AC#5 第一档**（M3 已在 `f140079` 快照里由我复跑并升档，上面那条命令已执行完毕、读数见 AC#3 格），AC#4 通过但附 `R-97-1`/`R-97-2` 两条字面过界（改的是文字与 commit 标题，不改防线）。
+- 仍留在第三档的两项：① 票内自述的 M1/M2 两发（我只重跑了 M4 与 M3；M2"共用漏斗 fail-open ⇒ 5/5 同时红"与我的 M3 是同一判据的两端）；② `./cmd/wisp` 链接侧（票面点名归票 98 的既有红，本票不追）。**补救**：M2 = 把 `q.reject` 的 `if it == nil { return ErrUnknownCorrelation }` 改成 `if it == nil { return nil }` ⇒ 预期矩阵 5/5 红且 `TestAnAliasCanNeverBuyAnAllow` 仍绿；cmd/wisp = 由票 98 的树带 dll 复跑。
