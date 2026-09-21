@@ -69,3 +69,33 @@
   我没在验收前把它当成已交付——这句话如果留在账上不更正，下一个读账的人又会以为它通了。
   next= 等一张写码名额（当前 4 张在飞=硬上限）后派单；AC#2 若与票 92 的"审计给人看"面板撞车，
   **以本票的审计 sink 那一半为准、面板那一半归 92**（AC#4 就是为此而写）。
+- 2026-09-21 19:3x（agent-ticket105）：**AC#1 复算完成，"零生产读取者"复现**。
+  命令＝票面 AC#1 原文（`grep -rn "RewrittenRoots(\|UnusableRoots(\|\.Roots(" --include=*.go . | grep -v _test.go`），
+  真实读数 **2 条命中，且两条都是方法的定义行、不是调用点**：
+  - `internal/tools/paths.go:186` `func (p *PathCanonicalizer) UnusableRoots() []string {`（定义）
+  - `internal/tools/paths.go:194` `func (p *PathCanonicalizer) RewrittenRoots() []string {`（定义）
+  去掉 `-v _test.go` 后总命中 **31**，其余 29 条全部落在测试文件：
+  `internal/tools/paths_rewrite_ticket102_test.go` 11、`paths_ticket107b_probes_test.go` 9、
+  `paths_ticket107_portable_test.go` 5、`paths_workspace_test.go` 3、`internal/risk/pathshape_portable_test.go` 1。
+  `Roots()` 也**没有任何非测试调用点**（上面 grep 的 `\.Roots(` 分支零命中）。
+  ⇒ 判：**复现**，本票不降级，AC#2 照做。
+  同一条 grep 的邻域补充（说明这本账今天只到"判定"、没到"人"）：`Result.Rewritten` 的 6 个非测试读取点
+  （`internal/risk/syncdirs.go:143`、`internal/risk/winsec_c26.go:60,62`、`internal/tools/paths.go:82`、
+  `internal/panel/workspace.go:99,104,107`）全是**安全判定/契约字段**方向；
+  `internal/panel/` 那三处是票 92 的 composer 回显（本票 AC#4 地界，不动）。
+- **AC#2 接线设计（写码前定位）**：消费者落在 `internal/tools/bridge.go` 的 `book()`——
+  它就是每调用一条的结构化审计记录（`tools: call kind=...`），与 `MODE-READ`/`MODE-SILENCE` 同族，
+  且 `Options.Logf` 由装配根 `cmd/wisp/run.go:353` 接的是 `rt.auditf`（同一个 sink）⇒
+  链路 `cmd/wisp/run.go:265 NewPathCanonicalizer` → `run.go:337 tools.New(Options{Paths: rt.paths, Logf: rt.auditf})`
+  → `bridge.book()` 读 `RewrittenRoots()/UnusableRoots()/Roots()`。不新造第二本账、不改 `paths.go`。
+- **AC#3 现场分析（先登记，避免后人重走）**：目标腿＝票 102 处置表第 4 行
+  `internal/risk/syncdirs.go:222-229`（`Resolve(anc)` 的 `err` 分支 + `ares.Actable()`）。
+  可达性推演：非 exempt 的 junction 祖先会被**第一次** `Resolve(raw)` 的 `reparseComponents` 先拒
+  （祖先分量 ⊆ 全路径分量），exempt 的 junction 则在 `res.Resolved` 处提前返回；
+  ⇒ 该腿的"被拒"形状要靠 exempt 祖先 + 目标不存在（`!res.Resolved`）才进得到，
+  用例形状＝`mklink /J` 临时目录 + `reparse_point_exceptions` 登记该 junction + 目标写一个新文件。
+  断言对象＝**可观察结果**：`IsSyncPath` 的 `Sync`/`Root.Source`/`Why`，以及"祖先被 C26 移动时不落到错树"。
+  变异＝在 `/tmp` 快照里删掉 222-229 的判定、直接用 `anc` 拼答案，要求本用例红在行为。
+  ⚠ 若推演结论是"这条腿在无 exempt 登记的真机上不可达"，我会把**实际红的那条断言原文**写进票面，
+  不会为了勾框改 `syncdirs.go`（那是票 102 已结案的语义）。
+  next= 写 AC#3/AC#2 的修前红用例并单独 commit。
