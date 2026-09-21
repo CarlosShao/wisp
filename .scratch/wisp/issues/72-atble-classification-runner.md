@@ -51,19 +51,45 @@ A 表（`blacklist.go:132` 的 `~/.ssh/**` 之类）语义是**不可放行的�
 
 ## Acceptance criteria
 
-- [ ] **AC#1 根因定位**：读新 run 的诊断输出（**不要**在本地猜完就改码），给出"A 表锚点为何不比 B 表更近"的
+- [x] **AC#1 根因定位**：读新 run 的诊断输出（**不要**在本地猜完就改码），给出"A 表锚点为何不比 B 表更近"的
       **机制级**解释，并指明具体那一行代码。允许结论是"Windows-by-design 需要归一化两侧"，但必须给出证据。
-- [ ] **AC#2 修复方向：归一化两侧，不是加特例**。修法必须让"A 表优先"成为**不变式**
+      **证据 = 票 70 从 run 35549859581 抠出的实值**（不是本地猜）：锚点 `c:\users\runner~1\...\001\.ssh` `isUnder=false`，
+      canonical 是 `C:\Users\runneradmin\...`。那一句就是漏点：`internal/risk/blacklist.go:120` 起
+      `normDir(userHomeDir())` 把 `os.Getenv("USERPROFILE")` 的**字面拼写**直接当锚点，从没进过 C26 管线；
+      `internal/risk/blacklist.go:132`（现 `:170`）的 `isUnder(p, home+`\.ssh`)` 于是拿"已展开"比"未展开"。
+      结论：**Windows-by-design 会产两种拼写，归一化两侧是契约要求**（SPEC-06 §4 `展开 8.3 短名` / C26 句柄真实路径）。
+- [x] **AC#2 修复方向：归一化两侧，不是加特例**。修法必须让"A 表优先"成为**不变式**
       （同一条路径既命中 A 又命中 B 时永远判 A），**禁止**用"把 `.ssh` 的特例写进 canonicalizer"或
       "调整 case 顺序"来过关。
-- [ ] **AC#3 双向变异检验**：①把修复退回旧实现 ⇒ 分类用例必须转红；②**构造一条 A 与 B 同时命中的形状**
+      落地：`internal/risk/pathresolver.go` 新增 `pathForms`/`formsOf`/`anchorForms`（锚点走**同一条**句柄管线，
+      `GetFinalPathNameByHandle` + `\\?\` 剥离 + UNC 归一，零字符串启发式）；`blacklist.go` 的 A 规则改成
+      `aEq`/`aUnder` 多形比较 + `uncertainAnchorMiss` 的 **fail-closed**（拼写无法证明已展开 ⇒ 判 A）。
+      没有 `.ssh` 特例、没有 case 顺序调整、没有任何 `isCI`/环境变量分支（A19/M-7/C-3 族）。
+- [x] **AC#3 双向变异检验**：①把修复退回旧实现 ⇒ 分类用例必须转红；②**构造一条 A 与 B 同时命中的形状**
       （比如把禁目录做成 temp 下的子目录、文件名同时匹配 B 表模式），证明修复后的不变式判 A。
+      ①= `pathresolver.go` 的 `formsOf` 退回"只给 raw 拼写" ⇒ `TestClassifyAnchorSpellingIsNotVerdict` /
+      `TestClassifySpellingInvariance` / `TestClassifyFailClosedWhenSpellingUnprovable` 三条转红，其余票 18 用例**仍绿**
+      （本机 USERPROFILE 拼写恰好等于句柄拼写 ⇒ 只有新用例看得见这个洞，正是 AC#4 需要 runner 的原因）；
+      退回后 `git diff --quiet -- internal/risk` rc=0。②= `TestAListWinsWhereBothTablesHit`。
 - [ ] **AC#4 本机 + runner 两侧都过**：贴出两侧**逐字同命令**的输出与真实 exit code；
       runner 侧必须来自一次**真 run**，不是本地等价环境。
-- [ ] **AC#5 不放宽任何断言**：`ClassA` 的期望值、A/B 表内容、豁免语义（只按精确路径）
+      **本机侧已量（`go test ./internal/risk/... -count=2` rc=0；`-count=1 -v` = 123 `=== RUN` / 122 PASS / 1 SKIP / 0 FAIL，
+      那 1 条 SKIP 是 `TestSyncRegistryProbeLive`，HEAD 纯净树同样 SKIP，非本票引入）**。
+      **框不勾**：runner 侧要 push 才有一次真 run，而本票明写"绝不 push" ⇒ 交编排者跑。
+- [x] **AC#5 不放宽任何断言**：`ClassA` 的期望值、A/B 表内容、豁免语义（只按精确路径）
       一律不许改；若证据表明**必须**改契约，**停下来上报编排者**（D22）。
+      **取证仪器一字未动**：`internal/risk/pathresolver_junction_windows_test.go` 不在本票任何一个 commit 的 diff 里
+      （`git diff cada033..HEAD --name-only` 不含它），没加 `t.Skip`、没加 build tag、锚点拼写没"对齐"、期望值仍是 `ClassA`。
+      A/B 表内容与规则字符串逐字保留（只把"拿字面锚点比"换成"拿展开锚点比"）；
+      `ErrReparseDenied` 与 `reparse_point_exceptions` 的"只按精确路径"语义零改动。
+      **一处如实报备**：`Gate` 的 B 档单文件豁免查表从"只比 caller 给的拼写"改成"比该路径的全部拼写形"——
+      同文件不同拼写时确认仍然生效（否则修复会把用户已经确认过的文件重新卡在门外），
+      方向是"多问一次"而不是"多放一次"，A 档仍不可豁免。若编排者判定这算放宽，指一句我收回去。
 - [ ] **AC#6 顺带把票 70 的 AC#3 闭掉**：本票的修复就是那条 CI 步骤转绿的因；
       修好后在票 70 的 log 里补一行指回本票，并把"步骤名陈旧"这件事改成非误导性命名（改名不算放宽门）。
+      前半done：票 70 log 已补指回本票的一行。**后半没做，因为 `.github/workflows/ci.yml` 是票 71 在途的文件**（共树禁改清单）；
+      建议的新步骤名（逐字可用）：`PathResolver red-team cases (junction/8.3/UNC/\\?\ - tickets 18/20/72)`，
+      交编排者或票 71 落。
 
 ## 硬约束
 
@@ -90,6 +116,21 @@ A 表（`blacklist.go:132` 的 `~/.ssh/**` 之类）语义是**不可放行的�
   **字面拼写**，从没进过 C26 管线 ⇒ `blacklist.go:132` 的 `isUnder(p, home+`\.ssh`)` 拿长名去比短名，静默 miss，
   掉到 B 表 `id_*`（`blacklist.go:155`）。修法按 R17 不变式做：**两侧都进句柄真实路径**，锚点无法证明已展开时 fail-closed。
   next=落 `pathresolver*.go` 的锚点展开实现 + `blacklist.go` 改为多形比较（不动表内容），然后跑 AC#3 双向变异。
+- [2026-09-21T10:25Z] agent=agent-ticket72 did=**AC#1/AC#2/AC#3/AC#5 落地（AC#2 的实现 + AC#3 的双向变异都跑过）**。
+  实现：`pathresolver.go` 加 `pathForms`/`formsOf`/`anchorForms`/`tailExistsBelow`/`pathExists`（锚点走同一条 C26 句柄管线；
+  祖先走不动时把"存在但打不开"的那一节标成 `partial`）+ `blacklist.go` 的 A 规则换成 `aEq`/`aUnder` 多形比较与
+  `uncertainAnchorMiss` 的 fail-closed 分支，B 档豁免查表改成"同一文件的所有拼写形"。
+  新增仪器文件：`internal/risk/pathresolver_anchor_spelling_windows_test.go` 四条
+  （`TestClassifyAnchorSpellingIsNotVerdict` 用 junction 当 USERPROFILE，**不依赖 8.3、不依赖 CI、不需要管理员**就复刻出同一种不对称；
+  `TestClassifySpellingInvariance` 把不变式直接写成"同一文件九种拼写同判"；
+  `TestAListWinsWhereBothTablesHit` 是 AC#3② 的 A∩B；
+  `TestClassifyFailClosedWhenSpellingUnprovable` 用**悬空 junction** 造出"存在但打不开"，证明 fail-closed 走的是 A 不是 B）。
+  变异（AC#3①）：把 `formsOf` 退回"只交 raw 拼写" ⇒ 上面第 1/2/4 条转红，报的正是
+  `canonical ... classified B ... want ClassA` 与三条 exact A 路径直接 `Class:none Allow:true`（比 runner 症状更宽）；
+  票 18 原有十条用例在本机**仍全绿** ⇒ 本机看不见这个洞不是"洞不在"，是"这台机器的 USERPROFILE 恰好等于句柄拼写"。
+  退回变异后 `git diff --quiet -- internal/risk` rc=0。门：`gofmt -l internal/risk` 空、`go vet ./internal/risk/...` rc=0、
+  `go test ./internal/risk/... -count=2` rc=0、`GOOS=linux go vet ./internal/risk/` rc=0（跨平台不炸）。
+  next=AC#4 等编排者 push 后的一次真 run（`test-windows`）；AC#6 的步骤改名因 `ci.yml` 属票 71 而未做，建议名已写进票 70 log。
 - 2026-09-21 09:10 编排者建票。**为什么单开一张**：票 70 的代理在 `a04d3e2` 里明确写了
   "这条按真缺陷登记、够格单开一张票"，而它自己撞 turn 上限死了；把一个安全分类失效留在
   "让 CI 变绿"那张票里，很容易被下一个代理用"改断言/加 skip"的最短路径解决掉——那正是本项目最贵的一类错。

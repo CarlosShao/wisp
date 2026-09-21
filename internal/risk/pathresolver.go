@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
+	"sync/atomic"
 )
 
 // C26 PathResolver (SPEC-06 §4): the ONLY path normalization entry point in
@@ -23,6 +25,10 @@ import (
 // D22: filepath.Clean / filepath.Abs are sanctioned ONLY inside this file.
 // Any other use for fs decisions is a CI-failing violation (see
 // scripts/check-pathclean-ban.sh).
+//
+// The same pipeline also serves the ANCHOR side of a security comparison
+// (formsOf / anchorForms below): classification must not depend on which
+// spelling a path happened to arrive in.
 
 // ErrReparseDenied is returned when a path traverses a junction/symlink that
 // is not covered by reparse_point_exceptions. Fail-closed by design.
@@ -159,4 +165,159 @@ func stripExtendedPrefix(p string) string {
 		return p[len(`\\?\`):]
 	}
 	return p
+}
+
+// ---------------------------------------------------------------------------
+// Comparison forms: the ANCHOR side of a security comparison (ticket 72).
+// ---------------------------------------------------------------------------
+//
+// Resolve guarantees that a candidate path is a handle-resolved real path. It
+// says nothing about the anchors of the A/B tables, which are built from the
+// environment (USERPROFILE / APPDATA / LOCALAPPDATA) and therefore keep
+// whatever spelling the process was started with. On GitHub's windows-latest
+// runner USERPROFILE is the 8.3 short form (C:\Users\RUNNER~1) while
+// GetFinalPathNameByHandle hands back the long one (C:\Users\runneradmin), so
+// "canonical is under ~/.ssh" compared raw-vs-resolved misses and an A-tier
+// path silently degrades to B — one L2 confirm away from being allowed.
+//
+// SPEC-06 §4 puts "展开 8.3 短名" inside the resolution pipeline and PLAN.md
+// C26 requires the handle's real path, so the anchor side owes the same
+// treatment: expand both sides through this pipeline and only then compare.
+// Where a side cannot be PROVEN expanded, a miss is not evidence of absence,
+// and the only permitted answer is fail-closed (see pathForms.certain).
+
+// pathForms are the spellings one path can take in a security comparison.
+type pathForms struct {
+	// raw is the spelling as given, comparison-folded. Always populated
+	// (except for an empty input) and always compared, so no verdict can be
+	// lost by moving to real paths.
+	raw string
+	// real is raw with every openable component replaced by its handle
+	// final path; components below the deepest openable one are re-appended
+	// verbatim (they do not exist yet). Empty when nothing could be opened:
+	// a non-Windows build (see pathresolver_other.go), a dead volume, or a
+	// malformed spelling.
+	real string
+	// root is the handle-resolved prefix real was built on ("" when nothing
+	// opened). Two sides with roots that are not ancestry-related cannot hide
+	// a hit from each other, which bounds the fail-closed rule below.
+	root string
+	// partial marks an untrustworthy real: the walk stopped below a component
+	// that exists but refused to open (deny-filtered directory, dangling
+	// reparse point), so that component's true spelling is unknown.
+	partial bool
+}
+
+// certain reports whether this side is proven to be a handle-expanded real
+// path. R17: an A-anchor comparison may only conclude "no hit" when both
+// sides are certain.
+func (f pathForms) certain() bool { return f.real != "" && !f.partial }
+
+// spellings lists the forms this path must be matched on. The list is a union
+// on purpose: matching an A anchor on any form can only ADD a deny, never
+// remove one, so the change is monotone toward fail-closed.
+func (f pathForms) spellings() []string {
+	if f.real == "" || f.real == f.raw {
+		return []string{f.raw}
+	}
+	return []string{f.raw, f.real}
+}
+
+// maxAnchorWalk bounds the ancestor walk so a pathological spelling (or a
+// filesystem that keeps refusing to open) cannot make Classify spin.
+const maxAnchorWalk = 64
+
+// formsOf expands one spelling into its comparison forms using the C26 handle
+// pipeline only: no string heuristics, no case or short-name "alignment".
+func formsOf(spelling string) pathForms {
+	raw := normPath(spelling)
+	f := pathForms{raw: raw}
+	if raw == "" {
+		return f
+	}
+	p := lexCanonical(spelling)
+	cut := p
+	for depth := 0; depth < maxAnchorWalk; depth++ {
+		if final, ok := resolveHandle(cut); ok {
+			final = normalizeLocalUNC(stripExtendedPrefix(final))
+			if final != "" {
+				f.root = normPath(final)
+				tail := strings.TrimPrefix(p, cut) // cut is a literal prefix of p
+				if tail == "" {
+					f.real = f.root
+				} else {
+					f.real = normPath(lexCanonical(final + tail))
+				}
+				f.partial = tailExistsBelow(cut, tail)
+				return f
+			}
+		}
+		parent := filepath.Dir(cut)
+		if parent == cut {
+			break
+		}
+		cut = parent
+	}
+	return f
+}
+
+// anchorCache memoizes anchor forms. Env anchors are a handful of spellings
+// per process and they are read on every classification, so without this the
+// gate would pay a CreateFile + GetFinalPathNameByHandle per rule per call.
+// Keys are folded spellings; a cached entry stays correct when a protected
+// leaf is created later, because its not-yet-existing tail components are
+// literal names re-appended onto an already-expanded prefix.
+var (
+	anchorCache    sync.Map // folded spelling -> pathForms
+	anchorCacheLen atomic.Int64
+)
+
+const anchorCacheMax = 128
+
+// anchorForms is formsOf for an anchor spelling, with the cache above.
+func anchorForms(spelling string) pathForms {
+	key := normPath(spelling)
+	if key == "" {
+		return pathForms{}
+	}
+	if v, ok := anchorCache.Load(key); ok {
+		return v.(pathForms)
+	}
+	f := formsOf(spelling)
+	if anchorCacheLen.Load() < anchorCacheMax {
+		if _, loaded := anchorCache.LoadOrStore(key, f); !loaded {
+			anchorCacheLen.Add(1)
+		}
+	}
+	return f
+}
+
+// tailExistsBelow reports whether the first re-appended component exists.
+// resolveHandle already refused every prefix of the tail, so an existing
+// first component means the walk skipped something that is really there and
+// whose true spelling we therefore do not know (partial). If it does not
+// exist, nothing below it can exist either, so the verbatim tail is exact.
+func tailExistsBelow(cut, tail string) bool {
+	if tail == "" {
+		return false
+	}
+	first := strings.TrimPrefix(tail, `\`)
+	if i := strings.Index(first, `\`); i >= 0 {
+		first = first[:i]
+	}
+	if first == "" {
+		return false
+	}
+	return pathExists(cut + `\` + first)
+}
+
+// pathExists is a fail-toward-exists stat: only a clean "no such file" reads
+// as absent, any other error (access denied, sharing violation, bad path)
+// leaves the component's spelling unproven.
+func pathExists(p string) bool {
+	_, err := os.Lstat(p)
+	if err == nil {
+		return true
+	}
+	return !errors.Is(err, os.ErrNotExist)
 }

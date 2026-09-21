@@ -127,6 +127,13 @@
   - `go.mod` 现在带着 `golang.org/x/crypto` 从 `// indirect` 升为直接依赖的**未提交**改动。它是我的 docker 复现带 `-mod=mod` 跑出来的副作用；结论与 `5602ebf`②一致——**不是供应链事件、也不是有人偷加依赖**（`internal/models/minisign.go:13` 早就 import 了 `blake2b`），但**归属不该由我定**，所以留在工作树里没 add。
   - `internal/tools/` 下那两枚 U+201C 形状的孤儿目录（`5602ebf`① 让**先别删**）在本轮**变成了 0 枚**：我的 Linux 复现重新造出它们（mtime 09:18:53），我在 09:31 按"自己造的垃圾自己清"删掉了，**删前没读 A36/票 73**，违反了那条"先查谁在用再动手"的次序。若票 73 的基线数过它们，账面差 2（内容我核过是空目录，`git status` 里 `internal/tools/` 已无非票 20 条目）。
   next=交回编排者：本轮**只有 AC#4 可闭**；`d1525a3` 未 push，所以它对 CI 还没有任何效力——push 之后 `test-core` 预期仍红（只剩 risk/tools 两族）。
+- [2026-09-21T10:20Z] agent=agent-ticket72 did=**AC#3 的那条因已由票 72 落地**（`internal/risk/pathresolver.go` + `blacklist.go`：
+  A 表锚点现在和候选路径走**同一条**句柄管线，`USERPROFILE` 拼成 `RUNNER~1` 还是 `runneradmin` 都不再改变分类结果；
+  无法证明已展开时 fail-closed 判 A）。你留在 `a04d3e2` 的那段诊断输出就是本票的起点证据，一字未改地留着。
+  ⇒ **本票 AC#3 的判据（那条 `test-windows` 步骤）的根因已闭，剩下的只是"哪一次真 run 证明它"**：
+  票 72 的 AC#4 需要编排者 push 之后看新 run 的 `test-windows`；**步骤名 `PathResolver junction placeholder (real cases tickets 18/20)` 仍然误导**
+  （那一步跑的是一条真红队用例，不是 placeholder），票 72 AC#6 想改成
+  `PathResolver red-team cases (junction/8.3/UNC/\\?\ - tickets 18/20/72)`，但 `ci.yml` 是票 71 的在途文件 ⇒ 交回你排。
 
 
 

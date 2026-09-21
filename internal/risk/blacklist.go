@@ -58,6 +58,14 @@ func logf(format string, args ...any) {
 // Classify classifies an already-resolved canonical path. Callers MUST pass
 // the path through Resolve first; lexically-spelled inputs are matched on a
 // best-effort normalized form only (defence in depth, not a bypass route).
+//
+// "Best effort" since ticket 72 means "the same handle pipeline": the input is
+// expanded again (formsOf below) and so is every anchor, because a spelling
+// the resolver never saw (a short-form USERPROFILE, say) must not be able to
+// move a path out of A. The added forms only ever turn a miss into a deny;
+// Gate's B-tier override matches them too, which is the same-file question
+// asked the other way round — the confirmation was for a file, not for one
+// spelling of it.
 func Classify(canonical string) Class {
 	c, _ := classifyWith(canonical)
 	return c
@@ -67,13 +75,14 @@ func Classify(canonical string) Class {
 // normalized path of individually L2-confirmed B-tier files to true.
 func Gate(canonical string, bOverrides map[string]bool) PathDecision {
 	p := normPath(canonical)
-	class, rule := classifyWith(canonical)
+	cand := formsOf(canonical)
+	class, rule := classifyForms(cand)
 	switch class {
 	case ClassA:
 		logf("risk: A-list DENY path=%s rule=%s (non-overridable)", p, rule)
 		return PathDecision{Class: ClassA, Reason: "A-list sensitive path (non-overridable): " + rule}
 	case ClassB:
-		if bOverrides != nil && bOverrides[p] {
+		if overrideApplies(cand, bOverrides) {
 			logf("risk: B-list OVERRIDE (single-file, L2 confirmed) path=%s rule=%s", p, rule)
 			return PathDecision{Class: ClassB, Allow: true, Reason: "B-list single-file override (one L2 confirm + logged): " + rule}
 		}
@@ -82,6 +91,22 @@ func Gate(canonical string, bOverrides map[string]bool) PathDecision {
 	default:
 		return PathDecision{Class: ClassNone, Allow: true}
 	}
+}
+
+// overrideApplies reports whether the operator confirmed this exact file.
+// Every comparison form of the path is checked, so a B grant recorded under
+// the handle-resolved spelling still covers the caller's own spelling of the
+// same file (and vice versa) — it is the same file either way.
+func overrideApplies(cand pathForms, bOverrides map[string]bool) bool {
+	if len(bOverrides) == 0 {
+		return false
+	}
+	for _, s := range cand.spellings() {
+		if s != "" && bOverrides[s] {
+			return true
+		}
+	}
+	return false
 }
 
 // normPath folds a path into the comparison form: forward slashes unified,
@@ -113,53 +138,141 @@ func baseName(p string) string {
 // classifyWith matches the canonical path against the A and B tier rules.
 // Anchors come from the live environment so tests can relocate the profile.
 func classifyWith(canonical string) (Class, string) {
-	p := normPath(canonical)
+	return classifyForms(formsOf(canonical))
+}
+
+// classifyForms does the actual matching, on the comparison forms of one path
+// (see pathresolver.go: formsOf / pathForms).
+//
+// Ticket 72 invariant, in one line: **the verdict must not depend on the
+// spelling a path arrived in.** Both sides of every A-anchor comparison below
+// are therefore handle-expanded, and a comparison whose provenance is not
+// provably expanded fails CLOSED (aEquiv / aUnder report such a miss as a
+// hit) instead of quietly dropping a path from A into B.
+func classifyForms(cand pathForms) (Class, string) {
+	p := cand.raw
 	if p == "" {
 		return ClassNone, ""
 	}
-	home := normDir(userHomeDir())
-	appData := normDir(envOr("APPDATA", filepath.Join(userHomeDir(), "AppData", "Roaming")))
-	localAppData := normDir(envOr("LOCALAPPDATA", filepath.Join(userHomeDir(), "AppData", "Local")))
+	homeS := normDir(userHomeDir())
+	appDataS := normDir(envOr("APPDATA", filepath.Join(userHomeDir(), "AppData", "Roaming")))
+	localAppDataS := normDir(envOr("LOCALAPPDATA", filepath.Join(userHomeDir(), "AppData", "Local")))
+
+	// Anchor side of the comparison: the same C26 handle pipeline the
+	// candidate went through, so RUNNER~1 and runneradmin become one shape.
+	// Each rule asks for its own child anchor (`<home>\.ssh` and friends),
+	// because the expansion has to be proven per path, not per env var.
 
 	// ---- A tier (absolute, non-overridable) ----
 	switch {
-	case home != "" && p == home+`\.git-credentials`:
+	case homeS != "" && aEq(cand, anchorForms(homeS+`\.git-credentials`)):
 		return ClassA, "~/.git-credentials"
-	case hasGitConfigSegment(p):
+	case aAnyForm(cand, hasGitConfigSegment):
 		return ClassA, ".git/config"
-	case isUnder(p, normDir(appData+`\wisp`)) && p == normDir(appData+`\wisp\config.toml`):
+	case aUnder(cand, anchorForms(appDataS+`\wisp`)) &&
+		aEq(cand, anchorForms(appDataS+`\wisp\config.toml`)):
 		return ClassA, "%APPDATA%\\wisp\\config.toml"
-	case home != "" && isUnder(p, home+`\.ssh`):
+	case homeS != "" && aUnder(cand, anchorForms(homeS+`\.ssh`)):
 		return ClassA, "~/.ssh/**"
-	case home != "" && p == home+`\.aws\credentials`:
+	case homeS != "" && aEq(cand, anchorForms(homeS+`\.aws\credentials`)):
 		return ClassA, "~/.aws/credentials"
-	case home != "" && p == home+`\.kube\config`:
+	case homeS != "" && aEq(cand, anchorForms(homeS+`\.kube\config`)):
 		return ClassA, "~/.kube/config"
-	case isBrowserCredentialStore(baseName(p)):
+	case aAnyForm(cand, func(s string) bool { return isBrowserCredentialStore(baseName(s)) }):
 		return ClassA, "browser credential store"
-	case appData != "" && isUnder(p, appData+`\microsoft\protect`):
+	case appDataS != "" && aUnder(cand, anchorForms(appDataS+`\microsoft\protect`)):
 		return ClassA, "%APPDATA%\\Microsoft\\Protect\\** (DPAPI master keys)"
-	case localAppData != "" && isUnder(p, localAppData+`\microsoft\credentials`):
+	case localAppDataS != "" && aUnder(cand, anchorForms(localAppDataS+`\microsoft\credentials`)):
 		return ClassA, "%LOCALAPPDATA%\\Microsoft\\Credentials\\**"
 	}
 
 	// ---- B tier (default deny + single-file override) ----
-	base := strings.ToLower(baseName(p))
-	switch {
-	case strings.HasPrefix(base, ".env"):
-		return ClassB, ".env*"
-	case strings.HasSuffix(base, ".pem"):
-		return ClassB, "*.pem"
-	case strings.HasSuffix(base, ".p12"), strings.HasSuffix(base, ".pfx"):
-		return ClassB, "*.p12|*.pfx"
-	case strings.HasPrefix(base, "id_"):
-		return ClassB, "id_*"
-	case strings.HasPrefix(base, "secrets."):
-		return ClassB, "secrets.*"
-	case strings.Contains(base, "credentials") && strings.HasSuffix(base, ".json"):
-		return ClassB, "*credentials*.json"
+	// The first form is exactly the spelling the caller handed in (which is
+	// what this function has always matched), so no B verdict can be lost;
+	// later forms only add hits, which for this tier means "asks first".
+	for _, s := range cand.spellings() {
+		base := strings.ToLower(baseName(s))
+		switch {
+		case strings.HasPrefix(base, ".env"):
+			return ClassB, ".env*"
+		case strings.HasSuffix(base, ".pem"):
+			return ClassB, "*.pem"
+		case strings.HasSuffix(base, ".p12"), strings.HasSuffix(base, ".pfx"):
+			return ClassB, "*.p12|*.pfx"
+		case strings.HasPrefix(base, "id_"):
+			return ClassB, "id_*"
+		case strings.HasPrefix(base, "secrets."):
+			return ClassB, "secrets.*"
+		case strings.Contains(base, "credentials") && strings.HasSuffix(base, ".json"):
+			return ClassB, "*credentials*.json"
+		}
 	}
 	return ClassNone, ""
+}
+
+// aEq and aUnder are the two A-anchor relations. They are spelled separately
+// from isUnder / == so that the fail-closed clause below applies to security
+// comparisons only and never to a plain path test.
+func aEq(cand, anchor pathForms) bool { return aRelates(cand, anchor, eqPath) }
+
+func aUnder(cand, anchor pathForms) bool { return aRelates(cand, anchor, isUnder) }
+
+func eqPath(p, dir string) bool { return p == dir }
+
+// aRelates matches every comparison form of the candidate against every
+// comparison form of the anchor, and — when that finds nothing — asks whether
+// the miss is even trustworthy (uncertainAnchorMiss).
+func aRelates(cand, anchor pathForms, rel func(p, dir string) bool) bool {
+	for _, c := range cand.spellings() {
+		if c == "" {
+			continue
+		}
+		for _, a := range anchor.spellings() {
+			if a == "" {
+				continue
+			}
+			if rel(c, a) {
+				return true
+			}
+		}
+	}
+	return uncertainAnchorMiss(cand, anchor)
+}
+
+// aAnyForm applies a shape test (path segments, base name) to every
+// comparison form the path can take.
+func aAnyForm(cand pathForms, test func(string) bool) bool {
+	for _, s := range cand.spellings() {
+		if s != "" && test(s) {
+			return true
+		}
+	}
+	return false
+}
+
+// uncertainAnchorMiss is R17's fail-closed clause: "if a side cannot be proven
+// expanded, the only allowed behavior is fail-closed". A miss between an A
+// anchor and a candidate is only evidence of absence when BOTH sides are
+// proven handle-resolved real paths. If one side had to stop its expansion
+// below a component that exists but refused to open (a deny-filtered
+// directory, a dangling reparse point), the two paths might be the same tree
+// and the answer is "treat it as protected".
+//
+// The clause is bounded on purpose, so it stays a fail-closed tie-breaker
+// rather than a blanket deny:
+//   - it needs a resolved root on both sides. A path on a dead volume, or one
+//     on a platform whose resolver is still DEFERRED (pathresolver_other.go),
+//     has no root and cannot hide inside a live anchor tree;
+//   - the roots must be ancestry-related, i.e. one tree could contain the
+//     other. Unrelated trees are a proven miss.
+func uncertainAnchorMiss(cand, anchor pathForms) bool {
+	if cand.root == "" || anchor.root == "" {
+		return false
+	}
+	if cand.certain() && anchor.certain() {
+		return false
+	}
+	return isUnder(cand.root, anchor.root) || isUnder(anchor.root, cand.root)
 }
 
 // hasGitConfigSegment reports whether the path is exactly <...>/.git/config.
