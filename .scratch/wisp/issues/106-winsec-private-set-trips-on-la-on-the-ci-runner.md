@@ -1,6 +1,6 @@
 # 106 — winsec 的"私有集"在 **CI 的 Windows runner 上**被 `LA` 绊倒 ⇒ `test-windows` 连续红（8 条用例全在 `NewStore`/`MigratePlaintext` 第一步就死）
 
-**Status:** open（2026-09-21 18:1x 编排者建；来源=**CI 步级读数**，run `35586044995`/`35585821747`/`35585147258`/`35581075691` 的 `test-windows` 步全是 failure）
+**Status:** ready-for-review（2026-09-21 18:52 `agent-ticket106` 交件；原 open 行见本条 append 之前的态。**AC#5 未勾**：本机全绿不算过，欠编排者 push 后读 `test-windows` 步级结论，run id 位留给下）
 **Type:** 环境相关的**过严判定**（不是泄露，是**拒绝服务**：门在自己身上绊倒 ⇒ 整条 Windows 测试线不可用）
 **Blocks:** CI 转绿 · 票 **103** 的验收（它也在 `internal/winsec/`）· 票 **95** 的接线（它要把更多落点接到 winsec 上，接到一个 CI 上必挂的口上）
 **Blocked by:** nothing（但**动 `internal/winsec/` 之前要等 `agent-ticket103` 交件**，同文件冲突）
@@ -37,17 +37,17 @@ delete_test.go:25: NewStore: secret: create C:\Users\RUNNER~1\AppData\Local\Temp
 
 ## AC（1:1，裁决表 `docs/evidence/s1/106-*.md` 由验收方出）
 
-- [ ] **AC#1** 把"私有集"的**定义与使用点**逐条落到 file:line：白名单里到底有哪些 SID/名字、比较的是 **SID 还是名字**、
+- [x] **AC#1** 把"私有集"的**定义与使用点**逐条落到 file:line：白名单里到底有哪些 SID/名字、比较的是 **SID 还是名字**、
       继承来的 ACE 是不是也参与判定、`noticeNarrowed` 与 `sealError` 各在哪一条路上说话。
       并**量出**本机 temp 与 runner temp 的 DACL 差异（本机 `icacls` 真实读数；runner 那份引 CI 原文，标"日志档"）。
-- [ ] **AC#2** 造一台**能复现的仪器**：一条用例在**没有 `LA` 的机器上也能验证"带外来主体的继承 DACL 会被正确处理"**
+- [x] **AC#2** 造一台**能复现的仪器**：一条用例在**没有 `LA` 的机器上也能验证"带外来主体的继承 DACL 会被正确处理"**
       （例：在临时目录里**显式种一条**给 `LA`（或任意一个非私有集主体）的 ACE ⇒ 断言真实行为），
       ⚠ 修前必须红（票面贴红名与断言原文）。**不许**用 `t.Skip`/"只在某平台跑"把它挡掉（那是掩盖，不是平台 API 天生不存在）。
-- [ ] **AC#3** 修的方向必须是**"该拒的仍拒、不该拒的不拒"**：
+- [x] **AC#3** 修的方向必须是**"该拒的仍拒、不该拒的不拒"**：
       判据两半 —— ① 一条"给别的账户留了真实授权 ⇒ 必须仍报错/或按契约收窄并通知"的用例；
       ② 一条"只是继承来的、指向**同组内主体**（`BA` 与 `LA` 的关系）⇒ **不再绊倒**"的用例。
       ⚠ 方向性写死：**放行侧只认唯一已解析形式（SID），拒绝侧可以遍历表示形式**；拿不准就从严并登记代价。
-- [ ] **AC#4** 变异：把私有集校验整块去掉 ⇒ ①那半必须红；只保留"什么都不查"⇒ 必须红（证明我们不是在用"取消检查"换绿）。
+- [x] **AC#4** 变异：把私有集校验整块去掉 ⇒ ①那半必须红；只保留"什么都不查"⇒ 必须红（证明我们不是在用"取消检查"换绿）。
       锚点=承载行为那一行，同链 grep 证落地，`go build` rc=0 先量到（**编译失败不算变异**），
       变异只在 `/tmp` 快照（`git archive` + 会话后缀）里做，还原证 `git diff --quiet`。
 - [ ] **AC#5** 门禁：按包 `gofmt`/`gofumpt` 空、`go vet` 与 `GOOS=linux go vet` 按包 rc=0、
@@ -123,3 +123,41 @@ delete_test.go:25: NewStore: secret: create C:\Users\RUNNER~1\AppData\Local\Temp
   全部只碰 `t.TempDir()` 下的目录，用例结束由 `t.TempDir` 清理；**没有 `t.Skip`、没有平台后缀挡路**（文件名后缀 `_windows_test.go` 是本包
   ACL API 的天生形状 —— `winsec_other.go` 里没有 DACL 可言，同包既有 11 个测试文件皆如此，可移植侧另有 `private_other_test.go`）。
   next= 提交修后生产码 ⇒ 跑 AC#3 两侧读数 + AC#4 变异（`/tmp` 快照）+ AC#5 门禁，票面第二枚 append 登记，AC#5 的 CI 那格留给编排者。
+
+- 2026-09-21 18:52（`agent-ticket106`）：**第二枚 append：修后读数、变异、门禁、AC#5 的欠账**。
+  **修后本机（同一套用例，生产码 = `34f6959`）**：
+  `--- PASS: TestGateJudgesThePrivateSetByResolvedSID`（三条腿全 PASS）、
+  `--- PASS: TestSealNarrowsAndNamesThePrincipalItRemovedBySID`、
+  `--- PASS: TestGateRefusesADescriptorThatLeavesARealGrantToAnotherAccount`；`-count=2 -v ./internal/winsec/` 整包 78→82 行 RUN，0 FAIL 0 SKIP。
+  修前红一共两条（对 `8b6f691` 的生产码，`-count=1 -v`，摘掉点名新函数的第 3 腿后跑的）：
+  `TestSealNarrowsAndNamesThePrincipalItRemovedBySID`（`:243`，`cleared="LA(A;OICI;FA;;;LA) WD(A;OICI;FA;;;WD)"` 里没有 `S-1-1-0`）、
+  `TestGateRefusesADescriptorThatLeavesARealGrantToAnotherAccount`（`:290`，报错只说 `([WD])` 不说 `S-1-1-0`）。
+  `TestGateJudgesThePrivateSetByResolvedSID` 两条腿**在本机修前修后都 PASS —— 这是设计如此**：本机 `LA` = `...-500` 是别人，
+  判据取"本机把它解析成谁"，所以它在 runner（`LA` == 令牌用户）上才会红；**它就是钉 CI 那一格的那枚仪器**。
+  **AC#3 两半的落点**：① `TestGateRefuses...`（给别的账户留真实授权 ⇒ 仍然报错，且报错点名 SID）+ `TestSealNarrows...`（收窄并通知，通知带 SID）；
+  ② `TestGateJudges.../a name spelling cannot change the verdict`（同三主体换拼写 ⇒ 判决不变）+ `/the set holds no name`（放行侧集合里不许出现任何名字，
+  `SY`/`BA`/`LA`/`ME`/`WD`/`AU` 逐个钉死；旧代码连 `me={u.Uid,"ME"}` 里的 `ME` 都是 OS 会**原样回显**的占位符 SID，实测 `D:(A;;FA;;;ME)` 印回 `ME`，
+  它根本不是当前用户 —— 名字当判据的另一枚证据）。
+  **AC#4 变异（全在 `/tmp` 快照：`git archive 34f6959 | tar -x -C /tmp/wisp-ticket106-mut{,b}`，同链 `grep -n` 证落地，先 `go build` rc=0）**：
+  MUT-A =`winsec_windows.go:362` `if !ace.grant || !set[ace.trustee]` → `if false && (...)`（拆掉 verifyPrivate 的私有集腿）
+  ⇒ `--- FAIL: TestGateRefusesADescriptorThatLeavesARealGrantToAnotherAccount`（`:312` "a DACL leaving S-1-1-0 a real grant ... was accepted as private"），其余 4 条 PASS。
+  MUT-B = MUT-A + `:96`（现 `:96` 通知腿）→ `if true || !set[ace.trustee]`（什么都不查）
+  ⇒ **2 FAIL**：上面那条 + `TestSealNarrowsAndNamesThePrincipalItRemovedBySID`（`:268`，`cleared=""`）。
+  ⇒ **"取消检查"换不来绿**；两半判据各自红在自己的腿上。**还原证**：仓内 `git diff --quiet -- internal/winsec/winsec_windows.go` 干净（变异从未落进仓库，快照用完即弃，未建 worktree）。
+  **AC#5 门禁（`-v`，两样本全报）**：`go test -count=2 -v ./internal/winsec/ ./internal/secret/ ./internal/config/ ./internal/proc/`
+  ⇒ **RUN=410 / 不同测试名=205（×2 恰等）/ PASS=407 / FAIL=1 / SKIP=2**，`ok winsec 12.505s`、`ok secret 0.430s`、`ok config 2.813s`、`FAIL proc 4.151s`。
+  FAIL 逐条点名 = `TestExternalSamplerReadsSubjectFromOutside`（`internal/proc`，`NtQuerySystemInformation: buffer never sufficient`）
+  —— **不是本票引入的**：`git archive 8b6f691` 快照上同一条同样红（一次），隔离复跑 `-count=3` 三次**全 PASS** ⇒ 按 proc/票 103 同一口径记为负载假红，两样本都报不改判。
+  SKIP 逐条点名 = `TestHelperProcess` ×2（`jobscope_windows_test.go:87` "helper process mode not set"，`internal/proc` 的 re-exec 助手本非用例）。
+  `gofmt -l internal/winsec` 空、`gofumpt -l internal/winsec` 空（GOPATH/bin 二进制）；按包 `go vet ./internal/winsec/` rc=0、`GOOS=linux go vet ./internal/winsec/` rc=0。
+  `sh scripts/d22scan.sh` rc=0 clean，台账各 scope 不降：`#1-5 internal/=197 cmd/=20`、`#6 frontend/=40`、`#7 internal/tools/=17`、
+  `#8 design/=16 frontend/=40 internal/=347 cmd/=26`（`#8 internal/` 上一登记 346 ⇒ 347，多的就是我这一枚测试文件；`tools/d22scan/**` 与 `allowlist.txt` 未碰）。
+  **AC#5 未勾的原因与下一步（编排者的手）**：本机 temp 与 runner temp 不同 ⇒ 本机全绿不能结案。**欠 push 后读 `test-windows` 步级结论**：
+  要看的是 `go test ./internal/proc/ ./internal/secret/ ./internal/config/` 里 `internal/secret` 是否 `ok`、以及本票三条新用例在 runner 上是否 PASS
+  （`TestGateJudgesThePrivateSetByResolvedSID` 在 runner 上走的是 `LA == 令牌用户` 那一支，本机走不到）。
+  run id 位 = ____（等 push 后填）。**若仍红**，唯一剩下的解释是"CI 那份 `LA` 不是令牌用户"（我按 DACL 形状判它是自己写下去的那条：六条三对、无 `ID` 位、`D:P` 在场）；
+  真到那一步，下一条命令 = 在 `applyDescriptorWindows` 里把回读的 SID 列表与 `SealDir` 前的 before 列表一起打进错误信息，再跑一次 runner 取二元读数。
+  **未碰**：`docs/PLAN.md`、`docs/specs/*`、`internal/risk/**`、`tools/d22scan/**`、`allowlist.txt`、`internal/secret` 的断言、任何阈值/golden；
+  别人的 ` M` 文件（`internal/config/*`、`ci.yml`、`internal/risk/syncdirs*`、`scripts/portable-tests.sh` 等）一枚未 add、一枚未 commit；未 push；仓内未建 worktree。
+  票面本枚 append 的 `git diff --numstat` 删除列 = 5（= Status 一行原地改写 + AC#1..AC#4 四个勾框 `[ ]`→`[x]`），**无内容行被删**。
+  next= 编排者 push `34f6959`+交件 commit ⇒ 读 `test-windows` 步级结论填 run id 位；随后 `internal/config` 的 105/95 线可以把更多落点接上 winsec。
