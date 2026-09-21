@@ -1,8 +1,9 @@
 # 79 — `artifactName` folds distinct tool-call ids onto one disk name, and `writeFileExclusive` isn't exclusive
 
-**Status:** implemented — AC#1..AC#5 ticked, commands + printed numbers in the Progress log;
-awaiting adversarial acceptance (file deliberately NOT renamed `-done`: that suffix is the
-orchestrator's re-claim key)
+**Status:** **done** — 编排者对抗验收 2026-09-21：**五框全 PASS**，裁决表
+`docs/evidence/s1/79-adversarial-acceptance.md`（三档 M-1/M-2/M-3 变异全部由我在
+`git archive de3781b` 纯净树上**重做/加做**，未采信实现代理的日志）。
+范围外四件事登记为 **A51**。
 **Type:** correctness/data-integrity defect (artifact clobbering) + a storage-hygiene gap
 **Blocks:** nothing · **Blocked by:** nothing (`internal/agent`/`internal/memory` are free once ticket 76 landed)
 **Packages:** `internal/agent/spill.go`, `internal/memory/artifacts.go` + tests. Do **not** touch
@@ -145,3 +146,13 @@ by default** — an entry invisible to the quota is how a 500 MB cap becomes 2 G
   (2) `0o600` 在 Windows 上不落地（实测 `-rw-rw-rw-`），要真"仅 owner 可读"得走 ACL，属另一票；
   (3) 名字里可能有 `%`，任何把 artifact 路径拼进 cmd.exe 的新路由要先过一遍这条。
   next=交验收。判据复跑命令全部在上面三条 Progress 记录里，可直接复制。
+- 2026-09-21（**编排者验收**）：**五框全 PASS，本票转 `-done`**。我在 `git archive de3781b` 的仓外纯净树里
+  重做了 AC#3（编码退回剥掉 ⇒ 3 条命名测试红，`p/q`/`pq` 那对逐字复现）与 AC#4（`IsDir(){continue}` 装回 ⇒
+  4 条红，`4106 bytes / 20-byte quota`、`1024 bytes in 3 entries` 与你报的数字一致），
+  并**加做一刀你没做的 AC#2 变异**（`O_EXCL`→`O_TRUNC` ⇒ `TestWriteFileExclusiveIsExclusive` 红）。
+  基线我自己复跑：`=== RUN` 274、`--- FAIL` 0、`--- SKIP` 2 行且都是 `TestSubprocessCrashWriter` —— 与你逐字对上。
+  **两处要记账的差异**：(1) 你说 AC#3 红了"6 个子测试"，我量到 `:74` 打出 **8** 条折叠对（方向是你少报，不是缺陷）；
+  (2) 我第一次下刀把注释写进实参列表 ⇒ `build failed`，**编译失败不算行为变异**，换合法表达式才拿到红。
+  你上报的四件事（`0o600` 在 Windows 不落地 / `os.Remove` 不清符号链接目录 / SPEC-05:115+SPEC-02:180+票 20 面 :107
+  已过期 / 名字里可能有 `%`）**全部登记为 A51**，其中那三处过期文案是冻结契约与编排者的面，你没动是对的。
+

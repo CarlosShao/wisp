@@ -104,7 +104,10 @@ from 10.
       裁决表 `docs/evidence/s1/76-adversarial-acceptance.md`）：目标目录只在 `memory.Open(dataDir)` /
       `agent.NewSpiller(dir)` 构造时固定，调用者能递进来的只有一个**组件名**（artifact name / tool-call id），
       而含分隔符 / `..` / 盘符 / UNC 的组件一律**拒**（memory 侧 `ErrInvalidArtifactName`，**拒在碰文件系统之前**）
-      或**净化**（agent 侧只留 `[A-Za-z0-9_-]`，整串剥光则退回 `tool-output-seq<N>.txt`）；containment 由
+      或**编码**（agent 侧。**2026-09-21 由编排者按票 79 的结果改写此半句**：原文是"只留
+      `[A-Za-z0-9_-]`，整串剥光则退回 `tool-output-seq<N>.txt`"，而那个"剥掉"本身就是票 79 修的缺陷 ——
+      `p/q` 与 `pq` 会折成同一个磁盘名、后写者静默覆盖前者的字节。现在是**对 id 做百分号转义**，
+      于是名字里不出现字面 `/ \ : .` ⇒ 这条不变式比原措辞**更强而不是更松**；登记见 A51③）；containment 由
       **真目录递归列举差分 + 两条阳性对照**证明，不靠字符串比较。`fs.write` 到用户目录仍走 C26 门
       （规则分离：这两条路按票 76 的裁定**故意不**过 `risk.Resolve`，理由是不接受调用方路径 ⇒ 无可控面）。
       判据用例：`TestArtifactsAPITakesNoCallerControlledDestinationPath`、`TestDeleteArtifactRejectsTheFourHostileShapes`、
