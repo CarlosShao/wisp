@@ -22,12 +22,14 @@
 //	                      (C29: hashes come from the signed manifest only)
 //	6 panel-approval      `approval.decide` in frontend/ (D33/F2: allow
 //	                      decisions are native-side only) - scope: frontend/
-//	                      (TEXT UNCHANGED - D22 owns it. The scope's tree does
-//	                      not exist at this HEAD, so this ban currently has NO
-//	                      coverage; declaredScopes() prints that out loud as
-//	                      "[NOT COVERED]" instead of letting a 0-file walk read
-//	                      as green, and its drift guard fails the scan the day
-//	                      frontend/ appears while the entry is still exempt)
+//	                      (TEXT UNCHANGED - D22 owns it. ARMED LIVE since
+//	                      ticket 88: ticket 77 landed frontend/ at 63ef895, so
+//	                      the exemption ticket 67 registered ("the tree does not
+//	                      exist, keeping this would be pretending to scan")
+//	                      became a false claim, and its own drift guard fired.
+//	                      The walk now examines 35 text files in this repo
+//	                      (measured 2026-09-21 on a `git archive HEAD` snapshot)
+//	                      and an empty scope is fatal - see declaredScopes)
 //	7 internal-artifact-tool  host-internal artifact writes implemented as
 //	                      gated tool names (D34 note 2) - scope: internal/tools/
 //	8 emoji               zero emoji in design/ (every text file) and in the
@@ -222,7 +224,7 @@ type scanScope struct {
 	seenKey     string // ban #8's emojiSeen key; empty when examinedKey is used
 	examinedKey string // bans #1-7's examined key; empty when seenKey is used
 	live        bool   // true: 0 examined files is fatal; false: see absentOK below
-	absentOK    bool   // true only for a scope whose tree is KNOWN ABSENT (ban #6 today)
+	absentOK    bool   // true only for a scope whose tree is KNOWN ABSENT (no such scope in the ledger today - see driftedAbsentScope)
 	note        string // printed with the scope so a disclaimer cannot be dropped
 }
 
@@ -291,6 +293,17 @@ func undeclaredKeys(s *scanner, scopes []scanScope) []string {
 // moment frontend/ reappears while the entry is still exempt - the exemption
 // cannot outlive the fact that justified it. Re-arm it (flip live:true) in the
 // same commit that lands ticket 34's panel scaffold.
+//
+// SUPERSEDED BY TICKET 88 (2026-09-21), kept verbatim above because the paragraph
+// above is a measurement claim that has since become false, and a correction that
+// erases the claim leaves no trace of the mistake. What changed: ticket 77 created
+// frontend/ (63ef895), so "the tree does not exist" stopped being a fact and the
+// exemption became the lie it was invented to prevent - driftedAbsentScope fired
+// exactly as designed (measured: `sh scripts/d22scan.sh` on a `git archive HEAD`
+// snapshot exits 2 naming ban #6). The entry is now live:true, the ban TEXT is
+// still untouched (D22: not an agent's to shorten), and the empty-scope rule that
+// made the flip cost 5 restated ledger tests is still the rule nobody may soften:
+// an instrument that examines 0 files does not get to print a verdict.
 func declaredScopes(root string) []scanScope {
 	internalGo, cmdGo := goScopeKey(filepath.Join(root, "internal")), goScopeKey(filepath.Join(root, "cmd"))
 	return append([]scanScope{
@@ -304,13 +317,15 @@ func declaredScopes(root string) []scanScope {
 		},
 		{
 			label: "ban #6 frontend/", dir: filepath.Join(root, "frontend"),
-			kind: "text files", examinedKey: "panel-approval",
-			live: false, absentOK: true,
-			note: "tree absent at this HEAD, so ban #6 has NO coverage - the walk still runs " +
-				"(it costs nothing and fires the day the panel lands) and the ban TEXT is " +
-				"unchanged (D22: not an agent's to shorten). Re-arm live:true together with " +
-				"ticket 34's frontend/ scaffold; the drift guard fails this scan if the tree " +
-				"appears before someone does.",
+			kind: "text files", examinedKey: "panel-approval", live: true,
+			note: "armed by ticket 88 on 2026-09-21, in the batch after ticket 77 landed " +
+				"frontend/ at 63ef895 - ticket 67 had registered this scope exempt on the " +
+				"ground that the tree did not exist, and that ground is gone. live:true means " +
+				"exactly one thing here: 0 examined files is fatal. The ban TEXT is unchanged " +
+				"(D22: not an agent's to shorten), and walkText gives it every file under " +
+				"frontend/ that is not node_modules/ or testdata/ - .tsx, .ts, .mjs, .css, " +
+				".md, .json and extension-less files included, no suffix allowlist to shrink " +
+				"the ban into (35 files as measured 2026-09-21).",
 		},
 		{
 			label: "ban #7 internal/tools/", dir: filepath.Join(root, "internal", "tools"),
@@ -353,6 +368,14 @@ func emptyLiveScope(scopes []scanScope, s *scanner) string {
 // driftedAbsentScope returns the label of a scope registered as "tree absent"
 // whose tree is now PRESENT ("" if none). It is the counterpart guard: without
 // it, an absentOK entry is a hole that stays open after the reason closes.
+//
+// NO SCOPE IN declaredScopes() SETS absentOK ANY MORE (ticket 88 armed ban #6,
+// the last exemption). This guard is NOT dead code to delete: it is what makes
+// an exemption self-expiring, so the next agent that registers a scope as
+// "absent, therefore exempt" cannot leave it there after the tree appears.
+// Because the production ledger no longer exercises it, its teeth are pinned in
+// scan_test.go against a SYNTHETIC exempt scope (TestExemptScopeCannotOutliveItsAbsentTree),
+// in both directions - a guard only ever observed passing is not a guard.
 func driftedAbsentScope(scopes []scanScope) string {
 	for _, sc := range scopes {
 		if !sc.live && sc.absentOK {
@@ -871,13 +894,39 @@ func checkRoot(root string) (int, error) {
 // "prove the gate can go red") can assert the RED paths - exit 2 on an empty
 // live scope, exit 1 on a seeded finding - against captured output without
 // exec'ing the binary. main() is a thin argument-parsing shell over it, so a
-// test cannot pass by calling a helper main() never uses.
+// test cannot pass by calling a helper main() never uses - which is why the
+// ledger is read here through exactly one call, verdict() -> declaredScopes(),
+// and the parameterized body is only reachable from a test that names the
+// scopes it injects (see fixtureVerdict).
 //
 // Priority order is deliberate: an empty instrument outranks a finding, and a
 // finding outranks the clean sentence, because a 2 is "do not trust anything
 // this run printed".
 func verdict(out, errOut io.Writer, root string, goFiles int, s *scanner) int {
-	scopes := declaredScopes(root)
+	return verdictWithScopes(out, errOut, root, goFiles, s, declaredScopes(root))
+}
+
+// fixtureScope is injected by the tests ONLY (ticket 88 AC#3): an extra exempt
+// scope with a tree a fixture can create at will.
+//
+// WHY A SEAM EXISTS: ticket 67 registered ban #6 exempt, so the drift guard was
+// testable end-to-end by accident - creating frontend/ in a fixture tripped it.
+// Ticket 88 armed ban #6 (correctly: the tree is real now), which means
+// declaredScopes() contains no exemption left, and "accidental testability" is
+// gone with it. The rule still has to be enforced, so it gets tested the way
+// every other rule here is: seed a synthetic exempt scope, show the guard stays
+// silent while that tree is absent, and show it fires the moment the tree
+// appears. main() never calls this - main() goes through verdict(), which passes
+// the real ledger - so the fixture cannot make the shipped decision weaker.
+type fixtureScope struct{ extra []scanScope }
+
+// fixtureVerdict exists so a test that injects scopes says so in the function
+// name it calls; nothing outside _test.go uses it.
+func fixtureVerdict(out, errOut io.Writer, root string, goFiles int, s *scanner, fx fixtureScope) int {
+	return verdictWithScopes(out, errOut, root, goFiles, s, append(declaredScopes(root), fx.extra...))
+}
+
+func verdictWithScopes(out, errOut io.Writer, root string, goFiles int, s *scanner, scopes []scanScope) int {
 	emo := emojiScopes(root)
 
 	fmt.Fprintf(out, "d22scan: examined %d production Go files under internal/ and cmd/ of %s\n", goFiles, filepath.ToSlash(root))

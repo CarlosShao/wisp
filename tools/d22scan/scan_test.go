@@ -411,6 +411,14 @@ func liveFixture(t *testing.T) string {
 	seedFile(t, root, "internal/tools/ok.go", "package tools\n")
 	seedFile(t, root, "cmd/wisp/main.go", "package main\n\nfunc main() {}\n")
 	seedFile(t, root, "design/index.html", "<html>ok</html>\n")
+	// Ticket 88: ban #6 became live, so "every live scope does real work" now
+	// includes frontend/. The file is a .tsx on purpose - that is the extension
+	// ticket 88 AC#1 asked about and the one the panel is written in, so a
+	// regression that narrowed walkText's filter to .js would turn every test
+	// built on this fixture red instead of quietly re-creating an empty
+	// instrument. The content is clean: ban #6 must be able to examine files and
+	// still be green (a live scope is not a violation).
+	seedFile(t, root, "frontend/src/panel.tsx", "export const Panel = () => null;\n")
 	return root
 }
 
@@ -434,6 +442,27 @@ func runVerdict(t *testing.T, root string, s *scanner) (string, string, int) {
 	return out.String(), errOut.String(), code
 }
 
+// runInjectedVerdict is runVerdict for the ONE rule that the shipped ledger can
+// no longer reach: exemption drift. It calls fixtureVerdict, which appends the
+// given scopes to declaredScopes() and nothing else, so the real ledger is still
+// what produces every other verdict in this file (see fixtureScope's comment for
+// why ticket 88 had to open this seam instead of leaning on ban #6 again).
+func runInjectedVerdict(t *testing.T, root string, s *scanner, extra ...scanScope) (string, string, int) {
+	t.Helper()
+	var out, errOut strings.Builder
+	code := fixtureVerdict(&out, &errOut, root, 99, s, fixtureScope{extra: extra})
+	return out.String(), errOut.String(), code
+}
+
+// labels renders scope labels for failure messages.
+func labels(scopes []scanScope) []string {
+	out := make([]string, 0, len(scopes))
+	for _, sc := range scopes {
+		out = append(out, sc.label)
+	}
+	return out
+}
+
 // TestVerdictGreenOnFullyLiveFixture is the control the red tests below are
 // measured against: with every live scope populated the scan exits 0 and prints
 // exactly one work line per declared scope.
@@ -452,9 +481,17 @@ func TestVerdictGreenOnFullyLiveFixture(t *testing.T) {
 		if got := strings.Count(out, "scope "+sc.label); got != 1 {
 			t.Errorf("self-report line for %s printed %d times, want exactly 1 (report:\n%s)", sc.label, got, out)
 		}
-		if !sc.live && sc.count(s) != 0 {
-			t.Errorf("exempt scope %s unexpectedly examined %d files", sc.label, sc.count(s))
+		// Ticket 88 inverted this assertion. It used to read "an exempt scope must
+		// examine 0 files", which was only ever satisfiable by ban #6 and which
+		// died with the exemption. What the fixture now pins is the stronger
+		// shape: a live scope that examined nothing cannot be green, so if this
+		// trips the run is lying about coverage in the other direction.
+		if sc.live && sc.count(s) == 0 {
+			t.Errorf("live scope %s examined 0 files in the fully live fixture: the green rc=0 below would be an empty-instrument pass", sc.label)
 		}
+	}
+	if unc := uncoveredScopes(scopes); len(unc) != 0 {
+		t.Errorf("ticket 88 armed the last exemption; this fixture is what keeps guard 3 honest, so an exempt scope here must be deliberate: %v", labels(unc))
 	}
 	if n := strings.Count(out, "d22scan: scope "); n != len(scopes) {
 		t.Errorf("printed %d scope lines for %d declared scopes - report and ledger disagree", n, len(scopes))
@@ -512,18 +549,66 @@ func TestVerdictRedOnGoScopeWithOnlyTestFiles(t *testing.T) {
 	}
 }
 
-// TestExemptScopeCannotOutliveItsAbsentTree is the drift guard: ban #6's entry is
-// exempt ONLY because frontend/ does not exist. The moment the tree appears the
-// exemption is a lie in the other direction, and the ban #6 matcher must
-// demonstrate it is alive by reporting the seeded panel violation.
+// TestExemptScopeCannotOutliveItsAbsentTree is the drift guard (guard 3), pinned
+// with a SYNTHETIC exempt scope rather than with ban #6.
+//
+// Until ticket 88 this test rode on a coincidence: ban #6 happened to be
+// registered exempt, so `mkdir frontend/` in a fixture tripped the guard. Once
+// ban #6 is armed - which is what the tree landing requires - that coincidence
+// is gone, and the rule would have gone untested while looking untouched. So the
+// scope is now built here: the assertion is about the RULE ("an exemption is a
+// claim about a tree, and claims rot"), not about one ban's row in the ledger.
+// Both directions are asserted, because a guard that is only ever seen firing -
+// or only ever seen silent - is a tautology and not a gate.
 func TestExemptScopeCannotOutliveItsAbsentTree(t *testing.T) {
 	root := liveFixture(t)
-	if got := driftedAbsentScope(declaredScopes(root)); got != "" {
-		t.Fatalf("fixture broken: frontend/ is absent so no drift is expected, got %q", got)
-	}
-	seedFile(t, root, "frontend/src/app.js", "export function decide() { return approval.decide({allow: true}); }\n")
 
+	// Precondition, so the injection below cannot mask a real exemption: the
+	// shipped ledger declares none, hence guard 3 has no production target and
+	// this synthetic scope is the only thing keeping it proven.
+	real := declaredScopes(root)
+	if unc := uncoveredScopes(real); len(unc) != 0 {
+		t.Fatalf("expected no exempt scope in declaredScopes() after ticket 88, got %v - re-pin this test if that changed", labels(unc))
+	}
+	if got := driftedAbsentScope(real); got != "" {
+		t.Fatalf("the real ledger drifts on its own: %q", got)
+	}
+
+	const tree = "exempt-fixture-tree"
+	dir := filepath.Join(root, tree)
+	exempt := scanScope{
+		label: "synthetic exempt/" + tree, dir: dir,
+		kind: "text files", examinedKey: "synthetic-exempt-ban", live: false, absentOK: true,
+		note: "fixture-only scope: exists so guard 3 stays testable after ticket 88 " +
+			"armed ban #6 and emptied the ledger of exemptions",
+	}
+	scopes := append(append([]scanScope{}, real...), exempt)
+
+	// Direction 1: tree absent -> the exemption is legal, the guard is silent and
+	// the verdict stays green. Without this half, "exempt" would read as "always
+	// fatal" and nobody could ever register one.
 	s := scanFixture(t, root)
+	if len(s.findings) != 0 {
+		t.Fatalf("fixture must start finding-free so rc means what it says: %v", s.findings)
+	}
+	if got := driftedAbsentScope(scopes); got != "" {
+		t.Fatalf("guard fired while %s is absent - it is not conditioned on the tree, it is a tautology: %q", tree, got)
+	}
+	out, errOut, code := runInjectedVerdict(t, root, s, exempt)
+	if code != 0 {
+		t.Fatalf("an exemption whose tree is really absent must be green, got rc=%d out=%s err=%s", code, out, errOut)
+	}
+	if !strings.Contains(out, "[NOT COVERED]") || !strings.Contains(out, "NOT COVERED: synthetic exempt/"+tree) {
+		t.Errorf("the exempt scope must still be reported as not covered, got %q", out)
+	}
+
+	// Direction 2: the tree appears. Seed a real ban #6 violation in the same
+	// breath so the old test's third assertion survives: the guard outranks the
+	// finding (rc=2, "do not trust anything this run printed") while the finding
+	// is still on stdout, because a suppression guard must not silence evidence.
+	seedFile(t, root, tree+"/holder.md", "# this tree exists now\n")
+	seedFile(t, root, "frontend/src/app.js", "export function decide() { return approval.decide({allow: true}); }\n")
+	s = scanFixture(t, root)
 	var hit bool
 	for _, f := range s.findings {
 		if f.Ban == "panel-approval" {
@@ -533,16 +618,70 @@ func TestExemptScopeCannotOutliveItsAbsentTree(t *testing.T) {
 	if !hit {
 		t.Fatalf("ban #6's matcher is dead - the seeded panel-approval violation was not reported: %v", s.findings)
 	}
-	out, errOut, code := runVerdict(t, root, s)
+	if got := driftedAbsentScope(scopes); got != exempt.label {
+		t.Fatalf("tree present while the scope is exempt must name %q, got %q", exempt.label, got)
+	}
+	out, errOut, code = runInjectedVerdict(t, root, s, exempt)
 	if code != 2 {
 		t.Fatalf("tree present while the scope is exempt must be fatal (rc=2), got rc=%d out=%s err=%s", code, out, errOut)
 	}
-	if !strings.Contains(errOut, "ban #6 frontend/") {
+	if !strings.Contains(errOut, exempt.label) {
 		t.Errorf("drift message must name the scope, got %q", errOut)
 	}
 	if !strings.Contains(out, "panel-approval") {
 		t.Errorf("the finding must still be printed before the guard exits, got %q", out)
 	}
+}
+
+// TestBan6ScopeIsNotNarrowedByAnExtensionFilter pins ticket 88 AC#1's real
+// question. ban #6 predates the panel: if walkText filtered by suffix and the
+// panel turned out to be .tsx, arming the scope would have produced a gate that
+// is live, green, and blind. The fixture therefore plants a violation in every
+// extension class the panel actually uses plus the two skip rules, and demands
+// the counts and the hits come out as the wording promises.
+func TestBan6ScopeIsNotNarrowedByAnExtensionFilter(t *testing.T) {
+	root := liveFixture(t)
+	if err := os.RemoveAll(filepath.Join(root, "frontend")); err != nil {
+		t.Fatal(err)
+	}
+	seedFile(t, root, "tools/d22scan/allowlist.txt", "# empty\n")
+	cases := []string{
+		"frontend/src/Card.tsx",    // ticket 77's components
+		"frontend/src/lib/util.ts", // ticket 77's helpers
+		"frontend/scripts/dev.mjs", // ticket 77's tooling
+		"frontend/src/app.css",     // styles
+		"frontend/README.md",       // docs
+		"frontend/package.json",    // config
+		"frontend/Procfile",        // no extension at all
+	}
+	for _, rel := range cases {
+		seedFile(t, root, rel, "export const x = approval.decide();\n")
+	}
+	// Out of scope by rule, not by suffix: these two directories are skipped for
+	// every ban (vendored code is not our source).
+	seedFile(t, root, "frontend/node_modules/pk/index.tsx", "approval.decide();\n")
+	seedFile(t, root, "frontend/testdata/golden.tsx", "approval.decide();\n")
+
+	s := scanFixture(t, root)
+	if got := s.examined["panel-approval"]; got != len(cases) {
+		t.Errorf("ban #6 examined %d files, want %d - walkText's filter and this list disagree, and one of them is narrowing the ban", got, len(cases))
+	}
+	byPath := map[string]int{}
+	for _, f := range s.findings {
+		if f.Ban == "panel-approval" {
+			byPath[f.Path]++
+		}
+	}
+	for _, rel := range cases {
+		if byPath[rel] == 0 {
+			t.Errorf("ban #6 did not fire in %s: the scope examines it but the matcher is blind to that file class (all findings %v)", rel, s.findings)
+		}
+		delete(byPath, rel)
+	}
+	for p := range byPath {
+		t.Errorf("unexpected panel-approval finding at %s (vendored/testdata leak?)", p)
+	}
+	t.Logf("ban #6 examined %d and fired in all %d extension classes", s.examined["panel-approval"], len(cases))
 }
 
 // TestVerdictRedOnUndeclaredCounter pins the structural guard: a walk that bumps a
@@ -615,6 +754,12 @@ func TestLedgerCountsMatchAnIndependentWalk(t *testing.T) {
 		{"ban #7 internal/tools/", count(filepath.Join(root, "internal", "tools"), prodGo), s.examined["internal-artifact-tool"]},
 		{"ban #8 internal/", count(filepath.Join(root, "internal"), goFile), s.emojiSeen["internal/"]},
 		{"ban #8 cmd/", count(filepath.Join(root, "cmd"), goFile), s.emojiSeen["cmd/"]},
+		// Ticket 88: ban #6 used to be missing here because it always walked 0
+		// files and needed no falsifier. Now that its number decides CI it gets
+		// one, and `anything` is the point - the independent walk accepts every
+		// file the way walkText does, so a future suffix filter in either place
+		// shows up as a mismatch instead of a smaller number nobody noticed.
+		{"ban #6 frontend/", count(filepath.Join(root, "frontend"), func(string) bool { return true }), s.examined["panel-approval"]},
 	}
 	for _, c := range cases {
 		if c.report != c.want {
@@ -628,9 +773,12 @@ func TestLedgerCountsMatchAnIndependentWalk(t *testing.T) {
 	}
 }
 
-// TestRealRepoLedgerIsHonest is AC#4 on this repository: no live scope is empty,
-// no exemption has drifted, no counter is undeclared, and the only uncovered
-// scope is ban #6 - stated in the verdict line instead of left implied.
+// TestRealRepoLedgerIsHonest is AC#4 on this repository, restated by ticket 88
+// for the armed ban #6: no live scope is empty, no exemption has drifted, no
+// counter is undeclared - and there is no longer an "only uncovered scope" to
+// confess to, so the honest thing this test pins instead is that ban #6 really
+// reads the panel's files. Pre-ticket-88 it asserted the opposite number
+// (`examined == 0`), which is what made the flip cost it.
 func TestRealRepoLedgerIsHonest(t *testing.T) {
 	root, err := filepath.Abs(filepath.Join("..", ".."))
 	if err != nil {
@@ -655,19 +803,26 @@ func TestRealRepoLedgerIsHonest(t *testing.T) {
 	for _, sc := range uncoveredScopes(scopes) {
 		unc = append(unc, sc.label)
 	}
-	if len(unc) != 1 || unc[0] != "ban #6 frontend/" {
-		t.Errorf("exactly one uncovered scope (ban #6) is expected on this HEAD, got %v", unc)
+	if len(unc) != 0 {
+		t.Errorf("ticket 88 armed ban #6, so this HEAD declares no uncovered scope; found %v - an exemption needs a tree that provably does not exist, and one that exists must be live or the run must say it is not covered", unc)
 	}
-	if s.examined["panel-approval"] != 0 {
-		t.Errorf("ban #6 examined %d files while declared exempt: the ledger's absent policy is now wrong",
-			s.examined["panel-approval"])
+	// AC#1's number, as a gate rather than a log line: this is the assertion that
+	// catches "armed but blind" - live:true with a filter that never matches the
+	// panel's file classes would still print a verdict.
+	if n := s.examined["panel-approval"]; n == 0 {
+		t.Error("ban #6 is live yet examined 0 files under frontend/: an armed empty instrument is worse than an honest NOT COVERED")
+	} else {
+		t.Logf("ban #6 examined %d frontend/ text files in the real repo", n)
 	}
 	out, errOut, code := runVerdict(t, root, s)
 	if code != 0 {
 		t.Fatalf("HEAD must be green, rc=%d out=%s err=%s", code, out, errOut)
 	}
-	if !strings.Contains(out, "clean") || !strings.Contains(out, "NOT COVERED: ban #6 frontend/") {
-		t.Errorf("the clean line must state what it did NOT cover, got %q", out)
+	if !strings.Contains(out, "clean") {
+		t.Errorf("the clean line must be there, got %q", out)
+	}
+	if strings.Contains(out, "NOT COVERED") {
+		t.Errorf("nothing is uncovered on this HEAD, so the verdict must not claim it is: %q", out)
 	}
 	for _, sc := range scopes {
 		if !sc.live {
@@ -677,6 +832,9 @@ func TestRealRepoLedgerIsHonest(t *testing.T) {
 		if !strings.Contains(out, want) {
 			t.Errorf("clean line omits live scope %s with its real count (%q)", sc.label, want)
 		}
+	}
+	if !strings.Contains(out, fmt.Sprintf("ban #6 frontend/=%d", s.examined["panel-approval"])) {
+		t.Errorf("the clean line must carry ban #6's real count, got %q", out)
 	}
 }
 
@@ -710,18 +868,18 @@ func TestBuiltBinaryGoesRedEndToEnd(t *testing.T) {
 	}
 
 	cases := []struct {
-		name   string
-		setup  func(t *testing.T, root string)
-		wantRC int
-		want   string
+		name    string
+		setup   func(t *testing.T, root string)
+		wantRC  int
+		wantAll []string
 	}{
 		{
 			name: "seeded violation exits 1",
 			setup: func(t *testing.T, root string) {
 				seedFile(t, root, "internal/bad/leak.go", "package bad\n\nfunc worker() {}\n\nfunc leak() { go worker() }\n")
 			},
-			wantRC: 1,
-			want:   "bare-goroutine",
+			wantRC:  1,
+			wantAll: []string{"bare-goroutine"},
 		},
 		{
 			name: "empty live scope exits 2",
@@ -730,22 +888,49 @@ func TestBuiltBinaryGoesRedEndToEnd(t *testing.T) {
 					t.Fatal(err)
 				}
 			},
-			wantRC: 2,
-			want:   "ban #7 internal/tools/",
+			wantRC:  2,
+			wantAll: []string{"ban #7 internal/tools/", "empty instrument"},
 		},
+		// Ticket 88 AC#4: the positive control for the armed ban #6, through the
+		// process CI runs. The seed is the same file and the same line the ticket
+		// 71 case used (frontend/src/app.js, `approval.decide(...)`) - the panel
+		// is .tsx in production, and TestBan6ScopeIsNotNarrowedByAnExtensionFilter
+		// covers that class; renaming the seed to dodge a filter question would be
+		// the AC#1 hole written into a test.
 		{
-			name: "exempt scope whose tree appeared exits 2",
+			name: "armed ban 6 goes red on the panel violation exits 1",
 			setup: func(t *testing.T, root string) {
-				seedFile(t, root, "frontend/app.js", "export const x = approval.decide();\n")
+				seedFile(t, root, "frontend/src/app.js", "export function decide() { return approval.decide({allow: true}); }\n")
 			},
-			wantRC: 2,
-			want:   "ban #6 frontend/",
+			wantRC:  1,
+			wantAll: []string{"panel-approval", "approval.decide", "ban #6 frontend/", "frontend/src/app.js"},
+		},
+		// And the other direction of the flip: ban #6 is now subject to the rule
+		// it was exempt from. Losing frontend/ is a coverage change, so it stops
+		// the verdict instead of reading as "the panel got clean".
+		//
+		// The case this REPLACED ("exempt scope whose tree appeared exits 2") is
+		// gone from the built-binary list because nothing in declaredScopes() is
+		// exempt any more; the only way to give the binary an exemption would have
+		// been to register a fake one in production code, which is the disease, not
+		// the test. Guard 3's teeth moved to
+		// TestExemptScopeCannotOutliveItsAbsentTree, which drives the same verdict()
+		// decision against a synthetic exempt scope in both directions.
+		{
+			name: "ban 6 tree gone while declared live exits 2",
+			setup: func(t *testing.T, root string) {
+				if err := os.RemoveAll(filepath.Join(root, "frontend")); err != nil {
+					t.Fatal(err)
+				}
+			},
+			wantRC:  2,
+			wantAll: []string{"ban #6 frontend/", "empty instrument"},
 		},
 		{
-			name:   "fully live fixture exits 0",
-			setup:  func(_ *testing.T, _ string) {},
-			wantRC: 0,
-			want:   "clean",
+			name:    "fully live fixture exits 0",
+			setup:   func(_ *testing.T, _ string) {},
+			wantRC:  0,
+			wantAll: []string{"clean", "ban #6 frontend/="},
 		},
 	}
 	for _, c := range cases {
@@ -769,8 +954,10 @@ func TestBuiltBinaryGoesRedEndToEnd(t *testing.T) {
 				t.Fatalf("exit code: want %d, got %d\nstdout:\n%s\nstderr:\n%s", c.wantRC, rc, stdout.String(), stderr.String())
 			}
 			joined := stdout.String() + stderr.String()
-			if !strings.Contains(joined, c.want) {
-				t.Errorf("output must name %q, got:\n%s", c.want, joined)
+			for _, want := range c.wantAll {
+				if !strings.Contains(joined, want) {
+					t.Errorf("output must name %q, got:\n%s", want, joined)
+				}
 			}
 		})
 	}

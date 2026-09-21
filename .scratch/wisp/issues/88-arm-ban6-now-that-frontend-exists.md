@@ -83,3 +83,29 @@
 - 2026-09-21（编排者）：建票。我做过一次 `live:true` 的试验并**已 `git restore` 还原**（工作树干净），
   5 条红的名单与报错原文在上面。我的判断：本票的价值不是"翻一个布尔"，
   而是**回答 AC#1 那个 N**——如果过滤器不收 `.tsx`，那我们今天所有关于"ban #6 已覆盖面板"的说法都是空的。
+- 2026-09-21（票 88 代理）：**AC#1 答：N = 35，不是 0。假设里的那个洞不存在，但差一点就存在。**
+  测量方法：`rm -rf /tmp/wisp88-base && mkdir -p /tmp/wisp88-base && git archive HEAD | tar -x -C /tmp/wisp88-base`
+  然后 `cd /tmp/wisp88-base && sh scripts/d22scan.sh`。翻牌**前**的输出已经把 N 量出来了
+  （walk 一直在跑，只是账上记成 exempt）：
+  `d22scan: scope ban #6 frontend/         examined  35 text files  [NOT COVERED]`，
+  并且**同一跑当场 rc=2**：`scope ban #6 frontend/ is registered as absent-but-exempt while its directory EXISTS`
+  ⇒ 编排者"push 会被挡"的判断成立，纯净树 HEAD 上 `sh scripts/d22scan.sh` 现在就是红的（rc=1，因为 step1 的 go test 先 FAIL）。
+  过滤器原文依据（`tools/d22scan/main.go`）：`walkText(dir, ban, check, goOnly)` 的后缀判断只有一句
+  `if goOnly && (!strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go")) { return nil }`，
+  而 ban #6 的调用是 `walkText(filepath.Join(root,"frontend"), "panel-approval", s.panelCheck, **false**)`
+  ⇒ `goOnly=false` 时**根本没有后缀过滤器**：frontend/ 下除 `node_modules/`、`testdata/`、`.git/` 之外的
+  每个文件都被读、被逐行扫（`.tsx`/`.ts`/`.mjs`/`.css`/`.md`/`.json`/无后缀全收）。
+  `isTextFile()`（那份后缀清单，含 .ts/.tsx/.jsx/.css/.md）**只服务 ban #8 的 design/**，与 ban #6 无关。
+  35 个文件的构成：16 tsx / 6 json / 3 ts / 3 mjs / 2 css / 1 md / 1 html / 1 go / 1 .gitkeep / 1 .gitignore。
+  ⇒ **本票的缺陷本体不是"空仪器"，是"豁免本身变成谎话"**（drift guard 已经把它抓住了）。
+  ⚠ 反手一条给未来的自己：**不许**为了"整齐"给 walkText 的非 goOnly 分支加 `isTextFile` 白名单——
+  那是把 35 缩成 33 并漏掉无后缀文件的**收窄**（R16#4），且会被 `TestLedgerCountsMatchAnIndependentWalk` 的 ban #6 行抓住。
+  为防止"armed but blind"另加了一条正向钉子 `TestBan6ScopeIsNotNarrowedByAnExtensionFilter`。
+- 2026-09-21（票 88 代理）：**AC#2 落地 + AC#3 五条红全部重新表述完毕**（同枚 commit）。
+  `declaredScopes()` 里 ban #6 = `live: true`、`absentOK` 去掉、`note` 改写为"谁在哪一批翻的、为什么"，
+  D22 那句"ban 文本不是代理能缩的"保留。**判定文本/正则一个字未改**（见 AC#5 的 diff 证明）。
+  "live 作用域 examine 0 个文件 ⇒ 致命"这条规则**未动**，翻牌后 ban #6 自己也开始受它管。
+  AC#6：**真树 0 命中**——`grep -rn 'approval\.decide' frontend/`（排除 node_modules）无匹配，
+  `cd tools/d22scan && go test ./...` rc=0，其中扫真仓的 `TestScannerSelfScanOfRealRepoIsGreen` /
+  `TestRealRepoLedgerIsHonest` 都在跑 ban #6 ⇒ 票 77 vendored 的 Approval Card 不需要改名。
+
