@@ -198,3 +198,53 @@ ghost（展开到不存在的树）在**两侧**都仍然 `Roots()` 空 + 记 `n
 next= 编排者 push 后读 `test-core`（ubuntu）步级结论补上面那个 run id 空位；`normalizeLocalUNC` 那条**不拆票**（实测 POSIX 不可达，见同形排查）；
 `TestResolvePerCallBudget` 在"两包同跑"下的 CPU 争用属票 93 的 CI 步形状那条线，不在本票。
 
+---
+
+## acceptor-ticket107 验收（2026-09-21 18:4x-18:5x，append-only；完整裁决表见 `docs/evidence/s1/107-adversarial-acceptance.md`）
+
+**总判：AC#3 不通过**（AC#1/AC#2/AC#4/AC#5 通过）。定性＝**修法的方向反了**：AC#2 你定"产生端"是对的，
+但产生端要交的是"**已解析**"，你交的是"**存在**"。`treeOnDisk` 用 `os.Stat`（跟随符号链接），而 POSIX 整条腿无 realpath
+（`internal/risk/pathresolver_other.go:10/:12`）⇒ 该平台放行判定从此只看"存在"，**放行侧宽于票 102 立的标准**。
+
+**探针 A（Docker/alpine 真跑，我在 `/tmp/accept107/snap` 纯净快照里做）**：`base/proj` 是指向 `base/outside` 的符号链接，
+`allowed_dirs=["%AC107_ROOT%/proj"]`，target=`base/proj/secret.txt`。
+
+| | 修前 | 修后 |
+| --- | --- | --- |
+| `Roots()` / `UnusableRoots()` | `[]` / `[…not confirmed on disk…]` | `[.../proj]` / `[]` |
+| `InAllowlist` | **false** | **true** |
+| 真正打开的树（`EvalSymlinks`） | — | **`.../outside/secret.txt`**（`os.ReadFile` 读出 `TOPSECRET`） |
+
+⇒ 三件齐：**修后放行、修前不放行、被放行的树不是操作者点名的那棵** ⇒ **跨树放行（fail-open），与票 102 要修的洞同形、方向相反**。
+对照：探针 B（root 是符号链接但拼成普通绝对路径、未被改写）修前修后**都 true** ⇒ 那条是 POSIX 旧账（你 `paths.go:160-169` 的自述属实）；
+探针 C（root 是真树、target 走 root 里 `proj/esc → outside`）修前 false / 修后 true ⇒ **这条增量是本票新放的**。
+
+**谁控制 root**：`internal/config/schema.go:472` →（原样拷）→ `cmd/wisp/run.go:261-265` ⇒ **只有操作者能设，模型不可控**，
+等级如实从"高危"降为"操作者自己机器上的符号链接会让批准对象换树"，**但不等于没有洞**：`RewrittenRoots()` 只记 `%VAR%`/`~` 改写，**不记跟随**，界面上没人告诉他 `proj` 是链到别处的。
+
+**`unusable`→`roots` 的去向**：`p.roots` 的唯一判定消费者就是 `InAllowlist`（`paths.go:122-135`），
+其调用点 `internal/risk/rules_gateway.go:45`（拒腿 L2）与 `internal/tools/bridge.go:845`（放行/免问腿 `inScope`）
+⇒ **没有**第三条判定跟着变宽；但**同一本账同时服务"拒"与"放行"**正是本仓要拆的那条（登记 R-107-2）。
+
+**正确形状（二选一，都不许反过来放宽放行侧换绿）**：① 放行侧补 `filepath.EvalSymlinks`（root 与 target **两侧同一处理**，否则票 102 用例照样红），
+或把 `pathresolver_other.go` 的 DEFERRED realpath+lstat 真做出来（冻结包，另开票）；② **保持"更严"**，
+把票 102 那条断言改成"POSIX 上判 false + 断言 `unusable` 有该文案"，并在票面明写"`[fs] allowed_dirs` 改写腿在 POSIX 整体失效"是一条**有 owner 决策的降级**，不是"修到绿"。
+
+**AC#4 我自己双向做了**（同快照，`grep -n` 同链证落地，先 build rc=0）：① `76: if !res.Resolved {` ⇒ LINUX BUILD rc=0 ⇒
+POSIX 上 `TestPathCanonicalizerAccountsForRewrittenRoots` **FAIL** + `TestTicket107AllowlistJudgmentTwoShapes` **FAIL**；
+② `130: if f == r || strings.HasPrefix(f, r) {` ⇒ `TestTicket107AllowlistBoundaryIsComponentWise` **FAIL**（`.../proj-evil/b.txt` 被放行）。
+⇒ 变异②证明"前缀/兄弟树"维度**真有牙**；**符号链接维度无牙**，即 AC#3 那一格。快照已还原（`diff -q` 对 HEAD ⇒ IDENTICAL），仓内未建 worktree。
+
+**你交回的两条**：① `TestResolvePerCallBudget` 我重跑两包同跑 `-count=2 -v` ⇒ **rc=0、两条 PASS、0.730/0.524 ms/op** ⇒ 判**负载假红**，不归票 86，读数全登；
+② `SKIP=TestSyncRegistryProbeLive×2` **坐实 HEAD 就有**（`git status` 里 `internal/risk` 干净），**但你的因果解释我推翻**：
+`tools/d22scan/runtests.sh:75` 就是 `go test -v -count=1`、`:88 count '^--- SKIP'`、`:99 SKIP is not a pass`，
+而我实测 `^--- SKIP` col 0 命中 2 次 ⇒ **SKIP=0 不可能是因为"非 -v"**；票 93 请改查**门禁包集合是否覆盖 `internal/risk`**，别按错因果修。
+
+**票面 numstat 删除列=1** 已核：唯一删除行就是 Status 行，正文一字未改写 ⇒ 通过。
+**门禁**：`gofmt -l` 空、`go vet` 与 `GOOS=linux go vet`（按包）各 rc=0、`-count=2 -v` 530 RUN==265×2 ⇒ 通过。
+POSIX 复现**我独立跑通**（含一条手法坑：Git Bash 下 `-v "C:\…":/t` 会静默挂空且 **rc=0＝假绿**，必须 `MSYS_NO_PATHCONV=1` + 容器内 `ls` 自证，登记 R-107-4）。
+**伪授权 0 次**（工具输出末尾无任何"编排者备注/停手/revert"文本），未执行 revert。
+
+next= 本票**退回实现方**：按正确形状①或②重做放行侧；重做后 AC#4 需**再加一发变异**（把 `treeOnDisk` 换成 `EvalSymlinks` 类"已解析"⇒ 探针 A 必须转 false），
+并把我这三枚探针**收进仓内可跑用例**（现在只在 `/tmp` 快照，进不了 CI 就等于没有）。
+
