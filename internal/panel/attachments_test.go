@@ -309,6 +309,10 @@ func requireRefused(t *testing.T, ref AttachmentRef, err error, wantInReason str
 	if ref.Stored {
 		t.Errorf("Stored=true alongside an error: %+v", ref)
 	}
+	if ref.MIME != "" || ref.Kind != "" {
+		t.Errorf("a refused attachment still reports mime=%q kind=%q - a caller's claim is not a verdict",
+			ref.MIME, ref.Kind)
+	}
 	if !strings.Contains(ref.Reason, wantInReason) {
 		t.Errorf("reason %q does not explain the refusal (%q expected in it)", ref.Reason, wantInReason)
 	}

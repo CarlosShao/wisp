@@ -84,7 +84,9 @@ type AttachmentRef struct {
 	ID string `json:"id"`
 	// Name is the sanitized display name (for humans only).
 	Name string `json:"name"`
-	// MIME is the SNIFFED type, never the declared one.
+	// MIME is the SNIFFED type, never the declared one. It is empty unless
+	// Stored is true: a refusal must not echo the caller's own claim back as if
+	// a verdict had been reached about it (the reason text carries the claim).
 	MIME string `json:"mime"`
 	// Kind is "image" or "video": what the agent can do with it.
 	Kind string `json:"kind"`
@@ -281,6 +283,8 @@ func (b *AttachmentBroker) refuse(ref AttachmentRef, reason string) (AttachmentR
 	ref.Stored = false
 	ref.Deduplicated = false
 	ref.Artifact = ""
+	ref.MIME = ""
+	ref.Kind = ""
 	ref.SizeBytes = 0
 	ref.Reason = reason
 	return ref, fmt.Errorf("%w: %s", ErrAttachmentRejected, reason)

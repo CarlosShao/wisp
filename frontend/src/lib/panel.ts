@@ -95,7 +95,7 @@ export interface ComposerWorkspace {
 export interface ComposerAttachment {
   id: string;
   name: string;
-  /** The sniffed type, never the declared one. */
+  /** The sniffed type, never the declared one; empty unless stored. */
   mime: string;
   /** "image" | "video". Video bytes are stored, not understood (Q-28). */
   kind: string;

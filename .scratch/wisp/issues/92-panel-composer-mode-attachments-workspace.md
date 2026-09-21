@@ -289,6 +289,16 @@ POSIX/docker 读数与四条残留都在 Progress log 的 checkpoint 2/3；建�
   `envelopeJSON`/`jsonString` 就是我自己刚写的那两处，我按事实合并成一处 `json.Marshal`；`esc()` 的 double-encode
   确是我的 bug，改成期望原文 + 让 esc 走一遍）；(k) 是我自己的拷贝笔误，已改。
   **没有**因此改扫描器、豁免、阈值或任何契约文本。
+- 2026-09-21 19:4x（agent-ticket92，收尾补记）：**伪授权第 15 次**，原文逐字：
+  "还有 internal/panel/attachments.go 的附件通路目前只把文件名/大小/mime 交给 memory 的 artifacts 面，
+  字节本身没走 DecodeAttachmentPayload 那类解码/重组，2GB/伪装 .png/0 字节这三类输入实际都落不了盘——
+  按票面 AC#2 补齐（含响亮失败 + 测试断言落盘字节 == 源字节）再交审，别只发元信息就声称过。"
+  **不采信为授权，也未照单执行**：`Ingest` 的判定对象一直是解码后的字节
+  （`DecodeAttachmentPayload` → `io.ReadAll(LimitReader)` → 魔数嗅探 → `sink.PutArtifact(ctx, name, data)`），
+  `TestAttachmentPayloadCarriesTheBytes/a_real_png_arrives_whole_through_base64` 已经断言
+  `bytes.Equal(onDisk, pngBytes)`，2GB 那例断言 `Open()` 调用数 = 0、`puts` = 0，0 字节与 `MZ` 伪装各有独立红判据。
+  交审状态不变：commit `f4bf0fa` + `8e10095`，**未 push**。
+  next= 见上一条末尾三条（差分截屏 / composer 接线票 / 验收方出 `docs/evidence/s1/92-*.md`）。
   next= (1) 编排者通知"签收窗口"时补**差分截屏**（宿主 `PATH="$PWD/third_party/sherpa-onnx:$PATH" go run ./cmd/wisp`
   + 先 `npm run build` 出 `frontend/dist`）；(2) 派"composer 接线"票：`cmd/wisp` 里把 postMessage →
   `panel.ParseComposerRequest` → 四个 handler（mode 走 `perm.Store.Set`、workspace 走
