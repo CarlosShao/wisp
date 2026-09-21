@@ -3,7 +3,10 @@ package winsec
 import (
 	"errors"
 	"fmt"
+	"log/slog"
+	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 )
@@ -63,13 +66,102 @@ var (
 )
 
 // SetPathResolver installs the C26 pipeline. internal/risk calls it from init.
-// Passing nil restores the built-in verifier; there is no way to install a
-// resolver that rewrites nothing and refuses nothing, because the built-in one
-// always runs the shape and reparse checks below.
+// Passing nil restores the built-in verifier.
+//
+// Ticket 103's AC#1 is the reason this function is no longer a plain assignment.
+// PROBE A of ticket 94's acceptance installed, from *outside* this package, a
+// resolver that answers every hostile spelling with "yes", and winsec then
+// silently rewrote somebody else's DACL and reported success. The seam itself is
+// not the bug - winsec cannot import risk without closing a cycle (see the note
+// at the top of this file) - so the fix is three guards on the way in:
+//
+//  1. single use: while a resolver is installed it may not be replaced by a
+//     different one. Falling back to nil is always allowed, because nil means the
+//     built-in floor, which can refuse and rewrite nothing;
+//  2. conformance: the candidate must answer every hostile shape in
+//     resolverProbeShapes either by refusing it or by handing back a spelling the
+//     floor itself accepts. A pass-through rubber stamp can do neither - which is
+//     precisely why it is dangerous;
+//  3. loud refusal with an audit record: a rejected install leaves the incumbent
+//     in place and writes an ERROR-level slog record naming the candidate and the
+//     reason. A guard that fails quietly is indistinguishable from no guard.
+//
+// It deliberately does not panic: init() order across packages means a panic here
+// would take a binary down over a wiring mistake, whereas a refusal leaves it on
+// the floor, which is only ever narrower.
+//
+// What the guard cannot do is read intent, so it is not the whole story:
+// ResolvePath re-runs the floor on whatever the installed resolver answers, which
+// is what makes a fake that somehow got in inert rather than merely unlikely.
 func SetPathResolver(r C26Resolver) {
+	if r == nil {
+		resolverMu.Lock()
+		was := fmt.Sprintf("%T", resolver)
+		resolver = nil
+		resolverMu.Unlock()
+		slog.Info("winsec: sealing path resolver reset to the built-in floor", "was", was)
+		return
+	}
+	name := fmt.Sprintf("%T", r)
+	if reason := resolverConformanceFailure(r); reason != "" {
+		slog.Error("winsec: refusing to install a path resolver into the sealing seam",
+			"resolver", name,
+			"reason", reason,
+			"consequence", "the incumbent resolver, or the built-in floor, stays in place")
+		return
+	}
 	resolverMu.Lock()
 	defer resolverMu.Unlock()
+	if resolver != nil {
+		if incumbent := fmt.Sprintf("%T", resolver); incumbent != name {
+			slog.Error("winsec: refusing to replace the already installed sealing path resolver",
+				"installed", incumbent,
+				"attempted", name,
+				"reason", "the seam is single-use: reset it to nil first, the only direction that can narrow")
+			return
+		}
+		slog.Debug("winsec: sealing path resolver installed again identically", "resolver", name)
+		return
+	}
 	resolver = r
+	slog.Info("winsec: sealing path resolver installed", "resolver", name,
+		"probes_passed", len(resolverProbeShapes()))
+}
+
+// resolverProbeShapes are spellings that no resolver which deserves the name may
+// answer by passing them straight through, one per way the answer would name a
+// different tree than the caller: which object a relative spelling names depends
+// on where the process happens to be standing, and which object "parent\.."
+// names depends on what the parent is *behind a link*. Both are refused by the
+// built-in floor, so the only acceptable answers are a refusal or a rewrite.
+//
+// They need no fixtures, no privilege and no filesystem mutation, which is what
+// makes it safe to run them from an init()-time setter.
+func resolverProbeShapes() []string {
+	sep := string(filepath.Separator)
+	shapes := []string{os.TempDir() + sep + ".." + sep + "wisp-103-conformance-probe"}
+	if runtime.GOOS == "windows" {
+		shapes = append(shapes, "wisp103"+sep+"conformance-probe")
+	}
+	return shapes
+}
+
+// resolverConformanceFailure returns the reason r must not be installed, or ""
+// when it may.
+func resolverConformanceFailure(r C26Resolver) string {
+	for _, probe := range resolverProbeShapes() {
+		out, err := r.Resolve(probe)
+		if err != nil {
+			continue // refusing a hostile shape is the job, not a failure
+		}
+		if out == probe {
+			return fmt.Sprintf("it answered the hostile shape %q by passing it through unchanged, which is the bypass this seam exists to close", probe)
+		}
+		if _, fErr := (builtinVerifier{}).Resolve(out); fErr != nil {
+			return fmt.Sprintf("it answered %q with %q, a spelling the built-in floor itself refuses: %v", probe, out, fErr)
+		}
+	}
+	return ""
 }
 
 // PathResolverInstalled reports the installed pipeline, or nil when the built-in
@@ -86,8 +178,8 @@ func PathResolverInstalled() C26Resolver {
 // build one that carries a path: the only mint is ResolvePath, which runs C26 or
 // the built-in verifier. That is what makes "this was resolved" a type-level fact
 // instead of a comment, and it is why the sealing walk below takes ResolvedPath
-// rather than a string - filepath.Abs cannot come back without deleting a
-// parameter type first.
+// rather than a string - a caller cannot produce the value by hand, it has to
+// survive the floor.
 type ResolvedPath struct {
 	path string
 }
@@ -121,7 +213,26 @@ func ResolvePath(input string) (ResolvedPath, error) {
 		return ResolvedPath{}, fmt.Errorf("winsec: refusing to seal %s: %w: resolver returned an empty path",
 			input, ErrUnresolvedPath)
 	}
+	// AC#1's second half, and the reason "the seam is guarded" is not load-bearing
+	// on the guard alone: whatever is installed, the spelling that reaches
+	// os.Mkdir / os.Chmod has to pass the floor *for itself*. A resolver that
+	// answers with a path carrying a link in its ancestor chain, a "..", an empty
+	// segment or a \\?\ prefix is not describing the tree the caller named, so the
+	// seal is refused here rather than taken on the resolver's word.
+	if _, fErr := (builtinVerifier{}).Resolve(p); fErr != nil {
+		return ResolvedPath{}, fmt.Errorf("winsec: refusing to seal %s: the installed %s answered %q, a spelling the floor itself refuses: %w",
+			input, resolverLabel(r), p, fErr)
+	}
 	return ResolvedPath{path: p}, nil
+}
+
+// resolverLabel attributes a refusal to the thing that produced it, so a fake
+// answer cannot be reported as this package's own opinion.
+func resolverLabel(r C26Resolver) string {
+	if _, isFloor := r.(builtinVerifier); isFloor {
+		return "built-in floor"
+	}
+	return fmt.Sprintf("%T", r)
 }
 
 // resolveString is ResolvePath for the exported entry points, which keep their

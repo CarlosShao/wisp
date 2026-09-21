@@ -42,6 +42,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // ErrNotSealable reports that a path could not be made private. Callers must
@@ -221,10 +222,64 @@ func SealDir(path string) error {
 // This is the one entry point that deliberately does not resolve its argument
 // through C26. Its subject *is* the link: resolving first would deny the call on
 // the very reparse point it exists to unlink, so the entry would stay occupied
-// and the quota would keep counting a tree nobody owns. The safety comes from
-// the operation instead of from a normalized spelling - it opens with
-// FILE_FLAG_OPEN_REPARSE_POINT and never recurses.
-func RemoveUnlinked(path string) error { return removeUnlinked(path) }
+// and the quota would keep counting a tree nobody owns. The safety comes from the
+// operation instead of from a normalized spelling - it opens with
+// FILE_FLAG_OPEN_REPARSE_POINT and never recurses - plus the ancestor check
+// below, which is ticket 103's AC#2: PROBE F measured that a spelling *reaching*
+// the leaf through a junction made this call delete a file inside somebody else's
+// tree and return nil, because the only guard was on the last component.
+func RemoveUnlinked(path string) error {
+	if link := firstLinkAncestor(path); link != "" {
+		return fmt.Errorf("%w %s: the spelling reaches it through the link at %s, and whatever lives behind that link is not this tree's data to delete",
+			ErrIsReparsePoint, path, link)
+	}
+	return removeUnlinked(path)
+}
+
+// firstLinkAncestor returns the shortest ancestor of path that is a link, or ""
+// when none is. path itself is deliberately excluded: unblocking a link standing
+// where an artifact was expected is RemoveUnlinked's whole purpose, and refusing
+// on the leaf would break the reclaim route ticket 79 built.
+//
+// The prefixes are built by concatenating on the platform separator rather than
+// filepath.Join/Clean on purpose (D22 ban #2): normalizing here would collapse
+// exactly the shapes - "parent\..\something", a doubled separator - that hide a
+// link behind a lexical spelling, and the answer would then describe a different
+// tree than the one os.Remove is about to act on.
+func firstLinkAncestor(path string) string {
+	sep := string(filepath.Separator)
+	var vol, rest string
+	if v := filepath.VolumeName(path); v != "" {
+		vol, rest = v, strings.TrimPrefix(path, v)
+	} else if strings.HasPrefix(path, sep) {
+		vol, rest = sep, strings.TrimPrefix(path, sep)
+	}
+	var prefixes []string
+	cur := vol
+	for _, part := range strings.Split(rest, sep) {
+		if part == "" {
+			continue
+		}
+		switch {
+		case cur == "":
+			cur = part
+		case strings.HasSuffix(cur, sep):
+			cur += part
+		default:
+			cur += sep + part
+		}
+		prefixes = append(prefixes, cur)
+	}
+	if len(prefixes) == 0 {
+		return ""
+	}
+	for _, prefix := range prefixes[:len(prefixes)-1] {
+		if ancestorIsLink(prefix) {
+			return prefix
+		}
+	}
+	return ""
+}
 
 func wrapPath(path string, err error) error {
 	return fmt.Errorf("%w: %s: %v", ErrNotSealable, path, err)

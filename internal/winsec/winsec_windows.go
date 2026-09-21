@@ -496,3 +496,11 @@ func deleteReparsePoint(path string) error {
 	}
 	return nil
 }
+
+// ancestorIsLink is RemoveUnlinked's half of ticket 103's AC#2, in the platform's
+// own words: the reparse attribute, the same predicate isReparsePoint and
+// therefore the same predicate the sealing walk uses, so "is this a link" cannot
+// mean two different things inside one package. A junction reports no
+// ModeSymlink to os.Lstat on Windows, which is why the portable version in
+// winsec_other.go could not have been used here.
+func ancestorIsLink(prefix string) bool { return isReparsePoint(prefix) }

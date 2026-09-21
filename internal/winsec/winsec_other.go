@@ -79,3 +79,15 @@ func removeUnlinked(path string) error {
 	}
 	return nil
 }
+
+// ancestorIsLink is RemoveUnlinked's half of ticket 103's AC#2. POSIX needs the
+// check even though os.Remove never follows the leaf: a symlink in the *middle*
+// of a spelling redirects the unlink into somebody else's tree just the same, and
+// the leaf-not-followed property says nothing about the ancestors.
+func ancestorIsLink(prefix string) bool {
+	info, err := os.Lstat(prefix)
+	if err != nil {
+		return false // an ancestor that is not there cannot be a link
+	}
+	return info.Mode()&os.ModeSymlink != 0
+}
