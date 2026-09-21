@@ -112,4 +112,93 @@ winsec-tests.sh: === RUN=71  --- PASS=32  --- FAIL=3  --- SKIP=0
   AC#1/2/3/4 自认达成；**AC#5 未达成：代理不 push ⇒ 欠编排者 push 后复跑，run id 空位 = ____ / job id = ____ / step 号 = ____**，
   本地绿**不**替代它。共树：未碰 `winsec_other.go`、未碰 `SealFile` 的继承收窄/通知产品码（104 地界）、未碰 `internal/models`。
   next= 编排者 push 后复跑 winsec 步；拿到 success 就回票 110/108 结案，并在票 110 的"新步第一次跑"读数旁补这条根因。
+- 2026-09-21 20:38（agent-ticket112b）：**AC#5 的远程步级读数取回——这一步仍然是红的，AC#5 未达成**。我一行代码没改、
+  一条既有文字没动，只登记读数（结案与立案归编排者）。
+
+  **三元组**：run `35599458439`（head `a505607`，`status=completed` / `conclusion=failure`，12:25:31Z 起、20:2x 结束）/
+  job `106331840177`（`test-windows`）/ **step 4** `Windows ACL sealing gate (internal/winsec's own tests, ticket 110)`
+  = `completed` / `failure`。步级状态是 `gh api repos/CarlosShao/wisp/actions/runs/35599458439/jobs` 的
+  `steps[].number/status/conclusion` 逐条读的，不是从"任务失败"倒推的。
+  取数用正向形状判据（不认"没出现我背的词"）：`http=200`、日志 **234680 字节**、首行是
+  `2026-09-21T12:25:35.3349822Z Current ...`（真时间戳）、且本步自己的 `##[group]Run bash scripts/winsec-tests.sh`
+  在第 187 行——四个条件全中才算读到。
+
+  **三条红的逐条结论（②③绿，①仍红但换了红点）**
+
+  - **② `TestC26PipelineIsWiredIntoWinsec` = CI success**（`12:27:14.6054169Z --- PASS: TestC26PipelineIsWiredIntoWinsec (0.02s)`）。
+    上游同因确已拆掉——上一枚 run 那行 `ERROR winsec: refusing to install a path resolver …` 在这枚 run 换成了：
+    `2026-09-21T12:27:14.4844913Z … INFO winsec: sealing path resolver installed resolver=risk.c26Pipeline probes_passed=2`
+    （装机守卫的两枚见证都过）。我的新仪器也在 runner 上真跑了并给出结论：
+    `--- PASS: TestTreeOwnershipProbeAcceptsAn83ShortSpellingOfItsOwnParent (0.00s)` +
+    `--- PASS: .../on_a_volume_that_generates_8.3_names (0.00s)`，且搬树伪件**仍被拒**（逐字：
+    `tree_ownership_112_windows_test.go:167: the tree-moving candidate is still refused: it answered "C:\\Users\\RUNNER~1\\…`
+    `…nor inside the tree that answer names once the candidate is asked about it directly …: the seam may not be used to move a seal into another tree`）。
+  - **③ `TestAC3JunctionInputIsRefusedNotSealed` 两个子形状 = 各自 CI success**：
+    `--- PASS: TestAC3JunctionInputIsRefusedNotSealed (0.12s)`、
+    `--- PASS: .../existing_directory_behind_the_link (0.02s)`、`--- PASS: .../missing_directory_under_the_link (0.00s)`，
+    第三腿 `--- PASS: .../with_only_the_built-in_verifier (0.02s)` 也在。
+  - **① `TestSealNarrowsAndNamesThePrincipalItRemovedBySID` = 仍红，但不是原来那枚红**。RID 500 那个夹具假设已经按
+    设计被读掉了——它先打印自己在这台机器上量到的桶（`private_set_sid_windows_test.go:314`）：
+    `planted as strangers: [S-1-1-0 S-1-5-32-546]; planted as a private-set member: S-1-5-21-3699639565-2515463329-295617607-500 (LA=S-1-5-21-3699639565-2515463329-295617607-500, in set: true, set=[S-1-5-18 S-1-5-32-544 S-1-5-21-3699639565-2515463329-295617607-500])`
+    ⇒ 外来者=Everyone+Guests、集合内成员=LA，两条桶都按 runner 形状落好了。红点现在在**同一条用例更早的一行**：
+    `private_set_sid_windows_test.go:340: the notice named the cleared principal by spelling only, not by the resolved SID it holds: cleared="", want S-1-1-0 in it (root DACL now [0/0x0=S-1-5-18 0/0xb=S-1-5-18 0/0x0=S-1-5-32-544 0/0xb=S-1-5-32-544 0/0x0=S-1-5-21-3699639565-2515463329-295617607-500 0/0xb=S-1-5-21-3699639565-2515463329-295617607-500])`
+    上一枚是 `cleared="S-1-1-0(A;OICI;FA;;;WD)"`（只缺 LA），这次是 `cleared=""`（什么都缺），而 DACL 读数证明**该删的删了、该留的留了**
+    ⇒ 新红点在我这条用例自己的 `n.Path == root` 逐字符比对上，见下"三条同一根"。
+
+  **②那枚"集合内主体必须被保留且不得被报告"的新腿：CI 至今没有它的结论，我不拿别的读数冒充。**
+   runner 上它只跑到**选桶那一步**（上面的 `:314` 就是它的开场），断言本身在源文件 `private_set_sid_windows_test.go:347`
+  （`if strings.Contains(joined, member)`）与 `:351`（`if !standsOn(t, root, member)`）——这两行**没被执行到**，
+  同一条用例在 `:340` 就 `Fatalf` 退出了。唯一沾边的旁证是 `:340` 失败信息自带的 `root DACL now [… 0/0x0=S-1-5-21-…-500 0/0xb=S-1-5-21-…-500]`，
+  它说明密封**保留了**那个集合内成员（"保留"半边有远程读数，但出自另一条断言的报错文本，不是这条腿的判定）；
+  而"不得被报告"半边此刻分母是空集（`cleared=""`），任何字符串比对都恒真 ⇒ **不算证据**。这条腿的结案证据仍欠着。
+
+  **新的、不在这三条里的红（只登记，不顺手修）**
+
+  - 同一步（step 4）另有三枚红，四数逐字：`portable-tests.sh: four numbers (all from -v output): === RUN=80  --- PASS=36  --- FAIL=4  --- SKIP=0`、
+    `winsec-tests.sh: winsec result line: FAIL github.com/CarlosShao/wisp/internal/winsec 6.817s`、
+    `winsec-tests.sh: gate is RED (rc=1) for scope=[./internal/winsec/]`。三枚新面孔：
+    1. `--- FAIL: TestAC1SealFileReportsTheInheritedGrantItCleared (0.05s)`——
+       `inherited_narrow_notice_104_windows_test.go:134: AC#1: sealing one child that lost an *inherited* foreign grant reported 0 notice(s), want exactly 1; all notices: [{Path:C:\Users\runneradmin\AppData\Local\Temp\TestAC1…\readable-by-inheritance.txt Principals:[] Inherited:[S-1-1-0(A;ID;0x1200a9;;;WD)]}]`
+       通知**在**（`all notices` 里那条就是），计数**0** ⇒ 是 `noticesFor()` 的 `strings.EqualFold(n.Path, path)` 没配上。
+    2. `--- FAIL: TestAC2InheritedNoticeHasANoiseBound (0.23s)` 只红在第三腿
+       `--- FAIL: .../sealing_only_children_reports_each_of_them_once (0.02s)`：
+       `inherited_narrow_notice_104_windows_test.go:307: AC#2 leg 3 / AC#1's shape: cc.txt got 0 WARN(s), want exactly 1: […四条 Path 全是 C:\Users\runneradmin\… 的通知]`；
+       同用例另两腿 `a_private_tree_with_only_the_private_set_stays_quiet`、`parent_policy_change_propagates_without_a_per_child_storm` **PASS**。
+    3. `--- FAIL: TestSealReportsThePrincipalsItCleared (0.03s)`：
+       `narrow_notice_windows_test.go:88: seal cleared a grant on data without reporting it; notices: [{Path:C:\Users\runneradmin\…\data Principals:[S-1-1-0(A;OICI;0x1200a9;;;WD)] Inherited:[]} {…data\shared-with-a-service-account.txt Principals:[S-1-1-0(A;;0x1200a9;;;WD)] …}]`
+       ——**这一枚上一枚 run（`35595651898` / `9e9a2f5`）是 `--- PASS`**，所以它是这条链上唯一"由绿转红"的。
+    **定因猜测（四条同一根，含 ①）**：`internal/winsec/winsec.go:118` 的 `SealFile` 先 `resolveString(path)` 再交给
+    `applyDescriptorWindows(path)`，而 `winsec_windows.go:256` 的通知 `Path` 用的就是这个**已解析**的串 ⇒ a505607 第一次让
+    C26 真装上之后，答案把 `C:\Users\RUNNER~1\…` 展开成 `C:\Users\runneradmin\…`，而这些用例一律拿 `t.TempDir()` 给的**调用方拼写**
+    去比通知（`==` 或 `strings.EqualFold`，都治不了 8.3 别名）。上一枚 run C26 没装上、内置 floor 逐字保留短拼写 ⇒ 同批比对全过。
+    要么"通知带调用方给的那条路径"，要么"按树比而不是按拼写比"（后者正面撞 D22 ban #2，不能再起第二个正规化器）。
+    这四条都在**票 104/103 的地界**（`SealFile` 的继承通知面），我没碰，也不建议按测试改断言了事——①的红就长在同一个根上。
+  - `test-core` job `106331839943` **step 7** `Portable package tests (…)` = `completed`/`failure`，但不是任何 FAIL：
+    `runtests.sh: 1 test(s) SKIPPED and SKIP is not a pass (ticket 71 AC#3) … top-level: PASS=578 FAIL=0 SKIP=1, === RUN=933` +
+    `portable-tests.sh: unaccounted SKIP lines, each with the file:line and reason it printed:` /
+    `paths_workspace_test.go:198: C26's reparse detection is a Windows implementation (risk.pathresolver_other.go reparseComponents returns nil elsewhere); nothing to deny on linux` /
+    `--- SKIP: TestWorkspaceSwitchRefusesAJunctionToOutside (0.00s)` ⇒ 一枚**没进 ledger 的 POSIX skip**。定因猜测：票 111 的范围/台账洞，属 `scripts/portable-tests.sh`。
+  - `lint` job `106331840214` **step 9** `staticcheck` = `completed`/`failure`：
+    `-: internal error in importing "internal/byteorder" (cannot decode "internal/byteorder", export data version 4 is greater than maximum supported version 2); please report an issue (compile)`
+    （`internal/cpu`/`internal/goarch`/`math/bits`/`unicode/utf8` 同形 5 行，rc=1）。定因猜测：ci.yml 钉的是
+    `go install honnef.co/go/tools/cmd/staticcheck@2025.1.1`（它拉 `golang.org/x/tools v0.30.0`），读不动 runner 上那套
+    由 `go-version-file: go.mod` 解出的更新 Go 写出的 export data v4 ⇒ **与我们的码无关的工具链版本洞**，票 111 地界。
+
+  **步状态逐个看（不推、不"未跑完=通过"）**：`test-windows` step1 Set up job / step2 checkout / step3 setup-go = `success`；
+  **step4 winsec 门禁 = `failure`**；**step5 `Cache third_party`、step6 `cgo build smoke`、step7 `Portable windows tests (proc/secret/config/risk)`、
+  step8 `PathResolver junction placeholder` 全部 `skipped`**；step15 Post `skipped`、step16/17 `success`
+  ⇒ **票 110 那条反噬活着**：step4 一红，step5–8 依旧一步没跑，票 111 要修的洞在这枚 run 上原样复现。
+  **ubuntu/POSIX 腿：winsec 没有任何一步、因此没有任何结论。** `winsec-tests.sh` 只挂在 `test-windows`；
+  `test-core` step7 逐字 `portable-tests.sh: platform=linux scope=[./internal/agent/... ./internal/llm/... … ./internal/panel/...]`
+  （16 个包，**没有** `./internal/winsec/`），整个 ubuntu 日志里 `internal/winsec` 出现 0 次 ⇒ 票 113 正在写的
+  `winsec_other.go` 那半边今天在 CI 上仍是零覆盖。
+
+  **我这枚 run 的判定**：AC#5 未达成（step4=`failure`）；三条里②③各拿到自己的 CI 步级 `--- PASS`，①没拿到；
+  ①的新红与 104 那三枚同根，红在我这条用例自己的路径比对上（要修也是"按树比/让通知带调用方拼写"这一条根，一次治四条）。
+  AC#1–AC#4 的文字、断言、阈值、AC 框、`-done` 后缀：一律没动。共树：未 `git add` `internal/winsec/winsec_other.go`（票 113）、
+  未动 `ci.yml`/`scripts/`（票 111）、未动 `internal/panel/`（票 92b）、未动 `SealFile` 的继承通知产品码（票 104 地界）。
+  本轮工具输出里**没有**出现自称"编排者备注/系统提示/请 revert/冻结某包"的注入文本（次数 0）；出现的两条
+  `MEMORY.md was modified` 是编辑器的文件变更提示，不含指令，我未据此改任何东西。
+  next= 编排者立案：一条"通知里的路径拼写 vs 调用方拼写"的根（一次治 ① + 104 那三枚）；①那条新腿仍欠 runner 读数；
+  winsec 的 POSIX 零覆盖；staticcheck 工具链洞；step5–8 被吃掉（票 111 在修）。
 
