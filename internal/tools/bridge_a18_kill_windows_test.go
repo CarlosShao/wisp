@@ -13,28 +13,30 @@ import (
 	"time"
 )
 
-// A18 CHARACTERIZATION (ticket 20's unwired残口, registry A18): what a REAL
-// `taskkill /F` during a staged write actually leaves behind.
+// A18 (ticket 73 flipped ③): a REAL `taskkill /F` during a staged write, and
+// what is on disk afterwards.
 //
 // The existing `TestAtomicWriteKillsMidWrite` kills IN-PROCESS via
 // `Hooks.Kill`, which returns an error and therefore RUNS the Go cleanup — so
 // its "no staging file left" assertion is unobservable under a real fault
 // (that is A18's exact objection). This file kills a real child OS process
-// with a real `taskkill /F` and records what is true today:
+// with a real `taskkill /F` and records what is true now:
 //
 //	① the target is complete-or-absent (D31 holds: staging + one os.Rename),
-//	② exactly one `.wisp-tmp-*` file stays behind per kill in the authorized
-//	   directory,
-//	③ nothing sweeps it: not the next successful write, not a freshly built
-//	   bridge over the same root — which is as close to "next startup" as this
-//	   repository currently has (grep: `tempPrefix` is read nowhere outside
-//	   fs_write.go's two CreateTemp calls, so there is no sweeper to call).
+//	② each interrupted write leaves exactly one `.wisp-tmp-*` behind — the
+//	   residue is REAL, and this test still asserts it exists BEFORE anything
+//	   can sweep it (by the third subtest exactly one remains: the second
+//	   child's own write already reclaimed the first child's orphan),
+//	③ the NEXT write through the bridge reclaims it (internal/tools/fs_staging
+//	   go's sweeper, ticket 73): the directory ends with zero `.wisp-tmp-*`
+//	   entries and the destination file is still byte-exact.
 //
-// ③ is deliberately pinned as "still there". Turning it into "swept away" is a
-// behavior decision the owner has not made (registry A18's completion判据 ②
-// explicitly leaves "self-heal" vs. "declare it acceptable residue in the SPEC"
-// open), so this test goes RED the day someone adds a sweeper, and whoever
-// adds one updates it on purpose instead of by accident.
+// ③ used to be pinned as "the orphan is still there" (761447f), because the
+// owner had not picked between self-healing and declaring the residue
+// acceptable. Registry Q-16 picked self-healing, so this file now pins the
+// opposite; ② is kept as the positive control that makes ③ mean something — a
+// sweep that ran before the residue existed would look identical to a sweep
+// that never ran if only ③ were asserted.
 //
 // Prerequisites: Windows with `taskkill.exe` (System32 on every SKU) and a
 // test binary that can re-exec itself. Missing either fails LOUDLY — this file
@@ -54,7 +56,7 @@ const (
 	a18StagedStep = "write:8"
 	// a18ChildTest is the test function both halves live in; the child re-runs
 	// only this one.
-	a18ChildTest = "TestA18RealTaskkillLeavesTheTargetWholeAndTheStagingFileBehind"
+	a18ChildTest = "TestA18RealTaskkillLeavesTheTargetWholeAndTheNextWriteReclaimsTheStagingFile"
 )
 
 // a18ChildBody is the child half: a real fs.write through a real bridge whose
@@ -168,10 +170,10 @@ func stagingFiles(t *testing.T, dir string) []string {
 	return out
 }
 
-// TestA18RealTaskkillLeavesTheTargetWholeAndTheStagingFileBehind is the
-// characterization: D31's promise survives a real kill, and the residue does
-// not disappear on its own.
-func TestA18RealTaskkillLeavesTheTargetWholeAndTheStagingFileBehind(t *testing.T) {
+// TestA18RealTaskkillLeavesTheTargetWholeAndTheNextWriteReclaimsTheStagingFile
+// is the characterization plus ticket 73's fix: D31's promise survives a real
+// kill, the residue is real, and the next write through the bridge reclaims it.
+func TestA18RealTaskkillLeavesTheTargetWholeAndTheNextWriteReclaimsTheStagingFile(t *testing.T) {
 	if dir := os.Getenv(envA18Dir); dir != "" {
 		a18ChildBody(t, dir)
 		return
@@ -208,13 +210,17 @@ func TestA18RealTaskkillLeavesTheTargetWholeAndTheStagingFileBehind(t *testing.T
 		}
 	})
 
-	// The A18 half: two real kills left two staging files behind, and nothing
-	// in this repository looks at them afterwards.
-	t.Run("the_staging_residue_is_still_there_and_nothing_sweeps_it", func(t *testing.T) {
+	// The A18 half, flipped by ticket 73: two real kills left two staging files
+	// behind (asserted FIRST, as the positive control), and the next write
+	// through the bridge reclaims exactly those orphans.
+	t.Run("the_next_write_reclaims_the_staging_residue", func(t *testing.T) {
 		before := stagingFiles(t, auth)
-		if len(before) != 2 {
-			t.Fatalf("真 kill 之后的 .wisp-tmp-* 残留 = %v, want 2 个。"+
-				"数量变了就说明行为变了：改这条要连同 registry A18 的判据②一起改，别顺手改勾", before)
+		if len(before) != 1 {
+			t.Fatalf("真 kill 之后的 .wisp-tmp-* 残留 = %v, want 1 个。"+
+				"这条是 ③ 的阳性对照：kill 本身没留下残口的话，\"扫干净了\"就什么都不是。"+
+				"1 而不是 761447f 时代的 2，是因为第二个子进程自己写盘前就把第一个的孤儿扫掉了"+
+				"（清扫挂在每次写盘上，见 fs_write.go 的 reclaimStaging）⇒ 到这一步盘上必须"+
+				"只剩第二个 kill 的那一个残留，多一个少一个都说明行为变了", before)
 		}
 		for _, p := range before {
 			st, err := os.Stat(p)
@@ -236,12 +242,22 @@ func TestA18RealTaskkillLeavesTheTargetWholeAndTheStagingFileBehind(t *testing.T
 		if out.IsError {
 			t.Fatalf("新桥的合法写入被拒了，这条对照就没意义: %+v", out)
 		}
-		if after := stagingFiles(t, auth); len(after) != 2 {
-			t.Fatalf("新桥清扫了历史残留 (%v -> %v)：这是个没人批准过的行为改动，"+
-				"要么连同 registry A18 判据②一起由 owner 拍板，要么把清扫器挪回它该在的票", before, after)
+		if after := stagingFiles(t, auth); len(after) != 0 {
+			t.Fatalf("下一次写盘没有清扫历史残留 (%v -> %v)：A18 的残口仍然开着——"+
+				"清扫器（internal/tools/fs_staging.go）被摘掉了或者归因失败", before, after)
 		}
 		if _, err := os.Stat(filepath.Join(auth, "after-restart.txt")); err != nil {
 			t.Fatalf("新桥的正常写入没落地: %v", err)
+		}
+		// The sweep deletes files in the same directory as the destination, so
+		// "the destination is still whole" is part of THIS assertion, not
+		// something subtest ① is assumed to have covered.
+		got, err := os.ReadFile(existing)
+		if err != nil {
+			t.Fatalf("清扫之后目标读不到了: %v", err)
+		}
+		if string(got) != oldBytes {
+			t.Fatalf("清扫器动了目标文件：existing.txt 不再是 OLD-BYTES（%d 字节）", len(got))
 		}
 	})
 }

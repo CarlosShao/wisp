@@ -274,7 +274,13 @@ func (d FSDeps) stageAndRename(ctx context.Context, target string, src io.Reader
 	if err := se.at(ctx, "create-temp"); err != nil {
 		return se.stoppedResult("写入")
 	}
-	tmp, err := os.CreateTemp(parent, tempPrefix+"*")
+	// A18 / ticket 73: a real taskkill runs no Go cleanup, so the staging file an
+	// interrupted write left behind used to sit in the user's allowed dir forever
+	// (761447f measured exactly one per kill). Reclaim them BEFORE this call
+	// creates its own temp file, so the sweep can never see - let alone delete -
+	// the file the current write owns.
+	reclaimStaging(parent, se)
+	tmp, err := os.CreateTemp(parent, stagingPattern())
 	if err != nil {
 		// Nothing was created, so nothing is claimed: no ledger, no undo.
 		return Result{Text: "创建临时文件失败：" + err.Error() + "（目标未被改动）", IsError: true}
@@ -494,7 +500,10 @@ func (fsMove) crossVolume(ctx context.Context, se *sideEffect, from, to string,
 	}
 	defer src.Close() //nolint:errcheck // read-only handle
 
-	tmp, err := os.CreateTemp(parent, tempPrefix+"*")
+	// Same A18 reclaim as fs.write's staged write: the destination directory is
+	// the one being written, and this call's own temp file does not exist yet.
+	reclaimStaging(parent, se)
+	tmp, err := os.CreateTemp(parent, stagingPattern())
 	if err != nil {
 		return Result{Text: "创建目标临时文件失败：" + err.Error() + "（源未被改动）", IsError: true}
 	}
