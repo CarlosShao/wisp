@@ -1,6 +1,6 @@
 # 107 — 票 102 那条"改写要记账"的判据在 **ubuntu 上是红的**：`paths_rewrite_ticket102_test.go:64` 说 `InAllowlist("/tmp/…/proj/a.txt") = false`（`test-core` 连 2 次红）
 
-**Status:** open（2026-09-21 18:1x 编排者建；来源=**CI 步级读数** run `35585147258`、`35586044995` 的 `test-core` 步）
+**Status:** ready-for-review（2026-09-21 18:3x `agent-ticket107` 定性+修完，POSIX 侧在 Docker/Linux 容器里**真跑过**修前红/修后绿/两发变异；正文仍为 append-only，numstat 里那 1 行删除就是本行）
 **Type:** 同一不变式**只在半个平台成立**（票 82 的 POSIX 家族、A74③ 的反斜杠折叠，同形）
 **Blocks:** CI 转绿 · "路径已解析"这句话能不能对 owner 说满 · **Blocked by:** nothing
 **Packages:** `internal/tools/`（`InAllowlist` 与那条用例两侧之一）、必要时 `internal/risk/` 的比较端。
@@ -71,3 +71,130 @@ Windows 侧同一条用例**绿**（本机 `-count=2` 四包全绿，验收代�
   拿不到就在票面留 run id 位由编排者补——**这一条已同时写进本票 AC#1 与票 106 AC#5**。
   next= 派单（不与 103/106 撞文件：本票在 `internal/tools/`+`internal/risk/` 的比较端）；
   修完后由编排者 push 并读 `test-core` 的步级结论结案。
+
+---
+
+## agent-ticket107 交件（2026-09-21 18:2x-18:3x，append-only；上面 AC#1..AC#5 的框留着不勾，勾与证据在下面 1:1 对齐）
+
+### AC#1 复现：POSIX 侧**真跑过**（本机有 Docker Desktop + WSL2 内核，容器 alpine，`Linux 6.6.114.1-microsoft-standard-WSL2`）
+
+手法（登记下来，因为 `GOOS=linux go test` 只编译不执行这条是本票的根）：
+Windows 侧 `GOOS=linux CGO_ENABLED=0 go test -c -o /tmp/agent-ticket107/tools_linux.test ./internal/tools/`（rc=0），
+再把该二进制挂进 `docker run --rm -v <tmp>:/t alpine /t/tools_linux.test -test.v` **在 x86_64 Linux 上执行**。
+⇒ 修前读数（同一条用例、同一条断言、逐字）：
+
+```
+=== RUN   TestPathCanonicalizerAccountsForRewrittenRoots
+    paths_rewrite_ticket102_test.go:64: InAllowlist("/tmp/TestPathCanonicalizerAccountsForRewrittenRoots1970682827/001/proj/a.txt") = false although the expanded root is a real tree; the fix must not turn into option (A)
+--- FAIL: TestPathCanonicalizerAccountsForRewrittenRoots (0.01s)
+```
+
+**归因**：`git log -S'not confirmed on disk' -- internal/tools/paths.go` 与 `git log -- internal/tools/paths_rewrite_ticket102_test.go`
+**各只有一个 commit = `a66aadf`**（票 102 fix B），`git log -- internal/tools/paths.go` 再往前是 `ed74595`(票 75)/`c9c3a6f`(票 20)。
+⇒ 这条红是 **`a66aadf` 引入的**，不是 `a1613d9` 之前就有；票面引的两次 run（`35585147258`/`35586044995`）都在其后，与读数一致。
+（push 后 CI 复跑的 run id 位：**待编排者补 `____________`**，本代理不 push。）
+
+### AC#2 定性：**产生端**（比较端无罪），两种形状分别喂进判定函数的读数
+
+判定函数 = `PathCanonicalizer.InAllowlist`。同一条 target 串（两臂字节相同，`equal=true`），差别只在 root 的拼法。
+探针用例落在 `internal/tools/paths_ticket107_portable_test.go:TestTicket107AllowlistJudgmentTwoShapes`（无 skip 路径）。
+**修前**在 POSIX（Docker/alpine）实测：
+
+| 臂 | root 拼法 | target 喂进判定的串 | `InAllowlist` 输出 |
+| --- | --- | --- | --- |
+| 形状 R（已解析真树形式） | `/tmp/…/001/proj` | `/tmp/…/001/proj/a.txt` | **true** |
+| 形状 E（用例期望形式，走 C26 展开） | `%WISP107_ROOT%/proj` | 同上，字节相同 | **false** |
+| 交叉喂（root 取 R 的、canonical 取 E 的） | — | 同上 | **true** |
+
+shape E 那臂同时给出 `roots=[]`、
+`unusable=["%WISP107_ROOT%/proj": C26 expanded it onto /tmp/…/001/proj but that tree is not confirmed on disk, authorizing nothing"]`
+⇒ **root 在进比较之前就被丢掉了**，比较端（`foldPath` + `r+pathSep` 前缀）对同一个串判对（true/true）。
+⇒ 罪在产生端：`internal/tools/paths.go:76`（修前 `:64`）`if !res.Resolved`。`res.Resolved` 只有 handle 解析才置真
+（`internal/risk/pathresolver.go:132`），而 POSIX 侧 `internal/risk/pathresolver_other.go:10 resolveHandle() (string, bool) { return "", false }`
+是 DEFERRED 桩 ⇒ **POSIX 上任何路径都不可能被"确认"**，于是每一条 `%VAR%`/`~` 拼写的 allowed_dirs 都被静默丢弃。
+方向如票面所料＝**更严（fail-closed）**：不泄露，但 `[fs] allowed_dirs` 授权面在 POSIX 上整体失效。
+Windows 侧同一条探针修前修后都 true（`Resolved` 在 Windows 真给得出），所以本机的四包门禁结构性看不见它。
+
+**修法**（不动票 102 的账本语义：`rewritten` 记录、`UnusableRoots` 文案、"改写到别处要记账"三条全部保留）：
+把"确认这棵树"从**只有 Windows 有的能力**换成**两侧都有的能力**——`!res.Resolved && !treeOnDisk(res.Canonical)`（新 `treeOnDisk`，`paths.go:170`，`os.Stat`+IsDir）。
+`res.Resolved` 仍优先短路 ⇒ Windows 判定逐字节不变（`a1613d9`/票 102 那五框不受影响）；
+ghost（展开到不存在的树）在**两侧**都仍然 `Roots()` 空 + 记 `not confirmed on disk`，这条断言因此从"只在 Windows 有意义"变成两侧都有牙。
+诚实登记强度：POSIX 侧这个确认是**存在性**级别的（跟随符号链接、不识别祖先链上的 symlink），
+与"同一 root 直接拼成绝对路径（未被改写）时根本不做任何 OS 确认"是同强度的——本改动只是把改写腿拉平到未改写腿，没有放宽未改写腿。
+真正的 realpath/lstat 拒绝仍是 `pathresolver_other.go` 头上那条 DEFERRED（macOS/Linux）的活。
+
+### 同形排查（A74③ 那一类）：POSIX 反斜杠折叠——**没有跨目录放行**，另有一处"读代码像有、实测判为不可达"的登记
+
+量到的动作清单（比较端逐处看过，非通读猜）：
+- `internal/tools/paths.go:188 unifySeparators` 与 `internal/risk/pathresolver.go:229 unifySeparators`：**都在 `filepath.Separator == '\\'` 编译期常量分支里**，POSIX 原样返回 ⇒ 无折叠。
+- `internal/risk/blacklist.go:134` 走的是上面那个带守卫的 fold ⇒ 无折叠。反向折叠（`\`→`/`）全仓非测试代码 grep **零命中**。
+- ⇒ 本票这一路（`InAllowlist`/`foldPath`）**不存在**"两个不同 POSIX 名字折成同一个串"的 fail-open；AC#4 变异②用读数证明了它有牙。
+- ⚠ **另登记一条被本票测量后判为"不成立"**（我一开始按代码读出的形状写成过"POSIX 上 `//a/b` 会被折成 `\a\b`、`//localhost/c$\x` 会被折成 `C:\x`"——**那是我没量就写的，下面用实测推翻**）：`internal/risk/pathresolver.go:249-252 normalizeLocalUNC`
+  的入口守卫（`:249`）是 `strings.HasPrefix(p, "\\\\") || strings.HasPrefix(p, "//")`，`:252` 是**无平台分支的** `ReplaceAll(p, "/", "\\")`。
+  读数（同一 /tmp 快照里 `GOOS=linux CGO_ENABLED=0 go test -c ./internal/risk/` + docker/alpine 执行，一次性探针，未进仓）：
+
+  ```
+  in="//a/b"                 Resolve.Canonical="/a/b"              Resolved=false err=<nil>
+  in="\\a/b"                 Resolve.Canonical="/\\a/b"            Resolved=false err=<nil>
+  in="//localhost/c$\x"      Resolve.Canonical="/localhost/c$\x"   Resolved=false err=<nil>
+  in="//"                    Resolve.Canonical="/"                 Resolved=false err=<nil>
+  merge check: //a/b -> "/a/b"  vs  \\a/b -> "/\\a/b"   SAME=false
+  ```
+
+  ⇒ **POSIX 上这条折不动**：`Resolve` 的顺序是 `p = lexCanonical(p)`（`pathresolver.go:107`）之后才 `normalizeLocalUNC(p)`（`:108`），
+  `lexCanonical` 已把 `//` 前缀压成 `/`，UNC 分支在 POSIX 上**不可达**；两个不同名字也没有折成同一个串（`SAME=false`）。
+  ⇒ 本票**不**新开这一票，只把"读代码以为有、实测没有"这件事留在台账里；`normalizeLocalUNC` 里那句无分支的 `ReplaceAll` 仍是**只在 Windows 才安全**的写法，
+  真要动它得先证明它还有别的调用序（现无）。
+
+### AC#3 两侧都被真正执行过（无 skip、无构建约束）
+
+新增两个用例（`internal/tools/paths_ticket107_portable_test.go`）都是 `package tools` 裸用例，**没有任何 `t.Skip` / `//go:build`**：
+
+- POSIX（Docker/alpine，`-test.count=2`）：`=== RUN` 6 = 3 名 ×2，`--- PASS` 6，末行 `PASS`，rc=0。
+  三条＝`TestPathCanonicalizerAccountsForRewrittenRoots`（票 102 原用例，修后转绿）、`TestTicket107AllowlistJudgmentTwoShapes`、`TestTicket107AllowlistBoundaryIsComponentWise`。
+- Windows（本机 `-count=2 -v`）：同样 6 次 RUN / 6 次 PASS，`ok github.com/CarlosShao/wisp/internal/tools 0.095s`。
+- 关于"平台 API 天生不存在"那半：**票 102 自己那条用例里已有的 `if len(...Roots())==1 {…} else {t.Logf}` 探针我原样保留**（那是"这一半能不能被证伪"的探测，不是把断言挡出平台；
+  修后两侧都进 if 分支）。真正无条件的断言由本票两条新用例承担。归档时请写：**本票属"两侧都有真断言"，不属"平台 API 天生不存在"**。
+
+### AC#4 变异双向（只在 `/tmp/agent-ticket107-snap` 的 `git archive HEAD` 快照里做，仓库内未建 worktree/checkout）
+
+- **变异①**（把修好那端退回旧实现）：`sed 's|if !res.Resolved && !treeOnDisk(res.Canonical) {|if !res.Resolved {|'`。
+  落地证据（同链 `grep -n`）：`76:			if !res.Resolved {`；先 `GOOS=linux CGO_ENABLED=0 go test -c` **MUT1 BUILD RC=0**（编译过的，不算空枪）。
+  POSIX 读数：`--- FAIL: TestPathCanonicalizerAccountsForRewrittenRoots`（`paths_rewrite_ticket102_test.go:64`）+ `--- FAIL: TestTicket107AllowlistJudgmentTwoShapes`（`paths_ticket107_portable_test.go:66`，
+  `roots=[] unusable=[…"not confirmed on disk"…]`），`TestTicket107AllowlistBoundaryIsComponentWise` PASS，rc=1。⇒ **POSIX 那条确实红**。
+- **变异②**（把折叠/比较放宽成"任意前缀"）：`sed 's|if f == r \|\| strings.HasPrefix(f, r+pathSep) {|if f == r \|\| strings.HasPrefix(f, r) {|'`。
+  落地证据：`130:		if f == r || strings.HasPrefix(f, r) {`；`MUT2 WINDOWS BUILD RC=0` + `MUT2 LINUX BUILD RC=0`。
+  Windows 读数：`--- FAIL: TestTicket107AllowlistBoundaryIsComponentWise`（`…\proj-evil\b.txt` 被 `…\proj` 放行，rc=1，`=== RUN`=2）。
+  POSIX 读数：同一条 `--- FAIL`（`/tmp/…/001/proj-evil/b.txt` 被放行，rc=1），另两条 PASS。⇒ "放行侧只认唯一已解析形式"**真有牙**。
+- 还原证据：`cp /tmp/agent-ticket107/paths.go.good internal/tools/paths.go` 后 `grep -n 'treeOnDisk(res.Canonical)'` 打在 `76:`，
+  且 `diff -q` 对仓库内文件 **SNAP RESTORED IDENTICAL**（快照目录留在 `/tmp`，未进仓）。
+
+### AC#5 门禁四数（工作树，2026-09-21 18:3x）
+
+- `gofmt -l internal/tools internal/risk` → 空。`$(go env GOPATH)/bin/gofumpt -l internal/tools/ internal/risk/` → 空（gofumpt 已装）。
+- `go vet ./internal/tools/ ./internal/risk/` rc=0；`GOOS=linux go vet ./internal/tools/ ./internal/risk/` rc=0（**按包**，没跑整树那条既有坑）。
+- `go test -count=2 -v ./internal/tools/ ./internal/risk/`：**rc=1**，点名如下——
+  `=== RUN` **530** == 不同测试名 **265** × 2 ✓；`internal/tools` **ok 34.948s**（0 FAIL / 0 SKIP）。
+  `internal/risk` FAIL **1 名 ×2**：`TestResolvePerCallBudget`（`internal/risk/pathresolver_budget_norace_test.go:34/37`）
+  两次读数 **1.407 ms/op**（734 样本）与 **1.237 ms/op**（974 样本），预算 1.000 ms ⇒ 计时阈值用例被 CPU 争用打穿。
+  **归因为非本票**：本票只改 `internal/tools/`，`internal/risk` 不依赖它；纯净快照（HEAD + 本票两文件）同法跑 `./internal/risk/` **rc=0，0.614/0.718 ms/op**；
+  工作树**单独**跑 `go test -count=2 ./internal/risk/` **rc=0**（不带 `-v`、不与 tools 包并发）。两包同跑才是那条红。禁改阈值/断言，故**只登记不调**，多样本都报了。
+  SKIP **1 名 ×2**：`TestSyncRegistryProbeLive`（工作树里在 `internal/risk/syncdirs_windows_test.go:112`，正是**票 93 在飞的那个文件**）——
+  是它自己的 `t.Skip`（注册表探针不可用），**不是 `-v` 造成的**，也不是本票引入。
+  ⚠ 但**也不是票 93 新造的**：同一法在 HEAD 纯净快照跑 `go test -count=2 -v ./internal/risk/` 同样打印 2 行 `--- SKIP: TestSyncRegistryProbeLive`，
+  而 `scripts/d22scan.sh` 第一步的 `runtests.sh: OK packages=[./...] PASS=21 FAIL=0 **SKIP=0**` 是**非 `-v` 读数**（不带 `-v` 时 go test 根本不逐条打印 SKIP）
+  ⇒ "SKIP=0"与"确实有 1 条 SKIP"同时为真，这条差异请直接转给票 93（它判据就是"把 SKIP 数当结论"）。
+- `sh scripts/d22scan.sh` 在纯净快照（`/tmp/agent-ticket107-snap`）跑：**rc=0 / clean**，
+  `bans #1-5 internal/=197, cmd/=20, ban #6 frontend/=37, ban #7 internal/tools/=17, ban #8 design/=16, frontend/=37, internal/=346, cmd/=26`；
+  与 HEAD 台账对照（`git ls-files`：`internal/**.go`=345 → 快照 346，非测试 197 不变，`internal/tools` 生产 17 不变，`cmd` 26 不变）⇒ **各 scope 只增不减**（本票加的 1 个文件是 `_test.go`）。
+  `runtests.sh: OK packages=[./...] PASS=21 FAIL=0 SKIP=0`。**ban #8 覆盖注释与 `_test.go`，本票两文件零 emoji、零非 ASCII 注释。**
+
+### 落点与冲突
+
+只动了 `internal/tools/paths.go`（+`os` import、+`treeOnDisk`、`:75` 一行条件）与新增 `internal/tools/paths_ticket107_portable_test.go`。
+票 102 那条用例正文、`internal/risk/**`（含 `pathresolver*.go`、`syncdirs*.go`）、`ci.yml`、`scripts/`、`internal/winsec/`、`internal/config/*` **一个字没改**；
+`git status` 里别人的 ` M` 未覆盖、未还原、未 commit。
+
+next= 编排者 push 后读 `test-core`（ubuntu）步级结论补上面那个 run id 空位；`normalizeLocalUNC` 那条**不拆票**（实测 POSIX 不可达，见同形排查）；
+`TestResolvePerCallBudget` 在"两包同跑"下的 CPU 争用属票 93 的 CI 步形状那条线，不在本票。
+

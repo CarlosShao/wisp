@@ -2,6 +2,7 @@ package tools
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -56,12 +57,23 @@ func NewPathCanonicalizer(allowedDirs, reparseExceptions []string) *PathCanonica
 		// MOVED and that the OS cannot confirm as an existing tree is dropped:
 		// authorizing a tree nobody can point at is a fail-open, and the config
 		// line that produced it is kept for the operator.
+		//
+		// Ticket 107: "the OS cannot confirm" must be stated in a capability the
+		// running platform actually has. res.Resolved is handle-based and only
+		// ever true on Windows (risk.resolveHandle is a stub elsewhere), so on
+		// its own it dropped EVERY expanded root on POSIX - the whole [fs]
+		// allowed_dirs surface vanished for any ~/... or %VAR% spelling
+		// (fail-closed, so no leak, but an authorization surface that silently
+		// authorizes nothing). treeOnDisk is the platform-portable half of the
+		// same question; res.Resolved keeps priority so Windows verdicts stay
+		// byte-identical to ticket 102's (a handle-resolved tree is never
+		// re-probed).
 		if res.Rewritten {
 			p.mu.Lock()
 			p.rewritten = append(p.rewritten, fmt.Sprintf("%q -> %s (%s)",
 				d, res.Canonical, strings.Join(res.Rewrites, "+")))
 			p.mu.Unlock()
-			if !res.Resolved {
+			if !res.Resolved && !treeOnDisk(res.Canonical) {
 				p.unusable = append(p.unusable, fmt.Sprintf(
 					"%q: C26 expanded it onto %s but that tree is not confirmed on disk, authorizing nothing", d, res.Canonical))
 				continue
@@ -145,8 +157,25 @@ func (p *PathCanonicalizer) RewrittenRoots() []string {
 	return append([]string(nil), p.rewritten...)
 }
 
+// treeOnDisk answers ticket 102's confirmation question with a capability every
+// platform has: the OS says this directory exists. It is NOT a normalization -
+// it neither cleans nor absolutizes, so it stays outside C26's single-entry
+// rule - and it is only consulted where res.Resolved cannot speak (POSIX, where
+// handle-based resolution is deferred; see risk.pathresolver_other.go). The
+// strength it has is exactly the strength the same root already has on POSIX
+// when it is spelled as a plain absolute path, i.e. when nothing was rewritten:
+// that spelling is accepted from the lexical pipeline without any OS
+// confirmation at all. Confirming an expanded root no more weakly than that
+// keeps one rule for both legs instead of silently authorizing nothing.
+func treeOnDisk(canonical string) bool {
+	st, err := os.Stat(canonical)
+	return err == nil && st.IsDir()
+}
+
 // pathSep is the comparison separator: the PLATFORM one. C26's canonical is the
 // real path of the real file, which on POSIX is '/'-shaped and on Windows
+// '\'-shaped (ticket 75); a hard-coded '\\' here used to make every comparison
+// string on Linux name a path no OS call can open.
 // '\'-shaped (ticket 75); a hard-coded '\\' here used to make every comparison
 // string on Linux name a path no OS call can open.
 const pathSep = string(filepath.Separator)
