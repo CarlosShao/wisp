@@ -56,3 +56,23 @@
   验收代理实测"另进程 `type` + `SealFile` + 描述符写 + `rename` 三条路都读得到"⇒ **同用户不受影响**。
   这条与票 95 一起进 owner 的选择题，**代价用实测值，不用我的推断**。
   next= 排队（写码并发已到上限 4）；排入顺序建议排在票 107 续跑之后（那张是 fail-open，本张是窗口）。
+
+- 2026-09-21 20:1x（agent-ticket104-109）：**防双派体检已过**：`git status --porcelain internal/models/` 空、
+  `git log --oneline -6 -- internal/models/` 最后一格是 `80923a9`（票 95 自己那批）、本票文末除编排者建票条目外无他人开工登记。
+  **AC#1/AC#2 的修前红已量到**（`internal/models/handoff_window_109_test.go`，可移植、无 icacls，Linux 也能跑同一份）：
+  - 红名 `TestAC1HandoffRefusesAModelSwappedAfterEnsureIsVerified`，rc=1，断言原文：
+    "AC#1/AC#2 (AC95-R1): the hand-off reported a model available whose file was swapped after Ensure verified it -
+     the span between Ensure's return and the reader's open has no guard. state=FirstRun"
+    上一行是同一次跑的实测："swapped 1 byte of model.onnx inside the post-verification window"
+  - **为什么这条红不是推断**：换字节这件事发生在 `Ensure` 自己的 `Progress(PhaseDone)` 回调里，
+    那个回调跑在 `VerifyDir` 通过之后、`Ensure` 返回之前（`downloader.go` 交还点三段各有一处），
+    所以"验过之后才被换掉"是被构造出来的，不是假设的；`bridge.go:51` 的 `Dispatch(EvDownloadCompleted)`
+    在这一刻仍然报"可用"⇒ 交还点到读取点之间确实无人守。
+  - 交还点→读取点的 file:line 链（AC#1 要求引）：`internal/models/downloader.go:138 Ensure` →
+    缓存命中重验 `downloader.go:178 VerifyDir`（返回前）→ `bridge.go:44 b.mgr.Ensure` →
+    `bridge.go:51 Dispatch(EvDownloadCompleted)`（状态机宣布 FirstRun/可用）→ 此后才有人按返回的目录去 open。
+  - 危害上限（AC#1 第三问）：**下一次 `Ensure` 会重新验签**（`VerifyDir` 在缓存命中分支每次都跑，票 95 的
+    `TestAC3EveryInstalledFileIsReverifiedAtReadTime` 逐文件钉过）⇒ 危害是"一次会话内被换"，不是永久。
+  next= 收口方向=**②读取路径上再验一次**（`Manager.VerifyInstalled(id)`，交还点调用；不碰 `internal/winsec` 语义、
+  不改那一个落点的 ACL ⇒ 不扩族），然后补 AC#2 反半边（正常安装 + 双实例复用）、AC#3 rename seam 钉、AC#4 安装目录反向钉，
+  Windows 那半用 `icacls` 量 SID 级前后。
