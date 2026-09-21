@@ -344,13 +344,17 @@ func twoComponents(body string) (string, string, bool) {
 
 func (s *syncSet) match(rawPath string) SyncStatus {
 	if s == nil {
-		return SyncStatus{Sync: true, Root: SyncRoot{Provider: "sync-suspect", Source: "no-detector"},
-			Why: "no sync detector configured; fail-closed: write target unverifiable"}
+		return SyncStatus{
+			Sync: true, Root: SyncRoot{Provider: "sync-suspect", Source: "no-detector"},
+			Why: "no sync detector configured; fail-closed: write target unverifiable",
+		}
 	}
 	if strings.TrimSpace(rawPath) == "" {
-		return SyncStatus{Sync: true,
+		return SyncStatus{
+			Sync: true,
 			Root: SyncRoot{Provider: "sync-suspect", Source: "suspect-fallback"},
-			Why:  "empty/unparseable write target; fail-closed as sync-suspect"}
+			Why:  "empty/unparseable write target; fail-closed as sync-suspect",
+		}
 	}
 	if hasFoldedDotDot(rawPath) {
 		// N-10 hardening (adversarial re-verification R2/R5): a `..` component
@@ -359,9 +363,11 @@ func (s *syncSet) match(rawPath string) SyncStatus {
 		// classified. The landing probes showed Windows folds `.`/`..` the same
 		// way before it opens the file, so this is safe *today* — but that is
 		// OS semantics, not a check in here, so make it an invariant instead.
-		return SyncStatus{Sync: true,
+		return SyncStatus{
+			Sync: true,
 			Root: SyncRoot{Provider: "sync-suspect", Source: "suspect-fallback"},
-			Why:  "write target folds a '..' component: cleaning erases the segments the reparse check audits; fail-closed as sync-suspect (N-10)"}
+			Why:  "write target folds a '..' component: cleaning erases the segments the reparse check audits; fail-closed as sync-suspect (N-10)",
+		}
 	}
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -374,8 +380,10 @@ func (s *syncSet) match(rawPath string) SyncStatus {
 		if err != nil && !errors.Is(err, ErrReparseDenied) && !errors.Is(err, errTargetUnverified) {
 			why += ": " + err.Error()
 		}
-		return SyncStatus{Sync: true,
-			Root: SyncRoot{Provider: "sync-suspect", Source: "suspect-fallback"}, Why: why}
+		return SyncStatus{
+			Sync: true,
+			Root: SyncRoot{Provider: "sync-suspect", Source: "suspect-fallback"}, Why: why,
+		}
 	}
 	for _, e := range s.roots {
 		if isUnder(cand, e.canon) {
@@ -385,9 +393,11 @@ func (s *syncSet) match(rawPath string) SyncStatus {
 	// Component-bounded under-profile test (isUnder, not a raw prefix: a
 	// sibling `profileevil` must not be swept in — MINOR N-5).
 	if !s.complete && s.home != "" && isUnder(cand, s.home) {
-		return SyncStatus{Sync: true,
+		return SyncStatus{
+			Sync: true,
 			Root: SyncRoot{Provider: "sync-suspect", Path: s.home, Source: "suspect-fallback"},
-			Why:  "no confirmed sync location (P12); path under the user profile treated as sync-suspect (safe default)"}
+			Why:  "no confirmed sync location (P12); path under the user profile treated as sync-suspect (safe default)",
+		}
 	}
 	return SyncStatus{Sync: false, Why: "write target is not under any sync root"}
 }

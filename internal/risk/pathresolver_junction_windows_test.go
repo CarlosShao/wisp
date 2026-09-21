@@ -262,8 +262,10 @@ func TestAListDenyAndUnoverridable(t *testing.T) {
 // log entry; non-listed paths stay ClassNone.
 func TestBListDefaultDenyAndOverride(t *testing.T) {
 	home := tmpHome(t)
-	names := []string{".env", ".env.local", "server.pem", "cert.p12", "cert.pfx",
-		"id_rsa", "secrets.yaml", "prod-credentials.json"}
+	names := []string{
+		".env", ".env.local", "server.pem", "cert.p12", "cert.pfx",
+		"id_rsa", "secrets.yaml", "prod-credentials.json",
+	}
 	for _, n := range names {
 		p := filepath.Join(home, "proj", n)
 		if got := Classify(p); got != ClassB {

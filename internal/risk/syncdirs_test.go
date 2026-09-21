@@ -98,8 +98,10 @@ func TestSyncFallbackNotDisarmableByWeakRoot(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, src := range []string{"default", "fixture", "options", ""} {
-		p := NewProvenance(ProvOptions{NoProbe: true, HomeDir: home,
-			SyncRoots: []SyncRoot{{Provider: "OneDrive", Path: root, Source: src}}})
+		p := NewProvenance(ProvOptions{
+			NoProbe: true, HomeDir: home,
+			SyncRoots: []SyncRoot{{Provider: "OneDrive", Path: root, Source: src}},
+		})
 		if p.SyncDetectionComplete() {
 			t.Errorf("source %q must not count as confirmed", src)
 		}
@@ -108,8 +110,10 @@ func TestSyncFallbackNotDisarmableByWeakRoot(t *testing.T) {
 		}
 	}
 	for _, src := range []string{"registry", "config", "env"} {
-		p := NewProvenance(ProvOptions{NoProbe: true, HomeDir: home,
-			SyncRoots: []SyncRoot{{Provider: "OneDrive", Path: root, Source: src}}})
+		p := NewProvenance(ProvOptions{
+			NoProbe: true, HomeDir: home,
+			SyncRoots: []SyncRoot{{Provider: "OneDrive", Path: root, Source: src}},
+		})
 		if !p.SyncDetectionComplete() {
 			t.Errorf("source %q must count as confirmed", src)
 		}
@@ -147,8 +151,10 @@ func TestSyncEnvConfiguredRoots(t *testing.T) {
 	if err := os.MkdirAll(root, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	roots := envConfiguredRoots(probeEnv{Home: home, OneDrive: root,
-		OneDriveConsumer: root, OneDrivePublic: "  "})
+	roots := envConfiguredRoots(probeEnv{
+		Home: home, OneDrive: root,
+		OneDriveConsumer: root, OneDrivePublic: "  ",
+	})
 	if len(roots) != 2 {
 		t.Fatalf("expected OneDrive + OneDriveConsumer roots, got %+v", roots)
 	}
@@ -276,7 +282,8 @@ func TestSyncNormalNewFileWriteNotFlagged(t *testing.T) {
 		t.Fatal(err)
 	}
 	p := NewProvenance(ProvOptions{NoProbe: true, HomeDir: home, SyncRoots: []SyncRoot{
-		{Provider: "OneDrive", Path: filepath.Join(home, "OneDrive"), Source: "registry"}}})
+		{Provider: "OneDrive", Path: filepath.Join(home, "OneDrive"), Source: "registry"},
+	}})
 	if !p.SyncDetectionComplete() {
 		t.Fatal("sanity: registry-grade root is confirmed")
 	}
@@ -314,8 +321,10 @@ func TestSyncSuspectFallbackWhenUndetectable(t *testing.T) {
 
 func TestSyncUnresolvablePathFailClosed(t *testing.T) {
 	home, _, _ := sandbox(t)
-	p := NewProvenance(ProvOptions{NoProbe: true, HomeDir: home,
-		SyncRoots: []SyncRoot{{Provider: "OneDrive", Path: filepath.Join(home, "OneDrive")}}})
+	p := NewProvenance(ProvOptions{
+		NoProbe: true, HomeDir: home,
+		SyncRoots: []SyncRoot{{Provider: "OneDrive", Path: filepath.Join(home, "OneDrive")}},
+	})
 	// Empty/absent path spelling: unverifiable -> sync (strict side).
 	if !p.IsSyncPath("").Sync {
 		t.Fatal("empty path must fail-closed as sync")
@@ -341,7 +350,8 @@ func TestSyncDotDotTailFailsClosed(t *testing.T) {
 		}
 	}
 	p := NewProvenance(ProvOptions{NoProbe: true, HomeDir: home, SyncRoots: []SyncRoot{
-		{Provider: "OneDrive", Path: root, Source: "registry"}}})
+		{Provider: "OneDrive", Path: root, Source: "registry"},
+	}})
 	if !p.SyncDetectionComplete() {
 		t.Fatal("precondition: registry-grade root confirmed, so only root membership may decide")
 	}

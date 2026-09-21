@@ -146,8 +146,10 @@ func TestBuildChainReportsUnimplementedProtocol(t *testing.T) {
 // The preset table (ticket 05) must cover the 12 approved providers with a
 // protocol and base URL the seam can consume.
 func TestPresetTableCoversTwelveProviders(t *testing.T) {
-	want := []string{"openai", "anthropic", "deepseek", "qwen", "zhipu", "moonshot",
-		"siliconflow", "openrouter", "ollama", "minimax", "mimo", "stepfun"}
+	want := []string{
+		"openai", "anthropic", "deepseek", "qwen", "zhipu", "moonshot",
+		"siliconflow", "openrouter", "ollama", "minimax", "mimo", "stepfun",
+	}
 	names := config.PresetNames()
 	if len(names) != len(want) {
 		t.Fatalf("presets = %v, want %d entries", names, len(want))

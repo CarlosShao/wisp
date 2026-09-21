@@ -127,7 +127,8 @@ func (s *sideEffect) render() string {
 
 // writeAll streams a payload in chunk-sized steps, checking every boundary.
 func (s *sideEffect) writeAll(ctx context.Context, f *os.File, src io.Reader,
-	onUpdate func(string), limit int) (int, error) {
+	onUpdate func(string), limit int,
+) (int, error) {
 	buf := make([]byte, s.chunk)
 	if limit > 0 && len(buf) > limit {
 		buf = buf[:limit]
@@ -262,8 +263,8 @@ func (t fsWrite) Execute(ctx context.Context, params json.RawMessage, onUpdate f
 // any death before that step leaves whatever was there byte-for-byte intact -
 // which is what TestAtomicWriteKillsMidWrite asserts against an EXISTING file.
 func (d FSDeps) stageAndRename(ctx context.Context, target string, src io.Reader,
-	onUpdate func(string)) Result {
-
+	onUpdate func(string),
+) Result {
 	parent := dirOf(target)
 	if parent == "" {
 		return Result{Text: "拒绝写入卷根目录：" + target, IsError: true}
@@ -308,8 +309,10 @@ func (d FSDeps) stageAndRename(ctx context.Context, target string, src io.Reader
 	}
 	if err := tmp.Close(); err != nil {
 		se.record("临时文件已写出但关闭失败，请人工确认：%v", err)
-		return Result{Text: "关闭临时文件失败：" + err.Error(), IsError: true,
-			AppliedSteps: se.snapshot()}
+		return Result{
+			Text: "关闭临时文件失败：" + err.Error(), IsError: true,
+			AppliedSteps: se.snapshot(),
+		}
 	}
 	se.record("临时文件已落盘并关闭")
 
@@ -324,8 +327,10 @@ func (d FSDeps) stageAndRename(ctx context.Context, target string, src io.Reader
 		if rmErr := os.Remove(tmpName); rmErr == nil {
 			se.record("删除临时文件 %s（目标从头到尾未被改动）", baseOf(tmpName))
 		}
-		return Result{Text: "原子重命名失败：" + err.Error() + "（目标未被改动）",
-			IsError: true, AppliedSteps: se.snapshot()}
+		return Result{
+			Text:    "原子重命名失败：" + err.Error() + "（目标未被改动）",
+			IsError: true, AppliedSteps: se.snapshot(),
+		}
 	}
 	se.record("原子重命名 %s → %s（目标此刻起为新内容）", baseOf(tmpName), target)
 	return Result{
@@ -378,15 +383,19 @@ func (t fsTrash) Execute(ctx context.Context, params json.RawMessage, onUpdate f
 	if !recycleBinSupported() {
 		// The platform has no bin: refuse. There is no branch below that could
 		// turn into an unlink, which is the difference between L1 and a lie.
-		return Result{Text: "本平台无 Shell 回收站 API，fs.trash 拒绝执行（绝不退化成删除）：" + target,
-			IsError: true}, nil
+		return Result{
+			Text:    "本平台无 Shell 回收站 API，fs.trash 拒绝执行（绝不退化成删除）：" + target,
+			IsError: true,
+		}, nil
 	}
 	detail, err := shellTrash(target)
 	if err != nil {
 		// The shell said no. Nothing moved, and nothing was deleted either.
 		se.record("Shell 回收站调用失败：%v（项目未被删除）", err)
-		return Result{Text: "放入回收站失败：" + err.Error() + "（项目未被删除）",
-			IsError: true, AppliedSteps: se.snapshot()}, nil
+		return Result{
+			Text:    "放入回收站失败：" + err.Error() + "（项目未被删除）",
+			IsError: true, AppliedSteps: se.snapshot(),
+		}, nil
 	}
 	se.record("通过 %s 将 %s 放入回收站，并已核对还原记录 %s（位于 %s）",
 		detail.API, target, detail.Record, detail.Bin)
@@ -452,8 +461,10 @@ func (t fsMove) Execute(ctx context.Context, params json.RawMessage, onUpdate fu
 	}
 	if err := os.Rename(from, to); err != nil {
 		se.record("同卷重命名失败：%v（源与目标均保持原状）", err)
-		return Result{Text: "移动失败：" + err.Error() + "（源与目标均未被改动）",
-			IsError: true, AppliedSteps: se.snapshot()}, nil
+		return Result{
+			Text:    "移动失败：" + err.Error() + "（源与目标均未被改动）",
+			IsError: true, AppliedSteps: se.snapshot(),
+		}, nil
 	}
 	se.record("同卷重命名 %s → %s（再用一次反向重命名即可改回）", from, to)
 	if onUpdate != nil {
@@ -471,7 +482,8 @@ func (t fsMove) Execute(ctx context.Context, params json.RawMessage, onUpdate fu
 // matters most here: a veto between the copy and the removal leaves TWO copies,
 // and the report has to say that out loud.
 func (fsMove) crossVolume(ctx context.Context, se *sideEffect, from, to string,
-	onUpdate func(string)) Result {
+	onUpdate func(string),
+) Result {
 	parent := dirOf(to)
 	if parent == "" {
 		return Result{Text: "拒绝移动到卷根目录：" + to, IsError: true}
@@ -509,8 +521,10 @@ func (fsMove) crossVolume(ctx context.Context, se *sideEffect, from, to string,
 		if rmErr := os.Remove(tmpName); rmErr == nil {
 			se.record("删除目标临时文件（源未被改动）")
 		}
-		return Result{Text: "跨卷移动失败：" + err.Error() + "（源未被改动）",
-			IsError: true, AppliedSteps: se.snapshot()}
+		return Result{
+			Text:    "跨卷移动失败：" + err.Error() + "（源未被改动）",
+			IsError: true, AppliedSteps: se.snapshot(),
+		}
 	}
 	se.record("目标已就位：%s", to)
 
@@ -526,8 +540,10 @@ func (fsMove) crossVolume(ctx context.Context, se *sideEffect, from, to string,
 	}
 	if err := os.Remove(from); err != nil {
 		se.record("删除源失败：%v（现在有两份内容，请人工确认）", err)
-		return Result{Text: "目标已建立，但源删除失败：" + err.Error() + "（两份内容并存）",
-			IsError: true, AppliedSteps: se.snapshot()}
+		return Result{
+			Text:    "目标已建立，但源删除失败：" + err.Error() + "（两份内容并存）",
+			IsError: true, AppliedSteps: se.snapshot(),
+		}
 	}
 	se.record("已永久删除源 %s（跨卷移动的删除不进回收站）", from)
 	if onUpdate != nil {
@@ -563,8 +579,10 @@ func (t fsDelete) Execute(ctx context.Context, params json.RawMessage, _ func(st
 		return Result{}, err
 	}
 	if !t.d.DeleteEnabled {
-		return Result{Text: "fs.delete 未获授权（[fs] delete_enabled=false），已拒绝执行",
-			IsError: true}, nil
+		return Result{
+			Text:    "fs.delete 未获授权（[fs] delete_enabled=false），已拒绝执行",
+			IsError: true,
+		}, nil
 	}
 	var a fsPathArgs
 	if err := json.Unmarshal(params, &a); err != nil {
@@ -583,8 +601,10 @@ func (t fsDelete) Execute(ctx context.Context, params json.RawMessage, _ func(st
 	}
 	if err := os.Remove(target); err != nil {
 		se.record("删除失败：%v（目标未被改动）", err)
-		return Result{Text: "删除失败：" + err.Error(), IsError: true,
-			AppliedSteps: se.snapshot()}, nil
+		return Result{
+			Text: "删除失败：" + err.Error(), IsError: true,
+			AppliedSteps: se.snapshot(),
+		}, nil
 	}
 	se.record("已永久删除 %s（不进入回收站，无法由 Wisp 还原）", target)
 	return Result{

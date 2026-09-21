@@ -116,8 +116,10 @@ type Assembler struct {
 
 // NewAssembler builds an assembler for a scaled budget set.
 func NewAssembler(model string, b Budgets, cache llm.CacheSupport) *Assembler {
-	return &Assembler{budgets: b, identity: defaultIdentity, safety: defaultSafety,
-		style: defaultStyle, Cache: cache, Model: model}
+	return &Assembler{
+		budgets: b, identity: defaultIdentity, safety: defaultSafety,
+		style: defaultStyle, Cache: cache, Model: model,
+	}
 }
 
 // Sections renders every D39 section in canonical order, each clipped to its
@@ -131,12 +133,18 @@ func (a *Assembler) Sections(in PromptInput) []Section {
 		{Kind: SecIdentity, Budget: a.budgets.SectionIdentity, Text: a.identity, CachePrefix: true},
 		{Kind: SecSafety, Budget: a.budgets.SectionSafety, Text: a.safety, CachePrefix: true},
 		{Kind: SecStyle, Budget: a.budgets.SectionStyle, Text: a.style, CachePrefix: true},
-		{Kind: SecResidentTools, Budget: a.budgets.SectionResidentTools,
-			Text: residentIdx, CachePrefix: true},
-		{Kind: SecProfile, Budget: a.budgets.SectionProfile,
-			Text: profileText(in.Profiles, a.budgets.SectionProfile)},
-		{Kind: SecRetrievedTools, Budget: a.budgets.SectionToolIndex,
-			Text: in.Injection.IndexText},
+		{
+			Kind: SecResidentTools, Budget: a.budgets.SectionResidentTools,
+			Text: residentIdx, CachePrefix: true,
+		},
+		{
+			Kind: SecProfile, Budget: a.budgets.SectionProfile,
+			Text: profileText(in.Profiles, a.budgets.SectionProfile),
+		},
+		{
+			Kind: SecRetrievedTools, Budget: a.budgets.SectionToolIndex,
+			Text: in.Injection.IndexText,
+		},
 		{Kind: SecScene, Budget: a.budgets.SectionScene, Text: sceneText(in.Scene)},
 	}
 	for i := range out {

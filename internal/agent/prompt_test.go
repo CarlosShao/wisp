@@ -31,10 +31,14 @@ func sysBytes(req *llm.Request) string {
 
 func prefixOnlyTools() []ToolInfo {
 	return []ToolInfo{
-		{Name: "echo", Description: "Echo back the given text.", Resident: true,
-			Parameters: json.RawMessage(`{"type":"object"}`)},
-		{Name: "sleep", Description: "Sleep for milliseconds.", Resident: true,
-			Parameters: json.RawMessage(`{"type":"object"}`)},
+		{
+			Name: "echo", Description: "Echo back the given text.", Resident: true,
+			Parameters: json.RawMessage(`{"type":"object"}`),
+		},
+		{
+			Name: "sleep", Description: "Sleep for milliseconds.", Resident: true,
+			Parameters: json.RawMessage(`{"type":"object"}`),
+		},
 	}
 }
 
@@ -220,8 +224,10 @@ func TestD39SectionBudgetsAndTotalCeiling(t *testing.T) {
 		// Overflow the (3) and (2) suffix sections on purpose: enforceTotal
 		// must bring the whole prompt back inside 2300.
 		Profiles: manyProfileLines(20),
-		Scene: Scene{Now: time.Unix(1700000000, 0).UTC(), FocusWindow: "资源管理器",
-			Scenario: "通勤"},
+		Scene: Scene{
+			Now: time.Unix(1700000000, 0).UTC(), FocusWindow: "资源管理器",
+			Scenario: "通勤",
+		},
 		Injection: Injection{
 			Resident:  prefixOnlyTools(),
 			IndexText: strings.Repeat("- 第三方工具: 一段足够长的说明文字用来撑爆预算\n", 60),

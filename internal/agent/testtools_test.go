@@ -58,11 +58,15 @@ func newBlockingProvider() *blockingProvider {
 // the golden fixtures call (echo, sleep).
 func (p *blockingProvider) Tools(context.Context) ([]ToolInfo, error) {
 	return []ToolInfo{
-		{Name: "echo", Description: "Echo back the given text.", Resident: true, RiskLevel: RiskL0,
-			Parameters: json.RawMessage(`{"type":"object"}`)},
-		{Name: "sleep", Description: "Sleep for the given number of milliseconds.",
+		{
+			Name: "echo", Description: "Echo back the given text.", Resident: true, RiskLevel: RiskL0,
+			Parameters: json.RawMessage(`{"type":"object"}`),
+		},
+		{
+			Name: "sleep", Description: "Sleep for the given number of milliseconds.",
 			Resident: true, RiskLevel: RiskL0,
-			Parameters: json.RawMessage(`{"type":"object"}`)},
+			Parameters: json.RawMessage(`{"type":"object"}`),
+		},
 	}, nil
 }
 
@@ -92,8 +96,10 @@ func (p *blockingProvider) Execute(ctx context.Context, req ToolRequest) (ToolOu
 		return ToolOutcome{}, cerr
 	}
 	if cerr := ctx.Err(); cerr != nil {
-		return ToolOutcome{Text: "cancelled", IsError: true,
-			ErrorClass: string(observe.ClassCancelled)}, nil
+		return ToolOutcome{
+			Text: "cancelled", IsError: true,
+			ErrorClass: string(observe.ClassCancelled),
+		}, nil
 	}
 	return ToolOutcome{Text: "released"}, nil
 }

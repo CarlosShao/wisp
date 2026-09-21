@@ -17,10 +17,14 @@ func baseTurn() *llm.Request {
 	return &llm.Request{
 		Model:  "mock-small",
 		System: []llm.Content{llm.TextPart{Text: "identity"}, llm.TextPart{Text: "style"}},
-		Messages: []llm.Message{{Role: llm.RoleUser,
-			Content: []llm.Content{llm.TextPart{Text: "hi"}}}},
-		Tools: []llm.ToolDef{{Name: "get_weather", Description: "d",
-			Parameters: json.RawMessage(`{"type":"object"}`)}},
+		Messages: []llm.Message{{
+			Role:    llm.RoleUser,
+			Content: []llm.Content{llm.TextPart{Text: "hi"}},
+		}},
+		Tools: []llm.ToolDef{{
+			Name: "get_weather", Description: "d",
+			Parameters: json.RawMessage(`{"type":"object"}`),
+		}},
 		// Declared even though this protocol cannot honor it: the seam's
 		// capability bit says breakpoints have no effect here.
 		CacheBreakpoints: []int{-1, 0},
@@ -79,11 +83,17 @@ func TestToolTurnsRoundTripThroughTheWire(t *testing.T) {
 	req := baseTurn()
 	req.Messages = append(req.Messages,
 		llm.Message{Role: llm.RoleAssistant, Content: []llm.Content{
-			llm.ToolUsePart{ID: "call_a1", Name: "get_weather",
-				Input: json.RawMessage(`{"city":"Zhuhai"}`)}}},
+			llm.ToolUsePart{
+				ID: "call_a1", Name: "get_weather",
+				Input: json.RawMessage(`{"city":"Zhuhai"}`),
+			},
+		}},
 		llm.Message{Role: llm.RoleTool, Content: []llm.Content{
-			llm.ToolResultPart{ID: "call_a1",
-				Content: []llm.Content{llm.TextPart{Text: "sunny"}}}}},
+			llm.ToolResultPart{
+				ID:      "call_a1",
+				Content: []llm.Content{llm.TextPart{Text: "sunny"}},
+			},
+		}},
 	)
 	proc.StreamGolden(t, unit(), "responses-tool-call", req)
 	body, _ := proc.LastRequest(t, "responses")

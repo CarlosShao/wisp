@@ -62,7 +62,6 @@ type MemSample struct {
 
 // SampleMem takes one measurement of the current process.
 func SampleMem() MemSample {
-
 	var s MemSample
 
 	h := windows.CurrentProcess()
@@ -271,6 +270,7 @@ func u64min(a, b uint64) uint64 {
 	}
 	return b
 }
+
 func u64max(a, b uint64) uint64 {
 	if a > b {
 		return a

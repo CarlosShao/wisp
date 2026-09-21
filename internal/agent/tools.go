@@ -121,10 +121,14 @@ type EchoProvider struct {
 func NewEchoProvider(tools ...ToolInfo) *EchoProvider {
 	if len(tools) == 0 {
 		tools = []ToolInfo{
-			{Name: "echo", Description: "Echo back the given text.", Resident: true,
-				Parameters: json.RawMessage(`{"type":"object","properties":{"text":{"type":"string"}},"required":["text"]}`)},
-			{Name: "sleep", Description: "Sleep for the given number of milliseconds.", Resident: true,
-				Parameters: json.RawMessage(`{"type":"object","properties":{"ms":{"type":"integer"}},"required":["ms"]}`)},
+			{
+				Name: "echo", Description: "Echo back the given text.", Resident: true,
+				Parameters: json.RawMessage(`{"type":"object","properties":{"text":{"type":"string"}},"required":["text"]}`),
+			},
+			{
+				Name: "sleep", Description: "Sleep for the given number of milliseconds.", Resident: true,
+				Parameters: json.RawMessage(`{"type":"object","properties":{"ms":{"type":"integer"}},"required":["ms"]}`),
+			},
 		}
 	}
 	return &EchoProvider{tools: tools, created: time.Now()}
@@ -159,8 +163,10 @@ func (p *EchoProvider) Execute(ctx context.Context, req ToolRequest) (ToolOutcom
 	out := ToolOutcome{}
 	if len(req.Args) > 0 {
 		if err := json.Unmarshal(req.Args, &a); err != nil {
-			out = ToolOutcome{Text: "invalid arguments: " + err.Error(), IsError: true,
-				ErrorClass: string(observe.ClassTool)}
+			out = ToolOutcome{
+				Text: "invalid arguments: " + err.Error(), IsError: true,
+				ErrorClass: string(observe.ClassTool),
+			}
 			p.record(req, out)
 			return out, nil
 		}
@@ -179,8 +185,10 @@ func (p *EchoProvider) Execute(ctx context.Context, req ToolRequest) (ToolOutcom
 			out = ToolOutcome{Text: fmt.Sprintf("slept %dms", a.MS)}
 		}
 	default:
-		out = ToolOutcome{Text: "unknown tool " + req.Name, IsError: true,
-			ErrorClass: string(observe.ClassTool)}
+		out = ToolOutcome{
+			Text: "unknown tool " + req.Name, IsError: true,
+			ErrorClass: string(observe.ClassTool),
+		}
 	}
 	p.record(req, out)
 	return out, nil

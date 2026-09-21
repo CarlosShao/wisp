@@ -372,8 +372,8 @@ func dispositionOf(dec Decision) OutcomeKind {
 
 // run executes the tool under the ceiling and the per-tool deadline.
 func (b *Bridge) run(ctx context.Context, req agent.ToolRequest, entry Entry,
-	dec Decision) (agent.ToolOutcome, error) {
-
+	dec Decision,
+) (agent.ToolOutcome, error) {
 	timeout := b.timeoutFor(entry)
 	dec.Timeout = timeout
 
@@ -546,7 +546,8 @@ func (b *Bridge) cancelText(dec Decision, res Result) string {
 // unknown irreversibility class, which R8 fail-closes to L2 rather than letting
 // a broken judge read as "nothing to worry about".
 func (b *Bridge) factsFor(ctx context.Context, entry Entry, params map[string]any,
-	rawPaths []string) risk.Facts {
+	rawPaths []string,
+) risk.Facts {
 	var f risk.Facts
 	if hook := entry.Decl.Facts; hook != nil {
 		f = safeFacts(ctx, hook, params, rawPaths)
@@ -557,7 +558,8 @@ func (b *Bridge) factsFor(ctx context.Context, entry Entry, params map[string]an
 }
 
 func safeFacts(ctx context.Context, hook func(context.Context, map[string]any, []string) risk.Facts,
-	params map[string]any, rawPaths []string) (f risk.Facts) {
+	params map[string]any, rawPaths []string,
+) (f risk.Facts) {
 	defer func() {
 		if rec := recover(); rec != nil {
 			f = risk.Facts{Irreversible: []string{fmt.Sprintf("宿主事实钩子 panic: %v", rec)}}
@@ -688,7 +690,8 @@ func (k OutcomeKind) errorClass() string {
 // (outcome, nil) - see Execute's comment for why a rejection must never travel
 // as a Go error.
 func (b *Bridge) reject(ctx context.Context, req agent.ToolRequest, dec Decision,
-	why, class string, kind OutcomeKind) (agent.ToolOutcome, error) {
+	why, class string, kind OutcomeKind,
+) (agent.ToolOutcome, error) {
 	if dec.Reason == "" {
 		dec.Reason = why
 	}
@@ -707,7 +710,8 @@ func (b *Bridge) reject(ctx context.Context, req agent.ToolRequest, dec Decision
 
 // close books a call that reached execution and returns its outcome.
 func (b *Bridge) close(ctx context.Context, req agent.ToolRequest, dec Decision,
-	out agent.ToolOutcome, kind OutcomeKind) (agent.ToolOutcome, error) {
+	out agent.ToolOutcome, kind OutcomeKind,
+) (agent.ToolOutcome, error) {
 	b.book(ctx, req, dec, kind)
 	if out.RiskLevel == "" {
 		out.RiskLevel = dec.LevelString()

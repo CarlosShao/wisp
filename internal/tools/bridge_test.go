@@ -199,8 +199,10 @@ func TestToolConcurrencyCeilingIsFour(t *testing.T) {
 	reg := NewRegistry()
 	if err := reg.Register(Entry{
 		Tool: tool,
-		Decl: Decl{Capabilities: []Capability{CapFSRead}, Needs: []Capability{CapFSRead},
-			Declared: risk.L0, Provider: KindBuiltin},
+		Decl: Decl{
+			Capabilities: []Capability{CapFSRead}, Needs: []Capability{CapFSRead},
+			Declared: risk.L0, Provider: KindBuiltin,
+		},
 	}); err != nil {
 		t.Fatal(err)
 	}
@@ -413,7 +415,8 @@ func TestC4SlotsWithoutAnImplementationAreNotSilent(t *testing.T) {
 	if err := reg.RegisterProvider(NewBuiltinProvider(
 		Entry{Tool: &fixtureTool{name: "probe.ok"}, Decl: Decl{
 			Capabilities: []Capability{CapFSRead}, Needs: []Capability{CapFSRead},
-			Declared: risk.L0, Provider: KindBuiltin}})); err != nil {
+			Declared: risk.L0, Provider: KindBuiltin,
+		}})); err != nil {
 		t.Fatal(err)
 	}
 	if _, ok := reg.Lookup("probe.ok"); !ok {
@@ -431,7 +434,8 @@ func TestC4RegistryRejectsBadDeclarations(t *testing.T) {
 	reg := NewRegistry()
 	good := Entry{Tool: &fixtureTool{name: "probe.a"}, Decl: Decl{
 		Capabilities: []Capability{CapFSRead}, Needs: []Capability{CapFSRead},
-		Declared: risk.L0, Provider: KindBuiltin}}
+		Declared: risk.L0, Provider: KindBuiltin,
+	}}
 	if err := reg.Register(good); err != nil {
 		t.Fatal(err)
 	}
@@ -447,14 +451,18 @@ func TestC4RegistryRejectsBadDeclarations(t *testing.T) {
 		{"no dot", Entry{Tool: &fixtureTool{name: "nodothere"}}},
 		{"two dots", Entry{Tool: &fixtureTool{name: "a.b.c"}}},
 		{"uppercase", Entry{Tool: &fixtureTool{name: "FS.Read"}}},
-		{"no parameter schema", Entry{Tool: &fixtureTool{name: "probe.e", noSchema: true},
-			Decl: Decl{Declared: risk.L0}}},
+		{"no parameter schema", Entry{
+			Tool: &fixtureTool{name: "probe.e", noSchema: true},
+			Decl: Decl{Declared: risk.L0},
+		}},
 		{"unknown capability", Entry{Tool: &fixtureTool{name: "probe.u"}, Decl: Decl{
 			Capabilities: []Capability{"root"}, Needs: []Capability{"root"},
-			Declared: risk.L0}}},
+			Declared: risk.L0,
+		}}},
 		{"risk above L2", Entry{Tool: &fixtureTool{name: "probe.r"}, Decl: Decl{
 			Capabilities: []Capability{CapFSRead}, Needs: []Capability{CapFSRead},
-			Declared: risk.Deny}}},
+			Declared: risk.Deny,
+		}}},
 	} {
 		if err := reg.Register(bad.e); err == nil {
 			t.Errorf("%s: Register accepted an invalid entry", bad.name)
@@ -669,7 +677,8 @@ func TestToolCallRowsAreComplete(t *testing.T) {
 	// shape (user_rejected) the vocabulary has.
 	l1 := Entry{Tool: &fixtureTool{name: "probe.rev"}, Decl: Decl{
 		Capabilities: []Capability{CapFSWrite}, Needs: []Capability{CapFSWrite},
-		Declared: risk.L1, Provider: KindBuiltin}}
+		Declared: risk.L1, Provider: KindBuiltin,
+	}}
 	if err := b.reg.Register(l1); err != nil {
 		t.Fatal(err)
 	}
@@ -679,7 +688,8 @@ func TestToolCallRowsAreComplete(t *testing.T) {
 		t.Fatal(err)
 	}
 	cases = append(cases, struct{ tool, args, risk, decision, outcome, class string }{
-		"probe.rev", "{}", "L1", "reject", "error", "user_rejected"})
+		"probe.rev", "{}", "L1", "reject", "error", "user_rejected",
+	})
 
 	rows, err := store.ListToolCallsByTask(t.Context(), "task-1")
 	if err != nil {

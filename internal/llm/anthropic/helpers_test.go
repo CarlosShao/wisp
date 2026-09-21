@@ -1,8 +1,9 @@
 package anthropic
 
 import (
-	"github.com/CarlosShao/wisp/internal/llm"
 	"net/http"
+
+	"github.com/CarlosShao/wisp/internal/llm"
 )
 
 // endpointOptionsFor builds adapter options pointing at base. The transport is

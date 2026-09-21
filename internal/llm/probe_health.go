@@ -242,8 +242,10 @@ func RunProbeSuite(ctx context.Context, p LlmProvider, o ProbeSuiteOptions) (Pro
 			return rep, fmt.Errorf("llm: unknown probe capability %q", c)
 		}
 		res := runProbeOnModel(ctx, p, cse, o.Model)
-		out := ProbeOutcome{Capability: c, Declared: declaredCapability(o.Declared, c),
-			Result: res, Attempted: cse.NotImplementable == ""}
+		out := ProbeOutcome{
+			Capability: c, Declared: declaredCapability(o.Declared, c),
+			Result: res, Attempted: cse.NotImplementable == "",
+		}
 		rep.Outcomes = append(rep.Outcomes, out)
 		rep.Probed = append(rep.Probed, string(c))
 		if !out.Attempted {
@@ -258,8 +260,10 @@ func RunProbeSuite(ctx context.Context, p LlmProvider, o ProbeSuiteOptions) (Pro
 		}
 		rep.AllOK = false
 		if out.Mismatch() {
-			m := ProbeMismatch{Provider: o.Provider, Model: o.Model, Capability: c,
-				Declared: true, Measured: false, Detail: res.Detail, At: at}
+			m := ProbeMismatch{
+				Provider: o.Provider, Model: o.Model, Capability: c,
+				Declared: true, Measured: false, Detail: res.Detail, At: at,
+			}
 			rep.Mismatches = append(rep.Mismatches, m)
 			o.Mismatch(m)
 		}

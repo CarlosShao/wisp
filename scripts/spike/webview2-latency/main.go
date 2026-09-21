@@ -75,8 +75,10 @@ var (
 	pDispatchMessageW = modUser32.NewProc("DispatchMessageW")
 )
 
-const swHide = 0
-const swShow = 5
+const (
+	swHide = 0
+	swShow = 5
+)
 
 func pumpOnce() {
 	type msg struct {
@@ -189,9 +191,11 @@ func pctl(v []float64, p float64) float64 {
 }
 
 func runFull(dataPath string) fullRun {
-	rep := fullRun{Mode: "full", Machine: common.GetMachineInfo(),
+	rep := fullRun{
+		Mode: "full", Machine: common.GetMachineInfo(),
 		StartedAt: time.Now().UTC().Format(time.RFC3339), DataPath: dataPath,
-		ColdNote: "NewWithOptions(create+show+embed) + SetHtml + first dispatch round trip"}
+		ColdNote: "NewWithOptions(create+show+embed) + SetHtml + first dispatch round trip",
+	}
 
 	w, coldMs, err := bringUp(dataPath)
 	if err != nil {
@@ -318,6 +322,6 @@ func main() {
 	}
 	fmt.Println(string(b))
 	if *out != "" {
-		os.WriteFile(*out, b, 0644)
+		os.WriteFile(*out, b, 0o644)
 	}
 }

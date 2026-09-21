@@ -141,8 +141,10 @@ func TestBallLivePositionPersistence(t *testing.T) {
 	}
 	requireQuietBallDesktop(t)
 
-	b, err := New(Options{Initial: statemachine.StateSleeping, Store: store,
-		WindowTitle: liveBallTitle(t), Hotkeys: liveHotkeys()})
+	b, err := New(Options{
+		Initial: statemachine.StateSleeping, Store: store,
+		WindowTitle: liveBallTitle(t), Hotkeys: liveHotkeys(),
+	})
 	if err != nil {
 		t.Fatalf("New: %v", err)
 	}
@@ -169,8 +171,10 @@ func TestBallLivePositionPersistence(t *testing.T) {
 	}
 
 	// Re-open: the restored top-left must equal the saved position.
-	b2, err := New(Options{Initial: statemachine.StateSleeping, Store: store,
-		WindowTitle: liveBallTitle(t) + "-2", Hotkeys: liveHotkeys()})
+	b2, err := New(Options{
+		Initial: statemachine.StateSleeping, Store: store,
+		WindowTitle: liveBallTitle(t) + "-2", Hotkeys: liveHotkeys(),
+	})
 	if err != nil {
 		t.Fatalf("reopen: %v", err)
 	}
@@ -273,8 +277,10 @@ func TestBallLiveIdleBorderTransition(t *testing.T) {
 
 	// Static frames keep the frozen mapping and no timer, even after a border
 	// has been travelling.
-	for _, s := range []statemachine.State{statemachine.StateArmed, statemachine.StateMuted,
-		statemachine.StateConversation, statemachine.StateError} {
+	for _, s := range []statemachine.State{
+		statemachine.StateArmed, statemachine.StateMuted,
+		statemachine.StateConversation, statemachine.StateError,
+	} {
 		b.SetState(s)
 		if timerOn() {
 			t.Fatalf("%s armed the transition timer (frozen policy grants it none)", s)

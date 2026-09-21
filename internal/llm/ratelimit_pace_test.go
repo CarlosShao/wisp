@@ -152,7 +152,8 @@ func TestRPM10EleventhRequestWaitsLocally(t *testing.T) {
 	paced := llm.NewLimiterProvider(inner, lim)
 
 	req := &llm.Request{Model: "mock-small", Messages: []llm.Message{{
-		Role: llm.RoleUser, Content: []llm.Content{llm.TextPart{Text: "hi"}}}}}
+		Role: llm.RoleUser, Content: []llm.Content{llm.TextPart{Text: "hi"}},
+	}}}
 
 	// Ten requests fit the burst capacity: each reaches the server
 	// immediately, with no local wait at all.
@@ -313,5 +314,6 @@ func TestCancellationWhilePacingIsNotAProviderFailure(t *testing.T) {
 
 func adapterReq() *llm.Request {
 	return &llm.Request{Model: "mock-small", Messages: []llm.Message{{
-		Role: llm.RoleUser, Content: []llm.Content{llm.TextPart{Text: "hi"}}}}}
+		Role: llm.RoleUser, Content: []llm.Content{llm.TextPart{Text: "hi"}},
+	}}}
 }

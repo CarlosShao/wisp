@@ -251,19 +251,25 @@ func (s *Server) handleMessages(w http.ResponseWriter, r *http.Request) {
 		"message": map[string]any{
 			"id": msgID, "type": "message", "role": "assistant", "model": req.Model,
 			"content": []any{},
-			"usage": map[string]int{"input_tokens": promptTokens,
-				"cache_read_input_tokens": 0, "output_tokens": 0},
+			"usage": map[string]int{
+				"input_tokens":            promptTokens,
+				"cache_read_input_tokens": 0, "output_tokens": 0,
+			},
 		},
 	}) {
 		return
 	}
 	if p.reason != "" {
-		if !raw("content_block_start", map[string]any{"type": "content_block_start",
-			"index": idx, "content_block": map[string]any{"type": "thinking", "thinking": ""}}) {
+		if !raw("content_block_start", map[string]any{
+			"type":  "content_block_start",
+			"index": idx, "content_block": map[string]any{"type": "thinking", "thinking": ""},
+		}) {
 			return
 		}
-		if !raw("content_block_delta", map[string]any{"type": "content_block_delta",
-			"index": idx, "delta": map[string]any{"type": "thinking_delta", "thinking": p.reason}}) {
+		if !raw("content_block_delta", map[string]any{
+			"type":  "content_block_delta",
+			"index": idx, "delta": map[string]any{"type": "thinking_delta", "thinking": p.reason},
+		}) {
 			return
 		}
 		if !raw("content_block_stop", map[string]any{"type": "content_block_stop", "index": idx}) {
@@ -275,28 +281,39 @@ func (s *Server) handleMessages(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case p.toolName != "":
 		stop = "tool_use"
-		if !raw("content_block_start", map[string]any{"type": "content_block_start",
+		if !raw("content_block_start", map[string]any{
+			"type":  "content_block_start",
 			"index": idx, "content_block": map[string]any{
 				"type": "tool_use", "id": "toolu_mock_1", "name": p.toolName,
-				"input": map[string]any{}}}) {
+				"input": map[string]any{},
+			},
+		}) {
 			return
 		}
-		if !raw("content_block_delta", map[string]any{"type": "content_block_delta",
-			"index": idx, "delta": map[string]any{"type": "input_json_delta",
-				"partial_json": p.toolArgs}}) {
+		if !raw("content_block_delta", map[string]any{
+			"type":  "content_block_delta",
+			"index": idx, "delta": map[string]any{
+				"type":         "input_json_delta",
+				"partial_json": p.toolArgs,
+			},
+		}) {
 			return
 		}
 		if !raw("content_block_stop", map[string]any{"type": "content_block_stop", "index": idx}) {
 			return
 		}
 	default:
-		if !raw("content_block_start", map[string]any{"type": "content_block_start",
-			"index": idx, "content_block": map[string]any{"type": "text", "text": ""}}) {
+		if !raw("content_block_start", map[string]any{
+			"type":  "content_block_start",
+			"index": idx, "content_block": map[string]any{"type": "text", "text": ""},
+		}) {
 			return
 		}
 		for _, piece := range splitChunks(p.answer, 16) {
-			if !raw("content_block_delta", map[string]any{"type": "content_block_delta",
-				"index": idx, "delta": map[string]any{"type": "text_delta", "text": piece}}) {
+			if !raw("content_block_delta", map[string]any{
+				"type":  "content_block_delta",
+				"index": idx, "delta": map[string]any{"type": "text_delta", "text": piece},
+			}) {
 				return
 			}
 		}

@@ -40,8 +40,10 @@ api_key = "rt-plain-abcdef9988"
 alert_threshold = 0.8
 `
 
-const openaiSecret = "sk-openai-plain-1122334455"
-const realtimeSecret = "rt-plain-abcdef9988"
+const (
+	openaiSecret   = "sk-openai-plain-1122334455"
+	realtimeSecret = "rt-plain-abcdef9988"
+)
 
 func writeFixture(t *testing.T, content string) string {
 	t.Helper()

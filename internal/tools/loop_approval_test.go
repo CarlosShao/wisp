@@ -263,7 +263,8 @@ func dumpToolLog(res agent.Result) string {
 func writeThenTextSSE(t *testing.T, target string) []byte {
 	t.Helper()
 	args, err := json.Marshal(map[string]string{
-		"path": filepath.ToSlash(target), "content": "written by the loop"})
+		"path": filepath.ToSlash(target), "content": "written by the loop",
+	})
 	if err != nil {
 		t.Fatal(err)
 	}

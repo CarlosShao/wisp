@@ -219,7 +219,8 @@ func main() {
 		bridge := ball.NewHotkeyReloader(b, b.ConfiguredHotkeys(), func() ball.HotkeyConfig {
 			h := mgr.Config().Hotkey
 			return ball.ApplyHotkeyDefaults(ball.HotkeyConfig{
-				Summon: h.Summon, Mute: h.Mute, Cancel: h.Cancel, Panel: h.Panel})
+				Summon: h.Summon, Mute: h.Mute, Cancel: h.Cancel, Panel: h.Panel,
+			})
 		})
 		bridge.Refresh = func() error { _, err := mgr.CheckAndReload(); return err }
 		mgr.OnReload = bridge.OnReload()

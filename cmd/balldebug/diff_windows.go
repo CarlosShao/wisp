@@ -385,9 +385,11 @@ func runDiffForState(exe string, o diffOpts, v stateVariant, idx int) (stateRow,
 	statusPath := filepath.Join(o.dir, ".status-"+v.label)
 	_ = os.Remove(statusPath)
 
-	childArgs := []string{"-state", v.state, "-hold", "-status", statusPath,
+	childArgs := []string{
+		"-state", v.state, "-hold", "-status", statusPath,
 		"-x", fmt.Sprint(o.x), "-y", fmt.Sprint(o.y),
-		"-cycle-ms", fmt.Sprint(o.dwell.Milliseconds())}
+		"-cycle-ms", fmt.Sprint(o.dwell.Milliseconds()),
+	}
 	if v.dock != "" {
 		childArgs = append(childArgs, "-dock", v.dock)
 	}

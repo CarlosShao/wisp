@@ -118,8 +118,10 @@ func TestTurnCollectorCompleteToolCallAndMaxTokens(t *testing.T) {
 }
 
 func TestStopReasonEnumIsExact(t *testing.T) {
-	want := []StopReason{StopEndTurn, StopMaxTokens, StopToolUse, StopStopSequence,
-		StopContentFilter, StopCancelled, StopError}
+	want := []StopReason{
+		StopEndTurn, StopMaxTokens, StopToolUse, StopStopSequence,
+		StopContentFilter, StopCancelled, StopError,
+	}
 	for _, r := range want {
 		if !r.Valid() {
 			t.Errorf("%s not valid", r)
@@ -579,8 +581,10 @@ func TestLimiterProviderReconcilesUsage(t *testing.T) {
 	l := NewBucketLimiter(RateLimits{TPM: 100})
 	p := NewLimiterProvider(inner, l)
 	// Estimate 800 tokens; real usage 4: the bucket must get ~796 back.
-	req := &Request{Model: "m", Messages: []Message{{Role: RoleUser,
-		Content: []Content{TextPart{Text: strings.Repeat("x", 3200)}}}}}
+	req := &Request{Model: "m", Messages: []Message{{
+		Role:    RoleUser,
+		Content: []Content{TextPart{Text: strings.Repeat("x", 3200)}},
+	}}}
 	if err := p.Stream(context.Background(), req, func(StreamEvent) error { return nil }); err != nil {
 		t.Fatal(err)
 	}
@@ -636,8 +640,10 @@ func TestRequestEstimateTokensAndValidate(t *testing.T) {
 	if err := r.Validate(); err == nil {
 		t.Error("empty model accepted")
 	}
-	r = &Request{Model: "m", Messages: []Message{{Role: RoleUser,
-		Content: []Content{TextPart{Text: strings.Repeat("a", 40)}}}}, MaxOutputTokens: 30}
+	r = &Request{Model: "m", Messages: []Message{{
+		Role:    RoleUser,
+		Content: []Content{TextPart{Text: strings.Repeat("a", 40)}},
+	}}, MaxOutputTokens: 30}
 	if err := r.Validate(); err != nil {
 		t.Fatal(err)
 	}

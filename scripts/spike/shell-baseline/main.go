@@ -175,6 +175,6 @@ func main() {
 	b, _ := json.MarshalIndent(res, "", "  ")
 	fmt.Println(string(b))
 	if *out != "" {
-		os.WriteFile(*out, b, 0644)
+		os.WriteFile(*out, b, 0o644)
 	}
 }

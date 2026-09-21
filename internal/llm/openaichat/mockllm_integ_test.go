@@ -207,8 +207,10 @@ func TestMockllmGoldenByteIdenticalEvents(t *testing.T) {
 
 			// Runner B: mockllm serving the same bytes.
 			a2 := New(endpointOptionsFor(proc.base+"/v1", false, false))
-			ev2 := collectStream(t, a2, &llm.Request{Model: "golden/" + name,
-				Messages: baseRequest().Messages})
+			ev2 := collectStream(t, a2, &llm.Request{
+				Model:    "golden/" + name,
+				Messages: baseRequest().Messages,
+			})
 
 			if len(ev1) != len(ev2) {
 				t.Fatalf("event counts differ: replayer=%d mockllm=%d", len(ev1), len(ev2))

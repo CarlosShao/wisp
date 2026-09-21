@@ -87,7 +87,8 @@ func TestBatchRefusalsBelowThresholdAndOnSensitiveVerdicts(t *testing.T) {
 func TestR7SizedBatchEscalatesToL2Unaggregated(t *testing.T) {
 	ui := newFakeUI()
 	g, clk, _ := newGate(t, ui, approval.Options{
-		Window: 3 * time.Second, ApprovalTimeout: 300 * time.Second, WarningLead: 30 * time.Second})
+		Window: 3 * time.Second, ApprovalTimeout: 300 * time.Second, WarningLead: 30 * time.Second,
+	})
 	g.AdmitTextTask(testTask)
 	res := runWindow(t, g, context.Background(), l1Decision(manyPaths(60)...))
 	p := ui.wait(t)
@@ -119,7 +120,8 @@ func TestR7SizedBatchEscalatesToL2Unaggregated(t *testing.T) {
 func TestR7SizedBatchThatNobodyAnsweredIsRejectedNotRun(t *testing.T) {
 	ui := newFakeUI()
 	g, clk, _ := newGate(t, ui, approval.Options{
-		Window: 3 * time.Second, ApprovalTimeout: 300 * time.Second, WarningLead: 30 * time.Second})
+		Window: 3 * time.Second, ApprovalTimeout: 300 * time.Second, WarningLead: 30 * time.Second,
+	})
 	g.AdmitTextTask(testTask)
 	res := runWindow(t, g, context.Background(), l1Decision(manyPaths(60)...))
 	ui.wait(t)

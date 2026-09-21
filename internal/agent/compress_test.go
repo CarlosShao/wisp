@@ -26,14 +26,24 @@ func buildRoundHistory(rounds, padBytes int) []llm.Message {
 	for i := 0; i < rounds; i++ {
 		id := fmt.Sprintf("c%02d", i)
 		hist = append(hist,
-			llm.Message{Role: llm.RoleUser,
-				Content: []llm.Content{llm.TextPart{Text: fmt.Sprintf("问题 %d %s", i, pad)}}},
-			llm.Message{Role: llm.RoleAssistant,
-				Content: []llm.Content{llm.ToolUsePart{ID: id, Name: "echo",
-					Input: json.RawMessage(`{"text":"hi"}`)}}},
-			llm.Message{Role: llm.RoleTool,
-				Content: []llm.Content{llm.ToolResultPart{ID: id,
-					Content: []llm.Content{llm.TextPart{Text: "结果 " + pad}}}}},
+			llm.Message{
+				Role:    llm.RoleUser,
+				Content: []llm.Content{llm.TextPart{Text: fmt.Sprintf("问题 %d %s", i, pad)}},
+			},
+			llm.Message{
+				Role: llm.RoleAssistant,
+				Content: []llm.Content{llm.ToolUsePart{
+					ID: id, Name: "echo",
+					Input: json.RawMessage(`{"text":"hi"}`),
+				}},
+			},
+			llm.Message{
+				Role: llm.RoleTool,
+				Content: []llm.Content{llm.ToolResultPart{
+					ID:      id,
+					Content: []llm.Content{llm.TextPart{Text: "结果 " + pad}},
+				}},
+			},
 		)
 	}
 	return hist
@@ -175,11 +185,17 @@ func TestCompressTriggerScalesWithWindow(t *testing.T) {
 	for i := 0; i < rounds; i++ {
 		id := fmt.Sprintf("s%02d", i)
 		hist = append(hist,
-			llm.Message{Role: llm.RoleUser,
-				Content: []llm.Content{llm.TextPart{Text: fmt.Sprintf("问 %d %s", i, pad)}}},
-			llm.Message{Role: llm.RoleAssistant,
-				Content: []llm.Content{llm.ToolUsePart{ID: id, Name: "echo",
-					Input: json.RawMessage(`{}`)}}},
+			llm.Message{
+				Role:    llm.RoleUser,
+				Content: []llm.Content{llm.TextPart{Text: fmt.Sprintf("问 %d %s", i, pad)}},
+			},
+			llm.Message{
+				Role: llm.RoleAssistant,
+				Content: []llm.Content{llm.ToolUsePart{
+					ID: id, Name: "echo",
+					Input: json.RawMessage(`{}`),
+				}},
+			},
 		)
 	}
 	n := NewCompressor(big, nil).TotalTokens(hist)

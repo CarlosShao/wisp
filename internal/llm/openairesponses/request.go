@@ -110,8 +110,10 @@ func (a *Adapter) buildWire(req *llm.Request) ([]byte, error) {
 			return nil, observe.New(observe.ClassInternal,
 				fmt.Sprintf("openai-responses: tool %q has invalid JSON schema", t.Name))
 		}
-		w.Tools = append(w.Tools, wireToolDef{Type: "function", Name: t.Name,
-			Description: t.Description, Parameters: params})
+		w.Tools = append(w.Tools, wireToolDef{
+			Type: "function", Name: t.Name,
+			Description: t.Description, Parameters: params,
+		})
 	}
 
 	if req.ToolChoice != nil {
@@ -167,8 +169,10 @@ func (a *Adapter) encodeMessage(req *llm.Request, m llm.Message) ([]wireInputIte
 					fmt.Sprintf("openai-responses: user message cannot carry %T", p))
 			}
 		}
-		return []wireInputItem{{Type: "message", Role: "user",
-			Content: mustJSON(parts)}}, nil
+		return []wireInputItem{{
+			Type: "message", Role: "user",
+			Content: mustJSON(parts),
+		}}, nil
 
 	case llm.RoleAssistant:
 		var out []wireInputItem
@@ -188,20 +192,26 @@ func (a *Adapter) encodeMessage(req *llm.Request, m llm.Message) ([]wireInputIte
 					return nil, observe.New(observe.ClassInternal,
 						fmt.Sprintf("openai-responses: tool_use %q arguments are not valid JSON", c.ID))
 				}
-				out = append(out, wireInputItem{Type: "function_call",
-					CallID: c.ID, Name: c.Name, Arguments: args})
+				out = append(out, wireInputItem{
+					Type:   "function_call",
+					CallID: c.ID, Name: c.Name, Arguments: args,
+				})
 			default:
 				return nil, observe.New(observe.ClassInternal,
 					fmt.Sprintf("openai-responses: assistant message cannot carry %T", p))
 			}
 		}
 		if len(parts) > 0 {
-			out = append([]wireInputItem{{Type: "message", Role: "assistant",
-				Content: mustJSON(parts)}}, out...)
+			out = append([]wireInputItem{{
+				Type: "message", Role: "assistant",
+				Content: mustJSON(parts),
+			}}, out...)
 		}
 		if len(out) == 0 {
-			out = append(out, wireInputItem{Type: "message", Role: "assistant",
-				Content: mustJSON([]wireContentPart{{Type: "output_text", Text: ""}})})
+			out = append(out, wireInputItem{
+				Type: "message", Role: "assistant",
+				Content: mustJSON([]wireContentPart{{Type: "output_text", Text: ""}}),
+			})
 		}
 		return out, nil
 
@@ -231,8 +241,10 @@ func (a *Adapter) encodeMessage(req *llm.Request, m llm.Message) ([]wireInputIte
 		if res.IsError {
 			out = "tool error: " + out
 		}
-		return []wireInputItem{{Type: "function_call_output", CallID: res.ID,
-			Output: mustJSON([]wireContentPart{{Type: "input_text", Text: out}})}}, nil
+		return []wireInputItem{{
+			Type: "function_call_output", CallID: res.ID,
+			Output: mustJSON([]wireContentPart{{Type: "input_text", Text: out}}),
+		}}, nil
 
 	case llm.RoleSystem:
 		return nil, observe.New(observe.ClassInternal,

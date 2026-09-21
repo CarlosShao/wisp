@@ -103,11 +103,14 @@ func TestPanelSourcedAllowIsRejectedOnEveryForgeableAxis(t *testing.T) {
 		want error
 	}{
 		{"面板声称自己是原生，且不带令牌", approval.Request{
-			CorrelationID: p.CorrelationID, Allow: true, Source: "native"}, approval.ErrPanelAllow},
+			CorrelationID: p.CorrelationID, Allow: true, Source: "native",
+		}, approval.ErrPanelAllow},
 		{"面板声称原生并携带真实令牌", approval.Request{
-			CorrelationID: p.CorrelationID, Allow: true, Source: "native", Grant: p.Grant}, approval.ErrPanelAllow},
+			CorrelationID: p.CorrelationID, Allow: true, Source: "native", Grant: p.Grant,
+		}, approval.ErrPanelAllow},
 		{"面板只带令牌不给答案（Allow=false 视为拒绝）", approval.Request{
-			CorrelationID: p.CorrelationID, Allow: false, Source: "panel"}, nil},
+			CorrelationID: p.CorrelationID, Allow: false, Source: "panel",
+		}, nil},
 	}
 	// Case 3 answers the item, so run the two allow forgeries first.
 	for _, tc := range cases[:2] {
@@ -166,7 +169,8 @@ func TestGrantIsSingleUseAndBoundToItsItem(t *testing.T) {
 	// The route is what carries authority, not the claim: a native decision
 	// that describes itself as a panel still needs (and gets) the grant.
 	if err := g.DecideFromNative(context.Background(), approval.Request{
-		CorrelationID: pA.CorrelationID, Allow: true, Grant: pA.Grant, Source: "panel"}); err != nil {
+		CorrelationID: pA.CorrelationID, Allow: true, Grant: pA.Grant, Source: "panel",
+	}); err != nil {
 		t.Fatalf("DecideFromNative with a real grant: %v", err)
 	}
 	if a := mustAnswer(t, resA); a.a != tools.AnswerAllow {
@@ -185,7 +189,8 @@ func TestGrantIsSingleUseAndBoundToItsItem(t *testing.T) {
 func TestL2QueueAutoRejectsAt300sKeepsTaskAliveAndWarnsAt270s(t *testing.T) {
 	ui := newFakeUI()
 	g, clk, _ := newGate(t, ui, approval.Options{
-		ApprovalTimeout: 300 * time.Second, WarningLead: 30 * time.Second})
+		ApprovalTimeout: 300 * time.Second, WarningLead: 30 * time.Second,
+	})
 	revoke := g.AdmitTextTask(testTask)
 	defer revoke()
 

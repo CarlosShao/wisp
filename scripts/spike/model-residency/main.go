@@ -282,15 +282,17 @@ func openSession(which, modelsDir string) (func() (*session, error), []modelFile
 // ------------------------------------------------------------- modes
 
 func runResidency(which, modelsDir string, budgetMs int64, out string) {
-	rep := residencyReport{Program: "model-residency", Which: which,
+	rep := residencyReport{
+		Program: "model-residency", Which: which,
 		Machine: common.GetMachineInfo(), StartedAt: time.Now().UTC().Format(time.RFC3339),
 		SherpaVersion: sherpa.GetVersion(),
-		Note:          "idle residency = loaded, settled, NO inference; post-inference = after one warmup inference"}
+		Note:          "idle residency = loaded, settled, NO inference; post-inference = after one warmup inference",
+	}
 	defer func() {
 		b, _ := json.MarshalIndent(rep, "", "  ")
 		fmt.Println(string(b))
 		if out != "" {
-			os.WriteFile(out, b, 0644)
+			os.WriteFile(out, b, 0o644)
 		}
 	}()
 
@@ -332,15 +334,17 @@ func runResidency(which, modelsDir string, budgetMs int64, out string) {
 }
 
 func runSwitch(modelsDir string, budgetMs int64, out string) {
-	rep := residencyReport{Program: "model-residency", Which: "switch",
+	rep := residencyReport{
+		Program: "model-residency", Which: "switch",
 		Machine: common.GetMachineInfo(), StartedAt: time.Now().UTC().Format(time.RFC3339),
 		SherpaVersion: sherpa.GetVersion(),
-		Note:          "half-duplex serial: ASR fully disposed (incl FreeOSMemory) before TTS load; budget 1600ms = D32 16.3.4 'first token -> first TTS audio, TTS not yet loaded'"}
+		Note:          "half-duplex serial: ASR fully disposed (incl FreeOSMemory) before TTS load; budget 1600ms = D32 16.3.4 'first token -> first TTS audio, TTS not yet loaded'",
+	}
 	defer func() {
 		b, _ := json.MarshalIndent(rep, "", "  ")
 		fmt.Println(string(b))
 		if out != "" {
-			os.WriteFile(out, b, 0644)
+			os.WriteFile(out, b, 0o644)
 		}
 	}()
 

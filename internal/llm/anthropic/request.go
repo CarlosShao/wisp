@@ -342,8 +342,10 @@ func (a *Adapter) encodeAssistant(m llm.Message, mark bool) (wireMessageIn, erro
 				return wireMessageIn{}, observe.New(observe.ClassInternal,
 					fmt.Sprintf("anthropic: tool_use %q input is not valid JSON", c.ID))
 			}
-			b, err := json.Marshal(wireToolUseBlock{Type: "tool_use", ID: c.ID,
-				Name: c.Name, Input: input})
+			b, err := json.Marshal(wireToolUseBlock{
+				Type: "tool_use", ID: c.ID,
+				Name: c.Name, Input: input,
+			})
 			if err != nil {
 				return wireMessageIn{}, err
 			}
@@ -393,8 +395,10 @@ func (a *Adapter) encodeToolResult(m llm.Message, mark bool) (wireMessageIn, err
 	if len(inner) == 0 {
 		inner = append(inner, mustJSON(wireTextBlock{Type: "text", Text: " "}))
 	}
-	b, err := json.Marshal(wireToolResultBlock{Type: "tool_result", ToolUseID: res.ID,
-		Content: mustArray(inner), IsError: res.IsError})
+	b, err := json.Marshal(wireToolResultBlock{
+		Type: "tool_result", ToolUseID: res.ID,
+		Content: mustArray(inner), IsError: res.IsError,
+	})
 	if err != nil {
 		return wireMessageIn{}, err
 	}
@@ -465,14 +469,18 @@ func markLastBlock(blocks []json.RawMessage) {
 	}
 	var tu wireToolUseBlock
 	if err := json.Unmarshal(last, &tu); err == nil && tu.Type == "tool_use" {
-		blocks[len(blocks)-1] = mustJSON(wireToolUseBlock{Type: "tool_use", ID: tu.ID, Name: tu.Name,
-			Input: tu.Input, CacheControl: cacheControl})
+		blocks[len(blocks)-1] = mustJSON(wireToolUseBlock{
+			Type: "tool_use", ID: tu.ID, Name: tu.Name,
+			Input: tu.Input, CacheControl: cacheControl,
+		})
 		return
 	}
 	var tr wireToolResultBlock
 	if err := json.Unmarshal(last, &tr); err == nil && tr.Type == "tool_result" {
-		blocks[len(blocks)-1] = mustJSON(wireToolResultBlock{Type: "tool_result", ToolUseID: tr.ToolUseID,
-			Content: tr.Content, IsError: tr.IsError, CacheControl: cacheControl})
+		blocks[len(blocks)-1] = mustJSON(wireToolResultBlock{
+			Type: "tool_result", ToolUseID: tr.ToolUseID,
+			Content: tr.Content, IsError: tr.IsError, CacheControl: cacheControl,
+		})
 	}
 	// Any other final block type cannot carry a marker in this protocol; the
 	// breakpoint is then a no-op (prefix caching degrades, semantics do not).

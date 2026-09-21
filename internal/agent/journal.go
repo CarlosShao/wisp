@@ -23,9 +23,7 @@ type Journal interface {
 	FinishToolCall(ctx context.Context, id int64, outcome, errorClass string) error
 }
 
-var (
-	_ Journal = (*memory.Store)(nil)
-)
+var _ Journal = (*memory.Store)(nil)
 
 // Decision values (tool_call.decision). Ticket 21 replaces the pass-through
 // decision with real gate outcomes; the vocabulary is already frozen here.

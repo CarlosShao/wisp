@@ -214,8 +214,8 @@ func (s *streamState) openBlocks() bool { return len(s.blocks) > 0 }
 // whether the terminal sentinel was seen; err is a classified failure that
 // caller must surface (the caller owns the terminal triple).
 func (s *streamState) handle(_ context.Context, eventName string, data []byte,
-	emit func(llm.StreamEvent) error) (bool, error) {
-
+	emit func(llm.StreamEvent) error,
+) (bool, error) {
 	var ev wireEvent
 	if err := json.Unmarshal(data, &ev); err != nil {
 		return false, observe.Wrap(observe.ClassProvider, err,
@@ -258,16 +258,20 @@ func (s *streamState) handle(_ context.Context, eventName string, data []byte,
 		st := &blockState{kind: blk.Type, id: blk.ID, name: blk.Name}
 		s.blocks[ev.Index] = st
 		if st.kind == "tool_use" {
-			if err := emit(llm.StreamEvent{Type: llm.EvToolCallStart,
-				ToolCallID: st.id, ToolName: st.name}); err != nil {
+			if err := emit(llm.StreamEvent{
+				Type:       llm.EvToolCallStart,
+				ToolCallID: st.id, ToolName: st.name,
+			}); err != nil {
 				return false, err
 			}
 			// A non-empty input at start time (rare, but real for
 			// pre-filled turns) is the args payload: replay it as one delta
 			// so the assembler never loses it.
 			if args := strings.TrimSpace(string(blk.Input)); args != "" && args != "{}" && args != "null" {
-				if err := emit(llm.StreamEvent{Type: llm.EvToolCallArgsDelta,
-					ToolCallID: st.id, ArgsDelta: args}); err != nil {
+				if err := emit(llm.StreamEvent{
+					Type:       llm.EvToolCallArgsDelta,
+					ToolCallID: st.id, ArgsDelta: args,
+				}); err != nil {
 					return false, err
 				}
 			}
@@ -311,8 +315,10 @@ func (s *streamState) handle(_ context.Context, eventName string, data []byte,
 			if d.PartialJSON == "" {
 				return false, nil
 			}
-			if err := emit(llm.StreamEvent{Type: llm.EvToolCallArgsDelta,
-				ToolCallID: st.id, ArgsDelta: d.PartialJSON}); err != nil {
+			if err := emit(llm.StreamEvent{
+				Type:       llm.EvToolCallArgsDelta,
+				ToolCallID: st.id, ArgsDelta: d.PartialJSON,
+			}); err != nil {
 				return false, err
 			}
 		default:

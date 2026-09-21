@@ -153,7 +153,8 @@ func NewBucketLimiter(limits RateLimits) *BucketLimiter {
 // 60-second window can be proven without waiting 60 seconds - the pacing
 // arithmetic itself is identical.
 func NewBucketLimiterWithClock(limits RateLimits, now func() time.Time,
-	sleep func(context.Context, time.Duration) error) *BucketLimiter {
+	sleep func(context.Context, time.Duration) error,
+) *BucketLimiter {
 	if now == nil {
 		now = time.Now
 	}

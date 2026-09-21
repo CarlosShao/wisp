@@ -163,10 +163,14 @@ func BaseRequest() *llm.Request {
 // more than a slogan.
 func weatherAndTimeCalls() []llm.ToolCall {
 	return []llm.ToolCall{
-		{ID: "call_a1", Name: "get_weather",
-			Args: json.RawMessage(`{"city":"Zhuhai"}`), Complete: true},
-		{ID: "call_b2", Name: "get_time",
-			Args: json.RawMessage(`{}`), Complete: true},
+		{
+			ID: "call_a1", Name: "get_weather",
+			Args: json.RawMessage(`{"city":"Zhuhai"}`), Complete: true,
+		},
+		{
+			ID: "call_b2", Name: "get_time",
+			Args: json.RawMessage(`{}`), Complete: true,
+		},
 	}
 }
 

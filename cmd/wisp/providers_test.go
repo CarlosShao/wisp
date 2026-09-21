@@ -32,8 +32,10 @@ type providersFixture struct {
 
 func newProvidersFixture(t *testing.T) *providersFixture {
 	t.Helper()
-	pf := &providersFixture{t: t, srv: adaptertest.StartMockllm(t),
-		out: &bytes.Buffer{}, err: &bytes.Buffer{}}
+	pf := &providersFixture{
+		t: t, srv: adaptertest.StartMockllm(t),
+		out: &bytes.Buffer{}, err: &bytes.Buffer{},
+	}
 	pf.dir = t.TempDir()
 	body := fmt.Sprintf(`schema_version = 2
 

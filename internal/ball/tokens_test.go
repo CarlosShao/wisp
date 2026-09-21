@@ -336,8 +336,10 @@ func TestAnimationPolicyZeroTimerInSleeping(t *testing.T) {
 	if p := AnimationPolicy(statemachine.StateSettling); p.Kind != AnimFade {
 		t.Errorf("Settling policy = %+v; want the one-shot fade", p)
 	}
-	for _, s := range []statemachine.State{statemachine.StateListening,
-		statemachine.StateThinking, statemachine.StateConfirming, statemachine.StateSpeaking} {
+	for _, s := range []statemachine.State{
+		statemachine.StateListening,
+		statemachine.StateThinking, statemachine.StateConfirming, statemachine.StateSpeaking,
+	} {
 		if p := AnimationPolicy(s); p.Kind != AnimFrame || p.PeriodMs <= 0 {
 			t.Errorf("%s policy = %+v; want an animation frame timer", s, p)
 		}

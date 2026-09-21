@@ -94,8 +94,8 @@ var validQuotaStates = map[string]bool{
 // UpsertProviderProbe writes a probe outcome for provider/model (ticket 11's
 // write path). lastProbeAt is the wall-clock instant of the probe.
 func (s *Store) UpsertProviderProbe(ctx context.Context, provider, model string,
-	flags ProbeFlags, ok bool, latencyMS int64, lastProbeAt time.Time) error {
-
+	flags ProbeFlags, ok bool, latencyMS int64, lastProbeAt time.Time,
+) error {
 	if provider == "" || model == "" {
 		return errors.New("memory: provider and model are required")
 	}

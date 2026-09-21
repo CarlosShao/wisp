@@ -140,15 +140,21 @@ func (s *Server) handleResponses(w http.ResponseWriter, r *http.Request) {
 	if !req.Stream {
 		output := []map[string]any{}
 		if reason != "" {
-			output = append(output, map[string]any{"type": "reasoning", "id": "rs_mock_1",
-				"summary": []map[string]string{{"type": "summary_text", "text": reason}}})
+			output = append(output, map[string]any{
+				"type": "reasoning", "id": "rs_mock_1",
+				"summary": []map[string]string{{"type": "summary_text", "text": reason}},
+			})
 		}
 		if toolName != "" {
-			output = append(output, map[string]any{"type": "function_call", "id": "fc_mock_1",
-				"call_id": "call_mock_1", "name": toolName, "arguments": toolArgs})
+			output = append(output, map[string]any{
+				"type": "function_call", "id": "fc_mock_1",
+				"call_id": "call_mock_1", "name": toolName, "arguments": toolArgs,
+			})
 		} else {
-			output = append(output, map[string]any{"type": "message", "role": "assistant",
-				"content": []map[string]string{{"type": "output_text", "text": answer}}})
+			output = append(output, map[string]any{
+				"type": "message", "role": "assistant",
+				"content": []map[string]string{{"type": "output_text", "text": answer}},
+			})
 		}
 		writeJSON(w, map[string]any{
 			"id": respID, "object": "response", "model": req.Model,
@@ -161,8 +167,10 @@ func (s *Server) handleResponses(w http.ResponseWriter, r *http.Request) {
 	sse := newSSEWriter(w, lat, trunc)
 	if !sse.event("response.created", map[string]any{
 		"type": "response.created",
-		"response": map[string]any{"id": respID, "object": "response",
-			"status": "in_progress", "model": req.Model},
+		"response": map[string]any{
+			"id": respID, "object": "response",
+			"status": "in_progress", "model": req.Model,
+		},
 	}) {
 		return
 	}
@@ -170,8 +178,10 @@ func (s *Server) handleResponses(w http.ResponseWriter, r *http.Request) {
 	if reason != "" {
 		if !sse.event("response.output_item.added", map[string]any{
 			"type": "response.output_item.added", "output_index": outIdx,
-			"item": map[string]any{"id": "rs_mock_1", "type": "reasoning",
-				"summary": []any{}},
+			"item": map[string]any{
+				"id": "rs_mock_1", "type": "reasoning",
+				"summary": []any{},
+			},
 		}) {
 			return
 		}
@@ -183,8 +193,10 @@ func (s *Server) handleResponses(w http.ResponseWriter, r *http.Request) {
 		}
 		if !sse.event("response.output_item.done", map[string]any{
 			"type": "response.output_item.done", "output_index": outIdx,
-			"item": map[string]any{"id": "rs_mock_1", "type": "reasoning",
-				"summary": []map[string]string{{"type": "summary_text", "text": reason}}},
+			"item": map[string]any{
+				"id": "rs_mock_1", "type": "reasoning",
+				"summary": []map[string]string{{"type": "summary_text", "text": reason}},
+			},
 		}) {
 			return
 		}
@@ -193,8 +205,10 @@ func (s *Server) handleResponses(w http.ResponseWriter, r *http.Request) {
 	if toolName != "" {
 		if !sse.event("response.output_item.added", map[string]any{
 			"type": "response.output_item.added", "output_index": outIdx,
-			"item": map[string]any{"id": "fc_mock_1", "type": "function_call",
-				"call_id": "call_mock_1", "name": toolName, "arguments": ""},
+			"item": map[string]any{
+				"id": "fc_mock_1", "type": "function_call",
+				"call_id": "call_mock_1", "name": toolName, "arguments": "",
+			},
 		}) {
 			return
 		}
@@ -206,16 +220,20 @@ func (s *Server) handleResponses(w http.ResponseWriter, r *http.Request) {
 		}
 		if !sse.event("response.output_item.done", map[string]any{
 			"type": "response.output_item.done", "output_index": outIdx,
-			"item": map[string]any{"id": "fc_mock_1", "type": "function_call",
-				"call_id": "call_mock_1", "name": toolName, "arguments": toolArgs},
+			"item": map[string]any{
+				"id": "fc_mock_1", "type": "function_call",
+				"call_id": "call_mock_1", "name": toolName, "arguments": toolArgs,
+			},
 		}) {
 			return
 		}
 	} else {
 		if !sse.event("response.output_item.added", map[string]any{
 			"type": "response.output_item.added", "output_index": outIdx,
-			"item": map[string]any{"id": "msg_mock_1", "type": "message",
-				"role": "assistant", "content": []any{}},
+			"item": map[string]any{
+				"id": "msg_mock_1", "type": "message",
+				"role": "assistant", "content": []any{},
+			},
 		}) {
 			return
 		}
@@ -229,9 +247,11 @@ func (s *Server) handleResponses(w http.ResponseWriter, r *http.Request) {
 		}
 		if !sse.event("response.output_item.done", map[string]any{
 			"type": "response.output_item.done", "output_index": outIdx,
-			"item": map[string]any{"id": "msg_mock_1", "type": "message",
+			"item": map[string]any{
+				"id": "msg_mock_1", "type": "message",
 				"role":    "assistant",
-				"content": []map[string]string{{"type": "output_text", "text": answer}}},
+				"content": []map[string]string{{"type": "output_text", "text": answer}},
+			},
 		}) {
 			return
 		}
@@ -256,8 +276,10 @@ func respInputItems(raw json.RawMessage) []respInputItem {
 	}
 	var s string
 	if err := json.Unmarshal(raw, &s); err == nil {
-		return []respInputItem{{Type: "message", Role: "user",
-			Content: mustJSONStringAsArray(s)}}
+		return []respInputItem{{
+			Type: "message", Role: "user",
+			Content: mustJSONStringAsArray(s),
+		}}
 	}
 	var one respInputItem
 	if err := json.Unmarshal(raw, &one); err == nil && one.Type != "" {

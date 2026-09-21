@@ -255,8 +255,10 @@ func (s *streamState) handle(data string, emit func(llm.StreamEvent) error) (boo
 			return false, nil
 		}
 		st.streamArgs = true
-		if err := emit(llm.StreamEvent{Type: llm.EvToolCallArgsDelta,
-			ToolCallID: st.callID, ArgsDelta: f.Delta}); err != nil {
+		if err := emit(llm.StreamEvent{
+			Type:       llm.EvToolCallArgsDelta,
+			ToolCallID: st.callID, ArgsDelta: f.Delta,
+		}); err != nil {
 			return false, err
 		}
 		return false, nil
@@ -295,8 +297,10 @@ func (s *streamState) itemAdded(f wireFrame, emit func(llm.StreamEvent) error) e
 	switch st.kind {
 	case "function_call":
 		s.calledFunction = true
-		return emit(llm.StreamEvent{Type: llm.EvToolCallStart,
-			ToolCallID: st.callID, ToolName: st.name})
+		return emit(llm.StreamEvent{
+			Type:       llm.EvToolCallStart,
+			ToolCallID: st.callID, ToolName: st.name,
+		})
 	case "refusal":
 		s.sawRefusal = true
 	}
@@ -319,8 +323,10 @@ func (s *streamState) itemDone(f wireFrame, emit func(llm.StreamEvent) error) er
 		s.items[id] = st
 		if st.kind == "function_call" {
 			s.calledFunction = true
-			if err := emit(llm.StreamEvent{Type: llm.EvToolCallStart,
-				ToolCallID: st.callID, ToolName: st.name}); err != nil {
+			if err := emit(llm.StreamEvent{
+				Type:       llm.EvToolCallStart,
+				ToolCallID: st.callID, ToolName: st.name,
+			}); err != nil {
 				return err
 			}
 		}
@@ -328,8 +334,10 @@ func (s *streamState) itemDone(f wireFrame, emit func(llm.StreamEvent) error) er
 	switch st.kind {
 	case "function_call":
 		if !st.streamArgs && strings.TrimSpace(it.Arguments) != "" {
-			if err := emit(llm.StreamEvent{Type: llm.EvToolCallArgsDelta,
-				ToolCallID: st.callID, ArgsDelta: it.Arguments}); err != nil {
+			if err := emit(llm.StreamEvent{
+				Type:       llm.EvToolCallArgsDelta,
+				ToolCallID: st.callID, ArgsDelta: it.Arguments,
+			}); err != nil {
 				return err
 			}
 		}

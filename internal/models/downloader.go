@@ -248,8 +248,10 @@ func (m *Manager) downloadEntry(ctx context.Context, entry *ModelEntry, progress
 	// Extract archives (bytes were hash-verified inside downloadArtifact).
 	for _, i := range archived {
 		a := entry.Artifact(i)
-		progress(ProgressEvent{ModelID: entry.ID, Phase: PhaseExtracting, ArtifactIndex: i, ArtifactCount: count,
-			BytesDone: doneAll, TotalBytes: totalAll, Percent: percentOf(doneAll, totalAll)})
+		progress(ProgressEvent{
+			ModelID: entry.ID, Phase: PhaseExtracting, ArtifactIndex: i, ArtifactCount: count,
+			BytesDone: doneAll, TotalBytes: totalAll, Percent: percentOf(doneAll, totalAll),
+		})
 		archivePath := filepath.Join(staging, filepath.FromSlash(a.Path))
 		if err := ExtractTarBz2(archivePath, staging); err != nil {
 			_ = os.RemoveAll(staging)
@@ -261,8 +263,10 @@ func (m *Manager) downloadEntry(ctx context.Context, entry *ModelEntry, progress
 	// Final gate before anything leaves staging: verify every installed file
 	// hash inside staging (F3: mirror bytes are never trusted).
 	for _, want := range entry.InstalledFiles() {
-		progress(ProgressEvent{ModelID: entry.ID, Phase: PhaseVerifying, ArtifactCount: count,
-			BytesDone: doneAll, TotalBytes: totalAll, Percent: percentOf(doneAll, totalAll)})
+		progress(ProgressEvent{
+			ModelID: entry.ID, Phase: PhaseVerifying, ArtifactCount: count,
+			BytesDone: doneAll, TotalBytes: totalAll, Percent: percentOf(doneAll, totalAll),
+		})
 		p := filepath.Join(staging, filepath.FromSlash(want.Path))
 		if err := verifyFileHash(p, want.SHA256, want.SizeBytes); err != nil {
 			// A failed verification means staged bytes are wrong: reject+delete.
@@ -277,8 +281,8 @@ func (m *Manager) downloadEntry(ctx context.Context, entry *ModelEntry, progress
 // chain, Range resume and retry/backoff. Returns bytes counted for this
 // artifact (its full size on success).
 func (m *Manager) downloadArtifact(ctx context.Context, entry *ModelEntry, index int, a FileSpec,
-	staging string, progress func(ProgressEvent), doneBefore, totalAll int64) (int64, error) {
-
+	staging string, progress func(ProgressEvent), doneBefore, totalAll int64,
+) (int64, error) {
 	dst := filepath.Join(staging, filepath.FromSlash(a.Path))
 	if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
 		return 0, observeWrap(ClassModel, "create staging subdir", err)
@@ -291,9 +295,11 @@ func (m *Manager) downloadArtifact(ctx context.Context, entry *ModelEntry, index
 	// here: pass = resume skip, fail = reject+delete and refetch.
 	if offset == a.SizeBytes && offset > 0 {
 		if err := verifyFileHash(dst, a.SHA256, a.SizeBytes); err == nil {
-			progress(ProgressEvent{ModelID: entry.ID, Phase: PhaseDownloading, URL: currentCandidateLabel(entry, a),
+			progress(ProgressEvent{
+				ModelID: entry.ID, Phase: PhaseDownloading, URL: currentCandidateLabel(entry, a),
 				ArtifactIndex: index, ArtifactCount: entry.ArtifactCount(),
-				BytesDone: doneBefore + offset, TotalBytes: totalAll, Percent: percentOf(doneBefore+offset, totalAll)})
+				BytesDone: doneBefore + offset, TotalBytes: totalAll, Percent: percentOf(doneBefore+offset, totalAll),
+			})
 			return offset, nil
 		}
 		_ = os.Remove(dst)
@@ -307,9 +313,11 @@ func (m *Manager) downloadArtifact(ctx context.Context, entry *ModelEntry, index
 			if err := ctx.Err(); err != nil {
 				return 0, err
 			}
-			progress(ProgressEvent{ModelID: entry.ID, Phase: PhaseConnecting, URL: cand, Attempt: attempt,
+			progress(ProgressEvent{
+				ModelID: entry.ID, Phase: PhaseConnecting, URL: cand, Attempt: attempt,
 				ArtifactIndex: index, ArtifactCount: entry.ArtifactCount(),
-				BytesDone: doneBefore + offset, TotalBytes: totalAll, Percent: percentOf(doneBefore+offset, totalAll)})
+				BytesDone: doneBefore + offset, TotalBytes: totalAll, Percent: percentOf(doneBefore+offset, totalAll),
+			})
 
 			_, err := m.fetchOne(ctx, cand, dst, &offset, a, entry, index, progress, doneBefore, totalAll)
 			if err == nil {
@@ -336,8 +344,8 @@ func (m *Manager) downloadArtifact(ctx context.Context, entry *ModelEntry, index
 // offset. 206 appends (resume), 200 restarts (server ignored Range), 416 with
 // a complete offset means the file was already fully staged.
 func (m *Manager) fetchOne(ctx context.Context, cand, dst string, offset *int64, a FileSpec,
-	entry *ModelEntry, index int, progress func(ProgressEvent), doneBefore, totalAll int64) (int64, error) {
-
+	entry *ModelEntry, index int, progress func(ProgressEvent), doneBefore, totalAll int64,
+) (int64, error) {
 	wantSize := a.SizeBytes
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, cand, nil)
@@ -401,9 +409,11 @@ func (m *Manager) fetchOne(ctx context.Context, cand, dst string, offset *int64,
 			wn, werr := f.Write(buf[:n])
 			counted += int64(wn)
 			digester.Write(buf[:wn])
-			progress(ProgressEvent{ModelID: entry.ID, Phase: PhaseDownloading, URL: cand,
+			progress(ProgressEvent{
+				ModelID: entry.ID, Phase: PhaseDownloading, URL: cand,
 				ArtifactIndex: index, ArtifactCount: entry.ArtifactCount(),
-				BytesDone: doneBefore + counted, TotalBytes: totalAll, Percent: percentOf(doneBefore+counted, totalAll)})
+				BytesDone: doneBefore + counted, TotalBytes: totalAll, Percent: percentOf(doneBefore+counted, totalAll),
+			})
 			if werr != nil {
 				return 0, observeWrap(ClassModel, "write staging", werr)
 			}

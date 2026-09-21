@@ -30,8 +30,10 @@ func turn(msgs ...llm.Message) *llm.Request {
 		System:           stableSystem(),
 		Messages:         msgs,
 		CacheBreakpoints: []int{-1}, // after System, before the conversation
-		Tools: []llm.ToolDef{{Name: "get_weather", Description: "d",
-			Parameters: json.RawMessage(`{"type":"object"}`)}},
+		Tools: []llm.ToolDef{{
+			Name: "get_weather", Description: "d",
+			Parameters: json.RawMessage(`{"type":"object"}`),
+		}},
 	}
 }
 
@@ -117,11 +119,17 @@ func TestCachedPrefixIsByteStableAcrossTurns(t *testing.T) {
 	// message (time/focus section) appended AFTER the breakpoint.
 	r2 := turn(userMsg("今天天气怎么样"),
 		llm.Message{Role: llm.RoleAssistant, Content: []llm.Content{
-			llm.ToolUsePart{ID: "call_a1", Name: "get_weather",
-				Input: json.RawMessage(`{"city":"Zhuhai"}`)}}},
+			llm.ToolUsePart{
+				ID: "call_a1", Name: "get_weather",
+				Input: json.RawMessage(`{"city":"Zhuhai"}`),
+			},
+		}},
 		llm.Message{Role: llm.RoleTool, Content: []llm.Content{
-			llm.ToolResultPart{ID: "call_a1",
-				Content: []llm.Content{llm.TextPart{Text: "sunny 27C"}}}}},
+			llm.ToolResultPart{
+				ID:      "call_a1",
+				Content: []llm.Content{llm.TextPart{Text: "sunny 27C"}},
+			},
+		}},
 		userMsg("现在几点"))
 	r2.CacheBreakpoints = []int{-1}
 	if _, _, err := adaptertest.Drain(t, a, r2); err != nil {

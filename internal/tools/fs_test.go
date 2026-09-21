@@ -62,8 +62,10 @@ func TestFSReadTaintFeedsR4(t *testing.T) {
 	g := &gateSpy{approveAns: AnswerReject}
 	if err := b.reg.Register(Entry{
 		Tool: &fixtureTool{name: "probe.exfil", params: `{"type":"object"}`},
-		Decl: Decl{Capabilities: []Capability{CapNet}, Needs: []Capability{CapNet},
-			Declared: risk.L0, Provider: KindBuiltin},
+		Decl: Decl{
+			Capabilities: []Capability{CapNet}, Needs: []Capability{CapNet},
+			Declared: risk.L0, Provider: KindBuiltin,
+		},
 	}); err != nil {
 		t.Fatal(err)
 	}

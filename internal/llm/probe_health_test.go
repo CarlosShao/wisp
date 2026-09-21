@@ -63,7 +63,8 @@ func newProbeFixture(t *testing.T) *probeFixture {
 type memoryHealthSink struct{ store *memory.Store }
 
 func (m memoryHealthSink) RecordProbe(ctx context.Context, provider, model string,
-	flags llm.MeasuredFlags, ok bool, latencyMS int64, at time.Time) error {
+	flags llm.MeasuredFlags, ok bool, latencyMS int64, at time.Time,
+) error {
 	return m.store.UpsertProviderProbe(ctx, provider, model, memory.ProbeFlags{
 		Text: flags.Text, Vision: flags.Vision, AudioIn: flags.AudioIn,
 		AudioOut: flags.AudioOut, Thinking: flags.Thinking, FC: flags.FC,
@@ -314,8 +315,10 @@ func TestProbeSuiteBrokenOnAllThreeDialects(t *testing.T) {
 				Capabilities: []llm.ProbeCapability{llm.ProbeFC, llm.ProbeVision},
 			})
 
-			route := map[string]string{"openai-chat": "chat", "anthropic": "messages",
-				"openai-responses": "responses"}[protocol]
+			route := map[string]string{
+				"openai-chat": "chat", "anthropic": "messages",
+				"openai-responses": "responses",
+			}[protocol]
 			if n := pf.requests(t, route); n != 2 {
 				t.Errorf("%s: %s served %d requests, want 2 (both probes really ran)",
 					protocol, route, n)
@@ -442,7 +445,8 @@ func TestProbeSuiteSinkFailurePropagates(t *testing.T) {
 type failingSink struct{ err error }
 
 func (f failingSink) RecordProbe(context.Context, string, string, llm.MeasuredFlags,
-	bool, int64, time.Time) error {
+	bool, int64, time.Time,
+) error {
 	return f.err
 }
 

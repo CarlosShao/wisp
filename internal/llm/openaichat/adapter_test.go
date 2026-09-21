@@ -276,9 +276,11 @@ func TestInfoCacheCapabilityBits(t *testing.T) {
 // ensure the golden fixtures on disk match what the tests expect (guards
 // against fixture drift between the two runners).
 func TestGoldenFixturesExist(t *testing.T) {
-	for _, name := range []string{"tool-call", "max-tokens", "disconnect",
+	for _, name := range []string{
+		"tool-call", "max-tokens", "disconnect",
 		"usage-multichunk", "backoff-429", "provider-500", "unauthorized",
-		"missing-usage", "missing-finish", "long-text"} {
+		"missing-usage", "missing-finish", "long-text",
+	} {
 		if _, err := os.Stat(filepath.Join(goldenDir, name+".sse")); err != nil {
 			t.Errorf("fixture %s missing: %v", name, err)
 		}

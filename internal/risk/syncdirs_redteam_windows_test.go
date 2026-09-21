@@ -71,7 +71,8 @@ func syncSandbox(t *testing.T) (p *Provenance, home, root string) {
 		}
 	}
 	p = NewProvenance(ProvOptions{NoProbe: true, HomeDir: home, SyncRoots: []SyncRoot{
-		{Provider: "OneDrive", Path: root, Source: "registry"}}})
+		{Provider: "OneDrive", Path: root, Source: "registry"},
+	}})
 	if !p.SyncDetectionComplete() {
 		t.Fatal("sanity: the injected registry-grade root must be confirmed (fallback must NOT be what flags these writes)")
 	}

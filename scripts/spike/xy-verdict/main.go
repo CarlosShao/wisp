@@ -134,7 +134,7 @@ func runIdle(kind string, outPath string) {
 	b, _ := json.MarshalIndent(rep, "", "  ")
 	fmt.Println(string(b))
 	if outPath != "" {
-		os.WriteFile(outPath, b, 0644)
+		os.WriteFile(outPath, b, 0o644)
 	}
 }
 
@@ -148,7 +148,7 @@ func runUnload(which, modelsDir string, budgetMs int64, outPath string) {
 		b, _ := json.MarshalIndent(rep, "", "  ")
 		fmt.Println(string(b))
 		if outPath != "" {
-			os.WriteFile(outPath, b, 0644)
+			os.WriteFile(outPath, b, 0o644)
 		}
 	}()
 

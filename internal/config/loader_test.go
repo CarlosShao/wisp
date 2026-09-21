@@ -280,8 +280,10 @@ func TestSaveFileRoundTripsThroughLoad(t *testing.T) {
 	c.App.Theme = "light"
 	c.Ball.Size = 60
 	c.LLM.Providers = map[string]Provider{
-		"deepseek": {Protocol: ProtocolOpenAIChat, BaseURL: "https://api.deepseek.com/v1",
-			APIKeyRef: "env:K", Models: map[string]ModelSpec{"deepseek-chat": {}}},
+		"deepseek": {
+			Protocol: ProtocolOpenAIChat, BaseURL: "https://api.deepseek.com/v1",
+			APIKeyRef: "env:K", Models: map[string]ModelSpec{"deepseek-chat": {}},
+		},
 	}
 	c.Plugins.Entries = map[string]PluginEntry{
 		"clip": {Enabled: true, Capabilities: []string{"clipboard"}},

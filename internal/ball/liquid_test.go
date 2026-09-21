@@ -247,8 +247,10 @@ func TestTransitionTimerSetIsTheFrozenTimerSet(t *testing.T) {
 	if transitionDriven(statemachine.StateSleeping) {
 		t.Fatal("Sleeping must never be transition-driven")
 	}
-	for _, s := range []statemachine.State{statemachine.StateConversation, statemachine.StateArmed,
-		statemachine.StateMuted, statemachine.StateError, statemachine.StateDownloading} {
+	for _, s := range []statemachine.State{
+		statemachine.StateConversation, statemachine.StateArmed,
+		statemachine.StateMuted, statemachine.StateError, statemachine.StateDownloading,
+	} {
 		if transitionDriven(s) {
 			t.Errorf("%s must stay a static frame with no timer", s)
 		}

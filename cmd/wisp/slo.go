@@ -322,7 +322,8 @@ func cmdSLO(args []string) int {
 // hand back its own report, this exits 2 - silently degrading to the old
 // in-tree basis is exactly what the ticket exists to prevent.
 func runOutOfTree(ctx context.Context, rt *proc.Runtime, run *sloRun,
-	state string, seconds float64, interval time.Duration, settleMS int, leak bool) (int, error) {
+	state string, seconds float64, interval time.Duration, settleMS int, leak bool,
+) (int, error) {
 	run.Mode = "state"
 	run.Posture = "skeleton"
 	settleBeforeSample(settleMS)
@@ -370,7 +371,8 @@ func runOutOfTree(ctx context.Context, rt *proc.Runtime, run *sloRun,
 // the same boot, the same settle, then nothing at all, because a product
 // posture that is busy being an instrument measures the instrument.
 func runSubject(ctx context.Context, sampler *observe.Sampler, run *sloRun, state string,
-	seconds float64, interval time.Duration, settleMS int, readyPath string, leak, selfSample bool) (int, error) {
+	seconds float64, interval time.Duration, settleMS int, readyPath string, leak, selfSample bool,
+) (int, error) {
 	run.Mode = "subject"
 	run.Posture = "skeleton"
 	run.SubjectPID = uint32(os.Getpid())

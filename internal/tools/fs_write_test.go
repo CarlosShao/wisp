@@ -680,12 +680,14 @@ func TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop(t *testing.T) {
 
 	bus := newFakeBus()
 	g := &gateSpy{approveAns: AnswerAllow} // cross-volume is L2 -> approval route
-	deps := FSDeps{Paths: NewPathCanonicalizer([]string{mustCanonical(t, root)}, nil),
+	deps := FSDeps{
+		Paths: NewPathCanonicalizer([]string{mustCanonical(t, root)}, nil),
 		Hooks: Hooks{AtStep: func(step string) {
 			if step == "remove-source" {
 				bus.veto("corr-1") // the user's veto arrives after the copy landed
 			}
-		}}}
+		}},
+	}
 	b, _ := fsDepsBridge(t, deps, g)
 	b.cancel = bus
 

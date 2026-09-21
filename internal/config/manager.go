@@ -225,7 +225,8 @@ func (m *Manager) apply(fresh *Config) *Report {
 // -> L2 hook (nil denies); rejected -> keep old values; approved or
 // tighten/neutral -> apply. All directions are logged.
 func (m *Manager) applyLocked(section string, fresh *Config, rep *Report,
-	unchanged func() bool, direction func() (loosen, tighten []string), applyTo func(apply bool)) {
+	unchanged func() bool, direction func() (loosen, tighten []string), applyTo func(apply bool),
+) {
 	if unchanged() {
 		return
 	}

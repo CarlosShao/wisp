@@ -69,7 +69,8 @@ func TestMatrixRow1RetryStaysThinkingAndNoticesAfterFiveSeconds(t *testing.T) {
 	var notices []llm.RetryNotice
 	slept := []time.Duration{}
 
-	inner := &scripted{info: llm.ProviderInfo{Protocol: "scripted"}, attempts: &attempts,
+	inner := &scripted{
+		info: llm.ProviderInfo{Protocol: "scripted"}, attempts: &attempts,
 		onCall: func(n int) ([]llm.StreamEvent, error) {
 			if n < 3 {
 				return failureEvents(observe.ClassProvider, "500"),
@@ -80,7 +81,8 @@ func TestMatrixRow1RetryStaysThinkingAndNoticesAfterFiveSeconds(t *testing.T) {
 				{Type: llm.EvStop, Stop: llm.StopEndTurn},
 				{Type: llm.EvDone},
 			}, nil
-		}}
+		},
+	}
 
 	rp := llm.NewRetrying(inner, llm.RetryOptions{
 		Max: 3, Base: 5 * time.Second, Now: clock.Now, NoticeAfter: 5 * time.Second,
@@ -148,8 +150,10 @@ func TestMatrixRow2ExhaustedIsExplicitErrorNotSilence(t *testing.T) {
 		evs[0].Err.Detail = "HTTP 502 upstream exploded"
 		return evs, evs[0].Err
 	}}
-	rp := llm.NewRetrying(inner, llm.RetryOptions{Max: 3, Base: time.Millisecond,
-		Sleep: func(context.Context, time.Duration) error { return nil }})
+	rp := llm.NewRetrying(inner, llm.RetryOptions{
+		Max: 3, Base: time.Millisecond,
+		Sleep: func(context.Context, time.Duration) error { return nil },
+	})
 
 	events, turn, err := adaptertest.Drain(t, rp, adaptertest.BaseRequest())
 	if err == nil {
@@ -191,8 +195,10 @@ func TestMatrixRow3AuthIsUnconfiguredAndNeverRetried(t *testing.T) {
 		proc.Reset(t)
 		proc.QueueFault(t, adaptertest.Fault{Status: status, Times: 5})
 		rp := llm.NewRetrying(mustProvider(t, "openai-chat", proc.Base+"/v1"),
-			llm.RetryOptions{Max: 3, Base: time.Millisecond,
-				Sleep: func(context.Context, time.Duration) error { return nil }})
+			llm.RetryOptions{
+				Max: 3, Base: time.Millisecond,
+				Sleep: func(context.Context, time.Duration) error { return nil },
+			})
 
 		_, turn, err := adaptertest.Drain(t, rp, adaptertest.BaseRequest())
 		if err == nil {
@@ -219,8 +225,10 @@ func TestMatrixRow3AuthIsUnconfiguredAndNeverRetried(t *testing.T) {
 func TestMatrixRow4QuotaIsAccountNotNetwork(t *testing.T) {
 	proc := adaptertest.StartMockllm(t)
 	proc.Reset(t)
-	proc.QueueFault(t, adaptertest.Fault{Status: 429, Times: 1,
-		Body: `{"error":{"message":"no credits","type":"insufficient_quota","code":"insufficient_quota"}}`})
+	proc.QueueFault(t, adaptertest.Fault{
+		Status: 429, Times: 1,
+		Body: `{"error":{"message":"no credits","type":"insufficient_quota","code":"insufficient_quota"}}`,
+	})
 	_, _, quotaErr := adaptertest.Drain(t,
 		mustProvider(t, "openai-chat", proc.Base+"/v1"), adaptertest.BaseRequest())
 	if adaptertest.ClassOf(quotaErr) != observe.ClassBudget {

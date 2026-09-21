@@ -152,8 +152,10 @@ func TestRealDownloadPuncArchiveThroughPipeline(t *testing.T) {
 		t.Fatal(err)
 	}
 	dir := t.TempDir()
-	mgr, err := NewManager(Options{DataDir: dir, Manifest: m, VerifySignature: true,
-		BackoffBase: 200 * time.Millisecond, Attempts: 3})
+	mgr, err := NewManager(Options{
+		DataDir: dir, Manifest: m, VerifySignature: true,
+		BackoffBase: 200 * time.Millisecond, Attempts: 3,
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -175,8 +177,10 @@ func TestP3BlockedModelRefused(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	mgr, err := NewManager(Options{DataDir: t.TempDir(), Manifest: m, VerifySignature: true,
-		HTTPClient: &http.Client{Transport: panicTransport{}}})
+	mgr, err := NewManager(Options{
+		DataDir: t.TempDir(), Manifest: m, VerifySignature: true,
+		HTTPClient: &http.Client{Transport: panicTransport{}},
+	})
 	if err != nil {
 		t.Fatal(err)
 	}

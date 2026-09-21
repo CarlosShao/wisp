@@ -143,8 +143,10 @@ func enumerateBallWindows() []struct {
 		pGetWindowThreadProcessID.Call(hwnd, uintptr(unsafe.Pointer(&pid)))
 		tb := make([]uint16, 128)
 		n, _, _ := pGetWindowTextW.Call(hwnd, uintptr(unsafe.Pointer(&tb[0])), uintptr(len(tb)))
-		out = append(out, hit{hwnd: windows.HWND(hwnd), pid: pid,
-			title: windows.UTF16ToString(tb[:n])})
+		out = append(out, hit{
+			hwnd: windows.HWND(hwnd), pid: pid,
+			title: windows.UTF16ToString(tb[:n]),
+		})
 		return 1
 	})
 	pEnumWindows.Call(cb, 0)

@@ -344,9 +344,11 @@ func (rt *agentRuntime) execute(task string) int {
 	if rt.store != nil {
 		c, cancel2 := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel2()
-		tl := memory.TaskLog{ID: res.TaskID, State: state, QueryText: task,
+		tl := memory.TaskLog{
+			ID: res.TaskID, State: state, QueryText: task,
 			CostTokensIn: int64(res.Usage.InputTokens), CostTokensOut: int64(res.Usage.OutputTokens),
-			CostAmountMicro: res.CostMicros, Currency: res.Currency, ErrorClass: class}
+			CostAmountMicro: res.CostMicros, Currency: res.Currency, ErrorClass: class,
+		}
 		if err := rt.store.StartTaskLog(c, tl); err != nil {
 			rt.auditf("wisp run: task_log open failed: %v", err)
 		}
@@ -392,7 +394,8 @@ func (rt *agentRuntime) execute(task string) int {
 type storeHealthSink struct{ store *memory.Store }
 
 func (m storeHealthSink) RecordProbe(ctx context.Context, provider, model string,
-	flags llm.MeasuredFlags, ok bool, latencyMS int64, at time.Time) error {
+	flags llm.MeasuredFlags, ok bool, latencyMS int64, at time.Time,
+) error {
 	return m.store.UpsertProviderProbe(ctx, provider, model, memory.ProbeFlags{
 		Text: flags.Text, Vision: flags.Vision, AudioIn: flags.AudioIn,
 		AudioOut: flags.AudioOut, Thinking: flags.Thinking, FC: flags.FC,

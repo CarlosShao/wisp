@@ -66,17 +66,20 @@ func newChain(t *testing.T) *chainFixture {
 		t.Fatalf("chain elements = %d, want 2", len(providers))
 	}
 	cf.names = names
-	cf.runner = &llm.ChainRunner{Elements: providers, Names: names,
+	cf.runner = &llm.ChainRunner{
+		Elements: providers, Names: names,
 		OnFailover: func(ev llm.FailoverEvent) {
 			cf.failovers = append(cf.failovers, ev)
-		}}
+		},
+	}
 	return cf
 }
 
 func chainRequest() *llm.Request {
 	return &llm.Request{Model: "mock-small", Messages: []llm.Message{{
 		Role:    llm.RoleUser,
-		Content: []llm.Content{llm.TextPart{Text: "chain probe"}}}}}
+		Content: []llm.Content{llm.TextPart{Text: "chain probe"}},
+	}}}
 }
 
 // TestFailoverAfterPrimaryExhaustion is the headline AC#4 case.

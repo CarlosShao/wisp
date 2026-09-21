@@ -111,8 +111,10 @@ func runProbes() []probe {
 			return "OK";
 		})()
 	`
-	p2 := probe{Name: "es2017-async/await+promise.all+catch",
-		Note: "native microtask draining; no host timers inside goja (setTimeout absent by design)"}
+	p2 := probe{
+		Name: "es2017-async/await+promise.all+catch",
+		Note: "native microtask draining; no host timers inside goja (setTimeout absent by design)",
+	}
 	val, err := vm.RunString(asyncScript)
 	if err != nil {
 		p2.Error = err.Error()
@@ -314,6 +316,6 @@ func main() {
 	b, _ := json.MarshalIndent(res, "", "  ")
 	fmt.Println(string(b))
 	if *out != "" {
-		os.WriteFile(*out, b, 0644)
+		os.WriteFile(*out, b, 0o644)
 	}
 }

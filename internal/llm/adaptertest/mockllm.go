@@ -325,8 +325,10 @@ func RunFaultSuite(t *testing.T, u Unit, fs FaultSuite) {
 		// the echo text rather than pass silently.
 		proc.Control(t, "/__control/reset", "{}")
 		req := BaseRequest()
-		req.Messages = []llm.Message{{Role: llm.RoleUser,
-			Content: []llm.Content{llm.TextPart{Text: "ping-ticket11"}}}}
+		req.Messages = []llm.Message{{
+			Role:    llm.RoleUser,
+			Content: []llm.Content{llm.TextPart{Text: "ping-ticket11"}},
+		}}
 		_, turn, err := Drain(t, newProvider(Options{}), req)
 		if err != nil {
 			t.Fatalf("mockllm rejected the adapter request: %v (turn=%+v)", err, turn)

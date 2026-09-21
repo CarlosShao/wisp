@@ -156,8 +156,10 @@ var remoteSinkSuffixes = []string{"url", "uri", "endpoint", "webhook", "href"}
 // remoteSinkSchemes identify a remote sink by VALUE, so renaming the key cannot
 // close the gate either: a parameter whose text is an address means content in
 // the same call can leave the machine.
-var remoteSinkSchemes = []string{"http://", "https://", "ftp://", "ftps://", "sftp://",
-	"ws://", "wss://", "s3://", "webdav://", "dav://", "file://", "mailto:"}
+var remoteSinkSchemes = []string{
+	"http://", "https://", "ftp://", "ftps://", "sftp://",
+	"ws://", "wss://", "s3://", "webdav://", "dav://", "file://", "mailto:",
+}
 
 // contract defaults for the scanning budgets (overridable via ProvOptions;
 // zero/negative means "use the default", never "scan nothing").
@@ -412,8 +414,10 @@ func (p *Provenance) ScopeTaints(scopeID string) []TaintInfo {
 	defer p.mu.RUnlock()
 	var out []TaintInfo
 	for _, m := range p.scopes[scopeID] {
-		out = append(out, TaintInfo{ScopeID: scopeID, Tool: m.tool, Origin: m.origin,
-			RuneLen: m.idx.nrunes, MarkedAt: m.at})
+		out = append(out, TaintInfo{
+			ScopeID: scopeID, Tool: m.tool, Origin: m.origin,
+			RuneLen: m.idx.nrunes, MarkedAt: m.at,
+		})
 	}
 	return out
 }
@@ -468,8 +472,10 @@ func (p *Provenance) scopeMarks(scopeID string) ([]*taintMark, bool) {
 func (p *Provenance) Inspect(scopeID, tool string, params map[string]any) (Hit, bool) {
 	marks, unbound := p.scopeMarks(scopeID)
 	if unbound {
-		return Hit{ScopeID: scopeID, Channel: ChUnknown, SrcTool: SrcUnboundScope,
-			Origin: "scope is not open (OpenScope missing or already closed)"}, true
+		return Hit{
+			ScopeID: scopeID, Channel: ChUnknown, SrcTool: SrcUnboundScope,
+			Origin: "scope is not open (OpenScope missing or already closed)",
+		}, true
 	}
 	if len(marks) == 0 {
 		return Hit{}, false
@@ -551,8 +557,10 @@ func (p *Provenance) Inspect(scopeID, tool string, params map[string]any) (Hit, 
 		// JSON nests for free, so an unscanned tail is treated as tainted
 		// rather than silently passed.
 		logf("risk/C25: params of tool %q nest deeper than MaxParamDepth=%d; tail unscanned, fail-closed R4", tool, p.maxDepth)
-		return Hit{ScopeID: scopeID, Channel: ChUnknown, SrcTool: SrcUnscannedNesting,
-			Origin: fmt.Sprintf("parameters nested deeper than %d levels", p.maxDepth)}, true
+		return Hit{
+			ScopeID: scopeID, Channel: ChUnknown, SrcTool: SrcUnscannedNesting,
+			Origin: fmt.Sprintf("parameters nested deeper than %d levels", p.maxDepth),
+		}, true
 	}
 	return Hit{}, false
 }
@@ -565,8 +573,10 @@ func (p *Provenance) Inspect(scopeID, tool string, params map[string]any) (Hit, 
 func (p *Provenance) CheckText(scopeID string, ch Channel, text string) (Hit, bool) {
 	marks, unbound := p.scopeMarks(scopeID)
 	if unbound {
-		return Hit{ScopeID: scopeID, Channel: ch, SrcTool: SrcUnboundScope,
-			Origin: "scope is not open (OpenScope missing or already closed)"}, true
+		return Hit{
+			ScopeID: scopeID, Channel: ch, SrcTool: SrcUnboundScope,
+			Origin: "scope is not open (OpenScope missing or already closed)",
+		}, true
 	}
 	if len(marks) == 0 {
 		return Hit{}, false

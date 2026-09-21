@@ -625,8 +625,10 @@ func (r *renderer) arc(c d2d1Point2F, radius float32, startDeg, endDeg, width fl
 
 func (r *renderer) pointOn(c d2d1Point2F, radius, deg float32) d2d1Point2F {
 	rad := deg * float32(math.Pi) / 180
-	return d2d1Point2F{c.x + radius*float32(math.Cos(float64(rad))),
-		c.y + radius*float32(math.Sin(float64(rad)))}
+	return d2d1Point2F{
+		c.x + radius*float32(math.Cos(float64(rad))),
+		c.y + radius*float32(math.Sin(float64(rad))),
+	}
 }
 
 // line: DrawLine takes D2D1_POINT_2F BY VALUE - two floats packed into one
