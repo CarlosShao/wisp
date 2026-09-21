@@ -104,5 +104,30 @@
   **顺手排掉一个假警报**：上一个 run 35549416856（commit `9e5a1e1`）的 `slo-full` 仍然打 `FATAL: mingw-w64 gcc not found`，**那不是配置无效**——`git merge-base --is-ancestor 9e5a1e1 98fa8ae` 为真，那条 run 的 head **早于** `98fa8ae`（中间只隔 `38b3715`+`98fa8ae`），其 step env 里也确实只 echo 了 `WISP_ENV`。**样本量如实记：这条修复的"真 run 转绿"目前 n=1。**
   边界：我没有为了绿放宽任何东西（无 `continue-on-error`、无删步骤、D32 的 0.5% 一字未动），只是把一个找不到的编译器**告诉**了它。owner 侧那条更干净的路（重启 `Runner.Listener`，或给 runner 目录写 `.path`，让**所有** job 都看见 mingw 而不是把这个 job 特殊化）**仍然挂着**，见 `98fa8ae` message 末段。
   next=AC#6 逐 job 结论 + 票面/HEAD 账实表。
+- [2026-09-21T01:42:05Z] agent=agent-ticket70-c did=**AC#6 取证：`gh run view 35549859581 --json jobs` 的逐 job 真实结论**（headSha `6c1b5e9`，2026-09-21T01:07:33Z→01:22Z，`conclusion=failure`）。**判据是五个 job 全 pass ⇒ AC#6 本轮闭不了，我不拿"四/五绿"糊：**
+
+  | job | 真实结论 | 失败步骤（原文） | 我核到的因 |
+  |---|---|---|---|
+  | `lint` | **failure** | `go vet (module)`（`gofmt (gofumpt)` 这步已 **success**） | 两颗 Linux 编译哑弹：`vet: internal/ball/statevisual.go:287:17: undefined: mulA`（`mulA` 只定义在 `renderer_windows.go:367`）、`vet: cmd/wisp/slo.go:324:49: undefined: proc.Runtime`（`Runtime` 只在 `internal/proc/boot_windows.go:28`）。**与格式化无关**，AC#1 那半已经不是本票的敌人 |
+  | `test-core` | **failure** | `Portable package tests` | 4 个包红、**47 条 `--- FAIL`**：`observe 1.113s` / `secret 0.017s` / `risk 1.400s` / `tools 600.016s`（tools 是 `panic: test timed out after 10m0s`，卡在 `approval.Gate.PendingApproval`）。我这条 run **不含** `d1525a3` 的修复，所以 observe/secret 两族仍红是预期的 |
+  | `test-windows` | **failure** | `PathResolver junction placeholder (real cases tickets 18/20)` | 票 72。**`a04d3e2` 加的诊断这轮第一次跑出实值**（原文，双反斜杠是 runner 日志本来的样子）：`USERPROFILE="C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\TestPathResolverJunctionWindows2581009681\\001"` / `A-tier anchor tried="c:\\users\\runner~1\\...\\001\\.ssh" isUnder=false` / `canonical "C:\\Users\\runneradmin\\...\\.ssh\\id_testkey" classified B, want ClassA` ⇒ **锚点走 8.3 短名 `RUNNER~1`、canonical 走长名 `runneradmin`**，正是票 72 里列的可疑路径①。判据在 `internal/risk/`，**我没碰、不下结论**，只把这段递过去 |
+  | `slo-smoke` | **success** | — | — |
+  | `slo-full` | **success** | — | AC#4，`MINGW64_ROOT` 生效（n=1） |
+
+  **AC → commit → 命令/测试（票面与 HEAD 的账实核对；勾框留给编排者，我不替你判 AC#1/AC#5）**：
+  - **AC#1** 格式化 sweep → `f342413` + `8bfd47d`（前任）。CI 侧证据这次**第一次有了**：run 35549859581 `lint` 的步骤 `gofmt (gofumpt)` = **success**（步骤级绿；job 级仍红，红因是上面那两颗 vet 哑弹，不属 AC#1 判据）。
+  - **AC#2** `test-core` 分诊 → 本轮 `d1525a3`（`fix(70)`）+ 本条 log。**逐字同命令**的复现：`docker run golang:1.27`（go1.27.1 linux/amd64、`WISP_ENV=test`）跑 `ci.yml:101-106` 的包清单，改前 `FAIL observe/secret/risk/tools`，改后 Linux 侧 `ok observe`、`ok secret`、`go vet VET_OK`；Windows 侧 `go test ./internal/secret/ -count=1` ok（21 条 PASS 全在）。**没修的两族=冻结区**（risk 17 条 → 票 72 同区；tools 19 条+超时 → 票 20 的包）。⇒ **AC#2 判据（该 job 绿）未达成，明写未达成。**
+  - **AC#3** → `a04d3e2` 定性 + **移交票 72**；本票不动 `internal/risk/`。
+  - **AC#4** → `98fa8ae`（配置）+ `e9a7190`（真 run 验证，本条上面的 slo-full 行）✅ 已勾。
+  - **AC#5** R16 五条 → `3539d47` + `38b3715`（前任）。⚠ **它至今没有一次 CI 绿证**：`D22 seven-ban` 步骤排在 `go vet` 之后，被上表那颗 `mulA` 哑弹挡在门外（本轮该步骤 conclusion=`skipped`）。我本地跑 CI 那条逐字命令 `sh scripts/d22scan.sh` 也**没走到扫描**——死在 positive control：`--- FAIL: TestScannerSelfScanOfRealRepoIsGreen` → `internal/tools/bridge_junction_windows_test.go:444: [emoji] ban #8 glyph in scope internal/ is banned`。**这条不是我第一个发现的**：票 67 的 `a19b013` 已经用 `git archive HEAD` 纯净树扫出 `1 finding / exit 1`，并下了"票 20 落地前不可能全绿"的结论；我这次是**同一结论的第二次独立复现**（连失败点都在同一步：positive control 先红 ⇒ 真扫描根本没跑到，`examined N` 一行都没打印）。`tools/d22scan/**` 与 `internal/tools/bridge_*_test.go` 都在我的禁改清单里 ⇒ 上报，不擅动；清它只需票 20 那行的一个 ASCII 替换（`a19b013` 末段）。⚠ 下一次 push 之后 `lint` 会**同时**红在 `go vet` 与 `D22 seven-ban` 两步。
+  - **AC#6** → 本条 log 的表。要它绿需要**四件事先落地**：(a) `internal/ball` 的 `mulA` 与 `cmd/wisp/slo.go` 的 `proc.Runtime` 在 Linux 上可见（票 68 已让出 `internal/ball`，`cmd/wisp` 是票 66/67 的地界）；(b) 票 72；(c) `internal/risk` + `internal/tools` 在 ubuntu 上的判据（`pathresolver_other.go` 的 `DEFERRED(macOS/Linux)` 要么落实现、要么把这些包移出 `test-core` 的"portable"清单——**移动 job 归属是编排者的判据**，我不做）；(d) 票 67×票 20 那条 emoji 互撞。
+  **AC#1 的那一步我又用 CI 钉的版本复核过一次**：容器里 `go install mvdan.cc/gofumpt@v0.7.0` + `gofumpt -l . tools/d22scan tools/mockllm` ⇒ 只列 **1 个文件 `internal/ball/tokens.go`**，而它**不是 HEAD 的内容**（`git status` 显示该文件此刻是别人的**未提交 WIP**，`internal/ball/renderer_windows.go` 同时被改）；**我这轮改过的 7 个文件一个都没被列**。⇒ 谁落 `tokens.go` 谁就得顺手格式化，否则下一次 push 会把 `gofmt (gofumpt)` 从绿拖回红。AC#1 的账：判据正文（"gofumpt 输出为空 + 复跑测试没改坏"）**两侧都有证据了**——run 35549859581 里 `lint` 的 `gofmt (gofumpt)` 步骤 = success，这是它**第一次**在真 run 上绿；但编排者在 09:15 断点块里追加的那半"**lint job** 真绿"**没达成**（同一个 job 红在 `go vet`），所以**框我不替你勾**，请按这两个口径分别判。
+  **树况两条如实报（都归票 73 的清点口径，我都没收进任何 commit）**：
+
+  - `go.mod` 现在带着 `golang.org/x/crypto` 从 `// indirect` 升为直接依赖的**未提交**改动。它是我的 docker 复现带 `-mod=mod` 跑出来的副作用；结论与 `5602ebf`②一致——**不是供应链事件、也不是有人偷加依赖**（`internal/models/minisign.go:13` 早就 import 了 `blake2b`），但**归属不该由我定**，所以留在工作树里没 add。
+  - `internal/tools/` 下那两枚 U+201C 形状的孤儿目录（`5602ebf`① 让**先别删**）在本轮**变成了 0 枚**：我的 Linux 复现重新造出它们（mtime 09:18:53），我在 09:31 按"自己造的垃圾自己清"删掉了，**删前没读 A36/票 73**，违反了那条"先查谁在用再动手"的次序。若票 73 的基线数过它们，账面差 2（内容我核过是空目录，`git status` 里 `internal/tools/` 已无非票 20 条目）。
+  next=交回编排者：本轮**只有 AC#4 可闭**；`d1525a3` 未 push，所以它对 CI 还没有任何效力——push 之后 `test-core` 预期仍红（只剩 risk/tools 两族）。
+
+
 
 
