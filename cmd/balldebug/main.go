@@ -30,6 +30,22 @@ import (
 	"github.com/CarlosShao/wisp/internal/statemachine"
 )
 
+// Roster names for this harness's own goroutines (D38b).
+//
+// They are deliberately NOT borrowed from the product roster: R16#5 forbids
+// reusing an existing roster name to slip past the leak check, and borrowing
+// "hotkey-listener" or "asr-infer" would make these three debug goroutines
+// look like accounted-for residents. They are not - they are balldebug's, and
+// the honest consequence is one "goroutine outside the D38 roster" WARN per
+// spawn plus an entry in RosterReport.Unknown. Suppressing that WARN needs a
+// TemporaryNames entry in internal/observe/goroutine.go, which is ticket 66's
+// file (and ticket 67's mockllm loose end); it is NOT this ticket's call, so
+// the noise stays and the leak check keeps its sight on these sites.
+const (
+	goroutineHotkeyBridge = "balldebug-hotkey-bridge"
+	goroutineLevelFeeder  = "balldebug-level-feeder"
+)
+
 // allStates is the D43 state order used by the visual cycle (boot -> idle ->
 // session -> failure helpers), matching SPEC-08 §2.1 table order.
 var allStates = []statemachine.State{
@@ -163,7 +179,7 @@ func main() {
 		errs []error
 		// Hotkey bridge teardown (only set with -config): cancel, then join.
 		stopBridge func()
-		joinBridge chan struct{}
+		joinBridge <-chan struct{}
 	)
 
 	// Tray Exit and Ctrl+C both land here; the teardown is common.
@@ -226,13 +242,16 @@ func main() {
 		})
 		bridge.Refresh = func() error { _, err := mgr.CheckAndReload(); return err }
 		mgr.OnReload = bridge.OnReload()
-		pollCtx, stopPoll := context.WithCancel(context.Background())
-		// runHotkeyBridge is panic-isolated and returns when ctx is cancelled;
-		// the join below keeps the harness free of leaked goroutines (main owns
-		// the goroutine, so stopBridge+joinBridge are its roster entry).
-		pollDone := make(chan struct{})
-		go runHotkeyBridge(bridge, pollCtx, time.Second, pollDone)
-		stopBridge, joinBridge = stopPoll, pollDone
+		// The bridge runs on the registry (R16#2): Registry.Spawn gives it the
+		// shared recover boundary (D37b) and a roster-visible lifetime, so
+		// main's join below is checked by the leak detector instead of only by
+		// a reviewer's eye. bridge.Run returns when the root ctx is cancelled,
+		// so the join cannot hang.
+		bridgeRoot := observe.NewRoot(goroutineHotkeyBridge)
+		bridgeHandle := observe.Default.Spawn(goroutineHotkeyBridge, "balldebug", bridgeRoot, func(ctx context.Context) {
+			bridge.Run(ctx, time.Second)
+		})
+		stopBridge, joinBridge = bridgeRoot.Cancel, bridgeHandle.Done()
 		fmt.Printf("balldebug: hotkey bridge polling %s\n", *configPath)
 	}
 	if *posX >= 0 && *posY >= 0 {
@@ -256,13 +275,7 @@ func main() {
 	// the ball (SetAudioLevel is the project's single render-side audio seam,
 	// C25). The feeder is owned by main and joined before teardown. In -tour
 	// the walk feeds each step on its own, so the quiet steps really are quiet.
-	feedStop := make(chan struct{})
-	feedDone := make(chan struct{})
-	if *level > 0 && !*tour {
-		go feedLevels(b, float32(*level), feedStop, feedDone)
-	} else {
-		close(feedDone)
-	}
+	feedRoot, feedHandle := spawnLevelFeeder(b, float32(*level), *level > 0 && !*tour)
 
 	dwell := time.Duration(*cycleMs) * time.Millisecond
 
@@ -322,8 +335,10 @@ func main() {
 
 	// Stop feeding before the zero-timer assertions so no posted level task
 	// interleaves with the final state switch.
-	close(feedStop)
-	<-feedDone
+	if feedHandle != nil {
+		feedRoot.Cancel()
+		<-feedHandle.Done()
+	}
 
 	// Stop polling the config before the final assertions: a rebind mid-flight
 	// would unregister/re-register under the zero-timer check below.
@@ -380,15 +395,13 @@ func writeStatus(path string, s statemachine.State, timers bool) {
 
 // feedLevels pushes a syllabified synthetic envelope into Ball.SetAudioLevel
 // (the render-side audio seam) at the capture cadence, so the liquid has a
-// voice to follow. Owned by main: it returns when stop closes, and reports
-// through done. A panic here must never take the harness down with it.
-func feedLevels(b *ball.Ball, amp float32, stop <-chan struct{}, done chan<- struct{}) {
-	defer close(done)
-	defer func() {
-		if r := recover(); r != nil {
-			slog.Error("balldebug: level feeder panicked", "panic", r)
-		}
-	}()
+// voice to follow. Owned by main: it returns when stop closes.
+//
+// It runs under observe.Registry.Spawn (R16#2), which owns the recover
+// boundary - there is deliberately no recover() in here, because one would
+// turn a panic into a clean exit and the registry would report nothing. The
+// caller joins and reads Handle.Err() instead.
+func feedLevels(b *ball.Ball, amp float32, stop <-chan struct{}) {
 	tk := time.NewTicker(33 * time.Millisecond) // ~30fps, the model's cap
 	defer tk.Stop()
 	var n int
@@ -405,6 +418,21 @@ func feedLevels(b *ball.Ball, amp float32, stop <-chan struct{}, done chan<- str
 			b.SetAudioLevel(v)
 		}
 	}
+}
+
+// spawnLevelFeeder starts the envelope feeder on the registry and hands back
+// the root + handle its owner needs in order to cancel and join it (R16#2).
+// When on is false nothing starts and both returns are nil, so the caller
+// skips the join - the -level-0 path must not leave anything on the roster.
+func spawnLevelFeeder(b *ball.Ball, amp float32, on bool) (*observe.Root, *observe.Handle) {
+	if !on {
+		return nil, nil
+	}
+	root := observe.NewRoot(goroutineLevelFeeder)
+	h := observe.Default.Spawn(goroutineLevelFeeder, "balldebug", root, func(ctx context.Context) {
+		feedLevels(b, amp, ctx.Done())
+	})
+	return root, h
 }
 
 // runTour is the owner-facing walkthrough for ticket 62 sign-off: one run, one
@@ -437,13 +465,15 @@ func runTour(b *ball.Ball, dwell time.Duration, level float32, exit chan string)
 			tag, b.DebugTimersAlive(), edgeLabel(e), p, owns, handleCount())
 	}
 	// feed runs the synthetic envelope for one step, owned and joined here.
+	// A panic inside feedLevels is recovered by the registry and reported
+	// through its sink (defaultPanicSink -> slog), which is exactly what this
+	// goroutine's own recover did before R16#2 moved it onto Spawn - so there
+	// is no second report here, and no lost one either.
 	feed := func(d time.Duration) {
-		stop := make(chan struct{})
-		done := make(chan struct{})
-		go feedLevels(b, amp, stop, done)
+		root, h := spawnLevelFeeder(b, amp, true)
 		time.Sleep(d)
-		close(stop)
-		<-done
+		root.Cancel()
+		<-h.Done()
 		b.SetAudioLevel(0)
 	}
 
@@ -626,16 +656,8 @@ func hotkeySummary(b *ball.Ball) string {
 	return strings.Join(lines, "\n  ")
 }
 
-// runHotkeyBridge is the -config poll goroutine's body. main owns it (cancel
-// through the stop func, join through done) and a panic in one tick is reported
-// instead of taking the harness down; HotkeyReloader.Run returns when ctx is
-// cancelled, so the join cannot hang.
-func runHotkeyBridge(r *ball.HotkeyReloader, ctx context.Context, every time.Duration, done chan<- struct{}) {
-	defer close(done)
-	defer func() {
-		if rec := recover(); rec != nil {
-			slog.Error("balldebug: hotkey bridge panicked; hotkeys unchanged", "panic", rec)
-		}
-	}()
-	r.Run(ctx, every)
-}
+// runHotkeyBridge was the -config poll goroutine's body until R16#2 moved the
+// spawn onto observe.Registry.Spawn: the bridge's panic isolation and join are
+// now the registry's (D37b/D38b), so the harness has no private `go` statement
+// left. What remains of it is the one-line `bridge.Run(ctx, every)` inside the
+// Spawn callback above.
