@@ -101,6 +101,15 @@ func TestPathResolverJunctionWindows(t *testing.T) {
 		t.Fatalf("exempted junction should pass reparse gate: %v", rerr)
 	}
 	if got := Classify(res.Canonical); got != ClassA {
+		// Print the anchors, not just the verdict: this case passes on a dev
+		// box and fails on the windows-latest runner, and the only way to tell
+		// "USERPROFILE did not take" from "Resolve returned a different
+		// spelling" is to see what the A-tier rule actually compared against.
+		// Strictly additive - the assertion below is unchanged.
+		home := normDir(userHomeDir())
+		t.Errorf("USERPROFILE=%q HOME=%q -> userHomeDir()=%q", os.Getenv("USERPROFILE"), os.Getenv("HOME"), home)
+		t.Errorf("A-tier anchor tried=%q isUnder=%v (the rule that must fire is ~/.ssh/**)",
+			home+`\.ssh`, isUnder(normPath(res.Canonical), home+`\.ssh`))
 		t.Fatalf("canonical %q classified %v, want ClassA (defense in depth)", res.Canonical, got)
 	}
 	if d := gateFor(t, res.Canonical); d.Allow {
