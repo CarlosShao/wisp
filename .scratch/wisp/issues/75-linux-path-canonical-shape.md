@@ -1,6 +1,8 @@
 # 75 — Path canonicalization emits Windows-shaped (backslash) paths on Linux, so `internal/tools` is 19 FAIL + a 600 s timeout in `test-core`
 
-**Status:** ready-for-agent, **派发被两张票压住（我建票时把这条写错了，现在更正）**
+**Status:** in-progress（票 72 已落地 `f1033e1` ⇒ 派发条件满足；开工即测量）
+**Claimed by:** implementer agent（2026-09-21 10:2x）
+**Evidence:** `docs/evidence/s1/75-rootcause-linux-path-shape.md`（根因 file:line + AC#1 docker 基线 + AC#4 提案）
 **Type:** portability defect (CI-blocking)
 **Blocks:** ticket 70 AC#2 (`test-core`)
 **Blocked by（原文是"票 73"，那是错的）**：**票 72** 才是真冲突——它此刻正在 `internal/risk/` 里改
@@ -53,3 +55,16 @@ reading you implemented and **why, in the commit message**.
 - If a widened gate's coverage now catches existing violations, **fix them in the same batch**
   (A40⑤: the emoji-gate widening left `HEAD` red in `lint` for ~13 min for exactly one `U+26A0`).
 - First checkpoint commit within your first 15 tool calls; sync Status + boxes + `next=` every commit.
+
+## Progress
+
+- 2026-09-21 10:2x 开工。票 72 已 `f1033e1` 落地 ⇒ 派发条件满足。
+  只读代理的 `docs/evidence/s1/75-rootcause-linux-path-shape.md` **不存在**，根因自己定位：
+  `internal/risk/pathresolver.go:139` 的 `normalizeLocalUNC` 第一行无条件
+  `strings.ReplaceAll(p, "/", "\\")`，配合 `pathresolver.go:62` 的 `lexCanonical`
+  在 Linux 上把 `/home/u/x` 变成 `<cwd>/\home\u\x` —— 一个 OS 根本开不了的字符串。
+  Windows 上 `filepath.Clean` 本来就把 `/` 折成 `\`，故该行在 Windows 恒等 = 所有本地门绿。
+- 基线测量已在 docker `golang:1.27` 用逐字 CI 命令跑起来（`git archive HEAD` 干净快照，
+  共树有票 76 在途代理，未跑任何整仓门）。
+- next= 等 docker 基线跑完补齐 AC#1 三个读数 → 落修复（`pathresolver.go` 单独一个 commit
+  以便 owner 一键退回"只交提案"的读数）→ Windows `-count=2` 半边门 → 勾框。
