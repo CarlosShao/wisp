@@ -1,6 +1,6 @@
 # 87 — L2 卡片上的"提前拒绝"找不到条目 ⇒ 人想拒也拒不掉，只能干等满 300 秒（票 84 的副产品，**不是安全洞**）
 
-**Status:** open
+**Status:** in-progress（AC#1 只读部分已查完并找到实例，正在做 AC#2 的码与用例）
 **Type:** 可用性缺陷（安全侧已经是 fail-closed，坏的是"人无法提前结束"）
 **Blocks:** nothing · **Blocked by:** nothing（`internal/agent/approval/` 与 `internal/panel/` 此刻无人写）
 **Packages:** `internal/agent/approval/`（`Gate.Veto` 与它的键匹配）、`internal/panel/`（卡片回传路径）、
@@ -24,7 +24,7 @@
 
 ## 先查后修（AC#1 是只读）
 
-- [ ] **AC#1** 把"卡片显示 ↔ 门里的条目"这条键链画出来：卡片上带的关联标识是什么形状、
+- [x] **AC#1** 把"卡片显示 ↔ 门里的条目"这条键链画出来：卡片上带的关联标识是什么形状、
       谁生成、`Veto`/`Allow`/`Reject` 各自按什么查（**逐处给 file:line**）。
       然后**列出所有能让"卡片在显示、门里查不到"成立的路径**（例如队列被 LRU 挤掉、批次尺寸裁剪、
       重启后重建卡片、面板与宿主两套键）。**查不到实例就如实写"没找到"** ⇒ 本票降级为文档说明并关闭。
@@ -52,4 +52,58 @@ Git Bash 里挂容器路径要 `MSYS_NO_PATHCONV=1`；四种假绿逐跑点名�
 
 ## Progress log（append-only）
 
-（空）
+### 2026-09-21 · 票 87 代理 · AC#1 只读结论：**找到实例**（不是"没找到"）
+
+**键链（谁生成 → 什么形状 → 各答复按什么查）**
+
+1. 标识生成（三层，逐处）：
+   - 桥：`internal/tools/bridge.go:219-220` `req.CorrelationID == ""` 就填 `req.TaskID`；`bridge.go:279` 放进
+     `Decision.CorrelationID`。文本循环：`internal/agent/loop.go:644` `CorrelationID: taskID` ⇒ 生产形状是
+     **corr == taskID**（字符串相同，不是同一概念相同）。
+   - 队列再签发：`internal/agent/approval/queue.go:126-152 push()` —— 键 `corr := d.CorrelationID`（133），
+     空则 `"approval-"+seq`（135），撞车则 `fmt.Sprintf("%s#%d", d.CorrelationID, q.seq)`（138）；
+     存 `it.Corr`（141）与 `q.byID[corr] = it`（148）。形状：任意调用方字符串，或 `approval-<n>`，或 `<corr>#<seq>`。
+   - 卡片带的是**队列的键**：`gate.go:446 corr := it.Corr` → `gate.go:452 d.CorrelationID = corr` →
+     `gate.go:464 promptFor(d, corr, …)` → `Prompt.CorrelationID = corr`（`gate.go:528`）。
+     面板视图同名：`PanelItem.CorrelationID = it.Corr`（`queue.go:325`）。
+   - **同一次调用里存在第二套键**：D31 记账用 `incoming := orDefaultText(d.CorrelationID, d.TaskID)`
+     （`gate.go:451`，注释 447-450 自认"两个不是同一个字符串一旦队列重签发过"），`markStarted(incoming, …)`
+     （`gate.go:482`）；桥的取消总线同样用进入时的键（`bridge.go:397/399/463/519`）。
+2. 各答复按什么查：
+   - `Native().Allow` → `gate.go:561` → `queue.go:231 q.byID[corr]` + grant 绑定摘要（`queue.go:240`、`approval.go:253-261`）。
+   - `Native().Reject` → `gate.go:564` → `queue.go:268 byID`；`Panel().Reject` → `gate.go:568` → 同上；
+     `Panel().View/Head` → `queue.go:316/338`。`DecideFromNative/DecideFromPanel` → `gate.go:595/593/614` → 同上。
+   - `Gate.Veto`（按键/悬浮球/Esc/KWS 那条）→ **只查 `g.windows[v.CorrelationID]`（`gate.go:372`）和
+     `g.running`（`gate.go:390`）**；L1 窗口表的键是 `orDefaultText(d.CorrelationID, d.TaskID)`
+     （`gate.go:247-249`）。**`Veto` 全程没有一行去查 `g.q`。**
+
+**能让"卡片在显示、门里查无此项"成立的实例（逐条判）**
+
+- **实例 1（成立，主因）**：L2 路线 `PendingApproval` **从不 `openWindow`**（`gate.go:432-513` 里没有任何
+  `openWindow` 调用），所以卡片正显示时 `Veto` 即使在**正确的 `it.Corr`** 上也走 `gate.go:407`
+  返回 `ErrUnknownCorrelation`。并且卡片**自己把这个通道列为可用**：`promptFor` 对 L1/L2 一视同仁地塞
+  `Channels: g.channels.Statuses()`（`gate.go:541`），`cmd/wisp/run.go:525-527` 原样打印「取消方式：…（已加载）」。
+  ⇒ 人按了，票没被听见，只能等满 300s（`gate.go:501-504`）。这就是票面的形状。
+- **实例 2（成立）**：R7 大批次在 L1 路线上被升级改走 L2（`gate.go:228-244`）⇒ 同一个 corr 在 L1 会命中窗口表、
+  升级后反而查不到，属于实例 1 的一个入口。
+- **实例 3（成立，条件性）**：队列重签发后（`queue.go:135/138`）卡片键 `it.Corr` ≠ 宿主记账键 `incoming`；
+  以 task id / 进入时 corr 回投的宿主 → `byID` 查不到。当前 `bridge.go:219-220` 保证非空，所以只有"corr 撞车"
+  才触发（并发多卡、或 replay 名字撞车，`queue.go:368-370`）。
+- **不成立/不存在**：(a) 队列满 → `push` 之前就 fail-closed 拒绝（`queue.go:129-131`），卡片根本没显示；
+  pending 集合没有 LRU 挤掉机制（只有 history LRU `queue.go:175-180`，那时卡片已消失）；
+  (b) 批次裁剪 `batch.go` 只改 L1 卡片**内容**（前 5 条），不改键；
+  (c) "重启后重建卡片" —— 全仓找不到 pending 审批的持久化/重建代码，**这条路径不存在**（如实写）；
+  (d) 面板/宿主两套键 —— 只要面板从 `PanelAPI` 取视图就是同一个 `it.Corr`，**没找到**第二套键；
+  ⚠ 唯一没核完的：`internal/panel/approval.go:40 correlationId` 是**票 77 刚刚落的**（本次会话内新出现），
+  它的 correlationId 从哪个结构取我**没读**，因为 `internal/panel/` 归它，**登记给编排者**。
+
+**修法取向（AC#2）**：`Veto` 在 windows/running 都查不到时，去门里按 reject 方向结算该 pending 项
+（立刻结束等待 + 仍按拒绝处理）；并给队列加**只在拒绝方向生效、且仅在无歧义时**的别名解析
+（卡片键 / 进入时 corr / taskID）。允许侧一律保持只认精确键 + grant 绑定 —— 别名宽松只给"更容易拒绝"。
+`300`/`30` 两个数字不改（AC#4；`queue.go:92-94`，且 30s 提示确已在 `gate.go:458-460/487-499` 实现，无需登记缺）。
+
+（前 4 条框未勾：AC#2/AC#3/AC#5 待码与门禁数字。）
+
+next= 在 `internal/agent/approval/` 落 `Veto` 的 L2 拒绝分支 + 队列的"只拒绝方向"别名解析，加双向可判用例，
+再跑 AC#3 两侧变异与 AC#5 门禁；`internal/panel/` 我不碰（票 77 在写，本次会话内它刚新增 `approval.go`）。
+
