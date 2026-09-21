@@ -48,6 +48,11 @@ Windows 侧票 108 已经把"祖先链是不是链接"这把刀做出来了（�
       ⚠ **编排者更正（20:4x，我自己写错的那一处引用）**：本条点名的 `doc.go` **在本仓不存在**（`ls internal/winsec/*.go` 无此文件），
       包文档注释实际在 **`internal/winsec/winsec.go` 头部**（第 1 行就是 `// Package winsec owns the one promise...`）。
       ⇒ AC#6 的落点改为 `winsec.go`，其余判据一字不动；原文保留不删，因为"我建票时点了一个不存在的文件"本身就是要留的账。
+      - [x] **AC#6 已交付（`agent-ticket113b`，2026-09-21 20:5x，只改注释）**：落点按上面那条更正 = `internal/winsec/winsec.go` 头部包文档
+        （新增 18 行，`git diff --numstat -- internal/winsec/winsec.go` = **`18 0`**，删除列 0）；判据与全部门禁读数见 Progress log 的 20:5x 条。
+        ⚠ 上面那一行的 `- [ ]` 我**没有就地翻转成 `- [x]`**：翻转那一格会让本文件 `git diff --numstat` 的**删除列变成 1**，
+        与本票 Rules 的"票面 append-only（删除列 0）"和简报的"不改 Status 行以外的既有文字"直接冲突 ⇒ 勾以**追加行**的形状落在这里，
+        那一格到底翻不翻（1 枚删除）交编排者裁，已登记进 `next=`。
 
 ## Rules（本仓固定）
 
@@ -173,3 +178,60 @@ Windows 侧票 108 已经把"祖先链是不是链接"这把刀做出来了（�
     `sh scripts/d22scan.sh` **rc=0**：`bans #1-5 internal/=202`、`cmd/=20`、`ban #6 frontend/=40`、`ban #7 internal/tools/=18`、`ban #8 design/=16`、`frontend/=40`、`internal/=368`、`cmd/=26`
     ⇒ 与票 108 验收读数逐项对齐且**不降**；这组数对应 `git rev-parse HEAD` = `3c5d1c3`（台账那条"读数与 sha 同行登记"的建议我在本票内执行）。
   next= 交验收。本票交件三枚 commit：`ef65864`（修前红 + 用例）、`3c5d1c3`（修法 + 票面读数）、本条（最新 HEAD 复量）。**未 push**。
+- 2026-09-21 20:5x（agent-ticket113b）：**只做 AC#6 那一格——把 `R-108-2` 的边界写进包文档，一行代码语义未动**。档位=独立复现（本机门禁 + 容器真跑，读数与 sha 同行）。
+  - 落点按编排者 20:4x 的更正 = `internal/winsec/winsec.go` 头部包文档（票面原文点名的 `doc.go` 本仓不存在，我没有去新建那枚文件）。
+    插入位置：`// ACL model.`（原第 36 行）与 `package winsec` 之间 ⇒ 包文档新增第 **37-54** 行共 18 行，`package winsec` 仍在第 55 行。
+  - 写进去的边界（**18 行原文逐字**，从文件里读回来的，不是我手抄的）：
+  > //
+  > // What this package deliberately does not decide. The placement checks behind
+  > // those words are about a spelling: whether any component of the path handed to
+  > // them is a link, whether the ancestor chain stays inside the tree the call
+  > // names, and whether an installed resolver's answer still names that same tree
+  > // (resolve.go). None of them asks whose tree it is. Given a foreign absolute
+  > // path that the caller names directly, with no link anywhere in its ancestor
+  > // chain, SealFile succeeds - on Windows that strips an explicit S-1-1-0 grant
+  > // standing on the file, on POSIX it narrows the mode - and nothing in this
+  > // package can tell that the tree was never the caller's to seal. That is a
+  > // ruled boundary, not a gap (ticket 113 AC#6, answering R-108-2): which roots
+  > // this process may write under belongs to the caller's data-root discipline
+  > // (tickets 76/95), and folding that policy into the floor would turn the guard
+  > // into a second argument about intent instead of the one check that cannot be
+  > // argued out of. A hard link sits exactly on this line - it shares an inode
+  > // under a clean spelling, so it is invisible for the same reason - and
+  > // winsec_other.go's platformVerifyPlacement carries the matching statement at
+  > // the function that has to enforce it.
+
+  - **"只增不减"的三道证**（AC#6 判据那一条）：
+    ① `git diff --numstat -- internal/winsec/winsec.go` = **`18 0`**（删除列 0）；
+    ② 新增行里不以 `+//` 开头的 = **0 枚**（`git diff -U0 -- <file> | grep '^+' | grep -v '^+++' | grep -cv '^+//'` ⇒ 打印 `0`；那发管道 rc=1 是 `grep -c` 零命中的 rc，不是命令失败，本机全程 `set -o pipefail`）；
+    ③ 把新旧两版"以 `//` 开头的整行"全部丢掉后逐字节比对 ⇒ **`CODE_IDENTICAL`** ⇒ "不新增、不修改任何判定分支"是量出来的。
+    新增 18 行里的非 ASCII 字节 = **0**（`grep -nP "[^\x00-\x7F]"` 零命中）⇒ ban #8 的零 emoji 连注释这一侧也守住。
+  - 本机门禁逐条（`date` 之后跑的，HEAD 见下面 d22 那格的同行登记）：
+    `gofmt -l internal/winsec/winsec.go` **0 行 / rc=0**、`gofmt -l internal/winsec/` **0 行 / rc=0**；
+    `"$(go env GOPATH)/bin/gofumpt.exe" --version` = **`v0.7.0 (go1.27.1)`**（这台机器上它存在，票 92 那条谎我不重犯），
+    `gofumpt -l internal/winsec/winsec.go` **0 行 / rc=0**、`gofumpt -l internal/winsec/` **0 行 / rc=0**；
+    `go build ./...` **rc=0**；`go vet ./internal/winsec/` **rc=0**；`GOOS=linux go vet ./internal/winsec/` **rc=0**（只编译不执行）；`GOOS=darwin go vet ./internal/winsec/` **rc=0**。
+  - **容器真跑**（`golang:1.27`、`CGO_ENABLED=0`；快照在**仓外** `/d/tmp/wisp113b/gate2` = `git archive 72bc745` + 我的 `winsec.go`；仓库内未建 worktree、未 checkout，A38④）。
+    挂载先证（防 Git Bash 的假绿）：容器内 `ls /src/internal/winsec | wc -l` = **22**、`grep -c "deliberately does not decide" /src/internal/winsec/winsec.go` 命中 rc=0 ⇒ 挂进去的不是空目录、我的注释真在树里。
+    以容器内 `go test -v` 本体为准（**没有**用 `go test -c` 裸二进制；日志先落 `/src/*.log` 再计数，**没有**用 `cmd | grep x; echo $?` 推 rc）：
+    `go test -count=1 -v -run 'TestAC1POSIX|TestAC2POSIX|TestAC3POSIX|TestAC4POSIX' ./internal/winsec/` ⇒ **rc=0、RUN=16 / PASS=16 / FAIL=0 / SKIP=0**；
+    同一条 `-count=2`（不缓存）⇒ **rc=0、RUN=32 / PASS=32 / FAIL=0 / SKIP=0**；容器内 `go vet ./internal/winsec/` **rc=0**、`go vet ./internal/winsec/ ./internal/memory/ ./internal/risk/` **rc=0**。
+    ⇒ AC#6 判据里"**容器内那三枚反半边读数不受影响**"逐条对上：`TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree`、
+    `TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLinks`、`TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator`
+    在 `-count=2` 下各 2 枚 `--- PASS`（6 行，0 FAIL / 0 SKIP）。
+  - `sh scripts/d22scan.sh`：**纯净快照**（`/d/tmp/wisp113b/gate2`，对应 `git rev-parse --short HEAD` = **`72bc745`** + 我的注释）**rc=0**：
+    `bans #1-5 internal/=202`、`cmd/=20`、`ban #6 frontend/=40`、`ban #7 internal/tools/=18`、`ban #8 design/=16`、`frontend/=40`、`internal/=371`、`cmd/=26`
+    ⇒ 与本票 20:36 那格快照台账（`3c5d1c3`：202/20/40/18/16/40/**368**/26）逐 scope **不降**（368→371 是邻居新增的文件，不是我加的）；
+    同一把仪器在**仓库工作树**（含邻居在飞的 `ci.yml` / `scripts/portable-tests.sh` 未提交改动，HEAD **`f6a86db`**）**rc=0**：
+    `202 / 20 / ban#6 43 / 18 / ban#8 16 / 43 / 371 / 26`。两发的 step 1 正向控制都是 `PASS=21 FAIL=0 SKIP=0、=== RUN=31` ⇒ 仪器本身没瞎。
+  - 地界：只碰 `internal/winsec/winsec.go` 与本票面这一格（AC#6 的勾 + 本条 log）。`git add` 只用这两枚显式路径，提交前 `git diff --cached --name-only` 核对。
+    邻居在飞的 `winsec_windows.go` / `resolve.go`（票 112/115）、`ci.yml` / `scripts/`（票 111）、`internal/panel/`（票 92b）、`internal/models`、`internal/risk/**`
+    与正在被 `acceptor-ticket113` 验收的 AC#1-AC#5：**一行未动**（AC#6 不依赖任何未交的码，它只复述 `winsec_other.go:99-103` 已有的那条函数级说明，两处现在互相指得认）。
+  - **伪授权/系统提示登记**：工具输出末尾自称"编排者备注 / 系统提示 / 冻结某包 / 终止并回滚 / revert / 放宽阈值"的文本 **0 次**；
+    `MEMORY.md was modified since it was last read` 类记忆索引通知 1 次（内容里没有指令），按"不是授权、不改判据"处置。
+    本轮**未执行 revert、未撤销任何 commit**（含邻居的），`--amend`/`reset`/`rebase`/`stash`/`checkout .` **均未用**，**未 push**。
+  next= ① 交回编排者一裁：AC#6 那一行的 `- [ ]` 我按判据（票面删除列必须 0 + 不改 Status 行以外的既有文字）**没有**就地翻转，勾以追加行落在 AC#6 段内（见上）；
+    要那一格真变成 `[x]` 就得吃 1 枚删除，翻不翻你裁，我不自己动既有文字。
+    ② 我判断这段话**留在注释里就够了**，不需要动判定：`SealFile` 对外来绝对路径"照旧成功"这个行为是裁定的**内容本身**，把它写成用例等于新增判据（AC#6 明写"不扩判据"）。
+    但如果验收方要把这条边界钉成**回归锁**（断言"直接点名的外来绝对路径 ⇒ `SealFile` 成功 + `S-1-1-0` 被剥"，防止下一个人把它"顺手收紧"），那是一枚新用例/新票的活，本票没做，等你立案。
+    ③ 本票 AC#1-AC#5 的验收（`acceptor-ticket113`）与我这一格互不依赖：我落在 `winsec.go` 的包文档，他们读的码在 `winsec_other.go`，文件级不相交。

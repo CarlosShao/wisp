@@ -34,6 +34,24 @@
 // specific. On POSIX there is nothing new to do, so a name that advertises the
 // platform the hole is specific to is more honest than one implying a portable
 // ACL model.
+//
+// What this package deliberately does not decide. The placement checks behind
+// those words are about a spelling: whether any component of the path handed to
+// them is a link, whether the ancestor chain stays inside the tree the call
+// names, and whether an installed resolver's answer still names that same tree
+// (resolve.go). None of them asks whose tree it is. Given a foreign absolute
+// path that the caller names directly, with no link anywhere in its ancestor
+// chain, SealFile succeeds - on Windows that strips an explicit S-1-1-0 grant
+// standing on the file, on POSIX it narrows the mode - and nothing in this
+// package can tell that the tree was never the caller's to seal. That is a
+// ruled boundary, not a gap (ticket 113 AC#6, answering R-108-2): which roots
+// this process may write under belongs to the caller's data-root discipline
+// (tickets 76/95), and folding that policy into the floor would turn the guard
+// into a second argument about intent instead of the one check that cannot be
+// argued out of. A hard link sits exactly on this line - it shares an inode
+// under a clean spelling, so it is invisible for the same reason - and
+// winsec_other.go's platformVerifyPlacement carries the matching statement at
+// the function that has to enforce it.
 package winsec
 
 import (
