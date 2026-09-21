@@ -1105,6 +1105,21 @@ vet: cmd/wisp/slo.go:324:49: undefined: proc.Runtime
 本 commit 已把该步与它的阳性对照（`tools/d22scan/runtests.sh -C tools/d22scan ./...`）**提到 gofmt/vet 之前**：
 不删步骤、不给任何步骤加 `continue-on-error`、不让任何步骤可跳过（D22 mode 6 未碰）。
 
+## 编排者登记 A82（2026-09-21 19:3x，票 107b 停在"不 commit"上是对的，我做的是让它**不可能丢**）
+
+- `agent-ticket107b` 交件时报了一件我没预料到的事：**它的修复没法提交**——`internal/tools/paths.go` 的工作树里
+  同时压着它自己的放行侧修复（`treeResolvedAsNamed`/`resolvedForm`/`rootsContain`）与**票 92 在飞的 `workspace` 收窄 hunk**，
+  先提就把别人的活吞进自己的 commit（A34）⇒ 它把行号、全文、下一条命令写进票面**然后停手**。
+  ⚠ **这是我要的行为**，而且它比我上一条记的"报告 > 覆盖"更进一步：**它宁可留一个未提交的修复，也没有污染别人的活**。
+- **我做的处置（下次同类直接照抄）**：把整份工作树状态逐字存成 `docs/evidence/s1/107b-pending-paths-go.patch`（189 行、117 增 / 23 删）
+  **并提交进 git** ⇒ 修复不再依赖任何代理活着；同时在**两张票面**都插了交接条（要求先落地的人**分署** commit message）。
+- ⚠ **一条别误读的账**：**HEAD 上 `internal/tools` 现在是红的**（107b 的探针 A/B/C 已进树、修复没进）
+  ⇒ 这是**诚实的红**、不是回归；我读 CI 步级结论时会按这个前提解释，别人也是。
+- **顺带一条被实测纠正的因果（A80③ 的续）**：票 107b 自报"Linux 侧 SKIP=3 **均为既有 `t.Skip`、非 `-v` 造成**"
+  ⇒ 与验收代理推翻票 93 那句是同一件事：**不要把"仪器为什么这么报"的解释背下来，去读那台仪器的源码。**
+  `next=` ① 等票 92 落 `paths.go`（或我另派一次"只提 107b 那几行"）⇒ 之后才给票 107 复验；
+  ② 票 107 在此之前**保持 `rejected-needs-fix`、不挂 `-done`**。
+
 ## 编排者登记 A81（2026-09-21 19:1x，票 93 与 106 结案（**两张都由我补勾最后一格，证据是 CI 步级读数**）；**第三种"仪器以为在跑其实没跑"**）
 
 - **A81① 结两张**：**93**（portable 步不再把 SKIP 记成 ok）与 **106**（winsec 在 CI runner 上被 `LA` 绊倒）都判 `PASS WITH CONDITIONS`，

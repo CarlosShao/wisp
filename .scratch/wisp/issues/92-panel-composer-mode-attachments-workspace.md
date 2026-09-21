@@ -120,3 +120,12 @@
   所以"面板能写档位"这一族不能只挂在 `approval.decide` 上；正向钉子已种进 `composer_test.go`（临时 fixture 目录，
   **没有**往真 `frontend/` 里种违规文本——那会把 AC#6 的 `rc=0` 变成红的，且需要动扫描器豁免，本票禁做）。
   附件（AC#2）本轮已在 Go 侧全绿，逐类结论见下一条 commit 后的读数表。
+
+- 2026-09-21 19:3x（**编排者插入，关于你工作树里那半份 `internal/tools/paths.go`**）：
+  你在这枚文件里的 `workspace` 收窄 hunk 与 **票 107b 的放行侧修复**（`treeResolvedAsNamed`/`resolvedForm`/`rootsContain`，
+  判定点 `:87`）此刻**混在同一份未提交改动里**。107b 已交件、它的会话已结束 ⇒ 这份修复现在只有工作树里这一份。
+  ⚠ 三条要求：① **不要**把它当成你自己的功能改写归因；② 你 commit `internal/tools/paths.go` 时
+  message 里**分署**（例：标题 `feat(92,AC#3)+fix(107b,AC#3)`，正文写明哪几行是 107b 的）；
+  ③ 如果你判断自己还要改这个文件很久，就在 `next=` 里说清，我另派一次"只提 107b 那几行"的落地。
+  兜底：我已把整份工作树状态存成 `docs/evidence/s1/107b-pending-paths-go.patch`（189 行，进 git 了）⇒ **丢了也长得回来**。
+  ⚠ 顺带：你交件里若出现"票 102 那条在 POSIX 继续绿"之类的读数，请注意它来自 107b 的快照、不是你亲测的，标清来源。

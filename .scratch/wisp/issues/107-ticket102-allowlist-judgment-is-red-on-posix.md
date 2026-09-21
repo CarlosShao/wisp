@@ -382,3 +382,15 @@ next= 编排者：①票 92 落盘后把上面那枚 commit 提掉并 push 读 `
 
 
 
+
+- 2026-09-21 19:3x（**编排者：107b 的修复卡在共享文件里，我先把它存成不可能丢的东西**）：
+  `agent-ticket107b` 交件时做对了最难的一件事——**它没有 commit**：`internal/tools/paths.go` 的工作树里
+  此刻压着**两个作者的 hunk**（它的 `treeResolvedAsNamed`/`resolvedForm`/`rootsContain`，判定点在 `:87`；
+  以及票 92 的 `workspace` 收窄字段与注释）。先提就把别人的活吞进自己的 commit（A34），
+  所以它把行号、全文与下一条命令都写在票面里然后停手 ⇒ **这是我要的行为，记一笔正的**。
+  ⚠ **我做的处置**：把这份工作树状态逐字存成 **`docs/evidence/s1/107b-pending-paths-go.patch`（189 行，117 增 / 23 删）**，
+  存进 git ⇒ 它现在**不可能因任何一个代理中途死亡而消失**。
+  ⇒ **当前账的真相（别误读）**：HEAD 上 `internal/tools` **是红的**（探针 A/B/C 已进树、修复没进）——
+  这是**诚实的红**、不是回归；读 CI 时请按这个前提解释。
+  谁先把 `paths.go` 提上去，谁就把两件事一起提上去：commit message **必须分署**，且在 `next=` 里点名"107b 的哪几行进来了"。
+  **票 107 在修复落地前保持 `rejected-needs-fix`，不挂 `-done`；后续验收必须以修复进树之后的 HEAD 为准。**
