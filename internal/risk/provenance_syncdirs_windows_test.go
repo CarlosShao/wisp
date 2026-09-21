@@ -32,8 +32,12 @@ import (
 // channel on one platform where the verdict is decidable: every separator
 // spelling of a real file inside a registry-grade sync root upgrades to
 // ChSyncWrite, and no spelling of a real file outside it does. The engine comes
-// from m7Engine, whose precondition (SyncDetectionComplete) is what makes the
-// positive and the negative mean "membership" rather than "everything is dirty".
+// from m7Engine, which since ticket 82 builds its root and its plain directory
+// OUTSIDE the profile so that membership — not the under-profile suspect net,
+// and not a SyncDetectionComplete() POSIX cannot ever report — is what makes
+// the positive and the negative mean "membership" rather than "everything is
+// dirty"; the windows-only consequence of a confirmed grade (disarming that net
+// for an in-profile target) is pinned in syncdirs_windows_test.go.
 func TestExfilSyncWriteWindowsSpellingInvariant(t *testing.T) {
 	p, syncTarget, plain := m7Engine(t)
 

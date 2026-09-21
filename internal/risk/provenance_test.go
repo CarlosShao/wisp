@@ -431,31 +431,31 @@ func TestNamedChannelParamEscape(t *testing.T) {
 // --- M-7: the write/sync gate must not be selectable by parameter name --------
 
 // m7Engine is an engine whose "not a sync dir" verdict can only come from root
-// MEMBERSHIP: a registry-grade (confirmed) root switches the under-profile
-// suspect net off, and the plain target is a brand-new file in an existing
-// non-sync directory — exactly the shape a real fs.write call carries.
+// MEMBERSHIP: the injected root is registry-grade evidence and the plain target
+// is a brand-new file in an existing non-sync directory — exactly the shape a
+// real fs.write call carries.
+//
+// It is now a thin wrapper over syncdirs_test.go's membershipEngine (ticket 82,
+// AC#1). Read that comment for why the two directories sit OUTSIDE the profile:
+// the previous shape required SyncDetectionComplete() before the negative
+// verdict could mean membership, and on POSIX that precondition has no object
+// (no root is ever C26-canonical there until ticket 55), which is what made all
+// four TestWriteGate* cases red on ubuntu while their actual subject — the gate
+// is decided by the SHAPE of the call, never by a payload key name — is
+// platform-independent code. The four cases now run on both platforms.
+// What only Windows can decide (a confirmed grade switching the blanket
+// under-profile net off, including for a plain target that IS inside the
+// profile) moved to syncdirs_windows_test.go; the matching POSIX reality is
+// asserted in syncdirs_other_test.go.
 func m7Engine(t *testing.T) (p *Provenance, syncTarget, plainTarget string) {
 	t.Helper()
-	base := t.TempDir()
-	home := filepath.Join(base, "profile")
-	root := filepath.Join(home, "OneDrive")
-	work := filepath.Join(home, "work")
-	for _, d := range []string{root, work} {
-		if err := os.MkdirAll(d, 0o755); err != nil {
-			t.Fatal(err)
-		}
-	}
-	p = NewProvenance(ProvOptions{NoProbe: true, HomeDir: home, SyncRoots: []SyncRoot{
-		{Provider: "OneDrive", Path: root, Source: "registry"},
-	}})
-	if !p.SyncDetectionComplete() {
-		t.Fatal("precondition: the injected registry-grade root must confirm detection, so the suspect net is NOT what decides these cases")
-	}
+	e := membershipEngine(t, "registry")
+	p = e.p
 	p.OpenScope("task-1")
 	if !p.Mark("task-1", SrcWebFetch, "https://x", "quote: "+marker) {
 		t.Fatal("mark rejected")
 	}
-	return p, filepath.Join(root, "Notes", "out.md"), filepath.Join(work, "brand-new.md")
+	return p, e.syncTarget, e.plainTarget
 }
 
 // TestWriteGateNotSelectedByPayloadKey is the M-7 half that must be CAUGHT:

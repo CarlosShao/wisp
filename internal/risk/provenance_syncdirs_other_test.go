@@ -24,9 +24,12 @@ import (
 //     asserted ONLY when the engine reports detection complete, which is the
 //     honest way of parking it: it starts biting the moment ticket 55 lands, and
 //     nobody can read today's green as "the POSIX negative control passes".
-//     TestWriteGatePlainLocalWriteNotFlagged and its 7 siblings in the same
-//     package are that missing-detection red today, and this ticket does not
-//     touch them (they belong to ticket 55).
+//     Ticket 82 re-pointed the 8 same-family reds this comment used to name:
+//     their subject (the write gate, root membership) turned out to be
+//     assertable on POSIX once the fixture stopped borrowing Windows-only
+//     ground, so they run on both platforms now — see
+//     membershipEngine in syncdirs_test.go, and syncdirs_other_test.go for the
+//     grading consequence that really is absent here.
 
 func posixSyncEngine(t *testing.T) (p *Provenance, syncTarget, plainTarget, backslashNameInSyncRoot string) {
 	t.Helper()

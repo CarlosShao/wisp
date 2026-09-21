@@ -31,10 +31,11 @@ Windows 专属判据进 `//go:build windows`，POSIX 侧留一条**断言当前�
 
 ## AC（1:1，裁决表 `docs/evidence/s1/82-*.md`）
 
-- [ ] **AC#1** 上面 8 条**逐条定性**并列表：哪些属于"只在 Windows 上有意义"（进 windows 层）、
+- [x] **AC#1** 上面 8 条**逐条定性**并列表：哪些属于"只在 Windows 上有意义"（进 windows 层）、
   哪些其实**两侧都该跑**（那就是真缺陷，不许搬走，就地修）。
   ⚠ 不许整族打包贴 tag —— 那正是 A49② 里票 78 代理拒绝过的"整包被静默排除"。
   **判据**：每条给一句"为什么这条在 POSIX 上没有可断言的对象"或"这条两侧都有对象、留下"。
+  ⇒ 定性表见 Progress log 2026-09-21 第二条（6 条两侧都有对象、就地修；2 条的"确认等级拆掉兜底网"半边进 windows 层）。
 - [ ] **AC#1b（2026-09-21 由 A57④ 追加，编排者写的判据）** 碰 `internal/risk` 的**折叠语义**时，
   必须同时检查 `internal/risk/rules_test.go:198` 是否**还在测东西**：它用
   `C:\Program Files\Git\bin\git.exe` 这条字面 Windows 路径做输入，今天两侧同字节同结论（不是问题），
@@ -80,4 +81,22 @@ docker 挂**快照**不挂工作树；票面 Progress log append-only，**要改
   的**引擎形状**改成两侧可判（root 与对照目录都在 home 之外），把"confirmed 等级本身"这条判据留到分层里；
   ②`"确认等级能否拆掉兜底网"` 这一半在 POSIX 确实无对象，进 windows 层，POSIX 层留一条断言
   "今天任何等级都拆不掉（fail-closed）"的活用例，并指名票 55 落地时怎么转活（AC#2）。
+
+- 2026-09-21 **AC#1 八条逐条定性**（"POSIX 上没有可断言的对象"这句必须能落到具体一行代码上，所以每条都点了那一行）：
+  先给共性根因：`syncSet.finalize` 只在**同时**满足 `canonical`（=`Resolve().Resolved`，POSIX 恒 false，见
+  `pathresolver_other.go:10`）与 `gradeConfirmed(Source)` 时置 `complete=true`。这 8 条里凡死在
+  `SyncDetectionComplete()` 前置条件上的，**死因是"POSIX 造不出 canonical root"，不是"POSIX 判不出 sync"**——
+  `match()` 在兜底网之前就先比 root membership，且兜底网**只覆盖 profile home 之下**，所以
+  **把 fixture 的两个目录搬到 home 之外，membership 两侧都判得出**。⇒ 六条属"两侧都有对象"，就地修；
+  | # | 用例 | 定性 | 处置 |
+  |---|------|------|------|
+  | 1-4 | `TestWriteGate{NotSelectedByPayloadKey,PlainLocalWriteNotFlagged,EveryPathTargetJudged,AllPathsNonSyncStaysExempt}` | 两侧都有对象：被测的是 writeGate 的"豁免只看调用形状、不看 payload 键名"，平台无关代码；红的唯一来源是 `m7Engine` 那句 `SyncDetectionComplete()` sanity | 就地修：`m7Engine` 换成 home 之外形状（POSIX 可判），并断言 `Root.Source != "suspect-fallback"` 自证判决来自 membership |
+  | 5 | `TestSyncNormalNewFileWriteNotFlagged` | 两侧都有对象（B-1 假阳性锤：新文件落在非 root 目录不是通道）；POSIX 无对象的只是 `sanity: registry-grade root is confirmed` 那一行 | 就地修（`membershipEngine`）+ 补正向对照（同一引擎写进 root 必须 hit），防"什么都不 flag" |
+  | 8 | `TestSyncDotDotTailFailsClosed` | 两侧都有对象：`hasFoldedDotDot` 是纯词法判据，跑在任何 OS 咨询之前；红的来源仍是那句 confirmed sanity | 就地修：换 home 之外形状后 `filepath.Clean(raw)==folded` 前提两侧同构 |
+  | 6 | `TestSyncFallbackNotDisarmableByWeakRoot` | **一半一半**：弱等级永不拆网两侧有对象；"registry/config/env 拆网 + 拆网后 under-profile 判非 sync"在 POSIX 无对象（拆网要 canonical） | 拆：portable 留弱等级半边；`TestSyncConfirmedGradesDisarmFallbackWindows` 进 windows 层；POSIX 层 `TestSyncNoGradeIsConfirmedOnPosix` 断"7 个等级名一个都不拆" |
+  | 7 | `TestSyncEnvConfiguredRoots` | **一半一半**：`envConfiguredRoots` 是 `probeEnv` 的纯函数（等级/provider/空白剔除）、写进 env root 判 sync 且归因 `Source=="env"` —— 两侧都有对象；"env ⇒ complete" 无对象 | 拆：portable 留纯函数 + membership 归因半边；complete 半边进 windows 层 |
+  ⇒ 没有任何一条被"整族打包贴 tag"：新增的 windows 层只装上面**两条**用例的 confirmed-grade 半边（2 个用例），
+  其余 6 条反而**多**在 POSIX 上跑了起来（覆盖面净增，不是搬走）。
+  POSIX 层另加 3 条活用例（`syncdirs_other_test.go`，无一条 `t.Skip`）：等级现实、membership 现实、
+  `registryProbe` 桩本身（票 55 落地即红的 tripwire）。
 

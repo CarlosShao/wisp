@@ -26,6 +26,72 @@ func sandbox(t *testing.T) (home, lapp, app string) {
 	return
 }
 
+// syncEnv is the P12 fixture of ticket 82: one injected sync root, one plain
+// directory, and a profile home that contains NEITHER of them.
+type syncEnv struct {
+	p           *Provenance
+	home        string // fake profile, empty on purpose (see membershipEngine)
+	cloud       string // the sibling tree that holds root and work
+	root        string // existing dir, injected as `grade` evidence
+	work        string // existing plain dir, no client anywhere near it
+	syncTarget  string // brand-new file under root   -> sync BY MEMBERSHIP
+	plainTarget string // brand-new file under work   -> not sync, same route
+}
+
+// membershipEngine builds the fixture whose two verdicts are decidable on EVERY
+// platform, which is what AC#1 of ticket 82 needed before any of this family
+// could be called Windows-only.
+//
+// The older fixtures (m7Engine's pre-ticket-82 shape, syncSandbox in
+// syncdirs_redteam_windows_test.go) put the root and the plain directory INSIDE
+// the profile, so "not a sync write" there could only mean "the under-profile
+// suspect net was disarmed", and disarming it takes a root that is both
+// confirmed-GRADE and C26-CANONICAL (syncSet.finalize). Canonicalization is the
+// half POSIX does not have: syncSet.add only sets canonical=true when Resolve
+// reports Resolved, and pathresolver_other.go's resolveHandle is the
+// DEFERRED(macOS/Linux) stub that ticket 55 owns. So that precondition has no
+// object on POSIX — it is not an assertion that happens to fail, there is
+// nothing there to assert on.
+//
+// Moving both directories out of the profile removes the net from the
+// decision without removing anything from the subject: match() compares the
+// roots BEFORE the fallback and the fallback only covers paths under the
+// profile, so membership is the only thing that can flip either verdict here,
+// on either platform. The preconditions below assert that by ATTRIBUTION
+// (Root.Source), so today's green can never be read as "the fallback decided
+// this" — the mistake ticket 75's report made illegal.
+//
+// grade is the Source the root is injected with, because which grades count as
+// confirmed is itself tiered: the portable cases pass "registry", the POSIX
+// tier sweeps every grade name to pin that none of them is actionable there.
+func membershipEngine(t *testing.T, grade string) syncEnv {
+	t.Helper()
+	base := t.TempDir()
+	e := syncEnv{
+		home:  filepath.Join(base, "profile"),
+		cloud: filepath.Join(base, "cloud"),
+	}
+	e.root = filepath.Join(e.cloud, "OneDrive")
+	e.work = filepath.Join(e.cloud, "work")
+	for _, d := range []string{e.home, e.root, e.work} {
+		if err := os.MkdirAll(d, 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	e.syncTarget = filepath.Join(e.root, "Notes", "out.md") // never created
+	e.plainTarget = filepath.Join(e.work, "brand-new.md")   // never created
+	e.p = NewProvenance(ProvOptions{NoProbe: true, HomeDir: e.home, SyncRoots: []SyncRoot{
+		{Provider: "OneDrive", Path: e.root, Source: grade},
+	}})
+	if st := e.p.IsSyncPath(e.syncTarget); !st.Sync || st.Root.Source == "suspect-fallback" {
+		t.Fatalf("precondition: %s must be sync by ROOT MEMBERSHIP, not by the fallback: %+v", e.syncTarget, st)
+	}
+	if st := e.p.IsSyncPath(e.plainTarget); st.Sync {
+		t.Fatalf("precondition: %s must be judged a plain non-sync target: %+v", e.plainTarget, st)
+	}
+	return e
+}
+
 func TestSyncDefaultLocationProbe(t *testing.T) {
 	home, _, _ := sandbox(t)
 	oned := filepath.Join(home, "OneDrive")
@@ -89,8 +155,21 @@ func TestSyncFixtureFallbackAndMatch(t *testing.T) {
 	}
 }
 
-// M-3: only env/registry/config-grade evidence may disarm the fallback, and a
-// decoy (or a merely-existing default directory) can never do it.
+// M-3, portable half: a weak-grade root (a directory that merely exists at a
+// default location, a fixture line, an injected option) is user-supplied data,
+// not proof that a client syncs there, so it must NEVER disarm the
+// under-profile suspect net. That half has an object wherever the net is armed,
+// i.e. on both platforms.
+//
+// The MIRROR half — which grades DO disarm it — is the part that is not
+// portable today, and ticket 82 AC#1 refuses to pretend otherwise: reaching
+// "confirmed" needs a C26-canonical root, and on POSIX nothing is ever
+// canonical until ticket 55 lands. That half now lives in
+// syncdirs_windows_test.go (TestSyncConfirmedGradeDisarmsFallbackWindows), and
+// syncdirs_other_test.go asserts the POSIX reality (no grade name at all
+// disarms it here, fail-closed) instead of keeping a Windows-only expectation
+// as a permanent red.
+
 func TestSyncFallbackNotDisarmableByWeakRoot(t *testing.T) {
 	home, _, _ := sandbox(t)
 	root := filepath.Join(home, "OneDrive")
@@ -108,21 +187,9 @@ func TestSyncFallbackNotDisarmableByWeakRoot(t *testing.T) {
 		if !p.IsSyncPath(filepath.Join(home, "Documents", "exfil.md")).Sync {
 			t.Errorf("source %q: under-profile fallback must stay armed", src)
 		}
-	}
-	for _, src := range []string{"registry", "config", "env"} {
-		p := NewProvenance(ProvOptions{
-			NoProbe: true, HomeDir: home,
-			SyncRoots: []SyncRoot{{Provider: "OneDrive", Path: root, Source: src}},
-		})
-		if !p.SyncDetectionComplete() {
-			t.Errorf("source %q must count as confirmed", src)
-		}
-		if p.IsSyncPath(filepath.Join(home, "Documents", "exfil.md")).Sync {
-			t.Errorf("source %q: confirmed root must lift the blanket suspect net", src)
-		}
-		// ...while the confirmed root itself keeps flagging.
+		// The injected root itself flags whichever grade it came with.
 		if !p.IsSyncPath(filepath.Join(root, "notes.md")).Sync {
-			t.Errorf("source %q: writes under the confirmed root must be sync", src)
+			t.Errorf("source %q: writes under the injected root must be sync", src)
 		}
 	}
 }
@@ -142,9 +209,19 @@ func TestSyncUnverifiedRootKeepsFallback(t *testing.T) {
 	}
 }
 
-// M-2: the OneDrive environment variables are a confirmed-grade location
-// signal (this is what the machine actually publishes when HKCU Accounts has
-// no UserFolder), and the registry probe logic is now injectable + covered.
+// M-2: the OneDrive environment variables are a confirmed-grade LOCATION signal
+// (this is what the machine actually publishes when HKCU Accounts has no
+// UserFolder), and the registry probe logic is now injectable + covered.
+//
+// Ticket 82 AC#1 keeps the portable half here: what envConfiguredRoots returns
+// is a pure function of the environment it is handed (grade, provider, the
+// blank-value trim), and the verdict for a write under that root is decided by
+// ROOT MEMBERSHIP, which match() checks before the fallback, so it is assertable
+// on POSIX too. What is NOT assertable there is the grade's consequence — that
+// env evidence switches the under-profile net off — because on POSIX no root is
+// ever C26-canonical: that consequence is pinned per platform by
+// TestSyncConfirmedGradeDisarmsFallbackWindows (windows) and
+// TestSyncNoGradeIsConfirmedOnPosix (!windows).
 func TestSyncEnvConfiguredRoots(t *testing.T) {
 	home, _, _ := sandbox(t)
 	root := filepath.Join(home, "OneDrive")
@@ -164,11 +241,8 @@ func TestSyncEnvConfiguredRoots(t *testing.T) {
 		}
 	}
 	p := NewProvenance(ProvOptions{NoProbe: true, HomeDir: home, SyncRoots: roots})
-	if !p.SyncDetectionComplete() {
-		t.Fatal("env-grade roots are confirmed evidence")
-	}
-	if !p.IsSyncPath(filepath.Join(root, "Notes", "new.md")).Sync {
-		t.Fatal("env root must flag writes under it")
+	if st := p.IsSyncPath(filepath.Join(root, "Notes", "new.md")); !st.Sync || st.Root.Source != "env" {
+		t.Fatalf("env root must flag writes under it BY MEMBERSHIP (not by the suspect net), got %+v", st)
 	}
 }
 
@@ -271,31 +345,29 @@ func TestSyncSuspectFallbackIsComponentBounded(t *testing.T) {
 
 // B-1 guard: the fix must not turn every legitimate new-file write into a
 // sync channel. A brand-new file in a plain (non-sync) directory, with a
-// confirmed root registered, is NOT sync and its content is not scanned.
+// registry-grade root registered, is NOT sync and its content is not scanned.
+//
+// Ticket 82 AC#1: this ran on Windows only until now because the fixture kept
+// the plain directory inside the profile and required SyncDetectionComplete()
+// before "not sync" could mean anything; on POSIX that precondition has no
+// object, so the case died at its own sanity check. With membershipEngine the
+// subject (a new file that is not under any root stays out of channel R4) is
+// asserted on both platforms, and the positive control below keeps the
+// exemption from being "nothing is ever sync".
 func TestSyncNormalNewFileWriteNotFlagged(t *testing.T) {
-	home, _, _ := sandbox(t)
-	work := filepath.Join(home, "work")
-	if err := os.MkdirAll(work, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.MkdirAll(filepath.Join(home, "OneDrive"), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	p := NewProvenance(ProvOptions{NoProbe: true, HomeDir: home, SyncRoots: []SyncRoot{
-		{Provider: "OneDrive", Path: filepath.Join(home, "OneDrive"), Source: "registry"},
-	}})
-	if !p.SyncDetectionComplete() {
-		t.Fatal("sanity: registry-grade root is confirmed")
-	}
-	target := filepath.Join(work, "brand-new-file.md") // never created
-	st := p.IsSyncPath(target)
-	if st.Sync {
+	e := membershipEngine(t, "registry")
+	if st := e.p.IsSyncPath(e.plainTarget); st.Sync {
 		t.Fatalf("normal new-file write into a plain dir must NOT be sync: %+v", st)
 	}
-	p.OpenScope("task-1")
-	p.Mark("task-1", SrcFSRead, "/secret", marker)
-	if _, ok := p.Inspect("task-1", "fs.write", map[string]any{"path": target, "content": marker}); ok {
+	e.p.OpenScope("task-1")
+	e.p.Mark("task-1", SrcFSRead, filepath.Join(e.home, "secret.txt"), marker)
+	if _, ok := e.p.Inspect("task-1", "fs.write", map[string]any{"path": e.plainTarget, "content": marker}); ok {
 		t.Fatal("a plain local write of tainted content must stay out of the R4 channel (SPEC-06 §5)")
+	}
+	// Positive control on the same engine: the only thing that flips the verdict
+	// is which directory the bytes land in.
+	if _, ok := e.p.Inspect("task-1", "fs.write", map[string]any{"path": e.syncTarget, "content": marker}); !ok {
+		t.Fatal("ESCAPIABLE: the same tainted bytes aimed at the injected root must be an R4 channel")
 	}
 }
 
@@ -339,32 +411,27 @@ func TestSyncUnresolvablePathFailClosed(t *testing.T) {
 // invariant of this code. It is now one: a spelling carrying a folded `..`
 // fails closed as sync-suspect instead of being classified from a string that
 // no longer describes the write.
+//
+// Ticket 82 AC#1: the hardening itself is lexical (hasFoldedDotDot runs on the
+// raw spelling before any OS is consulted), so it has an object on POSIX as
+// well — but the fixture had to change for this case to prove it. The old one
+// put `work` inside the profile and required SyncDetectionComplete() so that the
+// "plain write stays clean" control could not be satisfied by luck; on POSIX
+// that precondition has no object, so the case died before its first assertion.
+// membershipEngine puts both directories outside the profile, which makes the
+// negative control mean non-membership on either platform.
 func TestSyncDotDotTailFailsClosed(t *testing.T) {
-	base := t.TempDir()
-	home := filepath.Join(base, "profile")
-	root := filepath.Join(home, "OneDrive")
-	work := filepath.Join(home, "work")
-	for _, d := range []string{root, work, filepath.Join(root, "Notes")} {
-		if err := os.MkdirAll(d, 0o755); err != nil {
-			t.Fatal(err)
-		}
-	}
-	p := NewProvenance(ProvOptions{NoProbe: true, HomeDir: home, SyncRoots: []SyncRoot{
-		{Provider: "OneDrive", Path: root, Source: "registry"},
-	}})
-	if !p.SyncDetectionComplete() {
-		t.Fatal("precondition: registry-grade root confirmed, so only root membership may decide")
-	}
+	e := membershipEngine(t, "registry")
 	sep := string(filepath.Separator)
-	folded := filepath.Join(work, "x.md") // what the raw spelling below cleans to
-	raw := strings.Join([]string{root, "Notes", "..", "..", "work", "x.md"}, sep)
+	folded := filepath.Join(e.work, "x.md") // what the raw spelling below cleans to
+	raw := strings.Join([]string{e.root, "Notes", "..", "..", "work", "x.md"}, sep)
 	if filepath.Clean(raw) != folded {
 		t.Fatalf("test premise broken: %q does not clean to %q", raw, folded)
 	}
-	if st := p.IsSyncPath(folded); st.Sync {
+	if st := e.p.IsSyncPath(folded); st.Sync {
 		t.Fatalf("precondition broken: the folded target must be a plain non-sync write: %+v", st)
 	}
-	st := p.IsSyncPath(raw)
+	st := e.p.IsSyncPath(raw)
 	if !st.Sync {
 		t.Fatalf("ESCAPIABLE (N-10): a spelling with a folded `..` was classified anyway: %+v", st)
 	}
@@ -373,14 +440,14 @@ func TestSyncDotDotTailFailsClosed(t *testing.T) {
 	}
 	// The exfil gate follows the verdict, and the plain spelling is unaffected
 	// (this is the false-positive side: a normal new-file write stays clean).
-	p.OpenScope("task-1")
-	if !p.Mark("task-1", SrcFSRead, filepath.Join(home, "secret.txt"), marker) {
+	e.p.OpenScope("task-1")
+	if !e.p.Mark("task-1", SrcFSRead, filepath.Join(e.home, "secret.txt"), marker) {
 		t.Fatal("mark rejected")
 	}
-	if _, ok := p.Inspect("task-1", "fs.write", map[string]any{"path": raw, "content": marker}); !ok {
+	if _, ok := e.p.Inspect("task-1", "fs.write", map[string]any{"path": raw, "content": marker}); !ok {
 		t.Error("ESCAPIABLE (N-10): fs.write through a folded `..` escaped the sync gate")
 	}
-	if _, ok := p.Inspect("task-1", "fs.write", map[string]any{"path": folded, "content": marker}); ok {
+	if _, ok := e.p.Inspect("task-1", "fs.write", map[string]any{"path": folded, "content": marker}); ok {
 		t.Error("false positive: plain new-file write flagged after the N-10 hardening")
 	}
 }
