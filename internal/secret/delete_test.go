@@ -1,3 +1,9 @@
+//go:build windows
+
+// DPAPI-store tests: see the platform note in store_test.go (ticket 70 AC#2).
+// Exists/Delete/Blobs all read and remove real dpapi: blobs, so they need the
+// Windows protector; they run under test-windows' `go test ./internal/secret/`.
+
 package secret
 
 import (

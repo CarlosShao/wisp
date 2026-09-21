@@ -1,3 +1,9 @@
+//go:build windows
+
+// MigratePlaintext rewrites plaintext api_key fields into dpapi: refs, which
+// requires the Windows protector: see the platform note in store_test.go
+// (ticket 70 AC#2). Run under test-windows' `go test ./internal/secret/`.
+
 package secret
 
 import (

@@ -156,13 +156,16 @@ func TestRollingWriterSizeRoll(t *testing.T) {
 
 func TestRollingWriterDayRoll(t *testing.T) {
 	dir := t.TempDir()
-	w, err := newRollingWriter(dir, 0, 7)
+	day1 := time.Date(2026, 9, 19, 12, 0, 0, 0, time.UTC)
+	day2 := day1.Add(25 * time.Hour)
+	// The clock goes in through the constructor: the eager first open must
+	// already speak the fixture's calendar, or the writer also creates a file
+	// for the REAL today and the "one file per day" count is off by one on
+	// every date outside {day1, day2}.
+	w, err := newRollingWriterClock(dir, 0, 7, func() time.Time { return day1 })
 	if err != nil {
 		t.Fatal(err)
 	}
-	day1 := time.Date(2026, 9, 19, 12, 0, 0, 0, time.UTC)
-	day2 := day1.Add(25 * time.Hour)
-	w.now = func() time.Time { return day1 }
 	if _, err := w.Write([]byte("day one\n")); err != nil {
 		t.Fatal(err)
 	}

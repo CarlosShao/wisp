@@ -170,17 +170,29 @@ type rollingWriter struct {
 }
 
 func newRollingWriter(dir string, sizeMB, days int) (*rollingWriter, error) {
+	return newRollingWriterClock(dir, sizeMB, days, time.Now)
+}
+
+// newRollingWriterClock is the seam newRollingWriter runs through: the clock is
+// a PARAMETER so a day-roll test can install its fake day BEFORE the eager
+// open. With the wall clock baked in, the boot file is named after the real
+// today and any fixture day is an extra file - which is what made
+// TestRollingWriterDayRoll green only on the two dates its fixture hardcoded.
+func newRollingWriterClock(dir string, sizeMB, days int, now func() time.Time) (*rollingWriter, error) {
 	if sizeMB <= 0 {
 		sizeMB = 10 // schema default ([observe] roll.size_mb)
 	}
 	if days <= 0 {
 		days = 7 // schema default ([observe] roll.days)
 	}
+	if now == nil {
+		now = time.Now
+	}
 	w := &rollingWriter{
 		dir:     dir,
 		maxSize: int64(sizeMB) << 20,
 		days:    days,
-		now:     time.Now,
+		now:     now,
 	}
 	// Open eagerly so a broken log dir fails at init, not on first log line,
 	// and run the retention sweep once at boot.

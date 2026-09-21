@@ -194,9 +194,18 @@ func TestSampleStateLeakFixtureFlipsRed(t *testing.T) {
 
 func TestSampleStateCPUTotalDrivenMean(t *testing.T) {
 	// 0.5 core-second per second on a 12-core box = 4.166% all-core.
+	//
+	// The drive rate must be expressed as a fraction of ALL-CORE capacity, not
+	// as an absolute core-seconds/second: cpuPercent divides by
+	// runtime.NumCPU() (sampler.go:314), so the old literal read as 4.166% on
+	// this 12-core dev box and as 12.5% (measured 14.85%) on the 4-core ubuntu
+	// CI runner - same code, same assertion, different machine. The band below
+	// is unchanged; only the fixture's machine dependence is removed.
+	const wantAllCorePercent = 4.166
+	perSecond := wantAllCorePercent / 100 * float64(runtime.NumCPU()) // core-seconds per second
 	cpu := int64(0)
 	ft := &fakeTree{current: func() TreeMetrics {
-		cpu += int64(0.5 * float64(20*time.Millisecond) / float64(time.Nanosecond))
+		cpu += int64(perSecond * float64(20*time.Millisecond) / float64(time.Nanosecond))
 		return TreeMetrics{PIDs: 1, PrivateWorkingSetBytes: 16 << 20, Handles: 10, CPUTotalNanos: cpu}
 	}}
 	s := NewSampler(ft, NewRegistry())

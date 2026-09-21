@@ -1,3 +1,16 @@
+//go:build windows
+
+// Platform note (ticket 70 AC#2, test-core triage): every test in this file
+// drives Store()/Resolve(), i.e. DPAPI protect/unprotect, which is
+// Windows-only by design (C28/SPEC-02 §6). internal/secret/protect_other.go is
+// a documented fail-closed stub on other platforms - it never degrades to
+// plaintext - so on ubuntu these tests can only ever fail with
+// "DPAPI is only available on Windows". They run in the test-windows job,
+// which executes `go test ./internal/secret/`; internal/secret/refs_test.go
+// stays untagged and keeps the portable (env: ref / redaction) surface under
+// test-core. No assertion was changed or dropped: only the platform on which
+// this file compiles.
+
 package secret
 
 import (
