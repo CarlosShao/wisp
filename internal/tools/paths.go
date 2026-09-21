@@ -32,42 +32,76 @@ type PathCanonicalizer struct {
 	// unusable records roots that could not be canonicalized: they authorize
 	// nothing (fail-closed) and the reason is kept for the audit line.
 	unusable []string
+	// rewritten records roots whose spelling C26's expansion step substituted
+	// (ticket 102): the authorized tree is not the tree the config spelled, and
+	// an operator reading the config would not recognize it. Bounded by the
+	// number of [fs] allowed_dirs entries.
+	rewritten []string
 }
 
 // NewPathCanonicalizer resolves the allowlist roots through C26 once and
-// returns the adapter. An EMPTY allowlist authorizes nothing: every path is
-// out-of-scope, so every fs call lands at L2 (R2) rather than passing through
-// unjudged.
+// returns the adapter. An EMPTY allowlist authorizes nothing: every fs call
+// lands at L2 (R2) rather than passing through unjudged.
 func NewPathCanonicalizer(allowedDirs, reparseExceptions []string) *PathCanonicalizer {
 	p := &PathCanonicalizer{exceptions: append([]string(nil), reparseExceptions...)}
 	for _, d := range allowedDirs {
-		c, err := p.resolve(d)
-		if err != nil || c == "" {
+		res, err := p.resolve(d)
+		if err != nil || res.Canonical == "" {
 			p.unusable = append(p.unusable, fmt.Sprintf("%q: %v", d, err))
 			continue
 		}
-		p.roots = append(p.roots, foldPath(c))
+		// Ticket 102 (fix B) consumption site, authorization leg. Expansion is
+		// contract-required for a root spelled ~/... or %VAR%\... (SPEC-06 §4
+		// step 1), so a rewrite is not refused outright - but a root that C26
+		// MOVED and that the OS cannot confirm as an existing tree is dropped:
+		// authorizing a tree nobody can point at is a fail-open, and the config
+		// line that produced it is kept for the operator.
+		if res.Rewritten {
+			p.mu.Lock()
+			p.rewritten = append(p.rewritten, fmt.Sprintf("%q -> %s (%s)",
+				d, res.Canonical, strings.Join(res.Rewrites, "+")))
+			p.mu.Unlock()
+			if !res.Resolved {
+				p.unusable = append(p.unusable, fmt.Sprintf(
+					"%q: C26 expanded it onto %s but that tree is not confirmed on disk, authorizing nothing", d, res.Canonical))
+				continue
+			}
+		}
+		p.roots = append(p.roots, foldPath(res.Canonical))
 	}
 	return p
 }
 
-// resolve is the ONE canonicalization call site in this package.
-func (p *PathCanonicalizer) resolve(raw string) (string, error) {
+// resolve is the ONE canonicalization call site in this package. It hands back
+// the whole C26 Result rather than just a spelling on purpose: the two callers
+// read ticket 102's account differently (roots are authorization, so a rewrite
+// is recorded and fail-closed; a target's judged tree is the same tree the tool
+// opens and prints, so a rewrite is only traceable through Result.Spelling).
+func (p *PathCanonicalizer) resolve(raw string) (risk.Result, error) {
 	res, err := risk.Resolve(raw, p.exceptions)
 	if err != nil {
-		return "", err
+		return risk.Result{}, err
 	}
-	return res.Canonical, nil
+	return res, nil
 }
 
 // Canonicalize implements risk.PathCanonicalizer (and the narrower contract
 // builtin tools use to open what the judge looked at). A reparse traversal
 // returns risk.ErrReparseDenied, which R2 turns into a fail-closed L2.
+//
+// Ticket 102 disposition for this leg: NOT a refusal. fs.go / fs_write.go /
+// mode.go open exactly what this function returns, and rules_gateway's R2
+// verdict and audit line are computed from the same string, so judgement,
+// execution and report all name ONE tree even when expansion moved it.
 func (p *PathCanonicalizer) Canonicalize(raw string) (string, error) {
 	if strings.TrimSpace(raw) == "" {
 		return "", fmt.Errorf("tools: empty path")
 	}
-	return p.resolve(raw)
+	res, err := p.resolve(raw)
+	if err != nil {
+		return "", err
+	}
+	return res.Canonical, nil
 }
 
 // InAllowlist implements risk.PathCanonicalizer against already-canonical
@@ -99,6 +133,16 @@ func (p *PathCanonicalizer) Roots() []string {
 // authorize nothing, which is the fail-closed direction.
 func (p *PathCanonicalizer) UnusableRoots() []string {
 	return append([]string(nil), p.unusable...)
+}
+
+// RewrittenRoots lists the [fs] allowed_dirs entries C26's expansion step moved
+// onto another tree, as `"spelling" -> tree (constructs)` (ticket 102). The
+// audit surface is what makes the (B) account more than a struct field: a root
+// that authorizes a tree other than the one written down is operator-visible.
+func (p *PathCanonicalizer) RewrittenRoots() []string {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+	return append([]string(nil), p.rewritten...)
 }
 
 // pathSep is the comparison separator: the PLATFORM one. C26's canonical is the

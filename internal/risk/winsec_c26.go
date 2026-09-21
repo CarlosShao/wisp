@@ -30,10 +30,16 @@ type c26Pipeline struct{}
 // state for a directory winsec is about to create, and still after the reparse
 // traversal check, so a nonexistent leaf under an existing junction is refused
 // rather than created through the link.
+//
+// This is the one C26 leg that both ACTS on a tree (through winsec, which
+// seals whatever it returns) and reports success to its caller, so it goes
+// through Result.Actable: an expansion that moved the path off the tree the
+// caller named (ticket 102 / PROBE B2) is refused here and propagates through
+// winsec.ResolvePath's %w wrapping as a sealing failure - never as "sealed".
 func (c26Pipeline) Resolve(input string) (string, error) {
 	res, err := Resolve(input, nil)
 	if err != nil {
 		return "", err
 	}
-	return res.Canonical, nil
+	return res.Actable()
 }

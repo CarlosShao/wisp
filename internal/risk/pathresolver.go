@@ -2,6 +2,7 @@ package risk
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -34,6 +35,19 @@ import (
 // is not covered by reparse_point_exceptions. Fail-closed by design.
 var ErrReparseDenied = errors.New("risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions")
 
+// ErrRewrittenPath reports that C26's expansion step moved a spelling onto a
+// different tree than the one the caller's own string names, so the caller may
+// not act on the result as if it were the tree it asked about.
+//
+// It is NOT a complaint about expansion: SPEC-06 §4 line 50 puts
+// 「展开(env / ~)」 first in the pipeline on purpose (the A-tier blacklist in
+// SPEC-06 §4.1 is itself spelled with ~ and %APPDATA%, so classification needs
+// the expansion). What it refuses is the *unbound* use of the answer -
+// sealing/creating/authorizing the rewritten tree while telling the caller
+// "done" about the spelling it held (ticket 102, PROBE B2 of
+// docs/evidence/s1/94-adversarial-acceptance.md).
+var ErrRewrittenPath = errors.New("risk: expansion moved this path onto a tree the caller did not name")
+
 // Result is the outcome of resolving one path through the C26 pipeline.
 type Result struct {
 	// Canonical is the real path after handle resolution (8.3 expanded,
@@ -49,6 +63,39 @@ type Result struct {
 	// Resolved reports whether handle-based resolution succeeded (the path
 	// exists and the OS gave us its final form).
 	Resolved bool
+	// Spelling is the input exactly as Resolve received it, before any
+	// pipeline step. It is what the human sees in an approval prompt and what
+	// the caller would join its own writes onto, so a verdict taken on
+	// Canonical can always be traced back to the form it was asked about.
+	Spelling string
+	// Rewritten reports that the pipeline's expansion step (SPEC-06 §4 step 1)
+	// substituted something: %VAR%, $VAR or a leading ~ resolved to a value,
+	// so Canonical may name a different tree than Spelling does. False means
+	// no substitution happened, which is what lets a caller bind its own
+	// lexical abs to Canonical (ticket 102).
+	Rewritten bool
+	// Rewrites names the constructs that substituted, in pipeline order
+	// ("env", "home"); empty unless Rewritten.
+	Rewrites []string
+}
+
+// Actable returns the spelling a caller may *act on* - create, seal, open,
+// authorize - as opposed to merely classify. It is the accounting half of
+// ticket 102's fix (B): expansion stays in the pipeline because the contract
+// puts it there, but a leg that both touches a tree and reports success to its
+// caller must come through here, because here is where an expansion that moved
+// the path off the caller's own tree turns into ErrRewrittenPath instead of
+// into "sealed a tree nobody asked about, err = nil".
+//
+// Every security consumer of Result outside this file reads the account
+// through this method or through Result.Rewritten; the static criterion in
+// pathresolver_rewrite_account_test.go fails the build-level gate if one stops.
+func (r Result) Actable() (string, error) {
+	if r.Rewritten {
+		return "", fmt.Errorf("%w: %s expands to %s (%s); act on the expanded tree only if you asked for it by name",
+			ErrRewrittenPath, r.Spelling, r.Canonical, strings.Join(r.Rewrites, "+"))
+	}
+	return r.Canonical, nil
 }
 
 // Resolve runs the fixed C26 pipeline on input. exceptions carries the
@@ -56,7 +103,7 @@ type Result struct {
 // prefixes). Nonexistent paths resolve lexically and still classify; only a
 // non-exempted reparse traversal is an error.
 func Resolve(input string, exceptions []string) (Result, error) {
-	p := expandInput(input)
+	p, kinds := expandAccounted(input)
 	p = lexCanonical(p)      // the one sanctioned lexical step
 	p = normalizeLocalUNC(p) // \\localhost\c$\... and \\?\UNC\localhost\c$\... -> c:\...
 	p = lexCanonical(p)      // re-clean after prefix rewriting
@@ -66,7 +113,7 @@ func Resolve(input string, exceptions []string) (Result, error) {
 		exems[strings.ToLower(ee)] = true
 	}
 
-	res := Result{}
+	res := Result{Spelling: input, Rewritten: len(kinds) > 0, Rewrites: kinds}
 	if comps := reparseComponents(p); len(comps) > 0 {
 		for _, c := range comps {
 			if exems[strings.ToLower(c)] {
@@ -94,10 +141,35 @@ func Resolve(input string, exceptions []string) (Result, error) {
 
 // expandInput expands environment variables (%VAR% and $VAR) and a leading
 // ~ (the user home). Unknown constructs pass through untouched.
+//
+// It is the pipeline's step 1 without its bookkeeping, and therefore only
+// correct where the caller cannot ACT on the answer: the reparse-exception
+// table and syncdirs' unresolvable-root fallback, both of which are compared
+// against other C26 output and never handed to a write. Anything that decides
+// or acts goes through Resolve + Result.Actable.
 func expandInput(input string) string {
+	p, _ := expandAccounted(input)
+	return p
+}
+
+// expandAccounted is step 1 of SPEC-06 §4 with the account ticket 102 needs:
+// it returns the expanded spelling plus which constructs actually substituted.
+// The substitution is the contract's own; the account is what stops the
+// substitution from silently moving the decision onto another tree.
+func expandAccounted(input string) (string, []string) {
+	var kinds []string
+	add := func(kind string) {
+		for _, k := range kinds {
+			if k == kind {
+				return
+			}
+		}
+		kinds = append(kinds, kind)
+	}
+
 	p := strings.TrimSpace(input)
 	if p == "" {
-		return p
+		return p, nil
 	}
 	// Windows-style %VAR%.
 	for start := strings.Index(p, "%"); start >= 0; start = strings.Index(p[start+1:], "%") + start + 1 {
@@ -108,16 +180,25 @@ func expandInput(input string) string {
 		name := p[start+1 : start+1+end]
 		if v := os.Getenv(name); v != "" && !strings.Contains(name, "%") {
 			p = p[:start] + v + p[start+1+end+1:]
+			add("env")
 		}
 	}
+	// POSIX-style $VAR / ${VAR}. os.ExpandEnv leaves everything it does not
+	// know about alone, so a change to the string is the only evidence there is
+	// (and it drops an unset $VAR to empty, which is a substitution too).
+	before := p
 	p = os.ExpandEnv(p)
+	if p != before {
+		add("env")
+	}
 	// Leading ~ -> home. Only bare ~, ~/ or ~\ (never ~user).
 	if p == "~" || strings.HasPrefix(p, `~\`) || strings.HasPrefix(p, "~/") {
 		if home, err := os.UserHomeDir(); err == nil && home != "" {
 			p = home + p[1:]
+			add("home")
 		}
 	}
-	return p
+	return p, kinds
 }
 
 // lexCanonical is the single sanctioned filepath.Abs + filepath.Clean call

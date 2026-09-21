@@ -139,9 +139,22 @@ func (s *syncSet) finalize() {
 func (s *syncSet) add(r SyncRoot) {
 	res, err := Resolve(r.Path, s.excs)
 	c := syncRootC{root: r}
-	if err == nil && res.Resolved && res.Canonical != "" {
+	switch {
+	case err == nil && res.Rewritten:
+		// Ticket 102 (fix B) consumption site: C26's step 1 substituted part of
+		// the configured spelling (%VAR% / $VAR / leading ~), so the tree being
+		// compared is NOT the tree the operator spelled. The root still guards —
+		// canon is the expanded tree, which is what the OS actually means, and
+		// dropping the guard would be a fail-open of its own — but it may not
+		// disarm the sync-suspect net as canonical-grade evidence: that switch
+		// authorizes writes, and a root nobody confirmed in resolved form cannot
+		// prove it. Same direction as the !res.Resolved branch below.
+		c.canon, c.canonical = normPath(res.Canonical), false
+		logf("risk/C25: sync root %q was rewritten by expansion (%s); it guards %s but does not count as canonical evidence",
+			r.Path, strings.Join(res.Rewrites, "+"), res.Canonical)
+	case err == nil && res.Resolved && res.Canonical != "":
 		c.canon, c.canonical = normPath(res.Canonical), true
-	} else {
+	default:
 		// Root itself unresolvable (e.g. not yet created): keep the lexical
 		// form for comparison but remember it is not verified.
 		c.canon, c.canonical = normPath(expandInput(r.Path)), false
@@ -186,13 +199,23 @@ func (s *syncSet) resolveTarget(raw string) (string, error) {
 	if err != nil {
 		return "", err // non-exempted reparse traversal: fail closed upstream
 	}
-	if res.Canonical == "" {
+	// Ticket 102 (fix B) consumption site: this is a write verdict - "not a sync
+	// dir" is what lets fs.write through un-suspected. If expansion substituted
+	// part of the spelling, C26 judged a tree the caller did not name, so the
+	// only permitted answer is the fail-closed one (the caller's error path
+	// reads as sync-suspect). Actable is also taken on the ancestor re-resolve
+	// below for the same reason: the account is read, never assumed.
+	canon, err := res.Actable()
+	if err != nil {
+		return "", err
+	}
+	if canon == "" {
 		return "", errTargetUnverified
 	}
 	if res.Resolved {
-		return normPath(res.Canonical), nil
+		return normPath(canon), nil
 	}
-	anc, rest := deepestExistingAncestor(res.Canonical)
+	anc, rest := deepestExistingAncestor(canon)
 	if anc == "" {
 		return "", errTargetUnverified // nothing of this chain exists on disk
 	}
@@ -200,7 +223,11 @@ func (s *syncSet) resolveTarget(raw string) (string, error) {
 	if err != nil {
 		return "", err // the existing part of the chain traverses a reparse point
 	}
-	if ares.Canonical == "" {
+	anceCanon, err := ares.Actable()
+	if err != nil {
+		return "", err // ticket 102: an ancestor C26 moved is not evidence about this one
+	}
+	if anceCanon == "" {
 		return "", errTargetUnverified
 	}
 	if !ares.Resolved {
@@ -225,7 +252,7 @@ func (s *syncSet) resolveTarget(raw string) (string, error) {
 		// under-profile writes keep falling into the suspect net. Compiling
 		// for darwin does NOT mean that judgment is well-informed.
 	}
-	return normPath(ares.Canonical + sepStr + strings.Join(rest, sepStr)), nil
+	return normPath(anceCanon + sepStr + strings.Join(rest, sepStr)), nil
 }
 
 // deepestExistingAncestor splits an absolute, lexically cleaned path into the
