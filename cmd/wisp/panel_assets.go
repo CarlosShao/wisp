@@ -18,6 +18,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/CarlosShao/wisp/internal/panel"
 	"github.com/CarlosShao/wisp/internal/risk"
@@ -26,10 +27,11 @@ import (
 func cmdPanelAssets(args []string) int {
 	fs := flag.NewFlagSet("panel-assets", flag.ContinueOnError)
 	manifest := fs.Bool("manifest", false, "list every file the binary carries, with size and fingerprint")
+	check := fs.Bool("check", false, "verify the entry file and every asset it references are inside this binary")
 	render := fs.String("render", "", "write the embedded bytes for this request path to stdout")
 	l2 := fs.String("l2", "", "assess this tool name with the remaining args as its argv and print the L2 card JSON")
 	fs.Usage = func() {
-		fmt.Fprintln(os.Stderr, "usage: wisp panel-assets [-manifest] [-render <path>] [-l2 <tool> <args...>]")
+		fmt.Fprintln(os.Stderr, "usage: wisp panel-assets [-manifest] [-check] [-render <path>] [-l2 <tool> <args...>]")
 	}
 	if err := fs.Parse(args); err != nil {
 		return 2
@@ -86,6 +88,17 @@ func cmdPanelAssets(args []string) int {
 		for _, line := range lines {
 			fmt.Println(line)
 		}
+	case *check:
+		// The "the embed carried less than the build produced" detector: an
+		// operator, and the AC#1 evidence run, both end here rather than
+		// eyeballing a blank panel.
+		served, err := assets.Check()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "wisp panel-assets: %v\n", err)
+			return 1
+		}
+		fmt.Printf("panel assets check: entry=%s built=%t %d asset refs resolve [%s]\n",
+			panel.EntryFile, assets.Built(), len(served), strings.Join(served, " "))
 	default:
 		if !assets.Built() {
 			fmt.Fprintln(os.Stderr, "wisp panel-assets: assets NOT BUILT")

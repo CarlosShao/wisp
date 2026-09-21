@@ -224,3 +224,43 @@ C21、D23/§17 零 emoji 图标、D29 人工视觉签收、ban #6 / ban #8
     所以正确分配是 **留 5 / 缓 4 / 砍 2**（合计 11），**不是 5/4/3**。
     ⇒ 别为了凑够"砍 3"去砍掉一个本没在清单上的东西，也别凭空发明第 12 条。
   - **一期不变**：以上全是 **React Bits = 二期**；一期 **零 React Bits 代码进树**，基座 = Beautiful UI + shadcn + Tailwind。
+
+- **14:5x `agent-ticket77d`（第三任）第一枚 checkpoint：审计收下前任未提交改动 + AC#1 取到真数 + AC#4 台账与真红**。
+  **对前任（`agent-ticket77b`）未提交改动的审计结论 = 收，且一字不改**：
+  `internal/panel/assets.go`(+52)/`cmd/wisp/panel_assets.go`(+15)/新增 `internal/panel/assets_test.go`(182 行)
+  是 **AC#1 的自洽半成品**（不是残件）：`Assets.Check()` 把"entry 在 embed 树里、它点名的哈希资产不在"这个
+  真实失效模式（Vite 改哈希 / `all:dist` 模式打错 / 构建中断）变成一条有退出码的判定，`newAssets()` 抽出来
+  让同一判定能被**合成 bundle** 驱动，因此"无 node 的机器"上也有证据。它缺的只是**变异检验**与**一次真取数**，
+  两者在本条补齐；判据不是"看着能用"：
+  (1) **变异真红**：把 `if _, _, err := a.Resolve(ref); err != nil` 改成 `... && false` ⇒
+      `go test ./internal/panel/ -run 'TestCheck|TestBuiltin|TestAnchor'` **`--- FAIL: TestCheckRejectsEntryNamingAnUnembeddedAsset`**、包 rc=1；
+      还原后 `grep -c "err != nil && false"` = **0**、包重新 `ok`。
+      ⚠ 诚实口径：同一变异下 `TestBuiltinBundleIsCompleteOrAbsentNeverHalf` **仍 PASS** —— 因为真 bundle 本来就完整，
+      它的牙只在合成 bundle 那条上；这条不是被变异证明的，是被下面 AC#1 的真数证明的。
+  (2) **四种假绿逐条查**：`go test -count=2 ./internal/panel/ -v` = **RUN 32 / PASS 32 / FAIL 0 / SKIP 0**，
+      32 == 2 × 16 个不同名（对得上，无同名刷分）；无 `--- SKIP`；`-run` 那条的匹配数=5>0；编译 rc=0 非"编译失败当变异"。
+  (3) **没有为变绿删断言**：`TestAnchorOnlyBundleIsNotBuiltAndFailsClosed` 钉"只有锚点 ⇒ built=false 且
+      Resolve/Check/Manifest 三入口全 fail-closed"，`TestResolveRefusesPathsOutsideTheBundle` 钉 5 条越界路径。
+  **AC#1（PARTIAL 收口到"能命令级复现"，框仍不勾，原因见末）**：
+  `go build -o build/wisp.exe ./cmd/wisp` **rc=0**（27878718 B）。**剥光 node/npm 的真跑**
+  （`PATH=/c/Windows/System32:/c/Windows:/usr/bin`，`command -v node`/`npm` 双双 **ABSENT**）：
+  `wisp.exe version` **rc=0**、`wisp.exe panel-assets` **rc=0** = `panel assets embedded: 4 files, entry=index.html built=true`、
+  **`wisp.exe panel-assets -check` rc=0** = `entry=index.html built=true 2 asset refs resolve
+  [./assets/index-DIrih6dy.js ./assets/index-BQ3J3QdO.css]` —— 即"页面点名的资产二进制自己就有"这条现在是命令级事实。
+  `node_modules/` 被 `git check-ignore -v` 证实由
+  `frontend/.gitignore:7` 挡住（根 `.gitignore` 的 `node_modules/` 一行是第二层），未进本枚 commit。
+  **AC#4（本票范围内的半边闭合）**：`sh scripts/d22scan.sh` 自报**逐作用域文件数**——
+  `scope ban #6 frontend/ examined 38 text files`（票 88 已把 ban #6 翻成 `live:true`，与编排者给的 35 相比
+  我这次多 3 个文件，因为本票之后 `frontend/` 又落了文件；**取我自己的数 38**）、
+  `scope ban #8 design/ 16 text files` / `ban #8 internal/ 322 Go files` / `ban #8 cmd/ 25 Go files`。
+  **planted 真红**：临时 `frontend/src/__ban6_probe.ts` 写入 `approval.decide` ⇒
+  d22scan **rc=1**（不再是前任遇到的那个 rc=2 guard 抢跑）并点名 `frontend/src/__ban6_probe.ts:1: [panel-approval] ...`，
+  探针已删除（`ls` 证不存在）。⇒ AC#4 的两个判据中"逐作用域文件数>0"与"plant⇒rc=1 且点名"都在此闭合，
+  **但 ban #8 的声明作用域不含 `frontend/`**（scanner 只报 design/internal/cmd），
+  前端零 emoji 这一半靠的是本票自装的 `TestFrontendHasNoEmoji`（24 文件 0 命中）——
+  把 ban #8 扩到 `frontend/` 要在 `tools/d22scan/**` 改，那是编排者的地界，本票**未改任何 ban**（台账如实记此口径差）。
+  ⚠ **一条先于本票存在的红，不追**：当前工作树 `sh scripts/d22scan.sh` **rc=1**，但**唯一命中的不是我**——
+  `internal/winsec/winsec.go:126: [pathresolver-bypass]`（票 89 在飞的未提交改动，我没碰）。
+  另 `go test ./cmd/wisp/` 在本机**加载期就 rc=1（`0xc0000135`）**，纯净树 `git archive 63ef895` 同读数 ⇒ 仪器问题，登记不追。
+  `next=` AC#3（L2 卡的**渲染证据**：由 `internal/risk` 真决策对象驱动、并给出 DOM/字符串级"这些值真被画出来了"的证明）
+  → 之后 AC#6（CI job 的真实 run id，本票不能 push，只能写"欠 push 后复跑"）。

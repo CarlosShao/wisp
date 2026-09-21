@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -44,11 +45,18 @@ func BuiltinAssets() (*Assets, error) {
 	if err != nil {
 		return nil, fmt.Errorf("panel: cannot open embedded dist: %w", err)
 	}
-	a := &Assets{tree: sub}
-	if _, err := fs.Stat(sub, EntryFile); err == nil {
+	return newAssets(sub), nil
+}
+
+// newAssets decides the built / not-built state for any tree the same way, so
+// the tests can hand it a synthetic bundle - including the "embed carried the
+// entry but not the assets" case that only happens by accident in the real one.
+func newAssets(tree fs.FS) *Assets {
+	a := &Assets{tree: tree}
+	if _, err := fs.Stat(tree, EntryFile); err == nil {
 		a.built = true
 	}
-	return a, nil
+	return a
 }
 
 // Built reports whether the binary really carries a built panel, as opposed
@@ -111,6 +119,44 @@ func (a *Assets) Manifest() ([]string, error) {
 	}
 	sort.Strings(out)
 	return out, nil
+}
+
+// entryRefRe matches the asset references Vite writes into index.html
+// (src="./assets/index-<hash>.js", href="./assets/index-<hash>.css").
+var entryRefRe = regexp.MustCompile(`(?i)\b(?:src|href)\s*=\s*["']([^"']+)["']`)
+
+// Check proves the embedded bundle is internally complete, which is the
+// failure mode "go:embed shipped less than npm run build produced" actually
+// looks like: the entry file is there, the page loads, and then every hashed
+// asset it names 404s, so the panel renders blank while the binary still
+// reports built=true.
+//
+// It returns the bundle-relative names it resolved so a caller can print how
+// many bytes the page actually depends on. Anything the entry references that
+// cannot be resolved from the same tree is an error naming that reference.
+func (a *Assets) Check() ([]string, error) {
+	entry, _, err := a.Resolve(EntryFile)
+	if err != nil {
+		return nil, err
+	}
+	var served []string
+	seen := map[string]bool{}
+	for _, match := range entryRefRe.FindAllStringSubmatch(string(entry), -1) {
+		ref := match[1]
+		if cut := strings.IndexAny(ref, "?#"); cut >= 0 {
+			ref = ref[:cut]
+		}
+		if ref == "" || strings.HasPrefix(ref, "#") || strings.HasPrefix(ref, "//") ||
+			strings.HasPrefix(ref, "data:") || strings.Contains(ref, "://") || seen[ref] {
+			continue
+		}
+		seen[ref] = true
+		if _, _, err := a.Resolve(ref); err != nil {
+			return served, fmt.Errorf("panel: %s references %q but the embedded bundle cannot serve it", EntryFile, ref)
+		}
+		served = append(served, ref)
+	}
+	return served, nil
 }
 
 // contentTypeOf covers the shapes Vite emits. Anything unlisted is refused by
