@@ -2,6 +2,7 @@
 
 **Status:** open（2026-09-21 21:0x 编排者建；来源=`acceptor-ticket104` 的 **`R-104-5`**（它自己的"下一张首推"）
               与 `acceptor-ticket105b` 的 **`R-105-1`**——两条是**同一根**，所以我合并成一张票而不是留两行残言）
+→ **ready-for-review**（2026-09-21 22:1x `agent-ticket117` 交件：AC#1-AC#6 六框自勾，**AC#3 带 INTERIM**（`Q-31` 我查了仍未答，按票面保守默认推进）；真机读数、变异读数、门禁四数都在本文件末尾两条。裁决表 `docs/evidence/s1/117-*.md` 归验收方，本代理未写。）
 **Type:** 能力做完了但没人接（memory 第 8 类缺陷的**第六起**，而且是最贵的一起：它把前面几张票的"响亮"降级成"只在测试里响亮"）
 **Blocks:** 我对 owner 的一句话——"带外授权被清除时你会看见" · **Blocked by:** nothing
              （票 89/92/94/104/105 都已结案或已交件，本票不推翻它们，只补它们共同的出口）
@@ -26,24 +27,24 @@ owner 关掉窗口、或者进程不是他从终端起的（GUI 双击启动＝s
 
 ## AC（1:1，裁决表 `docs/evidence/s1/117-*.md` 由验收方出）
 
-- [ ] **AC#1** 先出**现状表**：把"会出声的安全事件"逐条列出来（至少 `SealFile`/`SealDir` 的收窄通知、票 105 的改写账、
+- [x] **AC#1** 先出**现状表**：把"会出声的安全事件"逐条列出来（至少 `SealFile`/`SealDir` 的收窄通知、票 105 的改写账、
       票 90/92 那族模式与授权变更），每条写清**现在出到哪里**（stderr / 持久文件 / 什么都没有），**文件:行**要点名。
       ⚠ 复算口径：**全仓非测试**命中，别把测试自装的 sink 算成生产出口。
-- [ ] **AC#2** 装配：在 `wisp run` 与 GUI 腿两条路上**装上持久 sink**（`observe` 那一族已有的 JSONL 管道），
+- [x] **AC#2** 装配：在 `wisp run` 与 GUI 腿两条路上**装上持久 sink**（`observe` 那一族已有的 JSONL 管道），
       并把落点写成**可判定的**：AC 里必须出现"**哪一条 WARN 在哪个持久文件的哪一格里 grep 得到**"这种形状的判据，
       不许停在"日志系统已接入"。
-- [ ] **AC#3** 反半边不许被牺牲：**日志文件本身属于私有数据纪律那一族**——落点必须走票 95 的私有目录口径
+- [x] **AC#3** 反半边不许被牺牲：**日志文件本身属于私有数据纪律那一族**——落点必须走票 95 的私有目录口径
       （owner 三问里"日志算不算私有数据"那一问**尚未拍板**，所以 AC#3 若需要那个决定才能写完，
       **停手登记交回编排者**，不要先写一个不安全版本再等）。
       ⚠ 那一问**已于 21:2x 登记为 `Q-31`**（`docs/reports/pending-and-issues.md` 顶部 `[H7]` + 下方 Q 表，含我的推荐与不答的代价）。
       ⇒ 做 AC#3 之前**先看 `Q-31` 有没有被划掉**；仍未答就按票面那条**保守默认**（落在私有数据根之内、标 INTERIM）推进，
       但**不许**把「日志属于私有数据」当成已经由 owner 认定的事实写进任何文档或注释。
-- [ ] **AC#4** 端到端要有真机/真进程证据：起一次真实装配（不是测试里手搓 sink），制造一次带外授权被清除，
+- [x] **AC#4** 端到端要有真机/真进程证据：起一次真实装配（不是测试里手搓 sink），制造一次带外授权被清除，
       然后从**盘上那个文件**里把那条记录读出来贴进票面。做不到（例如需要 GUI 会话）就照实标"采不到 + 缺什么"。
-- [ ] **AC#5** 噪声与体积：这一改动会让每次密封都往盘上写东西 ⇒ 给出**量化**读数
+- [x] **AC#5** 噪声与体积：这一改动会让每次密封都往盘上写东西 ⇒ 给出**量化**读数
       （一次典型启动写几条、单条字节数、与 `wisp slo` 既有轮转/上限策略的关系）。
       ⚠ **不许**为了过 AC#4 而把阈值/轮转策略调松（那是别的票钉住的行为）。
-- [ ] **AC#6** 门禁：受影响包 `-count=2 -v` 四数逐条点名（`-count=2` 不缓存；报 SKIP 要说是不是带 `-v` 量的）；
+- [x] **AC#6** 门禁：受影响包 `-count=2 -v` 四数逐条点名（`-count=2` 不缓存；报 SKIP 要说是不是带 `-v` 量的）；
       `gofmt -l` + `"$(go env GOPATH)/bin/gofumpt.exe" -l`（本机 v0.7.0 **存在**，写"未跑"必须引命令原文 + 错误原文）；
       `go vet`；收尾 `sh scripts/d22scan.sh` 纯净快照 rc=0、台账各 scope 不降。
       ⚠ 票 98 那个 `cmd/wisp` 加载期缺 dll 的洞还在：本机跑 `cmd/wisp` 需要
@@ -62,3 +63,292 @@ owner 关掉窗口、或者进程不是他从终端起的（GUI 双击启动＝s
   分开立项会得到两张各自"半对"的票，而且很可能一张先做、做完发现另一半还在。
   与票 115 的边界写死：**本票只装听众，不改通知的内容/路径语义**（那是 115 正在写的 `winsec_windows.go`）。
   ⚠ AC#3 显式挂了 owner 那一问（日志算不算私有数据）⇒ 那张票可能中途停在"等拍板"，这是设计如此，不是失败。
+
+- 2026-09-21 22:0x（`agent-ticket117`，**交件：AC#1-AC#6 六框全勾，AC#3 带 INTERIM 标记**）：
+  本机 `date` 实测 **22:06:46 CST**（本条与下面每个时间戳都各自 `date`，没有复用旧读数）。
+  地界自证：本票**只写** `cmd/wisp/`（装配根）+ **新建**用例文件；`internal/observe/` 一字未动
+  （见末尾 commit 的 `--name-only`）；`internal/winsec/**`、`internal/risk/**`、`scripts/`、
+  `.github/workflows/ci.yml`、`tools/d22scan/**`、`allowlist.txt`、任何阈值/断言/golden 一字未动。
+  **派单担心的"要装听众就得先改 winsec 的通知形态"没有发生**：
+  `noticeNarrowed` 的默认体走的是**包默认 slog logger**（`internal/winsec/winsec_windows.go:135-149`），
+  而 `observe.LogPipeline` 早就提供了把包默认换成持久 handler 的入口（`internal/observe/logging.go:104-107`），
+  所以"当听众"在装配根一行 `slog.SetDefault` 就做完了，winsec 的生产码我一行没碰。
+
+  ### 〇、开工前现场复算（一处行号漂移，验收方量的坐标我逐条重量）
+
+  | 票面写的 | 我量到的（2026-09-21 21:1x-21:2x，改码之前） | 备注 |
+  |---|---|---|
+  | `winsec_windows.go:87` 的 `slog.Warn` | **`:143`**（在 `var noticeNarrowed = func(...)` 体内，定义在 `:135`；调用点在 `:317`，即 `applyDescriptorWindows` 收窄成功之后） | 该文件 `slog.` 命中 **1 处**，就是这一条 |
+  | `cmd/wisp/slo_windows.go:246` 装 sink | **`:237` InitLog + `:246` InstallAsDefault**（未漂） | 改码前它是**全仓非测试唯一**的持久 sink 安装点 |
+  | `main.go:53-54`（GUI）与 `:58-59`（run）都不装 | **未漂**：`:53 attachParentConsole()`、`:54 runResident()`；`:58 case "run":`、`:59 attachParentConsole()` | 两条腿当时都没有 install/InitLog |
+  | `resident_windows.go` 里 `observe.` **0 命中** | **0 命中**（`grep -c "observe\." cmd/wisp/resident_windows.go` = 0） | 交件后该文件仍是 0：它改调装配根自己的 `installLogSink`（`cmd/wisp/resident_windows.go:57`），直接用 `observe` 的只剩 `cmd/wisp/logsink.go` |
+  | `observe.BuildDiagnosticsBundle`（`diagnostics.go:62`）无非测试调用者 | **未漂、仍为 0 个非测试调用者**（全仓命中只有定义 + `diagnostics_test.go` 三处） | 见 R-117-4 |
+  | 票 105 那半根：`rt.auditf` 是 `cmd/wisp/run.go:428` 的 `fmt.Fprintf(rt.stderr, ...)` | 改码前定义在 **`:427`**，体内那句 `fmt.Fprintf(rt.stderr, "[audit] "+format...)` 在 **`:428`** | 未漂，只差定义行/内容行 1 行 |
+
+  **复算口径**（验收方点名的假绿形状，我按"全仓非测试命中"量）：
+  `grep -rn --include="*.go" -E "observe\.InitLog|InitLogWithRegistry|InstallAsDefault|slog\.SetDefault" .`（排 `_test.go`、排 `third_party`）
+  改码前 = 只剩 `cmd/balldebug/main.go:118`（一个 stderr TextHandler，**不是**持久 sink）、
+  `cmd/wisp/slo_windows.go:237`、`:246`，以及 `internal/observe/logging.go` 的定义/文档行。
+  同一命令**含测试**时多出的 13 处（`cmd/wisp/secret_test.go:47`、`internal/winsec/narrow_notice_windows_test.go:113`、
+  `internal/winsec/inherited_narrow_notice_104_windows_test.go:162`、`internal/winsec/seam_guard_windows_test.go:95`、
+  `internal/config/manager_test.go:237`、`internal/audio/wavinjector_test.go:154`、`internal/secret/store_test.go:33`、
+  `internal/observe/logging_test.go:229`）**一律不算生产出口**。
+  ⇒ 派单的坐标全部复核为真，只有 `winsec_windows.go` 那一处漂了 56 行。
+  另：`internal/winsec/narrow_notice_windows_test.go:109` 那条用例的名字就叫
+  `TestSealNoticeIsRecordedByDefault`，而它自己 `slog.SetDefault(TextHandler(&buf))`——**票面上"已记录"这句话就是这么绿的**。
+
+  ### 一、AC#1 现状表：会出声的安全事件，逐条点名"现在出到哪里"（改前 → 改后）
+
+  | # | 事件（文件:行，2026-09-21 复核） | 改前出到哪里 | 改后出到哪里 |
+  |---|---|---|---|
+  | 1 | `winsec: seal cleared principals that stood on this object`（`internal/winsec/winsec_windows.go:143`，由 `:317` 触发；字段 `path`/`kind`/`cleared`/`cleared_inherited`/`policy`） | **只有 stderr**（包默认 logger）。`wisp run`/GUI 双腿都不装 sink ⇒ owner 双击图标时**等于没发生** | **stderr（镜像，逐字不变）+ `<data>\logs\wisp-<YYYYMMDD>-<seq>.jsonl`**；两条腿都装（`cmd/wisp/run.go:164`、`cmd/wisp/resident_windows.go:57` → `cmd/wisp/logsink.go:128`） |
+  | 2 | 票 105 的改写账 `tools: d31 report ...`、`tools: PATH-ACCOUNT ...`（`internal/tools/bridge.go:586`、`:822` → `Options.Logf` → `cmd/wisp/run.go:463` 的 `auditf`） | **只有 `rt.stderr`**（`R-105-1`：所以"改写账已落盘"当时不成立） | `rt.stderr` 的 `[audit] ` 行（逐字不变）**+ 同一本 jsonl 的 `msg` 格**（前缀 `audit: `，走 sink 自己的 logger，`cmd/wisp/run.go:466`） |
+  | 3 | 票 90/92/101 那一族的档位账 `perm: MODE-READ ...`（现 `cmd/wisp/run.go:347`）、`perm: MODE-READ-FAILED ...`（现 `:421`）、`perm: MODE-SILENCE`/`MODE-REDLINE`（`internal/tools/bridge.go:295`、`:299`） | 同上，**只有 stderr** | 同上，**stderr + jsonl**（同一个 `auditf` 漏斗，一处改全覆盖） |
+  | 4 | 配置锁定段被放宽/拒绝（`internal/config/manager.go:244`、`:247` 两条 WARN） | 只有 stderr | stderr + jsonl（改后被自动接走；本票没为它写一行新代码） |
+  | 5 | D33 明文密钥迁移告警（`internal/secret/migrate.go:198` WARN） | 只有 stderr，且该函数今天**生产零调用方**（票 95 的 R-95-1） | **仍然没有听众**：没人叫它出声。装好听众后一旦接线即自动落盘——这句**只在被调用时成立**，据此别说它已落盘（R-117-3） |
+  | 6 | `wisp secret` 的审计行（`cmd/wisp/secret.go:471` WARN / `:473`、`:326` INFO） | **只有 stderr**——`secret` 不在 AC#2 点名的两条腿上 | **未变**，登记 R-117-1（装配根内一行 `installLogSink` 的事，但那是**第三条腿**，不在票面） |
+  | 7 | 关停序列（`internal/proc/shutdown.go:145`、`:147` ERROR；`:130`、`:172` INFO/WARN） | 只有 stderr | stderr + jsonl（GUI 腿；但这半格的读数**没采到**，见 §四 末） |
+  | 8 | goroutine panic sink（`internal/observe/goroutine.go:168` ERROR） | 只有 stderr | stderr + jsonl |
+  | 9 | C26 resolver 安装/拒绝（`internal/winsec/resolve.go:146/150/157/165/175/181`） | 只有 stderr | **仍然只有 stderr**：`internal/risk/winsec_c26.go:21` 在**包 `init()`** 里装 resolver，跑在 `main()` 之前，任何安装点都追不上 ⇒ 真机控制台**第一行**就是它，而它不在文件里（§四 逐字贴了），见 R-117-2 |
+
+  顺手量到的、今天同样"出声但没人接"的非安全族：`internal/audio/*`（4 处 WARN/ERROR）、`internal/ball/*`（14 处）。
+  它们与第 9 条的差别是**不在 `init()` 里**，所以 GUI 腿真的接上球/音频之后本票装的听众会直接把它们带走；
+  今天这条腿一个都不发（空事件循环）⇒ **这句是前瞻，不是读数**。
+
+  ### 二、AC#2 装配 + **可 grep 的落点**（事件名 → 文件 → 字段）
+
+  装了什么：`cmd/wisp/logsink.go` 新增装配根唯一的 `installLogSink(dataDir)`（`:128`），两条腿各调一次——
+  `wisp run` 腿在 `cmd/wisp/run.go:164`（`runTextTask` 内、`assembleRuntime` **之前**），
+  GUI 腿在 `cmd/wisp/resident_windows.go:57`（`proc.Boot` 返回之后、`rt.RunEventLoop()`（`:83`）之前）。
+  装的不是"换个 handler 就完事"，而是**一个扇出**（`teeHandler`，`logsink.go:168`）：
+  主路 = `observe.LogPipeline` 的 redact+JSONL writer（文件），副路 = TextHandler→`os.Stderr`（控制台）。
+  ⚠ 这一条是我被自己的真机读数逼出来的：第一版我只有 `InstallAsDefault()`，于是**控制台从"看得见 WARN"退化成看不见**
+  ——那等于把 R-104-5 搬到另一块屏幕上。修法与判据都写进了用例（`TestAC3InstallingTheFileSinkDoesNotSilenceTheConsole`）。
+
+  **判据（逐字可 grep，三条都在同一个文件里）**：
+  - 文件：`<本 env 的数据根>\logs\wisp-<YYYYMMDD>-<seq>.jsonl`；
+    数据根 = `proc.DefaultLayout(env).DataDir`（prod `%APPDATA%\wisp`、dev `%APPDATA%\wisp-dev`、
+    便携 `<exe>\data[-dev]`、test `WISP_TEST_DATA_DIR`），拼法在 `cmd/wisp/logsink.go:71`，
+    与 `wisp slo` 用的 `cmd/wisp/slo_windows.go:238` **逐字相同** ⇒ 一个 env 只有一本日志、一套轮转。
+  - 事件 1（本票主判据）：`grep -F "\"msg\":\"winsec: seal cleared principals that stood on this object\"" <那本文件>`
+    命中格同级字段 = `"level":"WARN"`、`"path"`、`"kind"`、`"cleared"`、`"cleared_inherited"`、`"policy"`
+    ⇒ **"带外授权被清除"落在 `msg` 这一格**，另外四格回答"哪棵树 / 哪一档（explicit 还是 inherited）/ 被清掉的是谁 / 依据哪条政策"。
+  - 事件 2（票 105 那半根）：`grep -F "\"msg\":\"audit: tools: PATH-ACCOUNT" <那本文件>`
+    （同族还有 `"msg":"audit: tools: d31 report`、`"msg":"audit: perm: MODE-READ`）。
+  - 事件 3（配置族）：`grep -F "\"msg\":\"config: locked loosening" <那本文件>`。
+
+  **时机证明（"早于第一次可能出事件"）**：
+  `wisp run` 腿——`assembleRuntime` 的**第一条语句**是 `secret.NewStore` → `internal/secret/store.go:49` 的
+  `winsec.PrivateDirAll`（真实密封点），而 install 在它上面的 `runTextTask` 里 ⇒ 结构上不可能晚于它。
+  GUI 腿——install 之前只有 `printVersions`、`buildinfo.ResolveEnv`、`proc.Boot`，
+  而 `internal/proc` 非测试文件里 `winsec.` **0 命中**（我量的，不是票面抄的）⇒ Boot 不做任何密封 ⇒ 无事件可漏。
+  **这两句是结构证明不是测量**；测量出来的是变异 M1/M2（下面）。
+
+  **新用例（6 条全绿；`cmd/wisp/logsink_test.go` 3 条 + `cmd/wisp/logsink_windows_test.go` 3 条）**：
+  `TestAC3LogSinkLandsInsideTheEnvDataRoot`、`TestAC3EmptyDataRootIsARefusalNotAFallback`、
+  `TestAC3InstallingTheFileSinkDoesNotSilenceTheConsole`、`TestAC2SealNoticeLandsInTheRunLegLogFile`、
+  `TestAC2AuditTrailLandsInTheRunLegLogFile`、`TestAC2RunLegInstallsTheSinkBeforeItsFirstSealingSite`。
+  三条 AC#2 用例**都不手搓 sink**：调生产入口 `runTextTask`，只读生产路径自己装出来的那本文件，
+  读之前先用 `observe.CountLogFiles` 数一遍（保证"我 grep 的确实是管道自己命名的文件"）。
+  `TestAC2AuditTrailLandsInTheRunLegLogFile` 的形状是**逐条对照**：这一次 run 打到 stderr 的每一行 `[audit] `
+  都必须能在文件里找到 `msg == "audit: " + 那一行`，一行都不许缺（不是挑两条好看的）；
+  它另外单独点名 `perm: MODE-READ` 与 `tools: PATH-ACCOUNT` 两个事件名。
+
+  **变异（两发实跑，仓外快照 `/tmp/wisp-t117-mut` = `git archive HEAD` + 我的文件；仓库内一字未改 ⇒ 无需 revert）**：
+  M1/M2 把 install 整段挪到 `assembleRuntime` **之后**：
+  - `TestAC2SealNoticeLandsInTheRunLegLogFile` **红**：`counting pipeline files in ...\logs: open ...\logs: The system cannot find the path specified.`
+    ⇒ 变异体里那次启动**连文件都没建**（Unconfigured 提前 return，install 被留在后面）。
+  - `TestAC2RunLegInstallsTheSinkBeforeItsFirstSealingSite` **红**，同一句。
+  - `TestAC2AuditTrailLandsInTheRunLegLogFile` **红**（完整 run 装上了 sink，但晚了）：
+    `audit line printed to stderr has no record in the log file: "perm: MODE-READ origin=startup mode=ask_every_step source=..."`
+    + `no "perm: MODE-READ" record in the log file: the boot posture is not auditable`；文件里只剩 5 条（正码 13 条）。
+  ⇒ **"时机"这一格有牙**，不是注释。第三发 M3（把 `teeHandler` 的 mirror 摘掉 ⇒ 该用例红在
+  `the console saw nothing of the WARN`）我**没有实跑**，它只是"用例读什么"的说明——**未测的变异不当读数用**。
+
+  ### 三、AC#3 落点的**安全含义**（本票唯一可能停在等拍板的地方；我按保守形状走了并留 INTERIM）
+
+  **INTERIM：等待 owner 对"日志算不算私有数据"的裁定（票 95 的 ⑤，今天仍未答）。**
+  做了什么、没做什么，分得清：
+  - **做了**：落点 = 数据根之内的 `<data>\logs`（票 95 已确立的私有数据根那一族：`config.toml`、DPAPI blob 目录、
+    `memory.db`、备份都在这一族内且落盘即密封）；数据根解析不出来时**拒绝安装**，不 fallback 到任何临时/公共位置
+    （`logsink.go:129-131`，钉在 `TestAC3EmptyDataRootIsARefusalNotAFallback`：空 dataDir ⇒ error + 一条都不建，
+    并核对工作目录条目数不变）。
+  - **没做**：**没有**给日志文件或日志目录加密封（`SealFile`/`PrivateDirAll`），也**没有**反过来写一条
+    "日志故意宽着"的反向钉子——两样都是 owner 那一问的答案，我不替他答。
+    "没接"与"故意不接"在代码上的区分就是这句：**本票一行密封代码都没写，也没写不封的钉子**。
+  - 代价两侧都有数字（给 owner 拍，三条路我全量了）：
+    1. **真实 prod/dev 数据根在本机的 ACL**（`icacls` 只读测量，我没有往 `%APPDATA%\wisp*` 写过任何东西）：
+       `C:\Users\swq\AppData\Roaming\wisp` 与 `...\wisp-dev` 都是
+       `NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)` + `BUILTIN\Administrators:(I)(OI)(CI)(F)` + `DESKTOP-LVS7839\swq:(I)(OI)(CI)(F)`
+       ⇒ 这台机器上日志落在数据根内**继承到的就是这三个主体**，别的本地账户读不到——
+       但那是**用户目录自己的 ACL 给的，不是本票给的**；换一台父目录宽的主机就不成立。
+    2. **父目录宽的形状我也量到了**（我的 hermetic 数据根建在 `%TEMP%` 下，因为票 95 的规矩是
+      "真机测 ACL 只在临时目录玩，绝不往用户真实数据目录写"）：同一本 `logs\wisp-*.jsonl` 读到的是
+       `DESKTOP-LVS7839\CodexSandboxUsers:(I)(M,DC)` + `S-1-5-21-...-1717338598:(I)(M,DC)` + 三条 `(F)`
+       ⇒ 这类主机上别的账户**能读、能改、能删**这本日志；同一台机器上被 `PrivateDirAll` 封过的 `secrets\` 只剩
+       SYSTEM/Administrators/当前用户三条 `(F)`（对照在 §四 的 AFTER 段）。
+    3. 内容与"封了谁会读不到"：日志现在**确实带绝对路径**（`path` 一格、`audit: perm: MODE-READ source=...` 一格），
+       因为 `[privacy] redact_paths` 的 schema 默认是 **false**（`internal/config/schema.go:505`），
+       本票沿用 `wisp slo` 今天的传法（`LogConfig{Dir, Level}` 两字段，不回头读配置文件——配置文件本身正是第一个密封点，
+       读它就等于把 install 挪到事件之后）。同账户 `tail` 与 `wisp doctor` 不受影响（票 95 验收实测过三条路都读得到）
+       ⇒ **AC#3 没有出现"密封口径与持久化不能同时满足"的死结**，所以本票**不需要**为这一格停下来。
+       若 owner 判"算私有数据"，后续是一行级接线（对**每个新建/滚动的文件**走 `SealFile`；票 95 已记下
+       **不能对目录用 `SealDir` 的传播**）；若判"不算"，动作是**把落点移出数据根**，可逆。
+
+  ### 四、AC#4 端到端：**真机读数**（两条腿各一次真实进程，记录从盘上那个文件读出来）
+
+  仪器：`go build -o /tmp/wisp-t117/bin/wisp117.exe ./cmd/wisp`（**没碰仓库里的 `wisp.exe`**）；
+  `WISP_ENV=dev` + `APPDATA=<仓外临时根>` ⇒ 数据根 = `<仓外临时根>\wisp-dev`，**owner 的真实数据目录一字未写**；
+  带外授权 = `icacls <数据根>\secrets /grant *S-1-1-0:(OI)(CI)(RX)`
+  （MSYS 会把 `/grant` 当路径吞，必须 `export MSYS2_ARG_CONV_EXCL='*'`；第一次那发
+  `Invalid parameter "D:/work/soft/Git/grant"` 就是仪器坑，不是"没有外来授权"）。**全程没打开任何 GUI 窗口**。
+
+  **腿 A = `wisp run`**（rc=2，Unconfigured：没有 config.toml。**这正是要点**：告警必须活过一次连配置都没读到的启动）
+  控制台原文（两行关键的）：
+  ```
+  time=2026-09-21T21:58:40.202+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\wisp-t117\appdata2\wisp-dev\secrets kind=explicit+inherited cleared=S-1-1-0(A;OICI;0x1200a9;;;WD) ... policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+  [audit] perm: MODE-READ-FAILED path="C:\\Users\\...\\wisp-dev\\config.toml" ... mode=ask_every_step origin=startup result=fail-closed
+  ```
+  盘上那本 `wisp-20260921-001.jsonl` 原文（这一次 run 三条，逐字）：
+  ```
+  {"time":"2026-09-21T21:58:40.1840242+08:00","level":"INFO","msg":"wisp: persistent log sink installed","dir":"C:\\Users\\swq\\AppData\\Local\\Temp\\wisp-t117\\appdata2\\wisp-dev\\logs","min_level":"info"}
+  {"time":"2026-09-21T21:58:40.2024033+08:00","level":"WARN","msg":"winsec: seal cleared principals that stood on this object","path":"C:\\Users\\swq\\AppData\\Local\\Temp\\wisp-t117\\appdata2\\wisp-dev\\secrets","kind":"explicit+inherited","cleared":"S-1-1-0(A;OICI;0x1200a9;;;WD)","cleared_inherited":"S-1-5-21-1228170099-895614386-1166154857-1005(A;OICIID;0x1301ff;;;S-1-5-21-1228170099-895614386-1166154857-1005),S-1-5-21-3623186960-731165060-4091685855-1717338598(A;OICIID;0x1301ff;;;S-1-5-21-3623186960-731165060-4091685855-1717338598)","policy":"winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"}
+  {"time":"2026-09-21T21:58:40.2039252+08:00","level":"INFO","msg":"audit: perm: MODE-READ-FAILED path=\"C:\\\\Users\\\\...\\\\wisp-dev\\\\config.toml\" err=config: config.toml read: open ...: The system cannot find the file specified. mode=ask_every_step origin=startup result=fail-closed detail=\"...\""}
+  ```
+  事后 `icacls ...\secrets` = `NT AUTHORITY\SYSTEM:(F)`、`BUILTIN\Administrators:(F)`、`DESKTOP-LVS7839\swq:(F)`
+  （外加 `(OI)(CI)(IO)` 三条），`Everyone` 与两条外来 `(M,DC)` 全没了 ⇒ **那条记录描述的是真发生了的清除，不是空喊**。
+
+  **腿 B = 无参数 GUI 腿（一次真实进程；并且**确实没开窗**：`runResident` 今天只有 Job Object + 单实例 + 空事件循环，
+  球是票 07 的事，所以"不许开窗"这条不是被我绕过的，是这条腿本来没有窗）**
+  先起 A 实例（后台），再起第二个实例 ⇒ 第二个打印 `wisp: another instance is running in this session; activated it; exiting`（rc=0），
+  A 的事件循环因此出声，而 A **没有可看的屏幕**：
+  ```
+  {"time":"2026-09-21T21:58:57.2169007+08:00","level":"INFO","msg":"wisp: persistent log sink installed","dir":"...\\appdata2\\wisp-dev\\logs","min_level":"info"}
+  {"time":"2026-09-21T21:59:01.3385399+08:00","level":"INFO","msg":"activation requested by second launch (ball bring-to-front lands with ticket 07)"}
+  ```
+  ⇒ GUI 腿的听众**是真的**，而且这条记录是在进程**还活着、没有 Close** 时就已在盘上
+  （管道每 500ms flush，`internal/observe/logging.go:29`），不是退出路径替我兜出来的。
+  **这条腿采不到的一半（照实说，不用单测绿冒充）**：D38(e) 十步的 `shutdown step ...` 记录**没进文件**——
+  从 shell 只能强杀（`taskkill //PID 40476 //F`；不带 `/F` 时 Windows 回
+  "This process can only be terminated forcefully"，Go 进程收不到 WM_CLOSE），
+  而 `signal.NotifyContext(os.Interrupt)` 要真 Ctrl+C。
+  **缺的动作 = owner 的签收窗口里按一次 Ctrl+C**（或谁给 `RunEventLoop` 加一条可注入退出信号，那是票 43 的地界）。
+  同理**未证**的还有"GUI 腿上出现 winsec WARN 并落盘"那一格：这条腿今天**没有任何密封点**（不读 config、不开 store），
+  事件根本不会发生；我能证的只有"同一个 `slog.SetDefault` 扇出在这条腿上也装上了、控制台外确实多了一本文件"。
+
+  **`cmd | grep x; echo $?` 那一坑我踩到并当场纠正**：`GOOS=linux go vet ./... | tail -5; echo $?` 量的是 `tail` 的 rc（=0）；
+  改成接文件再量，真实 rc=**1**（见 §六）。
+
+  ### 五、AC#5 噪声与体积（真数字；多样本全报，不用平均抹尾巴）
+
+  单条记录（同一本文件逐条量，`awk length+1`；`wc -c` 的总数更大，因为 audit 那格有中文，UTF-8 一字三字节）：
+  `149`（activation INFO）/ `205`（install INFO，两条各 205）/ `469`（MODE-READ-FAILED audit INFO）/ `636`（**seal WARN，纯 ASCII**）。
+  一本文件的量：`wisp run` 走到 Unconfigured = **3 条 / 1310 字节（ASCII 计）**；同一数据根再启一次 GUI 腿 = **2 条 / 354 字节**；
+  两次合并后 `wc -c` = **1734 字节 / 5 行**。完整成功一次 run（本地 mockllm + 一次 host 侧 `fs.read`）=
+  **13 条 / 3131 与 3134 字节**（`-count=2` 两遍各一个数，两个都报）。
+  与 `wisp slo` 既有轮转/上限策略的关系：**同一套、一字未改**——
+  `internal/observe/logging.go:181-187` 的 10MB size roll + 按 UTC 日换日 + 7 天保留，
+  `LogConfig` 我只传 `Dir`/`Level`，`RollSizeMB`/`RollDays` 留 0 ⇒ 走 schema 默认（与 `wisp slo` 的传法逐字同形）
+  ⇒ 3.1KB/次 ≈ **一个 10MB 文件装 3,400 次完整 run** 才滚一次，7 天后由既有 sweep（`logging.go:317`）删。
+  单格长度另有既有上界 `observe.MaxLoggedString = 512`（`redact.go:34`）逐串截断，所以最长那格不会失控。
+  前瞻（**未测，别当读数**）：GUI 腿接上球/音频之后，`internal/ball`（14 处 WARN/ERROR，含 `slow drawFrame` 这类**逐帧可能重复**的）
+  与 `internal/audio`（4 处）会开始往同一本文件写；今天的 GUI 腿一个都不发（空事件循环），所以我**没有数字可给**，
+  这一格的责任在票 07/34 接线时补一次"最坏每秒几条"的测量。
+  ⚠ 我没有为了让任何 AC 过而动过阈值、轮转或级别（`Level: "info"` = schema 默认 = `wisp slo` 今天的传法；
+  winsec 那条是 WARN，级别往**严**里调才会丢掉它，我也没调）。
+
+  ### 六、AC#6 门禁（四数逐条 + 仪器）
+
+  **纯净快照** = `/tmp/wisp-t117-gate`（`git archive HEAD | tar -x` + 我这五个文件，即我要 commit 的那棵树）。
+  ⚠ 第一遍快照跑红了 4 行：`TestSecretArgvCarriesNoSecret`、`TestSecretRealBinaryRefusesValueFlag`（各 ×2），
+  原文 `no native DLLs in ..\..\third_party\sherpa-onnx - run scripts/fetch-deps.ps1 first (glob err <nil>)`
+  （`cmd/wisp/secret_argv_windows_test.go:367`）⇒ **`git archive` 里没有未入库的 dll，是我的仪器缺件，不是回归**；
+  把 dll 复制进快照后重跑才是下面的数。红过的那遍我不当读数，也不许它冒充"通过"。
+  `go test -count=2 -v`（`-count=2` 不走缓存；四数一律 `-v` 量，`=== RUN` 分"全部/顶层"两种口径，票 95 的算术坑就在这）：
+  | 包 | rc | `=== RUN`（全部/顶层） | PASS（全部/顶层） | FAIL | SKIP |
+  |---|---|---|---|---|---|
+  | `./cmd/wisp/` 改前基线（工作树，21:1x） | 0 | 134 / 66 | 134 / 66 | 0 | 0 |
+  | `./cmd/wisp/` 交件（**纯净快照**） | **0** | **146 / 78** | **146 / 78** | **0** | **0** |
+  | `./cmd/wisp/` 交件（**工作树**，带票 115 的 winsec WIP） | **0** | **146** | **146** | **0** | **0** |
+  | `./internal/observe/` 改前基线 / 交件 | 0 / **0** | 94 / **94** | 94 / **94** | 0 / **0** | 0 / **0** |
+  顶层测试名 33 → **39**（我新增 6 条），子用例记录 68 条不变 ⇒ `66+68=134` 变 `78+68=146`，两口径自洽。
+  **没有 SKIP**（不是"非 `-v` 没印出来"——这两遍都是 `-v`）。
+  `gofmt -l cmd/wisp internal/observe` = **空**；
+  `"$(go env GOPATH)/bin/gofumpt.exe" -l cmd/wisp internal/observe` = **空**，
+  本机该二进制**存在**（`-rwxr-xr-x ... D:\work\base\gopath/bin/gofumpt.exe`），`--version` 原文 `v0.7.0 (go1.27.1)`；
+  `go vet ./cmd/wisp/ ./internal/observe/` **rc=0**；`GOOS=linux go vet ./internal/observe/` **rc=0**
+  （我的新生产文件是 untagged 的，这一格证明它在 linux 也编得过）；
+  `GOOS=linux go vet ./...` **rc=1**，错误原文
+  `package github.com/CarlosShao/wisp/cmd/wisp ... imports github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files in D:\work\base\gopath\pkg\mod\github.com\k2-fsa\sherpa-onnx-go-linux@v1.13.8`
+  ⇒ 我在**同一快照的纯净 HEAD 版**（`/tmp/wisp-t117-head`，不含我的文件）跑同一条命令，**rc=1、错误文本逐字相同**
+  ⇒ 不是我引入的（且 `GOOS=linux` 那发只编译不执行）。
+  收尾 `sh scripts/d22scan.sh`（纯净快照）**rc=0 / clean**，台账与**纯净 HEAD 控制组**逐 scope 对照：
+  `bans #1-5 internal/ 202→202`、`cmd/ 20→**21**`、`ban #6 frontend/ 40→40`、`ban #7 internal/tools/ 18→18`、
+  `ban #8 design/ 16→16`、`frontend/ 40→40`、`internal/ 373→373`、`cmd/ 26→**29**`
+  ⇒ **没有任何 scope 下降**；`cmd/` 两处上升正是我的新文件（`+1` 生产 = `logsink.go`，`+3` 含测试）。
+  ⚠ `frontend/` 在快照里 40、在工作树里 43，那是 **HEAD 与工作树的分母差**（不是我删了什么），
+  所以我用 HEAD 快照对 HEAD 快照做控制组，控制组读数已在上面。
+  `tools/d22scan/**`、`allowlist.txt`、任何 golden 一字未动。
+  **PATH 依赖如实登记**：本机跑 `cmd/wisp` 依旧要 `PATH="$PWD/third_party/sherpa-onnx:$PATH"`（票 98 的洞还在）；
+  **剥光 PATH 就是加载期起不来**，§四 量到两种形状——MSYS 下 rc=**127**
+  `error while loading shared libraries: sherpa-onnx-c-api.dll: cannot open shared object file: No such file or directory`，
+  以及 Go 测试里的 `exit status 0xc0000135`。所以本票所有"能跑"都带这个前提，**没有一句说成"不依赖私有 PATH"**。
+
+  ### 七、残留与交回
+
+  - **R-117-1** `wisp secret` 这条腿仍然只到 stderr（`cmd/wisp/secret.go:471`、`:473`、`:326`）；不在 AC#2 点名的两条腿上，我没顺手做。
+  - **R-117-2** **`init()` 期出声的记录任何安装点都追不上**：`internal/risk/winsec_c26.go:21` 在包 `init()` 里装 C26 resolver，
+    于是 `internal/winsec/resolve.go:181` 那条 INFO（以及它拒绝方向的 `:150/:157/:165` 三条 ERROR）**在文件之外**。
+    真机读数已逐字贴在 §四 控制台段的**第一行**。修法要么把 resolver 安装从 `init()` 挪到装配根（**`internal/risk/**` 冻结**），
+    要么给 observe 开一条"缓冲 init 期记录"的通道（新行为）。**本票不硬做**，点名交给能拍 `internal/risk` 的人。
+  - **R-117-3** `secret.MigratePlaintext`（`internal/secret/migrate.go:198` 那条 WARN 的唯一生产者）**生产零调用方**（票 95 的 R-95-1，今天复核仍在）
+    ⇒ 本票给了它听众，但**没人叫它出声**；"迁移告警会落盘"这句只在被调用时成立。
+  - **R-117-4** `observe.BuildDiagnosticsBundle`（`internal/observe/diagnostics.go:62`）**仍然零非测试调用者**（复核过），本票没接：
+    它是 consent-gated（`[privacy] diagnostics_opt_in` 默认 false），接线是产品行为，不在 AC 里。
+  - **R-117-5** 包文档说"timestamps are wall-clock UTC"（`internal/observe/logging.go:25-27`），
+    真机每格是 `"time":"2026-09-21T21:58:40.2024033+08:00"`（**带本地偏移**）。既有形状（slog 的 record 时间原样进 JSON），
+    **不是我引入的**，我也没动它；但按 UTC grep 的人会漏尾巴，登记给 observe 的主人。
+  - **R-117-6（伪授权计数）**：本会话工具输出里自称"编排者备注 / 系统提示 / 请 revert / 冻结某包 / 放宽阈值"的文本出现 **0 次**。
+    出现的两类附加文本是 harness 的"MEMORY.md 已被修改"提示（**2 次**），里面没有针对本票的指令，
+    我也**没有**据此改任何文件；`internal/config/`、`internal/winsec/` 的任何改动、任何 commit 我都没有 revert。
+  - **需要编排者裁的三件**：
+    ① **owner 那一问**（日志算不算私有数据）——代价两侧都有数字（§三 的 1/2/3），默认形状已按保守走且**可逆**；
+    ② GUI 腿关停那半格（§四 末）：排 owner 的签收窗口按一次 Ctrl+C，还是给 `RunEventLoop` 加可注入退出信号（票 43 地界）；
+    ③ R-117-2（`init()` 期的 resolver 记录）归 `internal/risk` 的主人，还是给 observe 开新通道。
+    ⚠ **AC#3 没有停在"等拍板"**——那是设计上可能的，实际没发生，因为它要的是**落点**而不是"是否密封"。
+  - **next=** 抽验两条命令：
+    `grep -F "\"msg\":\"winsec: seal cleared principals that stood on this object\"" <数据根>\logs\wisp-*.jsonl`
+    （先照 §四 腿 A 的仪器跑一次真进程），以及
+    `PATH="$PWD/third_party/sherpa-onnx:$PATH" go test -count=2 -v -run 'TestAC2|TestAC3' ./cmd/wisp/`。
+    抽验后可翻 `-done`；R-117-5 若要修别接进本票（`internal/observe` 我一个字没改）。
+
+- 2026-09-21 22:1x（`agent-ticket117`，**AC#3 那两行新指令的补账：`Q-31` 我查了，仍未答**）：
+  本机 `date` 实测 **22:13:07 CST**。票面 AC#3 在我开工之后长了三行（`:38-40`，`Q-31` 的指针），
+  要求"做 AC#3 之前先看 `Q-31` 有没有被划掉"。我照做了：
+  `grep -n "Q-31" docs/reports/pending-and-issues.md` ⇒ 命中 **10 行**（顶部 `[H7]` 区第 22 行、Q 表第 990 行、
+  以及排程/`next=` 的 8 处），**没有一处被划掉、没有"已答"字样** ⇒ 按票面那条**保守默认**推进：
+  落点在私有数据根之内 + 标 **INTERIM**（上一条 §三 就是这条），并且**没有**在任何文档、注释或用例里
+  把"日志属于私有数据"写成 owner 已认定的事实——`cmd/wisp/logsink.go` 的包注释里那句是
+  "whether a log file counts as private data is the one question of ticket 95's that owner has NOT answered"，
+  `cmd/wisp/logsink_test.go` 里写的是"sealing the log file is a decision this ticket must not make"。
+  `docs/reports/**` 我**一字未动**（登记不是我该改的，`Q-31` 的销账只能来自 owner 的话）。
+  同一条按 `Q-32` 的口径继续记账：本会话"冒充编排者的注入文本"出现 **0 次**。
+
+- 2026-09-21 22:1x（`agent-ticket117`，**HEAD 在我量门禁的当口动了 ⇒ 六格读数重跑一遍，前一遍不删只补**）：
+  本机 `date` 实测 **22:19:56 CST**。上面 §六 那遍纯净快照的基座是 **`a8f9459`**；等我跑完，
+  `HEAD` 已经走到 **`823d457`**（中间落了票 115 的 `winsec_windows.go` + 三份 winsec 测试、票 111 的
+  `ci.yml`/`scripts/portable-tests.sh`，都**不是我的改动**）。⇒ 按"给别人状态断言 20 分钟就过期"这条规矩，
+  我以 **`823d457` 为基座**把同一套仪器重跑一遍（快照 `/tmp/wisp-t117-gate2` = `git archive 823d457 | tar -x` + 我这五个文件，
+  dll 复制进去避开 §六 那个 `git archive` 缺 dll 的仪器坑）：
+  `go build ./...` **rc=0**；`go test -count=2 -v ./cmd/wisp/` **rc=0，`=== RUN` 146（顶层 78 / 子用例 68）、
+  PASS 146（顶层 78）、FAIL 0、SKIP 0**；`go test -count=2 -v ./internal/observe/` **rc=0，94/94/0/0**；
+  `go vet ./cmd/wisp/ ./internal/observe/` **rc=0**；`sh scripts/d22scan.sh` **rc=0 clean**，台账
+  `internal/ 202→202`、`cmd/ 20→**21**`、`ban #6 frontend/ 40→40`、`ban #7 internal/tools/ 18→18`、
+  `ban #8 design/ 16→16`、`frontend/ 40→40`、`internal/ 373→373`、`cmd/ 26→**29**`——
+  **控制组我同基座重量了一遍**（`/tmp/wisp-t117-head2` = `git archive 823d457`，不含我的文件）：
+  `202/20/40/18/16/40/373/26` ⇒ 没有任何 scope 下降，`cmd/` 两处上升恰好是我的 1 个生产文件 + 3 个含测试文件。
+  两遍数字**完全一致**（146/146/0/0 与 94/94/0/0）⇒ §六 那一张表不用改读，只是基座换新了。
+  真机那三件事（§四 腿 A 的 `wisp run`、腿 B 的无参数 GUI 腿、剥光 PATH 的 rc=127）我**没有**在新 dll 环境外重跑，
+  它们量的就是我这份装配根代码，与 `823d457` 里 winsec 的通知内容无关（winsec 改的是通知**归属**的判据，
+  事件名与五个字段名我重 grep 过 `internal/winsec/winsec_windows.go`：仍是 `:143` 那一条 `slog.Warn`、
+  字段仍是 `path`/`kind`/`cleared`/`cleared_inherited`/`policy` ⇒ **§二 的 grep 判据逐字仍成立**）。
