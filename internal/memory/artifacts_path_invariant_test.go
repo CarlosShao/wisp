@@ -8,13 +8,13 @@ package memory
 // caller ever supplies is a bare artifact NAME, and the directory it is resolved
 // against is the one memory.Open fixed at construction. So there is no "attempt"
 // to make, and the honest replacement for that box is a positive invariant plus
-// the four hostile component shapes being proven rejected here.
+// every hostile component shape being proven rejected here.
 //
 // Three layers of proof, deliberately redundant:
 //   1. an AST audit of the source itself (no path-shaped parameter, every
 //      filesystem-mutating call rooted at s.artifactsDir, every internal
 //      dir-taking helper called only with s.artifactsDir);
-//   2. the four hostile shapes (separator / .. / drive letter / UNC) each in a
+//   2. every hostile shape (separator / .. / drive letter / UNC) each in its
 //      named subtest, each asserted rejected BY THE GUARD (sentinel error, not a
 //      filesystem error) with the file the caller named still on disk;
 //   3. containment by real recursive directory listing (no string comparison),
@@ -299,7 +299,12 @@ func TestArtifactsAPITakesNoCallerControlledDestinationPath(t *testing.T) {
 }
 
 // ---------------------------------------------------------------------------
-// Layer 2 — the four hostile shapes, one named subtest each.
+// Layer 2 — every hostile shape, one named subtest each: six of them, because
+// AC#1 (ticket 81) keeps the literal-`\` spelling of the two separator kinds
+// beside the platform-neutral one. The two test names below still say "Four",
+// which docs/evidence/s1/76-adversarial-acceptance.md cites verbatim; renaming
+// them would rewrite someone else's evidence trail, so inv76Shapes is the source
+// of truth and both tests just loop over whatever it returns.
 // ---------------------------------------------------------------------------
 
 // TestDeleteArtifactRejectsTheFourHostileShapes is AC#1 on the delete route:
@@ -376,7 +381,7 @@ func inv76MustReject(t *testing.T, route, name string, err error, target string)
 // ---------------------------------------------------------------------------
 
 // TestArtifactsContainmentByDirectoryListing is AC#2: after driving every
-// artifacts entry point with the four hostile shapes, a recursive listing of the
+// artifacts entry point with every hostile shape, a recursive listing of the
 // whole fixture root must be byte-identical to the snapshot taken before, and
 // nothing may exist at any path the caller named. The second half is a positive
 // control: one legitimate delete must show up in the same diff, so an empty diff

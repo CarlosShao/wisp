@@ -1,6 +1,6 @@
 # 81 — 两份 containment 测试的**阳性对照是 Windows 形状**，ubuntu 上必红（票 76/79 的判据仪器在 Linux 上不自证）
 
-**Status:** in progress — AC#1 已落地（Windows 本机两侧绿），AC#2 的 Linux 侧/docker 实测、AC#3 全仓扫描、AC#4 门禁待交
+**Status:** code 侧完成、四框已勾（两侧本地实测）· **未闭**：ubuntu CI 侧 `test-core` 要一次 push 才能复验（本代理不 push）、裁决表 `docs/evidence/s1/81-*.md` 归对抗验收代理
 **Type:** 测试夹具的平台可移植性缺陷（不是生产洞，但**它让"防逃逸的那条判据"在 Linux 上等于没跑**）
 **Blocks:** 票 70 的 AC#2/AC#6（`test-core` 现在只剩 10 条红，其中 2 条就是本票）· **Blocked by:** nothing
 **Packages:** `internal/agent/spill_path_invariant_test.go`、`internal/memory/artifacts_path_invariant_test.go`
@@ -39,7 +39,7 @@ the listing never saw the deliberate escape outside the data dir (…); AC#2 wou
 - [x] **AC#3** **全仓扫同族**：`grep -rn` 出所有在没有 build tag 的测试文件里用字面 `\` 当目录分隔符的地方
   （含 `"a\\b"`、`filepath.ToSlash` 反用、`\r?\n` 之类合法的除外），逐条列进本票 log：
   要么本票一并修掉，要么写清"它在两侧语义相同、不需要修"的理由。**不许只报"扫了没问题"**——要给出命中清单。
-- [ ] **AC#4** 门禁（只跑自己碰的包）：`gofmt -l` 空、`go vet` rc=0、`go test -count=2` rc=0，
+- [x] **AC#4** 门禁（只跑自己碰的包）：`gofmt -l` 空、`go vet` rc=0、`go test -count=2` rc=0，
   并 `GOOS=linux go vet` rc=0；逐跑点名 `--- SKIP`/`--- FAIL` 行数与名字。
 
 ## Rules（本仓固定）
@@ -137,4 +137,24 @@ docker 挂载**快照**而不是工作树（别人的在飞改动会混进你的
   另：`internal/agent/spill_path_invariant_test.go` 与 `internal/memory/artifacts_path_invariant_test.go` 里剩下的 `\` 字面量
   （`p\q`、`\\fileserver\share\payload`、`C:\Windows\System32\drop`、`{"/", "\\", ":", ".."}`）都是**喂给编码器的输入串**
   或**对编码结果的负断言**，不构造路径 ⇒ 两侧语义相同，保留。
-  next= AC#4 门禁（两包 -count=2 全量 + GOOS=linux go vet，两侧各一次），然后交回
+  next= AC#4 门禁（两包 -count=2 全量 + GOOS=linux go vet，两侧各一次），见 C6
+- **C6（AC#4 门禁，只跑本票碰的两个包）**
+  - **Windows 工作树**（我的两份文件 = 已提交状态，`git diff --quiet -- internal/agent internal/memory` 当场证干净）：
+    `gofmt -l internal/agent internal/memory` → 0 行；`go vet ./internal/agent ./internal/memory` → rc=0；
+    `GOOS=linux go vet ./internal/agent ./internal/memory` → rc=0；
+    `go test -count=2 -v ./internal/agent ./internal/memory` → **rc=0，RUN=284 PASS=282 FAIL=0 SKIP=2**，两包各 `ok`（agent 4.52s / memory 29.63s）。
+  - **Linux docker `golang:1.27` 快照**（`git archive HEAD` 重导，挂快照不挂工作树）：`gofmt -l` 0 行、`go vet` rc=0、
+    `go test -count=2 -v` → **rc=0，RUN=284 PASS=282 FAIL=0 SKIP=2**，两包各 `ok`（agent 7.69s / memory 27.33s）。
+    两侧用例清单逐条同数：284 = 2×142，过滤集 50 = 2×25。
+  - 四种假绿逐跑点名：① `--- SKIP` 2 条 = `TestSubprocessCrashWriter` ×2（`internal/memory/concurrent_test.go:186`
+    的子进程角色占位；父用例 `TestCrashRecoveryKillMidWrite` 真跑且 PASS），两侧同名同数、票前既有，不是本票换来的绿；
+    ② `-run` 空匹配：五份日志（两侧 gate + 两侧过滤集 + 快照基线）里 `no tests to run` 命中 **0**；
+    ③ `-count=N` 已按上面的 2 倍关系核对；④ 静默跳步：docker 侧 `vet && test` 同链（vet 不绿就没有测试输出，而输出在），
+    `gofmt -l` 单独核了**输出行数为 0**（日志首行即 `=== RUN`，没有文件名）。
+  - 附带（同一枚 commit）：`artifacts_path_invariant_test.go` 里 "four hostile shapes" 的旧文案对齐成 "every hostile shape / six of them"，
+    Layer 2 标题处写明**测试函数名里的 "Four" 故意不改**——`docs/evidence/s1/76-adversarial-acceptance.md` 逐字引用它，
+    改名字等于替别人重写验收账。
+  - **本票没闭的两件事**：(a) 票面 ①② 两条红是在 **ubuntu CI**（run 35558750456）上观测的，本代理不 push，
+    所以"CI 侧真的转绿"要编排者推一次才能复验——我的 Linux 证据是本地 docker 快照；(b) 裁决表 `docs/evidence/s1/81-*.md`
+    是对抗验收代理的产物，不属写码代理地界。四框都勾了，但 Status 不写 `-done`。
+  next= 交回编排者：push 一次让 `test-core` 在 ubuntu 复验这两条；随后派对抗验收出 `docs/evidence/s1/81-*.md`
