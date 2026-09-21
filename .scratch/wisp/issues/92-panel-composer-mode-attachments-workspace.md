@@ -77,3 +77,46 @@
   判据是 `PLAN.md:1588`（'允许'只在原生侧）与 M4（全自动要 L2 确认）。
   **owner 补的两条不在本票**：视频语义理解（**Q-28**）与悬浮球/看门狗改造（**Q-29**），他都说了"不急、放最后"。
   next= 等票 90 的 AC#1 落地后派单；在此之前可以先把附件通路的 AC#2 做起来（它不依赖档位）。
+
+## Progress log（agent-ticket92，append-only）
+
+- 2026-09-21 18:45（agent-ticket92）：**checkpoint 1 / 基线读数**。`date` 实测 `Mon Sep 21 18:45:15 CST 2026`。
+  开工前 `sh scripts/d22scan.sh` 真实读数（树 = 本工作树，含邻居 `internal/winsec/winsec_windows.go` 的 ` M`）：
+  **rc=0**，逐作用域 `bans #1-5 internal/=197`、`bans #1-5 cmd/=20`、**`ban #6 frontend/=40`**、
+  `ban #7 internal/tools/=17`、`ban #8 design/=16`、**`ban #8 frontend/=40`**、`ban #8 internal/=347`、`ban #8 cmd/=26`。
+  ⇒ 收尾时 `ban #6/#8 frontend/` 的 40 必须**只增不减**（本票新建 composer 组件会把分母推高，这就是 AC#6 要的覆盖面证明）。
+  上面那串 `frontend/src/app.js:1: [panel-approval] ...` 与 `scan_test.go:1157` 是 d22scan **自己包的 fixture 输出**
+  （它跑自己的 `go test ./...`），末行对本仓的判定是 `clean - no D22 ban violations`。
+  已读码定位的现状：档位由 `internal/perm.Store`（票 90）持有，`cmd/wisp/run.go:377 confirmModeSwitch` 是唯一的
+  L2 强确认落点（R20/M4）；面板契约面 = `frontend/src/lib/panel.ts` ↔ `internal/panel/approval*.go`
+  （`Snapshot`/`ResultChunk` 现在**只声明在 `approval_test.go` 里**，生产侧无处构造——票 35 的泵还没落地留下的形状）；
+  附件存储复用面 = `internal/memory/artifacts.go`（`validArtifactName` 守卫 + `winsec.PrivateFileExclusive` 真 O_EXCL +
+  `enforceArtifactsQuota` 递归配额，票 76/79 成果）；工作区校验复用面 = `risk.Resolve` + `Result.Actable`
+  （票 102/107 的"改写要记账"，`res.Resolved` 在 POSIX 恒 false，所以本票不拿它当唯一确认腿）。
+  计划落点：`internal/panel/composer.go`（档位/工作区**只读视图** + 请求类型）、`internal/panel/attachments.go`
+  （白名单 + 魔数嗅探 + 响亮失败）、`internal/memory` 导出一条复用既有守卫的 artifact 写入腿（**不新建旁路目录**）、
+  `internal/tools/paths.go` 加"工作区**收窄**"（默认空 = 行为逐字节不变）、
+  `frontend/src/components/composer.tsx` + `frontend/src/lib/panel.ts`（显示 + 只发起请求）。
+  **不做**：git 分支/仓库切换（AC#7 用 grep 证）、视频语义理解（Q-28）、改扫描器/豁免。
+  next= 按 AC#1 先在快照里种"直接改 mode"的正向钉子并跑出红，再动实现。
+
+- 2026-09-21 19:2x（agent-ticket92）：**checkpoint 2 / 新增用例的"修前红"原文**（AC#1/AC#4 的契约腿）。
+  `go test -v -count=1 -run 'TestModeViewHasNoWriteSurface|TestComposerContract|TestPlantedComposer' ./internal/panel/` ⇒ **rc=1**：
+  红名 `TestComposerContractTypesMatchFrontend`，断言原文两行：
+  `composer_test.go:74: Go Snapshot emits [composer] that interface PanelSnapshot does not declare`
+  `composer_test.go:71: frontend/src/lib/panel.ts declares no interface ComposerState - the composer contract was renamed on one side only`
+  同一批里既有守卫 `TestApprovalCardViewJSONKeysMatchFrontendTypes` 也被这条新字段拖红（`approval_test.go:129` 同一句 `Go Snapshot emits [composer] ...`）
+  ⇒ 证明 `Snapshot ↔ PanelSnapshot` 那把双向锁**是活的**：Go 侧加一个字段而前端不声明，两枚独立用例同时红。
+  同一跑里已绿的三枚（不是"修前红"，是 AC#1 的正向钉子本身）：
+  `TestPlantedComposerModeWriteGoesRed`（往临时 `composer.tsx` 里种两种"页面自己改档位"的写法，
+  门一 = d22scan ban #6 的同款 `approval.decide`（票 77 已把正则逐字复制进本包 `panelDecisionIdentifierRe`）、
+  门二 = 本票新增 `composerModeWriteRe`（`setMode`/`panel.mode.set`/`PermissionMode =`/`perm.Store.Set`），
+  日志原文 `red as required: 1 line(s) matched, first=composer.tsx:4: ... method: "approval.decide", target: "mode", to: "auto_approve"`，
+  以及 `first=composer.tsx:1: export function setMode(next: string): void {`）；
+  `TestModeViewHasNoWriteSurface`（反射证明 `ModeView` 零方法 + 本包不导出 `Set|Write|Apply|ChangeMode`）；
+  `AC#7` 的 `TestNoGitSwitchCapabilityInThePanelSurface` 绿（`frontend/` 与 `internal/panel/` 生产文件里
+  没有任何 checkout/switchBranch/repoPicker/worktree 形状的能力入口）。
+  ⇒ 本票的形状按 AC#1 交了两道门而不是一道：**ban #6 抓不到 `panel.mode.set`**，
+  所以"面板能写档位"这一族不能只挂在 `approval.decide` 上；正向钉子已种进 `composer_test.go`（临时 fixture 目录，
+  **没有**往真 `frontend/` 里种违规文本——那会把 AC#6 的 `rc=0` 变成红的，且需要动扫描器豁免，本票禁做）。
+  附件（AC#2）本轮已在 Go 侧全绿，逐类结论见下一条 commit 后的读数表。

@@ -57,6 +57,39 @@ func strayBytes(strays []strayEntry) int64 {
 // which is exactly the thing the artifacts API must never do from a caller name.
 var ErrInvalidArtifactName = errors.New("memory: invalid artifact name")
 
+// PutArtifact stores caller-supplied bytes as one artifact file inside THIS
+// store's artifacts directory - the same flat tree ticket 76 guarded and ticket
+// 79 made exclusive. There is deliberately no second home for user-supplied
+// bytes (ticket 92 AC#2): an attachment shares the name guard, the real O_EXCL,
+// the private DACL and the recursive quota of everything else in here, so it
+// cannot grow a subtree the retention job cannot see.
+//
+// A collision is fs.ErrExist, not an overwrite: artifact names are injective in
+// their content (panel's attachment names are content hashes), so "already
+// exists" means "these exact bytes are already stored" and the caller decides
+// what to report.
+func (s *Store) PutArtifact(ctx context.Context, name string, data []byte) error {
+	if err := validArtifactName(name); err != nil {
+		return err
+	}
+	if err := winsec.PrivateFileExclusive(filepath.Join(s.artifactsDir, name), data); err != nil {
+		return err
+	}
+	// Quota is enforced on the write path, not only by the retention job: the
+	// job runs on a schedule, and an attachment big enough to blow the cap must
+	// not wait for it to become visible in the accounting.
+	if _, _, err := s.enforceArtifactsQuota(ctx, ArtifactsQuotaBytes); err != nil {
+		return fmt.Errorf("memory: enforce artifacts quota after %q: %w", name, err)
+	}
+	return nil
+}
+
+// ValidArtifactName is the exported half of this package's name guard, so a
+// caller that must refuse BEFORE it holds any bytes (a panel rejecting a
+// file name that spells a path) refuses with the same verdict the store would
+// reach at write time rather than with a divergent copy of the rules.
+func ValidArtifactName(name string) error { return validArtifactName(name) }
+
 // ListArtifacts returns the artifacts directory contents, oldest-written
 // first (the eviction order). Only conforming bare-file artifacts are returned;
 // non-conforming entries are logged, counted and reclaimed elsewhere.

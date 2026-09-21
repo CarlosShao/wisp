@@ -32,20 +32,9 @@ import (
 	"github.com/CarlosShao/wisp/internal/risk"
 )
 
-// Snapshot is the one push the panel receives per state change (ticket 35 owns
-// the pump). It is the whole truth: nothing on screen lives outside it.
-type Snapshot struct {
-	Pending     []ApprovalCardView `json:"pending"`
-	Results     []ResultChunk      `json:"results"`
-	GeneratedAt string             `json:"generatedAt"`
-}
-
-// ResultChunk is one streamed assistant chunk.
-type ResultChunk struct {
-	CorrelationID string `json:"correlationId"`
-	Text          string `json:"text"`
-	Done          bool   `json:"done"`
-}
+// Snapshot and ResultChunk moved to composer.go in ticket 92: a view model only
+// a test file can build is one production never sends, and the composer section
+// this ticket adds has to be constructible from the assembly root.
 
 func TestApprovalCardViewFromRealAssessor(t *testing.T) {
 	assessor := risk.NewRiskAssessor()
