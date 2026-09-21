@@ -33,6 +33,10 @@ import (
 // and the ruling this file pins (ticket 115 AC#2) is "attribute by tree": the
 // caller's spelling goes through the one resolver this package may use and the two
 // sides are then compared by component (noticeNamesTree in winsec_windows.go).
+// R-115-2 holds this file's own legs to that same rule, via answerNamesTree115:
+// after the caller-side migration landed, the only two cases run 35608530583 still
+// lost were two of these self-proof legs, each red because it held the caller's
+// spelling and compared it with the answer by hand.
 //
 // Why these cases plant the alias instead of waiting for it: this box's own temp
 // root needs no short name, so living on a machine cannot reproduce the runner's
@@ -78,6 +82,42 @@ func shortFormOf115(t *testing.T, path string) string {
 func widen115(t *testing.T, path string) {
 	t.Helper()
 	mustExec(t, "icacls", path, "/grant", "*"+everyoneSID+":(RX)")
+}
+
+// answerNamesTree115 asks this file's own question - "does the answer this notice
+// carries name the same tree as the spelling the caller typed?" - and answers it
+// by tree, which is the ruling ticket 115 AC#2 wrote down. The attribution itself
+// is delegated to the package's single noticeNamesTree rather than re-derived
+// here, so this file does not grow a comparison face beside the ones commit
+// 527d303 migrated on the caller side.
+//
+// What the wrapper adds over calling that helper directly is the guard.
+// noticeNamesTree answers false both for "this notice is not about that tree" and
+// for "ResolvePath would not vouch for that spelling". At the production seam the
+// collapse is the right direction - a caller asking "was my tree reported on?"
+// hears "no" and goes looking. Inside a case it is not: this file's back half
+// reads a false as "these are two different trees", so an unanswerable question
+// could satisfy a rejection leg without having compared anything. Here a spelling
+// nothing can name is a Fatal, which keeps both directions answerable-or-loud.
+//
+// It replaces the five faces in this file that held the caller's own spelling and
+// compared it with the notice's answer: the strings.EqualFold in the forward half
+// and the four bare sameTree calls in the back half (R-115-2 - on run
+// 35608530583 those were the only two cases still red, and both are this file's
+// self-proof legs, red because the caller's "long" spelling carries an 8.3
+// segment there).
+//
+// The one literal comparison left in the file is the instrument leg that demands
+// the notice NOT be fold-equal to the short spelling it was sealed through. It
+// stays literal on purpose: its claim is "an 8.3 expansion happened at all", and
+// answered by tree that claim is a tautology - the resolver's answer is always in
+// the tree the short spelling names - so the leg would stop proving anything.
+func answerNamesTree115(t *testing.T, n narrowNotice, spelling string) bool {
+	t.Helper()
+	if _, err := ResolvePath(spelling); err != nil {
+		t.Fatalf("this leg cannot be asked at all: ResolvePath(%q) refused to vouch for the spelling it was handed: %v", spelling, err)
+	}
+	return noticeNamesTree(n, spelling)
 }
 
 // childTree115 is a private directory holding one artifact, both in the long
@@ -143,9 +183,11 @@ func plantChildTree115(t *testing.T, name string) childTree115 {
 // and the notice's attribution must not depend on which one the caller typed.
 //
 // It also reproduces the four CI reds' mechanism on this box (AC#1): the notice
-// carries the resolver's answer, which is fold-equal to the long spelling and not
-// fold-equal to the short one, so a case-insensitive string comparison is enough
-// for one caller spelling and useless for the other.
+// carries the resolver's answer, which is fold-equal to this box's long spelling
+// and never to the short one, so the attribution leg asks the tree rule (a string
+// comparison there is what lost the runner two cases over one spelling) while the
+// instrument leg stays a literal comparison, because what it has to prove is that
+// the answer is not the spelling that was typed.
 func TestNoticeAttributionSurvivesAn83AliasOfItsOwnTree(t *testing.T) {
 	got := captureNotices115(t)
 	tr := plantChildTree115(t, "wisp115longdirname")
@@ -181,7 +223,7 @@ func TestNoticeAttributionSurvivesAn83AliasOfItsOwnTree(t *testing.T) {
 			t.Fatalf("the instrument measured nothing: the notice repeated the caller's short spelling (%q), "+
 				"so no 8.3 expansion happened on this path and the CI reds are not reproduced here", n.Path)
 		}
-		if !strings.EqualFold(n.Path, tr.child) {
+		if !answerNamesTree115(t, n, tr.child) {
 			t.Errorf("the notice no longer carries the resolver's answer for the object that was sealed: path=%q, long spelling=%q",
 				n.Path, tr.child)
 		}
@@ -227,7 +269,7 @@ func TestNoticeAttributionKeepsTwoTreesApart(t *testing.T) {
 				t.Fatalf("AC#3 back half: %d notice(s) attributed to %s through %q, want the 1 that names it: %+v",
 					len(hits), tc.name, typed, *got)
 			}
-			if !sameTree(hits[0].Path, tc.tree.child) {
+			if !answerNamesTree115(t, hits[0], tc.tree.child) {
 				t.Fatalf("AC#3 back half: the notice attributed to %q is not about %s: path=%q", typed, tc.name, hits[0].Path)
 			}
 		}
@@ -237,7 +279,7 @@ func TestNoticeAttributionKeepsTwoTreesApart(t *testing.T) {
 				// still find exactly its own notice - and never the other one.
 				t.Fatalf("spelling %q of the other tree matched %d notice(s) of this pair, want its own 1: %+v",
 					foreign, len(hits), *got)
-			} else if sameTree(hits[0].Path, tc.tree.child) {
+			} else if answerNamesTree115(t, hits[0], tc.tree.child) {
 				t.Fatalf("AC#3 back half: %q (the other tree) was attributed to this tree's notice: %+v", foreign, hits[0])
 			}
 		}
@@ -263,12 +305,12 @@ func TestNoticeAttributionKeepsTwoTreesApart(t *testing.T) {
 		if len(hits) != 1 {
 			t.Fatalf("the directory seal's own notice is not attributable through %q: %d hit(s), notices=%+v", typed, len(hits), *got)
 		}
-		if !sameTree(hits[0].Path, a.dir) {
+		if !answerNamesTree115(t, hits[0], a.dir) {
 			t.Fatalf("a notice about %q was attributed to the directory %q: %+v", hits[0].Path, typed, hits[0])
 		}
 	}
 	for _, typed := range a.spelling {
-		if hits := noticesAboutTree(*got, typed); len(hits) != 1 || !sameTree(hits[0].Path, a.child) {
+		if hits := noticesAboutTree(*got, typed); len(hits) != 1 || !answerNamesTree115(t, hits[0], a.child) {
 			t.Fatalf("the child's notice must stay its own: spelling %q matched %+v", typed, hits)
 		}
 	}
