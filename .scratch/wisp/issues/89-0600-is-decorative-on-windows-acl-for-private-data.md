@@ -1,8 +1,11 @@
 # 89 — `0o600` 在 Windows 上是装饰品：artifact / 密钥 / 数据库**从来没真的"只有我能读"过**（A51①②）
 
-**Status:** **returned-for-fix**（2026-09-21 16:1x 独立对抗验收判：**AC#2 一格 FAIL，其余五格 PASS** ⇒ **不能改名 `-done`**。
-裁决表 `docs/evidence/s1/89-adversarial-acceptance.md`。四条待补项逐条列在下面那条 log 里，
-** blockers：`internal/winsec/` 此刻有 `agent-ticket94` 在写** ⇒ 本票修复等它交件。）
+**Status:** **fix-complete-awaiting-reacceptance**（2026-09-21 16:1x 独立对抗验收判 **AC#2 一格 FAIL、其余五格 PASS** ⇒ 退回四条；
+`agent-ticket89b` 已在 `c8d5c94`（第 1、2 条判据+接线）/`01e7007`（第 3、4 条 + 前三次变异读数）/本枚（第 4 条变异读数 + 全量门禁）
+**把四条全部补完，各带实测红名** ⇒ **等重验收，仍不改名 `-done`**。裁决表 `docs/evidence/s1/89-adversarial-acceptance.md`。
+票面那两句错话（"普通权限建不出目录符号链接"、"第三个主体会在写入点直接失败"）**已按实测改掉**，见 Progress log 17:5x/18:1x。
+~~blockers：`internal/winsec/` 此刻有 `agent-ticket94` 在写~~ ⇒ 已解：94 的 `ResolvedPath` 铸造口与 `internal/risk/winsec_c26.go`
+形状**原样保留**，本枚未新增任何绕开它的入口。）
 **Type:** 安全（本机数据泄露面：同机其他用户/进程可读我们的私有数据）
 **Blocks:** nothing · **Blocked by:** nothing（`internal/memory/artifacts.go` 与 `internal/agent/spill.go` 此刻无人写）
 **Packages:** 新建一个 Windows ACL 的小工具文件（建议 `internal/acl/` 或 `internal/winsec/`，**由你定，但要在票面写理由**）
@@ -57,6 +60,38 @@
 数红/绿用全量输出仪器；票面 append-only，**要改的那行先读再替换**。
 
 ## Progress log（append-only）
+
+- 2026-09-21 18:1x（`agent-ticket89b`，**收尾枚：第 4 条的变异读数 + 全量门禁 + d22scan**）：
+  **变异读数 #4（证明第 4 条那条通知是承重的，不是装饰）**：`git archive 01e7007 | tar -x -C /tmp/wisp89b-nt`，
+  把 `applyDescriptorWindows` 里的 `noticeNarrowed(narrowNotice{…})` 换成 `_ = before // MUTATION-89SILENT`
+  （同链 `grep -n` 命中 144 行、`go build ./internal/winsec/` rc=0 ⇒ 可编译且行为改变）⇒
+  `go test -count=1 -v -run 'TestSeal' ./internal/winsec/` **rc=1，`=== RUN` 2，两条全红**：
+  `--- FAIL: TestSealReportsThePrincipalsItCleared (0.23s)`、`--- FAIL: TestSealNoticeIsRecordedByDefault (0.07s)`
+  ⇒ "重新变回静默清除"这件事只有这两格会响，红名与判据一一对上（`-run` 仅用于变异读数，条数按 `=== RUN`=2 点名）。
+  **对票 94 形状的尊重**：本枚**没有新增任何绕开 `ResolvedPath` 铸造口的入口**——第 2 条走的是既有公开 API
+  （`winsec.PrivateFile` / `winsec.SealFile`，两者都在内部过 `resolveString`），第 4 条只动 `applyDescriptorWindows`
+  这一个已存在的平台内部接缝；`RemoveUnlinked` 刻意不解析路径那一条**未碰**（票 94 自认弱处，验收方在判，且要动 `internal/memory`）。
+  **最终门禁（工作树 = 本枚）**：`gofmt -l internal/winsec internal/secret internal/memory internal/agent` 空；
+  `gofumpt -l .`（**全仓**）空；`go vet ./internal/winsec/ ./internal/secret/ ./internal/memory/ ./internal/agent/` rc=0；
+  `GOOS=linux go vet` 同四包（按包作用域，A54③）rc=0；
+  **`go test -count=2` 四包全 `ok` rc=0**：winsec 25.132s / secret 1.533s / memory 34.235s / agent 6.958s，
+  全量输出里 `--- SKIP` **0 条**、`--- FAIL` **0 条**（用 `grep -E "SKIP|FAIL"` 扫全量输出计数，不是 `head`）。
+  **`sh scripts/d22scan.sh` 在纯净树上跑**（`git archive HEAD | tar -x -C /tmp/wisp89b-d22`）：
+  `d22scan: clean - no D22 ban violations`，`tools/d22scan` 的 positive control `ok 6.891s`，
+  生产文件计数 bans#1-5 internal/=197 / cmd/=20、ban#6 frontend/=37、ban#7 internal/tools/=17、ban#8 internal/=337、cmd/=25；
+  **`allowlist.txt` 未改**（仍是那 5 行非注释，一条没加）。
+  **对 owner 的口径可以升格到哪一步（诚实版）**：退回单第 1、2 条补完之后，
+  "只有当前用户可读"现在点名覆盖 **artifacts / DPAPI blob / db+wal+shm / staging / `config.toml.bak-plaintext`（含既有备份的 repair 腿）
+  / 迁移临时件（rename 后落在 `config.toml` 上）**，且"既存带显式 ACE 的老树"这一格现在有用例咬（含"删掉 walk 必红"）；
+  **仍然不覆盖**：`internal/config` 与 `internal/models` 的写路径（票 95/90 的账）、日志（票 95，裁定只能走 `SealFile`）。
+  本机 `CodexSandboxUsers` + 一个解析不出名字的别名 SID 对未密封的落点仍持有 `(M,DC)`——这条基线没变，
+  变的是"密封过的对象上它们不存在"这一判据现在覆盖到了迁移备份。
+  next= **交编排者重验收**（四条各带读数与红名，见 17:2x / 17:5x / 本枚三条）。请顺带处理两件我不做的事：
+  ① `docs/reports/pending-and-issues.md` 两条登记更正——A51② 在 **junction 与目录符号链接两类对象上都不复现**
+  （本机实测），以及新语义"**winsec 拥有 data 树的唯一授权权：带外授权会在下一次密封时被清除，并且打一条
+  `level=WARN … cleared=<trustee>(<ace>)` 的可 grep 记录**"（验收 §8 要求登记的那条，registry 是编排者的面）；
+  ② 若验收要"第二账户真的读不到"的强证据，仍需一台能 `runas` 的机器（本箱拿不到那两个沙箱账户口令）。
+
 
 - 2026-09-21 17:5x（`agent-ticket89b`，**退回单第 3、4 条落地 + 上一枚 `c8d5c94` 欠的三次变异读数**）：
   **变异读数 #1（第 1 条要求的"删掉 `propagatePrivate` 必红"）**——在仓外快照
@@ -352,6 +387,12 @@
 `config/parse.go:213`、`observe/logging.go:72/:244`（0o644 日志）、`ball/position.go:73/:77`、
 `secret/migrate.go:154/:168`、`cmd/wisp/doctor.go:248`、`cmd/wisp/slo_windows.go:559`（禁改区）。
 接线都是一行级的替换，但要有人裁决"日志/模型缓存算不算私有数据"。
+
+  **2026-09-21 `agent-ticket89b` 更正（退回单第 2 条之后）**：上面这串里的 **`secret/migrate.go:154/:168` 已接**
+  （两处 → `winsec.PrivateFile`，并给"备份已存在就不写"那条分支补了 `winsec.SealFile` 的 repair 腿，
+  判据 `internal/winsec/migrate_windows_test.go` 两条 + 删掉接线必红的变异读数）。
+  **其余站点不变**：`models/downloader.go`、`config/*`、`observe/logging.go`、`ball/position.go`、`cmd/wisp/*`
+  仍等票 95/90 的裁决与地界。
 
   next= 编排者：(1) 三枚 commit（`b994a2c`→`de15a6b`→`57bdbb2`+本次这枚）已过全部署门禁，可派验收；
   (2) 上面那串同族站点要不要一起收（建议开一张小票，或并到票 90 的"权限模式"里）；
