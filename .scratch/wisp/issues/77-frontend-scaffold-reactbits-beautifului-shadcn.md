@@ -1,15 +1,27 @@
 # 77 — Frontend scaffold: React + TS + Tailwind + shadcn, vendored react-bits / beautifului components, sharing C21 tokens
 
-**Status:** **parked / blocked-on-owner**（2026-09-21 10:40）——**owner 明确"前端先别急"**：
-  他要先亲自挑 **react-bits** 的动画组件再开工。⚠ **我原来那条"开工前先要逐屏参考图"的前提是错的**——
-  beautifului 是**组件库**，组件本身就是视觉基线（"深度思考""加载态"没有可选可不选，原话："这有啥好选的"）。
-  需要他挑的只有 react-bits（同一效果几十种花样，那是审美选择）。组件清单与我们的画面对应关系见 registry **A47**。
-  ⇒ **等待期不空转**：本票的**非视觉部分**（Vite 骨架、`go:embed`、CI 新 job、token 单一来源与四方对账、
-  `ban #6`/`ban #8` 武装）可以先行，但**等 owner 的挑选结果一起做**，避免同一批文件改两遍。
+**Status:** **unblocked**（2026-09-21 13:5x，owner 第二次指令 ⇒ 裁定 **R19**）——
+他挑完了动画组件（12 条清单在 R19 表里），并且给了**排序**：
+**第一版只用 Beautiful UI 那套 agent 组件为基座（+ shadcn 基础件 + Tailwind），React Bits 二期再叠。**
+⚠ 一期因此**不引 React Bits 的任何代码** ⇒ 它的 **MIT + Commons Clause** 许可审查推到二期
+（但**引入前必须 owner 复核**这条留在 AC#7 的台账判据里，不许因为"二期"就忘掉）。
+"等 owner 逐屏给参考图"那条前提**早已作废**（A47），这次也不再有任何等他答的视觉项。
+
+**一期范围 = R19 的排序 + Q-24 的判据**：只做 **L2 确认卡 + 面板骨架**，其余屏后面按票排。
+**两条一期的硬约束（先于任何视觉效果）**：
+1. **桌面那颗球不许换实现**：Win32 分层窗口 + Direct2D 画的，D32 门 = 休眠 **CPU ≤0.5% / RSS ≤25MB**
+   （`PLAN.md:527`、`:1032`）。R19 表里的 `Agentic Ball` **只能**当"面板里的次要指示"，
+   **绝不能**变成原生球的替代品。
+2. **全屏 WebGL 氛围层同屏最多 1 个**（`Glass Flow`/`Aura Blob`/`Neural Float`/`Fog Sphere` 四条互相排斥），
+   且**面板一隐藏就必须销毁**（不是"暂停渲染循环"就算）——WebView2 的 CPU 是要计进 D32 预算的。
+   二期落地时这条要有用例钉住"隐藏后 CPU 回落"。
+
 **Type:** feature / infrastructure (first real frontend code in this repo)
-**Blocks:** 面板与 L2 确认卡的所有后续票 · **Blocked by:** 票 78（Linux 上 `go vet` 红会连带把新 CI 步骤变哑）、Q-20/Q-22/Q-23/Q-24
-**Owner ruling:** **R18**（2026-09-21 10:24，owner 指令：动画组件用 reactbits、agent 组件用 beautifului.dev、
-基础组件用 shadcn，**`design/` 原型不再作为蓝本**）
+**Blocks:** 面板与 L2 确认卡的所有后续票 · **Blocked by:** ~~owner 的挑选~~ **已解除**；
+票 78（Linux `go vet`）已由 **A54③** 查清"那条命令在本机永远 rc=1"的仪器问题、CI 侧样本仍挂票 70；
+Q-23/Q-24（我的推荐已生效，见 R19 第 1 条）
+**Owner ruling:** **R18**（栈与 `design/` 降级）+ **R19**（基座=Beautiful UI、React Bits 二期、12 条清单与我给的取舍建议）
+
 **Spec refs:** `PLAN.md:981`（栈本就是 React+TS+Tailwind+shadcn/ui，宿主 `jchv/go-webview2`）、
 `PLAN.md:1032-1036`（界面分层）、`PLAN.md:1038-1040`（**共享 token 是硬要求**）、`PLAN.md:1044`（**前端必须无状态**）、
 C21、D23/§17 零 emoji 图标、D29 人工视觉签收、ban #6 / ban #8
@@ -60,6 +72,9 @@ C21、D23/§17 零 emoji 图标、D29 人工视觉签收、ban #6 / ban #8
 - [ ] **AC#6** CI 新 job 有真实 run id + 结论（见前提 6）；**不允许用"本地跑过了"替代**。
 - [ ] **AC#7** vendored 清单：`frontend/VENDORED.md` 逐文件列 来源仓库 / 组件名 / 许可（含 Commons Clause 标注），
       且 `git grep` 能在每个 vendored 文件头找到出处。
+      ⇒ **R19 之后的一期口径**：一期**只会出现 Beautiful UI（MIT）与 shadcn/ui（MIT）两类来源**；
+      React Bits 一条代码都不许进树。台账里请**明写一行"React Bits = 二期，许可为 MIT + Commons Clause，
+      引入前需 owner 复核"**，让它不会因为"这期不用"而从账上消失。
 
 ## 硬规矩（本项目 24 小时内的事故换来的）
 - 只许你动 `frontend/**`、`docs/contracts/**`、`.github/workflows/ci.yml`（新增 job 那一段）、
