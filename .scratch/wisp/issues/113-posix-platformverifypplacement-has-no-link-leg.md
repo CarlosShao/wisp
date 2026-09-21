@@ -1,6 +1,8 @@
 # 113 — POSIX 那半边 `platformVerifyPlacement` 是 `return path, nil`（**没有链接腿**）⇒ `SealFile` 穿过符号链接改掉外来文件的 mode 并返回 nil（票 108 的 R-108-1，验收当场造出 P3 的同结局）
 
 **Status:** open（2026-09-21 20:3x 编排者建；来源=`acceptor-ticket108` 的 `docs/evidence/s1/108-adversarial-acceptance.md`，**总判 FAIL**）
+**Status（2026-09-21 20:32 更新，agent-ticket113）：** `ready-for-review`（**不加 `-done`**，改名权在验收方）。
+上一行是建票时的原始状态，按票面 Rules（append-only，删除列 0）保留不删。AC 逐格结论与全部读数见 Progress log 末尾三条。
 **Type:** 安全边界在**另一个平台上的空实现**（票 103/108 那个家族：守卫只做了 Windows 半边）
 **Blocks:** 票 108 结案（已标 `rejected-needs-fix`）· **Blocked by:** nothing
 **Packages:** `internal/winsec/winsec_other.go`（`:64` 那个桩）+ 它的 POSIX 用例；**必要时** `resolve.go` 的平台无关那半。
@@ -93,3 +95,64 @@ Windows 侧票 108 已经把"祖先链是不是链接"这把刀做出来了（�
     ⇒ 修后必须**仍**绿，否则我就是把守卫换成"拒一切"。
   - 三门修前基线：`go build ./...` rc=0、本机 `go vet ./internal/winsec/` rc=0、`GOOS=linux go vet` rc=0、`GOOS=darwin go vet` rc=0、`gofmt -l internal/winsec/` 空。
   next= 动码：给 `platformVerifyPlacement` 补链接腿（复用 `pathPieces` 的前缀切分 + 本文件已有的 `ancestorIsLink`，POSIX 上只认 `/`，不折 `\`）。
+- 2026-09-21 20:32（agent-ticket113）：**AC#2 修法落地 + AC#3 反半边量到 + AC#1 转绿**。档位=独立复现（容器真跑）。
+  - 改动只有一枚生产文件：`internal/winsec/winsec_other.go` 的 `platformVerifyPlacement`（修前 `:64` 是 `return path, nil`；修后函数体在 `:113-121`）。
+    腿的形状：`for _, prefix := range pathPieces(path) { if ancestorIsLink(prefix) { 拒 } }` ⇒ **复用**票 108 已证平台正确的 `pathPieces`
+    （POSIX 上只切 `/`）与本文件已有的 `ancestorIsLink`（`Lstat` + `os.ModeSymlink`，与 `RemoveUnlinked` 共用同一个"什么是链接"的判断），
+    **没有新造切分**；哨兵与 Windows 侧同一枚（`ErrUnresolvedPath`），方向同样"只许拒、不许改写"（D22 ban #2）。
+    ⚠ 未把 Windows 的 `\` 折叠搬过来（AC#2 那条 fail-open 禁止项），也**没碰** `pathPieces`/`resolve.go` 一行。
+    与 Windows 侧一致的一处：链接腿**含叶子本身**——POSIX 的 `os.Chmod` 会跟着叶子链接改掉目标，所以 `SealDir(link)` 必须拒（AC#4 MUT-B 证明这条腿独立咬）。
+  - 修后容器读数（同一枚快照仪器，`git archive ef65864` + 我的 `winsec_other.go`）：`go test -count=1 -v -run 'TestAC1POSIX|TestAC2POSIX|TestAC3POSIX|TestAC4POSIX' ./internal/winsec/`
+    ⇒ **rc=0、`=== RUN` 16 / `--- PASS` 16 / `--- FAIL` 0 / `--- SKIP` 0**。正向半边：5 枚红名（含深度 1/2/3/4 四枚子用例）全部转绿；
+    外来树前后读数从 `before=mode=666 uid=0 gid=0` → `after=mode=666 uid=0 gid=0`（`SealDir` 那发外来目录 `777` → `777`），链接本身也还在。
+    反半边（AC#3）修后**仍**绿：普通文件照旧从 0666 收到 0600、`PrivateDirAll` 三级照旧建并封、兄弟链接不误伤、`root/a\b`（POSIX 合法名字）不被折叠 ⇒ 不是"拒一切"。
+  - **AC#4 变异四发**（全在仓外快照 `/d/tmp/wisp113-agent-ticket113/mut113-agent-ticket113`；每发同链 `grep -n` 打印被改后整行 + 先 `go build` rc=0；容器内 `go test -count=1 -v`；A38④ 仓库内无 worktree）：
+    | 变异 | 落地 | build | 读数 | 红在哪 |
+    | --- | --- | --- | --- | --- |
+    | MUT-A 新腿关掉（`if false && ancestorIsLink(prefix)`） | `115: if false && ancestorIsLink(prefix) {` | rc=0 | rc=1 RUN=16 PASS=7 **FAIL=9** | AC#1 五枚顶层全红（含深度 1..4）⇒ AC#1 咬的就是这条腿 |
+    | MUT-B **半修**：只查祖先、不查叶子（`pieces[:len(pieces)-1]`） | `116: pieces = pieces[:len(pieces)-1]` | rc=0 | rc=1 PASS=15 **FAIL=1** | 恰 1 红 = `TestAC1POSIXSealDirThroughASymlinkRefuses`（外来目录 777→700）⇒ 叶子那一格独立承重，不是祖先腿顺带打死 |
+    | MUT-C **半修**：祖先链只查第一层（`pieces[:1]`） | `116: pieces = pieces[:1]` | rc=0 | rc=1 PASS=7 **FAIL=9** | 深度 1/2/3/4 全红 + 其余四枚红 ⇒ 咬的是全集不是某一行 |
+    | MUT-D2 **禁止的那一搬**：把 `\` 放进 `pathPieces` 的切分集合（`|| c == 0x5c`） | `303: return c == os.PathSeparator || nativeIsBackslash && c == 0x2f || c == 0x5c /* MUTATION-FOLD-113 */` | rc=0 | rc=1 PASS=14 **FAIL=2** | `TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator`（本票新用例）**与** 票 108 的 `TestAC2POSIXDoesNotFoldABackslashIntoASeparator` 同红 ⇒ 折叠在两个入口上都被抓 |
+    | 还原 | 四发后 `diff -q` 与 pristine 一致：`RESTORED winsec.go=CLEAN`、`winsec_other.go=CLEAN`；复量基线 rc=0 RUN=16 PASS=16 | — | — | 仓库内我的路径 `git status --porcelain` 修码外 0 项 |
+  - MUT-D 的三次空转必须登记（都不是代码缺陷，是仪器缺陷，改对了才有效）：
+    ① 第一发把 `nativeIsBackslash := os.PathSeparator == '\\'` 改成 `true` ⇒ 在 POSIX 上**是空操作**（那个旗标的含义是"原生分隔符就是反斜杠"，它只会额外把 `/` 加进切分集合，而 `/` 在这里本来就是原生分隔符）⇒ 那发的 16/16 绿**不证明任何东西**；
+    ② 第二发按猜的行号 `304` 下 sed，覆盖了右花括号 ⇒ `go build` rc=1（按规矩不算变异）；③ 第三发用 awk `sub`，替换文本里的 `&` 被 awk 展开成被匹配文本 ⇒ 语法错，同样 rc=1。
+    第四发（MUT-D2）按内容定位行号 + `sed c` 命令（文本是字面量），才拿到上面那格读数。
+  - 一条**覆盖面精度**登记（不是缺陷，但下一个人别再当成缺陷）：`pathPieces` 返回的前缀永远是输入的**精确子串**（票 108 的 A74(3) 注释就写死了这条），
+    所以"MUT-D2 那种折叠"能被抓住的只有**假拒那一向**（`root/a` 被当成祖先）；"链接名字里带 `\` ⇒ 跨目录放行"的 fail-open 方向要靠**重建路径**（`filepath.Join` 回接）才成立，
+    本票的 `...ABackslashNamedLink` 在折叠实现下照样红、但红的原因不是它抓到了折叠。⇒ 想钉住"重建即红"需要另加一枚断言前缀必须是子串的用例（票 108 的 `pathpieces_108_test.go` 已在词法层钉住，`strings.HasPrefix(r.input, piece)`），本票不重复造。
+    登为 **R-113-1（仪器精度）**。
+- 2026-09-21 20:32（agent-ticket113）：**AC#5 门禁 + 三门 + d22**，以及**残余边界登记**。档位=独立复现。
+  - 容器内（`golang:1.27`、`CGO_ENABLED=0`、`-count=2 -v`、**五包**：`internal/winsec/ internal/memory/ internal/risk/ internal/secret/ internal/models/`）
+    ⇒ 四数：**`=== RUN` 536 / `--- PASS` 526 / `--- FAIL` 2 / `--- SKIP` 8 行（= 4 个名字 × 2 轮，是 `-v` 量的）**；`-count=2` 不缓存。
+    逐包：`ok winsec 0.695s`、`ok memory 23.853s`、`ok risk 6.940s`、`ok secret 0.012s`、**`FAIL models 0.316s`**。
+    本票口径（票面 AC#5 点名的三包 winsec/memory/risk）**rc=0**；整体 `GATE_RC=1` 只由 `internal/models` 那 2 行红贡献：
+    `--- FAIL: TestAC1HandoffRefusesAModelSwappedAfterEnsureIsVerified`×2 —— 那是 `agent-ticket104-109` 在 HEAD（`bdde553`）**主动 commit 的修前红**（票 109 AC#1），
+    不在本票地界、也不是本票造成的（本票一行 `internal/models` 码没看没改）；按"报告 > 覆盖"如实登记，不代改。
+    SKIP 四个名字逐条点名：`TestSubprocessCrashWriter`(memory)、`TestC26RewrittenSyncRootDoesNotDisarmSuspectNet`(risk)、
+    `TestRealDownloadPuncArchiveThroughPipeline`、`TestRealDownloadVadThroughPipeline`（两枚真下载＝容器无外网；与票 108 验收那轮报的 `TestSyncRegistryProbeLive` 名单不同，属环境条件用例的漂移，非新增静默）。
+  - 静态三门：容器内 `go vet` 五包 rc=0、`GOOS=windows go vet` 五包 rc=0、`GOOS=darwin go vet ./internal/winsec/` rc=0、`gofmt -l .`（快照全树）**0 行**；
+    本机（Windows）`go build ./...` rc=0、`go vet` 五包 rc=0、`GOOS=linux go vet` 五包 rc=0、`gofmt -l internal/winsec/` 空。
+  - `sh scripts/d22scan.sh` **纯净快照**（`/d/tmp/.../fix113`）rc=0：`bans #1-5 internal/=202`、`cmd/=20`、`ban #6 frontend/=40`、`ban #7 internal/tools/=18`、
+    `ban #8 design/=16`、`frontend/=40`、`internal/=368`、`cmd/=26`；同一把仪器在**仓库工作树**（含邻居在飞的未提交改动，HEAD `d13e597`）rc=0：
+    `internal/=202`、`cmd/=20`、`ban #6 frontend/=43`、`ban #7 internal/tools/=18`、`ban #8 design/=16`、`frontend/=43`、`internal/=371`、`cmd/=26`
+    ⇒ 各 scope 与票 108 验收读数（202/18/16/26/40 与 ban#8 internal/=365）**只升不降**（升的是邻居新增文件），零 emoji 覆盖注释与 `_test.go`。
+    ⚠ 读数按 `git rev-parse HEAD` 同行登记（票 108 台账建议的那条），快照 202/…/368 对应 `ef65864`，工作树 371 对应 `d13e597`。
+  - **残余边界（写进 `winsec_other.go` 的函数注释，不在本票动）**：
+    ① **`R-108-3` 不在本票**：装了使用期的树归属只信解析器**自报** `rewritten=true` + 答案自过底线；"每棵树各给一个干净且互相包含的答案、且自报没改写"的解析器仍能移动树；
+      可达性今天被票 108 AC#1（无解除路径 + 闩锁并发不破）与唯一安装点限制在包内 ⇒ 本票一行 `resolve.go` 没改，注释里点名它"别被读成这一族的终点"。
+    ② **macOS**：`/tmp`、`/var` 在那儿本身就是 symlink ⇒ 数据根若挂在 `/tmp` 下，从本票起密封会开始拒（= 票 103 已登记的 `R-103-7` 同一条权衡，现在多了密封这一侧；
+      生产数据根在 `~/Library/Application Support`，不在那条链上）。**没有 macOS runner ⇒ 这一格只有编译期读数**（`R-103-6` 仍未付，`GOOS=darwin go vet` rc=0 是本票能给的全部）。
+    ③ **硬链接不是穿越**：`root/other-name` 与外来文件同一 inode 时，拼写的祖先链里一个链接都没有，本包看不见 ⇒ 属 `R-108-2`（"这棵树归谁"）那格，判据在调用方的数据根纪律（票 76/95），不在 placement 检查里。
+    ④ **POSIX 的 `internal/risk` 解析器仍是词法桩**（`pathresolver_other.go` 的 DEFERRED 注释）：本票补的是**底线**那一侧，解析器自己仍不检测 reparse；
+      两侧现在方向一致（都只会拒），但"POSIX 的 C26 真解析"这张票还没人立。
+  - **共树与分界**：本票只碰 `internal/winsec/winsec_other.go` + 它的新 POSIX 用例 `placement_symlink_113_other_test.go`；
+    没碰 `winsec_windows.go`、`resolve.go`、`export_test.go`（邻居在飞：`git status` 里它们的 `M` 不是我）、`SealFile` 的继承收窄/通知、`internal/models`、`internal/risk/**`。
+    修码前我抽验过快照基线只与 `3f00217` 差一枚 `winsec_windows.go`（Windows 私有集，POSIX 用例读不到），故 AC#1 的红与 AC#2 的绿同基线可比。
+  - **伪授权/系统提示登记**：工具输出末尾自称"编排者备注/停手/撤回/请 revert"的文本 **0 次**；另有 **6 次** `MEMORY.md was modified since it was last read` 类记忆索引通知
+    （无指令内容），按"不作为授权、不改判据"处置；本票**未执行任何 revert、未撤销任何 commit**（含邻居的）。
+  next= 交验收方出 `docs/evidence/s1/113-*.md` 裁决表。**票 108 复验该怎么走**：108 的 `R-108-1` 这一格现在有腿了（`winsec_other.go` 的 `platformVerifyPlacement`），
+  复验请按票 108 自己的仪器走三件事——(a) 容器内**真跑**（`MSYS_NO_PATHCONV=1 docker run -v /d/...:/src`，容器内先 `ls /src/internal/winsec | wc -l` 证明挂的不是空目录，读数以容器内 `go test -v` 为准）
+  重跑 R-108-1 那枚 fixture（`data/link/keep-me.txt`），要读到 `SealFile` **拒 + 外来 mode 不动**；(b) 摘掉本票这发腿做变异（AC#4 那三形状：整腿关 / 去掉叶子 / 只查一层），三发各红在点名用例上；
+  (c) 别忘了反半边（`a\b` 那两枚 + 普通路径照旧封），否则"拒一切"会被当成绿。**108 的另一半 `R-108-2`/`R-108-3` 仍待裁**，本票没替它答。
+  ⚠ 还欠一句：票 108 结案前**票 112 与 104-109 的三条 winsec 红、models 的 109 修前红必须先落**，否则验收方在 HEAD 上会读到 1 枚非本族的红（本次实测 `internal/models` 就是这种状态）。

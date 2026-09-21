@@ -54,14 +54,71 @@ func fstypeOf(path string) string {
 
 func sealFile(path string) error { return applyDescriptor(path, false) }
 
-// platformVerifyPlacement mirrors the DEFERRED leg of internal/risk's
-// pathresolver_other.go: on this platform C26 itself resolves lexically and does
-// not detect reparse traversal, so the floor here stops at the portable shape
-// checks in resolve.go rather than inventing a stricter rule that would make
-// production refuse paths its own PathResolver accepts (and would break a macOS
-// install whose /tmp or HOME sits behind a symlink). The gap is stated, not
-// papered over: when that DEFERRED leg lands, this function is where it plugs in.
-func platformVerifyPlacement(path string) (string, error) { return path, nil }
+// platformVerifyPlacement is the POSIX half of the floor the Windows file
+// implements, and ticket 113 is the reason it is no longer `return path, nil`.
+//
+// That stub used to justify itself by pointing at internal/risk's DEFERRED
+// non-Windows resolver: "the platform's own PathResolver detects no reparse
+// traversal, so the floor must not invent a stricter rule than the resolver
+// it stands under." The comparison was with the wrong side. This function is the
+// floor for binaries that link no resolver at all (internal/secret and
+// internal/memory do not), and os.Chmod on this platform follows symlinks, so
+// `return path, nil` did not mean "this platform has nothing to check" - it meant
+// the sealing entry points had no link leg here, and PROBE P3's outcome
+// reappeared one platform away: SealFile through a symlink returned nil while the
+// chmod landed on somebody else's file (measured: -rw-rw-rw- becomes
+// -rw-------). A guarantee that holds only where the second platform's API
+// happens to be stricter is not a guarantee; "Windows 上守住了" was never evidence
+// that this invariant holds.
+//
+// So the walk is the same walk as placement_windows.go's, on this platform's own
+// facts: every prefix pathPieces offers is Lstat'ed, and the predicate is
+// ancestorIsLink - the same one RemoveUnlinked uses above, so the reclaim route
+// and the seal route cannot disagree about what a link is. pathPieces is reused
+// rather than re-cut here because it is the piece ticket 108's AC#2 proved
+// platform-correct: on POSIX it cuts on '/' alone, and a backslash is an ordinary
+// character in a file name. Treating the backslash as a separator on this
+// platform is not conservatism - it either refuses the real directory named `a\b`
+// or, once the pieces are re-joined, Lstats `x/y` while the link is `x\y`, which
+// is the cross-directory fail-open this repository already booked as A74(3).
+//
+// Like the Windows leg it can only refuse, never rewrite (D22 ban #2), and it
+// checks the leaf as well as the ancestors: a symlink standing where the caller
+// named a file is not "the tree this call names" either, and it is precisely the
+// case where os.Chmod would seal the target. Missing prefixes read as "not a
+// link", which is what lets PrivateDirAll create its own levels parent first.
+//
+// Two costs, both stated rather than discovered later:
+//
+//   - a macOS install whose data root sits under /tmp or /var (both are
+//     symlinks there) starts refusing. That is the already-booked R-103-7 trade
+//     for RemoveUnlinked, now applied to sealing too, and the reason is the same:
+//     refusing loudly is the only direction available to a floor. There is no
+//     macOS runner, so this stays a compile-level reading plus a claim (R-103-6
+//     is still unpaid);
+//   - hard links are not traversal. A regular file that happens to share its
+//     inode with somebody else's name has no symlink anywhere in its spelling, so
+//     nothing in this package can see it; that is R-108-2's question ("whose tree
+//     is this"), which lives with the caller's data-root discipline (tickets
+//     76/95), not in a placement check.
+//
+// Deliberately out of scope, and named so nobody reads this function as the end
+// of the family: R-108-3. Once a resolver is installed, the use-time leg trusts
+// that resolver's own `rewritten` account plus this floor re-run on its answer,
+// so a resolver that answers each tree with a clean, mutually contained spelling
+// and truthfully reports no rewrite can still move a tree. That leg is a property
+// of the seam in resolve.go, it is reachable only from inside this package today
+// (no release path, latch proven race-free by ticket 108's AC#1), and closing it
+// here would be a second answer to one question.
+func platformVerifyPlacement(path string) (string, error) {
+	for _, prefix := range pathPieces(path) {
+		if ancestorIsLink(prefix) {
+			return "", fmt.Errorf("%w: %s reaches it through the link at %s, which is not the tree this call names",
+				ErrUnresolvedPath, path, prefix)
+		}
+	}
+	return path, nil
+}
 
 // sealDir narrows a directory. It deliberately does not walk the existing
 // subtree the way the Windows implementation does: on POSIX a child never
@@ -80,10 +137,12 @@ func removeUnlinked(path string) error {
 	return nil
 }
 
-// ancestorIsLink is RemoveUnlinked's half of ticket 103's AC#2. POSIX needs the
-// check even though os.Remove never follows the leaf: a symlink in the *middle*
-// of a spelling redirects the unlink into somebody else's tree just the same, and
-// the leaf-not-followed property says nothing about the ancestors.
+// ancestorIsLink is RemoveUnlinked's half of ticket 103's AC#2, and since ticket
+// 113 the predicate platformVerifyPlacement walks with. The two routes need it for
+// mirror-image reasons: os.Remove never follows the leaf, but a symlink in the
+// middle of a spelling still redirects the unlink into somebody else's tree, and
+// os.Chmod follows the leaf as well, so the seal route has to refuse one more
+// component than the unlink route does.
 func ancestorIsLink(prefix string) bool {
 	info, err := os.Lstat(prefix)
 	if err != nil {
