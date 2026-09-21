@@ -1,6 +1,18 @@
 # 89 — `0o600` 在 Windows 上是装饰品：artifact / 密钥 / 数据库**从来没真的"只有我能读"过**（A51①②）
 
-**Status:** **fix-complete-awaiting-reacceptance**（2026-09-21 16:1x 独立对抗验收判 **AC#2 一格 FAIL、其余五格 PASS** ⇒ 退回四条；
+**Status:** **accepted-done（复验通过）**（2026-09-21 17:3x 第二轮独立对抗复验判 **退回单四条全部 PASS**，
+复验表 `docs/evidence/s1/89b-reacceptance.md`；第一轮表 `89-adversarial-acceptance.md`。
+独立复现要点：删 `propagatePrivate` ⇒ rc=1、`=== RUN` 25、**14 绿 1 红、红名唯一**，
+红因原文 `NOT PRIVATE operator-widened-file.txt: foreign SID(s) S-1-1-0`（在 HEAD 上同锚点红两条，更强）；
+迁移备份同一份 `.bak-plaintext` BEFORE `Everyone:(I)(RX)` → AFTER 只剩 SY/BA/我；
+符号链接那一格**真测掉了**（未提权 + 开发者模式=1 ⇒ `os.Symlink` 成功、`os.Remove` 能拆、目标存活）；
+带外授权被清除时**不再是静默的**，且白名单**按 SID 不按名字**（九发对照）。
+四包回归 402 RUN=2×201、0 FAIL。⚠ 复验同时**更正了修复者一句「全量 0 SKIP」**：实测有 **2 行 SKIP**
+（`TestSubprocessCrashWriter` ×2，票前既有），而**非 `-v` 的输出根本不印 SKIP** ⇒ 「0 SKIP」这种说法必须配 `-v` 才成立。
+⚠ 三笔随改名落的账：**R-89b-5 立案票 104**（只对单个孩子 `SealFile` 时，它那份**继承来的**授权被静默清掉、0 条 WARN）、
+`internal/config` 的同类明文站点与它的 `.bak-<schema>` **仍敞**（归票 95）、
+以及 **`MigratePlaintext` 至今无生产调用方**（⇒ 这条密封今天是「能力就绪、没人叫它」，票 95 接线时一并处理）。
+**票 94 的牙没被卸**：未动 `winsec.go`/`resolve.go`，铸造口未被绕开，攻击性输入仍被拒。）
 `agent-ticket89b` 已在 `c8d5c94`（第 1、2 条判据+接线）/`01e7007`（第 3、4 条 + 前三次变异读数）/本枚（第 4 条变异读数 + 全量门禁）
 **把四条全部补完，各带实测红名** ⇒ **等重验收，仍不改名 `-done`**。裁决表 `docs/evidence/s1/89-adversarial-acceptance.md`。
 票面那两句错话（"普通权限建不出目录符号链接"、"第三个主体会在写入点直接失败"）**已按实测改掉**，见 Progress log 17:5x/18:1x。
