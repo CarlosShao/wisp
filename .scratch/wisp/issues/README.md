@@ -132,6 +132,12 @@ All tickets are **vertical tracer bullets**; work the **frontier** (all blockers
   `SwimLevelGain`/`SpinLevelGain` 而**零消费者**，真正驱动像素的是 `liquid.go` 的 `Spin*RadPerS`
   ⇒ 与 **A33（声明✓/实测✗）同族**。⚠ 删已记录的 token **必须与替代同 commit**；
   表↔`tokens.css` 那格若本票不收，**必须写成带票号的书面接手**，"暂缓"无票号即不合格。
+- **票 70 取证后新建（2026-09-21 09:44，编排者建票）**：**75 linux-path-canonical-shape** ——
+  `test-core` 里 **`risk` 17 条 + `tools` 19 条 + 600s 超时是同一个根因**：C26 canonical 在 Linux
+  仍产**反斜杠形状**。本机全绿正是因为形状在 Windows 上碰巧对。
+  ⚠ 两条硬规矩写死在票面：**正解若落在 `internal/risk/pathresolver*.go` 必须先报编排者（D22）**；
+  **不许用 `//go:build windows` 把它掩掉**——同一个手法在 `secret`（DPAPI 平台限制）上是合法的，
+  在这里是掩盖，区别只在根因。派发需等票 73 落地（同包冲突）。
 
 - **状态回写（2026-09-20 23:5x，编排者自我更正）**：**62 liquid-glass-ball-visuals：`-done` → `review`**。
   我今天在**八个 AC 框一个都没勾**（实测 `^- [ ]`=8 / `^- [x]`=0）且 **AC#8 要求的
