@@ -1,6 +1,6 @@
 # 79 — `artifactName` folds distinct tool-call ids onto one disk name, and `writeFileExclusive` isn't exclusive
 
-**Status:** ready-for-agent
+**Status:** in-progress (implementer agent on it; `internal/agent`/`internal/memory` claimed)
 **Type:** correctness/data-integrity defect (artifact clobbering) + a storage-hygiene gap
 **Blocks:** nothing · **Blocked by:** nothing (`internal/agent`/`internal/memory` are free once ticket 76 landed)
 **Packages:** `internal/agent/spill.go`, `internal/memory/artifacts.go` + tests. Do **not** touch
