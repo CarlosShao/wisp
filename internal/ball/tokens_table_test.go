@@ -70,6 +70,7 @@ type c21GeomRow struct {
 	rule   string        // first column, for the log lines
 	names  []string      // the row's "Go 常量" column
 	claims []c21NumClaim // numbers stated in its "值" and "用途" columns
+	body   string        // its "值" and "用途" columns, for string-token assertions
 	line   int
 }
 
@@ -115,10 +116,26 @@ func c21PkgDir(t *testing.T) string {
 	return filepath.Dir(thisFile)
 }
 
+// c21ExemptRow is one row of the table's 未接线豁免 section: the Go references it
+// attributes and the one-line reason ticket 74 family 3 demands per row. The
+// reasons live HERE (in the document the check reads) rather than in a Go map so
+// the exemption list cannot become a second truth that drifts from the table.
+type c21ExemptRow struct {
+	where  string
+	tokens []string // "Palette.FgPrimary" / "looks[*].Deep" / "CountdownFontPx"
+	reason string
+	line   int
+}
+
+// c21ExemptRefRe picks the backticked token references out of an exemption row's
+// first column. Dot- and bracket-qualified forms are allowed because that is how
+// the two colour tables name their fields.
+var c21ExemptRefRe = regexp.MustCompile("`(looks\\[\\*\\]\\.[A-Za-z0-9]+|[A-Z][A-Za-z0-9]*(\\.[A-Za-z0-9]+)?)`")
+
 // c21ParseTable reads the markdown rows of the four token tables. Rows are only
 // collected under the four known section headings, so the header block's own
 // comparison table and the 审计 section cannot leak in.
-func c21ParseTable(t *testing.T, root string) ([]c21ColourRow, []c21GeomRow) {
+func c21ParseTable(t *testing.T, root string) ([]c21ColourRow, []c21GeomRow, []c21ExemptRow) {
 	t.Helper()
 	data, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(c21TablePath)))
 	if err != nil {
@@ -127,6 +144,7 @@ func c21ParseTable(t *testing.T, root string) ([]c21ColourRow, []c21GeomRow) {
 	var (
 		colour  []c21ColourRow
 		geom    []c21GeomRow
+		exempt  []c21ExemptRow
 		section string
 	)
 	for i, raw := range strings.Split(string(data), "\n") {
@@ -141,6 +159,8 @@ func c21ParseTable(t *testing.T, root string) ([]c21ColourRow, []c21GeomRow) {
 				section = "look"
 			case strings.Contains(line, "几何"):
 				section = "geom"
+			case strings.Contains(line, "豁免"):
+				section = "unconsumed"
 			default:
 				section = ""
 			}
@@ -150,32 +170,51 @@ func c21ParseTable(t *testing.T, root string) ([]c21ColourRow, []c21GeomRow) {
 			continue
 		}
 		cells := c21Cells(line)
-		if len(cells) != 4 || c21IsSeparator(cells) || strings.HasPrefix(cells[0], "CSS 变量") {
+		if c21IsSeparator(cells) {
 			continue
 		}
 		where := fmt.Sprintf("%s:%d", c21TablePath, lineNo)
 		switch section {
 		case "dark", "light", "look":
+			if len(cells) != 4 || strings.HasPrefix(cells[0], "CSS 变量") {
+				continue
+			}
 			colour = append(colour, c21ColourRow{
 				where: where, section: section, cssVar: cells[0], line: lineNo,
 				goRef: c21TrimTicks(cells[2]), claim: c21TrimTicks(cells[3]),
 			})
 		case "geom":
-			row := c21GeomRow{where: where, line: lineNo, rule: cells[0]}
+			if len(cells) != 4 || strings.HasPrefix(cells[0], "CSS 变量") {
+				continue
+			}
+			row := c21GeomRow{where: where, line: lineNo, rule: cells[0], body: cells[1] + " " + cells[3]}
 			for _, m := range c21IdentRe.FindAllStringSubmatch(cells[2], -1) {
 				if c21ExportRe.MatchString(m[1]) {
 					row.names = append(row.names, m[1])
 				}
 			}
-			row.claims = c21NumClaims(cells[1] + " " + cells[3])
+			row.claims = c21NumClaims(row.body)
 			geom = append(geom, row)
+		case "unconsumed":
+			if len(cells) != 2 || strings.HasPrefix(cells[0], "Go 引用") {
+				continue
+			}
+			row := c21ExemptRow{where: where, line: lineNo, reason: cells[1]}
+			for _, m := range c21ExemptRefRe.FindAllStringSubmatch(cells[0], -1) {
+				row.tokens = append(row.tokens, m[1])
+			}
+			if len(row.tokens) == 0 {
+				t.Errorf("%s: an exemption row whose first column names no Go reference attributes nothing: %q", where, cells[0])
+				continue
+			}
+			exempt = append(exempt, row)
 		}
 	}
 	if len(colour) == 0 || len(geom) == 0 {
 		t.Fatalf("%s parsed to %d colour rows and %d geometry rows: the document shape changed and every check below would pass vacuously",
 			c21TablePath, len(colour), len(geom))
 	}
-	return colour, geom
+	return colour, geom, exempt
 }
 
 // c21Cells splits a markdown table row into its trimmed cells.
@@ -605,7 +644,7 @@ func c21ColourFieldNames(t *testing.T, typ reflect.Type) []string {
 // spot check.
 func TestC21TableColourRowsMatchCode(t *testing.T) {
 	root := c21RepoRoot(t)
-	colour, geom := c21ParseTable(t, root)
+	colour, geom, _ := c21ParseTable(t, root)
 	if len(geom) == 0 {
 		t.Fatal("geometry table empty")
 	}
@@ -853,7 +892,7 @@ func c21MatchClaim(val float64, name string, claims []c21NumClaim) (found, exact
 func TestC21GeometryRowsMatchCodeConstants(t *testing.T) {
 	root := c21RepoRoot(t)
 	dir := filepath.Join(root, "internal", "ball")
-	_, geom := c21ParseTable(t, root)
+	_, geom, _ := c21ParseTable(t, root)
 	code := c21TokensGoConsts(t, dir)
 	declared := c21PackageConsts(t, dir) // tokens.go + hit.go + liquid.go + ...
 
@@ -1002,33 +1041,34 @@ func c21NumText(v float64) string {
 	return strconv.FormatFloat(v, 'g', -1, 64)
 }
 
-// ------------------------------------------- check 3: zero consumers visible
+// -------------------------------------- check 3: zero consumers must be judged
+//
+// Ticket 69 shipped this as a report ("an unconsumed token is not this test's
+// call"). Ticket 74 family 3 closes that: a report nobody reads is exactly how
+// SwimLevelGain managed to be documented, machine-checked and wired to nothing at
+// the same time. So now every zero-consumer token needs a row of the table's own
+// 未接线豁免 section saying why it is legal, and the section is compared in BOTH
+// directions (a missing row and a stale row are both red). The reasons live in
+// the document, not in a Go map, so this cannot become a second drifting copy of
+// the table it audits.
 
-// TestC21TokenConsumerReport prints, for the owner, the tokens that exist and are
-// tabled but are never referenced by the ball package's drawing code. Reporting
-// only: an unconsumed token is a spec nobody has approved yet (ticket 68/65/Q
-// list territory), so judging it red is not this test's call. What the test does
-// guarantee is that the scan runs and can tell consumed from unconsumed.
+// c21MinExemptReason is the shortest reason this check accepts. It exists to keep
+// the placeholder answers out: the shortest row in the table today is a full
+// sentence naming a substitute path or an owning ticket, and "暂未使用" is not.
+const c21MinExemptReason = 20
+
 func TestC21TokenConsumerReport(t *testing.T) {
 	dir := c21PkgDir(t)
-	_, geom := c21ParseTable(t, c21RepoRoot(t))
+	_, geom, exempt := c21ParseTable(t, c21RepoRoot(t))
 	code := c21TokensGoConsts(t, dir)
 
-	files, err := filepath.Glob(filepath.Join(dir, "*.go"))
-	if err != nil || len(files) == 0 {
-		t.Fatalf("glob the ball package: %v (%d files)", err, len(files))
-	}
 	idents := map[string]int{} // plain identifiers: constants in use
 	fields := map[string]int{} // selector names: Palette / LiquidLook fields in use
 	scanned := 0
-	for _, f := range files {
-		base := filepath.Base(f)
-		if base == "tokens.go" || strings.HasSuffix(base, "_test.go") {
-			continue
-		}
+	for _, f := range c21DrawingFiles(t, dir) {
 		n := c21CollectRefs(t, f, idents, fields)
 		if n == 0 {
-			t.Fatalf("%s contributed no identifiers: the scan is broken, not the file", base)
+			t.Fatalf("%s contributed no identifiers: the scan is broken, not the file", filepath.Base(f))
 		}
 		scanned++
 	}
@@ -1036,8 +1076,14 @@ func TestC21TokenConsumerReport(t *testing.T) {
 		t.Fatal("no drawing files were scanned: the report would be vacuous")
 	}
 
-	tokens := make([]string, 0, len(code)+49)
+	tokens := make([]string, 0, len(code)+len(c21MotionGolden)+49)
 	for _, n := range c21SortedNames(code) {
+		tokens = append(tokens, n)
+	}
+	// Ticket 74: the constants the table names from hit.go and liquid.go are held
+	// to the same rule as tokens.go's - tabled means somebody reads it, or the
+	// table says why not.
+	for _, n := range c21SortedKeys(c21MotionGolden) {
 		tokens = append(tokens, n)
 	}
 	for _, n := range c21ColourFieldNames(t, reflect.TypeOf(Palette{})) {
@@ -1071,7 +1117,7 @@ func TestC21TokenConsumerReport(t *testing.T) {
 		t.Fatalf("none of the %d tokens matched a reference in the %d drawing files scanned - the scan is broken, not the code", len(tokens), scanned)
 	}
 	sort.Strings(zero)
-	t.Logf("ZERO-CONSUMER TOKENS (%d of %d checked; %d are referenced by %d non-test files) - report only, ticket 69 AC#3:",
+	t.Logf("ZERO-CONSUMER TOKENS (%d of %d checked; %d are referenced by %d non-test files):",
 		len(zero), len(tokens), len(live), scanned)
 	for _, tok := range zero {
 		line := "  UNCONSUMED " + tok
@@ -1080,6 +1126,48 @@ func TestC21TokenConsumerReport(t *testing.T) {
 		}
 		t.Log(line)
 	}
+
+	// (a) the exemption rows, attributed.
+	attributed := map[string]string{}
+	for _, r := range exempt {
+		if len([]rune(r.reason)) < c21MinExemptReason {
+			t.Errorf("%s: the exemption reason is %d runes (%q) - ticket 74 wants a sentence naming the substitute path or the owning ticket, not a placeholder",
+				r.where, len([]rune(r.reason)), r.reason)
+		}
+		if !strings.ContainsAny(r.reason, "`0123456789") {
+			t.Errorf("%s: the exemption reason names no code path and no number (%q) - point it at what draws this instead, or at the ticket that will", r.where, r.reason)
+		}
+		for _, tok := range r.tokens {
+			if prev, dup := attributed[tok]; dup {
+				t.Errorf("%s: %s is exempted twice (%s and %s): one token, one home", r.where, tok, prev, r.where)
+				continue
+			}
+			attributed[tok] = r.where
+		}
+	}
+
+	// (b) zero-consumer <-> exemption: both directions.
+	zeroSet := make(map[string]bool, len(zero))
+	for _, tok := range zero {
+		zeroSet[tok] = true
+		if _, ok := attributed[tok]; !ok {
+			t.Errorf("%s is tabled but nothing in the ball package reads it, and %s's 未接线豁免 table has no row for it: wire it, delete it with its replacement in one commit, or write the one-line reason (ticket 74 family 3, A33)",
+				tok, c21TablePath)
+		}
+	}
+	for _, r := range exempt {
+		for _, tok := range r.tokens {
+			if zeroSet[tok] {
+				continue
+			}
+			if _, inTable := rowOfTableToken(geom, tok); !inTable && !strings.Contains(tok, ".") {
+				t.Errorf("%s: the exemption row names %s, which the geometry table declares nowhere - the row audits nothing, point it at a tabled token or delete it", r.where, tok)
+			}
+			t.Errorf("%s: the exemption row for %s is stale - something in the package reads it again, so it is no longer documented-but-unconsumed; delete the row", r.where, tok)
+		}
+	}
+	t.Logf("未接线豁免: %d row(s) attribute all %d zero-consumer token(s); %d/%d checked tokens are live",
+		len(exempt), len(zero), len(live), len(tokens))
 }
 
 // rowOfTableToken finds the geometry row that declares a token, so the report
@@ -1099,15 +1187,35 @@ func rowOfTableToken(geom []c21GeomRow, tok string) (string, bool) {
 	return "", false
 }
 
-// c21CollectRefs records every identifier and every selector name one file uses.
+// c21CollectRefs records every identifier and every selector name one file USES.
 // Comments are excluded for free because the AST does not carry them: a token
 // mentioned only in prose is not a consumer (that is how SleepRestRatio's
 // comment-only mentions must not read as usage).
+//
+// The identifier's OWN declaration is not a use either. tokens.go is skipped by
+// the caller so the point is moot there, but since ticket 74 the scan also covers
+// hit.go and liquid.go, where the declarations and the uses share a file: without
+// this, a constant nobody ever read would still count as consumed by its own
+// `const` line, which is precisely the empty check A33 is about.
 func c21CollectRefs(t *testing.T, path string, idents, fields map[string]int) int {
 	t.Helper()
 	file, err := parser.ParseFile(token.NewFileSet(), path, nil, parser.ParseComments)
 	if err != nil {
 		t.Fatalf("parse %s: %v", filepath.Base(path), err)
+	}
+	declared := map[*ast.Ident]bool{}
+	for _, decl := range file.Decls {
+		gd, ok := decl.(*ast.GenDecl)
+		if !ok {
+			continue
+		}
+		for _, spec := range gd.Specs {
+			if vs, ok := spec.(*ast.ValueSpec); ok {
+				for _, id := range vs.Names {
+					declared[id] = true
+				}
+			}
+		}
 	}
 	n := 0
 	ast.Inspect(file, func(node ast.Node) bool {
@@ -1118,6 +1226,9 @@ func c21CollectRefs(t *testing.T, path string, idents, fields map[string]int) in
 				n++
 			}
 		case *ast.Ident:
+			if declared[x] {
+				return true // this file declaring it is not it being used
+			}
 			idents[x.Name]++
 			n++
 		}
@@ -1136,7 +1247,7 @@ func c21CollectRefs(t *testing.T, path string, idents, fields map[string]int) in
 func TestC21CodeTokensAreTabledOrExempt(t *testing.T) {
 	root := c21RepoRoot(t)
 	dir := filepath.Join(root, "internal", "ball")
-	colour, geom := c21ParseTable(t, root)
+	colour, geom, _ := c21ParseTable(t, root)
 	tabled := c21TableNames(colour, geom)
 
 	seen := map[string]bool{}

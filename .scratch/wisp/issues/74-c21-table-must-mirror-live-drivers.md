@@ -39,7 +39,7 @@ about any of them.
 - [x] **AC#1** `SwimLevelGain`/`SpinLevelGain`: no longer both "declared" and "unconsumed" — either
   deleted-with-replacement-in-one-commit, or the test pins them to a named consumer. Show the grep
   that proves the consumer exists (`git grep -n`).
-- [ ] **AC#2** Every constant that *changes pixels* under `internal/ball` (hit.go, liquid.go,
+- [x] **AC#2** Every constant that *changes pixels* under `internal/ball` (hit.go, liquid.go,
   renderer_windows.go) is either in the C21 table or in the exemption list with a reason; the
   machine check itself proves it (the report count goes to 0 unattributed).
 - [ ] **AC#3** Mutation proof for the new/changed assertions: pick at least 2 rows, change the code
@@ -105,3 +105,26 @@ about any of them.
   `go test ./internal/ball/... -count=2` ok、`go test ./internal/ball/ -v` RUN=54 / SKIP=0 / PASS=54。
   next=family 3：在表里开「未接线豁免」小节，27 条零消费者**逐条一句理由**，并把消费者报告从
   "只打印"改成"未归因即红"（理由放表里、由测试解析，避免理由清单本身成为第二份会漂移的真相源）。
+- [2026-09-21T03:05:00Z] agent=ticket74 did=**family 3：零消费者从"打印"变成"必判"，理由写在表里由测试解析**（勾 AC#2）。
+  新增表小节「未接线豁免（documented but unconsumed，票 74 family 3）」= **24 行覆盖 27 个 token**
+  （11 个 `Tint*` 死色端点、`FgPrimary`/`FgTertiary`/`GlassRing`/`GlassHi`/`GlassHiSoft`/`InfoLine`/
+  `OrbShadow` 7 个面板侧色、`looks[*].Deep`、`BallSizeSmall/LargePx`、`Dur*Ms` 三档、`FontSizeMonoPx`、
+  `CountdownFontPx`、`FirstRunGuidePulseMs`），每行一句**指向具体去处**的理由。
+  为什么理由放在 md 里而不是 Go map：豁免清单若另存一份，它就是第二份会漂移的真相源——本票要修的正是这个。
+  `TestC21TokenConsumerReport` 现在双向比对：**漏一行 ⇒ 红**、**已重新接线仍挂豁免 ⇒ 红（stale）**、
+  **理由 < 20 rune 或不含任何代码名/数字 ⇒ 红**（`c21MinExemptReason`，挡"暂未使用"这类占位话）。
+  口径同时收紧两处：① 被检 token 集合从 105 → **116**（`c21MotionGolden` 的 11 条 hit.go/liquid.go
+  常量纳入同一条规则）；② `c21CollectRefs` 不再把**声明本身**当使用（tokens.go 本来就跳，但票 74 起
+  扫描覆盖 hit.go/liquid.go，那里声明与使用同文件——不修就会把"只有 `const` 行提到它"读成已接线）。
+  变异证据（临时改码，跑完还原）：`statevisual.go:132 * SleepRestRatio -> * 0.62`（`grep -c MUTATION-74D`=1
+  且行内容打印为证）⇒ `TestC21TokenConsumerReport` FAIL 点名 `SleepRestRatio is tabled but nothing in the
+  ball package reads it … 未接线豁免 table has no row for it`；还原 `git diff --quiet` 空。
+  报告口径：ZERO-CONSUMER **27 of 116**、`未接线豁免: 24 row(s) attribute all 27` ⇒ **未归因 0 条**。
+  ⚠ AC#2 的**已知缺口（写进表末段）**：`renderer_windows.go` 仍有**未命名裸字面量**在改像素
+  （`liqRate`/`liqPhase`、渐变 stop 的 0.42/0.78、`permille` 的 775+225…），机器检查按 `const` 声明枚举，
+  结构上看不见它们；把它们提成 token 属改绘制代码，不在本票范围。
+  next=收紧两处判据：几何值匹配 containment → **单射**（已实测今天的 containment **会放过**
+  `tokens.go:361 DockTriggerPx 16 -> 160`：整包 `go test ./internal/ball/` 仍 `ok`、几何用例仍 PASS，
+  只在日志里多打一条 "MATCHED WITHOUT THE PROMISED UNIT (5): … DockTriggerPx=160 @ …:155" ——
+  它借走了同属 `DockAnimMs` 的那个 160ms），以及给 `FontFamily` 补**值断言**
+  （`--font-sans` 里确有 "Microsoft YaHei UI"，所以值断言可以做成真的）。

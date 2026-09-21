@@ -226,6 +226,47 @@ alpha，`hex()` 0xRRGGBB + alpha）。D2D 使用直通 alpha 的 `D2D1_COLOR_F`�
 | （无，原生自有） | —— | `looks[solar].Caustic` | `hex(0x2A1206,0.32)` |
 | （无，原生自有） | —— | `looks[solar].Glow` | `hex(0xFDBA74,0.50)` |
 
+## 未接线豁免表（documented but unconsumed，票 74 family 3）
+
+上面三张表里有若干行**值是真的、但球面绘制代码今天不读它**。票 69 的机器检查原本只把这份清单
+打印出来（`ZERO-CONSUMER TOKENS (29 of 105)`），打印不构成约束 —— 一条"进了表、没人读"的常量与
+`SwimLevelGain` 的区别只是有没有人记得去读日志，那正是 A33「声明✓ / 实测✗」的成因。本票起：
+**每一条零消费者必须在本表占一行并写明一句理由**，`TestC21TokenConsumerReport` 双向比对（漏一行 ⇒
+红，多一行/已接线仍挂豁免 ⇒ 红，理由短到说不出东西 ⇒ 红）。理由必须指向一个具体去处（替代路径、
+CSS 侧消费者、接线的票），"暂未使用"不算。
+
+| Go 引用 | 为什么它今天不接线仍然合法（一句） |
+|---|---|
+| `Palette.FgPrimary` | CSS 侧 13 个 design 文件在引用（`base.css` + 12 张屏），球面文字只取 `Palette.OnSolid`（角标数字）与 `Palette.FgSecondary`，第三档没有像素路径 |
+| `Palette.FgTertiary` | `--fg-tertiary` 是面板三级文本（`base.css` 13 处 + 8 张屏），悬浮球内不存在第三级文字；面板原生切片（票 33+）才是它的消费方 |
+| `Palette.GlassRing` | 面板 `--shadow-pop`/`--shadow-card` 的 1px 棱边色；球体边缘由 `looks[*].Rim` + `GlassRimPx` 承担（票 62），不叠 CSS 的 shadow 语法 |
+| `Palette.GlassHi` | 面板 inset 高光（`--glass-hi` 只在 `tokens.css` 的 shadow 组合里被引用），球面高光是 `looks[*].Hi` + `OrbHi`，两者不同源 |
+| `Palette.GlassHiSoft` | `base.css`/`ball.html` 的 soft inset 线；原生球体没有独立 soft 层（三枚 brush 直接叠出），所以无消费者 |
+| `Palette.InfoLine` | 原生侧 info 只有队列点，取 `Palette.Info` 单色；`--info-line` 在 CSS 也只被 `base.css` 引用一次，是面板描边色 |
+| `Palette.OrbShadow` | 球的接地阴影由 `looks[*].Caustic × GlassCaustic` 画（`renderer_windows.go` 的 caustic brush），`--orb-shadow` 是 CSS 侧 approval/ball 两屏的投影色 |
+| `Palette.TintAccentHi` | v2 把球面渐变收敛成「核心色 + 高光色」，accent 态实际取 `Palette.Accent`（`statevisual.go`），`--tint-accent-hi` 在 `tokens.css` 之外零引用（死色镜像） |
+| `Palette.TintSuccessHi` | success 态取 `Palette.Success`/`SuccessLine`，`--tint-success-hi` 全仓无引用（`design/` 实测 0 处 `var()`）⇒ 只作为 CSS 声明的镜像保留 |
+| `Palette.TintSuccessLo` | 同上：`--tint-success-lo` 无 CSS 消费者，原生 success  glow 走 `SuccessLine`；v1 三段 tint 在 v2 已收敛（`tokens.css:115` 注释自述） |
+| `Palette.TintWarmHi` | Warm 态取 `Palette.Warm` + `WarmOpacityLow/High` 的整窗 alpha 呼吸，`--tint-warm-hi` 无引用；本行值与 `TintWarnHi` 同字面量（`#F0DCB8`）是 CSS 事实，不是抄错 |
+| `Palette.TintWarmLo` | `--tint-warm-lo` 在 `tokens.css:117` 只声明不使用，原生 Warm 双色端点由 looks 表接管（票 62） |
+| `Palette.TintWarnHi` | warn 态（Unconfigured/Watchdog/Stuck）取 `Palette.Warn`/`WarnLine`；`--tint-warn-hi` 与 `TintWarmHi` 同为 `#F0DCB8`，CSS 侧两者都没有 `var()` 消费者 |
+| `Palette.TintWarnLo` | `--tint-warn-lo` 零引用（`tokens.css:118/273`），原生侧无 warn 双色渐变路径 |
+| `Palette.TintDangerHi` | danger 态取 `Palette.Danger` + `DangerLine`，`ConfirmingPulseMs` 的脉冲环用单色；`--tint-danger-hi` 在 CSS 与原生两侧都无消费者 |
+| `Palette.TintDangerLo` | 同上，`--tint-danger-lo` 零引用；v2 的「核心发光色」两档里 lo 端已被液面的 `Caustic` 取代（票 62） |
+| `Palette.TintNeutralHi` | neutral 态只有 `-mid` 有人用（`statevisual.go` 的 `Palette.TintNeutralMid` + `ball.html:195`），hi/lo 两端在 v2 无消费者 |
+| `Palette.TintNeutralLo` | `--tint-neutral-lo` 零引用；NoNetwork/Nonetwork 态用 `Danger`/`BGOverlay` 单色，不铺 neutral 三段渐变 |
+| `looks[*].Deep` | `LiquidLook` 九个字段里唯一没人读的（其余八个 `renderer_windows.go` 都在画，含 `activeLook.Hi`）：票 62 留的第二层折射，属票 65「质感仍是赝品」的返工项；删字段要连带删 4 行 look 表 = 缩契约，交 owner |
+| `BallSizeSmallPx` / `BallSizeLargePx` | `--ball-sm`/`--ball-lg` 在 `ball.html` 各 6 处是**档位参照**，原生侧只有连续尺寸 + `BallSizeMinPx`/`BallSizeMaxPx` 钳位，没有"小/大档"开关 ⇒ 保留镜像等档位开关 |
+| `DurFastMs` / `DurBaseMs` / `DurSlowMs` | 三档驱动 CSS 过渡（`base.css` 11 处、`ball.html` 3 处）；原生动效时长是**逐态**常量 `BorderOpenMs` 220 / `BorderCloseMs` 180 / `SettlingFadeMs` 260 —— 票 69 的 D12 已记下 180 与 260 同值但不同源，改 CSS 档不会改它们 |
+| `FontSizeMonoPx` | `--t-mono` 是审批/聊天屏的等宽字号（`base.css` + `approval.html` + `chat.html`），球内不排等宽文本；DWrite 只建 `BadgeFontPx` 与 `FontSizeMicroPx` 两款格式 |
+| `CountdownFontPx` | 环下倒计时走 `Visual.BadgeText`，实际取 `microFmt`（`FontSizeMicroPx` 11）或 `badgeFmt`（`BadgeFontPx` 10）⇒ 这条 10px 与 `BadgeFontPx` 重叠属**待裁定**（本表 :155 行同时记两者），不是抄写错误，也不许悄悄改任一侧 |
+| `FirstRunGuidePulseMs` | `is-firstrun` 的引导脉冲在 CSS 是动画，原生 S1 把 FirstRun 映射成静态（`anim.go:63-65` 明写 guide pulse 后补，`statevisual.go:223` 是静态分支）⇒ 周期常量等引导动画接线票 |
+
+**这张表不豁免的东西**：改了像素却没名字的数字。反查（票 74 AC#2 留下的缺口）：`internal/ball` 里
+仍有**未命名的裸字面量**在驱动画面 —— `renderer_windows.go` 的 `liqRate`/`liqPhase`（各 blob 的相对
+转速与相位）、渐变 stop 的 `0.42/0.78`、`permille` 的高光区间 `775 + 225*…` 等；机器检查按 `const`
+声明枚举，结构上看不见它们。把它们提成 token 属改绘制代码，不在本票范围（见票面 AC#2 的缺口栏）。
+
 ## 审计
 
 - `go test ./internal/ball/ -run TestNoHardcodedColorsInBallPackage`：`internal/ball` 包内除
