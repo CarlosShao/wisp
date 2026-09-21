@@ -1105,6 +1105,27 @@ vet: cmd/wisp/slo.go:324:49: undefined: proc.Runtime
 本 commit 已把该步与它的阳性对照（`tools/d22scan/runtests.sh -C tools/d22scan ./...`）**提到 gofmt/vet 之前**：
 不删步骤、不给任何步骤加 `continue-on-error`、不让任何步骤可跳过（D22 mode 6 未碰）。
 
+## 编排者登记 A72（2026-09-21 17:2x，票 90 那枚空框**被补成真读数而不是被圆过去**；顺手抓到"能力做完了但没人调用"）
+
+- **A72①** `agent-ticket90b` 交件：AC#4 现在是**五轮真变异**的账（每轮同链 grep 证锚点、还原后 `diff -q` 一致）：
+  删 `case R8:` ⇒ 红 2（"irreversible call raised 0 L2 cards, want 1"）；只删 `SessionOverrideBlocked` 分支 ⇒ 红 1，
+  而真实链那条**因第二证人 `case R4:` 仍在 ⇒ 绿**（**有原因的绿**，与被藏起来的绿是两回事）；两证人同删 ⇒ 红 3；
+  把 Deny 改成可静默 ⇒ 红 4（含两条**非本票**的旧卫兵，且 A 档文件真被写入）；
+  "模式优先"短路 ⇒ 红 5，**三条红线全红**。基线 222 PASS / 1 SKIP / 0 FAIL，
+  唯一 SKIP 点名 `TestSyncRegistryProbeLive`（**票 93 的账**）；
+  `TestResolvePerCallBudget` 首轮 1.166ms/op 越 1ms 预算 ⇒ 单跑 `-count=2` 两次 ok，**按"负载抖动"登记、阈值一字未动**
+  （这正是票 86 那格脆弱性的又一次现场发作，等编队安静时一并量）。
+  ⚠ 它还记了一笔**过程诚实账**：有一轮 `sed` 少删一个 `}` 导致语法错，**它明确写"这一轮不计入变异"**——
+  这正是本仓"编译失败不算变异"的规矩被真的执行了。
+- **A72② 它交回来的两条装配缺口我立案成票 101**：`internal/perm` **生产零 importer**、`cmd/wisp/run.go` **没有 `Modes:` 注入**
+  ⇒ 它自己的判词是"代价被 fail-closed 兜住（未注入=最严档）"，**这句我认可但不够**：
+  **兜住的是"不会意外宽松"，没兜住的是"owner 已拍板的 M3（手动选过就一直按那档）今天没生效"**。
+  ⇒ 这是 memory 第 8 条（能力类 AC 必问生产调用者）在本会话的**第三次发作**（前两次：票 63/票 11），
+  对策也照旧：**"做一个能力"和"把它接上"要么同票、要么当场立案**——这次 `cmd/wisp/` 被别人地界压着做不到同票 ⇒ 立案。
+- **A72③ 编队**：写码 `agent-ticket89b`（票 89 退回单）+ `agent-ticket101`（装配）；
+  验收 `acceptor-ticket94`、`acceptor-ticket96`，本轮再派 `acceptor-ticket90`（三档语义是安全面，必须独立复现）。
+  **cnb 已推平到 `6114e3d` 附近；GitHub 仍在 TLS 中断中重试** ⇒ 继续不引用 CI 读数。
+
 ## 裁定 R21（2026-09-21 17:0x，编排者定）：**OS 级隔离这一期不做**；AppContainer 记 **RESERVED + 可判定触发门**（票 100），并明写"**权限模式不改变 OS 能力**"
 
 **依据**：票 91 两个会话的实测（`docs/evidence/s1/91-isolation-options.md` 路 1、`91-os-isolation-memo.md` 路 2/3，
