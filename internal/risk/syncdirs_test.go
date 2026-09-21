@@ -92,6 +92,31 @@ func membershipEngine(t *testing.T, grade string) syncEnv {
 	return e
 }
 
+// outOfProfile builds a real, absolute path that is NOT under the fake profile,
+// with the platform's own separator. Two tests in this file used to write
+// `D:\plain\data.txt` for that job: on Windows it is a genuine out-of-profile
+// path, and on POSIX it is a backslash-named file that happens to be RELATIVE,
+// so the assertion passed without ever reaching the "outside the profile"
+// concept the case is about. (Spellings that genuinely need a Windows-shaped
+// input belong in a Windows-tier file — syncdirs_redteam_windows_test.go is
+// where the `\\?\` and 8.3 forms live — and TestSyncRegistryProbeTable's
+// "nil source (non-Windows) must yield no roots" case is the portable, honest
+// statement of the same fact about the probe itself.)
+func outOfProfile(t *testing.T, home string) string {
+	t.Helper()
+	other := filepath.Join(filepath.Dir(home), "outside-profile")
+	if err := os.MkdirAll(other, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	p := filepath.Join(other, "plain", "data.txt") // never created, like a real fs.write target
+	if isUnder(normPath(p), normPath(home)) {
+		t.Fatalf("test premise broken: %q is under the profile %q", p, home)
+	}
+	return p
+}
+
+// TestSyncDefaultLocationProbe asserts the weakest grade stays a directory
+// probe: it is only about a directory that exists under the profile.
 func TestSyncDefaultLocationProbe(t *testing.T) {
 	home, _, _ := sandbox(t)
 	oned := filepath.Join(home, "OneDrive")
@@ -150,7 +175,7 @@ func TestSyncFixtureFallbackAndMatch(t *testing.T) {
 		t.Fatal("under-profile write must stay sync-suspect while no confirmed root exists")
 	}
 	// Outside the profile is still not a sync channel.
-	if p.IsSyncPath(`D:\plain\data.txt`).Sync {
+	if p.IsSyncPath(outOfProfile(t, home)).Sync {
 		t.Fatal("path outside the user profile must not be suspect")
 	}
 }
@@ -386,7 +411,7 @@ func TestSyncSuspectFallbackWhenUndetectable(t *testing.T) {
 		t.Fatalf("under-profile path must be sync-suspect, got %+v", st)
 	}
 	// Outside the profile is not suspect.
-	if p.IsSyncPath(`D:\plain\data.txt`).Sync {
+	if p.IsSyncPath(outOfProfile(t, home)).Sync {
 		t.Fatal("path outside the user profile must not be suspect")
 	}
 }

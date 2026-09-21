@@ -37,7 +37,14 @@ func posixSyncEngine(t *testing.T) (p *Provenance, syncTarget, plainTarget, back
 	home := filepath.Join(base, "profile")
 	root := filepath.Join(home, "OneDrive")
 	work := filepath.Join(home, "work")
-	for _, d := range []string{root, work} {
+	// The target below is `OneDrive/Notes/out.md`, and Notes is created for the
+	// same reason ticket 75 created the profile: an ancestor that does not
+	// exist is not a failure (the lexical fallback still classifies it), but the
+	// ancestor walk ticket 75 repaired only ever runs on the part of the chain
+	// the OS can confirm, so pinning the existing-ancestor case needs the
+	// directory to exist. Without it this leg asserts only the missing-ancestor
+	// route and the two spellings collapse into one.
+	for _, d := range []string{root, work, filepath.Join(root, "Notes")} {
 		if err := os.MkdirAll(d, 0o755); err != nil {
 			t.Fatal(err)
 		}
