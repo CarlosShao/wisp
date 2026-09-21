@@ -114,6 +114,15 @@ All tickets are **vertical tracer bullets**; work the **frontier** (all blockers
   本票把同一纪律推到其余仪器，且 **AC#2 要求一次真实的红**（阳性对照），否则不算完。
   ⚠ 只许从严：不许为了让某次跑变绿现场调低可见性阈值（D22 精神）；`allowlist.txt` 只许变短或不变。
   **blocked-on-70**：本票要改 `.go`，必须等全仓 gofumpt 那一次重写落地，否则每个文件都撞车。
+- **票 70 死前发现（2026-09-21 09:11，编排者建票，优先级高于普通票）**：
+  **72 atble-classification-runner (18)** —— **A 表（禁区不可放行）在 GitHub `windows-latest` 上退化成
+  B 表（一次 L2 确认可放行）**，本机同命令 PASS、`pathresolver_junction_windows_test.go:104` 在 runner 上 FAIL。
+  ⇒ **纵深防御真破一格**，不是断言写松、也不是占位步骤（那位的 `a04d3e2` 已逐条排除
+  `os.UserHomeDir`/`t.Setenv`/`normPath`/`isUnder`/A 表命中，且**一字未改断言**只加诊断输出）。
+  ⚠ 本票要动 `internal/risk/`＝**冻结区 ⇒ 改法先报编排者判**；判据要求"归一化两侧、不是加特例"、
+  双向变异、**本机 + runner 两侧都过**。**为什么不留在票 70 里**：安全分类失效留在"让 CI 变绿"的票内，
+  极易被下一个代理用"改断言/加 skip"的最短路径解决掉。
+
 - **状态回写（2026-09-20 23:5x，编排者自我更正）**：**62 liquid-glass-ball-visuals：`-done` → `review`**。
   我今天在**八个 AC 框一个都没勾**（实测 `^- [ ]`=8 / `^- [x]`=0）且 **AC#8 要求的
   `62-adversarial-acceptance.md` 不存在**的情况下给它加了 `-done` 后缀——同时违反规则 4 与规则 6。
