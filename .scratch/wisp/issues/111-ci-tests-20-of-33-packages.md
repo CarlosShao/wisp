@@ -250,3 +250,24 @@ step1–3 success、**step4 failure**、**step5 `Cache third_party` / step6 `cgo
      ③ session / watchdog / agent/scheduler 三个 DEFERRED 桩：实现票（28/42/47）落地时**必须**同时把包放回
        scope 并更新 pin，否则 GUARD C 显红——这是设计好的耦合，别让谁顺手绕过。
   6. AC#7 的口径已按"当众改口径"落在上面那条；若编排者认为该撤票 110 AC#4 的措辞本身，请直接在 110 面下判。
+- 2026-09-21 21:4x（agent-ticket111）：**收口读数补记**（上一条 next= 4 那句"core 预期仍红两发"现在有实测量了）。
+  - 干净快照 `/tmp/wisp-t111-f`（= `8fe5c7c` + 本票最终脚本内容，即 `7699ec3` 的形状）在真 ubuntu 容器跑
+    `--scope=core`：**=== RUN=1036 / PASS=660 / FAIL=1 / SKIP=0**，GUARD B 表 **25 行**（24+winsec），rc=1。
+    那一枚 FAIL 是 `internal/panel` 的 `TestComposerRenderFixtureTellsTheTruth`（panel 早在旧 16 包 scope 里，
+    票 92b 正在写它）⇒ **不是本票新接的包**。
+  - **AC#10 本机这半边现在可核对**：同一条命令改前是 `SKIP=1`（票面引的 run `35599458439` step7 形状），
+    改后 **`SKIP=0`**，且"未 accounted SKIP"那段一行没打印 ⇒ 那枚 skip 进了台账、被逐 run 对着 linux 测试二进制
+    重验，**没有为了消数字新增任何 Skip**。
+  - **AC#9 本机这半边**：`ok   github.com/CarlosShao/wisp/internal/winsec  0.511s` + 它自己的 GUARD B 行
+    ⇒ ubuntu 腿历史上第一次真跑 winsec 的 `!windows` 半边。**run id / job id / step 号仍欠**（next= 2），
+    这条不许拿它冒充 CI 绿。
+  - windows 腿在最终脚本下再跑一发（工作树=`7699ec3`）：**=== RUN=409 / PASS=279 / FAIL=0 / SKIP=0**，
+    8 行全 `ok (own line)`，rc=0。PASS 275→279 是别人这两小时给 risk/proc 加的用例，不是本票。
+  - ⚠ 补一条"守卫不是装饰"的证据（对应上面变异 5）：本票过程中我把 GUARD B 的结果行形状写坏过一次
+    （两个相邻 `[[:space:]]+`），真跑直接把两个**本来正常**的包全判红 rc=1 ⇒ 它会咬人，不只会打印表格。
+  - 门禁四数收口：`bash -n` 三脚本 rc=0；`sh scripts/d22scan.sh` **rc=0 clean**，各 scope **不降**
+    （#1-5 internal/=202、cmd/=20；#6 frontend/=43；#7 internal/tools/=18；
+    #8 design/=16、frontend/=43、internal/=372、cmd/=26——多的那 1 个是票 115 的测试文件）；
+    `--scope=census` 自证完整：windows 33 行 / linux 32 行。
+  - **待 push 才能结的格子仍是 next= 1/2/3/4 四条**，其中 next= 1（AC#6 同枚 run 里 step4 与 step5–8 同时有结论）
+    是本票唯一的生死判据：**只要还有一步是 skipped，就判 AC#6 FAIL**，不接受"通过附条件"。
