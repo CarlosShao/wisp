@@ -1,0 +1,1081 @@
+package ball
+
+// Ticket 69 (registry A24-D4) — machine checks for the C21 design-token table.
+//
+// docs/evidence/s1/c21-native-tokens.md is the hand-maintained C21 table. Since
+// ticket 12 AC#7 it carries 61 rows nobody tested (25 geometry/motion rows +
+// 36 liquid-glass look colours): TestTokenGoldenValues pins 20 palette colours
+// and TestNoHardcodedColorsInBallPackage only forbids literals in the drawing
+// code. Table and code could therefore drift in opposite directions with CI
+// green — and one row (tokens.go CountdownFontPx) had already drifted to zero
+// consumers without anything being able to see it.
+//
+// These tests close that gap in BOTH directions, inside the table's own
+// declared scope (the "范围" block ticket 12 wrote, plus A24-D6):
+//
+//	table -> code   every row names a token that exists, with the value stated
+//	code -> table   every Palette field, every look colour and every exported
+//	                tokens.go geometry constant is declared by exactly one row
+//
+// What is deliberately NOT asserted here, and why:
+//   - the table's `tokens.css 值` column against design/assets/tokens.css. That
+//     is ticket 12's manual three-way cross-check (A24-D6 leaves the 80
+//     panel-only CSS declarations out of scope); converting it into a machine
+//     check is a separate call, not this ticket's.
+//   - any *default* ball value. Ticket 68 AC#2 owns flipping the prototype
+//     default, and SPEC-08 §2 is frozen. Where table and code disagree on a
+//     value, the row is reported for the owner (A24-D1..D6 precedent), never
+//     "fixed" by one side.
+//   - whether an unconsumed token is legal. It is not this test's call: the
+//     zero-consumer report prints the list (AC: report first, not fatal) and
+//     the ticket carries it to the owner.
+
+import (
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"math"
+	"os"
+	"path/filepath"
+	"reflect"
+	"regexp"
+	"runtime"
+	"sort"
+	"strconv"
+	"strings"
+	"testing"
+)
+
+const c21TablePath = "docs/evidence/s1/c21-native-tokens.md"
+
+// ---------------------------------------------------------------- table model
+
+// c21ColourRow is one row of the three colour tables (dark, light, look).
+type c21ColourRow struct {
+	where   string // "docs/evidence/s1/c21-native-tokens.md:41"
+	section string // "dark" | "light" | "look"
+	cssVar  string // first column, verbatim (--accent, or 无 for the look rows)
+	goRef   string // "Palette.Accent" / "looks[aurora].BlobA" (backticks off)
+	claim   string // "hex(0x86C2B9,1)" - what the table says the code holds
+	line    int
+}
+
+// c21GeomRow is one row of the geometry/motion table.
+type c21GeomRow struct {
+	where  string
+	rule   string        // first column, for the log lines
+	names  []string      // the row's "Go 常量" column
+	claims []c21NumClaim // numbers stated in its "值" and "用途" columns
+	line   int
+}
+
+// c21NumClaim is one number written into a geometry row, with the unit that
+// stood next to it ("ms", "s", "px", "fps", "dpi", "%" or "" when bare).
+type c21NumClaim struct {
+	val    float64
+	unit   string
+	tagged bool
+}
+
+var (
+	c21IdentRe  = regexp.MustCompile("`([A-Za-z_][A-Za-z0-9_]*)`")
+	c21ExportRe = regexp.MustCompile(`^[A-Z][A-Za-z0-9]*$`)
+	c21NumRe    = regexp.MustCompile(`([0-9]+(?:\.[0-9]+)?)\s*(ms|fps|dpi|px|s|%)?`)
+	c21HexLitRe = regexp.MustCompile(`0[xX][0-9A-Fa-f]+`)
+	c21RGBARe   = regexp.MustCompile(`^rgba\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9.]+)\s*\)$`)
+	c21HexRe    = regexp.MustCompile(`^hex\(\s*(0[xX][0-9A-Fa-f]{6})\s*,\s*([0-9.]+)\s*\)$`)
+	c21LookRef  = regexp.MustCompile(`^looks\[([^\]]+)\]\.([A-Za-z0-9]+)$`)
+)
+
+// c21RepoRoot locates the checkout from this file's own path. A missing table is
+// fatal on purpose: an unreadable table must never be able to pass as "checked".
+func c21RepoRoot(t *testing.T) string {
+	t.Helper()
+	_, thisFile, _, ok := runtime.Caller(0)
+	if !ok {
+		t.Fatal("runtime.Caller(0) failed")
+	}
+	root := filepath.Clean(filepath.Join(filepath.Dir(thisFile), "..", ".."))
+	if _, err := os.Stat(filepath.Join(root, filepath.FromSlash(c21TablePath))); err != nil {
+		t.Fatalf("%s is not reachable from %s: %v - this check must never skip", c21TablePath, root, err)
+	}
+	return root
+}
+
+func c21PkgDir(t *testing.T) string {
+	t.Helper()
+	_, thisFile, _, ok := runtime.Caller(0)
+	if !ok {
+		t.Fatal("runtime.Caller(0) failed")
+	}
+	return filepath.Dir(thisFile)
+}
+
+// c21ParseTable reads the markdown rows of the four token tables. Rows are only
+// collected under the four known section headings, so the header block's own
+// comparison table and the 审计 section cannot leak in.
+func c21ParseTable(t *testing.T, root string) ([]c21ColourRow, []c21GeomRow) {
+	t.Helper()
+	data, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(c21TablePath)))
+	if err != nil {
+		t.Fatalf("read %s: %v", c21TablePath, err)
+	}
+	var (
+		colour  []c21ColourRow
+		geom    []c21GeomRow
+		section string
+	)
+	for i, raw := range strings.Split(string(data), "\n") {
+		line, lineNo := strings.TrimRight(raw, "\r"), i+1
+		if strings.HasPrefix(line, "#") {
+			switch {
+			case strings.Contains(line, "明色系"):
+				section = "dark"
+			case strings.Contains(line, "亮色系"):
+				section = "light"
+			case strings.Contains(line, "色板"):
+				section = "look"
+			case strings.Contains(line, "几何"):
+				section = "geom"
+			default:
+				section = ""
+			}
+			continue
+		}
+		if section == "" || !strings.HasPrefix(line, "|") {
+			continue
+		}
+		cells := c21Cells(line)
+		if len(cells) != 4 || c21IsSeparator(cells) || strings.HasPrefix(cells[0], "CSS 变量") {
+			continue
+		}
+		where := fmt.Sprintf("%s:%d", c21TablePath, lineNo)
+		switch section {
+		case "dark", "light", "look":
+			colour = append(colour, c21ColourRow{
+				where: where, section: section, cssVar: cells[0], line: lineNo,
+				goRef: c21TrimTicks(cells[2]), claim: c21TrimTicks(cells[3]),
+			})
+		case "geom":
+			row := c21GeomRow{where: where, line: lineNo, rule: cells[0]}
+			for _, m := range c21IdentRe.FindAllStringSubmatch(cells[2], -1) {
+				if c21ExportRe.MatchString(m[1]) {
+					row.names = append(row.names, m[1])
+				}
+			}
+			row.claims = c21NumClaims(cells[1] + " " + cells[3])
+			geom = append(geom, row)
+		}
+	}
+	if len(colour) == 0 || len(geom) == 0 {
+		t.Fatalf("%s parsed to %d colour rows and %d geometry rows: the document shape changed and every check below would pass vacuously",
+			c21TablePath, len(colour), len(geom))
+	}
+	return colour, geom
+}
+
+// c21Cells splits a markdown table row into its trimmed cells.
+func c21Cells(line string) []string {
+	parts := strings.Split(line, "|")
+	if len(parts) > 0 && strings.TrimSpace(parts[0]) == "" {
+		parts = parts[1:]
+	}
+	if len(parts) > 0 && strings.TrimSpace(parts[len(parts)-1]) == "" {
+		parts = parts[:len(parts)-1]
+	}
+	out := make([]string, len(parts))
+	for i, p := range parts {
+		out[i] = strings.TrimSpace(p)
+	}
+	return out
+}
+
+func c21IsSeparator(cells []string) bool {
+	for _, c := range cells {
+		if c == "" || strings.Trim(c, "-: ") != "" {
+			return false
+		}
+	}
+	return true
+}
+
+func c21TrimTicks(s string) string {
+	return strings.Trim(strings.TrimSpace(s), "`")
+}
+
+// c21NumClaims extracts every number with its unit from row text. Hex literals
+// are removed first so their digits cannot be read as values, and "dpi" is kept
+// as its own unit so a screen resolution can never satisfy a px token.
+func c21NumClaims(text string) []c21NumClaim {
+	low := c21HexLitRe.ReplaceAllString(strings.ToLower(text), "")
+	var out []c21NumClaim
+	for _, m := range c21NumRe.FindAllStringSubmatch(low, -1) {
+		v, err := strconv.ParseFloat(m[1], 64)
+		if err != nil {
+			continue
+		}
+		out = append(out, c21NumClaim{val: v, unit: m[2], tagged: m[2] != ""})
+	}
+	return out
+}
+
+func c21ClaimsText(claims []c21NumClaim) string {
+	if len(claims) == 0 {
+		return "none"
+	}
+	parts := make([]string, 0, len(claims))
+	for _, c := range claims {
+		parts = append(parts, fmt.Sprintf("%g%s", c.val, c.unit))
+	}
+	return strings.Join(parts, ", ")
+}
+
+// c21TableNames is every Go name the table declares, keyed by the reference form
+// used in each table's Go column.
+func c21TableNames(colour []c21ColourRow, geom []c21GeomRow) map[string]string {
+	out := map[string]string{}
+	for _, r := range colour {
+		out[r.goRef] = r.where
+	}
+	for _, r := range geom {
+		for _, n := range r.names {
+			out[n] = r.where
+		}
+	}
+	return out
+}
+
+// ------------------------------------------------------------- the code side
+
+// c21ConstInfo is one exported package-level constant read off tokens.go.
+type c21ConstInfo struct {
+	name string
+	kind string // "num" | "string" | "derived" (constant expression) | "other"
+}
+
+// c21TokensGoConsts enumerates the exported constants tokens.go actually declares
+// straight from its syntax tree, so a constant added without a table row cannot
+// hide.
+func c21TokensGoConsts(t *testing.T, dir string) map[string]c21ConstInfo {
+	t.Helper()
+	out := map[string]c21ConstInfo{}
+	for _, c := range c21ExportedConsts(t, filepath.Join(dir, "tokens.go")) {
+		if c.kind == "enum" {
+			continue // an iota enumeration member is not a design token value
+		}
+		out[c.name] = c
+	}
+	if len(out) < 50 {
+		t.Fatalf("tokens.go enumerated only %d exported constants: the enumeration is broken, not the file", len(out))
+	}
+	return out
+}
+
+// c21ExportedConsts reads one file's exported package-level constants. A
+// parenthesized block inherits the previous spec's type, which is how
+// `const ( ThemeDark Theme = iota; ThemeLight )` makes ThemeLight a Theme: that
+// type is not a plain numeric/string type, so both members are left out.
+func c21ExportedConsts(t *testing.T, path string) []c21ConstInfo {
+	t.Helper()
+	file, err := parser.ParseFile(token.NewFileSet(), path, nil, parser.ParseComments)
+	if err != nil {
+		t.Fatalf("parse %s: %v", filepath.Base(path), err)
+	}
+	var out []c21ConstInfo
+	for _, decl := range file.Decls {
+		gd, ok := decl.(*ast.GenDecl)
+		if !ok || gd.Tok != token.CONST {
+			continue
+		}
+		var inherited ast.Expr
+		for _, spec := range gd.Specs {
+			vs, ok := spec.(*ast.ValueSpec)
+			if !ok {
+				continue
+			}
+			typ := vs.Type
+			if typ == nil {
+				typ = inherited
+			} else {
+				inherited = vs.Type
+			}
+			if typ != nil && !c21PlainValueType(typ) {
+				continue
+			}
+			for i, id := range vs.Names {
+				if !id.IsExported() {
+					continue
+				}
+				var expr ast.Expr
+				if i < len(vs.Values) {
+					expr = vs.Values[i]
+				}
+				out = append(out, c21ConstInfo{name: id.Name, kind: c21ExprKind(expr)})
+			}
+		}
+	}
+	return out
+}
+
+func c21PlainValueType(expr ast.Expr) bool {
+	id, ok := expr.(*ast.Ident)
+	if !ok {
+		return false
+	}
+	switch id.Name {
+	case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32",
+		"float32", "float64", "string", "rune", "byte":
+		return true
+	}
+	return false
+}
+
+func c21ExprKind(expr ast.Expr) string {
+	switch e := expr.(type) {
+	case *ast.BasicLit:
+		switch e.Kind {
+		case token.INT, token.FLOAT:
+			return "num"
+		case token.STRING:
+			return "string"
+		}
+	case *ast.BinaryExpr, *ast.ParenExpr, *ast.UnaryExpr:
+		return "derived"
+	case *ast.Ident:
+		if e.Name == "iota" {
+			return "enum"
+		}
+	}
+	return "other"
+}
+
+func c21SortedNames(m map[string]c21ConstInfo) []string {
+	out := make([]string, 0, len(m))
+	for k := range m {
+		out = append(out, k)
+	}
+	sort.Strings(out)
+	return out
+}
+
+// c21GeometryGolden is the test's inventory of the numeric token surface. Every
+// value here is a reference to the constant itself, so it cannot drift away from
+// tokens.go; what can drift is the NAME list, and
+// TestC21GeometryRowsMatchCodeConstants fails if it stops matching the AST
+// enumeration of tokens.go in either direction.
+var c21GeometryGolden = map[string]float64{
+	// Liquid blob placement + glass edge weights (ticket 62).
+	"SleepRestRatio":  SleepRestRatio,
+	"LiquidRadiusA":   LiquidRadiusA,
+	"LiquidRadiusB":   LiquidRadiusB,
+	"LiquidRadiusC":   LiquidRadiusC,
+	"LiquidOffsetA":   LiquidOffsetA,
+	"LiquidOffsetB":   LiquidOffsetB,
+	"LiquidOffsetC":   LiquidOffsetC,
+	"GlassRimPx":      GlassRimPx,
+	"GlassLipPx":      GlassLipPx,
+	"GlassCaustic":    GlassCaustic,
+	"BorderRingPx":    BorderRingPx,
+	"SwimLevelGain":   SwimLevelGain,
+	"SpinLevelGain":   SpinLevelGain,
+	"BorderOpenMs":    BorderOpenMs,
+	"BorderCloseMs":   BorderCloseMs,
+	"SummonFlowMs":    SummonFlowMs,
+	"DockAnimMs":      DockAnimMs,
+	"DockOverlapFrac": DockOverlapFrac,
+	"DockTriggerPx":   DockTriggerPx,
+
+	// Geometry + motion tokens (SPEC-08 §2 / tokens.css).
+	"BallSizeDefaultPx":    BallSizeDefaultPx,
+	"BallSizeSmallPx":      BallSizeSmallPx,
+	"BallSizeLargePx":      BallSizeLargePx,
+	"BallSizeMinPx":        BallSizeMinPx,
+	"BallSizeMaxPx":        BallSizeMaxPx,
+	"SleepingDotPx":        SleepingDotPx,
+	"SleepOpacity":         SleepOpacity,
+	"SleepingRestMinPx":    SleepingRestMinPx,
+	"RestSettledOpacity":   RestSettledOpacity,
+	"DurFastMs":            DurFastMs,
+	"DurBaseMs":            DurBaseMs,
+	"DurSlowMs":            DurSlowMs,
+	"WarmBreathPeriodMs":   WarmBreathPeriodMs,
+	"SpeakingBreathMs":     SpeakingBreathMs,
+	"ListeningWaveMs":      ListeningWaveMs,
+	"ThinkingSweepMs":      ThinkingSweepMs,
+	"ConfirmingPulseMs":    ConfirmingPulseMs,
+	"FirstRunGuidePulseMs": FirstRunGuidePulseMs,
+	"SettlingFadeMs":       SettlingFadeMs,
+	"WarmOpacityLow":       WarmOpacityLow,
+	"WarmOpacityHigh":      WarmOpacityHigh,
+	"MaxAnimFPS":           MaxAnimFPS,
+	"MinFrameMs":           MinFrameMs,
+	"WarmBreathFPS":        WarmBreathFPS,
+	"SlashStrokePx":        SlashStrokePx,
+	"IconStrokePx":         IconStrokePx,
+	"RingStrokePx":         RingStrokePx,
+	"ConvRingStrokePx":     ConvRingStrokePx,
+	"ThinkingBandPx":       ThinkingBandPx,
+	"BadgeDiameterPx":      BadgeDiameterPx,
+	"BadgeFontPx":          BadgeFontPx,
+	"BadgeBorderPx":        BadgeBorderPx,
+	"QueueDotPx":           QueueDotPx,
+	"FontSizeMonoPx":       FontSizeMonoPx,
+	"FontSizeMicroPx":      FontSizeMicroPx,
+	"CountdownFontPx":      CountdownFontPx,
+}
+
+// c21StringTokens are the non-numeric tokens of the same surface. The table names
+// FontFamily's CSS source (--font-sans) but states no value for it, so there is
+// nothing numeric to compare: the name is still checked in both directions, and
+// this list is what keeps that one gap visible instead of silent.
+var c21StringTokens = map[string]string{
+	"FontFamily": FontFamily,
+}
+
+// c21OutTableExempt lists the exported constants the ball package keeps OUTSIDE
+// tokens.go, which therefore sit outside the table's declared scope ("本表只覆盖
+// internal/ball/tokens.go 的 40 个 Palette 字段 + 全部导出的几何/动效常量", A24-D6).
+// Each entry carries the reason it is not a C21 token. A new exported constant in
+// one of these files that is neither tabled nor listed here fails the test, which
+// is the ticket's "要么进表要么显式豁免并写明理由".
+var c21OutTableExempt = map[string]string{
+	// hit.go: hit-test result codes and the window maths around them.
+	"HTClient":         "Win32 hit-test return value, not a design token",
+	"HTTransparent":    "Win32 hit-test return value, not a design token",
+	"HTNowhere":        "Win32 hit-test return value, not a design token",
+	"RingMarginPx":     "GLOW 候选 D7: ring margin the window maths uses, in code but never in the table - owner call whether C21 should own it",
+	"ClickTolerancePx": "GLOW 候选 D7: click tolerance, same shape as RingMarginPx",
+
+	// hotkey_windows.go: a keybinding string, not geometry or colour.
+	"AltSummonSpace": "Default hotkey text (SPEC-04 surface), not a C21 token",
+
+	// liquid.go: the audio-envelope motion internals ticket 62 grew next to the
+	// tabled liquid placement constants. GLOW 候选 D8: they are motion values a
+	// token table could carry, but the table's scope stops at tokens.go.
+	"SpinBaseRadPerS":   "GLOW 候选 D8: liquid spin rate, ticket 62 motion internal",
+	"SpinLevelRadPerS":  "GLOW 候选 D8: liquid spin rate gain, ticket 62 motion internal",
+	"SpinSummonRadPerS": "GLOW 候选 D8: summon spin burst, ticket 62 motion internal",
+	"SilenceLevelGate":  "GLOW 候选 D8: envelope silence gate, ticket 62 motion internal",
+	"SilenceHoldMs":     "GLOW 候选 D8: silence hold period, ticket 62 motion internal",
+	"LevelAttackTauMs":  "GLOW 候选 D8: envelope attack time constant, ticket 62 motion internal",
+	"LevelReleaseTauMs": "GLOW 候选 D8: envelope release time constant, ticket 62 motion internal",
+	"MotionEpsilon":     "GLOW 候选 D8: settle epsilon, numerical noise floor not a visual token",
+	"FrameIntervalMs":   "GLOW 候选 D8: derives from the tabled MaxAnimFPS instead of restating it",
+}
+
+// c21StructColour reads one Color field by name.
+func c21StructColour(holder any, field string) (Color, bool) {
+	v := reflect.ValueOf(holder).FieldByName(field)
+	if !v.IsValid() || v.Type() != reflect.TypeOf(Color{}) {
+		return Color{}, false
+	}
+	c, ok := v.Interface().(Color)
+	return c, ok
+}
+
+func c21PaletteOf(section string) Palette {
+	if section == "light" {
+		return LightPalette()
+	}
+	return DarkPalette()
+}
+
+func c21LookByNameExact(name string) (LiquidLook, bool) {
+	for _, l := range looks {
+		if l.Name == name {
+			return l, true
+		}
+	}
+	return LiquidLook{}, false
+}
+
+func c21ColourFieldNames(t *testing.T, typ reflect.Type) []string {
+	t.Helper()
+	var out []string
+	for i := 0; i < typ.NumField(); i++ {
+		f := typ.Field(i)
+		if f.Type != reflect.TypeOf(Color{}) {
+			continue
+		}
+		out = append(out, f.Name)
+	}
+	return out
+}
+
+// ----------------------------------------------------- check 1: colour rows
+
+// TestC21TableColourRowsMatchCode walks the C21 table's three colour sections and
+// asserts, row by row, that the token exists and holds exactly the value the
+// table writes - then walks the other way and asserts that no Palette field or
+// look colour exists without a row. That covers all 114 colour rows (40 dark +
+// 38 light + 36 look), against the 20 TestTokenGoldenValues kept for the CSS
+// spot check.
+func TestC21TableColourRowsMatchCode(t *testing.T) {
+	root := c21RepoRoot(t)
+	colour, geom := c21ParseTable(t, root)
+	if len(geom) == 0 {
+		t.Fatal("geometry table empty")
+	}
+
+	var dark, light, look []c21ColourRow
+	for _, r := range colour {
+		switch r.section {
+		case "dark":
+			dark = append(dark, r)
+		case "light":
+			light = append(light, r)
+		case "look":
+			look = append(look, r)
+		}
+	}
+	// These are the counts the table itself declares (40 dark + 38 light rows,
+	// and 4 looks x 9 colour fields). Deleting a row narrows the contract, so it
+	// stops here instead of quietly checking less; adding rows needs no edit.
+	for _, c := range []struct {
+		name string
+		got  int
+		want int
+	}{
+		{"dark (:root)", len(dark), 40},
+		{"light ([data-theme=light])", len(light), 38},
+		{"look", len(look), len(looks) * 9},
+	} {
+		if c.got < c.want {
+			t.Errorf("the %s colour table declares %d rows, want at least %d: a row that vanished takes its machine check with it (%s)",
+				c.name, c.got, c.want, c21TablePath)
+		}
+	}
+
+	// (a) table -> code: same name, same value.
+	seen := make(map[string]c21ColourRow, len(colour))
+	verified := 0
+	for _, r := range colour {
+		key := r.section + "|" + r.goRef
+		if prev, dup := seen[key]; dup {
+			t.Errorf("%s: %s is declared twice in the %s table (first at %s): one token needs exactly one row, or the check cannot say which value wins",
+				r.where, r.goRef, r.section, prev.where)
+			continue
+		}
+		seen[key] = r
+
+		var got Color
+		switch r.section {
+		case "dark", "light":
+			if !strings.HasPrefix(r.goRef, "Palette.") {
+				t.Errorf("%s: %q is not a Palette.<Field> reference - this row no longer matches the table's documented form", r.where, r.goRef)
+				continue
+			}
+			field := strings.TrimPrefix(r.goRef, "Palette.")
+			var ok bool
+			if got, ok = c21StructColour(c21PaletteOf(r.section), field); !ok {
+				t.Errorf("%s: the table declares Palette.%s, but internal/ball/tokens.go has no Color field of that name", r.where, field)
+				continue
+			}
+		case "look":
+			m := c21LookRef.FindStringSubmatch(r.goRef)
+			if m == nil {
+				t.Errorf("%s: %q is not a looks[<name>].<Field> reference - this row no longer matches the table's documented form", r.where, r.goRef)
+				continue
+			}
+			l, ok := c21LookByNameExact(m[1])
+			if !ok {
+				t.Errorf("%s: the table declares looks[%s], but tokens.go ships no look of that name (looks are %s)",
+					r.where, m[1], strings.Join(LookNames(), ", "))
+				continue
+			}
+			if got, ok = c21StructColour(l, m[2]); !ok {
+				t.Errorf("%s: LiquidLook has no Color field %q, so this row checks nothing", r.where, m[2])
+				continue
+			}
+		default:
+			t.Errorf("%s: colour row in unknown section %q", r.where, r.section)
+			continue
+		}
+
+		want, err := c21EvalClaim(r.claim)
+		if err != nil {
+			t.Errorf("%s: cannot read the table's Go value %q: %v", r.where, r.claim, err)
+			continue
+		}
+		if !colorEq(got, want) {
+			t.Errorf("%s: %s drifted - the table states %s (%s) and internal/ball/tokens.go holds %s",
+				r.where, r.goRef, r.claim, c21ColourText(want), c21ColourText(got))
+			continue
+		}
+		verified++
+	}
+
+	// (b) code -> table: nothing in the colour surface may be undeclared.
+	darkIdx := map[string]c21ColourRow{}
+	for _, r := range dark {
+		darkIdx[strings.TrimPrefix(r.goRef, "Palette.")] = r
+	}
+	lightIdx := map[string]bool{}
+	for _, r := range light {
+		lightIdx[strings.TrimPrefix(r.goRef, "Palette.")] = true
+	}
+	paletteType := reflect.TypeOf(Palette{})
+	darkPal, lightPal := reflect.ValueOf(DarkPalette()), reflect.ValueOf(LightPalette())
+	var cascade []string
+	for i := 0; i < paletteType.NumField(); i++ {
+		f := paletteType.Field(i)
+		if f.Type != reflect.TypeOf(Color{}) {
+			t.Errorf("Palette.%s is a %s, not a Color: the colour tables only cover Color fields, so this one would go unchecked - extend these tests deliberately", f.Name, f.Type)
+			continue
+		}
+		if _, declared := darkIdx[f.Name]; !declared {
+			t.Errorf("Palette.%s exists in tokens.go but the dark (:root) table declares no row for it (code -> table direction, A24-D4)", f.Name)
+		}
+		if lightIdx[f.Name] {
+			continue
+		}
+		// Not in the light table: the table's prose promises the light block does
+		// not redefine it, i.e. CSS cascade carries the :root value. That promise
+		// is only true if the two palettes really agree.
+		dv, _ := c21StructColour(darkPal.Field(i).Interface(), f.Name)
+		lv, _ := c21StructColour(lightPal.Field(i).Interface(), f.Name)
+		if !colorEq(dv, lv) {
+			t.Errorf("Palette.%s has no light-table row, so cascade says it carries the :root value, but dark=%s light=%s",
+				f.Name, c21ColourText(dv), c21ColourText(lv))
+			continue
+		}
+		cascade = append(cascade, f.Name)
+	}
+	if len(cascade) > 0 {
+		sort.Strings(cascade)
+		t.Logf("light table reuses the :root value by cascade for %d field(s): %s (the table states this in prose above its light rows)",
+			len(cascade), strings.Join(cascade, ", "))
+	}
+
+	lookIdx := map[string]bool{}
+	for _, r := range look {
+		if m := c21LookRef.FindStringSubmatch(r.goRef); m != nil {
+			lookIdx[m[1]+"/"+m[2]] = true
+		}
+	}
+	lookType := reflect.TypeOf(LiquidLook{})
+	lookChecked := 0
+	for _, l := range looks {
+		for i := 0; i < lookType.NumField(); i++ {
+			f := lookType.Field(i)
+			if f.Type != reflect.TypeOf(Color{}) {
+				continue
+			}
+			if !lookIdx[l.Name+"/"+f.Name] {
+				t.Errorf("looks[%s].%s exists in tokens.go but the look table declares no row for it (code -> table direction, A24-D4)", l.Name, f.Name)
+				continue
+			}
+			lookChecked++
+		}
+	}
+	t.Logf("verified %d/%d colour rows against tokens.go (%d palette fields checked in code -> table, %d look colours, %d looks)",
+		verified, len(colour), paletteType.NumField(), lookChecked, len(looks))
+}
+
+// c21EvalClaim evaluates the Go construction the table writes for a colour
+// (rgba(0..255,0..255,0..255,alpha) or hex(0xRRGGBB,alpha)) with the very
+// helpers tokens.go uses, so "equal" means equal channels.
+func c21EvalClaim(claim string) (Color, error) {
+	if m := c21RGBARe.FindStringSubmatch(claim); m != nil {
+		var ch [3]uint8
+		for i := 0; i < 3; i++ {
+			v, err := strconv.ParseUint(m[i+1], 10, 8)
+			if err != nil {
+				return Color{}, fmt.Errorf("channel %q is not a 0..255 integer", m[i+1])
+			}
+			ch[i] = uint8(v)
+		}
+		a, err := strconv.ParseFloat(m[4], 32)
+		if err != nil {
+			return Color{}, fmt.Errorf("alpha %q is unreadable", m[4])
+		}
+		return rgba(ch[0], ch[1], ch[2], float32(a)), nil
+	}
+	if m := c21HexRe.FindStringSubmatch(claim); m != nil {
+		v, err := strconv.ParseUint(strings.TrimPrefix(strings.TrimPrefix(m[1], "0x"), "0X"), 16, 32)
+		if err != nil {
+			return Color{}, fmt.Errorf("hex %q is unreadable", m[1])
+		}
+		a, err := strconv.ParseFloat(m[2], 32)
+		if err != nil {
+			return Color{}, fmt.Errorf("alpha %q is unreadable", m[2])
+		}
+		return hex(uint32(v), float32(a)), nil
+	}
+	return Color{}, fmt.Errorf("neither rgba(...) nor hex(0xRRGGBB, alpha)")
+}
+
+func c21ColourText(c Color) string {
+	return fmt.Sprintf("rgba(%.0f,%.0f,%.0f,%.6f)", c.R*255, c.G*255, c.B*255, c.A)
+}
+
+// ------------------------------------------------- check 2: geometry rows
+
+// c21WantedUnits is the unit a constant's own name promises. The table writes
+// durations in seconds ("Speaking 呼吸 1.6s") while the constants are ms, so "s"
+// counts as ms; a bare number is what a ratio, opacity or gain is stated with.
+func c21WantedUnits(name string) []string {
+	switch {
+	case strings.HasSuffix(name, "Ms"):
+		return []string{"ms", "s"}
+	case strings.HasSuffix(name, "Px"):
+		return []string{"px"}
+	case strings.HasSuffix(name, "FPS"):
+		return []string{"fps"}
+	default:
+		return []string{""}
+	}
+}
+
+// c21MatchClaim reports whether any number in the row states val, and whether it
+// does so with the unit the name promises (a bare "44–72" satisfying
+// BallSizeMaxPx is a match, just a weaker one, and gets reported as such).
+func c21MatchClaim(val float64, name string, claims []c21NumClaim) (found, exactUnit bool) {
+	want := c21WantedUnits(name)
+	for _, c := range claims {
+		if c.unit == "dpi" {
+			continue
+		}
+		v := c.val
+		if c.unit == "s" {
+			v *= 1000
+		}
+		if math.Abs(v-val) > 1e-9 {
+			continue
+		}
+		found = true
+		for _, u := range want {
+			if c.unit == u {
+				return true, true
+			}
+		}
+	}
+	return found, false
+}
+
+// TestC21GeometryRowsMatchCodeConstants walks the geometry/motion table row by
+// row: every constant a row names must exist in tokens.go, and the value
+// tokens.go holds must be a number the row actually states. The reverse pass
+// requires every exported tokens.go constant to be named by exactly one row.
+func TestC21GeometryRowsMatchCodeConstants(t *testing.T) {
+	root := c21RepoRoot(t)
+	_, geom := c21ParseTable(t, root)
+	code := c21TokensGoConsts(t, filepath.Join(root, "internal", "ball"))
+
+	// (0) the test's own inventory must be exactly tokens.go's constants, or the
+	// rows below would be checked against a stale list.
+	for _, name := range c21SortedNames(code) {
+		info := code[name]
+		switch info.kind {
+		case "num", "derived":
+			if _, ok := c21GeometryGolden[name]; !ok {
+				t.Errorf("tokens.go declares the constant %s (%s) but c21GeometryGolden does not list it: add the value, add the table row, or say why it is not a token", name, info.kind)
+			}
+		case "string":
+			if _, ok := c21StringTokens[name]; !ok {
+				t.Errorf("tokens.go declares the string constant %s but c21StringTokens does not list it", name)
+			}
+		default:
+			t.Errorf("tokens.go declares %s in a form this test does not understand (%s): extend the test deliberately, do not skip it", name, info.kind)
+		}
+	}
+	for name := range c21GeometryGolden {
+		if _, ok := code[name]; !ok {
+			t.Errorf("c21GeometryGolden lists %s, which internal/ball/tokens.go no longer declares - it was renamed or deleted and the table row must follow", name)
+		}
+	}
+	for name := range c21StringTokens {
+		if _, ok := code[name]; !ok {
+			t.Errorf("c21StringTokens lists %s, which internal/ball/tokens.go no longer declares", name)
+		}
+	}
+
+	// (a) table -> code: names exist, one row per name.
+	rowOf := map[string]c21GeomRow{}
+	named := 0
+	for _, r := range geom {
+		if len(r.names) == 0 {
+			t.Logf("%s: this row states a rule (%s) without naming a Go constant, so there is no value to compare", r.where, r.rule)
+			continue
+		}
+		for _, n := range r.names {
+			if prev, dup := rowOf[n]; dup {
+				t.Errorf("%s: %s is declared by two table rows (%s and %s): one token, one home", r.where, n, prev.where, r.where)
+			}
+			rowOf[n] = r
+			if _, ok := code[n]; !ok {
+				t.Errorf("%s: the table names %s, but tokens.go declares no such exported constant", r.where, n)
+			}
+			named++
+		}
+	}
+
+	// (b) code -> table.
+	for _, name := range c21SortedNames(code) {
+		if _, ok := rowOf[name]; !ok {
+			t.Errorf("tokens.go exports %s but no geometry-table row declares it (code -> table direction, A24-D4)", name)
+		}
+	}
+
+	// (c) values.
+	var weak, unclaimed []string
+	for _, r := range geom {
+		if len(r.names) == 0 {
+			continue
+		}
+		claimed := make([]bool, len(r.claims))
+		for _, n := range r.names {
+			if info, ok := code[n]; ok && info.kind == "string" {
+				continue // stated by name in the row; no numeric claim to check
+			}
+			val, ok := c21GeometryGolden[n]
+			if !ok {
+				continue // already reported by (0)/(a)
+			}
+			found, exact := c21MatchClaim(val, n, r.claims)
+			if !found {
+				t.Errorf("%s: %s = %s, but this row states no such number (its numbers are: %s) - table and code drifted",
+					r.where, n, c21NumText(val), c21ClaimsText(r.claims))
+				continue
+			}
+			if !exact {
+				weak = append(weak, fmt.Sprintf("%s=%s @ %s", n, c21NumText(val), r.where))
+			}
+			for i, c := range r.claims {
+				v := c.val
+				if c.unit == "s" {
+					v *= 1000
+				}
+				if !claimed[i] && math.Abs(v-val) <= 1e-9 {
+					claimed[i] = true
+				}
+			}
+		}
+		for i, c := range r.claims {
+			if !claimed[i] {
+				unclaimed = append(unclaimed, fmt.Sprintf("%g%s @ %s", c.val, c.unit, r.where))
+			}
+		}
+	}
+	// Where the check is weakest, said out loud: a value that collides with
+	// another number in the same row still passes, because a row states its
+	// numbers in prose. The two lists below are exactly those rows.
+	if len(weak) > 0 {
+		sort.Strings(weak)
+		t.Logf("MATCHED WITHOUT THE PROMISED UNIT (%d): %s", len(weak), strings.Join(weak, ", "))
+	}
+	if len(unclaimed) > 0 {
+		sort.Strings(unclaimed)
+		t.Logf("NUMBERS NO NAMED CONSTANT CLAIMS (%d): %s", len(unclaimed), strings.Join(unclaimed, ", "))
+	}
+	t.Logf("checked %d constant declarations across %d geometry rows against %d exported tokens.go constants",
+		named, len(geom), len(code))
+}
+
+func c21NumText(v float64) string {
+	return strconv.FormatFloat(v, 'g', -1, 64)
+}
+
+// ------------------------------------------- check 3: zero consumers visible
+
+// TestC21TokenConsumerReport prints, for the owner, the tokens that exist and are
+// tabled but are never referenced by the ball package's drawing code. Reporting
+// only: an unconsumed token is a spec nobody has approved yet (ticket 68/65/Q
+// list territory), so judging it red is not this test's call. What the test does
+// guarantee is that the scan runs and can tell consumed from unconsumed.
+func TestC21TokenConsumerReport(t *testing.T) {
+	dir := c21PkgDir(t)
+	_, geom := c21ParseTable(t, c21RepoRoot(t))
+	code := c21TokensGoConsts(t, dir)
+
+	files, err := filepath.Glob(filepath.Join(dir, "*.go"))
+	if err != nil || len(files) == 0 {
+		t.Fatalf("glob the ball package: %v (%d files)", err, len(files))
+	}
+	idents := map[string]int{} // plain identifiers: constants in use
+	fields := map[string]int{} // selector names: Palette / LiquidLook fields in use
+	scanned := 0
+	for _, f := range files {
+		base := filepath.Base(f)
+		if base == "tokens.go" || strings.HasSuffix(base, "_test.go") {
+			continue
+		}
+		n := c21CollectRefs(t, f, idents, fields)
+		if n == 0 {
+			t.Fatalf("%s contributed no identifiers: the scan is broken, not the file", base)
+		}
+		scanned++
+	}
+	if scanned == 0 {
+		t.Fatal("no drawing files were scanned: the report would be vacuous")
+	}
+
+	tokens := make([]string, 0, len(code)+49)
+	for _, n := range c21SortedNames(code) {
+		tokens = append(tokens, n)
+	}
+	for _, n := range c21ColourFieldNames(t, reflect.TypeOf(Palette{})) {
+		tokens = append(tokens, "Palette."+n)
+	}
+	for _, n := range c21ColourFieldNames(t, reflect.TypeOf(LiquidLook{})) {
+		tokens = append(tokens, "looks[*]."+n) // per-field: one look is live at a time
+	}
+
+	var zero, live []string
+	for _, tok := range tokens {
+		n := tok
+		if i := strings.LastIndex(tok, "."); i >= 0 {
+			n = tok[i+1:]
+			if fields[n] == 0 {
+				zero = append(zero, tok)
+			} else {
+				live = append(live, tok)
+			}
+			continue
+		}
+		if idents[n] == 0 {
+			zero = append(zero, tok)
+		} else {
+			live = append(live, tok)
+		}
+	}
+	// Anti-vacuity: if the identifier scan matched nothing, every token would land
+	// in `zero` and the report would look like a full pass.
+	if len(live) == 0 {
+		t.Fatalf("none of the %d tokens matched a reference in the %d drawing files scanned - the scan is broken, not the code", len(tokens), scanned)
+	}
+	sort.Strings(zero)
+	t.Logf("ZERO-CONSUMER TOKENS (%d of %d checked; %d are referenced by %d non-test files) - report only, ticket 69 AC#3:",
+		len(zero), len(tokens), len(live), scanned)
+	for _, tok := range zero {
+		line := "  UNCONSUMED " + tok
+		if r, ok := rowOfTableToken(geom, tok); ok {
+			line += " (declared at " + r + ")"
+		}
+		t.Log(line)
+	}
+}
+
+// rowOfTableToken finds the geometry row that declares a token, so the report
+// points at the table line an owner would have to rule on.
+func rowOfTableToken(geom []c21GeomRow, tok string) (string, bool) {
+	name := tok
+	if i := strings.LastIndex(tok, "."); i >= 0 {
+		name = tok[i+1:]
+	}
+	for _, r := range geom {
+		for _, n := range r.names {
+			if n == name {
+				return r.where, true
+			}
+		}
+	}
+	return "", false
+}
+
+// c21CollectRefs records every identifier and every selector name one file uses.
+// Comments are excluded for free because the AST does not carry them: a token
+// mentioned only in prose is not a consumer (that is how SleepRestRatio's
+// comment-only mentions must not read as usage).
+func c21CollectRefs(t *testing.T, path string, idents, fields map[string]int) int {
+	t.Helper()
+	file, err := parser.ParseFile(token.NewFileSet(), path, nil, parser.ParseComments)
+	if err != nil {
+		t.Fatalf("parse %s: %v", filepath.Base(path), err)
+	}
+	n := 0
+	ast.Inspect(file, func(node ast.Node) bool {
+		switch x := node.(type) {
+		case *ast.SelectorExpr:
+			if x.Sel != nil {
+				fields[x.Sel.Name]++
+				n++
+			}
+		case *ast.Ident:
+			idents[x.Name]++
+			n++
+		}
+		return true
+	})
+	return n
+}
+
+// -------------------------------------- check 4: no unlisted code-side tokens
+
+// TestC21CodeTokensAreTabledOrExempt is the other half of the reverse direction:
+// an exported constant anywhere in the ball package is either declared by the C21
+// table or exempt with a written reason. tokens.go's own constants are held to the
+// stricter rule by TestC21GeometryRowsMatchCodeConstants (the table's declared
+// scope), so this test covers what lives next to it.
+func TestC21CodeTokensAreTabledOrExempt(t *testing.T) {
+	root := c21RepoRoot(t)
+	dir := filepath.Join(root, "internal", "ball")
+	colour, geom := c21ParseTable(t, root)
+	tabled := c21TableNames(colour, geom)
+
+	seen := map[string]bool{}
+	for _, info := range c21TokensGoConsts(t, dir) {
+		seen[info.name] = true
+	}
+
+	files, err := filepath.Glob(filepath.Join(dir, "*.go"))
+	if err != nil || len(files) == 0 {
+		t.Fatalf("glob the ball package: %v", err)
+	}
+	for _, f := range files {
+		base := filepath.Base(f)
+		if base == "tokens.go" || strings.HasSuffix(base, "_test.go") {
+			continue
+		}
+		for _, c := range c21FileConsts(t, f) {
+			if seen[c.name] {
+				continue // tokens.go owns it; the geometry test judges it
+			}
+			if _, ok := tabled[c.name]; ok {
+				continue // tabled even though it lives elsewhere
+			}
+			if reason, ok := c21OutTableExempt[c.name]; ok {
+				t.Logf("EXEMPT %s (%s) is outside the table on purpose: %s", c.name, base, reason)
+				continue
+			}
+			t.Errorf("%s exports %s (%s), which is neither declared by %s nor listed in c21OutTableExempt with a reason - add the table row or exempt it deliberately",
+				base, c.name, c.kind, c21TablePath)
+		}
+	}
+	// A stale exemption hides as much as a missing one.
+	for name := range c21OutTableExempt {
+		if _, ok := tabled[name]; ok {
+			t.Errorf("c21OutTableExempt lists %s, which the table now declares: drop the exemption", name)
+			continue
+		}
+		found := false
+		for _, f := range files {
+			if filepath.Base(f) == "tokens.go" || strings.HasSuffix(f, "_test.go") {
+				continue
+			}
+			for _, c := range c21FileConsts(t, f) {
+				if c.name == name {
+					found = true
+				}
+			}
+		}
+		if !found {
+			t.Errorf("c21OutTableExempt lists %s, which the package no longer declares: remove the stale exemption", name)
+		}
+	}
+}
+
+// c21FileConsts is c21ExportedConsts narrowed to the kinds that could carry a
+// token value: enums (IconKind, AnimKind, HotkeyStatus, the Win32 hit-test codes)
+// and iota members are left out for the same reason as in tokens.go.
+func c21FileConsts(t *testing.T, path string) []c21ConstInfo {
+	t.Helper()
+	var out []c21ConstInfo
+	for _, c := range c21ExportedConsts(t, path) {
+		if c.kind == "num" || c.kind == "string" || c.kind == "derived" {
+			out = append(out, c)
+		}
+	}
+	return out
+}
