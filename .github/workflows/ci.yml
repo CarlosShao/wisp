@@ -183,6 +183,16 @@ jobs:
     runs-on: [self-hosted, wisp-slo]
     env:
       WISP_ENV: test
+      # The runner's job environment carries no msys64 on PATH: measured on the
+      # wisp-slo machine, `msys64` appears 0 times in _diag/Worker_*.log for the
+      # runs that failed here, while gcc lives at E:\work\base\msys64\mingw64\bin
+      # (on the interactive user PATH only). build.ps1's own fallback path is
+      # C:\msys64\..., which is the wrong drive here, so its discovery found no
+      # compiler and the step died before compiling anything. MINGW64_ROOT is
+      # build.ps1's documented knob (docs/BUILD.md); this supplies it rather than
+      # weakening the step. Verified locally with msys removed from PATH:
+      # build.ps1 -> "go build ok" + doctor all PASS + rc=0.
+      MINGW64_ROOT: E:\work\base\msys64\mingw64\bin
     steps:
       - uses: actions/checkout@v4
 
