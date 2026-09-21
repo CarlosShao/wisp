@@ -170,3 +170,63 @@ delete_test.go:25: NewStore: secret: create C:\Users\RUNNER~1\AppData\Local\Temp
   我没碰它们（不 add、不删、不改）。**push 时若 `test-windows` 报 winsec 编译红，那是 108 的未提交文件，不是本票** ——
   要么先由 108 修好那枚未用变量，要么本票的 CI 复跑只读 `internal/secret`/`internal/config` 两步的步级结论。
   next= 编排者 push `34f6959`（生产码）+ `0f4c891`/`0a44598`（用例与账），读 `test-windows` 里 `internal/secret` 是否 `ok`，回填上面的 run id 位。
+
+### 对抗验收段（append-only，`acceptor-93-106`，2026-09-21 19:12 CST；裁决表 `docs/evidence/s1/106-adversarial-acceptance.md`）
+
+- **总判 PASS WITH CONDITIONS。** 我没动 Status、没动任何勾框（票面 append-only ⇒ 勾框会制造删除列）。
+- **① 旧码到底错在哪：错在"名字比较"，不是"集合成员" —— 实现方的因果裁决成立，修法仍然成立。**
+  我读的正是它给的命令口径：`git show 1400e15^:internal/winsec/winsec_windows.go`，第 292-347 行原文 ——
+  `allowed = {"SY":true, sidSystem:true, "BA":true, sidAdmins:true, u.Uid:true}`（**令牌用户以 SID 在集合内**），
+  然后 `if !allowed[fields[5]] { foreign = append(...) }`，而 `fields[5]` 来自 `sd.String()` 的 **SDDL 拼写**
+  ⇒ runner 上 OS 把内置 Administrator 的 SID 印成 `LA`、`LA` 不是那张表的键 ⇒ 拒自己。
+  两个替代解释我都排除了：**"把 `BA` 组与 `LA` 账户混为一谈"** —— 旧码不查任何组成员关系，纯字符串相等；
+  **"`u.Uid` 在 runner 上解析成 `runneradmin` 而 ACE 落的是 `Administrator`"** —— 构造性排除：那份 DACL 只有 winsec
+  自己写得出来（`:261 sidStrings(sidSystem, sidAdmins)` + `:334 convertSID(u.Uid)`，且 `D:P` 已剥继承），
+  CI 那份是**六条三对、无 `ID` 位** ⇒ 第三对只能是 `convertSID(u.Uid)` 那条；若 `u.Uid` ≠ ACE 主体，我们会看到
+  **四个**不同主体，日志里没有。**8.3 短名与判定无因果**这一点我也独立核到：修后的判定链不经过任何路径名解析。
+- **② 没有偷偷放宽**：`privateSet`（`:408`，返回字面量在 `:432`）**仍三员、零名字**。反半边我亲测：HEAD 下
+  `TestGateRefusesADescriptorThatLeavesARealGrantToAnotherAccount` **PASS**（给 `S-1-1-0` 留真实 ALLOW ⇒ 仍拒、报错点名 SID）。
+  **变异我自己重跑（`/tmp/ac936-mut`，每发先 `go build ./internal/winsec/` rc=0、同链 `grep -n` 证落地）**：
+  MUT-A `:362`→`if false && (...)` ⇒ **rc=1**，`--- FAIL: TestGateRefuses...` @ `private_set_sid_windows_test.go:312`
+  「a DACL leaving S-1-1-0 a real grant on the object was accepted as private」；
+  MUT-B = MUT-A + `:96`→`if true || ...` ⇒ **rc=1、2 条 FAIL**（上面那条 + `--- FAIL: TestSealNarrowsAndNamesThePrincipalItRemovedBySID`
+  @ `:268`，`cleared=""`，root DACL 回读正是六条三对）。⇒ **取消检查换不来绿。** 还原 `cmp` 字节相同。
+- **③ 恒绿那条：算"钉 runner 那一格的仪器"，且它有牙 —— 我把它人为弄红过一次**：TEETH = `:432` 往集合里塞
+  `"LA","BA","SY"` 三个名字 ⇒ build rc=0、`--- FAIL: TestGateJudgesThePrivateSetByResolvedSID`，
+  红在子腿 `/the_set_holds_no_name_in_the_form_it_is_compared_with` @ `:195`「the private set admits a principal by name,
+  not by SID: "LA"」。⚠ 但另两条子腿（`runner_descriptor_is_judged_by_what_it_resolves_to`、
+  `a_name_spelling_cannot_change_the_verdict`）在 MUT-A/MUT-B/TEETH 三发下**都仍绿** ⇒ 那两腿目前只有意图级证据（`R-106-4`）。
+- **④ AC#5 的 CI 那半由我补（run id 位可填）**：run **`35591482293`**（head `440dd88`）→ job `test-windows`
+  **id=`106306750494`** → **steps**：`5|cgo build smoke|success`、**`6|Portable windows tests (proc/secret/config)|success`**、
+  `7|PathResolver junction placeholder|success`（job conclusion=success；同 run 只有 `lint`=failure，与本票无关）。
+  日志（我亲手 `gh api .../jobs/106306750494/logs`，763 行）第 249/389/449/718/719/720 行：
+  `portable-tests.sh: platform=windows scope=[./internal/proc/ ./internal/secret/ ./internal/config/]`、
+  `ok .../internal/proc 11.781s`、**`ok .../internal/secret 0.391s`**、`ok .../internal/config 0.881s`、
+  `runtests.sh: OK ... top-level: PASS=108 FAIL=0 SKIP=0, === RUN=164`、`four numbers: === RUN=164 --- PASS=108 --- FAIL=0 --- SKIP=0`
+  ⇒ **票面那个"`internal/secret` 整包 8+ 条死在 `NewStore` 第一步"在 runner 上确实消失。**
+  ⚠ **本票最重的条件（`R-106-1`）**：同一份日志里 `internal/winsec` 命中 **0 次** ⇒ **CI 没有任何步骤跑 winsec 自己的用例**，
+  所以"三条新用例在 runner 上 PASS"与 `LA == 令牌用户` 那一支**至今无 CI 台账**，`internal/secret` 变绿只是**间接**证据。
+  下一条命令：`ci.yml` 的 `test-windows` 加一步 `bash scripts/portable-tests.sh ./internal/winsec/`（票 93 已把这台仪器修好），
+  再 `gh api repos/CarlosShao/wisp/actions/runs?per_page=5` 取新 run id 读该步。
+- **⑤ 门禁我自己重跑（纯净 `git archive 440dd88` 快照，不含票 108 的两枚未跟踪文件 ⇒ 别人的半成品没算成回归）**：
+  `go test -count=2 -v ./internal/winsec/ ./internal/secret/ ./internal/config/ ./internal/proc/` ⇒ **rc=0**，
+  `=== RUN=410`、**顶层 `--- PASS`=270**、**`--- FAIL`=0**、`--- SKIP=2`（`-v` 读数，逐条点名 `TestHelperProcess` ×2，
+  `jobscope_windows_test.go:87`，re-exec 助手本非用例，已由票 93 台账第 3 条记账）。
+  **口径差异如实报**：交件段写 `PASS=407 / 不同测试名=205（×2 恰等）`；我 `^--- PASS` 只数顶层（Go 的子测试 PASS 行缩进），
+  顶层不同用例 = `winsec 27 + secret 21 + config 56 + proc 32 = 136`，×2=272 顶层 RUN，余 138 条是子测试。
+  **两边都报、不重测到运气好；FAIL=0 与 PASS=407 不是同一根计数轴，不构成矛盾。**
+  ⚠ **`TestExternalSamplerReadsSubjectFromOutside` 我没复现到红**（proc `ok 2.760s`；另加并发压测 proc 仍 rc=0）
+  ⇒ 与实现方同口径：**负载假红，不是回归**。`gofmt -l` 四包+`scripts` **空**；`gofumpt.exe`（本机 `$(go env GOPATH)/bin` **有**）`-l` **空**；
+  按包 `go vet` 与 `GOOS=linux go vet` 四包 **rc=0**；`sh scripts/d22scan.sh` **rc=0 clean**，
+  `internal/=197 cmd/=20 / #6 frontend/=37 / #7 internal/tools/=17 / #8 design/=16 frontend/=37 internal/=347 cmd/=26`
+  —— `internal/=347`（交件段 346→347）**逐字吻合**；唯一不吻合是 `frontend/` **37 vs 交件的 40**，
+  我判它那一跑在仓库工作树里（含票 92/77 未跟踪的 `frontend/` WIP），两份数不可直接对照 ⇒ `R-106-3`。
+- **⑥ 我没能复现的一格（明写，档位③）**：AC#2 的"**修前红**"—— 在 `1400e15^` 的生产码上放入这枚测试文件会**编译不过**
+  （第三条腿点名新函数 `privateSet`），而这正是交件段自己披露的"摘掉第三条腿"。⇒ 披露方向诚实，但那两行红名
+  （`:243` / `:290`）是**我读的、不是我跑的**。补救：`git archive 1400e15^ | tar -x -C /tmp/ac106-pre`，拷入 HEAD 的
+  `private_set_sid_windows_test.go` 后手工摘第 3 腿，`go test -count=1 -v -run TestSealNarrows...` 重产那两行。
+- 残留：**R-106-1**（CI 不跑 winsec，见④）· **R-106-2**（修前红档位③，见⑥）· **R-106-3**（`frontend/` 37 vs 40 的对齐不归本票；
+  `noticeNarrowed` 的 `winsec.go:212` 说话点我未逐行核）· **R-106-4**（`TestGateJudges...` 的第 1、3 腿三发变异全绿 ⇒ 未证区分力）。
+  验收期**未顺手修任何缺陷**；未碰 `docs/PLAN.md`、`docs/specs/*`、`internal/risk/**`、`tools/d22scan/**`、`allowlist.txt`、
+  任何阈值/golden/断言；仓内未建 worktree、未 push、票 108 的两枚文件一枚未 add。
+
