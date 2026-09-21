@@ -188,3 +188,125 @@ WARN winsec: seal cleared principals that were placed on this object explicitly
   同一份 `config.toml.bak-plaintext` 在 `0a3a445` 上还是**宽的**（本代理在 0a3a445 上跑同一仪器：
   `NOT PRIVATE config.toml.bak-plaintext: [Everyone [S-1-1-0] (I)(RX)]` + `NOT PRIVATE config.toml after the rename` 两条红）
   ⇒ 这条同时把上一轮验收的"最坏产物没封"那笔账**用本代理自己的 icacls 原文**复现了一遍。
+
+---
+
+## 第 3 条：目录符号链接那一格本代理自己复测 —— **修复者说的是真的；A51② 的旧登记要更正，判据给在下面**
+
+本代理自己写仪器（`internal/acc89b/probe34_windows_test.go`，全在 `t.TempDir()` 里，未碰任何真实数据目录），
+不 import 被测包的 helper。原始读数（本代理的 `t.Logf` 行，逐字）：
+
+```
+PRIV IsInRole(Administrator) = False
+PRIV dev-mode = HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock
+        AllowDevelopmentWithoutDevLicense    REG_DWORD    0x1
+PRIV whoami = swq
+SYMLINK os.Symlink(non-empty dir) error = <nil>
+LSTAT mode=Lrw-rw-rw- ModeSymlink=true reparse=true FILE_ATTRIBUTE_REPARSE_POINT(0x400) set=true
+A51-RECHECK os.Remove(dir symlink to non-empty dir) err = <nil> ; target still there = true
+TARGET-INTACT after RemoveUnlinked
+WALK-DID-NOT-CROSS target still wide: [Everyone [S-1-1-0] (OI)(CI)(RX)
+    DESKTOP-LVS7839\CodexSandboxUsers [S-1-5-21-…-1005] (I)(OI)(CI)(M,DC)
+    S-1-5-21-3623186960-…-1717338598 (I)(OI)(CI)(M,DC)]
+JUNCTION mklink /J -> Junction created for …\junction <<===>> …\target
+JUNCTION Lstat mode=?rw-rw-rw- ModeSymlink=false reparse-bit=true
+```
+
+⇒ 四条都成立，**且是本代理自己测的**：① 这台机**未提权 + 开发者模式=1 ⇒ `os.Symlink` 到非空目录直接成功**；
+② `Lstat` 给 `Lrw-rw-rw-`、`ModeSymlink` 与 reparse 属性**同时**置位；
+③ `os.Remove` 对**目录符号链接**也**能**直接拆、目标内容毫发无损；
+④ `SealDir`/`PrivateDirAll` 的传播游走**不穿**符号链接（链接目标那条宽 DACL 原样留着，
+连本机那两个真实外来主体的 `(M,DC)` 都没被动过）。
+另外 `JUNCTION` 那一发独立复现了"Go 的 `Lstat` 对 junction **不**给 `ModeSymlink`、只给 reparse 位"
+⇒ `isReparsePoint` 用属性而不是 `ModeSymlink` 是**必须的**（这条实现做对了，本代理支持它继续留在判据里）。
+
+**仪器自曝一条（不拿它当结论）**：本代理想补第三档证据 `whoami /priv`，在这台机上取到**空输出**
+（`cmd /c whoami /priv` 从 Go 与从 MSYS 两个方向都是 1 行空表头）。
+按本仓"空输出先怀疑仪器"的规矩，这一档**不计**：结论建立在 `IsInRole=False` + 注册表 `0x1` +
+`os.Symlink` 返回 `<nil>` 三条实测上，这三条本代理都拿到了原文。
+
+### A51② 那条旧登记要不要更正：**要，改两处，判据与原文读数如下**
+
+`docs/reports/pending-and-issues.md` 的 A51② 现文（本代理读到的口径）说的是
+"`os.Remove` 删不掉指向目录的符号链接 ⇒ 游离子树回收清不掉"。本轮读数：
+
+1. **junction**：上一轮验收与本代理本轮**各自独立**测到 `os.Remove` 返回 `<nil>`、目标内容全在
+   （本轮原文见上 `JUNCTION …` 两行 + 上一轮报告的 `VERDICT-89ACC` 行）；
+2. **目录符号链接**：本代理本轮原文 `A51-RECHECK os.Remove(dir symlink to non-empty dir) err = <nil> ; target still there = true`。
+
+⇒ 落账判据（**编排者的面，本代理不写 registry**）：A51② 应改成
+**"在本机 Go 1.27.1 / Win11 上不复现（junction 与目录符号链接两类对象都实测 `os.Remove` 能直接拆、目标内容存活）；
+保留 `RemoveUnlinked` 的理由从'删不掉'改成'只可能删到链接本身、绝不把删除半径交给别人'"**。
+第二句是必须的：如果只把"删不掉"划掉而不换理由，后人会顺手把 `RemoveUnlinked` 当成多余代码删了。
+**registry 现文的本代理读数**（`docs/reports/pending-and-issues.md:1865`，逐字）：
+"**A51② `os.Remove` 删不掉"指向目录的符号链接"** ⇒ 一个裸名 artifact 若被替换成 symlink-to-dir，
+票 79 的游离子树回收路径会清不掉它"——**这句在本机为假**；`A64③(1)`（同一文件 `:1453`）只更正了
+**junction 一半**（"能删指向非空目录的 junction"），**目录符号链接那一半还挂着**，
+且两处都没换掉"`RemoveUnlinked` 存在的理由"。⇒ 落账动作 = 改 `:1865` 本体 + 补 `:1453` 的第二类对象 + 换理由句。
+
+---
+
+## 第 4 条：本代理攻"报出来"这条 —— **白名单按 SID 成立、SYSTEM/Administrators 不噪；但"继承来的那份"确实绕过检测（登记为射程限定，不判 FAIL）**
+
+### 4.1 攻"挂在父目录上继承下来（SDDL 带 `ID`）会不会绕过检测"：**会，实测确认**
+
+本代理的仪器（`TestProbeNoticeMissesInheritedGrants`）：`PrivateDirAll(root)` → 操作员在 **root** 上
+`icacls /grant *S-1-1-0:(OI)(CI)(RX)` → 在 root 里建 `artifact.txt`（它**存着**一份
+`Everyone:(I)(RX)`，本代理的前置断言验过）→ **只**调 `winsec.SealFile(child)`（生产里
+"某个工件被重新落一次盘"就是这个形状，`memory.Open` 不会被触发）⇒
+
+```
+NOTICE-LINES for a SealFile that removed an inherited copy of an operator grant: 0 ([])
+AUDIT GAP CONFIRMED: the child lost read access for Everyone and nothing named it
+```
+
+同一发里 `foreignPrincipals(child)` 从"宽"变成"空" ⇒ **子项上那份带外授权确实被清掉了，一条日志都没有**。
+
+**判：这一格不是 FAIL，是这条通知的射程比它的名字窄。** 三条理由：
+① 机密性方向是**紧**的（对象只会变窄，不会变宽）；② 那份 ACE 的**来源**（root 上那条显式的）
+在 root 下一次被密封时**会**报（§4.2 每一发报的就是它）；
+③ 代码注释与 `TestSealReportsThePrincipalsItCleared` 明写并且**钉住**了"纯继承的孩子不出现在通知里"
+⇒ 这是**已经写在纸面上的取舍**，不是偷偷漏。
+但**必须落一句账**（R-89b-5）：票面/registry 里"带外授权会在下一次密封时被清除，**并且打一条 WARN**"
+这句要改成——"**记在该对象自己 DACL 上的（SDDL 不带 `ID`）授权被清时才打 WARN；
+只继承自父目录的那一份不打**（它随父目录被密封时由父目录那一条承担），
+所以'某个孩子悄悄读不到了'这一格今天没有日志"。
+
+### 4.2 攻"SYSTEM/Administrators 不该报（避免噪声）"与"白名单按 SID 而不是按名字字符串"：**两条都过**
+
+九发对照（每发独立 `t.TempDir()` 根，`icacls /grant <拼法>:(OI)(CI)(RX)` 后 `SealDir(root)`，
+数 `seal cleared principals` 那一条 WARN）。**本代理一律把 grantee 先翻成 SID 再落地**（`sidOfName` 走
+`NTAccount→SecurityIdentifier`），这样构造本身就不依赖 icacls 会不会解析某个显示名：
+
+| grantee 拼法 | 期望 | 实测 WARN 条数 | 通知里的 `cleared=` |
+| --- | --- | --- | --- |
+| `*S-1-5-18`（SYSTEM，SID） | 不报 | **0** | — |
+| `*S-1-5-32-544`（Administrators，SID） | 不报 | **0** | — |
+| `BUILTIN\Administrators`（**名字**） | 不报 | **0** | — |
+| `DESKTOP-LVS7839\swq`（**我，名字**） | 不报 | **0** | — |
+| `*S-1-1-0`（Everyone，SID） | 报 | 1 | `WD(A;OICI;0x1200a9;;;WD)` |
+| `Everyone`（**名字**） | 报 | 1 | `WD(A;OICI;0x1200a9;;;WD)` |
+| `*S-1-5-6`（SERVICE） | 报 | 1 | `SU(A;OICI;0x1200a9;;;SU)` |
+| `*S-1-5-11`（Authenticated Users） | 报 | 1 | `AU(A;OICI;0x1200a9;;;AU)` |
+| `DESKTOP-LVS7839\CodexSandboxUsers`（本机真账户组） | 报 | 1 | `S-1-5-21-…-1005(A;OICI;0x1200a9;;;S-1-5-21-…-1005)` |
+
+⇒ **白名单确实按 SID 判**：`allowedSIDStrings()` 的键是 `SY`/`S-1-5-18`/`BA`/`S-1-5-32-544`/`user.Current().Uid`，
+**一个账户显示名都不在里面**；SDDL 由 OS 产出（缩写或裸 SID，**从不出显示名**）
+⇒ "本地化机器上名字会变"打不到这条判据。
+最硬的一发是 `Everyone`（名字形式）与 `*S-1-1-0`（SID 形式）**报出同一个 `WD`** ⇒ 检测不看操作员怎么拼，
+看 OS 把 trustee 落成什么。`CodexSandboxUsers` 那一发同时证明：能被 icacls 解析出来的本机组，
+通知里仍以**裸机器 SID** 出现（与 AC#1 那条"解析不出名字的别名 SID"同源，两条腿都覆盖到了）。
+
+### 4.3 本代理另外两发攻击（都干净，写出来免得下一任再猜）
+
+- **DENY ACE**：`icacls root /deny *S-1-1-0:(OI)(CI)(RX)` 后 `SealDir(root)` = **`<nil>`**，
+  并且**报了**：`WARN winsec: … cleared=WD(D;OICI;0x1200a9;;;WD)`。
+  ⇒ 本代理原本怀疑"`verifyPrivate` 把 `fields[0] != "A"` 当外来主体 ⇒ 带 DENY 的对象会被拒绝密封、
+  运维可以让我们自我锁死"——**在本机不成立**：整个 DACL 被换掉，读回的是换后的那份，没有 DENY 可挑。
+- **备份位置被人放了一根符号链接**（攻第 2 条新接线的分支判定：`os.Stat(backupPath)` 走**未解析**拼法，
+  两条腿的动作都走**已解析**拼法，问它们不一致时会怎样）：
+  `BRANCH-A`（`config.toml.bak-plaintext` 是指向目录的链接）与 `BRANCH-B`（指向别人家的文件）
+  **两次都拒绝**：`winsec: refusing to seal … traverses a reparse point …, which is not the tree this call names`，
+  并且 `VICTIM-INTACT the foreign file behind the link is untouched`、链接目标那条宽 DACL 原样保留。
+  ⇒ **没有写穿链接**，票 94 的牙没被这两行接线卸掉。代价登记为可用性（R-89b-6）：
+  备份位置上有一根既存链接 ⇒ 迁移**永久失败**（错误具名、带路径，方向是紧的）。
