@@ -1,6 +1,11 @@
 # 108 — 票 103 的守卫被验收代理**三枚探针当场绕过**：先 `nil` 解除再装伪造解析器（外来 `S-1-1-0` 被静默剥掉）、全 `/` 或混合分隔符让祖先检查**一个都不查**、`platformVerifyPlacement` 同错法还在（退回单）
 
-**Status:** ready-for-review（2026-09-21 19:2x `agent-ticket108` 交件；原 open 于 2026-09-21 18:5x 编排者建；来源=`acceptor-ticket103` 的 **R-103-1 / R-103-2 / R-103-3 / R-103-4**，裁决表 `docs/evidence/s1/103-adversarial-acceptance.md`）
+**Status:** **rejected-needs-fix**（2026-09-21 20:3x 编排者标注，依据=`acceptor-ticket108` 的
+`docs/evidence/s1/108-adversarial-acceptance.md`：**总判 FAIL**（不是"通过附条件"），
+因为验收在 **POSIX 上把 P3 的结局真造出来了**：`winsec_other.go:64` 的 `platformVerifyPlacement` 就是 `return path, nil`、
+底线没有链接腿 ⇒ 容器里 `SealFile` 穿过 symlink 返回 nil、外来文件 mode 从 `0666` 变 `0600`。
+**Windows 四格它都量到绿**（56/56，外加自造 15 枚形状无一漏、并发 48 线程混打闩锁 0 race、还自己补了一向 MUT-4），
+退回单 = **票 113**；本票正文与裁决表一字不动。原 ready-for-review（2026-09-21 19:2x `agent-ticket108` 交件；8:5x 编排者建；来源=`acceptor-ticket103` 的 **R-103-1 / R-103-2 / R-103-3 / R-103-4**，裁决表 `docs/evidence/s1/103-adversarial-acceptance.md`）
 **Type:** 安全边界（**修法自身开出的新攻击面**——票 103 修的是"没有守卫"，本票修的是"守卫可被绕过"）
 **Blocks:** 票 103 结案（我已把它标 `rejected-needs-fix`，见其票头）· **Blocked by:** nothing
 **Packages:** `internal/winsec/` 里的**缝与祖先链**：`resolve.go`（一次性守卫、`firstLinkAncestor`）、

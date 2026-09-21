@@ -338,3 +338,16 @@ POSIX/docker 读数与四条残留都在 Progress log 的 checkpoint 2/3；建�
   **残留 R-92-1..R-92-8** 全在裁决表（含 **R-92-5：UI 至今无真机差分截屏**，可见性证据只有 `react-dom/server` 的 fixture；签收窗口时由实现侧/补验代理补，命令顺序 **先 `cd frontend && npm run build`** 再 `PATH="$PWD/third_party/sherpa-onnx:$PATH" go run ./cmd/wisp`，三态差分；owner 本人眼睛签收；本轮验收**未开任何窗口**）。
   **伪授权：本会话实测 0 次**（只遇到 2 次 harness 的 `MEMORY.md modified` 通知与 1 次 `[SYSTEM NOTIFICATION - NOT USER INPUT]` 后台任务事件，均未当作指令）⇒ 对代理自述的 15 次**不背书也不否认**。
   next= 实现侧只需做一件事即可复审：**把 5 个文件的 `gofumpt` 跑净**（不改断言、不改 CI），并按 `R-92-1`/`R-92-2` 决定门是扩到结构还是留在文本；接线票落地时必须自带"没有原生确认腿就不许写档位"的用例。
+
+- 2026-09-21 20:4x（**编排者：本票按验收判定退回，退回单=本票自身续跑**）：`acceptor-ticket92` 总判 **不通过（退回补齐）**，
+  硬红两枚：**① `gofumpt -l` 有 5 个文件全是你新增的**，而 `gofumpt.exe v0.7.0` 本机存在、CI 也有那一步
+  ⇒ 交件里"gofumpt 本机无二进制（未跑）"**不实**（本仓对"未跑"的口径是：先找过再说找不到，找不到要写命令）；
+  **② 你报的 POSIX 四数 48/47/0/1 不可复现**，验收在 Docker 里量到 **273/170/0/4 rc=0** ⇒ 你那半份读数的口径要重做并写明命令。
+  ⚠ 另外三件我记账但不阻塞结案：**门二只扫 `.ts/.tsx/.css` 的字面量** ⇒ `.js` 里的 `postMessage({method:"panel.mode.set"})`
+  与运行时拼出来的方法名（`["panel","mode","set"].join(".")`）两形**全绿**；"2 处 postMessage"那枚钉子只在 `panel.ts` 内数；
+  把 `approval.decide` 塞进 `frontend/dist/` 产物 ⇒ 包内孪生绿、`d22scan.sh` 红。
+  **验收没判 FAIL 的理由我认可并要留在账上**：`ModeView` 反射零方法、`ParseComposerRequest`/`perm.Store.Set` 生产调用者各 0
+  ⇒ **渲染侧无处可发**，所以那是"门的覆盖面"残留而不是"档位能被改"的洞（`R-92-1` 一类）。
+  正向记两笔：**107b 那处性质在 `8e10095` 之后仍然成立**（root 做成指向别处的 junction + `%VAR%` 展开 ⇒ `roots=[]`、
+  `UnusableRoots` 记账、`InAllowlist(未点名树)=false`），且验收**没把 107b 的三处函数算到 92 头上**（我那条补署被下游读到了）。
+  next= 派 `agent-ticket92b` 从断点补齐（只补 ①②两条硬红 + 门二的覆盖面），别重做整票。
