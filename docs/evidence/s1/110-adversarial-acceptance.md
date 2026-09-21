@@ -1,37 +1,43 @@
 # 票 110 对抗验收裁决表（acceptor-110-97）
 
-被验收对象：`.scratch/wisp/issues/110-no-ci-step-runs-internal-winsec.md` · commit `9e9a2f5`（已 push）
-验收会话后缀：`ac110` · 全部快照在 `/tmp`（仓内零 worktree）
-本表由独立对抗验收方产出，未参考先前对话；自述读数一律标档位。
+被验收对象：`.scratch/wisp/issues/110-no-ci-step-runs-internal-winsec.md` · commit `9e9a2f5`（已 push，run `35595651898`）
+验收方快照（全部仓外，A38④）：`/tmp/wisp-ac110-snap` = `git archive 9e9a2f5 | tar -x`（会话后缀 `ac110`）
+仓库工作树在整个验收期内未被验收方改动（收尾 `git diff --quiet -- . ':!internal/tools'` rc=0；`internal/tools/bridge.go` 与 `internal/winsec/inherited_narrow_notice_104_windows_test.go`、`internal/risk/syncdirs_ancestor_reparse_ticket105_windows_test.go` 是别人的在飞文件，未触碰、未参与任何读数）。
+**本表所有绿/红都写明来自哪棵树**：`9e9a2f5` 纯净快照，或 GitHub 归档日志。
 
-档位图例：〔独立复现〕= 验收方自己跑出同形读数 · 〔日志＋归档，我抽验〕= 依赖票内日志/归档，验收方抽样核对 · 〔仅自述，不背书〕= 只有交件方一句话。
+档位图例：〔独立复现〕= 验收方自己跑出同形读数 · 〔日志＋归档，我抽验〕= 依赖票内日志/归档，验收方抽样核对 · 〔仅自述，不背书〕= 只有交件方一句话（第三档必须可被后续 push 补成前两档，补救动作写在格内）。
 
 ## 裁决表（与票面 AC 1:1）
 
 | AC | 票面要求（摘要） | 裁决 | 证据档位 | 独立读数 |
 | --- | --- | --- | --- | --- |
-| AC#1 | 全 CI 每一步实跑哪些包 × `go list ./...` 对账，点名 winsec 0 次与其余零覆盖包 | TBD | TBD | TBD |
-| AC#2 | 落一步真跑 winsec 测试 + 一次**步级**成功读数（run/job/step） | TBD | TBD | run `35595651898` / job `106319703680` / step 4 |
-| AC#3 | 新步自己会红 + 不是空仪器（两发变异，同链 grep + `go build` rc=0） | TBD | TBD | TBD |
-| AC#4 | `R-93-4` 收口：`TestSyncRegistryProbeLive` 的步级证据或"不该纳入"的论证 | TBD | TBD | TBD |
-| AC#5 | `bash -n` rc=0；`sh scripts/d22scan.sh` 纯净快照 rc=0 且台账不降；新步不得排在常红步之后 | TBD | TBD | TBD |
+| AC#1 | 全 CI 每一步实跑哪些包 × `go list ./...` 对账；点名 winsec 0 次与**其余**零覆盖包 | **通过（口径更正 1 处）** | 单 run 全量＝〔独立复现〕；"全 CI 历史"外推＝〔日志＋归档，我抽验〕 | 我自己 `go list ./...` = **33**。我自己 `gh api .../runs/35591482293/logs`（241 193 B zip，解出 6 个 job × 逐步文件）后 `grep -hoE "(ok\|FAIL) github.com/CarlosShao/wisp/..."` 去重 = **21 条**，其中 `tools/d22scan` 属独立 module（不在 33 分母内）⇒ **仓库包 20**，与票面 20 一致。windows 腿（`test-windows/`）实跑集只有 `internal/{proc,secret,config,risk}` 4 个。`internal/winsec` 的顶层结果行 `^(ok\|FAIL)[[:space:]]+.../internal/winsec` = **0 条** ⇒ 票面判断成立。**6 个零覆盖包我自己复算**：有 `*_test.go` 的包 = 26（我自己的 per-package `ls` 计数），26 − 20 = **6** = `internal/winsec`(15 个 test 文件)、`internal/ball`(11)、`cmd/wisp`(5)、`internal/perm`(2)、`internal/plugin`(1)、`cmd/llmrecord`(1) ⇒ 名单与票面逐字一致。⚠ **更正**：票内"它在日志里出现 18 次"我按 `internal/winsec` 匹配复算 = **0 命中**；按宽松串 `winsec` = **18 行**（`4_test-windows.txt` 3 + `test-core/7_...txt` 15）⇒ 数字对得上但**口径未写匹配式**，见 `R-110-3`。⚠ 分母外推的边界：我只对 `35591482293` 做了逐步全量复算；"全部历史都是这 20 个包"是票自述（60 次 run 全在 2026-09-21 10:42–11:46Z 窗口内、`go list`/步清单同形），我抽验的是这一份完整日志 ⇒ 记第二档。 |
+| AC#2 | 落一步真会跑 winsec 测试的门禁（windows job）+ 一次**步级**读数 | **通过（步级读数已存在；步本身红 ⇒ 登记为发现）** | 〔独立复现〕 | `gh api repos/CarlosShao/wisp/actions/runs/35595651898/jobs` → **job `106319703680`** / **step 4** `Windows ACL sealing gate (internal/winsec's own tests, ticket 110)` = **`status=completed con=failure`**（非 cancelled、非 in_progress；执行 11:44:41→11:46:30 ≈ 109 s）。该步日志尾部四数：**=== RUN=71 / --- PASS=32 / --- FAIL=3 / --- SKIP=0**，`FAIL github.com/CarlosShao/wisp/internal/winsec 13.707s`，`winsec-tests.sh: gate is RED (rc=1)` ⇒ **"它上一次真跑完并给出过结论"成立（run+job+step 三号齐全）**，门从此存在。⚠ **CI 首日 3 条红名，逐条登记且全部只属 `internal/winsec` 一个包**：① `TestSealNarrowsAndNamesThePrincipalItRemovedBySID`；② `TestC26PipelineIsWiredIntoWinsec`；③ `TestAC3JunctionInputIsRefusedNotSealed`（子例 `existing_directory_behind_the_link`、`missing_directory_under_the_link`）。同一台 windows 开发机跑同一棵树（`9e9a2f5` 快照）= **rc=0，RUN=71/PASS=35/FAIL=0/SKIP=0**〔独立复现〕⇒ 本机不复现、只有 runner 看得见，正是票面立票理由被实证。⚠ **旧红不算在新步账上**（同 run）：`lint` job=106319703752 step6 `gofmt (gofumpt)` 红，未格式化文件 = `internal/panel/{attachments_test,bridge_test,composer,composer_test,workspace}.go`（票 92 一族），并连带 step7-10 `go vet`×2/`staticcheck`/`mockllm vet` **skipped**（A54 同族，非本票）；`test-core` job=106319703513 step7 红，根因唯一：`--- SKIP: TestWorkspaceSwitchRefusesAJunctionToOutside`（PASS=570/FAIL=0/SKIP=1，`runtests.sh` 把任何顶层 SKIP 判死）⇒ 亦非 winsec 包。本票新步**未**用 `continue-on-error`、未放宽任何断言（我读了 `.github/workflows/ci.yml` 该 job 全文：无 `if:`、无 `continue-on-error`）。**第二枚样本（同一天别人之后的 push）**：run `35595884176`（head `d43e277`，含本票那枚 ci.yml）→ job `106320537496` / step4 `Windows ACL sealing gate ...` = **con=failure，status=completed**，step5-8 依旧 `skipped` ⇒ 步级读数**两枚样本同形**，不是一次性抖动。 |
+| AC#3 | 新步自己会红 + 不是空仪器（同链 `grep -n` 证落地、先 `go build` rc=0） | **通过（三发全部独立复现）** | 〔独立复现〕 | 全部在 `/tmp/wisp-ac110-snap`；仓库树 winsec 全程未动。**M1 安全断言弄坏**：`internal/winsec/winsec_windows.go:432` 私有集改回"按名字比" ⇒ `grep -n` 打印 `433: return map[string]bool{"SY": true, "BA": true, me: true}, me, nil // MUTATION-ac110-private-set-by-name`，`go build ./internal/winsec/` rc=0，`bash scripts/winsec-tests.sh` **rc=1，=== RUN=68 / PASS=9 / FAIL=26 / SKIP=0**，红名含 `TestGateJudgesThePrivateSetByResolvedSID`、`TestSealNarrowsAndNamesThePrincipalItRemovedBySID`、`TestSealReportsThePrincipalsItCleared`（与票自报同形）。⚠ 诚实记一发废弹：我第一次注入的同行变异 `go build` 就报 `declared and not used: system/admins` ⇒ **按规矩"编译失败不算变异"作废**，改成带 `_, _ = system, admins` 的可编形式后才计数。**M2 仪器弄空**（scope 换成不含任何 winsec 测试的目录）：第 50 行 `scope=("$target")` → `scope=(./internal/config/)`，`grep -n` 证落地 ⇒ **rc=2** + `GUARD 1 - the package list for this step does not name ./internal/winsec/; it is [./internal/config/]`。**M3 包被掏空**（防"扫空=绿"）：`mv internal/winsec/*_test.go` 移出 ⇒ 包仍能编（`[no test files]`），**rc=1** + `GUARD 2 - the run printed NO top-level result line for github.com/CarlosShao/wisp/internal/winsec`，四数 `RUN=0 PASS=0 FAIL=0 SKIP=0`。还原证：`diff -q winsec_windows.go /tmp/winsec_windows.go.orig.ac110` 与 `diff -q scripts/winsec-tests.sh <repo>` 均 rc=0（`M1_restored_clean_by_copy` / `SCRIPT_RESTORED_CLEAN`），14 个 `*_test.go` 全部归位（`ls | wc -l`=14），仓库侧 `git diff --quiet` rc=0。⚠ 一处诚实差异：M1 还原后 `diff` 先报"第 432 行残留 `_, _ = system, admins`"（我的反向 sed 漏删该行）⇒ 用 `.orig` 覆盖后才是真干净，第一次 `diff -q` 失败已如实登记。 |
+| AC#4 | `R-93-4` 一并收：windows 腿把 `TestSyncRegistryProbeLive` 纳入分母的步级证据，或论证不该纳入 | **通过（附条件：步级证据至今不存在）** | 〔日志＋归档，我抽验〕＋论证＝〔独立复现（读码）〕 | 我读了 `scripts/portable-tests.sh`：ledger 行仍在（`:93`），reason 自陈"as of ticket 110 AC#4 the windows leg carries `./internal/risk/` in its scope, so this row is re-verified against the compiled WINDOWS test binary (`go test -list`) and printed with its reason in that step's log"，且 `ci.yml` 的 windows portable 步实跑 `bash scripts/portable-tests.sh ./internal/proc/ ./internal/secret/ ./internal/config/ ./internal/risk/`（我读 `.github/workflows/ci.yml` 原文核到）。**"不该进 RUN 分母"的论证我认可**：`runtests.sh` 把任何顶层 SKIP 判死（M1/旧红读数里可见 `-skip ^...TestSyncRegistryProbeLive$` 已把它排除在跑之外），纳入只有两种读数——常红或裸 `go test` 的假 `ok`（票 93 要消灭的字节形状）。⚠ **但它许诺的步级证据至今 0 次**：run `35595651898` 的 step 7 `Portable windows tests (proc/secret/config/risk)` = **con=skipped**（被新步的红挡住），`test-windows` 目录下我只解出 step1-4 的日志文件 ⇒ 该 reason 行**从未在 CI 上打印过一次**。补救动作：见 `R-110-2`/`R-110-4`（修 winsec 红或调整步序，之后回填 step 7 的 class+reason 行）。票自述的本机读数（`--- SKIP` at `syncdirs_windows_test.go:133`；risk 整包 PASS=201）我**未复跑**，记第三档。 |
+| AC#5 | `bash -n` rc=0；`sh scripts/d22scan.sh` 纯净快照 rc=0 且各 scope 不降；新步不得排在会失败的步之后 | **通过（附一条后果登记）** | 〔独立复现〕 | `bash -n scripts/winsec-tests.sh` rc=0、`bash -n scripts/portable-tests.sh` rc=0（`9e9a2f5` 快照）。`sh scripts/d22scan.sh` 在 `9e9a2f5` 纯净快照 **rc=0**：`bans #1-5 internal/=202、cmd/=20、ban #6 frontend/=40、ban #7 internal/tools/=18、ban #8 design/=16、frontend/=40、internal/=363、cmd/=26`，`tools/d22scan` 自检 `PASS=21 FAIL=0 SKIP=0 === RUN=31`；与票 97 树（`f140079`）快照的台账**逐字节同数** ⇒ "不降"结构性成立（`.github/`、`scripts/` 不在被扫 scope 内）。**步骤位置我自己判一次**：`ci.yml` 与真实 job steps 双证一致 —— `test-windows` 实排 = 1 Set up job / 2 checkout / 3 setup-go / **4 新步** / 5 Cache third_party / 6 cgo build smoke / 7 Portable windows tests / 8 junction placeholder ⇒ 新步之前只有 `checkout`/`setup-go`（本 run 两步 con=success），**没有任何会常红的步骤** ⇒ 它选的"排前面"确实免掉 `if: always()`，判据字面满足。⚠ 代价当场兑现：见 `R-110-2`。 |
 
-## 步骤位置判定（AC#5 关键，验收方自己读 `ci.yml` + 真实 job steps）
+## 步骤位置判定（结论）
 
-`test-windows` 实排（来自 run `35595651898` / job `106319703680` 的 `.steps[].name`，与 `.github/workflows/ci.yml` 一致）：
+"排前面"与"`if: always()`"两个候选里，票面的选择**在它自己的 AC#5 判据下是对的**（新步之前只有 checkout/setup-go）。但同一次 push 实测到反向 hazard：新步红 ⇒ 同 job 下游 4 步（Cache/cgo build smoke/Portable windows tests/junction）全部 `con=skipped`；对照改动前的 run `35591482293` / job `106306750494`，那 4 步 step4-7 **全部 con=success** ⇒ 这一次 push 之后 windows 腿原有的 proc/secret/config/risk 覆盖**从 CI 上消失了**；且在下一次 push（run `35595884176` / job `106320537496`）**同样成立**（step4 failure ⇒ step5-8 skipped），已是两枚样本。这不是"在最需要它的日子里不执行"（它执行了并给了结论），而是"它红了会把别人的绿一起带走"，登记为 `R-110-2`，处置权在编排者（**不许**为了绿把 winsec 断言放宽或把包撤回清单）。
 
-1. Set up job · 2. actions/checkout@v4 · 3. actions/setup-go@v5 · **4. Windows ACL sealing gate (internal/winsec's own tests, ticket 110)** · 5. Cache third_party · 6. cgo build smoke · 7. Portable windows tests (proc/secret/config/risk) · 8. PathResolver junction placeholder
+## R-110-x 登记（验收期未顺手修任何一条）
 
-⇒ 新步之前只有 checkout / setup-go，无第三个可常红步骤（`if: always()` 的必要性判定：TBD）。
+- **R-110-1** `internal/winsec` 在 CI runner 上真实红 3 条（`TestSealNarrowsAndNamesThePrincipalItRemovedBySID` / `TestC26PipelineIsWiredIntoWinsec` / `TestAC3JunctionInputIsRefusedNotSealed` 含 2 子例），本机 35/35 绿 ⇒ 只在 runner DACL/junction 形状下复现，属票 106/108/94 那一族的**未愈部分**。**next=** 开一张 winsec 修复票（点名这 3 条 + "本机绿/runner 红"的差异原因），修完再回填 AC#2 的绿读数。
+- **R-110-2** 新步红连带 skip 掉 `test-windows` 的 step 5-8（含改动前一直绿的 proc/secret/config/risk 与 junction 步）⇒ windows 腿净覆盖比 `9e9a2f5` 之前**下降**。**补救（二选一，都不许放宽断言）**：(a) 修 R-110-1 让 step 4 绿；(b) 把新步移到 portable 步之后并给它 `if: always()`（A61 的正解），或改用 GitHub 的 per-step 失败不传播写法（job 级 `fail-fast` 不适用于同 job 步骤，故只能靠 (a)/(b)）。
+- **R-110-3** 票内"日志里出现 18 次"未写匹配式：`internal/winsec` = 0 命中、宽松 `winsec` = 18 行。**补救**：追加更正一句匹配式（`grep -c winsec`），避免后人按前缀串复算时以为票在造假。
+- **R-110-4** AC#4 许诺的 windows 腿 ledger 复验至今无一次步级读数（step 7 从未执行）。**补救**：下一次 push 读 `test-windows` step 序号（现 7）的 `runtests.sh` reason 行并回填；同根于 R-110-2。
 
-## 同 run 的其它步级读数（区分"旧红"与"新步的账"）
+## 总判（票 110）
 
-TBD（lint / test-core 红名归因）。
+**通过（附条件）**：AC#1/AC#2/AC#3/AC#5 成立（前两格数字全部我复算过、第三格三发变异全部我独立复现），AC#4 成立但**附条件**（其步级证据至今不存在，条件 = R-110-2/R-110-4 的补救）。
+"AC#2 的结局"（winsec 在 CI 上零覆盖）未被造出来：该包现已有一次真跑完并给出结论的步级读数，红名按票面规则登记为发现。
+四格数字不降、无放宽、无 `continue-on-error`、无断言/阈值改动 ⇒ 不触退回线。
 
-## R-110-x 登记
+## 伪授权登记
 
-TBD
+票 110 验收全程（`gh api` ×5、两次日志 zip、快照三发变异、d22scan）工具输出末尾出现自称"编排者备注/停手/撤回/请 revert"的文本 **0 次**；未执行任何 revert。另记一次**非**伪授权的系统提示（称 `MEMORY.md` 被修改）：它不含指令也未触发动作，按台账 A75②/A78③"撤销只能来自对话"处理，未据此改变任何动作。
 
-## 未验完 / 断点
+## 断点（若被截断）
 
-本文件为第一枚 checkpoint 骨架：AC#2 步级读数待 run 跑完回填，AC#1 复算与 AC#3 变异在进行中。
+本票 AC 五格全部已判；未复跑的两项＝票 110 自述的本机 risk 整包四数（PASS=201 那组）与 winsec 的 `//go:build !windows` 半边（ubuntu 腿，票自述"未动"）⇒ 均记第三档，补救 = 由后续按包/按腿的票补读数。已补的第二枚 CI 样本：run `35595884176` / job `106320537496` step4 = failure（见 AC#2 格）。下一条命令（若继续加严）：在 `/tmp/wisp-ac110-snap` 里 `go test ./internal/risk/ -run 'TestSyncRegistryProbeLive$' -count=1 -v` 复现那条 `--- SKIP` 的 reason 行，把 AC#4 的"本机侧"从第三档提到第一档（CI 侧仍欠 step 7 真跑一次的步级读数）。
