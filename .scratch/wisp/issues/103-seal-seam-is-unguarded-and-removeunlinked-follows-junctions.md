@@ -1,6 +1,9 @@
 # 103 — 密封的**两处旁路**：`SetPathResolver` 谁都能装（装了个橡皮图章就静默重写外来 DACL），`RemoveUnlinked` 能沿 junction 删别人真文件且返回 nil（票 94 验收的 R-c / R-b）
 
-**Status:** ready-for-review（2026-09-21 18:4x `agent-ticket103` 修完两处守卫并跑完三门；正文仍为 append-only，numstat 里那 1 行删除就是本行）
+**Status:** **rejected-needs-fix**（验收判 `PASS WITH CONDITIONS`，但**编排者据其探针把它退回**：
+   验收代理自己造出三枚探针，其中两枚**达成了本票 AC#1/AC#2 正是要防的结果** ⇒ 结论不能是"通过附条件"。
+   退回单 = **票 108**；本票正文与裁决表一字不动。2026-09-21 18:5x 编排者）
+   —— 原 `ready-for-review`（2026-09-21 18:4x `agent-ticket103` 修完两处守卫并跑完三门；正文仍为 append-only，numstat 里那 1 行删除就是本行）
 **Type:** 安全边界（一个是**接缝无守卫**，一个是**今天够不到的陷阱**——两者不同档，同票不同判据）
 **Blocks:** 票 94 挂 `-done` 的条件之一 · **Blocked by:** nothing
 **Packages:** `internal/winsec/`（seam 的注册口与 `RemoveUnlinked`）。
