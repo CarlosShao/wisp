@@ -78,8 +78,8 @@ var unwiredKeys = []unwiredKey{
 	},
 	{
 		path:    "risk.blacklist_overrides",
-		missing: "risk.Gate has zero production call sites (the live chain calls risk.Classify, whose signature takes no override set) and nothing populates bOverrides",
-		lands:   "the contract defines a B-tier exemption as a runtime event - one L2 confirmation plus a log line (SPEC-06 sec 4.1), which lands with the approval queue, ticket 21; wiring a static pre-authorization instead would need D22 (ticket 80 AC#2)",
+		missing: "nothing populates the bOverrides map risk.Gate reads: ticket 90 gave Gate a production call site (internal/tools readBlacklist, which feeds the card and the security log), but the confirmations that would fill this map are minted only by an L2 answer, and that flow is ticket 21's approval queue",
+		lands:   "the contract defines a B-tier exemption as a runtime event - one L2 confirmation plus a log line (SPEC-06 sec 4.1), which lands with the approval queue, ticket 21; wiring a static pre-authorization instead would need D22 (ticket 80 AC#2), because a file on disk cannot have clicked anything",
 		fires:   func(c *Config) bool { return len(c.Risk.BlacklistOverrides) > 0 },
 	},
 	{

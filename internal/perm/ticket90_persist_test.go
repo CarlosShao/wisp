@@ -220,8 +220,6 @@ func TestTicket90UntouchedConfigStartsAtTheDefault(t *testing.T) {
 func TestTicket90SessionGrantDoesNotSurviveRestart(t *testing.T) {
 	ctx := context.Background()
 	dir := t.TempDir()
-	cfgDir := t.TempDir()
-	path := writeConfig(t, cfgDir, risk.ModeAskEveryStepName)
 
 	// Same restart pair as AC#3(a): grant vs mode, one mechanism each.
 	store, err := memory.Open(dir, memory.WithLogger(slog.New(slog.DiscardHandler)))
@@ -274,16 +272,12 @@ func TestTicket90SessionGrantDoesNotSurviveRestart(t *testing.T) {
 		t.Errorf("the surviving row belongs to %q, not the dead session", all[0].SessionID)
 	}
 
-	// And the contrast, in the same test so nobody can "merge" the two cases
-	// without deleting one: the MODE does cross that exact boundary.
-	mgr := openManager(t, path)
-	if err := mgr.SetPermissionMode(risk.ModeAutoApprove); err != nil {
-		t.Fatalf("SetPermissionMode: %v", err)
-	}
-	if got := openManager(t, path).Config().PermissionMode(); got != risk.ModeAutoApprove {
-		t.Errorf("mode after restart = %v, want auto_approve (AC#3a), while the grant above "+
-			"correctly did NOT survive (AC#3b)", got)
-	}
+	// Deliberately NO mode assertion here. R20/M3's boundary clause says the
+	// two expectations are two cases, not one: this test fails ONLY if a session
+	// grant becomes durable, and TestTicket90ManualSwitchSurvivesRestart fails
+	// ONLY if the mode stops being durable. Wiring the contrast into this test
+	// would make AC#3b depend on AC#3a's mechanism, which is exactly the merge
+	// the ruling forbids ("合并成一条持久化" = 给永久免审通行证开门).
 }
 
 // ---------------------------------------------------------------------------
