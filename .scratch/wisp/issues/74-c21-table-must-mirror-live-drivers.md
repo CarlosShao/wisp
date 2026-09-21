@@ -1,6 +1,6 @@
 # 74 — Make the C21 token table mirror the constants that actually drive the ball
 
-**Status:** ready-for-agent
+**Status:** in-progress (agent ticket74 implementing; family 2 first, per the ticket's own priority)
 **Type:** defect-fix (contract fidelity, cosmetic surface but governance-loaded: C21 is a frozen contract)
 **Blocks:** nothing · **Blocked by:** nothing — ticket 69 shipped the machine check that discovered this
 **Packages:** `internal/ball` + `docs/evidence/s1/c21-native-tokens.md` only. Do **not** touch
@@ -68,3 +68,19 @@ about any of them.
 - First checkpoint commit **within your first 15 tool calls**; sync Status + boxes + a `next=`
   Progress log line on every commit (a ticket whose face lags HEAD gets its work redone by the next
   agent).
+
+## Progress log（append-only；每个 commit 一行 `- [ISO-UTC] agent=... did=...`）
+
+- [2026-09-21T02:05:00Z] agent=ticket74 did=**基线复测 + 落盘 checkpoint（未改任何码）**。
+  `go test ./internal/ball/ -run TestC21 -v` 四条全绿，报告口径复核为 **29 of 105 零消费者**、
+  **15 条表外豁免**（hit.go 5 + hotkey_windows.go 1 + liquid.go 9），与票 69 交付时一致。
+  family 2 的**前提已独立验真**：`git grep -n "SwimLevelGain\|SpinLevelGain" -- internal cmd` 只有
+  `tokens.go:351-352` 的声明和 `tokens_table_test.go:380-381` 的金标准条目 ⇒ **零消费者成立**；
+  真正的驱动在 `liquid.go:224`（`SpinBaseRadPerS + SpinLevelRadPerS*level + SpinSummonRadPerS*summon`）。
+  ⚠ 并且**"偏心增益 0.55"那一半也不是没被实现，而是被写成字面量**：`renderer_windows.go:274` 的
+  `or := liqOffset[bi]*R` 根本不读电平，电平改的是 `:543 shrink := 1 - 0.12*v.LiquidLevel` /
+  `:544 flow := 1 + 0.10*v.SummonFlow` —— 两个**未命名的裸字面量**在改像素，机器检查按 `const` 声明
+  枚举，因此结构上看不见它们（记为缺口，见 AC#2 判定）。
+  next=一个 commit 内做完 family 2 的"删除 + 换指向"：`tokens.go` 删 `SwimLevelGain`/`SpinLevelGain`，
+  表 :153 行改指 `liquid.go` 的 `Spin*RadPerS` 真实驱动，同 commit 把它们从 `c21OutTableExempt` 摘掉，
+  并让几何用例在**整包**范围内解析表名（否则 liquid.go 的名字会被判"tokens.go 无此外常量"）。
