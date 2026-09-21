@@ -1,6 +1,7 @@
 # 77 — Frontend scaffold: React + TS + Tailwind + shadcn, vendored react-bits / beautifului components, sharing C21 tokens
 
-**Status:** **in progress**（AC#1 已落 PARTIAL，见 Progress log）/ 原 claimed（2026-09-21 14:0x，`agent-ticket77` 已认领并开工，
+**Status:** **in progress**（AC#2 / AC#5 / AC#7 已交 `63ef895`；AC#1 PARTIAL）/ 原 claimed（2026-09-21 14:0x，`agent-ticket77` 已认领并开工，
+**2026-09-21 16:5x 由 `agent-ticket77b` 接续**（前任撞 150 轮上限，断点见编排者 16:2x 那条与我的 16:5x 那条），
 按 owner 拍的板：**基座 = Beautiful UI**，一期 **React Bits 零代码进树**）。
 上一状态：**unblocked**（2026-09-21 13:5x，owner 第二次指令 ⇒ 裁定 **R19**）——
 他挑完了动画组件（12 条清单在 R19 表里），并且给了**排序**：
@@ -190,3 +191,20 @@ C21、D23/§17 零 emoji 图标、D29 人工视觉签收、ban #6 / ban #8
   --emitDeclarationOnly false"` → `"tsc -b"`（无害，但**归属是它**，接续的人要先决定留还是回）。
   `next=` 交回给接续代理：**先 AC#1 收尾（真构建 + 真 embed + `wisp.exe` 载入），再 AC#3，最后 AC#6**；
   AC#4 只留 ban #8 那半边在你范围内。
+
+- **16:5x `agent-ticket77b`（接续代理）接手 + 那枚未提交改动的处置 = 留（有据）**。
+  **处置**：`frontend/package.json` 的 `"typecheck": "tsc -b"` **保留**。判断不是"看着无害"，是**变异检验过它仍有牙**：
+  往 `frontend/src/__typecheck_probe.ts` 写一行 `export const probe: number = "not a number";` ⇒
+  `npm run typecheck` **rc=2** 并点名 `src/__typecheck_probe.ts(1,14): error TS2322`；删掉探针后 **rc=0**。
+  另外两条事实支持"留"：`tsconfig.app.json` 与 `tsconfig.node.json` 都写着 `"noEmit": true`、
+  `tsBuildInfoFile` 落在 `node_modules/.tmp/`，所以 `tsc -b` **不向仓内或 dist/ 吐任何产物**
+  （跑完 `git status --porcelain frontend/` 只有 package.json 那一行，`find` 无游离 `*.d.ts`），
+  而 `"tsc -b && vite build"` 里的 build 脚本本来就是这个形态 ⇒ 两条命令同一语义、少一处自造 flag 组合。
+  **本枚 commit 只含票面 + `frontend/package.json`**（checkpoint；`internal/risk/provenance_syncdirs_other_test.go`
+  在 `git status` 里是**别人（票 82）在飞的改动**，我没碰也没提）。
+  **接续代理的领地重申**：`frontend/**`、`docs/contracts/**`、`internal/panel/**`（只加）、
+  `cmd/wisp/panel_assets.go`（本票所有）、`.github/workflows/ci.yml`（只加自己的 job）。
+  **不碰**：`internal/ball/**`、`internal/risk/**`、`internal/tools/**`、`tools/d22scan/**`、`allowlist.txt`、`design/**`。
+  `next=` AC#1 收尾——给 `panel.Assets` 加一条**产物完整性自检**（entry 引用必须能在同一 embed 树里取到字节），
+  配 `internal/panel/assets_test.go` 的"断引用"用例（这条就是票面点名的"能抓到产物没被嵌进去"的用例），
+  再跑真构建 + `wisp.exe` 无 node 载入，报产物哈希与退出码。
