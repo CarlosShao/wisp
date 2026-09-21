@@ -1,3 +1,5 @@
+//go:build windows
+
 // Command balldebug is the ticket 07 debug harness: it boots the real ball
 // window + state machine and either walks all 20 states on a timer (for the
 // visual evidence script scripts/dev/ball-cycle.ps1) or runs interactively
