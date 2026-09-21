@@ -20,17 +20,18 @@
 
 ---
 
-## 进度总览（七项攻击全部做完；结论在文末 1:1 裁决表）
+## 进度总览（七项攻击 + 一项对票面论证的反向变异，全部做完；结论在文末 1:1 裁决表）
 
-| # | 攻击点 | 本代理判定 |
+| # | 内容 | 本代理判定 |
 | --- | --- | --- |
 | 1 | `ResolvedPath` 是不是唯一铸造口 | **允许残留**（包外三条路全封死=实测；包内伪造**悄悄通过**=实测，票面那句话写过头） |
 | 2 | `init()` seam 是不是静默旁路 | **PASS，但确认存在"初始化顺序决定形状"的活证据**（今天无生产码踩到；另发现 `SetPathResolver` 无守卫=见第 1 项） |
 | 3 | AC#1 定性重跑 | **PASS（实现者是对的一方，本代理与编排者原断言被推翻）** |
 | 4 | AC#3 变异复现 | **PASS（三条红名全复现，SID 级证据本代理自己拿到；但红名里只两条承载判据）** |
 | 5 | "内置 verifier 只拒不改写" | **verifier 腿 PASS；C26 腿 FAIL 级残留**：实测出一条"过了检查却被改写、封的与判的不是同一棵"的路径 |
+| 5b | 票面那句"未接线即拒会红 20+ 条"（MUTATION-94B） | **为真且保守（实测 49 条）**；附带测出 `internal/winsec` 自身 **0 条红**⇒verifier 正向半句树内无覆盖 |
 | 6 | 门检复跑 | **PASS（rc=0 与逐作用域台账 8 行与本票票面逐字相同；ban 文本/allowlist 未动，git 证）** |
-| 7 | 两条自认弱处裁决 | ①转下张票（登记 AC 缺口）；②**票 94 未闭**——且实现者给的理由被实测推翻（修法不需要动 memory） |
+| 7 | 两条自认弱处裁决 | ①转下张票（登记 AC 缺口，5b 已把它从"自认"升级为"实测覆盖洞"）；②**票 94 未闭**——实现者给的理由被实测推翻（修法不需要动 memory） |
 
 ---
 
@@ -227,7 +228,9 @@ $ go test -count=1 -run 'TestAC3JunctionInputIsRefusedNotSealed' -v ./internal/w
 它红是因为 `privateDirAll` 的爬升对 junction 报 `is not a directory`（`errors.Is(err, risk.ErrReparseDenied)`
 不成立），而不是因为封错了树；票面自己承认这点（"红在偶然原因上…只当第二条腿，绝不当证明"），
 所以真正承重的是 `existing_directory_behind_the_link` 与 `with_only_the_built-in_verifier` 两条。
-本代理复核这个自陈**属实**（看 `TEST_RC=1` 输出里只有前者打印了 `WRONG TREE SEALED`），
+本代理复核这个自陈**属实**：打印 `WRONG TREE SEALED` 的是 `existing_directory_behind_the_link`（`:92`）
+与 `with_only_the_built-in_verifier`（`:116`）两条，`missing_directory_under_the_link` 只报
+`no C26 refusal: winsec: …\data\link is not a directory`（红，但红在偶然原因上）；
 不额外扣账，但登记一句：**红名数量 3 ≠ 判据数量 2**。
 
 **还原证明**：`cp` 回原文件后
@@ -288,6 +291,41 @@ caller's dir still Everyone-readable: true
 要么把 canonical 交回调用方（后者要动 memory/secret 签名 = 票 18/79 地界）。
 
 **判定：票面那句话 PASS；但"封的与判的不是同一棵"这个问题只关掉了一半。**
+
+---
+
+## 第 5 项补充：把票面的**设计论证**也当判据测了一次（MUTATION-94B）
+
+票面 Progress log 与"门禁读数"段各写了一句用来证明"为什么必须有内置 verifier"的话：
+**"把未接线的默认做成响亮拒绝会让 `internal/secret`/`internal/memory` 两套 suite 红 20+ 条"**。
+这句话是可以伪造的（没人会去测），所以本代理在快照里真的做出来了：把 `resolve.go:110-112` 的
+`if r == nil { r = builtinVerifier{} }` 换成 `return ResolvedPath{}, fmt.Errorf("%w: no C26 pipeline linked", ErrUnresolvedPath)`，
+`go vet ./internal/winsec/` → **rc=0**（不是编译失败），然后：
+
+```
+$ go test -count=1 ./internal/secret/ ./internal/memory/       RC=1
+FAIL  github.com/CarlosShao/wisp/internal/secret   0.127s
+FAIL  github.com/CarlosShao/wisp/internal/memory  30.188s
+--- FAIL 行数 : 49（46 个不同顶层测试名 + 3 条子测试），三条抽样原因均为
+    "not provably resolved, refusing to seal: no C26 pipeline linked (MUTATION-94B)"
+
+$ go test -count=1 ./internal/winsec/
+ok  github.com/CarlosShao/wisp/internal/winsec   5.184s      ← 全包 0 条红
+```
+
+⇒ **两句同时成立**：① 票面那句设计论证**为真且偏保守**（实测 49 条，不是 20+；本代理不采信"约数"，
+按自己数的报）；② 更值钱的是第二行——**把整个内置 verifier 拆掉换成响亮拒绝，`internal/winsec`
+自己一条都发现不了**，因为 AC#3 的第三条子用例只断 `errors.Is(err, ErrUnresolvedPath)`，
+而"响亮拒绝"和"verifier 拒"共用同一个 sentinel ⇒ 那条腿**钉的是"拒"，不是"有一个只拒不改写的 verifier"**。
+verifier 的正向半句（"干净绝对路径未接线时原样通过"）在树内**覆盖 0 条**。这把第 7 项①从"实现者自认弱处"
+升级成**实测出的覆盖洞**，也顺带说明为什么它只能在 `secret`/`memory` 里补、在 `winsec` 里补不到。
+
+**还原证明**：`git show 20b525d:internal/winsec/{resolve.go,winsec.go,placement_windows.go,resolve_windows_test.go}`
+逐个 `diff -q` 对快照 → **四文件全部 == `20b525d`**，`grep -c MUTATION` → 0。
+⚠ 另需记一句避免误读：验收期间仓内工作树**已被别票推进**
+（`git diff --stat 20b525d -- internal/winsec/` → `acl_windows_test.go` +107、新增 `migrate_windows_test.go` +147，
+全是加测试，**没有动本票那四个文件**）⇒ 本代理所有读数钉在 `20b525d`/`dd1e8d3^` 两枚 SHA 的快照上，
+**工作树生产文件本代理零改动**（本会话唯一提交是 `docs/evidence/s1/94-adversarial-acceptance.md`）。
 
 ---
 
@@ -377,10 +415,13 @@ placement_windows.go, resolve_windows_test.go, winsec.go, winsec_other.go}`）�
    `installed := winsec.PathResolverInstalled(); … t.Cleanup(restore)` 这种"测试自己换开关"的形状，
    将来谁把生产接线挪走而测试仍绿，是可能的。
 3. **"看图说话"（没测就写）** —— 票面 AC#1 的 (b) 本代理逐行复算过，**全部属实**；
-   但"旧写法**确实**重写了别人的 DACL"这句，票面是拿测试打印当证据的，本代理**独立重跑变异**才确认；
-   另外票面"未接线时 `secret`/`memory` 会红 20+ 条"这一条本代理**没能独立复现**
-   （它需要一个"未接线即拒"的版本才能测，本代理没有那个树），记为**未证、但不影响结论**
-   （本代理用 PROBE D 直接证明内置 verifier 的兜底方向是对的，比那条反证更强）。
+   "旧写法**确实**重写了别人的 DACL"这句，票面是拿测试打印当证据的，本代理**独立重跑变异**才确认；
+   票面"未接线即拒 ⇒ `secret`/`memory` 会红 20+ 条"这一条本代理**也真去做了那个变异**
+   （MUTATION-94B，见第 5 项补充）：**方向为真、量级保守**（实测 49 条），
+   同时暴露出"`internal/winsec` 自己 0 条红"这个覆盖洞 ⇒ 这条**不再记为未证**。
+   本代理唯一仍未证的票面断言是 `cmd/wisp/doctor.go:222-245`/`internal/proc/envfork.go:55-136`
+   那两条**来源链**（`os.UserConfigDir()`/`PortableDataDirName` 全只过 `filepath.Join`）——
+   它们只影响 AC#1 的"来源有多宽"，不影响"链上零解析"的判决（那由 5 个调用点 + 全仓 `risk.Resolve(` 计数支撑）。
 4. **"多样本挑运气"** —— **命中一条**：`TestResolvePerCallBudget` 票面报"静默三次全 ok"，
    本代理静默 7 样本 6 ok/1 FAIL（数字见第 6 项）。这条不改 AC 的绿，但它把一条**边界性 flake**
    写成了"争用所致、已排除"，归因过头。
@@ -393,10 +434,14 @@ placement_windows.go, resolve_windows_test.go, winsec.go, winsec_other.go}`）�
 （`grep -rn "ErrUnresolvedPath" --include=*.go internal/ | grep -v internal/winsec` → **No matches**）
 ⇒ 这条腿的覆盖**只有** `resolve_windows_test.go:112-120` 那一腿，而那是**运行时把开关拔了**，
 不等于"二进制没 link risk"这一真实状态（本代理的 PROBE D 才是，但它在临时目录里、没进树）。
+**并且本代理实测：把 verifier 整个换成响亮拒绝，`internal/winsec` 0 条红（MUTATION-94B，第 5 项补充）
+⇒ 它现在钉住的是"拒"，不是"存在一个只拒不改写的 verifier"，正向半句树内覆盖 = 0 条。**
 **裁决：算票 94 未闭的一条，但不必回退实现——转下张票**：在 `internal/secret` 或 `internal/memory`
-（两者经实测**不 link risk**）加一条"数据根拼成 junction ⇒ `PrivateDirAll` 必须以
-`winsec.ErrUnresolvedPath` 拒"的用例，成本一条测试，覆盖的是真实链接形状。
-理由：行为本身已被本代理证对（PROBE D 四腿全拒、没建目录、外来 DACL 不变），缺的只是"别人以后能重跑"。
+（两者经实测**不 link risk**）加两条用例：
+(i) 数据根拼成 junction ⇒ `PrivateDirAll` 以 `winsec.ErrUnresolvedPath` 拒；
+(ii) 干净的绝对路径未接线时**能封成**且 `String()` 与输入**逐字节相同**（这才是钉住"只拒不改写"的那一半）。
+理由：行为本身已被本代理证对（PROBE D 四腿全拒、没建目录、外来 DACL 不变；PROBE C 十种形状 byte-identical），
+缺的只是"别人以后能重跑"。
 
 **② `RemoveUnlinked` 刻意不解析** —— **本代理实测它比票面写的更糟，而且票面给的理由是错的。**
 探针 F（不 link risk 的二进制）：路径 `<data>\link\artifacts\keep-me.txt`，其中 `link` 是 junction，
@@ -427,7 +472,8 @@ junction itself still present: true
 | **AC#1** | 判 (b)：四个调用点只过 `filepath.Join/Abs`；并推翻"winsec import risk 无环" | `go build` 在基线快照给出四跳 `import cycle not allowed`；5 个调用点 file:line 逐条复算为词法；非测试 `risk.Resolve(` 全仓仅 `internal/tools/paths.go:56` | **PASS** |
 | **AC#2** | 纯净快照 `git archive 20b525d` d22scan rc=0，台账 `ban #6` 不减；allowlist 未动 | rc=0（33.2s），台账 8 行逐字复现（`internal/=197`、`#6 frontend/=37`、`#7=17`、`#8 16/37/335/25`）；`grep -vc '^\s*#' allowlist.txt`=5，`git diff --name-only 7910bcd^ HEAD -- allowlist.txt` 空 | **PASS** |
 | **AC#3** | junction 输入"要么拒要么封到解析后那棵"；变异退回 `filepath.Abs` 三条红名 + SID 证据 | 变异 `vet rc=0`、三条子用例全红、`WRONG TREE SEALED … from [S-1-1-0 …] to […×2]` 本代理自己拿到；未接线二进制四腿 `ErrUnresolvedPath` 拒且外来 DACL 不变；还原 `diff -r` rc=0。**折扣**：红名 3 条里 1 条红在偶然原因；另发现 C26 腿的 `%VAR%` 改写会"封 A 判 B"（PROBE B2，err=nil），此路 AC#3 未覆盖 | **PASS（附一条须立案的同缺陷类残留，见第 5 项）** |
-| **AC#4** | "收尾前必须跑 `sh scripts/d22scan.sh`"写进票面并实测跑得起来（给时长与 rc） | 固定动作在本票 `## 门禁（AC#4）` 段（第 85-102 行，`## Rules` 之前）；本代理自测时长 **33.2s / rc=0**（纯净快照）与 **基线 rc=1** ⇒ 脚本真的会红也真的能绿；未碰 `ci.yml`（`git log` 无该文件） | **PASS** |
+| **AC#4** | "收尾前必须跑 `sh scripts/d22scan.sh`"写进票面并实测跑得起来（给时长与 rc） | 固定动作在本票 `## 门禁（AC#4）` 段（第 85-102 行，`## Rules` 之前）；本代理自测时长 **33.2s / rc=0**（纯净快照）与 **基线 rc=1** ⇒ 脚本真的会红也真的能绿；
+`git diff --name-only 7910bcd^ HEAD -- .github/workflows/ci.yml` → **空**（未抢票 85 的地界） | **PASS** |
 | **AC#5** | gofmt/gofumpt 0 行、vet rc=0、`-count=2 ./internal/winsec/` rc=0 并逐条点名 SKIP/FAIL | 0 行 / 0 行 / rc=0 / **44 RUN·44 PASS·0 FAIL·0 SKIP（22 不同名）**；四包连带回归 ok；`internal/risk` 预算测试 6ok/1FAIL（非本票回归，归因被票面写过满） | **PASS（附仪器账一条）** |
 
 ---
