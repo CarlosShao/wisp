@@ -1,6 +1,6 @@
 # 106 — winsec 的"私有集"在 **CI 的 Windows runner 上**被 `LA` 绊倒 ⇒ `test-windows` 连续红（8 条用例全在 `NewStore`/`MigratePlaintext` 第一步就死）
 
-**Status:** ready-for-review（2026-09-21 18:52 `agent-ticket106` 交件；原 open 行见本条 append 之前的态。**AC#5 未勾**：本机全绿不算过，欠编排者 push 后读 `test-windows` 步级结论，run id 位留给下）
+**Status:** accepted-done（2026-09-21 19:1x 编排者标注，判据与 run id 见文末追加段；原 ready-for-review（2026-09-21 18:52 `agent-ticket106` 交件；原 open 行见本条 append 之前的态。**AC#5 未勾**：本机全绿不算过，欠编排者 push 后读 `test-windows` 步级结论，run id 位留给下）
 **Type:** 环境相关的**过严判定**（不是泄露，是**拒绝服务**：门在自己身上绊倒 ⇒ 整条 Windows 测试线不可用）
 **Blocks:** CI 转绿 · 票 **103** 的验收（它也在 `internal/winsec/`）· 票 **95** 的接线（它要把更多落点接到 winsec 上，接到一个 CI 上必挂的口上）
 **Blocked by:** nothing（但**动 `internal/winsec/` 之前要等 `agent-ticket103` 交件**，同文件冲突）
@@ -50,7 +50,7 @@ delete_test.go:25: NewStore: secret: create C:\Users\RUNNER~1\AppData\Local\Temp
 - [x] **AC#4** 变异：把私有集校验整块去掉 ⇒ ①那半必须红；只保留"什么都不查"⇒ 必须红（证明我们不是在用"取消检查"换绿）。
       锚点=承载行为那一行，同链 grep 证落地，`go build` rc=0 先量到（**编译失败不算变异**），
       变异只在 `/tmp` 快照（`git archive` + 会话后缀）里做，还原证 `git diff --quiet`。
-- [ ] **AC#5** 门禁：按包 `gofmt`/`gofumpt` 空、`go vet` 与 `GOOS=linux go vet` 按包 rc=0、
+- [x] **AC#5** 门禁：按包 `gofmt`/`gofumpt` 空、`go vet` 与 `GOOS=linux go vet` 按包 rc=0、
       `go test -count=2 -v ./internal/winsec/ ./internal/secret/ ./internal/config/ ./internal/proc/` rc=0
       且**逐条点名 SKIP/FAIL**（`=== RUN` 行数 == 不同测试名 ×2）；收尾必跑 `sh scripts/d22scan.sh`（纯净快照 rc=0，台账不降）。
       ⚠ 本机全绿**不算**这条过：**必须写"欠编排者 push 后拿 CI 步级结论复跑"**，并在票面留 run id 位。
@@ -230,3 +230,18 @@ delete_test.go:25: NewStore: secret: create C:\Users\RUNNER~1\AppData\Local\Temp
   验收期**未顺手修任何缺陷**；未碰 `docs/PLAN.md`、`docs/specs/*`、`internal/risk/**`、`tools/d22scan/**`、`allowlist.txt`、
   任何阈值/golden/断言；仓内未建 worktree、未 push、票 108 的两枚文件一枚未 add。
 
+
+- 2026-09-21 19:1x（**编排者结案，依据 = `docs/evidence/s1/106-adversarial-acceptance.md`，commit `5ddef2a`**）：判 **PASS WITH CONDITIONS**，五框现为 **5/5**。
+  ① **我原先的嫌疑被否证，验收把因果钉回正确那头**：旧码死在**名字比较**（`1400e15^` 的 `allowed` 里其实**有** `u.Uid`(SID)，
+    但判定用 `allowed[fields[5]]` 去查 **SDDL 拼写**）；"把 `BA` 组与 `LA` 账户混同"与"`u.Uid` 在 runner 上是 `runneradmin`"
+    两个替代解释**按构造排除**（落盘器只放三员、CI 那份六条三对且无 `ID` 位）⇒ **我怀疑的 8.3 短名与这次失败无因果**。
+  ② **方向守住了**：私有集仍是三员、**只比 SID**（`:420-432` 逐个 `canonicalSIDString`，"集合里一个名字都没有"），
+    只有拒绝/通知侧才遍历表示形式（`:103`）⇒ 与"放行侧必须比拒绝侧更窄"一致，**没有靠把 `LA` 加白名单糊过去**。
+  ③ **反半边仍拒、恒绿那条有牙**：`MUT-A(:362→if false)` ⇒ `TestGateRefuses…` 红 `@:312`；`MUT-B(+ :96→if true)` ⇒ 两条红
+    （另一条 `:268 cleared=""`）；把 `:432` 人为塞一个名字 ⇒ `/the_set_holds_no_name…` FAIL `@:195`。
+  ④ **AC#5 由编排者补勾，证据是机读的**：run **`35591482293`** / job **`106306750494`** / **step 6 = success**，
+    日志 `ok internal/secret 0.391s`、`FAIL=0 SKIP=0`。
+  ⚠⚠ **但同一条日志暴露出一件比本票更大的事（`R-106-1`）**：`internal/winsec` 在那个日志里**命中 0 次**
+    ⇒ **CI 没有任何一步跑 winsec 的测试**——也就是"密封代码本身在 CI 上零覆盖"，
+    本票"runner 那一格"只是**间接**证实（通过 secret/config 的下游）。修前的那条红因此停在**档位③**（`R-106-2`）。
+    ⇒ **单立票 110**（与票 93 的 `R-93-4` 是同一个洞的两侧）。另：`TestExternalSampler…` 未被复现到红 ⇒ 负载假红，归票 86。

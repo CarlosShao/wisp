@@ -1,6 +1,6 @@
 # 93 — portable 测试步是裸 `go test` ⇒ **SKIP 记成 ok**：`TestSyncRegistryProbeLive` 两侧都跳，CI 却全绿
 
-**Status:** open（2026-09-21 17:1x 编排者建，来源=票 82 交件时**自己点名**的残留；我没让它顺手修，因为那超出票 82 的界）
+**Status:** accepted-done（2026-09-21 19:1x 编排者标注，判据与 run id 见文末追加段；原 open（2026-09-21 17:1x 编排者建，来源=票 82 交件时**自己点名**的残留；我没让它顺手修，因为那超出票 82 的界）
 **Status (agent-ticket93, 2026-09-21 18:5x):** ready-for-review —— AC#1/#2/#3/#5 见文末"交件段"；
 **AC#4 未勾**（本代理不 push，`c8c828e` 还没进任何 run ⇒ 欠编排者 push 后复跑，取数命令已写在文末）。
 `allowlist.txt` 与 `tools/d22scan/**` 一字未动；没删步骤、没改阈值、没放宽任何断言、没用 build tag 排除整包。
@@ -36,7 +36,7 @@ portable 步不拒。这就是本票的缺陷本体——**不是那条用例该
 - [x] **AC#3** 双向变异：(i) 把机制改成 no-op ⇒ **必须有既有用例红**（不是本票新写的）；
       (ii) 往快照里**种一条 `t.Skip`** ⇒ portable 步必须红并点名它。锚点=承载行为那一行，
       同链 grep 证落地，**编译失败不算变异**，还原后 `git diff --quiet` 证干净。
-- [ ] **AC#4** CI 上有**真实 run id + 步级结论**（`gh run view --job` 读**step**，不读 job status；
+- [x] **AC#4** CI 上有**真实 run id + 步级结论**（`gh run view --job` 读**step**，不读 job status；
       并区分 failure / cancelled（`total_count=0` 不是样本）/ 未跑完）。⚠ 代理**不 push** ⇒
       这条若要 push 才能拿到，就在票面明写"欠编排者 push 后复跑"，**不许用"本地跑过了"替代**。
 - [x] **AC#5** 门禁（只跑自己碰的范围）：`gofmt -l` 空、改动脚本 `bash -n` / `go vet` rc=0、
@@ -237,3 +237,17 @@ next=（本票留给下一手的具体命令）：
   上面"台账真的会红"第②发已把 `TestSyncRegistryProbeLive` 列为红名；两说以②发与裁决表为准，原文保留不删。
   next= 编排者据本段勾 AC#4；`internal/risk`/`internal/tools` 的 owner 各自搬 tag / 造第二卷后**删对应台账**（删了不会红，红的是"条目还在但测试不在"）。
 
+
+- 2026-09-21 19:1x（**编排者结案，依据 = `acceptor-93-106` 的裁决表 `docs/evidence/s1/93-adversarial-acceptance.md`，commit `2e9d23e`**）：
+  判 **PASS WITH CONDITIONS**，五框现为 **5/5**。逐条我认下来的东西：
+  ① **覆盖面同分母＝是**（`360efdf` 的 16 包 vs 脚本 scope `diff` 空；`go list` 两侧各 23 包、集合相同）——
+    这是我给这张票最担心的一条（少一个包＝把被检查对象从门禁里删掉），验收独立量过。
+  ② **台账自己会红**：验收三发复现（种 `t.Skip` ⇒ `observe/clock_test.go:13` rc=1 并点名；
+    台账 no-op ⇒ rc=1 且红在**既有用例** `TestSubprocessCrashWriter`＋`TestSyncRegistryProbeLive`；条目腐坏 ⇒ rc=1「name NO TEST」）。
+  ③ `//go:build windows` 那一搬**判为正当**（平台 API 天生不存在，不是挡红）：
+    `GOOS=linux/windows go vet ./internal/risk/` 均 rc=0、测试文件 linux 12 / windows 15、**整包仍在门禁内**。
+  ④ **AC#4 由编排者补勾，证据是机读的**：run **`35591482293`** / job **`106306750423`** / **step 7 = success**，
+    日志逐字含 `platform=linux`、在评 7/10、`RUN=862 PASS=540 SKIP=0`。
+  ⚠ 两条偏差如实登记：实现方预言"该步 failure 并点名 F-1"**已被票 107 的返工超过**（验收登记为偏差，不判红）；
+    F-2 `pathresolver_budget_norace_test.go:37` 验收判**负载假红**（0.285/0.309/0.365、加压 0.550 ms/op 全 PASS）⇒ **归票 86 的记账、不是回归**。
+  `R-93-1..4` 中**最该接住的一条已单立成票 110**（windows 腿没有一步真正跑该用例 ⇒ 与 `R-106-1` 同一个洞）。
