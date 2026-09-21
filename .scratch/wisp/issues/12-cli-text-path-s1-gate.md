@@ -132,7 +132,19 @@ moment: type → reply → notification → memory returns to idle.
       `TestProvidersProbeUnconfiguredRefIsNotSilentlyKeyless`；
       mockllm 侧新增 thinking 能力档（`tools/mockllm/thinking_capability_test.go`）。
       ⚠ 这些是代理**未写进票面**、由编排者按代码与 commit 对账补记的（见 Progress log 的疏漏记录）。
-- [ ] Zero emoji scan over new UI strings passes; tokens doc updated with any additions.
+- [x] Zero emoji scan over new UI strings passes; tokens doc updated with any additions.
+  **2026-09-21 09:50 由编排者勾选**（票面 `:175` 写的两个解除条件现已**同时成立**：
+  票 67 的 AC#3 覆盖面扩展于 `bcf44d6` 落地并经我独立复现，票 68 的 AC#1 三列表早前已交付）。
+  判据不是我读的日志，是我在**纯净树**上敲的：`git archive HEAD` 解到仓库外 →
+  `cd tools/d22scan && go run . -root ../..` → **exit 0**，末行自报
+  `internal/ 289 Go files, comments and _test.go included; cmd/ 21`（`67-adversarial-acceptance.md`）。
+  ⚠ **这一框现在覆盖的是什么、不覆盖什么，必须写清**：
+  覆盖面是**所有 Go 源码里的字面量与注释**（含 `_test.go`）；
+  **非 Go 的 UI 资产没有门**，因为本 HEAD **根本没有 `frontend/` 那棵树**——
+  ban #6 至今仍指向那个恒 0 文件的死作用域。这不是本票的缺陷，**已带票号移交票 71**，
+  所以这一框的"passes"应读作"**在 Go 面上通过、且没有任何东西被静默略过**"，
+  而不是"UI 文案全链路已被看管"。后半句"tokens doc updated"由票 69 的机器检查接管（表↔码双向已钉死），
+  票 74 正在把它没看管的 29 条漂移收口。
 - [ ] Human visual acceptance of ball states (user signs off screenshots — D29 rule).
 - [ ] **（2026-09-20 编排者新加，registry A25）回复后 3s 回落有实测记录**：PLAN `:1424` 的 S1 第一判据原文是
       「打字→得回复→**3s 回落**」，逐项对账后确认这是**四项里唯一从未被量过的一条**
