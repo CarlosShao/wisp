@@ -38,6 +38,35 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: D22 scanner positive control (tools/d22scan tests, seeded red)
+        # runtests.sh asserts that the tests ACTUALLY RAN (ticket 71 AC#3):
+        # top-level PASS/FAIL lines > 0 and zero SKIP, so "go test ./..." can
+        # never again mean "the pattern matched nothing". This is the step that
+        # proves the gate below CAN go red - see TestBuiltBinaryGoesRedEndToEnd
+        # in tools/d22scan/scan_test.go, which compiles the binary and asserts
+        # process exit codes 1 and 2 on seeded violations.
+        run: bash tools/d22scan/runtests.sh -C tools/d22scan ./...
+
+      - name: D22 seven-ban + emoji scan (tools/d22scan)
+        # Wrapper is the supported entry point (ticket 67 AC#2): it derives the
+        # repo root from its own location, runs the seeded-violation positive
+        # control and then the scan, so "the scanner never ran" cannot read as
+        # green. tools/d22scan is its own Go module - invoking it from the repo
+        # root by path silently no-ops, which is what this step guards against.
+        #
+        # WHY THIS STEP IS AT THE TOP OF THE JOB (ticket 71 finding, 2026-09-21):
+        # it used to sit BELOW gofmt/vet/staticcheck, and GitHub skips every step
+        # after the first failure. `go vet (module)` has been red on ubuntu since
+        # fd8f838 (portable internal/ball/statevisual.go calls mulA, defined only
+        # in renderer_windows.go) - so this gate's CI verdict has literally never
+        # been produced, on any run, while the job printed a red we attributed to
+        # "the code" rather than to "the step that never got here". Reproduced
+        # locally without CI: `GOOS=linux go vet ./internal/ball/` -> undefined:
+        # mulA. Running the scan FIRST means a platform-build complaint can never
+        # again hide the D22 result. No step was removed, reordered into
+        # skippability, or given continue-on-error (D22 run-away mode 6).
+        run: sh scripts/d22scan.sh
+
       - name: gofmt (gofumpt)
         run: |
           go install mvdan.cc/gofumpt@latest
@@ -59,14 +88,6 @@ jobs:
         run: |
           go install honnef.co/go/tools/cmd/staticcheck@2025.1.1
           staticcheck ./...
-
-      - name: D22 seven-ban + emoji scan (tools/d22scan)
-        # Wrapper is the supported entry point (ticket 67 AC#2): it derives the
-        # repo root from its own location, runs the seeded-violation positive
-        # control and then the scan, so "the scanner never ran" cannot read as
-        # green. tools/d22scan is its own Go module - invoking it from the repo
-        # root by path silently no-ops, which is what this step guards against.
-        run: sh scripts/d22scan.sh
 
       - name: mockllm module vet
         run: go vet ./...
@@ -113,7 +134,12 @@ jobs:
             ./internal/panel/... -count=1
 
       - name: Environment fork assertion (WISP_ENV=test data dir)
-        run: go test ./internal/proc/ -run TestLayoutForTestEnv -count=1 -v
+        # runtests.sh instead of bare `go test` (ticket 71 AC#3): a -run pattern
+        # that matches nothing prints PASS + `ok` + exit 0, so renaming
+        # TestLayoutForTestEnv would turn this step into a permanent green no-op.
+        # Measured on HEAD: the drifted-name form exits 0 with 0 `=== RUN` lines;
+        # through this script it exits 1 and prints the counts.
+        run: bash tools/d22scan/runtests.sh ./internal/proc/ -run TestLayoutForTestEnv
 
       - name: Stop compose services
         if: always()
@@ -146,7 +172,19 @@ jobs:
         run: go test ./internal/proc/ ./internal/secret/ ./internal/config/ -count=1
 
       - name: "PathResolver junction placeholder (real cases tickets 18/20)"
-        run: go test ./internal/risk/ -run TestPathResolverJunctionWindows -count=1 -v
+        # bash + runtests.sh (ticket 71 AC#3): the file that declares this test is
+        # pathresolver_junction_windows_test.go, so on any runner where the name or
+        # the _windows suffix drifts, `go test -run TestPathResolverJunctionWindows`
+        # reports `ok` and matches nothing. Verified locally on Windows: PASS=1,
+        # SKIP=0, === RUN=1 through the script; the drifted pattern exits 1.
+        # DO NOT READ THIS WIRING AS A FIX OR A MASK: the step FAILS on
+        # windows-latest today for its own real reason (run 35551819606 job
+        # 106188167785: USERPROFILE's 8.3 form RUNNER~1 makes the A-tier anchor
+        # classify B, want ClassA), and runtests.sh propagates a non-zero `go
+        # test` exit code unchanged (registry A43② documents the same discipline
+        # for the vet failure that hid this gate).
+        shell: bash
+        run: bash tools/d22scan/runtests.sh ./internal/risk/ -run TestPathResolverJunctionWindows
 
   # ------------------------------------------------------------- slo-smoke --
   # Memory/handle subset on a hosted Windows runner (no audio hardware):

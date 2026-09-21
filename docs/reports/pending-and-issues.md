@@ -782,6 +782,21 @@
     d22scan 的 `frontend/` 作用域实际走 0 个文件。票 67 已把 `examined N` + `N==0 致命退出` 落进 d22scan
     （R16 裁定 3 禁止回退），另外两条**已建票面收口**：**票 71 `71-gates-must-self-report.md`**
     （AC#1..#7，含"必须给出一次真实的红"作为 AC#2；`blocked-on-70` 只因为两者都要改 `.go`）。
+    - **🟡 ⑤ 部分闭于票 71（2026-09-21 10:4x，commit `b551fef` + 本条所在 commit）——三条逐一报，不整体打勾**：
+      (a) **d22scan 的 0 文件作用域：闭**（`b551fef`）。台账现在覆盖 **8 个作用域**并逐条打
+      `scope <label> examined N`；致命退出从 ban #8 推广到全部 live 作用域，另加两条守卫：
+      "扫了却没登记台账" ⇒ rc 2、"登记为豁免而树已出现" ⇒ rc 2。ban #6 走的是 AC#4 字面之外的
+      第三种处置（exempt + 每次打印 `NOT COVERED` + 豁免自己过期），**禁令文本一字未动**，待编排者裁决。
+      (b) **`go test -run <不匹配>` 打印 ok：闭**（本 commit）。`tools/d22scan/runtests.sh` 断言
+      top-level `--- PASS/FAIL` > 0、`--- SKIP` == 0、并把 `=== RUN`/`PASS=`/`SKIP=` 的**数字打出来**；
+      实测：漂移名字 `-run TestLayoutForTestEnvRenamedAway` ⇒ 裸 `go test` **rc=0**、经脚本 **rc=1**
+      （`PASS=0 FAIL=0 SKIP=0, === RUN=0, '[no tests to run]'=1`）；CI 的 `-run` 两步（test-core 的
+      `TestLayoutForTestEnv`、test-windows 的 `TestPathResolverJunctionWindows`）已改走该脚本。
+      (c) **`cmd/balldebug -diff` 恒返回 nil：未闭** —— 实现者被明确限定只碰
+      `tools/d22scan/**` 与 `.github/workflows/ci.yml`，`cmd/balldebug` 不在其内（AC#1/AC#2 的那半张票
+      需要单独派活；`internal/ball` 此刻正被票 74 占用）。
+      **另见 A43：本轮又挖出两架同族空仪器**（一条是 CI 步骤次序造成的"门从未跑过"，一条是 run 取消的真机制）。
+
   **归属**：①我今天就地改回（已完成：文件回到 `62-liquid-glass-ball-visuals.md`、Status→review，
   提交 `fc33532`）；②④ 归**证据更正代理**（只追加、不覆写原文，每条带可复现命令）；
   ⑤ 归**票 71**；②的根因修复（正确调用姿势）已在 A22/票 67 落地。
@@ -1013,6 +1028,69 @@
    抑制它需要在 `internal/observe/goroutine.go` 加 `TemporaryNames` 条目——
    **那是票 66 的文件**，所以**等 66 收尾再做**；代理"拒绝借用现有名册名来骗过泄漏检测"的判断**是对的**，
    骗过检测器比多一行 WARN 贵得多。
+
+## 票 71 implementer 登记 A43（2026-09-21 10:4x，两条只读调查的结果：**一条把 A40②/A41 悬着的机制钉死了，一条把"lint 红"从瞬态改判成真实破损**）
+
+### A43① push run 被 cancelled 的真机制：**排队中的 run 被新 push 顶替，它们一个 job 都没派发过**
+
+A40② 提的问题、A41 排除的两种解释（配置差异 / 我们自己 `gh run cancel`）我都独立复核为**成立**，
+并补上 A41 留下的两个候选的判决证据：
+
+- **零 job**：`gh api repos/CarlosShao/wisp/actions/runs/<id>/jobs --jq .total_count` 对
+  `35551631530`(d7876d3) / `35551685331`(a8ae9ad) / `35551751520`(ae37d42) / `35551581002`(aa0b682)
+  全部返回 **0**。⇒ 这些 run **从未 in progress**，`cancel-in-progress` 那个键**根本没参与**（它只管正在跑的）。
+  它们处于 GH 的 *pending* 态，而"同一 workflow+ref 只保留最新的 pending run、更旧的自动取消"是**与
+  cancel-in-progress 无关的另一条规则** ⇒ A41 候选①**确认**，候选②（外部/人手动）**排除**。
+- **并发组的占用者是 `bcf44d6` 那次 run**：`35551168596` created 01:31:26 → completed 01:45:35（14 分钟，
+  就是 A40④ 那条 U+26A0 造成的 lint 红）。上面四个 cancelled run 的 created 全落在 01:39–01:43 这个窗口内，
+  每个被取消的时刻 ≈ 下一个 run created 前 **1 秒**。
+- **队列放行的直接证据**：`24a66b6` 的 run `35551819606` 的各 job `started_at` = **01:45:37–01:45:40**，
+  即前一个 run 结束**后 2 秒**——串行等待的形状，不是"被谁取消"的形状。
+- 仓库内 `grep -rn "gh run cancel" --include=*.md .` 与 A41 的 `git grep` 一致：**零命中**。
+
+**⇒ A27 口径要改两处**（不是"部分是测量假象"这么简单）：
+这些 cancelled run **连样本都不算**——零 job、零输出、零信息；把它们计入"CI 一直红"是**用没跑过的东西做证据**，
+比用失败做证据更糟。而**真实失败依然真实**：同一时间窗内所有真正跑起来的 run
+（`35549416856`/`35549859581`/`35550643982`/`35551168596`/`35551819606`）结论都是 `failure`。
+所以"A27 的框架需要更正"的准确说法是：**"从没绿过"是代码问题；"tip 上从没看到过结论"是节奏问题**
+——push ~1 commit/min vs 流水线 ~14 min ⇒ 只有最后一次 push 有可能跑完，而它又会被下一次顶掉。
+**留给编排者的处置（我没动 ci.yml 的 concurrency，因为不能 push 就无法观测效果）**：
+候选修法是把组键加 `${{ github.sha }}`（每个 SHA 独立成组，不再互相顶替），代价是并发 runner 分钟数上升，
+且 self-hosted `wisp-slo` 只有一个 runner ⇒ slo-full 会在 **job** 层排队（那是可见的等待，不是被抹掉的 run）。
+**判据（新，可直接抄进规则）**：报 CI 状态必须给 run id **且** `jobs.total_count`；
+`total_count=0` 的 run 一律记作**未跑**，不得计入 pass/fail 样本。
+
+### A43② `undefined: mulA` / `undefined: proc.Runtime`：**不是 stale SHA、不是瞬态，是 linux-only 的真实编译破损，HEAD 至今仍在**
+
+run `35551819606` / job `106188167868`（lint，event=push，headSha `24a66b6a63f0fcd186bbbdcaae4491abb84ce919`
+——就是那次的 SHA，无重跑、attempt=1）里 `go vet ./...` 在 ubuntu-latest 报：
+
+```
+vet: internal/ball/statevisual.go:287:17: undefined: mulA
+vet: cmd/wisp/slo.go:324:49: undefined: proc.Runtime
+```
+
+本地"跑不出来"的原因不是环境漂移，而是**本机是 windows/amd64**：
+
+- `mulA` 只定义在 `internal/ball/renderer_windows.go:368`，该文件首行 `//go:build windows`；
+  调用方 `internal/ball/statevisual.go` **无 tag**（portable）⇒ linux 侧包内没有这个符号。
+- `proc.Runtime` 只定义在 `internal/proc/boot_windows.go:28`（同样 windows-only），
+  调用方 `cmd/wisp/slo.go` 无 tag。
+- 在 `git archive HEAD` 解出的纯净树里交叉复现，**错误文本逐字相同**：
+  `GOOS=linux go vet ./internal/ball/` ⇒ `vet.exe: internal\ball\statevisual.go:287:17: undefined: mulA`。
+  （`GOOS=linux go vet ./cmd/wisp/` 在这台机器上先停在别处：本地模块缓存里没有
+  `sherpa-onnx-go-linux`，build constraints 把整个依赖包排除了；`proc.Runtime` 那条要等 ball 修完才会重新露头。）
+- 引入点：`fd8f838`（"checkpoint the glass Sleeping body the killed prototype agent left mid-task"）
+  与 `00bbb76`（票 66 slo AC#3 取数）。**归属：票 74（`internal/ball`）与 slo/票 66（`cmd/wisp`）**，
+  两者都不在本 implementer 的所有路径内 ⇒ 只登记不动码。修法二选一由 owner 定：
+  把符号搬进 portable 文件，或给调用方加 windows tag（**后者是收窄覆盖面，要走 D22/编排者**）。
+
+**⚠ 顺带挖到第 4 架同族空仪器（本票主题的新实例，不是环境问题）**：`lint` job 里
+"D22 seven-ban + emoji scan" 原本站在 `go vet (module)` **后面**，而 Actions 在某步失败后会**跳过后续所有步骤**
+⇒ 自 `fd8f838` 起，**D22 扫描在 CI 上从未产出过一个结论**（我看过的每一次 lint run 该步都是 `skipped`）。
+"门没跑"和"门跑了没问题"在 CI 输出上又一次长得一模一样，这次的成因不是路径、不是范围，是**步骤次序**。
+本 commit 已把该步与它的阳性对照（`tools/d22scan/runtests.sh -C tools/d22scan ./...`）**提到 gofmt/vet 之前**：
+不删步骤、不给任何步骤加 `continue-on-error`、不让任何步骤可跳过（D22 mode 6 未碰）。
 
 ## 编排者登记 A42（2026-09-21 10:05，票 73 验收：一次"我自己重做变异"抓出**注释与真实防线不一致**）
 

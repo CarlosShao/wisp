@@ -1,8 +1,9 @@
 # 71 — 每道门必须自报工作量：把"没报问题"和"没看"变成可区分的两件事
 
-**Status:** in progress（d22scan + ci.yml 部分已开工；`cmd/balldebug` 部分**不在本代理所有路径内**，见 Progress log 的移交条目）
+**Status:** in progress（我所有路径内的部分已落地：台账 + runner + CI 三处接入 + A43；AC#1/#2 的
+`cmd/balldebug` 那半张票**不在本代理所有路径内**，AC#5 的"CI 真红"因**禁止 push** 而物理不可证；均见 Progress log）
 **Claimed by:** ticket-71 implementer（2026-09-21，负责 `tools/d22scan/**` 与 `.github/workflows/ci.yml`）
-**Last update:** 2026-09-21 09:5x（编排者 09:41 三条移交已接：第 2 条已闭，第 1/3 条进行中）
+**Last update:** 2026-09-21 10:5x（AC#3 已勾；AC#4 差一个 ban #6 处置的裁决；AC#1/#2 的 balldebug 那半张票移交；A43 两条调查已落 registry）
 **Blocked by:** 70-ci-actually-green（只因为两者都要改 `.go`，不是语义依赖；票 70 的 gofumpt 已落地）
 **Parallel slots:** ≤1 sub-agent（本票改的是**门禁自身**，改错会让后面所有票的"绿"都失去意义）
 **Spec refs:** README 完成规则 6（1:1 裁决表）、D22（契约变更需人批）、C31（可观测性）
@@ -34,9 +35,14 @@ R16 裁定 3 **禁止回退**）。本票把同样的纪律推到**其余三类�
       阈值**写死在票面/配置里**并带来源（D43/SPEC-08），**不许为了让某次跑变绿而现场调低**（D22 精神）。
 - [ ] **AC#2**：阳性对照（**这条不做本票不算完**）：构造一次**故意不成像**的跑（把球隐藏或把阈值调到
       不可能达到），证明 AC#1 的门**会红**。今天的教训正是"没红"被当成"过"。
-- [ ] **AC#3**：一个可复用的测试运行器（脚本或 `cmd/` 下的小工具），跑 `go test -tags <X> -v <pkg>`
+- [x] **AC#3**：一个可复用的测试运行器（脚本或 `cmd/` 下的小工具），跑 `go test -tags <X> -v <pkg>`
       后**断言 `--- PASS/FAIL/SKIP` 行数 > 0 且 `-run` 模式实际匹配到测试**；
       匹配 0 条时**非零退出**并打印它匹配到了什么。**不得**把 SKIP 计入"通过"。
+      ⇒ **落地物 `tools/d22scan/runtests.sh`**（票面简报只给了我 `tools/d22scan/**` 与 `ci.yml` 两处，
+      所以它没去 `scripts/`；调用点在 CI 里只有一行，编排者若要迁进 `scripts/` 是一句 `git mv`）。
+      实测见 Progress log 10:4x 条：漂移名 `-run` 裸跑 **rc=0** / 经脚本 **rc=1**，SKIP 一律 rc=1，
+      真失败原样传递 rc=1，`-tags` 透传已验。CI 的三处接入：`lint` 的阳性对照步、`test-core` 的
+      `TestLayoutForTestEnv`、`test-windows` 的 `TestPathResolverJunctionWindows`。
 - [ ] **AC#4**：`d22scan` **逐作用域**自报 `examined N files`（含 `frontend/` 这类子作用域），
       任何**声明了但恒为 0** 的作用域 ⇒ 致命退出；或者**删掉那个作用域**并在 allowlist 留一行说明。
       现存的 `allowlist.txt` 只允许**变短或不变**，变长需我在票面批。
@@ -89,7 +95,7 @@ R16 裁定 3 **禁止回退**）。本票把同样的纪律推到**其余三类�
   exit 0）今天只自报了 ban #8 的 3 个作用域，ban #6 `frontend/`、ban #7 `internal/tools/`
   与 `internal/` / `cmd/` 各自的 Go 文件数**一条都没报**。⇒ 下一步：给 d22scan 装**统一作用域台账**
   （每个声明作用域 `examined N`）+ 把 `emptyScope` 守卫推到 ban #6/#7，并保证只严不宽。
-- 2026-09-21 10:2x **AC#4 的 d22scan 部分已落地并有真红**（commit 见下）。台账 `declaredScopes()`
+- 2026-09-21 10:2x **AC#4 的 d22scan 部分已落地并有真红**（commit `b551fef`）。台账 `declaredScopes()`
   现覆盖 8 个作用域，每个都在 stdout 打 `scope <label> examined N <kind>`；`emptyLiveScope` 把
   致命退出从"只有 ban #8"推到全部 live 作用域；新增 `undeclaredKeys`（扫了却没上报 ⇒ rc=2）与
   `driftedAbsentScope`（登记为"树不存在"而树已出现 ⇒ rc=2，让豁免**自己过期**）。
@@ -105,3 +111,19 @@ R16 裁定 3 **禁止回退**）。本票把同样的纪律推到**其余三类�
   `NOT COVERED: ban #6 frontend/` + 树出现即 rc=2**。字面判据是"致命或删掉"，二选一我都没做满，
   所以框留给编排者裁决。⇒ next=纯净树（`git archive HEAD`）复跑证 HEAD 绿，然后把 AC#5 的"CI 真红"
   缺口如实写进票面（本代理被明令**不得 push**，AC#5 的"贴出 CI 红的那一行"在物理上不可证）。
+- 2026-09-21 10:4x **AC#3 落地 + CI 次序修正 + A43 两条调查结论落盘**。commit：`b551fef`（台账）与
+  本条所在 commit（runner / ci.yml / registry）。**AC 账实表（1:1，README 规则 6）**：
+  | AC | 框 | 命令与真实数字 |
+  |----|----|----------------|
+  | #1 balldebug 阈值门 | ☐ 未做 | 不在我被给的所有路径内（`cmd/balldebug`），且 `internal/ball` 正被票 74 占用 ⇒ **移交编排者派活** |
+  | #2 阳性对照（一次真红） | ☐ 框留给 #1 的红；**同族等价物已做** | 编译真二进制跑进程退出码：种 `go worker()` ⇒ **rc=1**、清空 `internal/tools/` ⇒ **rc=2**、造出 `frontend/` ⇒ **rc=2**、全 live fixture ⇒ **rc=0**（`TestBuiltBinaryGoesRedEndToEnd` 的 4 个子测试全 PASS） |
+  | #3 测试运行器 | ☑ | `sh tools/d22scan/runtests.sh ./internal/proc/ -run TestLayoutForTestEnv` ⇒ `PASS=1 FAIL=0 SKIP=0, === RUN=3` **rc=0**；名字漂移版 `-run TestLayoutForTestEnvRenamedAway` ⇒ 裸 `go test` **rc=0**、经脚本 **rc=1**（`PASS=0 FAIL=0 SKIP=0, === RUN=0, '[no tests to run]'=1`）；SKIP fixture ⇒ **rc=1**；真失败 ⇒ **rc=1** 原样传递；`-tags windows` 透传 ⇒ **rc=0**；`-C /tmp`（无 go.mod）⇒ **rc=2** |
+  | #4 逐作用域自报 | ☐ **差一个裁决** | 台账 8 条全打数（`bans #1-5 internal/=184 cmd/=16`、`ban #7 internal/tools/=16`、`ban #8 design/=16 internal/=293 cmd/=21`），live 作用域 0 文件 ⇒ rc=2，另有"扫了未登记 ⇒ rc=2""豁免过期 ⇒ rc=2"两条守卫；`allowlist.txt` 条目 **5 → 5** 未增。**不勾的原因**：ban #6 我走了 AC 字面（致命 或 删作用域+allowlist 加一行）之外的第三种处置，两难写在"编排者追加"第 1 条的引用块里 |
+  | #5 接进 CI + 一次真实红 | ☐ 物理不可证 | 接入已完成（3 处 + 阳性对照步提到 vet 之前）；**"贴出 CI 红的那一行"需要 push，而我被明令不得 push** ⇒ 这一半不勾，不拿"本地能红"冒充。顺带把 `lint` 次序的问题登记为 **A43②**：自 `fd8f838` 起 D22 扫描步在 CI 上**从未产出过一个结论**（被前面的 `go vet` 失败跳过） |
+  | #6 registry A30⑤ | ☑（按"部分闭"写） | A30⑤ 追加逐条三行（a 闭 / b 闭 / c 未闭）+ 新增 **A43**；`git diff --numstat` 实测 **78 insertions / 0 deletions** ⇒ 未销毁任何历史条目（我第一版编辑误删了 A42 的标题行，已当场补回并用 numstat 复验 0 删除） |
+  | #7 对抗验收（非实现者） | ☐ 不归我 | 本表是**实现者自账**，按规则 6 必须由编排者或另一代理独立重做变异后才算验收 |
+  **纯净树（编排者追加第 3 条）**：`git archive HEAD | tar -x -C /tmp/wisp-head-<pid>`（**树外**，避免 A38 的
+  嵌套目录让并发代理多算一份源码）后跑 `go run . -root <abs>` ⇒ **rc=0**、`go test ./...` ⇒ **rc=0**
+  （HEAD=`b551fef`）。同一棵纯净树交叉 vet 复现 `undefined: mulA` ⇒ 见 A43②（别人路径，只登记不动）。
+  ⇒ next=等编排者对 ban #6 处置的裁决；把 `cmd/balldebug`（AC#1/#2 那半张票）派给能碰它的代理；
+  本代理剩余额度只用于文档/票面，不再扩路径。
