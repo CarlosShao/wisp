@@ -206,6 +206,39 @@ func (m *Manager) Ensure(ctx context.Context, id string, onProgress ...func(Prog
 	return installDir, nil
 }
 
+// VerifyInstalled re-checks an installed model against the signed manifest at
+// the moment the model is handed over, not only when Ensure decided to return
+// it (ticket 109, AC95-R1).
+//
+// The window this closes is a clock window, not a permission one: Ensure
+// verifies per file *before* it returns, and the reader opens the files
+// *after*, and this package deliberately does not seal them - the bytes are
+// public and the wide directory is what lets a second instance under another
+// account reuse a multi-gigabyte cache (ticket 95's ruling, which this does not
+// touch). So anything that can write the install directory owns the span
+// between those two events. The closure is therefore the second verification,
+// and it is reachable without a *ModelEntry because that is exactly what a
+// hand-off site does not have.
+//
+// It re-reads and re-hashes; it does not trust anything cached about a previous
+// pass. Cost is one more full read of the installed files at hand-off, the same
+// cost Ensure's cache-hit branch already pays per call.
+func (m *Manager) VerifyInstalled(id string) error {
+	entry, err := m.opts.Manifest.FindModel(id)
+	if err != nil {
+		return err
+	}
+	dir := filepath.Join(m.opts.DataDir, id)
+	if override, ok := m.opts.LocalOverride[id]; ok {
+		dir = override
+	}
+	if err := m.VerifyDir(entry, dir); err != nil {
+		return observeWrap(ClassModel, "hand-off re-verification",
+			fmt.Errorf("model %s installed files no longer match the signed manifest in %s: %w", id, dir, err))
+	}
+	return nil
+}
+
 // Cancel aborts an in-flight Ensure for id. The aborted run cleans its
 // staging directory before returning (no partials outside staging, ever).
 func (m *Manager) Cancel(id string) {

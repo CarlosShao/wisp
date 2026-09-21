@@ -48,6 +48,19 @@ func (b *DownloadingBridge) Run(ctx context.Context, id string) (statemachine.St
 		}
 		return b.record(), err
 	}
+	// Ticket 109's hand-off check. Ensure verified the bytes *before* it
+	// returned and the reader opens them *after* this call announces the model
+	// available; the model directory stays inherit-wide on purpose (ticket 95),
+	// so that span is writable by anything the parent grants write to. Re-verify
+	// here, at the one point in this package where "available" is decided, and
+	// fail the walk instead of announcing a swapped file. The state machine gets
+	// no new event: row #37 already has exactly the two exits this needs.
+	if verr := b.mgr.VerifyInstalled(id); verr != nil {
+		if _, derr := b.machine.Dispatch(statemachine.EvDownloadFailed, nil); derr != nil {
+			return b.record(), fmt.Errorf("models: exit Downloading after the hand-off check: %w (re-verify err: %v)", derr, verr)
+		}
+		return b.record(), verr
+	}
 	if _, derr := b.machine.Dispatch(statemachine.EvDownloadCompleted, nil); derr != nil {
 		return b.record(), fmt.Errorf("models: exit Downloading after completion: %w", derr)
 	}
