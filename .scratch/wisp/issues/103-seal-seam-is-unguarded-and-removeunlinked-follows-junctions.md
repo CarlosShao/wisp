@@ -1,6 +1,6 @@
 # 103 — 密封的**两处旁路**：`SetPathResolver` 谁都能装（装了个橡皮图章就静默重写外来 DACL），`RemoveUnlinked` 能沿 junction 删别人真文件且返回 nil（票 94 验收的 R-c / R-b）
 
-**Status:** open（2026-09-21 17:4x 编排者建；来源=`acceptor-ticket94` 的两条残留，它自己给的方向是"立案，不救不判"）
+**Status:** ready-for-review（2026-09-21 18:4x `agent-ticket103` 修完两处守卫并跑完三门；正文仍为 append-only，numstat 里那 1 行删除就是本行）
 **Type:** 安全边界（一个是**接缝无守卫**，一个是**今天够不到的陷阱**——两者不同档，同票不同判据）
 **Blocks:** 票 94 挂 `-done` 的条件之一 · **Blocked by:** nothing
 **Packages:** `internal/winsec/`（seam 的注册口与 `RemoveUnlinked`）。
@@ -92,3 +92,67 @@
   下一条命令：实现守卫（`SetPathResolver` 一次性 + 一致性探针 + 响亮审计；`ResolvePath` 对
   resolver 的**答案**再跑一遍内置底线；`removeUnlinked` 动手前逐级查祖先链是不是链接），
   然后跑 AC#4 的门与 AC#3 的三向变异。
+
+- 2026-09-21 18:4x（`agent-ticket103`）**修复落地 + AC#3 三向变异 + AC#4 门**（commit `0717bf2` 生产码，前一枚 `184af22` 是修前红用例）：
+  **AC#1（R-c）已修，形状保留**：`SetPathResolver` 现在三道守卫——①一次性（缝上已有解析器时换一个不同的进来会被拒；
+  唯一允许的退路是 `nil`＝内置底线，它只能拒不能改写，所以"拆回底线"永远安全，票 94 测试里
+  `resolve_windows_test.go` 的拔—装复位照旧走得通）；②一致性探针（`resolverProbeShapes()` 两个纯拼写形状：
+  相对路径与 `<TempDir>\..\x`，都是底线必拒的，可接受的答案只有"拒"或"交回一个底线认的改写"——
+  恒说 OK 的橡皮图章两头都不沾，且探针不需要特权、不建 fixture、不动文件系统，所以能在 init 期跑）；
+  ③拒装写 ERROR 级 slog 审计并保留在位者，**不 panic**（init 顺序会把整个二进制带走，拒装只让它落回底线）。
+  **另加结构性的一半**（守卫不可被绕过的原因）：`ResolvePath` 现在把已装 resolver 交回的**答案**再过一遍
+  `builtinVerifier`，所以即便有假解析器进了缝，带链接/`..`/空段/`\?\` 的答案也到不了 `os.Mkdir`；
+  错误点名"哪一方给的答复"。**没有**倒回 `filepath.Abs`（票 94 的账不清零）。
+  绿读数（`-count=2`，逐条点名）：`TestAC1SeamRejectsARubberStampAndLeavesTheForeignDaclAlone`、
+  `TestAC1SeamIsSingleUse`、`TestAC1RefusedInstallLeavesTheSealWorking`、
+  `TestAC2RemoveUnlinkedRefusesAPathThroughAJunction`、`TestAC2RemoveUnlinkedStillUnlinksAStandaloneLink` 全 PASS；
+  SID 级判据此刻是"外来文件 `S-1-1-0` 前后都在"：`before=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-...-1001] after=同`。
+- **AC#2（R-b）只做了守卫 + tripwire，语义修在 winsec 自己包里，一行 `internal/memory` 生产码都没动**：
+  `RemoveUnlinked` 动手前跑 `firstLinkAncestor(path)`（祖先链逐级 Lstat，**不含叶子**——解链本身就是这个口的用途），
+  Windows 用 `isReparsePoint`、POSIX 用 `ModeSymlink`（junction 在 Windows 的 `Lstat` 里**不报** ModeSymlink，
+  实测 attributes=0x410，所以这个谓词必须分平台）；前缀用平台分隔符拼接，不用 `filepath.Join/Clean`
+  （在这里做词法归一化，抹掉的正是它要找的形状）。`internal/memory/artifacts_junction_tripwire_windows_test.go`
+  钉住回收遍历对 junction 只报一个条目（`walk over the junction entry reported [...\artifacts\junklink]`）+ 结果面
+  （目标树文件与目录都在）+ 阳性对照（普通 stray-dir 照样被清，防止"什么都没删"被当成绿）。
+- **AC#3 变异三向**（全部在 `/tmp/wisp-103-agent-ticket103`＝`git archive HEAD` 的仓外快照里做，目录名带会话后缀；
+  每发都在同一条 `&&` 链里 `grep -n` 打印被改后的整行，且 `go build` rc=0 先量到；`go test -v` 数 `=== RUN`）：
+  - **MUT-1 去掉注册守卫**（两行：`for _, probe := range resolverProbeShapes() {`→`range []string{} {`（落地行 resolve.go:152）、
+    `if resolver != nil {`→`if resolver != nil && false {`（落地行 resolve.go:115））：`=== RUN` 3 条，
+    **2 FAIL / 1 PASS**：`TestAC1SeamRejectsARubberStamp...` 红在 `AC#1 leg 1 RED: a pass-through rubber stamp was installed
+    into the sealing seam (now winsec_test.rubberStampResolver)`（**红在守卫**），`TestAC1SeamIsSingleUse` 红在 seam-not-single-use；
+    witness `TestAC1RefusedInstallLeavesTheSealWorking` 仍 PASS。
+  - **MUT-2 注册了但被拒、只拆审计**（`slog.Error("winsec: refusing to install a path resolver...`→`slog.Debug(`，落地行 resolve.go:107）：
+    `=== RUN` 3 条，**1 FAIL / 2 PASS**，唯一红是 `AC#1 leg 1 RED: refusing the fake left no audit record naming it; log was:`（空日志），
+    而"缝上仍是原解析器 + 外来 DACL 的 `S-1-1-0` 一字未动 + 密封照常工作"三条读数全绿
+    ⇒ **证明 MUT-1 的红在守卫身上，不在噪声身上**，且审计断言本身是活的。
+  - **MUT-3 tripwire 的"不下降"改成"下降"**（`removeStray` 的 `filepath.WalkDir(...)`→`descendFollowingLinks(...)`，
+    一个用 `os.Stat`+`os.ReadDir` 跟链接的递归；落地行 artifacts.go:155/322，`go build` rc=0）：
+    `TestAC2ReclaimWalkNeverDescendsIntoAJunction` **FAIL**，红在读数
+    `removeStray(junklink): ... winsec: entry is a link ... the spelling reaches it through the link at ...\artifacts\junklink`
+    ⇒ 一旦有人把遍历接成下降的，**立刻红**（并且因为 AC#2 的守卫在位，它是"响亮地红"而不是"别人树里的文件静默消失"）。
+    诚实登记两点：该用例 leg 1（断言 `WalkDir` 本身不下降）测的是标准库行为，MUT-3 不会让它红——咬住的是结果面那条腿；
+    第一发用 `filepath.EvalSymlinks` 的变异**没有落地成下降**（Windows 上它对 junction 不解引用，读数 `--- PASS`），已换成上面的版本重测。
+    `TestStrayRemovalDoesNotFollowLinks`（票 79 的既有用例）在 MUT-3 下仍 PASS ⇒ 它钉不住下降，这条 tripwire 是新增量。
+  - **还原**：三发变异之后把快照里被改的文件用 `git show HEAD:<path>` 逐字节写回，
+    `diff -q` 对 resolve.go / winsec.go / winsec_windows.go / winsec_other.go / artifacts.go 全部 `CLEAN`，
+    并把快照与一份重新 `git archive HEAD` 的副本 `diff -rq` **零差异**（无残留）。仓库目录内**未建 worktree / 未 checkout**。
+- **AC#4 门（真实树）**：`go test -count=2 ./internal/winsec/ ./internal/memory/ ./internal/secret/ ./internal/risk/`
+  → `ok winsec 12.436s / ok memory 26.597s / ok secret 0.570s / ok risk 7.798s`，FAIL=0；
+  `go test -v ./internal/winsec/ ./internal/memory/` `=== RUN` **102** 条，**SKIP 恰 1 条**：
+  `TestSubprocessCrashWriter`（`internal/memory` 既有、与本票无关的环境条件用例，点名在此不算静默绿）；
+  受我改动辐射的 `./internal/agent/`（1.903s ok）`./internal/tools/`（13.751s ok）同跑。
+  `gofmt -l internal/winsec/ internal/memory/` 空、`$(go env GOPATH)/bin/gofumpt -l` 空；
+  `go vet ./internal/winsec/` 与 `GOOS=linux`/`GOOS=darwin go vet ./internal/winsec/`、`GOOS=linux go vet ./internal/memory/` 全 rc=0（按包，仓根整树跑是既有坑不重踩）。
+  `sh scripts/d22scan.sh`：**clean - no D22 ban violations**（bans #1-5 internal/=197、cmd/=20、#6 frontend/=40、#7 internal/tools/=17、
+  #8 design/=16、frontend/=40、internal/=342 Go 文件含注释与 `_test.go`、cmd/=26；runtests.sh 侧 packages=[./...] top-level PASS=21 FAIL=0 SKIP=0）。
+  ⚠ 两点环境账，不是我的红：`go build ./...` 在本机当前树上 rc=1，坏在**别人未提交**的
+  `internal/config/parse.go:214 undefined: winsec` + `migrate.go "os" imported and not used`（`git status` 里是别人的活，我没碰），
+  故按包量；`TestResolvePerCallBudget`（票 86 的负载假红）本轮未出现。
+  另：`tools/d22scan` 我一行未改，`allowlist.txt` 未改，冻结清单未碰；未 push。
+  **残留交回**：AC 框我不自勾（裁决表 `docs/evidence/s1/103-*.md` 归验收方）。
+  next= `acceptor-ticket103` 按 AC#1..#4 逐格裁；重点复核三处：① 守卫是否给了伪造留了别的门
+  （`%VAR%`/前导 `~` 的**改写型**伪造仍归票 102 的 `Actable()`，winsec 看不出"善意改写"与"劫持改写"的区别，
+  我在 `resolve.go` 的注释与本 log 里都写明了这条边界）；② POSIX 侧守卫我只能编译期验（`GOOS=linux/darwin go build`+`go vet` rc=0），
+  **探针集合在 Linux 上是否会把 risk 的纯词法解析器拒掉，本机测不到**——若 CI 跑 Linux，这是第一条要看的眼色；
+  ③ AC#2 的祖先检查是 fail-closed：数据根若真的放在别人 symlink 底下，回收会开始报错（方向是拒，不是删），
+  这是有意的语义收紧，验收方若判它过界请说一声。

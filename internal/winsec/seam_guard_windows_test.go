@@ -230,7 +230,7 @@ func TestAC1SeamIsSingleUse(t *testing.T) {
 	// install attempt must be refused.
 	winsec.SetPathResolver(narrowOnlyResolverB{})
 	if got := resolverName(winsec.PathResolverInstalled()); got != resolverName(narrowOnlyResolver{}) {
-		t.Errorf("AC#1 RED: the seam was re-installed from %s to %s - it is not single-use", got, resolverName(narrowOnlyResolverB{}))
+		t.Errorf("AC#1 RED: the seam is not single-use - %s replaced %s after the second SetPathResolver", got, resolverName(narrowOnlyResolver{}))
 	}
 	if !strings.Contains(logged.String(), "already") {
 		t.Errorf("AC#1: the second install must leave an already-installed audit record, got: %s", logged.String())
