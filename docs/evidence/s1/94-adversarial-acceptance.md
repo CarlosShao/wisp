@@ -28,10 +28,10 @@
 | 2 | `init()` seam 是不是静默旁路 | **PASS，但确认存在"初始化顺序决定形状"的活证据**（今天无生产码踩到；另发现 `SetPathResolver` 无守卫=见第 1 项） |
 | 3 | AC#1 定性重跑 | **PASS（实现者是对的一方，本代理与编排者原断言被推翻）** |
 | 4 | AC#3 变异复现 | **PASS（三条红名全复现，SID 级证据本代理自己拿到；但红名里只两条承载判据）** |
-| 5 | "内置 verifier 只拒不改写" | **verifier 腿 PASS；C26 腿 FAIL 级残留**：实测出一条"过了检查却被改写、封的与判的不是同一棵"的路径 |
+| 5 | "内置 verifier 只拒不改写" | **verifier 腿 PASS；C26 腿留一条实测残留 R-a**：过检查却被改写、封的与判的不是同一棵（AC#3 字面仍 PASS，见文末） |
 | 5b | 票面那句"未接线即拒会红 20+ 条"（MUTATION-94B） | **为真且保守（实测 49 条）**；附带测出 `internal/winsec` 自身 **0 条红**⇒verifier 正向半句树内无覆盖 |
 | 6 | 门检复跑 | **PASS（rc=0 与逐作用域台账 8 行与本票票面逐字相同；ban 文本/allowlist 未动，git 证）** |
-| 7 | 两条自认弱处裁决 | ①转下张票（登记 AC 缺口，5b 已把它从"自认"升级为"实测覆盖洞"）；②**票 94 未闭**——实现者给的理由被实测推翻（修法不需要动 memory） |
+| 7 | 两条自认弱处裁决 | **两条都转下张票（必须立案）**：①5b 已把它从"自认"升级为"实测覆盖洞"（verifier 拆掉 winsec 自己 0 条红）；②PROBE F 实测该口能沿 junction 删掉别人的真文件并返回 nil，但 PROBE W 证明今天唯一生产调用方（`removeStray` 的 `WalkDir` 不下降）**够不到** ⇒ 定性为导出 API 地雷；且实现者"要先动 memory"的理由被推翻（修法在 winsec 自己包里） |
 
 ---
 
@@ -467,7 +467,7 @@ placement_windows.go, resolve_windows_test.go, winsec.go, winsec_other.go}`）�
 理由：行为本身已被本代理证对（PROBE D 四腿全拒、没建目录、外来 DACL 不变；PROBE C 十种形状 byte-identical），
 缺的只是"别人以后能重跑"。
 
-**② `RemoveUnlinked` 刻意不解析** —— **本代理实测它比票面写的更糟，而且票面给的理由是错的。**
+**② `RemoveUnlinked` 刻意不解析** —— **本代理实测它比票面写的更糟，但可达性也被本代理自己限定住了。**
 探针 F（不 link risk 的二进制）：路径 `<data>\link\artifacts\keep-me.txt`，其中 `link` 是 junction，
 末组件是**真文件不是链接**：
 
@@ -477,15 +477,28 @@ foreign file still present afterwards: false      ← 别人树里的文件被�
 junction itself still present: true
 ```
 
-⇒ 它的守卫只有"**末组件**是链接就别跟"，**没有任何一条"路径中途穿过链接就不许动手"**的检查，
-所以它能沿 junction 走到别人的树里删一个真实文件并报告成功。
-票面说"要收这个口得先动 `internal/memory`（票 18/79 的地界）"——**这句被推翻**：
-`RemoveUnlinked` 的策略是 `internal/winsec` 自己的码，最少只需在动手前对**除末组件外**的祖先链
-跑一次现成的 `platformVerifyPlacement`/已装的 C26（正是 `placement_windows.go` 里那段逐级走
-`isReparsePoint` 的循环，去掉最后一级即可），**一行生产码地界都不越**。
-**裁决：票 94 未闭。** 建议：要么在本票内补这一格（同包、同地界、可用 PROBE F 当红名），
-要么明确立案并在票 94 的 Status 上写"AC#2 之外仍有一条同类的删除半径未收"。
-不要按"转下张票"处理完就算——它的后果是**删别人的东西**，比放置错位重。
+⇒ 它的守卫只有"**末组件**是链接就别跟"，**没有任何一条"路径中途穿过链接就不许动手"**的检查。
+票面说"要收这个口得先动 `internal/memory`（票 18/79 的地界）"——**这句被推翻**：最少只需在动手前对
+**除末组件外**的祖先链跑一次现成的 `platformVerifyPlacement`/已装的 C26（正是 `placement_windows.go`
+里那段逐级 `isReparsePoint` 的循环，去掉最后一级），**一行生产码地界都不越**。
+
+**但本代理没有停在这句上，而是去查了唯一生产调用方到底够不够得到（探针 W）**：
+`internal/memory/artifacts.go:153` 的 `removeStray` 用 `filepath.WalkDir` 量自己的子树，再
+`filepath.Join(s.artifactsDir, rel)` 重建路径去删。实测那份 walk **看见 junction 时报的是
+`isdir=false type=?---------`，并且不下降**：
+
+```
+. (isdir=true)   junklink (isdir=false type=?---------)   stray (isdir=true)   stray\ours.txt (isdir=false)
+walk descended into the junction: false
+foreign victim still present: true
+```
+
+⇒ 生产码**今天构造不出**"中途穿过链接的 `full`"：链接要么被 walk 当成一个文件条目交回（那时
+`RemoveUnlinked` 正好走"只解链不进入"的设计分支），要么根本进不了 `rel`。
+所以这一格的准确定性是：**导出 API 上的地雷（下一个调用方一次 `Join` 就能踩，且失败方向是删别人的东西、返回 nil），
+不是今天可达的活缺陷。**
+**裁决：转下张票**——但**必须立案**，且立案时把票面"要先动 memory"那句错账改掉（修法在 `internal/winsec` 自己包里，
+红名就用本代理这条 PROBE F）。
 
 ---
 
@@ -504,28 +517,52 @@ junction itself still present: true
 
 ## 两句必须直答的结论
 
-**1) 票 94 能否挂 `-done`？—— 本代理判：暂不能挂，退回补一格即可挂（不必回退实现）。**
-五枚 AC 本代理**全部独立复现**（上表），代码形状、门检、变异、门禁数字都对，AC#1 对编排者的推翻也是对的
-⇒ **不是 `returned-for-fix` 那种"账不实"**。压住它的只有两件事：
-①第 7 项② —— `RemoveUnlinked` 沿 junction **删掉了别人树里的真文件、返回 nil**（PROBE F 实测），
-同包一行祖先链检查就能收，票面"必须动 memory"的理由被推翻 ⇒ 这条属于"本票地界内的没做完"；
-②第 1/5 项的两条残留（`SetPathResolver` 无守卫、`expandInput` 把放置改写成另一棵树）至少要在票面
-登记成明账并把"类型上可证明/永远走 C26"两句文案改到与实测一致。
-两条都是**小改 + 重跑本文件点名的红名**，不需要新架构。补完即可挂 `-done`（并把 ①②若不做则立案）。
-⚠ **不要把票 89 的账混进来**：票 89 现在是 `returned-for-fix`（它自己那条"删掉 propagatePrivate 后 34 条全绿"
-与"唯一那份明文产物没封"两格没闭），那是**另一张票的独立欠账**，与上面 ①② 无涉，也不因票 94 落地而消除。
+### 1) 票 94 能否挂 `-done`？—— **能挂，但是条件式挂：四条残留先立案、两句过头文案先降级。**
 
-**2)"封私有数据时用的路径现在是解析过的"这句今天能不能对 owner 说？—— 能有条件地说，但不能按票面措辞说。**
-**能说的部分（有实测支撑）**：对**链上 `internal/risk` 的进程**（`cmd/wisp`、`internal/agent` 实测 link）
-以及**没链 risk 的进程**（`internal/secret`、`internal/memory`），五个封存入口
-`PrivateDirAll`/`SealDir`/`SealFile`/`PrivateFile`/`PrivateFileExclusive` 现在都会在动手前先过
-C26 或内置 verifier，**junction 输入一律拒、且外来 DACL 一字不变**（本代理 PROBE D + 变异对照）；
-这条覆盖比"只改 `PrivateDirAll` 那一行"更宽，是票 94 的真实增量。
-**必须加的三个限定（都是本代理实测，不是假想）**：
-(i) **删除腿不在内** —— `RemoveUnlinked` 仍不解析，且已实测能沿 junction 删别人的真文件（PROBE F）；
-(ii) **"解析过"≠"封的就是调用方那棵"** —— C26 的 `expandInput` 会把含 `%VAR%`/前导 `~` 的拼写改写到
-另一棵树，winsec 封改写后的那棵并返回 nil，调用方拿不到 canonical（PROBE B2）；
-(iii) **它是"装了才解析"的保证，不是结构保证** —— 任何同模块包可用 `SetPathResolver` 换成橡皮图章，
-包内也能直接给未导出字段赋值（PROBE A / 变异），所以"下次不可能退回"这句话不能对 owner 讲。
-⇒ 对 owner 的准确表述是：**"今天这条路上，junction / 8.3 / `\\?\` / 尾点空格这一类已经会变成响亮拒绝
-而不是静默封错树；但删除口和'调用方与封存档各拿一份路径'这两格还没闭，票 94 没挂 done 就是为了这个。"**
+先说清楚判据从哪来往哪走：五枚 AC 本代理**逐条独立复现且全 PASS**（上表），
+门检 rc=0 的 8 行台账、`-count=2` 的 44/44/0/0、变异三条红名与 SID 级证据、AC#1 对编排者断言的推翻，
+没有一条是靠票面自报的数 ⇒ **这不是票 89 那种"账不实"的 `returned-for-fix`**。
+本代理**中途改过一次判**：起初把第 7 项②（`RemoveUnlinked`）当成"本票地界内没做完"从而压住 `-done`，
+随后自己做了探针 W，证明今天唯一生产调用方的 `filepath.WalkDir` **不下降进 junction**、
+构造不出那个删除路径 ⇒ 那条的准确定性是**导出 API 地雷**而非活缺陷，压 `-done` 不成比例。
+
+挂 `-done` 的四个条件（都只要求在账上，不要求在本票内改实现）：
+
+| 残留 | 本代理实测锚点 | 该谁收 |
+| --- | --- | --- |
+| R-a `expandInput` 把放置改写到另一棵树（含 `%VAR%`/前导 `~` 的数据根），封一棵、返回 nil、调用方写另一棵 | PROBE B2（三行打印：canonical 变了、caller 那棵 `exists=false`、err=nil） | **新票（安全类，优先级不低）**；AC#3 字面它 PASS（封的确实是 resolver 给的那棵），没覆盖的是"canonical 与调用方拼写指向两个对象"这种情形 |
+| R-b `RemoveUnlinked` 不校验祖先链，可沿 junction 删别人树里的真文件并返回 nil | PROBE F（`err=<nil>`、`foreign file … present: false`）；可达性由 PROBE W 限定为"今天不可达" | **新票**，立案时改掉票面"要先动 memory"那句（修法在 `internal/winsec` 自己包里） |
+| R-c `SetPathResolver` 无 `sync.Once`、无"只许变窄"检查；包外装橡皮图章后 `PrivateDirAll` 静默重写外来 DACL | PROBE A（`err=<nil>`、victim 的 `S-1-1-0` 由有到无） | 小改（本票地界即可）或并入 R-b 那张票 |
+| R-d 内置 verifier 的**正向半句**（干净绝对路径原样通过）树内覆盖 0 条 | MUTATION-94B：把 verifier 整个换成响亮拒绝，`go test ./internal/winsec/` **ok**，而 `secret`+`memory` 红 **49 条** | **转下张票**（两条用例，写在第 7 项①） |
+
+外加一条文案账：`resolve.go:88-90` 的 "filepath.Abs cannot come back without deleting a parameter
+type first" 与本票 Progress log 的"生产二进制永远走 C26"两句都**比实测强**（前者被本代理的变异直接打穿、
+后者被 PROBE E 的 init 顺序打穿），实现者补一条 append-only 的 Progress log 把话说准即可，不改判据。
+
+⚠ **不要把票 89 的账混进这一格**：票 89 现在是 `returned-for-fix`
+（`.scratch/wisp/issues/89-*.md:3` 自记"AC#2 一格 FAIL，其余五格 PASS"，锚点是"删掉 propagatePrivate
+后 34 条全绿"与"唯一那份明文产物没封"）。那是**另一张票的独立欠账**，既不因票 94 落地而消除，
+也不该算到上面 R-a..R-d 任何一条上；两票现在都在改 `internal/winsec/`，**并树时先后顺序要编排者定**。
+
+### 2) "封私有数据时用的路径现在是解析过的"—— **能有条件地说；按票面那句原话说是不行的。**
+
+**能说的部分（本代理实测）**：不管进程有没有链上 `internal/risk`
+（实测 `internal/secret`、`internal/memory` **不链**，`internal/agent`、`cmd/wisp` **链**），
+五个封存入口 `PrivateDirAll`/`SealDir`/`SealFile`/`PrivateFile`/`PrivateFileExclusive`
+现在都会在动手**之前**先过 C26 或内置 verifier：一个中途带 junction 的输入
+**四条腿全部拒、不在链接下建目录、不写文件、外来 DACL 一字不变，而同一棵树不带链接时照样封得成**
+（PROBE D + AC#3 变异对照）。这条覆盖面比"把 `winsec.go:126` 那一行换掉"宽，是票 94 的真实增量。
+
+**必须同时说的三个限定（都是实测，不是假想）**：
+(i) **只保"封存"这一族**：`RemoveUnlinked` 仍不解析（R-b），今天够不到，但它是同一个包里导出的口；
+(ii) **"解析过"不等于"封的就是调用方要写的那棵"**：装了 C26 时 `expandInput` 会改写含 `%VAR%`/前导 `~`
+的拼写，winsec 封改写后那棵并返回 nil，而 canonical 没有任何渠道回到调用方
+（`memory/open.go:181-183` 之后全用自己的词法 `abs`）⇒ 见 R-a；
+(iii) **它是"装了才解析"的保证，不是结构保证**：同模块任何包能把 seam 换成橡皮图章（R-c），
+包内 3 行就能伪造 `ResolvedPath`（本代理的变异），所以"下次不可能退回"这种话不能对 owner 讲。
+
+⇒ 给 owner 的准确句子是：
+**"决定'给哪棵树封权限'的那一步，今天不会再拿一条只做词法拼接的路径去动别人的 DACL 了——
+带链接的形状一律响亮拒绝，这一条我们能在真机上调出来给你看；
+但'解析过的路径'与'调用方真正写进去的那棵树'是不是同一棵，还差 `%VAR%` 展开那一格（R-a），
+删除那条腿也还留着（R-b），这两格已经立案，没算在'已完成'里。"**
