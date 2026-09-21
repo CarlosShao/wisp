@@ -156,3 +156,17 @@ Windows 侧票 108 已经把"祖先链是不是链接"这把刀做出来了（�
   重跑 R-108-1 那枚 fixture（`data/link/keep-me.txt`），要读到 `SealFile` **拒 + 外来 mode 不动**；(b) 摘掉本票这发腿做变异（AC#4 那三形状：整腿关 / 去掉叶子 / 只查一层），三发各红在点名用例上；
   (c) 别忘了反半边（`a\b` 那两枚 + 普通路径照旧封），否则"拒一切"会被当成绿。**108 的另一半 `R-108-2`/`R-108-3` 仍待裁**，本票没替它答。
   ⚠ 还欠一句：票 108 结案前**票 112 与 104-109 的三条 winsec 红、models 的 109 修前红必须先落**，否则验收方在 HEAD 上会读到 1 枚非本族的红（本次实测 `internal/models` 就是这种状态）。
+- 2026-09-21 20:36（agent-ticket113）：**在最新 HEAD 上复量一遍，上面那格的"非本族红"已经不是红**。档位=独立复现。
+  邻居在我 `3c5d1c3` 落地前后往 `internal/winsec/resolve.go`（+79）与 `export_test.go`（+15）提交了东西，
+  所以"我的绿属于 `ef65864` 那棵树"这句话不能留在票面上——重新 `git archive 3c5d1c3` 到仓外 `/d/tmp/wisp113-agent-ticket113/head113`，容器内同一条仪器重跑：
+  - 挂载先证：容器内 `ls /src/internal/winsec | wc -l` = **22**、`ls | grep -c 113` = 1（我的用例在树里）。
+  - POSIX 全套 `-count=1 -v -run 'TestAC1POSIX|TestAC2POSIX|TestAC3POSIX|TestAC4POSIX' ./internal/winsec/` ⇒ **rc=0、RUN=16 / PASS=16 / FAIL=0 / SKIP=0**
+    ⇒ 正+反两边在邻居的新 `resolve.go` 之上照样成立（他们那 +79 行没有把这条腿变松，也没被这条腿打死）。
+  - **`-count=2 -v` 五包（winsec/memory/risk/secret/models）⇒ rc=0、`=== RUN` 540 / `--- PASS` 532 / `--- FAIL` 0 / `--- SKIP` 8 行（= 4 个名字 × 2 轮，`-v` 量的；`-count=2` 不缓存）**；
+    逐包 `ok winsec 0.313s / ok memory 24.173s / ok risk 8.032s / ok secret 0.011s / ok models 0.431s`
+    ⇒ 上面那 2 行 `internal/models` 的红是 `agent-ticket104-109` 在那一刻的**修前红**，他们已在本轮之前自己收掉（现在 0 红）；本票从头到尾没碰过那枚包。
+    SKIP 名单与上一致：`TestSubprocessCrashWriter`、`TestC26RewrittenSyncRootDoesNotDisarmSuspectNet`、两枚 `TestRealDownload*`（容器无外网）。
+  - 静态三门在同一棵快照上重跑：`gofmt -l .` **0 行**、容器 `go vet` 五包 rc=0、`GOOS=windows go vet` 五包 rc=0、`GOOS=darwin go vet ./internal/winsec/` rc=0；
+    `sh scripts/d22scan.sh` **rc=0**：`bans #1-5 internal/=202`、`cmd/=20`、`ban #6 frontend/=40`、`ban #7 internal/tools/=18`、`ban #8 design/=16`、`frontend/=40`、`internal/=368`、`cmd/=26`
+    ⇒ 与票 108 验收读数逐项对齐且**不降**；这组数对应 `git rev-parse HEAD` = `3c5d1c3`（台账那条"读数与 sha 同行登记"的建议我在本票内执行）。
+  next= 交验收。本票交件三枚 commit：`ef65864`（修前红 + 用例）、`3c5d1c3`（修法 + 票面读数）、本条（最新 HEAD 复量）。**未 push**。
