@@ -1,8 +1,13 @@
 # 75 — Path canonicalization emits Windows-shaped (backslash) paths on Linux, so `internal/tools` is 19 FAIL + a 600 s timeout in `test-core`
 
-**Status:** ready-for-agent, **but hold dispatch until ticket 73 lands** (same package `internal/tools`)
+**Status:** ready-for-agent, **派发被两张票压住（我建票时把这条写错了，现在更正）**
 **Type:** portability defect (CI-blocking)
-**Blocks:** ticket 70 AC#2 (`test-core`) · **Blocked by:** ticket 73 (package conflict, not semantics)
+**Blocks:** ticket 70 AC#2 (`test-core`)
+**Blocked by（原文是"票 73"，那是错的）**：**票 72** 才是真冲突——它此刻正在 `internal/risk/` 里改
+`pathresolver*.go`，而本票的正解**极可能就是同一个文件**（C26 的 canonical 在 Linux 产反斜杠）。
+同包并行 = 假并行（会把对方的改动吞进我的 diff 或反过来）。票 73 已 `done`，`internal/tools` 现在反而是空的。
+⇒ **派发条件 = 票 72 落地之后**。等待期不浪费：我另派了一个**只读**代理去做根因定位
+（只查不改，产出"哪一行在 Linux 上产反斜杠"的证据表），这样本票开工时不必从冷搜索开始。
 **Packages:** `internal/tools` (+ possibly `internal/risk/pathresolver*` = **frozen, D22 — see below**)
 **Evidence:** ticket 70's run forensics (`24a66b6`), docker `golang:1.27` reproduction with the CI command verbatim
 

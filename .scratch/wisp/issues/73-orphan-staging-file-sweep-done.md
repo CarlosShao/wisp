@@ -1,6 +1,13 @@
 # 73 — Sweep orphan `.wisp-tmp-*` staging files left by a real kill
 
-**Status:** ready-for-review — AC#1–AC#5 全部已证并勾（证据 `docs/evidence/s1/73-orphan-staging-sweep.md`）；本票收尾，未 push
+**Status:** **done（5/5 PASS，编排者 2026-09-21 10:05 归档）**
+裁决表 + **我自己做的五发变异矩阵**：`docs/evidence/s1/73-adversarial-acceptance.md`。
+全部动作在 `git archive HEAD` 解到 `/tmp` 的**纯净树**里做（共享树里四个代理在写码）。
+要点：**单独关掉 reparse 门或 `IsRegular` 门，三条安全用例都不红；两门全撤 + 前缀归属 ⇒ 三条齐红**
+⇒ 判定为**分层冗余防御**而不是"测试无效"（这两者必须分清，前者不是缺陷）。
+⚠ 顺带抓到一处**错归因**并已登记：`staging_live_windows.go:49` 的注释把 junction 安全归给 reparse 门，
+实测真 junction 是**非 regular**、先被 `IsRegular()` 挡下 ⇒ 危险是反的（后人读注释敢删真正兜底那行）。
+交回的六条处置全在裁决表末节，其中"旧命名孤儿永久不可归属"升级为 **Q-18**（owner）。 ready-for-review — AC#1–AC#5 全部已证并勾（证据 `docs/evidence/s1/73-orphan-staging-sweep.md`）；本票收尾，未 push
 **Type:** defect-fix (bookkeeping of a proven leak)
 **Blocks:** nothing · **Blocked by:** nothing (the characterization test already exists)
 **Spec refs:** D31 atomic-rename, SPEC-07 §2–§3, registry **A18**
