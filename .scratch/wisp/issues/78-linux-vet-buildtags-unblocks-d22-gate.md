@@ -1,6 +1,6 @@
 # 78 — Fix the Linux-only `go vet` errors that have been silently skipping the D22 gate in CI since `fd8f838`
 
-**Status:** in-progress (agent=ticket78；`mulA` 已定位、`internal/proc` 实测 Linux 已干净、发现第三处 Linux 阻塞是本机交叉编译伪影) (**优先级最高：它是 A44① 的因——D22 门禁从未在 CI 上产出过一次结论**)
+**Status:** in-progress (agent=ticket78；修复 `2201530` + 回归门禁已落，AC#1-3 已勾并附 exit code，只剩 AC#4 等编排者 push 的 run id) (**优先级最高：它是 A44① 的因——D22 门禁从未在 CI 上产出过一次结论**)
 **Type:** build/portability defect (tiny diff, large governance consequence)
 **Blocks:** 票 71 的 AC 收尾、票 77（新 CI job 不能建立在一个哑步骤上）、`test-core`/`lint` 的可信度
 **Blocked by:** nothing — `internal/ball`（票 74 已 done）与 `cmd/wisp`/`internal/proc`（票 66 已 done）现在都空
@@ -32,12 +32,12 @@ vet 一失败，**扫描步骤被 `skipped`，D22 门从未在 CI 上给出过�
   就用 tag 把它挡掉，让 Linux 上根本不存在这条路径。
 
 ## AC（1:1 裁决表）
-- [ ] **AC#1** `GOOS=linux go vet ./...`（主模块）干净——**这就是本票的判据仪器**，
+- [x] **AC#1** `GOOS=linux go vet ./...`（主模块）干净——**这就是本票的判据仪器**，
       必须给出真实命令与 exit code。⚠ 变异检验：把任一处修复退回旧形状 ⇒ 该命令必须转红
       （**先 grep 证变异落盘再跑**，还原后证明确实还原）。
-- [ ] **AC#2** Windows 侧**零行为变化**：`go test ./internal/ball/ ./internal/proc/ ./cmd/wisp/ -count=2` 全绿，
+- [x] **AC#2** Windows 侧**零行为变化**：`go test ./internal/ball/ ./internal/proc/ ./cmd/wisp/ -count=2` 全绿，
       且 `gofmt -l` 触及包为空。
-- [ ] **AC#3** 一条防回归的机械检查：新增用例或 CI 步骤，使"无 tag 文件引用 windows-only 符号"这类形状
+- [x] **AC#3** 一条防回归的机械检查：新增用例或 CI 步骤，使"无 tag 文件引用 windows-only 符号"这类形状
       **在 CI 上必红**（可选实现：`GOOS=linux go vet ./...` 作为 lint job 的一步）。
       判据：它必须自己有一次真红（种子一个故意的引用 ⇒ 步骤红），否则等于没装（A15/A44①）。
 - [ ] **AC#4** D22 扫描步骤**第一次产出真实 CI 结论**：交回 push 之后的 run id + job id + 该步骤的结论。
@@ -71,3 +71,48 @@ vet 一失败，**扫描步骤被 `skipped`，D22 门从未在 CI 上给出过�
   `proc.Runtime` 持 `*JobScope`/`*SingleInstance`（Job Object + 命名互斥体）⇒ **真平台相关**，走 tag。
   **next=** 下一 commit 落两处修复；AC#3 倾向"测试内 exec `GOOS=linux go vet`"（仓内已有先例
   `cmd/wisp/secret_argv_windows_test.go:166` exec `go`），从而**不改 ci.yml**，把该文件留给票 71/77。
+
+- [2026-09-21T03:07:49Z] agent=ticket78 did=**修复落地（`2201530`）+ 装上回归门禁（本 commit）**。
+  **票面"已测事实"是采样偏差不是清单**：`go vet` 每包只印**第一个**类型错误，所以 CI 日志的 2 行
+  ≠ 全集。用 `go build -gcflags=-e` 与 `go test -gcflags=-e -c`（含测试文件）量到
+  **22 处 / 4 文件**：`statevisual.go` 1(mulA)、`hotkey_test.go` 19(modControl/vkEscape/
+  ParseAccelerator/DefaultHotkeys/…)、`liquid_test.go` 1(pal)、`slo.go` 8、`main.go` 3。
+  `secret.go` 是**假阳性**——`proc.Boot` 只出现在它的散文里（"This command never calls proc.Boot"）。
+  形状**逐个符号**定：① mulA 只做通道运算，`Color` 与兄弟 `rgba`/`hex`/`WithAlpha` 全住在无 tag 的
+  tokens.go ⇒ **移符号**，40+ 个 windows 调用点一行不改；② hotkey_test.go 的对象整体是 Win32
+  MOD_/VK_ + RegisterHotKey 语法 ⇒ **tag 掉**（同包 `hotkey_status_test.go` 早就带这个 tag）；
+  ③ liquid_test.go 的 `pal` 定义就是 `var pal = DarkPalette()`（renderer_windows.go:77）且该测试从不
+  SetTheme ⇒ 改调 `DarkPalette()`，Windows 上逐位等价、断言强度不减（**不**为省事关掉整份可移植测试）；
+  ④ proc.Boot/Runtime/ErrAlreadyRunning/SignalExistingInstance 与 runResident 真平台相关 ⇒ 函数体
+  **逐字**搬进 `slo_windows.go`/`resident_windows.go`，各配 `_other.go` 的 **exit 2 闭合失败**
+  （沿用 slo 自己"起不来/测不到就 2"的码），**零值 stub 一个没造**。
+  为什么不给整个 cmd/wisp 加 windows tag：实测含可构建包的树里，`GOOS=linux go vet ./...` 对
+  **全文件被排除**的包**静默跳过**（mixed 用例 rc=0）——那是把主二进制从门禁里摘掉，与本票目的相反。
+  **判据**：纯净 HEAD + 同一仪器 `GOOS=linux go vet ./...` **rc=1**（逐字节复现票面两条）；修复后
+  **rc=0**。cmd/wisp 那侧本机拿不到判据（`GOOS=linux` 时 CGO_ENABLED 自动降 0，sherpa 的文件被全排除；
+  强开则死在 runtime/cgo 的 sys/mman.h），故用 `/tmp` 纯净副本 + 只含 GetVersion/GetOnnxruntimeVersion
+  的 sherpa 桩（仓外、未提交）测得 rc=0，真值仍以 CI 的 ubuntu 为准。
+  **AC#1 变异检验**：mulA 退回 renderer_windows.go，grep 锚在**声明行**证落盘 ⇒
+  `GOOS=linux go vet ./internal/ball/` **rc=1** 报 `statevisual.go:287:17: undefined: mulA`；
+  `git checkout HEAD --` 那两文件还原 ⇒ 同命令 **rc=0**。
+  **AC#2**：`gofmt -l internal/ball internal/proc cmd/wisp` 空、`go build ./cmd/wisp/` rc=0、
+  `go vet` 三包 rc=0、`PATH=third_party/sherpa-onnx:$PATH go test ./internal/ball/ ./internal/proc/
+  ./cmd/wisp/ -count=2` 三包全 ok rc=0。顺带量到一个**先于本票存在**的坑：不带该 PATH 时
+  `go test ./cmd/wisp/` 直接 `exit status 0xc0000135`（buildWispForTest 造的子 wisp.exe 找不到 native
+  DLL）；**已证与本票无关**——同一沙盒把 HEAD 的 cmd/wisp+internal/ball 换回去、真实 go.mod、同命令，
+  红得逐字符相同。
+  **AC#3** 落在 `internal/proc/crossvet_test.go`：`internal/proc` 是我自有包里**唯一两个 CI job 都会跑**
+  的（ubuntu test-core 与 windows "Portable windows tests" 都列了它），而 `internal/ball` 的测试没有任何
+  job 跑——放那儿等于没装。它在任何 host 上 exec `GOOS=linux go vet` 覆盖 cgo-free 的 proc+ball，
+  **无 skip 分支**（go 解析不到就 Fatalf）。它自己那次真红：种子 `func ticket78Canary() Palette {
+  return pal }` 进无 tag 文件 ⇒ 本机 `go build` **rc=0**、`go vet` **rc=0**（Windows 全盲，正是这个类
+  活了 20+ 提交的原因），`GOOS=linux go vet` **rc=1**、该测试 **rc=1**；种子已删（`test -e` = GONE）。
+  ⚠ 建门禁时**连踩本票自己的坑两次**，是教训不是脚注：文件名 `crossvet_linux_test.go` 的 `_linux`
+  后缀**本身就是一条隐式 build tag**，windows 上整文件被排除，`go test -run` 打 `no tests to run`
+  还 **rc=0 假绿**（ci.yml:139 记的正是这类），改名 `crossvet_test.go` 才看见 `=== RUN`；
+  `go vet` **不认 `-count`**（带上就把门禁做成永久红）；种子注释里的 `//go:build` 字样会让
+  `grep 'go:build'` 假报"有 tag"，锚必须打 `^//go:build`——"变异检验要锚在真正承载它的那一行"第三次成立。
+  **next=交编排者（AC#4，本框不勾，我没 push）**：push 后请回填 run id + job id + `lint` job 里
+  **"D22 seven-ban + emoji scan (tools/d22scan)" 这一步的 conclusion**——那才是本票存在的理由；
+  同一次里 `go vet (module)` 应从 X 变 ✓（它不再 abort 后面的步骤）。按 A44③ 先排掉 cancelled /
+  `jobs.total_count = 0` 的排队被取代 run，那不是样本。
