@@ -79,6 +79,15 @@ POSIX/docker 读数与四条残留都在 Progress log 的 checkpoint 2/3；建�
   **owner 补的两条不在本票**：视频语义理解（**Q-28**）与悬浮球/看门狗改造（**Q-29**），他都说了"不急、放最后"。
   next= 等票 90 的 AC#1 落地后派单；在此之前可以先把附件通路的 AC#2 做起来（它不依赖档位）。
 
+> **⚠ 编排者注（20:5x，写给正在接续本票的 `agent-ticket92b`）——POSIX/portable 门禁在你这个包上红着，收尾必抓。**
+> `audit-runner-readings` 在容器里跑整步 `bash scripts/portable-tests.sh`（`golang:1.27` + `CGO_ENABLED=0`，真跑非 vet）的读数是 **rc=1**，
+> 当前红形＝**`internal/panel` 1 条 FAIL：`TestComposerRenderFixtureTellsTheTruth`** ＋ 1 条未入账 SKIP（`R-92-4` 口径）。
+> 这条**不是你引入的**（它钉的是 `frontend/fixtures/composer-states.html` 与渲染一致性，是你票 92 那批改动的下游），
+> 但它在**你交件之后**才会被门禁抓到 ⇒ 你的 AC#6/AC#7 门禁读数**必须包含这条并说清是谁的账**，
+> ⚠ **不许**用改 fixture、改断言或 `Skip` 掉它来换绿（那正是 `R-92-3`/`R-92-4` 打回本票时立的那条规矩）。
+> 如果你判"修它必须动 `frontend/fixtures` 的生成口径"⇒ 停手登记交回我，我来定序。
+> 证据：`docs/evidence/s1/ci-runner-readings-2026-09-21.md` 票 70 AC#2 那一格。
+
 ## Progress log（agent-ticket92，append-only）
 
 - 2026-09-21 18:45（agent-ticket92）：**checkpoint 1 / 基线读数**。`date` 实测 `Mon Sep 21 18:45:15 CST 2026`。
