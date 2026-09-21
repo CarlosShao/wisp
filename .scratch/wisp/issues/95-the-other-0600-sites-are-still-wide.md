@@ -60,6 +60,72 @@
 
 ## Progress log（append-only）
 
+- 2026-09-21 18:0x（`agent-ticket95`，**第一枚 checkpoint：AC#1 前三类裁定 + 那条模型矛盾的取证**）：
+  先跑 `date`：本机 18:01 CST。开工前现场核对（`git status`）：`scripts/d22scan.sh` 与
+  `internal/winsec/seam_guard_windows_test.go` 有别人的未提交改动 ⇒ 我这两个文件/目录一字未动。
+
+  ### 一、那条自相矛盾：我用证据判了，判给**台账**（票 95 表里那一格错），并登记"该更正"
+
+  判据问题是编排者给的两句：**校验发生在读取时还是写入时？对象是每个模型文件还是一份索引/清单？**
+  两处原文我都读了：票 95 表第 20 行（`archive.go:41/:73/:78` 标"要封"，理由是"这些文件之后被当作可信
+  模型读回"）与台账 `docs/reports/pending-and-issues.md:1433`（A68⑤："**模型缓存不封**——公开签名的模型文件
+  （C29 走签名清单），读到不产生泄露，封了反而挡住多实例复用"）、`:1124`（A76③ 登记这条矛盾本身）。
+
+  取证（全部为本机实读源码，file:line 为我这次核过的当前行号）：
+  1. **读取时**校验：`internal/models/downloader.go:170-174`——`Ensure` 的缓存命中分支在返回安装目录之前
+     必须过 `m.VerifyDir(entry, installDir)`；`:161` 的 `local_override` 分支同样过它。校验**不在写入侧独活**。
+  2. **每个文件**校验：`VerifyDir` 在 `downloader.go:519-531` 遍历 `entry.InstalledFiles()` 逐个
+     `verifyFileHash(p, want.SHA256, want.SizeBytes)`；`InstalledFiles()` 的定义在
+     `internal/models/manifest.go:218-229`——归档件走 `a.Archive.Files`（清单里逐条列出的成员），
+     非归档件走 `a.Path/SHA256/SizeBytes` ⇒ 覆盖面是**每个落盘文件**，不是一份索引。
+  3. 校验基准的权威来源：`internal/models/doc.go:6-16`——清单本身用 minisign 离线验签
+     （`manifest.go`/`minisign.go`，公钥在 buildinfo），**先验签再联网**，hash 只从清单取（`downloader.go:53-64`、
+     `manager` 构造期双门 `:99-107`）⇒ 换一份清单要换构建期公钥，不是同机另一账户能做的事。
+  4. 解包产物离开 staging 之前还有一道全量门：`downloader.go:263-276`（staging 内逐个 `verifyFileHash`，
+     失败 ⇒ `RemoveAll(staging)` 拒绝）。
+  ⇒ **结论**："未过签名的文件也会被当作可信模型读回"这个前提**不成立**；票 95 表第 20 行括号里那句
+  "之后被当作可信模型读回"恰恰是该类**已被逐文件校验**的位置，不是密封的理由。
+  ⇒ 判：**`internal/models/` 四类落点（staging `:224`/`:287`、解包 `:73`/`:78`/`:41`、安装目录 `:566`）不封**，
+  按 AC#3 给**反向钉子**（钉住"读取时逐文件校验"这两条事实本身，任一条退化 ⇒ 用例红 ⇒ 裁定必须重开）。
+  ⚠ **改台账不是我的职权**：`docs/reports/**` 一字未动；这里登记的是"票 95 表第 20 行该更正"，交编排者落账。
+  ⚠ 顺带一条诚实修正：台账那句"封了反而挡住多实例复用"的**代价**说得不准——`winsec` 封的是
+  当前用户 SID（+SYSTEM+Administrators，见 `winsec.go:16-19`），**同一用户的其它实例照样读得到**，
+  被封的只有别的账户。⇒ 不封的真正理由是"读到不产生泄露（内容公开且逐文件校验）"，不是"怕挡到复用"。
+
+  ### 二、AC#1 其余两类（本 checkpoint 判完）
+
+  - **④ 凭据迁移 `internal/secret/migrate.go:154`/`:168`——票面引用已腐坏，本票无活可接**。
+    实读当前源码：该两处今天**已经**是 `winsec.PrivateFile(backupPath, raw, 0o600)`（`:169`）、
+    `winsec.SealFile(backupPath)`（`:174`，既存备份的修复腿）、`winsec.PrivateFile(tmpPath, out, 0o600)`（`:189`），
+    是票 89 退回单补的。**泄露后果**：备份是迁移前那份配置，装着用户迁移前的**全部明文 api_key**
+    （源码注释 `:157-163` 自己点名），同机另一账户读到＝密钥泄露。**封了谁会读不到**：只有
+    `secret.MigratePlaintext` 自己（写后不再读回）与用户手看的备份文件——同一用户仍可读。⇒ 无代价。
+    ⚠ 但票面 17:4x ②那条"**`MigratePlaintext` 至今无生产调用方**"我复核为**真**：
+    全仓 `grep -rn MigratePlaintext` 只有 `internal/secret/migrate.go:66/:86` 的定义与 `*_test.go`
+    ⇒ 票 89 那三处密封今天是"能力就绪、没人叫它"。**接线点在装配根（`cmd/wisp/`）＝别人地界**
+    ，且它改的是"启动即改写用户配置文件"这种产品行为 ⇒ **本票不接、登记**（见末尾 R-95 清单），
+    `next=` 编排者裁装配根归属。
+  - **③ 配置写路径 `internal/config/migrate.go:83` + `internal/config/parse.go:200/:213`——判"要封"，本票接线**。
+    真实写入格式（读一处）：`migrate.go:82-85` 把**迁移前的原始 TOML 字节** `raw` 整份写进
+    `path + ".bak-" + strconv.Itoa(from)`，模式参数 `0o600` 在 Windows 不落地；
+    `parse.go:200-218` 是 `atomicWrite`：`os.CreateTemp(parent, ".wisp-config-*.tmp")` 写完后
+    `os.Chmod(tmpName, 0o600)`（同样不落地）再 `os.Rename` 到 `config.toml`——**rename 保留描述符**
+    （同一事实在 `secret/migrate.go:185-188` 已被写死），所以那个 pre-rename 临时文件的宽 ACL
+    **就是最终 `config.toml` 的 ACL**。
+    逐字段判"里面实际会出现什么"（票面 17:4x ①要求）：`internal/config/schema.go` 的
+    `providers.<n>.api_key` 走 `RefPrefixDPAPI` 引用（`secret/configrefs.go:16` 一族），
+    但**迁移前**的配置里同一个键可以是**明文**（正是 `secret.MigratePlaintext` 存在的理由，
+    `secret/migrate.go:157-163`），另有 `[models]` 镜像 URL、`local_override` 绝对路径、
+    `[llm]` 端点、日志目录路径。⇒ 泄露给同机另一账户的后果＝**可读的配置在票 89 之后仍然宽**：
+    `config.toml` 与其 `.bak-<schema>` 明文备份在别的账户眼里是明文文件。
+    **封了谁会读不到**：`config.Load`/`atomicWrite` 与配置编辑器都以**同一用户**身份跑（`winsec` 授的是当前用户
+    SID），⇒ 只有"别的本地账户读配置"这条路被关；`wisp doctor` 若以另一账户跑会读不到（本票不跑那种形态）。
+    ⇒ 接 `migrate.go:83`（`winsec.PrivateFile`）与 `parse.go` 的 temp（`winsec.PrivateFile` 取代
+    `CreateTemp`+`Chmod`，保留独占语义）。
+
+  未判：⑤ 日志（**做证据但不接线、不写反向钉子**，代价两条路写清交回）、⑥ 球位置、⑦ doctor/SLO（**只登记**）。
+  next= 见本条末尾。
+
 - 2026-09-21 17:4x（编排者，**票 89 复验把两笔账明确转到本票**，登记不扩写）：
   ① `internal/config` 的写路径与它的 `.bak-<schema>` 备份**今天仍然宽**（复验代理实测点名，
      与票 89 已修的 `secret/migrate.go:154` 同族、同形状）⇒ 进本票 AC#1 的裁定清单，
