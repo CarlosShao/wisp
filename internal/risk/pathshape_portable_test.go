@@ -168,6 +168,86 @@ func TestTierAAnchorsMatchNativeSpelling(t *testing.T) {
 	}
 }
 
+// TestOverrideKeyKeepsPosixBackslashesDistinct is ticket 75 item P4 on the
+// ALLOW side of the blacklist. Gate's bOverrides map — the L2 single-file
+// confirmation, and the shape config's risk.blacklist_overrides will feed — is
+// keyed on normPath output. normPath used to fold '/' into '\' unconditionally,
+// and '\' is an ordinary character inside a POSIX file name, so TWO DIFFERENT
+// FILES SHARED ONE COMPARISON KEY and a confirmation recorded for either one
+// unlocked the other. A merge on the deny side is an annoyance; a merge on the
+// allow side is fail-open, which is the same invariant ticket 72 states as
+// "the basis for letting something through must be the one spelling the OS
+// vouches for".
+//
+// The pair below is that collision in minimal form, chosen so BOTH members are
+// still B-tier after the fix — that is what makes the bleed reachable at all:
+//
+//	<home>/id_k/x.pem   a directory plus a file           -> B via "*.pem"
+//	<home>/id_k\x.pem   ONE file name holding a backslash  -> B via "id_*"
+//
+// Pre-fix both folded to "\home\u\id_k\x.pem" (baseName cut on the '\' too, so
+// the second one read as "x.pem" and inherited the first one's key).
+func TestOverrideKeyKeepsPosixBackslashesDistinct(t *testing.T) {
+	home, _, _ := sandbox(t)
+	if filepath.Separator == '\\' {
+		// The same function, in the direction that is real on Windows: the two
+		// separator spellings of ONE file must keep folding to ONE key, or the
+		// override an operator confirmed would stop applying to its own file.
+		// Asserted here so this test has content on both platforms instead of
+		// being a silent no-op on one of them.
+		a := normPath(filepath.Join(home, "id_k", "x.pem"))
+		b := normPath(home + `\id_k/x.pem`)
+		if a != b {
+			t.Fatalf("Windows must fold both separators into one key: %q vs %q", a, b)
+		}
+		return
+	}
+
+	nested := filepath.Join(home, "id_k", "x.pem")
+	flat := filepath.Join(home, `id_k\x.pem`)
+	for _, p := range []string{nested, flat} {
+		if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(p, []byte("key material"), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if normPath(nested) == normPath(flat) {
+		t.Fatalf("two different POSIX files fold to one comparison key %q", normPath(nested))
+	}
+
+	resN, err := Resolve(nested, nil)
+	if err != nil {
+		t.Fatalf("Resolve(%s): %v", nested, err)
+	}
+	resF, err := Resolve(flat, nil)
+	if err != nil {
+		t.Fatalf("Resolve(%s): %v", flat, err)
+	}
+	for _, tc := range []struct {
+		path, canon string
+	}{
+		{nested, resN.Canonical},
+		{flat, resF.Canonical},
+	} {
+		if got := Classify(tc.canon); got != ClassB {
+			t.Fatalf("classify(%q) = %s, want B: the fixture must stay in the tier that has an "+
+				"override seam (%s)", tc.canon, got, tc.path)
+		}
+	}
+
+	// The bleed itself: the operator confirmed exactly ONE of the two files.
+	ovr := map[string]bool{normPath(resF.Canonical): true}
+	if d := Gate(resF.Canonical, ovr); !d.Allow {
+		t.Fatalf("the override must apply to the file it was recorded for: %+v", d)
+	}
+	if d := Gate(resN.Canonical, ovr); d.Allow {
+		t.Fatalf("CROSS-FILE BLEED (fail-open): the override recorded for %q unlocked the different "+
+			"file %q (verdict %+v)", resF.Canonical, resN.Canonical, d)
+	}
+}
+
 // TestSyncAncestorWalkVerifiesNativeChain pins the syncdirs half of the defect:
 // deepestExistingAncestor hands each prefix to os.Lstat, so a '\' joined walk
 // verified NOTHING on Linux and every write fail-closed to sync-suspect.

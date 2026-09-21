@@ -1,6 +1,6 @@
 # 75 — Path canonicalization emits Windows-shaped (backslash) paths on Linux, so `internal/tools` is 19 FAIL + a 600 s timeout in `test-core`
 
-**Status:** in-progress（票 72 已落地 `f1033e1` ⇒ 派发条件满足；开工即测量）
+**Status:** in-progress（owner 指派的四项里 1/2/3 已完成并测量；剩 AC#4 由 owner 用交接段落关闭、AC#6 需 owner 推送后的 run 证据）
 **Claimed by:** implementer agent（2026-09-21 10:2x）
 **Evidence:** `docs/evidence/s1/75-rootcause-linux-path-shape.md`（根因 file:line + AC#1 docker 基线 + AC#4 提案）
 **Type:** portability defect (CI-blocking)
@@ -85,9 +85,10 @@ reading you implemented and **why, in the commit message**.
   → `Gate`/`overrideApplies` 的 `bOverrides` 那一侧只被测了"两种 Windows 拼写不改变裁定"（且那条在
   `_windows_test.go` 层，Linux 上不跑）** ⇒ 本代理补一条不带 tag 的正反两用例（见下一个 commit）。
 - **第 3 项**："靠这层脏才绿"的用例：`TestFourChannelExfilSuite/fs.write_into_sync_dir` 的 fixture 已由
-  `ed74595` 换成 `t.TempDir()` 下的真实平台形状目录（POSIX 等价腿已在），但"Windows 字面量"那一腿与
-  "修好之后一条外平台字面量**不该再**被判 sync 嫌疑"这条反向钉都还不存在 ⇒ 分层补齐（windows 层 +
-  POSIX 层 + 不带 tag 的反向钉）。
+  `ed74595` 换成 `t.TempDir()` 下的真实平台形状目录（跨平台那条腿已在）。本代理补的是另两半：
+  windows 层的拼写不变式（含"根外目标不得被标"的反向钉，只有 Windows 判得动）与 `//go:build !windows`
+  层的 POSIX 等价用例（含休眠的"普通写不嫌疑"腿）。原计划的"不带 tag 的反向钉"被实测否掉了 —— Linux 上那条
+  断言现在必然红（票 55 的检测缺口），写死它等于替票 55 糊一层，故改为休眠形式；见下面落地段。
 - **第 4 项 AC#4 保持不勾**（owner 裁决 R17：修实现去符合既有契约 ≠ D22 改契约）。交接段落已写进本文件
   Progress 末段，供 owner 亲自关闭。
 
@@ -115,3 +116,39 @@ A/B 表内容、`Class` 取值、函数签名、调用点、`Resolve` 的 fail-c
   ② sync-write exfil 用例分层（windows 层字面量腿 + 不带 tag 的"外平台字面量不再一律嫌疑"反向钉）→
   ③ 重跑票 72 的六条不变式 + `GOOS=linux go vet` 两侧门，然后**由 owner 推送**后按 run id + job id 读
   `test-core` 补 AC#6（本代理不 push）。AC#6 框在此之前保持不勾。
+
+- 2026-09-21 接续代理第 2/3 项落地完毕（下面三段是测量，不是计划）。
+  **P4 状态**：`ed74595` 已经修掉实现（`internal/tools/paths.go` 的 `const sep` →
+  `pathSep = string(filepath.Separator)` + `unifySeparators` 平台分支；`internal/risk/blacklist.go:134`
+  的 `normPath` 同一处置），tools 侧由 `TestFoldPathKeepsPosixBackslashesDistinct` 钉住**白名单根**那一侧；
+  **`bOverrides`（放行侧 map 查表）那一侧当时没有 POSIX 用例**，本代理补
+  `internal/risk/pathshape_portable_test.go:TestOverrideKeyKeepsPosixBackslashesDistinct`
+  （不带 build tag；`<home>/id_k/x.pem` 与同名但含反斜杠的 `<home>/id_k\x.pem` 两条都判 B、折叠键必须不同、
+  给其中一条的 override 不得解锁另一条；Windows 分支断言"同一文件的两种分隔符拼写必须仍折成一个键"，
+  所以它在两个平台上都不是空跑）。**变异对照**：(M1) 把 risk 的折叠改成无条件 ⇒ 该测试 Linux 红
+  （docker `golang:1.27`，`--- FAIL`，RC=1）；(M1b) 把折叠在 Windows 侧关掉 ⇒ 同一条测试在 Windows 红。
+  **exfil 用例分层**：windows 层新增 `internal/risk/provenance_syncdirs_windows_test.go:
+  TestExfilSyncWriteWindowsSpellingInvariant`（7 子项：真实同步根内 4 种拼写必须全升 `ChSyncWrite`，
+  根外 3 种拼写必须不升 —— 后者就是"不是一张一律捞起的网"那一半，只有在本机检测能走完时才判得动），
+  POSIX 层新增 `internal/risk/provenance_syncdirs_other_test.go`（`//go:build !windows`）
+  `TestExfilSyncWritePosixSpellingInvariant`（用 `t.TempDir()` 构造，含"文件名里带 `\` 仍在同步根内"一条；
+  它的"普通写不该被标"反向腿**显式做成休眠断言**：`SyncDetectionComplete()` 为假时只 `t.Log`，票 55 落地即自动生效，
+  因为今天那条腿在 Linux 上属于票 55 那 8 条红，本代理不糊）。
+  **变异对照**：(M3) 令 `deepestExistingAncestor` 永远返回 ""（就是在 Windows 上模拟修好之前的 POSIX 形状）
+  ⇒ windows 层那条测试以 3 条 `plain_dir` 子项转红，MUTANT_RC=1；恢复后 `grep -c MUTANT` = 0。
+- 门（都是 scoped，共树票 79 仍在写 `internal/agent`、`internal/memory`，未跑整仓门）：
+  `gofmt -l internal/risk internal/tools` 空；`go vet ./internal/risk/ ./internal/tools/` rc=0；
+  `GOOS=linux go vet` 同两包 rc=0；Windows 全包 `go test ./internal/risk/ ./internal/tools/ -count=1`
+  → `ok risk 4.853s` / `ok tools 14.097s`；**票 72 六条不变式重跑 `-count=2`：rc=0，`=== RUN` 12，
+  顶层 PASS 12，FAIL 0，SKIP 0**（`TestClassifyAnchorSpellingIsNotVerdict`、`TestClassifySpellingInvariance`、
+  `TestClassifyFailClosedWhenSpellingUnprovable`、`TestAListWinsWhereBothTablesHit`、
+  `TestOverrideOnlyAcceptsTheResolvedForm`、`TestCanonicalInputGainsNoSecondForm`）。
+  docker `golang:1.27`（`git archive HEAD` 快照 + 只覆盖本代理改动的三个文件）：
+  `internal/tools` **ok 9.345s**（前后一致），`internal/risk` 红数 **8 → 8，零新增红**，
+  那 8 条与基线逐字同名（票 55）；本代理两条 POSIX 新测试 `-count=2` 全绿。
+- 顺手记一笔待 owner 裁决的新缺陷候选：`risk.Gate` 的 `bOverrides` 形参**今天没有任何生产调用方**
+  （`internal/config/schema.go:457 BlacklistOverrides` 会被解析、`manager.go:356` 还会对它做松/紧方向审计，
+  但没有人把它喂进 `Gate`）⇒ "单文件 B 档豁免"这条契约目前只存在于测试里。
+- next= 交回 owner：① 推送后按 run id + job id 读 `test-core`（AC#6，step 结论而非 job 结论，
+  `jobs.total_count=0` 不算样本）；② AC#4 用上面的交接段落关闭；③ 决定要不要把 `bOverrides` 无调用方
+  登记成新票。
