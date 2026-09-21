@@ -36,6 +36,18 @@
 `git commit -q -F - -- <显式路径>` + 带引号 heredoc；禁 `git add -A`；禁 `--amend`/`reset`/`rebase`/`stash`/`checkout .`；
 **不 push**；不在仓内建 worktree（A38④）；票面 append-only，要改的那行先读再替换；四种假绿逐跑点名。
 
+
+
 ## Progress log（append-only）
+
+- 2026-09-21 15:5x（编排者，**排队原因，别当成"没人想到"**）：本票**故意现在不派**。
+  它测的是**一条 1ms 墙钟预算的分布**，而编队里同时有 2 个写码代理 + 5 个验收/只读代理在跑 `go test` 与 docker
+  ⇒ **在吵的机器上量出来的分位数没有意义**，量到"红"还会误判成回归。
+  **排程判据（三件事同时成立才派）**：① 编队里 `internal/risk/` 无人写（票 94 已闭、票 82 的验收代理只读快照）；
+  ② 没有 docker/`go test -count=` 的并发跑动（`git status --porcelain` 里没有 `internal/risk` 的改动即可初判）；
+  ③ 我自己先看一眼当轮 `test-windows`/`test-core` 的 run id，确认这条用例**当时是红还是绿**，
+     好让代理有"CI 侧的第三个样本"可比。
+  ⚠ AC#1 要求"三档分布"（单跑 / 与 config 并跑 / 与全仓并跑），**多样本全报**是本票的底线：
+  拿一次安静的单跑数字去勾框，等于把这条脆弱性重新藏起来。
 
 （空）
