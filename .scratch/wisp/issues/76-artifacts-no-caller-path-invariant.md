@@ -1,6 +1,6 @@
 # 76 — Pin the artifacts path as "no caller-controlled path enters it" (closes ticket 20's `:103` box honestly)
 
-**Status:** ready-for-agent
+**Status:** in progress（实现代理 checkpoint 1：`internal/memory` 侧四层证明已绿 + 顺手坐实一个真缺陷；`internal/agent` 侧未写）
 **Type:** security-invariant characterization (closes an AC box that is currently **untestable as written**)
 **Blocks:** ticket 20 archival · **Blocked by:** nothing (packages free: `internal/agent`, `internal/memory`)
 **Packages:** `internal/agent/spill.go`, `internal/memory/artifacts.go` + their tests. Do **not** touch
@@ -63,3 +63,26 @@ the box in writing:
   all have agents in flight; a `go test ./...` would be measuring their uncommitted WIP, not HEAD.
 - First checkpoint commit within your first 15 tool calls; sync Status + boxes + `next=` every commit.
 - Unprovable AC ⇒ leave the box unticked and say why.
+
+## Progress log (append-only, newest last)
+
+- 2026-09-21（实现代理，checkpoint 1）：**memory 侧四层证明落地**，新增
+  `internal/memory/artifacts_path_invariant_test.go`：①`TestArtifactsAPITakesNoCallerControlledDestinationPath`
+  用 `go/ast` 审 artifacts.go —— 没有任何入口收 path/dir/dest 形参数、3 处 `os.Remove`/`os.MkdirAll`
+  的路径参数全部源自 `s.artifactsDir`、3 处 `listArtifactsDir(...)` 调用点全部只喂 `s.artifactsDir`
+  （审到零命中即 t.Fatal，防探针空跑）；②`TestDeleteArtifactRejectsTheFourHostileShapes` +
+  ③`TestDeletePrivacyItemRejectsTheFourHostileShapes`：分隔符/`..`/盘符/UNC 各一个命名子测试，
+  每张卡的是"**被守卫拒**"而不是"被文件系统拒"——断言 `errors.Is(err, ErrInvalidArtifactName)` 且
+  **不是** `ErrNotFound`，同时调用者点名的 canary 逐字节还在；④`TestArtifactsContainmentByDirectoryListing`：
+  对整个 fixture 根做递归 `WalkDir` 快照 + 差分，恶意名单跑完两条路后 added/removed 双空，
+  **阳性对照**（删一个合法 bare name ⇒ 差分里必须恰好出现那一条且落在 artifacts 内）保证差分不是瞎的。
+  **坐实并修掉一个真缺陷（D-76a）**：原守卫 `filepath.Base(name) != name` 只看 Go 的语义，
+  Windows 在解析前会**剥掉组件尾部的点和空格**，于是 `DeleteArtifact("....")` 是 `.` 的一种拼法——
+  实测它穿过守卫直达 `os.Remove(<artifactsDir>\....)`，只因目录非空才报 "The directory is not empty"，
+  空目录时就是一次删掉 artifacts 目录本身的操作。修法：`strings.TrimRight(name, ". ") != name` 一律拒。
+  顺带新增哨兵 `ErrInvalidArtifactName`（纯 additive，旧错误文案一字未变），因为"拒了"必须**机器可辨**，
+  否则 AC#1 只能靠嗅 `err.Error()` 字符串。`go test ./internal/memory/` 全包 `ok 12.434s`。
+  **AC#1/AC#2/AC#3/AC#4/AC#5 全部未勾**：agent 侧（`artifactName` 净化路径）还没测，变异检验和
+  `-count=2` 门禁也没跑，此刻任何勾选都是假绿。
+  **next=写 `internal/agent/spill_path_invariant_test.go`（四种形状净化后的**磁盘名**逐个断言 +
+  真目录列举差分 + 经真 `memory.Store` 的端到端落盘），然后做 AC#3 双包变异检验与 AC#5 门禁。**

@@ -24,6 +24,13 @@ type Artifact struct {
 	ModTime   time.Time `json:"mod_time"` // wall clock, display only
 }
 
+// ErrInvalidArtifactName is the sentinel behind every refusal of the artifact
+// name guard (ticket 76). It exists so a caller - or a test - can tell "the
+// guard said no before the filesystem was touched" apart from "no such file"
+// without matching on message text: the second verdict means a path WAS built,
+// which is exactly the thing the artifacts API must never do from a caller name.
+var ErrInvalidArtifactName = errors.New("memory: invalid artifact name")
+
 // ListArtifacts returns the artifacts directory contents, oldest-written
 // first (the eviction order).
 func (s *Store) ListArtifacts(ctx context.Context) ([]Artifact, error) {
@@ -138,15 +145,28 @@ func (s *Store) PurgeArtifacts(ctx context.Context) (int, error) {
 }
 
 // validArtifactName guards against path traversal: artifacts live flat in
-// the artifacts dir, so only bare names are accepted.
+// the artifacts dir, so only bare names are accepted. Every refusal carries
+// ErrInvalidArtifactName (ticket 76) so the reject is machine-distinguishable
+// from a filesystem error.
 func validArtifactName(name string) error {
 	if name == "" {
-		return fmt.Errorf("memory: artifact name is required")
+		return fmt.Errorf("%w: required (bare file names only)", ErrInvalidArtifactName)
 	}
 	if strings.ContainsRune(name, '/') || strings.ContainsRune(name, '\\') ||
 		strings.ContainsRune(name, ':') || name == "." || name == ".." ||
 		filepath.Base(name) != name {
-		return fmt.Errorf("memory: invalid artifact name %q (bare file names only)", name)
+		return fmt.Errorf("%w %q (bare file names only)", ErrInvalidArtifactName, name)
+	}
+	// Windows strips TRAILING dots and spaces from a path component before it
+	// resolves it, so "...." is a spelling of "." and "report.txt." is a spelling
+	// of "report.txt": the guard would say "bare name, fine" and os.Remove would
+	// then act on a path the caller did not name (measured: DeleteArtifact("....")
+	// reached os.Remove on <artifactsDir>\.... and only failed because the
+	// directory was not empty). Ticket 76 closes that alias: a name must survive
+	// Win32 trailing-dot/space stripping unchanged to be its own name.
+	if trimmed := strings.TrimRight(name, ". "); trimmed != name {
+		return fmt.Errorf("%w %q (a trailing dot or space is a different path on Windows)",
+			ErrInvalidArtifactName, name)
 	}
 	return nil
 }
