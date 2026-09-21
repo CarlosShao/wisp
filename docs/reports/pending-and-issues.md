@@ -1240,6 +1240,33 @@ vet: cmd/wisp/slo.go:324:49: undefined: proc.Runtime
   `next=` ① **暂不 push**，等 `ci-read-111b` 回来说 AC#6 是「修好了」还是「仍有步骤被吃掉」；
   ② 回来后**一次批量 push**（含 115b/116/117/85 攒下的本地 commit）；③ 票 86 只在编队安静时；
   ④ `Q-31/32/33` 与 `Q-25` 挂着等 owner。
+## 编排者登记 A93（2026-09-21 21:5x，**票 92 附条件结案；验收方把我上一轮对你说过的一句"Linux 端有一条红"否掉了**）
+
+- **A93① 我对 owner 的一处口径要更正（这次是我说错的，不是代理）**：21:2x 我告诉他"票 92 的 Linux 端还有一条测试红在修（`TestComposerRenderFixtureTellsTheTruth`）"。
+  验收方复算：**那条红的成因是 `git archive` 的 CRLF 伪形**——blob 与工作树都是 `i/lf w/lf`，
+  但归档导出时混进 8 个 CR（**加 `-c core.autocrlf=false` 也挡不住，两条她都量了**），而那枚用例按 `" -->\n"` 切块 ⇒ 三块全解析不出（读数正是 `no block for …×3` + `0 painted states`）。
+  整步 `portable-tests.sh` 在 `e563a61` 复跑是 **rc=0 / 1036/661/0/0** ⇒ **现在不红**。
+  ⇒ 教训归到我自己的仪器上：**在 `git archive` 快照里跑"对换行字节敏感"的用例，得到的红要先怀疑 CRLF，再怀疑代码**。
+  已连带登记 `R-92b-5`（该用例对换行敏感，要么改分隔符形状、要么给 `*.html` 加 `-text` 属性）。
+- **A93② 两形全绿是 `ban #6` 这一族的真洞，我把它从"票 92 的残留"升成票 114 的硬 AC**：
+  **F5**：`sendRequest("panel"+"."+noun+"."+verb)` 运行时算出 `panel.apporval.decide`（原文拼写为 `approval`）⇒ **三枚判据全绿**，连 `d22scan` 也 rc=0 clean；
+  **F6**：把第二通道放进 **`frontend/public/*.js` + 在 `index.html` 引用** ⇒ 那枚可达性钉报 `21 files scanned, 2 host call sites`，**一个数都没动** ⇒ 全绿。
+  ⚠ 关键区分（验收方自己做的对照）：**同一位置直接写字面 `approval.decide` 时 `d22scan` 会红并点名该文件**
+  ⇒ **漏的不是扫描器，是那枚钉的"扫描根"比渲染器实际加载的文件集合窄**（`R-92b-2`）。
+  这条区分很重要，否则会开错票去"加强扫描器"。
+- **A93③ 验收方建议另开"票 123"，我没开——并入票 114（AC#8–AC#11）**：票 114 的标题逐字就是这件事，
+  再开一张只会得到两张各自半对的票。同时把它的 `R-92b-1`（"两边同改"从承诺变成门）写成 AC#8，
+  因为这是**结构上唯一能挡住运行时拼接的形状**（字面量门永远慢一步）。
+  另两条顺手带进票 114：`R-92-2` 的另一半（宿主有**两种装法**，钉只认 `postMessage`，`AddHostObjectToScript` 那条要么禁用要么进同一枚钉）·
+  `R-92b-3`（把 `npm run render:composer && git diff --exit-code` 做成 CI 一步，关掉"fixture 可手写可腐坏"）。
+- **A93④ 一条口径账要记住**：交件里写"本轮 `frontend/` 一行未改"在**树级别为假**（差 1 行，实为注释，结论仍成立，`R-92b-7`）。
+  ⇒ 以后这类"一行未改"的断言**必须说明是按 git 追踪内容还是按工作树**——两种都可能是真话，但只有一种能被复算。
+  同一族还有 `R-92b-8`：它拒绝扩 AC#7 扫描面的理由是"`vendor-shadcn.mjs:2` 有 `git checkout` 字样会红"，
+  我读了原文，**字面为真**；但同文件已经有 `codeOnly()`（剥注释）这层，**"扩面 + 剥注释"它没测过** ⇒ 推论未穷尽。
+  **编队（21:5x）**：写码 `agent-ticket117` · `agent-ticket119`（2/4）；
+  只读 `ci-read-111b`（run `35606321404`：`test-core` **已 completed/success**＝ubuntu 腿历史上第一次给 winsec 出结论）· `acceptor-ticket116`（锚 `80e248c`）。
+  `next=` ① 派 118/121 的时机：117 让出 `cmd/wisp` 才能派 121；115b 让出 `winsec_windows.go` 才能派 118；
+  ② 票 85a 的 `lint` 新读数要等下一次 push 之后的 run；③ `Q-31/32/33/25` 挂着等 owner。
 ## 编排者登记 A91（2026-09-21 21:5x，**依赖图预做回来：不在主程序里的 13 个包中只有 4 个是真信号**；85a 交件；两条新账登记）
 
 - **A91① 一条通用仪器的第一版清单，被预做数据从"全仓"改成了"两个包"。** `audit-deps-reachability` 量的分母（快照 `7699ec3`，
@@ -1283,6 +1310,34 @@ vet: cmd/wisp/slo.go:324:49: undefined: proc.Runtime
   只读 `acceptor-ticket92b` · `ci-read-111b`。**仍未 push（守 A90②的取证窗口）**，攒着等读数回来一次批量推。
   `next=` ① `ci-read-111b` → 结票 111 与 85a（后者要 `lint` 步的新读数，可能得再推一次才拿得到）；
   ② 117 交件后派 121；③ `Q-31/32/33/25` 挂着等 owner。
+## 编排者登记 A94（2026-09-21 22:0x，**两条门第一次拿到步级实证：反噬修好了、winsec 的 POSIX 半边第一次在 CI 上有分母**；另建票 123，并更正我自己一处"仍活着"的断言）
+
+- **A94① 票 110/111 那条链终于闭上了一半以上**：run `35606321404` 的 `test-windows` 里，ACL 门禁第 4 步 failure（允许红），
+  而它之后的 **`Cache third_party`／`cgo build smoke`／`cmd/wisp CLI tests`／`Portable windows tests`／`PathResolver junction`
+  五步各有 conclusion、无一 skipped** ⇒ **"一步红吃掉后面所有步"这个反噬第一次被证明修好了**（`!cancelled()` 六处在场）。
+  同枚 run 的 `test-core` **第 7 步**逐字给出 **`ok github.com/CarlosShao/wisp/internal/winsec 0.019s`**，
+  且 POSIX 半边真执行（`TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator` PASS）；
+  `internal/winsec` 在 core 日志里的出现次数 **0 → 4** ⇒ 票 113 那条链接线腿**从今天起有 CI 回归保护**（A87④/A90 那笔账清掉）。
+- **A94② 我又有一处"仍活着"说早了，已在票面更正**：票 85 裁定里我写"R-4（`mockllm module vet` 被 staticcheck 连带 skip）仍活着"——
+  步级读数是**第 10 步 success**（`ci.yml:111` 已带 `!cancelled()`，日志第 543 行紧随 staticcheck 报错后真启动了 `go vet ./...`）
+  ⇒ **是票 111 治掉的，不是 85a**；`agent-ticket85` 顺手加的那一处属多余但无害，保留不撤。
+  ⚠ 同一步也确认 **staticcheck 本体仍是 5 行崩溃串、零 finding 产出**（第 9 步 failure）⇒ **85a 的钉版本仍然必要**，票 85 不因此结案。
+- **A94③ 新建票 123：4 枚 `cmd/wisp` 用例在 runner 上全因"审批超时（1/300 秒未确认）⇒ C18 判拒绝"而红。**
+  取证方那句判语我照抄进票面：**"runner 给的是第二个答案，且不是环境问题"**——
+  `PASS=29 / FAIL=4`、29+4=**33** 与本机分母吻合，其中 `TestComposedGateBlocksAWriteForTwoSeconds` 耗时 **301.06 秒**＝正好撞满那个超时；
+  `Cache` 与 `cgo build smoke` 两步都 success ⇒ **缺 DLL 那条借口已被排除**。
+  ⇒ 我在票面把话说在前面：**C18 在无人确认时判拒绝是契约要求的正确行为，红的是"用例假设了有人"**；
+  **300 秒不是旋钮**，把断言改成"超时也没关系"就是把我们刚修好的响亮失败改回静默。
+  正解方向＝**测试自带一条可编程的确认腿**，并且**同一条用例在确认返回"拒绝"时仍须通过**（防止把断言写成恒真）。
+- **A94④ windows 腿还有一条未记账 skip 没归零**：`syncdirs_redteam_windows_test.go:220` → `TestSyncRedTeamRealOneDrive`
+  （`detected roots: []`）。好消息是它现在**能点名带原因**（票 93 那族改动生效），坏消息是"归零"这件事不成立
+  ⇒ 已写进票 123 AC#5，要求二选一：**永不 skip 的替身层** 或 **写进已知环境依赖豁免清单并注明归谁**，不许放着。
+  **编队（22:0x）**：写码 `agent-ticket117`（`cmd/wisp` 日志出口）· `agent-ticket119`（POSIX 误伤面）＝2/4；
+  只读 `acceptor-ticket116`（锚 `80e248c`）。**两个写码位空着但我不填**：
+  票 118 要等 `agent-ticket115b` 让出 `internal/winsec/winsec_windows.go`，票 121/123 要等票 117 让出 `cmd/wisp/`——
+  **同一枚文件双写是我自己定的假并行禁令（A83③/A91④ 同族），不能为了"队里看起来忙"去破。**
+  `next=` ① 115b/117 任一交件即派 118 或 121；② 下一次 push 之后取 **85a 的 `lint` 新读数**（期望自报 `modules=3 packages=… findings≈37 toolchain-crash-lines=0`）；
+  ③ 票 86 只在编队安静时；④ `Q-31/32/33/25` 挂着等 owner。
 ## 编排者登记 A92（2026-09-21 21:5x，**票 116 交件（六格自封、等验收翻）**；那条注入文本**升级成"要求沉默"**，计数 ≥7）
 
 - **A92① 注入文本第一次明确要求"别提它"。** `agent-ticket116` 交回：本轮工具输出里**至少 7 次**出现自称"系统注入"的文本，

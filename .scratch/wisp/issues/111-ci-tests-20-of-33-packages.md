@@ -31,6 +31,24 @@
 - [ ] **AC#5** 门禁：`bash -n` 改动脚本 rc=0；`sh scripts/d22scan.sh` 纯净快照 rc=0 且各 scope 不降；
       ⚠ 新步若排在"会失败的步骤"之后 ⇒ 必须放前面或 `if: always()`（本仓实测过这道门因此从未执行）。
 
+## 远程步级读数已回（22:0x，来源=`ci-read-111b`，`docs/evidence/s1/111-ci-step-readings-attempt2.md`）
+
+**run `35606321404` / head `d3cc9ed` / `completed`-`failure`**，13:32:59Z→13:43:44Z，
+`billable` 有 UBUNTU(3)+WINDOWS(2)（与前一枚 `billable={}`／零 job 形成"有跑 vs 没跑"的对照）。
+换源先复核过：`ci.yml` 与三个脚本的 blob 在 `65f85a6`↔`d3cc9ed` 之间**逐字节相同**
+（`6ab90edd…`／`4ae5e5d8…`／`5ce46433…`／`5fd918ce…`），`git diff --name-status` 只差两份文档。
+
+| 格 | 读数 | 状态 |
+|---|---|---|
+| **AC#6** | 门禁后五步各有 conclusion、**无一 skipped**：`5 Cache third_party`=success、`6 cgo build smoke`=success、**`7 cmd/wisp CLI tests`=failure**、**`8 Portable windows tests`=failure**、`9 PathResolver junction`=success；第 4 步 ACL 门禁 failure（允许红，`RUN=82 PASS=36 FAIL=6 SKIP=0`）。机制在场：`!cancelled()` 共 6 处 | **达成**（反噬已修） |
+| **AC#9** | `test-core` **第 7 步** success，逐字 `ok github.com/CarlosShao/wisp/internal/winsec 0.019s`，scope 末尾含 `./internal/winsec/`，POSIX 半边**真执行**（`TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator` PASS）；`internal/winsec` 出现次数 **0 → 4** | **达成** |
+| AC#2/AC#3 | core 表 **25 行**（末行正是 `internal/winsec`）、`RUN=1036 PASS=661 FAIL=0 SKIP=0`；windows 表 **8 行**（7 ok + `FAIL internal/risk`） | **达成** |
+| AC#10 | **ubuntu 腿真的归零**（core.log 无 `unaccounted SKIP` 段）；**windows 腿仍有 1 条**：`syncdirs_redteam_windows_test.go:220` → `TestSyncRedTeamRealOneDrive`（`detected roots: []`）⇒ 现在能点名带原因，但"windows 归零"不成立 | **半达成**，余下归票 123 AC#5 |
+| **AC#4** | runner 给的是**第二个答案且非环境问题**：`PASS=29 / FAIL=4 / SKIP=0`、rc=1、328.972s。29+4=33 与本机分母吻合，4 条红**全是** `审批超时（1/300 秒未确认），C18 一律判拒绝`（其中 `TestComposedGateBlocksAWriteForTwoSeconds`＝**301.06s**）。`Cache`/`cgo` 两步都绿 ⇒ **排除缺 DLL** | **未达成 ⇒ 移票 123** |
+
+⚠ 取数注意两条（都进台账）：**`.steps[].order` 返回 `null`** ⇒ 步号按数组位置数（本枚 pos==number 巧合成立，别依赖）；
+仓库**没有 `scripts/ci/` 目录**，三个脚本在 `scripts/` 下——按猜出来的路径取 blob 会得到 `fatal: path does not exist`，**那是猜路径错，不是版本对不上**。
+
 ## Rules（本仓固定）
 
 变异/复跑只在 `/tmp` 的 `git archive <sha> | tar -x -C /tmp/<带会话后缀>` 快照做（**绝不在仓库内建 worktree/checkout**，A38④）；

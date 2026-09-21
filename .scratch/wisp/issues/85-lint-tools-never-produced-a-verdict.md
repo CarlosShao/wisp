@@ -133,6 +133,12 @@ GOOS=windows 78 条 / 21 个包；分类 linux＝`26×U1000 / 3×SA1019 / 2×S10
 四种假绿逐跑点名；⚠ Windows 主机上 `GOOS=linux go vet ./...` 因 CGO=0 排除 sherpa 预编译包而**永远 rc=1**，
 **不要**拿它当判据（A54③）。
 
+> **⚠ 更正（22:0x，来源=`ci-read-111b` 的 run `35606321404` 步级读数）**：我在"编排者裁定"里说
+> **R-4（`mockllm module vet` 被 staticcheck 连带 skip）"仍活着"——那句在 `d3cc9ed` 上已经不成立**：
+> 第 10 步 `mockllm module vet` = **success**（`ci.yml:111` 带 `!cancelled()`，日志第 543 行紧随 staticcheck 报错之后真启动了 `go vet ./...`）。
+> ⇒ **是票 111 的改动治掉的，不是 85a**。`agent-ticket85` 顺手给那一步加的 `!cancelled()` 属**多余但无害**，保留。
+> 同一枚读数也确认 **staticcheck 本体仍是 5 行崩溃串、零 finding 产出**（第 9 步 failure）⇒ 85a 的钉版本**仍有必要**，本票不因此结案。
+
 ## Progress log（append-only）
 
 - 2026-09-21 18:1x（编排者，**CI 步级读数到手：本票的 AC#2 前提被实测背书，且新出一条同账**）：
