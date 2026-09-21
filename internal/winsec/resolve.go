@@ -258,7 +258,44 @@ func resolveAccounted(r C26Resolver, input string) (string, bool, error) {
 func resolverTreeOwnershipFailure(r C26Resolver) string {
 	sep := string(filepath.Separator)
 	parent := os.TempDir()
-	child := parent + sep + "wisp-108-tree-ownership-probe"
+	return treeOwnershipFailureForPair(r, parent, parent+sep+"wisp-108-tree-ownership-probe")
+}
+
+// treeOwnershipFailureForPair is the leg above with the probe pair supplied, so
+// ticket 112's instrument can plant the CI runner's own shape - a parent that
+// exists and is spelled in its 8.3 short form, and a child that does not exist
+// under that spelling - on a machine whose own temp path needs no short name.
+//
+// Why a second witness is needed at all (measured, run 35595651898): the honest
+// pipeline answers an EXISTING object with the filesystem's own real path, which
+// expands 8.3, and a MISSING leaf with the caller's lexical spelling, which does
+// not. On a box whose profile directory is longer than eight characters those two
+// answers name the same tree in two different spellings
+// (C:\Users\RUNNER~1\AppData\Local\Temp and C:\Users\runneradmin\AppData\Local\Temp),
+// and the single containment check below read that as a moved seal and refused to
+// install C26 - which is how one machine's username took the whole sealing
+// resolver down to the built-in floor. Comparing spellings is not something this
+// package may do (D22 ban #2 forbids a second normalizer), so instead of
+// loosening the comparison the probe now asks the candidate one more question and
+// accepts only when the candidate vouches for its own answer:
+//
+//	either the child's answer sits inside the answer for the child's stated
+//	parent (ticket 108's rule, unchanged and still the first thing tried), or
+//	the candidate, asked about the parent prefix of the answer it just gave,
+//	names that very same tree it already named for the probe parent.
+//
+// An honest resolver passes the second witness precisely because the two
+// spellings are one object, and it has to say so consistently out loud. A
+// constant fake is caught earlier, by the equal-answers leg. A tree-moving fake
+// is caught here as well: asked what its own answer's parent is, it has to place
+// that parent inside the tree it named for the probe parent, and the whole point
+// of the fake is that it does not. Refusal or an honest rewrite account on any
+// leg still counts as narrow, as it does everywhere in this file; nothing here
+// can be satisfied by passing an answer through unchanged, and
+// ResolvePath keeps re-running the floor on whatever the installed resolver
+// answers, so a candidate that contradicts itself between two calls is still
+// refused at the moment it matters rather than at install time only.
+func treeOwnershipFailureForPair(r C26Resolver, parent, child string) string {
 	childAns, childMoved, cErr := resolveAccounted(r, child)
 	if cErr != nil || childMoved {
 		return "" // refusing, or honestly accounting for a move, are both narrow
@@ -271,11 +308,47 @@ func resolverTreeOwnershipFailure(r C26Resolver) string {
 		return fmt.Sprintf("it answered %q and %q with the same single spelling %q, i.e. it does not resolve the tree the caller named at all",
 			parent, child, childAns)
 	}
-	if !answerInsideTree(childAns, parentAns) {
+	if answerInsideTree(childAns, parentAns) {
+		return ""
+	}
+	anchor := filepath.Dir(childAns)
+	if anchor == childAns {
+		// Nothing to vouch for: the answer is a root, and a root cannot sit inside
+		// the tree the probe named. The original refusal stands.
 		return fmt.Sprintf("it answered %q with %q, which is not inside the tree %q it answered for that path's own parent %q: the seam may not be used to move a seal into another tree",
 			child, childAns, parentAns, parent)
 	}
-	return ""
+	anchorAns, anchorMoved, aErr := resolveAccounted(r, anchor)
+	if aErr != nil || anchorMoved {
+		return ""
+	}
+	if sameTree(anchorAns, parentAns) || answerInsideTree(anchorAns, parentAns) {
+		return ""
+	}
+	return fmt.Sprintf("it answered %q with %q, which is neither inside the tree %q it answered for that path's own parent %q nor inside the tree that answer names once the candidate is asked about it directly (%q for %q): the seam may not be used to move a seal into another tree",
+		child, childAns, parentAns, parent, anchorAns, anchor)
+}
+
+// sameTree reports whether two spellings name one object by the platform's own
+// component rule, with no normalization performed on either side - the same
+// rule answerInsideTree uses, minus the requirement of a deeper path.
+func sameTree(a, b string) bool {
+	compsA, compsB := pathComponents(a), pathComponents(b)
+	if len(compsA) != len(compsB) {
+		return false
+	}
+	fold := func(s string) string {
+		if os.PathSeparator == '\\' {
+			return strings.ToLower(s)
+		}
+		return s
+	}
+	for i := range compsA {
+		if fold(compsA[i]) != fold(compsB[i]) {
+			return false
+		}
+	}
+	return true
 }
 
 // answerInsideTree reports whether child names something inside parent, by

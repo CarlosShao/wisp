@@ -33,3 +33,18 @@ func SeamLatchedForTest() bool {
 	defer resolverMu.RUnlock()
 	return seamLatched
 }
+
+// TreeOwnershipProbeForTest runs the install-time tree-ownership leg of the seam
+// guard against a probe pair the caller supplies, without touching the seam.
+//
+// It exists because that leg's verdict is the one thing in this package that
+// depends on how the machine spells its own temp directory, and the CI runner's
+// spelling (C:\Users\RUNNER~1\..., an 8.3 short name for a profile directory
+// longer than eight characters) is not reproducible on a laptop by living on it.
+// The instrument therefore plants the shape in a temporary directory - a long
+// name, asked for in its short form, plus a child that does not exist - and
+// judges the real pipeline's answer pair (ticket 112 AC#3). Test-only, like
+// SetSeamForTest: nothing outside this package's test binary can steer the guard.
+func TreeOwnershipProbeForTest(r C26Resolver, parent, child string) string {
+	return treeOwnershipFailureForPair(r, parent, child)
+}

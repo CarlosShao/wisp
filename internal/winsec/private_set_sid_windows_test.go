@@ -122,27 +122,6 @@ func privateSetSIDsBySID(t *testing.T) map[string]bool {
 	return map[string]bool{systemSID: true, administrators: true, u.Uid: true}
 }
 
-// administratorSID is the local account the SDDL renderer spells "LA", taken
-// from the system's own well-known-SID table rather than from a name lookup, so
-// nothing in these tests depends on how an account happens to be called. On the
-// CI runner that account is the one the job runs as, which is the whole defect;
-// on an ordinary box it is somebody else. The tests below ask this machine
-// instead of assuming either answer.
-func administratorSID(t *testing.T) string {
-	t.Helper()
-	scratch := filepath.Join(t.TempDir(), "la")
-	if err := os.Mkdir(scratch, 0o700); err != nil {
-		t.Fatal(err)
-	}
-	plantDescriptor(t, scratch, "D:(A;;FA;;;LA)")
-	aces := resolvedTrustees(t, scratch)
-	if len(aces) != 1 {
-		t.Fatalf("resolving LA left %d ACEs: %v", len(aces), aces)
-	}
-	i := strings.IndexByte(aces[0], '=')
-	return aces[0][i+1:]
-}
-
 // TestGateJudgesThePrivateSetByResolvedSID is AC#2 and AC#3 both halves at once:
 // the same judgment on a machine where "LA" is the current user and on one where
 // it is not.
@@ -230,6 +209,60 @@ func TestGateJudgesThePrivateSetByResolvedSID(t *testing.T) {
 	})
 }
 
+// administratorSID is the local account the SDDL renderer spells "LA", taken
+// from the system's own well-known-SID table rather than from a name lookup, so
+// nothing in these tests depends on how an account happens to be called. On the
+// CI runner that account is the one the job runs as, which is the whole defect;
+// on an ordinary box it is somebody else. The tests below ask this machine
+// instead of assuming either answer.
+func administratorSID(t *testing.T) string {
+	t.Helper()
+	return plantedTrusteeSID(t, "D:(A;;FA;;;LA)")
+}
+
+// guestsSID is BUILTIN\Guests (S-1-5-32-546), resolved through the OS's own SDDL
+// parser from its numeric form and read back out of the binary ACE. It is the
+// principal ticket 112 added to the fixture: an alias can never be the token
+// user's own SID, so it is a stranger on a machine that runs the job as the built-in
+// Administrator and on one that does not, which is what makes the "cleared and
+// named by SID" leg machine-independent. The OS still renders it back by name
+// ("BG"), so it exercises the same spelling-vs-SID distinction "LA" did.
+func guestsSID(t *testing.T) string {
+	t.Helper()
+	guests := plantedTrusteeSID(t, "D:(A;;FA;;;S-1-5-32-546)")
+	if guests != "S-1-5-32-546" {
+		t.Fatalf("asking this machine for BUILTIN\\Guests returned %q, not the alias SID", guests)
+	}
+	return guests
+}
+
+func plantedTrusteeSID(t *testing.T, sddl string) string {
+	t.Helper()
+	scratch := filepath.Join(t.TempDir(), "la")
+	if err := os.Mkdir(scratch, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	plantDescriptor(t, scratch, sddl)
+	aces := resolvedTrustees(t, scratch)
+	if len(aces) != 1 {
+		t.Fatalf("resolving %q left %d ACEs: %v", sddl, len(aces), aces)
+	}
+	i := strings.IndexByte(aces[0], '=')
+	return aces[0][i+1:]
+}
+
+// standsOn is the binary DACL read of "this principal is on this object", with no
+// name and no rendering involved.
+func standsOn(t *testing.T, path, sid string) bool {
+	t.Helper()
+	for _, ace := range resolvedTrustees(t, path) {
+		if i := strings.IndexByte(ace, '='); i >= 0 && ace[i+1:] == sid {
+			return true
+		}
+	}
+	return false
+}
+
 // TestSealNarrowsAndNamesThePrincipalItRemovedBySID is AC#3 leg (a): a real
 // grant left for another account is still not tolerated - the seal narrows it
 // and says so, and what it says is the one form that cannot be confused with
@@ -249,8 +282,47 @@ func TestSealNarrowsAndNamesThePrincipalItRemovedBySID(t *testing.T) {
 	if la == "" {
 		t.Fatal("no local Administrator account to plant")
 	}
-	mustExec(t, "icacls", root, "/grant", "*"+everyoneSID+":(OI)(CI)F")
-	mustExec(t, "icacls", root, "/grant", "*"+la+":(OI)(CI)F")
+	// Ticket 112's red on run 35595651898 was this fixture's assumption, not the
+	// notice. The Windows job runs as the built-in Administrator, so "LA" resolves
+	// to the token user's SID, which ticket 106 put inside the private set by
+	// definition - the seal therefore kept that grant and named only Everyone. The
+	// CI's own readings say the instrument was wrong, not the machine:
+	//
+	//	private_set_sid_windows_test.go:268: ... cleared="S-1-1-0(A;OICI;FA;;;WD)",
+	//	  want S-1-5-21-3699639565-2515463329-295617607-500 in it (root DACL now
+	//	  [0/0x0=S-1-5-18 0/0xb=S-1-5-18 0/0x0=S-1-5-32-544 0/0xb=S-1-5-32-544
+	//	   0/0x0=S-1-5-21-3699639565-2515463329-295617607-500
+	//	   0/0xb=S-1-5-21-3699639565-2515463329-295617607-500])
+	//
+	// So the candidate list is now read off this machine instead of hard-coded: a
+	// stranger that can never be the token user (Guests) carries the proof
+	// everywhere, and a private-set member is planted on purpose so the membership
+	// direction - kept, and never reported as cleared - is asserted too. Which
+	// bucket "LA" lands in is measured, named in the failure message, and never
+	// skipped.
+	guests := guestsSID(t)
+	if inPrivateSet(set, guests) {
+		t.Fatalf("no stranger to plant on this machine: BUILTIN\\Guests is inside the private set %v", setKeys(set))
+	}
+	foreign := []string{everyoneSID, guests}
+	member := administrators
+	if inPrivateSet(set, la) {
+		member = la // the runner's shape: the job runs as the built-in Administrator
+	} else {
+		foreign = append(foreign, la) // this box's shape: LA is somebody else
+	}
+	t.Logf("planted as strangers: %v; planted as a private-set member: %s (LA=%s, in set: %v, set=%v)",
+		foreign, member, la, inPrivateSet(set, la), setKeys(set))
+
+	plant := append(append([]string{}, foreign...), member)
+	for _, sid := range plant {
+		mustExec(t, "icacls", root, "/grant", "*"+sid+":(OI)(CI)F")
+	}
+	for _, sid := range plant {
+		if !standsOn(t, root, sid) {
+			t.Fatalf("the fixture planted nothing to judge for %s: %v", sid, resolvedTrustees(t, root))
+		}
+	}
 
 	got = nil
 	if err := SealDir(root); err != nil {
@@ -263,10 +335,21 @@ func TestSealNarrowsAndNamesThePrincipalItRemovedBySID(t *testing.T) {
 		}
 	}
 	joined := strings.Join(cleared, " ")
-	for _, want := range []string{everyoneSID, la} {
+	for _, want := range foreign {
 		if !strings.Contains(joined, want) {
 			t.Fatalf("the notice named the cleared principal by spelling only, not by the resolved SID it holds: cleared=%q, want %s in it (root DACL now %v)", joined, want, resolvedTrustees(t, root))
 		}
+	}
+	// The membership direction, which is the one the CI runner was actually
+	// exercising when this test went red: a principal inside the private set is
+	// kept and is never reported as narrowed away, whichever name the OS chose to
+	// render it with.
+	if strings.Contains(joined, member) {
+		t.Fatalf("the notice named a private-set member as cleared: member=%s cleared=%q (set %v, trustees %v)",
+			member, joined, setKeys(set), resolvedTrustees(t, root))
+	}
+	if !standsOn(t, root, member) {
+		t.Fatalf("the seal removed the private-set member %s it was given: %v", member, resolvedTrustees(t, root))
 	}
 	// And the narrowing itself: nothing outside the private set may stand on the
 	// object after the seal, whichever way the OS spells what is left.
