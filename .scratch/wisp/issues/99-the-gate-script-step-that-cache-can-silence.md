@@ -151,3 +151,16 @@ sh "$root/tools/d22scan/runtests.sh" -C tools/d22scan ./...
 next= 等验收方出 `docs/evidence/s1/99-*.md` 裁决表。编排者的账（**不在本票**，本票一行没改）：
 `.github/workflows/ci.yml:48` 与 `:68` 现在跑的是同一台仪器的同一次测试（CI 多花一遍 tools/d22scan 的 `-v` 测试，本机实测第一步 3.3-3.5s + 21 用例），
 要不要把两步并成一步归票 85/93；若并，判据是"两步合一"而不是"把 `scripts/d22scan.sh` 改回去"。
+
+- 2026-09-21 18:12（agent-ticket99，交件后立刻登记的一条**提交形状异常**，如实写不藏）：
+  我这枚路径限定提交 `9e00629` 的 `--numstat` 里**只有票面一个文件**（`99 5`），因为 `scripts/d22scan.sh` 的改动
+  在我提交前 52 秒（18:09:54）已被另一枚提交 **`d0d8782`**（`fix(99,AC#2): d22scan.sh 第一步改走 runtests.sh`，`23 4`）
+  从我未提交的工作树里带走了 —— `git show d0d8782` 的那 27 行**与我写的字节字节相同**（`index bd6db7c..f64f2f0`），
+  不是我提交的（我的提交动作只发生过一次，就是 `9e00629`）。⇒ **净结果无损**：HEAD 上脚本内容 = 我 AC#3/AC#4 实测的内容
+  （`git diff --quiet -- scripts/d22scan.sh` 为空），票面在 `9e00629`。但**账要分两枚看**：
+  代码那半在 `d0d8782`，交件那半在 `9e00629`；共树里有人（或另一个 99 的执行者）会把我未提交的改动扫进它自己的提交，
+  这是编排者的账（A38④ 的共树家族），**本票不动历史**（禁 `--amend`/`reset`/`rebase`）。
+- 同一次登记附**收尾复跑**（A64②，committed HEAD `9e00629`，主树，18:12）：`sh scripts/d22scan.sh` rc=**0**，
+  整份日志 `(cached)` 出现 **0** 次，第一步 `runtests.sh: OK - packages=[./...] top-level: PASS=21 FAIL=0 SKIP=0, === RUN=31`，
+  末行 `clean - no D22 ban violations`（`ban #6 frontend/=40`、`ban #7 internal/tools/=17`、`ban #8 internal/=340`、`ban #8 cmd/=26`）⇒ 台账不降。
+  **未 push**。next= 验收方出 `docs/evidence/s1/99-*.md`。
