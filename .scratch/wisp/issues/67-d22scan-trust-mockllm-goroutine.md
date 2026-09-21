@@ -208,3 +208,19 @@ CI 该步**无 `continue-on-error`** ⇒ **job 红**。
   `gofumpt v0.7.0 -l tools/d22scan` 空、`go vet`（d22scan 模块 + `./internal/llm/`）exit 0。
   next=票 20 落地后清掉那 1 行 `⚠` → 本地 `sh scripts/d22scan.sh` 应全绿；编排者复跑 AC#4 门禁并决定是否勾 AC#3；
   `ci.yml:23` 的注释与 ban #6 的 `frontend/` 作用域分别移交票 70 / 票 71。
+- [2026-09-21T01:44:00Z] agent=agent-ticket67b did=**种子阳性 + 撤销 + 仪器验证 + 推翻我自己上一条的一个判断**（证据 §5/§7/§8）。
+  ①种子：`internal/llm/probe_health.go:3` 临时插一行含 U+2713 的注释（**故意用已跟踪文件**，否则 `git diff` 撤销证明是空的＝假证）；
+  先 `grep -nP '\x{2713}'` + `git diff --stat` 证明落盘，再跑 `cd tools/d22scan && go run . -root ../..` →
+  **2 finding(s)**、点名 `probe_health.go:3` 与 `bridge_junction_windows_test.go:444`、**EXIT=1**（`go run` 与编译二进制两个退出码都贴）；
+  撤销后 `git diff -- internal/llm/probe_health.go` **0 行**、`git status --short -- internal/llm/` 空、
+  `grep -cP '\x{2713}'` = 0、`grep -rn 'zz_ticket67b_seed'` 全仓 0 ⇒ 撤销干净。
+  ②新仪器实测（不是只有单测）：构造一棵 `cmd/` 下无 `.go` 的假仓 → `ban #8 scope cmd/ examined 0 file(s)` +
+  **EXIT=2**，与"有违规＝1"可分辨 ⇒ 删除 `frontend/` 之后，"声明了却走 0 文件"比原来更硬而不是更松。
+  ③**更正我上一条的一处结论**：我说那 1 行 `⚠` 因未跟踪所以 CI 看不见、lint 仍绿——**错了**。票 20 的代理在
+  `d63bc49`（09:27:37+08:00，早我 commit 约 5 分钟）把 `bridge_junction_windows_test.go` 连字形一起入库 ⇒
+  `git archive HEAD` 纯净树扫描 = **1 finding / EXIT=1**、`sh scripts/d22scan.sh` = **SCRIPT_EXIT=1**
+  ⇒ **本票交付后 CI 的 lint job 仍是红的，红因不在我的改动里**（HEAD 生产 `.go` 零字形，`grep -cP` 在导出树上 = 0）。
+  我没为了让它绿去改票 20 正在写的文件、没加豁免（`allowlist.txt` 仍 5 行非注释、`git diff` 空）、没改断言、没 skip。
+  两次 commit 前各跑 `git diff --cached --name-only`，暂存恰为我的 5 个文件；别人在飞的 `go.mod`/`internal/observe/*`/`internal/secret/*` 全程未被我吞。
+  next=编排者在票 20 之后把 `bridge_junction_windows_test.go:444` 的 `⚠` 改 ASCII（`[!]`/`WARN:`）→ 届时 `sh scripts/d22scan.sh` 应 exit 0，
+  AC#3 才能整框勾上；AC#4 门禁需在新红因清除后复跑。
