@@ -2,7 +2,7 @@
 
 **Status:** in-progress
 **Claimed by:** ~~agent-ticket70~~（174 次调用撞 turn 上限而死，**票面一条 log 都没写**）→ ~~agent-ticket70-c~~（只做 AC#2/AC#4/AC#6，已交回）→ **agent-ticket70-d**（接手 AC#1 尾巴 / AC#2 新 HEAD 重测 / AC#6 逐步骤证据 / D22 positive control 卡点）
-**Last update:** 2026-09-21 11:5x（agent-ticket70-d 认领；起点 HEAD `17efc2c`，其真 run 35558750456 的逐步骤结论见本条下面的 Progress log）
+**Last update:** 2026-09-21 12:3x（agent-ticket70-d：**AC#1 已按判据正文闭**（`6ce43c7` + 勾框说明）；AC#2 在新 HEAD 重测完＝**3 包 / 10 条红，未达成**；AC#6 逐步骤表已贴（3 success / 2 failure）；D22 positive control **已不红**（`a8ae9ad`）。新炸点：`staticcheck` 那一步在 go1.27 上**跑不动**，升版本即挖出 **35 条** finding ⇒ 全交回编排者）
 **Blocked by:** ~~66、68~~ **两条都已解除**：票 66 已闭（`-done`），票 68 是 `blocked-on-owner` 且 `internal/ball`/`cmd/balldebug` 已让出
 
 > ## 编排者重建的断点（09:15，我逐条亲自验过，**接续代理不要重做**）
@@ -49,12 +49,19 @@
 
 ## 验收标准
 
-- [ ] **AC#1 格式化 sweep（机械、零语义）**：`gofumpt -w` 过 CI 那条命令列出的全部路径，
+- [x] **AC#1 格式化 sweep（机械、零语义）**：`gofumpt -w` 过 CI 那条命令列出的全部路径，
   直到 `gofumpt -l . tools/d22scan tools/mockllm` **输出为空**。
   ⚠ **单独一个 commit**，message 里写明"纯格式化、无行为改动"；
   **不许**混进任何逻辑修改，也不许用"把 gofumpt 步骤改成 `continue-on-error`"糊过去
   （D22 明写 no job skippable，**放宽门不是修门**）。
   完成后复跑 `go test -count=1 ./...`（可跑的包）证明没改坏。
+  （**2026-09-21 12:3x 由 agent-ticket70-d 按判据正文闭**：尾巴只剩 1 个文件，`6ce43c7` 单独一枚纯格式化 commit；
+  纯净树上 `gofumpt -l . tools/d22scan tools/mockllm` **v0.7.0 与 CI 实际用的 @latest(v0.12.0) 两个版本都输出 0 行、exit 0**；
+  复跑证据=`go vet ./internal/risk/` rc=0、Windows `go test ./internal/risk/ -count=1 -v` rc=0（149 RUN / 87 PASS / **0 FAIL** / 1 既有 SKIP）、
+  Linux 全 portable 清单在含此 commit 的树上跑过（下一条 AC#2 条的 497/481/10/6 总账）。
+  ⚠ **两个口径分开**：本 AC 正文已闭；但"**lint job 真绿**"不是本 AC 的判据、**未达成**——下一次 push 之后该步骤会绿，
+  而同一个 job 会红在 `staticcheck`（CI 从未产生过该步判据，见 AC#2 条末的 ⛔），归属 AC#6/编排者判。
+  另：票面第 44 行"CI 钉的 v0.7.0"是**假前提**，`ci.yml:72` 写的是 `gofumpt@latest`。）
 - [ ] **AC#2 `test-core` 分诊**：在 **Linux** 上复现那 4 条（CI runner 就是 ubuntu-latest），
   逐条定性为「平台差 / 票 66 或 67 带出的回归 / 本就在坏的断言」。
   **禁止**为了让它绿而改断言或加 skip；平台差异要落成**显式 build tag 或平台专属期望值**，并说明为什么。
@@ -164,3 +171,26 @@
   - 独立仪器复核（不信扫描器自己的嘴）：我用 ban #8 的**同一字符类**（`[\U0001F000-\U0001FAFF\u2600-\u27BF\u2B00-\u2BFF\uFE0F\U0001F1E6-\U0001F1FF]`）自己扫 `internal/` + `cmd/` 的 `.go`：**扫到 327 个文件（与扫描器自报的 303+24 逐字相符）、命中 0 处**。第 444 行的非 ASCII 码点逐字打出来只剩 CJK 与全角标点。
   - **`tools/d22scan/**` 与 `allowlist.txt` 一字未动**：`grep -vc '^#\|^$' tools/d22scan/allowlist.txt` = **5**（与票 70-c/票 67 记录的 4→5 之后的数字相同，既没变长也没变短）。CI 侧同样两份证据：上表 `lint` 的 D22 两步在 `17efc2c` 均为 **success**。⇒ 票面 AC#5 那条"⚠ 下一次 push 之后 lint 会同时红在 go vet 与 D22 seven-ban 两步"的**后半句作废**（D22 已被 `a8ae9ad` 清掉），前半句（`go vet`）仍未证。
   next=AC#2 在新 HEAD 的 Linux 逐包重测（`docker run golang:1.27` 逐字复刻 `ci.yml:127-134`）+ `go vet ./...`/`staticcheck` 在 Linux 上的真结果，一起写下一条。
+
+- [2026-09-21T12:3xZ] agent=agent-ticket70-d did=**AC#2 在新 HEAD 上重新分诊**（票面"四族红"那张表按编排者的话**作废**，下面是替换它的新表）。判据＝**与 CI 那一行逐字相同的命令**跑在 **Linux** 上：`git archive HEAD` 纯净树 → `docker run --rm -i -e WISP_ENV=test golang:1.27`（容器内 `go version go1.27.1 linux/amd64`），包清单照抄 **`ci.yml:127-134`（编排者更正过的行号，不是 101-106）**的 16 个 `./internal/...` 树，只多带一个 `-v`（为了让仪器数得出条数，不改判据）。**exit code：`DOCKER_RC=1`（红，如实报）。**
+
+  **总账（全量输出仪器数出来的，不是"默认只打第一条"的那种数）**：`=== RUN` 顶层 **497** = `--- PASS` **481** + `--- FAIL` **10** + `--- SKIP` **6**（**逐条对得上，0 条来路不明**；含子测试的 `=== RUN` 782、子测试 `--- PASS` 285、子测试 FAIL **0**）；包级 **16 ok / 3 FAIL / 4 no test files**；假绿四项逐个查过：`no tests to run` **0** 次；6 条 SKIP 逐条点名且**没一条被算成 ok**（`TestSubprocessCrashWriter`=helper 只被子进程用、`TestSyncRegistryProbeLive`=本机无 registry-grade 记录、`TestD34WriteMatrix`+`TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop`=Linux 上无卷标识、`TestRealDownload*`×2=要 `WISP_IT_REAL_MIRROR=1`）。
+
+  | 族 | 票 70-c 在 `6c1b5e9` 的旧账 | **新 HEAD（`17efc2c`+我的 `6ce43c7`）实测** | 定性 |
+  |---|---|---|---|
+  | `internal/observe` | 2 FAIL | **ok 2.548s** ✅ | `d1525a3` 的时钟注入缝 + 按核数换算仍成立 |
+  | `internal/secret` | 7 FAIL | **ok 0.095s** ✅ | `//go:build windows` 方案仍成立；portable 面（`refs_test.go`）仍在 ubuntu 跑 |
+  | `internal/risk` | 17 FAIL | **8 FAIL / 2.271s** ❌ 仍红 | **同族但少了一半**（票 72 + 票 75 的路径形状修掉了 9 条）。剩下 8 条**同一个因**：`syncdirs_test.go:118 source "registry"/"config"/"env" must count as confirmed`、`:168 env-grade roots are confirmed evidence`、`provenance_test.go:469/541/608/670` 与 `syncdirs_test.go:356` 的 `precondition: the injected registry-grade root must confirm detection` —— Linux 上 `registryProbe` 返回 nil、`syncdirs_other.go` 带 `DEFERRED(P12-macos)`，于是 P12 那一层的前置条件在 ubuntu 上永远不成立。**全部在 `internal/risk/**`＝我的禁改区，与票 72 同区 ⇒ 未动、上报** |
+  | `internal/tools` | 19 FAIL + **600s 超时 panic** | **ok 13.003s** ✅ | **票 75 的 C26 canonical-on-Linux 落地被这次复现证实**：不仅 19 条转绿，那条 `panic: test timed out after 10m0s`（旧 `wiring_test.go` 卡在 `approval.Gate.PendingApproval` 4m50s）**一并消失**——前任猜的"超时可能是路径故障的下游"这条**被证实**，没有第二个 Linux 审批洞 |
+  | `internal/agent` | （旧账 ok） | **1 FAIL / 7.885s** ❌ **新增** | `TestSpillContainmentByDirectoryListing`（`spill_path_invariant_test.go:280/286`，票 76 的 `39420cf` 新加，`6c1b5e9` 时该文件**不存在**）：夹具拿 `..\..\..\..\CONTROL-escape` 当"控制逃逸"样本，Linux 上反斜杠是**合法文件名字符**⇒ 文件老老实实落在 artifacts 目录里（名字含反斜杠），夹具自己的前置"listing 必须看得见那个逃逸"不成立，于是它**主动拒绝跑成空断言**（打印 "AC#2 would be vacuous"）。**同一命令在 Windows 上 `--- PASS`（实测，`internal/agent 0.071s`）** |
+  | `internal/memory` | （旧账 ok） | **1 FAIL / 19.364s** ❌ **新增** | `TestArtifactsContainmentByDirectoryListing`（`artifacts_path_invariant_test.go:464`，票 76 的 `d9224af` 新加）：purge 报 `removed [data/artifacts/nested\canary-separator.txt ...]`，want 却是 `data/artifacts/nested/canary-separator.txt` —— 同一条"反斜杠在 Linux 上是文件名而不是目录分隔符"的形状差。**Windows 上 `--- PASS`（实测，`internal/memory 0.102s`）** |
+
+  **我的复现与 CI 的账实核对（这条最重要，因为它排除"是我机器/我容器特殊"）**：`gh run view 35558750456 --log` 里 CI 自己打的包级结论是 **`FAIL internal/agent 0.851s` / `FAIL internal/memory 10.822s` / `FAIL internal/risk 1.968s`，其余 16 包 `ok`（含 `ok internal/tools 9.285s`）**，`--- FAIL` 计数 **10**，与我在容器里数出的 **同一批 10 个测试名逐字相同** ⇒ 族定性不是单机偶发。
+  **⇒ AC#2 判据（`test-core` 绿）未达成：3 包 / 10 条红。本轮一条断言都没改、一条 `t.Skip` 都没加、一个包都没移出 portable 清单。** 三族红的处置全是**归属判断**，见下面"交回编排者"。
+
+  **顺手把 CI 从未产生过判据的三步补了本地证据（它们在 `17efc2c` 全是 `skipped`，不能记成"过了"）**：
+  - `go vet ./...`（Linux，逐字同命令）⇒ **`VET_RC=0`**，`go vet -gcflags=-e ./...` 全量仪器**一行输出都没有** ⇒ 票 78 的两颗哑弹（`internal/ball/statevisual.go` 的 `undefined: mulA`、`cmd/wisp/slo.go` 的 `undefined: proc.Runtime`）**在 Linux 上确实修好了**（此前**从未**有过一次 CI 绿证）。
+  - `go vet ./...` 在 `tools/d22scan`、`tools/mockllm` 两个嵌套模块 ⇒ **`D22SCAN_VET_RC=0` / `MOCKLLM_VET_RC=0`**。
+  - `test-core` 的 `Environment fork assertion`（`bash tools/d22scan/runtests.sh ./internal/proc/ -run TestLayoutForTestEnv`）⇒ **`FORK_RC=0`**，`top-level: PASS=1 FAIL=0 SKIP=0, === RUN=3, '[no tests to run]'=0`。
+  - ⛔ **新炸点（本条唯一"下次 push 会多一步红"的预警）**：`staticcheck ./...`。CI 钉的是 **`staticcheck@2025.1.1`**，它在 **go1.27 上根本跑不起来**：6 行 `-: internal error in importing "internal/byteorder"/"internal/cpu"/"internal/goarch"/"math/bits"/"unicode/utf8" (cannot decode ..., **export data version 4 is greater than maximum supported version 2**)` ⇒ `SC_2025_RC=1`，**0 条真实 finding**（也就是说：**这一步的 CI 判据至今一次都没产生过**，它一直被前面的失败挡着）。把工具升到 `@latest` 后能跑（`staticcheck 2026.2.1 (0.8.1)`），但会**立刻挖出 35 条真 finding、`SC_LATEST_RC=1`**：`27×U1000(未用的函数/类型) + 3×SA1019(runtime.GOROOT 已废弃) + 3×S1011 + 1×SA4006 + 1×SA4000`，散在 **15 个包**：`cmd/wisp`×5、`internal/agent`×3 + `internal/agent/approval`×4、`internal/llm`(+adaptertest/anthropic/openaichat)×6、`internal/audio`×4、`internal/ball/tokens_table_test.go`×2、`internal/tools`×4、`internal/memory`×2、`internal/observe`×2、`internal/config/parse.go:223`×1、`internal/models/archive.go`×1、`internal/proc/crossvet_test.go`×1（**`internal/risk` 一条都没有**）。**我没碰其中任何一个文件**（`cmd/wisp/**`、`internal/config`（票 80 在途）、`internal/tools`、`internal/memory/*_test` 全在禁改或别人在途的清单里），也没动 `ci.yml`（票 71 的在途文件）⇒ 只上报：**"pin 太老跑不动"与"升上去就有 35 条账"是同一件事的两面，得编排者定顺序**（先清 35 条再升 pin，还是给 staticcheck 单开一张票）。
+  next=把 AC#1 的框勾上（判据正文已满足，含 v0.7.0 与 CI 实际用的 @latest v0.12.0 双版本复核），然后交回编排者：AC#2 三族红的归属、staticcheck 的 35 条、以及"lint 下一次 push 会红在 staticcheck 而不是 gofmt/vet"。
