@@ -161,3 +161,12 @@ delete_test.go:25: NewStore: secret: create C:\Users\RUNNER~1\AppData\Local\Temp
   别人的 ` M` 文件（`internal/config/*`、`ci.yml`、`internal/risk/syncdirs*`、`scripts/portable-tests.sh` 等）一枚未 add、一枚未 commit；未 push；仓内未建 worktree。
   票面本枚 append 的 `git diff --numstat` 删除列 = 5（= Status 一行原地改写 + AC#1..AC#4 四个勾框 `[ ]`→`[x]`），**无内容行被删**。
   next= 编排者 push `34f6959`+交件 commit ⇒ 读 `test-windows` 步级结论填 run id 位；随后 `internal/config` 的 105/95 线可以把更多落点接上 winsec。
+
+- 2026-09-21 18:56（`agent-ticket106`，交件后追加）：**共树碰撞登记（不是我引入的，会污染 AC#5 的 CI 读数）**。
+  我 `-count=2 -v` 全绿之后（`0f4c891` 时点，winsec RUN=80/0 FAIL/0 SKIP），`internal/winsec/` 里出现了两枚**未跟踪的别人的文件**：
+  `seam_bypass_108_windows_test.go`、`ancestor_separator_108_other_test.go`（票 108 的手），当场让
+  `go vet ./internal/winsec/` 与 `go test ./internal/winsec/` **测试包编译失败**：
+  `vet.exe: internal\winsec\seam_bypass_108_windows_test.go:85:24: declared and not used: victimSidsBefore`（`go build ./internal/winsec/` 生产码仍 rc=0，我的改动没坏）。
+  我没碰它们（不 add、不删、不改）。**push 时若 `test-windows` 报 winsec 编译红，那是 108 的未提交文件，不是本票** ——
+  要么先由 108 修好那枚未用变量，要么本票的 CI 复跑只读 `internal/secret`/`internal/config` 两步的步级结论。
+  next= 编排者 push `34f6959`（生产码）+ `0f4c891`/`0a44598`（用例与账），读 `test-windows` 里 `internal/secret` 是否 `ok`，回填上面的 run id 位。
