@@ -11,9 +11,28 @@
 # the repository root from its own location, so it works from any directory.
 #
 # Both commands are load-bearing and run in this order on purpose:
-#   1. go test ./...  - the seeded-violation positive control. It proves the
-#      gate CAN go red, so a later "clean" cannot mean "the gate is blind".
+#   1. runtests.sh -C tools/d22scan ./... - the seeded-violation positive
+#      control. It proves the gate CAN go red, so a later "clean" cannot mean
+#      "the gate is blind".
 #   2. go run . -root - the real scan of the working tree.
+#
+# Why step 1 goes through tools/d22scan/runtests.sh and not bare `go test`
+# (ticket 99 AC#2, measured in a /tmp snapshot of HEAD, not theorized):
+# several tests here - TestScannerSelfScanOfRealRepoIsGreen above all - read the
+# repository tree at RUNTIME, and the go test cache only records build inputs,
+# so a violation added to internal/ or frontend/ cannot invalidate them. Run 1
+# of the script passed, a `frontend/src/app.js:1 approval.decide` was then
+# planted, run 2 of step 1 printed:
+#
+#	ok  	github.com/CarlosShao/wisp/tools/d22scan	(cached)
+#
+# with exit code 0 - the positive control endorsed a tree it had never looked
+# at again. Step 2 still caught it, so the script as a whole stayed red, but a
+# control that has to be trusted cannot be the one served from a cache.
+# runtests.sh forces -count=1 (and -v, and "SKIP is not a pass"), which is the
+# SAME instrument CI's "D22 scanner positive control" step already calls, so the
+# two call sites no longer hold two different rules for one job (ticket 71
+# AC#3's lesson: bare `go test` is not a gate).
 #
 # No skippable step, no `|| true`, no continue-on-error (D22 run-away mode 6).
 set -eu
@@ -28,8 +47,8 @@ fi
 
 cd "$root/tools/d22scan"
 
-echo "d22scan.sh: positive control - go test ./... (tools/d22scan)"
-go test ./...
+echo "d22scan.sh: positive control - runtests.sh -C tools/d22scan ./..."
+sh "$root/tools/d22scan/runtests.sh" -C tools/d22scan ./...
 
 echo "d22scan.sh: scan of $root"
 go run . -root "$root"
