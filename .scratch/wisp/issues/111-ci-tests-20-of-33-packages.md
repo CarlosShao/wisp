@@ -60,6 +60,22 @@
       ⇒ 匹配式要能区分"**被测包**"与"日志里出现过这个词"，并用一次阳性自证（种一个只在字符串里出现的包名 ⇒ 不许计入分母）。
 
 
+- [ ] **AC#9（编排者 21:0x 追加，来源=run `35599458439` 的真实读数）** **`internal/winsec` 的 POSIX 半边今天零覆盖**：
+      `test-core`（ubuntu 腿）step7 的逐字 scope 是那 16 个包、**不含** `./internal/winsec/`，全日志里 `internal/winsec` 出现 **0 次**
+      ⇒ 票 113 刚交的链接腿（`winsec_other.go`）**没有任何 CI 回归保护**，只有编排者本机 Docker 跑过。
+      判据：ubuntu 腿里出现一步真跑 winsec 的 `!windows` 半边，并给出**该步的 run id + job id + step 号 + 结论**。
+      ⚠ 不许用"本机 Docker 跑过"替代；也不许把它接成"只编译不执行"（`GOOS=linux go vet` 那一类）就算数。
+- [ ] **AC#10（编排者 21:0x 追加）** `test-core` step7 现在报 **PASS=578 FAIL=0 SKIP=1**，而那枚 skip
+      （`TestWorkspaceSwitchRefusesAJunctionToOutside`，`paths_workspace_test.go:198`，理由是"C26 reparse 检测是 Windows-only"）
+      **不在任何台账里** ⇒ 与票 93 同族（**步不再把 SKIP 记成 ok**），但这一枚要的是：**未记账的 skip 必须响亮**——
+      要么进"已知双平台跳过"清单并写明归谁，要么在 POSIX 上给出等价判据。**不许**为消掉数字而 `Skip` 掉它。
+
+## 追加段的来历（21:0x，编排者）
+
+`agent-ticket112b` 取回了 run **`35599458439` / job `106331840177` / step 4** 的逐字读数，**本票 AC#6 的那个洞被现场证实还活着**：
+step1–3 success、**step4 failure**、**step5 `Cache third_party` / step6 `cgo build smoke` / step7 `Portable windows tests` / step8 `PathResolver junction placeholder` 全部 `skipped`**。
+⇒ 我建票时写的"为了加一道门把 windows 腿净覆盖加成负的"**不是推断，是有样本的事实**。你修 AC#6 时把这枚 run 当**修前证据**贴进去。
+
 ## Progress log（append-only）
 
 - 2026-09-21 20:0x（编排者）：建票。来源是票 110 的 AC#1 **顺手扫出来的全仓对账**——

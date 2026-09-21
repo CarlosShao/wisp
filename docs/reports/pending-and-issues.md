@@ -1105,6 +1105,35 @@ vet: cmd/wisp/slo.go:324:49: undefined: proc.Runtime
 本 commit 已把该步与它的阳性对照（`tools/d22scan/runtests.sh -C tools/d22scan ./...`）**提到 gofmt/vet 之前**：
 不删步骤、不给任何步骤加 `continue-on-error`、不让任何步骤可跳过（D22 mode 6 未碰）。
 
+## 编排者登记 A86（2026-09-21 21:1x，**票 112 的修复让 C26 第一次真装上 ⇒ 同一步冒出四枚新红，其中一枚上一轮是 PASS**；建票 115）
+
+- **A86① "反噬"从推断升级成样本**：run **`35599458439` / job `106331840177`** 的步状态逐字是
+  step1–3 success、**step4 failure**、**step5 `Cache third_party` / step6 `cgo build smoke` / step7 `Portable windows tests` / step8 `PathResolver junction placeholder` 全部 `skipped`**
+  ⇒ 我给票 111 写的那句"为加一道门把 windows 腿净覆盖加成负的"**不再是推理**，是有 run id 的事实。已把那枚 run 指定为票 111 AC#6 的**修前证据**。
+- **A86② 修复本身是有效的，但暴露了下一层**：三条老红里**两条真绿了**——
+  `TestC26PipelineIsWiredIntoWinsec` PASS 且上游首次装机成功
+  （逐字 `INFO winsec: sealing path resolver installed resolver=risk.c26Pipeline probes_passed=2`，上一枚同一位置是 `ERROR … refusing to install …`）、
+  `TestAC3JunctionInputIsRefusedNotSealed` 两个子形状各自 PASS。第三条（SID 命名）**红点前移**到同一条用例更早的 `n.Path == root` 逐字符比对，
+  而它新增的"集合内主体必须被保留"那条腿**在 CI 上至今没有结论**（同一条用例先在前一行 `Fatalf` 退出 ⇒ 分母是空集、断言恒真不算证据）。
+  ⇒ **票 112 不能结案**，且这条"我用本地绿替代了远程结论"的形状要留在书面上。
+- **A86③ 四枚新红同一根，我单独立票 115 而不是塞回 112**：C26 真装上之后，通知里的 `Path` 变成**解析器的答案**
+  （`C:\Users\runneradmin\…`），而这些用例拿 `t.TempDir()` 的**调用方拼写**比 ⇒ 短名/长名不是大小写差异，`EqualFold` 治不了。
+  其中 **`TestSealReportsThePrincipalsItCleared` 上一枚 run 是 `--- PASS`** ⇒ 这是全链唯一一枚"由绿转红"，
+  性质上是**我们的守卫变严之后，测试自己的假设露馅**，不是新缺陷把功能弄坏了。
+  票 115 的 AC#2 要求**先裁语义**（通知带调用方拼写 vs 比对面改成"按树不按拼写"）**再选修法**，
+  并且明写：**"再洗一遍路径让两边相等"被 D22 ban #2 堵死**（不许起第二个正规化器）。
+- **A86④ 两笔账我明确不混进票 115**（都追加进**票 111**，覆盖面地界）：
+  ① **`internal/winsec` 的 POSIX 半边在 CI 上零覆盖**——ubuntu 腿 step7 的逐字 scope 是那 16 个包、**不含** winsec，
+  全日志里 `internal/winsec` 出现 **0 次** ⇒ **票 113 刚交的链接腿没有任何 CI 回归保护**（我 A85④ 的怀疑被读数证实，不是猜）；
+  ② `test-core` step7 报 `PASS=578 FAIL=0 SKIP=1`，那枚 skip（`TestWorkspaceSwitchRefusesAJunctionToOutside`）
+  **不在任何台账里** ⇒ 与票 93 同族，但要求不同：**未记账的 skip 要响亮**。
+  `lint` step9 的 `staticcheck`（`export data version 4 > 2`，逐字 5 行同形）仍归**票 85**，`audit-85-preflight` 正在量它的爆炸半径。
+- **A86⑤ 一条取数纪律今天第三次救场**：`agent-ticket112b` 汇报它用**四条正向判据**才算读到日志
+  （`http=200` + 日志 **234680 字节** + 首行真时间戳 + `##[group]Run bash scripts/winsec-tests.sh` 落在第 187 行）。
+  我自己在这条路上假绿过一次（把 `TLS handshake timeout` 读成成功）⇒ **"正向形状判据"现在是所有取远程数据简报的固定一句**。
+  **编队（21:1x）**：写码 `agent-ticket115`（新）· `agent-ticket111`（`ci.yml`，已把 AC#9/#10 追加进它正在读的 AC 段）·
+  `agent-ticket92b` · `agent-ticket113b`（注释一格）；只读 `acceptor-ticket105b/104/109b/113` · `audit-runner-readings` · `audit-85-preflight`。
+  `next=` ① 票 112 结案条件＝那枚"成员保留"腿拿到 CI 结论；② 票 85 排 111 之后；③ 票 86 只在编队安静时；④ owner 三问未答。
 ## 编排者登记 A84（2026-09-21 20:2x，**两条"退回"落地成两张新票：108→113、92→114**；一次规则第一次被自主执行）
 
 - **A84① 票 108 总判 FAIL ⇒ 退回，并当场立案票 113。** 这是"**探针达成了本票 AC 声称要防的结局 ⇒ 不能是"通过附条件"**"
