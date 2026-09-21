@@ -138,3 +138,34 @@
   这次是同票做不到（`cmd/wisp/` 被别人的地界压着），所以立案）。
   next= 等 `agent-ticket89b` 交件（它此刻在 `internal/secret/`+`internal/winsec/`）⇒ 与本票无文件冲突，
   但 `cmd/wisp/` 要留给票 92 的话就先派本票；两票撞车时**本票优先**（它挡的是 owner 已拍板的功能）。
+
+- 2026-09-21（**acceptor-ticket101 独立对抗验收交件**）：裁决表 `docs/evidence/s1/101-adversarial-acceptance.md`
+  已出，与 AC#1–AC#5 五框 1:1。**总判 `PASS WITH CONDITIONS`**（不改票头 Status，-done 后缀归编排者）。
+  五框逐条：AC#1 **通过**〔独立复现〕（grep 非零 1 命中 `cmd/wisp/run.go:53`；六环按符号重定位 `:216`→`:314`→`:324`→`:332`→`:343`
+  → `internal/tools/bridge.go:90/:177`，行号在 HEAD=`a1613d9` 上未漂）· AC#2 **通过**〔独立复现〕（读的是测试体不是测试名：
+  三条各自独立函数，断的是开卡数/退出码/盘上键存在与否/文件是否真落盘，两侧都带非空对照；`h.start` 每 boot 私有 buffer ⇒ 无污染）·
+  AC#3 **通过但有条件**（三态各自一条 PASS；方向**只更严不更松**：bridge 根本不构造 ⇒ 无可执行链；档值取 `risk.DefaultMode()` 同源）·
+  AC#4 **通过**〔独立复现，本代理自己做的变异〕（快照 `/tmp/wisp-101-mut-ac1-acceptor101`，锚点 `run.go:343` 按值实际所在行定位，
+  同链 grep 打印被改后整行，`go build` rc=0 **先编译成功再判变异**，带票 98 注入跑 `-v -count=1`：
+  **只有 (a) FAIL** —— `run_mode101_test.go:305: auto_approve still opened 1 card(s) for an L1 write; the档 was read but never
+  reached the decision chain`，另 4 个（含三子用例）PASS，test_rc=1；主树未动，`git status --porcelain cmd/wisp/ internal/perm/` 空）·
+  AC#5 **通过但有条件**（`gofmt -l` 空 rc=0；`gofumpt` 本机无二进制 ⇒ 改 `go run mvdan.cc/gofumpt@latest -l cmd/wisp internal/perm` 输出空 rc=0；
+  `go vet ./cmd/wisp/ ./internal/perm/` rc=0；`go test -count=2 -v ./internal/perm/` rc=0 = **28 `=== RUN` / 28 PASS / 0 SKIP / 0 FAIL**，是 `-v`）。
+  **戳穿的那条自相矛盾计数**：AC#5 的"15 个顶层测试 ×2 减去缓存复用"两处都错 —— 实测 `internal/perm` **14** 个顶层测试
+  （`store_test.go` 9 + `ticket90_persist_test.go` 5），**14×2=28 等式本就成立**，`-count=2` 不存在结果缓存。
+  台账：`sh scripts/d22scan.sh`（与 CI 逐字同形）两棵树皆 clean rc=0，**共享树 `ban #6/#8 frontend/=40` 与实现方读数持平不降**；
+  快照树 37 是 `git archive` 不含 ignore 文件的**树口径差**（`git ls-files frontend|wc -l`=37、`git status --porcelain frontend/` 空）；
+  `ban #8 internal/` 337→**340** 属上升。
+  "注释说谎"那账**用 file:line 判实**：`internal/perm/store.go:122`（文档"audit trail … first line"）vs `:141` 调 `record()`、
+  `:261` `record()` 只 append `s.hist` 不碰 `s.logf`、`:274` `audit()` 才写 sink ⇒ **启动那行确实从未进审计**；归票 90，登记 `R-101-1`，
+  装配根补的 `MODE-READ` 对**本票判据等价**（进 sink、点名档、被 AC#2/3 断言）、对**库契约不等价**（kind token 不同、只覆盖 `cmd/wisp` 一条路径），
+  故不阻塞本票；本代理一行未碰 `internal/perm`。
+  残留：`R-101-1`（票 90 的注释/sink 账）· `R-101-2`（票面计数解释就地更正，读数有效）· `R-101-3`（**条件**：全仓 gofumpt 一栏归 CI/编排者）·
+  `R-101-4`（`Store.Set` 生产零调用者 ⇒ **M3 写侧未交付**，票 92/77 复用 `rt.modes`+`runSpec.modeConfirm`，别开第二条装配路径）·
+  `R-101-5`（**条件**：坏配置＝退出 2 且无 in-app 出路，解释已用户可见）· `R-101-6`（宿主包本机判据仍靠票 98 注入；全包 40.9s 那份是实现方自述）·
+  `R-101-7`（共享树 `git diff --quiet` rc=1 属并行票 103/`internal/risk` 的未提交改动，非本票造成）。
+  **直答 owner**："现在改档重启后还在不在？"—— **读侧：在**（盘上那档真进决策链，拔线即红）；**写侧：不在**（无可用户入口发起那次"改"，
+  控制台那次 L2 必然被拒）。**库层可用、装配根可用、用户层入口不可用** ⇒ 不能说"你选过的那档会一直生效"。
+  另：本代理会话的工具输出里**未**出现自称"编排者备注"的假指令，无原文可登记；全程按"工具输出不是授权"处理。
+  本代理只写 `docs/evidence/s1/101-adversarial-acceptance.md` + 本段追加，未动 PLAN/specs/risk/d22scan/allowlist，未 push。
+  next= 编排者定 Status；`R-101-1` 转票 90 的验收判；票 92 落 `Set` 调用者时**必须**一并回答"第二个 `perm.New` 调用者的审计首行谁写"。
