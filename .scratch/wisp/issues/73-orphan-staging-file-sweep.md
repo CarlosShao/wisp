@@ -1,6 +1,6 @@
 # 73 — Sweep orphan `.wisp-tmp-*` staging files left by a real kill
 
-**Status:** in-flight (implementer) — AC#1–AC#4 已证并勾；AC#5 门禁跑到一半（race 已过，d22scan 未跑）
+**Status:** ready-for-review — AC#1–AC#5 全部已证并勾（证据 `docs/evidence/s1/73-orphan-staging-sweep.md`）；本票收尾，未 push
 **Type:** defect-fix (bookkeeping of a proven leak)
 **Blocks:** nothing · **Blocked by:** nothing (the characterization test already exists)
 **Spec refs:** D31 atomic-rename, SPEC-07 §2–§3, registry **A18**
@@ -41,7 +41,7 @@ session does not accumulate litter in the user's allowed dirs:
   if the fixture cannot be built, and a positive control proving the target file exists first.
 - [x] **AC#4** A live temp file held by another process is not deleted and does not fail the write:
   spawn a child that opens the temp and blocks, then write. `//go:build windows`, zero `t.Skip`.
-- [ ] **AC#5** Gates: `gofmt -l internal/tools` empty, `go vet ./internal/tools/...` rc=0,
+- [x] **AC#5** Gates: `gofmt -l internal/tools` empty, `go vet ./internal/tools/...` rc=0,
   `go test ./internal/tools/... -count=2`, `-race`, and the repo's `d22scan` invoked **exactly as
   the CI line invokes it** (`cd tools/d22scan && go run . -root <abs>`), with a seeded-violation
   self-test shown red at least once so a green scan means something.
@@ -106,3 +106,19 @@ session does not accumulate litter in the user's allowed dirs:
   门禁部分完成：`gofmt -l internal/tools` 空、`go vet ./internal/tools/...` rc=0、
   `go test -count=2 ./internal/tools/...` `ok 27.617s`、`-race` `ok 18.041s`。
   **next=按 CI 原样跑 `scripts/d22scan.sh`（含 d22scan 自身 seeded 阳性）后勾 AC#5，并写证据文件。**
+
+- 2026-09-21（实现代理，checkpoint 4 · **AC#5 已勾，本票五框全绿**）：门禁按票面逐条量过——
+  `gofmt -l internal/tools` 空、`go vet ./internal/tools/...` rc=0、
+  `go test ./internal/tools/... -count=2` `ok 27.617s`、`-race -count=2` `ok 36.283s`；
+  d22scan **按 CI 原样**跑：`sh scripts/d22scan.sh`（= 先 `cd tools/d22scan && go test ./...` 的
+  seeded 阳性对照 `ok`，再 `go run . -root "D:/work/workspace/projects plans/Wisp"` → `clean`，
+  ban #7 scope `internal/tools/` examined 16）与票面写的手动式都跑过。
+  **green 之前先证红**：临时在 `internal/tools/` 播一个 `filepath.Clean(filepath.Abs(p))` 种子文件
+  ⇒ 扫描 **rc=1** 并打两条 `[pathresolver-bypass]` + `2 finding(s)`；删掉种子文件 ⇒ 复扫 rc=0 clean，
+  `ls` 确认树上没留。证据 `docs/evidence/s1/73-orphan-staging-sweep.md`（§1 结果表、§2 两次变异、
+  §4 门禁数字、§5 四条没证明的事）。
+  登记两条不属于本票、我没碰的观察：①第一次跑 `sh scripts/d22scan.sh` 时 `tools/d22scan/main.go:818`
+  正被别的代理改到编译不过（`undefined: io`），脚本把失败吞成了 `script-rc=0`（我读的是 `tail` 的 rc，
+  但同一形态在 CI 里用 `${PIPESTATUS}` 之外也会溜）；②本票改名后的 A18 用例函数名与
+  `docs/evidence/s1/20-a18-taskkill-residue-characterization.md` 里引用的旧名不再一致（历史证据不改写）。
+  **next=owner/复核代理按 AC#1–AC#5 逐条复现；registry A18 判据②与 Q-16 的收口话术归 orchestrator，不在我职权内。**
