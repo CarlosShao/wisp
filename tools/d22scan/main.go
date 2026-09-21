@@ -32,8 +32,10 @@
 //	                      and an empty scope is fatal - see declaredScopes)
 //	7 internal-artifact-tool  host-internal artifact writes implemented as
 //	                      gated tool names (D34 note 2) - scope: internal/tools/
-//	8 emoji               zero emoji in design/ (every text file) and in the
-//	                      Go sources of internal/ + cmd/ - comments and
+//	8 emoji               zero emoji in design/ (every text file), in frontend/
+//	                      (EVERY file, ticket 96 - same walk shape as ban #6, no
+//	                      suffix allowlist) and in the Go sources of internal/ +
+//	                      cmd/ - comments and
 //	                      _test.go INCLUDED (D23). This is the one ban whose
 //	                      scope is NOT the "production, non-test" default
 //	                      above, and it is deliberately so: see emojiScopes
@@ -199,6 +201,16 @@ type emojiScope struct {
 	dir    string // absolute path
 	label  string // repo-relative label, quoted in findings and in the self-report
 	goOnly bool   // true: only .go files count (see walkEmoji's scope note)
+	// everyFile true scans EVERY file under dir, with no suffix allowlist -
+	// the walk shape ban #6 uses on the same tree (walkText). Ticket 96 added
+	// it because the alternative for frontend/ was the goOnly:false branch,
+	// which filters through isTextFile(): measured on `git ls-files frontend`,
+	// that whitelist drops 5 of 37 tracked files, including all three
+	// scripts/*.mjs (the vendoring tooling R18 exists to police). Reusing it
+	// would have made ban #8's view of frontend/ a strict SUBSET of ban #6's,
+	// i.e. the "gate blind to a whole class of file" shape R16#4 forbids
+	// re-narrowing a ban into. Mutually exclusive with goOnly.
+	everyFile bool
 }
 
 // scanScope is ONE DECLARED WALK of the whole scan, whichever ban it serves.
@@ -448,9 +460,27 @@ func describeScopes(scopes []scanScope, s *scanner) []string {
 // ban #7, so "the walk ran empty" was indistinguishable from "the walk found
 // nothing". See scanScope for the ledger and driftedAbsentScope for why the
 // exemption expires by itself.
+//
+// SUPERSEDED IN PART BY TICKET 96 (2026-09-21): frontend/ is back in this list
+// under the OTHER allowed outcome - real coverage, not a deletion. The paragraphs
+// above stand as the reason it was deleted once, and that reason ("the tree does
+// not exist") is exactly what ticket 77 changed at 63ef895: ticket 88 armed ban
+// #6 over frontend/ and measures 40 text files on this HEAD, yet this list still
+// had three entries, so ban #8 read ZERO bytes of the panel while the run printed
+// three confident scope lines. Different shape from ticket 67's - no exemption
+// was ever registered here, so nothing could drift and no guard could fire: the
+// list was simply never synchronised. That is why the coverage is pinned by
+// literal label in scan_test.go rather than by inspecting this function body.
+// frontend/ is declared everyFile, NOT goOnly:false, because the goOnly:false
+// branch filters through isTextFile(), whose suffix whitelist drops 5 of the 37
+// tracked files under frontend/ (all three scripts/*.mjs, .gitignore,
+// frontend/dist/.gitkeep) and would make ban #8's view of this tree a strict
+// subset of ban #6's over the same files. Widening a ban is allowed; handing it a
+// filter is not (R16#4).
 func emojiScopes(root string) []emojiScope {
 	return []emojiScope{
 		{dir: filepath.Join(root, "design"), label: "design/"},
+		{dir: filepath.Join(root, "frontend"), label: "frontend/", everyFile: true},
 		{dir: filepath.Join(root, "internal"), label: "internal/", goOnly: true},
 		{dir: filepath.Join(root, "cmd"), label: "cmd/", goOnly: true},
 	}
@@ -805,17 +835,30 @@ func (s *scanner) walkEmoji(sc emojiScope) error {
 			if d.Name() == "node_modules" || d.Name() == ".git" {
 				return filepath.SkipDir
 			}
-			if sc.goOnly && d.Name() == "testdata" {
+			// testdata is skipped for the scopes whose sibling bans skip it
+			// (goOnly: internal/ + cmd/, everyFile: frontend/, whose walk must
+			// match ban #6's rule for=for). design/ keeps walking its testdata if
+			// any appears: that tree predates the rule and narrowing it now would
+			// drop a file class from a ban this ticket may not shrink.
+			if (sc.goOnly || sc.everyFile) && d.Name() == "testdata" {
 				return filepath.SkipDir
 			}
 			return nil
 		}
-		if sc.goOnly {
+		switch {
+		case sc.goOnly:
 			if !strings.HasSuffix(path, ".go") {
 				return nil
 			}
-		} else if !isTextFile(path) {
-			return nil
+		case sc.everyFile:
+			// No filter at all: this is ban #6's walkText shape, chosen so the
+			// emoji gate cannot read a smaller tree than the panel-approval gate
+			// reads next door. Files that are not text still get their BYTES
+			// searched - see the binary note above.
+		default:
+			if !isTextFile(path) {
+				return nil
+			}
 		}
 		src, err := os.ReadFile(path)
 		if err != nil {

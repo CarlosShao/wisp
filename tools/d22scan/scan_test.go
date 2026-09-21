@@ -336,13 +336,20 @@ func TestDeclaredEmojiScopeCannotWalkZeroFiles(t *testing.T) {
 	seedFile(t, root, "tools/d22scan/allowlist.txt", "# empty\n")
 	seedFile(t, root, "design/screens/ball.md", "# Ball\n\n- idle glow\n")
 	seedFile(t, root, "internal/ok/ok.go", "package ok\n")
+	// Ticket 96: frontend/ is a declared scope now, so this fixture has to seed
+	// it too - otherwise "cmd/ is the empty one" would be decided by which empty
+	// scope happens to come first in the list, and cmd/ is the tree this test was
+	// written to prove the guard names. The second half below removes frontend/
+	// instead, so the guard is shown firing for the panel's tree as well and the
+	// rule cannot be satisfied by ordering luck.
+	seedFile(t, root, "frontend/src/panel.tsx", "export const Panel = () => null;\n")
 	// cmd/ deliberately absent.
 
 	s, err := scanWithStats(root)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if s.emojiSeen["design/"] == 0 || s.emojiSeen["internal/"] == 0 {
+	if s.emojiSeen["design/"] == 0 || s.emojiSeen["internal/"] == 0 || s.emojiSeen["frontend/"] == 0 {
 		t.Fatalf("fixture broken: scopes backed by files must report work, got %v", s.emojiSeen)
 	}
 	if s.emojiSeen["cmd/"] != 0 {
@@ -353,6 +360,35 @@ func TestDeclaredEmojiScopeCannotWalkZeroFiles(t *testing.T) {
 	}
 	if got := emptyEmojiScope(emojiScopes(root), s.emojiSeen); got != "cmd/" {
 		t.Fatalf("the empty declared scope must be named, got %q (counts %v)", got, s.emojiSeen)
+	}
+
+	if err := os.RemoveAll(filepath.Join(root, "frontend")); err != nil {
+		t.Fatal(err)
+	}
+	s2, err := scanWithStats(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if s2.emojiSeen["frontend/"] != 0 {
+		t.Fatalf("fixture broken: frontend/ was deleted, saw %d", s2.emojiSeen["frontend/"])
+	}
+	seedFile(t, root, "cmd/wisp/main.go", "package main\n\nfunc main() {}\n")
+	s3, err := scanWithStats(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if s3.emojiSeen["cmd/"] == 0 {
+		t.Fatalf("fixture broken: cmd/ was seeded, saw %d", s3.emojiSeen["cmd/"])
+	}
+	if got := emptyEmojiScope(emojiScopes(root), s3.emojiSeen); got != "frontend/" {
+		t.Fatalf("the panel's tree must be subject to the same empty-scope rule, got %q (counts %v)", got, s3.emojiSeen)
+	}
+	out, errOut, code := runVerdict(t, root, s3)
+	if code != 2 {
+		t.Fatalf("an empty ban #8 scope must exit 2, got rc=%d out=%s err=%s", code, out, errOut)
+	}
+	if !strings.Contains(errOut, "ban #8 scope frontend/") {
+		t.Errorf("guard must name ban #8's frontend/ scope, got %q", errOut)
 	}
 }
 
@@ -388,8 +424,19 @@ func TestScopeReportMatchesRealCoverage(t *testing.T) {
 			t.Errorf("the clean verdict line would not name scope %s it actually scanned: %q", sc.label, report)
 		}
 	}
-	if strings.Contains(report, "frontend") {
-		t.Errorf("the verdict line mentions frontend/ while emojiScopes() has no such entry: %q", report)
+	// RESTATED BY TICKET 96 (AC#3 + AC#4). This assertion used to read
+	// `if strings.Contains(report, "frontend") { t.Errorf(...) }`, because at
+	// ticket 71's HEAD emojiScopes() had deliberately NO frontend/ entry and a
+	// footer naming it would have been a lie. The entry exists now and walks the
+	// panel's files, so the claim is the other way round: a report that does NOT
+	// name frontend/ is the lie. Why this has to be a literal string at all, and
+	// cannot be left to the loop just above: that loop derives BOTH sides from
+	// emojiScopes(), so it is self-consistent and can never notice a missing
+	// tree - which is precisely ticket 96's bug shape (the list was never
+	// synchronised and every internal check stayed green). Only this literal
+	// "frontend/" catches "somebody dropped the entry again".
+	if !strings.Contains(report, "frontend/") {
+		t.Errorf("the ban #8 report does not name frontend/ at all: emojiScopes() must carry the panel's tree (ticket 96 AC#3) - %q", report)
 	}
 }
 
@@ -704,6 +751,138 @@ func TestVerdictRedOnUndeclaredCounter(t *testing.T) {
 	}
 }
 
+// TestRealRepoBan8CoversFrontendTreeAtBan6sCount is ticket 96 AC#1's number and
+// AC#3's falsifier in one place. The two gates now walk the SAME tree with the
+// SAME rule - every file, node_modules/ and testdata/ skipped - so their counts
+// are not merely "close", they are the same integer, and this test demands
+// equality rather than explaining a difference away.
+//
+// AC#3's half: every expectation below is a LITERAL "ban #8 frontend/". The
+// other real-repo ledger tests build their expectations by iterating over
+// emojiScopes(), which is exactly why they all stayed green for the whole time
+// the panel was uncovered - delete frontend/ from that list and they shrink
+// theirselves to three rows and still agree. This test cannot be satisfied that
+// way: if the entry goes missing, emojiSeen["frontend/"] is 0, ban #6's is 37+,
+// the equality fails, the >0 guard fires and the printed line disappears.
+func TestRealRepoBan8CoversFrontendTreeAtBan6sCount(t *testing.T) {
+	root, err := filepath.Abs(filepath.Join("..", ".."))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(root, "go.mod")); err != nil {
+		t.Skipf("not inside the wisp repo: %v", err)
+	}
+	s := scanFixture(t, root)
+
+	front := s.emojiSeen["frontend/"]
+	if front == 0 {
+		t.Fatal("ban #8 examined 0 files under frontend/: the panel's tree is uncovered again (ticket 96), and a run that examines nothing does not get to print \"clean\"")
+	}
+	if ban6 := s.examined["panel-approval"]; front != ban6 {
+		t.Errorf("ban #8 examined %d frontend/ files but ban #6 examined %d - the two gates walk the same tree with the same rule (all files; node_modules/ and testdata/ skipped), so any difference is an exclusion or a filter that one walk grew and the other did not", front, ban6)
+	}
+
+	var labels []string
+	for _, sc := range declaredScopes(root) {
+		labels = append(labels, sc.label)
+		if sc.label != "ban #8 frontend/" {
+			continue
+		}
+		if !sc.live {
+			t.Errorf("ban #8 frontend/ is registered non-live, so an empty walk there would print a verdict instead of failing")
+		}
+		if sc.count(s) != front {
+			t.Errorf("ledger reports %d for ban #8 frontend/ while emojiSeen says %d", sc.count(s), front)
+		}
+	}
+	if !strings.Contains(strings.Join(labels, ","), "ban #8 frontend/") {
+		t.Errorf("declaredScopes() carries no ban #8 frontend/ entry: %v - the ledger must name the tree the ban claims to cover (ticket 96 AC#1)", labels)
+	}
+
+	out, errOut, code := runVerdict(t, root, s)
+	// HEAD may be red for reasons this ticket does not own, so only the scope
+	// lines are claimed here; TestRealRepoLedgerIsHonest owns the verdict.
+	//
+	// describeScopes pads the label to %-24s, so the line is compared after
+	// collapsing runs of spaces - otherwise this test would be pinning the
+	// column width rather than the coverage.
+	line := ""
+	for _, l := range strings.Split(out, "\n") {
+		if strings.Contains(l, "scope ban #8 frontend/") {
+			line = strings.Join(strings.Fields(l), " ")
+		}
+	}
+	want := fmt.Sprintf("d22scan: scope ban #8 frontend/ examined %d text files", front)
+	if line != want {
+		t.Errorf("the self-report line for ban #8 frontend/ is %q, want %q (rc=%d err=%s)", line, want, code, errOut)
+	}
+	if sum := scopeSummary(declaredScopes(root), s); !strings.Contains(sum, fmt.Sprintf("ban #8 frontend/=%d", front)) {
+		t.Errorf("the clean line's scope summary omits ban #8 frontend/=%d, got %q", front, sum)
+	}
+}
+
+// TestBan8FrontendScopeIsNotNarrowedByAnExtensionFilter is ticket 96 AC#2's
+// in-repo twin and AC#3's decision spelled out: reusing the existing
+// goOnly:false branch would have routed frontend/ through isTextFile(), which
+// drops .mjs, extension-less files and dotfiles - measured 5 of the 37 tracked
+// files in frontend/ today, including all three scripts/*.mjs, i.e. the
+// vendoring tooling R18 exists to police. Every class below therefore carries
+// the glyph in a COMMENT, not a string literal, because ban #8's semantics
+// (walkEmoji's first bullet) already count prose.
+//
+// The `.md` row answers the ticket's third question explicitly: yes, non-.go
+// text is scanned, and the reason is that the panel's most likely emoji are UI
+// copy and notes, and D23 governs design language, which lives in prose. The
+// last two rows are the exclusion rule (AC#2's "排除了什么"): node_modules/ and
+// testdata/ are out for every ban in this tool, so an emoji there is reported
+// neither by ban #6 nor by ban #8.
+func TestBan8FrontendScopeIsNotNarrowedByAnExtensionFilter(t *testing.T) {
+	root := liveFixture(t)
+	if err := os.RemoveAll(filepath.Join(root, "frontend")); err != nil {
+		t.Fatal(err)
+	}
+	seedFile(t, root, "tools/d22scan/allowlist.txt", "# empty\n")
+	// U+2713 CHECK MARK, inside emojiRe's \x{2600}-\x{27BF} band.
+	cases := []struct {
+		rel, why string
+	}{
+		{"frontend/src/Card.tsx", "the panel's own components"},
+		{"frontend/src/lib/util.ts", "helpers"},
+		{"frontend/scripts/vendor.mjs", "the vendoring tooling isTextFile() has no .mjs for"},
+		{"frontend/src/app.css", "styles"},
+		{"frontend/VENDORED.md", "docs: this is the .md answer - .md IS scanned"},
+		{"frontend/package.json", "config"},
+		{"frontend/Procfile", "no extension at all, also scanned"},
+	}
+	for _, c := range cases {
+		seedFile(t, root, c.rel, "// ready \u2713 in a comment\n")
+	}
+	seedFile(t, root, "frontend/node_modules/pk/index.tsx", "// ready \u2713\n")
+	seedFile(t, root, "frontend/testdata/golden.tsx", "// ready \u2713\n")
+
+	s := scanFixture(t, root)
+	if got := s.emojiSeen["frontend/"]; got != len(cases) {
+		t.Errorf("ban #8 examined %d frontend/ files, want %d - walkEmoji's everyFile branch and this list disagree, and one of them is narrowing the ban", got, len(cases))
+	}
+	byPath := map[string]int{}
+	for _, f := range s.findings {
+		if f.Ban == "emoji" && strings.HasPrefix(filepath.ToSlash(f.Path), "frontend/") {
+			byPath[filepath.ToSlash(f.Path)]++
+		}
+	}
+	for _, c := range cases {
+		want := filepath.ToSlash(c.rel)
+		if byPath[want] == 0 {
+			t.Errorf("ban #8 did not fire in %s (%s): the scope counted it but the matcher is blind to that file class (all findings %v)", c.rel, c.why, s.findings)
+		}
+		delete(byPath, want)
+	}
+	for p := range byPath {
+		t.Errorf("unexpected ban #8 hit at %s: node_modules/ or testdata/ leaked into the emoji scope", p)
+	}
+	t.Logf("ban #8 examined %d and fired in all %d frontend/ file classes, incl. .mjs, .md and extension-less", s.emojiSeen["frontend/"], len(cases))
+}
+
 // TestLedgerCountsMatchAnIndependentWalk is AC#4's falsifier: the printed numbers
 // are compared against a SECOND, independent walk computed in the test. Without
 // it a ledger that counts the wrong thing (every .go including _test.go, or a
@@ -760,6 +939,13 @@ func TestLedgerCountsMatchAnIndependentWalk(t *testing.T) {
 		// file the way walkText does, so a future suffix filter in either place
 		// shows up as a mismatch instead of a smaller number nobody noticed.
 		{"ban #6 frontend/", count(filepath.Join(root, "frontend"), func(string) bool { return true }), s.examined["panel-approval"]},
+		// Ticket 96: ban #8 now walks the SAME tree with the SAME rule (every
+		// file, node_modules/ and testdata/ skipped), so this scope's falsifier
+		// is the identical `anything` predicate as ban #6's two lines above. A
+		// suffix filter reappearing in either walk shows up here as a mismatch
+		// against this independent count, and a frontend/ entry deleted from
+		// emojiScopes() shows up as report=0.
+		{"ban #8 frontend/", count(filepath.Join(root, "frontend"), func(string) bool { return true }), s.emojiSeen["frontend/"]},
 	}
 	for _, c := range cases {
 		if c.report != c.want {
@@ -917,14 +1103,33 @@ func TestBuiltBinaryGoesRedEndToEnd(t *testing.T) {
 		// TestExemptScopeCannotOutliveItsAbsentTree, which drives the same verdict()
 		// decision against a synthetic exempt scope in both directions.
 		{
-			name: "ban 6 tree gone while declared live exits 2",
+			name: "frontend tree gone while declared live exits 2",
 			setup: func(t *testing.T, root string) {
 				if err := os.RemoveAll(filepath.Join(root, "frontend")); err != nil {
 					t.Fatal(err)
 				}
 			},
+			// RESTATED BY TICKET 96 (AC#4): the assertion used to be
+			// {"ban #6 frontend/", "empty instrument"}, i.e. guard 2's wording.
+			// It still measures "losing a live tree stops the verdict" - rc=2 and
+			// the tree named - but which guard produces that changed, because
+			// frontend/ is now declared by ban #8 too and guard 1 (a declared ban
+			// #8 scope that walked 0 files) deliberately outranks guard 2. So the
+			// case is no longer reachable for ban #6 by deleting the tree; the
+			// "empty instrument" wording below keeps that job pinned in a case
+			// ban #8 does not shadow.
 			wantRC:  2,
-			wantAll: []string{"ban #6 frontend/", "empty instrument"},
+			wantAll: []string{"ban #8 frontend/", "examined 0 files"},
+		},
+		{
+			name: "ban 7 tree gone while declared live exits 2",
+			setup: func(t *testing.T, root string) {
+				if err := os.RemoveAll(filepath.Join(root, "internal", "tools")); err != nil {
+					t.Fatal(err)
+				}
+			},
+			wantRC:  2,
+			wantAll: []string{"ban #7 internal/tools/", "empty instrument"},
 		},
 		{
 			name:    "fully live fixture exits 0",
