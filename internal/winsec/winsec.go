@@ -91,7 +91,7 @@ func privateFile(path string, data []byte, flags int, perm fs.FileMode) error {
 	if err := sealHandle(f); err != nil {
 		_ = f.Close()
 		_ = os.Remove(path)
-		return err
+		return sealError(path, err)
 	}
 	if _, err := f.Write(data); err != nil {
 		_ = f.Close()
@@ -107,7 +107,7 @@ func privateFile(path string, data []byte, flags int, perm fs.FileMode) error {
 }
 
 // SealFile narrows an existing file to the current user.
-func SealFile(path string) error { return sealFile(path) }
+func SealFile(path string) error { return sealError(path, sealFile(path)) }
 
 // PrivateDirAll creates path and any missing parents, sealing **every level it
 // creates** before descending into it. Sealing afterwards is not enough: a
@@ -167,7 +167,7 @@ func PrivateDirAll(path string, perm fs.FileMode) error {
 
 // SealDir narrows a directory to the current user, with new children inheriting
 // exactly that and nothing wider.
-func SealDir(path string) error { return sealDir(path) }
+func SealDir(path string) error { return sealError(path, sealDir(path)) }
 
 // RemoveUnlinked deletes the entry at path without following it, so a link
 // standing where private data was expected disappears while whatever lives
@@ -181,4 +181,18 @@ func RemoveUnlinked(path string) error { return removeUnlinked(path) }
 
 func wrapPath(path string, err error) error {
 	return fmt.Errorf("%w: %s: %v", ErrNotSealable, path, err)
+}
+
+// sealError normalizes any sealing failure to ErrNotSealable at the API
+// boundary. The platform implementations already wrap, but the promise
+// "a refused seal is not a completed write" is a contract for callers, so it
+// must not depend on whether some implementation remembered to label its error.
+func sealError(path string, err error) error {
+	if err == nil {
+		return nil
+	}
+	if errors.Is(err, ErrNotSealable) {
+		return err
+	}
+	return wrapPath(path, err)
 }

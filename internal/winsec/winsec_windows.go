@@ -354,8 +354,10 @@ func removeUnlinked(path string) error {
 	}
 	attr, ok := info.Sys().(*syscall.Win32FileAttributeData)
 	if ok && attr.FileAttributes&windows.FILE_ATTRIBUTE_REPARSE_POINT != 0 {
-		if err := deleteReparsePoint(path); err != nil {
-			return fmt.Errorf("%w %q: %v: refusing to recurse into whatever it points at",
+		if err := deleteLink(path); err != nil {
+			// The path goes out plainly, not %q: a reclaim loop logs this and a
+			// human has to be able to grep it.
+			return fmt.Errorf("%w %s: %v: refusing to recurse into whatever it points at",
 				ErrIsReparsePoint, path, err)
 		}
 		return nil
@@ -376,6 +378,11 @@ var (
 )
 
 type fileDispositionInformationEx struct{ Flags uint32 }
+
+// deleteLink is the seam the AC#4 "named error" leg injects through: the real
+// disposition call is the only way to remove such a link, and when it fails the
+// caller must hear about it as ErrIsReparsePoint rather than as a silent skip.
+var deleteLink = deleteReparsePoint
 
 func deleteReparsePoint(path string) error {
 	h, err := windows.CreateFile(windows.StringToUTF16Ptr(path),

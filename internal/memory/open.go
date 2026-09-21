@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/CarlosShao/wisp/internal/observe"
+	"github.com/CarlosShao/wisp/internal/winsec"
 	_ "modernc.org/sqlite"
 )
 
@@ -169,7 +170,10 @@ func Open(dir string, opts ...Option) (*Store, error) {
 	if err != nil {
 		return nil, fmt.Errorf("memory: resolve data dir: %w", err)
 	}
-	if err := os.MkdirAll(abs, 0o755); err != nil {
+	// The data root is sealed before anything is written into it, and sealed
+	// with inheritance, because wisp.db-wal / wisp.db-shm are created by SQLite
+	// and nothing in this repository gets to seal them afterwards.
+	if err := winsec.PrivateDirAll(abs, 0o700); err != nil {
 		return nil, fmt.Errorf("memory: create data dir: %w", err)
 	}
 	s := &Store{
@@ -181,7 +185,7 @@ func Open(dir string, opts ...Option) (*Store, error) {
 		reg:          o.reg,
 		target:       o.target,
 	}
-	if err := os.MkdirAll(s.artifactsDir, 0o755); err != nil {
+	if err := winsec.PrivateDirAll(s.artifactsDir, 0o700); err != nil {
 		return nil, fmt.Errorf("memory: create artifacts dir: %w", err)
 	}
 	if err := s.migrate(); err != nil {
@@ -496,7 +500,7 @@ func (s *Store) backupPath(from, to int) string {
 // migration must not destroy it).
 func (s *Store) backupDatabase(from, to int) error {
 	dst := s.backupPath(from, to)
-	if err := os.MkdirAll(s.backupDir, 0o755); err != nil {
+	if err := winsec.PrivateDirAll(s.backupDir, 0o700); err != nil {
 		return fmt.Errorf("memory: create backup dir: %w", err)
 	}
 	if _, err := os.Stat(dst); err == nil {

@@ -10,6 +10,8 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/CarlosShao/wisp/internal/winsec"
 )
 
 // artifacts\ management (SPEC-02 §4/§6): host-internal artifacts
@@ -166,7 +168,7 @@ func (s *Store) removeStray(name string) error {
 				return nil
 			}
 			full := filepath.Join(s.artifactsDir, rel)
-			if rErr := os.Remove(full); rErr != nil && !errors.Is(rErr, fs.ErrNotExist) {
+			if rErr := winsec.RemoveUnlinked(full); rErr != nil && !errors.Is(rErr, fs.ErrNotExist) {
 				return fmt.Errorf("memory: remove artifacts stray file %q: %w", rel, rErr)
 			}
 			return nil
@@ -176,7 +178,7 @@ func (s *Store) removeStray(name string) error {
 	}
 	for i := len(dirs) - 1; i >= 0; i-- {
 		full := filepath.Join(s.artifactsDir, dirs[i])
-		if err := os.Remove(full); err != nil && !errors.Is(err, fs.ErrNotExist) {
+		if err := winsec.RemoveUnlinked(full); err != nil && !errors.Is(err, fs.ErrNotExist) {
 			return fmt.Errorf("memory: reclaim artifacts stray dir %q: %w", dirs[i], err)
 		}
 	}

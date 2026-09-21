@@ -6,6 +6,8 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+
+	"github.com/CarlosShao/wisp/internal/winsec"
 )
 
 // ErrPortableDecrypt is returned when a dpapi: ref cannot be decrypted under
@@ -41,7 +43,10 @@ func NewStore(dataDir string, opts ...Option) (*Store, error) {
 	for _, o := range opts {
 		o(s)
 	}
-	if err := os.MkdirAll(s.dir, 0o700); err != nil {
+	// DPAPI user scope is the crypto boundary, but the blob file is not the
+	// key: whoever can read it can still try to decrypt it, and on Windows
+	// MkdirAll's 0o700 never restricted anybody (ticket 89).
+	if err := winsec.PrivateDirAll(s.dir, 0o700); err != nil {
 		return nil, fmt.Errorf("secret: create %s: %w", s.dir, err)
 	}
 	return s, nil
@@ -71,7 +76,7 @@ func (s *Store) Store(ref, secret string) error {
 	if err != nil {
 		return err
 	}
-	if err := os.WriteFile(s.blobPath(id), blob, 0o600); err != nil {
+	if err := winsec.PrivateFile(s.blobPath(id), blob, 0o600); err != nil {
 		return fmt.Errorf("secret: store: write blob: %w", err)
 	}
 	return nil

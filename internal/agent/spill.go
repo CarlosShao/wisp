@@ -12,6 +12,7 @@ import (
 	"sync"
 
 	"github.com/CarlosShao/wisp/internal/observe"
+	"github.com/CarlosShao/wisp/internal/winsec"
 )
 
 // D15(3) long-output spill (SPEC-05 §4.2): a single tool result over the
@@ -103,7 +104,11 @@ func (s *Spiller) Prepare(callID, text string) (Spill, error) {
 
 	name := artifactName(callID, s.nextSequence())
 	path := filepath.Join(s.dir, name)
-	if err := os.MkdirAll(s.dir, 0o755); err != nil {
+	// Sealed, not merely created: on Windows MkdirAll's mode argument is
+	// ignored, so an artifact written into this directory inherited whatever
+	// the parent's DACL granted - ticket 89's A51①, and artifacts are the least
+	// sensitive of the four private classes.
+	if err := winsec.PrivateDirAll(s.dir, 0o700); err != nil {
 		return Spill{}, observe.Wrap(observe.ClassResource, err, "agent: create artifacts dir")
 	}
 	// The capped bytes, not the raw ones: TotalBytes below is what the stub
@@ -117,7 +122,7 @@ func (s *Spiller) Prepare(callID, text string) (Spill, error) {
 		// a model re-reading the path sees either the whole old output or the
 		// whole new one, never a torn artifact.
 		tmp := path + ".retry"
-		if wErr := os.WriteFile(tmp, []byte(capped), 0o600); wErr != nil {
+		if wErr := winsec.PrivateFile(tmp, []byte(capped), 0o600); wErr != nil {
 			return Spill{}, observe.Wrap(observe.ClassResource, wErr, "agent: write spill artifact retry")
 		}
 		if rErr := os.Rename(tmp, path); rErr != nil {
@@ -242,18 +247,11 @@ func digestArtifactID(callID string) string {
 // half-decide by accident: see Prepare, which documents retry as last-writer-
 // wins and performs the swap atomically.
 func writeFileExclusive(path string, data []byte) error {
-	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o600)
-	if err != nil {
-		return err
-	}
-	if _, err := f.Write(data); err != nil {
-		// A half-written artifact would outlive this call: the name is exactly
-		// the one a re-read of Spill.Path resolves to.
-		_ = f.Close()
-		_ = os.Remove(path)
-		return err
-	}
-	return f.Close()
+	// winsec keeps the O_EXCL, the remove-on-partial-write and the promise that
+	// the bytes only ever land in a descriptor that is already in place: on
+	// Windows the 0o600 below used to be the only access control claimed, and it
+	// controls nothing.
+	return winsec.PrivateFileExclusive(path, data)
 }
 
 // takeTokens returns the leading budget tokens of s (4 bytes per token under

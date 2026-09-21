@@ -142,3 +142,40 @@
       那条红**不是实现缺陷**，是判据被编辑掉了；重加调用后才真绿。记这条是因为：红/绿名如果不带原文，
       这种"测试自己坏了"的红会被当成实现的功劳或罪状。
 - [ ] 待办：AC#4（链接）、AC#5（失败注入）、把 memory/agent/secret 三条落盘路径接上 `winsec`、AC#6 的 POSIX 侧点名。
+- [x] **AC#5 失败方向只能收紧（红→绿有名字）**：`internal/winsec/private_fail_test.go`（无 build tag，两平台都跑）。
+  注入点 = `applyDescriptor` 这个包内接缝（不是"假装失败"，是真的把平台实现换掉）：
+  `TestAC5FailedSealRefusesTheWrite` 4/4 子测试绿，且要求**同时**满足 ①错误里 `errors.Is(err, ErrNotSealable)`
+  ②`assertNoBytesOnDisk` —— 磁盘上**一个字节都不许留**。四条腿：exclusive 工件 / 覆盖式写 / 目录链 / 直接 SealFile+SealDir。
+  ⚠ 这条一开始**红了 4/4**，红因是真的：调用点原样把注入错误往外抛，只有平台实现自己 wrap 时才有
+  `ErrNotSealable` ⇒ 契约不能依赖"每个实现都记得 wrap" ⇒ 在公共边界加 `sealError()` 归一化。
+  **变异检验（AC#5 的承载行）**：把 `winsec.go:91` 的 `if err := sealHandle(f); err != nil {` 改成
+  `if err := sealHandle(f); false && err != nil { // MUTATION-89`（字面就是"设不上就算了、继续以宽权限写"）⇒
+  `--- FAIL: TestAC5FailedSealRefusesTheWrite/exclusive_artifact` + `…/replacement_write`（2 红，其余 13 条保持绿 ⇒
+  变异只打到该打的判据，不是全炸），红因 `private_fail_test.go:48: PrivateFile accepted a refused seal`；
+  还原后 `grep -rn MUTATION-89` 为空、全套重跑 rc=0。编译失败不算变异：本次变异**可编译且行为改变**。
+- [x] **AC#4 A51②：本机可构造，用的是 junction（`mklink /J`，普通权限即可）**。
+  `internal/winsec/reparse_windows_test.go` 三条全绿：
+  ① `TestAC4JunctionAtArtifactPositionIsNotRecursed` —— 链接指向"非空目录"，`RemoveUnlinked` 拆链接本身，
+  目标里的 `sub/keep-me.txt` **必须还在**（红一次就是越界删除）；
+  ② `TestAC4UnlinkableLinkGivesNamedError` —— 注入 `deleteLink` 失败 ⇒ 必须拿到包着 `ErrIsReparsePoint`
+  **且带路径**的错误（这条也先红过一次：错误里路径用 `%q` 打印成 `C:\Users\…`，判据按原文匹配路径 ⇒ 红；改成 `%s` 才绿 —— 记下来是因为
+  "错误里有没有路径"这种事只有断言才能发现）；③ `TestAC4SealedWalkSkipsLinks` —— `SealDir` 的传播**不穿链接**
+  （用 `verifyPrivate(keep)` 仍失败来证明目标的 DACL 没被我们改写）。
+  **诚实结论（A51② 本身）**：本机 Go 1.27 + Win11 上 `os.Remove` **能**删掉指向非空目录的 junction
+  （测试里那条 `os.Remove cleared this junction directly; A51② does not reproduce for it` 就是实测日志），
+  但无论成功与否都**断言了目标内容仍在**；而**目录符号链接**这台机普通权限建不出来（需
+  `SeCreateSymbolicLinkPrivilege`/开发者模式）⇒ 那条构造放在 **Linux 侧**：
+  `internal/winsec/private_other_test.go` 的 `TestPOSIXSymlinkAtArtifactPositionIsNotRecursed`（`os.Symlink` 免特权），
+  两侧强度：Windows 侧证"实现不递归、失败具名"，POSIX/Linux 侧证"同一 API 在 unlink 语义下也不越界"。
+  **没有**因为 os.Remove 这次成功就把判据删掉：`RemoveUnlinked` 走的是
+  `CreateFile(FILE_FLAG_OPEN_REPARSE_POINT|BACKUP_SEMANTICS)+SetFileInformationByHandle(FileDispositionInfoEx)`，
+  这是"只可能删到链接本身"的那条形。生产侧接点：`memory/artifacts.go` 的 `removeStray` 两处 `os.Remove(full)` 已换成它。
+- [x] **落盘路径接线（票面点名的三个家）**：`agent/spill.go`（artifacts 目录 → `PrivateDirAll`；`.retry` 临时件 → `PrivateFile`；
+  `writeFileExclusive` → `PrivateFileExclusive`）、`secret/store.go`（secrets 目录 + DPAPI blob）、
+  `memory/open.go`（data 根 / artifacts / backup）、`memory/artifacts.go`（reclaim 用 `RemoveUnlinked`）。
+  **生产路径端到端 icacls 证据**：`TestAC3ProductionDataRootIsPrivateEndToEnd`（宽父目录下 `memory.Open`+`secret.NewStore`，
+  打开态探 `wisp.db`/`-wal`/`-shm`，再全树 sweep：`sweep checked 8 entries … all private`）；
+  `internal/agent/spill_acl_windows_test.go::TestAC3SpillArtifactLandsPrivate` 走真 `Spiller.Prepare`：
+  `icacls tool-output-call_acl.txt -> [NT AUTHORITY\SYSTEM BUILTIN\Administrators DESKTOP-LVS7839\swq]`。
+  ⚠ **没接的同族**（本票落点之外，要编排者拍板）：`models/downloader.go:224/:389`（staging，AC#1 实测同样带外来 ACE）、
+  `config/migrate.go:83`+`config/parse.go:213`（0o600 配置备份）、`observe/logging.go:244`（0o644 日志）、`ball/position.go:77`。
