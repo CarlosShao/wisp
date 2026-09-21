@@ -113,13 +113,14 @@ func TestAC1SealFileReportsTheInheritedGrantItCleared(t *testing.T) {
 	}
 
 	// Before reading: the grant really is on the child, and really is inherited.
+	// Ticket 118 AC#3/AC#4: this was a search of icacls text for the bytes that
+	// name Everyone, which cannot answer the second half of this sentence at all
+	// (the "(I)" marker below was only ever logged). readDACL answers both, out of
+	// the binary ACE, by trustee SID and by the inherited flag.
 	beforeACL := icaclsRaw(t, child)
 	t.Logf("icacls BEFORE SealFile %s\n%s", child, beforeACL)
-	if !namesEveryone(beforeACL) {
+	if !grantStandsOn118(t, child, everyoneSID, true) {
 		t.Fatalf("the fixture did not produce the inherited grant this test is about:\n%s", beforeACL)
-	}
-	if !strings.Contains(strings.ToUpper(beforeACL), "(I)") {
-		t.Logf("note: icacls renders the inherited copy as: %s", strings.TrimSpace(beforeACL))
 	}
 
 	*got = nil
@@ -147,7 +148,7 @@ func TestAC1SealFileReportsTheInheritedGrantItCleared(t *testing.T) {
 	if err := verifyPrivate(child); err != nil {
 		t.Errorf("the child is not private after the seal, i.e. the notice papered over a seal that cleared nothing: %v", err)
 	}
-	if namesEveryone(afterACL) {
+	if everyoneStandsOn118(t, child) {
 		t.Errorf("icacls still shows the foreign principal on %s after the seal:\n%s", child, afterACL)
 	}
 }
@@ -179,10 +180,15 @@ func TestAC1DefaultLogSaysInherited(t *testing.T) {
 	}
 	out := buf.String()
 	t.Logf("default rendering: %s", strings.TrimSpace(out))
-	if !strings.Contains(out, "level=WARN") || !strings.Contains(out, "inherited") {
-		t.Fatalf("the default notifier does not distinguish an inherited clearing: %q", out)
+	// Ticket 118 AC#1/AC#2: this leg used to ask Contains(out, "inherited"), which
+	// every rendering satisfies because the attribute is NAMED cleared_inherited=.
+	// acceptor-ticket104's M4 (swap the two buckets) therefore left this case green
+	// while the kind value moved to "explicit". The kind VALUE is compared now, and
+	// so is which principals stand in which bucket.
+	if !strings.Contains(out, "level=WARN") || !noticeRendersKindOnTree118(t, out, child, "inherited") {
+		t.Fatalf("the default notifier does not distinguish an inherited clearing (kind= must be the token \"inherited\"): %q", out)
 	}
-	if !strings.Contains(out, everyoneSID) || !strings.Contains(out, filepath.Base(child)) {
+	if !noticeClearsOnTreeExactly118(t, out, child, everyoneSID) || !strings.Contains(out, filepath.Base(child)) {
 		t.Errorf("the line names neither the principal nor the path an operator has to grep for: %q", out)
 	}
 }
