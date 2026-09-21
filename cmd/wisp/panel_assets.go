@@ -1,7 +1,7 @@
 package main
 
 // `wisp panel-assets` - the diagnostic face of the embedded panel bundle
-// (ticket 77 AC#1).
+// (ticket 77 AC#1) and of the L2 card payload (AC#3).
 //
 // Why a subcommand exists at all: AC#1's judgement is that the panel reaches a
 // machine with no node, no npm and no network. That is only provable if
@@ -14,22 +14,50 @@ package main
 // to call the same panel.Assets API this command prints.
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
 
 	"github.com/CarlosShao/wisp/internal/panel"
+	"github.com/CarlosShao/wisp/internal/risk"
 )
 
 func cmdPanelAssets(args []string) int {
 	fs := flag.NewFlagSet("panel-assets", flag.ContinueOnError)
 	manifest := fs.Bool("manifest", false, "list every file the binary carries, with size and fingerprint")
 	render := fs.String("render", "", "write the embedded bytes for this request path to stdout")
+	l2 := fs.String("l2", "", "assess this tool name with the remaining args as its argv and print the L2 card JSON")
 	fs.Usage = func() {
-		fmt.Fprintln(os.Stderr, "usage: wisp panel-assets [-manifest] [-render <path>]")
+		fmt.Fprintln(os.Stderr, "usage: wisp panel-assets [-manifest] [-render <path>] [-l2 <tool> <args...>]")
 	}
 	if err := fs.Parse(args); err != nil {
 		return 2
+	}
+
+	// The card path is the panel's data source: internal/risk decides, this
+	// prints exactly the JSON the WebView2 host pushes. Ticket 35 replaces the
+	// printing with a bridge push; nothing else about the payload changes, which
+	// is why the frontend's ApprovalCardView keys are pinned against it.
+	if *l2 != "" {
+		rest := fs.Args()
+		view := panel.NewApprovalCardView(risk.NewRiskAssessor(), panel.ApprovalSubject{
+			CorrelationID: "panel-assets-l2",
+			Tool:          *l2,
+			Args:          rest,
+			CallChain:     []string{"cli", "panel-assets", *l2},
+			Facts: risk.Facts{
+				Declared: risk.L1,
+				Paths:    rest,
+			},
+		})
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		if err := enc.Encode(view); err != nil {
+			fmt.Fprintf(os.Stderr, "wisp panel-assets: encode: %v\n", err)
+			return 1
+		}
+		return 0
 	}
 
 	assets, err := panel.BuiltinAssets()

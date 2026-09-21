@@ -65,14 +65,14 @@ C21、D23/§17 零 emoji 图标、D29 人工视觉签收、ban #6 / ban #8
 ## AC（1:1 裁决表，与框逐条对应；能力类框必须回答"生产里谁调用它"）
 - [ ] **AC#1** `frontend/` 可构建，产物被 `go:embed` 打进二进制，`wisp.exe` 在无 node 环境的机器上能拉起面板。
       判据：**剥光 PATH 里的 node/npm** 后跑一次真拉起（这条来自我们自己踩过的"签收命令只在开发机能跑"）。
-- [ ] **AC#2** token 四方对账用例落地 + 一次"只改前端一处颜色 ⇒ 用例红"的变异（grep 证落盘 → 跑 → 还原 → 证还原）。
+- [x] **AC#2** token 四方对账用例落地 + 一次"只改前端一处颜色 ⇒ 用例红"的变异（grep 证落盘 → 跑 → 还原 → 证还原）。
 - [ ] **AC#3** L2 确认卡渲染真数据：由 `internal/risk` 的真实决策对象驱动，**不是**组件库 demo 的假 props。
       ⚠ 能力类判据：**说清生产调用者是谁**（哪个装配根、什么事件流），否则按 A33 只能记 PARTIAL。
 - [ ] **AC#4** `ban #6` 与 `ban #8` 对真实 `frontend/` 的作用域台账：贴出扫描器自报的**逐作用域文件数**（>0），
       并给出一次故意在前端写 `approval.decide` ⇒ **rc=1 且点名文件** 的真红。
-- [ ] **AC#5** 前端无任何本地持久化；重启 WebView 后一切从 Go 侧恢复到同一状态（一条真机或半真机用例证明）。
+- [x] **AC#5** 前端无任何本地持久化；重启 WebView 后一切从 Go 侧恢复到同一状态（一条真机或半真机用例证明）。
 - [ ] **AC#6** CI 新 job 有真实 run id + 结论（见前提 6）；**不允许用"本地跑过了"替代**。
-- [ ] **AC#7** vendored 清单：`frontend/VENDORED.md` 逐文件列 来源仓库 / 组件名 / 许可（含 Commons Clause 标注），
+- [x] **AC#7** vendored 清单：`frontend/VENDORED.md` 逐文件列 来源仓库 / 组件名 / 许可（含 Commons Clause 标注），
       且 `git grep` 能在每个 vendored 文件头找到出处。
       ⇒ **R19 之后的一期口径**：一期**只会出现 Beautiful UI（MIT）与 shadcn/ui（MIT）两类来源**；
       React Bits 一条代码都不许进树。台账里请**明写一行"React Bits = 二期，许可为 MIT + Commons Clause，
@@ -122,3 +122,54 @@ C21、D23/§17 零 emoji 图标、D29 人工视觉签收、ban #6 / ban #8
   `next=` AC#2 四方对账用例 + AC#7 `frontend/VENDORED.md`；之后 AC#4 台账
   （**已知雷**：`frontend/` 一存在，`tools/d22scan` 的 driftedAbsentScope 就 rc=2 要求把 ban #6
   翻成 live:true，而 `tools/d22scan/**` 不是本票能动的地方 —— 见 Progress log 下一条的数字）。
+
+- **15:2x `agent-ticket77` AC#2 + AC#5 + AC#7 落地，AC#3/AC#4 各带回一处硬事实**。
+  **AC#2 四方对账**：新用例 `TestC21DesignTokensFourWayAgree`（`internal/panel/tokens_fourway_test.go`）
+  一次跑核 P1 `design/assets/tokens.css` / P2 `docs/evidence/s1/c21-native-tokens.md` /
+  P3 `internal/ball/tokens.go` / P4 `frontend/src/styles/tokens.generated.css`：
+  实测 `135 dark + 71 light tokens reconciled`、`legs 2-4 reconciled for 78 of 78 colour rows`、rc=0。
+  ⚠ **口径偏差，先记在这里**：票面写的是"把 `TestC21TableColourRowsMatchTokensCSS` 扩成四方"，
+  而那条用例在 `internal/ball/` —— 本票硬规矩明令不许动 `internal/ball`。四方因此落在**我自己的
+  作用域里新增的一条用例**上（P2↔P3 那一腿在两边各核一次，语义等价、互不遮蔽），
+  ball 的三方用例一字未改。**要不要把它并回 ball 由 ball 的地界决定，不由本票决定。**
+  **变异检验（真红）**：只改前端第 42 行 `--accent: #86C2B9` → `#86C2B8` ⇒
+  `--- FAIL` rc=1，两条腿同时点名（`tokens.css declares --accent = "#86C2B9" but ... carries "#86C2B8"`
+  与 `native Palette.Accent holds "hex(0x86C2B9,1)" but the panel renders --accent = "#86C2B8"`，
+  `78 → 77 rows`）。独立第二道 `node scripts/gen-tokens.mjs --check` 同一改动 rc=1。
+  **还原证明**：`npm run tokens` 重生成后 `sha256sum` = `93a887626d6ebdb2...`（与变异前同一串），
+  `git diff --stat` 对该文件为空，用例回到 rc=0。
+  **AC#5**：`TestPanelFrontendIsStateless` 扫 `frontend/src` 20 个文件 × 7 类持久化 API
+  （localStorage/sessionStorage/indexedDB/document.cookie/caches/serviceWorker/node:fs）= **0 命中**；
+  `TestPanelSnapshotSurvivesWebviewRestart` 用真评估器的决策 → 432 B JSON → 丢弃全部内存态再读回
+  `reflect.DeepEqual` 相等（票面允许的"半真机"形状；真 WebView2 归票 33）。
+  **AC#7**：`frontend/VENDORED.md` 逐文件台账（Beautiful UI 8 个 + shadcn 4 个，各带来源/组件/许可/
+  上游 commit `05dab2d2b5f1`/本地改动/挂载状态），**React Bits 单列一行**：二期、**MIT + Commons Clause**、
+  **引入前必须 owner 复核**、并给了可重跑的反查命令 `git grep -in "react-bits\|reactbits" -- frontend/`。
+  两条 vendoring 脚本进了仓（`frontend/scripts/vendor.mjs`、`vendor-shadcn.mjs`），台账可被命令复现。
+  **AC#4 的两处硬事实**：
+  (1) **第一个真命中是我自己的台账** —— `frontend/VENDORED.md` 为了说明 ban #6 而写了那个标识符，
+      被 `TestFrontendNeverNamesAnApprovalDecision` 点名 `frontend/VENDORED.md:109`（`--- FAIL` rc=1）。
+      处置=**改我们的措辞**，`tools/d22scan/**` 与 `allowlist.txt` **一字未动**（豁免清单只短不长）。
+  (2) **planted 真红**：临时 `frontend/src/__ban6_probe.ts` 写入该标识符 ⇒ 扫描器点名
+      `frontend/src/__ban6_probe.ts:1: [panel-approval] ...`，但**退出码是 2 不是 1**：
+      `verdict()` 的 guard 3（`driftedAbsentScope`）排在 findings 判定之前，而 ban #6 仍登记 `absentOK`。
+      同一个 rc=2 在**没有任何命中**的当前树上也一样出现（`scope ban #6 frontend/ examined 37 text files [NOT COVERED]`）。
+      ⇒ **`frontend/` 一进树，D22 门禁就是红的，而解除它唯一的一行（`live:true`）在 `tools/d22scan/main.go`，
+      不是本票能动的地界**（票面硬规矩 + 编排者指令一致）。扫描器自己的报错文案就是这个意思：
+      "Flip it to live:true in the same commit that creates the tree"。**这条要编排者落地**，
+      否则 A58 刚转绿的 lint job 会因为我这一票重新红。
+      ban #8 一侧：它的声明作用域只有 `design/ internal/ cmd/`，**不含 `frontend/`** ⇒
+      票面"选一种并登记"我选的是**自己武装**（`TestFrontendHasNoEmoji`，字符区间照抄 scanner 的 `emojiRe`），
+      24 个文件 0 命中；上游 `tool-chips.tsx` 带进来的 2 个 U+2713 在 vendoring 时就 ASCII 化了（不是事后追改）。
+  **AC#3 现状（PARTIAL，框不勾）**：`internal/panel/approval.go` 的 `NewApprovalCardView` 直接问
+  `risk.NewRiskAssessor()`（与 `internal/tools/bridge.go:169` 同一个构造函数），真评估器实测
+  `level=L2 rules=[R1 R8] reason="R1: 工具声明为下界（L1）; R8: 不可逆操作（永久删除）"`；
+  原因缺失时 `ReasonKnown=false` 且有专门用例钉住"不得显示成无风险"（票 20 第 7 框那条 D22 项未落地的口径）。
+  Go↔TS 契约由 `TestApprovalCardViewJSONKeysMatchFrontendTypes` 双向核（10/3/3 个 JSON 键）。
+  生产调用者：今天是 `wisp panel-assets -l2 <tool> -- <argv>`（无 node 环境实测 rc=0，输出上面那份 JSON），
+  明天是票 35 的桥推送。**没勾的原因**：没有任何浏览器/DOM 证据能证明 React 真把这些值画成了卡
+  （一期无 vitest/jsdom 用例，WebView2 本体归票 33）⇒ 按 A33 记 PARTIAL。
+  门禁复跑：`go build ./...` rc=0、`go vet ./internal/panel/... ./cmd/wisp/...` rc=0、
+  `gofmt -l cmd/wisp internal/panel frontend` 空、`go test ./internal/panel/ -v` **10/10 PASS 0 SKIP**。
+  `next=` AC#6 的 `lint-frontend` job 新增行（只加我自己的 job，`ci.yml` 请编排者复核），
+  以及编排者那一行 ban #6 `live:true`；AC#3 的 DOM 证据与 AC#1 的真窗口一起排在票 33/35 之后。

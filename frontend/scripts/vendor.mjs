@@ -40,11 +40,15 @@ const JOBS = [
 // or register the tree as out of scope - so we ASCII-ize. An unmapped glyph is
 // fatal rather than silently shipped, because a re-vendor must not be able to
 // reopen the hole.
+// Written with escapes rather than the glyphs themselves: internal/panel's
+// TestFrontendHasNoEmoji scans this directory with the scanner's own ranges, and
+// the table that removes the glyphs must not be the thing that reintroduces
+// them. U+2713/U+2714 check, U+2717/U+2715 cross.
 const GLYPH_MAP = new Map([
-  ["✓", "[ok]"],
-  ["✔", "[ok]"],
-  ["✗", "[x]"],
-  ["✕", "[x]"],
+  ["\u2713", "[ok]"],
+  ["\u2714", "[ok]"],
+  ["\u2717", "[x]"],
+  ["\u2715", "[x]"],
 ]);
 const EMOJI_RE = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{1F1E6}-\u{1F1FF}]/gu;
 
