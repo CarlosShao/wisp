@@ -2,6 +2,7 @@ package tools
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 	"sync"
 
@@ -80,7 +81,7 @@ func (p *PathCanonicalizer) InAllowlist(canonical string) bool {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 	for _, r := range p.roots {
-		if f == r || strings.HasPrefix(f, r+sep) {
+		if f == r || strings.HasPrefix(f, r+pathSep) {
 			return true
 		}
 	}
@@ -100,18 +101,32 @@ func (p *PathCanonicalizer) UnusableRoots() []string {
 	return append([]string(nil), p.unusable...)
 }
 
-// pathSep is the comparison separator. C26 normalizes to backslashes, so the
-// adapter never has to ask the OS.
-const sep = `\`
+// pathSep is the comparison separator: the PLATFORM one. C26's canonical is the
+// real path of the real file, which on POSIX is '/'-shaped and on Windows
+// '\'-shaped (ticket 75); a hard-coded '\\' here used to make every comparison
+// string on Linux name a path no OS call can open.
+const pathSep = string(filepath.Separator)
 
-// foldPath puts a canonical path into the comparison form: forward slashes
-// unified, lowercased, trailing separators trimmed. It is a COMPARISON fold,
-// not a normalization - it neither cleans nor absolutizes, and calling it on
-// user input instead of Canonicalize would be the C26 bypass D22 forbids.
+// unifySeparators folds '/' into '\' on Windows, where the OS treats the two as
+// one, and leaves the string untouched on POSIX, where '\' is an ordinary
+// filename character (folding it there would merge two different files into one
+// comparison key). The branch is a compile-time constant on each platform, so
+// Windows output is byte-identical to the pre-ticket-75 code.
+func unifySeparators(p string) string {
+	if filepath.Separator == '\\' {
+		return strings.ReplaceAll(p, "/", `\`)
+	}
+	return p
+}
+
+// foldPath puts a canonical path into the comparison form: alternate separators
+// unified into the platform one, lowercased, trailing separators trimmed. It is
+// a COMPARISON fold, not a normalization - it neither cleans nor absolutizes,
+// and calling it on user input instead of Canonicalize would be the C26 bypass
+// D22 forbids.
 func foldPath(p string) string {
-	u := strings.ReplaceAll(p, "/", sep)
-	u = strings.ToLower(u)
-	for len(u) > 1 && strings.HasSuffix(u, sep) {
+	u := strings.ToLower(unifySeparators(p))
+	for len(u) > 1 && strings.HasSuffix(u, pathSep) {
 		u = u[:len(u)-1]
 	}
 	return u

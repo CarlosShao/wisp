@@ -125,11 +125,19 @@ func overrideApplies(cand pathForms, bOverrides map[string]bool) bool {
 	return bOverrides[cand.real]
 }
 
-// normPath folds a path into the comparison form: forward slashes unified,
-// lowercased, trailing separators trimmed.
+// normPath folds a path into the comparison form: alternate separators unified
+// into the platform one, lowercased, trailing separator trimmed. It is a
+// COMPARISON fold and stays inside this package; the shape it produces must
+// never be handed to the OS or printed as a path (ticket 75) - that shape is
+// C26's canonical, which is platform-native by construction.
 func normPath(p string) string {
-	u := strings.ReplaceAll(p, "/", `\`)
-	return strings.TrimSuffix(strings.ToLower(u), `\`)
+	u := strings.ToLower(unifySeparators(p))
+	// Trimming the root itself (POSIX "/", Windows "\") would erase the only
+	// thing that makes the path absolute, so keep it.
+	if t := strings.TrimSuffix(u, sepStr); t != "" || u != sepStr {
+		return t
+	}
+	return u
 }
 
 // normDir normalizes an anchor directory for prefix matching.
@@ -140,12 +148,30 @@ func normDir(p string) string {
 	return p
 }
 
+// anchorPath puts an anchor directory and its literal child segments together
+// in the comparison shape. Both sides arrive separator-unified (normPath /
+// normDir above), so a plain sepStr join is all this is - and it has to be the
+// platform separator, because the result goes into formsOf, which absolutizes
+// and Lstats it. A backslash glued onto a POSIX home names a file that can
+// never exist (ticket 75).
+func anchorPath(dir string, parts ...string) string {
+	out := dir
+	for _, p := range parts {
+		if out == sepStr {
+			out += p // never build "//" off the POSIX root
+			continue
+		}
+		out += sepStr + p
+	}
+	return out
+}
+
 func isUnder(path, dir string) bool {
-	return path == dir || strings.HasPrefix(path, dir+`\`)
+	return path == dir || strings.HasPrefix(path, dir+sepStr)
 }
 
 func baseName(p string) string {
-	if i := strings.LastIndex(p, `\`); i >= 0 {
+	if i := strings.LastIndex(p, sepStr); i >= 0 {
 		return p[i+1:]
 	}
 	return p
@@ -178,27 +204,31 @@ func classifyForms(cand pathForms) (Class, string) {
 	// candidate went through, so RUNNER~1 and runneradmin become one shape.
 	// Each rule asks for its own child anchor (`<home>\.ssh` and friends),
 	// because the expansion has to be proven per path, not per env var.
+	// The join goes through anchorPath, i.e. the PLATFORM separator: these
+	// strings are handed to formsOf, which absolutizes and Lstats them, so a
+	// backslash glued onto a POSIX home names a file that cannot exist
+	// (ticket 75). The human-readable rule strings below stay as written.
 
 	// ---- A tier (absolute, non-overridable) ----
 	switch {
-	case homeS != "" && aEq(cand, anchorForms(homeS+`\.git-credentials`)):
+	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.git-credentials`))):
 		return ClassA, "~/.git-credentials"
 	case aAnyForm(cand, hasGitConfigSegment):
 		return ClassA, ".git/config"
-	case aUnder(cand, anchorForms(appDataS+`\wisp`)) &&
-		aEq(cand, anchorForms(appDataS+`\wisp\config.toml`)):
+	case aUnder(cand, anchorForms(anchorPath(appDataS, `wisp`))) &&
+		aEq(cand, anchorForms(anchorPath(appDataS, `wisp`, `config.toml`))):
 		return ClassA, "%APPDATA%\\wisp\\config.toml"
-	case homeS != "" && aUnder(cand, anchorForms(homeS+`\.ssh`)):
+	case homeS != "" && aUnder(cand, anchorForms(anchorPath(homeS, `.ssh`))):
 		return ClassA, "~/.ssh/**"
-	case homeS != "" && aEq(cand, anchorForms(homeS+`\.aws\credentials`)):
+	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.aws`, `credentials`))):
 		return ClassA, "~/.aws/credentials"
-	case homeS != "" && aEq(cand, anchorForms(homeS+`\.kube\config`)):
+	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.kube`, `config`))):
 		return ClassA, "~/.kube/config"
 	case aAnyForm(cand, func(s string) bool { return isBrowserCredentialStore(baseName(s)) }):
 		return ClassA, "browser credential store"
-	case appDataS != "" && aUnder(cand, anchorForms(appDataS+`\microsoft\protect`)):
+	case appDataS != "" && aUnder(cand, anchorForms(anchorPath(appDataS, `microsoft`, `protect`))):
 		return ClassA, "%APPDATA%\\Microsoft\\Protect\\** (DPAPI master keys)"
-	case localAppDataS != "" && aUnder(cand, anchorForms(localAppDataS+`\microsoft\credentials`)):
+	case localAppDataS != "" && aUnder(cand, anchorForms(anchorPath(localAppDataS, `microsoft`, `credentials`))):
 		return ClassA, "%LOCALAPPDATA%\\Microsoft\\Credentials\\**"
 	}
 
@@ -292,8 +322,9 @@ func uncertainAnchorMiss(cand, anchor pathForms) bool {
 }
 
 // hasGitConfigSegment reports whether the path is exactly <...>/.git/config.
+// It is fed comparison forms (normPath output), so one separator is enough.
 func hasGitConfigSegment(p string) bool {
-	segs := strings.Split(p, `\`)
+	segs := strings.Split(p, sepStr)
 	for i, s := range segs {
 		if s == ".git" && i+2 == len(segs) && segs[i+1] == "config" {
 			return true

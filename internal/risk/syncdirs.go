@@ -213,17 +213,19 @@ func (s *syncSet) resolveTarget(raw string) (string, error) {
 		// in pathresolver_other.go): the lexical form is all C26 can offer
 		// there; the ancestor chain at least is known to exist.
 		//
-		// NOTE(adversarial re-verification N-9): on POSIX this branch is
-		// currently UNREACHABLE — deepestExistingAncestor Lstats `\`-joined
-		// components, which never exist there, so the walk returns anc=="" and
-		// the caller lands in errTargetUnverified: every write is judged
-		// sync-suspect (the strict side, not a hole, but it would flag every
-		// plain local write once the engine is wired on macOS). Closing that —
-		// native separators on the walk, plus a real CloudStorage probe — is
-		// ticket 55's AC line, not this file's; compiling for darwin does NOT
-		// mean this path behaves.
+		// This branch used to be UNREACHABLE on POSIX (adversarial
+		// re-verification N-9): deepestExistingAncestor Lstat-ed `\`-joined
+		// components, which never exist there, so the walk returned anc==""
+		// and every write fail-closed to sync-suspect. Ticket 75 fixed the
+		// shape (native separators in the walk and in the re-join below), so
+		// the lexical fallback now does what its comment always said. What
+		// ticket 55 still owns is the OTHER half of the macOS line: a real
+		// CloudStorage/nsurlcaches directory probe as confirmed-grade
+		// evidence, without which s.complete stays false on POSIX and
+		// under-profile writes keep falling into the suspect net. Compiling
+		// for darwin does NOT mean that judgment is well-informed.
 	}
-	return normPath(ares.Canonical + `\` + strings.Join(rest, `\`)), nil
+	return normPath(ares.Canonical + sepStr + strings.Join(rest, sepStr)), nil
 }
 
 // deepestExistingAncestor splits an absolute, lexically cleaned path into the
@@ -250,8 +252,8 @@ func deepestExistingAncestor(canon string) (string, []string) {
 	base, n := root, 0
 	for i, c := range comps {
 		next := base + c
-		if !strings.HasSuffix(next, `\`) {
-			next += `\`
+		if !strings.HasSuffix(next, sepStr) {
+			next += sepStr
 		}
 		st, err := os.Lstat(next)
 		if err != nil {
@@ -265,7 +267,7 @@ func deepestExistingAncestor(canon string) (string, []string) {
 	if n == len(comps) {
 		return "", nil // full path exists yet was not handle-resolvable
 	}
-	return strings.TrimSuffix(base, `\`), comps[n:]
+	return strings.TrimSuffix(base, sepStr), comps[n:]
 }
 
 // hasFoldedDotDot reports whether the raw spelling carries a `..` component,
@@ -275,7 +277,7 @@ func deepestExistingAncestor(canon string) (string, []string) {
 // fails closed on it (adversarial re-verification N-10); ordinary fs.write
 // targets contain no `..`, so the false-positive surface is ~zero.
 func hasFoldedDotDot(raw string) bool {
-	for _, c := range strings.Split(strings.ReplaceAll(raw, "/", `\`), `\`) {
+	for _, c := range strings.Split(unifySeparators(raw), sepStr) {
 		if c == ".." {
 			return true
 		}
@@ -284,10 +286,14 @@ func hasFoldedDotDot(raw string) bool {
 }
 
 // splitPathComponents separates the volume/UNC root of an absolute path
-// (C:\, \\?\C:\, \\server\share\, \\?\UNC\server\share\, or the POSIX root
-// mapped onto `\`) from its components. An empty root means "unclassifiable".
+// (C:\, \\?\C:\, \\server\share\, \\?\UNC\server\share\) or the POSIX root
+// from its components. An empty root means "unclassifiable".
+//
+// The Windows-shaped branches are dead code on POSIX and stay dead: there the
+// only root a C26 canonical can carry is "/", and '\' is an ordinary filename
+// character that must NOT be turned into one (ticket 75).
 func splitPathComponents(p string) (string, []string) {
-	u := strings.ReplaceAll(p, "/", `\`)
+	u := unifySeparators(p)
 	var root, rest string
 	switch {
 	case strings.HasPrefix(u, `\\?\UNC\`):
@@ -309,15 +315,15 @@ func splitPathComponents(p string) (string, []string) {
 			return "", nil
 		}
 		root, rest = `\\`+server+`\`+share+`\`, body[len(server)+1+len(share)+1:]
-	case len(u) >= 2 && u[1] == ':':
-		root, rest = u[:2]+`\`, u[2:]
-	case strings.HasPrefix(u, `\`):
-		root, rest = `\`, u[1:]
+	case filepath.Separator == '\\' && len(u) >= 2 && u[1] == ':':
+		root, rest = u[:2]+sepStr, u[2:]
+	case strings.HasPrefix(u, sepStr):
+		root, rest = sepStr, u[1:]
 	default:
 		return "", nil
 	}
 	var comps []string
-	for _, c := range strings.Split(rest, `\`) {
+	for _, c := range strings.Split(rest, sepStr) {
 		if c != "" {
 			comps = append(comps, c)
 		}

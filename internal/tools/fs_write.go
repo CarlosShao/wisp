@@ -175,9 +175,14 @@ func (d FSDeps) canonical(raw string) (string, error) {
 
 // dirOf is the parent directory of a C26-canonical path: a string cut at the
 // last separator of an ALREADY canonical input. No Clean, no Abs (D22).
+//
+// The cut uses the PLATFORM separator. Rewriting '/' into '\' before cutting
+// (ticket 75) left the POSIX parent as a backslash string that reaches the
+// operator in the audit line ("在 \tmp\x 创建临时文件 y") and, on POSIX, also
+// mangles any name that legitimately contains a backslash.
 func dirOf(canonical string) string {
-	c := strings.ReplaceAll(canonical, "/", `\`)
-	i := strings.LastIndex(c, `\`)
+	c := unifySeparators(canonical)
+	i := strings.LastIndex(c, pathSep)
 	if i <= 0 {
 		return ""
 	}
@@ -186,8 +191,8 @@ func dirOf(canonical string) string {
 
 // baseOf is the trailing component of a canonical path (string cutting only).
 func baseOf(canonical string) string {
-	c := strings.ReplaceAll(canonical, "/", `\`)
-	if i := strings.LastIndex(c, `\`); i >= 0 {
+	c := unifySeparators(canonical)
+	if i := strings.LastIndex(c, pathSep); i >= 0 {
 		return c[i+1:]
 	}
 	return c
