@@ -141,6 +141,19 @@ the resolver denies any path that traverses a reparse point」）。
 ⇒ **路 1 结论：不采用**。它能给的只有"少一点写权限"，代价是 `shell.exec` 生态半瘫 + 一个"我们降权了"的错误信号。
 这与第一会话 §0 第 2 点的结论一致（它从"能用与挡住互斥"的角度得到同一答案）。
 
+### 3.3 编排者给的任务：把"路 1 不解决问题"当**待推翻的假设**去打
+
+判据 = 能否构造出"**子进程还能正常干活、且读不到我的目录**"的受限令牌配方。
+我在本机（非提权、令牌无 `SeIncreaseQuotaPrivilege`）实测了 4 种：
+`DISABLE_MAX_PRIVILEGE` / `+LUA_TOKEN` / `+WRITE_RESTRICTED`(restricting SID 只给 `Everyone`) /
+`WRITE_RESTRICTED` 去 `LUA`。**四种读 `%USERPROFILE%` 靶文件与列目录全 OK**（§3.2 表），
+即**四种都读不到"挡住"**。再加上第一会话的 5 种（配方 2/5/6 会废掉子进程、4 直接被 `errno=87` 拒绝），
+**本机上"能用 + 挡住"这一格在受限令牌里是空的 ⇒ 假设未被推翻**。
+唯一同时满足两半的是 **AppContainer**（§4：读/写/宿主内存/HKCU 全 DENIED，显式授权的路径可读写），
+**而它不是受限令牌**——这是路 2 存在的理由，不是路 1 的变体。
+⚠ 诚实边界：这只证到"本机 + 非提权 + 我试过的这 4 种组合"；提权宿主上 `TOKEN_MANDATORY_POLICY_NO_READ_UP`
+能不能补上"读"那一半，**未证**（第一会话 `:149-151` 拿到的是负向读数）。
+
 ---
 
 ## 4. 路 2：AppContainer — 实测（补齐第一会话没写出的 §4）
