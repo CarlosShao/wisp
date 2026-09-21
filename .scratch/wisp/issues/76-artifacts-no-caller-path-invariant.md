@@ -1,6 +1,6 @@
 # 76 — Pin the artifacts path as "no caller-controlled path enters it" (closes ticket 20's `:103` box honestly)
 
-**Status:** in progress（实现代理 checkpoint 1：`internal/memory` 侧四层证明已绿 + 顺手坐实一个真缺陷；`internal/agent` 侧未写）
+**Status:** in progress（实现代理 checkpoint 2：两条路由的四层证明都已绿；差 AC#3 变异与 AC#5 门禁）
 **Type:** security-invariant characterization (closes an AC box that is currently **untestable as written**)
 **Blocks:** ticket 20 archival · **Blocked by:** nothing (packages free: `internal/agent`, `internal/memory`)
 **Packages:** `internal/agent/spill.go`, `internal/memory/artifacts.go` + their tests. Do **not** touch
@@ -86,3 +86,23 @@ the box in writing:
   `-count=2` 门禁也没跑，此刻任何勾选都是假绿。
   **next=写 `internal/agent/spill_path_invariant_test.go`（四种形状净化后的**磁盘名**逐个断言 +
   真目录列举差分 + 经真 `memory.Store` 的端到端落盘），然后做 AC#3 双包变异检验与 AC#5 门禁。**
+- 2026-09-21（实现代理，checkpoint 2）：**agent 侧四层证明落地**，新增
+  `internal/agent/spill_path_invariant_test.go`（未改 spill.go 一行实现）：
+  ①`TestSpillCallIDHostileShapesSanitizedToBareNames` 分隔符/`..`/盘符/UNC 各一命名子测试，
+  断言净化后的**确切磁盘名**（`p/q`→`tool-output-pq.txt`、`../../escape`→`tool-output-escape.txt`、
+  `C:\Windows\System32\drop`→`tool-output-CWindowsSystem32drop.txt`、
+  `\\fileserver\share\payload`→`tool-output-fileserversharepayload.txt`）+ 该名字里没有 `/ \ : ..`
+  + 真 `ReadDir` 里**只有**这一个文件；另一子测试钉"整串被剥光 ⇒ 退回 `tool-output-seq<N>.txt`"。
+  ②`TestSpillContainmentByDirectoryListing`：递归列举差分 + **阳性对照**——手工做一次"绕过净化器"的
+  同样 join 并真写盘，证明列举确实看得见越界（否则整张 AC#2 是瞎跑）。对照把转义算术**量**出来了：
+  `artifactName` 的前缀 `tool-output-` 会吃掉第一个 `..`（变成字面量组件 `tool-output-..`，被第二个 `..` 抵消），
+  所以要 `depth+2` 组 `..\` 才正好落到 root——3 组只到 `data\`，实测两次才修对，注释里写明了"这是量出来的"。
+  ③`TestSpillIntoRealStoreThenDeleteStaysUnderDataDir`：一个真 `memory.Store` 数据目录上，
+  spill 路由（敌意 id）+ memory 路由（敌意名）轮流上，列举差分要求新增只允许 `data/artifacts/*`。
+  ④`TestSpillAPITakesNoCallerControlledDestinationPath`：AST 审 spill.go —— 导出面不许有 destination 形参
+  （`NewSpiller` 是唯一例外，它是宿主侧构造），两个 os/内部写盘 sink（`os.WriteFile`、`writeFileExclusive`）
+  的路径实参必须展开到 `s.dir` + `artifactName(`（需要不动点展开：`path`/`name` 是两条语句）。
+  **AC#1/AC#2 两侧全绿；AC#3 变异/AC#5 门禁未做 ⇒ 五框仍全部未勾。**
+  `go test -count=1 ./internal/agent/ ./internal/memory/` = ok 1.744s / ok 12.956s。
+  **next=AC#3 双包变异检验（各自 neutralize 掉 reject/净化那一步，先 grep 证明改动真落地，再证明 AC#1+AC#2 同时变红，
+  然后还原 + `grep -c`=0 + `git diff --quiet`），跑 AC#5 门禁，最后交票 20 `:103` 的替换句子。**
