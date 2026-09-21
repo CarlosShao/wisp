@@ -54,6 +54,47 @@
 
 ## Progress log（append-only）
 
+- 2026-09-21（`agent-ticket91b`，第二会话；**本条只写票面、未 commit**——派单限定我只许提交
+  `docs/evidence/s1/91-os-isolation-memo.md` 一个文件，是否入账由编排者定）：
+  - **先纠派单**：我收到的说法是"前任零产出、`91-*.md` 不存在"，实际 `91-isolation-options.md`
+    已由编排者 `2cac098` 入库。我据此改形状：**没重做路 1 的 spike**（按 :66 的要求），
+    只做了它的读数的**独立横向复测** + 补齐它断掉的 **§4 AppContainer**、**§5 独立账户**、**§6 a–e**、**§9 AC#4 草案**。
+    产物：`docs/evidence/s1/91-os-isolation-memo.md`，commit **`73cec78`**（1 file, +394）。
+  - **它的 :174 有一句未实测的话，必须纠**（否则实现票照它写）："AppContainer 也不需要常驻件（一次属性赋值）"——
+    本机文档常量 `PROC_THREAD_ATTRIBUTE_SECURITY_CAPABILITY`(0x00020000) 的 `UpdateProcThreadAttribute`
+    = **errno 24 `ERROR_BAD_LENGTH`**（`Length` 填 32/28 都试了）；能起得来的是**旧的 0x00020009 + 无 `Length` 字段的载荷布局**
+    （子进程自报 `isAppContainer=1`、`integrity=S-1-16-4096`、AC SID 与 `CreateAppContainerProfile` 返回的一致）。
+    **"能用的恰好是被标废弃的那个"这条矛盾要进票 95 AC#1，不能写成"按 MSDN"。**
+  - **§67 要我打的假设：没推翻**。我在本机（非提权、令牌无 `SeIncreaseQuotaPrivilege`）构造并实测了
+    `DISABLE_MAX_PRIVILEGE`、`+LUA_TOKEN`、`+WRITE_RESTRICTED`（restricting SID 只给 `Everyone`）、
+    去 `LUA` 变体共 4 种令牌，**四种读 `%USERPROFILE%` 靶文件与列目录全 OK**；
+    唯一"能正常干活"与"读不到目录"同时成立的配方是 **AppContainer**（读/写/宿主内存/HKCU 全 DENIED，
+    显式授权路径可读写），**它不是受限令牌**。⇒ 前任"路 1 不解决问题"的结论**独立复现成立**。
+  - **我给它加强的一条**（它没测）：`OpenProcess(宿主, PROCESS_VM_READ)` 在**全部四种降权令牌下都 OK**。
+    而今天工具的读、DPAPI 解密、SQLite 页、模型权重**都在宿主内存里**（`internal/tools/fs.go:144` 是主进程内 `os.Open`）
+    ⇒ 只要秘密还在主进程，降权子进程就是同房间另一个进程，**降权形同装饰**。这条比"能不能读目录"更致命。
+  - **补齐它记为未证的那格**：`whoami /priv` 用全路径 `$env:WINDIR\System32\whoami.exe` 取到了
+    （MSYS 会把 `/priv` 当路径吞掉，这就是它 grep 到空的原因）⇒ 本机令牌**只有 5 条特权，确无
+    `SeIncreaseQuotaPrivilege`**。所以"无特权也能 `CreateProcessAsUserW` 起降权子进程"是真读数不是侥幸；
+    同一令牌走 `CreateProcessWithTokenW` 则 **1314 特权不足**；再加 `LOGON_WITH_PROFILE`
+    ⇒ **15.5s 无任何输出、被我 TerminateProcess（两次复现）**。
+  - **给票 90 的直接答案（M1）**：**不要加"降权跑工具"第四维**。今天**没有可降权的对象**——
+    全仓非测试的 `exec.Command` 只有 `mockllm`/SLO 自测/`doctor`，`shell.exec` 与 D46 插件都还没落地。
+    只需在票 90 明写"**权限模式不改变 OS 能力**"，防止将来把"全自动"实现成"顺手降个权"（同 `PLAN.md:592`/`:2490` 的假承诺判法）。
+  - **推荐**：路 1 不采用（与前任同）· 路 3 不推荐（`net user /add` = error 5；`LogonUserW` 内置账户全 **1326 不是 1314**
+    ⇒ 挡路的是凭据不是 API；跨用户起进程**未证**；且产品要保管一个能登录本机的口令 = 新增 D33 面）·
+    路 2 **RESERVED + 可判定触发门**（票 95 草案 AC#0：`shell.exec`/D46 真在生产路径起子进程才解锁），
+    代价与四条工程债写在 §4.3/§4.4，D32 的 `Sleeping … 无子进程` ⇒ **常驻降权 executor 出局**。
+  - **引用我又抓两起**（继它抓的 `PLAN.md:1032`）：① "**C30 明写**它不是安全边界"归因不成立——
+    `PLAN.md:1380` 与 `internal/proc/jobscope_windows.go:15-27` 都无此句（实质我对）；
+    ② 票 90 把红线"不可逆操作"挂在 `PLAN.md:1629`，而 1629 原文是 **A 档黑名单读取**
+    （真锚 = `PLAN.md:123` + `internal/risk/rules_irreversible.go:5-14`）。D32 权威行 = **`PLAN.md:2253`**。
+  - **我自己的装置有一处失败，标成作废**：DPAPI 探针产出的 blob 不以 `DPAPI` 魔数开头、
+    **控制组自解都 errno=13 `ERROR_INVALID_DATA`** ⇒ 本会话的 `DPAPI_unprotect` 读数**全不采信**，
+    "AC 下能否解密"仍**未证**（前任 `spike2` 那套是跑通的）。写在 §10 未证清单第 1 条。
+  - 规矩：未改任何生产文件与配置、未动冻结面、未 push、未建 worktree、快照目录带我的后缀 `wisp91b-t2`；
+    现场痕迹（靶文件/ACL ACE/HKCU 试验键/AppContainer 配置）收尾已清理并验证（`DeleteAppContainerProfile => 0`）。
+
 - 2026-09-21 15:2x（编排者，**把死掉那位的产物存成检查点，并给接续者留真实起点**）：
   `spike-ticket91` 撞 150 轮上限死亡（161 次工具调用，中途**休眠过数小时**——本仓已知现象：冻住的会话会在某轮突然醒来然后立刻撞上限）。
   它**不是零产出**：`docs/evidence/s1/91-isolation-options.md`（15924 字节，15:19 落盘）已写完
