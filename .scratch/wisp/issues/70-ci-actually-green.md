@@ -1,8 +1,8 @@
 # 70 — 让 CI 真的成为护栏：5 个 job 全红，逐因分诊（本仓的"门禁"从未生效过）
 
 **Status:** in-progress
-**Claimed by:** ~~agent-ticket70~~（174 次调用撞 turn 上限而死，**票面一条 log 都没写**）→ agent-ticket70-c（接续，只做 AC#2/AC#4/AC#6）
-**Last update:** 2026-09-21 09:15（编排者：从 `git log` 重建断点，见下面那块）
+**Claimed by:** ~~agent-ticket70~~（174 次调用撞 turn 上限而死，**票面一条 log 都没写**）→ ~~agent-ticket70-c~~（只做 AC#2/AC#4/AC#6，已交回）→ **agent-ticket70-d**（接手 AC#1 尾巴 / AC#2 新 HEAD 重测 / AC#6 逐步骤证据 / D22 positive control 卡点）
+**Last update:** 2026-09-21 11:5x（agent-ticket70-d 认领；起点 HEAD `17efc2c`，其真 run 35558750456 的逐步骤结论见本条下面的 Progress log）
 **Blocked by:** ~~66、68~~ **两条都已解除**：票 66 已闭（`-done`），票 68 是 `blocked-on-owner` 且 `internal/ball`/`cmd/balldebug` 已让出
 
 > ## 编排者重建的断点（09:15，我逐条亲自验过，**接续代理不要重做**）
@@ -138,3 +138,5 @@
 
 
 
+- [2026-09-21T11:5xZ] agent=agent-ticket70-d did=**认领 + 起点实测**（本轮承诺范围＝编排者指定的 4 项：AC#1 尾巴、AC#2 在新 HEAD 重测、AC#6 逐 job 逐步骤证据、D22 positive control 卡点）。起点 HEAD `17efc2c`，AC#1 尾巴先用 **CI 钉的 v0.7.0** 复核：`go install mvdan.cc/gofumpt@v0.7.0` ⇒ `gofumpt --version` = `v0.7.0 (go1.27.1)`，`gofumpt -l . tools/d22scan tools/mockllm` **只列 1 个文件** `internal/risk/provenance_syncdirs_windows_test.go`（票 75 代理新加、未跑 gofumpt）。⇒ 与简报一致，**旧"69 个文件"已过期**。
+  next=一枚纯格式化 commit（只 `-w` 那个文件）→ 用 `docker run golang:1.27` 逐字复刻 `ci.yml:127-134` 重测 AC#2 → 把 run 35558750456 的逐步骤表贴进本 log → 自己复现 D22 positive control。
