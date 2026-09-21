@@ -1013,6 +1013,28 @@
    **那是票 66 的文件**，所以**等 66 收尾再做**；代理"拒绝借用现有名册名来骗过泄漏检测"的判断**是对的**，
    骗过检测器比多一行 WARN 贵得多。
 
+## 编排者登记 A41（2026-09-21 09:54，A40② 那条"cancelled 不是 failure"我**当场往下挖了两层**，把已排除项留给票 71 的代理，别重做）
+
+A40② 说最近三个 **push** run 是 `cancelled`。我又查了两步，**排除了两种最容易先猜的解释**：
+
+1. **不是配置差异**：`git show <sha>:.github/workflows/ci.yml` 逐个字面比过
+   `24a66b6` / `a0aa0d5` / `ae37d42` / `d7876d3` 四个 SHA —— concurrency 块**完全相同**，
+   都是 `cancel-in-progress: ${{ github.event_name == 'pull_request' }}`，对 push 事件求值为 **false**。
+   所以"是不是某次提交把它改成了 true"这条**已否证**。
+2. **不是我们自己脚本干的**：`git grep -n "run cancel|cancel-in-progress|gh run"` 在
+   `scripts/`、`.github/`、`docs/` 里**没有任何调用 `gh run cancel` 的地方**（只有 ci.yml 那行本体与文档引用）。
+   ⇒ "某个代理为了抢 self-hosted runner 而取消队列"**没有仓库内证据**（但**不能排除**代理直接敲 CLI，
+   这只有 GH 侧审计能证；我给票 71 的调查项就是要 run id 与 `run_updated_at`）。
+
+**剩下的候选**：①GH 对**同一 concurrency group 内排队中的 run** 的行为与文档直觉不同
+（`24a66b6` 至今 `in_progress`，其后四个全 `cancelled`——这正是 `cancel-in-progress: true` 的表现形状）；
+②仓库外有 automation/人手动取消。
+**判据（写死，别再含糊）**：报 CI 状态时必须区分 **failure / cancelled / 未跑完**，并引用 **run id**；
+在被取消的 run 混在样本里时，**"CI 从没绿过"这句话有一部分是测量假象**，
+不能全部算成代码缺陷——这与我今天另一条同族判据是同一个：**故障是被注入的还是真实的，样本的来历决定结论的强度**。
+（顺手记一条我自己的操作错误：`gh run view 24a66b6` 报 404，因为该命令要的是 **run id**（如 `35552339895`）不是 SHA。
+   下次别再拿 SHA 去查。）
+
 ## 编排者登记 A40（2026-09-21 09:45，票 70 交回三张 commit 之后：**CI 第一次有两格绿**，但 A27 的说法要改口径）
 
 - **A40① `slo-smoke` + `slo-full` 首次 success**（run 35549859581 / job 106183007038，`e9a7190`；
