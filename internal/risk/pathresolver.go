@@ -132,10 +132,42 @@ func lexCanonical(p string) string {
 	return filepath.Clean(p)
 }
 
+// sepStr is the platform's path separator as a string. C26's canonical form is
+// the real path of the real file (SPEC-06 §4), and on a POSIX system that shape
+// uses '/'; '\' is merely a legal character inside a POSIX file name. Anything
+// that hands a path to the OS (Lstat, Open, a re-joined ancestor chain) or to a
+// human (an audit line) must build it with sepStr, never with a literal '\'.
+const sepStr = string(filepath.Separator)
+
+// unifySeparators folds the alternate separator into the platform one. On
+// Windows the OS treats '/' and '\' as interchangeable, so both have to be
+// folded or "C:/a" and "C:\a" compare unequal; on POSIX '\' is an ordinary
+// filename character and folding it away would merge two different files into
+// one comparison string, which for the B-tier override map is a cross-file
+// unlock. The branch is a compile-time constant on each platform.
+func unifySeparators(p string) string {
+	if filepath.Separator == '\\' {
+		return strings.ReplaceAll(p, "/", `\`)
+	}
+	return p
+}
+
 // normalizeLocalUNC maps UNC spellings of local drives back to drive paths:
 // \\localhost\c$\x\y, \\127.0.0.1\c$\x\y and \\?\UNC\localhost\c$\x\y
 // become c:\x\y. Other UNC paths are left as canonical \\server\share form.
+//
+// It normalizes UNC spellings and NOTHING ELSE: a path that is not shaped like
+// a UNC path is returned untouched. Rewriting separators unconditionally used
+// to live here (ticket 75), and on Linux that turned every absolute path into
+// a backslash string which (a) is not absolute anymore, so the next
+// lexCanonical re-anchored it on the process working directory, and (b) no OS
+// call can open. It never mattered on Windows because filepath.Clean had
+// already folded '/' to '\' two lines earlier, which is exactly why the defect
+// survived every local gate.
 func normalizeLocalUNC(p string) string {
+	if !strings.HasPrefix(p, `\\`) && !strings.HasPrefix(p, `//`) {
+		return p // not a UNC spelling: this function has no business here
+	}
 	u := strings.ReplaceAll(p, "/", `\`)
 	for _, server := range []string{"localhost", "127.0.0.1"} {
 		for _, prefix := range []string{`\\?\UNC\` + server + `\`, `\\\?\UNC\` + server + `\`, `\\` + server + `\`} {
@@ -301,14 +333,14 @@ func tailExistsBelow(cut, tail string) bool {
 	if tail == "" {
 		return false
 	}
-	first := strings.TrimPrefix(tail, `\`)
-	if i := strings.Index(first, `\`); i >= 0 {
+	first := strings.TrimPrefix(tail, sepStr)
+	if i := strings.Index(first, sepStr); i >= 0 {
 		first = first[:i]
 	}
 	if first == "" {
 		return false
 	}
-	return pathExists(cut + `\` + first)
+	return pathExists(cut + sepStr + first)
 }
 
 // pathExists is a fail-toward-exists stat: only a clean "no such file" reads
