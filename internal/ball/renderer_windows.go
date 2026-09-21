@@ -364,17 +364,6 @@ func (r *renderer) center() d2d1Point2F {
 	return d2d1Point2F{float32(r.w) / 2, float32(r.h) / 2}
 }
 
-// mulA scales a color's alpha (straight alpha, D2D does the premultiply).
-func mulA(c Color, a float32) Color {
-	if a < 0 {
-		a = 0
-	}
-	if a > 1 {
-		a = 1
-	}
-	return Color{c.R, c.G, c.B, c.A * a}
-}
-
 // setSolid colors the shared solid brush (SetColor - no allocation).
 func (r *renderer) setSolid(c Color) {
 	col := colorF(c)

@@ -11,12 +11,10 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
 	"github.com/CarlosShao/wisp/internal/buildinfo"
-	"github.com/CarlosShao/wisp/internal/proc"
 	sherpa "github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx"
 )
 
@@ -83,52 +81,9 @@ func main() {
 	}
 }
 
-// runResident is the no-args path: boot (env layout, Job Object, single
-// instance, goroutine registry), run the empty event loop, then exit through
-// the D38(e) shutdown order. A second launch in the same session signals the
-// running instance's activation event and exits (D42#7).
-func runResident() {
-	printVersions("")
-
-	env, err := buildinfo.ResolveEnv()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "wisp: %v\n", err)
-		os.Exit(2)
-	}
-
-	rt, err := proc.Boot(env)
-	if errors.Is(err, proc.ErrAlreadyRunning) {
-		layout, lerr := proc.DefaultLayout(env)
-		if lerr == nil && layout.MutexEnabled {
-			_ = proc.SignalExistingInstance(layout.ActivateEventName)
-		}
-		fmt.Println("wisp: another instance is running in this session; activated it; exiting")
-		return
-	}
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "wisp: boot failed: %v\n", err)
-		os.Exit(1)
-	}
-	defer func() {
-		records := rt.Shutdown(false)
-		failed := 0
-		for _, rec := range records {
-			if rec.Err != nil {
-				failed++
-				fmt.Printf("wisp: shutdown step %d (%s) FAILED: %v\n", rec.Step, rec.Name, rec.Err)
-			}
-		}
-		fmt.Printf("wisp: exited through the D38(e) shutdown order (10 steps, %d failed)\n", failed)
-	}()
-
-	sum := rt.Layout.Summary()
-	fmt.Printf("wisp: resident runtime booted (%s, data dir = %s, portable = %v, job object = on, single instance = %v)\n",
-		sum.EnvBadge(), sum.DataDir, sum.Portable, rt.Instance != nil)
-	fmt.Printf("wisp: empty event loop running; the floating ball arrives in ticket 07 (Ctrl+C exits cleanly)\n")
-
-	reason := rt.RunEventLoop()
-	fmt.Printf("wisp: event loop ending (%s); running the D38(e) shutdown order\n", reason)
-}
+// runResident lives in resident_windows.go (with a fail-closed counterpart in
+// resident_other.go): it boots the Windows resident runtime - Job Object,
+// per-session single instance, event loop - none of which exist off Windows.
 
 // cmdRun is the S1 text path (ticket 12): runTextTask assembles the whole
 // stack - credential store, config, provider, approval gate, host bridge,

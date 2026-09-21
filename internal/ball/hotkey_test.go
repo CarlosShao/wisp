@@ -1,8 +1,16 @@
+//go:build windows
+
 package ball
 
 import "testing"
 
 // TestParseAccelerator covers the [hotkey] binding grammar.
+//
+// This file is //go:build windows because its whole subject is Win32: the
+// MOD_/VK_ constants, modNoRepeat, DefaultHotkeys, AltSummonSpace and
+// ParseAccelerator are all declared in hotkey_windows.go, so an untagged test
+// here cannot type-check on any other GOOS (ticket 78 - it was the second
+// error hidden behind undefined: mulA in the same package).
 func TestParseAccelerator(t *testing.T) {
 	cases := []struct {
 		in   string

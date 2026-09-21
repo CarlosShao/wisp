@@ -44,6 +44,23 @@ func hex(rgb uint32, a float32) Color {
 // WithAlpha returns the same RGB with alpha replaced (opacity layering).
 func (c Color) WithAlpha(a float32) Color { return Color{c.R, c.G, c.B, a} }
 
+// mulA scales a color's alpha (straight alpha, D2D does the premultiply).
+//
+// This lives here, next to the Color it operates on and to its siblings
+// rgba/hex/WithAlpha, because it is pure channel arithmetic: it touches no
+// COM, no D2D and no syscall, so it was never platform-specific. It used to
+// sit in renderer_windows.go, which made every untagged file that needed it
+// (statevisual.go) fail `go vet` on any non-Windows GOOS (ticket 78).
+func mulA(c Color, a float32) Color {
+	if a < 0 {
+		a = 0
+	}
+	if a > 1 {
+		a = 1
+	}
+	return Color{c.R, c.G, c.B, c.A * a}
+}
+
 // Premultiplied returns the premultiplied form used by 32bpp ARGB bitmaps
 // (UpdateLayeredWindow expects premultiplied alpha).
 func (c Color) Premultiplied() Color {

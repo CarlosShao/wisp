@@ -277,7 +277,12 @@ func TestSleepingFrameLosesTheBorderAuthority(t *testing.T) {
 		t.Fatalf("Sleeping must park the motion: owns=%v border=%v active=%v",
 			m.ownsBorder, m.border, m.active)
 	}
-	v := VisualFor(pal, BallSizeDefaultPx, statemachine.StateSleeping, 0)
+	// DarkPalette() rather than the package global `pal`: on Windows pal IS
+	// DarkPalette() until SetTheme is called (renderer_windows.go:77) and this
+	// test never switches the theme, so the assertion is bit-identical here -
+	// but `pal` lives in a //go:build windows file, and this test's subject (the
+	// motion mixer and VisualFor) is portable (ticket 78).
+	v := VisualFor(DarkPalette(), BallSizeDefaultPx, statemachine.StateSleeping, 0)
 	if v.BorderAlpha != 0 || !v.Glass {
 		t.Fatalf("the Sleeping frame must carry no border: %+v", v)
 	}

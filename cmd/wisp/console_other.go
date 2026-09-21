@@ -10,6 +10,7 @@ package main
 // not exist on other platforms, where a process started from a terminal
 // already has its standard handles.
 //
-// This file exists only so the untagged callers (main.go, secret.go, slo.go)
-// type-check when GOOS is not windows; it changes no Windows behaviour.
+// This file exists only so the untagged callers (main.go, secret.go,
+// slo_windows.go) type-check when GOOS is not windows; it changes no Windows
+// behaviour.
 func attachParentConsole() {}
