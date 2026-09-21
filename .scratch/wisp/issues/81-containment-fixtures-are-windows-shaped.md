@@ -29,14 +29,14 @@ the listing never saw the deliberate escape outside the data dir (…); AC#2 wou
 
 ## 判据（1:1，裁决表 `docs/evidence/s1/81-*.md`）
 
-- [ ] **AC#1** 两条用例都改成**平台无关地表达同一个意思**：逃逸/嵌套的"物理路径"用 `filepath.Join` 或
+- [x] **AC#1** 两条用例都改成**平台无关地表达同一个意思**：逃逸/嵌套的"物理路径"用 `filepath.Join` 或
   `filepath.Separator` 构造，同时**保留**字面反斜杠拼写作为额外一例（它在 Linux 上是合法文件名、
   在 Windows 上是分隔符，这个不对称本身就是要钉的东西）。**不许**给这两份文件加 `//go:build windows`
   把它们变成"Linux 上静默不跑"——那是 A49② 里票 78 代理拒绝过的那类修法（整包被排除 = 静默跳过）。
-- [ ] **AC#2** 两个方向各自**制造一次红**：(i) 在 Linux（docker `golang:1.27`）证明改后这两条**真跑且绿**，
+- [x] **AC#2** 两个方向各自**制造一次红**：(i) 在 Linux（docker `golang:1.27`）证明改后这两条**真跑且绿**，
   且把生产侧的转义临时拆掉时它们**变红**（说明判据仍咬得住）；(ii) 在 Windows 本机同样跑一遍。
   ⚠ 变异锚点选**真正承载行为的那一行**，同一条 `&&` 链里先 grep 证明落地，还原后 `git diff --quiet` 证干净。
-- [ ] **AC#3** **全仓扫同族**：`grep -rn` 出所有在没有 build tag 的测试文件里用字面 `\` 当目录分隔符的地方
+- [x] **AC#3** **全仓扫同族**：`grep -rn` 出所有在没有 build tag 的测试文件里用字面 `\` 当目录分隔符的地方
   （含 `"a\\b"`、`filepath.ToSlash` 反用、`\r?\n` 之类合法的除外），逐条列进本票 log：
   要么本票一并修掉，要么写清"它在两侧语义相同、不需要修"的理由。**不许只报"扫了没问题"**——要给出命中清单。
 - [ ] **AC#4** 门禁（只跑自己碰的包）：`gofmt -l` 空、`go vet` rc=0、`go test -count=2` rc=0，
@@ -83,3 +83,58 @@ docker 挂载**快照**而不是工作树（别人的在飞改动会混进你的
   并加 `len(planted) < 4` / `slices.Equal(flats, want)` 两条反-vacuous 卫兵。
   Windows 本机重跑：`rc=0`、50 条 `=== RUN`、0 FAIL、0 SKIP。
   next= 重新 archive 快照跑 Linux（AC#2(i) 要绿），再做 AC#2 的变异检验
+- **C3（AC#2(i) Linux 侧绿）** 快照 `git archive HEAD`（`4683c34`）→ `D:\tmp\wisp81snap2`，
+  `docker run golang:1.27`，`go test -count=2 -v -run 'Containment|LiteralBackslash|HostileShapes|StaysUnderDataDir|RejectsTheFour' ./internal/agent ./internal/memory`
+  → **rc=0，RUN=50 PASS=50 FAIL=0 SKIP=0**（两包各 `ok`；`-count=2` 与 `-count=1` 的 RUN 比 50:25 成立 ⇒ 真的跑了两遍，不是空匹配）。
+  Windows 侧同一条 `-run` 过滤器：工作树（内容 = `4683c34` 的这两份文件）`-count=2` → `rc=0，RUN=50 PASS=50 FAIL=0 SKIP=0`；
+  同一快照 `-count=1` 基线 → `RUN=25 PASS=25 FAIL=0 SKIP=0`，快照还原后再跑一遍仍 25/25。
+  平台日志（两侧都留了证据行）：
+  - Linux：`GOOS=linux separator='/': literal-backslash names living as ONE flat file name in the artifacts dir:
+    [..\canary-dotdot-literal.txt nested-backslash\canary-literal.txt]`；
+    `control: escape id "../../../../CONTROL-escape" resolves to "/tmp/.../001/CONTROL-escape.txt"`（对照真的越界）；
+    `literal-backslash control: id "..\..\..\..\CONTROL-literal" resolves to ".../data/artifacts/tool-output-..\..\..\..\CONTROL-literal.txt"`（Linux 上它**不**越界，断言的就是这一条）。
+  - Windows：`GOOS=windows separator='\': ... : []`（零扁平）；两条对照都落在 root。
+  ⇒ **AC#1/AC#2(i) 打勾**：两侧同一批 25 条用例、同一套断言，无 build tag、无 SKIP。
+- **C4（AC#2(ii) 变异检验：两侧各制造一次真红）** 全部在快照 `D:\tmp\wisp81snap2` 里做，**工作树一次都没脏过**
+  （`git diff --quiet -- internal/agent internal/memory` 当场证明）。锚点先 `grep -n` 证明改动落地、同一条 `&&` 链里再跑：
+  - **MUT-A `internal/agent/spill.go:210`**（真正承载转义的那一行 `if c == '_' || ... {`，加 `|| c == '/'` ⇒ 分隔符不再转义）：
+    Linux `rc=1，RUN=25 FAIL=5`：`TestSpillContainmentByDirectoryListing`、`TestSpillIntoRealStoreThenDeleteStaysUnderDataDir`、
+    `TestSpillCallIDHostileShapesSanitizedToBareNames{,/separator,/dotdot}`；Windows 同一变异 `rc=1，RUN=25 FAIL=5`，同样三条顶层用例红。
+    （第一次尝试因把 `\` 也塞进 sed 替换而写成非法字符字面量 `'\'`，**编译失败不算行为变异**，已作废重跑；`/` 在两侧都是 `filepath.Join` 的分隔符，足以证明判据咬得住。）
+  - **MUT-B `internal/memory/artifacts.go:297`**（`validArtifactName` 头部插 `if name != "" { return nil }` ⇒ 名字守卫整体失效）：
+    Linux `rc=1，RUN=25 FAIL=16`（含 `TestArtifactsContainmentByDirectoryListing` + 两条 `RejectsTheFourHostileShapes` 的 6 个子测试各两侧），
+    实测红字：`DeleteArtifact("nested/canary-separator.txt") accepted a caller-named path`、
+    `hostile names changed the tree: + [] / - [data/artifacts/..\canary-dotdot-literal.txt data/artifacts/nested-backslash\canary-literal.txt
+    data/artifacts/nested/canary-separator.txt data/canary-dotdot.txt]`（Linux 版）——Windows 版同一条断言报的是
+    `[data/artifacts/nested-backslash/canary-literal.txt ... data/canary-dotdot-literal.txt data/canary-dotdot.txt]`，
+    即**同一判据在两侧各自咬住各自的物理事实**，这正是 AC#1 要的形状。
+  - 两个变异都 `git archive HEAD | tar -x` 还原（`grep -c` 命中归零），还原后 Windows 重跑 25 RUN / 25 PASS / 0 FAIL / 0 SKIP。
+    ⇒ **AC#2 打勾**。
+- **C5（AC#3 全仓同族扫描：命中清单）** 仪器三条，都在 `dev`@`4683c34` 上跑，全量输出不截断：
+  1. **广谱**（任一测试文件里含转义 `\\` 或含 `\` 的反引号串）：**389 行 / 70 个文件**；
+     其中被 windows 门（文件名 `_windows_test.go` 或 `//go:build windows`）挡住的 **13 文件 / 46 行**，
+     未被挡的 **57 文件 / 343 行**。这 343 行的大头是**正则转义**（`\b`、`\.`、`[0-9]` 类，如 `internal/ball/tokens_test.go:95`、
+     `internal/observe/nobarego_test.go:26`）与 `"\n"`/`"\r\n"` 类合法转义，以及**只当数据用的 Windows 路径字面量**
+     （`internal/config/{unwired,manager,migrate,boundary}_test.go` 的 TOML 串、`internal/memory/dao_test.go:385` 的授权 Pattern、
+     `internal/observe/logging_test.go:107` 的被脱敏文本、`internal/ball/position_test.go` 的 `\\.\DISPLAY1` 设备名、
+     `internal/risk/{provenance,rules,taintmatch,syncdirs}_test.go` 的评估输入字符串）——
+     两侧都是同一串字节、不构造物理路径，**不需要修**（`internal/risk/**` 与 `internal/config/**` 亦为票 70/80/82 地界）。
+  2. **窄谱（决定性）**：`\` 与路径构造调用同行的 → **11 行**，去掉 5 条 `"\n"` 假命中（`internal/tools/{wiring,fs_write}_test.go`、
+     `internal/observe/logging_test.go:191,199`）与 1 条写入文件**内容**的 `C:\Users\x\Dropbox\.dropbox`（`internal/risk/syncdirs_test.go:48`），
+     **真正用字面 `\` 构造物理路径的只有 5 行**：
+     - `internal/memory/artifacts_path_invariant_test.go:94,:104` — **本票自己保留的两例字面反斜杠夹具**，
+       由 `TestArtifactsLiteralBackslashKeepsItsAsymmetry` 显式钉住两侧语义（Windows 嵌套 / Linux 扁平），且 target 定义为
+       "本平台把它解析成哪儿"，不再是硬编码形状。✅ 本票已修。
+     - `internal/tools/pathshape_portable_test.go:110`、`internal/risk/pathshape_portable_test.go:75,:207` —
+       票 75 的"可移植路径形状"族：三处**都在 `filepath.Separator` 分支里**（如 `if filepath.Separator != '\\' { ... }`、
+       `foreignSepT()`、`home + "\\id_k/x.pem"` 双侧折叠断言），断言的是"这台机器上反斜杠是/不是分隔符"本身 ⇒
+       **两侧语义各自明确、已按平台分流，不需要修**（且 `internal/risk/**` 是禁改地界）。
+     - （同族旁证：`internal/memory/artifacts_stray_test.go` 票 79 的套件全用 `filepath.Join(arts, "stray", "deep", "hidden.bin")`
+       造嵌套，反斜杠只出现在报错文案里 ⇒ 不需要修；本票的修法就是照它对齐的。）
+  3. **`filepath.ToSlash` 反用**：把 ToSlash 结果直接喂回 OS 的调用 **0 处**；最接近的一例是
+     `internal/tools/wiring_test.go:162` 把 `filepath.ToSlash(target)` 当 `fs.write` 的 JSON 参数——
+     那是"另一种分隔符拼写也必须能用"的**正向**探针，两侧同一断言，不需要修。
+  另：`internal/agent/spill_path_invariant_test.go` 与 `internal/memory/artifacts_path_invariant_test.go` 里剩下的 `\` 字面量
+  （`p\q`、`\\fileserver\share\payload`、`C:\Windows\System32\drop`、`{"/", "\\", ":", ".."}`）都是**喂给编码器的输入串**
+  或**对编码结果的负断言**，不构造路径 ⇒ 两侧语义相同，保留。
+  next= AC#4 门禁（两包 -count=2 全量 + GOOS=linux go vet，两侧各一次），然后交回
