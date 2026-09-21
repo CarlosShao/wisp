@@ -87,6 +87,7 @@ POSIX/docker 读数与四条残留都在 Progress log 的 checkpoint 2/3；建�
 > ⚠ **不许**用改 fixture、改断言或 `Skip` 掉它来换绿（那正是 `R-92-3`/`R-92-4` 打回本票时立的那条规矩）。
 > 如果你判"修它必须动 `frontend/fixtures` 的生成口径"⇒ 停手登记交回我，我来定序。
 > 证据：`docs/evidence/s1/ci-runner-readings-2026-09-21.md` 票 70 AC#2 那一格。
+> ⚠ **`R-92-5`（真机差分截屏）这一格已登记为 `Q-33`**（同一份报告的 `[H7]` + Q 表）：owner 至今未答要不要开面板签收 ⇒ **不要为了结这一格而自己开窗**，也不要把它写成已签收。
 
 ## Progress log（agent-ticket92，append-only）
 
