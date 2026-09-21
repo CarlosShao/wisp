@@ -139,6 +139,29 @@ func TestPlantedComposerModeWriteGoesRed(t *testing.T) {
 	if len(violations) > 0 {
 		t.Errorf("frontend/ holds a composer-side permission write; only the native side may decide (PLAN.md:1588):%s", strings.Join(violations, "\n"))
 	}
+
+	// Door 2 forgives prose and nothing else: a mode write wearing a comment's
+	// clothes must still be caught, or the comment filter would be a hole in the
+	// gate rather than a filter on it. (This file's own author learned the rule
+	// the cheap way: a header line saying "there is no setMode-shaped call here"
+	// was the first real-tree hit door 2 ever produced.)
+	t.Run("door 2 ignores comment prose but not code behind a comment opener", func(t *testing.T) {
+		prose := filepath.Join(dir, "prose.tsx")
+		proseBody := "/**\n * 不要在这里 " + "setMode" + " - 档位由原生侧决定\n */\nexport const ok = 1 // " + "setMode" + "\n"
+		if err := os.WriteFile(prose, []byte(proseBody), 0o600); err != nil {
+			t.Fatalf("write prose plant: %v", err)
+		}
+		if hits := modeWriteMatchesInCodeFile(prose); len(hits) > 0 {
+			t.Errorf("comment prose tripped the gate (%v) - the filter is missing the prose it claims to allow", hits)
+		}
+		hidden := filepath.Join(dir, "hidden.tsx")
+		if err := os.WriteFile(hidden, []byte("/* just a note */ set"+"Mode(\"auto_approve\")\n"), 0o600); err != nil {
+			t.Fatalf("write hidden plant: %v", err)
+		}
+		if hits := modeWriteMatchesInCodeFile(hidden); len(hits) == 0 {
+			t.Error("a mode write placed after a comment opener escaped door 2 - the comment filter is a hole")
+		}
+	})
 }
 
 // TestModeViewHasNoWriteSurface is the Go-side half of AC#1: the view model the
@@ -324,6 +347,15 @@ func reMatchesInFile(re *regexp.Regexp, path string) []string {
 
 // scanComposerPermissionWrites applies BOTH doors to one tree and returns the
 // offending lines (empty = clean).
+//
+// The two doors are applied differently on purpose:
+//
+//	door 1 (ban #6) is applied to the raw text, exactly as tools/d22scan walks
+//	   frontend/, because that is the instrument whose verdict AC#6 reports and
+//	   it does not care whether a banned identifier sat in a comment;
+//	door 2 (this ticket's mode-write gate) is applied to code only. It is a
+//	   naming gate over prose-heavy files, and a component that documents "do
+//	   not call the setter" in its header would otherwise read as a violation.
 func scanComposerPermissionWrites(t *testing.T, root string) []string {
 	t.Helper()
 	var out []string
@@ -341,10 +373,11 @@ func scanComposerPermissionWrites(t *testing.T, root string) []string {
 		if !strings.HasSuffix(p, ".ts") && !strings.HasSuffix(p, ".tsx") && !strings.HasSuffix(p, ".css") {
 			return nil
 		}
-		for _, re := range []*regexp.Regexp{panelDecisionIdentifierRe, composerModeWriteRe} {
-			if hits := reMatchesInFile(re, p); len(hits) > 0 {
-				out = append(out, hits...)
-			}
+		if hits := reMatchesInFile(panelDecisionIdentifierRe, p); len(hits) > 0 {
+			out = append(out, hits...)
+		}
+		if hits := modeWriteMatchesInCodeFile(p); len(hits) > 0 {
+			out = append(out, hits...)
 		}
 		return nil
 	})
@@ -353,4 +386,104 @@ func scanComposerPermissionWrites(t *testing.T, root string) []string {
 	}
 	sort.Strings(out)
 	return out
+}
+
+// modeWriteMatchesInCodeFile applies door 2 to the code half of a file.
+func modeWriteMatchesInCodeFile(path string) []string {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return []string{"unreadable: " + err.Error()}
+	}
+	var out []string
+	for i, line := range strings.Split(string(data), "\n") {
+		code := codeOnly(line)
+		if composerModeWriteRe.MatchString(code) {
+			out = append(out, filepath.Base(path)+":"+strconv.Itoa(i+1)+": "+strings.TrimSpace(code))
+		}
+	}
+	return out
+}
+
+// codeOnly strips the comment half of one TypeScript/TSX line: a trailing //
+// comment, and any line that is nothing but comment syntax (// ... or the *
+// continuation of a block comment). A line OPENING with /* is still scanned,
+// because "/* whatever */ setMode(...)" is code wearing a comment's clothes, and
+// that is the one shape a stripping filter must not forgive.
+func codeOnly(line string) string {
+	t := strings.TrimSpace(line)
+	if strings.HasPrefix(t, "//") || (strings.HasPrefix(t, "*") && !strings.HasPrefix(t, "**")) ||
+		strings.HasPrefix(t, "*/") {
+		return ""
+	}
+	if i := strings.Index(line, "//"); i >= 0 {
+		// Do not cut inside a string literal - the shapes that matter here are
+		// URLs and method names, both of which can carry slashes.
+		if !strings.Contains(strings.TrimSpace(line[:i]), `"`) &&
+			!strings.Contains(strings.TrimSpace(line[:i]), "'") {
+			line = line[:i]
+		}
+	}
+	return line
+}
+
+// TestComposerRenderFixtureTellsTheTruth reads the committed render evidence
+// (frontend/fixtures/composer-states.html, produced by `npm run render:composer`
+// over the real React component) and checks the three states it claims. This is
+// the non-interactive render check: it proves the values the composer is given
+// end up on screen, including the two states where lying is easiest - no
+// snapshot yet, and an attachment the native side refused.
+//
+// It is not a screenshot. The differential-screenshot pass for owner's sign-off
+// is still open (ticket 92 AC#6's residual), and this test says nothing about
+// pixels, only about painted text.
+func TestComposerRenderFixtureTellsTheTruth(t *testing.T) {
+	path := filepath.Join(panelRepoRoot(t), "frontend", "fixtures", "composer-states.html")
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("read the render fixture: %v - regenerate it with `npm run render:composer`", err)
+	}
+	blocks := map[string]string{}
+	for _, chunk := range strings.Split(string(data), "<!-- ") {
+		if chunk == "" {
+			continue
+		}
+		name, body, found := strings.Cut(chunk, " -->\n")
+		if !found {
+			continue
+		}
+		blocks[strings.TrimSpace(name)] = body
+	}
+	for _, name := range []string{"no host attached", "workspace chosen, video stored",
+		"unsupported attachment told to the user"} {
+		if _, ok := blocks[name]; !ok {
+			t.Errorf("the render fixture has no block for %q - the harness and this test disagree "+
+				"about which states are evidenced", name)
+		}
+	}
+	if b := blocks["no host attached"]; b != "" {
+		for _, want := range []string{"档位未知", "尚未收到原生侧的状态快照"} {
+			if !strings.Contains(b, want) {
+				t.Errorf("with no snapshot at all the row does not say so (%q missing):\n%s", want, b)
+			}
+		}
+		if strings.Contains(b, "全自动") {
+			t.Errorf("an unknown mode rendered as a named档:\n%s", b)
+		}
+	}
+	if b := blocks["workspace chosen, video stored"]; b != "" {
+		for _, want := range []string{`D:\work\Wisp\notes`, "clip.mp4", "video/mp4", "需原生 L2 强确认"} {
+			if !strings.Contains(b, want) {
+				t.Errorf("the chosen-workspace state is missing %q:\n%s", want, b)
+			}
+		}
+	}
+	if b := blocks["unsupported attachment told to the user"]; b != "" {
+		if !strings.Contains(b, "不受支持") || !strings.Contains(b, "MZ") {
+			t.Errorf("a refused attachment is not told to the user verbatim:\n%s", b)
+		}
+		if strings.Contains(b, "已存入附件目录") {
+			t.Errorf("a refused attachment ALSO renders as stored - the user cannot tell what happened:\n%s", b)
+		}
+	}
+	t.Logf("render fixture verified across %d painted states", len(blocks))
 }

@@ -12,6 +12,7 @@ package panel
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"errors"
 	"io"
 	"os"
@@ -314,4 +315,70 @@ func requireRefused(t *testing.T, ref AttachmentRef, err error, wantInReason str
 	if !strings.Contains(err.Error(), wantInReason) {
 		t.Errorf("error %q must carry the same reason the user sees", err)
 	}
+}
+
+// TestAttachmentPayloadCarriesTheBytes is AC#2's transport half: the file's
+// CONTENT must reach the native side through the panel's text envelope, and a
+// damaged trip must be refused instead of becoming a shorter file.
+func TestAttachmentPayloadCarriesTheBytes(t *testing.T) {
+	f := newFakeArtifacts(t)
+	b, err := NewAttachmentBroker(f, memory.ValidArtifactName, MaxAttachmentBytes)
+	if err != nil {
+		t.Fatalf("broker: %v", err)
+	}
+
+	t.Run("a real png arrives whole through base64", func(t *testing.T) {
+		src, err := DecodeAttachmentPayload(AttachmentPayload{
+			Name: "shot.png", DeclaredMIME: "image/png", SizeBytes: int64(len(pngBytes)),
+			DataBase64: base64.StdEncoding.EncodeToString(pngBytes),
+		})
+		if err != nil {
+			t.Fatalf("decode: %v", err)
+		}
+		ref, err := b.Ingest(context.Background(), src)
+		if err != nil {
+			t.Fatalf("ingest: %v", err)
+		}
+		onDisk, err := os.ReadFile(filepath.Join(f.dir, ref.Artifact))
+		if err != nil {
+			t.Fatalf("read back: %v", err)
+		}
+		if !bytes.Equal(onDisk, pngBytes) {
+			t.Errorf("the stored bytes are not the bytes the user picked: %x != %x", onDisk, pngBytes)
+		}
+	})
+
+	t.Run("undecodable base64 is refused, not stored as nothing", func(t *testing.T) {
+		_, err := DecodeAttachmentPayload(AttachmentPayload{
+			Name: "x.png", SizeBytes: 4, DataBase64: "!!!not base64!!!",
+		})
+		if err == nil || !errors.Is(err, ErrAttachmentRejected) {
+			t.Fatalf("undecodable payload returned %v, want a refusal", err)
+		}
+		if !strings.Contains(err.Error(), "无法解码") {
+			t.Errorf("refusal does not say what failed: %v", err)
+		}
+	})
+
+	t.Run("a truncated payload is refused, not stored short", func(t *testing.T) {
+		enc := base64.StdEncoding.EncodeToString(pngBytes)
+		_, err := DecodeAttachmentPayload(AttachmentPayload{
+			Name: "cut.png", DeclaredMIME: "image/png", SizeBytes: int64(len(pngBytes)),
+			DataBase64: enc[:len(enc)-4],
+		})
+		if err == nil || !strings.Contains(err.Error(), "截断") {
+			t.Fatalf("a truncated payload returned %v, want a truncation refusal", err)
+		}
+	})
+
+	t.Run("an empty payload is refused", func(t *testing.T) {
+		src, err := DecodeAttachmentPayload(AttachmentPayload{Name: "nil.png", DataBase64: ""})
+		if err != nil {
+			t.Fatalf("decode of an empty payload should succeed so the reason is the store's: %v", err)
+		}
+		if _, err := b.Ingest(context.Background(), src); err == nil ||
+			!strings.Contains(err.Error(), "0 字节") {
+			t.Fatalf("an empty payload ingested as %v, want the 0-byte refusal", err)
+		}
+	})
 }

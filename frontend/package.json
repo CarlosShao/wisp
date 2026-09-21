@@ -12,6 +12,7 @@
     "tokens": "node scripts/gen-tokens.mjs",
     "tokens:check": "node scripts/gen-tokens.mjs --check",
     "render:l2": "vite build --ssr scripts/render-l2.tsx --outDir node_modules/.tmp/l2render --logLevel warn && node node_modules/.tmp/l2render/render-l2.js",
+    "render:composer": "vite build --ssr scripts/render-composer.tsx --outDir node_modules/.tmp/composerrender --logLevel warn && node node_modules/.tmp/composerrender/render-composer.js",
     "vendor:beautifului": "node scripts/vendor.mjs",
     "vendor:shadcn": "node scripts/vendor-shadcn.mjs"
   },

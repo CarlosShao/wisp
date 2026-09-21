@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -38,6 +39,12 @@ type PathCanonicalizer struct {
 	// an operator reading the config would not recognize it. Bounded by the
 	// number of [fs] allowed_dirs entries.
 	rewritten []string
+	// workspace is the narrowed root a panel-side workspace switch set
+	// (ticket 92 AC#3). Empty means "nothing was narrowed": the config roots
+	// alone decide scope, which is every run that never touched a composer.
+	// It can only ever TIGHTEN InAllowlist - a workspace outside the roots is
+	// refused at switch time - so no workspace choice can widen authority.
+	workspace string
 }
 
 // NewPathCanonicalizer resolves the allowlist roots through C26 once and
@@ -58,22 +65,26 @@ func NewPathCanonicalizer(allowedDirs, reparseExceptions []string) *PathCanonica
 		// authorizing a tree nobody can point at is a fail-open, and the config
 		// line that produced it is kept for the operator.
 		//
-		// Ticket 107: "the OS cannot confirm" must be stated in a capability the
-		// running platform actually has. res.Resolved is handle-based and only
-		// ever true on Windows (risk.resolveHandle is a stub elsewhere), so on
-		// its own it dropped EVERY expanded root on POSIX - the whole [fs]
-		// allowed_dirs surface vanished for any ~/... or %VAR% spelling
-		// (fail-closed, so no leak, but an authorization surface that silently
-		// authorizes nothing). treeOnDisk is the platform-portable half of the
-		// same question; res.Resolved keeps priority so Windows verdicts stay
-		// byte-identical to ticket 102's (a handle-resolved tree is never
-		// re-probed).
+		// Ticket 107 (round 1): "the OS cannot confirm" had to be stated in a
+		// capability the running platform actually has, because res.Resolved is
+		// handle-based and only ever true on Windows (risk.resolveHandle is a
+		// stub elsewhere), which dropped EVERY expanded root on POSIX.
+		// Ticket 107 (round 2, rejected round 1's answer): confirmation may not
+		// be downgraded to "something exists under that name" - os.Stat follows
+		// links, so a root spelled %VAR%\proj that is a link onto another tree
+		// would authorize a tree the operator never named (acceptance probe A).
+		// The release side therefore gets a form that has actually been
+		// resolved: treeResolvedAsNamed is true only when the OS says the named
+		// path IS the tree on disk, with no link crossed. res.Resolved keeps
+		// priority so Windows verdicts stay byte-identical to ticket 102's (a
+		// handle-resolved tree is never re-probed). Where a platform cannot
+		// resolve, the root is dropped and recorded - stricter, not looser.
 		if res.Rewritten {
 			p.mu.Lock()
 			p.rewritten = append(p.rewritten, fmt.Sprintf("%q -> %s (%s)",
 				d, res.Canonical, strings.Join(res.Rewrites, "+")))
 			p.mu.Unlock()
-			if !res.Resolved && !treeOnDisk(res.Canonical) {
+			if !res.Resolved && !treeResolvedAsNamed(res.Canonical) {
 				p.unusable = append(p.unusable, fmt.Sprintf(
 					"%q: C26 expanded it onto %s but that tree is not confirmed on disk, authorizing nothing", d, res.Canonical))
 				continue
@@ -126,8 +137,37 @@ func (p *PathCanonicalizer) InAllowlist(canonical string) bool {
 	}
 	p.mu.RLock()
 	defer p.mu.RUnlock()
-	for _, r := range p.roots {
-		if f == r || strings.HasPrefix(f, r+pathSep) {
+	if !rootsContain(p.roots, f) {
+		return false
+	}
+	// Ticket 107 (round 2): the release side also recognizes the RESOLVED form,
+	// and it must contain THAT under the same root. The lexical spelling alone
+	// cannot tell "inside the allowed tree" from "inside a link that hangs off
+	// it and lands elsewhere" (acceptance probe C: root/proj is real, the target
+	// goes out through proj/esc). Requiring both is strictly narrower: every
+	// path that passed before either fails to resolve or still resolves inside
+	// the root. Unresolvable means unauthorized, so a platform whose resolver
+	// cannot see a link (Windows reports no error and no switch for a junction,
+	// measured) still refuses instead of vouching for a tree it did not look at.
+	rf, ok := resolvedForm(canonical)
+	if !ok || !rootsContain(p.roots, foldPath(rf)) {
+		return false
+	}
+	// Ticket 92 AC#3: once a workspace is chosen, scope narrows to it. An empty
+	// workspace is "nothing chosen", so every judgement before the first switch
+	// is byte-identical to what it was.
+	if p.workspace != "" && !rootsContain([]string{p.workspace}, f) {
+		return false
+	}
+	return true
+}
+
+// rootsContain is the component-boundary, case-folded containment test over a
+// set of already-folded roots. It takes no lock so the locked callers can
+// compose it (InAllowlist) without re-entering p.mu.
+func rootsContain(roots []string, folded string) bool {
+	for _, r := range roots {
+		if folded == r || strings.HasPrefix(folded, r+pathSep) {
 			return true
 		}
 	}
@@ -157,19 +197,73 @@ func (p *PathCanonicalizer) RewrittenRoots() []string {
 	return append([]string(nil), p.rewritten...)
 }
 
-// treeOnDisk answers ticket 102's confirmation question with a capability every
-// platform has: the OS says this directory exists. It is NOT a normalization -
-// it neither cleans nor absolutizes, so it stays outside C26's single-entry
-// rule - and it is only consulted where res.Resolved cannot speak (POSIX, where
-// handle-based resolution is deferred; see risk.pathresolver_other.go). The
-// strength it has is exactly the strength the same root already has on POSIX
-// when it is spelled as a plain absolute path, i.e. when nothing was rewritten:
-// that spelling is accepted from the lexical pipeline without any OS
-// confirmation at all. Confirming an expanded root no more weakly than that
-// keeps one rule for both legs instead of silently authorizing nothing.
+// treeOnDisk answers the WEAKER question: does something exist under this name,
+// following links on the way. That is the right strength where a name is only
+// being checked for existence (the workspace leg of this package confirms the
+// directory a picker chose), and it is the wrong strength for an authorization:
+// ticket 107 round 1 used it there and acceptance probe A showed a root that is
+// a link onto another tree then authorized the tree nobody named. New callers
+// that gate authority must use treeResolvedAsNamed instead.
 func treeOnDisk(canonical string) bool {
 	st, err := os.Stat(canonical)
 	return err == nil && st.IsDir()
+}
+
+// treeResolvedAsNamed answers ticket 102's confirmation question with the
+// strongest form the release side is allowed to use: the OS says this directory
+// exists AND the name the operator wrote is that directory, not a link onto
+// something else. It is NOT a normalization - it neither cleans nor absolutizes,
+// so it stays outside C26's single-entry rule - and it is only consulted where
+// res.Resolved cannot speak (POSIX, where handle-based resolution is deferred;
+// see risk.pathresolver_other.go).
+//
+// Round 1 of this ticket used os.Stat here, which follows links: a root spelled
+// %VAR%/proj whose proj is a link onto another tree was accepted and the tree
+// the tool then opened was the one nobody named. Equality against the resolved
+// spelling is what closes that, and it fails closed on every platform: a machine
+// where the resolver cannot answer gets no authorization, only a line in
+// UnusableRoots.
+func treeResolvedAsNamed(canonical string) bool {
+	r, err := filepath.EvalSymlinks(canonical)
+	if err != nil || foldPath(r) != foldPath(canonical) {
+		return false
+	}
+	st, err := os.Stat(r)
+	return err == nil && st.IsDir()
+}
+
+// resolvedForm puts a canonical path into the one shape the release side trusts:
+// every link followed. It is only ever used as an ADDITIONAL condition next to
+// the lexical comparison, so a platform whose resolver answers nothing usable
+// can only lose authorizations, never gain them.
+//
+// The tail of a path may legitimately not exist yet (a write that creates a new
+// file), so a missing component is walked past and re-appended; but "missing"
+// and "there, and I could not look through it" report the same ENOENT-looking
+// error on both platforms - Windows answers ERROR_PATH_NOT_FOUND for a path
+// crossing a junction that EvalSymlinks does not resolve at all. os.Lstat on the
+// failing component tells them apart: it succeeds exactly when the path is there
+// but unresolvable, which is the shape this function refuses.
+func resolvedForm(p string) (string, bool) {
+	var tail []string
+	cur := p
+	for {
+		if r, err := filepath.EvalSymlinks(cur); err == nil {
+			for i := len(tail) - 1; i >= 0; i-- {
+				r = filepath.Join(r, tail[i])
+			}
+			return r, true
+		}
+		if _, lerr := os.Lstat(cur); !errors.Is(lerr, os.ErrNotExist) {
+			return "", false
+		}
+		dir := filepath.Dir(cur)
+		if dir == cur {
+			return "", false
+		}
+		tail = append(tail, filepath.Base(cur))
+		cur = dir
+	}
 }
 
 // pathSep is the comparison separator: the PLATFORM one. C26's canonical is the

@@ -31,6 +31,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -353,4 +354,53 @@ func mimeAgrees(declared, actual string) bool {
 func shortHash(b []byte) string {
 	sum := sha256.Sum256(b)
 	return hex.EncodeToString(sum[:8])
+}
+
+// AttachmentPayload is the wire form of one composer attachment: the panel's
+// postMessage envelope carries text, so the bytes travel base64 (ticket 92
+// AC#2). The payload IS the content - a request that only named a file would
+// leave the native side with metadata and nothing to send to the agent.
+type AttachmentPayload struct {
+	Name         string `json:"name"`
+	DeclaredMIME string `json:"declaredMime"`
+	SizeBytes    int64  `json:"sizeBytes"`
+	DataBase64   string `json:"dataBase64"`
+}
+
+// DecodeAttachmentPayload turns a wire payload into a source Ingest can judge.
+//
+// Every failure here is a refusal with a reason, because the alternatives are
+// the two ways this ticket can lie to its user: a decode error swallowed into an
+// empty file (which then reads as "the user attached nothing"), or a truncated
+// encode stored as if it were the whole file (which sends the agent a broken
+// image and tells the user it was sent).
+func DecodeAttachmentPayload(p AttachmentPayload) (AttachmentSource, error) {
+	raw := strings.ReplaceAll(strings.TrimSpace(p.DataBase64), "\n", "")
+	data, err := base64.StdEncoding.DecodeString(raw)
+	if err != nil {
+		// WebView File read paths occasionally produce the URL-safe or unpadded
+		// spelling; retry both before refusing, so the refusal that does happen
+		// is about the bytes and not about an encoder this side never tried.
+		if alt, aErr := base64.RawStdEncoding.DecodeString(raw); aErr == nil {
+			data, err = alt, nil
+		} else if alt, aErr := base64.URLEncoding.DecodeString(raw); aErr == nil {
+			data, err = alt, nil
+		} else {
+			return AttachmentSource{}, fmt.Errorf("%w: %q 的 base64 内容无法解码：%v",
+				ErrAttachmentRejected, p.Name, err)
+		}
+	}
+	if p.SizeBytes > 0 && int64(len(data)) != p.SizeBytes {
+		return AttachmentSource{}, fmt.Errorf("%w: %q 声称 %d 字节，实际收到 %d 字节（传输被截断或读错）",
+			ErrAttachmentRejected, p.Name, p.SizeBytes, len(data))
+	}
+	buf := data
+	return AttachmentSource{
+		DisplayName:  p.Name,
+		DeclaredMIME: p.DeclaredMIME,
+		SizeBytes:    int64(len(buf)),
+		Open: func() (io.ReadCloser, error) {
+			return io.NopCloser(bytes.NewReader(buf)), nil
+		},
+	}, nil
 }
