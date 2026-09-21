@@ -108,3 +108,28 @@ func TestWriteGatePlainTargetInsideProfileWindows(t *testing.T) {
 		t.Error("ESCAPIABLE: with the net disarmed, a write into the confirmed root stopped flagging")
 	}
 }
+
+// TestSyncRegistryProbeLive is P12 live registry evidence (skipped where the
+// hive has nothing to say): it asserts the probe's SHAPE, never machine state.
+//
+// Ticket 93 AC#2 moved it here verbatim from syncdirs_test.go. Reason: the
+// subject is `registryProbe`, whose POSIX implementation (syncdirs_other.go)
+// has no registry to read, so on that platform the loop body can never execute
+// and `len(roots) == 0` is a property of the OS, not of the code. Under a bare
+// `go test` that reads as `ok` on both platforms, which is why this case had
+// never produced a verdict in CI. It is now evaluated only where the API
+// exists; the file-level //go:build windows above is the constraint, and the
+// package itself stays portable-tagged, so `go vet ./...` still type-checks it
+// on both platforms (see the go-list numbers on the ticket).
+func TestSyncRegistryProbeLive(t *testing.T) {
+	roots := registryProbe(probeEnv{Home: userHomeDir()})
+	for _, r := range roots {
+		if r.Source != "registry" || r.Provider == "" || r.Path == "" {
+			t.Fatalf("live registry probe returned a malformed root %+v", r)
+		}
+		t.Logf("P12 evidence: registry-confirmed %s root %s", r.Provider, r.Path)
+	}
+	if len(roots) == 0 {
+		t.Skip("no registry-grade sync record on this machine (HKCU Accounts without UserFolder is the documented reality here)")
+	}
+}

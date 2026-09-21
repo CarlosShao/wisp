@@ -333,20 +333,11 @@ func TestSyncRegistryProbeTable(t *testing.T) {
 	}
 }
 
-// P12 live registry evidence (skipped where the hive has nothing to say):
-// asserts the probe's SHAPE, never machine state.
-func TestSyncRegistryProbeLive(t *testing.T) {
-	roots := registryProbe(probeEnv{Home: userHomeDir()})
-	for _, r := range roots {
-		if r.Source != "registry" || r.Provider == "" || r.Path == "" {
-			t.Fatalf("live registry probe returned a malformed root %+v", r)
-		}
-		t.Logf("P12 evidence: registry-confirmed %s root %s", r.Provider, r.Path)
-	}
-	if len(roots) == 0 {
-		t.Skip("no registry-grade sync record on this machine (HKCU Accounts without UserFolder is the documented reality here)")
-	}
-}
+// TestSyncRegistryProbeLive (the P12 live registry evidence case) lives in
+// syncdirs_windows_test.go as of ticket 93 AC#2: the registry hive it probes
+// does not exist on POSIX, so keeping it here meant a `--- SKIP` that bare
+// `go test` booked as `ok` on every CI run. Body moved verbatim; nothing about
+// its assertions changed.
 
 // N-5: the suspect net is component-bounded — a sibling directory whose name
 // merely starts with the profile name must not be swept in.

@@ -124,22 +124,33 @@ jobs:
           echo "mock-llm never became reachable"
           exit 1
 
-      - name: Portable package tests (agent/llm/config/memory/observe/secret/risk/statemachine/...)
-        run: |
-          go test ./internal/agent/... ./internal/llm/... ./internal/config/... \
-            ./internal/memory/... ./internal/observe/... ./internal/secret/... \
-            ./internal/risk/... ./internal/statemachine/... ./internal/session/... \
-            ./internal/watchdog/... ./internal/tools/... ./internal/models/... \
-            ./internal/buildinfo/... ./internal/audio/... ./internal/proc/... \
-            ./internal/panel/... -count=1
-
       - name: Environment fork assertion (WISP_ENV=test data dir)
         # runtests.sh instead of bare `go test` (ticket 71 AC#3): a -run pattern
         # that matches nothing prints PASS + `ok` + exit 0, so renaming
         # TestLayoutForTestEnv would turn this step into a permanent green no-op.
         # Measured on HEAD: the drifted-name form exits 0 with 0 `=== RUN` lines;
         # through this script it exits 1 and prints the counts.
+        #
+        # MOVED ABOVE the portable step (ticket 93, tightening, no step removed
+        # and no threshold changed): it sat below a step that bare `go test` lets
+        # go red, and GitHub stops at the first failed step - so on any run where
+        # the portable step was red, this gate had literally never produced a
+        # verdict, which is the A44-1 shape ticket 71 already fixed once in the
+        # lint job. It needs neither compose nor mock-llm, so nothing it depends
+        # on moved.
         run: bash tools/d22scan/runtests.sh ./internal/proc/ -run TestLayoutForTestEnv
+
+      - name: Portable package tests (agent/llm/config/memory/observe/secret/risk/statemachine/...)
+        # Ticket 93: this used to be a bare `go test <16 packages> -count=1`, and
+        # Go books a SKIP as `ok` - so a case that could not evaluate anything
+        # (internal/risk's TestSyncRegistryProbeLive, skipping on both platforms)
+        # printed the same bytes as a pass. scripts/portable-tests.sh delegates
+        # every verdict to tools/d22scan/runtests.sh (the strict runner from
+        # ticket 71 AC#3: zero SKIP, non-zero go exit, and "no top-level result
+        # at all" are all fatal) and adds a per-platform, reason-carrying,
+        # re-verified ledger for the cases that are declared out of scope. The
+        # package list lives in that script, not here.
+        run: bash scripts/portable-tests.sh
 
       - name: Stop compose services
         if: always()
@@ -169,7 +180,15 @@ jobs:
         run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
 
       - name: Portable windows tests (proc/secret/config)
-        run: go test ./internal/proc/ ./internal/secret/ ./internal/config/ -count=1
+        # Same disease as the ubuntu step above (ticket 93): bare `go test` books
+        # a SKIP as `ok`, and this scope contains one - internal/proc's
+        # TestHelperProcess, the re-exec child entry point, which skips every
+        # time it is not the child. Through the same runner, with shell: bash
+        # because windows defaults to pwsh: an unaccounted SKIP here is now a
+        # red step, and the one accounted case is named with its reason in the
+        # log and re-verified against the compiled test binary on every run.
+        shell: bash
+        run: bash scripts/portable-tests.sh ./internal/proc/ ./internal/secret/ ./internal/config/
 
       - name: "PathResolver junction placeholder (real cases tickets 18/20)"
         # bash + runtests.sh (ticket 71 AC#3): the file that declares this test is
