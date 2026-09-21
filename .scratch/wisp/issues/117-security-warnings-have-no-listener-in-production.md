@@ -352,3 +352,192 @@ owner 关掉窗口、或者进程不是他从终端起的（GUI 双击启动＝s
   它们量的就是我这份装配根代码，与 `823d457` 里 winsec 的通知内容无关（winsec 改的是通知**归属**的判据，
   事件名与五个字段名我重 grep 过 `internal/winsec/winsec_windows.go`：仍是 `:143` 那一条 `slog.Warn`、
   字段仍是 `path`/`kind`/`cleared`/`cleared_inherited`/`policy` ⇒ **§二 的 grep 判据逐字仍成立**）。
+
+- 2026-09-21 22:4x–22:5x（`agent-ticket117b`，**断点接续 + 门禁全量复算 + AC#4 那三件真机事我自己重跑了一遍**）：
+  本机 `date` 起于 **22:46:17 CST**（我开工第一条命令实测），落笔在 **22:59 CST 之后**；每条读数各自带时间戳，没复用上一条。
+  先说清楚：**我这一条不是"验收"**。验收方是另一个位，我没写 `docs/evidence/s1/117-*.md`，票面 Status 我也没动。
+
+  ### 零、我先做抢救而不是先读代码：两枚 checkpoint commit
+
+  前任的全部成果在我开工时**仍是未提交状态躺在共享工作树里**。我先落盘再复算：
+  - **`ce666ea`** = 票 117 的五枚代码文件。`git add` 只列显式路径；commit 前 `git diff --cached --name-only` 逐行核对
+    ⇒ 恰好 5 枚、**无清单外路径**才提交；commit 后 `git log --name-only -1` 自证只含
+    `cmd/wisp/logsink.go`、`cmd/wisp/logsink_test.go`、`cmd/wisp/logsink_windows_test.go`、
+    `cmd/wisp/resident_windows.go`、`cmd/wisp/run.go`，行数与派单一致（193 / 186 / 343、+39/-1、+20/-0）。
+    标题写明"checkpoint（前任撞轮数上限死亡后落盘）"，**没写结案也没写通过**。
+  - **`23403ab`** = 票面 md 那 296 行（前任的三条 Progress log + 六格自勾），**内容一字未改**地入库。
+    救它的理由：我 commit 完代码之后它**仍躺在工作树里**，而那段时间 `agent-ticket119` 已经往 `dev` 上压了三枚 commit
+    （`189cb1e` / `980cb71` / `8c8aad3`）⇒ 代收风险是活的，不是假设。
+  - 119 的四枚（`cmd/wisp/doctor.go`、`internal/proc/envfork.go`、`internal/winsec/winsec_other.go`、
+    `internal/winsec/dataroot_symlink_119_other_test.go`）**没有一枚进过我的 commit**；它们后来由 119 自己提交了。
+    **我只 commit，没有 push。**
+
+  ### 一、断点判定：它**六格都真的做完了**；缺的是"提交"与"在新环境重跑真机"这两件纸面外的事
+
+  派单给我的先验是"它自述六格齐，但最后一句在写新东西"。**我按代码 + 文件时间戳重量了一遍，结论与先验不同**：
+  - 被引用的最后一句 "Now let me write the sink wiring. First the new assembly-root helper:"
+    对应的是 **21:55 之前**（`logsink.go` 的 mtime 正是 **21:55:59**，那句就是它的开头）
+    ⇒ 编排者看到的**不是死前最后一句，而是一份约 25 分钟前的旧 transcript**。
+    它在那之后还写了 `run.go`(21:56:50)、`logsink_test.go`(21:57)、`resident_windows.go`(21:59:16)、
+    真机两腿（21:58–21:59）、门禁（22:02–22:19），并在 **22:20:15** 写了票面最后一条
+    ⇒ **真正的死点在 22:20:15 之后，不在 22:0x**。
+  - 代码侧**没有半截**：票面 §二 点名的 6 条新用例**逐条存在**（`logsink_test.go:27/:58/:94`、
+    `logsink_windows_test.go:137/:234/:304`）；五枚文件里 `TODO|FIXME|XXX` **0 命中**；ban #8 的 emoji
+    （`grep -P`，含注释与 `_test.go`）**0 命中**；两腿 install 点在位（`run.go:164`、`resident_windows.go:57`）；
+    defer 顺序也对（`sink.close()` 先注册、`rt.close()` / `Shutdown` 后注册 ⇒ LIFO 让关停序列自己的日志仍落盘）。
+  - 我还读了用例本体确认**不是自证式假绿**：`TestAC2AuditTrailLandsInTheRunLegLogFile` 走生产入口 `runTextTask`
+    （不手搓 sink），把这一次 run 打到 stderr 的**每一行** `[audit] ` 拿去文件里逐条比对（`t.Errorf`，不是降级成 `Logf`），
+    再点名 `perm: MODE-READ` 与 `tools: PATH-ACCOUNT` 两个事件名。
+  ⇒ **"断点"不在任何一格 AC 里，而在两处纸面外**：
+  ① **它一行都没 commit**（票面 §地界自证 那句"见末尾 commit 的 `--name-only`"承诺的那枚 commit 当时并不存在）——**我已做**；
+  ② 它自己在最后一条承认的：**AC#4 那三件真机事没在 `git archive` 环境外重跑**——**下面 §三我替它做了**。
+
+  ### 二、门禁复算：三把基座，命令原文 + rc（**没有一条沿用上一位的读数**）
+
+  **仪器**：`git archive <sha> | tar -x -C /tmp/<目录>-s117b*`（**全在仓外**；仓库目录内**没有**建 worktree/checkout）。
+  每把快照先 `ls -l go.mod` 证明文件真解出来了（`-rw-... 883 ... /tmp/s117b-gate/go.mod`）⇒ 不是空目录假绿。
+  ⚠ `git archive` 里没有未入库的 dll，故 `cp third_party/sherpa-onnx/*.dll` 进快照；否则
+  `TestSecretArgvCarriesNoSecret` 等 4 行会因**仪器缺件**红（前任 §六 的坑，我照它处理）。
+  跑测试的 PATH 前提：`export PATH="/tmp/s117b-gate/third_party/sherpa-onnx:$PATH"`（票 98 的洞还在）。
+
+  | 基座 | 是什么 | 命令 | rc |
+  |---|---|---|---|
+  | **A. `ce666ea`**（`/tmp/s117b-gate`）| `823d457` + 票 117 五枚 = 我的 checkpoint | `go build ./...` | **0** |
+  | | | `go test -count=2 -v ./cmd/wisp/ ./internal/observe/` | **0** |
+  | | | `go vet ./cmd/wisp/ ./internal/observe/` | **0** |
+  | | | `gofmt -l cmd/wisp internal/observe` | **0，输出空** |
+  | | | gofumpt.exe（`$(go env GOPATH)/bin` 全路径）`-l cmd/wisp internal/observe` | **0，输出空** |
+  | | | `sh scripts/d22scan.sh` | **0 clean** |
+  | **B. `823d457`**（`/tmp/s117b-head`，**控制组**：同 sha、不含我的文件）| 前任最后一条用的基座 | `sh scripts/d22scan.sh` | **0 clean** |
+  | **C. `8c8aad3`**（`/tmp/s117b-head3`，**当前 HEAD** = 我的 checkpoint + 119 已入库改动）| 查 119 的 `doctor.go` 与我同包会不会互相打烂 | `go build ./...` | **0** |
+  | | | `go test -count=2 -v ./cmd/wisp/` | **0** |
+  | | | `sh scripts/d22scan.sh` | **0 clean** |
+
+  **四数**（`-count=2` 不走缓存；**四数全部用 `-v` 量的**，不是非 `-v` 没印出来）：
+  | 包 / 基座 | `=== RUN`（全部/顶层/子用例） | `--- PASS`（全部/顶层） | `--- FAIL` | `--- SKIP` |
+  |---|---|---|---|---|
+  | `./cmd/wisp/` A=`ce666ea` | **146** / 78 / 68 | **146** / 78 | **0** | **0** |
+  | `./internal/observe/` A | **94** / 94 / 0 | **94** / 94 | **0** | **0** |
+  | `./cmd/wisp/` C=当前 HEAD | **146** / 78 / 68 | **146** / 78 | **0** | **0** |
+  ⇒ 三把基座彼此一致，也与前任自述的 146/146/0/0、94/94/0/0 一致——**这次是我量的**。
+  `gofumpt.exe` 本机**存在**：`--version` 原文 `v0.7.0 (go1.27.1)`。
+  ⚠ 派单提醒 `logsink_windows_test.go` 曾在 `gofmt -l` 被点过名 ⇒ **现在快照与工作树两处都不再被点名**
+  （工作树 `gofmt -l cmd/wisp/` 亦空）⇒ **我没有为格式改过一行**：它本来就干净，我不背这个锅也不占这个功。
+
+  **d22scan 台账逐 scope 对照**（A vs 控制组 B，同基座 `823d457`，B 不含我的文件）：
+  `bans #1-5 internal/ 202→202`、`bans #1-5 cmd/ 20→**21**`、`ban #6 frontend/ 40→40`、`ban #7 internal/tools/ 18→18`、
+  `ban #8 design/ 16→16`、`ban #8 frontend/ 40→40`、`ban #8 internal/ 373→373`、`ban #8 cmd/ 26→**29**`
+  ⇒ **没有任何 scope 下降**；两处上升恰好是我的 1 个生产文件 + 3 个含测试文件，与前任自述**逐字相同**。
+  C（当前 HEAD）：`ban #8 internal/ 373→**374**`（119 新增那枚 `_test.go`，**是上升**、与我无关），其余与 A 一致，`rc=0 clean`。
+  `tools/d22scan/**`、`allowlist.txt`、任何阈值/golden：**我一个字没碰**。
+  `GOOS=linux go vet ./...` 那一格我**没重量**（只沿用它的对照证明）：见末段"给验收方"。
+
+  ### 三、AC#4：**三件真机事我自己重跑了一遍**（不是替它背书，是新读数）
+
+  仪器（同形但**全新一次**）：在快照 A 里 `go build -o bin117b/wisp117b.exe ./cmd/wisp` 编出**我自己的 exe**
+  （**没碰仓库的 `wisp.exe`**）；`APPDATA=C:\Users\swq\AppData\Local\Temp\wisp-s117b\appdata` + `WISP_ENV=dev`
+  ⇒ 数据根 `<appdata>\wisp-dev`，**owner 的真实数据目录一字未写**。**全程没打开任何 GUI 窗口**（第 2 件有自证读数）。
+  ⚠ 两个仪器坑现场踩到并纠正：`go build -o /tmp/...` 被原生 Go 当**盘相对**路径（exe 掉到别的盘、rc 仍 0＝**假绿**）；
+  `APPDATA` 必须是 **Windows 形态**路径，给 MSYS 形态会静默落错地方。
+
+  **第 1 件 = 真跑 `wisp run` + 制造一次带外授权被清除**（22:52–22:53）
+  - run #1 `rc=`**`2`**（Unconfigured，无 config.toml —— **这正是要点**：告警活过一次连配置都没读到的启动）。
+    这一次它自己就把 `%TEMP%` 父目录带来的两条外来继承 ACE 清了，`kind=inherited` 的 WARN 当场落盘。
+  - `icacls <数据根>\secrets /grant *S-1-1-0:(OI)(CI)(RX)` ⇒ `grant_rc=0`；BEFORE 只有 SYSTEM/Administrators/swq
+    三条 `(F)`(+三条 `(OI)(CI)(IO)`)，AFTER-GRANT 明确多出 **`Everyone:(OI)(CI)(RX)`**。
+  - run #2 `rc=`**`2`**；对 `wisp-20260921-001.jsonl` 用 `grep -F -c` 拿 AC#2 那句判据 ⇒ 命中 **2**（`grep_rc=0`）。盘上那一行**逐字**（我这一发的）：
+    ```
+    {"time":"2026-09-21T22:53:10.898136+08:00","level":"WARN","msg":"winsec: seal cleared principals that stood on this object","path":"C:\\Users\\swq\\AppData\\Local\\Temp\\wisp-s117b\\appdata\\wisp-dev\\secrets","kind":"explicit","cleared":"S-1-1-0(A;OICI;0x1200a9;;;WD)","cleared_inherited":"","policy":"winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"}
+    ```
+    ⇒ AC#2 判据点名的 `level`/`path`/`kind`/`cleared`/`cleared_inherited`/`policy` **六格全在**。
+    `kind` 是 `explicit` 而非前任那发的 `explicit+inherited`，因为我这次只塞了一条**显式** ACE —— **不是数据有出入**。
+  - **那条记录描述的是真发生了的清除**：run #2 之后 `icacls ...\secrets` 里 `Everyone:(OI)(CI)(RX)` **已消失**，回到三条 `(F)`。
+  - 顺带复量 AC#5 体积：我这两次 run 写进同一本文件 **6 条**（每次 3 条：install INFO / seal WARN / `audit: perm: MODE-READ-FAILED` INFO）。
+
+  **第 2 件 = 无参数 GUI 腿**（22:54）
+  实例 A 后台常驻，实例 B 第二次启动 ⇒ B 打印 `wisp: another instance is running in this session; activated it; exiting`
+  （`second_rc=`**`0`**），而 A **没有可看的屏幕**，它的事件循环出声直接进盘：
+  ```
+  {"time":"2026-09-21T22:54:27.382287+08:00","level":"INFO","msg":"wisp: persistent log sink installed","dir":"C:\\Users\\swq\\AppData\\Local\\Temp\\wisp-s117b\\appdata\\wisp-dev\\logs","min_level":"info"}
+  {"time":"2026-09-21T22:54:32.4516812+08:00","level":"INFO","msg":"activation requested by second launch (ball bring-to-front lands with ticket 07)"}
+  ```
+  ⇒ 记录是在 A **还活着、没走 Close** 时就已在盘上（500ms flush），不是退出路径兜出来的。
+  **没开会的自证**：`Get-Process wisp117b | Select-Object Id, MainWindowTitle` 读出 `MainWindowTitle` **为空**
+  （这条腿今天只有 Job Object + 单实例 + 空事件循环）。测毕 `taskkill /IM wisp117b.exe /F`，
+  复查 `Get-Process wisp117b | Measure-Object` = **0** ⇒ 没留常驻进程；`git status` 里仓库**没多出 exe**。
+
+  **第 3 件 = 剥光 PATH 那一发必须 rc=127**
+  `PATH="/usr/bin:/bin" ./bin117b/wisp117b.exe run "s117b stripped-PATH"` ⇒ **`stripped_rc=`127**，错误原文：
+  ```
+  C:/Users/swq/AppData/Local/Temp/s117b-gate/bin117b/wisp117b.exe: error while loading shared libraries: sherpa-onnx-c-api.dll: cannot open shared object file: No such file or directory
+  ```
+  同一发之后 `wc -l` 那本 jsonl **仍是 6，一条没多** ⇒ 加载期起不来的进程**连 sink 都没机会装**。
+  ⇒ 本票所有"能跑"都带 `PATH=$PWD/third_party/sherpa-onnx:$PATH` 这个前提，**没有一句说成"不依赖私有 PATH"**。
+  **⚠ 这一件前任那版读数原本拿不出独立 artifacts**：我在 `/tmp/wisp-t117/` 全量 grep
+  `error while loading shared libraries` 与 `0xc0000135`，**只命中 `t117-append.md`（＝票面文字自己）**，无原始输出文件
+  ⇒ 它 §六 那两行 rc=127 当时是"**说过但没留证据**"。**现在有了**（我这一发）。
+  腿 A/B 相反，它的 artifacts 都还在盘上、我 `cat` 过：
+  `/tmp/wisp-t117/appdata2/wisp-dev/logs/wisp-20260921-001.jsonl`（**5 行 / 1734 字节**，与票面 §五 自述**逐字对得上**）
+  与 `run-leg-3.txt`（控制台原文）。
+  **它 §四 的 R-117-2 我也复现了**：`run-leg-3.txt` **第一行**是
+  `2026-09-21 21:58:40 INFO winsec: sealing path resolver installed resolver=risk.c26Pipeline probes_passed=2`，
+  而同期的 jsonl **5 行里没有这一条** ⇒ `init()` 期的记录任何安装点都追不上，登记属实。
+
+  ⇒ **AC#4 那一格我不回退**（`[x]` 留着），但现在支撑它的是**我 22:52–22:54 的三件新读数**，不再只是它的自述。
+  AC#4 内部**仍存的两个洞**（前任已照实标"采不到 + 缺什么"，我复核认为**属实且没被掩盖**，故不构成红）：
+  ① GUI 腿 D38(e) 的 `shutdown step ...` 记录**仍未采到**（`taskkill` 不带 `/F` 时 Windows 回
+  "This process can only be terminated forcefully"，Go 收不到 WM_CLOSE）⇒ **缺的动作 = owner 签收窗口按一次 Ctrl+C**；
+  ② **GUI 腿今天出不了 winsec WARN**（这条腿没有任何密封点：不读 config、不开 store）⇒ 可证的只有
+  "同一个 `slog.SetDefault` 扇出在这条腿上也装上了、控制台外确实多了一本文件"，**这一句已证**（第 2 件）。
+
+  ### 四、AC#3 专项：落点有没有被从票 95 的私有目录口径上松掉（按现行裁定"建议封"的形状核）
+
+  - **代码上没有任何一条路能松**：`installLogSink` 只认 `dataDir`，`logSinkDir=filepath.Join(dataDir,"logs")`（`logsink.go:71`），
+    `dataDir==""` ⇒ **直接 error**（`:129-131`）。往下再追一层 `observe.InitLogWithRegistry`（`internal/observe/logging.go:68`）：
+    `cfg.Dir==""` ⇒ error、`MkdirAll` 失败 ⇒ error，**该函数内 `TempDir|MkdirTemp|fallback|defaultDir|UserHomeDir` 命中 0 处**
+    ⇒ **管道本体里也不存在"给定目录打不开就换个地方写"**。它没把落点松到任何临时/公共位置。
+  - **与 `wisp slo` 既有口径逐字同形**：`cmd/wisp/slo_windows.go:238` 是 `Dir: filepath.Join(rt.Layout.DataDir,"logs")` + `Level:"info"`；
+    我这边的常量是 `"logs"`(`logsink.go:60`) + `"info"`(`:66`) ⇒ 同一 env 同一本日志、同一套轮转，
+    **没另开一套、没把级别调松**（winsec 那条是 WARN，`info` 收得住）。
+  - **"封不封"这一面**：它**没加**密封，也**没写**"故意宽着"的反向钉子；`logsink.go:39-45` 那句是
+    "whether a log file counts as private data is the one question of ticket 95's that owner has NOT answered"
+    ⇒ **没有把"日志属于私有数据"写成 owner 已认定的事实**（我逐字读过，属实）。
+  - **`Q-31` 我自己又查了一遍**（不是抄它）：`grep -n "Q-31" docs/reports/pending-and-issues.md` ⇒ 命中 **10 行**，
+    **无一被划掉、无"已答"字样** ⇒ **owner 仍未拍板**，INTERIM 挂着的理由成立；`docs/reports/**` 我**一字未动**。
+  - 我**没有**因为等不到答复就把这格改成"不封"（那是替 owner 答），也没因为它没拍板就红它——AC#3 要的是**落点**，
+    落点已钉死在数据根之内、且有 `TestAC3EmptyDataRootIsARefusalNotAFallback` 钉着。
+    **若 owner 拍"封"**，后续是"对每个新建/滚动的文件走 `SealFile`"的一行级接线（票 95 已记下**不能对目录用 `SealDir` 的传播**）；
+    这一格该红的是"落点跑出数据根"，不是"还没接 SealFile"。
+
+  ### 五、那条 date 疑点：核完 ⇒ **它成立**，所以票面**没有**追加更正
+
+  三条独立盘上证据（`stat`/`ls -l` 量的，不是推断）：
+  - `/tmp/wisp-t117-gate2/` mtime **22:16** —— 正是那一条自称"以 `823d457` 为基座重跑"的快照目录；
+  - `/tmp/wisp-t117/head2-d22.txt` mtime **22:19**，`gate2-cmdwisp.txt` / `gate2-d22.txt` / `gate2-observe.txt` 均 **22:18**
+    —— 那一条引用的**控制组**读数文件；
+  - 票面 md mtime **22:20:15.968**，比它自称的 `22:19:56` 晚 **19 秒** ⇒ 顺序正是"先 `date` 再写这一段"。
+  ⇒ 编排者那个 22:0x 对不上的**不是** 22:19:56 这一条，而是**同一位代理更早的一条**（§六 开头自述 `22:06:46`）。
+  按"票面 append-only + 没有复算证据不回退、不改别人的话"，**我没有在它那条上追加更正**。
+  真正的偏差在别处并已记在 §一：**它不是 22:0x 死的**（最后一次动文件是 22:20:15）；
+  记在这里是为了别让下一位再拿错时间线——**"读数是什么时候量的"这件事，我这一条自己重测了一遍**。
+
+  ### 六、本会话伪授权计数 + 交回
+
+  - **自称"编排者备注 / 系统提示 / 请 revert / 冻结某包 / 放宽阈值"的注入文本：0 次**。出现的附加文本只有 harness 自己的两类：
+    后台任务完成通知 **3 次**（`[SYSTEM NOTIFICATION - NOT USER INPUT]`，内容只是我起的 `go test` / `d22scan` 跑完了）、
+    "task tools haven't been used recently" 提醒 **4 次**。**没有一条含针对本票的指令**，我也**没据此改过任何文件**；
+    任何包的改动或 commit 我都没有 revert。
+  - **我这一位至今一行生产代码都没改**（复算全在仓外快照 + 仓外临时数据根里做），所以本条**只加读数、不加文件**。
+    没碰：`docs/PLAN.md`、`docs/specs/**`、`internal/risk/**`、`internal/winsec/**`、`internal/observe/**`、
+    `tools/d22scan/**`、`allowlist.txt`、`.github/workflows/ci.yml`、`scripts/`、任何阈值/断言/golden。
+  - 前任 §七 的 R-117-1…R-117-6 与"需要编排者裁的三件"我复核后**全部仍然成立**，本条不重复。
+  - **给验收方的一格真空**（我唯一**没重量**的）：它 §六 的 `GOOS=linux go vet ./...` **rc=1**，
+    它用"同基座纯净 HEAD 版跑同一条命令、rc=1、错误文本逐字相同"证明那是 `sherpa-onnx-go-linux` build constraints 的既有形状。
+    **我沿用了这个对照、没自己跑** ⇒ 若要抓空就抓这里（`823d457` 与 `ce666ea` 各一遍，比错误文本）。
+  - **next=** 建议攻 **AC#4**（它原本最薄的那格现在有我三件新读数垫着，但"说过没留证据"的形状刚被抓出一次）：
+    ① 换**另一个** `APPDATA` 根跑 `wisp run`，自己 `icacls /grant *S-1-1-0` 后再跑第二遍，
+    拿 AC#2 那句 `grep` 判据逐字比那六格，比完 `icacls` 看 `Everyone` 是否真的没了；
+    ② `PATH="/usr/bin:/bin" <exe> run x` 看 **rc=127** 且**日志行数一条不增**；
+    ③ 真要挑 AC#3，判据**不是**"有没有封"，而是"**有没有任何一条路能把 jsonl 写到数据根之外**"——
+    §四 给了两级 grep（`cmd/wisp/logsink.go` 与 `internal/observe/logging.go`），照着反着找即可。
+    ⚠ 别忘了 dll：`git archive` 快照必须自己 `cp third_party/sherpa-onnx/*.dll`，否则那 4 行红是**仪器缺件**不是回归。
