@@ -152,6 +152,55 @@ next= 等验收方出 `docs/evidence/s1/99-*.md` 裁决表。编排者的账（*
 `.github/workflows/ci.yml:48` 与 `:68` 现在跑的是同一台仪器的同一次测试（CI 多花一遍 tools/d22scan 的 `-v` 测试，本机实测第一步 3.3-3.5s + 21 用例），
 要不要把两步并成一步归票 85/93；若并，判据是"两步合一"而不是"把 `scripts/d22scan.sh` 改回去"。
 
+## 验收读数（acceptor-ticket99，`date` 实测 2026-09-21 18:27:42 CST）—— 总判：**通过（附条件）**
+
+裁决表：`docs/evidence/s1/99-adversarial-acceptance.md`（四框 1:1，每行标来源档位）。快照全在仓外 `/tmp`
+（`/tmp/wisp-99-ac1-ac99`=`git archive d0d8782^`、`/tmp/wisp-99-mut-ac99`、`/tmp/wisp-99-gate-ac99`=建快照时 HEAD `06906f7`），
+仓内未建 worktree、未 checkout；**主树未跑门禁**（共树在飞：票 95 `internal/config`、票 93 `ci.yml`+`scripts/`）。仪器 `go1.27.1 windows/amd64`。
+
+- **AC#1 〔独立复现〕**：改前脚本（`grep -n '^go test \./\.\.\.$' scripts/d22scan.sh` → `32:go test ./...`）在快照里 run1 rc=**0**
+  第 2 行 `ok  	github.com/CarlosShao/wisp/tools/d22scan	10.352s`（真跑喂热缓存）→ 种 `frontend/src/app.js` 的 `approval.decide` →
+  run2 整脚本 rc=**1**，但第 2 行是 `ok  	github.com/CarlosShao/wisp/tools/d22scan	(cached)`；**单独再跑第一步本体**
+  `cd tools/d22scan && go test ./...` → rc=**0** 同一行 `(cached)` ⇒ **步骤级=复现／脚本级=未复现**（红是第二步 `go run .` 抓的），与票面判定一致。
+  差异说明：`go test` 缓存键含**运行目录**，所以新 `/tmp` 快照第一次必然真跑、同目录第二次回放 ⇒ 危害只咬"同一工作树反复自检"这条 A64② 的路（见 R-99-3）。
+- **AC#2 〔独立复现〕覆盖面三问**：① **同一测试集合**——改前改后都 `cd "$root/tools/d22scan"`（第 48 行是 context 行、未动），
+  `go list ./...` 在该 module 只有 **1 个包**，`scripts/spike`/`tools/mockllm` 改前改后都不在分母 ⇒ 没把被检查对象删出门禁；
+  ② "SKIP 不算过 / PASS=0 且 FAIL=0 就红"是**纯加严**（只会把 0 变 1，rc 原样透传），`$@` 只有 `./...`，
+  无 `-failfast`/`-short`/`-run`、无 `GOFLAGS` ⇒ 覆盖面语义未改；继承来的新风险已登记（`tools/d22scan` 将来若有平台性 SKIP，第一步会红且原因不是禁令，那是**正确**的红，不许回头放宽脚本）；
+  ③ **任意 cwd 成立**：`cd /tmp && sh <绝对路径>/scripts/d22scan.sh` rc=**0**；`cd <snap>/frontend/src && sh ../../scripts/d22scan.sh` rc=**0**；
+  `cd /tmp && sh <snap>/tools/d22scan/runtests.sh -C tools/d22scan ./...` rc=**0**（`runtests.sh:53-56` 把 `-C` 解析成自身推导的 `$root/…`，`:58-62` 的 `go.mod` 守卫让写错的 `-C` 只能 exit 2、不能假绿）。
+  ④ **CI 那侧**：`:48` 与 `:68` 第一步现在是逐字同一条命令 ⇒ CI 每轮多跑一整遍（本机冷跑 9.5s/21 用例/`=== RUN`=31）。**不是本票的账**（AC#2 正是要求并成同一台仪器），
+  登记给票 85/93；合一的判据=**合 CI 两步**（保留 `scripts/d22scan.sh` 为唯一入口），**不是**把脚本改回裸 `go test`。
+- **AC#3 〔独立复现〕双向**：(i) 在**有修法的同一棵树**上把承载行 `51` 换回裸 `go test ./...`（`MUTANT-LANDED` + 同链 `grep -n` 打印 `51:go test ./...` + `bash -n` rc=0），
+  干净树 rc=0 `ok ... 9.492s` → 种同一违规 → 整脚本 rc=1 而第一步 `(cached)`、**第一步单独跑 rc=0 `ok ... (cached)`** ⇒ "种了违规还绿"**回来了**。
+  ⚠ 我头两发 `sed` 因锚点漏算 `"$root` 里的 `$` 而**静默不匹配**，被同链 `grep -n` 无输出打断才发现（那次 run1 日志第 2 行是 `=== RUN` = `-v` 输出 = 脚本没被改），读数已作废重跑——票面"同链 grep 证落地"这次救了我。
+  (ii) 修法在场 + 同一个 `frontend/` 违规：脚本 rc=**1**，红名 `--- FAIL: TestScannerSelfScanOfRealRepoIsGreen (0.47s)`（`scan_test.go:269: repo HEAD violates: frontend/src/app.js:1: [panel-approval]`）
+  + `--- FAIL: TestRealRepoLedgerIsHonest (0.49s)`，`runtests.sh: go test exited 1 - packages=[./...] top-level: PASS=19 FAIL=2 SKIP=0, === RUN=31, '[no tests to run]'=0`；
+  该日志里 `d22scan.sh: scan of` **零命中** ⇒ `set -eu` 在第一步就死，第二步根本没跑 ⇒ **这条调用路径自己有牙**（没借票 88 的口）。还原后 `diff -q` 与主树逐字节相同（rc=0）、种子文件已删。
+- **AC#4 〔独立复现〕**：`bash -n scripts/d22scan.sh` rc=**0**（快照与主树各一次）；纯净快照 `sh scripts/d22scan.sh` 连跑两次 rc=**0**/**0**，
+  两次 `runtests.sh: OK - ... PASS=21 FAIL=0 SKIP=0, === RUN=31`；`(cached)` 我自己数 = **0** 与 **0**；台账 `d22scan: scope` 行 **8** 行齐全：
+  `bans #1-5 internal/`=197、`bans #1-5 cmd/`=20、`ban #6 frontend/`=**37**、`ban #7 internal/tools/`=17、`ban #8 design/`=16、`ban #8 frontend/`=**37**、`ban #8 internal/`=342、`ban #8 cmd/`=26
+  ⇒ `ban #6/#8 frontend/` **不降**（342 vs 票面 340 是票 103 新增 `internal/winsec` 文件，只增不减，非本票造成）。
+
+**归属核对（本票来历特殊）**：`d0d8782`（`23 4 scripts/d22scan.sh`，**修法本体**）message 首句自证"由编排者代 agent-ticket99 落档"，并明写 AC#3/AC#4 读数仍缺、由 99b 续；
+`9e00629`（`99 5` 票面，**只改票面**）把四框读数整段署在 `agent-ticket99 @18:05` 名下（且 line 126 留了"我没提交"这句与仓库状态矛盾的残留），
+而 AC#3/AC#4 的快照目录 `/tmp/wisp-t99b-agent-ticket99` 是 99b 的；第三枚 **`06906f7`**（18:13:19，`13 0` 票面，= 我建快照时的 HEAD）
+已由 99b 自登记"账分两枚：代码在 `d0d8782`，票面在 `9e00629`" ⇒ **拆分已披露，不是隐瞒，读数本身不假**（我逐条复现出来了）。
+仍欠两笔（登记 **R-99-1**）：(a) 交件读数抬头 line 61 与 Status line 3 把 99b 测的 AC#3/AC#4 仍冠 `agent-ticket99 @18:05`；
+(b) `06906f7` 的"我的脚本改动被 `d0d8782` 带走"与 `d0d8782` 的"编排者代 agent-ticket99 落档"两种口径并存，脚本改动的作者没有唯一定稿（归编排者定）。
+本段为追加，未改写 99b 正文、未改 Status、未改文件名。
+
+**登记（验收期一律没动代码/契约）**：R-99-1 记账更正（本段落档）· R-99-2 票面 AC#4 括号"HEAD rc=1 / `internal/winsec/winsec.go:126`"是**腐坏的引用**
+（我在 `d0d8782^` 与 `06906f7` 两棵纯净树都是 rc=0，`internal/winsec/` 一行没读没改），判据按实测写 · R-99-3 缓存键含运行目录 ⇒ 脚本头部注释与票面该补"同一工作树内反复自检才会回放"这个限定语（我没动脚本） ·
+R-99-4 CI 两步重复跑，账归票 85/93 · R-99-5 共树 HEAD 在我会话中从 `0717bf2` 漂到 `06906f7`，本报告每份绿都点名来自哪棵 `/tmp` 快照 ·
+R-99-6 `sed` 静默不匹配两发 = 方法坑，同链 `grep -n` 整行是唯一防线。
+
+**第三档（仅自述，不背书）与补救**：99b 自述的 `/tmp/wisp-t99*` 目录内日志、"主树收尾 rc=0"、"allowlist 仍 5 行非注释"中属于它当时那次运行的部分，
+我无从复跑 ⇒ 不背书。补救动作：AC#1/AC#3/AC#4 我已用**自己的**快照独立复现（上列读数即我的，不是抄的）；"主树收尾 rc=0"改由票 93/103 收尾时在共享树跑一次并点名每条命中的归属；
+`allowlist.txt` 行数我按 `git show --numstat` + 现树计数抽验（见裁决表末段）。
+
+next= 交编排者：`-done` 时把 R-99-1 的 sha 拆账并进台账、按 R-99-2 把 AC#4 的旧括号标为过期、按 R-99-3 补脚本注释限定语；R-99-4 派给票 85/93。本代理未 push、未改 `tools/d22scan/**`/`allowlist.txt`/`ci.yml`/任何断言与阈值。
+
 - 2026-09-21 18:12（agent-ticket99，交件后立刻登记的一条**提交形状异常**，如实写不藏）：
   我这枚路径限定提交 `9e00629` 的 `--numstat` 里**只有票面一个文件**（`99 5`），因为 `scripts/d22scan.sh` 的改动
   在我提交前 52 秒（18:09:54）已被另一枚提交 **`d0d8782`**（`fix(99,AC#2): d22scan.sh 第一步改走 runtests.sh`，`23 4`）
