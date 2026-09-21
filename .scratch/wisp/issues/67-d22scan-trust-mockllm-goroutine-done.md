@@ -1,9 +1,14 @@
 # 67 — 让 D22 静态门重新可信：`mockllm.go` 裸 goroutine + emoji 门看不见 Go 字符串
 
-**Status:** review（**4/4 框已勾**；AC#1/AC#2 早前经编排者独立验证，AC#3 于 09:41 由编排者勾选，
-AC#4 见下。**待办只剩一张 1:1 裁决表**，之后即可 `-done`。
-⚠ 两条移交已写进**票 71**：ban #6 仍指 `frontend/`（恒 0 文件的死作用域，不是我该缩的禁令）、
-`.github/workflows/ci.yml:23` 注释仍写 "design/ and frontend/" 与现覆盖面不符（该文件归票 70））
+**Status:** **done（4/4 PASS，编排者 2026-09-21 09:48 归档）**
+裁决表：`docs/evidence/s1/67-adversarial-acceptance.md`。AC#4 按票面自己的要求（"AC#3 落地后必须重跑"）
+在 09:48 **重跑过**，六条逐条复现：`gofmt -l` 空、`go vet ./internal/llm/... ./cmd/wisp/` rc=0、
+`go test -count=2 ./internal/llm/adaptertest/` ok 3.401s、`cd tools/d22scan && go test ./...` ok 0.586s
+（24 条 RUN/PASS、0 条 SKIP/FAIL）、纯净树扫描 **exit 0 且自报 internal/ 289 Go files**。
+⚠ **两处诚实限定留在裁决表里**：①整仓 `go vet ./...` 我**故意没跑**（`internal/ball` 正被票 74 改着，
+跑全仓等于把邻居的 WIP 当 HEAD 判），那一格由票 74 落地后复跑 + CI lint 兜底；
+②`allowlist.txt` **4 行 → 5 行**不是本票加的，是票 70 的 `38b3715`（R16#1 按文件豁免）——
+旧文本不覆盖，在此追加更正。
 **Claimed by:** agent-ticket67（报告已交，**勿重开 AC#1/AC#2**；AC#3 等票 66 收尾后由**新代理接续**，从 Progress log 的 `next=` 起）
 **Last update:** 2026-09-21（AC#3 判据① 字形清理已落地，见 Progress log 末条；覆盖面扩展等票 70）
 **Blocked by:** —（包与票 66 不相交：`internal/llm/adaptertest` + `tools/d22scan`；**AC#3 例外，须等票 66 落地**，见下）
