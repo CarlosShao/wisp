@@ -14,7 +14,9 @@ import (
 // Ticket 11 AC#6, consumer side: turn probe.go's per-capability PRIMITIVE
 // (ticket 09's contract: one minimal real request per capability, response
 // checked) into the provider_health WRITE PATH (SPEC-02 schema v2) plus the
-// declared-vs-measured mismatch event (SPEC-05 sec 3.1: 「声明 ✓ 实测 ✗」必须可见).
+// declared-vs-measured mismatch event (SPEC-05 sec 3.1: 「声明 PASS 实测 FAIL」
+// 必须可见). SPEC-05 spells that pair as a check mark and a cross; D22 ban #8
+// keeps those glyphs out of internal/, so this quotation is ASCII by design.
 //
 // The load-bearing property is that a verdict is MEASURED: RunProbeSuite forms a
 // verdict only from RunProbe's outcome, i.e. from a request that really went out
@@ -117,7 +119,7 @@ type HealthSink interface {
 		ok bool, latencyMS int64, lastProbeAt time.Time) error
 }
 
-// ProbeMismatch is the structured 「声明 ✓ / 实测 ✗」fact: the catalog claims a
+// ProbeMismatch is the structured 「声明 PASS / 实测 FAIL」fact: the catalog claims a
 // capability the wire refused to demonstrate. The seam emits DATA; the ball and
 // the panel (ticket 40) own rendering it, but Label() is the single frozen copy
 // so no surface invents its own wording (the RetryNotice rule).
@@ -200,7 +202,7 @@ type ProbeSuiteOptions struct {
 	Declared config.Capabilities
 	// Capabilities defaults to DefaultProbeCapabilities.
 	Capabilities []ProbeCapability
-	// Sink writes provider_health, Mismatch announces every 「声明 ✓ 实测 ✗」.
+	// Sink writes provider_health, Mismatch announces every 「声明 PASS 实测 FAIL」.
 	// Both are required: a run that cannot record, or cannot be loud about a
 	// contradiction, fails instead of quietly doing nothing.
 	Sink     HealthSink

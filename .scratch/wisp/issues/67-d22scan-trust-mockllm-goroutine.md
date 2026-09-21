@@ -187,3 +187,24 @@ CI 该步**无 `continue-on-error`** ⇒ **job 红**。
   ④它另外登记了一条我没让它修的覆盖洞：**ban #1 只匹配闭包字面量**，`go probeReader()` 这类具名调用扫不出
   （生产范围实测 4 处）⇒ 今天的 `clean` 含义是"无闭包字面量裸协程"。归票 70 AC#5，**我未默默扩语义**。
   next=票 66 收尾后：AC#3 三步（改 `providers.go` 三处字形 → 扩 ban #8 覆盖面且**排除注释** → 只许从严）。
+- [2026-09-21T01:32:00Z] agent=agent-ticket67b did=**AC#3 判据②（覆盖面扩展）落地，但 AC#3 整框不勾**（原因见下"未做"）。
+  证据 `docs/evidence/s1/67-emoji-scope-internal-cmd.md`。①ban #8 作用域收进 `emojiScopes()` 单一真相源：
+  `design/`（全部文本）+ **`internal/` + `cmd/` 的 `.go`，含 `_test.go`、含注释**（扩面后自报 16 / 289 / 21 文件，
+  289+21=310 与 `find internal cmd -name '*.go'` 逐数吻合）。②**"排除注释"这条按实测否证**：`main.go:449` 逐行匹配原文、
+  不剥注释 ⇒ 注释字形本就是违规；要排除注释得**新增**剥注释代码＝缩小覆盖面（R16#4 禁），故从严保留，
+  代价是 `probe_health.go:17/:120/:203` 三行注释清成 ASCII `PASS`/`FAIL`（仅注释，零逻辑改动，措辞对齐 `cmd/wisp/providers.go` 的 `fff4cad`；
+  SPEC-05 原文保留字形并在注释里说明，防后人当误引去改）。③**`frontend/` 死作用域按票 71 精神删除**并留理由：该树在本 HEAD 不存在、
+  恒 0 文件＝"看着在扫其实没扫"；同时加 `emptyEmojiScope()` ⇒ 声明了却走 0 文件的作用域 **exit 2**（比删除更硬），
+  票 34 落地 `frontend/` 那天在**同一个 commit** 里加回条目。④**末行话术改成由 `describeEmojiScopes()` 生成**，
+  打印真实作用域与真实文件数，不再可能出现"没扫的树被写进 clean 行"。⑤测试：新增
+  `TestEmojiBanCoversGoSourcesNotJustDesign`（4 粒种子：internal/ 注释 + internal/ 字符串字面量 + `_test.go` + cmd/，逐一断言被报出）、
+  `TestDeclaredEmojiScopeCannotWalkZeroFiles`、`TestScopeReportMatchesRealCoverage`；`cd tools/d22scan && go test -v ./...` **10 条 9 绿 1 红**、
+  REAL_EXIT=1，唯一红因 `TestScannerSelfScanOfRealRepoIsGreen` → `internal/tools/bridge_junction_windows_test.go:444` 的 `⚠`。
+  **未做/不能全绿**：那 1 行属**此刻正在写该文件的票 20**（`git status` 显示它仍是 `??` 未跟踪），硬约束"同文件并发＝假并行"优先于
+  "CI 必须绿"，我一个字没碰、也没加豁免/skip；因为它未被跟踪，CI 检出 HEAD 看不到它，lint job 预期仍绿（commit B 用 `git archive HEAD` 独立验证）。
+  只读登记两条我没权限动的残留：`.github/workflows/ci.yml:23` 的注释仍写 "zero-emoji scan over design/ and frontend/"（票 70 领地，
+  现已与实际覆盖面不符）；ban #6 `panel-approval` 仍走不存在的 `frontend/`（恒 0 作用域，票 71 AC#4 处置，我没擅自缩别的禁令）。
+  `allowlist.txt` **仍 5 行非注释、`git diff` 为空**＝零新豁免。门禁：`gofmt -l tools/d22scan internal/llm` 空、
+  `gofumpt v0.7.0 -l tools/d22scan` 空、`go vet`（d22scan 模块 + `./internal/llm/`）exit 0。
+  next=票 20 落地后清掉那 1 行 `⚠` → 本地 `sh scripts/d22scan.sh` 应全绿；编排者复跑 AC#4 门禁并决定是否勾 AC#3；
+  `ci.yml:23` 的注释与 ban #6 的 `frontend/` 作用域分别移交票 70 / 票 71。

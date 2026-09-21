@@ -24,7 +24,14 @@
 //	                      decisions are native-side only) - scope: frontend/
 //	7 internal-artifact-tool  host-internal artifact writes implemented as
 //	                      gated tool names (D34 note 2) - scope: internal/tools/
-//	8 emoji               zero emoji in design/ and frontend/ (D23)
+//	8 emoji               zero emoji in design/ (every text file) and in the
+//	                      Go sources of internal/ + cmd/ - comments and
+//	                      _test.go INCLUDED (D23). This is the one ban whose
+//	                      scope is NOT the "production, non-test" default
+//	                      above, and it is deliberately so: see emojiScopes
+//	                      and walkEmoji for the reasons, and pin any change
+//	                      there in scan_test.go rather than in the footer,
+//	                      which is generated from the scope list.
 //
 // Findings are suppressed only via allowlist.txt entries of the form
 // "ban-id<TAB>repo-relative path prefix<TAB>reason" (committed, reviewable,
@@ -74,7 +81,8 @@ type scanner struct {
 	root      string
 	allow     map[string]map[string]bool // ban-id -> path prefix set
 	findings  []Finding
-	failAddOn string // unused placeholder guard
+	failAddOn string         // unused placeholder guard
+	emojiSeen map[string]int // ban #8: scope label -> files actually line-scanned
 }
 
 var (
@@ -135,7 +143,18 @@ func isSecretNamed(name string) bool {
 
 // Scan walks the repo at root and returns all non-allowlisted findings.
 func Scan(root string) ([]Finding, error) {
-	s := &scanner{root: root, allow: map[string]map[string]bool{}}
+	s, err := scanWithStats(root)
+	if err != nil {
+		return nil, err
+	}
+	return s.findings, nil
+}
+
+// scanWithStats is Scan plus the per-scope work counts: "no findings" and
+// "nothing was looked at" stay distinguishable (ticket 67 AC#2 bought the same
+// property for the Go scope with checkRoot; main.go enforces it for ban #8).
+func scanWithStats(root string) (*scanner, error) {
+	s := &scanner{root: root, allow: map[string]map[string]bool{}, emojiSeen: map[string]int{}}
 	if err := s.loadAllowlist(filepath.Join(root, "tools", "d22scan", "allowlist.txt")); err != nil {
 		return nil, err
 	}
@@ -153,13 +172,77 @@ func Scan(root string) ([]Finding, error) {
 	if err := s.walkText(filepath.Join(root, "internal", "tools"), "internal-artifact-tool", s.artifactCheck, true); err != nil {
 		return nil, err
 	}
-	if err := s.walkEmoji(filepath.Join(root, "design")); err != nil {
-		return nil, err
+	for _, sc := range emojiScopes(root) {
+		if err := s.walkEmoji(sc); err != nil {
+			return nil, err
+		}
 	}
-	if err := s.walkEmoji(filepath.Join(root, "frontend")); err != nil {
-		return nil, err
+	return s, nil
+}
+
+// emojiScope is one tree ban #8 walks.
+type emojiScope struct {
+	dir    string // absolute path
+	label  string // repo-relative label, quoted in findings and in the self-report
+	goOnly bool   // true: only .go files count (see walkEmoji's scope note)
+}
+
+// emojiScopes is ban #8's ENTIRE coverage, kept in one place so the tool cannot
+// print a footer naming a tree it never walked - the failure shape of A22 /
+// A26 / A30, and exactly what this list was before ticket 67 AC#3 landed:
+// design/ plus frontend/, and frontend/ does not exist at this HEAD, so the
+// ban was blind to all 310 .go files of the product while printing "no emoji in
+// design/ or frontend/".
+//
+// WHY frontend/ WAS DELETED INSTEAD OF FIXED (ticket 71 AC#4's two allowed
+// outcomes are "give it real coverage" or "delete it"; only one is available):
+//   - It cannot have coverage today: `ls frontend/` is "No such file or
+//     directory" (measured 2026-09-21), so the entry could only ever walk zero
+//     files. Keeping it was pretending to scan.
+//   - Making an absent scope non-fatal was the lie; so the empty-scope check in
+//     main is fatal (exit 2). Re-add frontend/ to this list in the SAME commit
+//     that lands ticket 34's scaffold - emojiScopes() is now the single source
+//     of truth for ban #8's coverage, so "the panel tree is not covered" reads
+//     off one function body instead of hiding behind a walk that never runs.
+//   - NOT touched here: ban #6 (panel-approval) still walks frontend/ via
+//     walkText above and is still an always-0 scope. Deleting it would narrow a
+//     ban I do not own, which R16#4 forbids an agent to do; ticket 71 AC#4 owns
+//     its disposal. It is listed as a known residual in
+//     docs/evidence/s1/67-emoji-scope-internal-cmd.md rather than left unsaid.
+func emojiScopes(root string) []emojiScope {
+	return []emojiScope{
+		{dir: filepath.Join(root, "design"), label: "design/"},
+		{dir: filepath.Join(root, "internal"), label: "internal/", goOnly: true},
+		{dir: filepath.Join(root, "cmd"), label: "cmd/", goOnly: true},
 	}
-	return s.findings, nil
+}
+
+// describeEmojiScopes renders the per-scope work counts. main() builds its
+// "clean" line out of this string, so the sentence cannot claim a scope the
+// list does not contain (the ticket 67 AC#3 footer bug).
+func describeEmojiScopes(scopes []emojiScope, seen map[string]int) string {
+	parts := make([]string, 0, len(scopes))
+	for _, sc := range scopes {
+		kind := "text files"
+		if sc.goOnly {
+			kind = "Go files, comments and _test.go included"
+		}
+		parts = append(parts, fmt.Sprintf("%s %d %s", sc.label, seen[sc.label], kind))
+	}
+	return strings.Join(parts, "; ")
+}
+
+// emptyEmojiScope returns the label of the first declared ban #8 scope that
+// line-scanned zero files, or "" when every scope did real work. A declared
+// scope with no files behind it is an empty instrument (ticket 71 AC#4): main
+// treats it as fatal instead of letting it read as green.
+func emptyEmojiScope(scopes []emojiScope, seen map[string]int) string {
+	for _, sc := range scopes {
+		if seen[sc.label] == 0 {
+			return sc.label
+		}
+	}
+	return ""
 }
 
 func (s *scanner) loadAllowlist(path string) error {
@@ -424,11 +507,46 @@ func (s *scanner) walkText(dir, ban string, check func(string) (string, bool), g
 	})
 }
 
-func (s *scanner) walkEmoji(dir string) error {
-	if _, err := os.Stat(dir); os.IsNotExist(err) {
+// walkEmoji line-scans one ban #8 scope.
+//
+// Two scope decisions live here because both were argued in the ticket and
+// both are things a later reader will otherwise "fix" the wrong way:
+//
+//   - COMMENTS COUNT, and this is not a policy choice but a measurement: the
+//     loop below matches emojiRe against the RAW line and nothing strips
+//     comments first, so a glyph in prose is already a violation in this
+//     instrument's semantics. Ticket 67 AC#3 proposed the opposite ("comments
+//     are not user-visible, exclude them"); implementing that needs new
+//     comment-stripping code, i.e. a coverage NARROWING, which R16#4 forbids.
+//     The measured blast radius of keeping comments in was 3 production lines
+//     (internal/llm/probe_health.go:17/:120/:203, all comments), and they were
+//     cleaned to ASCII PASS/FAIL rather than exempted - see
+//     docs/evidence/s1/67-emoji-scope-internal-cmd.md. Attribution caveat on
+//     purpose: ban #8 is D23's design-language ban, NOT a console-encoding
+//     check; the encoding argument was specific to cmd/wisp's verdict column.
+//   - _test.go COUNTS. Test sources are where a verdict literal gets
+//     copy-pasted FROM, and every expensive false green in this repo's recent
+//     history came from a gate blind to a whole class of file (ban #1 saw only
+//     `go func(`; ban #8 saw only design/). Cost measured for this change:
+//     1 line, in internal/tools/bridge_junction_windows_test.go:444, owned by
+//     ticket 20 and deliberately NOT edited here (concurrent same-file writes
+//     are fake parallelism); it is registered as the known pending finding.
+//
+// goOnly covers the remaining file classes under internal/ and cmd/: the only
+// non-.go files there are testdata goldens (57 .sse fixtures) and leaked test
+// debris under internal/tools/tmp/, i.e. not source - and testdata is skipped
+// below exactly as walkGo/walkText skip it for every other ban, so ban #8 gains
+// no file class the other bans lack and drops none either. design/ stays
+// all-text (isTextFile) because its HTML/CSS/JS mockups ARE the surface D23
+// governs.
+func (s *scanner) walkEmoji(sc emojiScope) error {
+	if _, err := os.Stat(sc.dir); os.IsNotExist(err) {
+		// Absent tree: the count stays 0 and emptyEmojiScope in main makes
+		// that fatal. Not an error here, so Scan stays usable from fixtures
+		// that seed only part of the repo.
 		return nil
 	}
-	return filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {
+	return filepath.WalkDir(sc.dir, func(path string, d os.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -436,18 +554,26 @@ func (s *scanner) walkEmoji(dir string) error {
 			if d.Name() == "node_modules" || d.Name() == ".git" {
 				return filepath.SkipDir
 			}
+			if sc.goOnly && d.Name() == "testdata" {
+				return filepath.SkipDir
+			}
 			return nil
 		}
-		if !isTextFile(path) {
+		if sc.goOnly {
+			if !strings.HasSuffix(path, ".go") {
+				return nil
+			}
+		} else if !isTextFile(path) {
 			return nil
 		}
 		src, err := os.ReadFile(path)
 		if err != nil {
 			return err
 		}
+		s.emojiSeen[sc.label]++
 		for i, line := range strings.Split(string(src), "\n") {
 			if emojiRe.MatchString(line) {
-				s.add("emoji", path, i+1, "emoji is banned in design/ and frontend/ (D23)")
+				s.add("emoji", path, i+1, fmt.Sprintf("ban #8 glyph in scope %s is banned (D23): covers comments and _test.go, not only string literals", sc.label))
 			}
 		}
 		return nil
@@ -528,18 +654,33 @@ func main() {
 			" or `cd tools/d22scan && go run . -root ../../` (see tools/d22scan/main.go doc comment)")
 		os.Exit(2)
 	}
-	findings, err := Scan(abs)
+	stats, err := scanWithStats(abs)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "d22scan:", err)
 		os.Exit(2)
 	}
+	findings := stats.findings
 	fmt.Printf("d22scan: examined %d production Go files under internal/ and cmd/ of %s\n", files, filepath.ToSlash(abs))
+	scopes := emojiScopes(abs)
+	for _, sc := range scopes {
+		fmt.Printf("d22scan: ban #8 scope %-10s examined %d file(s)\n", sc.label, stats.emojiSeen[sc.label])
+	}
 	for _, f := range findings {
 		fmt.Println(f.String())
+	}
+	// A declared scope that walked nothing is an empty instrument, not a
+	// verdict: louder and higher-priority than "N findings" (ticket 71 AC#4).
+	if empty := emptyEmojiScope(scopes, stats.emojiSeen); empty != "" {
+		fmt.Fprintf(os.Stderr, "d22scan: ban #8 scope %s examined 0 files - it is declared in emojiScopes() but walks nothing."+
+			" Point it at a real tree or delete the entry; never leave a scope pretending to scan (ticket 71 AC#4)\n", empty)
+		os.Exit(2)
 	}
 	if len(findings) > 0 {
 		fmt.Fprintf(os.Stderr, "d22scan: %d finding(s); D22 bans are not negotiable (see PLAN.md D22, tools/d22scan/allowlist.txt)\n", len(findings))
 		os.Exit(1)
 	}
-	fmt.Println("d22scan: clean - no D22 ban violations, no emoji in design/ or frontend/")
+	// Generated from the scope list + its real counts, so this sentence cannot
+	// outlive a coverage change (the old footer claimed frontend/, which is not
+	// a tree in this repo, while all 310 product .go files went unscanned).
+	fmt.Println("d22scan: clean - no D22 ban violations; ban #8 emoji coverage: " + describeEmojiScopes(scopes, stats.emojiSeen))
 }

@@ -265,3 +265,125 @@ func TestScannerSelfScanOfRealRepoIsGreen(t *testing.T) {
 		}
 	}
 }
+
+// TestEmojiBanCoversGoSourcesNotJustDesign is registry A23 judgement ① pinned
+// in code: ban #8 must fire inside internal/ AND inside cmd/, on a COMMENT
+// line, on a string literal and in a _test.go file. Before ticket 67 AC#3's
+// coverage step all four of these seeds walked past the gate unnoticed, because
+// the only declared scopes were design/ and frontend/ - and frontend/ does not
+// exist in this repository, so every .go file in the product was invisible to
+// the ban while the footer still claimed "no emoji in design/ or frontend/".
+func TestEmojiBanCoversGoSourcesNotJustDesign(t *testing.T) {
+	root := t.TempDir()
+	seedFile(t, root, "tools/d22scan/allowlist.txt", "# empty\n")
+
+	// U+2713 CHECK MARK: inside emojiRe's \x{2600}-\x{27BF} band, and the exact
+	// code point that lived in cmd/wisp/providers.go until fff4cad.
+	seedFile(t, root, "internal/ok/comment.go", "package ok\n\n// a verdict reads \u2713 here\n")
+	seedFile(t, root, "internal/ok/literal.go", "package ok\n\nconst banner = \"ready \u2713\"\n")
+	seedFile(t, root, "internal/ok/emoji_test.go", "package ok\n\n// \u2713 in a test file comment\nfunc TestNothing(*testing.T) {}\n")
+	seedFile(t, root, "cmd/wisp/glyph.go", "package main\n\n// \u2713 in cmd/\nfunc main() {}\n")
+
+	// Control for the documented goOnly rule: a non-.go file under internal/ is
+	// testdata goldens / leaked test debris, not source, so it is out of scope.
+	seedFile(t, root, "internal/ok/testdata/fixture.txt", "ready \u2713\n")
+
+	findings, err := Scan(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []string{
+		"internal/ok/comment.go",    // comment line, internal/
+		"internal/ok/literal.go",    // string literal, internal/
+		"internal/ok/emoji_test.go", // _test.go
+		"cmd/wisp/glyph.go",         // cmd/
+	}
+	got := map[string]int{}
+	for _, f := range findings {
+		if f.Ban != "emoji" {
+			t.Errorf("unexpected non-emoji finding from the fixture: %s", f.String())
+			continue
+		}
+		got[f.Path]++
+	}
+	for _, p := range want {
+		if got[p] != 1 {
+			t.Errorf("ban #8 must report %s exactly once, got %d (all findings: %v)", p, got[p], findings)
+		}
+		delete(got, p)
+	}
+	for p := range got {
+		if strings.HasPrefix(p, "internal/ok/testdata/") {
+			t.Errorf("ban #8 reported the goOnly control %s - if that is the NEW intended scope, delete this control and its comment, do not delete the coverage", p)
+			continue
+		}
+		t.Errorf("unexpected emoji finding for %s (all: %v)", p, findings)
+	}
+}
+
+// TestDeclaredEmojiScopeCannotWalkZeroFiles pins the disposition of frontend/:
+// a scope named in emojiScopes() that line-scans no files is a loud failure,
+// not a green run. Deleting the dead entry is what ticket 71 AC#4 allows;
+// leaving it to walk nothing while the footer advertises it is what this guard
+// makes impossible to repeat.
+func TestDeclaredEmojiScopeCannotWalkZeroFiles(t *testing.T) {
+	root := t.TempDir()
+	seedFile(t, root, "tools/d22scan/allowlist.txt", "# empty\n")
+	seedFile(t, root, "design/screens/ball.md", "# Ball\n\n- idle glow\n")
+	seedFile(t, root, "internal/ok/ok.go", "package ok\n")
+	// cmd/ deliberately absent.
+
+	s, err := scanWithStats(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if s.emojiSeen["design/"] == 0 || s.emojiSeen["internal/"] == 0 {
+		t.Fatalf("fixture broken: scopes backed by files must report work, got %v", s.emojiSeen)
+	}
+	if s.emojiSeen["cmd/"] != 0 {
+		t.Fatalf("fixture broken: cmd/ has no files, saw %d", s.emojiSeen["cmd/"])
+	}
+	if len(s.findings) != 0 {
+		t.Fatalf("fixture must be finding-free so the guard is what trips, got %v", s.findings)
+	}
+	if got := emptyEmojiScope(emojiScopes(root), s.emojiSeen); got != "cmd/" {
+		t.Fatalf("the empty declared scope must be named, got %q (counts %v)", got, s.emojiSeen)
+	}
+}
+
+// TestScopeReportMatchesRealCoverage is the "覆盖面与话术必须一致" pin: the green
+// footer text is GENERATED from emojiScopes() and its real counts, so it can
+// neither advertise a tree the scan does not walk (the old frontend/ claim) nor
+// silently drop one it does. This runs against the real repository on purpose -
+// the claim under test is about this repo's actual coverage.
+func TestScopeReportMatchesRealCoverage(t *testing.T) {
+	root, err := filepath.Abs(filepath.Join("..", ".."))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(root, "go.mod")); err != nil {
+		t.Skipf("not inside the wisp repo: %v", err)
+	}
+	s, err := scanWithStats(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	scopes := emojiScopes(root)
+	for _, sc := range scopes {
+		if s.emojiSeen[sc.label] == 0 {
+			t.Errorf("ban #8 scope %s walks 0 files in the real repo: it is a dead entry, give it coverage or delete it (ticket 71 AC#4)", sc.label)
+		}
+	}
+	if got := emptyEmojiScope(scopes, s.emojiSeen); got != "" {
+		t.Errorf("real repo must have no empty ban #8 scope, got %q", got)
+	}
+	report := describeEmojiScopes(scopes, s.emojiSeen)
+	for _, sc := range scopes {
+		if !strings.Contains(report, sc.label) {
+			t.Errorf("the clean verdict line would not name scope %s it actually scanned: %q", sc.label, report)
+		}
+	}
+	if strings.Contains(report, "frontend") {
+		t.Errorf("the verdict line mentions frontend/ while emojiScopes() has no such entry: %q", report)
+	}
+}
