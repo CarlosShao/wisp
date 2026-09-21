@@ -1,8 +1,8 @@
 # 96 — `ban #8`（零 emoji）**根本没扫 `frontend/`**：面板那 40 个文本文件今天是"门开着但没人看"
 
 **Status:** 交付待验收（agent-ticket96，2026-09-21 16:2x；实现 commit `5e8f87b`，只含 `tools/d22scan/` 两文件。
-AC#1..AC#5 达成、AC#6 **PARTIAL**（纯净树 rc 卡在票 94 的 `internal/winsec/winsec.go:126`，非本票账），
-数字与口径见 Progress log 末条）（2026-09-21 15:5x 编排者建；来源=票 77 接续代理交件时**点名为它 AC#4 的硬缺口**，不是它要偷工）
+**AC#1..AC#6 六格全达成**（AC#6 起初因票 94 的 `winsec.go:126` 记 PARTIAL，该红源随 `7910bcd` 落地而消失，
+读数与两次的差别写在 Progress log 末两条）（2026-09-21 15:5x 编排者建；来源=票 77 接续代理交件时**点名为它 AC#4 的硬缺口**，不是它要偷工）
 **Type:** 门禁完整性（票 71 AC#4 / A44① / A54② / 票 88 的同族：**覆盖面自己会烂，而输出长得和"检查过"一模一样**）
 **Blocks:** 票 **77 的 AC#4**（那一框字面就要"`ban #8` 对 `frontend/` 的自报文件数"，今天**打不出这个数**）
 · **Blocked by:** nothing（`tools/d22scan/` 此刻无人写；票 88 已交件）
@@ -51,7 +51,7 @@ AC#1..AC#5 达成、AC#6 **PARTIAL**（纯净树 rc 卡在票 94 的 `internal/w
       逐条列"旧断言 / 新断言 / 为什么新断言仍然在测同一件事"。
 - [x] **AC#5** `ban` 文本零改动证明：`git diff` 到本票第一枚 commit 的父，贴出**ban 文本与字符类那几行未动**的证据；
       `allowlist.txt` 仍是 **5 行非注释**（`grep -v '^#' allowlist.txt | grep -c .`）。
-- [ ] **AC#6** 门禁：`cd tools/d22scan && go test -count=1 ./...` rc=0（**必须 `-count=1`**，
+- [x] **AC#6** 门禁：`cd tools/d22scan && go test -count=1 ./...` rc=0（**必须 `-count=1`**，
       ⚠ 它是**独立 Go module**，从仓根跑会打印 `main module does not contain package` 而**扫描器根本没执行**——本仓栽过）、
       `gofmt -l tools/d22scan/` 空、纯净树 `sh scripts/d22scan.sh` **rc=0** 且逐作用域贴全。
 
@@ -160,5 +160,14 @@ AC#1..AC#5 达成、AC#6 **PARTIAL**（纯净树 rc 卡在票 94 的 `internal/w
   其余 7 个作用域与本票工作树读数一致 ⇒ 判据按"除该已知命中外无新命中"达成（快照内中和后 rc=0），
   AC#6 记 **PARTIAL**，勾框留空。
 
-  next= 验收方按 AC#1..AC#5 出裁决表；AC#6 的纯净树 rc 需等票 94 的 `winsec.go:126` 落地后由编排者复跑一次
-  （`sh scripts/d22scan.sh` 应为 rc=0）。另：票 77 的 AC#4 现在打得出自报数了（40/37），可以解阻塞。
+- 2026-09-21 16:3x（agent-ticket96）：**AC#6 的纯净树补正 —— 上面那框留空的原因已经消失，AC#6 整框勾上。**
+  上一条写"纯净快照 rc=1、唯一命中 `internal/winsec/winsec.go:126`"是 `5e8f87b` 当时的真读数，**不撤不回**；
+  但它是有时效的：票 94 的 `7910bcd fix(94,AC#1-AC#3)` 随后落了地，本票交件后我重测了一次
+  `git archive HEAD | tar -x -C /tmp/wisp96-head && sh /tmp/wisp96-head/scripts/d22scan.sh`
+  ⇒ **rc=0**，且那一步 `go test ./...` 是**真跑不是缓存**（`ok github.com/CarlosShao/wisp/tools/d22scan 8.550s`，
+  缓存命中不会花 8.5 秒），零 finding，八行作用域逐字：
+  `bans #1-5 internal/ 197`、`bans #1-5 cmd/ 20`、`ban #6 frontend/ 37`、`ban #7 internal/tools/ 17`、
+  `ban #8 design/ 16`、**`ban #8 frontend/ 37`**、`ban #8 internal/ 335`、`ban #8 cmd/ 25`。
+  ⇒ AC#1 的"两边相等"在**已提交的树**上再次成立（37=37），不依赖我工作树里那些未入库的构建产物。
+  全程未碰 `internal/winsec/`（上一条已写明该账不属本票），也未因它绿了就回头改判据。
+  next= 只剩验收方出 `docs/evidence/s1/96-*.md` 裁决表；票 77 的 AC#4 自报数可解阻塞。
