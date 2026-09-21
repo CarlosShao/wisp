@@ -250,9 +250,15 @@ func TestAC2InheritedNoticeHasANoiseBound(t *testing.T) {
 		}
 		// The operator widens the parent; the OS pushes the grant into the kids.
 		mustExec(t, "icacls", root, "/grant", "*"+everyoneSID+":(OI)(CI)(RX)")
+		// Ticket 118 AC#7: this used to be a t.Logf note searching icacls text for
+		// the digits of S-1-1-0, which never matched (the renderer spells the
+		// trustee "Everyone"), so the note printed on every run and the premise of
+		// the whole leg - the kids really do carry the parent's grant, inherited -
+		// was never asserted. It is now, out of the binary ACE.
 		for _, k := range kids {
-			if !strings.Contains(mustExec(t, "icacls", k), everyoneSID) {
-				t.Logf("note: %s did not pick up the parent's grant:\n%s", k, mustExec(t, "icacls", k))
+			if !grantStandsOn118(t, k, everyoneSID, true) {
+				t.Fatalf("AC#2 leg 2 measures nothing: %s did not pick up the parent's grant as an inherited ACE, so sealing the parent had no per-child work to skip:\n%s",
+					k, icaclsRaw(t, k))
 			}
 		}
 
@@ -272,10 +278,25 @@ func TestAC2InheritedNoticeHasANoiseBound(t *testing.T) {
 		}
 		t.Logf("leg 2 (parent sealed first, then %d children): total WARN = %d (parent=%d, children=%d), per-child=%v",
 			len(kids), len(*got), parentNotices, len(*got)-parentNotices, perChild)
+		// Ticket 118 AC#7: the two lines below are the teeth this leg was missing.
+		// agent-ticket115b measured that with `noticeNamesTree` forced to answer
+		// always-true and always-false this leg stayed green in both runs, because
+		// the only judge was the global bound further down: over a capture that
+		// holds one notice, "not more than one is about this child" is satisfied by
+		// every attribution rule, including one that ignores the path. The claim
+		// this leg exists for is the tree-shaped one - the parent's notice belongs to
+		// the parent and to none of the six children - so both halves are stated
+		// now: zero notices attributable to a child that emitted none, and exactly
+		// one attributable to the parent that did. Either answer forced to a
+		// constant reddens one of them, by name.
 		for _, k := range kids {
-			if n := len(noticesAboutTree(*got, k)); n > 1 {
-				t.Errorf("AC#2 leg 2: %s emitted %d WARN(s), the bound is 1 per child", filepath.Base(k), n)
+			if n := len(noticesAboutTree(*got, k)); n != 0 {
+				t.Errorf("AC#2 leg 2: %s emitted %d WARN(s), and the bound this leg exists for is 0 - the parent's seal recomputed the child's inherited copy away, so no notice is the child's to carry: %+v",
+					filepath.Base(k), n, *got)
 			}
+		}
+		if n := len(noticesAboutTree(*got, root)); n != 1 {
+			t.Errorf("AC#2 leg 2: the parent that was sealed holds %d notice(s) attributable to it, want exactly 1: %+v", n, *got)
 		}
 		if len(*got) > 1 {
 			t.Errorf("AC#2 leg 2: whole-tree propagation over a parent the ticket-89 leg already covers must not re-report every child: got %d notice(s): %+v", len(*got), *got)
@@ -338,10 +359,30 @@ func TestAC3OwnGrantsStaySilentWhicheverWayTheOSNamesThem(t *testing.T) {
 		mustExec(t, "icacls", child, "/grant", spelling+":(RX)")
 	}
 	mustExec(t, "icacls", root, "/grant", "*S-1-5-18:(OI)(CI)(RX)")
+	// Ticket 118 AC#7: a witness in the same directory carrying a grant that really
+	// is foreign, so the capture below is not empty while this child's own count
+	// still has to be zero. Without it the loop over noticesFor had nothing to
+	// inspect on any machine where the whitelist works, and
+	// agent-ticket115b measured exactly that: forcing noticeNamesTree to answer
+	// always-true and always-false both left this case green, because its only
+	// judge was the global "the whole capture holds zero notices" line. Both halves
+	// are stated now - the child keeps 0 notices and the witness keeps exactly the
+	// 1 it earned - and no rule that ignores the path can produce that pair.
+	witness := filepath.Join(root, "service-witness.txt")
+	if err := os.WriteFile(witness, []byte("x"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	mustExec(t, "icacls", witness, "/grant", "*"+serviceSID+":(RX)")
+	if !grantStandsOn118(t, witness, serviceSID, false) {
+		t.Fatalf("the witness planted nothing to report, so the leg below would measure nothing: %s", icaclsRaw(t, witness))
+	}
 
 	*got = nil
 	if err := SealFile(child); err != nil {
 		t.Fatalf("SealFile: %v", err)
+	}
+	if err := SealFile(witness); err != nil {
+		t.Fatalf("SealFile(witness): %v", err)
 	}
 	t.Logf("own-trustee seal WARN count = %d (%+v)", len(*got), *got)
 	for _, n := range noticesFor(*got, child) {
@@ -356,7 +397,13 @@ func TestAC3OwnGrantsStaySilentWhicheverWayTheOSNamesThem(t *testing.T) {
 			}
 		}
 	}
-	if len(*got) != 0 {
-		t.Errorf("sealing a child that only ever held our own trustees + their inherited copies emitted %d WARN(s), want 0: %+v", len(*got), *got)
+	if n := len(noticesFor(*got, child)); n != 0 {
+		t.Errorf("sealing a child that only ever held our own trustees + their inherited copies emitted %d WARN(s) attributable to it, want 0: %+v", n, *got)
+	}
+	if n := len(noticesFor(*got, witness)); n != 1 {
+		t.Errorf("the witness file held one genuinely foreign grant and %d notice(s) are attributable to it, want exactly 1 - the same capture has to be able to say which tree was narrowed: %+v", n, *got)
+	}
+	if len(*got) != 1 {
+		t.Errorf("the child and its witness together should have produced exactly 1 WARN in the whole capture, the witness's own; got %d: %+v", len(*got), *got)
 	}
 }
