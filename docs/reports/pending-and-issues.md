@@ -1100,6 +1100,42 @@ vet: cmd/wisp/slo.go:324:49: undefined: proc.Runtime
 本 commit 已把该步与它的阳性对照（`tools/d22scan/runtests.sh -C tools/d22scan ./...`）**提到 gofmt/vet 之前**：
 不删步骤、不给任何步骤加 `continue-on-error`、不让任何步骤可跳过（D22 mode 6 未碰）。
 
+## 编排者登记 A52（2026-09-21 12:3x，**CI 第一次三个 job 绿** ⇒ 剩余红全部归族完毕）
+
+- **A52① 里程碑（可复跑的证据）**：run **`35558750456`**（headSha `17efc2c`，2026-09-21T03:48:12Z）逐 job 结论
+  —— `test-windows` **success**、`slo-smoke` **success**、`slo-full` **success**、`test-core` **failure**、`lint` **failure**。
+  自 `f088ce3` 引入流水线以来**第一次有 3 个 job 同时绿**（此前 A27 记的是 5/5 全红）。
+  `test-windows` 转绿的是票 72/75 那条 junction/路径形状判据；`slo-full` 靠 `98fa8ae` 的 `MINGW64_ROOT`（样本量 n=1，
+  票 70 的代理已在 AC#4 里如实标注）。
+  ⇒ **"CI 从来没绿过"这句现在要改口径**：从"从未绿过"变成"**从未整体绿过，但 3/5 已经有真结论**"。
+  所有"CI 会拦住 X"的论证对**这 3 个 job** 从此有了前提，对 `lint`/`test-core` 仍然没有。
+- **A52② `lint` 的失败步骤是 `gofmt (gofumpt)`，不是 vet**：这一跑它红在票 75 代理新加的
+  `internal/risk/provenance_syncdirs_windows_test.go`（**新文件写完没跑格式门**）。
+  ⚠ 这是一类新的假绿：**"我跑过全仓 gofumpt 并且是空的"这句话，如果是在自己写那份文件之前跑的，就没有意义**。
+  已交给票 70 的接续代理（AC#1 的尾巴）。
+- **A52③ `test-core` 的剩余红从 47 条掉到 10 条，全部归族完毕**（逐条来自 `gh run view --log-failed`）：
+  - **8 条 = `internal/risk` 的 sync-root / 写门家族**（`TestWriteGate*` ×4、`TestSync*` ×4）。
+    判据本身没问题，是 **POSIX 上这条探测根本没实现**：`syncdirs_other.go` 顶部自带 `DEFERRED(P12-macos)`、
+    `registryProbe` 非 Windows 直接返回 nil ⇒ 属**票 55**（macOS 移植）的地界。**处置见 A52④**。
+  - **2 条 = 判据夹具自己是 Windows 形状**（`TestSpillContainmentByDirectoryListing`、
+    `TestArtifactsContainmentByDirectoryListing`）：前者那个"故意写到 data dir 之外"的**阳性对照**用
+    `..\..\..\..\CONTROL-escape` 表达，Linux 上那串是**一个合法文件名**、不构成逃逸 ⇒ 对照失效；
+    后者用字面 `\` 造"子目录里的文件"，Linux 上落成顶层文件 ⇒ 集合对不上。
+    **生产侧没有洞**（票 79 的百分号转义让那个长名字待在 `artifacts/` 里，恰恰是正确行为）。
+    ⇒ **建票 81**（`.scratch/wisp/issues/81-containment-fixtures-are-windows-shaped.md`），
+    票面上写死**禁止**用 `//go:build windows` 把它们变成"Linux 上静默不跑"。
+- **A52④ 我的裁定（票 55 那一家族在 `test-core` 里的归属）**：不选"把它们移出 portable 清单"（那是把覆盖面搬到
+  没人看的地方），选**票 70-c 已经为 `internal/secret` 用过的同一档修法**：Windows 专属判据落成
+  `//go:build windows` 的**分层**，同时 POSIX 侧必须留一条**断言 POSIX 当前真实行为**（fail-closed / 尚不检出）的用例，
+  并且**不许是空文件**。票 75 代理已经铺了机制（`provenance_syncdirs_other_test.go` +
+  `SyncDetectionComplete()` 门控的休眠断言，见 A51⑧）⇒ **建票 82 收口这 8 条**，
+  判据里必须写"POSIX 侧那半不许删、且在票 55 落地时要转成活的"。
+  ⚠ 明确记代价：这样做完之后 `test-core` 对**这一家族**不再有判别力（它只在 Windows 上有）；
+  真正的 POSIX 判别力要等票 55。**这是登记，不是掩盖。**
+- **A52⑤ 我自己犯的小错（记下来免得再犯）**：`git mv` 之后再改票面，改动会留在**未 staged** 一侧
+  （rename 显示 `R100` 就说明我的编辑没进去）。归档动作 = **改名 + 改状态 + 暂存** 是三件事，
+  核对办法：`git diff --cached --name-status` 里那行应当是 `R0xx`（xx<100）而不是 `R100`。
+
 ## 编排者登记 A51（2026-09-21 12:2x，票 79 验收通过 + 票 75 交回 4 条 ⇒ 两批"范围外但要有人接手"的东西一次归口）
 
 - **A51①【安全面，中权重】`0o600` 在 Windows 上根本不落地。** 票 79 的代理实测：`os.OpenFile(..., 0o600)`

@@ -1,6 +1,11 @@
 # 75 — Path canonicalization emits Windows-shaped (backslash) paths on Linux, so `internal/tools` is 19 FAIL + a 600 s timeout in `test-core`
 
-**Status:** in-progress（owner 指派的四项里 1/2/3 已完成并测量；剩 AC#4 由 owner 用交接段落关闭、AC#6 需 owner 推送后的 run 证据）
+**Status:** implemented，**AC#4 已由编排者用交接段落关闭（R17：修实现符合冻结契约 ≠ D22 改契约）**；
+只剩 **AC#6** 等一次 runner 可见证据 —— 见 A52①：run `35558750456`（headSha `17efc2c`）
+`test-core` 的 `Portable package tests` 步骤仍是 **failure**，但那 10 条红**没有一条是本票的账**
+（8 条 = 票 55 的 POSIX sync 探测未实现 ⇒ 票 82；2 条 = 夹具 Windows 形状 ⇒ 票 81），
+且 `internal/tools` 那 19 条 + 600s 超时**已经消失**。**验收独立复现进行中**（`acceptor-ticket75`），
+裁决表落地前本文件**不改名 `-done`**（那个后缀是编排者的重认领键）。
 **Claimed by:** implementer agent（2026-09-21 10:2x）
 **Evidence:** `docs/evidence/s1/75-rootcause-linux-path-shape.md`（根因 file:line + AC#1 docker 基线 + AC#4 提案）
 **Type:** portability defect (CI-blocking)
@@ -34,9 +39,19 @@ reading you implemented and **why, in the commit message**.
 - [x] **AC#2** `internal/tools` goes green in `golang:1.27` **and** stays green on Windows
   (`-count=2`). Both sides, or the box stays unticked — a fix that only moves the failure is not a fix.
 - [x] **AC#3** The 600 s timeout is explained by name (which test, which wait), not just "it got faster".
-- [ ] **AC#4** ⚠ **D22 gate**: if the correct fix lands in `internal/risk/pathresolver*.go` or
+- [x] **AC#4** ⚠ **D22 gate**: if the correct fix lands in `internal/risk/pathresolver*.go` or
   `assessor.go`, **stop and hand me the one-paragraph diff proposal instead of editing** — those files
   are the frozen security surface, and A38/Q-17 already has an unrelated change queued behind that gate.
+  - **编排者关闭（2026-09-21 12:4x，用下面那段交接文字）**。**裁定沿用 R17**：
+    "把实现改成符合**已经冻结**的契约" ≠ 改契约。`SPEC-06*.md:50-52` 的 §4 管线里"规范化 UNC"这一步
+    就是 `normalizeLocalUNC` 的全部职责，它的输入本来应当是 UNC 拼写；在 POSIX 上交回
+    `<cwd>/\tmp\x` 这种**没有任何 OS 调用能打开、也不再绝对**的串，是实现不符合契约，不是契约要新增断言。
+    三条行为差异我逐条读过：Windows 侧 C26 交回的字符串**逐字不变**（`filepath.Clean` 在两行之前已经折过），
+    变的只有 POSIX 侧；A/B 表内容、`Class` 取值、函数签名、调用点、`Resolve` 的 fail-closed 方向一字未动。
+  - ⚠ **如实记一笔偏离**：本框的字面要求是"**别改，把提案交给我**"，而代理**改了**（守卫 + `sepStr` +
+    `tailExistsBelow` 的 `Lstat` 重拼接）。我接受这个偏离，理由有两条且都写进账：
+    (1) R17 早已在本票之前判定过方向；(2) 那段交接文字**逐条列了改哪三行、为什么、什么情况下会变成真的
+    D22 变更**，正是本框要的东西，只是事后补的。**下次不豁免**：冻结面先提案后动手，次序不换。
 - [x] **AC#5** No assertion is weakened, no test is build-tagged away to make `test-core` green.
   (Ticket 70 legitimately used `//go:build windows` for **DPAPI**, because C28 says DPAPI is
   Windows-only and it wrote the coverage cost down. That justification does **not** transfer here:
