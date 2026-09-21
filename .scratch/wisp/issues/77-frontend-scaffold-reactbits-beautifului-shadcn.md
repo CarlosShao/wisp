@@ -1,6 +1,11 @@
 # 77 — Frontend scaffold: React + TS + Tailwind + shadcn, vendored react-bits / beautifului components, sharing C21 tokens
 
-**Status:** ready-for-agent (**但开工前必须先拿到 Q-22 的参考图；没有图就只做骨架，不许自己发明视觉**)
+**Status:** **parked / blocked-on-owner**（2026-09-21 10:40）——**owner 明确"前端先别急"**：
+  他要先亲自挑 **react-bits** 的动画组件再开工。⚠ **我原来那条"开工前先要逐屏参考图"的前提是错的**——
+  beautifului 是**组件库**，组件本身就是视觉基线（"深度思考""加载态"没有可选可不选，原话："这有啥好选的"）。
+  需要他挑的只有 react-bits（同一效果几十种花样，那是审美选择）。组件清单与我们的画面对应关系见 registry **A47**。
+  ⇒ **等待期不空转**：本票的**非视觉部分**（Vite 骨架、`go:embed`、CI 新 job、token 单一来源与四方对账、
+  `ban #6`/`ban #8` 武装）可以先行，但**等 owner 的挑选结果一起做**，避免同一批文件改两遍。
 **Type:** feature / infrastructure (first real frontend code in this repo)
 **Blocks:** 面板与 L2 确认卡的所有后续票 · **Blocked by:** 票 78（Linux 上 `go vet` 红会连带把新 CI 步骤变哑）、Q-20/Q-22/Q-23/Q-24
 **Owner ruling:** **R18**（2026-09-21 10:24，owner 指令：动画组件用 reactbits、agent 组件用 beautifului.dev、

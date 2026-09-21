@@ -973,7 +973,7 @@
 | **Q-19** `renderer_windows.go` 里仍有**没名字的裸字面量**在改像素（`liqRate{1.0,-1.6,0.55}`、`liqPhase{0,2.1,4.2}`、渐变停靠 0.42/0.78、`permille 775+225`）——**任何枚举型检查在结构上看不见它们**（票 74 缺口#1） | **与票 62/65 的真机视觉签收同批提出来变成 C21 token**（它们本来就是改视觉的动作） | 不答的代价：C21 表会继续"全绿但漏内容"，而我们刚花两张票把这类缺口定义为要收口的 |
 | **Q-20** 三家库都是 **copy-paste 进仓**（react-bits / beautifului / shadcn 都不是运行时依赖）——**vendored 源码** 还是 **npm 依赖**？ | **vendored 到 `frontend/src/components/`，每文件头注明来源+许可** | 这本就是这类库的设计意图；我们不发 npm 包，vendored 能把 **Commons Clause 的暴露面缩到具体文件**、离线可构建、ban 扫描能直接读到源码。代价：升级要手动 diff |
 | **Q-21** react-bits 许可是 **`MIT + Commons Clause`**（47.7k★，`LICENSE.md` 非纯 MIT） | **现在只登记；发布/售卖前逐组件复核并出一份清单** | 自用不受影响；Commons Clause 限制的是"把软件本身拿去卖/当竞争性服务提供"。你定的路线是**先自用再谈发布**，所以现在不是阻塞项，但必须留在文档里，别到发布前才发现 |
-| **Q-22** `design/` 11 屏原型降级为"参考、非蓝本"后，**视觉真相源是什么**？ | **你逐屏给一张目标截图/参考**（reactbits/beautifului 官网截图也行） | ⚠ 这是**票 65 的老坑重演条件**——那张票 blocked-on-owner 的原因就是"到今天没有任何代理见过参考图"。**没有参考图，代理会自己发明"好看"的定义**，再在签收环节被你打回。给图的成本远低于返工 |
+| **Q-22** `design/` 11 屏原型降级为"参考、非蓝本"后，**视觉真相源是什么**？ | **你逐屏给一张目标截图/参考**（reactbits/beautifului 官网截图也行） | ⚠ 这是**票 65 的老坑重演条件**——那张票 blocked-on-owner 的原因就是"到今天没有任何代理见过参考图"。**没有参考图，代理会自己发明"好看"的定义**，再在签收环节被你打回。给图的成本远低于返工 | **→ 2026-09-21 10:40 关闭：前提不成立（见 A47）。beautifului 是组件库不是界面稿，组件即视觉基线；需要 owner 挑的只有 react-bits 的动画组件。**
 | **Q-23** L2 强确认卡（`PLAN.md:1034` 已定为 WebView）用 beautifului 的 approval 组件 + **把拒绝/批准理由上卡** | **是**——这正是 **Q-17** 的实现落点 | 一次解决两件事：卡面显示"为什么无法规范化/目标到底是什么"，且不必我们自己发明卡片。**代价**：要给 `ErrReparseDenied` 补可枚举原因 ⇒ **D22 域**（碰冻结的 `pathresolver*.go`），要你点头 |
 | **Q-24** 前端第一批落地范围 | **只做 L2 确认卡 + 面板骨架**，其余屏后面按票排 | 确认卡是安全面，且 `ban #6` 一建 `frontend/` 就武装（禁止 `approval.decide` 出现在前端）。先做它能让"放行只在原生侧"**立刻变成机器可检查的**，而不是文档里的一句话 |
 | **Q-25** CI concurrency group 要不要加 `github.sha`（让每个 push 都拿到自己的结论，不再互相取代排队 run） | **要**，但我先自己实测再定，不占你的判断 | 代价：runner 并发压力上升（self-hosted 只有一台 `wisp-selfhosted-01`）⇒ 我倾向"lint/test 按 sha 分组、slo 保持排队"。**这条我下一轮能自己测出来**，先记着别当成结论 |
@@ -1098,6 +1098,30 @@ vet: cmd/wisp/slo.go:324:49: undefined: proc.Runtime
 "门没跑"和"门跑了没问题"在 CI 输出上又一次长得一模一样，这次的成因不是路径、不是范围，是**步骤次序**。
 本 commit 已把该步与它的阳性对照（`tools/d22scan/runtests.sh -C tools/d22scan ./...`）**提到 gofmt/vet 之前**：
 不删步骤、不给任何步骤加 `continue-on-error`、不让任何步骤可跳过（D22 mode 6 未碰）。
+
+## 编排者登记 A47（2026-09-21 10:40，**更正我自己 R18 里问错的一件事：Q-22 的前提不成立**）
+
+我在 R18 里把 **Q-22 写成"请 owner 逐屏给参考图"**，并把它列为票 77 的开工前置。
+**owner 澄清后确认这条问错了**：beautifului.dev **是组件库，不是界面稿**——
+"深度思考""加载态"这类**组件本身就是视觉基线**，没有"选哪个画面长什么样"的余地（他的原话：这有啥好选的）。
+真正需要他亲自挑的只有 **react-bits 的动画组件**（那一库里同一个效果有几十种花样，是审美选择而非功能选择）。
+⇒ **Q-22 关闭（前提不成立）**；**前端整体暂缓**，等他给出 react-bits 的挑选结果再开工票 77。
+**教训归到我自己的账上**：我把"降级原型蓝本"直接推论成"需要新的逐屏蓝本"，
+而正确答案是"组件级蓝本 + 少量动画由 owner 挑"——**建票时把推断当需求写进去，就会凭空造出一个卡点**。
+（与 A37 同族：那次是我只读字段不读正文；这次是我没分清"库的层级"就外推。）
+
+### 顺手把 owner 截图里的组件清单落档（省得下个会话再去抓网站）
+beautifului.dev（Built by Turbo，上游 `TurboKach/ai-native-react-components`，**MIT**）共 **21 个组件**：
+`Loading State`（像素网格加载 + 计时）、`Thinking`（可展开的思考轨迹：steps/reasoning/search/coding）、
+`Streaming Text`（流式回答 + 内联来源 + 追问）、`Approval Card`（**动手前问人**）、`Tool Chips`、`Task Rows`、
+`Chat`、`Prompt Bar`、`Recommendation Card`、`Context Cards`、`Diff Table`、`Records Table`、`Filter Table`、
+`Sidebar Nav`、`Search`、`Flowchart`、`Insight Cards`、`Code Block`、`Fine-tune Card`、`Selection Actions`、
+`Agent Screen`。
+**与我们画面的对应关系（我的判断，不是 owner 的）**：
+L2 强确认卡 = `Approval Card`；工具调用过程展示 = `Tool Chips` + `Task Rows`；
+"在想"的等待态 = `Thinking` + `Loading State`；历史/记录 = `Records Table` + `Filter Table`；
+配置改动预览 = `Diff Table`；面板导航 = `Sidebar Nav` + `Search`。
+⇒ **也就是说我们原本要自己设计的确认卡与调用链展示，这套库里是现成的**，票 77 的"第一批范围"照此更省。
 
 ## 编排者登记 A46（2026-09-21 10:33，票 72 落地：安全分类去拼写化完成，但**两代理同文件**要立刻定序）
 
