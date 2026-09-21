@@ -45,8 +45,10 @@ func TestExfilSyncWriteWindowsSpellingInvariant(t *testing.T) {
 		{"sync root, native spelling", true, syncTarget},
 		{"sync root, all-forward-slash", true, filepath.ToSlash(syncTarget)},
 		{"sync root, both separators at once", true, filepath.Dir(syncTarget) + `\Notes/shared.md`},
-		{"sync root, forward slash under a backslash parent", true,
-			filepath.Dir(filepath.Dir(syncTarget)) + `/Notes\shared.md`},
+		{
+			"sync root, forward slash under a backslash parent", true,
+			filepath.Dir(filepath.Dir(syncTarget)) + `/Notes\shared.md`,
+		},
 		{"plain dir, native spelling", false, plain},
 		{"plain dir, all-forward-slash", false, filepath.ToSlash(plain)},
 		{"plain dir, both separators at once", false, filepath.Dir(plain) + `\brand-new.md`},
