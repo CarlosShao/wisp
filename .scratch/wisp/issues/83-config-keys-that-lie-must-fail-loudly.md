@@ -1,7 +1,7 @@
 # 83 — 配置里"看着能用、其实没接线"的键要**响亮地失败**（票 80 裁决 (C)；先例 `SPEC-03:42 verify_signature`）
 
 **Status:** 五框全闭、待对抗验收（AC#1 表在 L2 / 校验在 `internal/config/unwired.go` / 变异在 L3 / 不做的在 L4 / 门禁在 L4）。
-起点 HEAD `4b05be0`，本轮 commit：`6028977`(认领) → `a95ee3a`(守卫码+用例) → `4dec91b`(AC#1 表) → 本轮(L3/L4)
+起点 HEAD `4b05be0`，本轮 commit：`6028977`(认领) → `a95ee3a`(守卫码+用例) → `4dec91b`(AC#1 表) → `e4a0fac`(L3/L4) → 本轮(L5 修自己带进 CI 的 emoji 哑弹)
 **Type:** 安全可用性/诚实性（一个说谎的配置键）——**不是**新能力
 **Blocks:** nothing · **Blocked by:** nothing（`internal/config` 此刻无人写；票 80 已交回且零 Go 改动）
 **Packages:** `internal/config/`（校验与加载路径）+ 新建的用例。**禁改**：`docs/PLAN.md`、`docs/specs/*.md`
@@ -240,6 +240,29 @@ Status `open` ⇒ `claimed`。本轮次序：AC#1 全量同类键扫描（含间
 `next=` 交回编排者：① `[net]` 两键是否算本票扩面（票 80 只点了 `[risk]` 三候选）；② `[plugins]` 五键要不要照同一判据一起守卫；
 ③ `SPEC-03:34/36` 与 `PLAN.md:2732` 的限定语请由编排者落；④ `TestResolvePerCallBudget` 单独立票。
 写码代理这边**没有未闭的框**，等对抗验收；验收判据 = L2 表逐键 + L3 两个方向的变异数 + L4 门禁表。
+
+### L5 — 我自己造的一枚 CI 哑弹：`a95ee3a` 在 Go 注释里放了 U+1F512（D22 ban #8 零 emoji）（2026-09-21）
+
+票 70 的 `564be23` 抓到并点名：`internal/config/unwired.go:13` 的注释写着 `locked (🔒) section`。
+它**没替我修**（简报禁改区点名 `internal/config`，且 `a95ee3a` 是几分钟前的活人产物）⇒ 修法在我这边。
+本轮改掉（改写成 ASCII "the four marked rows of SPEC-03 sec 3"）后逐跑复核：
+
+- **独立仪器（不信扫描器的嘴）**：`find internal cmd -name '*.go'` = **329** 个文件，
+  用 ban #8 的同一字符类 `[\x{1F000}-\x{1FAFF}\x{2600}-\x{27BF}\x{2B00}-\x{2BFF}\x{FE0F}\x{1F1E6}-\x{1F1FF}]`
+  全量扫 ⇒ **命中 0 处**；我这 5 个 Go 文件单独扫也 ⇒ **0 处**。
+- **门禁五项复跑**（改注释之后）：`gofmt -l internal/config` 空 rc=0、
+  `gofumpt -l . tools/d22scan tools/mockllm` 空 rc=0、`go vet ./internal/config/` rc=0、
+  `GOOS=linux go vet ./internal/config/` rc=0、`go test -count=2 ./internal/config/` rc=0
+  （`=== RUN` 194 / `--- PASS` 106 / `    --- PASS` 88 / `--- SKIP` **0** / `--- FAIL` **0**）。
+- `sh scripts/d22scan.sh` 现在 **exit 2**，但**红点已不在 ban #8**：
+  `scope ban #8 internal/ examined 305 Go files`、`cmd/ examined 24 Go files` 均无 finding；
+  exit 2 的原因是 `frontend/` 目录被票 77 建出来了、而 ban #6 还登记着 "absent-but-exempt"
+  ⇒ **与本票无关，交编排者/票 70 处置**（它自己的输出文字已经写明"flip it to live:true in the same commit that creates the tree"）。
+- ⚠ 顺带提醒：**票面 markdown 里继续用 🔒/⚠ 是安全的**（ban #8 走 `.go` 与声明的文本树，`docs/`、`.scratch/` 不在 `internal/`+`cmd/` 口径内），
+  但**任何 Go 注释里都不许**——这张票的教训。
+
+`next=` 交回编排者（L4 末尾的四项不变），另加第 ⑤ 项：**`sh scripts/d22scan.sh` 的 ban #6 "absent-but-exempt" 需要与 `frontend/` 同 commit 翻成 `live:true`**（票 77 刚建了树）。
+
 
 
 

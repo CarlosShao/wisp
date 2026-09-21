@@ -10,7 +10,8 @@ import (
 //
 // A key is in this file when all three hold:
 //
-//  1. it sits in a locked (🔒) section and the direction auditor in manager.go
+//  1. it sits in a locked section (the four marked rows of SPEC-03 sec 3:
+//     [risk], [fs], [net], [plugins]) and the direction auditor in manager.go
 //     names it as a loosen/tighten key, i.e. the config layer already asserts
 //     it has a security consequence;
 //  2. nothing in this repository reads its value (ticket 80 AC#1's read/write
