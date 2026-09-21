@@ -1,6 +1,21 @@
 # 113 — POSIX 那半边 `platformVerifyPlacement` 是 `return path, nil`（**没有链接腿**）⇒ `SealFile` 穿过符号链接改掉外来文件的 mode 并返回 nil（票 108 的 R-108-1，验收当场造出 P3 的同结局）
 
-**Status:** open（2026-09-21 20:3x 编排者建；来源=`acceptor-ticket108` 的 `docs/evidence/s1/108-adversarial-acceptance.md`，**总判 FAIL**）
+**Status:** **accepted-done**（2026-09-21 21:2x 编排者按 `acceptor-ticket113` 的裁决表结案：**通过附条件**。
+              它逐字复现了 108 那枚定命探针「真的红过、现在真的不红」，四发变异一字不差重造，五包四数精确 `540/532/0/8`；
+              **未触发退回铁律**——`穿过 symlink` 那一枚它自己打不穿；能打穿「改权限并返回 nil」的两枚（硬链接、check-then-act 竞态）
+              都在本票 AC 字面之外，分别归 `R-108-2` 与新建的票 120。
+              **它的三个条件我这一轮全部落地/归位**：
+              ① AC#6 未交件＝**时间差**，不是漏做——它查的是 `34a810b`/`f6a86db`，而 `1499efe` 在它收工前才进树；
+                 我自己复核过形状：`1499efe` 对 `winsec.go` 是 **18 增 / 0 删**，且「新增的非注释行」计数＝**0**，
+                 `S-1-1-0` 与「None of them asks whose tree it is」那句话都在包里了 ⇒ 条件已满足。
+              ② `R-113-A` 零 CI 覆盖＝**票 111 的 AC#9 早就写了这一格**（我 21:0x 追加），它这次是**独立佐证**：
+                 run `35601785381` / job `106339582851 test-core` / **step 7** 的 scope 不含 `./internal/winsec/`、
+                 **整个 job 日志 `internal/winsec` 命中 0 次**；唯一 winsec 门是 `test-windows` **step 4**，
+                 而 `scripts/winsec-tests.sh:73-80` 在非 Windows 直接 `exit 2`。
+              ③ `R-113-B`（误伤面）⇒ **新建票 119**；`R-113-C`（叶子方向缺 2 枚用例）⇒ **并进票 118 的 AC#6**；
+                 `R-113-D`（check-then-act 154/4000）⇒ **新建票 120**；`R-113-F`（ban#8 在 `3c5d1c3` 应是 371 不是 368）⇒ 见 A89④。
+              `R-108-5` 它同样只能判「采不到」：`GOOS=darwin go vet` 只证能编译 ⇒ darwin 那半边**今天仍无行为读数**，不结案、也不假装结案。
+              —— 原 `open`（2026-09-21 20:3x 编排者建；来源=`acceptor-ticket108` 的 `docs/evidence/s1/108-adversarial-acceptance.md`，**总判 FAIL**）
 **Status（2026-09-21 20:32 更新，agent-ticket113）：** `ready-for-review`（**不加 `-done`**，改名权在验收方）。
 上一行是建票时的原始状态，按票面 Rules（append-only，删除列 0）保留不删。AC 逐格结论与全部读数见 Progress log 末尾三条。
 **Type:** 安全边界在**另一个平台上的空实现**（票 103/108 那个家族：守卫只做了 Windows 半边）

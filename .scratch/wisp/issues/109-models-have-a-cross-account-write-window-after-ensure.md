@@ -1,6 +1,15 @@
 # 109 — 模型文件在 `Ensure` **交还之后**有一段跨账户写窗（验收实测到继承 `(M,DC)`）+ 宽 temp + `rename` 这条通用序列**没有 seam 守卫** + 安装目录那一格没有钉子（票 95 验收的 AC95-R1/R3/R4）
 
-**Status:** ready-for-review（原 open；2026-09-21 18:5x 编排者建；来源=`acceptor-ticket95` 的 `docs/evidence/s1/95-adversarial-acceptance.md`）
+**Status:** **rejected-needs-fix**（2026-09-21 21:2x 编排者按 `acceptor-ticket109b` 的裁决表改判：**总判 FAIL-退回**。
+              修法本身是**真的**：修前红、M1/M2 变异、POSIX 容器读数、SID 级前后读数验收方全部亲手复现，
+              安装目录 ACL 前后逐字不变、`sha256 mismatch` 那串它自己跑出同一结果；
+              **退回归的是落点**：`internal/models` 不在 `cmd/wisp` 的依赖图里、`DownloadingBridge.Run` 生产调用者 **0**
+              ⇒ AC#2 自述的「真实交还点接线」不成立（守卫挂在一条今天不跑的路上）。
+              唯一阻塞项 `R-109-4`；「接线 + 一条通用仪器」**归新建的票 121**，本票只欠两格小账：
+              AC#2 的落点语义 + `R-109-2`（未点名的文件/子目录不参与哈希）与 `R-109-3`（按名字而不是按 SID 过滤 ACL）。
+              **没据此退回的另一半要留话**：守卫返回之后到读取者 open 之前还剩同样形状的一整段，
+              但「引擎装载」今天在本仓**无路径可达成**（`internal/speech` 只有 `doc.go`）⇒ 登 `R-109-1`，等 Phase 4。
+              —— 原 `ready-for-review`（原 open；2026-09-21 18:5x 编排者建；来源=`acceptor-ticket95` 的 `docs/evidence/s1/95-adversarial-acceptance.md`）
 **Type:** 安全窗口（**TOCTOU 形状**：验签通过之后、引擎读取之前，文件仍可被同机另一个账户改写）
 **Blocks:** nothing（票 95 已按"不封 + 反向钉子"结案，本票不推翻那个判定，只补它没覆盖的那一段）
              · **Blocked by:** nothing

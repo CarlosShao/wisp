@@ -33,6 +33,13 @@
       种一个不含那两个字母的主体 ⇒ 旧识别法会误认，新判定必须不认。
 - [ ] **AC#4** **不新增任何判定分支、不改生产码一行**：如果某条判据必须动 `winsec_windows.go` 才成立，
       **停手登记交回编排者**（那是票 115 或新票的地界），不要顺手改。
+- [ ] **AC#6（编排者 21:2x 追加，来源=`acceptor-ticket113` 的 `R-113-C`）** POSIX **叶子方向**缺两枚用例：
+      交付的 5 枚 AC#1 用例里链接**全放在祖先位**，只有 `SealDir` 那枚碰叶子位 ⇒
+      验收方的 MUT-B（`pieces = pieces[:len(pieces)-1]`，即"不查叶子"）**只让 1 枚红**，
+      而它自造的 `SealFile(link)` / `PrivateFile(link)` 两枚在现码上绿、在 MUT-B 上红
+      ⇒ **实现对、覆盖缺两枚**。本格要的就是把那两枚补进 `placement_symlink_113_other_test.go`
+      （或新建 `_118_` 文件），并自证"半修 MUT-B 现在至少红 3 枚"。
+      ⚠ 这是**只加测试**的一格，与票 120 的竞态、票 119 的语义都无关，别顺手改判定。
 - [ ] **AC#5** 门禁：`internal/winsec/` `-count=2 -v` 四数逐条点名（`=== RUN` 行数 == 不同测试名 × 2；
       `-count=2` **不缓存**；非 `-v` 既不印 PASS 也不印 SKIP）；`gofmt -l` + `"$(go env GOPATH)/bin/gofumpt.exe" -l`
       （本机 v0.7.0 **存在**，写"未跑"必须引命令原文 + 错误原文）；`go vet` 双 GOOS（**`GOOS=linux go vet` 只编译不执行**，别写成"Linux 测过了"）；
