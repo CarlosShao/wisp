@@ -5,7 +5,13 @@
 // Bans (PLAN.md D22 fourth-round additions), production scope internal/ +
 // cmd/ (non-test, non-testdata) unless stated:
 //
-//	1 bare-goroutine      `go func(` - every goroutine via observe.Registry.Spawn
+//	1 bare-goroutine      every `go <anything>` - closure literal OR named
+//	                      call (widened by R16#1; the pre-R16 matcher saw only
+//	                      `go func(` and "clean" therefore meant "no bare
+//	                      closures", not "nothing bypasses Spawn").
+//	                      Every goroutine via observe.Registry.Spawn; the only
+//	                      file-level exemption is internal/observe/goroutine.go,
+//	                      which implements Registry itself.
 //	2 pathresolver-bypass filepath.Clean / filepath.Abs outside the allowlist
 //	                      (C26 PathResolver is the only path comparison)
 //	3 plaintext-key       key/token/secret-named identifier assigned a
@@ -246,11 +252,21 @@ func (s *scanner) scanGoFile(path string) error {
 	ast.Inspect(f, func(n ast.Node) bool {
 		switch v := n.(type) {
 		case *ast.GoStmt:
+			// R16#1: the ban covers EVERY `go <anything>`, not just the closure
+			// literal. `go probeReader()` spawns exactly as unsafely as
+			// `go func(){}`, so matching only FuncLit left the gate blind to
+			// named calls. The one sanctioned spawn point is exempted BY FILE
+			// PATH (internal/observe/goroutine.go - it implements Registry),
+			// never by call shape; see tools/d22scan/allowlist.txt.
+			pos := fset.Position(v.Pos())
 			if _, ok := v.Call.Fun.(*ast.FuncLit); ok {
-				pos := fset.Position(v.Pos())
 				s.add("bare-goroutine", path, pos.Line,
 					"bare `go func(` is banned (D22/D38b): use observe.Registry.Spawn (named, owner, recover boundary)")
+				break
 			}
+			s.add("bare-goroutine", path, pos.Line,
+				"bare `"+goStmtText(v)+"` is banned (D22/D38b, R16: named calls count too): use observe.Registry.Spawn (named, owner, recover boundary)")
+
 		case *ast.CallExpr:
 			if sel, ok := v.Fun.(*ast.SelectorExpr); ok {
 				if id, ok := sel.X.(*ast.Ident); ok && id.Name == "filepath" {
@@ -315,6 +331,29 @@ func (s *scanner) scanGoFile(path string) error {
 		}
 	}
 	return nil
+}
+
+// goStmtText renders a compact "go f()" spelling of a go statement for the
+// finding message, so a named call reads distinctly from a closure literal.
+func goStmtText(v *ast.GoStmt) string {
+	var b strings.Builder
+	b.WriteString("go ")
+	switch fn := v.Call.Fun.(type) {
+	case *ast.Ident:
+		b.WriteString(fn.Name)
+	case *ast.SelectorExpr:
+		if id, ok := fn.X.(*ast.Ident); ok {
+			b.WriteString(id.Name + "." + fn.Sel.Name)
+		} else {
+			b.WriteString(fn.Sel.Name)
+		}
+	case *ast.FuncLit:
+		b.WriteString("func()")
+	default:
+		b.WriteString("call")
+	}
+	b.WriteString("(...)")
+	return b.String()
 }
 
 // looksLikePlaintextKey filters ref kinds, placeholders and low-entropy words.

@@ -25,10 +25,21 @@ func TestScanDetectsAllSeededViolations(t *testing.T) {
 	root := t.TempDir()
 	seedFile(t, root, "tools/d22scan/allowlist.txt", "# empty allowlist for the fixture\n")
 
+	// Two seeds, not one: R16#1 widened ban #1 to every `go <anything>`, so the
+	// positive control has to prove the NAMED form is caught as well. A gate
+	// that only ever fires on `go func(` is exactly the A26 hole being closed -
+	// if the named matcher regressed to "invisible", this fixture would still
+	// look green.
 	seedFile(t, root, "internal/bad/goroutine.go", `package bad
 
 func leak() {
 	go func() { println("unnamed") }()
+}
+
+func worker() {}
+
+func leakNamed() {
+	go worker()
 }
 `)
 	seedFile(t, root, "internal/bad/paths.go", `package bad
@@ -73,7 +84,7 @@ var names = []string{"spill", "internal.logwrite"}
 		got[f.Ban]++
 	}
 	want := map[string]int{
-		"bare-goroutine":         1,
+		"bare-goroutine":         2,
 		"pathresolver-bypass":    1,
 		"plaintext-key":          1,
 		"wallclock-timeout":      1,

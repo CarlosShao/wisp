@@ -4,3 +4,4 @@ pathresolver-bypass	internal/memory/open.go	ticket-06 data-dir root only; migrat
 pathresolver-bypass	internal/models/manifest.go	C29 manifest canonicalization of manifest-provided paths; junction hardening via C26 lands ticket 18
 mirror-hash	internal/models/downloader.go	mismatch error message only; hash source is the signed manifest (C29/F3)
 pathresolver-bypass	internal/risk/pathresolver.go	C26 sanctioned lexical step (SPEC-06 §4 pipeline); ticket 18
+bare-goroutine	internal/observe/goroutine.go	R16#1: this file implements Registry itself - the `go r.run(...)` at :281 IS the sanctioned spawn point. Exempted BY FILE PATH only (never by call shape), so every other `go <anything>` in the tree is a finding.
