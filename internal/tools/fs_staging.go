@@ -156,7 +156,7 @@ func splitStagingName(rest string) (owner, pid, random string, ok bool) {
 		return "", "", "", false
 	}
 	owner, pid, random = parts[0], parts[1], parts[2]
-	if len(owner) != stagingOwnerLen || random == "" || !allDigits(pid) {
+	if len(owner) != stagingOwnerLen || random == "" || !allDigits(pid) || pid == "0" {
 		return "", "", "", false
 	}
 	if strings.ContainsAny(random, `\/*:`) {

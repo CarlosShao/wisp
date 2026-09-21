@@ -1,6 +1,6 @@
 # 73 — Sweep orphan `.wisp-tmp-*` staging files left by a real kill
 
-**Status:** in-flight (implementer) — 清扫器已落地，AC#1 已证并勾；AC#2/#3/#4/#5 未证
+**Status:** in-flight (implementer) — AC#1–AC#4 已证并勾；AC#5 门禁跑到一半（race 已过，d22scan 未跑）
 **Type:** defect-fix (bookkeeping of a proven leak)
 **Blocks:** nothing · **Blocked by:** nothing (the characterization test already exists)
 **Spec refs:** D31 atomic-rename, SPEC-07 §2–§3, registry **A18**
@@ -33,13 +33,13 @@ session does not accumulate litter in the user's allowed dirs:
   through the bridge leaves the target directory with **zero** `.wisp-tmp-*` entries; the destination
   file is still byte-exact. Mutation check required: revert the reclaimer to no-op ⇒ this test goes
   red (grep-prove the mutation landed before running, restore and grep-prove it is gone).
-- [ ] **AC#2** Attribution is real, not "delete every `.wisp-tmp-*` in the dir": a `*.wisp-tmp-*`
+- [x] **AC#2** Attribution is real, not "delete every `.wisp-tmp-*` in the dir": a `*.wisp-tmp-*`
   file **the bridge did not create** (e.g. a foreign file with the same prefix, created directly by
   the test) survives the sweep, with a test that names the surviving file.
-- [ ] **AC#3** Reparse-point safety: an orphan-shaped name reached through a **real NTFS junction**
+- [x] **AC#3** Reparse-point safety: an orphan-shaped name reached through a **real NTFS junction**
   pointing outside the allowed dirs is not deleted. `mklink /J` for real, `t.Fatalf` (not `t.Skip`)
   if the fixture cannot be built, and a positive control proving the target file exists first.
-- [ ] **AC#4** A live temp file held by another process is not deleted and does not fail the write:
+- [x] **AC#4** A live temp file held by another process is not deleted and does not fail the write:
   spawn a child that opens the temp and blocks, then write. `//go:build windows`, zero `t.Skip`.
 - [ ] **AC#5** Gates: `gofmt -l internal/tools` empty, `go vet ./internal/tools/...` rc=0,
   `go test ./internal/tools/... -count=2`, `-race`, and the repo's `d22scan` invoked **exactly as
@@ -88,3 +88,21 @@ session does not accumulate litter in the user's allowed dirs:
   **AC#2/#3/#4/#5 未勾**：判据用例还没写；`-count=2`/`-race`/d22scan 门禁还没跑。
   **next=写 `internal/tools/fs_staging_windows_test.go`：外人不删（AC#2）、真 junction 不穿（AC#3）、
   活人持有的不删且写盘照常成功（AC#4），然后跑全套门禁 + d22scan 种子阳性。**
+
+- 2026-09-21（实现代理，checkpoint 3 · **AC#2/#3/#4 已勾**）：新增 `internal/tools/fs_staging_windows_test.go`
+  （`//go:build windows`，零 `t.Skip`）。AC#2 `TestSweepReclaimsOnlyItsOwnStagingFiles`：6 个撞前缀的外人文件
+  （逐个点名，含"形状全对但 owner 不是本程序"和"pid 段不是数字"）+ 1 个"本程序活 pid"的孤儿全部存活，
+  同目录那个死 pid 孤儿被扫掉；另有 `TestSweepNamingSchemeRejectsNearMisses` 钉字符串层
+  （发现并修掉一个真洞：`pid == "0"` 曾被当成合法创建者）。AC#3 `TestSweepNeverDeletesThroughARealJunction`：
+  `mklink /J` 真 junction，链名**就是可归因的孤儿名**，两道阳性对照（读得到对面字节 + 同目录普通孤儿确实被扫掉），
+  然后断言对面文件字节未动**且 junction 本身没被删**。AC#4 `TestSweepSparesATempFileHeldByAnotherProcess`：
+  子进程 `CreateFile` 共享位**故意不给 FILE_SHARE_DELETE** 后阻塞；A 形状（名字里是活 pid）与 B 形状
+  （名字里是死 pid、但句柄在活人手里）都存活且写盘成功；B 再真 taskkill 释放后下一次写盘必须扫掉它
+  ——证明上一条的幸存是句柄而不是名字。子进程 re-exec 自己（`-test.run=^TestSweepSpares…$`），三处 `t.Fatalf`
+  写清缺什么前提。
+  **变异检验（超出票面要求，因为 AC#2/#3 是这张票的危险面）**：把 `sweepStagingOrphans` 退回"前缀即我的"
+  （grep 命中 `fs_staging.go:224` 的 `MUTATION-73`）⇒ AC#2/AC#3/AC#4 **三条全红**（AC#3 报"清扫器连 junction
+  本身都删了"）；删掉该行 ⇒ `grep -rn MUTATION-73 internal/tools/` rc=1 零命中 ⇒ `TestSweep|TestA18` 全绿。
+  门禁部分完成：`gofmt -l internal/tools` 空、`go vet ./internal/tools/...` rc=0、
+  `go test -count=2 ./internal/tools/...` `ok 27.617s`、`-race` `ok 18.041s`。
+  **next=按 CI 原样跑 `scripts/d22scan.sh`（含 d22scan 自身 seeded 阳性）后勾 AC#5，并写证据文件。**
