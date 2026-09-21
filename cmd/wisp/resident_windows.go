@@ -43,6 +43,26 @@ func runResident() {
 		fmt.Fprintf(os.Stderr, "wisp: boot failed: %v\n", err)
 		os.Exit(1)
 	}
+	// Ticket 117: the resident process is the leg owner actually uses - double
+	// click the icon, no terminal attached, stderr going nowhere. Everything
+	// this process logs (the seal notices of internal/winsec, a locked config
+	// section loosened under L2, the D33 credential migration, the panic sink)
+	// needs a listener on disk, or "you will see it when an authorization is
+	// cleared" is a sentence that only holds in a test binary.
+	//
+	// Ordering: proc.Boot is the only thing that ran before this, and it seals
+	// nothing - internal/proc has zero winsec imports - so no event can have
+	// been missed. The close defer is registered BEFORE the shutdown defer so
+	// LIFO runs the D38(e) sequence first and its own log lines still land.
+	sink, sinkErr := installLogSink(rt.Layout.DataDir)
+	if sinkErr != nil {
+		// Loud, and it does not stop the app: a log directory that will not
+		// open must not become a way to keep Wisp from starting. The notices
+		// fall back to stderr, which is the state before this ticket.
+		fmt.Fprintf(os.Stderr, "wisp: 持久日志未启用（%v）：安全告警只会到 stderr，不会落盘\n", sinkErr)
+	} else {
+		defer sink.close()
+	}
 	defer func() {
 		records := rt.Shutdown(false)
 		failed := 0

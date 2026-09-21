@@ -121,6 +121,11 @@ type runSpec struct {
 	// operator clicked allow", because a console run has no native channel and
 	// its L2 card therefore always resolves to a reject.
 	modeConfirm perm.ConfirmFunc
+	// sink is the persistent log pipeline this run installed. Every caller
+	// leaves it nil: runTextTask fills it in after installing the sink, and
+	// agentRuntime.auditf books the audit trail through it so the ledger lands
+	// on disk without the same sentence reaching the console twice.
+	sink *logSink
 }
 
 // runTextTask executes one CLI text task and returns the process exit code.
@@ -148,6 +153,24 @@ func runTextTask(s runSpec) int {
 	}
 	if s.dataDir == "" {
 		s.dataDir = resolveDataDir(buildEnvString())
+	}
+
+	// Ticket 117: the persistent listener goes on BEFORE the assembly, not
+	// after it. assembleRuntime's first statement is secret.NewStore ->
+	// winsec.PrivateDirAll, which is already a sealing site, so a sink
+	// installed after that point would miss exactly the record this exists to
+	// keep. Registered before rt.close() so the shutdown defer below runs
+	// first and its own log lines land in the file (LIFO).
+	sink, sinkErr := installLogSink(s.dataDir)
+	if sinkErr != nil {
+		// Loud and named, and it does not stop the run (SPEC-05 §3.4 forbids
+		// the silent downgrade, not the degraded boot): refusing to start over
+		// a log directory would turn a full disk into an app that will not
+		// open, while the notices keep going to stderr as before.
+		fmt.Fprintf(s.stderr, "wisp run: 持久日志未启用（%v）：本轮安全告警只会到 stderr，不会落盘\n", sinkErr)
+	} else {
+		s.sink = sink
+		defer sink.close()
 	}
 
 	rt, code := assembleRuntime(s)
@@ -424,8 +447,23 @@ func (rt *agentRuntime) close() {
 }
 
 // logf is the audit sink: the bridge's and the gate's lines.
+//
+// Both halves are load-bearing and they answer two different complaints:
+//
+//   - stderr is the operator standing at a terminal, reading this run.
+//   - slog is the record that outlives the process. Ticket 105 wired the D31
+//     path-rewrite account ("tools: d31 report ...") and the mode reads
+//     ("perm: MODE-READ ...") into this function, and R-105-1 was right that
+//     calling that "persisted" was false: an fmt.Fprintf to a stream is not a
+//     ledger. Now the same line also goes through the sink this run installed,
+//     the rolling JSONL file under <data>\logs (see logsink.go) - so the
+//     rewrite ledger is on disk on the production path, not only in a test that
+//     built its own sink. It rides the sink's own logger rather than the
+//     process default precisely so the console keeps ONE copy of each line.
 func (rt *agentRuntime) auditf(format string, args ...any) {
-	fmt.Fprintf(rt.stderr, "[audit] "+format+"\n", args...)
+	line := fmt.Sprintf(format, args...)
+	fmt.Fprint(rt.stderr, "[audit] "+line+"\n")
+	rt.spec.sink.logger().Info("audit: " + line)
 }
 
 // execute runs one task through the loop and presents the result.
