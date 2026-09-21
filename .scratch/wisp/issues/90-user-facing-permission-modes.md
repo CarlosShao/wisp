@@ -1,6 +1,7 @@
 # 90 — 面向用户的**权限模式开关**（三档：只问高危 / 每步都问 / 全自动，且"全自动"也吃不到不可逆操作）
 
-**Status:** **unblocked**（2026-09-21 17:0x，owner 已把 M1–M5 全部拍完，见裁定 **R20** 与本票末尾"owner 定案"条）—— 可以开工。UI 落点那半（输入框显示档位 + 附件 + 工作区选择）**拆给票 92**，本票只做权限语义、持久化、切档确认与审计。
+**Status:** **in-progress（2026-09-21，agent-ticket90）** —— 已按 owner 定案 M1–M5 + R20 选定施工形状（见本条下面第一条 Progress log），
+开始落码。前：**unblocked**（2026-09-21 17:0x，owner 已把 M1–M5 全部拍完，见裁定 **R20** 与本票末尾"owner 定案"条）。UI 落点那半（输入框显示档位 + 附件 + 工作区选择）**拆给票 92**，本票只做权限语义、持久化、切档确认与审计。
 **Type:** 安全能力 + 可用性（owner 2026-09-21 明确要求："有没有设计类似的权限切换的功能？这个也是很基本的，我希望都有"）
 **Blocks:** 票 21 的 segment 2（原生确认卡）、票 48（审批队列）、票 49（会话授权）——**这四张是同一条链**
 **Blocked by:** 票 80/83 已查清的前提：**`risk.Gate` 在生产里零调用点**（真实链走的是 `risk.Classify`），
@@ -90,3 +91,31 @@
   - **红线复述（owner 这次没改，照旧不可越）**：不可逆操作任何档都必须拒/问（`PLAN.md:1629`）；
     污染升级不能被任何授权覆盖（`:1640`）；"允许"只接受原生侧点击（`:1588`，`ban #6` 是它的机器门）；
     L2 不许无限等待，超时 300s 判拒（`:3143` + C18）。
+
+- 2026-09-21（agent-ticket90，**checkpoint #1：形状选择，先落盘再写码**）：已逐字读完票面（含最后两条 Progress log）
+  与 R20 的边界条款。施工形状定如下：
+  1. **档位类型**：`internal/risk/mode.go`（**新文件、非冻结**；冻结的 `assessor.go` 一字不动）。
+     `ModeAskEveryStep`（默认）/ `ModeAskHighRisk` / `ModeAuto` + `ParseMode` + `Mode.Screen(d Decision) (Decision, bool)`。
+     类型放 `risk` 是为了让 `config` 与 `tools` 都能引它而不形成环（`risk` 不引 `config`）。
+  2. **进链方式（AC#1）**：`internal/tools/bridge.go` 的 `route` 改成收**显式参数** `mode`，
+     值由 `Options.Modes ModeSource`（`Mode() risk.Mode`）在每次 `Execute` 开头读一次；
+     **没有任何包级可变全局**，未注入 = 永远最严档（fail-closed）。
+  3. **持久化键（M3 / AC#3a）**：`config.toml` 的 `risk.permission_mode`（[risk] 是 locked section），
+     默认 `"ask_every_step"`；未知值**加载即报错**（票 83 的规矩），并在 `unwired.go` 的
+     `lockedKeyDisposition` 与 `manager.go` 的 `riskDirection` 里挂号（往全自动走 = loosen）。
+  4. **M3 边界（编排者加的）**：只有**模式这一个偏好**进 config.toml 从而跨重启；
+     **会话授权不碰这条通道**——`PLAN.md:1640` 一字不动，票 49 的 `GrantScopeSession` 保持"重启即失效"。
+     ⇒ **AC#3(a)/(b) 与 AC#3b 是三条独立用例，不合并**。
+  5. **M4 确认 + 审计**：新建 `internal/perm`（**新包，不踩别人的地界**）持有 `Store`：
+     `Set(m, origin, actor)` ⇒ 只有目标档是 `ModeAuto` 时走一次 **L2 强确认**（复用 `tools.Gate.PendingApproval`，
+     超时沿用 `risk.confirm_timeout_sec` 默认 300s，**这个数不动**）；**三档切换全部写审计**
+     （from/to/时间/来源/谁触发），落在**现有 audit sink**（`Options.Logf` 那一族 `[audit]` 行）上，**不新建第二套**；
+     另留 `Mode()` / `LastSwitch()` 给票 92 以**只读**形式显示。
+  6. **红线判定（AC#2）**：`ModeScreen` 的静默白名单是**排除式**写的——
+     `Deny`、R3、R4（`SessionOverrideBlocked`）、R8 不可逆、R2 工作区外、R5 外网、R9/未知等级 **一律不许被任何档静默**。
+  7. **AC#5 台账**：`risk.Gate` 今天在生产里**仍是零调用点**；本票给它一个真实调用者
+     （B 档的"单文件已确认"判定走 `Gate`，`internal/tools/paths.go`），
+     若最终没落地就在此明写"仍归票 21 未建"，**不假装它存在**。
+  8. **禁区自查**：不碰 `internal/winsec/**`、`frontend/**`、`internal/panel/`、`cmd/wisp/`、`internal/risk` 既有测试文件、
+     `assessor.go`/`pathresolver*.go`/`rules_gateway.go`/`tools/d22scan/**`/`allowlist.txt`/`docs/PLAN.md`/`docs/specs/*.md`。
+     ⇒ **已知代价**：`cmd/wisp/run.go` 那行 `Modes:` 注入由票 77 的文件承载，本票只把**需要的改动缩到一行**并在票面登记交接。
