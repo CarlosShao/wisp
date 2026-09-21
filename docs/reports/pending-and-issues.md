@@ -1101,6 +1101,29 @@ vet: cmd/wisp/slo.go:324:49: undefined: proc.Runtime
 本 commit 已把该步与它的阳性对照（`tools/d22scan/runtests.sh -C tools/d22scan ./...`）**提到 gofmt/vet 之前**：
 不删步骤、不给任何步骤加 `continue-on-error`、不让任何步骤可跳过（D22 mode 6 未碰）。
 
+## 编排者登记 A58（2026-09-21 15:2x，**`lint` 现在只红在一件事上** + `go vet` 首次真绿 + 票 81 结案）
+
+- **A58① run `35562680354`（headSha `e5e5eb7`）逐步骤，这是本项目迄今最干净的一次**：
+  `lint` job 的 9 个真实步骤里 **7 个 success**：
+  `D22 scanner positive control` ✓、`D22 seven-ban + emoji scan` ✓、`gofmt (gofumpt)` ✓、
+  **`go vet (module)` ✓**、**`go vet (tools/d22scan module)` ✓**，只有 **`staticcheck` ✗** 一个红点
+  （`mockllm module vet` 因前一步失败被 skipped —— 记清楚：**它没跑，不是过了**）。
+  ⇒ `lint` 从"不知道在红什么"变成"**红的是一件事，而且有票**"（票 85）。
+  ⚠ 这两条 `go vet` 步骤**从未产生过判据**（A44/A54 一路被前面的失败挡住），**现在是第一次**
+  ⇒ 票 78 AC#1 里我写的"CI 侧无样本"已就地刷新为**已取得**（追加在它票面 log，不追改原文）。
+- **A58② `test-core` 的红：47 → 10 → 8**，剩下的 8 条**同一族、同一个根因**
+  （POSIX 上 sync-root 探测未实现 ⇒ 票 55，处置=票 82 分层）。
+  ⇒ 判据面已经清干净了：**从现在起 `test-core` 任何新增红都是新缺陷**，
+  不再是"历史遗留噪音"。这条变化很重要，因为**以前它红了也没人能从噪音里读出新东西**。
+- **A58③ 票 81 结案**（裁决表 `docs/evidence/s1/81-adversarial-acceptance.md`）：
+  我复跑 Windows 侧 `RUN 50 / PASS 50 / FAIL 0 / SKIP 0`，与代理逐字一致；
+  ubuntu 侧**不拿我的本地 docker 充数**——用 CI 自己那条 `test-core` 的 FAIL 名单证明那两条 containment 已消失。
+  两条通用判据由它产出（派生期望值 + 反-vacuous 卫兵；`*_windows_test.go` **文件名不施加任何门**），
+  已分别写进票 82 的 AC#1b / AC#2b。
+- **A58④ 一句给自己盯的话**：今天三次把"锚点行之前的插入"做成**吃掉锚点行**（A52⑤ 的同类，
+  第 4 次差点提交出"AC#2 只剩半截"的票面）。规矩不变：**append-only 文件每次编辑 commit 前看
+  `git diff --numstat`，删除列必须为 0**。本条 A58 自己也是这么做的（`13 0` / `32 0` 实测）。
+
 ## 编排者登记 A57（2026-09-21 15:0x，票 81 交回四框全勾：**两侧同数** + 一处命名债我判不改 + 一处潜伏空仪器）
 
 - **A57① 我这一侧的独立复跑逐字对上**（Windows 本机，与代理报的同一过滤器）：

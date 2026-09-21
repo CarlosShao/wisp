@@ -169,3 +169,10 @@ vet 一失败，**扫描步骤被 `skipped`，D22 门从未在 CI 上给出过�
   顺带：本票全程只在自有包内改动，**ci.yml 一个字没碰**；仓根的构建产物
   `wisp.exe`（我跑 `go build ./cmd/wisp/` 掉出来的 27MB，`*.exe` 已 gitignore 所以 status 里看不见）
   已删——共享树里留个大二进制会喂给别人写的文件遍历扫描器。
+
+- 2026-09-21 15:1x（**编排者补一条刷新**）：我在 AC#1 里写的那句"CI 侧 ubuntu 原生 `go vet (module)` **至今无样本**"
+  **现已刷新**：run `35562680354`（headSha `e5e5eb7`）的 `lint` job 里
+  `go vet (module)` = **success**、`go vet (tools/d22scan module)` = **success**、
+  `gofmt (gofumpt)` = **success**、D22 两步 = **success** ⇒ **AC#1 的 CI 侧绿证到手**，票 78 那颗"哑弹"彻底闭环。
+  `lint` 现在只红在**一步**：`staticcheck`（跑不动的那把工具，A56① ⇒ 票 85）。
+  也就是说 lint 从"不知道在红什么"变成"**红的是一件事，且有票**"。

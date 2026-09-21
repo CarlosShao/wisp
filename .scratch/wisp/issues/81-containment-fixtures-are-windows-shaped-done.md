@@ -1,6 +1,6 @@
 # 81 — 两份 containment 测试的**阳性对照是 Windows 形状**，ubuntu 上必红（票 76/79 的判据仪器在 Linux 上不自证）
 
-**Status:** code 侧完成、四框已勾（两侧本地实测）· **未闭**：ubuntu CI 侧 `test-core` 要一次 push 才能复验（本代理不 push）、裁决表 `docs/evidence/s1/81-*.md` 归对抗验收代理
+**Status:** **done**（编排者对抗验收 2026-09-21 15:1x）—— 四框全 PASS，裁决表 `docs/evidence/s1/81-adversarial-acceptance.md`。**未闭那半句已由 CI 本身闭上**：run `35562680354`（headSha `e5e5eb7`）的 `test-core` 全量 `--- FAIL` = **8 条**，全部属 `internal/risk` 的 sync-root 家族（票 55/票 82），本票那两条 containment 已不在名单里（47 → 10 → **8**）。
 **Type:** 测试夹具的平台可移植性缺陷（不是生产洞，但**它让"防逃逸的那条判据"在 Linux 上等于没跑**）
 **Blocks:** 票 70 的 AC#2/AC#6（`test-core` 现在只剩 10 条红，其中 2 条就是本票）· **Blocked by:** nothing
 **Packages:** `internal/agent/spill_path_invariant_test.go`、`internal/memory/artifacts_path_invariant_test.go`
@@ -158,3 +158,15 @@ docker 挂载**快照**而不是工作树（别人的在飞改动会混进你的
     所以"CI 侧真的转绿"要编排者推一次才能复验——我的 Linux 证据是本地 docker 快照；(b) 裁决表 `docs/evidence/s1/81-*.md`
     是对抗验收代理的产物，不属写码代理地界。四框都勾了，但 Status 不写 `-done`。
   next= 交回编排者：push 一次让 `test-core` 在 ubuntu 复验这两条；随后派对抗验收出 `docs/evidence/s1/81-*.md`
+
+- 2026-09-21（**编排者验收**）：**四框全 PASS，本票转 `-done`**，裁决表
+  `docs/evidence/s1/81-adversarial-acceptance.md`。
+  **决定性证据是 CI 本身**：run `35562680354`（headSha `e5e5eb7`）的 `test-core` 全量去重后
+  `--- FAIL` = **8 条**，全部是 `internal/risk` 的 sync-root 一家族（票 55/票 82 的账），
+  **你修的那两条 containment 已不在名单里** ⇒ 47 → 10 → **8**。
+  我自己复跑（Windows，同一过滤器）：`rc=0`、`=== RUN 50`、`PASS 50`、`FAIL 0`、`SKIP 0`、
+  `no tests to run` 0 次 —— 与你所报**逐字一致**。
+  三条被我带进通用账的收获：期望集合要**派生**不要点名（你顺手加的两条反-vacuous 卫兵是正解）；
+  `RejectsTheFour…` **不改名、改注释**（那名字被 76 的验收表逐字引用，改名=替别人重写验收账）；
+  `rules_test.go:198` 的潜伏空仪器已写成**票 82 的 AC#1b**，另给它加了 **AC#2b**
+  （`*_windows_test.go` 这个文件名**不施加任何门**，只改名会让整包 `ok [no test files]` 静默消失）。
