@@ -1,10 +1,14 @@
 # 20 — host bridge + first tool family: fs.*, capability checks, spill rule
 
 **Status:** review（两段 fs 工具族已落地并由编排者验收：`docs/evidence/s1/20-needs-assertion-restored.md`；
-残口只有两条 —— **AC#5** junction/8.3 在**桥层**零命中（只有 `internal/risk` 层有）、
-以及 **A18** 真 `taskkill` 下的 `.wisp-tmp-*` 残留）
-**Claimed by:** T20-seg1-agent (host bridge + C4 registry), T20-seg2-agent (fs write family)
-**Last update:** 2026-09-20 23:32 (编排者复验轮)
+残口**从两条收窄到一条** —— 第 5 框「桥层 junction/8.3」已于 2026-09-21 用**真产物**闭合
+（`internal/tools/bridge_junction_windows_test.go` + 证据 `docs/evidence/s1/20-bridge-junction-shortname.md`，
+含吞掉下层拒绝的变异检验）；剩下 **A18** 真 `taskkill` 下的 `.wisp-tmp-*` 残留：已补特征化测试记录
+今日真实行为（**每次 kill 留一个 `.wisp-tmp-*`，没有任何东西扫它**），但"清扫 vs 申报可接受残留"是行为设计，
+仍归 owner ⇒ A18 保持 open）
+**Claimed by:** T20-seg1-agent (host bridge + C4 registry), T20-seg2-agent (fs write family),
+T20-box5-agent (桥层 junction/8.3 拒绝 + A18 特征化)
+**Last update:** 2026-09-21 09:20 (票 20 第 5 框闭合，A18 补特征化)
 ⚠ **两处过期表述以本块为准（我逐条 grep 复现后更正）**：
 ① 正文里的 `who calls this in production? NOBODY YET, and it is NOT reachable from cmd/wisp`（见 §Progress）**已作废**——
 `cd011b8 feat(12)` 之后 `cmd/wisp/run.go` 真的 `tools.New`(:262) + `approval.New`(:255) + 注册全部
@@ -82,7 +86,20 @@ from 10.
       `TestLateVetoRendersTheApprovalLayersAppliedStepsReport`,
       `TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop`,
       `TestApprovedL2ThatStopsMidWriteIsNotRenderedAsNeverStarted`.
-- [ ] Reparse/short-name target via junction → denied (18 integration).
+- [x] Reparse/short-name target via junction → denied (18 integration).
+      **桥层**证据（2026-09-21，真产物、零 `t.Skip`）：`internal/tools/bridge_junction_windows_test.go` —
+      `TestBridgeRefusesARealJunctionOnTheReadRoute`（fs.read/fs.list 穿真 `mklink /J`）、
+      `TestBridgeWritesNothingThroughARealJunction`（5 子项：write 覆写/新建、trash、move、delete，
+      目标目录**逐文件 sha256 快照** before==after）、
+      `TestJunctionInsideAnAllowedRootCannotReachAnAListFile`、
+      `TestBridgeRefusesTheRealShortNameOfAnAListFile`（`GetShortPathNameW` 真短名 → Deny via R3、门零调用）、
+      `TestShortNameSpellingGetsTheSameVerdictAsTheLongOne`、
+      `TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing`（真 SQLite 行）。
+      审批门一律 **AnswerAllow** ⇒ 拒它的是桥不是人；阳性对照先证明 junction 真能读出那 94 字节。
+      变异检验（`fs.go:95-98` + `fs_write.go:169-174` 吞掉下层拒绝）→ 6 条顶层 + 8 子项全红。
+      证据：`docs/evidence/s1/20-bridge-junction-shortname.md`。
+      ⚠ 这一框闭合**没有**顺手改任何守卫；§4 那三条上报（可批准的 L2 遮住 A 档、审计行记成
+      "工具说不"、第 7 框要的原因枚举不存在）留给 owner 判。
 - [ ] Artifacts API writes only under data dir; attempting user-dir write via artifacts API →
       rejected; `fs.write` to user dir remains gated (rule separation test).
 - [ ] **第 7 框（2026-09-20 23:59 编排者补，来源：本票头部 ④）`[fs] allowed_dirs` 首次使用询问流的最小子集**。
@@ -97,10 +114,14 @@ from 10.
         **禁止**新增第二条授权路径、禁止直接改 `PathCanonicalizer` 的根集合、禁止"这次先放行下次再说"。
       - **(c) 三条断言**：①(a) 的两类拒绝原因可区分；②批准 → 下一次同路径调用成功，**拒绝 → 仍被拒**；
         ③**junction / 8.3 拒绝绝不产生询问**（这条是本 AC 的安全内核，缺它则本 AC 不成立）。
-      **归属与阻塞**：本票的框**原本就没有编号**（按位置数：共 **7 框**，当前 `grep -c "^- \[x\]"`=4、
-      `grep -c "^- \[ \]"`=**3** ⇒ 未勾的是「桥层 junction/8.3」「artifacts spill」「本框」；
+      **归属与阻塞**：本票的框**原本就没有编号**（按位置数：共 **7 框**。编排者 2026-09-20 写这句时实测
+      `grep -c "^- \[x\]"`=4、`grep -c "^- \[ \]"`=3，未勾的是「桥层 junction/8.3」「artifacts spill」「本框」；
+      **2026-09-21 第 5 框闭合后复测 = 5 / 2**，未勾的只剩「artifacts spill」与「本框」。
       日后做 1:1 裁决表时**按位置对齐**，别自己编号后又在别处引用错号）。
-      另有一条**不在框里**的残口：**A18** 真 `taskkill` 下的 `.wisp-tmp-*` 残留。
+      另有一条**不在框里**的残口：**A18** 真 `taskkill` 下的 `.wisp-tmp-*` 残留 —— 2026-09-21 已补
+      特征化测试（`internal/tools/bridge_a18_kill_windows_test.go`：真 kill 下目标要么完整要么不存在，
+      但**每次 kill 留一个 `.wisp-tmp-*`，新建的桥/下一次成功写盘都不扫它**），
+      "自愈清扫 vs 申报可接受残留"仍归 owner 判 ⇒ A18 继续 open。
       本框与 **A19**（审批层没有输入设备）同源，最小实现只能用 native prompt。
       ⚠ **不得与票 70 的全仓格式化并发**（要改 `internal/tools`）。
 
@@ -243,3 +264,56 @@ from 10.
   GUI at 39) — note it has NO SPEC-12 §5 row, so marking it `DEFERRED` in code would break the
   1:1 cross-check; (e) still owed to ticket 19 (N-11) the `rules_gateway.go` R4 comment, and the
   missing `tool_call.rules_hit` column (a SPEC-02 §3 contract change, human approval required).
+- [2026-09-21T01:20Z] agent=T20-box5 did=**第 5 框：桥层的真 junction / 8.3 拒绝**（票 18 integration 缺的
+  **上层半边**）。**先复现编排者那条 grep**：`junction|mklink|GetShortPathName` 在 `internal/tools/*_test.go`
+  **0 命中** ⇒ 当时只有"下层会拒"、没有"上层拦得住"，正是 A33② 那一族的形状。
+  **做了什么**：新文件 `internal/tools/bridge_junction_windows_test.go`（`//go:build windows`，与票 18 同惯例，
+  **零 `t.Skip`**），6 条用例全部经 `Bridge.Execute` 而不是直接调工具：真 `mklink /J` junction 种在**授权根内**、
+  目标在根外；真 8.3 短名取自 `GetShortPathNameW`（两种产物**本机都建成了**，前置条件写进 `t.Fatalf` 的失败文本里，
+  跑不动就红、不许用字符串假装）。审批门一律 **AnswerAllow** ⇒ "人已点批准"之后仍然拒；目标目录按**逐文件
+  sha256 快照**断言 before==after，两侧目录再断言无 `.wisp-tmp-*`；每个 fixture 先做**阳性对照**（`os.ReadFile`
+  从 junction 对面读出那 94 字节，读不到就判用例无效）。覆盖：`fs.read`/`fs.list`/`fs.write`(覆写+新建)/
+  `fs.trash`/`fs.move`/`fs.delete` 六个入口 + A 档短名 + 真 SQLite 审计行。
+  **证据在哪**：`docs/evidence/s1/20-bridge-junction-shortname.md`（§2 用例表 / §3 变异检验 / §4 同形排查清单）。
+  **变异检验**（防自证）：把 `fs.go:95-98` 与 `fs_write.go:169-174` 改成"吞掉解析器的不、直接用原样路径"
+  → **6 顶层 + 8 子项全红**，红字里 junction 对面的文件被真写、真进回收站（还原记录 `$I41EUHE.txt`）、真被永久删；
+  已还原（`grep -c MUTATION-20` = 0、`git diff internal/tools/fs*.go` 空、复跑全绿），窗口只活了几十秒且开工前
+  `tasklist` 确认无 `go.exe`/`wisp.exe`/`balldebug.exe`。**8.3 那两条在这条变异下没红**，诚实记着：这条变异吞的是
+  工具层的第二次解析，而 8.3 的拒绝发生在判定层（R2/R3 自己 Canonicalize），不是同一条路径。
+  **门禁**（两个新文件都落地后复跑，2026-09-21 09:4x）：`gofmt -l internal/tools` 空、`go vet ./internal/tools/` rc=0、
+  `go test -count=2 ./internal/tools/` `ok 25.192s`、`go test -race -count=1 ./internal/tools/` `ok 17.709s`、
+  `bash scripts/d22scan.sh` clean；本框 7 条新用例 `-count=2 -v` 实跑
+  **`=== RUN` 36 / `--- PASS` 36 / `--- SKIP` 0 / `--- FAIL` 0**（全文连字符串 `skip` 都 0 次）。
+  **同形排查（13 个入口，逐项文件:行在证据 §4）**：fs 全套 11 个入口 + 两个 R8 探针**都**过 C26，
+  且判定层与执行层各解析一次；两条 artifacts 路（`internal/agent/spill.go:97-106`、
+  `internal/memory/artifacts.go:104-146`）**不过** C26，但它们不接受调用方给的路径（`artifactName` 把 callID
+  裁成 `[A-Za-z0-9_-]`、`validArtifactName` 只收裸名）⇒ 按硬规矩**只上报、一行守卫都没加**。
+  **三条留给 owner 的判定**（本框未处理）：① `<allowed>\jn\<A 档文件>` 今天是**可批准的 L2**、不是 Deny，
+  卡面上目标只写成"无法规范化"——**批准它的人看不见自己批准了什么**，挡住字节的仅是工具层的第二次解析；
+  ②被批准的红队调用在 `tool_call` 里记成 `decision=allow / outcome=error / error_class=tool`，
+  即"工具说不"而不是"策略说不"（与 A21 同族）；③第 7 框 (a) 要的"机器可辨原因值"今天**不存在**——
+  两类拒绝只在措辞上分岔，`risk.ErrReparseDenied` 在 `bridge.go:628-631`/`fs.go:96` 被折成字符串。
+  **没证明但看起来成立的**：symlink 未测（要特权或开发者模式，我只造了 junction，虽然二者落进
+  `pathresolver_windows.go:87` 同一个 reparse 分支）；UNC 与 `\?\` 在桥层没重做（票 18 覆盖的是 resolver，
+  且这两种拼法规范化会成功，形状等同本框的 8.3 越界项）；**硬链接根本不是 reparse point，两层都看不见它**——
+  本框未测，也不知道有没有人测过，若算缺口应新开条目；跨卷 junction 未测。
+  next=**第 6 框**（artifacts spill 规则分离）与**第 7 框**（`allowed_dirs` 首次使用询问，前置=先给上面③定层次）；
+  A18 的进展见下一条 log。
+- [2026-09-21T01:35Z] agent=T20-box5 did=**A18 特征化（不修行为，只把今日真实行为钉成断言）**。
+  **做了什么**：新文件 `internal/tools/bridge_a18_kill_windows_test.go`（`//go:build windows`，零 `t.Skip`）。
+  父测试用 `exec.Command(os.Args[0], "-test.run=^TestA18…$")` 重启**自己的测试二进制**（本仓 `internal/` 零
+  `TestMain`，所以走子分支），子进程经**真桥 + AnswerAllow 门**调 `fs.write`、`WriteChunk:4`，
+  在 `Hooks.AtStep("write:8")` 落信号文件后**永久阻塞**；父进程轮询到信号后跑**真 `taskkill /F /PID`**
+  （A18 判据原文要的就是这个，没退化成 `Process.Kill`，也没退化回进程内 `Hooks.Kill`——后者正是 A18 说的假象来源）。
+  **今日真实结果**：①覆写分支目标**逐字仍是 OLD-BYTES**、新建分支目标**不存在** ⇒ D31 在真故障下成立
+  （机制就是 `fs_write.go:277` 暂存建在目标目录 + `:325` 单次 `os.Rename`）；②**每次 kill 恰好留 1 个
+  `.wisp-tmp-*`**（实测各 4 字节 = 被杀时已写进暂存区的量，`t.Logf` 记数不钉数）；③**没有任何东西扫它**：
+  同目录再来一次全新桥的成功写盘之后两个残留仍在原地（全仓 `tempPrefix` 只有 `fs.go`/`fs_write.go` 三处写入者、
+  零读取者 ⇒ 今天根本没有可称"下次启动"的清扫器）。
+  **判据①闭合、判据②不闭合**：A18 原文两条完成判据里"目标要么完整要么不存在"这条现在有真 kill 证据了；
+  "下次启动自愈清理 **或** 明确申报可接受残留并写进 SPEC"这条**我没动**——把"没扫"改成"扫掉"是行为设计，
+  写进 SPEC 是契约变更（D22），都归 owner。用例因此**故意钉在"仍在"**：谁加了清扫器它就红，逼他回来改这条
+  判据而不是静默改行为。**next=owner 在 A18 判据②的两个选项里选一个**（加启动清扫器=哪张票；或 SPEC 里
+  承认残留可接受）；证据 `docs/evidence/s1/20-a18-taskkill-residue-characterization.md` §2/§3/§5。
+  反空跑：绕过阻塞点的子进程自己 `os.Exit(5)` 打印 "wrote without blocking" 并被父进程判失败；
+  未测的分支（暂存文件**内容**是否等于已 Write 量、rename 之后那一段的真 kill 时机）写在证据 §5。
