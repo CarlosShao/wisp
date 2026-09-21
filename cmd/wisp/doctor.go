@@ -219,6 +219,17 @@ func findDepsToml(exeDir string) (*depsToml, string, bool) {
 // resolveDataDir implements the SPEC-03 §5.2 data dir rules (ticket 01 scope:
 // portable mode + the per-env appdata fork; mutex/log/endpoint forks are later
 // tickets).
+//
+// Ticket 119: the two roots that come from the OS (the temp dir behind
+// WISP_ENV=test, and the user config dir behind dev/prod) are handed to
+// proc.SealableRoot before they become the data root. That is the caller side of
+// the placement floor: internal/winsec refuses a path that reaches itself
+// through a symlink, which is right for an attacker's link and wrong for
+// TMPDIR=/var/link/... and for a $HOME/.config that dotfiles manage to link, so
+// the layer that asks the OS resolves the OS's answer and winsec keeps checking
+// the spelling it is given. Without this, `wisp run`/`wisp providers` fail at
+// the very first sealing call on those systems - secret.NewStore ->
+// winsec.PrivateDirAll - with a refusal that reads like an attack.
 func resolveDataDir(env string) string {
 	if exeDir := executableDir(); exeDir != "" {
 		if _, err := os.Stat(filepath.Join(exeDir, "portable.txt")); err == nil {
@@ -229,15 +240,13 @@ func resolveDataDir(env string) string {
 		}
 	}
 	if env == "test" {
-		if v := os.Getenv("WISP_TEST_DATA_DIR"); v != "" {
-			return v
-		}
-		return filepath.Join(os.TempDir(), fmt.Sprintf("wisp-test-%d", os.Getpid()))
+		return proc.TestDataDir()
 	}
 	base, err := os.UserConfigDir() // %APPDATA%
 	if err != nil {
 		base = "."
 	}
+	base = proc.SealableRoot(base)
 	if env == "dev" {
 		return filepath.Join(base, "wisp-dev")
 	}

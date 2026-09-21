@@ -91,11 +91,82 @@ func LayoutFor(env buildinfo.Env, userConfigRoot string) (Layout, error) {
 // TestDataDir resolves the test-env data dir (SPEC-03 §5.2): the
 // WISP_TEST_DATA_DIR injection when set, else %TEMP%\wisp-test-<pid> (one dir
 // per test process, so parallel test binaries never share state).
+//
+// Ticket 119: the %TEMP% half of that sentence goes through SealableRoot,
+// because %TEMP%/TMPDIR is an OS answer and not a caller declaration - on macOS
+// it lives under /var, which is a symlink, and winsec's placement floor
+// (internal/winsec/winsec_other.go, ticket 113) refuses any path that reaches
+// itself through one. The WISP_TEST_DATA_DIR injection is returned verbatim:
+// whoever sets it has already declared the tree, and rewriting a declared root
+// is not this function's call to make.
 func TestDataDir() string {
 	if dir := os.Getenv(TestDataDirEnv); dir != "" {
 		return dir
 	}
-	return filepath.Join(os.TempDir(), fmt.Sprintf("wisp-test-%d", os.Getpid()))
+	return filepath.Join(SealableRoot(os.TempDir()), fmt.Sprintf("wisp-test-%d", os.Getpid()))
+}
+
+// SealableRoot returns the spelling of a root this process is about to seal,
+// with every symlink in the part of it that already exists resolved away and
+// the components that do not exist yet re-joined unchanged. It is ticket 119's
+// answer to the collateral the ticket 113 leg produced: the same
+// "an ancestor is a link, so refuse" rule that stops a seal from wandering
+// through /varlink into somebody else's tree also refuses the ordinary shape of
+// a real system, where the OS itself spells the temp dir and (on Linux, with
+// dotfiles) the config dir through a symlink - /tmp -> /private/tmp on macOS,
+// $HOME/.config -> ~/dotfiles/config, TMPDIR=/var/link/... in a container.
+//
+// Why the resolution belongs here and not in winsec: deciding *which tree to
+// seal* is the caller's data-root discipline, which is the boundary ticket 113's
+// AC#6 wrote into the package doc ("none of the placement checks asks whose tree
+// it is"). The floor can only refuse, never rewrite, and it must stay that way
+// on both platforms - a per-platform containment rule inside it would make the
+// POSIX floor weaker than the Windows one, which is the exact asymmetry ticket
+// 113 was opened to remove. So the layer that reads the OS resolves what the OS
+// answered, and winsec keeps checking the spelling it is handed, unchanged.
+//
+// It is not a second PathResolver and not a normalizer (D22 ban #2): it never
+// cleans, never absolutizes, never case-folds, and nothing in internal/winsec
+// calls it - the only C26 entry point stays internal/risk/pathresolver.go. What
+// it does is ask the filesystem one question about one existing prefix
+// (filepath.EvalSymlinks, the platform's own link semantics) and paste the
+// untouched tail back on.
+//
+// The direction on failure is "hand back what we were given". If the prefix
+// cannot be read, the root stays as declared and the seal that follows either
+// succeeds on the spelling it was given or is refused loudly by winsec;
+// SealableRoot swallowing a root into "" would turn a refusal into a mystery.
+// Callers that need the guarantee they are getting from this are the sealing
+// sites themselves, and they already refuse.
+func SealableRoot(path string) string {
+	if path == "" {
+		return path
+	}
+	var missing []string
+	cur := path
+	for {
+		_, err := os.Lstat(cur)
+		if err == nil {
+			break
+		}
+		if !errors.Is(err, fs.ErrNotExist) {
+			return path // unreadable, not absent: not ours to reinterpret
+		}
+		parent := filepath.Dir(cur)
+		if parent == cur {
+			return path
+		}
+		missing = append(missing, filepath.Base(cur))
+		cur = parent
+	}
+	real, err := filepath.EvalSymlinks(cur)
+	if err != nil {
+		return path
+	}
+	for i := len(missing) - 1; i >= 0; i-- {
+		real = filepath.Join(real, missing[i])
+	}
+	return real
 }
 
 // PortableDataDirName is the exe-relative data dir under portable mode: dev
@@ -147,7 +218,12 @@ func DefaultLayout(env buildinfo.Env) (Layout, error) {
 	if err != nil {
 		return Layout{}, fmt.Errorf("proc: user config dir: %w", err)
 	}
-	l, err := LayoutFor(env, dir)
+	// Ticket 119: $HOME/.config is a symlink on a great many real Linux setups
+	// (dotfiles managers), and winsec's placement floor refuses any root that
+	// reaches itself through one. The OS read is resolved here; LayoutFor itself
+	// stays a pure function of its injected argument, so a test or a caller that
+	// declares its own root keeps the spelling it declared.
+	l, err := LayoutFor(env, SealableRoot(dir))
 	if err != nil {
 		return Layout{}, err
 	}

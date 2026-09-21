@@ -90,12 +90,27 @@ func sealFile(path string) error { return applyDescriptor(path, false) }
 //
 // Two costs, both stated rather than discovered later:
 //
-//   - a macOS install whose data root sits under /tmp or /var (both are
-//     symlinks there) starts refusing. That is the already-booked R-103-7 trade
-//     for RemoveUnlinked, now applied to sealing too, and the reason is the same:
-//     refusing loudly is the only direction available to a floor. There is no
-//     macOS runner, so this stays a compile-level reading plus a claim (R-103-6
-//     is still unpaid);
+//   - a data root that reaches itself through a symlink starts refusing. That is
+//     the already-booked R-103-7 trade for RemoveUnlinked, now applied to
+//     sealing too, and the reason is the same: refusing loudly is the only
+//     direction available to a floor. The shapes are not hypothetical, and
+//     ticket 113 registered only the first of them (R-113-B, measured in a Linux
+//     container: 81 failing lines across this package and internal/config,
+//     internal/agent, internal/memory with TMPDIR behind a symlink):
+//   - macOS, where /tmp and /var are symlinks, so any root under them is one;
+//   - the test env's data root, which is os.TempDir() + a pid suffix;
+//   - Linux, where dotfiles managers commonly make $HOME/.config a symlink,
+//     which is the user config dir this repository's data root hangs off.
+//     Ticket 119's answer is option 2 of the three it was offered: the layer that
+//     asks the OS resolves what the OS answered (proc.SealableRoot, used by
+//     internal/proc's data-root resolution and cmd/wisp's resolveDataDir), so a
+//     root handed to this floor names a real tree. This function's rule is
+//     unchanged, deliberately: a per-platform containment test inside the floor
+//     would make the POSIX leg weaker than the Windows one, which is the exact
+//     asymmetry ticket 113 was opened to close. What it still refuses, and must
+//     keep refusing, is a root nobody resolved - the link is then the only thing
+//     that says which tree the bytes land in, and this package does not read
+//     intent out of a spelling (see the package doc, R-108-2);
 //   - hard links are not traversal. A regular file that happens to share its
 //     inode with somebody else's name has no symlink anywhere in its spelling, so
 //     nothing in this package can see it; that is R-108-2's question ("whose tree
