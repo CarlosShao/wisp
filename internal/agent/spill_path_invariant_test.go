@@ -49,7 +49,14 @@ var inv76aBudget = Budgets{RawOutputCapBytes: 1 << 20, SpillTokens: 40, SpillHea
 const inv76aPayload = "PAYLOAD" // repeated below; content is irrelevant to the path
 
 // inv76aShape is one hostile caller-supplied component plus the name the
-// sanitizer must reduce it to.
+// ENCODER must produce from it.
+//
+// TICKET 79 changed these literals, and only these literals: the names below are
+// what the ids USED to collapse onto ("p/q" and "pq" both became
+// tool-output-pq.txt), and that collapse was the clobbering defect this repo is
+// fixing. The four shapes are still asserted to come out BARE, with no / \ : ..
+// anywhere and with the full payload inside - containment is exactly as pinned as
+// it was; what changed is that nothing is silently dropped on the way.
 type inv76aShape struct {
 	sub      string // AC#1 subtest name
 	callID   string // model-supplied tool-call id
@@ -60,34 +67,36 @@ func inv76aShapes() []inv76aShape {
 	return []inv76aShape{
 		{
 			sub: "separator",
-			// Both spellings, because the sanitizer drops them alike: the
+			// Both spellings, because the encoder escapes them alike: the
 			// forward-slash form first (a nested path), then a backslash form
 			// that must not become a second directory level either.
 			callID:   "p/q",
-			wantName: "tool-output-pq.txt",
+			wantName: "tool-output-p%2Fq.txt",
 		},
 		{
 			sub: "dotdot",
-			// The pure escape spelling: if anything ever joined this raw, the
-			// file would land outside the artifacts dir.
+			// The pure escape spelling. Every dot escapes too, which is what
+			// kills the class outright: a dot-component cannot appear in an
+			// artifact name at any position, so neither can the Windows
+			// trailing-dot alias ticket 76 fixed on the delete side.
 			callID:   "../../escape",
-			wantName: "tool-output-escape.txt",
+			wantName: "tool-output-%2E%2E%2F%2E%2E%2Fescape.txt",
 		},
 		{
 			sub:      "drive_letter",
 			callID:   `C:\Windows\System32\drop`,
-			wantName: "tool-output-CWindowsSystem32drop.txt",
+			wantName: "tool-output-%43%3A%5C%57indows%5C%53ystem32%5Cdrop.txt",
 		},
 		{
 			sub:      "unc",
 			callID:   `\\fileserver\share\payload`,
-			wantName: "tool-output-fileserversharepayload.txt",
+			wantName: "tool-output-%5C%5Cfileserver%5Cshare%5Cpayload.txt",
 		},
 	}
 }
 
 // TestSpillCallIDHostileShapesSanitizedToBareNames is AC#1 on the spill route:
-// every shape is SANITIZED (not rejected - a spill must still happen), and the
+// every shape is ENCODED (not rejected - a spill must still happen), and the
 // exact on-disk name is asserted, plus that the name is a bare file name in the
 // dir the constructor fixed and holds the full payload.
 func TestSpillCallIDHostileShapesSanitizedToBareNames(t *testing.T) {
@@ -140,21 +149,43 @@ func TestSpillCallIDHostileShapesSanitizedToBareNames(t *testing.T) {
 		})
 	}
 
-	// The degenerate case the fallback exists for: an id made only of stripped
-	// characters must still produce a bare, sequence-derived name (and must not
-	// collapse onto "." or an empty name).
-	t.Run("everything_stripped_falls_back_to_sequence", func(t *testing.T) {
-		for _, id := range []string{"....", "..", `\\`, "!!!"} {
+	// The degenerate case the fallback exists for. TICKET 79 narrowed it and the
+	// subtest is renamed to say so: an id made only of formerly-stripped
+	// characters now ENCODES to something non-empty, so the sequence fallback is
+	// left with exactly one job - the empty id, the only input that still encodes
+	// to nothing. What this subtest used to be asserting was itself an instance of
+	// the defect: all four ids stripped to "", all four fresh Spillers restarted at
+	// sequence 1, and their artifacts overwrote each other in this one directory
+	// while the test congratulated them on "the fallback name". Bare and
+	// non-degenerate is still what is pinned - plus that five ids get five names.
+	t.Run("encoded_shapes_stay_bare_and_empty_id_falls_back_to_sequence", func(t *testing.T) {
+		seen := map[string]string{}
+		for _, id := range []string{"", "....", "..", `\\`, "!!!"} {
 			sp, err := NewSpiller(filepath.Join(root, "fallback"), inv76aBudget).Prepare(id, strings.Repeat(inv76aPayload, 200))
 			if err != nil {
 				t.Fatalf("Prepare(%q): %v", id, err)
 			}
-			if !strings.HasPrefix(sp.Name, "tool-output-seq") || !strings.HasSuffix(sp.Name, ".txt") {
-				t.Errorf("id %q produced %q, want the sequence fallback name", id, sp.Name)
+			if id == "" && !strings.HasPrefix(sp.Name, "tool-output-seq") {
+				t.Errorf("empty id produced %q, want the sequence fallback name", sp.Name)
 			}
 			if sp.Name == "tool-output-.txt" || sp.Name == "tool-output-..txt" {
 				t.Errorf("id %q produced the degenerate name %q", id, sp.Name)
 			}
+			if filepath.Base(sp.Name) != sp.Name {
+				t.Errorf("id %q produced the non-bare name %q", id, sp.Name)
+			}
+			for _, bad := range []string{"/", "\\", ":", ".."} {
+				if strings.Contains(sp.Name, bad) {
+					t.Errorf("id %q produced a name containing %q: %q", id, bad, sp.Name)
+				}
+			}
+			if prev, dup := seen[sp.Name]; dup {
+				t.Errorf("ids %q and %q collide on the name %q", prev, id, sp.Name)
+			}
+			seen[sp.Name] = id
+		}
+		if len(seen) != 5 {
+			t.Errorf("%d distinct names for 5 distinct ids, want 5 (name -> id: %v)", len(seen), seen)
 		}
 	})
 }
@@ -465,6 +496,13 @@ func TestSpillAPITakesNoCallerControlledDestinationPath(t *testing.T) {
 // prefix, then each remaining ".." pops one real component. dir sits `depth`
 // components below root, so an escape needs depth+2 groups. Verified by this
 // test's own positive control, which fails loudly if the guess is off by one.
+//
+// TICKET 79 note: the encoder now escapes every dot and separator, so feeding
+// this id through Prepare lands a bare name INSIDE the artifacts dir - the
+// escape below is only reachable through the hand-rolled join in the positive
+// control, which is exactly where it belongs. It is kept as live input for the
+// Prepare loop because "an id engineered to walk out" is the thing a containment
+// test should still hand to the real route.
 func inv76aEscapeID(t *testing.T, dir, root, marker string) string {
 	t.Helper()
 	rel, err := filepath.Rel(root, dir)

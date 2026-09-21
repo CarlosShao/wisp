@@ -421,27 +421,49 @@ func TestArtifactsContainmentByDirectoryListing(t *testing.T) {
 		}
 	}
 
-	// (e) purge must also be containment-safe with a nested canary on disk: the
-	// listing skips directories, so a stray subdirectory cannot be "purged" into
-	// a traversal.
+	// (e) purge must be containment-safe with a nested canary on disk, and
+	// TICKET 79 changed what it is allowed to leave behind: a stray subdirectory
+	// used to be invisible to the listing (and so to the quota and to this purge,
+	// which is how a 500MB cap becomes 2GB and why "one-click clear" kept bytes).
+	// It is now reclaimed too - so the containment question gets a sharper form:
+	// not "did purge skip the subtree" but "did every path purge took away sit
+	// inside the artifacts dir, at any depth, and was the set exactly this".
+	//
+	// inv76InsideDir only accepts a DIRECT child, which is the wrong shape for a
+	// recursive reclaim, so the loop below prefixes on the artifacts tree and the
+	// set equality right after it is what carries the teeth: an unexpected removal
+	// anywhere - the data dir, the DB, the user dir - fails on the name.
 	n, err := s.PurgeArtifacts(ctx)
 	if err != nil {
 		t.Fatalf("PurgeArtifacts: %v", err)
 	}
-	if n != 1 {
-		t.Errorf("purge removed %d, want the 1 remaining file", n)
+	if n != 2 {
+		t.Errorf("purge removed %d entries, want 2 (the 1 remaining file + the stray nested dir)", n)
 	}
 	added3, removed3 := inv76Diff(before, inv76Tree(t, root))
 	if len(added3) != 0 {
 		t.Errorf("purge added %v", added3)
 	}
+	const artTree = "data/artifacts/"
 	for _, r := range removed3 {
-		if !inv76InsideDir(r, artifactsDir, root) {
+		if !strings.HasPrefix(r, artTree) {
 			t.Errorf("purge removed %s, outside the artifacts dir", r)
 		}
 	}
-	if _, err := os.Stat(filepath.Join(artifactsDir, "nested")); err != nil {
-		t.Errorf("the nested canary dir must survive a purge: %v", err)
+	wantRemoved := []string{
+		artTree + "nested",
+		artTree + "nested/canary-separator.txt",
+		artTree + "real-1.txt", // the (d) positive control, still in this diff
+		artTree + "real-2.txt",
+	}
+	if !slices.Equal(removed3, wantRemoved) {
+		t.Errorf("purge removed %v, want exactly %v", removed3, wantRemoved)
+	}
+	if _, err := os.Stat(filepath.Join(artifactsDir, "nested")); !errors.Is(err, fs.ErrNotExist) {
+		t.Errorf("the stray nested dir survived a purge (err=%v); ticket 79 says it must not", err)
+	}
+	if entries, err := os.ReadDir(artifactsDir); err != nil || len(entries) != 0 {
+		t.Errorf("artifacts dir is not empty after a purge: %d entries left, err=%v", len(entries), err)
 	}
 	if _, err := os.Stat(dataDir); err != nil {
 		t.Errorf("the data dir must survive a purge: %v", err)

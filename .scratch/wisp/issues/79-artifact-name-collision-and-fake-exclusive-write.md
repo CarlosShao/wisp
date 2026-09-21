@@ -43,9 +43,9 @@ rather than silently ignoring. **"Silently ignore" is the status quo and it is t
 by default** — an entry invisible to the quota is how a 500 MB cap becomes 2 GB.
 
 ## AC (1:1 verdict table, one row per box)
-- [ ] **AC#1** A test proving two *different* ids that previously collided now produce *different* on-disk
+- [x] **AC#1** A test proving two *different* ids that previously collided now produce *different* on-disk
   names (or a loud failure), with the collision pair from the report (`p/q` vs `pq`) as named subtests.
-- [ ] **AC#2** `writeFileExclusive` is genuinely exclusive (or renamed + behavior documented), **plus** a test
+- [x] **AC#2** `writeFileExclusive` is genuinely exclusive (or renamed + behavior documented), **plus** a test
   pinning what a same-id retry does now (both outcomes are acceptable; *unspecified* is not).
 - [ ] **AC#3** Mutation: revert the injectivity change ⇒ AC#1 must go red; **grep-prove the mutation landed
   before running and prove the revert after** (this repo has produced several false greens from
@@ -61,3 +61,43 @@ by default** — an entry invisible to the quota is how a 500 MB cap becomes 2 G
 `git diff --cached --name-only`; no `--amend`/`reset`/`rebase`/`stash` (A34); no whole-repo gates
 (shared tree); no worktree inside the repo (A38④); don't touch ticket 76's or ticket 20's faces
 (those are mine). First checkpoint commit within 15 tool calls; sync Status + boxes + `next=` every commit.
+
+## Progress log (append-only, newest last)
+
+- 2026-09-21（实现代理，checkpoint 1）：只改 Status，形状三选一定案（注入式命名 / 真 O_EXCL +
+  同 id 重走原子替换 / Defect 2 取选项 (a)），并把"票 76 的字面量必须跟着动"这件事写在脸上。
+- 2026-09-21（实现代理，checkpoint 2）：**Defect 1 + Defect 2 双双落地**，两包 `go test -count=1` 全绿。
+  - **命名形状：escape，不是 hash，不是"检测冲突就报错"**。`artifactName` 现在把 `[a-z0-9_-]`
+    以外的每个字节 percent-escape（大写十六进制）。选 escape 的理由：它**信息论上就是 1:1**，
+    不依赖摘要抗碰撞；`TestArtifactNameRoundTripsToTheExactID` 里带一个测试自己的解码器，
+    26 个 id（含 `\x00`、`%2F`、`tool-output-x.txt`、尾随空格）逐个 decode 回原 id——
+    "注入"是被证明的，不是被打印出来的。**大写也 escape** 是票面没写但同一个缺陷的另一顶帽子：
+    artifacts 在 NTFS 上，NTFS 折叠大小写，留着 `PQ` 原样进名字就等于 `pq`/`PQ` 仍然同一个文件。
+    `.` 也 escape 顺带把票 76 在删除侧修的"尾部点别名"在写入侧一起堵了（名字里不再有字面点）。
+    超长的切在 escape 边界外 + 追 sha256(原始 id) 前 8 字节：不加上限的话 3 倍膨胀会把
+    Windows 255 字节组件上限撞穿，那是把"静默覆盖"换成"直接写失败"。空 id 的退例 token 从
+    `seq<N>` 改成 `seq.<N>`——字面点不在编码器值域里，所以退例名也不会再和某个字面 id 撞。
+  - **`writeFileExclusive` 现在是 `O_CREATE|O_EXCL`**，名字不再是谎话；写失败会删掉半截文件。
+    同 id 重试的行为**定死并测死**：`Prepare` 收到 `fs.ErrExist` 时按"同一个逻辑 id 的自己人"处理
+    （名字已经注入式， Occupied 只剩这一种解释），走 temp+rename 的 D31 原子替换，last-writer-wins，
+    不报错、不留 temp、重启后同 id 也算重试（`TestSpillAcrossRestartsKeepsRetrySemantics`）。
+  - **Defect 2 取 (a)**：`listArtifactsDir` 递归量游离子目录（WalkDir 用 Lstat，不跟符号链接），
+    配额把游离子树和规矩文件放进**同一条 LRU 队列**比 mtime，purge 也回收它。
+    移除只用 `os.Remove`（不自上而下递归删的 `RemoveAll`），先文件后目录、子先于父。
+    选 (a) 不选 (b) 的判决理由写在下一枚 commit 的正文里。
+  - **动了票 76 的字面量（如实报告，共 3 处）**：`spill_path_invariant_test.go` 4 个 `wantName`
+    （那 4 个字符串**就是**本票要消掉的折叠结果）+ 那个 seq 退例子测试（改名的同时把它**加强**成
+    "5 个 id 必须得 5 个名字"——旧代码里那 4 个 id 全折进 `tool-output-seq1.txt` 互相覆盖，
+    测试却在为这个结果鼓掌）；`artifacts_path_invariant_test.go` 的 (e) 段：
+    "nested 目录必须活过 purge" 按本票判据反了，改成"必须不活过"并把 removed 集合**逐个名字**钉死，
+    containment 从"只能是 artifacts 的直接子项"改成"artifacts 树内任意深度 + 集合相等"。
+    守卫拒绝的四形状、AST sink 审计、containment 差分、阳性对照**一条没动**，全绿。
+  - **新发现、本票不修**：(1) `os.OpenFile(..., 0o600)` 在 Windows 上是装饰——落盘是
+    `-rw-rw-rw-`，权限由目录 ACL 继承，所以 artifact 的"只有我可读"从来没成立过（旧代码同样）；
+    (2) 名字里现在可能有 `%`，`cmd.exe` 会展开 `%XX%` 形态——模型拿到的是 `fs.read` 路径不过 shell，
+    但任何"把 artifact 路径塞进 shell 命令"的新路由都要先想这条；(3) `tool-output-*.txt` 的 8.3 短名
+    在前 6 个字符就分叉，长文件名关闭短名时无关，开着则是同一个折叠类（票 20/18 的 junction 证据区）。
+  - AC#1/AC#2 勾上；**AC#3/AC#4 的变异检验和 AC#5 门禁还没跑 ⇒ 那三框仍空**。
+    `go test -count=1 ./internal/agent/ ./internal/memory/` = ok 1.683s / ok 12.971s。
+    **next=做 AC#3（把 `encodeArtifactID` 换回 strip，grep 证明落地，看 AC#1 变红，还原）和
+    AC#4（把 `if e.IsDir()` 的 `continue` 装回去，看我的游离子树用例变红，还原），然后跑 AC#5 三门禁 + RUN 计数不变式。**
