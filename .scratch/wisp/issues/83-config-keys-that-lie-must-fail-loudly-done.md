@@ -1,7 +1,17 @@
 # 83 — 配置里"看着能用、其实没接线"的键要**响亮地失败**（票 80 裁决 (C)；先例 `SPEC-03:42 verify_signature`）
 
-**Status:** 五框全闭、待对抗验收（AC#1 表在 L2 / 校验在 `internal/config/unwired.go` / 变异在 L3 / 不做的在 L4 / 门禁在 L4）。
-起点 HEAD `4b05be0`，本轮 commit：`6028977`(认领) → `a95ee3a`(守卫码+用例) → `4dec91b`(AC#1 表) → `e4a0fac`(L3/L4) → 本轮(L5 修自己带进 CI 的 emoji 哑弹)
+**Status:** **done**（编排者对抗验收 2026-09-21 14:3x）—— 五框全 PASS，裁决表
+`docs/evidence/s1/83-adversarial-acceptance.md`。我亲自复跑：包内门禁逐字对上
+（`go test -count=2 -v ./internal/config/` rc=0，`=== RUN 194 = 2 × 97`、`PASS 106`、`FAIL 0`、`SKIP 0`），
+并**自己下了一刀它没下过的变异**（把 `validate.go:30` 的 `validateUnwired(c),` 注释掉 ⇒
+`TestUnwiredSecurityKeysFailLoudly` 等 **4 条命名用例同时红**，还原后 `git diff --quiet` 干净）
+⇒ 判据真的咬得住，且"诚实配置不受影响""报错早于任何写盘"这两条不是装饰。
+五个交回问题的裁决（原文在裁决表末段）：`[net]` 两键**算扩面**、`[plugins]` 五键**登记不扩面**（归票 50）、
+两处冻结文件的限定语**我不代落**（只有 owner 能改 ⇒ 已转成 Q-27 的批语）、墙钟脆弱性**建票 86**、
+`ban #6` 与 `frontend/` 的豁免翻转**由我在建树同批做**（不许建目录的代理顺手改豁免文件）。
+起点 HEAD `4b05be0`，本轮 commit：`6028977`(认领) → `a95ee3a`(守卫码+用例) → `4dec91b`(AC#1 表) →
+`e4a0fac`(L3/L4) → `5ca30a7`(**它自己修掉自己带进 CI 的 emoji 哑弹**)
+
 **Type:** 安全可用性/诚实性（一个说谎的配置键）——**不是**新能力
 **Blocks:** nothing · **Blocked by:** nothing（`internal/config` 此刻无人写；票 80 已交回且零 Go 改动）
 **Packages:** `internal/config/`（校验与加载路径）+ 新建的用例。**禁改**：`docs/PLAN.md`、`docs/specs/*.md`

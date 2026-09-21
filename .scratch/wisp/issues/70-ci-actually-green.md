@@ -65,11 +65,25 @@
 - [ ] **AC#2 `test-core` 分诊**：在 **Linux** 上复现那 4 条（CI runner 就是 ubuntu-latest），
   逐条定性为「平台差 / 票 66 或 67 带出的回归 / 本就在坏的断言」。
   **禁止**为了让它绿而改断言或加 skip；平台差异要落成**显式 build tag 或平台专属期望值**，并说明为什么。
-- [ ] **AC#3 `test-windows` 的 placeholder 定性**：查清它是"待票 18/20 真实用例的占位"还是"真失败"。
-  若确为占位，**改成显式的 TODO 步骤且**在 PLAN/HANDOVER 里留痕（改法由我定，代理先给证据）。
+- [x] **AC#3 `test-windows` 的 placeholder 定性**：查清它是"待票 18/20 真实用例的占位"还是"真失败"。
+  **编排者判（A56⑤）：从来不是占位，是真失败**（根因＝票 72 的 A 表锚点走 8.3 短名那条），
+  修好后在 run `35558750456` 里**步骤级首次真绿** ⇒ "定性"这半已达成。
+  票面上那半句"若确为占位，改成显式 TODO 步骤"的**前提不成立** ⇒ 不改步骤语义；
+  但步骤名里遗留的 **"placeholder" 字样是过期信息**（会把后来人引向错误判断），
+  **改名字归票 85 AC#4**（`ci.yml` 由它一起改，避免两个人同改一个文件）。
+
 - [x] **AC#4 `slo-full` runner**：查 `Build wisp.exe` 在自托管 runner 上为何失败（deps 缓存？PATH？CGO？），
   交付**可复跑的修复步骤**或"此 runner 今天不可用"的明确结论 + 需要 owner 做什么。（**2026-09-21 闭**：因=runner 环境无 gcc，修=配置侧 `MINGW64_ROOT`（`98fa8ae`），**已由一次真 run 验证转绿**，见 Progress log 的 AC#4 条；owner 侧更干净的替代路（重启 Runner.Listener / 写 `.path`）仍挂着，未做。）
-- [ ] **AC#5 ban #1 覆盖洞（A26 剩余半）—— 按裁定 R16 执行，不要再问**：
+- [x] **AC#5 ban #1 覆盖洞（A26 剩余半）—— 按裁定 R16 执行，不要再问**：
+  **编排者勾框（A56⑤）。** 五条 R16 全部已落地（`3539d47` + `38b3715`：`cmd/balldebug` 三处具名 spawn
+  改走 `observe.Registry.Spawn`、ban #1 从 `go func(` 扩到 `go <任意>`、`allowlist.txt` 只多出
+  R16#1 唯一授权的那条文件级豁免），并且**首次拿到 CI 步骤级绿证**——run `35558750456` 的
+  `D22 scanner positive control` 与 `D22 seven-ban + emoji scan` 两步 **success**，
+  后者自报 `examined 204 production Go files`（我在 `git archive HEAD` 纯净树里逐字同形复跑过一遍，rc=0）。
+  ⚠ 代理当时**拒绝勾这框**的理由也如实保留：那时最新 HEAD 被一枚 `🔒`(U+1F512) 注释字形弄红
+  （票 83 的 `a95ee3a` 带入），它没有为了绿去动扫描器或豁免文件。**它拒的是当时的状态，不是判据本身**；
+  那枚哑弹已由票 83 自己修掉（`5ca30a7`）。
+
   匹配器 `tools/d22scan/main.go:251-252` 只对字面量 `go func(` 报警。我（编排者）逐条核过它说的"4 处具名协程"，
   **更正为 3 处要处理 + 1 处是机制本身**：`internal/observe/goroutine.go:281` 的 `go r.run(...)`
   **就是 Registry 的内部实现**，不是漏网；要改的是 `cmd/balldebug/main.go:231`（`runHotkeyBridge`）

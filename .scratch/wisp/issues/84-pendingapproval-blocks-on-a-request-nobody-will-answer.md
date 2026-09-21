@@ -1,6 +1,6 @@
 # 84 — 审批门"等一个永远不会来的决定"：`PendingApproval` 无对应待审批项时**阻塞到超时**而不是快速失败
 
-**Status:** open（**排队**：写码代理槽位已满，交回一张再派一张）
+**Status:** in-progress（写码代理已认领，正在跑 AC#1 两侧读数）
 **Type:** 可用性/正确性缺陷（可能是死等；生产链路会把工具调用挂住）
 **Blocks:** nothing（目前只在变异态下被逼出来）· **Blocked by:** nothing
 **Packages:** `internal/agent/approval/gate.go`（≈`:473`）与它的调用方 `internal/tools/bridge.go`（≈`:340`）。
@@ -66,4 +66,12 @@ commit 前核对 `git diff --cached --name-only`；禁 `--amend`/`reset`/`rebase
 
 ## Progress log（append-only）
 
-（空）
+- 2026-09-21 **认领 + 代码读数（checkpoint 1）**：读完 `internal/agent/approval/gate.go`（`PendingApproval`
+  在 `:432`，卡点 `:473`）、`internal/agent/approval/queue.go`、`internal/tools/bridge.go:340` 与
+  `docs/evidence/s1/75-linux-mutation-check.md` §4.3。**定性中间结论**：`PendingApproval` 不是"查一个已存在的
+  待审批项"，它自己 `q.push()` 登记再等；等的上界是 `g.clock.After(g.q.Timeout())`，
+  `Queue.Timeout()` 默认 `DefaultApprovalTimeout = 300 * time.Second`（`queue.go:92`，`NewQueue` 里
+  `timeout <= 0` 也会被兜回默认值 ⇒ 不存在"0 = 无限"这条路）。`ErrUnknownCorrelation`
+  （`internal/agent/approval/ui.go:124`）是**答复侧**（`Veto`/`q.allow`/`q.reject`）的具名错误，
+  这三条路径实测是**立即返回**的。⇒ 倾向 **(b) 有界等待**，票面"无上限挂死"的说法待 AC#1 两侧读数裁决后**照实改小**。
+  `next=` 先补 AC#1 的两侧读数（Windows 本机 + docker `golang:1.27` 的 `git archive` 仓外快照）。
