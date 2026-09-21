@@ -180,3 +180,29 @@ owner 2026-09-20 裁定：**现在插队修，不等 S3**。本票消化 registr
   修法方向不变（具名单表消 zip，不接受"保留 zip + 加断言"），**优先级改为与票 39 的第五热键同批**
   （那才是它真变静默的时刻）。变异检验预期**反转**：对调前两项**应当转红**；红=按文档性 MINOR 收尾，
   绿=我这层更正又错了、升回原严重度。**本票仍不改球码**（已 `review`，且段 2 归属未定）。
+- [2026-09-21T00:35Z] agent=orchestrator did=**闭 MINOR-1 + MINOR-2，AC#4 的"不被 skip"从"结构成立"升级为"有逐跑记录"**。
+  过程要如实记：**第 2 个代理（`agent-ticket64-winline`，08:29 起跑）其实把测试跑完了**，
+  归档了 `run1.log`（291 行）/`results-pass{1,2}.txt`/`table-body.txt`（58 行逐条表），
+  **死在"把数字写进票面"这一步之前**（第 3 次尝试，平台连接中断，24 次调用）。
+  我 08:33 在**同一台机、同一棵树、`tasklist` 确认无 `go.exe`/wisp/balldebug 进程**下
+  **逐字同命令自跑第二次**：`go test -tags winlive -count=2 -v ./internal/ball/` → **`REAL_EXIT=0`**。
+  计数（我自己 grep 日志、不是抄代理）：`=== RUN` **128** = **58 个不同测试 × 2**；顶层 `--- PASS` **116**
+  + 缩进子测试 **12** = 128 **一条不落**；`--- SKIP` **0**、字符串 `SKIP` 全文出现 **0 次**
+  ⇒ 包里那 8 处 `SKIP-LOUD` 分支一条都没走；末行 `ok ... 24.494s`。run1 形状相同（23.795s）。
+  **交互四项逐条真名（两次都 PASS×2、无 SKIP）**：`TestLiveClickSummonsAndDragDoesNot`、
+  `TestLiveConfirmingCancelAndEscReturned`、`TestLiveNeverStealsFocus`、`TestLiveTransparentCornerFallsThrough`；
+  另 winlive 组 `TestLiveHotkeyRebindEndToEnd`/`TestLiveMuteHotkeyEndToEnd`/
+  `TestLiveHotkeyOccupiedVsNotAttempted`/`TestLiveSleepingZeroTimerHandles`/
+  `TestBallLive{EdgeDock,EdgeDockHover,Lifecycle,PositionPersistence,IdleBorderTransition,AudioLiquidGate}` 全 PASS。
+  ⇒ **退回条件未触发**，`:51` 那框保持已勾，且现在有纸面逐跑支撑。证据目录
+  `docs/evidence/s1/64-winline-retest-2026-09-21/`（含 `RESULTS.md` 判定全文）。
+  **两个连带结论**：①`TestLiveSleepingZeroTimerHandles` 真跑过两遍 ⇒ 票 07 第 4 框那句
+  "断言存在但藏在 `-tags winlive` 后面、今天是否真执行未证"**已被这次回答**（票 07 那框我仍不代勾，
+  理由写在那张票上）；②`A29⑥` 那颗地雷**这次没炸**：`TestBallLiveAudioLiquidGate` 两次都在
+  "环境默认 `prototypeVisuals=false`"下自称 frozen 通过，也就是说**它现在测的确实是 frozen**——
+  地雷仍在（翻默认值时才会炸），票 68 AC#2 改默认值时必须同批改它。
+  **仍未勾的三框如实留着**：`:44`（改 `[hotkey]` 后端到端重注册——`TestLiveHotkeyRebindEndToEnd` 这次 PASS 了，
+  但那句"旧键不再响应"我**还没读测试体确认它被断言**，读之前不勾）、`:48`（默认键文档半）、
+  `:62`（多显示器真拖：本机无第二屏，按票面规则**保持未勾**）。
+  next=**A16 变异检验**（桌面与测试窗此刻真空着，这已是登记里的"第一件事"）→ 读 `:44` 的测试体再定那框。
+

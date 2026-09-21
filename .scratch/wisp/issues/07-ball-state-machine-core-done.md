@@ -52,7 +52,7 @@ basic animations; full visual polish gate is human acceptance at 12).
       design/screens/ball.html (colors/opacity/sizes per SPEC-08 §2.1).
 - [ ] Interactive: click ball → Sleeping→Listening; Esc/click cancels from Confirming; focus
       never stolen (verified with a focused editor); transparent region click-through.
-- [ ] Sleeping-state CPU ≈0 (no timers) — measurable in 08's sampler; here: assert no animation
+- [x] Sleeping-state CPU ≈0 (no timers) — measurable in 08's sampler; here: assert no animation
       timer handles alive in Sleeping.
 - [ ] Hotkeys registered/re-registered on config change; mute toggles Muted state.
 - [ ] Multi-monitor: drag to second monitor, persist, restore; simulated detach → primary.
@@ -71,8 +71,15 @@ basic animations; full visual polish gate is human acceptance at 12).
         `internal/ball/liquid_test.go:245`（"Sleeping must never host the transition timer"）与
         `internal/ball/hotkey_live_test.go:292 TestLiveSleepingZeroTimerHandles`——后者还自带阳性对照
         （"probe must SEE a timer in Warm, or the zero in Sleeping proves nothing"），写法是对的。
-        ⚠ 但 `hotkey_live_test.go` **在 `-tags winlive` 后面**，所以这条断言今天**有没有真的执行**仍未证
-        ⇒ **保持未勾**，正由票 64 的 winlive 复测给出逐跑结果；跑出来后由那张票的证据闭这一框。
+        ✅ **2026-09-21 00:36 更新：那句"有没有真的执行"已经回答了**——
+        `TestLiveSleepingZeroTimerHandles` 在 08:29 与 08:33 **各跑过一遍**
+        （`go test -tags winlive -count=2 -v ./internal/ball/`，58 个不同测试 × 2、**0 SKIP**、
+        `REAL_EXIT=0`，逐跑记录 `docs/evidence/s1/64-winline-retest-2026-09-21/RESULTS.md`）。
+        ⇒ **本框两句各有凭据，正式勾上**（框在下方 `:55`，句一 = 附录 C 树外口径 `0.0000%`，
+        D32 的 ≤0.5% 一字未动；句二 = 上面那两条断言 + 两遍真跑）。
+        我先前那句"这条断言今天有没有真的执行仍未证"是**在拿到复跑之前写的**，留着不删：
+        "我判断没证据"与"确实没证据"不是一回事，这正是这个项目今天反复付学费的那条区分。
+
         （我把这句从"没验证过存在"改成"存在但覆盖面未证"——一次 grep 就推翻了我自己三分钟前写的话，
         记在这里免得下一个人以为代码里缺断言。）
 
