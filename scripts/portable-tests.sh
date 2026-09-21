@@ -101,6 +101,17 @@ fi
 #   windows test-windows' portable step.
 #   cli     cmd/wisp, whose test binary needs the sherpa DLLs (ticket 98's load
 #           hole) - run by scripts/wisp-cli-tests.sh, which stages them first.
+#
+# ./internal/winsec/ joined the core list for ticket 111 AC#9: the ubuntu leg ran
+# 16 globs that never named it, so the whole `!windows` half of the package that
+# decides whether a path really gets an ACL had ZERO CI regression protection -
+# ticket 113's linking leg (winsec_other.go) existed only in a laptop Docker run.
+# Measured on the clean 8fe5c7c snapshot inside a real ubuntu container:
+# === RUN=35 / PASS=20 / FAIL=0 / SKIP=0, rc=0, and winsec printed its own
+# top-level result line. That is a POSIX denominator of 20 assertions, not a
+# compile-only claim - `GOOS=linux go vet` cannot produce either number.
+# The windows half stays where ticket 110 put it (its own step, own guards); the
+# two legs now cover different files of the same package, which is the point.
 mode=core
 case "${1-}" in
     --scope=*) mode=${1#--scope=}; shift ;;
@@ -135,6 +146,7 @@ github.com/CarlosShao/wisp/internal/risk
 github.com/CarlosShao/wisp/internal/secret
 github.com/CarlosShao/wisp/internal/statemachine
 github.com/CarlosShao/wisp/internal/tools
+github.com/CarlosShao/wisp/internal/winsec
 '
 win_pin='
 github.com/CarlosShao/wisp/cmd/llmrecord
@@ -165,7 +177,7 @@ core)
         ./internal/tools/... ./internal/models/...
         ./internal/buildinfo/... ./internal/audio/... ./internal/proc/...
         ./internal/panel/... ./internal/ball/ ./internal/perm/
-        ./internal/plugin/ ./cmd/llmrecord/
+        ./internal/plugin/ ./cmd/llmrecord/ ./internal/winsec/
     )
     pinned=$core_pin
     ;;
@@ -313,6 +325,7 @@ ledger=(
     "TestRealDownloadPuncArchiveThroughPipeline|./internal/models/|any|opt-in|real-network spot check gated by WISP_IT_REAL_MIRROR=1 (manifest_real_test.go:147); same reason as the VAD row"
     "TestSyncRegistryProbeLive|./internal/risk/|windows|fixture|P12 live registry evidence; on ubuntu it is now out of scope by platform instead of by skip (ticket 93 AC#2 moved it verbatim into syncdirs_windows_test.go), and on a Windows host whose HKCU Accounts key carries no UserFolder the hive has nothing to say. Measured on a windows host at HEAD 84e43af: --- SKIP at syncdirs_windows_test.go:133. As of ticket 110 AC#4 the windows leg carries ./internal/risk/ in its scope, so this row is re-verified against the compiled WINDOWS test binary (go test -list) and printed with its reason in that step's log - which is the step-level answer R-93-4 asked for. Remedy for a real run: a host with a sync record, or fold the shape check into the fixture-driven case. next= on ticket 93"
     "TestC26RewrittenSyncRootDoesNotDisarmSuspectNet|./internal/risk/|linux|fixture|needs a handle-resolved form of an existing directory, which POSIX has no object for (pathresolver_rewrite_account_test.go:138). AC#2's remedy is a platform-layer move, impossible from this ticket: the file matches this ticket's forbidden pattern internal/risk/pathresolver*.go. The case RUNS AND PASSES on windows, so the assertion is not lost, it is only un-evaluable here. next= an owner for that file"
+    "TestWorkspaceSwitchRefusesAJunctionToOutside|./internal/tools/|linux|fixture|ticket111 AC#10. The case is AC#3(ii) with a REAL junction: on windows it builds one with cmd /c mklink /J and asserts the switch is refused (runs and passes here). On POSIX there is nothing to refuse, because the detection it exercises is itself a Windows implementation - internal/tools/paths_workspace_test.go:198 skips with 'C26's reparse detection is a Windows implementation (risk.pathresolver_other.go reparseComponents returns nil elsewhere); nothing to deny on linux'. Registered rather than deleted because the file's own comment promises 'the skip is reported, never averaged away', and runtests.sh making every SKIP fatal is what turns that promise into a red step: an unaccounted skip on the ubuntu leg (test-core step 7, measured PASS=578 FAIL=0 SKIP=1 on run 35599458439) is exactly what this row exists to name. OWNER of the POSIX half: whoever lands reparseComponents in risk.pathresolver_other.go - that file is forbidden to this ticket (internal/risk/pathresolver*.go, same wall as the row above), so the POSIX-equivalent criterion is NOT faked here. The row is re-verified against the compiled LINUX test binary on every run: delete the skip, and the case starts running here; delete the case, and GUARD's staleness check goes red."
     "TestD34WriteMatrix|./internal/tools/|linux|fixture|the table needs a second volume from otherVolumeDir (fs_write_test.go:140/151), and the volume-identity call it uses is a Windows API - on POSIX there is no object to ask. In a CI ubuntu container /tmp and / are one filesystem anyway. It RUNS AND PASSES on a two-volume windows host, so if a windows host ever has a single volume this entry does not cover it and the step goes red on purpose"
     "TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop|./internal/tools/|linux|fixture|same otherVolumeDir requirement as the write matrix row above (fs_write_test.go:677); on POSIX there is no volume identity to compare, so the case has no subject. Runs and passes on a two-volume windows host"
 )
@@ -456,8 +469,8 @@ while IFS= read -r pkg; do
         missing=$((missing + 1))
     else
         case $line in
-        ok*) per_pkg["$pkg"]="ok (ran)" ;;
-        *) per_pkg["$pkg"]="FAIL (ran, and said so)" ;;
+        ok*) per_pkg["$pkg"]="ok (own line)" ;;
+        *) per_pkg["$pkg"]="FAIL (own line)" ;;
         esac
     fi
     printf 'portable-tests.sh:   %-14s %s\n' "${per_pkg[$pkg]}" "$pkg"
