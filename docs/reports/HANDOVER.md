@@ -82,6 +82,60 @@
 
 ## 4. 在途状态（**2026-09-21 09:38 版，取代下面 23:5x 版**；旧版整段保留在文末供追溯）
 
+## 4.0b 停车点（**2026-09-21 13:3x 版；新会话从这一节起读，别从 09:38/10:18 那两节读**）
+
+**数字一律用命令取，别信这句话**：`ls .scratch/wisp/issues/*-done.md | wc -l` → 13:2x 实测 **26**。
+`git log --oneline -1`、`git status --porcelain`、`gh run list --branch dev -L 3` 三条各取一次现状。
+
+**今天这一天真正换来的三件结构性事实（比任何一张票都值钱）**
+1. **CI 第一次有 3 个 job 同时绿**：run `35558750456`（headSha `17efc2c`）=
+   `test-windows` / `slo-smoke` / `slo-full` **success**，`test-core` / `lint` **failure**。
+   ⇒ "CI 从来没绿过"（A27）要改口径成"**从未整体绿过，但这 3 个已有真结论**"。
+   `test-core` 的红 **47 → 10 条**，10 条全部归族完毕（8 条 = POSIX 上 sync-root 探测未实现 ⇒ 票 55/票 82；
+   2 条 = 判据夹具自己是 Windows 形状 ⇒ 票 81）。见 **A52**。
+2. **D22 安全扫描第一次真在 CI 上产出结论**（run `35558750456` 的 `lint` job：positive control 步
+   `TestScanDetectsAllSeededViolations` PASS ⇒ 紧接着的 seven-ban + emoji scan = **success**，
+   且自报覆盖面 `internal/=303` Go files / `cmd/=24` / `design/=16`，末行 `clean`）。
+   A26/A44① 那句"该门自 `fd8f838` 起从未产出过一个结论"**关闭**。见 **A54**。
+3. **`frontend/` 不存在 ⇒ `ban #6` 至今 0 覆盖**（扫描器明写 `[NOT COVERED]`，不假绿）。
+   票 77 建目录的**同一批**必须武装 ban #6/#8（R18 已记）。
+
+**此刻在飞（截至本停车点，未收到完成通知）**
+- `agent-ticket70-d` — 票 70：AC#1 尾巴（全仓 `gofumpt -l . tools/d22scan tools/mockllm` 现在只剩
+  `internal/risk/provenance_syncdirs_windows_test.go`）、Linux 重新分诊、AC#6 逐 job 逐步骤、
+  D22 positive control 那个 ⚠ 字形（它上任时发现已在 `a8ae9ad` 被清掉）。**别和它抢 CI 配置与 `internal/risk` 的格式化。**
+- `agent-ticket81` — 票 81：`internal/agent` + `internal/memory` 那两条 Windows 形状夹具（已有 commit `522efec`）。
+  **判据里禁止用 `//go:build windows` 把它们变成"Linux 上静默不跑"。**
+- `agent-ticket83` — 票 83：把"被解析、零消费者"的配置键改成**加载时响亮报错**（选项 C，见 A53②）。
+  ⚠ 它**不许**去接 `risk.Gate`（那是新造放行侧能力 = 票 21 + D22）。
+- `verify75` — 只读复现：Linux 基线 + **把 `normalizeLocalUNC` 的守卫退回无条件折叠**看 POSIX 用例是否真变红。
+  它在**渐进写** `docs/evidence/s1/75-independent-verification.md`（第 1 组已完成且质量高：
+  `internal/tools` Linux **0 FAIL / ok 9.671s**、`internal/risk` 残留 8 条逐条归族、3 条 SKIP 点名）⇒
+  **接续的人别重做第 1 组**，先看那个文件的最后一组写到哪。
+
+**票 75 现状**：AC#4 已用 R17 关闭（修实现符合已冻结契约 ≠ 改契约；如实记了一次次序偏离——那框字面要求"别改、交提案"）。
+只剩 AC#6 等 `verify75` + 下一次 run。**票 79 / 78 我已独立验收**（裁决表
+`docs/evidence/s1/79-adversarial-acceptance.md`、`75-independent-verification.md`）。
+**票 80 以"零码裁决"结案**：它推翻了编排者 A51⑤ 的定性（真相是 `risk.Gate` 生产零调用点，不是"一根线忘了接"）。
+
+**排队中（有票面、无人写）**：**票 82**（POSIX sync 分层，判据已写死"不许整族打包贴 tag"）；
+票 71 剩 3 框；票 72 的 AC#4 要一次 runner 证据；`TestResolvePerCallBudget` 墙钟抖动（**A53④**，单独一票，
+**现在不许把 1ms 调大**）；artifact 的 Windows ACL（**A51①②**，含 `secrets\`/`staging\`/`wisp.db` 待查）。
+
+**blocked-on-owner（只剩两件真需要他）**
+1. **票 77（前端）等他从 react-bits 里挑组件**——beautifului 那 21 个 agent 组件已判定"照单全收、不用挑"（A47）。
+2. **Q-26 / Q-27 两句冻结文件里的限定语**（artifact 文件名是 id 的百分号转义；`blacklist_overrides` 键表标"尚未生效"）。
+   **代码侧的改动都不需要他**，只有"动 `docs/PLAN.md` / `docs/specs/*.md` 那几行字"才需要（D22）。
+
+**今天新长出来的规矩（接续的人会被这些判，别再付一次学费）**
+- **A52⑤**：`git mv` 之后再改票面，改动留在**未 staged** 一侧 ⇒ 归档 = 改名 + 改状态 + 暂存三件事，
+  核对 `git diff --cached --name-status` 那行是 `R0xx` 而不是 `R100`。
+- **A54③**：Windows 主机上 `GOOS=linux go vet ./...` **永远 rc=1**（CGO_ENABLED=0 把 sherpa 的 linux
+  预编译包整个排除），与被审对象无关 ⇒ 判据仪器要么与 CI 逐字同形（同一台 ubuntu、同 CGO），要么按包作用域跑。
+- **A53③ 通用判据**：凡是"被解析、被审计，但零消费者"的配置键，要么响亮失败，要么在键表里明写"由票 N 实现"，
+  **不许静默接受**。
+
+
 ### 4.0 停车点（2026-09-21 10:18，编排者会话turn预算耗尽时留下；**新会话从这一节起，别从上面那节读**）
 
 **数字用命令取，别信这句话**：`ls .scratch/wisp/issues/*-done.md | wc -l` → 10:17 实测 **22**。
