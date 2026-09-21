@@ -62,10 +62,10 @@ func logf(format string, args ...any) {
 // "Best effort" since ticket 72 means "the same handle pipeline": the input is
 // expanded again (formsOf below) and so is every anchor, because a spelling
 // the resolver never saw (a short-form USERPROFILE, say) must not be able to
-// move a path out of A. The added forms only ever turn a miss into a deny;
-// Gate's B-tier override matches them too, which is the same-file question
-// asked the other way round — the confirmation was for a file, not for one
-// spelling of it.
+// move a path out of A. The extra forms only ever turn a miss into a deny:
+// the ALLOW side is deliberately narrower (see overrideApplies), because the
+// basis for letting something through has to be the one spelling the OS vouches
+// for, not any string that happens to look like it.
 func Classify(canonical string) Class {
 	c, _ := classifyWith(canonical)
 	return c
@@ -94,19 +94,35 @@ func Gate(canonical string, bOverrides map[string]bool) PathDecision {
 }
 
 // overrideApplies reports whether the operator confirmed this exact file.
-// Every comparison form of the path is checked, so a B grant recorded under
-// the handle-resolved spelling still covers the caller's own spelling of the
-// same file (and vice versa) — it is the same file either way.
+//
+// Deliberately NARROWER than the deny side (编排者插单 2026-09-21 10:08, and
+// the same asymmetry R17 asks for): classification walks every comparison
+// form because a miss there silently downgrades A to B, but an override is an
+// ALLOW, and an allow must rest on the one form the OS vouches for. Two
+// consequences, both intentional:
+//
+//   - the incoming path must already BE the handle-resolved spelling. A caller
+//     that hands in a spelling with a second form (an 8.3 short name, which on
+//     a busy volume can alias a DIFFERENT directory, a junction, a \\?\ or UNC
+//     variant) is asked to confirm again rather than waved through;
+//   - the key must equal that resolved form, so a confirmation recorded for a
+//     non-canonical string never unlocks the real file behind it either.
+//
+// When nothing on the path can be opened (a platform whose resolver is still
+// DEFERRED, or a dead volume) there is exactly one form and no evidence of a
+// second one, so the lookup falls back to it — that is the pre-ticket-72
+// behavior, not a widening.
 func overrideApplies(cand pathForms, bOverrides map[string]bool) bool {
 	if len(bOverrides) == 0 {
 		return false
 	}
-	for _, s := range cand.spellings() {
-		if s != "" && bOverrides[s] {
-			return true
-		}
+	if cand.real == "" {
+		return cand.raw != "" && bOverrides[cand.raw]
 	}
-	return false
+	if cand.raw != cand.real {
+		return false // spelled differently from its own real path: confirm again
+	}
+	return bOverrides[cand.real]
 }
 
 // normPath folds a path into the comparison form: forward slashes unified,

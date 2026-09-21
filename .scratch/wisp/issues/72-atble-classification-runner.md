@@ -1,8 +1,8 @@
 # 72 — A 表（受保护路径）在 CI runner 上退化成 B 表：C26 的纵深防御真破了一格
 
-**Status:** in progress（R17 已解除 D22 闸门 ⇒ 直接改实现）
-**Claimed by:** implementer（票 72 代理，2026-09-21 10:05 接手；根因已由票 70 的 run 35547905707 诊断输出提供）
-**Last update:** 2026-09-21 10:05（implementer 认领；R17 见票尾）
+**Status:** review（修复与用例已入库 `f1033e1` + 插单回执 commit；AC#1/#2/#3/#5 本机可证已勾，**AC#4 的 runner 半边与 AC#6 的改名都不在代理手里**）
+**Claimed by:** implementer（票 72 代理，2026-09-21 10:05 接手；根因已由票 70 的 run 35549859581 诊断输出提供）
+**Last update:** 2026-09-21 11:00（implementer：执行 10:08 插单，放行侧改窄 + round-3 变异）
 **Blocked by:** —（与票 70 共享同一条测试，但**修的是实现不是 CI**；票 70 只负责"这条 CI 变绿"）
 **Parallel slots:** ≤1 sub-agent（碰 `internal/risk/`，那里是**冻结契约**，见"硬约束"）
 **Spec refs:** C26 PathResolver、SPEC-06 §4 解析管线、D22（契约变更需人批）、票 18 的红队四连
@@ -78,13 +78,24 @@ A 表（`blacklist.go:132` 的 `~/.ssh/**` 之类）语义是**不可放行的�
       **框不勾**：runner 侧要 push 才有一次真 run，而本票明写"绝不 push" ⇒ 交编排者跑。
 - [x] **AC#5 不放宽任何断言**：`ClassA` 的期望值、A/B 表内容、豁免语义（只按精确路径）
       一律不许改；若证据表明**必须**改契约，**停下来上报编排者**（D22）。
-      **取证仪器一字未动**：`internal/risk/pathresolver_junction_windows_test.go` 不在本票任何一个 commit 的 diff 里
-      （`git diff cada033..HEAD --name-only` 不含它），没加 `t.Skip`、没加 build tag、锚点拼写没"对齐"、期望值仍是 `ClassA`。
+      **取证仪器一字未动**，判据是逐字比对而不是"我觉得没改"：
+      `git diff --quiet a04d3e2 HEAD -- internal/risk/pathresolver_junction_windows_test.go` **rc=0**
+      （和票 18 那版逐字节相同），没加 `t.Skip`、没加 build tag、锚点拼写没"对齐"、期望值仍是 `ClassA`。
       A/B 表内容与规则字符串逐字保留（只把"拿字面锚点比"换成"拿展开锚点比"）；
       `ErrReparseDenied` 与 `reparse_point_exceptions` 的"只按精确路径"语义零改动。
-      **一处如实报备**：`Gate` 的 B 档单文件豁免查表从"只比 caller 给的拼写"改成"比该路径的全部拼写形"——
-      同文件不同拼写时确认仍然生效（否则修复会把用户已经确认过的文件重新卡在门外），
-      方向是"多问一次"而不是"多放一次"，A 档仍不可豁免。若编排者判定这算放宽，指一句我收回去。
+      **两侧规则现在刻意不对称（按编排者插单 10:08 改，理由写在 `overrideApplies` 的注释里）**：
+      判定（deny）侧遍历全部比较形（漏一次就是把 A 降成 B，方向是"多问"）；
+      **批准（override / 放行）侧只认唯一已解析形**——caller 给的拼写必须**就是**句柄真实拼写，
+      且 key 等于它，才放行；带第二种拼写进来的（8.3 短名可能别名到**另一个目录**、junction、`\\?\`、UNC）一律再点一次确认。
+      钉这条不对称的用例 = `TestOverrideOnlyAcceptsTheResolvedForm`（四条断言，含对照组防"什么都不放"）；
+      它的变异"把放行侧改回遍历全部形式"→ 断言 (1)(2) 转红，报的正是
+      `Allow:true ... B-list single-file override`。
+      我没有走第 4 条反驳通道：`TestCanonicalInputGainsNoSecondForm` 只证明"**Resolve 交回的**路径恒一种形"，
+      而 `Gate`/`Classify` 是导出 API，caller 可以递进任何拼写 ⇒ "恒为 1"不成立，窄规则是对的。
+      插单前我在 AC#5 写的那段"豁免查表改成全部拼写形"**作废**，那正是被指出来的放宽。
+      **改动的爆炸半径也被钉住了**：`TestCanonicalInputGainsNoSecondForm` 断言
+      "已经是句柄拼写的输入（= Resolve 交给每个生产 caller 的东西）只产一种比较形且 `certain()`"，
+      也就是"对没有第二种拼写的路径，本票一个字都不改变判定"这句话现在是可跑的，不是口头承诺。
 - [ ] **AC#6 顺带把票 70 的 AC#3 闭掉**：本票的修复就是那条 CI 步骤转绿的因；
       修好后在票 70 的 log 里补一行指回本票，并把"步骤名陈旧"这件事改成非误导性命名（改名不算放宽门）。
       前半done：票 70 log 已补指回本票的一行。**后半没做，因为 `.github/workflows/ci.yml` 是票 71 在途的文件**（共树禁改清单）；
@@ -131,6 +142,37 @@ A 表（`blacklist.go:132` 的 `~/.ssh/**` 之类）语义是**不可放行的�
   退回变异后 `git diff --quiet -- internal/risk` rc=0。门：`gofmt -l internal/risk` 空、`go vet ./internal/risk/...` rc=0、
   `go test ./internal/risk/... -count=2` rc=0、`GOOS=linux go vet ./internal/risk/` rc=0（跨平台不炸）。
   next=AC#4 等编排者 push 后的一次真 run（`test-windows`）；AC#6 的步骤改名因 `ci.yml` 属票 71 而未做，建议名已写进票 70 log。
+- [2026-09-21T10:40Z] agent=agent-ticket72 did=**AC#3 变异检验在"修复已入库"的状态下重跑一遍（round 2），并补上钉爆炸半径的第五条用例**。
+  变异（`formsOf` 退回只交 raw 拼写）后同一命令 `-run 'TestClassify…|TestPathResolver|TestAList|TestBList|TestResolve|TestReparse'`：
+  **RUN=15 / PASS=12 / FAIL=3 / SKIP=0**，红的正是 `TestClassifyAnchorSpellingIsNotVerdict`、
+  `TestClassifySpellingInvariance`、`TestClassifyFailClosedWhenSpellingUnprovable`；
+  撤掉变异后 `git diff --quiet -- internal/risk` **rc=0**、`git status --short -- internal/risk` 空，
+  重跑 **RUN=15 / PASS=15 / FAIL=0 / SKIP=0**。
+  新增 `TestCanonicalInputGainsNoSecondForm`：Resolve 交回的 canonical 只产**一种**比较形且 `certain()==true`
+  ⇒ "对本来只有一种拼写的路径，本票不改变任何判定"这句话现在有用例守着。
+  顺手做了消费者侧的礼貌检查（不是我的包，只读数）：`go test ./internal/tools/ -run 'Path|Sensit|Classif|Gate|Approv'` ok。
+  next=交回编排者：AC#4 的 runner 半边等一次 push 后的 `test-windows`；AC#6 的改名等 `ci.yml`（票 71）落地，建议名已给。
+- [2026-09-21T10:52Z] agent=agent-ticket72 did=**把"本票把 C26 的 1ms 预算跑坏了"这句嫌疑排除掉，并登记一条对别人有用的观测**。
+  `-count=1 -v` 全量在编队嘈杂时偶发只红 `TestResolvePerCallBudget`（墙钟预算，`!race` 编译）。同一分钟内做 A/B：
+  **本票的树 0.803 ms/op 过**，**HEAD 纯净树（`git archive HEAD` 解到 /tmp/wisp-head72，不含本票任何改动）1.012 ms/op 红**。
+  反向样本也有：更早一轮 HEAD 0.515 过 / 本票 0.455 过；再早一轮本票 1.562 红 / HEAD 同条件过。
+  ⇒ 判定：**这台共享机器上墙钟预算的抖动，不是本票引入的**（本票 diff 没碰 `Resolve` 的代码路径，
+  `resolveHandle` 的调用数一字未改，`Resolve` 也不调 `formsOf`）。
+  登记给票 70/71 的"门要能自报"族：墙钟 + 共树编队 ⇒ 这道门自带抖动，红的时候要先做纯净树 A/B 再定罪。
+  **我不动它**（改判据=放宽门，不是本票的活）。
+  最终门（编队相对安静的一轮）：`gofmt -l internal/risk` 空、`go vet ./internal/risk/...` rc=0、
+  `GOOS=linux go vet ./internal/risk/...` rc=0、`go test ./internal/risk/... -count=2` rc=0。
+  next=只剩 AC#4 的 runner 半边与 AC#6 的改名，两件都在编排者手里（push / `ci.yml` 归票 71）。
+- [2026-09-21T11:00Z] agent=agent-ticket72 did=**执行编排者 10:08 插单：把"放行侧"改窄，并给两侧规则的不对称补上用例与变异**。
+  我 10:25 那版 `overrideApplies` 确实是"遍历全部拼写形"，插单指出的放宽成立 ⇒ 已改：
+  现在只认 `cand.real`，且要求 `cand.raw == cand.real`（caller 递进来的就必须是句柄真实拼写）；
+  `real == ""`（拿不出句柄真值的平台/死卷）退回唯一可用形 = 票 72 之前的行为，不是新增放宽。
+  新增 `TestOverrideOnlyAcceptsTheResolvedForm`（junction 造出"一文件两拼写"，四条断言含"规范+规范⇒放"的对照组）。
+  **round 3 变异**：把 `overrideApplies` 改回遍历全部形式 ⇒ 该用例断言 (1)(2) 转红，
+  打印的就是被禁的那句 `{Allow:true NeedL2:false Class:B Reason:B-list single-file override … id_*}`；
+  撤变异后 `git diff --quiet -- internal/risk` 只看本次改动前状态（见下条 commit 后的复核）。
+  同一轮补的 `TestCanonicalInputGainsNoSecondForm` 从"反驳通道"降级成"爆炸半径证明"（AC#5 已改写）。
+  next=最终门跑完后 commit；之后本票代理侧无未做项，只剩 AC#4 runner 半边与 AC#6 改名在编排者手里。
 - 2026-09-21 09:10 编排者建票。**为什么单开一张**：票 70 的代理在 `a04d3e2` 里明确写了
   "这条按真缺陷登记、够格单开一张票"，而它自己撞 turn 上限死了；把一个安全分类失效留在
   "让 CI 变绿"那张票里，很容易被下一个代理用"改断言/加 skip"的最短路径解决掉——那正是本项目最贵的一类错。
@@ -189,3 +231,18 @@ A 表判定**遍历所有拼写形式**，任一命中即判 A ⇒ 这是从严�
 4. 若你判断我这条错了（例如 C26 已保证 `canonical` 只可能是句柄真实路径，因而 override 侧的
    多形式**永远只有一个元素**），**就用证据说服我**：给出那个保证在哪个 file:line、
    以及一条能证明"多形式集合在 canonical 上恒为 1"的用例。**别静默保留。**
+
+**逐条回执（implementer，10:58，未走反驳通道）**：
+1. 保持现状 — `classifyForms` 的 A 侧仍是 `aEq`/`aUnder` 多形遍历（`internal/risk/blacklist.go`）。
+2. 已改 — `overrideApplies` 现在只认唯一已解析形：`cand.real != "" && cand.raw == cand.real && bOverrides[cand.real]`；
+   `real == ""`（该平台/该卷拿不出句柄真值）时退回唯一可用形，即票 72 之前的行为，不是放宽。
+   **两侧规则不同的原因**（按你要求写进票面与代码注释）：判定侧漏一次 = A 静默降 B（放行风险由别人承担），
+   批准侧多放一次 = 8.3 别名到另一个目录时放过同名文件；所以**拒绝可以宽，放行必须窄**，宁可让人多点一次。
+3. 已补 — `TestOverrideOnlyAcceptsTheResolvedForm` 四条断言：非规范拼写 + 规范 override ⇒ 不放；
+   非规范拼写 + 记在非规范形上的 override ⇒ 不放；规范路径 + 非规范 override ⇒ 不放；规范 + 规范 ⇒ 放（对照组）。
+   变异"改回遍历全部形式"实测转红：`Allow:true … B-list single-file override`（断言 1 与 2 同时红）。
+4. 不采用 — 我确实补了 `TestCanonicalInputGainsNoSecondForm`，但它只覆盖"Resolve 交回的路径恒一种形"；
+   `Classify`/`Gate` 是导出 API，caller 能递进任何拼写（实测 `grep -rn "\bGate(" --include=*.go internal/ cmd/`
+   的非测试命中只有 `blacklist.go:76` 它自己的定义 ⇒ 今天还没有生产 caller 传 override 表；
+   `Classify` 侧的生产 caller 是 `internal/tools/paths.go:131`，它传的是 `Resolve` 的 canonical），所以"恒为 1"不是可依赖的前提。
+

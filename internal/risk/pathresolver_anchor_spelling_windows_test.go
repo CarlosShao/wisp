@@ -116,6 +116,87 @@ func TestClassifySpellingInvariance(t *testing.T) {
 	}
 }
 
+// TestCanonicalInputGainsNoSecondForm bounds the blast radius of ticket 72:
+// for a path that already IS the handle's spelling (which is what Resolve
+// hands to every production caller), formsOf must produce exactly one
+// comparison form and call it certain. That is the precise statement of "this
+// fix does not change the verdict for a path that has no second spelling";
+// the tests above cover the other half.
+func TestCanonicalInputGainsNoSecondForm(t *testing.T) {
+	home := tmpHome(t)
+	for _, p := range []string{
+		filepath.Join(home, ".ssh", "id_testkey"),
+		filepath.Join(home, ".git-credentials"),
+		filepath.Join(home, "plain.txt"),
+		home,
+		filepath.Join(home, "not-created-yet", "deep.txt"),
+	} {
+		res, err := Resolve(p, nil)
+		if err != nil {
+			t.Fatalf("Resolve(%q): %v", p, err)
+		}
+		f := formsOf(res.Canonical)
+		if got := len(f.spellings()); got != 1 {
+			t.Errorf("canonical %q produced %d comparison forms %q, want 1 (verdict must not move for a path with one spelling)", res.Canonical, got, f.spellings())
+		}
+		if !f.certain() {
+			t.Errorf("canonical %q is not certain: root=%q real=%q partial=%v", res.Canonical, f.root, f.real, f.partial)
+		}
+	}
+}
+
+// TestOverrideOnlyAcceptsTheResolvedForm pins the asymmetry the deny side does
+// NOT share (编排者插单 2026-09-21 10:08): classification may walk every
+// spelling because a miss there downgrades A to B, but a B-tier single-file
+// override is an ALLOW and may only be satisfied by the one form the OS
+// vouches for. The alias here is a junction, i.e. exactly the "one spelling,
+// two files" shape an 8.3 short name can take on a busy volume.
+//
+// Its mutation ("let the override walk all forms again") must go red on the
+// first assertion below.
+func TestOverrideOnlyAcceptsTheResolvedForm(t *testing.T) {
+	root := t.TempDir()
+	profile := filepath.Join(root, "profile")
+	alias := filepath.Join(root, "alias")
+	mustWrite(t, filepath.Join(profile, "proj", "id_demo.txt"), "secret")
+	mkJunction(t, alias, profile)
+
+	res, err := Resolve(filepath.Join(profile, "proj", "id_demo.txt"), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	canonical := res.Canonical                              // the resolved spelling
+	viaAlias := filepath.Join(alias, "proj", "id_demo.txt") // a second spelling of it
+	if strings.EqualFold(canonical, viaAlias) {
+		t.Fatalf("test premise broken: alias %q must be spelled differently from %q", viaAlias, canonical)
+	}
+	if got := Classify(viaAlias); got != ClassB {
+		t.Fatalf("alias spelling classified %v, want ClassB (premise)", got)
+	}
+
+	// (1) the override was granted for the ALIAS spelling itself: not a form
+	// the OS vouches for, so it must not unlock anything.
+	if d := Gate(viaAlias, map[string]bool{strings.ToLower(viaAlias): true}); d.Allow {
+		t.Errorf("override recorded on a non-resolved spelling unlocked the file: %+v", d)
+	}
+	// (2) an override recorded for the resolved path, asked through a
+	// different spelling: confirm again, do not wave it through on a string.
+	if d := Gate(viaAlias, map[string]bool{strings.ToLower(canonical): true}); d.Allow {
+		t.Errorf("non-canonical spelling was allowed on the strength of a canonical override: %+v", d)
+	}
+	// (3) the reverse: the canonical path presented with an override recorded
+	// against some other spelling stays denied.
+	if d := Gate(canonical, map[string]bool{strings.ToLower(viaAlias): true}); d.Allow {
+		t.Errorf("canonical path unlocked by an override for a different spelling: %+v", d)
+	}
+	// (4) control, so this is a rule and not a blanket deny: canonical override
+	// + canonical path is exactly the L2-confirmed single file the tier allows.
+	d := Gate(canonical, map[string]bool{strings.ToLower(canonical): true})
+	if !d.Allow || d.Class != ClassB {
+		t.Fatalf("canonical override for the canonical path must allow: %+v", d)
+	}
+}
+
 // TestAListWinsWhereBothTablesHit is AC#3's A∩B shape: one path that matches
 // an A rule and a B rule at once must classify A, and B's single-file
 // override must not unlock it. The control proves the A verdict comes from the
