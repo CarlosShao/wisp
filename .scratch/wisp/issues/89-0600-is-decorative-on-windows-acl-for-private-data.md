@@ -58,6 +58,73 @@
 
 ## Progress log（append-only）
 
+- 2026-09-21 17:5x（`agent-ticket89b`，**退回单第 3、4 条落地 + 上一枚 `c8d5c94` 欠的三次变异读数**）：
+  **变异读数 #1（第 1 条要求的"删掉 `propagatePrivate` 必红"）**——在仓外快照
+  `git archive c8d5c94 | tar -x -C /tmp/wisp89b-walk` 里把 `winsec_windows.go` 的
+  `return propagatePrivate(path)` 改成 `return nil // MUTATION-89WALK`（`applyDescriptor` 保留）：
+  先证**可编译**（`go build ./...` rc=0）再在同一条链里 `grep -n MUTATION-89WALK` 命中 293 行，然后
+  `go test -count=1 -v ./internal/winsec/` ⇒ **rc=1，`=== RUN` 25、顶层 14 PASS / 1 FAIL、0 SKIP**，
+  **红名唯一**：`--- FAIL: TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs (1.06s)`，
+  红因是 OS 自己的原文（三个带显式 ACE 的子项全都还是宽的）：
+  `icacls text of operator-widened-file.txt still names the foreign principal (Everyone)` /
+  `NOT PRIVATE operator-widened-file.txt: foreign SID(s) S-1-1-0 (principals: [Everyone NT AUTHORITY\SYSTEM BUILTIN\Administrators DESKTOP-LVS7839\swq])`，
+  `operator-widened-dir` 与 `inside.txt` 同形 ⇒ **变异只打到该打的那一格**，其余 14 条（含两条 AC#1 反向钉子、AC#4/AC#5、
+  生产端到端）保持绿，正是验收报告 §6(b) 预测的形状。快照在仓外，工作树未做变异。
+  **变异读数 #2（第 2 条）**：`/tmp/wisp89b-mig`（同一 SHA）把 `migrate.go` 两处退回
+  `os.WriteFile(..., 0o600) /*MUTATION-89MIG*/`（`grep -c` = 2、`go build ./internal/secret/` rc=0）⇒
+  `--- FAIL: TestAC2MigrationBackupIsPrivate (2.58s)`（`=== RUN` 1），红因就在备份文件自己身上：
+  `NOT PRIVATE config.toml.bak-plaintext: foreign SID(s) S-1-1-0 (principals: [Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq])`
+  （`-run` 过滤只用于这次变异读数，条数已按 `=== RUN`=1 点名）。
+  **变异读数 #3（我加的 repair 腿）**：`/tmp/wisp89b-rep` 把 `} else if serr := winsec.SealFile(backupPath); serr != nil {`
+  换成永不触发的等价式（`grep -c`=1、build rc=0）⇒ `--- FAIL: TestAC2PreExistingMigrationBackupIsRepaired (2.24s)`，
+  **同一条路径前后两次 icacls 原文对照**：
+  BEFORE `config.toml.bak-plaintext carries foreign SID(s) S-1-1-0, S-1-1-0` →
+  AFTER `icacls text … still names the foreign principal (Everyone)` +
+  `NOT PRIVATE … (principals: [Everyone Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq])`
+  ⇒ "备份永不覆盖"这条既有语义在没接线的 build 上确实是**永久漏**，接线的确是它被修掉的原因；
+  同时断言了备份**字节不变**（first-seen original must win 没被 repair 腿破坏）。
+  ⚠ 头两次 sed 因把标记写成行尾 `//` 注释而**编译失败**（`if err := …; // 注释` 吃掉后半行 / `undefined: serr`）——
+  **编译失败不算变异**，两次都重做后才取数，记下来是因为这就是本仓规矩存在的原因。
+  **第 3 条（票面那句事实错）——已按实测改掉，不是"仍未测"**：见上面被替换的 AC#4 构造可行性框与 AC#4 条目。
+  读数：未提权（`IsInRole(Administrator)=False`；`swq` 在 Administrators 组但令牌未提升）+
+  `AllowDevelopmentWithoutDevLicense = 1` ⇒ `os.Symlink` 到**非空目录**返回 `<nil>`；
+  测试里 `os.Symlink ok: artifact -> …\someone-elses-tree (Lstat mode Lrw-rw-rw-, FILE_ATTRIBUTE_REPARSE_POINT set)`。
+  两条新用例（`TestAC4DirectorySymlinkAtArtifactPositionIsNotRecursed`、`…InsideSealedTreeIsNotWalked`）
+  = 目标内容存活 + 只拆链接 + 注入 `deleteLink` 失败后仍拿 `ErrIsReparsePoint` 且带路径 + 密封游走**不穿**符号链接
+  （`verifyPrivate(keep)` 仍失败 ⇒ 目标的 DACL 没被我们改写）。**A51② 的更正登记再扩一格**：`os.Remove`
+  对目录符号链接也**能**直接拆（`os.Remove cleared the directory symlink directly; A51② does not reproduce for it on this box`）。
+  ⚠ 换一台关掉开发者模式的机器这条构造会失败 ⇒ `mkDirSymlink` 打**具名 `t.Skipf`**（带 `os.Symlink` 原始错误），
+  本次跑 **0 SKIP**（不拿"条件构造"当挡箭牌）。真实数据目录未碰，构造全在 `t.TempDir()` 里、测完自清。
+  **第 4 条（严格度描述反了）——选了 ②"让清除既存主体这件事报出来"，白名单不开口**：
+  **实测语义（把票面/registry 那句错话换成这个）**：给某目录**有意**加第三个主体 ⇒ **写入点不会失败**
+  （PROTECTED DACL 让子项根本不继承父上的第三主体，`PrivateFile(<root>/artifact.txt)` 会成功），
+  真正发生的是**下一次 `SealDir`/`SealFile` 把它从该对象自己的 DACL 上清掉** ⇒ 风险比"拒写"更大（授权无声消失）。
+  为什么不选 ①（白名单扩展点）：验收 §8 的三条理由在本票证据里是可复现的——m4 变异去掉 `PROTECTED` 之后
+  `CodexSandboxUsers` 带着 `0x1301ff` 长进"已密封"的文件，`verifyPrivate` 是唯一当场拦住它的东西；
+  白名单一开口这条拦截同时失效，而这个包唯一的承诺就是"只有我"。
+  **实现**：`winsec_windows.go` 的 `applyDescriptorWindows` 在 set **之前**先读一次 DACL，
+  `explicitForeignPrincipals` 只挑"**挂在该对象自己身上**（SDDL flags 不含 `ID`=INHERITED_ACE）且不在 {我,SY,BA} 白名单"的 ACE
+  （deny/audit 等非 `A` 条目一并算），密封成功且 `verifyPrivate` 通过之后把每一条交给 `noticeNarrowed`；
+  默认实现是 `slog.Warn`，字段 `path` / `cleared` / `policy`，走应用既有的日志管道
+  （winsec **不能** import `internal/observe`——图是 observe→secret→winsec，那条边会成环）。
+  **为什么只报显式、不报继承来的**：本包存在的理由就是清继承噪声，全报等于没有信号；这一格有用例钉住
+  （`TestSealReportsThePrincipalsItCleared` 要求"只继承 root 那条宽 ACE 的孩子**不出现**在通知里"，同时
+  root 与自带显式 ACE 的孩子**必须**出现，且出现之后 `verifyPrivate` 真的过——通知不是在对空气喊）。
+  **读数（HEAD，`-count=1 -v ./internal/winsec/`）**：`=== RUN` 29、顶层 **19 PASS / 0 FAIL / 0 SKIP**（另含 10 条子测试），
+  新增具名 4 条：`TestAC4DirectorySymlinkAtArtifactPositionIsNotRecursed` /
+  `TestAC4DirectorySymlinkInsideSealedTreeIsNotWalked` / `TestSealReportsThePrincipalsItCleared` /
+  `TestSealNoticeIsRecordedByDefault` 全 PASS；默认通知那条的实测日志原文：
+  `level=WARN msg="winsec: seal cleared principals that were placed on this object explicitly" path=…\data cleared=SU(A;OICI;0x1200a9;;;SU) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"`。
+  门禁（本枚）：`gofmt -l`/`gofumpt -l` 空、`go vet ./internal/winsec/ ./internal/secret/` rc=0、
+  `GOOS=linux go vet` 同两包 rc=0（按包作用域，A54③）、`go test -count=2` 两包 rc=0（winsec 12.261s / secret 0.704s）。
+  ⚠ **POSIX 侧不适用**：`sealDir` 在 `_other.go` 里没有 walk（chmod 不区分"显式/继承"主体），所以第 4 条的语义是 Windows 专属；
+  Linux 真机复跑仍归票 89 已记录的 AC#6 那批（本枚未改 `_other.go`，不重测）。
+  next= ① 第 1/2 条的判据+接线+变异读数已齐，第 3/4 条已落 ⇒ 剩 `docs/reports/pending-and-issues.md` 两条更正登记
+  （A51②：junction **与**目录符号链接两类上 `os.Remove` 都能拆；新语义："winsec 拥有 data 树的唯一授权权，
+  带外授权会在下一次密封时被清除并且**会打一条 WARN**"）——那是编排者的面，我不写；
+  ② 收尾枚跑 `sh scripts/d22scan.sh` + 全量四包门禁 + Status 同步。
+
+
 - 2026-09-21 17:2x（`agent-ticket89b`，**退回单第 1、2 条：判据 + 接线落地**）：
   **第 1 条（AC#2 的覆盖面主张没有用例咬）——判据已进包内**：
   `internal/winsec/acl_windows_test.go::TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs`。
@@ -133,9 +200,19 @@
   当前 SID `S-1-5-21-1228170099-895614386-1166154857-1001`（账户 `swq`）；本机无既存 `wisp.db`（data 根尚未创建）。
   ⚠ `internal/winsec/winsec_windows.go` 此刻是**故意的占位**（只有 `os.Chmod`，也就是仓库今天的行为），
   所以本包判据测试**预期先红**——红完才换 SetSecurityDescriptorInfo。
-- [ ] AC#4 构造可行性：普通权限建不出符号链接（需 `SeCreateSymbolicLinkPrivilege`/开发者模式），
-  但 **junction 不需要特权**（`mklink /J`），而它正是"指向非空目录的链接"这一类，`os.Remove` 对它
-  报 `ERROR_DIR_NOT_EMPTY` ⇒ **本机可构造**，不必只靠 CI/Linux 侧等价构造。
+- [x] AC#4 构造可行性（**2026-09-21 `agent-ticket89b` 实测更正，原句"普通权限建不出符号链接"是错的**）：
+  **这台机上未提权就能建目录符号链接**——`IsInRole(Administrator)=False`（账户 `swq` 在 Administrators 组里，
+  但进程令牌没提升）+ `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock\AllowDevelopmentWithoutDevLicense = 1`
+  ⇒ `os.Symlink(dir, link)` 返回 `<nil>`，`Lstat` 给 `Lrw-rw-rw-`、`os.ModeSymlink` 置位、
+  `FILE_ATTRIBUTE_REPARSE_POINT` 也置位（⇒ 实现的 `isReparsePoint` 用属性而不是 `ModeSymlink` 是**必须**的，
+  否则密封游走会漏掉所有 junction）。⇒ 那一格属于"**可测而未测**"，现已测：
+  `internal/winsec/reparse_windows_test.go::TestAC4DirectorySymlinkAtArtifactPositionIsNotRecursed`
+  + `…InsideSealedTreeIsNotWalked`（构造全在 `t.TempDir()` 内，测完自清，未碰任何真实数据目录）。
+  实测读数：`os.Remove` 对**目录符号链接**也**能**直接拆掉、目标内容毫发无损
+  （`os.Remove cleared the directory symlink directly; A51② does not reproduce for it on this box`）
+  ⇒ A51② 在 junction 与目录符号链接**两类对象上都不复现**，本票的判据因此双向断言"目标仍在"。
+  **特权前提没被抹掉**：换成关了开发者模式、又没给 `SeCreateSymbolicLinkPrivilege` 的机器，`os.Symlink` 就会失败
+  ⇒ `mkDirSymlink` 在这种情况下打**具名 `t.Skipf`**（含 `os.Symlink` 的原始错误），不是静默通过。
 - [x] **AC#1 基线：四类私有数据的 icacls 原文**（判据测试 `internal/winsec/acl_windows_test.go`，四类各走**生产入口**：
   artifact = `spill.go:245` 的 `O_CREATE|O_EXCL,0o600`；secret blob = `secret.NewStore`+`Store`（真 DPAPI 落盘）；
   `wisp.db`/`-wal`/`-shm` = `memory.Open` 真 SQLite，**在 store 打开状态下**探测侧文件；staging = `downloader.go:224/:389` 同形 idiom。
@@ -225,8 +302,10 @@
   （用 `verifyPrivate(keep)` 仍失败来证明目标的 DACL 没被我们改写）。
   **诚实结论（A51② 本身）**：本机 Go 1.27 + Win11 上 `os.Remove` **能**删掉指向非空目录的 junction
   （测试里那条 `os.Remove cleared this junction directly; A51② does not reproduce for it` 就是实测日志），
-  但无论成功与否都**断言了目标内容仍在**；而**目录符号链接**这台机普通权限建不出来（需
-  `SeCreateSymbolicLinkPrivilege`/开发者模式）⇒ 那条构造放在 **Linux 侧**：
+  但无论成功与否都**断言了目标内容仍在**；而**目录符号链接**（**此句原写"这台机普通权限建不出来"，
+  2026-09-21 `agent-ticket89b` 实测推翻：开发者模式=1 + 未提权 ⇒ `os.Symlink` 直接成功**）
+  ⇒ 那条构造**Windows 侧已补**（`TestAC4DirectorySymlinkAtArtifactPositionIsNotRecursed` /
+  `…InsideSealedTreeIsNotWalked`），Linux 侧那条继续作为免特权平台的**第二套**等价构造而不是替代品：
   `internal/winsec/private_other_test.go` 的 `TestPOSIXSymlinkAtArtifactPositionIsNotRecursed`（`os.Symlink` 免特权），
   两侧强度：Windows 侧证"实现不递归、失败具名"，POSIX/Linux 侧证"同一 API 在 unlink 语义下也不越界"。
   **没有**因为 os.Remove 这次成功就把判据删掉：`RemoveUnlinked` 走的是

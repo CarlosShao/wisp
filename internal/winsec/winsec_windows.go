@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"log/slog"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -36,12 +37,94 @@ const (
 // above it refuses to place bytes rather than proceeding wide.
 var applyDescriptor = applyDescriptorWindows
 
+// narrowNotice is the audit record of one thing a seal did that used to be
+// silent: it cleared a principal that stood on this object's DACL *in its own
+// right* (not inherited), i.e. somebody had granted it there deliberately.
+//
+// Ticket 89's acceptance killed the ticket's earlier claim that such a grant
+// "fails at the write point": a PROTECTED DACL means a foreign principal on the
+// parent never reaches the child the seal writes, so nothing fails there. What
+// actually happens is that the next SealDir/SealFile wipes the out-of-band
+// grant. That is a *bigger* risk than a refusal - an operator adds a service
+// account, sees no error, and the authorization evaporates at the next open of
+// the store. Keeping the whitelist closed (acceptance's ruling: the one promise
+// here is "only I", and any hole in it un-does the PROTECTED leg) while making
+// the removal loud is the branch this takes: the policy stays "winsec owns the
+// grants on this tree", and the human who just lost an ACE learns it from a
+// warning carrying the path and the principal.
+type narrowNotice struct {
+	Path string
+	// Principals are the SDDL trustee tokens cleared off this object, e.g. "WD"
+	// (Everyone) or a bare "S-1-5-6".
+	Principals []string
+}
+
+// noticeNarrowed is the seam tests swap. The default writes to the default slog
+// logger, which is where the app's own log pipeline (internal/observe) already
+// lives - winsec must not import it (the graph runs observe -> secret -> winsec,
+// so that edge would close a cycle), and a log line is the narrowest channel
+// that is still auditable.
+var noticeNarrowed = func(n narrowNotice) {
+	slog.Warn("winsec: seal cleared principals that were placed on this object explicitly",
+		"path", n.Path,
+		"cleared", strings.Join(n.Principals, ","),
+		"policy", "winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal")
+}
+
+// explicitForeignPrincipals lists the ACEs on path that (a) name somebody
+// outside the private set and (b) are on this object *itself*. The second half
+// is what keeps the notice a signal: the inherited junk this package exists to
+// clear is on effectively every file in a profile directory, so reporting those
+// would drown the one case anybody needs to hear about, an explicit grant.
+// SDDL marks an ACE that came from a parent with the INHERITED_ACE flag ("ID"),
+// and the materialised inherit-only companions of our own grants are inside the
+// whitelist anyway.
+func explicitForeignPrincipals(path string) ([]string, error) {
+	sd, err := windows.GetNamedSecurityInfo(path, windows.SE_FILE_OBJECT,
+		windows.DACL_SECURITY_INFORMATION)
+	if err != nil {
+		return nil, err
+	}
+	if sd == nil {
+		return nil, errors.New("read-back returned no descriptor")
+	}
+	sddl := sd.String()
+	if sddl == "" {
+		return nil, errors.New("read-back produced no SDDL")
+	}
+	allowed, _, err := allowedSIDStrings()
+	if err != nil {
+		return nil, err
+	}
+	var out []string
+	for _, ace := range aceGroups(sddl) {
+		fields := strings.Split(ace, ";")
+		if len(fields) < 6 {
+			continue
+		}
+		if strings.Contains(fields[1], "ID") {
+			continue // inherited from a parent: not this object's own grant
+		}
+		if fields[0] == "A" && allowed[fields[5]] {
+			continue
+		}
+		// A deny ACE, an audit ACE, anything that is not one of our three grants:
+		// it is about to be gone, and whoever put it there should hear about it.
+		out = append(out, fields[5]+"("+ace+")")
+	}
+	return out, nil
+}
+
 // applyDescriptorWindows builds an explicit DACL and writes it into the object's
 // security descriptor with SE_DACL_PROTECTED, which is what "inheritance cannot
 // widen this" means at the API level: without the flag the parent's grants stay
 // in force underneath ours, and the file keeps the foreign ACE it inherited at
 // birth.
 func applyDescriptorWindows(path string, dir bool) error {
+	// Read the before-state first: after the set there is nothing left to
+	// compare against. A failure here is not fatal to the seal (the set and the
+	// verify below decide that), it only costs the audit line.
+	before, beforeErr := explicitForeignPrincipals(path)
 	acl, err := privateACL(dir)
 	if err != nil {
 		return wrapPath(path, err)
@@ -54,7 +137,13 @@ func applyDescriptorWindows(path string, dir bool) error {
 		nil, nil, acl, nil); err != nil {
 		return wrapPath(path, err)
 	}
-	return verifyPrivate(path)
+	if err := verifyPrivate(path); err != nil {
+		return err
+	}
+	if beforeErr == nil && len(before) > 0 {
+		noticeNarrowed(narrowNotice{Path: path, Principals: before})
+	}
+	return nil
 }
 
 // sealHandle seals a file that is open but still empty. It goes through the

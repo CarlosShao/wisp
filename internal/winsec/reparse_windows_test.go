@@ -34,14 +34,164 @@ func mustExec(t *testing.T, name string, args ...string) string {
 // mode, which is why the A51② leg of ticket 89 *is* constructible on this
 // machine: a junction is exactly the shape of the bug, a link standing where an
 // artifact was expected whose target is a non-empty directory. os.Symlink to a
-// directory is the other shape and needs SeCreateSymbolicLinkPrivilege; if it
-// is unavailable the test says so out loud rather than skipping silently, and
-// the Linux leg in private_other_test.go covers that construction.
+// directory is the other shape and is now constructed too, in its own tests
+// below - see mkDirSymlink for what that costs.
 func mkJunction(t *testing.T, link, target string) {
 	t.Helper()
 	t.Logf("mklink /J: %s", strings.TrimSpace(mustExec(t, "cmd", "/c", "mklink", "/J", link, target)))
 	if !reparseAt(link) {
 		t.Fatalf("%s is not a reparse point, so this test measured nothing", link)
+	}
+}
+
+// mkDirSymlink makes a *directory* symbolic link, the second shape of A51② and
+// the one this file used to hand to the Linux leg on the claim that unprivileged
+// Windows cannot create it. That claim was wrong on this machine: with developer
+// mode on (HKLM ...\AppModelUnlock\AllowDevelopmentWithoutDevLicense = 1)
+// os.Symlink succeeds for a directory target without elevation, measured on the
+// record in ticket 89's log.
+//
+// It is a helper rather than a straight call because the privilege really is
+// conditional - a box with developer mode off and no SeCreateSymbolicLinkPrivilege
+// fails here, and on such a box the honest reading is "this construction is
+// unavailable", which t.Skipf states out loud (and which acceptance has to
+// count as a SKIP, not as an ok). Unlike a junction, Go's Lstat does report
+// ModeSymlink for this object, which is why the two kinds need separate legs.
+func mkDirSymlink(t *testing.T, link, target string) {
+	t.Helper()
+	if err := os.Symlink(target, link); err != nil {
+		t.Skipf("cannot construct a directory symlink here: os.Symlink(%s, %s) = %v "+
+			"(needs developer mode or SeCreateSymbolicLinkPrivilege; the Linux leg in "+
+			"private_other_test.go is the equivalent construction on such a box)", target, link, err)
+	}
+	info, err := os.Lstat(link)
+	if err != nil {
+		t.Fatalf("lstat after os.Symlink: %v", err)
+	}
+	if info.Mode()&os.ModeSymlink == 0 {
+		t.Fatalf("%s is not a symlink after all (mode %v), so this test measured nothing", link, info.Mode())
+	}
+	if !reparseAt(link) {
+		t.Fatalf("the symlink is not a reparse point (mode %v), so the implementation's own check would miss it", info.Mode())
+	}
+	t.Logf("os.Symlink ok: %s -> %s (Lstat mode %v, FILE_ATTRIBUTE_REPARSE_POINT set)", filepath.Base(link), target, info.Mode())
+}
+
+// dirWithContents is somebody else's tree: non-empty, with a nested file the
+// deletion radius must stop in front of.
+func dirWithContents(t *testing.T) (outside, deep, innocent string) {
+	t.Helper()
+	outside = filepath.Join(t.TempDir(), "someone-elses-tree")
+	deep = filepath.Join(outside, "sub")
+	if err := os.MkdirAll(deep, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	innocent = filepath.Join(deep, "keep-me.txt")
+	if err := os.WriteFile(innocent, []byte("not ours to delete"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(outside, "second.txt"), []byte("x"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	return outside, deep, innocent
+}
+
+// TestAC4DirectorySymlinkAtArtifactPositionIsNotRecursed is the leg ticket 89
+// claimed it could not build on Windows and parked on Linux. Same assertions as
+// the junction test, different object: a symlink to a *non-empty directory*
+// standing where an artifact was expected.
+func TestAC4DirectorySymlinkAtArtifactPositionIsNotRecursed(t *testing.T) {
+	outside, deep, innocent := dirWithContents(t)
+
+	root := filepath.Join(t.TempDir(), "data")
+	if err := PrivateDirAll(root, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	link := filepath.Join(root, "artifact")
+	mkDirSymlink(t, link, outside)
+
+	// A51② on the record for *this* object kind: if os.Remove clears it, log
+	// that; if it refuses, log that too and make sure the target survived the
+	// refusal. Either way the premise below is measured, not assumed.
+	switch err := os.Remove(link); err {
+	case nil:
+		if _, sErr := os.Stat(innocent); sErr != nil {
+			t.Fatalf("os.Remove reported success and took the target with it: %v", sErr)
+		}
+		t.Logf("os.Remove cleared the directory symlink directly; A51② does not reproduce for it on this box")
+	default:
+		if _, sErr := os.Stat(innocent); sErr != nil {
+			t.Fatalf("os.Remove reported failure yet the target is gone: %v", sErr)
+		}
+		t.Logf("A51② reproduced for a directory symlink: os.Remove = %v", err)
+	}
+	if _, lErr := os.Lstat(link); lErr != nil {
+		mkDirSymlink(t, link, outside) // rebuild for the legs below
+	}
+
+	if err := RemoveUnlinked(link); err != nil {
+		t.Fatalf("RemoveUnlinked refused to clear the symlink: %v", err)
+	}
+	if _, err := os.Lstat(link); !errors.Is(err, fs.ErrNotExist) {
+		t.Errorf("symlink still present after RemoveUnlinked: %v", err)
+	}
+	// ① the whole point: the deletion radius stopped at the link.
+	if _, err := os.Stat(innocent); err != nil {
+		t.Errorf("TARGET DELETED - RemoveUnlinked followed the symlink into %s: %v", outside, err)
+	}
+	if _, err := os.Stat(deep); err != nil {
+		t.Errorf("target subtree deleted too: %v", err)
+	}
+
+	// ② refusing to unlink a symlink must still be a *named* failure.
+	keep := filepath.Join(outside, "second.txt")
+	mkDirSymlink(t, link, outside)
+	orig := deleteLink
+	deleteLink = func(string) error { return errors.New("injected: disposition refused") }
+	t.Cleanup(func() { deleteLink = orig })
+	err := RemoveUnlinked(link)
+	if err == nil {
+		t.Fatal("injected unlink failure accepted, and the reclaim loop would keep going")
+	}
+	if !errors.Is(err, ErrIsReparsePoint) {
+		t.Fatalf("error does not name the reparse point: %v", err)
+	}
+	if !strings.Contains(err.Error(), link) {
+		t.Errorf("error does not carry the path the caller has to report: %v", err)
+	}
+	if _, sErr := os.Stat(keep); sErr != nil {
+		t.Errorf("target damaged while refusing to remove the link: %v", sErr)
+	}
+}
+
+// TestAC4DirectorySymlinkInsideSealedTreeIsNotWalked is the same rule on the
+// write side: sealing a tree must not reach through a symlink, or "I sealed my
+// data root" silently modifies whatever the link points at.
+func TestAC4DirectorySymlinkInsideSealedTreeIsNotWalked(t *testing.T) {
+	root := filepath.Join(t.TempDir(), "data")
+	if err := PrivateDirAll(root, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	outside, _, keep := dirWithContents(t)
+	inner := filepath.Join(root, "work")
+	if err := os.MkdirAll(inner, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	mkDirSymlink(t, filepath.Join(inner, "link"), outside)
+
+	if err := SealDir(root); err != nil {
+		t.Fatalf("SealDir over a subtree containing a symlink: %v", err)
+	}
+	// verifyPrivate is the predicate the implementation itself fails closed on,
+	// so "it still fails" proves the seal never crossed the link.
+	if err := verifyPrivate(keep); err == nil {
+		t.Errorf("symlink target got sealed after all: %s", keep)
+	}
+	if err := RemoveUnlinked(filepath.Join(inner, "link")); err != nil {
+		t.Fatalf("RemoveUnlinked inside a subtree: %v", err)
+	}
+	if _, err := os.Stat(keep); err != nil {
+		t.Errorf("removing the inner symlink damaged the target: %v", err)
 	}
 }
 
