@@ -156,3 +156,22 @@
   **探针集合在 Linux 上是否会把 risk 的纯词法解析器拒掉，本机测不到**——若 CI 跑 Linux，这是第一条要看的眼色；
   ③ AC#2 的祖先检查是 fail-closed：数据根若真的放在别人 symlink 底下，回收会开始报错（方向是拒，不是删），
   这是有意的语义收紧，验收方若判它过界请说一声。
+
+## 独立对抗验收交回（`acceptor-ticket103`，2026-09-21；append-only，前文一行未动）
+
+**总判：PASS WITH CONDITIONS（通过但有条件）** —— 裁决表 `docs/evidence/s1/103-adversarial-acceptance.md`（AC#1..#4 1:1，含档位标注与命令原文）。
+AC 框仍不自勾由验收方裁：本代理的裁法是 **AC#3 无条件通过；AC#1/AC#2/AC#4 通过但有条件**。
+
+**三处点名的直答（细节与读数在裁决表）**
+- **① 边界守住了，但描述窄了一格**：`%VAR%`/`~` 的改写型伪造确实被 102 的账拦在缝前（`internal/risk/winsec_c26.go:39-44` → `pathresolver.go:93-100` 的 `Actable()` → `winsec/resolve.go:210` 包成密封失败）。但"看不出善意改写/劫持改写"不止适用于 `%VAR%`/`~`：实测**任何**已装 resolver 交回"干净但换了树"的答案，winsec 照封（`resolve.go:222` 只认拼写形状，不认树归属）⇒ 那一半没有票接着，记 `R-103-1` 的 remediation。
+- **② POSIX 验到了**，不必只靠编译期：本代理在**真 Linux 容器**（`docker run golang:1.27`，快照 = `git archive HEAD`）量到 `probes_passed=1`、`--- PASS: TestAC103POSIXRiskResolverPassesTheProbe`（**探针没有把 risk 的纯词法解析器拒掉**）、`--- PASS: TestAC103POSIXRemoveUnlinkedAncestorGuard`，四包 `ok winsec/risk/memory/secret` 干净复跑 RC=0；CI 侧对得上 **run `35587986855`（run_number 148，head `b2fa2ed` ⊇ `0717bf2`）** 步级 `Portable package tests` 里 `ok internal/risk 1.130s`、`ok internal/memory 10.748s`（ubuntu）。**"本机全绿 ≠ CI 过了"仍照登**：148 的 job 结论是 failure，红因不属本票（`internal/tools` 的 `TestPathCanonicalizerAccountsForRewrittenRoots`＝102/106 地界；`test-windows` 的 `internal/secret` 红在 `verifyPrivate: ... ([LA LA])`＝runner 账号映射，`verifyPrivate` 不在 `0717bf2` diff 内）；**当前 HEAD 没有跑完过的 run ⇒ 欠编排者 push 后复跑**。
+- **③ 判为契约要求的从严**（方向是拒不是删），但"正常路径不受影响"只到间接读数（`TestAC2RemoveUnlinkedStillUnlinksAStandaloneLink` PASS、memory/secret 本机与 Linux 容器全绿），**没有一条用例钉住"数据根真在别人 symlink 底下 ⇒ 报 ErrIsReparsePoint"这一形态**；POSIX 用 `ModeSymlink` 查祖先 ⇒ macOS 的 `/tmp`、`/var` 本身是链接，以 tmp 为根的回收会开始报错。这属语义收紧，不判过界（票面 AC#2 原句就是"必须拒"），但记 `R-103-7` 请编排者裁"从严即可／要豁免通道"。
+
+**本代理独立复现的红与变异（不抄实现方读数）**
+- 两条腿 + SID 级读数：`TestAC1SeamRejectsARubberStampAndLeavesTheForeignDaclAlone`、`TestAC1SeamIsSingleUse`、`TestAC1RefusedInstallLeavesTheSealWorking`、`TestAC2RemoveUnlinkedRefusesAPathThroughAJunction` 全 PASS（`-count=2` 两样本）；真机 `mklink /J` 在位（`attributes 0x410`），外来文件 `S-1-1-0` **前后都在**。
+- 变异三向自做：MUT-1 两行（`resolve.go:115/152`）⇒ 5 RUN、3 PASS/2 FAIL，红名都在守卫上；MUT-2（`resolve.go:107` Error→Debug）⇒ 8 RUN、7 PASS/**恰 1 FAIL**（只红审计断言，witness 绿）；MUT-3（`artifacts.go:155` → `descendFollowingLinks103`）⇒ `TestAC2ReclaimWalkNeverDescendsIntoAJunction` **FAIL**，且票 79 的 `TestStrayRemovalDoesNotFollowLinks` 仍 PASS（新 tripwire 是真增量）。还原：5 文件 `diff -q` 全 CLEAN，快照复跑 `ok winsec 7.127s / ok memory 13.519s`。
+- 攻守卫（我自己的探针，只活在 `/tmp` 快照，未进仓）：**P1b 换个注册顺序**（先 `nil` 释放再装恒改写型伪造）⇒ 探针收下、`SealFile` 返回 nil、外来文件 `S-1-1-0` **由有到无**；**P2 分隔符改写**（`/` 或混合）⇒ `firstLinkAncestor` 一个祖先都不查，沿 junction 删掉外来文件且返回 nil；**P3** 纯底线 + `/` 拼写 ⇒ 同一错法在 `placement_windows.go`（**不是 `0717bf2` 改的文件**）上改掉外来 DACL。类型名撞名方向 fail-safe（伪造进不来），已量到 ERROR 读数。
+- 门禁复跑：`gofmt`/`gofumpt`（GOPATH/bin 有二进制，跑了）空；按包 `go vet` 原生 + `GOOS=linux` + `GOOS=darwin` 全 rc=0；`sh scripts/d22scan.sh` rc=0 clean、各 scope 文件数不降（`#8 internal/` 342→346 升）；四包 `-count=2 -v` 里 **FAIL 1 条 = `TestResolvePerCallBudget`（隔离复跑 PASS：0.779 ms/op vs 1.000 ms，票 86 负载假红，两样本都报）**；**SKIP 逐条点名 = `TestSubprocessCrashWriter`（memory）+ `TestSyncRegistryProbeLive`（risk）** ⇒ 你那句"SKIP 恰 1 条"只对 winsec+memory 成立，且"102"是每轮数（`-count=2 -v` 原始 204 行）＝`R-103-5`。
+
+**缺陷登记（验收期未修，各该自开票）**：`R-103-1` 一次性守卫可被注册顺序解除 + 缝上答案的树归属无人查（安全）；`R-103-2` `firstLinkAncestor` 分隔符可绕（守卫可绕，陷阱档）；`R-103-3` `platformVerifyPlacement` 同形既有洞（**非本票引入**，票 94 底线的账）；`R-103-4` 恒等重装分支覆盖率 0 ⇒ 幂等语义没钉；`R-103-5` 计数/SKIP 口径；`R-103-6` darwin 无运行期读数 + Linux 探针少一形状；`R-103-7` symlink 数据根的报错形态无用例。
+**未碰**：`internal/risk/**`、`tools/d22scan/**`、`allowlist.txt`、`docs/PLAN.md`、`docs/specs/*`、`internal/memory` 生产码；未 push；仓内未建 worktree。
