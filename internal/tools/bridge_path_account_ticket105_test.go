@@ -160,8 +160,9 @@ func TestUnusableRootIsVisibleInTheAuditRecord(t *testing.T) {
 	if line == "" {
 		t.Fatalf("no PATH-ACCOUNT record in %s:\n%s", path, readBack())
 	}
-	if !strings.Contains(line, "not confirmed on disk") || !strings.Contains(line, spelled) {
-		t.Errorf("unusable half of the account missing from the record: %q (want %q and the drop reason)", line, spelled)
+	if !strings.Contains(line, "not confirmed on disk") || !strings.Contains(line, "%"+name+"%") {
+		t.Errorf("unusable half of the account missing from the record: %q (want %q and the drop reason)",
+			line, spelled)
 	}
 	if !strings.Contains(line, "roots=0") {
 		t.Errorf("record = %q, want roots=0: a dropped root must not read as authorization", line)

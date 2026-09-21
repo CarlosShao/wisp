@@ -806,6 +806,24 @@ func (b *Bridge) book(ctx context.Context, req agent.ToolRequest, dec Decision, 
 		dec.LevelString(), dec.DecisionColumn, kind.outcomeColumn(),
 		dec.RulesHit, b.inScope(dec), dec.Reason)
 
+	// Ticket 105 AC#2: this is the production reader of ticket 102's rewrite
+	// account. Until here the only consumers of Roots()/RewrittenRoots()/
+	// UnusableRoots() were tests, so "the operator can see which root C26 moved"
+	// was a comment. It is now a record in the same sink as MODE-READ and the
+	// line above (Options.Logf, wired to agentRuntime.auditf by cmd/wisp).
+	// It goes out for EVERY call judged on a path, not only when the account has
+	// something to complain about: empty lists are the evidence that the book was
+	// read and came back clean, which is precisely what a reader cannot recover
+	// from a missing line. The account is ticket 102's - no second book is kept
+	// here, and the joined form is printed unescaped because the entries already
+	// name the config spelling, the tree it moved to and the construct.
+	if len(dec.Paths) > 0 {
+		roots, rewritten, unusable := b.pathAccount()
+		b.log("tools: PATH-ACCOUNT task=%s tool=%s roots=%d rewritten=[%s] unusable=[%s]",
+			req.TaskID, req.Name, len(roots),
+			strings.Join(rewritten, "; "), strings.Join(unusable, "; "))
+	}
+
 	if b.j == nil || req.TaskID == "" {
 		return
 	}
@@ -832,6 +850,18 @@ func (b *Bridge) book(ctx context.Context, req agent.ToolRequest, dec Decision, 
 	if _, err := b.j.InsertToolCall(ctx, tc); err != nil {
 		b.log("tools: tool_call insert failed task=%s tool=%s: %v", req.TaskID, req.Name, err)
 	}
+}
+
+// pathAccount reads ticket 102's book: the roots in effect and the two things
+// the C26 expansion step left behind on the way there (roots that moved onto
+// another tree, roots that were dropped and authorize nothing). It exists so
+// the audit record above names the same three lists the canonicalizer keeps,
+// with no copy of its own to fall out of sync.
+func (b *Bridge) pathAccount() (roots, rewritten, unusable []string) {
+	if b.paths == nil {
+		return nil, nil, nil
+	}
+	return b.paths.Roots(), b.paths.RewrittenRoots(), b.paths.UnusableRoots()
 }
 
 // inScope reports whether every judged path landed inside [fs] allowed_dirs -
