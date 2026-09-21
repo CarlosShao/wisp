@@ -1,6 +1,6 @@
 # 78 — Fix the Linux-only `go vet` errors that have been silently skipping the D22 gate in CI since `fd8f838`
 
-**Status:** ready-for-agent (**优先级最高：它是 A44① 的因——D22 门禁从未在 CI 上产出过一次结论**)
+**Status:** in-progress (agent=ticket78；`mulA` 已定位、`internal/proc` 实测 Linux 已干净、发现第三处 Linux 阻塞是本机交叉编译伪影) (**优先级最高：它是 A44① 的因——D22 门禁从未在 CI 上产出过一次结论**)
 **Type:** build/portability defect (tiny diff, large governance consequence)
 **Blocks:** 票 71 的 AC 收尾、票 77（新 CI job 不能建立在一个哑步骤上）、`test-core`/`lint` 的可信度
 **Blocked by:** nothing — `internal/ball`（票 74 已 done）与 `cmd/wisp`/`internal/proc`（票 66 已 done）现在都空
@@ -53,3 +53,21 @@ vet 一失败，**扫描步骤被 `skipped`，D22 门从未在 CI 上给出过�
 - 共享树里**不要跑全仓 `go test ./...`**（会吃到别人未提交的 WIP）；要看 HEAD 的真实状态用
   `git archive HEAD | tar -x -C /tmp/<dir>`，**且绝不在仓库内建 worktree**（A38④）。
 - 前 15 次工具调用内必须有一个 checkpoint commit；每次 commit 同步 Status + 勾框 + `next=`。
+
+## Progress log（append-only；每个 commit 一行 `- [ISO-UTC] agent=... did=...`）
+
+- [2026-09-21T00:00:00Z] agent=ticket78 did=**基线复测 + 落盘 checkpoint（本 commit 未改任何码）**。
+  分包实测（本机 windows/amd64）：`GOOS=linux go vet ./internal/ball/` → **红**，
+  `internal\ball\statevisual.go:287:17: undefined: mulA`（与票面逐字节一致）；
+  `GOOS=linux go vet ./internal/proc/` → **rc=0，本来就干净**（票面把 `proc` 也列为红点，实测它自身无过）；
+  `GOOS=linux go vet ./cmd/wisp/` → **报的不是 `undefined: proc.Runtime`，而是更早的加载失败**：
+  `imports github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files`。
+  根因已量清：**从 windows 交叉到 linux 时 `go env CGO_ENABLED` 自动变 0**，而 sherpa 的 linux 绑定三个文件
+  全部带 `//go:build linux && …` 且要 cgo ⇒ 包为空 ⇒ 加载即失败，`proc.Runtime` 那一条被挡在它后面看不见。
+  强开 `CGO_ENABLED=1 GOOS=linux` 则死在 `# runtime/cgo: sys/mman.h: No such file or directory`（本机无 linux 交叉 C 编译器）。
+  **⇒ 结论：票面 AC#1 的 `GOOS=linux go vet ./cmd/wisp/` 在本机上不可能给出判据**；
+  CI 的 lint job 是 `runs-on: ubuntu-latest`（ci.yml:33）+ cgo 天然开着 ⇒ 那边的 `go vet ./...` 才会真报到 `proc.Runtime`。
+  形状判定依据：`Color` 定义在**无 tag** 的 `internal/ball/tokens.go:30`，`mulA` 只做 alpha 缩放、不碰 COM/D2D ⇒ **它本来就不平台相关**；
+  `proc.Runtime` 持 `*JobScope`/`*SingleInstance`（Job Object + 命名互斥体）⇒ **真平台相关**，走 tag。
+  **next=** 下一 commit 落两处修复；AC#3 倾向"测试内 exec `GOOS=linux go vet`"（仓内已有先例
+  `cmd/wisp/secret_argv_windows_test.go:166` exec `go`），从而**不改 ci.yml**，把该文件留给票 71/77。
