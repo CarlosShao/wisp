@@ -82,10 +82,12 @@ sh scripts/d22scan.sh                          → 两步都过：
 扫描 **rc=1**、两条 `[pathresolver-bypass]` 命中并打 `2 finding(s); D22 bans are not negotiable`；
 删掉文件 ⇒ 复扫 rc=0 clean，`ls` 确认种子文件不在树里（没有留垃圾）。
 
-⚠ 一条**不属于本票**的观察：第一次跑 `sh scripts/d22scan.sh` 时该模块**编译不过**
-（`tools/d22scan/main.go:818:26: undefined: io`），而脚本的 `set -eu` 之外没有拦到这一步——
-`script-rc=0` 是从 `tail` 读的。**脚本自身的退出码是否会把 go test 的失败带出去，属 d22scan 在飞代理的地盘**，
-我没碰 `tools/d22scan/`（票面禁我进），只登记。
+⚠ 一条**不属于本票**的观察，并且**先撤回我自己的错判**：第一次跑 `sh scripts/d22scan.sh` 时该模块
+编译不过（`tools/d22scan/main.go:818:26: undefined: io`，别的代理在飞），而我当时打的
+`script-rc=0` **量的是 `tail` 的退出码不是脚本的**（`$?` 在管道后面）——脚本自己是 `set -eu`，
+`go test` 失败会中止它。**所以"脚本吞掉失败"这句不成立，是我读错了自己的命令。**
+真正剩下的事实只有：d22scan 模块在共享树上是会被别人改到短时间编译不过的，
+跑门禁前要接受"第一次红不是我的锅"这个噪声。我没碰 `tools/d22scan/`（票面禁我进）。
 
 ## 5. 没证明但看起来成立的事
 

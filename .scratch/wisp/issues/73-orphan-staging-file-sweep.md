@@ -122,3 +122,16 @@ session does not accumulate litter in the user's allowed dirs:
   但同一形态在 CI 里用 `${PIPESTATUS}` 之外也会溜）；②本票改名后的 A18 用例函数名与
   `docs/evidence/s1/20-a18-taskkill-residue-characterization.md` 里引用的旧名不再一致（历史证据不改写）。
   **next=owner/复核代理按 AC#1–AC#5 逐条复现；registry A18 判据②与 Q-16 的收口话术归 orchestrator，不在我职权内。**
+
+- 2026-09-21（实现代理，checkpoint 5 · **自我更正一条，框不动**）：证据文件 §4 里我原来写
+  "`sh scripts/d22scan.sh` 把 d22scan 模块编译不过吞成了 rc=0"——**这句不成立，已撤回并就地改写**：
+  那个 `script-rc=0` 是我用 `$?` 读管道尾部 `tail` 的退出码，量的根本不是脚本；脚本本身 `set -eu`，
+  `go test` 红就会中止。留下的事实只有"共享树上 d22scan 模块会被别人改到短时间编译不过"。
+  **另登记三条本票改动的对外后果，交给 orchestrator 判放哪：**
+  ①`a0072b0` 之后暂存名换了方案（`.wisp-tmp-<owner8>-<pid>-<rand>`），**旧方案
+  `.wisp-tmp-<随机数>` 的孤儿在新代码里永久不可归因 ⇒ 永远扫不掉**：任何已经按 761447f 之前版本
+  跑过并被真 kill 过的用户目录，残留不会自愈（要收得靠一次显式的"旧名兼容清扫"，那是新决策，我没做）；
+  ②A18 用例②的可见残留数从 **2 变成 1**（清扫挂在每次写盘上），任何引用"两次 kill 留两个"的
+  文档/review 判据现在都过时；③用例函数改名（`…TheStagingFileBehind` → `…TheNextWriteReclaimsTheStagingFile`），
+  票 20 证据文件里的旧名不改写。
+  **next=交复核代理复现 AC#1–AC#5；①要不要补"旧名兼容清扫"由 owner 判。**
