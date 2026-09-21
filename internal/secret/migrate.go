@@ -10,6 +10,8 @@ import (
 	"strings"
 
 	"github.com/pelletier/go-toml/v2"
+
+	"github.com/CarlosShao/wisp/internal/winsec"
 )
 
 // Migration vocabulary (D33, D36#5, SPEC-03 §5.3): config.toml must never
@@ -71,7 +73,9 @@ type plaintextField struct {
 //  2. the field becomes api_key_ref = "dpapi:<blob-id>" (deterministic blob
 //     id derived from the TOML path, so re-runs address the same blob);
 //  3. the original file is backed up as config.toml.bak-plaintext (an
-//     existing backup is never clobbered - the FIRST original wins);
+//     existing backup is never clobbered - the FIRST original wins - but it is
+//     narrowed to the current user either way: that file holds the plaintext
+//     keys this migration exists to remove, ticket 89);
 //  4. a user-visible notice is logged (slog) and returned in the report.
 //
 // Idempotent: a config without plaintext api_key fields is a no-op (no
@@ -149,13 +153,26 @@ func MigratePlaintext(configPath string) (*MigrationReport, error) {
 
 	// Backup the original. An existing backup is never overwritten: the
 	// first-seen original is the one worth keeping.
+	//
+	// Both branches have to seal. The backup is the *pre-migration* config, i.e.
+	// the one file on this machine that still carries every plaintext api_key the
+	// user had before D33 moved them into DPAPI blobs - and a mode argument is
+	// decorative on Windows (ticket 89, AC#1: `0o600` there lands as whatever the
+	// parent directory's ACL says, measured as `(M,DC)` for two other local
+	// accounts). Sealing only the rewritten config while leaving the plaintext
+	// copy wide hands the whole migration back to the hole it was meant to close.
+	// The existing-backup branch is the repair path for exactly that tree: a
+	// backup written before this call sealed anything stays on disk forever,
+	// because the branch above refuses to overwrite it.
 	backupPath := configPath + BackupSuffix
 	if _, statErr := os.Stat(backupPath); errors.Is(statErr, fs.ErrNotExist) {
-		if werr := os.WriteFile(backupPath, raw, 0o600); werr != nil {
+		if werr := winsec.PrivateFile(backupPath, raw, 0o600); werr != nil {
 			return nil, fmt.Errorf("secret: migrate: write backup %s: %w", backupPath, werr)
 		}
 	} else if statErr != nil {
 		return nil, fmt.Errorf("secret: migrate: stat backup %s: %w", backupPath, statErr)
+	} else if serr := winsec.SealFile(backupPath); serr != nil {
+		return nil, fmt.Errorf("secret: migrate: seal existing backup %s: %w", backupPath, serr)
 	}
 	report.BackupPath = backupPath
 
@@ -165,7 +182,11 @@ func MigratePlaintext(configPath string) (*MigrationReport, error) {
 		return nil, fmt.Errorf("secret: migrate: serialize: %w", err)
 	}
 	tmpPath := configPath + migrateTmpSuffix
-	if werr := os.WriteFile(tmpPath, out, 0o600); werr != nil {
+	// Same reason as the backup, and the same shape AC#2's "the directory chain
+	// has to carry it" argument names: this is a pre-rename temp, the class of
+	// file that exists only for a moment and is never sealed by anybody else.
+	// Rename preserves the descriptor, so this also lands on configPath.
+	if werr := winsec.PrivateFile(tmpPath, out, 0o600); werr != nil {
 		return nil, fmt.Errorf("secret: migrate: write %s: %w", tmpPath, werr)
 	}
 	if rerr := os.Rename(tmpPath, configPath); rerr != nil {

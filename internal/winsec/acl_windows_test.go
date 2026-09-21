@@ -377,3 +377,110 @@ func TestAC2SealedDirCoversFilesItNeverTouched(t *testing.T) {
 	}
 	assertPrivateACL(t, stray)
 }
+
+// ---------------------------------------------------------------- AC#2 (b) --
+//
+// TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs is the coverage leg
+// the first version of this file did *not* have, and the reason it did not have
+// it is worth keeping in the open: every child above holds its foreign grant by
+// **inheritance only**, and an inherited ACE is not stored in the child - it is
+// recomputed from the parent the moment the parent's DACL changes. So all of
+// them come out private even if sealDir's propagation walk is deleted (measured
+// twice: the ticket's own acceptance report §6(b), and the mutation recorded in
+// this ticket's log). The claim "sealing the data root repairs a tree that
+// predates this package" is therefore only true, and only testable, for children
+// carrying a grant of their **own**.
+//
+// That is also the honest boundary of the walk: it is load-bearing exactly when
+// somebody (an operator's share fix, a service-account grant, an installer) put
+// an ACE on the child itself. A test written against an arbitrary stray file
+// would pass for the wrong reason and pin nothing.
+func TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs(t *testing.T) {
+	root := filepath.Join(t.TempDir(), "data")
+	if err := winsec.PrivateDirAll(root, 0o700); err != nil {
+		t.Fatalf("PrivateDirAll: %v", err)
+	}
+	assertPrivateACL(t, root)
+
+	// An operator widens the root itself (a share fix, a service account that
+	// needs to read artifacts for a report). Everything created below inherits
+	// that grant, and two of the children are then given it *explicitly*.
+	run(t, "icacls", root, "/grant", "*"+everyoneSID+":(OI)(CI)(RX)")
+
+	// Three children each carrying its own explicit Everyone grant: a plain file,
+	// a directory, and a file born inside that directory afterwards (so it
+	// inherits the directory's own explicit grant as well).
+	ownFile := filepath.Join(root, "operator-widened-file.txt")
+	ownDir := filepath.Join(root, "operator-widened-dir")
+	inside := filepath.Join(ownDir, "inside.txt")
+	if err := os.WriteFile(ownFile, []byte("pre-existing artifact"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Mkdir(ownDir, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	// icacls /grant writes into the *object's* DACL: this is the explicit,
+	// non-inherited shape, which is the whole point of the construction.
+	run(t, "icacls", ownFile, "/grant", "*"+everyoneSID+":(RX)")
+	run(t, "icacls", ownDir, "/grant", "*"+everyoneSID+":(OI)(CI)(RX)")
+	if err := os.WriteFile(inside, []byte("sidecar of a widened dir"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	// A control that does NOT depend on the walk: this child's foreign grant is
+	// inherited from the root only, so rewriting the root's DACL is enough and
+	// the OS recomputes it. Logged as what it is - it stays green with the walk
+	// deleted, which is exactly why it is not the criterion.
+	reinherit := filepath.Join(root, "inherits-only.txt")
+	if err := os.WriteFile(reinherit, []byte("x"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	// Negative leg first: if the construction did not actually land a foreign
+	// grant on those children, every assertion below would measure air.
+	for _, p := range []string{ownFile, ownDir, inside} {
+		if !rawNamesEveryone(t, p) {
+			t.Fatalf("pre-condition: %s carries no explicit Everyone grant, so this test measures nothing", p)
+		}
+	}
+
+	if err := winsec.SealDir(root); err != nil {
+		t.Fatalf("SealDir over a tree with explicitly widened children: %v", err)
+	}
+
+	// The ticket's demand, stated against the OS's own text rather than against
+	// this file's parser: the foreign principal is simply absent afterwards.
+	for _, p := range []string{ownFile, ownDir, inside} {
+		assertNoForeignPrincipalText(t, p)
+		assertPrivateACL(t, p)
+	}
+	t.Logf("boundary check: %s holds only an *inherited* copy of the root's grant, so the OS recomputed it "+
+		"without the walk - this leg discriminates nothing, see the comment above", filepath.Base(reinherit))
+}
+
+// rawNamesEveryone reports whether icacls names Everyone on path - either as the
+// resolved account name or as the bare SID (icacls prints the SID whenever name
+// resolution fails, and this repository has already been bitten once by a parser
+// that assumed one spelling).
+func rawNamesEveryone(t *testing.T, path string) bool {
+	t.Helper()
+	raw := icaclsRaw(t, path)
+	return strings.Contains(raw, everyoneSID) || strings.Contains(raw, "Everyone")
+}
+
+// assertNoForeignPrincipalText is the ticket's criterion in its literal form:
+// the OS's own text for this object names Everyone nowhere - neither as the
+// resolved account name nor as the bare SID (icacls prints the SID whenever name
+// resolution fails). assertPrivateACL resolves names to SIDs and is the stronger
+// judgement; this one is the text-level reading the acceptance report asks for,
+// kept separately so a parser bug cannot make both agree by accident.
+func assertNoForeignPrincipalText(t *testing.T, path string) {
+	t.Helper()
+	raw := icaclsRaw(t, path)
+	for _, needle := range []string{everyoneSID, "Everyone"} {
+		if strings.Contains(raw, needle) {
+			t.Errorf("icacls text of %s still names the foreign principal (%s):\n%s",
+				filepath.Base(path), needle, raw)
+		}
+	}
+}

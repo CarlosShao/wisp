@@ -58,6 +58,39 @@
 
 ## Progress log（append-only）
 
+- 2026-09-21 17:2x（`agent-ticket89b`，**退回单第 1、2 条：判据 + 接线落地**）：
+  **第 1 条（AC#2 的覆盖面主张没有用例咬）——判据已进包内**：
+  `internal/winsec/acl_windows_test.go::TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs`。
+  形状就是验收报告 §6(b) 那台探针（搬进来，不是引用）：`PrivateDirAll(root)` 之后先
+  `icacls root /grant *S-1-1-0:(OI)(CI)(RX)`（模拟运维带外授权），再造三个**自带显式 ACE** 的子项
+  （`icacls <child> /grant *S-1-1-0:(RX)` 写的是**该对象自己的** DACL——这正是"只有子项自带显式 ACE 时 walk 才承重"那一格）
+  与一个**纯继承**的对照孩子，然后只调公开入口 `SealDir(root)`。两条断言腿：
+  `assertNoForeignPrincipalText`（**icacls 原文**里 `S-1-1-0` 与 `Everyone` 两种拼法都不许出现）+
+  `assertPrivateACL`（名字→SID 解析后按白名单判，两把尺子分开，防止一个解析 bug 让两条一起说谎）。
+  **先断言宽再断言窄**：`rawNamesEveryone` 不成立就 `t.Fatalf` 拒绝跑完（票 79 那次"判据被编辑掉"的红就是缺这条）。
+  诚实边界也钉死在文件里：那个纯继承的孩子**在删掉 walk 的 build 上仍然绿**（OS 自己重算），
+  注释与 `t.Logf` 都明写它"不区分任何事"——所以承重格是"子项自带显式 ACE"，不是"随便建个子文件"。
+  **读数（HEAD，`-count=1 -v`，具名 4 条全 PASS、0 SKIP、0 FAIL）**：
+  `TestAC2SealedDirCoversFilesItNeverTouched` 1.77s / `TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs` 0.59s /
+  `TestAC2MigrationBackupIsPrivate` 0.87s / `TestAC2PreExistingMigrationBackupIsRepaired` 0.25s。
+  ⚠ "删掉 `propagatePrivate` 必红"的变异读数在下一枚 commit（本枚只落判据，不许先把结论写上）。
+  **第 2 条（同包最坏的产物没封）——一行级接线 ×2 已落，另加 repair 腿 ×1**：
+  `internal/secret/migrate.go` 的 `os.WriteFile(backupPath, raw, 0o600)` → `winsec.PrivateFile`、
+  `os.WriteFile(tmpPath, out, 0o600)` → `winsec.PrivateFile`；**并**把"备份已存在就不写"那条分支补上
+  `winsec.SealFile(backupPath)`——理由：`config.toml.bak-plaintext` 是**永不覆盖**的，
+  一台在本修复之前跑过迁移的机器上，那份明文副本会**永远**宽下去，只接新写的路径等于只修未来不修现场。
+  **密封前后各取一次 icacls 原文（`internal/winsec/migrate_windows_test.go`，同一对象、同一条路径）**：
+  备份文件先 `icacls /grant *S-1-1-0:(RX)` ⇒ BEFORE 读数 `NOT PRIVATE … foreign SID(s) S-1-1-0`（测试自己把它 `t.Logf` 出来），
+  跑 `secret.MigratePlaintext` ⇒ AFTER 读数只剩 `NT AUTHORITY\SYSTEM / BUILTIN\Administrators / DESKTOP-LVS7839\swq`，
+  且断言备份**字节没被改写**（first-seen original must win 这条既有语义不能被 repair 腿破坏）。
+  另一条腿 `TestAC2MigrationBackupIsPrivate` 在带外宽父目录里跑真迁移：迁移前的 `config.toml` 仍是宽的
+  （那是 `internal/config` 的写路径，票 95 的账，本票不越界），**它备份出来的 `.bak-plaintext` 已经私有**，
+  `secrets\` 全树 sweep 私有，且迁移后的 `config.toml` 也私有（tmp 封了 + rename 保留 descriptor）。
+  门禁（本枚）：`gofmt -l internal/winsec internal/secret` 空、`gofumpt -l` 空、
+  `go vet ./internal/winsec/ ./internal/secret/` rc=0、`go test -count=1` 两包 `ok`（winsec 7.380s / secret 0.378s）。
+  next= 本枚 SHA 上做两次变异（删 `propagatePrivate`、把 migrate 两行退回 `os.WriteFile`）取红名 → 交第 3 条（符号链接真测）
+  与第 4 条（静默清除改成会报出来）。
+
 - 2026-09-21 16:1x（编排者，**验收退回单，四条待补；代理已收工 ⇒ 修复另派一人**）：
   `acceptor-ticket89` 八项全部自己测过（未抄本票一个数字），基线/红转绿/"差点假绿"/PROTECTED 变异/
   fail-closed 变异/junction 复现/AC#6 真 Linux 都成立。挡在结案前面的只有四条：
