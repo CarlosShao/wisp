@@ -75,3 +75,15 @@ commit 前核对 `git diff --cached --name-only`；禁 `--amend`/`reset`/`rebase
   （`internal/agent/approval/ui.go:124`）是**答复侧**（`Veto`/`q.allow`/`q.reject`）的具名错误，
   这三条路径实测是**立即返回**的。⇒ 倾向 **(b) 有界等待**，票面"无上限挂死"的说法待 AC#1 两侧读数裁决后**照实改小**。
   `next=` 先补 AC#1 的两侧读数（Windows 本机 + docker `golang:1.27` 的 `git archive` 仓外快照）。
+- 2026-09-21 **AC#1 用例落地 + Windows 侧读数（checkpoint 2）**：新文件
+  `internal/agent/approval/ticket84_no_owner_test.go`（5 条用例，全部在 `internal/agent/approval/` 内，
+  未动 `bridge.go`、未动任何既有测试）。Windows 本机 `go test -count=1 -timeout 120s -v -run '<5 条命名>'`
+  **rc=0**：`unanswered L2 (250ms deadline): returned after 250.9374ms (start=12:54:47, end=12:54:48)`；
+  八条"无对应待审批项"答复路由（`Native.Allow`/`Native.Reject`/`Panel.Reject`/`DecideFromNative.{allow,reject}`/
+  `DecideFromPanel.reject`/`Veto.unknown`/`Veto.empty`）全部 `in 0s` 且 `errors.Is(err, ErrUnknownCorrelation)`；
+  界面不可达那条 `returned after 0s`（立即 fail-closed）。
+  **1 条 `--- SKIP` 已点名**：`TestDefaultDeadlineWallClockMeasurement`（默认 300s 的墙钟计量，
+  需 `WISP_84_MEASURE=1` 显式开启，本轮两侧各真跑一次，读数进 `docs/evidence/s1/84-ac1-bounded-wait.md`）。
+  短窗口那条用例用的是 `Options.ApprovalTimeout`——生产同款旋钮（`cmd/wisp/run.go:259` 从
+  `[risk].confirm_timeout_sec` 喂进来），不是给测试单独塞的小窗口。
+  `next=` Linux（docker `golang:1.27` + `git archive <sha>` 仓外快照）跑同一批 + 300s 墙钟计量，再核 AC#2 契约行号。
