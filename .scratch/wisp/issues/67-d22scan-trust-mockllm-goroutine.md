@@ -1,6 +1,9 @@
 # 67 — 让 D22 静态门重新可信：`mockllm.go` 裸 goroutine + emoji 门看不见 Go 字符串
 
-**Status:** blocked-on-ticket:66（AC#1/AC#2 **已交付并经编排者独立验证**；AC#3 要改 `cmd/wisp/providers.go`，与票 66 同包）
+**Status:** review（**4/4 框已勾**；AC#1/AC#2 早前经编排者独立验证，AC#3 于 09:41 由编排者勾选，
+AC#4 见下。**待办只剩一张 1:1 裁决表**，之后即可 `-done`。
+⚠ 两条移交已写进**票 71**：ban #6 仍指 `frontend/`（恒 0 文件的死作用域，不是我该缩的禁令）、
+`.github/workflows/ci.yml:23` 注释仍写 "design/ and frontend/" 与现覆盖面不符（该文件归票 70））
 **Claimed by:** agent-ticket67（报告已交，**勿重开 AC#1/AC#2**；AC#3 等票 66 收尾后由**新代理接续**，从 Progress log 的 `next=` 起）
 **Last update:** 2026-09-21（AC#3 判据① 字形清理已落地，见 Progress log 末条；覆盖面扩展等票 70）
 **Blocked by:** —（包与票 66 不相交：`internal/llm/adaptertest` + `tools/d22scan`；**AC#3 例外，须等票 66 落地**，见下）
@@ -42,7 +45,17 @@ CI 该步**无 `continue-on-error`** ⇒ **job 红**。
   我踩的坑不是"扫描器漏报"而是"我用的调用方式让它没跑"，所以这一格的交付物包括
   **把仓根误调用也变成不可能**：要么在 `scripts/` 加一个包装入口并在 CI 与文档里统一用它，
   要么让它对错误调用**显式报错退出**。
-- [ ] **AC#3 emoji 门覆盖面（本票唯一要动 `cmd/wisp/` 的半格，等票 66 落地后再做）。**
+- [x] **AC#3 emoji 门覆盖面（本票唯一要动 `cmd/wisp/` 的半格，等票 66 落地后再做）。**
+  **2026-09-21 09:41 由编排者勾选**，判据是我自己敲的两条：
+  ①覆盖面已扩（`bcf44d6`）——`cd tools/d22scan && go run . -root ../..` 末行自报
+  `internal/ 292 Go files, comments and _test.go included; cmd/ 21`（**不是空转**，A16 那一族的判据）；
+  ②`go test ./... -run SelfScan -v` → `--- PASS: TestScannerSelfScanOfRealRepoIsGreen (0.24s)`。
+  ⚠ **诚实记账：这条框不是代理交完就成立的**。它一直红到 09:40，因为**票 20 的 `d63bc49`（比票 67b 晚 5 分钟入库）**
+  在 `internal/tools/bridge_junction_windows_test.go:444` 的注释里带了一个 `U+26A0`——
+  新门上线后抓到的**第一个真命中**，代价是 **HEAD 的 CI lint 红约 13 分钟**。
+  我用 1 行纯注释的 ASCII 替换收掉它（`a8ae9ad`，**没加豁免、没 skip、没动那条注释记录的实质内容**）。
+  **⇒ 通用判据（新）**：**放宽一个门禁的覆盖面，必须在同一批改完它新照到的存量违规**，
+  否则"覆盖面扩展"与"上一个提交"之间必然存在一段红窗口。本条已归 **票 71**（它正是管"门要自报覆盖面"的票）。
   今天 `main.go:71` 的 `emojiRe` 只被 `walkEmoji` 用在 `design/` 与 `frontend/`（`main.go:137-142`），
   而 **`frontend/` 在本 HEAD 不存在** ⇒ 门对 `internal/`+`cmd/` 的 Go 字符串字面量**完全不可见**。
   真命中 3 处、由**票 12 自己的 `cd011b8`** 带入：`cmd/wisp/providers.go:201`（`U+2717`）、`:203`（`U+2713`）、
