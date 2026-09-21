@@ -133,3 +133,15 @@ by default** — an entry invisible to the quota is how a 500 MB cap becomes 2 G
     commit `6901aa9` 的正文里（那四个 `wantName` 字符串本身就是本票要消掉的折叠结果）。
     next=clean-HEAD 复测（`git archive HEAD | tar -x -C /tmp/…`，在仓外），确认这枚 HEAD 单独可绿，
     然后把 run id / 数字交给验收。
+- 2026-09-21（实现代理，checkpoint 4 = clean-HEAD 复测）：**HEAD `878d9f8` 单独自洽**。
+  `git archive HEAD | tar -x -C /tmp/wisp79-head`（在仓外，不建 worktree，A38④），
+  在那份快照里 `go vet ./internal/agent/ ./internal/memory/` rc=0，
+  `go test -count=2 ./internal/agent/ ./internal/memory/` = **ok agent 2.904s / ok memory 25.683s**。
+  ⇒ 我的两枚 commit 不依赖任何人在飞的未提交改动。
+  **本票范围外、没动、要有人接手才知道的三件事**：
+  (1) `docs/specs/SPEC-05-agent-core.md:115` 与 `SPEC-02-data-storage.md:180` 还写着
+  `artifacts\tool-output-<id>.txt`，磁盘上现在是 `<encoded id>`（票 20 面 `:107` 那句
+  "只留 `[A-Za-z0-9_-]`，整串剥光退回 `tool-output-seq<N>.txt`"也已被本票作废——那是编排者的面，我没改）；
+  (2) `0o600` 在 Windows 上不落地（实测 `-rw-rw-rw-`），要真"仅 owner 可读"得走 ACL，属另一票；
+  (3) 名字里可能有 `%`，任何把 artifact 路径拼进 cmd.exe 的新路由要先过一遍这条。
+  next=交验收。判据复跑命令全部在上面三条 Progress 记录里，可直接复制。
