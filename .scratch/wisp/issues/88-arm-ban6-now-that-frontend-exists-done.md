@@ -1,6 +1,14 @@
 # 88 — 把 `ban #6` 从"豁免"翻成"真覆盖"（`frontend/` 已经进树了，豁免就变成谎话）
 
-**Status:** ready-for-review
+**Status:** **accepted-done**（2026-09-21 16:0x 独立对抗验收判 **AC#1–AC#6 六格全 PASS**，
+裁决表 `docs/evidence/s1/88-adversarial-acceptance.md`。验收代理在快照 `git archive 84e4161` 里
+自己种、自己删、自己退：正向种子 ⇒ rc=1 点名；`rm -rf frontend` 而仍声明 `live:true` ⇒
+**编译出的二进制 rc=2 且输出里 `clean` 出现 0 次**（它同时记下读数坑：`go run` 会把 2 折成 1）；
+ban 正则块 **sha256 前后一致**、`emptyLiveScope`/`driftedAbsentScope` **函数体逐字节相同**、
+allowlist 前后**都是 5 行且 diff 为空**；**六枚变异全红**（含"把整个布尔退回 exempt"那一枚），无一条被改写成恒真。
+⚠ 它登记的**两条非本票残留**已由编排者立案：**票 99**（`scripts/d22scan.sh` 第一步是裸 `go test ./...` ⇒
+**本机测试缓存能把一次真违规端成绿**），以及 `internal/winsec/winsec.go:126` 那条仍压着 push 的
+`pathresolver-bypass`（**票 94**，与 HEAD 同树复现，不是本票的账）。）
 **next:** 编排者验收——AC#1~AC#6 六框已勾（数字逐条挂在 log 第 2/3/5/6 条），代码沿用 `84e4161`，
           本票只补票面证据。**push 的 blocker 已从本票转移到票 89**（见 log 第 7 条的红账）。
 **Type:** 门禁完整性（A26 / A44① / A54② / A56④ 的同族，**这一次是轮到 ban #6 自己**）
