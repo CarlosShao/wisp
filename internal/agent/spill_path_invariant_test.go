@@ -379,8 +379,10 @@ func TestSpillAPITakesNoCallerControlledDestinationPath(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	pathLike := []string{"path", "dir", "dirname", "dest", "dst", "target", "root",
-		"basedir", "folder", "filename", "file", "prefix", "where", "output"}
+	pathLike := []string{
+		"path", "dir", "dirname", "dest", "dst", "target", "root",
+		"basedir", "folder", "filename", "file", "prefix", "where", "output",
+	}
 	const constructor = "NewSpiller" // the one host-side place a dir is supplied
 
 	render := func(n any) string {
@@ -409,8 +411,10 @@ func TestSpillAPITakesNoCallerControlledDestinationPath(t *testing.T) {
 	// Sinks: the os mutators plus this file's own write primitive. Every sink
 	// call's first argument must be a local whose initializer mentions BOTH
 	// s.dir and the sanitizer artifactName(.
-	mutators := map[string]bool{"WriteFile": true, "Create": true, "OpenFile": true,
-		"MkdirAll": true, "Remove": true, "Rename": true}
+	mutators := map[string]bool{
+		"WriteFile": true, "Create": true, "OpenFile": true,
+		"MkdirAll": true, "Remove": true, "Rename": true,
+	}
 	localSinks := map[string]bool{"writeFileExclusive": true}
 	checked := 0
 	for _, fd := range inv76aFuncDecls(src) {

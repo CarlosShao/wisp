@@ -131,8 +131,10 @@ func TestArtifactsAPITakesNoCallerControlledDestinationPath(t *testing.T) {
 	src := inv76ParseFile(t, "artifacts.go")
 
 	// Every parameter name that would mean "the caller chooses where this goes".
-	pathLike := []string{"path", "dir", "dirname", "dest", "dst", "target", "root",
-		"basedir", "folder", "filename", "file", "full", "prefix", "joined", "abs", "where"}
+	pathLike := []string{
+		"path", "dir", "dirname", "dest", "dst", "target", "root",
+		"basedir", "folder", "filename", "file", "full", "prefix", "joined", "abs", "where",
+	}
 
 	// listArtifactsDir is the one internal helper that does take a directory, so
 	// the audit must (a) allow it and (b) prove nobody can feed it anything but
@@ -189,9 +191,11 @@ func TestArtifactsAPITakesNoCallerControlledDestinationPath(t *testing.T) {
 	// Every filesystem-mutating call in the file must be rooted at
 	// s.artifactsDir, either directly or through a local assigned from a
 	// filepath.Join(s.artifactsDir, ...) in the same function.
-	mutators := map[string]bool{"Remove": true, "RemoveAll": true, "MkdirAll": true,
+	mutators := map[string]bool{
+		"Remove": true, "RemoveAll": true, "MkdirAll": true,
 		"WriteFile": true, "Create": true, "CreateTemp": true, "OpenFile": true, "Rename": true,
-		"Truncate": true, "Chmod": true, "Chtimes": true}
+		"Truncate": true, "Chmod": true, "Chtimes": true,
+	}
 	checked := 0
 	for _, fn := range inv76Funcs(src) {
 		derived := inv76DirDerivedVars(fn, "s.artifactsDir")
