@@ -1,8 +1,8 @@
 # 70 — 让 CI 真的成为护栏：5 个 job 全红，逐因分诊（本仓的"门禁"从未生效过）
 
-**Status:** in-progress
-**Claimed by:** ~~agent-ticket70~~（174 次调用撞 turn 上限而死，**票面一条 log 都没写**）→ ~~agent-ticket70-c~~（只做 AC#2/AC#4/AC#6，已交回）→ **agent-ticket70-d**（接手 AC#1 尾巴 / AC#2 新 HEAD 重测 / AC#6 逐步骤证据 / D22 positive control 卡点）
-**Last update:** 2026-09-21 12:3x（agent-ticket70-d：**AC#1 已按判据正文闭**（`6ce43c7` + 勾框说明）；AC#2 在新 HEAD 重测完＝**3 包 / 10 条红，未达成**；AC#6 逐步骤表已贴（3 success / 2 failure）；D22 positive control **已不红**（`a8ae9ad`）。新炸点：`staticcheck` 那一步在 go1.27 上**跑不动**，升版本即挖出 **35 条** finding ⇒ 全交回编排者）
+**Status:** ~~in-progress~~ → **blocked-on-owner**（agent-ticket70-d 本轮承诺的 4 项已全部交付；剩下每一件事的判据都不在代理手里：`internal/risk` 的 ubuntu 归属 / `staticcheck` 的 pin-vs-35-findings 顺序 / 放行 `internal/config` 那一行注释 / push 之后才能取到的 AC#6 五 job 全 pass）
+**Claimed by:** ~~agent-ticket70~~（174 次调用撞 turn 上限而死，**票面一条 log 都没写**）→ ~~agent-ticket70-c~~（只做 AC#2/AC#4/AC#6，已交回）→ ~~agent-ticket70-d~~（AC#1 尾巴 + AC#2 新 HEAD 重测 + AC#6 逐步骤证据 + D22 卡点，已交回；**未 push**）
+**Last update:** 2026-09-21 12:5x（agent-ticket70-d 收尾：AC#1 **已勾**；AC#2 在新 HEAD 重测＝**Linux 上只剩 `internal/risk` 1 包 / 8 条红**（中途曾数到 3 包 10 条，被票 81 的 `4683c34` 修掉 2 条，两条账都在 log 里）；AC#6 逐 job 逐步骤表已贴（run `35558750456`＝3 success / 2 failure，cancelled run 按 total_count=0 排除）；D22 卡点：在 `17efc2c` 上**已不红**（`a8ae9ad`），但在最新 HEAD `c12c82f` 上**以新形状复现**（票 83 的 `🔒` 注释）。两件从未产生过 CI 判据的事被本次取证揭出：`go vet (module)` 在 Linux 实测 **rc=0**（票 78 的修复首次有证），而 `staticcheck` 那一步 **pin 在 go1.27 上根本跑不动**、升版本即 **35 条 finding**）
 **Blocked by:** ~~66、68~~ **两条都已解除**：票 66 已闭（`-done`），票 68 是 `blocked-on-owner` 且 `internal/ball`/`cmd/balldebug` 已让出
 
 > ## 编排者重建的断点（09:15，我逐条亲自验过，**接续代理不要重做**）
