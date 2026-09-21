@@ -856,7 +856,25 @@
 
 **不答的总代价**：票 65（质感返工）与票 68 AC#2/AC#3 全部动不了，SPEC-08 的 INTERIM"赝品"标记继续挂着。
 
+- **[A34] ⚠ 共享工作树的新事故类型：**别的代理 `git commit --amend` 把它下面我的提交孤立掉了**（我核过 reflog，无数据丢失）**—
+  08:52 时间线（`git reflog` 原文）：票 70 的代理先 `commit: fix(70)…`（`3539d47`）→
+  我 `commit: docs(62,HANDOVER)`（`c2ec6c3`，父就是 `3539d47`）→ **它 `commit (amend)` 生成 `4fb2ad8`**
+  ⇒ amend 的父是 `e4d5a20`，**我的 `c2ec6c3` 当场从分支上被摘掉**（它的 numstat 里还**多出了我的两个文件**
+  ——因为索引是共享的，amend 会把我 staged 的东西一起吞进去）→ 随后一步 `reset: moving to c2ec6c3` 恢复。
+  **现状我逐条验过，没有损失**：`HEAD == origin/dev == cnb/dev == b4df8d9`（**没人 force-push**，
+  `4fb2ad8` 不在任何分支上）；我的 62/HANDOVER 三处内容 grep 全在；
+  它的 R16 改动也在（`cmd/balldebug/main.go` 里裸 `go` 语句 **0** 处、`observe` 相关调用 **8** 处、
+  名册名 `balldebug-hotkey-bridge` / `balldebug-level-feeder` **不借产品名**，R16#5 兑现）。
+  **根因不是它"作弊"，是我给的规矩有洞**：简报里禁止了 `git add -A`、`git stash`、`git checkout .`、`push`，
+  **唯独没禁 `git commit --amend` 与 `git reset`**——而"已推送不许改写"这条我只写给自己，没写给代理。
+  ⇒ **今后所有简报固定加一条**：`commit --amend` / `reset` / `rebase` **一律禁止**，
+  要改主意就**再补一个新 commit**（本项目今天已经在自己的历史上付过两次"改写"的学费：A30① 与 A31）。
+  顺带记一条正面事实：这次的接续与自我修正质量很高（它连做两个 `fix(70)` 把 balldebug 三处、
+  `cmd/wisp` 的 Win32 面收进 build tag、`//go:build windows` 补上——那是 ubuntu lint 里"从没被看见过的三颗哑弹"）。
+  **归属**：规矩改在我的简报模板里；无待办。
+
 - **[A30] 票 68 的 ①–⑥ 已归 registry A29；本节 R15 是它们中**只有 owner 能答**的那部分** —
+
 
   纯索引条目，避免"发现记了但没人拍板"。对应关系：R15#1/#2↔A29①，#3↔A29⑤，#4↔A29②，
   #5↔A29③，#6↔A28/A29 DPI 条；A29④（`SleepWindowEdgePx` 零调用者）与 A29⑥（winlive 地雷）
