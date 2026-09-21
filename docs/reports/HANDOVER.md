@@ -100,6 +100,15 @@
 - **只读代理**：票 75 根因定位（只写一个证据文件 `docs/evidence/s1/75-rootcause-linux-path-shape.md`）。
   它的产出决定票 75 开工时改哪一行，**不要重复派**。
 
+**两个在飞代理的断点原文（10:19 抓取；代理若被杀，接续就从这两句起，别整票重做）**
+- 票 72：`next=AC#4 等编排者 push 后的一次真 run（test-windows）；AC#6 的步骤改名因 ci.yml 属票 71 而未做`
+  ⇒ **我已经推送（HEAD `9c161bb` 双远程同步）**，所以它欠的只是一次真 run 的 run id + 结论；
+  取法：`gh run list --branch dev --limit 3 --json headSha,conclusion,status`（**记得区分 failure / cancelled / 未跑完，见 A40②/A41**）。
+- 票 76：`next=写 internal/agent/spill_path_invariant_test.go（四种形状净化后的磁盘名逐个断言）`
+  ⇒ 该文件此刻**已存在但未跟踪**，`internal/memory` 侧已在 `d9224af` 落地 ⇒ 接续只做 agent 半边。
+- 票 71 最新提交 `7a4d3ee`（"本地装了 gofumpt 才看见我自己这两个文件会让 lint 第一步红"）
+  ⇒ **教训同一族**：门禁工具没装在本地时，"我没看到红"不等于"没有红"（A15/A16 的形状）。
+
 **队列**：**票 75**（Linux 上 C26 产反斜杠 ⇒ `risk` 17 + `tools` 19 FAIL + 600s 超时）
 **派发条件是票 72 落地**（同一个 `internal/risk`，同包并行=假并行；我建票时误写成"等票 73"，已在票面更正）。
 
