@@ -161,24 +161,35 @@ AC#5 本地四数（新 runner，默认 16 包全量，**两侧都带 `-v`**；�
 其余门禁：`gofmt -l internal/risk/` 空；`bash -n scripts/portable-tests.sh` rc=0；
 `sh scripts/d22scan.sh`（快照内）clean，八项 scope 计数全在输出里；我的新文件与追加段零非 ASCII 字符（ban #8）。
 
-AC#4 **未勾**：本代理不 push，`c8c828e` 还没进任何 run ⇒ 没有真实 run id 与步级结论可贴。
-**欠编排者 push 后复跑**，判据与命令：`gh run list --branch <分支> --limit 3` 取 run id，
-`gh run view --job <test-core job id> --log` 或 `gh api repos/<owner>/<repo>/actions/jobs/<job-id>/logs`
-读 **steps 数组**（不读 job 颜色），确认 "Portable package tests" 这一步自己给出结论
-（期望：日志含 `portable-tests.sh: four numbers ... --- SKIP=0`，以及 F-1 那条 `internal/tools` 红名 ——
-这一步红是**正确的**，它是本票第一次让该步产出真结论）。顺带预期 `test-windows` 的
-"Portable windows tests" 也第一次因 F-2 之外的原因给出结论。
+AC#4 **未勾**：本代理不 push，`c8c828e` 与 `df0a1e0` 都还没进任何 run
+（`gh run list --limit 50 --json headSha` 里两个 sha 各 `grep -c` = 0）⇒ **欠编排者 push 后复跑**。
+
+拿得到的**修前**步级读数（`gh run view 35590599782 --json jobs` 读 steps 数组，不读 job 颜色；
+该 run headSha=`a64d06fb8cb6d3b1055a17deb5ac423f6bbc2853`，job conclusion=failure）：
+
+    test-core :: Portable package tests (...)      :: success
+    test-core :: Environment fork assertion        :: success
+
+这就是本票要钉的形状在 CI 台账上的证据：那一步自己判 `success`，而它内部两侧各含着 7-8 条 `--- SKIP`
+（AC#1 的台账）——"步级 success"与"结论产出过"不是同一件事。注意该 run 的 headSha 比 360efdf 旧，
+所以 **F-1 进树之后的 CI 还没有任何 run**：我不能说那道后门"已经从未执行过"，只能说
+**一旦 portable 步红（F-1 让它在 linux 上必红），GitHub 在首个失败步后停止执行，后面的门就不会跑**；
+本票已把 `Environment fork assertion` 提到该步之前，属加严（未删步骤、未改阈值）。
+push 后的期望读数与勾框条件：日志含 `portable-tests.sh: platform=linux ... four numbers
+(all from -v output): === RUN=… --- PASS=… --- FAIL=… --- SKIP=0`，且该步 conclusion 为 failure 并点名
+`TestPathCanonicalizerAccountsForRewrittenRoots`（这一步红是**正确的**，是该步第一次产出真结论）；
+把 run id + job id + 该步 conclusion 原文回填本段才勾框。另核 `test-windows` 的
+"Portable windows tests"（现在也走同一个 runner）。
 
 顺手发现（都不在我界内，登记不修）：
 - **F-1**（linux 真红，包 = `internal/tools`，不是我上面初判的 risk）：`--- FAIL: TestPathCanonicalizerAccountsForRewrittenRoots`，
   `internal/tools/paths_rewrite_ticket102_test.go:64`，`InAllowlist("/tmp/…/proj/a.txt") = false although the expanded root is a real tree`。
   windows 侧 PASS ⇒ 只在 POSIX 红。裸 `go test` 也会报这条（FAIL 不像 SKIP 那样被记成 ok），所以它不是假绿；
-  但它意味着 `test-core` 的 portable 步自 360efdf 起在 CI 上是红的，而排在它后面的
-  `Environment fork assertion` 从未执行（本票已把那道门提到前面，见上）。next= 回派票 102 的 owner。
+  但它让 `test-core` 的 portable 步在 linux 上必红，并把后面的门挡掉（见上）。next= 回派票 102 的 owner。
 - **F-2**（windows 真红）：`internal/risk/pathresolver_budget_norace_test.go:37`
   `TestResolvePerCallBudget: C26 Resolve 2.202 ms/op, budget 1.000 ms, 1207 samples`。
-  `a1613d9` 上同一棵树这一段是 PASS（`=== RUN=986 PASS=617 FAIL=0`），到 `360efdf`（父链含票 103 的 winsec 改动）
-  变红。阈值属禁改面，我没动。next= 票 103 或编排者判它是不是真回归。
+  `a1613d9` 上同一批包是 FAIL=0（`=== RUN=986 PASS=617 SKIP=7`），到 `360efdf`（父链含票 103 的 winsec 改动）
+  变红。阈值属禁改面，我没动。next= 票 103/106 或编排者判它是不是真回归。
 
 next=（本票留给下一手的具体命令）：
 1. 编排者：push `c8c828e` ⇒ 复跑 AC#4（命令见上），把步级结论回填本段并勾框。
