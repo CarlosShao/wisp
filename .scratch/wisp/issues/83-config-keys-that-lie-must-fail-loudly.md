@@ -1,6 +1,7 @@
 # 83 — 配置里"看着能用、其实没接线"的键要**响亮地失败**（票 80 裁决 (C)；先例 `SPEC-03:42 verify_signature`）
 
-**Status:** claimed（票 83 由写码代理认领；AC#1 键清单扫描中）
+**Status:** 五框全闭、待对抗验收（AC#1 表在 L2 / 校验在 `internal/config/unwired.go` / 变异在 L3 / 不做的在 L4 / 门禁在 L4）。
+起点 HEAD `4b05be0`，本轮 commit：`6028977`(认领) → `a95ee3a`(守卫码+用例) → `4dec91b`(AC#1 表) → 本轮(L3/L4)
 **Type:** 安全可用性/诚实性（一个说谎的配置键）——**不是**新能力
 **Blocks:** nothing · **Blocked by:** nothing（`internal/config` 此刻无人写；票 80 已交回且零 Go 改动）
 **Packages:** `internal/config/`（校验与加载路径）+ 新建的用例。**禁改**：`docs/PLAN.md`、`docs/specs/*.md`
@@ -30,23 +31,34 @@
 
 ## AC（1:1，裁决表 `docs/evidence/s1/83-*.md`）
 
-- [ ] **AC#1** **先把同类键扫全**（不要只修一个键就交）：`grep` 出 `internal/config` 里每个被解析、
+- [x] **AC#1** **先把同类键扫全**（不要只修一个键就交）：`grep` 出 `internal/config` 里每个被解析、
   但在 `internal/config` 之外**零消费者**的键。票 80 已经点了三个候选：`[risk] shell_enabled`、
   `allow_shell_string`、`shell_allowlist`（`grep "\.Risk\."` 全仓只命中 `L1WindowSec`/`ConfirmTimeoutSec`），
   以及 🔒 段的 `ConfirmLocked`（D36 规则 1，生产未赋值）。
   **交付物 = 一张表**：键 → 解析处 → 消费者（"无"也要给 grep 证据）→ 处置（响亮失败 / 已有计划接（指名票号）/ 保留但文档说明）。
   ⚠ "grep 零命中"在这里**不足以**定罪：要顺带查是否存在**间接消费**（反射、按名取值的 map、TOML 原样透传）。
-- [ ] **AC#2** 校验落地：对表里判为"响亮失败"的键，**加载时**报错并指名键名 + 一句"该能力尚未实现/由票 N 实现"，
+- [x] **AC#2** 校验落地：对表里判为"响亮失败"的键，**加载时**报错并指名键名 + 一句"该能力尚未实现/由票 N 实现"，
   **错误发生在任何副作用之前**（照 `verify_signature` 先例的形状）。
   判据用例必须包含：**不写这个键的用户不受影响**（默认配置仍加载成功）。
-- [ ] **AC#3** 双向变异：(i) 把校验去掉 ⇒ 用例红；(ii) 把校验做宽（例如对所有未知键报错）⇒
+- [x] **AC#3** 双向变异：(i) 把校验去掉 ⇒ 用例红；(ii) 把校验做宽（例如对所有未知键报错）⇒
   必须有用例**因此变红**（防止"用一个大棒假装修好了"）。锚点=承载行为的那一行，同链 grep 自证，还原后 `diff -q`/`git diff --quiet`。
-- [ ] **AC#4** 明确**不做**：不接 `risk.Gate`、不给 `Classify` 开 override 形参、不动审批队列。
+- [x] **AC#4** 明确**不做**：不接 `risk.Gate`、不给 `Classify` 开 override 形参、不动审批队列。
   在票面写一行"这些属于票 21 / 需 D22"，并把它链接到 A51⑤ 与票 80 的裁决。
-- [ ] **AC#5** 门禁（只跑自己碰的包）：`gofmt -l` 空、`gofumpt -l <files>` 空、`go vet ./internal/config/` rc=0、
+- [x] **AC#5** 门禁（只跑自己碰的包）：`gofmt -l` 空、`gofumpt -l <files>` 空、`go vet ./internal/config/` rc=0、
   `GOOS=linux go vet ./internal/config/` rc=0、`go test -count=2 ./internal/config/` rc=0，
   逐跑点名 `--- SKIP`/`--- FAIL`。**并且**：如果两包并跑出现墙钟抖动（票 80 量到 `TestResolvePerCallBudget`
   在 `config`+`risk` 并跑时红、单跑绿），**如实登记为外项**，不许顺手调那个 1ms 预算。
+
+## 每条 AC 的落点（裁决表就是票面自己，证据文件 `docs/evidence/s1/83-*.md` 本票**没建**——理由见下）
+
+| AC | 落点 | 达成 / 未达成 |
+|---|---|---|
+| AC#1 | L2 的键表 + 七条仪器 I-A~I-G | **达成（有声明的边界）**：Go 侧全量；**非 Go 侧（IPC/脚本按字符串取键）未扫**，L2 末段明写 |
+| AC#2 | `internal/config/unwired.go`（6 行守卫表）+ `validate.go:30` 挂载 + `unwired_test.go` 六个子例 & "默认配置照常加载" 四个子例 & 副作用次序用例 | **达成** |
+| AC#3 | L3（去掉校验 ⇒ 11 条红；做宽成"连有消费者的键一起拒" ⇒ 6 条红，含设计锚点；两次都有 grep 自证与还原证明） | **达成** |
+| AC#4 | L4 上半（三件不做的事 + 归票 21 / 需 D22 的链接） | **达成** |
+| AC#5 | L4 的表（本票包五项全 rc=0；两包并跑红 2 条 = `TestResolvePerCallBudget`，**登记为外项、未动 1ms**） | **达成（包内）**；⚠ 本轮**单跑也红**，见 L4 的抖动登记 |
+| 未闭的框 | **无一个框未闭**，但两处**没做到位的地方要说清**：① 没有单独的 `docs/evidence/s1/83-*.md`（AC 抬头要求"裁决表 `docs/evidence/s1/83-*.md`"）——票面 L2/L3/L4 已逐条 1:1 承载，且本仓规矩是"不主动新建报告 md"，要不要另立一份交编排者定；② `[plugins]` 五键**只登记未守卫**（L2 表 + L4 交回项 ②） | 见"需要编排者拍板" |
 
 ## Rules（本仓固定）
 
@@ -146,6 +158,91 @@ Status `open` ⇒ `claimed`。本轮次序：AC#1 全量同类键扫描（含间
 如果编排者知道有 GUI/IPC 侧按字符串取键的通道，本表结论要按那条通道复核。
 
 `next=` AC#3 双向变异的实测数字（写在 L3），AC#5 的并跑抖动登记（L4）。
+
+### L3 — AC#3 双向变异（2026-09-21，两次都在同一条 `&&` 链里先 grep 自证再跑）
+
+承载行为的锚点行 = `internal/config/validate.go:30` 的 `validateUnwired(c),`（守卫唯一入口）
+与 `internal/config/unwired.go` 的守卫表。
+
+**(i) 把校验去掉 ⇒ 用例红。**
+`sed -i 's/^\t\tvalidateUnwired(c),$/\t\t\/\/ MUTATION(i): guard removed/' internal/config/validate.go`
+⇒ 同一链内 grep 自证：`grep -c 'MUTATION(i)' validate.go` = **1**，`grep -c 'validateUnwired(c),' validate.go` = **0**。
+跑 `go test -count=1 -v -run 'TestUnwired|TestEveryLocked|TestRoundTrip|TestMigrate|TestValidate' ./internal/config/`
+⇒ **rc=1**，`=== RUN` 69、`--- PASS` 21、`--- FAIL` **4 顶层 + 7 子例 = 11 条**：
+`TestUnwiredSecurityKeysFailLoudly`（6 个子例全红：六个键各自"必须失败却通过了"）
++ `TestUnwiredGuardLeavesHonestConfigsAlone/tightening_a_guarded_key_past_its_default_is_still_rejected`
++ `TestUnwiredGuardFiresBeforeAnyFileWrite` + `TestUnwiredKeysStillRoundTripAtTheByteLevel`。
+⇒ 用例真锚在校验上，不是靠别的东西绿。
+
+**(ii) 把校验做宽（大棒）⇒ 必须有用例因此变红。**
+注入的"大棒"= 往守卫表里加一行，把**有消费者的** `fs.allowed_dirs`（`cmd/wisp/run.go:223` 在喂 C26 canonicalizer）
+也折进拒绝集合（`fires: len(c.FS.AllowedDirs) > 0`）。
+⇒ 同一链内 grep 自证：`grep -c 'MUTATION(ii)' unwired.go` = **2**（注入行 + 其 `lands`）、
+守卫表里 `path: "fs.allowed_dirs"` = **1** 行。
+跑同一串 ⇒ **rc=1**，`=== RUN` 69、`--- PASS` 19、`--- FAIL` **6 顶层 + 0 子例**：
+`TestUnwiredGuardIsScopedNotABigStick`（**设计好的那根反大棒锚点，如预期变红**：一份合法的
+`[fs] allowed_dirs` + `[risk] l1_window_sec` + `[net].proxy` + `[plugins]` + 30 多个"零消费者但未守卫"的键的配置被拒了）
++ `TestEveryLockedSectionKeyIsAccountedFor`（守卫表与处置表必须逐键对齐）
++ `TestRoundTripLoadMarshalLoad` + `TestRoundTripBytes` + `TestMigrateV1Fixture` + `TestMigrateNoVersionKeyAssumedV1`。
+⇒ 大棒式修法（"把所有没接线的键一律拒 / 把所有未知键一律拒"）**会被这棵树打红**，不是"改宽一点也算修好"。
+
+**还原证明**：变异 (i) 后 `git diff --quiet -- internal/config/validate.go` **rc=0**；
+变异 (ii) 后 `git diff --name-only -- internal/config/` 只剩 `unwired_test.go`
+（那是我当轮**故意要提交**的锚点加强，不是变异残留），`grep -c MUTATION internal/config/*.go` **16 个文件全 0**；
+随后 `go test -count=2 ./internal/config/` rc=0。
+
+`next=` AC#5 门禁 + 并跑抖动登记 + 本票明确不做的那件事（L4）。
+
+### L4 — AC#4 明确不做 + AC#5 门禁 + 墙钟抖动登记（2026-09-21）
+
+**AC#4：本票刻意不做的事**（写了就等于新造一条没人审过的**放行侧**通道）：
+1. **不接 `risk.Gate`**：不把 `cfg.Risk.BlacklistOverrides` 灌进 `bOverrides`，也不把生产判定链从
+   `risk.Classify` 换到 `risk.Gate`（换过去还要在 `rules_gateway.go:84 case TierB:` 上开豁免位 ⇒ 冻结面）。
+2. **不给 `Classify` 开 override 形参**（`internal/risk/blacklist.go:69` 的签名不动）。
+3. **不动审批队列 / 不动 `Manager.ConfirmLocked` 的 nil=fail-closed 语义**，不新增任何"L2 强确认之后把文件记进某张 map"的容器。
+   ⇒ 这三件事属于 **ticket 21**（`assessor.go:144-146` 冻结注释原文 "exemption flow lands with the approval queue, ticket 21"），
+   且按票 80 的 **AC#2 裁决 / A53②** 的 (A)(B) 两分支，任何静态预授权形态**都要 D22 人工批准**（要改 `SPEC-06 §4.1` 的
+   "豁免 = 一次 L2 强确认 + 写日志" 与 `PLAN.md:2396-2399` 的"必须由人点"）。本票只走 (C)。
+
+**AC#5 门禁（只跑本票碰到的包 `internal/config/`）**
+
+| 命令 | rc | 真实输出 / 计数 |
+|---|---|---|
+| `gofmt -l internal/config` | **0** | 空输出（16 个文件无一待格式化） |
+| `gofumpt -l . tools/d22scan tools/mockllm` | **0** | **空输出**（全仓口径，含别人在飞的文件；`gofumpt` 不在 PATH，用 `$(go env GOPATH)/bin/gofumpt`） |
+| `go vet ./internal/config/` | **0** | 无输出 |
+| `GOOS=linux go vet ./internal/config/` | **0** | 无输出（Linux 编译哑弹已查） |
+| `go test -count=2 -v ./internal/config/` | **0** | `ok github.com/CarlosShao/wisp/internal/config 3.050s`；`=== RUN` **194** = count=1 的 97 的**整 2 倍**（N 倍核对过）；`--- PASS` **106**（=53×2）、`    --- PASS` **88**（=44×2）、`--- SKIP` **0**、`--- FAIL` **0** |
+| `go test -count=2 -v ./internal/config/ ./internal/risk/`（两包并跑） | **1** | `ok internal/config 7.050s` ／ `FAIL internal/risk 14.870s`；总 `=== RUN` **492**、`--- PASS` 278 + `    --- PASS` 210、`--- SKIP` **2**（同一测试 `TestSyncRegistryProbeLive` × count=2）、`--- FAIL` **2**（`TestResolvePerCallBudget` × count=2） |
+
+**四种假绿逐跑点名**：`--- SKIP` 只有并跑那次的 `TestSyncRegistryProbeLive` ×2（**不是本票的包**，票 82 家族既有条件跳过）；
+本票包内 **0 条 SKIP、0 条 FAIL**；没用 `-run` 收窄做交付判据（`-run` 只用在变异与复核上，
+且每次都数了 `=== RUN` 条数、没有出现 `no tests to run`）；`-count=2` 按上面两行做了 N 倍核对；
+没有步骤被静默跳过。
+
+**⚠ 墙钟抖动登记为外项（不调那个 1ms 预算，一票没动它）**：
+`internal/risk/pathresolver_budget_norace_test.go:34,37` 的 `TestResolvePerCallBudget`
+在两包并跑时 **1.945 / 2.420 ms/op**（预算 1ms，852/447 samples）⇒ 两条 `--- FAIL`；
+本轮**连单跑都红**：`go test -count=2 -run TestResolvePerCallBudget ./internal/risk/` 给出 **1.356 / 1.194 ms/op**（739/1352 samples）。
+⇒ 比票 80 L3 记的数字更糟，但形状一致（这台机器此刻同时有 agent-ticket70-d / 77 / 81 在编译与跑测试）。
+**本票不改它、不放宽它、也不把它算进自己的门禁结论**：它是票 18 AC#6 的墙钟性能契约，
+处置建议仍按票 80 交回的那两条（`testing.Short()` 门控，或改成同机基线的倍数），**单独一票**。
+⇒ 结论：`internal/config` 侧全绿；`internal/risk` 侧的红**与本票改动无关**（本票零文件落在 `internal/risk/`）。
+
+**交回编排者的两行键表限定语（本票不写 `docs/`，原文照抄可用）**
+- `docs/PLAN.md:2732`（🔒 `[risk]` 行，接在 `blacklist_overrides[]` 之后）：
+  > ｜**其中 `shell_enabled` / `allow_shell_string` / `shell_allowlist` / `blacklist_overrides` 四项今天没有消费者（B 档豁免与 shell 工具都尚未实现），写入非默认值即加载报错，不静默接受**（票 83；先例 `verify_signature`）
+- `docs/specs/SPEC-03-config-secrets-envs.md:34`（🔒 `[risk]` 行，同位置）：
+  > （`shell_enabled` `allow_shell_string` `shell_allowlist` `blacklist_overrides` **未实现 ⇒ 写非默认值加载报错，指名由谁实现**，票 83）
+- `docs/specs/SPEC-03-config-secrets-envs.md:36`（🔒 `[net]` 行，本票扫描新增的两键）：
+  > （`allowlist` **未实现 ⇒ 写入即加载报错**，票 22 落地时移除；`block_private_ranges` **写 false 报错而非生效**：R5 的私有网段判定是硬编码的，SPEC-06 §6.3，关掉它需 D22）
+
+`next=` 交回编排者：① `[net]` 两键是否算本票扩面（票 80 只点了 `[risk]` 三候选）；② `[plugins]` 五键要不要照同一判据一起守卫；
+③ `SPEC-03:34/36` 与 `PLAN.md:2732` 的限定语请由编排者落；④ `TestResolvePerCallBudget` 单独立票。
+写码代理这边**没有未闭的框**，等对抗验收；验收判据 = L2 表逐键 + L3 两个方向的变异数 + L4 门禁表。
+
+
+
 
 ### L1 — AC#2 校验先落地（承载体在，表随后补全）（2026-09-21）
 
