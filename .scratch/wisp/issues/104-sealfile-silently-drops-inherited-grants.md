@@ -63,3 +63,25 @@ SY/BA/我 四种拼法全静默）⇒ 这条**别改回去**，本地化机器�
   ⚠ 本票最怕的修法我写在正文里了：**把 `ID` 过滤删掉换取"全都报"** ⇒ 那会让每次正常密封都刷屏，
   噪声一响真信号就没人看——**"响亮失败"的门禁票必须同时报噪声上界**（AC#2 就是为此存在）。
   next= 排在票 102 之后（102 是 fail-open，本票是可观察性）；它小，可与之并行，只要不撞 `internal/risk/`。
+
+- 2026-09-21 19:4x（agent-ticket104-109）：**修前红已量到**，用例落在包内新文件
+  `internal/winsec/inherited_narrow_notice_104_windows_test.go`（内部测试包，因为要够到 `narrowNotice`；
+  与票 89 的外部包同名 helper 各留一份，注释已写明原因）。
+  红名与断言原文（`go test -count=1 -v -run 'TestAC1…|TestAC2…|TestAC3…'`，HEAD 行为，rc=1）：
+  - `TestAC1SealFileReportsTheInheritedGrantItCleared` →
+    "AC#1: sealing one child that lost an *inherited* foreign grant reported 0 notice(s), want exactly 1; all notices: []"
+  - `TestAC1DefaultLogSaysInherited` → "the default notifier does not distinguish an inherited clearing: \"\""
+  - `TestAC2InheritedNoticeHasANoiseBound/sealing_only_children_reports_each_of_them_once` →
+    "AC#2 leg 3 / AC#1's shape: ca.txt got 0 WARN(s), want exactly 1"（cb/cc/cd 同，4/4 孩子全 0）
+  - **同轮已绿的对照组**（证明红不是"守卫拒一切"）：leg 1 `{me,SY,BA}` 树 WARN=0；
+    leg 2（先封父再封 6 个孩子）total WARN=1（parent=1, children=0）；
+    `TestAC3OwnGrantsStaySilentWhicheverWayTheOSNamesThem` PASS（自己三个主体按 SID 拼四种全静默）。
+  ⚠ 红是在"`narrowNotice` 已加 `Inherited` 字段、但检测面仍跳过 `ace.inherited`"这一步量到的：
+  纯 HEAD 下这份文件引用 `n.Inherited` 编译不过，而**编译失败不算红**（也不算变异），
+  所以先把数据结构接好、行为保持 HEAD 原样，再量断言红 ⇒ 这条红就是 AC#3① 的变异腿（同一行）。
+  承载行为那一行 = `foreignPrincipals` 里的 `if ace.inherited { continue }`（原 `explicitForeignPrincipals:93`）。
+  AC#2 leg 2 的实测顺带否证了本票正文担心的"刷屏"形状：**父目录一收窄，OS 就把孩子们的继承副本一起算了**，
+  所以"整树传播"天然是 1 条而不是 N 条；只有"父目录仍宽、单独封孩子"才会每个孩子 1 条，
+  而那正是判据 ②（可达主体集合真的变小了），该报。
+  next= 翻掉那一行（把继承项分桶进 `Inherited`），跑绿，再按 AC#3 在 /tmp 仓外快照做三发变异 + AC#4 四数门禁。
+

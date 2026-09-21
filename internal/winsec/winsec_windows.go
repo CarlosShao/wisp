@@ -55,8 +55,15 @@ var applyDescriptor = applyDescriptorWindows
 type narrowNotice struct {
 	Path string
 	// Principals are the SDDL trustee tokens cleared off this object, e.g. "WD"
-	// (Everyone) or a bare "S-1-5-6".
+	// (Everyone) or a bare "S-1-5-6". Bucketed by *how the grant stood on this
+	// object*: Principals are the ones the object carried in its own DACL.
 	Principals []string
+	// Inherited holds the tokens the object only had because a parent handed
+	// them down. Ticket 104 is the reason the two buckets are separate: sealing
+	// one child drops the inherited copy too, and an operator has to be able to
+	// tell "somebody granted this here" from "this one child was sealed while its
+	// parent stayed wide" without reading a filesystem.
+	Inherited []string
 }
 
 // noticeNarrowed is the seam tests swap. The default writes to the default slog
@@ -65,34 +72,44 @@ type narrowNotice struct {
 // so that edge would close a cycle), and a log line is the narrowest channel
 // that is still auditable.
 var noticeNarrowed = func(n narrowNotice) {
+	kind := "explicit"
+	switch {
+	case len(n.Principals) == 0 && len(n.Inherited) > 0:
+		kind = "inherited"
+	case len(n.Principals) > 0 && len(n.Inherited) > 0:
+		kind = "explicit+inherited"
+	}
 	slog.Warn("winsec: seal cleared principals that were placed on this object explicitly",
 		"path", n.Path,
+		"kind", kind,
 		"cleared", strings.Join(n.Principals, ","),
+		"cleared_inherited", strings.Join(n.Inherited, ","),
 		"policy", "winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal")
 }
 
-// explicitForeignPrincipals lists the ACEs on path that (a) name somebody
-// outside the private set and (b) are on this object *itself*. The second half
-// is what keeps the notice a signal: the inherited junk this package exists to
-// clear is on effectively every file in a profile directory, so reporting those
-// would drown the one case anybody needs to hear about, an explicit grant.
-// Inheritance is read from the ACE header's INHERITED_ACE bit rather than from
-// the "ID" letters in the rendering, and the materialised inherit-only
-// companions of our own grants are inside the set anyway.
-func explicitForeignPrincipals(path string) ([]string, error) {
+// foreignPrincipals lists the ACEs on path that name somebody outside the
+// private set, split by how they stood on the object.
+//
+// The explicit bucket is ticket 89's leg: a grant on this object *in its own
+// right*, i.e. somebody put it here. The inherited bucket is ticket 104's: the
+// same removal, but reached through the parent. Keeping them in one message
+// (rather than suppressing one of them) is what bounds the noise - see
+// TestAC2InheritedNoticeHasANoiseBound, which measures the case where
+// inheritance does the same work for free: once the parent is narrowed the OS
+// recomputes the children's inherited copies away, so propagating a policy
+// change down a tree still costs one notice, not one per child.
+//
+// Judgment is by SID throughout; the rendered text rides along for the message.
+func foreignPrincipals(path string) (explicit, inherited []string, err error) {
 	object, err := readDACL(path)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	set, err := privateSetSIDSet()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	var out []string
 	for _, ace := range object.aces {
-		if ace.inherited {
-			continue // inherited from a parent: not this object's own grant
-		}
 		if ace.grant && set[ace.trustee] {
 			continue
 		}
@@ -100,9 +117,23 @@ func explicitForeignPrincipals(path string) ([]string, error) {
 		// our three grants: it is about to be gone, and whoever put it there
 		// should hear about it - named by the one form of a principal that
 		// cannot be confused with somebody else's account.
-		out = append(out, ace.trustee+"("+ace.text+")")
+		token := ace.trustee + "(" + ace.text + ")"
+		// TICKET-104-CARRIER: the two buckets below are the whole behavior of
+		// this function; the filter here decides who gets heard about.
+		if ace.inherited {
+			continue
+		}
+		explicit = append(explicit, token)
 	}
-	return out, nil
+	return explicit, inherited, nil
+}
+
+// explicitForeignPrincipals is the explicit bucket on its own: the shape ticket
+// 89 shipped and the one ticket 106's gate suite drives directly. New code
+// wants foreignPrincipals, which also sees the inherited half.
+func explicitForeignPrincipals(path string) ([]string, error) {
+	explicit, _, err := foreignPrincipals(path)
+	return explicit, err
 }
 
 // objectDACL is one object's DACL in the form this package judges it by: the
@@ -192,7 +223,7 @@ func applyDescriptorWindows(path string, dir bool) error {
 	// Read the before-state first: after the set there is nothing left to
 	// compare against. A failure here is not fatal to the seal (the set and the
 	// verify below decide that), it only costs the audit line.
-	before, beforeErr := explicitForeignPrincipals(path)
+	explicit, inherited, beforeErr := foreignPrincipals(path)
 	acl, err := privateACL(dir)
 	if err != nil {
 		return wrapPath(path, err)
@@ -208,8 +239,8 @@ func applyDescriptorWindows(path string, dir bool) error {
 	if err := verifyPrivate(path); err != nil {
 		return err
 	}
-	if beforeErr == nil && len(before) > 0 {
-		noticeNarrowed(narrowNotice{Path: path, Principals: before})
+	if beforeErr == nil && (len(explicit) > 0 || len(inherited) > 0) {
+		noticeNarrowed(narrowNotice{Path: path, Principals: explicit, Inherited: inherited})
 	}
 	return nil
 }
