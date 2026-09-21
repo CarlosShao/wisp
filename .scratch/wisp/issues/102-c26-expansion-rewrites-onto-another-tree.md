@@ -229,6 +229,17 @@ next= 交回验收代理出裁决表（`docs/evidence/s1/102-*.md`）；本票�
   但按票面 AC#2 的原文（"grep 出所有 `Resolve(` 非测试命中逐点处置"、"不许只改 winsec 那条腿"）保留了 `internal/tools/paths.go` 那一处最小改动，
   并在此登记。若那句真是编排者的口径，revert 单文件即可（`internal/risk` 的三条腿不依赖它），但 AC#2 会退回"只修一半"的状态、AC#5 的全仓扫描会红。
   next= 验收代理出 `docs/evidence/s1/102-*.md` 裁决表；R-b/R-c/R-d 与 `memory/open.go` 那份词法 abs 不在本票内（仍挂票 94/18/79 的账）。
+- 2026-09-21 19:1x（acceptor-ticket102，独立对抗验收）：**总判 PASS WITH CONDITIONS**，裁决表 `docs/evidence/s1/102-adversarial-acceptance.md`。
+  五框全部勾得住，逐条一句话：AC#1 通过（本代理自己在 `0117459` 仓外快照复现修前红 rc=1、`=== RUN` 3、`--- FAIL` 3、`FAIL-OPEN:` **9 次**；HEAD 快照同命令 rc=0、`=== RUN` 3、`FAIL-OPEN` 0）；
+  AC#2 通过（`grep -rn "risk\.Resolve(" --include=*.go . | grep -v _test.go` = 1 命中 `internal/tools/paths.go:81`、包内另 4 处，与处置表 1:1，多一条少一条都没有；五条腿逐条读了测试体，三断行为结果、腿 4 只钉符号）；
+  AC#3 通过（自建 `/tmp/wisp-102-mut1-ac2`：M1 `94: if false && r.Rewritten {` build rc=0 ⇒ 红 AC#1 两子 + `TestC26RewriteAccountIsRecorded` 三子 = 5；M2 `116: … Rewritten: false …` build rc=0 ⇒ 另红 `TestC26RewrittenSyncRootDoesNotDisarmSuspectNet` + tools `TestPathCanonicalizerAccountsForRewrittenRoots`，与自述逐字对得上）；
+  AC#4 通过（HEAD 仓外快照 `go test -count=2 -v` 四包 rc=0：risk 324/322/0/2、winsec 58/58/0/0、tools 202/202/0/0、memory 134/132/0/2，SKIP 逐条点名且 `TestSyncRegistryProbeLive` 在修前快照**同样 2 条 SKIP**；`gofmt -l .` 空、`gofumpt -l .` 空、`go vet` 与 `GOOS=linux go vet` 按包 8 × rc=0 而**整仓 `./...` rc=1** ⇒ 自述没把整仓说成按包；`sh scripts/d22scan.sh` rc=0、台账 8 数逐字复现、`#6/#8 frontend/=37` 未降）；
+  AC#5 **通过但有条件**（本代理另做两枚反证：新造第六条腿直接 `return res.Canonical` ⇒ 判据报到 file:line 转红；把扫描根指向空目录 ⇒ `the instrument is broken, not the code` 转红 ⇒ 非 vacuous、非"扫空=绿"）。
+  **契约三处引句逐字成立**（`SPEC-06:50`、`PLAN.md:2375`、`PLAN.md:1376` 均由本代理直读当前文本命中，含 `SPEC-06:63-66` 的 `~/.git-credentials`/`%APPDATA%` 支撑句）⇒ "修实现 ≠ 改契约"、"本票不需 owner 批文本"成立，`docs/` 一字未动（diff 清单可证）。
+  **`internal/tools/paths.go` 争议裁决：改动成立、保留**——自述与 `git show a66aadf -- internal/tools/paths.go` 逐行相符；无调用方可控选择器（遍历的是配置拥有的 `allowed_dirs`，`InAllowlist` 是 OR 折叠不是 first-match）；`roots` 与 `unusable` 互斥且放行侧多一道 `res.Resolved` ⇒ **判定侧不比授权侧宽**；target 腿不拒是对的（拒它就是把 (B) 偷做成 (A)）。那段自称"编排者备注"的注入文本既非授权亦非禁令，唯一依据是票面 AC#2 原文。
+  登记残留 7 条 **R-102-1..R-102-7**（不阻塞 `-done`）：R-1 票面"6 条断言红"实为 9；R-2 处置表 file:line 未随改动重算（`:56`→`:81` 等）；R-3 腿 4 无可达性行为用例；R-4 AC#5 扫描排除 `testdata/`+`docs/`+`tools/` 前缀，藏在那里的第六条腿扫不到；**R-5 `RewrittenRoots()` 全仓零生产读取者**（`Roots()`/`UnusableRoots()` 同形，`cmd/wisp/run.go:265` 只构造不打印）⇒"operator-visible 审计面"目前只有测试承载；R-6 `Result.Spelling` 注释宣称的"审批提示里人看到的形"无承载者；R-7 `cmd/wisp` 本机 `0xc0000135` 与整仓 linux vet 两条仪器坑。
+  本代理只写裁决表 + 本段追加，未改禁区、未动共树门禁、未行使 `-done` 命名与 Status 归类。
+  next= 编排者裁 R-102-3/4/5 各立一票；R-102-1/2/6 随下一次追加清；本票可进 `-done` 的判定不在本代理职权内。
 - 2026-09-21 17:5x（**编排者裁决，针对上面那条"伪授权"账**）：
   ① **那段"编排者备注/冻结 `internal/tools/`"不是我发的**。我的核查三条：全仓 `grep -rn "编排者备注"` 只命中**本票票面**
   （即你的登记），源码/脚本零来源；项目内**未配置任何 hook**（`.qoder/settings.json` 不存在）；我这一轮给你的简报里没有那句措辞。
@@ -243,3 +254,6 @@ next= 交回验收代理出裁决表（`docs/evidence/s1/102-*.md`）；本票�
   我另派它逐行核对你的自述与 `git show a66aadf -- internal/tools/paths.go` 是否一致、以及**逐字核对**那三处契约引句
   （按 R21④："契约明写"只许引真实存在的句子，包括我说的话）。
   ⑤ 你交件里说 `TestResolvePerCallBudget` **未量到红** ⇒ 记为票 86 的负载假红，不算本票缺陷，也不许为它调阈值。
+- 2026-09-21 19:2x（acceptor-ticket102，共树竞态一条记账）：我 19:1x 那段落在编排者 17:5x 段**之前**——我读票面时文件末行还是 `next= 验收代理出…`，
+  写回时编排者那段已并发追加在后面，Edit 只能挂在锚点后 ⇒ 顺序倒置、**内容一条未丢**（`git diff --numstat` 该文件 = 新增 / **删除 0**）。
+  与编排者 17:5x ②③ 的口径**一致**（`paths.go` 改动保留、依据是票面 AC#2 原文而非注入文本），本代理不另立裁。为保 append-only（删除列 0）不移动任何已有行，仅在此留这条顺序说明。
