@@ -74,3 +74,34 @@
 - [ ] AC#4 构造可行性：普通权限建不出符号链接（需 `SeCreateSymbolicLinkPrivilege`/开发者模式），
   但 **junction 不需要特权**（`mklink /J`），而它正是"指向非空目录的链接"这一类，`os.Remove` 对它
   报 `ERROR_DIR_NOT_EMPTY` ⇒ **本机可构造**，不必只靠 CI/Linux 侧等价构造。
+- [x] **AC#1 基线：四类私有数据的 icacls 原文**（判据测试 `internal/winsec/acl_windows_test.go`，四类各走**生产入口**：
+  artifact = `spill.go:245` 的 `O_CREATE|O_EXCL,0o600`；secret blob = `secret.NewStore`+`Store`（真 DPAPI 落盘）；
+  `wisp.db`/`-wal`/`-shm` = `memory.Open` 真 SQLite，**在 store 打开状态下**探测侧文件；staging = `downloader.go:224/:389` 同形 idiom。
+  当前用户 SID `S-1-5-21-1228170099-895614386-1166154857-1001`（`DESKTOP-LVS7839\swq`）。**四类每一类的 DACL 首条 ACE 都是同一个外来主体**：
+
+  ```
+  acl_windows_test.go:197: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC1BaselineProductionPaths240781008\\001\\data\\artifacts\\artifact-89.txt"
+  C:\Users\swq\AppData\Local\Temp\TestAC1BaselineProductionPaths240781008\001\data\artifacts\artifact-89.txt DESKTOP-LVS7839\CodexSandboxUsers:(I)(M,DC)
+  S-1-5-21-3623186960-731165060-4091685855-1717338598:(I)(M,DC)
+  NT AUTHORITY\SYSTEM:(I)(F)
+  BUILTIN\Administrators:(I)(F)
+  DESKTOP-LVS7839\swq:(I)(F)
+  ```
+  `secrets\baseline`（DPAPI blob）、`data\artifacts`、`data\secrets`、`data\staging`、`wisp.db`、`wisp.db-wal`、`wisp.db-shm`、
+  `staging\model.bin` 全部是**同一份五条 ACE 的形状**（目录多 `(OI)(CI)`），逐条原文见交回报告 / `-v` 输出。⇒
+  **`DESKTOP-LVS7839\CodexSandboxUsers` 与一个解析不出名字的别名 SID `S-1-5-21-3623186960-…-1717338598`
+  对工件、DPAPI blob、数据库与 WAL 全都持有 `(M,DC)` = MODIFY（含读+写）+ DELETE CHILD**，
+  全部由父目录**继承**而来。"只有我能读我的数据"在本机不是"没验证"，是**当场为假**。
+  本机主体清单（能不能算"第二账户"）：
+  本地用户: 
+  CodexSandboxUsers 成员: 
+- [x] **AC#3 判据先红**（`-count=1 -v`，`go test ./internal/winsec` rc=1）：
+  `--- FAIL: TestAC3SealedWritesCarryNoForeignSID/artifact-exclusive`、`…/secret-blob`、`…/staging-temp`
+  （3/3 子测试红）+ `--- FAIL: TestAC2SealedDirCoversFilesItNeverTouched`，红因全是被测代码只有 `os.Chmod`：
+  `NOT PRIVATE artifact-exclusive: foreign SID(s) S-1-1-0 (principals: [Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq])`
+  ——即"父目录给了 Everyone 读，`0o600` 一声不响地让它长在文件上"。
+  ⚠ **本文件差点假绿过一次**：第一版 `aclSIDs` 跳过 `icacls` 首行，而 icacls 把**第一条 ACE 和路径印在同一行**——
+  于是"外来主体持有 MODIFY"恰好被丢掉，AC#3 三个子测试在**没有任何修复**的情况下全绿。
+  现已改为剥掉路径前缀 + 数每一条 `:(` 行（注释里记了这段），且 `TestAC1BaselineForeignACEPropagatesIntoModeOnlyWrites`
+  是**反向钉子**：它断言"宽父目录的 ACE 一定会传到子文件"，一旦这条不成立就红，防止判据测空气。
+- [ ] 待办：`winsec_windows.go` 换真 SetNamedSecurityInfo（PROTECTED DACL + 逐层封 + 传播），AC#4 链接、AC#5 失败注入。
