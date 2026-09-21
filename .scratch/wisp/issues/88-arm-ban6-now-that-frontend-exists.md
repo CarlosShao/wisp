@@ -190,5 +190,11 @@
   另：在**工作树**（票 77/89 未提交的在飞改动）里跑包测试，报的是同样两条红 +
   `ban #6 examined 38 frontend/ text files`（38 是票 77 的代理正在往 `frontend/` 加文件，与本票无关）
   ⇒ 这就是为什么 AC#1/AC#5 的证据必须取自 `git archive` 的仓外纯净快照，而不是工作树。
+- 2026-09-21（票 88b 代理接续）：**第 7 条那笔红账在 HEAD 前移后复核仍然成立**（写票面时 HEAD=`de15a6b`，交回时 HEAD 已到 `29ee4e1`，其间只有编排者的 docs 票面提交）：
+  `git show HEAD:internal/winsec/winsec.go | grep -n "filepath.Abs"` ⇒ **126 行仍在**；
+  `grep -c winsec tools/d22scan/allowlist.txt` ⇒ **0**（无条目）；
+  `git log --oneline 84e4161..HEAD -- tools/d22scan` ⇒ 除本票的 docs 提交外**空** ⇒ 翻牌后的门禁代码没被别人动过，
+  上面 AC#1~AC#6 的读数**继续有效**，无需重测。票 89 那侧若把 `filepath.Abs` 换成 C26 PathResolver，
+  纯净快照重跑 `sh scripts/d22scan.sh` 应从 rc=1 回 rc=0，**ban #6 那行的 35 不受影响**。
 
 
