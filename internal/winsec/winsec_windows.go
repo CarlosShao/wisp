@@ -71,6 +71,62 @@ type narrowNotice struct {
 	Inherited []string
 }
 
+// noticeNamesTree reports whether a notice is about the tree that spelling names.
+//
+// Ticket 115's ruling is that this question is answered by tree, never by
+// spelling, for the same reason ticket 106 keyed the private set by SID instead
+// of by display name and ticket 112's seam guard stopped reading a spelling
+// difference as a tree move: a representation is not an identity. The Path below
+// carries the resolver's answer on purpose - that is the object the seal actually
+// modified, and ResolvePath has already refused any answer its own pipeline
+// accounts as a move off the tree the caller named (see applyDescriptorWindows).
+//
+// A caller holding its own spelling therefore cannot compare strings with it. On
+// a machine whose profile directory is longer than eight characters Windows
+// spells one object two ways (C:\Users\RUNNER~1\... and C:\Users\runneradmin\...:
+// USERPROFILE is the 8.3 short form, GetFinalPathNameByHandle answers the long
+// one), and an 8.3 alias is not a case difference, so strings.EqualFold does not
+// cure it - measured on run 35599458439, where the first CI run with C26 actually
+// installed lost four notice cases at once on exactly that, while the notices
+// themselves were present and correct in the same log lines.
+//
+// The comparison puts the caller's spelling through the one resolver this package
+// may use - ResolvePath, i.e. the installed C26 pipeline, or the built-in floor
+// when nothing is linked - and then applies the component rule the seam guard
+// already uses (sameTree in resolve.go). Nothing here normalizes anything: no
+// Clean, no Abs, no hand-rolled case folding of a whole path, which is what
+// D22 ban #2 forbids and what ticket 94's defect class is about. It is the same
+// discipline internal/risk already applies to its own security comparisons
+// (pathForms, ticket 72: expand both sides through the pipeline, then compare).
+//
+// Failure direction is a false alarm rather than a false all-clear: a spelling
+// ResolvePath will not vouch for attributes to no notice at all, so a caller
+// asking "was my tree reported on?" hears "no" and goes looking, instead of
+// hearing "yes" about a tree nothing can name.
+func noticeNamesTree(n narrowNotice, spelling string) bool {
+	resolved, err := ResolvePath(spelling)
+	if err != nil {
+		return false
+	}
+	return sameTree(n.Path, resolved.String())
+}
+
+// noticesAboutTree is noticeNamesTree over a captured set: the tree-shaped
+// version of "which of these notices is about the thing I pointed at". It exists
+// so that every consumer of narrowNotice answers that question the same way
+// instead of inventing a fourth spelling comparison - the three comparison faces
+// this package's own cases use today are an exact ==, a strings.EqualFold and a
+// strings.ToLower map key, and all three miss an 8.3 alias.
+func noticesAboutTree(got []narrowNotice, spelling string) []narrowNotice {
+	var out []narrowNotice
+	for _, n := range got {
+		if noticeNamesTree(n, spelling) {
+			out = append(out, n)
+		}
+	}
+	return out
+}
+
 // noticeNarrowed is the seam tests swap. The default writes to the default slog
 // logger, which is where the app's own log pipeline (internal/observe) already
 // lives - winsec must not import it (the graph runs observe -> secret -> winsec,
@@ -253,6 +309,11 @@ func applyDescriptorWindows(path string, dir bool) error {
 		return err
 	}
 	if beforeErr == nil && (len(explicit) > 0 || len(inherited) > 0) {
+		// The path handed to this function has already been through
+		// ResolvePath (winsec.go's SealFile/SealDir/PrivateDirAll resolve before
+		// they call here), so it is the resolver's answer and therefore the
+		// object that was just modified. Ticket 115 keeps that as the source and
+		// moves the *comparison* onto the tree instead: noticeNamesTree.
 		noticeNarrowed(narrowNotice{Path: path, Principals: explicit, Inherited: inherited})
 	}
 	return nil
