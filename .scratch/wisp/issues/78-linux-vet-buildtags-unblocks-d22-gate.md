@@ -116,3 +116,24 @@ vet 一失败，**扫描步骤被 `skipped`，D22 门从未在 CI 上给出过�
   **"D22 seven-ban + emoji scan (tools/d22scan)" 这一步的 conclusion**——那才是本票存在的理由；
   同一次里 `go vet (module)` 应从 X 变 ✓（它不再 abort 后面的步骤）。按 A44③ 先排掉 cancelled /
   `jobs.total_count = 0` 的排队被取代 run，那不是样本。
+
+- [2026-09-21T03:20:00Z] agent=ticket78 did=**push 前必读：下一次 run 会长什么样（两个"不是我改的、但会咬 AC#4"的实测）**。
+  ① **lint job 下一次仍然会红，但那不代表门禁又哑了**。按 ci.yml 现有步骤顺序
+  （positive control → **D22 scan** → gofmt → vet → staticcheck），纯净 HEAD 上
+  `gofumpt -l .` 已经报**两个非本票文件**：`internal/agent/spill_path_invariant_test.go`、
+  `internal/memory/artifacts_path_invariant_test.go`（票 76 已提交的形状，`git status` 干净 ⇒
+  确实进了 HEAD）。它在第 3 步红 ⇒ 后面的 vet/staticcheck 被 skipped，
+  **但 D22 scan 在它前面已经跑完** ⇒ 那一步该拿到真实 conclusion。
+  ⇒ **读 AC#4 时只看那一步的结论，别看 job 的红绿**；本票自有包
+  `gofumpt -l internal/ball internal/proc cmd/wisp` **空**。
+  ② **`staticcheck` 那一步大概率是台坏机器，与本票无关**：CI 用
+  `go-version-file: go.mod`（go 1.27 / toolchain go1.27.1），本机同版本，跑 CI 钉的
+  `staticcheck@2025.1.1` 直接
+  `internal error in importing "math/bits" (cannot decode ..., export data version 4 is
+  greater than maximum supported version 2)`，rc=1 —— 它连标准库都读不进来，
+  跟我写的码无关（也**没跑到**我的码，所以我新文件的 staticcheck 结论本机拿不到，这条如实挂着）。
+  修法是把版本升到支持 go1.27 的 staticcheck，但那是 `.github/workflows/ci.yml` 的一行，
+  与本票 AC#3 无关且 71/77 也要那个文件 ⇒ **我只上报，不动手**。
+  顺带：本票全程只在自有包内改动，**ci.yml 一个字没碰**；仓根的构建产物
+  `wisp.exe`（我跑 `go build ./cmd/wisp/` 掉出来的 27MB，`*.exe` 已 gitignore 所以 status 里看不见）
+  已删——共享树里留个大二进制会喂给别人写的文件遍历扫描器。
