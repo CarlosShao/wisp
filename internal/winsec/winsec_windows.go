@@ -38,8 +38,13 @@ const (
 var applyDescriptor = applyDescriptorWindows
 
 // narrowNotice is the audit record of one thing a seal did that used to be
-// silent: it cleared a principal that stood on this object's DACL *in its own
-// right* (not inherited), i.e. somebody had granted it there deliberately.
+// silent: it cleared a principal that could reach this object, either because it
+// stood on this object's DACL *in its own right* (ticket 89's leg, somebody had
+// granted it there deliberately) or because this one object was narrowed while
+// its parent was left wide (ticket 104's leg, the grant came down by
+// inheritance). The two are separate buckets because the two have different
+// fixes for the operator: one says "an out-of-band grant on this file is gone",
+// the other says "this file stopped being as reachable as its directory".
 //
 // Ticket 89's acceptance killed the ticket's earlier claim that such a grant
 // "fails at the write point": a PROTECTED DACL means a foreign principal on the
@@ -79,7 +84,7 @@ var noticeNarrowed = func(n narrowNotice) {
 	case len(n.Principals) > 0 && len(n.Inherited) > 0:
 		kind = "explicit+inherited"
 	}
-	slog.Warn("winsec: seal cleared principals that were placed on this object explicitly",
+	slog.Warn("winsec: seal cleared principals that stood on this object",
 		"path", n.Path,
 		"kind", kind,
 		"cleared", strings.Join(n.Principals, ","),
@@ -118,9 +123,17 @@ func foreignPrincipals(path string) (explicit, inherited []string, err error) {
 		// should hear about it - named by the one form of a principal that
 		// cannot be confused with somebody else's account.
 		token := ace.trustee + "(" + ace.text + ")"
-		// TICKET-104-CARRIER: the two buckets below are the whole behavior of
-		// this function; the filter here decides who gets heard about.
+		// TICKET-104-CARRIER: which bucket a cleared grant lands in is the whole
+		// behavior of this function, and there are two buckets now. An inherited
+		// ACE still standing on this object is a principal that *can reach this
+		// file today*, and the PROTECTED set takes it away from this file only -
+		// which is the case that has to be loud (ticket 104's judgment ②).
+		// The suppression ticket 89 needed is still there: our own three grants
+		// are skipped by SID above, and a parent that has already been narrowed
+		// no longer hands anything down, so propagating a policy change costs one
+		// notice at the parent and none per child (AC#2 leg 2 measures that).
 		if ace.inherited {
+			inherited = append(inherited, token)
 			continue
 		}
 		explicit = append(explicit, token)

@@ -1,6 +1,6 @@
 # 104 — 只对单个孩子做 `SealFile` 时，它那份**继承来的**授权被静默清掉（0 条 WARN）＝票 89 第 4 条修复的射程外剩余
 
-**Status:** open（2026-09-21 17:4x 编排者建；来源=`acceptor-ticket89b` 的复验残留 **R-89b-5**，它判"PASS 附射程限定"而不是 FAIL）
+**Status:** ready-for-review（原 open；2026-09-21 17:4x 编排者建；来源=`acceptor-ticket89b` 的复验残留 **R-89b-5**，它判"PASS 附射程限定"而不是 FAIL）
 **Type:** 安全可观察性（**修了一半的静默问题**——票 89 把"清除带外授权"改成会报警，但只覆盖了显式 ACE 那一半）
 **Blocks:** nothing · **Blocked by:** nothing（`internal/winsec/` 现在无人写；票 89 已结案）
 **Packages:** `internal/winsec/`（`applyDescriptorWindows` 的"清除检测"那一段 + `noticeNarrowed`）。
@@ -84,4 +84,45 @@ SY/BA/我 四种拼法全静默）⇒ 这条**别改回去**，本地化机器�
   所以"整树传播"天然是 1 条而不是 N 条；只有"父目录仍宽、单独封孩子"才会每个孩子 1 条，
   而那正是判据 ②（可达主体集合真的变小了），该报。
   next= 翻掉那一行（把继承项分桶进 `Inherited`），跑绿，再按 AC#3 在 /tmp 仓外快照做三发变异 + AC#4 四数门禁。
+
+- 2026-09-21 20:0x（agent-ticket104-109）：**修后绿，本票方向 = 判据 ②"更响亮"**（没动清除语义，一次都没少清）。
+  承载行为那一行：`internal/winsec/winsec_windows.go` 的 `foreignPrincipals`（原 `explicitForeignPrincipals:93` 的
+  `if ace.inherited { continue }` ⇒ 现在分桶进 `narrowNotice.Inherited`）。原 `explicitForeignPrincipals` 以
+  薄封装保留（票 106 的套件直接驱动它，语义与 HEAD 逐字相同），**没碰** `resolve.go`/缝/祖先链/私有集。
+  **`icacls` SID 级前后**（AC#1 那个孩子，`-v` 里逐字打印）：
+  - 前：`Everyone:(I)(RX)` + `NT AUTHORITY\SYSTEM:(I)(F)` + `BUILTIN\Administrators:(I)(F)` + `DESKTOP-LVS7839\swq:(I)(F)`
+  - 后：`NT AUTHORITY\SYSTEM:(F)` + `BUILTIN\Administrators:(F)` + `DESKTOP-LVS7839\swq:(F)`（`(I)` 全没了 = PROTECTED 落地）
+  - 默认日志渲染（真通道）：`level=WARN msg="winsec: seal cleared principals that stood on this object" kind=inherited
+    cleared="" cleared_inherited=S-1-5-21-…-1005(A;OICIID;0x1301ff;;;S-1-5-21-…-1005),S-1-5-21-…(A;OICIID;…)`
+    ⇒ `kind` + `cleared`/`cleared_inherited` 两格把 inherited 与 explicit 分开。
+  **正反两边都量**（"什么都没发生"不算绿、"守卫拒一切"也不算绿）：正=上面 1 条 WARN；反=AC#2 leg 1 `{me,SY,BA}` 树 **0 条**。
+  **AC#2 噪声上界实测**：leg1 = 0 条；leg2（先 `SealDir(父)` 再单独封 6 个孩子）= **total 1**（父 1 / 孩子 0）——
+  父一收窄 OS 就把孩子的继承副本一起重算掉，所以"整树传播"天然不刷屏（顺带否证本票正文担心的 N 条形状）；
+  leg3（父留宽、单独封 4 个孩子）= **4 条 = 每个孩子恰好 1 条**（判据 ②，可达主体集合真的变小了，该报）。
+  **AC#3 三发变异**（`/tmp/wisp-104-109-sess`，`git archive 4693feb | tar -x` + 只回打本票修复；每发同链 `grep -n` 打印被改后整行、`go build ./internal/winsec/` rc=0 先量到）：
+  - M1 退回"只看显式 ACE"（删掉 `inherited = append(...)` 一行）⇒ `TestAC1SealFile…` rc=1
+    "reported 0 notice(s), want exactly 1"（leg3 也回落到 0）。
+  - M2 白名单从 **SID** 换成名字字符串（`nameWhitelisted104(ace.text)`，行 119/658）⇒ AC#2 leg1 rc=1 **10 条**、leg2 rc=1 每个孩子 2 条。
+    本地化/限定名（`DESKTOP-…\swq`）对不上 ⇒ 正是这条防止静默失效。
+  - M3 WARN 改成"每次都报"（`if true || beforeErr == nil`，行 255）⇒ AC#2 leg1 rc=1 **10 条**。
+  还原：变异树逐发重抽，末了 `diff -q` 快照(只打修复) == 工作树 ⇒ 仓内零残留（`git status --porcelain internal/winsec/` 只 `M winsec_windows.go`）。
+  **AC#4 门禁**（`-count=2 -v`，四数逐条；`-count=2` 不缓存，非 ×2 减缓存）：
+  `internal/winsec/` rc=0 RUN=156 PASS=78 FAIL=0 SKIP=0 · `internal/memory/` rc=0 RUN=136 PASS=72 FAIL=0 **SKIP=2**
+  （`TestSubprocessCrashWriter` ×2 两份样本，与本票无关的既有跳过：本机无子进程崩溃注入条件）·
+  `internal/secret/` rc=0 RUN=58 PASS=42 FAIL=0 SKIP=0 · `internal/agent/` rc=0 RUN=152 PASS=118 FAIL=0 SKIP=0。
+  `gofmt -l internal/ cmd/ tools/` 空、`gofumpt -l internal/winsec/` 空（`D:\work\base\gopath/bin/gofumpt` 存在）、
+  `go vet ./internal/winsec/` rc=0、`GOOS=linux go vet ./internal/winsec/` rc=0、`sh scripts/d22scan.sh` rc=0 clean（ban #8 internal/=366 Go 文件含注释与 `_test.go`）。
+  **POSIX 那半没动**：`winsec_other.go` 无 ACL 概念，通知腿只在 Windows；未跑 Docker（无对应改动，登记为"不涉及"）。
+  **受影响的 `SealFile`/`SealDir` 调用点清单**（`SealFile` 直接调用只有 2 处，其余走同一个 `applyDescriptorWindows` 漏斗）：
+  `internal/config/parse.go:215`（pre-rename temp，票 95）、`internal/secret/migrate.go:174`（backup，票 89/95）；
+  漏斗上游：`internal/agent/spill.go`（PrivateDirAll/PrivateFile/PrivateFileExclusive，票 79/92 路）、
+  `internal/config/migrate.go`、`internal/memory/artifacts.go`、`internal/memory/open.go`×3（票 89/94）、
+  `internal/secret/migrate.go`×2、`internal/secret/store.go`×2；winsec 包内测试另有 4 个文件引用 `SealFile`。
+  这些站点全部在**私有树**里（父已 PROTECTED），实测新增 WARN=0（AC#2 leg1 + AC#3 自己的对照组 + 四包全绿）。
+  **AC#5 分工**：本 commit 正文与本票只主张"补继承那一半"；显式那一半（票 89 第 4 条）语义与报文原样保留，
+  `TestSealReportsThePrincipalsItCleared` / `TestSealNoticeIsRecordedByDefault` / `TestSealNarrowsAndNamesThePrincipalItRemovedBySID`
+  三条都在本跑里 PASS ⇒ 票 89 的覆盖面没被本票读成"已全部覆盖"，**没有需要登记更正的原句**。
+  ⚠ 全程未见伪造"编排者备注"文本（0 次）。
+  next= 交验收出 `docs/evidence/s1/104-*.md`；本代理转票 109。
+
 
