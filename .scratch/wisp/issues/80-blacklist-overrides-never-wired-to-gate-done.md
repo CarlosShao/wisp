@@ -1,9 +1,12 @@
 # 80 — `blacklist_overrides` 配置被解析、被方向审计，但**从来没有接到 `risk.Gate` 上**
 
-**Status:** AC#1+AC#2 已裁决 —— 死线确认（且 `risk.Gate` 生产零调用点）；**契约没有写这条能力** ⇒ 走票面第二分支：
-**停下上报编排者，判是否 D22**。AC#3/AC#4 按裁决**不写实现码**（选项 A/B/C/D 见 Progress log L3）。
+**Status:** **done**（编排者验收 2026-09-21 13:0x）—— 本票的交付物是**裁决**，不是码：**零 Go 改动**，
+且这一格判得比建票时准。AC#1 的读/写穷尽清单把定性**推翻了编排者自己的 A51⑤**（真相是
+`risk.Gate` **生产零调用点**，不是"一根线忘了接"）；AC#2 用契约正文证明**契约从未承诺**这个键生效
+⇒ 按票面第二分支停下，没有为了有活干而造修复。**编排者裁决 = 选项 (C)**（见 A53②），
+后续工作**全部转移到票 83**；AC#3/AC#4/AC#5 的接手方逐条写在框后。
 **Type:** 契约与实现脱节（一个面向用户的开关是死线）
-**Blocks:** nothing · **Blocked by:** 编排者对 AC#2 第二分支的裁决（是否 D22；见 Progress log L3 的选项 A/B/C/D）。
+**Blocks:** nothing · **Blocked by:** ~~编排者对 AC#2 第二分支的裁决~~ **已给（A53②：选 (C)，需 D22 的只有键表那半句 ⇒ Q-27）**。
 （开票时 `Blocked by: nothing`，`internal/risk` 此刻无人写：票 75 已交、票 72 只碰过 `pathresolver.go`/`blacklist.go`）
 **Packages:** `internal/config/`、`risk.Gate` 的构造点、以及新建的接线测试。**禁改冻结面**：
 `internal/risk/assessor.go`、`internal/risk/pathresolver*.go`、`rules_gateway.go`、`docs/PLAN.md`、`docs/specs/*.md`。
@@ -51,6 +54,10 @@
   `GOOS=linux go vet <pkgs>` rc=0（Linux 编译哑弹是 A44/A49 的老坑）。
   ⇒ **未闭框，但基线已跑**（见 L3）：本票**零 Go 文件改动**，门禁无改动面可验；
   仍把 `internal/risk` + `internal/config` 的现状数字记进票面，顺带交出一条**先存在的脆弱性能用例**。
+  ⇒ **编排者补（A53）**：接手方 = **票 83 的 AC#5**（同两个包，而票 83 会真改 Go 文件 ⇒ 门禁有承载体）；
+  AC#3/AC#4 的接手方 = **票 21**（审批队列），裁决走 A53② 的选项 (C) ⇒ **本票永远不勾这两框**，
+  它们是**被裁决取消**、不是**没做完**。那条 `TestResolvePerCallBudget` 抖动登记为 **A53④**，单独一票，
+  **现在不许把 1ms 预算调大**。
 
 ## Rules
 
