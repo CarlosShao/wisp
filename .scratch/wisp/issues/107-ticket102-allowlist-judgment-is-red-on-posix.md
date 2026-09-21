@@ -256,3 +256,69 @@ POSIX 复现**我独立跑通**（含一条手法坑：Git Bash 下 `-v "C:\…"
 next= 本票**退回实现方**：按正确形状①或②重做放行侧；重做后 AC#4 需**再加一发变异**（把 `treeOnDisk` 换成 `EvalSymlinks` 类"已解析"⇒ 探针 A 必须转 false），
 并把我这三枚探针**收进仓内可跑用例**（现在只在 `/tmp` 快照，进不了 CI 就等于没有）。
 
+---
+
+## agent-ticket107b 第二轮（2026-09-21 19:1x 起，append-only）
+
+**Status（107b 这轮）：`ready-for-review`（修法＝正确形状①；上一版的 `rejected-needs-fix` 原文与读数保留在上方，本行是追加，票面删除列 0。）**
+
+### 本轮选的路径：**①补一层真正解析过的形式**，root 与 target **两条腿都补**
+
+理由（不选②"保持更严"的原因）：②要把票 102 那条断言在 POSIX 上改成"判 false"，那等于把
+`[fs] allowed_dirs` 的改写腿在 POSIX 上**永久废弃**，而这条废弃需要 owner 决策（票面 AC#3 的"平台能力天生不存在"那一格）；
+本票在**没有**owner 批准降级的前提下，唯一合法动作是把"已解析"补进放行侧——它同时满足
+"红要修"（票 102 那条用例在 POSIX 继续绿，见下方读数）与"不许放宽放行侧"（两处改动**都是加条件**，见修法）。
+
+### 修前红（三枚探针进仓：`internal/tools/paths_ticket107b_probes_test.go`，无 `t.Skip`、无 `//go:build`）
+
+容器方法照验收那条路走，并**避开两个新坑**：挂载用 `/c/...` 正斜杠形式（不是 `C:\…`），容器内先 `ls -la /t/tools_linux.test` 自证看得见文件；
+所有 rc 用容器内 `echo "LINUX_RC=$?"` 取，不经 `| grep`（`set -o pipefail` 同时开着）。
+快照：`/c/Users/swq/AppData/Local/Temp/wisp107b-107b-snap`（`git archive HEAD` = `440dd88`，含被退回的 `be8b403`）＋本票这枚新用例；**仓内未建 worktree/checkout**。
+
+**POSIX（Docker/alpine，x86_64，`Linux 6.6.114.1-microsoft-standard-WSL2`）修前 rc=1，4 条 RUN 里 3 条红**：
+
+```
+--- PASS: TestPathCanonicalizerAccountsForRewrittenRoots        (票 102 那条，在 be8b403 下是绿的)
+--- FAIL: TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing
+    paths_ticket107b_probes_test.go:124: AC#3 RED: InAllowlist("/tmp/…/001/proj/marker.txt") = true although the named root
+      "%WISP107B_A_ROOT%/proj" expands onto "/tmp/…/001/proj", a link onto "/tmp/…/001/outside": the tree that opens
+      ("/tmp/…/001/outside/marker.txt") is one the operator never named
+--- FAIL: TestTicket107bProbeCLinkInsideAllowedRootStaysOutside
+    paths_ticket107b_probes_test.go:170: AC#3 RED: InAllowlist("/tmp/…/001/proj/esc/marker.txt") = true: it leaves the allowed
+      root "/tmp/…/001/proj" through the link "/tmp/…/001/proj/esc" and lands on "/tmp/…/001/outside/marker.txt"
+--- FAIL: TestTicket107bProbeBJudgedTreeIsTheOpenedTree
+    paths_ticket107b_probes_test.go:213: AC#3 RED: InAllowlist("/tmp/…/001/proj/marker.txt") = true but the tree that opens
+      ("/tmp/…/001/outside/marker.txt") is named by no root in the book (roots=[/tmp/…/001/proj])
+```
+
+**Windows（工作树同一条用例，本机 `-count=1 -run TestTicket107b`）修前 rc=1，1 条红**：探针 A/B **PASS**、探针 C **FAIL**——
+`paths_ticket107b_probes_test.go:170: AC#3 RED: InAllowlist("…\proj\esc\marker.txt") = true: it leaves the allowed root "…\proj"
+through the link "…\proj\esc"`。⇒ **探针 C 是两侧都红的**，不是只有 POSIX 有。
+
+**三条新读数（决定修法形状，全部实测，非读代码猜）**：
+1. Windows 上 `filepath.EvalSymlinks` **看不见 junction**：`eval(link)` 返回**链接自身**且 `err=<nil>`，`eval(通过链接的文件)` 反而报
+   `The system cannot find the path specified`；但 `os.Readlink` 与 `os.Lstat` 都看得见（探针前提就是靠这四个信号取"或"，任一即成立，全不成立则 `t.Fatalf` 自证失效）。
+   ⇒ **不能拿 `EvalSymlinks` 当 Windows 的链接探针**；Windows 的拒绝腿本来在 `risk.Resolve` 里就 deny 掉 reparse traversal
+   （修前读数 `unusable=["%WISP107B_A_ROOT%\proj": risk: path traverses a reparse point …]`、`Canonicalize(…\proj\marker.txt) refused`），
+   所以 Windows 不需要这一层，**但这一层在 Windows 上必须"解析不出来就 fail-closed"**，否则会被 `EvalSymlinks` 的哑值骗过去。
+2. POSIX 上 `EvalSymlinks` 完全看得见符号链接（上面三条红里的 `opened=` 就是它给的）⇒ 这一层在 POSIX 是真有牙的。
+3. `t.TempDir()` 两侧都是真树（`/tmp/…` 与 `C:\Users\…\Temp\…`，祖先无链接）⇒ "已解析"这一层**不会**把票 102 那条正当用例改成 false（下面复跑证明）。
+
+### 同轮量清：`roots` 这本账喂两腿（R-107-2 的读数，拆不拆归编排者判）
+
+生产码里 `InAllowlist` 的调用点 **2 处**（`grep -rn "InAllowlist(" --include=*.go cmd internal | grep -v _test.go` = 4 命中：1 声明 + 1 实现 + 2 调用）：
+`internal/risk/rules_gateway.go:45`＝**拒腿**（false ⇒ R2/L2），`internal/tools/bridge.go:845`＝**免问/放行腿**（`inScope`）。
+`Roots()`/`UnusableRoots()`/`RewrittenRoots()` 三个 getter 在 `cmd/` 与 `internal/` 非测试代码里**消费者 0 处**（只有 `internal/tools/paths.go:160/168/176` 的定义本身）
+⇒ 现状是"**一本账 + 三个只读审计面**"，两腿读的确实是同一本账，而两腿要的强度不同（拒腿只要"存在"就够严，放行腿要"已解析"才不越树）。
+**本轮不改这一形状**（拆账要动 `rules_gateway.go`，那是禁改文件），只把读数与"两腿强度不同"登记在此。
+
+### 共树碰撞登记（不是我的改动，也不是我造成的）
+
+本轮开工时发现 `internal/tools/paths.go` 在 `git status` 里是 ` M`，**是票 92 的在飞改动**（新字段 `workspace` +
+`InAllowlist` 循环重构成 `rootsContain` + 新文件 `internal/tools/paths_workspace{,_test}.go`）。
+它与我落在同一个函数上。⇒ 本票的修法**按"加条件"的方式与它复合**（不改它任何一行语义），
+提交纪律：本枚 checkpoint 只含我这一个新文件；`paths.go` 那枚改动在票 92 落盘之前不会被我 commit（见文末"没做完的格子"）。
+另登记：`internal/winsec/winsec.go` 此刻也是 ` M`（`"strings" imported and not used`）⇒ **工作树里 `internal/tools` 编译不过**，
+所以本轮所有跑测在 `/tmp` 纯净快照里做（HEAD 是干净的），这与"不在仓内建 worktree"不冲突。
+
+
