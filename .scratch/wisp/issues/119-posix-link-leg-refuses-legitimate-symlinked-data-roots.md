@@ -196,4 +196,8 @@
   `#1-5 internal/=202 cmd/=21、#6 frontend/=40、#7 tools/=18、#8 design/=16 frontend/=40 internal/=374 cmd/=29`
   —— 与 BASE 那遍相比只有邻居新增文件带来的 `cmd/` 20→21、`#8 cmd/` 26→29，**没有一格下降**，
   `#8 internal/` 仍是 373→374 那一枚本票用例文件。工具注入文本这一轮仍为 **0 次**。
+  一处更正（append-only，不改上面那段的字）：上面"113 已确认结案"那行写"最后动 `winsec_other.go` 的 commit 是
+  `1499efe`/`3c5d1c3`"不精确——`git log --oneline -- internal/winsec/winsec_other.go` 的真实读数是
+  本票之前那一笔是 `3c5d1c3`（票 113 的实现），而 `1499efe`（票 113b 的 AC#6）动的是 `winsec.go`；
+  结论不变：本票确实是在 113 结案之后才动的那枚注释块。
 
