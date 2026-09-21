@@ -133,3 +133,17 @@
   18 个零消费者 `Palette` 字段、`looks[*].Deep`、`Dur*Ms` 与 `BorderCloseMs` 的同值不同源）。
   next=AC#2 的三次变异（码侧 `DockTriggerPx` 16→17、表侧 look 色一位、表侧几何行 16px→17px），
   原始输出落 `docs/evidence/s1/69-mutation-tokens.md`。
+- [2026-09-21T01:33:00Z] agent=ticket69 did=AC#2 三次变异检验落盘并全部还原：
+  **M1 码侧** `internal/ball/tokens.go:361 DockTriggerPx 16 -> 17`（先 `grep -c MUTATION`=1 +
+  `git diff --stat` 证落盘）⇒ 唯一红的是 `TestC21GeometryRowsMatchCodeConstants`
+  （报文点名 `c21-native-tokens.md:155`，"DockTriggerPx = 17, but this row states no such number"），
+  既有 47 条全绿 —— 含 `dock_test.go:118`，它的 `const trigger = DockTriggerPx` 从常量推导、改值不会红，
+  这正是 A24-D4 说的空档。**M2 表侧** `:218 looks[solar].Glow hex(0xFDBA74,0.50) -> ...75` ⇒
+  `TestC21TableColourRowsMatchCode` 红（113/114，两边值都打印）。**M3 表侧几何** `:155 距边 16px -> 17px`
+  （码不动）⇒ 几何用例红，报文与 M1 镜像（"DockTriggerPx = 16, but this row states no such number"）。
+  还原复核：`grep -c MUTATION` 两个文件皆 0、`git diff --quiet` 对两文件为空、
+  `git grep -n MUTATION-69 -- internal docs` 零命中；复跑 `gofmt -l internal/ball` 空、
+  `go vet` rc=0、`go test -count=2 ./internal/ball/` → `ok 0.453s`、新增用例 4 条 `-run TestC21` 全 PASS。
+  原始输出与判定范围/未证明部分写在 `docs/evidence/s1/69-mutation-tokens.md`。勾 AC#2。
+  next=交编排者：判 D7-D12 六条分歧（尤其 D9 的语义漂移与 D12 的同值不同源），
+  以及"表↔tokens.css 那条人肉对账要不要也机器化"。本票代码面已无待办。
