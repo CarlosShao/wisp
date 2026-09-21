@@ -89,13 +89,16 @@
 **先取现状，别信这段话**：`git log --oneline -6`、`git status --porcelain`、
 `ls .scratch/wisp/issues/*-done.md | wc -l`、`gh run list --branch dev -L 3`。
 
-**⚠ 本会话结束时唯一挂着的"人为压住"：push 没推**（本地领先 origin/dev 若干枚）。
-原因**已实测、可复现**：HEAD 上 `sh scripts/d22scan.sh` **rc≠0** ——
-`internal/winsec/winsec.go:126` 用 `filepath.Abs` 决定"给哪棵树封 ACL"，命中 D22 的 `pathresolver-bypass`（票 89 的码）。
-**修法与判据在票 94**（`agent-ticket94` 正在写，禁改 allowlist、禁改 ban 文本）。
-⇒ **新会话第一件事**：等票 94 交件后自己复跑那条门检（`git archive HEAD | tar -x -C /tmp/<后缀>` +
-`sh scripts/d22scan.sh` **rc=0** + `gofmt -l internal/` 空），**通过了才推** origin 与 cnb（串行，GitHub TLS 偶发失败重试 ≤5）。
-**不要**为了推而把 ban 改窄或往 allowlist 加行。
+**push 状态（16:5x 更新，取代我 15:4x 写的那段"压住"）**：门检那条 blocker **已消失**
+（票 94 把 `winsec.go:126` 的 `filepath.Abs` 换成 `ResolvedPath` + `risk` 侧 seam，纯净树
+`sh scripts/d22scan.sh` 从 rc=1 变 **rc=0**、`gofmt -l` 空、`go build ./...` rc=0）。
+⇒ **cnb 已推平**（`942ab5a..18b6f37`，`rev-list --left-right` = **0/0**）；
+**GitHub 落后约 45 枚**：分块推成功一段（`942ab5a..b994a2c`）之后连续 **HTTP 408 / TLS `unexpected eof`**，
+已挂**后台重试循环**（12 次 × 20s 间隔）。树里最大 blob 只有 639 KB ⇒ **是链路不是体积**。
+⚠ **新会话接手第一件事：先 `git rev-list --count origin/dev..HEAD` 看是否归零**；
+没归零就再推（串行：先 origin 再 cnb，GitHub 偶发失败要重试）。
+**两个远程不一致期间，不要引用任何 CI 读数**——`gh run list` 拿到的结论属于哪一枚 SHA 会说不清
+（本仓规矩：说不出 run id 的门禁就当它不存在）。
 
 **本会话（2026-09-21 下午）真正落下来的账**
 1. **裁定 R20**：owner 拍完权限模式 M1–M5（三档 / 默认最严 / **档位持久化——他推翻了我的推荐** /
