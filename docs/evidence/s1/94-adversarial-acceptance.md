@@ -90,7 +90,7 @@ internal/winsec/resolve.go:124  return ResolvedPath{path: p}, nil ← 唯一的�
    那台 resolver"，而"装什么"是全模块可写的。这一条不否决票 94 的 AC（今天没有任何码这么装），
    但"类型上可证明"这个说法的强度必须照实测降级：**它是"链上装了 risk 才可证明"，不是"结构上不可伪造"。**
 
-**判定：允许残留。** 修法：`SetPathResolver` 改成 `sync.Once` + 只允许装入"能拒的那一类"
+**判定：允许残留（登记为文末 R-c）。** 修法：`SetPathResolver` 改成 `sync.Once` + 只允许装入"能拒的那一类"
 （或干脆把安装口做成 `risk` 侧的 `//go:linkname`/未导出钩子），并把第 4、5 两条写进 `resolve.go` 的注释，
 别再说"不可能退回"。
 
@@ -290,7 +290,7 @@ caller's dir still Everyone-readable: true
 **要求立案**：`winsec` 侧要么在"解析后 ≠ 解析前（词法可比）"时**拒绝放置**，
 要么把 canonical 交回调用方（后者要动 memory/secret 签名 = 票 18/79 地界）。
 
-**判定：票面那句话 PASS；但"封的与判的不是同一棵"这个问题只关掉了一半。**
+**判定：票面那句话 PASS；但"封的与判的不是同一棵"这个问题只关掉了一半（残留登记为文末 R-a）。**
 
 ---
 
