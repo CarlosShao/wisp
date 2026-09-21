@@ -1105,6 +1105,50 @@ vet: cmd/wisp/slo.go:324:49: undefined: proc.Runtime
 本 commit 已把该步与它的阳性对照（`tools/d22scan/runtests.sh -C tools/d22scan ./...`）**提到 gofmt/vet 之前**：
 不删步骤、不给任何步骤加 `continue-on-error`、不让任何步骤可跳过（D22 mode 6 未碰）。
 
+## 编排者登记 A77（2026-09-21 18:1x，**CI 第一次给出步级读数 ⇒ 当场挖出三件不同的红**；票 102 结案；我自己双派了一张票）
+
+- **A77① 票 102（fail-open 那条）结案 = `accepted-done`**（`360efdf`，`git ls-tree` 里 `102-` 恰好 1 行）。
+  验收没有抄读数：修前红它在 `0117459` 快照里**亲自跑出**（`FAIL-OPEN:` 实测 **9** 次，票面写 6 ⇒ `R-102-1` 红量少报）、
+  两发变异**它自己做的**（红量与实现方逐字一致）、AC#5 加了**两枚反证**（伪造第六条腿 / 扫描根指向空目录）证明那条静态判据不是"扫空=绿"、
+  三处契约引句（`SPEC-06:50`、`PLAN.md:2375`、`:1376`）**逐字直读命中** ⇒ "**修实现 ≠ 改契约**、不需要 owner 批文本"站得住。
+  `internal/tools/paths.go` 那处争议（A75②的伪授权涉及的同一改动）**独立判为保留**：自述与 diff 相符、
+  无调用方可控选择器、且**授权侧比拒绝侧多一道 `res.Resolved`** ⇒ "放行侧更窄"成立。
+- **A77② 对 owner 的一句话升级了，但只升一半（逐字口径）**：
+  现在**能说**"入口已规范化、路径被改写时会记账，而且每条安全判定都必须读这本账"；
+  **不能说**"人看得见哪条路被改写过"——三个读取口 `RewrittenRoots()`/`Roots()`/`UnusableRoots()`
+  **全仓零生产读取者**（`R-102-5`）⇒ 转成**票 105**，且 AC#2 直接把"接线"写进判据
+  （票 63 / 票 11 那两次"能力票与接线票拆开 ⇒ 后者无人认领"不重演）。
+- **A77③ 我做错的一件事，当场记**：**同一张票双派**。票 99 的代理我先收到一枚"死亡通知"（撞轮数上限），
+  我据它以 `d0d8782` **代它落档**了脚本改动，并派 `agent-ticket99b` 从断点续；
+  结果**原代理并没有死**——它继续跑完并交件（`(cached)` 复现、AC#3 双向、AC#4 连跑两次 0/0、台账不降全都有）。
+  ⇒ 两枚 commit 的账现在是分裂的：代码在 `d0d8782`（我）、票面与 AC 读数为 `9e00629` + `06906f7`，
+  而 99 自己在票面如实登记了"我的脚本改动在提交前 52 秒被 `d0d8782` 从未提交工作树带走"。
+  **教训固化**：**"死亡通知"不等于无产物、更不等于已停手**（这条我 memory 里写过，这次是**反方向**踩：
+  通知说死了、我又派了一个；正确动作是**先查 `git log`+`git status` 里它自己的痕迹再决定代落档/续跑**）。
+  已 `TaskStop` 掉 99b，重复工作止于此。
+- **A77④ CI 步级读数第一次到手 ⇒ 三件不同的红，一张票只装一件**（此前"CI 从来没绿过"里混着 `cancelled` 的测量假象）：
+  - **票 106**（`test-windows`，连 4 次红 run `35581075691`/`35585147258`/`35585821747`/`35586044995`）：
+    winsec 的"私有集"判定被 GitHub Windows runner 临时目录里**继承来的 `LA`（Administrator 账户）ACE** 绊倒 ⇒
+    `internal/secret` 整包 8+ 条用例在 `NewStore`/`MigratePlaintext` **第一步就死**。
+    ⚠ 报错里的路径是 **8.3 短名** `C:\Users\RUNNER~1\...` ⇒ 与票 102 的"展开改写"、8.3 别名同族，
+    **明令不许用"`LA` 加进白名单"一行糊过去**。本机不复现（我这台机器 temp 的 DACL 不同）⇒ 这就是"按包在本机跑"看不见的那一类。
+  - **票 107**（`test-core` ubuntu，2 次红）：**票 102 自己写的判据在 POSIX 上红**
+    （`paths_rewrite_ticket102_test.go:64: InAllowlist("/tmp/…/proj/a.txt") = false`）
+    ⇒ 我登记**自己的漏**：我给票 102 验收写的门禁是"四包 `-count=2` + **按包 `GOOS=linux go vet`**"，
+    而 **`GOOS=linux go vet` 只编译不执行** ⇒ 平台形状洞它结构性看不见。
+    固化：**凡改动涉及"路径形状 / 大小写 / 分隔符"的票，判据里必须有一条"在另一个平台上被真正执行过"**，
+    拿不到就在票面留 run id 位由编排者补（已同时写进票 106 AC#5 与票 107 AC#1）。
+  - **票 85 追加**（`lint :: staticcheck`，连 4 次红）：不是我们的代码，是工具链版本不匹配
+    （CI 原文：`go: downloading honnef.co/go/tools v0.6.1` + `export data version 4 is greater than maximum supported version 2`，
+    涉及 `internal/byteorder`/`internal/cpu`/`internal/goarch`/`math/bits`/`unicode/utf8`）
+    ⇒ **AC#2"第一次产出真实判据"的前提被实测确认：staticcheck 至今产出过 0 条 findings**。
+    同账新出一条：票 99 的修法使 **`ci.yml:48` 与 `:68` 现在重复跑同一台仪器** ⇒ 判据写死"要合就两步合一，**不许把脚本改回裸 `go test`**"。
+- **A77⑤ 编队（18:1x）**：写码在飞 `agent-ticket93`（`ci.yml`+`scripts/`）、`agent-ticket95`（`internal/config`/`models`/`observe`/`secret`）；
+  刚交件待验收 `agent-ticket103`（`0717bf2`，winsec 密封缝守卫）、`agent-ticket99`（票 99 四框）、`agent-ticket101`（已结案）、`agent-ticket102`（已结案）。
+  待派（按序）：**106 → 107**（两条都挡 CI 转绿）· 92 · 97 · 104 · 85（等 93 交件，同文件）· 86（只在编队安静时派）。
+  `next=` ① 派 `acceptor-ticket103` 复验 `0717bf2`；② 106/107 交件后 **push + 读步级结论**才算结案（本机绿不算）；
+  ③ 三条红清完之后，"CI 从来没绿过"这句话要**重写**成带 run id 的版本。
+
 ## 编排者登记 A76（2026-09-21 18:0x，票 101 结案；**我自己造的一处矛盾**被写进派单；我自己的取数脚本又假绿了一次）
 
 - **A76① 票 101 结案 = `accepted-done`（判 PASS WITH CONDITIONS）**，`b9067fd`，文件名已挂 `-done`

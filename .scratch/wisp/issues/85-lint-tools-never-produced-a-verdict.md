@@ -70,4 +70,19 @@
 
 ## Progress log（append-only）
 
-（空）
+- 2026-09-21 18:1x（编排者，**CI 步级读数到手：本票的 AC#2 前提被实测背书，且新出一条同账**）：
+  ① `lint :: staticcheck` 在 run **`35586044995`、`35585821747`、`35585147258`、`35581075691`**（连 4 次）
+  **全是 failure**，且错误**不是我们代码的问题**，是工具与工具链版本不匹配，CI 原文逐字：
+  `go: downloading honnef.co/go/tools v0.6.1` 紧跟
+  ` -: internal error in importing "internal/byteorder" (cannot decode "internal/byteorder", export data version 4 is greater than maximum supported version 2); please report an issue (compile)`
+  （同一批还有 `internal/cpu`、`internal/goarch`、`math/bits`、`unicode/utf8` 四条同形）
+  ⇒ 本票 AC#1（两把工具钉版本）**就是为这个而存在的**，AC#2"第一次产出真实判据"的前提已确认：**staticcheck 至今一条 findings 都没产出过**。
+  ② 新同账（**归本票，因为它就是 `ci.yml` 的账**）：票 99 把 `scripts/d22scan.sh` 第一步改调
+  `tools/d22scan/runtests.sh -C tools/d22scan ./...` 之后，**`ci.yml:48` 与 `:68` 现在跑的是同一台仪器的同一次测试**
+  ⇒ CI 多花一整遍 `tools/d22scan` 的 `-v` 测试。判据写死：**要合就合"两步合一"，不许把 `scripts/d22scan.sh` 改回裸 `go test`**
+  （那会把票 99 刚堵的缓存洞重新打开）。
+  ③ 与票 99/93 的对账：票 99 交件时点名"`(cached)` 在修法版日志里出现 **0** 次"、纯净快照连跑两次 rc=0；
+  票 93 正在动 `ci.yml` 的 portable 步 ⇒ **本票开工前必须先读 93 交回来的是什么形状**，别把两步的修法互相覆盖。
+  next= 等写码槽位（当前 `internal/winsec`+`internal/tools`+`ci.yml`+`scripts/` 四路在飞）；
+  顺序建议：**本票排在票 93 交件之后**（同文件），排在票 106/107 之后（那两条挡着 CI 转绿，本票挡的是"lint 有没有判据"）。
+
