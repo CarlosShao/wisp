@@ -208,3 +208,18 @@
   ⇒ **`test-core` 在 Linux 上现在只剩 1 个包 / 8 条红，且 8 条全在 `internal/risk/**`（我的禁改区、票 72 同区、P12 的 registry/config/env 三档在 Linux 上永不 confirmed）**。上一条里我数的 `internal/agent` 与 `internal/memory` 各 1 条**已被票 81 的 `4683c34`（"derive the purge expectation from where the OS resolved each canary, not from a name list"）修掉**——修法正是 AC#2 允许的那条"平台专属期望值"，**不是** skip 也不是删断言，值得记一笔：**它证明了那两条红不需要我来动手**。
   **AC#2 结论不变：判据（`test-core` 绿）未达成 ⇒ 框不勾**，但"未达成"的原因从"四族"收敛成"一族半"（risk 8 条 + 下面两件与 test-core 无关的 lint 侧炸点）。
   next=交回编排者三件事：(1) `internal/risk` 那 8 条在 ubuntu 上该不该算 portable（**移出清单是编排者的判据**）；(2) `staticcheck` 的 pin 跑不动 vs 升上去 35 条 finding 的先后顺序；(3) push 之后按 AC#6 的口径重看 `lint`/`test-core` 两步——**`gofmt (gofumpt)` 这次会绿**（AC#1 的 CI 侧最后一块证据），`test-core` 预期仍红 8 条。
+
+- [2026-09-21T12:5xZ] agent=agent-ticket70-d did=⛔ **简报第 4 步的 D22 positive control 卡点：以另一种形状复现了——而且这次的制造者是我自己动不了的人**。我上面那条"D22 已不红"在**它当时的锚点上仍然为真**（run `35558750456`/head `17efc2c` 两步 success、`a8ae9ad` 清掉了 :444 的 `⚠`），但我交完 AC#2 之后按"最新 HEAD 再核一遍"的规矩在 `git archive HEAD`（HEAD=`c12c82f`，已含票 83 的 `a95ee3a`）的纯净树上重跑 `sh scripts/d22scan.sh`：**`D22_RC=1`，又死了，死在同一条 positive control 上**：
+  ```
+  --- FAIL: TestScannerSelfScanOfRealRepoIsGreen (0.82s)
+      scan_test.go:269: repo HEAD violates: internal/config/unwired.go:13:
+          [emoji] ban #8 glyph in scope internal/ is banned (D23):
+          covers comments and _test.go, not only string literals
+  --- FAIL: TestRealRepoLedgerIsHonest (0.59s)
+      scan_test.go:667: HEAD must be green, rc=1 out=d22scan: examined 99 production Go files ...
+  FAIL github.com/CarlosShao/wisp/tools/d22scan 12.810s
+  ```
+  **命中点逐字**：`internal/config/unwired.go:13` 注释里的 **U+1F512 `🔒`**（`//  1. it sits in a locked (🔒) section ...`），由**票 83 的 `a95ee3a`（"six locked-section keys that lie now fail the load loudly"）**带进来，落库时间就在我这一轮的中段。我的独立仪器（ban #8 同一字符类，自己扫 `internal/`+`cmd/` 的 `.go`）给出全仓真数：**扫 329 文件、命中 1 处**，就是这一处 ⇒ 不是"2 处错误"那类采样假象。⚠ 顺带一条对仪器的更正：`TestRealRepoLedgerIsHonest` 那次自报的是 `examined 99`（不是上次的 203）——它扫的是 `tools/d22scan` 自己的**测试夹具树**而非全仓，别把 99 读成"覆盖面缩了"；全仓那一步的 203/184/19/303/24 在 `17efc2c` 上仍是 CI 日志里的原值。
+  **为什么我这次也不修**：(a) 简报的禁改区写着"票 80 的代理正在 `internal/config` 里查 `bOverrides`，别去那里"，`a95ee3a` 又是几分钟前的活人产物；(b) `tools/d22scan/**` 与 `allowlist.txt` 是硬禁（allowlist 此刻仍 **5 条非注释行**，我没动）。**修法与 `a8ae9ad` 同形、且比它更省事**：把注释里的 `🔒` 换成 ASCII（例如 `locked (L2-locked) section`），1 文件 1 行、纯注释、零逻辑；**简报第 4 步说的"换成 Go 字符串转义 `\u201c`"在这个案子上做不到**——字形在注释里，注释内 Go 转义不生效（两次卡点都是这种形状：`⚠`/`🔒` 都在注释，都不是弯引号）。**若票 83 的代理已经收工，这条我随时可以补一刀，但需要编排者点头放行 `internal/config`。**
+  ⇒ **对下一次 push 的预测（先写下来，别事后归因）**：`lint` 会红在 `D22 scanner positive control`（第 1 步，`tools/d22scan` 的 `go test ./...` 因真仓违规而 FAIL）+ `D22 seven-ban + emoji scan`，**而 `gofmt (gofumpt)` 会绿**（我在 HEAD `c12c82f` 的纯净树上双版本复核：`v0.7.0 -l` **0 行 rc=0**、`@latest=v0.12.0 -l` **0 行 rc=0**）；`go vet` 三步入 CI 之后**大概率绿**（Linux 容器实测 rc=0），再往下就会第一次真正跑到 `staticcheck` ⇒ **红**（pin 跑不动）。也就是说：**AC#1 绿了、AC#5 的门反而被别人的新文件弄红了，而 AC#6 的判据（五 job 全 pass）一次比一次看得清——它红得越来越"诚实"了。**
+  next=交回编排者拍板：`internal/config/unwired.go:13` 的 1 行注释我改不改（放行与否）；`internal/risk` 8 条在 ubuntu 的归属；`staticcheck` 的 pin-vs-35-findings 顺序。票面 6 枚 commit（`d1455d1`/`6ce43c7`/`7f050b7`/`7b85b09`/`c12c82f`/`e4082a0` + 本条），**未 push**。
