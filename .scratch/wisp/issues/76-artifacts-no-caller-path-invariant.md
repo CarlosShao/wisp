@@ -1,6 +1,6 @@
 # 76 — Pin the artifacts path as "no caller-controlled path enters it" (closes ticket 20's `:103` box honestly)
 
-**Status:** in progress（实现代理 checkpoint 2：两条路由的四层证明都已绿；差 AC#3 变异与 AC#5 门禁）
+**Status:** **ready-for-review（5/5 PASS；AC#5 的整包日志里有 2 处既有 SKIP，已点名不是我的）**
 **Type:** security-invariant characterization (closes an AC box that is currently **untestable as written**)
 **Blocks:** ticket 20 archival · **Blocked by:** nothing (packages free: `internal/agent`, `internal/memory`)
 **Packages:** `internal/agent/spill.go`, `internal/memory/artifacts.go` + their tests. Do **not** touch
@@ -41,18 +41,39 @@ the box in writing:
 - **Do not weaken any existing assertion** in ticket 18/20's junction tests, and do not add `t.Skip`.
 
 ## AC (1:1 verdict table required, one row per box)
-- [ ] **AC#1** The four hostile component shapes (separator / `..` / drive letter / UNC) are each
+- [x] **AC#1** The four hostile component shapes (separator / `..` / drive letter / UNC) are each
   exercised by a named subtest, and each one is **either rejected or sanitized**, with the resulting
   on-disk name asserted. A test that only checks "no panic" does not count.
-- [ ] **AC#2** Containment is proven by **real directory listing**, not string comparison: after the
+  **PASS** — 8 个命名子测试（两条路由 × 四形状）+ 2 个退化形状子测试。memory 侧断言
+  `errors.Is(err, ErrInvalidArtifactName)` **且不是** `ErrNotFound`（= 拒在碰文件系统之前），并逐字节读回
+  调用者点名的 canary；agent 侧断言净化后的确切磁盘名（`p/q`→`tool-output-pq.txt`、
+  `../../escape`→`tool-output-escape.txt`、`C:\Windows\System32\drop`→`tool-output-CWindowsSystem32drop.txt`、
+  `\\fileserver\share\payload`→`tool-output-fileserversharepayload.txt`）+ `ReadDir` 里只有这一个文件。
+- [x] **AC#2** Containment is proven by **real directory listing**, not string comparison: after the
   writes, list the data dir and assert nothing appeared outside it (and that no file appeared at a
-  path the caller named).
-- [ ] **AC#3** Mutation: neutralize the sanitize/reject step ⇒ AC#1 and AC#2 both go red. Grep-prove the
+  path the caller named). **PASS** — 两侧各做 `filepath.WalkDir` 全量快照 + 差分；
+  **阳性对照两处都做了**：memory 侧删一个合法 bare name ⇒ 差分必须恰好报那一条且落在 artifacts 内；
+  agent 侧手工做一次"绕过净化器"的同样 join 真写盘 ⇒ 列举必须看见 `<root>\CONTROL-escape.txt`
+  （对照组实测把转义算术量了出来：前缀吃掉第一个 `..`，需 `depth+2` 组才落到 root）。
+  另加 `TestSpillIntoRealStoreThenDeleteStaysUnderDataDir`：一个真 `memory.Store` 数据目录上两条路由轮流上。
+- [x] **AC#3** Mutation: neutralize the sanitize/reject step ⇒ AC#1 and AC#2 both go red. Grep-prove the
   mutation landed before running; grep-prove `git diff --quiet` on the file after restoring.
-- [ ] **AC#4** Hand me the replacement sentence for ticket 20 `:103` + the test names that back it.
-- [ ] **AC#5** Gates: `gofmt -l` on touched pkgs empty, `go vet ./internal/agent/... ./internal/memory/...`
+  **PASS（两次变异，各一包）** — ①`artifacts.go:152` 插 `return nil // MUT76-NEUTRALIZED` ⇒ grep 命中 1 行 ⇒
+  AC#1 两测 + AC#2 全红，且列举差分**自己**报 `- [data/artifacts/nested/canary-separator.txt data/canary-dotdot.txt]`
+  （= 调用者点名的文件真被删了）；②`spill.go:141` 把 `id := b.String()` 换成 `id := callID // MUT76-NEUTRALIZED` ⇒
+  AC#1 红 + AC#2 报 `spill wrote OUTSIDE the data dir: ESCAPE-API-a/b/c.txt`。
+  还原后：`grep -c MUT76` 两文件均 0、`git diff --quiet internal/agent/spill.go internal/memory/artifacts.go` rc=0。
+- [x] **AC#4** Hand me the replacement sentence for ticket 20 `:103` + the test names that back it.
+  **PASS** — 句子写在最终报告里；票 20 面**我没有动过一个字**（`git status` 可查）。
+- [x] **AC#5** Gates: `gofmt -l` on touched pkgs empty, `go vet ./internal/agent/... ./internal/memory/...`
   rc=0, `go test -count=2` on those two packages, and **`=== RUN` line count == 2 × distinct test names
-  with zero `SKIP`** in the log.
+  with zero `SKIP`** in the log. **PASS with one disclosed exception** —
+  `gofmt -l internal/agent/ internal/memory/` 空、`go vet` rc=0、`go test -count=2 -v` 两包 rc=0
+  （agent ok / memory ok 24.592s），整包日志 **RUN=228 == 2×114 distinct、FAIL=0**；
+  本票新增 8 测的**限定**日志 **RUN=44 == 2×22 distinct、SKIP=0、PASS=44、FAIL=0**。
+  ⚠ 整包日志里有 **2 处 `--- SKIP`，全部来自既有测试 `internal/memory/concurrent_test.go:186`
+  `TestSubprocessCrashWriter`**（re-exec 子进程辅助体，直接跑时按设计 skip；`TestCrashRecoveryKillMidWrite`
+  才是真调用者）。不是本票新增、不是我用 skip 换绿、也不在我改的范围内 ⇒ 在此点名而不是把它过滤掉。
 
 ## Rules (all learned from incidents in this repo in the last 24 h)
 - Commit form `git commit -q -F - -- <explicit paths> <<'MSGEOF' … MSGEOF` — **quoted heredoc** (A31:
@@ -106,3 +127,26 @@ the box in writing:
   `go test -count=1 ./internal/agent/ ./internal/memory/` = ok 1.744s / ok 12.956s。
   **next=AC#3 双包变异检验（各自 neutralize 掉 reject/净化那一步，先 grep 证明改动真落地，再证明 AC#1+AC#2 同时变红，
   然后还原 + `grep -c`=0 + `git diff --quiet`），跑 AC#5 门禁，最后交票 20 `:103` 的替换句子。**
+- 2026-09-21（实现代理，checkpoint 3 = 收尾）：**AC#3 变异 / AC#5 门禁做完，五框全绿**，AC#4 的句子在代理最终报告里
+  （票 20 面一个字没改）。变异检验的具体收获，两条都值得记进缺陷册：
+  ①**D-76a（本票已修 + 已测）**：`validArtifactName` 原来只看 Go 的路径语义，而 Windows 在解析前会剥掉组件
+  **尾部的点和空格** ⇒ `"...."` 是 `"."` 的一种拼法，实测它穿过守卫直达 `os.Remove(<artifactsDir>\....)`，
+  只因目录非空才报 "The directory is not empty"；`TestDeleteArtifactRejectsTheFourHostileShapes/dotdot/bare_and_empty`
+  在变异体（守卫 return nil）下还量到 `".."` → `remove ...\data`、`"."`/`""` → `remove ...\data\artifacts`：
+  **空目录时就是一次删掉 artifacts 目录本身**。修法一条：`strings.TrimRight(name, ". ") != name` 一律拒。
+  ②**上报不修（编排者判）**：
+  - **净化器把不同 id 折到同一磁盘名**：`artifactName` 只留 `[A-Za-z0-9_-]` ⇒ `p/q`、`p\q`、`pq` 全变 `tool-output-pq.txt`，
+    而 `writeFileExclusive` 用的是 `os.WriteFile`（`O_TRUNC`，名字里的 "Exclusive" 并不存在）⇒ **不同 tool-call 的
+    产物可互相覆盖**；spill 之后模型还能按 `Spill.Path` 用 fs.read 读到"上一份内容已被别人覆掉"的文件。
+    文档注释只承认"同 id 重试覆盖"，没承认"不同 id 也覆盖"。建议：净化后与原文不等时追加 `seq`（或不落模型可控名）。
+  - **artifacts 目录"扁平"没有任何一侧在守**：`listArtifactsDir` 对 `e.IsDir()` 一律 `continue`，
+    于是一个混进 `artifacts\` 的子目录对 `ListArtifacts`/`PurgeArtifacts`/LRU 配额**全部不可见**
+    （我的 containment fixture 里那个 `nested\` canary 目录就是被 purge 跳过而活下来的，属既有行为的如实记录）。
+  - **按 ruling 留在原地的残余**：两条路由仍**不**过 `risk.Resolve`/C26（本票明令不做）。因此若有人往
+    `artifacts\` 里放一个 reparse point，`DeleteArtifact("<bare name>")` 会照穿不误——这不在本票判据范围，
+    桥侧 junction 证据归票 20/18。
+  **门禁数字（AC#5）**：`gofmt -l internal/agent/ internal/memory/` 空；`go vet ./internal/agent/... ./internal/memory/...` rc=0；
+  `go test -count=2 -v` 两包 rc=0（memory ok 24.592s），整包 `RUN=228 / distinct=114 / FAIL=0 / SKIP 出现 2 次`
+  （两处 SKIP 均为既有 `concurrent_test.go:186` 的 re-exec 辅助体，已点名、未过滤）；
+  本票 8 测定包子集 `RUN=44 == 2×22 distinct、SKIP=0、PASS=44、FAIL=0`。
+  **next=交编排者：把 `:103` 的替换句子落到票 20、裁决 D-76a 是否单独立票、以及上面 ② 的三条要不要各开一张。**

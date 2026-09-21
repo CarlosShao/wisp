@@ -22,6 +22,7 @@ package agent
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/printer"
@@ -179,10 +180,15 @@ func TestSpillContainmentByDirectoryListing(t *testing.T) {
 	before := inv76aTree(t, root)
 	userBefore := inv76aTree(t, userDir)
 	sp := NewSpiller(artifacts, inv76aBudget)
+	// Errors are collected, not fatal: under the AC#3 mutation the sanitizer is
+	// gone and some of these calls fail on a broken path. Aborting there would
+	// hide the thing this test exists to measure - the LISTING after the escape.
+	var errs []error
 	var callerNamed []string
 	for _, sh := range inv76aShapes() {
-		if _, err := sp.Prepare(sh.callID, strings.Repeat(inv76aPayload, 200)); err != nil {
-			t.Fatalf("Prepare(%q): %v", sh.callID, err)
+		_, err := sp.Prepare(sh.callID, strings.Repeat(inv76aPayload, 200))
+		if err != nil {
+			errs = append(errs, fmt.Errorf("Prepare(%q): %w", sh.callID, err))
 		}
 		callerNamed = append(callerNamed, sh.callID)
 	}
@@ -193,8 +199,11 @@ func TestSpillContainmentByDirectoryListing(t *testing.T) {
 		id := inv76aEscapeID(t, artifacts, root, marker)
 		callerNamed = append(callerNamed, id)
 		if _, err := sp.Prepare(id, strings.Repeat(inv76aPayload, 200)); err != nil {
-			t.Fatalf("Prepare(escape id %q): %v", id, err)
+			errs = append(errs, fmt.Errorf("Prepare(escape id %q): %w", id, err))
 		}
+	}
+	for _, e := range errs {
+		t.Error(e)
 	}
 
 	added, removed := inv76aDiff(before, inv76aTree(t, root))
