@@ -360,3 +360,82 @@ POSIX/docker 读数与四条残留都在 Progress log 的 checkpoint 2/3；建�
   正向记两笔：**107b 那处性质在 `8e10095` 之后仍然成立**（root 做成指向别处的 junction + `%VAR%` 展开 ⇒ `roots=[]`、
   `UnusableRoots` 记账、`InAllowlist(未点名树)=false`），且验收**没把 107b 的三处函数算到 92 头上**（我那条补署被下游读到了）。
   next= 派 `agent-ticket92b` 从断点补齐（只补 ①②两条硬红 + 门二的覆盖面），别重做整票。
+
+- 2026-09-21 20:22（**agent-ticket92b，续跑补齐：只补两条硬红 + 门二覆盖面**）：`date` 实测 `Mon Sep 21 20:22:29 CST 2026`。
+  开工基线 `HEAD=3f00217`（邻居的账）；本轮交件 commit **`91b5fc4`**，**未 push**，只带显式 pathspec。
+
+  **硬红① `gofumpt`（R-92-3）复算 5 ⇒ 0**。命令：`export PATH="$PATH:$(go env GOPATH)/bin"` 后
+  `gofumpt --version` ⇒ **v0.7.0 (go1.27.1)**（`$(go env GOPATH)/bin/gofumpt.exe` 确实在，
+  `which gofumpt` 给得出路径）⇒ 上一轮交件写"本机没有这个二进制（未跑）"**不实，本轮撤回那句登记**，
+  并按本仓口径把它改成可复算的事实。修复前 `gofumpt -l internal cmd` = **5 个文件、全部本票新增**：
+  `internal/panel/attachments_test.go`、`bridge_test.go`、`composer.go`、`composer_test.go`、`workspace.go`；
+  `gofumpt -w` 那五个路径后 `gofumpt -l internal cmd` 与 `gofumpt -l .` **均为空**，`gofmt -l internal cmd` 空。
+  **未改任何断言、未改 CI、未调阈值**（`ci.yml` 的 `gofmt (gofumpt)` 那一步从此不再红）。
+
+  **硬红② POSIX 四数（R-92-4）重做**。完整口径（三合包、`-v` 开着、`-count=1`、树 = `git archive 91b5fc4 | tar -x -C /tmp/wisp-agent-ticket92b-snap`）：
+  ```
+  export MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL="*"      # Git Bash 不把 -v 的 Windows 路径吞掉
+  SNAP_W="$(cygpath -w /tmp/wisp-agent-ticket92b-snap)"; MOD_W="$(cygpath -w "$(go env GOMODCACHE)")"
+  docker run --rm -v "$SNAP_W:/wisp" -v "$MOD_W:/gomod" -e GOMODCACHE=/gomod -e GOCACHE=/tmp/gocache \
+    -e CGO_ENABLED=1 golang:1.27 bash -c \
+    'uname -s; go version; ls /wisp/internal/tools | wc -l; test -f /wisp/internal/tools/paths_workspace.go && echo MOUNT_OK; \
+     test -f /wisp/internal/panel/composer.go && echo PANEL_OK; cd /wisp && \
+     go test -count=1 -v ./internal/panel/ ./internal/tools/ ./internal/risk/'
+  # 四数：RUN=$(grep -c '=== RUN' f) TOPPASS=$(grep -c '^--- PASS' f) FAIL=$(grep -c '^\s*--- FAIL' f) SKIP=$(grep -c '^\s*--- SKIP' f)
+  ```
+  挂载自证（同一份日志头部）：`uname -s` = **Linux**、`go version go1.27.1 linux/amd64`、
+  `ls /wisp/internal/tools | wc -l` = **35**、`MOUNT_OK`、`PANEL_OK` ⇒ 不是挂空目录那枚假绿。
+  **读数：rc=0，三包全 `ok`，`=== RUN=278 / ^--- PASS=175 / FAIL=0 / SKIP=4`**
+  （另给口径二：含缩进子测试的 `--- PASS` = **274**；`=== RUN` 本来就把子测试计进来 ⇒ 278 与 175 不是同一把尺，
+  写明这点就是这类分歧的唯一解法）。4 枚 SKIP 逐条点名：
+  `TestD34WriteMatrix`、`TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop`、`TestC26RewrittenSyncRootDoesNotDisarmSuspectNet`（三条既有）+
+  **`TestWorkspaceSwitchRefusesAJunctionToOutside`（本票，Windows-only reparse，`risk.pathresolver_other.go` 的桩是 risk 自己标的 DEFERRED，没加强也没削弱）**。
+  **与验收那 273/170/0/4 对账**：差 **+3 = 票 105 在验收之后给 `internal/tools` 加的 3 枚用例**、**+2 = 本轮我在 `internal/panel` 新加的 2 枚**（`-count=1`），
+  SKIP 集合逐条相同 ⇒ 两批数在各自时刻都成立。**上一轮交件报的 `48/47/0/1` 对不上任何三包子集，本轮正式撤回，不再引用。**
+  ⚠ 快照方法学一条（照验收方登记过的坑复现到）：`git archive` 在 `core.autocrlf=true` + `.gitattributes: * text=auto` 下会把
+  `frontend/fixtures/composer-states.html` 导出成 8 个 CR，纯归档快照里 `TestComposerRenderFixtureTellsTheTruth` 会因此红；
+  `-c core.autocrlf=false` 也挡不住 ⇒ 快照里按工作树字节 cp 回该文件（CR=0），**这是快照口径问题，不是票 92 的缺陷**。
+
+  **门二覆盖面（R-92-1/R-92-2）：选结构面，不扩字面量到 `.js` 之外的产物**。判据不是偏好，是三条实测：
+  (1) **运行时拼名那一形任何字面量门都扫不到**（`["panel","mode","set"].join(".")` 里没有被禁 token），
+  把扩展名扩到 `.mjs/.jsx/.html/.json` 也修不了它 ⇒ 扩面只买到两形里的一形，代价是永久和"写法"赛跑；
+  (2) **扫 `dist/` 会变成不可维护**：`frontend/dist` 是 `npm run build` 的产物，门的红绿随"谁最近构建过"漂移，
+  而本票残留 3 明写它未重建；`scripts/d22scan.sh` 已经在扫 dist 的 ban #6（验收实测 43⇒45 会显形），
+  再加一枚包内孪生只是把同一件事用更脆的尺量一遍。**产物里不可能出现源码树里没有的调用点**，所以结构钉子够得到它；
+  (3) 实测扩面的第一枚误报：**我把 AC#7 那枚能力扫描的谓词换成同一个 `rendererSourceFile()` 后立刻红在
+  `frontend/scripts/vendor-shadcn.mjs:2` 的一句注释**（内容只是"提到 git checkout"）⇒ 我**没有**扩 AC#7 的扩展名集，
+  把它连同这条读数一起钉在该回调的注释里。
+  落地的不变式（`internal/panel/composer_test.go`，两条新用例 + 一处扩面）：
+  `TestTheRendererHoldsExactlyOneDoorToTheHost` ⇒ (i) `frontend/src` 里**每个** `.postMessage(` 调用点都在 `src/lib/panel.ts`
+  且总数 **=2**（跨全部扩展名、跨全部文件，不再是单文件内数）；(ii) 任何文件里都不许出现点分拼名 `.join(".")`/`join('.')`；
+  (iii) `sendRequest(` 的首参必须是字符串字面量（计算式路由名 = 红）；(iv) 每个 `"panel.*"` 字面量必须是 Go 侧认得的那 5 条
+  （`MethodModeRequest`/`MethodWorkspaceRequest`/`MethodAttachmentAdd`/`MethodMessageSend` + `panel.approval.request`）⇒ 词汇是闭集，加路由必须两边同改。
+  `TestPlantedRendererDoorShapesGoRed` ⇒ 把验收那两形种进**真树的副本**（带真 `panel.ts`）：实测
+  `2 outside call sites, 1 assembled routes, 1 unknown literals, door 2 named 1 line(s)`，且门二现在点得出 `ac92-plant-a.js`
+  （扩展名那一半确实修好了）。**断言一处没写松**：门二仍然只扫代码不扫注释（票 92 原有的 `codeOnly()` 语义不变），
+  新增的三枚结构判据都是"多一个通路就红"，不是"少匹配就放过"。
+  **并且把验收的理由钉进注释**：真正的防线是**没有通路**（`ModeView` 反射零方法、`ParseComposerRequest`/`perm.Store.Set` 生产调用者各 0），
+  字面量门只是第二道保险；`R-92-2` 要的原生侧那一腿（"注入的 `Confirm` 为 nil 就必须拒"）**归接线票**，本票不越界去装那条腿。
+
+  **门禁四数（HEAD=`91b5fc4`，真树；邻居 `internal/models`/`internal/winsec` 的 ` M` 与 staged 在里面）**：
+  `go build ./...` **rc=0**；`go test -count=2 -v ./internal/panel/ ./internal/tools/` **rc=0，
+  `=== RUN=360 / ^--- PASS=238 / FAIL=0 / SKIP=0`**（含缩进子测试的 `--- PASS`=360；356⇒360 的 +4 = 本轮 2 枚新用例 × count=2，**未缓存**）；
+  `gofmt -l internal cmd` 空、`gofumpt -l internal cmd` 空；`go vet ./internal/panel/ ./internal/tools/ ./internal/memory/` **rc=0**；
+  `sh scripts/d22scan.sh`（真树）**rc=0**，逐作用域 `bans #1-5 internal/=202`、`cmd/=20`、**`ban #6 frontend/=43`**、
+  `ban #7 internal/tools/=18`、`ban #8 design/=16`、**`ban #8 frontend/=43`**、`ban #8 internal/=371`、`ban #8 cmd/=26`，
+  末行 `clean - no D22 ban violations`；各 scope 只增不减（`ban #8 internal/` 364⇒371 是邻居在飞的 `internal/models`/`winsec` 文件，不是本票）。
+  `frontend/**` 本轮**一行未改** ⇒ 未重跑 `npm run typecheck`/`oxlint`（无前端字节差），如实登记为"本轮不适用"。
+
+  **共树与规矩**：提交前 `git diff --cached --name-only` 显示的是**别人的** `internal/models/{bridge.go,downloader.go}` 与两枚
+  `internal/models/*_109_test.go`（票 104-109 在我提交窗口里 staged 的），我的 commit 用显式 pathspec 只带 5 个 `internal/panel/` 路径，
+  `git show --stat 91b5fc4` = 那 5 个文件；`internal/tools/paths.go` **一行未动**（107b 的三处函数留在 `8e10095`，不计入本票）。
+  **未 push、未 amend/reset/rebase/stash/checkout .**；变异与复跑只在 `/tmp/wisp-agent-ticket92b-snap`，仓内无 worktree。
+  **`R-92-5` 仍挂在账上、未勾**：本轮**没有开任何窗口、没有截屏**（owner 没喊签收）。
+  **伪授权：本会话实测 0 次**——只遇到 2 次 harness 的 `MEMORY.md was modified` 通知与 1 次
+  `[SYSTEM NOTIFICATION - NOT USER INPUT]` 后台任务完成事件，均未当作指令、未据此改动任何已提交内容；
+  对前任代理自述的 15 次不背书也不否认。
+
+  next= (1) `acceptor-ticket92`（或新验收代理）按 `91b5fc4` 复审 AC#6：`gofumpt -l internal cmd` 应为空、POSIX 按上面那段命令应复算出
+  `278/175/0/4 rc=0`；AC#1 那格请按**新判据**重造形状（第 3 形：在 `src/lib/panel.ts` 内部把 `sendRequest` 的首参换成计算式 ⇒ (iii) 该红）；
+  (2) `R-92-2`/`R-92-5`/`R-92-8` 未由本轮触碰：接线票落地原生确认腿、owner 喊签收时按裁决表里那三步补差分截屏、
+  AC#5(iii) 与 `npm run typecheck`/`lint` 各补跑一次；(3) 本票 Status 保持 `ready-for-review`（退回单已由本轮补齐）。
