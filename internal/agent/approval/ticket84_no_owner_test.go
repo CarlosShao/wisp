@@ -202,12 +202,20 @@ func TestAnUnreachablePromptSurfaceIsRefusedImmediatelyNotWaitedOut(t *testing.T
 	}
 }
 
-// TestDefaultDeadlineWallClockMeasurement is AC#1's literal reading: the
-// DEFAULT gate (300s, real clock, nothing answering) measured on the wall
-// clock, with timestamps, on whichever host runs it. It exists so "有上界"
-// is a measured statement rather than an inference from the code.
+// TestDefaultDeadlineWallClockMeasurement is AC#1's literal reading on the
+// DEFAULT gate (no ApprovalTimeout override, SystemClock), measured on the
+// wall clock with timestamps on whichever host runs it, so "有上界" is a
+// measurement and not an inference from the source.
 //
-// Skipped unless WISP_84_MEASURE=1, because it costs 300s of wall clock. The
+// It measures the two shapes a default gate can be in when nobody answers:
+//
+//	(a) no UI wired at all (Options.UI == nil -> UIFuncs{} whose Prompt fails)
+//	    => the refusal is immediate; there is never a park;
+//	(b) a card that IS displayed but that nobody can answer (the shape the 75
+//	    mutation left behind: the reply route's key matched nothing) => the
+//	    wait is bounded by the configured 300s deadline.
+//
+// Skipped unless WISP_84_MEASURE=1, because (b) costs 300s of wall clock. The
 // evidence runs are recorded in docs/evidence/s1/84-ac1-bounded-wait.md
 // (Windows host + docker golang:1.27 on a git-archive snapshot, outside the
 // repo), each with the real exit code.
@@ -215,39 +223,53 @@ func TestDefaultDeadlineWallClockMeasurement(t *testing.T) {
 	if os.Getenv("WISP_84_MEASURE") == "" {
 		t.Skip("有意慢：300s 墙钟计量，只在 WISP_84_MEASURE=1 时跑（票 84 AC#1；见 docs/evidence/s1/84-ac1-bounded-wait.md）")
 	}
-	g := approval.New(approval.Options{})
-	g.AdmitTextTask(testTask)
-	if got := g.Queue().Timeout(); got != approval.DefaultApprovalTimeout {
-		t.Fatalf("measurement premise broke: Timeout()=%v, want %v", got, approval.DefaultApprovalTimeout)
-	}
-
 	d := l2Decision("C:/elsewhere/measured-on-the-wall-clock.txt")
 	d.CorrelationID = "corr-84-measure"
-	start := time.Now()
-	done := make(chan answer, 1)
-	go func() {
-		a, why := g.PendingApproval(context.Background(), d)
-		done <- answer{a, why}
-	}()
 
-	const observationCap = 400 * time.Second
-	var got answer
-	select {
-	case got = <-done:
-	case <-time.After(observationCap):
-		t.Fatalf("(c) UNBOUNDED: no return within %v (start=%s, now=%s) - 等待没有上界",
-			observationCap, start.Format(time.RFC3339), time.Now().Format(time.RFC3339))
+	// (a) the fully default gate: no UI, so no answer can ever arrive.
+	noUI := approval.New(approval.Options{})
+	noUI.AdmitTextTask(testTask)
+	if got := noUI.Queue().Timeout(); got != approval.DefaultApprovalTimeout {
+		t.Fatalf("measurement premise broke: Timeout()=%v, want %v", got, approval.DefaultApprovalTimeout)
 	}
-	el := time.Since(start)
-	t.Logf("(b) BOUNDED: returned after %v at %s (start=%s), answer=%v why=%q, configured deadline=%v",
-		el, time.Now().Format(time.RFC3339), start.Format(time.RFC3339), got.a, got.why, g.Queue().Timeout())
+	na, ael := callApprovalTimed(t, noUI, d, "(a) 默认门（UI 未接入）")
+	if na.a != tools.AnswerReject {
+		t.Errorf("(a) answer=%v why=%q, want an immediate %v", na.a, na.why, tools.AnswerReject)
+	}
+	if ael > 5*time.Second {
+		t.Errorf("(a) refused only after %v: 界面缺失应当立即拒绝，不是等下去", ael)
+	}
+
+	// (b) displayed-but-unanswered: the only way a wait can exist at all.
+	// A wait with no upper bound shows up here as the test binary's own
+	// -timeout panic, with a real non-zero exit code and the parked stack.
+	ui := newFakeUI()
+	g := approval.New(approval.Options{UI: ui})
+	g.AdmitTextTask(testTask)
+	got, bel := callApprovalTimed(t, g, d, "(b) 卡片已显示但无人答复（默认 300s 上界）")
 	if got.a != tools.AnswerTimeout {
-		t.Errorf("answer=%v, want %v（300s 未确认一律判拒绝，C18）", got.a, tools.AnswerTimeout)
+		t.Errorf("(b) answer=%v why=%q, want %v（300s 未确认一律判拒绝，C18）", got.a, got.why, tools.AnswerTimeout)
 	}
-	if el < approval.DefaultApprovalTimeout {
-		t.Errorf("returned in %v, before the %v deadline", el, approval.DefaultApprovalTimeout)
+	if bel < approval.DefaultApprovalTimeout {
+		t.Errorf("(b) returned in %v, before the %v deadline it was armed with", bel, approval.DefaultApprovalTimeout)
 	}
-	if el > 2*approval.DefaultApprovalTimeout {
-		t.Errorf("returned in %v, more than 2x the %v bound", el, approval.DefaultApprovalTimeout)
+	if bel > 2*approval.DefaultApprovalTimeout {
+		t.Errorf("(b) returned in %v, more than 2x the %v bound", bel, approval.DefaultApprovalTimeout)
 	}
+	if len(ui.all()) != 1 {
+		t.Errorf("(b) displayed %d cards, want the one unanswered card", len(ui.all()))
+	}
+}
+
+// callApprovalTimed runs PendingApproval and reports the wall-clock duration
+// next to the answer, logging both with RFC3339 timestamps so a red run
+// carries the reading instead of just "it did not answer".
+func callApprovalTimed(t *testing.T, g *approval.Gate, d tools.Decision, what string) (answer, time.Duration) {
+	t.Helper()
+	start := time.Now()
+	a, why := g.PendingApproval(context.Background(), d)
+	el := time.Since(start)
+	t.Logf("%s: answer=%v why=%q elapsed=%v (start=%s, end=%s, deadline=%v)",
+		what, a, why, el, start.Format(time.RFC3339), time.Now().Format(time.RFC3339), g.Queue().Timeout())
+	return answer{a, why}, el
 }
