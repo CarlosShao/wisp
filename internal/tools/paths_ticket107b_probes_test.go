@@ -120,6 +120,16 @@ func TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing(t *testing.T) {
 	cand := judge107b(t, pc, via)
 	t.Logf("roots=%v rewritten=%v unusable=%v judged=%q opened=%q",
 		pc.Roots(), pc.RewrittenRoots(), pc.UnusableRoots(), cand, real)
+	// The root leg has to have its own teeth: a name that is not the tree it
+	// points at must never enter the authorization book, so that the audit line
+	// and the deny leg's reason name a tree that exists rather than a link.
+	if r := pc.Roots(); len(r) != 0 {
+		t.Errorf("AC#3 RED: Roots() = %v: the named root %q is a link onto %q, so it authorizes nothing and must not be in the book",
+			r, spelled, outside)
+	}
+	if u := pc.UnusableRoots(); len(u) == 0 {
+		t.Errorf("UnusableRoots() is empty: a dropped root must leave the operator a reason, got roots=%v", pc.Roots())
+	}
 	if pc.InAllowlist(cand) {
 		t.Errorf("AC#3 RED: InAllowlist(%q) = true although the named root %q expands onto %q, a link onto %q: the tree that opens (%q) is one the operator never named",
 			cand, spelled, proj, outside, real)
