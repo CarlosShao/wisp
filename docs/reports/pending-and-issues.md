@@ -1104,6 +1104,45 @@ vet: cmd/wisp/slo.go:324:49: undefined: proc.Runtime
 本 commit 已把该步与它的阳性对照（`tools/d22scan/runtests.sh -C tools/d22scan ./...`）**提到 gofmt/vet 之前**：
 不删步骤、不给任何步骤加 `continue-on-error`、不让任何步骤可跳过（D22 mode 6 未碰）。
 
+## 编排者登记 A69（2026-09-21 16:3x，**票 82 结案 ⇒ ubuntu 那 8 条红归零**；票 96 把 `ban #8` 也武装到 `frontend/`；**push 门检第一次全绿**）
+
+- **A69① 票 82 判 `accepted-done`**（裁决表 511 行、三枚 commit `b4435d3`/`5b1d855`/`d863bd9`）。
+  `acceptor-ticket82` 的所有关键读数都是自己在 `git archive 629ce3c` 快照 + docker `golang:1.27` 里跑的：
+  ubuntu `internal/risk` **rc=0 / RUN 124 / PASS 123 / FAIL 0 / SKIP 1**，那 8 条逐条 `--- PASS`；
+  改前基线 `42ed13f^` 独立复现回**顶层红 8 条、名字一字不差**（68→71 顶层）；
+  门禁 `gofmt`/`gofumpt v0.7.0`/`vet` 全 rc=0，`-count=2` 两侧 **302=2×151 / 248=2×124** 逐名核过；
+  还原用 `git archive -- internal/risk` + `diff -r` rc=0 证干净。⇒ **`test-core` 的那族红到此归零**。
+- **A69② 两条"我写错的判据"在这张票上闭环**（原文都保留）：
+  ① **R-1**：AC#2b 那句"`*_windows_test.go` 不施加门"**是我写的、且错了**（Go 剥 `_test` 后按 `_GOOS` 尾部施加约束），
+     验收代理独立复现同一读数：**只删 tag、保文件名 ⇒ ubuntu 打 `no tests to run` + rc=0，不红**。
+     判据最终版：**两层都必须有自己的 `//go:build` 行，且两侧各做一次剥 tag 变异**；
+     并且"只改文件名"在 windows 侧真的生效这件事要写进简报——**它让漏写 tag 的人看不到症状**。
+  ② **R-2**：**MUT-c** 把 `gradeConfirmed` 加宽去认 `"default"` ⇒ **ubuntu rc=0 全绿、Windows rc=1**
+     ⇒ 本票定性表第 6 行"弱等级永不拆网**两侧有对象**"是 **over-claim**（Linux 侧那条是空仪器）。
+     ⇒ 已把这一格转成**票 55 的第四个 macOS 落地锚点**（判据形状反着用：**加宽 ⇒ 用例必须红**）。
+  ③ **R-3 → 票 93**（`TestSyncRegistryProbeLive` 在 ubuntu 是**结构性永久 SKIP**，且 skip 文案在 Linux 上说 Windows 的谎；
+     本票 portable 步逐字重放读数 **TOPSKIP=7，全部点名 + 归包**）；**R-4 → 票 85**
+     （`lint` 里 `staticcheck` 一红就**连带 `mockllm module vet` 被 skipped** ⇒ A44① 同族的结构性空窗，判据 `if: always()`）。
+- **A69③ 一句我今天才敢说的话（有真 CI 读数，档位=验收代理取的日志、我未能二次复核）**：
+  `test-core` 自 `42ed13f` 起**连续 4 个 run success**（`942ab5a` 逐步骤全绿），更早的 `e5e5eb7` 是 failure
+  ⇒ **"ubuntu 上的 portable 测试全绿"这件事今天第一次成立**，票 70 的 AC#2 可据此重判。
+  ⚠ 但票 70 的 **AC#6（五 job 全 pass）仍不成立**——`lint` 还红在 `staticcheck`（票 85 的账）。
+  我今早试图自己 `gh run list` 复核，**GitHub API TLS handshake timeout**（本仓已知偶发），
+  所以这条挂在〔日志读数，未二次复现〕档；**push 之后我会用新 run 亲取一次**。
+- **A69④ 票 96 落地（`5e8f87b`/`1fc4ff7`/`8b1b10f`）：`ban #8` 现在真扫 `frontend/`**。
+  它做的三个决定都写在了 commit 里，其中一条值得学：它**没有**复用现成的 `goOnly:false` 那条路
+  （那条走 `isTextFile()` 后缀白名单，实测会**在同一棵树上丢 5 个文件** ⇒ `ban #8` 会变成 `ban #6` 的**真子集**，
+  正是票 88 那个"收窄"错的镜像），而是新增 `everyFile` 走**全文件无后缀过滤**，与 `ban #6` 逐字同形。
+  **两条门的文件数相等**（纯净树 `ban #6 = 37`、`ban #8 = 37`）被钉成一条用例
+  `TestRealRepoBan8CoversFrontendTreeAtBan6sCount` + 一次独立 walk 交叉核对；
+  AC#3 反向变异（从清单里删 `frontend/`）红 **6 条**，其中两条以**字面量**钉 `"frontend/"` ⇒ AC#1 不是自证。
+- **A69⑤ push 门检第一次全绿**（HEAD `20b525d`，仓外纯净快照 `/tmp/wisp-gate96`）：
+  `go build ./...` **rc=0**、`gofmt -l internal cmd tools` **空**、`sh scripts/d22scan.sh` **rc=0**，
+  台账八行全在（`bans #1-5 internal/=197`、`cmd/=20`、`ban #6 frontend/=37`、`ban #7 internal/tools/=17`、
+  `ban #8 design/=16`、**`ban #8 frontend/=37`**、`internal/=335`、`cmd/=25`）。
+  A64 压着 push 的那条 `winsec.go:126` 已随票 94 的 `7910bcd` 消失 ⇒ **本地领先远程 40 枚，本条之后我推 origin 与 cnb**。
+  ⚠ 这**不等于票 89/94 已结案**：票 89 仍是 `returned-for-fix`（A68），票 94 仍在收尾。
+
 ## 编排者登记 A68（2026-09-21 16:1x，**票 89 被退回**：五格 PASS 但"覆盖面主张"一格被实测打空，外加一处**比原缺陷更坏的漏项**）
 
 - **A68① 覆盖面主张没有用例钉住 = 一句"顺带成立"的宣传**。验收代理在快照里把 `sealDir` 的

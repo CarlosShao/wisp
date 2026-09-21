@@ -62,6 +62,8 @@ Windows 专属判据进 `//go:build windows`，POSIX 侧留一条**断言当前�
   审 code 的人看不见 tag 行就以为没分层。票 75/78 的结论（分层要用 tag 表达）我照办了，
   但建议在 A5x 里把这句判据写成"两层都必须有自己的 `//go:build` 行，且**两侧各做一次剥 tag 变异**"。
 
+- [x] **AC#2b 的编排者裁定（2026-09-21 16:2x）＝接受上面那条事实更正**："`*_windows_test.go` 不施加门"这句**是我写的，且它错了**——Go 的文件名构建约束先剥 `_test` 再看 `_GOOS` 尾部，所以 windows 层**光靠文件名就已经被 gate**（`acceptor-ticket82` 独立复现同一读数：只删 tag、保文件名 ⇒ ubuntu 打 `no tests to run` + **rc=0，不红**）。原句**留在上面不删**（本仓规矩：保留原文 + 追加更正）。⇒ 判据最终版：**两层都必须有自己的 `//go:build` 行，且两侧各做一次"剥 tag 变异"**；并且**"只改文件名"在 windows 侧真的生效**这件事本身要写进简报——它让漏写 tag 的人**看不到症状**。
+
 - [x] **AC#2** POSIX 层**不许是空文件、不许全是 `t.Skip`**：它必须断言 POSIX **当前**的真实行为
   （fail-closed / 尚未检出），并在注释里指名**票 55 落地时这一层要怎么转成活的**（A51⑧）。
   ⇒ `internal/risk/syncdirs_other_test.go`：3 条活用例、**0 个 `t.Skip`/`t.Log` 早退**（ubuntu 上 3/3 `--- PASS`），
@@ -89,6 +91,28 @@ docker 挂**快照**不挂工作树；票面 Progress log append-only，**要改
 四种假绿逐跑点名（SKIP 当 ok / `-run` 空匹配 / `-count=N` 没核对倍数 / 步骤被静默跳过）。
 
 ## Progress log（append-only）
+
+- 2026-09-21 16:2x（编排者，**独立对抗验收判 PASS ⇒ 本票结案；两条改名前置当场落**）：
+  `acceptor-ticket82` 在 `git archive 629ce3c` 的仓外快照 + docker `golang:1.27`（命名卷带会话后缀）里
+  把六个框逐条自己跑过：ubuntu `internal/risk` **rc=0 / RUN 124 / PASS 123 / FAIL 0 / SKIP 1**，
+  那 8 条**逐条 `--- PASS`**；改前基线 `42ed13f^` 独立复现回**顶层红 8 条、名字一字不差**。
+  四组变异（正向删 tag、只删 tag 保文件名、Windows 侧剥 `!windows`、四次生产码行为变异）**全部如预期**，
+  还原用 `git archive -- internal/risk` + `diff -r` rc=0 证明。⇒ **判 PASS，可挂 `-done`**。
+  - **R-1（已落在本票面 AC#2b 那条裁定里）**：那条"文件名不施加门"的更正**我接受了**，
+    它把判据推向更严的版本（见 AC#2b 末句）。
+  - **R-2（当场登记并转票 55 当锚点）**：验收代理的 **MUT-c** 实测：把 `gradeConfirmed` 加宽去认 `"default"`
+    ⇒ **ubuntu rc=0 全绿**、Windows rc=1 ⇒ 本票表里第 6 行那句"弱等级永不拆网**两侧有对象**"**是 over-claim**
+    （Linux 侧那条其实是**空仪器**）。⇒ 已追加进票 55 的锚点段；**本票不改表正文**（保留原文 + 这条更正）。
+  - **R-3（本票之外、已立案）**：`TestSyncRegistryProbeLive` 在 ubuntu 是**结构性永久 SKIP**，
+    且它的 skip 文案在 Linux 上说了一句 Windows 的谎 ⇒ 归**票 93**（portable 步把 SKIP 记成 ok）。
+    本票 portable 步逐字重放读数：**TOPSKIP=7，全部点名 + 归包**。
+  - **R-4（归票 85）**：`lint` 里 `staticcheck` 一红就**连带 `mockllm module vet` 被 skipped**
+    ⇒ 与 A44① 同族的"步骤次序造成的结构性空窗"，判据是 `if: always()`。
+  - **顺带一条大事（对票 70 的账有用）**：验收代理取到真 CI 读数——`test-core` 自 `42ed13f` 起
+    **连续 4 个 run success**（`942ab5a` 逐步骤全绿），更早的 `e5e5eb7` 是 failure
+    ⇒ **"ubuntu 的 portable 测试全绿"今天第一次成立**，票 70 的 AC#2 可据此重判；
+    但 AC#6 判据是"五 job 全 pass"，`lint` 仍红在 `staticcheck` ⇒ 那条**还没**成立。
+  next= 挂 `-done`（两条前置已落）。本票**没有留未接的码**；R-2/R-3/R-4 的归宿分别是票 55 / 93 / 85。
 
 - 2026-09-21 写码代理认领本票（HEAD `c923327`，局面基线 = CI run `35562680354` / headSha `e5e5eb7` 的 8 条同族红）。
   本枚 checkpoint 只改票面 Status + 这条 log，先落账再动代码。
