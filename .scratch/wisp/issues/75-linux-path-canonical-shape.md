@@ -68,3 +68,50 @@ reading you implemented and **why, in the commit message**.
   共树有票 76 在途代理，未跑任何整仓门）。
 - next= 等 docker 基线跑完补齐 AC#1 三个读数 → 落修复（`pathresolver.go` 单独一个 commit
   以便 owner 一键退回"只交提案"的读数）→ Windows `-count=2` 半边门 → 勾框。
+- 2026-09-21 接续代理（owner 指定四项）开工。根因与已落地面不重做（见上两条 + `27c6fe5`/`ed74595`/`493b4e7`）。
+  **第 1 项 Windows 半边门：已真跑，`-count=2`，四个文件全绿，零 SKIP**（本 box 是 Windows 原生，非交叉编译）：
+  - `internal/risk/pathresolver_junction_windows_test.go`（票 18 Case 1–10，10 条顶层）
+    → `ok github.com/CarlosShao/wisp/internal/risk 1.640s`，**EXIT=0**，`=== RUN` **20**，顶层 `--- PASS` **20**。
+  - `internal/tools/bridge_junction_windows_test.go`（票 20，6 条顶层）
+    → `ok internal/tools 1.674s`，**EXIT=0**，`=== RUN` **28**（含子项），顶层 `--- PASS` **12**。
+  - `internal/tools/fs_staging_windows_test.go`（票 73，4 条顶层）
+    → `ok internal/tools 3.341s`，**EXIT=0**，`=== RUN` **8**，顶层 `--- PASS` **8**。
+  - `internal/tools/bridge_a18_kill_windows_test.go`（票 73，1 条顶层）
+    → `ok internal/tools 2.364s`，**EXIT=0**，`=== RUN` **8**，顶层 `--- PASS` **2**。
+  ⇒ 报告"未证/局限"第一条（"Windows 那一半它没测 ⇒ 恒等只是推理"）**关闭**：形状修复在 Windows 上确实是恒等。
+- **第 2 项 P4**：`ed74595` 已把 `internal/tools/paths.go` 的 `const sep` 换成 `pathSep = string(filepath.Separator)`
+  + `unifySeparators` 平台分支，跨文件放行泄漏（`a\b` 与 `a/b` 折成同一 key）在**白名单根**这一侧已被
+  `TestFoldPathKeepsPosixBackslashesDistinct` 钉住。**但同一折叠在 `internal/risk/blacklist.go:134 normPath`
+  → `Gate`/`overrideApplies` 的 `bOverrides` 那一侧只被测了"两种 Windows 拼写不改变裁定"（且那条在
+  `_windows_test.go` 层，Linux 上不跑）** ⇒ 本代理补一条不带 tag 的正反两用例（见下一个 commit）。
+- **第 3 项**："靠这层脏才绿"的用例：`TestFourChannelExfilSuite/fs.write_into_sync_dir` 的 fixture 已由
+  `ed74595` 换成 `t.TempDir()` 下的真实平台形状目录（POSIX 等价腿已在），但"Windows 字面量"那一腿与
+  "修好之后一条外平台字面量**不该再**被判 sync 嫌疑"这条反向钉都还不存在 ⇒ 分层补齐（windows 层 +
+  POSIX 层 + 不带 tag 的反向钉）。
+- **第 4 项 AC#4 保持不勾**（owner 裁决 R17：修实现去符合既有契约 ≠ D22 改契约）。交接段落已写进本文件
+  Progress 末段，供 owner 亲自关闭。
+
+### AC#4 交接段落（D22 gate；本代理不自行勾框，请 owner 用它关闭）
+
+本票在冻结面 `internal/risk/pathresolver.go` 上只改了三处，且都是"把实现改得符合已冻结的契约"而不是"改契约"：
+(1) `normalizeLocalUNC` 开头加守卫 `if !strings.HasPrefix(p, "\\") && !strings.HasPrefix(p, "//") { return p }`，
+把该函数从"对每个路径无条件把 `/` 折成 `\` 并返回"收窄为"只对真是 UNC 拼写的串动手，其余原样交回"；
+(2) 新增包内常量 `sepStr = string(filepath.Separator)` 与辅助 `unifySeparators`（折叠只发生在 Windows 分支），
+供同包 `blacklist.go` / `syncdirs.go` 使用；
+(3) `tailExistsBelow` 交给 `os.Lstat` 的那次重拼接从字面 `\` 改成 `sepStr`。
+**行为差异**：Windows 上 C26 交回的 canonical 字符串逐字不变（`filepath.Clean` 两行之前已把 `/` 折成 `\`，
+守卫分支根本取不到），POSIX 上从 `<cwd>/\tmp\x`（一条没有任何 OS 调用能打开、也不再绝对的串）变成 `/tmp/x`；
+A/B 表内容、`Class` 取值、函数签名、调用点、`Resolve` 的 fail-closed 方向一字未动。
+**授权它的契约线**：`docs/specs/SPEC-06*.md:50-52`（§4 管线：展开 env/~ → 绝对化 → Clean → 句柄真实路径 →
+拒 reparse → 展开 8.3 → **规范化 UNC** —— 最后一步就是 `normalizeLocalUNC` 的全部职责，它的输入本就是 UNC 拼写）
++ `docs/PLAN.md:1376`（C26 唯一入口，"真实路径"）、`:1796`（D33/F1 推翻字面比较那一行）、`:2377`
+（macOS 侧 `realpath` + `lstat`，即 canonical 在 POSIX 上必须是 `/` 形状）。
+**什么情况下这次编辑会变成一个真的 D22 变更**：如果正解被选成反方向那一种 —— 即主张 C26 的 canonical 在
+**所有平台上必须是同一个 `\` 形状单一串**，于是契约要新增一条"跨平台单一形状"断言、比较侧改成双侧折叠、
+并在任何 OS 调用之前把串展开回去，同时改写 `SPEC-06 §4` 与票 18/72 已冻结的裁定不变式 —— 那需要 owner 拍板。
+本票走的不是这条路，故 AC#4 的框留着不勾，由 owner 用本段落关闭。
+
+- next= 本代理剩余三步：① 给 `bOverrides` 侧补一条不带 tag 的 POSIX 折叠不合并用例（P4 的残余漏口）→
+  ② sync-write exfil 用例分层（windows 层字面量腿 + 不带 tag 的"外平台字面量不再一律嫌疑"反向钉）→
+  ③ 重跑票 72 的六条不变式 + `GOOS=linux go vet` 两侧门，然后**由 owner 推送**后按 run id + job id 读
+  `test-core` 补 AC#6（本代理不 push）。AC#6 框在此之前保持不勾。
