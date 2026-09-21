@@ -357,12 +357,17 @@ func (g *Gate) Complete(corr string) {
 // (D31). The veto is recorded so the running tool can see it through Bus.
 var ErrAlreadyStarted = errors.New("approval: 执行已开始，取消不是原子的（D31），将报告已生效步骤")
 
-// Veto cancels the L1 window named by v.CorrelationID.
+// Veto cancels the L1 window named by v.CorrelationID, or - when the name
+// addresses a pending L2 card instead, which is the case ticket 87 was about -
+// refuses that card through the same funnel Native.Reject uses.
 //
 // It returns ErrChannelUnavailable (wrapping the exact 「语音取消不可用」 style
 // wording) for a channel the host never loaded, ErrUnknownCorrelation when the
-// id matches no live window (C18 routing: a click cannot land on someone
-// else's request), and ErrAlreadyStarted when the call already went live.
+// id matches no live window and no pending item (C18 routing: a click cannot
+// land on someone else's request), and ErrAlreadyStarted when the call already
+// went live. Every one of those is a refusal-shaped outcome: this function has
+// no route to an allow, and a veto that cannot be placed never authorizes
+// anything.
 func (g *Gate) Veto(v Veto) error {
 	err := g.channels.check(v.Channel)
 	if strings.TrimSpace(v.CorrelationID) == "" {
@@ -404,7 +409,22 @@ func (g *Gate) Veto(v Veto) error {
 	if r != nil {
 		return ErrAlreadyStarted
 	}
-	return ErrUnknownCorrelation
+	// Ticket 87: an L2 approval never opens an L1 window - PendingApproval
+	// registers into the queue instead - so a veto naming a card that is ON
+	// SCREEN used to fall through to ErrUnknownCorrelation here, while the very
+	// card it named advertises this channel (promptFor stamps the same
+	// g.channels.Statuses() onto both routes). The user's
+	// vote was simply not heard and the call waited out the full C18 deadline.
+	// Hand it to the queue's refusal funnel instead: the same AnswerReject the
+	// native and panel 「拒绝」 buttons produce, needing no grant and no proof,
+	// and the waiting call stops waiting now.
+	//
+	// Direction check, because this is the only place a veto can touch an L2
+	// item: it can only ever refuse. An unknown id still answers
+	// ErrUnknownCorrelation, a live window still wins the lookup above, and a
+	// started call still reports D31. Nothing here can produce an allow.
+	return g.q.reject(v.CorrelationID,
+		sprintf("用户在 L2 审批卡片显示期间通过「%s」否决了本次操作，未执行", channelNames[v.Channel]))
 }
 
 // LateVeto reports whether a started call was vetoed after it began (the

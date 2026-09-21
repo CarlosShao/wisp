@@ -33,6 +33,14 @@ type qitem struct {
 	Corr string
 	Seq  uint64
 
+	// names are the OTHER strings this one card can legitimately be addressed
+	// by: the correlation id as it arrived before the queue re-stamped it, and
+	// the task id the host keys its own bookkeeping on (tools/bridge.go routes
+	// cancels by orDefault(CorrelationID, TaskID)). Ticket 87: a card that is
+	// on screen is addressable by whatever the display was built from, and a
+	// reply carrying one of those names is not a reply for a different request.
+	names []string
+
 	// bind is the digest a grant must match to authorize THIS item. It covers
 	// the correlation id, the task, the tool, the level, the argument bytes
 	// and the sequence number, so a nonce cannot be replayed onto a different
@@ -60,6 +68,11 @@ type Queue struct {
 	seq     uint64
 	pending []*qitem
 	byID    map[string]*qitem
+	// alias is the reject-direction index: every extra name a live card answers
+	// to (qitem.names) plus the item that owns it. The allow side never reads it
+	// - a grant is only ever spendable on the exact key the queue issued - so
+	// the index can only ever make a REFUSAL land, never an approval.
+	alias   map[string]map[*qitem]bool
 	history []*qitem
 	logf    func(string, ...any)
 }
@@ -82,7 +95,8 @@ func NewQueue(timeout, warnBefore time.Duration, maxPending int, logf func(strin
 	}
 	return &Queue{
 		timeout: timeout, warn: warnBefore, maxPend: maxPending,
-		maxRepl: DefaultReplayHistory, byID: map[string]*qitem{}, logf: logf,
+		maxRepl: DefaultReplayHistory, byID: map[string]*qitem{},
+		alias: map[string]map[*qitem]bool{}, logf: logf,
 	}
 }
 
@@ -139,6 +153,7 @@ func (q *Queue) push(d tools.Decision) (*qitem, error) {
 	}
 	it := &qitem{
 		Dec: d, Corr: corr, Seq: q.seq,
+		names:  otherNames(d, corr),
 		grants: newGrantStore(),
 		state:  statePending,
 		answer: make(chan answer, 1),
@@ -146,9 +161,90 @@ func (q *Queue) push(d tools.Decision) (*qitem, error) {
 	it.bind = bindDigest(corr, d.TaskID, d.Tool, d.LevelString(), q.seq, d.Args)
 	q.pending = append(q.pending, it)
 	q.byID[corr] = it
+	q.indexLocked(it)
 	q.logf("approval: queued corr=%s task=%s tool=%s depth=%d",
 		corr, d.TaskID, d.Tool, len(q.pending))
 	return it, nil
+}
+
+// otherNames are the reject-direction names of one card: everything it may be
+// addressed by that is NOT the key the queue just issued. An empty or
+// duplicate name is not an alias - it is the same string.
+func otherNames(d tools.Decision, corr string) []string {
+	var out []string
+	for _, n := range []string{d.CorrelationID, d.TaskID} {
+		if n == "" || n == corr {
+			continue
+		}
+		dup := false
+		for _, have := range out {
+			if have == n {
+				dup = true
+				break
+			}
+		}
+		if !dup {
+			out = append(out, n)
+		}
+	}
+	return out
+}
+
+// indexLocked registers one item's reject-direction names. Caller holds q.mu.
+func (q *Queue) indexLocked(it *qitem) {
+	for _, n := range it.names {
+		set := q.alias[n]
+		if set == nil {
+			set = map[*qitem]bool{}
+			q.alias[n] = set
+		}
+		set[it] = true
+	}
+}
+
+// unindexLocked removes one item from the alias index (it left the queue).
+// Caller holds q.mu.
+func (q *Queue) unindexLocked(it *qitem) {
+	for _, n := range it.names {
+		set := q.alias[n]
+		if set == nil {
+			continue
+		}
+		delete(set, it)
+		if len(set) == 0 {
+			delete(q.alias, n)
+		}
+	}
+}
+
+// resolveLocked finds the live pending item a reply names. The queue key always
+// wins. strict is the posture of the side that must not be forgiving: an allow
+// passes true and gets nothing but its exact key. The reject side passes
+// false, which additionally reads the alias index - the only direction a
+// borrowed name can move a call in is 「do not run it」, so leniency here can
+// make a refusal land sooner and can never let something through.
+//
+// An alias naming more than one live item is NOT guessed: with two cards on
+// screen that a reply cannot tell apart, the reply means neither of them and
+// stays an unknown correlation id. Caller holds q.mu.
+func (q *Queue) resolveLocked(name string, strict bool) *qitem {
+	if name == "" {
+		return nil
+	}
+	if it := q.byID[name]; it != nil && it.state == statePending {
+		return it
+	}
+	if strict {
+		return nil
+	}
+	if set := q.alias[name]; len(set) == 1 {
+		for it := range set {
+			if it.state == statePending {
+				return it
+			}
+		}
+	}
+	return nil
 }
 
 // position returns one item's 1-based place in the FIFO (the depth badge).
@@ -171,6 +267,7 @@ func (q *Queue) dropLocked(it *qitem, keepForReplay bool) {
 		}
 	}
 	delete(q.byID, it.Corr)
+	q.unindexLocked(it)
 	it.grants.revoke()
 	if keepForReplay {
 		q.history = append(q.history, it)
@@ -262,12 +359,21 @@ func (q *Queue) revokeGrants(corr string) {
 }
 
 // reject closes one item as refused. No proof is required: refusing is the
-// fail-closed direction, which is why the panel may do it (SPEC-06 §9).
+// fail-closed direction, which is why the panel may do it (SPEC-06 §9), and it
+// is the single funnel every refusal route goes through - native, panel, and
+// since ticket 87 the veto channel too. That is deliberate: the AnswerReject
+// literal below is the one place the human-said-no direction is written, so
+// turning it into an allow is a mutation the R7/C18 fail-closed family has to
+// survive rather than a per-route decision that can be re-forgotten.
+//
+// The lookup is the lenient one (see resolveLocked): a reply that cannot be
+// answered is a lost vote, and the only thing a borrowed name can buy here is
+// that the refusal lands sooner.
 func (q *Queue) reject(corr, reason string) error {
 	q.mu.Lock()
-	it, ok := q.byID[corr]
+	it := q.resolveLocked(corr, false)
 	q.mu.Unlock()
-	if !ok {
+	if it == nil {
 		return ErrUnknownCorrelation
 	}
 	why := reason

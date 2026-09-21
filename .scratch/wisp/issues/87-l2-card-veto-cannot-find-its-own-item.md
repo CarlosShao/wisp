@@ -28,7 +28,7 @@
       谁生成、`Veto`/`Allow`/`Reject` 各自按什么查（**逐处给 file:line**）。
       然后**列出所有能让"卡片在显示、门里查不到"成立的路径**（例如队列被 LRU 挤掉、批次尺寸裁剪、
       重启后重建卡片、面板与宿主两套键）。**查不到实例就如实写"没找到"** ⇒ 本票降级为文档说明并关闭。
-- [ ] **AC#2** 若 AC#1 找到实例：**加一条双向都可判的用例**——"卡片存在 + 门里查无此项"时，
+- [x] **AC#2** 若 AC#1 找到实例：**加一条双向都可判的用例**——"卡片存在 + 门里查无此项"时，
       点击拒绝必须 **(i) 立刻结束该次的等待**（不许再等满 300s）并且 **(ii) 仍然按拒绝处理**
       （找不到条目只能让"拒绝"更容易生效，**绝不能**因为查不到就放行或忽略）。
       ⚠ 这条 **(ii) 是本票的安全底线**：任何"查不到 ⇒ 当作已批准/当作无需处理"的修法一律不过。
@@ -102,8 +102,33 @@ Git Bash 里挂容器路径要 `MSYS_NO_PATHCONV=1`；四种假绿逐跑点名�
 （卡片键 / 进入时 corr / taskID）。允许侧一律保持只认精确键 + grant 绑定 —— 别名宽松只给"更容易拒绝"。
 `300`/`30` 两个数字不改（AC#4；`queue.go:92-94`，且 30s 提示确已在 `gate.go:458-460/487-499` 实现，无需登记缺）。
 
-（前 4 条框未勾：AC#2/AC#3/AC#5 待码与门禁数字。）
+（本条 checkpoint 时勾了 AC#1；AC#2/AC#3/AC#5 的数字在下面的段落里逐组补。）
 
-next= 在 `internal/agent/approval/` 落 `Veto` 的 L2 拒绝分支 + 队列的"只拒绝方向"别名解析，加双向可判用例，
-再跑 AC#3 两侧变异与 AC#5 门禁；`internal/panel/` 我不碰（票 77 在写，本次会话内它刚新增 `approval.go`）。
+### 2026-09-21 · 票 87 代理 · AC#2 落码（第二枚 checkpoint 的内容）
+
+改动只在 `internal/agent/approval/`（`internal/panel/` 归票 77，未碰）：
+
+- `queue.go`：`qitem` 新增 `names`（同一张卡的其它合法称呼：进入时的 corr、taskID）；`Queue` 新增
+  **只服务拒绝方向**的 `alias` 索引 + `resolveLocked(name, strict)`：
+  精确键永远优先，`strict=true`（允许侧）拿不到别名，`strict=false`（拒绝侧）才读别名索引，
+  **一个别名指向多张活卡时不许猜**（返回"查无此项"）。`reject()` 换成宽松解析，
+  `allow()` **一行未动**（仍是精确键 + grant 绑定摘要）。
+- `gate.go`：`Veto` 在 windows/running 两级都查不到之后，把这一票交给 `q.reject(...)`（原生/面板"拒绝"
+  按钮同一个漏斗），于是 AC#1 的实例 1/2/3 都不再需要等满上界。方向自查：这条分支只能产生拒绝。
+- 新用例 `ticket87_veto_l2_test.go`（4 条）：精确键否决 / 宿主自有键（taskID）否决 / 两名歧义不许猜 /
+  无关 id 的否决不得碰到别人的卡（该卡随后仍可用自己的 grant 批准，反证否决没变成放行）。
+  门限 `ApprovalTimeout: 30s`，断言 2s 内结束 ⇒ (i) 的变异会真等 30s 再红，**不写 300s 常跑用例**。
+
+AC#4 自查：`300`/`30` 两个数字一个没改（`queue.go:92-94` 原样；30s 提示在 `gate.go:458-460/487-499` 已实现，
+无需登记缺，console UI 会打印 `[warning]`）。
+
+已跑门禁：`gofmt -l internal/agent/approval/` 空、`gofumpt -l` 我这三个文件空、
+`go vet ./internal/agent/approval/` rc=0、`GOOS=linux go vet ./internal/agent/approval/` rc=0、
+`go test -count=2 ./internal/agent/approval/` rc=0（`=== RUN` 84 = count=1 的 42 ×2、FAIL 0、
+SKIP 2 = 票 84 的 `TestDefaultDeadlineWallClockMeasurement` ×2，默认 `WISP_84_MEASURE` 未设 ⇒ 有意慢跳过）。
+⚠ 全仓 `gofumpt -l .` 现在唯一红的是 `internal/risk/syncdirs_test.go`（票 82 在飞的测试文件，**不是我写的**，我没碰）。
+
+next= 跑 AC#3 两侧变异（(i) 把 `Veto` 的 L2 分支退回 `return ErrUnknownCorrelation` ⇒ 新用例红；
+(ii) 把 `Queue.reject` 的 `tools.AnswerReject` 改成 `tools.AnswerAllow` ⇒ **既有** fail-closed 用例红），
+把两侧红名抄回票面后收尾。`internal/panel/approval.go` 的 correlationId 来源仍登记给编排者。
 
