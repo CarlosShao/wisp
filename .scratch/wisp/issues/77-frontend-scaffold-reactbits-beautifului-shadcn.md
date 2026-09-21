@@ -173,3 +173,20 @@ C21、D23/§17 零 emoji 图标、D29 人工视觉签收、ban #6 / ban #8
   `gofmt -l cmd/wisp internal/panel frontend` 空、`go test ./internal/panel/ -v` **10/10 PASS 0 SKIP**。
   `next=` AC#6 的 `lint-frontend` job 新增行（只加我自己的 job，`ci.yml` 请编排者复核），
   以及编排者那一行 ban #6 `live:true`；AC#3 的 DOM 证据与 AC#1 的真窗口一起排在票 33/35 之后。
+
+- 2026-09-21 16:2x（**编排者记：代理撞 150 轮上限死亡，本文件由我补断点，活没丢**）：
+  它交回了 **3 框真绿**（`63ef895`：AC#2 四方对账 135 dark + 71 light token、78/78 配色行四腿全核，
+  变异 `--accent #86C2B9 → #86C2B8` 真红并且**独立第二道** `gen-tokens --check` 同改动也红；
+  AC#5 无状态 20 文件 × 7 类持久化 API 0 命中 + WebView 重启快照回读相等；AC#7 vendored 台账）。
+  死前最后一句是它**自己发现自己的 vendoring 脚本有 bug**：
+  `node` 的 `String.replace` 把 `$'` 当特殊替换模式 ⇒ 测试文件被复制成三份，它说"整份重写"。
+  ⚠ 我已复核**树里没有留下三份的痕迹**：`internal/panel/tokens_fourway_test.go`(550) 与
+  `frontend_hygiene_test.go`(319) 各自 `^package ` 只出现 **1 次**、无重复顶层 `func` 名 ⇒ 污染发生在提交之前，
+  它自己修完了才提的（这条判据以后可以复用：**怀疑文件被复制成几份，就数 `^package` 与重名顶层声明**）。
+  **未闭**：AC#1（PARTIAL：构建 + `go:embed`）、AC#3（L2 卡渲真数据）、AC#4（`ban #6`/`#8` 作用域台账——
+  其中 ban #6 那半边**已被我拆出去成票 88**，因为它是扫描器侧的活、不该由建目录的人顺手改自己的考卷）、
+  AC#6（CI 新 job）。
+  **工作树里还留着它一枚未提交改动**：`frontend/package.json` 的 `"typecheck": "tsc -b --noEmit false
+  --emitDeclarationOnly false"` → `"tsc -b"`（无害，但**归属是它**，接续的人要先决定留还是回）。
+  `next=` 交回给接续代理：**先 AC#1 收尾（真构建 + 真 embed + `wisp.exe` 载入），再 AC#3，最后 AC#6**；
+  AC#4 只留 ban #8 那半边在你范围内。
