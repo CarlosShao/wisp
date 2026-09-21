@@ -191,7 +191,7 @@ type emojiScope struct {
 // print a footer naming a tree it never walked - the failure shape of A22 /
 // A26 / A30, and exactly what this list was before ticket 67 AC#3 landed:
 // design/ plus frontend/, and frontend/ does not exist at this HEAD, so the
-// ban was blind to all 310 .go files of the product while printing "no emoji in
+// ban was blind to every .go file of the product while printing "no emoji in
 // design/ or frontend/".
 //
 // WHY frontend/ WAS DELETED INSTEAD OF FIXED (ticket 71 AC#4's two allowed
@@ -519,22 +519,24 @@ func (s *scanner) walkText(dir, ban string, check func(string) (string, bool), g
 //     are not user-visible, exclude them"); implementing that needs new
 //     comment-stripping code, i.e. a coverage NARROWING, which R16#4 forbids.
 //     The measured blast radius of keeping comments in was 3 production lines
-//     (internal/llm/probe_health.go:17/:120/:203, all comments), and they were
-//     cleaned to ASCII PASS/FAIL rather than exempted - see
+//     (internal/llm/probe_health.go, comment-only, as counted 2026-09-21), and
+//     they were cleaned to ASCII PASS/FAIL rather than exempted - see
 //     docs/evidence/s1/67-emoji-scope-internal-cmd.md. Attribution caveat on
 //     purpose: ban #8 is D23's design-language ban, NOT a console-encoding
 //     check; the encoding argument was specific to cmd/wisp's verdict column.
 //   - _test.go COUNTS. Test sources are where a verdict literal gets
 //     copy-pasted FROM, and every expensive false green in this repo's recent
 //     history came from a gate blind to a whole class of file (ban #1 saw only
-//     `go func(`; ban #8 saw only design/). Cost measured for this change:
-//     1 line, in internal/tools/bridge_junction_windows_test.go:444, owned by
+//     `go func(`; ban #8 saw only design/). Cost as counted 2026-09-21: 1 line,
+//     a comment in internal/tools/bridge_junction_windows_test.go, owned by
 //     ticket 20 and deliberately NOT edited here (concurrent same-file writes
-//     are fake parallelism); it is registered as the known pending finding.
+//     are fake parallelism); it is registered as the known pending finding in
+//     docs/evidence/s1/67-emoji-scope-internal-cmd.md (S7).
 //
 // goOnly covers the remaining file classes under internal/ and cmd/: the only
-// non-.go files there are testdata goldens (57 .sse fixtures) and leaked test
-// debris under internal/tools/tmp/, i.e. not source - and testdata is skipped
+// non-.go files there are testdata goldens (the .sse fixtures under
+// internal/{agent,llm,models}/testdata) and leaked test-debris directories such
+// as internal/tools/tmp/, i.e. not source - and testdata is skipped
 // below exactly as walkGo/walkText skip it for every other ban, so ban #8 gains
 // no file class the other bans lack and drops none either. design/ stays
 // all-text (isTextFile) because its HTML/CSS/JS mockups ARE the surface D23
@@ -680,7 +682,8 @@ func main() {
 		os.Exit(1)
 	}
 	// Generated from the scope list + its real counts, so this sentence cannot
-	// outlive a coverage change (the old footer claimed frontend/, which is not
-	// a tree in this repo, while all 310 product .go files went unscanned).
+	// outlive a coverage change (the old footer hardcoded "design/ or frontend/",
+	// and frontend/ is not a tree in this repo while every product .go file went
+	// unscanned).
 	fmt.Println("d22scan: clean - no D22 ban violations; ban #8 emoji coverage: " + describeEmojiScopes(scopes, stats.emojiSeen))
 }

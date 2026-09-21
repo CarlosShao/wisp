@@ -224,3 +224,12 @@ CI 该步**无 `continue-on-error`** ⇒ **job 红**。
   两次 commit 前各跑 `git diff --cached --name-only`，暂存恰为我的 5 个文件；别人在飞的 `go.mod`/`internal/observe/*`/`internal/secret/*` 全程未被我吞。
   next=编排者在票 20 之后把 `bridge_junction_windows_test.go:444` 的 `⚠` 改 ASCII（`[!]`/`WARN:`）→ 届时 `sh scripts/d22scan.sh` 应 exit 0，
   AC#3 才能整框勾上；AC#4 门禁需在新红因清除后复跑。
+- [2026-09-21T01:52:00Z] agent=agent-ticket67b did=**把自己写进注释的数拆掉**（第三个 commit，`fix(67)` 形状，纯注释）。
+  规则说"注释里对机制的归因可能是错的"，而 `walkEmoji` 的注释里躺着三个会腐烂的数字：`57 .sse fixtures`
+  （**本 session 内这个数就从 57 漂到 52** —— `find internal cmd -type f ! -name '*.go' | wc -l` 两次实测不同，
+  期间别的代理一直在提交；我**没有**去归因是谁删的，正因为不归因才更该把数拆掉）、`310 .go files`、以及两处指向具体行号的引用
+  （`:17/:120/:203`、`:444`，行号随任何一次编辑漂移）。改成：类名 + "as counted 2026-09-21" + 证据文件章节指针，
+  数字只留在带时间戳的证据里。覆盖面与判定逻辑**零改动**：`emojiScopes()` 仍是 design/ + internal/ + cmd/，
+  重跑 `go run . -root ../..` 仍是 1 finding / exit 1（唯一红因仍是票 20 那行），
+  `gofmt -l`/`gofumpt v0.7.0 -l` 空、`go vet ./...` exit 0、`go test ./...` 仍 9 绿 1 红（REAL_EXIT=1，同一红因）。
+  next=同上一条：等票 20 之后清那 1 行 `⚠`；本票 AC#3 的覆盖面半步已交完，整框与 AC#4 复跑归编排者。
