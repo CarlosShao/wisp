@@ -4,7 +4,7 @@ package main
 // caller of the capability probe (ruling A11 / ticket 11 AC#6).
 //
 // Before this file llm.RunProbeSuite had nine green tests and no caller: the
-// 「声明 ✓ / 实测 ✗」 event SPEC-05 §3.1 demands could not fire on a real
+// 「声明 PASS / 实测 FAIL」 event SPEC-05 §3.1 demands could not fire on a real
 // machine, because nothing built a provider and asked it what it can actually
 // do. Same shape as A8 and A13, and the same fix - the composition root now
 // calls it.
@@ -38,7 +38,7 @@ Usage:
   wisp providers probe <provider>/<model> [--timeout 30s]
         run the capability probe suite (fc / vision / thinking) against the
         REAL provider, write the verdicts into provider_health and print every
-        「声明 ✓ / 实测 ✗」 mismatch
+        「声明 PASS / 实测 FAIL」 mismatch
 
 Keys never come from here: both subcommands resolve api_key_ref through the
 DPAPI store of the active env, exactly like the text path does.
@@ -198,9 +198,12 @@ func providersProbe(io_ providersIO, cfg *config.Config, st *secret.Store, argv 
 	fmt.Fprintf(io_.out(), "wisp providers: %s/%s 实测（p50 %dms，写入 %v）\n",
 		rep.Provider, rep.Model, rep.LatencyMS, rep.Written)
 	for _, o := range rep.Outcomes {
-		verdict := "✗"
+		// AC#3 (ticket 67 / A23): the verdict column is ASCII PASS/FAIL, not
+		// U+2713/U+2717 - the console font does not guarantee those codepoints,
+		// and both fall inside the D22 ban #8 range (U+2190-U+2BFF).
+		verdict := "FAIL"
 		if o.Result.OK {
-			verdict = "✓"
+			verdict = "PASS"
 		}
 		declared := "未声明"
 		if o.Declared {

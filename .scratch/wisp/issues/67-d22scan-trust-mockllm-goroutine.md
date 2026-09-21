@@ -2,7 +2,7 @@
 
 **Status:** blocked-on-ticket:66（AC#1/AC#2 **已交付并经编排者独立验证**；AC#3 要改 `cmd/wisp/providers.go`，与票 66 同包）
 **Claimed by:** agent-ticket67（报告已交，**勿重开 AC#1/AC#2**；AC#3 等票 66 收尾后由**新代理接续**，从 Progress log 的 `next=` 起）
-**Last update:** 2026-09-20
+**Last update:** 2026-09-21（AC#3 判据① 字形清理已落地，见 Progress log 末条；覆盖面扩展等票 70）
 **Blocked by:** —（包与票 66 不相交：`internal/llm/adaptertest` + `tools/d22scan`；**AC#3 例外，须等票 66 落地**，见下）
 **Parallel slots:** ≤1 sub-agent（**不要**碰 `cmd/wisp/`、`internal/proc/`、`internal/observe/` —— 票 66 在飞）
 **Spec refs:** D22（七条禁令不可协商）、D38b、PLAN §16、票 12 AC#7
@@ -158,6 +158,20 @@ CI 该步**无 `continue-on-error`** ⇒ **job 红**。
   实测计数：`grep -E '^[[:space:]]*go [a-zA-Z_(]' internal cmd`（排除 `_test.go`）= **4 处**，其中 1 处是 sanctioned、3 处待判。
   ⇒ **"d22scan clean" 的准确读法**：现有生产码里**没有以匿名闭包形式起的裸 goroutine**，
   不等于"没有绕过 `Registry.Spawn` 的裸 goroutine"。这条判据目前只对 FuncLit 形状为真。
+- [2026-09-21T01:14:34Z] agent=agent-ticket67-ac3 did=**AC#3 判据①（字形）落地；覆盖面扩展按编排者 09:01 裁定归票 70，
+  本框因此不勾**。`cmd/wisp/providers.go` 6 处 U+2713/U+2717（`:7` 注释、`:41` help 文本、`:201/:203` verdict
+  字面量，各含 2 字形）一次清光，verdict 列改为 ASCII `PASS`/`FAIL`（Windows 控制台字体不保证这两个码位）；
+  `providers_test.go:4` 注释同形字一并清（2 处）。测试侧：既有用例 grep 后**本就不断言字形**，故无断言可改、
+  一条未删未放宽；新增 `probeVerdicts` **正向**判据（verdict 列只能恰好是 `PASS` 或 `FAIL`）+
+  broken 态 `thinking=FAIL`/`fc=PASS`、default 态全列 `PASS` 的具名断言。
+  变异自证：临时把 OK 分支改成 `"✔"`(U+2714) → 目标用例 FAIL 并逐行点名，撤销后复扫 ban 区间零残留。
+  门禁：`go test -count=2 ./cmd/wisp/` ok 76.641s / rc=0（⚠ 需 `third_party/sherpa-onnx` 进 PATH，
+  否则 0xc0000135，票 63 已记的既有坑）；`go vet ./cmd/wisp/` rc=0；`gofmt -l cmd/wisp` 空。
+  用户可见实跑（live mockllm + `WISP_ENV=test` 临时 data dir，非测试内缓冲）两态全贴：
+  `docs/evidence/s1/67-ac3-ascii-verdict.md`（表样：`  thinking 声明 实测 FAIL`）。
+  **只读登记**：`internal/llm/probe_health.go` `:17/:120/:203` 注释 3 行 6 字形是扩面前的第二批，未碰。
+  next=票 70 落地后做 ban #8 覆盖面扩展（`internal/`+`cmd/` 字符串字面量，排除注释与否须先实测
+  `emojiRe` 现状）；届时第二批字形与 `internal/` 其余命中逐个登记、只许从严。票 12 AC#7 的"另一半"仍等覆盖面扩展。
 - [2026-09-20T15:24Z] agent=orchestrator did=**票面对账 + 勾 AC#4（独立复现，非采信自述）+ Status→blocked-on-ticket:66**。
   ①我自己复跑 AC#4 六条：`cd tools/d22scan && go run . -root ../..` → `clean` 且自报
   **`examined 194 production Go files`**、**exit 0**；`go test ./...`（模块内 seeded-violation 阳性对照）通过；

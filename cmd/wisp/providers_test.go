@@ -1,9 +1,10 @@
 package main
 
 // Ruling A11 / ticket 11 AC#6: `llm.RunProbeSuite` had nine green tests and no
-// production caller, so the 「声明 ✓ / 实测 ✗」 event could never fire on a real
-// machine. These cases drive the composition root's own provider path against
-// the live mockllm and pin both directions with the SERVER's capability mode.
+// production caller, so the 「声明 PASS / 实测 FAIL」 event could never fire on a
+// real machine. These cases drive the composition root's own provider path
+// against the live mockllm and pin both directions with the SERVER's
+// capability mode.
 
 import (
 	"bytes"
@@ -88,6 +89,43 @@ func (pf *providersFixture) health() memory.ProviderHealth {
 	return row
 }
 
+// probeVerdicts parses the verdict column out of a `wisp providers probe`
+// report. A verdict row is printed as "  <capability> <声明|未声明> 实测 <verdict>"
+// (providers.go's table), so the rows are exactly the two-space-indented lines
+// whose third whitespace field is 实测.
+//
+// Ticket 67 AC#3 pins this column POSITIVELY: every row's verdict must equal
+// the literal "PASS" or "FAIL" - not merely "not a checkmark". The d22scan
+// emoji ban covers U+2190-U+2BFF and currently cannot see cmd/ at all; a third
+// symbol sneaking into this column must fail HERE, not wait for the gate.
+func probeVerdicts(t *testing.T, out string) map[string]string {
+	t.Helper()
+	verdicts := map[string]string{}
+	for _, line := range strings.Split(out, "\n") {
+		if !strings.HasPrefix(line, "  ") || strings.HasPrefix(line, "    ") {
+			continue // verdict rows carry exactly two leading spaces
+		}
+		fields := strings.Fields(line)
+		if len(fields) != 4 || fields[2] != "实测" {
+			t.Errorf("unrecognised two-space row in probe report: %q", line)
+			continue
+		}
+		verdict := fields[3]
+		if verdict != "PASS" && verdict != "FAIL" {
+			t.Errorf("verdict for %s = %q, want exactly PASS or FAIL", fields[0], verdict)
+			continue
+		}
+		if _, dup := verdicts[fields[0]]; dup {
+			t.Errorf("duplicate verdict row for %s", fields[0])
+		}
+		verdicts[fields[0]] = verdict
+	}
+	if len(verdicts) == 0 {
+		t.Error("the probe report printed no verdict rows")
+	}
+	return verdicts
+}
+
 // TestProvidersProbeRecordsMeasuredThinkingFalse is the event firing on a real
 // machine: the catalog declares thinking, the server withholds every reasoning
 // delta, and `wisp providers probe` says so out loud AND writes the verdict.
@@ -106,6 +144,16 @@ func TestProvidersProbeRecordsMeasuredThinkingFalse(t *testing.T) {
 	}
 	if !strings.Contains(out, "thinking") {
 		t.Errorf("the probe report is missing the thinking line:\n%s", out)
+	}
+	// Ticket 67 AC#3: the verdict column reads in ASCII, pinned POSITIVELY
+	// (every row is exactly PASS or FAIL) and the two rows this case proves
+	// are named: thinking withheld => FAIL, fc measured OK => PASS.
+	verdicts := probeVerdicts(t, out)
+	if verdicts["thinking"] != "FAIL" {
+		t.Errorf("thinking verdict = %q, want FAIL", verdicts["thinking"])
+	}
+	if verdicts["fc"] != "PASS" {
+		t.Errorf("fc verdict = %q, want PASS", verdicts["fc"])
 	}
 	// The server is provably the cause, not the assertion: three probe requests
 	// went out (fc, vision, thinking) on the chat route.
@@ -135,6 +183,19 @@ func TestProvidersProbeRecordsMeasuredThinkingTrue(t *testing.T) {
 	}
 	if strings.Contains(pf.err.String(), "能力实测不符") {
 		t.Errorf("a capable server must not produce a mismatch: %s", pf.err.String())
+	}
+	// The other side of the same positive pin: with a capable server every
+	// verdict row reads PASS. The fixture declares fc/vision/thinking all
+	// true, so a row that were FAIL here would also have raised the mismatch
+	// asserted absent above - this closes the loop on the printed table.
+	verdicts := probeVerdicts(t, pf.out.String())
+	if verdicts["thinking"] != "PASS" {
+		t.Errorf("thinking verdict = %q, want PASS", verdicts["thinking"])
+	}
+	for name, v := range verdicts {
+		if v != "PASS" {
+			t.Errorf("capable server measured %s = %q, want PASS", name, v)
+		}
 	}
 	if h := pf.health(); h.Probe.Thinking == nil || *h.Probe.Thinking != true {
 		t.Errorf("persisted thinking = %v, want measured true", h.Probe.Thinking)
