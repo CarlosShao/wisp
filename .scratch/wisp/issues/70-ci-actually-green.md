@@ -142,3 +142,25 @@
   next=一枚纯格式化 commit（只 `-w` 那个文件）→ 用 `docker run golang:1.27` 逐字复刻 `ci.yml:127-134` 重测 AC#2 → 把 run 35558750456 的逐步骤表贴进本 log → 自己复现 D22 positive control。
 - [2026-09-21T11:58Z] agent=agent-ticket70-d did=**AC#1 的尾巴落地**（`6ce43c7`，**单独一枚纯格式化 commit**，只含 1 个 `.go` 文件）。判据逐字用 CI 钉的版本：`go install mvdan.cc/gofumpt@v0.7.0` ⇒ `gofumpt --version` = `v0.7.0 (go1.27.1)`；`gofumpt -l . tools/d22scan tools/mockllm` 改前 **1 行**（`internal\risk\provenance_syncdirs_windows_test.go`）→ 改后 **0 行、exit 0** ⇒ 本票 AC#1 正文的判据（"输出为空"）**第一次真的成立**。**行为改动＝0**：`git diff -w` 只剩那一条跨行 composite literal 的括号形状（字面量字符串、字段值、真值全部一字未动）。改后复跑：`go vet ./internal/risk/` rc=0；`go test ./internal/risk/ -count=1 -v` rc=0，`=== RUN` **149** / `--- PASS` **87** / `--- FAIL` **0** / `--- SKIP` **1**（SKIP 是既有的 `TestSyncRegistryProbeLive`："本机 HKCU 无 registry-grade 同步记录"，不是我造的，也没被算成 ok）。⚠ 这只闭 AC#1 的**本地半**；CI 侧 `gofmt (gofumpt)` 步骤要在**下一次 push 之后的 run** 里才是绿——本轮 HEAD `17efc2c` 的那次 run 该步骤就是 **failure**（红因正是这个文件），见下面 AC#6 条。
   next=AC#2（`docker run golang:1.27` 逐字复刻 `ci.yml:127-134` 的包清单，在新 HEAD+格式化树上重测）。
+- [2026-09-21T12:1xZ] agent=agent-ticket70-d did=**AC#6 在新 HEAD `17efc2c` 上的逐 job 逐步骤取证** + **D22 positive control 卡点：我自己复现的结论是"已经不红了"**。
+
+  **AC#6（run `35558750456`，headSha `17efc2c1d950975f712c8c159221be096de91c1a`，branch dev，event push，2026-09-21T03:48:12Z，`gh run view 35558750456 --json jobs` 原文结论）**：判据＝五个 job 全 pass ⇒ **本轮未达成，3 success / 2 failure**。逐步骤（不是逐 job）：
+
+  | job | job 结论 | 逐步骤（真实 conclusion） |
+  |---|---|---|
+  | `lint` | **failure** | `D22 scanner positive control` **success** → `D22 seven-ban + emoji scan` **success** → `gofmt (gofumpt)` **failure** → `go vet (module)` `skipped`、`go vet (tools/d22scan module)` `skipped`、`staticcheck` `skipped`、`mockllm module vet` `skipped`。**硬规矩 (c)：那 4 个 skipped 不是"过了"，是 GitHub 在 `gofmt` 失败后不再执行**——所以 `17efc2c` 上"Linux 的 `go vet ./...` 到底绿不绿"至今**没有一次 CI 证据**（票 78 的两颗哑弹修没修好，CI 层面仍是未证，见下） |
+  | `test-core` | **failure** | `Start compose test services` success → `Probe mock-llm` success → `Portable package tests` **failure** → `Environment fork assertion (WISP_ENV=test data dir)` `skipped`（同前：前一步失败，不代表它过）→ `Stop compose services` success |
+  | `test-windows` | **success** | 7 个真实步骤全 success，含 `cgo build smoke`、`Portable windows tests (proc/secret/config)`、**`PathResolver junction placeholder (real cases tickets 18/20)`**（票 72 的因落地后这步第一次转绿；步骤名仍误导，归票 71/72 改） |
+  | `slo-smoke` | **success** | `Build wisp.exe` + `SLO smoke gate` + `Upload SLO report` 全 success |
+  | `slo-full` | **success** | `Build wisp.exe (deps cached on the runner)` + `SLO full gate (six states + settle + leak)` + `Upload SLO report` 全 success（AC#4 的 `MINGW64_ROOT` 现在是 **n=2**：`35549859581` + 本次） |
+
+  **硬规矩 (a) 的排除**：同一时段 run `35554681609`（headSha `131f722`）`conclusion=cancelled`，`gh run view --json jobs` 回 `jobs: []`（**total_count=0**）⇒ **不是样本，直接排除**，没进上表任何一格。
+  **`gofmt (gofumpt)` 那一步的红因（从 CI 日志原文取的，不是推断）**：`gofumpt would reformat:` / `internal/risk/provenance_syncdirs_windows_test.go` / `##[error]Process completed with exit code 1.` ⇒ **正是我 `6ce43c7` 修掉的那个文件**；顺带纠正一处本票记了很久的假前提：**CI 这条命令是 `go install mvdan.cc/gofumpt@latest`，没有钉版本**（日志：`go: downloading mvdan.cc/gofumpt v0.12.0`）。"CI 钉的 v0.7.0"是**票面早期写的**、与实际不符 ⇒ 我用**两个版本**都复核了：同一棵纯净树上 `v0.7.0 -l` 与 `v0.12.0 -l` **均 0 行、exit 0**，所以 `6ce43c7` 之后这一步在两个版本下都该绿。⚠ **`@latest` 本身是个门随机性来源**（哪天 gofumpt 改版就全体历史 commit 一起红），但 `ci.yml` 是票 71 的在途文件 ⇒ **只上报、不改**。
+  另一条**账实纠正**：票 70-c 记过"gofmt 步骤第一次真 run 绿"（run `35549859581`，head `6c1b5e9`）——那是真的，但**只在 `6c1b5e9` 那个点上为真**；票 75 在 `ea01b9f` 新加的 `_windows_test.go` 又把它拖回红。⇒ **"AC#1 已闭"这件事没有永久属性，只有"某次 push 的某一步"属性**，这也是为什么这一步的判据必须每次 push 重看。
+
+  **D22 positive control 卡点（简报第 4 步）——我自己复现：已经不红了，前任的锚点确实漂了**：
+  - 复现环境与命令：`git archive HEAD` 解到仓外纯净树 ⇒ `sh scripts/d22scan.sh`（脚本自己派生 repo root）⇒ **exit 0**：`positive control - go test ./...` → `ok github.com/CarlosShao/wisp/tools/d22scan 2.631s`，随后真扫描自报 `examined 203 production Go files`、ban #8 `internal/ 303 Go files` + `cmd/ 24` + `design/ 16 text files`，末行 `clean - no D22 ban violations`；唯一 `NOT COVERED` 是 ban #6 `frontend/`（该树在此 HEAD 不存在，脚本文本明写这不是豁免）。
+  - **谁修的 / 修的是什么**：`a8ae9ad`（**编排者本人**，09:40）把 `internal/tools/bridge_junction_windows_test.go:444` 注释里的 **U+26A0 `⚠`** 换成 ASCII 标记 `NOTE(d22 ban #8):`，1 文件 1 行、纯注释。⇒ 简报里"裸 typographic-quote 字形换成 Go 字符串转义（`\u201c` 形态）"这个修法**在本例上既不可能也不需要**：字形在**注释**里（注释内 Go 转义不生效），且它是 `⚠` 不是弯引号。**我没有为此动任何文件**。
+  - 独立仪器复核（不信扫描器自己的嘴）：我用 ban #8 的**同一字符类**（`[\U0001F000-\U0001FAFF\u2600-\u27BF\u2B00-\u2BFF\uFE0F\U0001F1E6-\U0001F1FF]`）自己扫 `internal/` + `cmd/` 的 `.go`：**扫到 327 个文件（与扫描器自报的 303+24 逐字相符）、命中 0 处**。第 444 行的非 ASCII 码点逐字打出来只剩 CJK 与全角标点。
+  - **`tools/d22scan/**` 与 `allowlist.txt` 一字未动**：`grep -vc '^#\|^$' tools/d22scan/allowlist.txt` = **5**（与票 70-c/票 67 记录的 4→5 之后的数字相同，既没变长也没变短）。CI 侧同样两份证据：上表 `lint` 的 D22 两步在 `17efc2c` 均为 **success**。⇒ 票面 AC#5 那条"⚠ 下一次 push 之后 lint 会同时红在 go vet 与 D22 seven-ban 两步"的**后半句作废**（D22 已被 `a8ae9ad` 清掉），前半句（`go vet`）仍未证。
+  next=AC#2 在新 HEAD 的 Linux 逐包重测（`docker run golang:1.27` 逐字复刻 `ci.yml:127-134`）+ `go vet ./...`/`staticcheck` 在 Linux 上的真结果，一起写下一条。
