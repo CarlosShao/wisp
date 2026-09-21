@@ -205,3 +205,34 @@
     `RemoveUnlinked`/`SealFile` 的八种分隔符拼写（含相对拼写）、以及"POSIX 折 `\`"的反向变异；
     (3) Linux 那半**必须容器真跑**（方法一那条命令可直接复用），不接受 `go test -c` 无源码目录的读数。
     本票交件后 HEAD 之上另有票 92/109 的 WIP 未提交，**复验请按包跑**，别跑整仓门禁。
+
+- 2026-09-21 19:56（`acceptor-ticket108`）**独立对抗验收 = 总判 FAIL（不通过，退回）**。裁决表 `docs/evidence/s1/108-adversarial-acceptance.md`（与 AC 1:1、三档证据逐格标档位）。
+  我一行生产码没改、没建 worktree、没 checkout、没 revert 任何 commit；仪器全在 `/tmp` 仓外快照（`ac108`/`gate108`/`mut108-ac108`）。
+  - **三枚探针红→绿的我的自证读数**（纯净 HEAD 快照，`-v -run 'TestAC1|TestAC2|TestAC3|TestAC4'`）：**rc=0、`=== RUN` 56、`--- PASS` 56、`--- FAIL` 0** ⇒ P1b/P2/P3 的形状全绿；
+    `icacls` SID 级两侧都量：外来 victim `before=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-...-1001]` = `after`（**由有到仍有**），我们自己故意放宽的 `blob.bin` `S-1-1-0` **由有到无**（守卫没把正常密封打死）。
+  - **我新造的 15 枚形状（打修法的形状，不是重跑旧探针）**：**没有一枚让"祖先链一个都不查"复活** ——
+    守住：`\\?\C:\`、`\\.\C:\`、`\\localhost\` UNC 拼写、小写盘符+全 `/`、祖先尾点 `link.`、祖先尾空格 `link `、混合+双分隔符、全大写、祖先里插 `..\`；
+    **尾分隔符 + 叶子本身就是链接**（`link\`、`link/`）两侧都守住（外来空目录仍在；Windows 解掉链接本身 = 票 79 要的行为；Linux 上 `link\` 被当作**另一个名字**，即"POSIX 不折 `\`"成立）。
+    不算功也不算是洞的三枚：8.3 短名祖先、`%2F`、我拼错的 `\\Users\...` ⇒ 都是"路径不存在 ⇒ 既有 Gone-as-success 语义"返回 nil，外来文件/目录/DACL 三条断言全未红。
+    闩锁并发：**48 goroutine 混打 `SetPathResolver(nil)`/伪造/读**，`-count=2 -race` ⇒ `rc=0`、2 RUN / 2 PASS、`WARNING: DATA RACE 0`、伪造一次都没进缝。
+  - **AC#3 判不通过（这就是总判 FAIL 的那一格 = `R-108-1`）**：`internal/winsec/winsec_other.go:64` 的 POSIX `platformVerifyPlacement` 是 `return path, nil`，底线**没有链接腿** ⇒ 容器内实测
+    `SealFile("/tmp/.../data/link/keep-me.txt")`（link 是指向外来的 symlink）**返回 nil 且外来文件 mode 由 `-rw-rw-rw-` 变 `-rw-------`** = P3 同一结局、换平台。
+    预先存在（本票没碰该文件），但 AC#3 措辞未加平台限定、且票面要求 POSIX 真跑正是为暴露这类形状 ⇒ 按票头规则不写"通过（附条件）"。
+    Windows 那半边我自己 5 枚新拼写（含 `\\?\`、尾点、混合）全拒且 SID 级前后未变 ⇒ 通过。AC#1/AC#2/AC#4/AC#5 通过（AC#4 附自陈残余 `R-108-3`）。
+  - **`RemoveUnlinked` 拒相对拼写 = 裁定"fail-closed 的正确从严，保留"**：非测试调用点穷举只有 `internal/memory/artifacts.go:204,214` 两枚，都是 `filepath.Join(s.artifactsDir, rel)`，
+    而 `artifactsDir` 在 `open.go:169,183` 由 `filepath.Abs(dir)` 派生 ⇒ 生产结构上递不进相对拼写；反向也量（阳性对照绿、`memory` 包容器内绿）。要求结案时把它写成契约一句而不是停在"请裁决"。
+  - **变异四发（我做的，全含 `grep -n` 落地 + `go build` rc=0）**：MUT-1（把票 103 的 nil 门装回去）56/54/**2 FAIL**，两红都在 AC#1 守卫上；
+    MUT-2（摘树归属探针）56/55/**1 FAIL**，恰红在 `TestAC4TreeOwnershipIsPartOfTheConformanceContract`；MUT-3（Windows 不认 `/`）56/41/**15 FAIL**，按形状点名；
+    **MUT-4（我补的一向：摘 `IsAbs`）** 56/53/**3 FAIL**，红在 `volume-only-relative-tail` ⇒ 那格收紧不是白加。还原 `diff -q` 全 CLEAN（我如实登记自己一次"只还原一枚文件"的操作瑕疵，快照内、已补）。
+  - **门禁与容器（独立复现）**：`go test -count=2 -v` 四包 **rc=0 / `=== RUN` 664 / PASS 660 / FAIL 0 / SKIP 4**（2 个名字 ×2 轮，`-v` 量的，`TestSubprocessCrashWriter`、`TestSyncRegistryProbeLive`）；
+    `gofmt -l` 与 `gofumpt -l` 四包**空**、原生 `go vet` rc=0、`GOOS=linux go vet` rc=0、`GOOS=darwin go vet ./internal/winsec/` rc=0、`sh scripts/d22scan.sh` **rc=0 零 emoji**。
+    **POSIX 用 `docker run golang:1.27` + 容器内 `go test` 真跑**（挂载后先 `ls` 证明 19 枚文件在、且我的探针不在这次读数里）⇒ **`LINUX_RC=0`**：`ok winsec 0.034s / risk 3.335s / memory 11.976s / secret 0.007s`；
+    AC 探针子集 Linux `4 RUN / 4 PASS / 0 SKIP`（`TestAC4POSIXFloor...` 在 Linux 上**没 skip**）。没用 `go test -c` 无源码那条读数。
+  - **台账 37/40 我复算的结论**：同一把仪器在**当前 HEAD 的纯净快照**上给 `ban #6 frontend/=40`、`ban #8 frontend/=40`（同批 `internal/=202`、`internal/tools/=18`、`ban #8 internal/=365`）⇒ **没有下降**；
+    37 是"`git archive` 快照 vs 后来 HEAD"的读数差（票 92 把 3 枚 `frontend/` 文件带进树之前取的名），旁证是同一次输出里 `internal/` 与 `internal/tools/` 也在涨。建议今后各 scope 读数**与 `git rev-parse HEAD` 同行登记**。
+  - **伪授权监测**：自称"编排者备注/停手/撤回/请 revert"的文本 **0 次**；另有 2 次 `MEMORY.md was modified since it was last read` 系统提示（记忆索引自身通知，无指令），按"不作为授权"处置，未改判据、未撤销 commit。
+  - **新立/结转的账**：`R-108-1`（POSIX 底线缺链接腿，**阻断结案**）、`R-108-2`（`SealFile` 对直接点名的外来绝对路径会剥 `S-1-1-0`；守卫是拼写级不是所有权级，要不要收紧请裁）、
+    `R-108-3`（使用期只信解析器自报的 `rewritten`，实现方已自陈，我确认存在且今天只能在包内塞）、`R-108-4`（恒等重装按 `%T` 而非指针比身份，行为安全、措辞不精确）、
+    `R-108-5`（继承 `R-103-6`/`R-103-7`：darwin 仍只有编译期读数，本轮**未复验**，我没有 macOS）。
+    next= 实现方按 `R-108-1` 补 POSIX 那条腿（`Lstat` + `os.ModeSymlink` 走同一把 `pathPieces`，POSIX 只认 `/`）并把反向用例钉进容器真跑，然后走票 103 复验。
+
