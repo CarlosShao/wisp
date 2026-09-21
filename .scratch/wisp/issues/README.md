@@ -168,3 +168,11 @@ multi-task concurrency unlocks only at 47 (SPEC-12 §2).
   CLI `wisp run`. No mock-instead-of-real to fake completion; never weaken SLO thresholds.
 - Each slice completion requires: gap audit + pre-mortem + adversarial acceptance by a DIFFERENT
   agent (SPEC-10 §7–8).
+- **票 20 归档前必须解掉的一格（2026-09-21 09:57，编排者建票）**：**76 artifacts-no-caller-path-invariant** ——
+  票 20 `:103` 那框写的是"用 artifacts API 往用户目录写 → 被拒"，但票 20 的代理实测两条 artifacts 路
+  （`internal/agent/spill.go:97-106`、`internal/memory/artifacts.go:104-146`）**不接受调用方路径**
+  ⇒ **没有东西可"尝试"**，那框是**照一个 API 并不存在的威胁模型写的**。
+  本票把这种"隐含的安全"变成**跑过一遍的不变式**（四种恶意组件形状 + 真目录清单证明未越界 + 变异检验），
+  然后**由我改写 `:103` 的框文本**（那张票面归我，代理只交替换句与测试名）。
+  ⚠ 明令**禁止**顺手把 artifacts 改走 C26：那是冻结契约的行为变更、此处零安全收益，且会撞正在
+  `internal/risk` 上跑的票 72。
