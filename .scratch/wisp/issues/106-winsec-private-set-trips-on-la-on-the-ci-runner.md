@@ -72,3 +72,54 @@ delete_test.go:25: NewStore: secret: create C:\Users\RUNNER~1\AppData\Local\Temp
   我一张票只装一件。**为什么不在本地修完再交**：本机复现不出来（第 3 条因果），
   而"在 CI 上验"这一半必须走 push ⇒ 那是编排者的手，规矩写进 AC#5 了。
   next= 等 `agent-ticket103` 交件（同文件）后**优先**派本票（它挡着整条 Windows 测试线，也挡着票 95 把更多落点接上来）。
+
+- 2026-09-21 18:47（`agent-ticket106`）：**第一枚 checkpoint：修前红 + 私有集定义与比较端的 file:line 表**。
+  本机 `icacls %TEMP%` 真实读数（不是猜的，`C:\Users\swq\AppData\Local\Temp`）：
+  `CodexSandboxUsers:(OI)(CI)(M,DC)`、`S-1-5-21-3623186960-731165060-4091685855-1717338598:(OI)(CI)(M,DC)`、
+  `NT AUTHORITY\SYSTEM:(OI)(CI)(F)`、`BUILTIN\Administrators:(OI)(CI)(F)`、`DESKTOP-LVS7839\swq:(OI)(CI)(F)`
+  ⇒ **本机 temp 确实带着两条外来继承 ACE**，与 runner 那份（引票面上方 CI 原文，标"日志档"）不同，但**两者都不是本票的绊点**（见下"因果裁决"）。
+  本机身份读数：`user.Current().Uid` = `S-1-5-21-1228170099-895614386-1166154857-1001`；本机 `LA`（内置 Administrator）=
+  `S-1-5-21-1228170099-895614386-1166154857-500` ⇒ **在本机 `LA` 是别人**，在 runner 上 `LA` 就是那个令牌用户（判据不能钉死任一侧）。
+
+  **因果裁决（票面第 1 条要先分清的）**：`internal/winsec` 自己写出的私有 DACL 在**任何**机器上都是这个形状（本机实测，`SealDir` 之后回读）：
+  `D:PAI(A;;FA;;;SY)(A;OICIIO;GA;;;SY)(A;;FA;;;BA)(A;OICIIO;GA;;;BA)(A;;FA;;;<me>)(A;OICIIO;GA;;;<me>)`
+  ——**六条 = 三主体 ×（自身 FA + 容器物化的 inherit-only 伴侣），且没有一条带 `ID`**（`AceFlags` 实测 0x0 / 0xb）。
+  CI 那份正是同一形状，只是第三个主体被 OS 印成 `LA`。⇒ **绊倒我们的不是"继承来的外来 ACE"，是我们自己写下去的、给"当前用户"的那一条被 OS 用**名字**印了出来**；
+  继承来的外来 ACE 走 PROTECTED 设置时被剥掉（本机实测：child 从 `D:AI(A;OICIID;FA;;;LA)...` 密封后变成上面那六条，`LA` 不在场），
+  它从来到不了 `verifyPrivate`。**`BA` 在集合里而 `LA` 不在并不是"集合定义不自洽"**：集合的三员是 SY/BA/令牌用户，
+  runner 上令牌用户 == 内置 Administrator ⇒ 那条 ACE 的 SID **本来就在集合内**，被拒纯粹因为**判定比的是名字**。
+  8.3 短名 `RUNNER~1` 与本票判定**无因果**（它是 env `TEMP` 带进来的路径拼写，主体侧我们已改成只认 SID，见下）。
+
+  **私有集定义与比较端（修后交付态 file:line，`internal/winsec/winsec_windows.go`）**
+  | 位置 | 内容 |
+  |---|---|
+  | `winsec_windows.go:25-26` | `sidSystem = "S-1-5-18"`、`sidAdmins = "S-1-5-32-544"` —— 集合的两个成员，**SID 字符串** |
+  | `winsec_windows.go:408`（`privateSet`） | **私有集 = {SY 的 SID, BA 的 SID, 令牌用户的 SID}**，三员全为解析后的 SID 串；**没有任何名字**（`:420-432` 三个成员逐个 `canonicalSIDString`） |
+  | `winsec_windows.go:444`（`canonicalSIDString`） | 比较端唯一已解析形式：`ConvertStringSidToSid` ⇒ `(*SID).String()`，与 ACE 里读出的 SID 同形 |
+  | `winsec_windows.go:172`（`readDACL`） | 主体来自**二进制 ACE**：`(*windows.SID)(unsafe.Pointer(&ace.SidStart)).String()`；非 ALLOWED/DENIED 类型 ⇒ `"unreadable"`（fail closed，`:170-174`） |
+  | `winsec_windows.go:362` | **判定**：`if !ace.grant || !set[ace.trustee]` ⇒ foreign —— 比的是 SID，不比拼写 |
+  | `winsec_windows.go:371` | `grantsMe` 同样比 SID（`me`），旧代码此处比的是 `{u.Uid,"ME"}` 名字表 |
+  | `winsec_windows.go:166` | 继承/继承只读 `ace.Header.AceFlags` 的 `INHERITED_ACE`/`INHERIT_ONLY_ACE` **位**，不再 `Contains(flags,"ID")` |
+  | `winsec_windows.go:103` | **拒绝/通知侧遍历表示形式**：`ace.trustee+"("+ace.text+")"` —— 先 SID，后 OS 自己的 SDDL 片段（`text`，`:134` 里 zip 自 `aceGroups`） |
+  | `winsec_windows.go:82` | `explicitForeignPrincipals` = `noticeNarrowed` 那条路（收窄并通知），同样按 SID 判外来 |
+  | `sealError`/`wrapPath` | `winsec.go:284`（`wrapPath` 把判定包成 `ErrNotSealable`）、`winsec.go:292`（`sealError` 在 API 边界归一化）；`noticeNarrowed` 说话点 = `winsec_windows.go:212`（`applyDescriptorWindows` 里 set+verify 都成功之后） |
+  旧实现（`0717bf2` 态）对照：`allowedSIDStrings` 返回 `{SY, S-1-5-18, BA, S-1-5-32-544, u.Uid}` 与 `me={u.Uid,"ME"}`，
+  然后 `verifyPrivate` 用 `allowed[fields[5]]` 拿 **SDDL 文本字段**去查这张名字表 —— `LA` 不在表上 ⇒ 拒自己。
+
+  **修前红（AC#2 的仪器；本机、无 `LA`-即-我 的机器上跑出来的）**
+  新文件 `internal/winsec/private_set_sid_windows_test.go`，对 **HEAD（`8b6f691`）的生产码**跑 `-count=1 -v`
+  （那一跑里把 `:183-206` 的第三条腿摘掉了——它点名新函数 `privateSet`，对 HEAD 是**编译期不存在**而不是断言红，
+  所以它不作"修前红"的证据，只作交付后的结构守卫；摘掉后其余两条腿与交付态逐字一致，红行因此是 `:243`，交付态同一句断言在 `:268`）：
+  ```
+  === RUN   TestSealNarrowsAndNamesThePrincipalItRemovedBySID
+      private_set_sid_windows_test.go:268: the notice named the cleared principal by spelling only, not by
+        the resolved SID it holds: cleared="LA(A;OICI;FA;;;LA) WD(A;OICI;FA;;;WD)", want S-1-1-0 in it
+        (root DACL now [0/0x0=S-1-5-18 0/0xb=S-1-5-18 0/0x0=S-1-5-32-544 0/0xb=S-1-5-32-544
+         0/0x0=S-1-5-21-1228170099-895614386-1166154857-1001 0/0xb=S-1-5-21-1228170099-895614386-1166154857-1001])
+  --- FAIL: TestSealNarrowsAndNamesThePrincipalItRemovedBySID (0.26s)
+  ```
+  仪器做法照票面：**在临时目录里 `icacls /grant '*<SID>:(OI)(CI)F'` 显式种两条给非私有集主体**（`S-1-1-0` 与本机 `LA` 的 SID，
+  都用 SID 不用短名/账户名），断真实行为：密封仍要成功、外来主体必须从对象 DACL 上消失、且**通知里带解析后的 SID**。
+  全部只碰 `t.TempDir()` 下的目录，用例结束由 `t.TempDir` 清理；**没有 `t.Skip`、没有平台后缀挡路**（文件名后缀 `_windows_test.go` 是本包
+  ACL API 的天生形状 —— `winsec_other.go` 里没有 DACL 可言，同包既有 11 个测试文件皆如此，可移植侧另有 `private_other_test.go`）。
+  next= 提交修后生产码 ⇒ 跑 AC#3 两侧读数 + AC#4 变异（`/tmp` 快照）+ AC#5 门禁，票面第二枚 append 登记，AC#5 的 CI 那格留给编排者。
