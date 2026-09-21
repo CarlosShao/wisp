@@ -44,7 +44,10 @@
 **SKIP 逐条点名（2 条，同一个名字跑了两遍）**：
 - `--- SKIP: TestSyncRegistryProbeLive (0.00s)`（日志第 268、585 行，`internal/risk`）
   原因读了源码（`internal/risk/syncdirs_test.go:346-348`）：本机 HKCU 没有 registry-grade 同步盘记录 ⇒ `t.Skip("no registry-grade sync record on this machine …")`。**与票 90 无关，属票 19 家族的环境跳过。**
-  ⇒ **假绿排查**：这 2 条 SKIP 在两次样本里都是同一条，**没有任何一条票 90 的用例被 SKIP 冒充**（票 90 的 15 条用例在下面每轮都以 `--- PASS` 或 `--- FAIL` 现形）。
+  ⇒ **假绿排查**：这 2 条 SKIP 在两次样本里都是同一条，**没有任何一条票 90 的用例被 SKIP 冒充**。
+  本代理把票 90 的**全部 22 条用例函数名**（`internal/tools/ticket90_test.go` 8 条 + `internal/perm/store_test.go` 9 条
+  + `internal/perm/ticket90_persist_test.go` 5 条）逐个回查参照运行（`go test -count=1 -v` 同三包，干净树：
+  **RUN=265 / PASS=264 / FAIL=0 / SKIP=1 / rc=0**）⇒ **22 全 `--- PASS`、0 FAIL、0 缺席**（没有一个名字"根本没跑"）。
 
 **唯一的那条 FAIL 是本仓已登记的仪器噪声，本代理没拿它当借口、逐样本量过它**：
 `TestResolvePerCallBudget`（`internal/risk/pathresolver_budget_norace_test.go:21`，C26 性能门，预算 1ms 墙钟）
@@ -65,16 +68,23 @@
 
 锚点全部是**承载行为那一行**；每轮**同一条 `&&` 链里先 grep 证落地**，再 `go build ./...` 单独打印 rc
 （**编译失败不算变异**：本代理 7 轮变异 **build rc 全部实测 = 0**，没有一轮是靠"红"来冒充变异成功），
-还原后 `diff -q` 与原件一致。**参照数**：本轮变异只跑 risk/perm/tools 三包（`-count=1 -v`）。
+还原后 `diff -q` 与原件一致。**参照数**：本轮变异只跑 risk/perm/tools 三包（`-count=1 -v`），
+干净参照跑了一次：**`RUN=265 / PASS=264 / FAIL=0 / SKIP=1`，rc=0**（`/tmp/m0-clean.log`）。
+⚠ **加减核对**：M2/M3/M4/M5 那几轮的 RUN 是 **266** 而不是 265 —— 多的那一条是**本代理自己的探针**
+`TestAcceptorProbeRealTaintVerdictShape`（名字集合 `diff` 出来只有它，见下），它在收尾时被删除、整树 `diff -rq` 已证清干净；
+**不是票 90 的用例数在动**。各轮"PASS + FAIL + SKIP = RUN"本代理逐轮核过：
+M1 `262+2+1=265`（无探针）、M3 `261+4+1=266`（3 条票 90 红 + 1 条 flake + 探针 PASS）、
+M4 `261+4+1=266`（4 条全红、那一轮 flake 恰好 PASS）、M5 `259+6+1=266`（5 条票 90 红 + 1 条 flake）。
+**M2 与 M2′ 两轮是 `-run` 过滤跑**（24/22 条），只用于点名红名与断言文本，**不参与总数加减**。
 
 | # | 变异 | PROOF（同链 grep） | build rc | 测试 rc | 红名（本代理原文） | 断言原文首句 | 还原 |
 |---|---|---|---|---|---|---|---|
 | **M1** 去掉"不可逆"红线 | 删 `case R8:` 两行（`internal/risk/mode.go` `redLine()`） | `grep -n "case R8:"` ⇒ **rc=1（空）**；邻居 `case R5:/R9:/SessionOverrideBlocked` 计数 **4** 仍在（外科手术） | **0** | **1** | **2**：`TestTicket90ScreenTable`、`TestTicket90IrreversibleStillAsksInEveryMode` | `ticket90_test.go:335: mode=auto_approve: irreversible call raised 0 L2 cards, want 1` ／ `store_test.go:299: R8 不可逆 under auto_approve: level = L0, want L2` | `diff -q` 一致，md5 回到 `faec9e19…` |
 | **M2** 去掉"污染升级"红线·证人一 | 删 `if d.SessionOverrideBlocked {…}` 整支 | `grep -n "d.SessionOverrideBlocked"` ⇒ **rc=1**；`case R4/R5/R8/R9` 计数 **4** 仍在 | **0** | **1** | **1**：`TestTicket90TaintFlagAndDenyAreNeverSilenced` | `store_test.go:319: mode=auto_approve: a tainted verdict came out L0 (silenced=true); PLAN.md:1640 says no authorization - including a permission mode - covers a C25 escalation` | 一致 |
 | **M2′**（本代理**加测**的镜像刀）只删第二个证人 | 删 `case R4:` 两行 | `grep -n "case R4:"` ⇒ **rc=1**；flag 支仍在（邻居计数 **3**） | **0** | **1** | **1**：`TestTicket90ScreenTable` | `store_test.go:299`（"R4 污染"那一行）—— 与 M2 红的是**不同**用例 | 一致 |
-| **M3** 两个证人同灭 | 上面两刀一起 | `grep -n "case R4:\|d.SessionOverrideBlocked"` ⇒ **rc=1**，其余 6 个 case 仍在 | **0** | **1** | **3 票 90 + 1 flake**：`TestTicket90TaintEscalationNeverSilenced`、`TestTicket90ScreenTable`、`TestTicket90TaintFlagAndDenyAreNeverSilenced`（+ `TestResolvePerCallBudget`） | `ticket90_test.go:371: mode=auto_approve: tainted call raised 0 L2 cards, want 1` | 一致 |
+| **M3** 两个证人同灭 | 上面两刀一起 | 同一链里 `grep` 两个锚点（`case R4:` 与 `d.SessionOverrideBlocked`）⇒ **双双空、rc=1**，其余 6 个 case 仍在 | **0** | **1** | **3 票 90 + 1 flake**：`TestTicket90TaintEscalationNeverSilenced`、`TestTicket90ScreenTable`、`TestTicket90TaintFlagAndDenyAreNeverSilenced`（+ `TestResolvePerCallBudget`） | `ticket90_test.go:371: mode=auto_approve: tainted call raised 0 L2 cards, want 1` | 一致 |
 | **M4** 去掉"Deny 永不被静默"（= `PLAN.md:1588`/`ban #6` 的机器形状） | `mode.go:161` 的 `Silenced{Level: Deny, Kept: "拒绝级…"}` 改成 `Silenced{Level: L0, Silenced: true} // MUT-C` | `grep -n "Level: Deny, Kept"` ⇒ **rc=1**；落地行打印在 **`mode.go:161`** | **0** | **1** | **4**：`TestTicket90TierADenySurvivesEveryMode`、`TestTicket90TaintFlagAndDenyAreNeverSilenced` + **两条非本票的旧卫兵** `TestBridgeRefusesTheRealShortNameOfAnAListFile`、`TestSensitiveFileIsDeniedNotEscalated` | `ticket90_test.go:417: mode=ask_every_step: A-tier path ran the tool 1 times, want 0` ／ `bridge_junction_windows_test.go:502: 8.3 拼法绕过了 A 档拒绝` ／ `fs_test.go:173: A-list read must be denied` | 一致 |
-| **M5** 红线改成"模式优先" | `Screen()` **函数体第一句**插入 `if m == ModeApprove… { return Silenced{Level: L0, Silenced: true} } // MUT-D` | `sed -n '157,163p'` 打印它确为函数体首句；`grep -c MUT-D` = **1** | **0** | **1** | **5 票 90 + 1 flake**：`TestTicket90IrreversibleStillAsksInEveryMode`、`TestTicket90TaintEscalationNeverSilenced`、`TestTicket90TierADenySurvivesEveryMode`、`TestTicket90ScreenTable`、`TestTicket90TaintFlagAndDenyAreNeverSilenced` | 五条首句逐字为 `ticket90_test.go:335`、`:371`、`:417: mode=auto_approve: A-tier path ran the tool 1 times, want 0`、`store_test.go:299`、`store_test.go:319` | 一致；末轮 `grep -c "MUT-"` = **0** 且 `go build ./...` rc=0 |
+| **M5** 红线改成"模式优先" | `Screen()` **函数体第一句**插入 `if m == ModeAutoApprove { return Silenced{Level: L0, Silenced: true, Mode: m} } // MUT-D` | `sed -n '157,163p'` 打印它确为函数体首句；`grep -c MUT-D` = **1** | **0** | **1** | **5 票 90 + 1 flake**：`TestTicket90IrreversibleStillAsksInEveryMode`、`TestTicket90TaintEscalationNeverSilenced`、`TestTicket90TierADenySurvivesEveryMode`、`TestTicket90ScreenTable`、`TestTicket90TaintFlagAndDenyAreNeverSilenced` | 五条首句逐字为 `ticket90_test.go:335`、`:371`、`:417: mode=auto_approve: A-tier path ran the tool 1 times, want 0`、`store_test.go:299`、`store_test.go:319` | 一致；末轮 `grep -c "MUT-"` = **0** 且 `go build ./...` rc=0 |
 
 **与前任票面的对账（逐条，不平均）**：它报的 **(i)-a 红 2 / (i)-b1 红 1 / (i)-b2 红 3 / (i)-c 红 4 / (ii) 红 5**
 **五轮的名单、文件行号、断言文本本代理全部独立复现，无一相符不上**。它的总数 222 是**顶层口径**（见第 1 节），不是假数。
@@ -170,7 +180,10 @@
 ## 5. "模式不改变 OS 能力"（裁定 R21 第 3 条点名要求票 90 明写的那一句）
 
 - **要求**：R21③"**并要求票 90 明写一句"权限模式不改变 OS 能力"**——防的是将来有人把"全自动"实现成"顺手降个权"，那是**假承诺**"。
-- **代码侧（本代理量的）**：`grep -rn "CreateProcessWithToken\|ImpersonateLoggedOnUser\|SetTokenInformation\|AdjustTokenPrivileges\|CreateRestrictedToken\|DROP_PRIVILEGES\|SeDebug" internal/risk/mode.go internal/perm/ internal/tools/mode.go internal/config/permmode.go internal/tools/bridge.go` ⇒ **rc=1，零命中**。
+- **代码侧（本代理量的）**：对票 90 新增的五个文件（`internal/risk/mode.go`、`internal/perm/**`、`internal/tools/mode.go`、
+  `internal/config/permmode.go`、`internal/tools/bridge.go`）`grep -rn` 七个降权/令牌形状
+  （`CreateProcessWithToken`、`ImpersonateLoggedOnUser`、`SetTokenInformation`、`AdjustTokenPrivileges`、
+  `CreateRestrictedToken`、`DROP_PRIVILEGES`、`SeDebug`）⇒ **rc=1，零命中**。
   票 90 的三枚提交也**没有一处新增子进程 / 令牌 / ACL 操作**（diffstat 见第 0 节）⇒ **"全自动"确实只是"少问一次"，没被实现成任何形式的降权或放宽 OS 权限**。R21 担心的那个假承诺**没有被写出来**。
 - **文档侧（票面）**：`grep -n "OS 能力\|降权\|令牌\|privilege\|AppContainer\|沙箱"` 打在票 90 全文 ⇒ **只有第 25、73-74 行的"现状/建票"叙述**（说 OS 级隔离**没有**），
   **"权限模式不改变 OS 能力"这一句一个字都没写**。
@@ -188,7 +201,7 @@
 
 **先数，再跑，最后才对账。**
 
-1. **grep 非测试命中，本代理自己数**：`grep -rn "risk\.Gate(" --include=*.go . \| grep -v "_test.go"` ⇒ **恰好 1 条**：
+1. **grep 非测试命中，本代理自己数**：`grep -rn "risk\.Gate(" --include=*.go .` 再过 `grep -v "_test.go"` ⇒ **恰好 1 条**：
    `internal/tools/mode.go:98`（`readBlacklist`）。**"零调用点 → 有调用点"这句在调用点这一级为真。**
 2. **那道守卫在生产里满不满足**（这是"能不能走到"的关键，不是宣布的）：
    - 守卫：`bridge.go:291` `if len(rawPaths) > 0 && verdict.Level >= risk.L1 { dec.Blacklist = b.readBlacklist(rawPaths) }`
@@ -256,7 +269,7 @@ d22scan: clean - no D22 ban violations
   `TestTicket90PersistFailureKeepsMemory`（写盘失败内存回滚）。
 
 **L2 超时 300s —— 这个数字本代理逐字量过，没动**：
-`internal/config/schema.go:446`（在 `d5564c2` 的快照里）= `ConfirmTimeoutSec int \`toml:"confirm_timeout_sec" default:"300"\``，
+`internal/config/schema.go:446`（在 `d5564c2` 的快照里）= 字段 `ConfirmTimeoutSec int`，toml 标签 `confirm_timeout_sec`，**`default` 值实测为 `"300"`**（原文一行：`…toml:"confirm_timeout_sec" default:"300"`），
 `cmd/wisp/run.go:297` 用它构造 `ApprovalTimeout`；票 90 新增的四个文件里 `grep "300"` **只命中两处注释**
 （`perm/store.go:86`、`risk/mode.go:32`），**没有任何一处引入第二个超时时钟**。
 `perm.Store.Set` 自己**不持钟**（只接调用方 `ctx` + `ConfirmFunc`），所以它**没有能力**把 300s 改长或改短。⇒ **无人在这个数字上 FAIL。**
