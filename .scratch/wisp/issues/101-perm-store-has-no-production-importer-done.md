@@ -3,6 +3,12 @@
 **Status:** open（2026-09-21 17:1x 编排者建；来源=`agent-ticket90b` 交件时**自己点名**的台账缺口）
 → **ready-for-review**（2026-09-21 `agent-ticket101` 交件：AC#1–AC#5 五框都有真实读数，见下；
 裁决表仍归验收方，`docs/evidence/s1/101-*.md` 本代理未写）
+→ **accepted-done**（2026-09-21 17:5x `acceptor-ticket101` 判 **PASS WITH CONDITIONS**：五框逐条独立复现、
+AC#4 的变异是它自己做的（`run.go:343` 拔线 ⇒ **只有** `TestTicket101ManualSwitchSurvivesRestart` 红）。
+⚠ 结案限定语，对 owner 的口径**不许省**：**读侧已通、写侧未通**——
+"写进 `config.toml` 的那一档重启后一直生效"成立；
+"用户在界面上选过一次就一直生效"**不成立**（`Store.Set` 生产零调用者 = `R-101-4`，归票 92/77）。
+它同时**戳穿了我写在票面的一句计数解释**（"15 个顶层测试 ×2 减缓存复用"两处皆错：实测 14 个，且 `-count=2` 不缓存）。）
 **Type:** 能力已实现但没接线（memory 第 8 条那个形状的又一例：**测试证明它会工作，生产里没人叫它**）
 **Blocks:** owner 要的 M3（档位持久化）**在真机上是否成立** · **Blocked by:** nothing
 **Packages:** `cmd/wisp/`（装配根：启动时读档、把 mode 注进链）、`internal/perm/`（存储本体，别改语义）。
