@@ -1,8 +1,8 @@
 # 72 — A 表（受保护路径）在 CI runner 上退化成 B 表：C26 的纵深防御真破了一格
 
-**Status:** ready（**优先级高于普通票**：这是安全分类失效，不是构建噪音）
-**Claimed by:** —（从票 70 的死前发现接手；票 70 的代理在 174 次调用撞 turn 上限，临终那句话就是本票的未决问题）
-**Last update:** 2026-09-21 09:10（编排者建票，来源：commit `a04d3e2` 的实测与诊断增量）
+**Status:** in progress（R17 已解除 D22 闸门 ⇒ 直接改实现）
+**Claimed by:** implementer（票 72 代理，2026-09-21 10:05 接手；根因已由票 70 的 run 35547905707 诊断输出提供）
+**Last update:** 2026-09-21 10:05（implementer 认领；R17 见票尾）
 **Blocked by:** —（与票 70 共享同一条测试，但**修的是实现不是 CI**；票 70 只负责"这条 CI 变绿"）
 **Parallel slots:** ≤1 sub-agent（碰 `internal/risk/`，那里是**冻结契约**，见"硬约束"）
 **Spec refs:** C26 PathResolver、SPEC-06 §4 解析管线、D22（契约变更需人批）、票 18 的红队四连
@@ -80,6 +80,16 @@ A 表（`blacklist.go:132` 的 `~/.ssh/**` 之类）语义是**不可放行的�
   （四个在途代理的包）。
 
 ## log
+- [2026-09-21T10:10Z] agent=agent-ticket72 did=**认领 + 根因定位（AC#1 的证据链已闭合，先记 checkpoint）**。
+  起点证据是票 70 从 run **35549859581**（commit `6c1b5e9`，job `test-windows`）里抠出的 `a04d3e2` 诊断实值：
+  `USERPROFILE="C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\TestPathResolverJunctionWindows2581009681\\001"`
+  / `A-tier anchor tried="c:\\users\\runner~1\\...\\001\\.ssh" isUnder=false`
+  / `canonical "C:\\Users\\runneradmin\\...\\.ssh\\id_testkey" classified B`。
+  **机制级结论**：`Resolve` 的产物两侧不对称——候选路径过了 `resolveHandle`（`GetFinalPathNameByHandle`，已展开 8.3），
+  而 A 锚点走 `internal/risk/blacklist.go:120` 的 `normDir(userHomeDir())`，也就是 `os.Getenv("USERPROFILE")` 的
+  **字面拼写**，从没进过 C26 管线 ⇒ `blacklist.go:132` 的 `isUnder(p, home+`\.ssh`)` 拿长名去比短名，静默 miss，
+  掉到 B 表 `id_*`（`blacklist.go:155`）。修法按 R17 不变式做：**两侧都进句柄真实路径**，锚点无法证明已展开时 fail-closed。
+  next=落 `pathresolver*.go` 的锚点展开实现 + `blacklist.go` 改为多形比较（不动表内容），然后跑 AC#3 双向变异。
 - 2026-09-21 09:10 编排者建票。**为什么单开一张**：票 70 的代理在 `a04d3e2` 里明确写了
   "这条按真缺陷登记、够格单开一张票"，而它自己撞 turn 上限死了；把一个安全分类失效留在
   "让 CI 变绿"那张票里，很容易被下一个代理用"改断言/加 skip"的最短路径解决掉——那正是本项目最贵的一类错。
