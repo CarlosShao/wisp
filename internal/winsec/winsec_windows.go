@@ -76,41 +76,109 @@ var noticeNarrowed = func(n narrowNotice) {
 // is what keeps the notice a signal: the inherited junk this package exists to
 // clear is on effectively every file in a profile directory, so reporting those
 // would drown the one case anybody needs to hear about, an explicit grant.
-// SDDL marks an ACE that came from a parent with the INHERITED_ACE flag ("ID"),
-// and the materialised inherit-only companions of our own grants are inside the
-// whitelist anyway.
+// Inheritance is read from the ACE header's INHERITED_ACE bit rather than from
+// the "ID" letters in the rendering, and the materialised inherit-only
+// companions of our own grants are inside the set anyway.
 func explicitForeignPrincipals(path string) ([]string, error) {
-	sd, err := windows.GetNamedSecurityInfo(path, windows.SE_FILE_OBJECT,
-		windows.DACL_SECURITY_INFORMATION)
+	object, err := readDACL(path)
 	if err != nil {
 		return nil, err
 	}
-	if sd == nil {
-		return nil, errors.New("read-back returned no descriptor")
-	}
-	sddl := sd.String()
-	if sddl == "" {
-		return nil, errors.New("read-back produced no SDDL")
-	}
-	allowed, _, err := allowedSIDStrings()
+	set, err := privateSetSIDSet()
 	if err != nil {
 		return nil, err
 	}
 	var out []string
-	for _, ace := range aceGroups(sddl) {
-		fields := strings.Split(ace, ";")
-		if len(fields) < 6 {
-			continue
-		}
-		if strings.Contains(fields[1], "ID") {
+	for _, ace := range object.aces {
+		if ace.inherited {
 			continue // inherited from a parent: not this object's own grant
 		}
-		if fields[0] == "A" && allowed[fields[5]] {
+		if ace.grant && set[ace.trustee] {
 			continue
 		}
-		// A deny ACE, an audit ACE, anything that is not one of our three grants:
-		// it is about to be gone, and whoever put it there should hear about it.
-		out = append(out, fields[5]+"("+ace+")")
+		// A deny ACE, an audit ACE, an object ACE, anything that is not one of
+		// our three grants: it is about to be gone, and whoever put it there
+		// should hear about it - named by the one form of a principal that
+		// cannot be confused with somebody else's account.
+		out = append(out, ace.trustee+"("+ace.text+")")
+	}
+	return out, nil
+}
+
+// objectDACL is one object's DACL in the form this package judges it by: the
+// descriptor as the OS renders it (for the messages) plus every ACE resolved to
+// the trustee's SID. Names are never part of a judgment here.
+type objectDACL struct {
+	sddl      string
+	protected bool
+	aces      []resolvedACE
+}
+
+type resolvedACE struct {
+	// trustee is the SID string of the principal the ACE names, read out of the
+	// binary ACE. "unreadable" for the ACE shapes whose trustee sits at another
+	// offset (object ACEs), which fail closed.
+	trustee     string
+	grant       bool
+	inherited   bool
+	inheritOnly bool
+	// text is the OS's own SDDL rendering of this ACE, kept for the messages and
+	// the audit notice: it is a representation, never an input to a decision.
+	text string
+}
+
+// readDACL pulls the DACL back off the object by name. Reading it back is the
+// point: SetNamedSecurityInfo reporting nil is not evidence that the descriptor
+// landed, and the name form also re-checks that the path still resolves to the
+// object we meant.
+func readDACL(path string) (objectDACL, error) {
+	sd, err := windows.GetNamedSecurityInfo(path, windows.SE_FILE_OBJECT,
+		windows.DACL_SECURITY_INFORMATION)
+	if err != nil {
+		return objectDACL{}, err
+	}
+	if sd == nil {
+		return objectDACL{}, errors.New("read-back returned no descriptor")
+	}
+	out := objectDACL{sddl: sd.String()}
+	if out.sddl == "" {
+		return objectDACL{}, errors.New("read-back produced no SDDL")
+	}
+	out.protected = strings.Contains(out.sddl, "D:P")
+	dacl, _, err := sd.DACL()
+	if err != nil {
+		return objectDACL{}, err
+	}
+	if dacl == nil {
+		// A NULL DACL grants everything to everyone; there is nothing to walk.
+		// The missing-DACL leg of verifyPrivate is what refuses this object.
+		return out, nil
+	}
+	// aceGroups renders the same ACEs in the same order, so zipping them gives
+	// each judgment its representation for the message next to it.
+	texts := aceGroups(out.sddl)
+	for i := uint32(0); i < uint32(dacl.AceCount); i++ {
+		var ace *windows.ACCESS_ALLOWED_ACE
+		if err := windows.GetAce(dacl, i, &ace); err != nil {
+			return objectDACL{}, err
+		}
+		r := resolvedACE{
+			grant:       ace.Header.AceType == windows.ACCESS_ALLOWED_ACE_TYPE,
+			inherited:   ace.Header.AceFlags&windows.INHERITED_ACE != 0,
+			inheritOnly: ace.Header.AceFlags&windows.INHERIT_ONLY_ACE != 0,
+		}
+		switch ace.Header.AceType {
+		case windows.ACCESS_ALLOWED_ACE_TYPE, windows.ACCESS_DENIED_ACE_TYPE:
+			r.trustee = (*windows.SID)(unsafe.Pointer(&ace.SidStart)).String()
+		default:
+			r.trustee = "unreadable"
+		}
+		if int(i) < len(texts) {
+			r.text = texts[i]
+		} else {
+			r.text = "ace[" + fmt.Sprint(i) + "]"
+		}
+		out.aces = append(out.aces, r)
 	}
 	return out, nil
 }
@@ -270,47 +338,37 @@ func currentUserSID() (*windows.SID, error) {
 // private one that was asked for. SetNamedSecurityInfo returning nil is not
 // enough - the entire defect this package exists for is a call that reports
 // success while the object keeps the permissions it had - and the check is made
-// on the SDDL the OS itself produces, because that names *who* holds the grant
-// rather than just how many ACEs are present. So "no foreign SID appears" is
-// enforced at runtime, not only asserted in a test.
+// on the ACEs themselves, resolved to the SIDs they name, because that says
+// *who* holds the grant rather than merely how many entries are present. The
+// OS's own SDDL rendering rides along in every message, since a number of ACEs
+// that fails to be the property is also the thing an operator has to read. So
+// "no principal outside the private set appears" is enforced at runtime, not
+// only asserted in a test.
 func verifyPrivate(path string) error {
-	sd, err := windows.GetNamedSecurityInfo(path, windows.SE_FILE_OBJECT,
-		windows.DACL_SECURITY_INFORMATION)
+	object, err := readDACL(path)
 	if err != nil {
 		return wrapPath(path, err)
 	}
-	if sd == nil {
-		return wrapPath(path, errors.New("read-back returned no descriptor at all"))
+	if !object.protected {
+		return wrapPath(path, fmt.Errorf("DACL is missing or unprotected, so inherited grants still apply: %s", object.sddl))
 	}
-	sddl := sd.String()
-	if sddl == "" {
-		return wrapPath(path, errors.New("read-back produced no SDDL"))
-	}
-	if !strings.Contains(sddl, "D:P") {
-		return wrapPath(path, fmt.Errorf("DACL is missing or unprotected, so inherited grants still apply: %s", sddl))
-	}
-	allowed, me, err := allowedSIDStrings()
+	set, me, err := privateSet()
 	if err != nil {
 		return wrapPath(path, err)
 	}
 	var foreign []string
 	grantsMe := false
-	for _, ace := range aceGroups(sddl) {
-		fields := strings.Split(ace, ";")
-		if len(fields) < 6 || fields[0] != "A" {
-			foreign = append(foreign, "("+ace+")")
-			continue
-		}
-		if !allowed[fields[5]] {
-			foreign = append(foreign, fields[5])
+	for _, ace := range object.aces {
+		if !ace.grant || !set[ace.trustee] {
+			foreign = append(foreign, ace.trustee+"("+ace.text+")")
 			continue
 		}
 		// An inherit-only ACE hands a right to children and holds none over this
 		// object, so it must not be counted as "the current user can read this".
-		if strings.Contains(fields[1], "IO") {
+		if ace.inheritOnly {
 			continue
 		}
-		if me[fields[5]] {
+		if ace.trustee == me {
 			grantsMe = true
 		}
 	}
@@ -320,32 +378,79 @@ func verifyPrivate(path string) error {
 	// *nothing outside the private set is named*, and that the owner is not
 	// locked out by the repair.
 	if len(foreign) > 0 {
-		return wrapPath(path, fmt.Errorf("DACL names principals outside the private set (%v): %s", foreign, sddl))
+		return wrapPath(path, fmt.Errorf("DACL names principals outside the private set (%v): %s", foreign, object.sddl))
 	}
 	if !grantsMe {
-		return wrapPath(path, fmt.Errorf("DACL grants the current user nothing on this object: %s", sddl))
+		return wrapPath(path, fmt.Errorf("DACL grants the current user nothing on this object: %s", object.sddl))
 	}
 	return nil
 }
 
-// allowedSIDStrings is the set of principals a private object may name, plus the
-// subset that is "me". SYSTEM and Administrators arrive from SDDL either as
-// their abbreviations or as full SIDs, so both spellings are accepted.
-func allowedSIDStrings() (allowed, me map[string]bool, err error) {
+// privateSet is the set of principals a private object may name, in the one
+// form the allow side of this package accepts: a resolved SID string. SYSTEM and
+// Administrators by their SIDs, and the account this process runs as.
+//
+// There is deliberately no name in here. SDDL renders a principal by a
+// well-known *name* whenever the OS has one for that SID - S-1-5-18 comes back as
+// "SY", S-1-5-32-544 as "BA", and the built-in account with RID 500 as "LA" - so
+// a whitelist of names has to be maintained against whatever the machine decides
+// to print, and the previous version of this function was exactly that: it listed
+// "SY" and "BA" and the current user's SID as Go renders it, which passed on a
+// box where the job runs as an ordinary account and refused the descriptor this
+// package itself wrote on the CI runner, where the job's token *is* the built-in
+// Administrator and its own grant came back spelled "LA" (ticket 106). Comparing
+// SIDs is not a wider set: "LA" is admitted only when the local Administrator's
+// SID is the token's SID, which is the same fact stated without a name.
+//
+// The reject side keeps the representations: a refusal or a notice carries the
+// SDDL text alongside the SID, because names are fine to *report* and unsound to
+// decide with.
+func privateSet() (allowed map[string]bool, me string, err error) {
 	u, err := user.Current()
 	if err != nil {
-		return nil, nil, fmt.Errorf("winsec: current user: %w", err)
+		return nil, "", fmt.Errorf("winsec: current user: %w", err)
 	}
 	if u.Uid == "" || !strings.HasPrefix(u.Uid, "S-") {
-		return nil, nil, fmt.Errorf("winsec: current user has no SID: %q", u.Uid)
+		return nil, "", fmt.Errorf("winsec: current user has no SID: %q", u.Uid)
 	}
-	allowed = map[string]bool{
-		"SY": true, sidSystem: true,
-		"BA": true, sidAdmins: true,
-		u.Uid: true,
+	// Re-render the token's SID through the system's own converter so the set
+	// holds exactly the form (*SID).String() produces for a trustee read out of
+	// a binary ACE; the two are then comparable as strings with no name, no
+	// case-folding and no alias in between.
+	me, err = canonicalSIDString(u.Uid)
+	if err != nil {
+		return nil, "", err
 	}
-	me = map[string]bool{u.Uid: true, "ME": true}
-	return allowed, me, nil
+	system, err := canonicalSIDString(sidSystem)
+	if err != nil {
+		return nil, "", err
+	}
+	admins, err := canonicalSIDString(sidAdmins)
+	if err != nil {
+		return nil, "", err
+	}
+	return map[string]bool{system: true, admins: true, me: true}, me, nil
+}
+
+// privateSetSIDSet is privateSet for callers that only have to ask "is this
+// inside the set".
+func privateSetSIDSet() (map[string]bool, error) {
+	set, _, err := privateSet()
+	return set, err
+}
+
+// canonicalSIDString resolves a SID string to the form this package compares
+// on, and releases the conversion's allocation.
+func canonicalSIDString(str string) (string, error) {
+	sid, err := convertSID(str)
+	if err != nil {
+		return "", err
+	}
+	out := sid.String()
+	if _, err := windows.LocalFree(windows.Handle(unsafe.Pointer(sid))); err != nil {
+		return "", err
+	}
+	return out, nil
 }
 
 // aceGroups pulls the parenthesised ACEs out of an SDDL descriptor string.
