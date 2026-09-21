@@ -1104,6 +1104,48 @@ vet: cmd/wisp/slo.go:324:49: undefined: proc.Runtime
 本 commit 已把该步与它的阳性对照（`tools/d22scan/runtests.sh -C tools/d22scan ./...`）**提到 gofmt/vet 之前**：
 不删步骤、不给任何步骤加 `continue-on-error`、不让任何步骤可跳过（D22 mode 6 未碰）。
 
+## 编排者登记 A70（2026-09-21 16:5x，**沙箱那题现在有实测答案了**（owner 直接问过的那件）+ 我抓到一枚"涂了勾没跑读数"+ push 一半成功）
+
+- **A70① 票 91 的第二会话（`agent-ticket91b`）把三路都量了**（产物 `docs/evidence/s1/91-os-isolation-memo.md`，
+  commit `73cec78`；它**没重做**前任的路 1，只补断掉的 §4/§5/§6/§9——这正是我在票面上写"别重做、去打第 ② 条"要的形状）。
+  **对 owner 那句"我们到底有没有沙箱"，现在的答案有读数了**（档位：〔代理实测，我未逐格复现〕）：
+  - **受限令牌**：4 种配方（含 `WRITE_RESTRICTED` + 只给 Everyone 的 restricting SID）读 `%USERPROFILE%`/`%APPDATA%`
+    **全部 ALLOWED**，只挡得住写；而且 `OpenProcess(宿主, VM_READ)` 还 **OK**（能读宿主内存）。
+    ⇒ 前任备忘录那句"能干活 + 挡得住"**那一格在本机是空的**，**假设没被推翻**。
+    附带读数：无 `SeIncreaseQuota` 也能 `CreateProcessAsUserW`；`CreateProcessWithTokenW` 报 **1314**；
+    `LOGON_WITH_PROFILE` **15.5s 挂死（复现两次）**。
+  - **AppContainer**：**唯一做到读/写/宿主内存/HKCU 全 DENIED** 的那条，且**非管理员就能建 profile**。
+    但代价是真的：文档常量 `0x00020000` 直接 `ERROR_BAD_LENGTH`，只有**废弃的 `0x00020009`** 起得来；
+    每条路径要显式 ACL + 事后撤销；`%TEMP%` 指向不存在的容器目录、`%LOCALAPPDATA%` 不可读。
+    ⇒ 它还**纠正了前任备忘录里一句未证的话**（`:174` "一次属性赋值"）。
+  - **独立低权限账户**：`net user /add` = **error 5**（拒绝访问）；`LogonUserW` 对内置账户全部 **1326**（密码不对）
+    而**不是 1314**（privilege 不够）⇒ **挡路的是凭据不是 API**；跨用户起进程**未证**。
+  - **它的推荐**：**S1 三条都不落地**，AppContainer 记 **RESERVED + 可判定的触发门**（草案挂在票 95 的 AC#0）；
+    并且**票 90 的 M1 不要加"降权"第四维**——理由很硬：**今天没有可降权的对象**（工具就在主进程里跑，
+    `internal/tools/fs.go:144`），而一个常驻降权 executor 会**直接违反 D32 的 `Sleeping…无子进程`** ⇒ 出局。
+    ⚠ 它也交回两起**引用问题**：我此前写在账上的"**C30 明写**它不是安全边界"这句**不成立**
+    （C30 的原文没有这句明写——**方向是对的，措辞是我加戏**）；票 90 把"不可逆必拒"挂在 `PLAN.md:1629` 也要重核。
+    **这两条我接受并当场登记**（原文不删）：安全结论的方向可以靠推断，但**"契约明写"这四个字只能引用真的句子**。
+- **A70② 我抓到一枚"涂了勾但没有读数"的框（今天第一例，方向与上午那例相反）**：
+  票 90 的 **AC#4（双向变异）框是 `[x]`**，而全文检索 **"AC#4" 在那张票上只出现一次——就是框本身**，
+  log 里**没有任何一次变异的 rc、红名、断言原文**。前任的最后一句话恰好是
+  "Now AC#4: bidirectional mutation testing in a fresh out-of-repo snapshot" ⇒ 它是**先涂勾、后去做、死在做**，
+  留下一个**看起来有证据其实没有**的框。
+  ⚠ 这与上午票 88 那例（**做完没涂勾**）恰好相反，而**后一种危险得多**：未勾的框会被接手人立刻看见，
+  涂了勾的空框会**被下一份报告引用成结论**。
+  ⇒ 已派 `agent-ticket90b` **专做这一框**，判据写明：**红成那样才留勾；没红就当众改回未勾**（不许留没读数的勾），
+  并要求它在票面登记"为什么这框此前是空的"——**写"前任涂了勾没跑"，不许粉饰**。
+- **A70③ 票 94 交件**：`filepath.Abs` 那条已被换成 `ResolvedPath` 类型（唯一铸造口）+ `risk` 侧 `init()` 装 seam，
+  **门检从 rc=1 变 rc=0**（`sh scripts/d22scan.sh` 纯净树，台账 `ban #6 frontend/=37` 未降）⇒
+  **A64 压着 push 的理由消失**。它同时**实测推翻了我 A64① 里的"无环"断言**（见 A66③）。
+  两点自认弱处（`verifier` 腿的 CI 覆盖、`RemoveUnlinked` 刻意不解析）已交给 `acceptor-ticket94` 判归属。
+- **A70④ push：cnb 已推平（`942ab5a..18b6f37`，`rev-list --left-right` = 0/0），GitHub 半路卡住**。
+  分块推**成功了一段**（`942ab5a..b994a2c`），之后连续 **HTTP 408 / TLS `unexpected eof`** ⇒
+  我挂了**后台重试循环**（12 次，间隔 20s）。⚠ 树里最大 blob 只有 639 KB（`docs/evidence/s1/66/66-full-subset-slo-report.json`）
+  ⇒ **不是体积问题，是链路问题**（这与全天 `gh` API 那次 TLS timeout 同源）。
+  **两个远程现在不一致**：cnb 是最新的，GitHub 落后若干枚 ⇒ 这会影响 `gh run list` 取到的 CI 结论属于哪一枚 SHA，
+  **我在推平之前不引用任何 CI 读数**（A69③ 那条"连续 4 个 run success"仍停在〔日志读数，未二次复现〕档）。
+
 ## 编排者登记 A69（2026-09-21 16:3x，**票 82 结案 ⇒ ubuntu 那 8 条红归零**；票 96 把 `ban #8` 也武装到 `frontend/`；**push 门检第一次全绿**）
 
 - **A69① 票 82 判 `accepted-done`**（裁决表 511 行、三枚 commit `b4435d3`/`5b1d855`/`d863bd9`）。
