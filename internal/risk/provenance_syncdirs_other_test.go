@@ -61,6 +61,8 @@ func posixSyncEngine(t *testing.T) (p *Provenance, syncTarget, plainTarget, back
 
 func TestExfilSyncWritePosixSpellingInvariant(t *testing.T) {
 	p, syncTarget, plain, backslashName := posixSyncEngine(t)
+	syncRoot := filepath.Dir(filepath.Dir(syncTarget)) // back to .../OneDrive
+	missingAncestors := filepath.Join(syncRoot, "Notes", "deep", "missing", "out.md")
 
 	// Positive, unconditionally: membership in the injected root, spelled the
 	// POSIX way, is the channel. The old fixture could only claim this because
@@ -68,6 +70,13 @@ func TestExfilSyncWritePosixSpellingInvariant(t *testing.T) {
 	// that agree with each other.
 	for _, tc := range []struct{ name, path string }{
 		{"write into sync root", syncTarget},
+		// The OTHER route ticket 75 repaired: nothing below the root exists, so
+		// the verdict has to come from re-anchoring on the deepest existing
+		// ancestor (the root itself) and re-joining the lexical remainder. With
+		// only the two cases above this file would pin the existing-ancestor
+		// route and nothing else, which is how a regression on the missing half
+		// could go unnoticed.
+		{"sync root through missing intermediate ancestors", missingAncestors},
 		// A backslash is not a separator here, so this is ONE file name
 		// (`.env\staging`) sitting directly inside the sync root: still a sync
 		// write, and the name must not be cut in half on the way to the verdict.
@@ -82,6 +91,11 @@ func TestExfilSyncWritePosixSpellingInvariant(t *testing.T) {
 			}
 			if hit.Channel != ChSyncWrite {
 				t.Errorf("channel: got %q want %q", hit.Channel, ChSyncWrite)
+			}
+			// On POSIX the blanket net IS armed, so "it was flagged" alone would
+			// prove nothing: the attribution has to name the injected root.
+			if st := p.IsSyncPath(tc.path); st.Root.Source != "registry" {
+				t.Errorf("verdict attributed to %q, not to the injected sync root: %+v", st.Root.Source, st)
 			}
 		})
 	}
