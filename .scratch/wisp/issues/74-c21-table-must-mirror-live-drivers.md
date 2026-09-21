@@ -42,7 +42,7 @@ about any of them.
 - [x] **AC#2** Every constant that *changes pixels* under `internal/ball` (hit.go, liquid.go,
   renderer_windows.go) is either in the C21 table or in the exemption list with a reason; the
   machine check itself proves it (the report count goes to 0 unattributed).
-- [ ] **AC#3** Mutation proof for the new/changed assertions: pick at least 2 rows, change the code
+- [x] **AC#3** Mutation proof for the new/changed assertions: pick at least 2 rows, change the code
   value, show the specific test go red by name, grep-prove the mutation landed, restore, grep-prove
   it is gone (`git diff --quiet` on both files).
 - [ ] **AC#4** Table↔`tokens.css` gap: either add the cross-check, or move this AC to a written
@@ -128,3 +128,24 @@ about any of them.
   只在日志里多打一条 "MATCHED WITHOUT THE PROMISED UNIT (5): … DockTriggerPx=160 @ …:155" ——
   它借走了同属 `DockAnimMs` 的那个 160ms），以及给 `FontFamily` 补**值断言**
   （`--font-sans` 里确有 "Microsoft YaHei UI"，所以值断言可以做成真的）。
+- [2026-09-21T03:35:00Z] agent=ticket74 did=**收紧两处判据 + 五次变异全绿反证**（勾 AC#3）。
+  ① 几何值匹配 containment → **单射**（`c21TakeClaim`：匹配到的数字被"用掉"，同行第二枚常量不得复用同一个
+  写出来的数字；`c21MatchClaim` 删除，不留死码）。表的对应改动：`描边宽` 一行把 1.5px 写三遍、2px 写两遍
+  ——**同值几枚常量就写几遍**成为表的书写规则，这条规则本身就是可读性收益。
+  ② `FontFamily` 补**值断言**：字体行如实写出 `Microsoft YaHei UI`，测试要求行的 `值/用途` 文本包含
+  `c21StringTokens` 钉住的字符串 ⇒ 换任何字体名都会红（此前只查名字双向，值随意）。
+  ③ 顺带把 `c21StringTokens` 缺钉值、以及"钉了值但行里没写"两种空档也判红。
+- [2026-09-21T03:36:00Z] agent=ticket74 did=**AC#3 变异台账（5 次，逐条：改→grep 证落盘→点名红→还原→`git diff --quiet` 证干净）**。
+  | # | 改动 | 落盘证据 | 结果 |
+  |---|---|---|---|
+  | M-A | `liquid.go:28 SpinLevelRadPerS 4.20 -> 4.35` | `grep -c MUTATION-74A`=1 | **FAIL** `TestC21GeometryRowsMatchCodeConstants`："…:159: SpinLevelRadPerS = 4.35, but this row states no such number" |
+  | M-B | `hit.go:27 ClickTolerancePx 4.0 -> 6.0` | `grep -n MUTATION-74B` 打印该行 | **FAIL** 同一用例："…:162: ClickTolerancePx = 6, but this row states no UNCLAIMED number equal to it (its numbers are: 8px, 4px, 96dpi)" |
+  | M-C | `tokens.go DockTriggerPx 16 -> 160`（**收紧前整包 `ok`、用例 PASS**，只在日志多打一条 "MATCHED WITHOUT THE PROMISED UNIT: DockTriggerPx=160"） | `grep -n MUTATION-74C` | 收紧后 **FAIL**："…:164: … two constants are sharing one written digit" ⇒ containment→单射的必要性由此坐实 |
+  | M-D | `statevisual.go:132 * SleepRestRatio -> * 0.62` | `grep -c`=1 且 `sed -n 132p` 打印 | **FAIL** `TestC21TokenConsumerReport`："SleepRestRatio is tabled but nothing … has no row for it" |
+  | M-E | `tokens.go FontFamily "Microsoft YaHei UI" -> "Segoe UI Variable Text"` | `git diff --stat` 1 file/1 insertion | **FAIL** 几何用例："…:155: FontFamily = "Segoe UI Variable Text", but this row never writes that string" |
+  还原复核：`grep -c MUTATION-74B` = 0、`git diff --quiet -- hit.go tokens.go statevisual.go liquid.go` **四文件皆空**、
+  复跑 `go test ./internal/ball/... -count=2` → `ok 0.355s`。
+  ⚠ 一次**假变异**被纪律本身抓到：M-B 第一次 sed 模式带了中国缩进的 `\t`，替换没落盘 ⇒ 测试"绿"，
+  `grep -n MUTATION-74B` 零命中当场暴露——这就是"先 grep 证明落盘再跑测试"存在的理由（A24 系列第 N 次）。
+  next=AC#4：`表 ↔ design/assets/tokens.css` 的第三腿要不要今天机器化（先量：CSS 129 条声明、表内 78 配色行
+  声称与 CSS 同源）——能加就加，加不动就写成有名有姓的移交票；然后 AC#5 收尾门禁。

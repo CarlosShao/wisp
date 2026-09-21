@@ -150,9 +150,9 @@ alpha，`hex()` 0xRRGGBB + alpha）。D2D 使用直通 alpha 的 `D2D1_COLOR_F`�
 | FirstRun 引导脉冲 | 2.6s | `FirstRunGuidePulseMs` | 引导脉冲周期（S1 静态，接线票启用） |
 | Settling 渐隐 | 260ms，1→0.35 | `SettlingFadeMs` | 一次性有界动画（非循环） |
 | 帧率上限 | ≤30fps | `MaxAnimFPS` / `MinFrameMs` / `WarmBreathFPS` | 所有动画定时器周期 ≥33ms；Warm 走 10fps 慢拍（`WarmBreathFPS`，此前只出现在用途栏未入 Go 常量列） |
-| 描边宽 | 1.5px 斜杠 / 图标；Conversation 环 2px；Thinking 底部光带 2px | `SlashStrokePx` / `IconStrokePx` / `RingStrokePx` / `ConvRingStrokePx` / `ThinkingBandPx` | SPEC-08 §2.1（`ThinkingBandPx` 为本票补录） |
+| 描边宽 | 斜杠 1.5px / 图标 1.5px / 环 1.5px；Conversation 环 2px；Thinking 底部光带 2px | `SlashStrokePx` / `IconStrokePx` / `RingStrokePx` / `ConvRingStrokePx` / `ThinkingBandPx` | SPEC-08 §2.1（`ThinkingBandPx` 为本票补录）。**票 74：同行同值不再互相掩护**——机器检查从"这行里有任意数字等于它"改成"每枚常量得占到一份没被用过的数字"，所以几枚常量同值就要把这个数字写几遍（旧写法只写一遍，那正是 `DockTriggerPx` 能被同行的 160ms 掩护过去的形状） |
 | 角标 / 队列点 | 17px 角标、10px 数字、2px 角标描边、9px info 点 | `BadgeDiameterPx` / `BadgeFontPx` / `BadgeBorderPx` / `QueueDotPx` | ball.html（`BadgeBorderPx` 为本票补录） |
-| 字体 | `--font-sans` CJK 头 + `--t-mono` 12.5 / `--t-micro` 11；环下倒计时 10px | `FontFamily` / `FontSizeMonoPx` / `FontSizeMicroPx` / `CountdownFontPx` | DWrite 文本（`CountdownFontPx` 为本票补录） |
+| 字体 | `--font-sans` 的 CJK 头 `Microsoft YaHei UI` + `--t-mono` 12.5 / `--t-micro` 11；环下倒计时 10px | `FontFamily` / `FontSizeMonoPx` / `FontSizeMicroPx` / `CountdownFontPx` | DWrite 文本（`CountdownFontPx` 为本票补录）。`Microsoft YaHei UI` 是本票补的**值断言**：此前这行只引用 `--font-sans`，`FontFamily` 换成任何字符串表都照样"匹配" |
 | 液态斑位置（票 62，无 CSS 对应） | 半径 0.72 / 0.62 / 0.50 × 球半径；偏心 0.22 / 0.30 / 0.40 | `LiquidRadiusA` / `LiquidRadiusB` / `LiquidRadiusC` / `LiquidOffsetA` / `LiquidOffsetB` / `LiquidOffsetC` | 三枚软场叠加才读成「液体」；渲染器只旋转与胀缩，不重建 brush |
 | 玻璃边缘权重（票 62，无 CSS 对应） | 外缘暗环 1.2px / 内亮唇 1.0px / 焦散 0.30 / 「未说话」边框环 1.8px（96 DPI 物理 px，绘制时按 DPI 缩放） | `GlassRimPx` / `GlassLipPx` / `GlassCaustic` / `BorderRingPx` | 浅色桌布上的对比度锚点 |
 | 音频包络 → 液体**几何**（票 62 建，票 74 换指向） | 每单位电平可见半径收缩 0.12 / 每单位唤起爆发扩散 0.10 | `LiquidGatherPerLevel` / `SummonFlowSpread` | 无分配：只改已有 brush 的几何。**本行此前记 `SwimLevelGain` 0.55 / `SpinLevelGain` 1.0，两个常量零消费者已删**（票 74：`git grep` 只命中声明与测试金标准）：偏心量是烘焙常量 `liqOffset[bi]*R`，不读电平；电平真正改的是可见半径，而那两个因子当时是渲染器里的裸字面量 |

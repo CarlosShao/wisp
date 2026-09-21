@@ -859,13 +859,20 @@ func c21WantedUnits(name string) []string {
 	}
 }
 
-// c21MatchClaim reports whether any number in the row states val, and whether it
-// does so with the unit the name promises (a bare "44–72" satisfying
-// BallSizeMaxPx is a match, just a weaker one, and gets reported as such).
-func c21MatchClaim(val float64, name string, claims []c21NumClaim) (found, exactUnit bool) {
+// c21TakeClaim is the geometry row's value assertion. Ticket 69 shipped the match
+// as containment ("does ANY number in this row equal the constant?"); this is the
+// same question with the half that was missing: the number it matches is CONSUMED,
+// so a second constant in the same row cannot be satisfied by the same written
+// digit. Containment alone let a row mask a wrong value - measured before this
+// change: setting tokens.go's DockTriggerPx to 160 kept the whole package green,
+// because that row already writes 160ms for DockAnimMs. A row that legitimately
+// states the same number for two constants must now write it twice, which is also
+// the more honest table. A bare number that lacks the unit the constant's name
+// promises is still a match, just a weaker one, and is reported as such.
+func c21TakeClaim(val float64, name string, claims []c21NumClaim, taken []bool) (found, exactUnit bool) {
 	want := c21WantedUnits(name)
-	for _, c := range claims {
-		if c.unit == "dpi" {
+	for i, c := range claims {
+		if taken[i] || c.unit == "dpi" {
 			continue
 		}
 		v := c.val
@@ -875,14 +882,28 @@ func c21MatchClaim(val float64, name string, claims []c21NumClaim) (found, exact
 		if math.Abs(v-val) > 1e-9 {
 			continue
 		}
-		found = true
 		for _, u := range want {
 			if c.unit == u {
+				taken[i] = true
 				return true, true
 			}
 		}
 	}
-	return found, false
+	for i, c := range claims {
+		if taken[i] || c.unit == "dpi" {
+			continue
+		}
+		v := c.val
+		if c.unit == "s" {
+			v *= 1000
+		}
+		if math.Abs(v-val) > 1e-9 {
+			continue
+		}
+		taken[i] = true
+		return true, false
+	}
+	return false, false
 }
 
 // TestC21GeometryRowsMatchCodeConstants walks the geometry/motion table row by
@@ -991,29 +1012,33 @@ func TestC21GeometryRowsMatchCodeConstants(t *testing.T) {
 		claimed := make([]bool, len(r.claims))
 		for _, n := range r.names {
 			if info, ok := declared[n]; ok && info.kind == "string" {
-				continue // stated by name in the row; no numeric claim to check
+				want, pinned := c21StringTokens[n]
+				if !pinned {
+					t.Errorf("%s: the table names the string constant %s but c21StringTokens pins no value: this row compares nothing - pin it or say in the row that it carries no value", r.where, n)
+					continue
+				}
+				// The value assertion FontFamily never had: the row quoted
+				// --font-sans as its source but never wrote the family the code
+				// actually asks DirectWrite for, so any string could sit in
+				// tokens.go and the table still "matched".
+				if !strings.Contains(r.body, want) {
+					t.Errorf("%s: %s = %q, but this row never writes that string - a token value the table does not state cannot be audited: %s",
+						r.where, n, want, c21TablePath)
+				}
+				continue
 			}
 			val, ok := c21TabledValue(n)
 			if !ok {
 				continue // already reported by (0)/(a)/(a2)
 			}
-			found, exact := c21MatchClaim(val, n, r.claims)
+			found, exact := c21TakeClaim(val, n, r.claims, claimed)
 			if !found {
-				t.Errorf("%s: %s = %s, but this row states no such number (its numbers are: %s) - table and code drifted",
+				t.Errorf("%s: %s = %s, but this row states no UNCLAIMED number equal to it (its numbers are: %s) - table and code drifted, or two constants are sharing one written digit; state the number once per constant",
 					r.where, n, c21NumText(val), c21ClaimsText(r.claims))
 				continue
 			}
 			if !exact {
 				weak = append(weak, fmt.Sprintf("%s=%s @ %s", n, c21NumText(val), r.where))
-			}
-			for i, c := range r.claims {
-				v := c.val
-				if c.unit == "s" {
-					v *= 1000
-				}
-				if !claimed[i] && math.Abs(v-val) <= 1e-9 {
-					claimed[i] = true
-				}
 			}
 		}
 		for i, c := range r.claims {
@@ -1022,9 +1047,11 @@ func TestC21GeometryRowsMatchCodeConstants(t *testing.T) {
 			}
 		}
 	}
-	// Where the check is weakest, said out loud: a value that collides with
-	// another number in the same row still passes, because a row states its
-	// numbers in prose. The two lists below are exactly those rows.
+	// What the check still cannot say, out loud: a number written in prose that
+	// belongs to no named constant (a SPEC clause number, "96 DPI", a commit hash)
+	// is listed below and NOT judged, because surjectivity would turn every
+	// sentence in the 用途 column into a token. What ticket 74 did close is the
+	// other half - one written number can no longer satisfy two constants.
 	if len(weak) > 0 {
 		sort.Strings(weak)
 		t.Logf("MATCHED WITHOUT THE PROMISED UNIT (%d): %s", len(weak), strings.Join(weak, ", "))
