@@ -20,8 +20,15 @@ concurrency:
 jobs:
   # ---------------------------------------------------------------- lint ----
   # gofumpt/vet/staticcheck + D22 seven-ban static scan (tools/d22scan) +
-  # zero-emoji scan over design/ and frontend/ (inside d22scan). The scan's
-  # own red-path is pinned by its seeded-violation test.
+  # ban #8 zero-emoji scan. The scope names come from the tool, never from this
+  # comment: as of ticket 67 AC#3 / ticket 71 AC#4 the truth source is
+  # emojiScopes() in tools/d22scan/main.go = design/ + internal/ + cmd/ (all
+  # .go, comments and _test.go included). The previous wording here said
+  # "design/ and frontend/", a tree that does not exist at this HEAD - a stale
+  # copy of the very lie ticket 71 exists to make impossible, so it is now
+  # written as a pointer to the function instead of a duplicated list.
+  # The scan's own red-path is pinned by its seeded-violation test, which the
+  # wrapper below runs BEFORE the scan (positive control).
   lint:
     runs-on: ubuntu-latest
     steps:

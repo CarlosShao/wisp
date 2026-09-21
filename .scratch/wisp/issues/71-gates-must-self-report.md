@@ -1,9 +1,9 @@
 # 71 — 每道门必须自报工作量：把"没报问题"和"没看"变成可区分的两件事
 
-**Status:** pending（**先决条件：票 70 的全仓 gofumpt 落地后再动 `.go`**，否则每个文件都撞车）
-**Claimed by:** —
-**Last update:** 2026-09-20 23:5x（编排者建票，来源 A22/A26/A30⑤ 的元教训）
-**Blocked by:** 70-ci-actually-green（只因为两者都要改 `.go`，不是语义依赖）
+**Status:** in progress（d22scan + ci.yml 部分已开工；`cmd/balldebug` 部分**不在本代理所有路径内**，见 Progress log 的移交条目）
+**Claimed by:** ticket-71 implementer（2026-09-21，负责 `tools/d22scan/**` 与 `.github/workflows/ci.yml`）
+**Last update:** 2026-09-21 09:5x（编排者 09:41 三条移交已接：第 2 条已闭，第 1/3 条进行中）
+**Blocked by:** 70-ci-actually-green（只因为两者都要改 `.go`，不是语义依赖；票 70 的 gofumpt 已落地）
 **Parallel slots:** ≤1 sub-agent（本票改的是**门禁自身**，改错会让后面所有票的"绿"都失去意义）
 **Spec refs:** README 完成规则 6（1:1 裁决表）、D22（契约变更需人批）、C31（可观测性）
 
@@ -74,3 +74,14 @@ R16 裁定 3 **禁止回退**）。本票把同样的纪律推到**其余三类�
    **本票 AC 判据里要加一条**：任何"扩覆盖面"的改动，收尾时必须跑一次**纯净树**
    （`git archive HEAD` 或等价手段）证明它是绿的——在有别的代理并发的共享树里，
    `git status` 干净**不等于** HEAD 干净。
+
+## Progress log（票 71 implementer，`tools/d22scan/**` + `.github/workflows/ci.yml`）
+- 2026-09-21 09:5x 开工。**已闭**：编排者追加第 2 条（`ci.yml:23` 注释仍写 "design/ and frontend/"）——
+  注释改为**指向真相源函数** `emojiScopes()` 而不是复制一份清单，因为复制出来的清单本身就是这次要修的
+  病灶（话术与覆盖面脱钩）。**移交出去**：AC#1/AC#2 的 `cmd/balldebug -diff` 阈值门不在本代理所有路径内
+  （编排者只给了 `tools/d22scan/**` 与 `ci.yml`），且 `internal/ball` 正被票 74 代理占用 ⇒ 交回编排者派活。
+  本代理按同一条**精神**在自己所有物上做等价物：阳性对照必须是**真的红**（AC#2 的形状），不是绿。
+  **进行中**：AC#4 的逐作用域自报——实测基线（`cd tools/d22scan && go run . -root <abs>`，
+  exit 0）今天只自报了 ban #8 的 3 个作用域，ban #6 `frontend/`、ban #7 `internal/tools/`
+  与 `internal/` / `cmd/` 各自的 Go 文件数**一条都没报**。⇒ 下一步：给 d22scan 装**统一作用域台账**
+  （每个声明作用域 `examined N`）+ 把 `emptyScope` 守卫推到 ban #6/#7，并保证只严不宽。
