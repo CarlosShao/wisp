@@ -128,7 +128,7 @@ delete_test.go:25: NewStore: secret: create C:\Users\RUNNER~1\AppData\Local\Temp
   **修后本机（同一套用例，生产码 = `34f6959`）**：
   `--- PASS: TestGateJudgesThePrivateSetByResolvedSID`（三条腿全 PASS）、
   `--- PASS: TestSealNarrowsAndNamesThePrincipalItRemovedBySID`、
-  `--- PASS: TestGateRefusesADescriptorThatLeavesARealGrantToAnotherAccount`；`-count=2 -v ./internal/winsec/` 整包 78→82 行 RUN，0 FAIL 0 SKIP。
+  `--- PASS: TestGateRefusesADescriptorThatLeavesARealGrantToAnotherAccount`；`-count=2 -v ./internal/winsec/` 整包 RUN=80（交件前同包实测 78，多的正是新用例 ×2；80 = 40 个不同测试名 ×2），0 FAIL 0 SKIP。
   修前红一共两条（对 `8b6f691` 的生产码，`-count=1 -v`，摘掉点名新函数的第 3 腿后跑的）：
   `TestSealNarrowsAndNamesThePrincipalItRemovedBySID`（`:243`，`cleared="LA(A;OICI;FA;;;LA) WD(A;OICI;FA;;;WD)"` 里没有 `S-1-1-0`）、
   `TestGateRefusesADescriptorThatLeavesARealGrantToAnotherAccount`（`:290`，报错只说 `([WD])` 不说 `S-1-1-0`）。
