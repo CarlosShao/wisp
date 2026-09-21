@@ -1,6 +1,8 @@
 # 89 — `0o600` 在 Windows 上是装饰品：artifact / 密钥 / 数据库**从来没真的"只有我能读"过**（A51①②）
 
-**Status:** ready-for-review（AC#1-AC#6 六框全勾；码与用例见本票 log 末段三枚 commit）
+**Status:** **returned-for-fix**（2026-09-21 16:1x 独立对抗验收判：**AC#2 一格 FAIL，其余五格 PASS** ⇒ **不能改名 `-done`**。
+裁决表 `docs/evidence/s1/89-adversarial-acceptance.md`。四条待补项逐条列在下面那条 log 里，
+** blockers：`internal/winsec/` 此刻有 `agent-ticket94` 在写** ⇒ 本票修复等它交件。）
 **Type:** 安全（本机数据泄露面：同机其他用户/进程可读我们的私有数据）
 **Blocks:** nothing · **Blocked by:** nothing（`internal/memory/artifacts.go` 与 `internal/agent/spill.go` 此刻无人写）
 **Packages:** 新建一个 Windows ACL 的小工具文件（建议 `internal/acl/` 或 `internal/winsec/`，**由你定，但要在票面写理由**）
@@ -55,6 +57,33 @@
 数红/绿用全量输出仪器；票面 append-only，**要改的那行先读再替换**。
 
 ## Progress log（append-only）
+
+- 2026-09-21 16:1x（编排者，**验收退回单，四条待补；代理已收工 ⇒ 修复另派一人**）：
+  `acceptor-ticket89` 八项全部自己测过（未抄本票一个数字），基线/红转绿/"差点假绿"/PROTECTED 变异/
+  fail-closed 变异/junction 复现/AC#6 真 Linux 都成立。挡在结案前面的只有四条：
+  1. **AC#2 的覆盖面主张没有用例钉住**：验收代理实测**删掉 `sealDir` 里的 `propagatePrivate(path)`
+     （保留 `applyDescriptor`、可编译）⇒ 包内 **34 条全绿**，一条都不红。
+     它同时给出真实边界：**只有"子项自带显式 ACE"时那次 walk 才承重**（它自造的探针里
+     HEAD 全收、去掉 walk 后三条仍宽）。⇒ **修法**：把它现成的探针形状搬进包内，
+     补一条"已存在的、带外来显式 ACE 的子项，在父目录被 `SealDir` 之后 icacls 原文里**不再出现 `S-1-1-0`**"的用例，
+     并要求它在"删掉 `propagatePrivate`"的 build 上**必红**（验收代理已经验过这个方向）。
+  2. **同包一处更重的账（验收代理新挖，本票自己没报）**：`internal/secret/migrate.go:154`
+     写的是**迁移前的原始 config 备份**（`config.toml.bak`），里面**含明文密钥**，而它用的是
+     **装饰性的 `0o600`**（本票的 AC#1 已经证明那串数字在 Windows 上不落地）
+     ⇒ **同一条已结案的缺陷，最坏的一份产物被漏掉了**：主 config 封了、迁移前的明文没封。
+     另：`:168` 的 tmp 文件同形状。**修法是一行级 ×2**（走 `winsec.SealFile`/`PrivateFile`）。
+  3. **本票面有一句事实错**：它写"普通权限建不出目录符号链接"。验收代理实测：
+     **未提权 + 开发者模式=1 ⇒ `os.Symlink` 直接成功** ⇒ 那一格属于"**可测而未测**"，不是"测不了"。
+     ⇒ 把这句改成"本机开发者模式下可构造，已构造并测过"或"仍未测"，**二选一**，不许留着。
+  4. **本票面把严格度描述错位**：它说"将来有意给某目录加第三个主体 ⇒ 会在**写入点直接失败**"。
+     验收代理实测是**下次 `SealDir` 静默清除该主体**（不是当场报错）。
+     ⇒ **真实风险更大而不是更小**：静默清除意味着"某人给服务账户加的授权会无声消失"。
+     修法二选一并写进票面：要么加一条**显式允许的白名单扩展点**，要么让"清除既存主体"这件事**报出来**。
+  **不在本票的**：`winsec.go:126` 的 `filepath.Abs`（票 94，验收代理也明写"不挡本票"）。
+  **对 owner 的口径**：验收代理的原话是——"只对我可读"**今天不能无条件说**，只能点名四条主路
+  （artifacts / DPAPI blob / db+wal+shm / staging）；`config.toml.bak`、日志、既存带显式 ACE 的老树**仍然宽**。
+  等第 1、2 条补完才把这句话升格。
+  next= 等票 94 交件让出 `internal/winsec/` ⇒ 派修复代理（一次 commit 能补完 1/3/4，第 2 条是两行接线）。
 
 （空）
 - [x] **AC#2 方向：目录链先封、文件兜底（覆盖面靠目录，两条都要）** — 理由：
