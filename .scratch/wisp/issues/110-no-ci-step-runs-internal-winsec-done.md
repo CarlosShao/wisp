@@ -1,6 +1,16 @@
 # 110 — CI 里**没有任何一步真正跑 `internal/winsec` 的测试**：密封代码本身在 CI 上零覆盖（票 106 的 R-106-1 + 票 93 的 R-93-4，同一个洞的两侧）
 
 **Status:** ready-for-review（2026-09-21 19:1x 编排者建 · 19:4x agent-ticket110 交件，**未 push**）
+→ **accepted-done**（2026-09-21 21:0x 由 `acceptor-110-97` 判 **通过（附条件）**，裁决表
+`docs/evidence/s1/110-adversarial-acceptance.md`（`d639fc8`）。**AC#2 由它补上**：
+run `35595651898`/job `106319703680`/step4 = completed+failure、四数 RUN=71/PASS=32/**FAIL=3**/SKIP=0；
+第二枚样本 run `35595884176`/job `106320537496` 同形 ⇒ **这道门真跑完并给过结论**（红也是结论）。
+红三条全属 winsec（=票 112），同一棵树它自己那台 windows 机 35/35 绿 ⇒ 环境差异坐实。
+⚠ 它**没有把两枚旧红算到新步头上**：lint 的 gofumpt 红在 `internal/panel` 5 个文件（连带 vet/staticcheck 被 skip）、
+test-core 的唯一根因是一条顶层 SKIP。**并且更正了我一句话**："winsec 出现 18 次"是**宽松串**匹配，带前缀 `github.com/…/internal/winsec` 是 **0 命中**。
+⚠⚠ **`R-110-2` 是这张票最贵的产出**：step4 一红，**step5–8 全被跳过**（旧 run 那 4 步本来全绿）⇒
+**我们为了加一道门，把 windows 腿的净覆盖加成了负的。** 转**票 111 的 AC#6**（`ci.yml` 同文件、它接手）。
+`R-110-3` 匹配式缺、`R-110-4` 票面承诺的 step7 读数至今 0 次 ⇒ 一并转票 111。）
 **Type:** 门禁覆盖面（票 71/93/96/99 同族：**门存在于配置里 ≠ 门跑过并给过结论**）
 **Blocks:** "runner 那一格"的直接证实 · 票 94/103/106 一系列密封改动的 CI 侧背书 · **Blocked by:** nothing
 **Packages:** `.github/workflows/ci.yml`（`test-windows` 的包清单）或 `scripts/portable-tests.sh` 的 scope（**二选一说清为什么**）。
