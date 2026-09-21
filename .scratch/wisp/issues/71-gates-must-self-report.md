@@ -136,3 +136,9 @@ R16 裁定 3 **禁止回退**）。本票把同样的纪律推到**其余三类�
   8 条作用域全打数；`sh tools/d22scan/runtests.sh -C tools/d22scan ./...` ⇒ **rc=0**，
   `PASS=18 FAIL=0 SKIP=0, === RUN=26`。⇒ next=交回编排者：ban #6 处置裁决、balldebug 半张票派活、
   memory 的 gofumpt 红、A43② 的两个符号归属。
+- 2026-09-21 11:1x **收工前的最后一次纯净树复核（HEAD=`9c161bb`，含我全部 4 个 commit）**：
+  `sh scripts/d22scan.sh` ⇒ **rc=0**，8 条作用域全打数（internal/=184、cmd/=16、ban#7=16、
+  ban#8 design=16 / internal=294 / cmd=21；ban#6 仍是唯一 `[NOT COVERED]`）。
+  `gofumpt -l .` 在整棵 HEAD 上**只剩 1 个文件**：`internal/memory/artifacts_path_invariant_test.go`
+  （`d9224af`，票 76，不属我）⇒ 我自己的路径 gofumpt 为空，但 **lint 第一步在 HEAD 上仍会因这一条红**，
+  这是该转给票 76 的一句话，不是我该顺手改的文件（同文件并发 = 假并行）。本代理停在这里。
