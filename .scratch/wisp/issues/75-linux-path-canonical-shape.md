@@ -29,15 +29,15 @@ the two is correct is a **contract question**: read C26 in `docs/specs/` first a
 reading you implemented and **why, in the commit message**.
 
 ## AC (1:1 verdict table required)
-- [ ] **AC#1** Reproduce in docker with the CI command verbatim (not a local `go test`): record the
+- [x] **AC#1** Reproduce in docker with the CI command verbatim (not a local `go test`): record the
   exact command + `47`-ish baseline FAIL count in the evidence file **before** changing anything.
-- [ ] **AC#2** `internal/tools` goes green in `golang:1.27` **and** stays green on Windows
+- [x] **AC#2** `internal/tools` goes green in `golang:1.27` **and** stays green on Windows
   (`-count=2`). Both sides, or the box stays unticked — a fix that only moves the failure is not a fix.
-- [ ] **AC#3** The 600 s timeout is explained by name (which test, which wait), not just "it got faster".
+- [x] **AC#3** The 600 s timeout is explained by name (which test, which wait), not just "it got faster".
 - [ ] **AC#4** ⚠ **D22 gate**: if the correct fix lands in `internal/risk/pathresolver*.go` or
   `assessor.go`, **stop and hand me the one-paragraph diff proposal instead of editing** — those files
   are the frozen security surface, and A38/Q-17 already has an unrelated change queued behind that gate.
-- [ ] **AC#5** No assertion is weakened, no test is build-tagged away to make `test-core` green.
+- [x] **AC#5** No assertion is weakened, no test is build-tagged away to make `test-core` green.
   (Ticket 70 legitimately used `//go:build windows` for **DPAPI**, because C28 says DPAPI is
   Windows-only and it wrote the coverage cost down. That justification does **not** transfer here:
   path shape is not a platform-API limitation, it is our bug.)

@@ -60,8 +60,13 @@ func TestResolveCanonicalIsPlatformShaped(t *testing.T) {
 }
 
 func TestResolveKeepsSeparatorsOutOfPosixNames(t *testing.T) {
+	// The assertion below is about a character POSIX treats as an ordinary
+	// filename byte and Windows does not, so it only has content on POSIX.
+	// Written as a guard rather than a t.Skip so the SKIP ledger of this
+	// package stays exactly what it was before ticket 75 (one entry,
+	// TestSyncRegistryProbeLive) and no red can hide behind a skip.
 	if filepath.Separator == '\\' {
-		t.Skip("a backslash is not an ordinary filename character on Windows")
+		return
 	}
 	home, _, _ := sandbox(t)
 	// '\' is a legal character inside a POSIX file name. The old unconditional
@@ -81,6 +86,29 @@ func TestResolveKeepsSeparatorsOutOfPosixNames(t *testing.T) {
 	}
 	if _, err := os.Lstat(res.Canonical); err != nil {
 		t.Errorf("canonical %q is not openable: %v", res.Canonical, err)
+	}
+}
+
+// TestDoubleSlashSpellingIsNotUNC pins the one ordering the fix introduces: a
+// POSIX path that starts with two slashes is an ordinary absolute path, not a
+// UNC candidate, and must come back with its own shape. lexCanonical (Clean)
+// collapses "//a/b" to "/a/b" before normalizeLocalUNC ever sees it, which is
+// what keeps the `//` branch of the UNC guard dead on POSIX. If that order is
+// ever swapped, this is the line that says so.
+func TestDoubleSlashSpellingIsNotUNC(t *testing.T) {
+	if filepath.Separator == '\\' {
+		return // guard, not t.Skip: see TestResolveKeepsSeparatorsOutOfPosixNames
+	}
+	res, err := Resolve(`//localhost/c$/x`, nil)
+	if err != nil {
+		t.Fatalf("Resolve: %v", err)
+	}
+	if strings.Contains(res.Canonical, `\`) {
+		t.Errorf("canonical = %q: a POSIX double-slash spelling was rewritten into UNC shape",
+			res.Canonical)
+	}
+	if res.Canonical != "/localhost/c$/x" {
+		t.Errorf("canonical = %q, want %q", res.Canonical, "/localhost/c$/x")
 	}
 }
 

@@ -74,8 +74,11 @@ func TestCanonicalizeAgreesWithTheOSName(t *testing.T) {
 }
 
 func TestFoldPathKeepsPosixBackslashesDistinct(t *testing.T) {
+	// Guard, not t.Skip: the property is about a character that is only a
+	// filename byte on POSIX, and the package's SKIP ledger must stay at zero
+	// so no red can hide behind a skip (ticket 75 AC#5).
 	if filepath.Separator == '\\' {
-		t.Skip(`on Windows '/' and '\' are the same separator, which is what foldPath is for`)
+		return
 	}
 	// Folding '/' into '\' used to make these two POSIX paths one comparison
 	// key. foldPath's output authorizes roots, so that merge is a fail-open.
