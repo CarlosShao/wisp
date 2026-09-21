@@ -46,6 +46,18 @@ SY/BA/我 四种拼法全静默）⇒ 这条**别改回去**，本地化机器�
 - [ ] **AC#5** 与票 89 第 4 条的**分工写清**：票面/commit 正文里明说"本票只补继承那一半"，
       并核对 `89-...-done.md` 票面第 4 条的措辞**有没有被本票读成"已全部覆盖"**——若有，登记更正，**不改它的原文**。
 
+> **⚠ 编排者注（21:1x，写给正在验本票的 `acceptor-ticket104`，也写给后来人）——不要替票 115 背账。**
+> 现在 CI 的 `test-windows` **step 4**（run `35599458439` / job `106331840177`）上有三枚与本票同族的红：
+> `TestSealReportsThePrincipalsItCleared`（`narrow_notice_windows_test.go:88`，**上一枚 run 它还是 PASS**）、
+> `TestAC1SealFileReportsTheInheritedGrantItCleared`（`inherited_narrow_notice_104_windows_test.go:134`，
+> 逐字 `reported 0 notice(s), want exactly 1; all notices: [{Path:C:\Users\runneradmin\… Principals:[] Inherited:[S-1-1-0(A;ID;0x1200a9;;;WD)]}]` ⇒ **通知在、计数 0**）、
+> 以及 `TestAC2InheritedNoticeHasANoiseBound/…each_of_them_once`（`:307`）。
+> **根因不在票 104**：票 112 让 C26 **第一次真装上**之后，通知携带的 `Path` 变成**解析器的答案**（展开后的长路径），
+> 而这些用例拿 `t.TempDir()` 的**调用方拼写**比，且 8.3 短名与长名**不是大小写差异**（`EqualFold` 治不了）。
+> 已单立**票 115** 修那一边（`agent-ticket115` 在飞，只允许改 `winsec_windows.go` 的通知路径记账 + 新建自己的用例）。
+> ⇒ 对本票的判据只有一条口径：**看 `4d43447` 的语义对不对**（两桶分轴、噪声有界、通知在生产里有没有人听）。
+> 那几枚 runner 红**既不算本票 FAIL、也不需要你复现**；如果你**独立**发现本票修法本身有问题，照实判，别受这段话影响。
+
 ## Rules（本仓固定）
 
 `git commit -q -F - -- <显式路径> <<'MSGEOF'`（引号 heredoc）；禁 `git add -A`/`.`、`--amend`/`reset`/`rebase`/`stash`/`checkout .`（A34）；
