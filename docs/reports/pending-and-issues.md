@@ -1101,6 +1101,38 @@ vet: cmd/wisp/slo.go:324:49: undefined: proc.Runtime
 本 commit 已把该步与它的阳性对照（`tools/d22scan/runtests.sh -C tools/d22scan ./...`）**提到 gofmt/vet 之前**：
 不删步骤、不给任何步骤加 `continue-on-error`、不让任何步骤可跳过（D22 mode 6 未碰）。
 
+## 编排者登记 A57（2026-09-21 15:0x，票 81 交回四框全勾：**两侧同数** + 一处命名债我判不改 + 一处潜伏空仪器）
+
+- **A57① 我这一侧的独立复跑逐字对上**（Windows 本机，与代理报的同一过滤器）：
+  `go test -count=2 -v -run 'Containment|LiteralBackslash|HostileShapes|StaysUnderDataDir|RejectsTheFour' ./internal/agent ./internal/memory`
+  ⇒ **rc=0、`=== RUN` 50、`--- PASS` 50、`--- FAIL` 0、`--- SKIP` 0、`no tests to run` 出现 0 次**。
+  代理报的是 `50/50/0/0`（两侧同数）⇒ **一致**。它的 AC#4 两包全量也是两侧各 `RUN 284 = 2 × 142`、
+  2 条 SKIP 都是既有的 `TestSubprocessCrashWriter`（同名同数），不是新增。
+  ⚠ **AC#1/AC#2 的"ubuntu 侧"我不采信本地 docker 就当完**：那两条红是在 CI 上观测的，
+  所以勾框要等 run `35562680354`（headSha `e5e5eb7`）的 `test-core` 结论 —— 回填前票 81 **不改名 `-done`**。
+- **A57② 它做对的一件关键取舍**（写进规矩）：purge 的期望集合**不再点名文件**，改成
+  "按 target 落在 artifacts 树里"派生。理由成立：**点名的期望值会把"测试作者的机器形状"当成规格**，
+  这正是票 81 要修的那个病本身。⇒ 通用判据：**凡"列举目录后比对集合"的用例，期望值要由规则派生，不要硬编码字面名。**
+  它还留了两条**反-vacuous 卫兵**（防止派生逻辑退化成"什么都算对"）——这条也要照抄到同类用例上。
+- **A57③ 命名债：我判"不改名，改注释"**。`TestDelete{Artifact,PrivacyItem}RejectsTheFourHostileShapes`
+  现在有 6 个子测试，函数名还叫 "Four"。代理没改名，理由我接受：
+  这名字被 `docs/evidence/s1/76-adversarial-acceptance.md`、本 registry、票 20/76/81 **逐字引用**，
+  **改名等于替别人重写验收账**（而且验收账是历史证据，不该被后来者追改）。
+  ⇒ 处置：**在函数上方加一行注释说明"Four = 必须被拒的四种敌意形状；多出的两例是字面反斜杠的不对称对照"**，
+  随下一次碰这个文件的任务带上（不单独派代理）。
+- **A57④ 一处潜伏的空仪器（它登记、我没让别人现在动）**：`internal/risk/rules_test.go:198` 用
+  `C:\Program Files\Git\bin\git.exe` 这条字面 Windows 路径做输入，**按 `git.exe` 命中 allowlist**、
+  两侧同字节同结论 ⇒ **今天不是问题**。但它断言的是"折叠行为"：
+  **如果哪天 risk 改成"只在 Windows 上折叠 `\`"**（票 82/票 75 正在往这个方向走），
+  这条会在 ubuntu 上**静默变成空仪器**——跑过、绿、但没测到任何东西。
+  ⇒ **归票 82 的判据里加一条**：碰 `internal/risk` 折叠语义时，必须同时检查 `rules_test.go:198` 是否还在测东西。
+- **A57⑤ 我顺手查清了 `ban #6` 那个"豁免到期"机制长在哪**（为了票 77 建 `frontend/` 时我能一次做对）：
+  **不在 `allowlist.txt`**（那 5 行是文件级豁免，一条没多），而在 **`tools/d22scan/main.go` 的 `declaredScopes()`**
+  里，配套 **Guard 3（`main.go:916-921`）**：*"一个豁免是一条关于树的断言，而断言会烂"* ⇒
+  目录出现而条目还是 exempt，扫描器**直接报错**而不是偷偷开始覆盖。
+  ⇒ 这是 A53③ 那条通用判据的**同类正例**（"被解析、零消费者 ⇒ 要么响亮失败要么写清楚"），
+  也确认了 A56④：**翻转动作必须发生在 `frontend/` 进树的那一批里，且由我落**（`tools/d22scan/**` 不归建目录的人改）。
+
 ## 编排者登记 A56（2026-09-21 14:4x，票 70 接续交回五项待拍板 + 票 83 验收 + **我自己复核出来的一条"门从未有判据"**）
 
 - **A56① 今天最尴尬的一条：`lint` 里另外两把工具也从来没有产出过判据。**
