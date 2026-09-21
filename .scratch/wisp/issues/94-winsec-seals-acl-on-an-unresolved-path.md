@@ -1,6 +1,8 @@
 # 94 — 私有数据目录的"封 ACL"用了 `filepath.Abs` 而不是 C26 PathResolver ⇒ **D22 门在 CI 之前把它拦下了**（票 89 的码，push 因此压住）
 
-**Status:** in-progress（agent-ticket94 已接手；票 89 已交件 `0a3a445`，`internal/winsec/` 现在是本代理地界）
+**Status:** ready-for-review（agent-ticket94：AC#1-AC#5 五框自勾，代码 `7910bcd`+`20b525d`，
+仓外纯净快照 `sh scripts/d22scan.sh` **rc=0** ⇒ **编排者的 push 可以放开了**；⚠ 留给验收方的两点写在 Progress log 末条）
+**原 Status:** in-progress（agent-ticket94 已接手；票 89 已交件 `0a3a445`，`internal/winsec/` 现在是本代理地界）
 ⚠ 第一枚 checkpoint 已落盘（见 Progress log 末条）：AC#1 判明为 **(b)**，并**推翻**本票"无循环依赖"的前提。
 **Type:** 安全边界（D22 ban #2 `pathresolver-bypass`）+ 一个**没被回答的设计问题**：拿没解析过的路径去决定"给哪棵树封权限"，本身是不是缺陷
 **Blocks:** **编排者的 push**（HEAD 上 `sh scripts/d22scan.sh` 现在就是红的，见下面读数 ⇒ 推上去 `lint` 会红在 D22 两步）
@@ -53,20 +55,25 @@ cd /tmp/wisp-pushgate90 && sh scripts/d22scan.sh
 
 ## AC（1:1，裁决表 `docs/evidence/s1/94-*.md` 由验收方出）
 
-- [ ] **AC#1** 定性：给出上面 (a)/(b) 的**判决 + 每个调用点的 file:line 证据**（"谁把路径递给 winsec、
+- [x] **AC#1** 定性：给出上面 (a)/(b) 的**判决 + 每个调用点的 file:line 证据**（"谁把路径递给 winsec、
       递之前解没解过"）。判不准就写"未证"并说明缺哪次测量——**不许两种都写成可能**。
-- [ ] **AC#2** 修法落地后 `sh scripts/d22scan.sh` 在**仓外纯净快照**（`git archive <你的 SHA>`，目录带会话后缀）
+      ⇒ **判决 (b)**，四条链的 file:line 与"推翻无环前提"的测量都写在 Progress log 末段（checkpoint 1）。
+- [x] **AC#2** 修法落地后 `sh scripts/d22scan.sh` 在**仓外纯净快照**（`git archive <你的 SHA>`，目录带会话后缀）
       **rc=0**，并把逐作用域台账原样贴出来（`ban #6` 的 35 不许变少）。⚠ 快照目录必须带你的会话后缀。
-- [ ] **AC#3** 一条**反向用例**：构造"未解析形式"的输入（junction / 8.3 短名 / 尾随点空格 任一种真实形状），
+      ⇒ `/tmp/wisp94gate2-94` = `git archive 20b525d`，**rc=0**；台账见下面"门禁读数"段（`ban #6` 35→**37**，只升未降）。
+- [x] **AC#3** 一条**反向用例**：构造"未解析形式"的输入（junction / 8.3 短名 / 尾随点空格 任一种真实形状），
       断言 `PrivateDirAll` **要么拒、要么封到解析后的那一棵**——**不许封到它以为的那棵**。
       并做变异：把修法退回 `filepath.Abs` ⇒ 该用例必须红（锚点=承载行为那一行，同链 grep 证落地，
       还原后 `git diff --quiet` 证干净；**编译失败不算变异**）。
-- [ ] **AC#4** 流程洞（上面那个"按包门禁看不见全仓 ban"）：把它变成**每个代理都会做一次的固定动作**——
+      ⇒ `internal/winsec/resolve_windows_test.go`：真 junction（`mklink /J`）三条子用例，变异红名与 SID 级证据在下面。
+- [x] **AC#4** 流程洞（上面那个"按包门禁看不见全仓 ban"）：把它变成**每个代理都会做一次的固定动作**——
       在本票的 Rules/门禁段里加一条"收尾前必须跑 `sh scripts/d22scan.sh`"，并**实测它跑得起来**（给时长与 rc；
       慢到不可接受就报数字并说明为什么，**不许以"太慢"为由不加**）。
       ⚠ 只登记不改 `ci.yml`（CI 侧的改法是票 85 的地界，别抢）。
-- [ ] **AC#5** 门禁：`gofmt -l` + `gofumpt -l`（**票 89 目前就红在这条上，见下面"附带"**）、
+      ⇒ 固定动作已写进本票"## 门禁（AC#4）"段（`## Rules` 之前）；时长/ rc 在下面读数里。
+- [x] **AC#5** 门禁：`gofmt -l` + `gofumpt -l`（**票 89 目前就红在这条上，见下面"附带"**）、
       `go vet ./internal/winsec/` rc=0、`go test -count=2 ./internal/winsec/` rc=0 并逐条点名 SKIP/FAIL。
+      ⇒ 五项全绿，逐条数字在下面"门禁读数"段；"附带"那条 gofmt 已被票 89 的 `0a3a445` 自行带成 0 行（本票未动）。
 
 ## 附带（同一枚 push 里的第二个红，与本票同批清）
 
@@ -74,6 +81,65 @@ HEAD 上 `gofmt -l internal/winsec/` **不为空**（`winsec_windows.go` 未格�
 `gofmt/gofumpt` 那步会红。**这是纯格式化**（票 70 有先例：`style(70,AC#1): gofumpt … 纯格式化、无行为改动`）。
 ⚠ **但 `internal/winsec/**` 现在是活人的地界**（票 89 在写），所以**谁先交件谁顺手把它带成 0 行**，
 本票在它之后接续。编排者不代跑（共树，A34）。
+
+## 门禁（AC#4：按包门禁结构性看不见全仓 ban ⇒ 固定动作）
+
+本票的教训不是 `winsec` 写错了 API，而是**票 89 把按包门禁全跑绿之后 HEAD 仍然是红的**：
+`bans #1-5` 的作用域是整个 `internal/` 与 `cmd/`，而代理的门禁清单只有 `gofmt/gofumpt/vet <pkgs>/test <pkgs>`。
+⇒ 从今天起本仓每个动 `internal/**` 或 `cmd/**` 的票，**收尾前必须跑一次**（写进票面门禁段，不跑不许勾 AC#5）：
+
+```
+rm -rf /tmp/wisp<票号>gate-<会话> && mkdir -p /tmp/wisp<票号>gate-<会话>
+git archive HEAD | tar -x -C /tmp/wisp<票号>gate-<会话>
+cd /tmp/wisp<票号>gate-<会话> && sh scripts/d22scan.sh   # 期望 rc=0，并把台账逐作用域贴进票面
+```
+
+**实测跑得起来**（本票两次读数）：
+- 基线（HEAD=`15c649f`，独占）：**rc=1**，墙钟 **10.6s**。
+- 交件（HEAD=`20b525d`，与并发的 `go test -count=2 ./internal/winsec/` 同跑，故偏慢）：**rc=0**，墙钟 **43.7s**；
+  其中 `tools/d22scan` 自扫 `go test ./...` 11.3s。慢的唯一原因是并发编译 + `icacls` 争 CPU，**不是脚本本身**，
+  所以这条动作按 10~45s 计价可接受。
+⚠ CI 侧要不要常驻这一步是**票 85 的地界**，本票只登记不改 `.github/workflows/ci.yml`。
+
+## 门禁读数（AC#2/AC#5 的原始数字，快照 `/tmp/wisp94gate2-94` = `git archive 20b525d`）
+
+```
+sh scripts/d22scan.sh                                   → rc=0，d22scan: clean - no D22 ban violations
+d22scan: scope bans #1-5 internal/      examined 197 production Go files
+d22scan: scope bans #1-5 cmd/           examined  20 production Go files
+d22scan: scope ban #6 frontend/         examined  37 text files          （基线 35 ⇒ 只升未降 ✓）
+d22scan: scope ban #7 internal/tools/   examined  17 production Go files
+d22scan: scope ban #8 design/           examined  16 text files
+d22scan: scope ban #8 frontend/         examined  37 text files
+d22scan: scope ban #8 internal/         examined 335 Go files（含注释与 _test.go）
+d22scan: scope ban #8 cmd/              examined  25 Go files（含注释与 _test.go）
+```
+`gofmt -l internal/winsec/ internal/risk/` → 0 行；`gofumpt -l` 同 scope → 0 行；
+`gofmt -l ./internal ./cmd ./tools`（全仓，防我把别处弄红）→ 0 行；`go vet ./internal/winsec/` → rc=0。
+`go test -count=2 -v ./internal/winsec/` → **rc=0**，`=== RUN` 44 行 = 2 × 22 个不同名（12 个顶层 + 10 个子测试）✓，
+`--- SKIP` **0 条**、`--- FAIL` **0 条**（不是"没跑"：44 次 RUN 全有对应 PASS）。
+连带回归（HEAD 基线同样全绿，逐包 rc=0）：`./internal/secret/ ./internal/memory/ ./internal/agent/ ./internal/risk/ ./internal/observe/`。
+⚠ 这条回归本身就是形状的一部分：把未接线的默认做成"响亮拒绝"会让 `internal/secret`/`internal/memory`
+两套 suite 红 **20+ 条**（它们不 link `internal/risk`），实测读数就是内置 verifier 存在的理由。
+
+**AC#3 变异（退回 `filepath.Abs`）的红名与证据**：锚点 = `internal/winsec/winsec.go` 的
+`dir, err := ResolvePath(path)` 那四行；同一条 `&&` 链里先 `grep -n "MUTATION-94"` 证落地、
+`go vet ./internal/winsec/` rc=0 证**不是编译失败**，然后：
+
+```
+--- FAIL: TestAC3JunctionInputIsRefusedNotSealed/existing_directory_behind_the_link
+--- FAIL: TestAC3JunctionInputIsRefusedNotSealed/missing_directory_under_the_link
+--- FAIL: TestAC3JunctionInputIsRefusedNotSealed/with_only_the_built-in_verifier
+PrivateDirAll returned success for a path whose tree lives behind a junction: …\data\link\artifacts
+WRONG TREE SEALED: …\someone-elses-tree\artifacts
+  went from [S-1-1-0(Everyone) S-1-5-32-544 S-1-5-18 S-1-5-21-…-1001]
+        to  [S-1-5-18 ×2 S-1-5-32-544 ×2 S-1-5-21-…-1001 ×2]     ← 外来读授权被我们的封存抹掉
+```
+⇒ 旧写法**确实**把别人的 DACL 重写了（不是"可能"，是 icacls 读数）。还原后
+`git diff --quiet -- internal/winsec/winsec.go` rc=0（共树，全局 diff 不可能干净，故按路径 scope），
+重跑 `go test -run TestAC3JunctionInputIsRefusedNotSealed ./internal/winsec/` → ok。
+内置 verifier 那一腿（`SetPathResolver(nil)`）在同一条用例里独立断 `ErrUnresolvedPath`，
+所以"接线被删掉"也仍然红；`TestC26PipelineIsWiredIntoWinsec` 单独钉住 `risk` 的 `init` 装上了真管道。
 
 ## Rules（本仓固定）
 
@@ -148,3 +214,27 @@ HEAD 上 `gofmt -l internal/winsec/` **不为空**（`winsec_windows.go` 未格�
     断言"要么 `ErrReparseDenied` 拒、要么封到解析后那一棵"，**不许封到它以为的那棵**；
     变异 = 把入口退回 `filepath.Abs` ⇒ 该用例必须红（编译必须过，否则不算变异）。
   next= 落地上述形状 → 写 AC#3 用例 → 跑变异 → AC#4 门禁登记 → AC#5 全量读数 → 纯净快照 d22scan rc=0。
+
+- 2026-09-21 17:1x（agent-ticket94，交件）：五框自勾，代码两枚 commit：`7910bcd`（形状落地）+ `20b525d`
+  （变异复现要打印"封到了哪一棵"）。改动清单：新增 `internal/winsec/resolve.go`（`C26Resolver` seam +
+  `ResolvedPath` 类型 + 内置 verifier）、`internal/winsec/placement_windows.go`（Windows 只验不写的放置检查）、
+  `internal/winsec/resolve_windows_test.go`（AC#3 + 接线 pin）、`internal/risk/winsec_c26.go`（`init()` 把
+  `Resolve(input, nil)` 装进 seam）；修改 `internal/winsec/winsec.go`（五个封存入口动手前先解析，
+  `PrivateDirAll` 的 `filepath.Abs` 消失，封存核心改收 `ResolvedPath`）、`winsec_other.go`（POSIX 腿写明与
+  risk 的 DEFERRED 对齐）。**allowlist 一行未动（仍 5 行非注释）**、`tools/d22scan/**` 未动、
+  `pathresolver*.go`/`assessor.go`/`rules_gateway.go`/`docs/PLAN.md`/`docs/specs/*.md` 一字未改、
+  `frontend/**`/`internal/panel/`/`cmd/wisp/`/`internal/config/`/`internal/agent/` 未碰、`ci.yml` 未碰。
+  需要谁协调：**目前为零** —— 我刻意保住 `PrivateDirAll(string)` 的签名，`internal/memory/open.go:176,188,503`、
+  `internal/secret/store.go:49`、`internal/agent/spill.go:111` 三个人的文件一行没改就能编过，
+  它们的输入现在由 winsec 自己解析/拒绝（读侧 C26 的接线仍是票 18 的活，`internal/memory/open.go`
+  那条 allowlist 也因此**没有**变短：本票不消费它）。
+  留给验收方的两点（我自认的弱处，别当成已证）：
+  ① 内置 verifier 只在 `internal/risk` 没被 link 时才是主角，生产二进制永远走 C26 ⇒ 那条腿的 CI 覆盖
+     靠 `resolve_windows_test.go` 里 `SetPathResolver(nil)` 那一腿撑着；
+  ② `RemoveUnlinked` 明确不解析（理由写在函数注释），但它因此仍能沿着一个 junction 走到"它以为在自己的
+     artifacts 树里"的位置去 unlink —— 那棵树是 `internal/memory/artifacts.go:171,181` 递进来的，
+     要收这个口得先动 memory（票 18/79 的地界），本票没动。
+  票面 numstat 提醒：本次 72 加 6 删 = 5 条 AC 勾框 + 1 条 Status 转换，段落插入部分删除列为 0（标题已重抄）。
+  next= 交给验收方出 `docs/evidence/s1/94-*.md`；编排者可放开 push（HEAD 的 D22 已 rc=0）。
+  若验收方要我把 seam 换成"调用方递已解析类型"的强形状，那需要票 18 或 79 在 memory/secret/agent 三处
+  同步改签名，本票单独做会让别人编译失败。
