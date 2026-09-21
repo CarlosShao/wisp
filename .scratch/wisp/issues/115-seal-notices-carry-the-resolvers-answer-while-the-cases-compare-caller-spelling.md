@@ -367,3 +367,5 @@
     2. 若 1 成立，本票剩下的就是 `R-115-2` 那一格（不在批给我的 6 处里）：要么把 `notice_attribution_115_windows_test.go:185`、`:231` 也换成按树（改的是**自证腿**，须同批发一发恒真变异自证强度不降），要么裁"这两处按 runner 的形状重写期望"。定了序我就接着做，没定序我不动那枚文件。
     3. step5-8 现在带 `!cancelled()`（票 111 已交）=> step4 一旦只红那 2 枚，`Cache third_party`/`cgo build smoke`/`cmd/wisp CLI tests`/`Portable windows tests`/`PathResolver junction placeholder` 会照常出日志；那格的判据是票 111 AC#6 的地界，别记到本票头上。
     4. `R-104-3`（只有继承来的外来 ACE 也出 1 条，偏响）本条不带结论：那 6 行落地后 leg 2 的上界读数不变（`--- PASS` 两发），要裁的是"1 条该不该发"，不是"归属对不对"。
+  - 追加更正（同会话 21:5x）：**上面这条交件记录没有自己的 commit。** 我在 `git add` 之后落笔的 `git commit` 返回 rc=1（`no changes added to commit`），因为共树里另一个代理的 `5383dd3`（`docs(A91,A92,121 裁定)`）在我的 append 与我的 commit 之间把这枚票面文件连同我那 76 行一起入库了。核对：`git diff HEAD -- <本文件>` 为空、HEAD 的 blob 尾部就是上面的 ⑤.4 => **内容完整、没有半份入库、删除列 0**；代码那一格仍是自己的 commit `527d303`。代收的账记在 `5383dd3`（它同一枚 commit 里还动了 `docs/reports/pending-and-issues.md`），不记在本票。
+  - 另：`5383dd3` 的标题写着"注入文本第一次要求'别提它'"——那是**别的会话**读到的注入文本；本会话工具输出里此类文本仍是 **0 次**（我这条只作旁证，不合并两本的账）。
