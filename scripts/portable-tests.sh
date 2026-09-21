@@ -41,9 +41,36 @@
 # CI host has) and named as next= work on the ticket. The registry case that
 # COULD be moved was moved, in the same commit, to syncdirs_windows_test.go.
 #
+# TICKET 111 - THE THREE GUARDS BELOW THE SCOPE, AND WHY THIS SCRIPT OWES THEM.
+# "A package name in a list" and "that package was tested" were never connected
+# here. AC#1's census over CI history found 20 tested packages out of `go list
+# ./...`=33, and the reason is not only the missing five: it is also that an entry
+# with NOTHING behind it cannot fail. internal/session and internal/watchdog are
+# in the list below and have never had a test file - doc.go only, both marked
+# "DEFERRED: implemented by ticket 28 / 42, this ticket only freezes the package
+# boundary" - and a third case (internal/agent/scheduler) was reachable only
+# because the list said ./internal/agent/... . Measured, not argued:
+# `runtests.sh ./internal/session/` alone exits 1 (no top-level result at all),
+# but INSIDE a 23-package invocation the strict runner's "PASS>0" test is
+# satisfied by the other packages, so the empty one contributes nothing and stays
+# invisible forever. That is why the scope is now resolved to import paths and
+# audited per package by three guards, none of which can be talked around:
+#   GUARD A (AC#3)  a declared package that compiles ZERO test files on this
+#                   platform is a red step - the entry must gain a denominator
+#                   or leave the list out loud;
+#   GUARD B (AC#2)  every declared package must print its OWN top-level result
+#                   line in this run, matched anchored and literal, so "the word
+#                   appeared in the log" can never count as "the package ran";
+#   GUARD C (AC#3)  the named scopes pin their resolved import paths, so
+#                   deleting an entry (or a glob quietly narrowing) fails the
+#                   step instead of shortening the run.
+#
 # Usage:
-#   bash scripts/portable-tests.sh                      # the 16-package CI portable scope
-#   bash scripts/portable-tests.sh ./internal/proc/ ... # a narrower scope (windows job)
+#   bash scripts/portable-tests.sh                    # the core (ubuntu) CI scope
+#   bash scripts/portable-tests.sh --scope=windows    # the test-windows scope
+#   bash scripts/portable-tests.sh --scope=cli        # cmd/wisp, after third_party
+#   bash scripts/portable-tests.sh ./internal/proc/   # explicit scope (A and B still
+#                                                     # apply; C has nothing to pin)
 set -eu -o pipefail
 
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -57,26 +84,220 @@ if [ ! -f "$strict" ]; then
     exit 2
 fi
 
-# The scope CI's test-core job runs, stated once; ci.yml points here so the list
-# cannot drift between a workflow edit and a local re-run.
-scope=()
-if [ $# -eq 0 ]; then
-    scope=(
-        ./internal/agent/... ./internal/llm/... ./internal/config/...
-        ./internal/memory/... ./internal/observe/... ./internal/secret/...
-        ./internal/risk/... ./internal/statemachine/... ./internal/session/...
-        ./internal/watchdog/... ./internal/tools/... ./internal/models/...
-        ./internal/buildinfo/... ./internal/audio/... ./internal/proc/...
-        ./internal/panel/...
-    )
-else
-    scope=("$@")
-fi
+# The scopes CI runs, stated once, here - ci.yml names a scope, it does not carry
+# a package list. That move is ticket 111 AC#2's: a workflow line naming a package
+# is not evidence the package was tested, and the guard that makes deleting one
+# fail loudly (GUARD C) only works if the list and its pin live together.
+#
+#   core    test-core (ubuntu). Every portable package with a test denominator on
+#           both platforms. ./internal/session/ and ./internal/watchdog/ USED to
+#           be here and are gone: they are doc.go-only boundary stubs
+#           (DEFERRED: ticket 28 / ticket 42), so they could never go red and
+#           never proved anything. ./internal/agent/... is spelled out as agent +
+#           agent/approval for the same reason - the glob was quietly carrying
+#           agent/scheduler, a third doc.go-only stub. When those packages get
+#           code, put them back: GUARD A rejects them until they have a test file,
+#           so re-entry cannot be lazy.
+#   windows test-windows' portable step.
+#   cli     cmd/wisp, whose test binary needs the sherpa DLLs (ticket 98's load
+#           hole) - run by scripts/wisp-cli-tests.sh, which stages them first.
+mode=core
+case "${1-}" in
+    --scope=*) mode=${1#--scope=}; shift ;;
+esac
 
+# Each named scope carries the set its globs resolve to, on one line per import
+# path. GUARD C compares against this, and --scope=census reads it, so the list a
+# step claims and the audit of that claim cannot be maintained apart. Refresh with:
+#   bash scripts/portable-tests.sh --scope=census
+core_pin='
+github.com/CarlosShao/wisp/cmd/llmrecord
+github.com/CarlosShao/wisp/internal/agent
+github.com/CarlosShao/wisp/internal/agent/approval
+github.com/CarlosShao/wisp/internal/audio
+github.com/CarlosShao/wisp/internal/ball
+github.com/CarlosShao/wisp/internal/buildinfo
+github.com/CarlosShao/wisp/internal/config
+github.com/CarlosShao/wisp/internal/llm
+github.com/CarlosShao/wisp/internal/llm/adaptertest
+github.com/CarlosShao/wisp/internal/llm/anthropic
+github.com/CarlosShao/wisp/internal/llm/golden
+github.com/CarlosShao/wisp/internal/llm/openaichat
+github.com/CarlosShao/wisp/internal/llm/openairesponses
+github.com/CarlosShao/wisp/internal/memory
+github.com/CarlosShao/wisp/internal/models
+github.com/CarlosShao/wisp/internal/observe
+github.com/CarlosShao/wisp/internal/panel
+github.com/CarlosShao/wisp/internal/perm
+github.com/CarlosShao/wisp/internal/plugin
+github.com/CarlosShao/wisp/internal/proc
+github.com/CarlosShao/wisp/internal/risk
+github.com/CarlosShao/wisp/internal/secret
+github.com/CarlosShao/wisp/internal/statemachine
+github.com/CarlosShao/wisp/internal/tools
+'
+win_pin='
+github.com/CarlosShao/wisp/cmd/llmrecord
+github.com/CarlosShao/wisp/internal/ball
+github.com/CarlosShao/wisp/internal/config
+github.com/CarlosShao/wisp/internal/perm
+github.com/CarlosShao/wisp/internal/plugin
+github.com/CarlosShao/wisp/internal/proc
+github.com/CarlosShao/wisp/internal/risk
+github.com/CarlosShao/wisp/internal/secret
+'
+cli_pin='
+github.com/CarlosShao/wisp/cmd/wisp
+'
+winsec_pin='
+github.com/CarlosShao/wisp/internal/winsec
+'
+
+scope=()
+pinned=''
+case $mode in
+core)
+    scope=(
+        ./internal/agent/ ./internal/agent/approval/
+        ./internal/llm/... ./internal/config/...
+        ./internal/memory/... ./internal/observe/... ./internal/secret/...
+        ./internal/risk/... ./internal/statemachine/...
+        ./internal/tools/... ./internal/models/...
+        ./internal/buildinfo/... ./internal/audio/... ./internal/proc/...
+        ./internal/panel/... ./internal/ball/ ./internal/perm/
+        ./internal/plugin/ ./cmd/llmrecord/
+    )
+    pinned=$core_pin
+    ;;
+windows)
+    scope=(
+        ./internal/proc/ ./internal/secret/ ./internal/config/ ./internal/risk/
+        ./internal/ball/ ./internal/perm/ ./internal/plugin/ ./cmd/llmrecord/
+    )
+    pinned=$win_pin
+    ;;
+cli)
+    # cmd/wisp's own tests. Only scripts/wisp-cli-tests.sh may call this, because
+    # the test binary dies at LOAD time without the sherpa DLLs on PATH (ticket
+    # 98), and that script stages them and refuses to run if they are not there.
+    scope=(./cmd/wisp/)
+    pinned=$cli_pin
+    ;;
+census)
+    scope=()
+    pinned=''
+    ;;
+*)
+    echo "portable-tests.sh: unknown --scope=$mode (known: core, windows, cli, census)" >&2
+    exit 2
+    ;;
+esac
 goos=$(go env GOOS)
 if [ -z "$goos" ]; then
     echo "portable-tests.sh: go env GOOS came back empty" >&2
     exit 2
+fi
+
+if [ "$mode" = census ]; then
+    # GUARD A's numbers for EVERY package in the module, plus which named scope
+    # claims it. `t=`/`x=` are the test files that COMPILE INTO THIS PLATFORM's
+    # test binary, so a build tag that empties a package on one platform shows up
+    # as 0 there and non-zero on the other. A NO-SCOPE row is zero coverage said in
+    # the same voice as a covered one, which is what AC#1 asked for: the ticket's
+    # "CI 测了 20/33" claim is only meaningful if the other 13 are on the page.
+    all=$(go list ./... 2>/dev/null | sort -u)
+    n=$(printf '%s\n' "$all" | grep -c . || true)
+    echo "portable-tests.sh: census GOOS=$goos - go list ./... = $n packages (one row each)"
+    printf 'portable-tests.sh: %-46s %-11s %s\n' PACKAGE 'TESTS(t/x)' 'CLAIMED BY'
+    empty=0
+    noscope=0
+    while IFS= read -r p; do
+        [ -n "$p" ] || continue
+        counts=$(go list -f '{{len .TestGoFiles}}/{{len .XTestGoFiles}}' "$p" 2>/dev/null || echo '?/?')
+        where=''
+        for m in core windows cli winsec; do
+            case $m in
+            core) pin=$core_pin ;; windows) pin=$win_pin ;; cli) pin=$cli_pin ;;
+            winsec) pin=$winsec_pin ;;
+            esac
+            if printf '%s\n' "$pin" | grep -qxF "$p"; then where="$where$m"; fi
+        done
+        if [ -z "$where" ]; then where=' NO-SCOPE'; noscope=$((noscope + 1)); fi
+        case $counts in
+        0/0) empty=$((empty + 1)); where="$where <-NO-TESTS" ;;
+        esac
+        printf 'portable-tests.sh: %-46s %-11s %s\n' "$p" "$counts" "$where"
+    done <<<"$all"
+    echo "portable-tests.sh: census totals: packages=$n with-zero-compiled-tests=$empty claimed-by-no-scope=$noscope"
+    exit 0
+fi
+
+if [ $# -gt 0 ]; then
+    # Explicit paths are the local-debug form (and how winsec-tests.sh delegates).
+    # GUARD A and GUARD B still apply to whatever is named; only GUARD C's pin is
+    # skipped, because an ad-hoc list has no expectation to be faithful to.
+    scope=("$@")
+    pinned=''
+fi
+if [ ${#scope[@]} -eq 0 ]; then
+    echo "portable-tests.sh: empty scope (mode=$mode) - refusing to be a green no-op" >&2
+    exit 2
+fi
+
+# ---- resolve the scope once, so all three guards read the same truth ---------
+resolved=$(mktemp 2>/dev/null || echo "$root/.portable-resolved.$$.txt")
+if ! go list "${scope[@]}" >"$resolved" 2>&1; then
+    cat "$resolved"
+    echo "portable-tests.sh: go list [${scope[*]}] failed - the scope cannot be audited" \
+        "against a pattern that does not resolve." >&2
+    rm -f "$resolved"
+    exit 1
+fi
+grep -v '^$' "$resolved" | sort -u >"$resolved.sorted" || true
+mv "$resolved.sorted" "$resolved"
+pkgcount=$(wc -l <"$resolved" | tr -d '[:space:]')
+
+# GUARD C: the named scopes pin their own resolved set. Deleting an entry from the
+# list above, or letting a glob quietly stop covering a package, is a red step -
+# not a run that tests one fewer thing and prints the same green. This is the
+# shape ticket 93's "条目腐坏即红" and winsec-tests.sh's guard 1 already use; it
+# fires in BOTH directions, so renaming ball into a package nobody named is caught
+# too.
+if [ -n "$pinned" ]; then
+    want=$(printf '%s\n' "$pinned" | grep -v '^[[:space:]]*$' | sort -u)
+    got=$(cat "$resolved")
+    if [ "$want" != "$got" ]; then
+        {
+            echo "portable-tests.sh: GUARD C - scope mode=$mode resolved to a DIFFERENT package"
+            echo "portable-tests.sh:   set than the one pinned next to it. Pinned: $(printf '%s\n' "$want" | wc -l | tr -d '[:space:]'), resolved: $pkgcount."
+            diff <(printf '%s\n' "$want") <(printf '%s\n' "$got") | sed 's/^/portable-tests.sh:   /' || true
+            echo "portable-tests.sh: a deleted or newly-uncovered package must fail the step, not"
+            echo "portable-tests.sh: shorten it. Either restore the scope entry or update the pin"
+            echo "portable-tests.sh: in the SAME commit and say why in the CI log."
+        } >&2
+        rm -f "$resolved"
+        exit 1
+    fi
+fi
+
+# GUARD A: the loud empty denominator. `.TestGoFiles`+`.XTestGoFiles` are the
+# files that COMPILE INTO THIS PLATFORM's test binary, so a build tag that
+# excludes a package's tests on this GOOS is caught here as well as a missing
+# file. An entry like this can never go red and never proves anything, which is
+# the exact hole internal/session and internal/watchdog sat in.
+denom=$(go list -f '{{if or .TestGoFiles .XTestGoFiles}}{{else}}EMPTY {{.ImportPath}}
+{{end}}' "${scope[@]}" | grep '^EMPTY ' || true)
+if [ -n "$denom" ]; then
+    {
+        echo "portable-tests.sh: GUARD A - these packages are declared in scope mode=$mode but"
+        echo "portable-tests.sh:   compile NO test file at all for GOOS=$goos:"
+        printf '%s\n' "$denom" | sed 's|^|portable-tests.sh:   |'
+        echo "portable-tests.sh: a scope entry with no denominator cannot fail, so keeping it there"
+        echo "portable-tests.sh: is a false claim of coverage (ticket 111 AC#3). Give the package a"
+        echo "portable-tests.sh: test, or take the entry out and say where its coverage lives."
+    } >&2
+    rm -f "$resolved"
+    exit 1
 fi
 
 # name|package|platform|class|reason
@@ -201,6 +422,63 @@ if [ "$skipped" -ne 0 ]; then
     grep -B1 -- '^--- SKIP' "$capture" >&2 || true
 fi
 
-rm -f "$capture"
+# GUARD B (ticket 111 AC#2 + AC#8): a package counts as tested only if THIS run
+# printed a top-level result line for its exact import path.
+#
+# The anchor is the whole point. R-110-3 is a matching expression that let a bare
+# substring "winsec" be read as 18 hits when the package was tested 0 times; the
+# general form of that mistake is "the word appears in the log" == "the package
+# ran". So: line-anchored to ^ok/FAIL (a result line Go prints once per package),
+# the import path regex-ESCAPED (an unescaped `.` in github.com/... matches any
+# character, so internalXwinsec would vouch for internal/winsec), and followed by
+# whitespace or end-of-line, which is what keeps internal/winsecfrom counting for
+# internal/winsec. A seeded positive control is on the ticket: a test that only
+# PRINTS another package's name contributes nothing to this table.
+escape_re() { printf '%s' "$1" | sed 's/[][\\^$.*+?(){}|]/\\&/g'; }
+# Go's package result line is `ok  \t<import path>\t0.123s`, tab-delimited with a
+# duration (or `[build failed]`). Demanding that tail is what keeps a test that
+# writes `os.Stdout.WriteString("ok  github.com/...internal/perm\t0.01s")` from
+# impersonating a package: it can fake the prefix at column 0, faking the whole
+# shape plus being inside the right package's output block is a different claim.
+# The residual limit is stated rather than hidden: this is a line-shape match on
+# captured output, not a property of the go test protocol. The `-count=1` the
+# strict runner forces is what makes `[no test files]` and `(cached)` impossible
+# to confuse with a real run here.
+result_tail='[[:space:]]+([0-9]+\.[0-9]+s|\[build failed\])$'
+
+missing=0
+declare -A per_pkg=()
+while IFS= read -r pkg; do
+    [ -n "$pkg" ] || continue
+    line=$(grep -E "^(ok|FAIL)[[:space:]]+$(escape_re "$pkg")${result_tail}" "$capture" | tail -1 || true)
+    if [ -z "$line" ]; then
+        per_pkg["$pkg"]='<NO TOP-LEVEL RESULT LINE> missing'
+        missing=$((missing + 1))
+    else
+        case $line in
+        ok*) per_pkg["$pkg"]="ok (ran)" ;;
+        *) per_pkg["$pkg"]="FAIL (ran, and said so)" ;;
+        esac
+    fi
+    printf 'portable-tests.sh:   %-14s %s\n' "${per_pkg[$pkg]}" "$pkg"
+done <"$resolved"
+
+if [ "$missing" -ne 0 ]; then
+    {
+        echo "portable-tests.sh: GUARD B - $missing of $pkgcount packages in scope mode=$mode printed"
+        echo "portable-tests.sh:   NO top-level result line, so this step tested them ZERO times:"
+        for p in "${!per_pkg[@]}"; do
+            if [ "${per_pkg[$p]}" = '<NO TOP-LEVEL RESULT LINE> missing' ]; then
+                echo "portable-tests.sh:   $p"
+            fi
+        done
+        echo "portable-tests.sh: a package that goes missing here is one that a build tag emptied, that"
+        echo "portable-tests.sh: was renamed, or that the run never reached. That is a red, not a run"
+        echo "portable-tests.sh: that got shorter (ticket 111 AC#2/AC#8)."
+    } >&2
+    if [ "$rc" -eq 0 ]; then rc=1; fi
+fi
+
+rm -f "$capture" "$resolved"
 [ "$rc" -eq 0 ] || echo "portable-tests.sh: strict runner exited $rc for scope=[${scope[*]}]" >&2
 exit "$rc"

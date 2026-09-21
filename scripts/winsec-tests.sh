@@ -100,7 +100,27 @@ failed=$(count '^--- FAIL')
 skipped=$(count '^--- SKIP')
 
 # guard 2: the package itself must have booked a top-level result.
-result_line=$(grep -E "^(ok|FAIL)[[:space:]]+$pkgpath([[:space:]]|$)" "$capture" || true)
+#
+# TICKET 111 AC#8 - R-110-3 is this line's disease, not a hypothetical. The
+# original form of the audit was a loose substring search for "winsec" over the
+# log, which counted 18 hits in a run where the package was tested 0 times: "the
+# word is in the output" and "this package ran" are different claims, and only the
+# second one belongs in a coverage denominator. Three things are pinned here:
+#   1. the line is anchored to ^ok/FAIL, the two tokens Go uses ONLY for a
+#      package-level result, so a test that merely prints the path (a log line, a
+#      t.Log of a golden path, this very script's own echo) cannot match;
+#   2. the path is regex-ESCAPED. It came from `go list` and contains dots -
+#      unescaped, `github.com/...internal/winsec` also matches
+#      `githubXcom/...internal/winsec`, i.e. the separator is a wildcard;
+#   3. the match must be followed by whitespace or end-of-line, so
+#      internal/winsecfoo or internal/winsec_extra cannot vouch for
+#      internal/winsec. A positive control that plants a package name ONLY inside
+#      a test's log output is on the ticket (AC#8), and it contributes 0 here.
+# What this guard cannot see is a package that produces a result line but no test
+# (`ok  path  [no test files]`) - that hole is closed one level down, by GUARD A
+# of scripts/portable-tests.sh, which this script delegates to.
+esc_pkgpath=$(printf '%s' "$pkgpath" | sed 's/[][\\^$.*+?(){}|]/\\&/g')
+result_line=$(grep -E "^(ok|FAIL)[[:space:]]+${esc_pkgpath}[[:space:]]+([0-9]+\.[0-9]+s|\[build failed\])$" "$capture" | tail -1 || true)
 if [ -z "$result_line" ]; then
     echo "winsec-tests.sh: GUARD 2 - the run printed NO top-level result line for" \
         "$pkgpath, so this step tested the package it is named for zero times." >&2

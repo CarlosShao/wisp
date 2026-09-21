@@ -56,15 +56,23 @@ jobs:
         #
         # WHY THIS STEP IS AT THE TOP OF THE JOB (ticket 71 finding, 2026-09-21):
         # it used to sit BELOW gofmt/vet/staticcheck, and GitHub skips every step
-        # after the first failure. `go vet (module)` has been red on ubuntu since
-        # fd8f838 (portable internal/ball/statevisual.go calls mulA, defined only
-        # in renderer_windows.go) - so this gate's CI verdict has literally never
-        # been produced, on any run, while the job printed a red we attributed to
-        # "the code" rather than to "the step that never got here". Reproduced
-        # locally without CI: `GOOS=linux go vet ./internal/ball/` -> undefined:
-        # mulA. Running the scan FIRST means a platform-build complaint can never
-        # again hide the D22 result. No step was removed, reordered into
+        # after the first failure. At the time `go vet (module)` was red on ubuntu
+        # - fd8f838 had portable internal/ball/statevisual.go calling mulA, which
+        # is defined only in renderer_windows.go - so this gate's CI verdict had
+        # literally never been produced, on any run, while the job printed a red we
+        # attributed to "the code" rather than to "the step that never got here".
+        # Running the scan FIRST means a platform-build complaint can never again
+        # hide the D22 result. No step was removed, reordered into
         # skippability, or given continue-on-error (D22 run-away mode 6).
+        #
+        # CORRECTION, recomputed by ticket 111 so the example above is not read as
+        # a current fact: `go vet (module)` is GREEN on ubuntu today (run
+        # 35600043583 step 7 = success; and in a real container `go vet ./...` is
+        # rc=0 with cgo on, rc=1 only for cmd/wisp with cgo off). The ball/mulA
+        # case is fixed. The same disease in this job is now elsewhere and still
+        # live: `staticcheck` fails and its dependent `mockllm module vet` reports
+        # `skipped` in that same run - ticket 85's instrument hole, which is why
+        # the guard below was added to that step and why the ordering rule stays.
         run: sh scripts/d22scan.sh
 
       - name: gofmt (gofumpt)
@@ -90,6 +98,17 @@ jobs:
           staticcheck ./...
 
       - name: mockllm module vet
+        # Ticket 111 AC#5/AC#6, same shape as test-windows: this is a gate for a
+        # SEPARATE module (tools/mockllm, which nothing else in this job vets) and
+        # in run 35600043583 job 106334066361 it reported `skipped` because
+        # `staticcheck` two steps above it was red. A step that only gets to
+        # answer when a different tool succeeds has no CI verdict, which is the
+        # sentence this repo has now written four times. The guard is the only
+        # change; `staticcheck` itself is untouched - its own hole
+        # ("export data version 4 is greater than maximum supported version 2", so
+        # it has never produced a finding) is ticket 85's and is deliberately not
+        # fixed here.
+        if: ${{ !cancelled() }}
         run: go vet ./...
         working-directory: tools/mockllm
 
@@ -140,7 +159,7 @@ jobs:
         # on moved.
         run: bash tools/d22scan/runtests.sh ./internal/proc/ -run TestLayoutForTestEnv
 
-      - name: Portable package tests (agent/llm/config/memory/observe/secret/risk/statemachine/...)
+      - name: Portable package tests (core scope; the list and its guards live in scripts/portable-tests.sh)
         # Ticket 93: this used to be a bare `go test <16 packages> -count=1`, and
         # Go books a SKIP as `ok` - so a case that could not evaluate anything
         # (internal/risk's TestSyncRegistryProbeLive, skipping on both platforms)
@@ -150,7 +169,19 @@ jobs:
         # at all" are all fatal) and adds a per-platform, reason-carrying,
         # re-verified ledger for the cases that are declared out of scope. The
         # package list lives in that script, not here.
-        run: bash scripts/portable-tests.sh
+        #
+        # TICKET 111 moved the list behind a NAME (`--scope=core`) and added three
+        # guards to it, because "the scope has a row for X" was never the same
+        # claim as "X was tested": internal/session and internal/watchdog were rows
+        # of that kind, with zero test files behind them (doc.go boundary stubs),
+        # and a ./internal/agent/... glob was quietly carrying a third (scheduler).
+        # An entry with no denominator cannot go red, so it cannot be evidence. The
+        # scope now pins its own resolved package set, rejects any declared package
+        # that compiles no test file on this platform, and requires every one of
+        # them to print its own anchored top-level result line. Four packages with
+        # tests and no CI step were pulled in on the way: internal/ball,
+        # internal/perm, internal/plugin, cmd/llmrecord.
+        run: bash scripts/portable-tests.sh --scope=core
 
       - name: Stop compose services
         if: always()
@@ -159,6 +190,43 @@ jobs:
   # -------------------------------------------------------- test-windows ----
   # cgo build smoke (clean-clone + build.ps1, S0 done criterion) + the
   # PathResolver junction placeholder (real cases land with tickets 18/20).
+  #
+  # EVERY STEP BELOW THE SETUP ONES CARRIES `if: ${{ !cancelled() }}` (ticket 111
+  # AC#6). Read this before touching it, because the shape looks like a relaxation
+  # and is the opposite:
+  #
+  # GitHub applies a default status check of `success()` to every step, so the
+  # first red step skips all the rest. Ticket 110 added the winsec gate as this
+  # job's FIRST test step so it could not be masked (its AC#5 reasoning is in that
+  # step's comment) - and in doing so turned the job into: winsec red => the cgo
+  # build smoke, the portable windows tests and the PathResolver case all report
+  # `skipped`. Measured twice, on two runs:
+  #   run 35595651898 job 106319703680: step 4 "Windows ACL sealing gate"
+  #     =failure, the next four steps =skipped (those four were all `success` on
+  #     the run immediately before it).
+  #   run 35600043583 job 106334066496 (dev @ d13e597, 2026-09-21 12:31Z): same
+  #     shape, STILL LIVE - gate=failure, 5..8=skipped.
+  # So adding one gate made the windows leg's NET COVERAGE NEGATIVE: one red test
+  # file in internal/winsec now hides a build regression and two other gates. The
+  # gate is not the problem; the skipping is.
+  #
+  # WHY `!cancelled()` AND NOT `always()`: the runner applies the default
+  # `success()` check unless the step names a status function, so both do get the
+  # step to run. But `always()` "returns true even when canceled", and the
+  # workflow-syntax docs warn against using it for anything that could hit a
+  # critical failure (a cancelled job can leave such a step running until the
+  # 360-minute timeout); their recommended form for exactly this case is
+  # `if: ${{ !cancelled() }}`. It runs on green, runs on red, and stands down on
+  # cancel. The `${{ }}` cannot be omitted here: an expression that starts with
+  # `!` must be braced or quoted, because `!` is reserved notation.
+  #
+  # WHY THIS IS NOT A DOOR REMOVED (the two forbidden shapes, both absent): no
+  # step was deleted, and NO step here carries `continue-on-error`, whose entire
+  # documented meaning is "prevents a job from failing when a step fails". A step
+  # run under `!cancelled()` that exits non-zero still fails the job exactly as
+  # before - the only change is that the steps after it also get to answer. AC#6's
+  # criterion is therefore per-step, not per-job: in ONE run the winsec gate may be
+  # red AND every step after it must carry its own conclusion.
   test-windows:
     runs-on: windows-latest
     env:
@@ -172,6 +240,11 @@ jobs:
 
       - name: "Windows ACL sealing gate (internal/winsec's own tests, ticket 110)"
         shell: bash
+        # AC#6 (ticket 111): this gate is the step whose red used to eat the four
+        # steps below it. It stays FIRST inside the job (ticket 110 AC#5 - it must
+        # not sit behind `cgo build smoke`, which has been red before) and it is
+        # itself guarded so a red checkout/setup cannot make it inconclusive.
+        if: ${{ !cancelled() }}
         # WHY THIS STEP EXISTS (ticket 110 AC#1, read off run 35591482293): the
         # string `ok github.com/CarlosShao/wisp/internal/winsec` appeared ZERO
         # times in that run's logs. The windows job's two test steps covered
@@ -209,15 +282,42 @@ jobs:
         run: bash scripts/winsec-tests.sh
 
       - name: Cache third_party (deps.toml key)
+        if: ${{ !cancelled() }}
         uses: actions/cache@v4
         with:
           path: third_party
           key: wisp-third_party-${{ hashFiles('deps.toml') }}
 
       - name: "cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)"
+        # AC#6: red on run 35551819606 before, and skipped behind the winsec gate
+        # since ticket 110 - a build gate that only gets to answer when the ACL
+        # tests pass. Now it always answers.
+        if: ${{ !cancelled() }}
         run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -Env dev
 
-      - name: Portable windows tests (proc/secret/config/risk)
+      - name: "cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4)"
+        # AC#4 asked whether this package can be tested on CI at all, and forbade
+        # answering from the laptop. It was measured on both legs - see
+        # scripts/wisp-cli-tests.sh's header for the four readings. Short version:
+        # on windows its 33 top-level cases go PASS=33 FAIL=0 SKIP=0 rc=0 once the
+        # pinned third_party/sherpa-onnx DLLs are on PATH, which is exactly what
+        # the cache step and build.ps1 above produce; the same command without them
+        # is ticket 98's `0xc0000135` before a single test runs. On ubuntu the
+        # binary builds and runs but 19 of its cases are red, which is a finding
+        # for the package owner and is written up on the ticket rather than being
+        # wired into this job.
+        #
+        # WHY IT SITS HERE AND NOT HIGHER: it is the only step in the job that
+        # consumes another step's product, so it must follow the third_party
+        # staging. That is a dependency, not a masking risk - with `!cancelled()`
+        # on all five steps, being unable to run because the DLLs are absent is
+        # reported by the script as a named setup failure (a red) instead of an
+        # inconclusive skip.
+        shell: bash
+        if: ${{ !cancelled() }}
+        run: bash scripts/wisp-cli-tests.sh
+
+      - name: Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)
         # Same disease as the ubuntu step above (ticket 93): bare `go test` books
         # a SKIP as `ok`, and this scope contains one - internal/proc's
         # TestHelperProcess, the re-exec child entry point, which skips every
@@ -243,8 +343,15 @@ jobs:
         # and this step goes red. Widening the scope to all of internal/risk
         # also moved 201 previously windows-untested assertions into the
         # denominator (measured on that host: PASS=201 FAIL=0 SKIP=0, rc=0).
+        # The package list moved INTO scripts/portable-tests.sh as the named
+        # `windows` scope (ticket 111 AC#2/AC#3): ci.yml carrying it inline is the
+        # "配置里有一行 = 它跑过了" claim this repo keeps getting bitten by. The
+        # script now pins the resolved import paths, so dropping an entry from the
+        # list fails the step instead of shortening the run, and every package it
+        # claims to test must print its own top-level result line.
         shell: bash
-        run: bash scripts/portable-tests.sh ./internal/proc/ ./internal/secret/ ./internal/config/ ./internal/risk/
+        if: ${{ !cancelled() }}
+        run: bash scripts/portable-tests.sh --scope=windows
 
       - name: "PathResolver junction placeholder (real cases tickets 18/20)"
         # bash + runtests.sh (ticket 71 AC#3): the file that declares this test is
@@ -259,6 +366,7 @@ jobs:
         # test` exit code unchanged (registry A43② documents the same discipline
         # for the vet failure that hid this gate).
         shell: bash
+        if: ${{ !cancelled() }}
         run: bash tools/d22scan/runtests.sh ./internal/risk/ -run TestPathResolverJunctionWindows
 
   # ------------------------------------------------------------- slo-smoke --
