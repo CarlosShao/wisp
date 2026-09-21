@@ -3,6 +3,12 @@
 **Status:** **in progress**（AC#2 / AC#5 / AC#7 已交 `63ef895`；AC#1 PARTIAL）/ 原 claimed（2026-09-21 14:0x，`agent-ticket77` 已认领并开工，
 **2026-09-21 16:5x 由 `agent-ticket77b` 接续**（前任撞 150 轮上限，断点见编排者 16:2x 那条与我的 16:5x 那条），
 按 owner 拍的板：**基座 = Beautiful UI**，一期 **React Bits 零代码进树**）。
+> **2026-09-21 15:1x 第三任 `agent-ticket77d` 的 Status 快照（不覆盖上面那行，只追加）**：
+> AC#1 / AC#3 / AC#4 的**判据数字全部到位**（见 Progress log 14:5x 与 15:1x 两条），
+> 四框**仍不勾**，且每一框只剩同一段"最后 mile"：**真 WebView2 host（票 33）与 bridge 推送（票 35）不在这棵树里**
+> ——AC#4 另欠 `tools/d22scan` 里 ban #8 的 `frontend/` 作用域那一行（编排者地界，见 15:1x 条末）。
+> AC#6 的 `lint-frontend` job **已写进 `ci.yml` 但无 run id**（本票不许 push）⇒ 框不勾，
+> **明写"欠 push 后复跑"**，不许用"本地 6 步 rc=0"替代（`npm ci` 那步本地**故意没跑**，理由见 15:1x 条）。
 上一状态：**unblocked**（2026-09-21 13:5x，owner 第二次指令 ⇒ 裁定 **R19**）——
 他挑完了动画组件（12 条清单在 R19 表里），并且给了**排序**：
 **第一版只用 Beautiful UI 那套 agent 组件为基座（+ shadcn 基础件 + Tailwind），React Bits 二期再叠。**
@@ -264,3 +270,65 @@ C21、D23/§17 零 emoji 图标、D29 人工视觉签收、ban #6 / ban #8
   另 `go test ./cmd/wisp/` 在本机**加载期就 rc=1（`0xc0000135`）**，纯净树 `git archive 63ef895` 同读数 ⇒ 仪器问题，登记不追。
   `next=` AC#3（L2 卡的**渲染证据**：由 `internal/risk` 真决策对象驱动、并给出 DOM/字符串级"这些值真被画出来了"的证明）
   → 之后 AC#6（CI job 的真实 run id，本票不能 push，只能写"欠 push 后复跑"）。
+
+- **15:1x `agent-ticket77d` 第二枚 checkpoint：AC#3 拿到渲染证据 + AC#1 拿到真半嵌红 + AC#6 job 落盘（无 run id）**。
+  **AC#3（渲染证据到位，框仍不勾，欠的是 host/pump）**：新文件 `frontend/scripts/render-l2.tsx`
+  用 `react-dom/server` 渲**生产根** `src/App.tsx → PanelSkeleton → L2ApprovalCard`，
+  输入是 `wisp.exe panel-assets -l2 fs.delete -irreversible delete -- "C:/Users/swq/Documents/notes.md"` 的 JSON。
+  为此给 `-l2` 探针补了一条 `-irreversible <ops>`：`risk.Facts.Irreversible` 是**被判断的输入**，
+  CLI 不给就永远出不来 R8 ⇒ 真读数 **level=L2 rules=[R1 R8]
+  reason="R1: 工具声明为下界（L1）; R8: 不可逆操作（永久删除）"**（此前只能到 L1/R1）。
+  **判据全部由输入派生，脚本里没有一个被断言的字面量**（否则就等于"卡恰好画了这些字"）：
+  rc=0、**1 card / 6885 B HTML**；grep 实到 `>L2<` ×1、`fs.delete` ×2、`R1` ×1、`R8` ×1、
+  原因行 ×1、`cli &gt; panel-assets` ×1、`判定来自 原生风险评估` ×1、卡标题 `需要你的确认` ×1。
+  **两条负向对照**：(a) 上游 demo 的问卷串（`How many flavors should we launch?` / `Chocolate chips` /
+  `Send answers`）在 HTML 里 **0 命中**；(b) 卡数必须等于 pending 数（防止"少画一张卡"读成绿）。
+  **Q-23 fail-closed 的渲染级证据**：把同一 JSON 改成 `reasonKnown:false` + `reason:""` 再渲
+  ⇒ rc=0、`信息不足` ×1、原原因文本 ×0（真没了）、`>L2<` 仍 ×1（**没有降级成看起来安全的空位**）。
+  **变异检验（证明这整套断言有牙）**：把渲染目标临时换成 vendored demo `approval-card.tsx` ⇒
+  **rc=1 / 10 条点名失败**（8 条"渲不出真值"+1 条"0 cards for 1 pending"+1 条"带着 demo 串"）。
+  还原后 `sha256sum` 与快照同串、`diff` 0 行、`npm run render:l2` 重新 rc=0。
+  **同一份真 JSON 已固化为 `frontend/fixtures/l2-card-fs-delete.json`**（与 CLI 输出 `diff` 为空），
+  CI 无 Go 也能重放。**为什么放 `scripts/` 不放 `src/`**：它 `import node:fs` 读文件，
+  放进 `frontend/src` 会被 AC#5 的 `TestPanelFrontendIsStateless`（扫 7 类持久化 API 含 `node:fs`）判红——
+  而给那条用例开例外就是削弱 AC#5 ⇒ 代价如实记在这里：**该文件不被 `tsc -b` 覆盖**（`vite build --ssr` 会做语法转换、`oxlint` 会扫它），
+  它渲染的 `src/**` 仍在 typecheck 范围内。**还欠的两件（不在本票地界）**：① 生产装配根今天是
+  `cmd/wisp/panel_assets.go` 的 `-l2` 诊断分支，真事件流是票 35 的 bridge 推送 + 票 33 的 WebView2 host；
+  ② 真浏览器里的 DOM（本证据是 `renderToStaticMarkup` 的 HTML 串，React 自己画的，但没有 layout/paint）。
+  **AC#1 补上"真半嵌红"（不再是合成 bundle）**：`mv frontend/dist/assets/index-UL9kYvYl.js` 出 embed 目录
+  → `go build` 得到 3 文件的二进制（entry 在、`Built()=true`）→ **`wisp.exe panel-assets -check` rc=1**
+  并点名 `index.html references "./assets/index-UL9kYvYl.js" but the embedded bundle cannot serve it`；
+  `npm run build` 重生成 + 重编 → `-check` **rc=0** `2 asset refs resolve [./assets/index-UL9kYvYl.js ./assets/index-CEH-Pz8P.css]`。
+  ⚠ **一条诚实的边界**：`Check()` 证的是"embed 内部自洽"，**不是"embed 比磁盘上的 dist 旧"**——
+  旧 exe 带着自己那套自洽的旧哈希，`-check` 仍 rc=0（实测）。产物↔二进制同一性由"build 顺序 + CI 同 job"保证，不由它保证。
+  无 node 复跑（`node`/`npm` 双 ABSENT，exe 27881312 B）：`panel-assets` rc=0（4 files, built=true）、
+  `-render /assets/index-UL9kYvYl.js` → **264929 B / text/javascript**、`-render ../go.mod` **rc=1 拒绝**。
+  **AC#4 数字更新**（本枚又往 `frontend/` 落了 2 个文件）：`scope ban #6 frontend/ examined 40 text files`
+  （14:5x 那枚是 38，两条新文件各 +1）、ban #8 仍只报 `design/ 16` / `internal/ 322` / `cmd/ 25`，
+  **planted 红复现**：`frontend/src/__ban6_probe.ts:1: [panel-approval]` + **rc=1**，探针已删。
+  ⚠ **要编排者裁的一条口径**：AC#4 字面要 ban #8 对 `frontend/` 的自报文件数，但它的声明作用域不含 `frontend/`，
+  而 `tools/d22scan/**` 不许本票动；What-to-build 第 5 条给的两种合法选择里本票走的是"自装 + ASCII 化"
+  （`TestFrontendHasNoEmoji` 现扫 **25 文件 0 命中**、ban #6 孪生检查 **36 文件**）。
+  ⇒ 我按字面记 **PARTIAL**，不自己勾；若裁"自装即满足"，请由改 ban #8 作用域的人同批勾。
+  **AC#6（job 落盘，run id 明确没有）**：`.github/workflows/ci.yml` 追加 `lint-frontend`（ubuntu-latest，
+  `working-directory: frontend`，**8 步 = checkout + setup-node(24,npm cache,lockfile 键) + 6 条命令**：
+  `npm ci` / `typecheck` / `lint` / `tokens:check` / `build` / `render:l2 -- fixtures/...`；
+  无 `if:`、无 `continue-on-error`、无 path 过滤（D22 mode-6），且**它是独立 job**，别的 job 红遮不住它
+  （A44① 那个"步骤在永久红的步骤后面所以从未产出结论"的病，正是靠 job 级隔离而不是靠排序解决的——本票全步只用 node，票 78 的 Go-on-Linux 问题够不到它）。
+  **本地逐步 rc**：typecheck 0 / lint 0 / tokens:check 0 / build 0 / render:l2 0；
+  ⚠ **`npm ci` 本地故意没跑**——它会先删 `node_modules` 再联网重装，失败会把这台机器上唯一能出这些数字的环境拆掉。
+  ⇒ **本票不能 push，所以 AC#6 没有任何 run id**；`gh run list --branch dev` 最新 5 条
+  （`35566711794` / `35566346598` / `35566028944` / `35564183459` / `35564090950`）**全部 completed/failure**，
+  且都早于本枚 commit ⇒ 里面**不可能有 `lint-frontend`**。**欠：编排者 push 后 `gh run view <id> --json jobs` 取步级结论**，
+  我不用"本地跑过了"替代这一格。
+  **门禁复跑（本枚碰的东西）**：`gofmt -l cmd/wisp/panel_assets.go internal/panel` 空、`go vet ./internal/panel/` rc=0、
+  `go test -count=2 ./internal/panel/` **RUN 32 / PASS 32 / FAIL 0 / SKIP 0**（16 个不同名 × 2）、
+  `go build ./cmd/wisp` rc=0、前端 `typecheck`/`lint`(**6 warnings 0 errors**，逐名：`scripts/vendor.mjs:15,53`、
+  `src/components/ai-native/tool-chips.tsx:89`、`src/components/panel-skeleton.tsx:16`、
+  `src/components/ui/badge.tsx:61`、`src/components/ui/button.tsx:77` —— **6 条全部既有条目，
+  新文件 `scripts/render-l2.tsx` 0 warning**；`vendor.mjs` 被扫到也顺带证明 oxlint 覆盖 `scripts/`)/`build` rc=0。
+  ⚠ **不追的红**：`sh scripts/d22scan.sh` 现在 rc=1，唯一命中是 **HEAD 上** `internal/winsec/winsec.go:126 [pathresolver-bypass]`
+  （票 89 的 `57bdbb2` 引入，编排者已为它立案 **票 94/A64**，`git show HEAD:internal/winsec/winsec.go` 可复核，非本票）；
+  `go test ./cmd/wisp/` 本机加载期 rc=1（`0xc0000135`）照旧登记不追。
+  `next=` 本票范围内**已无可推的框**：AC#1/AC#3 等票 33/35 的 host+pump，AC#4 等 ban #8 作用域那一行，AC#6 等 push。
+  若编排者要我在这些之前再加一层证据，最有价值的是**真浏览器里的 DOM 断言**（需要新测试工具链，一期未定，等裁）。

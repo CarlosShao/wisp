@@ -1,0 +1,21 @@
+{
+  "correlationId": "panel-assets-l2",
+  "tool": "fs.delete",
+  "args": [
+    "C:/Users/swq/Documents/notes.md"
+  ],
+  "level": "L2",
+  "rulesHit": [
+    "R1",
+    "R8"
+  ],
+  "reason": "R1: 工具声明为下界（L1）; R8: 不可逆操作（永久删除）",
+  "reasonKnown": true,
+  "sessionOverrideBlocked": false,
+  "callChain": [
+    "cli",
+    "panel-assets",
+    "fs.delete"
+  ],
+  "decidedBy": "native"
+}

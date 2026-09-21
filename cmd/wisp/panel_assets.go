@@ -30,8 +30,9 @@ func cmdPanelAssets(args []string) int {
 	check := fs.Bool("check", false, "verify the entry file and every asset it references are inside this binary")
 	render := fs.String("render", "", "write the embedded bytes for this request path to stdout")
 	l2 := fs.String("l2", "", "assess this tool name with the remaining args as its argv and print the L2 card JSON")
+	l2Irreversible := fs.String("irreversible", "", "with -l2: comma-separated irreversible operations the CALLER declares in its risk.Facts (R8's input)")
 	fs.Usage = func() {
-		fmt.Fprintln(os.Stderr, "usage: wisp panel-assets [-manifest] [-check] [-render <path>] [-l2 <tool> <args...>]")
+		fmt.Fprintln(os.Stderr, "usage: wisp panel-assets [-manifest] [-check] [-render <path>] [-l2 <tool> <args...>] [-irreversible <ops>]")
 	}
 	if err := fs.Parse(args); err != nil {
 		return 2
@@ -49,8 +50,9 @@ func cmdPanelAssets(args []string) int {
 			Args:          rest,
 			CallChain:     []string{"cli", "panel-assets", *l2},
 			Facts: risk.Facts{
-				Declared: risk.L1,
-				Paths:    rest,
+				Declared:     risk.L1,
+				Paths:        rest,
+				Irreversible: splitFacts(*l2Irreversible),
 			},
 		})
 		enc := json.NewEncoder(os.Stdout)
@@ -112,4 +114,26 @@ func cmdPanelAssets(args []string) int {
 		fmt.Printf("panel assets embedded: %d files, entry=%s built=%t\n", len(lines), panel.EntryFile, assets.Built())
 	}
 	return 0
+}
+
+// splitFacts turns a comma-separated flag value into the string slice a
+// risk.Facts field expects, dropping empties so "-irreversible ," is the same
+// as not passing it at all.
+//
+// This exists because risk.Facts is judged INPUT, not something the card or
+// this command may invent: R8 fires on what the caller declared irreversible,
+// so a probe that wants the real L2 verdict has to be able to say so. Nothing
+// here derives a level - internal/risk still decides that.
+func splitFacts(value string) []string {
+	if strings.TrimSpace(value) == "" {
+		return nil
+	}
+	parts := strings.Split(value, ",")
+	out := make([]string, 0, len(parts))
+	for _, part := range parts {
+		if trimmed := strings.TrimSpace(part); trimmed != "" {
+			out = append(out, trimmed)
+		}
+	}
+	return out
 }

@@ -258,3 +258,58 @@ jobs:
           name: slo-full-report
           path: build/slo/slo-report.json
           if-no-files-found: error
+
+  # ------------------------------------------------------- lint-frontend ----
+  # Ticket 77 AC#6: frontend/ is real code now, so it gets a real gate.
+  #
+  # It is its OWN job on purpose. The disease this ticket keeps hitting (A44-1,
+  # written up in the lint job above) is "a step exists but never produced a
+  # verdict", because it sat below a step that has been red on ubuntu since
+  # fd8f838. Jobs are independent, so no other job's red can mask this one, and
+  # every step here is node-only: ticket 78's Go-on-Linux problem cannot reach
+  # it, and none of these steps may be moved behind another gate.
+  #
+  # D22 mode-6: no `if:`, no `continue-on-error`, no skip flag, no path filter.
+  # A skippable job is a job that will one day be skipped.
+  lint-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Matches the local toolchain the numbers on ticket 77 were taken
+          # with (node v24.9.0); Vite 8 / TS 6 need >= 20.19.
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: npm ci (lockfile is the only source of deps)
+        run: npm ci
+
+      - name: typecheck (tsc -b, noEmit per tsconfig.*.json)
+        run: npm run typecheck
+
+      - name: lint (oxlint)
+        run: npm run lint
+
+      - name: token drift guard (generated theme must equal the C21 table)
+        # AC#2's independent second channel: gen-tokens --check regenerates
+        # frontend/src/styles/tokens.generated.css from docs/evidence/s1 and
+        # fails on any byte of difference, so nobody can hand-edit the theme.
+        run: npm run tokens:check
+
+      - name: build (vite build -> frontend/dist, the bytes go:embed carries)
+        run: npm run build
+
+      - name: L2 card renders the real risk fields (AC#3 render evidence)
+        # react-dom/server paints src/App.tsx over fixtures/l2-card-fs-delete.json,
+        # which is verbatim `wisp.exe panel-assets -l2 fs.delete -irreversible delete`
+        # output. Every assertion is derived from that JSON, and the vendored
+        # Beautiful UI demo questionnaire appearing anywhere is a failure - so
+        # this step goes red if the card ever renders library props.
+        run: npm run render:l2 -- fixtures/l2-card-fs-delete.json
+
