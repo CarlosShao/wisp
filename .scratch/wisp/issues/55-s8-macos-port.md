@@ -36,3 +36,13 @@ prebuilt artifacts.
       `internal/risk/syncdirs_redteam_*_test.go` spellings equivalents pass on macOS.
 
 ## Progress log (append-only, newest last)
+
+- 2026-09-21 17:1x（编排者，票 82 结案时追加的**验收锚点**，不是新工作）：票 82 已经把
+  `internal/risk` 的 sync-root 家族在 POSIX 上**分层**了——Windows 专属判据进 `//go:build windows`，
+  POSIX 侧留了三条"断言当前真实行为"的用例，并把它们做成**票 55 落地即红**的 tripwire：
+  **`TestSyncNoGradeIsConfirmedOnPosix`**、**`TestSyncMembershipDecidesOffProfilePosix`**、
+  **`TestSyncRegistryProbeIsAStubHere`**（`internal/risk/syncdirs_other_test.go`）。
+  ⇒ **macOS 移植交件时必须逐条点名这三条**：它们变红是**预期且有意义的**（POSIX 侧"还没实现"这个事实被实现
+  打破了），修法是**把断言升级为真实判据**，**绝不是**放宽或删掉。⚠ 前两条断言的是"没有确认等级 / 成员关系
+  决定嫌疑"，第三条断言的是"registry 探针在此平台是桩"——macOS 若有自己的等价物（iCloud Drive 同步根），
+  第三条要改成 macOS 层的真实探测用例而不是直接删。
