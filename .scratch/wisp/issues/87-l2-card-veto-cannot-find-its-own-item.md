@@ -1,6 +1,6 @@
 # 87 — L2 卡片上的"提前拒绝"找不到条目 ⇒ 人想拒也拒不掉，只能干等满 300 秒（票 84 的副产品，**不是安全洞**）
 
-**Status:** in-progress（AC#1 只读部分已查完并找到实例，正在做 AC#2 的码与用例）
+**Status:** ready-for-review（AC#1-AC#5 五框全勾；码与用例在 `dfe9d9f`→`1068eb9`，两侧数字在本票 log 末段）
 **Type:** 可用性缺陷（安全侧已经是 fail-closed，坏的是"人无法提前结束"）
 **Blocks:** nothing · **Blocked by:** nothing（`internal/agent/approval/` 与 `internal/panel/` 此刻无人写）
 **Packages:** `internal/agent/approval/`（`Gate.Veto` 与它的键匹配）、`internal/panel/`（卡片回传路径）、
@@ -32,14 +32,19 @@
       点击拒绝必须 **(i) 立刻结束该次的等待**（不许再等满 300s）并且 **(ii) 仍然按拒绝处理**
       （找不到条目只能让"拒绝"更容易生效，**绝不能**因为查不到就放行或忽略）。
       ⚠ 这条 **(ii) 是本票的安全底线**：任何"查不到 ⇒ 当作已批准/当作无需处理"的修法一律不过。
-- [ ] **AC#3** 变异双向：(i) 把"立刻结束"退回"等满上界" ⇒ 用例红；
+- [x] **AC#3** 变异双向：(i) 把"立刻结束"退回"等满上界" ⇒ 用例红；
       (ii) 把失败侧从"拒绝"改成"放行" ⇒ **必须有既有用例红**（R7/C18 的 fail-closed 家族）。
       锚点=承载行为的那一行，同链 grep 自证落地，还原后 `git diff --quiet` 证干净；编译失败不算变异。
-- [ ] **AC#4** 不动 C18 的 300s：**一个数字都不改**（不许"为了少等把超时调小"）。
+      （两侧数字与红名见 log 末段：(i) 2 红含 `STILL BLOCKED after 2s`；(ii) 4 红其中
+      `TestPanelSourcedAllowIsRejectedOnEveryForgeableAxis` + `TestReplayRedisplaysUnderAFreshGrant` 是既有用例。）
+- [x] **AC#4** 不动 C18 的 300s：**一个数字都不改**（不许"为了少等把超时调小"）。
       `PLAN.md:1368` 的"超时前 30s 醒目提示"若未实现，只登记，不在本票补。
-- [ ] **AC#5** 门禁（只跑自己碰的包）：`gofmt -l` 空、`gofumpt -l <files>` 空、
+      （`queue.go:92-94` 与 `gate.go:456-460/487-499` 均未改；30s 提示**已实现**，见 log「AC#4 结案」。）
+- [x] **AC#5** 门禁（只跑自己碰的包）：`gofmt -l` 空、`gofumpt -l <files>` 空、
       `go vet <pkgs>` rc=0、`GOOS=linux go vet <pkgs>` **按包作用域**跑 rc=0（⚠ 别用 `GOOS=linux go vet ./...`，
       那条在 Windows 主机上因 CGO=0 排除 sherpa 而永远 rc=1，A54③）、`go test -count=2 <pkgs>` rc=0 且逐条点名 SKIP/FAIL。
+      （数字见 log；⚠ `go test ./cmd/wisp/` 在本机 rc=1 = 加载期 `0xc0000135`，
+      纯净树 `git archive 63ef895` 同读数 ⇒ 先于本票存在，已登记给编排者。）
 
 ## Rules（本仓固定）
 
@@ -131,4 +136,58 @@ SKIP 2 = 票 84 的 `TestDefaultDeadlineWallClockMeasurement` ×2，默认 `WISP
 next= 跑 AC#3 两侧变异（(i) 把 `Veto` 的 L2 分支退回 `return ErrUnknownCorrelation` ⇒ 新用例红；
 (ii) 把 `Queue.reject` 的 `tools.AnswerReject` 改成 `tools.AnswerAllow` ⇒ **既有** fail-closed 用例红），
 把两侧红名抄回票面后收尾。`internal/panel/approval.go` 的 correlationId 来源仍登记给编排者。
+
+### 2026-09-21 · 票 87 代理 · AC#1 的"待核"补上 + AC#3 变异两侧 + AC#5 数字（收尾）
+
+**面板与宿主两套键（这次是读到的，不是猜的）**：`internal/panel/approval.go:28/40/78` 的
+`ApprovalCardView.CorrelationID` 取自 `ApprovalSubject.CorrelationID`，注释写明"the agent loop owns the
+correlationId (C17)" ⇒ 面板卡片带的是**进入时的 C17 键**；而队列自己的键是 `it.Corr`（`queue.go:133-139`，
+只有空/撞车时才与之不同）。今天两者相同只因为 `internal/agent/loop.go:644` 把 corr 写成 taskID，
+且队列没重签发。同时 `internal/panel/` 与 `cmd/wisp/panel_assets.go` 里 **零** 处引用 `Gate.Panel()/Native()`
+或 `Reject/Veto` ⇒ 面板回投递这条路还不存在（票 37），所以这条现在是**条件性实例**（一旦接线就成真）；
+本次的别名索引正是提前把它接住的形状（进入时 corr 与 taskID 都能命中拒绝方向）。
+`cmd/wisp/panel_assets.go:45` 那张 `correlationId: "panel-assets-l2"` 是票 77 的 embed 证明面（写死的样例，
+门里根本没有这一项），**render-only**，不是活的审批。
+
+**AC#3 变异（逐条点名，锚点=承载行为那一行，同链 grep 自证落地，还原后 `git diff --quiet -- internal/agent/approval/` rc=0）**
+
+- (i-a) `gate.go:426` 锚点 `return g.q.reject(v.CorrelationID,` → 加 `-mut87i` 后缀（等价于"这条分支不存在"）：
+  rc=1，`=== RUN` 4 条中 **2 红**：
+  `FAIL TestAVetoAgainstAnOnScreenL2CardEndsTheWaitNowAndStillRefuses`（`Veto on the displayed card:
+  approval: correlation_id 无对应待审批项`）+ `FAIL TestAVetoNamedByTheHostsOwnKeyStillRefusesThatCard`；
+  歧义不许猜/无关 id 不碰别人的卡 两条 PASS（它们本来就不依赖这条分支）。
+- (i-b) 同一锚点改成 `return nil`（"听见了但其实什么都没做"）：rc=1，2 红，红名是**等待上界断言**：
+  `ticket87_veto_l2_test.go:91: veto against an on-screen L2 card: STILL BLOCKED after 2s
+  (start=13:34:56, now=13:34:58) - 闸门没有上界` 与 `:147` 同形状 ⇒ 证明 (i) 那半边真的在测"立刻结束"，
+  而不是只测错误码。用例 armed 的是 30s 门限（**不是 300s 常跑用例**）。
+- (ii) `queue.go:383` 锚点 `answer{a: tools.AnswerReject, why: why}`（`Queue.reject` 的投递，唯一一处写
+  "人说了不"的方向）→ 改 `tools.AnswerAllow`：rc=1，全仓 `=== RUN` 42 条里 **4 红**，其中**两条是既有用例**：
+  `FAIL TestPanelSourcedAllowIsRejectedOnEveryForgeableAxis`（`queue_test.go:143: answer="allow"，期望 reject：
+  面板只能拒绝`）、`FAIL TestReplayRedisplaysUnderAFreshGrant`（`queue_test.go:280: answer="allow"，期望 reject`）
+  —— R7/C18 fail-closed 家族确实坐在这一行上；另两条是本票新用例。
+- 三次变异全部还原：`cp` 回备份 + `git diff --quiet -- internal/agent/approval/` rc=0（工作树里别人的
+  `frontend/`、`internal/risk/` 改动我没碰也没还原）。
+
+**AC#5 门禁（只跑我碰的包 + 两个下游）**
+
+- `gofmt -l internal/agent/approval/` 空；`gofumpt -l internal/agent/approval/` 空；
+  commit 前重跑全仓 `gofumpt -l . tools/d22scan tools/mockllm` **空**（上一次它红在 `internal/risk/syncdirs_test.go`，
+  那是票 82 在写的文件，现已不见 ⇒ 他们自己收干净了）。
+- `go vet ./internal/agent/approval/` rc=0；`GOOS=linux go vet ./internal/agent/approval/ ./internal/tools/` rc=0
+  （**按包作用域**，没用 `./...`，A54③）。
+- `go test -count=2 ./internal/agent/approval/` rc=0：`=== RUN` 84 = count=1 的 42 ×2（核对过倍数）、
+  `--- FAIL` 0、`--- SKIP` 2 = `TestDefaultDeadlineWallClockMeasurement` ×2（票 84 的 300s 墙钟计量，
+  默认无 `WISP_84_MEASURE` ⇒ 有意慢跳过，不是假绿）、`no tests to run` 未出现。
+- 回归：`go test -count=2 ./internal/tools/` rc=0（30.0s，`Veto` 的老形状调用方在那儿）。
+  ⚠ `go test ./cmd/wisp/` rc=1 `exit status 0xc0000135`（STATUS_DLL_NOT_FOUND）：**不是本票的回归** ——
+  证据：`-run '^$'`（不执行任何用例）同样 0xc0000135，且 `git archive 63ef895`（我落码之前的提交）解到
+  `/tmp/wisp87s75ctl` 纯净树跑 `./cmd/wisp/` 也是同一读数 ⇒ 本机的加载期问题（cgo/DLL 不在 PATH），登记给编排者。
+
+**AC#4 结案**：`300`/`30` 一个数字未改（`queue.go:92-94` 与 `Options.ApprovalTimeout/WarningLead` 原样；
+新用例只用 30s 的门限做断言）。"超时前 30s 醒目提示"**已实现**：`gate.go:458-460` 起 warn 定时器、
+`gate.go:487-499` 发 `EventWarning` 并写明"审批将在 N 秒后自动拒绝"，console 侧 `cmd/wisp/run.go:538-541`
+会打印 `[warning] …` ⇒ 本票无需登记缺失，也无需补。
+
+四框现全勾。next= 交回编排者：`cmd/wisp` 的 0xc0000135（加载期，先于本票存在）要不要单开票；
+`internal/panel/approval.go` 的 C17 键与队列键在票 37 接线时的对账归谁（我这边已备好拒绝方向的别名解析）。
 
