@@ -70,3 +70,16 @@ docker 挂载**快照**而不是工作树（别人的在飞改动会混进你的
     `-run 'Containment|LiteralBackslash|HostileShapes|StaysUnderDataDir|RejectsTheFour'` 两包 `ok`（0 SKIP / 0 FAIL）。
   - AC#1 勾框**留到 Linux 侧绿了再打**——票面要的是两侧都跑，不在只测了一侧时就记完成。
   next= docker `golang:1.27` 跑 `git archive` 快照，证明这两条在 Linux 上真跑且绿（AC#2(i)），然后做生产侧转义/守卫的变异检验
+- **C2（Linux 首轮实测：改对了方向，但暴露我第一版仍带 Windows 预设）** 快照 `git archive HEAD` → `D:\tmp\wisp81snap`，
+  `docker run golang:1.27 -count=2 -v` 两包：50 条 `=== RUN`、**4 条 FAIL**（同一对，×2）、0 SKIP；agent 包 `ok`，memory 包红。
+  失败原文（`artifacts_path_invariant_test.go:502`）：
+  `purge removed [data/artifacts/..\canary-dotdot-literal.txt data/artifacts/nested data/artifacts/nested-backslash\canary-literal.txt
+  data/artifacts/nested/canary-separator.txt data/artifacts/real-1.txt data/artifacts/real-2.txt] want exactly [去掉第一条]`。
+  根因是**我自己的 C1 版本**：`wantRemoved` 仍按名字点了两例字面反斜杠 canary，而 Linux 上 `..\canary-dotdot-literal.txt`
+  这个字面名**不越界、老老实实落在 artifacts 里**，于是它也归 purge 管——这正是票面要的不对称的第二面，
+  第一版把它漏掉了（同一原因让 `LiteralBackslash` 那条断言误报"意外反斜杠条目"）。
+  修法：期望集合改为**按前缀从 target 派生**（`inv76Rel(root, sh.target)` 落在 `data/artifacts/` 里就算），
+  不对称测试 `TestArtifactsLiteralBackslashKeepsItsAsymmetry` 重写成两侧通用的"含 `\` 而本平台不当它是分隔符 ⇒ 必是扁平一条"，
+  并加 `len(planted) < 4` / `slices.Equal(flats, want)` 两条反-vacuous 卫兵。
+  Windows 本机重跑：`rc=0`、50 条 `=== RUN`、0 FAIL、0 SKIP。
+  next= 重新 archive 快照跑 Linux（AC#2(i) 要绿），再做 AC#2 的变异检验

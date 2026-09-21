@@ -488,16 +488,25 @@ func TestArtifactsContainmentByDirectoryListing(t *testing.T) {
 	// not from a hard-coded list of slash-keys that only one platform can
 	// produce: a canary the OS resolved into a subdirectory contributes that
 	// directory as well, a canary it resolved to one flat name contributes only
-	// itself. Which of those each shape is happens per-platform (see
-	// inv76Shapes), and the set equality below still has the same teeth - an
-	// unexpected removal anywhere, the DB or the data dir or the user dir,
-	// fails on the name.
-	wantRemoved := inv76ReclaimKeys(artTree,
+	// itself, and a `..\`-shaped canary is only inside this tree on the platform
+	// that does not read the backslash as a boundary (Linux - ticket 79's
+	// encoder is precisely about that). Which of those each shape is happens
+	// per-platform, so the membership test below is the prefix, not a name list.
+	// The set equality still has the same teeth: an unexpected removal anywhere -
+	// the DB, the data dir, the user dir - fails on the name.
+	planted := []string{
 		inv76Rel(root, filepath.Join(artifactsDir, "real-1.txt")), // the (d) control, already gone
 		inv76Rel(root, filepath.Join(artifactsDir, "real-2.txt")),
-		inv76Rel(root, inv76ShapeNamed(t, shapes, "separator").target),
-		inv76Rel(root, inv76ShapeNamed(t, shapes, "separator_backslash_literal").target),
-	)
+	}
+	for _, sh := range shapes {
+		if k := inv76Rel(root, sh.target); strings.HasPrefix(k, artTree) {
+			planted = append(planted, k)
+		}
+	}
+	if len(planted) < 4 {
+		t.Fatalf("only %d canaries resolve inside the artifacts tree, the set equality is too small to bite", len(planted))
+	}
+	wantRemoved := inv76ReclaimKeys(artTree, planted...)
 	if !slices.Equal(removed3, wantRemoved) {
 		t.Errorf("purge removed %v, want exactly %v", removed3, wantRemoved)
 	}
@@ -544,16 +553,16 @@ func TestArtifactsContainmentByDirectoryListing(t *testing.T) {
 // There is no build tag on this file and there must not be one: this test is the
 // proof that both platforms run it and see different, asserted, physics.
 func TestArtifactsLiteralBackslashKeepsItsAsymmetry(t *testing.T) {
-	s, _, _, _, shapes := inv76Fixture(t)
+	s, root, _, _, shapes := inv76Fixture(t)
 	artifactsDir := s.ArtifactsDir()
+	const artTree = "data/artifacts/"
 
-	lit := inv76ShapeNamed(t, shapes, "separator_backslash_literal")
 	neu := inv76ShapeNamed(t, shapes, "separator")
 
-	// Each shape's target is defined as "where this OS resolves the caller's
-	// string", so both must exist on both platforms — this is the part that used
-	// to be spelled with a hard-coded `\` and therefore only held on Windows.
-	for _, sh := range []inv76Shape{lit, neu} {
+	// Each target is defined as "where this OS resolves the caller's string", so
+	// every canary must be exactly there on every platform — the part that used to
+	// be hard-coded with a `\` and therefore only ever held on Windows.
+	for _, sh := range shapes {
 		if _, err := os.Stat(sh.target); err != nil {
 			t.Fatalf("shape %q: the file the caller named is not at %s on this platform: %v",
 				sh.sub, sh.target, err)
@@ -568,40 +577,60 @@ func TestArtifactsLiteralBackslashKeepsItsAsymmetry(t *testing.T) {
 		t.Errorf("the platform-neutral separator shape did not create a directory: %v", err)
 	}
 
-	// The literal shape nests on exactly one platform, and WHICH one is asserted
-	// from the platform's own separator rather than left to chance.
-	const litDirName = "nested-backslash" // the component before the `\`
+	// A name carrying `\` that this OS does not read as a boundary is ONE flat
+	// file name; the same bytes on Windows are two path components. Derived from
+	// filepath.Separator, so "which side we are on" is asserted, not assumed.
+	var flats []string
+	for _, sh := range shapes {
+		if strings.Contains(sh.name, `\`) && !strings.Contains(sh.name, string(filepath.Separator)) {
+			flats = append(flats, sh.name)
+		}
+	}
+	slices.Sort(flats)
+	if filepath.Separator == '\\' {
+		if len(flats) != 0 {
+			t.Fatalf("Windows reads `\\` as a separator, so no shape may be flat here; got %v", flats)
+		}
+		if _, err := os.Stat(filepath.Join(artifactsDir, "nested-backslash")); err != nil {
+			t.Errorf("the literal-backslash separator shape made no directory on Windows: %v", err)
+		}
+		if _, err := os.Stat(filepath.Join(artifactsDir, "nested-backslash", "canary-literal.txt")); err != nil {
+			t.Errorf("the literal-backslash separator shape is not nested on Windows: %v", err)
+		}
+	} else {
+		want := []string{`..\canary-dotdot-literal.txt`, `nested-backslash\canary-literal.txt`}
+		if !slices.Equal(flats, want) {
+			t.Fatalf("on Linux both literal-backslash shapes are flat names; this fixture produced %v, want %v", flats, want)
+		}
+		for _, f := range flats {
+			if _, err := os.Lstat(filepath.Join(artifactsDir, f)); err != nil {
+				t.Errorf("flat literal-backslash entry %q is missing: %v", f, err)
+			}
+			if k := inv76Rel(root, filepath.Join(artifactsDir, f)); !strings.HasPrefix(k, artTree) {
+				t.Errorf("flat entry %q is not inside the artifacts tree (%s)", f, k)
+			}
+		}
+		if _, err := os.Stat(filepath.Join(artifactsDir, "nested-backslash")); !errors.Is(err, fs.ErrNotExist) {
+			t.Errorf("a backslash-shaped name created a DIRECTORY on a platform where the backslash is not a separator (err=%v)", err)
+		}
+	}
+
+	// And the real listing agrees with the claim, entry by entry: no stray
+	// backslash-named file beyond the pinned ones, on either platform.
 	entries, err := os.ReadDir(artifactsDir)
 	if err != nil {
 		t.Fatal(err)
 	}
-	var sawFlatEntry bool
 	for _, e := range entries {
-		if e.IsDir() {
+		if e.IsDir() || !strings.Contains(e.Name(), `\`) {
 			continue
 		}
-		if e.Name() == lit.name {
-			sawFlatEntry = true
-		} else if strings.Contains(e.Name(), `\`) {
-			t.Errorf("a top-level entry name contains a backslash but is not the pinned fixture: %q", e.Name())
+		if !slices.Contains(flats, e.Name()) {
+			t.Errorf("a top-level entry name contains a backslash but is not a pinned fixture: %q (pinned: %v)", e.Name(), flats)
 		}
 	}
-	_, dirErr := os.Stat(filepath.Join(artifactsDir, litDirName))
-	wantFlat := filepath.Separator != '\\'
-	if got := litDirName + `\canary-literal.txt`; got != lit.name {
-		t.Fatalf("the fixture this test pins has drifted from the spelling it asserts: %q vs %q", lit.name, got)
-	}
-	if sawFlatEntry != wantFlat {
-		t.Errorf("literal-backslash entry flat in the artifacts listing = %v, want %v (separator %q)",
-			sawFlatEntry, wantFlat, filepath.Separator)
-	}
-	if nested := dirErr == nil; nested == wantFlat {
-		t.Errorf("literal-backslash shape created a directory named %q on a platform whose separator is %q (dir present=%v, want %v)",
-			litDirName, filepath.Separator, nested, !wantFlat)
-	}
-	t.Logf("GOOS=%s separator=%q: literal-backslash name %q is %s",
-		runtime.GOOS, filepath.Separator, lit.name,
-		map[bool]string{true: "one flat file name", false: "a nested path"}[sawFlatEntry])
+	t.Logf("GOOS=%s separator=%q: literal-backslash names living as ONE flat file name in the artifacts dir: %v",
+		runtime.GOOS, filepath.Separator, flats)
 }
 
 // ---------------------------------------------------------------------------
