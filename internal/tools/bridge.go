@@ -81,6 +81,19 @@ type Options struct {
 	// can be vetoed mid-flight and no report can be built - which is the
 	// honest state of a bridge whose gate is NoGate.
 	Cancel CancelBus
+
+	// Modes is the READ side of the user-facing permission mode (ticket 90,
+	// ruling R20): nil means the strictest档 (ask_every_step) for every call,
+	// which is the fail-closed direction - an unwired composition can never run
+	// relaxed by accident. The bridge only ever reads it; switching lives in
+	// internal/perm, where a switch costs a confirmation and an audit line.
+	Modes ModeSource
+	// Confirmations returns the B-tier single-file overrides on record (the
+	// set risk.Gate's bOverrides argument was designed to receive). nil or
+	// empty means "no file has ever been confirmed", so every B-tier path stays
+	// "ask first". Populating it is ticket 21's confirmation flow; nothing in
+	// this package can add to it.
+	Confirmations func() map[string]bool
 }
 
 // Bridge is the host bridge: the single choke point every capability flows
@@ -116,6 +129,11 @@ type Bridge struct {
 	logf     func(string, ...any)
 	onDec    func(Decision)
 	cancel   CancelBus
+	// modes and confirmations are ticket 90's two read-only injections: the
+	// permission mode source, and the B-tier override set risk.Gate reads. Both
+	// are read per call, and neither has a setter on the bridge.
+	modes         ModeSource
+	confirmations func() map[string]bool
 
 	// classifier is shared: it is stateless over the frozen blacklist.
 	classifier risk.SensitiveClassifier
@@ -144,18 +162,25 @@ func New(o Options) *Bridge {
 		gate = NoGate{}
 	}
 	b := &Bridge{
-		reg:        o.Registry,
-		paths:      o.Paths,
-		prov:       o.Provenance,
-		j:          o.Journal,
-		gate:       gate,
-		declared:   o.DeclaredCaps,
-		sem:        make(chan struct{}, ceiling),
-		defTm:      defTm,
-		onUpdate:   o.OnUpdate,
-		logf:       o.Logf,
-		onDec:      o.OnDecision,
-		cancel:     o.Cancel,
+		reg:      o.Registry,
+		paths:    o.Paths,
+		prov:     o.Provenance,
+		j:        o.Journal,
+		gate:     gate,
+		declared: o.DeclaredCaps,
+		sem:      make(chan struct{}, ceiling),
+		defTm:    defTm,
+		onUpdate: o.OnUpdate,
+		logf:     o.Logf,
+		onDec:    o.OnDecision,
+		cancel:   o.Cancel,
+		modes:    o.Modes,
+		confirmations: func() map[string]bool {
+			if o.Confirmations == nil {
+				return nil // no file was ever confirmed: B tier stays "ask first"
+			}
+			return o.Confirmations()
+		},
 		classifier: NewSensitiveClassifier(),
 		seqs:       map[string]int64{},
 		scopes:     map[string]bool{},
@@ -250,10 +275,34 @@ func (b *Bridge) Execute(ctx context.Context, req agent.ToolRequest) (agent.Tool
 	dec.RulesHit = verdict.RulesHit
 	dec.Reason = verdict.Reason
 	dec.SessionOverrideBlocked = verdict.SessionOverrideBlocked
+
+	// --- ticket 90: the permission mode screens that verdict -----------------
+	// Read once per call (AC#1: an explicit value, never a package global), then
+	// handed to route as a PARAMETER. dec.Level keeps the assessed level, because
+	// that is what the tool_call row's risk_level column means; the mode's effect
+	// travels as Mode/ModeSilenced/ModeKept so "why was nobody asked" is readable
+	// from the record.
+	mode := b.permissionMode()
+	sil := mode.Screen(verdict)
+	dec.Mode = mode
+	dec.ModeSilenced = sil.Silenced
+	dec.ModeKept = sil.Kept
+	if len(rawPaths) > 0 && verdict.Level >= risk.L1 {
+		dec.Blacklist = b.readBlacklist(rawPaths)
+	}
+	switch {
+	case sil.Silenced:
+		b.log("tools: MODE-SILENCE mode=%s assessed=%s effective=%s tool=%s rules=%v "+
+			"(a silenced question, not an allow: no user click happened)",
+			mode, verdict.Level, sil.Level, req.Name, verdict.RulesHit)
+	case sil.Kept != "":
+		b.log("tools: MODE-REDLINE mode=%s still asks tool=%s rules=%v because=%s",
+			mode, req.Name, verdict.RulesHit, sil.Kept)
+	}
 	b.emit(dec)
 
 	// --- routing: L0 pass, L1 window, L2 approval, Deny never reaches a gate -
-	ok2, why := b.route(ctx, &dec)
+	ok2, why := b.route(ctx, &dec, sil)
 	if !ok2 {
 		class := string(observe.ClassUserRejected)
 		if dec.Level == risk.Deny {
@@ -308,11 +357,17 @@ func (b *Bridge) capsOf(name string, entry Entry) capSet {
 // routing
 // ---------------------------------------------------------------------------
 
-// route maps the assessed level onto the gate branch that owns it
-// (SPEC-06 §2) and books the decision column. It returns whether the call may
-// proceed plus the user-visible reason when it may not.
-func (b *Bridge) route(ctx context.Context, dec *Decision) (bool, string) {
-	switch dec.Level {
+// route maps the EFFECTIVE level (the assessed verdict as screened by the
+// permission mode, ticket 90) onto the gate branch that owns it (SPEC-06 §2)
+// and books the decision column. It returns whether the call may proceed plus
+// the user-visible reason when it may not.
+//
+// sil is a parameter, not a lookup: this is the one place a level becomes "ask
+// the user" or "do not ask", so the mode that decided it has to be visible in
+// the signature (AC#1). An implementation that reached for a global here would
+// put the permission switch inside the enforcement layer.
+func (b *Bridge) route(ctx context.Context, dec *Decision, sil risk.Silenced) (bool, string) {
+	switch sil.Level {
 	case risk.L0:
 		dec.DecisionColumn = agent.DecisionAllow
 		return true, ""

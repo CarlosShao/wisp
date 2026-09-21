@@ -124,6 +124,7 @@ var lockedKeyDisposition = map[string]string{
 	"risk.allow_shell_string":  "unwired:risk.allow_shell_string",
 	"risk.shell_allowlist":     "unwired:risk.shell_allowlist",
 	"risk.blacklist_overrides": "unwired:risk.blacklist_overrides",
+	"risk.permission_mode":     "consumed: Config.PermissionMode is read per tool call by the bridge (internal/tools), persisted by Manager.SetPermissionMode; ticket 90",
 	// [fs]
 	"fs.allowed_dirs":             "consumed: cmd/wisp/run.go feeds the C26 canonicalizer",
 	"fs.reparse_point_exceptions": "consumed: cmd/wisp/run.go feeds the C26 canonicalizer",

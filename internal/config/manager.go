@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/CarlosShao/wisp/internal/observe"
+	"github.com/CarlosShao/wisp/internal/risk"
 )
 
 // Reload manager (SPEC-03 sec 4.2/4.3): owns the in-memory config, polls
@@ -351,6 +352,20 @@ func riskDirection(old, new *RiskSection) (loosen, tighten []string) {
 		loosen = append(loosen, "risk.l1_window_sec")
 	} else if new.L1WindowSec < old.L1WindowSec {
 		tighten = append(tighten, "risk.l1_window_sec")
+	}
+	// risk.permission_mode (ticket 90, R20/M1): the mode ordering IS the
+	// ask-nothing ordering, so a higher rank = asks about less = loosening, and
+	// D36 rule 1 puts it behind the same L2 re-confirmation as the other
+	// locked keys. An unparseable value parses to the strictest mode on both
+	// sides (risk.ParseMode never guesses), so a corrupt mode can only ever
+	// register as a tightening or as neutral here, never as a loosening.
+	oldMode, _ := risk.ParseMode(old.PermissionMode)
+	newMode, _ := risk.ParseMode(new.PermissionMode)
+	switch {
+	case newMode > oldMode:
+		loosen = append(loosen, "risk.permission_mode")
+	case newMode < oldMode:
+		tighten = append(tighten, "risk.permission_mode")
 	}
 	loosen, tighten = setDirection(loosen, tighten, "risk.shell_allowlist", old.ShellAllowlist, new.ShellAllowlist)
 	return setDirection(loosen, tighten, "risk.blacklist_overrides", old.BlacklistOverrides, new.BlacklistOverrides)

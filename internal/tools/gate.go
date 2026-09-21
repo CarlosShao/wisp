@@ -24,6 +24,23 @@ type Decision struct {
 	Capabilities []Capability
 	// SessionOverrideBlocked is R4's "no D45 grant covers this" flag.
 	SessionOverrideBlocked bool
+	// Mode is the user-facing permission mode this call was screened under
+	// (ticket 90, R20). It travels with the verdict because "why was I not
+	// asked?" is a question the audit trail has to answer from the record, not
+	// from the config file's current contents.
+	Mode risk.Mode
+	// ModeSilenced is true when the mode removed a question this verdict would
+	// otherwise have asked. It is NOT an allow: the assessed Level below stays
+	// the judge's own conclusion, which is what the tool_call.risk_level column
+	// books (SPEC-02 §3).
+	ModeSilenced bool
+	// ModeKept names the red line that refused to silence the verdict, empty
+	// when the mode applied as asked. Audit text, rendered verbatim.
+	ModeKept string
+	// Blacklist is risk.Gate's reading of this call's paths (tier A/B plus
+	// which B-tier files a single L2 confirmation could unlock). See
+	// BlacklistNote in mode.go: it is evidence for the card, never authority.
+	Blacklist BlacklistNote
 	// DecisionColumn is the tool_call.decision value the routing resolved to
 	// (agent.DecisionAllow / Reject / Timeout). Empty until routing runs.
 	DecisionColumn string

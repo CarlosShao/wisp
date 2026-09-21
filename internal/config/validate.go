@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/CarlosShao/wisp/internal/observe"
+	"github.com/CarlosShao/wisp/internal/risk"
 	"github.com/CarlosShao/wisp/internal/secret"
 )
 
@@ -27,6 +28,7 @@ func validate(c *Config) error {
 		validateAudio(c),
 		validatePrivacy(c),
 		validateModels(c),
+		validateRisk(c),
 		validateUnwired(c),
 		validateCost(c),
 		validateObserve(c),
@@ -94,6 +96,19 @@ func validateModels(c *Config) error {
 	if !c.Models.VerifySignature {
 		return observe.New(observe.ClassConfig,
 			"config.toml: models.verify_signature is hard-coded true (read-only, C29); writing false is rejected")
+	}
+	return nil
+}
+
+// validateRisk checks the [risk] enum added by ticket 90. It is the loud half
+// of the ticket-83 rule: a permission key that nothing reads must fail at load
+// (unwired.go), and a permission key that IS read must not accept a value the
+// reader cannot map. An unknown mode is therefore an error naming the whole
+// vocabulary, never a silent fall back to the default - "it fell back" and "it
+// was never written" look identical in the field.
+func validateRisk(c *Config) error {
+	if _, err := risk.ParseMode(c.Risk.PermissionMode); err != nil {
+		return observe.New(observe.ClassConfig, "config.toml: risk.permission_mode: "+err.Error())
 	}
 	return nil
 }

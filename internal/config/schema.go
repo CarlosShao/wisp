@@ -455,6 +455,15 @@ type RiskSection struct {
 	ShellAllowlist []string `toml:"shell_allowlist"`
 	// BlacklistOverrides are B-tier blacklist exemptions (per entry).
 	BlacklistOverrides []string `toml:"blacklist_overrides"`
+	// PermissionMode is the user-facing permission mode (ticket 90, R20/M1):
+	// "ask_every_step" (default, strictest) | "ask_high_risk" | "auto_approve".
+	// It is the ONLY persisted permission preference in the system: R20/M3
+	// makes a manually chosen mode survive a new session and a restart, and
+	// nothing else may borrow that channel - a D45 session grant stays
+	// session-scoped and dies with the process (PLAN.md:1640, ticket 49), so
+	// the two are covered by separate tests, never one "persistence" test.
+	// An unknown value is a load error (validateRisk), not a fallback.
+	PermissionMode string `toml:"permission_mode" default:"ask_every_step"`
 }
 
 // FSSection is the locked [fs] section.
