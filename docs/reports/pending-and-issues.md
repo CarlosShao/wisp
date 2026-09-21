@@ -1099,6 +1099,21 @@ vet: cmd/wisp/slo.go:324:49: undefined: proc.Runtime
 本 commit 已把该步与它的阳性对照（`tools/d22scan/runtests.sh -C tools/d22scan ./...`）**提到 gofmt/vet 之前**：
 不删步骤、不给任何步骤加 `continue-on-error`、不让任何步骤可跳过（D22 mode 6 未碰）。
 
+## 编排者登记 A50（2026-09-21 10:52，票 75 撞 150 轮上限死亡 + **我差点回滚掉活人的工作**）
+
+- **A50① 接续起点**：它死时把两份 POSIX 形状用例**改好并 staged 但未 commit**，票面与证据文档各有未提交增量。
+  我按老规矩先审后存：diff 里 grep `MUT|t.Skip|return true|if true` **零命中**；
+  `GOOS=linux go vet ./internal/risk/ ./internal/tools/` **rc=0**；票 72 的不变式重跑 `ok`；
+  `go test ./internal/tools/` **ok 13.772s**——**那个 600s 超时 panic 已经消失**，与根因报告
+  （P1+P2+P3 之后 tools 从 25 FAIL+超时变 `ok` 9.4s）的预测**逐条对上**。⇒ 存成检查点，派接续。
+- **A50②  我自己的误判，当场纠正并立判据**：我看到 `internal/agent/spill.go` 有 115+/20- 未提交，
+  第一反应是"**票 75 越界写了别人的包**，要按 A36 的规矩回退"。
+  实际是：**diff 的注释里明写 "ticket 79, C25"，正在实现 id 的可逆编码——那是票 79 的代理此刻的活**。
+  **我因为先读了 diff 才没动手**；如果我按"包归属"直接 `checkout --`，就把一个活着的代理的工作毁了。
+  ⇒ **判据（新，共享工作树专用）**：**判断一份未提交改动归谁，看它的注释/引用了哪张票、在做什么语义，
+  不要只看它落在哪个包**——包级领地划分只是派发时的约定，**不是归属证明**。
+  回退任何不属于我的 WIP 之前，必须先把 diff 存到仓库外留痕。
+
 ## 编排者登记 A48（2026-09-21 10:44，只读代理的根因报告回来了：**Linux 上 A 表仍在静默降级**）
 
 全文落档 `docs/evidence/s1/75-rootcause-locator-report.md`（**唯一副本**——它原指派的文件名已被票 75 的
