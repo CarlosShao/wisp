@@ -1,6 +1,7 @@
 # 94 — 私有数据目录的"封 ACL"用了 `filepath.Abs` 而不是 C26 PathResolver ⇒ **D22 门在 CI 之前把它拦下了**（票 89 的码，push 因此压住）
 
-**Status:** open（2026-09-21 15:1x 编排者建；⚠ **等票 89 交件后再派**——同包 `internal/winsec/**` 现在有人在写）
+**Status:** in-progress（agent-ticket94 已接手；票 89 已交件 `0a3a445`，`internal/winsec/` 现在是本代理地界）
+⚠ 第一枚 checkpoint 已落盘（见 Progress log 末条）：AC#1 判明为 **(b)**，并**推翻**本票"无循环依赖"的前提。
 **Type:** 安全边界（D22 ban #2 `pathresolver-bypass`）+ 一个**没被回答的设计问题**：拿没解析过的路径去决定"给哪棵树封权限"，本身是不是缺陷
 **Blocks:** **编排者的 push**（HEAD 上 `sh scripts/d22scan.sh` 现在就是红的，见下面读数 ⇒ 推上去 `lint` 会红在 D22 两步）
 · **Blocked by:** 票 **89**（它的代码引入了这个调用点；本票不能和它同时在 `internal/winsec/` 里写）
@@ -92,3 +93,58 @@ HEAD 上 `gofmt -l internal/winsec/` **不为空**（`winsec_windows.go` 未格�
   （我扫过 HEAD：`ban #8` 对 `internal/` 324 文件、`cmd/` 25 文件**零命中**）⇒ 那条**不需要放行**了，
   本票的命中点是 `pathresolver-bypass`，不是 emoji。
   next= 等票 89 交件（它的 Status 已经写 ready-for-review）⇒ 派单，与本票附带那条 gofmt 同批。
+
+- 2026-09-21 16:0x（agent-ticket94，checkpoint 1/AC#1 定性 + 形状选定）：
+  **先复现门检**（仓外快照 `/tmp/wisp94gate-94a`，`git archive HEAD`=15c649f，`sh scripts/d22scan.sh`）：
+  **rc=1**，命中 `internal/winsec/winsec.go:126: [pathresolver-bypass] filepath.Abs ...`，
+  失败的两条正是票面点名的 `TestScannerSelfScanOfRealRepoIsGreen` 与 `TestRealRepoLedgerIsHonest`；
+  台账逐作用域与票面读数一致：`bans #1-5 internal/=190`、`cmd/=20`、`ban #6 frontend/=35 text files`、
+  `#7 internal/tools/=16`、`#8 design/=16`、`#8 internal/=324`、`#8 cmd/=25`。墙钟 **10.6s**（`real`）。
+  ⚠ 附带那条 gofmt 已不需要本票带：`gofmt -l internal/winsec/` **0 行**（票 89 的 `0a3a445` 自行消除了，
+  见 AC#5 段的实测）。
+
+  **AC#1 判决：(b)** —— 封权限这条路**真的**能吃进未解析路径，四个生产调用点一个都没有过 C26
+
+  判据不是"我看代码觉得"，而是**每一条链的源头都落到了 `filepath.Join` + 未解析的环境来源**，
+  且全仓 `risk.Resolve(` 的非测试调用点（`grep -rn "risk\.Resolve(" --include=*.go`）**没有一个**在数据根这条链上：
+
+  1. `internal/memory/open.go:176` ← `:169` `abs, err := filepath.Abs(dir)`（就是 allowlist 上那条"声明"）
+     ← `cmd/wisp/providers.go:172` `memory.Open(io_.dataDir)` ← `:81` `resolveDataDir(buildinfo.EnvString())`
+     ← `cmd/wisp/doctor.go:222-245`：来源只有 `os.Executable()` 目录、`os.UserConfigDir()`、`os.TempDir()`、
+     `WISP_TEST_DATA_DIR`，全部只过 `filepath.Join`。⇒ **`open.go` 的"已解析"确实只是声明**。
+  2. `internal/memory/open.go:188`（artifacts）与 `:503`（backup）← `:183/:182` `filepath.Join(abs, ...)`，同一个未解析根。
+  3. `internal/secret/store.go:49` ← `:42` `filepath.Join(dataDir, "secrets")` ←
+     `cmd/wisp/providers.go:84` / `cmd/wisp/run.go:179` / `cmd/wisp/secret.go:246`；
+     `secret.go:170` 的 `layout.DataDir` ← `internal/proc/envfork.go:55-136`（`filepath.Join(userConfigRoot, "wisp")`
+     / `PortableDataDirName` / `ApplyPortableOverride` 的 `filepath.Join(exeDir, name)`）⇒ **同样零解析**。
+  4. `internal/agent/spill.go:111` ← `Spiller.dir` ← `internal/agent/loop.go:238` `NewSpiller(opt.Config.ArtifactsDir)`
+     ← `cmd/wisp/run.go:324` `filepath.Join(rt.spec.dataDir, "artifacts")` ← `run.go:135` `resolveDataDir(...)`。
+
+  ⇒ 也就是说 `PrivateDirAll` 的"逐级建 + 逐级封"决定的是**一条只做过词法拼接的树**。`filepath.Abs` 不解析
+  reparse、不展开 8.3、不剥 `\\?\`、不尾随点空格，而 `WISP_TEST_DATA_DIR` 与 `%APPDATA%` 这两个来源
+  都在这台机器上真实可控 ⇒ 这是**独立缺陷**（(b)），不是"该用哪个 API"的口味问题（(a)）。
+
+  **⚠ 推翻本票前提：`winsec` import `risk` 会成环**
+
+  票面（与派单语）写的"编排者已核过 `internal/risk` **不** import `internal/winsec` ⇒ 无循环依赖"
+  **只对直接 import 成立**。实测闭包：
+  `go list -deps ./internal/risk/` → `internal/risk` ← `internal/observe`（`redact.go:112` 调 `secret.RedactSecret`）
+  ← `internal/secret`（`store.go:10` import `winsec`）← `internal/winsec`。
+  ⇒ `winsec → risk` 一旦直写，链路 `risk → observe → secret → winsec → risk` 成环，`go build` 直接拒绝。
+  **缺的这次测量就是 `go list -deps`**（只核 `.Imports` 不够）。
+
+  **形状选定（AC#2/AC#3 的落点）**
+
+  因为 (i) AC#1=(b) 必须真的解析或响亮拒绝、(ii) 四个生产调用点全在**需要协调**的文件里
+  （`internal/memory/*.go`、`internal/secret/store.go`、`internal/agent/spill.go`；`cmd/wisp/`、`internal/config/` 禁碰），
+  (iii) `risk → winsec` 方向是**干净**的（winsec 无内部依赖）、
+  修法收在**本票地界 + 一枚反向注入的安装钩子**：
+  - `internal/winsec/`：新增 `ResolvedPath` 只经 C26 管道铸造（seam 未装 ⇒ **响亮失败**，不是静默词法拼接），
+    `PrivateDirAll`/`SealDir`/`SealFile`/`PrivateFile*` 的 `filepath.Abs` 位置改吃**已解析**值；
+    **公开签名不收窄**（不收 `string`→换类型），以免打断票 90/18 正在写的调用方编译。
+  - `internal/risk/`：**新增一个文件**（不碰 `pathresolver*.go`/`assessor.go`/`rules_gateway.go` 三个冻结件）
+    把 `risk.Resolve` 装进 winsec 的 seam ⇒ C26 仍是**唯一实现**，winsec 不复制第二条管道。
+  - AC#3 用例：真 junction（`mklink /J`，本包已有 `mkJunction` 且票 89 证过无特权可用）喂进 `PrivateDirAll`，
+    断言"要么 `ErrReparseDenied` 拒、要么封到解析后那一棵"，**不许封到它以为的那棵**；
+    变异 = 把入口退回 `filepath.Abs` ⇒ 该用例必须红（编译必须过，否则不算变异）。
+  next= 落地上述形状 → 写 AC#3 用例 → 跑变异 → AC#4 门禁登记 → AC#5 全量读数 → 纯净快照 d22scan rc=0。
