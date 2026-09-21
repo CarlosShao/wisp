@@ -54,6 +54,30 @@
       ⚠ 本机跑 `cmd/wisp` 需要 `PATH="$PWD/third_party/sherpa-onnx:$PATH"`（票 98 的洞），
       并且**"剥光 PATH 还能不能跑"要照实报**。
 
+## 编排者裁定（21:5x，来源=`audit-deps-reachability` 的 `docs/evidence/s1/121-preflight-deps-reachability.md`，474 行）
+
+- **AC#3 的清单第一版＝选项 2：`{internal/models, internal/statemachine}`。**
+  预做量到的分母（纯净快照 `7699ec3`，三个 GOOS 逐字相同）：`go list ./...` = **33 个包**、
+  过滤到本模块前缀后**在图里的是 20 个**、**不在图里 13 个**；
+  而这 13 条里**只有 4 条是"修了才绿"的真信号**（`models`/`statemachine`/`audio`/`ball`），
+  其余 9 条是**恒真红**（4 个只有 `doc.go` 的 DEFERRED 占位 + 3 个 `package main` + 2 个带 `testing`/`httptest` 的测试夹具）。
+  ⇒ 它算出的收紧阶梯是 42→22→13→9→6→**4**。所以我**不选**你原方案里"全仓 33"那种形状：
+  **一条会把 4 条真信号淹在 9 条噪音里的门，等于没有门**。
+  选项 2 的好处：`statemachine` 今天虽不欠票，但它**经 `models/bridge.go:8` 传递性掉出图**，
+  与 `models` 在同一次 AC#2 落地后**一起转绿** ⇒ **本票不引入任何自己交不掉的红**。**批准纳入。**
+- **AC#3 追加一条硬判据（这是我看完你的表才想到的坑）**：断言必须**逐 GOOS 各跑一次**（至少 `windows` 与 `linux`）。
+  否则有人把那条边写进一个 `//go:build windows` 文件里 ⇒ **windows 腿绿、linux 腿静默掉出图**，
+  而 CI 两条腿分别在不同 job 里，没人会把它读成同一件事。
+  ⚠ 同时记住预做那格"看起来矛盾"的读数：**`GOOS=linux go list -deps` 本身 rc=1**（失败点在第三方
+  `sherpa-onnx-go-linux: build constraints exclude all Go files`），要加 `-e` 才拿得到包集合——
+  **那是仪器的 rc，不是"包不在图里"的证据**，别混。
+- **本票 `Blocked by` 追加一条**：**票 117 此刻正在写 `cmd/wisp/run.go`＋`resident_windows.go`＋新建 `logsink*.go`（未提交，在飞）**
+  ⇒ 两票都要动**装配根**，**冲突判据落到文件级**：`cmd/wisp/run.go` 与 `resident_windows.go` **117 持有**，
+  本票等它交件之后再动；真需要提前动，先来问我，**不要在同一枚文件上做第二次装配**。
+- **`internal/audio` 与 `internal/ball` 这两格不在本票做**（它们才是这次预做真正新增的发现——此前**没有票在管**）：
+  我已把它们**登记成显式推迟项**（见 `docs/reports/pending-and-issues.md` A91③，含完成判据与残缺表现），
+  **不在这里开新票**——`audio` 的消费方 `internal/speech` 到今天还是 `doc.go`，现在接进去只能接一条没人读的采集边。
+
 ## Rules（本仓固定）
 
 - 只 commit 不 push；`git add` 只用显式路径；commit 前 `git diff --cached --name-only`（共树很脏）。

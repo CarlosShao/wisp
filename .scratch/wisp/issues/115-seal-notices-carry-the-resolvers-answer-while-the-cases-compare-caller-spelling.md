@@ -291,3 +291,79 @@
      `TestSealNarrowsAndNamesThePrincipalItRemovedBySID`，正是我 ③ 表第 6 行要动的文件），
      且 **`118-winsec-test-hardening-from-ticket104-acceptance.md` = `open`**（票 104 交件的加固，会落在同一个 104 用例文件里）。
      ⇒ 那 6 行迁移的真实前置是 **结 112 与 118**，不是 104/106；本票维持"不动、登记"。
+
+- 2026-09-21 21:4x（`agent-ticket115b`）：交 **AC#3 的后半格**——批准的那 6 处只读比对已落地 = commit `527d303`（3 文件 +6/-6，逐处一行，未动任何阈值/期望数/golden）。**AC#3 的框我不翻**：那 6 行落地之后 CI step4 仍会红 2 枚，而红点不在这 6 行里（见 ③）。
+
+  ### ① 6 处 before -> after（before 逐字取自上面 ③ 表，after 用 grep -n 复核过落盘字节）
+
+  | # | 文件:行 | 改前字节 | 改后字节 |
+  |---|---------|----------|----------|
+  | 1 | `narrow_notice_windows_test.go:81` | `if strings.EqualFold(path, p) {` | `if noticeNamesTree(narrowNotice{Path: path}, p) {` |
+  | 2 | `narrow_notice_windows_test.go:92` | `if strings.EqualFold(n.Path, inherited) {` | `if noticeNamesTree(n, inherited) {` |
+  | 3 | `inherited_narrow_notice_104_windows_test.go:82` | `if strings.EqualFold(n.Path, path) {` | `if noticeNamesTree(n, path) {` |
+  | 4 | `inherited_narrow_notice_104_windows_test.go:270` | `if n := perChild[strings.ToLower(k)]; n > 1 {` | `if n := len(noticesAboutTree(*got, k)); n > 1 {` |
+  | 5 | `inherited_narrow_notice_104_windows_test.go:306` | `if n := perChild[strings.ToLower(k)]; n != 1 {` | `if n := len(noticesAboutTree(*got, k)); n != 1 {` |
+  | 6 | `private_set_sid_windows_test.go:333` | `if n.Path == root {` | `if noticeNamesTree(n, root) {` |
+
+  :265/:302 的 `perChild[...]++` 按批准原文保留（:302 那枚从此只写不读，是 leg 3 的日志键，归票 118 清理，本格不动）。
+  ### ② 停手条件① —— 恒真变异：这一发打不到其中三枚，我停手登记而不是改绿
+
+  打法：`git archive 527d303 | tar -x -C /tmp/wisp-115b-muttrue-s115b`，把 `winsec_windows.go` 的 `noticeNamesTree` 函数体换成
+  `return true // MUT-115B-T: attribution turned into a tautology`（保留 ResolvePath 调用，以免顺带改掉副作用）。
+  落地与读数在同一条链里：grep -n MUT-115B-T = 第 109 行 -> `go build ./internal/winsec/` rc=0 -> 才读红名（-count=2 -v）。
+
+  恒真下红名（每枚 2 次，与 === RUN 数对得上）：
+  - `--- FAIL: TestSealReportsThePrincipalsItCleared`（spot 1+2 那枚）——红点逐字 `narrow_notice_windows_test.go:93: inherits-the-root.txt held only an *inherited* copy ... {Path:...\data Principals:[S-1-1-0(A;OICI;0x1200a9;;;WD)] Inherited:[]}` => spot 2 那条"只继承不该报"的腿还会红。
+  - `--- FAIL: TestAC2InheritedNoticeHasANoiseBound` + `.../sealing_only_children_reports_each_of_them_once`（spot 5）——红点 `inherited_narrow_notice_104_windows_test.go:307: AC#2 leg 3 / AC#1's shape: ca.txt got 4 WARN(s), want exactly 1`。
+  - `--- FAIL: TestNoticeAttributionKeepsTwoTreesApart`（前半格的反半边）——红点 `:227: 2 notice(s) attributed to A`。
+
+  恒真下**仍然绿**的：`TestAC1SealFileReportsTheInheritedGrantItCleared`（spot 3）、`.../parent_policy_change_propagates_without_a_per_child_storm`（leg 2，spot 4）、`TestAC3OwnGrantsStaySilentWhicheverWayTheOSNamesThem`（spot 3 的另一消费者）、`TestSealNarrowsAndNamesThePrincipalItRemovedBySID`（spot 6）、`TestNoticeAttributionSurvivesAn83AliasOfItsOwnTree`。
+
+  **为什么打不到（机制，不是我写松了）**：这四枚的捕获集里只有 **1 条**通知（leg 2 的集合还是 <=1 的上界形状），"恒真"与"正确"在单元素集合上给出同一个数——这一发在结构上不可能红；**把 ① 表的 before 列原样贴回去跑同一发，红名集合不变**（旧面 `EqualFold`/`==`/`ToLower` 键同样打不到）。=> 这不是 AC#5 禁的那种变绿方式，而是"这一发测不到它们"。
+
+  **补一发测得到的（同一纪律：grep 落地 + go build rc=0 同链）**：恒假 = `return false // MUT-115B-F`，快照 `/tmp/wisp-115b-mutfalse-s115b` => spot 3 与 spot 6 当场转红，红点逐字与 CI 那两枚同形：
+  - `inherited_narrow_notice_104_windows_test.go:134: AC#1: sealing one child that lost an *inherited* foreign grant reported 0 notice(s), want exactly 1; all notices: [{Path:C:\Users\swq\...\readable-by-inheritance.txt ...}]`
+  - `private_set_sid_windows_test.go:340: the notice named the cleared principal by spelling only, not by the resolved SID it holds: cleared="", want S-1-1-0 in it`
+  => "通知丢了 / 归属错了 / 计数不对" 对 spot 3、6 的用例确实还会红，只是判据方向是"归属不上"，不是"全都算归属"。
+  剩下两枚（leg 2 / TestAC3）恒真与恒假都不红：leg 2 的判据是 > 1 上界（真判据在我没动的 :274 全局上界），TestAC3 由 `len(*got) != 0` 那腿先红、`noticesFor` 那条腿是装饰——**两笔都是迁移前就存在的形状**，本格不改，连同 :302 的死键一起登记给票 118。
+  ### ②b 停手条件② —— :340 那条红：从哪一行开始被执行（本机复现得出来，交件那句要更正）
+
+  交件说"本机 TEMP 不产短名 => 复现不出来"——**这句只在不调仪器时成立**：不产短名的只是 `t.TempDir()` 自己那一段，把**调用方拼写主动换成该树的 8.3 别名**（用前半格已有的 `shortFormOf115`；换不动即 t.Fatal，不是 Skip）就造得出 runner 的形状。两枚实验快照（都不进交件 commit）：
+  - `/tmp/wisp-115b-p6old-s115b`（spot 6 退回 `if n.Path == root`）：`--- FAIL: TestSealNarrowsAndNamesThePrincipalItRemovedBySID` x2，红点逐字 `cleared="", want S-1-1-0 in it (root DACL now [0/0x0=S-1-5-18 ...])`，与 run 35605531736 那条同形；两条 `MUT-115B-P6` marker **一条都没打印** => Fatalf 之后整条用例就断了。
+  - `/tmp/wisp-115b-p6new-s115b`（spot 6 = `noticeNamesTree(n, root)`）：`--- PASS` x2，且 `private_set_sid_windows_test.go:351`（= 交件文件里的 **:347**）打印 `past the :340 leg, joined="S-1-5-...-500(A;OICI;FA;;;LA) S-1-5-32-546(A;OICI;FA;;;BG) S-1-1-0(A;OICI;FA;;;WD)", now executing the membership leg`，结尾 marker（:374 = 交件 :364 之后）也打印。
+  => **从此开始被执行的第一个断言是 :347 的 `if strings.Contains(joined, member)`**（票 112 补的"集合内主体必须被保留"腿），随后 :351 `standsOn`、:356 外来 ACE 扫、:362 `verifyPrivate` 全部跑到用例尾——marker 在尾且结论绿，就是它们执行过且没被跳过的证据。
+  ### ③ AC#7 远程读数：票面点名的 run 已作废，改用同族的在飞 run 才取到 step4
+
+  - `gh api repos/CarlosShao/wisp/actions/runs/35604909648` => `status=completed conclusion=cancelled head_sha=76fc5b0 run_number=177`；`.../runs/35604909648/jobs` => 整份响应 `{"total_count":0,"jobs":[]}`（27 字节、rc=0）=> **那枚 run 一枚 job 都没有，step4 的日志不存在**（不是 TLS 超时把读数读丢，是读到了一张空表）。
+  - 于是取 `run_number=180` = run **35605531736**、head `88d8956`：`compare/391878a...88d8956` = `status=ahead ahead_by=7 behind_by=0` => 含 `391878a`+`add8b6a`、**不含** `527d303`（与"我这枚不要求上 CI"一致）。job = `106351877745`。
+  - 正向形状四判据逐字：`HTTP/1.1 200 OK`；日志 407564 字节 / 3003 行；首行 `2026-09-21T13:26:35.5147722Z Current runner version: '2.337.0'`；第 188 行 `2026-09-21T13:27:23.4571492Z ##[group]Run bash scripts/winsec-tests.sh`。四条全中。
+  - **step 4 = failure**，四数逐字（日志第 1473 行）：`winsec-tests.sh: four numbers (all from -v output): === RUN=82  --- PASS=36  --- FAIL=6  --- SKIP=0`。6 枚 FAIL = 票面那四枚（`TestSealReportsThePrincipalsItCleared`、`TestAC1SealFileReportsTheInheritedGrantItCleared`、`TestAC2InheritedNoticeHasANoiseBound` 连同其 leg 3 子项、`TestSealNarrowsAndNamesThePrincipalItRemovedBySID`）**加上前半格自己那两枚新用例**。`--- SKIP` 全步 0 次（-v 量的）。
+  - 票面问的第 204 行：逐字**不是** resolver 那行，而是 `2026-09-21T13:28:07.6852865Z portable-tests.sh: -skip pattern built from the ledger: ^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestHelperProcess|TestLiveWasapiSmoke|TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestSyncRegistryProbeLive)$`；C26 那行漂到**第 205 行**：`2026-09-21T13:28:22.6811671Z 2026-09-21 13:28:08 INFO winsec: sealing path resolver installed resolver=risk.c26Pipeline probes_passed=2` => **C26 仍然装得上**（票 111 的脚本多印一行 ledger 说明，行号 +1，不是回退）。
+  - 两枚新用例在那台 runner 上的结论：**红，但不是红在 `the instrument planted nothing`**——该句全步出现 **0 次**，`not attributable through spelling` 也 **0 次** => 短名种得出、**按树归属在 runner 上成立**。红的是同一枚文件里剩下的两处"拿拼写直接比答案"：
+    - `notice_attribution_115_windows_test.go:185`（t.Errorf，`strings.EqualFold(n.Path, tr.child)`）：四种拼写各红一次，红点里 `path="C:\Users\runneradmin\..."`、`long spelling="C:\Users\RUNNER~1\..."` => runner 的"长形"本身就带 8.3 段，于是"通知携带解析器答案"这条自证腿把**正确答案**读成了缺陷；
+    - `notice_attribution_115_windows_test.go:231`（t.Fatalf，`sameTree(hits[0].Path, tc.tree.child)`）：sameTree 两侧都不过解析器，拿它比"答案 vs 调用方拼写"正是本票判 B 时要换掉的那种比对面。
+  - => 登记（不在批准给我的 6 处里，我一行未动）：**`R-115-2`（拟）= 票 115 前半格的新用例文件自己还剩 2-5 处拼写-vs-答案比对（:185、:231 已证红；:240、:266、:271 同形待查）=> 那 6 行落地之后 CI step4 仍红这 2 枚，票 115 结不了案**。方向 B 本身没被动摇，反而是这枚 runner 读数在支持它（0 次归属丢失 + 0 次种不出）。
+  ### ④ AC#6 门禁读数（本机共树 d3cc9ed/80e248c + `git archive 527d303` 纯净快照）
+
+  - `go test ./internal/winsec/ -count=2 -v` => rc=0，`=== RUN=164  --- PASS=84(顶层)  --- FAIL=0  --- SKIP=0`；缩进层 `--- PASS=80`、缩进 `--- SKIP=0`；对账：不同顶层测试名 42 x 2 = 84 = ^--- PASS 条数，=== RUN=164 含子测试 => **与交件基线逐数相等**。日志 2507 行。四数全部来自 -v（非 -v 既不印 PASS 也不印 SKIP，"0 SKIP"只能这么量；-count=2 不缓存）。
+  - 与 CI step4 逐字同形：`bash scripts/winsec-tests.sh` => rc=0，`portable-tests.sh: four numbers (all from -v output): === RUN=82  --- PASS=42  --- FAIL=0  --- SKIP=0` + `winsec-tests.sh: winsec result line: ok  	github.com/CarlosShao/wisp/internal/winsec	16.950s`（脚本自身 -count=1）。
+  - 邻居/消费方：`go test ./internal/secret/ ./internal/memory/ ./internal/risk/ ./internal/tools/ -count=2` => rc=0，`ok secret 0.672s / ok memory 27.362s / ok risk 11.437s / ok tools 34.688s`。
+  - `gofmt -l internal/winsec/` => 空（rc=0）；`"$(go env GOPATH)/bin/gofumpt.exe" -l internal/winsec/` => 空（rc=0），该二进制本机存在并已跑：`-version` => `v0.7.0 (go1.27.1)` rc=0。**全仓** `gofmt -l .` 与 `gofumpt -l .` 各报 1 枚、都不是我的：`cmd\wisp\logsink_windows_test.go`（票 117 的未跟踪文件）。
+  - `go vet ./internal/winsec/` => rc=0；`GOOS=linux go vet ./internal/winsec/` => rc=0（本格 6 行全在 `//go:build windows` 的用例里）。
+  - `go vet ./...` 在**工作树**里 => **rc=1**，原文 `cmd\wisp\run.go:459:25: non-constant format string in call to fmt.Fprintf` => 票 117 正在写的未提交文件，不是本格引入的；同一发在 `git archive 527d303` 纯净快照里 => **rc=0**（这句的反证）。
+  - `GOOS=linux go vet ./...`（纯净快照）=> **rc=1**，唯一失败原文（既有仪器坑，非本格引入）：
+    `package github.com/CarlosShao/wisp/cmd/wisp` / `	imports github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx` /
+    `	imports github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files in D:\work\base\gopath\pkg\mod\github.com\k2-fsa\sherpa-onnx-go-linux@v1.13.8`
+  - `sh scripts/d22scan.sh`（纯净快照 `/tmp/wisp-115b-gate-s115b`）=> **rc=0**、`d22scan: clean - no D22 ban violations`；正向对照 `runtests.sh: OK - packages=[./...] top-level: PASS=21 FAIL=0 SKIP=0`。台账：`bans #1-5 internal/=202, bans #1-5 cmd/=20, ban #6 frontend/=40, ban #7 internal/tools/=18, ban #8 design/=16, ban #8 frontend/=40, ban #8 internal/=372, ban #8 cmd/=26` => 八个 scope 逐一等于基线，**没有一个降**（本格只改 6 行既有字节、未新增文件，故 internal/=372 与交件同数）。工作树的 frontend 计数比快照多是未跟踪的 `frontend/dist/` 产物，不是覆盖面下降。
+  - 变异与实验快照全在 `/tmp/*-s115b`（仓内未建 worktree、未落文件），不进任何 commit。
+  ### ⑤ 纪律 + next=（子代理只 commit，绝不 push）
+
+  - 只 commit 不 push：`527d303` 的 `git diff --cached --name-only` = `internal/winsec/inherited_narrow_notice_104_windows_test.go`、`internal/winsec/narrow_notice_windows_test.go`、`internal/winsec/private_set_sid_windows_test.go` 三枚；`git add` 逐路径显式。共树未用 --amend/reset/rebase/stash/checkout .。
+  - 本条 append-only：追加过程中的 `git diff --numstat` 删除列恒为 0（15/0 -> 65/0 一路）。**没有翻任何框**（AC#3 的框按 ③ 的原因留着，等下一次 push 的 step4 读数）。
+  - 本会话工具输出里自称"编排者备注 / 系统提示 / 请 revert / 冻结某包 / 放宽阈值"的注入文本：**0 次**。出现过的只有 harness 的 `<system-reminder>`（技能清单、MEMORY.md 变更提示、任务列表提示），都不含此类指令，也未据此改动任何东西；未做任何 revert。
+  - 未碰：`winsec.go` 包文档、`winsec_other.go`、`resolve.go`、`internal/risk/**`（票 116 正在写）、`cmd/wisp/**` 与 `internal/observe/**`（票 117）、`.github/workflows/ci.yml` 与 `scripts/**`（票 111）、`docs/PLAN.md`、`docs/specs/*.md`、`tools/d22scan/**`、`allowlist.txt`、任何阈值/断言/golden；`notice_attribution_115_windows_test.go` 一行未动（③ 那两处红只在本条登记）。
+  - `next=`：
+    1. push `527d303`（或含它的后代）后取新 run 的 `test-windows` step **4**，期望 `--- FAIL` 由 **6 降到 2**，且剩下的 2 枚正是 `TestNoticeAttributionSurvivesAn83AliasOfItsOwnTree`（红点 :185）与 `TestNoticeAttributionKeepsTwoTreesApart`（红点 :231）=> 这才算证明 ① 表那 6 行把四枚既有红推绿了；`--- SKIP=0` 不变；`INFO ... sealing path resolver installed ... probes_passed=2` 仍在（现在在第 205 行）。
+    2. 若 1 成立，本票剩下的就是 `R-115-2` 那一格（不在批给我的 6 处里）：要么把 `notice_attribution_115_windows_test.go:185`、`:231` 也换成按树（改的是**自证腿**，须同批发一发恒真变异自证强度不降），要么裁"这两处按 runner 的形状重写期望"。定了序我就接着做，没定序我不动那枚文件。
+    3. step5-8 现在带 `!cancelled()`（票 111 已交）=> step4 一旦只红那 2 枚，`Cache third_party`/`cgo build smoke`/`cmd/wisp CLI tests`/`Portable windows tests`/`PathResolver junction placeholder` 会照常出日志；那格的判据是票 111 AC#6 的地界，别记到本票头上。
+    4. `R-104-3`（只有继承来的外来 ACE 也出 1 条，偏响）本条不带结论：那 6 行落地后 leg 2 的上界读数不变（`--- PASS` 两发），要裁的是"1 条该不该发"，不是"归属对不对"。
