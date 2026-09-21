@@ -345,3 +345,19 @@ go test ./...           ⇒ ok  github.com/CarlosShao/wisp/tools/d22scan  (cache
 ⚠ 边界要说清：这道门的范围**只有 `frontend/`**（`node_modules/`、`testdata/` 被跳过），
 所以准确的说法是"**面板树里出现 `approval.decide` ⇒ CI 红**"；
 它**不**保证"`approval.decide` 出现在任何别处也红"（别处归 ban #6 之外的账，例如票 96 正在补的 ban #8 覆盖面）。
+
+---
+
+## 11. 交回前的最新一次复核（HEAD 已前移到 `d119434`，我又量了一遍）
+
+```
+git archive d119434 | tar -x -C /tmp/wisp88acc-head2 && sh scripts/d22scan.sh   ⇒ RC=1
+  唯一 finding：internal/winsec/winsec.go:126: [pathresolver-bypass] filepath.Abs …   ← 票 89/94 的账，仍在 HEAD 里
+  同一跑：d22scan: scope ban #6 frontend/         examined  37 text files            ← 本票的门照常干活
+git show HEAD:tools/d22scan/main.go | grep -n 'label: "ban #6 frontend/"' -A 2   ⇒ :331-:332 仍是 live: true
+git show HEAD:tools/d22scan/allowlist.txt | grep -v '^\s*#' | grep -c .           ⇒ 仍是 5 行，
+  且**没有**任何人给 winsec 开豁免条目（pathresolver-bypass 三条仍是 open.go / manifest.go / pathresolver.go）
+```
+⇒ 两点结论对 owner 有用：**(1)** 翻牌没被后来者退回去；**(2)** push 的 D22 红账**至今仍是票 89/94 的 `filepath.Abs`**，
+修法方向是对的（工作树里 `internal/winsec/resolve.go` + `internal/risk/winsec_c26.go` 在走 C26 PathResolver，
+**而不是往 allowlist 塞一行**——那正是 D22 不许代理做的事）。本票与此无关，我不代裁。
