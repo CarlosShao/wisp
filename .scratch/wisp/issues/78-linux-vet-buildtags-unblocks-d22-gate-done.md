@@ -1,6 +1,16 @@
 # 78 — Fix the Linux-only `go vet` errors that have been silently skipping the D22 gate in CI since `fd8f838`
 
-**Status:** in-progress (agent=ticket78；修复 `2201530` + 回归门禁已落，AC#1-3 已勾并附 exit code，只剩 AC#4 等编排者 push 的 run id) (**优先级最高：它是 A44① 的因——D22 门禁从未在 CI 上产出过一次结论**)
+**Status:** **done**（编排者验收 2026-09-21 13:2x）—— AC#1..AC#4 四框全绿。
+**本票的主旨已达成并有 CI 原文**：run `35558750456` 里
+`D22 scanner positive control (tools/d22scan tests, seeded red)` = **success**、
+`D22 seven-ban + emoji scan (tools/d22scan)` = **success**，且我抠出它自报的覆盖面
+（`bans #1-5 internal/=184`、`cmd/=19`、`#7 internal/tools/=16`、`#8 internal/=303`、`#8 cmd/=24`、`#8 design/=16`，
+末行 `clean - no D22 ban violations`）⇒ **A44① 的"D22 门禁从未在 CI 上产出过一次结论"正式关闭**，
+七条禁令 + emoji 扫描**第一次真的在把关**。
+⚠ 两条如实挂着的尾巴写在框后：AC#1 那条"CI 侧 ubuntu 原生 `go vet (module)` 绿"仍**无样本**
+（该步在本 run 里因前面的 `gofmt (gofumpt)` 失败而 skipped ⇒ 归票 70 的 AC#6），
+`ban #6 frontend/` 是 `examined 0 [NOT COVERED]`（目录不存在，扫描器明说不假绿 ⇒ 票 77 建目录时同批武装）。
+
 **Type:** build/portability defect (tiny diff, large governance consequence)
 **Blocks:** 票 71 的 AC 收尾、票 77（新 CI job 不能建立在一个哑步骤上）、`test-core`/`lint` 的可信度
 **Blocked by:** nothing — `internal/ball`（票 74 已 done）与 `cmd/wisp`/`internal/proc`（票 66 已 done）现在都空
@@ -35,14 +45,36 @@ vet 一失败，**扫描步骤被 `skipped`，D22 门从未在 CI 上给出过�
 - [x] **AC#1** `GOOS=linux go vet ./...`（主模块）干净——**这就是本票的判据仪器**，
       必须给出真实命令与 exit code。⚠ 变异检验：把任一处修复退回旧形状 ⇒ 该命令必须转红
       （**先 grep 证变异落盘再跑**，还原后证明确实还原）。
+  - **编排者复跑后的口径更正（2026-09-21 13:2x，不撤勾、改判据读法）**：我在 `git archive de3781b` 的纯净快照里
+    跑**逐字相同**的命令 `GOOS=linux go vet ./...` ⇒ **rc=1**，但输出只剩**一条**：
+    `package github.com/CarlosShao/wisp/cmd/wisp imports .../sherpa_onnx imports
+     .../sherpa-onnx-go-linux: build constraints exclude all Go files`。
+    ⇒ **这条不是本票的敌人，是我的仪器不匹配**：从 Windows 交叉到 linux 时 `CGO_ENABLED` 默认 0，
+    那个预编译包整个被 build constraint 排除 ⇒ **`GOOS=linux go vet ./...` 在本机上永远不可能 rc=0**，
+    与本票修没修对无关。（代理在票面 `:79` 已自己发现同一件事，我这次是第二次独立复现。）
+    **真正未见的判据**是 CI 上 ubuntu 原生的那一步 `go vet (module)`：run `35558750456` 里它 **skipped**
+    （被前面的 `gofmt (gofumpt)` 挡住，A44 同族），所以**AC#1 的"CI 侧绿"仍无样本**——
+    这条随票 70 的 AC#6 一起收，不在本票重复。**本票勾上的部分**＝它自己那两处修复确实生效：
+    我的复跑里 `undefined: mulA` 与 `undefined: proc.Runtime` **两条都消失了**，这就是它该交付的东西。
 - [x] **AC#2** Windows 侧**零行为变化**：`go test ./internal/ball/ ./internal/proc/ ./cmd/wisp/ -count=2` 全绿，
       且 `gofmt -l` 触及包为空。
 - [x] **AC#3** 一条防回归的机械检查：新增用例或 CI 步骤，使"无 tag 文件引用 windows-only 符号"这类形状
       **在 CI 上必红**（可选实现：`GOOS=linux go vet ./...` 作为 lint job 的一步）。
       判据：它必须自己有一次真红（种子一个故意的引用 ⇒ 步骤红），否则等于没装（A15/A44①）。
-- [ ] **AC#4** D22 扫描步骤**第一次产出真实 CI 结论**：交回 push 之后的 run id + job id + 该步骤的结论。
+- [x] **AC#4** D22 扫描步骤**第一次产出真实 CI 结论**：交回 push 之后的 run id + job id + 该步骤的结论。
       ⚠ 区分 **failure / cancelled(0 job) / 未跑完**（A44③）：排队被取代的 run **不算样本**。
       你不需要 push（编排者推），把这条留着不勾并写 `next=`，我推完回填。
+  - **编排者回填（2026-09-21 13:1x）**：run **`35558750456`**（headSha `17efc2c`，2026-09-21T03:48:12Z，
+    job `test-core`… 不，本步在 **`lint`** job）**`D22 seven-ban + emoji scan (tools/d22scan)` = success**。
+    **这不是"没报错所以没跑"**：我从 `gh run view 35558750456 --log` 里逐条抠出它自报的覆盖面 ——
+    `bans #1-5 internal/=184`、`#1-5 cmd/=19`、`#7 internal/tools/=16`、`#8 internal/=303 Go files`、
+    `#8 cmd/=24`、`#8 design/=16`，末行 `d22scan: clean - no D22 ban violations`；
+    且**同一个 job 里它的阳性对照在前一步真红过**（`TestScanDetectsAllSeededViolations` PASS，
+    其内部断言打印 `rc=1 stdout=d22scan: examined 16 production Go files ...`）
+    ⇒ "见过它红"这条判据成立，绿是有意义的。**A44①/A26 的"D22 门从未产出结论"自此关闭。**
+    ⚠ 一个**诚实的残余空档**（不是本票的账）：`ban #6 frontend/` 仍是 `examined 0 [NOT COVERED]`，
+    因为 `frontend/` 这个目录在当前 HEAD 上不存在。扫描器**明说**了这点而不是假绿，
+    等票 77（前端脚手架）建出目录时同批武装（R18 已记）。
 
 ## 硬规矩
 - 只动 `internal/ball/**`、`internal/proc/**`、`cmd/wisp/**`（以及为 AC#3 需要时的 `.github/workflows/ci.yml` 一行）。

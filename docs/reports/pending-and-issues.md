@@ -1101,6 +1101,34 @@ vet: cmd/wisp/slo.go:324:49: undefined: proc.Runtime
 本 commit 已把该步与它的阳性对照（`tools/d22scan/runtests.sh -C tools/d22scan ./...`）**提到 gofmt/vet 之前**：
 不删步骤、不给任何步骤加 `continue-on-error`、不让任何步骤可跳过（D22 mode 6 未碰）。
 
+## 编排者登记 A54（2026-09-21 13:2x，**D22 安全扫描第一次真在 CI 上把关** + 我自己踩到的"交叉编译假红"）
+
+- **A54① 治理里程碑**：run **`35558750456`** 的 `lint` job 里
+  `D22 seven-ban + emoji scan (tools/d22scan)` = **success**，并且我**没有把"没报错"当成"跑过了"**——
+  从 `gh run view --log` 抠出它自报的覆盖面：`bans #1-5 internal/=184`、`#1-5 cmd/=19`、
+  `#7 internal/tools/=16`、`#8 internal/=303 Go files`、`#8 cmd/=24`、`#8 design/=16`，
+  末行 `d22scan: clean - no D22 ban violations`；阳性对照那一步在前一格就 **PASS** 了
+  `TestScanDetectsAllSeededViolations`（其内部断言打印的子进程就是 `rc=1 ... examined 16 production Go files`）
+  ⇒ **"先见过它红"成立**。A26/A44① 那句"D22 门禁自 `fd8f838` 起从未产出过一个结论"**关闭**。
+  ⚠ 顺序之所以对：票 66/70 时期把该步**提到了 `gofmt`/`go vet` 之前**，所以这次它没被前面的失败挡住。
+  **这就是"门的位置"比"门的内容"更先决的又一个实例。**
+- **A54② 一个诚实的空档（不算绿）**：`ban #6 frontend/` = `examined 0 text files [NOT COVERED]`，
+  因为当前 HEAD 上没有 `frontend/` 目录。扫描器**明写**"NO coverage"而不是把 0 当通过（票 67 装的仪器在工作）。
+  ⇒ 票 77（前端脚手架）落地时**同批武装 ban #6/#8**，R18 已记这条。
+- **A54③ 我自己踩的坑，写给所有后来的代理**：我为了独立复核票 78 的 AC#1，在 Windows 主机上跑
+  `GOOS=linux go vet ./...` ⇒ **rc=1**，但唯一那条是
+  `cmd/wisp → sherpa_onnx → sherpa-onnx-go-linux: build constraints exclude all Go files`。
+  **交叉到 linux 时 `CGO_ENABLED` 默认为 0**，那个预编译 cgo 包整体被排除 ⇒
+  **这条命令在 Windows 主机上永远不可能 rc=0，与被审对象无关**。
+  ⇒ 三条固化判据：①**判据仪器要么与 CI 逐字同形（同一台 ubuntu、同 CGO），要么按包作用域跑**
+  （`GOOS=linux go vet ./internal/ball/` 这类 cgo-free 包是有效仪器）；
+  ②复跑出现红时**先问"这条红是不是我的调用方式造的"**（票 78 的代理自己已经发现同一件事，我这次是第二次复现）；
+  ③"我本地的 rc"与"CI 那一步的 conclusion"是**两种证据**，不许互相替代 ——
+  CI 的 `go vet (module)` 那一步在本 run 里是 **skipped**（被前面的 gofumpt 红挡住），
+  所以**票 78 的"CI 侧 vet 绿"至今无样本**，仍挂在票 70 的 AC#6 上。
+
+
+
 ## 编排者登记 A53（2026-09-21 12:5x，票 80 交回：**结论是"不该写码"，而且把我 A51⑤ 的定性推翻了一格**）
 
 - **A53① 更正 A51⑤ 的定性（我自己写窄了）**：A51⑤ 说"`bOverrides` 没有生产调用者"。票 80 的穷尽清单证明
