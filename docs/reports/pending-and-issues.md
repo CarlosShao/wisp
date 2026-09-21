@@ -1099,6 +1099,66 @@ vet: cmd/wisp/slo.go:324:49: undefined: proc.Runtime
 本 commit 已把该步与它的阳性对照（`tools/d22scan/runtests.sh -C tools/d22scan ./...`）**提到 gofmt/vet 之前**：
 不删步骤、不给任何步骤加 `continue-on-error`、不让任何步骤可跳过（D22 mode 6 未碰）。
 
+## 编排者登记 A46（2026-09-21 10:33，票 72 落地：安全分类去拼写化完成，但**两代理同文件**要立刻定序）
+
+- **A46① 我 10:08 的插单被执行了，而且是被同一个人**：`6a6c85e` 把 **override（放行）侧收窄到只认已解析形式**，
+  并加了 `TestOverrideOnlyAcceptsTheResolvedForm`；其变异（把 `overrideApplies` 改回"遍历全部形式"）
+  **确实转红**。拒绝侧保留"遍历全部拼写形式"，两边不对称从此**有用例钉住**。
+  根因也定位到具体行：`blacklist.go:120` 用**字面 env 拼写**建 A 档锚点、`blacklist.go:132` 拿它和已解析路径比
+  ⇒ **一侧展开、一侧没展开**。修法走"两侧同一条管线"（`pathForms`/`formsOf`/`anchorForms` +
+  `uncertainAnchorMiss` 作 fail-closed 条款），**纯增量**：`git diff cada033..HEAD -- pathresolver.go` 删除 0 行、
+  `Resolve` 未动、**`internal/risk` 里 `isCI|Getenv("CI")|GITHUB*` grep 0 命中**（我明令禁止的那条形态）。
+  ⇒ **判据在真机上被复述了一次**：我给代理的那条"拒绝可宽、放行只认已解析"，现在是一条测试而不是口头约定。
+- **A46② ⚠ 立即要处理的编队事故**：票 72 交接时报告 **`internal/risk/pathresolver.go` 里此刻躺着
+  票 75 的未提交 WIP**，且该 WIP（`normalizeLocalUNC` 改成 UNC-only + 新增 `sepStr`）
+  **把我刚写的 `tailExistsBelow` 的那一行也改了** ⇒ 同文件两人同改，正是我一直避免的假并行，
+  只不过这次是我没预料到两张票的修点会重叠。**处置**：票 75 落地后我**第一件事**就是重跑票 72 那 6 条用例
+  （`TestClassifyAnchorSpellingIsNotVerdict`/`SpellingInvariance`/`FailClosedWhenSpellingUnprovable`/
+  `AListWinsWhereBothTablesHit`/`OverrideOnlyAcceptsTheResolvedForm`/`CanonicalInputGainsNoSecondForm`），
+  任何一条红 ⇒ 视为票 75 破坏了票 72 的不变式，**退回给票 75 修而不是我顺手调**。
+- **A46③ 一条编队层面的事实（不是代码缺陷）**：`TestResolvePerCallBudget` **在共享机器上负载敏感**——
+  纯净 HEAD 在同一分钟内测到 1.012 ms/op 而它的树 0.803，一次 `-count=2` 红、后两次绿。
+  代理**故意没动这条门**（改它＝放宽它），只把 A/B 数字记进票面 ⇒ 处理正确。
+  **我的结论**：带时延门的票必须**独占测量窗口**（记忆里"测量类 1 个名额"那条），
+  且今后凡是时延类失败，先问"当时有几个代理在跑"，再问代码。
+- **A46④ 两条诚实限定，登记以免被后人误读为已证**：①**本机无法把原始 instrument 弄红**
+  （本箱 `USERPROFILE` 拼写已等于句柄拼写，且临时卷上 8.3 生成本身是关的 `getShortPath=""`），
+  代理用的是 junction 别名复现同一种不对称 ⇒ **"真 8.3 拼写也好了"这一条目前只靠 runner 那一次运行 +
+  两侧都过 `GetFinalPathNameByHandle` 的事实**，票 75 落地后的 runner run 要顺带再证一次；
+  ②非 Windows 侧 `pathresolver_other.go` 的 `DEFERRED` stub 让 `root==""` 两侧相同 ⇒
+  **fail-closed 条款在 Linux 上永不触发**（若一刀切成"无法证明即判 A"，Linux 上会把所有路径判 A，
+  代理没这么做并写了理由）——这条与票 75 的 Linux 根因是**同一处代码**，务必一起看。
+- **A46⑤ 簿记**：`cada033` 的 commit message 末尾留了一行 `MSGEOF && git log --oneline -1`
+  ——heredoc 终止符写在了命令行上（A31 的又一种形态；**提交内容本身是对的**，A34 禁止改写已提交历史，
+  所以留着）。代理自己如实报出来了。**⇒ 简报模板里的"quoted heredoc"要补一句：终止符必须独占一行。**
+
+## 编排者登记 A45（2026-09-21 10:31，票 76 落地：**今天第三例"拼写改变安全语义"**，以及一条 provenance 破坏）
+
+- **A45① D-76a：`DeleteArtifact("....")` 就是 `DeleteArtifact(".")` 的一种拼写。**
+  Windows 在解析前会**剥掉尾部的点和空格**，而旧守卫只看 Go 的路径语义 ⇒ 它真的走到了
+  `os.Remove(<artifactsDir>\....)`，当时只因目录非空才没出事，**空目录时 artifacts 目录本身会被删**。
+  我在纯净树里把守卫（`artifacts.go:167` 的 `strings.TrimRight(name, ". ")`）中和后重跑：
+  **FAIL 2 / PASS 11**，红的正是 `TestDeleteArtifactRejectsTheFourHostileShapes/dotdot/bare_and_empty`；
+  还原后 `ok`。⇒ 修好了，且**测试确实钉得住**（〔独立复现〕）。
+- **A45② 升一条通用检查项**：今天三例同族——①票 72 的 `RUNNER~1`（8.3 短名让 A 表降级成 B 表）、
+  ②票 71 查到 `test-windows` 那步失败也有它自己的同一类真原因、③这条尾部点/空格。
+  ⇒ **凡见"名字/路径比较"，先问 Windows 会不会把它认成别的东西**：尾部点与空格、8.3 短名、
+  大小写、`\?\` 前缀、尾分隔符。**不变式仍是 R17 那句：判定不得依赖路径的拼写形式**；
+  且**拒绝侧可以遍历全部形式，放行侧只认已解析形式**（票 72 的插单，验收时专核）。
+- **A45③ 票 76 交回、故意没修的两条我开了票 79**：
+  ①`artifactName` 把**不同的** tool-call id 折成同一个磁盘名（`p/q`、`p\q`、`pq` ⇒ 都变
+  `tool-output-pq.txt`），而 **`writeFileExclusive` 根本没用 `O_EXCL`**（`os.WriteFile` = `O_CREATE|O_TRUNC`，
+  **名字在撒谎**）⇒ **两次不同调用会静默互相覆盖工件**，先前交给模型的 `Spill.Path` 可能读到别人的输出。
+  **这是 provenance 破坏，不是外观问题**（C25 的地盘）。
+  ②`listArtifactsDir` 的 `if e.IsDir() { continue }` 使游离子目录对 `ListArtifacts`/`PurgeArtifacts`/
+  **500MB 配额全部隐形**（票 76 的 `nested\` canary 真的活过了 purge）——
+  **"对配额隐形"就是 500MB 变 2GB 的路径，静默忽略不能靠默认赢**。
+- **A45④ 一条记账姿势，值得单独表扬并抄进简报模板**：票 76 的报告里主动写出
+  "整包日志有 2 条 `--- SKIP`，来自既有的 `concurrent_test.go:186`（设计上单独跑就 skip，
+  真驱动是另一个用例）"——**是"点名"而不是"过滤掉"**。我这一整天在防的就是这个形状
+  （`ok` 里混着 skip、`-run` 空匹配也报绿），它主动把它交出来了。
+  ⇒ **今后验收固定问一句：你的日志里 `SKIP` 出现了几次、分别是谁。**
+
 ## 编排者登记 A44（2026-09-21 10:26，票 71 交回——**本项目最重要的门从来没有在 CI 上跑过一次**）
 
 - **A44① 最严重的一条**：自 `fd8f838`（**我给一个被杀代理做的检查点提交**）起，lint job 里

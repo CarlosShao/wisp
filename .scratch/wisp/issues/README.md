@@ -190,3 +190,9 @@ multi-task concurrency unlocks only at 47 (SPEC-12 §2).
   `GOOS=linux go vet` 的两个 undefined（`mulA`、`proc.Runtime`，无 tag 文件引用 windows-only 符号）
   自 `fd8f838` 起让 **D22 静态扫描步骤被 skipped ⇒ 那道门从未在 CI 上产出过一次结论**。
   **禁止用零值 Linux stub 把编译错误换成假绿**；正解是补 tag 或移动符号。已派出代理。
+- **票 76 交回、故意没修的两条（2026-09-21 10:33）**：**79 artifact-name-collision-and-fake-exclusive-write** ——
+  ①`artifactName` 把**不同**的 tool-call id 折成同一个磁盘名（`p/q`、`p\q`、`pq` ⇒ 都成
+  `tool-output-pq.txt`），而 **`writeFileExclusive` 没用 `O_EXCL`**（名字在撒谎）
+  ⇒ **两次调用静默互相覆盖工件**，先前交给模型的 `Spill.Path` 可能读到别人的输出 = **provenance 破坏（C25）**；
+  ②`listArtifactsDir` 的 `if e.IsDir() { continue }` 让游离子目录对 `List/Purge/500MB 配额`**全部隐形**
+  ⇒ 500MB 变 2GB 就是这么来的，**"静默忽略"不能靠默认赢**。

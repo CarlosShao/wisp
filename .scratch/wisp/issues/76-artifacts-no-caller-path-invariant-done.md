@@ -1,6 +1,9 @@
 # 76 — Pin the artifacts path as "no caller-controlled path enters it" (closes ticket 20's `:103` box honestly)
 
-**Status:** **ready-for-review（5/5 PASS；AC#5 的整包日志里有 2 处既有 SKIP，已点名不是我的）**
+**Status:** **done（5/5 PASS，编排者 2026-09-21 10:33 归档）**
+裁决表 `docs/evidence/s1/76-adversarial-acceptance.md`。AC#3 我自己在纯净树重做：中和 `artifacts.go:167` 的
+`strings.TrimRight(name, ". ")` 守卫 ⇒ **FAIL 2 / PASS 11**（红在 `.../dotdot/bare_and_empty`），还原后 `ok`。
+交付：票 20 `:103` 已**改写文本并勾选**（原框照的是这个 API 并不存在的威胁模型）；两条没修的开出**票 79**。
 **Type:** security-invariant characterization (closes an AC box that is currently **untestable as written**)
 **Blocks:** ticket 20 archival · **Blocked by:** nothing (packages free: `internal/agent`, `internal/memory`)
 **Packages:** `internal/agent/spill.go`, `internal/memory/artifacts.go` + their tests. Do **not** touch

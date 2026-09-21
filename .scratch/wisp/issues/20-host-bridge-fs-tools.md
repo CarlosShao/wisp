@@ -100,8 +100,20 @@ from 10.
       证据：`docs/evidence/s1/20-bridge-junction-shortname.md`。
       ⚠ 这一框闭合**没有**顺手改任何守卫；§4 那三条上报（可批准的 L2 遮住 A 档、审计行记成
       "工具说不"、第 7 框要的原因枚举不存在）留给 owner 判。
-- [ ] Artifacts API writes only under data dir; attempting user-dir write via artifacts API →
-      rejected; `fs.write` to user dir remains gated (rule separation test).
+- [x] **Artifacts API 无调用方可控目标路径**（2026-09-21 10:31 由编排者**改写并勾选**；判据来自票 76，
+      裁决表 `docs/evidence/s1/76-adversarial-acceptance.md`）：目标目录只在 `memory.Open(dataDir)` /
+      `agent.NewSpiller(dir)` 构造时固定，调用者能递进来的只有一个**组件名**（artifact name / tool-call id），
+      而含分隔符 / `..` / 盘符 / UNC 的组件一律**拒**（memory 侧 `ErrInvalidArtifactName`，**拒在碰文件系统之前**）
+      或**净化**（agent 侧只留 `[A-Za-z0-9_-]`，整串剥光则退回 `tool-output-seq<N>.txt`）；containment 由
+      **真目录递归列举差分 + 两条阳性对照**证明，不靠字符串比较。`fs.write` 到用户目录仍走 C26 门
+      （规则分离：这两条路按票 76 的裁定**故意不**过 `risk.Resolve`，理由是不接受调用方路径 ⇒ 无可控面）。
+      判据用例：`TestArtifactsAPITakesNoCallerControlledDestinationPath`、`TestDeleteArtifactRejectsTheFourHostileShapes`、
+      `TestDeletePrivacyItemRejectsTheFourHostileShapes`、`TestArtifactsContainmentByDirectoryListing`、
+      `TestSpillCallIDHostileShapesSanitizedToBareNames`、`TestSpillContainmentByDirectoryListing`、
+      `TestSpillIntoRealStoreThenDeleteStaysUnderDataDir`、`TestSpillAPITakesNoCallerControlledDestinationPath`。
+      ⚠ **原文是照这个 API 并不存在的威胁模型写的**——旧文本要求『用 artifacts API 往用户目录写 → 被拒』，
+      但没有调用方可控路径就没有『尝试』可做，于是这框**永远勾不上**；改文本而不是凑勾，
+      也不是把框留着让整票看起来未完（保留原文于此，见第 13 条规矩）。
 - [ ] **第 7 框（2026-09-20 23:59 编排者补，来源：本票头部 ④）`[fs] allowed_dirs` 首次使用询问流的最小子集**。
       范围**只有这三条**，多一条就算越界（GUI 完整版归票 39，SPEC-12 §5 **没有这一行 ⇒ 代码里不许标 `DEFERRED`**）：
       - **(a) 拒绝原因必须可区分**：因"路径不在任何 allowed 根下"而被拒时，桥必须返回一个**机器可辨的**
