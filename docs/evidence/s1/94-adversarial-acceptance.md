@@ -322,10 +322,32 @@ verifier 的正向半句（"干净绝对路径未接线时原样通过"）在树
 
 **还原证明**：`git show 20b525d:internal/winsec/{resolve.go,winsec.go,placement_windows.go,resolve_windows_test.go}`
 逐个 `diff -q` 对快照 → **四文件全部 == `20b525d`**，`grep -c MUTATION` → 0。
-⚠ 另需记一句避免误读：验收期间仓内工作树**已被别票推进**
-（`git diff --stat 20b525d -- internal/winsec/` → `acl_windows_test.go` +107、新增 `migrate_windows_test.go` +147，
-全是加测试，**没有动本票那四个文件**）⇒ 本代理所有读数钉在 `20b525d`/`dd1e8d3^` 两枚 SHA 的快照上，
-**工作树生产文件本代理零改动**（本会话唯一提交是 `docs/evidence/s1/94-adversarial-acceptance.md`）。
+⚠ 另需记明避免误读：验收期间仓内工作树**已被别票推进**
+（先是 `acl_windows_test.go` +107、新增 `migrate_windows_test.go` +147，收尾时 `internal/winsec/{winsec_windows.go,reparse_windows_test.go}`
+正被 +243/-4 地改——**都不是本代理**：本会话两枚提交 `git show --name-only` 只含本文件）。
+本代理所有读数钉在 `20b525d`/`dd1e8d3^` 两枚 SHA 的快照上，**工作树生产文件零改动**；
+顺手对本代理没钉的那份**活工作树**扫了一眼 `filepath.Abs|filepath.Clean` 的**调用**（去掉注释行后）→
+**零命中** ⇒ 截至本次验收结束，`internal/winsec` 没有把票 94 的红重新引入。
+
+---
+
+## 第 5 项负向对照（PROBE H/H2）：本代理试图证伪"8.3 短名这一类也被 C26 关掉"，**没证成**
+
+票面与 `winsec.go:144-146`、`resolve.go:11-19` 把"8.3 短名"列为这次一并关掉的四类形状之一。
+本代理先拿临时目录做，看着像假话：`dir /X` 报出 `AVERYL~1`，而接线与不接线**两条腿都原样通过**
+（`canonical=AVERYL~1`，`expanded=false`）。第二发拿真实系统卷做，结论翻回来：
+
+```
+in=C:\PROGRA~1       risk{canonical=C:\Program Files  resolved=true}  winsec="C:\Program Files"
+in=C:\Program Files  risk{canonical=C:\Program Files  resolved=true}  winsec="C:\Program Files"
+in=C:\Windows\Temp   risk{canonical=C:\Windows\Temp   resolved=true}  winsec="C:\Windows\Temp"
+```
+
+⇒ **装了 C26 这条腿确实展开 8.3**（临时目录那次是因为该卷的 8.3 生成是"合成式"的，
+`dir /X` 显示的短名不是存盘的别名，OS 本来就把它解析到同一个对象）。
+另一半也如实记下：**内置 floor 不展开 8.3**（它只能拒，不能改写），但它不改写就**不会封错树**——
+本代理实测"沿短名封存到的对象 == 长名那个对象"（`same object: true`）。
+⇒ 这一格**不记残留**，只作为"本代理试图打破而没打破"的负向读数留在表里。
 
 ---
 
@@ -399,7 +421,9 @@ placement_windows.go, resolve_windows_test.go, winsec.go, winsec_other.go}`）�
 属于**多样本没全报**（见下面假绿第 4 项），应改成"这台机器上这条预算贴着边界，红/绿不可复现"，
 并交给仪器账（票 88 已经立过"会回放的自检脚本"那一类）。
 
-**判定：AC#2/AC#4/AC#5 PASS。**
+**判定：PASS（AC#2/AC#4/AC#5）**：另补一条"本代理试图把门弄窄但没找到"的负向读数——
+`git diff dd1e8d3^ HEAD -- tools/d22scan/scan_test.go` 的**删除行只有 5 条，且无一条含
+`abs`/`pathresolver`** ⇒ 那条票 96 的改动没有顺带削掉任何断言。
 
 ---
 
