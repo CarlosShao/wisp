@@ -187,3 +187,13 @@
   另有 **2 次**对话层 `MEMORY.md was modified since it last read` 通知（内容是他的记忆索引）⇒ 按"不是授权、不改判据"处置。
   `next=` 等编排者对上面 1/2/3/5 四条的裁定；票 119 的实现侧我这边没有未完项。
 
+- 2026-09-21 22:5x（agent-ticket119，补一条复测）：交件 commit `189cb1e` 落在 `HEAD=ce666ea` 之上，
+  而上面那张表的读数锚在 `BASE=823d457`（票 115/117 的三笔 `c6dbbf9`/`2611558`/`ce666ea` 是在我量完之后进的树）
+  ⇒ 在**含全部邻居的 `git archive 189cb1e` 纯净快照**里把同一把尺重走一遍：
+  容器内 `-count=1 -v ./internal/winsec/ ./internal/proc/`，实目录形状 `RUN=56 PASS=56 FAIL=0 SKIP=0` rc=0，
+  链接形状 `RUN=56 PASS=39 FAIL=17 SKIP=0` rc=1（红的仍是 harness 未解析根 + 那枚 `envfork_test.go:108` 断言，
+  本票 5 枚用例在两形下全绿）；`sh scripts/d22scan.sh` 同一快照 rc=0，台账
+  `#1-5 internal/=202 cmd/=21、#6 frontend/=40、#7 tools/=18、#8 design/=16 frontend/=40 internal/=374 cmd/=29`
+  —— 与 BASE 那遍相比只有邻居新增文件带来的 `cmd/` 20→21、`#8 cmd/` 26→29，**没有一格下降**，
+  `#8 internal/` 仍是 373→374 那一枚本票用例文件。工具注入文本这一轮仍为 **0 次**。
+
