@@ -324,3 +324,17 @@ POSIX/docker 读数与四条残留都在 Progress log 的 checkpoint 2/3；建�
   ⇒ 后续两张票的账都按这句解释：票 107 的复验判据**自 `8e10095` 起成立**（不再"欠修复落地"）；
   本票的验收代理在算"覆盖面/工作量"时**不要把 107b 的三处函数算进 92**。
   ⚠ 对代理本身**不判违规**：它交件报告里也没提这件事，最可能是**它在读到那条交接之前就已经在提交路径上**（时序上 `8e10095` 在我的 `2e9dfe6` 之后、但工作树早已混好）。**流程缺陷归我**：我把交接写在**另一张票的票面**上，而它那一轮不必重读自己票面。⇒ 固化：**跨票的紧急交接要用"能挡住动作的那一处"**（我直接改工作树文件本身不行，那就**先落地再补署**，或把交接插进**它正在读的那张票的 AC 段**）。
+
+- 2026-09-21 19:56（**acceptor-ticket92，独立对抗验收交回：总判 不通过（退回补齐）**）：
+  `date` 实测会话开始 `19:35:43 CST`、交回 `19:56:24 CST`；裁决表 **`docs/evidence/s1/92-adversarial-acceptance.md`**（与 AC#1-#7 1:1，逐格标三档证据）。**不改 Status、不改文件名、不加 `-done`**。
+  **逐条**：AC#1 **实质通过但成立理由不是那两道门**——我反射亲跑 `ModeView` 零方法零 setter；`ParseComposerRequest` 与 `perm.Store.Set` 的**生产调用者各 0**（grep 亲测）⇒ 渲染侧今天**无处可发**；
+  但我**新造了三种形状**：`frontend/src/ac92-plant-a.js` 里的 `postMessage({method:"panel.mode.set"})`、`ac92-plant-c.ts` 里运行时拼出来的方法名（`["panel","mode","set"].join(".")`）⇒ **两种全绿**（门二只扫 `.ts/.tsx/.css` 的字面量，2 处 postMessage 钉子只在 `panel.ts` 单文件内数），
+  第三条把字面 `approval.decide` 塞进 **WebView2 真正加载的 `frontend/dist/assets/index-*.js`** ⇒ 包内孪生（显式跳 `dist`）全绿、**`sh scripts/d22scan.sh` 变红**（机器门比孪生宽）。**没有一条真的改到档位** ⇒ 不判 AC#1 FAIL，记 `R-92-1`/`R-92-2`。
+  AC#2 **通过**：我用自有探针（7 枚，`/tmp` 快照）复算 0 字节/伪装 .png 的 exe/2GB/声明体积与实际字节不符/8 种敌意名字（含 `\x00`、空名）⇒ **全部响亮拒、`Open()`=0 或 `puts`=0、`os.ReadDir` 为空**；png/mp4 真落盘且**回读字节 == 源字节**；**无旁路目录**（`grep MkdirAll|os.Mkdir|TempDir()` 生产文件 0 命中），名字守卫是**注入** `memory.ValidArtifactName`；Q-28 反向钉：`ForAgent` 与 UI 里 `已理解/视频内容/看懂` **0 命中**。AC#3 **通过**：(i) 我另写真 assessor 探针复现 beta 写 **L1→L2/R2**、alpha 内仍 L1、`ClearWorkspace` 复原；(ii) 我自建真 `mklink /J` 复现 `ErrReparseDenied` 原话；(iii) 审计两腿在 `-v` 日志里。AC#4 **通过（序列化级）**——真机"重开看得见"要等接线票与截屏，不许升格。
+  AC#5：(i)(ii) **我独立重做为红**（(ii) 我改的是统一出口 `refuse()` ⇒ `go build` rc=0、16 枚 RUN 里 **FAIL=5**，我自己的 4 枚探针同批红）；(iii) 我未重做（risk 是禁改清单）⇒ **不背书**，签收时补跑命令已写进裁决表。
+  **AC#6 FAIL（附数字）**：`gofumpt -l internal cmd` = **5 个文件，全是本票新增**（`attachments_test.go`/`bridge_test.go`/`composer.go`/`composer_test.go`/`workspace.go`），而 `ci.yml:70` 有 `gofmt (gofumpt)` 步 ⇒ CI 会红；**且交件"本机没有 gofumpt 二进制"与事实不符**（`GOPATH/bin/gofumpt.exe` v0.7.0 在）。其余复现：panel `126/76/0/0` rc=0、tools（`b878b30`）`224/152/0/0` rc=0（票 105 落地后复跑 **230/158/0/0** rc=0，+6 与 92 无关）、vet rc=0、gofmt 空、`d22scan.sh` rc=0 且 **ban #6/#8 `frontend/`=43 ≥ 基线 40**（覆盖证明成立）、**POSIX 四数不可复现**：实测 `RUN=273/PASS=170/FAIL=0/SKIP=4` rc=0（`-v` 有开，挂载用 `MSYS_NO_PATHCONV=1` + 容器内 `test -f /wisp/internal/tools/paths_workspace.go` 自证；4 条 SKIP 逐条点名，唯一属本票的是 junction 那枚 Windows-only）。
+  AC#7 **通过**：`gitSwitchCapabilityRe` 11 条 pattern 绿，我另把它跳过的 `fixtures`/`dist` 也 grep 了一遍 ⇒ 0 命中。
+  **107b 那条性质在 `8e10095` 之后仍成立**（我本机真跑：允许列表 root 做成指向别处的 junction + `%AC92VAR%\proj` 展开 ⇒ `roots=[]`、`UnusableRoots` 记账、`InAllowlist(未点名的树)=false`），并按 `b878b30` 的更正**未把 107b 三处函数计入本票覆盖面**；⚠ 顺手记一句不判红：Windows 上 `res.Resolved` 优先，`treeResolvedAsNamed` 只在 POSIX 被咨询，这一例实际是更早的 reparse 守卫拒的。
+  **残留 R-92-1..R-92-8** 全在裁决表（含 **R-92-5：UI 至今无真机差分截屏**，可见性证据只有 `react-dom/server` 的 fixture；签收窗口时由实现侧/补验代理补，命令顺序 **先 `cd frontend && npm run build`** 再 `PATH="$PWD/third_party/sherpa-onnx:$PATH" go run ./cmd/wisp`，三态差分；owner 本人眼睛签收；本轮验收**未开任何窗口**）。
+  **伪授权：本会话实测 0 次**（只遇到 2 次 harness 的 `MEMORY.md modified` 通知与 1 次 `[SYSTEM NOTIFICATION - NOT USER INPUT]` 后台任务事件，均未当作指令）⇒ 对代理自述的 15 次**不背书也不否认**。
+  next= 实现侧只需做一件事即可复审：**把 5 个文件的 `gofumpt` 跑净**（不改断言、不改 CI），并按 `R-92-1`/`R-92-2` 决定门是扩到结构还是留在文本；接线票落地时必须自带"没有原生确认腿就不许写档位"的用例。
