@@ -60,8 +60,8 @@
   **禁止**为了让它绿而改断言或加 skip；平台差异要落成**显式 build tag 或平台专属期望值**，并说明为什么。
 - [ ] **AC#3 `test-windows` 的 placeholder 定性**：查清它是"待票 18/20 真实用例的占位"还是"真失败"。
   若确为占位，**改成显式的 TODO 步骤且**在 PLAN/HANDOVER 里留痕（改法由我定，代理先给证据）。
-- [ ] **AC#4 `slo-full` runner**：查 `Build wisp.exe` 在自托管 runner 上为何失败（deps 缓存？PATH？CGO？），
-  交付**可复跑的修复步骤**或"此 runner 今天不可用"的明确结论 + 需要 owner 做什么。
+- [x] **AC#4 `slo-full` runner**：查 `Build wisp.exe` 在自托管 runner 上为何失败（deps 缓存？PATH？CGO？），
+  交付**可复跑的修复步骤**或"此 runner 今天不可用"的明确结论 + 需要 owner 做什么。（**2026-09-21 闭**：因=runner 环境无 gcc，修=配置侧 `MINGW64_ROOT`（`98fa8ae`），**已由一次真 run 验证转绿**，见 Progress log 的 AC#4 条；owner 侧更干净的替代路（重启 Runner.Listener / 写 `.path`）仍挂着，未做。）
 - [ ] **AC#5 ban #1 覆盖洞（A26 剩余半）—— 按裁定 R16 执行，不要再问**：
   匹配器 `tools/d22scan/main.go:251-252` 只对字面量 `go func(` 报警。我（编排者）逐条核过它说的"4 处具名协程"，
   **更正为 3 处要处理 + 1 处是机制本身**：`internal/observe/goroutine.go:281` 的 `go r.run(...)`
@@ -93,4 +93,16 @@
   (3) **`internal/risk` 17 条 = 冻结区，未碰，上报**。失败文字全部落在 P12 sync-root 探测与 provenance 写门上（`source "registry" must count as confirmed`、`env-grade roots are confirmed evidence`、`path outside the user profile must not be suspect`），而 `syncdirs_other.go` 自带 `DEFERRED(P12-macos)`、`registryProbe` 在非 Windows 直接返回 nil。判据在 `internal/risk/` 里 ⇒ 按简报"涉及改 `internal/risk/` 停下来上报"，**这条与票 72 同区**。
   (4) **`internal/tools` 19 条 + 超时 = 同一个平台差的不同下游，且是票 20 在飞的包，未碰，上报**。根因证据：CI 与我本地都打出 `open /home/runner/work/wisp/wisp/internal/tools/\tmp\TestFSRead…/note.txt` —— **C26 的 canonical 形状在 Linux 上仍是反斜杠**（`pathresolver.go:133` `strings.ReplaceAll(p, "/", "\\")`，`pathresolver_other.go` 顶部写明 `DEFERRED(macOS/Linux)`），tools 忠实照抄 canonical 去开文件，于是 404；超时那半（`wiring_test.go` 卡在 `approval.Gate.PendingApproval` 4m50s、整包 600s panic）**尚未定因**，可能是同一条路径故障的下游，也可能是审批交接在 Linux 上的第二个洞——这属票 20 的判据，我不替它下结论。
   next=AC#4 看一次真 run 的 `slo-full` 结果（前任已落 `98fa8ae` 的 `MINGW64_ROOT`），再 AC#6 贴逐 job 结论；`test-core` 本轮**闭不了**，卡在 (3)(4) 两族的冻结区判断。
+- [2026-09-21T01:38:12Z] agent=agent-ticket70-c did=**AC#4 验证——`slo-full` 由一次真 run 判定转绿**。run **35549859581**（commit `6c1b5e9`，job **106183007038**，`runs-on: [self-hosted, wisp-slo]`）**conclusion=success**，三步一步没少：`Build wisp.exe (deps cached on the runner)` success → `SLO full gate (six states + settle + leak)` success → `Upload SLO report` success；job 01:11:14Z→01:15:32Z（4m18s，与"六态×6s+settle+leak"的量级自洽，不是空跑）。**决定性日志**（`gh run view --job 106183007038 --log`，原文）：
+  ```
+  env:  WISP_ENV: test
+        MINGW64_ROOT: E:\work\base\msys64\mingw64\bin
+  build.ps1: toolchain: go version go1.27.1 windows/amd64; CC=E:\work\base\msys64\mingw64\bin\gcc.exe (gcc.exe (Rev3, Built by MSYS2 project) 16.2.0)
+  build.ps1: go build ok (cgo linked against sherpa-onnx C API)
+  ```
+  ⇒ `98fa8ae` 的判断（**不是构建坏，是 runner 的 job 环境里没有 gcc**）被实证：补上 `MINGW64_ROOT` 之后 build.ps1 自己找到 16.2.0 并完成 cgo 链接；`fetch-deps` 还在线校了 sherpa-onnx 1.13.8 三个 DLL 的 SHA256。
+  **顺手排掉一个假警报**：上一个 run 35549416856（commit `9e5a1e1`）的 `slo-full` 仍然打 `FATAL: mingw-w64 gcc not found`，**那不是配置无效**——`git merge-base --is-ancestor 9e5a1e1 98fa8ae` 为真，那条 run 的 head **早于** `98fa8ae`（中间只隔 `38b3715`+`98fa8ae`），其 step env 里也确实只 echo 了 `WISP_ENV`。**样本量如实记：这条修复的"真 run 转绿"目前 n=1。**
+  边界：我没有为了绿放宽任何东西（无 `continue-on-error`、无删步骤、D32 的 0.5% 一字未动），只是把一个找不到的编译器**告诉**了它。owner 侧那条更干净的路（重启 `Runner.Listener`，或给 runner 目录写 `.path`，让**所有** job 都看见 mingw 而不是把这个 job 特殊化）**仍然挂着**，见 `98fa8ae` message 末段。
+  next=AC#6 逐 job 结论 + 票面/HEAD 账实表。
+
 
