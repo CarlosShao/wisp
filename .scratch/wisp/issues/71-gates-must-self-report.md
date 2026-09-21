@@ -64,6 +64,10 @@ R16 裁定 3 **禁止回退**）。本票把同样的纪律推到**其余三类�
 
 1. **ban #6 仍指向 `frontend/`** —— 那棵树在本 HEAD **不存在**，所以那条禁令是**恒 0 文件的死作用域**。
    ⚠ 不要"顺手缩掉"：禁令文本属 D22 范围，要动先报编排者。可先做的是让 `emptyScope` 守卫也覆盖 ban #6。
+   > 2026-09-21 票 71 implementer：**已做，且做的比"覆盖"更多**——禁令文本一字未动；ban #6 现在在
+   > 台账里，每次运行打一行 `[NOT COVERED]` + 一条解释，且"树出现但豁免还在"= rc 2（自己过期的豁免）。
+   > 待你裁决：这算不算 AC#4 的第三种处置（判据字面是"致命退出 或 删作用域+allowlist 留一行"，
+   > 前者会让 CI 为代理无权修的原因永久红，后者要给 allowlist 加行 ⇒ 违反"只许变短或不变"）。
 2. **`.github/workflows/ci.yml:23` 的注释仍写 "design/ and frontend/"**，与 `emojiScopes()` 现在的真相源
    （`design/` + `internal/` + `cmd/`）不符。注释归票 70 的文件 ⇒ **等票 70 落地后同批改**，别提前撞车。
 3. **新判据（今天用一次红 CI 换来的）**：**放宽/扩大一个门禁的覆盖面，必须在同一批 commit 里改完它新照到的
@@ -85,3 +89,19 @@ R16 裁定 3 **禁止回退**）。本票把同样的纪律推到**其余三类�
   exit 0）今天只自报了 ban #8 的 3 个作用域，ban #6 `frontend/`、ban #7 `internal/tools/`
   与 `internal/` / `cmd/` 各自的 Go 文件数**一条都没报**。⇒ 下一步：给 d22scan 装**统一作用域台账**
   （每个声明作用域 `examined N`）+ 把 `emptyScope` 守卫推到 ban #6/#7，并保证只严不宽。
+- 2026-09-21 10:2x **AC#4 的 d22scan 部分已落地并有真红**（commit 见下）。台账 `declaredScopes()`
+  现覆盖 8 个作用域，每个都在 stdout 打 `scope <label> examined N <kind>`；`emptyLiveScope` 把
+  致命退出从"只有 ban #8"推到全部 live 作用域；新增 `undeclaredKeys`（扫了却没上报 ⇒ rc=2）与
+  `driftedAbsentScope`（登记为"树不存在"而树已出现 ⇒ rc=2，让豁免**自己过期**）。
+  **实测（工作树，非纯净树）**：`go test ./...` rc=0，`=== RUN` **26**、`--- PASS` 18 + 子测试 8 = 26、
+  `--- FAIL` **0**、`--- SKIP` **0**；`go run . -root <abs>` rc=0 打印
+  internal/=184 / cmd/=16 / ban#7=16 / ban#8 design=16 internal=293 cmd=21，ban #6 一行 `[NOT COVERED]`。
+  **阳性对照（AC#2 同族，`go test -v` 的 4 条 e2e 子测试）**：编译**真二进制**后跑进程退出码——
+  种一条 `go worker()` ⇒ rc=**1**；把 `internal/tools/` 清空 ⇒ rc=**2**；造出 `frontend/` ⇒ rc=**2**；
+  全 live fixture ⇒ rc=0。**allowlist.txt 未动**：条目数 5 → **5**（`grep -c '\t'` 实测）。
+  **AC#4 框仍不勾的唯一原因**：ban #6 我走了 AC 给的**第三个**处置——既不致命（那会让 CI 为一个
+  代理无权修的原因永久红：删禁令文本是 D22 范围）也不删作用域（那会丢掉面板落地当天就会响的匹配器，
+  且需在 allowlist 加一行说明 ⇒ 违反"只许变短或不变"），而是**登记为 exempt + 每次运行打印
+  `NOT COVERED: ban #6 frontend/` + 树出现即 rc=2**。字面判据是"致命或删掉"，二选一我都没做满，
+  所以框留给编排者裁决。⇒ next=纯净树（`git archive HEAD`）复跑证 HEAD 绿，然后把 AC#5 的"CI 真红"
+  缺口如实写进票面（本代理被明令**不得 push**，AC#5 的"贴出 CI 红的那一行"在物理上不可证）。

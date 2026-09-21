@@ -1,8 +1,13 @@
 package main
 
 import (
+	"bytes"
+	"errors"
+	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -387,3 +392,395 @@ func TestScopeReportMatchesRealCoverage(t *testing.T) {
 		t.Errorf("the verdict line mentions frontend/ while emojiScopes() has no such entry: %q", report)
 	}
 }
+
+// ---------------------------------------------------------------------------
+// ticket 71 AC#4 + AC#2: the per-scope ledger, and a RED proof for every guard
+// on it. AC#2's rule is that a guard nobody has seen fail is not a guard, so
+// each of the four checks has its own seeded-red test instead of one shared
+// happy path.
+// ---------------------------------------------------------------------------
+
+// liveFixture is a repository shape on which EVERY live scope does real work, so
+// a guard tripping in a test built on it can only be the thing under test.
+func liveFixture(t *testing.T) string {
+	t.Helper()
+	root := t.TempDir()
+	seedFile(t, root, "tools/d22scan/allowlist.txt", "# empty\n")
+	seedFile(t, root, "go.mod", "module x\n")
+	seedFile(t, root, "internal/ok/ok.go", "package ok\n")
+	seedFile(t, root, "internal/tools/ok.go", "package tools\n")
+	seedFile(t, root, "cmd/wisp/main.go", "package main\n\nfunc main() {}\n")
+	seedFile(t, root, "design/index.html", "<html>ok</html>\n")
+	return root
+}
+
+func scanFixture(t *testing.T, root string) *scanner {
+	t.Helper()
+	s, err := scanWithStats(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return s
+}
+
+// runVerdict calls verdict directly rather than exec'ing the binary: the thing
+// under test is the decision, and the subprocess wiring (main turning a returned
+// code into a process exit code) has its own end-to-end test below,
+// TestBuiltBinaryGoesRedEndToEnd, which is the one CI's step actually depends on.
+func runVerdict(t *testing.T, root string, s *scanner) (string, string, int) {
+	t.Helper()
+	var out, errOut strings.Builder
+	code := verdict(&out, &errOut, root, 99, s)
+	return out.String(), errOut.String(), code
+}
+
+// TestVerdictGreenOnFullyLiveFixture is the control the red tests below are
+// measured against: with every live scope populated the scan exits 0 and prints
+// exactly one work line per declared scope.
+func TestVerdictGreenOnFullyLiveFixture(t *testing.T) {
+	root := liveFixture(t)
+	s := scanFixture(t, root)
+	if len(s.findings) != 0 {
+		t.Fatalf("fixture must be finding-free so the exit code means what it says: %v", s.findings)
+	}
+	scopes := declaredScopes(root)
+	out, errOut, code := runVerdict(t, root, s)
+	if code != 0 {
+		t.Fatalf("fully live fixture must be green, got rc=%d out=%s err=%s", code, out, errOut)
+	}
+	for _, sc := range scopes {
+		if got := strings.Count(out, "scope "+sc.label); got != 1 {
+			t.Errorf("self-report line for %s printed %d times, want exactly 1 (report:\n%s)", sc.label, got, out)
+		}
+		if !sc.live && sc.count(s) != 0 {
+			t.Errorf("exempt scope %s unexpectedly examined %d files", sc.label, sc.count(s))
+		}
+	}
+	if n := strings.Count(out, "d22scan: scope "); n != len(scopes) {
+		t.Errorf("printed %d scope lines for %d declared scopes - report and ledger disagree", n, len(scopes))
+	}
+}
+
+// TestVerdictRedOnEmptyBan7Scope is AC#2 for the generalized guard: ban #7's
+// directory exists but holds no production Go file, which the pre-ticket-71 tool
+// reported as NOTHING at all (no counter, no line) and so as a pass.
+func TestVerdictRedOnEmptyBan7Scope(t *testing.T) {
+	root := liveFixture(t)
+	// Empty the scope without deleting the directory: the walk runs, sees no
+	// production .go file, and must not be allowed to read as "checked".
+	if err := os.Remove(filepath.Join(root, "internal", "tools", "ok.go")); err != nil {
+		t.Fatal(err)
+	}
+	s := scanFixture(t, root)
+	if s.examined["internal-artifact-tool"] != 0 {
+		t.Fatalf("fixture broken: ban #7 examined %d files, want 0", s.examined["internal-artifact-tool"])
+	}
+	_, errOut, code := runVerdict(t, root, s)
+	if code != 2 {
+		t.Fatalf("an always-empty live scope must be fatal (rc=2), got rc=%d stderr=%q", code, errOut)
+	}
+	if !strings.Contains(errOut, "ban #7 internal/tools/") {
+		t.Errorf("the fatal message must name the empty scope, got %q", errOut)
+	}
+}
+
+// TestVerdictRedOnGoScopeWithOnlyTestFiles is the shape the OLD aggregate number
+// could not see: a cmd/ holding only _test.go files still left the aggregate
+// "examined N production Go files under internal/ and cmd/" large, so the run
+// looked healthy while bans #1-5 were blind to every cmd/ file.
+func TestVerdictRedOnGoScopeWithOnlyTestFiles(t *testing.T) {
+	root := liveFixture(t)
+	cmdMain := filepath.Join(root, "cmd", "wisp", "main.go")
+	if err := os.Rename(cmdMain, filepath.Join(root, "cmd", "wisp", "main_test.go")); err != nil {
+		t.Fatal(err)
+	}
+	s := scanFixture(t, root)
+	cmdKey, internalKey := goScopeKey(filepath.Join(root, "cmd")), goScopeKey(filepath.Join(root, "internal"))
+	if s.examined[cmdKey] != 0 {
+		t.Fatalf("fixture broken: cmd/ must contribute 0 production files, got %d", s.examined[cmdKey])
+	}
+	agg := s.examined[internalKey] + s.examined[cmdKey]
+	if agg == 0 {
+		t.Fatal("fixture broken: the aggregate must be non-zero, that is the point of the test")
+	}
+	_, errOut, code := runVerdict(t, root, s)
+	if code != 2 {
+		t.Fatalf("aggregate non-zero (%d) but cmd/ empty: must be fatal, got rc=%d stderr=%q", agg, code, errOut)
+	}
+	if !strings.Contains(errOut, "bans #1-5 cmd/") {
+		t.Errorf("must name bans #1-5 cmd/, got %q", errOut)
+	}
+}
+
+// TestExemptScopeCannotOutliveItsAbsentTree is the drift guard: ban #6's entry is
+// exempt ONLY because frontend/ does not exist. The moment the tree appears the
+// exemption is a lie in the other direction, and the ban #6 matcher must
+// demonstrate it is alive by reporting the seeded panel violation.
+func TestExemptScopeCannotOutliveItsAbsentTree(t *testing.T) {
+	root := liveFixture(t)
+	if got := driftedAbsentScope(declaredScopes(root)); got != "" {
+		t.Fatalf("fixture broken: frontend/ is absent so no drift is expected, got %q", got)
+	}
+	seedFile(t, root, "frontend/src/app.js", "export function decide() { return approval.decide({allow: true}); }\n")
+
+	s := scanFixture(t, root)
+	var hit bool
+	for _, f := range s.findings {
+		if f.Ban == "panel-approval" {
+			hit = true
+		}
+	}
+	if !hit {
+		t.Fatalf("ban #6's matcher is dead - the seeded panel-approval violation was not reported: %v", s.findings)
+	}
+	out, errOut, code := runVerdict(t, root, s)
+	if code != 2 {
+		t.Fatalf("tree present while the scope is exempt must be fatal (rc=2), got rc=%d out=%s err=%s", code, out, errOut)
+	}
+	if !strings.Contains(errOut, "ban #6 frontend/") {
+		t.Errorf("drift message must name the scope, got %q", errOut)
+	}
+	if !strings.Contains(out, "panel-approval") {
+		t.Errorf("the finding must still be printed before the guard exits, got %q", out)
+	}
+}
+
+// TestVerdictRedOnUndeclaredCounter pins the structural guard: a walk that bumps a
+// counter no scope reports is work the self-report does not account for. This is
+// exactly the hole opened by adding an s.walkGo(...) call and forgetting the
+// ledger entry, which would otherwise print a confident "clean".
+func TestVerdictRedOnUndeclaredCounter(t *testing.T) {
+	root := liveFixture(t)
+	s := scanFixture(t, root)
+	s.examined["some-future-ban"] = 7
+	out, errOut, code := runVerdict(t, root, s)
+	if code == 0 {
+		t.Fatalf("an undeclared counter must not yield a verdict, got rc=%d out=%s", code, out)
+	}
+	if code != 2 {
+		t.Fatalf("want rc=2 for undeclared work, got rc=%d err=%q", code, errOut)
+	}
+	if !strings.Contains(errOut, "some-future-ban") {
+		t.Errorf("guard must name the undeclared counter, got %q", errOut)
+	}
+}
+
+// TestLedgerCountsMatchAnIndependentWalk is AC#4's falsifier: the printed numbers
+// are compared against a SECOND, independent walk computed in the test. Without
+// it a ledger that counts the wrong thing (every .go including _test.go, or a
+// directory skipped by mistake) stays internally consistent and still prints a
+// confident number - "examined N" only means something if N is the truth.
+func TestLedgerCountsMatchAnIndependentWalk(t *testing.T) {
+	root, err := filepath.Abs(filepath.Join("..", ".."))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(root, "go.mod")); err != nil {
+		t.Skipf("not inside the wisp repo: %v", err)
+	}
+	s := scanFixture(t, root)
+
+	count := func(dir string, accept func(string) bool) int {
+		n := 0
+		err := filepath.WalkDir(dir, func(p string, d os.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+			if d.IsDir() {
+				if d.Name() == "testdata" || d.Name() == ".git" || d.Name() == "node_modules" {
+					return filepath.SkipDir
+				}
+				return nil
+			}
+			if accept(p) {
+				n++
+			}
+			return nil
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		return n
+	}
+	goFile := func(p string) bool { return strings.HasSuffix(p, ".go") }
+	prodGo := func(p string) bool { return goFile(p) && !strings.HasSuffix(p, "_test.go") }
+
+	cases := []struct {
+		label  string
+		want   int
+		report int
+	}{
+		{"bans #1-5 internal/", count(filepath.Join(root, "internal"), prodGo), s.examined[goScopeKey(filepath.Join(root, "internal"))]},
+		{"bans #1-5 cmd/", count(filepath.Join(root, "cmd"), prodGo), s.examined[goScopeKey(filepath.Join(root, "cmd"))]},
+		{"ban #7 internal/tools/", count(filepath.Join(root, "internal", "tools"), prodGo), s.examined["internal-artifact-tool"]},
+		{"ban #8 internal/", count(filepath.Join(root, "internal"), goFile), s.emojiSeen["internal/"]},
+		{"ban #8 cmd/", count(filepath.Join(root, "cmd"), goFile), s.emojiSeen["cmd/"]},
+	}
+	for _, c := range cases {
+		if c.report != c.want {
+			t.Errorf("scope %s reported examining %d files, independent walk says %d - the number in the self-report is wrong, not just small",
+				c.label, c.report, c.want)
+		}
+		if c.report == 0 {
+			t.Errorf("scope %s examined 0 files in the real repo", c.label)
+		}
+		t.Logf("verified %s: %d files", c.label, c.report)
+	}
+}
+
+// TestRealRepoLedgerIsHonest is AC#4 on this repository: no live scope is empty,
+// no exemption has drifted, no counter is undeclared, and the only uncovered
+// scope is ban #6 - stated in the verdict line instead of left implied.
+func TestRealRepoLedgerIsHonest(t *testing.T) {
+	root, err := filepath.Abs(filepath.Join("..", ".."))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(root, "go.mod")); err != nil {
+		t.Skipf("not inside the wisp repo: %v", err)
+	}
+	s := scanFixture(t, root)
+	scopes := declaredScopes(root)
+
+	if got := emptyLiveScope(scopes, s); got != "" {
+		t.Errorf("live scope %s walks 0 files in the real repo: give it coverage or delete it (ticket 71 AC#4)", got)
+	}
+	if got := driftedAbsentScope(scopes); got != "" {
+		t.Errorf("scope %s is registered absent while its tree exists - flip it to live:true (ticket 71 AC#4)", got)
+	}
+	if extra := undeclaredKeys(s, scopes); len(extra) != 0 {
+		t.Errorf("walks bumped counters that no scope reports: %v", extra)
+	}
+	var unc []string
+	for _, sc := range uncoveredScopes(scopes) {
+		unc = append(unc, sc.label)
+	}
+	if len(unc) != 1 || unc[0] != "ban #6 frontend/" {
+		t.Errorf("exactly one uncovered scope (ban #6) is expected on this HEAD, got %v", unc)
+	}
+	if s.examined["panel-approval"] != 0 {
+		t.Errorf("ban #6 examined %d files while declared exempt: the ledger's absent policy is now wrong",
+			s.examined["panel-approval"])
+	}
+	out, errOut, code := runVerdict(t, root, s)
+	if code != 0 {
+		t.Fatalf("HEAD must be green, rc=%d out=%s err=%s", code, out, errOut)
+	}
+	if !strings.Contains(out, "clean") || !strings.Contains(out, "NOT COVERED: ban #6 frontend/") {
+		t.Errorf("the clean line must state what it did NOT cover, got %q", out)
+	}
+	for _, sc := range scopes {
+		if !sc.live {
+			continue
+		}
+		want := fmt.Sprintf("%s=%d", sc.label, sc.count(s))
+		if !strings.Contains(out, want) {
+			t.Errorf("clean line omits live scope %s with its real count (%q)", sc.label, want)
+		}
+	}
+}
+
+// e2eRoot is a fixture that clears checkRoot (which wants >= minProductionGoFiles
+// production .go files), so the binary reaches the guards instead of dying on the
+// root sanity check first.
+func e2eRoot(t *testing.T) string {
+	t.Helper()
+	root := liveFixture(t)
+	for i := 0; i < 12; i++ {
+		seedFile(t, root, fmt.Sprintf("internal/pkg%02d/f.go", i), "package pkg\n")
+	}
+	return root
+}
+
+// TestBuiltBinaryGoesRedEndToEnd is the positive control in the shape the CI step
+// actually consumes: it compiles the real binary and asserts the PROCESS exit
+// code. Everything above tests verdict()'s return value, which is worthless if
+// main() ever stops passing it to os.Exit - a `_ = verdict(...)` regression would
+// leave every unit test green while the lint job goes green on a red tree, which
+// is ticket 71's disease in its purest form.
+func TestBuiltBinaryGoesRedEndToEnd(t *testing.T) {
+	if _, err := exec.LookPath("go"); err != nil {
+		t.Skipf("no go toolchain to build the scanner with: %v", err)
+	}
+	bin := filepath.Join(t.TempDir(), "d22scan-e2e"+exeSuffix())
+	build := exec.Command("go", "build", "-o", bin, ".")
+	build.Dir = "."
+	if out, err := build.CombinedOutput(); err != nil {
+		t.Fatalf("go build failed: %v\n%s", err, out)
+	}
+
+	cases := []struct {
+		name   string
+		setup  func(t *testing.T, root string)
+		wantRC int
+		want   string
+	}{
+		{
+			name: "seeded violation exits 1",
+			setup: func(t *testing.T, root string) {
+				seedFile(t, root, "internal/bad/leak.go", "package bad\n\nfunc worker() {}\n\nfunc leak() { go worker() }\n")
+			},
+			wantRC: 1,
+			want:   "bare-goroutine",
+		},
+		{
+			name: "empty live scope exits 2",
+			setup: func(t *testing.T, root string) {
+				if err := os.Remove(filepath.Join(root, "internal", "tools", "ok.go")); err != nil {
+					t.Fatal(err)
+				}
+			},
+			wantRC: 2,
+			want:   "ban #7 internal/tools/",
+		},
+		{
+			name: "exempt scope whose tree appeared exits 2",
+			setup: func(t *testing.T, root string) {
+				seedFile(t, root, "frontend/app.js", "export const x = approval.decide();\n")
+			},
+			wantRC: 2,
+			want:   "ban #6 frontend/",
+		},
+		{
+			name:   "fully live fixture exits 0",
+			setup:  func(_ *testing.T, _ string) {},
+			wantRC: 0,
+			want:   "clean",
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			root := e2eRoot(t)
+			c.setup(t, root)
+			cmd := exec.Command(bin, "-root", root)
+			var stdout, stderr bytes.Buffer
+			cmd.Stdout, cmd.Stderr = &stdout, &stderr
+			err := cmd.Run()
+			rc := 0
+			if err != nil {
+				var ee *exec.ExitError
+				if !errors.As(err, &ee) {
+					t.Fatalf("running the scanner failed: %v", err)
+				}
+				rc = ee.ExitCode()
+			}
+			t.Logf("rc=%d stdout=%sstderr=%s", rc, stdout.String(), stderr.String())
+			if rc != c.wantRC {
+				t.Fatalf("exit code: want %d, got %d\nstdout:\n%s\nstderr:\n%s", c.wantRC, rc, stdout.String(), stderr.String())
+			}
+			joined := stdout.String() + stderr.String()
+			if !strings.Contains(joined, c.want) {
+				t.Errorf("output must name %q, got:\n%s", c.want, joined)
+			}
+		})
+	}
+}
+
+func exeSuffix() string {
+	if runtime.GOOS == "windows" {
+		return ".exe"
+	}
+	return ""
+}
+
+
