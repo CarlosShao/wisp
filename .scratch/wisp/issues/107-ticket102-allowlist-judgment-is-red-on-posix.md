@@ -1,6 +1,14 @@
 # 107 — 票 102 那条"改写要记账"的判据在 **ubuntu 上是红的**：`paths_rewrite_ticket102_test.go:64` 说 `InAllowlist("/tmp/…/proj/a.txt") = false`（`test-core` 连 2 次红）
 
-**Status:** ready-for-review（2026-09-21 18:3x `agent-ticket107` 定性+修完，POSIX 侧在 Docker/Linux 容器里**真跑过**修前红/修后绿/两发变异；正文仍为 append-only，numstat 里那 1 行删除就是本行）
+**Status:** **rejected-needs-fix**（2026-09-21 18:5x 编排者退回。验收判 **AC#3 不通过**（AC#1/2/4/5 通过），
+   裁决表 `docs/evidence/s1/107-adversarial-acceptance.md`（commit `827a903`）：
+   **我让验收去攻的那一矛命中了** —— 修法把 POSIX 的"放行侧"从"已解析真实路径"降成"跟随符号链接的存在性"，
+   探针实测出**跨树放行（fail-open）**：`allowed_dirs=["%AC107_ROOT%/proj"]`、`base/proj` 是指向 `base/outside` 的符号链接
+   ⇒ **修前 `InAllowlist=false`、修后 `=true`，而真正打开的是操作者从未点名的另一棵树**（`os.ReadFile` 读出 `TOPSECRET`，
+   `EvalSymlinks` 给的是 `…/outside/secret.txt`）。三件齐（修后放行／修前不放行／放行的树非点名那棵）。
+   ⇒ 本票的**红要修，但不许用"放宽放行侧"去修**（memory 第 22 条：放行依据必须比拒绝依据更窄）。
+   退回后的正确形状与探针清单见文末追加段与票 108 的同族处置；**续跑单 = 本票重新开工**，不另立号。）
+   —— 原 `ready-for-review`（2026-09-21 18:3x `agent-ticket107` 定性+修完，POSIX 侧在 Docker/Linux 容器里**真跑过**修前红/修后绿/两发变异；正文仍为 append-only，numstat 里那 1 行删除就是本行）
 **Type:** 同一不变式**只在半个平台成立**（票 82 的 POSIX 家族、A74③ 的反斜杠折叠，同形）
 **Blocks:** CI 转绿 · "路径已解析"这句话能不能对 owner 说满 · **Blocked by:** nothing
 **Packages:** `internal/tools/`（`InAllowlist` 与那条用例两侧之一）、必要时 `internal/risk/` 的比较端。
