@@ -1,6 +1,6 @@
 # 82 — `internal/risk` 的 sync-root 家族在 ubuntu 上 8 条红：判据没写错，是**POSIX 侧这条探测根本没实现**
 
-**Status:** open（**排队**：等票 70/80/81 里有写码代理交回再派，写码代理总数不超过 3）
+**Status:** in-progress（票 82 写码代理已认领，正在做 AC#1 的 8 条逐条定性）
 **Type:** 门禁归属裁定（A52④）+ 测试分层落地
 **Blocks:** 票 70 的 AC#6（`test-core` 在票 81/82 之前不可能绿）· **Blocked by:** nothing
 **Packages:** `internal/risk/` 的**测试文件**（`syncdirs*_test.go`、写门/取证相关用例）。
@@ -68,4 +68,16 @@ docker 挂**快照**不挂工作树；票面 Progress log append-only，**要改
 
 ## Progress log（append-only）
 
-（空）
+- 2026-09-21 写码代理认领本票（HEAD `c923327`，局面基线 = CI run `35562680354` / headSha `e5e5eb7` 的 8 条同族红）。
+  本枚 checkpoint 只改票面 Status + 这条 log，先落账再动代码。
+  读过的机制件：`internal/risk/syncdirs_other.go:20 registryProbe` 直接 `return nil`（`DEFERRED(P12-macos)` ticket 55）、
+  `internal/risk/pathresolver_other.go:10 resolveHandle` 返回 `("", false)` ⇒ `syncSet.add` 的 `canonical` 恒 false
+  ⇒ `syncSet.finalize` 的 `s.complete` 恒 false ⇒ `SyncDetectionComplete()` 在 POSIX 恒 false。
+  **本票的落点推论（AC#1 定性前先记）**：这 8 条**不是**整族都"在 POSIX 上无对象"——
+  `match()` 只在 `!s.complete && isUnder(cand, s.home)` 时兜底，所以**只要被测路径落在 profile home 之外**，
+  POSIX 上"是不是 sync 通道"就仍然**只由 root membership 决定**（两侧都有对象）。
+  ⇒ 分层方案 = ①把 4 条 `TestWriteGate*` + `TestSyncDotDotTailFailsClosed` + `TestSyncNormalNewFileWriteNotFlagged`
+  的**引擎形状**改成两侧可判（root 与对照目录都在 home 之外），把"confirmed 等级本身"这条判据留到分层里；
+  ②`"确认等级能否拆掉兜底网"` 这一半在 POSIX 确实无对象，进 windows 层，POSIX 层留一条断言
+  "今天任何等级都拆不掉（fail-closed）"的活用例，并指名票 55 落地时怎么转活（AC#2）。
+
