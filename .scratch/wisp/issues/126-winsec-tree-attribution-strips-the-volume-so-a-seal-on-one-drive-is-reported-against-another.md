@@ -22,11 +22,11 @@
       （这条决定它是「记账错」还是「守门错」，**危害差一个量级**）。
 - [x] **AC#3** 修法要**变异自证**：改前那枚跨卷用例红、改后绿；且**同一发不许让任何既有归属用例变成绿方式**
       （票 113/115/119 那三族拒绝腿一枚都不许松）。
-- [ ] **AC#4** CI 覆盖要么补上，要么**如实登记**「runner 单卷 ⇒ 这一形在 CI 上恒不可见」——
+- [x] **AC#4** CI 覆盖要么补上，要么**如实登记**「runner 单卷 ⇒ 这一形在 CI 上恒不可见」——
       **不许拿「CI 绿」当这一格的通过证据**（说不出 run id + job id + step 号就当那道门不存在）。
-- [ ] **AC#5** 门禁：`internal/winsec/` `-count=2 -v` 四数 + `bash scripts/winsec-tests.sh` 与 CI 同形的那一发；
+- [x] **AC#5** 门禁：`internal/winsec/` `-count=2 -v` 四数 + `bash scripts/winsec-tests.sh` 与 CI 同形的那一发；
       `gofmt`/`gofumpt` 真跑；`go vet` 双 GOOS；`sh scripts/d22scan.sh` 纯净快照 rc=0 + 台账各 scope 不降。
-- [ ] **AC#6** 清理自证：跨卷探针落在**卷根**上、`git status` 看不见（上一轮就留了 `wisp118-xvol-probe\p.txt` 在 C:/D:/E:/F: 四枚卷根）
+- [x] **AC#6** 清理自证：跨卷探针落在**卷根**上、`git status` 看不见（上一轮就留了 `wisp118-xvol-probe\p.txt` 在 C:/D:/E:/F: 四枚卷根）
       ⇒ 交件前逐枚卷根 `ls` 证明已清。
 
 ## Rules（本仓固定）
@@ -156,3 +156,89 @@
   `true ⇒ 这枚通知就是关于你那棵树`），收紧它们不存在任何把"被拒"翻成"被放行"的通路；
   反向的过严代价由上表三枚 CONTROL 与票 112 那枚用例钉住，六/七枚腿里 `wantRefused:false` 的三枚
   改前改后都绿（`CONTROL RED` 一次都没触发）。
+
+- 2026-09-22 20:5x（agent-ticket126，**AC#4＝补腿 + 如实登记，两样都做＝勾**）：
+  **补上的腿**：四枚新用例里有三枚不需要第二枚真卷——
+  `TestCrossVolumeSpellingsAreNotOneTree`（纯拼写）、
+  `TestNoticeFromOneVolumeIsNotAttributedToAnotherVolumeSpelling`（真 seal + **植进去的卷字母**：
+  本机 `ResolvePath("Z:\...\store-44440\artifact.txt")` 实测答回该拼写本身、err=nil，所以那一发
+  在单卷机器上问得出口，`Z:` 由 `os.Lstat("Z:\")` 失败来选，不靠本机凑巧有六枚卷）、
+  `TestSeamGuardRefusesACandidateWhoseSecondWitnessNamesAnotherVolume`（候选自己说谎，
+  守卫只比它拿到的答案，**一枚卷都不问文件系统**）。⇒ 票面 `:12-13` 那句"这一形今天没有任何 CI 覆盖"
+  在本票之后**只对第四枚用例成立**，前三枚从此在 winsec 那道门上跑。
+  **那道门的身份（前手 sha 的读数，不是我的）**：run `35723172814`（headSha `09b5285`，dev 的 push）·
+  job `test-windows` = `106730524368` · step **4** "Windows ACL sealing gate (internal/winsec's own
+  tests, ticket 110)" conclusion=**success**，日志原文：
+  ```
+  winsec-tests.sh: winsec result line: ok  	github.com/CarlosShao/wisp/internal/winsec	7.639s
+  winsec-tests.sh: four numbers (all from -v output): === RUN=86  --- PASS=46  --- FAIL=0  --- SKIP=0
+  ```
+  我在本机 `git archive 09b5285` 的同一发整包读数**逐字相同**（86/46/0/0）⇒ 那道步跑的集合与本机一致，
+  我补的腿会进去；交件组那一发本机实测应为 `RUN=91 PASS=50 FAIL=0 SKIP=0`（gate 快照里 `bash scripts/winsec-tests.sh`
+  真跑出来就是这个数，见 AC#5）。
+  **⚠ 本格不拿"CI 绿"当通过证据**，理由逐字写在这里：本票只 commit 不 push，我自己的 sha
+  （`a701138`/`fe93558`/`a3ce3a4`/`bb8393e`…）在 CI 上**一次都没跑过**，所以"我的交件的 run id + job id + step 号"
+  这枚东西今天不存在，我不会拿前手 sha 的绿来替它签字。上面那段 run id 只用来钉**门在哪**、
+  以及**本机与那道门跑的是同一集合**这一枚可比性。
+  **如实登记恒不可见的那一腿**：`TestNoticeFromOneVolumeIsNotAttributedToASecondRealVolume/two_real_volumes`
+  ——要两枚真卷才存在（`subst` 被 `GetFinalPathNameByHandle` 塌回底层卷、`\?\`/UNC 被
+  `placement_windows.go:33/37` 直接拒，这两条 118b 已量、我复核同结论）。runner 若只有一枚可建目录的卷，
+  它会打 `--- SKIP` **带自己的名字与分母**（`this machine has %d volume root(s) that accept a directory (...)`），
+  是票 112 的能力门形状、不是 `t.Skip` 掩耳；四数口径 `^--- SKIP` 只数顶层 ⇒ 顶层仍 0、门禁不红。
+  这一腿在 CI 上今天仍拿不到判决，登记为**遗留**，交回编排者（下面 next= 第 3 条）。
+  `.github/workflows/ci.yml` 与 `scripts/` 一字未动（冻结地界）。
+
+- 2026-09-22 20:2x（agent-ticket126，**AC#5 门禁＝勾**；先一枚时间戳更正：上面 AC#3 写的 20:3x 与 AC#4 写的 20:5x
+  都是凭手感写的、比钟面早，`date` 实测本条落笔时是 20:2x、`git log` 里 `a3ce3a4`=20:06、`bb8393e`=20:12。
+  文字与读数不改，只在这里点名：**顺序以 commit sha 为准**，后面几格每一枚都先 `date` 再写）：
+  全部读在纯净快照 `git archive bb8393e | tar -x -C /d/tmp/wisp126-s126/gate`（**没有**在仓库树内建 worktree/checkout）。
+  | 命令原文 | rc | 读数 |
+  |---|---|---|
+  | `go test -count=2 -v ./internal/winsec/` | 0 | 四数 `=== RUN`=**182**（=91×2）· `--- PASS`=**100**（=50×2）· `--- FAIL`=**0** · `--- SKIP`=**0**；`grep -c '(cached)'`=**0** ⇒ `-count=2` 没吃缓存；收尾 `ok … 27.957s`（日志 `log_gate_count2.txt`） |
+  | `bash scripts/winsec-tests.sh`（与 CI 同形那一发） | 0 | `winsec-tests.sh: four numbers (all from -v output): === RUN=91 --- PASS=50 --- FAIL=0 --- SKIP=0`、`winsec result line: ok … 12.566s`，GUARD 1/GUARD 2 都过；下层 `runtests.sh: OK … PASS=50 FAIL=0 SKIP=0, === RUN=91, '[no tests to run]'=0`（`-skip` 清单是那七枚既有的，本票没新增） |
+  | `gofmt -l .`（快照根） | 0 | **空输出**＝零候选 |
+  | `"$(go env GOPATH)/bin/gofumpt.exe" --version` / `-l .` | 0 / 0 | `v0.7.0 (go1.27.1)`（二进制**存在**，"未跑"那一格不适用，无需引错误原文）；`-l .` **空输出** |
+  | `go vet ./internal/winsec/ ./internal/proc/`（host=windows） | 0 | 干净 |
+  | `GOOS=linux go vet ./internal/winsec/ ./internal/proc/` | 0 | **只编译不执行**——这一格不许读成"Linux 测过了"，所以下面另跑一发容器真执行 |
+  | `GOOS=darwin go vet ./internal/winsec/` | 0 | 第三 GOOS 顺手点名的 |
+  | 容器内（`golang:1.27`，linux/amd64，先 `ls -l /src/go.mod` 证明 **883** bytes 在位）`go vet` + `go test -count=1 -v ./internal/winsec/ ./internal/proc/` | 0 | **执行**读数：`RUN`=58 · 顶层 `--- PASS`=39 · `--- FAIL`=0 · `--- SKIP`=0，`ok winsec 0.193s`、`ok proc 1.916s`。同法在**基线快照** `09b5285` 再跑一发控制组：**58/39/0/0 逐字相同** ⇒ POSIX 半边一枚判决都没被本票改动（本票新文件是 `//go:build windows`，`filepath.VolumeName` 在 POSIX 恒空，这是那枚"票 107 那一族会不会在 POSIX 变红"的直接读数而不是推理） |
+  | `sh scripts/d22scan.sh` | 0 | `d22scan: clean - no D22 ban violations`；正向对照那一跑 `runtests.sh: OK - packages=[./...]` 在内，`TestBuiltBinaryGoesRedEndToEnd` 六腿全绿 ⇒ 门不是瞎的 |
+  **台账八 scope 逐数（不许任何一枚下降）**：
+  | scope | 基线控制 `09b5285` | 同 sha 复跑控制 `bb8393e` | 交件 `bb8393e` | 判 |
+  |---|---|---|---|---|
+  | bans #1-5 `internal/` | 202 | 202 | **202** | 持平 |
+  | bans #1-5 `cmd/` | 22 | 22 | **22** | 持平 |
+  | ban #6 `frontend/` | 40 | 40 | **40** | 持平 |
+  | ban #7 `internal/tools/` | 18 | 18 | **18** | 持平 |
+  | ban #8 `design/` | 16 | 16 | **16** | 持平 |
+  | ban #8 `frontend/` | 40 | 40 | **40** | 持平 |
+  | ban #8 `internal/` | **382** | 383 | **383** | **+1**，来源逐字：新增 `internal/winsec/volume_attribution_126_windows_test.go` 进入 ban #8 的"Go files, comments and `_test.go` included"口径（编排者给的当前基线 382 在 `09b5285` 控制组逐字复算为真） |
+  | ban #8 `cmd/` | **32** | 32 | **32** | 持平（派单给的 32 逐字复算为真） |
+  同 sha 控制组与交件组逐数相同 ⇒ 那八格不是缓存读出来的。
+  `tools/d22scan/**`、`allowlist.txt`、任何阈值/golden/`.github/workflows/ci.yml`、`scripts/` **一字未动**
+  （可核：`git diff --name-only 09b5285..HEAD` 只列 `internal/winsec/resolve.go`、
+  `internal/winsec/volume_attribution_126_windows_test.go` 与本票面三枚路径）。
+  零"减"自证：没删过任何用例、没降过任何断言、没加过 `t.Skip`（唯一那枚 Skip 是能力门的**命名子用例**，
+  本机实测走的是它另一条分支：`--- PASS: .../two_real_volumes`）、没把 `Fatalf` 降级成 `Logf`。
+
+- 2026-09-22 20:2x（agent-ticket126，**AC#6 卷根清理自证＝勾**）：本票落在卷根上的东西有两族，全部由用例自己的
+  `t.Cleanup` 收（不是我手工补的，读数在下面这枚 `ls` 上）：
+  1. `wisp126-xvol-enumeration-probe`（`R-118-8` 那枚"建目录枚举"的探针，26 枚字母逐枚试）；
+  2. `wisp126-xvol-<pid>\store-44440\artifact.txt`（两枚真卷那一发，`C:\` 与 `D:\` 各一枚，
+     外加 `icacls` 留在其上的 Everyone 授权——随目录一起删）。
+  交件前逐枚卷根 `ls`（`ls -a /<vol>/ | grep -Ei "wisp|ac118|xvol|probe"`）：
+  ```
+  C: entries=30 ; wisp126/xvol/ac118 residue: [end]
+  D: entries=33 ; wisp126/xvol/ac118 residue: [end]
+  E: entries=34 ; wisp126/xvol/ac118 residue: [end]
+  F: entries=7  ; wisp126/xvol/ac118 residue: [end]
+  G:\ H:\ I:\ J:\ -> ls: cannot access '/G/wisp*': No such file or directory（枚举时这几枚报
+      "The system cannot find the path specified"，探针从未落在上面）
+  ```
+  四枚可建目录的卷根逐枚 `[end]`＝零命中；`ls -d /<A..J>/wisp*` 十枚字母全 No such file。
+  前任留下的 `wisp118-xvol-probe\p.txt`、`ac118b-xvol`、`ac118r-xvol` 我这几发也都顺带复验为不存在。
+  仓库树侧：`git status --porcelain` 交件前后都只列我自己那三枚路径，卷根探针落在 git 看不见的地方，
+  所以这一格凭上面那八行 `ls` 原文结，不凭 `git status` 空结。快照残骸在 `/d/tmp/wisp126-s126/`，
+  `find -maxdepth 1 -type d` 实测 **12 枚目录**（仓库外，要不要清由编排者定，本票不动仓库外别人的快照）；
+  另登记一枚我自己跑命令时误建的空目录 `gate;D`（`ls` 数出来的那一刻混进去了），发现即 `rmdir` 掉，
+  所以上一句的枚数按清后重数写 12，不是 13。
