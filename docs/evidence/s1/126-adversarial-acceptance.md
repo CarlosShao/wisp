@@ -37,35 +37,99 @@
 
 ### 1.1 两枚比较在生产里的全部读数点（我自己 grep 全仓，不按它的行号）
 
-`sameTree` 与 `answerInsideTree` 在非测试代码里的调用者，我数出来是**三处、两个方向**，
-与它自述的位置相同、行号因票 125 的后续编辑已漂移（它写 `:311`/`:325`，交件树实际是 `:391`/`:405`）：
+`sameTree` 与 `answerInsideTree` 在非测试代码里的调用者，我数出来是**三处、两个方向**。
+行号口径我不含糊：票面写的 `:311`/`:325` **在交件树 `81b4d5f` 上逐字成立**（我在那枚快照里自己
+`grep -n` 出来就是 311/325）；它们在工作树 HEAD 上是 `:391`/`:405`——**这枚漂移是票 125 后落在同一枚
+`resolve.go` 上的 84 行造成的**，不是 126 写错行号。下表用交件树行号：
 
 | 读数点 | 代码 | `true` 被读成 | `false` 被读成 |
 |---|---|---|---|
-| 缝守第一道包含见证 | `internal/winsec/resolve.go:391` `if answerInsideTree(childAns, parentAns) { return "" }` | **放行**（`""`＝可以装） | 继续往下走 |
-| 缝守第二见证 | `internal/winsec/resolve.go:405` `if sameTree(anchorAns, parentAns) \|\| answerInsideTree(anchorAns, parentAns) { return "" }` | **放行** | **拒绝**（走到最后一行的 refusal 文案） |
-| 通知归属 | `internal/winsec/winsec_windows.go:111` `return sameTree(n.Path, resolved.String())`（`noticeNamesTree`） | "这枚通知就是关于你那棵树" | "不是"（虚警方向，见 1.3） |
+| 缝守第一道包含见证 | `internal/winsec/resolve.go:311` `if answerInsideTree(childAns, parentAns) { return "" }` | **放行**（`""`＝可以装） | 继续往下走 |
+| 缝守第二见证 | `internal/winsec/resolve.go:325` `if sameTree(anchorAns, parentAns) \|\| answerInsideTree(anchorAns, parentAns) { return "" }` | **放行** | **拒绝**（走到最后一行的 refusal 文案） |
+| 通知归属 | `internal/winsec/winsec_windows.go:111` `return sameTree(n.Path, resolved.String())`（`noticeNamesTree`） | "这枚通知就是关于你那棵树" | "不是"（虚警方向，见 1.2） |
 
 结构性事实：两枚函数本次只加了 `if !sameVolume(...) { return false }` 的**提前返回**，
-其余分支一字未动（`fold` 闭包提成 `foldSegment` 是同体搬家）。
-⇒ 对任意输入 `(a,b)`，改后为 `true` 必然改后也为改前 `true`：**逐点单调收紧**，
+其余分支一字未动。我把 `09b5285..81b4d5f` 里 `resolve.go` 的**全部 14 行删除**逐行列出来核过：
+它们是两枚 `fold := func(s string) string { ... ToLower ... }` 闭包（各 6 行）加两枚调用点——
+`foldSegment` 是同一枚函数体搬家，**零行为变化**。
+⇒ 对任意输入 `(a,b)`，改后为 `true` 必然改前也为 `true`：**逐点单调收紧**，
 不存在任何输入让 `false` 变 `true`。这一枚是我自己读 diff 得到的，不是转述。
 
-### 1.2 我要找的"放宽通路"在哪：归属侧的 `false` 会不会被别处当放行读
+### 1.2 我要找的"放宽通路"在哪：归属侧的 `false` 会不会被别处当放行读——**找不到**
 
-**状态：待写**（关键：`noticeNamesTree`/`noticesAboutTree` 是否有任何**非测试**消费者）
+`grep -rn "noticeNamesTree\|noticesAboutTree"` 扫全仓（含 `cmd/`、`tools/`），非测试命中只有
+`winsec_windows.go` 里它自己的定义加三处注释，和 `resolve.go` 一枚注释。
+⇒ **这两枚归属助手今天零枚非测试消费者**：`sameTree` 在归属侧的唯一生产读者是
+`noticeNamesTree`，而 `noticeNamesTree` 只被 `_test.go` 调用。
+所以归属侧连"把 `false` 读成放行"的通路都不存在，收紧它在生产里一个字节都放不宽。
 
-### 1.3 反向代价（过严）的钉子是否真有牙
+我也把"第三种可能"（某处 `if !sameTree(...) { return "" }` 这种把取反当放行读的写法）数了一遍：
+全仓对这两枚函数的取反调用数为 **0**。
 
-**状态：待写**
+顺带钉住我自己的口径，免得这枚读数被反过来用：票 126 的 `Type` 行写"生产缺陷（通知归属判据）"。
+按消费者算，归属这一侧今天确实是**只有测试在读的判据**；但它是包内唯一的归属判据
+（`winsec_windows.go:116` 明写 every consumer of narrowNotice 都走它），而**缝守那一侧是硬生产**
+⇒ 这枚 `Type` 站得住，我不据这一点降格本票。
+
+### 1.3 反向的代价（过严）钉住了吗——钉住了，且我另打三发验它的钉子是双向的
+
+它主张"过严会误伤诚实 resolver、整条 C26 掉回内置底线（run 35595651898 那一族）"，
+交件用七枚腿里四枚 `wantRefused:false` 的 CONTROL 加票 112 那枚用例钉。我复算：
+
+- 四枚 CONTROL 在**改前改后都绿**（`refusal=""` 逐腿亲眼读到，一次 `CONTROL RED` 都没触发）；
+- `TestTreeOwnershipProbeAcceptsAn83ShortSpellingOfItsOwnParent`（票 112 的"诚实 resolver 必须过缝"）
+  基线 `PASS` → 交件 `PASS`；
+- **我自己补的两发放宽变异**证明这套钉子双向有牙：把 `sameTree` 掰成恒 `true`
+  （＝能造出的最大放宽，比 `09b5285` 还宽）红 **9 枚**，其中 **5 枚是既有用例**
+  （`TestAC2InheritedNoticeHasANoiseBound`、`TestAC3OwnGrantsStaySilentWhicheverWayTheOSNamesThem`、
+  `TestSealReportsThePrincipalsItCleared`、`TestNoticeAttributionKeepsTwoTreesApart`、
+  `TestTreeOwnershipProbeAcceptsAn83ShortSpellingOfItsOwnParent`）；
+  把 `answerInsideTree` 掰成恒 `true` 红 **3 枚**。
+  ⇒ 换句话说：**假如票 126 交的是放宽，既有套件会自己变红**。这枚读数不是交件提供的，是我打的。
+
+### 1.4 "本票没动到别处"的另外两枚独立证据
+
+- POSIX：容器（`golang:1.27`，linux/amd64，挂载后先 `ls -l /src/go.mod` 验 883 字节非空挂）**真执行**，
+  交件组 `RUN=58 PASS=39 FAIL=0 SKIP=0`，基线控制组 `58/39/0/0` **逐字相同**——
+  不是拿 `GOOS=linux go vet` 的"只编译"充当执行。
+- **票 125 叠在 126 之后又动了同一枚 `resolve.go`**（`4824bb8`，+84 行，改 `resolverProbeRoot`）。
+  我在 `bd50c63`（当前 HEAD）另跑一整包：`RUN=91 PASS=50 FAIL=0 SKIP=0`，与 `81b4d5f` 相同
+  ⇒ 126 的判决没被后继改动动摇；且 126 的缝守用例是把 pair 直接喂给 `treeOwnershipFailureForPair`，
+  不经 125 新改的探针根解析，两票在这枚函数上互不掩盖。
+
+**首要攻击点结论：九发变异（它六发 + 我三发）里，没有任何一发造出"拒绝侧变松／放行侧变宽"。
+硬性退回条件未触发。**
 
 ---
 
 ## 2. AC#1 —— 判归属：卷段该不该进比较
 
-**裁决：待定** ｜ **标签：待定**
+**裁决：通过** ｜ **标签：〔独立复现〕**（判据本身是裁定，我复现的是它给的代价与理由）
 
-读数：待写
+它裁：**该进**，且进的位置是那两枚树比较本身，不是任一调用方。我三条独立复算：
+
+1. **修在比较里、不在调用方**这一枚，我按"还有没有第三枚调用者"验：全仓非测试调用者就是
+   `:311`/`:325`/`winsec_windows.go:111` 三处，两处缝守一处归属（见 1.1）。
+   修在任一调用方都会留下其余两枚裸奔——它这个理由是**成立的**，且它没漏报调用者。
+2. **`pathComponents` 不该动**这一枚它是可反证的：它说"把卷段塞进 `pathComponents` 会改掉
+   票 108/118 已交付的判据形状（`pathpieces_108_test.go:102` 直接红）"。
+   我没有信这句话，**我打了这一发变异自己看**（`MUT-PC-KEEPVOL`：`winsec.go:353`
+   的 `i := len(filepath.VolumeName(path))` 改成 `i := 0`；先 `diff` 证落地、`go build` rc=0 才读名）：
+   整包 `RUN=91 PASS=49 FAIL=1 SKIP=0`，红的那**一枚恰好就是
+   `TestAC2ComponentsAndTraversalPerSeparatorShape`**，而本票新四枚在此发下**全绿**。
+   ⇒ 代价主张逐字成立，且这枚代价是**票 108 的**、不是本票自己的钉子逼出来的。
+3. **跨平台代价**：POSIX 半边 `58/39/0/0` 与基线相同（1.4），它写的"POSIX 上 `VolumeName` 恒空
+   ⇒ 两枚比较逐字保持原判据"是执行过的读数而不是推理。
+
+**两问逐问答的判语**：
+- *攻击面还是运维事故面*——我同意它按攻击面记账，且我要说得更硬：缝守侧那一发
+  **不需要任何运维巧合**，一枚对同一尾段跨卷作答的候选今天就能过缝（AC#2 已量，见第 3 格）。
+  归属侧它算成"事故面 + 审计说错对象"，但按 1.2，那枚判据今天**只有测试在读**，
+  所以归属侧连事故面的生产通路都还没开通——它把这一侧说重了一点，方向无害，不据此改判。
+- *同一信任域下危害边界*——它的"同信任域只降级归属侧、不降级缝守侧"我接受：
+  缝守一旦放行，落点由那枚说谎候选说了算，而 `platformVerifyPlacement` 是在**它自己给的落点**上
+  做形状检查，管不住"落点选在另一枚卷"这一形。这一点我用 `P5` 探针侧验过：
+  底线拒的是 `\\?\`/UNC/设备前缀/尾点/重解析点，**不含卷字母归属**。
 
 ---
 
