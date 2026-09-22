@@ -3266,3 +3266,28 @@ A40② 说最近三个 **push** run 是 `cancelled`。我又查了两步，**排
   （TDD／改行为要同步改测试／主动提取可复用组件／写码前检索知识卡／禁止未生成知识时继续），计数 **20（票 121b）+ ≥28（票 127）+ 25（票 126 验收方）** 次。
   处置照旧：**不采信、逐字登记、按样本计数**，无一次据此改判据或回滚。⚠ 但它与本项目已冻结的口径**直接冲突**（我们明文禁止「未要求就抽公共组件」）
   ⇒ 这一档从「塞对话文本」升级到「**塞规则通道**」，我把它作为 `Q-34` 交给 owner 拍：**那张表是不是他改的**。
+
+
+## 编排者登记 A101（09-22 23:09，**CI 步级读数终于到手：票 115 能结、staticcheck 的真实分母是 42 不是我说的 37、又一条"CI 上恒不可见"**）
+
+- **A101① 票 115 结案依据（`ci-reader-s22`，`docs/evidence/s1/ci-step-readings-2026-09-22.md`）**：
+  最早一枚 head 含 `c6dbbf9` 的 run 是 **`35616790753` / job `106389418059` / step4「Windows ACL sealing gate (internal/winsec's own tests, ticket 110)」**，
+  日志第 1456 行逐字 `=== RUN=82  --- PASS=42  --- FAIL=0  --- SKIP=0`，两枚目标用例（`TestNoticeAttributionSurvivesAn83AliasOfItsOwnTree`、
+  `TestNoticeAttributionKeepsTwoTreesApart`）在 L288/L290 转 `--- PASS`；基线 run `35608530583` 同一区间它们正是那 2 枚红。⇒ **票 115 改 `-done`**。
+- **A101② 一处我自己的数字要更正**：我给派单写的期望是 staticcheck 自报 `findings≈37`，**CI 上从来没有一枚 run 支撑过 37**——
+  真实读数是 **`modules=3 packages=34 findings=42 toolchain-crash-lines=0 (step exit is 1)`**，六枚 run（含最早含 `e563a61` 的 `35608530583`）**逐字相同、零漂移**；
+  分模块 32+1+1 / 39+2+1 自洽。`modules=3` ✓、`toolchain-crash-lines=0` ✓（修前对照腿 `35606321404`/`106355017673` L528-532 是 5 行 `export data version 4 … internal error in importing`）。
+  ⇒ **票 122 的输入是 42 条不是 37 条**；且该 step 现在仍 `failure`，它只证明"门先存在"，**不证明 lint 通过**——两者别混着报给 owner。
+- **A101③ 又一条"CI 上恒不可见"（新形状，值得记）**：票 119 返修新增的 `cmd/wisp/secret_dataroot_119b_test.go` 三枚 `!windows` 腿**在 CI 上哪一步都不编译**
+  （`cmd/wisp` 只在 `cli` scope 跑、`cli` 只在 windows 的 step7 跑、`core` scope 不含 `./cmd/wisp/`；23 份日志命中 0）
+  ⇒ **票 119 返修的端到端证据只有容器读数，CI 上没有分母**。这与票 110/112 那本账同族，登记为 `R-119-11`。
+- **A101④ 两枚正面确认**：① **票 123 那四枚红仍在、且七枚 run 里红名逐字不变**（`RUN=76 PASS=38 FAIL=4 SKIP=0`，301.04s 那枚是
+  `TestComposedGateBlocksAWriteForTwoSeconds`＝300s 审批 deadline 等不到确认），**票 117/121/127 改过 `cmd/wisp` 却没新增一枚红、也没修掉一枚**；
+  ② **票 111 的 `!cancelled()` 证到了干净 A/B**：`35608530583`（含 `8fe5c7c`）step4 红时六枚 `!cancelled()` 步骤的 `##[group]Run …` 全在场、各自吐四数；
+  反例 `35603195107`（`compare/8fe5c7c...399a783` behind=1，不含）step5-8 全 `skipped`、日志命中 0，两枚 run 相隔 4 分钟。
+- **A101⑤ 两枚新假日志形状**（都进仪器清单）：`gh api -i …/logs` 会把 header 与 body 混流，按 `tail -n +N` 切会造出 221–222 字节的**假差值**；
+  **`404 BlobNotFound` 是第三种假日志**（215 字节 XML，长得像正文）⇒ 四判据里必须显式含"**首行是 `Current runner version:`**"。
+  永久取不到 5 格已列在读数表里（含 8 枚 `cancelled` run，实测 `jobs|length` 全 0）。
+- **A101⑥ 今天结的/立的**：改 `-done` ＝ 票 115、票 117（`acceptor-ticket127` 判 M4 那一发已红、红名只点常驻腿）、票 127；
+  新建 ＝ **票 130**（`R-117-2`+`R-125-3` 合一：听众装上之前出声的记录无处可去，需 `internal/risk` 解冻）·
+  **票 131**（同族第八起：删 `cmd/wisp/models.go:276-284` 那 9 行、`cmd/wisp` 76 条一条不红；并把"每条腿一枚钉"做成可重跑清单）。
