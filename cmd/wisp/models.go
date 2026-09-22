@@ -69,7 +69,7 @@ Usage:
                               109's guard) and announce it through D43 row #37
 
 Store root: [models] dir, relative to the data dir, default <data dir>\models.
-Mirrors: [models] mirror (bytes only - hashes come from the signed manifest).
+Mirrors: [models] mirror serve bytes only; the signed manifest is the authority.
 Manifest: WISP_MODELS_MANIFEST, else <exe dir>\models, else <cwd>\models.
 `
 

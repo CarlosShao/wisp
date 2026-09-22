@@ -573,7 +573,12 @@ func (m *Manager) VerifyDir(entry *ModelEntry, dir string) error {
 	named := make(map[string]bool, len(want))
 	namedDirs := map[string]bool{}
 	for _, w := range want {
-		rel := filepath.ToSlash(filepath.Clean(w.Path))
+		// No filepath.Clean here on purpose, twice over: manifest.ParseManifest
+		// already refused any path that is not its own cleaned form
+		// (validRelPath), and D22 bans filepath.Clean outside the C26 path
+		// resolver precisely because re-normalizing an already-vetted string is
+		// where a second, weaker path policy grows in.
+		rel := filepath.ToSlash(w.Path)
 		named[rel] = true
 		for d := path.Dir(rel); d != "." && d != "/"; d = path.Dir(d) {
 			namedDirs[d] = true
@@ -604,8 +609,16 @@ func verifyNothingUnnamed(dir string, named, namedDirs map[string]bool) error {
 		if rerr != nil {
 			return rerr
 		}
-		rel = filepath.ToSlash(filepath.Clean(rel))
+		// filepath.Rel already returns a cleaned path, so ToSlash below changes
+		// the spelling and not the meaning. Anything still reaching upward is
+		// reported rather than re-normalized: this walk has no business trusting
+		// a path that leaves the directory it started in.
+		rel = filepath.ToSlash(rel)
 		if rel == "." {
+			return nil
+		}
+		if rel == ".." || strings.HasPrefix(rel, "../") {
+			extra = append(extra, rel+" (outside the model dir)")
 			return nil
 		}
 		if d.Type()&os.ModeSymlink != 0 {
