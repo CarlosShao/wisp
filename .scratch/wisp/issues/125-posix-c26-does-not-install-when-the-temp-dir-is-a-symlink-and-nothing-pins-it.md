@@ -18,7 +18,7 @@
 - [x] **AC#1** 先给**「C26 在位」一枚 POSIX 正向用例**：今天唯一断言在 `resolve_windows_test.go`，POSIX 那枚是 `Skip`
       ⇒ 先让 POSIX 有能红的钉子（`PathResolverInstalled()` 必须等于 `risk.c26Pipeline`），**并自证它真的会红**
       （一发「让安装被跳过」的变异 ⇒ 红名点到它）。
-- [ ] **AC#2** 复算并裁定这一形该不该发生：守门人用**未解析的** `os.TempDir()` 造探针，是不是把「OS 自己的合法形状」当成了攻击？
+- [x] **AC#2** 复算并裁定这一形该不该发生：守门人用**未解析的** `os.TempDir()` 造探针，是不是把「OS 自己的合法形状」当成了攻击？
       与票 119 已批准的纪律（**调用方解析 OS 给的答案**）对齐之后，`resolve.go` 那两处该不该同样走 `SealableRoot`？
       ⚠ `internal/winsec/resolve.go` 与 `internal/risk/**` 都在冻结/禁改列 ⇒ **本票 AC#2 只出裁定与判据，动码要我先解冻**；
       停在「裁完交回」是**合格交件**，不是失败。
@@ -82,4 +82,82 @@
     另需一枚反向 leg 证明**拒绝侧没变松**（穿过链接的候选照样拒）。票 126 的 `a701138` 已先读过：
     它改的是 `sameTree`/`answerInsideTree` 的卷段，与本票这两枚探针根**不是同一件东西**，
     它的 `volume_attribution_126_windows_test.go:262` 自己拿 `os.TempDir()` 造 pair，不经这两处 ⇒ 不受影响（待复算）。
+
+- [2026-09-22 agent=agent-ticket125 did=AC#2] **裁定：是误伤，该修；已修，判据两枚都真读数；拒绝侧逐数没动。**
+
+  **① 裁定（三个候选动作，逐个判，不是选一个顺手的）**
+  - **①「不动，接受这一形掉到底线」→ 拒。** 代价是可核的：软链 temp 形下整条 C26 不在位，
+    底线**只会拒不会改写**（`resolve.go:29-32` 自己写着），于是 D31 那本改写账（`Result.Rewritten`）
+    在这一形里**永远是空的**——票 102/105 那本账的读者拿不到任何记录，而进程照常 rc=0。
+  - **②「守门人自己解析它问 OS 的那枚答案」→ 采。** 这正是票 119 已批准的纪律
+    （`internal/proc/envfork.go:107-116`：**OS 给的答案解析，别人按名字交给你的值原样**）。
+    `os.TempDir()` 是前者，不是后者；两处探针根（`resolve.go:195/197`、`:258/260`）此前直接拿未解析拼写当材料。
+  - **③「放宽守门人对候选答案的底线复算」→ 拒，且已实测它会给什么放行。** 见 MUT-125B 那发：
+    删掉 `resolverConformanceFailure` 里"候选的答案必须过一遍底线"那一支，一枚**答案穿过链接**的候选
+    立刻被判定可安装（`refused=false reason=""`）⇒ 放行侧确实会松，这一支一字未动。
+  - **为什么不是"直接调用 `proc.SealableRoot`"**：`envfork.go:147-152` 的边界话写明
+    "nothing in internal/winsec calls it"，且 `winsec_other.go` 的票 113 AC#6 package doc 把
+    "哪棵树"归给调用方。让底线反过来依赖上面那层，正好把那条边界话拆掉。所以本包自带同一条走法
+    （`resolveProbeRoot`：走到文件系统认得的最长前缀 → 问它自己的实名 → 未存在尾段原样接回），
+    **失败方向＝拿回未解析的原拼写（＝今天的形状）**，绝不变成一枚静默跳过的探针。
+
+  **② 改动（`internal/winsec/resolve.go`，+82/−2，两处探针根换成 `resolverProbeRoot()`）**：
+  新增 `resolverProbeRoot()` / `resolveProbeRoot()`；`resolverProbeShapes()` 与
+  `resolverTreeOwnershipFailure()` 各改一枚调用点；`sameTree`/`sameVolume`/`foldSegment`/
+  `answerInsideTree`（票 126 `a701138` 那一笔）**一字未动**，`volume_attribution_126_windows_test.go`
+  一字未动（可核：`git diff --name-only` 只列三枚路径）。
+
+  **③ 判据（新交 `internal/winsec/seam_probe_root_125_other_test.go` 三枚 leg + AC#1 那枚钉的第二形）**
+  三台对照（`git archive 81b4d5f` 纯净快照 + 交件文件；`-v` 逐数，容器真跑）：
+
+  | 台 | 命令结果 | 四数（顶层/子用例） | 红名 |
+  |---|---|---|---|
+  | **pre**（`ff3faf9` 的码 + 新 leg） | rc=1 | `RUN=14 顶层PASS=2 顶层FAIL=3 子PASS=6 子FAIL=3 SKIP=0` | `…ProbeShapesAreBuiltOnAResolvedRoot125/measured_symlink_spelled_temp`、`…AcceptsTheHonestPOSIXAnswer125/measured_symlink_spelled_temp`、`c26_seam_posix…InstallSurvivesASymlinkSpelledTemp125/measured_symlink_spelled_temp`（子进程 rc=1，`AC#1 RED: winsec.PathResolverInstalled() = <nil>`）；**四枚 control_* 全绿** |
+  | **post**（本改动） | rc=0 | `RUN=14 顶层PASS=5 顶层FAIL=0 子PASS=9 子FAIL=0 SKIP=0` | 无 |
+  | **MUT-125B**（删底线复算那一支，`resolve.go:300: _ = out // MUTATION-125B`，`go vet` rc=0） | rc=1 | `顶层FAIL=1 子FAIL=2` | `TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125/{control_plain_temp,measured_symlink_spelled_temp}`，红因逐字 `AC#2 RED (the refusal side moved): the seam guard accepted answer_through_the_link … refused=false reason=""` |
+
+  **`PathResolverInstalled()` 四枚读数（同一枚钉，两形 × 改前改后）**：
+  软链形改前 `<nil>` ⇒ 改后 `risk.c26Pipeline`；plain 形改前 `risk.c26Pipeline` ⇒ 改后 `risk.c26Pipeline`。
+  改后那一发的现场行：`child: … INFO winsec: sealing path resolver installed resolver=risk.c26Pipeline probes_passed=1`
+  + `child: --- PASS: TestAC1POSIXSeamHoldsC26Pipeline125`（`TMPDIR=<…>/varlink125/tmproot125`）；
+  改前同一位置是 `ERROR winsec: refusing to install …` + `AC#1 RED … = <nil>`（原文已在 §实测事实/票 119 §六）。
+  探针材料的形状读数（改前/改后各一条，逐字）：
+  改前 `TMPDIR="…/varlink125/tmproot125" shapes=["…/varlink125/tmproot125/../wisp-103-conformance-probe"]`，
+  改后 `TMPDIR="…/varlink125/tmproot125" shapes=["…/real125/tmproot125/../wisp-103-conformance-probe"]`
+  ⇒ ** hostile 的 `..` 还在**（`/../wisp-103-conformance-probe`），换掉的只有它站的那枚根。
+
+  **④ 拒绝侧逐数（这格不许被读成"顺手放宽了放行"）**：五枚候选 × 两形，改前改后**同一套判决**，
+  `resolverConformanceFailure` 的理由原文都在日志里：`pass_through`（"passing it through unchanged"）、
+  `constant`（"with the same single spelling"，票 108 的 P1b）、`tree_moving`（"neither inside … nor inside …"）、
+  `no_account`（"it cannot answer the tree-ownership question at all"，R-103-1）、
+  `answer_through_the_link`（改后两形都是"a spelling the built-in floor itself refuses"）——
+  五枚全部 `refused=true`；同格还钉了底线自己拒未解析拼写（`control_unresolved_root_still_refused_by_the_floor_itself`）
+  与"守门人不拒自己的底线"两条前置，免得这格绿在"什么都拒"上。
+
+  **⑤ 平台边界（照实）**：
+  - **Windows 本机实测**：`/tmp/wisp-t125-{pre,post}` 两棵快照在宿主（go1.27.1 windows/amd64）
+    `go test -count=2 -v ./internal/winsec/ ./internal/config/` **改前改后四数相同**：
+    `RUN=382 PASS=212 FAIL=0 SKIP=0`，两把 rc=0；`probes_passed=2`、`installed=risk.c26Pipeline` 两把都在。
+    本机 temp 读数 `tempdir="C:\Users\swq\AppData\Local\Temp"`、`evalsymlinks` **同一枚拼写**（err=nil）
+    ⇒ 这台机器上解析是恒等操作。
+  - **CI runner 的 8.3 形（票 112 那一族）本机不可复现**：⇒ 只给推断，不写成实测——解析会把
+    `C:\Users\RUNNER~1\…` 换成实名，于是 ambient 那对探针**两枚同根**、可能不再走到第二证人腿；
+    这是"ambient 探针行使到哪一腿"的形状变化，**不是任何放行变宽**（候选的答案照样过底线复算，见 ④）。
+    112 的植桩仪器（`tree_ownership_112_windows_test.go` 走 `TreeOwnershipProbeForTest`，自带 pair，
+    不经 `os.TempDir()`）在本机两把里都仍 PASS。
+  - **macOS 那半：只有推断、无 runner**（R-103-6 那笔账仍未付），不许读成"macOS 已验"。
+  - 票 124 那族 harness 红（软链 temp 下 79–83 条）**本票一字未动**，本改动只把守门人自己那条腿接上。
+
+  **⑥ 卫生**：`gofmt -l` 与 `gofumpt v0.7.0 -l` 对 `resolve.go` + 两枚交件文件**皆空**；三枚文件 CR=0；
+  注释与测试零 emoji；`GOOS=linux go vet ./internal/winsec/ ./internal/config/` rc=0（**只编译不执行**，
+  正向读数只来自上面的容器真跑）。
+  **登记 `R-125-1`（建议归属：编排者的判据仪器账）**：解析探针根之后，install-time 的树归属 pair 在
+  两形下都是"同一枚根的两枚拼写"，真管线那一发永远走不到第二证人腿（与 `R-126-1` 同一族第二半）⇒
+  以后跨卷/跨根的判据必须继续靠植桩的 fake，不许读成"环境探针已经覆盖"。
+  **登记 `R-125-2`（建议归属：编排者，要裁合并还是三枚副本）**："走到存在前缀 + `EvalSymlinks` + 尾段原样接回"
+  这条走法现在是仓内第三枚副本：`internal/proc/envfork.go:160` `SealableRoot`、
+  `internal/tools/paths.go:251` 附近、本票新增 `internal/winsec/resolve.go` `resolveProbeRoot`。
+  本票**没有**合并成一枚 leaf 包，因为合并要动 `envfork.go:147-152` 与 `winsec_other.go` 的边界话（两枚都不是本票地界）。
+  **next=AC#3**（可见性：那行 `ERROR` 接票 117 的持久 sink 复算一次，逐字给"在/不在"）。
+
 

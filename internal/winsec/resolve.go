@@ -3,6 +3,7 @@ package winsec
 import (
 	"errors"
 	"fmt"
+	"io/fs"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -194,11 +195,90 @@ func SetPathResolver(r C26Resolver) {
 // below is deliberately the same kind of probe: two spellings, no mkdir.
 func resolverProbeShapes() []string {
 	sep := string(filepath.Separator)
-	shapes := []string{os.TempDir() + sep + ".." + sep + "wisp-103-conformance-probe"}
+	shapes := []string{resolverProbeRoot() + sep + ".." + sep + "wisp-103-conformance-probe"}
 	if runtime.GOOS == "windows" {
 		shapes = append(shapes, "wisp103"+sep+"conformance-probe")
 	}
 	return shapes
+}
+
+// resolverProbeRoot is the spelling these probes are built on, and ticket 125's
+// AC#2 ruling written where the code has to carry it.
+//
+// Both probe sites used to take os.TempDir() verbatim. On a machine whose temp
+// dir is *spelled* through a symlink - a container with TMPDIR under a linked
+// /var, macOS where /tmp and /var are links, any box whose temp path simply
+// contains one - that hands the guard a root which the built-in floor refuses
+// for its own sake. The candidate then answers the hostile shape honestly (it
+// folds the parent pointer and keeps the rest of the spelling the OS gave it),
+// the floor refuses that answer, and the guard concludes the *candidate* is the
+// problem: it refuses to install C26, and the whole process drops to the floor
+// over a spelling nobody chose (measured pre-fix, Linux container,
+// `installed=<nil>` with the ERROR line; `risk.c26Pipeline` in the same container
+// with a real temp dir). That is the gatekeeper reading the OS's own legitimate
+// shape as an attack, and it is the same instrument family as ticket 124's
+// harness reds - it only grew on the guard's own leg.
+//
+// So the probe root is resolved before it is used. That is ticket 119's already
+// approved discipline - the layer that asks the OS resolves what the OS answered
+// (internal/proc's SealableRoot) - applied to the only OS read this package makes
+// about its *own* fixture. It is deliberately not a call into internal/proc:
+// envfork.go's boundary note ("nothing in internal/winsec calls it") is the
+// package doc ticket 113 AC#6 wrote, and the floor must not start depending on
+// the layer above it to keep that boundary checkable.
+//
+// What this does not change, and what the legs in seam_probe_root_125_other_test.go
+// measure instead of assert: no caller's path passes through here; ResolvePath
+// still re-runs the floor on every answer the installed resolver gives; a
+// spelling nobody resolved is still refused by platformVerifyPlacement; and the
+// probes keep their hostility, because "<root>/../<name>" is still a parent
+// pointer the floor refuses outright, so a candidate that answers it by passing
+// it through is still refused - now on a root that names a real tree on every
+// platform rather than on one that depends how the machine spells /tmp.
+//
+// The direction on failure is "hand back what os.TempDir said", i.e. exactly
+// today's behavior. An unresolvable temp dir must never become a skipped probe:
+// a probe that does not run is a guard that passes for free.
+func resolverProbeRoot() string {
+	return resolveProbeRoot(os.TempDir())
+}
+
+// resolveProbeRoot walks to the longest prefix of path that the filesystem agrees
+// to, asks that prefix for its own real spelling, and re-joins the components that
+// do not exist yet unchanged. It is the same walk proc.SealableRoot performs, for
+// the same reason, on material this package owns rather than on a caller's root:
+// no cleaning, no absolutizing, no case folding, and nothing that could turn a
+// refusal into an approval - the answer is only ever fed to a check that can
+// still say no.
+func resolveProbeRoot(path string) string {
+	if path == "" {
+		return path
+	}
+	var missing []string
+	cur := path
+	for {
+		_, err := os.Lstat(cur)
+		if err == nil {
+			break
+		}
+		if !errors.Is(err, fs.ErrNotExist) {
+			return path // unreadable, not absent: not this guard's to reinterpret
+		}
+		parent := filepath.Dir(cur)
+		if parent == cur {
+			return path
+		}
+		missing = append(missing, filepath.Base(cur))
+		cur = parent
+	}
+	real, err := filepath.EvalSymlinks(cur)
+	if err != nil {
+		return path
+	}
+	for i := len(missing) - 1; i >= 0; i-- {
+		real = filepath.Join(real, missing[i])
+	}
+	return real
 }
 
 // resolverConformanceFailure returns the reason r must not be installed, or ""
@@ -257,7 +337,7 @@ func resolveAccounted(r C26Resolver, input string) (string, bool, error) {
 // Refusal on either probe is acceptable, as it is everywhere in this file.
 func resolverTreeOwnershipFailure(r C26Resolver) string {
 	sep := string(filepath.Separator)
-	parent := os.TempDir()
+	parent := resolverProbeRoot()
 	return treeOwnershipFailureForPair(r, parent, parent+sep+"wisp-108-tree-ownership-probe")
 }
 
