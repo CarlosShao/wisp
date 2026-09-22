@@ -499,7 +499,7 @@ consequence="the incumbent resolver, or the built-in floor, stays in place"
 | `R-119-7` | `./cmd/wisp/` 在 POSIX **19 枚红**（`secret: DPAPI is only available on Windows`），控制组与锚点红名集合**相同** ⇒ 既有缺口；它使"命令面级"的 POSIX 密封用例无处可钉 | 票 111/票 123（`cmd/wisp` CLI 假设 CI 上有人审批）那本账 |
 | `R-119-8` | harness 的 81 条在 **HEAD 仍是 83 条**，且已换成票 118 自己的新用例在红（`TestAC118POSIX…`/`TestAC5*`） | **票 118/111**（唯一合法清法：测试解析自己的 `t.TempDir()`）；`MUT-119-E` 是"为什么不能靠放宽底线"的实测引证 |
 | `R-119-9` | 本票 5 枚用例里 2 枚的 **fixture 用被测函数算**（`proc.SealableRoot(base)`），与 `internal/proc/envfork_test.go:117` 自立的规矩冲突；MUT-A@HEAD 实测会让 4/5 枚变红，其中 2 枚红因是 fixture 不再干净而非语义 | 票 118（测试加固地界） |
-| `R-119-10` | 新注释块 markdown 层级写坏：票面"两条成本"下三个子项被拉成同级 `-`（`winsec_other.go:93-118`），读起来像"六条成本" | 与 `R-119-2` 同批改（纯注释，零风险） |
+| `R-119-10` | 新注释块 markdown 层级写坏：`grep -c "^//   - "` 在控制组是 **2** 条、锚点是 **5** 条同级条目（`:93/:100/:101/:102/:114`）——原本"两条成本"下的三个子项被拉成同级，**标题还写着 "Two costs" 而列表有五项** | 与 `R-119-2` 同批改（纯注释，零风险） |
 
 ## 九、能不能结案 / 下一张该派什么
 
