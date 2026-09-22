@@ -312,6 +312,16 @@ func TestSeamGuardRefusesACandidateWhoseSecondWitnessNamesAnotherVolume(t *testi
 			wantRefused: false, anchor: movedDir, wantAnchorAsk: true,
 		},
 		{
+			// The volume fold has a production consequence: a resolver is entitled to
+			// answer one object's volume in either case, and the 8.3 asymmetry that
+			// took C26 down on run 35595651898 was exactly a difference the guard had
+			// to ignore. This is the leg that goes red if sameVolume ever compares the
+			// volume segment case-sensitively.
+			name:        "control: the second witness names that tree with another case of the volume letter",
+			answers:     map[string]string{parent: parentOnD, child: movedOnD, movedDir: `d:\wisp126-seam\probe-tree`},
+			wantRefused: false, anchor: movedDir, wantAnchorAsk: true,
+		},
+		{
 			name:        "control: the child's answer is inside the probe parent's tree",
 			answers:     map[string]string{parent: parentOnD, child: parentOnD + `\leaf`},
 			wantRefused: false, anchor: movedDir, wantAnchorAsk: false,
