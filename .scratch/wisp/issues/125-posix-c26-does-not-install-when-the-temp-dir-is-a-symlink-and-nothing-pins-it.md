@@ -25,7 +25,7 @@
 - [x] **AC#3** 可见性：**静默降级**是这张票的第二个缺陷——那行 `ERROR` 今天到不到得了人眼前？
       接票 117 已装的持久 sink 复算一次（软链 temp 形状下盘上那行 JSONL 在不在、字段是什么）；
       不在就是 `R-117-*` 那一族的**第八次**，写清哪一格该红。
-- [ ] **AC#4** 门禁：受影响包 `-count=2 -v` 四数 + 容器真跑（`ls -l go.mod` 自证挂载）；`gofmt`/`gofumpt` 全路径真跑；
+- [x] **AC#4** 门禁：受影响包 `-count=2 -v` 四数 + 容器真跑（`ls -l go.mod` 自证挂载）；`gofmt`/`gofumpt` 全路径真跑；
       `go vet` 双 GOOS；`sh scripts/d22scan.sh` 纯净快照 rc=0 + 台账各 scope 不降。
 
 ## Rules（本仓固定）
@@ -220,6 +220,74 @@
   无终端入口下等于无记录；实测真二进制 + 真 sink：盘上 `winsec` 零命中。
   **next=AC#4**（纯净快照门禁：受影响包 `-count=2 -v` 四数 + 容器真跑；`gofmt`/`gofumpt` 全路径真跑；
   `go vet` 双 GOOS；`sh scripts/d22scan.sh` rc=0 + 台账八 scope 与同 sha 控制组逐数）。
+
+- [2026-09-22 agent=agent-ticket125 did=AC#4] **门禁：全在纯净快照真跑并逐数点名；台账八 scope 零下降。**
+  树：`git archive a03f7ef | tar -x -C /tmp/wisp-t125-s125`（控制组 `git archive 81b4d5f | tar -x -C /tmp/wisp-t125-ctrl81b`；
+  **仓库内没建 worktree、没 checkout**，`git status --porcelain` 全程干净）。容器挂载自证每把先 `ls -l /s125/go.mod /ctrl/go.mod`，
+  `uname -s`=Linux、`go version go1.27.1 linux/amd64`、`ls /s125/internal/winsec | wc -l`=28；
+  容器命令全程带 `MSYS_NO_PATHCONV=1`（票 126 `R-126-4` 那条）。
+
+  **① 受影响包四数（`-count=2 -v`，只能从 `-v` 量）**
+  | 包 | 本票 sha `a03f7ef` | 控制组 `81b4d5f` | rc |
+  |---|---|---|---|
+  | `./internal/winsec/`（POSIX 容器） | `RUN=104 PASS=60 FAIL=0 SKIP=0` | `RUN=84 PASS=54 FAIL=0 SKIP=0` | 两把 rc=0 |
+  | `./internal/config/`（POSIX 容器） | `RUN=202 PASS=110 FAIL=0 SKIP=0` | `RUN=194 PASS=106 FAIL=0 SKIP=0` | 两把 rc=0 |
+  | 两包合并跑（POSIX 容器） | `RUN=306 PASS=170 FAIL=0 SKIP=0` rc=0 | — | — |
+  | 同两包（**Windows 宿主真跑**，resolve.go 是共用件） | `RUN=382 PASS=212 FAIL=0 SKIP=0` rc=0；分包 `winsec 182/100/0/0`、`config 200/112/0/0` | 改前同一形 `382/212/0/0`（AC#2 那格量的） | rc=0 |
+  增量可核对：winsec `+20 RUN / +6 顶层 PASS`＝本票三枚 leg（3 顶层 + 7 子用例）×2；
+  config `+8 RUN / +4 PASS`＝两枚（2 顶层 + 2 子用例）×2。
+  **邻居包（同容器 `-count=2 -v` 五包合跑 `./internal/secret/ ./internal/memory/ ./internal/proc/ ./internal/risk/ ./internal/agent/`）：
+  `RUN=600 TOPPASS=372 TOPFAIL=0 TOPSKIP=4` rc=0，与本票 sha 和控制组**逐数相同**（0 格下降、0 枚新红）。
+
+  **② 软链 temp 形状那一把（信息性，票 124 那族的账，本票没动它）**
+  `TMPDIR=/tmp/lnk-<tag>/link/tmproot`（先 `test -L` 断言过真是链接）两包 `-count=1 -v`，
+  本票 sha 独立跑了两遍、两遍同数：`RUN=144 PASS=62 FAIL=19 SKIP=4`；控制组 `RUN=139 PASS=61 FAIL=19 SKIP=0`
+  ⇒ **红数 19 枚两把相同**（＝票 124 那族 harness 红，不在本票地界）；
+  本票那四枚 leg 在这形下 **`t.Skipf` 自己**（`SKIP=4`）——理由就是它们内置的前置：
+  harness 的 base 自己经链接时"两形"塌成一形，读数没有对照组，宁可 skip 也不交一枚假绿；
+  **`TestAC1POSIXSeamHoldsC26Pipeline125` 在这形里是 `--- PASS`**（改前同一形是 `<nil>` 红）
+  ⇒ 修好的是"软链 temp 下 C26 在不在位"这件事本身，与 harness 那 19 枚无关。
+
+  **③ 卫生**：`gofmt -l internal cmd` 容器侧与宿主侧**皆空**；
+  `"$(go env GOPATH)/bin/gofumpt.exe" -l internal cmd` 宿主侧**空**，版本读数 **`v0.7.0 (go1.27.1)`**
+  （容器侧 `which gofumpt` → `GOFUMPT_IN_CONTAINER: command not found`，故 gofumpt 只有宿主一把，如实记）。
+  `go vet` 三把 GOOS 对两枚受影响包：`GOOS=linux`/`GOOS=windows`/`GOOS=darwin`（`CGO_ENABLED=0`）**rc=0/rc=0/rc=0**
+  （**只编译不执行**，正向读数只来自上面的容器/宿主真跑）。
+  `CGO_ENABLED=0 GOOS=linux go vet ./cmd/wisp/` **rc=1**，原文
+  `imports github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files in …`
+  ⇒ 本票的 vet 口径**不覆盖 `cmd/wisp`**（票 127 AC#2 已把这条写进过注释，我照它口径）。
+  **CR 逐文件量**（不做全局断言）：`internal/winsec/resolve.go` CR=0/LF=689、
+  `internal/winsec/seam_probe_root_125_other_test.go` CR=0/LF=307、
+  `internal/config/c26_seam_posix_125_test.go` CR=0/LF=209，**工作树与纯净快照逐枚相同**。
+  注释与测试零 emoji（`d22scan` ban #8 clean 即读数的反证位）。
+
+  **④ `sh scripts/d22scan.sh` + 台账八 scope（本票 sha vs 控制组，逐数）**
+  两把 rc=**0**（宿主两枚快照 + 容器一枚快照都跑成）。
+  | scope | `a03f7ef` | `81b4d5f` | 判 |
+  |---|---|---|---|
+  | bans #1-5 internal/ | 202 | 202 | 持平 |
+  | bans #1-5 cmd/ | 22 | 22 | 持平 |
+  | ban #6 frontend/ | 40 | 40 | 持平 |
+  | ban #7 internal/tools/ | 18 | 18 | 持平 |
+  | ban #8 design/ | 16 | 16 | 持平 |
+  | ban #8 frontend/ | 40 | 40 | 持平 |
+  | **ban #8 internal/** | **385** | **383** | **+2＝本票新增两枚 `_test.go`（无一下降；派单给的现基线 383 与控制组逐字吻合）** |
+  | ban #8 cmd/ | 32 | 32 | 持平 |
+  容器那把八数与宿主两把**完全相同**（同一棵树、两种平台）。
+
+  **⑤ 本票四笔提交与 `--name-only` 清单（改名 0 枚，全部显式路径 add，提交前逐行核过）**
+  `ff3faf9` — 票面 + `internal/config/c26_seam_posix_125_test.go`（AC#1）
+  `4824bb8` — 票面 + `internal/winsec/resolve.go` + `internal/winsec/seam_probe_root_125_other_test.go` + `internal/config/c26_seam_posix_125_test.go`（AC#2）
+  `a03f7ef` — 票面（AC#3，纯读数，零码）
+  `git diff --name-only 81b4d5f..HEAD` 只列这四枚路径；`cmd/wisp/**`、`internal/observe/**`、`internal/models/**`、
+  `internal/risk/**`、`docs/reports/**`、`docs/PLAN.md`、`docs/specs/**`、`rules_gateway.go`、`tools/d22scan/**`、
+  `allowlist.txt`、`.github/workflows/ci.yml`、`scripts/`、任何阈值/golden **一字未动**；
+  票 126 的 `volume_attribution_126_windows_test.go` 与 `sameTree`/`sameVolume`/`foldSegment` **一字未动**。
+  **登记 `R-125-4`（建议归属：票 124/118/111 那本 harness 账）**：软链 temp 形状下本票四枚 leg 走 `t.Skipf`
+  （`SKIP=4` 就是这么来的），CI 上一枚"harness 自己解析 `t.TempDir()`"的修法能让它们从 SKIP 变在跑；
+  在那之前"这格在 CI 绿"不能读成"这一形被测过"。
+  **next=** 见本日志末格。
+
 
 
 
