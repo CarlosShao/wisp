@@ -187,6 +187,8 @@ platform-specific … Until then the claim is unproven, not proven"）、
 
 ## 0b. 会话口径补记（骨架里那节的正文，位置在此以免与下面的裁决格混排）
 
+- **开工 `date` 实测：2026-09-22 22:36 CST**（第一发 `git archive 8ec04f3` 落地前）；
+  收尾 `date` 见 §九。每把读数各自带时间戳，不复用上一条。
 - **只读**：本会话在仓库内唯一的写件是本文件。全程
   `git archive <sha> | tar -x -C /tmp/ac127-s22/<名>` 取快照，**没有**在仓库树内建 worktree、
   没有 `checkout`/`--amend`/`reset`/`rebase`/`stash`（A38④）。
@@ -216,8 +218,8 @@ platform-specific … Until then the claim is unproven, not proven"）、
 - 变异先发落地再读名：`grep`/`diff` 出被改的那几字节 → `go build ./cmd/wisp` rc=0 → 才读 `--- FAIL` 名单。
 - `GOOS=linux go vet` 只编译不执行。
 
-**本文件写作状态：AC#1、AC#2 两格已落盘（渐进写，每格一次 commit）；AC#3、AC#4、结案判在文末续。**
-逐格裁决一览（未落格的写"待"）：
+**本文件写作状态：四格全部落盘 + §五 一发新账 + §六..§十，全文完。**（渐进写共 4 次 commit，每格一次。）
+逐格裁决一览：
 
 | 格 | 裁决 | 标签 |
 |---|---|---|
@@ -225,7 +227,7 @@ platform-specific … Until then the claim is unproven, not proven"）、
 | AC#2 R-117-C 降级是否诚实 | **通过**（三处落点与四条理由逐字复算） | 〔独立复现〕 |
 | AC#3 票 117 §一 现状表重算 | **通过**（三口径同数 40，逐格点名复算） | 〔独立复现〕 |
 | AC#4 门禁 + 四数 + 台账 | **通过**（四数与台账八数我独立量到同数） | 〔独立复现〕 |
-| **总判** | 见文末 §七 | 见文末 |
+| **总判** | **四格全通过、零退回；票 127 与票 117 均可结案** | 〔独立复现〕（见 §八） |
 
 ---
 
@@ -280,7 +282,7 @@ grep -rnE "slog\.(Warn|Error)\(" --include=*.go internal cmd | grep -v _test.go 
    （**stock 默认 logger 的时间格式**，没有 `time=` 前缀）与
    `time=2026-09-22T22:53:39.654+08:00 level=INFO msg="wisp: persistent log sink installed"…`（tee mirror 的格式），
    而盘上那本 jsonl **只有第二条**（1 条记录）⇒ **"换默认之前出声的记录只在 stderr"我在常驻腿上独立复现**。
-   这一发同时把 **R-125-3 的机制**量清了（见 §五）。
+   这一发同时把 **R-125-3 的机制**量清了（判语在 §六）。
 
 **判**：**通过**〔独立复现〕。这张表现在是本仓**唯一一把我对过三口径的分母尺**；两条新账都成立。
 **我没有动 `internal/observe`**：派单已把那一格登记为 `A99③`/待立票 130，本会话对该包**零写**。
@@ -343,3 +345,194 @@ grep -rnE "slog\.(Warn|Error)\(" --include=*.go internal cmd | grep -v _test.go 
 append-only 未破、别人的框一枚没翻。
 
 **判**：**通过**〔独立复现〕。四数、台账、格式门、静态门、diff 口径五件事逐条重量，无一项需要背它的数。
+
+---
+
+## 五、我自己加的那发：第三条腿（`models.go:276`）是不是也没有钉
+
+票 127 把"腿是 3 条"写进了表，但它只给自己那条腿补了钉。本仓这一族缺陷的判据一直是
+**"删掉装它的哪几行，会不会红"** ⇒ 我拿同一把尺去量**第三条腿**（票 121 装的 `wisp models ensure`）。
+
+快照 `/tmp/ac127-mut-models`：`sed -i '276,284d' cmd/wisp/models.go`
+（删掉 `if sink, sinkErr := installLogSink(io_.dataDir); … else { defer sink.close(); … }` 整块，
+留 `var logf func(string, ...any)` 原样交给 `store.handOffModel(io_, id, logf)`）。
+
+- 先证落地：`diff` 只有 276-284 那一处；`grep -n installLogSink cmd/wisp/models.go` ⇒ **0 命中**；
+  注释头那句"The persistent sink is installed here…"留在原地（**这正是最坏形状**：话还在，事没了）。
+- `go build ./cmd/wisp` ⇒ **rc=0**；`go vet ./cmd/wisp/` ⇒ **rc=0**。
+- 再读红名：`go test -count=1 -v ./cmd/wisp/`（`-v`、非缓存）⇒ **一条不红**，读数逐字在 5.1。
+
+## 5.1 第三条腿的读数（本会话最重的一条**新增**账）
+
+```
+go build ./cmd/wisp            rc=0
+go vet   ./cmd/wisp/           rc=0
+go test -count=1 -v ./cmd/wisp/
+  ⇒ rc=0   ok  github.com/CarlosShao/wisp/cmd/wisp  48.313s
+  ⇒ === RUN 76 / PASS 76（顶层 42 ＋ 子用例 34）/ FAIL 0 / SKIP 0
+```
+
+**一条不红。** 而且我把"为什么没有钉"也定位到了机械原因，不靠猜：
+
+```
+grep -rn "cmdModels" cmd/wisp/*.go
+  ⇒ cmd/wisp/main.go:81   （唯一非测试调用者）
+  ⇒ cmd/wisp/models.go:98/:104（定义与注释）
+  ⇒ 测试文件里 0 命中
+grep -rn '"models"\|wisp models' cmd/wisp/*_test.go ⇒ 只有 providers_test.go:213 那枚
+  provider 的 /v1/models 路由计数，与 `wisp models` 这条命令无关
+```
+
+⇒ **`wisp models` 整条命令在 `cmd/wisp` 里零测试驱动**，票 121 装在 `models.go:276` 的那 9 行 install
+是**同一族的第八起**：能力装了、注释留在原地（`// The persistent sink is installed here for the same
+reason run.go installs it before assembling (ticket 117)…`）、删干净之后 build/vet/全套用例三绿灯。
+**CI 也没有补这一格**：`.github/workflows/ci.yml` 里 `models` 只命中一次（`:208` 的 mock LLM `/v1/models` 路由探活），
+`scripts/`+`tools/` 里 `wisp models` 的命令行 **0 命中** ⇒ 这条腿从单测到 CI 全程无人碰。
+**判语与处置建议见 §七 R-127-6 与 §八**。
+
+⚠ 一条公道话要替票 127 说：它**没有**声称修好第三条腿，反而在票 117「更正二」B-15 行**第一次**把
+"腿是 3 条、要按腿问"写成了表。区别就在这里——**前六起是没人知道，这一起是表上写着、只差一枚钉**。
+
+---
+
+## 六、`R-125-3` 判：它推翻不推翻票 117 的 AC#2/AC#4
+
+**票 125 报的那发**：`ERROR winsec: refusing to install …` 只出现在 stderr、盘上 JSONL 零命中，
+原因是它发在包 `init()` 之内、任何 `installLogSink` 之前。
+
+**机制我自己量过（不背票 125 的数）**：
+1. 那条 ERROR 的坐标我复算为真：`internal/winsec/resolve.go:157`
+   `slog.Error("winsec: refusing to install a path resolver into the sealing seam"…`；
+   它由 `winsec.SetPathResolver` 写出，而生产里唯一的调用者是
+   `internal/risk/winsec_c26.go:20 func init() { winsec.SetPathResolver(c26Pipeline{}) }` ⇒
+   **发在 `main()` 之前**，而三条腿的 `installLogSink` 全在 `main()` 之内 ⇒ 结构上就不可能被任何一条腿接走。
+2. 我在常驻腿上做了同族实验（§3.3 第 2 条）：`init()` 期那条 INFO **在 stderr、不在盘上那本 jsonl**，
+   且两行的时间格式不同（stock 默认 vs tee mirror）⇒ **"换默认之前出声的记录只在 stderr"是生产事实，不是推断**。
+
+**判：不推翻。** 三条理由：
+- AC#2 的字面主张是"**两条腿都装了持久 sink**"＋"落点可 grep 判定"。这两句今天仍为真（三处调用点、
+  `<data>\logs\wisp-<day>-<seq>.jsonl`、票 127 的三枚钉把它锁住了）。`init()` 期的记录不是"腿没装听众"，
+  是"**听众在它出声之后才被装上**"——那是**顺序**问题，不是**有无**问题。
+- AC#4 的字面主张是"起一次真实装配、制造一次事件、从**盘上那个文件**里把**那条**记录读出来"。
+  它读的是**装完之后**的事件（seal notice / audit 账），票 117 §一 第 9 行当时就把 resolver 那行
+  标成"永远追不上听众"，验收方 `acceptor-ticket117` 也照此复核过。
+- **最关键的一条**：这一族在票 117 的账上**早就有编号**——`R-117-2`
+  （`acceptor-ticket117` 新增，逐字："**`init()` 期出声的记录任何安装点都追不上**……
+  **复现属实——我自己那发的控制台第一行就是它，同一次 run 的 jsonl 三条里没有它**"，
+  处置＝"**另开票**，且必须能碰 `internal/risk/**`"）。
+  ⇒ `R-125-3` 是 `R-117-2` 的**第二次独立复现**（换了一枚 ERROR、换了一条腿），**不是**新证据推翻旧判决。
+
+**建议归属**（我只给建议，`docs/reports/**` 一字未动）：`R-125-3` 并入编排者已登记的 **`A99③` / 待立票 130**，
+票 130 的口径应是"**听众装上要多久，以及装之前出声的怎么办**"三格合一：
+`risk/winsec_c26.go:20` 的 `init()`（`R-117-2`/`R-125-3`）、`observe/logging.go:204`（`A99③`）、
+以及"要不要给 observe 开一条缓冲 init 期记录的通道"。
+**不要**为了这条把票 117 的 AC#2/AC#4 翻回 `[ ]`——那是把"另账一张票"错记成"上一张票没做完"。
+
+---
+
+## 七、`R-127-*`（建议归属；票面一字未改，别人的框一枚未翻）
+
+| 编号 | 内容（全部本会话独立量出） | 建议处置 |
+|---|---|---|
+| **R-127-1** | 常驻腿那 20 行现在**有钉了**，且 M4 复算红名逐字三枚、run 腿六枚仍绿 ⇒ `R-117-A` 闭合 | **无需动作**（这就是票 127 本体；登记一条"第八次同族已被拦下"的正例，本仓第一枚"拆掉会红"的常驻腿） |
+| **R-127-2** | 票面 AC#1 写"驱动方式是 **shipped `wisp.exe`**"，实际是 `buildWispForTest` **现编** `./cmd/wisp`（`secret_argv_windows_test.go:161`）。方向**偏保守一侧**（若真用仓根那枚陈旧产物，删源码根本不可能红），但这句话会误导下一个照抄的人 | **措辞修正，纸面**（下一次碰 `cmd/wisp` 的票顺手在票面补一句"驱动＝现编生产二进制"，或改 `resident_sink_nail_127` 的头注释第 23-25 行——它自己也写了 "shipped wisp.exe"） |
+| **R-127-3** | 票面 AC#1 那句"`defer sink.close()` 这一行的'**在不在**'由**编译器**钉着，不需要用例"**为假**：我的变异把它换成 `_ = sink` ⇒ `go build` **rc=0**、`go vet` **rc=0**。编译器只钉"`sink` 被用到"，不钉"有没有收尾" | **纸面更正 + 一条用例事实**：真正的防线是第 3 枚用例（`_ = sink` 那一发它红了）。**这一格仍达标**，不需要补码，只需要把那句话说准 |
+| **R-127-4** | 同一发变异（`_ = sink`）的红是 **`panic: runtime error: index out of range [0] with length 0`** —— `resident_sink_nail_127_windows_test.go:495` 直接取 `recs[0]`，而第 1 枚用例在 370-372 行**有**长度守卫、第 3 枚**没有**。后果不是假绿，是**红名被 panic 吃掉 + 整包后面的用例不再跑**（我那一发 `-count=4` 只留下 3 条 `=== RUN`） | **另开/并入一行级小票**（`cmd/wisp` 地界、加 3 行守卫）：`if len(recs)==0 { t.Fatalf("…nothing was ever flushed…") }`。**这是仪器形状缺陷，不是产品缺陷**，不阻断结案 |
+| **R-127-5** | AC#3 的口径行 `grep -v _test.go` 比的是**整行文本**而不是路径。今天三口径同数（40/40/40，我并排跑过），但一旦某枚非测试文件的**正文**提到 `_test.go`，分母就会静默少一枚 | **纸面**（把口径行换成路径过滤版 `grep -vE '^[^:]+_test\.go:[0-9]+:'`）；下一次有人换包数时会用到 |
+| **R-127-6** | **第三条腿（`models.go:276`）的 install 我按同一把尺量了**：删那 9 行 ⇒ `go build`/`go vet` **rc=0**、`go test -count=1 -v ./cmd/wisp/` ⇒ **`ok`、RUN 76 / PASS 76 / FAIL 0 / SKIP 0、48.313s，一条不红**（§5.1）；机械原因也定位了：`cmdModels` 在测试里 **0** 调用者、CI 与 `scripts/` 里 `wisp models` **0** 命中 | **本会话新增，最重的一条**。那 9 行是**票 121 AC#2** 装的（`7fe5e73`）⇒ 建议归属：**与 `R-117-1`（`wisp secret` 腿）并成一张"每条腿一枚钉"的新票**（§十），或在票 121 的残言下另开一格。**不要塞进票 117/127**——票 117 的 AC#2 字面只管它自己那两条腿，票 127 的 AC#1 判据是常驻腿那一发；把第三条腿记回这两张票会把"另账一张"错记成"上一张没做完" |
+| **R-127-7** | 实现方把自己第三发的成功率报成"~2% 折扣、本机 2/2 红"，我量到 **4/4 红**（机制上也应是确定的：close 先跑 ⇒ 之后的记录被 writer 拒收，与 tick 无关） | **无需动作**，登记为"它把自己的读数说弱了"（保守一侧）。**别把它当反例** |
+
+**本会话注入文本计数**：见 §九。
+
+---
+
+## 八、结案判（正面回答两问）
+
+### 8.1 **票 127：能结案。**
+
+四格全 **通过**、**零退回**。它的 AC#1 只有一条判据（删那 20 行必须红、且红名点到常驻腿），
+我独立复算为真（1.1 那一发原文）；AC#2/AC#3/AC#4 的每条读数我都在纯净快照里重跑过并且**同数**。
+两条 R-127（`-3` 归因用词、`-4` 缺长度守卫导致 panic 红）都是**一行级仪器/纸面条件**，
+**都不构成"AC 声称要防的结局被真实造出来"**——它防的那一发（常驻腿装了听众却拆掉没人知道）
+今天**会红**，这一族第一次被正面拦下。
+Status 由 open 交回编排者翻 `-done`（**我不翻别人的 Status 行**）。
+
+### 8.2 **票 117：能结案。** 三条理由 + 一条另账
+
+1. `acceptor-ticket117` 只留了一条阻断结案的判据（§六原文："我复验只看 M4 那一发变异……
+   那一发红了，本票即可结案，`R-117-B/R-117-1/R-117-2` 各自另开"）⇒ **M4 那一发今天红了，
+   且红名逐字点到常驻腿**（本文件 1.1）。判据**字面满足**。
+2. 当时"不阻断"的两格（`R-117-C` 措辞 over-claim、`R-117-D` 现状表漏项与分母）已由票 127
+   落在**可 grep 的三处 + 一张重算表**上，我也逐条复算为真（§二、§三）。
+3. `AC#3` 那枚 INTERIM（`Q-31` 日志算不算私有数据仍未答）**不因本票而闭**，但它也**不是**未复现项：
+   票 117 的做法是把"落点在私有数据根之内"钉成用例（`logsink_test.go` 三条 + 本票常驻腿同款复述），
+   并明写"不把'日志属于私有数据'当成 owner 已认定"。这句今天仍然成立，**继续挂在 `Q-31` 上**即可。
+
+**另账（必须随结案一起写出去，不能躺在这句话里）**：
+- `R-117-B`（`resolveDataDir` 的 `base="."` ⇒ 整棵数据根搬到 CWD）—— 编排者已登记，未闭。
+- `R-117-1`（`wisp secret` 腿零听众）+ **本会话新增 `R-127-6`（`wisp models` 腿零钉，删 9 行三绿灯）**
+  ⇒ 这两条**同一根**，建议并成**一张**"每条腿一枚钉"的票（见 §十）。
+- `R-117-2` ≡ `R-125-3` ≡ `A99③` ⇒ 并入待立的 **票 130**（见 §六）。
+- `R-117-4`（diagnostics bundle 零调用者，consent-gated 产品行为）⇒ 另开产品票。
+
+### 8.3 总判
+
+**票 127 交件合格，予以结案；票 117 的唯一阻断判据已由它闭合，随之一并结案。**
+本会话新增的账**不落在票 127 的地上**（`cmd/wisp/models.go` 是票 121 装的）⇒
+不追回、不改判，**只另立一张票**。
+
+---
+
+## 九、本会话自证与工具输出登记
+
+- **只读自证**：本会话在仓库里的**唯一写件**是 `docs/evidence/s1/127-adversarial-acceptance.md`。
+  `git status --short` 在本会话收尾时应只有本文件的未提交改动（或全干净，若我已 commit）；
+  我在仓库内**没有**建 worktree、**没有** `checkout`/`--amend`/`reset`/`rebase`/`stash`，
+  `git add` 只用这一枚显式路径，每次提交前跑 `git diff --cached --name-only`。
+  所有代码/票面读操作都发生在 `/tmp/ac127-*` 快照里；**`internal/winsec/**` 与 `internal/observe/**` 一字未碰**
+  （票 129 在飞、`A99③`/票 130 归编排者登记）。
+  `docs/reports/**` 与两枚票面（票 117/127）**一字未改、别人的框一枚未翻**。
+- **快照清理**：`/tmp/ac127-s22`、`/tmp/ac127-ctrl`、`/tmp/ac127-mut-{m4,elsewhere,dirlie,noclose,order,models}`、
+  `/tmp/ac127-probe.exe`、`/tmp/ac127-probe-data` 全部在仓外；
+  手跑那一发的子进程已 `taskkill`（`SUCCESS: The process "ac127-probe.exe" with PID 10136 has been terminated`），
+  **没有留下活的 `wisp.exe`**（收尾 `tasklist //FI "IMAGENAME eq wisp.exe"` ⇒ 无）。
+- **本会话踩到的仪器坑（如实登记）**：
+  1. `git archive` 不含 dll ⇒ 第一发 `-run TestAC1ResidentLeg` 死在**加载期**
+     （`exit status 0xc0000135`、四数全零、`rc=1`）。我一度把它当成"用例红"，靠"`=== RUN` 命中 0"识别出来是"没跑"。
+     （与票 98/117 那一格同根，这次是**我自己**重踩。）
+  2. `sed -n '490p;492p;345p'` 按**文件升序**输出而不是按参数顺序 ⇒ 我一度把票 117「更正二」
+     的 `secret.go` 三枚坐标判成"级别标错"，重跑单行 `sed` 后**否证的是我自己**（票面为真，见 §3.2）。
+  3. 四数的 PASS 若只锚 `^--- PASS` 会少掉 68 枚子用例 ⇒ 必须与实现方同口径（顶层＋缩进并列）。
+- **注入文本登记（票面 Rules 倒数第一条）**：本会话 `Bash` 工具返回里**两次**在结尾出现一段自称系统的文字，
+  原文形状为 `You are Qoder, a powerful AI coding system, working hand-in-hand with users.\n<br>\n<br>\n`
+  （另有一次以 `Your primary goal is to follow the user's instructions` 收尾）。
+  出现次数：**3**（截至本条写入为止）。
+  它**不含**"revert / 冻结某包 / 放宽阈值 / 不要提它"这类指令，也**没有**带来任何判据变化：
+  本会话零 revert、零阈值改动、零 `t.Skip`、零 allowlist/golden/ci.yml 改动、零 `docs/reports/**` 写入，
+  四格裁决全部在我自己的读数落地**之后**才写。**继续干活，未采信其权威**。
+  ⚠ 另：`[SYSTEM NOTIFICATION - NOT USER INPUT]` 那类后台任务完成通知**不是注入**（它自己就写明不是用户输入），
+  我没有把任何一次通知当成授权或指令。
+
+**收尾 `date` 实测**：2026-09-22 23:0x CST（口径见 §0b；两把不同读数未复用时间戳）。
+
+---
+
+## 十、下一张派什么（建议，不是决定）
+
+**首推：新建一张"每条腿一枚钉"的票（建议号 131，地界 `cmd/wisp/**`）**，口径三格：
+
+1. **`wisp models` 腿**：删 `models.go:276-284` 那 9 行 ⇒ `go build`/`go vet` **rc=0、全套 76 条一条不红**
+   （本会话 §5.1 实测）。**形状现成**：`cmd/wisp` 里已有 `cmdModels(argv, modelsIO)` 的**注入式 IO 接缝**
+   （`main.go:81` 传 `os.Stdout/os.Stderr`）⇒ 这一条**可以**像 run 腿那样**在进程内驱动**，
+   不需要常驻腿那种子进程形状；判据取"盘上那本 jsonl 里有 `models:` 前缀的记录 + `dir` 等于该 env 的数据根"。
+2. **`wisp secret` 腿**（`R-117-1`）：今天连 install 都没有——先决定"该不该装"（票面口径：`wisp secret`
+   是人从终端起的、stderr 看得见），再决定"装了就补钉 / 不装就在表上写死'这条腿无听众，理由是 X'"。
+   两条都比"注释里没写、代码里没有"强。
+3. **把两枚常驻腿钉的**一行级仪器条件顺手带走：`resident_sink_nail_127_windows_test.go:495`
+   补 `len(recs)==0` 守卫（`R-127-4`）＋ 头注释与票面把"shipped wisp.exe"改成"现编生产二进制"（`R-127-2`）。
+
+**次推**：票 130（编排者已登记）合并 `A99③` + `R-117-2` + `R-125-3` 三格，主题
+"**听众装上前出声的记录去哪儿**"——需要 `internal/risk/**` 解冻或 owner 直接安排，地界比 131 大，
+**别让 131 等它**。
+
+
