@@ -103,11 +103,60 @@ func TestLayoutForTestEnv(t *testing.T) {
 		if err != nil {
 			t.Fatalf("LayoutFor(test): %v", err)
 		}
-		want := filepath.Join(os.TempDir(), fmt.Sprintf("wisp-test-%d", os.Getpid()))
-		if l.DataDir != want {
-			t.Errorf("test DataDir = %q, want %q", l.DataDir, want)
+		// Ticket 118 AC#9. This leg used to compare DataDir with
+		// filepath.Join(os.TempDir(), "wisp-test-<pid>"), i.e. with whatever
+		// spelling TMPDIR happens to carry. Ticket 119 made TestDataDir resolve that
+		// root, so on the shape 119 exists for - TMPDIR behind a symlink, which is
+		// macOS's /var and any Linux host that links its temp tree - the two sides
+		// stopped being the same string and a correct implementation read as a
+		// failure. The contract is not a spelling, so it is stated as the contract:
+		// the per-pid leaf the caller is promised, on a root that reaches the temp
+		// tree by identity and has no link left anywhere in it. The last part is
+		// what the placement floor (internal/winsec/winsec_other.go, ticket 113)
+		// refuses a spelling with a link in it *for*, and it is read from the
+		// filesystem here rather than from SealableRoot: an expectation computed by
+		// the function under test cannot fail.
+		leaf := fmt.Sprintf("wisp-test-%d", os.Getpid())
+		if got := filepath.Base(l.DataDir); got != leaf {
+			t.Errorf("test DataDir = %q, want the per-pid leaf %q under the temp tree", l.DataDir, leaf)
 		}
+		parent := filepath.Dir(l.DataDir)
+		real, err := filepath.EvalSymlinks(os.TempDir())
+		if err != nil {
+			t.Fatalf("EvalSymlinks(%q): %v", os.TempDir(), err)
+		}
+		gotInfo, gotErr := os.Stat(parent)
+		wantInfo, wantErr := os.Stat(real)
+		if gotErr != nil || wantErr != nil {
+			t.Fatalf("stat the root (%v) against the temp tree %q (%v)", gotErr, real, wantErr)
+		}
+		if !os.SameFile(gotInfo, wantInfo) {
+			t.Errorf("the test data root %q is not the tree this machine's temp dir reaches (%q): TestDataDir must resolve os.TempDir(), not substitute a directory of its own", parent, real)
+		}
+		if link := firstLinkInPath(parent); link != "" {
+			t.Errorf("the test data root %q still reaches itself through the link at %q, so the seal that follows refuses it (ticket 113's placement floor); the layer that asks the OS must resolve what the OS answered (ticket 119)", parent, link)
+		}
+		t.Logf("test DataDir = %q (TMPDIR = %q, which reaches %q)", l.DataDir, os.TempDir(), real)
 	})
+}
+
+// firstLinkInPath answers, from the filesystem and not from a string, which prefix
+// of path reaches itself through a symlink ("" when none does). It walks the way
+// SealableRoot walks - ask the OS about this spelling, then about its parent, until
+// the parents stop differing - so the claim it supports is "no link is left in this
+// root", which is the property internal/winsec's placement floor checks before it
+// will chmod anything.
+func firstLinkInPath(path string) string {
+	for cur := path; ; {
+		if info, err := os.Lstat(cur); err == nil && info.Mode()&os.ModeSymlink != 0 {
+			return cur
+		}
+		parent := filepath.Dir(cur)
+		if parent == cur {
+			return ""
+		}
+		cur = parent
+	}
 }
 
 // TestLayoutForkMatrix is the SPEC-03 §6 environment-fork acceptance: the
