@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"testing"
 )
@@ -219,18 +220,14 @@ func TestNoticeFromOneVolumeIsNotAttributedToASecondRealVolume(t *testing.T) {
 }
 
 // crossVolumeWitness126 is the candidate ticket 118's acceptance recorded as
-// never built (R-118-9): a resolver whose second witness at the seam guard names
-// a tree on ANOTHER volume whose tail is byte-identical to the tree it named for
-// the probe parent. Whether such a candidate gets installed is decided by the
-// two comparisons this ticket changed, so this is the leg that turned "wrong
-// bookkeeping" into "wrong gatekeeping" - and, after the fix, the nail that
-// keeps it closed.
+// never built (R-118-9): a resolver whose answers at the seam guard name a tree
+// on ANOTHER volume whose tail is byte-identical to a tree it named elsewhere.
+// It answers only the spellings the guard actually asks about, and records what
+// it was asked, so "the guard never reached the leg this case is about" is a
+// Fatal rather than a quiet green.
 type crossVolumeWitness126 struct {
-	parent, child  string
-	parentAns      string
-	childAns       string
-	anchorAns      string
-	guardSawAnchor bool
+	answers map[string]string
+	asked   map[string]bool
 }
 
 func (f *crossVolumeWitness126) Resolve(input string) (string, error) {
@@ -239,65 +236,114 @@ func (f *crossVolumeWitness126) Resolve(input string) (string, error) {
 }
 
 func (f *crossVolumeWitness126) ResolveAccounted(input string) (string, bool, error) {
-	switch {
-	case input == f.parent:
-		return f.parentAns, false, nil
-	case input == f.child:
-		return f.childAns, false, nil
-	case input == filepath.Dir(f.childAns):
-		f.guardSawAnchor = true
-		return f.anchorAns, false, nil
-	default:
+	if f.asked == nil {
+		f.asked = map[string]bool{}
+	}
+	f.asked[input] = true
+	answer, ok := f.answers[input]
+	if !ok {
 		return "", false, fmt.Errorf("%w: instrument was not expecting %q", ErrUnresolvedPath, input)
 	}
+	return answer, false, nil
 }
 
 // TestSeamGuardRefusesACandidateWhoseSecondWitnessNamesAnotherVolume is AC#2's
 // leg, now nailed. It needs no second volume: the candidate lies about paths and
 // the guard compares only what it is handed, which is exactly why this leg runs
 // on a single-volume runner.
+//
+// Each refusal leg is paired with a control that differs from it ONLY in the
+// volume segment, so the verdict cannot come from the component rule, the
+// equal-answers leg or a refusal. Which of the guard's three comparisons carries
+// each leg is attributed by the mutation matrix on the ticket, not by reading
+// prose off a log line.
 func TestSeamGuardRefusesACandidateWhoseSecondWitnessNamesAnotherVolume(t *testing.T) {
 	sep := string(filepath.Separator)
 	parent := os.TempDir()
 	child := parent + sep + "wisp-126-tree-ownership-probe"
-	newFake := func(anchorAns string) *crossVolumeWitness126 {
-		return &crossVolumeWitness126{
-			parent:    parent,
-			child:     child,
-			parentAns: `D:\wisp126-seam\probe-tree`,
-			childAns:  `D:\wisp126-seam\moved-seal\leaf`,
-			anchorAns: anchorAns,
+	const (
+		parentOnD = `D:\wisp126-seam\probe-tree`
+		movedOnD  = `D:\wisp126-seam\moved-seal\leaf`
+		movedDir  = `D:\wisp126-seam\moved-seal`
+	)
+	// The instrument's own shapes must not collapse: if the child's answer were
+	// inside the tree named for the probe parent, the guard would stop at its
+	// first containment leg and the two witness legs below would never be asked.
+	if answerInsideTree(movedOnD, parentOnD) {
+		t.Fatal("the instrument planted nothing: the child's answer is inside the probe parent's tree")
+	}
+	const childOnOtherVolumeDir = `C:\wisp126-seam\probe-tree`
+	legs := []struct {
+		name        string
+		answers     map[string]string
+		wantRefused bool
+		// anchor is the spelling whose being asked about proves the guard reached
+		// the second witness at resolve.go:325 rather than stopping earlier.
+		anchor        string
+		wantAnchorAsk bool
+	}{
+		{
+			name:        "second witness names the same tree on another volume",
+			answers:     map[string]string{parent: parentOnD, child: movedOnD, movedDir: `C:\wisp126-seam\probe-tree`},
+			wantRefused: true, anchor: movedDir, wantAnchorAsk: true,
+		},
+		{
+			name:        "second witness names a deeper tree on another volume",
+			answers:     map[string]string{parent: parentOnD, child: movedOnD, movedDir: `C:\wisp126-seam\probe-tree\deeper`},
+			wantRefused: true, anchor: movedDir, wantAnchorAsk: true,
+		},
+		{
+			name: "the child's own answer names a deeper tree on another volume",
+			answers: map[string]string{
+				parent:                parentOnD,
+				child:                 childOnOtherVolumeDir + `\leaf`,
+				childOnOtherVolumeDir: `C:\wisp126-seam\unrelated-tree`,
+			},
+			wantRefused: true, anchor: childOnOtherVolumeDir, wantAnchorAsk: true,
+		},
+		{
+			name:        "control: the second witness names that very tree, same volume",
+			answers:     map[string]string{parent: parentOnD, child: movedOnD, movedDir: parentOnD},
+			wantRefused: false, anchor: movedDir, wantAnchorAsk: true,
+		},
+		{
+			name:        "control: the second witness names a containing tree, same volume",
+			answers:     map[string]string{parent: parentOnD, child: movedOnD, movedDir: parentOnD + `\deeper`},
+			wantRefused: false, anchor: movedDir, wantAnchorAsk: true,
+		},
+		{
+			name:        "control: the child's answer is inside the probe parent's tree",
+			answers:     map[string]string{parent: parentOnD, child: parentOnD + `\leaf`},
+			wantRefused: false, anchor: movedDir, wantAnchorAsk: false,
+		},
+	}
+	for _, leg := range legs {
+		fake := &crossVolumeWitness126{answers: leg.answers}
+		reason := treeOwnershipFailureForPair(fake, parent, child)
+		refused := reason != ""
+		asked := make([]string, 0, len(fake.asked))
+		for input := range fake.asked {
+			asked = append(asked, input)
 		}
-	}
-	// The child's answer must genuinely not be inside the tree named for the
-	// probe parent, or the guard stops at its first containment leg and never
-	// reaches the witness this case is about.
-	if answerInsideTree(`D:\wisp126-seam\moved-seal\leaf`, `D:\wisp126-seam\probe-tree`) {
-		t.Fatal("the instrument's own shapes collapsed: the first containment leg would answer this case")
-	}
-	fake := newFake(`C:\wisp126-seam\probe-tree`)
-	reason := treeOwnershipFailureForPair(fake, parent, child)
-	t.Logf("AC#2 candidate: parent->%q child->%q anchor(Dir of the child answer=%q)->%q",
-		fake.parentAns, fake.childAns, filepath.Dir(fake.childAns), fake.anchorAns)
-	t.Logf("AC#2 verdict: refusal=%q", reason)
-	if !fake.guardSawAnchor {
-		t.Fatalf("AC#2 instrument measured nothing: the guard never asked about the second witness for %q",
-			filepath.Dir(fake.childAns))
-	}
-	if reason == "" {
-		t.Errorf("AC#2/AC#3 RED: the seam guard admitted a candidate whose second witness names %q while the tree it named for the probe parent is %q - same tail, another volume. Installing that resolver lets every seal land on a tree no caller named.",
-			fake.anchorAns, fake.parentAns)
-	}
-
-	// Controls the fix may not tighten: the same candidate vouching with the same
-	// volume, and one vouching with a tree that contains it. A guard that
-	// refuses honest resolvers takes the whole sealing pipeline down to the
-	// built-in floor, which is the failure run 35595651898 measured.
-	if reason := treeOwnershipFailureForPair(newFake(`D:\wisp126-seam\probe-tree`), parent, child); reason != "" {
-		t.Errorf("CONTROL RED: a same-volume second witness is now refused: %s", reason)
-	}
-	if reason := treeOwnershipFailureForPair(newFake(`D:\wisp126-seam\probe-tree\deeper`), parent, child); reason != "" {
-		t.Errorf("CONTROL RED: a second witness naming a tree that contains the probe parent's answer is now refused: %s", reason)
+		sort.Strings(asked)
+		t.Logf("AC#2 leg %q: answers=%v asked=%v refusal=%q", leg.name, leg.answers, asked, reason)
+		if !fake.asked[parent] || !fake.asked[child] {
+			t.Errorf("AC#2 instrument measured nothing on leg %q: the guard never asked about both probe shapes (asked %v)", leg.name, asked)
+			continue
+		}
+		if fake.asked[leg.anchor] != leg.wantAnchorAsk {
+			t.Errorf("AC#2 instrument measured the wrong leg %q: second witness %q asked=%v, wanted %v",
+				leg.name, leg.anchor, fake.asked[leg.anchor], leg.wantAnchorAsk)
+		}
+		if refused != leg.wantRefused {
+			if leg.wantRefused {
+				t.Errorf("AC#2/AC#3 RED on leg %q: the seam guard admitted a candidate that moves a seal across volumes (answers %v); it owed a refusal and said %q",
+					leg.name, leg.answers, reason)
+			} else {
+				t.Errorf("CONTROL RED on leg %q: the seam guard now refuses a candidate whose answers name one tree on one volume: %s. A guard that over-refuses takes the whole sealing pipeline down to the built-in floor, which is the failure run 35595651898 measured.",
+					leg.name, reason)
+			}
+		}
 	}
 }
 
