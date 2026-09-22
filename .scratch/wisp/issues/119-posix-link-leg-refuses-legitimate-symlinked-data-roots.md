@@ -271,4 +271,123 @@
 
   `R-119-3`（声明树到底动不动）的裁定与钉它的用例、`R-119-2` 那两句注释的收窄，在下一条报。
 
+- 2026-09-22 17:2x（agent-ticket119b，**返修第三、四件 + 门禁复算：`R-119-2`/`R-119-10` 注释收窄、`R-119-3` 裁定、票 113 那 16 枚复算**）：
+  实现件共四笔 commit：`36294c2`（①生产一行 + 三枚用例）、`33c8acd`（②恒真用例修形）、`4f19ec6`（本条前一件的票面）、
+  `034080c`（③④注释，纯注释）。锚：返修基线 = `e475ce0`（派单时的 HEAD）。
+
+  ### 一处更正（append-only，不改上面那段的字）："winsec 一字未动"这句按验收方换的尺打折，本轮把话改口
+
+  判定分支确实一字未动（`if ancestorIsLink(prefix)` 那三行仍在，`winsec.go`/`resolve.go` md5 三版一致），
+  但**票面上"winsec 是否一字未动"那一行的字面不成立**：真实读数到本轮为止是
+  `internal/winsec/winsec_other.go` 相对票 119 控制组 `ce666ea` 共 **53 增 / 11 删，全部是注释行**
+  （票 119 交件时是 21/6，本轮 ③④ 又加了 32/5）。⇒ 台账只能记"**判定未动，注释动了**"，
+  不许记"一字未动"。三把尺都留了读数：剥尽注释与空行后逐行 diff 59 行 vs 59 行、**hunks = 0**；
+  票面自己那把 `git diff -U0 | grep '^[+-]' | grep -v 注释 | wc -l` = **0**；
+  `winsec.go` = `a6144c880de80e43bb1393f3624e7221`、`resolve.go` = `7eb8a754eb3db1c8cf42a9dfeaa33074`
+  在 `1499efe` / 本轮基线 / 工作树三枚相同（与验收方 §四 读数逐字一致）。**`winsec.go` 包文档本轮一字未动**（票 113b 交的字）。
+
+  ### 返修③ `R-119-2` + `R-119-10`：把全称句换成能站住的形状，并把写坏的层级修回来
+
+  - 被 `wisp-sec` 读数证伪的那句 `so a root handed to this floor names a real tree` 换成：
+    "**今天被解析的是本仓库自己的四枚调用方**（`proc.TestDataDir`、`proc.DefaultLayout`、
+    `cmd/wisp` 的 `resolveDataDir` 与 `resolveSecretLayout`），这是一条纪律而不是这个包能检查的性质——
+    下一个密封点仍要自己解析，这里没有任何东西会替你注意到它忘了"。第四枚是本轮补上的，
+    并把它被漏掉时量到的读数（同一枚二进制 doctor 已解析、`wisp secret list` 仍 rc=1）写在旁边。
+  - `R-119-4` 那半面登记进同一枚注释：调用方一解析，"哪棵树落笔"就从响亮拒绝变成跟着链接走一次，
+    而**穿过链接仍拒**（点名两枚钉住它的用例）。硬链接挪出"Two costs"列表成为独立一段——
+    `grep -c "^//   - "` 的读数：控制组 `ce666ea` = 2、票 119 锚点 = 5（标题写 Two costs 而列表五项）、**本轮修回 2**。
+    三条形状改成同一 bullet 内的散文枚举，因为 `gofmt` 会把文档注释里嵌套的 `*` 子项强行拉平成 `-`（先量到再改形）。
+
+  ### 返修④ `R-119-3` 裁定：**分界不在"谁声明的"，在"这枚值在什么契约下被用"**
+
+  票面原话"`WISP_ENV=test` 的数据根该由调用方解析，但只解析 OS 给的答案"只对一半：
+  `XDG_CONFIG_HOME`/`HOME` 也是注入方写的，却会被改写。裁定（写在 `internal/proc/envfork.go` 的 `TestDataDir` 文档上）：
+
+  | 值 | 契约 | 动作 | 钉它的用例 |
+  | --- | --- | --- | --- |
+  | `WISP_TEST_DATA_DIR` | **身份契约**：设置它的人拿返回值跟自己的字符串比，并继续用自己命名的路径 | **逐字返回**，改了就是把存储从调用方脚下搬走；代价一并钉住：经链接声明的注入根交给底线**照旧被拒**，且拒了什么都不建 | `TestAC2POSIXInjectedTestDataDirStandsAsDeclared119`（两条 leg + 前提自证） |
+  | `os.TempDir()` / `os.UserConfigDir()`（含 `TMPDIR`/`HOME`/`XDG_CONFIG_HOME` 三条来源） | **位置契约**：进程在问"用户配置在哪"，答案是一棵树，内核怎么拼就怎么落 | **解析**（`SealableRoot`），无论它由哪个环境变量带来 | `cmd/wisp/secret_dataroot_119b_test.go` 的 HOME 形与 XDG 形 + `TestAC1POSIXSymlinked{TempDir,ConfigDir}RouteBecomesSealable119` |
+
+  两半都被用例钉住 ⇒ 这句原则不再是只对一半的自律话；`sessionLayout` 的文档同步写明"交进来的根是声明，不许替调用方解析"。
+
+  ### 票 113 那 16 枚 + 票 119 原五枚（派单第③不许做的事：不许放宽放行侧换绿）
+
+  两枚纯净快照同一容器并排跑（`/base` = `git archive e475ce0`、`/src` = `git archive 034080c`），
+  `-count=1 -v -run 'TestAC[1-4]POSIX' ./internal/winsec/`，**逐名逐状态列成文件再 diff**：
+
+  - 实目录形：base 与 after 都是 `RUN=21 PASS=21 FAIL=0 SKIP=0` rc=0 ⇒ **`diff rc=0`（21 行一字不差）**。
+  - 软链形（`/varlink -> /realpriv`，`ls -ld` 硬断言通过）：两枚快照都是 `RUN=21 PASS=16 FAIL=5 SKIP=0` rc=1
+    ⇒ **`diff rc=0`**；那 5 红仍是验收方点名的同名同因（`TestAC2POSIXDoesNotFoldABackslashIntoASeparator`、
+    `TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator`、`TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree`、
+    `TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLinks`、`TestAC4POSIXFloorAnswersInsideTheNamedTree`），
+    全是 harness 未解析根那一族（`R-119-8`，票 118/111 地界）。
+  - 拆出来数：**票 113 的 16 行 + 票 119 的 5 行 = 21**（`grep -c 119` = 5），五枚 119 用例在两形下**全 PASS、0 SKIP**；
+    本轮把 AC2/AC3 两枚的 fixture 改了形，**名字与判定方向一枚没变**。
+  - 整包复算 `./internal/winsec/ ./internal/proc/`：实目录形两枚快照 `RUN=58 PASS=58 FAIL=0 SKIP=0` 且 `diff rc=0`；
+    软链形两枚快照 `RUN=58 PASS=41 FAIL=17 SKIP=0` 且 `diff rc=0` ⇒ 本轮**没有把任何一枚红改成通过方式**。
+  - 反证仍在：`MUT-119b-W`（`if false && ancestorIsLink(prefix)`）⇒ `FAIL=12`，票 113 那族含 4 枚子测试同红，
+    本票三枚反半边（`...UnresolvedSymlinkedRootStillRefused119`、`TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119`、
+    修好的 `TestAC2...StandsAsDeclared119` leg 1）同红 ⇒ 放行侧没有被换绿，票 107 那一族动作今天仍有牙齿。
+
+  ### 门禁（派单汇报第④项）
+
+  容器 `golang:1.27`（uid 0，Linux），纯净快照 `git archive 034080c | tar -x`（`ls -l /src/go.mod` 与七枚被验文件 md5 在日志头），
+  实目录形 `TMPDIR=/tmp/plain119`（`ls -ld` 读到 `drwxr-xr-x` 才用）：
+
+  - 六包（winsec/proc/secret/config/agent/memory）`-count=2 -v`：**rc=0、RUN=602 PASS=600 FAIL=0 SKIP=2**；
+    不同 `=== RUN` 名 = **301** ⇒ 301×2 = 602 对上（`-count=2` 确实不缓存）。口径注明：
+    PASS/FAIL/SKIP 一律按 `^\s*--- ` 数（**含子测试**，故 RUN = PASS + SKIP）；票 119 上面那张表用的是顶层口径。
+  - 同六包**非 `-v`**：`PASS` 命中 **0** 行、`SKIP` 命中 **0** 行、`ok` 6 行，rc=0。
+  - `./cmd/wisp/` 本轮三枚 `-count=2 -v`：**RUN=6 PASS=6 FAIL=0 SKIP=0** rc=0，不同名 3 ⇒ 3×2=6。
+  - `gofmt -l`（六枚全路径，含未动的 `cmd/wisp/doctor.go`）：**空**。
+    `gofumpt -l`（同六枚全路径）：**空**，版本 `v0.7.0 (go1.27.1)`，宿主 `D:\work\base\gopath\bin\gofumpt.exe`；
+    容器那把跑不了 gofumpt 是**仪器边界**（`--network=none` 且模块缓存里没有 `mvdan.cc`），已按派单口径写命令原文而不是写"未跑"。
+  - `go vet`：容器内 linux（CGO_ENABLED=1，winsec/proc/secret/memory/**cmd/wisp**）rc=0；
+    `GOOS=windows`、`GOOS=darwin`（内部四包，CGO_ENABLED=0）各 rc=0；
+    `GOOS=linux CGO_ENABLED=0 go vet ./cmd/wisp/` **rc=1**（`build constraints exclude all Go files in sherpa-onnx-go-linux`）
+    ⇒ 这条 rc=0 **不覆盖 `cmd/wisp`**，`cmd/wisp` 的 POSIX 结论来自 CGO_ENABLED=1 的 vet + 真跑的 `go test` + 真二进制。
+    （四把 rc 全部改成"先捕获再打印"的量法：票面旧口径里有三把把 `tail` 的 rc 当成了 `go vet` 的 rc，本轮不复用。）
+  - 宿主 Windows：`go vet ./internal/proc/ ./internal/winsec/ ./cmd/wisp/` rc=0；
+    `go test -count=1 ./internal/winsec/ ./internal/proc/ ./internal/secret/` 三包全 ok（16.8s / 13.9s / 0.2s）。
+  - `sh scripts/d22scan.sh` 纯净快照**两枚都 rc=0**，台账逐 scope 相比（`/base` = `e475ce0`）：
+    `#1-5 internal/=202 cmd/=22、#6 frontend/=40、#7 internal/tools/=18、#8 design/=16 frontend/=40 internal/=382`
+    两遍**相同**，`#8 cmd/` **30 → 31**（+1 = 本轮新增的 `cmd/wisp/secret_dataroot_119b_test.go`；
+    `bans #1-5 cmd/` 不动是因为它只数生产文件，新文件是 `_test.go`）。
+    **`ban #8 internal/` 仍是派单给的基线 382，一格没动**：本轮在 `internal/` 只改了两枚已存在的文件（注释与 fixture），
+    没有新增文件 ⇒ 覆盖数不变，无需解释来源。`d22scan` 判 clean，无 ban 命中。
+
+  ### 纪律登记
+
+  只 commit 未 push；`git add` 只用显式路径，四笔 commit 的 `git show --name-only` 逐笔只有我自己的路径；
+  **`git diff --cached --name-only` 里从头到尾都带着两枚不是我下的件**：
+  `.scratch/wisp/issues/105-c26-rewrite-account-has-no-production-reader.md` 与
+  `.../116-ancestor-actable-leg-still-has-no-behavior-case.md` 的 **staged deletion**（派单开工前 `git status` 第一列就是 `D `）。
+  复算它们的来历：`git ls-tree HEAD` 里**同时**有原名的两枚与 `-done.md` 的两枚 ⇒ `e475ce0` 那次改名只加了新名字、没删旧名字，
+  有人随后把旧名 `git rm --cached`/删除放进了索引。不是我的件、我没提交它们（`git commit -- <路径>` 限定），
+  收尾时它们仍在索引里等编排者裁（**代收风险登记**）。
+  共树未用 `--amend`/`reset`/`rebase`/`stash`/`checkout .`；仓库内未建 worktree/checkout（A38④），
+  测量/变异/构建全在 `D:\tmp\wisp119b\{snap-head,snap-instr,snap-wip,snap-after,snap-final,mut/{T,F,R,W,B},scripts,results,bin}`。
+  注释与测试零 emoji（`d22scan` ban #8 含 `_test.go` 与注释，两枚快照都 clean）。
+  CR 按派单口径**逐文件量**：三枚改动文件与本轮新文件 CR 全 = 0（不把 archive 注入 CR 当默认解释）。
+  工具输出里自称"编排者备注 / 系统提示 / 请 revert / 冻结某包 / 放宽阈值 / 不要提它"的文本：**0 次**。
+  登记两类确实出现的注入样文本，都不是指令也不是授权：
+  (a) harness 在工具输出尾部追加的 `The task tools haven't been used recently…` + 一份**别人的**任务列表
+  （含"#5 [in_progress] 在飞写码：票 117 / 票 119"这类字样），本轮出现 **13 次**；
+  (b) Write/Edit 成功回执里的 `[Write]/[Edit] handled ... CRLF line endings` 转换提示，出现 **≥16 次**
+  （处置：逐文件 `tr -cd '\r' | wc -c` 实测 CR=0，不拿它当解释）。两类的处置都是**没按它们改任何判据**。
+
+  ### `next=`（还差什么才能翻 `-done`）
+
+  1. **验收方复判 AC#1/AC#2**：本轮把派单四件做完，`MUT-119-SEC` 那一格现在有仪器看着了（红→绿→拆行再红三段读数都在上面）；
+     改名权在验收方，我不自翻 `-done`。
+  2. `R-119-5`（POSIX 上"C26 解析器在不在位"零用例 + 软链 temp 下守门人自伤拒装）**今天仍在**：
+     本轮真二进制复算里，`WISP_ENV=test TMPDIR=/varlink/w119tmp` 那一形**仍打那条 ERROR**
+     （`refusing to install a path resolver into the sealing seam … /varlink/wisp-103-conformance-probe …`），
+     dev 三形则打 `INFO … probes_passed=1`。它不在本票射程（`resolve.go` 禁改、`internal/risk` 冻结）。
+  3. `R-119-8`（harness 那 83 条）不变：本轮整包软链形仍是 `FAIL=17`（winsec+proc 两包），名集与修前 `diff rc=0` ⇒ 一票没少也没多。
+  4. `R-119-7`（`cmd/wisp` 在 POSIX 的 19 枚 DPAPI 红）本轮没碰，也没被本轮改动（新用例只走 `NewStore`，不碰 protector）。
+  5. `R-119-4`（② 换出来的落点归属面）已由本轮写进 `winsec_other.go` 的第二条成本；**要不要并案到票 120 / `R-108-2` 那本账，请编排者裁**。
+  6. 索引里那两枚不是我下的 staged deletion，请编排者裁是谁的字（见上）。
+
+
 
