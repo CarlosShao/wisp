@@ -34,10 +34,13 @@
 //     the directory the seal created, which is what winsec verifies; they are not
 //     a claim that another account was locked out, and nothing here should be
 //     read as one;
-//   - every expected value is written against the *real* tree or against the
-//     link's own name, never against a spelling produced by resolving a path
-//     inside the test, so the cases say the same thing on a macOS host, where
-//     the ambient temp dir is itself reached through /var.
+//   - an expected value is written against the *real* tree (asked of the
+//     filesystem with filepath.EvalSymlinks, see cleanSpelling119) or against the
+//     link's own name - never against a spelling produced by the function the
+//     case is testing. Ticket 119's acceptance measured what that costs: the two
+//     fixtures that asked proc.SealableRoot for their expectations stayed green
+//     while production was mutated into resolving the declared roots it is
+//     supposed to leave alone, because SealableRoot is idempotent.
 package winsec_test
 
 import (
@@ -100,6 +103,19 @@ func assertSealedDir119(t *testing.T, viaLink, real string) {
 	if got := info.Mode().Perm(); got != 0o700 {
 		t.Errorf("AC#1: %s landed %o, not 0700 - the seal did not run on the resolved tree", real, got)
 	}
+}
+
+// cleanSpelling119 asks the filesystem how the kernel spells a path that already
+// exists. It is deliberately filepath.EvalSymlinks and not proc.SealableRoot:
+// the latter is what several of these cases exist to test, and an expectation
+// computed by the function under test cannot fail.
+func cleanSpelling119(t *testing.T, path string) string {
+	t.Helper()
+	clean, err := filepath.EvalSymlinks(path)
+	if err != nil {
+		t.Fatalf("EvalSymlinks(%s): %v", path, err)
+	}
+	return clean
 }
 
 // TestAC1POSIXSymlinkedTempDirRouteBecomesSealable119 is the WISP_ENV=test route
@@ -204,8 +220,10 @@ func TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119(t *testing.T) {
 	base := t.TempDir()
 	// Declared the way option 2 says a caller declares it: the OS-side links in
 	// the ambient temp dir are resolved away, so the case measures the link
-	// inside the data root and not wherever the test binary happens to live.
-	root := filepath.Join(proc.SealableRoot(base), "data")
+	// inside the data root and not wherever the test binary happens to live. The
+	// clean spelling is asked of the filesystem, not of proc.SealableRoot (see
+	// cleanSpelling119).
+	root := filepath.Join(cleanSpelling119(t, base), "data")
 	if err := winsec.PrivateDirAll(root, 0o700); err != nil {
 		t.Fatalf("AC#3: PrivateDirAll refused its own tree: %v", err)
 	}
@@ -245,25 +263,63 @@ func TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119(t *testing.T) {
 }
 
 // TestAC2POSIXInjectedTestDataDirStandsAsDeclared119 pins the line option 2 draws
-// between an OS answer and a caller declaration: WISP_TEST_DATA_DIR is returned
-// verbatim, so the harness that sets it owns the spelling it declared and winsec
-// answers it the way it answers any other caller - resolved spellings seal,
-// links get refused. Rewriting an injected root here would move the store out
-// from under the harness that named it.
+// between an OS answer and a caller declaration (ticket 119's ruling on
+// R-119-3): WISP_TEST_DATA_DIR is returned verbatim, so the harness that set it
+// owns the spelling it declared and winsec answers it the way it answers any
+// other caller - resolved spellings seal, links get refused. Rewriting an
+// injected root would move the store out from under the harness that named it.
+//
+// Both directions are asserted, and the expectations come from the filesystem:
+//   - a root declared *through* the link must come back exactly as declared (an
+//     implementation that resolves injections, which is the discipline this case
+//     exists to keep, returns the other spelling instead), and it must then be
+//     refused by the floor and create nothing;
+//   - the same tree declared by its clean spelling must come back exactly as
+//     declared too, and must seal - so the rule is "as declared", not "refused".
+//
+// The first leg is why the fixture is spelled through the link. Ticket 119's
+// acceptance ran production through the mutation "resolve the injected root as
+// well" and this case read green, because its expectation used to be computed by
+// proc.SealableRoot, which is idempotent: as declared and resolved-and-rejoined
+// were the same string, so no implementation could contradict it.
 func TestAC2POSIXInjectedTestDataDirStandsAsDeclared119(t *testing.T) {
 	base := t.TempDir()
-	// The fixture is declared the way a harness on a normal system declares it:
-	// as a root that names a real tree. What this case pins is that proc hands
-	// the injection back untouched, not that the floor accepts any spelling a
-	// harness might invent under a symlinked temp dir - that one is refused, and
-	// TestAC1POSIXUnresolvedSymlinkedRootStillRefused119 already says so.
-	injected := filepath.Join(proc.SealableRoot(base), "harness", "picked")
-	t.Setenv(proc.TestDataDirEnv, injected)
+	shape := newLinkShape119(t, base, "inj")
 
-	if got := proc.TestDataDir(); got != injected {
-		t.Errorf("AC#2: an injected data root was rewritten: got %q, want the declared %q", got, injected)
+	// Leg one: declared through the link, so "verbatim" and "resolved" are
+	// different strings and only one of them can satisfy the assertion.
+	declared := shape.spelledThrough(filepath.Join("harness", "picked"))
+	asTheKernelSpellsIt := filepath.Join(cleanSpelling119(t, shape.link), "harness", "picked")
+	if declared == asTheKernelSpellsIt {
+		t.Fatalf("premise broke: %q is already the kernel's own spelling, so this leg could not tell an untouched root from a resolved one", declared)
 	}
-	// Declared-and-clean still seals, so the rule is "as declared", not "refused".
+	t.Setenv(proc.TestDataDirEnv, declared)
+
+	if got := proc.TestDataDir(); got != declared {
+		t.Errorf("AC#2 RED: an injected data root was rewritten: got %q, want the declared %q. Rewriting it resolves the link the caller chose, which is exactly what option 2 refuses to do to a declared root (the OS-side reads, os.TempDir and os.UserConfigDir, are resolved elsewhere and have their own cases)", got, declared)
+	}
+	// The price of "as declared", pinned rather than implied: the floor answers a
+	// root that reaches itself through a link with a refusal, and refuses without
+	// creating anything in the tree the link names.
+	err := winsec.PrivateDirAll(declared, 0o700)
+	t.Logf("AC#2 PrivateDirAll(%q) -> %v", declared, err)
+	if err == nil {
+		t.Errorf("AC#2 RED: the floor accepted a declared root that reaches itself through the link at %s, so the placement leg is gone on the route option 2 leaves untouched", shape.link)
+	} else if !errors.Is(err, winsec.ErrUnresolvedPath) {
+		t.Errorf("AC#2: refusal did not name ErrUnresolvedPath: %v", err)
+	}
+	if _, statErr := os.Lstat(asTheKernelSpellsIt); !errors.Is(statErr, fs.ErrNotExist) {
+		t.Errorf("AC#2 RED: the refusal created %s anyway (%v)", asTheKernelSpellsIt, statErr)
+	}
+
+	// Leg two: the same tree declared the way a harness on a normal system
+	// declares it. Declared-and-clean still comes back untouched and still seals,
+	// which is what keeps leg one from being read as "injections are refused".
+	injected := filepath.Join(cleanSpelling119(t, shape.real), "harness", "picked")
+	t.Setenv(proc.TestDataDirEnv, injected)
+	if got := proc.TestDataDir(); got != injected {
+		t.Errorf("AC#2 RED: a clean injected data root was rewritten: got %q, want the declared %q", got, injected)
+	}
 	if err := winsec.PrivateDirAll(injected, 0o700); err != nil {
 		t.Errorf("AC#2 RED: a clean injected data root was refused: %v", err)
 	}
