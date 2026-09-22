@@ -31,6 +31,9 @@ Usage:
                    the capability probe suite into provider_health
   wisp secret      credential entry (ticket 63): set/get/list/unset a DPAPI
                    blob without the key ever entering argv, a log line or chat
+  wisp models      signed model store (C29, ticket 121 AC#2): list the verified
+                   manifest, re-check an installed model, or make one available
+                   through the Downloading hand-off and its re-verification
   wisp doctor      toolchain and native-DLL self-check, prints PASS/FAIL
   wisp panel-assets  embedded panel bundle (ticket 77): -manifest lists what the
                    binary carries, -render <path> writes the bytes the WebView2
@@ -68,6 +71,14 @@ func main() {
 		}
 	case "secret":
 		os.Exit(cmdSecret(args[1:]))
+	case "models":
+		// Ticket 121 AC#2: the model hand-off chain (models.Manager ->
+		// DownloadingBridge.Run -> VerifyInstalled) reaches the product through
+		// this line. attachParentConsole because, like `wisp secret`, it is a
+		// command an operator runs from an Explorer-launched process; the
+		// refused-hand-off verdict has to be readable somewhere.
+		attachParentConsole()
+		os.Exit(cmdModels(args[1:], modelsIO{stdout: os.Stdout, stderr: os.Stderr}))
 	case "slo":
 		os.Exit(cmdSLO(args[1:]))
 	case "panel-assets":
