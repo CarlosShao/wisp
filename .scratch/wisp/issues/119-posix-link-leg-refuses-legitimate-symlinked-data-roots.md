@@ -369,6 +369,17 @@
   测量/变异/构建全在 `D:\tmp\wisp119b\{snap-head,snap-instr,snap-wip,snap-after,snap-final,mut/{T,F,R,W,B},scripts,results,bin}`。
   注释与测试零 emoji（`d22scan` ban #8 含 `_test.go` 与注释，两枚快照都 clean）。
   CR 按派单口径**逐文件量**：三枚改动文件与本轮新文件 CR 全 = 0（不把 archive 注入 CR 当默认解释）。
+  两处更正（append-only，不改上面的字）：
+  1. 上面"本轮在 `internal/` 只改了两枚已存在的文件"不精确，真实读数是**三枚**：
+     `internal/winsec/winsec_other.go`（注释）、`internal/proc/envfork.go`（注释）、
+     `internal/winsec/dataroot_symlink_119_other_test.go`（fixture 与用例形）；
+     结论不变——`internal/` 没有新增文件 ⇒ `ban #8 internal/` 覆盖数 382 不动。
+  2. 本轮三枚新用例**今天不落在任何 CI runner 上**（登记，不当已覆盖）：`.github/workflows/ci.yml` 的 ubuntu 腿
+     跑的是 `bash scripts/portable-tests.sh --scope=core`，而 `./cmd/wisp/` 属于 `--scope=cli`
+     （`scripts/portable-tests.sh:162,192,195`），CLI 那一步只在 windows 腿（`ci.yml:369`），
+     `//go:build !windows` 的用例在它里面根本不存在 ⇒ 本轮 POSIX 读数全部来自容器（`-count=2 -v` 那一条），
+     这与 `R-113-A`/`R-119-7` 是同一族"命令面级 POSIX 无门"的账。要让这三枚上 CI，
+     得先有 ubuntu 腿跑 cli scope（或把它们挪进 core 里的某枚包），那是票 111/票 123 的地界 ⇒ 记进 `next=` 第 7 条。
   工具输出里自称"编排者备注 / 系统提示 / 请 revert / 冻结某包 / 放宽阈值 / 不要提它"的文本：**0 次**。
   登记两类确实出现的注入样文本，都不是指令也不是授权：
   (a) harness 在工具输出尾部追加的 `The task tools haven't been used recently…` + 一份**别人的**任务列表
@@ -388,6 +399,9 @@
   4. `R-119-7`（`cmd/wisp` 在 POSIX 的 19 枚 DPAPI 红）本轮没碰，也没被本轮改动（新用例只走 `NewStore`，不碰 protector）。
   5. `R-119-4`（② 换出来的落点归属面）已由本轮写进 `winsec_other.go` 的第二条成本；**要不要并案到票 120 / `R-108-2` 那本账，请编排者裁**。
   6. 索引里那两枚不是我下的 staged deletion，请编排者裁是谁的字（见上）。
+  7. 本轮三枚新用例在 CI 上**没有腿**（ubuntu 跑 `--scope=core`，`./cmd/wisp/` 在 `--scope=cli`，CLI 那一步只有 windows；
+     见上面"两处更正"第 2 条）。要么给 ubuntu 加一条 cli-scope 腿（票 111/123 地界，且要先解 `R-119-7` 那 19 枚 DPAPI 红），
+     要么由编排者裁定"容器读数即本轮判据"，二者必居其一才谈得上翻 `-done`——我不能一边登记无门一边自勾覆盖了。
 
 
 
