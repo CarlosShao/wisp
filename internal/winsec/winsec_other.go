@@ -96,26 +96,53 @@ func sealFile(path string) error { return applyDescriptor(path, false) }
 //     direction available to a floor. The shapes are not hypothetical, and
 //     ticket 113 registered only the first of them (R-113-B, measured in a Linux
 //     container: 81 failing lines across this package and internal/config,
-//     internal/agent, internal/memory with TMPDIR behind a symlink):
-//   - macOS, where /tmp and /var are symlinks, so any root under them is one;
-//   - the test env's data root, which is os.TempDir() + a pid suffix;
-//   - Linux, where dotfiles managers commonly make $HOME/.config a symlink,
-//     which is the user config dir this repository's data root hangs off.
+//     internal/agent, internal/memory with TMPDIR behind a symlink). Three
+//     shapes, and only the first was registered by ticket 113: macOS, where /tmp
+//     and /var are symlinks so any root under them is one; the test env's data
+//     root, which is os.TempDir() plus a pid suffix; and Linux, where dotfiles
+//     managers commonly make $HOME/.config a symlink, which is the user config
+//     dir this repository's data root hangs off.
+//
 //     Ticket 119's answer is option 2 of the three it was offered: the layer that
-//     asks the OS resolves what the OS answered (proc.SealableRoot, used by
-//     internal/proc's data-root resolution and cmd/wisp's resolveDataDir), so a
-//     root handed to this floor names a real tree. This function's rule is
+//     asks the OS resolves what the OS answered. This function's rule is
 //     unchanged, deliberately: a per-platform containment test inside the floor
 //     would make the POSIX leg weaker than the Windows one, which is the exact
 //     asymmetry ticket 113 was opened to close. What it still refuses, and must
 //     keep refusing, is a root nobody resolved - the link is then the only thing
 //     that says which tree the bytes land in, and this package does not read
-//     intent out of a spelling (see the package doc, R-108-2);
-//   - hard links are not traversal. A regular file that happens to share its
-//     inode with somebody else's name has no symlink anywhere in its spelling, so
-//     nothing in this package can see it; that is R-108-2's question ("whose tree
-//     is this"), which lives with the caller's data-root discipline (tickets
-//     76/95), not in a placement check.
+//     intent out of a spelling (see the package doc, R-108-2).
+//
+//     Which roots are resolved today is a list of this repository's callers, not
+//     a property this package can check: proc.TestDataDir (os.TempDir),
+//     proc.DefaultLayout (os.UserConfigDir), cmd/wisp's resolveDataDir and - since
+//     ticket 119's rework, which is what R-119-1 was - cmd/wisp's
+//     resolveSecretLayout. The fourth was missing, and measured on one and the
+//     same binary: `wisp doctor` printed a resolved tree while `wisp secret list`
+//     returned rc=1 through a symlinked HOME, .config or XDG_CONFIG_HOME, because
+//     that command reads os.UserConfigDir() itself and never passes through
+//     DefaultLayout. So the honest claim is "every data root this repository ships
+//     today is resolved before it reaches this floor", never "a root handed to
+//     this floor names a real tree": the next sealing site has to do the same and
+//     nothing here notices if it forgets. The rule that decides which root gets
+//     resolved is R-119-3's ruling, written on proc.TestDataDir - an answer to an
+//     OS question is resolved, a value this process was handed by name is left
+//     exactly as declared.
+//
+//   - what option 2 buys back is a decision this leg used to force. Once the
+//     caller resolves, whoever owns TMPDIR / HOME / XDG_CONFIG_HOME decides which
+//     tree a seal lands in, where the answer used to be a refusal (that is
+//     R-119-4's account, and it is a landing-point ownership question rather than
+//     a traversal one: a link planted inside an already-resolved data root is
+//     still refused here, pinned on that route by ticket 119's
+//     TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119 and, for the
+//     resolveSecretLayout route, by
+//     TestAC3POSIXSecretRouteLinkInsideItsDataRootStillRefused119).
+//
+// Hard links stay out of this leg and were never the second cost: a regular file
+// that happens to share its inode with somebody else's name has no symlink
+// anywhere in its spelling, so nothing in this package can see it; that is
+// R-108-2's question ("whose tree is this"), which lives with the caller's
+// data-root discipline (tickets 76/95), not in a placement check.
 //
 // Deliberately out of scope, and named so nobody reads this function as the end
 // of the family: R-108-3. Once a resolver is installed, the use-time leg trusts

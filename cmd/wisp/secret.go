@@ -99,6 +99,10 @@ type secretCmd struct {
 // resident process uses (SPEC-03 §5.2, SPEC-02 §6). configRoot/exeDir are
 // parameters rather than OS reads here so a test can point dev/test/prod at
 // three temp dirs and prove the isolation through this exact command surface.
+// The consequence of that is stated in R-119-3's terms: a root passed in here is
+// a declaration, so this function must not resolve it for the caller - the
+// wrapper that reads the OS does that (resolveSecretLayout), and the placement
+// floor keeps refusing anything still spelled through a link.
 func sessionLayout(env buildinfo.Env, configRoot, exeDir string) (proc.Layout, error) {
 	l, err := proc.LayoutFor(env, configRoot)
 	if err != nil {

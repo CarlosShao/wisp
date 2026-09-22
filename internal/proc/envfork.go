@@ -92,13 +92,32 @@ func LayoutFor(env buildinfo.Env, userConfigRoot string) (Layout, error) {
 // WISP_TEST_DATA_DIR injection when set, else %TEMP%\wisp-test-<pid> (one dir
 // per test process, so parallel test binaries never share state).
 //
-// Ticket 119: the %TEMP% half of that sentence goes through SealableRoot,
-// because %TEMP%/TMPDIR is an OS answer and not a caller declaration - on macOS
-// it lives under /var, which is a symlink, and winsec's placement floor
-// (internal/winsec/winsec_other.go, ticket 113) refuses any path that reaches
-// itself through one. The WISP_TEST_DATA_DIR injection is returned verbatim:
-// whoever sets it has already declared the tree, and rewriting a declared root
-// is not this function's call to make.
+// Ticket 119's rework settles its R-119-3 (the ticket had drawn the line at "an
+// OS answer" vs "a caller declaration", which is only half true: XDG_CONFIG_HOME
+// and HOME are values somebody injected too). The discriminator is the contract
+// the value is used under, not who typed it:
+//
+//   - WISP_TEST_DATA_DIR is an identity contract. The harness that set it
+//     compares strings with whatever comes back and keeps using the path it
+//     named, so it is returned verbatim; rewriting it would move the store out
+//     from under the caller that named it. Pinned both ways by
+//     TestAC2POSIXInjectedTestDataDirStandsAsDeclared119, including the price of
+//     verbatim: a declared root that reaches itself through a link is then
+//     refused by the placement floor, and is refused without creating anything.
+//   - os.TempDir() and os.UserConfigDir() are an answer to a question this
+//     process asked ("where does user config live"), and the answer is a
+//     location: it is resolved (SealableRoot), whichever environment variable
+//     happened to carry it, because a data root has to name the tree the kernel
+//     will write to. On macOS the answer is always spelled through /var, and a
+//     winsec placement refusal there is the floor rejecting an ordinary machine
+//     (internal/winsec/winsec_other.go, ticket 113). Pinned for HOME, for
+//     $HOME/.config and for XDG_CONFIG_HOME by the three cases in
+//     cmd/wisp/secret_dataroot_119b_test.go and by the two route cases in
+//     internal/winsec/dataroot_symlink_119_other_test.go.
+//
+// So one kind of declared value being rewritten is required and the other is
+// forbidden; both halves are asserted, which is what keeps this from being the
+// one-sentence rule it used to be.
 func TestDataDir() string {
 	if dir := os.Getenv(TestDataDirEnv); dir != "" {
 		return dir
