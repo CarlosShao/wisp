@@ -332,23 +332,81 @@ func treeOwnershipFailureForPair(r C26Resolver, parent, child string) string {
 // sameTree reports whether two spellings name one object by the platform's own
 // component rule, with no normalization performed on either side - the same
 // rule answerInsideTree uses, minus the requirement of a deeper path.
+//
+// Ticket 126 put the volume segment into that rule, which is where it belongs
+// and never was. pathComponents starts after filepath.VolumeName on purpose
+// (winsec.go:344's comment is the reason: a volume is not an ancestor of
+// anything, and Lstat("C:") names whatever directory the process happens to be
+// standing in), but this comparison inherited that start point as if it were a
+// statement about identity instead of a statement about ancestors. The
+// consequence is that C:\store-44440\artifact.txt and
+// D:\store-44440\artifact.txt have always been "one tree" here.
+//
+// Two production faces read that verdict, which is why the fix is in the
+// comparison and not in either caller:
+//
+//   - noticeNamesTree (winsec_windows.go:106) attributes a seal's notice to the
+//     callers asking "was my tree reported on?". Measured on this box with two
+//     real volumes, a seal that ran on C: produced one notice and that notice
+//     was attributed to a never-sealed tree on D: - forward leg green, so this
+//     is a misattribution and not an everything-is-unattributed artifact;
+//   - the install-time tree-ownership leg below (:325) treats a matching second
+//     witness as "narrow", i.e. as grounds to INSTALL the resolver that offered
+//     it. Measured with a candidate that answers a probe parent with
+//     D:\wisp126-seam\probe-tree and that same tree's own parent with
+//     C:\wisp126-seam\probe-tree: before this change the seam admitted it.
+//
+// That second face is why the change is only allowed in this direction. Both
+// comparisons are used exclusively as grounds to PASS something, so narrowing
+// them can refuse a candidate that was previously admitted, and can never admit
+// one that was previously refused. Nothing here widens a guard, and the
+// honest-resolver legs of tickets 112 and 115 - which compare two spellings of
+// one object on one volume - keep their verdicts, because a real object's volume
+// letter does not change between its 8.3 spelling, its long spelling and its
+// mixed-case spelling (measured: the installed pipeline answers
+// "c:\Windows\explorer.exe" as "C:\Windows\explorer.exe").
 func sameTree(a, b string) bool {
+	if !sameVolume(a, b) {
+		return false
+	}
 	compsA, compsB := pathComponents(a), pathComponents(b)
 	if len(compsA) != len(compsB) {
 		return false
 	}
-	fold := func(s string) string {
-		if os.PathSeparator == '\\' {
-			return strings.ToLower(s)
-		}
-		return s
-	}
 	for i := range compsA {
-		if fold(compsA[i]) != fold(compsB[i]) {
+		if foldSegment(compsA[i]) != foldSegment(compsB[i]) {
 			return false
 		}
 	}
 	return true
+}
+
+// sameVolume reports whether two spellings name something on the same volume,
+// under the platform's own case rule and nothing else. On POSIX
+// filepath.VolumeName is the empty string for every input, so this is true for
+// every pair and the two comparisons above keep exactly the verdicts they had
+// before ticket 126 - the change is Windows-only in effect, not in build tag.
+//
+// The comparison is by the volume segment as spelled, with no normalization: a
+// drive letter and its \\?\ form, or two UNC shares that redirect to one store,
+// read as different volumes here. That is the narrow direction, and it is the
+// same disagreement platformVerifyPlacement already refuses at the landing floor
+// (placement_windows.go:33's extended-length and UNC legs), so nothing that
+// reaches a seal can be lost on it.
+func sameVolume(a, b string) bool {
+	return foldSegment(filepath.VolumeName(a)) == foldSegment(filepath.VolumeName(b))
+}
+
+// foldSegment applies the platform's own case rule to one path segment. Windows
+// names objects case-insensitively and POSIX does not, which is the rule
+// sameTree and answerInsideTree were already applying per segment; it is
+// factored out only so the volume segment is folded by the same rule and this
+// package does not grow a second one.
+func foldSegment(s string) string {
+	if os.PathSeparator == '\\' {
+		return strings.ToLower(s)
+	}
+	return s
 }
 
 // answerInsideTree reports whether child names something inside parent, by
@@ -356,19 +414,23 @@ func sameTree(a, b string) bool {
 // rule). No normalization is performed on either side, and on Windows the
 // comparison is case-insensitive because that is the platform's own rule for
 // naming an object - not because a mismatch would be treated as a rewrite.
+//
+// Ticket 126 added the volume leg for the same reason it added it to sameTree,
+// and the acceptance round of ticket 118 measured this function answering the
+// same way there: D:\store\artifact is not inside C:\store, it is a different
+// tree that happens to be spelled alike below its volume. Both callers of this
+// function are the seam guard's grounds to pass a candidate (:311 and :325), so
+// this too only ever refuses more.
 func answerInsideTree(child, parent string) bool {
+	if !sameVolume(child, parent) {
+		return false
+	}
 	childComps, parentComps := pathComponents(child), pathComponents(parent)
 	if len(childComps) <= len(parentComps) {
 		return false
 	}
-	fold := func(s string) string {
-		if os.PathSeparator == '\\' {
-			return strings.ToLower(s)
-		}
-		return s
-	}
 	for i, want := range parentComps {
-		if fold(childComps[i]) != fold(want) {
+		if foldSegment(childComps[i]) != foldSegment(want) {
 			return false
 		}
 	}
