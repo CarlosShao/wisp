@@ -59,6 +59,33 @@ func crossVolumePair126(t *testing.T, existing string) (real, planted string) {
 	return "", ""
 }
 
+// vouchedSpelling129 closes R-126-3, the one condition ticket 126's acceptance
+// round left open: both of that file's Fatalf preconditions guard the side that
+// was sealed, and nothing guarded the side being *asked about*.
+//
+// The leg that needs it reads "no notice from a seal on C: may be attributed to
+// the planted Z: spelling", and the attribution runs through noticeNamesTree,
+// which answers false for two different questions - "this notice is not about
+// that tree" and "ResolvePath will not vouch for that spelling". On this box the
+// planted spelling is answerable (the floor passes an absolute path through
+// whether the volume exists or not), so the leg compares something and pre2 goes
+// red as it should. On a machine whose ResolvePath refuses a letter that is not
+// mounted, every one of those false answers would come from the second question,
+// len(theirs) would be 0 for free, and the leg would report green having
+// attributed nothing to nothing.
+//
+// Ticket 115 wrote this rule for exactly this file's fixtures - answerNamesTree115
+// is the same guard one layer up, and ticket 126 reused captureNotices115 and
+// widen115 without it - so the shape is not new here, only the leg it lands on.
+// Inside a case an unanswerable question is a Fatal; at the production seam it
+// stays the false direction it is documented as (winsec_windows.go:102).
+func vouchedSpelling129(t *testing.T, spelling string) {
+	t.Helper()
+	if _, err := ResolvePath(spelling); err != nil {
+		t.Fatalf("this leg cannot be asked at all: ResolvePath(%q) refused to vouch for the spelling it was handed: %v", spelling, err)
+	}
+}
+
 // TestCrossVolumeSpellingsAreNotOneTree is the unit face: the two comparisons
 // themselves, over spellings this package must decide about without asking the
 // filesystem. It carries the legs that keep the fix from becoming "nothing is
@@ -140,6 +167,10 @@ func TestNoticeFromOneVolumeIsNotAttributedToAnotherVolumeSpelling(t *testing.T)
 	if strings.EqualFold(filepath.VolumeName(sealed), filepath.VolumeName(planted)) {
 		t.Fatalf("the instrument planted nothing: both spellings are on volume %q", filepath.VolumeName(sealed))
 	}
+	// R-126-3, the asked side: everything below reads a "no" from
+	// noticesAboutTree as "these are two trees", so the planted spelling has to be
+	// a question ResolvePath will answer at all.
+	vouchedSpelling129(t, planted)
 	t.Logf("AC#4 shapes: sealed=%s planted=%s (volumes %q vs %q, tails byte-identical)",
 		sealed, planted, filepath.VolumeName(sealed), filepath.VolumeName(planted))
 	mine := noticesAboutTree(*got, child)
@@ -154,7 +185,11 @@ func TestNoticeFromOneVolumeIsNotAttributedToAnotherVolumeSpelling(t *testing.T)
 			len(theirs), sealed, planted, filepath.VolumeName(planted))
 	}
 	for _, n := range *got {
-		if noticeNamesTree(n, planted) {
+		// answerNamesTree115 rather than a bare noticeNamesTree: same question, and
+		// it is the guard that refuses to read "ResolvePath would not vouch for this
+		// spelling" as "this notice is about a different tree" (R-126-3's second
+		// half - the per-notice face had the same free green available).
+		if answerNamesTree115(t, n, planted) {
 			t.Errorf("AC#3 RED: noticeNamesTree(notice for %q, %q) = true", n.Path, planted)
 		}
 	}
@@ -206,6 +241,12 @@ func TestNoticeFromOneVolumeIsNotAttributedToASecondRealVolume(t *testing.T) {
 		if err := SealFile(a); err != nil {
 			t.Fatalf("SealFile(%s): %v", a, err)
 		}
+		// R-126-3 again, on the same face: B is the tree being asked about, and a
+		// ResolvePath that will not vouch for it would make "zero notices about B"
+		// true without attributing anything. B exists on this box (it was just
+		// created and widened), so this precondition costs nothing here and is the
+		// only thing that keeps it honest somewhere else.
+		vouchedSpelling129(t, b)
 		mine, theirs := noticesAboutTree(*got, a), noticesAboutTree(*got, b)
 		t.Logf("AC#8 shapes: A=%s B=%s (volumes %q vs %q)", a, b, filepath.VolumeName(a), filepath.VolumeName(b))
 		t.Logf("notices after sealing A only: %d; attributed to A: %d; attributed to never-sealed B: %d", len(*got), len(mine), len(theirs))

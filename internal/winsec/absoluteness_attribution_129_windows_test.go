@@ -111,9 +111,61 @@ func TestAbsolutenessSpellingsAreNotOneTree(t *testing.T) {
 	}
 }
 
-// absolutenessPair129 is the probe shape the seam guard compares, spelled so that
-// the two candidate answers name two objects while agreeing in every segment
-// pathComponents looks at.
+// TestAttributionFaceNeverSeesAMixedAbsolutenessPair is the reading behind this
+// ticket's AC#2 claim that the attribution face cannot be reached by this defect
+// today. noticeNamesTree resolves the caller's spelling through ResolvePath and
+// compares it against the notice's own path, so both sides of that comparison are
+// answers this package already vouched for. If every one of them is absolute, the
+// new leg can only ever agree there, and the face it protects is the guard's, not
+// the audit channel's. Measured on a real seal rather than argued from the source.
+func TestAttributionFaceNeverSeesAMixedAbsolutenessPair(t *testing.T) {
+	got := captureNotices115(t)
+	dir := filepath.Join(t.TempDir(), "store-44440")
+	if err := os.MkdirAll(dir, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	child := filepath.Join(dir, "artifact.txt")
+	if err := os.WriteFile(child, []byte("wisp 129\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	widen115(t, child)
+	if err := SealFile(child); err != nil {
+		t.Fatalf("SealFile(%s): %v", child, err)
+	}
+	if len(*got) == 0 {
+		t.Fatal("this instrument measured nothing: the seal emitted no notice to inspect")
+	}
+	resolved, err := ResolvePath(child)
+	if err != nil {
+		t.Fatalf("ResolvePath(%q) refused the spelling that was just sealed: %v", child, err)
+	}
+	if !filepath.IsAbs(resolved.String()) {
+		t.Errorf("AC#2 RED: ResolvePath answered %q with %q, which is not absolute, so the attribution face can be handed a mixed pair after all",
+			child, resolved.String())
+	}
+	for _, n := range *got {
+		if !filepath.IsAbs(n.Path) {
+			t.Errorf("AC#2 RED: a notice carries %q, which is not absolute, so sameTree can be asked about a pair that disagrees in absoluteness here", n.Path)
+		}
+		if !noticeNamesTree(n, child) {
+			t.Errorf("CONTROL RED: the notice for %q is no longer attributed to the tree that was just sealed", n.Path)
+		}
+	}
+	t.Logf("AC#2 attribution-face reading: %d notice(s), all absolute=%v, caller's resolved answer absolute=%v (%s)",
+		len(*got), allAbsolute129(*got), filepath.IsAbs(resolved.String()), resolved.String())
+}
+
+func allAbsolute129(notices []narrowNotice) bool {
+	for _, n := range notices {
+		if !filepath.IsAbs(n.Path) {
+			return false
+		}
+	}
+	return true
+}
+
+// absolutenessPair129 names the seam guard's probe shapes: two candidate answers
+// that name two objects while agreeing in every segment pathComponents looks at.
 const (
 	probeTreeAbs129 = `D:\wisp129-seam\probe-tree`
 	probeTreeRel129 = `D:wisp129-seam\probe-tree`

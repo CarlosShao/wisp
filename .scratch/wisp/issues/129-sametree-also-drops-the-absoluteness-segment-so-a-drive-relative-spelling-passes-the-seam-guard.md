@@ -19,7 +19,7 @@
 
 - [x] **AC#1** 把②那句**量成读数**：造出"驱动器相对拼写 vs 绝对拼写"这对树，证明过缝之后 seal **真会落到另一棵树**（落点、`icacls` 前后、被剥掉的继承授权逐条）。量不出来就**如实写"危害未证"**，不许拿"看起来能"当判据。
 - [x] **AC#2** 裁定：绝对性该不该进 `sameTree` 的比较（与票 126 AC#1 同一把尺：缝守侧按攻击面记、归属侧按事故面记）。
-- [ ] **AC#3** 修 `R-126-3` 那一枚 guard（同票前置）：`noticeNamesTree`/`noticesAboutTree` 的**被问侧**无人守——票 115 的 `answerNamesTree115` 守的正是被问侧，票 126 复用了它的 fixture 却漏了这枚 guard。补上并自证它挡得住"换台机器就什么都没比较而报绿"。
+- [x] **AC#3** 修 `R-126-3` 那一枚 guard（同票前置）：`noticeNamesTree`/`noticesAboutTree` 的**被问侧**无人守——票 115 的 `answerNamesTree115` 守的正是被问侧，票 126 复用了它的 fixture 却漏了这枚 guard。补上并自证它挡得住"换台机器就什么都没比较而报绿"。
 - [ ] **AC#4** 变异自证：改前那枚跨绝对性用例红、改后绿；**拒绝侧一枚不许变松**；既有 `--- PASS` 名字集合与基线 `diff` 只许多不许变向。
 - [ ] **AC#5** 门禁：`internal/winsec/` `-count=2 -v` 四数 + `bash scripts/winsec-tests.sh` 同形一发；`gofmt`/`gofumpt` 全路径真跑；`go vet` 双 GOOS；d22scan 纯净快照 rc=0 + 台账各 scope 不降（`ban #8 internal/` 现基线 **385**）；跨卷探针**逐枚卷根**自证已清（AC#6 形状的教训在票 126/118）。
 
@@ -91,4 +91,34 @@
   交件码：`internal/winsec/resolve.go`（新增 `sameAbsoluteness`，两枚比较各加一枚提前返回）＋
   `internal/winsec/absoluteness_attribution_129_windows_test.go`（比较面＋缝守裁决面，7 枚腿含 4 枚 CONTROL）＋
   `internal/winsec/absoluteness_seam_landing_129_windows_test.go`（对象级/真材料裁决/落点/代价，外部测试包，复用票 108 的 icacls fixture 与 `seamAt108`）。
+
+- 2026-09-23 00:0x（agent-ticket129，**AC#3＝R-126-3 那枚 guard 补上了，并量成"会红"**）：
+  两道 guard 落在 `volume_attribution_126_windows_test.go`（同票前置，判据一字未改）：
+  - 新增 `vouchedSpelling129(t, spelling)` —— 与票 115 的 `answerNamesTree115` 同形：被问的那一枚拼写如果 `ResolvePath` 不认，
+    就 `t.Fatalf("this leg cannot be asked at all: …")`；用在 `TestNoticeFromOneVolumeIsNotAttributedToAnotherVolumeSpelling`
+    的 `theirs := noticesAboutTree(*got, planted)` 之前，也用在 `…ASecondRealVolume/two_real_volumes` 的 `noticesAboutTree(*got, b)` 之前
+    （那一枚验收方没点名，同一个洞）；
+  - 逐枚通知那一圈从裸的 `noticeNamesTree(n, planted)` 换成 `answerNamesTree115(t, n, planted)`（票 115 的规矩：inside a case,
+    an unanswerable question is a Fatal），`theirs`/`mine` 的期望值与 `AC#3 RED` 文案一字未动 ⇒ 没有"顺手改 126 的判据"。
+
+  **自证（同一发变异打在两枚树上，先 diff 证落地、`go build` rc=0 才读名）**：MUT-ASKED-REFUSES ＝ 在 `builtinVerifier.Resolve`
+  的 `IsAbs` 腿之后插 7 行，令"卷不存在的拼写"被拒（模拟一台 `ResolvePath` 不肯认 `Z:` 拼写的机器）：
+  - `s129-mut-asked-base`（`f5bbccd` ＝ 126 交付原样，无 guard）：`--- PASS: TestNoticeFromOneVolumeIsNotAttributedToAnotherVolumeSpelling (0.04s)`
+    **⇒ 假绿量成读数了**：日志里 `planted=Z:\…\artifact.txt` 说明腿照跑，而它一次都没比较过任何东西；
+  - `s129-mut-asked-post`（cell-1 那枚 `a45b2e9` ＋ 本格 guard 的文件）：**同一发**变异 ⇒
+    `--- FAIL: …`，红名即 guard 原文 `this leg cannot be asked at all: ResolvePath("Z:\…") refused to vouch for the spelling it was handed:
+    … the installed risk.c26Pipeline answered "Z:\…", a spelling the floor itself refuses …`
+    （顺带把"拒点在 `ResolvePath` 对答案重跑底线的那一腿"钉成了读数）；
+  - 反向对照：同一发变异下 `TestNoticeFromOneVolumeIsNotAttributedToASecondRealVolume/two_real_volumes` 在两枚树上都 `--- PASS`
+    ⇒ 变异是**定点**的，不是把整包打死。
+  附：本格的 post 快照是 `git archive a45b2e9` 再放一枚改过的 126 文件（当时尚未提交），读数在 `D:\tmp\s129-mut-*.log`。
+
+  另补一枚 AC#2 的归属侧读数（原来我只是"说"归属侧吃不到这一形，现在量）：
+  `TestAttributionFaceNeverSeesAMixedAbsolutenessPair` —— 真 seal 一发、取回通知，逐枚 `filepath.IsAbs(n.Path)` 与
+  `ResolvePath(child)` 的答案都绝对 ⇒ `noticeNamesTree` 那一侧的 `sameTree` 永远拿到同属一类的成对答案，
+  本票新增的 leg 在归属面上**无输入可达**；缝守面才是它落地的地方（与票 126 验收方 1.2 的"零枚非测试消费者"同向）。
+
+  改后整包 `go test -count=2 -v ./internal/winsec/`：`RUN=202 PASS=116 FAIL=0 SKIP=0`（单次 101/58）、`ok … 21.099s`；
+  `--- PASS` 名字集合与基线 `diff` ＝ **增 8 枚、移除 0 枚**（`comm -23` 空）；`gofmt -l internal/winsec/` 空输出。
+
 
