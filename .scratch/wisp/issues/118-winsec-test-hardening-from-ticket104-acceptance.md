@@ -158,3 +158,38 @@
   但**红点具体落在哪一腿**它没写；我量到的是 `firstLinkInPath` 那一腿（`:137`），
   `os.SameFile` 那一腿在 pre-119 形状下**不红**（`/tmp/linktree` 与 `/tmp/realtree` 是同一 inode，`os.Stat` 会跟链）——
   也就是说那枚 SameFile 断言守的是"别换一棵树"，软链形状由 `:137` 那一腿守，两腿不是同一件事，读数各自独立成立。
+- 2026-09-22 10:3x（agent-ticket118b，**AC#8 停手回报：这证明的是生产判据会归错，本格留 `[ ]`**）：
+  - 本机**造得出**两棵尾段逐字相同、卷不同的树，不需要"本机造不出"这一句。票面提的两条替代路径我都量了，
+    两条都不能表达这个形状，原因是同一个：它们在同一枚底线（`platformVerifyPlacement`，placement_windows.go）
+    上就被拒了，`sameTree` 根本没机会被问——
+    `\\?\`/UNC 拼写被 `strings.HasPrefix(path, "\\?\")` 与 `strings.HasPrefix(vol, "\\")` 直接拒；
+    `subst` 字母不是第二枚卷，`GetFinalPathNameByHandle` 会答成底层真卷，两棵"不同卷"的树在解析器那里塌成一棵。
+    剩下唯一可量的形状是**真第二卷**：本机有 C:/D:/E:/F: 四枚 NTFS 本地固定卷（`Get-CimInstance Win32_LogicalDisk` 读数，
+    DriveType 全为 3），用例按"根可写的卷"枚举取前两枚（这台机器上量到的是 C: 与 D:）。
+  - 读数（在 `git archive HEAD` 的快照 `D:\tmp\wisp118-s118b\mut-ac8` 里，文件
+    `internal/winsec/cross_volume_118_windows_test.go`；`go vet ./internal/winsec/` rc=0 后才读）：**红，且红名是行为的**：
+    ```
+    AC#8 shapes: A=C:\wisp118-ac8-26904\store-44440\artifact.txt B=D:\wisp118-ac8-26904\store-44440\artifact.txt (volumes C: vs D:, tails identical)
+    AC#8 the comparison itself: sameTree(A, B) = true
+    AC#8 RED: 1 notice(s) from a seal that ran on C:\...\artifact.txt are attributed to D:\...\artifact.txt,
+              a tree on the volume D: that was never sealed. ... pathComponents dropped the volume segment and the two trees became one.
+    ```
+    两枚 leg 都在：正向对照（A 自己的通知确实归给 A）绿，第二枚（B 从未被 seal，可归到 B 的通知必须是 0 枚）红。
+    责任位置可指到字节：`winsec_windows.go:111` `sameTree(n.Path, resolved.String())` →
+    `resolve.go:335` `sameTree` → `winsec.go:353` `pathComponents` 的起点 `i := len(filepath.VolumeName(path))`，
+    卷段从来不进比较。**这一格不是测试判据的洞：`sameTree` 是生产码，且它另有一枚生产调用者**
+    （`resolve.go:325`，C26 缝上那道"答案有没有把 seal 挪到另一棵树"的守门）。
+    如实分开两笔账：我**量到**的是 `sameTree` 跨卷返回 true；它**在缝守那条腿上会让跨卷答案过关**这一步
+    我没有单独造一发用例去量（那要造一枚会跨卷作答的 fake resolver，是另一张票的形状），那是同一枚函数上的推理，
+    不当读数用。
+  - 处置：按票面 AC#4/AC#8 那句话**停手**——没有动 `winsec_windows.go`/`resolve.go` 一行，
+    也**没有把这枚红的用例塞进仓库**（`internal/winsec` 的门禁把 FAIL 直接判红，一枚已知生产洞的用例进树会把
+    整条 winsec 腿和票 110/112 那套 CI 步骤一起拖红，那是给编排者添账不是交件）。用例**全文留在本条里**，
+    新票可直接从此处取：判据三条——(1) 枚举"根可写"的卷，取不到两枚就 `t.Fatalf` 报"本机造不出"（**不是 Skip**，
+    本仓的门禁里任何顶层 SKIP 都是致命项）；(2) 正向 leg 断"自己的通知归得给自己"，否则第二枚可以由常数 false 满足；
+    (3) 反向 leg 断"从未被 seal 的那棵树归到 0 枚"。修的方向是把卷段纳入比较（`sameTree` 的起点，或
+    `filepath.VolumeName` 两侧相等再比 components），那一动会同时改缝守那条腿的判定，
+    还得回答 8.3/大小写/`\\?\` 的既有前提——**这不是本票的形状**，等编排者立票。
+  - 现场清账：测量在 C:/D: 各留下了 `<vol>\wisp118-ac8-26904`（我的用例只 RemoveAll 了 store 子目录），已删；
+    另清掉前任 08:53 断线时留在 C:/D:/E:/F: 四枚卷根上的 `wisp118-xvol-probe\p.txt`（同为 AC#8 探针残骸，
+    不在仓库内，故 STEP 0 的 `git status` 看不见它）。
