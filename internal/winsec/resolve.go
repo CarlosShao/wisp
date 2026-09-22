@@ -445,8 +445,15 @@ func treeOwnershipFailureForPair(r C26Resolver, parent, child string) string {
 // letter does not change between its 8.3 spelling, its long spelling and its
 // mixed-case spelling (measured: the installed pipeline answers
 // "c:\Windows\explorer.exe" as "C:\Windows\explorer.exe").
+//
+// Ticket 129 added the second dropped segment, sameAbsoluteness below, on the
+// same two faces: this comparison had already learned that a tail says nothing
+// about which volume it hangs off, and it had not learned that a tail says
+// nothing about whether it hangs off that volume's root or off the process's own
+// current directory on it. Nothing there is changed by what follows; the rule
+// only gets one more requirement to satisfy.
 func sameTree(a, b string) bool {
-	if !sameVolume(a, b) {
+	if !sameVolume(a, b) || !sameAbsoluteness(a, b) {
 		return false
 	}
 	compsA, compsB := pathComponents(a), pathComponents(b)
@@ -477,6 +484,42 @@ func sameVolume(a, b string) bool {
 	return foldSegment(filepath.VolumeName(a)) == foldSegment(filepath.VolumeName(b))
 }
 
+// sameAbsoluteness reports whether two spellings hang their tails off the same
+// kind of root, which is ticket 129's half of the identity test: dropping the
+// volume segment was half of what filepath.VolumeName takes out of
+// pathComponents, and the rest of that prefix - whether a separator follows the
+// volume letter - is what decides whether the tail names an object under the
+// volume root or under whatever directory the process happens to be standing in
+// on that volume.
+//
+// The verdict is about the pair, not about absolute-ness itself, and deliberately
+// so: two drive-relative spellings with one tail do name one object (they share
+// the same per-drive root), so refusing that would be this package inventing a
+// rule the floor already states elsewhere. The floor's rule is
+// builtinVerifier.Resolve's first leg - filepath.IsAbs - and the pair rule here
+// is the same predicate, applied to two answers instead of one. That is the
+// direction this package is allowed to move in: for every input pair, agreeing
+// absoluteness is a requirement on top of what sameTree and answerInsideTree
+// already asked, so a true after the change was true before it, and nothing that
+// was refused becomes admitted.
+//
+// The cost is measured, not assumed, in
+// absoluteness_seam_landing_129_windows_test.go: ResolvePath is the only mint for a
+// path a seal acts on, and every spelling it answers without an error came back
+// absolute on this box - a drive-relative input is answered with its own
+// absolutized path, so no answer this package can seal with has ever been in the
+// class this leg now refuses. What the leg refuses is exactly the pair the guard
+// was reading as one tree: a candidate's absolute answer next to a candidate's
+// drive-relative answer with the same tail, which is two objects, and the
+// install-time seam treats a matching pair of those as grounds to install.
+//
+// On POSIX filepath.VolumeName is empty for every input and this is the same
+// statement IsAbs makes about a leading separator, so "a/b" and "/a/b" stop
+// reading as one tree here too - which is the same correction, one root over.
+func sameAbsoluteness(a, b string) bool {
+	return filepath.IsAbs(a) == filepath.IsAbs(b)
+}
+
 // foldSegment applies the platform's own case rule to one path segment. Windows
 // names objects case-insensitively and POSIX does not, which is the rule
 // sameTree and answerInsideTree were already applying per segment; it is
@@ -500,9 +543,13 @@ func foldSegment(s string) string {
 // same way there: D:\store\artifact is not inside C:\store, it is a different
 // tree that happens to be spelled alike below its volume. Both callers of this
 // function are the seam guard's grounds to pass a candidate (:311 and :325), so
-// this too only ever refuses more.
+// this too only ever refuses more. Ticket 129 added the absoluteness leg here for
+// the same reason it added it to sameTree, and the reading that forced it is the
+// one this function is asked for: the guard's first containment witness took an
+// absolute answer as sitting inside a drive-relative one whose tail it matches,
+// which is two objects under two different roots.
 func answerInsideTree(child, parent string) bool {
-	if !sameVolume(child, parent) {
+	if !sameVolume(child, parent) || !sameAbsoluteness(child, parent) {
 		return false
 	}
 	childComps, parentComps := pathComponents(child), pathComponents(parent)
