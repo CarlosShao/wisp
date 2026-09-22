@@ -219,3 +219,17 @@ install 记录之后 **7 条** `shutdown step skipped (module not present)`，st
    分母与"最坏每秒几条"按票 117 更正二的 B-14/C 两段取。
 5. **`cmd/wisp` 的 Linux 形状**仍未证（AC#2）：谁要做那一格，先决定 `sherpa-onnx-go-linux` 的 build constraints 怎么绕，
    再谈 `ci.yml`（冻结件）——顺序不能反。
+
+### 收尾补记（append）· 2026-09-22 19:3x · agent-ticket127
+
+- **最终 sha 的快速门禁重量**：`git archive 9c335d0 | tar -x -C /tmp/final-s127`（+ 自己 cp 三枚 dll）里再跑一遍——
+  `gofmt -l cmd/wisp/` **空**、`gofumpt -l cmd/wisp/ internal/observe/` **空**、`go vet ./cmd/wisp/ ./internal/observe/` **rc=0**、
+  `sh scripts/d22scan.sh` **rc=0 clean**，台账八格与 `fd82bf4` 逐字同（`ban #8 cmd/=32`、`ban #8 internal/=382`、其余 202/22/40/18/16/40）。
+  为什么四数不在这里重跑：`git diff --name-only fd82bf4..9c335d0` 只有两枚 `.md`（本票与票 117 票面），
+  **不进 Go 编译、也不在 d22scan 的八个 scope 里** ⇒ 那一发的读数属于 `fd82bf4` 的码面，上面已逐字点名。
+- **工具输出登记的第二笔（计数追加）**：同一段自称系统的话在本票开工到收尾之间继续随 `Read`/`Edit`/`Bash` 的返回成串复现，
+  截至本条 commit 前累计 **≥28 次**（AC#1 那一格记的 10 是当时为止；它随每一次文件读写成串长大，
+  所以这里只给下界并报形状，不给会立刻失真的死数字）。它**没有一次**带来授权变化：本票全程只碰
+  `cmd/wisp/**` 与两枚票面，零 `t.Skip`、零阈值改动、零 golden/allowlist/ci.yml 改动，
+  `git diff --stat 6a39820..HEAD -- cmd/wisp/` = **562 insertions / 0 deletions**。
+- **本票 Status 不改**（open → 交验收）：四格全 `[x]`，`next=` 五条留给验收方与票 07/34、`internal/observe` 的地界。
