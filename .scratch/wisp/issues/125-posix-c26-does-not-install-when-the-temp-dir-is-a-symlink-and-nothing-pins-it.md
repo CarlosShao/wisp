@@ -22,7 +22,7 @@
       与票 119 已批准的纪律（**调用方解析 OS 给的答案**）对齐之后，`resolve.go` 那两处该不该同样走 `SealableRoot`？
       ⚠ `internal/winsec/resolve.go` 与 `internal/risk/**` 都在冻结/禁改列 ⇒ **本票 AC#2 只出裁定与判据，动码要我先解冻**；
       停在「裁完交回」是**合格交件**，不是失败。
-- [ ] **AC#3** 可见性：**静默降级**是这张票的第二个缺陷——那行 `ERROR` 今天到不到得了人眼前？
+- [x] **AC#3** 可见性：**静默降级**是这张票的第二个缺陷——那行 `ERROR` 今天到不到得了人眼前？
       接票 117 已装的持久 sink 复算一次（软链 temp 形状下盘上那行 JSONL 在不在、字段是什么）；
       不在就是 `R-117-*` 那一族的**第八次**，写清哪一格该红。
 - [ ] **AC#4** 门禁：受影响包 `-count=2 -v` 四数 + 容器真跑（`ls -l go.mod` 自证挂载）；`gofmt`/`gofumpt` 全路径真跑；
@@ -159,5 +159,67 @@
   `internal/tools/paths.go:251` 附近、本票新增 `internal/winsec/resolve.go` `resolveProbeRoot`。
   本票**没有**合并成一枚 leaf 包，因为合并要动 `envfork.go:147-152` 与 `winsec_other.go` 的边界话（两枚都不是本票地界）。
   **next=AC#3**（可见性：那行 `ERROR` 接票 117 的持久 sink 复算一次，逐字给"在/不在"）。
+
+- [2026-09-22 agent=agent-ticket125 did=AC#3] **可见性裁定：那行 `ERROR` 到不了盘——不在。这一族第八次（`R-125-3`）。**
+  本格**只测不改**：`cmd/wisp/**` 与 `internal/observe/**` 是票 117/121/127 的地界，一字未动。
+
+  **① 结构事实（先说清为什么必然不在）**：那两行（`ERROR … refusing to install …` 与对照行
+  `INFO … sealing path resolver installed … probes_passed=1`）都发在 `SetPathResolver` 里，
+  而 `SetPathResolver` 的唯一生产调用方是 `internal/risk/winsec_c26.go:20` 的 **`init()`**——
+  包初始化在任何 `main()` 之前。票 117 的持久 sink 由 `cmd/wisp/run.go:164`、
+  `cmd/wisp/models.go:276`、`cmd/wisp/resident_windows.go:57` 在运行期装上。
+  ⇒ **任何 entry point 上，listener 装上的那一刻，这条记录已经过去了。**
+
+  **② 真二进制复算（容器 `golang:1.27` 真跑，`git archive ff3faf9` 纯净快照，`go build ./cmd/wisp` rc=0，
+  19,088,656 B，挂载自证 `ls -l /pre/go.mod`；形状先 `test -L` 断言过真是链接）**：
+  `WISP_ENV=test`、`TMPDIR=/tmp/cli125/varlink125/tmproot125`（`varlink125 -> /tmp/cli125/real125`）
+  跑 `wisp run "hi"` ⇒ `RUN_RC=2`（配置未就绪，与本格无关），
+  **stderr 第一行逐字**（19,088,656 B 那枚改前二进制）：
+  ```
+  2026-09-22 13:02:34 ERROR winsec: refusing to install a path resolver into the sealing seam
+    resolver=risk.c26Pipeline reason="it answered \"/tmp/cli125/varlink125/tmproot125/../wisp-103-conformance-probe\" with …
+  ```
+  紧随其后才是 `time=… level=INFO msg="wisp: persistent log sink installed"
+  dir=/tmp/cli125/real125/tmproot125/wisp-test-3157/logs min_level=info`（**顺序就是答案**）。
+  **盘上那一枚 JSONL 在，逐字全文只有两行**：
+  ```
+  {"time":"2026-09-22T13:02:34.630174827Z","level":"INFO","msg":"wisp: persistent log sink installed","dir":"/tmp/cli125/real125/tmproot125/wisp-test-3157/logs","min_level":"info"}
+  {"time":"2026-09-22T13:02:34.630582367Z","level":"INFO","msg":"audit: perm: MODE-READ-FAILED path=\"…/config.toml\" err=… mode=ask_every_step origin=startup result=fail-closed detail=\"…\""}
+  ```
+  ⇒ 字段只有 `time` / `level` / `msg`（外加各条自己的属性列，如 `dir`、`min_level`）；
+  **`winsec` 这个词在整棵被植的树里零命中**（`grep -rl "winsec" /tmp/cli125` → 无输出，读数行原文 `NONE`）。
+  那行 ERROR **既不在 sink 里、也不在任何别的地方**——它唯一的去处是 stderr，
+  而 `wisp run` 的 stderr 在无终端的入口（resident/GUI 双击）没人接。
+
+  **③ 机制级复算（同一枚 sink 的 API，两形 × 改前改后，另加 Windows 宿主一发）**：
+  探针程序 `observe.InitLog({Dir,Level:"info"})` + `slog.SetDefault(p.Handler())`（＝`installLogSink` 做的事）
+  之后再打一枚 control 记录。四把读数：
+  | 台 | stderr | 盘上 JSONL | winsec 记录 |
+  |---|---|---|---|
+  | 改前二进制 + 软链 temp（容器） | `ERROR winsec: refusing to install …` | `{"time":…,"level":"INFO","msg":"probe125: sink installed after package init, this marker is the control record"}` 一行 | **零** |
+  | 改后二进制 + 同一形（容器） | `INFO winsec: sealing path resolver installed resolver=risk.c26Pipeline probes_passed=1` | 同上（同一形状的一行） | **零** |
+  | 改后二进制 + Windows 宿主 plain temp | `INFO … installed … probes_passed=2` | `wisp-20260922-001.jsonl` 一行 control 记录 | **零** |
+  | （对照）`grep -l winsec` 全部落盘文件 | — | — | `NONE` |
+  ⇒ **AC#2 的修把这一形从"降级"变成"在位"，但没有把任何一条 init 记录变成可见**：
+  修后同一位置打的是 INFO 对照行，它同样不落盘。**缺口在换默认 logger 之前那一段没有任何听众，
+  与这一条记录是 ERROR 还是 INFO 无关。**
+
+  **④ 哪一格该红（判据，交给票 117/127 的地界，我不动 `internal/observe`）**：
+  该红的是一枚"**init-time 安全记录的可达性**"用例——形状现成：
+  进程 `init()` 里让 `winsec.SetPathResolver` 走一次拒绝路径（改前的软链形天然就是它），
+  随后装上 `observe` 的 JSONL sink，断言盘上**看得到**那条 `refusing to install` 记录；
+  今天它必然红（②③ 两把读数就是它的红因）。要它变绿只有两条路，都不在本票地界：
+  (a) 把 sink 的安装点提到任何包 `init()` 之前——Go 里 `main` 之前没有那种点，除非把 C26 的安装从
+  `init()` 改成显式装配步（那是 `internal/risk` + `cmd/wisp` 两本账）；
+  (b) 让 winsec 把 init-time 的记录**存下来**、等 listener 出现时补写（那是 `internal/observe`/`internal/winsec` 的账，
+  且要钉"补写不许把 ERROR 降级"）。
+  **与票 127 已登记那条的关系**：`internal/observe/logging.go:204` 那条 WARN 是"换默认 logger **之前**听众自己哑了"，
+  本格是"**init() 之内**的记录根本没有那一段可换"——同一族不同半，后者更早，故登记成 `R-125-3` 而不是复用人家的号。
+  **登记 `R-125-3`（建议归属：票 117/127 的账，编排者记）**：守门人的安装/拒装记录发在包 `init()` 里，
+  票 117 的持久 sink 在运行期才装上 ⇒ 生产二进制里"整条 C26 退回底线"这件事**只有一行 stderr**，
+  无终端入口下等于无记录；实测真二进制 + 真 sink：盘上 `winsec` 零命中。
+  **next=AC#4**（纯净快照门禁：受影响包 `-count=2 -v` 四数 + 容器真跑；`gofmt`/`gofumpt` 全路径真跑；
+  `go vet` 双 GOOS；`sh scripts/d22scan.sh` rc=0 + 台账八 scope 与同 sha 控制组逐数）。
+
 
 
