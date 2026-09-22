@@ -135,31 +135,229 @@
 
 ## 3. AC#2 —— 量出没量的那一腿（`resolve.go:325` 缝守；本票生死格）
 
-**裁决：待定** ｜ **标签：待定**
+**裁决：通过** ｜ **标签：〔独立复现〕**
 
-读数：待写。要复算的三件事：
-1. 自造 fake resolver `crossVolumeWitness126` 是否真把 C26 缝守量成"改前放行跨卷候选"（`refusal=""`）；
-2. `guardSawAnchor` 哨兵——它在 `a701138` 版存在，交件版已被同票重构换名，我要判新哨兵是否同等强、
-   能否挡住"守卫根本没走到第二见证却报绿"这种空转；
-3. 六/七条腿里三枚 `wantRefused:false` 的 CONTROL 是否改前改后都绿（不许有 `CONTROL RED`）。
+我在 `git archive 09b5285` + 交件那枚用例文件（**逐字节比对确认与 `81b4d5f` 里那枚相同**）的快照里
+自己跑了一遍，读的是 `-v` 日志里的逐腿原文，不是它的转述。
+
+**改前（基线树，交件用例）——三条拒绝腿全部被放行：**
+
+| 腿 | `asked`（守卫真问过哪些输入） | `refusal` |
+|---|---|---|
+| second witness names the same tree on another volume | 含 `D:\wisp126-seam\moved-seal` | `""` **放行** |
+| second witness names a deeper tree on another volume | 含 `D:\wisp126-seam\moved-seal` | `""` **放行** |
+| the child's own answer names a deeper tree on another volume | **不含**锚点 | `""` 放行，且哨兵报 `asked=false, wanted true` |
+| 四枚 CONTROL（含"另一个大小写的卷字母"那枚） | — | `""` 全绿，无 `CONTROL RED` |
+
+⇒ **判定"守门错"成立**，不是记账错：那道 install-time 门在两枚真卷都不存在的情况下，
+把一枚对同一尾段跨卷作答的候选判成"窄、可以装"。这不需要任何运维巧合，纯拼写就够。
+
+**改后（`81b4d5f`）**：三枚拒绝腿各拿到**完整 refusal 文本**，收尾正是那句
+`... nor inside the tree that answer names once the candidate is asked about it directly
+("C:\wisp126-seam\probe-tree" for "D:\wisp126-seam\moved-seal"): the seam may not be used to
+move a seal into another tree`；四枚 CONTROL 仍 `refusal=""`。第三枚腿改后也问到锚点了
+（`asked` 里出现 `C:\wisp126-seam\probe-tree`）⇒ 腿归位。
+
+### 3.1 哨兵能不能挡住"守卫根本没走到 `:325` 却报绿"——能，且它今天就抓到过一次
+
+交件版的哨兵是 `crossVolumeWitness126.asked` 这张记录表加腿上的 `wantAnchorAsk`。我逐条判它的强度：
+
+- **"什么都没量到"会出声**：`if !fake.asked[parent] || !fake.asked[child]` ⇒ `t.Errorf` **并 `continue`**
+  ——`continue` 只跳过判决比对，那一腿已经记红了，所以不存在"空转还绿"这条路。
+- **"走错了腿"也会出声**：`fake.asked[leg.anchor] != leg.wantAnchorAsk` ⇒ `t.Errorf`。
+  **这枚哨兵在我这次复算里真的响了**：改前的第三枚腿被放行是发生在 `:311` 那道包含见证上、
+  根本没走到 `:325`，哨兵如实报 `asked=false, wanted true`。
+  ⇒ 它不是装饰；它把"哪一枚比较接管了这一腿"变成读数而不是叙述。
+- **反向也有哨兵**：第七枚腿（child 答案本就在探针父树里）标 `wantAnchorAsk:false`，
+  守卫若多问一次锚点照样红。枚数为**七枚腿、四枚 CONTROL**，不是票面说的六/三。
+- **归因不靠读日志**：`MUT-VOL-DROP-SAME`（只删 `sameTree` 的卷段）与 `MUT-VOL-DROP-INSIDE`
+  （只删 `answerInsideTree` 的卷段）**两发都把缝守那枚用例打红**（各 4/2 枚红里都含它）
+  ⇒ "这一腿是被卷段比较撑住的"由变异证明，不由 prose 主张。
+
+### 3.2 要登记的两处文字与代码不符（不改判，但别让它留在账上）
+
+1. 票面 AC#2 那条写的哨兵符号 **`guardSawAnchor` 在交件树里不存在**。它确实存在过——
+   `git show a701138:...126_windows_test.go` 的 233/248/283 行——随后被同票的 `fe93558`/`a3ce3a4`
+   重构成 `asked`/`wantAnchorAsk`。票面 append-only 所以留着旧名可以理解，
+   但**交件后的自述点了一个文件里没有的标识符**，下一个人照票面去找会落空。
+2. 同一句说"量不到就 `t.Fatalf`"，交件实现是 `t.Errorf`（外加腿首那枚 `answerInsideTree` 形状自检才是 `t.Fatal`）。
+   效果上仍会红，方向没错，属于措辞与实现不符。
+3. 票面 AC#3 末句"六/七枚腿里 `wantRefused:false` 的三枚"，交件树是**四枚**（第七枚是补的大小写 CONTROL）。
+
 
 ---
 
 ## 4. AC#3 —— 修法变异自证 + 同一发不许让任何既有归属用例变绿
 
-**裁决：待定** ｜ **标签：待定**
+**裁决：通过** ｜ **标签：〔独立复现〕**
 
-要复算的三件事：
-1. 改前红四枚 / 改后绿（`pre2` 快照独立跑）；
-2. 既有 `--- PASS` 名字集合与基线 `diff` **只多本票四枚**（它报 `86/46 → 91/50`）——我用 diff 证，不听自述；
-3. `VOL-FALSE` 那发它报红 16 枚，其中既有腿 12 枚 ⇒ 逐名核对这 12 枚是**强度提升的合理红**
-   还是**断言被改方向的假红**（后者直接退回）。
+### 4.1 改前红 / 改后绿（我自己跑的四发整包）
+
+| 快照 | rc | `^=== RUN` | `^--- PASS` | `^--- FAIL` | `^--- SKIP` |
+|---|---|---|---|---|---|
+| `base` = `git archive 09b5285` | 0 | 86 | 46 | 0 | 0 |
+| `pre2` = 同一枚归档 **+ 交件用例文件**（与 `81b4d5f` 里那枚**逐字节相同**，我 `diff` 过） | 1 | 91 | **46** | **4** | 0 |
+| `post` = `git archive 81b4d5f` | 0 | 91 | 50 | 0 | 0 |
+| `head` = `git archive bd50c63`（票 125 叠在上） | 0 | 91 | 50 | 0 | 0 |
+
+`pre2` 的红名恰四枚顶层 + 一枚嵌套（`.../two_real_volumes`），逐枚点到本票自己的用例；
+顶层 `PASS` 仍是 46 ＝ **基线那 46 枚一枚没掉**。
+
+### 4.2 既有 `--- PASS` 名字集合与基线的 diff（我不用它的自述，我用 diff）
+
+```
+$ diff <(base 的 ^--- PASS 名字|sort) <(post 的 ^--- PASS 名字|sort)
+38a39
+> TestCrossVolumeSpellingsAreNotOneTree
+42a44,45
+> TestNoticeFromOneVolumeIsNotAttributedToASecondRealVolume
+> TestNoticeFromOneVolumeIsNotAttributedToAnotherVolumeSpelling
+45a49
+> TestSeamGuardRefusesACandidateWhoseSecondWitnessNamesAnotherVolume
+```
+46 → 50 行，**差集只有本票新增那四枚，少一枚、多一枚别的都没有**（`RUN` 多 5 而不是 4，
+是因为 `^=== RUN` 会把嵌套的 `two_real_volumes` 计进去而缩进的 `--- PASS` 不计——
+这是 `scripts/winsec-tests.sh` 自己的口径，我去读那三行 `count()` 才敢这么算）。
+
+再加一枚结构证明，比 diff 更硬：`git diff --name-only 09b5285..81b4d5f` 只有三枚路径
+（票面、`resolve.go`、新用例），`--numstat` 显示新用例 **393 增 0 删**，
+`git diff 09b5285..81b4d5f -- internal/winsec/winsec.go internal/winsec/placement_windows.go` **空输出**。
+⇒ 既有用例**一枚都没被编辑过**，"把断言改方向的假红"在这枚交件里**结构上不可能发生**。
+
+### 4.3 变异清单：它六发我复算 + 我补三发（每发都先发落地再读名）
+
+每发流程＝`cp -r` 新快照 → `perl` 改 → `diff` 出那几字节（落地证明，逐发印出）→
+`go build ./internal/winsec/` rc=0 → 才 `go test -count=1 -v` 读红名。所有发 `cached=0`。
+
+| 发 | 改法 | RUN/PASS/FAIL/SKIP | 红名（顶层） | 谁报的 |
+|---|---|---|---|---|
+| MUT-VOL-DROP-SAME | 删 `sameTree` 那三行卷段 | 91/46/**4**/0 | 本票四枚 | 它报 4 ⇒ **复算相同** |
+| MUT-VOL-DROP-INSIDE | 只删 `answerInsideTree` 的卷段 | 91/48/**2**/0 | 单元面 + 缝守那枚 | 它报 2 同名 ⇒ **复算相同** |
+| MUT-VOL-DROP-BOTH | 两枚都删＝改前 | 91/46/**4**/0 | 与 `pre2` 逐名相同 | 它报 4 ⇒ **复算相同** |
+| MUT-VOL-TRUE | `sameVolume` 恒真 | 91/46/**4**/0 | 同上 | 它报 4 ⇒ **复算相同** |
+| **MUT-VOL-FALSE** | `sameVolume` 恒假 | 91/34/**16**/0 | 见 4.4 | 它报 16 ⇒ **复算相同，16 枚名字逐枚相同** |
+| MUT-VOL-NOCASE | 卷段用大小写敏感 `==` | 91/48/**2**/0 | 单元面 + 缝守"另一个大小写"那枚 CONTROL | 它报 2 ⇒ **复算相同** |
+| **MUT-SAMETREE-TRUE** | `sameTree` 恒真（我能造的最大放宽） | 91/41/**9**/0 | 本票四枚 + **五枚既有用例** | **我补的** |
+| **MUT-INSIDE-TRUE** | `answerInsideTree` 恒真 | 91/47/**3**/0 | 单元面 + 缝守 + 票 112 那枚诚实腿 | **我补的** |
+| **MUT-PC-KEEPVOL** | 卷段塞进 `pathComponents`（`i := 0`） | 91/49/**1**/0 | 只红 `TestAC2ComponentsAndTraversalPerSeparatorShape` | **我补的**（验 AC#1 代价主张） |
+
+前两发补上的读数是这格真正想要的：**这套钉子对"变宽"同样会红**，
+所以"只往严走"不是信仰，是可测的性质。
+
+### 4.4 恒假那 16 枚红：是强度红，不是假红（我逐条分诊）
+
+`MUT-VOL-FALSE` 的 16 枚顶层红，分解**与它报的一致**：既有归属族 9 枚 + 缝守/装配 3 枚 + 本票 4 枚。
+我做的不是数数，是**验每一类的红因**：
+
+1. **这 12 枚既有红在基线和交件树上都是 `PASS`**（我逐枚 `grep` 两处日志对表，12/12 相同）。
+   ⇒ 它们不是被本票改坏的，是**被恒假退化拖红的**，正是"新判据不是装饰"的反证。
+2. 抽样红因（不是猜的，是日志原文）：
+   - `TestAC1SealFileReportsTheInheritedGrantItCleared`：
+     `sealing one child ... reported 0 notice(s), want exactly 1` ⇒ **正向归属腿死了**（合理红）；
+   - `TestNoticeAttributionKeepsTwoTreesApart`：trip 的是票 115 那枚
+     "this instrument would measure nothing" 的 `t.Fatalf` ⇒ 仪器**拒绝交出空转绿**（合理红）；
+   - `TestAC3JunctionInputIsRefusedNotSealed/{两条嵌套腿}`：
+     `C26 is not installed, so this leg measured the fallback instead`
+     ⇒ 恒假把**诚实** pipeline 挡在缝外、C26 没装上，被票 118 那枚前置抓出来。
+     这恰好就是它 AC#2 里描述的"过严 ⇒ 整条 C26 掉回底线"那一族后果，**被既有仪器自己报告了**。
+3. **票 113/119 的拒绝腿可达性我按读数验，不按"文件没动"推**：
+   `TestAC2AncestorGuardHoldsForEverySeparatorSpelling`、`TestAC3PlacementFloorHoldsForEverySeparatorSpelling`、
+   `TestAC2AncestorPrefixesForEverySeparatorShape`、`TestAC5FailedSealRefusesTheWrite`、
+   `TestGateJudgesThePrivateSetByResolvedSID` 在 `base`/`post`/**恒假**/**两枚都删**/**恒真**五发里
+   **全部 `PASS`** ⇒ 落点底线那一族根本不经过被改的字节，一枚都没松（连退化发都碰不到它们）。
+
+### 4.5 "不是常数 false 凑的"——票 118 判据 2 我原样复算
+
+同一发里正向腿两任都绿、反向腿换判决，读的是 `-v` 的 `t.Logf` 计数：
+
+| | `attributed to A`（被 seal 的那棵） | `attributed to never-sealed B` |
+|---|---|---|
+| 改前 `pre2` | **1** | **1** ⇒ `AC#3 RED: 1 notice(s) ... attributed to "D:\..."` |
+| 改后 `post` | **1** | **0** |
+
+植拼写那一腿同理：`attributed to the tree that was sealed: 1 of 1; to the planted other-volume
+spelling: 0`，且它 `sealed=C:\Users\...` / `planted=Z:\Users\...`、尾段 byte-identical ⇒ 单卷机器可跑。
+
 
 ---
 
-## 5. AC#4 —— CI 覆盖：补腿 or 如实登记，不许拿"CI 绿"背书
+## 5. AC#4 —— CI 覆盖：补腿 or 如实登记，且不许拿"CI 绿"背书
 
-**裁决：待定** ｜ **标签：待定**
+**裁决：通过附条件** ｜ **标签：〔独立复现〕**（机制与门禁身份）＋ **〔仅自述，不背书〕**
+（"CI runner 只有一枚可建目录的卷"这一枚外部事实）
+
+### 5.1 它有没有在别处偷偷用"CI 绿"给这格背书——没有，我按 run id 逐处数
+
+票面全文里 run id 只出现三枚，用途各不相同，我逐处读过：
+`35723172814` 出现**一次**（`:169`），且当场标注"**前手 sha 的读数，不是我的**"；
+`35595651898` 是当作**过严会掉底线的失败后果**引用的（`:82`），不是背书；
+`35599458439` 在 `winsec_windows.go` 的注释里，与本票无关。
+`:179-182` 与 `:258` 两处显式声明"本格不拿 CI 绿当通过证据、我自己的 sha 在 CI 上一次都没跑过"。
+我复核这条声明**为真**：`git log` 上 `a701138`/`fe93558`/`a3ce3a4`/`bb8393e`/`5e0f63f`/`81b4d5f`
+都在本地 `dev`，没有对应的 push 记录可引，也没有任何一格拿它们去过 CI 结论。
+
+### 5.2 门禁身份与可比性：我自己把 CI 那份日志拉下来对
+
+`gh api repos/CarlosShao/wisp/actions/jobs/106730524368/logs` 取回原始日志（408,880 字节），
+`grep` 步 4 的输出：
+
+```
+winsec-tests.sh: four numbers (all from -v output): === RUN=86  --- PASS=46  --- FAIL=0  --- SKIP=0
+winsec-tests.sh: winsec result line: ok  github.com/CarlosShao/wisp/internal/winsec   7.639s
+```
+步 4 名称与结论我另用 `gh run view --json jobs` 核过：
+`"Windows ACL sealing gate (internal/winsec's own tests, ticket 110)"`，`conclusion=success`
+（**注意 job 整体是 `failure`**，成功的是这一步——它没拿 job 绿糊步绿，这一点我认可）。
+我在 `git archive 09b5285` 的本机整包读数**也是 `86/46/0/0`**（见 4.1）
+⇒ "那道门跑的就是这套集合"这一枚可比性成立，它补的三条腿会进去。
+
+### 5.3 恒不可见那一腿：我不读代码，我把它**量成**单卷
+
+`MUT`-级打法：在 `81b4d5f` 的副本里把 `writableVolumeRoots126` 的枚举改成"每枚字母都拒绝"
+（`refused[root] = "simulated by acceptor-ticket126: single-volume CI runner"`），
+先 `go vet` rc=0 才读：
+
+```
+=== RUN   TestNoticeFromOneVolumeIsNotAttributedToASecondRealVolume/two_real_volumes
+    ...: this machine has 0 volume root(s) that accept a directory ([]; 26 refused), so two real
+         trees with one tail cannot be planted
+    --- SKIP: TestNoticeFromOneVolumeIsNotAttributedToASecondRealVolume/two_real_volumes
+--- PASS: TestNoticeFromOneVolumeIsNotAttributedToASecondRealVolume (0.00s)
+ok  github.com/CarlosShao/wisp/internal/winsec
+```
+按门禁口径数：顶层 `RUN=2 PASS=1 FAIL=0 `**`SKIP=0`**，缩进的 `--- SKIP`=1，包 `ok`、rc=0。
+⇒ 三条主张全部实测成立：**报自己的名字与分母**、**是命名子用例的 SKIP 不是 `t.Skip` 掩耳**、
+**顶层四数不因它变红**。且它**没有伪 PASS**——那一腿打的是 `--- SKIP`，不是 `--- PASS`。
+本机真实两枚卷时同一腿走另一分支：`--- PASS: .../two_real_volumes`。
+
+### 5.4 附的那枚条件（这是本格唯一没过的东西，也是我今天最实的一枚发现）
+
+"三条腿不需要第二枚真卷"我逐枚验：
+- 缝守那枚：候选自己说谎，守卫只比它拿到的答案，`treeOwnershipFailureForPair` 全程不碰文件系统 ⇒ 成立；
+- 纯拼写那枚：`TestCrossVolumeSpellingsAreNotOneTree` 只喂字面量 ⇒ 成立；
+- **植卷字母那枚：只在本机成立，且用例自己没有守住它。**
+
+`TestNoticeFromOneVolumeIsNotAttributedToAnotherVolumeSpelling` 的反向腿是
+`theirs := noticesAboutTree(*got, planted)` ⇒ `noticeNamesTree(n, planted)` ⇒ `ResolvePath(planted)`。
+而 `crossVolumePair126` 的两道 `Fatalf` 前置守的是 **`ResolvePath(existing)`（被 seal 那一侧）**
+与尾段相等，**没有一道守在被问的那一枚拼写上**。
+我在自己的探针里量了本机行为：`ResolvePath("Z:\...\store-44440\artifact.txt")` **答回该拼写本身、
+`err=nil`**（`Z:\totally\absent\path.txt` 也照样答）⇒ **今天这枚腿不是空转**，
+`pre2` 能红就是最好的证明（空转的腿红不起来）。
+但换到一台 `ResolvePath` 会拒绝 `Z:` 拼写的机器上，`noticeNamesTree` 的失败方向是 `false`
+⇒ `len(theirs)==0` ⇒ **那一腿会在什么都没比较的情况下报绿**。
+
+这正是票 115 已经立过规矩的那个坑，而且规矩就写在同一枚包里：
+`notice_attribution_115_windows_test.go:117` 的 `answerNamesTree115` 第一件事就是
+`if _, err := ResolvePath(spelling); err != nil { t.Fatalf("this leg cannot be asked at all: ...") }`
+——**守的是被问的那一枚**。票 126 的文件复用了 115 的 `captureNotices115`/`widen115`，
+唯独没复用这枚 guard，并在 `R-126-3` 里把"带两道前置"写成了已经治好这个坑。
+
+⇒ 所以本格的**条件**是：AC#4 里"前三枚从此在 winsec 那道门上跑"这一主张，
+对植拼写那一枚只在"该机器 `ResolvePath` 会答应植进去的拼写"时才成立，而用例不守住这一枚。
+它不是放宽（生产侧零风险，见 1.2），所以不触发退回；但它是一枚**未闭合的仪器强度**问题，
+**建议归属：票 126 的结案备注 + 下一张 winsec 归属票的措辞**（修法很小：反向腿改用
+`answerNamesTree115`，或在 `Fatalf` 里补一句 `ResolvePath(planted)`）。
 
 ---
 
