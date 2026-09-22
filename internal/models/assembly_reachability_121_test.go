@@ -97,6 +97,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strings"
 	"testing"
 )
@@ -182,11 +183,12 @@ func TestAC3CapabilityPackagesReachTheCompositionRoot(t *testing.T) {
 // container readings recorded in the ticket face for this file (golang:1.27,
 // CGO_ENABLED=0 and =1, both query forms, both GOOS values).
 //
-// Where the plain form is unavailable, that is logged with its own error text
-// and asserted nowhere. That is not the case weakening itself to pass: the
-// policy assertion above runs on three GOOS regardless, and this sentence is
-// the reason the ticket face says the equivalence control has a host-leg
-// denominator and not a cross-compiled one.
+// Where the plain form is unavailable, the failure is logged with its own error
+// text and the one-directional difference is reported rather than asserted. That
+// is not the case weakening itself to pass: the policy assertion above runs on
+// three GOOS regardless, and this sentence is the reason the ticket face says the
+// equivalence control has an assertable denominator on a cgo-enabled host and a
+// report-only one where the third-party edge is broken.
 func plainRunMustMatchTheESet(t *testing.T, root string) {
 	t.Helper()
 	goos := runtime.GOOS
@@ -197,9 +199,25 @@ func plainRunMustMatchTheESet(t *testing.T, root string) {
 	}
 	plainOut, err := goListDeps(root, goos, false)
 	if err != nil {
+		// The plain query exits non-zero on a leg whose cgo-gated third-party
+		// variant is excluded, but it still prints the part of the closure it
+		// resolved. So the security-relevant half of the comparison can be
+		// REPORTED here even though it cannot be asserted: an entry that only
+		// -e found is the false-green shape. It cannot be a FAIL on this leg
+		// because the same one-way difference has a second, harmless cause - the
+		// broken edge truncates the plain closure, so a package reached only
+		// through it legitimately disappears. Today's container reading is that
+		// the two sets are equal here, which is what keeps this from being a
+		// hedge: the log line names the number instead of gesturing at it.
+		only := entriesOnlyIn(modulePackageSet(withE), modulePackageSet(plainOut))
 		t.Logf("-e/no-e equivalence control UNAVAILABLE on this host (GOOS=%s): the plain query exits "+
-			"non-zero (%v). Logged rather than asserted, and the reason is measured, not assumed - see "+
-			"this function's comment.", goos, err)
+			"non-zero (%v). What it did print is still compared, one way: %d of this module's packages "+
+			"appear in the -e set and not in the plain output (a non-empty list here is the false-green "+
+			"shape and is worth reading, but it also has a harmless cause - see this branch's comment).",
+			goos, err, len(only))
+		for _, pkg := range only {
+			t.Logf("  only in the -e set: %s", pkg)
+		}
 		return
 	}
 	plain := modulePackageSet(plainOut)
@@ -274,20 +292,30 @@ func modulePackageSet(out string) map[string]bool {
 	return set
 }
 
-// setDiff renders what one set has that the other lacks, for the -e control leg.
+// setDiff renders what each set has that the other lacks, for the -e control leg.
 func setDiff(a, b map[string]bool) string {
 	var sb strings.Builder
-	for k := range a {
-		if !b[k] {
-			sb.WriteString("  only in -e set: " + k + "\n")
-		}
+	for _, k := range entriesOnlyIn(a, b) {
+		sb.WriteString("  only in -e set: " + k + "\n")
 	}
-	for k := range b {
-		if !a[k] {
-			sb.WriteString("  only in plain set: " + k + "\n")
-		}
+	for _, k := range entriesOnlyIn(b, a) {
+		sb.WriteString("  only in plain set: " + k + "\n")
 	}
 	return sb.String()
+}
+
+// entriesOnlyIn lists what a has that b lacks, sorted so a log line built from it
+// is stable across runs (an unordered list reads like a different answer each
+// time it is printed, which makes a report-only leg impossible to re-check).
+func entriesOnlyIn(a, b map[string]bool) []string {
+	var out []string
+	for k := range a {
+		if !b[k] {
+			out = append(out, k)
+		}
+	}
+	sort.Strings(out)
+	return out
 }
 
 // moduleRootForTest walks up from the test's working directory to the module

@@ -27,18 +27,18 @@
 
 ## AC（1:1，裁决表 `docs/evidence/s1/121-*.md` 由验收方出）
 
-- [ ] **AC#1** 复算并贴**四件仪器**的读数：`go list -deps ./cmd/wisp`（含/不含 `internal/models`）、
+- [x] **AC#1** 复算并贴**四件仪器**的读数：`go list -deps ./cmd/wisp`（含/不含 `internal/models`）、
       `DownloadingBridge.Run` 的非测试调用者 grep、`bridge.go` 之上那条边的实际形状、以及"有没有任何配置能绕过守卫"。
       复现不出来就照实写"未复现"，并说明验收方那条读数是在哪个 sha 上量的。
-- [ ] **AC#2** 把这条链**真接进去**：判据是**可 grep 的**——装配之后 `go list -deps ./cmd/wisp` **必须包含 `wisp/internal/models`**，
+- [x] **AC#2** 把这条链**真接进去**：判据是**可 grep 的**——装配之后 `go list -deps ./cmd/wisp` **必须包含 `wisp/internal/models`**，
       且 `VerifyInstalled` 在真进程的交还路径上被调到（点名文件:行）。
       ⚠ **不许**用"新增一条导出 API 并在测试里调"来交这一格；那正是本票要防的形状。
-- [ ] **AC#3（外溢价值最大的一格）** 把"**能力类包必须出现在 `cmd/wisp` 的依赖图里**"做成**一条可重跑的用例**：
+- [x] **AC#3（外溢价值最大的一格）** 把"**能力类包必须出现在 `cmd/wisp` 的依赖图里**"做成**一条可重跑的用例**：
       给一张清单（本票先放 `internal/models`），清单里每一项断言它在 `go list -deps ./cmd/wisp` 的输出中；
       不在 ⇒ **响亮失败**。⚠ 这条**只加仪器、不扩范围**：别的包（例如票 117 那条日志出口）
       由**各自那张票**负责在结案时把自己**加进清单**，加不加由编排者判——**不许**在这一格顺手把 33 个包全塞进去，
       那会当场把测试变成永久红（爆炸半径要先量）。
-- [ ] **AC#4** 顺带补票 109 退回的两个洞（验收方实测能滑过去的两形）：
+- [x] **AC#4** 顺带补票 109 退回的两个洞（验收方实测能滑过去的两形）：
       **未点名的文件/子目录不参与哈希**（`R-109-2`）· **按名字而不是按 SID 过滤 ACL**（`R-109-3`，
       与 `internal/winsec` 自己"判据用 SID 不用名字"的口径冲突）。
       ⚠ 若 `R-109-3` 的正解要改 `internal/winsec` 的判定 ⇒ **停手登记交回编排者**（那是别的票的地界），
@@ -94,3 +94,78 @@
   ⇒ **口径不是双重标准，是分界线在"AC 有没有主张生产"**。这一条我写进 A89，因为它会反复用到。
   票 109 保持 **rejected-needs-fix**：它自己只欠两格（AC#2 的落点语义 + AC#4 的两洞），
   而"把链接进真进程"这件事**归本票**（它比一次修复大，且带一条通用仪器）。
+- 2026-09-22 18:1x（`agent-ticket121b`）：**接手 + STEP 0**（checkpoint commit `84cc526`）。
+  接手时工作树里躺着前任的一枚未提交改动（`git status --porcelain` = ` M internal/models/assembly_reachability_121_test.go`
+  ＋ 一条 `?? docs/evidence/s1/118-adversarial-acceptance.md`，那是 `acceptor-ticket118` 的，我没碰没 add）。
+  **原文读数**（不是转述别人）：`gofmt -l internal/models/` =
+  `:212:2: expected declaration, found 'if'` / `:255:2: expected declaration, found cmd` /
+  `:284:2: expected declaration, found 'for'`（rc=2）；`go vet ./internal/models/` =
+  `internal\models\assembly_reachability_121_test.go:212:2: expected declaration, found 'if'`。
+  **判定＝能救的半成品**，三条依据：①坏形只有一处——它把 `-e` 对照腿从硬编码 `GOOS=windows` 改写成 host GOOS，
+  旧函数尾巴（:212-219）留在闭合括号外面，纯粘贴残留；②AC#3 的政策断言腿（清单 vs 三 GOOS）与两条 sanity 腿
+  **一行都没被改**（`git show 30a73f1 -- internal/models/` 逐段比过），所以已提交用例没改坏，无需回退；
+  ③它要办的事是真的：旧写法在 ubuntu 腿上是 `t.Errorf`，那是**假红**——我在容器里量到
+  `CGO_ENABLED=0 GOOS=windows go list -deps ./cmd/wisp` **rc=1**，原文
+  `imports github.com/k2-fsa/sherpa-onnx-go-windows: build constraints exclude all Go files`（四条读数见 AC#3 条）。
+  我只补到能编译（`selfT`→形参 `t *testing.T`、补 `runtime` 导入、删尾巴），**没写"结案/通过"**。
+  共树里没用 `reset`/`checkout .`/`stash`。
+- 2026-09-22 18:1x（`agent-ticket121b`）：**AC#1 复算完 → 勾上**。四件仪器**全部自己重跑**，没引用预做那张表：
+  (i) `go list -deps ./cmd/wisp`：基线用 `git archive 7fe5e73^`（=`3b03f00`）纯净快照 ⇒ windows 腿 **rc=0 / 过滤后 20 个本仓包**、
+  `internal/models` 与 `internal/statemachine` **都不在**（linux/darwin 用 `-e`，见 AC#3 条我对 `-e` 的声明，同样 20、同样都不在）；
+  HEAD 上同一把尺 **22 个、两枚都在**（逐包 diff 就多了那两行，见 AC#2 条）。
+  (ii) `DownloadingBridge.Run` 非测试调用者：接线前 0（`grep -rn DownloadingBridge` 包外零行仍成立），
+  接线后 **1 枚真生产调用者 = `cmd/wisp/models.go:303`**（`bridge.Run(ctx, id)`），经 `:297 WireDownloading` 装配。
+  ⚠ `cmd/balldebug/main.go:252` 那条 `.Run(ctx, time.Second)` 是 `internal/ball` 的另一个 bridge，**不算**（同名串台）。
+  (iii) `bridge.go` 之上那条边的实际形状：`Run`（`bridge.go:39`）体内 `Ensure` 之后是
+  `if verr := b.mgr.VerifyInstalled(id); verr != nil {`（**`bridge.go:58`**，行号在 HEAD 逐字仍是这一行），
+  `VerifyInstalled` 声明在 `downloader.go:228`；非测试调用者现在是两枚：`bridge.go:58` 与 `cmd/wisp/models.go:241`。
+  (iv) **有没有配置能绕过守卫＝没有**，且我在**真进程**上量到拒绝形状：config 写 `verify_signature = false` ⇒
+  `wisp models verify vad-silero` **rc=2**，原文
+  `models.verify_signature is hard-coded true (read-only, C29); writing false is rejected); the file was left untouched`，
+  第二道门 `downloader.go:106`（`NewManager` 直接拒构造）。⇒ 验收方那句"问题不是能关掉，是这条链今天不跑"两条都复现。
+- 2026-09-22 18:1x（`agent-ticket121b`）：**AC#2 复算完 → 勾上**。判据是可 grep 的那一条，我接前/接后各跑一遍**纯净快照**：
+  `git archive 7fe5e73^` → 20/20/20（三 GOOS，都不含 models、不含 statemachine）；`git archive 84cc526` → **22/22/22**。
+  windows 腿逐包 diff 原文只有两行新增：
+  `> github.com/CarlosShao/wisp/internal/models` 与 `> github.com/CarlosShao/wisp/internal/statemachine`。
+  ⚠ linux/darwin 那两列是 `go list **-e** -deps` 的产物：`-e` **会跳过坏边继续输出**，所以它不是 rc、也不自证闭包完整；
+  对照腿（AC#3 条）只在能跑 plain 查询的腿上成立，这一句按预做 §6 第 3 条**不往满里说**。
+  真进程读数（本机 windows，`PATH` 挂了 `third_party/sherpa-onnx`，data dir 走 `portable.txt` 那条到临时目录）：
+  `models list` **rc=0**（已验签清单 6 枚）、`models ensure vad-silero` **rc=0**（state=FirstRun，ticks=24，末次 100%，**1.23s**）、
+  `models verify vad-silero` **rc=0**（0.00s）。交还那一步就是 `VerifyInstalled` 被调的那一步（`cmd/wisp/models.go:303` → `bridge.go:58`）。
+  ⇒ 与前任 commit message 的差：**它说 2.03s、我量到 1.23s**（同形同机不同次，属噪声，见 AC#6 条）；
+  它说"三平台各 22 个"——这一条我逐字复现。
+- 2026-09-22 18:1x（`agent-ticket121b`）：**AC#3 复算完 → 勾上**，并**登记一条这条仪器看不见的东西**（见本条末）。
+  用例在 `internal/models/assembly_reachability_121_test.go`（清单 = `{internal/models, internal/statemachine}`，逐 GOOS 各跑一次，
+  `windows/linux/darwin`），宿主选 `internal/models` 的理由写在文件头（`cmd/wisp` 的测试在 ubuntu 腿零分母）。
+  **自证会红（三发变异，全在 `git archive 84cc526` 纯净快照里跑，恢复后 `gofmt -l` 空、`go build ./cmd/wisp/` rc=0）**：
+  - **M-A（把真边塞进 `//go:build windows`）**＝票面点名的那一形：`GOOS=windows` 子腿 **PASS**、
+    `GOOS=linux` / `GOOS=darwin` **各两枚红**（models + statemachine，"Parsed set: 20"）⇒ **逐 GOOS 那条腿不是装饰腿**，
+    它抓的正是"windows 腿绿、linux 腿静默掉出图"。
+  - **M-B（把这条真边整条摘掉：删 `cmd/wisp/models.go` + `main.go` 的 `case "models"`，树仍可编译）**
+    ⇒ **6 枚红点名**（两枚包 × 三个 GOOS），test rc=1。⇒ 清单断言本身不是恒真。
+  - **M-B1（我第一版把 M-B 做错了，做出来一枚真读数）**：只摘 `case "models"` 分发、**留着 import** ⇒
+    `go list -deps` 里 `internal/models` **还在**、用例**全绿**、`go build ./cmd/wisp/` rc=0。
+    ⇒ 这条仪器的天花板就是预做 §4.2 那句话：**"包在图里"与"符号有人调"是两道门**，AC#3 只能立前者；
+    "接了但没人分发"这一形它看不见，本票靠 AC#2 的 grep 判据（生产调用者点名 file:行）盖住。登记，不装作它已覆盖。
+  **对照腿（STEP 0 那枚半成品）补完之后我自己在容器里量的四条**（`golang:1.27`，warm mod cache，快照根）：
+  `CGO_ENABLED=0` ＋ host GOOS=linux 的 plain 查询 **rc=1**（sherpa-onnx-go-linux 排除全部 Go 文件）**但 stdout 仍含 22 个本仓包**；
+  `CGO_ENABLED=1` ＋ GOOS=linux **rc=0 / 22**；`CGO_ENABLED=0` ＋ 交叉 GOOS=windows **rc=1**（`sherpa-onnx-go-windows: build constraints exclude all Go files`）；
+  `CGO_ENABLED=1` ＋ 交叉 GOOS=windows **rc=0 / 22**。⇒ 硬编码"在不是你所在的平台上重跑 plain"确实是一枚假红，
+  而**报告-only 那一支现在会打印数**：容器里 `-e/no-e` 单向差 = **0 枚**（原文 `0 of this module's packages appear in the -e set and not in the plain output`）。
+  **本机 windows 腿**：`-e set == plain set (22 of this module's packages)`，且 plain rc=0（272 行原始输出）。
+- 2026-09-22 18:1x（`agent-ticket121b`）：**AC#4 复算完 → 勾上**。两个洞我都**自己在真进程＋变异两条腿**重跑：
+  **R-109-2（未点名的条目不参与哈希）**：修前读数我用 `git archive 30a73f1` 那棵树**另编了一枚二进制**跑出来的——
+  同一个已装好、逐枚哈希全对的 store 里塞 `zz-unnamed-extra.onnx` ⇒ `wisp models verify vad-silero` **rc=0，原文"与已验签清单一致"**
+  ⇒ 验收方那形**真的滑得过去**，不是纸面推断。HEAD 上同一枚文件 ⇒ **rc=1**，点名
+  `model dir holds 1 entry the signed manifest does not name: zz-unnamed-extra.onnx`；删掉 ⇒ **rc=0**（反向腿）。
+  **变异 M-C（`downloader.go:593` 那一行换成 `return nil`）**：windows 腿 `TestAC42` 四形**全红** + `TestAC43` 交还腿红；
+  容器（`CGO_ENABLED=0`）腿再加 `TestAC44`（链接站在点名的位子上、哈希全对）+ `TestAC45`（没点名的位子站链接）**红**，
+  而 `TestAC41` / `TestAC46` 两枚反向腿**保持绿** ⇒ 用例既会红也不是恒假。变异恢复后 `grep -c MUTATION` = 0。
+  **R-109-3（按 SID 而不是按名字）**：**变异 M-D**（把 `sidIdentity` 改成直接信 icacls 打的 trustee 文本＝回到按名字判）⇒
+  `TestAC47` 四形里 **3 枚红**（canonical 名 / 短拼写 / 翻不出名字的原始 SID）＋ `TestAC48`（错 SID 必须 0 命中）红 ＋
+  `TestAC49`（翻不出名字必须报错）红；**第 4 形"要的 SID 直接以裸 SID 出现"保持绿**——它本来就不经解析器，绿得对，登记在这里免得被读成漏跑。
+  反向对照"种一个不含那个名字的主体"在两层都有：合成层 `TestAC48` 拿三枚错 SID 各断言 0 命中，
+  活体层 `handoff_window_109_windows_test.go:171`（把父目录的授权摘掉后该对象上必须 0 命中）。
+  **地界**：`git show --stat a7dfca9` 七枚文件全在 `internal/models/` 内 ⇒ `R-109-3` 的正解**没要改 `internal/winsec` 的判定**，
+  改的是本包自己那两枚读 ACL 的测试助手，停手条款没触发。
+
