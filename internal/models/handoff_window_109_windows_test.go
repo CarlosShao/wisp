@@ -30,23 +30,20 @@ import (
 	"testing"
 )
 
-// aceLinesNaming returns the ACE lines of path's descriptor that name the given
-// account, with the path itself stripped the way the ticket 95 helper does.
-func aceLinesNaming(t *testing.T, path, account string) []string {
+// aceLinesOwnedBy returns the ACE lines of path's descriptor that belong to the
+// given account.
+//
+// Ticket 121 AC#4 (R-109-3) is the reason this does not read the way it used to.
+// The version ticket 109 shipped compared the trustee TEXT icacls printed against
+// a hand-typed account name, which silently misses every grant that text does
+// not spell exactly: an unresolved trustee prints as a bare numeric SID, and an
+// account has more than one spelling. internal/winsec's standing rule is that
+// identity is a SID, so the comparison happens there now - `account` is only a
+// label used to look the SID up, and the parser plus its synthetic cases live in
+// acl_sid_121_test.go so both CI legs can judge the logic.
+func aceLinesOwnedBy(t *testing.T, path, account string) []string {
 	t.Helper()
-	raw := icaclsRun(t, path)
-	var out []string
-	for _, line := range strings.Split(strings.ReplaceAll(raw, "\r\n", "\n"), "\n") {
-		line = strings.ReplaceAll(line, path, "")
-		i := strings.LastIndex(line, ":(")
-		if i <= 0 {
-			continue
-		}
-		if strings.EqualFold(strings.TrimSpace(line[:i]), account) {
-			out = append(out, strings.TrimSpace(line))
-		}
-	}
-	return out
+	return aceTextForSID(t, path, account)
 }
 
 func seededStore(t *testing.T) (store string, m *Manifest) {
@@ -60,10 +57,13 @@ func seededStore(t *testing.T) (store string, m *Manifest) {
 		t.Fatal(err)
 	}
 	// "any other local account can write here", spelled the way a profile
-	// directory spells it: inheritable Modify for BUILTIN\Users.
+	// directory spells it: inheritable Modify for BUILTIN\Users. The grant goes
+	// in by SID (usersSID) and the read-back below is by SID too, so the seed
+	// and the judgement cannot drift into naming two different principals.
 	icaclsRun(t, store, "/grant:r", usersSID+`:(OI)(CI)(M)`)
-	if got := aceLinesNaming(t, store, `BUILTIN\Users`); len(got) == 0 {
-		t.Fatalf("the seed did not land, this test would prove nothing; icacls says: %s", icaclsRun(t, store))
+	if got := aceLinesOwnedBy(t, store, `BUILTIN\Users`); len(got) == 0 {
+		t.Fatalf("the seed did not land, this test would prove nothing; every trustee icacls lists on "+
+			"the object: %v", allTrusteesOn(t, store))
 	} else {
 		t.Logf("store root seeded with: %v", got)
 	}
@@ -86,8 +86,8 @@ func TestAC1TheWriteWindowIsAnInheritedCrossAccountRight(t *testing.T) {
 	}
 	target := filepath.Join(dir, filepath.FromSlash(entry.InstalledFiles()[0].Path))
 
-	beforeDir := aceLinesNaming(t, dir, `BUILTIN\Users`)
-	beforeFile := aceLinesNaming(t, target, `BUILTIN\Users`)
+	beforeDir := aceLinesOwnedBy(t, dir, `BUILTIN\Users`)
+	beforeFile := aceLinesOwnedBy(t, target, `BUILTIN\Users`)
 	t.Logf("BEFORE the hand-off guard - install dir %s: %v", filepath.Base(dir), beforeDir)
 	t.Logf("BEFORE the hand-off guard - installed file %s: %v", filepath.Base(target), beforeFile)
 	if len(beforeDir) == 0 || len(beforeFile) == 0 {
@@ -129,8 +129,8 @@ func TestAC1TheWriteWindowIsAnInheritedCrossAccountRight(t *testing.T) {
 		restore()
 	}
 
-	afterDir := aceLinesNaming(t, dir, `BUILTIN\Users`)
-	afterFile := aceLinesNaming(t, target, `BUILTIN\Users`)
+	afterDir := aceLinesOwnedBy(t, dir, `BUILTIN\Users`)
+	afterFile := aceLinesOwnedBy(t, target, `BUILTIN\Users`)
 	t.Logf("AFTER the hand-off guard ran - install dir: %v", afterDir)
 	t.Logf("AFTER the hand-off guard ran - installed file: %v", afterFile)
 	// The reverse leg, at SID level: closing the window must not have touched
@@ -168,7 +168,7 @@ func TestAC4InstallDirWidthIsDeliberateAndHasABreakLine(t *testing.T) {
 	// A store root with NO foreign grant at all: the install dir then inherits
 	// nothing wide, which is the "sealed" shape the ruling forbids silently.
 	icaclsRun(t, store, "/remove", `BUILTIN\Users`)
-	if got := aceLinesNaming(t, dir, `BUILTIN\Users`); len(got) != 0 {
+	if got := aceLinesOwnedBy(t, dir, `BUILTIN\Users`); len(got) != 0 {
 		t.Fatalf("removing the parent's grant left an explicit foreign ACE on the install dir - out-of-band by ticket 89's definition: %v", got)
 	}
 
@@ -182,7 +182,7 @@ func TestAC4InstallDirWidthIsDeliberateAndHasABreakLine(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	lines := aceLinesNaming(t, dir2, `BUILTIN\Users`)
+	lines := aceLinesOwnedBy(t, dir2, `BUILTIN\Users`)
 	if len(lines) == 0 {
 		t.Fatalf("AC#4: the install dir of a store root that grants Users Modify inherits nothing - either this class got sealed "+
 			"(re-open ticket 95's ruling) or the width arrived by hand: icacls %s", icaclsRun(t, dir2))

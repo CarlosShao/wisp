@@ -7,9 +7,11 @@ import (
 	"fmt"
 	"hash"
 	"io"
+	"io/fs"
 	"net/http"
 	"net/url"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -548,19 +550,106 @@ func transportFallback(u string) (string, bool) {
 
 // VerifyDir checks that dir contains every installed file of the entry with
 // exact sha256 and size (cache hits and local_override both use this; cheap:
-// pure streaming hashes, no network).
+// pure streaming hashes, no network), and that dir holds NOTHING ELSE (ticket
+// 121 AC#4, closing acceptor-ticket109b's R-109-2).
+//
+// The second half is the one that was missing. Ticket 109's guard re-hashes the
+// files the manifest names, which answers "was one of these bytes swapped" and
+// says nothing about "something that is not any of these bytes was added".
+// Measured in the real binary before this change (ticket face, AC#4): dropping
+// zz-unnamed-extra.onnx and a sub/ directory into an installed model directory
+// left `wisp models verify` printing 与已验签清单一致, rc=0. That is the shape a
+// loader that opens a file by directory convention gets poisoned by, and it is
+// why "verified" has to mean the whole tree and not the named subset of it.
+//
+// It costs one directory walk with no hashing on top of the hashes, which is
+// why AC#6's timing reading is taken with this check in place.
 func (m *Manager) VerifyDir(entry *ModelEntry, dir string) error {
 	st, err := os.Stat(dir)
 	if err != nil || !st.IsDir() {
 		return fmt.Errorf("model dir %s missing", dir)
 	}
-	for _, want := range entry.InstalledFiles() {
-		p := filepath.Join(dir, filepath.FromSlash(want.Path))
-		if err := verifyFileHash(p, want.SHA256, want.SizeBytes); err != nil {
-			return fmt.Errorf("%s: %w", want.Path, err)
+	want := entry.InstalledFiles()
+	named := make(map[string]bool, len(want))
+	namedDirs := map[string]bool{}
+	for _, w := range want {
+		rel := filepath.ToSlash(filepath.Clean(w.Path))
+		named[rel] = true
+		for d := path.Dir(rel); d != "." && d != "/"; d = path.Dir(d) {
+			namedDirs[d] = true
 		}
 	}
+	for _, w := range want {
+		p := filepath.Join(dir, filepath.FromSlash(w.Path))
+		if err := verifyFileHash(p, w.SHA256, w.SizeBytes); err != nil {
+			return fmt.Errorf("%s: %w", w.Path, err)
+		}
+	}
+	return verifyNothingUnnamed(dir, named, namedDirs)
+}
+
+// verifyNothingUnnamed walks dir and refuses any entry the manifest does not
+// name: an extra file, an extra directory, or a link standing where a file or a
+// directory was expected. Symlinks are called out separately because their whole
+// point is that they reach bytes outside the verified tree - which is the same
+// reason internal/winsec refuses a data root that links its way somewhere else
+// (tickets 108/113/119), and why os.Lstat, not os.Stat, decides the type here.
+func verifyNothingUnnamed(dir string, named, namedDirs map[string]bool) error {
+	var extra []string
+	walkErr := filepath.WalkDir(dir, func(p string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		rel, rerr := filepath.Rel(dir, p)
+		if rerr != nil {
+			return rerr
+		}
+		rel = filepath.ToSlash(filepath.Clean(rel))
+		if rel == "." {
+			return nil
+		}
+		if d.Type()&os.ModeSymlink != 0 {
+			extra = append(extra, rel+" (symlink)")
+			return nil
+		}
+		if d.IsDir() {
+			if !namedDirs[rel] {
+				extra = append(extra, rel+"/")
+			}
+			return nil
+		}
+		if !named[rel] {
+			extra = append(extra, rel)
+		}
+		return nil
+	})
+	if walkErr != nil {
+		return fmt.Errorf("walk model dir %s: %w", dir, walkErr)
+	}
+	if len(extra) > 0 {
+		shown := extra
+		if len(shown) > unnamedListMax {
+			shown = append(append([]string{}, shown[:unnamedListMax]...),
+				fmt.Sprintf("... and %d more", len(shown)-unnamedListMax))
+		}
+		return fmt.Errorf("model dir holds %d entr%s the signed manifest does not name: %v - "+
+			"re-hashing only the named files cannot see an added one, so a loader that opens this "+
+			"directory by name could be handed bytes nobody verified",
+			len(extra), plural(len(extra) == 1, "y", "ies"), strings.Join(shown, ", "))
+	}
 	return nil
+}
+
+// unnamedListMax bounds how many offenders one error line prints; the count in
+// the same line stays exact, so a flooded directory cannot hide behind a
+// truncated message either.
+const unnamedListMax = 12
+
+func plural(one bool, singular, many string) string {
+	if one {
+		return singular
+	}
+	return many
 }
 
 func verifyFileHash(path, wantSHA string, wantSize int64) error {

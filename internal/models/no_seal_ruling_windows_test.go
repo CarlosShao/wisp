@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 	"testing"
 )
 
@@ -33,7 +32,7 @@ func TestAC3ExtractionIsDeliberatelyNotSealed(t *testing.T) {
 	icaclsRun(t, dir, "/grant:r", usersSID+`:(OI)(CI)(RX)`)
 	acl := icaclsRun(t, dir)
 	t.Logf("wide staging parent %s\n%s", dir, acl)
-	if !namesPrincipal(acl, dir, "BUILTIN\\Users") {
+	if !principalHoldsGrant(t, dir, "BUILTIN\\Users") {
 		t.Fatalf("icacls seeding did not land, this test would prove nothing:\n%s", acl)
 	}
 
@@ -53,7 +52,7 @@ func TestAC3ExtractionIsDeliberatelyNotSealed(t *testing.T) {
 		p := filepath.Join(dest, filepath.FromSlash(want.Path))
 		got := icaclsRun(t, p)
 		t.Logf("icacls %s\n%s", p, got)
-		if !namesPrincipal(got, p, "BUILTIN\\Users") {
+		if !principalHoldsGrant(t, p, `BUILTIN\Users`) {
 			t.Errorf("%s stopped being inherit-wide: something sealed this class. Re-open the "+
 				"ticket 95 AC#1 ruling before landing it:\n%s", want.Path, got)
 		}
@@ -65,18 +64,19 @@ func TestAC3ExtractionIsDeliberatelyNotSealed(t *testing.T) {
 	}
 }
 
-func namesPrincipal(acl, path, name string) bool {
-	for _, line := range strings.Split(strings.ReplaceAll(acl, "\r\n", "\n"), "\n") {
-		line = strings.ReplaceAll(line, path, "")
-		i := strings.LastIndex(line, ":(")
-		if i <= 0 {
-			continue
-		}
-		if strings.EqualFold(strings.TrimSpace(line[:i]), name) {
-			return true
-		}
-	}
-	return false
+// principalHoldsGrant reports whether the object's descriptor carries an ACE
+// belonging to the principal named by account.
+//
+// This replaced a text comparison against whatever icacls printed for the
+// trustee (ticket 121 AC#4 / R-109-3, the same correction handoff_window_109
+// carries): the grant this test measures was seeded as a SID (`usersSID`), so
+// answering the question by matching a hand-typed name meant the seed and the
+// judgement were two different spellings of the same principal held together
+// only by this file's optimism. The parser and its synthetic cases are in
+// acl_sid_121_test.go, which runs on both CI legs.
+func principalHoldsGrant(t *testing.T, path, account string) bool {
+	t.Helper()
+	return len(aceTextForSID(t, path, account)) > 0
 }
 
 func icaclsRun(t *testing.T, args ...string) string {
