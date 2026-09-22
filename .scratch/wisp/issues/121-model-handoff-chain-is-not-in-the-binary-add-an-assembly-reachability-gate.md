@@ -168,4 +168,49 @@
   活体层 `handoff_window_109_windows_test.go:171`（把父目录的授权摘掉后该对象上必须 0 命中）。
   **地界**：`git show --stat a7dfca9` 七枚文件全在 `internal/models/` 内 ⇒ `R-109-3` 的正解**没要改 `internal/winsec` 的判定**，
   改的是本包自己那两枚读 ACL 的测试助手，停手条款没触发。
+- 2026-09-22 18:1x（`agent-ticket121b`）：**AC#5 逐字写清残留窗，本格留在 `[ ]`——它没被修，也不许被说成修了。**
+  票面原话是"守卫返回之后到读取者 open 之前**还剩同样形状的一整段**"，接线之后**这一段还在**，逐字如下：
+  - **还剩哪一段**：从 `internal/models/bridge.go:58` 的 `VerifyInstalled` **返回通过**那一刻起，
+    到"谁去 `open` 那枚已验签的字节"那一刻止——整段都在守卫的**后面**，守卫对它一无所知；
+    `wisp models ensure` 走的是 `Run` 返回 state 之后打印一行、`os.Exit(0)`，中间没有任何读取者接手。
+  - **谁占着**：装好那段窗上仍挂着跨账号的继承写授权。本机活体读数（`-v`，`TestAC1TheWriteWindowIsAnInheritedCrossAccountRight`
+    与 `TestAC4InstallDirWidthIsDeliberateAndHasABreakLine` 两枚 PASS）：守卫跑完之后
+    `AFTER the hand-off guard ran - install dir: [BUILTIN\Users (I)(OI)(CI)(M)]`、
+    `AFTER the hand-off guard ran - installed file: [BUILTIN\Users (I)(M)]` ⇒ **继承来的 Modify 仍在**，
+    持有者是 `BUILTIN\Users` 这一 SID 主体（AC#4 之后是按 SID 认的了）。
+    为什么它在那儿：装目录**故意**是继承宽的（票 95 的裁定，钉子是 `internal/models/no_seal_ruling_windows_test.go`），
+    所以父目录授权给过写的那些主体，个个都占着守卫返回之后那一段。
+  - **接线之后是否变成可达＝否**，判据是我自己量的、不是注释里的话：`cmd/wisp` 的依赖图里唯一在 `internal/models`
+    之外拼出 store 路径的代码是 `cmd/wisp/models.go:158` 的 `modelStoreDir`，它只作为 `Options.DataDir` 传进去 + 打印；
+    `Manager.Ensure` 的返回值（`downloader.go:140`，第一个 return 是装好的目录）在 `bridge.Run` 里被 `_, err :=` **丢掉**，
+    `Run` 只往外传 `(statemachine.State, error)`；全图 `os.Open*` 落在 `internal/{winsec(3),observe(1),memory(1),tools(3),models(6)}`，
+    没有一处按 `<store>/<id>/<file>` 去开模型字节。⇒ **这一段今天没有终点**，所以我不据此说"竞态已修"，也不把它算成缺陷交付。
+  - **什么时候变成别人的活**：任何一个把模型字节读进内存的装载器落地那一刻——今天 `internal/speech` 仍只有 `doc.go`、
+    仓内不存在 `internal/engines/`。那张贴了读者的票要自己收这段口，`cmd/wisp/models.go` 的 AC#5 注释块已经把这句话钉在那条边的旁边。
+  - 留在 `[ ]` 的**理由**（免得被读成"忘了勾"）：本格唯一能自动收口的做法是把装目录封窄，而那**正是票 95 明令不许做的事**、
+    且有专门用例钉着；我不拿"写清楚了"冒充"修好了"。
+- 2026-09-22 18:1x（`agent-ticket121b`）：**AC#6 复算完 → 勾上**（这一格要的是"照抄进票面并标噪声"，不是缺陷判定）。
+  仪器 = `internal/models/verify_cost_121_bench_test.go`（Benchmark，不是 Test ⇒ `go test` 与 `portable-tests.sh` 都不会跑到它，
+  也不会变成 SKIP；跑法 `go test ./internal/models -run '^$' -bench BenchmarkAC6 -benchtime=5x -benchmem`）。
+  **逐枚全报，不平均、不调阈值**（256 MiB 一枚文件，`VerifyInstalled` 单次）：
+  - run A（18:09:28→18:09:48）计时腿 892 / 924 / 930 / 888 / 880 ms（301 / 291 / 289 / 302 / 305 MB/s），
+    另有一枚框架预热腿 794 ms（338 MB/s，另一个 store 目录）；同 run 的 `Ensure` 缓存命中对照腿
+    1.03s(261) 预热 + 890 / 927 / 950 / 872 / 882 ms。
+  - run B（18:09→相隔 30s，18:10:17→18:10:38）计时腿 897 / 907 / 955 / 965 / **998** ms（299 / 296 / 281 / 278 / 269 MB/s）；
+    `Ensure` 对照腿 901 / 914 / 923 / 934 / 892 ms。
+  - **与验收方那组的差**：验收方 1.07–1.22 s（220–252 MB/s），我这十枚**全部低于它的下沿**（最大 0.998 s，最慢 269 MB/s）。
+    方向是"更快"，不是"超预算"，所以没有 FAIL 要报；但这不代表验收方那组错——**同形同机差到 20% 量级，本身就是噪声标尺**：
+    我这十枚**全是热页缓存读数**（fixture 刚由本次进程写下，Windows 上没有丢页缓存的手段，本机也没让我重启），
+    而且**采样窗口里另有代理在跑**（`acceptor-ticket118` 正在验票 118，它是否在那 20 秒里编译我不能证明），
+    验收方当时同样是"≥3 个代理在编译、页缓存无法丢弃 ⇒ 全偏热"。⇒ 冷读与真机启动路径**今天没有读数**，别把这两组数当同一种条件。
+  - **"启动翻倍"这句成立**（这是给 owner 看的那个数）：同一枚 256 MiB，`Ensure` 缓存命中已经付 0.87–0.95 s，
+    交还复验再付 0.88–1.00 s ⇒ 两笔同量级，**模型字节的读在启动期确实是两倍**。
+  - **票面那个 707.8 MB 我复算不出来**，登记差值：`models/manifest.json` 六枚的 `size_bytes` 逐枚是
+    32654866 / 643854 / 237202501 / 163002883 / 64717756 / 129347466，合计 **627,569,326 B = 627.6 MB = 598.5 MiB**
+    （逐枚 `files[].size_bytes` 相加 = 626.9 MB，差的 0.6 MB 是 `vad-silero` 那一枚没列 files）。
+    ⇒ 按我测到的 ~300 MB/s，全清单复验 ≈ **2.1 秒量级**，不是票面写的"约 3 秒"；票面那个 707.8 MB 的口径我找不到能对上它的算法。
+  - **AC#4 那道目录树走的边际代价**：同一棵一枚文件的树，把 `downloader.go:593` 那次调用换成 `return nil`（变异 M-C 的形状）
+    再跑五枚 882 / 872 / 923 / 906 / 873 ms ⇒ 与开着它的 880–998 ms **落在同一散布里**，量不出来。
+    ⚠ 这只覆盖"每个模型一枚文件"的形状；条目多/目录深的树我没测，那句"多走一遍目录树、不做哈希"因此是**上限未知**的说法。
+
 
