@@ -25,7 +25,7 @@
       漏了 2 族**可达**的 ERROR（`internal/statemachine/machine.go:139`、`internal/plugin/disposal.go:208/332`）与
       `internal/observe/goroutine.go:271`、`internal/observe/logging.go:204/307`；audio 是 **5** 不是 4、ball 是 **17** 不是 14；
       两处行号已漂（`run.go:347/421` → 实为 `355/429`）。
-- [ ] **AC#4** 门禁：`go test -count=2 -v ./cmd/wisp/ ./internal/observe/` 四数；
+- [x] **AC#4** 门禁：`go test -count=2 -v ./cmd/wisp/ ./internal/observe/` 四数；
       `gofmt -l cmd/wisp/` 与 `"$(go env GOPATH)/bin/gofumpt.exe" -l` 真跑（`logsink_windows_test.go` 曾被 `gofmt -l` 点过名，若仍不格式就改掉）；
       `go vet`；`sh scripts/d22scan.sh` 纯净快照 rc=0 + 台账各 scope 不降（`ban #8 cmd/` 基线 **29**）。
 
@@ -155,3 +155,67 @@ B 漏掉的 4 族 + 分母 + 腿数、C §五 前瞻的口径更新。**本票�
 
 **关停账（AC#1 那一发的副产品，正好填 §一 第 7 行"这半格没采到"）**：常驻腿干净退出 rc=0，
 install 记录之后 **7 条** `shutdown step skipped (module not present)`，step 号 **[1 2 3 4 5 6 7]**、末条仍是 shutdown 记录。
+
+### 2026-09-22 19:2x · agent-ticket127 · **AC#4 完成（翻 [x]）：门禁全部在纯净快照里真跑，四数与同 sha 控制组逐数并列**
+
+**两枚纯净快照**（票 117 §六 那枚"`git archive` 里没有 `third_party/`"的仪器坑照抄，两边都 `cp third_party/sherpa-onnx/*.dll`）：
+- 交件组 `git archive fd82bf4 | tar -x -C /tmp/gate-s127`（含 AC#1 的 533 行用例与 AC#2/AC#3 的注释/票面）
+- 控制组 `git archive 6a39820 | tar -x -C /tmp/ctrl-s127`（本票开工前的树）
+
+**四数（`-count=2`、`-v` 量，两口径并列；不是缓存也不是 SKIP 换来的绿）**
+
+| 包 | 组 | rc | `=== RUN`（全部 / 顶层） | PASS（全部 / 顶层） | FAIL | SKIP | 墙钟 |
+|---|---|---|---|---|---|---|---|
+| `./cmd/wisp/` | 控制 `6a39820` | 0 | **146** / 78 | **146** / 78 | **0** | **0** | 67.681s |
+| `./cmd/wisp/` | **交件 `fd82bf4`** | **0** | **152** / **84** | **152** / **84** | **0** | **0** | 89.758s |
+| `./internal/observe/` | 控制 | 0 | 94 / 94 | 94 / 94 | 0 | 0 | 2.345s |
+| `./internal/observe/` | **交件** | **0** | **94** / **94** | **94** / **94** | **0** | **0** | 2.316s |
+
+`152-146=6` ＝ 本票新增 **3 枚**用例 × `-count=2`，顶层 `84-78=6` 同解（本票没加子用例）⇒ 增量自洽。
+墙钟 `+22.1s` 是本票的形状带来的：每枚用例要先 `go build ./cmd/wisp`（本机 **3.77s** 一发）再起真子进程，
+两枚等 500ms flush tick、一枚等干净退出。**如实登记**：这是这条腿第一次被真跑所付的价，不是回归。
+
+**格式与静态门（都在快照里跑，不在工作树里"我记得"）**
+- `gofmt -l cmd/wisp/`（gate-s127）⇒ **空**；`"$(go env GOPATH)/bin/gofumpt.exe" -l cmd/wisp/ internal/observe/` ⇒ **空**；
+  本机该二进制**存在**，`--version` 原文 **`v0.7.0 (go1.27.1)`** ⇒ 派单里"写未跑必须引错误原文"那一格不适用，两把都真跑了。
+  票面点名的 `logsink_windows_test.go` 本轮 `gofmt -l`/`gofumpt -l` 均**未点名**。
+- `go vet ./cmd/wisp/ ./internal/observe/`（gate-s127）⇒ **rc=0**。
+- `sh scripts/d22scan.sh`（gate-s127）⇒ **rc=0 / clean**，正向对照（step 1 `runtests.sh -C tools/d22scan ./...`）
+  原文 `runtests.sh: OK - packages=[./...] top-level: PASS=21 FAIL=0 SKIP=0, === RUN=31, '[no tests to run]'=0`（控制组逐字同）。
+
+**台账八 scope：交件组 vs 同 sha 控制组逐数并列（不许任何 scope 下降）**
+
+| scope | 控制 `6a39820` | 交件 `fd82bf4` | 判 |
+|---|---|---|---|
+| bans #1-5 `internal/` | 202 | **202** | 持平 |
+| bans #1-5 `cmd/` | 22 | **22** | 持平 |
+| ban #6 `frontend/` | 40 | **40** | 持平 |
+| ban #7 `internal/tools/` | 18 | **18** | 持平 |
+| ban #8 `design/` | 16 | **16** | 持平 |
+| ban #8 `frontend/` | 40 | **40** | 持平 |
+| ban #8 `internal/` | **382** | **382** | 持平（派单给的 382 逐字复算为真） |
+| ban #8 `cmd/` | **31** | **32** | **+1**，来源逐字：本票新增 `cmd/wisp/resident_sink_nail_127_windows_test.go` 进入 emoji/注释扫描的"Go files, comments and `_test.go` included"口径 |
+
+⚠ 票面 AC#4 写的基线 **29** 是票 117 时期的数；**同 sha（`6a39820`）控制组今天量到 31**（票 121/119b 期间 `cmd/` 多了文件）。
+本票以**同 sha 控制组**为准（31→32），没有下降的 scope，`tools/d22scan/**`、`allowlist.txt`、任何阈值/golden 一字未动。
+
+**别的格子顺带量的**：AC#1 变异组（`/tmp/s127-mut`，删那 20 行）的 `-count=1` 全量四数 **RUN 76 / PASS 73 / FAIL 3 / SKIP 0**、
+`go build`/`go vet` rc=0 —— 见上面 AC#1 那一格。
+**票 123 那批 CLI 用例本票一字未动**，判据不是"我说没动"而是两行可核的数：
+`git diff --stat 6a39820..fd82bf4 -- cmd/wisp/` = `3 files changed, 562 insertions(+)`、**0 deletions**（纯插入），
+且**交件组与控制组的 `./cmd/wisp/` 都是 FAIL=0** ⇒ 那批用例的红（如果还存在）既不在本票的交件组里、也不是本票消掉的；
+本轮两组 152/146 条里 `审批超时` 那批不在红名清单（红名只有 AC#1 变异组那三枚）。
+
+### next=（本票交回）
+
+1. **票 117 可以结案**：R-117-A（常驻腿零钉）已由 `8663a39` 的三枚用例闭合，且 M4 重量给了逐字红名；
+   R-117-C、R-117-D 两处纸面分别落在「更正一」「更正二」。**验收方要重量的话**：命令原文与两枚快照路径都在 AC#1/AC#4 两格里。
+2. **`defer sink.close()` 那一行的"在不在"是编译器钉的、"先后"是第 3 枚用例钉的**，但后者有 ~2% 的 500ms flush-tick 折扣（本机 2/2 红）。
+   要抹掉这 2%，得给 `LogPipeline` 一个"最后一条记录的落盘时刻"可查的缝——那是 `internal/observe` 的地界，不在本票。
+3. **`logging.go:204` 那一格是真缺口**：听众装不上那一瞬，听众自己的失败发在 `slog.SetDefault` 之前 ⇒ 永远进不了它抱怨的那本文件。
+   修法（先装再 sweep，或把这一条改发到一个显式 writer）在 `internal/observe`，本票只在票 117 更正二的 B-13 行登记了形状。
+4. **票 07/34 接线时必须重跑本票 AC#1 那一发**：常驻腿今天"没有密封点"是因为它什么都不干；
+   球/音频一接上，`internal/ball` 的 17 枚（含逐帧可重复的 `:393`/`:417`）与 `internal/audio` 的 5 枚会开始往同一本文件写，
+   分母与"最坏每秒几条"按票 117 更正二的 B-14/C 两段取。
+5. **`cmd/wisp` 的 Linux 形状**仍未证（AC#2）：谁要做那一格，先决定 `sherpa-onnx-go-linux` 的 build constraints 怎么绕，
+   再谈 `ci.yml`（冻结件）——顺序不能反。

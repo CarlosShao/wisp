@@ -569,7 +569,7 @@ owner 关掉窗口、或者进程不是他从终端起的（GUI 双击启动＝s
   `go test ./cmd/wisp/` 在那条腿上**也编不过**（同一条 sherpa 错误）⇒ 先要有人决定 `cmd/wisp` 的 linux 形状，
   那是票 111/93 的 scope 地盘，不是本票地界。
 
-同一格第二半照此复算：本票 §二 那三条 AC#3 用例（`cmd/wisp/logsink_test.go`，untagged）在 CI 上
+同一格第二半照此复算：本票 §三 那三条 AC#3 用例（`cmd/wisp/logsink_test.go`，untagged）在 CI 上
 **任何平台都只在 Windows 执行**——`ci.yml` 里跑 `./cmd/wisp/` 的只有 windows-latest job 的
 "cmd/wisp CLI tests" 那一步（ubuntu job 走 `bash scripts/portable-tests.sh --scope=core`，清单里没有 `cmd/wisp`）。
 票 127 新加的三枚常驻腿用例带 `//go:build windows`，走的是同一条腿、同一个 step。
