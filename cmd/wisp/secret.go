@@ -120,6 +120,21 @@ func resolveSecretLayout(env buildinfo.Env) (proc.Layout, error) {
 	if err != nil {
 		return proc.Layout{}, fmt.Errorf("wisp secret: user config dir: %w", err)
 	}
+	// Ticket 119's rework (R-119-1): `wisp secret` is the second production
+	// reader of that OS answer, and it never passes through proc.DefaultLayout,
+	// so the resolution ticket 119 installed there did not reach this line. On a
+	// dotfiles-managed Linux home $HOME/.config is a symlink, and macOS spells
+	// both /tmp and /var that way, so the root handed to winsec's placement floor
+	// (internal/winsec/winsec_other.go, ticket 113) was unresolved and the first
+	// sealing call refused it: measured on one and the same binary, `wisp doctor`
+	// printed the resolved tree while `wisp secret list` returned rc=1 in three
+	// dev shapes (HOME through a link, $HOME/.config itself a link,
+	// XDG_CONFIG_HOME through a link). Ruling R-119-3, pinned by
+	// TestAC1POSIXSecretRouteSymlinkedHomeBecomesSealable119: what this process
+	// learns by asking the OS is resolved, because a data root is a location
+	// contract; what it is handed by name (proc.TestDataDirEnv) is returned
+	// verbatim, because whoever wrote it compares strings with the answer.
+	root = proc.SealableRoot(root)
 	exeDir := ""
 	if exe, err := os.Executable(); err == nil {
 		exeDir = filepath.Dir(exe)
