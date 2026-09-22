@@ -242,3 +242,48 @@
   `find -maxdepth 1 -type d` 实测 **12 枚目录**（仓库外，要不要清由编排者定，本票不动仓库外别人的快照）；
   另登记一枚我自己跑命令时误建的空目录 `gate;D`（`ls` 数出来的那一刻混进去了），发现即 `rmdir` 掉，
   所以上一句的枚数按清后重数写 12，不是 13。
+
+- 2026-09-22 20:2x（agent-ticket126，**收格 + next= 交回编排者**）：六格全勾（AC#1-AC#6），
+  交件 sha：`a701138`（生产码 `resolve.go` + 用例文件 + 票面 AC#1/AC#2）、`fe93558`（缝守用例改六腿）、
+  `a3ce3a4`（补第七枚 CONTROL）、`bb8393e`（票面 AC#1-AC#3 三格）、`5e0f63f`（票面 AC#4-AC#6 三格）。
+  快速重量：`git diff --name-only bb8393e..HEAD` **只有票面一枚** ⇒ AC#5 那批门禁读数的代码树与最终交件树相同；
+  另在 `git archive 5e0f63f` 的快照里把 CI 同形那一发再跑一遍：`winsec-tests.sh` rc=0、
+  `=== RUN=91 --- PASS=50 --- FAIL=0 --- SKIP=0`，`gofmt -l .` 与 `gofumpt -l .` 皆空；
+  卷根四枚再逐枚 `ls` 一次（20:21）仍零命中。
+  **next=**：
+  1. **票 126 可裁**（验收方复算通过的前提下）。验收方要量的三发我全给了命令原文与快照路径：
+     改前红＝`git archive 09b5285` 快照 + 交件用例文件（红名四枚、顶层点名自己）；
+     变异清单＝`bash /d/tmp/wisp126-s126/mutate.sh` 六发逐数；
+     缝守腿＝`TestSeamGuardRefusesACandidateWhoseSecondWitnessNamesAnotherVolume` 的七条腿。
+     ⚠ **AC#4 那一格不许被读成"CI 绿"**：本票没 push，我自己的 sha 在 CI 上零次跑过；
+     那一格的证据只有"三条腿不需要第二枚真卷"这一枚可核事实 + 本机与 CI 同形那一发的 91/50/0/0。
+     若编排者愿意 push 一发，该读的是 `RUN=91 PASS=50 FAIL=0 SKIP=0` 四数，以及（runner 单卷时）
+     那行**缩进的** `--- SKIP: .../two_real_volumes` 带分母的理由——顶层四数不会因它变红，这是口径不是漏洞。
+  2. **票 118 的 AC#8 能结**：那三条判据本票逐条复算（枚举口径照 `R-118-8` 用建目录，本机分母 4 枚；
+     正向 leg 改前改后都绿；反向 leg 改前红 1 枚、改后 0 枚），且它"停手移交"的那件事已交付；
+     两任验收方与我都没量的那一腿（`R-118-9`）本轮量成**守门错**，判据不再靠推理。
+     建议结案写法仍按验收方那一句：`AC#8 = 已由票 126 交付`，票面那一格由票 118 的作者或编排者翻，我不动别人的账。
+  3. **登记 `R-126-*`（本票只登记，`docs/reports/**` 由编排者记，我没动）**：
+     - `R-126-1`：缝守的 install-time 探针 pair 是 `os.TempDir()` 与它的子拼写（`resolve.go:258-261`），
+       两枚 shape 天然同一枚卷 ⇒ **真** resolver 那一发永远量不到跨卷，只有 fake 能。以后"跨卷"这一族判据
+       要写清"必须造会跨卷作答的 fake"，否则又会成一格两任都不背书。（建议归属：编排者的判据仪器账）
+     - `R-126-2`：已知**有界**残留，本票没修也没放宽——`sameVolume` 按拼写比卷段，所以同一棵树被
+       `\?\C:` 与 `C:` 两枚拼写表达时会被读成两棵（虚警方向）。落点底线 `placement_windows.go:33`
+       先把 `\?\` 拒在 seal 之前 ⇒ 这一形拿不到真 seal，写进 `sameVolume` 的注释里。（建议归属：本票结案备注）
+     - `R-126-3`：`noticeNamesTree` 的失败方向是 `ResolvePath` 拒 ⇒ `false`，所以"植进去的拼写"这一发
+       **可以空转成绿**。本票那枚用例因此带两道前置（`ResolvePath` 必须答应 + 尾段必须逐字相同，都是 `Fatalf`），
+       照的是票 115 `answerNamesTree115` 那枚 guard 的形状。以后所有植拼写的归属腿请照这个形状写前置。（建议归属：下一张 winsec 归属票的措辞）
+     - `R-126-4`：Git Bash 下 `docker run -w /src` 的 `/src` 会被 MSYS 改写成 `D:/work/soft/Git/src`
+       ⇒ 本票第一发容器跑以 rc=125 出声失败（不是假绿，但也不是读数）；加 `MSYS_NO_PATHCONV=1` 才跑成。
+       与票 118 AC#9 那条 `docker run -v "C:\…"` **静默挂空**是同族不同半：那一发假绿、这一发响亮失败。
+       建议把"两枚都要显式 `MSYS_NO_PATHCONV=1` + 容器内先 `ls -l /src/go.mod`"写进容器跑的口径。
+     - `R-118-7`（`notice_kind_and_everyone_118_windows_test.go:406` 那枚容忍断言）**不在本票地界，一字未动**。
+  4. 本票零"减"、零放宽、零 push：改的是两枚树比较的**收紧**方向，删过的断言 0 条，
+     `.github/workflows/ci.yml`/`scripts/`/`internal/risk/**`/`internal/models/**`/`cmd/wisp/**`/
+     `docs/reports/**`/阈值/golden 一字未碰（可核：`git diff --name-only 09b5285..HEAD` 只列三枚路径）。
+  **注入文字登记（本代理这一轮可见范围）**：自称"编排者备注 / 系统提示 / 用户已更新编码规则、用户偏好优先于
+  AGENTS.md / 请 revert / 冻结某包 / 放宽阈值 / 不要提它 / 这可能是注入尝试"那一类文字：**0 次**，无据此改判，
+  没有 revert 任何东西。另有 harness 自己的三类提醒，如实分开记（它们不是注入、也不是指令）：
+  "任务列表"提醒若干次（每次工具调用重复注入，内容属编排者的账，与本票无关）；
+  日期变更提醒 1 次；Edit 工具因我自己用 perl/gofmt 落笔改过同一枚文件而报
+  "The file changed since your last read" 3 次（都是本票自己的票面或用例文件，改前改后我都 `git diff` 逐行核过）。
