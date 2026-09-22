@@ -33,7 +33,7 @@
       种一个不含那两个字母的主体 ⇒ 旧识别法会误认，新判定必须不认。
 - [ ] **AC#4** **不新增任何判定分支、不改生产码一行**：如果某条判据必须动 `winsec_windows.go` 才成立，
       **停手登记交回编排者**（那是票 115 或新票的地界），不要顺手改。
-- [ ] **AC#6（编排者 21:2x 追加，来源=`acceptor-ticket113` 的 `R-113-C`）** POSIX **叶子方向**缺两枚用例：
+- [x] **AC#6（编排者 21:2x 追加，来源=`acceptor-ticket113` 的 `R-113-C`）** POSIX **叶子方向**缺两枚用例：
       交付的 5 枚 AC#1 用例里链接**全放在祖先位**，只有 `SealDir` 那枚碰叶子位 ⇒
       验收方的 MUT-B（`pieces = pieces[:len(pieces)-1]`，即"不查叶子"）**只让 1 枚红**，
       而它自造的 `SealFile(link)` / `PrivateFile(link)` 两枚在现码上绿、在 MUT-B 上红
@@ -127,3 +127,17 @@
     注：票面 AC#1 写的"`winsec_windows.go:80-86` 那个 switch"是建票时的行号，今天的真实位置是 `:136-142`
     （115 那批把通知内容搬进这个文件之后行的）；我按 switch 的字面形状删的，不是按行号。
   勾了 AC#1/AC#2/AC#3/AC#7 四格；AC#6/AC#9 等容器读数，AC#5/AC#8 后做。
+- 2026-09-22 10:2x（agent-ticket118b，AC#6 容器复算＝勾，来源 commit `0b1fd06`）：POSIX 那一腿只能真跑，
+  命令原文（挂载后**先证明文件在**，规避 Git Bash 下 `-v "C:\…"` 静默挂空的假绿）：
+  `MSYS_NO_PATHCONV=1 docker run --rm -e CGO_ENABLED=0 -e WISP_ENV=test -v /d/tmp/wisp118-s118b:/work -v wisp118mod:/go/pkg/mod -v wisp118build:/root/.cache/go-build -w /work golang:1.27 sh -c 'ls -l /work/base/go.mod /work/mut-mutb/go.mod && …'`
+  容器内 `ls -l /src/go.mod`/`ls /work/base/go.mod` 打得到字节（883 bytes），`ls /work/base/internal/winsec | wc -l` = 26。
+  - 基线（纯净快照 `base`＝HEAD，linux/amd64，`go test -count=1 -v ./internal/winsec/`）**rc=0**：
+    `=== RUN`=42、顶层 `--- PASS`=27、`--- FAIL`=0、`--- SKIP`=0；`placement_leaf_118_other_test.go` 的两枚
+    `TestAC118POSIX{SealFile,PrivateFile}RefusesALinkStandingWhereTheFileWasNamed` 在现码上绿。
+  - **MUT-B**（`winsec_other.go` 的走链改成 `pieces := pathPieces(path); for _, prefix := range pieces[:len(pieces)-1]`，
+    即"只走祖先、不看叶子"）：容器内先 `sed -n '128,136p'` 印出改后的那几字节**证明落地**、再
+    `go vet ./internal/winsec/` **rc=0**，然后读数——**红 3 枚**（`0b1fd06` 之前是 1 枚）：
+    `TestAC1POSIXSealDirThroughASymlinkRefuses`（票 113 交付的那一枚）+ 本格补的两枚，红名是行为的而不是拼写的：
+    `placement_leaf_118_other_test.go:84` `AC#6 RED: SealFile(...) left the victim at mode=600 …, it was mode=666 - the mode change followed the leaf`、
+    `:114` `AC#6 RED: PrivateFile(...) replaced the victim's bytes ("not this tree's data" -> "top secret")`、`:118` 同一发受害者 mode。
+    ⇒ 前任自述的"实现对、覆盖缺两枚"这一格复算成立；票面 AC#6 要求的"半修 MUT-B 现在至少红 3 枚"达成（正好 3）。
