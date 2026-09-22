@@ -62,7 +62,7 @@
       ⇒ 要一发**能红的对照用例**：造两棵"尾段逐字相同、卷不同"的树（造不出真第二卷就用 `subst`/UNC/或明确写"本机造不出"），
       断"另一棵树的通知不得归到本树"。**如果它证明的是生产判据（不只是测试判据）会归错 ⇒ 停手回报，不要自己改 `winsec_windows.go`**，
       我会另开立票；如果证明测试形状本来就归不错，就把这句读数写进票面销账。
-- [ ] **AC#9（来源 `agent-ticket119` 待裁第 1 条，我的裁定＝改）** `internal/proc/envfork_test.go:108`
+- [x] **AC#9（来源 `agent-ticket119` 待裁第 1 条，我的裁定＝改）** `internal/proc/envfork_test.go:108`
       那枚断言编码的是**票 119 修前的拼写**（软链 TMPDIR 形状下由绿转红、正常形状仍绿）。
       ⇒ 把它改成断"该树已被调用方解析"的**语义**而不是某个拼写，并按 119 的读数以容器真跑复现
       修前红/修后绿。**注意地界**：本格只碰这一枚 `_test.go`，`internal/proc/envfork.go` 是票 119 已交生产码，一行不许动。
@@ -141,3 +141,20 @@
     `placement_leaf_118_other_test.go:84` `AC#6 RED: SealFile(...) left the victim at mode=600 …, it was mode=666 - the mode change followed the leaf`、
     `:114` `AC#6 RED: PrivateFile(...) replaced the victim's bytes ("not this tree's data" -> "top secret")`、`:118` 同一发受害者 mode。
     ⇒ 前任自述的"实现对、覆盖缺两枚"这一格复算成立；票面 AC#6 要求的"半修 MUT-B 现在至少红 3 枚"达成（正好 3）。
+- 2026-09-22 10:3x（agent-ticket118b，AC#9 容器复算＝勾，来源 commit `3b03f00`）：形状＝容器内
+  `ln -sfn /tmp/realtree /tmp/linktree` + `TMPDIR=/tmp/linktree`；挂载仍用 `/d/...` 且容器内 `ls -l /work/base/go.mod`
+  打到 883 bytes。五发读数（`go test -count=1 -v -run TestLayoutForTestEnv ./internal/proc/`，全部在
+  `git archive HEAD` 的快照副本里做，仓库树的 `envfork.go` 一行未动）：
+  | 树 | TMPDIR | rc | 读数 |
+  |---|---|---|---|
+  | `base`（现码＋新断言） | `/tmp` 实目录 | 0 | 绿 |
+  | `base` | `/tmp/linktree` 软链 | 0 | 绿，`:139` 记 `DataDir = "/tmp/realtree/wisp-test-161" (TMPDIR = "/tmp/linktree", which reaches "/tmp/realtree")` |
+  | `mut-oldassert`（把断言退回 118 之前那句字符串比较） | 软链 | **1** | `envfork_test.go:121: test DataDir = "/tmp/realtree/wisp-test-70", want "/tmp/linktree/wisp-test-70"` |
+  | `mut-pre119`（`TestDataDir` 退回 119 前那发：不走 `SealableRoot`） | 软链 | **1** | `:137 the test data root "/tmp/linktree" still reaches itself through the link at "/tmp/linktree" …`（**新**断言红，且红在"树里仍留软链"那一腿，不是拼写腿） |
+  | `mut-pre119` | 实目录 | 0 | 绿——同一枚断言在没有链的形状上不制造红 |
+  ⇒ 三条各自成立：修前拼写在软链形下确实红（第 3 行）、新断言在**正确的**实现上绿（第 2 行）、
+  新断言**不是恒真**（第 4 行在把生产码退回 119 之前那一发上红）。第 5 行是它也不是恒假的对照。
+  如实登记一处与前任自述的差：`3b03f00` 的 commit message 写"把 TestDataDir 退回 119 前那一发×软链 TMPDIR 下新断言红"，
+  但**红点具体落在哪一腿**它没写；我量到的是 `firstLinkInPath` 那一腿（`:137`），
+  `os.SameFile` 那一腿在 pre-119 形状下**不红**（`/tmp/linktree` 与 `/tmp/realtree` 是同一 inode，`os.Stat` 会跟链）——
+  也就是说那枚 SameFile 断言守的是"别换一棵树"，软链形状由 `:137` 那一腿守，两腿不是同一件事，读数各自独立成立。
