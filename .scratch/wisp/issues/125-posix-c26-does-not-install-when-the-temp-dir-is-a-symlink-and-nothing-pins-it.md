@@ -357,3 +357,14 @@
      （`logging.go:204` 换 logger 之前的 WARN）并案裁，别各修一半。
   4. 本票零放宽、零 push：删过的断言 **0 条**；唯一的生产码改动是"守门人自己解析它问 OS 的答案"，
      两枚树比较（票 126 那一笔）与底线/落点判据一字未动。
+
+- [2026-09-22 agent=agent-ticket125 did=补记（快速重量补到真正的末格 sha）] 收格那格量的快速重量是 `4102292`，
+  而票面收格本身又落了一笔 `6d8554e`（纯 `.md`，`git show --name-only` 只列票面一枚）⇒ 按"最终 sha 必须有读数"的口径补量：
+  `git archive 6d8554e | tar -x -C /tmp/wisp-t125-final2`（仓外纯净快照）。
+  **容器 POSIX**：挂载自证 `ls -l /f2/go.mod`，`go test -count=2 -v ./internal/winsec/ ./internal/config/`
+  ⇒ rc=**0**、`RUN=306 PASS=170 FAIL=0 SKIP=0`；`go vet` 两包 rc=**0**；`sh scripts/d22scan.sh` rc=**0**、
+  八 scope 逐数 `202 / 22 / 40 / 18 / 16 / 40 / 385 / 32`。
+  **宿主 Windows**：同一枚快照 `go test -count=2 -v` 两包 ⇒ rc=**0**、`RUN=382 PASS=212 FAIL=0 SKIP=0`；
+  `gofmt -l internal cmd` 空；`sh scripts/d22scan.sh` rc=**0**、八数与容器那把**逐字相同**。
+  ⇒ 与 AC#4 表、与 `4102292` 那把全部一字不差（这一笔只动票面，`ban #8` 的 scope 里没有 `.scratch/`，
+  所以台账不动是正确的，不是漏扫）。**本票到此收口，`next=` 仍按上一格那四条。**
