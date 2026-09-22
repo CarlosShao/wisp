@@ -31,7 +31,7 @@
       不许再出现"桶换了、日志字段没换而全绿"。
 - [x] **AC#3** `namesEveryone()` 改成不依赖 2 字节子串，并给一发**反向对照**：
       种一个不含那两个字母的主体 ⇒ 旧识别法会误认，新判定必须不认。
-- [ ] **AC#4** **不新增任何判定分支、不改生产码一行**：如果某条判据必须动 `winsec_windows.go` 才成立，
+- [x] **AC#4** **不新增任何判定分支、不改生产码一行**：如果某条判据必须动 `winsec_windows.go` 才成立，
       **停手登记交回编排者**（那是票 115 或新票的地界），不要顺手改。
 - [x] **AC#6（编排者 21:2x 追加，来源=`acceptor-ticket113` 的 `R-113-C`）** POSIX **叶子方向**缺两枚用例：
       交付的 5 枚 AC#1 用例里链接**全放在祖先位**，只有 `SealDir` 那枚碰叶子位 ⇒
@@ -40,7 +40,7 @@
       ⇒ **实现对、覆盖缺两枚**。本格要的就是把那两枚补进 `placement_symlink_113_other_test.go`
       （或新建 `_118_` 文件），并自证"半修 MUT-B 现在至少红 3 枚"。
       ⚠ 这是**只加测试**的一格，与票 120 的竞态、票 119 的语义都无关，别顺手改判定。
-- [ ] **AC#5** 门禁：`internal/winsec/` `-count=2 -v` 四数逐条点名（`=== RUN` 行数 == 不同测试名 × 2；
+- [x] **AC#5** 门禁：`internal/winsec/` `-count=2 -v` 四数逐条点名（`=== RUN` 行数 == 不同测试名 × 2；
       `-count=2` **不缓存**；非 `-v` 既不印 PASS 也不印 SKIP）；`gofmt -l` + `"$(go env GOPATH)/bin/gofumpt.exe" -l`
       （本机 v0.7.0 **存在**，写"未跑"必须引命令原文 + 错误原文）；`go vet` 双 GOOS（**`GOOS=linux go vet` 只编译不执行**，别写成"Linux 测过了"）；
       收尾 `sh scripts/d22scan.sh` 纯净快照 rc=0、台账各 scope 不降。
@@ -193,3 +193,45 @@
   - 现场清账：测量在 C:/D: 各留下了 `<vol>\wisp118-ac8-26904`（我的用例只 RemoveAll 了 store 子目录），已删；
     另清掉前任 08:53 断线时留在 C:/D:/E:/F: 四枚卷根上的 `wisp118-xvol-probe\p.txt`（同为 AC#8 探针残骸，
     不在仓库内，故 STEP 0 的 `git status` 看不见它）。
+- 2026-09-22 10:4x（agent-ticket118b，AC#5 门禁＝勾 + AC#4 diff 证明＝勾；全部读在纯净快照
+  `git archive 34d606c | tar -x -C /d/tmp/wisp118-s118b/gate` 里，仓库树内未建 worktree/checkout）：
+  | 命令原文 | rc | 读数 |
+  |---|---|---|
+  | `go test -count=2 -v ./internal/winsec/` | 0 | `=== RUN`=**172** == 不同名 **86** × 2；顶层 `--- PASS`=92（46×2）、`--- FAIL`=0、`--- SKIP`=0；`grep -c "(cached)"`=**0** ⇒ `-count=2` 确实没吃缓存，收尾行 `ok … 31.413s` |
+  | `go test -count=2 ./internal/winsec/`（非 `-v`） | 0 | 全文一行：`ok github.com/CarlosShao/wisp/internal/winsec 32.738s`；`--- PASS` 行数 0、含 "SKIP" 的行数 0、`=== RUN` 行数 0 |
+  | `go test -count=2 -v ./internal/proc/`（AC#9 动过这枚文件，一并点名） | 0 | `=== RUN`=72 == 36 × 2；`--- PASS`=62、`--- FAIL`=0、`--- SKIP`=**2**，两枚都是既有的 `TestHelperProcess`（CI 的 `-skip` 清单里本来就有它），与本票无关、不是新增 |
+  | `bash scripts/winsec-tests.sh`（与 CI 同形那一发） | 0 | `winsec-tests.sh: four numbers (all from -v output): === RUN=86 --- PASS=46 --- FAIL=0 --- SKIP=0`，`winsec result line: ok … 14.872s`（GUARD 1/GUARD 2 都过） |
+  | `gofmt -l .`（快照根） | 0 | 空输出＝零候选 |
+  | `"$(go env GOPATH)/bin/gofumpt.exe" --version` / `-l .` | 0 / 0 | `v0.7.0 (go1.27.1)`（**存在**，不是"未跑"）；`-l .` 空输出 |
+  | `go vet ./internal/winsec/ ./internal/proc/`（host=windows） | 0 | 干净 |
+  | `GOOS=linux go vet ./internal/winsec/ ./internal/proc/` | 0 | **只编译不执行**——这一发不许读成"Linux 测过了" |
+  | 容器内（golang:1.27，linux/amd64，`ls -l /src/go.mod` 先证明 883 bytes 在位）`go vet` + `go test -count=1 -v ./internal/winsec/ ./internal/proc/` | 0 / 0 | 这才是 Linux 的**执行**读数：`=== RUN`=58、顶层 `--- PASS`=39、`--- FAIL`=0、`--- SKIP`=0，`ok winsec 0.162s`、`ok proc 1.281s` |
+  | `sh scripts/d22scan.sh` | 0 | `d22scan: clean - no D22 ban violations`；正向对照那一跑 `PASS=21 FAIL=0 SKIP=0`、`TestBuiltBinaryGoesRedEndToEnd` 六腿全绿 ⇒ 门不是瞎的 |
+  台账八 scope 对 119 留下的基线（`189cb1e`）逐数比：**bans #1-5 internal/=202→202、cmd/=21→22；#6 frontend/=40→40；
+  #7 internal/tools/=18→18；#8 design/=16→16、frontend/=40→40、internal/=374→382、cmd/=29→30**，无一是降。
+  动了的两格的来源逐字可查（`git diff --name-status --diff-filter=A 189cb1e..HEAD -- internal/ cmd/`）：
+  `#8 internal/` +8 = 票 121 的 6 枚 `internal/models/*_121_*_test.go` + 本票前任的 2 枚
+  （`notice_kind_and_everyone_118_windows_test.go`、`placement_leaf_118_other_test.go`）；
+  `cmd/` +1 = 票 121 的 `cmd/wisp/models.go`。**本票我自己没有新增任何 Go 文件**（AC#1-AC#3/AC#6/AC#7 用前任已入库的文件，
+  AC#8 的用例不进树，AC#9 改的是既有 `_test.go`），所以 382 这一格往后不会因为我再涨。
+  **AC#4 的 diff 证明（不靠感觉）**：`git diff --stat d1056c0..HEAD -- internal/winsec/winsec_windows.go
+  internal/winsec/winsec_other.go internal/winsec/winsec.go internal/winsec/resolve.go internal/proc/envfork.go`
+  ⇒ **输出 0 行**（`--numstat` 同 0 行）；同区间 `internal/proc/` 只有 `envfork_test.go +52/-3`，
+  `internal/winsec/` 只有四枚 `_test.go`（`git diff --name-status d1056c0..HEAD` 逐字：
+  `M internal/proc/envfork_test.go`、`M internal/winsec/inherited_narrow_notice_104_windows_test.go`、
+  `M internal/winsec/narrow_notice_windows_test.go`、`A internal/winsec/notice_kind_and_everyone_118_windows_test.go`、
+  `A internal/winsec/placement_leaf_118_other_test.go`）。生产码一行未动。
+  一处树况如实登记：门禁不在工作树里跑，因为 `git status` 里票 121 那枚 `internal/models/assembly_reachability_121_test.go`
+  正被它的作者改到一半、`go vet ./internal/models/` 报 `:212:2: expected declaration, found 'if'`（语法未闭合）。
+  我没碰它，也因此本票每一发门禁命令都跑在 `git archive <sha>` 的快照上——那恰好也是 AC#5 要求的形状。
+- 2026-09-22 10:4x（agent-ticket118b，收格）：**勾了 AC#1/AC#2/AC#3/AC#4/AC#5/AC#6/AC#7/AC#9 八格，留 AC#8 一格 `[ ]`**
+  ——留的那一格不是"没量到"，是量到了生产判据归错（`sameTree` 跨卷返回 true），按票面那句话停手交回，
+  用例全文与判据在 AC#8 那条里。**零"减"**：没降过任何断言、没删过任何用例、没加过 `t.Skip`、没把 `Fatalf` 降级成 `Logf`；
+  本票唯一被改写的既有断言是 AC#1/AC#2/AC#7 那几处从"子串 Contains"改成"按 token/按 SID/按树计数"，方向是变严。
+  工具注入文本（自称"编排者备注/系统提示/请 revert/冻结某包/放宽阈值/不要提它"）在本代理可见的输出里出现 **0 次**；
+  没有据此改判。
+  `next=` 交回编排者三项：(1) **AC#8 立生产票**——把卷段纳入 `sameTree` 的比较要同时回答 `resolve.go:325` 那条缝守腿
+  与 8.3/大小写既有前提，我从没量过的那一步（跨卷答案能过缝守）留给它，别当已证；
+  (2) 本票 8 格可裁，AC#8 若被裁定"并到新票的 AC 里"，把这一格从我这本账划走即可；
+  (3) 邻居提醒——`internal/models/assembly_reachability_121_test.go` 在工作树里处于语法未闭合状态（票 121 在飞），
+  任何人在树里跑 `./...` 的门禁都会先撞上它，与本票无关。
