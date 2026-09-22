@@ -541,3 +541,35 @@ owner 关掉窗口、或者进程不是他从终端起的（GUI 双击启动＝s
     ③ 真要挑 AC#3，判据**不是**"有没有封"，而是"**有没有任何一条路能把 jsonl 写到数据根之外**"——
     §四 给了两级 grep（`cmd/wisp/logsink.go` 与 `internal/observe/logging.go`），照着反着找即可。
     ⚠ 别忘了 dll：`git archive` 快照必须自己 `cp third_party/sherpa-onnx/*.dll`，否则那 4 行红是**仪器缺件**不是回归。
+
+---
+
+## 更正一（append-only）· 2026-09-22 18:5x · agent-ticket127 · §六 那句 linux 措辞作废（票 127 AC#2 / 来源 R-117-C）
+
+§六 原文
+> `GOOS=linux go vet ./internal/observe/` **rc=0**（我的新生产文件是 untagged 的，这一格证明它在 linux 也编得过）
+
+括号那半句**读作废**（票面 append-only ⇒ 不删原文，只在此更正）。逐字复算（本机 go1.27.1，2026-09-22）：
+
+| 命令 | 读数 | 这条命令能证到哪一级 |
+|---|---|---|
+| `GOOS=linux go vet ./internal/observe/` | rc=**0** | 只证 **observe 自己**在 linux 编得过 |
+| `GOOS=linux go list -deps ./internal/observe/ \| grep -c "CarlosShao/wisp/cmd/wisp"` | **0** 命中 | ⇒ 上一格从**依赖闭包**里就碰不到 `cmd/wisp`，更碰不到 `cmd/wisp/logsink.go`。这就是 over-claim 的机械证明 |
+| `GOOS=linux go vet ./cmd/wisp/`（HEAD `8663a39`） | rc=**1**，原文 `package github.com/CarlosShao/wisp/cmd/wisp` / `imports github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx` / `imports github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files in D:\work\base\gopath\pkg\mod\github.com\k2-fsa\sherpa-onnx-go-linux@v1.13.8` | ⇒ `cmd/wisp` 整包**没有 linux 构建** |
+| 同一条命令在**父 commit `6a39820` 的纯净快照** | rc=**1**、错误文本**逐字相同** | ⇒ 既有形状，不是票 117、也不是票 127 引入的 |
+
+能站住的准确说法：**untagged 只意味着"参与本包的每一种构建"，而 `cmd/wisp` 今天没有 linux 那一种构建** ⇒
+"新增生产文件 Linux 编得过"这一格**无法由任何包级 linux 命令证真**；`logsink.go` 确实一字不碰平台专有件，
+所以那句要等本包的 linux 腿存在才成立——**在此之前它是未证，不是已证**。
+
+**票 127 选的是「如实降级」而不是「补覆盖」**，两条都写在这里：
+- 降级已落地（两处代码注释，形状与上表同）：`cmd/wisp/logsink.go` 头部 `PLATFORM` 段、
+  `cmd/wisp/logsink_test.go` 头部 `PLATFORM LEG` 段。
+- 补覆盖为什么不在本票做：`.github/workflows/ci.yml` 是冻结件；且即便加一发 ubuntu 步，
+  `go test ./cmd/wisp/` 在那条腿上**也编不过**（同一条 sherpa 错误）⇒ 先要有人决定 `cmd/wisp` 的 linux 形状，
+  那是票 111/93 的 scope 地盘，不是本票地界。
+
+同一格第二半照此复算：本票 §二 那三条 AC#3 用例（`cmd/wisp/logsink_test.go`，untagged）在 CI 上
+**任何平台都只在 Windows 执行**——`ci.yml` 里跑 `./cmd/wisp/` 的只有 windows-latest job 的
+"cmd/wisp CLI tests" 那一步（ubuntu job 走 `bash scripts/portable-tests.sh --scope=core`，清单里没有 `cmd/wisp`）。
+票 127 新加的三枚常驻腿用例带 `//go:build windows`，走的是同一条腿、同一个 step。

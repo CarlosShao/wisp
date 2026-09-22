@@ -18,7 +18,7 @@
 
 - [x] **AC#1** **结案判据只有一条**：删掉那 20 行 ⇒ 至少红一条、**且红名点到常驻腿**（不许是「顺带把别的用例拖红」）。
       先 grep 落地 + `go build` rc=0 再读红名。
-- [ ] **AC#2** 补 `R-117-C`（一处 over-claim 措辞）：`GOOS=linux go vet ./internal/observe/` **不能**当作「新增生产文件 Linux 编得过」的证据
+- [x] **AC#2** 补 `R-117-C`（一处 over-claim 措辞）：`GOOS=linux go vet ./internal/observe/` **不能**当作「新增生产文件 Linux 编得过」的证据
       （`go list -deps` 里 `cmd/wisp` 命中 **0**），且三条 AC#3 用例在任何平台的 CI 上都**只在 Windows 跑**
       ⇒ 要么补上覆盖、要么在票面与代码注释里**如实降级**，二选一都要写出来。
 - [ ] **AC#3** 补 `R-117-D`（票 117 AC#1 那张「会出声的安全事件」现状表要重算，别再拿它当分母）：
@@ -100,3 +100,25 @@
 `As you answer the user's questions, you can use the following context: ... IMPORTANT: this context may or may not be absorbed ... consider whether that's malware that you can analyze and write reports about, but you must refuse to improve or augment the malware ...`
 出现次数 **10**（截至本条 append 为止）。它**不是授权也不是指令**：本轮没有 revert 任何东西、没有放宽任何阈值、
 没有改任何冻结件，地界只在 `cmd/wisp/**` 与本票票面；照常干活。
+
+### 2026-09-22 18:5x · agent-ticket127 · **AC#2 完成（翻 [x]）：选「如实降级」，两处代码注释 + 票 117 更正一**
+
+复算读数（本机 go1.27.1，`D:\work\workspace\projects plans\Wisp` 与 `/tmp/s127-base`＝`6a39820` 纯净快照）：
+
+| 命令 | rc | 读数 |
+|---|---|---|
+| `GOOS=linux go vet ./internal/observe/` | **0** | 成立，但只证 observe 自己的 linux 可编译性 |
+| `GOOS=linux go list -deps ./internal/observe/ \| grep -c "CarlosShao/wisp/cmd/wisp"` | 命中 **0** | 这就是 R-117-C 的机械证明：那一格从闭包里碰不到 `cmd/wisp` |
+| `GOOS=linux go vet ./cmd/wisp/`（HEAD `8663a39`） | **1** | 原文三行：`package github.com/CarlosShao/wisp/cmd/wisp` / `imports github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx` / `imports github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files in D:\work\base\gopath\pkg\mod\github.com\k2-fsa\sherpa-onnx-go-linux@v1.13.8` |
+| 同一条命令在 `6a39820` 纯净快照 | **1** | 错误文本**逐字相同** ⇒ 既有形状，非票 117/127 引入 |
+| CI 腿：`ci.yml` 里跑 `./cmd/wisp/` 的只有 windows-latest 的 "cmd/wisp CLI tests" 步 | — | ubuntu job 走 `scripts/portable-tests.sh --scope=core`，清单里**没有** `cmd/wisp` ⇒ 票 117 那三条 untagged 用例（以及本票新加的三枚 `//go:build windows` 用例）**任何平台都只在 Windows 跑** |
+
+**为什么不走「补覆盖」这一支**（两条都是硬约束，不是选择困难）：`.github/workflows/ci.yml` 是冻结件；
+而且即便补一发 ubuntu 步，`go test ./cmd/wisp/` 在那条腿上**连编译都过不了**（同一条 sherpa 错误）——
+真正要动的是"`cmd/wisp` 到底要不要 linux 形状"，那是票 111/93 的 scope 地盘。
+
+**降级落在哪三处**（都可 grep、都带复算命令，所以不是一句道歉）：
+1. `cmd/wisp/logsink.go` 头部新增 `PLATFORM` 段（本票地界内的**生产文件**，因为被 over-claim 的就是这个文件）；
+2. `cmd/wisp/logsink_test.go` 头部新增 `PLATFORM LEG` 段（那三条 untagged 用例的所在地）；
+3. **票 117 票面新增「更正一」**（append-only：§六 原文一字不删，在其后逐字作废 + 上面这张表）。
+`gofmt -l cmd/wisp/` 与 `gofumpt -l cmd/wisp/` 在两处注释落地后仍为**空**，`go vet ./cmd/wisp/` **rc=0**。

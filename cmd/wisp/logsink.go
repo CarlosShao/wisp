@@ -43,6 +43,17 @@ package main
 // the resolved data dir of the running env, so the question owner has to answer
 // is about one directory, not about a temp file. See logSinkDir and its
 // invariant test.
+//
+// PLATFORM, written because ticket 117 over-claimed this file once (R-117-C,
+// corrected by ticket 127 AC#2): being untagged only means this file
+// participates in every build of package main - and package main has no Linux
+// build, because `GOOS=linux go vet ./cmd/wisp/` is rc=1 on the sherpa-onnx
+// import main.go carries. So nothing in this file has ever been *compiled* for
+// Linux, and no GOOS=linux reading of some other package can be quoted as if it
+// had: cmd/wisp is outside those dependency closures. What is true is weaker
+// than what was written - this file deliberately imports nothing
+// platform-specific, which is why it will still build for Linux on the day the
+// package's Linux leg exists. Until then the claim is unproven, not proven.
 
 import (
 	"context"

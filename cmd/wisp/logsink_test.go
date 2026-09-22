@@ -13,6 +13,24 @@ package main
 // private-data discipline (config.toml, the DPAPI blob dir, memory.db and the
 // backups all land sealed inside it), and that a missing data root is a refusal
 // instead of a fallback to some world-shared temp default.
+//
+// PLATFORM LEG, stated because ticket 117's §六 overstated it (R-117-C, fixed by
+// ticket 127 AC#2): this file carries no build tag, and being untagged is *not*
+// evidence that it compiles under GOOS=linux. This package does not build for
+// linux at all - `GOOS=linux go vet ./cmd/wisp/` is rc=1 with the verbatim line
+//
+//	imports github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files
+//
+// measured identical at 6a39820 and at 8663a39, so it is this package's cgo
+// shape and not anything these cases introduced - and the only CI leg that runs
+// ./cmd/wisp/ is the "cmd/wisp CLI tests" step on windows-latest
+// (.github/workflows/ci.yml; the ubuntu job's --scope=core never carries this
+// package). So the honest reading of these three untagged cases is: they run on
+// every platform this package builds on, which today is Windows alone.
+// `GOOS=linux go vet ./internal/observe/` rc=0 proves observe's own Linux
+// buildability and nothing more: cmd/wisp appears 0 times in that command's
+// dependency closure (`GOOS=linux go list -deps ./internal/observe/ | grep -c
+// CarlosShao/wisp/cmd/wisp` = 0).
 
 import (
 	"encoding/json"
