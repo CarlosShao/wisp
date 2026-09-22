@@ -223,6 +223,123 @@ platform-specific … Until then the claim is unproven, not proven"）、
 |---|---|---|
 | AC#1 常驻腿钉子 / M4 重量 | **通过**（附两条仪器条件 1.4，不阻断） | 〔独立复现〕 |
 | AC#2 R-117-C 降级是否诚实 | **通过**（三处落点与四条理由逐字复算） | 〔独立复现〕 |
-| AC#3 票 117 §一 现状表重算 | 待 | 待 |
-| AC#4 门禁 + 四数 + 台账 | 待 | 待 |
-| **总判** | 待 | 待 |
+| AC#3 票 117 §一 现状表重算 | **通过**（三口径同数 40，逐格点名复算） | 〔独立复现〕 |
+| AC#4 门禁 + 四数 + 台账 | **通过**（四数与台账八数我独立量到同数） | 〔独立复现〕 |
+| **总判** | 见文末 §七 | 见文末 |
+
+---
+
+## 三、AC#3 票 117「更正二」那张现状表 —— **通过**〔独立复现〕
+
+### 3.1 分母我自己跑了一遍（派单点名要的那一行）
+
+口径行照票面逐字跑在快照 `/tmp/ac127-s22`（`8ec04f3`）：
+
+```
+grep -rnE "slog\.(Warn|Error)\(" --include=*.go internal cmd | grep -v _test.go \
+  | grep -vE '^[^:]+:[0-9]+:[[:space:]]*//'          ⇒  40
+```
+
+**40 枚，分布逐包与票面一字不差**：
+`ball 17 / audio 5 / winsec 4 / observe 4 / proc 3 / plugin 2 / config 2 / statemachine 1 / secret 1 / cmd/wisp 1`。
+
+⚠ **这一格我额外量了一件事：这把尺子为什么今天可信**。那条管道里 `grep -v _test.go` 比的是**整行文本**
+（路径在前缀里，所以能过滤测试文件），但**同时**会误伤"正文提到 `_test.go` 的非测试行"。我把三种口径并排跑：
+
+| 口径 | 读数 |
+|---|---|
+| A 票面原样（文本过滤） | **40** |
+| B 换成严格路径过滤 `^[^:]+_test\.go:[0-9]+:` | **40** |
+| C 去掉"注释行"那一层过滤 | **40** |
+
+⇒ 三个口径**同数**，且 A 的集合里正文含 `_test.go` 的非注释命中是 **0**。
+所以 40 不是靠一把歪尺子凑出来的；但**下一个人换包数时 A 与 B 就可能分歧**（`R-127-5`，建议口径行改写成路径过滤版）。
+
+### 3.2 派单点名的每一格我都逐行打开看过（不是抄票面）
+
+| 票面主张 | 我的复算 |
+|---|---|
+| 漏项 5 枚坐实 | `statemachine/machine.go:139` = `slog.Error("state machine rejected transition"…` ✓；`plugin/disposal.go:208` = `slog.Error("disposal_incomplete: Defer called after Dispose"` ✓、`:332` = `slog.Error("disposal step failed"…` ✓，且它**在 `for _, f := range res.Failed` 循环体内**（325-333 行整段读过）⇒ "一次关停可产出 N 条"为真；`observe/goroutine.go:271` = `slog.Warn("goroutine outside the D38 roster…"` ✓（在 `Spawn` 的 `cat == CategoryUnknown` 分支里 ⇒ 逐 spawn 一条）；`observe/logging.go:204` + `:307` 两句同为 `observe: log retention sweep failed` ✓ |
+| audio **5**（不是 4）、ball **17**（不是 14），并给逐文件分解 | ✓ 逐文件复算：ball = `ball_windows.go` **7**、`hotkey_windows.go` **6**、`hotkey_reload.go` **3**、`renderer_windows.go` **1**；audio = `audio.go` **2**、`mmdevice_windows.go` **2**、`wasapimic_windows.go` **1**。逐行坐标也对：`audio.go:136/:152`、`mmdevice_windows.go:60/:65`、`wasapimic_windows.go:112`、`ball_windows.go:393`(`slow drawFrame`)/`:417`(`slow ULW frame`) |
+| `run.go:347/:421` → 实为 `:355/:429`（+8） | ✓ `run.go:355` = `rt.auditf("perm: MODE-READ origin=startup…`、`:429` = `rt.auditf("perm: MODE-READ-FAILED…`，与票面标的两枚事件名逐字对上 |
+| `secret.go:471` WARN / `:473`、`:326` INFO → **漂 +19** ⇒ `:490` WARN、`:492` INFO、`:345` INFO | ✓（**这一格我自己差点读错，写下来免得下一个也错**：`sed -n '490p;492p;345p'` 按**文件升序**输出，不按参数顺序；按升序还原 ⇒ `:490` WARN、`:492` `slog.Info(audit)`、`:345` `slog.Info("wisp secret: stored dpapi blob"…` ⇒ 三条**级别标注全对**，且相对票 117 交件树 `ce666ea` **恰好统一 +19**：326→345、471→490、473→492） |
+| 行号未漂的照实登记（不"整张表全错"） | ✓ `proc/shutdown.go:130` INFO（**就是本票钉子读的那句** `shutdown step skipped (module not present)`）、`:145/:147` ERROR、`:172` WARN；`winsec/resolve.go:146` INFO / `:150/:157/:165` ERROR / `:175` Debug / `:181` INFO；`risk/winsec_c26.go:20` 是 `func init()`、`:21` 是 `winsec.SetPathResolver(c26Pipeline{})`；`secret/migrate.go:198` WARN ⇒ 全部复算为真 |
+| 「腿不是两条是三条」 | ✓ `grep -rn "installLogSink(" --include=*.go cmd internal \| grep -v _test.go` ⇒ `run.go:164`、`resident_windows.go:57`、`models.go:276` 三处，**没有第四处**；`wisp secret` 那条腿**仍无听众**（`cmd/wisp/secret.go` 内 `installLogSink` 0 命中）✓ |
+| 「ball/audio 今天都不在 wisp.exe 的任何一条腿上」 | ✓ `internal/ball` 非测试 importer 只有 `cmd/balldebug/main.go`；`internal/audio` 非测试 importer **0**；`cmd/wisp/**` 非测试文件里两个包各 **0** 命中（只有 `notify_windows.go:13` 一句注释提到它）⇒ C 段"下一次测量的起点是 22 枚"的**前提**（还没进二进制）成立 |
+| `statemachine` / `plugin` 的可及性判语 | ✓ `statemachine` 非测试 importer 含 `cmd/wisp/models.go`、`internal/models/bridge.go`、`internal/ball/*`（+`cmd/balldebug`）⇒ run/models 腿可达、常驻腿今天不可达；`plugin` 唯一非测试 importer = `internal/memory/retention.go` ⇒ 走记忆保留的 run 腿可达 |
+
+### 3.3 它自己新增那两条（不在派单里）
+
+1. **`:204` 与 `:307` 必须分两格记**——机制我读码复算：`:204` 在 `InitLog` 里（`rollingWriter` 起手 sweep 失败），
+   而换默认 logger 是**回到 `installLogSink` 之后**才做的（`logsink.go:148` `slog.SetDefault(teeHandler{…})`），
+   `internal/observe` 自己的 `InstallAsDefault()`（`logging.go:107`）这条腿没人调 ⇒
+   **它永远进不了它正在抱怨的那本文件**。`:307` 在周期 sweep 里、装在换默认之后 ⇒ 会进文件。判**为真**。
+2. **听众装不上那一瞬听众自己是哑的**——我把自己手跑那一发拿来验**同族形状**：
+   子进程 stderr 两行是
+   `2026-09-22 22:53:39 INFO winsec: sealing path resolver installed resolver=risk.c26Pipeline probes_passed=2`
+   （**stock 默认 logger 的时间格式**，没有 `time=` 前缀）与
+   `time=2026-09-22T22:53:39.654+08:00 level=INFO msg="wisp: persistent log sink installed"…`（tee mirror 的格式），
+   而盘上那本 jsonl **只有第二条**（1 条记录）⇒ **"换默认之前出声的记录只在 stderr"我在常驻腿上独立复现**。
+   这一发同时把 **R-125-3 的机制**量清了（见 §五）。
+
+**判**：**通过**〔独立复现〕。这张表现在是本仓**唯一一把我对过三口径的分母尺**；两条新账都成立。
+**我没有动 `internal/observe`**：派单已把那一格登记为 `A99③`/待立票 130，本会话对该包**零写**。
+
+---
+
+## 四、AC#4 门禁 / 四数 / 墙钟账 / 台账 —— **通过**〔独立复现〕
+
+### 4.1 四数（两枚快照、`-count=2`、`-v` 量）
+
+| 包 | 组 | rc | `=== RUN`（全部 / 顶层） | PASS（全部 / 顶层） | FAIL | SKIP | 墙钟 |
+|---|---|---|---|---|---|---|---|
+| `./cmd/wisp/` | 控制 `6a39820` | 0 | **146** / 78 | **146** / 78 | **0** | **0** | 72.879s（自报 67.681s） |
+| `./cmd/wisp/` | **交件 `8ec04f3`** | **0** | **152** / **84** | **152** / **84** | **0** | **0** | 92.567s（自报 89.758s） |
+| `./internal/observe/` | 交件 | 0 | **94** / 94 | **94** / 94 | 0 | 0 | 2.296s（自报 2.316s） |
+
+**增量自洽**：`152-146 = 6` ＝ 3 枚新用例 × `-count=2`；顶层 `84-78 = 6` 同解；
+子用例两侧都是 **68** ⇒ "本票没加子用例"是**能核的**（我独立量到）。
+我读 PASS 的口径与它一致：`^--- PASS` **84** ＋缩进 `^    --- PASS` **68** ＝ 152；
+票面把"全部/顶层"两栏并列的写法**没有骗人**，沿用。墙钟差 4-5s 是本机负载，不构成读数分歧。
+
+### 4.2 格式与静态门（都真跑在快照里）
+
+- `gofmt -l cmd/wisp/` ⇒ **空**；`"$(go env GOPATH)/bin/gofumpt.exe" -l cmd/wisp/ internal/observe/` ⇒ **空**；
+  `gofumpt --version` ⇒ **`v0.7.0 (go1.27.1)`**（与票面引的版本串逐字相同）⇒
+  "写'未跑'必须引命令原文"那一格**不适用**，两把都真跑了；票面点名的 `logsink_windows_test.go` 未被点名。
+- `go vet ./cmd/wisp/ ./internal/observe/` ⇒ **rc=0**。
+- `sh scripts/d22scan.sh`（交件快照）⇒ **rc=0 / clean**，正向控制原文
+  `runtests.sh: OK - packages=[./...] top-level: PASS=21 FAIL=0 SKIP=0, === RUN=31, '[no tests to run]'=0`
+  ——**逐字**与它自报相同。
+
+### 4.3 台账八 scope：交件 vs 同 sha 控制组
+
+| scope | 控制 `6a39820` | 交件 `8ec04f3` | 判 |
+|---|---|---|---|
+| bans #1-5 `internal/` | 202 | **202** | 持平 |
+| bans #1-5 `cmd/` | 22 | **22** | 持平 |
+| ban #6 `frontend/` | 40 | **40** | 持平 |
+| ban #7 `internal/tools/` | 18 | **18** | 持平 |
+| ban #8 `design/` | 16 | **16** | 持平 |
+| ban #8 `frontend/` | 40 | **40** | 持平 |
+| ban #8 `internal/` | 382 | **382** | 持平（它引的 382 我逐字复算为真） |
+| **ban #8 `cmd/`** | **31** | **32** | **+1，来源我自己定位到一枚文件** |
+
+**+1 的来源我不采信它的说法**：两棵树 `find cmd -name '*.go'` 求差 ⇒
+**唯一差异**是 `cmd/wisp/resident_sink_nail_127_windows_test.go`（31 → 32 枚）⇒ 它的归因**逐字成立**。
+⚠ 票面 AC#4 自写的基线 **29** 是票 117 时期的数，同 sha 控制组今天是 **31**；
+它按"同 sha 控制组为准"处理并把矛盾自己翻出来登记，是**对的**（这正是本仓要的形状）。
+零 scope 下降；`tools/d22scan/**`、`allowlist.txt`、任何阈值/golden 我复算**一字未动**（见 4.4）。
+
+### 4.4 "没顺手动掉票 123 那批 CLI 用例"的判据
+
+`git diff --numstat 6a39820..fd82bf4 -- cmd/wisp/` ⇒
+`11 0 logsink.go`、`18 0 logsink_test.go`、`533 0 resident_sink_nail_127_windows_test.go`
+= **3 files changed, 562 insertions(+), 0 deletions**（逐字复算为真）⇒ 纯插入，**没有一条既有用例被改或被删**。
+`git diff --name-only fd82bf4..9c335d0` ＝ 2 枚 `.md`、`9c335d0..8ec04f3` ＝ 1 枚 `.md`
+⇒ 最终 sha 的**码面**与 `fd82bf4` 相同，所以 4.1 那四数可以直接记在它的交件码面上（这条推理我核过）。
+票 117 票面：`git diff --numstat 6a39820 8ec04f3 -- …117….md` ⇒ **72 / 0**（零删除）⇒
+"§六 原文一字不删、只在其后作废"**是真的**；127 票面那 4 处删除**全部**是 `- [ ] **AC#N**` → `- [x]`（自己那四格），
+append-only 未破、别人的框一枚没翻。
+
+**判**：**通过**〔独立复现〕。四数、台账、格式门、静态门、diff 口径五件事逐条重量，无一项需要背它的数。
