@@ -3132,3 +3132,87 @@ A40② 说最近三个 **push** run 是 `cancelled`。我又查了两步，**排
   崩溃原文 `66-smoke-pre-fix-crash.log`）；阳性对照 = 同一表达式在 StrictMode 下喂 0/1/2 项失败得
   `allPass=True/False/False`，即修完仍会红。附带：`-Subset full`（六态）exit=0，但六态 `posture` **全是 skeleton** ⇒
   不得当作 D32 六态表达标（边界写在 C.5）。
+
+
+## 编排者登记 A95（09-22 16:38，**这一条是补写的：我上一枚 commit 的标题自称含 A95，而 A95 根本不在台账里**）
+
+- **A95⓪ 我的 commit message 第二次说满了**：`823d457` 的标题写着「92 结案补真,121 预检读数入库,**A95**」，
+  但它 `--name-only` 只有两枚路径（票 92 + 票 121 预检读数）。⇒ **台账那一格从未落地**。
+  这与同一个上午的 `aca704d` 是同一族：那次改名落地、`Status` 没落地（`R100`），我把它记成「commit 声称动了某文件 ⇒ 提交后必须回查 `--name-status`/`--numstat`」。
+  **这次的形状更狠**：标题里点名的是一件**根本不在这枚 commit 里**的东西，`--name-status` 查不出来，只有查台账才查得出来。
+  ⇒ 新加一条自查：**标题里每一枚编号（A##/票##/Q##）都要能在 diff 里找到落点**，找不到就不许写。
+- **A95① 票 92 的结案终于真落地**：`823d457` 把那 13 行 `accepted-done（附条件，条件已归位）` 提进去了（1 删是旧 `ready-for-review` 行、原文整段保留在其下）。
+  两条硬账 `R-92-3`/`R-92-4` 已清；`R-92-1` 未清但没达成 AC 要防的结局 ⇒ 走附条件，条件全部落到票 114 的 AC#8–AC#11。
+  **`R-92-5` 仍挂着**：真机差分截屏至今没有。
+- **A95② 票 115 的最后一格（`R-115-2`）交回并落地**：`c6dbbf9` 把新用例自己剩下的 5 处「拿拼写比答案」换成按树归属（`:184/:230/:240/:266/:271`），
+  并在**本机造出 runner 的 8.3 形状**复现了改前红/改后绿（本机短形段 `TESTNO~1` vs runner `RUNNER~1`，机制同一条、不是同一个字符串）。
+  恒真变异只红得到拒绝腿、恒假红两枚 ⇒ 它另补两发单点退回，证明确实是这 5 处各自的腿在承重。
+  ⚠ 它留了一处**要我裁的口径**：`sameTree` 比对前剥掉 volume 段 ⇒ 跨卷那一根轴上比字面宽松。这笔我升成 **`R-115-3`**，见下面的票 126（**已被 118b 量成生产洞**）。
+- **A95③ 票 116 结案**（`acceptor-ticket116`，裁决表 `docs/evidence/s1/116-adversarial-acceptance.md` 已在 `d1056c0` 入库）：
+  六格全部〔独立复现〕，POSIX 那遍是**容器真跑**且先 `ls -l /wisp/go.mod` 挡掉「Git Bash 下 `docker -v C:\…` 静默空挂 rc=0」那枚假绿。
+  它自己补的 **M3**（`Actable()` 恒返回规范形）把四枚里三枚按红 ⇒ 票 116 文件头那句
+  「A wrong-but-called Actable() would keep these tests green」**过保守、不成立**（`R-116-2`，只改注释措辞）。
+  **`acceptor-ticket105b` 卡的那格由本票补齐 ⇒ 票 105 同时改 `-done`**。
+
+## 编排者登记 A96（09-22 16:38，**票 118 九格里八格落地；AC#8 那格量出一个真的生产归属洞——不是测试形状问题**）
+
+- **A96① 实现方死在轮数上限、账全在 commit 里**：`agent-ticket118` 连交 `69c7236`（AC#1-3）、`712d048`（AC#7）、`0b1fd06`（AC#6）、`3b03f00`（AC#9）四枚，
+  然后 08:54 断线——**票面九格一个都没勾、Progress log 一个字都没写**。⇒ 断点只能由我从 commit message 反推
+  （这就是我派单里「每完成一格立刻 commit + 写票面」那条规矩要防的形状，它做到了前半、没做到后半）。
+  接续者 `agent-ticket118b` **先复算再翻框**，八格勾上，逐格附红名。
+- **A96② `kind=` 那一族从此有牙齿**：M5（删掉整个 `kind` switch）现在红 3 枚、M4（两桶互换）红 **5 枚**（归属面 + 渲染面 + 三枚 kind）；
+  `namesEveryone()` 不再拿 2 字节子串 `"WD"` 认 Everyone。⚠ 118b 如实补了一格：`kind=explicit` 那枚在 M5 下**必然仍绿**（M5 的输出就是 "explicit"），它由 M4 红
+  ⇒ 「三取值各一枚」这句话要按这个形状读。
+- **A96③ AC#8 是本轮最硬的一发（`R-115-3` → 票 126）**：`sameTree` 在比对前剥掉 volume 段
+  （责任字节 `winsec_windows.go:111` → `resolve.go:335` → `winsec.go:353` 的 `i := len(filepath.VolumeName(path))`）。
+  118b 用**真第二卷**（C:/D: 皆 NTFS 本地固定卷）量到：`sameTree(A,B)=true`，**C: 上那发 seal 的通知被归到从未被 seal 的 D: 树**；
+  同发里正向 leg「自己的通知归自己」仍绿 ⇒ 不是常数 false 凑出来的。`subst` 被 `GetFinalPathNameByHandle` 塌回底层卷、`\?\`/UNC 被落点底线直接拒
+  ⇒ **只有真卷能表达这一形**。
+  ⚠ 它明确写了自己**没量**的那一步：`sameTree` 另有生产调用者 `resolve.go:325`（C26 缝守），那一腿的后果**按推理不按读数**。
+  ⇒ 它按票面规则**停手没改生产码**、也没把那枚红用例进树（会连带拖红票 110/112 那条 CI 腿），把用例全文与三条判据写进票面供票 126 直取。
+- **A96④ 一处仓库外残骸**：断线的 118 把 AC#8 探针 `wisp118-xvol-probe\p.txt` 落在了 **C:/D:/E:/F: 四枚卷根上**（`git status` 看不见）⇒ 118b 已删并入账。
+  **跨卷探针的清理是 git 管不到的**，以后写这类派单要加一句「探测量完自己扫一遍四枚卷根」。
+
+## 编排者登记 A97（09-22 16:38，**票 117：第七次同族形状被抓个正着——给 owner 的那条腿装了听众、一枚钉都没留**）
+
+- **A97① 总判：交付是真的，六格没有一格「未复现」，但不能结案**。`acceptor-ticket117` 的 **M4** 就是这一族的现行形态：
+  **把 `cmd/wisp/resident_windows.go` 那 20 行 install 全删 ⇒ `go build` rc=0、`go vet` rc=0、`cmd/wisp` 全套 146 条用例一条都不红、`ok … 60.987s`。**
+  也就是：常驻 GUI 腿（**owner 真正在用的那条**）今天仍处在「拆掉也没人知道」的状态——与票 110/114/117 立票时同一族，**第七次**。
+  ⇒ 结案判据它只给了一条：**删掉那 20 行必须至少红一条、且红名点到常驻腿**（`R-117-A`，落进票 127）。
+- **A97② 它同时抓到两处「说过没留证据」并自己补齐**：(a) 前任那发 `rc=127` 在 `/tmp/wisp-t117/` 里 grep 只命中票面文字自己、无原始输出
+  ⇒ 验收方重跑拿到 **rc=127** 且日志**一条不增**；(b) 前任明写「M2 那发我没实跑」⇒ 它跑了，红在
+  `TestAC3InstallingTheFileSinkDoesNotSilenceTheConsole`（`the console saw nothing of the WARN`）。
+  **AC#4 判通过**：换根重造带外授权清除，盘上那一行七个键逐字全中，且跑完 `Everyone` 真从 ACL 消失（记录描述的是**真发生的清除**）。
+- **A97③ AC#3 没有拿 `Q-31` 当停手理由**（这是我要的形状）：四发探法（`APPDATA` 未设 run 腿/GUI 腿、`WISP_ENV=test`）**都在解析出的数据根之内 ⇒ 造不出逃逸**；
+  GUI 腿在未设 `APPDATA` 时是**拒绝**（`%AppData% is not defined`），不是回落。owner 真实两根只读重量：恰好三条 `(I)(OI)(CI)(F)` 且**都没有 `logs` 目录**（缺失即证据）。
+  真可达的 fallback 在**上游** `resolveDataDir` 的 `base="."`（自 `bcc892c`，**不是票 117 引入**）⇒ 独立成票 128，比日志那一格严重（它同时搬动 `config.toml`/DPAPI/`memory.db`）。
+- **A97④ 我自己登记过的一处仪器事实被推翻（重要）**：我在 A93① 记过「`git archive` 会注入 CR 字节、`-c core.autocrlf=false` 也挡不住」。
+  `acceptor-ticket117` 用四把尺（`od -c`／`tr -cd|wc -c`／`grep -P`／`git cat-file`）复算，证明**本仓 `.go` 文件在 `e9d70ca` 上不注入 CR**
+  （`*.go text eol=lf` 盖住了 `text=auto` + `core.autocrlf=true`）。
+  ⇒ 口径收窄为：**CR 那类读数必须逐文件量，不许全局断言「archive 会注入 CR」**；当初那枚 `TestComposerRenderFixtureTellsTheTruth` 的红发生在**非 `.go` 的 fixture 路径**上，
+  那一形今天是否仍成立**我没重量**（记进待办，别当已结）。
+  同时它排掉一枚新假绿：`grep -c $'\r'` 在 Git Bash 里被当**空模式**、匹配每一行。
+- **A97⑤ 台账归属**：`R-117-A`（常驻腿零钉）/`R-117-C`（`GOOS=linux go vet ./internal/observe/` 被当成「Linux 编得过」是 over-claim，
+  且三条 AC#3 用例在任何平台的 CI 上都只在 Windows 跑）/`R-117-D`（AC#1 现状表漏 2 族可达 ERROR + audio/ball 分母报错）→ **票 127**；
+  `R-117-B`（数据根 `base="."`）→ **票 128**；`R-117-1`（`wisp secret` 腿）/`R-117-2`（`init()` 期记录，要 `internal/risk` 解冻，是主线最后一截）/
+  `R-117-4`（diagnostics bundle）→ 各自另计，**不阻票 117**。
+
+## 编排者登记 A98（09-22 16:38，**票 119 判退回：② 只做了一半，而交回的注释把这一半写成了全部**）
+
+- **A98① 退回归因（不是因为它选了 ②）**：`acceptor-ticket119` 实测支持 ②/① 那一刀的切法，但同一枚容器、同一枚形状（`$HOME` 经软链）、同一枚**修后**真二进制：
+  `wisp doctor` 的落点行已从 `/varlink/…` 变 `/realpriv/…`，**`wisp secret list` 仍 rc=1、错误原文一字未变**（dev 三形修前修后都 rc=1）。
+  ⇒ 票 AC 声称要防的结局（合法数据根被误伤 ⇒ 产品跑不起来）在票面**自己点名的第二条生产路**上今天仍被真实造出来 ⇒ 按票 103/107 口径**不盖「附条件」章**。
+  根因事实：`cmd/wisp/secret.go:118-129` 自己读 `os.UserConfigDir()` 交给 `LayoutFor`、**不走 `DefaultLayout`**。
+- **A98② 它另加的四发变异里有一发是新的假绿形状**：`R`（抹掉「声明的树原样返回」这条纪律）⇒ **56 条全绿、连专门钉它的那枚用例都 PASS**，
+  因为 fixture 用**被测函数自己**算期望（`SealableRoot` 幂等 ⇒ 恒真）。⇒ 进票 119 返修（`R-119-9`）：**不许拿被测函数算 fixture**。
+  `SEC`（补上缺的那一行）⇒ dev 三形 rc=1→0，而 winsec+proc+secret **60 条 outcome diff rc=0** ⇒ **仪器对第二条生产 config 路零敏感**。
+- **A98③ 比本票误伤面更大的一格（→ 票 125）**：同一形状下实测
+  `ERROR winsec: refusing to install a path resolver into the sealing seam … resolver=risk.c26Pipeline`，探针 `winsec.PathResolverInstalled()` 读数是 **`<nil>`**
+  ⇒ **临时目录经软链时整条 C26 都不在位、退回内置底线**（plain 形是 `risk.c26Pipeline` + `probes_passed=1`）。
+  机制在 `internal/winsec/resolve.go:195/197`、`:258/260` **直接拿未解析的 `os.TempDir()` 当探针材料**——与那 81 条 harness 红同族的仪器形状。
+  ⚠ **POSIX 侧零正向用例**（唯一断言在 `resolve_windows_test.go`，POSIX 那枚是 `Skip`）⇒ 危害面「静默降级 + 无人出声」，
+  但落点仍受底线约束（穿链接照样拒，实测）。macOS 那半只有推断、无 runner。
+- **A98④ 「winsec 一字未动」这句要打折**：换尺复算（剥尽注释空行）winsec 两版 **59 行 vs 59 行、hunks=0**、`winsec.go`/`resolve.go` md5 三版一致 ⇒ 判定分支确实没动；
+  但 `winsec_other.go` 注释 **21 增 / 6 删** ⇒ **「一字未动」这个字面说法不能照签**（结论成立、措辞过头）。
+- **A98⑤ 交件方自报的一处假绿值得留档**：验收方自己第一版形状脚本把 `/varlink` 建成了**真目录**，据此读到过一发 dev 形 rc=0 的**假绿**，
+  加链接硬断言后重测才成立 ⇒ **POSIX 形状类实验必须先断言「那个位置真的是链接」**，否则整段读数在错的形状上。
