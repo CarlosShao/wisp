@@ -97,7 +97,7 @@ func TestAC45SymlinkInAnUnnamedPlace(t *testing.T) {
 // back a directory this check accepts, on the platform where the extraction is
 // exercised at all.
 func TestAC46EnsureStillInstallsACleanTree(t *testing.T) {
-	store, mgr, dir := poisonTree(t)
+	_, mgr, dir := poisonTree(t)
 	if _, err := os.Stat(filepath.Join(dir, "dict", "inner.txt")); err != nil {
 		t.Fatalf("named subdirectory missing after install: %v", err)
 	}
