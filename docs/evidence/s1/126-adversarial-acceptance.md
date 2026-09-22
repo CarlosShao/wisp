@@ -27,13 +27,25 @@
 - 变异先发落地再读名：`grep` 那几字节确认真改掉 → `go build ./internal/winsec/` rc=0 → 才读 `--- FAIL` 名单。
 - `GOOS=linux go vet` 只编译不执行；容器真执行另发，加 `MSYS_NO_PATHCONV=1`，挂载后先 `ls -l /src/go.mod` 验非空挂。
 
-**本文件写作状态：骨架。** 下面六格逐格落盘，每格一次。
+**本文件写作状态：六格已全落盘（渐进写，每格一次），已收总判。**
+逐格裁决一览：
+
+| 格 | 裁决 | 标签 |
+|---|---|---|
+| 首要攻击点（方向自查） | **未见任何放宽，退回条件未触发** | 〔独立复现〕 |
+| AC#1 卷段该不该进比较 | **通过** | 〔独立复现〕 |
+| AC#2 缝守那一腿（生死格） | **通过**（量成"守门错"） | 〔独立复现〕 |
+| AC#3 变异自证 + 不放宽 | **通过** | 〔独立复现〕 |
+| AC#4 CI 覆盖 / 不许拿 CI 绿背书 | **通过附条件**（5.4） | 〔独立复现〕+〔仅自述，不背书〕 |
+| AC#5 门禁 | **通过** | 〔独立复现〕 |
+| AC#6 清理自证 | **通过** | 〔独立复现〕 |
+
 
 ---
 
 ## 1. 首要攻击点（跨格）：它主张"只往严走、不存在把被拒翻成被放行的通路"——我自己找反例
 
-**状态：判定待写**（下面第 1.1 节是我自己穷尽的读数方向，与它的自述无关）
+**状态：判定见本节末与第 1.2/1.3。下面第 1.1 节是我自己穷尽的读数方向，与它的自述无关。**
 
 ### 1.1 两枚比较在生产里的全部读数点（我自己 grep 全仓，不按它的行号）
 
@@ -363,38 +375,187 @@ ok  github.com/CarlosShao/wisp/internal/winsec
 
 ## 6. AC#5 —— 门禁
 
-**裁决：待定** ｜ **标签：待定**
+**裁决：通过** ｜ **标签：〔独立复现〕**
+
+全部读在 `git archive 81b4d5f` 的纯净快照（`/tmp/ac126-sq/post`，仓库树内零 worktree/checkout），
+基线控制读在 `git archive 09b5285`。九发我自己跑，命令原文与读数：
+
+| 命令 | rc | 我的读数 | 与自述 |
+|---|---|---|---|
+| `go test -count=2 -v ./internal/winsec/` | 0 | `RUN=`**182** `PASS=`**100** `FAIL=`**0** `SKIP=`**0**；`grep -c '(cached)'`=**0**；`ok … 19.867s` | 逐字相同（182=91×2、100=50×2） |
+| `bash scripts/winsec-tests.sh` | 0 | `winsec-tests.sh: four numbers …: === RUN=91 --- PASS=50 --- FAIL=0 --- SKIP=0`，GUARD 1/GUARD 2 都过；下层 `runtests.sh: OK … PASS=50 FAIL=0 SKIP=0, === RUN=91, '[no tests to run]'=0` | 逐字相同 |
+| `gofmt -l .` | 0 | **空输出**（0 字节） | 相同 |
+| `$(go env GOPATH)/bin/gofumpt.exe --version` / `-l .` | 0 / 0 | `v0.7.0 (go1.27.1)`（二进制在位，"未跑"不适用）；`-l .` **空输出** | 相同 |
+| `go vet ./internal/winsec/ ./internal/proc/`（host=windows） | 0 | 干净 | 相同 |
+| `GOOS=linux go vet ./internal/winsec/ ./internal/proc/` | 0 | **只编译不执行**——所以我不拿它当 Linux 结论，另跑下面那发容器 | 相同 |
+| `GOOS=darwin go vet ./internal/winsec/` | 0 | 第三 GOOS | 相同 |
+| 容器真执行（POST）：`MSYS_NO_PATHCONV=1 docker run --rm -v "C:\…\post:/src" -w /src golang:1.27` | 0 | 先 `ls -l /src/go.mod`＝**883 字节在位**（非空挂）；`VET_RC=0`；`RUN=58 PASS=39 FAIL=0 SKIP=0`；`ok winsec 0.099s`、`ok proc 0.964s` | 逐字相同 |
+| 容器真执行（BASE 控制组） | 0 | `RUN=58 PASS=39 FAIL=0 SKIP=0` **与交件组逐字相同** | 相同 ⇒ POSIX 半边零判决变化，是执行过的读数 |
+
+`R-126-4` 那枚坑我照它说的绕开了：两发容器都显式 `MSYS_NO_PATHCONV=1`，且都在容器内先 `ls -l /src/go.mod`
+证明不是静默空挂。**我自己另踩到两枚同族仪器坑，如实登记**（见第 8 格末）。
+
+`sh scripts/d22scan.sh`：交件快照 rc=0 `d22scan: clean - no D22 ban violations`；
+正向对照 `runtests.sh: OK - packages=[./...] top-level: PASS=21 FAIL=0 SKIP=0, === RUN=31`，
+`TestBuiltBinaryGoesRedEndToEnd` **六腿全绿** ⇒ 门不是瞎的。
+
+**台账八 scope（基线控制 vs 交件，两发都在我手里真跑）**：
+
+| scope | 基线 `09b5285` | 交件 `81b4d5f` | 判 |
+|---|---|---|---|
+| bans #1-5 `internal/` | 202 | **202** | 持平 |
+| bans #1-5 `cmd/` | 22 | **22** | 持平 |
+| ban #6 `frontend/` | 40 | **40** | 持平 |
+| ban #7 `internal/tools/` | 18 | **18** | 持平 |
+| ban #8 `design/` | 16 | **16** | 持平 |
+| ban #8 `frontend/` | 40 | **40** | 持平 |
+| ban #8 `internal/` | **382** | **383** | **+1**，来源逐字＝新增那枚 `_test.go` 进入"comments and `_test.go` included"口径；两发的 `TestLedgerCountsMatchAnIndependentWalk` 各自独立走到 382/383，不是我算的 |
+| ban #8 `cmd/` | 32 | **32** | 持平 |
+
+⇒ **八枚里无一枚下降**，唯一变化那枚是本票应交的账。
+冻结地界我也复核了：`git diff --name-only 09b5285..81b4d5f` 只有三枚路径，
+`tools/d22scan/**`、`allowlist.txt`、`scripts/**`、`.github/workflows/ci.yml`、`docs/PLAN.md`、
+`internal/risk/**`、任何阈值/golden **一字未动**。
 
 ---
 
 ## 7. AC#6 —— 清理自证（跨卷探针落在卷根，`git status` 看不见）
 
-**裁决：待定** ｜ **标签：待定**
+**裁决：通过** ｜ **标签：〔独立复现〕**
+
+### 7.1 逐枚卷根我自己 `ls`（跑了全部九发变异 + 两发容器 + 三发探针**之后**再数一遍）
+
+```
+c: entries=30 residue=[end]      d: entries=33 residue=[end]
+e: entries=34 residue=[end]      f: entries=7  residue=[end]
+```
+过滤式 `grep -Ei "wisp|ac118|ac126|xvol|probe"`，四枚全 `[end]`＝零命中。
+枚数与前手交件自报的 `30/33/34/7` **逐枚相同**（这枚一致本身就是可比性证据：
+两轮之间没有多留一枚目录）。`G..Z` 二十余枚字母在文件系统里根本不存在（`no-such-dir`），
+探针从未落在上面。我也按名字直查了本票与上一轮留下的每一枚：
+`/c|d|e|f/wisp126-xvol-enumeration-probe`、`/…/wisp126-xvol-*`、
+`wisp118-xvol-probe`、`ac118b-xvol`、`ac118r-xvol` ⇒ **全部 No such file**。
+
+### 7.2 `R-118-8` 的枚举口径我自己复量（两任读数之差就在这里）
+
+我自己写了一枚独立探针（不在仓库内），对 `A..Z` 每枚字母**同时**试"建目录"和"建文件"：
+
+```
+C:\: mkdir_err=<nil> | writefile_err=open C:\ac126-file-probe.txt: Access is denied.
+D:\: mkdir_err=<nil> | writefile_err=<nil>
+E:\: mkdir_err=<nil> | writefile_err=<nil>
+F:\: mkdir_err=<nil> | writefile_err=<nil>
+其余 22 枚字母: The system cannot find the path specified（两样都失败）
+
+DENOMINATOR mkdir-based     = 4  [C: D: E: F:]
+DENOMINATOR writefile-based = 3     [D: E: F:]     <-- 少了 C:
+```
+⇒ **`R-118-8` 那条警告逐字为真**：C 盘根拒绝普通用户建文件、允许建目录，
+用 `WriteFile` 枚举会把 C: 丢掉、分母从 4 变 3。交件的 `writableVolumeRoots126`
+用的是 `os.Mkdir` 枚举（我读过那几行，也在我那一发"模拟单卷"里把它短路验证过），
+本机分母 **4 枚 = `[C:\ D:\ E:\ F:\]`**，与前两任验收方一致，没有另造口径。
+
+### 7.3 探针的回收是用例自己的 `t.Cleanup` 做的，不是我手工补的
+
+`writableVolumeRoots126` 在枚举之后挂了 `t.Cleanup`，对 A..Z 逐枚 `Lstat`+`RemoveAll`，
+残留会打 `AC#6 cleanup RED`；两枚真卷那发另挂一枚 `t.Cleanup` 删 `wisp126-xvol-<pid>` 整棵并
+`Lstat` 复查。我在 `base/post/head/pre2` 加九发变异共十几轮整包日志里 `grep "AC#6 cleanup RED"`
+⇒ **零命中**，且 7.1 的 `ls` 是独立于这份日志的第二枚证据。
+快照残骸全在仓库外（`/tmp/ac126-sq/**`），仓库侧 `git status --porcelain` 只列我自己那枚验收文件。
 
 ---
 
-## 8. `R-126-1..4` 逐条判（含 `R-118-8` 卷枚举口径的复算）
+## 8. `R-126-1..4` 逐条判（外加我自己踩到的三枚仪器坑）
 
 | 编号 | 它的登记 | 我的判 |
 |---|---|---|
-| R-126-1 | 缝守 install-time 探针 pair 天然同卷 ⇒ 真 resolver 永远量不到跨卷 | 待写 |
-| R-126-2 | `\\?\C:` 与 `C:` 被读成两棵树，方向是"虚警、底线先拒" | 待写（**这条若落在虚警方向之外就是新洞，要实测**） |
-| R-126-3 | `noticeNamesTree` 失败方向是 `ResolvePath` 拒 ⇒ `false`，植拼写可空转成绿 | 待写 |
-| R-126-4 | Git Bash 下 `docker run -w /src` 被 MSYS 改写 | 待写 |
-| R-118-8 口径 | C 盘根拒绝建文件、允许建目录 ⇒ `WriteFile` 枚举会漏 C:，分母 4 枚 | 待写（我自己复量） |
+| **R-126-1** | install-time 探针 pair 天然同卷 ⇒ 真 resolver 永远量不到跨卷，只有 fake 能 | **成立**，并加码两点它没写的：(a) 枚 pair 在票 125 之后是 `resolverProbeRoot()` 解析过的 temp 根加它的子拼写，**解析符号链接不改卷**，所以 125 叠上来之后这条仍然真；(b) 交件的缝守用例是直接拿**自己那对 pair** 调 `treeOwnershipFailureForPair`，绕开了生产 pair——这是合理的（同一个生产函数），但意味着"真 resolver + 跨卷 + install-time"这一组合**今天依然结构性量不到**。归属：编排者的判据仪器账，同意。 |
+| **R-126-2** | `\\?\C:` 与 `C:` 被读成两棵树，方向是"虚警、底线先拒" | **成立，且我从"仅自述"升成"实测"**。我自己的探针读数：`filepath.VolumeName` 对 `` \\?\C:\x `` 返回的是 **`` \\?\C: ``**（不是空），所以 `sameVolume` 看到的是两枚不同的卷段 ⇒ `sameTree=false`——**机制与它注释里写的一致**（我第一次量成 `""` 是我自己 heredoc 吃了反斜杠，见下面 R-ac126-1）。它依赖的"底线先拒"我也逐枚量了：`platformVerifyPlacement` 对 `\\?\`、`\\.\`、UNC **三发全部返回 error**；`ResolvePath` 对 `\\?\` 与 UNC 两发都**拒绝**。⇒ 这一形拿不到真 seal，虚警判定成立。<br>**我补的那一发才是这格的真问题**：如果 `\\?\` 这一族落在虚警之外就是新洞，所以我直接量了放行方向——`sameTree(\\?\C:\tail, \\?\D:\tail)=`**false**、`answerInsideTree(\\?\C:\tail, \\?\D:\prefix)=`**false** ⇒ 扩展长度命名空间**没有**把两枚真卷并进一棵树。**不是新洞。** 归属：本票结案备注，同意。 |
+| **R-126-3** | `noticeNamesTree` 失败方向是 `ResolvePath` 拒 ⇒ `false`，植进去的拼写这一发可以空转成绿；它自称用例带两道前置已治 | **半成立，且它的"已治"这一半我判不认**（详见 5.4）：危险描述完全正确，前置确实有两道 `Fatalf`，**但两道守的都是被 seal 那一侧（`ResolvePath(existing)`）与尾段相等，没有一道守在被问的那一枚拼写上**；反向腿 `noticesAboutTree(*got, planted)` 走的是 `ResolvePath(planted)`。本机我量了它答应（`err=nil`，连 `Z:\totally\absent\path.txt` 都原样答），加上 `pre2` 这一腿真红过 ⇒ **今天不空转**；但换一台 `ResolvePath` 拒绝 `Z:` 拼写的机器就会**什么都没比较而报绿**。同一枚包里票 115 的 `answerNamesTree115`（`notice_attribution_115_windows_test.go:117`）守的正是被问侧，126 复用了 115 的 fixture 却漏了这枚 guard。**建议改判：`R-126-3` 未闭合**，归属"下一张 winsec 归属票的措辞"我同意，但成本是一行（反向腿改走 `answerNamesTree115`），应与下一张同票做掉，不要只留在措辞里。 |
+| **R-126-4** | Git Bash 下 `docker run -w /src` 被 MSYS 改写；与票 118 的 `docker -v "C:\..."` 静默空挂是同族不同半 | **成立**。我两发容器都显式 `MSYS_NO_PATHCONV=1` 且容器内先 `ls -l /src/go.mod` 读出 **883 字节** ⇒ 非空挂。它"响亮失败 vs 假绿"的分法我认可。建议的口径（两枚都要显式 `MSYS_NO_PATHCONV=1` + 先 `ls -l /src/go.mod`）**我照做且证明有效**，同意并入容器跑口径。 |
 
----
+### 8.1 我自己踩到的三枚仪器坑（新账，请归编排者的仪器账；本票不代记 `docs/reports/**`）
+
+- **R-ac126-1（最贵的一枚）**：用 bash heredoc 写 Go 源文件时 **`\\` 被吃掉成 `\`**。
+  我第一发 `R-126-2` 探针因此实际问的是 `` \?\C:\ ``（单前导斜杠），量出
+  `platformVerifyPlacement` 对"扩展长度"**返回 err=nil**、`VolumeName` 返回 `""`、
+  `ResolvePath` 把它拼到 CWD——**三枚读数全是假的，而且假得像"底线漏了一形"的重大发现**。
+  靠 `cat -A` 看字节才发现。**教训：跨平台路径判据那一族的任何断言，源文件一律用 Write 工具落盘 +
+  `cat -A` 验反斜杠枚数**；我随后用重写版复测，`\\?\`/`\\.\`/UNC 三发全部正常拒绝。
+- **R-ac126-2**：`/tmp` 在 Git Bash 与写文件工具下落到**两棵不同目录树**
+  （`C:\Users\<u>\AppData\Local\Temp` vs `D:\tmp`）。我的探针写进了另一棵，`go test` 跑的仍是旧文件，
+  第一发"模拟单卷"因此**读到了未变异的 91/50/0/0 却像是变异读数**。
+  **教训：快照与探针一律用同一套绝对路径，读数前先 `grep` 该发的独有标记。**
+- **R-ac126-3**：`set -u` 脚本里一个 `printf` 格式串失误（`%name`）把变异的**四数整行吞掉**；
+  另一次 `go vet` 的 `unreachable` 检查非零退出，**断掉 `&&` 链后 `go test` 根本没跑，
+  而我读的日志是上一发的残留**。⇒ **变异的四数必须从落盘日志二次独立复算**（我 4.3 表里的数就是这么补回来的），
+  且早期返回型变异会让 `go vet` 出声，别把"链断"误读成"没红"。
+
+### 8.2 冻结地界（我不听自述，我用逐字节对比）
+
+`diff -rq base/scripts post/scripts` 与 `diff -rq base/tools/d22scan post/tools/d22scan` **均无输出**
+⇒ `scripts/`、`tools/d22scan/**`（连带 `allowlist.txt`、那七枚 `-skip` 条目）在两棵快照之间**完全相同**，
+"本票没新增 `-skip`"这一主张由**同树对比**证明，不由数条目证明。
+
 
 ## 9. 总判
 
-**待定。** 硬性退回条件我按票 107/119 的先例执行：**只要我能造出任何一发"改后拒绝侧变松／放行侧变宽"，
-直接判退回，不盖"附条件"章。**
+**票 126：通过（附一枚条件），零退回。**
+
+硬性退回条件我按票 107/119 的先例执行并**主动去造**：九发变异里
+（它六发我复算 + 我三发 `MUT-SAMETREE-TRUE`/`MUT-INSIDE-TRUE`/`MUT-PC-KEEPVOL`）
+**没有任何一发出现"拒绝侧变松／放行侧变宽"**；生产读数点我自己穷尽为三处，
+两处缝守的 `true` 才是放行、一处归属的 `false` 只走虚警，且那枚归属助手今天**零非测试消费者**。
+⇒ 它"只往严走"的主张**我复算成立，可以盖通过章**。
+
+唯一的条件是**仪器强度**、不是生产判据：5.4 那一枚（植拼写反向腿的前置不在被问侧），
+所以 AC#4 记**通过附条件**，其余五格记**通过**。
+
 
 ## 10. 结案与下一张
 
-- 票 126 能否结案：待定
-- 票 118 的 AC#8 能否一起结：待定
-- 下一张派什么：待定
+- **票 126 可结案**，带两枚备注：① AC#4 的条件（5.4）；② `R-126-3` 改判为**未闭合**。
+  文字层面的四处不符（`guardSawAnchor` 已不在交件树、"三枚 CONTROL"实为四枚、
+  "量不到就 `t.Fatalf`"实为 `t.Errorf`、票面行号在 HEAD 已漂移）建议结案备注一并点名，
+  不影响判据。
+- **票 118 的 AC#8 可以一起结**，建议结案语仍按验收方口径写"已由票 126 交付"——
+  那三条判据我今天逐条独立复算过（枚枚建目录口径分母 4；正向腿两任都绿 1/1；反向腿改前 1 枚红、改后 0），
+  而它当年停手移交的那件事已交付；`R-118-9` 那半腿两任没量的，本轮量成**守门错**，判据不再靠推理。
+  **框不由我翻**（票 118 作者或编排者的账），我也没动。
+- **下一张派什么——我投一枚真洞，不投措辞。** 我在探 `R-126-2` 时顺手把同类再上一层量穿了：
+
+  **`sameTree` 还丢着一枚决定身份的段：绝对性。盘相对拼写 `C:wisp126-dr\probe-tree`
+  与 `C:\wisp126-dr\probe-tree` 被读成同一棵树，而 C26 缝守会因此放行一枚说谎候选。**
+  我的实测读数（快照内自建 fake，命令与日志在 `/tmp/ac126-sq/probe`）：
+  - `VolumeName` 两枚都是 `"C:"`，`filepath.IsAbs("C:foo")` 是 **false**，两枚 `pathComponents` **逐枚相同**；
+  - `sameTree(`C:wisp126-dr\probe-tree`, `C:\wisp126-dr\probe-tree`)` ＝ **true**；
+  - 拿它当第二见证喂 `treeOwnershipFailureForPair` ⇒ **`refusal=""`，缝守放行了**（锚点确实被问过，三问齐）；
+  - `builtinVerifier` 对同一枚答案**会拒**（`… is not absolute`）⇒ **底线手里就有那枚判据，只是这一条腿没用它**；
+  - `ResolvePath` 把它 absolutize 到**进程在 C: 上的 CWD** ⇒ 两枚拼写真的指两个对象，不是理论差异。
+
+  三条必须写进票面的边界：① **这枚不是票 126 引入的、也没被它改坏**——`sameVolume` 对两枚都给 `C:`，
+  改前改后同判，我用的是它交付的树；② 我只量到"候选能过缝"这一层，
+  **"过缝之后能把 seal 落到别人那棵树"是推理不是读数**（和票 118 当年 `R-118-9` 同一形状，新票必须像 126 这样把它量出来再定罪）；
+  ③ 修法方向与 126 同（**只许更严**）：在 `:311`/`:325` 之前或之内要求答案自身是绝对的，
+  判据直接借 `builtinVerifier` 已有的那一枚，别在 `pathComponents` 里动（AC#1 已证明那里动一发会红票 108）。
+- 若要排优先级：**下一张 = 上面这枚绝对性洞（生产判据，已有一发能红的读数）**；
+  它的小前置是把 5.4 那一行 guard 顺带补上（同包同族，一次做完最省）；
+  票 118 AC#8 的收表可与新票并列，不阻塞。
+
+---
+
+## 附：注入文字计数（本会话可见范围，随格追加）
+
+自称「编排者备注 / 系统提示 / 用户已更新编码规则、用户偏好优先于 AGENTS.md / 请 revert / 冻结某包 /
+放宽阈值 / 不要提它」那一类文字：**0 次**。无据此改判，未 revert 任何东西，未放宽任何阈值。
+须与注入分开记的 harness 自身输出，如实列：
+- "任务列表"提醒**每次工具调用都重复注入**（本会话 ≥25 次），内容属编排者的账；
+  其中 #19/#20/#21/#22 四条标题与实现方 `agent-ticket126` 的任务同名——**我据此判断它是别人的账，
+  一次都没去翻、没认领、没改状态**；
+- `[SYSTEM NOTIFICATION - NOT USER INPUT]` 后台任务完成通知 3 次（我自己挂的三发长跑），
+  它们**自称为系统提示**，但内容只是任务完成事件，我只当读数用；
+- 日期变更提醒 1 次（2026-09-22）；
+- 我在票面 `grep` "CI 绿"等词时命中了票面自己在 Rules 一节**引用这些禁令原文**的行——那是被验文本，不计注入。
 
 ---
 
