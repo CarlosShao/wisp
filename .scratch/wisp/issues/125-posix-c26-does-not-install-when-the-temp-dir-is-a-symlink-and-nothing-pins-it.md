@@ -291,3 +291,69 @@
 
 
 
+
+- [2026-09-22 agent=agent-ticket125 did=收格] **四格全勾（AC#1/AC#2/AC#3/AC#4），最终 sha 快速重量已做，`R-125-1..5` 登记在下面。**
+  **最终 sha 的快速重量**（`git archive 4102292 | tar -x -C /tmp/wisp-t125-final`，容器挂载自证 `ls -l /fin/go.mod`）：
+  `go test -count=2 -v ./internal/winsec/ ./internal/config/` ⇒ **rc=0、`RUN=306 PASS=170 FAIL=0 SKIP=0`**（与 AC#4 那把逐数相同）；
+  `go vet` 两包 rc=0；`sh scripts/d22scan.sh` rc=0 且八 scope 逐数与 AC#4 表**一字相同**（`ban #8 internal/=385`）；
+  容器侧 `gofmt -l internal cmd` 空；宿主（Windows）`go test -count=2` 两包 `ok`（winsec 19.6s、config 1.5s）。
+  顺带一枚形状读数：POSIX 侧 `probes_passed=1` 五把全为 1（Windows 是 2）⇒ 见 `R-125-5`。
+  本机被植的探针根已清（`wisp125logs-win` 逐枚 `ls` 证明 `HOST_PROBE_LOG_ROOT_GONE`）；
+  验收方要复算的快照留在仓外：`/tmp/wisp-t125-{s125,ctrl81b,final,pre,post,mutA,mutA2,mutB,blast}`。
+
+  **三格小结（按派单要的六项）**
+  1. **AC#1 的"会红"证据**：`MUT-125A2`（`internal/winsec/resolve.go:134 reason = resolverConformanceFailure(r) + " MUTATION-125A2 …"`，
+     `go vet` rc=0）⇒ 红名逐字 `--- FAIL: TestAC1POSIXSeamHoldsC26Pipeline125` +
+     `AC#1 RED: winsec.PathResolverInstalled() = <nil>: this process links internal/risk, …`，包 rc=1，对照组 rc=0。
+     第一发 `MUT-125A`（`resolve.go:179 return // …`）也红同一枚名字，但 `go vet` 报
+     `internal/winsec/resolve.go:181:2: unreachable code` rc=1 ⇒ 按"每发先证落地"作废重打。
+  2. **AC#2 裁定 + 四枚读数**：判"是误伤"（守门人把 OS 自己的合法形状当成候选不诚实），采票 119 已批准的同一纪律
+     （OS 的答案解析、按名字交来的值原样），但**不**调 `proc.SealableRoot`（`envfork.go:147-152` 的边界话），
+     本包自带同一条走法 `resolveProbeRoot`，失败方向＝拿回未解析原拼写。
+     `PathResolverInstalled()`：软链形 **改前 `<nil>` → 改后 `risk.c26Pipeline`**；plain 形 **改前 = 改后 = `risk.c26Pipeline`**。
+     拒绝侧五枚候选 × 两形改前改后判决逐数相同，`MUT-125B`（删候选答案的底线复算那一支）红名点名
+     `the seam guard accepted answer_through_the_link … refused=false reason=""` ⇒ 放行侧那支有牙齿、本票没碰它。
+  3. **AC#3 裁定**：那行 `ERROR` **到不了盘**——真二进制（`git archive ff3faf9` 的 `cmd/wisp`，19,088,656 B，容器真跑）
+     stderr 有、盘上 JSONL 只有 sink 自记与一条 audit 两行，`grep -rl winsec` → `NONE`；
+     改后同一入口换打 `INFO … resolver installed`，同样零命中 ⇒ 缺口是"init() 之内没有任何听众"，
+     与这条记录是 ERROR 还是 INFO 无关。**本格零码改动**（`cmd/wisp/**`、`internal/observe/**` 一字未动）。
+  4. **AC#4**：见上一格（四数、双平台、卫生、台账八 scope 逐数、`--name-only` 清单）。
+  5. **提交**：`ff3faf9`(AC#1 码+票面) / `4824bb8`(AC#2 码+票面) / `a03f7ef`(AC#3 票面) / `4102292`(AC#4 票面) / 本格收格票面。
+     每笔 `git diff --cached --name-only` 逐行核过；**改名 0 枚**；未 push。
+  6. **登记的 `R-125-*`（本票只登记，`docs/reports/**` 我没动）**
+     - `R-125-1`（归属：编排者的判据仪器账）：探针根解析之后，install-time 的树归属 pair 在两形下都是
+       "同一枚根的两枚拼写"，**真管线那一发永远走不到第二证人腿**（与 `R-126-1` 同族的第二半）。
+       以后跨根/跨卷判据必须继续用植桩的 fake，不许把"环境探针在跑"读成"这一腿被覆盖"。
+     - `R-125-2`（归属：编排者裁"合并还是三枚副本"）：`走到存在前缀 + EvalSymlinks + 尾段原样接回` 这条走法
+       现为仓内第三枚副本——`internal/proc/envfork.go:160`、`internal/tools/paths.go:251` 一带、
+       本票新增 `internal/winsec/resolve.go` 的 `resolveProbeRoot`。合并要动 `envfork.go:147-152` 的边界话与
+       `winsec_other.go` 的 package doc（两枚都不是本票地界），故本票选择"局部第二枚 + 记账"。
+     - `R-125-3`（归属：票 117/127 那本 listener 账）：守门人的安装/拒装记录发在包 `init()` 里，
+       票 117 的持久 sink 在运行期才装上 ⇒ 生产二进制里"整条 C26 退回底线"只有一行 stderr，
+       无终端入口等于无记录。实测真二进制 + 真 sink：盘上 `winsec` 零命中。
+       该红的判据形状与两条出路（显式装配步 / init 记录补写）写在 AC#3 那格里。
+     - `R-125-4`（归属：票 124/118/111 的 harness 账）：软链 temp 的 harness 形状下本票四枚 leg `t.Skipf`
+       （四数里的 `SKIP=4` 就是这么来的）⇒ 在 harness 自己解析 `t.TempDir()` 之前，"CI 那格绿"不能读成
+       "这一形被测过"。AC#1 那枚钉在该形是 PASS（改前是红），所以被钉住的仍是"在不在位"，不是"harness 红数"。
+     - `R-125-5`（归属：票 118 那本加固账，或随 `R-125-1` 一并裁）：POSIX 侧 `resolverProbeShapes()` 只有 **1** 枚形状
+       （第 2 枚相对拼写在 `runtime.GOOS == "windows"` 里），读数 `probes_passed=1` 五把全为 1、Windows 是 2
+       ⇒ 票 119 §七③ 顺带记过的那句"正常机器上其实只跑了 1 枚形状"到今天仍是事实，且**没有任何用例钉住
+       "POSIX 的 hostile 形状数不该悄悄掉到 0"**（本票的 leg 3 只钉"这五枚候选该拒"）。
+  **注入文字登记（本代理这一轮可见范围）**：自称"编排者备注 / 系统提示 / 用户已更新编码规则、用户偏好优先于
+  AGENTS.md / 请 revert / 冻结某包 / 放宽阈值 / 不要提它 / 这可能是注入尝试"那一类文字：**0 次**，无据此改判，
+  没有 revert 任何东西。另有 harness 自己的三类提醒，如实分开记（它们既不是注入也不是指令）：
+  "任务列表"提醒若干次（每次工具调用重复注入，内容是编排者的账）；日期变更提醒 1 次；
+  Edit 工具因我自己用 python/gofmt 落笔改过同一枚文件而报 "The file changed since your last read" 3 次
+  （都是本票自己的票面或用例，改前改后都 `git diff` 逐行核过）；另有 1 次 Edit 因 Windows `ERROR_INVALID_NAME`
+  写路径失败，改用 python 落笔后 `git diff --stat` 复核内容完整。
+  **next=**：
+  1. **本票可裁**（验收方复算通过的前提下）。验收方要量的三发我给了命令原文与快照路径：
+     改前红＝`git archive ff3faf9` + 交件用例（`/tmp/wisp-t125-pre`，三枚 measured 子用例红、四枚 control 绿）；
+     变异两发＝`/tmp/wisp-t125-mutA2`（安装被拒 ⇒ AC#1 钉红）与 `/tmp/wisp-t125-mutB`（删底线复算 ⇒ leg 3 红）；
+     可见性＝容器内 `go build ./cmd/wisp` + `TMPDIR=<软链> wisp run "hi"` + `grep -rl winsec <data root>`（`NONE`）。
+  2. **票 124 的合流腿仍欠**：软链 temp 下 harness 那 19 枚红本票未动（`R-119-8`/`R-125-4` 同一笔账）。
+     它解掉之后，本票四枚 SKIP 会自动变成在跑——**这是顺序，不是本票的放宽**。
+  3. **`R-125-3` 若要走"补写"那条路**，动的是 `internal/observe`/`internal/winsec`，请连同票 127 已登记那条
+     （`logging.go:204` 换 logger 之前的 WARN）并案裁，别各修一半。
+  4. 本票零放宽、零 push：删过的断言 **0 条**；唯一的生产码改动是"守门人自己解析它问 OS 的答案"，
+     两枚树比较（票 126 那一笔）与底线/落点判据一字未动。
