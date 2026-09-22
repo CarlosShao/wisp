@@ -20,7 +20,7 @@
       跨卷同尾形是**攻击面**还是**运维事故面**？如果同一台机器上的两枚卷属于同一信任域，这一发的实际危害边界到哪里为止。
 - [x] **AC#2** 量出没量的那一腿：`resolve.go:325` 那条 C26 缝守在同形下**会不会把另一卷的树当成同一棵**
       （这条决定它是「记账错」还是「守门错」，**危害差一个量级**）。
-- [ ] **AC#3** 修法要**变异自证**：改前那枚跨卷用例红、改后绿；且**同一发不许让任何既有归属用例变成绿方式**
+- [x] **AC#3** 修法要**变异自证**：改前那枚跨卷用例红、改后绿；且**同一发不许让任何既有归属用例变成绿方式**
       （票 113/115/119 那三族拒绝腿一枚都不许松）。
 - [ ] **AC#4** CI 覆盖要么补上，要么**如实登记**「runner 单卷 ⇒ 这一形在 CI 上恒不可见」——
       **不许拿「CI 绿」当这一格的通过证据**（说不出 run id + job id + step 号就当那道门不存在）。
@@ -54,7 +54,7 @@
   `[C:\ D:\ E:\ F:\]` 可建目录的卷根，其余 22 枚字母报 "The system cannot find the path specified"——
   与前两任验收方的分母一致，没有另造一套。
 
-* 2026-09-22 20:0x（agent-ticket126，**AC#2＝量出来了：是「守门错」不是「记账错」**）：
+- 2026-09-22 20:0x（agent-ticket126，**AC#2＝量出来了：是「守门错」不是「记账错」**）：
   `R-118-9` 那一腿（"一条会跨卷作答的 resolver 今天能不能过那道缝"，两任都没造 fake resolver 因而 open）
   我这轮**造出来并量了**。形状：`treeOwnershipFailureForPair` 喂一枚我自己写的候选
   （`crossVolumeWitness126`），它对探针父答 `D:\wisp126-seam\probe-tree`、对探针子答
@@ -82,7 +82,7 @@
   （run 35595651898 的真实后果），所以交件的用例里同卷第二见证、包含关系的见证各留一枚 CONTROL，
   两枚都在改前/改后都绿，`TestTreeOwnershipProbeAcceptsAn83ShortSpellingOfItsOwnParent`（票 112）改后仍绿。
 
-* 2026-09-22 20:1x（agent-ticket126，**AC#1 裁定：卷段该进比较**）：
+- 2026-09-22 20:1x（agent-ticket126，**AC#1 裁定：卷段该进比较**）：
   **结论**：该进，且进的位置是那两枚树比较本身（`resolve.go` 的 `sameTree`/`answerInsideTree`），
   不是任一调用方——两枚调用方读的是同一个判据，修在调用方会留下第三枚将来新增的调用者仍然裸奔。
   `pathComponents` 自己**不动**：它剥卷段是为了"卷不是祖先"这件事（`winsec.go:308-311` 的注释就是理由，
@@ -104,3 +104,55 @@
   代价：POSIX 侧 `filepath.VolumeName` 恒为 `""` ⇒ 两枚比较逐字保持原判据，**没有**跨平台新红腿
   （票 107 那一族的复算在下面 AC#5 的 `GOOS=linux` 那一发点名）。
 
+- 2026-09-22 20:3x（agent-ticket126，**AC#3 变异自证＝勾**）：
+  **改前红**（快照 `D:\tmp\wisp126-s126\pre2` = `git archive 09b5285` + 交件那枚用例文件
+  `internal/winsec/volume_attribution_126_windows_test.go`，`go vet ./internal/winsec/` rc=0 之后才读名字）：
+  ```
+  --- FAIL: TestCrossVolumeSpellingsAreNotOneTree
+  --- FAIL: TestNoticeFromOneVolumeIsNotAttributedToAnotherVolumeSpelling
+  --- FAIL: TestNoticeFromOneVolumeIsNotAttributedToASecondRealVolume
+      --- FAIL: TestNoticeFromOneVolumeIsNotAttributedToASecondRealVolume/two_real_volumes
+  --- FAIL: TestSeamGuardRefusesACandidateWhoseSecondWitnessNamesAnotherVolume
+  ```
+  四枚顶层名字逐枚点到用例自己，红文原文含 `AC#3 RED: sameTree("C:\wisp126-trees\store-44440\artifact.txt",
+  "D:\...") = true, but these are two trees on two volumes`、`AC#2/AC#3 RED ... the seam guard admitted a
+  candidate that moves a seal across volumes` 与各 leg 名。**改后绿**：同一枚文件在 `a3ce3a4` 的树上
+  `--- PASS` 四枚、`--- FAIL`=0（读数在下面 AC#5 那一格与 baseline 快照同批发）。
+  两枚真卷那一发在本机量到 `A=C:\wisp126-xvol-<pid>\store-44440\artifact.txt
+  B=D:\wisp126-xvol-<pid>\store-44440\artifact.txt`，改前 "attributed to never-sealed B: 1"、改后 0，
+  正向腿两发都是 "attributed to A: 1 of 1" ⇒ 不是常数 false 凑的（票 118 判据 2 原样复算）。
+  `R-118-8` 的枚举口径照用：建目录枚举，本机分母 `[C:\ D:\ E:\ F:\]`=4 枚。
+  **变异清单**（每发打在 `git archive a3ce3a4` 的新快照里，`bash /d/tmp/wisp126-s126/mutate.sh`；
+  顶层 `--- FAIL` 数与红名逐发点名，`=== RUN` 每发都是 91）：
+  | 发 | 改法（打在 `resolve.go`） | FAIL | 红到的名字 |
+  |---|---|---|---|
+  | MUT-VOL-DROP-SAME | 删掉 `sameTree` 里那三行卷段检查 | 4 | 本票四枚全红 |
+  | MUT-VOL-DROP-INSIDE | 只删 `answerInsideTree` 里的卷段检查 | 2 | `TestCrossVolumeSpellingsAreNotOneTree` + `TestSeamGuard...`（缝守那枚的 :311 与 :325-answerInsideTree 两半各一条腿跟着红） |
+  | MUT-VOL-DROP-BOTH | 两枚都删＝改前状态 | 4 | 同 MUT-VOL-DROP-SAME，与 pre2 那一发逐名相同 |
+  | MUT-VOL-TRUE | `sameVolume` 常数 true | 4 | 同上（恒真＝退化回改前） |
+  | MUT-VOL-FALSE | `sameVolume` 常数 false | **16** | 见下面那段"没有一枚既有归属用例被放宽"的证据 |
+  | MUT-VOL-NOCASE | `sameVolume` 用大小写敏感的 `==` | 2 | 单元面 + 缝守新补的那枚 `control: ... another case of the volume letter` |
+  **同一发不许让任何既有归属用例变成绿方式**——两批发读数：
+  1. **既有用例一枚都没换判决**：`pre-base`(09b5285) 与 `post-base`(a3ce3a4) 各整包跑一遍，
+     顶层 `--- PASS` 名字集合做 `diff`，差别**只有本票新增那四枚**（`86 RUN/46 PASS` → `91 RUN/50 PASS`，
+     两发 `--- FAIL`=0、`--- SKIP`=0）。少一枚、多一枚别的都没有。
+  2. **恒假那一发证明正向腿仍然全有牙**：MUT-VOL-FALSE 红 16 枚，其中既有归属族 9 枚
+     （`TestAC1SealFileReportsTheInheritedGrantItCleared`、`TestAC1DefaultLogSaysInherited`、
+     `TestAC2InheritedNoticeHasANoiseBound`、`TestAC3OwnGrantsStaySilentWhicheverWayTheOSNamesThem`、
+     `TestSealReportsThePrincipalsItCleared`、`TestSealNoticeIsRecordedByDefault`、
+     `TestNoticeAttributionSurvivesAn83AliasOfItsOwnTree`、`TestNoticeAttributionKeepsTwoTreesApart`、
+     `TestSealNarrowsAndNamesThePrincipalItRemovedBySID`）+ 缝守/装配 3 枚
+     （`TestTreeOwnershipProbeAcceptsAn83ShortSpellingOfItsOwnParent`＝票 112 那条"诚实 resolver 必须过缝"，
+     `TestC26PipelineIsWiredIntoWinsec`、`TestAC3JunctionInputIsRefusedNotSealed`）+ 本票 4 枚。
+     ⇒ 新加的判据**不是**恒真也不是恒假的装饰，把它掰成"永远不同卷"会立刻把票 104/112/115/118 的正向腿一起拖红。
+  3. **票 113/119 那两族的拒绝腿可达性为 0**，这一点按字节算而不是按推理：本票动的是 `resolve.go` 里
+     `sameTree`/`answerInsideTree` 的函数体与其 fold 闭包，`winsec.go` 的 `pathComponents`/`pathPieces`
+     一字未动（`git diff --name-only 09b5285..a3ce3a4` 只有 `internal/winsec/resolve.go` 一枚生产文件），
+     而 113/119 的拒绝腿走的是 `platformVerifyPlacement` → `pathPieces` 那条 Lstat 走链的形状检查
+     （`winsec.go:323` 那一处 `vol := filepath.VolumeName(path)` 保留卷段、不参与比较，我没碰），
+     两侧不共用任何被改的字节。票 115 的归属腿在上面第 2 批读数里直接被 MUT-VOL-FALSE 红到。
+  方向自查（本票唯一被禁止的方向）：两枚比较在生产里**只**被当作"放行的理由"读
+  （`resolve.go:311`、`:325` 的 `true ⇒ return ""（窄，可以装）`；`winsec_windows.go:111` 的
+  `true ⇒ 这枚通知就是关于你那棵树`），收紧它们不存在任何把"被拒"翻成"被放行"的通路；
+  反向的过严代价由上表三枚 CONTROL 与票 112 那枚用例钉住，六/七枚腿里 `wantRefused:false` 的三枚
+  改前改后都绿（`CONTROL RED` 一次都没触发）。
