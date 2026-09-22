@@ -573,3 +573,43 @@ owner 关掉窗口、或者进程不是他从终端起的（GUI 双击启动＝s
 **任何平台都只在 Windows 执行**——`ci.yml` 里跑 `./cmd/wisp/` 的只有 windows-latest job 的
 "cmd/wisp CLI tests" 那一步（ubuntu job 走 `bash scripts/portable-tests.sh --scope=core`，清单里没有 `cmd/wisp`）。
 票 127 新加的三枚常驻腿用例带 `//go:build windows`，走的是同一条腿、同一个 step。
+
+---
+
+## 更正二（append-only）· 2026-09-22 19:0x · agent-ticket127 · §一 那张「会出声的安全事件」现状表重算（票 127 AC#3 / 来源 R-117-D）
+
+**为什么这张表必须重算**：它是别人的分母（票 07/34 的"最坏每秒几条"、票 121 的 models 腿都从这儿取数）。
+本轮逐格复算，**漏 4 族、错 2 个分母、错 2 处行号**；§一 原文一字不删（票面 append-only），改表在此。
+
+**复算口径**（拿这张表的人请先跑这一行，包数变了就是表要改）：
+`grep -rnE "slog\.(Warn|Error)\(" --include=*.go internal cmd | grep -v _test.go | grep -vE '^[^:]+:[0-9]+:[[:space:]]*//'`
+⇒ 非测试 **WARN/ERROR 共 40 枚**，分布：ball **17** / audio **5** / winsec 4 / observe 4 / proc 3 / plugin 2 / config 2 / statemachine 1 / secret 1 / cmd/wisp 1。
+（§一 原文只数到 9 行，且把 audio 记成 4、ball 记成 14。）
+
+### A. §一 已有行的漂移修正（2026-09-22 实测，基座 `938fda1`）
+
+| 原行 | 原坐标 | 复算 |
+|---|---|---|
+| 3 | `cmd/wisp/run.go:347` / `:421` | **漂 +8** ⇒ 现为 `run.go:355`（`perm: MODE-READ`）、`run.go:429`（`MODE-READ-FAILED`） |
+| 6 | `cmd/wisp/secret.go:471` WARN / `:473`、`:326` INFO | **漂 +19** ⇒ 现为 `:490` WARN、`:492` INFO、`:345` INFO；**这一行的判语不变**：`wisp secret` 今天仍无听众（`installLogSink` 的三个调用点是 `run.go:164`、`resident_windows.go:57`、`models.go:276`） |
+| 7 | `internal/proc/shutdown.go:145/:147` ERROR、`:130/:172` INFO/WARN | 坐标全对；**"GUI 腿这半格没采到"作废** ⇒ 票 127 的 `TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink` 第一次采到：子进程干净退出 rc=0，文件里 install 记录之后 **7 条** `shutdown step skipped (module not present)`，step 号 **[1 2 3 4 5 6 7]**，末条仍是 shutdown 记录（＝sink 在 D38(e) 之后才关） |
+| 9 | `internal/winsec/resolve.go:146/150/157/165/175/181`、`internal/risk/winsec_c26.go:21` | 坐标全对，但级别要写清：`:150/:157/:165` 是 **ERROR**、`:146/:181` INFO、`:175` Debug；`winsec_c26.go:21` 正是 `winsec.SetPathResolver(...)`（`func init()` 在 `:20`）⇒ **"resolver 那行永远追不上听众"仍然成立**，票 127 在常驻腿上也复现了：子进程 stderr 第一行就是 `INFO winsec: sealing path resolver installed resolver=risk.c26Pipeline probes_passed=2`，而 jsonl 的第 0 条是 install 记录 |
+| 5 | `internal/secret/migrate.go:198` WARN | 对；`MigratePlaintext`（`:86`）非测试调用方 **0** ⇒ "仍然没有听众"这句照旧成立 |
+| 1/2 | `winsec_windows.go:143`（`:317` 触发）、`tools/bridge.go:586/:822` → `run.go:463` | 全部复算为**真**（`noticeNarrowed` 在 `:317`，`auditf` 在 `:463`） |
+
+### B. §一 漏掉的行（**可达**、且改后自动被本票装的听众带走 ⇒ 分母必须含它们）
+
+| # | 事件（文件:行，2026-09-22 复核） | 为什么原来漏了 | 改后出到哪里 |
+|---|---|---|---|
+| 10 | `internal/statemachine/machine.go:139` ERROR `state machine rejected transition`（字段 `from`/`event`/`err`） | §一 只数了"安全族"，状态机被当成非安全件 | stderr + jsonl。可及性：`internal/statemachine` 的非测试 importer 含 **`cmd/wisp/models.go`**、`internal/models/bridge.go`、`internal/ball/*` ⇒ run/models 腿可达；常驻腿今天不可达（无球） |
+| 11 | `internal/plugin/disposal.go:208` ERROR `disposal_incomplete: Defer called after Dispose` + `:332` ERROR `disposal step failed` | 同上 | stderr + jsonl。可及性：`internal/plugin` 的唯一非测试 importer 是 `internal/memory/retention.go` ⇒ 走记忆保留的 run 腿可达。⚠ `:332` 在 `for _, f := range res.Failed` **循环里** ⇒ 一次关停可产出 N 条，"最坏每秒几条"要按 N 记 |
+| 12 | `internal/observe/goroutine.go:271` WARN `goroutine outside the D38 roster (leak symptom)` | §一 只列了同文件 `:168` 那枚 panic sink（第 8 行） | stderr + jsonl。**每条花名册报告里的每个未登记 goroutine 一条** ⇒ 与 `:168` 不同量级；常驻腿装有 `observe-logs` 自己的 flusher goroutine，接线后这一枚是**唯一可能在无人值守时逐轮重复**的 |
+| 13 | `internal/observe/logging.go:204` 与 `:307` WARN `observe: log retention sweep failed` | 完全漏（本票没数过自己） | **两格不一样**：`:307` 在周期 sweep 里 ⇒ 装在 `slog.SetDefault` 之后 ⇒ 会进文件；`:204` 在 `InitLog` 里、`installLogSink` 还没换默认 logger ⇒ **这条永远进不了它正在抱怨的那本文件**，只在 stderr。本票新写的 `cmd/wisp/logsink.go` 注释与票 127 用例把这一形状如实登记：**听众装不上的那一瞬，听众自己的失败是哑的** |
+| 14 | 非安全族分母：`internal/audio/*` **5**（不是 4）、`internal/ball/*` **17**（不是 14） | 数是 2026-09-21 数的，票 118/119/121 期间这两族被补过码 | audio 5 = `audio.go:136/:152`、`mmdevice_windows.go:60/:65`、`wasapimic_windows.go:112`；ball 17 = `ball_windows.go` 7（**含逐帧可重复的 `:393 slow drawFrame`、`:417 slow ULW frame`**）、`hotkey_windows.go` 6、`hotkey_reload.go` 3、`renderer_windows.go` 1。可及性（决定"最坏每秒几条"该谁测）：`internal/ball` 的非测试 importer 只有 **`cmd/balldebug`**（调试二进制，不是 `wisp.exe`），`internal/audio` 非测试 importer **0** ⇒ 这两族今天**都不在 wisp.exe 的任何一条腿上** |
+| 15 | 腿的数量：§一 全篇说"**两条腿**" | 票 121 又装了一条 | 今天 `installLogSink` 的调用点是 **3**：`run.go:164`、`resident_windows.go:57`、`models.go:276`（`wisp models ensure`）。所以"某事件有没有听众"要按**腿**问，不能再按"run/GUI 二选一"问 |
+
+### C. 本票 §五 那句前瞻的口径更新
+
+原文"GUI 腿接上球/音频之后…我没有数字可给"照旧成立，但**下一次测量的起点是 22 枚**（audio 5 + ball 17），
+其中**逐帧/逐调用可重复**的是 `ball_windows.go:393`、`:417`、`plugin/disposal.go:332`、`observe/goroutine.go:271` 这四处形状；
+`Level: "info"` 与轮转/上限一字未动（本票与票 127 都没动阈值）。

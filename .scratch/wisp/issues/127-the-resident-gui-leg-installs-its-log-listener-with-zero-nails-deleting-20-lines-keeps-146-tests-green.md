@@ -21,7 +21,7 @@
 - [x] **AC#2** 补 `R-117-C`（一处 over-claim 措辞）：`GOOS=linux go vet ./internal/observe/` **不能**当作「新增生产文件 Linux 编得过」的证据
       （`go list -deps` 里 `cmd/wisp` 命中 **0**），且三条 AC#3 用例在任何平台的 CI 上都**只在 Windows 跑**
       ⇒ 要么补上覆盖、要么在票面与代码注释里**如实降级**，二选一都要写出来。
-- [ ] **AC#3** 补 `R-117-D`（票 117 AC#1 那张「会出声的安全事件」现状表要重算，别再拿它当分母）：
+- [x] **AC#3** 补 `R-117-D`（票 117 AC#1 那张「会出声的安全事件」现状表要重算，别再拿它当分母）：
       漏了 2 族**可达**的 ERROR（`internal/statemachine/machine.go:139`、`internal/plugin/disposal.go:208/332`）与
       `internal/observe/goroutine.go:271`、`internal/observe/logging.go:204/307`；audio 是 **5** 不是 4、ball 是 **17** 不是 14；
       两处行号已漂（`run.go:347/421` → 实为 `355/429`）。
@@ -122,3 +122,36 @@
 2. `cmd/wisp/logsink_test.go` 头部新增 `PLATFORM LEG` 段（那三条 untagged 用例的所在地）；
 3. **票 117 票面新增「更正一」**（append-only：§六 原文一字不删，在其后逐字作废 + 上面这张表）。
 `gofmt -l cmd/wisp/` 与 `gofumpt -l cmd/wisp/` 在两处注释落地后仍为**空**，`go vet ./cmd/wisp/` **rc=0**。
+
+### 2026-09-22 19:0x · agent-ticket127 · **AC#3 完成（翻 [x]）：表重算并落在票 117「更正二」**
+
+**落点**：票 117 票面新增 **「更正二」**（§一 原文 append-only 不删，改表在其后），三段：A 已有行的漂移修正、
+B 漏掉的 4 族 + 分母 + 腿数、C §五 前瞻的口径更新。**本票没有为它写一行生产码**（纯纸面，判据在下面）。
+
+**口径（下一位拿这张表的人请先跑这一行，包数变了就是表要改）**
+`grep -rnE "slog\.(Warn|Error)\(" --include=*.go internal cmd | grep -v _test.go | grep -vE '^[^:]+:[0-9]+:[[:space:]]*//'`
+⇒ 非测试 WARN/ERROR **40 枚**：ball **17** / audio **5** / winsec 4 / observe 4 / proc 3 / plugin 2 / config 2 / statemachine 1 / secret 1 / cmd/wisp 1。
+
+**派单点名的每一格都自己复算过（不是抄来的）**
+- 漏项坐实：`internal/statemachine/machine.go:139` ERROR（`state machine rejected transition`）、
+  `internal/plugin/disposal.go:208` + `:332` ERROR、`internal/observe/goroutine.go:271` WARN、
+  `internal/observe/logging.go:204` + `:307` WARN ⇒ 全部逐行打开看过原文才写进表。
+- 分母坐实：audio **5**（不是 4）、ball **17**（不是 14），并给出逐文件分解（`ball_windows.go` 7、
+  `hotkey_windows.go` 6、`hotkey_reload.go` 3、`renderer_windows.go` 1；audio：`audio.go` 2、
+  `mmdevice_windows.go` 2、`wasapimic_windows.go` 1）。
+- 行号坐实：`run.go:347/:421` **确已漂到 `355/:429`**（+8）；本票另外量到 §一 第 6 行也漂：
+  `cmd/wisp/secret.go:471/:473/:326` → 实为 **`:490/:492/:345`**（+19），这条不在派单里，是我自己撞上的。
+- 复算后**没有**漂移的也照实登记：`winsec_windows.go:143`（`:317` 触发）、`tools/bridge.go:586/:822` → `run.go:463`、
+  `proc/shutdown.go:130/:145/:147/:172`、`winsec/resolve.go:146/150/157/165/175/181`、`risk/winsec_c26.go:21`、
+  `secret/migrate.go:198`（`MigratePlaintext` 非测试调用方仍是 **0**）⇒ 别把"这张表全错"当成结论。
+
+**本票量到的两处新账（写进表，不在派单里）**
+1. **腿不是两条是三条**：`installLogSink` 现有 **3** 个调用点 —— `run.go:164`、`resident_windows.go:57`、
+   `models.go:276`（票 121 给 `wisp models ensure` 也装了一条）。"某事件有没有听众"从此要按腿问。
+   `wisp secret` 那条腿仍然无听众（第 6 行的判语不变）。
+2. **听众装不上的那一瞬，听众自己的失败是哑的**：`observe/logging.go:204` 那条 WARN 发在 `InitLog` 内部、
+   即 `installLogSink` 换默认 logger **之前** ⇒ 它永远进不了它正在抱怨的那本文件（只在 stderr）；
+   同一条句子的周期版 `:307` 装在换默认之后 ⇒ 会进文件。两格必须分开记。
+
+**关停账（AC#1 那一发的副产品，正好填 §一 第 7 行"这半格没采到"）**：常驻腿干净退出 rc=0，
+install 记录之后 **7 条** `shutdown step skipped (module not present)`，step 号 **[1 2 3 4 5 6 7]**、末条仍是 shutdown 记录。
