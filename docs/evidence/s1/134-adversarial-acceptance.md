@@ -54,6 +54,7 @@
 | AC | 判定 | 一句话依据（原文/`file:line` 见同名小节） |
 |---|---|---|
 | AC#1 | PASS | 形状＝C 为主 + B 为辅，票面 `:179-186` 有 owner 原话与为什么不选 A；动 `ci.yml` 的第一枚 commit 在 AC#1 之后 |
+| AC#2 | PASS（B 那半边有一处判语不成立，见 §2.4） | run/job/step/结论四项我自己从 API 读到；那枚 run 的 `slo-check.ps1` blob 我复算＝`560186fa` |
 
 ## 1. AC#1 形状由 owner 认（PASS）
 
@@ -76,4 +77,94 @@ b9b2072 09-23 10:41 feat(134 AC#2,AC#3): daily schedule for slo-full plus a pin 
 
 阈值侧：`internal/observe/thresholds.go` 在 `6effb7e`、`b723978`、`3f17504`、`7b4c36a`、`ff4d27b`、`decb7b9`、
 `44ab500`、`HEAD` **八枚锚点上都是同一枚 blob `e2677b11b5a5adff8b4eb87c36d31286a274471d`**（`git rev-parse <r>:…` 逐枚算）。
+
+## 2. AC#2 真跑出一枚 run id + job id + step 名 + 结论（PASS；B 那半边见 §2.4）
+
+### 2.1 四项我自己从 API 取的（不引实现方的读数）
+
+```
+$ gh api repos/CarlosShao/wisp/actions/runs/35810714576
+  name=ci event=push branch=dev sha=58302cc status=completed conclusion=failure created=2026-09-23T02:31:45Z
+$ gh api repos/CarlosShao/wisp/actions/jobs/107021435150
+  name=slo-full conclusion=success runner labels=self-hosted,wisp-slo
+  started=02:31:49Z completed=02:34:30Z          # 窗口 161 s（票面那格写 162 s，差 1 秒，口径含首尾，不改原文只登记）
+  step 5 = "SLO full gate (six states + settle + leak)" conclusion=success started=02:32:17Z completed=02:34:17Z
+```
+
+⇒ run id + job id + step 名 + 结论四项齐，**这一格按本仓口径成立**。
+⚠ 一条我必须自己指出而不是顺着实现方：**整枚 run 的结论是 `failure`**（别的 job 红）。AC#2 那格引的是**第 5 步的结论**，
+这没有错，但"这枚 run 绿"这种说法在本票任何地方都不成立——本仓 `ci` 徽章长期全红（`A115②`），
+`slo-full` 一枚 job 的绿只是其中一步的绿。
+
+### 2.2 blob 等价（AC#2 那格的"改动真的在跑"）
+
+`gh api repos/CarlosShao/wisp/commits/<sha>` 逐枚取 head_sha，再 `git rev-parse <sha>:scripts/slo-check.ps1`：
+
+| 用途 | run | sha | `slo-check.ps1` blob | `thresholds.go` blob |
+|---|---|---|---|---|
+| AC#2 那枚 run | `35810714576` | `58302cc` | `560186fa` | `e2677b11` |
+| AC#6 前置取证（改前红） | `35817761098` | `df4a60a` | `560186fa` | `e2677b11` |
+| AC#6 争用⇒无结论 | `35825185739` | `44ab500` | `6e2ba550` | `e2677b11` |
+| AC#6 安静⇒真取样 | `35826548877` | `3f17504` | `6e2ba550` | `e2677b11` |
+
+`560186fa` 与 `e951dfa`（AC#4 那枚）的 blob **同一枚**（`git rev-parse e951dfa:scripts/slo-check.ps1` = `560186fa…`）⇒
+票面 AC#2 那句"那枚 run 里的 ps1 与我 `e951dfa` 的 blob 逐字节相同"**成立**。
+`6e2ba550` 与被验版本 `6effb7e`/`3f17504` 的 ps1 **同一枚**⇒ 两种绿都是**当前这码脚本**跑出来的，不是旧脚本。
+
+### 2.3 两种绿我各自读了步级原文（`gh api .../actions/jobs/<id>/logs`，取法写明）
+
+争用那发（job `107065251117`）第 5 步内，逐字：
+
+```
+2026-09-23T06:06:32.5959005Z slo-check.ps1: NO CONCLUSION (machine-contended) - subset=full refused to sample, no numbers were produced
+2026-09-23T06:06:32.5975951Z slo-check.ps1: machine-contended reason: foreign toolchain/wisp process present: go.exe pid=46680 started=2026-09-23 14:06:19 path=D:\work\base\go\bin\go.exe
+2026-09-23T06:06:32.5991238Z slo-check.ps1: machine-contended reason: foreign toolchain/wisp process present: link.exe pid=45912 …
+2026-09-23T06:06:32.6008624Z slo-check.ps1: machine-contended reason: foreign toolchain/wisp process present: gcc.exe pid=25184 …
+2026-09-23T06:06:32.6030546Z slo-check.ps1: machine-contended reason: foreign toolchain/wisp process present: cc1.exe pid=54776 started=… path=
+2026-09-23T06:06:32.6054940Z slo-check.ps1: NO CONCLUSION (machine-contended): 4 reason(s), 0 state file(s) written, slo-report.json NOT written
+2026-09-23T06:06:32.7134223Z slo-check.ps1: NO CONCLUSION (machine-contended): exit 0
+2026-09-23T06:06:33.9810367Z ##[warning]No files were found with the provided path: build/slo/slo-report.json. No artifacts will be uploaded.
+```
+
+同枚 run 的产物表我单独取了一次（`gh api .../runs/35825185739/artifacts`）：**只有 `slo-smoke-report 2026-09-23T06:07:46Z` 一枚**，
+没有 `slo-full-report` ⇒ "争用不给钉续命"这一形在真 CI 上成立（这是 AC#6 后半的关键之一，见 §6）。
+
+安静那发（job `107069434922`，sha `3f17504`）第 5 步内，逐字：
+
+```
+2026-09-23T06:24:30.0319569Z slo-check.ps1: precheck ok - no foreign toolchain/runner process, machine-wide cpu max 28%
+2026-09-23T06:24:45.3189869Z slo-check.ps1: state Sleeping exit=0 pass=True
+2026-09-23T06:25:00.5316293Z slo-check.ps1: state Armed exit=0 pass=True
+2026-09-23T06:25:15.7511029Z slo-check.ps1: state Warm exit=0 pass=True
+2026-09-23T06:25:31.0408151Z slo-check.ps1: state Conversation exit=0 pass=True
+2026-09-23T06:25:46.3450384Z slo-check.ps1: state PanelOpen exit=0 pass=True
+2026-09-23T06:26:01.5819050Z slo-check.ps1: state WorkPeak exit=0 pass=True
+2026-09-23T06:26:13.7390318Z slo-check.ps1: settle exit=0 pass=True
+2026-09-23T06:26:25.0032952Z slo-check.ps1: leak exit=1 flipped_to_fail=True
+2026-09-23T06:26:25.0582596Z slo-check.ps1: report written to E:\work\base\actions-runner\_work\wisp\wisp\build\slo\slo-report.json (all_pass=True)
+```
+
+我还把那枚 run 上传的 artifact **下载并解开了**（三枚：`10735461474` / `10735960453` / `10737938571`，
+见 `/tmp/wisp134-acc-r1-d/`；三枚 = `10737938571`（run `35832874239`，07:42:24Z）/
+`10735461474`（就是上面这枚安静 run `35826548877` 的）/ `10729737755`（run `35810714576`，AC#2 那枚））——
+每枚 `slo-report.json` 645 KB、`subset=full`、`results` 六条
+（Sleeping/Armed/Warm/Conversation/PanelOpen/WorkPeak）每条 `exit=0 pass=True` 且带 10 个字段的真 report、
+`settle.pass=True`、`leak_fixture.flipped_to_fail=True`、`all_pass=True` ⇒ 钉读到的"有效样"今天确实是六态真样，
+不是空壳（这一条正面回答 §6.2 的"假 report"问题在当前树上的真值）。
+顺带一格实现方没写的：`35810714576`（AC#2 那枚 run）自己也上传了 `slo-full-report`
+（artifact `10729737755`，`generated_at=2026-09-23T02:34:17Z`，六态齐、`all_pass=True`）⇒ AC#2 那格不必只靠
+"precheck ok" 那行日志间接推断它取到了样。
+
+### 2.4 AC#2 的 B 那半边：`schedule` 的"还没到点"这句判语，一半不成立（新发现）
+
+`gh run list --repo CarlosShao/wisp --event schedule --limit 10` ⇒ **空**（本仓历史上零枚 schedule run）。
+
+- `ci.yml` 的 `37 19 * * *`（19:37Z）：现在 08:37Z，**确实还没到点** ⇒ 这条判语成立。
+- `slo-fresh.yml` 的 `23 */6 * * *`（00:23/06:23/12:23/18:23Z）：`gh api .../actions/workflows/slo-fresh.yml`
+  回 `"created_at":"2026-09-23T11:41:11.000+08:00"` = **03:41:11Z**，也就是这枚 workflow 在 dev 上已注册 2 h 42 m，
+  **06:23:00Z 那一格已经过去、没有产出任何 run** ⇒ 证据 §5/§8.7 的 U2 把两枚 cron 一起写成"都还没到点"，
+  对 `slo-fresh.yml` 这一半**不成立**。
+  我不据此断言"cron 永远不响"：新加入默认分支的 scheduled workflow 在第一格被 GitHub 跳过是有的（也可能是高负载推迟）。
+  但它已经不是"还没到点"，而是"**到点了没响**"，这两者在本仓口径下差一整格证据（AC#3/AC#6 的钉自己那枚时钟从没走过）。
+  下一格是 **12:23Z**（距今约 3 h 45 m）⇒ 归给 §8 的 `R-134-4`：到点后再读一次，仍 0 就说明 B 那半边没在交付它承诺的东西。
 
