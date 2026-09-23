@@ -151,3 +151,55 @@
 也**不触发**票面那句"回 131 续单"。⚠ 但 `R-133-6` 指出前任 §3 那句"摘掉本尺五发零红"是**全称量词用假**（与 §2.0.1 自相矛盾）⇒ 证据面要改。
 
 **本票不结案**（AC#2 未勾）；`R-133-7`（gofumpt 未跑／d22scan "不降"无可比基线）归 **AC#5 那一格**，不阻塞本表；`R-133-8` 是验收方给自己的两轮种法教训（多点红了别家的门 ⇒ 会 `t.Fatalf` 掉子用例、分母缩小不是变绿），**不修**，写给下一位复跑者。
+
+---
+
+## AC#2 退回件的回修已交（本程 `worker-ticket133-ac2-fix` 09-23 22:5x +08，证据 `docs/evidence/s1/133-ac2-fix.md`）
+
+**动了哪一枚文件**：`cmd/wisp/leg_dispatch_gate_133_test.go` **一枚**（零新增用例、零改名、零阈值改动）
+＋ 本证据文件 ＋ 前任证据 `133-ac1-ac2-instrument.md` §3 旁边那段更正（**原文未抹**，`git diff --numstat`
+删除列 = 0）。**没碰** 131 的门与钉（`leg_sink_gate_131_test.go`／`leg_sink_nail_131_windows_test.go`
+只读、只 `-skip`），**没碰**兄弟在飞的 `cmd/wisp/providers_test.go`／`secret_test.go`。
+
+| 编号 | 修法一句话 | 验收方那一发复跑：改前 | 改后（红名全是 `TestAC1AC2DispatchHopGate133`） |
+| --- | --- | --- | --- |
+| `R-133-1`（高） | 覆盖桶只收 `isRunnableCase133`（`Recv==nil` ＋ `Test` 前缀 ＋ 参数恰一枚 `*testing.T` ＋ 无返回值），其余 test 声明落新的 `helpers` 桶（loose 走图仍看得见 ⇒ "用例经 helper 驱动这条腿"的原读数不丢） | `p1` 绿，账本 `covered=test TestSfx131LegIsDriven`（同名方法整包无 `=== RUN`、无 `--- PASS`） | **红**，`leg "sfx131" … covered by nothing` ＋ 账本 `covered=RED nothing` |
+| `R-133-2`（中） | 钉表查的就是那枚收紧后的桶 ⇒ 红名文案 "is not a test function" 与判据一致，并点名找到的是什么（helper/方法 vs 没这个名字） | `p3` 绿，`covered=nail phantomHelper133 -> cmdSfx131` | **红（两枚）**：钉不是用例 ＋ 这条腿无人覆盖 |
+| `R-133-3`（中） | 行扫描保留（不折回只信 AST），每枚标记记 `{leg,site,file}`；只有坐在"这条腿的 dispatch 文件 ∪ entry 声明文件"里的裁决句才算覆盖，放错地方的**单独报红**；first-seen 仍留给"裁决＋钉同场"与"裁决指向不在册腿"两枚判据 ⇒ 不降级 | `p2` 绿，`covered=ruling doctor.go:341` | **红（两枚）**：misplaced 那一枚 ＋ `covered by nothing`；正向控制一枚（裁决句写进 `sfx131x.go`）仍绿 |
+| `R-133-4`（中） | `caseLabelLegs133`：命令词标签逐枚成腿；`-` 拼写须是命令词前缀才折进新列 `aliases=`，否则自成一腿；非字面量标签各自成腿（X8 文案逐字未动） | `p5` 绿，账本仍 11 legs、`runalt133` 零行 | **红**：12 legs、`leg runalt133 … reaches installLogSink …` ＋ usage 双向差；`leg version aliases=--version\|-v` 从"零行"变"在行上看得见" |
+| `R-133-5`（低，验收方**未造**） | 本程造出来了（`p6`）⇒ 按"若造出来就一并修并附三态"修：`classifyCond133` 返回 `(keys, aliases, kind)`，复合条件里每一处 `argv==字面量` 都出一条腿；折叠规则与 `R-133-4` 合并成同一处 `splitCommandLabels133` | `p6` 绿，`x133a` 在整份读数里出现 **0 次**（12 legs） | **红（两枚）**：`leg "x133a" … covered by nothing` ＋ 无 usage 行；13 legs。**这一形自本程起是已证**，不再只登记字节 |
+| `R-133-6`（中，证据面） | 前任 §3 那句"摘掉本尺五发零红"旁边插入更正段（原文照录）：只有 X14 两拍零红，另四发摘掉本尺仍由 131 的门红 | — | 本程第一手凭据：同一棵有本尺的树上 `-skip` 掉本尺跑六发 ⇒ N-3／X4／X8／X12 各 rc=1 100/52/1/0 红 `TestAC4EveryLegIsNailedOrRuled`；X14 两拍 rc=0 100/53/0/0 无人红 |
+
+**五发老账不退化**：锚 `fbf420c` 的纯净树（`ARCHIVE-MODULE` 行 `sha1sum` 逐字节同、`git diff --name-only fbf420c HEAD -- cmd/wisp/` 空）
+上六发两拍、门关着（`-skip '^TestAC4EveryLegIsNailedOrRuled$'`）仍 **rc=1 100/52/1/0**，
+红名逐发仍点到本尺；每发六栏机检：131 门提及 0／`--- SKIP` 行 0／本尺 RUN 1／本尺 FAIL 1／`build failed` 0／`panic:` 0。
+**四数**（只从 `-v` 量）：`-count=2` = 202/108/0/0、`-count=1` = 101/54/0/0、`-skip` 本尺 = 100/53/0/0；
+逐名 `comm`：新增只有 `TestAC1AC2DispatchHopGate133` 一枚、消失 0 枚、共有 53 枚一字未动。
+**门禁**：`gofmt -l cmd/wisp/` 空；`gofumpt` **写明版本 `v0.12.0 (go1.27.1)`**（CI `ci.yml:111-114` 装的仍是 `@latest`、版本未钉 ⇒ 本读数只在改版前可比）空、
+CI 逐字同形 `gofumpt -l . tools/d22scan tools/mockllm` 空；`go vet ./cmd/wisp/` windows rc=0；
+`GOOS=linux go vet ./cmd/wisp/` rc=1 停在 cgo 包加载（诊断里 `cmd/wisp/*.go:line` 命中 0 ⇒ 既非破口亦非清白）、
+真类型读数是 `golang:1.27` 容器原生 `VET_RC_0`（挂载先证：`/src/go.mod` 883 字节＋被验那枚文件 60998 字节）；
+`sh scripts/wisp-cli-tests.sh` rc=0 且 101/54/0/0；`sh scripts/d22scan.sh` rc=0、各 scope 无缩小（只写"无缩小"，"不降"仍缺进仓基线 ⇒ `R-133-7`／AC#5 地界）；
+软链 temp 那一形两枚读数（普通形 101/54/0/0 vs 真符号链接形 rc=1 92/26/28/0，顶层名册逐名相同、`--- SKIP`=0，
+少掉的 9 枚是两枚父用例 `t.Fatal` 后没起的子用例、逐名列在证据 §5）＋ 一枚改前控制（`54123e0` 同形 92/22/32/0）。
+
+**两半句没做，按派单"报回不硬修"**：
+① `R-133-2` 的第一选项"登记表存函数值"**装不了**——`legCovers133` 那四枚声明指向的用例逐枚在
+`leg_sink_nail_131_windows_test.go:346,407`／`logsink_windows_test.go:137`／`resident_sink_nail_127_windows_test.go:393`，
+全在 `_windows_test.go` 后缀里，而本尺是跨平台文件 ⇒ 换成函数值会让 linux 侧 `go vet`／`go test` 直接 `undefined:`，
+把"关着门仍红"的独立读数换成"编不过"。代价已登记（`covered=nail` 那一列仍是按名字的源码查表，build-tag 藏起来的用例今天仍会被认作钉）。
+② `R-133-3` 那半句"裁决句必须点到该腿的 entry 名"没做——今天五枚裁决句（`main.go:65/70/74`、`panel_assets.go:16`、
+`slo_windows.go:186`）都没写符号名，装上就得改三枚生产文件的裁决注释才不红，出了本程地界。
+AC#3 那句"主动弄哑自己的自证腿"、AC#6（仪器进 CI 的 run id）、`R-133-7` 三格本程**未动**。
+
+**本格不勾**：AC#2 的翻格由编排者按裁决表判（派单写死"不许自己勾 AC#2"）。
+
+commit 列表（本程，锚 `54123e0`；只 commit 未 push）：
+`4ba8438` R-133-1＋R-133-2 修法 → `8bc75fa` 证据 §0/§1/§2.1/§3.1 → `6bb5a56` R-133-3 修法 →
+`e2e61a0` 证据 §2.2-§2.4/§3.2 ＋ 前任 §3 更正段 → `090bb3e` R-133-4 修法 → `fbf420c` R-133-5 修法（自造探针）→
+`7bdfbbb` 证据 §2.5/§3.5/§6 → `ca2b34a` 证据 §3.3/§3.4 → `21c8def` 证据 §5/§3.6 → 本节与票面 log 那一枚。
+
+`next=` 交回编排者：请**非实现者验收方**在 `fbf420c`（或其后代）上原样复跑 `p1`／`p2`／`p3`／`p5` ＋ 本程自造的 `p6`
+＋ 五发两拍，然后按 `docs/evidence/s1/133-adversarial-acceptance.md` §3.1／§6／§8 判 AC#2 是否翻格；
+`R-133-2` 的函数值那一支与 `R-133-3` 的 entry-name 半句**要动生产文件**，建议另派到 AC#3／AC#5 那两格里做，
+别在续单里顺手做半截；票 135 面上 `R-131r3-1` 是同族不同尺（131 的第二把尺），本程只修了 133 这一把，**两票不许互相以为对方已修完**。

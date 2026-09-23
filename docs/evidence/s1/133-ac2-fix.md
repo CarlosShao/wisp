@@ -395,7 +395,7 @@ comm -12 F-roster-ins.txt F-roster-skip.txt  ->  53 枚共有，一字未动
 | 读数 | 命令 | 结果 |
 | --- | --- | --- |
 | gofmt（整包） | `gofmt -l cmd/wisp/` | rc=0，输出 0 行 |
-| **gofumpt（版本写明）** | `go install mvdan.cc/gofumpt@latest` 后 `gofumpt -version` | **`v0.12.0 (go1.27.1)`**；本机原本不在 PATH ⇒ 这一枚读数是**这一版**量出来的。CI 那一步（`.github/workflows/ci.yml:110-117`）装的也是 `@latest`、**版本未钉** ⇒ 下一位复跑若版本不同，本行要重取，不能沿用 |
+| **gofumpt（版本写明）** | `go install mvdan.cc/gofumpt@latest` 后 `gofumpt -version` | **`v0.12.0 (go1.27.1)`**；本机原本不在 PATH ⇒ 这一枚读数是**这一版**量出来的。CI 那一步（`.github/workflows/ci.yml:111-114`（`- name: gofmt (gofumpt)` 在 :111、`go install mvdan.cc/gofumpt@latest` 在 :113、`gofumpt -l . tools/d22scan tools/mockllm` 在 :114；`sh scripts/d22scan.sh` 在 :109））装的也是 `@latest`、**版本未钉** ⇒ 下一位复跑若版本不同，本行要重取，不能沿用 |
 | gofumpt（本包） | `gofumpt -l cmd/wisp/` | rc=0，0 行 |
 | gofumpt（CI 逐字同形） | `gofumpt -l . tools/d22scan tools/mockllm` | rc=0，0 行 |
 | go vet（windows 原生） | `go vet ./cmd/wisp/` | rc=0 |
