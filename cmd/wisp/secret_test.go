@@ -664,7 +664,7 @@ func TestSecretFailurePathsLogAndPrintNoPlaintext(t *testing.T) {
 	})
 
 	t.Run("unset name (no such blob)", func(t *testing.T) {
-		dir := t.TempDir()
+		dir := sealableTempDir124(t)
 		p := newProbe(t, buildinfo.EnvTest, dir, false, "", goodKey, goodKey)
 		if code := p.cmd.run([]string{"get", "never-stored"}); code == 0 {
 			t.Fatal("get of an unset name must fail")

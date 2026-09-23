@@ -37,7 +37,7 @@ func newProvidersFixture(t *testing.T) *providersFixture {
 		t: t, srv: adaptertest.StartMockllm(t),
 		out: &bytes.Buffer{}, err: &bytes.Buffer{},
 	}
-	pf.dir = t.TempDir()
+	pf.dir = sealableTempDir124(t)
 	body := fmt.Sprintf(`schema_version = 2
 
 [llm]
