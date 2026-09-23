@@ -171,3 +171,109 @@ rc=1 / RUN=58 / PASS=52 / FAIL=6 / SKIP=0 / panic=0
 | 还原 | `diff -q` 与 pristine **无输出**，并另证与本程锚点仓库里那枚 `sampler.go` **逐字相同**；复跑 `rc=0 / 58 / 58 / 0 / SKIP0`（`…-anchor-M3-restore-v.txt`） |
 
 **本节小结**：AC#8②③ 两判据我都在自己的锚点上独立复现（终判与"哪几发复现了"见 §9）。
+
+---
+
+## §2 AC#9 判据①②③：逐判据对表
+
+### 2.1 判据①：用例形状与"是不是自己算自己"
+
+被验文件 `internal/observe/sampler_settle_zerosample_136_test.go`（commit `2f291d0`，`153 增 0 删`，本程锚点在位）。腿 A 的断言链逐跳与其落点（行号我自己 `grep -n` 复核过，实现方给的 `:63/:66/:73/:76/:79/:85/:88/:101-113` **全部对得上**）：
+
+| 跳 | 断言（原文） | 期望值来自哪里 | 落到生产码的哪一处 |
+| --- | --- | --- | --- |
+| 前提 1 | `reads == 0 ⇒ t.Fatal`（`:62-64`） | **测试自己维护的 fixture 计数器**（`ft.current` 里 `reads++`），不是被测函数的返回物 | `sampler.go:476` 的 `m, err := s.tree.ReadTree()` |
+| 前提 2 | `len(rep.Samples) != 0 ⇒ t.Fatalf`（`:65-67`） | 字面量 0 | `sampler.go:477` 那枚 `> 0` 判据 + `:486` 的 append |
+| 归因隔离 | `FreeOSMemoryRequested`／`FreeOSMemoryCount>0`／`FinalBytes<=CapBytes`（`:72-80`） | 这三条是**为了让 `Pass=false` 只剩一个可能来源**；其中 `FinalBytes<=CapBytes` 是**报告内部两字段互比**（唯一一处自指，见下） | `sampler.go:499-500` 的 `memOK`／`releaseOK` |
+| 钉 | `if rep.Pass { t.Fatalf }`（`:84-86`）、`if rep.BackWithinCapMS >= 0 { t.Fatalf }`（`:87-89`） | 字面量：不许 true、必须仍是负哨兵 | `sampler.go:488-489`（唯一能给 `BackWithinCapMS` 赋非负值的位置）与 `:498-501` |
+| 出线自陈 | `wire["samples"]` 在且空、`wire["pass"]==false`、`wire["back_within_cap_ms"]==float64(-1)`（`:101-113`） | 字面量 | `SettleReport` 的 json tag（`sampler.go:431-443`，其中 `samples`/`pass` 在 `:441-442`） |
+
+⇒ **不是"拿被测函数自己的返回值当期望值"**：整条链里只有 `rep.FinalBytes > rep.CapBytes` 那一跳是报告内部两字段互比，而它的用途是**归因守卫**（证明"内存比较这一项本身是满足的"），不是钉本身；钉本身用的是字面量。
+补一发说明这一跳也不是哑的：`stateMemCap` 若被改成负数，`memOK` 立刻假红，会先红在 `:78` 而不是悄悄绿过（这一发我**没有真打**，属读码推演，记进 §6）。
+
+腿 B（正向对照 `TestCheckSettleTrustworthyReadsAreRecorded`，`:125-153`）我复算了实现方自加的那发 **M11**（`:486` `rep.Samples = append(rep.Samples, sm)` ⇒ `_ = sm`，落地 `486:			_ = sm` ＋ `go build ./...` rc=0）：
+
+```
+rc=1 / RUN=58 / PASS=57 / FAIL=1 / SKIP=0 / panic=0
+--- FAIL: TestCheckSettleTrustworthyReadsAreRecorded     红在 sampler_settle_zerosample_136_test.go:142
+TestCheckSettleZeroTrustworthySamplesFailsClosed 同发仍 --- PASS
+```
+
+⇒ 两腿各响各的，腿 B 不哑（与实现方 §4.4 同读数）。
+
+**再补一发（实现方没造过的支，我造的）V7**：让 settle 循环**压根不读树**（`:476` ⇒ `m, err := TreeMetrics{}, error(nil)`）。这一发打的是腿 A 的**前提腿**，用来排除"前提腿写成恒真"：
+
+```
+$ grep -n 'TreeMetrics{}, error(nil)' …-anchor/internal/observe/sampler.go
+476:		m, err := TreeMetrics{}, error(nil)
+$ go build ./...   rc=0
+rc=1 / RUN=58 / PASS=55 / FAIL=3 / SKIP=0 / panic=0
+--- FAIL: TestCheckSettleZeroTrustworthySamplesFailsClosed   sampler_settle_zerosample_136_test.go:63: precondition broken: the tree was never read
+--- FAIL: TestCheckSettleTrustworthyReadsAreRecorded         sampler_settle_zerosample_136_test.go:142
+--- FAIL: TestCheckSettleVerifiesReleaseCounter              sampler_test.go:269
+```
+
+⇒ 前提腿**有牙**（今天不响、这么改才响），且这一发同包还有第二、第三枚仪器认（既有的 `TestCheckSettleVerifiesReleaseCounter`），归因不孤立。
+
+### 2.2 判据②：`:477` 落 `> 0` ⇒ `>= 0`（M10）——**两棵独立树各来一次**
+
+**先证落地再读数**（本程锚点树）：
+
+```
+$ grep -n 'if err == nil && m.PrivateWorkingSetBytes' …-anchor/internal/observe/sampler.go
+477:		if err == nil && m.PrivateWorkingSetBytes >= 0 {
+$ diff -u <pristine-anchor>/sampler.go <anchor>/sampler.go      # 只那一行
+-		if err == nil && m.PrivateWorkingSetBytes > 0 {
++		if err == nil && m.PrivateWorkingSetBytes >= 0 {
+$ go build ./...   rc=0
+```
+
+**有钉的树**（`anchor`＝`76662d8`，`/d/tmp/wisp136r2-ac8ac9-anchor-M10-v.txt`）：
+
+```
+rc=1 / RUN=58 / PASS=57 / FAIL=1 / SKIP=0 / panic=0
+--- FAIL: TestCheckSettleZeroTrustworthySamplesFailsClosed      ← 红名逐名＝只此一枚
+    sampler_settle_zerosample_136_test.go:66: precondition broken: a settle window of zero-footprint reads recorded 5 samples,
+      report=&{… CapBytes:26214400 FreeOSMemoryCount:1 FreeOSMemoryRequested:true BackWithinCapMS:20 ElapsedMS:100 FinalBytes:0
+              Samples:[{TreePrivateBytes:0 …}×5] Pass:true}
+=== RUN   TestCheckSettleTrustworthyReadsAreRecorded
+--- PASS: TestCheckSettleTrustworthyReadsAreRecorded (0.10s)     ← 同发仍绿
+```
+
+**无钉的树**（`nailless`＝`79ddd49`：守卫在位、AC#9 那枚钉还没有；同一发 M10、同一落地证明）：
+
+```
+$ grep -n 'if err == nil && m.PrivateWorkingSetBytes' …-nailless/internal/observe/sampler.go
+477:		if err == nil && m.PrivateWorkingSetBytes >= 0 {
+$ go build ./...   rc=0
+rc=0 / RUN=56 / PASS=56 / FAIL=0 / SKIP=0 / panic=0        ← 整包静默通过
+```
+
+⇒ **两棵树之差就是本格"有没有牙"的定义**：同一发放宽，无钉的包 56/56 rc=0（复算成立实现方 §4.2 与上一程 `R-136-1` 那句"56/56、rc=0"），有钉的包红且**只红本程那一枚**，红点 `:66`。实现方给的读数（`58/57/1/SKIP0/panic0`、红名一枚、红点 `:66`、改前 `56/56 rc=0`）我**逐项复现一致**。
+红名里那串病形与上一程验收方探针同族：`BackWithinCapMS:20`、5 枚 `TreePrivateBytes:0` 的"样本"、`FinalBytes:0`、`Pass:true`（枚数/毫秒随 ticker 抖动）。
+
+### 2.3 判据③：还原 ⇒ 复绿（三态齐）
+
+```
+$ python wisp136r2-ac8ac9-mut.py <anchor> <pristine-anchor> restore
+RESTORED
+$ diff -q <pristine-anchor>/sampler.go <anchor>/sampler.go            # 无输出＝与本程快照逐字相同
+$ diff -q <repo@76662d8>/sampler.go <anchor>/sampler.go               # 无输出＝与仓库里的生产码逐字相同
+$ go test -count=1 -v ./internal/observe/     # …-anchor-final-v.txt
+rc=0 / RUN=58 / PASS=58 / FAIL=0 / SKIP=0 / panic=0
+```
+
+`nailless` 那棵树还原后另取一发：`rc=0 / 56 / 56 / 0 / SKIP0 / panic0`。
+⇒ **AC#9 三态齐**：未变异绿（58/58）／变异红（58 RUN、1 FAIL、红名点名新用例、红点 `:66`）／还原复绿（58/58）。
+
+### 2.4 判据④的约束面（顺手核，不放宽）
+
+| 约束 | 我的复核 |
+| --- | --- |
+| 不许改 `SampleState` 那侧语义 | `git diff 1d38206..76662d8 -- internal/observe/sampler.go` **无输出** ⇒ 本程生产码一字未动，两格都是纯加钉 |
+| 不许动阈值／golden／`thresholds.go` | 同差集里 `internal/observe/` 只有 `sampler_test.go`（+10）与新用例文件（+153），`thresholds.go` 零命中；D32 的 0.5%/25MB 未被任何一发触碰（我的变异只落 `:290`/`:464`/`:476`/`:486`/`:498-501`/json tag，且**全部在仓外快照树**） |
+| 不许把已有 `TestCheckSettle*` 两枚改成 Skip | 两枚在本程每发读数里都是 `--- PASS`（或该红时红），包内 `t.Skip` 出现次数 0；`--- SKIP` 计数每发都是 **0** |
+
+### 2.5 本节仪器自报（诚实）
+
+V7 那一发我的驱动器第一次给的锚点文本在包里命中 **2 次**（`SampleState` 与 `CheckSettle` 同形一行），驱动**拒绝落发并回滚**；那次 `go build` 之后的读数是打在已还原的树上的（58/58 全绿，**不是**变异读数）。把锚点扩成三行唯一后重打，才得到 §2.1 里那发 V7。这条不是被验面的问题，是我的仪器行为，原样记。
