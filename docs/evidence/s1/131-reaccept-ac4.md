@@ -445,7 +445,7 @@ package other than this one is still invisible to a name walk"）。这句话此
 
 ---
 
-## 11. 临时件清单（按 `issues/README.md` 规则 8：**只建不删**，收尾我没跑过任何 `rm`/`rmdir`）
+## 11. 临时件清单（按 `issues/README.md` 规则 8：**只建不删**；收尾一次 `rm` 也没跑，但见本节末两笔违反）
 
 **基线与反查**：`/tmp/wisp131-acc-r3`（被验快照，含三枚 dll）、`/tmp/wisp131-verify-acc-r3`（同 sha 现取，用于 `diff -r` 反查）、
 `/tmp/wisp131-r3-old`（`56d8026` 锚点快照，用于 §1.1/§7 的两枚锚点复测）。
