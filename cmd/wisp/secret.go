@@ -209,8 +209,8 @@ func cmdSecret(args []string) int {
 	// (runSet) and the WARN record of a --force delete that left config
 	// references dangling (runUnset). Before this line neither of them outlived
 	// the terminal, which is the defect ticket 117 fixed on the run leg. The
-	// verdict is therefore "install", and leg_sink_nail_131_test.go drives this
-	// exact entry point to keep it.
+	// verdict is therefore "install", and
+	// leg_sink_nail_131_windows_test.go drives this exact entry point to keep it.
 	//
 	// What the install does NOT change is the C28 boundary, which is why it is
 	// safe here at all: the records name a ref, an env, a portability flag and

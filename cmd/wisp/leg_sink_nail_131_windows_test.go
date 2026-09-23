@@ -56,17 +56,33 @@ package main
 // waited for. The three drives in this file together cost milliseconds, which is
 // also why none of them is a subprocess case like ticket 127's.
 //
-// PLATFORM, because these two files are untagged and reach across to
-// windows-tagged ones: sinkInstallRecord and residentInstallMsg come from
-// resident_sink_nail_127_windows_test.go, and readSink, readResidentSink and
-// jsonlFilesUnder are the instruments declared there and in
-// logsink_windows_test.go. That is the choice, not an accident. package main has
-// no Linux leg (main.go's sherpa import is what makes `GOOS=linux go vet
-// ./cmd/wisp/` rc=1, and scripts/wisp-cli-tests.sh says the same in its header),
-// so today both directions compile or nothing does; on the day a Linux leg lands,
-// an untagged file that fails to *compile* is a louder reading than a second
-// windows-tagged file that silently drops the enumeration gate's denominator on
-// the other leg - which is exactly the hole ticket 121 AC#3 wrote out at length.
+// PLATFORM, because this file carries a windows name and that is a decision with
+// a measurement behind it, not a coincidence. Its two nails read records through
+// instruments declared in windows-tagged files - sinkInstallRecord,
+// residentInstallMsg, residentEarlyResolverMsg, jsonlFilesUnder and
+// readResidentSink come from resident_sink_nail_127_windows_test.go, readSink
+// from logsink_windows_test.go - and they register two cases that live there
+// (TestAC1ResidentLegInstallsItsLogListenerOnDisk,
+// TestAC2SealNoticeLandsInTheRunLegLogFile). While this file was untagged it
+// therefore referenced symbols that do not exist off Windows, and a real ubuntu
+// build said so out loud: `go vet ./cmd/wisp/` rc=1 with
+// "vet: cmd/wisp/leg_sink_nail_131_test.go:127:12: undefined: sinkInstallRecord"
+// (measured in docker.io/golang:1.27, linux/amd64, CGO_ENABLED=1, on a pristine
+// `git archive` snapshot; the same reading the CI lint job produced). Cross
+// compiling from windows cannot produce that reading - there the sherpa import
+// fails first with "build constraints exclude all Go files", which is what made
+// the red look like a toolchain artifact for four runs.
+//
+// The other way to fix the compile was to move those five helpers and those two
+// cases out of tickets 117 and 127's judgment files into untagged ones. That is a
+// rewrite of somebody else's instrument for a build fix, so the tag moved here
+// instead. What a windows tag costs is a denominator that can go empty on the
+// other platform without saying so, and that cost is paid where it belongs:
+// leg_sink_gate_131_test.go now reports a zero-registration platform as blindness
+// rather than as a clean ledger. Measured on the same linux build, that gate runs
+// and stays RED - four install legs it cannot reconcile plus the named empty
+// denominator. Red-without-coverage is not the same claim as green, and this file
+// does not make one.
 
 import (
 	"bytes"

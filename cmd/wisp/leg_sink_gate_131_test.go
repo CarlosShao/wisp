@@ -43,9 +43,24 @@ package main
 // non-vacuous. A registered case that reads the sink and asserts nothing would
 // satisfy it. Two things close the gap instead of this file alone: a registration
 // takes a func(*testing.T) *value*, so the named case has to exist and compile
-// into this test binary (a rename, a deletion, or a build tag that hides the file
-// is a compile error rather than a green), and the body check below requires the
-// registered case to reach the disk through one of the three shared sink readers.
+// into this test binary (a rename or a deletion is a compile error rather than a
+// green), and the body check below requires the registered case to reach the disk
+// through one of the three shared sink readers.
+//
+// THE ONE HOLE THAT COMPILING DOES NOT CLOSE, and what this file does about it:
+// a build tag can hide an ENTIRE nail file, and then the registrations simply are
+// not in the binary and nothing fails to link. That is not hypothetical - the
+// four nails this gate reconciles all live in files whose names end in
+// _windows_test.go, so on any other GOOS the denominator is zero. An empty
+// denominator on a platform that still enumerates install legs would be the worst
+// possible reading, greener than having no gate at all, so the check at the
+// bottom of the case below reports it as blindness (which legs it could not
+// reconcile, and which files the registrations live in) and stays red. Measured:
+// on linux/amd64 this gate runs and FAILS with four unreconciled legs plus the
+// named zero denominator; on windows it runs with four nails registered. What is
+// NOT claimed anywhere in this file is that a green here means "every leg has a
+// nail that tests it" - the ledger is about which legs reach the listener and
+// which claims name them, not about what each nail asserts.
 // The per-nail "拆掉 install 会红" mutations are recorded in the ticket face, and
 // they are the reading a reviewer is expected to re-run.
 //
@@ -214,7 +229,24 @@ func TestAC4EveryLegIsNailedOrRuled(t *testing.T) {
 		t.Errorf("AC#4 RED: %s", stale)
 	}
 	if len(legNails131) == 0 {
-		t.Error("AC#4 RED: zero nails registered in this test binary, so the gate has nothing to reconcile and would pass on an empty list")
+		// An empty registration list is not an empty obligation list. The legs are
+		// read off the sources, which every GOOS in this repository compiles the
+		// same way, while the nails are compiled into this binary and every one of
+		// them now sits behind a _windows_test.go file name. On a platform whose
+		// denominator is zero the rows above say "no nail" about legs that do have
+		// nails nobody compiled here - and the same silence, one edit later, would
+		// be a green ledger. Report the blindness by name and stay red.
+		var blind []string
+		for _, leg := range legs {
+			if leg.installs {
+				blind = append(blind, leg.key)
+			}
+		}
+		sort.Strings(blind)
+		t.Errorf("AC#4 RED (the instrument, not the code): zero nails registered in this test binary, so the gate has nothing to reconcile and would pass on an empty list.\n"+
+			"GOOS=%s compiled no nail file: every registerLegNail131 call lives in a *_windows_test.go file, so the %d leg(s) in the ledger that reach %s (%s) are UNREAD on this platform, not unnailed - and no row of this ledger is coverage here, in either direction.\n"+
+			"Fix: run this package where the nails compile (scripts/wisp-cli-tests.sh, the windows leg), or give this GOOS its own nail file and register it. This reading stays red on purpose: a gate that cannot see is not a gate that has seen nothing to complain about.",
+			runtime.GOOS, len(blind), installsFuncName, strings.Join(blind, ", "))
 	}
 
 	report := "leg ledger, enumerated from source at run time:\n" + strings.Join(lines, "\n")
@@ -255,13 +287,18 @@ type funcInfo131 struct {
 	slogSel map[string]bool
 }
 
-// loadMainPackage131 parses every .go file in dir. Build constraints are not
-// consulted, and that is argued rather than assumed: package main has no Linux
-// build (main.go's sherpa import makes `GOOS=linux go vet ./cmd/wisp/` rc=1 with
-// "build constraints exclude all Go files"), so on the only platform these tests
-// run - the one scripts/wisp-cli-tests.sh stages DLLs for - every file below is
-// compiled, and a leg or nail behind a tag would be caught by its registration
-// failing to link before this reading could be generous about it.
+// loadMainPackage131 parses every .go file in dir, whatever its build constraints
+// say, and that is argued from a measurement rather than assumed. The assumption
+// this file used to rest on - "package main has no Linux build, because main.go's
+// sherpa import makes `GOOS=linux go vet ./cmd/wisp/` rc=1" - was only ever true
+// of cross compiling FROM windows, where the sherpa constraint error comes first
+// and hides everything behind it. On a real linux runner the same command
+// compiles this package, test files included (CGO_ENABLED=1, rc=0), so
+// ignoring build tags here is not covered by "nothing else compiles anyway":
+// it unions same-named declarations across platforms on purpose, and the
+// denominator that CAN go empty on another platform is the registration list,
+// which the blindness check at the bottom of the gate reports instead of
+// swallowing.
 func loadMainPackage131(dir string) (*mainPackage131, error) {
 	entries, err := os.ReadDir(dir)
 	if err != nil {

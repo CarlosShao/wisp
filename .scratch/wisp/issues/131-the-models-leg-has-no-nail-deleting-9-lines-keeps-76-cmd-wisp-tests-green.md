@@ -302,3 +302,43 @@ CI 形状那格两趟 `ok` 分别是 44.302s（控制）与 42.988s（候选）�
 ⇒ 续单第一步不是改码，是 `git rev-parse HEAD` 重新锚定 + `git log --oneline -5 -- cmd/wisp/leg_sink_nail_131_test.go` 看清谁在动它；
 若 130 仍在飞，**先报告别动**（共享工作树，禁 `stash`/`checkout .`/`--amend`）。
 地界照旧：只碰 `cmd/wisp/**`；`internal/winsec/**` 由票 129 在飞，禁改清单含**用户自己有未提交改动的文件**。
+
+---
+
+## 续单进度（append-only，`worker-ticket131-followup`）
+
+### 2026-09-23 13:0x — 第 0 件：钉文件在 Linux 上编不过，已修；门的 Linux 分母如实报
+
+**重新锚定**：开工 `git rev-parse HEAD` = `3029415`（工作树干净）。`git log --oneline -6 -- cmd/wisp/` 显示
+最后动这包的是票 130 的 `9b5d64d`/`d87905c`，131 的代码态停在 `56d8026` ⇒ 验收方 §2 那张表（RUN 82/…）已不是当前树。
+**我的新基线（`3029415` 纯净快照 + 三枚 dll，`PATH=<快照>/third_party/sherpa-onnx`）**：
+`go test -count=2 -v ./cmd/wisp/` ⇒ `=== RUN` **200** / 顶层 **PASS 106 / FAIL 0 / SKIP 0**（子用例 94/0/0），rc=0，`ok` 104.464s；
+`sh scripts/wisp-cli-tests.sh` ⇒ `=== RUN` **100** / 顶层 **PASS 53 / FAIL 0 / SKIP 0**（子用例 47），rc=0，`ok` 53.519s；
+`sh scripts/d22scan.sh` ⇒ rc=0，八 scope `bans#1-5 internal/=203 cmd/=22 · #6 frontend/=40 · #7 internal/tools/=18 · #8 design/=16 frontend/=40 internal/=390 cmd/=37`。
+（与验收方 §2 的差 = 票 129/130 新增的文件与用例，逐数只增不减。）
+
+**复现（Docker `golang:1.27` 原生 linux/amd64，CGO_ENABLED=1，纯净快照）**：
+`go vet ./cmd/wisp/` rc=**1** ⇒ `vet: cmd/wisp/leg_sink_nail_131_test.go:127:12: undefined: sinkInstallRecord`，
+与 CI run `35817761098` 那行逐字一致。**误归因为什么会发生**：在 Windows 上 `GOOS=linux go vet ./cmd/wisp/` 只拿到
+sherpa 那句 `build constraints exclude all Go files` 就死了（包加载阶段，类型检查没跑），真伤挡在后面 ⇒
+"整树 rc=1 = 交叉编译假象"这种整体归因不成立，本轮起所有 vet 读数**逐错误行归因**。
+
+**选 (A)（改名）不选 (B)，理由里有两条实测**：
+① 派单要我先量的那件事我量了 —— **A 之下门在 Linux 不是恒绿**：钉文件改 windows-only 后，
+`go test -count=1 -v -run TestAC4EveryLegIsNailedOrRuled ./cmd/wisp/` 在 Linux 原生仍**红**（4 行 `install=true` 的腿
++ `zero nails registered`，GATE_RC=1，原文见证据档 §3）。清单不为空是因为 `loadMainPackage131` 从**磁盘源码**读腿、
+无视 build tag，两平台拿到的都是同一张 15 行表，只有 `nails=` 那一列会空 ⇒ "看不见任何钉 ⇒ 永不报少一条腿"这个后果不存在。
+② 但那一发红**说的是假话**（把"本平台没编译钉"报成"这些腿没钉"），故同批改门的分母检查：
+`len(legNails131)==0` 那一支如实报名 GOOS + 四枚读不见的腿 + 修法，**一条红也没移除**，Windows 侧读数逐字不变。
+③ 不选 (B) 的实测理由：131 的钉文件在 Linux 缺的不是 1 枚符号而是 **8 枚**，其中两枚是票 117/127 的**用例本体**
+（`TestAC2SealNoticeLandsInTheRunLegLogFile`、`TestAC1ResidentLegInstallsItsLogListenerOnDisk`）+ 5 枚 helper，
+搬到无后缀文件 = 为编译破口重写别人的判据件，超本件授权。
+
+**改后**：Linux `go vet ./cmd/wisp/` rc=**0**；Windows 门的四行 `nailed` 账本逐字不变，三枚 131 用例 PASS。
+改名 `git mv`（R100），新落 `cmd/wisp/leg_sink_nail_131_windows_test.go`；旧名 `cmd/wisp/leg_sink_nail_131_test.go` 同 commit 消失。
+另把 `secret.go:212` 注释里的文件名跟着改，并把门文件头/`loadMainPackage131` 注里那句**已被证伪的事实**
+（"package main 没有 Linux 构建"）换成实测读数。判据强度零变化。
+
+**登记（不下判断）**：同一枚 Linux 容器整包跑 ⇒ 顶层 20 PASS / 20 FAIL，红因原文都是 `DPAPI is only available on Windows`
+（与 `scripts/wisp-cli-tests.sh` 头部当年"ubuntu 19 of 29 红"同一格旧账，非本件引入，归 `next=` ③）。
+证据档：`docs/evidence/s1/131-followup-0-crossplatform.md`。
