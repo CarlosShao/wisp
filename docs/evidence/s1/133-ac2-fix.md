@@ -344,9 +344,22 @@ RUN 从 101 到 100 就是那一枚被 `-skip` 掉的 131 门）。逐名与四�
 四发仍由 131 的门红、只有 X14 两拍零红。§2.4 那段更正按这一枚读数写。
 （两形树基不同的那笔账在 §6 第 7 条，别把这两枚当成同一枚读数。）
 
-### 3.6 四枚探针在最终树上的复跑（`fbf420c` ＋ 第 5 枚修法之后，见 §3.6 段日志 `FIN-*.log`）
+### 3.6 四枚探针在同一棵最终树上的复跑（`fbf420c`，五枚修法全在场）
 
-（待填：B 脚本读数）
+时刻 `date -u` 14:46:44Z–14:47:3xZ（本地 22:46–22:47 +08），树 `/d/tmp/wisp133-ac2fix-T9`，
+日志 `FINAL-B.log` ＋ `FIN-*.log`。每枚先 `go build ./...` 证落地再取判据。
+
+| 探针 | build | 本尺 | 红名原文（裁到 150 列） |
+| --- | --- | --- | --- |
+| `p4` 对照 | rc=0 | **rc=1 红** | `AC#1 RED: leg "sfx131" (main.go:81) is dispatched by func main and covered by nothing: …`；账本 `covered=RED nothing` |
+| `p1` 同名方法 | rc=0 | **rc=1 红** | 同上那一枚红；探针件落地行 `probe133_test.go:10: func (phantomRecv133) TestSfx131LegIsDriven() { _ = cmdSfx131(nil) }` |
+| `p2` 不相邻裁决 | rc=0 | **rc=1 红（两枚）** | `AC#1 RED: doctor.go:341 carries WISP-LEG-COVERAGE-RULING: for leg "sfx131", but doctor.go owns neither this leg's dispatch (main.go:81) nor any symbol it c…` ＋ `covered by nothing` |
+| `p3` 钉指向 helper | rc=0 | **rc=1 红（两枚）** | `AC#1 RED: this gate claims leg "sfx131" is nailed by "phantomHelper133", which is not a test function in this directory's sources: declares probe133_test.g…` ＋ `covered by nothing`；落地行 `leg_dispatch_gate_133_test.go:140: {leg: "sfx131", test: "phantomHelper133", entry: "cmdSfx131"},` |
+| `p5` 同 case 多标签 | rc=0 | **rc=1 红** | `AC#1 RED: leg "runalt133" (main.go:80) reaches installLogSink on this path: dispatch -> runTextTask -> installLogSink` ＋ usage 双向差那一枚 |
+| `p6` 复合 if（自造） | rc=0 | **rc=1 红** | 见 §3.5（树 `T8`＝同一版尺，与 `T9` 只差兄弟那三枚文件，本尺 `sha1sum` 同） |
+
+⇒ **四条（＋一条自造）在最终树上全部转红、红名全部点到 `TestAC1AC2DispatchHopGate133`**，
+且六发 `go build ./...` 全 rc=0（不是包级 `[build failed]` 冒充红）。
 
 ## 4. 四数逐名账（合并态快照，只从 `-v` 量）
 
@@ -377,7 +390,42 @@ comm -12 F-roster-ins.txt F-roster-skip.txt  ->  53 枚共有，一字未动
 本程**没有**另起 `*_133_test.go` 新件：四条的"探针"是**变异件**（装在快照树里、跑完留盘不进仓），
 不是一枚新的进仓用例；AC#3 那句"给这条判据装一枚主动弄哑自己的自证腿"是**另一格**（见 §6）。
 
-## 5. 门禁（待填）
+## 5. 门禁（最终 sha `fbf420c`，树 `/d/tmp/wisp133-ac2fix-T6`；日志 `FINAL-C.log`）
+
+| 读数 | 命令 | 结果 |
+| --- | --- | --- |
+| gofmt（整包） | `gofmt -l cmd/wisp/` | rc=0，输出 0 行 |
+| **gofumpt（版本写明）** | `go install mvdan.cc/gofumpt@latest` 后 `gofumpt -version` | **`v0.12.0 (go1.27.1)`**；本机原本不在 PATH ⇒ 这一枚读数是**这一版**量出来的。CI 那一步（`.github/workflows/ci.yml:110-117`）装的也是 `@latest`、**版本未钉** ⇒ 下一位复跑若版本不同，本行要重取，不能沿用 |
+| gofumpt（本包） | `gofumpt -l cmd/wisp/` | rc=0，0 行 |
+| gofumpt（CI 逐字同形） | `gofumpt -l . tools/d22scan tools/mockllm` | rc=0，0 行 |
+| go vet（windows 原生） | `go vet ./cmd/wisp/` | rc=0 |
+| go vet（`GOOS=linux`，宿主交叉） | `GOOS=linux go vet ./cmd/wisp/` | **rc=1**，三行诊断全部是 `imports github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files in …@v1.13.8`；诊断里 `cmd/wisp/*.go:line` 命中数 = **0** ⇒ 既非破口亦非清白（逐错误行归因），真类型读数走下面那枚容器 |
+| 容器真类型读数 | `golang:1.27`，`CGO_ENABLED=1`，仓库 `:ro`，`GOPROXY=off` | 挂载先证：`/src/go.mod` 883 字节、`/src/cmd/wisp/leg_dispatch_gate_133_test.go` **60998 字节**（就是被验那枚文件）、`/gomod/github.com` 列出 `!burnt!sushi dlclark dop251…`；`go env` = linux／amd64／1／/gomod；`go vet ./cmd/wisp/` ⇒ **VET_RC_0**。挂载走 `/d/...` ＋ `MSYS_NO_PATHCONV=1`（Git Bash 下 `docker run -v "C:\…"` 会静默挂空且 rc=0＝假绿） |
+| CI 逐字同形 | `sh scripts/wisp-cli-tests.sh` | rc=0；`portable-tests.sh: four numbers (all from -v output): === RUN=101 --- PASS=54 --- FAIL=0 --- SKIP=0`；`runtests.sh: OK - … top-level: PASS=54 FAIL=0 SKIP=0, === RUN=101, '[no tests to run]'=0`。⚠ 该脚本自带的 `-skip` 名单（7 枚：`TestDefaultDeadlineWallClockMeasurement` 等）在本包 `*_test.go` 里**逐名零命中** ⇒ 两形读数逐字同不是"被跳过"造成的 |
+| 全仓仪器 | `sh scripts/d22scan.sh` | rc=0、clean；正向控制 `runtests.sh: OK - top-level: PASS=21 FAIL=0 SKIP=0, === RUN=31`；各 scope：`bans#1-5 internal/=203`、`cmd/=22`、`#6 frontend/=40`、`#7 internal/tools/=18`、`#8 design/=16`、`frontend/=40`、`internal/=401`、`cmd/=39` |
+| 四数（字面 AC#5 命令） | `go test -count=2 -v ./cmd/wisp/` | 见 §4：202/108/0/0，`[no tests to run]`=0，`panic:` 行 0，本尺出现 2 次 |
+
+**d22scan 的"各 scope 不降"怎么说才不越界**：验收方在 `c5f140c` 快照上量的是
+`internal/=397`、`cmd/=38`（ban #8 那两枚），本程在 `fbf420c` 上量到 **401／39**——
+增加的是兄弟在 `54123e0..fbf420c` 之间落进 `cmd/wisp`／`internal` 的用例文件（票 124 的 AC#2b 批次），
+**没有任何一枚 scope 缩小**。本程据此只写"无缩小"，不写"不降"成立——
+进仓的历史基线数没有，那一笔仍记在 `R-133-7`（AC#5 地界，见 §6 第 5 条）。
+
+**容器与分母那两个坑（两形各一枚，"不再红"要分清变绿还是被跳过）**：
+
+| 形 | 读数 | 名册 |
+| --- | --- | --- |
+| 普通 temp（`go test -count=1 -v ./cmd/wisp/`，最终 sha 树） | rc=0 **101/54/0/0** | 54 枚顶层 |
+| **真符号链接 temp**（`MSYS=winsymlinks:nativestrict ln -s` 造 `link2 -> tmpdir-real`，`TMPDIR`／`TMP`／`TEMP` 全指过去；普通 `ln -s` 在本机造不出来，第一次那枚 `SYMLINK-MADE=no` 的读数只是"换了个真目录"，不算这一形） | rc=1 **92/26/28/0** | 顶层名册与普通形 `diff` **逐名相同**（54 枚）；`--- SKIP` 行 **0** |
+
+⇒ 软链那一形下少掉的 9 枚 `=== RUN` **不是被跳过**，是两枚父用例 `t.Fatal` 之后它们的子用例没起，
+逐名是 `TestSecretUnsetRefusesWhileReferenced` 的 6 枚与
+`TestTicket101UnreadableModeFailsLoudlyAndStrict` 的 3 枚；两枚父用例本身都在 28 枚红里。
+**控制一枚**：同一形在**改前**基树 `54123e0`（无本程任何修法）上是 rc=1 **92/22/32/0** ⇒
+那一形的红早于本程、且本程之后顶层红 32 降到 28（降的是兄弟那批 tempdir 转换，不是本尺放的水）；
+本尺自己在那一形里 `--- PASS: TestAC1AC2DispatchHopGate133`。
+日志：`C-symlinktmp.log`（最终 sha 软链形）、`C-symlinktmp-PREFIX.log`（改前控制）、
+`t-normal.txt`／`t-sym.txt`（两次 `=== RUN` 名册，`comm` 差集即上面九枚）。
 
 ## 6. 未验证、没做的、与要报回来的
 
