@@ -122,7 +122,7 @@ panic: runtime error: index out of range [0] with length 0 [recovered, repanicke
 | --- | --- | --- | --- | --- |
 | 1 | `diagnostics_test.go:101` | `def[0].ID` | 同一表达式里 `len(def) != 1 \|\|` 短路 | **不改**：空 slice 时左项已为真，`\|\|` 短路后 `def[0]` 不可达，形状本身就是长度守卫 |
 | 2 | `earlylog_130_test.go:127` | `got[0]/[1]/[2]` | 同行 `len(got) != 3 \|\|` 短路 | **不改**：同上 |
-| 3 | `earlylog_130_test.go:131` | `recs[1]`、`k[0]` | `recs` 与 `got` 同源（`msgs()` 就是从 `snapshot()` 派生的，实测 `earlylog_130_test.go:62-69`），`:127` 已断 3 枚；`k[0]` 前有 `len(k) != 1 \|\|` | **不改**：索引源长度已被同一测试里的 `t.Fatalf` 钉住，且 `flushed != 3` 在 `:123` 先响 |
+| 3 | `earlylog_130_test.go:131` | `recs[1]`、`k[0]` | `recs` 与 `got` 同源（`msgs()` 就是从 `snapshot()` 派生的，实测 `earlylog_130_test.go:51-64`），`:127` 已断 3 枚；`k[0]` 前有 `len(k) != 1 \|\|` | **不改**：索引源长度已被同一测试里的 `t.Fatalf` 钉住，且 `flushed != 3` 在 `:123` 先响 |
 | 4 | `earlylog_130_test.go:134-135` | `recs[0]`、`recs[2]` | 同 #3 | **不改**：同因 |
 | 5 | `earlylog_130_test.go:172-173` | `recs[0]` | `:169` `if len(recs) != earlyLogMaxRecords+1 { t.Fatalf }` | **不改**：长度守卫在索引之前，且是 Fatal 不是 Error |
 | 6 | `earlylog_130_test.go:232` | `sink.snapshot()[0]` | `:230` `if flushed, _ := b.drain(sink); flushed != 1 { t.Fatalf }` | **不改**：`flushed` 就是落进 sink 的记录数，等价于长度守卫；真漂了会红在 `:231` 而不是 panic |
@@ -385,8 +385,9 @@ $ /d/work/base/gopath/bin/gofumpt.exe -l internal/observe/
 | `f08c247` | `docs/evidence/s1/136-ac8-ac9-impl.md` | §4-§7 |
 | `d068527` | `.scratch/wisp/issues/136-….md` | 票面 log 追加 5 行（§4.5 那条 flake 的读数更正） |
 | `0ba1b46` | `docs/evidence/s1/136-ac8-ac9-impl.md` | §4.5／§5-G4 同步补记 |
+| （本枚） | `docs/evidence/s1/136-ac8-ac9-impl.md` | §7 补全 ＋ §8 两个计数（这一句写下的同时它自己也成了清单里的一枚，不再回头改数） |
 
-⇒ 本程共 8 枚 commit（代码 2 枚：`79ddd49`／`2f291d0`；证据与票面 log 6 枚）。每枚 `git add -- <显式路径>`、`git diff --cached --name-only` 只出现上述路径；`git commit -q -F - -- <显式路径>`；**只 commit 未 push**；未用 `--amend`/`reset`/`rebase`/`stash`/`checkout .`；仓内未建 worktree。工作树里那枚未跟踪件 `docs/reports/2026-09-23-gap-analysis-vs-oss-harnesses.md` 全程未读、未提交、未改、未删。
+⇒ 本程 commit：代码 2 枚（`79ddd49`／`2f291d0`）＋ 证据与票面 log 若干枚（`36443f2`／`595abd3`／`040f4d4`／`f08c247`／`d068527`／`0ba1b46`／本枚）。每枚 `git add -- <显式路径>`、`git diff --cached --name-only` 只出现上述路径；`git commit -q -F - -- <显式路径>`；**只 commit 未 push**；未用 `--amend`/`reset`/`rebase`/`stash`/`checkout .`；仓内未建 worktree。工作树里那枚未跟踪件 `docs/reports/2026-09-23-gap-analysis-vs-oss-harnesses.md` 全程未读、未提交、未改、未删。
 
 期间有兄弟代理/编排者的 commit 交错进同一条分支（我核过它们与本程地界零交集）：`ca2b34a`／`21c8def`／`6e027e4`（票 133）、`048a9e4`（票 122）、`5803479`／`d39dd93`／`dda1dd0`（HANDOVER 与 A13x 台账）。`git diff --name-only 1d38206..HEAD -- cmd/wisp` **无输出** ⇒ 我在 `cmd/wisp` 的禁区确实没进。
 
