@@ -106,3 +106,109 @@
 - 四台 `SKIP` 计数（顶层 + 子测试）**全 0**。
 - ⚠ **28 枚两形都红的名册改前改后逐名相同**：`diff /d/tmp/wisp124-2b4-logs/both-red.txt both-red-post.txt` ⇒ **0 行、rc=0**。即本批既没把它们修绿、也没多红一枚、也没换名。
 - 改后 only-in-link **0 枚**（`comm -23 POST-L.red POST-P.red` 空）；`POST-L.red.txt` 与 `POST-P.red.txt` `diff` **逐名 IDENTICAL**（各 28 名）。
+
+
+## 3. 判据②：普通形一枚都不许多红 + `git diff` 证判定分支一字未动
+
+**逐数相同**：POST-P 与 PRE-P **八个数逐数相同**——`RUN=71 PASS=20 FAIL=21 SKIP=0` ＋ `SUBPASS=23 SUBFAIL=7 SUBSKIP=0`（包级耗时同量级 `10.377 s`／`10.334 s`）。普通形红名 **28 → 28**，一枚都不许多红、一枚也没被修绿。
+
+四条脚本核过的等式（不靠目测）：
+
+- 普通形红名册：`diff PRE-P.red.txt POST-P.red.txt` ⇒ **0 行**（各 28 名）。
+- 两形都红那一档跨批不变：`diff both-red.txt both-red-post.txt` ⇒ **0 行、rc=0**（PRE 台算出的 28 枚名册与 POST 台算出的**逐名相同**）。
+- 用例名集合：`PRE-P ↔ POST-P`、`PRE-L ↔ POST-L`、`POST-L ↔ POST-P` `comm -3` 各 **0 行** ⇒ 没多一枚、没少一枚。
+- `test timed out`／`panic` 在 8 发 `-v` 日志里各 **0** 命中 ⇒ 没有"一条挂了吞掉同包读数"的形状。
+
+**`git diff` 的删除侧全文只有 2 行，两行都是 `t.TempDir()` 那一个表达式**（`git show --numstat 5265c3a` ＝ 3 枚文件、删除列合计 2；下面是 `git diff 54123e0 5265c3a -- cmd/wisp/` 里全部非 `---` 头的 `-` 行，逐字抄，`^I` 是一枚制表符）：
+
+- `^Idir` 前缀两行的原文（省略 `-` 号）：
+  - `^Ipf.dir = t.TempDir()` — **1 行**（`providers_test.go:40`，`newProvidersFixture` 里那一枚，覆盖 4 枚顶层）
+  - `^I^Idir := t.TempDir()` — **1 行**（`secret_test.go:667`，`unset name (no such blob)` 子测试体内那一枚）
+
+**新增侧只有 3 枚文件、40 行**：上面两行的同名替换（`sealableTempDir124(t)`，逐文件 `+/-` 严格对称 `1/1`、`1/1`）＋ 新委托文件 `cmd/wisp/tempdir_resolved_124_test.go`（`38/0`）。⇒ **判定分支、断言、阈值、golden、期望值一行未动**：删除行与新增行一一对应，全部落在「递给底线的根怎么拼」这一件事上。⇒ 票面 AC#3「不许拿放行侧放宽换绿」在本批成立：解析层在**调用方（测试）**这一侧，`internal/winsec` 与 `internal/risk` 的判定码一个字没碰（本批连 `internal/**` 都没碰）。
+
+范围核对（命令逐条跑过，命中数即结论）：
+
+- `git diff --name-only 54123e0 5265c3a -- cmd/wisp/` ＝ **本批 3 枚路径**，别的零枚。
+- 禁改列**零 hunk**（`git diff --name-only 54123e0 5265c3a -- <清单>` 输出 **0 行**）：`docs/PLAN.md`、`docs/specs/**`、`internal/risk/**`、`internal/risk/pathresolver*.go`、`rules_gateway.go`、`tools/d22scan/**`、`allowlist.txt`、`frontend/**`、`internal/winsec/**`、`internal/proc/**`。
+- 票 133 在飞的那枚文件**零 hunk**：`cmd/wisp/leg_dispatch_gate_133_test.go`（工作树里它此刻是 `M`，那是兄弟自己的改动，本程未 add、未 commit、未读进任何一发）。
+- 票 131 的门与钉（只读列）**零 hunk**：`cmd/wisp/leg_sink_gate_131_test.go`、`cmd/wisp/leg_sink_nail_131_windows_test.go`。
+- 前三批已交面**零回退**：`internal/{memory,config,tools,llm,perm,agent}/**` 在 `54123e0..5265c3a` 输出 **0 行**。
+- 任何阈值／golden／`thresholds.go`：**0 行命中**（`git diff --name-only 54123e0 5265c3a | grep -iE 'threshold|golden'` 为空）。
+- `internal/winsec/**` 的 `SealableRoot` 调用方数**不因本批腐坏**：`grep -n "SealableRoot(" internal/winsec/*.go` 的非注释命中数仍 **0**，`internal/proc/envfork.go:148` 那句 "nothing in internal/winsec calls it" 逐字仍成立。本批把调用方从 3a 的 9 枚增到 **10 枚**（新增的是 `cmd/wisp` 的测试侧委托），全在 winsec 之外。
+
+⚠ **本包内留着没改的同类站点（逐名登记，与批次 2／3a「非红用例的站点不顺手改」同处理）**：改后 `grep -n 't\.TempDir()\|os\.TempDir()' cmd/wisp/*_test.go` 共 **49 行**（其中 1 行就是新委托本体里被解析的那一枚，不是递根点）。按文件分：
+
+| 文件 | 站点数 | 为什么没改 |
+|---|---|---|
+| `secret_test.go` | 21 | 全属**别的使用例**：`:646`/`:684` 是同一父用例的另两枚子测试，`:684` 那枚（`store_write_failure_surfaces_the_ref_only`）在**两形都红**（28 那一档，本批一枚不许顺手修绿）、`:646`（`unwritable store dir`）两形都 PASS；其余 `:174…:1192` 属两形都 PASS 或都红的其它用例 ⇒ 都不在本批 5 枚账面内 |
+| `secret_dataroot_119b_test.go`（`!windows`） | 3 | 票 119 的 R-119-1 复验件；两形都 PASS ⇒ 不在分母 |
+| `dataroot_128_test.go` / `run_mode101_test.go` / `run_test.go` / `logsink_test.go` | 2/2/1/2 | 同上：不在 5 枚名册内（其中 `run_mode101_test.go`、`run_test.go` 的贡献者正是那 28 枚两形都红的命令面腿，改了就是把本票范围外的事顺手做掉） |
+| `*_windows_test.go` 5 枚文件（`dataroot_128_windows`、`early_log_nail_130_windows`、`leg_sink_nail_131_windows`、`logsink_windows`、`resident_sink_nail_127_windows`、`secret_argv_windows`） | 17 | 带 `//go:build windows` 的三枚（`logsink_windows`、`resident_sink_nail_127_windows`、`secret_argv_windows`、`dataroot_128_windows`、`early_log_nail_130_windows`）在 POSIX 容器里**连编译都不参与** ⇒ 本票形状无分母；另两枚是票 131／130 的钉与门，只读列 |
+| `leg_dispatch_gate_133_test.go`、`leg_sink_gate_131_test.go` | 0 | 本就无 `t.TempDir()`；且属地界外 |
+
+⇒ 本批只把**账上那 5 枚各自可达的 2 处递根点**换掉；其余 47 处按名留在原样。
+
+## 4. 判据③：两形各取一枚 + RUN／SKIP 差**逐名**解释
+
+两形各一枚已完成（§2 的 POST-L／POST-P，另 `-count=2` 两形各一枚见 §7.1）。本批只裁**一枚包** `./cmd/wisp/`：
+
+- **`RUN` 两形逐台相等、差为 0**：PRE-L `71` = PRE-P `71` = POST-L `71` = POST-P `71`。⇒ 票面 15:3x「软链形自己会缩小分母」那条附带发现（AC#1 记的是 `memory 36→67`、`tools 77→79`、`config 99→101`、`winsec 45→52` 四枚包）**在本包不复现**，`cmd/wisp` 从来不在那四枚里。**机制**：会缩小分母的形状是"父用例死在 setup ⇒ `t.Run` 的子测试从未被创建"。本包 5 枚里 4 枚是**顶层**（顶层被 `=== RUN` 计入，与它死不死无关），第 5 枚 `unset name (no such blob)` 的红落在**子测试自己体内**（`t.Run` 已经跑起来、`newProbe`/`p.cmd.run` 都在子测试体内），所以子测试总数恒为 `SUBPASS+SUBFAIL = 30`（PRE-L `22+8`、PRE-P `23+7`、POST-L `23+7`、POST-P `23+7`）⇒ **分母一枚没缩**。唯一"缩"的可能性来自那 28 枚里的 `TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128`（它有 4 枚子测试），四台都数到 4 枚 ⇒ 也没缩。
+- **`SKIP` 两形逐台相等、恒为 0**（顶层 + 子测试，四台八数全 0；名册 `POST-L.skip.txt`/`PRE-L.skip.txt` 各 0 行）。⇒ 本包**没有**形状自带的 SKIP：AC#1 点名的那 4 枚「从跑变成 SKIP」全在 `internal/winsec`（3 枚票 125 自拒探针）与 `internal/config`（1 枚），**一枚都不在本包**。
+- **「变绿」还是「被跳过」逐枚分清**：① §2 表 POST-L 列 5 枚**逐枚写的是 `PASS`**，取自 `-v` 日志的逐名 `--- PASS` / `    --- PASS` 行（非包级 `ok`）；② 四台 `SKIP` 计数全 0 ⇒ 没有任何一枚可以用 SKIP 蒙绿；③ 用例名集合 PRE-L ↔ POST-L `comm -3` = **0 行** ⇒ 改后软链可见用例集合与改前软链**同一批**，不是"少跑了几枚所以绿"；④ 那 5 枚自己的机制字串（其名字出现在 `refusing to seal /varlink/w124tmp/<它们的名>` 里）从 PRE-L 的 5 处降到 POST-L 的 **0 处**（§1 ④ 逐名归因），是同一枚用例走通了 setup，不是没走。
+- ⚠ **"不再红"在本包还第三种可能要分清**：一枚用例可以从"红在未解析根"变成"红在别处"。逐名核过没有这种偷换——5 枚在 POST-L 全是 `PASS` 而不是 `FAIL`（§2 表），且 28 枚那档名册 `diff` 前后 0 行 ⇒ 没有一枚从 5 挪进 28、也没有一枚从 28 挪进 5。
+- 普通形那一发同样 `SKIP=0 SUBSKIP=0`，用的却是**另一枚新容器**、并带 `exit 99`（`/varlink` 必须根本不存在、`/plainroot` 不许是链接）⇒ 两形只差 `TMPDIR` 一个变量，不是同一容器换了个环境变量。
+
+## 5. 判据④：本批「另一种拒」逐枚**实拿**被拒字符串
+
+**取字串仪器**：`/d/tmp/wisp124-2b4-probe` ＝ 改后快照 + **6 处纯打印插入**（`/d/tmp/wisp124-2b4-probe-patch.py` 生成，只加 `t.Logf`；另在委托文件里加一枚**只打印**的 `acqLines124probe` 过滤器 helper）。一处都没动断言／阈值／期望值／控制流；行号锚不中即 `ANCHOR MISS` 且**不写盘**。**探针台 PROBE-L 八个数与 POST-L 逐数相同**（`rc=1 RUN=71 PASS=20 FAIL=21 SKIP=0 SUBPASS=23 SUBFAIL=7 SUBSKIP=0`），且红名册 `diff POST-L.red.txt PROBE-L.red.txt` ⇒ **0 行** ⇒ 探针没改变任何结局。以下逐字抄自 `/d/tmp/wisp124-2b4-logs/PROBE-L.__cmd_wisp_.txt` 的 `ACQ124-2B4` 行（共 6 行，`grep -c` 核过）。
+
+5 枚各自要的那一句「另一种拒或成」，**枚枚实拿**：
+
+1. `TestProvidersProbeRecordsMeasuredThinkingFalse` — 要的是「声明与实测不符要被喊出来」，不是执行。实拿 P1：
+   `root handed down="/realpriv/w124tmp/TestProvidersProbeRecordsMeasuredThinkingFalse3799153245/002"` ＋
+   `mismatch announcement received="wisp providers: 能力实测不符：acme/mock-small 声明支持 thinking，实测不可用（thinking probe: no reasoning delta (stop=end_turn text=\"echo: [think] 2+2=? Answer with just the number.\"), the advertised thinking produced nothing to think with）"`
+   ⇒ ①拿到的是**它自己要的那句能力实测不符**，②`root handed down` 已是解析后的 `/realpriv/…`（这层解析起效的直接旁证）。
+   再补一发 P1b（同一枚用例的判决列与落库行）实拿：`map[fc:PASS thinking:FAIL vision:PASS] thinking="FAIL" fc="PASS" has_timestamp=true` ⇒ 与 `:151-168` 那三条正向钉（`thinking` 必 `FAIL`、`fc` 必 `PASS`、时间戳非零）逐条对上。
+2. `TestProvidersProbeRecordsMeasuredThinkingTrue` — 要的是「同一命令、同一服务、只是服务能力换了 ⇒ 不许出现不符」。实拿 P2：`mismatch lines received=""` ＋ `verdict column=map[fc:PASS thinking:PASS vision:PASS]` ⇒ 拿到的是"零枚不符行"，正是它的断言方向。
+3. `TestProvidersDiscoverListsWhatTheServerServes` — 该枚里唯一"必须拒"的入口是 `pf.call("discover", "nope")` 不许 exit 0。实拿 P3：`unknown-provider refusal, full stderr: "wisp providers: 目录中没有 provider \"nope\""` ⇒ 拿到的是**目录里没有这个 provider** 那一族拒，不是"未解析根"那句。
+4. `TestProvidersProbeUnconfiguredRefIsNotSilentlyKeyless` — 要的是「解析不出 key_ref 时必须拒、且点名 Unconfigured、且一枚 chat 请求都不许发出去」。实拿 P4：`unconfigured-key refusal actually received: "wisp providers: 端点未就绪（Unconfigured）：auth: llm: resolving api_key_ref for provider \"acme\" failed (Unconfigured)"` ⇒ 拿到的是 `Unconfigured` 那一族拒（`:243` 的 `strings.Contains(…, "Unconfigured")` 由实拿串自证，不靠推）。
+5. `TestSecretFailurePathsLogAndPrintNoPlaintext/unset_name_(no_such_blob)` — 要的是「unset 一个没存过的名字时，失败信息必须点名那个 ref、不漏明文」。实拿 P5：
+   `root handed down="/realpriv/w124tmp/TestSecretFailurePathsLogAndPrintNoPlaintextunset_name_(no_such2193653121/001"` ＋
+   `stderr="wisp secret unset: secret: delete \"dpapi:never-stored\": no blob file under /realpriv/w124tmp/…/001/secrets: remove /realpriv/w124tmp/…/001/secrets/never-stored: no such file or directory"`
+   ⇒ 拿到的是**「no blob file … no such file or directory」**那一族拒、且串里点名 `never-stored`（`:678` 那句 `strings.Contains(q.errb,"never-stored")` 由实拿串自证）；改前软链形它拿到的是密封拒（§2 末逐字），两者不是同一句。
+
+**逐名核对，不是推**：PROBE-L 日志里 `ACQ124-2B4` 命中 **6** 行（五个入口 P1/P1b/P2/P3/P4/P5 各一行）；把「`refusing to seal /varlink/w124tmp/` 后面跟着本批那 5 枚之一的名字」这一条单独数，四台是 **PRE-L `5` → POST-L `0` → PROBE-L `0` → MUT-L `5`**（命令 `grep -c 'refusing to seal /varlink/w124tmp/\(TestProviders\|TestSecretFailurePathsLogAndPrintNoPlaintextunset\)'`）⇒ 变绿的是那 5 枚自己、变异回来的也是那 5 枚自己。本批 5 枚**全部**落在"必须成"或"必须拿到另一种拒"两档，**没有一枚**的断言被「未解析根」那句替代。
+
+⚠ 票面 16:33 那节列的 6 枚「另一种拒」在本包**一枚都没有**（那 6 枚分布在 winsec 3、memory 2、tools 1、llm 1）⇒ 上面 5 枚是**按本批自己的断言原文自己找、自己实拿**，没靠清点账的结论推断。
+
+## 6. 判据⑤：变异自证（票面 AC#4）— 三态原文
+
+变异 ＝ **把接上去那一步退回旧实现**：唯一一枚委托 `sealableTempDir124` 的函数体不再解析，把 `t.TempDir()` 原样交回去（标记 `MUTATION-124-2B4`；`proc` 引用留一行 `_ =` 保编译）。**两处调用点一个字不动** ⇒ `cmd/wisp` 的行为逐字回到改前。台子 `/d/tmp/wisp124-2b4-mut`（由 post 快照复制），跑法同一支 `/d/tmp/wisp124-2b4-h.sh`，变异件 `/d/tmp/wisp124-2b4-mutate.py`（锚不唯一即不写盘）。
+
+**变异先证落地，再读数**（容器 `wisp124-2b4-mutproof`，原文 `/d/tmp/wisp124-2b4-logs/MUT-PROOF.txt`，逐字）：
+
+```
+== mutation landed (grep -n) ==
+37:	_ = proc.SealableRoot // MUTATION-124-2B4: the resolution layer this batch added is removed here
+38:	return t.TempDir()    // MUTATION-124-2B4: hand the OS's unresolved root straight back
+return-proc-SealableRoot(t.TempDir())-remaining: 0
+sealableTempDir124-call-sites-still-present: 2
+== go build ./... ==
+go build rc=0
+== go vet ./cmd/wisp/ ==
+go vet rc=0
+```
+
+⇒ 四条先于任何红名读数：`grep -n MUTATION-124-2B4` 命中 **2 行**（就是被改的那两行）、`return proc.SealableRoot(t.TempDir())` 残留 **0**、两处调用点仍在（**2**）、容器原生 `go build ./...` rc=0、容器原生 `go vet ./cmd/wisp/` rc=0。挂载自证同 §0（`go.mod` 883 字节、`md5` 逐字同）。⚠ 如实登记一件事：插入后 `gofmt -l` 曾点到这枚被改文件（两枚尾注释的对齐），本方对**变异台**跑了 `gofmt -w` 再进容器；**入库那棵树从未被 gofmt 碰过**（§7.2 的 `gofmt -l cmd/wisp/` 全 0 行是在 post 快照上量的）。
+
+三态读数（同快照血统、同容器镜像、同形状断言）：
+
+| 台 | 形状 | 八个数 | 红名 |
+|---|---|---|---|
+| **POST（未变异）** | 软链 | `rc=1 RUN=71 PASS=20 FAIL=21 SKIP=0 SUBPASS=23 SUBFAIL=7 SUBSKIP=0` | 本批 5 枚**全绿**；包内 28 枚两形都红恒在 |
+| **MUT-L（拆掉解析层）** | 软链 | `rc=1 RUN=71 PASS=16 FAIL=25 SKIP=0 SUBPASS=22 SUBFAIL=8 SUBSKIP=0` | **5 枚全部回归**，红名与改前基线 PRE-L **逐名 IDENTICAL**：`diff PRE-L.red.txt MUT-L.red.txt` ⇒ **0 行、rc=0**（33 名一起比，含那 28 枚）；only-in-link 侧亦 `diff only-in-link.txt mut-only-in-link.txt` ⇒ **0 行**（同那 5 名）。机制字串回到 `not provably resolved`=26、`refusing to seal`=26、`/varlink`=27（与 PRE-L **逐数相同**）。样例逐字：`providers_test.go:133: memory: create data dir: winsec: refusing to seal /varlink/w124tmp/TestProvidersProbeRecordsMeasuredThinkingFalse2748381261/002: … winsec: path is not provably resolved, refusing to seal: … reaches it through the link at /varlink, which is not the tree this call names` |
+| **MUT-P（同一发变异）** | 普通 | `rc=1 RUN=71 PASS=20 FAIL=21 SKIP=0 SUBPASS=23 SUBFAIL=7 SUBSKIP=0` | 八个数与 PRE-P／POST-P **逐数相同**，红名 `diff PRE-P.red.txt MUT-P.red.txt` ⇒ **0 行** ⇒ 这层解析只在软链形起作用，普通形是恒等操作 |
+
+⇒ 红名**点到用例自己**（5 枚逐枚点名 + 28 枚恒在册，不是包级 `FAIL`），且变异先证落地（`grep -n` 出被改的那两行 + `go build` rc=0 + `go vet` rc=0）后才读数。**这一发做了。**
+⚠ 与本批无关但同一发顺带量到的一条，登记备核：解析后的拼写 `/realpriv/w124tmp` 在四台的行数是 PRE-L `11` → POST-L `19` → MUT-L `11`（变异台退回改前**同一数**，与红名册的 IDENTICAL 互相印证）；PROBE-L 那发的 `21` 多出的 2 行是判据④那两枚探针自己把 root 打印出来（P1、P5），不是行为差异。
