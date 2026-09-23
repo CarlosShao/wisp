@@ -4074,3 +4074,8 @@ A40② 说最近三个 **push** run 是 `cancelled`。我又查了两步，**排
   `worker-ticket124-ac2b-2` 刚派）；`acceptor-ticket134-r2` 与 `acceptor-ticket131-r3` 与 `worker-ticket124-ac2b-1` **三程已交件**。
   累计撞 150 轮上限 **4 次**（今天）。票面 **136 枚**，`-done` 后缀 **58**（134 改完）＋状态含 done **42**，差额仍 **16** 枚 ⇒ 那 16 枚
   "后缀与状态不一致"是**仪器该收的活**，已在本条登记，等一次专门核（不新开票，归下次清账）。
+- **补一条同步状态（09-23 18:3x，现量）**：本轮文档三枚 commit（`4d266f9`／改名补完枚／`dfa3dc4`）已推 **cnb**（`5bb7838..dfa3dc4 dev -> dev` 正形状），
+  **origin（GitHub）未推上** ⇒ `git push origin dev` 连续 **3 次** `schannel: failed to receive handshake, SSL/TLS connection failed`（本机今天第二次出现此形状，上一轮重试即恢复）。
+  当前 `HEAD=dfa3dc4`、`cnb/dev=dfa3dc4`、`origin/dev=5bb7838`（落后 4 枚）。⇒ **不构成数据丢失**（两远端有一枚全量＋本地全量），
+  但**别把"推过了"读成"两远端都推过了"**；下次动手前先补推并把正形状那行贴出来。⚠ 副作用一并记：GitHub 侧那趟 `ci` 也不会为新提交跑，
+  所以 18:3x 之后**没有任何新的远程门禁读数可引**（要引用只能引 `4e9adcc`/`2c259a2` 那两趟旧的）。
