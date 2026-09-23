@@ -237,3 +237,79 @@ tools 的回收站那枚、approval 的无门拒 L1、llm 的 `RefusesSilentRuns
   票 123 那族三枚 300 s 腿 + 两形都红 29 枚 + 形状自带 SKIP 4 枚（本批已把 winsec 那 3 枚钉成"改后仍 3 枚 SKIP、名册逐名相同"）；
   ④ 请一并裁上面那本 12 枚邻居账。⚠ 跑法账两条沿用：`exit 99`（普通形不许存在 `/varlink`）＋"每形一枚**新**容器"；
   另登记本批自撞的一次空跑：容器 `sh -c` 忘 `cd /src` ⇒ 两发 `-count=2` 第一轮 rc=1 全零读数（四数是 0 才没被当成绿）。
+
+
+## AC#2b 批次 4（`cmd/wisp` 5 枚）交件 —— AC#2b 的最后一批
+
+- 2026-09-23 22:1x `worker-ticket124-ac2b-4`：**AC#2b 批次 4 交件（动码，5 枚全转）**。锚 `54123e0`（开工首读 `git rev-parse --short HEAD`），
+  纯净快照 `git archive 54123e0 | tar -x -C /d/tmp/wisp124-2b4-pre`（**仓内未建 worktree、未 checkout**），改件 **`5265c3a`**
+  （3 枚文件、+40/-2，全在 `cmd/wisp/`）。途中 HEAD 漂到 `4fc65dd`/`a122240`/`6da6710`；已按名核清
+  `git diff --name-only 54123e0 5265c3a -- cmd/wisp/` **只有本批这 3 枚路径**（漂移全在 `.scratch/**`、`docs/**`、`internal/observe/`）。
+  全文 `docs/evidence/s1/124-ac2b-4-conversion.md`。**AC#2b 四批至此账面齐**（2b-1=40、2b-2=43、2b-3a=26、2b-3b=17、2b-4=5 ⇒ 131 枚可转全落地）。
+
+  **分母先自核（派单给的每个数字都当断言重走，含那个 5）**：从 AC#2a §5.9 取 `cmd/wisp/**` 名单＝5 枚；在 `54123e0` 的
+  软链/普通两形 `-count=1 -v` 上实测 `comm -23` ⇒ **only-in-link 恰 5 枚、逐名与账上枚枚对上**（`providers_test.go:133/179/208/228`
+  四枚顶层同一枚 `newProvidersFixture` ＋ `secret_test.go` 的 `TestSecretFailurePathsLogAndPrintNoPlaintext/unset_name_(no_such_blob)`，
+  其断言在 `:679`、递根点在 `:667`），反向差集 0 枚 ⇒ **与 3b 交回的名册零差、无需按实测改写分母**。同包**两形都红实测 28 枚**
+  ⇒ 与批次 3b 那句「28 枚」逐数相符；并把这 28 名与 **AC#1 §5.3 第 931 行**那批名做了一次双向差集 ⇒ **各 0 枚、set-equal**。
+  包级 `rc` 改前改后都是 **1**（那 28 枚贡献），本批全程按**逐枚点名**判、未按包级 rc 判。
+
+  **五判据**（全文证据 §2–§6；容器 `golang:1.27` `go1.27.1 linux/amd64`，8 发 `-v` ＋ 3 发非测试容器，**每形一枚新容器**，
+  挂载自证 `go.mod` 883 字节／`md5 f6ef6617…`／`md5 resolve.go b6876a5e…` 与前四批逐字同字）：
+  ① 5 枚 × 四台逐名表（程序化生成、非手抄）⇒ 软链形红名 **5 → 0**：顶层 `FAIL 25→21`、子测 `SUBFAIL 8→7`（恰 −4 −1），
+  顶层 `PASS 16→20`、子测 `SUBPASS 22→23`（恰 +4 +1），`RUN=71` 与 `SKIP=0` 四台恒定；POST-L 列 5 枚逐枚写的是 `--- PASS`。
+  ② **普通形八个数改前改后逐数相同**（`71/20/21/0`+`23/7/0`，两态 `rc=1` 同因）、28 枚红名册 `diff` **0 行**、
+  `git diff` **删除侧全文只有 2 行、两行都是 `t.TempDir()` 那一个表达式** ⇒ 判定分支／断言／阈值／golden 0 hunk，票面 AC#3 成立；
+  禁改列（`internal/{winsec,proc,risk}/**`、`rules_gateway.go`、`allowlist.txt`、阈值／golden、`frontend/**`、`docs/PLAN.md`、`docs/specs/**`、
+  `tools/d22scan/**`）＋ 票 133 在飞那枚 `leg_dispatch_gate_133_test.go` ＋ 票 131 的门与钉 ＋ 前三批已交面 **一律零 hunk**；
+  本批是**本票唯一没动 `internal/**` 的一批**。
+  ③ 两形各一枚新容器：**`RUN` 两形恒 71、差 0**、**`SKIP` 八数恒 0**、子测总数恒 30 ⇒ 票面 15:3x 那条「软链形自己缩小分母」
+  在本包**不复现**（机制：4 枚是顶层、第 5 枚的死落在子测试自己体内），"变绿 vs 被跳过"逐枚排除；另核第三种偷换——
+  没有一枚从这 5 枚挪进那 28 枚，也没有一枚从 28 挪进 5。
+  ④ 「另一种拒」**逐枚实拿**（探针台只加 6 处 `t.Logf`、八个数与 POST-L 逐数相同、红名册 `diff` 0 行）：P1 拿到
+  `wisp providers: 能力实测不符：acme/mock-small 声明支持 thinking，实测不可用（…）` 且打印出的 root 已是 `/realpriv/…`、
+  P1b 判决列 `map[fc:PASS thinking:FAIL vision:PASS]`；P2 `mismatch lines=""`；P3 `wisp providers: 目录中没有 provider "nope"`；
+  P4 `端点未就绪（Unconfigured）：auth: llm: resolving api_key_ref for provider "acme" failed`；P5 `secret: delete "dpapi:never-stored":
+  no blob file under /realpriv/…`（点名 `never-stored`，正是 `:678` 要的那句）。把「`refusing to seal /varlink/` 后面跟着本批 5 枚之一的名字」
+  单独数：四台 **5 → 0 → 0 → 5**。
+  ⑤ 变异三态：`MUTATION-124-2B4` 先证落地（`grep -n` 命中被改那 2 行、`return proc.SealableRoot(t.TempDir())` 残留 **0**、
+  两处调用点仍在＝2、容器原生 `go build ./...` 与 `go vet ./cmd/wisp/` 各 **rc=0**）再读数 ⇒ 软链形**重新 5 枚红**、
+  红名与改前基线 PRE-L **逐名 IDENTICAL**（`diff` 整份 33 名红册 **0 行**，only-in-link 侧 5 名亦 0 行），机制字串回到 26/26/27 逐数相同；
+  同一发在普通形**八数逐数相同、红名册 0 行差**。
+
+  **门禁（票面 AC#5 的本批范围）**：`-count=2 -v` 两形各一枚新容器 ⇒ 两形同 `142/40/42/0`+`46/14/0`，**每数都是 `-count=1` 那发的正好 2 倍**；
+  逐名核：两台红册 `diff` 0 行且恰为那 28 名 ×2，5 枚逐枚以 `--- PASS` 出现 2 次，零 SKIP／零 panic／零 `test timed out`。
+  `gofmt -l cmd/wisp`（整包）＋ `gofmt -l cmd internal` × 宿主／容器 **全 0 行**；`gofumpt` 真跑、整包 0 行、并与 CI **逐字同形**
+  那一步（快照根 `gofumpt -l . tools/d22scan tools/mockllm`）亦 **0 行**。⚠ **登记一处与原读数的分歧**：宿主 `gofumpt --version`
+  本批量到 **`v0.12.0 (go1.27.1)`**，不是前四批写的 `v0.7.0`；那枚二进制的 mtime 是本程开工后 2 分钟（21:39:59 +8），
+  且 `ci.yml:111-114` 逐字是 `go install mvdan.cc/gofumpt@latest`＝**未钉版本** ⇒ 四批各写自己手上那一枚才是可核形状，本批以 v0.12.0 报。
+  `go vet`：宿主原生 `GOOS=windows ./...` 与 `./cmd/wisp/` 各 **rc=0**；**容器 linux 原生** `./cmd/wisp/` 与 `./...` 各 **rc=0**
+  （批次 3b §9.4 记为「未取得」的那发全树容器读数，本批取到了）；宿主交叉 `GOOS=linux ./...` **rc=1**，那 3 行逐字归因到外部模块
+  `sherpa-onnx-go-linux@v1.13.8` 的 build constraints（pre 快照**逐字节相同**、剔 `cmd/(wisp|balldebug)` 后余 31 枚 rc=0）⇒ 既非破口亦非清白；
+  ⚠ 与 3a 不同的一点：**单点名 `GOOS=linux go vet ./cmd/wisp/` 也照样红同样那 3 行**（本批那枚包正是这条外部依赖的持有者）
+  ⇒ 交叉对本批**零清白可记**，清白全部由容器原生那两发提供。`sh scripts/d22scan.sh` 纯净快照 pre／post 各 **rc=0 clean**、
+  正向对照 `PASS=21 FAIL=0 SKIP=0 / RUN=31` 逐字相同、台账**八 scope 一枚不降**（ban #8 `internal/` 400→**401** 逐名归共树漂移那枚
+  `internal/observe/sampler_zerosample_136_test.go`、ban #8 `cmd/` 38→**39** 归本批那枚委托，余六数不变；pre 的 400/38 与 3b／3a 记的逐数相同）。
+
+  **三枚 300 s 腿照实豁免、未顺手修、未放宽**：`TestL1WriteGoesThroughTheRealBlockWindow`、`TestLateVetoRendersTheApprovalLayersAppliedStepsReport`、
+  `TestFSReadOnlyNeverOpensACard` 逐名核过全在 `internal/tools/wiring_test.go:112/:182/:291`，**一枚都不在 `cmd/wisp` 的名册里**（两形名册 `grep -c` 各 0）
+  ⇒ 本批对它们零需要、零贡献。`cmd/wisp` 那 28 枚两形都红**一枚未碰**（改前改后名册 `diff` 0 行）；本包其余 **47 处**未改的同类递根站点按名登记了为什么没改（证据 §3 末表）。
+
+  **一格不翻**：**AC#2 本格、AC#2b、AC#5 都不翻**。终判据「软链形红名数＝0」要 3a＋3b＋本批**合并态**才能量，且票 133 的 AC#2 修复
+  正在改同一枚包——本批收口时（22:12 +8）复看：`5265c3a` 之后兄弟又推了三枚 `test(133,…)`（`4ba8438`/`6bb5a56`/`090bb3e`），
+  `git diff --name-only 5265c3a HEAD -- cmd/wisp/` **只有 `leg_dispatch_gate_133_test.go` 一枚** ⇒ 与本批零交集、本批读数不回改，
+  但这条正好坐实：**复算的锚点必须选在票 133 落地之后**。
+
+  **`next=`（交编排者，给那一格复算；豁免名单逐名钉死 3＋29＋4＝36 枚，逐档标明数取自哪一发）**：
+  (a) 票 123 那族 **3 枚** 300 s 腿——名与行号如上，三枚**一起**豁免（只豁免两枚会得"多一枚红"的假破口；名册出处＝批次 2 §9 第 5(a) 条），
+  **`cmd/wisp` 贡献 0 枚**（本批一手量到：两形名册各 0、8 发 `test timed out` 命中 0）；
+  (b) 两形都红 **29 枚**＝`internal/panel/` **1**（数取自批次 2 §9 第 5(b) 条，本批未复测该包）＋ `cmd/wisp/` **28**
+  （**本批一手读数**：`/d/tmp/wisp124-2b4-logs/both-red.txt`，改前算出、改后 `diff` 0 行、gate 台＝该名册 ×2 逐名相同，且与 AC#1 §5.3 第 931 行 set-equal）；
+  (c) 形状自带 SKIP **4 枚**＝`internal/winsec/` 3（AC#1 §5.4 表 `winsec SKIP 3/0`，并由 3b 钉成"改后仍 3 枚、名册逐名相同"）＋ `internal/config/` 1（同表 `config SKIP 1/0`）；
+  ⚠ 同表 `memory 1/1`、`tools 3/3` 两行是**两形相等**、**不属这一档**，别按包累加错成 6 枚。**`cmd/wisp` 这一档贡献 0 枚**（四台 + 两台 gate 的 `SKIP`/`SUBSKIP` 八数全 0）。
+  复算那发的期望形状三条：`./cmd/wisp/` 两形名册**应逐名相等且各 71 名**（本批六台已证），若见 `RUN` 不等或冒出 SKIP 就是**新破口**（多半来自 133），不是形状副作用；
+  本批 5 枚名册可直接当差集的一侧（`/d/tmp/wisp124-2b4-logs/only-in-link.txt`，5 行）；
+  `cmd/wisp` 的机制字串改后**不归零**（软链仍有 21 行 `refusing to seal /varlink`，19 个父名全部落在那 28 枚名册内、差集 0 枚）⇒ **终判据按红名名册拿，别按 `grep -c` 拿**。
+  ⚠ 跑法账三条已在本批各自成立并建议沿用：`exit 99`（普通形断言 `/varlink` 根本不存在）、每形一枚**新**容器、
+  以及把批次 3b 那次自撞写进脚本的 `exit 90`（容器内 `cd /src` 不成立即停，防「四数全 0 被当成没红」；本批 8 发四数无一为 0）。
+  ⚠ 批次 3b §1.3(b)／§9.1(2)(3) 那本 **12 枚 winsec 邻居账**（软链形"绿得没有理由"）本批**未评、未修、不替它记账**，仍候裁。
