@@ -238,7 +238,8 @@ type pkg133 struct {
 
 	decls   map[string][]*decl133 // production decls by bare name
 	methods map[string][]*decl133 // production methods by bare name
-	tests   map[string][]*decl133 // decls in *_test.go, by bare name
+	tests   map[string][]*decl133 // runnable cases in *_test.go: top-level func TestXxx(t *testing.T)
+	helpers map[string][]*decl133 // everything else a *_test.go declares (helpers, methods, Benchmarks)
 
 	globals   map[string]bool            // package-level var names
 	varType   map[string]string          // package-level var -> struct or map type
@@ -276,6 +277,7 @@ func newPkg133() *pkg133 {
 		decls:     map[string][]*decl133{},
 		methods:   map[string][]*decl133{},
 		tests:     map[string][]*decl133{},
+		helpers:   map[string][]*decl133{},
 		globals:   map[string]bool{},
 		varType:   map[string]string{},
 		funcField: map[string]bool{},
@@ -313,7 +315,7 @@ func loadPackage133(dir string) (*pkg133, error) {
 		for k := range is {
 			p.knownPkgs[k] = true
 		}
-		p.collectTopLevel133(file, name)
+		p.collectTopLevel133(file, name, testingPkgName133(file))
 	}
 	p.collectRulings133(dir, entries)
 	return p, nil
@@ -366,7 +368,7 @@ func funcTargetName133(e ast.Expr) string {
 	return ""
 }
 
-func (p *pkg133) collectTopLevel133(f *ast.File, name string) {
+func (p *pkg133) collectTopLevel133(f *ast.File, name string, testingPkg string) {
 	isTest := strings.HasSuffix(name, "_test.go")
 	for _, d := range f.Decls {
 		switch fd := d.(type) {
@@ -380,8 +382,21 @@ func (p *pkg133) collectTopLevel133(f *ast.File, name string) {
 			}
 			decl := &decl133{name: fd.Name.Name, key: key, site: p.site133(fd.Pos()), file: name, prod: !isTest, body: fd.Body}
 			switch {
-			case isTest:
+			case isTest && isRunnableCase133(fd, testingPkg):
+				// R-133-1: the coverage bucket holds ONLY declarations Go's
+				// testing package can run - a top-level func TestXxx(t *testing.T)
+				// with no receiver and no results. Before this, any declaration in
+				// a _test.go file landed here under its bare name, so a method
+				// (which the testing package never calls) satisfied check (b)'s
+				// "a test case drives this leg", and the ledger printed
+				// `covered=test <name>` for a name with no === RUN anywhere.
 				p.tests[fd.Name.Name] = append(p.tests[fd.Name.Name], decl)
+			case isTest:
+				// Helpers, methods, benchmarks: still walkable in loose mode, so a
+				// case that drives a leg THROUGH a helper keeps being recognised as
+				// that case driving the leg. They are not cases, and they can no
+				// longer cover a leg by being named after one.
+				p.helpers[fd.Name.Name] = append(p.helpers[fd.Name.Name], decl)
 			case fd.Recv != nil:
 				p.methods[fd.Name.Name] = append(p.methods[fd.Name.Name], decl)
 			default:
@@ -397,6 +412,58 @@ func (p *pkg133) collectTopLevel133(f *ast.File, name string) {
 			p.collectSpecs133(fd, name)
 		}
 	}
+}
+
+// testingPkgName133 is the local name `testing` answers to in one file, which is
+// what makes the signature check below readable when a file imports it under an
+// alias.
+func testingPkgName133(f *ast.File) string {
+	for _, im := range f.Imports {
+		path, err := strconv.Unquote(im.Path.Value)
+		if err != nil || path != "testing" {
+			continue
+		}
+		if im.Name != nil {
+			return im.Name.Name
+		}
+		return "testing"
+	}
+	return "testing"
+}
+
+// isRunnableCase133 is R-133-1's judgement, spelled the way ticket 131's gate
+// spells its own (leg_sink_gate_131_test.go:617 checks `fn.Recv == nil &&
+// HasPrefix(fn.Name.Name, "Test")` before a test declaration is a case): no
+// receiver, a Test prefix, one parameter of type *<testing>.T, and no results.
+// Go's testing package runs exactly that shape and nothing else, so this is the
+// difference between "a name that looks like a case" and "a case that runs".
+func isRunnableCase133(fd *ast.FuncDecl, testingPkg string) bool {
+	if fd.Recv != nil || !strings.HasPrefix(fd.Name.Name, "Test") {
+		return false
+	}
+	if fd.Type == nil || fd.Type.Params == nil || len(fd.Type.Params.List) != 1 {
+		return false
+	}
+	if fd.Type.Results != nil && len(fd.Type.Results.List) > 0 {
+		return false
+	}
+	if len(fd.Type.Params.List[0].Names) > 1 {
+		return false
+	}
+	return isTestingTPtr133(fd.Type.Params.List[0].Type, testingPkg)
+}
+
+func isTestingTPtr133(e ast.Expr, testingPkg string) bool {
+	star, ok := e.(*ast.StarExpr)
+	if !ok {
+		return false
+	}
+	sel, ok := star.X.(*ast.SelectorExpr)
+	if !ok {
+		return false
+	}
+	id, ok := sel.X.(*ast.Ident)
+	return ok && id.Name == testingPkg && sel.Sel.Name == "T"
 }
 
 func (p *pkg133) collectSpecs133(gd *ast.GenDecl, file string) {
@@ -571,14 +638,23 @@ var builtins133 = map[string]bool{
 // lookup133 finds declarations by bare name. In loose mode (used only for the
 // test-side evidence walk) it also sees the functions declared in this
 // directory's test files, which is how a case that drives a leg through a helper
-// is still recognised as that case driving the leg.
+// is still recognised as that case driving the leg. Both test buckets are in
+// scope here - runnable cases and helpers - while only p.tests counts as coverage
+// evidence anywhere else in this file.
 func (p *pkg133) lookup133(name string, loose bool) []*decl133 {
 	out := append([]*decl133{}, p.decls[name]...)
 	out = append(out, p.methods[name]...)
 	if loose {
 		out = append(out, p.tests[name]...)
+		out = append(out, p.helpers[name]...)
 	}
 	return out
+}
+
+// testSide133 is every declaration a *_test.go file contributes to the loose walk.
+func (p *pkg133) testSide133(name string) []*decl133 {
+	out := append([]*decl133{}, p.tests[name]...)
+	return append(out, p.helpers[name]...)
 }
 
 func (p *pkg133) resolve133(c *ast.CallExpr, file string, locals map[string]string, loose bool) (ds []*decl133, disp string, qual string) {
@@ -614,7 +690,7 @@ func (p *pkg133) resolve133(c *ast.CallExpr, file string, locals map[string]stri
 			return nil, fn.Name, ""
 		}
 		if loose {
-			if fs := p.tests[fn.Name]; len(fs) > 0 {
+			if fs := p.testSide133(fn.Name); len(fs) > 0 {
 				return fs, fn.Name, ""
 			}
 		}
@@ -1125,7 +1201,18 @@ func (p *pkg133) coverageReds133(legs []*leg133) []string {
 	claimedBy := map[string][]legCover133{}
 	for _, c := range legCovers133 {
 		if len(p.tests[c.test]) == 0 {
-			reds = append(reds, fmt.Sprintf("this gate claims leg %q is nailed by %q, which is not a test function in this directory's sources. A renamed or build-tag-hidden case has to be red somewhere, and here is where.", c.leg, c.test))
+			// R-133-2: this used to say "not a test function" while the lookup
+			// behind it accepted any declaration with a matching bare name,
+			// including a helper and including a method. The bucket is tight now
+			// (see collectTopLevel133), so this sentence and its predicate are the
+			// same claim; the reading below names what was found instead so the
+			// next reader does not have to guess whether the name is missing or
+			// merely not a case.
+			what := "declares no function of that name in this directory's test sources"
+			if ds := p.helpers[c.test]; len(ds) > 0 {
+				what = fmt.Sprintf("declares %s, which this file sorts with %s: a helper or a method, not a case Go's testing package runs", ds[0].site, "isRunnableCase133")
+			}
+			reds = append(reds, fmt.Sprintf("this gate claims leg %q is nailed by %q, which is not a test function in this directory's sources: %s. A nail has to name a top-level func TestXxx(t *testing.T); the gate's registry is a list of cases, and the ledger row it produces is a coverage claim. A renamed or build-tag-hidden case has to be red somewhere, and here is where.", c.leg, c.test, what))
 			continue
 		}
 		claimedBy[c.leg] = append(claimedBy[c.leg], c)
@@ -1181,10 +1268,14 @@ func (p *pkg133) coverageReds133(legs []*leg133) []string {
 
 // drivenBy133 answers "which Test case in this directory reaches a symbol that
 // belongs to this leg and to no other leg". Evidence is restricted to plain
-// functions, not methods: a method name is resolved here without receiver types,
-// and a coincidental `.stop()` in somebody else's case is not a claim about this
-// leg. Test names are walked in sorted order so the row a reading quotes is the
-// same row the next run quotes.
+// functions, not methods: the bucket it reads is built by collectTopLevel133,
+// which since R-133-1 admits only a top-level func TestXxx(t *testing.T) with no
+// receiver and no results, i.e. only declarations the testing package can run.
+// The prefix filter below is a second, independent read of the same name, because
+// a method name would be resolved here without receiver types and a coincidental
+// `.stop()` in somebody else's case is not a claim about this leg. Test names are
+// walked in sorted order so the row a reading quotes is the same row the next run
+// quotes.
 func (p *pkg133) drivenBy133(leg *leg133, shared map[string]int) string {
 	var names []string
 	for name := range p.tests {
