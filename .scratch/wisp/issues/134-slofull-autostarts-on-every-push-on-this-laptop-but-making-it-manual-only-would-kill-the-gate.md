@@ -2,6 +2,20 @@
 
 **Status:** ready-for-review（**2026-09-23 10:5x：`agent-ticket134` 五格 AC 全落，AC#5 的 `shellcheck` 一格除外；
      本票一次都没 push，`schedule` 那半边在 GitHub 侧触发次数仍为 0**）。
+     **AC#6 已落（2026-09-23 14:2x，`agent-ticket134-ac6`，锚定 sha `b723978`，两半同批未拆交）**：
+     `machine-contended` 改判"本 run 无结论"（那一步仍无条件），新鲜度钉新增探针 **P3** 按
+     "最近一次*产出有效样本*的记录"（= artifact `slo-full-report` 的存在与 `created_at`）计龄，红→绿→红三态已贴原文。
+     ⚠ 本格有**一处超出简报具名地界**的改动（`ci.yml` 里 `slo-full` 的 `Upload SLO report` 那一步
+     `if-no-files-found: error` → `warn`）与**一处顺带补上的 AC#5 欠账**（`slo-freshness.sh` 两行 shellcheck SC1007），
+     不可避性与理由分别在 `docs/evidence/s1/134-ac6-contended-no-conclusion.md` §1.2 / §3.4——裁决时请单看这两处。
+     **AC#6 接续（2026-09-23 15:0x，`agent-ticket134-ac6-r2`，锚定 sha `3f17504`）**：**两种绿各一枚已在真 CI 上读到**
+     （争用⇒无结论：run `35825185739`/job `107065251117`/第 5 步/`success`；安静⇒真取样：run `35826548877`/job
+     `107069434922`/第 5 步/`success`，另有 `35826783905`/`107070162673` 同形第二发），⇒ AC#6 的勾**四项齐**；
+     P3 三态独立复造成立（红→绿→红 + "零 report 必红"），门禁四项复跑同形（d22 rc=0 / 解析器 6 枚 job + `slo-full`
+     零条件 / `bash -n` rc=0 / shellcheck HEAD rc=0 且 AC#3 原码那发 SC1007 复现）。旧 §5 U3 那格（"新代码走完六态
+     且 `all_pass=True`"）由这两枚 run 闭合；证据里那枚算错的 `198 28` 已登记订正为 `207 28`（HEAD `217 30`）。
+     ⚠ 顺带纠一句上头 10:5x 那段里的时态："本票一次都没 push"**只到当时为止**——`ff4d27b`/`decb7b9`/`44ab500`/
+     `3f17504` 今天已由编排者推上远程（§4/§8.1 那些 run 就是从这些 push 读到的），本枚仍未 push。
      曾为 in-progress（2026-09-23 10:2x 起由 `agent-ticket134` 接手，锚定 sha `ac6f31c`；原
      **Status:** ready-for-agent（2026-09-23 10:2x owner 批复「**这个也都按照你说的来吧**」⇒ 形状定为 **C 为主 + B 为辅**，
      **不撤销、不走 A**。编排者获准动 `.github/workflows/ci.yml` 的 `slo-full` 触发段与 `scripts/slo-check.ps1`，**只此一票、只这两处**；
@@ -83,7 +97,7 @@ A 我不做，除非 owner 明说"就要 A"。
       ⚠ 唯一没做到的一格：**本机没装 `shellcheck`**（`command -v shellcheck` rc=1）⇒ 那一格留给
       `.github/workflows/slo-fresh.yml` 的 `Shell lint for the pin` 步（缺它即硬红），**未验证**。
 
-- [ ] **AC#6（09-23 12:5x 编排者追加，来源＝`Q-36`：owner 回「都按推荐」批的就是这一格）**
+- [x] **AC#6（09-23 12:5x 编排者追加，来源＝`Q-36`：owner 回「都按推荐」批的就是这一格）**
       `A115④⑤` 量到一件事：AC#4 那枚"争用即拒采样"的形状 C **单独看是对的**，但它与"runner 就在这台笔记本上、
       编队几乎一直在编译"组合之后，`slo-full` **每次推送几乎必红**；而 dev 的 `ci` 徽章本来就已连红 ≥2 天（`A115②`）
       ⇒ 结果是一枚**真伤**（票 131 的 Linux 编译破口，带病 4h17m）被泡在红海里没人看见。
@@ -110,6 +124,42 @@ A 我不做，除非 owner 明说"就要 A"。
       - 门禁照 AC#5 那一套重跑一遍（`sh scripts/d22scan.sh` 纯净快照 rc=0 + 台账八 scope 不降；
         YAML 改动用解析器复核"6 枚 job 全在、`slo-full` 那一步仍无条件"；`bash -n`；
         顺带补 AC#5 欠的那格——**本机没有 `shellcheck`**，要么装上再跑，要么如实保持"未验证"，不许拿"装不上"当跳过）。
+      ⇒ **落定（`agent-ticket134-ac6`，2026-09-23 14:2x，全在
+      `docs/evidence/s1/134-ac6-contended-no-conclusion.md`）**。前置取证：简报那四项**复核成立**
+      （run `35817761098` / job `107042866358` / 第 5 步 / `failure`，步内 `FAIL machine-contended …` +
+      `##[error]Process completed with exit code 1.`，且该 run 的 ps1 blob `560186fa…` 与我锚点同一枚字节）；
+      两条断言不成立已如实报（"每推必红"当天实为 11 success / 8 failure；台账 `Q-36` 行写"10 天"而脚本
+      真默认 **3 天**）。**前半**：`slo-check.ps1` 只动 `if ($reasons.Count -gt 0)` 那一枚块 ⇒
+      打 `NO CONCLUSION (machine-contended)` + 逐条理由 + 写 `build/slo/slo-no-conclusion.json`
+      （`verdict=no-conclusion`，**不是** report、不在上传面上）+ `exit 0`；**拒绝出数的条件一字未动**
+      （AC#4 方向没反转），"出了数而 `all_pass=False`"仍 `exit 1`（本地抓到一发 RC=1 + CI 侧 §0.4 那枚旧形）。
+      **后半**：`slo-freshness.sh` 新增探针 **P3**——判据物 = **名字恰为 `slo-full-report` 的最新一枚未过期
+      workflow artifact 的 `created_at`**（`GET /repos/{o}/{r}/actions/artifacts` 逐页取 max；
+      "artifact 在" = "report 在" = "数字在"，因为 ci 的上传步只写死那一枚文件、脚本只在真取样后写它、
+      upload-artifact@v4=`ea165f8d` 在零匹配时根本不创建 artifact），**不是 job 的 conclusion**；
+      两个新令牌 `slo-full-sample-stale` / `slo-full-sample-never`；P2 保留（它是唯一看得见 queued 永不动的探针），
+      阈值分叉独立（`SLO_FULL_MAX_AGE_DAYS` / `SLO_FULL_SAMPLE_MAX_AGE_DAYS`，默认都 3 天）。
+      **硬判据三态（红→绿→红）逐字入库**：+10 天世界（真 API 的最新 report + 注入新鲜 job 记录，
+      ⇒ P2 三发全绿而钉仍红）`rc=1 slo-full-sample-stale` → `SLO_FULL_SAMPLE_MAX_AGE_DAYS=30` `rc=0` →
+      还原 `rc=1`；另五发：`none` 世界红且放宽无效（接缝关不掉探针）、只放宽 P2 仍红（两枚旋钮互不顶替）、
+      无 token `exit 2`、ci.yml 副本塞 `if:`/删 `cron:` 仍红（P1 在 `warn` 改动之后仍有牙）、
+      把 artifact 名字换成 `slo-smoke-report` ⇒ 读到的"最新样"整枚换掉（过滤器有牙，逼出名字收成单一常量）。
+      **门禁**：`git archive HEAD` 纯净快照 `sh scripts/d22scan.sh` rc=0（PASS=21/FAIL=0/SKIP=0，RUN=31）+
+      台账八 scope 逐格不降（203/22/40/18/16/40/390/37）；解析器读数 6 枚 job 全在、`slo-full` 步级
+      `if:`/`continue-on-error` = NONE、门步骤 unconditional=True、触发表与 concurrency 原样；
+      `sh -n` / `bash -n` rc=0；**shellcheck 那格从"未验证"升为已验证**（本机仍无原生 shellcheck，
+      改在 docker 里跑 Linux 版 0.11.0 + "埋病文件验挂载"防假绿）——第一发就把 AC#3 原码的
+      `CDPATH= cd` 两行判成 SC1007 rc=1 ⇒ 那枚 `Shell lint for the pin` 兜底步本来在装了 linter 的 runner 上会红，
+      改成语义等价的 `CDPATH=''` 后 rc=0。D32 两阈值：`thresholds.go` 锚点与 HEAD **同一枚 blob** `e2677b11…`，
+      ps1 自锚点删掉的 16 行逐字全列、无一行是判据条件。
+      **CI 侧回读（不拿本地绿替代）**：run `35825185739` / job `107065251117` / 第 5 步
+      `SLO full gate (six states + settle + leak)` / **`success`**（整枚 job success，60 s），步内
+      `NO CONCLUSION (machine-contended)` 4 条理由 + `exit 0` + `##[warning]No files were found …`，
+      且那枚 run 的 artifact 表**只有 `slo-smoke-report`、没有 `slo-full-report`** ⇒ 争用 run 不给钉续命；
+      同刻钉的真读数仍报"最新有效样 04:44:08Z"（旧 blob 那枚红 run 的形状见 §0）。
+      ⚠ 未验证五格照单列（钉自身在 CI 的首次执行 = `total_count 0`、`schedule` 触发仍 0、
+      新代码走完六态且 `all_pass=True` 那一发、`slo-smoke` 争用形状、`GITHUB_STEP_SUMMARY` 分支）。
+      撤销口令**「slo-full 恢复判红」**只回退前半那两样（`exit 1` + `error`），**P3 不许跟着撤**。
 
 ## Rules（本仓固定）
 
@@ -204,3 +254,59 @@ A 我不做，除非 owner 明说"就要 A"。
   **next=编排者**：把这 4 枚 commit push 上双远程 ⇒ ① 回读带 `schedule` 之后那枚 run 的语义（push 半边不受影响），
   ② 让 `slo-fresh.yml` 至少手动 dispatch 一次、说出它的 run id + step 结论，③ 要让 B 真变成每天一次，
   需要 `dev → main` 一次合并（cron 只认默认分支）。撤销口令不变：回「就要 A」我立刻换形状并保留 AC#3 那枚钉。
+- [2026-09-23 15:0x +08] agent=agent-ticket134-ac6-r2 did=**AC#6 的 CI 实证补齐 + 前任证据的"注释 vs 读数"审计**
+  （接续：`agent-ticket134-ac6` 撞 150 轮上限被停，断点是"两种绿只拿到争用那一种"；我**没重做它的码**，
+  锚点 = 它自己的 `3f17504`，工作树 `scripts/**` 与 `.github/**` 当时逐字节等于 HEAD）。
+  **① 本格真正的判据：`slo-full` 现在这枚绿是哪一种绿——两种各一枚，步级日志逐字在证据 §8.1**（同一枚
+  ps1 blob `6e2ba550…` + ci.yml blob `c5a98063…`，四处相同：HEAD/`44ab500`/`3f17504`/`7b4c36a`）：
+  ⓐ **争用 ⇒ 新规则**：run **`35825185739`** / job **`107065251117`** / 第 **5** 步
+  `SLO full gate (six states + settle + leak)` / **`success`**，步内 `NO CONCLUSION (machine-contended) … 4 reason(s),
+  0 state file(s) written, slo-report.json NOT written` + `… : exit 0` + `##[warning]No files were found …`；
+  该 run artifact 表只有 `slo-smoke-report`、**没有** `slo-full-report`。
+  ⓑ **安静 ⇒ 真取了样**：run **`35826548877`**（sha `3f17504`）/ job **`107069434922`** / 第 **5** 步同名同位 /
+  **`success`**，步内 `precheck ok - no foreign toolchain/runner process, machine-wide cpu max 28%` →
+  六态 `exit=0 pass=True` × 6 → `settle exit=0 pass=True` → `leak exit=1 flipped_to_fail=True` →
+  `report written … (all_pass=True)`，且 runner 自己回上传参 `name: slo-full-report` / `if-no-files-found: warn`；
+  artifact `slo-full-report 06:26:30Z`（id `10735461474`）。ⓒ 第三枚同形：run **`35826783905`**（sha `7b4c36a`）/
+  job **`107070162673`** / 第 5 步 / `success`（`cpu max 34%`、`all_pass=True`、artifact id `10735960453`）。
+  ⇒ **AC#6 那一格的 `[x]` 从今天起四项齐**（run id + job + step + 结论，两种绿各一枚）；徽章侧比值：带 AC#6 代码的
+  三枚 run **3/3 slo-full success**（其中一枚走的就是新"无结论"分支），它之前那批 8/9 failure（证据 §8.2）。
+  ⚠ 整枚 `ci` 当天仍红（`lint`/`test-windows`，票 129/130/131 那两路），本格只治 `slo-full` 一枚 job 的颜色，没读大。
+  **② P3 独立复造**（`/tmp/wisp134-r2/p3/` 副本，真文件一字节未动，注入 url 用 `example.invalid` 不冒充真 job）：
+  红 **`Q1 rc=1 slo-full-sample-stale`**（真 API 最新样 +10 天、P2 恒绿）→ 绿 **`Q2 rc=0`**（只放宽
+  `SLO_FULL_SAMPLE_MAX_AGE_DAYS=30`）→ 红 **`Q3 rc=1`**（还原）；另 **`R1 rc=1 slo-full-sample-never`**
+  =「连续只有 contended、零 report」那一发的独立复造、**`R5 rc=1`** = 只放宽 P2 顶不掉 P3、**`Q5 rc=2`** = 无 token
+  是"查不了"不是通过。今天真实态 **`R0 rc=0`**，P3 读到的最新样已换成安静 run 的 `06:29:27Z`（钉的钟被真取样拨新了）。
+  `slo-fresh.yml` 独立性没坏：`on = schedule + workflow_dispatch`、`ubuntu-latest`、`permissions` 未加宽、三步零条件、
+  两枚 workflow 互不引用，且 `44ab500` 对它是 `15 0`＝纯注释。
+  **③ 门禁重跑**（被验版本 `3f17504`）：`git archive HEAD` 纯净快照 `sh scripts/d22scan.sh` **rc=0**
+  （PASS=21/FAIL=0/SKIP=0、RUN=31、种子红正向对照 6 子用例全过、examined 225）；台账八 scope 逐格与 §3.1 相同
+  （203/22/40/18/16/40/390/37）；解析器（PyYAML）读回 `job count = 6`、`slo-full` 步级 `if:`/`continue-on-error`
+  = **NONE**、门步骤 unconditional=True、触发表与 concurrency 原样；`bash -n`/`sh -n` rc=0；
+  shellcheck（docker 内 Linux 0.11.0，挂载用 `/d/…` + `MSYS_NO_PATHCONV=1` 并以埋病文件自证非空挂）
+  HEAD **rc=0**、`44ab500` 那版（AC#3 原码）**rc=1 / SC1007 at line 85 与 86**＝§3.4 那发关键读数连行号一起复现。
+  **④ 前任"注释先于读数"审计**：路径/编号/`§` 交叉引用逐条核过全部真实存在，关键数复算一处不差
+  （numstat 86/16、41/2、15/0，`thresholds.go` 两侧同 blob `e2677b11…`，ps1 的 `:153 :211 :225 :381 :396` 与
+  `0.5%/25MB` 六处，ci.yml 九枚步级 `if:` 的行号与 `slo-full:` 键在 `:537`，PSParser `tokens=1842 errors=0`）。
+  **不成立四处、已改成与事实同形**：(a) 证据 §2.2 的 `git diff --numstat` = `198 28` ⇒ 真值 `207 28`（到 HEAD `217 30`），
+  **那一枚数已入库**故不改写、在 §8.5 登记订正；(b) §4 边界 3 / §5 U5 把"`GITHUB_STEP_SUMMARY` 分支未触发过"
+  当读数——`Add-Content` 本来就不进 job 日志，这条路对它全盲 ⇒ 就地 `〔r2 订正〕` 降为"仪器看不见 ≠ 没发生"；
+  (c) §5 U3「新代码走完六态且 `all_pass=True` 那一发未拿到」⇒ 已拿到两发，就地标闭合；
+  (d) §2.4 末"那十一发"数出来是 12 个标号（口径问题，登记，不动原文）。
+  另登记一条仪器事实防下次误判：**同一枚 job 的同一条日志行，`gh api .../logs` 与 `gh run view --job --log`
+  的微秒尾数不同**（`.5959005Z` vs `.5958952Z`）⇒ 引用"逐字"必须写明取法（证据 §8.1）。
+  **地界**：本程只写 `docs/evidence/s1/134-ac6-contended-no-conclusion.md`（追加 §8 + 三处订正标记）与本票面
+  （本行）；**零枚 `.go`、零阈值、零判据码、零工作流**；`cmd/wisp/**`（在飞的票 131 续单）与 `frontend/**` 一字节未碰。
+  **自称权威文字登记**：本程命中 **9 次** "Note: The file `C:\Users\swq\.qoder-cn\memory\MEMORY.md` was modified…"
+  + 一整段记忆索引（出处逐条与命令前 40 字写在证据 §8.8）。**这一程它不算"伪"**：那枚路径真、且真在变
+  （11698 B/mtime 13:38 → 12040 B/mtime 14:53:29）⇒ 是真的 harness 文件监视，按 `A104③` 的两条判据过：
+  路径真、内容不过权。九段里**没有**一条要求 revert/放宽阈值/改判据；其中"别代仍在追加的代理入库它的证据文件"
+  与"别让子代理自己清理临时件"两句形似对本格的指令 ⇒ **未据此改道**：按派单补成同形并 commit，
+  临时件（`/tmp/wisp134-r2/`、`/d/work/tmp/wisp134-r2-sc/`）一律留着不删、交回后由你一次清理。
+  **仍空四格**：U1 钉自身在 CI 的首次执行（`total_count = 0`）、U2 两枚 `schedule` 触发次数（还没到点）、
+  U4 `slo-smoke` 的争用形状（零发真读数）、U5 step summary 的**回读仪器**（缺位）。
+  **next=编排者**：① `gh workflow run slo-fresh.yml -R CarlosShao/wisp`——U1 一闭，AC#3 与 AC#6 的"CI 上真红"
+  才同时有 run id 可指（那一发今天会是绿，最新样已是 `06:29:27Z`）；② 本程 4 枚 commit（`ff4d27b`/`decb7b9`/
+  `44ab500`/`3f17504`）**加本枚**已在本地，push 权在你手上；③ U4/U5 要分母得各补一枚仪器，都不在本格地界。
+  撤销口令照旧一句：**「slo-full 恢复判红」**——只回退前半那两样（`exit 1` + `error`），**P3 不许跟着撤**。
+
