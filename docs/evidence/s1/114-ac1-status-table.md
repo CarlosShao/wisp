@@ -8,6 +8,7 @@
 ⇒ 本表**所有 `cmd/wisp/**` 行号一律改用 `git show HEAD:<path>` 复核**（唯一被纠的一处：`Modes: rt.modes` 由脏树的 `:379` 改回 HEAD 的 `run.go:366`）；
 `internal/`、`frontend/`、`tools/`、`scripts/`、`.github/` 在 `git status --porcelain` 里**零修改** ⇒ 那部分的 `file:line` 工作树 = HEAD，可直接引。
 两条"0 生产调用者"的关键断言另按 HEAD 独立复跑一次（`git grep`）：`cmd/` 非测试代码里 `.Set(` = 0、`internal/panel` 的非测试 importer = 1 枚（`cmd/wisp/panel_assets.go`）⇒ **与脏树读数一致**。
+**会话期间 HEAD 又前进**：本表提交时父提交是 `7a5dab2`（票 128 的 docs，非本代理所为）。`git diff --numstat 7ad6eb4 HEAD -- internal/panel internal/perm frontend tools scripts .github cmd/wisp/run.go` **输出为空** ⇒ 本表引用的每一枚文件在 `7ad6eb4` 与 `HEAD` 之间**零漂移**，行号两处通用；只有上面那批**未提交**的 `cmd/wisp/*.go` WIP 例外（按 HEAD 引）。
 **证据档位图例**：〔独立复现〕= 本代理自己 grep/读原文得出；〔引台账〕= 只引用既有裁决表/账目原文，未独立复算。
 
 命令口径说明（避免仪器假读数）：以下"调用者清单"均由 `grep -rn <符号> --include=*.go .` 在全仓（含 `cmd/`、`internal/`、`tools/`）采得，**逐条人工分类为生产/测试**（分类判据 = 文件名是否以 `_test.go` 结尾 + 是否位于 `cmd`/`internal` 之外）。"0 生产调用者"这类结论下面**逐条列出行号**，不给"应该没有"式断言。
