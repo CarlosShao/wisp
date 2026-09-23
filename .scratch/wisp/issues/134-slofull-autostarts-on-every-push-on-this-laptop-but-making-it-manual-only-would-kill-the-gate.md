@@ -310,3 +310,14 @@ A 我不做，除非 owner 明说"就要 A"。
   `44ab500`/`3f17504`）**加本枚**已在本地，push 权在你手上；③ U4/U5 要分母得各补一枚仪器，都不在本格地界。
   撤销口令照旧一句：**「slo-full 恢复判红」**——只回退前半那两样（`exit 1` + `error`），**P3 不许跟着撤**。
 
+
+## Progress log（09-23 15:3x 编排者，`U1` 的前半我已代跑，别再做一次）
+
+接续方在 `next=` 里留了一句"这枚新鲜度钉从未在 CI 上执行过（`total_count = 0`）"。我以 `workflow_dispatch` 手动触发了一次，四项齐：
+
+- **run `35831465653`** / job **`107084825136`**（`slo-full-must-keep-getting-triggered`）/ 事件 `workflow_dispatch` / 结论 **`success`**（14 秒，2026-09-23T07:23:34Z）
+- 步级：`slo-full freshness pin (ticket 134 AC#3)` = **success**、`Shell lint for the pin` = **success**（其余为 checkout/Complete job）
+
+⇒ **"这枚钉在 CI 上到底存不存在"这一格，从今天起有 run id 可引**（此前按本仓口径它等于不存在）。
+⚠ **但"它在 CI 上真会红"仍未证**——要一枚过期样本才红，而今天最新样是 `06:57Z` 那发安静 run。
+⇒ 这一条**继续挂在未勾状态**，谁要结它得先造出"CI 上看到 stale/never 结论"的那一发真 run。
