@@ -156,4 +156,108 @@ M8（把判据反写）——三发都响，且 M6/M7 只响该响的那条腿�
 ### 我复算到哪一档（不许把本包写成全仓）
 
 我在 **windows/amd64 宿主**上把**全仓 `./...` 两态**复算到了（档 B、档 C），本包两棵树也各跑了一次（档 A）。
-我**没有**在 linux 上跑全仓 `./...` 两态对照；linux 腿我只测了"这枚钉进不进 core scope、有没有被 skip 收走"（§4）。
+我**没有**在 linux 上跑全仓 `./...` 两态对照；linux 腿我只测了"这枚钉进不进 core scope、有没有被 skip 收走、能不能真红"（§4）。
+
+---
+
+## §4 CI 落点：我自己量的读数
+
+### 4.1 名单与行号（可重算）
+
+| 主张 | 我的实测（锚 `e8190bf` 纯净树） |
+| --- | --- |
+| observe 在 core 名单里 | `scripts/portable-tests.sh:140` 逐字 `github.com/CarlosShao/wisp/internal/observe`（`core_pin` 块从 `:124` 起）；同文件 `:175` 的 core scope glob 含 `./internal/observe/...` |
+| CI 哪一步跑它 | `.github/workflows/ci.yml` job `test-core`（`:224`）、`runs-on: ubuntu-latest`（`:225`）、step 名在 `:266`、**`:288` 就是 `run: bash scripts/portable-tests.sh --scope=core`** |
+| 编排者那句"行号引偏" | **不成立**：`:267-287` 才是注释块（讲的是 GUARD A/B/C 与"哪些包没有分母"），`:288` 是 run 命令行本身。实现方引对了。重算：`grep -n '' .github/workflows/ci.yml \| sed -n '266,289p'` |
+| Windows 腿 | `--scope=windows` 的 scope 在 `:184-190`、`win_pin` 在 `:151-160`，**两处的包名单里都没有 observe** ⇒ 实现方"Windows 那条腿本来不含 observe"为真 |
+
+### 4.2 有没有被 skip／ledger 收走
+
+- `scripts/portable-tests.sh` 的 `ledger`（`:319-331`）共 **11 条**，容器里实跑打印的是
+  `portable-tests.sh: 11 ledger entries, 8 accounted on this platform`；
+  生效于 linux 的 8 条逐名：`TestDefaultDeadlineWallClockMeasurement`、`TestSubprocessCrashWriter`、
+  `TestRealDownloadVadThroughPipeline`、`TestRealDownloadPuncArchiveThroughPipeline`、
+  `TestC26RewrittenSyncRootDoesNotDisarmSuspectNet`、`TestWorkspaceSwitchRefusesAJunctionToOutside`、
+  `TestD34WriteMatrix`、`TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop`。
+- 实跑打出的完整 pattern（原文）：
+  `^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestC26RewrittenSyncRootDoesNotDisarmSuspectNet|TestWorkspaceSwitchRefusesAJunctionToOutside|TestD34WriteMatrix|TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop)$`
+  ⇒ 本票两枚用例名**都不在其中**；且 pattern 是 `^(…)$` 全锚，`-skip` 不可能顺带吞掉别的名字。
+- 反向那道保险也在：ledger 条目若在该包里 `-list` 不到（改名／删掉／被 build tag 挡掉），脚本走 `stale` 分支 **exit 1**（`:396-404`）。
+  也就是说"往名单里塞一条来收走新钉"这条路本身就是会红的。
+
+### 4.3 ubuntu 那腿到底有没有分母（容器原生 `golang:1.27` = `go1.27.1 linux/amd64`）
+
+挂载按派单给的形做，先证真挂上再读数：`MSYS_NO_PATHCONV=1` + `/d/...` + 容器内
+`ls -l /src/go.mod` ⇒ `-rwxrwxrwx 1 root root 883 … /src/go.mod`；M1 那一发用**单文件 bind-mount**
+（`-v …/sampler.go.M1:/src/internal/observe/sampler.go:ro`）落，宿主那棵树全程不被改（落地证明：
+容器内 `grep -c "len(rep.Samples) == 0"` ⇒ RUN A 打 `1`、RUN B 打 `0`，`ls -l` 显示 18636 字节 vs 19098）。
+
+| 读数 | RUN A（pristine） | RUN B（M1） |
+| --- | --- | --- |
+| `bash scripts/portable-tests.sh --scope=core` 对 observe 那一行 | `ok (own line)  github.com/CarlosShao/wisp/internal/observe` | **`FAIL (own line) github.com/CarlosShao/wisp/internal/observe`** |
+| core 步里 `=== RUN`／`--- PASS` 两条新用例 | `1471:=== RUN TestSampleStateZeroSampleWindowFailsClosed` / `1472:--- PASS (0.12s)` / `1473:=== RUN …Trustworthy…` / `1474:--- PASS (0.06s)` | `1471:=== RUN …ZeroSample…` / **`1473:--- FAIL (0.05s)`** / `1474:=== RUN …Trustworthy…` / `1475:--- PASS` |
+| 整条 core 步里的红名 | `TestComposerRenderFixtureTellsTheTruth`（`internal/panel`，与守卫无关） | `TestSampleStateZeroSampleWindowFailsClosed` ＋ 上面那枚 |
+| 定点：`sh tools/d22scan/runtests.sh ./internal/observe/... -count=1 -skip "<上面那串原文>"` | rc=0，**RUN=56 / PASS=56 / FAIL=0 / SKIP=0**，`runtests.sh: OK … top-level: PASS=56 FAIL=0 SKIP=0, === RUN=56, '[no tests to run]'=0` | rc=1，**RUN=56 / PASS=55 / FAIL=1 / SKIP=0**，红名＝那枚钉 |
+
+⇒ **"这枚钉会真进 CI"为真，且不是靠读 yml 读出来的**：ubuntu 腿有分母（56 枚、逐名可点），
+把守卫拆掉它在 CI 的形状里就是红的；`-skip` 名单没收到它；Windows 腿不含本包这条如实保留。
+
+顺带量到、**不归本票**的一枚（写清免得下一个人重新发现）：`e8190bf` 的 pristine 树在 linux 上
+`--scope=core` **本来就 rc=1**（`internal/panel` 的 `TestComposerRenderFixtureTellsTheTruth` 在 POSIX 上红）。
+门禁处在这种"已经红着"的状态时，新增真伤不改变步的颜色，只多一行红名；
+归因还能给是因为 `portable-tests.sh` 逐包打 `ok/FAIL (own line)`（GUARD B）。这条属票 114／门禁那族账，不写进 AC#1 判据。
+
+---
+
+## §5 AC#8 那本邻居账：定性 + 被它拖走的枚数（不修）
+
+AC#8 的文本不在我锚的 `e8190bf` 票面上（该 sha 的票面是 7 格 AC；AC#8 是编排者 22:1x 追加的，
+`git log -- .scratch/wisp/issues/136-*.md` ⇒ 追加发生在 `6da6710` 之后）。我按**当前票面**上 AC#8 的结案判据①来定这一格。
+
+### 5.1 panic 为真：两发"空 Samples"，走两条互不相干的路
+
+| 发 | 怎么把 `Samples` 弄空 | 落地证明 | 全包四数 + panic |
+| --- | --- | --- | --- |
+| M3（＝§1 那发） | `sampler.go:290` `<= 0` ⇒ `>= 0`（逢读数都丢） | `diff` 单行 + `go build ./...` rc=0 | rc=1 / RUN=**52** / PASS=**47** / FAIL=**5** / SKIP=0 + **1 枚 panic** |
+| M9（补，独立路） | `sampler.go:297` `rep.Samples = append(rep.Samples, sample)` ⇒ `_ = sample`（**丢弃分支一字未动**） | `diff` 单行（`-rep.Samples = append…` / `+_ = sample`）+ `go build ./...` rc=0 | rc=1 / RUN=**52** / PASS=**47** / FAIL=**5** / SKIP=0 + **同一枚 panic** |
+
+两发的 panic 原文同形：
+
+```
+--- FAIL: TestSamplerGoroutineAccountingFollowsRegistry (0.03s)
+panic: runtime error: index out of range [0] with length 0 [recovered, repanicked]
+github.com/CarlosShao/wisp/internal/observe.TestSamplerGoroutineAccountingFollowsRegistry(...)
+	D:/tmp/wisp136-acc-r1/…/internal/observe/sampler_test.go:308 +0x23b
+```
+
+M9 的意义：**丢弃分支没动、`sampling` 守卫还在**，只把 `Samples` 弄空 ⇒ 照样 panic ⇒
+所以吞读数的原因确实是"`rep.Samples` 为空 ＋ `:308` 无长度守卫直取 `[0]`"，不是 M3 那发的语义。
+另把该用例单拎出来跑（`-run TestSamplerGoroutineAccountingFollowsRegistry`）在同发下也是 panic ⇒ 归因到枚。
+
+### 5.2 被它拖走的枚数（逐名，roster 差集，不是估计）
+
+以未变异基线的 `=== RUN` 名册（56 枚）为分母，两发各跑一次后取差集，**两发拖走的是同一批 4 枚**：
+
+| # | 被拖走（该发里既没红也没绿，压根没跑到） | 它本来在名册的第几位 |
+| --- | --- | --- |
+| 1 | `TestLiveRegistryBaselineWithinSleepingGate` | 53 |
+| 2 | `TestThresholdTableCoversAllStates` | 54 |
+| 3 | **`TestSampleStateZeroSampleWindowFailsClosed`**（本票 AC#1 那枚钉） | 55 |
+| 4 | **`TestSampleStateTrustworthyWindowNotMarkedUnmeasurable`**（本票 AC#1 正向对照腿） | 56 |
+
+（`TestSamplerGoroutineAccountingFollowsRegistry` 自己是第 52 位，它**有**读数——`--- FAIL` ＋ panic，
+不计入"被拖走"；差集里也没有别的名字，`56 − 52 = 4` 与逐名列表一致。）
+
+### 5.3 定性
+
+- **既有件，不是装钉造出来的**：`git blame -L 305,310` ⇒ `739bb15f (CarlosShao 2026-09-20)`，早于 `4fc65dd`（本票钉）。
+- **同包 `[0]` 直取普查**：`grep -rn 'Samples\[\|Verdicts\[' internal/observe/*_test.go` ⇒ 只有
+  `sampler_test.go:308` 一处是无守卫直取；本票那两处在 `sampler_zerosample_136_test.go:79-80`，走的是
+  `for i := range rep.Verdicts` 的下标，长度天然安全。⇒ AC#8 里"别一把改完"那句眼下没有第二枚要改。
+- **对本票 AC#1 的实际影响**：只影响"读数的形状"，不影响判据。M3 那一发的**全包关门读数**取不到两条腿
+  （被吞了），我用定点读数补齐（腿 B 红在 `:151`、腿 A 同发绿）。而 AC#1 的**结案判据那一发（M1）不受它影响**：
+  M1 落地时全包 56 枚跑完、`panic=0`、红名逐名可点（§1）。
+- **AC#8 结案判据①＝我已复算成立**（造得出空 `Samples`、panic 为真、拖走 4 枚可逐名）。判据②（加守卫后同发只红这一枚、
+  其余照常跑完）与③（M3 因此可以走全包读数）**没做**——那是修的人的账，本程按派单**一字未修**。
+- 归谁：**归 AC#8 那一格**（修法只许动 `sampler_test.go` 那枚用例，不许改成 Skip——跳过＝把"没测"洗成"通过"）。
+
