@@ -277,3 +277,55 @@ rc=0 / RUN=58 / PASS=58 / FAIL=0 / SKIP=0 / panic=0
 ### 2.5 本节仪器自报（诚实）
 
 V7 那一发我的驱动器第一次给的锚点文本在包里命中 **2 次**（`SampleState` 与 `CheckSettle` 同形一行），驱动**拒绝落发并回滚**；那次 `go build` 之后的读数是打在已还原的树上的（58/58 全绿，**不是**变异读数）。把锚点扩成三行唯一后重打，才得到 §2.1 里那发 V7。这条不是被验面的问题，是我的仪器行为，原样记。
+
+---
+
+## §3 那一问：**现有三枚哨兵够不够**（零可信样本仍 pass 且说不出没测到——能不能造出来）
+
+作者 §6.5 报回：本格**没动生产码**，把"报告要说出自己没测到"钉在**现有哨兵**（空 `samples` ＋ `back_within_cap_ms:-1` ＋ `pass=false`）上。派单把"存不存在一个可达的形状让 settle 在零可信样本下仍 pass、而这三枚哨兵全都看不出异常"交给我裁。
+**这一支我判得出来，结论在下面，配读数。**
+
+### 3.1 先立结构事实（可复算，不是感觉）
+
+```
+$ grep -n 'BackWithinCapMS' internal/observe/sampler.go
+438:	BackWithinCapMS int64 `json:"back_within_cap_ms"` // -1 = never within window
+464:		BackWithinCapMS:       -1,            ← 唯一的初始化
+488:			if m.PrivateWorkingSetBytes <= capBytes && rep.BackWithinCapMS < 0 {
+489:				rep.BackWithinCapMS = time.Since(startAt).Milliseconds()   ← 唯一的赋值点
+498:	backInTime := rep.BackWithinCapMS >= 0 && rep.BackWithinCapMS <= within.Milliseconds()
+501:	rep.Pass = memOK && backInTime && releaseOK
+```
+
+`:486`（`rep.Samples = append(…)`）与 `:488-489` 在**同一个 `if` 块**里（`:477` 那个可信判据之内）。⇒ **在生产码未改的前提下**，"把 `-1` 摘掉"与"记下第 1 枚可信样本"是同一个动作，所以：
+
+> `len(Samples)==0` ⇒ `BackWithinCapMS==-1` ⇒ `backInTime=false` ⇒ `Pass=false`。**零可信样本仍 pass 的输入形状不可达**（不是"我没找到"，是写它的两行物理上是一起发生的）。
+
+### 3.2 我自己造的发（探针树，`-v` 原文；这些是我造的支，不是被验版本的判据读数）
+
+| 探到的形状 | 实测报告 | 读法 |
+| --- | --- | --- |
+| **每一发读树都 `err != nil`**（`fakeTree{err:…}`） | `samples=0 back=-1 final=0 pass=false`，出线 `…"samples":null,"pass":false` | 走的是另一条丢弃路（`err` 那半句），仍 fail-closed ✓；实现方的腿 A 只覆盖了 `err==nil`＋零足迹那一半，我这一半也确实是关着的 |
+| **死树报正足迹**（`PIDs:0`＋`PrivateWorkingSetBytes:5MB`） | `samples=5 back=20 final=5242880 pass=true` | 见 3.4 的可达性判定 |
+| **整窗口只有 1 枚可信读数**（5 发里第 3 发可信） | `samples=1 back=60 final=5242880 pass=true` | 1 枚就够交差；报告里**看不出**另外 4 枚被丢 |
+| **错误与可信交替**（约一半可信） | `samples=2 back=40 pass=true` | 同上：部分未测 = 无痕 |
+| **`SettleReport` 的字段清点** | 出线 key ＝ `final_bytes samples pass started_at cap_bytes free_os_memory_count target_state peak_bytes free_os_memory_requested back_within_cap_ms elapsed_ms`；`sample_errors` **ABSENT**、`last_sample_error` **ABSENT**、`dropped_reads` **ABSENT** | settle 侧**没有任何**"丢了多少读数/为什么丢"的字段 |
+
+### 3.3 再看哨兵会不会被改坏：本程造的四发（树＝`anchor`，每发先证 `diff`＋`go build rc=0`，整包 `-v`、零 `-run`）
+
+| 发 | 改法 | 落地 | 整包读数 | 本格那枚钉红不红／红点 |
+| --- | --- | --- | --- | --- |
+| **V1** | `:464` 初值 `-1` ⇒ `0` | `diff` 单行、build rc=0 | `rc=1 / 58 / 56 / 2 / SKIP0 / panic0`；红名 `TestCheckSettleZeroTrustworthySamplesFailsClosed` ＋ **既有** `TestCheckSettleNeverReachesCap` | **红** `:85`（`settle window with 0 trustworthy samples must never pass, got pass=true`） |
+| **V3** | `:477` ⇒ `if err == nil {`（摘掉足迹判据） | `diff` 单行、build rc=0 | `rc=1 / 58 / 57 / 1 / SKIP0 / panic0`，红名只一枚 | **红** `:66`（前提腿：它记了 5 枚它没测到的样本） |
+| **V4** | `Samples` 的 json tag `samples` ⇒ `samples,omitempty` | `diff` 单行、build rc=0 | `rc=1 / 58 / 57 / 1 / SKIP0 / panic0`，红名只一枚 | **红** `:102`（`the wire report dropped the samples field entirely`） |
+| **V6** | `:498` `backInTime := rep.BackWithinCapMS >= 0 && …` ⇒ `backInTime := rep.FinalBytes <= capBytes` | `diff` 单行、build rc=0 | `rc=1 / 58 / 57 / 1 / SKIP0 / panic0`，红名只一枚 | **红** `:85` |
+| ~~V2~~ | `:501` 摘掉 `backInTime` 那半句 | **落地不成立**：`internal\observe\sampler.go:498:2: declared and not used: backInTime`、`go build ./...` **rc=1** ⇒ 该发不是可比较的形状（读数面 `RUN=0`，包没编出来），我按"先证落地再读数"作废，不拿它下结论 | — | — |
+
+⇒ **V6 正是派单要我问的那一发**：它是一枚**编得过**的改法，改完之后 `Samples` 仍为空、`BackWithinCapMS` 仍是 `-1`（两枚哨兵"看不出异常"），但 `Pass=true`。本格这枚钉**仍然红**，因为它不是只盯哨兵，它把 `rep.Pass` 与出线的 `pass` 都用字面量钉了。V1 同理（pass=true 而哨兵齐）。
+
+### 3.4 结论（这一问的答复）
+
+1. **对 AC#9① 那句本身：现有哨兵＋这枚钉够用，不需要为翻本格去动生产码。** 依据：3.1 的结构性耦合（零可信样本 ⇒ `Pass=false` 在生产码未改时不可破）＋ 3.3 里四发能破它的改法**每一发都被这枚钉认出来**（红点各不相同时说明它真的是在逐条看 `pass`／`-1`／`samples`，不是看一个笼统的 rc）。⇒ **不构成本格的退回条件**：我没有造出"零可信样本仍 pass 且这枚钉绿着"的读数。
+2. **但有一格真缺口要另立（本格之外）**：settle 侧的"测量诚实度"只有**全丢**这一档会被看见，**部分未测**（1/5、2/4 可信）交出的是一枚看着完全正常的绿报告，而且 `SettleReport` 连 `sample_errors`/`last_sample_error` 都没有——而同包 `StateReport` 早就为这件事加过这两枚字段，注释还写着理由（`internal/observe/sampler.go:165-167`：*"A bare count let an instrument lose samples without saying what it lost（ticket 66：this instrument stops hiding things）"*）。⇒ 这是"同一族病只做了一半"的形状，**另立新格**（我登记为 `R-136-8`，见 §7）。按派单要求我**没有**就地放宽 AC#9 的条件、也**没有**要作者改生产码。
+3. **附带一条小的**：`SettleReport.Samples` 为空时 JSON 出线是 `"samples":null`（Go 对 nil slice 的行为），腿 A 那句 `else if !isList && wire["samples"] != nil` 因此**在本格任何形状下都不会响**——真正起作用的是它前面的"key 在不在"（V4 红在 `:102` 就是那条）。这是"防呆支取不到牙"，不影响本格判定，登记为 `R-136-9`（低）。
+4. **`PIDs:0` 那一形我判"生产侧不可达"，但只到读码这一层**：`internal/proc/treemetrics_windows.go:71-74`（job 关闭 ⇒ 直接报错）、`:88`（`inTree[r.selfPID] = true` 无条件把主进程塞进树）、`:121`（`m := observe.TreeMetrics{PIDs: len(inTree)}`）⇒ **一次成功的读必然 `PIDs >= 1`**，"有足迹但 `PIDs:0`"在这个 reader 里组不出来；`:104-112` 另有一条"快照看不见自己 ⇒ 重试后 fail-closed 报错"。所以那一发只在 **seam（`fakeTree`）层**存在，不构成生产缺口；我**没有**（也无法在单测里）驱动真 Job Object，故这条写成"读码判定＋探针形状"，不写成读数结论。
