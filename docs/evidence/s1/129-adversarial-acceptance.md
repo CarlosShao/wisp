@@ -469,3 +469,93 @@ POST : POSIXPROBE|false|false|"/wisp129/store-44440/artifact.txt"|"wisp129/store
 （`scripts/winsec-tests.sh:73-80` 自己把非 windows 判 rc=2），所以这一形今天**仍无回归保护**。
 ⇒ 登记为 `R-129-2`（原 N2 仍然欠，只是"这句话是假的"这一种担心被我排除了）。
 
+---
+
+## 5. AC#5 —— 门禁八发
+
+**裁决：PASS** ｜ 标签：〔独立复现七发半〕＋〔独立新造：它那一发过度归因，机制我量清了〕
+
+我在 `/tmp/wisp129-acc-r1`（纯净 `ea05cf5` 快照，`resolve.go` 与锚定 blob `cmp` 字节全等）里逐字重跑。
+**简报给我的那条断言（"129 把整树 rc=1 归成假象"）成立，而且比"归因错误"更硬一档**，见 5.2。
+
+| # | 命令（逐字） | rc | 我的读数 | 对实现者的账 |
+| --- | --- | --- | --- | --- |
+| 1 | `go test -count=2 -v ./internal/winsec/` | 0 | `RUN=202 PASS=116 FAIL=0 SKIP=0`、`(cached)`=0 | **复现** |
+| 2 | `bash scripts/winsec-tests.sh`（＝`ci.yml` 那一发的逐字形状） | 0 | 自报 `=== RUN=101 --- PASS=58 --- FAIL=0 --- SKIP=0`；guard 2 拿到结果线 `ok github.com/CarlosShao/wisp/internal/winsec 14.649s`；我用它自己那四条 grep 对同一份日志重数＝同数 | **复现** |
+| 3 | `gofmt -l . tools/d22scan tools/mockllm` | 0 | **0 行** | 复现 |
+| 4 | `gofumpt -l . tools/d22scan tools/mockllm`（`$(go env GOPATH)/bin/gofumpt`） | 0 | **0 行** | 复现 |
+| 5 | `go vet ./...`（host＝windows） | 0 | 0 行 | 复现 |
+| 6 | `GOOS=linux go vet ./internal/...` ／ `GOOS=darwin go vet ./internal/winsec/` | 0 ／ 0 | 各 0 行 | 复现（"双 GOOS"这两枚是本格的**分母**，都干净） |
+| 7 | `sh scripts/d22scan.sh` | 0 | 正对照 `PASS=21 FAIL=0 SKIP=0, === RUN=31`、扫描 `clean - no D22 ban violations` | 复现 |
+| 7b | 台账八 scope | — | `#1-5 internal/=203`、`#1-5 cmd/=22`、`#6 frontend/=40`、`#7 internal/tools/=18`、`#8 design/=16`、`#8 frontend/=40`、**`#8 internal/=390`**、`#8 cmd/=37` | **一枚对不上，见 5.1** |
+| 8 | POSIX `docker run … golang:1.27 … go test -count=2 -v ./internal/winsec/` | 0 | `RUN=104 PASS=60 FAIL=0 SKIP=0`；日志里 `Absoluteness`/`absoluteness` 命中 **0** ⇒ 129 的两枚文件在 POSIX 零分母 | **复现（含它自报的 N2 盲区）** |
+| 8b | 同一发 MUT-BOTH 打在 POSIX 容器里真执行 | **0** | `RUN=104 PASS=60 FAIL=0 SKIP=0`、红名 **0 枚**；容器内 `grep -c '|| !sameAbsoluteness'` 自报 **0**（证变异在容器里也活着） | **复现**（同一发在 Windows 打红 4 枚） |
+| 9 | 跨卷探针卷根自清 | — | `/c` 28 条、`/d` 31 条、`/e` 32 条、`/f` 5 条（`total` 非零 ⇒ 证明 `ls` 真读到目录）而 `wisp*` 命中**各 0**；`%TEMP%`(=`/tmp`，4,554 条) 按 12 枚精确名扫 `wisp129-dr*`/`wisp129-vouch*`/`wisp129-seam*`/`wisp-129-tree-ownership-probe`/`wisp-108-tree-ownership-probe`/`wisp-103-conformance-probe`/`wisp126-seam*`/`wisp129-osprobe*`/`wisp126-xvol*`/`wisp126-trees*`/`wisp129-trees*`/`wisp129-xvol*` **各 0**；我 12 枚快照目录的 `internal/winsec/` 里 `^(wisp|WISP)` 命中 **0** | **复现** |
+
+⚠ 本格我自己差点交出一枚假读数：第一次扫四枚卷根我用 `cmd //c dir /b`，四枚全报 `total_entries=0`
+—— 那是 MSYS 把参数吞了（票面 Rules 点名的同一枚仪器坑），**空输出会被我读成"很干净"**。
+发现后换成 msys 挂载路径重跑，并强制"totals 必须非零才算这一格成立"。登记以免下家照抄我的第一段。
+
+### 5.1 `ban #8 internal/` 390 vs 它报的 389：不是本票的账，我归到人了
+
+`git diff --name-status a71b2d8..ea05cf5 -- internal/` ⇒ 只有两行：
+`A internal/observe/earlylog_130_test.go`、`M internal/observe/logging.go`（＝票 130 的 `9b5d64d`）。
+`git ls-tree -r --name-only <sha> internal/ | grep -c '\.go$'` ⇒ `a71b2d8` **389**、`ea05cf5` **390**。
+⇒ 差的那一枚是**票 130 加的文件**，不是 129 造出来的。它报 389 在它自己的锚定树 `a71b2d8` 上是对的。
+"各 scope 不降"这一条在 `ea05cf5` 上照样成立（390 ≥ 派单给的 385 ≥ 票 121 表的 382），
+且 `allowlist.txt`/`tools/d22scan/**`/`scripts/` 我核过 129 一枚 commit 都没碰。
+
+### 5.2 那一发过度归因：机制我量清了，而且 129 手上当时就有能拆穿它的工具
+
+它写：模块整树 `GOOS=linux go vet ./...` **rc=1**，"唯一输出是 `cmd/wisp imports … sherpa-onnx-go-linux:
+build constraints exclude all Go files`＝无 C 交叉工具链的 host 假象，落在我地界之外，我只读数不修"。
+
+**观测半边：成立。** 我在 `ea05cf5` 快照上逐字重跑 `GOOS=linux go vet ./...` ⇒ **rc=1**，
+输出**确实只有那一行** sherpa。
+**归因半边：错，而且错在一个可复现的机制上。** 那枚被"假象"两个字盖掉的真伤在**同一枚 commit 上就存在**：
+
+- `git show a71b2d8:cmd/wisp/resident_sink_nail_127_windows_test.go | grep -c 'type sinkInstallRecord'` = 1
+  （**只有 `_windows_test.go` 定义它**），
+  而 `git show a71b2d8:cmd/wisp/leg_sink_nail_131_test.go` 第 127 行在用 `records []sinkInstallRecord`，
+  且那枚文件头两行是 `package main` —— **没有 `_windows` 后缀、没有 `//go:build windows`**。
+- 掩埋机制我做了两发对照才敢说（**同一枚 `ea05cf5` 源码，两枚仪器**）：
+  **(a) 129 用的那一枚** —— 在 **Windows 上交叉** `GOOS=linux go vet ./cmd/wisp/` ⇒
+  ```
+  package github.com/CarlosShao/wisp/cmd/wisp
+      imports github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx
+      imports github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files in …
+  ```
+  真伤**一个字都不露**。
+  **(b) 拆穿它的那一枚** —— **原生 linux 容器**（`golang:1.27`）里对同一份源码 `go vet ./cmd/wisp/` ⇒ **rc=1**、
+  ```
+  # github.com/CarlosShao/wisp/cmd/wisp
+  vet: cmd/wisp/leg_sink_nail_131_test.go:127:12: undefined: sinkInstallRecord
+  ```
+  ⇒ **包加载阶段先死在 cgo 依赖上，就永远走不到类型检查**，所以"唯一输出是假象"这句
+  **在结构上不可能**证明整树只有假象；同一份源码换一枚仪器，真伤当场出来。简报那条断言我复核成立。
+- ⚠ 关键的一层，也是我要写清为什么它比"归因错误"更重：**拆穿它所需的工具就在同一格里**。
+  它自己 AC#5 的第 ⑦/8 行就是 `MSYS_NO_PATHCONV=1 docker run … golang:1.27 …`。
+  只要在容器里多敲一发 `go vet ./cmd/wisp/`，那枚真伤当场就出来。
+- 它把地界划在"票 130 的 `cmd/wisp`"上，这一点我复核**也是错的**：那两枚文件名带 `131`，
+  归票 **131**（`docs/reports/` 与 HEAD 的 `3029415` 都在讲票 131 的钉）。**归错了票**，但没归给外人。
+
+**对 129 这一格的损害：零，我逐条钉过。** ① AC#5 要求的"双 GOOS"分母是 `./internal/...`(linux) 与
+`./internal/winsec/`(darwin)，两枚我都读到 rc=0；② 129 的生产文件只有 `internal/winsec/resolve.go`，
+它在 linux/darwin 两枚 GOOS 下都编译干净；③ 被掩埋的那枚错在 `cmd/wisp`，129 一枚字节都没碰过它
+（`git diff --name-only 4824bb8..ea05cf5` 里 `cmd/` 命中 0）；④ 那枚真伤**已经被人抓走并修掉了**：
+`717d822 fix(131续单,第0件)` 把 `leg_sink_nail_131_test.go` 改名成 `_windows_test.go`，
+HEAD 上 `git grep -ln sinkInstallRecord -- cmd/wisp/` 两枚命中都带 `_windows` 后缀了。
+⇒ 按简报的口径如实写：**归因错误发生在它身上，损害为零，且不需要它补修**。
+但这一枚**方法账**要记，因为它与 A115（CI 连红 100 枚所以多一枚真伤没人看见）是同一枚病的一半：
+另一半是"整体归因"。登记为 `R-129-3`，**不归 129 修**。
+
+### 5.3 AC#5 的另一枚欠账（它自己登记的，我复核成立）
+
+N2：本票那段 leg 在 POSIX **一枚分母都没有** —— 我用容器执行核到 `RUN=104/PASS=60/FAIL=0/SKIP=0`
+且日志里 `absoluteness` 命中 0；同一发 MUT-BOTH 在 POSIX **零枚红**。
+⇒ 复核成立，不是我读的结论。我在 2.1 补了一枚**验收方自己的** POSIX 读数（那句话是真的），
+但树里仍然没有 linux 的 winsec 分母，所以它**不构成回归保护**。`R-129-2` 承担这一格。
+
+**⇒ AC#5 通过。** 八发我全重跑，读数同形；一处台账差值我归给了票 130 而不是让本票背；
+一处过度归因我量清了机制、判它损害为零并登记为方法账。
+
