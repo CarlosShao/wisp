@@ -2,7 +2,12 @@
 
 **Status:** open（2026-09-22 22:3x 编排者建；来源 `acceptor-ticket117` 的 `R-117-2` + `agent-ticket125` 的 `R-125-3`，`acceptor-ticket127` 判定"不推翻票 117、是另账一张票"）
 **Type:** 生产缺陷（可见性/顺序），不是测试稳健性
-**Blocks:** nothing · **Blocked by:** **需要 `internal/risk` 解冻**（地界比日志大，别和票 131 混）
+**Blocks:** nothing · **Blocked by:** ~~需要 `internal/risk` 解冻~~ ⇒ **2026-09-23 10:2x owner 批准，但只放一枚具名文件**：
+**只解冻 `internal/risk/winsec_c26.go`**（那个 `func init()` 就在它 `:20`）。
+⚠ **这不是开放授权**：① `internal/risk/assessor.go`、`internal/risk/pathresolver*.go`、`rules_gateway.go` **仍在冻结清单里，一枚都不许动**；
+② 若正解其实落在 `internal/observe/logging.go`（`:204` 那条 WARN 的老家）或 `cmd/wisp/`，**那两处本来就不在冻结清单、不需要授权**，
+**优先往那边走**——把安全关键的 `init()` 顺序改动限制在不得不改的最小范围；
+③ 动 `winsec_c26.go` 之前**必须先交 AC#2 的裁定**（缓冲策略 a/b）并 commit，不许边想边改那枚文件。
 
 ## 两条独立复现（不是推理）
 
