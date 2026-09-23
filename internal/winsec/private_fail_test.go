@@ -25,7 +25,7 @@ func withInjectedSealFailure(t *testing.T, err error) {
 // anyway" is the exact behaviour this package exists to make impossible.
 func TestAC5FailedSealRefusesTheWrite(t *testing.T) {
 	injected := errors.New("injected: descriptor could not be applied")
-	dir := t.TempDir()
+	dir := SealableTempDirForTest124(t)
 
 	t.Run("exclusive artifact", func(t *testing.T) {
 		withInjectedSealFailure(t, injected)
@@ -97,7 +97,7 @@ func assertNoBytesOnDisk(t *testing.T, path string) {
 // injection the same calls must succeed, so the two tests above cannot both be
 // satisfied by an implementation that always errors or one that always ignores.
 func TestAC5FailureIsNotSwallowedByTheHappyPath(t *testing.T) {
-	dir := t.TempDir()
+	dir := SealableTempDirForTest124(t)
 	p := filepath.Join(dir, "artifact.txt")
 	if err := PrivateFileExclusive(p, []byte("written while the seal works")); err != nil {
 		t.Fatalf("PrivateFileExclusive: %v", err)

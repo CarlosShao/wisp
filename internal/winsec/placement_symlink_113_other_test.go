@@ -50,7 +50,7 @@ type foreign113 struct {
 func newForeign113(t *testing.T, name string) *foreign113 {
 	t.Helper()
 	f := &foreign113{}
-	f.dir = filepath.Join(t.TempDir(), name)
+	f.dir = filepath.Join(winsec.SealableTempDirForTest124(t), name)
 	if err := os.Mkdir(f.dir, 0o700); err != nil {
 		t.Fatal(err)
 	}
@@ -251,7 +251,7 @@ func TestAC1POSIXSealFileThroughABackslashNamedLink(t *testing.T) {
 // the call has to keep working. Without this case a "fix" that refuses
 // everything would read as green.
 func TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree(t *testing.T) {
-	root := filepath.Join(t.TempDir(), "data")
+	root := filepath.Join(winsec.SealableTempDirForTest124(t), "data")
 	if err := os.Mkdir(root, 0o700); err != nil {
 		t.Fatal(err)
 	}
@@ -286,7 +286,7 @@ func TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree(t *testing.T) 
 // SealFile alone.
 func TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLinks(t *testing.T) {
 	f := newForeign113(t, "foreign")
-	root := filepath.Join(t.TempDir(), "data")
+	root := filepath.Join(winsec.SealableTempDirForTest124(t), "data")
 	if err := os.Mkdir(root, 0o700); err != nil {
 		t.Fatal(err)
 	}
@@ -334,7 +334,7 @@ func TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLinks(t *testin
 // separator sees root/a as an ancestor and refuses its own tree.
 func TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator(t *testing.T) {
 	f := newForeign113(t, "foreign")
-	root := filepath.Join(t.TempDir(), "root")
+	root := filepath.Join(winsec.SealableTempDirForTest124(t), "root")
 	if err := os.Mkdir(root, 0o700); err != nil {
 		t.Fatal(err)
 	}

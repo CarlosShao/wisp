@@ -57,7 +57,7 @@ func leafLinkTo118(t *testing.T, root, linkName, target string) string {
 // nothing foreign in it, used as the anchor the leaf link hangs off.
 func ownTree118(t *testing.T) string {
 	t.Helper()
-	root := filepath.Join(t.TempDir(), "root")
+	root := filepath.Join(winsec.SealableTempDirForTest124(t), "root")
 	if err := os.Mkdir(root, 0o700); err != nil {
 		t.Fatal(err)
 	}

@@ -35,7 +35,7 @@ import (
 // still there, and its mode is still the wide one it was created with.
 func foreignTree108(t *testing.T, name string) (dir, victim string) {
 	t.Helper()
-	dir = filepath.Join(t.TempDir(), name)
+	dir = filepath.Join(winsec.SealableTempDirForTest124(t), name)
 	if err := os.Mkdir(dir, 0o700); err != nil {
 		t.Fatal(err)
 	}
@@ -93,7 +93,7 @@ func TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink(t *testing.T) {
 // and deletes) here.
 func TestAC2POSIXDoesNotFoldABackslashIntoASeparator(t *testing.T) {
 	foreignDir, victim := foreignTree108(t, "foreign")
-	root := filepath.Join(t.TempDir(), "root")
+	root := filepath.Join(winsec.SealableTempDirForTest124(t), "root")
 	if err := os.Mkdir(root, 0o700); err != nil {
 		t.Fatal(err)
 	}
@@ -153,7 +153,7 @@ func TestAC4POSIXFloorAnswersInsideTheNamedTree(t *testing.T) {
 	if prev := winsec.PathResolverInstalled(); prev != nil {
 		t.Skipf("this platform's binary links a real C26 pipeline (seam holds %T), so the floor leg measures nothing", prev)
 	}
-	root := filepath.Join(t.TempDir(), "data")
+	root := filepath.Join(winsec.SealableTempDirForTest124(t), "data")
 	dir := filepath.Join(root, "sub")
 	if err := winsec.PrivateDirAll(dir, 0o700); err != nil {
 		t.Fatalf("PrivateDirAll(%s): %v", dir, err)

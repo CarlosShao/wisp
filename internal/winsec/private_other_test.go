@@ -18,7 +18,7 @@ import (
 // applyDescriptorPOSIX's read-back).
 
 func TestPOSIXPrivateFileIsReally0600(t *testing.T) {
-	dir := t.TempDir()
+	dir := SealableTempDirForTest124(t)
 	p := filepath.Join(dir, "artifact.txt")
 	// 0o644 in, 0600 out: the promise is current-user-only, not "whatever the
 	// caller asked for", and on this platform that costs nothing.
@@ -35,7 +35,7 @@ func TestPOSIXPrivateFileIsReally0600(t *testing.T) {
 }
 
 func TestPOSIXPrivateDirIsReally0700(t *testing.T) {
-	root := filepath.Join(t.TempDir(), "data", "artifacts")
+	root := filepath.Join(SealableTempDirForTest124(t), "data", "artifacts")
 	if err := PrivateDirAll(root, 0o755); err != nil {
 		t.Fatalf("PrivateDirAll: %v", err)
 	}
@@ -58,7 +58,7 @@ func TestPOSIXPrivateDirIsReally0700(t *testing.T) {
 // unlink such an entry) does not exist on this platform - unlink operates on
 // the link.
 func TestPOSIXSymlinkAtArtifactPositionIsNotRecursed(t *testing.T) {
-	outside := filepath.Join(t.TempDir(), "someone-elses-tree")
+	outside := filepath.Join(SealableTempDirForTest124(t), "someone-elses-tree")
 	deep := filepath.Join(outside, "sub")
 	if err := os.MkdirAll(deep, 0o700); err != nil {
 		t.Fatal(err)
@@ -68,7 +68,7 @@ func TestPOSIXSymlinkAtArtifactPositionIsNotRecursed(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	root := filepath.Join(t.TempDir(), "data")
+	root := filepath.Join(SealableTempDirForTest124(t), "data")
 	if err := PrivateDirAll(root, 0o700); err != nil {
 		t.Fatal(err)
 	}
@@ -95,7 +95,7 @@ func TestPOSIXSymlinkAtArtifactPositionIsNotRecursed(t *testing.T) {
 // TestPOSIXMissingFileIsNotAnError keeps the reclaim loop's idempotence claim
 // platform-neutral.
 func TestPOSIXMissingFileIsNotAnError(t *testing.T) {
-	if err := RemoveUnlinked(filepath.Join(t.TempDir(), "gone")); err != nil {
+	if err := RemoveUnlinked(filepath.Join(SealableTempDirForTest124(t), "gone")); err != nil {
 		t.Errorf("RemoveUnlinked of a non-existent entry: %v", err)
 	}
 }
