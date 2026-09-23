@@ -1,6 +1,6 @@
 # 129 — `sameTree` 还丢着一枚**决定身份**的段：绝对性。`C:wisp\p` 与 `C:\wisp\p` 被读成同一棵树，实测**缝守放行**（`refusal=""`）
 
-**Status:** open（2026-09-22 21:1x 编排者建；来源 `acceptor-ticket126` 的 ⑦「投一枚真洞，不投措辞」）
+**Status:** **AC#1..AC#5 五格已交、待验收方裁定**（2026-09-23 12:5x 由接续代理交回 AC#4/AC#5；原状态：open（2026-09-22 21:1x 编排者建；来源 `acceptor-ticket126` 的 ⑦「投一枚真洞，不投措辞」））
 **Type:** **生产缺陷**（与票 126 同一枚函数、同一族形状，但**不是 126 引入、也没被 126 改坏**——改前改后同判）
 **Blocks:** nothing · **Blocked by:** 无 · **同族：** 票 126（volume 段）、票 108/103（seal 守卫可绕）
 
@@ -21,7 +21,7 @@
 - [x] **AC#2** 裁定：绝对性该不该进 `sameTree` 的比较（与票 126 AC#1 同一把尺：缝守侧按攻击面记、归属侧按事故面记）。
 - [x] **AC#3** 修 `R-126-3` 那一枚 guard（同票前置）：`noticeNamesTree`/`noticesAboutTree` 的**被问侧**无人守——票 115 的 `answerNamesTree115` 守的正是被问侧，票 126 复用了它的 fixture 却漏了这枚 guard。补上并自证它挡得住"换台机器就什么都没比较而报绿"。
 - [x] **AC#4** 变异自证：改前那枚跨绝对性用例红、改后绿；**拒绝侧一枚不许变松**；既有 `--- PASS` 名字集合与基线 `diff` 只许多不许变向。
-- [ ] **AC#5** 门禁：`internal/winsec/` `-count=2 -v` 四数 + `bash scripts/winsec-tests.sh` 同形一发；`gofmt`/`gofumpt` 全路径真跑；`go vet` 双 GOOS；d22scan 纯净快照 rc=0 + 台账各 scope 不降（`ban #8 internal/` 现基线 **385**）；跨卷探针**逐枚卷根**自证已清（AC#6 形状的教训在票 126/118）。
+- [x] **AC#5** 门禁：`internal/winsec/` `-count=2 -v` 四数 + `bash scripts/winsec-tests.sh` 同形一发；`gofmt`/`gofumpt` 全路径真跑；`go vet` 双 GOOS；d22scan 纯净快照 rc=0 + 台账各 scope 不降（`ban #8 internal/` 现基线 **385**）；跨卷探针**逐枚卷根**自证已清（AC#6 形状的教训在票 126/118）。
 
 ## Rules（本仓固定）
 
@@ -156,5 +156,34 @@
 
   ④ **`--- PASS` 名字集合**：还原态 58 枚 vs 本段 STEP 0 基线 58 枚，`comm -13` 增 **0**、`comm -23` 减 **0**
   （前任 AC#3 的 +8/−0 我没有引用，这格重新量）。读数表：`docs/evidence/s1/129-ac4-ac5-mutation-and-gates.md`。
+
+- 2026-09-23 12:5x（agent-ticket129-**接续**，**AC#5＝门禁八发全绿，两处盲区如实登记**）：除 `winsec-tests.sh` 外全部在
+  `git archive a71b2d8` 的纯净快照里跑；快照自证 `.gitattributes` 钉 `*.go text eol=lf`、`resolve.go` 与锚定 blob `cmp` 字节全等
+  （只有 `go.mod`/`go.sum` 落成 CRLF，本段无仪器把它们当 Go 源读）。**不取时序/RSS 结论**（`A103`，本机就是 self-hosted runner）。
+
+  - ① `go test -count=2 -v ./internal/winsec/` rc=0：`RUN=202 PASS=116 FAIL=0 SKIP=0`、`(cached)`=0（基线与还原后各一发，同数）。
+  - ② **`bash scripts/winsec-tests.sh`＝`ci.yml:386` 那一发的逐字形状**，rc=**0**：脚本自报
+    `=== RUN=101 --- PASS=58 --- FAIL=0 --- SKIP=0`、guard 2 拿到结果线 `ok github.com/CarlosShao/wisp/internal/winsec`；
+    我用它自己那四条 grep 对同一份日志重数一遍＝同数、`(cached)`=0。
+  - ③④ `gofmt -l . tools/d22scan tools/mockllm` **0 行**；`gofumpt -l . tools/d22scan tools/mockllm`（CI 逐字，`v0.7.0 (go1.27.1)` 在 `$(go env GOPATH)/bin`）**0 行**。
+  - ⑤ `go vet ./...` host（windows）rc=0；`GOOS=linux go vet ./internal/...` 与 `GOOS=darwin go vet ./internal/winsec/` 各 rc=0（⚠只编译）。
+    ⚠ 登记一发不该我碰的：模块整树 `GOOS=linux go vet ./...` **rc=1**，唯一输出是
+    `cmd/wisp imports … sherpa-onnx-go-linux: build constraints exclude all Go files`＝无 C 交叉工具链的 host 假象，
+    落在我地界之外（票 130 的 `cmd/wisp`），我只读数不修。
+  - ⑥ `sh scripts/d22scan.sh` 纯净快照 **rc=0**：正对照 `PASS=21 FAIL=0 SKIP=0 === RUN=31`、扫描 `clean`；
+    台账八 scope `bans#1-5 internal/=203 cmd/=22｜#6 frontend/=40｜#7 internal/tools/=18｜#8 design/=16 frontend/=40 internal/=**389** cmd/=37`
+    ⇒ 对最新在册基线（票 121 表：202/22/40/18/16/40/382/31）与派单给的 `ban #8 internal/` 385，**零枚下降**、`#8 internal/` +4。
+  - ⑦ **POSIX 半边真执行**（`MSYS_NO_PATHCONV=1 docker run … golang:1.27`，容器里 `ls -l /src/go.mod` 自证挂载非空）：
+    `go test -count=2 -v ./internal/winsec/` ⇒ `RUN=104 PASS=60 FAIL=0 SKIP=0`、rc=0。
+    ⚠ **同一发 MUT-BOTH 在 POSIX 上零枚红**（202/116 那套在 windows 打红 4 枚，linux 全绿）⇒
+    本票那段 leg 在 POSIX **一枚分母都没有**（129 的两枚测试文件全是 `_windows_test.go`），
+    `resolve.go` 注释里那句 POSIX 后果只有源码依据、没有用例依据；CI 也没有 linux 的 winsec 步（脚本自己的 GUARD 就把非 windows 判 rc=2）。
+  - ⑧ **跨卷探针逐枚卷根自证已清**：`C:\/D:\/E:\/F:\` 条目数 27/29/32/5（证明 `ls` 真读到目录）而 `wisp*` 命中**各 0**；
+    `%TEMP%` 按精确名扫 `wisp129-dr*`/`wisp129-vouch*`/`wisp129-seam*`/`wisp-129-tree-ownership-probe`/`wisp-108-tree-ownership-probe`/
+    `wisp-103-conformance-probe`/`wisp126-seam*`/`wisp129-osprobe*` **各 0**；五枚快照的 `internal/winsec/` 内 `^(wisp|WISP)` 命中 **0**。
+  - 还原总账：三枚被改过的文件在五枚快照目录里与纯净快照 `cmp` **15/15 identical**；仓库侧 `git status --porcelain internal/winsec` 空输出。
+
+  **两格欠账（不许被这枚 commit 混过去，验收方按这两条判）**：**(N1)** 腿表缺"腿数下限"断言，MUT5B 删掉一整枚
+  `wantRefused: true` 腿仍全绿（`A109②` 同形）；**(N2)** 那段 leg 在 POSIX 零分母（⑦ 的读数）。本段不改判据所以都没补。
 
 
