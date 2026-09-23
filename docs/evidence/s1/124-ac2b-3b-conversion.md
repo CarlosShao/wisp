@@ -182,3 +182,171 @@ AC#1 在 `7b4c36a` 上量出 17 枚；本批在 `4ea0db2` 的**改前基线**（
 
 ⇒ **裁决：17 枚全部该转（甲类），本批要动码。** 但**形状不许照抄批次 1/2**：不接 `proc.SealableRoot`，
 改按票 125 先例在包内自走。理由与实现见 §8。
+
+## 3. 判据① 逐枚转绿且点名（四数只从 `-v` 量）
+
+四台＝改前/改后 × 软链/普通，全部 `golang:1.27` 容器内 `go1.27.1 linux/amd64`、`./internal/winsec/` `-count=1 -v`
+（`BASE-L/BASE-P/POST-L/POST-P.log`；每台进容器先 `ls -l /src/go.mod`=883 + `md5sum resolve.go`=`b6876a5e…`）。
+**这 17 枚里 11 枚在宿主 Windows 上没有分母**（`!windows` 标签），所以本表**只有容器读数**，宿主那一台见 §7.2 的 windows 腿。
+
+| # | 用例名 | PRE-L 软链 | POST-L 软链 | PRE-P 普通 | POST-P 普通 |
+|---|---|---|---|---|---|
+| 1 | `TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasNamed` | FAIL | PASS | PASS | PASS |
+| 2 | `TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed` | FAIL | PASS | PASS | PASS |
+| 3 | `TestAC2POSIXDoesNotFoldABackslashIntoASeparator` | FAIL | PASS | PASS | PASS |
+| 4 | `TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator` | FAIL | PASS | PASS | PASS |
+| 5 | `TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree` | FAIL | PASS | PASS | PASS |
+| 6 | `TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLinks` | FAIL | PASS | PASS | PASS |
+| 7 | `TestAC4POSIXFloorAnswersInsideTheNamedTree` | FAIL | PASS | PASS | PASS |
+| 8 | `TestAC5FailedSealRefusesTheWrite` | FAIL | PASS | PASS | PASS |
+| 9 | `TestAC5FailureIsNotSwallowedByTheHappyPath` | FAIL | PASS | PASS | PASS |
+| 10 | `TestPOSIXMissingFileIsNotAnError` | FAIL | PASS | PASS | PASS |
+| 11 | `TestPOSIXPrivateDirIsReally0700` | FAIL | PASS | PASS | PASS |
+| 12 | `TestPOSIXPrivateFileIsReally0600` | FAIL | PASS | PASS | PASS |
+| 13 | `TestPOSIXSymlinkAtArtifactPositionIsNotRecursed` | FAIL | PASS | PASS | PASS |
+| 14 | `TestAC5FailedSealRefusesTheWrite/directory_chain` | FAIL | PASS | PASS | PASS |
+| 15 | `TestAC5FailedSealRefusesTheWrite/exclusive_artifact` | FAIL | PASS | PASS | PASS |
+| 16 | `TestAC5FailedSealRefusesTheWrite/replacement_write` | FAIL | PASS | PASS | PASS |
+| 17 | `TestAC5FailedSealRefusesTheWrite/seal_file_and_dir_direct` | FAIL | PASS | PASS | PASS |
+
+表由日志程序化生成、非手抄：对 17 枚逐名在四份 `-v` 日志中各查一次 `^ *--- (PASS|FAIL|SKIP): <名> ` 命中。
+**17 行 × 4 列无一格变差**（没有任何一枚从 PASS 变成 FAIL/SKIP）。
+
+包级四数（`〔容器/软链形〕`，`-count=1 -v`）：
+
+| 台 | RUN | 顶层 PASS | 顶层 FAIL | 顶层 SKIP | 子测 PASS | 子测 FAIL | rc |
+|---|---|---|---|---|---|---|---|
+| PRE-L | 45 | 14 | **13** | 3 | 11 | **4** | 1 |
+| POST-L | 45 | 27 | **0** | 3 | 15 | **0** | **0** |
+
+⇒ 本批软链形红名 **17 → 0**（顶层 13→0、子测试 4→0），且顶层 PASS 恰 +13、子测 PASS 恰 +4
+⇒ **变绿的是那 17 枚本身，不是分母移动**。`-v` 日志里点名宿主的 `refusing to seal` / `not provably resolved` 行数：
+PRE-L **20** 行 → POST-L **0** 行。
+
+## 4. 判据② 普通形一枚都不许多红，且判定分支一字未动
+
+**普通形八个数改前改后逐数相同**（`〔容器/普通形〕`，`-count=1 -v`）：
+PRE-P `RUN=52 顶层 30/0/0 子测 22/0` ＝ POST-P `RUN=52 顶层 30/0/0 子测 22/0`，`rc` 两枚都 0
+⇒ **普通形一枚都没多红，也没有一枚变绿**（本来就全绿）。
+
+**`git diff` 的删除侧全文**（`git diff 8ced405^ 8ced405 -- internal/winsec/` 里**全部** `-` 行，15 行，一字不差）：
+
+```
+-	dir = filepath.Join(t.TempDir(), name)
+-	root := filepath.Join(t.TempDir(), "root")
+-	root := filepath.Join(t.TempDir(), "data")
+-	root := filepath.Join(t.TempDir(), "root")
+-	f.dir = filepath.Join(t.TempDir(), name)
+-	root := filepath.Join(t.TempDir(), "data")
+-	root := filepath.Join(t.TempDir(), "data")
+-	root := filepath.Join(t.TempDir(), "root")
+-	dir := t.TempDir()
+-	dir := t.TempDir()
+-	dir := t.TempDir()
+-	root := filepath.Join(t.TempDir(), "data", "artifacts")
+-	outside := filepath.Join(t.TempDir(), "someone-elses-tree")
+-	root := filepath.Join(t.TempDir(), "data")
+-	if err := RemoveUnlinked(filepath.Join(t.TempDir(), "gone")); err != nil {
+```
+
+⇒ **15 行删除全部是"哪份根递给底线"这一个表达式**；`t.Errorf` / `t.Fatalf` / `assertRefused113` / `assertStillThere108` /
+`errors.Is(…)` / 模式位比较 / 阈值 **0 命中**。新增侧除两枚新文件外只有 15 处同名替换（`git diff --numstat` ＝ 15 增 15 删，逐文件 3/1/4/2/5）。
+⇒ **票面 AC#3 成立**：底线码与判定分支都没碰，`internal/winsec/resolve.go` 零 hunk、`internal/proc/**` 零 hunk、
+`internal/risk/**` 零 hunk、前两批已交文件零回退。
+
+## 5. 判据③ 两形各一枚，RUN/SKIP 差逐包解释
+
+受影响包只有一枚 `./internal/winsec/`（改动面见 §8，可盘上核）。两形各一枚 `-count=1 -v` 的差：
+
+| 项 | 软链形 | 普通形 | 差 | 逐名解释 |
+|---|---|---|---|---|
+| RUN | 45 | 52 | **7** | 全部是票 125 三枚自拒探针的 7 枚子测试（父用例 `t.Skipf` ⇒ 子测试从未被创建），逐名见下 |
+| 顶层 SKIP | 3 | 0 | 3 | 上述三枚父用例，软链形 `t.Skipf`（`seam_probe_root_125_other_test.go:120/223/276`），普通形跑 |
+| 顶层合计 | 27P+0F+3S=30 | 30P+0F+0S=30 | **0** | 顶层分母两形**一模一样** |
+| 子测合计 | 15P+0F | 22P+0F | 7 | 同 RUN 差 |
+
+那 7 枚子测试逐名：`TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125/{control_plain_temp,measured_symlink_spelled_temp}`、
+`TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125/{control_plain_temp,measured_symlink_spelled_temp}`、
+`TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/{control_plain_temp,measured_symlink_spelled_temp,control_unresolved_root_still_refused_by_the_floor_itself}`。
+
+⚠ **派单点名的那条（"软链形自己会缩小分母，'不再红'要分清变绿还是被跳过"）逐枚排掉**：
+
+- **SKIP 名册改前改后逐名相同**：`diff` PRE-L 与 POST-L 的 `--- SKIP` 名单 ＝ 空（就是那 3 枚 125 探针）
+  ⇒ 本批**没有新增任何一枚 SKIP**；
+- §3 表里 17 枚旁写的是 `PASS` 不是 `SKIP`，且 POST-L 的用例名集合与 PRE-P 逐名相等（只差那 7 枚 125 子测试）；
+- 那 3 枚探针 + 7 枚子测试**一枚未动**（既不在 17 枚分母里，也不在 §8 改动面里）；
+  批次 2 留下的跑法账（**每形一枚新容器 + `-timeout` 够长**）本批照做，两形分别用了独立容器。
+
+⇒ 形状自带的缩小（7 枚子测试）改前改后**同数同因**，没有被算进"本批清掉的红"。
+
+## 6. 判据④ "另一种拒"逐枚实拿字符串
+
+探针台 `PROBE-L`（`/d/tmp/wisp124-2b3b-probe/`，仓外）：只在 `private_fail_test.go` 加 **4 行 `t.Logf`**
+（`grep -c PROBE124` ＝ 4），不改任何断言 ⇒ 四数与 POST-L **逐数相同**（`RUN=45 顶层 27/0/3 子测 15/0`、rc=0），
+先证明探针本身没移动分母，再拿字符串。
+
+- **#1–#5（AC5 注入族，它自己要的是 `ErrNotSealable`）**——四枚都拿回**注入的那一句**，且 `IsErrNotSealable=true`：
+  `winsec: cannot apply a private security descriptor: /realpriv/w124tmp/TestAC5FailedSealRefusesTheWrite…/001/{artifact.txt,blob.bin,a,plain.txt}: injected: descriptor could not be applied`
+  ⇒ "未解析根"那句从这五枚的拒因里**消失**，注入腿重新成为操作性拒因（转前它拿到的是 `not provably resolved`，见 §1.3/F1-a）。
+- **#13/#14（AC118 leaf-link，它自己要的是"我种的叶子链接被拒"）**——转后逐字点名**自己的叶子**：
+  `AC#1 SealFile("/realpriv/…/002/root/artifact.txt") -> err=winsec: refusing to seal … reaches it through the link at /realpriv/…/002/root/artifact.txt, which is not the tree this call names`
+  （`AC#1 PrivateFile(…)` 同形）⇒ 链接名＝用例自己 `os.Symlink` 出来的那枚 `artifact.txt`，不再是宿主的 `/varlink`；
+  并且 `leafLinkTo118:50-52` 的 `filepath.EvalSymlinks` 前置**没被放宽也没被绕过**，它现在通过是因为形状真的对了。
+- **#3/#4/#5/#6/#7/#10/#11/#12/#13(模式族)/#15/#16/#17（反向腿，要的是"别拒"）**——转后拿到的是**成功**
+  （`SealFile`/`PrivateFile`/`PrivateDirAll`/`SealDir`/`RemoveUnlinked` 返回 nil，模式位回读 0600/0700 成立）。
+- ⚠ **反扫**：`POST-L.log` 与 `GATE-L.log` 里 `refusing to seal`、`not provably resolved`、`/varlink` 三串命中 **0 行**
+  ⇒ 没有一枚靠"换个理由拒"或"换个理由跳"过断言。
+
+## 7. 判据⑤ 变异自证三态 ＋ 票面 AC#5 门禁
+
+### 7.1 变异三态（票面 AC#4）
+
+`MUTATION-124-2B3B`：把 `tempdir_resolved_124_other_test.go` 的函数体退回原样交 `t.TempDir()`（＝拆掉这一层解析＝旧实现）。
+**先证落地、再读数**：
+
+- `grep -n` 落地：`…/wisp124-2b3b-mut/internal/winsec/tempdir_resolved_124_other_test.go:35` 命中 `MUTATION-124-2B3B`、
+  `:36` 命中 `return t.TempDir()`，**`return resolveProbeRoot` 命中 0**；
+- 容器原生 `go build ./internal/winsec/` **rc=0** ＋ `go vet ./internal/winsec/` **rc=0**（`MUT-BUILD.log`）**之后**才读红名。
+
+| 态 | 形状 | RUN | 顶层 PASS | 顶层 FAIL | 顶层 SKIP | 子测 PASS | 子测 FAIL | rc |
+|---|---|---|---|---|---|---|---|---|
+| PRE（旧实现） | 软链 | 45 | 14 | 13 | 3 | 11 | 4 | 1 |
+| POST（转后） | 软链 | 45 | 27 | **0** | 3 | 15 | **0** | **0** |
+| MUT（退回旧实现） | 软链 | 45 | 14 | **13** | 3 | 11 | **4** | **1** |
+| PRE / POST / MUT | 普通 | 52 | 30 | 0 | 0 | 22 | 0 | 0 |
+
+⇒ **三态齐**：拆掉解析 ⇒ 软链形**重新 17 枚红**，且 MUT-L 的红名与 PRE-L 的红名 **`diff` 逐名完全相同**（17 枚）；
+同一发变异在普通形 **0 红**、八个数与 PRE-P/POST-P **逐数相同**
+⇒ 这层解析**只在软链形起作用**，不是把普通形一起喂绿。
+
+### 7.2 门禁（票面 AC#5，本批受影响包＝`./internal/winsec/`）
+
+`-count=2 -v` 两形各一枚**新**容器（`〔容器/linux/amd64〕`，`-timeout 30m`）：
+
+| 形 | RUN | 顶层 PASS | 顶层 FAIL | 顶层 SKIP | 子测 PASS | 子测 FAIL | rc |
+|---|---|---|---|---|---|---|---|
+| GATE-L 软链 | 90 | 54 | **0** | 6 | 30 | **0** | 0 |
+| GATE-P 普通 | 104 | 60 | **0** | 0 | 44 | **0** | 0 |
+
+⇒ 每枚数都是 §3 那发 `-count=1` 的**正好 2 倍**（无缓存、无 flake、与原读数无分歧）；GATE-L 的 6 枚 SKIP＝那 3 枚 125 探针 ×2、
+名册逐名相同；GATE-P 的 SKIP 名册为空；两形机制字串 `not provably resolved` / `refusing to seal` / `/varlink` 命中 **0**。
+
+**宿主那半边（票面 AC#5 的 windows 腿，`〔宿主/windows〕`）**：`private_fail_test.go` 的 6 枚是本批唯一在宿主有分母的用例，
+它们在 Windows 上走 `tempdir_resolved_124_windows_test.go` 的字面 no-op ⇒ 改动面对宿主是零 hunk 的根表达式替换。
+宿主 `go vet ./internal/winsec/` **rc=0**（类型读数，见 §7.3）。
+
+静态与仪器：
+
+- `gofmt -l internal/winsec`（**整包**）宿主 **0 行**；`gofumpt -l internal/winsec`（**整包**）**0 行**，
+  版本 **`v0.7.0 (go1.27.1)`** —— CI 没钉版本，这里钉明我用的这枚；真跑，非"未跑"。
+- `d22scan` 纯净快照（正确调用式 `cd tools/d22scan && go run . -root "<仓绝对路径>"`，两发都 rc=0 clean）：
+  - PRE 快照（`4ea0db2` → `D:\tmp\wisp124-2b3b`）八 scope `203/22/40/18/16/40/397/38`；
+  - POST 快照（`8ced405` → `D:\tmp\wisp124-2b3b-post`）正向对照 `examined 225 production Go files`，八 scope `203/22/40/18/16/40/`**`400`**`/38`。
+  ⇒ **一枚 scope 都不降**；唯一变化 `ban #8 internal/` 397→400（+3）**逐名有出处**：本批 2 枚
+     （`tempdir_resolved_124_other_test.go`、`tempdir_resolved_124_windows_test.go`）
+     ＋ 兄弟 `worker-ticket124-ac2b-3a` 的 `62dda11`（`internal/agent` 26 枚，1 枚新文件）＝3。
+     其余七枚与批次 2 交回的 `203/22/40/18/16/40/397/38` **逐数相同**。
+
+### 7.3 `go vet` 双 GOOS
+
+（本小节读数见 `VET-CONTAINER.log` / `VET-HOST-WIN.log` / `VET-HOST-LINUXX.log`，逐行归因随 §9 一并补入。）
