@@ -1018,12 +1018,11 @@ func (p *pkg133) classifyCond133(e ast.Expr) (string, condKind133) {
 		if !ok {
 			return true
 		}
-		slot := p.isArgvSlot133(bin.X)
-		other := bin.Y
-		if slot {
-			other = bin.X
-		}
-		if slot && bin.Op == token.EQL {
+		if bin.Op == token.EQL && (p.isArgvSlot133(bin.X) || p.isArgvSlot133(bin.Y)) {
+			other := bin.Y
+			if p.isArgvSlot133(bin.Y) {
+				other = bin.X
+			}
 			if bl, ok := other.(*ast.BasicLit); ok && bl.Kind == token.STRING {
 				if v, err := strconv.Unquote(bl.Value); err == nil {
 					key, found = v, true
