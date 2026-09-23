@@ -55,6 +55,7 @@
 |---|---|---|
 | AC#1 | PASS | 形状＝C 为主 + B 为辅，票面 `:179-186` 有 owner 原话与为什么不选 A；动 `ci.yml` 的第一枚 commit 在 AC#1 之后 |
 | AC#2 | PASS（B 那半边有一处判语不成立，见 §2.4） | run/job/step/结论四项我自己从 API 读到；那枚 run 的 `slo-check.ps1` blob 我复算＝`560186fa` |
+| AC#3 | PASS（一处覆盖面缺口登记为 `R-134-3`） | 我在**被验版本那棵树**上用 `SLO_FRESH_CI` 指向四枚 ci.yml 变异件，P1 四发各红一次、干净件绿；树文件 `diff` 与 `git diff --numstat` 证明真 `ci.yml` 一字节未动 |
 
 ## 1. AC#1 形状由 owner 认（PASS）
 
@@ -167,4 +168,59 @@ $ gh api repos/CarlosShao/wisp/actions/jobs/107021435150
   我不据此断言"cron 永远不响"：新加入默认分支的 scheduled workflow 在第一格被 GitHub 跳过是有的（也可能是高负载推迟）。
   但它已经不是"还没到点"，而是"**到点了没响**"，这两者在本仓口径下差一整格证据（AC#3/AC#6 的钉自己那枚时钟从没走过）。
   下一格是 **12:23Z**（距今约 3 h 45 m）⇒ 归给 §8 的 `R-134-4`：到点后再读一次，仍 0 就说明 B 那半边没在交付它承诺的东西。
+## 3. AC#3 反静默死用例：那枚钉有没有牙（PASS；一处缺口见 §3.3）
 
+AC#3 的核心判据是"能红的钉"，不是"存在的钉"。我不复用实现方的 11 发，自己在**被验版本的树**上重造。
+两枚仪器：`p1-teeth.sh`（静态探针 P1，变异件全部经 `SLO_FRESH_CI` 指过去，不改树文件）与
+`run-p3b.sh`（动态探针 P2/P3 的三态）。
+
+### 3.1 P1 四发结构变异（`/tmp/wisp134-acc-r1-c/log/p1-summary.txt`，逐字尾部）
+
+```
+ci-clean       rc=0 |
+ci-no-cron     rc=1 | slo-freshness: FAIL slo-full-trigger-missing: … has no 'cron:' schedule entr
+ci-no-push     rc=1 | slo-freshness: FAIL slo-full-trigger-missing: … has no 'push:' trigger; slo-
+ci-coe         rc=1 | slo-freshness: FAIL slo-full-trigger-missing: the slo-full job now carries 'continue-on-error:' (D22 mode-6: a skippable job …
+ci-paths       rc=0 |                                        <- 这一发是缺口，见 §3.3
+tree copy still byte-identical to the snapshot ci.yml
+```
+
+另外一发我在 §6.2 里跑的（同一枚 P1，另一种形状）：给 `slo-full:` 的 job 体塞 `if: github.repository == 'CarlosShao/wisp'`
+⇒ `X7 rc=1 slo-full-trigger-missing: the slo-full job now carries 'if:'`，把 `ci.yml` 还原（`cp` 回原文件 + `diff` 判空）⇒
+`X8 rc=0`。**这五发全部落在含 AC#6 `if-no-files-found: warn` 的那棵树上** ⇒ 实现方"AC#6 的 `warn` 改动之后 P1 仍有牙"
+那句自述**成立**（我用的是另一组变异件，不是复跑它那几个）。
+
+### 3.2 P2/P3 的三态与两枚旋钮互不顶替（我自己的编号 X/W）
+
+```
+X1 rc=1  +10 天世界（真 API 的最新 report 当样、注入新鲜 job 记录）
+        FAIL slo-full-sample-stale: the last VALID SLO SAMPLE is 10 day(s) old (> 3) …（P2 那行明写 age: 0 day(s) 绿）
+X2 rc=0  同一世界只把 SLO_FULL_SAMPLE_MAX_AGE_DAYS=30 -> 绿（红确实是阈值咬的，不是常数红）
+X3 rc=1  还原 -> 又红
+X4 rc=1  同一世界只把 P2 的 SLO_FULL_MAX_AGE_DAYS=9999 -> 仍红 slo-full-sample-stale（P3 不是 P2 的别名）
+X5 rc=1  反过来：只放宽 SLO_FULL_SAMPLE_MAX_AGE_DAYS=30、把 job 记录摆老 -> 仍红 slo-full-stale（P2 也没被顶掉）
+X6 rc=0  真 API 全扫描（今天真实态）：P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T07:42:24Z
+        artifact_id=10737938571 run=35832874239 / scanned 3 page(s) x 100 … 76 valid-sample record(s) considered
+W1 rc=1  "每推都被触发、零份 report"那一形（SLO_FULL_LAST_SAMPLE=none）
+        FAIL slo-full-sample-never: no uploaded slo-full-report artifact at all …
+W2 rc=1  同一世界把 P2 放宽到 9999 天 -> 仍然 slo-full-sample-never（接缝关不掉探针）
+W6 rc=2  无 token（`env -u GH_TOKEN -u GITHUB_TOKEN` + GITHUB_REPOSITORY 有值）
+        slo-freshness: no GH_TOKEN/GITHUB_TOKEN - the freshness probes cannot look (this is not a pass)
+```
+
+⇒ 实现方交回项里我最在意的三发（"只放宽 P2 仍红"、"`slo-full-sample-never` 会红"、"无 token ⇒ `rc=2`"）**我逐发自己跑过，全部成立**，
+读数是上面这三段，不是它的。注入面我也核过：`.github/workflows/slo-fresh.yml` 里四个测试接缝
+（`SLO_FRESH_NOW`/`SLO_FULL_LAST_TRIGGER`/`SLO_FULL_LAST_SAMPLE`/`SLO_FRESH_CI`）**一个都没有被生产 workflow 设**
+（`yaml_check.py` 逐条打印，只有 `SLO_FULL_SAMPLE_MAX_AGE_DAYS` 出现在注释文字里），
+生产步的 env 只有 `GH_TOKEN` ⇒ 上面那些"注入"进不了 CI 那一条路。
+
+### 3.3 我抓到的一处覆盖面缺口（不推翻 AC#3 的勾，登记归单）
+
+P1 静态探针查的是：顶层 `on:` 在不在、`push:` 在不在、branches 里有没有 main/dev、有没有 `cron:`、
+`slo-full:` job 体内有没有 `if:`/`continue-on-error:`、以及还跑不跑 `-Subset full`。
+它**不查 `paths:` / `paths-ignore:` 触发过滤**（§3.1 的 `ci-paths` 那一发 `rc=0` 就是这件事的读数：
+我在 `on.push` 下面加了 `paths: [internal/**]`，钉当场看不见）。票面 AC#6 与 D22 mode-6 的禁令原文是
+"`if:` / `continue-on-error` / skip / **路径过滤**"四件并列，所以这是一条**禁令未被探针覆盖**的缺口。
+后果不是"门立刻静默死"：那种形状下 3 天后 P2/P3 仍会红（我 X5/W1 那两发就是它的下游），
+代价是**最多 3 天的软化期没人响亮说"触发器被动过了"**，而且红的时候报的是"样旧"不是"触发器被改"，归因会绕。
+登记为 `R-134-3`（见 §8），本格仍判 PASS：AC#3 要求的那枚"能红的钉"我自己造出来了、也确实红。
