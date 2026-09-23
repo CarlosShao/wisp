@@ -107,7 +107,52 @@ top-level-test-count=53     （^--- (PASS|FAIL): Test 共 53 枚，与基线同�
 ⇒ 本程采验收方给的第二个选项（"至少在查表时校验 receiver 为 nil ＋ 参数表含 `*testing.T`"），
 把判据与文案对齐；函数值那一支留给"钉注册点也搬进 windows 文件"的后续格（AC#3），本程不顺手做半截。
 
-（待填：2.2 R-133-3／2.3 R-133-4／2.4 R-133-6）
+### 2.2 `R-133-3`（中）：裁决句要在 owning 这条腿的文件里才算覆盖
+
+根因字节（验收方 §3.1 p2 那一发命中的）：`collectRulings133` 是**行扫描**，只取标记后第一个
+token 当腿名、first-seen 即停，既不要求与这条腿的代码相邻、也不要求在同一枚文件里。
+
+修法（**保留"第二把尺"这条线**：行扫描原样留着，没有改成从 AST 里读注释——派单硬约束 1
+不许把这把尺改回只信 AST，票 135 面上同一形已按此裁过一次）：
+
+- 扫描时把每一枚标记记成 `ruling133{leg, site, file}`（新增 `p.rulingAll`），
+  `p.rulings[leg]` 仍是 first-seen 站点 ⇒ 两枚**不认领覆盖**的判据能见度不降级：
+  "裁决＋钉同时在场"（`carries a coverage ruling … AND a nail claim`）与
+  "裁决指向不在册的腿"（`which is not in the dispatch census`）照旧看得见任意文件里的标记。
+- `rulingAdjacentTo133` ＋ `legOwnsFile133`：只有坐在"这条腿的 dispatch 所在文件 ∪ 它的 entry
+  声明所在文件"里的标记才被认作覆盖证据（账本 `covered=ruling <site>` 打的是这一枚站点）。
+- `misplacedRulingReds133`：一枚不落在任何 owning 文件里的标记**单独报红**，
+  不让它因为"这条腿另有钉"就悄悄躺在树上。
+- **没有采的形状**：验收方 §8 另半句"裁决句必须点到该腿的 entry 名"= 要求标记正文里出现
+  `cmdSfx131` 这类符号名。今天树上那五枚裁决句（`main.go:65/70/74`、`panel_assets.go:16`、
+  `slo_windows.go:186`）没有一枚写到 entry 符号名——加上这条判据就得改 `main.go` 等三枚生产文件
+  的裁决注释才不红，而那三枚不在本程地界（本程只碰 `leg_dispatch_gate_133_test.go`），
+  故**只做同文件核对**，把"点到 entry 名"登记进 §6 未验证面。
+
+### 2.3 `R-133-4`（中）：一条 case 的每一枚命令标签各出一行腿
+
+根因字节（原 `:965`）：`if key == "" { … key = v }` ⇒ 一条 clause 只有**第一条字面量标签**进清单，
+第二条命令名整条从账本消失，也不与 usage 双向差撞。
+
+修法 `caseLabelLegs133`：
+
+- **命令词形态的标签逐枚成腿**：各自的覆盖义务（判据 (b)）、各自欠 `usage` 一行（双向差）。
+- **旗标拼写折进主行的 `aliases=` 列**，条件是它的字母部分是主命令词的**前缀**
+  （`-v`/`--version` 是 `version` 的拼写；`-h`/`--help` 是 `help` 的拼写）——
+  今天 `main.go` 那两枚 clause 就是这个形状，折起来才不至于把"CLI 惯例的别名"当成第二条命令；
+  不是前缀的旗标（`-x133`）不折叠，仍是一条自己的腿，既欠钉也欠文档。
+- 非字面量标签仍**各自**成 `unparsed-label@<site>:<expr>` 腿并红（X8 的红名文案逐字未动；
+  多条非字面量标签也不再互相吞掉）。
+- `leg133` 新增 `aliases []string`，账本行尾部多一列 `aliases=…` ⇒ 别名从"零行"变成"在行上看得见"。
+
+### 2.4 `R-133-6`（中，证据面）：把那句全称量词按实际读数更正
+
+`docs/evidence/s1/133-ac1-ac2-instrument.md` §3 那句"把本尺摘掉，这五发的形状今天仍然
+没有任何一枚用例会红"——**原文留在原地未抹**，紧跟其后插入一段带 `>` 引块的更正
+（`git diff --numstat` 那枚文件删除列 = 0，只有 20 行插入）。更正段给的读数是：
+摘掉本尺后**只有 X14 两拍零红**，N-3／X4／X8／X12 四发各红一枚、红的是票 131 的门
+`TestAC4EveryLegIsNailedOrRuled`（验收方 §2.1 ①栏四行 100/52/1/0），并与同一份文件 §2.0.1
+的自述对齐。本程自己的六发复算（在同一棵有本尺的树上 `-skip` 掉本尺）见 §3.4。
 
 ## 3. 改后：同一发复跑
 
@@ -155,7 +200,62 @@ $ gofmt -l cmd/wisp/   rc=0 空输出
 $ go vet ./cmd/wisp/   rc=0
 ```
 
-（待填：3.2 p2／p5 复跑、3.3 五发老账不退化）
+### 3.2 `p2`（不相邻裁决句）与 `p5`（同 case 多标签）
+
+时刻 `date -u` 13:59:3xZ–14:06Z（本地 21:59–22:06 +08）。
+**先证一件事**：第一次跑 `p2` 用的树 `T2` 里，`probe.py` 的 `clean()` 把更早一轮留下的
+`leg_dispatch_gate_133_test.go.p1.bak`（**只含第 1 枚修法**的版本）盖回了我刚拷进去的文件，
+那次读到的"仍绿"是**改前的读数**，作废（日志 `POST-p2.log` 留盘不删，但不当证据）；
+下面两发都在新建的树上看 `sha1sum` 与仓内文件逐字相同之后才取。
+
+`p2`，树 `/d/tmp/wisp133-ac2fix-T3`（基树 `54123e0` ＋ 修法 1＋3）：
+
+```
+LANDED-MAIN x14b2c:
+  main.go:80: 		case "sfx131":
+  sfx131x.go:12: var holder131 = sinkHolder131{}
+PROBE p2 applied
+  doctor.go:341: // WISP-LEG-COVERAGE-RULING: sfx131 acceptor probe: planted in an unrelated production file, far from any code that owns this leg.
+BUILD POST3-p2 rc=0
+GATE POST3-p2 rc=1 red=1 pass=0
+leg_dispatch_gate_133_test.go:175: AC#1 RED: doctor.go:341 carries WISP-LEG-COVERAGE-RULING: for leg "sfx131", but doctor.go owns
+  neither this leg's dispatch (main.go:81) nor any symbol it calls (main.go, sfx131x.go). A coverage ruling has to sit next to the
+  code that owns the leg: as placed, one line at the end of any production file in this directory would back the claim that
+  somebody verifies "sfx131", which is the reading ticket 133's own acceptor registered as R-133-3.
+leg_dispatch_gate_133_test.go:175: AC#1 RED: leg "sfx131" (main.go:81) is dispatched by func main and covered by nothing: …
+  leg sfx131 main.go:81 installs=false handoff=false covered=RED nothing entries=cmdSfx131
+```
+
+⇒ 由绿转红，两枚红都点到 `TestAC1AC2DispatchHopGate133`，`go build ./...` rc=0（不是包级坏掉）。
+**正向控制一枚**（收紧判据不许把"写在该写地方的裁决句"一起打死）：同一发 x14b2c ＋ 同一行 usage，
+把裁决句从 `doctor.go` 末尾改到**这条腿自己的文件** `sfx131x.go:22`：
+
+```
+BUILD POST-p2b rc=0
+GATE POST-p2b rc=0 red=0 pass=1
+  leg sfx131 main.go:81 installs=false handoff=false covered=ruling sfx131x.go:22 entries=cmdSfx131 aliases=
+```
+
+`p5`，树 `/d/tmp/wisp133-ac2fix-T4`（基树 `54123e0` ＋ 修法 1＋3＋4）：
+
+```
+P5 applied（pristine main.go 上手种 `case "run", "runalt133":`，与验收方 extra.sh 同法）
+  main.go:82: 		case "run", "runalt133":
+BUILD FIN-p5 rc=0
+GATE POST-p5 rc=1 red=1 pass=0
+leg_dispatch_gate_133_test.go:175: AC#1 RED: leg "runalt133" (main.go:80) reaches installLogSink on this path: dispatch -> runTextTask -> installLogSink …
+leg_dispatch_gate_133_test.go:185: AC#1/#2 RED: leg "runalt133" is dispatched by func main and documented in no line of the usage block …
+dispatch ledger, read out of func main's own branches at run time (12 legs, 4 claims in this gate's registry):
+  leg run        main.go:80  installs=true  handoff=false covered=nail TestAC2SealNoticeLandsInTheRunLegLogFile -> runTextTask entries=attachParentConsole|cmdRun aliases=
+  leg runalt133  main.go:80  installs=true  handoff=false covered=RED sink with no nail                                   entries=attachParentConsole|cmdRun aliases=
+```
+
+⇒ 由绿转红：第二条标签现在**有自己的行**（12 legs），并且因为这条腿够得着听众又没钉、
+usage 里也没那行字，两枚红都点到本尺。别名折叠的正向控制同树可见：
+未变异的树上 `leg version … aliases=--version|-v`、`leg help … aliases=--help|-h`、
+`11 legs` 与基线逐字同（`go vet ./cmd/wisp/` rc=0）。
+
+（待填：3.3 五发老账不退化、3.4 摘掉本尺的六发）
 
 ## 4. 四数逐名账（待填）
 
