@@ -29,6 +29,14 @@
 - 本程只动 `cmd/wisp/leg_dispatch_gate_133_test.go` ＋ 本证据文件 ＋ 票面 append 一节 ＋
   前任证据文件 `133-ac1-ac2-instrument.md` 的 §3 更正段（只插入、不抹）。
 
+### 0.05 共树未提交面（别人的，本程一个字没动）
+
+`git status --short` 在本程中途起出现的兄弟未提交件：`.scratch/wisp/issues/124-*.md`、
+`docs/evidence/s1/124-ac2b-4-conversion.md`（`worker-ticket124-ac2b-4` 在飞），
+以及开工时就有的 `docs/reports/2026-09-23-gap-analysis-vs-oss-harnesses.md`。
+本程每一枚 commit 都带**显式 pathspec**，`git diff --cached --name-only` 逐枚核过暂存清单
+只含本程路径；未替兄弟 add、未替兄弟 commit、未 `git add -A`。
+
 ### 0.1 基线（未变异，`54123e0` 纯净树）
 
 ```
@@ -154,6 +162,17 @@ token 当腿名、first-seen 即停，既不要求与这条腿的代码相邻、
 `TestAC4EveryLegIsNailedOrRuled`（验收方 §2.1 ①栏四行 100/52/1/0），并与同一份文件 §2.0.1
 的自述对齐。本程自己的六发复算（在同一棵有本尺的树上 `-skip` 掉本尺）见 §3.4。
 
+### 2.5 `R-133-5`（低，验收方未造 ⇒ 本程自造之后才算已证）
+
+验收方 §8 那一格只登记了字节（`classifyCond133` 字面量分支 last-match、no-args 分支 first-match），
+**没有造出探针**，并写明"下一位请补"。本程补了（探针 `p6`，见 §3.5）：造出来确实能绿 ⇒
+按派单那句"若你造出来了再一并修并附三态"一并修掉，并从这一枚起它**是已证**、不再是读码断言。
+
+修法：`classifyCond133` 改成返回 `(keys, aliases, kind)`，条件里**每一处** `argv 槽位 == 字面量`
+比较都进 `keys`；`len(argv) == 0` 与字面量比较同时在场时两条腿都留（旧代码里字面量会吃掉 no-args）。
+标签折叠规则与 `R-133-4` 合并成同一处 `splitCommandLabels133`（旗标拼写须是命令词的前缀才折进
+`aliases`，否则自成一腿），两条判据不再各写一份、也就不会各自漂移。
+
 ## 3. 改后：同一发复跑
 
 ### 3.1 `p1`／`p3`（判据 (d) 的名字那一侧）
@@ -255,10 +274,102 @@ usage 里也没那行字，两枚红都点到本尺。别名折叠的正向控�
 未变异的树上 `leg version … aliases=--version|-v`、`leg help … aliases=--help|-h`、
 `11 legs` 与基线逐字同（`go vet ./cmd/wisp/` rc=0）。
 
-（待填：3.3 五发老账不退化、3.4 摘掉本尺的六发）
+### 3.5 `p6`（本程自造的 `R-133-5` 探针，三态齐全）
 
-## 4. 四数逐名账（待填）
+种法：pristine `main.go` 的 `switch args[0] {` 之前插
+`if len(args) > 0 && (args[0] == "x133a" || args[0] == "version") { attachParentConsole(); printVersions(""); return }`，
+**不动 usage 块**（这台件 `/d/tmp/wisp133-ac2fix-p6.sh`，两棵树只差第 5 枚修法）。
+
+```
+# 改前（树 /d/tmp/wisp133-ac2fix-T7 ＝ 54123e0 基树 ＋ 修法 1-4）
+P6 applied (compound early if; x133a deliberately NOT in the usage block)
+  main.go:79: 	if len(args) > 0 && (args[0] == "x133a" || args[0] == "version") {
+BUILD PRE5-p6 rc=0
+GATE PRE5-p6 rc=0 red=0 pass=1
+  dispatch ledger … (12 legs, 4 claims in this gate's registry):
+  leg version main.go:79  … covered=ruling main.go:65 entries=attachParentConsole|printVersions
+  leg version main.go:111 … covered=ruling main.go:65 entries=attachParentConsole|printVersions aliases=--vers
+X133A-ROWS=0 NAME-APPEARANCES=0        （"x133a" 在整份读数里出现 0 次）
+# 改后（树 /d/tmp/wisp133-ac2fix-T8 ＝ 同一基树 ＋ 修法 1-5）
+BUILD POST5-p6 rc=0
+GATE POST5-p6 rc=1 red=1 pass=0
+leg_dispatch_gate_133_test.go:175: AC#1 RED: leg "x133a" (main.go:79) is dispatched by func main and covered by nothing: …
+leg_dispatch_gate_133_test.go:185: AC#1/#2 RED: leg "x133a" is dispatched by func main and documented in no line of the usage block: …
+  dispatch ledger … (13 legs, 4 claims …):
+  leg x133a   main.go:79  installs=false handoff=false covered=RED nothing entries=attachParentConsole|printVersions aliases=
+X133A-ROWS=1 NAME-APPEARANCES=3
+```
+
+⇒ 一枚只写在复合条件**第一个**槽位上的命令名，改前整条不进账本（0 次出现）、判绿；
+改后有自己的行、两条红，红名仍是本尺。
+
+（待填：3.3 五发老账不退化、3.4 摘掉本尺的六发、3.6 四探针在最终树上的复跑）
+
+## 4. 四数逐名账（合并态快照，只从 `-v` 量）
+
+**树**：`/d/tmp/wisp133-ac2fix-T5` = `git archive 090bb3e`（本程第 4 枚修法 commit，
+落在兄弟 `worker-ticket124-ac2b-4` 的 AC#2b 三枚文件之上）`| tar -x` ＋ 三枚 DLL。
+**先证量的是被交版本**：`sha1sum cmd/wisp/leg_dispatch_gate_133_test.go` 仓内与归档后
+同为 `18b74b45c747487be419a1494bc17026d5e563cd`（脚本 `FINAL-A.log` 的 `ARCHIVE-MODULE` 行）。
+时刻 `date -u` 14:10:08Z–14:13:5xZ（本地 22:10–22:13 +08）。
+
+| 命令 | rc | RUN | PASS | FAIL | SKIP | 对基线 |
+| --- | --- | --- | --- | --- | --- | --- |
+| `go test -count=2 -v ./cmd/wisp/` | 0 | 202 | 108 | 0 | 0 | 字面 AC#5 命令；与前任 §4.1、验收方 §7.1 的 202/108/0/0 逐字同；`[no tests to run]` 命中 0；本尺在 count=2 里 `--- (PASS\|FAIL): TestAC1AC2DispatchHopGate133` 出现 2 次 |
+| `go test -count=1 -v ./cmd/wisp/` | 0 | 101 | 54 | 0 | 0 | ＝今天"有本尺"基线 101/54/0/0 |
+| `… -count=1 -v -skip '^TestAC1AC2DispatchHopGate133$'` | 0 | 100 | 53 | 0 | 0 | ＝今天"无本尺"基线 100/53/0/0（`-skip` 是少跑一枚、不是跑成 SKIP：SKIP 列仍 0） |
+
+**逐名 `comm`（不是差值）**，两份名册 = 上面两枚读数的顶层 `--- (PASS|FAIL|SKIP):` 行：
+
+```
+comm -23 F-roster-ins.txt F-roster-skip.txt  ->  TestAC1AC2DispatchHopGate133   （新增，仅此一枚）
+comm -13 F-roster-ins.txt F-roster-skip.txt  ->  （空）                          （无一名消失）
+comm -12 F-roster-ins.txt F-roster-skip.txt  ->  53 枚共有，一字未动
+```
+
+**四枚修法各自动了哪几枚数**：全部改在判据里（`isRunnableCase133`／
+`rulingAdjacentTo133`＋`misplacedRulingReds133`／`caseLabelLegs133`），
+**零新增用例、零删除用例、零改名** ⇒ 名册逐名可核：有本尺 54 枚、无本尺 53 枚，
+差的仍只有本尺那一枚，与改前（验收方 §7.1 在同一枚尺上量的 54/53）逐名同。
+本程**没有**另起 `*_133_test.go` 新件：四条的"探针"是**变异件**（装在快照树里、跑完留盘不进仓），
+不是一枚新的进仓用例；AC#3 那句"给这条判据装一枚主动弄哑自己的自证腿"是**另一格**（见 §6）。
 
 ## 5. 门禁（待填）
 
-## 6. 未验证与 next=（待填）
+## 6. 未验证、没做的、与要报回来的
+
+1. **AC#2 的翻勾权不在本程**。派单写死"不许自己勾 AC#2"，票面那一节也只 append 不翻格。
+   本程交的是四条（＋一条自造）修法与复跑读数，终裁按 `133-adversarial-acceptance.md`
+   的 §3.1／§8 由非实现者验收方复跑判。
+2. **钉表存函数值那一支没装**（`R-133-2` 的第一选项）。理由与逐枚文件名见 §2.1 末：
+   四枚钉指向的用例全在 `_windows_test.go` 后缀的文件里，本尺是跨平台文件，
+   换成函数值会让 linux 侧 `go vet`／`go test` 直接 `undefined:` ——
+   把"关着门仍红"的独立读数换成"编不过"，属派单点名的"修了会以另一种方式变哑"，**报回不硬修**。
+   代价登记在这里：`covered=nail …` 那一列仍是**按名字**对源码做的查表，
+   build-tag 藏起来的用例今天仍会被认作钉（本尺 header 的 blindness disclosure 一行已自陈）。
+3. **`R-133-3` 只做到"同文件核对"**，没做验收方那半句"裁决句必须点到该腿的 entry 名"。
+   今天五枚裁决句（`main.go:65/70/74`、`panel_assets.go:16`、`slo_windows.go:186`）
+   没有一枚写了 entry 符号名 ⇒ 装上就得改三枚生产文件的裁决注释才不红，那出了本程地界
+   （本程只碰 `leg_dispatch_gate_133_test.go`）。**残留形状**：一枚坐在 `main.go` 里、
+   点名 `version`、但不提任何符号名的裁决句仍然算覆盖。
+4. **AC#3 那句"给这条判据装一枚主动弄哑自己的自证腿"未做**——裁决表 §8 的修法栏把它列进
+   `R-133-1` 那一格，但 AC#3 本身"本表未裁"（不在派单地界）。本程四法的"自证"是**变异探针**
+   （装在快照树里、跑完留盘不进仓），不是一枚常驻的弄哑自证腿。
+5. **`R-133-7`（gofumpt 版本没钉在 CI／d22scan 各 scope 无可比历史基线）不在本程**：
+   §5 只写明**本程这一枚** gofumpt 的版本，没有代 CI 钉版本、也没有立进仓的 scope 基线数；
+   那一格仍归票 133 的 AC#5。
+6. **linux 面**：`GOOS=linux go vet ./cmd/wisp/` 停在 cgo 包加载（诊断里没有一枚
+   `cmd/wisp/*.go:line` ⇒ 既非破口亦非清白），真类型读数只有 `golang:1.27` 容器那一枚；
+   linux 上 `go test ./cmd/wisp/` 的 19 枚 FAIL 本程**未复跑**（package owner 地界，
+   且 `scripts/wisp-cli-tests.sh` 明写那是 windows 腿）。
+7. **五发的①栏（无仪器树 `c720494`）本程未重取**：§3.4 用的是"同一棵有本尺的树上 `-skip` 掉本尺"
+   这一形，与验收方①栏的树基不同（那棵树连 `main.go`/`panel_assets.go`/`slo_windows.go` 的
+   19/8/6 行裁决注释都没有）。两形都在说同一句"摘掉本尺之后还有谁红"，但**别把它当成同一枚读数**。
+8. **AC#6（仪器自己进 CI：说不出 run id＋job id＋step 名就当不存在）本程未动**：只 commit 未 push。
+9. **容器挂载与 TMPDIR 两枚坑**的处理见 §5：`MSYS_NO_PATHCONV=1` ＋ `/d/...` ＋ 容器内
+   `ls -l /src/go.mod` 先证挂上；软链 temp 那一形是**另一枚读数**，见 §5 末（分母是否缩小要分清）。
+
+`next=` 交回编排者：请**非实现者验收方**在本程最终 sha 上原样复跑 `p1`／`p2`／`p3`／`p5`
+（四枚已知探针）＋ `p6`（本程自造的 `R-133-5`）＋ 五发两拍，然后按裁决表 §3.1／§6／§8 判
+AC#2 是否翻格；`R-133-2` 的函数值那一支与 `R-133-3` 的 entry-name 半句**留给 AC#3／AC#5 那两格**
+（要动生产文件，别在续单里顺手做）。本程不改判据阈值、不动 131 的门与钉。
