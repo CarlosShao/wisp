@@ -77,13 +77,18 @@ $ cp third_party/sherpa-onnx/*.dll <树>/third_party/sherpa-onnx/   # 三枚 DLL
 | X14 二拍 拆掉 install | v3 | **rc=0 100/53/0/0 零红（门 PASS）** | **rc=1 101/53/1/0 红=只有本尺** | **rc=1 100/52/1/0 红=只有本尺** | difflines=0 |
 | 还原后的整包读数 | — | — | — | — | `Z2-restored-ins` rc=0 101/54/0/0 |
 
-落地证明（每发读红名之前先跑的两条，原文节选）：
+落地证明（每发读红名之前先跑的两条，原文节选；`noins` 那棵树的 `main.go` 少 19 行裁决注释，
+所以同一条腿在两棵树里的行号不同，这是两棵树自己的差，不是种法差）：
 
 ```
-LANDED-MAIN x14:            main.go:80:  case "sfx131:"     sfx131x.go:16: var holder131 = sinkHolder131{open: installLogSink}
-                            sfx131x.go:23: if _, err := holder131.open(args[0]); err != nil {
-BUILD 1v3noins-x14c rc=0 / BUILD 2v3ins-x14c rc=0        （X14 一拍）
-LANDED-MAIN n3:  cmdModels 的调用从 main.go 消失，case "models" 那三行仍在（脚本按"调用为 0"判落地）
+LANDED-MAIN n3: the os.Exit(cmdModels(...)) call is gone from main.go
+  main.go:74:         case "models":                      <- 腿还在，调用没了（脚本按"调用为 0"判落地）
+LANDED-MAIN x14c:                                       （X14 一拍，v3 轮）
+  main.go:80:         case "sfx131":                      <- 有仪器的树（c5f140c）
+  main.go:61:         case "sfx131":                      <- 无仪器的树（c720494）
+  sfx131x.go:16:      var holder131 = sinkHolder131{open: installLogSink}
+  sfx131x.go:23:      if _, err := holder131.open(args[0]); err != nil {
+BUILD 1v3noins-x14c rc=0 / BUILD 2v3ins-x14c rc=0
 ```
 
 真二进制活性（票面 X4／X14 的前提"不是死代码"，本验收方自己量的那一发）：
