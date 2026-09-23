@@ -1,0 +1,184 @@
+# 124 AC#2b 批次 3 后一半 — `internal/winsec` 的 17 枚：先裁该不该转，再动手
+
+## 0. 锚点与环境
+
+- 开工首读 `git rev-parse --short HEAD` = **`4ea0db2`**（分支 `dev`）。开工时 `git status --porcelain` 只有一枚
+  来源未明的未跟踪文件 `docs/reports/2026-09-23-gap-analysis-vs-oss-harnesses.md` —— 按派单：**未提交、未改、未删、未据它开票或改判据**。
+- 纯净快照：`git archive 4ea0db2 | tar -x -C /d/tmp/wisp124-2b3b`（461 枚 `.go`），**未在仓内建 worktree、未 checkout**。
+  快照内 `md5sum internal/winsec/resolve.go` = **`b6876a5efe759f6e17434d1b50a129c3`**，与 AC#1／AC#2a／2b-1／2b-2 逐字同字
+  ⇒ 两批前置动码（`fafe2b4`、`dfa3dc4`）**没有碰到 `internal/winsec`**，本锚的 winsec 码就是它们量过的同一版本。
+- 容器：`golang:1.27`（镜像 `3680233e3204`），容器内 `go version` = **`go1.27.1 linux/amd64`**。
+  挂载一律 `/d/...` + `MSYS_NO_PATHCONV=1`（派单警告的 `docker run -v "C:\…"` 静默空挂＝假绿），
+  每发进容器第一件事 `ls -l /src/go.mod` = `-rwxrwxrwx 1 root root 883`（证明文件真在，非空挂）。
+- 形状：`ln -s /realpriv /varlink` + `TMPDIR=/varlink/w124tmp`（软链形）；`TMPDIR=/plainroot/w124tmp`（普通形）。
+  硬断言沿用 2b-1 的 `exit 97`（空挂）／`exit 98`（形状没建成）／`exit 99`（普通形被 `/varlink` 污染），本批每一发均未命中。
+- 跑法脚本：`/d/tmp/wisp124-2b3b-run.sh`（CRLF 原件）+ `/d/tmp/wisp124-2b3b-run-lf.sh`（LF 副本，容器实际执行的那枚）。
+- 时间戳：本件所有 +8 时间由 `date -u` 换算（开工 12:52 UTC / 20:52 +8）。
+
+## 1. 17 枚名单，与派单给的三条实据的**自核**原文
+
+### 1.1 名单（`./internal/winsec/`，只在软链形红）
+
+AC#1 在 `7b4c36a` 上量出 17 枚；本批在 `4ea0db2` 的**改前基线**（容器软链形 `-count=1 -v`，
+`/d/tmp/wisp124-2b3b-logs/BASE-L.log`）复算，**逐名零差 = 13 枚顶层 FAIL + 4 枚子测试 FAIL**：
+
+| # | 用例名 | 文件 | 构建标签 | 宿主(Windows)编不编译 |
+|---|---|---|---|---|
+| 1 | `TestAC5FailedSealRefusesTheWrite` | `private_fail_test.go:26` | 无标签 | **编译** |
+| 2 | `TestAC5FailedSealRefusesTheWrite/exclusive_artifact` | `private_fail_test.go:30` | 无标签 | **编译** |
+| 3 | `TestAC5FailedSealRefusesTheWrite/replacement_write` | `private_fail_test.go:43` | 无标签 | **编译** |
+| 4 | `TestAC5FailedSealRefusesTheWrite/directory_chain` | `private_fail_test.go:56` | 无标签 | **编译** |
+| 5 | `TestAC5FailedSealRefusesTheWrite/seal_file_and_dir_direct` | `private_fail_test.go:66` | 无标签 | **编译** |
+| 6 | `TestAC5FailureIsNotSwallowedByTheHappyPath` | `private_fail_test.go:99` | 无标签 | **编译** |
+| 7 | `TestPOSIXPrivateFileIsReally0600` | `private_other_test.go:20` | `!windows` | 不编译 |
+| 8 | `TestPOSIXPrivateDirIsReally0700` | `private_other_test.go:37` | `!windows` | 不编译 |
+| 9 | `TestPOSIXSymlinkAtArtifactPositionIsNotRecursed` | `private_other_test.go:60` | `!windows` | 不编译 |
+| 10 | `TestPOSIXMissingFileIsNotAnError` | `private_other_test.go:97` | `!windows` | 不编译 |
+| 11 | `TestAC2POSIXDoesNotFoldABackslashIntoASeparator` | `ancestor_separator_108_other_test.go:94` | `!windows` | 不编译 |
+| 12 | `TestAC4POSIXFloorAnswersInsideTheNamedTree` | `ancestor_separator_108_other_test.go:152` | `!windows` | 不编译 |
+| 13 | `TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed` | `placement_leaf_118_other_test.go:75` | `!windows` | 不编译 |
+| 14 | `TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasNamed` | `placement_leaf_118_other_test.go:96` | `!windows` | 不编译 |
+| 15 | `TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree` | `placement_symlink_113_other_test.go:253` | `!windows` | 不编译 |
+| 16 | `TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLinks` | `placement_symlink_113_other_test.go:287` | `!windows` | 不编译 |
+| 17 | `TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator` | `placement_symlink_113_other_test.go:335` | `!windows` | 不编译 |
+
+宿主侧不是推断，是量出来的：`GOOS=windows go test ./internal/winsec/ -list '.*'`（在 `4ea0db2` 的纯净快照里跑）
+⇒ 上表 13 枚顶层名逐名 `-cx` 计数：第 1、6 枚命中 1，第 7–17 枚命中 **0**。
+⇒ **派单实据③成立且可量化：17 枚里 11 枚在宿主上连编译都不参与，只有 6 枚（#1–#6，`private_fail_test.go` 无标签）宿主有分母。**
+本件后面**每一个数都标"在哪台、哪个构建标签"**。
+
+### 1.2 三条实据的自核结论（我的转述也是断言，逐条重走）
+
+**① 票 119 面 `R-119-9` 的禁令原文 —— 对得上，逐字为真。**
+`.scratch/wisp/issues/119-posix-link-leg-refuses-legitimate-symlinked-data-roots.md:73`：
+
+> - **（2026-09-22 返修 `agent-ticket119b` 新增，来源 `R-119-9`）不许拿被测函数算 fixture。**
+>       一枚用例的期望值只能来自文件系统或调用方自己声明的字面值，不能来自被测函数（含其幂等组合）：
+>       `SealableRoot(base)` 当期望值 ⇒ 把"声明的树原样返回"这条纪律抹掉也照样绿（验收方变异 R 实测 56/56 全绿）。
+>       用例落笔前先问一句"哪一发生产变异能把它打红"，答不出就是恒真，别当覆盖交出去。
+
+**范围要点（决定本批怎么用这条）**：这条钉的是**期望值**的来路，不是**输入根**的来路。本批 17 枚的改动全部落在
+"测试自己把哪份根递给底线"这一侧（输入），没有任何一枚的期望值改成由被测函数算出来。§2 逐枚复核过这一点。
+
+**② `internal/proc/envfork.go` 头部明写 `nothing in internal/winsec calls it` —— 对得上，逐字为真。**
+`internal/proc/envfork.go:148`（`SealableRoot` 的文档块内）：
+
+> // cleans, never absolutizes, never case-folds, and nothing in internal/winsec
+> // calls it - the only C26 entry point stays internal/risk/pathresolver.go.
+
+并且这条边界**在 winsec 这一侧被第二次写下并解释了理由**——`internal/winsec/resolve.go:224-228`（票 125 的注释）：
+
+> // (internal/proc's SealableRoot) - applied to the only OS read this package makes
+> // about its *own* fixture. It is deliberately not a call into internal/proc:
+> // envfork.go's boundary note ("nothing in internal/winsec calls it") is the
+> // package doc ticket 113 AC#6 wrote, and the floor must not start depending on
+> // the layer above it to keep that boundary checkable.
+
+⇒ **批次 2 那句"winsec 不许照抄本批的委托形状"逐字成立**，而且理由比"幂等所以恒真"更硬：这是一条**双向写下的地界**，
+票 125 已经为同一道题给出过答案——winsec 要解析自己的 fixture 根，就在包内自己走（`resolveProbeRoot`，`resolve.go:253`），
+**不伸到上层去买**。本批照这个先例走，不接 `proc.SealableRoot`。
+
+**③ winsec 有一枚 `*_other_test.go`（非 windows 标签）宿主根本不编译 —— 对得上，且比转述更强。**
+转述只说"有一枚"；实测是**6 枚文件带 `!windows`**（`ancestor_separator_108_other`、`dataroot_symlink_119_other`、
+`placement_leaf_118_other`、`placement_symlink_113_other`、`private_other`、`seam_probe_root_125_other`），
+覆盖 17 枚里的 **11 枚**；另有 `private_fail_test.go` **无标签**，覆盖 6 枚。
+⇒ 派单要求的"读数必须说明在哪台、哪个构建标签"本批落成硬格式：§3/§7 每个数后面带 `〔容器/!windows〕` 或 `〔容器/无标签〕`。
+
+### 1.3 派单没给、但我撞上的两条（都要报，不当已验证用）
+
+**(a) `proc.SealableRoot` 在 winsec 里**不是**编译不通**。批次 1 的 `next=` 让下游怀疑接不上；我实测把它接通了：
+在 `/d/tmp/wisp124-2b3b-cycle`（快照副本，**仓外**）放一枚 `package winsec` + `//go:build linux` + `import "…/internal/proc"` 的探针
+`zz_cycleprobe_124_test.go`，容器原生 `go vet ./internal/winsec/` = **rc=0**、`go test -run NONE` = **ok**、
+`go test -list 'CycleProbe.*'` 列得出 `TestCycleProbe124`。根因：`go list -f '{{join .Imports " "}}' ./internal/proc`
+= `context errors fmt github.com/CarlosShao/wisp/internal/buildinfo` —— **`internal/proc` 并不 import `internal/winsec`**，两包无环。
+⇒ **"不许照抄委托形状"是一条纪律／地界约束，不是一条编译约束**。这点必须纠正，否则会下游会以为 winsec 是"转不了"。
+（我一开始按 `go list -deps ./internal/proc` 的输出判过"有环"，那枚输出把 winsec/secret/observe 都列进来了，与
+`.Imports`、`grep -r` 与**实际编译**三条都矛盾；以三条一致的为准，`-deps` 那一读登记为来源未明、不复用。）
+
+**(b) 软链形下 winsec 的 113/108 族拒绝腿是"绿得没有理由"的**（不在 17 枚里，是本批改动面必然牵到的邻居）。
+同一支仪器在两形下的逐字对比（`placement_symlink_113_other_test.go:153` 的 `t.Logf`）：
+
+- 软链形 `BASE-L.log:111`：`AC#1 SealFile("/varlink/.../002/root/link/keep-me.txt") -> err=winsec: refusing to seal …
+  **reaches it through the link at /varlink**, which is not the tree this call names`
+- 普通形 `BASE-P.log:128`：`AC#1 SealFile("/plainroot/.../002/root/link/keep-me.txt") -> err=winsec: refusing to seal …
+  **reaches it through the link at /plainroot/.../002/root/link**, which is not the tree this call names`
+
+⇒ 普通形拒的是**用例自己种的** `root/link`；软链形拒的是**宿主的** `/varlink`，而 `assertRefused113`
+（`placement_symlink_113_other_test.go:133-138`）只要求 `errors.Is(err, winsec.ErrUnresolvedPath)` —— 两根链接给出**同一个 sentinel**。
+⇒ 这几枚在软链形**过，但没过在它测的那条腿上**。逐枚点名（软链形 PASS、且日志里拒因写着 `/varlink`）：
+`TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone`、
+`TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth` 的 4 枚子测试、
+`TestAC1POSIXSealDirThroughASymlinkRefuses`、`TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing`、
+`TestAC1POSIXSealFileThroughABackslashNamedLink`、`TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink`、
+`TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor` = **8 枚顶层 + 4 枚子测试 = 12 枚**。
+这 12 枚**不在 17 枚的分母里**（它们是 PASS，不是 FAIL），但它们的 fixture 根由 `newForeign113`／`foreignTree108`
+两枚共享 helper 供给，**转 17 枚必然同时转它们**（§8 逐枚登记）。**这条是本批交回的最重要发现，请 2b-4 与验收方复算。**
+
+## 2. 甲／乙／丙 三分类，逐枚给理由（本件的主产物）
+
+### 2.0 裁的口径
+
+三档按派单定义。判"甲类"要同时过两条：(i) 它红是因为**测试根的来路不对**（与前两批同一枚病）；
+(ii) 换掉这枚根之后，**它被测的东西还在**。判"乙类"要拿出**断言原文**证明它要的就是"未解析那一形"被拒。
+判"丙类"要给出形状／依赖／生产侧的**可复核**理由。
+
+先把两条**通用事实**立住，后面逐枚只写这枚自己的部分：
+
+- **F1（红因全是宿主的链接，没有一枚是用例种的链接）**：17 枚的软链形失败串逐字回看（`BASE-L.log`，全文见 §3.1），
+  只有三种文案，且**每一种点名的链接都是 `/varlink`**（宿主自己那枚），不是用例在树里种的 link：
+  (a) `winsec: path is not provably resolved, refusing to seal …reaches it through the link at /varlink, which is not the tree this call names`；
+  (b) `winsec: entry is a link to something else, not private data …the spelling reaches it through the link at /varlink, and whatever lives behind that link is not this tree's data to delete`；
+  (c) `the leaf link does not answer with its own target: "/realpriv/…" vs "/varlink/…" (err=<nil>)`。
+- **F2（`SealableRoot` 幂等 ⇒ 普通形逐字不动）**：普通形下 `t.TempDir()` 的整条前缀里没有链接，
+  解析＝原样返回 ⇒ 改动**在普通形是字面 no-op**。这是判据②"普通形一枚都不许多红"的机理，§4 再用量去核。
+
+**结论先给：甲类 17 / 乙类 0 / 丙类 0。** 派单预留的"绝大多数属乙类、基本不该动码"这一支**没有成立**——
+理由是 §2.1–§2.3 逐枚的断言原文：17 枚里**没有任何一枚**的断言是"就是要拿未解析的根去试底线拒绝"。
+下面逐枚，并按派单要求把"如果哪天有人把它转绿会丢掉什么"这一栏**反向**填成"它现在红着会挡住什么"（乙类为 0，所以那一栏本批全空）。
+
+### 2.1 `private_fail_test.go`（无标签 ⇒ 宿主有分母）—— 6 枚，全甲类
+
+| # | 用例 | 断言原文（被测对象） | 类 | 本枚理由 |
+|---|---|---|---|---|
+| 1 | `TestAC5FailedSealRefusesTheWrite` | `private_fail_test.go:35` `t.Fatal("the write succeeded although the seal was refused")`、`:38` `t.Fatalf("error does not name the refusal: %v", err)`（配 `!errors.Is(err, ErrNotSealable)`） | **甲** | 它要的是**注入的** `applyDescriptor` 失败（`withInjectedSealFailure`，`:14-19`）。软链形下底线自己先拒（F1-a），sentinel 不是 `ErrNotSealable` ⇒ 拒因被换掉了。被测对象是"密封失败时写不写得下去"，与根的来路无关：换根后注入腿重新是操作性拒因。 |
+| 2–5 | 上表的 4 枚子测试 `exclusive_artifact`／`replacement_write`／`directory_chain`／`seal_file_and_dir_direct` | `:40`／`:53` `assertNoBytesOnDisk(t, p)`（`:88` `t.Errorf("refused write left %d bytes on disk at %s", …)`）；`:61` `t.Fatal("PrivateDirAll reported a private directory it could not seal")`；`:72-77` `SealFile`/`SealDir` 要 `ErrNotSealable` | **甲** | 同上：量的是"拒绝之后不留敏感字节、不留半成品目录"。`assertNoBytesOnDisk` 的期望来自**文件系统**（`os.Stat` 的 `fs.ErrNotExist`），不是被测函数 ⇒ 换根不触 R-119-9。 |
+| 6 | `TestAC5FailureIsNotSwallowedByTheHappyPath` | `:103` `t.Fatalf("PrivateFileExclusive: %v", err)`、`:109` `exclusive create must keep failing on an occupied name` | **甲** | 它是 #1 的反向半（不注入时必须成）。软链形红在 `:103` 的 `t.Fatalf` —— **正向那半根本没跑**，所以这一对目前是"一枚红遮一枚没测"。换根后两半才真的互为对照。 |
+
+⚠ 这 6 枚是 17 枚里**唯一宿主有分母**的（无 `!windows` 标签）。⇒ 本批给它们换根必须**在 Windows 上是 no-op**，
+否则会把宿主/CI 的 windows 腿一起动了。做法见 §8（平台分文件的 no-op 那一支）。
+
+### 2.2 `private_other_test.go`（`!windows` ⇒ 宿主零分母）—— 4 枚，全甲类
+
+| # | 用例 | 断言原文 | 类 | 本枚理由 |
+|---|---|---|---|---|
+| 7 | `TestPOSIXPrivateFileIsReally0600` | `:26` `t.Fatalf("PrivateFile: %v", err)`；`:33` `t.Errorf("artifact mode is %v, want -rw-------", got)` | **甲** | 被测对象是 **POSIX 模式位**（`0o644` 进、`0600` 出，靠 `applyDescriptorPOSIX` 回读）。软链形红在 `:26` 的 setup 拒 ⇒ 模式那半根本没读。换根不碰模式断言，也不产生任何"期望值来自被测函数"。 |
+| 8 | `TestPOSIXPrivateDirIsReally0700` | `:40` `t.Fatalf("PrivateDirAll: %v", err)`；`:48` `%s mode is %v, want drwx------` | **甲** | 同 #7，方向是目录 `0755` 进 `0700` 出。 |
+| 9 | `TestPOSIXSymlinkAtArtifactPositionIsNotRecursed` | `:73` `t.Fatalf("RemoveUnlinked: %v", err)`；`:76` `the link survived`；`:79` `TARGET DELETED - removal followed the symlink` | **甲**（但**最接近乙**，逐字核过） | 它**自己种**一枚 link 在 artifact 位置（`:77 os.Symlink(outside, link)`），要的是"unlink 作用于链接本身、不递归进别人的树"。软链形红在 `:73`——被**宿主的** `/varlink`（F1-a）拒了，`:77` 那枚被测链接**还没种出来**。⇒ 换根后它测的仍是自己种的链接；**而且这枚必须换两枚根**（`outside` 与 `root` 是两个 `t.TempDir()`），只换一枚会连 setup 都过不了。 |
+| 10 | `TestPOSIXMissingFileIsNotAnError` | `:99` `t.Errorf("RemoveUnlinked of a non-existent entry: %v", err)` | **甲** | 要的是"不存在的条目幂等、不算错"。软链形它拿到 F1-b（`entry is a link to something else`），因为宿主的链接在它的不存在路径的祖先上。⇒ 这枚的红恰恰**证明底线在链接上是拒的**：换根后"未解析形被拒"这条**仍然被别的用例钉着**（`seam_probe_root_125_other_test.go` 与票 113 族），不是被本批抹掉。 |
+
+### 2.3 `ancestor_separator_108` / `placement_leaf_118` / `placement_symlink_113`（均 `!windows`）—— 7 枚，全甲类
+
+| # | 用例 | 断言原文 | 类 | 本枚理由 |
+|---|---|---|---|---|
+| 11 | `TestAC2POSIXDoesNotFoldABackslashIntoASeparator`（108:94） | `:112` `t.Errorf("AC#2 RED: POSIX folded the backslash in %q into a separator and refused the tree's own file: %v", …)`；`:115` `the stray inside root/%s should have been removed`；`:117` `assertStillThere108(…)` | **甲** | 被测对象是 `pathPieces` 在非 Windows 上**只切 `/`**。红串（F1-b）逐字写着"…through the link at **/varlink**"，而它种的链接是 `root/a` ⇒ 拒因不是 `a\b` 那条例外。⚠ 这枚两半都红了（`:115` 说明文件**确实没被删**）⇒ 换根后"删得掉、且不误删别人树"两半才同时有分母。 |
+| 12 | `TestAC4POSIXFloorAnswersInsideTheNamedTree`（108:152） | `:159` `t.Fatalf("PrivateDirAll(%s): %v", dir, err)`；`:169` `AC#4 RED: the floor answered %q for %q, i.e. it rewrote the spelling…`；`:172` `AC#4 RED: the answer %q is not inside the named tree %q` | **甲**（R-119-9 专项核过） | ⚠ 本批最需要盯 R-119-9 的一枚：它的期望值就是**声明的那个字符串本身**（`got.String() != dir`）。⇒ 只要 `dir` 仍来自"调用方自己声明的局部变量"，纪律就还在；**红线是**不能写成 `winsec.ResolvePath(winsec.SealableRoot(...))` 之类拿被测函数再算一遍。本批按前一种改（只换 `t.TempDir()` 那一步的来路），并把它记进 §9 的复核点。另外它开头有 `:153` `PathResolverInstalled() != nil ⇒ t.Skipf`，是既有的形状无关守卫，不动。 |
+| 13 | `TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed`（118:75） | `:81` `assertRefused113(t, "SealFile", link, winsec.SealFile(link))`；`:84` `the mode change followed the leaf` | **甲**（红因是**守卫救回来的**） | 红在 helper `leafLinkTo118:50-52` 的前置（F1-c）：`EvalSymlinks(link)`=`/realpriv/…` ≠ `target`=`/varlink/…`。⇒ **这枚前置正是防 §1.3(b) 那种假绿的闸**：它没被放宽、也没被绕过，它把一枚本来会"因宿主的链接而绿"的用例**改成了响亮地红**。换根后前置成立、被测的 `SealFile(link)` 才真的跑。 |
+| 14 | `TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasNamed`（118:96） | `:107` `assertRefused113(t, "PrivateFile", link, err)`；`:114` `PrivateFile(%q) replaced the victim's bytes` | **甲** | 同 #13。 |
+| 15 | `TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree`（113:253） | `:269` `AC#3 RED: a plain file inside the named tree was refused`；`:281` `AC#3 RED: the seal did not narrow anything, mode is %o` | **甲** | AC#3 的反向半（"全都拒"的假修法是它打红）。软链形它被 `/varlink` 拒 ⇒ 这条**反向腿在软链形完全没有分母**。 |
+| 16 | `TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLinks`（113:287） | `:298` `AC#3 RED: PrivateDirAll refused its own tree`；`:311` `PrivateFile refused a plain path inside the named tree`；`:317` `SealDir refused its own directory`；`:326` `…a directory that merely has a link among its children` | **甲** | 它种的链接是 `root/not-an-ancestor` 与 `deep/dangling`（**兄弟/子节点**位置），红在 `:298` 宿主的链接。⇒ 换根后"旁边有链接也要能密封"这条仍然被测，且**只有**换根才测得到。 |
+| 17 | `TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator`（113:335） | `:355` `AC#3 RED: POSIX folded the backslash in %q into a separator and refused the tree's own file`；`:357` `%s is %v (%v), want -rw-------` | **甲** | 同 #11 的另一半（`root/a` 是链接 + 真目录 `a\b`）。红串又是 F1-a 的 `/varlink`。 |
+
+### 2.4 乙类＝0：这一档为什么空，以及它意味着什么
+
+派单要求乙类登记"保留红是有意的"并写清"转绿会丢掉什么检测力"。**本批没有这一档**，理由不是没找，是逐枚断言原文都对不上：
+
+- 票面 AC#2 那句"或改成显式钉住『就是要拿未解析的根试底线拒绝』"在 winsec 里**已经有专门的用例在做**，
+  而且**不是这 17 枚**：`seam_probe_root_125_other_test.go`（3 枚 `TestAC2POSIXSeam…125`，软链形逐名 `t.Skipf`，见 §5.4 对账）
+  与票 113 族 `placement_symlink_113_other_test.go` 的 `assertRefused113` 拒绝腿。
+  ⇒ **要保住的"未解析那一形"另有其人，本批 0 枚动它们**（批次 2 保留 `internal/config/c26_seam_posix_125_test.go` 是先例，本批同处理）。
+- 17 枚里名字带"Refuses"的只有 #1/#6/#13/#14/#16，逐字回看软链形**实际拿到**的字符串（§1.3 F1）：
+  没有一枚拿到"它自己要的那句拒"——#1/#6 要 `ErrNotSealable` 拿到 `not provably resolved`；#13/#14 根本没跑到断言。
+  ⇒ 与 AC#2a 账上"拒绝腿 0"一致（那本账是**断言方向**口径，本批是**改动面＋纪律**口径，两口径在此对上）。
+
+⇒ **裁决：17 枚全部该转（甲类），本批要动码。** 但**形状不许照抄批次 1/2**：不接 `proc.SealableRoot`，
+改按票 125 先例在包内自走。理由与实现见 §8。
