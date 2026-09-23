@@ -21,14 +21,22 @@
 |---|---|---|
 | `/d/tmp/wisp124-2b2-pre` | `git archive 5417a3c`（改前基线） | 1039 |
 | `/d/tmp/wisp124-2b2-post` | `git archive dfa3dc4`（改后） | 1046 |
-| `/d/tmp/wisp124-2b2-probe` | 待量：改后 + 判据④取字串探针 | - |
-| `/d/tmp/wisp124-2b2-mut` | 待量：改后 + 判据⑤变异 | - |
+| `/d/tmp/wisp124-2b2-probe` | 改后 + 判据④取字串探针（5 处插入、只 `t.Logf`，**未入库**） | 1046 |
+| `/d/tmp/wisp124-2b2-mut` | 待量：改后 + 判据⑤变异（**未入库**） | - |
 
 ## 1. 对派单数字的复核（派单给的每个数字都是断言）
 
 - 清点账点名（读 `124-ac2a-leg-classification.md` 逐行）：tools §5.8 = 行 107-127 共 21 枚，其中行 125（`TestL1WriteGoesThroughTheRealBlockWindow`）标「归因待票 123」不计本批 ⇒ **20**；llm §5.5 = 行 52-68 ⇒ **17**；perm §5.6 = 行 69-73 ⇒ **5**；approval §5.3 = 行 44 ⇒ **1**。合计 **43**。⇒ 与派单「20+17+5+1=43」**一致，登记差 0**。
-- 实测复算（pre 锚软链形逐名 `--- FAIL`，两形各一枚）：待量（PRE-L / PRE-P 在跑，读数落 §2 表）。
-- ⚠ 票 123 那两枚已知红（`TestL1Write` / `TestLateVeto`，同包 `wiring_test.go`，300.0x s 那族）**不在本批 43 枚**：`internal/tools/wiring_test.go` 本批一字未动（§3 的 `git show dfa3dc4` 文件清单可核），它们在改后软链形照常红，逐名登记为已知遗留。
+- **实测复算（pre 锚软链形 `-v` 逐名，台 PRE-L）**：tools 顶层 `--- FAIL` **21** + 子测试 `--- FAIL` **2** = 23 枚；llm 顶层 **11** + 子 **6** = 17 枚；perm 顶层 **5**；approval 顶层 **1**（其子测试 19 枚全 PASS）。⇒ 本锚 only-in-link 共 **46** 枚，**减票 123 那三枚 300 s 腿 = 43**，与账上名册逐名对得上（名册差集脚本核，`/d/tmp/wisp124-2b2-logs/ROSTER-*.txt`）。
+- ⚠ **登记一枚账上没有、本锚量到的新红（+1 差，按实测做）**：`internal/tools/TestFSReadOnlyNeverOpensACard`（`wiring_test.go:300`）软链形 `--- FAIL (300.04s)`、普通形 `--- PASS (0.00s)`，红串逐字 `out={Text:审批超时（300 秒未确认），C18 一律判拒绝，已自动拒绝 IsError:true RiskLevel:L2 ErrorClass:user_rejected}` —— 与账上已单列的 `TestL1Write`（300.04s）、`TestLateVeto`（300.01s）**同族同文案**（C18 审批超时腿，非密封拒）。
+  **为什么账上没有**：AC#2a 那台 tools 软链形跑到 **720 s 被包级 `-timeout` panic**（其日志 `PRE-L` 对应物 `A2L.__internal_tools_.txt` 尾行 `FAIL github.com/CarlosShao/wisp/internal/tools 720.105s`），三枚 300 s 腿只跑完两枚就被掐，第三枚从未计入红名；本批改跑法 `-timeout 25m`（900.3 s 跑完全部）才显形。⇒ 它与另两枚同归口**票 123**，**不在本批 43 枚清零目标内**；`internal/tools/wiring_test.go` 本批一字未动，改后软链形它照常红（§2 如实登记，不算本批转绿，也不算破判据②——普通形它本就 PASS 0.00s）。
+- ⚠ 票 123 那两枚已知红（`TestL1Write` / `TestLateVeto`）**不在本批 43 枚**：`internal/tools/wiring_test.go` 本批一字未动（§3 的 `git show dfa3dc4` 文件清单可核），它们在改后软链形照常红，逐名登记为已知遗留。
+- pre 锚两形四数（`-count=1 -v`）：
+
+| 台 | 形状 | tools | llm | perm | approval |
+|---|---|---|---|---|---|
+| PRE-L | 软链 | `rc=1 RUN=79 PASS=41 FAIL=21 SKIP=3 SUBPASS=12 SUBFAIL=2` | `rc=1 RUN=72 PASS=52 FAIL=11 SKIP=0 SUBPASS=3 SUBFAIL=6` | `rc=1 RUN=14 PASS=9 FAIL=5 SKIP=0` | `rc=1 RUN=49 PASS=28 FAIL=1 SKIP=1 SUBPASS=19 SUBFAIL=0` |
+| PRE-P | 普通 | `rc=0 RUN=79 PASS=62 FAIL=0 SKIP=3 SUBPASS=14 SUBFAIL=0` | `rc=0 RUN=72 PASS=63 FAIL=0 SKIP=0 SUBPASS=9 SUBFAIL=0` | `rc=0 RUN=14 PASS=14 FAIL=0 SKIP=0` | `rc=0 RUN=49 PASS=29 FAIL=0 SKIP=1 SUBPASS=19 SUBFAIL=0` |
 
 ## 2. 判据①：逐枚转绿且点名（`-v` 才有 PASS 名）
 
