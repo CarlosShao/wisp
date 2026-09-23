@@ -104,3 +104,11 @@
   与任何 `frontend/src/` 改动**未做、不勾**，按票头 09-23 横幅与 `A102③` 记在本行；本轮写码文件清单里**零枚**在 `frontend/` 下
   （`internal/panel/composer_handlers.go`、`internal/panel/composer_handlers_test.go`、`cmd/wisp/run.go`、本票面、`docs/evidence/s1/114-ac2-native-gate.md`）。
   next=编排者把 AC#6 交给 owner 指派的外部 agent；本票剩余格见上一条。
+- 2026-09-23 10:5x +08 `agent-ticket114-ac2` did=交装配与自证：`cmd/wisp/run.go:378` 把 `rt.modeWrites` 装配出来
+  （`Confirm` 交的是 `perm.New` 上面那**同一枚** `confirm`，字段 `run.go:229`），三发变异逐发还原
+  （M-1 门退回不检查 nil ⇒ `composer_handlers_test.go:137` 红；M-2 只记日志不拒但照样写 ⇒ 红在 **`:145` 的
+  "injected ModeWriter was called"**，即只断字符串的那一发放过去、本票的判据接住；还原后 `grep -c MUTATION` = 0）；
+  四数复绿 windows `go test -count=2 -v ./internal/panel/` = `152/92/0/0`，**Docker 真跑 linux = 同一读数**，
+  `bash scripts/wisp-cli-tests.sh` = `98/51/0/0`；`sh scripts/d22scan.sh` clean rc=0、`gofumpt -l` 三枚改动文件零输出。
+  证据：`docs/evidence/s1/114-ac2-native-gate.md`（含"没做到的"六条，第一条＝**通路仍不存在、`rt.modeWrites` 生产零调用者**）。
+  next=票 33/35 落宿主那一跳时必须调 `rt.modeWrites`（并解冻 `cmd/wisp/*_test.go` 补"Confirm 非 nil"的装配用例）；AC#3 在那之后。

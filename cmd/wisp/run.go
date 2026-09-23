@@ -50,6 +50,7 @@ import (
 	"github.com/CarlosShao/wisp/internal/llm"
 	"github.com/CarlosShao/wisp/internal/memory"
 	"github.com/CarlosShao/wisp/internal/observe"
+	"github.com/CarlosShao/wisp/internal/panel"
 	"github.com/CarlosShao/wisp/internal/perm"
 	"github.com/CarlosShao/wisp/internal/risk"
 	"github.com/CarlosShao/wisp/internal/secret"
@@ -218,10 +219,17 @@ type agentRuntime struct {
 	// modes is the assembled owner of the permission mode (ticket 90's storage,
 	// ticket 101's wire): the read the bridge consults once per call, and the
 	// only object in this process that may change the档.
-	modes  *perm.Store
-	notify notifyPoster
-	stdout io.Writer
-	stderr io.Writer
+	modes *perm.Store
+	// modeWrites is ticket 114 AC#2's gate: the one handler a panel mode request
+	// is answered by, assembled with the SAME L2 leg the Store above was handed.
+	// Nothing calls it yet - the WebView2 "event -> ParseComposerRequest" hop does
+	// not exist in this tree (tickets 33/35) - so this is the gate's other half,
+	// not a path: the host that gets wired later cannot assemble a wider档 without
+	// a confirmation leg.
+	modeWrites *panel.ModeWriteHandler
+	notify     notifyPoster
+	stdout     io.Writer
+	stderr     io.Writer
 	// logf receives the bridge's audit lines.
 	logf func(string, ...any)
 }
@@ -358,6 +366,22 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		return rt, 2
 	}
 	rt.modes = modeStore
+
+	// Ticket 114 AC#2 (R-92-2): the panel's档 request gets ONE handler, and it is
+	// handed the same `confirm` value the Store got above - so "no L2 leg attached"
+	// means the same thing on both sides of the boundary and the handler refuses a
+	// widening request before ever reaching Set. The handler never calls this leg
+	// itself (Set raises the single card; a second ask would be two 300s windows);
+	// the forward is here so that the day the ask moves, it moves to the same C18
+	// route. Switch.At is left alone: perm.Set stamps its own record and
+	// confirmModeSwitch reads only From/To.
+	rt.modeWrites = &panel.ModeWriteHandler{
+		Modes: modeStore,
+		Confirm: func(ctx context.Context, from, to risk.Mode, origin, actor string) error {
+			return confirm(ctx, perm.Switch{From: from, To: to, Origin: origin, Actor: actor})
+		},
+		Audit: rt.auditf,
+	}
 
 	// Which posture this boot came up in has to be readable in the log, not
 	// inferred from the file afterwards. The Store keeps its startup record in
