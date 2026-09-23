@@ -334,5 +334,7 @@ R-109-1（残留窗）仍开，交回编排者挂到"第一个把模型字节读
 6. **AC#3 清单入表纪律**（它 `next=` 第 2 条我核过方向）：票 117 / 票 114 结案时各自申请入表，
    `internal/audio`/`internal/ball` 仍挂 A91③；**本票一格都没顺手加**（我在 N-4 里加过 `internal/audio`，
    那是**变异**、做完就恢复，`diff` 为空可查）。
-7. 本表**只 commit 未 push**；`git add` 只有 `docs/evidence/s1/121-adversarial-acceptance.md` 一枚路径，
-   提交前 `git diff --cached --name-only` 逐字点过。
+7. 本表**只 commit 未 push**（`b43c149` 主表 + `9610d61` 两处口径更正）；`git add` 每一枚都只有
+   `docs/evidence/s1/121-adversarial-acceptance.md` 一枚路径，提交前 `git diff --cached --name-only` 逐字点过。
+   共树里此刻还有别人的在飞写件（`.github/workflows/ci.yml`、票 128 两枚、`docs/evidence/s1/131-adversarial-acceptance.md`、
+   `docs/reports/frontend-handoff.md`），**我全程没 add、没 commit、没读它们当基线**（我的读数全部来自 `git archive` 快照）。
