@@ -17,6 +17,13 @@
     D32 states + settle + leak self-test. Script is identical; only the
     state list differs. No subset may be skipped (D22 mode-6 ban).
 
+    Before ANY state is sampled the script runs a sampling-validity precheck
+    (ticket 134 AC#4): if foreign toolchain/wisp processes or a busy machine
+    are found it prints one loud "machine-contended" line per reason and
+    exits 1 without producing a single number. That gate may only ever
+    REFUSE more often; the two D32 thresholds it protects (Sleeping CPU
+    <=0.5%, RSS <=25MB) live in `wisp slo` and are not evaluated here.
+
     Output JSON schema (slo-report.json):
     {
       "generated_at": RFC3339,
@@ -57,6 +64,31 @@ function Fail([string]$Message) {
     exit 1
 }
 
+function Get-OwnProcessTree {
+    # Everything reachable from this script as a parent or a child: the runner
+    # host (Runner.Worker / Runner.Listener), the powershell host Actions used
+    # to start us, and our own wisp.exe children must never be mistaken for
+    # contention. Hops are bounded because a corrupt ParentProcessId would
+    # otherwise loop forever, and a truncated tree only ever makes the precheck
+    # refuse MORE (the one direction ticket 134 AC#4 allows).
+    param([int]$RootPid, [array]$All)
+    $ids = @($RootPid)
+    for ($hop = 0; $hop -lt 16; $hop++) {
+        $grown = $false
+        foreach ($p in $All) {
+            $procId = [int]$p.ProcessId
+            $parentId = 0
+            if ($p.ParentProcessId) { $parentId = [int]$p.ParentProcessId }
+            if ($parentId -gt 0) {
+                if (($ids -contains $procId) -and -not ($ids -contains $parentId)) { $ids += $parentId; $grown = $true }
+            }
+            if (($ids -contains $parentId) -and -not ($ids -contains $procId)) { $ids += $procId; $grown = $true }
+        }
+        if (-not $grown) { break }
+    }
+    return @($ids | Select-Object -Unique)
+}
+
 if (-not (Test-Path $WispExe)) {
     # Not a skippable step: the gate builds its own binary when missing.
     Write-Host "slo-check.ps1: wisp.exe missing; building (scripts/build.ps1 -Env dev)"
@@ -68,6 +100,148 @@ if (-not (Test-Path $WispExe)) { Fail "wisp.exe not found at $WispExe" }
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
 $env:WISP_ENV = 'test'
 $env:WISP_TEST_DATA_DIR = Join-Path $OutDir 'data'
+
+# --- clear stale numbers ---------------------------------------------------
+# The runner reuses E:\work\base\actions-runner\_work\wisp\wisp across runs, so
+# build\slo can still hold the previous run's JSON when this run refuses to
+# sample. "No numbers" has to mean no numbers on disk, not just no new ones.
+$stale = @(Get-ChildItem -Path $OutDir -Filter '*.json' -ErrorAction SilentlyContinue)
+if ($stale.Count -gt 0) {
+    Write-Host ("slo-check.ps1: clearing {0} stale report file(s) from {1}" -f $stale.Count, $OutDir)
+    $stale | Remove-Item -Force -ErrorAction SilentlyContinue
+}
+
+# --- sampling validity precheck (ticket 134 AC#4, shape C) -----------------
+# Why this exists (A103 in docs/reports/pending-and-issues.md, measured, not
+# theorized): slo-full runs on a self-hosted runner on the SAME 6C12T laptop the
+# review fleet compiles on, so one push can start a six-state sample while three
+# agents are mid `go test`. The resulting D32 reading can then be falsely red
+# (we chase a regression that does not exist) or falsely green-by-noise. Both
+# are worse than no reading, and both are reversible only if we say so out loud.
+#
+# This block therefore never weakens a check. It only ever adds a reason to
+# refuse to produce numbers, so a contended machine yields the word
+# "machine-contended" instead of a number. It is NOT a threshold: the D32 rows
+# (Sleeping CPU <=0.5%, RSS <=25MB) are evaluated by `wisp slo` itself and are
+# untouched by this ticket. There is deliberately no -Skip / -Force / env
+# override - a switch is a skip, and D22 mode-6 bans that.
+Write-Host 'slo-check.ps1: sampling validity precheck (ticket 134 AC#4)'
+try {
+    $allProcs = @(Get-CimInstance -ClassName Win32_Process -ErrorAction Stop)
+} catch {
+    Fail "sampling validity precheck cannot enumerate processes: $_"
+}
+if ($allProcs.Count -lt 2) {
+    Fail ('sampling validity precheck enumerated {0} process(es); refusing to sample on an unreadable process table (ticket 134 AC#4)' -f $allProcs.Count)
+}
+$ownIds = @(Get-OwnProcessTree -RootPid $PID -All $allProcs)
+
+# Foreign toolchain activity. Names only - no path guessing, so a leftover
+# wisp.exe from an earlier crash counts as contention too (it holds CPU and RSS
+# while we sample). The gate's own tree is excluded via $ownIds, and at this
+# point the gate has started no wisp.exe yet.
+$loadNames = @('go.exe', 'gofmt.exe', 'cgo.exe', 'compile.exe', 'asm.exe', 'link.exe',
+               'gcc.exe', 'g++.exe', 'cc1.exe', 'cc1plus.exe', 'as.exe', 'ld.exe',
+               'wisp.exe', 'wisp-cli.exe', 'staticcheck.exe')
+
+# "Anything under the runner's work root" is somebody else's CI checkout at
+# work. Derived from the variables Actions sets, so a local run (where they are
+# unset) simply loses this extra reason and keeps the name probe.
+$workPrefixes = @()
+if ($env:GITHUB_WORKSPACE) {
+    $ws = [IO.Path]::GetFullPath($env:GITHUB_WORKSPACE)
+    for ($depth = 0; $depth -lt 2; $depth++) {
+        $ws = Split-Path -Parent $ws
+        if ($ws) { $workPrefixes += $ws }
+    }
+}
+if ($env:RUNNER_TEMP) { $workPrefixes += [IO.Path]::GetFullPath($env:RUNNER_TEMP) }
+
+$offenders = @()
+foreach ($p in $allProcs) {
+    $procId = [int]$p.ProcessId
+    if ($ownIds -contains $procId) { continue }
+    $name = ''
+    if ($p.Name) { $name = $p.Name.ToLowerInvariant() }
+    $exePath = ''
+    if ($p.ExecutablePath) { $exePath = [string]$p.ExecutablePath }
+    $why = $null
+    if ($loadNames -contains $name) { $why = 'foreign toolchain/wisp process present' }
+    if (-not $why -and $exePath) {
+        foreach ($prefix in $workPrefixes) {
+            if ($exePath.StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase)) {
+                $why = 'process running under the runner work root'
+            }
+        }
+    }
+    if ($why) {
+        $started = 'unknown'
+        if ($p.CreationDate) { $started = ([datetime]$p.CreationDate).ToString('yyyy-MM-dd HH:mm:ss') }
+        $offenders += [pscustomobject]@{
+            pid    = $procId
+            name   = $name
+            path   = $exePath
+            reason = $why
+            started = $started
+        }
+    }
+}
+
+# Machine-wide load, so contention from a process this list does not name
+# (another agent's already-built binary, an indexer) is also refused. Max of two
+# 1s samples: a single sample can be a blip, and a 2s window costs 2s of a run
+# that already spends ~40s sampling.
+#
+# Honest limitation, recorded rather than hidden: if the WMI perf class is not
+# available the probe reports 'unavailable' and does NOT fail. Failing closed on
+# a missing perf counter would turn both subsets permanently red, which is the
+# "gate that never produces a verdict" disease this ticket exists to prevent.
+# The identity probe above still gates on such a machine, so the direction stays
+# "refuse at least as often".
+$cpuBusyPct = 50
+$cpuMax = -1
+for ($sample = 0; $sample -lt 2; $sample++) {
+    try {
+        $raw = Get-CimInstance -ClassName Win32_PerfFormattedData_PerfOS_Processor -Filter "Name='_Total'" -ErrorAction Stop | Select-Object -ExpandProperty PercentProcessorTime
+        if ($null -ne $raw) { $value = [int]$raw; if ($value -gt $cpuMax) { $cpuMax = $value } }
+    } catch { $cpuMax = -1; break }
+    if ($sample -lt 1) { Start-Sleep -Seconds 1 }
+}
+
+$reasons = @()
+foreach ($o in $offenders) {
+    $reasons += ('{0}: {1} pid={2} started={3} path={4}' -f $o.reason, $o.name, $o.pid, $o.started, $o.path)
+}
+if ($cpuMax -ge $cpuBusyPct) {
+    $reasons += ('machine-wide cpu utilisation {0}% over a 1s window (>= {1}%)' -f $cpuMax, $cpuBusyPct)
+}
+
+if ($reasons.Count -gt 0) {
+    Write-Host ('slo-check.ps1: FAIL machine-contended - subset={0} refused to sample, no numbers were produced' -f $Subset)
+    foreach ($reason in $reasons) {
+        Write-Host ("slo-check.ps1: machine-contended reason: {0}" -f $reason)
+    }
+    Write-Host ('slo-check.ps1: machine-contended: {0} reason(s), 0 state file(s) written, slo-report.json NOT written' -f $reasons.Count)
+    Write-Host 'slo-check.ps1: machine-contended: this is a SAMPLING VALIDITY verdict, not a performance'
+    Write-Host 'slo-check.ps1: machine-contended: result - D32 stays unverified for this run. Rerun when the'
+    Write-Host 'slo-check.ps1: machine-contended: machine is quiet (ticket 134 AC#4, shape C: refuse loudly'
+    Write-Host 'slo-check.ps1: machine-contended: instead of reporting a contaminated sample as truth).'
+    if ($env:GITHUB_STEP_SUMMARY) {
+        @(
+            '## slo-check: machine-contended',
+            '',
+            ('Refused to sample subset `{0}` ({1} reason(s)); no SLO numbers produced.' -f $Subset, $reasons.Count),
+            '',
+            ('| reason | process | pid | path |'),
+            ('|---|---|---|---|')
+        ) + @($offenders | ForEach-Object {
+            ('| {0} | {1} | {2} | {3} |' -f $_.reason, $_.name, $_.pid, $_.path)
+        }) + @('') | Add-Content -Path $env:GITHUB_STEP_SUMMARY -Encoding UTF8
+    }
+    exit 1
+}
+$cpuText = if ($cpuMax -ge 0) { "$cpuMax%" } else { 'unavailable (perf class unreadable)' }
+Write-Host ("slo-check.ps1: precheck ok - no foreign toolchain/runner process, machine-wide cpu max {0}" -f $cpuText)
 
 $states = @('Sleeping', 'Warm')
 if ($Subset -eq 'full') {

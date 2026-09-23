@@ -55,8 +55,9 @@ A 我不做，除非 owner 明说"就要 A"。
 - [ ] **AC#3** **反静默死用例**：造一枚能红的钉——"若 `slo-full` 连续 N 天没有任何一次被触发的记录，就红"
       （或等价形状：把触发器写进一枚被 CI 自己检查的清单）。**这一条是本票的判据核心**：
       没有它，本票就是在"把门换成没有门"之间做了个没人会发现的交易。
-- [ ] **AC#4** 若选 C：`slo-check.ps1` 的有效性检查**只许往"更常拒绝出数"的方向改**，
+- [x] **AC#4** 若选 C：`slo-check.ps1` 的有效性检查**只许往"更常拒绝出数"的方向改**，
       **D32 的两个阈值一个字节不动**；并要证明"机器忙 ⇒ 报 `machine-contended` 而不是报一个数字"这一形**真能触发**（造一次并发负载，贴读数）。
+      ⇒ 读数在 `docs/evidence/s1/134-ac4-machine-contended-readings.md`（三态：真 `go.exe` 负载 / "runner 目录下的进程" / 安静放行）。
 - [ ] **AC#5** 门禁：`sh scripts/d22scan.sh` 纯净快照 rc=0 + 台账各 scope 不降；`bash -n` / `shellcheck`（脚本若改）；
       任何 YAML 改动要用解析器复核"6 枚 job 全在、两行原样回显"（本仓已有这个仪器，照抄）。
 
@@ -81,3 +82,16 @@ A 我不做，除非 owner 明说"就要 A"。
   ⚠ 更正一处票面笔误：三形表里 C 那一行写的 `machine-contained` 应为 **`machine-contended`**；落地实现与本票后续
   引用一律以 `machine-contended` 为准（append-only 更正，上文不回改）。
   D32 两个阈值（`Sleeping` CPU ≤0.5% / RSS ≤25MB）本票一个字节不动。next=AC#4 前置检查 + AC#2 的 `schedule` 触发
+- [2026-09-23 10:2x +08] agent=agent-ticket134 did=**AC#4 结**：`scripts/slo-check.ps1` 取样前加**采样有效性前置检查**
+  （纯插入：`git diff --numstat` = `174 0`，删 0 行）。三条理由任一命中即 `FAIL machine-contended` + `exit 1` +
+  **不产出任何数字**（进检查前先清 `OutDir` 里上一轮遗留的 `*.json`，拒绝时 `0 state file(s) written,
+  slo-report.json NOT written`）：① 外来工具链/wisp 进程（`go`/`gofmt`/`cgo`/`compile`/`asm`/`link`/`gcc`/`cc1`/`as`/`ld`/
+  `wisp.exe`/`staticcheck`；本机自己那棵进程树按父子链排除）② 路径落在 runner 工作根
+  （`GITHUB_WORKSPACE` 的上两级 + `RUNNER_TEMP`）下的别的进程 ③ 机器整体 CPU 两枚 1 秒样本取最大 ≥50%。
+  **无 `-Skip`/无环境变量开关**（D22 mode-6：开关＝skip）。真触发读数三发见
+  `docs/evidence/s1/134-ac4-machine-contended-readings.md`：`go.exe` pid 47420 + `compile.exe` pid 1640 + cpu 100%
+  ⇒ contended；`foreignping.exe` pid 8392 落在假 `_work\wisp\wisp` ⇒ contended；安静时 `precheck ok … cpu max 22%`
+  ⇒ 放行（证明它不是"永远拒绝"）。⚠ 未验证两格：`GITHUB_STEP_SUMMARY` 分支（本地无该环境变量）、
+  以及**改动后完整六态仍能跑通**（本地那发用的是假 exe）——两格都等 push 后的真 run 回读。
+  ⚠ 期间踩到一次仪器坑：造负载的 bash 链整体被 `&` 吞后台 ⇒ 门禁先起跑、报了个假的 `precheck ok`；
+  重发前先 `tasklist` 确认 pid 活着才拿到真读数。next=AC#2 的 `schedule` + AC#3 的钉
