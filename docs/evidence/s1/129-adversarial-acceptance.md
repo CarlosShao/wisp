@@ -170,3 +170,147 @@ AC#4 shapes: sealed=C:\Users\swq\AppData\Local\Temp\TestNotice...2334399730\001\
 补上了（4 处命中、2 个使用点），且我**独立地**把那一枚假绿在缺 guard 的树上造出来、在有 guard 的树上
 打成红、还原复绿。
 
+---
+
+## 4. AC#4 —— 变异自证（本票最需要量清的一格）
+
+**裁决：PARTIAL** ｜ 标签：〔独立复现 ①②④ 全中〕＋〔独立新造：它自陈的"承重读数"实测不承重〕
+
+先说清楚**为什么不是退回**：退回硬线要求"AC 声称要防的结局被我真实造出来"。AC#4 三句各自声称防的
+结局是——① 摘掉那一段腿用例不红；② 本票把拒绝侧弄松了一枚；③ 既有 PASS 名字集合缩小或改向。
+**这三枚结局我一枚都没造出来**（下面逐条给数）。我造出来的是**另一枚**东西：
+AC#4 在③里指定的那枚"承重证据"承不住它被指派的那个任务。所以这一格是"断言成立、证据链有一节站不住"，
+按 PARTIAL 记，不按退回，也不按"附条件通过"。
+
+### 4.1 ① 与②：MUT-BOTH 三态（我复跑，逐字对上实现者的表）
+
+变异：`sameTree`（`resolve.go:456`）与 `answerInsideTree`（`:552`）各摘掉 `|| !sameAbsoluteness(…)`。
+落地证明：`grep -c '|| !sameAbsoluteness' internal/winsec/resolve.go` 由 **2 → 0**、`go build` rc=0。
+
+| 状态 | rc | 四数 | 顶层红名（去重） |
+| --- | --- | --- | --- |
+| 改前语义（MUT-BOTH，快照 `w129-mb`） | **1** | `RUN=202 PASS=108 FAIL=8 SKIP=0` | **4 枚** |
+| 改后（纯净 `ea05cf5` 快照） | 0 | `RUN=202 PASS=116 FAIL=0 SKIP=0` | 0 枚 |
+| 还原复绿（`git archive ea05cf5 internal/winsec/resolve.go \| tar -x` ＋ `cmp` 字节全等、`grep -c` 回 2） | **0** | `RUN=202 PASS=116 FAIL=0 SKIP=0` | 0 枚 |
+
+四枚红名逐字（全部点到跨绝对性，无一枚是噪声）：
+`TestAbsolutenessSpellingsAreNotOneTree`（比较面）、
+`TestSeamGuardRefusesACandidateWhoseSecondWitnessDiffersOnlyInAbsoluteness`（缝守裁决面）、
+`TestAC1SeamVouchesForTwoRealObjectsThatDifferOnlyInAbsoluteness`（真对象面）、
+`TestAC1SealLandsInAForeignTreeWhenTheSeamAdmittedAnAbsolutenessBlindCandidate`（落点面）。
+
+`--- PASS` 名字集合在变异态是 **54 枚**，与基线 58 枚对：`comm -23` 减的正是上面这 4 枚、`comm -13` 增 **0 枚**。
+⇒ 红名与名字集合两条互证，不是各自数一遍。
+
+### 4.2 ④：`--- PASS` 名字集合"只许多不许变向"
+
+| 对 | 增 | 减 |
+| --- | --- | --- |
+| 纯净 `ea05cf5`（58 枚）vs 我自己的基线（58 枚） | 0 | 0 |
+| 变异态（54 枚）vs 基线（58 枚） | 0 | 4（＝四枚红名，变异的预期后果） |
+
+⇒ 实现者报的 58 vs 58、增 0 减 0 **成立**。我数的时候只用 `grep -E '^--- PASS'` ＋ 去重，
+注释行与缩进的子用例（`    --- PASS:`）一枚不进分子，也没把 `--- PASS` 之外的行当命中。
+
+### 4.3 ③：拒绝侧一枚不许变松 —— 三条读数，两条对、一条不对
+
+**(i) 名单口径与绝对值：没复现出来。**
+实现者报"改前 47 → 改后 55"。我用三套仪器量同一枚口径（"顶层 `func Test…` 的函数体内出现
+`refus`/`Refus`"）：
+
+| 我的仪器 | 改前 `f5bbccd` | 改后 `ea05cf5` | 删除 | 新增 |
+| --- | --- | --- | --- | --- |
+| 行切法（朴素：切到行首 `}`） | 43 | 51 | **0** | **+8** |
+| `go/ast` 精确取函数体（含体内注释，不含函数上方 doc） | **43** | **51** | **0** | **+8** |
+| `go/ast` ＋把函数上方 doc 也算进体 | 46 | 54 | **0** | **+8** |
+
+⇒ **绝对值我对不上**（47/55 在我这三种口径下都没出现）。但两枚**承重主张**逐字成立：
+**删除 0 枚**、**新增恰 +8 枚**。我把三种口径都跑了，delta 在三种口径下都是 +8/−0，
+所以这一格的方向性结论我认；只是"47/55"这两个数本身，请在报告里按**未复现**处理，
+登记为 `R-129-5`（口径未写清，不影响裁决）。
+
+**(ii) 票 126 那张腿表一分未动：成立。**
+`grep -c 'wantRefused: true' volume_attribution_126_windows_test.go` 改前改后都是 **3**、
+`wantRefused: false` 都是 **4**；且 126 那张表的**每一枚腿名**在两枚树里逐字相同（我只在 `db9fafc`
+里加了 `vouchedSpelling129`/`answerNamesTree115` 两处调用，期望值与 `AC#3 RED` 文案未动）。
+
+**(iii) "承重的是行数读数、不是红名"这一句：实测不成立。** ⇒ 这是本格的实质发现，见 4.4。
+
+### 4.4 MUT5B 那一形：我自己复跑，并且造出两枚**它没登记的**更省的形
+
+**MUT5A 复跑（先证明仪器活着）**：把票 126 一枚**存量**拒绝腿的期望从 `wantRefused: true` 翻成 `false`
+（`volume_attribution_126_windows_test.go`，落地后 126 表 census `true=2 false=5`）⇒
+**rc=1**、`RUN=202 PASS=114 FAIL=2 SKIP=0`、顶层红名恰 1 枚，红名逐字点到腿名：
+`volume_attribution_126_windows_test.go:394: CONTROL RED on leg "second witness names the same tree on another volume" …`
+⇒ **翻一枚期望，仪器当场响。** 与实现者自报一致。
+
+**MUT5B 复跑（实现者自报的那一枚）**：从票 129 的腿表里**删掉一整枚 `wantRefused: true` 腿**
+（`absoluteness_attribution_129_windows_test.go`，9 行，落地后 129 表 census `true=2 false=3`）⇒
+
+```
+rc=0    RUN=202 PASS=116 FAIL=0 SKIP=0    红名 0 枚
+--- PASS: TestSeamGuardRefusesACandidateWhoseSecondWitnessDiffersOnlyInAbsoluteness
+```
+
+⇒ **复现成立：删掉一整枚腿而全表不红。**
+
+**但我没停在这一形。** 照票 131 验收 §4 的 X4（造一条活腿不给钉）/ X8（改标签写法使其不进账）/
+X12（一行别名使边从账上消失）那一族，我在 winsec 这两张腿表上又造出两枚**独立形状**，
+并且**逐枚量了实现者那两枚"承重读数"看不看得见**：
+
+| 形 | 做法 | 改动量 | 129 腿 census | 126 腿 census | 拒绝侧 roster（go/ast 口径） | PASS 名集合 | 包内红名 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **Y1**＝MUT5B | 删掉一整枚 `wantRefused: true` 腿 | 9 行 | true **3→2** / false 3 | 3 / 4（未动） | **51 枚、删除 0 枚、新增 8 枚** | 58 枚，**增 0 减 0** | **0 枚（全绿 202/116/0/0）** |
+| **Y2**＝131 的 X5 形（数量对、归属错） | **只改 1 行**：把那枚腿的 `answers` 里 `movedDir129: probeTreeRel129` 换成 `movedDir129: otherTree129`。腿名、注释、`wantRefused: true`、`anchor`、`wantAnchorAsk` **全部保留** | **1 行** | true **3 / false 3（一分未动）** | 3 / 4（未动） | **51 枚、删除 0 枚、新增 8 枚（与未变异树逐字同账）** | 58 枚，**增 0 减 0** | **0 枚（全绿 202/116/0/0）** |
+| **Y3**＝131 的 X12 形（一行使边消失） | **只改 1 行**：`refused := reason != ""` ⇒ `refused := leg.wantRefused`。整张表的判定从此恒真 | **1 行** | true 3 / false 3（未动） | 3 / 4（未动） | **51 枚、删除 0 枚、新增 8 枚（同账）** | 58 枚，**增 0 减 0** | **0 枚（全绿 202/116/0/0）** |
+
+三形都先 `diff` 证落地、`go build` rc=0、`go vet` rc=0 再读数；做完逐发还原。
+
+⇒ **三条结论，一条比一条硬**：
+
+1. **实现者"承重的是行数读数"这一句被推翻。** 它指的"行数读数"是 `R-129-5` 那枚 roster
+   （"0 removed、126 腿 3/4 未动"）。我在 Y1/Y2/Y3 三枚树下重跑同一枚 roster：
+   **51 枚、删除 0 枚、新增 8 枚，三发与未变异树**逐字同账；126 腿 census 也三发全同。
+   ⇒ roster 是**按函数**记的，腿是**函数里的表项**，所以删一枚腿、换一枚腿的靶、把整张表的判定改成恒真，
+   **roster 全都看不见**。"删除式放宽这一形承重的是行数读数"这句**不成立**——它只是把 blindness
+   从"红名"挪到了"roster"，两枚都不承重。
+2. **实现者 `next=` 里提的那枚修法（给腿表加"腿数下限"断言）会被 Y2/Y3 直接绕过。**
+   Y2/Y3 都把 129 那张表**保持在 `wantRefused: true` 3 枚 / `false` 3 枚**。只有 Y1（删项）会撞到下限。
+   ⇒ 这与票 131 的教训同形：131 的 X4（改分发形状）能被"数一下分支"接住，X12（一行别名）接不住；
+   这里 Y1 能被下限接住，**Y2/Y3 接不住**。修法要按"每一枚腿必须**被独立点名**"来写，
+   不是按"腿有几枚"来写（建议见 R-129-1）。
+3. **但被验的那枚生产改动**没有因为这三形失去证人：把 Y2/Y3 与 MUT-BOTH **叠起来**跑，
+   顶层红名仍是**同样那 4 枚**（`TestAbsolutenessSpellingsAreNotOneTree`、`TestSeamGuardRefuses…`、
+   `TestAC1SeamVouchesForTwoRealObjects…`、`TestAC1SealLandsInAForeignTree…`），
+   `RUN=202 PASS=108 FAIL=8 SKIP=0`。⇒ 静默丢掉的是**缝守裁决面那一条腿的靶**，
+   不是"这个修复从此没人管"。这也是我不把本格判成退回的第二个理由。
+
+### 4.5 我在最细粒度上重做了③：按**输入**而不是按腿
+
+③那句"拒绝侧一枚不许变松"与 AC#2 那句"形状只许更严"都是**对所有输入成立**的命题，
+所以我把它们当全称命题量，而不是数腿。我自己造了一枚仪器
+`zz_accmonotone_129acc_test.go`（**只落在快照里，仓库零改动**），把同一枚字节全等的文件放进
+改前树 `f5bbccd` 与改后树 `ea05cf5`，枚举一枚固定的、不碰文件系统的拼写语料：
+
+- 语料 315 枚唯一拼写 × 315 = **99,225 对**，每对读三枚判决
+  （`sameTree(a,b)`、`answerInsideTree(a,b)`、`answerInsideTree(b,a)`）⇒ **297,675 枚判决**。
+- 覆盖形状：`C:`/`c:`/`D:`/`Z:`、绝对与驱动器相对、`C:.`/`C:..\`、`/` 与 `\` 与混用、连续分隔符、
+  `..`/`.` 段、尾点段 `x.`、大小写卷字母、两枚 UNC 共享 `\\srv1\share`/`\\srv2\share`、
+  `\\?\C:\`、`\\.\PhysicalDrive0`、8.3 短名、空串与纯 `.`/`..`。
+- 两发输出**对齐自证**：`alignment failures = 0`（99,225 对逐对同序同名）。
+
+| 结果 | 数量 |
+| --- | --- |
+| **LOOSENED（改前 false → 改后 true）** | **0** |
+| TIGHTENED（改前 true → 改后 false） | **1,052** |
+| 按判决分：tightened | `sameTree` 56、`answerInsideTree` 498、反向 498 |
+
+⇒ **"拒绝侧一枚不许变松"与"只许更严"在输入粒度上成立，零枚例外。** 这一枚读数比 roster 强得多，
+也顺手把 AC#2 那句"对任意输入 `(a,b)`，改后 true ⇒ 改前 true"从**推理**升成了**读数**。
+（这枚仪器是我自己造的，不是它的；我建议把这型仪器收进 R-129-1 的修法里。）
+
+⚠ 造这枚仪器时我自己踩了一次票面 Rules 点名的坑：heredoc 把 `\\srv1\share` 吃成了 `\srv1\share`，
+差点让整枚 UNC 覆盖静默消失、报告里就会多一枚"覆盖了"的假话。发现后改成**运行时用
+`string(os.PathSeparator)` 拼所有反斜杠形状**（仪器里字面双反斜杠计数 = 0），并先 `go vet` 两枚树
+rc=0 才读数。与 `acceptor-ticket126` 那三枚假读数同族，这里登记以免下家再踩。
+
