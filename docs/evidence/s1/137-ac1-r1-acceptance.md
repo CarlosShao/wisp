@@ -309,3 +309,49 @@ MUT-D·普通形 `RUN=52 顶 PASS=17 顶 FAIL=13 顶 SKIP=0 子 PASS=17 子 FAIL
 11. **两枚在飞兄弟的半成品未读**（`acceptor-ticket133-ac2-r2` 的 `cmd/wisp`、`acceptor-ticket136-ac8-ac9-r1` 的 `internal/observe`）。
     本程每次 `git diff --cached --name-only` 都只有我自己那一枚文件（四次提交，逐次核过）。
 
+## §7 `R-137-x` 新账（号先查过占用：`grep -rn "R-137-" docs/ .scratch/` 除本件外零命中 ⇒ 从 1 起）
+
+### R-137-1 中·票面更正块 ③ 的对照组点名会造出一枚永远满足不了的落地凭据
+
+- **现象**：AC#3 判据更正块第③条写"对照组那三枚根已解析的用例（**119 族两枚 ＋ `TestAC1POSIXUnresolvedSymlinkedRootStillRefused119`**）在两形都必须仍红"。
+- **我这程的量**：MUT-D 下**两形都红**的三枚其实是 `TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed`、
+  `TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasNamed`、`TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119`
+  （软链形顶 FAIL 名册恰好只有这三枚，见 §4 表）。而被点进对照组的 `TestAC1POSIXUnresolvedSymlinkedRootStillRefused119`
+  是 **D·普通 FAIL／D·软链 PASS**，`TestAC2POSIXInjectedTestDataDirStandsAsDeclared119` 同形同色。
+- **为什么它俩不是对照**：两枚都用 raw `t.TempDir()`（`dataroot_symlink_119_other_test.go:194`、`:286`），
+  断言的正是"未解析的根必须被拒" ⇒ 软链形里宿主的链接给了它一个**合法的拒**。**它们和分母那 11 枚是同一种病，不是对照。**
+- **能复现**：是（本程十发，台件 `D:\tmp\wisp137r2-io\`，名册程序化生成）。
+- **危害形状**：AC#3 一旦落地就要按这条判"三枚仍红"，而这一形里其中一枚**结构上不可能红**
+  ⇒ 会把实现方推去"修一枚本来没坏的用例"，或把"绿"读成"变异没打到"而误废自己的落地凭据。
+- **修法方向（只给方向，票面归 owner 改）**：对照组改点名上面那三枚；或把凭据降级成"普通形三枚都红＋软链形至少两枚红"。
+  并把那两枚 119 用例**另立一栏**（它们该进 AC#4 的换根判据，不该进落地凭据）。
+- **归谁**：owner／编排者（票面文本），**我未动 `.scratch/wisp/issues/137-*.md` 一个字**。派单里同一处也是这么写的（同一错前提，不重复计）。
+
+### R-137-2 中·AC#2 指定的修法**够不到分母里那 2 枚**（108 族的断言不走 `assertRefused113`）
+
+- **现象**：票面 AC#2 的修法是"把 `assertRefused113` 收紧到分得出来——必须核被拒的那一个路径就是本用例自己种下去的那一个"。
+- **我这程 grep 到的调用面**（`grep -rn "assertRefused113(" internal/winsec/`）：helper 定义在 `placement_symlink_113_other_test.go:127`，
+  被 `placement_symlink_113_other_test.go` 调用 5 处、被 `placement_leaf_118_other_test.go` 调用 2 处，
+  **`ancestor_separator_108_other_test.go` 调用 0 处**。108 那两枚分母腿的断言是**内联**的
+  （`:80-84` 与 `:138-142`：只判 `err == nil` ＋ `errors.Is(err, ErrIsReparsePoint)` ＋ `assertStillThere108` 看外来文件），
+  同样**不分拒因**，但**不在 helper 里**。
+- **后果**：只改 `assertRefused113` 的话，分母 11 枚里有 **2 枚修不到**（108 族），
+  而 AC#3 的判据要求"11 枚在软链形全部转红"⇒ **AC#2 按票面字面做，AC#3 必红不齐全**。
+- **能复现**：是（`grep` 直接可核；且 §2.2 表里那 2 枚在 D·软链同样读 PASS，是同一处缺口的两处证据）。
+- **修法方向**：AC#2 的范围要写成"helper ＋ 108 那两枚的内联断言"三处同改，或把 108 的断言收进一枚共用 helper（仍是一行形状级别，不新增依赖）。
+  ⚠ 这条**必须在 AC#2 开工前落进票面**，否则实现方会按字面只做 helper、AC#3 那一格第二次被退回。
+- **归谁**：本票 AC#2 的实现方＋ owner（改票面范围句）。
+
+### R-137-3 低·更正块 ① 的依据句过度概括（结论仍立）
+
+"MUT-A／MUT-B／MUT-AB 那三发在未修的旧码上就已经全红（11 枚全响）"——实测 **A 响 9／B 响 2／AB 响 11**（§2.2）。
+"恒真判据"这个结论**不受影响**（票面指定的那一发本就是两路同坏＝AB），但依据句照抄进下游判据会写歪。
+修法方向：依据句收窄成"票面指定的那一发（两路同坏）在未修旧码上 11 枚全响"。**归 owner／编排者**。
+
+### R-137-4 低·边界注释点名的"钉"在另一个包里
+
+`winsec_other.go:139` 用 `TestAC3POSIXSecretRouteLinkInsideItsDataRootStillRefused119` 给"链路进数据根仍被拒"这条路由作保，
+但那枚用例在 **`cmd/wisp/secret_dataroot_119b_test.go:201`**——winsec 自己的分母里**永远读不到它**（我十发里它是 ABSENT，见 §5③）。
+不是行为缺陷，是**引用可读性**缺陷：在 winsec 里查这枚名会查不到。修法方向：注释里带包名限定。归 winsec 下一程（不阻塞本票）。
+
+
