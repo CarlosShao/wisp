@@ -282,3 +282,30 @@ D·软链形包级 `顶 FAIL 3` 的名册就是这三枚（`TestAC3POSIXLinkInsi
 **④ 更正块 ②「普通形八数逐数不变」——需要一个具体参照值，否则不可复算。** 我这程给出的就是这八个字：
 MUT-D·普通形 `RUN=52 顶 PASS=17 顶 FAIL=13 顶 SKIP=0 子 PASS=17 子 FAIL=5 子 SKIP=0 rc=1`，
 且**逐名 FAIL 名册与 MUT-AB·普通形完全相同**（§4 表）⇒ AC#3 落地时"普通形不许新增红／不许由绿转 SKIP"就按这两句核。
+
+## §6 我没做的档（诚实列，不是"遗漏后忘记写"）
+
+1. **AC#2／AC#3／AC#4／AC#5 一格未做**。`internal/winsec/**` 全程只读（`git status --porcelain internal/winsec/` 空），
+   收紧 `assertRefused113` 是 AC#2 的地界，我一行没动。**AC 勾一枚未翻**（含 AC#1 本身——终裁归 owner 落笔）。
+2. **MUT-C（把两条路共用的谓词 `ancestorIsLink` 打成 `return false`）我没造也没跑**。
+   测量方说"它被 MUT-AB 覆盖、同一批颜色"——**这句我没独立重走**，按本仓规矩记成
+   **〔验收方没造的支，不算已测〕**，不替它背书，也不据此减损 §2 那四发的结论。
+3. **票面指定的"形如让 `RemoveUnlinked`／seal 那条路直接返回成功"我只按两枚函数级形状落了**
+   （A＝seal 路、B＝unlink 路、AB＝两路），没去追"`RemoveUnlinked` 整枚导出函数直接 `return nil`"那种更外层写法；
+   它与 B 的区别只在 `filepath.IsAbs` 那半条相对路径守卫还在不在，本格结论不依赖它。
+4. **宿主侧（Windows）一枚读数都没取**：这 11 枚带 `//go:build !windows`，宿主没有分母；
+   也**没跑** `GOOS=windows go test -list`（那是票 124 批次 3b 量过的事，我没重走）。
+5. **门禁五读数全未做**（`gofmt -l` 整包／`gofumpt`（版本未钉明）／`go vet` 双 GOOS／`-count=2 -v` 两形四数／`sh scripts/d22scan.sh`）。
+   容器内 `go vet ./internal/winsec/` 只作为**变异落地证明**跑过（十二发全 rc=0），那不等于门禁。
+6. **计时类断言一枚未跑**（D32 的 CPU≤0.5%／RSS≤25MB 一个字节没动也没读）：本机两枚兄弟在飞、`slo-full` 会随 push 自启抢 CPU。
+7. **前例只当参照、没重判**：票 124 批次 3b 那本"邻居账"我只对齐了**基线六数**（§4 末条），
+   它那 17 枚红名的逐名裁决**我没重走一遍**（派单明令"不要重判它"）。
+8. **两枚 119 族的 success 腿（`TestAC1POSIXSymlinkedTempDirRouteBecomesSealable119`／`…ConfigDir…`）四发全绿这件事我没去判为什么**——
+   那是 AC#4 换根地界的事，本格只记下"它们不在变异面上"这个事实。
+9. **`cmd/wisp` 那枚 `TestAC3POSIXSecretRouteLinkInsideItsDataRootStillRefused119` 没跑**（不在 winsec 分母，且 `cmd/wisp` 有兄弟在飞），
+   我只用 `grep` 确认了它的所在（§5③）。
+10. **未跟踪件 `docs/reports/2026-09-23-gap-analysis-vs-oss-harnesses.md` 未读、未提交、未改、未删、未据它改判据**；
+    工作树里别人那两枚已改文件（`docs/reports/injection-timeline.md`、`pending-and-issues.md`）我没碰、没 stage。
+11. **两枚在飞兄弟的半成品未读**（`acceptor-ticket133-ac2-r2` 的 `cmd/wisp`、`acceptor-ticket136-ac8-ac9-r1` 的 `internal/observe`）。
+    本程每次 `git diff --cached --name-only` 都只有我自己那一枚文件（四次提交，逐次核过）。
+
