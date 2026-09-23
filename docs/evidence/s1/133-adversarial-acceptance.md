@@ -127,7 +127,71 @@ X14 二拍（`3v3ins-x14b2c-doorclosed.log`）：`AC#1 RED: leg "sfx131" (main.g
 
 ## 3. 首要攻击：这枚仪器自己的洞（同名方法／helper 名）
 
-（待填）
+### 3.0 判据代码在哪一处松（先给字节，再给读数）
+
+```
+cmd/wisp/leg_dispatch_gate_133_test.go:383	case isTest:
+cmd/wisp/leg_dispatch_gate_133_test.go:384		p.tests[fd.Name.Name] = append(p.tests[fd.Name.Name], decl)
+     -> 任何 _test.go 里的声明都进 tests 桶，键是**裸名**：不看 receiver（方法照收）、
+        不看 `Test` 前缀、不看是不是 `func(*testing.T)`
+cmd/wisp/leg_dispatch_gate_133_test.go:1127	if len(p.tests[c.test]) == 0 {   // 钉的"是不是真用例"＝名字在不在桶里
+cmd/wisp/leg_dispatch_gate_133_test.go:1191	if strings.HasPrefix(name, "Test") {  // (d) 的 driver：只认前缀
+```
+
+同族对照——票 131 那扇门在这一点上是**紧的**，本尺是**松的**：
+
+```
+cmd/wisp/leg_sink_gate_131_test.go:617	if isTest && fn.Recv == nil && strings.HasPrefix(fn.Name.Name, "Test") {
+cmd/wisp/leg_sink_gate_131_test.go:619	} else if isTest { continue }     // 方法/ helper 整个不进 tests 桶
+cmd/wisp/leg_sink_gate_131_test.go:225	func registerLegNail131(leg string, test func(*testing.T), entry ...string)
+     -> 131 的钉登记表存的是**函数值**，同名方法与非 Test helper 在类型上就进不来；
+        133 的 `legCovers133` 存的是**字符串**，只做名字查表
+```
+
+⇒ 实现方临终自述那句"tighten the coverage evidence so it names real `Test*` cases (not helpers)
+and can't be satisfied by a name-collision on a method"**没有落地**：那句话描述的收紧动作在
+`leg_dispatch_gate_133_test.go` 里找不到对应判据，实测三枚探针全绿（下面 p1/p2/p3）。
+这一条不是"改进建议没做"，而是**仪器判绿的覆盖面比它自己写在红名里的话宽**——
+判据 (d) 的原文是"no test case in this directory that drives a symbol belonging to this leg alone"，
+而今天**一枚永不运行的方法**就能把这句话判成假。
+
+### 3.1 五枚探针（都种在 X14 第二拍之上：install 已拆掉，只剩判据 (d) 能让它红）
+
+做法：`python wisp133-acc-r1-mutate.py <树> x14b2c` 先种第二拍，再 `python wisp133-acc-r1-probe.py <树> <探针>`
+加一枚探针件；每枚探针先 `go build ./...` 取 rc，再单跑本尺（`-run '^TestAC1AC2DispatchHopGate133$'`）取判绿／判红。
+台件与日志 `/d/tmp/wisp133-acc-r1-out/P-*.log`、`v3-probes.txt`、`extra.txt`。
+
+| 探针 | 种了什么（都在 `cmd/wisp/` 快照树里） | build | 本尺读数 | 账本那一行原文 |
+| --- | --- | --- | --- | --- |
+| **p4 对照** | 只在 `usage` 里加一行 `wisp sfx131` | rc=0 | **rc=1 红**（诚实的"给人看"那一行不换任何覆盖） | `covered=RED nothing` |
+| **p1 同名方法** | 一枚**方法** `func (phantomRecv133) TestSfx131LegIsDriven() { _ = cmdSfx131(nil) }` ＋ 上面那行 usage | rc=0 | **rc=0 绿** | `leg sfx131 main.go:81 installs=false handoff=false covered=test TestSfx131LegIsDriven drives cmdSfx131` |
+| **p2 不相邻裁决** | `doctor.go` 末尾一行 `// WISP-LEG-COVERAGE-RULING: sfx131 …`（离这条腿的代码 260 行）＋ usage | rc=0 | **rc=0 绿** | `covered=ruling doctor.go:341` |
+| **p3 钉指向 helper** | 把 `legCovers133` 加一行 `{leg:"sfx131", test:"phantomHelper133", entry:"cmdSfx131"}`，`phantomHelper133` 是 `_test.go` 里一枚**非 Test 前缀**的普通 helper | rc=0 | **rc=0 绿** | `covered=nail phantomHelper133 -> cmdSfx131` |
+| **p5 同 case 多标签** | `case "run":` 改成 `case "run", "runalt133":`（不加任何腿的行） | rc=0 | **rc=0 绿**，账本**只有 11 条腿** | `dispatch ledger … (11 legs, 4 claims …)`，`runalt133` 零行 |
+
+p1 的"这枚 test 到底跑没跑"另有两条独立读数（整包、门关着那份 `P-p1-fullpackage-doorclosed.log`）：
+
+```
+READ label=P-p1-fullpackage-doorclosed rc=0 RUN=100 TOPPASS=53 TOPFAIL=0 TOPSKIP=0
+grep -c '^=== RUN   TestSfx131LegIsDriven$'   -> 0
+grep -c '^--- (PASS|FAIL): TestSfx131LegIsDriven' -> 0
+grep -c '^--- (PASS|FAIL): Test'              -> 53   （与基线同一枚数，没多一枚）
+名字在整份日志里出现 1 次，唯一那次是本尺自己打的账本行
+```
+
+⇒ **(a) 认同名方法：成立。** 一枚 Go 永远不会运行的方法，配上给人看的那行 usage，
+就能把票 133 第五发第二拍那条"必须红"的判据判成绿，且账本把它印成 `covered=test …`。
+⇒ **(b) 认 helper 名：成立（在钉登记表这一侧）。** `legCovers133` 的 `test:` 字段允许指向非 `Test*`
+的 helper，而它对应的红名文案写的是 "not a test function in this directory's sources"——文案与判据不一致。
+（`drivenBy133` 那一侧有 `HasPrefix(name,"Test")`，纯 helper 名在那条路上不成立；但方法带 Test 前缀就能过。）
+
+### 3.2 这两问对判据的影响面
+
+- 直接击穿的是**判据 (d)**（被分发的腿必须被覆盖）与红名文案所说的"没有用例驱动它"。
+  **不击穿** AC#1 的五发本身（那五发里没有任何一枚同名方法/不相邻裁决在场，本验收方 §2 逐发复现全红）。
+- 击穿的是**票面 AC#2 要的那句主张**：§3 写的是"每枚被分发的腿在账本里占一行，逐行写着它
+  够不够得着听众、走的是哪条边、**被什么覆盖**"。p1/p2/p5 三发证明"被什么覆盖"这一列可以写假。
+- 与票 19／票 131 两轮的根因族同形：**按名字配对、只认前缀、first-match**（见 §4）。
 
 ## 4. 同形排查（first-match／按下标配对／只认前缀／只数不核）
 
