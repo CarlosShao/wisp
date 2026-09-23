@@ -177,3 +177,37 @@ D·软链形包级 `顶 FAIL 3` 的名册就是这三枚（`TestAC3POSIXLinkInsi
 而更正块里被算进对照组的那枚 `TestAC1POSIXUnresolvedSymlinkedRootStillRefused119` 在我的读数里是 **D·普通 FAIL／D·软链 PASS**（它本来就用 raw `t.TempDir()`、那一形里它*就该*被宿主的链接拒掉），
 详见 §5 与 R-137-1。
 
+## §3 枚数裁决：**11 枚＝7 顶层＋4 子测试**（票面标题那个"12＝8 顶层＋4 子测试"我复现得出它的来源、但不采信）
+
+我逐枚数的，判据与测量方同一句但各量各的：**票 113／票 108 的 POSIX 拒绝腿里，`root` 仍由未解析的 `t.TempDir()` 供给的那些枚**。
+先把两枚文件里所有顶层 `func Test` 摊开逐名判"算不算拒绝腿"（`grep -n '^func Test'` 自己取的行号）：
+
+| 顶层用例（文件:行） | 根从哪来 | 走哪条路 | 算不算本格拒绝腿 | 为什么 |
+| --- | --- | --- | --- | --- |
+| `placement_symlink_113_other_test.go:144` `TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone` | `:146` raw `t.TempDir()` | seal（`platformVerifyPlacement`） | **算** | 要的就是"拒"，且根未解析 |
+| `:165` `TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth` | `:169` raw | seal | **算**（顶层）＋**它的 4 枚子测试各算一枚** | 同上；4 枚 depth 子测是 4 个独立断言点 |
+| `:195` `TestAC1POSIXSealDirThroughASymlinkRefuses` | `:197` raw | seal | **算** | 同上 |
+| `:211` `TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing` | `:213` raw | seal | **算** | 同上 |
+| `:236` `TestAC1POSIXSealFileThroughABackslashNamedLink` | `:238` raw | seal | **算** | 同上 |
+| `:253` `TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree` | `:254` `SealableTempDirForTest124` | seal | **不算** | 它要的是"**成功**"（反向腿），把它算进"拒绝腿"就是把尺子反着拿 |
+| `:287` `TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLinks` | `:289` 同上 | seal | **不算** | 同上（还专门种一枚*不是*祖先的链接来防过度拒绝） |
+| `:335` `TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator` | `:337` 同上 | seal | **不算** | 同上 |
+| `ancestor_separator_108_other_test.go:67` `TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink` | `:69` raw | unlink（`firstLinkAncestor`） | **算** | 要"拒"，根未解析 |
+| `:94` `TestAC2POSIXDoesNotFoldABackslashIntoASeparator` | `:96` `SealableTempDirForTest124` | unlink | **不算** | 要"这次必须成功删掉自己的文件" ⇒ 反向腿 |
+| `:125` `TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor` | `:127` raw | unlink | **算** | 要"拒"，根未解析 |
+| `:152` `TestAC4POSIXFloorAnswersInsideTheNamedTree` | `:156` 已解析 | seal＋resolve | **不算** | 它的"拒"只针对 `../` 这种父指针拼写、根又是已解析的 ⇒ 天生有牙，且不在那 7 处 raw `t.TempDir()` 名单里 |
+
+⇒ **7 顶层（113 族 5 ＋ 108 族 2）＋ 4 子测试 ＝ 11 枚**。与"7 处有意未换的 `t.TempDir()`"逐处对得上
+（`placement_symlink_113_other_test.go:146/169/197/213/238` ＋ `ancestor_separator_108_other_test.go:69/127`，我自己 `grep -n` 复核，第 2 处一处覆盖 1 顶层＋4 子测）。
+`assertRefused113` 的真位置我再量一遍：**`placement_symlink_113_other_test.go:127`**（与 108 那枚 `:127` 的递根点同号不同物，别抄串）。
+
+**那个"12"是从哪来的（我能复现来源）**：`grep -c '^func Test'` 在 `placement_symlink_113_other_test.go` 上**恰好得 8**（已核），
+把 8 枚顶层全当拒绝腿再 ＋4 枚子测试＝12 —— 这正是票面标题与"为什么现在立案"表里那个数，也正好**漏掉** 108 真正的 2 枚顶层拒绝腿。
+所以这不是"另一版分母"，是**同一枚文件里成功腿与拒绝腿混装**造成的口径错。
+我也盘了另一枚凑法：两枚文件的顶层数 `8＋4＝12` 也等于 12，但那会是"12 枚全是顶层"，**与票面写的"8 顶层＋4 子测试"这个拆法不符**；
+按票面自己的拆法，来源就是前者（8 枚顶层全部当拒绝腿 ＋ 那 4 枚子测试，同时漏掉 108 的 2 枚）。
+
+**裁决**：测量方的"11＝7＋4"我**独立复现**（逐名、逐行、逐个根来源），票面标题的"12＝8＋4"不成立 ⇒ **§5 的枚数更正块成立**。
+
+⚠ 我**没有**用 `grep -c '^func Test'` 当分母，也没有沿用它的名单：上表 12 行逐名给了"算／不算"的理由，
+分母那 11 枚的名字在 §2.2 的逐名表里一枚一枚露过脸，名册差集见 §4。
