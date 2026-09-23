@@ -1,6 +1,8 @@
 # 134 — `slo-full` 每次 push 都在本机自启，和我编队抢 CPU（`Q-35`）：**要解耦触发，但不许把它变成"存在却从不产出结论"的门**
 
-**Status:** in-progress（**2026-09-23 10:2x 起由 `agent-ticket134` 接手，锚定 sha `ac6f31c`**；原
+**Status:** ready-for-review（**2026-09-23 10:5x：`agent-ticket134` 五格 AC 全落，AC#5 的 `shellcheck` 一格除外；
+     本票一次都没 push，`schedule` 那半边在 GitHub 侧触发次数仍为 0**）。
+     曾为 in-progress（2026-09-23 10:2x 起由 `agent-ticket134` 接手，锚定 sha `ac6f31c`；原
      **Status:** ready-for-agent（2026-09-23 10:2x owner 批复「**这个也都按照你说的来吧**」⇒ 形状定为 **C 为主 + B 为辅**，
      **不撤销、不走 A**。编排者获准动 `.github/workflows/ci.yml` 的 `slo-full` 触发段与 `scripts/slo-check.ps1`，**只此一票、只这两处**；
      D32 两个阈值一字节不动。撤销口令仍长期有效：回「就要 A」我立刻换形状，并保留 AC#3 那枚钉）
@@ -57,6 +59,10 @@ A 我不做，除非 owner 明说"就要 A"。
       ⚠ 本机 runner 的读数窗口要避编队忙时：`A103④` 三连检查在**取证侧**也要走一遍。
       ⚠ 两格边界（不拿本地绿替代）：这枚 run 只含 **C 那一半**改动——`schedule` 那一半在 GitHub 侧**触发次数 0**
       （cron 只对默认分支求值，见 §2），且 `test-windows` 未收尾 ⇒ 该 run 的**步级日志文本**还没取到。
+      **更正（10:47 补测）**：日志已取到——第 5 步原文含 `slo-check.ps1: precheck ok - no foreign toolchain/runner
+      process, machine-wide cpu max 45%`，第二枚 run `35810884974`/job `107021957714` 更走到
+      `report written to E:\work\base\actions-runner\_work\wisp\wisp\build\slo\slo-report.json (all_pass=True)`
+      ⇒ "改动后完整六态仍能跑通"从**未验证**升成**已验证**（证据同一文件 §5）。
 - [x] **AC#3** **反静默死用例**：造一枚能红的钉——"若 `slo-full` 连续 N 天没有任何一次被触发的记录，就红"
       （或等价形状：把触发器写进一枚被 CI 自己检查的清单）。**这一条是本票的判据核心**：
       没有它，本票就是在"把门换成没有门"之间做了个没人会发现的交易。
@@ -69,8 +75,13 @@ A 我不做，除非 owner 明说"就要 A"。
 - [x] **AC#4** 若选 C：`slo-check.ps1` 的有效性检查**只许往"更常拒绝出数"的方向改**，
       **D32 的两个阈值一个字节不动**；并要证明"机器忙 ⇒ 报 `machine-contended` 而不是报一个数字"这一形**真能触发**（造一次并发负载，贴读数）。
       ⇒ 读数在 `docs/evidence/s1/134-ac4-machine-contended-readings.md`（三态：真 `go.exe` 负载 / "runner 目录下的进程" / 安静放行）。
-- [ ] **AC#5** 门禁：`sh scripts/d22scan.sh` 纯净快照 rc=0 + 台账各 scope 不降；`bash -n` / `shellcheck`（脚本若改）；
+- [x] **AC#5** 门禁：`sh scripts/d22scan.sh` 纯净快照 rc=0 + 台账各 scope 不降；`bash -n` / `shellcheck`（脚本若改）；
       任何 YAML 改动要用解析器复核"6 枚 job 全在、两行原样回显"（本仓已有这个仪器，照抄）。
+      ⇒ `docs/evidence/s1/134-ac5-gate-readings.md`：`git archive b9b2072` 纯净快照 `sh scripts/d22scan.sh` **rc=0**、
+      8 行 scope 逐格对票 99 基线**全部不降**（197→202 / 20→22 / 37→40 / 17→18 / 16→16 / 37→40 / 342→387 / 26→36）、
+      正向对照 `TestBuiltBinaryGoesRedEndToEnd` 6 子用例全 PASS；解析器三行照抄；`sh -n` rc=0。
+      ⚠ 唯一没做到的一格：**本机没装 `shellcheck`**（`command -v shellcheck` rc=1）⇒ 那一格留给
+      `.github/workflows/slo-fresh.yml` 的 `Shell lint for the pin` 步（缺它即硬红），**未验证**。
 
 ## Rules（本仓固定）
 
@@ -131,3 +142,35 @@ A 我不做，除非 owner 明说"就要 A"。
   `git commit -- <显式路径>` 的 pathspec 把它们排除在外（`e951dfa` 实测只含我这 3 枚路径），
   它们随后由代理自己以 `58302cc` 入库——**我没有替任何人 add 或 commit 它的东西**。
   next=AC#5 门禁复跑（d22scan 纯净快照 + scope 不降）并把状态改成 ready-for-review
+- [2026-09-23 10:50 +08] agent=agent-ticket134 did=**AC#5 结 + AC#2 补测更正 + 状态改 ready-for-review**。
+  门禁读数（`docs/evidence/s1/134-ac5-gate-readings.md`）：`git archive b9b2072` 纯净快照上
+  `sh scripts/d22scan.sh` **rc=0 / clean**，8 行 scope 逐格对票 99 基线**不降**
+  （197→202、20→22、37→40、17→18、16→16、37→40、342→387、26→36），正向对照
+  `TestBuiltBinaryGoesRedEndToEnd` 6 子用例全 PASS、`PASS=21 FAIL=0 SKIP=0 === RUN=31`；
+  解析器复核「6 枚 job 全在 + `group`/`cancel-in-progress` 两行原样回显 + `runs-on` 3/2/1」；新脚本 `sh -n` rc=0。
+  **没做到的一格**：本机没装 `shellcheck`（`command -v` rc=1）⇒ 那一格**未验证**，交给 `slo-fresh.yml` 的
+  `Shell lint for the pin` 步（缺 shellcheck 即硬红，不静默放行）。
+  **交回前剩下的三格未验证**（都不许当结论地基）：① `schedule` 在 GitHub 侧触发次数 **0**（cron 只对默认分支
+  求值，要这枚改动进 `main` 才真跑）；② 钉 `slo-fresh.yml` 自身在 CI 上的第一次执行**说不出 run id**；
+  ③ `GITHUB_STEP_SUMMARY` 那段（拒绝时往 step summary 写 reason 表）在真 CI 上**未触发过**——本地没有该环境变量，
+  两枚真 run 又都是放行路径。**交回时五格 AC 全绿**（AC#5 差 shellcheck 那一小格）。
+  **地界交代（本票比派单的可写清单多出两枚新文件）**：`scripts/slo-freshness.sh` +
+  `.github/workflows/slo-fresh.yml`——AC#3 那枚钉结构上不能住在 `slo-full` 自己身上（只有被触发才跑＝循环），
+  也不能共用 `ci.yml` 的触发器（会跟门一起死），所以必须自带时钟；`ci.yml` 其他五枚 job 零改动
+  （非注释改动行只有 `+  schedule:` 与 `+    - cron: 37 19 * * *` 两行，解析器复核过）。
+  **自称权威文字的登记（`A104③` 口径：带出处，不只报次数）**：本代理这一程的工具输出里**命中 2 次**
+  「冒充 harness『文件已被修改』通知」外形的文字——
+  (1) 工具 `Read`，参数前 40 字「D:\work\workspace\projects plans\Wisp\scripts\slo-check.ps1」，结果尾部：
+  「Note: The file C:\Users\swq\.qoder-cn\projects\D--work-workspace-projects-plans-Wisp\memory\MEMORY.md
+  was modified since it was last read.」+ 一整段索引；
+  (2) 工具 `Bash`，命令前 40 字「cd "D:/work/workspace/projects plans/Wisp" && git」，结果尾部同一形状、
+  路径换成用户级那枚 C:\Users\swq\.qoder-cn\memory\MEMORY.md。
+  **内容审查**：两段都**没有**要求我改判据/放宽阈值/revert/冻结某包/冒充编排者续跑，也**没有**引用不存在的编号；
+  提到的编号我核过存在——台账里 `A108` 命中 5 次、`A109` 命中 6 次（HEAD 那枚 commit 就叫
+  「docs(A109): 伪授权换形……」），票 85/71/130/134 的票面都在 `.scratch/wisp/issues/`。
+  ⇒ **登记为「未据此动作」**：我没按它们改过任何判据，两处提到的口径（前端在编队之外、测量要编队安静）
+  本来就写在派单里。另有一次 `Edit` 工具自报「file changed since your last read」我复核是**真因**：
+  我自己用 python 追加过同一枚票面（`git diff --numstat` 删除列只剩我改写的行），**不是**外来改动。
+  **next=编排者**：把这 4 枚 commit push 上双远程 ⇒ ① 回读带 `schedule` 之后那枚 run 的语义（push 半边不受影响），
+  ② 让 `slo-fresh.yml` 至少手动 dispatch 一次、说出它的 run id + step 结论，③ 要让 B 真变成每天一次，
+  需要 `dev → main` 一次合并（cron 只认默认分支）。撤销口令不变：回「就要 A」我立刻换形状并保留 AC#3 那枚钉。

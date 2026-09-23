@@ -142,3 +142,30 @@ run `35809646757` / job `107018099910`（`created_at=2026-09-23T02:15:46Z|comple
 	memCapSleeping     int64 = 25 << 20
 	cpuLimitSleeping     = 0.5 // % of all-core mean, 1min window
 ```
+
+## 5. 补测（10:47 +08）：§1b 那一格已经取到了 —— CI 步级日志原文
+
+`run 35810714576` 整体收尾后 `gh run view --job=107021435150 --log` 可读，第 5 步里**我的前置检查
+就在那枚 self-hosted run 上真跑过并放行**：
+
+```
+2026-09-23T02:32:18.8201351Z slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+2026-09-23T02:32:22.3319766Z slo-check.ps1: precheck ok - no foreign toolchain/runner process, machine-wide cpu max 45%
+2026-09-23T02:32:22.3346911Z slo-check.ps1: sampling state Sleeping for 6s
+2026-09-23T02:32:37.6361128Z slo-check.ps1: state Sleeping exit=0 pass=True
+... Armed / Warm / Conversation / PanelOpen 同样 exit=0 pass=True ...
+```
+
+第二枚（head `3879686`，run **35810884974** / job **107021957714** / step 5，completed `success` @02:37:14Z）：
+
+```
+2026-09-23T02:35:00.9388804Z slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+2026-09-23T02:35:04.5207680Z slo-check.ps1: precheck ok - no foreign toolchain/runner process, machine-wide cpu max 28%
+2026-09-23T02:36:59.5336812Z slo-check.ps1: report written to E:\workasections-runner\_work\wisp\wispuild\slo\slo-report.json (all_pass=True)
+```
+
+⇒ 两件事一次说清：**runner 上祖先链排除真的起作用了**（那枚 run 里 runner 自己、`powershell.exe`、
+build 步都在场，检查没有把门打死，`all_pass=True`），且**"改动后完整六态仍能跑通"这一格从
+`未验证` 升成 `已验证`**（`docs/evidence/s1/134-ac4-machine-contended-readings.md` §4 的第二格）。
+两枚 run 都**不含** `schedule` 那半边改动（`b9b2072` 尚未 push，`origin/dev` 里没有它）——
+AC#2 剩下的唯一欠账仍是 §2 那句"cron 只对默认分支求值 ⇒ 触发次数 0"。
