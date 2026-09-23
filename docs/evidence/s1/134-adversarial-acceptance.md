@@ -56,6 +56,7 @@
 | AC#1 | PASS | 形状＝C 为主 + B 为辅，票面 `:179-186` 有 owner 原话与为什么不选 A；动 `ci.yml` 的第一枚 commit 在 AC#1 之后 |
 | AC#2 | PASS（B 那半边有一处判语不成立，见 §2.4） | run/job/step/结论四项我自己从 API 读到；那枚 run 的 `slo-check.ps1` blob 我复算＝`560186fa` |
 | AC#3 | PASS（一处覆盖面缺口登记为 `R-134-3`） | 我在**被验版本那棵树**上用 `SLO_FRESH_CI` 指向四枚 ci.yml 变异件，P1 四发各红一次、干净件绿；树文件 `diff` 与 `git diff --numstat` 证明真 `ci.yml` 一字节未动 |
+| AC#4 | PASS | 三条拒绝理由我各造一发（真 `wisp.exe` 并发 / `RUNNER_TEMP` 前缀命中 / CPU 54% 自然撞），安静时也真放行过；判色改了之后**拒绝出数的条件一字未动**（可执行行差分 + 六处条件行号回读） |
 
 ## 1. AC#1 形状由 owner 认（PASS）
 
@@ -224,3 +225,70 @@ P1 静态探针查的是：顶层 `on:` 在不在、`push:` 在不在、branches
 后果不是"门立刻静默死"：那种形状下 3 天后 P2/P3 仍会红（我 X5/W1 那两发就是它的下游），
 代价是**最多 3 天的软化期没人响亮说"触发器被动过了"**，而且红的时候报的是"样旧"不是"触发器被改"，归因会绕。
 登记为 `R-134-3`（见 §8），本格仍判 PASS：AC#3 要求的那枚"能红的钉"我自己造出来了、也确实红。
+
+## 4. AC#4 有效性检查只往"更常拒绝出数"改 + 真能触发（PASS）
+
+AC#4 有三件要做：拒绝这一形**真能触发**（要贴读数）、拒绝时**不产出任何数字**、以及"只许往更常拒绝的方向改"。
+我不复用 `134-ac4-machine-contended-readings.md` 的三发，自己造了四发，其中三发打在**未变异的快照副本**
+（`/tmp/wisp134-acc-r1-e/scripts/slo-check.ps1`，`git hash-object` = `6e2ba550d555a373b717ff7717f81b73f9cbd6ba`，
+与被验版本同一枚字节）：
+
+1. **理由一（外来工具链/wisp 进程）是真并发撞上的**（跑的是 copy a，但那一条用的是名探针，与被验字节同一份逻辑）：
+   ```
+   slo-check.ps1: machine-contended reason: foreign toolchain/wisp process present: wisp.exe pid=47928 started=2026-09-23 15:40:55 path=E:\work\base\actions-runner\_work\wisp\wisp\build\wisp.exe
+   slo-check.ps1: machine-contended reason: foreign toolchain/wisp process present: wisp.exe pid=33324 started=2026-09-23 15:40:57 path=…build\wisp.exe
+   slo-check.ps1: machine-contended reason: foreign toolchain/wisp process present: wisp.exe pid=49732 started=2026-09-23 15:40:59 path=…build\wisp.exe
+   ```
+   那三枚 pid 是**当时在飞的 run `35831816899` 的 slo-full 自己**——这一发不是我摆拍的，是本机 runner 真在取样时撞的。
+   CI 侧同一条形我也自己从日志读到（`go.exe`/`link.exe`/`gcc.exe`/`cc1.exe`，§2.3 逐字）。
+2. **理由二（runner 工作根下的进程）——我自己造的世界**（`three-states.sh`，跑的是从 git 里 `show` 出来的原始 blob，
+   阈值与条件一行的没改）：把 `RUNNER_TEMP` 指到 `C:\Windows` 之后，拒绝行逐字：
+   ```
+   slo-check.ps1: machine-contended reason: process running under the runner work root: sihost.exe pid=5892 started=2026-08-31 19:28:23 path=C:\Windows\system32\sihost.exe
+   slo-check.ps1: machine-contended reason: process running under the runner work root: svchost.exe pid=7500 …
+   ```
+3. **理由三（机器整体 CPU >=50%）自然撞上的，未变异副本**（`out-E-leakpass.log` 头部）：
+   ```
+   slo-check.ps1: machine-contended reason: machine-wide cpu utilisation 54% over a 1s window (>= 50%)
+   slo-check.ps1: NO CONCLUSION (machine-contended): 1 reason(s), 0 state file(s) written, slo-report.json NOT written
+   ```
+4. **安静时它不是"永远拒绝"**：同一枚未变异副本三连跑，`precheck ok` 分别读到 `cpu max 28%` / `40%` / `43%`
+   （`out-E-fail.log` / `out-E-nofile.log` / `out-E-pass.log`）⇒ 拒绝是有条件的。
+
+**拒绝 ⇒ 盘上真没数字**：第 3 发跑完 `OutDir` 里我只 `ls` 到 `slo-no-conclusion.json`，
+`state-*.json` / `settle.json` / `slo-report.json` 都不存在；那枚记录里 `state_files_written=0`、
+`slo_report_written=false`、`d32_evaluated=false`、`verdict=no-conclusion`。
+
+**"只许往更常拒绝出数"这条方向没被 AC#6 反转**（AC#4 交给 AC#6 的那道硬边界）：
+`direction_check.py` 把 `b723978`（AC#6 之前）与 `6effb7e`（被验版本）两枚 blob 各自剥掉注释与
+`Write-Host`/`Add-Content`/`Set-Content` 这类上色与落记录行之后做 unified diff——**可执行行的差三处**：
+争用分支里 `exit 1` → `exit 0`、新增的 `$noConclusion` 记录对象（纯数据）、step summary 的两行文字。
+所有**判定条件**在被验版本里逐条回读，行号一起给：
+
+```
+scripts/slo-check.ps1:144  if ($allProcs.Count -lt 2) {            # 进程表读不动 => Fail, 仍然 exit 1
+scripts/slo-check.ps1:153  $loadNames = @('go.exe', 'gofmt.exe', …  # 名单一字未增删
+scripts/slo-check.ps1:179  if ($loadNames -contains $name) { … }
+scripts/slo-check.ps1:182  if ($exePath.StartsWith($prefix, …)) { … }
+scripts/slo-check.ps1:211  $cpuBusyPct = 50
+scripts/slo-check.ps1:225  if ($cpuMax -ge $cpuBusyPct) { … }
+scripts/slo-check.ps1:229  if ($reasons.Count -gt 0) {              # 进这一支之前没有任何取样发生
+scripts/slo-check.ps1:396  if (-not $allPass) { exit 1 }            # 出了数而数不过仍然红
+```
+
+**D32 两条阈值**：`internal/observe/thresholds.go:19` `memCapSleeping int64 = 25 << 20`、
+`:26` `cpuLimitSleeping = 0.5` ⇒ 在被验版本与 `b723978`/`3f17504`/`7b4c36a`/`ff4d27b`/`decb7b9`/`44ab500`/`HEAD`
+上**同一枚 blob `e2677b11…`**（§1 那行，八枚锚点逐枚 `git rev-parse`）。再加两条实现方没交过的硬证：
+`git log b9b2072~1..6effb7e -- internal/observe/thresholds.go cmd/wisp/slo_windows.go` = **空**；
+本票五枚带码的 commit（`e951dfa`/`b9b2072`/`decb7b9`/`44ab500`/`3f17504`）文件清单加起来只有四枚路径
+（`scripts/slo-check.ps1`、`scripts/slo-freshness.sh`、`.github/workflows/ci.yml`、`.github/workflows/slo-fresh.yml`）
+⇒ AC#6 的具名解冻地界没越。ps1 里 `0.5%`/`25MB` 六处命中（`:29 :135 :241 :242 :256 :257`）全是注释与打印文本，
+没有一处是判据。
+
+**AC#6 对 `ci.yml` 的那处超界改动，我单独看了**（票面 `:8-10` 自己报备的那格）：
+`git diff b9b2072 6effb7e -- .github/workflows/ci.yml` 只有两个 hunk，都在 `slo-full` 那枚 job 体内——
+一是那段注释，二是 `Upload SLO report` 步的 `if-no-files-found: error` → `warn`。
+不可避性我判**成立**：门步骤保持无条件（§5 解析器读数：`slo-full` 五枚 step 全 unconditional），
+而"零匹配时既不失败、也不创建空 artifact"这一条不是我信它的注释，是我在真 CI 上量到的——
+§2.3 那枚争用 run 的产物表里**没有** `slo-full-report`、日志里有那条 `##[warning]No files were found …`。
+`slo-smoke` 那一步仍留 `error`（同一枚 diff 里没出现它）⇒ 放宽没有被顺手推广到 hosted 侧。
