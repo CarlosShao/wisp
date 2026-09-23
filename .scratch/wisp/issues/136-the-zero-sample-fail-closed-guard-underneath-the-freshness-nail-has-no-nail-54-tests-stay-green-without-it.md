@@ -71,3 +71,47 @@
   作为**口径登记**留在票 134 与台账，不进本票。
   next=派单顺序：本票排在 **133（`cmd/wisp` 分发仪器）与 124 的 2b-3/2b-4 之后**——AC#1 要动的 `internal/observe/**` 会与票 132
   （`SealDir` 生产零调用者）撞同一包，派之前先确认 132 不在飞；AC#2..AC#6 属 `scripts`/`.github` 地界，可另拆一枚并行。
+
+
+### Progress log 追加（2026-09-23 21:47 +08，agent=worker-ticket136-ac1，AC#1 单格）
+
+- **did=只交 AC#1（硬格），AC#2..AC#6 一字未碰**；起点 HEAD `09edf02`（第一次 `git rev-parse --short HEAD`），
+  读数全部取自 `git archive 09edf02 | tar -x -C /d/tmp/wisp136-ac1*` 的纯净快照，仓内未建 worktree、未 checkout。
+- **第 1 步「先证明现在不红」＝复现票面数字**：纯净快照里删掉 `internal/observe/sampler.go:332-340`（M1，
+  含随之未使用的 `"fmt"` import）⇒ 落地证明 `grep -n` 打出 `331- rep.Pass = true` 紧跟 `buildVerdicts` +
+  `go build ./...` rc=0，然后才读数：`go test -count=1 -v ./internal/observe/` ⇒ **rc=0、PASS=54、SKIP=0、FAIL=0**
+  （与未变异基线逐位相同）。**并多追一步验收方没做的**：`go test -count=1 ./...` 全仓两棵树对照，
+  红包集合与顶层红名集合 **IDENTICAL**（`cmd/wisp`／`internal/agent/approval`／`internal/panel`／`internal/risk`
+  那 4 枚红在同一 sha 的 pristine 树上就红，是兄弟在飞，不归本票），`internal/observe` 两棵树都打 `ok`
+  ⇒ 守卫被无声删掉时**全仓没有任何一枚仪器的状态发生变化**，这句现在是读数不是断言。
+- **第 2 步「装钉」**：`internal/observe/sampler_zerosample_136_test.go`（commit `4fc65dd`）两枚用例——
+  `TestSampleStateZeroSampleWindowFailsClosed`（零样本 ⇒ `pass=false` + 一枚 Gate 的 `sampling` 行 +
+  出线 JSON 带 `samples` 空且 `pass=false`，并核"除 `sampling` 行外没有别的门是红"以隔离归因）、
+  `TestSampleStateTrustworthyWindowNotMarkedUnmeasurable`（正向对照腿，防恒真：可信读数必须出样、不许长门、必须绿）。
+  阈值／golden／`thresholds.go` 一字未动，fixture 全部落在冻结阈值之下。
+- **第 3 步「同一发变异复跑」＝转红，红名点到新用例**：装钉树上落与第 1 步逐字同一发 M1 ⇒
+  `rc=1 / 55 PASS / 1 FAIL`，红名 **`TestSampleStateZeroSampleWindowFailsClosed`**，
+  红在 `:75 zero-sample window must never pass, got pass=true`，那串 verdicts 正是本票的病：
+  零样本窗口里 `tree_private_bytes 0.0MB Pass:true`、`cpu_percent_all_core 0.000% Pass:true` 全线绿。还原复绿 `rc=0 / 56 PASS`。
+- **自证腿不哑（四发 × 三态，每发先 restore 再单发）**：M1 删守卫 ⇒ 钉红；M2 把 `:290` 的零足迹丢弃改成永不误丢 ⇒
+  前提腿红（`:61 precondition broken: unmeasurable window produced 5 samples`）；M3 把同一行改成逢读数都丢 ⇒
+  正向对照腿红（`:151 trustworthy reads must be sampled`）；M4 保留 `sampling` 行但 `Pass: false → true`（守卫在、牙没了）⇒ 钉红。
+  四发各自只响该响的那条腿，另一腿同发仍绿。
+- **两条读数事故已报备、未粉饰**（详见证据 §3.2）：① M3 的**全包**读数取不到我的腿——既有的
+  `TestSamplerGoroutineAccountingFollowsRegistry` 在 `sampler_test.go:308` 越界 panic 先杀了测试二进制
+  （47 PASS/5 FAIL + panic），故该发改用定点读数；② 本程一度踩了**变异叠加**（M3 落在未还原的 M4 上），
+  发现后 restore 重测，叠发那份原文留存但不进结论。
+- **门禁与账面**：`gofmt -l internal/observe/` 与 `gofumpt -l`（本机 **v0.12.0 / go1.27.1**，CI 装的 `@latest` 未钉版本）均无输出；
+  `go vet` 原生 + `GOOS=linux` 交叉双形 rc=0；`go test -count=2 -v ./internal/observe/` 四数 **108/108/0/0 → 112/112/0/0**，
+  逐名账只多出本程两枚（各 2 次），无既有枚改名／消失／转 SKIP；`sh scripts/d22scan.sh` 两形 rc=0，
+  台账 `ban #8 internal/` 400→**401**（本程那枚 `_test.go`），**各 scope 无一下降**（`frontend/` 的 +3 是兄弟在飞的树，不是本程）。
+  分母两形各取一枚：Windows 原生与 `golang:1.27` 容器原生（挂载已用 `ls -l /src/go.mod` 证真挂上）
+  都是 `=== RUN=112 / PASS=112 / SKIP=0 / FAIL=0`，**逐名账 IDENTICAL** ⇒ 新增的绿不是被跳过。
+- **那句"答不出"的直答**：会红的是 `internal/observe` 的
+  `TestSampleStateZeroSampleWindowFailsClosed`（`internal/observe/sampler_zerosample_136_test.go:49`，红点 `:75`）；
+  它的门禁落点是 `scripts/portable-tests.sh` 的 `core_pin` 含 `internal/observe` ⇒ CI `test-core`（ubuntu-latest，
+  `ci.yml:288`，走 `runtests.sh` 那把"SKIP 不算 pass"的尺）。Windows 那条腿的 scope 本来不含 observe，已如实写清。
+- **未自勾 AC#1**（勾格归编排者按裁决表判）。证据 `docs/evidence/s1/136-ac1-zero-sample-nail.md`（§6 列了 5 项未验证：
+  CLI 端到端那一发、AC#2..AC#6、软链 `TMPDIR` 形、`CheckSettle` 那侧只做了读码核查未做变异、CI run id）。
+- next=建议派**非实现者**独立复现 §3 四发（M1/M2/M3/M4 三态）后裁 AC#1；
+  票面 `FM`／`FM2` 那发真跑 `wisp slo -seconds 0.05` 的 CLI 端到端等 `cmd/wisp` 空出来再补（此刻有兄弟在飞，本程未碰）。
