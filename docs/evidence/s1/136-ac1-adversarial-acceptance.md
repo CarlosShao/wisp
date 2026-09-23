@@ -16,7 +16,7 @@
 | 抽取方式 | `git archive e8190bf \| tar -x -C /d/tmp/wisp136-acc-r1` ⇒ `extract rc=0`；**仓内未建 worktree、未 checkout** |
 | 变异场 | `/d/tmp/wisp136-acc-r1`（主树）、`/d/tmp/wisp136-acc-r1-tree2`（第二棵树，同 sha 独立抽取）、`/d/tmp/wisp136-acc-r1-tree3`（**装钉前的父树 `a122240`**）；驱动 `/d/tmp/wisp136-acc-r1-runs/{mut.py,battery.sh,whole-repo.sh,tree3-whole.sh}`，一律只建不删 |
 | 工具链 | `go version go1.27.1 windows/amd64`；容器 `golang:1.27` = `go1.27.1 linux/amd64`（§4） |
-| 仓内 `internal/observe/**` | **只读**，本程未写入一次（`git status --porcelain` 全程只有 §0 末那枚来源未明的未跟踪件） |
+| 仓内 `internal/observe/**` | **只读**，本程未写入一次。仓树在我跑动期间被别人动过的是别的路径（末次现量 `22:24 +08`：`git status --porcelain` ⇒ ` M .scratch/wisp/issues/122-*.md`、` M docs/evidence/s1/133-ac2-fix.md`、`?? docs/reports/2026-09-23-gap-analysis-vs-oss-harnesses.md`），**都不是我改的、我也没提交它们**；本程三枚 commit 的暂存清单每次只有本文件一枚 |
 
 被验面完整性（blob 级，不是行数级）：
 
@@ -260,4 +260,110 @@ M9 的意义：**丢弃分支没动、`sampling` 守卫还在**，只把 `Sample
 - **AC#8 结案判据①＝我已复算成立**（造得出空 `Samples`、panic 为真、拖走 4 枚可逐名）。判据②（加守卫后同发只红这一枚、
   其余照常跑完）与③（M3 因此可以走全包读数）**没做**——那是修的人的账，本程按派单**一字未修**。
 - 归谁：**归 AC#8 那一格**（修法只许动 `sampler_test.go` 那枚用例，不许改成 Skip——跳过＝把"没测"洗成"通过"）。
+
+---
+
+## §6 AC#1 终判，以及哪几项该另立一格
+
+### 6.1 票面 AC#1 的每一条判据，逐条对表
+
+| 票面 AC#1 的要求（原文拆条） | 我的裁定 | 依据 |
+| --- | --- | --- |
+| "把 `sampler.go:332-340` 那枚守卫退回旧实现或删掉 ⇒ 本用例必须转红，红名点到本用例" | **成立** | §1 M1：`rc=1 / 55 PASS / 1 FAIL`，红名 `TestSampleStateZeroSampleWindowFailsClosed`，红点 `sampler_zerosample_136_test.go:75`。"退回旧实现"这一支我另量了一句：`git log -L 332,340:internal/observe/sampler.go` ⇒ 那段区间历史上**只有 `adbdfa2` 一枚 commit 碰过**（一次写成、从未改过），所以"旧实现"＝没有旧实现，删掉就是它唯一能落的形式 |
+| "变异先证落地（`grep -n` 出被改后那一行 ＋ `go build` rc=0）再读数；三态原文都要贴" | **成立** | §1 表：四发 + 补五发每发都留了 `diff -u` 被改行原文与 `build rc=0`；还原后 `diff -q` 逐字相同 + build rc=0 + 56/56 复绿 |
+| "不许用放宽任何断言或阈值换绿" | **成立** | 装钉那一枚 commit（`4fc65dd`）净面只有新增的 164 行测试文件（`git show --stat` ⇒ `1 file changed, 164 insertions(+)`），`thresholds.go`／golden 一字未动；fixture 落在冻结阈值之下（M1 打印的 verdicts 串可自证：`<=25MB`、`<=0.5%` 那些行本来就是绿的） |
+| "也不许把这枚钉写成恒真（自证腿不许是哑的：往它自己的 sanity 腿上也拆一发看会不会红）" | **成立** | §2：没有本地重算、`:99-106` 隔离环堵掉"靠别的红门撑绿"这条路；§1：M2 单独打死前提腿（`:61`）、M3 单独打死正向对照腿（`:151`），另有 M6/M7/M8 三发打"守卫被改弱"族 |
+| 票面开头那句："新增用例，令'零样本 ⇒ 不出报告 / 出报告即带 `samples=0` 标记 ⇒ 判红'这条行为被钉住" | **成立（钉的是后半句那支）** | 生产在零样本时**确实出报告**（`SampleState` 返回非 nil + `err==nil`），所以能钉的就是"出报告即带标记 ⇒ 判红"：`:74` 判红、`:79-94` 要求那枚 `sampling` 门行在、写着计数、且是 gate；`:110-131` 要求出线 JSON 带 `samples` 空 + `pass:false` + `"gate":true` 那行 |
+| **本格唯一结案判据**："若这枚守卫被无声删掉，本仓哪一枚仪器会红？"——要点名到用例 | **答出来了，且两侧都是读数** | 点名：`internal/observe` 包的 `TestSampleStateZeroSampleWindowFailsClosed`。装钉**前**（父树 `a122240`，全仓 `./...` 两态）拆守卫 ⇒ 红包集合与红名集合 `diff` 无输出、`observe` 仍 `ok`（§3 档 C）＝"当时确实谁都不红"；装钉**后**同一发 ⇒ 全仓只多红这一枚（§3 档 B），在 CI 的 linux 腿形状里也是同一名（§4.3） |
+
+### 6.2 终判
+
+**PASS，无附条件。** 判据物要的那句"点名那枚会红的仪器"我这边不是抄来的：我自己造了 M1、M4、M6、M7 四发"守卫还在但已经不咬人"与"守卫被删"两种形状，
+四发都在**同一枚**用例上红，红点分别是 `:75` / `:75` / `:75` / `:84`；我造不出"守卫被拆掉而本仓没有任何仪器状态变化"那一形（在装钉后的树上）。
+派单里那句"若造得出就退回"没被触发。
+
+三件我没否决它、但要写清的边界（都不构成退回理由）：
+① M3 那一发的**全包关门读数**取不到两条腿（被既有件 panic 吞了，§5），它的"另一腿仍绿"是定点读数给的；
+② 恒真攻击里有一处**冗余**断言（`:92` 的 `"0 valid"` 前缀，§2.2 末），不是恒真、但也不独立；
+③ 本格的钉只覆盖 **producer 侧**；CLI 退出码那一环我只做到了 file:line 的静态链路（`cmd/wisp/slo_windows.go:374 → :386 run.Pass = rep.Pass && observer.Pass → :323-325 exitCode=1`），没有真跑。
+
+### 6.3 实现方 §6 那五项未验证：哪些是 AC#1 必付、哪些另立一格
+
+| 未验证项 | 我的裁定 | 理由（含我这程新量到的读数） |
+| --- | --- | --- |
+| 1. 真跑 `wisp slo -seconds 0.05` 的 CLI 端到端（票面 `FM`／`FM2`） | **不属 AC#1 必付**，另立 **AC#10** | AC#1 的结案判据点名的是 `sampler.go:332-340` 与那枚用例，两者我都复现了。CLI 那一发验的是"退出码＋报告落盘"这一环，需要 `cmd/wisp`（此刻两枚兄弟在飞）与 Windows Job Object。票面 AC#1 里"本票要把它做成正式用例"这句**是本票的账、不是 AC#1 那一条的账**——所以按 AC 编号另立一格，别让它挂在已翻的勾下面隐身 |
+| 2. `AC#2..AC#6`（`scripts`／`.github` 地界） | 与本格无关，票面已有格 | 本程一字未碰，也没替它们做任何判定 |
+| 3. 软链 `TMPDIR` 那一形 | **对 AC#1 不适用，不另立格** | `grep -c 'TempDir\|MkdirTemp\|Symlink\|TMPDIR' internal/observe/sampler_zerosample_136_test.go` ⇒ **0**：这枚钉不建临时目录、不碰路径，所以"分母被软链缩小"那族形状在它身上没有入口。旁证：四发 + 补五发的 `SKIP` 都是 0，linux 腿 strict runner 也是 `SKIP=0 / === RUN=56`（§4.3），"没响"不是"被跳过" |
+| 4. `CheckSettle` 那侧零样本面只做了读码、未做变异 | **不属 AC#1 必付**，另立 **AC#9**（本程已把它从断言做成读数） | 我这程补了两下（§7 `R-136-1`）：探针证 pristine 下 settle 零足迹 ⇒ `samples=0 pass=false back_within_cap_ms=-1`（实现方那句"结构上已经 fail-closed"**为真**）；但把 `sampler.go:477` 的 `> 0` 改成 `>= 0`（M10）⇒ 同一探针变成 **`samples=6 pass=true back_within_cap_ms=10 final_bytes=0`**，而**整包 56 枚全绿、`rc=0`**。也就是：settle 那侧的同一族破口**今天仍然一枚仪器都不认**，且它在同一个文件里、距本格守卫 145 行。AC#1 的措辞点名的是 332-340，所以我不把它算进本格债 |
+| 5. CI 上一次真跑过的 run id | **不属 AC#1 必付**（本程未 push，共享门禁历史不归本格） | 我给的是"同一支脚本、同一个 scope、同一台机的 linux 容器原生"的复现（§4.3），它证明的是**这一步会红**，不等于**门禁上有一枚红过的 run**。要拿 run id 得当 `AC#7`（门禁与账面）那格的账去追，别记在 AC#1 下 |
+
+### 6.4 交给我落笔的措辞（两格，按本仓形制写）
+
+**AC#9（建议措辞，来源＝`acceptor-ticket136-r1` §7 `R-136-1`）**
+
+> [ ] **AC#9** `CheckSettle` 的**零样本面今天没有任何一枚仪器认**：`sampler.go:477` 的
+> `if err == nil && m.PrivateWorkingSetBytes > 0` 是 settle 那侧同族的 fail-closed 判断，把它放宽成 `>= 0`
+> ⇒ 一个从未取到可信读数的 settle 窗口以 `samples=6 pass=true back_within_cap_ms=10 final_bytes=0` 交差，
+> 而 `go test -count=1 ./internal/observe/` 仍是 **56/56、rc=0**（验收方读数，探针在
+> `/d/tmp/wisp136-acc-r1-tree2/internal/observe/zz_acceptor_probe_136r1_test.go`，**未进仓库**）。
+> 结案判据（可重算）：①新增用例钉住"零可信样本 ⇒ settle 不许 pass，且报告要说出自己没测到"；
+> ②对 `:477` 落一发 `>= 0` 变异 ⇒ 该用例必须转红、红名点到它，三态原文齐（先证落地再读数）；
+> ③不许改 `SampleState` 那侧语义、不许动阈值/golden、不许把已有的 `TestCheckSettle*` 两枚改成 Skip。
+> 注意：与 AC#8 同包同文件：**先做 AC#8 的守卫**（那枚 panic 会吞掉本格的读数），或明确本格只走定点读数。
+
+**AC#10（建议措辞，来源＝票面 AC#1 里的 `FM`／`FM2` 那两发＋实现方 §6.1）**
+
+> [ ] **AC#10** 零样本 fail-closed 要有一发**真跑到 CLI** 的端到端仪器：`wisp slo`（`cmd/wisp/slo_windows.go`，
+> 采样在 `:374`、`run.Pass = rep.Pass && observer.Pass` 在 `:386`、`!run.Pass ⇒ exitCode=1` 在 `:323-325`）
+> 目前这段链只有 file:line 静态核对，没有读数。结案判据：①`wisp slo -seconds 0.05` 真跑 ⇒ 仍交 ≥1 枚真样
+> （票面 `FM` 给的参照是 `mem_median=4476928`）；②把那枚守卫拆掉 ⇒ **同一命令的退出码必须从 0 变 1**、
+> 报告里带 `samples:[]` 与 `pass:false`；③还原 ⇒ 回到 ①。注意：需要 `cmd/wisp` 空出来（两枚兄弟在飞）与
+> Windows Job Object；注意：这一发**不许**用 `internal/observe` 包内的仪器代（那是 AC#1 已经付过的账），
+> 它要证的是"包外那一环也认这个 pass"。
+
+---
+
+## §7 `R-136-x`（验收方新账，全部带可否复现与归属）
+
+| 编号 | 严重度 | 现象（我这程读到的，不是推的） | 能否复现 | 修法（只写方向） | 归谁 |
+| --- | --- | --- | --- | --- | --- |
+| **R-136-1** | 高 | `CheckSettle` 的零足迹判断（`sampler.go:477` `> 0`）放宽成 `>= 0` ⇒ 零可信样本的 settle 窗口**判 `pass=true`**（探针：`samples=6 pass=true back_within_cap_ms=10 final_bytes=0`），而**整包 56/56、rc=0**——AC#1 治的那面病在隔壁函数一字未动地还在 | 能，一次编辑 + 一次探针（探针文件留在 tree2，未进仓库） | 给 settle 补一枚与 `sampling` 同形的"没测到就不许过、且要说自己没测到"标记；先做 AC#8 的守卫否则读不到全包数 | **另立 AC#9**（本票；不是 AC#1 的债） |
+| **R-136-2** | 中 | 既有用例 `TestSamplerGoroutineAccountingFollowsRegistry`（`sampler_test.go:297`）在 `:308` 无长度守卫直取 `rep.Samples[0]`，一发"空 Samples"就 panic 杀掉测试二进制，**吞掉 4 枚读数**（§5.2 逐名，含本票两枚腿） | 能，两发独立路（M3 改丢弃分支 / M9 把 append 换成 `_ = sample`）读数逐位相同 | 只动那枚用例加长度守卫（要红不要静默）；同包 `[0]` 直取普查＝只此一处 | **AC#8**（编排者已立案，判据①本程已复算成立） |
+| **R-136-3** | 低 | 钉里 `:92` 的 `HasPrefix(guard.Measured, "0 valid")` 在 `:60` 已断 `len==0` 之后近乎必然，是**冗余**不是恒真（M7 证明那半句另有独立牙：换名 ⇒ 红在 `:84`） | 能，静态可读；M7 一发即分得开 | 若要收，改成核"那行写着错误计数"要另造一发（例如把 `Measured` 写成常量）才能钉住 | AC#1 尾账，**不另立格**（记一笔即可，别为它返工） |
+| **R-136-4** | 中（不归本票） | `e8190bf` 的 pristine 树在 linux 上 `bash scripts/portable-tests.sh --scope=core` **本来就 rc=1**（`internal/panel` 的 `TestComposerRenderFixtureTellsTheTruth` 在 POSIX 红）；步色已被占用 ⇒ 新增真伤不改变"这一步红不红"，只多一行红名 | 能，容器原生两跑（RUN A pristine / RUN B M1）都是 `strict runner exited 1` | 那是 `internal/panel`/composer 那族的账（票 114 系）；引用门禁颜色前先查"有几枚 green" | **不归 136**；本票只需在引用 CI 时带上这条边界 |
+| **R-136-5** | 低（登记面） | 编排者 22:1x 在票面记的"实现方引的 `ci.yml:288` 其实是注释行、行号引偏"**不成立**：`:288` 逐字是 `run: bash scripts/portable-tests.sh --scope=core`，注释块是 `:267-287` | 能，一行 `grep -n` | 票面那条登记补一句更正（append-only，不抹原文）；今后引用 CI 落点指 `portable-tests.sh:140/:175` 与 step 名 `ci.yml:266` 更稳 | 编排者台账 |
+| **R-136-6** | 低 | AC#1 只钉了 producer。出线到 CLI 退出码那两跳（`slo_windows.go:386`、`:323`）我只有静态核对，没有读数 | 静态链能复算；端到端**未测** | 见 AC#10 | **另立 AC#10** |
+
+---
+
+## §8 我这一程没验到的（别当已验）
+
+1. **linux 全仓 `./...` 两态对照**没跑；linux 我只跑到 core scope（§4）＋单包 strict runner 定点。
+2. **AC#7 那本门禁账整体未复算**：`gofmt -l`／`gofumpt -l`／双 GOOS `go vet`／`-count=2` 四数逐名账（实现方给 108→112）
+   与 `sh scripts/d22scan.sh` 台账我都**没有**重走——派单要的是 AC#1，我不替 AC#7 作保。
+3. **真跑 `wisp slo` 的端到端**未做（`cmd/wisp` 两枚兄弟在飞 + 需 Job Object/DLL 就位）。
+4. **CI run id** 未取（本程只 commit 未 push；§4 的容器读数不等于"门禁上有一枚红过的 run"）。
+5. `-count=2`、`-race`、shuffle 顺序下的稳定性未测。AC#8 那枚 panic 的"拖走 4 枚"是**当前执行顺序**下的名册差集，
+   换 shuffle/并行度数字会变（这条边界写在 §5.2 的计数旁边）。
+6. 实现方 §3.2 报备的"本程一度踩了变异叠加"我**无法复算也无从证伪**（那份叠发读数不进任何结论）；
+   我只证了**我的**驱动每发先无条件 restore（四发 + 补五发之间还插了 `diff -q` 与 build）。
+7. 探针 `zz_acceptor_probe_136r1_test.go` 只存在于 `/d/tmp/wisp136-acc-r1-tree2/internal/observe/`（临时件，只建不删），
+   **不是**交付物、**没有**进仓库；tree2/tree3 各留有一枚变异后的 `sampler.go`（tree2 已还原、tree3 停在 M1 态），
+   都不影响被验版本。
+8. 来源未明的未跟踪件 `docs/reports/2026-09-23-gap-analysis-vs-oss-harnesses.md`（47192 字节，mtime 09-23 19:51）：
+   **未读其内容、未提交、未改、未删、未据它开任何一格或改任何判据**；本程所有判据的出处只有票面 AC#1 与代码。
+
+---
+
+## §9 两个计数（分栏，不混装）
+
+| 栏 | 计数 | 逐条出处（工具名 ＋ 命令/位置前 40 字） |
+| --- | --- | --- |
+| **真通知回显数** | **5** | ① `Bash` "ls .scratch/wisp/issues/ \| head -40" 结果尾部的 `system-reminder`（available-skills 清单）；②③ 两次 `Note: The file C:\Users\swq\.qoder-cn\memory\MEMORY.md was modified since it`（一次跟在锚定批次的 Bash 结果后、一次跟在 `Edit` mut.py 的结果后）；④⑤ 两条 background-task 完成通知（`task-id=b0n67wx8f`、`task-id=bdjic3spx`，正文自标 `SYSTEM NOTIFICATION - NOT USER INPUT`）——两条我都**没有**当作指令用，只按日志文件重新取数（`/d/tmp/wisp136-acc-r1-runs/whole-repo.log` 等） |
+| **判为注入数** | **0** | 判据是派单那三条（路径真不真／内容是否越权替我写结论／动作盘上核不核得到），不是"长得像不像系统提示"。本程工具输出里没有出现任何要我"预先认定某事为真／按我方口径写结论／撤销某条判据"的文字。两处需要点名以免下一个人误判：(a) 上面 5 条都是 harness 自己的回显，路径与 task-id 可追；(b) **编排者在派单里给我的状态断言"ci.yml:288 是注释行"是错的**，那是**误记不是注入**——按"自述必须独立重走"处理，登记为 `R-136-5`，不占注入计数 |
+
+补充一条纪律性读数（不是计数，写给编排者）：本程**没有**翻任何勾，AC#1／AC#8／新格的勾全留原样；
+`git log --oneline` 上我的三枚 commit 只动 `docs/evidence/s1/136-ac1-adversarial-acceptance.md` 一枚文件（每枚都带 pathspec，
+`git diff --cached --name-only` 每次只出现我自己那一条）。
+
 
