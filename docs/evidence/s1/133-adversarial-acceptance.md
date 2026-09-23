@@ -118,6 +118,24 @@ X14 二拍（`3v3ins-x14b2c-doorclosed.log`）：`AC#1 RED: leg "sfx131" (main.g
 ⇒ **五发的③栏红名都点到 `TestAC1AC2DispatchHopGate133`**，不是包级 `[build failed]`（六发 `go build ./...` 全 rc=0），
 也不是 131 的门（③栏里它的名字在日志中出现 0 次，见 §1 的做法段）。**AC#1 的归属硬线：本验收方复跑成立。**
 
+这六栏的逐枚机检（同一枚问题问六遍：门到底关没关、本尺跑没跑、红是不是包级）：
+
+```
+label                         131门提及 SKIP行 本尺RUN 本尺FAIL build-failed
+3ins-n3-doorclosed                0        0      1        1          0
+3v2ins-x4-doorclosed              0        0      1        1          0
+3ins-x8-doorclosed                0        0      1        1          0
+3v2ins-x12-doorclosed             0        0      1        1          0
+3v3ins-x14c-doorclosed            0        0      1        1          0
+3v3ins-x14b2c-doorclosed          0        0      1        1          0
+```
+
+**"不再红"的两形各取一枚**（防把"被跳过"读成"变绿"）：
+① 真绿一枚＝§3.1 的 p1 整包关门跑 `rc=0 100/53/0/0`、`--- SKIP` 行 0 枚、顶层 53 枚与基线同（**跑完了**才绿）；
+② 分母缩小一枚＝v1 轮 X4 的①栏 `RUN 95`（不是 100）：票 128 的门在 `t.Fatalf` 那一行掉自己 5 枚子用例，
+少掉的 5 枚 `=== RUN` 逐名可对（`cmdDoctor`/`cmdModels`/`cmdProviders`/`resolveSecretLayout`/`runTextTask`）——
+**那是被中止，不是没有**。本表的判定不依赖任何一枚"少跑了"的读数。
+
 ### 2.3 与前任读数的分歧（两边都留着）
 
 | 处 | 前任 §2 读数 | 本验收方 | 归因 |
