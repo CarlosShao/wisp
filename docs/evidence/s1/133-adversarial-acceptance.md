@@ -170,7 +170,7 @@ and can't be satisfied by a name-collision on a method"**没有落地**：那句
 | --- | --- | --- | --- | --- |
 | **p4 对照** | 只在 `usage` 里加一行 `wisp sfx131` | rc=0 | **rc=1 红**（诚实的"给人看"那一行不换任何覆盖） | `covered=RED nothing` |
 | **p1 同名方法** | 一枚**方法** `func (phantomRecv133) TestSfx131LegIsDriven() { _ = cmdSfx131(nil) }` ＋ 上面那行 usage | rc=0 | **rc=0 绿** | `leg sfx131 main.go:81 installs=false handoff=false covered=test TestSfx131LegIsDriven drives cmdSfx131` |
-| **p2 不相邻裁决** | `doctor.go` 末尾一行 `// WISP-LEG-COVERAGE-RULING: sfx131 …`（离这条腿的代码 260 行）＋ usage | rc=0 | **rc=0 绿** | `covered=ruling doctor.go:341` |
+| **p2 不相邻裁决** | `doctor.go` 末尾一行 `// WISP-LEG-COVERAGE-RULING: sfx131 …`（与这条腿的 entry 不同文件、相距整枚文件）＋ usage | rc=0 | **rc=0 绿** | `covered=ruling doctor.go:341` |
 | **p3 钉指向 helper** | 把 `legCovers133` 加一行 `{leg:"sfx131", test:"phantomHelper133", entry:"cmdSfx131"}`，`phantomHelper133` 是 `_test.go` 里一枚**非 Test 前缀**的普通 helper | rc=0 | **rc=0 绿** | `covered=nail phantomHelper133 -> cmdSfx131` |
 | **p5 同 case 多标签** | `case "run":` 改成 `case "run", "runalt133":`（不加任何腿的行） | rc=0 | **rc=0 绿**，账本**只有 11 条腿** | `dispatch ledger … (11 legs, 4 claims …)`，`runalt133` 零行 |
 
@@ -327,11 +327,11 @@ $ sh scripts/d22scan.sh                 rc=0   （与被验 CI 那一行逐字�
 | --- | --- | --- | --- | --- | --- |
 | **R-133-1** | **高**（AC#2 退回主因） | 判据 (d) 的"被某枚 `Test*` 驱动"只认**裸名前缀**：`_test.go` 里一枚**方法**（Go 永不运行）同名即可把第五发第二拍的红洗成绿 | **能**。`wisp133-acc-r1` 树：`python wisp133-acc-r1-mutate.py <树> x14b2c` ＋ `python wisp133-acc-r1-probe.py <树> p1` → `go build ./...` rc=0、本尺 rc=0，账本行 `leg sfx131 … covered=test TestSfx131LegIsDriven drives cmdSfx131`；整包关门跑里它没有 `=== RUN`、没有 `--- PASS`，顶层仍 53 枚。日志 `out/P-p1.log`、`out/P-p1-fullpackage-doorclosed.log` | `collectTopLevel133`（:383-384）的 tests 桶按 131 的 :617 收紧：`fd.Recv == nil && HasPrefix(name,"Test")` 且签名为 `func(*testing.T)`；并给这条判据装一枚**主动弄哑自己**的自证腿（AC#3 那一格要求的就是它） | **票 133 续单**（仪器自身，`leg_dispatch_gate_133_test.go`）；AC#2 翻格条件之一 |
 | **R-133-2** | 中 | 本尺自己的钉登记表 `legCovers133.test` 是**字符串**，:1127 只做名字查表；非 `Test*` 的 helper 名也算"钉"，而它的红名文案写的是 "is not a test function" | **能**。同一棵树 `… probe.py <树> p3` → rc=0，账本 `covered=nail phantomHelper133 -> cmdSfx131`（`out/P-p3.log`） | 登记表存**函数值**（同 `registerLegNail131`，131 :225），或至少在查表时校验 receiver 为 nil ＋ 参数表含 `*testing.T` | **票 133 续单**；与 R-133-1 同一处修法，可一并 |
-| **R-133-3** | 中 | `WISP-LEG-COVERAGE-RULING:` 只取标记后第一个 token 当腿名，**不要求与腿的代码相邻、不要求同文件**；红名文案说的 "write the ruling next to the code that owns the leg" 没有判据兜 | **能**。`… probe.py <树> p2`（标记落在 `doctor.go:341`，离 `sfx131` 的 entry 260 行）→ rc=0，账本 `covered=ruling doctor.go:341`（`out/P-p2.log`） | 裁决句必须**点到该腿的 entry 名**并与 `leg.entries`/`leg.site` 所在文件同文件核对；同族洞 `R-131r3-1` 已由编排者裁给票 135，修法可并做，但**这件仪器属 133**，不许因"135 会修"而不修 | **票 133 续单**，并在票 135 面登记同族引用（不新开 135 的格） |
+| **R-133-3** | 中 | `WISP-LEG-COVERAGE-RULING:` 只取标记后第一个 token 当腿名，**不要求与腿的代码相邻、不要求同文件**；红名文案说的 "write the ruling next to the code that owns the leg" 没有判据兜 | **能**。`… probe.py <树> p2`（标记落在**另一枚生产文件** `doctor.go:341`，与这条腿的 entry `cmdSfx131`（`sfx131x.go`）不同文件）→ rc=0，账本 `covered=ruling doctor.go:341`（`out/P-p2.log`） | 裁决句必须**点到该腿的 entry 名**并与 `leg.entries`/`leg.site` 所在文件同文件核对；同族洞 `R-131r3-1` 已由编排者裁给票 135，修法可并做，但**这件仪器属 133**，不许因"135 会修"而不修 | **票 133 续单**，并在票 135 面登记同族引用（不新开 135 的格） |
 | **R-133-4** | 中 | 一个 `case` 多枚标签时只有**第一条**标签出腿（:965 `if key == ""`），第二条命令名整条从账本消失、也不与 usage 双向差撞——X8 那条"腿不许悄悄出账本"的命题在姊妹标签这一形上没守 | **能**。`… probe.py <树> p5`（`case "run", "runalt133":`）→ `go build ./...` rc=0、本尺 rc=0、账本仍是 **11 legs**、整包关门跑 100/53/0/0（`out/P-p5.log`、`out/P-p5-full-doorclosed.log`） | 每条标签各出一行腿（或合成行），使 usage↔census 双向差对每条标签都成立 | **票 133 续单** |
 | **R-133-5** | 低（**未造**，只读码） | `classifyCond133` 两种匹配方向混用：字面量分支 `key, found = v, true` **无 `!found` 守卫**（last-match，:1028），no-args 分支带 `!found`（first-match，:1035）。`if args[0]=="a" \|\| args[0]=="b" {…}` 只留 `"b"` 一条腿 | **不能**——本验收方未造这一发，只登记字节。修法验证需要一发新变异（复合早退条件），下一位请补 | 与 R-133-4 同一个修法方向：每条可归类的 argv 比较各出一行腿 | **票 133 续单**（AC#4 那格的地界，可顺带） |
 | **R-133-6** | 中（证据面） | 前任证据 §3 那句"把本尺摘掉，五发今天仍然**没有任何一枚用例会红**"是**全称量词用假**，与它自己 §2.0.1 的读数（N-3/X4/X8/X12 的①栏各红一枚）互相矛盾 | **能**：§2.1 的①栏四行读数（`out/1v2noins-*.log`、`out/1v3noins-*.log`、`out/1noins-n3.log`） | 把那句改写成"X14 两拍摘掉本尺后零红；另四发摘掉本尺仍由票 131 的门红"。**本验收方不改实现方的件**，只登记 | **票 133 续单**（同一枚证据文件的下一次落笔） |
-| **R-133-7** | 低（AC#5 面，本格不裁） | §5 门禁里"gofofmt/**gofumpt** 真跑"未做（前任 §6.5 自登记）；d22scan"各 scope 不降"无可比历史基线——本验收方在快照上量到 frontend 两枚 scope 40 枚 vs 前任工作树 43 枚，正说明这句现在**只能自证一次、不能证不降** | 能（见 §7.2 末段） | 要么给 d22scan 各 scope 立一枚**进仓的**基线数，要么把"不降"从 AC#5 的判据里划掉 | **票 133 的 AC#5 那一格**（不是 AC#1/AC#2，不阻塞本表两格） |
+| **R-133-7** | 低（AC#5 面，本格不裁） | §5 门禁里"gofmt/**gofumpt** 真跑"未做（前任 §6.5 自登记）；d22scan"各 scope 不降"无可比历史基线——本验收方在快照上量到 frontend 两枚 scope 40 枚 vs 前任工作树 43 枚，正说明这句现在**只能自证一次、不能证不降** | 能（见 §7.2 末段） | 要么给 d22scan 各 scope 立一枚**进仓的**基线数，要么把"不降"从 AC#5 的判据里划掉 | **票 133 的 AC#5 那一格**（不是 AC#1/AC#2，不阻塞本表两格） |
 | **R-133-8** | 信息（不修） | 本验收方 v1/v2 两轮种法各自多点红了另一扇门：种件调 `resolveDataDir` ⇒ 票 128 的门红并 `t.Fatalf` 掉自己 5 枚子用例（分母 100→95）；种件里有裸 `slog.Info` ⇒ 131 的 R-117-1 判据红 | 能，`out/shots.txt`（v1）、`out/shots-v2.txt`（v2）留盘 | 无需修；写给下一位复跑者：**①栏"谁先红"随种法移动**，比较读数前先对齐腿的形状 | 登记，不归任何票 |
 
 ## 9. 总判
@@ -345,7 +345,7 @@ X14 两拍在**无仪器树**上今天确实零红（本尺是独占目击者）
 **AC#2 = 退回。** 三条主张（选清单式／写出另一种形状的例子／不写顺带全覆盖）成立，
 但第 4 条不成立，且不是文字问题：**(a)** "摘掉本尺五发零红"是一句被同一份文件 §2.0.1 推翻的全称断言（R-133-6）；
 **(b)** 更要紧的是它主张的那一列"每枚被分发的腿…被什么覆盖"今天**可以写假**——
-一枚永不运行的同名方法（R-133-1）、一行落在 260 行之外的裁决句（R-133-3）、一个姊妹 case 标签（R-133-4）
+一枚永不运行的同名方法（R-133-1）、一行落在**另一枚生产文件**末尾的裁决句（R-133-3）、一个姊妹 case 标签（R-133-4）
 都能让本尺判绿。这正是票面 AC#2 立的规矩要防的结局，也是票 19／131 两轮的根因族**在这枚新尺里重造了一遍**；
 实现方临终自述的那句收紧（"names real `Test*` cases (not helpers) and can't be satisfied by a name-collision on a method"）
 **实测没有落地**。按本仓硬线：AC 声称要防的结局被造出来 ⇒ 退回，不写附条件通过。
