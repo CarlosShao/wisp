@@ -214,3 +214,8 @@
   它和"吞读数"同族，建议单立一格；③派单提的"`GOOS=linux` 交叉会停在 cgo／`pathresolver` 那形"这一发**实测未成立**（3f 含 `internal/risk` 零输出），只登记差异。
   未自勾 AC#9。证据 `docs/evidence/s1/136-ac8-ac9-impl.md` §4-§7（§6 是 12 条未做的档，含 linux 全仓两态、CI run id、端到端）。
   next=两格都交完 ⇒ 派**非实现者**按票面 AC#8②③／AC#9①②③ 终裁并翻勾；同时请裁 §6.5（要不要补生产码那半件事）与 §4.5（flake 是否另立一格）。AC#10 仍排 133 之后。
+
+- [23:06 +08] agent=worker-ticket136-ac8-ac9 did=**上一条的一处读数更正（append-only，原文不抹）**：我在 AC#9 那条里写既有 flake `TestNoopTaskReturnsToBaseline`"观测 1/9"，那是当时的事实；交完两格后我对**最终工作树**（`f08c247`）又取了一发未变异的整包 `-v`，同一枚仪器**再次命中同一红点**：
+  `rc=1 / RUN=58 / PASS=57 / FAIL=1 / SKIP=0`，红名 `TestNoopTaskReturnsToBaseline`、`goroutine_test.go:33: PerTask mid-task = 2, want 3`（原文 `/d/tmp/wisp136ac8-ac9-final-v.txt`；随后连跑 3 次 58/58 复绿，`/d/tmp/wisp136ac8-ac9-final-r1..3.txt`）。
+  累计：本程约 27 发整包读数命中 2 发（1 发在未变异工作树、1 发在 tree1＋M10）。AC#8／AC#9 的任何判据不因此改动——两格的三态都是在**红名为本程那枚仪器**的读数上判的，且这两发里 `SKIP=0`、`panic=0`。证据 §4.5 与 §5-G4 已同步补记。
+  next=同上（终裁派非实现者）；这条只是把"flake 只出现过一次"这句从我的账里撤掉，别让下一个人按 1/9 去估风险。
