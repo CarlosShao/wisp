@@ -363,3 +363,346 @@ func CountLogFiles(dir string) (int, error) {
 }
 
 var _ io.WriteCloser = (*rollingWriter)(nil)
+
+// ---------------------------------------------------------------------------
+// The early log buffer (ticket 130, ruling "a-with-mirror" in
+// docs/reports/pending-and-issues.md A110 row 3).
+//
+// WHAT IT FIXES. Go runs a package's init() before main(), so a record made
+// from an init() is emitted while the process default logger is still the stock
+// one and no JSONL pipeline exists yet. Today that is one path:
+// internal/risk/winsec_c26.go's init() calls internal/winsec's
+// SetPathResolver, and that function logs the conformance verdict - either
+// "resolver installed" or "refusing to install". Both branches were reaching
+// the terminal and nothing else, so the single most auditable fact about the
+// sealing seam survived only as far as a console that the resident leg does not
+// have.
+//
+// WHY IT LIVES IN THIS PACKAGE. The main package's init() runs after every
+// dependency's, so nothing under cmd/ can catch a record made by another
+// package's init() - that is the trap this ticket's first draft fell into. Go
+// initializes dependencies before dependents, and internal/risk imports
+// internal/observe, so this package's init() is necessarily earlier than the
+// emitting one. internal/winsec must not import this package (the graph runs
+// observe -> secret -> winsec, so the edge would close a cycle - see
+// cmd/wisp/logsink.go's header), which is exactly why the buffer is pushed onto
+// the default logger here rather than pulled by the emitter there.
+//
+// WHY THE CONSOLE COPY IS NEVER SWITCHED OFF. The buffer is a SECOND copy, not
+// a relocation: every record still reaches the console, at the same level gate
+// and exactly once, from the moment this package initializes. (The console
+// handler is a TextHandler rather than the one Go had installed, which is a
+// shape change of the timestamp prefix and nothing else - see init() for the
+// cycle that capturing the stock handler creates.) The failure set of this
+// design is therefore today's failure set plus a record on disk: if the process
+// dies before a listener is installed, or runs a leg that never installs one,
+// everything it would have printed today still prints.
+// ---------------------------------------------------------------------------
+
+const (
+	// earlyLogMaxRecords and earlyLogMaxBytes bound the in-memory copy. The
+	// measured scale is one record per boot (the sealing verdict); 64 records
+	// leaves room for further packages to speak from their init() without
+	// touching a budget. The byte cap is the same 64 KiB the flush buffer uses
+	// (bufferedLogBytes). Neither cap costs filesystem activity at boot, which
+	// is what keeps this out of the D32 cold-read budget.
+	earlyLogMaxRecords = 64
+	earlyLogMaxBytes   = bufferedLogBytes
+
+	// earlyLogOverflowMsg is booked by a replay that hit a cap: "dropped N
+	// records" has to be a fact on disk, not a silent subtraction. The OLDEST
+	// kept message is named because in a boot ordering the earliest record is
+	// usually the cause and the newest one only the effect.
+	earlyLogOverflowMsg = "observe: early log buffer overflow"
+)
+
+// earlyLogBuffer holds the second copy. Package-level because the point of the
+// exercise is records made before any object exists to hold them.
+type earlyLogBuffer struct {
+	mu      sync.Mutex
+	recs    []slog.Record
+	size    int64
+	dropped int
+	first   string // message of the first kept record, named by the overflow record
+	closed  bool   // set by the first replay; later records are the pipeline's job
+}
+
+// earlyLogs is the buffer installed as the buffering half of the process default
+// by the init() below.
+var earlyLogs = &earlyLogBuffer{}
+
+// earlyTeeInstalled keeps the tee this package's init() installed addressable,
+// so a test can pin what its console mirror is: the live process default may have
+// been replaced by any test that calls slog.SetDefault, and the property worth
+// pinning is the one decided at init(). See internal/observe/earlylog_130_test.go.
+var earlyTeeInstalled earlyTee
+
+func init() {
+	// The console copy is a concrete TextHandler, NOT the handler Go had
+	// installed. That is not a style choice and it cost a deadlock to learn:
+	// Go's own default handler is a bridge into the log package, whose output is
+	// in turn bridged back into slog - resolved through slog.Default() at WRITE
+	// time, not at construction time. Capturing it here and then replacing the
+	// default is therefore a cycle: log.Print -> slog.Default -> this tee -> the
+	// captured stock handler -> log.Print -> the same non-reentrant log mutex,
+	// forever. internal/observe's own TestUnknownNameIsLeakSymptom is what
+	// catches it, because Registry.Spawn logs through the default while holding
+	// the registry (it hung this package's gate for 600s the first time).
+	//
+	// The visible cost of the TextHandler is the SHAPE of a pre-install console
+	// line: Go's stock form prints "2026-09-23 11:49:39 INFO msg", the
+	// TextHandler form prints "time=... level=INFO msg=...". Every record this
+	// ticket installs already has the second shape (cmd/wisp/logsink.go's mirror
+	// is the same handler), so the effect is that one line stops being the odd
+	// one out. What is unchanged is the promise ticket 130 is about: the console
+	// still receives the record, exactly once, and the level gate is the same
+	// LevelInfo the stock default applied.
+	tee := earlyTee{
+		buf:    &earlyBufferHandler{b: earlyLogs},
+		mirror: slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo}),
+	}
+	earlyTeeInstalled = tee
+	slog.SetDefault(slog.New(tee))
+}
+
+// FlushEarlyLogRecords replays the buffered early records into next, in the
+// order they were captured, and closes the buffer: after the first call nothing
+// is buffered any more, because the caller has installed a listener that carries
+// records itself. Idempotent - a second call replays nothing.
+//
+// It returns the number of records the handler accepted and the number that will
+// never be seen on disk (over the cap, or refused by the handler). The caller
+// books both counts; a reader holding one file off a disk should be able to tell
+// "no early record happened" apart from "the replay did not run".
+//
+// This is called by cmd/wisp/logsink.go immediately after slog.SetDefault and
+// BEFORE the install record, which is what puts a record made before the
+// listener ahead of the listener's own booking in the same file.
+func FlushEarlyLogRecords(next slog.Handler) (flushed, dropped int) {
+	return earlyLogs.drain(next)
+}
+
+// drain takes the whole buffer under the lock and writes it out unlocked: a
+// handler that calls back into logging must not deadlock against the buffer.
+func (b *earlyLogBuffer) drain(next slog.Handler) (int, int) {
+	b.mu.Lock()
+	recs, dropped, first := b.recs, b.dropped, b.first
+	b.recs, b.size, b.dropped, b.first, b.closed = nil, 0, 0, "", true
+	b.mu.Unlock()
+
+	if len(recs) == 0 && dropped == 0 {
+		return 0, 0
+	}
+	ctx := context.Background()
+	flushed := 0
+	for _, r := range recs {
+		if !next.Enabled(ctx, r.Level) {
+			// Below the installed sink's level: this record was never going to
+			// be a persisted one. Counted, not written.
+			dropped++
+			continue
+		}
+		if err := next.Handle(ctx, r.Clone()); err != nil {
+			dropped++
+			continue
+		}
+		flushed++
+	}
+	if dropped > 0 {
+		rec := slog.NewRecord(time.Now(), slog.LevelWarn, earlyLogOverflowMsg, 0)
+		rec.AddAttrs(
+			slog.Int("dropped", dropped),
+			slog.String("first_kept", first),
+			slog.Int("capacity", earlyLogMaxRecords),
+		)
+		if next.Enabled(ctx, rec.Level) {
+			_ = next.Handle(ctx, rec)
+		}
+	}
+	return flushed, dropped
+}
+
+// add keeps one record if there is room, and reports whether it was kept.
+func (b *earlyLogBuffer) add(r slog.Record) bool {
+	n := earlyRecordSize(r)
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	if b.closed {
+		return false
+	}
+	if len(b.recs) >= earlyLogMaxRecords || b.size+n > earlyLogMaxBytes {
+		b.dropped++
+		return false
+	}
+	if len(b.recs) == 0 {
+		b.first = r.Message
+	}
+	b.recs = append(b.recs, r.Clone())
+	b.size += n
+	return true
+}
+
+// earlyRecordSize is the memory a record costs the buffer. An estimate on
+// purpose - the cap exists to bound retention, not to account exactly.
+func earlyRecordSize(r slog.Record) int64 {
+	n := int64(len(r.Message)) + int64(r.NumAttrs())*8
+	r.Attrs(func(a slog.Attr) bool {
+		n += int64(len(a.Key)) + int64(len(a.Value.String())) + 8
+		return true
+	})
+	return n
+}
+
+// earlyTee is the handler the init() above installs as the process default: one
+// record, the buffer copy first and the console copy second. Buffering first is
+// the order that matters - a console that cannot be written (a detached GUI
+// process, a closed stderr) must not cost the copy that exists to outlive it.
+//
+// Enabled delegates to the console, so the level gate in front of this tee is
+// exactly the gate Go's own default applied: nothing that reaches it today gets
+// dropped by it, and nothing that was dropped before gets kept now.
+type earlyTee struct {
+	buf    *earlyBufferHandler
+	mirror slog.Handler
+}
+
+func (t earlyTee) Enabled(ctx context.Context, level slog.Level) bool {
+	return t.mirror.Enabled(ctx, level)
+}
+
+func (t earlyTee) Handle(ctx context.Context, r slog.Record) error {
+	_ = t.buf.Handle(ctx, r)
+	if t.mirror.Enabled(ctx, r.Level) {
+		_ = t.mirror.Handle(ctx, r)
+	}
+	// No error is propagated: Go's stock default handler never returned one
+	// either, and a record nobody could print is still a record.
+	return nil
+}
+
+func (t earlyTee) WithAttrs(attrs []slog.Attr) slog.Handler {
+	return earlyTee{buf: t.buf.withAttrs(attrs), mirror: t.mirror.WithAttrs(attrs)}
+}
+
+func (t earlyTee) WithGroup(name string) slog.Handler {
+	return earlyTee{buf: t.buf.withGroup(name), mirror: t.mirror.WithGroup(name)}
+}
+
+// earlyBufferHandler is the buffering half of the tee. It keeps the attributes
+// and groups added by With/WithGroup so a logger captured off the default before
+// any listener exists - internal/memory/open.go and internal/agent/loop.go both
+// do exactly that - still contributes the same record shape to the buffer that
+// it contributes to the console.
+//
+// It deliberately does NOT satisfy slog.Handler on its own: WithAttrs and
+// WithGroup are reached through earlyTee, which is the only thing ever installed
+// as a handler, so a chain can never buffer on one side and console on the other.
+type earlyBufferHandler struct {
+	b      *earlyLogBuffer
+	prefix []earlyAttr // chain attributes, in order, each with the groups open when it was added
+	group  []string    // group names open right now, outermost first; a "" name is a no-op
+}
+
+// earlyAttr is one attribute plus the group path it was added under.
+type earlyAttr struct {
+	path []string
+	attr slog.Attr
+}
+
+func (h *earlyBufferHandler) Handle(_ context.Context, r slog.Record) error {
+	own := make([]slog.Attr, 0, r.NumAttrs())
+	r.Attrs(func(a slog.Attr) bool {
+		own = append(own, a)
+		return true
+	})
+	out := slog.NewRecord(r.Time, r.Level, r.Message, r.PC)
+	out.AddAttrs(materializeEarlyAttrs(h.prefix, h.group, own)...)
+	h.b.add(out)
+	return nil
+}
+
+func (h *earlyBufferHandler) withAttrs(attrs []slog.Attr) *earlyBufferHandler {
+	if len(attrs) == 0 {
+		return h
+	}
+	merged := make([]earlyAttr, 0, len(h.prefix)+len(attrs))
+	merged = append(merged, h.prefix...)
+	for _, a := range attrs {
+		merged = append(merged, earlyAttr{path: h.group, attr: a})
+	}
+	return &earlyBufferHandler{b: h.b, prefix: merged, group: h.group}
+}
+
+func (h *earlyBufferHandler) withGroup(name string) *earlyBufferHandler {
+	if name == "" {
+		return h
+	}
+	group := make([]string, 0, len(h.group)+1)
+	group = append(group, h.group...)
+	return &earlyBufferHandler{b: h.b, prefix: h.prefix, group: append(group, name)}
+}
+
+// materializeEarlyAttrs turns a With-chain plus the attributes of one call into
+// the attribute list a handler would print: attributes that are contiguous and
+// share an open group become ONE group attribute, in order, nested as deep as
+// their paths say.
+//
+// The contiguity is not a shortcut, it is what log/slog itself does - a group
+// reopened later prints as a second object with the same key - and getting it
+// wrong here is a silent data loss rather than a shape difference: two
+// same-keyed group attributes in one JSON object are resolved by most parsers by
+// keeping the last, so the first group's attributes would vanish from the file
+// while still being on the console.
+func materializeEarlyAttrs(prefix []earlyAttr, group []string, own []slog.Attr) []slog.Attr {
+	items := make([]earlyAttr, 0, len(prefix)+len(own))
+	items = append(items, prefix...)
+	for _, a := range own {
+		items = append(items, earlyAttr{path: group, attr: a})
+	}
+	if len(items) == 0 {
+		return nil
+	}
+	type openGroup struct {
+		name  string
+		attrs []slog.Attr
+	}
+	var (
+		top   []slog.Attr
+		stack []openGroup
+	)
+	closeTo := func(depth int) {
+		for len(stack) > depth {
+			f := stack[len(stack)-1]
+			stack = stack[:len(stack)-1]
+			values := make([]any, 0, len(f.attrs))
+			for _, a := range f.attrs {
+				values = append(values, a)
+			}
+			nested := slog.Group(f.name, values...)
+			if len(stack) > 0 {
+				stack[len(stack)-1].attrs = append(stack[len(stack)-1].attrs, nested)
+				continue
+			}
+			top = append(top, nested)
+		}
+	}
+	for _, it := range items {
+		depth := 0
+		for depth < len(stack) && depth < len(it.path) && stack[depth].name == it.path[depth] {
+			depth++
+		}
+		closeTo(depth)
+		for i := depth; i < len(it.path); i++ {
+			stack = append(stack, openGroup{name: it.path[i]})
+		}
+		if len(stack) > 0 {
+			stack[len(stack)-1].attrs = append(stack[len(stack)-1].attrs, it.attr)
+			continue
+		}
+		top = append(top, it.attr)
+	}
+	closeTo(0)
+	return top
+}
+
+var _ slog.Handler = earlyTee{}

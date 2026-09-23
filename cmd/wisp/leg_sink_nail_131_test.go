@@ -260,21 +260,56 @@ func msgsOf131(recs []sinkInstallRecord) []string {
 }
 
 // assertInstallRecordFirst131 is AC#2's second clause, shared by every nail
-// here: the listener's own booking record must be record 0 and must name THIS
-// data root. Ordering is not decoration - installLogSink states the invariant
-// ("a sink installed after the first event loses exactly the record it exists to
-// keep"), and a leg that installed its sink after the event under test would
-// satisfy a "the record exists" assertion while breaking the one about when.
+// here: the listener's own booking record must precede the event this file is
+// about, must name THIS data root, and nothing but a record ticket 130 replays
+// from before the listener existed may sit in front of it. Ordering is not
+// decoration - installLogSink states the invariant ("a sink installed after the
+// first event loses exactly the record it exists to keep"), and a leg that
+// installed its sink after the event under test would satisfy a "the record
+// exists" assertion while breaking the one about when.
+//
+// WHY THE FIRST CLAUSE CHANGED SHAPE (ticket 130; the long version of this
+// reasoning is in cmd/wisp/resident_sink_nail_127_windows_test.go's header, for
+// the nail that ticket 130's ruling names explicitly). This used to require the
+// booking to be record 0. Ticket 130's fix moves a package init()'s sealing
+// verdict into the same file AHEAD of the booking, so "record 0 is the booking"
+// stopped being a claim about ordering and became a claim that the replay is
+// missing - after the fix it passes exactly when the defect is present. The
+// comparison therefore moved onto what the old one was protecting: the booking is
+// the landmark, everything in front of it is a replayed boot record, and because
+// every caller here asserts an event record that is neither the booking nor a
+// boot record, that partition is the same "the listener was installed before the
+// event" claim, stated without the incidental index.
+//
+// What this helper deliberately does NOT claim: that a boot record exists. These
+// nails run in-process, and one test binary installs many sinks, so which sink
+// receives the replay is decided by test order. The replay itself is pinned where
+// the process is real - cmd/wisp/early_log_nail_130_windows_test.go and the 127
+// file's subprocess cases.
 func assertInstallRecordFirst131(t *testing.T, s legSink131, dataDir string) {
 	t.Helper()
 	if len(s.records) == 0 {
 		t.Fatal("no records to read: the instrument returned an empty set")
 	}
-	first := s.records[0]
-	if first.Msg != residentInstallMsg {
-		t.Errorf("record 0 = %q, want %q: the leg's own listener booking must precede the event it is blamed for (records: %v)",
-			first.Msg, residentInstallMsg, msgsOf131(s.records))
+	installIdx := -1
+	for i, r := range s.records {
+		if r.Msg == residentInstallMsg {
+			installIdx = i
+			break
+		}
 	}
+	if installIdx < 0 {
+		t.Fatalf("no %q record in the file this leg wrote, so the leg booked no listener at all (records: %v)",
+			residentInstallMsg, msgsOf131(s.records))
+	}
+	for i, r := range s.records[:installIdx] {
+		if r.Msg != residentEarlyResolverMsg {
+			t.Errorf("record %d sits before the listener's booking and is %q, want %q or nothing: a leg that logs "+
+				"something before installLogSink loses exactly the record it exists to keep (records: %v)",
+				i, r.Msg, residentEarlyResolverMsg, msgsOf131(s.records))
+		}
+	}
+	first := s.records[installIdx]
 	if want := logSinkDir(dataDir); first.Dir != want {
 		t.Errorf("install record names dir = %q, want %q: AC#2's judgment is exactly this comparison, and it is the data root of the env the leg was driven with",
 			first.Dir, want)

@@ -30,6 +30,11 @@ package main
 //     the resident leg it means immediately after proc.Boot, which performs no
 //     sealing at all (internal/proc has zero winsec imports). A sink installed
 //     after the first event loses exactly the record it exists to keep.
+//     Ticket 130 closes the one gap this rule cannot reach by itself: a record
+//     made from another package's init() is older than any install this file can
+//     be placed before, because the main package's init() runs last. Those
+//     records are now carried by the buffer in internal/observe/logging.go and
+//     replayed by installLogSink ahead of the install record below.
 //  2. Landing spot: <the env's data root>\logs - the same spelling `wisp slo`
 //     already writes, and the tree ticket 95 put under private-data discipline
 //     (config.toml, the DPAPI blob dir, memory.db and the backups all land
@@ -154,6 +159,18 @@ func installLogSink(dataDir string) (*logSink, error) {
 		// the console content does not change shape when the sink arrives.
 		mirror: slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo}),
 	}))
+	// Ticket 130: replay what this package's init() caught before the listener
+	// existed, into the FILE ONLY, and ahead of the install record below. Not
+	// through slog.Default() - that would print each of them on the console a
+	// second time, and the console already saw them when the early tee in
+	// internal/observe handed them to Go's own default handler.
+	//
+	// Position here is the claim being made: a reader holding one file off a disk
+	// sees the sealing-seam verdict, then this listener's own booking, and can
+	// tell which came first. Redaction is not bypassed - p.Handler() IS the
+	// redactHandler - and an empty buffer costs nothing, so a leg with no early
+	// record keeps the file it had before.
+	earlyFlushed, earlyDropped := observe.FlushEarlyLogRecords(p.Handler())
 	// Book the install itself: a reader holding one file off a disk has to be
 	// able to tell which data root wrote it, and a record of "the listener was
 	// here from this moment" is what makes the ordering claim checkable after
@@ -161,8 +178,11 @@ func installLogSink(dataDir string) (*logSink, error) {
 	// min_level because "level" is the record's own field - a second one in the
 	// same JSON object would be a key collision a parser resolves by taking the
 	// last value, which is how the first version of this line read as
-	// "level":"info" next to "level":"INFO".
-	slog.Info("wisp: persistent log sink installed", "dir", dir, "min_level", logSinkLevel)
+	// "level":"info" next to "level":"INFO". The two early_* counts belong to
+	// ticket 130: without them, "no early record happened" and "the replay never
+	// ran" are the same file.
+	slog.Info("wisp: persistent log sink installed", "dir", dir, "min_level", logSinkLevel,
+		"early_records", earlyFlushed, "early_dropped", earlyDropped)
 	return &logSink{pipeline: p, dir: dir}, nil
 }
 

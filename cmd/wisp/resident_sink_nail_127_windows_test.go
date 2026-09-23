@@ -40,8 +40,30 @@ package main
 // What is deliberately NOT claimed here: this leg has no sealing site today
 // (`proc.Boot` imports no winsec), so the `winsec: seal cleared principals...`
 // WARN cannot be produced by it - see ticket 117 R-117-A and the ticket's own
-// §二. The record nailed below is the install record and the D38(e) shutdown
-// trail, which are the two things this leg really does log.
+// §二. The records nailed below are the install record and the D38(e) shutdown
+// trail, which are the two things this leg really does log, plus the one record
+// ticket 130 replays into this file from before the listener existed.
+//
+// WHY RECORD 0 CHANGED, and what it used to protect (ticket 130, A110 row 3
+// authorization; the intent is kept and the claim gets stronger, not weaker):
+//
+// These cases used to assert `recs[0].Msg == "wisp: persistent log sink
+// installed"`. That sentence was doing two jobs. One was the real claim: the
+// listener's own booking is the landmark in the file, and nothing the process
+// meant to audit precedes the thing that audits it. The other was incidental to
+// the pre-ticket-130 world: since a record made during a package init() could
+// not reach the file at all, the install booking was necessarily the first line
+// - so "index 0" silently also encoded "no boot-time record exists", which is
+// the very defect ticket 130 was opened for. Yesterday's assertion passed BECAUSE
+// the defect was present.
+//
+// The claim after the fix keeps the landmark job and adds to it: record 0 must
+// be the replayed early record, the install booking must come next, every record
+// before the install booking must be one of the replayed ones, and its timestamp
+// must be older than the install booking's. Delete the replay in
+// cmd/wisp/logsink.go and these cases go red again, in the same direction as
+// before - the early record is simply not in the file - so the authorization to
+// touch this nail did not buy a weaker instrument.
 
 import (
 	"bytes"
@@ -85,7 +107,26 @@ const (
 	// nothing attached; on this leg most steps are of that kind, and their
 	// landing in the same file is the ordering proof.
 	residentShutdownRecord = "shutdown step"
+	// residentEarlyResolverMsg is internal/winsec's sealing-seam verdict, emitted
+	// from internal/risk's package init() - before installLogSink can exist - and
+	// replayed into this leg's file by ticket 130's buffer. Copied as a literal on
+	// the same rule as the two above: if the sentence moves, this file has to say
+	// where the boot-time record of the sealing seam went instead.
+	residentEarlyResolverMsg = "winsec: sealing path resolver installed"
 )
+
+// installRecordIndex127 finds the listener's own booking record, the landmark
+// every ordering claim in this file is read against. -1 means the resident leg
+// never booked its sink at all, which is the ticket 117 failure this file was
+// written for.
+func installRecordIndex127(recs []sinkInstallRecord) int {
+	for i, r := range recs {
+		if r.Msg == residentInstallMsg {
+			return i
+		}
+	}
+	return -1
+}
 
 // sinkInstallRecord is one JSONL record with the fields this ticket's claims are
 // about. sinkRecord (logsink_windows_test.go) carries the winsec notice's fields;
@@ -97,6 +138,7 @@ type sinkInstallRecord struct {
 	Msg      string `json:"msg"`
 	Dir      string `json:"dir"`
 	MinLevel string `json:"min_level"`
+	Resolver string `json:"resolver"`
 	Step     int    `json:"step"`
 	Name     string `json:"name"`
 }
@@ -370,22 +412,50 @@ func TestAC1ResidentLegInstallsItsLogListenerOnDisk(t *testing.T) {
 	if len(recs) == 0 {
 		t.Fatalf("%s holds a pipeline file with no record in it", sinkDir)
 	}
-	first := recs[0]
-	if first.Msg != residentInstallMsg {
-		t.Errorf("record 0 = %q, want %q: the install record must be the first thing in the file, "+
-			"or the listener missed its own booking (records: %v)", first.Msg, residentInstallMsg, recs)
+	// Ticket 130 moved what record 0 is. Read the header of this file for why the
+	// claim below is the same job with a stronger fact behind it, and for what
+	// used to make this assertion pass.
+	installIdx := installRecordIndex127(recs)
+	if installIdx < 0 {
+		t.Fatalf("no %q record in the file the resident process wrote (records: %v)",
+			residentInstallMsg, msgsOf127(recs))
 	}
-	if first.Level != "INFO" {
-		t.Errorf("install record level = %q, want INFO", first.Level)
+	first := recs[0]
+	if first.Msg != residentEarlyResolverMsg {
+		t.Errorf("record 0 = %q, want %q: the boot-time sealing verdict must be replayed into this leg's "+
+			"file ahead of the listener's own booking. If the booking is record 0 again, the replay in "+
+			"cmd/wisp/logsink.go is gone and ticket 130's gap is open (records: %v)",
+			first.Msg, residentEarlyResolverMsg, recs)
+	}
+	if first.Resolver == "" {
+		t.Errorf("record 0 carries no resolver attribute, so it is not the sealing-seam verdict this leg booted with: %v", first)
+	}
+	if installIdx != 1 {
+		t.Errorf("install booking is record %d, want 1: the replayed early records come first and nothing else "+
+			"may sit before the booking (records: %v)", installIdx, msgsOf127(recs))
+	}
+	booking := recs[installIdx]
+	earlyTime, earlyErr := time.Parse(time.RFC3339Nano, first.Time)
+	bookingTime, bookingErr := time.Parse(time.RFC3339Nano, booking.Time)
+	switch {
+	case earlyErr != nil || bookingErr != nil:
+		t.Errorf("the stamps are not the RFC3339Nano form the pipeline writes: early %q (%v), booking %q (%v)",
+			first.Time, earlyErr, booking.Time, bookingErr)
+	case !earlyTime.Before(bookingTime):
+		t.Errorf("the replayed record's stamp %s is not older than the booking's %s: a replay that re-dates the "+
+			"record it rescued says the listener decided to speak, not that the boot did", earlyTime, bookingTime)
+	}
+	if booking.Level != "INFO" {
+		t.Errorf("install record level = %q, want INFO", booking.Level)
 	}
 	// WISP_TEST_DATA_DIR is an identity contract (internal/proc/envfork.go): it
 	// comes back verbatim, so this comparison is exact and not a tree match.
-	if first.Dir != sinkDir {
+	if booking.Dir != sinkDir {
 		t.Errorf("install record names dir = %q, want %q: the resident listener must book the data root it was booted with",
-			first.Dir, sinkDir)
+			booking.Dir, sinkDir)
 	}
-	if first.MinLevel != "info" {
-		t.Errorf("install record min_level = %q, want the schema default %q", first.MinLevel, "info")
+	if booking.MinLevel != "info" {
+		t.Errorf("install record min_level = %q, want the schema default %q", booking.MinLevel, "info")
 	}
 
 	leg.stop()
@@ -394,6 +464,13 @@ func TestAC1ResidentLegInstallsItsLogListenerOnDisk(t *testing.T) {
 	// bought by another writer that happened to use the same directory.
 	if !leg.stderr.has(residentInstallMsg) {
 		t.Errorf("the install record never reached the child's console; the fan-out went one way only.\n%s", leg.console())
+	}
+	// Ticket 130's other half, on this leg: the copy that got a second home in
+	// the file keeps its first one. Zero means the mirror was switched off to
+	// make the file cheap; two means the replay double-printed.
+	if n := strings.Count(leg.stderr.String(), residentEarlyResolverMsg); n != 1 {
+		t.Errorf("the boot-time sealing verdict reached the child's console %d times, want exactly 1 "+
+			"(a-with-mirror: never switched off, never doubled).\n%s", n, leg.console())
 	}
 	if !leg.stdout.has(residentReachedLoop) {
 		t.Errorf("the child never reached the event loop, so the disk read above proves little.\n%s", leg.console())
@@ -460,8 +537,9 @@ func TestAC1ResidentLegOutlivesItsOwnLogFailure(t *testing.T) {
 //
 // So the child is asked to leave the loop the way an operator does (Ctrl+C,
 // here a CTRL_BREAK_EVENT addressed to its own process group, which Go's console
-// handler raises as os.Interrupt), and the file then has to carry both halves:
-// the install record first, the shutdown trail last.
+// handler raises as os.Interrupt), and the file then has to carry all three
+// halves in this order: the boot-time record ticket 130 replays, the install
+// booking, the shutdown trail last.
 func TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink(t *testing.T) {
 	exe := buildWispForTest(t)
 	dataDir := t.TempDir()
@@ -505,18 +583,30 @@ func TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink(t *testing.T) {
 		t.Fatalf("%s holds a pipeline file with no record in it, so the ordering has nothing to be read out of; the leg exited %s",
 			sinkDir, leg.exitStatus())
 	}
-	if recs[0].Msg != residentInstallMsg {
-		t.Fatalf("record 0 = %q, want the install record: the trail below cannot be read as \"the listener caught the shutdown\" unless it starts with the listener (records: %v)", recs[0].Msg, recs)
+	if recs[0].Msg != residentEarlyResolverMsg {
+		t.Fatalf("record 0 = %q, want %q: the trail below cannot be read as \"the listener caught the shutdown\" "+
+			"unless the file starts where the process started - and record 0 being the booking again means the "+
+			"replay of the boot-time sealing verdict is gone (records: %v)",
+			recs[0].Msg, residentEarlyResolverMsg, recs)
+	}
+	installIdx := installRecordIndex127(recs)
+	if installIdx < 0 {
+		t.Fatalf("no %q record in the file, so the shutdown trail has no landmark to be read against (records: %v)",
+			residentInstallMsg, msgsOf127(recs))
+	}
+	if installIdx != 1 {
+		t.Fatalf("install booking is record %d, want 1: only the records ticket 130 replays may precede the "+
+			"listener's own booking (records: %v)", installIdx, msgsOf127(recs))
 	}
 	var trail []sinkInstallRecord
-	for _, r := range recs[1:] {
+	for _, r := range recs[installIdx+1:] {
 		if strings.Contains(r.Msg, residentShutdownRecord) {
 			trail = append(trail, r)
 		}
 	}
 	if len(trail) == 0 {
 		t.Fatalf("the D38(e) trail is not in the file the same process closed: %d record(s) after the install, all msgs %v",
-			len(recs)-1, msgsOf127(recs))
+			len(recs)-installIdx-1, msgsOf127(recs))
 	}
 	last := recs[len(recs)-1]
 	if !strings.Contains(last.Msg, residentShutdownRecord) {
