@@ -100,3 +100,31 @@ AC#1 的读数比票面预期大一个量级：**全 30 枚包里 132 枚只在�
 它没有按派单要求"渐进写"，而是**三枚样本齐了一次入库**，理由是"没跑完的样本只写'待量'会造出半成品读数"。
 ⇒ **追认这次偏离**（它与我 14:2x 新立的"注释不许先于读数"同向），但把口径写清：
 **渐进写的对象是"已成立的事实"，不是"半成品"**——拿不准时按它这样做，别拿"没渐进写"当违规。
+
+## AC#2b 的放行与分批（09-23 16:33 编排者，依据 `worker-ticket124-ac2a` 的 `docs/evidence/s1/124-ac2a-leg-classification.md`）
+
+清点结论：**可转 131 / 拒绝腿 0 / 待裁 1**。⇒ "不许变绿"那份名单是**空集**，
+凡名字或断言里带"拒/Refuses/want Err"的（winsec 的 `AC5 FailedSeal`、`AC118` 两枚 leaf-link、三枚 AC3 反向腿，memory 两枚 `ErrSchemaUnmigratable`，
+tools 的回收站那枚、approval 的无门拒 L1、llm 的 `RefusesSilentRuns`）都被逐字回查过它在软链形**实际拿到**的字符串，
+确认它们要的是**另一种拒或成**，不是"未解析根必须被拒"。
+
+- ⚠ **先订正一个我反复引用的数字**：在 `bcb03aa` 上实测 only-in-link 是 **133 枚，不是我说的 132**——
+  多出的那枚是 `internal/tools/TestLateVetoRendersTheApprovalLayersAppliedStepsReport`（`FAIL 300.02s`／普通形 `PASS 3.00s`），
+  与 `TestL1Write` 同属 **C18 审批超时族**、不是未解析根。⇒ **AC#1 只逮到前者、漏了这枚**。
+  两枚一并**归口票 123**，不进本票的清零目标。
+- **放行 AC#2b，但强制分批**（今天已有两枚代理撞 150 轮上限被掐，131 枚一次派完必再撞）。批次与每批的结案判据：
+  | 批 | 范围 | 枚数 |
+  |---|---|---|
+  | **2b-1** | `internal/memory` 33 ＋ `internal/config` 7 | 40 |
+  | **2b-2** | `internal/tools` 20 ＋ `internal/llm` 17 ＋ `internal/perm` 5 ＋ `internal/agent/approval` 1 | 43 |
+  | **2b-3** | `internal/agent` 26 ＋ `internal/winsec` 17 | 43 |
+  | **2b-4** | `cmd/wisp` 5 | 5 |
+  ⚠ **2b-4 排在 `acceptor-ticket131-r3` 交回之后**——那 5 枚在 `cmd/wisp/**`，而 r3 正锚在 `bcb03aa` 复验那一包（**文件级冲突，不是包级**）。
+- **每一批共用的结案判据**（缺一不翻格）：
+  ① 该批逐枚"软链形红 ⇒ 转后绿"，红名数按批递减并**点名到用例自己**；
+  ② **普通形一枚都不许多红**（`git diff` 证判定分支未动，接票面 AC#3）；
+  ③ **两形各取一枚**、两形 RUN/SKIP 差**逐包解释**（防"被跳过"冒充"被修好"，见票面 15:3x 那条附带发现）；
+  ④ 清点账上那三条硬提醒逐条落地：**交给子进程的根也要解析**（`memory.TestCrashRecoveryKillMidWrite` 走 `WISP_CRASH_DIR`）、
+     **六枚"另一种拒"复算时须各自仍拿到它自己要的拒**、**归零结论必须两形都有**；
+  ⑤ 全部批次做完的终判据：**软链形红名数 ＝ 0**（本票范围内；`TestL1Write`／`TestLateVeto` 两枚除外，它们归票 123）。
+- **AC#2a 已翻格**（清点方自己翻，附 5 枚 commit、零 `.go` 改动）。**AC#2 本格保持未勾**，等 2b-1..2b-4 全绿再按复算翻。

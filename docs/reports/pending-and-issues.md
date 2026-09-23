@@ -3938,3 +3938,19 @@ A40② 说最近三个 **push** run 是 `cancelled`。我又查了两步，**排
   代理的处置（关键结论一律另找独立仪器重取）与本页 §5 第 4 条同向，**照此执行、不升级**。
 - **A122⑥ 编队（16:0x）**：在飞 **3 枚**——`acceptor-ticket134-r1`（验收票 134 六格，重点打"假 report 能不能给 P3 续命"）·
   `worker-ticket124-ac2a`（132 枚的断言方向账）· `acceptor-ticket131-r3`（刚派的复验）。票 131 的 AC#4 **保持未勾**，等 r3。
+
+## 编排者登记 A123（09-23 16:33，**票 124 的清点把"要不要留红"这个问题直接归零了：131 枚可转、0 枚拒绝腿**）
+
+- **A123① 清点结论**（`worker-ticket124-ac2a`，锚 `bcb03aa`，账本 `docs/evidence/s1/124-ac2a-leg-classification.md` 132 行逐枚、5 枚 commit **零 `.go` 改动**）：
+  **可转 131／拒绝腿 0／待裁 1**。⇒ 我原先给 AC#2 设的那句"默认归类是可转、要判拒绝腿必须拿断言原文证明"**被真的执行了**，
+  而且它没有靠名字下判——凡带"拒/Refuses/want Err"的都用**软链形实际拿到的字符串**回查过（winsec 的 `AC5 FailedSeal` 要的是注入的 `ErrNotSealable`、
+  `AC118` 两枚要的是 leaf 位置那条指向外人的软链、memory 两枚要的是 `ErrSchemaUnmigratable`……**全不是"未解析根必须被拒"**）。
+- **A123② 它纠了我一个反复引用的数字**：only-in-link 在 `bcb03aa` 上是 **133 枚，不是我一路引用的 132**——
+  多出的是 `internal/tools/TestLateVetoRendersTheApprovalLayersAppliedStepsReport`（`FAIL 300.02s`／普通形 `PASS 3.00s`），
+  与 `TestL1Write` 同属 **C18 审批超时族**。**AC#1 只逮到前者、漏了这枚**。⇒ 两枚归口票 123，不进本票清零目标。
+  ⚠ 教训同族再记一次：**"红名清单"会随时间长大**，任何"共 N 枚"的说法都要带锚点 sha，否则下一位拿它当分母就错。
+- **A123③ 放行 AC#2b 但强制分批**（今天两枚代理撞 150 轮上限，131 枚一次派完必再撞）：2b-1 memory+config 40 · 2b-2 tools/llm/perm/approval 43 ·
+  2b-3 agent+winsec 43 · **2b-4 `cmd/wisp` 5 排在 `acceptor-ticket131-r3` 之后**（文件级冲突）。
+  每批共用五条结案判据（逐枚转绿点名／普通形一枚都不许多红／**两形各一枚且 RUN-SKIP 差逐包解释**／账上三条硬提醒逐条落地／终判据软链形红名归零）。
+- **A123④ 计数新规矩第二次生效**：清点方交回**两个数**（真通知回显 3／判为注入 0），并明确"那两块 `[SYSTEM NOTIFICATION]` 是我自己后台的真完成事件、run-id 对得上"。
+  ⇒ 昨天那个"一个字段装两种东西"的坏形状已经不再制造失真。
