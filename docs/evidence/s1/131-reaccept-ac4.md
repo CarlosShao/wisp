@@ -401,7 +401,8 @@ package other than this one is still invisible to a name walk"）。这句话此
 `holder131.open(root)` + `defer sink.close()`）＋ `main.go` 的 `switch` 里插 `case "sfx131": os.Exit(cmdSfx131(args[1:]))`。
 **不碰任何测试文件。**
 
-- `go build` rc=0、`go vet` rc=0、`gofmt` 空。
+- `go build` rc=0、`go vet` rc=0。（⚠ 诚实登记：我那枚**自己造的** `sfx131.go` 第一版被 `gofmt -l` 点出来——是我拼字符串时
+  把 Go 源码里的 `\n` 写坏了，`gofmt -w` 之后才 build；**被验树自身 `gofmt -l cmd/wisp/` 始终为空**，两拍的读数都取自格式化之后。）
 - **这条腿在真二进制上是活的**（`/tmp/wisp131-r3-z1.exe sfx131 <根>` rc=0）：
   `msg="wisp: persistent log sink installed" dir=<根>\logs` ⇒ 落出 `wisp-20260923-001.jsonl`，第 2 行就是那条 booking。
 - `go test -count=1 -v ./cmd/wisp/` ⇒ **rc=0，`RUN 100 / 顶层 53 / 0 / 0`**，门 `--- PASS`，`AC#4 RED` 命中 **0**，账本原文：
