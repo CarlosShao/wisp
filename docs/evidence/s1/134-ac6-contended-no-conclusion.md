@@ -304,3 +304,153 @@ push.branches = ['main', 'dev'] | schedule = [{'cron': '37 19 * * *'}] | pull_re
 step 级 `if` / `continue-on-error` 在 `slo-full` 五枚 step 上仍是 `NONE`，`extra keys = []`。
 全文件 `grep -cE '^[[:space:]]+continue-on-error:'` = **0**；`^[[:space:]]+if:` = 9 行（`:178 :215 :291 :351 :389 :399 :421 :457 :473`），
 **逐行都在 `slo-full` 之外**（`slo-full:` 的 job 键现在在 `:537`），与钉的 P1 探针同源。
+
+---
+
+## 2. 后半（收紧）：新鲜度钉改按「最近一次产出有效样本的记录」计龄
+
+### 2.1 判据物到底是什么、从哪儿读（正面回答交回项 ④）
+
+**判据物** = GitHub Actions 里**名字恰为 `slo-full-report` 的最新一枚未过期 workflow artifact** 的 `created_at`。
+读法 = `GET /repos/{owner}/{repo}/actions/artifacts?per_page=100&page=N`（`gh api`，N = 1..`SLO_FULL_ARTIFACT_PAGES`，默认 3），
+jq 里三条件：`.name=="slo-full-report"` + `.expired==false` + 取 `(.created_at, .workflow_run.id, .id)`，**逐页取 max(`created_at`）**。
+
+它为什么等价于"取到了有效样本"（三段都在同一枚 commit 里可核）：
+1. `ci.yml` 的 `Upload SLO report` 那一步 `path:` **只写死一枚文件** `build/slo/slo-report.json`；
+2. `scripts/slo-check.ps1` 只在**真跑完六态 + settle + leak** 之后才 `Set-Content` 那枚文件；
+   争用路径开局就把上一轮遗留的 `*.json` 清掉，然后打 `0 state file(s) written, slo-report.json NOT written` 并 exit 0；
+3. `actions/upload-artifact@v4`（= runner 今天真下载的 `ea165f8d…`，见 §1.2）在 `filesToUpload.length === 0` 时
+   **根本不进上传那支** ⇒ 不创建 artifact。
+
+⇒ 「artifact 在」= 「report 在」= 「数字在」。**不是 job 的 conclusion**（这一点 §2.3 的 T1 直接用一发读数钉死：
+job 那侧全绿、钉照样红）。
+
+### 2.2 `scripts/slo-freshness.sh` 改了什么
+
+`git diff --numstat` = `198 28`（对照锚点 blob `5a4a339a…`）。三处：
+
+- **P3 新增**（本节全部读数都打在它上面）。两个新失败令牌：`slo-full-sample-stale` / `slo-full-sample-never`。
+- **P2 保留不动**（判据、阈值、12 小时 queued 那支一字未改）。留着的理由写进了文件头：
+  P2 仍是**唯一**看得见"job 卡在 queued 永不启动 = 另一种静默死"的探针；P3 看不见那形（没 artifact 也没 report，
+  但也没人在跑）。两枚探针各查一种死法，阈值分叉独立（`SLO_FULL_MAX_AGE_DAYS` / `SLO_FULL_SAMPLE_MAX_AGE_DAYS`，默认都 3 天）。
+- **顺带纠一处腐坏的引用**：P1 注释原文写「measured: ci.yml carries **6** such lines outside slo-full」，
+  2026-09-23 复测是 **9**（8 枚 `if: ${{ !cancelled() }}` + 1 枚 `if: always()`，逐行行号已写进注释）。
+  只改注释，判据一字未动。
+- **一处防漂移的小重构**（被自己的变异逼出来的，见 M6）：artifact 名字在脚本里原本要写两遍（jq 里一遍、消息里一遍），
+  改成单一常量 `sample_artifact=slo-full-report`（**普通赋值，不是 env 接缝**）——否则"改了过滤器忘了改文案"
+  这种漂移可以造出一枚自称读了 D32 样本、实际读的是别家 artifact 的钉。
+
+新接缝（都只塑造**输入**，没有一个能关掉探针）：`SLO_FULL_LAST_SAMPLE` 注入一枚有效样本记录；
+取值 `none` = 造"扫描回来一份都没有"的世界（只会更红，不会更绿，M5b 专测这条）；
+`SLO_FULL_ARTIFACT_PAGES` 只改扫描页数；`can_look()` 把"查不了 ⇒ exit 2"从 P2 一处扩到两枚探针共用。
+
+### 2.3 硬判据：红 → 绿 → 红三态（**逐字**，final script 上跑的）
+
+世界设定（这就是 AC#6 说的那局面）：**job 侧每枚都新鲜**（注入一枚 1 小时前 `completed/success` 的 job 记录，
+P2 判绿），**盘上最近一枚真 report 是 10 天前**（这一条不打诳语：P3 读的是**真 API**，
+只把 `SLO_FRESH_NOW` 拨到 `2026-10-03T04:44:08Z`，也就是"最新那枚 report 已经 10 天"）。
+
+```
+### T1 RED (final script)
+slo-freshness: P2 newest slo-full job record: created_at=2026-10-03T04:00:00Z status=completed conclusion=success
+slo-freshness:   job url: https://github.com/CarlosShao/wisp/actions/runs/0/job/0
+slo-freshness:   age: 0 day(s) (2648 s); threshold: 3 day(s)
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T04:44:08Z artifact_id=10733125568 run=35819355656
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 70 valid-sample record(s) considered
+slo-freshness:   age: 10 day(s) (864000 s); threshold: 3 day(s)
+slo-freshness: FAIL slo-full-sample-stale: the last VALID SLO SAMPLE is 10 day(s) old (> 3). Jobs may well be green - since ticket 134 AC#6 a machine-contended run exits 0 without a report - so a green job is not the question. The question is when numbers last existed, and that was 2026-09-23T04:44:08Z (run 35819355656). D32 has been unverified since then.
+slo-freshness: 1 probe failure(s) - ticket 134 AC#3/AC#6 nail is red
+RC=1
+### T2 GREEN (SLO_FULL_SAMPLE_MAX_AGE_DAYS=30)
+（同上三行 P2 读数不变）
+slo-freshness:   age: 10 day(s) (864000 s); threshold: 30 day(s)
+slo-freshness: OK - slo-full still has automatic triggers, a trigger record inside the window, and a VALID SAMPLE inside the window
+RC=0
+### T3 RED again (env removed)
+slo-freshness:   age: 10 day(s) (864000 s); threshold: 3 day(s)
+slo-freshness: FAIL slo-full-sample-stale: ... （与 T1 同一枚令牌、同一句原文）
+RC=1
+```
+
+⇒ **红→绿→红齐**，且绿那一发**只由阈值放宽造成**（同世界同数据，只改 `SLO_FULL_SAMPLE_MAX_AGE_DAYS`）——
+证明红是判据咬的、不是常数红。**三发里 P2 那三行都是绿的** ⇒ 直接可视化"job 年龄这枚钉在 AC#6 之后就是装饰"。
+
+### 2.4 其余读数（同一次会话连跑，逐字要点）
+
+**L0 真跑、零接缝、真 API（今天的真实状态）**：
+
+```
+slo-freshness: P2 newest slo-full job record: created_at=2026-09-23T05:37:21Z status=completed conclusion=failure
+slo-freshness:   job url: https://github.com/CarlosShao/wisp/actions/runs/35823168549/job/107059176883
+slo-freshness: P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T04:44:08Z artifact_id=10733125568 run=35819355656
+slo-freshness:   scanned 3 page(s) x 100 of the artifact listing; 70 valid-sample record(s) considered
+slo-freshness: OK - ...
+RC=0
+```
+
+⇒ 两件事一次看清：`conclusion=failure` 的 job（那一枚就是本代理 §0 那枚 commit 被 push 之后的 run，争用红的）
+与"最新有效样 04:44:08Z"是**两个问题**；且 3 页 300 条 artifact 里 `slo-full-report` 命中 **70 枚**（去重后参与取 max）。
+
+**M4（判据独立性）**：同一 +10d 世界，只放宽 **P2** 的阈值（`SLO_FULL_MAX_AGE_DAYS=30`）⇒ **仍 RC=1**，
+令牌仍是 `slo-full-sample-stale`。⇒ P3 不是 P2 的别名，两枚旋钮各管各的。
+
+**M5 / M5b（一份 report 都没有的世界）**：`SLO_FULL_LAST_SAMPLE=none` + job 新鲜 ⇒
+
+```
+slo-freshness: FAIL slo-full-sample-never: no uploaded slo-full-report artifact at all (SLO_FULL_LAST_SAMPLE=none (fixture: scan returned no slo-full-report artifact)). slo-full is being triggered but has produced no valid sample that this pin can see - which since AC#6 is NOT the same question as 'is the job green'. D32 (Sleeping CPU <=0.5%, private RSS <=25MB) is unverified.
+RC=1
+```
+
+M5b：同世界把 `SLO_FULL_SAMPLE_MAX_AGE_DAYS` 放宽到 30 ⇒ **仍 RC=1**（`none` 不是关探针的口令）。
+
+**M6 / M6b（过滤器是有牙的还是装饰？）**：把 /tmp 副本里的 `sample_artifact` 换成 `slo-smoke-report`，
+其余一字不动，跑真 API：
+
+```
+M6  : P3 newest VALID SAMPLE: artifact slo-smoke-report  created_at=2026-09-23T05:39:19Z artifact_id=10734395325 run=35823168549 ; 100 record(s) considered
+M6b : P3 newest VALID SAMPLE: artifact slo-full-report   created_at=2026-09-23T04:44:08Z artifact_id=10733125568 run=35819355656 ;  70 record(s) considered
+```
+
+⇒ 换掉一枚字符串，读到的"最新样"就换了：**过滤器真在起作用**，不是常数。更要命的是 M6 那枚读到的
+`run=35823168549` 正是**本票据 commit 被 push 的那枚 run——它的 `slo-full` job 是争用红的、什么都没采样**，
+而 hosted 的 `slo-smoke` 上传了报告。⇒ 如果 P3 的名字写错成 smoke，它会在全机零 D32 样本的日子里报"样很新鲜"。
+这条同时解释 §2.2 里那处"单一常量"重构为什么不是洁癖。真文件复核：`grep -c slo-smoke-report scripts/slo-freshness.sh` = **0**，
+变异只活在 `/tmp/134ac6/mut/`。
+
+**M7（没有"查不了=通过"）**：`env -u GH_TOKEN -u GITHUB_TOKEN`、两个注入接缝都空 ⇒
+
+```
+slo-freshness: no GH_TOKEN/GITHUB_TOKEN - the freshness probes cannot look (this is not a pass)
+RC=2
+```
+
+**M8 / M9（P1 在本格改动之后仍有牙）**：`/tmp` 里的 ci.yml 副本给 `slo-full:` 塞一行
+`if: ${{ !cancelled() }}` ⇒ `RC=1 slo-full-trigger-missing: the slo-full job now carries 'if:'`；
+再删掉 `- cron:` 那行 ⇒ 两条同时红（`no 'cron:' schedule entry` + `carries 'if:'`）。
+⇒ 我把 `if-no-files-found: error` 改成 `warn` 之后，P1 那枚 `^[[:space:]]+if:` 锚**没有被同名前缀糊住**
+（`if-no-files-found:` 不匹配 `^ *if:`，实测 M8 仍能红），真文件跑 P1 也是绿的（L0）。
+还原证明：`grep -c "if: \${{ !cancelled() }}" .github/workflows/ci.yml` = 11，但其中**只有 8 枚**是步级条件行（把行首锚与行尾锚都加上的 `grep -cE` 复算 = 8，
+另 3 枚是注释里出现同一串字符的行），再算上 `:291` 那枚 `if: always()` 才是 P1 说的 9 枚真条件行；
+`git diff --numstat .github/workflows/ci.yml` 为空（本程改动已入库），变异文件全在 `/tmp`。
+
+### 2.5 P3 的边界（写在这里，不留到下次才发现）
+
+1. **出了数而数不过 ⇒ 不算"有效样本记录"**：`all_pass=false` 那枚 run `exit 1`，默认 `success()` 语义下
+   `Upload` 那一步根本不跑 ⇒ 无 artifact ⇒ P3 的钟不动。**故意如此**（那种 run 自己就是红的，
+   把它计入"样很新鲜"会让一枚长期红的门看起来健康）。今天有一枚实例：§0.4 的 `35806505339`。
+2. **扫描上限 `SLO_FULL_ARTIFACT_PAGES * 100`**（今天 300 条 ≥ 全仓 168 条）。越界时是**部分扫描**，
+   部分 max 只会**偏旧** ⇒ 误差方向是**偏红**，不会偏绿。
+3. **能伪造绿的路径只剩一条，且不在钉的地界内**：谁要能让 P3 读到假"有效样本"，就得**上传一枚名字恰为
+   `slo-full-report` 的 artifact**——那需要本仓一枚通过鉴权的 Actions run（编辑 ci.yml 的同一条信任边界），
+   而那条边界由 P1 + `tools/d22scan` + review 看着。**删 artifact 不能骗绿**（只会更红）。P3 不下载 zip、
+   不看内容：它只回答"最近一次有 report 存在是什么时候"。
+4. **保留期**：artifact 默认留 90 天（P3 今天读到的那枚 `slo-full-report` id=10733125568 的
+   `expires_at=2026-12-22T04:41:33Z`，`expired=false`）。3 天窗离 90 天很远；顺带一条实测：列表端点
+   **不给** `file_count`/`state`（读回来是 null），所以 P3 只能用 `name` + `expired` + `created_at` 三件，
+   想"顺手验一下 artifact 里有几个文件"这条路在这个端点上不存在（要验内容就得下 zip，另说）。
+   `.expired==false` 那一条是防"拿一枚已过期的当有效样"，不是防 retention 到期。
+5. **PR run 的 artifact 也计入**：`on.pull_request` 无分支过滤，PR 上跑出来的 `slo-full-report` 名字相同 ⇒
+   会被算作"出过样"。这不是漏洞而是**放宽**（真出过样），且 P2 那侧仍只看 main/dev；本仓目前无 PR 通路在用。
+6. **P3 不看 job 在哪个 run 里**：它信 artifact 的 `created_at`。若 runner 时钟漂了，
+   漂向未来的 report 会显得更新 —— 但这枚 report 的时间戳是 **GitHub 服务端**写入的（artifact `created_at`），
+   不是 runner 报的，所以这条不适用；真正的外部时钟是钉自己的 `now`（`date -u +%s`，ubuntu runner）。

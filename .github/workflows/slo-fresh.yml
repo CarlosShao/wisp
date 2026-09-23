@@ -22,6 +22,21 @@ name: slo-fresh
 #   slo-full-never-triggered   no slo-full job in the 25 newest ci runs
 #   slo-full-stale             newest trigger record older than 3 days
 #
+# Ticket 134 AC#6 (Q-36, owner 2026-09-23) added a second kind of death to
+# watch for, because the gate's colouring rule changed under AC#3's assumptions:
+# a machine-contended slo-full run now exits 0 and uploads no report, so the
+# job record stays "fresh" forever while D32 goes unverified. Ageing on trigger
+# records can no longer see that, so scripts/slo-freshness.sh grew probe P3 and
+# two more tokens:
+#   slo-full-sample-never      no slo-full-report artifact exists at all
+#   slo-full-sample-stale      the newest VALID SAMPLE is older than
+#                              SLO_FULL_SAMPLE_MAX_AGE_DAYS (default 3 days)
+# P3 reads the newest `slo-full-report` workflow artifact through the Actions
+# API - the same `actions: read` this workflow already asks for, nothing more -
+# because an artifact exists only when the gate actually produced numbers. It is
+# deliberately NOT the job conclusion, and it does not care what colour the
+# slo-full job is.
+#
 # No `if:`, no continue-on-error, no path filter, no skip flag (D22 mode-6).
 # Like every other cron here, this schedule is only evaluated for the config on
 # the DEFAULT BRANCH, so it is inert until this file reaches main - stated as a
