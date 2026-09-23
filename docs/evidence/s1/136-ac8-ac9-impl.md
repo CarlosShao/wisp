@@ -281,14 +281,14 @@ TestCheckSettleZeroTrustworthySamplesFailsClosed 同发仍 PASS
 
 ### 4.5 顺带量到的一枚既有 flake（登记，不归本程修、不影响任何判据）
 
-`TestNoopTaskReturnsToBaseline`（`internal/observe/goroutine_test.go:33`）在本程窗口内命中 **1 次**：
+`TestNoopTaskReturnsToBaseline`（`internal/observe/goroutine_test.go:33`）在本程窗口内命中 **2 次**：
 
 ```
 --- FAIL: TestNoopTaskReturnsToBaseline (0.00s)
     goroutine_test.go:33: PerTask mid-task = 2, want 3
 ```
 
-出处：tree1＋M10 的第一发整包读数（`/d/tmp/wisp136ac8-ac9-tree1-M10-nailless-v.txt`）。同一棵树同一发复跑两次＝56/56 rc=0；未变异的 tree1 连跑 5 次＝5/5 全绿（`/d/tmp/wisp136ac8-ac9-tree1-flake1..5.txt`）⇒ 观测频次 1/9。成因读码可辨：`reg.Spawn` 后立刻读 `RosterReport().PerTask`，未获调度则少计。**它不是本程造的**（本程未碰 `goroutine_test.go`，`git diff 1d38206..HEAD -- internal/observe/goroutine_test.go` 无输出），但它是**下一位读数的人会撞到的东西**，且它落在"吞读数判据"的同一族里（一枚仪器偶发把包级 rc 判红），值得单立一格——本程不动它。
+两处出处：①tree1＋M10 的第一发整包读数（`/d/tmp/wisp136ac8-ac9-tree1-M10-nailless-v.txt`）；②**交完两格之后、最终工作树（`f08c247`）的未变异整包读数**（`/d/tmp/wisp136ac8-ac9-final-v.txt`，`rc=1 / RUN=58 / PASS=57 / FAIL=1 / SKIP=0`，红名就是它）。同一棵树随后连跑 3 次全绿（`/d/tmp/wisp136ac8-ac9-final-r1..3.txt`），tree1＋M10 那发也连跑两次 56/56 rc=0，未变异 tree1 连跑 5 次 5/5 全绿 ⇒ 本程约 27 发整包读数里命中 2 发。**它不是本程造的**（本程未碰 `goroutine_test.go`，`git diff 1d38206..HEAD -- internal/observe/` 只有我那两枚文件），但它是**下一位读数的人会撞到的东西**，且它落在"吞读数判据"同一族里（一枚偶发仪器把包级 rc 判红、把"谁都没错"读成"这一包失败"），值得单立一格——本程不动它。
 
 ---
 
@@ -331,6 +331,8 @@ $ /d/work/base/gopath/bin/gofumpt.exe -l internal/observe/
 | --- | --- | --- | --- | --- | --- | --- |
 | 改前 | tree0（`git archive 1d38206`，锚点） | 0 | **112** | **112** | 0 | **0** |
 | 改后 | 本程工作树（AC#8 守卫＋AC#9 钉都在） | 0 | **116** | **116** | 0 | **0** |
+
+⚠ 补一句不粉饰的：同一棵"改后"工作树在 G4 之后又取了一发 `-count=1 -v`，那一发是 `rc=1 / 58 / 57 / 1 / 0`，红名是 §4.5 那枚既有 flake（`TestNoopTaskReturnsToBaseline`），**不是**本程任何一格；同名连跑 3 次 58/58 复绿。上表这两发本身都是 rc=0。
 
 逐名账（两发各自 `=== RUN` 去重后 `diff`，原文 `/d/tmp/wisp136ac8-ac9-names-before.txt` / `-after.txt`）：
 
