@@ -214,6 +214,17 @@ type decl133 struct {
 	body *ast.BlockStmt
 }
 
+// ruling133 is one WISP-LEG-COVERAGE-RULING marker seen by the line scan: the leg
+// name it carries, where it sits, and the file that holds it. The file is the
+// point - R-133-3 is a ruling that backs a leg from a file that owns nothing about
+// that leg, which is the same hole ticket 131's second ruler has as R-131r3-1 and
+// that ticket 135 is closing over there. This instrument closes its own copy.
+type ruling133 struct {
+	leg  string
+	site string
+	file string
+}
+
 // leg133 is one dispatch branch of func main, with the readings the two checks
 // above need.
 type leg133 struct {
@@ -250,10 +261,11 @@ type pkg133 struct {
 	imports   map[string]map[string]bool // file -> local import names
 	consts    map[string]string          // package-level string constants
 
-	mainBody *ast.BlockStmt
-	argvName string
-	blind    []string
-	rulings  map[string]string // leg key -> file:line of its coverage ruling
+	mainBody  *ast.BlockStmt
+	argvName  string
+	blind     []string
+	rulings   map[string]string // leg key -> file:line of the first ruling seen for it
+	rulingAll []ruling133       // every ruling seen, with the file it sits in (R-133-3)
 
 	knownPkgs map[string]bool         // every import name used anywhere in the directory
 	cache     map[*decl133]*calleeSet // resolved call sets, memoised
@@ -1179,8 +1191,10 @@ func (p *pkg133) render133(e ast.Expr) string {
 
 // coverageReds133 is check (b): a dispatched leg has to be covered by something.
 // Three forms count, and the ledger names which one it found: a nail claimed by this
-// file's own registry, a test case that drives a symbol belonging to that leg alone,
-// or a WISP-LEG-COVERAGE-RULING sentence in a production file naming the leg.
+// file's own registry (a name that is a runnable func TestXxx(t *testing.T), see
+// isRunnableCase133), a test case that drives a symbol belonging to that leg alone,
+// or a WISP-LEG-COVERAGE-RULING sentence that both names the leg and sits in a file
+// owning that leg's dispatch or one of its entries.
 //
 // A leg that installs the listener and has no nail is red on its own line, which is
 // the reading ticket 133's fifth shot needs on its first beat. The second beat is
@@ -1221,6 +1235,11 @@ func (p *pkg133) coverageReds133(legs []*leg133) []string {
 	for _, leg := range legs {
 		nails := claimedBy[leg.key]
 		ruling := p.rulings[leg.key]
+		// R-133-3: only a ruling that sits next to the leg's own code counts as
+		// coverage. `ruling` above stays the first-seen site so the two readings
+		// that do not credit it (the nail-plus-ruling contradiction, and the
+		// orphan-ruling red at the bottom) keep seeing a marker in any file.
+		adjacent := p.rulingAdjacentTo133(leg)
 		driver := ""
 		if len(nails) == 0 {
 			driver = p.drivenBy133(leg, shared)
@@ -1249,8 +1268,8 @@ func (p *pkg133) coverageReds133(legs []*leg133) []string {
 				leg.key, leg.site, sinkFunc133, leg.viaPath133(), leg.key, leg.entryName133()))
 		case driver != "":
 			leg.covered = "test " + driver
-		case ruling != "":
-			leg.covered = "ruling " + ruling
+		case adjacent != "":
+			leg.covered = "ruling " + adjacent
 		default:
 			leg.covered = "RED nothing"
 			reds = append(reds, fmt.Sprintf("leg %q (%s) is dispatched by func main and covered by nothing: no nail in this gate's registry, no test case in this directory that drives a symbol belonging to this leg alone, and no %s sentence naming it.\nThat is the second beat of ticket 133's fifth shot: a leg whose install block was deleted has no install-based obligation left, and \"nobody anywhere verifies this command\" is the fact that survives it. Fix: drive it from a case, or write the ruling next to the code that owns the leg.",
@@ -1262,6 +1281,7 @@ func (p *pkg133) coverageReds133(legs []*leg133) []string {
 			reds = append(reds, fmt.Sprintf("%s carries a coverage ruling for leg %q, which is not in the dispatch census: a ruling about a command nobody dispatches is prose, not a decision.", site, key))
 		}
 	}
+	reds = append(reds, p.misplacedRulingReds133(legs)...)
 	sort.Strings(reds)
 	return reds
 }
@@ -1396,11 +1416,83 @@ func (p *pkg133) collectRulings133(dir string, entries []os.DirEntry) {
 				p.blind = append(p.blind, fmt.Sprintf("%s:%d carries %s with no leg name after it", name, i+1, coverageRuling133))
 				continue
 			}
+			site := fmt.Sprintf("%s:%d", name, i+1)
+			p.rulingAll = append(p.rulingAll, ruling133{leg: leg, site: site, file: name})
 			if _, seen := p.rulings[leg]; !seen {
-				p.rulings[leg] = fmt.Sprintf("%s:%d", name, i+1)
+				p.rulings[leg] = site
 			}
 		}
 	}
+}
+
+// rulingAdjacentTo133 returns the site of a ruling that names this leg AND sits in
+// a file the leg owns, "" when the only rulings naming it sit elsewhere. "Owns" is
+// deliberately narrow (R-133-3): the file the dispatch branch is written in, or a
+// file declaring one of the symbols that branch calls directly. The red this
+// reading serves says "write the ruling next to the code that owns the leg", and a
+// marker that can be parked at the end of any production file in the directory is
+// not next to anything - one line in doctor.go would back a coverage claim for a
+// leg doctor has nothing to do with.
+func (p *pkg133) rulingAdjacentTo133(leg *leg133) string {
+	for _, r := range p.rulingAll {
+		if r.leg != leg.key {
+			continue
+		}
+		if p.legOwnsFile133(leg, r.file) {
+			return r.site
+		}
+	}
+	return ""
+}
+
+// legOwnsFile133 is the adjacency test above, spelled against the census row: the
+// leg's own site and the files its entries are declared in.
+func (p *pkg133) legOwnsFile133(leg *leg133, file string) bool {
+	if strings.SplitN(leg.site, ":", 2)[0] == file {
+		return true
+	}
+	for _, d := range p.allDecls133() {
+		for _, e := range leg.entries {
+			if d.key == e && d.file == file {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// misplacedRulingReds133 reports a ruling that is not credited anywhere: naming a
+// leg from a file that owns neither its dispatch nor any of its entries is prose
+// in the wrong place, and it stays red even when the leg is covered by something
+// else, so a planted backing line cannot sit in the tree quietly.
+func (p *pkg133) misplacedRulingReds133(legs []*leg133) []string {
+	byLeg := map[string]*leg133{}
+	for _, leg := range legs {
+		if _, ok := byLeg[leg.key]; !ok {
+			byLeg[leg.key] = leg
+		}
+	}
+	var reds []string
+	for _, r := range p.rulingAll {
+		leg, ok := byLeg[r.leg]
+		if !ok {
+			continue // the census already reports a ruling for a leg nobody dispatches
+		}
+		if p.legOwnsFile133(leg, r.file) {
+			continue
+		}
+		owned := []string{strings.SplitN(leg.site, ":", 2)[0]}
+		for _, e := range leg.entries {
+			for _, d := range p.allDecls133() {
+				if d.key == e {
+					owned = append(owned, d.file)
+				}
+			}
+		}
+		reds = append(reds, fmt.Sprintf("%s carries %s for leg %q, but %s owns neither this leg's dispatch (%s) nor any symbol it calls (%s). A coverage ruling has to sit next to the code that owns the leg: as placed, one line at the end of any production file in this directory would back the claim that somebody verifies %q, which is the reading ticket 133's own acceptor registered as R-133-3.",
+			r.site, coverageRuling133, r.leg, r.file, leg.site, strings.Join(dedupe133(owned), ", "), r.leg))
+	}
+	return reds
 }
 
 // ---------------------------------------------------------------------------
