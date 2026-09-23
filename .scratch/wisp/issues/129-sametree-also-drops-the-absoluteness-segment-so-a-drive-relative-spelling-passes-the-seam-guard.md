@@ -20,7 +20,7 @@
 - [x] **AC#1** 把②那句**量成读数**：造出"驱动器相对拼写 vs 绝对拼写"这对树，证明过缝之后 seal **真会落到另一棵树**（落点、`icacls` 前后、被剥掉的继承授权逐条）。量不出来就**如实写"危害未证"**，不许拿"看起来能"当判据。
 - [x] **AC#2** 裁定：绝对性该不该进 `sameTree` 的比较（与票 126 AC#1 同一把尺：缝守侧按攻击面记、归属侧按事故面记）。
 - [x] **AC#3** 修 `R-126-3` 那一枚 guard（同票前置）：`noticeNamesTree`/`noticesAboutTree` 的**被问侧**无人守——票 115 的 `answerNamesTree115` 守的正是被问侧，票 126 复用了它的 fixture 却漏了这枚 guard。补上并自证它挡得住"换台机器就什么都没比较而报绿"。
-- [ ] **AC#4** 变异自证：改前那枚跨绝对性用例红、改后绿；**拒绝侧一枚不许变松**；既有 `--- PASS` 名字集合与基线 `diff` 只许多不许变向。
+- [x] **AC#4** 变异自证：改前那枚跨绝对性用例红、改后绿；**拒绝侧一枚不许变松**；既有 `--- PASS` 名字集合与基线 `diff` 只许多不许变向。
 - [ ] **AC#5** 门禁：`internal/winsec/` `-count=2 -v` 四数 + `bash scripts/winsec-tests.sh` 同形一发；`gofmt`/`gofumpt` 全路径真跑；`go vet` 双 GOOS；d22scan 纯净快照 rc=0 + 台账各 scope 不降（`ban #8 internal/` 现基线 **385**）；跨卷探针**逐枚卷根**自证已清（AC#6 形状的教训在票 126/118）。
 
 ## Rules（本仓固定）
@@ -129,5 +129,32 @@
   顺带核了一件事：`git diff --stat db9fafc a71b2d8 -- internal/winsec` **空输出** ⇒ 锚定树里 winsec 就是 AC#3 交件态，
   我这枚基线与前一行自述的 202/116 同形不是抄的、是独立复现。读数表与后续变异落 `docs/evidence/s1/129-ac4-ac5-mutation-and-gates.md`。
   Status 与勾框本条不动（AC#4/AC#5 未量完）。
+
+- 2026-09-23 12:4x（agent-ticket129-**接续**，**AC#4＝三态齐了，拒绝侧一枚没松**）：全部落在快照目录，
+  `internal/winsec/**` 一字未改（`git status --porcelain internal/winsec` 空）。每发先 grep 证落地＋`go build` rc=0 再读红名，做完逐发还原。
+
+  ① **MUT-BOTH**（`sameTree`/`answerInsideTree` 两枚比较各摘掉 `|| !sameAbsoluteness(…)`，摘后 `grep -c` 由 2→**0**）
+  ⇒ `RUN=202 PASS=108 FAIL=8 SKIP=0`、rc=1，顶层红名去重 **4 枚**，逐字点到跨绝对性四张脸：
+  比较面 `AC#1/AC#3 RED: sameTree("C:wisp129-trees\\store-44440\\artifact.txt", "C:\\wisp129-trees\\store-44440\\artifact.txt") = true …`、
+  缝守裁决面 `AC#1/AC#3 RED on leg "second witness vouches for the probe parent's tree in a drive-relative spelling" … it owed a refusal and said ""`、
+  真对象面 `AC#1 RED: the seam's containment witness read "C:\\wisp129-vouch-27448\\tree\\leaf" as sitting inside …`、
+  落点面 `AC#1 RED: S-1-1-0 was stripped from …\victim\sub\keep-me.txt … Grants that disappeared: [S-1-1-0]`。
+  ② **还原**：`git archive a71b2d8 internal/winsec/resolve.go | tar -x` 回去，`cmp` 证 byte-identical、`grep -c` 回 2、
+  `go build` rc=0 ⇒ 四数回到 `202/116/0/0`、rc=0。
+  ②' **分腿**：只摘 `sameTree` ⇒ 3 枚红（独有红名＝落点面那枚）；只摘 `answerInsideTree` ⇒ 3 枚红（独有红名＝真对象面那枚）；
+  两发红名**并集恰为 MUT-BOTH 的 4 枚** ⇒ 两枚 leg 各自有一枚只靠它自己才绿的用例，不是一枚顺带钉住另一枚。
+
+  ③ **拒绝侧一枚不许变松**：拒绝侧成员按"函数体内出现 `refus`/`Refus`"点名，改前 `f5bbccd` **47 枚** → 改后 **55 枚**，
+  **改前−改后＝0 枚**（无删除、无改名），新增 8 枚全在 `absoluteness_*_129` 两枚文件里；票 126 的腿表 `wantRefused:` true 3→3 / false 4→4 一分未动。
+  红名集合的差（改前语义=MUT-BOTH vs 改后=还原态，只算拒绝侧）：**改后−改前＝0 枚**、**改前−改后＝4 枚**（这四枚的绿只由那段 leg 供给），
+  其余 **51 枚两发都绿**（47 枚存量拒绝腿判定逐枚未变 ＋ 本票 4 枚 CONTROL/代价腿）。
+  两发反向对照证明这套差值不是空仪器：**MUT5A** 把票 126 一枚存量拒绝腿的期望翻成 `false` ⇒ `rc=1`、
+  红名逐字点到腿名 `CONTROL RED on leg "second witness names the same tree on another volume"`；
+  **MUT5B** 把票 129 表里一整枚 `wantRefused: true` 腿删掉 ⇒ **仍全绿**（`2/2/0/0`）。
+  ⚠ 后者登记为本包仪器的**已知盲区**（`A109②` 同形：winsec 这两张腿表没有腿数下限断言，删腿不自己变红），
+  所以"删除式放宽"这一形承重的是上面的行数读数、不是红名差；本段不改判据所以没补这枚下限（写进 `next=`）。
+
+  ④ **`--- PASS` 名字集合**：还原态 58 枚 vs 本段 STEP 0 基线 58 枚，`comm -13` 增 **0**、`comm -23` 减 **0**
+  （前任 AC#3 的 +8/−0 我没有引用，这格重新量）。读数表：`docs/evidence/s1/129-ac4-ac5-mutation-and-gates.md`。
 
 
