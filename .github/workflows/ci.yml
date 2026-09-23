@@ -517,11 +517,23 @@ jobs:
   # What changed is what a red MEANS: scripts/slo-check.ps1 now refuses to
   # produce numbers when the machine is busy (its log says "machine-contended",
   # D32's thresholds are not evaluated at all on that path). A machine-contended
-  # run is a VALIDITY failure, not a performance regression: re-run it when the
+  # run is a VALIDITY refusal, not a performance regression: re-run it when the
   # laptop is quiet, and never read a D32 number out of it. That refusal is
   # deliberately not a skip (no `if:`, no continue-on-error, no -Skip switch) -
   # D22 mode-6. If this job ever stops being triggered altogether, the pin in
   # .github/workflows/slo-fresh.yml goes red (ticket 134 AC#3).
+  #
+  # Ticket 134 AC#6 (Q-36, owner 2026-09-23 "都按推荐") finishes the sentence
+  # above: a VALIDITY refusal no longer colours this job red either - the gate
+  # step exits 0 and prints "NO CONCLUSION (machine-contended)", because A115
+  # measured that a badge kept red by a busy laptop hides real breakage (ticket
+  # 131's Linux compile error, sick for 4h17m). The trade is two halves and the
+  # second one is the pay-off: "no valid sample" may never stay unnoticed, so
+  # probe P3 of scripts/slo-freshness.sh now ages on the newest uploaded
+  # slo-full-report artifact (a report exists only if numbers were produced)
+  # instead of on this job's record, and this laptop refusing to sample for
+  # days reddens that nail by itself. Cancel phrase: "slo-full 恢复判红".
+  # A run that DID sample and did not pass still exits 1 and still goes red.
   slo-full:
     runs-on: [self-hosted, wisp-slo]
     env:
@@ -555,7 +567,34 @@ jobs:
         with:
           name: slo-full-report
           path: build/slo/slo-report.json
-          if-no-files-found: error
+          # Ticket 134 AC#6 (was: error). On the machine-contended path the
+          # gate exits 0 WITHOUT a report - that is the whole trade the owner
+          # approved under Q-36 - and the step above this one stays
+          # unconditional (no `if:`, no continue-on-error, D22 mode-6), so the
+          # only way to keep "no conclusion" from being red is to stop
+          # demanding the file here. error would redden the job one step later
+          # and make AC#6 decoration.
+          #
+          # What replaces the missing-file error is NOT silence:
+          #   1. warn keeps an annotation on the run page ("No files were found
+          #      with the provided path ... No artifacts will be uploaded"),
+          #      verified against the very build the runner downloads today:
+          #      actions/upload-artifact@v4 -> ea165f8d65b6e75b540449e92b4886f43607fa02,
+          #      src/upload/upload-artifact.ts lines 31-52 - warn and ignore
+          #      both sit inside `if (filesToUpload.length === 0)`, so they
+          #      neither fail NOR create an empty artifact. That last part is
+          #      load-bearing: this artifact's existence is the input of probe
+          #      P3 in scripts/slo-freshness.sh (the record of "a valid sample
+          #      was produced"), so an empty placeholder would blind the nail.
+          #   2. slo-check.ps1 prints NO CONCLUSION (machine-contended) with
+          #      one line per reason and writes build/slo/slo-no-conclusion.json
+          #      (deliberately NOT the report path, so it is never uploaded).
+          #   3. slo-smoke below keeps `error`: the owner's ruling is about the
+          #      D32 merge gate on the contended laptop, and widening it to the
+          #      hosted PR gate was never on the table. Consequence stated
+          #      plainly: if a hosted runner ever refuses to sample, slo-smoke
+          #      still goes red - at this step instead of the gate step.
+          if-no-files-found: warn
 
   # ------------------------------------------------------- lint-frontend ----
   # Ticket 77 AC#6: frontend/ is real code now, so it gets a real gate.

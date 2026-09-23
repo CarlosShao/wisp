@@ -19,10 +19,17 @@
 
     Before ANY state is sampled the script runs a sampling-validity precheck
     (ticket 134 AC#4): if foreign toolchain/wisp processes or a busy machine
-    are found it prints one loud "machine-contended" line per reason and
-    exits 1 without producing a single number. That gate may only ever
-    REFUSE more often; the two D32 thresholds it protects (Sleeping CPU
-    <=0.5%, RSS <=25MB) live in `wisp slo` and are not evaluated here.
+    are found it prints one loud "NO CONCLUSION (machine-contended)" line per
+    reason and leaves no number behind. What that refusal COLOURS is decided
+    by ticket 134 AC#6 (owner 2026-09-23, Q-36): a contended run exits 0 and
+    writes a machine-readable no-conclusion record instead of reddening the
+    job, because a validity refusal is not a performance regression. The
+    precheck itself may only ever REFUSE more often (AC#4's direction, not
+    reversible by this or any later ticket); the two D32 thresholds it
+    protects (Sleeping CPU <=0.5%, RSS <=25MB) live in `wisp slo` and are not
+    evaluated here. "No conclusion" is not "no consequence": scripts/slo-fresh
+    ness.sh probe P3 ages on the newest uploaded slo-report artifact, so a
+    machine that keeps refusing to sample goes red on its own nail.
 
     Output JSON schema (slo-report.json):
     {
@@ -35,8 +42,11 @@
       "leak_fixture": { "flipped_to_fail": bool, "pass": <leak run pass> },
       "all_pass": bool
     }
-    Exit 0 iff all_pass; the script FAILS if the forced leak does NOT flip
-    the gate (a leak that passes means the sampler is broken).
+    Exit 0 iff all_pass, or iff this run produced no conclusion at all
+    (machine-contended, ticket 134 AC#6 - see above: no number, no red).
+    Exit 1 whenever a number WAS produced and did not pass; the script also
+    FAILS if the forced leak does NOT flip the gate (a leak that passes means
+    the sampler is broken).
 
 .USAGE
     scripts/slo-check.ps1 [-Subset smoke|full] [-SecondsPerState 4]
@@ -217,28 +227,88 @@ if ($cpuMax -ge $cpuBusyPct) {
 }
 
 if ($reasons.Count -gt 0) {
-    Write-Host ('slo-check.ps1: FAIL machine-contended - subset={0} refused to sample, no numbers were produced' -f $Subset)
+    # ---- colouring rule (ticket 134 AC#6, owner 2026-09-23 Q-36 "都按推荐") ----
+    # This branch used to exit 1. On a self-hosted runner that shares one
+    # laptop with a compiling review fleet (A103) that meant the D32 merge gate
+    # was red for "the machine was busy", and A115 measured what that costs:
+    # with the badge already red for two days straight, a real breakage
+    # (ticket 131's Linux compile error) sat unnoticed for 4h17m. Owner's
+    # ruling: a refused sample is a NO CONCLUSION, not a fail.
+    #
+    # What is NOT changed here, deliberately and permanently:
+    #   * WHEN we refuse - the three reasons above are AC#4's and may only ever
+    #     grow (this ticket does not touch a single condition).
+    #   * the numbers themselves - D32's Sleeping CPU <=0.5% and private RSS
+    #     <=25MB are evaluated by `wisp slo` and are one-byte identical.
+    #   * the "cannot look" paths - Fail() above still exits 1, because "the
+    #     instrument is broken" is not the same sentence as "no verdict today".
+    #   * any number produced by a run that DID sample: `all_pass=False` still
+    #     exits 1 at the bottom of this script.
+    # The step in .github/workflows/ci.yml stays unconditional (D22 mode-6:
+    # no `if:`, no continue-on-error), so the colour is carried by this exit
+    # code and by the record written below - nothing else.
+    Write-Host ('slo-check.ps1: NO CONCLUSION (machine-contended) - subset={0} refused to sample, no numbers were produced' -f $Subset)
     foreach ($reason in $reasons) {
         Write-Host ("slo-check.ps1: machine-contended reason: {0}" -f $reason)
     }
-    Write-Host ('slo-check.ps1: machine-contended: {0} reason(s), 0 state file(s) written, slo-report.json NOT written' -f $reasons.Count)
-    Write-Host 'slo-check.ps1: machine-contended: this is a SAMPLING VALIDITY verdict, not a performance'
-    Write-Host 'slo-check.ps1: machine-contended: result - D32 stays unverified for this run. Rerun when the'
-    Write-Host 'slo-check.ps1: machine-contended: machine is quiet (ticket 134 AC#4, shape C: refuse loudly'
-    Write-Host 'slo-check.ps1: machine-contended: instead of reporting a contaminated sample as truth).'
+    Write-Host ('slo-check.ps1: NO CONCLUSION (machine-contended): {0} reason(s), 0 state file(s) written, slo-report.json NOT written' -f $reasons.Count)
+    Write-Host 'slo-check.ps1: NO CONCLUSION (machine-contended): this is a SAMPLING VALIDITY verdict, not a'
+    Write-Host 'slo-check.ps1: NO CONCLUSION (machine-contended): performance result - D32 (CPU <=0.5%, private'
+    Write-Host 'slo-check.ps1: NO CONCLUSION (machine-contended): RSS <=25MB) stays unverified for this run.'
+    Write-Host 'slo-check.ps1: NO CONCLUSION (machine-contended): Rerun when the machine is quiet (ticket 134'
+    Write-Host 'slo-check.ps1: NO CONCLUSION (machine-contended): AC#4, shape C: refuse loudly instead of'
+    Write-Host 'slo-check.ps1: NO CONCLUSION (machine-contended): reporting a contaminated sample as truth).'
+    Write-Host 'slo-check.ps1: NO CONCLUSION (machine-contended): AC#6 recolors the refusal, it does not lift it.'
+    Write-Host 'slo-check.ps1: NO CONCLUSION (machine-contended): what keeps "no conclusion" from rotting in'
+    Write-Host 'slo-check.ps1: NO CONCLUSION (machine-contended): silence is probe P3 of scripts/slo-freshness.sh,'
+    Write-Host 'slo-check.ps1: NO CONCLUSION (machine-contended): which ages on the newest uploaded SLO REPORT'
+    Write-Host 'slo-check.ps1: NO CONCLUSION (machine-contended): artifact - never on this job, never on this'
+    Write-Host 'slo-check.ps1: NO CONCLUSION (machine-contended): exit code. Enough busy days in a row and the'
+    Write-Host 'slo-check.ps1: NO CONCLUSION (machine-contended): nail goes red by itself (ticket 134 AC#6).'
+
+    # The record half of the colouring rule. This file is NOT the report: it
+    # carries no state rows, no numbers and no all_pass flag, and ci.yml's
+    # Upload step names build/slo/slo-report.json only, so nothing here can be
+    # mistaken for a sample by the nail or by a human. It exists so "we refused,
+    # and here is why" survives on disk after the log window closes.
+    $noConclusion = [pscustomobject]@{
+        generated_at         = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+        subset               = $Subset
+        verdict              = 'no-conclusion'
+        reason               = 'machine-contended'
+        machine              = $env:COMPUTERNAME
+        reason_count         = $reasons.Count
+        reasons              = $reasons
+        offenders            = @($offenders | ForEach-Object {
+            [pscustomobject]@{ name = $_.name; pid = $_.pid; path = $_.path; why = $_.reason; started = $_.started }
+        })
+        state_files_written  = 0
+        slo_report_written   = $false
+        d32_evaluated        = $false
+        meaning              = 'No number was produced, so no number may be read out of this run. Rerun on a quiet machine.'
+        nail                 = 'scripts/slo-freshness.sh P3 ages on the newest slo-full-report artifact, not on this record'
+    }
+    $noConclusionPath = Join-Path $OutDir 'slo-no-conclusion.json'
+    $noConclusion | ConvertTo-Json -Depth 5 | Set-Content -Path $noConclusionPath -Encoding UTF8
+    Write-Host ('slo-check.ps1: NO CONCLUSION (machine-contended): record written to {0} (NOT a report; slo-report.json is not written on this path)' -f $noConclusionPath)
+
     if ($env:GITHUB_STEP_SUMMARY) {
         @(
-            '## slo-check: machine-contended',
+            '## slo-check: NO CONCLUSION (machine-contended)',
             '',
-            ('Refused to sample subset `{0}` ({1} reason(s)); no SLO numbers produced.' -f $Subset, $reasons.Count),
+            ('Refused to sample subset `{0}` ({1} reason(s)); no SLO numbers produced. D32 is not evaluated and not disputed by this run.' -f $Subset, $reasons.Count),
             '',
             ('| reason | process | pid | path |'),
             ('|---|---|---|---|')
         ) + @($offenders | ForEach-Object {
             ('| {0} | {1} | {2} | {3} |' -f $_.reason, $_.name, $_.pid, $_.path)
-        }) + @('') | Add-Content -Path $env:GITHUB_STEP_SUMMARY -Encoding UTF8
+        }) + @(
+            '',
+            ('Ticket 134 AC#6: this is reported as "no conclusion", not as a failure. The freshness nail (scripts/slo-freshness.sh P3) goes red if no uploaded SLO report is younger than its window.')
+        ) | Add-Content -Path $env:GITHUB_STEP_SUMMARY -Encoding UTF8
     }
-    exit 1
+    Write-Host 'slo-check.ps1: NO CONCLUSION (machine-contended): exit 0'
+    exit 0
 }
 $cpuText = if ($cpuMax -ge 0) { "$cpuMax%" } else { 'unavailable (perf class unreadable)' }
 Write-Host ("slo-check.ps1: precheck ok - no foreign toolchain/runner process, machine-wide cpu max {0}" -f $cpuText)
