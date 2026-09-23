@@ -329,3 +329,61 @@ $ grep -n 'BackWithinCapMS' internal/observe/sampler.go
 2. **但有一格真缺口要另立（本格之外）**：settle 侧的"测量诚实度"只有**全丢**这一档会被看见，**部分未测**（1/5、2/4 可信）交出的是一枚看着完全正常的绿报告，而且 `SettleReport` 连 `sample_errors`/`last_sample_error` 都没有——而同包 `StateReport` 早就为这件事加过这两枚字段，注释还写着理由（`internal/observe/sampler.go:165-167`：*"A bare count let an instrument lose samples without saying what it lost（ticket 66：this instrument stops hiding things）"*）。⇒ 这是"同一族病只做了一半"的形状，**另立新格**（我登记为 `R-136-8`，见 §7）。按派单要求我**没有**就地放宽 AC#9 的条件、也**没有**要作者改生产码。
 3. **附带一条小的**：`SettleReport.Samples` 为空时 JSON 出线是 `"samples":null`（Go 对 nil slice 的行为），腿 A 那句 `else if !isList && wire["samples"] != nil` 因此**在本格任何形状下都不会响**——真正起作用的是它前面的"key 在不在"（V4 红在 `:102` 就是那条）。这是"防呆支取不到牙"，不影响本格判定，登记为 `R-136-9`（低）。
 4. **`PIDs:0` 那一形我判"生产侧不可达"，但只到读码这一层**：`internal/proc/treemetrics_windows.go:71-74`（job 关闭 ⇒ 直接报错）、`:88`（`inTree[r.selfPID] = true` 无条件把主进程塞进树）、`:121`（`m := observe.TreeMetrics{PIDs: len(inTree)}`）⇒ **一次成功的读必然 `PIDs >= 1`**，"有足迹但 `PIDs:0`"在这个 reader 里组不出来；`:104-112` 另有一条"快照看不见自己 ⇒ 重试后 fail-closed 报错"。所以那一发只在 **seam（`fakeTree`）层**存在，不构成生产缺口；我**没有**（也无法在单测里）驱动真 Job Object，故这条写成"读码判定＋探针形状"，不写成读数结论。
+
+---
+
+## §4 `[0]` 直取普查的抽查（每类至少一枚，含最容易只对一半的那类）
+
+### 4.0 我自己的全量普查（不采信实现方的分母）
+
+```
+$ grep -rn '\[0\]' internal/observe/*_test.go | wc -l   →  22 行（本程锚点）
+```
+
+实现方那张表是 **17 行**，因为它按"索引点"合并同行/相邻行（`got[0]/[1]/[2]` 一行算一枚、`recs[0]` 与 `recs[2]` 的两行算一枚、`outer[0]` 的 241/243 算一枚、`inner[0]/[1]` 的 254/255/257/258 算一枚）。我的 22 行减去 4 处合并，再加上锚点后 `sampler_test.go` 因加守卫而多出来的两行（`:308` 现在是注释、`:318` 才是真读），**两边指的是同一批位置，无遗漏无多出**。
+
+再往宽处补一刀（派单没要求，但"同族"不能只按 `[0]` 这一个字面量问）：
+
+```
+$ grep -rn '\[[12]\]\|\[len(.*)-1\]' internal/observe/*_test.go   →  10 行
+```
+
+这 10 行**全部落在已普查过的那几枚测试里**（`got[1]/got[2]`、`recs[1]/recs[2]`、`outer[1]`、`inner[1]`、`names[1]`、`recs[len(recs)-1]`），且各自的前置长度守卫就是 §4.1 里那几条 ⇒ 实现方"17 处"作为**普查分母**是完整的，没有第二处 `[0]` 家族被漏。
+
+### 4.1 三类理由各抽一枚以上（逐条看代码，不看他写的理由）
+
+| 抽的哪枚 | 代码（我自己贴的原文） | 判定 |
+| --- | --- | --- |
+| **类 1：同行 `len(x) != N \|\|` 短路** | `diagnostics_test.go:101  if len(def) != 1 \|\| def[0].ID != "D-test" {`；`sampler_test.go:238  if got := s.Transitions(); len(got) != 1 \|\| got[0] != tr {`；`goroutine_test.go:152  if len(rep.Unknown) == 1 && rep.Unknown[0] == …`（`&&` 形）；`goroutine_test.go:158  if len(rep.Unknown) != 1 \|\| rep.Unknown[0] != …` | **判"不改"成立**：Go 的 `\|\|`/`&&` 短路 ⇒ 长度为 0 时左项就把整式定掉，`[0]` 求值不可达 |
+| **类 2：前置 `t.Fatalf` 长度守卫**（抽两枚，含实现方说得最"绕"的那枚） | `logging_test.go:180 if len(names) != 2 { t.Fatalf }` ⇒ `:183 names[0]/names[1]`；`errors_test.go:16 if len(classes) != 17 { t.Fatalf }` ⇒ `:41 classes[0]=`、`:42 AllClasses()[0]` | 第一枚**成立**。第二枚要额外一步：`:42` 换了一次调用（`AllClasses()` 再调一次），我核了实现：`errors.go:39 var allClasses = []ErrorClass{…}`（包级字面量）、`:48-50 func AllClasses() { return slices.Clone(allClasses) }` ⇒ 两次调用同源、无随机源 ⇒ 实现方那句"唯一能让它空掉的写法是 AllClasses() 返回不定长，而那会先在 :16 响"**成立** |
+| **类 2 里最微妙的那枚** | `earlylog_130_test.go:229-231 if flushed, _ := b.drain(sink); flushed != 1 { t.Fatalf }` ⇒ `:232 got := sink.snapshot()[0]` | **成立，但理由要说全**：`logging.go:487-509` 里 `flushed` 是"**成功交给 next 的记录数**"，而 sink（`capture130Handler.Enabled` 在 `earlylog_130_test.go:39`、`Handle` 在 `:41-46`）是无条件 append、`Enabled` 按 level 过滤 ⇒ 一枚 fresh sink 上 `flushed == len(snapshot())`；被 level 挡掉的走 `dropped++`，不进 sink。⇒ "`flushed != 1` 先响"确实等价于长度守卫，实现方这句不是糊的 |
+| **类 3：`SplitN` 天然非空**（派单点名"最容易只对一半"） | `logging_test.go:248 line := strings.TrimSpace(strings.SplitN(string(data), "\n", 2)[0])` | **这一类只此一枚，且判对了**：Go 的 `SplitN` 对**任何**输入（含空串）至少返回 1 段 ⇒ `[0]` 永在。它还漏答了半步、我补量了：包里另一处分段是 `nobarego_test.go:46 for i, line := range strings.Split(…)` —— **range 不索引**，所以没有第二枚需要判；同类的 `[1]` 形状在本包**不存在**（`SplitN(…, 2)` 的 `[1]` 才会需要对长度）。另外该处拿 `line` 去做 `json.Unmarshal`，失败是 `t.Fatalf` ⇒ 不会静默放行 |
+
+⇒ **抽查结论**：实现方"只改 1 处、其余 16 处不改"的判定我**抽查 4 类 6 枚（含它最微妙的两枚）后签字**，理由分类也站得住；"改一枚证明一枚"的账在 §1 有读数。
+
+### 4.2 它另登记的那枚 `sampler_test.go:31`——**这一支是我自己判的，不是它判的**
+
+```go
+// sampler_test.go:23-36
+func (f *fakeTree) ReadTree() (TreeMetrics, error) {
+	if f.err != nil { return TreeMetrics{}, f.err }
+	if f.current != nil { return f.current(), nil }
+	if f.i >= len(f.mu) {
+		return f.mu[len(f.mu)-1], nil     // :31  ← mu 为空且 current/err 都为 nil ⇒ [-1] 越界
+	}
+	…
+```
+
+- **今天有没有入口踩得到**（复核它的"无"，我自己走一遍）：包内 `&fakeTree{}`（裸构造）只有两处——`sampler_test.go:222` 与 `:233`。`:222` 那处只拿它调 `SampleState(ctx, SLOState("Nope"), …)`，而 `sampler.go:253-255` 的 `if !st.Valid() { return nil, … }` 在**任何一次 ReadTree 之前**就返回；`:233` 那处只调 `MarkTransition`/`Transitions`，压根不读树。⇒ **"当前无入口踩得到"为真**。
+- **但它是"一枚新用例就会踩到"的活雷**，我造了发测（探针树 `zz_acceptor136r2_probe2_test.go`，用 `recover` 把 panic 收成读数）：
+
+```
+=== RUN   TestAcceptorR2ProbeBareFakeTreePanic
+    zz_acceptor136r2_probe2_test.go:18: PROBE2 bare-fakeTree SampleState PANICKED as expected: runtime error: index out of range [-1]
+--- PASS: TestAcceptorR2ProbeBareFakeTreePanic (0.00s)
+=== RUN   TestAcceptorR2ProbeExistingBareUsesAreSafe
+    …:37: PROBE2 MarkTransition on bare fake tree ok (no tree read): b
+--- PASS: TestAcceptorR2ProbeExistingBareUsesAreSafe (0.00s)
+```
+
+⇒ 判定：**不是本格的债**（AC#8 点名的形状是 `rep.Samples[0]` 那枚、已修；`[0]` 普查也确实不含 `len(mu)-1`），但它是**同族第二枚"吞读数"仪器**，且离被踩只差"下一个人多写一枚用 `&fakeTree{}` 的正常采样用例"。登记为 `R-136-10`（低／可复现／修法方向＝给 seam 自己加守卫，别改任何用例语义）。它自报的"当前无入口"我复算成立，所以不记成"它漏了一处普查"。
