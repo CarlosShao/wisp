@@ -20,6 +20,24 @@ type fakeTree struct {
 	current func() TreeMetrics
 }
 
+// errFakeTreeNoScript answers a fakeTree that was handed no script at all.
+//
+// Ticket 136 AC#13 (R-136-9): this seam used to answer the exhausted-script
+// branch with f.mu[len(f.mu)-1], which on a bare &fakeTree{} is f.mu[-1] - a
+// runtime panic inside the *instrument*. A panic there kills the test binary,
+// so every case scheduled after it stops reporting at all (measured on a
+// pristine snapshot of 45c8d1c: baseline 58 RUN, adding one ordinary
+// &fakeTree{} sampling case dropped the package to 43 RUN and left 16 named
+// cases neither red nor green).
+//
+// The guard fails closed through the reader's own error channel instead: the
+// case that misused the fixture dies alone and red, with this sentence in its
+// output, and the rest of the package keeps running. It is deliberately not a
+// t.Skip and not a silent TreeMetrics{} return (same discipline as the AC#8
+// length guard at the bottom of this file).
+var errFakeTreeNoScript = errors.New(
+	"observe test seam: fakeTree has no scripted reads (bare &fakeTree{} is not a measurement; script mu/current or set err)")
+
 func (f *fakeTree) ReadTree() (TreeMetrics, error) {
 	if f.err != nil {
 		return TreeMetrics{}, f.err
@@ -28,6 +46,10 @@ func (f *fakeTree) ReadTree() (TreeMetrics, error) {
 		return f.current(), nil
 	}
 	if f.i >= len(f.mu) {
+		if len(f.mu) == 0 {
+			// Nothing was ever scripted: there is no last reading to repeat.
+			return TreeMetrics{}, errFakeTreeNoScript
+		}
 		return f.mu[len(f.mu)-1], nil
 	}
 	m := f.mu[f.i]
