@@ -127,11 +127,56 @@
 
 ## 5. 判据④：本批「另一种拒」复算 — 逐枚实拿字符串
 
-待量。
+**取字串仪器**：`/d/tmp/wisp124-2b2-probe` = 改后快照 + 5 处**纯打印**插入（`probe-patch.py` 生成，只加 `t.Logf("ACQ124-2B2 …")`，一处不动断言/阈值）。探针台四数与 POST-L **逐数相同**（tools `79/59/3/3`+`14/0`、llm `72/63/0/0`+`9/0`、perm `14/14/0/0`、approval `49/29/0/1`+`19/0`）⇒ 探针没改变任何结局。以下字符串逐字抄自该台软链形 `-v` 日志的 `ACQ124-2B2 …` 行。
+
+账上点名的两枚（124-ac2a §7 提醒②里落在本批的两枚）：
+
+1. `TestFSTrashGoesToTheRecycleBin`（tools，要的是「POSIX 无回收站时 fs.trash 必须拒并说出带『回收站』」）实拿：`trash supported=false out.IsError=true out.Text="本平台无 Shell 回收站 API，fs.trash 拒绝执行（绝不退化成删除）：/realpriv/w124tmp/TestFSTrashGoesToTheRecycleBin2188308832/001/trashme.txt"` ⇒ 拿到的仍是**回收站那一族的拒**，不是未解析根那句。
+2. `TestProbeSuiteRefusesSilentRuns`（llm，要的是「probe 不许静默跑」的两枚校验拒）实拿：`refusenosink err="llm: probe suite requires a HealthSink (an unread probe is not a measurement)"` 与 `refusenomismatch err="llm: probe suite requires a mismatch notice (SPEC-05 sec 3.1: declared-vs-measured must be visible)"` ⇒ 两种拒各自照拿（该枚在名册里是 PASS，探针是在断言之外**再跑一次同形调用**取字串，断言与请求计数检查未动）。
+
+本批其余断言里带「拒 / Rejects / Refuses / still refuses / 否决 / want L2 / want L1」的枚，逐枚实拿：
+
+3. `TestFSReadTaintFeedsR4`（tools，要 L2+R4 这一档**风险判级**）实拿：`r4 level=L2 rules=[R4] overrideBlocked=true reason="R4: 包含来自 fs.read /realpriv/w124tmp/TestFSReadTaintFeedsR44178382413/001/id.txt 的内容"` ⇒ 判级要的那档拒拿到的是自己的拒；字符串里根已是解析后的 `/realpriv/…`（这层解析起效的直接旁证）。
+4. `TestLoopStillRefusesL1WhenNoGateIsRegistered`（tools，要「无门时 L1 写被拒」的闸门语义）实拿：`nogate rejected=true errorClass="permission_denied" text="该操作属于 L1 级，审批通道尚未接入（ticket 21），已拒绝执行" cards=0` ⇒ 拒因还是**缺审批通道**，不是密封底线。
+5. `TestTenOpsInOneToolCallGetOneConfirm`（approval，要「L1 留级 + 10 项并一次确认 + 一次否决取消整批」）实拿：`batch level="L1" batchTotal=10 out.IsError=true out.Text="用户在 L1 确认窗口中通过「按 Esc 键」否决了本次操作（取消窗口，非撤销已写出的内容）"` ⇒ 级别回到 L1（改前软链形它拿到的是 `level="L2"`，账 §5.3 逐字），它要的拒是那扇 Esc 否决。
+
+**结论**：本批 43 枚没有一枚的断言被「未解析根」那句替代；全批软链形日志里 `not provably resolved` / `refusing to seal` 命中数 = **0**（§2）。账上「可转 ⇒ 接解析后仍成立」这一判在本批 43 枚上逐枚复核成立。
 
 ## 6. 判据⑤：变异自证（票面 AC#4）— 三态原文
 
-待量。
+变异 = **拆掉本批新加的那一层解析**：五枚委托文件的函数体改回把 `t.TempDir()` 原样交回去（`MUTATION-124-2B2`，`proc` 引用留一行 `_ =` 保编译）。`sealableTempCanonical124` 走 `sealableTempDir124`，同一发变异把它一起退回。台子 `/d/tmp/wisp124-2b2-mut`，跑法 `/d/tmp/wisp124-2b2-m2.sh`。
+
+```
+== mutation landed (grep) ==
+internal/tools/tempdir_resolved_124_test.go:28:	_ = proc.SealableRoot // MUTATION-124-2B2: the resolution layer this batch added is removed here
+internal/tools/tempdir_resolved_124_test.go:29:	return t.TempDir() // MUTATION-124-2B2: hand the OS's unresolved root straight back
+internal/tools/tempdir_resolved_124x_test.go:21:	_ = proc.SealableRoot // MUTATION-124-2B2: …
+internal/tools/tempdir_resolved_124x_test.go:22:	return t.TempDir() // MUTATION-124-2B2: …
+internal/llm/tempdir_resolved_124_test.go:22:	_ = proc.SealableRoot // MUTATION-124-2B2: …
+internal/llm/tempdir_resolved_124_test.go:23:	return t.TempDir() // MUTATION-124-2B2: …
+internal/perm/tempdir_resolved_124_test.go:23:	_ = proc.SealableRoot // MUTATION-124-2B2: …
+internal/perm/tempdir_resolved_124_test.go:24:	return t.TempDir() // MUTATION-124-2B2: …
+internal/agent/approval/tempdir_resolved_124_test.go:24:	_ = proc.SealableRoot // MUTATION-124-2B2: …
+internal/agent/approval/tempdir_resolved_124_test.go:25:	return t.TempDir() // MUTATION-124-2B2: …
+resolution delegations still present (want 0):
+internal/tools/tempdir_resolved_124_test.go:0
+internal/tools/tempdir_resolved_124x_test.go:0
+internal/llm/tempdir_resolved_124_test.go:0
+internal/perm/tempdir_resolved_124_test.go:0
+internal/agent/approval/tempdir_resolved_124_test.go:0
+go build rc=0
+go vet rc=0
+```
+
+三态读数（同快照血统、同容器、同形状断言；变异先证落地再读数）：
+
+| 台 | 形状 | 四数 | 红名 |
+|---|---|---|---|
+| **POST（未变异）** | 软链 | tools `rc=1 RUN=79 PASS=59 FAIL=3 SKIP=3 SUBPASS=14 SUBFAIL=0`；llm `rc=0 72/63/0/0`+`9/0`；perm `rc=0 14/14/0/0`；approval `rc=0 49/29/0/1`+`19/0` | 本批 **0 枚**（tools 那 3 枚系票 123 已知腿） |
+| **MUT-L（拆掉解析层）** | 软链 | tools `rc=1 RUN=79 PASS=41 FAIL=21 SKIP=3 SUBPASS=12 SUBFAIL=2`；llm `rc=1 RUN=72 PASS=52 FAIL=11 SKIP=0 SUBPASS=3 SUBFAIL=6`；perm `rc=1 RUN=14 PASS=9 FAIL=5 SKIP=0`；approval `rc=1 RUN=49 PASS=28 FAIL=1 SKIP=1 SUBPASS=19 SUBFAIL=0` | **43 枚回归**，逐名与改前基线 PRE-L **四包全部 IDENTICAL**（`tools/llm/perm/agent_approval: IDENTICAL red name sets`，23/17/5/1 枚）；机制字串回到 `not provably resolved`=23、`refusing to seal`=23、`审批未通过`=4、`审批通道尚未接入`=4，样例逐字：`probe_health_test.go:151: memory: create data dir: winsec: refusing to seal /varlink/w124tmp/TestProbeSuiteMeasuresBrokenFC3118190525/002/data: the installed risk.c26Pipeline answered "/varlink/…", a spelling the floor itself refuses` |
+| **MUT-P（同一发变异）** | 普通 | tools `rc=0 RUN=79 PASS=62 FAIL=0 SKIP=3 SUBPASS=14 SUBFAIL=0`；llm `rc=0 72/63/0/0`+`9/0`；perm `rc=0 14/14/0/0`；approval `rc=0 49/29/0/1`+`19/0` | 无（`FAIL` 行四包 = 0；四数与 PRE-P/POST-P **逐数相同** ⇒ 这层解析只在软链形起作用，普通形是恒等操作） |
+
+⇒ 红名**点到用例自己**（43 枚逐枚点名 + 3 枚已知腿一并回归，不是包级 `FAIL`），且变异前 `grep` 证落地、`go build` / `go vet` rc=0 先于读数。这一发**做了**。
 
 ## 7. 门禁读数（票面 AC#5）
 
