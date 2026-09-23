@@ -115,3 +115,21 @@
   CLI 端到端那一发、AC#2..AC#6、软链 `TMPDIR` 形、`CheckSettle` 那侧只做了读码核查未做变异、CI run id）。
 - next=建议派**非实现者**独立复现 §3 四发（M1/M2/M3/M4 三态）后裁 AC#1；
   票面 `FM`／`FM2` 那发真跑 `wisp slo -seconds 0.05` 的 CLI 端到端等 `cmd/wisp` 空出来再补（此刻有兄弟在飞，本程未碰）。
+
+- [ ] **AC#8**（09-23 22:1x 编排者追加，来源＝AC#1 实现方交件里"两条事故"的第一条）`internal/observe` 里有一枚**越界 panic 会把同包全部用例一起吃掉**的测试：
+      `sampler_test.go:297` 的 `TestSamplerGoroutineAccountingFollowsRegistry` 在 `:308` 直接取 `rep.Samples[0]`，**没有长度守卫**；
+      实现方实测：AC#1 那枚钉子的 M3 变异落在那一发改动上时，全包读数取不到它的腿——**该既有用例先 panic 杀掉了测试二进制**（读数 `47 PASS / 5 FAIL + panic`），
+      于是它只能改走"定点取数 ＋ 未变异定点对照"。
+      ⇒ 这不是 AC#1 的债（它已照实报备），但它是**本包的一枚仪器会吞掉别家的读数**的形状：
+      一条用例挂掉 ⇒ 同包其余几十条**既不算红也不算绿**，而包级 rc 只会说"这一包失败"。
+      **结案判据（可重算）**：①造一发"空 `Samples`"变异 ⇒ 今天必须是 **panic 且拖走同包若干枚**（逐名列出被拖走的）；
+      ②加上长度守卫（或 `t.skipIfEmpty` 一类**不许**用——要红，不能静默）⇒ 同一发变异下**只红这一枚、其余全部照常跑完**；
+      ③AC#1 那枚钉子的 M3 复跑因此可以在**全包**读数里取到，不再需要定点绕过（把这条当"修好了"的旁证）。
+      ⚠ 修法只许动那枚测试，**不许**碰被测的采样器语义；`grep` 同包还有几处 `[0]` 直取，逐枚判要不要一起加守卫（**别一把改完**，改一枚证明一枚）。
+
+- [2026-09-23 22:1x +08] agent=orchestrator did=AC#1 交件核收（三枚 commit 各一只文件、净面未越界）＋ 追加 AC#8。
+  两处引用我复看过：**"observe 在 CI core 名单里"为真**（`scripts/portable-tests.sh:140` 逐字列着
+  `github.com/CarlosShao/wisp/internal/observe`），但它引的 `ci.yml:288` 那一行其实是"哪些包**不**在这个 scope"的注释
+  ⇒ **结论成立、行号引偏**，今后引用 CI 落点请指 `portable-tests.sh` 的名单行或 step 名，别指 workflow 的注释行。
+  另一处我自己量的：`sampler_test.go:308` 确实是 `if rep.Samples[0].RuntimeGoroutines < 1` —— 无长度守卫，panic 源为真。
+  next=派**非实现者**独立复现 M1/M2/M3/M4 四发三态后终裁 AC#1（实现方未自勾，做得对）。
