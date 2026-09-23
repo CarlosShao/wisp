@@ -20,7 +20,7 @@ import (
 // rows.
 
 func TestMaxTokensFailsAllToolCallsOfThatMessage(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	store, err := memory.Open(dir)
 	if err != nil {
 		t.Fatalf("memory.Open: %v", err)

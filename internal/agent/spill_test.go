@@ -53,7 +53,7 @@ func TestSpillThresholdScalesWithWindow(t *testing.T) {
 			ApproxTokens(payload), tiny.SpillTokens, big.SpillTokens)
 	}
 
-	dirBig, dirTiny := t.TempDir(), t.TempDir()
+	dirBig, dirTiny := sealableTempDir124(t), sealableTempDir124(t)
 	if sp, err := NewSpiller(dirBig, big).Prepare("call_x", payload); err != nil || sp.Spilled {
 		t.Errorf("128k window: spilled=%v err=%v, want NO spill (below threshold)", sp.Spilled, err)
 	}
@@ -70,7 +70,7 @@ func TestSpillThresholdScalesWithWindow(t *testing.T) {
 // TestSpillTokenBoundary pins the D15(3) 4000-token reference boundary exactly.
 func TestSpillTokenBoundary(t *testing.T) {
 	b := BudgetsFor(128000) // SpillTokens = 4000
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	sp := NewSpiller(dir, b)
 
 	at := strings.Repeat("a", b.SpillTokens*4)     // exactly 4000 tokens
@@ -96,7 +96,7 @@ func TestSpillTokenBoundary(t *testing.T) {
 // output and the context stub carries head + tail + totals + path.
 func TestSpillArtifactAndStubShape(t *testing.T) {
 	b := BudgetsFor(128000)
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	sp := NewSpiller(dir, b)
 
 	// A distinctive, comfortably-over-threshold payload so head/tail are
@@ -197,7 +197,7 @@ func TestSpillThroughLoop(t *testing.T) {
 
 	// Tiny window (4096): the scaled threshold (128 tokens) drops below the same
 	// result, so it must spill through the real loop path.
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	hTiny := newHarness(t, "spill-tool", withConfig(func(c *Config) {
 		c.ContextWindow = 4096
 		c.ArtifactsDir = filepath.Join(dir, "artifacts")
@@ -239,7 +239,7 @@ func TestSpillThroughLoop(t *testing.T) {
 // the text, was cut away by the tail window. PLAN:432's order is truncate
 // FIRST, then land the file.
 func TestSpillArtifactRespectsRawCap(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	b := Budgets{RawOutputCapBytes: 200, SpillTokens: 40, SpillHeadTokens: 10, SpillTailTokens: 10}
 	sp := NewSpiller(dir, b)
 

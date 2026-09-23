@@ -100,7 +100,7 @@ func inv76aShapes() []inv76aShape {
 // exact on-disk name is asserted, plus that the name is a bare file name in the
 // dir the constructor fixed and holds the full payload.
 func TestSpillCallIDHostileShapesSanitizedToBareNames(t *testing.T) {
-	root := t.TempDir()
+	root := sealableTempDir124(t)
 
 	for _, sh := range inv76aShapes() {
 		// A per-shape dir that does not exist yet: MkdirAll(s.dir) is on this
@@ -197,7 +197,7 @@ func TestSpillCallIDHostileShapesSanitizedToBareNames(t *testing.T) {
 // listing would have seen an escape (so a green run is not an artifact of a
 // blind probe).
 func TestSpillContainmentByDirectoryListing(t *testing.T) {
-	root := t.TempDir()
+	root := sealableTempDir124(t)
 	dataDir := filepath.Join(root, "data")
 	artifacts := filepath.Join(dataDir, "artifacts")
 	userDir := filepath.Join(root, "Users", "carlos", "Documents")
@@ -342,7 +342,7 @@ func TestSpillContainmentByDirectoryListing(t *testing.T) {
 // artifacts route then deletes (hostile names), and a full listing of the root
 // in between shows that neither route could touch anything outside the data dir.
 func TestSpillIntoRealStoreThenDeleteStaysUnderDataDir(t *testing.T) {
-	root := t.TempDir()
+	root := sealableTempDir124(t)
 	store, err := memory.Open(filepath.Join(root, "data"),
 		memory.WithLogger(slog.New(slog.NewTextHandler(io.Discard, nil))))
 	if err != nil {

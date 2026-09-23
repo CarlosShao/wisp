@@ -20,7 +20,7 @@ import (
 // this one left it NULL/pending forever. Both paths make the identical
 // judgement (an unclosed call is never executed), so both must say so.
 func TestFailedTaskBooksOpenCallRowWithDecision(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	store, err := memory.Open(dir,
 		memory.WithLogger(slog.New(slog.NewTextHandler(io.Discard, nil))))
 	if err != nil {
@@ -80,7 +80,7 @@ func TestFailedTaskBooksOpenCallRowWithDecision(t *testing.T) {
 // the review demanded.
 
 func TestCancelledTaskPersistsTerminalRows(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	store, err := memory.Open(dir,
 		memory.WithLogger(slog.New(slog.NewTextHandler(io.Discard, nil))))
 	if err != nil {

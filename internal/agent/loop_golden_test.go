@@ -297,7 +297,7 @@ func TestGoroutineBudgetDrains(t *testing.T) {
 
 // task_log + tool_call rows (the 04 tables) through the real store.
 func TestTaskLogAndToolCallRows(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	store, err := memory.Open(dir)
 	if err != nil {
 		t.Fatalf("memory.Open: %v", err)

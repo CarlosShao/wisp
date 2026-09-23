@@ -97,7 +97,7 @@ func TestArtifactNameDoesNotFoldDistinctIDs(t *testing.T) {
 // onto) spills, and A's path - already handed to the model - must still hold
 // A's bytes. Under the old strip-and-truncate pair this returned B's payload.
 func TestSpilledBytesSurviveANameThatUsedToCollide(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	sp := NewSpiller(dir, spill79Budget)
 
 	for _, pair := range []struct {
@@ -275,7 +275,7 @@ func TestArtifactNameIsCanonicalAndBounded(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 func TestWriteFileExclusiveIsExclusive(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	p := filepath.Join(dir, "artifact.txt")
 
 	if err := writeFileExclusive(p, []byte("FIRST")); err != nil {
@@ -310,7 +310,7 @@ func TestWriteFileExclusiveIsExclusive(t *testing.T) {
 // by being the same logical id again. Documented and pinned: last writer wins,
 // the call succeeds, one file, no temp left behind.
 func TestSpillSameIDRetryOverwrites(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	sp := NewSpiller(dir, spill79Budget)
 
 	a, err := sp.Prepare("call_retry", spill79Payload("AAAA"))
@@ -350,7 +350,7 @@ func TestSpillSameIDRetryOverwrites(t *testing.T) {
 // depend on this process having seen the id before (a restart with a repeated id
 // is a retry too, not a failure).
 func TestSpillAcrossRestartsKeepsRetrySemantics(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	if _, err := NewSpiller(dir, spill79Budget).Prepare("call_restart", spill79Payload("AAAA")); err != nil {
 		t.Fatal(err)
 	}

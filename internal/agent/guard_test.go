@@ -149,7 +149,7 @@ func TestLoopGuardTokenBudgetScalesWithWindow(t *testing.T) {
 // Per-tool timeout: the call is aborted cooperatively at timeoutMs, the row is
 // booked with a tool class, and the loop keeps going (the model is told).
 func TestPerToolTimeoutFires(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	store, err := memory.Open(dir, memory.WithLogger(slog.New(slog.NewTextHandler(io.Discard, nil))))
 	if err != nil {
 		t.Fatalf("memory.Open: %v", err)
@@ -209,7 +209,7 @@ func TestPerToolTimeoutFires(t *testing.T) {
 // booked error_class="internal". This is the assertion on the EMITTED
 // error_class for the contract-honest branch.
 func TestPerToolTimeoutOfContractHonestToolIsToolClass(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	store, err := memory.Open(dir, memory.WithLogger(slog.New(slog.NewTextHandler(io.Discard, nil))))
 	if err != nil {
 		t.Fatalf("memory.Open: %v", err)
