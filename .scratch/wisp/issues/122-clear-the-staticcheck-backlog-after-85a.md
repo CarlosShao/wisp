@@ -82,6 +82,8 @@ linux 分类：`26×U1000 / 3×SA1019 / 2×S1011 / 1×SA9009 / 1×SA4006 / 1×SA
       **lint 这一族用的工具版本没钉，而"照 CI 逐字同形跑一遍门禁"这个动作本身会改宿主工具链。**
       实测两条读数：
       ① 那一步在 `.github/workflows/ci.yml:111-114`，逐字是 `go install mvdan.cc/gofumpt@latest` —— **`@latest` 就是没钉**。
+        ⚠ 锚点精度补一行（09-23 23:0x，逐行核过）：`:109` `run: sh scripts/d22scan.sh`、`:111` `- name: gofmt (gofumpt)`、
+        **`:113` 才是那枚 `go install mvdan.cc/gofumpt@latest`**、`:114` `gofumpt -l . tools/d22scan tools/mockllm` ⇒ 要钉版本就钉 `:113` 一行。
       ② 本机 `D:\work\base\gopath\bin\gofumpt.exe` 的 mtime ＝ **2026-09-23 22:10:08**（正好落在批次 4 跑门禁那一会儿），
         版本现读 `v0.12.0 (go1.27.1)`；而票 124 批次 1／2／3a／3b 四份证据里逐字写着的都是 `v0.7.0 (go1.27.1)`
         （锚点：`124-ac2b-2:213`、`124-ac2b-3a:209`、`124-ac2b-3b:341`）。
