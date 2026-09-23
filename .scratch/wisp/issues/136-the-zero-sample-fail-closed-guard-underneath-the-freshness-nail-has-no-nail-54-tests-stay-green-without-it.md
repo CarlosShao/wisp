@@ -170,3 +170,21 @@
   还有一处**两边都留、谁也没改谁**的读数分歧：全仓既有红包我量到 4 枚、验收方量到 3 枚（差 `internal/agent/approval`，
   它那边该包 `ok 0.720s`；`git diff 09edf02..e8190bf` 未动过那四条路径）⇒ 能说的只有"负载/环境差，各以锚点为准"，**不合并成一句结论**。
   next=派**一名非实现者**做 AC#8②③ ＋ AC#9（同包同文件、按顺序）；AC#10 排在 133 落地之后（要 `cmd/wisp` 空出来）。
+
+- [22:47 +08] agent=worker-ticket136-ac8-ac9 did=**AC#8②③ 交件**（锚点自己量＝`1d38206`；`cmd/wisp/**` 整块未碰）。
+  ②：`internal/observe/sampler_test.go` 的 `TestSamplerGoroutineAccountingFollowsRegistry`（`:297`）在 `rep.Samples[0]`
+  直取前加长度守卫（commit `79ddd49`，净面只有这一枚文件、10 增 0 删）；空 `Samples` 时 `t.Fatalf` 红在 `:315`，
+  **没有 `t.Skip`、没有静默返回**，`sampler.go` 一字未动（`git diff 1d38206..HEAD -- internal/observe/sampler.go` 无输出）。
+  同包 `[0]` 直取按 `grep -rn '\[0\]' internal/observe/*_test.go` 全量普查＝**17 处**，逐枚判：**只改 1 处**，
+  其余 16 处的理由（同行 `len(x) != N ||` 短路／前置 `t.Fatalf` 长度守卫／`SplitN` 天然非空）写在证据 §2.2；
+  另登记一枚**同族但不属 `[0]` 形状**的相邻件：`sampler_test.go:31` 的 `f.mu[len(f.mu)-1]`，实测当前无入口能踩到，未改。
+  前后对照（同一发 M3＝`sampler.go:290` `<= 0`⇒`>= 0`，两棵独立仓外纯净树，每发先无条件 restore 再打、还原后 `diff -q` 证逐字相同）：
+  改前 tree0＝`git archive 1d38206` ⇒ `rc=1 / RUN=52 / PASS=47 / FAIL=5 / SKIP=0 / panic=1`，拖走 4 枚逐名（含本票 AC#1 两腿）；
+  改后 tree1＝`git archive 79ddd49` ⇒ `rc=1 / RUN=56 / PASS=50 / FAIL=6 / SKIP=0 / panic=0`，名册与基线 `diff` 无输出。
+  ③：M3 的整包 `-v` 读数里直接取得到 AC#1 那枚钉——腿 A `TestSampleStateZeroSampleWindowFailsClosed` 绿、
+  腿 B `TestSampleStateTrustworthyWindowNotMarkedUnmeasurable` 红在 `sampler_zerosample_136_test.go:151`，
+  **本程未跑过任何 `-run` 定点绕过**；AC#1 的断言一字未改。三态齐（56/56/0/0 → 上述红 → 还原 56/56/0/0）。
+  ⚠ 一条措辞按实测报回：票面②那句"只红这一枚"**不成立也不该成立**（M3 同时开掉 `sampling` 门，另有 5 枚本就该红，
+  改前 panic 之前已红 4 枚可自证）；本格真正被钉住的性质是"不再由一枚 panic 代答、每枚各红各的、名册完整"。
+  未自勾 AC#8。证据 `docs/evidence/s1/136-ac8-ac9-impl.md` §0-§3。
+  next=接着做 AC#9（同序：守卫已在位，整包读数不再被吞）；两格终裁与翻勾派**非实现者**，门禁读数与"未做的档"一并留在证据里。
