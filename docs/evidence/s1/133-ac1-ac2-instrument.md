@@ -146,11 +146,89 @@ AC#1/#2 RED: the usage block documents command "slo", which func main does not d
 
 ### 2.4 X12 `var 别名 = installLogSink` + 经别名调用
 
-（待填）
+```
+① c720494 + 变异，无仪器  rc=1  100/52/1/0  reds: TestAC4EveryLegIsNailedOrRuled（131 补过的形 c 判据）
+② 门开着                  rc=1  101/52/2/0  reds: TestAC1AC2DispatchHopGate133, TestAC4EveryLegIsNailedOrRuled
+③ 门关着                  rc=1  100/52/1/0  reds: TestAC1AC2DispatchHopGate133      ← 红名点到 fake131
+④ 还原                    rc=0  101/54/0/0  RESTORE-DIFF rc=0 lines=0
+build：X12-1-build-base rc=0、X12-build-ins rc=0、X12-restore-build rc=0
+```
+③栏原文：
+
+```
+AC#1 RED: leg "fake131" (main.go:80) reaches installLogSink on this path: dispatch -> sinkAlias131 -> installLogSink
+A listener installed on a dispatched leg has to have a nail in this gate's registry, or the block can be deleted in silence, ...
+AC#1/#2 RED: leg "fake131" is dispatched by func main and documented in no line of the usage block: an operator cannot find it, and this gate has no second reading of the census to check it against.
+```
+⇒ 别名这一支本尺**自己建边**（`sinkAlias131 -> installLogSink` 印在红名里），
+不是"因为整包坏了才响"；与 X4 同一枚判据 (b)，两处独立读数。
 
 ### 2.5 X14 install 藏在结构体字段的初值里（两拍都必须红）
 
-（待填）
+**这一发是五发里唯一①栏真全绿的一发**——它也是票面上写死"第二拍也必须红"的那一发。
+
+```
+第一拍（装了听众、不给钉，不碰任何测试文件）
+① c720494 + 变异，无仪器  rc=0  100/53/0/0  reds: 无   gate131: 1 hits PASS, 131red=0   ← 今天全绿，门也绿
+② 门开着                  rc=1  101/53/1/0  reds: TestAC1AC2DispatchHopGate133          ← 只有本票仪器红
+③ 门关着                  rc=1  100/52/1/0  reds: TestAC1AC2DispatchHopGate133          ← 门本来就没红，关不关同一份红名
+④ 还原                    rc=0  101/54/0/0  RESTORE-DIFF rc=0 lines=0
+build：X14-1-build-base rc=0、X14-build-ins rc=0、X14-restore-build rc=0
+```
+②栏原文（门关着那份与它同一批红名，见③）：
+
+```
+AC#1 RED: leg "sfx131" (main.go:80) reaches installLogSink on this path: dispatch -> holder131.open -> installLogSink
+A listener installed on a dispatched leg has to have a nail in this gate's registry, or the block can be deleted in silence, which is the reading ticket 133 was filed for. Fix: write the case, then add {leg: "sfx131", test: TestYourCase, entry: "cmdSfx131"} to legCovers133.
+AC#1/#2 RED: leg "sfx131" is dispatched by func main and documented in no line of the usage block: an operator cannot find it, and this gate has no second reading of the census to check it against.
+```
+⇒ 红名点到的正是票面要的那句话：**这条腿装了听众却没钉**，且路径写的是
+`dispatch -> holder131.open -> installLogSink`（字段初值那条边被本尺接住了）。
+同一发变异在**门开着**时 `TestAC4EveryLegIsNailedOrRuled` 仍 `PASS`、`AC#4 RED` 命中 **0**
+⇒ 这一形今天只有本票这把尺看得见，不是蹭 131 的门。
+
+**第二拍（把字段初值与那次调用删掉，该文件代码里 `installLogSink` 引用为 0）**
+
+```
+① c720494 + 变异，无仪器  rc=0  100/53/0/0  reds: 无   gate131 PASS, 131red=0    ← 复验方实测同一形"整包仍是 100/53/0/0"，逐字复现
+② 门开着                  rc=1  101/53/1/0  reds: TestAC1AC2DispatchHopGate133   ← 门的账本仍写着 install=false，只有本尺红
+③ 门关着                  rc=1  100/52/1/0  reds: TestAC1AC2DispatchHopGate133   ← 本票仪器仍红（票面写死的那一条）
+④ 还原                    rc=0  101/54/0/0  RESTORE-DIFF rc=0 lines=0
+build：X14B2-build-base rc=0、X14B2-build-ins rc=0、X14B2-restore-build rc=0
+```
+③栏原文，连同账本那一行：
+
+```
+AC#1 RED: leg "sfx131" (main.go:80) is dispatched by func main and covered by nothing: no nail in this gate's registry, no test case in this directory that drives a symbol belonging to this leg alone, and no WISP-LEG-COVERAGE-RULING: sentence naming it.
+That is the second beat of ticket 133's fifth shot: a leg whose install block was deleted has no install-based obligation left, and "nobody anywhere verifies this command" is the fact that survives it. Fix: drive it from a case, or write the ruling next to the code that owns the leg.
+AC#1/#2 RED: leg "sfx131" is dispatched by func main and documented in no line of the usage block: an operator cannot find it, and this gate has no second reading of the census to check it against.
+  leg sfx131  main.go:80  installs=false handoff=false covered=RED nothing  entries=cmdSfx131
+```
+⇒ 红名换了判据但没换仪器：第一拍红在 (b)"装了听众没钉"，第二拍 install 已经拆掉，
+红在 (d)"这条被分发的腿什么都没覆盖"。**只把第一拍弄红等于放过这一形**，所以两拍的③栏都在上面。
+
+**两处如实登记的口径差**（都不影响判定，写出来防下一个人复核时对不上）：
+1. 复验方那句"`grep -c installLogSink` = 0"是连注释一起数的；本尺种的 beat-2 文件在**注释**里
+   引用了一次那个名字（`sfx131.go.x14b2.off:8`），代码里 0 处。判定材料是 AST 的调用边
+   （账本 `installs=false`），与 grep 无关。
+2. 快照里退役的种件改名成 `*.off` 保留着（"临时件只建不删"），所以 `diff -r` 反查带
+   `--exclude='*.off'`；`RESTORE-DIFF lines=0` 指的是除此之外该树与纯净树逐字节相同。
+
+### 2.6 AC#1 逐发红名一览（判据：五发都红，且关门仍红、红名是本票仪器）
+
+| 发 | ①无仪器 | ②门开着 | ③门关着：红名 | 判据 |
+| --- | --- | --- | --- | --- |
+| N-3 | rc=1（只 131 的门红） | 本尺 + 131 的门 | `TestAC1AC2DispatchHopGate133` 唯一 | (a) 三枚孤儿符号 + 钉的入口不再可达 |
+| X4 | rc=1（只 131 的门红） | 本尺 + 131 的门 | 同上 唯一 | (b) `--diag` 装了听众没钉（本尺把它读成一条腿） |
+| X8 | rc=1（只 131 的门红） | 本尺 + 131 的门 | 同上 唯一 | 标签非字面量 + 合成腿未覆盖 + 裁决/usage 双向差 |
+| X12 | rc=1（只 131 的门红） | 本尺 + 131 的门 | 同上 唯一 | (b) 别名边 `sinkAlias131 -> installLogSink` |
+| X14 一拍 | **rc=0 全绿、门 PASS** | **只有本尺红** | 同上 唯一 | (b) 字段边 `holder131.open -> installLogSink` |
+| X14 二拍 | **rc=0 全绿、门 PASS** | **只有本尺红** | 同上 唯一 | (d) 被分发的腿未覆盖（install 已拆） |
+
+⇒ **AC#1 判定：PASS**。五发（含 X14 两拍）逐一红、红名点到本票仪器、把 131 的门 `-run` 排除后
+仍红；④栏每发还原复绿且 `diff -r` 零差异。没有哪一发"只有 131 的门能红"，因此不必触发
+"这一形由 131 守、回 131 续单"那一条。唯一与票面预期不同的是 §2.0.1：①栏今天不再全绿，
+因为 131 在它自己的续单里把 N-3/X4/X8 三形接住了——照实登记，不改读数。
 
 ## 3. AC#2 覆盖面主张
 
