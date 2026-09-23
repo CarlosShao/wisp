@@ -55,6 +55,18 @@ package main
 // beside its install), so the flush is ordered by the code under test instead of
 // waited for. The three drives in this file together cost milliseconds, which is
 // also why none of them is a subprocess case like ticket 127's.
+//
+// PLATFORM, because these two files are untagged and reach across to
+// windows-tagged ones: sinkInstallRecord and residentInstallMsg come from
+// resident_sink_nail_127_windows_test.go, and readSink, readResidentSink and
+// jsonlFilesUnder are the instruments declared there and in
+// logsink_windows_test.go. That is the choice, not an accident. package main has
+// no Linux leg (main.go's sherpa import is what makes `GOOS=linux go vet
+// ./cmd/wisp/` rc=1, and scripts/wisp-cli-tests.sh says the same in its header),
+// so today both directions compile or nothing does; on the day a Linux leg lands,
+// an untagged file that fails to *compile* is a louder reading than a second
+// windows-tagged file that silently drops the enumeration gate's denominator on
+// the other leg - which is exactly the hole ticket 121 AC#3 wrote out at length.
 
 import (
 	"bytes"
