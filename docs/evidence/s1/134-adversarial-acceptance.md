@@ -57,6 +57,8 @@
 | AC#2 | PASS（B 那半边有一处判语不成立，见 §2.4） | run/job/step/结论四项我自己从 API 读到；那枚 run 的 `slo-check.ps1` blob 我复算＝`560186fa` |
 | AC#3 | PASS（一处覆盖面缺口登记为 `R-134-3`） | 我在**被验版本那棵树**上用 `SLO_FRESH_CI` 指向四枚 ci.yml 变异件，P1 四发各红一次、干净件绿；树文件 `diff` 与 `git diff --numstat` 证明真 `ci.yml` 一字节未动 |
 | AC#4 | PASS | 三条拒绝理由我各造一发（真 `wisp.exe` 并发 / `RUNNER_TEMP` 前缀命中 / CPU 54% 自然撞），安静时也真放行过；判色改了之后**拒绝出数的条件一字未动**（可执行行差分 + 六处条件行号回读） |
+| AC#5 | **PASS**〔r2 补格，依据见 §5〕 | 我在 `6effb7e` 纯净快照上自己跑：`sh scripts/d22scan.sh` **rc=0**、八 scope 逐格不降（203/22/40/18/16/40/390/37 对票 99 的 197/20/37/17/16/37/342/26）、解析器读回 6 枚 job + `slo-full` 五步全 unconditional、`sh -n`/`bash -n` rc=0；shellcheck 那格我**两条腿都自己走了一遍**（docker 内 Linux 0.11.0 rc=0 + 真 CI `Shell lint for the pin` 步 success），并核过为过 lint 做的那处改动**没动任何判据**（`CDPATH=` → `CDPATH=''`，四行差分 + 两形运行时同行为实测） |
+| AC#6 | **PASS**〔r2 补格，依据见 §6；三处缺口登记 `R-134-5`/`R-134-6`/`R-134-7`〕 | 首要探针我造了 **12 发假 report**（详见 §6.2 逐发落点）：**没有任何一发能在"不伪造 artifact"的前提下给钉续命**——盘上那枚路径上"没数字的报告"要么被清除、要么根本没被写出来；钉确实**只看名字与未过期、不看内容**（这是 `R-134-5`），而"有样 ⇒ 有数字"这条链的承重墙（`internal/observe/sampler.go:332` 的零样本 fail-closed）**无用例钉住**（`R-134-6`，我把守卫拆了整包 54 枚用例仍 rc=0）；两半交易的另一半成立：争用那枚 run 产物表**只有 `slo-smoke-report`**（我自己 `gh api` 取的），P3 的红我独立复造（含"只放宽 P2 仍红"与"只放宽样本网槛 P2 仍红"两向），取不到数据六形全 `rc=2`/`rc=1` 无一 pass |
 
 ## 1. AC#1 形状由 owner 认（PASS）
 
@@ -292,3 +294,153 @@ scripts/slo-check.ps1:396  if (-not $allPass) { exit 1 }            # 出了数�
 而"零匹配时既不失败、也不创建空 artifact"这一条不是我信它的注释，是我在真 CI 上量到的——
 §2.3 那枚争用 run 的产物表里**没有** `slo-full-report`、日志里有那条 `##[warning]No files were found …`。
 `slo-smoke` 那一步仍留 `error`（同一枚 diff 里没出现它）⇒ 放宽没有被顺手推广到 hosted 侧。
+
+---
+
+## 接续说明（`acceptor-ticket134-r2`，2026-09-23 17:1x-17:5x +08）
+
+上面到 §4 为止是 `acceptor-ticket134-r1` 的原文，**我一格没改、一个读数没覆写**。它撞 150 轮上限时把
+AC#1..AC#4 裁完并 commit 了，但文末 §5/§6/§7/§8 四节**只被 §1..§4 的正文引用、从未写出**（§2.3 引用了
+"§6.2 的假 report 问题"、§2.4 引用了"§8 的 `R-134-4`"、§3.3 引用了"§8"、§4 引用了"§5 解析器读数"）——
+**这些指向我下面要写的节，读者按编号跳过来看到的将是我的读数，不是它的**。这本身是一处"注释先于读数"，
+按本仓规矩保留原文、在此登记（它自己的文件里我不动）。
+
+开工时 `git rev-parse HEAD` = **`df0310622fd77953a0521c65d804990a71d1266c`**（分支 `dev`）。被验版本 =
+**`6effb7e`**（与 r1 同一枚锚），快照 = `git archive 6effb7e | tar -x -C /tmp/wisp134-acc-r2`，
+仓库内零 worktree、零 checkout。
+
+我自己复核了"简报说 HEAD 比被验版本新"这句话的实际面（不引简报的结论）：
+`git diff --numstat 6effb7e..HEAD -- scripts .github internal cmd` 命中 **12 枚文件**，全在 `cmd/wisp/**` 与
+`internal/config/**`、`internal/memory/**`（票 124/131 那两路），**`scripts/` 与 `.github/` 一枚没有**。
+被验面逐枚算 blob：`scripts/slo-check.ps1`=`6e2ba550`、`scripts/slo-freshness.sh`=`9882f1c4`、
+`.github/workflows/ci.yml`=`c5a98063`、`.github/workflows/slo-fresh.yml`=`18739b2d`、
+`internal/observe/thresholds.go`=`e2677b11` —— **`6effb7e` 与 HEAD 五枚全同**。
+唯一碰过被验语义邻域的是 `cmd/wisp/slo_windows.go`（`6 3`），我逐行看了那 9 行差分：**全是 `//` 注释行**
+（`git diff 6effb7e..HEAD -- cmd/wisp/slo_windows.go | grep '^[+-]'` 去掉文件标记与非注释行后为空），
+改的是票 131 那条"leg 记账口径"的句子，不是 `wisp slo` 的行为。⇒ 以 `6effb7e` 为被验面在本格仍然成立。
+
+## 5. AC#5 门禁：d22scan / 解析器 / bash -n / shellcheck（PASS）
+
+AC#5 那一格在票面是已勾的，但它自己登记了"唯一没做到的一格是 `shellcheck`"，而实现方后来用 docker 里的
+Linux 版补上了。我要判的是两件事：**门禁读数我这儿成不成立**，以及**那处"为了过 lint"的改动有没有把语义改掉**。
+放水只按两条判据看：断言/判据有没有被动、helper 是不是原有的。
+
+### 5.1 `sh scripts/d22scan.sh` 纯净快照 rc=0 + 八 scope 不降（我自己的读数）
+
+在 `/tmp/wisp134-acc-r2`（`git archive 6effb7e` 解开，未变异）上跑，全文 `/tmp/wisp134-acc-r2-a/d22scan-snapshot.log`：
+
+```
+runtests.sh: OK - packages=[./...] top-level: PASS=21 FAIL=0 SKIP=0, === RUN=31, '[no tests to run]'=0
+--- PASS: TestBuiltBinaryGoesRedEndToEnd (0.94s)        # 6 枚子用例全 PASS，正向对照在场
+d22scan: examined 225 production Go files under internal/ and cmd/
+d22scan: clean - no D22 ban violations
+d22scan rc=0
+```
+
+| scope | 票 99 基线（`99-adversarial-acceptance.md:174`，我自己回读的那一行） | 我这发 `6effb7e` | 判定 |
+|---|---|---|---|
+| bans #1-5 `internal/` | 197 | **203** | 不降 |
+| bans #1-5 `cmd/` | 20 | **22** | 不降 |
+| ban #6 `frontend/` | 37 | **40** | 不降 |
+| ban #7 `internal/tools/` | 17 | **18** | 不降 |
+| ban #8 `design/` | 16 | **16** | 持平 |
+| ban #8 `frontend/` | 37 | **40** | 不降 |
+| ban #8 `internal/` | 342 | **390** | 不降 |
+| ban #8 `cmd/` | 26 | **37** | 不降 |
+
+八行齐全、逐格不降。增量不是本票造成的：票 134 至今没新增任何 `.go` 文件（`git diff --numstat b723978..6effb7e`
+里属于本票的只有 `scripts/slo-check.ps1`、`scripts/slo-freshness.sh`、`.github/workflows/ci.yml`、
+`.github/workflows/slo-fresh.yml` 四枚 + 文档，**零枚 `.go`**，见 §6.4）。
+
+### 5.2 YAML 解析器复核（PyYAML 6.0.3，仪器我自己写的 `/tmp/wisp134-acc-r2-a/yaml_r2.py`）
+
+```
+job count = 6
+job names = ['lint', 'lint-frontend', 'slo-full', 'slo-smoke', 'test-core', 'test-windows']
+slo-full runs-on = ['self-hosted', 'wisp-slo']
+slo-full job-level if/continue-on-error = NONE
+  step 1 actions/checkout@v4                            unconditional=True
+  step 2 actions/setup-go@v5                            unconditional=True
+  step 3 Build wisp.exe (deps cached on the runner)     unconditional=True
+  step 4 SLO full gate (six states + settle + leak)     unconditional=True
+         run: ... slo-check.ps1 -Subset full -SecondsPerState 6
+  step 5 Upload SLO report                              unconditional=True
+         with: {'name': 'slo-full-report', 'path': 'build/slo/slo-report.json', 'if-no-files-found': 'warn'}
+triggers(on) keys = ['pull_request', 'push', 'schedule', 'workflow_dispatch']
+  push = {'branches': ['main', 'dev']} / schedule = [{'cron': '37 19 * * *'}] / workflow_dispatch = True
+slo-full step envs = [(1, {}), (2, {}), (3, {}), (4, {}), (5, {})]
+```
+
+六枚 job 全在、门步骤无条件、`-Subset full` 原样、`concurrency` 两行原样（我按 `on`/`concurrency` 整键读回）。
+最后一行是我这格真正要的一条：**`slo-full` 五枚步的 `env` 全是空的** —— 四枚测试接缝
+（`SLO_FRESH_NOW`/`SLO_FULL_LAST_TRIGGER`/`SLO_FULL_LAST_SAMPLE`/`SLO_FRESH_CI`）没有一枚被生产工作流设过，
+所以我下面那些"注入"进不了 CI 那条路（r1 在 §3.2 从 `slo-fresh.yml` 那头核过同一件事，两头发都对着）。
+
+`slo-fresh.yml` 我另读一遍独立性：`on = schedule(23 */6 * * *) + workflow_dispatch`、`runs-on: ubuntu-latest`、
+`permissions = contents:read + actions:read`（P3 要读的正是这一枚 `actions: read`，没有加宽）、三步零条件、
+生产步的 env 只有 `GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}`；它与 `ci.yml` 互不引用。
+
+### 5.3 `sh -n` / `bash -n`
+
+`sh -n scripts/slo-freshness.sh` **rc=0**、`bash -n scripts/slo-freshness.sh` **rc=0**（同一枚快照文件，
+blob `9882f1c4`）。
+
+### 5.4 shellcheck 那一格：两条腿我都自己走了一遍
+
+**腿一（本机 docker，Linux 版）**：容器挂载用 `/d/…` + `MSYS_NO_PATHCONV=1`。这发的挂载证明我不看"目录非空"，
+看**两侧 sha256 相同**（`alpine:3.20` 里 `sha256sum` 对同一枚文件）：
+
+```
+容器内 1dbb3b1444b13e8c93cd7e9bba76592eb7961c59d0c69e0d80549e7a9bd2916f  /src/slo-freshness-6effb7e.sh
+宿 主 1dbb3b1444b13e8c93cd7e9bba76592eb7961c59d0c69e0d80549e7a9bd2916f  slo-freshness-6effb7e.sh
+埋病文件 canary-bad.sh 两侧同为 cf8f3592…，shellcheck 对它 rc=1（SC2164 / SC2046 / SC2086 x2）⇒ 仪器有牙
+```
+
+| 被 linter 看的文件 | rc | 读数 |
+|---|---|---|
+| `scripts/slo-freshness.sh` @ `6effb7e`（被验，blob `9882f1c4`） | **0** | 无 finding |
+| `scripts/slo-freshness.sh` @ `44ab500`（AC#6 前半之前那版） | **1** | **SC1007 at :85:15 与 :86:15**（`-f gcc` 给的行列，与票面 §3.4 那发的行号一致） |
+
+⇒ r1 交回项里"SC1007 连行号一起复现"这句**我这发成立**。
+
+**腿二（真 CI，不是我的 docker）**：run `35831465653`（`slo-fresh`，事件 `workflow_dispatch`，
+head_sha **`6effb7e`** = 被验版本本身）的 job `slo-full-must-keep-getting-triggered`（id `107084825136`）
+步级结论我从 API 逐枚取回：`Set up job` success、`Run actions/checkout@v4` success、
+**`slo-full freshness pin (ticket 134 AC#3)` = success**、**`Shell lint for the pin` = success**、
+`Complete job` success。那枚 job 的日志里 `##[error]` 命中数 **0**；`shellcheck is not on this runner image`
+那串只在"回显的脚本正文"里出现 1 次（L122-124 的 `command -v … || { … }` 文本本身），
+步 4 的 `shellcheck -s sh scripts/slo-freshness.sh`（L126）之后无任何输出即结束 ⇒
+**hosted runner 上装了 shellcheck 且对被验 blob 返回 0**。这一发比我这发的 docker 更硬：它是 CI 自己走的这条路。
+顺带把 r1 在 §2.4 记的那件事对上一格：这枚钉的 `23 */6 * * *` 那枚 `cron` 在 `06:23:00Z` 已过、没产出 run
+（`gh run list --event schedule` 至我 09:53Z 复扫仍为空），所以**钉在 CI 上只活 `workflow_dispatch` 这条路**，
+`schedule` 那半边仍未交付（`R-134-4`）。
+
+### 5.5 "为了过 lint 把语义改掉"这一问：没有
+
+那处改动是 `3f17504`，我只看判据面：
+
+```
+$ git diff 44ab500..3f17504 -- scripts/slo-freshness.sh   # 去掉注释行之后
+-here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+-root=$(CDPATH= cd -- "$here/.." && pwd)
++here=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
++root=$(CDPATH='' cd -- "$here/.." && pwd)
+非注释改动行数：4（= 上面这两对，四行之外全是注释与那六行解释）
+```
+
+判据一（断言/判据动没动）：**没动**——三枚探针、四枚接缝、阈值、`exit` 码，一行没碰。
+判据二（helper 是不是原有的）：**是原有的**，没新增也没替换任何 helper。
+运行时等价性我没停在"读着一样"，测了：在一枚 `CDPATH` 指向别处的目录里 `cd -- target`——
+
+```
+CDPATH=  cd -- target     -> REFUSED   （旧拼写：赋值只对这一条 cd 生效，正是守卫要的）
+CDPATH='' cd -- target    -> REFUSED   （新拼写：同）
+对照组（不加赋值）        -> RESOLVED-VIA-CDPATH （证明这枚赋值确实在做事，两形都在做事）
+```
+
+⇒ 语义等价成立，`''` 只是把引号补上（POSIX 分词后两者同字节），**不是为过 lint 放宽判据**。
+
+**一格口径登记**（不是 AC#5 的缺陷，是给下一次别误读"全仓 lint 过了"）：同一枚 SC1007 拼写在
+`scripts/d22scan.sh:37-38` 仍在，我对它跑同一发 linter **rc=1（SC1007 x2）**；CI 那步只 lint
+`scripts/slo-freshness.sh` 一枚文件。`d22scan.sh` 在 AC#6 的"照旧禁改"清单里，所以本票不该顺手改它，
+登记为 `R-134-9`（口径类，低）。
