@@ -242,3 +242,43 @@ D·软链形包级 `顶 FAIL 3` 的名册就是这三枚（`TestAC3POSIXLinkInsi
 - 基线六数对齐**第三本账**：票 124 批次 3b 交件的 `POST-P 普通 52/30/0/0＋22/0`、`POST-L 软链 45/27/0/3＋15/0`
   （`docs/evidence/s1/124-ac2b-3b-conversion.md:220`、`:229`）与我这一程的基线两行**逐数相同**，测量方的中间那本也对得上
   ⇒ 三本账同一版被测码，锚点漂移不成立（§0 的差集为空是同一件事的第二种量法）。
+
+## §5 两块「更正块」的复核（它们本身也是编排者的未验证断言）
+
+票面文末那两块用 `>` 引起来的更正块是编排者按测量方报回写的。我按派单要求把它们当**断言**逐条重走，不背书。
+
+**① 「AC#3 沿用原句会拿到一枚恒真判据」——结论成立，但它给的依据句要收窄。**
+
+- 成立的部分（我独立量）：票面 AC#3 原句是"复跑 AC#1 那一发同一变异 ⇒ 这 12 枚必须转红"。
+  AC#1 那一发的形状（票面 line 30-31：让 seal 与 unlink 两条路都不看链接）＝我的 **MUT-AB**，
+  它在**一个字都没改的旧码**上就把 11 枚在**两形全部打红**（普通 11／软链 11，§2.2 逐名）。
+  ⇒ 拿它当"修好了才算数"的尺子，**改与不改都满足** ⇒ **恒真判据**这一条我复现了。
+- 要收窄的部分：更正块写的是"**MUT-A／MUT-B／MUT-AB 那三发**在未修的旧码上就已经全红（11 枚全响）"。
+  实测**只有 AB 全响**：单发 **A 响 9**（113 族）／**B 响 2**（108 族），另两枚各自 2／9 不响。
+  结论方向不变（AC#1 指定的那一发本就是两路同坏），但"三发都全响"这句**过度概括**，已记 R-137-2。
+- ⚠ 顺带一条给下游的硬话（这条派单没让我判，但它是我这几发读数的直接推论）：**判据也不能钉在单发 A 或单发 B 上**——
+  收紧断言之后复跑 MUT-A，108 那两枚走的是 unlink 路、链路完好、拒的就是自己种的 `root/link` ⇒ 它们**修完也不会响**；
+  于是"11 枚必须转红"在单发 A 上会变成一枚**恒不满足**的判据（另一类坏尺）。
+  ⇒ 能同时满足"不恒真"与"修完真能达成"的，目前只有 **MUT-D** 这一形（我的读数：软链 0 响／普通 11 响）。
+
+**② 「真实枚数＝11＝7 顶层＋4 子测试」——完全复现。** 见 §3：我逐名数、逐名给算／不算的理由，
+并复现出"12"的可复现来源（`grep -c '^func Test'` 在 113 文件恰得 8）。`assertRefused113` 真位置 `placement_symlink_113_other_test.go:127` 我也自己 `grep -n` 过。
+
+**③ 更正块里那句「对照组那三枚根已解析的用例（119 族两枚 ＋ `TestAC1POSIXUnresolvedSymlinkedRootStillRefused119`）在两形都必须仍红」——这条按字面执行会出事。**
+
+- 我的 MUT-D 读数里**两形都红**的三枚是：`TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed`、
+  `TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasNamed`、`TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119`
+  （D·软链形包级顶 FAIL 恰好就是这 3 枚、子测 0，名册见 §4）。
+- 而被点进对照组的那枚 `TestAC1POSIXUnresolvedSymlinkedRootStillRefused119` 实测是 **D·普通 FAIL／D·软链 PASS**。
+  原因不是 bug：它**本来就用 raw `t.TempDir()`（`dataroot_symlink_119_other_test.go:194`）**、断言的就是"未解析的根必须被拒"，
+  软链形里宿主的链接给了它一个**合法的拒** ⇒ 它和分母那 11 枚是**同一种病**，不是"根已解析的对照"。
+  同样形状的 `TestAC2POSIXInjectedTestDataDirStandsAsDeclared119`（`:286` raw）也是 D·普通 FAIL／D·软链 PASS。
+- ⚠ 若"119 族两枚"指的是 winsec 那枚 `TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119` 加上
+  `TestAC3POSIXSecretRouteLinkInsideItsDataRootStillRefused119`（源码注释 `winsec_other.go:139` 点过名）——后者**不在 winsec 包**，
+  它在 `cmd/wisp/secret_dataroot_119b_test.go:201`，**本格十发读数里没有它**（且那枚包正有兄弟代理在飞，我没去跑）。
+- ⇒ 这条按字面写会造出一枚**永远无法满足**的落地凭据，把未来 AC#3 的实现方推向"去修一枚没坏的用例"。已记 **R-137-1**。
+  我在 §2.4 用的是**我自己读出来的那三枚**，不是更正块点名的那三枚。
+
+**④ 更正块 ②「普通形八数逐数不变」——需要一个具体参照值，否则不可复算。** 我这程给出的就是这八个字：
+MUT-D·普通形 `RUN=52 顶 PASS=17 顶 FAIL=13 顶 SKIP=0 子 PASS=17 子 FAIL=5 子 SKIP=0 rc=1`，
+且**逐名 FAIL 名册与 MUT-AB·普通形完全相同**（§4 表）⇒ AC#3 落地时"普通形不许新增红／不许由绿转 SKIP"就按这两句核。
