@@ -307,7 +307,9 @@ MUT-D·普通形 `RUN=52 顶 PASS=17 顶 FAIL=13 顶 SKIP=0 子 PASS=17 子 FAIL
 10. **未跟踪件 `docs/reports/2026-09-23-gap-analysis-vs-oss-harnesses.md` 未读、未提交、未改、未删、未据它改判据**；
     工作树里别人那两枚已改文件（`docs/reports/injection-timeline.md`、`pending-and-issues.md`）我没碰、没 stage。
 11. **两枚在飞兄弟的半成品未读**（`acceptor-ticket133-ac2-r2` 的 `cmd/wisp`、`acceptor-ticket136-ac8-ac9-r1` 的 `internal/observe`）。
-    本程每次 `git diff --cached --name-only` 都只有我自己那一枚文件（四次提交，逐次核过）。
+    本程每次 `git diff --cached --name-only` 都只有我自己那一枚文件；**终局共十枚提交逐次核过**
+    （`ee0a169`/`75a193d`/`69d581d`/`fe617b7`/`53f1b8e`/`96b9c5b`/`e2ba9f0`/`286de6c`/`8c7ad1f`/`7ad0ec6`；
+    写这一行时手上只有四枚，那枚"四次"是当时量、已由本行改成终局数，不改写任何已提交的 message）。
 
 ## §7 `R-137-x` 新账（号先查过占用：`grep -rn "R-137-" docs/ .scratch/` 除本件外零命中 ⇒ 从 1 起）
 
