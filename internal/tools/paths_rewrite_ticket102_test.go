@@ -15,7 +15,7 @@ import (
 // (SPEC-06 §4 step 1), not a defect.
 
 func TestPathCanonicalizerAccountsForRewrittenRoots(t *testing.T) {
-	existing := t.TempDir()
+	existing := sealableTempDir124(t)
 	sub := filepath.Join(existing, "proj")
 	if err := os.MkdirAll(sub, 0o700); err != nil {
 		t.Fatalf("mkdir root: %v", err)

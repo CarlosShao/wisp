@@ -143,7 +143,7 @@ func TestTenOpsInOneToolCallGetOneConfirm(t *testing.T) {
 	ui := newFakeUI()
 	g, clk, _ := newGate(t, ui, approval.Options{Window: 3 * time.Second})
 	g.AdmitTextTask(testTask)
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	ft := newFakeTool("fs.write", tools.CapFSWrite, risk.L1, "paths")
 	b := bridgeFor(t, g, ft, []string{dir})
 

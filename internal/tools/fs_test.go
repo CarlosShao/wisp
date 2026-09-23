@@ -14,7 +14,7 @@ import (
 // contract under test is "a capability cannot be used outside the choke point".
 
 func TestFSReadReturnsTheFileAndTaintsIt(t *testing.T) {
-	root := tempCanonical(t)
+	root := sealableTempCanonical124(t)
 	secret := "本机凭据摘录：" + strings.Repeat("abcdefgh", 4)
 	path := writeUnder(t, root, "note.txt", secret)
 
@@ -48,7 +48,7 @@ func TestFSReadReturnsTheFileAndTaintsIt(t *testing.T) {
 // smuggled out through an exfil-shaped call is an L2 verdict with R4 in
 // rules_hit, and the flag that says no session grant may cover it.
 func TestFSReadTaintFeedsR4(t *testing.T) {
-	root := tempCanonical(t)
+	root := sealableTempCanonical124(t)
 	secret := "身份证号码 11010119900307" + "9"
 	path := writeUnder(t, root, "id.txt", secret)
 	b, _ := fsBridgeWith(t, nil, nil, root)
@@ -91,7 +91,7 @@ func TestFSReadTaintFeedsR4(t *testing.T) {
 }
 
 func TestFSListSummarizesADirectory(t *testing.T) {
-	root := tempCanonical(t)
+	root := sealableTempCanonical124(t)
 	for _, n := range []string{"alpha.txt", "beta.txt", "gamma.txt"} {
 		writeUnder(t, root, n, "x")
 	}
@@ -116,7 +116,7 @@ func TestFSListSummarizesADirectory(t *testing.T) {
 // (D15(3) caps are a host decision, but a tool that cut its own output must
 // say so).
 func TestFSListHonoursItsCap(t *testing.T) {
-	root := tempCanonical(t)
+	root := sealableTempCanonical124(t)
 	for _, n := range []string{"a", "b", "c", "d", "e"} {
 		writeUnder(t, root, n+".txt", "x")
 	}

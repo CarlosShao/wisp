@@ -163,7 +163,7 @@ func (f *loopFixture) rows(t *testing.T, taskID string) []memory.ToolCall {
 // loop, and the write happens because the window ran out unvetoed - not
 // because anything approved it silently.
 func TestLoopPassesDeclaredL1WriteThroughTheGate(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	f := composeLoop(t, dir, true)
 
 	start := time.Now()
@@ -224,7 +224,7 @@ func TestLoopPassesDeclaredL1WriteThroughTheGate(t *testing.T) {
 // early-reject's deletion safe: a host that assembles a loop without the D47
 // registration gets the old refusal back, and the file never appears.
 func TestLoopStillRefusesL1WhenNoGateIsRegistered(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	f := composeLoop(t, dir, false)
 
 	res := f.loop.Run(t.Context(), "把这句话写进文件")

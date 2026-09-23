@@ -47,7 +47,7 @@ type probeFixture struct {
 func newProbeFixture(t *testing.T) *probeFixture {
 	t.Helper()
 	pf := &probeFixture{srv: adaptertest.StartMockllm(t)}
-	store, err := memory.Open(filepath.Join(t.TempDir(), "data"))
+	store, err := memory.Open(filepath.Join(sealableTempDir124(t), "data"))
 	if err != nil {
 		t.Fatal(err)
 	}

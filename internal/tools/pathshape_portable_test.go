@@ -26,7 +26,7 @@ func foreignSepT() string {
 }
 
 func TestCanonicalizeReturnsAPathTheOSCanOpen(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	target := filepath.Join(dir, "payload.txt")
 	if err := os.WriteFile(target, []byte("ticket 75"), 0o600); err != nil {
 		t.Fatal(err)

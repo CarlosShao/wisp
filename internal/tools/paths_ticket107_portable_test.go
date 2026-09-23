@@ -25,7 +25,7 @@ import (
 // the canonicalizer whose root is already the resolved tree, so the comparison
 // leg is exercised on the exact string the failing platform rejected.
 func TestTicket107AllowlistJudgmentTwoShapes(t *testing.T) {
-	existing := t.TempDir()
+	existing := sealableTempDir124(t)
 	sub := filepath.Join(existing, "proj")
 	if err := os.MkdirAll(sub, 0o700); err != nil {
 		t.Fatalf("mkdir root: %v", err)
@@ -78,7 +78,7 @@ func TestTicket107AllowlistJudgmentTwoShapes(t *testing.T) {
 // parent) stays outside the allowlist. Weakening the fold to "any prefix" makes
 // this red.
 func TestTicket107AllowlistBoundaryIsComponentWise(t *testing.T) {
-	existing := t.TempDir()
+	existing := sealableTempDir124(t)
 	root := filepath.Join(existing, "proj")
 	sibling := root + "-evil"
 	for _, d := range []string{root, sibling} {

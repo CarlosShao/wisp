@@ -142,7 +142,7 @@ func TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing(t *testing.T) {
 // resolved form has to be consulted on both legs - handling only the root half
 // fixes one place out of two in the same invariant.
 func TestTicket107bProbeCLinkInsideAllowedRootStaysOutside(t *testing.T) {
-	base := t.TempDir()
+	base := sealableTempDir124(t)
 	proj := filepath.Join(base, "proj")
 	outside := filepath.Join(base, "outside")
 	for _, d := range []string{proj, outside} {

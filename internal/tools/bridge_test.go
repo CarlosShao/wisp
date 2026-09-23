@@ -606,8 +606,8 @@ func TestRiskDecisionRoutesEachLevelToItsBranch(t *testing.T) {
 // DECLARES L0 but reaches for an out-of-scope path is judged L2 by C19, so a
 // plugin (or a builtin) cannot self-downgrade its way past the gate.
 func TestDeclaredRiskIsOnlyAFloor(t *testing.T) {
-	root := tempCanonical(t)
-	outside := tempCanonical(t)
+	root := sealableTempCanonical124(t)
+	outside := sealableTempCanonical124(t)
 	g := &gateSpy{approveAns: AnswerReject}
 	b, _ := fsBridgeWith(t, nil, g, root)
 	paths := b.Paths()
@@ -647,14 +647,14 @@ func TestDeclaredRiskIsOnlyAFloor(t *testing.T) {
 // ASSESSED level, the decision, the outcome and a correlation_id, for the
 // executed path as well as for the refused ones.
 func TestToolCallRowsAreComplete(t *testing.T) {
-	root := tempCanonical(t)
+	root := sealableTempCanonical124(t)
 	store := openStore(t, filepath.Join(root, "data"))
 	var j agent.Journal = store
 	g := &gateSpy{approveAns: AnswerReject, windowAns: AnswerVeto}
 	b, _ := fsBridgeWith(t, j, g, root)
 	mustStartTask(t, store, "task-1")
 
-	outside := tempCanonical(t)
+	outside := sealableTempCanonical124(t)
 	inside := writeUnder(t, root, "a.txt", "hi")
 	cases := []struct {
 		tool, args, risk, decision, outcome, class string

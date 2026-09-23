@@ -136,7 +136,7 @@ func askOnce(t *testing.T, path string) (int, int) {
 // 档 that was manually picked is the档 the next process starts with. A
 // never-manually-changed config is the OTHER test below, not a case here.
 func TestTicket90ManualSwitchSurvivesRestart(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	path := writeConfig(t, dir, risk.ModeAskEveryStepName)
 	mgr := openManager(t, path)
 	var confirmCalls int
@@ -179,7 +179,7 @@ func TestTicket90ManualSwitchSurvivesRestart(t *testing.T) {
 // TestTicket90UntouchedConfigStartsAtTheDefault is AC#3(b): never manually
 // changed => a restart reads the first档, and the key is absent-or-default.
 func TestTicket90UntouchedConfigStartsAtTheDefault(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	c := config.NewDefaults()
 	if c.Risk.PermissionMode != risk.ModeAskEveryStepName {
 		t.Fatalf("the schema default is %q, want %q (R20/M2)",
@@ -219,7 +219,7 @@ func TestTicket90UntouchedConfigStartsAtTheDefault(t *testing.T) {
 // nothing, while the same two restarts above leave the mode in place.
 func TestTicket90SessionGrantDoesNotSurviveRestart(t *testing.T) {
 	ctx := context.Background()
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 
 	// Same restart pair as AC#3(a): grant vs mode, one mechanism each.
 	store, err := memory.Open(dir, memory.WithLogger(slog.New(slog.DiscardHandler)))
@@ -298,7 +298,7 @@ func TestTicket90ConfigKeyChangesWhatTheChainAsks(t *testing.T) {
 		{risk.ModeAskHighRiskName, 0, 0},
 		{risk.ModeAutoApproveName, 0, 0},
 	} {
-		dir := t.TempDir()
+		dir := sealableTempDir124(t)
 		path := writeConfig(t, dir, tc.key)
 		w, a := askOnce(t, path)
 		if w != tc.wantWindows || a != tc.wantApprove {
@@ -308,7 +308,7 @@ func TestTicket90ConfigKeyChangesWhatTheChainAsks(t *testing.T) {
 	}
 	// A value the reader cannot map must fail the LOAD (票 83: 响亮失败), and the
 	// error must name the key path.
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	path := writeConfig(t, dir, risk.ModeAskEveryStepName)
 	c := config.NewDefaults()
 	c.Risk.PermissionMode = "everything_off"
@@ -334,7 +334,7 @@ func TestTicket90ConfigKeyChangesWhatTheChainAsks(t *testing.T) {
 // other locked key. That is also why R20/M4 puts the confirmation on the SWITCH,
 // where a caller is identifiable, and not on the value.
 func TestTicket90HandEditLooseningGoesThroughD36(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	path := writeConfig(t, dir, risk.ModeAskEveryStepName)
 	mgr := openManager(t, path)
 	var seenSection string

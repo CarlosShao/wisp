@@ -360,7 +360,7 @@ func TestOverwriteDetectionFollowsTheCanonicalPath(t *testing.T) {
 func TestAtomicWriteKillsMidWrite(t *testing.T) {
 	const original = "ORIGINAL-CONTENT-THAT-MUST-SURVIVE-A-KILL"
 	t.Run("overwrite_target_keeps_its_old_bytes", func(t *testing.T) {
-		root := tempRaw(t)
+		root := sealableTempDir124(t)
 		target := filepath.Join(root, "keep.txt")
 		if err := os.WriteFile(target, []byte(original), 0o600); err != nil {
 			t.Fatal(err)
@@ -396,7 +396,7 @@ func TestAtomicWriteKillsMidWrite(t *testing.T) {
 	})
 
 	t.Run("new_file_target_does_not_appear_at_all", func(t *testing.T) {
-		root := tempRaw(t)
+		root := sealableTempDir124(t)
 		target := filepath.Join(root, "brand-new.txt")
 		g := &gateSpy{windowAns: AnswerTimeout} // the L1 window running out MEANS execute
 		b, _ := fsDepsBridge(t, FSDeps{
@@ -426,7 +426,7 @@ func TestAtomicWriteKillsMidWrite(t *testing.T) {
 	})
 
 	t.Run("a_clean_write_lands_and_round_trips", func(t *testing.T) {
-		root := tempRaw(t)
+		root := sealableTempDir124(t)
 		target := filepath.Join(root, "ok.txt")
 		g := &gateSpy{windowAns: AnswerAllow}
 		b, _ := fsDepsBridge(t, FSDeps{
@@ -475,7 +475,7 @@ func TestWriteRefusesABodyOverTheCap(t *testing.T) {
 // an unlink cannot do; on a platform without it, that nothing was deleted at
 // all. Either way the file never simply disappears.
 func TestFSTrashGoesToTheRecycleBin(t *testing.T) {
-	root := tempRaw(t)
+	root := sealableTempDir124(t)
 	target := filepath.Join(root, "trashme.txt")
 	if err := os.WriteFile(target, []byte("recoverable"), 0o600); err != nil {
 		t.Fatal(err)
@@ -640,7 +640,7 @@ func TestDeleteEnabledRegistersItAsL2(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 func TestFSMoveSameVolume(t *testing.T) {
-	root := tempRaw(t)
+	root := sealableTempDir124(t)
 	from := filepath.Join(root, "a.txt")
 	to := filepath.Join(root, "b.txt")
 	if err := os.WriteFile(from, []byte("payload"), 0o600); err != nil {

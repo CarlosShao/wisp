@@ -39,7 +39,7 @@ func assessWrite(t *testing.T, canon *PathCanonicalizer, target string) risk.Dec
 }
 
 func TestWorkspaceSwitchNarrowsWhatTheAssessorJudges(t *testing.T) {
-	base := t.TempDir()
+	base := sealableTempDir124(t)
 	wsA := mkDir(t, base, "alpha")
 	wsB := mkDir(t, base, "beta")
 	// Both trees are authorized by config; the file under beta is a plain L1

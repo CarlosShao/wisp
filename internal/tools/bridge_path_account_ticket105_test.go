@@ -87,7 +87,7 @@ func auditLine(log, marker string) string {
 // fs.read, and the account of ticket 102's book appears in the audit file with
 // its content intact.
 func TestRealToolCallWritesRewriteAccountIntoAudit(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	tree := filepath.Join(dir, "proj")
 	if err := os.MkdirAll(tree, 0o700); err != nil {
 		t.Fatal(err)
