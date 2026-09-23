@@ -203,3 +203,60 @@ commit 列表（本程，锚 `54123e0`；只 commit 未 push）：
 ＋ 五发两拍，然后按 `docs/evidence/s1/133-adversarial-acceptance.md` §3.1／§6／§8 判 AC#2 是否翻格；
 `R-133-2` 的函数值那一支与 `R-133-3` 的 entry-name 半句**要动生产文件**，建议另派到 AC#3／AC#5 那两格里做，
 别在续单里顺手做半截；票 135 面上 `R-131r3-1` 是同族不同尺（131 的第二把尺），本程只修了 133 这一把，**两票不许互相以为对方已修完**。
+
+---
+
+## AC#2 第二格复算＝**再次退回**（本程 `acceptor-ticket133-ac2-r2` 09-23 23:5x +08，证据 `docs/evidence/s1/133-ac2-r2-acceptance.md`）
+
+**锚点** `048a9e4`（`fbf420c` 的后代；`git diff --name-only fbf420c..048a9e4` 里 `cmd/wisp/**` 命中 **0** ⇒ 回修方
+在 `fbf420c` 上取的读数与本程同树可比；被测那枚尺 `sha1sum` ＝ `906201f4a3995d10b0a65910aa4cc68e1f745a9d`，
+与它 §3.3 的 `ARCHIVE-MODULE` 行逐字同）。**本节只 append、不翻格**（AC#2 由编排者按裁决表翻）。
+
+**逐发复算结果：回修方那五发探针本程全部独立复现"由绿转红"**（红名逐发都是 `TestAC1AC2DispatchHopGate133`、
+`go build ./cmd/wisp/` 与 `go build ./...` 每发都先 rc=0）：`p4` 仍红、`p1`／`p2`（两枚）／`p3`（两枚）／`p5`／`p6` 全红，
+账本 leg 数 `p1`–`p4` 12、`p5` 12、`p6` 13。六发两拍两形也复现：门关着六发全 rc=1 100/52/1/0 红名逐发点本尺；
+摘掉本尺四发仍由 131 的门红、**X14 两拍 rc=0 100/53/0/0**（⇒ `R-133-6` 那句更正本程有自己的第一手凭据，
+反向判据"二拍也必须红"成立）。基线两批发绿/发红都留着：第 2 批 101/54/0/0 与 202/108/0/0 **复现成功**，
+第 1 批三发红是既有 flake `TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink`（`0xc000013a`，四发同命令 3 红 1 绿）
+⇒ 这台机器上"四数"不是稳定量，本表一律以红名集合与名册差集为主证。
+
+**它自报"没做"的两半句，理由本程独立重走＝两条都成立**：① `R-133-2` 函数值那一支——`GOOS=linux go list -f {{.TestGoFiles}}`
+的测试文件集里**没有**那三枚 `_windows_test.go` 件而本尺在，容器 `golang:1.27` 里未种件 `go vet ./cmd/wisp/` rc=0、
+种上函数值即 `vet: …​undefined: TestAC2SealNoticeLandsInTheRunLegLogFile` ⇒ 装不下成立（只有一处措辞说宽了：
+宿主那条 `GOOS=linux go vet` 今天不带种件也 rc=1、诊断里 0 枚 `cmd/wisp:line`，走不到类型检查 ⇒ 记 `R-133-10` 信息级，不改判据）。
+② `R-133-3` entry-name 半句——五枚裁决句（`main.go:65/70/74`、`panel_assets.go:16`、`slo_windows.go:186`）
+逐枚判"正文点没点该腿 entry 符号名"＝**五枚全 NONE**，落在 **3 枚生产文件**里 ⇒ "装上就得改三枚生产文件"成立。
+⇒ 这两支按派单口径**不记成本格的破口**，归 **AC#3／AC#5**（残留形状另立 `R-133-11`）。
+
+**本格第二次退回的唯一实测理由（本程自造，前两程都没造）**：`p7`——一枚签名完全正确的
+`func TestR2P7LinuxOnlyCaseDrivesTheLeg(t *testing.T)` 种在 `probe133r2b_linux_test.go` 里（文件名后缀＝隐式
+`GOOS=linux`；`GOOS=windows go list` 的 `TestGoFiles` 里**没有**它、`GOOS=linux` 里有），配同一行 usage，
+在 X14 第二拍之上 ⇒ **本尺判绿 rc=0**、账本 `leg sfx131 … covered=test TestR2P7LinuxOnlyCaseDrivesTheLeg drives cmdSfx131`，
+整包两形（门关着／摘掉本尺）都 **rc=0 100/53/0/0**、`--- SKIP` 0、`panic` 0、那枚名字 `=== RUN` **0 次**、
+在整份日志里只出现 1 次＝本尺自己打的那行账本。⇒ **"删掉一截调用之后仍然全绿"这一形被验收方亲手造出来了**，
+按本仓硬线**只能判退回、不能判附条件**。同形另有一处：`p8`（裁决句坐在真正 owning 这条腿的那枚文件里、
+正文不点任何符号名）判绿——它是上面②那条已登记的残留，不参与判退回。
+**根因不是"签名检查没装"，是"这条声明今天编不编"没人问**：`isRunnableCase133` 之后的三处文字
+（`:398-405` holds ONLY declarations Go's testing package can run、`:1397-1400` 同义句、`:1338`
+"A renamed or **build-tag-hidden** case has to be red somewhere, **and here is where**"）
+与文件头"看不见"清单第 4 条"reconciles claims against **compiled test sources**"、`:245-246` 的"never less"
+**都被这一发证反**。
+
+**同一格第二次被退回 ⇒ 不再续第三格**。本节把出口写成两件事（细节与台件路径见证据 §3.4）：
+
+- **① 这一形做成家族票的第 7 发**：交 **票 135**，现有 `M-A`／`M-B`／`M-C`／`M-D′`／`M-E`／`M-F` 六发之后记作 **`M-G`**，
+  形状＝"一枚本平台不编译的合法签名 `Test*` 被认作覆盖"，归 135 的 AC#1/AC#2 那一根（自证腿不许是哑的＋做成常备用例），
+  与 135 已有 AC#7 那枚 `R-131r3-1`（131 的第二把尺只到文件粒度）是**同族不同尺**；⚠ **两票不许互相以为对方已修完**。
+- **② 本格翻格条件改写成一条可复算的跨票依赖**（三条同时在盘上才许勾，任一不在 ⇒ 保持退回）：
+  **C1** 某枚 sha 上 `sh /d/tmp/wisp133-r2-run.sh <标签> <新树> x14b2c p7 "-count=1 -run '^TestAC1AC2DispatchHopGate133$'"`
+  读到 **rc=1 且红名是本尺**，并且同树整包门关着**不得仍是 100/53/0/0**（今天它就是 ⇒ 那句是本格现状）；
+  **C2** 票 135 面上 `M-G` 有**非实现者**出的三态读数（落地行＋`go build` rc＋两拍红名），落在 `docs/evidence/s1/135-*.md`
+  具体一节并给 commit 短哈希——只结 AC#7 不满足 C2；
+  **C3** 若要升成"CI 守"须给具体 run id＋job id＋step 名，给不出当那道门不存在（本程 `gh run list` 取数失败 `api.github.com … EOF`，
+  未引任何 run 读数；AC#2 判据物本身不含 CI 落点，那是 AC#6 的账）。
+
+`R-133-9`（高）＝`p7` 那一形，修法方向**不许折回只信 AST**（票面"修法形状不许是"那条＋票 135 同条已裁过一次，理由复用）：
+给"进 `p.tests`"那一步加**平台求值**（文件名后缀＋`//go:build` 对 `runtime.GOOS`/`GOARCH` 求值），
+不通过的声明可另进一桶（走图仍看得见 ⇒ 跨平台互借那半句近似性保留）但**不得充当覆盖**，并红着说"这条覆盖证据今天不在本平台的二进制里"。
+`R-133-12`（信息）＝那枚既有 flake，不归本票。**本表未裁** AC#1／AC#3／AC#4／AC#5／AC#6；两栏计数：真通知回显 **5**、判为注入 **0**。
+
