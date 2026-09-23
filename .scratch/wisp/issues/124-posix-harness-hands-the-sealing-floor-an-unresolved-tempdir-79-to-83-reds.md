@@ -168,3 +168,72 @@ tools 的回收站那枚、approval 的无门拒 L1、llm 的 `RefusesSilentRuns
      **六枚"另一种拒"复算时须各自仍拿到它自己要的拒**、**归零结论必须两形都有**；
   ⑤ 全部批次做完的终判据：**软链形红名数 ＝ 0**（本票范围内；`TestL1Write`／`TestLateVeto` 两枚除外，它们归票 123）。
 - **AC#2a 已翻格**（清点方自己翻，附 5 枚 commit、零 `.go` 改动）。**AC#2 本格保持未勾**，等 2b-1..2b-4 全绿再按复算翻。
+
+## AC#2b 批次 3 后一半（`internal/winsec` 17 枚）交件 —— 先裁该不该转，再动手
+
+- 2026-09-23 21:2x `worker-ticket124-ac2b-3b`：**AC#2b 批次 3b 交件（动码，17 枚全转）**。锚 `4ea0db2` 首读，
+  纯净快照 `git archive 4ea0db2 | tar -x`（仓内未建 worktree、未 checkout），改件 `8ced405`。
+  途中 HEAD 有兄弟 `62dda11`（3a 的 `internal/agent` 26 枚）落在我之前，已核 `git diff --name-only 4ea0db2 8ced405`
+  在 winsec 侧只有我这一枚包的 7 个文件 ⇒ PRE/POST 之差对本批读数无影响。
+  **先裁后动**：把 17 枚逐枚分成甲/乙/丙，结论 **甲 17 / 乙 0 / 丙 0**，主产物在
+  `docs/evidence/s1/124-ac2b-3b-conversion.md` §2。派单预留的"绝大多数属乙类、这批基本不该动码"那一支**没成立**：
+  逐枚回看断言原文，17 枚里**没有任何一枚**的断言是"就是要拿未解析的根去试底线拒绝"——
+  软链形红串逐字只有三种文案（`not provably resolved`、`entry is a link to something else`、
+  `the leaf link does not answer with its own target`），**三种点名的链接都是宿主的 `/varlink`，没有一种是用例自己种的**。
+  要保住"未解析那一形"的用例**另有其人且一枚未动**（票 125 那 3 枚自拒探针 + 票 113 族拒绝腿），与批次 2 保留
+  `internal/config/c26_seam_posix_125_test.go` 同处理。**零放宽**：没删任何用例、没动任何断言或阈值。
+
+  **三条实据我自己重走了一遍，三条都对得上，但有一条要纠正转述**：
+  ① 票 119 `R-119-9`（`119-*.md:73`）"不许拿被测函数算 fixture"逐字为真——但它钉的是**期望值**的来路，
+  本批 15 处改动全在**输入根**那一侧，一枚期望值没改成由被测函数算（`TestAC4POSIXFloorAnswersInsideTheNamedTree`
+  的 `got.String() != dir` 仍拿声明串比，专项核过）；
+  ② `envfork.go:148` "nothing in internal/winsec calls it" 逐字为真，而且这条边界**在 winsec 这侧被第二次写下**
+  （`resolve.go:224-228`，票 125：底线不许依赖它上面的层，否则那句话不可核）⇒ **本批因此不接 `proc.SealableRoot`**，
+  改按票 125 先例复用包内已有的 `resolveProbeRoot`（**没写第四份走法**、**没 import proc**）；
+  ③ `*_other_test.go` 宿主不编译为真且可量化：**17 枚里 11 枚**在 `!windows` 标签下、宿主连编译都不参与
+  （`GOOS=windows go test -list` 逐名命中 0），只有 `private_fail_test.go` 的 **6 枚**（无标签）宿主有分母
+  ⇒ 那 6 枚在 Windows 上走**字面 no-op 的第二支**（runner 的 8.3 短名会改拼写，见 `export_test.go` 的
+  `TreeOwnershipProbeForTest`），宿主读数改前改后 **6/6 同 PASS**。
+  ⚠ **要纠正的一条**：批次 1 的 `next=` 让下游有理由怀疑 winsec"接不上"。**实测不是编译问题**——
+  在仓外快照副本放 `package winsec` + `import internal/proc` 的探针，容器原生 `go vet` **rc=0**、`go test -list` 列得出；
+  根因是 `go list -f '{{join .Imports " "}}' ./internal/proc` 里**根本没有 winsec**（两包无环）。
+  ⇒ "不许照抄委托形状"是**纪律／地界**约束，不是依赖缺失，别让下一位读成"这 17 枚转不了"。
+
+  **五判据**（全文证据 §3–§7，每数标"在哪台/哪个标签"）：
+  ① 17 枚 × 四台逐名表（改前/改后 × 软链/普通，程序化生成非手抄）⇒ **软链形红名 17 → 0**
+  （`〔容器/golang:1.27 go1.27.1 linux/amd64〕` 顶层 FAIL 13→0、子测 FAIL 4→0、顶层 PASS 恰 +13、子测 PASS 恰 +4、
+  RUN 45 不变、SKIP 3 不变；点名宿主的 `refusing to seal`/`not provably resolved` 行 **20 → 0**）；
+  ② **普通形八个数改前改后逐数相同**（52/30/0/0 + 22/0，两态 rc=0）＋ `git diff` **删除侧全文只有 15 行、
+  全是 `t.TempDir()` 那一个表达式** ⇒ 判定分支/断言/阈值 0 hunk，票面 AC#3 成立（`resolve.go`、`internal/proc/**`、
+  `internal/risk/**`、`internal/agent/**`、前两批已交文件**全零 hunk**）；
+  ③ 两形各一枚新容器：**两形 RUN 差 7 枚逐名＝票 125 三枚自拒探针的子测试**，**SKIP 名册改前改后 `diff` 为空**
+  ⇒ 本批零新增 SKIP、"被跳过冒充变绿"逐枚排除（17 枚旁写的是 `PASS`）；
+  ④ "另一种拒"逐枚实拿（探针台只加 4 行 `t.Logf`、四数与 POST 逐数相同）：AC5 那族 5 枚拿回**注入的**
+  `injected: descriptor could not be applied` 且 `IsErrNotSealable=true`；AC118 两枚的拒因点名**自己种的**
+  `…/002/root/artifact.txt` 而非 `/varlink`，且 `leafLinkTo118` 的 `EvalSymlinks` 前置一字未动（它是防假绿的闸）；
+  ⑤ 变异三态：`MUTATION-124-2B3B` 先 `grep -n` 证落地（`return resolveProbeRoot` 命中 0）+ 容器原生
+  `go build`/`go vet` **rc=0** 再读数 ⇒ 软链形**重新 17 枚红**、红名与改前基线 **`diff` 逐名完全相同**；
+  同一发在普通形 **0 红**、八个数逐数相同。
+  **门禁（票面 AC#5 的本批范围）**：`-count=2 -v` 两形各一枚新容器 ⇒ 软链 `90/54/0/6`+`30/0`、普通 `104/60/0/0`+`44/0`，
+  **每枚数都是 `-count=1` 那发的正好 2 倍**；`gofmt -l internal/winsec` 与 `gofumpt -l internal/winsec`（**整包**）各 **0 行**，
+  gofumpt 版本钉明 **`v0.7.0 (go1.27.1)`**；`go vet` 容器原生 `./internal/winsec/` **rc=0**（这才是 `!windows` 那 11 枚的类型读数，
+  宿主交叉那一发到不了类型检查、既不算破口也不算清白）；`d22scan` 纯净快照 pre/post 各 **rc=0 clean**、
+  台账八 scope **一枚不降**（`203/22/40/18/16/40/` 397→**400** `/38`，+3 逐名归给本批 2 枚新文件 + 兄弟 `62dda11` 的 1 枚）。
+
+  **本批最重要的一条不是那 17 枚，是顺手量到的邻居账（§1.3(b)，请裁）**：软链形下 winsec 的票 113/108 POSIX **拒绝腿**
+  有 **12 枚是"绿得没有理由"**（8 顶层 + 4 子测试）——同一支仪器在普通形拒的是用例自己种的 `root/link`、
+  在软链形拒的是宿主的 `/varlink`，而 `assertRefused113` 两形都只要求同一个 `ErrUnresolvedPath` ⇒ **分不出来**。
+  这 12 枚**不在 17 枚分母里**（它们是 PASS 不是 FAIL），但其 fixture 由本批改掉的两枚共享 helper
+  （`newForeign113`、`foreignTree108`）供给；它们**自己的** 7 处 `t.TempDir()` 按地界**有意未换**（属票 113/108 的用例面）
+  ⇒ 所以它们**仍然 vacuous**。修法就一行形状（把那 7 处也换掉），代价是要补一发 MUT-B 型变异才能证明它们真变强。
+  **不修的后果**：软链形＝macOS 真实形状下这 12 枚零检测力，下一位改 winsec 叶子腿的人不会收到任何红。
+  ⚠ 这条我只做到"两形字符串对比 + 同 sentinel 推不出区分"，**没做变异自证** ⇒ 按未验证登记，不算已成立。
+
+  **一格不翻**：AC#2 本格、AC#2b、AC#5 都不翻（终判据留到 2b-4 交回后一次性复算）。
+  **`next=` 交编排者 / 2b-4**：① `cmd/wisp` 5 枚（4 枚顶层同一枚 `newProvidersFixture` ⇒ 一处递根覆盖 4 枚 + `secret_test.go:679`
+  那一枚子测试），⚠ 同包 28 枚**两形都红**（DPAPI/命令面腿旧账）一枚都不许顺手修绿，**判据是逐枚点名不是包级 rc**，
+  地界按文件级核（`cmd/wisp/leg_dispatch_gate_133_test.go` 系票 133 在动）；② `cmd/wisp` **可以**直接接 `proc.SealableRoot`，
+  **只有 `internal/winsec` 是例外**，2b-4 不必再走 3b 这套；③ 全树终判据复算须含 **3a＋3b 合并态**，豁免名单逐名钉死为
+  票 123 那族三枚 300 s 腿 + 两形都红 29 枚 + 形状自带 SKIP 4 枚（本批已把 winsec 那 3 枚钉成"改后仍 3 枚 SKIP、名册逐名相同"）；
+  ④ 请一并裁上面那本 12 枚邻居账。⚠ 跑法账两条沿用：`exit 99`（普通形不许存在 `/varlink`）＋"每形一枚**新**容器"；
+  另登记本批自撞的一次空跑：容器 `sh -c` 忘 `cd /src` ⇒ 两发 `-count=2` 第一轮 rc=1 全零读数（四数是 0 才没被当成绿）。

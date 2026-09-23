@@ -349,4 +349,142 @@ PRE-P `RUN=52 顶层 30/0/0 子测 22/0` ＝ POST-P `RUN=52 顶层 30/0/0 子测
 
 ### 7.3 `go vet` 双 GOOS
 
-（本小节读数见 `VET-CONTAINER.log` / `VET-HOST-WIN.log` / `VET-HOST-LINUXX.log`，逐行归因随 §9 一并补入。）
+| 读法 | 台 | 范围 | rc | 逐行归因 |
+|---|---|---|---|---|
+| `go vet ./internal/winsec/` | **容器原生 linux/amd64**（`CGO_ENABLED` 默认，`8ced405` 快照） | 本批改动面 | **0** | **这才是那 11 枚 `!windows` 用例＋`tempdir_resolved_124_other_test.go` 的真类型读数**——宿主结构上到不了它们 |
+| `go vet ./internal/winsec/` | 宿主 windows | 本批改动面 | **0** | 覆盖 windows 那一支 no-op helper 与无标签的 `private_fail_test.go` |
+| `go vet ./...` | 宿主 **GOOS=windows** 全树 | 30 枚包 | **0** | 无输出 |
+| `GOOS=linux go vet ./...` | 宿主 **交叉** 全树 | 30 枚包 | **1** | 1 个错误块，逐字归因到 `package github.com/CarlosShao/wisp/cmd/wisp → imports github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx → imports github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files in …sherpa-onnx-go-linux@v1.13.8` |
+| `go vet ./...` | 容器原生 全树 | 30 枚包 | **未取得** | 首发为整树拉模块缓存，卡在 `go: downloading …/sherpa-onnx-go-linux v1.13.8` 未收敛；按批次 1/2 的同一账，**包级 rc=0 已覆盖本批改动面**，全树那一发留给 2b-4 的终判据复算 |
+
+⇒ 交叉那一发按派单口径**既不算破口也不算清白**：它停在外部模块的 build constraints、**到不了类型检查**（错误块里没有任何本仓
+`file:line`，且 `internal/winsec` 不在归因路径上）。同一发在批次 1、批次 2 逐字相同 ⇒ 与本批无关。
+本批改动面的类型读数取上面前两行的 **rc=0**。
+
+## 8. 改动面
+
+### 8.1 交件 commit
+
+| commit | 内容 |
+|---|---|
+| `857a5fe` | `docs/evidence/s1/124-ac2b-3b-conversion.md` §0–§2（三分类，本件主产物） |
+| `8ced405` | `internal/winsec/**` 动码（2 枚新文件 + 5 枚改 15 处） |
+| `09edf02` | 证据 §3–§7（判据①-⑤ 与门禁读数） |
+
+（本节与 §9/§10 是第 4 枚 commit。**AC#2 本格与 AC#5 都不翻**，见 §9。）
+
+### 8.2 文件级
+
+**新增（2 枚，都是 test-only，都不进生产码）**
+- `internal/winsec/tempdir_resolved_124_other_test.go` —— `//go:build !windows`，`package winsec`，
+  `SealableTempDirForTest124` ＝ `resolveProbeRoot(t.TempDir())`。**复用包内既有的那一次走法（`resolve.go:253`），
+  没写第四份重复解析**（票 125 `R-125-2` 那本副本账不增行），**也没 import `internal/proc`**。
+- `internal/winsec/tempdir_resolved_124_windows_test.go` —— `//go:build windows`，字面 no-op（宿主/CI 的 windows 腿一字不动，理由写在该文件注释里）。
+
+**修改（5 枚，共 15 处递根点，逐枚 file:line）**
+
+| 文件 | 处数 | 改后位置 | 覆盖的用例 |
+|---|---|---|---|
+| `private_fail_test.go`（无标签，`package winsec`） | 2 | `:28`、`:100` | #1–#6 |
+| `private_other_test.go`（`!windows`，`package winsec`） | 5 | `:21`、`:38`、`:61`、`:71`、`:98` | #7–#10 |
+| `ancestor_separator_108_other_test.go`（`!windows`，`package winsec_test`） | 3 | `:38`(helper `foreignTree108`)、`:96`、`:156` | #11、#12 |
+| `placement_leaf_118_other_test.go`（`!windows`，`package winsec_test`） | 1 | `:60`(helper `ownTree118`) | #13、#14 |
+| `placement_symlink_113_other_test.go`（`!windows`，`package winsec_test`） | 4 | `:53`(helper `newForeign113`)、`:254`、`:289`、`:337` | #15、#16、#17 |
+
+⇒ 三枚 helper 里只有 **2 枚**（`newForeign113`、`foreignTree108`）被换，因为它们**同时**供给了本批用例；
+`leafLinkTo118` 的 `filepath.EvalSymlinks` 前置**一字未动**（它是 §6 里那两枚的防假绿闸）。
+
+### 8.3 禁改列与兄弟地界（逐条核过，不是声明）
+
+- `docs/PLAN.md`、`docs/specs/**`、`internal/risk/**`、`internal/risk/pathresolver*.go`、`rules_gateway.go`、
+  `tools/d22scan/**`、`allowlist.txt`、任何阈值／golden／`thresholds.go`、`frontend/**`：**零 hunk**
+  （`git diff --name-only 4ea0db2 8ced405` 只出现上面这 7 枚路径，已在 §4 后逐枚核）。
+- `internal/proc/**` 的 `SealableRoot` 本体：**零 hunk，且根本没 import 它**。
+- `internal/winsec/resolve.go`（票面 AC#6 点名的禁改列）：**零 hunk**，只**读**了它的 `resolveProbeRoot`；
+  锚点与改后 `md5sum` 同为 `b6876a5efe759f6e17434d1b50a129c3`（每台容器都自证过）。
+- `internal/agent/**`：**零 hunk**（兄弟 3a 在那儿；它的 `62dda11` 在我之前落库，我没碰它的文件）。
+- 前两批已交文件（memory/config/tools/llm/perm/agent/Approval 的 `tempdir_resolved_124*_test.go`）：**零回退**。
+- `internal/winsec/dataroot_symlink_119_other_test.go`、`seam_probe_root_125_other_test.go`：**一字未动**
+  （前者是 `R-119-9` 的守卫文件、后者是那 3 枚自拒探针）。
+- 未跟踪的 `docs/reports/2026-09-23-gap-analysis-vs-oss-harnesses.md`：**未提交、未改、未删、未据它开票或改判据**
+  （全程 `git status --porcelain` 里它一直单独挂着）。
+
+### 8.4 宿主（`〔宿主/windows〕`）读数补全：本批唯一有宿主分母的那 6 枚
+
+派单要求"每个数标在哪台、哪个构建标签"，所以宿主半边单独量（`go test -count=1 -v -run 'TestAC5…'`，无标签文件，Windows 真跑）：
+
+| 用例 | 改前（`4ea0db2` 快照） | 改后（`8ced405` 工作树） |
+|---|---|---|
+| `TestAC5FailedSealRefusesTheWrite` | PASS | PASS |
+| `…/exclusive_artifact`、`…/replacement_write`、`…/directory_chain`、`…/seal_file_and_dir_direct` | PASS ×4 | PASS ×4 |
+| `TestAC5FailureIsNotSwallowedByTheHappyPath` | PASS | PASS |
+
+⇒ **6/6 两态同 PASS** ＝ windows no-op 那一支按设计生效（宿主半边没被解析层碰过）。
+另外 11 枚（`!windows`）宿主**连编译都不参与**（`GOOS=windows go test -list` 逐名命中 0，见 §1.1），
+所以它们在宿主**没有"改前改后"可言**，只有 §3 的容器读数。
+
+## 9. 未验证项与 `next=`
+
+### 9.1 未验证 / 已登记不裁
+
+1. **AC#2 本格不翻、AC#2b 不翻、AC#5 不翻**（派单明写）。票面 16:33 的终判据"软链形红名数＝0"
+   要 2b-4 交回后在全树一次性复算，本批只把 `./internal/winsec/` 这一包从 17 做到 0。
+2. **§1.3(b) 那 12 枚邻居的"vacuous green"是字符串对比推出来的，没做变异自证**。
+   我量到的是：软链形它们 PASS 且拒因写 `/varlink`、普通形同枚 PASS 且拒因写自己种的 link，
+   而 `assertRefused113` 两形都只要求 `ErrUnresolvedPath` ⇒ 同 sentinel、无法区分。
+   **没有做**的是"把叶子/祖先腿拆掉（票 113 验收方的 MUT-B）看它们在软链形会不会照样绿"那一发 ⇒ 属推断，交验收方。
+3. **邻居自己的 7 处 `t.TempDir()` 未换**（`ancestor_108:69,127`、`placement_symlink_113:146,169,197,213,238`），
+   所以那 12 枚在软链形**仍然 vacuous**。换它们＝动票 113/108 的用例面，不属本批 17 枚分母 ⇒ 有意不做，不属漏做。
+4. 交叉 `GOOS=linux go vet ./...`（宿主）按派单**既不算破口也不算清白**：停在外部模块 cgo 包的 build constraints，
+   到不了类型检查。真正的 linux 类型读数是**容器原生**那一发（§9.4）。
+5. `d22scan` 跑在含码的纯净快照（`8ced405`）上；**证据文件本身不在台账 scope 内**（台账只看 `internal/`、`cmd/`、
+   `frontend/`、`design/`），所以 §9/§10 追加不会再动那八枚数。
+6. **全树 30 枚包的分母本批未复跑**（那是 2b-4 的终判据）。本批改动面只有一枚包，且判据② 已证普通形逐数不变。
+7. 变异自证只发了**一票**（拆解析层）。票面 AC#4 要求的最低量是"至少一发把新加的那层解析拆掉"⇒ 已满足；
+   没有发"把 `resolveProbeRoot` 本身拆掉"那一发（它属票 125 的地界）。
+
+### 9.2 `next=`（交编排者 / 2b-4）
+
+1. **2b-4＝`cmd/wisp` 5 枚**（`TestProvidersProbeRecordsMeasuredThinkingFalse/True`、`TestProvidersDiscoverListsWhatTheServerServes`、
+   `TestProvidersProbeUnconfiguredRefIsNotSilentlyKeyless` 四枚顶层走同一枚 `newProvidersFixture` ⇒ 一处递根覆盖 4 枚；
+   加 `secret_test.go:679` 的 `TestSecretFailurePathsLogAndPrintNoPlaintext/unset_name_(no_such_blob)`）。
+   ⚠ 同包另有 **28 枚两形都红**（`DPAPI` 族 + 命令面腿，`R-119-7` 那本账）⇒ **一枚都不许顺手修绿**，
+   也不许因包级 `FAIL≠0` 把自己那 5 枚判成没转绿：**判据是逐枚点名、不是包级 rc**。
+   ⚠ 地界按**文件级**核：`cmd/wisp/leg_dispatch_gate_133_test.go` 系票 133 在动。
+2. ⚠ **形状别照抄**：`cmd/wisp` 与 2b-1/2 同为"调用方解析 OS 给的答案"，可直接用 `proc.SealableRoot`；
+   **只有 `internal/winsec` 是例外**（底线自己的包，见 §2.4 与 §8.2），2b-4 不需要再走 3b 这套。
+3. **全树终判据复算**（2b-4 交回后一次做，须含 3a＋3b 合并态）：纯净快照 + 两形各一枚**新**容器 +
+   逐包 `-count=1 -v` 跑 AC#1 那本 30 枚包分母 ⇒ 软链形红名与账上 131 枚"可转"做差集**期望为空**。
+   豁免名单逐名钉死为：票 123 那族 **三枚** 300 s 腿（`TestL1Write`、`TestLateVeto…`、`TestFSReadOnlyNeverOpensACard`）
+   ＋ 两形都红 29 枚（`panel` 1 ＋ `cmd/wisp` 28）＋ 形状自带 SKIP 4 枚（`winsec` 3 ＋ `config` 1，既非红亦非绿）。
+   ⇒ 本批把这 4 枚 winsec/config 侧的数字钉成了**改后仍 3 枚 SKIP、名册逐名相同**，复算时按名核即可。
+4. **请一并裁 §1.3(b)/§9.1(2)(3) 那本邻居账**（12 枚 winsec POSIX 拒绝腿在软链形是"绿得没有理由"）。
+   可选修法就一行形状：把那 7 处邻居根也换成 `SealableTempDirForTest124(t)`。
+   代价：动的是票 113/108 的用例面、且必须补一发 MUT-B 型变异才能证明它们真的变强 ⇒ 本批按地界没做。
+   不修的后果：软链形（＝macOS 真实形状）下这 12 枚**零检测力**，下一位改 `winsec` 叶子腿的人不会收到红。
+5. ⚠ **本批沿用的两条跑法账值得写进每份派单**：`exit 99`（普通形不许存在 `/varlink`，批次 1 加的）
+   与"每形一枚**新**容器"（批次 2 交的）；本批有一次**自己撞出来的**教训：容器内 `sh -c` 忘 `cd /src`
+   ⇒ `go.mod not found`、`-count=2` 两发第一轮全部 rc=1 空跑（**没被当成绿**，因为四数是 0）。登记在此以免下游重踩。
+
+### 9.4 容器原生 `go vet ./...`（真类型读数）
+
+**未取得，且不是破口**：那一发（`VET-CONTAINER.log`）在首次为整树拉模块缓存时卡在
+`go: downloading github.com/k2-fsa/sherpa-onnx-go-linux v1.13.8` 未收敛，本批不等它、改取**包级**那一发
+——`go vet ./internal/winsec/` 容器原生 **rc=0**（读数与逐行归因在 §7.3）。
+本批改动面只有 `internal/winsec` 一枚包，包级 rc=0 就是它的类型结论；**全树那一发留给 2b-4 的终判据复算顺手补**。
+
+## 10. 临时件（只建不删）
+
+| 路径 | 用途 |
+|---|---|
+| `/d/tmp/wisp124-2b3b/` | 锚点 `4ea0db2` 纯净快照（PRE 台；宿主改前读数也在这台上量） |
+| `/d/tmp/wisp124-2b3b-post/` | 改件 `8ced405` 纯净快照（POST 台 + `-count=2` 门禁台 + d22scan POST） |
+| `/d/tmp/wisp124-2b3b-mut/` | `MUTATION-124-2B3B` 台（判据⑤三态） |
+| `/d/tmp/wisp124-2b3b-probe/` | 探针台（判据④"另一种拒"实拿，只加 4 行 `t.Logf`） |
+| `/d/tmp/wisp124-2b3b-cycle/` | 环引用探针（§1.3(a)：证 `package winsec` import `proc` 无环、vet rc=0）——**在仓外** |
+| `/d/tmp/wisp124-2b3b-gocache/` | 容器共享 `GOMODCACHE`（被上面各台复用） |
+| `/d/tmp/wisp124-2b3b-run.sh`／`-run-lf.sh` | 跑法脚本（CRLF 原件／LF 副本，容器执行 LF 那枚） |
+| `/d/tmp/wisp124-2b3b-logs/` | 全部 `-v` 日志：`BASE-L/P`、`POST-L/P`、`MUT-L/P`、`PROBE-L`、`GATE-L/P`、`MUT-BUILD`、`VET-{CONTAINER,HOST-WIN,HOST-LINUXX}`、`HOST-LIST`、`PRE-L-red.txt`、`MUT-L-red.txt` |
+| `/d/tmp/wisp124-2b3b-frag-3-7.md` | 本件 §3–§7 的写作件（`cat >>` 用） |
+
+被本件引用的目录谁都别删——它们是这份裁决表可复算的凭据。
