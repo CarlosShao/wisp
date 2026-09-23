@@ -157,10 +157,20 @@
 - **33 `spill_test.go:186` `TestSpillThroughLoop`** — 摘：`t.Fatalf("tiny window must spill the same result, got %+v", resTiny.ToolLog)`（`:214`）。判：要「loop 里 tiny window 也 spill 成」；未解析根挡落盘 ⇒ 可转。
 - **34 `spill_test.go:241` `TestSpillArtifactRespectsRawCap`** — 摘：`t.Fatal(err)`（`:249`）。判：setup 被拒，要成 ⇒ 可转。
 - **35 `truncation_test.go:26` `TestMaxTokensFailsAllToolCallsOfThatMessage`** — 摘：`t.Fatalf("memory.Open: %v", err)`（`:26`）。判：开库 setup 被拒，要成 ⇒ 可转。
-- **36–38 子测试 `TestSpilledBytesSurviveANameThatUsedToCollide/{slash_id_then_bare_id, bare_id_then_backslash_id, dotdot_id_then_word_id}`**（父 `spill_name_injectivity_test.go:99`）
-  摘：`t.Fatalf("Prepare(%q): %v", pair.idA, err)`（`spill_name_injectivity_test.go:114`）。判：三枚同父——`Prepare` 落 spill 被未解析根拒；断言要「碰撞名前后 spill 都存活」，要成 ⇒ 可转。
-- **39–42 子测试 `TestSpillCallIDHostileShapesSanitizedToBareNames/{separator, dotdot, drive_letter, unc}`**（父 `spill_path_invariant_test.go:102`）
-  摘：`t.Fatalf("Prepare(%q) failed: %v", sh.callID, err)`（`spill_path_invariant_test.go:112`）。判：四枚同父，`Prepare` 被未解析根拒；形状是 callID 名净化、非路径根 ⇒ 要成，可转。
+- **36 子测试 `TestSpilledBytesSurviveANameThatUsedToCollide/slash_id_then_bare_id`**（父 `spill_name_injectivity_test.go:99`）
+  摘：`t.Fatalf("Prepare(%q): %v", pair.idA, err)`（`spill_name_injectivity_test.go:114`）。判：`Prepare` 落 spill 被未解析根拒；断言要「碰撞名前后 spill 都存活」，要成 ⇒ 可转。
+- **37 子测试 `TestSpilledBytesSurviveANameThatUsedToCollide/bare_id_then_backslash_id`**（同父/同 assert）
+  摘：`t.Fatalf("Prepare(%q): %v", pair.idA, err)`（`spill_name_injectivity_test.go:114`）。判：同上，未解析根挡 spill，要成 ⇒ 可转。
+- **38 子测试 `TestSpilledBytesSurviveANameThatUsedToCollide/dotdot_id_then_word_id`**（同父/同 assert）
+  摘：`t.Fatalf("Prepare(%q): %v", pair.idA, err)`（`spill_name_injectivity_test.go:114`）。判：同上 ⇒ 可转。
+- **39 子测试 `TestSpillCallIDHostileShapesSanitizedToBareNames/separator`**（父 `spill_path_invariant_test.go:102`）
+  摘：`t.Fatalf("Prepare(%q) failed: %v", sh.callID, err)`（`spill_path_invariant_test.go:112`）。判：`Prepare` 被未解析根拒；形状是 callID 名净化、非路径根 ⇒ 要成，可转。
+- **40 子测试 `TestSpillCallIDHostileShapesSanitizedToBareNames/dotdot`**（同父/同 assert）
+  摘：`t.Fatalf("Prepare(%q) failed: %v", sh.callID, err)`（`spill_path_invariant_test.go:112`）。判：同上 ⇒ 可转。
+- **41 子测试 `TestSpillCallIDHostileShapesSanitizedToBareNames/drive_letter`**（同父/同 assert）
+  摘：`t.Fatalf("Prepare(%q) failed: %v", sh.callID, err)`（`spill_path_invariant_test.go:112`）。判：同上 ⇒ 可转。
+- **42 子测试 `TestSpillCallIDHostileShapesSanitizedToBareNames/unc`**（同父/同 assert）
+  摘：`t.Fatalf("Prepare(%q) failed: %v", sh.callID, err)`（`spill_path_invariant_test.go:112`）。判：同上 ⇒ 可转。
 - **43 子测试 `TestSpillCallIDHostileShapesSanitizedToBareNames/encoded_shapes_stay_bare_and_empty_id_falls_back_to_sequence`**
   摘：`t.Fatalf("Prepare(%q): %v", id, err)`（`spill_path_invariant_test.go:166`）。判：同上，setup 被未解析根拒，要成 ⇒ 可转。
 
@@ -169,3 +179,47 @@
 - **44 `batch_test.go` `TestTenOpsInOneToolCallGetOneConfirm`**
   摘录：`p := ui.wait(t); if p.Level != "L1" { t.Fatalf("level=%q：授权目录内的声明 L1 写应留在 L1", p.Level) }`（`batch_test.go:164-167`）
   判定：**可转**。判据：软链形它红在 `level="L2"`（A2L `:166`）——写目标在未解析 `t.TempDir()` 里 ⇒ 规范化器不认它「在授权树内」⇒ 声明 L1 被升级到 L2。随后批合并拿不到、`spawn` 的协程卡在待答 ⇒ cleanup 里 `fakes_test.go:193 派生的测试协程未在 3s 内退出` + `:277 闸门退出时仍有 1 个待审批项未清理`。**3 s 是 t.Fatalf 之后 cleanup 的连锁，非独立病因**；根因仍是未解析根→不授权→升级 L2。解析根后目录被认作授权、写留 L1、10 项并一次确认 ⇒ 回到普通形绿。（此枚在 AC#1 两枚样本 L1/L2 同现，非争用 flake。）
+
+### 5.4 `./internal/config/`（7 枚：6 顶层 + 1 子测试）— 全可转
+
+> 逐字：A2L 里 config 的红串是 `save: config: config.toml temp file seal: winsec: refusing to seal /varlink/…`（写 config 到未解析根被拒），断言全是「必须 save/load/migrate 成」⇒ 全可转。⚠ 注意本包 §5.4 附带发现：`TestAC2POSIXSeamInstallSurvivesASymlinkSpelledTemp125` 在软链形从「跑」变「SKIP」——它**不在本 132 里**（不属这 7 枚），是票 125 自己认出形状拒测的正向钉，别把它当「被清掉的红」。
+
+- **45 `boundary_test.go:186` `TestRoundTripLoadMarshalLoad`** — 摘：`t.Fatalf("save: %v", err)`（`:191`；实拿 `…config.toml temp file seal: refusing to seal /varlink/…`）。判：save 写未解析根被拒，要成 ⇒ 可转。
+- **46 `boundary_test.go:234` `TestResolvedNeverPersists`** — 摘：`t.Fatal(err)`（`:239`，save 步）。判：setup 写被拒，要成 ⇒ 可转。
+- **47 `loader_test.go:275` `TestSaveFileRoundTripsThroughLoad`** — 摘：`t.Fatalf("save: %v", err)`（`:292`）。判：同上 ⇒ 可转。
+- **48 `migrate_test.go:48` `TestMigrateV1Fixture`** — 摘：`t.Fatalf("migrating load: %v", err)`（`:53`）。判：迁移前要写/开未解析根被拒，要成 ⇒ 可转。
+- **49 `migrate_test.go:112` `TestMigrateNoVersionKeyAssumedV1`** — 摘：`t.Fatalf("file without schema_version is treated as v1: %v", err)`（`:116`）。判：写 seed 文件被未解析根拒 ⇒ 可转。
+- **50 `unwired_test.go:55` `TestUnwiredGuardLeavesHonestConfigsAlone`（顶层）** — 摘：子测试 `t.Fatal(err)`（`unwired_test.go:90`）。判：顶层红由子测试聚合；写/重载 config 被未解析根拒，要成 ⇒ 可转。
+- **51 子测试 `TestUnwiredGuardLeavesHonestConfigsAlone/SaveFile_output_reloads`** — 摘：`t.Fatal(err)`（`unwired_test.go:90`，SaveFile 产物重载）。判：SaveFile 落未解析根被拒 ⇒ 可转。
+
+### 5.5 `./internal/llm/`（17 枚：11 顶层 + 6 子测试）— 全可转
+
+> 11 枚顶层红全部落在 `pf := newProbeFixture(t)`——fixture 内 `memory: create data dir: winsec: refusing to seal /varlink/… not provably resolved`。测的是 probe 套件对能力的判读（要成），与拒无关。⚠ `TestProbeSuiteRefusesSilentRuns` 名字带 "Refuses"，但它红在**同一 fixture setup 被拒**（`probe_health_test.go:391`），它要「拒」的是「probe 不许静默跑」这一应用行为、不是未解析根 ⇒ 可转（解析后 fixture 开得成，那条"拒静默"照旧成立）。
+
+- **52 `probe_health_test.go:150` `TestProbeSuiteMeasuresBrokenFC`** — 摘：`pf := newProbeFixture(t)`（`:151`）。判：fixture 开库被未解析根拒，测能力判读要成 ⇒ 可转。
+- **53 `probe_health_test.go:213` `TestProbeSuiteMeasuresBrokenVision`** — 摘：`pf := newProbeFixture(t)`。判：同上 ⇒ 可转。
+- **54 `probe_health_test.go:251` `TestProbeSuiteHonestProviderRecordsNoMismatch`** — 摘：`pf := newProbeFixture(t)`。判：同上 ⇒ 可转。
+- **55 `probe_health_test.go:281` `TestProbeSuiteHonestNegativeIsNotAMismatch`** — 摘：`pf := newProbeFixture(t)`。判：同上 ⇒ 可转。
+- **56 `probe_health_test.go:306` `TestProbeSuiteBrokenOnAllThreeDialects`（顶层）** — 摘：子测试 `pf := newProbeFixture(t)`（`:309`）。判：顶层红由 3 方言子测试聚合 ⇒ 可转（见 59–61）。
+- **57 `probe_health_test.go:352` `TestProbeSuiteCapableOnAllThreeDialects`（顶层）** — 摘：子测试 `pf := newProbeFixture(t)`（`:355`）。判：同上 ⇒ 可转（见 62–64）。
+- **58 `probe_health_test.go:390` `TestProbeSuiteRefusesSilentRuns`** — 摘：`pf := newProbeFixture(t)`（`:391`）。判：红在 fixture setup 被未解析根拒；"Refuses Silent"是 probe 行为断言、非根，要成 ⇒ 可转。
+- **59 `probe_health_test.go:420` `TestProbeSuiteSinkFailurePropagates`** — 摘：`pf := newProbeFixture(t)`。判：同上 ⇒ 可转。
+- **60 `probe_health_test.go:457` `TestProbeSuiteAudioStaysUnprobed`** — 摘：`pf := newProbeFixture(t)`。判：同上 ⇒ 可转。
+- **61 `probe_thinking_test.go:84` `TestProbeSuiteMeasuresBrokenThinking`** — 摘：`pf := newProbeFixture(t)`。判：同上 ⇒ 可转。
+- **62 `probe_thinking_test.go:120` `TestProbeSuiteThinkingCapableIsNotTheSameAsBroken`** — 摘：`pf := newProbeFixture(t)`。判：同上 ⇒ 可转。
+- **63 子测试 `TestProbeSuiteBrokenOnAllThreeDialects/openai-chat`**（父 `probe_health_test.go:306`）— 摘：`pf := newProbeFixture(t)`（`:309`）。判：fixture 开库被未解析根拒，测方言能力判读要成 ⇒ 可转。
+- **64 子测试 `TestProbeSuiteBrokenOnAllThreeDialects/anthropic`**（同父/同 assert）— 摘：`pf := newProbeFixture(t)`（`:309`）。判：同上 ⇒ 可转。
+- **65 子测试 `TestProbeSuiteBrokenOnAllThreeDialects/openai-responses`**（同父/同 assert）— 摘：`pf := newProbeFixture(t)`（`:309`）。判：同上 ⇒ 可转。
+- **66 子测试 `TestProbeSuiteCapableOnAllThreeDialects/openai-chat`**（父 `probe_health_test.go:352`）— 摘：`pf := newProbeFixture(t)`（`:355`）。判：同上 ⇒ 可转。
+- **67 子测试 `TestProbeSuiteCapableOnAllThreeDialects/anthropic`**（同父/同 assert）— 摘：`pf := newProbeFixture(t)`（`:355`）。判：同上 ⇒ 可转。
+- **68 子测试 `TestProbeSuiteCapableOnAllThreeDialects/openai-responses`**（同父/同 assert）— 摘：`pf := newProbeFixture(t)`（`:355`）。判：同上 ⇒ 可转。
+
+### 5.6 `./internal/perm/`（5 枚）— 全可转
+
+> 逐字：A2L perm 红串 = `SaveFile: config: config.toml temp file seal: winsec: refusing to seal /varlink/…`。测三档权限持久化（要成），与拒无关。
+
+- **69 `ticket90_persist_test.go:138` `TestTicket90ManualSwitchSurvivesRestart`** — 摘：`path := writeConfig(t, dir, risk.ModeAskEveryStepName)`（`:140` 处 `t.Fatalf("SaveFile: %v", err)`）。判：写 config 到未解析根被拒 ⇒ 可转。
+- **70 `ticket90_persist_test.go:181` `TestTicket90UntouchedConfigStartsAtTheDefault`** — 摘：`t.Fatalf("SaveFile: %v", err)`（`:190`）。判：同上 ⇒ 可转。
+- **71 `ticket90_persist_test.go:220` `TestTicket90SessionGrantDoesNotSurviveRestart`** — 摘：`t.Fatalf("memory.Open: %v", err)`（`:227`）。判：开库 setup 被未解析根拒 ⇒ 可转。
+- **72 `ticket90_persist_test.go:291` `TestTicket90ConfigKeyChangesWhatTheChainAsks`** — 摘：`path := writeConfig(t, dir, tc.key)`。判：写 config 被拒 ⇒ 可转。
+- **73 `ticket90_persist_test.go:336` `TestTicket90HandEditLooseningGoesThroughD36`** — 摘：`path := writeConfig(t, dir, risk.ModeAskEveryStepName)`。判：同上 ⇒ 可转。
