@@ -18,7 +18,7 @@ $ cp third_party/sherpa-onnx/*.dll <树>/third_party/sherpa-onnx/   # 三枚 DLL
 
 开工时刻 `date -u` = 2026-09-23 12:11:01z（本地 20:11 +08）。
 
-## 0. 骨架（本节以下逐节填，每裁一格 commit 一次）
+## 0. 裁决表（逐节填毕，每裁一格 commit 一次）
 
 | 格 | 判据出处 | 判定 |
 | --- | --- | --- |
@@ -269,12 +269,109 @@ grep -c '^--- (PASS|FAIL): Test'              -> 53   （与基线同一枚数�
 
 ## 7. 四数账与门禁抽查复算
 
-（待填）
+**先证"我量的就是被验版本"**（三棵树在测量后仍与 `c5f140c` 逐字节同）：
+
+```
+$ git show c5f140c:cmd/wisp/leg_dispatch_gate_133_test.go | sha1sum   adfdde9c33bb53cf9b4df49c2f24af73ea236ec1
+$ sha1sum /d/tmp/wisp133-acc-r1/cmd/wisp/leg_dispatch_gate_133_test.go  adfdde9c33bb53cf9b4df49c2f24af73ea236ec1
+$ git archive c5f140c cmd/wisp | tar -x -C /d/tmp/wisp133-acc-r1-verify
+$ diff -r -q --exclude='*.off' --exclude='*.bak' /d/tmp/wisp133-acc-r1/cmd/wisp /d/tmp/wisp133-acc-r1-verify/cmd/wisp   rc=0
+```
+（`*.off`/`*.bak` 是本验收方种件的退役件与备份，`.go` 面零差异。）
+
+### 7.1 四数（只从 `-v` 量，`/d/tmp/wisp133-acc-r1-out/`）
+
+| 命令 | rc | RUN | PASS | FAIL | SKIP | 对前任 |
+| --- | --- | --- | --- | --- | --- | --- |
+| `go test -count=2 -v ./cmd/wisp/`（快照树） | 0 | 202 | 108 | 0 | 0 | §4.1 的 202/108/0/0 逐字同；`[no tests to run]` 命中 0 |
+| `go test -count=1 -v ./cmd/wisp/` | 0 | 101 | 54 | 0 | 0 | §2.0 `S0-ins-pristine` 逐字同 |
+| `… -count=1 -v -skip '^TestAC1AC2DispatchHopGate133$'` | 0 | 100 | 53 | 0 | 0 | §4.3 基线独立复现逐字同 |
+| `sh scripts/wisp-cli-tests.sh`（CI 那一行逐字同形） | 0 | 101 | 54 | 0 | 0 | §4.2：`portable-tests.sh: four numbers … RUN=101 PASS=54 FAIL=0 SKIP=0`、`runtests.sh: OK - … top-level: PASS=54 … '[no tests to run]'=0` |
+
+逐名账（本验收方自己 `comm`，不依赖前任的名册文件）：
+`roster-ins.txt` 54 枚、`roster-skip.txt` 53 枚、`comm -23` 只多 `TestAC1AC2DispatchHopGate133`、
+`comm -13` 空、`comm -12` = 53 ⇒ §4.4 的"新增一枚、其余一字未动"独立复现。
+
+### 7.2 门禁五读数
+
+```
+$ gofmt -l cmd/wisp/                    rc=0  输出 0 行                （§5.1 同）
+$ go vet ./cmd/wisp/                    rc=0  windows native          （§5.2 同）
+$ GOOS=linux go vet ./cmd/wisp/         rc=1  3 行诊断，全部指向
+      sherpa-onnx-go-linux@v1.13.8 的 build constraints exclude all Go files
+      —— 诊断里没有任何 cmd/wisp/*.go:line:col ⇒ 既不算破口也不算清白（§5.3 同，逐错误行归因一致）
+$ 容器真类型读数（golang:1.27，CGO_ENABLED=1，:ro 挂载被验快照）
+      --- mount proof ---  /src/go.mod 883 bytes
+                           /src/cmd/wisp/leg_dispatch_gate_133_test.go 47739 bytes   ← 被验的那枚文件本身在挂载里
+                           /gomod/github.com !burnt!sushi dlclark dop251…
+      --- go env ---  linux / amd64 / CGO_ENABLED=1 / GOMODCACHE=/gomod
+      go vet ./cmd/wisp/  →  VET_RC_0                                   （§5.4 同，挂载先证非空走 /d/... + MSYS_NO_PATHCONV=1）
+$ sh scripts/d22scan.sh                 rc=0   （与被验 CI 那一行逐字同形：`run: sh scripts/d22scan.sh`，见 .github/workflows/ci.yml:109）
+      正向控制 runtests.sh: OK - top-level: PASS=21 FAIL=0 SKIP=0, === RUN=31, '[no tests to run]'=0
+      真扫 8 scope：bans#1-5 internal/=203、cmd/=22、#6 frontend/=40、#7 internal/tools/=18、
+                    #8 design/=16、frontend/=40、internal/=397、cmd/=38 → clean
+```
+
+**一处读数分歧（不影响判定，两边都留）**：前任 §5.5 的 `ban #6 frontend/` 与 `#8 frontend/` 是 **43** 文本文件，
+本验收方在 `c5f140c` 快照上量到 **40**。差 3 枚＝前任那次跑在**工作树**（含兄弟代理未提交的 frontend 面），
+本验收方跑在**被验快照**。`cmd/=38`、`internal/=397` 两枚与前任逐字同（那两枚面不受兄弟改动影响）。
 
 ## 8. R-133-x 清单
 
-（待填）
+| 编号 | 严重度 | 是什么 | 能否复现（怎么复现，快照目录名） | 修法 | 归谁 |
+| --- | --- | --- | --- | --- | --- |
+| **R-133-1** | **高**（AC#2 退回主因） | 判据 (d) 的"被某枚 `Test*` 驱动"只认**裸名前缀**：`_test.go` 里一枚**方法**（Go 永不运行）同名即可把第五发第二拍的红洗成绿 | **能**。`wisp133-acc-r1` 树：`python wisp133-acc-r1-mutate.py <树> x14b2c` ＋ `python wisp133-acc-r1-probe.py <树> p1` → `go build ./...` rc=0、本尺 rc=0，账本行 `leg sfx131 … covered=test TestSfx131LegIsDriven drives cmdSfx131`；整包关门跑里它没有 `=== RUN`、没有 `--- PASS`，顶层仍 53 枚。日志 `out/P-p1.log`、`out/P-p1-fullpackage-doorclosed.log` | `collectTopLevel133`（:383-384）的 tests 桶按 131 的 :617 收紧：`fd.Recv == nil && HasPrefix(name,"Test")` 且签名为 `func(*testing.T)`；并给这条判据装一枚**主动弄哑自己**的自证腿（AC#3 那一格要求的就是它） | **票 133 续单**（仪器自身，`leg_dispatch_gate_133_test.go`）；AC#2 翻格条件之一 |
+| **R-133-2** | 中 | 本尺自己的钉登记表 `legCovers133.test` 是**字符串**，:1127 只做名字查表；非 `Test*` 的 helper 名也算"钉"，而它的红名文案写的是 "is not a test function" | **能**。同一棵树 `… probe.py <树> p3` → rc=0，账本 `covered=nail phantomHelper133 -> cmdSfx131`（`out/P-p3.log`） | 登记表存**函数值**（同 `registerLegNail131`，131 :225），或至少在查表时校验 receiver 为 nil ＋ 参数表含 `*testing.T` | **票 133 续单**；与 R-133-1 同一处修法，可一并 |
+| **R-133-3** | 中 | `WISP-LEG-COVERAGE-RULING:` 只取标记后第一个 token 当腿名，**不要求与腿的代码相邻、不要求同文件**；红名文案说的 "write the ruling next to the code that owns the leg" 没有判据兜 | **能**。`… probe.py <树> p2`（标记落在 `doctor.go:341`，离 `sfx131` 的 entry 260 行）→ rc=0，账本 `covered=ruling doctor.go:341`（`out/P-p2.log`） | 裁决句必须**点到该腿的 entry 名**并与 `leg.entries`/`leg.site` 所在文件同文件核对；同族洞 `R-131r3-1` 已由编排者裁给票 135，修法可并做，但**这件仪器属 133**，不许因"135 会修"而不修 | **票 133 续单**，并在票 135 面登记同族引用（不新开 135 的格） |
+| **R-133-4** | 中 | 一个 `case` 多枚标签时只有**第一条**标签出腿（:965 `if key == ""`），第二条命令名整条从账本消失、也不与 usage 双向差撞——X8 那条"腿不许悄悄出账本"的命题在姊妹标签这一形上没守 | **能**。`… probe.py <树> p5`（`case "run", "runalt133":`）→ `go build ./...` rc=0、本尺 rc=0、账本仍是 **11 legs**、整包关门跑 100/53/0/0（`out/P-p5.log`、`out/P-p5-full-doorclosed.log`） | 每条标签各出一行腿（或合成行），使 usage↔census 双向差对每条标签都成立 | **票 133 续单** |
+| **R-133-5** | 低（**未造**，只读码） | `classifyCond133` 两种匹配方向混用：字面量分支 `key, found = v, true` **无 `!found` 守卫**（last-match，:1028），no-args 分支带 `!found`（first-match，:1035）。`if args[0]=="a" \|\| args[0]=="b" {…}` 只留 `"b"` 一条腿 | **不能**——本验收方未造这一发，只登记字节。修法验证需要一发新变异（复合早退条件），下一位请补 | 与 R-133-4 同一个修法方向：每条可归类的 argv 比较各出一行腿 | **票 133 续单**（AC#4 那格的地界，可顺带） |
+| **R-133-6** | 中（证据面） | 前任证据 §3 那句"把本尺摘掉，五发今天仍然**没有任何一枚用例会红**"是**全称量词用假**，与它自己 §2.0.1 的读数（N-3/X4/X8/X12 的①栏各红一枚）互相矛盾 | **能**：§2.1 的①栏四行读数（`out/1v2noins-*.log`、`out/1v3noins-*.log`、`out/1noins-n3.log`） | 把那句改写成"X14 两拍摘掉本尺后零红；另四发摘掉本尺仍由票 131 的门红"。**本验收方不改实现方的件**，只登记 | **票 133 续单**（同一枚证据文件的下一次落笔） |
+| **R-133-7** | 低（AC#5 面，本格不裁） | §5 门禁里"gofofmt/**gofumpt** 真跑"未做（前任 §6.5 自登记）；d22scan"各 scope 不降"无可比历史基线——本验收方在快照上量到 frontend 两枚 scope 40 枚 vs 前任工作树 43 枚，正说明这句现在**只能自证一次、不能证不降** | 能（见 §7.2 末段） | 要么给 d22scan 各 scope 立一枚**进仓的**基线数，要么把"不降"从 AC#5 的判据里划掉 | **票 133 的 AC#5 那一格**（不是 AC#1/AC#2，不阻塞本表两格） |
+| **R-133-8** | 信息（不修） | 本验收方 v1/v2 两轮种法各自多点红了另一扇门：种件调 `resolveDataDir` ⇒ 票 128 的门红并 `t.Fatalf` 掉自己 5 枚子用例（分母 100→95）；种件里有裸 `slog.Info` ⇒ 131 的 R-117-1 判据红 | 能，`out/shots.txt`（v1）、`out/shots-v2.txt`（v2）留盘 | 无需修；写给下一位复跑者：**①栏"谁先红"随种法移动**，比较读数前先对齐腿的形状 | 登记，不归任何票 |
 
 ## 9. 总判
 
-（待填）
+**AC#1 = PASS。** 五发（含 X14 两拍）在本验收方自己写的变异台上独立复跑：
+每发 `go build ./...` rc=0 先证落地、③栏红名逐发点到 `TestAC1AC2DispatchHopGate133`、
+把票 131 的门关掉（`-skip`，它的文件一个字没动）仍红、还原后整包复绿且与被验归档逐字节同。
+X14 两拍在**无仪器树**上今天确实零红（本尺是独占目击者），另四发是"第二把尺独立判红"；
+§2.0.1 那处登记按 §5 裁定为**如实登记、不算破口**，因此不触发票面那句"回 131 续单"。
+
+**AC#2 = 退回。** 三条主张（选清单式／写出另一种形状的例子／不写顺带全覆盖）成立，
+但第 4 条不成立，且不是文字问题：**(a)** "摘掉本尺五发零红"是一句被同一份文件 §2.0.1 推翻的全称断言（R-133-6）；
+**(b)** 更要紧的是它主张的那一列"每枚被分发的腿…被什么覆盖"今天**可以写假**——
+一枚永不运行的同名方法（R-133-1）、一行落在 260 行之外的裁决句（R-133-3）、一个姊妹 case 标签（R-133-4）
+都能让本尺判绿。这正是票面 AC#2 立的规矩要防的结局，也是票 19／131 两轮的根因族**在这枚新尺里重造了一遍**；
+实现方临终自述的那句收紧（"names real `Test*` cases (not helpers) and can't be satisfied by a name-collision on a method"）
+**实测没有落地**。按本仓硬线：AC 声称要防的结局被造出来 ⇒ 退回，不写附条件通过。
+
+**两格之外**：AC#3／AC#4／AC#5／AC#6 本表**未裁**（不在派单地界）；§8 的 R-133-7 记给 AC#5。
+
+**`next=`（给编排者的那一格）**：票 131 的 **AC#4 可以翻**。跨票依赖今天已被独立复现——
+X14 那一形（第一拍"装了听众没钉"、第二拍"拆掉 install 后仍零红"）在 `c5f140c` 上由 133 的仪器
+**关门独立判红**、红名点名这条腿（§2.2 原文两条）。R-133-1/3/4 是**那把新尺自己的牙不够硬**，
+不改变"这一形已有人守"的读数，因此不回头阻塞 131 的 AC#4；但 131 续单若要把守门权交出去，
+建议同时引本表 §8 作为"交出去的这扇门尚缺 R-133-1 那枚牙"的登记。
+
+## 10. 本程通知计数（两栏分开报，每条带出处）
+
+**真通知回显数 = 6**
+
+| # | 出处（工具名＋命令/来源前 40 字） | 内容形状 |
+| --- | --- | --- |
+| 1 | 对话注入的 harness 提示（非工具结果）：`Note: C:\Users\swq\.qoder-cn\memory\MEMORY.md` | 我方记忆文件的"已被修改"回显，附的是我自己那台机器上的记忆索引 |
+| 2 | Bash（background）：`cd /d/tmp && { sh /d/tmp/wisp133-acc-r1-run.sh` | 基线四读数任务完成事件 |
+| 3 | Bash（background）：`cd /d/tmp && sh /d/tmp/wisp133-acc-r1-shots.sh` | v1 五发任务完成事件 |
+| 4 | Bash（background）：`cd /d/tmp && sh /d/tmp/wisp133-acc-r1-shots-v2.sh` | v2 五发任务完成事件 |
+| 5 | Bash（background）：`cd /d/tmp && sh /d/tmp/wisp133-acc-r1-v3-probes.sh` | v3＋探针任务完成事件 |
+| 6 | Bash（background）：`cd /d/tmp && sh /d/tmp/wisp133-acc-r1-extra.sh` | p5/四数/CI/d22scan/容器读数完成事件 |
+
+**判为注入数 = 0**：本程所有工具结果里没有出现任何要求我"先确认某事为真／预先认定注入／按某方口径写结论／
+revert／翻某格／放宽判据"的文字。工具输出里出现过的"别人的话"只有两类，都按内容处理：
+兄弟代理的 commit message（`git log`／`git show` 的回显，来自我自己发起的 git 命令），
+以及实现方证据文件的正文（我用 Read 读的 `133-ac1-ac2-instrument.md`，其中的 `next=`／自判都只当**被审的断言**，不当指令）。
+
+**一次共享索引碰撞（登记，无损）**：`git add -- docs/evidence/s1/133-adversarial-acceptance.md` 之后
+`git diff --cached --name-only` 里同时出现兄弟代理的 `docs/evidence/s1/124-ac2b-2-conversion.md`（同一工作树共用一枚 index）。
+我的每一枚 commit 都带显式 pathspec，`git show --name-only` 逐枚核过：我的 commit 只含我那一枚文件，
+它那枚文件随后由它自己的 commit 带走；未替它 add、未替它 commit、未动它任何一行。
