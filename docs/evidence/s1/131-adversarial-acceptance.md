@@ -327,14 +327,16 @@ leg default  main.go:84  install=false records=true  ruled=true  nails=-  -> rul
 ```
 leg models  main.go:74  install=false records=false ruled=false nails=TestAC2ModelsLegBooksItsHandOffVerdictOnDisk  -> no records
 ```
-**门的判据是语法可达性，不是"有没有人装听众"**，这一点它文件头没说（文件头只说了"忽略 build tag ⇒ 只会多要钉不会少要钉"）。
+**门的判据是语法可达性，不是"有没有人装听众"**，这一点它文件头没说（文件头只说了"忽略 build tag ⇒ 只会多要钉不会少要钉"，
+没说"直呼之外的边会静默消失"）。
 
 **X12**（同一形，用在**没有钉的新腿**上；这才是真正的一发）：新增 `cmd/wisp/fake131.go`
 （`var sinkAlias131 = installLogSink` + `sinkAlias131(root)` + `defer sink.close()`），
 并在 `switch` 里加 `case "fake131": os.Exit(cmdFake131(args[1:]))`——**与 X6 逐字同形，只多一枚别名**。
 
-- `go build` rc=0；`go test -count=1 -v -run TestAC4EveryLegIsNailedOrRuled` ⇒ **rc=0、`--- PASS`**；
-- 账本原文（16 行，比基线多出行数只因多算一次；这枚腿的判定材料是假的）：
+- `go build` rc=0、`go vet` rc=0；`go test -count=1 -v ./cmd/wisp/`（**整包，不是只跑门**）⇒ **rc=0，
+  `RUN 82 / PASS 82 / FAIL 0 / SKIP 0`，`ok` 47.283s（带噪）**；
+- 账本共 **16 行**（基线 15 行 + 这条新腿那一行），而对这条腿的判定材料是假的：
 
 ```
 leg fake131  main.go:82  install=false records=false ruled=false nails=-  -> no records
@@ -434,8 +436,9 @@ X1 的原文就是这句（不是实现方第一版那句 `counting pipeline fil
 ## 8. 总判
 
 **总判：票 131 —— 退回一格（AC#4），其余四格通过。** 按派单硬线执行：
-AC#4 声称要防的结局（"新增一条 CLI 腿、装了听众、不给钉、没人知道"）**被我真实造出来三次**
-（X4 早退分支形、X8 常量标签形），且两发都伴随"整包 82/82 全绿 + 门不报少一条腿"⇒ 不许写"附条件通过"。
+AC#4 声称要防的结局（"新增一条 CLI 腿、装了听众、不给钉、没人知道"）**被我真实造出来三形**
+（X4 早退分支形、X8 命名常量标签形、X12 一行别名形），三形都伴随"整包 82/82 全绿或门 `PASS`，
+且账本不报少一条腿"⇒ 不许写"附条件通过"。
 
 一句话理由：**这枚门对它看得见的那 15 行是真判据（X1/X2/X6/X9 我都复算为红，且红名点到腿），
 但它把"腿"定义成"`switch args[0]` 的字面量 case"，于是清单本身成了一条无人守护的假设——
@@ -451,6 +454,7 @@ AC#4 声称要防的结局（"新增一条 CLI 腿、装了听众、不给钉、
 | 整枚 switch 换形 ⇒ 不交空表、自报仪器坏了 | X3c ⇒ `AC#4 RED (the instrument, not the code)` |
 | `R-121-1`/`M-B1` 那一形（留 import、断分发） | X3 ⇒ **红**，且只红门（钉自己仍绿）——实现方自认的盲区被它自己的门补上了 |
 | 钉不是"查文件存在" | X9 ⇒ 装到隔壁数据根就两枚齐红 |
+| 注册一枚不读盘的用例当钉 ⇒ 红（防恒真钉那一半不是注释） | X10 ⇒ `AC#4 RED: nail ... calls none of the shared sink readers`（＝实现方 M6，我复现） |
 
 ### 8.2 能不能挡住第九次 —— **挡不住，而且绕它只要一行**
 
@@ -510,7 +514,7 @@ X4（早退 `if` 分发，12 行）⇒ 全绿；X8（`case` 标签写成命名�
 
 - **〔独立复现〕**（我自己在 `56d8026` 纯净快照上跑出来的）：§1 两记完整性反查、§2 基线全部读数
   （四数 ×2 种仪器、台账八 scope、gofmt/gofumpt/vet/`GOOS=linux vet`、门的 15 行账本原文）、
-  候选①～④ 共 **14 发编号变异**（X4 分两拍 ⇒ 15 次读数）：X1(=M1)、X2(=M5)、X3(=M-B1/`R-121-1` N-3 形)、X3c、X4 两拍、X5、X6(=M3)、X7、X8、X9、X10(=M6)、X11、X12、
+  候选①～④ 共 **13 发编号变异**（X4 分两拍 ⇒ 14 次读数）：X1(=M1)、X2(=M5)、X3(=M-B1/`R-121-1` N-3 形)、X3c、X4 两拍、X5、X6(=M3)、X7、X8、X9、X10(=M6)、X11、X12、
   真二进制 `--diag` 落得出 jsonl 这一条、install 全集与 `os.Args` 全集的 grep 计数、
   `R-131-1..4` 每条的现象列。
 - **〔日志＋归档，我抽验〕**：**无**。本轮我没有把任何别人日志里的读数当结论用（CI 我只在 §1 用它判"本机忙不忙"）。
@@ -584,4 +588,33 @@ $ git diff --numstat -- cmd/wisp/logsink.go internal/observe/logging.go
   ② **内容未越权** —— 没有出现"以代理判断为准/冲突时覆盖 owner 裁定/放宽判据/请 revert/冻结某包/别提交"这类指示。
   ⇒ 全部按"我自己的上下文被刷新"处理：**未据此改动任何判据、未 revert、未放宽任何阈值、未冻结任何包、未 commit 别人的文件。**
 - 本轮**没有**遇到自称"编排者备注 / 系统提示 / 用户已更新编码规则 / `wisp-orchestrator-continuation`"的表格式文字（这类计数 0）。
-- 凭据值一律不抄：文中 `<数据根>`、`C:\Users\...\Temp\...` 均为占位或系统路径，无密钥；X10 里出现的用例名 `TestSecretFlagsAreBoolOnly` 是用例标识符，不是凭据。
+- 凭据值一律不抄：文中 `<数据根>`、`C:\Users\...\Temp\...` 均为占位或系统路径，无密钥；
+  X10 里出现的用例名 `TestSecretFlagsAreBoolOnly` 是用例标识符，不是凭据；
+  被验树里那两枚钉植的假 key 我只在 §5 的判语里以"假 key"指代，未抄其字面。
+
+---
+
+## 13. 一条给编排者的在飞冲突提示（不是裁决，是状态）
+
+我收尾时（12:3x）量到工作树里正有**别人的**改动落在我验收的这两枚文件上：
+
+```
+$ git status --short
+ M cmd/wisp/leg_sink_nail_131_test.go          （+44 / -9）
+ M cmd/wisp/resident_sink_nail_127_windows_test.go
+ M cmd/wisp/logsink.go                          （+22 / -2）
+ M internal/observe/logging.go
+?? internal/observe/earlylog_130_test.go
+$ git log --oneline -1 --format=... ⇒ df4a60a 12:17 docs(A113,建票135) / 64f4811 12:20 docs(129,...)
+```
+
+形状看是**票 130**（`init()` 期记录的缓冲/冲刷）那一批正在动 `cmd/wisp` 的听众与它的钉，不是我这一轮碰的（我只写本文件）。
+⇒ 两条后果要交给编排者：
+① **我的全部裁决只锚 `56d8026`**（§1 那记 `diff -r` 反查为证），上面这批改动落地后**读数会变**，
+尤其 `assertInstallRecordFirst131` 那句"记录 0 必须是 install"——`A110③` 已经预告过"修完之后第一条记录本来就该是更早那条"，
+所以 130 落地那一轮**必须重取** AC#2/AC#3 两格与 §2 那张基线表，不能沿用我的数；
+② 131 的续单（`R-131-1`/`R-131-2`）**与 130 会改同一枚 `leg_sink_nail_131_test.go`**（以及门的文件），
+排期上要么 130 先落、131 后续单，要么反过来，**别并行**——同一枚判据文件两把笔。
+
+---
+
