@@ -64,6 +64,9 @@ M3 那一发**全包读数取不到两条腿**——既有的 `TestSamplerGorout
 M8（把判据反写）——三发都响，且 M6/M7 只响该响的那条腿。M8 让两腿同时红是**正确**行为：条件反写同时破坏了
 "零样本要红"和"可信窗口不许长门"两面，两条腿各抓一面。
 
+另两发 **M9**（把 `:297` 的 `append` 换成 `_ = sample`，丢弃分支一字未动）与 **M10**（把 `CheckSettle` 的
+`sampler.go:477` `> 0` 换成 `>= 0`）不在 AC#1 的判据物上，各归 §5.1（证 panic 的原因）与 §7 `R-136-1`（settle 那侧无钉）。
+
 ---
 
 ## §2 断言链是不是落在生产码上（含"是不是自己算自己"）
@@ -78,7 +81,7 @@ M8（把判据反写）——三发都响，且 M6/M7 只响该响的那条腿�
 | --- | --- | --- |
 | `:60 len(rep.Samples) != 0` | 采样窗口里的有效样本数 | `sampler.go:296-298`（`derive` + `append`），丢弃支 `:290-294` |
 | `:63 reads == 0` | fixture 自己的读计数器（证明"树真被读过"） | `sampler.go:285` 的 `s.tree.ReadTree()` 循环 |
-| `:66 rep.SampleErrors == 0` 为假 | 丢弃计数 | `sampler.go:288` / `:293` |
+| `:66` 要求 `rep.SampleErrors != 0` | 丢弃计数 | `sampler.go:288` / `:293` |
 | `:69` 含 `"zero private working set"` | 生产那句错误原文 | `sampler.go:294` 字面量 `"read returned a zero private working set for a live tree"` |
 | `:74 if rep.Pass` **（本格的钉）** | `rep.Pass` 由生产那段 gate 归约算出 | `sampler.go:341-346`（`rep.Pass = true` ⇒ 任一 `Gate && !Pass` 即 false） |
 | `:79-84` 找 `Metric == "sampling"` | 那一行 verdict 只能由守卫产出 | `sampler.go:335-339`；全仓 `"sampling"` 这个 Metric 只有这一处生产者（`grep -rn '"sampling"' --include=*.go` ⇒ `sampler.go:336` + 本测试 4 处引用） |
@@ -327,7 +330,7 @@ M9 的意义：**丢弃分支没动、`sampling` 守卫还在**，只把 `Sample
 
 | 编号 | 严重度 | 现象（我这程读到的，不是推的） | 能否复现 | 修法（只写方向） | 归谁 |
 | --- | --- | --- | --- | --- | --- |
-| **R-136-1** | 高 | `CheckSettle` 的零足迹判断（`sampler.go:477` `> 0`）放宽成 `>= 0` ⇒ 零可信样本的 settle 窗口**判 `pass=true`**（探针：`samples=6 pass=true back_within_cap_ms=10 final_bytes=0`），而**整包 56/56、rc=0**——AC#1 治的那面病在隔壁函数一字未动地还在 | 能，一次编辑 + 一次探针（探针文件留在 tree2，未进仓库） | 给 settle 补一枚与 `sampling` 同形的"没测到就不许过、且要说自己没测到"标记；先做 AC#8 的守卫否则读不到全包数 | **另立 AC#9**（本票；不是 AC#1 的债） |
+| **R-136-1** | 高 | `CheckSettle` 的零足迹判断（`sampler.go:477` `> 0`）放宽成 `>= 0` ⇒ 零可信样本的 settle 窗口**判 `pass=true`**（探针：`samples=6 pass=true back_within_cap_ms=10 final_bytes=0`），而**整包 56/56、rc=0**——AC#1 治的那面病在隔壁函数一字未动地还在 | 能，一次编辑 + 一次探针（探针文件留在 tree2，未进仓库）。落地证明：`477: if err == nil && m.PrivateWorkingSetBytes >= 0 {` ＋ `go build ./...` rc=0；还原后 `diff -q` 逐字相同、`go test` 仍 `ok` | 给 settle 补一枚与 `sampling` 同形的"没测到就不许过、且要说自己没测到"标记；先做 AC#8 的守卫否则读不到全包数 | **另立 AC#9**（本票；不是 AC#1 的债） |
 | **R-136-2** | 中 | 既有用例 `TestSamplerGoroutineAccountingFollowsRegistry`（`sampler_test.go:297`）在 `:308` 无长度守卫直取 `rep.Samples[0]`，一发"空 Samples"就 panic 杀掉测试二进制，**吞掉 4 枚读数**（§5.2 逐名，含本票两枚腿） | 能，两发独立路（M3 改丢弃分支 / M9 把 append 换成 `_ = sample`）读数逐位相同 | 只动那枚用例加长度守卫（要红不要静默）；同包 `[0]` 直取普查＝只此一处 | **AC#8**（编排者已立案，判据①本程已复算成立） |
 | **R-136-3** | 低 | 钉里 `:92` 的 `HasPrefix(guard.Measured, "0 valid")` 在 `:60` 已断 `len==0` 之后近乎必然，是**冗余**不是恒真（M7 证明那半句另有独立牙：换名 ⇒ 红在 `:84`） | 能，静态可读；M7 一发即分得开 | 若要收，改成核"那行写着错误计数"要另造一发（例如把 `Measured` 写成常量）才能钉住 | AC#1 尾账，**不另立格**（记一笔即可，别为它返工） |
 | **R-136-4** | 中（不归本票） | `e8190bf` 的 pristine 树在 linux 上 `bash scripts/portable-tests.sh --scope=core` **本来就 rc=1**（`internal/panel` 的 `TestComposerRenderFixtureTellsTheTruth` 在 POSIX 红）；步色已被占用 ⇒ 新增真伤不改变"这一步红不红"，只多一行红名 | 能，容器原生两跑（RUN A pristine / RUN B M1）都是 `strict runner exited 1` | 那是 `internal/panel`/composer 那族的账（票 114 系）；引用门禁颜色前先查"有几枚 green" | **不归 136**；本票只需在引用 CI 时带上这条边界 |
