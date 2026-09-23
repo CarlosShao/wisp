@@ -4,6 +4,7 @@
 **Type:** 生产缺陷（可见性/顺序），不是测试稳健性
 **Blocks:** nothing · **Blocked by:** ~~需要 `internal/risk` 解冻~~ ⇒ **2026-09-23 10:2x owner 批准，但只放一枚具名文件**：
 **只解冻 `internal/risk/winsec_c26.go`**（那个 `func init()` 就在它 `:20`）。
+**⚑ 09-23 11:0x 本轮作废：只读代理核清依赖方向后判定正解落在 `internal/observe/logging.go` + `cmd/wisp/logsink.go`（两枚都不在冻结清单），`winsec_c26.go` 一个字都不必动 ⇒ 解冻未使用。教训：申请解冻前先核依赖方向（`init()` 早于 `main()`，且 `observe` 是 `risk` 的依赖）。**
 ⚠ **这不是开放授权**：① `internal/risk/assessor.go`、`internal/risk/pathresolver*.go`、`rules_gateway.go` **仍在冻结清单里，一枚都不许动**；
 ② 若正解其实落在 `internal/observe/logging.go`（`:204` 那条 WARN 的老家）或 `cmd/wisp/`，**那两处本来就不在冻结清单、不需要授权**，
 **优先往那边走**——把安全关键的 `init()` 顺序改动限制在不得不改的最小范围；
