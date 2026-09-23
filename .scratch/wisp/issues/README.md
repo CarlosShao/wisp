@@ -34,6 +34,15 @@ All tickets are **vertical tracer bullets**; work the **frontier** (all blockers
    （2026-09-20 owner 批准新增。起因：票 07 标 DONE 时 6 条 AC 只有 1 条被书面裁决过，
    其中"热键随配置重注册"的标的 `RebindHotkeys` 实为全仓零调用者的死代码；
    补裁另有 2 框 FAIL、2 框 PARTIAL。旧报告不追溯改写，但 13 张已 done 票的未决框由票 64 等消化。）
+7. **⛔ 前端（`frontend/**`）由 owner 另行指派的 agent 负责，本编队一律不领、不写、不"顺手修一角"**
+   （2026-09-23 09:22 owner 原话：「我是想让别的 agent 干前端部分的」；台账 `A102`）。
+   判据**按目录不按票号**：动手前先把要写的文件列出来，**只要有一枚落在 `frontend/` 下就整段停手上报**，
+   不许改成"只动一小角"继续干。受影响并被冻结的：票 **77**（余下 AC#1/#3/#4/#6，Status 已改 `blocked`）·
+   票 **114 的 AC#6**（真机差分截屏）· 界面票 **34 / 36 / 37 / 38 / 39 / 40** · `Q-33` 面板签收 · `R-92-5`。
+   **不冻结**（别扩大解释）：`internal/panel/` 与 `cmd/wisp/` 的 **Go 侧接线**、票 33 宿主、票 35 的 Go 半边、
+   球视觉票 **62/64/65/68**（Win32 + Direct2D，不属于这棵树的"前端"）。
+   ⇒ 若你被派到一张含前端腿的票：**只做非前端腿，把前端那格的框保持未勾**，并在 Progress log 写
+   `skipped=frontend(owner-delegated)`，不要替它勾、也不要替它写。
 
 ## Dependency graph (blockers in parentheses)
 

@@ -1,6 +1,13 @@
 # 77 — Frontend scaffold: React + TS + Tailwind + shadcn, vendored react-bits / beautifului components, sharing C21 tokens
 
-**Status:** **in progress**（AC#2 / AC#5 / AC#7 已交 `63ef895`；AC#1 PARTIAL）/ 原 claimed（2026-09-21 14:0x，`agent-ticket77` 已认领并开工，
+> **⛔ 2026-09-23 09:22 编排者按 owner 指令冻结本票（不改文件名，只改状态位）**：
+> 原话「我是想让别的 agent 干前端部分的」⇒ 本票**余下四格 AC#1 / AC#3 / AC#4 / AC#6 的正解全在 `frontend/` 下**，
+> 我编队**不再派发、不再代写**。已入库的三格（AC#2 / AC#5 / AC#7）**保留不回滚**。
+> 台账依据 `A102`，规则依据 `issues/README.md` 规则 7。
+> ⚠ 唯一例外（不属前端、可继续）：AC#4 欠在 `tools/d22scan` 里的 ban #8 `frontend/` 作用域那一行是**编排者地界**，
+> 它是扫描器配置不是界面代码。
+
+**Status:** **blocked（09-23，owner 把前端收走了）** / 上一状态 **in progress**（AC#2 / AC#5 / AC#7 已交 `63ef895`；AC#1 PARTIAL）/ 原 claimed（2026-09-21 14:0x，`agent-ticket77` 已认领并开工，
 **2026-09-21 16:5x 由 `agent-ticket77b` 接续**（前任撞 150 轮上限，断点见编排者 16:2x 那条与我的 16:5x 那条），
 按 owner 拍的板：**基座 = Beautiful UI**，一期 **React Bits 零代码进树**）。
 > **2026-09-21 15:1x 第三任 `agent-ticket77d` 的 Status 快照（不覆盖上面那行，只追加）**：
