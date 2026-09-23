@@ -387,3 +387,51 @@ func (f *fakeTree) ReadTree() (TreeMetrics, error) {
 ```
 
 ⇒ 判定：**不是本格的债**（AC#8 点名的形状是 `rep.Samples[0]` 那枚、已修；`[0]` 普查也确实不含 `len(mu)-1`），但它是**同族第二枚"吞读数"仪器**，且离被踩只差"下一个人多写一枚用 `&fakeTree{}` 的正常采样用例"。登记为 `R-136-10`（低／可复现／修法方向＝给 seam 自己加守卫，别改任何用例语义）。它自报的"当前无入口"我复算成立，所以不记成"它漏了一处普查"。
+
+---
+
+## §5 CI 落点与门禁（容器原文照贴）
+
+### 5.1 这两枚新用例**在不在** ubuntu 那条腿的分母里（自己 grep，不引前例的行号）
+
+```
+$ grep -n 'observe' scripts/portable-tests.sh
+140:github.com/CarlosShao/wisp/internal/observe          ← core_pin 名单里
+175:        ./internal/memory/... ./internal/observe/... ./internal/secret/...   ← core scope 解析出的包
+$ grep -n 'portable-tests' .github/workflows/ci.yml
+266:      - name: Portable package tests (core scope; …)   ← step 名
+288:        run: bash scripts/portable-tests.sh --scope=core
+```
+
+⇒ 实现方与前例引的 `:140`/`:175` **都对**；`ci.yml` 那一步是 `:266` 的 step、`:288` 的 run（票面上我按编排者已更正的口径引，不再指注释行）。该步走 `tools/d22scan/runtests.sh`（SKIP 算_fatal_）⇒ "判为绿"必须是真的跑到。
+
+### 5.2 容器原生跑（`golang:1.27` ＝ `go1.27.1 linux/amd64`，先证挂载真挂上）
+
+命令形状（**Git Bash 下 `MSYS_NO_PATHCONV=1` ＋ `/d/...`**，否则静默空挂载假绿）：
+
+```
+$ MSYS_NO_PATHCONV=1 docker run --rm -v /d/tmp/wisp136r2-ac8ac9-anchor:/src \
+    -v /d/work/base/gopath/pkg/mod:/gomodcache -w /src \
+    -e GOMODCACHE=/gomodcache -e GOFLAGS=-mod=mod -e CGO_ENABLED=0 golang:1.27 bash -c "ls -l /src/go.mod && go test -count=1 -v ./internal/observe/ …"
+```
+
+三态原文（**未跳任何一枚**）：
+
+| 发 | 容器内读数 |
+| --- | --- |
+| 挂载证明 | `-rwxrwxrwx 1 root root 883 Sep 23 15:15 /src/go.mod`、`go version go1.27.1 linux/amd64` |
+| 未变异 | `rc=0 / RUN=58 / PASS=58 / FAIL=0 / SKIP=0`，`ok github.com/CarlosShao/wisp/internal/observe 2.448s`；`TestCheckSettleZeroTrustworthySamplesFailsClosed`、`TestCheckSettleTrustworthyReadsAreRecorded` 在 linux 上**各有自己的 `=== RUN`/`--- PASS` 行**（`/tmp/o.txt` 第 80-83 行） |
+| M10（`:477` ⇒ `>= 0`） | `rc=1 / RUN=58 / PASS=57 / FAIL=1 / SKIP=0`；`--- FAIL: TestCheckSettleZeroTrustworthySamplesFailsClosed`，红点 `sampler_settle_zerosample_136_test.go:66` |
+| M3（`:290` ⇒ `>= 0`） | `rc=1 / RUN=58 / PASS=52 / FAIL=6 / SKIP=0 / PANIC=0`；红名 6 枚与宿主 §1.2 逐名同；守卫红在 `sampler_test.go:315`、AC#1 腿 B 红在 `sampler_zerosample_136_test.go:151` |
+
+⇒ **两格的新仪器在 ubuntu 腿"真进真能红"**（AC#9 那枚拿到 CI 形状的红名＋红点；AC#8 那枚改动在 linux 下同样把 panic 换成了单枚 FAIL、其余 57 枚照跑）。
+
+### 5.3 门禁复核（派单说只看两件事，我都看了；另把票面 AC#7 同款读数一并复算）
+
+| 项 | 我的读数 |
+| --- | --- |
+| **作者有没有写明 gofumpt 版本** | **写了**（证据 §5-G2：`v0.12.0 (go1.27.1)`，并明说 CI 那步是 `@latest` 未钉 ⇒ 读数只在改版前有效）。我复核：`/d/work/base/gopath/bin/gofumpt.exe --version` ⇒ **`v0.12.0 (go1.27.1)`**，与它写的一致；`gofumpt -l internal/observe/` **无输出**；`gofmt -l internal/observe/` **无输出**。⚠ **我全程没跑 `go install …@latest`**（派单明令：那会升掉宿主 `D:\work\base\gopath\bin\gofumpt.exe`；该二进制 mtime 仍是 `Sep 23 22:23`，早于本程） |
+| **`d22scan` `ban #8 internal/` 401→402 的归因** | 两发都在**仓外纯净树**上跑：`noguard`（`1d38206`）⇒ `ban #8 internal/ examined 401`，`anchor`（`76662d8`）⇒ **402**，两形 `rc=0`、`d22scan: clean`。归因：`git diff --name-status 1d38206..76662d8 -- '*.go'` 全仓只有 `A internal/observe/sampler_settle_zerosample_136_test.go` ＋ `M internal/observe/sampler_test.go` ⇒ **＋1 只可能来自它自己那枚新 `_test.go`**，别的 scope 一个没动（`cmd/=39`、`design/=16`、`ban #6/#7` 同数）。`frontend/` 两树都是 **40** ⇒ 实现方那发 `40→43` 确实来自它工作树里未跟踪的 `frontend/dist/` 产物，不是兄弟的树（`git diff --name-only 1d38206..76662d8 -- frontend/` **无输出**） |
+| `go vet` 双 GOOS | 原生 `./internal/observe/` **rc=0**；`GOOS=linux ./internal/observe/` **rc=0**；`GOOS=linux go vet ./...` **rc=1**，输出**只一条**诊断：`package …/cmd/wisp → imports …/sherpa-onnx-go-linux: build constraints exclude all Go files`；剔掉 `cmd/wisp` ⇒ 只剩 `cmd/balldebug: build constraints exclude all Go files`；剔掉两枚 `cmd/` 后 **30/30 非 cmd 包零输出 rc=0**（`go list ./...`＝33、剔 cmd＝30，输出文件 0 字节） ⇒ **派单那条"交叉 vet 会停在 cgo"的范围过宽，实现方报回得对，我独立复算同结论：失效面恰好这两枚 cmd 包** |
+| `-count=2 -v` 四数与**名册差集** | `noguard`（`1d38206`）＝ `rc=0 / 112 / 112 / 0 / SKIP0`；`anchor` 第一发＝ `rc=1 / 116 / 115 / 1 / SKIP0`，红名 `TestNoopTaskReturnsToBaseline`（`goroutine_test.go:33: PerTask mid-task = 1, want 3`）＝**票面 AC#11 那枚既有 flake 在本程的又一次命中**；第二发＝ `rc=0 / 116 / 116 / 0 / SKIP0`。逐名（`=== RUN` 去重后 `diff`）＝只多两行：`> TestCheckSettleTrustworthyReadsAreRecorded`、`> TestCheckSettleZeroTrustworthySamplesFailsClosed` ⇒ **实现方的 `112→116` 与"逐名只多它这两枚×2 轮"复现成立**，无改名、无消失、无转 SKIP；我第一发与它的 `116/116` 差的那一枚红名是 flake、不是本格仪器，也不在名册差集里 |
+| 判"不再红"分清变绿／被跳过 | 本程**每一发** `-v` 读数的 `--- SKIP` 计数都是 **0**（§0.3 三发、§1 三态、§2 三态＋V 族、§5.2 三发、`-count=2` 三发）；被验的三枚文件里 `t.Skip` 出现次数 0（唯一命中 `sampler_test.go:313` 是注释句 "never t.Skip, never a silent return"） |
