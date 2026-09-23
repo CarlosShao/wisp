@@ -444,3 +444,176 @@ CDPATH='' cd -- target    -> REFUSED   （新拼写：同）
 `scripts/d22scan.sh:37-38` 仍在，我对它跑同一发 linter **rc=1（SC1007 x2）**；CI 那步只 lint
 `scripts/slo-freshness.sh` 一枚文件。`d22scan.sh` 在 AC#6 的"照旧禁改"清单里，所以本票不该顺手改它，
 登记为 `R-134-9`（口径类，低）。
+
+## 6. AC#6 两半交易：争用改判「无结论」换 P3 按有效样本计龄（PASS；三处缺口见 §6.6）
+
+### 6.0 我怎么判这一格
+
+票面 AC#6 是 owner 批的一桩两半交易：放宽的那半是"机器忙取不到样"不再判红（`exit 0` + 响亮
+`NO CONCLUSION`），换的那半是"没有效样本不许久藏"（`scripts/slo-freshness.sh` 新增探针 P3，按
+"最近一次*产出有效样本*"计龄）。所以唯一有牙的问题是：
+
+> **一枚"看着像有效但其实没数字"的报告，能不能给 P3 续命？**
+
+能 ⇒ AC#6 声称要防的结局（永远没结论也能一直绿）被真实造出来 ⇒ 退回，不许附条件。
+不能 ⇒ 把每发假 report 各自落在哪一行说清楚。我的探针分三层打，逐发在 §6.2。
+
+### 6.1 P3 到底读了什么（先把判据物的边界说死）
+
+它读的是 **GitHub artifact 列表里名字恰为 `slo-full-report` 且 `expired==false` 的最新一枚 `created_at`**
+（`scripts/slo-freshness.sh:282` 名字是写死的常量、`:309-330` 逐页取、`:342-357` 自己算 max、`:359-371` 判龄）。
+我把这条谓词对着真 API 独立复算了一遍（`/tmp/wisp134-acc-r2-a/artifacts-p{1,2,3}.json` + 我自己的 python，
+不复用脚本的代码）：
+
+```
+total_count 字段 = 188；两页取回 100 + 88 = 188 枚，第三页空 ⇒ 今天这枚 3 页上限把列表扫完了
+name==slo-full-report 且未过期 = 76 枚   （脚本自己报的也是 76：'76 valid-sample record(s) considered'）
+我算的最新一枚   = 2026-09-23T07:42:24Z  id=10737938571  run=35832874239
+脚本报的最新一枚 = 2026-09-23T07:42:24Z  artifact_id=10737938571  run=35832874239   ⇒ 逐字相同
+这 76 枚的 size_in_bytes：min 19934 / max 22363（无一枚小于 5000 B）
+```
+
+同一发读出两条边界事实（都进 §6.6 的归单）：
+
+1. 谓词里**只有名字与 `expired`**——没有 `size_in_bytes`、没有 workflow、没有分支、没有事件。
+   对照：P2 是有分支谓词的（`:222-223` 的 `head_branch=="main" or "dev"`）。⇒ `R-134-5`。
+2. 返回顺序**严格按 artifact id 降序**（188 枚逐对验过），但 `created_at` 与 id **不同序**：
+   187 对相邻行里 **70 对是倒挂的**。⇒ 脚本"逐页取 max、不取第一行"是**必须**的而不是保守；
+   也正因此"扫到够新就早停"这种修法不成立。上限 3 页 x 100 = 300 枚 vs 今天 188 枚 ⇒ `R-134-7`。
+
+今天最新 12 枚样本的来源我也逐枚查了 run（`gh api .../actions/runs/<id>`）：**全部
+`event=push branch=dev`**，一枚侧链 dispatch 都没有。所以"来源不设防"今天是**读得出的洞、不是正在漏的水**。
+
+### 6.2 假 report 一族：20 发逐发（14 发打在钉、2 发打在盘、4 发打在驱动；这一族的读数最重要）
+
+结论先给：**没有任何一发能在"不伪造 artifact、不改码"的前提下给钉续命**；能造出"没数字还判有效"的那一发，
+是我在 `/tmp` 副本里把一枚守卫拆掉之后（那就是 `R-134-6`）。
+
+**层一：钉自己那侧（12 发，全走文档写明的测试接缝，真文件一字节未动）**
+
+接缝给的记录形状与真扫描一致（`created_at <TAB> run <TAB> artifact_id`）。P2 一律注入"新鲜 job 记录"，
+让红只剩 P3 一处，这样每发判的是 P3 本身。仪器在 `/tmp/wisp134-acc-r2-a/`（`env -i` 起壳，
+`SLO_FRESH_NOW` 把"现在"钉在 `2026-09-23T09:00:00Z`）。
+
+| # | 我造的世界 | rc | 落在哪 |
+|---|---|---|---|
+| H1 | 报告 10 天前（P2 恒绿） | **1** | `slo-full-sample-stale`（`:368-369`） |
+| H2 | 同 H1，**只把 P2 的门槛 `SLO_FULL_MAX_AGE_DAYS=9999`** | **1** | 仍 `slo-full-sample-stale` ⇒ **P3 不是 P2 的别名** |
+| H3 | 同 H1，只放宽 `SLO_FULL_SAMPLE_MAX_AGE_DAYS=30` | **0** | 红确实是这枚阈值咬的，不是常数红 |
+| H4 | `SLO_FULL_LAST_SAMPLE=none`（只有 contended、零 report） | **1** | `slo-full-sample-never`（`:360`） |
+| H5 | 同 H4，再把 P2 放宽到 9999 天 | **1** | 仍 never ⇒ 接缝关不掉探针 |
+| H6 | 报告 30 天前、门槛 30 天 | **0** | 边界是 `>` 不是 `>=` |
+| H7 | **声称有一枚报告、时间=现在，内容我不管** | **0** | 钉判"今天有新样" ⇒ **它对内容全盲**（`R-134-5` 的正面读数） |
+| H8 | 时间戳写成 `not-a-date` | **2** | `to_epoch` 拒猜（`:178-181`），不是 pass |
+| H9 | `SLO_FULL_LAST_SAMPLE=""`（空串想蒙成一枚记录） | **2** | 空串=未设 ⇒ 走真扫描 ⇒ 无 token 被 `can_look` 收口（`:195-213`） |
+| H10 | `SLO_FULL_ARTIFACT_PAGES=0` + 陈旧样 | **1** | 扫不到东西只会更红 |
+| H11 | `SLO_FULL_ARTIFACT_PAGES=abc` | **2** | 参数守卫（`:116-121`） |
+| H12 | 报告时间戳在**未来**（2027-01-01） | **0** | `age` 被夹成 0（`:363`）⇒ **未来样判新鲜**（`R-134-8`，低） |
+| H13 | 记录只给一列（缺 run/artifact 字段） | **1** | 仍按时间判红，没蒙混成绿 |
+| H14 | 反向：样新鲜、job 记录 10 天前、只放宽样本网槛 | **1** | `slo-full-stale` ⇒ P2 也没被顶掉 |
+
+（H1..H14 共 14 发，其中 12 发判的是 P3 单探针。）H7 与 H12 是这一族里我唯一"造成功"的两发，
+也都写进归单；它们成立的前提都是**有人往钉的输入里主动塞一枚不存在的样**（用接缝，或真造一枚 artifact），
+不是"什么都不做也能绿"。
+
+**层二：盘上那枚路径（真码、真跑）**
+
+| # | 我造的世界 | 结果 | 落点 |
+|---|---|---|---|
+| F0 | `-WispExe` 指到不存在的路径 + 一枚种好的假报告 | **rc=1**，假报告**还在盘上** | 它先去 `build.ps1` 补建二进制（`:102-106`），在 `git archive` 的快照里 build 死在"不是 git 仓库"⇒ 这发打在"仪器坏了"那条 `Fail` 上，不是"无结论"；也说明**清除（`:118-121`）排在补建之后**，一条坏路径不会让种下的文件被误当成样 |
+| F1 | 种一份 84 B 的 `slo-report.json`（`all_pass:true` 且 `results:[]`，看着像有效、里面没数字）+ 一份 17 B 的 `state-Sleeping.json`，再让真脚本在**争用**下跑 | **rc=0**，日志 `clearing 2 stale report file(s)`，跑完目录里**只剩 `slo-no-conclusion.json`**（`verdict=no-conclusion`、`state_files_written=0`、`slo_report_written=false`、`d32_evaluated=false`） | 清除发生在判色之前（`scripts/slo-check.ps1:118-121`）；无结论记录写的是**另一个文件名**（`:291-293`），而上传面只有 `build/slo/slo-report.json` 一枚（§5.2 解析器读数）⇒ **上一轮遗留 / 手摆的报告在这条路上必死** |
+
+F1 那发的争用不是我摆的样子：三行 `machine-contended reason` 里是**当时真在跑的 runner 自己**
+（`wisp.exe` pid 55592 / 6896 / 12712，路径 `E:\work\base\actions-runner\_work\wisp\wisp\build\wisp.exe`，
+17:30:12-16 起）⇒ 顺带给 AC#4 的理由一又添一发真读数（r1 §4 那条是同族另一发，不重复计）。
+
+**层三：写报告的那只手（"报告在 ⇒ 数字在"这条链的承重墙）**
+
+`scripts/slo-check.ps1` 里 `slo-report.json` **只有一个写手**（`:392-393`），它在取样循环之下；
+每枚状态的 `pass` 取自驱动自己那份 JSON 的 `.pass`（`:328-332`），JSON 解析失败只 `Write-Host WARNING`
+并把 `pass` 留成 `$false`；settle 还要独立核 `free_os_memory_count > 0`（`:350-353`）。于是我把矛头对准驱动：
+
+| # | 我造的世界 | 结果 |
+|---|---|---|
+| FD | 真 `wisp slo -state Sleeping -seconds 0.05 -interval-ms 250`（窗口短于一枚间隔）。用的是工作树那枚 `build/wisp.exe`（27881312 B，mtime 09-21 15:06，**早于被验版本**——这一发只判"短窗口会不会交空样"，不用于判版本行为差异，口径写在这） | **rc=0 pass=true，但不是空样**：`samples=1 sample_errors=0 mem_median=4476928 handles_max=183`、`duration_sec=0.2912717` ⇒ 短窗仍产真数（`internal/observe/sampler.go:250` 那句注释是真的） |
+| FM | 在 `/tmp` 变异副本里把 `internal/observe/sampler.go:332` 的零样本守卫改成 `if false && …`，再跑**我自己那枚探针**（`zzr2_guard_probe_test.go`：一份每次读都得零足迹的树 ⇒ `len(Samples)==0`） | **`samples=0 sample_errors=1 pass=true mem_median=0 cpu_mean=0.000 handles_max=0`** ⇒ **一枚什么都没测的窗口会判过**；这种报告会被写出去、被上传、被 P3 当"今天有新样" |
+| FM2 | 同一枚探针，守卫还原（`git show 6effb7e:internal/observe/sampler.go` 覆回，`diff` 判空、字节与被验版同） | **`samples=0 sample_errors=1 pass=false`** ⇒ 这面墙就是唯一挡着 FM 那结局的东西 |
+| FM3 | 守卫拆掉之后跑 `go test ./internal/observe`（`-count=1`） | **rc=0，54 枚 PASS** ⇒ **整包没有一枚用例钉住这面墙**（`grep -rn 'SampleErrors' internal/observe/*_test.go cmd/wisp/*_test.go` 命中 0 是同一件事的另一个读法；未变异的同一枚副本基线也 rc=0，所以不是我把包跑坏了） |
+
+FM / FM2 / FM3 三发是这一格我要归单的正面产出（`R-134-6`）。**它不是 AC#6 写坏的码**——
+`internal/observe/**` 在 AC#6 的"照旧禁改"清单里，本票也零枚 `.go`（§6.4 第 4 条）；
+但 AC#6 那句"artifact 在 ⇒ 数字在"**最终赖它成立**，而它现在没有任何用例兜着。
+
+### 6.3 另两发（票面点名的）
+
+- **只放宽 P2 时 P3 必须仍红**：H2（`SLO_FULL_MAX_AGE_DAYS=9999` ⇒ rc=1 `slo-full-sample-stale`）；
+  反向 H14（只放宽样本网槛 ⇒ rc=1 `slo-full-stale`）。两枚旋钮互不顶替，两个方向我都自己走了。
+- **取不到数据必须不是 pass**：K1 无 token ⇒ `rc=2`（原文 `no GH_TOKEN/GITHUB_TOKEN - the freshness
+  probes cannot look (this is not a pass)`）；K2 无 `GITHUB_REPOSITORY` ⇒ `rc=2`；K3 runs 查询报错 ⇒
+  `rc=2` 并把 GitHub 那句话回显；K4（P2 用接缝跳过、**artifacts 查询**报错）⇒ `rc=2`；
+  K5 gh 返回"空列表"（200、零行）⇒ `rc=1`（`slo-full-never-triggered` + `slo-full-sample-never`）；
+  K6 空列表 + 陈旧样 ⇒ `rc=1`；K7 找不到 `ci.yml` ⇒ `rc=2`；K8 把 `SLO_FRESH_CI` 指到一枚**空文件**
+  ⇒ `rc=1` 且五枚 `slo-full-trigger-missing`。K3/K4/K5/K6 用 `/tmp/wisp134-acc-r2-a/stub-{fail,junk}/gh`
+  两枚桩打的（只判脚本对"查不到"的处理，不冒充 GitHub；桩里不含任何凭据，`GH_TOKEN` 一律给字面量假值）。
+  **没有一个形状落在 pass。**
+
+### 6.4 硬边界（逐条给我自己的证据）
+
+1. **D32 两阈值所在那枚文件**：`internal/observe/thresholds.go` 在 `e951dfa`（AC#4）、`b723978`（AC#6 之前）、
+   `decb7b9`（前半）、`44ab500`（后半）、`3f17504`、**`6effb7e`（被验）**、`HEAD` **七枚锚点上都是同一枚
+   blob `e2677b11b5a5adff8b4eb87c36d31286a274471d`**（`git rev-parse <r>:…` 逐枚算）。文件里
+   `memCapSleeping int64 = 25 << 20`、`cpuLimitSleeping = 0.5` 原样。
+2. **AC#4 的方向没反转**：我把 `b723978` 与 `6effb7e` 两枚 `scripts/slo-check.ps1` blob 逐行对齐差分
+   （仪器与输出在 `/tmp/wisp134-acc-r2-a/`，按"可执行行 vs 上色/落记录行"分类）：
+   **删除的可执行行 17 行里有 6 行是 `<# … #>` 帮助块正文**，剩下 11 行全是 `Write-Host` /
+   step-summary 字符串 / `Add-Content` / 一枚 `}` / **一枚 `exit 1`**；
+   **新增行里属于"判定条件"的：0 行**。六处判据条件在两版里逐枚同数同形：`$loadNames = @(`、
+   `$cpuBusyPct = 50`、`if ($cpuMax -ge $cpuBusyPct)`、`if ($reasons.Count -gt 0)`、
+   `if (-not $allPass) { exit 1 }`、`if ($allProcs.Count -lt 2)` 各 before=1 after=1。
+   ⇒ 改的确实是"拒绝之后怎么上色"，"什么时候拒绝出数"一字未动；"出了数而数不过"仍 `exit 1`（`:396`），
+   这条在 CI 上也读得到（§6.5 那枚安静 run 的 `leak exit=1 flipped_to_fail=True` 之后才有 `all_pass=True`）。
+3. **D22 mode-6**：`slo-full` 的门步骤**无条件**（§5.2 五步全 `unconditional=True`），`if:` /
+   `continue-on-error` 在 job 级与步级都是 NONE，触发表四键原样；`Upload SLO report` 那步**也没有 `if:`**
+   （所以"出了数而数不过 ⇒ 步 4 红 ⇒ 步 5 不执行 ⇒ 不产 artifact ⇒ 钉的钟不动"是结构决定的，
+   也正是 `slo-freshness.sh:38-45` 写明的意图）。上色规则的全部重量落在**脚本自己的退出码与它写的记录**上。
+   `if-no-files-found: warn` 不是步条件、零匹配时也不创建 artifact（真 CI 侧读数见 §6.5，不靠注释）。
+   `slo-fresh.yml` 独立性完好（§5.2）。
+   **P1 在这处 `warn` 改动之后仍有牙**（我在副本上打的四发）：塞 job 级 `if:` ⇒ rc=1、塞步级
+   `continue-on-error:` ⇒ rc=1、删 `cron:` ⇒ rc=1、把 `-Subset full` 换成 `-Subset smoke` ⇒ rc=1，
+   同一枚干净副本 rc=0（`/tmp/wisp134-acc-r2-a/p1mut/`；真 `ci.yml` 与快照逐字节同，
+   `git status --porcelain -- scripts .github internal cmd` 交件前为空）。
+   **唯一塞不响的是 `paths:` 触发过滤**：我在 `on.push` 下加了 `paths: ['internal/**']`，钉 **rc=0**
+   —— 这是 r1 §3.3 那条 `R-134-3` 的**独立复现**（我造的是另一份变异件，不是复跑它那几个）。
+4. **具名解冻的地界**：`git diff --numstat b723978..6effb7e` 里属于本票的只有四枚路径
+   （`scripts/slo-check.ps1` `86 16`、`scripts/slo-freshness.sh` `217 30`、`.github/workflows/ci.yml` `41 2`、
+   `.github/workflows/slo-fresh.yml` `15 0`）**+ 文档**；**零枚 `.go`**、零 golden、零 `allowlist.txt`、
+   `scripts/d22scan.sh` 本体未动。票面 `:8-10` 自己报备的那处超界（`if-no-files-found`）在这四枚路径之内
+   （`slo-full` 那枚 job 体的那一步），我 §5.2 逐字段读回。
+
+### 6.5 CI 侧我自己从 API 取的五发（不引 r1、不引实现方的断言）
+
+`gh api .../actions/runs/<id>`、`.../actions/jobs/<id>`、`.../actions/jobs/<id>/logs`（第 5 步原文，取法写明；
+三枚 job 日志按"词"反扫 `gho_` / `github_pat_` / `GH_TOKEN=` 命中 0，各 12-27 KB）：
+
+| run | sha | job / 步 | 结论 | 我读到的原文要点 |
+|---|---|---|---|---|
+| `35825185739` | `44ab500` | `107065251117` 步 5 `SLO full gate (six states + settle + leak)` | **success** | `NO CONCLUSION (machine-contended) … 4 reason(s), 0 state file(s) written, slo-report.json NOT written` + `… : exit 0`，另有步 6 的 `##[warning]No files were found with the provided path: build/slo/slo-report.json. No artifacts will be uploaded.`（L250） |
+| 同上 | | 那枚 run 的**产物表** | | 只有 `slo-smoke-report 2026-09-23T06:07:46Z`（id `10734273097`，7055 B）——**没有 `slo-full-report`** ⇒ "争用不给钉续命"这句我自己量到了 |
+| `35826548877` | `3f17504` | `107069434922` 步 5 | success | `precheck ok … cpu max 28%` → 六态 `exit=0 pass=True` → `settle exit=0 pass=True` → `leak exit=1 flipped_to_fail=True` → `report written … (all_pass=True)`；步 5 回显上传参 `name: slo-full-report` / `if-no-files-found: warn`；产物 `slo-full-report 06:26:30Z`（id `10735461474`，21689 B） |
+| **`35831084009`** | **`6effb7e`（被验版本本身）** | `107083592018` 步 5 / 步 6 | success / success | `precheck ok … cpu max 24%`（07:20:24Z）→ 六态 `exit=0 pass=True` → `settle exit=0 pass=True` → `leak exit=1 flipped_to_fail=True` → `report written …`；产物 `slo-full-report 07:23:05Z`（id `10736979707`） |
+| **`35831465653`** | **`6effb7e`** | `slo-fresh` 的 `107084825136`，步 3 + 步 4 | success / success | 钉自己读到的就是上一行那枚样：`P3 newest VALID SAMPLE: artifact slo-full-report created_at=2026-09-23T07:23:05Z artifact_id=10736979707 run=35831084009 … age: 0 day(s) (37 s)`，收尾整句 `OK - … a VALID SAMPLE inside the window` ⇒ **两半交易在同一枚 sha 上、相隔 37 秒闭合** |
+
+另外我在本机抓到一发现场读数（不是历史）：`09:06:16Z` 完成的 `slo-full`（run `35840958334`，步级 success）
+那枚 run 的产物表**只有 `slo-smoke-report 09:08:19Z`**，而我 `09:0x` 跑真 P3 读到的最新样仍停在
+`07:42:24Z` ⇒ **"绿一发的 job 没给钉续命"这一形在我这一程又自然发生了一次**（同枚 run 的整枚 `ci` 结论是
+`failure`，别的 job 红 ⇒ `slo-full` 的绿只是一枚 job 的绿，本票哪一格都不成立"CI 绿了"）。
+
+### 6.6 AC#6 判定与三处新缺口
+
+**PASS。** 判据是这一格自己那条：AC#6 要防的是"**永远没结论也能一直绿**"。我在不伪造 artifact、不改码的
+前提下打了 20 发（§6.2 那张表的三层全在内），**没有一发把这条造出来**：盘上那枚路径上"没数字的报告"要么在判色之前就被清除（F1）、
+要么根本没被写出来（FD 与 FM2 那对读数说明写手只认带真样的报告）；钉侧唯一"成功"的两发（H7 内容全盲、
+H12 未来时间戳）都要有人往它的输入里主动塞一枚不存在的样。
+**这不是附条件通过**：五处缺口全数归单（`R-134-5` 判据物不看内容与来源、`R-134-6` 零样本承重墙无用例钉、
+`R-134-7` 扫描上限、`R-134-8` 未来时间戳、`R-134-9` lint 覆盖面口径），其中 `R-134-6` 是这一格的承重墙
+被我自己拆过一遍——它要红的是另一枚模块（AC#6 地界之外），所以记在墙上而不是记在这一格的勾上。
