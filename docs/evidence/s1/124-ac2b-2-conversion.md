@@ -40,15 +40,90 @@
 
 ## 2. 判据①：逐枚转绿且点名（`-v` 才有 PASS 名）
 
-待量（PRE-L / PRE-P / POST-L / POST-P 四台对照表 + 逐包四数）。
+四台对照（同一批用例，`-count=1 -v`）。PRE-L=改前软链、PRE-P=改前普通、POST-L=改后软链、POST-P=改后普通。逐名状态取自各台 `-v` 日志的 `--- (PASS|FAIL|SKIP)` 行（名册 `/d/tmp/wisp124-2b2-logs/ROSTER-*.txt`，16 枚名册文件）。
+
+| 包 | 用例名 | PRE-L(改前软链) | PRE-P(改前普通) | POST-L(改后软链) | POST-P(改后普通) |
+|---|---|---|---|---|---|
+| `tools` | `TestRealToolCallWritesRewriteAccountIntoAudit` | FAIL | PASS | **PASS** | PASS |
+| `tools` | `TestDeclaredRiskIsOnlyAFloor` | FAIL | PASS | **PASS** | PASS |
+| `tools` | `TestToolCallRowsAreComplete` | FAIL | PASS | **PASS** | PASS |
+| `tools` | `TestFSReadReturnsTheFileAndTaintsIt` | FAIL | PASS | **PASS** | PASS |
+| `tools` | `TestFSReadTaintFeedsR4` | FAIL | PASS | **PASS** | PASS |
+| `tools` | `TestFSListSummarizesADirectory` | FAIL | PASS | **PASS** | PASS |
+| `tools` | `TestFSListHonoursItsCap` | FAIL | PASS | **PASS** | PASS |
+| `tools` | `TestAtomicWriteKillsMidWrite` | FAIL | PASS | **PASS** | PASS |
+| `tools` | `TestAtomicWriteKillsMidWrite/new_file_target_does_not_appear_at_all` | FAIL | PASS | **PASS** | PASS |
+| `tools` | `TestAtomicWriteKillsMidWrite/a_clean_write_lands_and_round_trips` | FAIL | PASS | **PASS** | PASS |
+| `tools` | `TestFSTrashGoesToTheRecycleBin` | FAIL | PASS | **PASS** | PASS |
+| `tools` | `TestFSMoveSameVolume` | FAIL | PASS | **PASS** | PASS |
+| `tools` | `TestPathCanonicalizerAccountsForRewrittenRoots` | FAIL | PASS | **PASS** | PASS |
+| `tools` | `TestTicket107AllowlistJudgmentTwoShapes` | FAIL | PASS | **PASS** | PASS |
+| `tools` | `TestTicket107AllowlistBoundaryIsComponentWise` | FAIL | PASS | **PASS** | PASS |
+| `tools` | `TestTicket107bProbeCLinkInsideAllowedRootStaysOutside` | FAIL | PASS | **PASS** | PASS |
+| `tools` | `TestWorkspaceSwitchNarrowsWhatTheAssessorJudges` | FAIL | PASS | **PASS** | PASS |
+| `tools` | `TestCanonicalizeReturnsAPathTheOSCanOpen` | FAIL | PASS | **PASS** | PASS |
+| `tools` | `TestLoopPassesDeclaredL1WriteThroughTheGate` | FAIL | PASS | **PASS** | PASS |
+| `tools` | `TestLoopStillRefusesL1WhenNoGateIsRegistered` | FAIL | PASS | **PASS** | PASS |
+| `llm` | `TestProbeSuiteMeasuresBrokenFC` | FAIL | PASS | **PASS** | PASS |
+| `llm` | `TestProbeSuiteMeasuresBrokenVision` | FAIL | PASS | **PASS** | PASS |
+| `llm` | `TestProbeSuiteHonestProviderRecordsNoMismatch` | FAIL | PASS | **PASS** | PASS |
+| `llm` | `TestProbeSuiteHonestNegativeIsNotAMismatch` | FAIL | PASS | **PASS** | PASS |
+| `llm` | `TestProbeSuiteBrokenOnAllThreeDialects` | FAIL | PASS | **PASS** | PASS |
+| `llm` | `TestProbeSuiteBrokenOnAllThreeDialects/openai-chat` | FAIL | PASS | **PASS** | PASS |
+| `llm` | `TestProbeSuiteBrokenOnAllThreeDialects/anthropic` | FAIL | PASS | **PASS** | PASS |
+| `llm` | `TestProbeSuiteBrokenOnAllThreeDialects/openai-responses` | FAIL | PASS | **PASS** | PASS |
+| `llm` | `TestProbeSuiteCapableOnAllThreeDialects` | FAIL | PASS | **PASS** | PASS |
+| `llm` | `TestProbeSuiteCapableOnAllThreeDialects/openai-chat` | FAIL | PASS | **PASS** | PASS |
+| `llm` | `TestProbeSuiteCapableOnAllThreeDialects/anthropic` | FAIL | PASS | **PASS** | PASS |
+| `llm` | `TestProbeSuiteCapableOnAllThreeDialects/openai-responses` | FAIL | PASS | **PASS** | PASS |
+| `llm` | `TestProbeSuiteRefusesSilentRuns` | FAIL | PASS | **PASS** | PASS |
+| `llm` | `TestProbeSuiteSinkFailurePropagates` | FAIL | PASS | **PASS** | PASS |
+| `llm` | `TestProbeSuiteAudioStaysUnprobed` | FAIL | PASS | **PASS** | PASS |
+| `llm` | `TestProbeSuiteMeasuresBrokenThinking` | FAIL | PASS | **PASS** | PASS |
+| `llm` | `TestProbeSuiteThinkingCapableIsNotTheSameAsBroken` | FAIL | PASS | **PASS** | PASS |
+| `perm` | `TestTicket90ManualSwitchSurvivesRestart` | FAIL | PASS | **PASS** | PASS |
+| `perm` | `TestTicket90UntouchedConfigStartsAtTheDefault` | FAIL | PASS | **PASS** | PASS |
+| `perm` | `TestTicket90SessionGrantDoesNotSurviveRestart` | FAIL | PASS | **PASS** | PASS |
+| `perm` | `TestTicket90ConfigKeyChangesWhatTheChainAsks` | FAIL | PASS | **PASS** | PASS |
+| `perm` | `TestTicket90HandEditLooseningGoesThroughD36` | FAIL | PASS | **PASS** | PASS |
+| `approval` | `TestTenOpsInOneToolCallGetOneConfirm` | FAIL | PASS | **PASS** | PASS |
+
+**逐包四数**：
+
+| 台 | 形状 | `internal/tools` | `internal/llm` | `internal/perm` | `internal/agent/approval` |
+|---|---|---|---|---|---|
+| PRE-L（改前） | 软链 | `rc=1 RUN=79 PASS=41 FAIL=21 SKIP=3 SUBPASS=12 SUBFAIL=2` | `rc=1 RUN=72 PASS=52 FAIL=11 SKIP=0 SUBPASS=3 SUBFAIL=6` | `rc=1 RUN=14 PASS=9 FAIL=5 SKIP=0` | `rc=1 RUN=49 PASS=28 FAIL=1 SKIP=1 SUBPASS=19 SUBFAIL=0` |
+| PRE-P（改前） | 普通 | `rc=0 RUN=79 PASS=62 FAIL=0 SKIP=3 SUBPASS=14 SUBFAIL=0` | `rc=0 RUN=72 PASS=63 FAIL=0 SKIP=0 SUBPASS=9 SUBFAIL=0` | `rc=0 RUN=14 PASS=14 FAIL=0 SKIP=0` | `rc=0 RUN=49 PASS=29 FAIL=0 SKIP=1 SUBPASS=19 SUBFAIL=0` |
+| POST-L（改后） | 软链 | `rc=1 RUN=79 PASS=59 FAIL=3 SKIP=3 SUBPASS=14 SUBFAIL=0` | `rc=0 RUN=72 PASS=63 FAIL=0 SKIP=0 SUBPASS=9 SUBFAIL=0` | `rc=0 RUN=14 PASS=14 FAIL=0 SKIP=0` | `rc=0 RUN=49 PASS=29 FAIL=0 SKIP=1 SUBPASS=19 SUBFAIL=0` |
+| POST-P（改后） | 普通 | `rc=0 RUN=79 PASS=62 FAIL=0 SKIP=3 SUBPASS=14 SUBFAIL=0` | `rc=0 RUN=72 PASS=63 FAIL=0 SKIP=0 SUBPASS=9 SUBFAIL=0` | `rc=0 RUN=14 PASS=14 FAIL=0 SKIP=0` | `rc=0 RUN=49 PASS=29 FAIL=0 SKIP=1 SUBPASS=19 SUBFAIL=0` |
+
+⇒ 本批红名数 **43 → 0**（软链形）。tools 的 `rc` 仍为 `1`，其 `FAIL=3` **逐名**是票 123 那三枚 300 s 腿（`TestL1WriteGoesThroughTheRealBlockWindow` / `TestLateVetoRendersTheApprovalLayersAppliedStepsReport` / `TestFSReadOnlyNeverOpensACard`，§1 已登记），零枚属本批名单；其余三包 `rc` 从 `1` 到 `0`。日志里的机制字串（四包合计，行计数）：`not provably resolved` **23 → 0**、`refusing to seal` **23 → 0**、`审批未通过` **4 → 0**、`审批通道尚未接入` **4 → 0**。
 
 ## 3. 判据②：普通形一枚都不许多红 + `git diff` 证判定分支一字未动
 
-待量。
+**逐数相同**：POST-P 与 PRE-P 四包**十六个数逐数相同**——tools `79/62/0/3`+`14/0`、llm `72/63/0/0`+`9/0`、perm `14/14/0/0`、approval `49/29/0/1`+`19/0`。普通形红名数 **0 → 0**，一枚都不许多红。⚠ 普通形本来 PASS 的枚（含票 123 那三枚的普通形侧 `PASS 0.00s/3.00s/3.01s`）改后仍 PASS，逐名见 ROSTER-PRE-P/POST-P 差集（脚本核，四包**逐名相等**、无新增名无丢失名）。
+
+`git show dfa3dc4` 的**删除侧全文只有 30 行**，逐行抄（`-` 号省略；`git show --numstat` = 18 枚文件、删除列合计 30）：
+
+- `dir := t.TempDir()` — 10 行（tools 的 ticket105/loop_approval/pathshape/paths_rewrite 站点 + perm 5 + approval 1）
+- `	dir := t.TempDir()` — 1 行（perm `TestTicket90ConfigKeyChangesWhatTheChainAsks` 循环体内，缩进一级）
+- `root := tempCanonical(t)` — 6 行；`outside := tempCanonical(t)` — 2 行（tools fs_test 4 + bridge_test 4）
+- `root := tempRaw(t)` — 2 行；`	root := tempRaw(t)` — 3 行（tools fs_write 站点，子测试内缩进一级）
+- `existing := t.TempDir()` — 3 行；`base := t.TempDir()` — 2 行
+- `store, err := memory.Open(filepath.Join(t.TempDir(), "data"))` — 1 行（llm `newProbeFixture` 唯一 fixture 根）
+
+**新增侧**（除五枚新文件外只有 30 行）：30 行全部是同名替换（`sealableTempDir124(t)` / `sealableTempCanonical124(t)` 形）。**判定分支、断言、阈值、golden 一行未动**——删除行与新增行一一对应，全部落在「递给底线/规范化器的根怎么拼」这一件事上。⇒ 票面 AC#3「不许拿放行侧放宽换绿」在本批成立：解析层在调用方（测试）这一侧，`internal/winsec` 与 `internal/risk` 的判定码一个字没碰。
+
+范围核对：`git show --numstat dfa3dc4` = 18 枚文件、全部 `_test.go`（13 枚改点 + 5 枚新委托）；`git diff --name-only 5417a3c dfa3dc4` 里 `internal/`+`cmd/` 非 `_test.go` 命中 **0 枚**。禁改列 `internal/winsec/**`、`internal/risk/**`、`rules_gateway.go`、`allowlist.txt`、`frontend/**`、批次 1 已交的 `internal/memory/**`、`internal/config/**` **零 hunk**；`internal/tools/wiring_test.go` **零 hunk**（票 123 三枚腿所在文件）；`cmd/wisp/**` 本批零 hunk（2b-4 地界；§0 登记的 9 枚漂移文件里有 `cmd/wisp` 码，那系兄弟代理所改，不来自本批 commit）。
 
 ## 4. 判据③：两形各取一枚 + RUN/SKIP 差逐包解释
 
-待量。
+两形各一枚已完成（§2 的 POST-L / POST-P，另 `-count=2` 各一枚见 §7）。逐包解释：
+
+- **本批四包两形 `RUN` 逐包相等、差为 0**：tools `79=79`、llm `72=72`、perm `14=14`、approval `49=49`（改前改后四个数都相等）。⇒ 批次 1 那种「父用例死在 `Open` ⇒ 子测试从未被创建」的分母收缩**没有发生在本批**：本批 43 枚的红全部落在**用例体内部**（bridge 执行步 / `SaveFile` / `RunProbeSuite` / `Veto`），`t.Run` 已建子测试后其父才判负，四台 `SUBPASS+SUBFAIL` 恒为 tools `14`、llm `9`、approval `19`、perm `0`。
+- **`SKIP` 名册四台逐名同一组 4 枚**（脚本对照 ROSTER-*.\*.txt）：tools `TestD34WriteMatrix`、`TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop`、`TestWorkspaceSwitchRefusesAJunctionToOutside`（三枚都要 Windows 侧的回收站/卷/junction 能力，POSIX 自跳）+ approval `TestDefaultDeadlineWallClockMeasurement`（墙上时钟前提自跳）。**形状无关、改前改后一字不变**，与本批解析层无关，也不在任何名册差集里。
+- **怎么排除「被跳过冒充变绿」（逐枚）**：§2 表 POST-L 列 43 枚**逐枚写的是 `PASS`**（取自 `-v` 日志的逐名行，非包级 `ok`），名册里 43 枚**无一枚 `SKIP`/`FAIL`**；再核改后软链的**用例名集合**与改前普通形**逐名相等**（`comm` 双向为空 ⇒ 既没多出新用例名，也没少一枚）。
+- ⚠ **AC#2a 那本账的软链形「缩分母」现象在本批不复现**（tools `RUN=77`→本批 `79`、winsec 的 125 探针族不在本批四包）——本批跑法 `-timeout 25m` 让三枚 300 s 腿跑完，`RUN` 不再被包级超时截断。
 
 ## 5. 判据④：本批「另一种拒」复算 — 逐枚实拿字符串
 
