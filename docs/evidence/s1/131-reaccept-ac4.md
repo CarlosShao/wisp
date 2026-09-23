@@ -119,3 +119,136 @@ X2 红名里的 emit-site：slog.Info@secret.go:321 -> :328, slog.Info@:461 -> :
 ⇒ **判 PASS。** 六发原来那枚红**逐枚还在、名字一个没换**；新增的红全部点名归到票 130 的用例与本轮 `R-131-2` 的新判据上，
 方向是**查得更多**。⚠ 两处措辞要更正（不影响判定）：X2/X9 各多的是**两枚**（`100/48/5` 对上一任 `82/78/4`），
 续单证据与 A122① 一处写"两枚"一处写"一枚"，实测为**两枚**；X10 多的那一枚在**同一枚用例内部**，顶层 FAIL 枚数没变。
+
+---
+
+## 3. 结案判据 2：三发从绿变红（X4／X8／X12）—— **PASS**
+
+同一仪器、同一台机器、`go build` rc=0 之后才读数。三发修复前都是**门 `PASS`／整包 82 全绿**（上一任 §4 原文）。
+
+### 3.1 X4 ＝ 早退 `if` 分发一条装了听众的腿：红，且红名逐字点到 `--diag`
+
+造法（照上一任）：`main()` 里 `args := os.Args[1:]` 之后插
+`if len(args) > 0 && args[0] == "--diag" { os.Exit(cmdDiag131(args[1:])) }` ＋ 新生产文件 `cmd/wisp/diag131.go`
+（内含 `installLogSink(root)` + `defer sink.close()`，`grep -c installLogSink` = 1），**不给它钉、不碰任何测试文件**。
+`go build` rc=0、`go vet` rc=0。
+
+`go test -count=1 -v ./cmd/wisp/` ⇒ rc=**1**，`RUN 100 / 顶层 52 / 1 / 0`，**唯一一枚顶层红就是门本人**，红名原文两枚：
+
+```
+leg_sink_gate_131_test.go:348: AC#4 RED: main.go:51 reads args (the local os.Args was bound to) in func main outside every branch
+    this gate classifies (the argv binding, the `if len(args) == 0` leg, and the `switch args[...]`). Literals in that statement: "--diag"
+    Statement: if len(args) > 0 && args[0] == "--diag" { os.Exit(cmdDiag131(args[1:])) }
+    A dispatch that lives beside the switch is invisible to the leg list, so the leg it selects can install a listener with no nail and no row. ...
+leg_sink_gate_131_test.go:348: AC#4 RED: main.go:52 reads args ... The statement names no literal command, so this reader cannot say which leg it dispatches.
+    Statement: os.Exit(cmdDiag131(args[1:]))
+```
+
+⇒ 判据 2 那句"红名须点到 `--diag`"**逐字成立**（第一枚的 `Literals in that statement: "--diag"`；整份日志里 `--diag` 命中 2 次，全在红名内）。
+账本仍是 **15 行、`--diag` 零命中** ⇒ 拦下这形的不是"多了一条腿"，是"**越权读 argv 就红**"——这条比"数腿"结实，
+因为它不依赖门认得这条腿的形状。
+零误伤：未变异基线整份 `-count=2` 里 `AC#4 RED` 命中 **0**（§1）。还原 ⇒ `diff -r` 只差一枚 `go build` 落的 `wisp.exe`、门 `--- PASS`。
+
+### 3.2 X8 ＝ `case "slo":` 写成命名常量：红，且红来自门本人而不是"整包坏掉"
+
+造法：`case "slo":` ⇒ `case sloCmdName131:` ＋ `const sloCmdName131 = "slo"`（**直接取上一任快照里那枚 `main.go`，逐字节同形**）。
+`go build`/`go vet` rc=0。
+
+- 整包：rc=1，`RUN 100 / 52 / 1 / 0` ⇒ **一枚顶层红，且它就是 `TestAC4EveryLegIsNailedOrRuled`**。
+  这一条正是简报点名的"不许靠整包坏掉才响"：红的不是别的用例连带炸，是门自己判红。
+- 红名点到常量与行号，并给出解析到的值：
+  `the case label at main.go:84 is sloCmdName131, which is not a string literal. It is package-level const sloCmdName131 = "slo", so the leg this clause dispatches is "slo" ...`
+- 账本 **15 行一字不少**，那条腿以 `unparsed-label@main.go:84:sloCmdName131` 自己的行在账
+  （`install=false records=true ruled=true nails=- -> ruled`），`leg default main.go:95 -> no records` **不受影响**
+  ⇒ 上一任点名的两个后果（静默出账 / 与别人撞键后静默）**各自都有了对面的红**。
+  ⚠ 关键差别要说清：修复前是**两行都叫 `default`**、`leg slo` 这个键零命中；现在那个键改成了 `unparsed-label@...`，
+  但那条腿的三列读数与裁决仍在账、且门为它红一次 ⇒ 裁决标记的承重没有被改名洗掉。
+- 还原 ⇒ 只差 `wisp.exe`、门 `--- PASS`。
+
+### 3.3 X12 ＝ 新腿 + 一枚 `var 别名 = installLogSink`：红，且与 X6 同一枚红名
+
+造法：取上一任 `wisp131-acc131r2-x12-aliasnewleg/cmd/wisp/fake131.go` **原文件**（内含 `var sinkAlias131 = installLogSink` +
+`sinkAlias131(root)` + `defer sink.close()`）＋它那枚 `main.go`（`81a82,83` 插 `case "fake131":`）⇒ 与上一任逐字节同形。
+`go build`/`go vet` rc=0。
+
+- 整包 rc=1，`100 / 52 / 1 / 0`，红名与 X6 **同一枚**：
+  `AC#4 RED: leg "fake131" (main.go:82) reaches installLogSink on 1 line(s) of this package and no registered nail names it.`
+- 门另外把它新加的边打进日志（这一条上一任没有、本轮才有；它把"我看不见这条边"变成"我接上了并且说出来"）：
+  `leg_sink_gate_131_test.go:371: call edges added through package-level function values (R-131-1 形 c): cmdFake131:sinkAlias131->installLogSink`
+- 账本 **16 行**，`leg fake131 ... install=true records=true ... -> RED listener installed, no nail`
+  ⇒ 上一任最刺眼的那一点（活腿被写成 `install=false records=false -> no records`）已经翻成**真话 + 红**。
+- 还原 ⇒ 只差 `wisp.exe`、门 `--- PASS`。
+
+**X11 侧（同一形打在已有钉的 models 腿上）**：别名被接成边之后账本恢复 `install=true`，门 `PASS` 并打印
+`modelsEnsure:sinkViaVar131->installLogSink`（这一枚是续单方自报的读数；我在 §4 的 y3 那一发从另一侧独立撞过同一条路）。
+
+⇒ **判 PASS。** 三形全部从"绿/PASS"翻成"门本人红"：X4 点到 `--diag`、X8 不靠整包坏掉、X12 与 X6 同名。
+
+---
+
+## 4. 第五形（Y3 那一支）独立重走 —— 三处都办了，**其中一处测出真洞**
+
+简报要我：① 复造指名豁免、② 核那把尺的两枚误伤是**在未变异树上量到并修掉**的、③ 它自报"三枚恒真变体读数取自补尺**之前**那版码"
+⇒ **这一格由我补跑**。三处逐一，外加两枚我自己造的形状。
+
+### 4.1 ① 指名豁免那一支：现在**红**（它自报"补判据前实测静默 rc=0"，我在最终码上复造）
+
+造法（逐字照它的描述）：门 `leg_sink_gate_131_test.go:956`
+`if strings.Contains(fi.doc, legSinkRulingMarker) {` ⇒ `... || fi.name == "cmdSLO" {`，**同时**把
+`slo_windows.go:171` 的标记句改名成 `LEG-SINK-DECISION-REMOVED:`（即"账本说裁决过、文件里已经没有裁决句"）。`go build` rc=0。
+
+- 只跑门：`GATE_RC=1`，红名原文：
+  `leg_sink_gate_131_test.go:379: AC#4 RED: leg "slo" is booked as ruled at [slo_other.go:34 | slo_windows.go:185], but the marker sentence "WISP-LEG-SINK-RULING:" is in none of those files: the reading came from the instrument's own predicate, not from a ruling anybody wrote down.`
+- 整包：`RUN 100 / 52 / 1 / 0` —— **唯一一枚顶层红就是门**，不是"整包坏了才响"。
+⇒ **它自报的那一格（旧码 rc=0、账本仍写 `ruled=true` 而标记句已删）在 `bcb03aa` 上不再静默。** 〔独立复现〕
+
+### 4.2 ③ 三枚恒真变体：我在**最终码**上逐枚补跑（它自报这三枚取自补尺之前那版）
+
+| 枚 | 门里被改掉的那一行（＋同时删标记句／叠一发旧红） | 续单方自报（补尺前） | **我在 `bcb03aa` 的读数** |
+| --- | --- | --- | --- |
+| **A1** | `:956` ⇒ `if !fi.calls[installsFuncName] {`（不装听众就算裁决过） | "不绿：4 枚新红" | **不绿**：`AC#4 RED` 命中 **19 枚**，含 4 枚 `carries a WISP-LEG-SINK-RULING: sentence (...) AND reaches installLogSink`（models/no-args/run/secret），**另加 15 枚第二把尺的红**（`booked as ruled at ... is in none of those files`）；整包 `100/52/1/0`，顶层红仍是门本人 |
+| **A2** | `:946` install 谓词 ⇒ `if len(fi.slogSel) > 0 {` ＋ 叠 X1（删 models 那 9 行） | "不绿：3 枚红，X1 原有那枚仍在" | **不绿**：3 枚红，其中 **`AC#4 RED: nail "TestAC2ModelsLeg..." claims leg "models", which no longer installs the persistent sink (main.go:74)` 逐字仍在**（⇒ 旧红没被新谓词冲掉）；另两枚是 `leg "slo" ... reaches installLogSink ... no registered nail` 与 `leg "slo" carries a ... AND reaches installLogSink`；整包 `100/50/3/0` ＋ 1 枚子用例红 |
+| **A3** | `:950` records 谓词 ⇒ `if len(fi.slogSel) >= 0 {`（恒真）＋ 叠 X2 | "不绿：每条不发记录的腿各红一枚" | **不绿**：12 枚 `AC#4 RED: leg "--help" ("-v"/"default"/...) books records () through the process logger, installs no listener, and carries no WISP-LEG-SINK-RULING: sentence.`（每条无记录腿一枚）；整包 `100/48/5/0` ＋ 1 枚子用例红 |
+| **A0**（对照，仪器一字未动） | 只改 `slo_windows.go` 的标记词 | "门红并点名 `slo`" | **红**，点名 `leg "slo" ... carries no WISP-LEG-SINK-RULING: sentence`（⇒ 那枚标记确实承重，删了必红） |
+
+⇒ 三枚恒真变体在**最终码**上各自撞出新红，**没有一枚静默**；A2 还额外证明"旧红 X1 不被新谓词吞掉"。**这一格由我跑完了。** 〔独立复现〕
+
+### 4.3 ② 那把尺的两枚误伤：在**未变异树**上确已修掉，而且修完仍会红（我用两枚新形状顶它）
+
+- **误伤 1（本文件那枚标记常量被当成裁决句）**：修复手段＝测试文件不进字节扫描。
+  我在**未变异树**上从另一侧独立验到它：把标记句只写进一枚 `_test.go`（`logsink_test.go` 末尾追加一句
+  `// WISP-LEG-SINK-RULING: planted in a test file`）⇒ 门 `--- PASS`、整包 **`100/53/0/0` rc=0**。
+  这条**静默是有道理的、且不可被利用**：AST 那条路同样不收测试文件里的函数（`loadMainPackage131` 对 `isTest` 的非 `Test*` 函数
+  直接 `continue`），所以"往测试文件写标记"**伪造不出 `ruled=true`**，也就没有"拿测试文件洗掉一条真裁决"这条路。
+  ⇒ 不算缺陷，登记为口径条 `R-131r3-3`。
+- **误伤 2（`_windows`/`_other` 被合并成一个 site）**：修复手段＝按 `" | "` 逐段查。
+  我先复现它**修完仍然会红**（§4.1 那一发：slo 的 site 正是 `slo_other.go:34 | slo_windows.go:185` 这种合并串，两半都没有标记 ⇒ 红），
+  ⇒ 把尺调哑并不是这两枚误伤的唯一出路，这一点我证到了。
+
+**再拿两枚"不是 slo、不是指名豁免"的新形状顶它**（这一步就是简报要的"证明它修完仍会红"）：
+
+- **第二枚恒真豁免（换一形，不针对 slo）**：`:956` ⇒ `... || len(fi.slogSel) > 0 {`（"发过记录就算裁决过"）＋删 slo 标记。
+  ⇒ 门红 **9 枚**：既有老那条 `carries a ... AND reaches installLogSink`（4 枚，models/no-args/run/secret），
+  也有第二把尺在**非 slo 的腿**上咬下来的
+  `leg "models" is booked as ruled at [logsink.go:144], but the marker sentence ... is in none of those files`
+  ⇒ 这把尺不是只认 `slo` 的定制补丁。整包 `100/52/1/0`，顶层红仍是门。
+- **反向那一支在全新的文件上**：把 `// WISP-LEG-SINK-RULING: prose nobody dispatches to` 追加到 `doctor.go` 末尾
+  （自由浮动注释，不进任何函数 doc）⇒ 门红一枚，原文
+  `AC#4 RED: doctor.go carries a "WISP-LEG-SINK-RULING:" sentence that no ruled ledger row claims: a ruling nobody's dispatch reaches is prose, not a decision.`
+  ⇒ 反向读数也不只认 `slo_windows.go`。整包 `100/52/1/0`。
+
+### 4.4 但是我测出一枚**真的洞**：第二把尺只到"文件粒度"，一枚裸标记就能洗钱
+
+造法（`/tmp/wisp131-r3-y6-filegran`）：在上面那枚"发过记录就算裁决过"的豁免之上，把
+`// WISP-LEG-SINK-RULING: a sentence parked in this file by the probe, attached to no function.` **追加到 `slo_other.go` 末尾**，
+而 `slo_windows.go` 里那枚真裁决句仍然改走。`go build` rc=0。读数：
+
+- `leg "slo" is booked as ruled ... in none of those files` 那一枚红**消失了**。同一份码、只差这枚裸标记：
+  不带裸标记那一发该句命中 **1** 次、带裸标记这一发命中 **0** 次（逐枚 grep 对过，快照 `y5-waiver2` vs `y6-filegran`）。
+- 整包仍然红（那枚豁免让另外四条腿各自撞红），**所以今天它不静默**；但
+  **"放宽 `ruled` 谓词 ＋ 目标腿的 site 是合并串"这一形**下，只要往合并串里任意一枚文件塞一行裸标记，
+  `ruled=true` 就能在没有裁决句的那个文件上拿到背书。
+
+⇒ 这正是续单自己 `next=` ② 写的那格（"两个文件各写半句这种拼接仍未测"）——**我今天把它测出来了，方向确凿（红 → 不红）**。
+严重度我判**中低**：它需要有人**同时**放宽 `ruled` 谓词并塞一枚裸标记，而被放宽的谓词本身会先把另外四条腿弄红（不是免检），
+所以它**不是** AC#4 声称要防的那个结局（"新增一条腿不给钉、门静默"）⇒ **不构成退回触发线**。登记为 `R-131r3-1`。
