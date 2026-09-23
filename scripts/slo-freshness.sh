@@ -82,8 +82,16 @@
 # ci.yml, unparseable date).
 set -eu
 
-here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-root=$(CDPATH= cd -- "$here/.." && pwd)
+# Spell the empty prefix assignment as `CDPATH=''` rather than `CDPATH=`.
+# Identical shell semantics (an empty CPATH for the `cd` that follows), but the
+# linter (shellcheck 0.11.0) reads the bare `CDPATH= cd` spelling as a typo
+# (SC1007) and the "Shell lint for the pin" step in
+# .github/workflows/slo-fresh.yml is a hard gate - leaving it would have made
+# this nail's own workflow red the first time it ran on a runner that has a
+# linter. Measured 2026-09-23, see
+# docs/evidence/s1/134-ac6-contended-no-conclusion.md section 3.4.
+here=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+root=$(CDPATH='' cd -- "$here/.." && pwd)
 
 max_age_days=${SLO_FULL_MAX_AGE_DAYS:-3}
 sample_max_age_days=${SLO_FULL_SAMPLE_MAX_AGE_DAYS:-3}

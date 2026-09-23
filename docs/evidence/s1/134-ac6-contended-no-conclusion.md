@@ -454,3 +454,158 @@ RC=2
 6. **P3 不看 job 在哪个 run 里**：它信 artifact 的 `created_at`。若 runner 时钟漂了，
    漂向未来的 report 会显得更新 —— 但这枚 report 的时间戳是 **GitHub 服务端**写入的（artifact `created_at`），
    不是 runner 报的，所以这条不适用；真正的外部时钟是钉自己的 `now`（`date -u +%s`，ubuntu runner）。
+
+---
+
+## 3. 门禁（照票 134 AC#5 那一套重跑，被验版本 = `44ab500` 的树）
+
+### 3.1 `sh scripts/d22scan.sh` 纯净快照 rc=0 + 台账八 scope 不降
+
+```
+$ rm -rf /tmp/d22-134ac6 && mkdir -p /tmp/d22-134ac6
+$ git archive HEAD | tar -x -C /tmp/d22-134ac6            # HEAD = 44ab500
+$ cd /tmp/d22-134ac6 && sh scripts/d22scan.sh
+runtests.sh: OK - packages=[./...] top-level: PASS=21 FAIL=0 SKIP=0, === RUN=31, '[no tests to run]'=0
+--- PASS: TestBuiltBinaryGoesRedEndToEnd (1.27s)   （6 条子用例全 PASS）
+d22scan.sh: scan of /tmp/d22-134ac6
+d22scan: examined 225 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/d22-134ac6
+d22scan: clean - no D22 ban violations
+D22-RC=0
+```
+
+| scope | 票 99 基线 | AC#5 那格（`b9b2072`） | 本次（`44ab500`） | 判定 |
+|---|---|---|---|---|
+| bans #1-5 `internal/` | 197 | 202 | **203** | 不降 |
+| bans #1-5 `cmd/` | 20 | 22 | **22** | 持平 |
+| ban #6 `frontend/` | 37 | 40 | **40** | 持平 |
+| ban #7 `internal/tools/` | 17 | 18 | **18** | 持平 |
+| ban #8 `design/` | 16 | 16 | **16** | 持平 |
+| ban #8 `frontend/` | 37 | 40 | **40** | 持平 |
+| ban #8 `internal/` | 342 | 387 | **390** | 不降 |
+| ban #8 `cmd/` | 26 | 36 | **37** | 不降 |
+
+**8 行 scope 齐全、逐格不降**。三处上涨（203 / 390 / 37）不是本票造成的：**本格零枚 `.go` 改动**
+（`git diff --name-only b723978..HEAD -- '*.go'` 在本票四枚路径里为空），
+涨的是同树并行的票 129/130/131 那几枚 commit。
+
+### 3.2 两台 YAML 解析器读数（最终树，PyYAML 6.0.3）
+
+`ci.yml`（§1.4 那张表在改动入库之后又跑了一遍，逐字相同：`job count = 6` /
+`all six present = True (missing: [] extra: [])` / `runs-on ubuntu-latest=3 windows-latest=2 self-hosted+wisp-slo=1` /
+`slo-full steps=5 step-level-if-or-continue=NONE job-level=NONE` / 门步骤 `unconditional run step = True` /
+`with = {'name': 'slo-full-report', 'path': 'build/slo/slo-report.json', 'if-no-files-found': 'warn'}`）
+
+`slo-fresh.yml`（独立性复测）：
+
+```
+slo-fresh.yml PARSER-OK; jobs = ['slo-fresh']
+name = slo-full-must-keep-getting-triggered | runs-on = ubuntu-latest
+job-level if/continue-on-error = False False
+  step 1 | actions/checkout@v4 | conditional keys = []
+  step 2 | slo-full freshness pin (ticket 134 AC#3) | conditional keys = []
+  step 3 | Shell lint for the pin | conditional keys = []
+permissions = {'contents': 'read', 'actions': 'read'}
+on = {'schedule': [{'cron': '23 */6 * * *'}], 'workflow_dispatch': None}
+```
+
+⇒ 钉仍是**自带时钟 + 手动入口**、`ubuntu-latest`、`permissions` 没有加宽（`actions: read` 本来就够读 artifact 列表）、
+无 `if:` / 无 `continue-on-error`、无路径过滤；它与被测的 `slo-full` 不共用任何触发器。
+`slo-fresh.yml` 本程 `git diff --numstat` = `15 0`（纯注释，零删除）。
+
+### 3.3 D32 两条阈值未动（正面回答交回项 ⑥）
+
+- `internal/observe/thresholds.go` **锚点与 HEAD 同一枚 blob**：
+  `git rev-parse b723978:internal/observe/thresholds.go HEAD:internal/observe/thresholds.go`
+  ⇒ 两侧都是 `e2677b11b5a5adff8b4eb87c36d31286a274471d`；`git diff --numstat b723978..HEAD -- 该文件` 为空。
+  文件里那两行判据原文（`grep -n` 于 HEAD）：
+  ```
+  19:	memCapSleeping     int64 = 25 << 20
+  26:	cpuLimitSleeping     = 0.5 // % of all-core mean, 1min window
+  ```
+- `scripts/slo-check.ps1` 自锚点以来**被删掉的行**逐字全列（16 行，一类都不许漏）：
+  4 行头文档 + 2 行头文档 + 6 行 `Write-Host` 文案 + 1 行 step-summary 文案 + 1 行 step-summary 表格行 +
+  1 行 `Add-Content` 收尾 + **1 行 `exit 1`** ⇒ 没有任何一行是判据条件。HEAD 上仍在的原样条件：
+  ```
+  153:$loadNames = @('go.exe', 'gofmt.exe', 'cgo.exe', 'compile.exe', 'asm.exe', 'link.exe',
+  211:$cpuBusyPct = 50
+  225:if ($cpuMax -ge $cpuBusyPct) {
+  381:$allPass = ($failingStates.Count -eq 0) -and $settlePass
+  396:if (-not $allPass) { exit 1 }
+  ```
+  ⇒ "什么时候拒绝出数"（AC#4 的方向）与"出了数而不过就红"两条都在原位。
+  ps1 里出现的 `0.5%` / `25MB` 六处全是**文档与日志文案**（`:29 :135 :241-242` 注释、`:256-257` 打印），
+  数值本身由 `wisp slo` 判，脚本不参与。
+- `docs/PLAN.md`、`docs/specs/**`、`internal/risk/**`、`rules_gateway.go`、`tools/d22scan/**`、
+  `allowlist.txt`、`scripts/d22scan.sh`、任何 golden：本程 `git status --porcelain` 里从未出现，
+  `git log --name-only b723978..HEAD`（我的三枚 commit）只含 §"commit 清单"里那六枚路径。
+
+### 3.4 脚本 lint：shellcheck 这一格**这次真的跑起来了**（AC#5 欠的那格补上）
+
+本机仍然没有 `shellcheck`（`command -v shellcheck` rc=1），但 **docker 可用**，所以按简报给的挂载口径跑
+Linux 版（比 Windows 原生更贴 ubuntu runner）：
+
+```
+$ docker info --format '{{.ServerVersion}} {{.OSType}}'   ->  29.6.2 linux
+$ MSYS_NO_PATHCONV=1 docker run --rm --entrypoint shellcheck -w /src \
+      -v /d/work/tmp/134ac6-sc:/src:ro koalaman/shellcheck:stable --version
+    ShellCheck - shell script analysis tool / version: 0.11.0
+```
+
+**假绿防护**（简报点过的那发：`docker run -v "C:\…"` 会静默挂空且 rc=0）：镜像里没有 `/bin/sh`（拿 `ls -l /src/go.mod`
+进不去），所以我把"挂载真生效"换成**更强的一发**——往挂载目录里埋一枚**故意有病**的文件，让容器把**我的文件名与行内容**原样报回来：
+
+```
+In /src/mountproof.sh line 4:
+  echo $1
+       ^-- SC2086 (info): Double quote to prevent globbing and word splitting.
+```
+
+⇒ 内容穿过来了，挂载不是空的。
+
+**第一发读数（要害）**：`shellcheck -s sh scripts/slo-freshness.sh` 在**我接手时的那枚文件**上 **rc=1**：
+
+```
+In /src/scripts/slo-freshness.sh line 85:
+here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+              ^-- SC1007 (warning): Remove space after = if trying to assign a value ...
+In /src/scripts/slo-freshness.sh line 86:
+root=$(CDPATH= cd -- "$here/.." && pwd)
+              ^-- SC1007 (warning): ...
+```
+
+⇒ 这两行是 **AC#3 落地的原码**（不是我写的）。也就是说 `.github/workflows/slo-fresh.yml` 的
+`Shell lint for the pin` 那一步（AC#5 亲手指定为"shellcheck 那一格的兜底，缺它即硬红"）**在真装上 shellcheck 的
+runner 上会直接红**——AC#5 那格当时以"本机没装"结案，欠的就是这一发。
+
+**修法**（`scripts/slo-freshness.sh`，在本格解冻清单内）：把空的前缀赋值写成 `CDPATH=''`，
+与 `CDPATH=` 语义完全相同（先在容器里拿三形 `CDPATH=''` / `CDPATH= ;` / 裸 `cd` 各跑一发，`shellcheck` 对三形都 rc=0，
+我选**语义等价最强、改动最小**的第一形），并在原位写下为什么。改完：
+
+```
+$ MSYS_NO_PATHCONV=1 docker run --rm --entrypoint shellcheck -w /src -v /d/work/tmp/134ac6-sc:/src:ro \
+      koalaman/shellcheck:stable -s sh /src/scripts/slo-freshness.sh
+SC-RC=0
+```
+
+⚠ **过程中踩到自己造的一枚新坑，记下来防再犯**：我为此写的那段注释里有一行以
+`# shellcheck 0.11.0 reads the bare ...` 开头 ⇒ **注释自己变成了一枚无法解析的 shellcheck 指令**，
+`SC1073/SC1072 (error)`、rc=1。已改写措辞（`# the linter (shellcheck 0.11.0) ...`），
+并全库扫过一遍：`grep -n "^\s*# shellcheck" scripts/*.sh` 除既有 directive 外 0 命中。
+
+**其余 lint**：
+
+| 仪器 | 对象 | 读数 |
+|---|---|---|
+| `sh -n` | `scripts/slo-freshness.sh` | rc=0 |
+| `bash -n` | `scripts/slo-freshness.sh` | rc=0 |
+| shellcheck 0.11.0 `-s sh` | `scripts/slo-freshness.sh`（HEAD 最终版） | **rc=0** |
+| PSParser | `scripts/slo-check.ps1` | `PARSE-OK tokens=1842 errors=0` |
+| shellcheck（信息性，非本格地界） | `d22scan.sh` 2 / `portable-tests.sh` 39 / `winsec-tests.sh` 11 / `wisp-cli-tests.sh` 5 | 共 57 处发现 |
+
+⇒ 那 57 处**不归本票**（`slo-fresh.yml` 只 lint `slo-freshness.sh`；四枚脚本里三枚在禁改清单上），
+我只把数字如实贴出来，另立不立票由编排者定。
+
+### 3.5 测了但结论只能挂在"未验证"上的格子
+
+见 §5 末列表；其中 shellcheck 这一格**已从"未验证"升成"已验证"**（本机 docker 内跑 Linux 版 + 上表 rc=0），
+剩下的是 `slo-fresh.yml` 自身在 CI 上的第一次执行、`schedule` 那半边、以及 `GITHUB_STEP_SUMMARY` 分支。
