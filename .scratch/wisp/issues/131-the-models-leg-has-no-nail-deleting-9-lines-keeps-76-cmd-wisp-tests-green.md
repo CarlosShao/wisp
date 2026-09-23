@@ -19,12 +19,12 @@
 
 ## AC（1:1，裁决表 `docs/evidence/s1/131-*.md` 由验收方出）
 
-- [ ] **AC#1** 先出**腿清单**（可 grep、给文件:行）：`cmd/wisp` 的每条子命令腿 + 它有没有 install 听众 + 有没有钉。今天已知的形状：run **有钉**（票 117 三枚）、resident **有钉**（票 127 三枚）、models **无钉**、secret **未定**（`R-117-1`：先决定该不该装）。
-- [ ] **AC#2** `wisp models` 腿补钉。可用形状：它自带 `cmdModels(argv, modelsIO)` 注入接缝 ⇒ **可像 run 腿那样进程内驱动**，判据＝盘上 jsonl 有 `models:` 记录且 `dir` 等于该 env 的数据根。**不许 `t.Skip`、不许只查文件存在不查内容**。
-- [ ] **AC#3** `wisp secret` 腿（`R-117-1`）**先裁该不该装听众**，再决定装了就补钉 / 不装就把理由写死在代码注释里（不许留"以后再说"）。
-- [ ] **AC#4** **收敛判据**：把 AC#1 那张清单做成一枚用例（腿清单从源码枚举、不是硬编码字符串），
+- [x] **AC#1** 先出**腿清单**（可 grep、给文件:行）：`cmd/wisp` 的每条子命令腿 + 它有没有 install 听众 + 有没有钉。今天已知的形状：run **有钉**（票 117 三枚）、resident **有钉**（票 127 三枚）、models **无钉**、secret **未定**（`R-117-1`：先决定该不该装）。
+- [x] **AC#2** `wisp models` 腿补钉。可用形状：它自带 `cmdModels(argv, modelsIO)` 注入接缝 ⇒ **可像 run 腿那样进程内驱动**，判据＝盘上 jsonl 有 `models:` 记录且 `dir` 等于该 env 的数据根。**不许 `t.Skip`、不许只查文件存在不查内容**。
+- [x] **AC#3** `wisp secret` 腿（`R-117-1`）**先裁该不该装听众**，再决定装了就补钉 / 不装就把理由写死在代码注释里（不许留"以后再说"）。
+- [x] **AC#4** **收敛判据**：把 AC#1 那张清单做成一枚用例（腿清单从源码枚举、不是硬编码字符串），
       使"**新增一条腿而不给它钉**"当场红；并跑一发变异证明它不是恒绿（造一条假腿 ⇒ 用例点名）。
-- [ ] **AC#5** 门禁：`go test -count=2 -v ./cmd/wisp/` 四数 + 台账八 scope 与同 sha 控制组逐数不降（`ban #8 cmd/` 现基线 **32**）；
+- [x] **AC#5** 门禁：`go test -count=2 -v ./cmd/wisp/` 四数 + 台账八 scope 与同 sha 控制组逐数不降（`ban #8 cmd/` 现基线 **32**）；
       `gofmt -l cmd/wisp/` 与 `"$(go env GOPATH)/bin/gofumpt.exe" -l` 真跑；`go vet`；d22scan 纯净快照 rc=0。
       ⚠ `cmd/wisp` 要跑就得把 `third_party/` 那三枚 dll 拷进快照（`git archive` 不含未入库件），否则 `0xc0000135` 会让四数全零（**假绿/假红都造得出**）。
 
@@ -115,3 +115,133 @@ CTRL_BREAK 后以 `0xc000013a` 死亡、close 的 flush 没来得及跑 ⇒ 文�
 
 下一步（下一条 append）：AC#4 的三发变异（假腿点名 / 假腿给钉后不红 / 拆 models install 红名）、
 AC#2 的双向证明、`-count=2` 四数与台账对比、`gofmt`/`gofumpt`/`vet`/d22scan 纯净快照读数。
+
+### 2026-09-23 08:4x — 变异五发 + AC#5 门禁四数（`74b7`=`7e60d31`，其后 `627aa66` 只改红名文案）
+
+所有变异都在 `/tmp` 的一次性快照里做（`git archive 627aa66 | tar -x` + 拷三枚 dll，再就地改文件），
+工作树从头到尾没被变异污染；`627aa66` = 变异所用代码态（与 `7e60d31` 只差 M1 读数引出的那句文案）。
+
+**M1｜拆掉 `cmd/wisp/models.go:276-284` 那 9 行**（票面原始变异，逐字按行删，保留 `var logf func(string, ...any)`）：
+`go build ./cmd/wisp/` rc=0、`go vet ./cmd/wisp/` rc=0（⇒ 编译器仍然不知道发生了任何事），
+`go test -count=1 -v ./cmd/wisp/` ⇒ 82 枚 RUN 里 **3 枚顶层红 + 1 枚子用例红**，其余 79 枚绿，`FAIL 42.978s`：
+
+```
+--- FAIL: TestAC4EveryLegIsNailedOrRuled (0.02s)
+    leg_sink_gate_131_test.go:214: AC#4 RED: nail "TestAC2ModelsLegBooksItsHandOffVerdictOnDisk" claims leg "models",
+        which no longer installs the persistent sink (main.go:74): the nail is now proving something else, or nothing
+          leg models  main.go:74  install=false records=false ruled=false nails=TestAC2Models...  -> no records
+--- FAIL: TestAC2ModelsLegBooksItsHandOffVerdictOnDisk (0.00s)
+    leg_sink_nail_131_test.go:295: no wisp-<day>-<seq>.jsonl in <数据根>\logs: the leg ran to completion and its
+        listener wrote nothing there.
+        stderr:
+        wisp models ensure: 交还被拒绝（state=Error）：model: model id "absent-in-signed-manifest-131" not in signed manifest
+--- FAIL: TestAC2AC3DegradedLegsStillDeliverTheirVerdict/models (0.00s)
+    leg_sink_nail_131_test.go:443: a log directory that cannot be opened produced no named refusal
+        ("wisp models: 持久日志未启用" on stderr). ... That sentence is the half of the nine lines which is not a comment.
+```
+（这一发的第一版读数把主张说成了 syscall —— `counting pipeline files ...: The system cannot find the file specified`，
+`627aa66` 把"目录不存在"与"目录在而文件不在"合并成上面那句，并把被驱腿自己的 stdout/stderr 一起打出来。）
+
+**M2｜装上不会红**：同一枚钉在 `627aa66` 纯净快照里 `-count=2 -v` 两趟 164/164 全绿（数字见下），
+即 M1 不是"怎么都红"的钉子。
+
+**M5｜拆掉 `cmd/wisp/secret.go:219-223`（本票新装的 5 行）**：`go build`/`go vet` rc=0，三枚红，
+其中枚举门同时给出**两条**独立读数 —— 中间那行就是 R-117-1 的形状被机器复现：
+
+```
+leg_sink_gate_131_test.go:194: AC#4 RED: leg "secret" (main.go:72) books records
+    (slog.Info@secret.go:321, slog.Info@secret.go:461, slog.Warn@secret.go:461) through the process logger,
+    installs no listener, and carries no WISP-LEG-SINK-RULING: sentence.
+leg_sink_gate_131_test.go:214: AC#4 RED: nail "TestAC3SecretLegBooksItsAuditRecordsOnDisk" claims leg "secret",
+    which no longer installs the persistent sink (main.go:72) ...
+--- FAIL: TestAC3SecretLegBooksItsAuditRecordsOnDisk (0.01s)   （+ .../secret 降级子用例红）
+```
+这条读数是 AC#3 真正要的形态：不装听众 ⇒ 门**要求裁决**；装了 ⇒ 门**要求钉**；只装不钉 ⇒ 两条都红。
+
+**M3｜造一条假腿，不给钉**（快照里加 `case "faketest131": os.Exit(cmdFakeLeg131(args[1:]))` +
+一个只调用 `installLogSink` 的新生产函数）：
+
+```
+leg_sink_gate_131_test.go:171: AC#4 RED: leg "faketest131" (main.go:82) reaches installLogSink on 1 line(s)
+    of this package and no registered nail names it.
+    Fix: write the nail, and claim it with registerLegNail131("faketest131", TestYourCase) in the file that owns it.
+      leg faketest131  main.go:82  install=true records=true ruled=false nails=-  -> RED listener installed, no nail
+--- FAIL: TestAC4EveryLegIsNailedOrRuled (0.02s)
+```
+
+**M4｜同一条假腿，给它一枚钉**（`registerLegNail131("faketest131", TestAC4FakeLegNail131)`，
+那枚用例驱动 `cmdFakeLeg131` 并走 `readLegSink131` + `assertInstallRecordFirst131`）⇒
+`leg faketest131 ... -> nailed`、`--- PASS: TestAC4EveryLegIsNailedOrRuled (0.02s)`、`ok`。
+⇒ 门不是恒红：**把活干了它就闭嘴**，点名只在没干的时候。
+
+**M6｜防"恒真钉"的另一半**（假腿保留，但把注册指向一枚不读盘的用例 `TestSecretFlagsAreBoolOnly`）：
+
+```
+leg_sink_gate_131_test.go:188: AC#4 RED: nail "TestSecretFlagsAreBoolOnly" for leg "faketest131" calls none of the
+    shared sink readers (readLegSink131, readResidentSink, readSink), so it cannot be the case that goes red when
+    the install block is deleted (leg site main.go:82).
+```
+枚举门自己另有一发已经在本票写码过程中**当场炸过**的读数：我最初把 secret 腿的 C28 注释误标成
+`WISP-LEG-SINK-RULING:`，门立刻给出 `AC#4 RED: leg "secret" carries a WISP-LEG-SINK-RULING: sentence AND reaches
+installLogSink` —— "装了听众还想拿注释免钉"这条路是被堵着的，且这条 guard 抓到的是一次真实误用，不是构造。
+
+**AC#5 门禁（全部取自纯净快照，两枚快照同仪器）**
+
+| 仪器 | 控制组 `db9fafc` | 候选 `627aa66` |
+| --- | --- | --- |
+| `PATH=<dll> go test -count=2 -v ./cmd/wisp/` | RUN 152 / PASS 152 / FAIL 0 / SKIP 0，`ok` 86.929s | **RUN 164 / PASS 164 / FAIL 0 / SKIP 0，`ok` 86.648s** |
+| `sh scripts/wisp-cli-tests.sh`（CI 形状，`-count=1 -v -skip <台账>`） | RUN 76 / PASS 42 / FAIL 0 / SKIP 0，rc=0，`ok` 44.302s | **RUN 82 / PASS 46 / FAIL 0 / SKIP 0，rc=0，`ok` 42.988s** |
+| `sh scripts/d22scan.sh` | rc=0；bans#1-5 internal/=202 cmd/=22 · #6 frontend/=40 · #7 internal/tools/=18 · #8 design/=16 frontend/=40 internal/=387 **cmd/=32** | rc=0；同左，**cmd/=34**（+本票两枚文件），其余七数一字未降 |
+| `gofmt -l cmd/wisp/` | — | 空（rc=0） |
+| `"$(go env GOPATH)/bin/gofumpt.exe" -l cmd/wisp/` | v0.7.0 存在 | 空（rc=0；本票一度被它点出 `leg_sink_nail_131_test.go` 的连续 `var` 应并成块，已 `-w` 改掉） |
+| `go vet ./cmd/wisp/` / `go build ./...` | — | rc=0 / rc=0 |
+| `GOOS=linux go vet ./cmd/wisp/` | rc=1 | **rc=1，原文照抄**：`imports github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files in .../sherpa-onnx-go-linux@v1.13.8`（派单预告的形状，非本票引入；本票只编译不执行这一侧） |
+
+CI 形状那格两趟 `ok` 分别是 44.302s（控制）与 42.988s（候选）：候选多 6 枚用例反而快了 1.3s，
+这台机器上这个包的墙钟由既有的子进程用例主导，本票新增的 0.085s/趟淹在读数噪声里 —— 逐条时长
+按下面"墙钟账"那段的 `-v` 原文计算，不按包总时长推断。
+
+**墙钟账（本票新增多少秒）**：候选 `-v` 逐条量出的新增用例，两趟合计 **0.17s**
+（`TestAC4EveryLegIsNailedOrRuled` 0.05s、`TestAC3SecretLeg…` 0.05s、`TestAC2ModelsLeg…` 0.02s、
+`TestAC2AC3Degraded…` 0.03s + 两枚子用例 0.02s），即每趟 +0.085s ⇒ **单趟 43.3s 的 +0.20%**；
+整包 `-count=2` 总时长 86.929s → 86.648s（-0.32%，落在噪声内，且这包里真正贵的是既有的
+`TestTicket101UntouchedConfigRestartsAtDefault` 两趟 14.1s 与三枚 resident 子进程用例两趟 ~20s）。
+为什么这些秒必须花：钉要读的是**真进程写下去的字节**（jsonl + DPAPI blob + 真签名的清单），
+但两条腿都能进程内驱动（`cmdModels(argv, modelsIO{dataDir})` 是票 121 留的接缝，`cmdSecret` 靠
+`WISP_ENV`/`WISP_TEST_DATA_DIR` 定根），所以**本票一枚子进程都没起、一次 sleep 都没等**，
+也没新增任何时间/资源预算断言（R-116-1 那类债一条不加）：读盘都排在被驱函数自己 `defer sink.close()`
+之后，flush 由被测代码定序。
+
+**残窗（本票不谎称关掉）**：门的 records 谓词只看得见 `slog.Info/Warn/Error/Debug` 与 `observe.InitLog`
+两类调用，且只在 `cmd/wisp` 包内闭包游走。一条腿若把结论只交给 toast（`postSystemNotification`）、
+只 `fmt.Fprintf(os.Stderr,…)`、或者干脆不产记录，门会如实判"无义务" —— 那仍是票 117 R-117-1 的兄弟形状，
+只是本票没把判据吹到那里。要收这一格得先给出"什么算一条该被听见的记录"的仓级定义，另开票。
+
+### 2026-09-23 08:5x — 提交清单与 next
+
+- `7e60d31` `test(131,AC#1..AC#4)` — `--name-only`：
+  `cmd/wisp/leg_sink_gate_131_test.go`（新）、`cmd/wisp/leg_sink_nail_131_test.go`（新）、
+  `cmd/wisp/secret.go`、`cmd/wisp/slo_windows.go`、`cmd/wisp/resident_sink_nail_127_windows_test.go`、本票面。
+  无改名、无删除，故没有新旧两枚路径要对。
+- `627aa66` `test(131,AC#2)` — `--name-only`：`cmd/wisp/leg_sink_nail_131_test.go`（只把 M1 的红名从 syscall 改成主张）。
+- 本条 append 所在的 commit 只动票面一格。
+- AC 五格已按 129 的写法打勾；每格后面都有可复算的读数（腿清单 = 门每次运行的 `t.Logf` 表，
+  变异 = M1/M2/M3/M4/M5/M6 的原文，门禁 = 两枚同仪器快照的对照表）。
+
+**没做/不做的事，逐条点名**：票 123 那四枚 CLI 红（`审批超时（1/300 秒未确认）`；单枚 301.04s 是派单带来的读数，
+本票没有复算过它，也不需要 —— 见下）在本票两枚快照里都没有出现过，因为它们的产地不在 `./cmd/wisp/`：`grep -rln 审批超时 --include=*.go` 只命中
+`internal/agent/approval/queue.go` 与 `internal/tools/bridge.go`，本票的 diff 一格都没碰过这两处；
+控制组与候选组的 `./cmd/wisp/` 四数 FAIL 都是 0，所以也不存在"本票顺手把它弄绿"的可能。
+`internal/winsec/**` 一格未碰（129 在飞）；`internal/models/**`、`internal/observe/**`、`internal/proc/**`、
+`docs/reports/**`、`rules_gateway.go`、`tools/d22scan/**`、`allowlist.txt`、`.github/workflows/ci.yml`、
+`scripts/**`、任何阈值/golden 全部零改动（见上面 `--name-only`）。未 push。
+
+`next=` 三件，都归编排者裁：
+① 门的 records 谓词目前只认 `slog.*` 与 `observe.InitLog`；toast-only / 纯 stderr 的腿被判"无义务"，
+   这一格要不要收、按什么定义收（另开票，别在 131 里加判据）。
+② `resident_sink_nail_127_windows_test.go` 那枚 ordering 用例在编队负载下会以 `0xc000013a` 早死
+   （本票只补了 len guard，把 panic 变点名红），**它的等待语义与"文件出现即发 break"的时序仍是 127 的**，
+   归 127 的 owner 复算；R-127-4 的账本上这一条现在有了第二次实测。
+③ CI 侧：`cmd/wisp` 只活在水窗 legs（`scripts/wisp-cli-tests.sh`），枚举门因此也只在 windows-leg 有分母 ——
+   与票 121 AC#3 把装配可达性门放进 `internal/models`（core scope，ubuntu 也跑）是同一个缺口，
+   本票地界内无法移，记在此处不藏着。
