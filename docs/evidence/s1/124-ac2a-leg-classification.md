@@ -223,3 +223,133 @@
 - **71 `ticket90_persist_test.go:220` `TestTicket90SessionGrantDoesNotSurviveRestart`** — 摘：`t.Fatalf("memory.Open: %v", err)`（`:227`）。判：开库 setup 被未解析根拒 ⇒ 可转。
 - **72 `ticket90_persist_test.go:291` `TestTicket90ConfigKeyChangesWhatTheChainAsks`** — 摘：`path := writeConfig(t, dir, tc.key)`。判：写 config 被拒 ⇒ 可转。
 - **73 `ticket90_persist_test.go:336` `TestTicket90HandEditLooseningGoesThroughD36`** — 摘：`path := writeConfig(t, dir, risk.ModeAskEveryStepName)`。判：同上 ⇒ 可转。
+
+### 5.7 `./internal/memory/`（33 枚，全顶层）— 全可转
+
+> 逐字：A2L 里 33 枚红中 32 枚直报 `Open: memory: create data dir: winsec: refusing to seal /varlink/… not provably resolved`（DAO 全在 `openTestStore(t)` / `inv76Fixture(t)` 开库这步被拒，真正要断言的 DAO/quota/迁移行为根本没跑）；第 33 枚 `TestCrashRecoveryKillMidWrite` 报的是 `subprocess only committed 0 rows`——根因也是未解析根（见 85 行判据）。⚠ 两枚名字带 "Rejects…Hostile Shapes"、三枚带 "Unmigratable"，都**不是**未解析根腿：前者的"拒"是 artifact 删除的路径不变式形状（且它们红在 fixture setup、根本没到删除步），后者要的是 `ErrSchemaUnmigratable`（另一种错），普通形已满足 ⇒ 全可转。
+
+- **74 `artifacts_path_invariant_test.go:314` `TestDeleteArtifactRejectsTheFourHostileShapes`** — 摘：`s, _, _, _, shapes := inv76Fixture(t)`（`:315`）。判：红在 fixture 开库被未解析根拒；"四种 hostile shape" 是删除路径不变式、非根，要成 ⇒ 可转。
+- **75 `artifacts_path_invariant_test.go` `TestDeletePrivacyItemRejectsTheFourHostileShapes`** — 摘：`s, _, _, _, shapes := inv76Fixture(t)`（`:345`）。判：同上（红在开库）⇒ 可转。
+- **76 `artifacts_path_invariant_test.go:389` `TestArtifactsContainmentByDirectoryListing`** — 摘：`s, root, dataDir, userDir, shapes := inv76Fixture(t)`（`:390`）。判：开库被拒，测 containment 要成 ⇒ 可转。
+- **77 `artifacts_path_invariant_test.go:560` `TestArtifactsLiteralBackslashKeepsItsAsymmetry`** — 摘：`s, root, _, _, shapes := inv76Fixture(t)`（`:561`）。判：开库被拒 ⇒ 可转。
+- **78 `artifacts_stray_test.go:87` `TestStraySubdirectoryCannotHideBytesFromTheQuota`** — 摘：`s := openTestStore(t, WithLogger(logger))`（`:89`）。判：开库被未解析根拒，要成 ⇒ 可转。
+- **79 `artifacts_stray_test.go` `TestStraySubdirectorySharesTheQuotasLRUQueue`** — 摘：`s := openTestStore(t)`（`:136`）。判：同上 ⇒ 可转。
+- **80 `artifacts_stray_test.go` `TestPurgeArtifactsReclaimsStraySubdirectory`** — 摘：`s := openTestStore(t, WithLogger(logger))`（`:179`）。判：同上 ⇒ 可转。
+- **81 `artifacts_stray_test.go:223` `TestStrayRemovalDoesNotFollowLinks`** — 摘：`s := openTestStore(t)`（`:224`）。判：红在开库被未解析根拒；它测的是「清游离子目录不跟软链」（普通形已绿），与根无关 ⇒ 可转。
+- **82 `concurrent_test.go:34` `TestConcurrentWritersReaders`** — 摘：`s := openTestStore(t)`（`:35`）。判：开库被拒 ⇒ 可转。
+- **83 `dao_providerhealth_test.go` `TestProviderHealthProbeRoundTrip`** — 摘：`s := openTestStore(t)`（`:13`）。判：开库被拒，测 provider health DAO 要成 ⇒ 可转。
+- **84 `dao_providerhealth_test.go` `TestProviderHealthRecordErrorAndList`** — 摘：`s := openTestStore(t)`（`:56`）。判：同上 ⇒ 可转。
+- **85 `concurrent_test.go:220` `TestCrashRecoveryKillMidWrite`**
+  摘：`t.Fatalf("subprocess only committed %d rows within budget (want >= %d)", committed.Load(), killAfter)`（`concurrent_test.go:254`）
+  判定：**可转（带一处落地提醒）**。判据：软链形它红在「子进程只提交了 0 行」——父测把 `dir := t.TempDir()/data`（未解析 `/varlink`）经 `WISP_CRASH_DIR` 交给子进程，子进程 `Open(dir)` 被未解析根拒 ⇒ 0 行 ⇒ 30 s 超时。红串不是字面 "not provably resolved"（子进程 stderr 未被扫），但**根因仍是未解析根**。AC#2b 转换时须把**传给子进程的 `WISP_CRASH_DIR` 也换成解析后的根**，否则这条接不上（普通形已绿，非拒绝腿）。
+- **86 `dao_providerhealth_test.go` `TestProviderHealthMissingRowIsNoRows`** — 摘：`s := openTestStore(t)`（`:117`）。判：开库被拒 ⇒ 可转。
+- **87 `dao_test.go` `TestProfileUpsertAndLRUEvictionLogs`** — 摘：`s := openTestStore(t, WithLogger(logger))`（`:55`）。判：同上 ⇒ 可转。
+- **88 `dao_test.go` `TestProfileDeleteAndPurge`** — 摘：`s := openTestStore(t)`（`:136`）。判：同上 ⇒ 可转。
+- **89 `dao_test.go` `TestMemoryAddSearchDeletePurge`** — 摘：`s := openTestStore(t)`（`:164`）。判：同上 ⇒ 可转。
+- **90 `dao_test.go` `TestTaskLogLifecycleAndErrorClassValidation`** — 摘：`s := openTestStore(t)`（`:250`）。判：同上 ⇒ 可转。
+- **91 `dao_test.go` `TestToolCallLifecycleAndValidation`** — 摘：`s := openTestStore(t)`（`:305`）。判：同上 ⇒ 可转。
+- **92 `dao_test.go` `TestGrantCostPluginStateDAO`** — 摘：`s := openTestStore(t)`（`:379`）。判：同上 ⇒ 可转。
+- **93 `dao_test.go` `TestWriteQueueLazyLifecycle`** — 摘：`s := openTestStore(t, WithLogger(logger), WithRegistry(...))`（`:467`）。判：同上 ⇒ 可转。
+- **94 `dao_test.go` `TestAdvPanicWedge`** — 摘：`s := openTestStore(t, WithLogger(logger), WithRegistry(...))`（`:526`）。判：同上 ⇒ 可转。
+- **95 `migrate_v1seed_test.go` `TestMigrateSeededV1DatabaseToV2`** — 摘：`t.Fatalf("open v1: %v", err)`（`:26`）。判：open v1 写未解析根被拒 ⇒ 可转。
+- **96 `privacy_test.go:16` `TestPrivacyOpsAllDomains`** — 摘：`s := openTestStore(t)`（`:17`）。判：开库被拒 ⇒ 可转。
+- **97 `retention_test.go:112` `TestRetentionBoundaries`** — 摘：`s := openTestStore(t)`（`:113`）。判：同上 ⇒ 可转。
+- **98 `retention_test.go` `TestRetentionSchedule`** — 摘：`s := openTestStore(t, WithLogger(logger))`（`:191`）。判：同上 ⇒ 可转。
+- **99 `retention_test.go:227` `TestArtifactsLRUQuota`** — 摘：`s := openTestStore(t, WithLogger(logger))`（`:229`）。判：同上 ⇒ 可转。
+- **100 `retention_test.go:271` `TestArtifactsDeleteAndPurgeAndGuards`** — 摘：`s := openTestStore(t)`（`:272`）。判：同上 ⇒ 可转。
+- **101 `schema_test.go:171` `TestSchemaContractIntrospection`** — 摘：`s := openTestStore(t)`（`:172`）。判：开库被拒 ⇒ 可转。
+- **102 `schema_test.go` `TestMigrateFreshDatabaseCreatesCurrentVersion`** — 摘：`s := openTestStore(t)`（`:323`）。判：同上 ⇒ 可转。
+- **103 `schema_test.go` `TestMigrationChainWithBackup`** — 摘：`t.Fatalf("open v1: %v", err)`（`:386`）。判：open v1 被未解析根拒 ⇒ 可转。
+- **104 `schema_test.go:456` `TestMigrationFailedStepIsAtomic`** — 摘：`t.Fatal(err)`（`:460`，setup open/migrate）。判：开库/迁移 setup 被拒 ⇒ 可转。
+- **105 `schema_test.go` `TestMigrationNewerSchemaIsUnmigratable`** — 摘：`t.Fatal(err)`（`:512`，setup 写 seeded v-newer 库）。判：开库被未解析根拒，要成 ⇒ 可转。
+- **106 `schema_test.go` `TestMigrationForeignDatabaseIsUnmigratable`** — 摘：`t.Fatalf("error = %v, want ErrSchemaUnmigratable", err)`（`:579`）。判：软链形它拿到的 err 是未解析根拒（非 `ErrSchemaUnmigratable`）⇒ `want` 落空。它要的错误是**迁移语义的 `ErrSchemaUnmigratable`**、不是未解析根；解析根后能开那枚 foreign 库并正确返回该错（普通形已绿）⇒ 可转。
+
+### 5.8 `./internal/tools/`（21 枚：19 顶层 + 2 子测试）— 20 可转 + 1 归因待票 123 裁
+
+> ⚠ 本包的红**分两种机制**（都是未解析根，但文案不同），逐字都回看过：
+> (甲) 直接被密封底线拒：`memory.Open / composeLoop → refusing to seal /varlink/… not provably resolved`（109、124、125 等 setup 腿）；
+> (乙) 路径规范化器/C26 判「那棵树不在盘上、不授权」⇒ `InAllowlist=false` ⇒ 写升级 L2 ⇒ `L2 审批未通过，已拒绝执行`（RealToolCall/FS*/DeclaredRisk/Ticket107*/Canonicalize 等）。
+> 乙类的红串**不含**字面 "not provably resolved"，但根因同为未解析根（普通形全绿；解析根后规范化器认树、写留 L1）。除 `TestL1Write`（丙类，300 s C18 审批超时，见下行）外，全可转。
+
+- **107 `bridge_path_account_ticket105_test.go:89` `TestRealToolCallWritesRewriteAccountIntoAudit`**
+  摘：`t.Fatalf("precondition: the read must actually run, got %q", out.Text)`（`:112`；实拿 `got "L2 审批通道尚未接入（票 21），已拒绝执行"`）。判：乙类——读目标在未解析根、不被认授权→升 L2→被拒；断言要「读必须真跑」，要成 ⇒ 可转。
+- **108 `bridge_test.go:608` `TestDeclaredRiskIsOnlyAFloor`**
+  摘：`t.Fatalf("in-allowlist read: out=%+v err=%v", out, err)`（`:618`；`out={…L2 审批未通过，已拒绝执行…}`）。判：乙类（in-allowlist 读被升 L2 拒），要成 ⇒ 可转。
+- **109 `bridge_test.go:649` `TestToolCallRowsAreComplete`**
+  摘：`store := openStore(t, filepath.Join(root, "data"))`（`:651`；实拿 `memory.Open: create data dir: refusing to seal /varlink/… not provably resolved`）。判：甲类 setup 被拒，测 tool_call 行完整性要成 ⇒ 可转。
+- **110 `fs_test.go:16` `TestFSReadReturnsTheFileAndTaintsIt`** — 摘：`t.Fatalf("out=%+v err=%v", out, err)`（`:24`；`out={…L2 审批通道尚未接入，已拒绝执行…}`）。判：乙类，要成 ⇒ 可转。
+- **111 `fs_test.go:50` `TestFSReadTaintFeedsR4`**
+  摘：`t.Fatalf("tainted exfil judged %v, want L2 (decision=%+v)", d.Level, d)`（`:80`；实拿 `tainted exfil judged L0, want L2`）。判：乙类——因源读被未解析根挡住→没打上 taint→外渗被判 L0（要的是 L2 这档**风险判级**，非未解析根的拒）；解析后读得成、taint 生效、判回 L2（普通形绿）⇒ 可转。
+- **112 `fs_test.go:93` `TestFSListSummarizesADirectory`** — 摘：`t.Fatalf("out=%+v err=%v", out, err)`（`:101`）。判：乙类，要成 ⇒ 可转。
+- **113 `fs_test.go:118` `TestFSListHonoursItsCap`** — 摘：`t.Fatalf("out=%+v err=%v", out, err)`（`:127`）。判：乙类，要成 ⇒ 可转。
+- **114 `fs_write_test.go:360` `TestAtomicWriteKillsMidWrite`（顶层）** — 摘：子测试 `t.Errorf("a new file is the L1 row, so the window route was expected (window=%d)", w)`（`:424`）。判：乙类（新文件本应 L1、被升 L2 无窗口）；顶层红由 2 子测试聚合 ⇒ 可转（见 126、127）。
+- **115 `fs_write_test.go:477` `TestFSTrashGoesToTheRecycleBin`**
+  摘：`if !strings.Contains(out.Text, "回收站") { t.Errorf("the refusal must say why: %q", out.Text) }`（`:500-501`；实拿 `the refusal must say why: "L2 审批未通过，已拒绝执行"`）
+  判定：**可转（关键辨析）**。判据：它**确实**断言一个拒——但那是「POSIX 无回收站时 fs.trash 必须拒并说明带『回收站』」（`recycleBinSupported()==false` 分支），**不是**未解析根的拒。软链形里未解析根先把写升 L2、被审批拒（文案 `审批未通过`），抢在回收站检查前 ⇒ 该断言拿错文案。普通形里回收站腿的拒照拿（已绿），解析根后回到那条拒 ⇒ **它要的那句拒不被洗绿**。可转。
+- **116 `fs_write_test.go:642` `TestFSMoveSameVolume`** — 摘：`t.Fatalf("out=%+v err=%v", out, err)`（`:655`；`L2 审批未通过，已拒绝执行`）。判：乙类，要成 ⇒ 可转。
+- **117 `paths_rewrite_ticket102_test.go:17` `TestPathCanonicalizerAccountsForRewrittenRoots`** — 摘：`t.Errorf("InAllowlist(%q) = false although the expanded root is a real tree; the fix must not turn into option (A)", c)`（`:64`）。判：乙类（未解析根致 expanded root 不在盘确认→不授权），断言要 InAllowlist=true，要成 ⇒ 可转。
+- **118 `paths_ticket107_portable_test.go:27` `TestTicket107AllowlistJudgmentTwoShapes`** — 摘：`t.Errorf("shape R (root already resolved) InAllowlist(%q) = false, want true", …)`（`paths_ticket107_portable_test.go:63`）。判：乙类，要成（InAllowlist 应为真）⇒ 可转。
+- **119 `paths_ticket107_portable_test.go:80` `TestTicket107AllowlistBoundaryIsComponentWise`** — 摘：`t.Errorf("InAllowlist(%q) = false, want true: a file under the allowed root must pass", inside)`（`:99`）。判：乙类，要成 ⇒ 可转。
+- **120 `paths_ticket107b_probes_test.go:144` `TestTicket107bProbeCLinkInsideAllowedRootStaysOutside`**
+  摘：`InAllowlist("<T>") = false, want true: "<T>" is a real tree the operator named`（`:170`；前置 `:165` 记 `C26 expanded it onto <T> but that tree is not confirmed on disk, authorizing nothing`）
+  判定：**可转**。判据：名字 "StaysOutside" 讲的是「允许根内那条软链的探针应在根外」这一 allowlist 边界形状（非未解析根的拒）；它红在 `InAllowlist=want true 却 false`——未解析根致 C26 判该树不在盘、不授权。解析根后该树被确认，边界判定回到普通形（绿），"stays outside" 那半照测 ⇒ 可转。
+- **121 `paths_workspace_test.go:41` `TestWorkspaceSwitchNarrowsWhatTheAssessorJudges`** — 摘：`t.Fatalf("premise: an in-allowlist write with no workspace chosen assessed %q (%v), want L1", …)`（`:53`；实拿 `assessed "L2" ([R1 R2]), want L1`）。判：乙类（未解析根→不在授权目录→升 L2），断言要留 L1，要成 ⇒ 可转。
+- **122 `pathshape_portable_test.go:28` `TestCanonicalizeReturnsAPathTheOSCanOpen`** — 摘：`t.Fatalf("InAllowlist(%q) = false for a file inside the only allowed root %q: R2 would send every plain write to L2", …)`（`:51`）。判：乙类，要成 ⇒ 可转。
+- **123 `loop_approval_test.go:165` `TestLoopPassesDeclaredL1WriteThroughTheGate`** — 摘：`f := composeLoop(t, dir, true)`（`:167`；setup 内 `memory.Open … refusing to seal /varlink/…`）。判：甲类 setup 被拒，要成 ⇒ 可转。
+- **124 `loop_approval_test.go:226` `TestLoopStillRefusesL1WhenNoGateIsRegistered`**
+  摘：`f := composeLoop(t, dir, false)`（`:228`；实拿 `memory.Open: create data dir: refusing to seal /varlink/… not provably resolved`）
+  判定：**可转**。判据：名字 "StillRefuses" 要拒的是「无门时 L1 写被拒」这一**闸门语义**（普通形已满足）；它红在 `composeLoop` 的 `memory.Open` setup 被未解析根拒、根本没走到无门断言。解析根后 setup 成、"无门仍拒" 照测 ⇒ 可转，不洗绿。
+- **125 `wiring_test.go:112` `TestL1WriteGoesThroughTheRealBlockWindow`**
+  摘：`t.Fatalf("the window ran out unopposed, which MEANS execute: %+v", out)`（`:124`；实拿 `审批超时（300 秒未确认），C18 一律判拒绝，已自动拒绝`，`--- FAIL (300.04s)`、普通形 `--- PASS (3.01s)`）
+  判定：**归因待票 123 裁**（不替它下结论，按票面 AC#2裁定 附带发现 2）。判据：它红在 **300 s C18 审批超时常量**（文案逐字「审批超时（300 秒未确认），C18 一律判拒绝」），是「用例假设有人在旁边点确认」那一族（票 123）在 POSIX 软链形下的显形，**不是**「未解析根被拒」这一族。本账把它从三档里单拎出来；AC#2b 不得把它当"未解析根"接解析变绿，也不得当拒绝腿留红——归口待票 123。
+- **126 子测试 `TestAtomicWriteKillsMidWrite/new_file_target_does_not_appear_at_all`**（父 `fs_write_test.go:360`）
+  摘：`t.Errorf("a new file is the L1 row, so the window route was expected (window=%d)", w)`（`:424`）。判：乙类（未解析根→升 L2、不走 L1 窗口），要成 ⇒ 可转。
+- **127 子测试 `TestAtomicWriteKillsMidWrite/a_clean_write_lands_and_round_trips`**（同父）
+  摘：`t.Fatalf("out=%+v err=%v", out, err)`（`:438`；`L2 审批未通过，已拒绝执行`）。判：乙类，要成 ⇒ 可转。
+
+### 5.9 `./cmd/wisp/`（5 枚：4 顶层 + 1 子测试）— 全可转
+
+> 逐字：这 5 枚红串都直报 `memory: create data dir: winsec: refusing to seal /varlink/… not provably resolved`——全在 fixture/store setup 这步。⚠ 同包另外 28 枚是**两形都红**（DPAPI/命令面腿那本旧账，AC#1 §5.3 已排除在本票 132 之外），此处不列、不判。
+
+- **128 `providers_test.go:133` `TestProvidersProbeRecordsMeasuredThinkingFalse`** — 摘：`pf := newProvidersFixture(t)`（`:133`）。判：fixture 开库被未解析根拒 ⇒ 可转。
+- **129 `providers_test.go:179` `TestProvidersProbeRecordsMeasuredThinkingTrue`** — 摘：`pf := newProvidersFixture(t)`（`:179`）。判：同上 ⇒ 可转。
+- **130 `providers_test.go:208` `TestProvidersDiscoverListsWhatTheServerServes`** — 摘：`pf := newProvidersFixture(t)`（`:208`）。判：同上 ⇒ 可转。
+- **131 `providers_test.go:228` `TestProvidersProbeUnconfiguredRefIsNotSilentlyKeyless`** — 摘：`pf := newProvidersFixture(t)`（`:228`）。判：同上 ⇒ 可转。
+- **132 子测试 `TestSecretFailurePathsLogAndPrintNoPlaintext/unset_name_(no_such_blob)`**（父在 `secret_test.go`）
+  摘：`t.Errorf("the failure must name the ref, got: %s", q.errb)`（`secret_test.go:679`；实拿 `got: … secret: create /varlink/…: refusing to seal … not provably resolved`）
+  判定：**可转**。判据：它测「unset 不存在的名字时，失败信息要点名那个 ref、不漏明文」（错误卫生断言）；软链形里前置 `secret set` 落未解析根被拒（`:689 set: exit 1 …`）⇒ blob 没建成、unset 拿到的错误是密封拒而非「ref 不存在」的干净错误 ⇒ `must name the ref` 落空。普通形里该子测试绿（同包 `unset_name_(no_such_blob)` 未进 both-red 的 28 枚），解析根后回到普通形 ⇒ 可转。
+
+## 6. 与 AC#1 那 132 枚的对账（逐名，含「变绿 vs 被跳过」与多/少一枚）
+
+**口径**：本账在 `bcb03aa` 纯净快照、受影响 9 包 `-count=1 -v` 两形各一枚（`A2L`/`A2P`）。逐名差集（`link FAIL` 减 `plain FAIL`）：
+
+| 包 | 本账 only-in-link | AC#1 §5.3 only-in-link | 差 |
+|---|---|---|---|
+| `internal/agent` | 26 | 26 | 0 |
+| `internal/agent/approval` | 1 | 1 | 0 |
+| `internal/config` | 7 | 7 | 0 |
+| `internal/llm` | 17 | 17 | 0 |
+| `internal/memory` | 33 | 33 | 0 |
+| `internal/perm` | 5 | 5 | 0 |
+| `internal/tools` | **22** | 21 | **+1（`TestLateVetoRendersTheApprovalLayersAppliedStepsReport`）** |
+| `internal/winsec` | 17 | 17 | 0 |
+| `cmd/wisp` | 5 | 5 | 0 |
+| **合计** | **133** | **132** | **+1** |
+
+- **AC#1 的 132 枚逐名全在**：脚本核对 `list132.txt`（从 AC#1 §5.3 逐字抄）——132 枚在 `A2L` 全 `--- FAIL`、在 `A2P` 全 `--- PASS`，**零枚对不上**。⇒ AC#1 那本名册在 `bcb03aa` 上仍逐字成立。
+- **多的一枚 = `TestLateVetoRendersTheApprovalLayersAppliedStepsReport`（tools）**：软链形 `--- FAIL (300.02s)`、普通形 `--- PASS (3.00s)`。它与 AC#1 已单列的 `TestL1WriteGoesThroughTheRealBlockWindow`（同为 `300.0x s`、同为 `审批超时（300 秒未确认），C18 一律判拒绝`）**同属 C18 审批超时族**，红因不是未解析根。AC#1 只逮到 `TestL1Write` 一枚、漏了这枚。
+  - 旁证：AC#1 记 tools 软链形 `RUN=77`（比 plain 的 79 少 2，因 300 s 腿在 setup 就被拒、子测试不展开），本账 tools 软链形 `RUN=79`——差别正在这两枚审批腿：本快照里它们**跑满了 300 s**（进了窗口、没被 setup 提前挡），于是各自计入 `RUN` 并 FAIL。这不影响「未解析根那一族」的 132 枚名册，只是把 `TestLateVeto` 也带进了 only-in-link。
+  - ⇒ 这条**不是**「少/多一枚未解析根红」，而是「C18 超时腿是否跑满」的形态差；`TestLateVeto` 应和 `TestL1Write` 一起归口票 123，不进 AC#2b 转换范围。
+- **「变绿还是被跳过」逐包核（§5.4 附带发现，本账独立复现）**：软链形相对普通形新出现的 `SKIP` 只有 4 枚——`internal/winsec` 3 枚（`TestAC2POSIXSeam{ProbeShapes,Guard,Accepts}…125`）+ `internal/config` 1 枚（`TestAC2POSIXSeamInstallSurvivesASymlinkSpelledTemp125`）。这 4 枚**全不在 132 名册里**（是票 125 那族自认形状、拒测的 seam 探针），与本账要判的 132 无交集。⇒ 本账 132 枚（含特殊 `TestL1Write`）的「普通形不红」**全部是 `PASS`、无一靠 `SKIP` 蒙过去绿**（脚本核：133 枚 only-in-link 在 `A2P` 状态逐枚 = `PASS`）。若 AC#2b 把根解析干净，这 4 枚 seam 探针应回到 `PASS` 侧，别算进「被清掉的红」。
+
+## 7. 未验证项 + `next=`
+
+**未验证项**：
+1. **macOS 那半仍未实测**（本机无 macOS runner）——本账只在 Linux 容器软链 `TMPDIR` 复现；票面《事实》说这形状代 macOS（`/var` 是链接）那一形，与票 119 `R-119-8` 同账，不背书。
+2. **`TestL1Write` / `TestLateVeto` 的 C18 归因**：本账只**坐实其红因是 300 s 审批超时、非未解析根**（文案逐字为证），**未**裁它该在票 123 怎么修——归口待 123。
+3. **`memory.TestCrashRecoveryKillMidWrite` 的可转性有一处前提**（行 85 判据）：接解析时须把交给子进程的 `WISP_CRASH_DIR` 也换成解析后的根；本账**未在改码后复算**（AC#2b 的活），故该枚判「可转（带落地提醒）」，非「已验可转」。
+4. **"+2 枚被拒路径归属"**（AC#1 §5.1，票面 79→今 81）：本账不动它——它属 AC#2b 复算范围（票面 AC#2裁定 附带发现 3）。
+
+**`next=`（交编排者 / 供 AC#2b）**：
+- 本账三档：**可转 131 / 拒绝腿 0 / 待裁 1（`TestL1Write` 归票 123）**。⇒ **AC#2b 可对全部 131 枚「可转」接上票 119 那条「先解析再递底线」纪律**；**没有任何一枚需要作为拒绝腿保留红**（结案判据里"软链形红名数 = 拒绝腿档枚数"这一项，若 131 全接解析，理论上归零；余下红名应只剩 `TestL1Write`/`TestLateVeto` 两枚 C18 超时腿，而那两枚归票 123 裁，不在本票清零目标内）。
+- ⚠ AC#2b 三条硬提醒（账上已逐枚标注）：① `TestCrashRecoveryKillMidWrite` 要解析**交给子进程**的那个根；② 断言里带 "Refuses/Rejects/want Err…" 的 6 枚（winsec AC5/AC118/AC3 反向、memory 迁移腿、tools 回收站、llm RefusesSilentRuns）接解析后**必须仍拿到它们各自要的那种拒**（不是未解析根），复算时逐枚点红名自证；③ 归零结论**普通形 + 软链形各一枚**，且两形 `RUN/SKIP` 差要逐包解释（票面 AC#2裁定 附带发现 1 已升为跑法要求）。
