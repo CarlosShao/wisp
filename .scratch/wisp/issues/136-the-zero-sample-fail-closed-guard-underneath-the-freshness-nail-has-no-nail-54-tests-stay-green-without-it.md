@@ -188,3 +188,29 @@
   改前 panic 之前已红 4 枚可自证）；本格真正被钉住的性质是"不再由一枚 panic 代答、每枚各红各的、名册完整"。
   未自勾 AC#8。证据 `docs/evidence/s1/136-ac8-ac9-impl.md` §0-§3。
   next=接着做 AC#9（同序：守卫已在位，整包读数不再被吞）；两格终裁与翻勾派**非实现者**，门禁读数与"未做的档"一并留在证据里。
+
+- [23:02 +08] agent=worker-ticket136-ac8-ac9 did=**AC#9 交件**（①②③，`date -u` 原文 `Wed Sep 23 15:02:12 UTC 2026` ＋8）。
+  ①：新增 `internal/observe/sampler_settle_zerosample_136_test.go`（commit `2f291d0`，153 增 0 删，两枚用例与 AC#1 同形）——
+  腿 A `TestCheckSettleZeroTrustworthySamplesFailsClosed`（前提腿 `:63/:66` ⇒ 归因隔离 `:73/:76/:79`（released 计数与内存比较三项**全满足**，
+  所以 `pass=false` 只能来自"从未记录可信读数"）⇒ 钉 `:85/:88` ⇒ 出线自陈 `:101-113`（`samples` 空＋`pass:false`＋`back_within_cap_ms:-1`））；
+  腿 B `TestCheckSettleTrustworthyReadsAreRecorded` 正向对照防恒真（与已有 `sampler_test.go:243`/`:276` 不重复：那两枚都没断言过"可信读数会落进 `Samples`"）。
+  ②：`sampler.go:477` 的 `> 0` ⇒ `>= 0`（M10）**先证落地再读数**——`477: if err == nil && m.PrivateWorkingSetBytes >= 0 {` ＋ `diff -u` 单行 ＋ `go build ./...` rc=0，
+  然后整包 `-v`：`rc=1 / RUN=58 / PASS=57 / FAIL=1 / SKIP=0 / panic=0`，红名**只一枚**＝`TestCheckSettleZeroTrustworthySamplesFailsClosed`，红点 `:66`，
+  消息里就是那串病形（`BackWithinCapMS:20`、5 枚 `TreePrivateBytes:0` 的"样本"、`FinalBytes:0`、`Pass:true`）；腿 B 同发仍绿。
+  **改前对照我也复算了**：没有本程这枚钉的树（tree1＝`79ddd49`）落同一发 M10 ⇒ `56/56、rc=0`（复跑两次同数）⇒ 验收方 `R-136-1` 那句在我的锚点系上成立。
+  ③：还原 ⇒ `diff -q` 逐字相同（并另证与仓库里的生产码逐字相同）⇒ 复绿 `58/58`。**三态齐**。
+  ④约束：`SampleState` 那侧语义一字未动（`git diff 1d38206..HEAD -- internal/observe/` 只有我那两枚文件）、阈值/golden/`thresholds.go` 未动、
+  已有的 `TestCheckSettle*` 两枚未改未 Skip（整包读数里它们同发 `--- PASS`）。**本程生产码零改动**（`go build ./...` rc=0，`sampler.go` 与锚点逐字相同）。
+  自加一发 M11（`:486` 不记 `Samples`）证腿 B 不哑：只红腿 B（`:142`）、腿 A 仍绿。
+  门禁：`gofmt -l internal/observe/` 无输出；`gofumpt -l`（本机 **v0.12.0 / go1.27.1**，CI 是 `@latest` 未钉版本 ⇒ 该读数只在改版前有效）无输出；
+  `go vet` 双 GOOS 逐错误行归因（原生 `./internal/observe/` 与 `./...` 都 rc=0；`GOOS=linux ./...` rc=1 的**唯一**一条落在
+  `cmd/wisp → sherpa-onnx-go-linux@v1.13.8 build constraints exclude all Go files`，剔掉 `cmd/wisp` 后只剩 `cmd/balldebug` 那一条形同，
+  再剔掉两枚 `cmd/` 后**30/30 非 cmd 包 linux 交叉零输出 rc=0**）；`-count=2 -v` 四数 **112/112/0/0 → 116/116/0/0**，逐名差集只有本程新增两枚 ×2 轮、
+  无改名无消失无转 SKIP；`sh scripts/d22scan.sh` 两形 rc=0，`ban #8 internal/` 401→**402**（本程那枚 `_test.go`）、各 scope 无一下降，
+  并核清 `frontend/` 的 40→43 是工作树里未跟踪的 `frontend/dist/` 三枚构建产物、**不是**兄弟在飞的树（`git diff --name-only 1d38206..HEAD -- frontend/` 无输出）。
+  ⚠ 三条报回（不硬改读数、不放宽断言）：①**本格未动生产码**，"报告要说出自己没测到"钉在**现有哨兵**（空 `samples`＋`-1`＋`pass=false`）上——
+  若终裁要求像 `SampleState` 那样给 `SettleReport` 产出一枚显式 gate 门行，那要改 `sampler.go:477-501`，本程按派单停下没动；
+  ②量到一枚**既有 flake** `TestNoopTaskReturnsToBaseline`（`goroutine_test.go:33`，`PerTask mid-task = 2, want 3`，观测 1/9，非本程造的），
+  它和"吞读数"同族，建议单立一格；③派单提的"`GOOS=linux` 交叉会停在 cgo／`pathresolver` 那形"这一发**实测未成立**（3f 含 `internal/risk` 零输出），只登记差异。
+  未自勾 AC#9。证据 `docs/evidence/s1/136-ac8-ac9-impl.md` §4-§7（§6 是 12 条未做的档，含 linux 全仓两态、CI run id、端到端）。
+  next=两格都交完 ⇒ 派**非实现者**按票面 AC#8②③／AC#9①②③ 终裁并翻勾；同时请裁 §6.5（要不要补生产码那半件事）与 §4.5（flake 是否另立一格）。AC#10 仍排 133 之后。
