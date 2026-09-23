@@ -252,3 +252,96 @@ leg_sink_gate_131_test.go:348: AC#4 RED: main.go:52 reads args ... The statement
 ⇒ 这正是续单自己 `next=` ② 写的那格（"两个文件各写半句这种拼接仍未测"）——**我今天把它测出来了，方向确凿（红 → 不红）**。
 严重度我判**中低**：它需要有人**同时**放宽 `ruled` 谓词并塞一枚裸标记，而被放宽的谓词本身会先把另外四条腿弄红（不是免检），
 所以它**不是** AC#4 声称要防的那个结局（"新增一条腿不给钉、门静默"）⇒ **不构成退回触发线**。登记为 `R-131r3-1`。
+
+---
+
+## 5. Linux 侧"如实红"复走（原生容器，不是交叉编译）—— **PASS**
+
+### 5.1 仪器与挂载证明
+
+`git archive bcb03aa` 快照拷到 `D:\work\build-tmp\wisp131-acc-r3`，用
+`MSYS_NO_PATHCONV=1 docker run -v /d/work/build-tmp/wisp131-acc-r3:/src ... golang:1.27`（**真 `/d/...` 形，避开 `docker -v C:\…` 静默空挂那一枚假绿**），
+进容器**第一件事就是证挂载非空**，退出码一律 `cmd > log 2>&1; echo RC=$?`（**不碰 `${PIPESTATUS[0]}`，dash 下会 Bad substitution**）：
+
+```
+--- MOUNT PROOF ---
+-rwxrwxrwx 1 root root 883 Sep 23 08:08 /src/go.mod          # 非空挂
+--- PLATFORM ---  Linux / x86_64 / GOOS=linux GOARCH=amd64 CGO_ENABLED=1
+--- GO VET cmd/wisp ---  VET_RC=0
+go: downloading github.com/k2-fsa/sherpa-onnx-go v1.13.8
+go: downloading github.com/k2-fsa/sherpa-onnx-go-linux v1.13.8
+go: downloading modernc.org/sqlite v1.59.0  ...（另有 7 枚真下载）
+```
+
+⇒ **第 0 件成立**：`vet: cmd/wisp/leg_sink_nail_131_test.go:127:12: undefined: sinkInstallRecord` 这一行在原生 Linux 上**不再出现**，
+且 rc=0 **不是**"包没加载所以零检查"那种假绿（它先真下载了 sherpa-onnx-go-linux 等模块才报 0）。
+
+### 5.2 那扇门在 Linux 上不是恒绿，是**如实红**（原文）
+
+`go test -count=1 -v -run TestAC4EveryLegIsNailedOrRuled ./cmd/wisp/` ⇒ `GATE_RC=1`，`--- FAIL`，红名原文（逐字）：
+
+```
+    leg_sink_gate_131_test.go:275: AC#4 RED: leg "models" (main.go:74) reaches installLogSink on 1 line(s) of this package and no registered nail names it.
+    leg_sink_gate_131_test.go:275: AC#4 RED: leg "no-args" (main.go:51) ...
+    leg_sink_gate_131_test.go:275: AC#4 RED: leg "run" (main.go:61) ...
+    leg_sink_gate_131_test.go:275: AC#4 RED: leg "secret" (main.go:72) ...
+    leg_sink_gate_131_test.go:397: AC#4 RED (the instrument, not the code): zero nails registered in this test binary, so the gate
+        has nothing to reconcile and would pass on an empty list.
+        GOOS=linux compiled no nail file: every registerLegNail131 call lives in a *_windows_test.go file, so the 4 leg(s) in the
+        ledger that reach installLogSink (models, no-args, run, secret) are UNREAD on this platform, not unnailed - and no row of
+        this ledger is coverage here, in either direction.
+        Fix: run this package where the nails compile (scripts/wisp-cli-tests.sh, the windows leg), or give this GOOS its own nail
+        file and register it. This reading stays red on purpose: a gate that cannot see is not a gate that has seen nothing to complain about.
+--- FAIL: TestAC4EveryLegIsNailedOrRuled (0.18s)
+```
+
+同一发的账本：清单仍是**磁盘源码现算的 15 行**（`leg slo ... ruled=true -> ruled` 也在），只有 `nails=` 那一列空
+⇒ 简报担心的那一格（"把钉文件挪进 `_windows_test.go` ⇒ 门在 Linux 变成恒绿"）**没有发生**；
+而且它把"看不见"与"没得抱怨"分开写死了，那四行 `no registered nail` 之上还压了一条自报仪器的红。〔独立复现〕
+
+### 5.3 交叉编译那枚 rc=1 我按"逐错误行"归因，没有整体归因
+
+Windows 上 `GOOS=linux go vet ./cmd/wisp/` ⇒ rc=**1**，整份输出 **3 行**，逐行归因：
+
+```
+1  package github.com/CarlosShao/wisp/cmd/wisp                      <- 包名头（导入链上下文，不是诊断行）
+2      imports github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx          <- 导入链上下文
+3      imports github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files in ...sherpa-onnx-go-linux@v1.13.8   <- 唯一一枚诊断，落在第三方模块目录
+```
+
+`grep -nE 'cmd/wisp/[^ ]*\.go'` 对这份输出 ⇒ **rc=1（零命中）**，即**没有任何 `cmd/wisp/<file>.go:line:col` 形诊断**。
+⚠ 但"唯一错误行只指向 sherpa 模块目录"这句要加一个限定才严谨：`cmd/wisp` **确实出现在第 1 行**，那是**包名头**而不是诊断行。
+⇒ 归因结论不变（工具链约束、非本票引入、Linux 原生 rc=0 为反证），**但引用那句话的人别把它读成"输出里找不到 cmd/wisp 字样"**。
+这一格我按上一任踩过的坑办：不整体归因，逐行点名。
+
+---
+
+## 6. 票 130 越权改 131 的 helper：追认成不成立（我有一票否决）
+
+三发我都**在最终码 `bcb03aa` 上独立复跑**（续单方自报 P1/P2 的整包四数取自补第二把尺之前那版，那一格它登记为"待核"，现在我跑完了）。
+
+| 探针 | 造法 | 只跑目标用例 | **整包 `-count=1 -v` 四数与红名** | 与续单自报是否同账 |
+| --- | --- | --- | --- | --- |
+| **P1** 删掉 130 的冲刷 | `logsink.go:173` ⇒ `var earlyFlushed, earlyDropped int`（`grep -c FlushEarlyLogRecords` = 0），build/vet rc=0 | models 钉 **`--- PASS`**（rc=0） | rc=1，`100/50/3/0`：`TestAC3EarlyRecordLandsOnDiskBeforeTheInstallRecord`（130 断言 1）、`TestAC1ResidentLegInstallsItsLogListenerOnDisk`、`TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink`（127 两枚钉） | **同账，逐字** |
+| **P2** 原始疾病：某腿的事件早于它自己的 install | `models.go` 加包级 `func init() { slog.Info("models: P2 planted event ...") }` + `log/slog` import，build/vet rc=0 | models 钉 **`--- FAIL`**：`leg_sink_nail_131_windows_test.go:366: record 1 sits before the listener's booking and is "models: P2 planted event booked before this leg had a listener", want "winsec: sealing path resolver installed" or nothing ...（记录序列里 `wisp: persistent log sink installed` 排在第 3） | rc=1，`100/50/3/0`：models 钉 + 127 那两枚 | **同账**（这一发的四数取自**最终码**，续单那版是补尺前） |
+| **P3** 把 helper 第一条判据换回 130 之前的形状、打在**健康树**上 | `for i, r := range s.records[:installIdx] {...}` ⇒ `if installIdx != 0 { t.Errorf("install record is at index %d, want 0: ...") }` | — | rc=1，`100/52/1/0`，唯一一枚红＝`TestAC2ModelsLegBooksItsHandOffVerdictOnDisk`（`leg_sink_nail_131_windows_test.go:362: install record is at index 1, want 0`）；**`TestAC3SecretLeg...` 与门都 `--- PASS`** | **同账**（红谁取决于顺序，不是取决于秩序） |
+
+### 6.1 正面回答：**"追认成立"在 P1 前提失效之后仍然站得住，但依据必须换成 P2 单发**
+
+先把话说清：简报里"P1 ⇒ helper 仍须红"这条**前提**我复跑证否了（P1 下 131 的钉全绿）。但**前提错 ≠ 结论错**，
+因为"P1 这一发要回答的问题"从来不是"helper 还红不红"，而是**"130 有没有把它自己的修法偷渡成 131 的必要条件"**。
+按这两问分别看：
+
+1. **有没有把 131 的侦测力改弱？** 判据是 **P2**：原始疾病（本腿的事件排在 booking 之前）在改后的 helper 下**照样红**，
+   红名点到 `record 1 sits before the listener's booking`。⇒ 这一改保住了 helper 存在的理由。**成立。**
+2. **有没有把 130 的回放偷渡成 131 的前提？** 判据是 **P1 的实测结果本身**：把 130 的冲刷删掉，131 的 helper 与两枚钉**全 PASS**，
+   红的是 130 自己的断言与 127 的钉。⇒ 131 的判据**不依赖** 130 的回放在位（helper 的注释也逐字声明"它不主张 boot 记录存在"，
+   并把那一形的证人指到 `early_log_nail_130_windows_test.go` 与 127 的文件）。**没有偷渡。成立。**
+   ⚠ 这一条**恰恰是被"P1 应红"那个错前提挡住的**：若真按简报预期红起来，反而说明偷渡发生了。
+3. **旧形状能不能就这么留着？** 判据是 **P3**：换回"下标必须是 0"之后，**健康的树**上 models 钉红、secret 钉绿
+   ⇒ 旧判据红不红取决于测试顺序而不是秩序，它不是"更强的同一件事"，是"另一件会误报的事"。⇒ 130 动它**有正面必要**。
+
+⇒ **我的裁决：追认成立（不行使否决票），但成立的全部重量在 P2 与 P3 上，P1 只是"未偷渡"的反证，不是"仍侦测"的正证。**
+续单证据那段结论的**判定**与我一致，它把 P1 列作依据之一（"它没有把 130 的回放当成新的必要条件"）其实已经是正确用法，
+只是与简报的错前提并排写会让下一个人误读成"两发都支持侦测力"。⇒ 登记 `R-131r3-2`（归因/表述级）。
+**撤销令不在我这一程**：我没有回滚任何一枚文件，`9b5d64d` 那处改动原地未动（我只在 `/tmp` 的一次性副本里做过 P1/P2/P3）。
