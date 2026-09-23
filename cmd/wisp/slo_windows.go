@@ -176,9 +176,12 @@ hermetic data dir via WISP_TEST_DATA_DIR).
 // it a second, process-wide fan-out handler on top of a sink it already opens by
 // hand would duplicate records into the tree it is measuring, which is a
 // different claim from the one ticket 117's install makes on the other legs. The
-// enumeration gate in leg_sink_gate_131_test.go reports this row as "pipeline"
-// rather than "install", and this sentence is the reason that is a decision and
-// not an omission.
+// enumeration gate in leg_sink_gate_131_test.go reads this function's own doc
+// comment for the sentence above and its body for the calls below, so the row it
+// books for `wisp slo` in that gate's ledger is install=false with records=true
+// and ruled=true, and the state word on that line is "ruled" rather than
+// "nailed". This sentence is the reason that is a decision and not an
+// omission.
 func cmdSLO(args []string) int {
 	fs := flag.NewFlagSet("slo", flag.ContinueOnError)
 	fs.Usage = cmdSLOUsage

@@ -613,16 +613,24 @@ func assertNoPlaintextInSink131(t *testing.T, s legSink131, wantAbsent string) {
 }
 
 // The four nails below are the registrations AC#4's gate enumerates: a leg key
-// taken from main.go's own dispatch labels, and a function value rather than a
-// string, so a rename or a build tag that hides a nail is a compile error
-// instead of a quiet green. registerLegNail131 (leg_sink_gate_131_test.go) reads
-// the case's name back out of the compiled function, so the key is a claim about
-// main.go and the gate is what checks it.
+// taken from main.go's own dispatch labels, a function value rather than a string,
+// and the production entry symbol the case drives (R-131-2's third argument, so
+// the gate can check the claim against the dispatch instead of against this
+// comment). registerLegNail131 (leg_sink_gate_131_test.go) reads the case's name
+// back out of the compiled function, so the key is a claim about main.go and the
+// entry is a claim about this file's own code, and the gate is what checks both.
+//
+// Two of the four entries are what the case calls directly (cmdModels, cmdSecret,
+// runTextTask - the in-process shape AC#2 asked for). The resident one is not:
+// ticket 127's case drives a real wisp process and reads the file it left, so the
+// gate records that row as a name-only claim rather than as a checked one, which is
+// the sentence R-131-2's remedy asked for and the reason `nailed` is not the same
+// word as "asserted in-process".
 var (
-	nailRun131      = registerLegNail131("run", TestAC2SealNoticeLandsInTheRunLegLogFile)
-	nailResident131 = registerLegNail131("no-args", TestAC1ResidentLegInstallsItsLogListenerOnDisk)
-	nailModels131   = registerLegNail131("models", TestAC2ModelsLegBooksItsHandOffVerdictOnDisk)
-	nailSecret131   = registerLegNail131("secret", TestAC3SecretLegBooksItsAuditRecordsOnDisk)
+	nailRun131      = registerLegNail131("run", TestAC2SealNoticeLandsInTheRunLegLogFile, "runTextTask")
+	nailResident131 = registerLegNail131("no-args", TestAC1ResidentLegInstallsItsLogListenerOnDisk, "subprocess:runResident")
+	nailModels131   = registerLegNail131("models", TestAC2ModelsLegBooksItsHandOffVerdictOnDisk, "cmdModels")
+	nailSecret131   = registerLegNail131("secret", TestAC3SecretLegBooksItsAuditRecordsOnDisk, "cmdSecret")
 )
 
 var _ = []any{nailRun131, nailResident131, nailModels131, nailSecret131}
