@@ -59,7 +59,9 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/fs"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -191,10 +193,19 @@ func readLegSink131(t *testing.T, dataDir, stdout, stderr string) legSink131 {
 		console: "stdout:\n" + stdout + "\nstderr:\n" + stderr,
 	}
 	n, err := observe.CountLogFiles(s.dir)
-	if err != nil {
-		t.Fatalf("counting pipeline files in %s: %v", s.dir, err)
-	}
-	if n == 0 {
+	if err != nil || n == 0 {
+		// Two shapes, one reading: the directory never appeared (the install
+		// line is gone, so nothing ever asked for it) and the directory is there
+		// but holds no pipeline file. Both mean this leg ran to completion with no
+		// listener, and the message has to say so with the leg's own console in
+		// hand - "counting pipeline files: The system cannot find the file
+		// specified" names a syscall, not the claim that broke.
+		if err != nil && !errors.Is(err, fs.ErrNotExist) {
+			t.Fatalf("counting pipeline files in %s: %v", s.dir, err)
+		}
+		if err == nil && n != 0 {
+			t.Fatalf("unreachable: CountLogFiles reported %d files with no error", n)
+		}
 		t.Fatalf("no wisp-<day>-<seq>.jsonl in %s: the leg ran to completion and its listener wrote nothing there.\n%s",
 			s.dir, s.console)
 	}
