@@ -305,6 +305,16 @@ func TestSamplerGoroutineAccountingFollowsRegistry(t *testing.T) {
 	if rep.GoroutinesMax != 0 {
 		t.Fatalf("empty registry must report 0, got %d", rep.GoroutinesMax)
 	}
+	// Ticket 136 AC#8: length guard in front of the [0] read below. With no
+	// guard an empty rep.Samples panicked here, and the panic killed the test
+	// binary, so every case scheduled after this one stopped reporting at all
+	// (measured: 52 RUN / 47 PASS / 5 FAIL + panic, 4 cases swallowed). A
+	// sampler window that holds no sample is a failure of this case, so it
+	// says so and dies alone - never t.Skip, never a silent return.
+	if len(rep.Samples) == 0 {
+		t.Fatalf("sampler recorded 0 samples (sample_errors=%d last_error=%q): there is no reading to check goroutine accounting against",
+			rep.SampleErrors, rep.LastSampleError)
+	}
 	if rep.Samples[0].RuntimeGoroutines < 1 {
 		t.Fatal("runtime goroutine companion field must be recorded")
 	}
