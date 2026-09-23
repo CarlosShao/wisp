@@ -425,7 +425,123 @@ $ comm -12 roster-head.txt roster-skip133.txt | wc -l
 
 ## 5. 门禁与全仓仪器
 
-（待填）
+接续方补记；工作树本体、非快照、**HEAD 未动**（§4 的 `00d3f34` 之后继续，`git status --porcelain`
+内 `cmd/wisp/**` 始终为空，测量与被验版本同形）。
+
+### 5.1 `gofmt -l cmd/wisp/`（整包）
+
+```
+$ gofmt -l cmd/wisp/          rc=0   （无输出）
+```
+⇒ 整包**零文件待格式化**（含新落的 `leg_dispatch_gate_133_test.go`、`ed18727` 改过的
+`main.go`/`panel_assets.go`/`slo_windows.go`）。
+
+### 5.2 `go vet ./cmd/wisp/`（windows native）
+
+```
+$ go vet ./cmd/wisp/          rc=0   （无诊断）
+```
+⇒ 本包类型检查／vet 分析**零告警**，与前任 §2.5 三处 build 记 `rc=0`（X14-restore-build 那一栏）
+同调。
+
+### 5.3 `GOOS=linux go vet ./cmd/wisp/`（交叉 vet，工具链假象，**既不算破口也不算清白**）
+
+```
+$ GOOS=linux go vet ./cmd/wisp/          rc=1   2026-09-23 11:57:56z
+package github.com/CarlosShao/wisp/cmd/wisp
+	imports github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx
+	imports github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files in D:\work\base\gopath\pkg\mod\github.com\k2-fsa\sherpa-onnx-go-linux@v1.13.8
+$ GOOS=linux CGO_ENABLED=0 go vet ./cmd/wisp/          rc=1
+（同上一条诊断，逐字）
+```
+⇒ **rc=1 死在包加载**（`build constraints exclude all Go files`），**够不到 `cmd/wisp` 的类型检查**：
+交叉编译下 cgo 默认关，linux sherpa 绑定包内所有 `.go` 都带 `//go:build cgo && linux`，
+被 `exclude all`，`go vet` 在解析 import 阶段就退出。诊断文本**不含任何 `cmd/wisp/*.go:line:col`**、
+只有第三方包路径——这是工具链假象（brief 明写"既不算破口也不算清白"）；**票 131 的 Linux 编译破口
+曾被"整树 rc=1＝工具链假象"放过、带病 4h17m**（`feedback-verification-blind-spots`），所以这里
+显式逐错误行归因到 `sherpa-onnx-go-linux@v1.13.8`（**不是** `cmd/wisp/*.go`），并按下面 §5.4 单独
+补一枚真类型读数。
+
+### 5.4 Linux 容器**真类型读数**（`golang:1.27`，挂载已证非空）
+
+```
+$ date -u → 2026-09-23 12:00:43z
+$ MSYS_NO_PATHCONV=1 docker run --rm \
+    -v "/d/work/workspace/projects plans/Wisp:/src:ro" \
+    -v "/d/work/base/gopath/pkg/mod:/gomod" \
+    -e GOFLAGS=-mod=mod -e GOPROXY=off -e GOSUMDB=off -e GOMODCACHE=/gomod -e CGO_ENABLED=1 \
+    golang:1.27 sh -c 'set -e; echo "--- mount proof ---"; ls -l /src/go.mod; cd /src; \
+      go env GOOS GOARCH CGO_ENABLED GOMODCACHE; go vet ./cmd/wisp/; echo VET_RC=$?'
+--- mount proof ---
+-rwxrwxrwx 1 root root 855 Sep 21 01:17 /src/go.mod
+--- go env ---
+linux
+amd64
+1
+/gomod
+--- go vet ./cmd/wisp/ ---
+VET_RC=0
+```
+⇒ **rc=0、零诊断**：这是 §5.3 那一发**唯一能替代的真类型读数**——linux 容器里 CGO_ENABLED=1、
+`//go:build cgo && linux` 满足，包加载成功，`go vet` 真的跑完了分析器。挂载**先证非空**（`ls -l /src/go.mod`
+出 stat 行、`ls /gomod` 出 `github.com/...` 目录、`ls /src/cmd/wisp/*.go` 出被测文件），
+不走"Git Bash 下 `-v "C:\…"` 静默挂空且 rc=0"那条假绿（`MSYS_NO_PATHCONV=1` + `/d/...` 路径）。
+`GOPROXY=off` 强制走宿主 module cache、**未联网**、**未新下模块**。仓库 `:ro` 挂载，容器**不会**
+往工作树里写。**不覆盖 §2 任何读数**（那是前任变异读数，本节是本票门禁，两者是两回事）。
+
+### 5.5 全仓仪器 `sh scripts/d22scan.sh`（作用域是整个 `internal/`，按包门禁看不见它）
+
+调用形状（**wrapper 从仓根之外也不能省**——`scripts/d22scan.sh` 从自身位置派生仓库根、
+先 `cd tools/d22scan` 再 `go run . -root "$root"`；直接 `go run ./tools/d22scan -root .` 会撞
+"main module does not contain package"，`cd tools/d22scan && go run .` 会扫到空树——两种都曾是假绿）：
+
+```
+$ sh scripts/d22scan.sh                 rc=0   2026-09-23 12:01:58z → 12:02:03z (5s)
+```
+
+**Step 1（正向控制，runtests.sh `-count=1 -v`，证明门"能红"）**：
+```
+runtests.sh: OK - packages=[./...] top-level: PASS=21 FAIL=0 SKIP=0, === RUN=31, '[no tests to run]'=0
+  关键子用例（都 PASS）:
+    TestScanDetectsAllSeededViolations              种子违规被检出（否则后续"绿"=仪器瞎）
+    TestScanCleanRepoIsGreen                        纯净仓库判绿
+    TestAllowlistSuppressesOnlyListedPaths          allowlist 只压列出的路径
+    TestCheckRootRejectsBlindRoots/{empty_dir, go.mod_only,
+      the_d22scan_module_itself, repo_skeleton_with_two_go_files}
+                                                    拒绝四种"看起来像根其实扫不到东西"的根
+    TestBuiltBinaryGoesRedEndToEnd/{seeded_violation_exits_1, empty_live_scope_exits_2,
+      armed_ban_6_goes_red_on_the_panel_violation_exits_1,
+      frontend_tree_gone_while_declared_live_exits_2,
+      ban_7_tree_gone_while_declared_live_exits_2,
+      fully_live_fixture_exits_0}                   真二进制端到端 6 形
+```
+⇒ 正向控制 **21 枚顶层 PASS / 0 FAIL / 0 SKIP**——仪器**能红**，随后的"clean"不是"仪器瞎"。
+
+**Step 2（真扫工作树）**：
+```
+d22scan: examined 225 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
+d22scan: scope bans #1-5 internal/      examined 203 production Go files
+d22scan: scope bans #1-5 cmd/           examined  22 production Go files
+d22scan: scope ban #6 frontend/         examined  43 text files
+d22scan: scope ban #7 internal/tools/   examined  18 production Go files
+d22scan: scope ban #8 design/           examined  16 text files
+d22scan: scope ban #8 frontend/         examined  43 text files
+d22scan: scope ban #8 internal/         examined 397 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined  38 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations
+```
+⇒ **rc=0，八个 scope 全部非零命中、无违规**；`internal/` 203 / `cmd/` 22 / `internal/tools/` 18 枚
+生产 `.go` 全在扫描面内（票 133 的新文件不在 `internal/` 也不在 `tools/d22scan/` 的禁改面上，
+被 `ban #8 internal/` 与 `ban #8 cmd/` 的 emoji 扫各覆盖到）。
+
+### 5.6 §5 总判
+
+- `gofmt -l cmd/wisp/` **整包 rc=0**、无输出。
+- `go vet ./cmd/wisp/` windows native **rc=0**、零诊断。
+- `GOOS=linux go vet ./cmd/wisp/` **rc=1** 停在 cgo 包加载（诊断只有第三方包路径，**没有** `cmd/wisp/*.go`
+  的任何 file:line），**既不算破口也不算清白**。
+- Linux 容器真类型读数（golang:1.27，挂载证非空、CGO_ENABLED=1） **`go vet ./cmd/wisp/` rc=0、零诊断**。
+- 全仓仪器 `sh scripts/d22scan.sh` **rc=0**、正向控制 21/0/0/0 与真扫 8 scope 全绿。
 
 ## 6. 没做到的
 
