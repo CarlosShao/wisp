@@ -581,7 +581,7 @@ FM / FM2 / FM3 三发是这一格我要归单的正面产出（`R-134-6`）。**
    **P1 在这处 `warn` 改动之后仍有牙**（我在副本上打的四发）：塞 job 级 `if:` ⇒ rc=1、塞步级
    `continue-on-error:` ⇒ rc=1、删 `cron:` ⇒ rc=1、把 `-Subset full` 换成 `-Subset smoke` ⇒ rc=1，
    同一枚干净副本 rc=0（`/tmp/wisp134-acc-r2-a/p1mut/`；真 `ci.yml` 与快照逐字节同，
-   `git status --porcelain -- scripts .github internal cmd` 交件前为空）。
+   `git status --porcelain -- scripts .github internal tools` 交件时**逐枚为空**）。
    **唯一塞不响的是 `paths:` 触发过滤**：我在 `on.push` 下加了 `paths: ['internal/**']`，钉 **rc=0**
    —— 这是 r1 §3.3 那条 `R-134-3` 的**独立复现**（我造的是另一份变异件，不是复跑它那几个）。
 4. **具名解冻的地界**：`git diff --numstat b723978..6effb7e` 里属于本票的只有四枚路径
@@ -716,9 +716,16 @@ AC#5 PASS（r2 §5）· AC#6 PASS（r2 §6，五处缺口 `R-134-5`..`R-134-9`�
    ① AC#6 表行原写"12 发假 report"，与 §6.2 的三层计数（14 + 2 + 4 = 20）不一致，已改成 20 并标出分层；
    ② 同一行原写"三处缺口 `R-134-5`/`-6`/`-7`"，而 §6.6/§8.2 归的是五处（`R-134-5`..`-9`），已对齐。
    `git diff --numstat` 的删除列 = 被改写的行数（本程交件时逐次贴过：§6 那发 173/0 纯追加，本发只 1 行是改写）。
-3. 交件前我核过没有残留：`git status --porcelain -- scripts .github internal cmd tools` 为空；
-   工作树四枚被验面文件的 `git hash-object` 与 `6effb7e` 的 blob 逐枚相同（§接续说明）。
-   盘上只剩别人自己的在飞件（`cmd/wisp/leg_dispatch_gate_133_test.go` 未跟踪，票 133 的，我没碰）。
+3. 交件前我核过没有残留，**逐枚 pathspec 分开量的**（18:1x）：
+   `scripts` / `.github` / `internal` / `tools` / `docs/PLAN.md` **五路全 EMPTY**；
+   `cmd` 那一路**不为空，但不是我动的**——`M cmd/wisp/main.go`、`M cmd/wisp/panel_assets.go`、
+   `M cmd/wisp/slo_windows.go`、`?? cmd/wisp/leg_dispatch_gate_133_test.go`（票 133/124 那两路在飞）。
+   一处口径更正：本节 §6.4 第 3 条原先把这串读数写成了"`… internal cmd` 交件前为空"，**cmd 那一路当时
+   就已有一枚别人的未跟踪件**，读数被我抄宽了一格，已就地改窄为实际量过的四路（这是自纠，不是改别人）。
+   另记一笔：`git diff --numstat 6effb7e..HEAD -- scripts .github` 在我交件时命中 **0 枚文件**，
+   而被验版本的五枚 blob 与工作树逐枚相同（§接续说明）⇒ 别人在 `cmd/wisp/**` 上的未提交改动
+   **不影响本程任何一发读数**（我全部探针跑在 `git archive` 的快照上，唯一跑工作树的是那枚旧 `wisp.exe`，
+   其口径已写在 §6.2 层三 FD 那一行）。
 
 ### 8.4 本程临时件清单（只建不删；收尾请一次清理）
 
