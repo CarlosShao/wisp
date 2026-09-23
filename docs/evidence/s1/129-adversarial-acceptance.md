@@ -314,3 +314,158 @@ X12（一行别名使边从账上消失）那一族，我在 winsec 这两张腿
 `string(os.PathSeparator)` 拼所有反斜杠形状**（仪器里字面双反斜杠计数 = 0），并先 `go vet` 两枚树
 rc=0 才读数。与 `acceptor-ticket126` 那三枚假读数同族，这里登记以免下家再踩。
 
+---
+
+## 1. AC#1 —— 把"过缝之后能落进别人的树"量成读数
+
+**裁决：PASS** ｜ 标签：〔独立复现，在我自己这台机器上重新发生了一次〕
+
+票面要求三样：落点、`icacls` 前后、被剥掉的继承授权**逐条**。三样我核到了，而且**不是**读它的日志 ——
+我把改前语义打在快照上自己跑了一遍，落点/前后/逐条全在我自己的日志里。
+
+### 1.1 改前红：我打在**真正的改前树**上，不是只打在变异代理上
+
+把 129 的两枚测试文件放进 `f5bbccd`（＝票 129 之前的树，`grep -c '|| !sameAbsoluteness'` = **0**），
+`go vet` rc=0、`go test -count=2 -v ./internal/winsec/` ⇒ **rc=1**、`RUN=202 PASS=108 FAIL=8 SKIP=0`、
+顶层红名 **4 枚**，与 MUT-BOTH（把两枚 `|| !sameAbsoluteness` 摘掉）**逐字同名**。
+⇒ 两枚"改前"仪器互证：MUT-BOTH 是改前语义的忠实代理，不是造出来的替身。
+
+### 1.2 危害读数（我自己的日志，`/tmp/w129-mb-mb.log`，逐字）
+
+**落点。** 调用者指的是 `…\002\data\blob.bin`；seal 实际改写了 `…\001\victim\sub\keep-me.txt`
+（`001\victim` 这一棵树调用者从头到尾没有点过名）。中间那枚候选解析器经**生产的** `SetPathResolver` 装上去，
+日志原文：`AC#1 install attempt: seam now *winsec_test.witness129; asked=[…]` 三问齐、`admitted=true`，
+随后 `AC#1 SealFile("…\002\data\blob.bin") -> <nil>`。
+
+**`icacls` 前后 —— 同一枚对象、同一枚仪器。** 两遍读数都走
+`absoluteness_seam_landing_129_windows_test.go` 里的同一个变量 `foreignFile`
+（`:= filepath.Join(victim, "sub", "keep-me.txt")`，`aclSIDs(t, foreignFile)` 在 `:335` 与 `:393` 各一次），
+而 `aclSIDs`（`acl_windows_test.go:86`）本身就是 shell 出 `icacls` 再解析 SID＋名字，
+所以"前后"确实都是 icacls 读数、且落在同一个路径字符串上。我自己日志里的原文：
+
+```
+改前（同一对象）：
+  …\001\victim\sub\keep-me.txt  Everyone:(I)(RX)
+                                BUILTIN\Administrators:(I)(F)
+                                NT AUTHORITY\SYSTEM:(I)(F)
+                                DESKTOP-LVS7839\swq:(I)(F)
+  sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001]
+
+改后（同一对象）：
+  …\001\victim\sub\keep-me.txt  NT AUTHORITY\SYSTEM:(F)
+                                BUILTIN\Administrators:(F)
+                                DESKTOP-LVS7839\swq:(F)
+  sids=[S-1-5-18 S-1-5-32-544 S-1-5-21-1228170099-895614386-1166154857-1001]
+```
+
+**被剥掉的授权逐条。** 红名原文：
+`AC#1 RED: S-1-1-0 was stripped from …\001\victim\sub\keep-me.txt … Grants that disappeared: [S-1-1-0].`
+⇒ 逐条点名（由 `dropped129(before, after)` 按集合差算出来，不是数个数）。
+本枚 fixture 只种了一枚外来授权，所以"逐条"今天是一枚 —— 我核过：改前 DACL 里 `Everyone:(I)(RX)`
+**带 `(I)` 标记**，即它确实是**继承来的**那一条，票面"被剥掉的**继承**授权"这一句用词准确。
+另外我顺手量到第二枚观察者看不见的后果：剩下三条由 `(I)(F)` 变成 `(F)` —— seal 不只是删了一条，
+它把整张 DACL 重写成显式了。这条实现者没写，不加戏、只登记。
+
+**反向对照（危害没有溢出到别处，说明读数不是"整棵树都坏了"的假象）**：
+同一发里调用者自己那枚 `blob.bin` 改后**仍然授着 `S-1-1-0`**（`names=[Everyone …]`），
+即"封该封的地方"根本没发生；受害者树的**父目录** `…\001\victim` DACL 前后未变
+（`equalSIDs` 那枚断言没红）；`innocentFile` 仍在（`os.Stat` 那枚断言没红）。
+⇒ 落点精确到"另一棵树里的那一枚文件"，不是一团噪声，这才使上面那句"seal 落到别人的树"站得住。
+
+### 1.3 票面边界②那一格到此结案
+
+票面原本写「『过缝之后能落进别人的树』是**推理、未读数** ⇒ 新票必须先把这一段量出来再定罪」。
+⇒ 它量出来了，且我在**另一台时间点的同一台机器**上重新量到同一次剥离。边界②不再是账。
+
+### 1.4 AC#1 我只挑到的一枚小刺（不改判）
+
+`icacls` 的**原始**输出只在"改后"打印（`:409`/`:410` 那两行 `icaclsRaw`），改前打印的是
+`aclSIDs` 解析过的 SID＋名字（`:335`/`:346`）与 `foreignVictimTree` 那一步的 raw（`:332`/`:334` 我日志里有）。
+⇒ 前后**都**是 icacls 来源、同一对象、逐条对得上，票面要求的"前后"成立；我只记一句
+"改前那两行 raw 输出来自 fixture 内部而非本用例的显式打印"，属可复跑性的小改善项，进 `R-129-6`（最低档）。
+
+**⇒ AC#1 通过。** 落点、icacls 前后（同一枚对象、同一枚仪器）、被剥授权逐条（带 `(I)` 的那一条）三样齐，
+且我自己复现了一次，不需要写"危害未证"。
+
+---
+
+## 2. AC#2 —— 裁定：绝对性该不该进 `sameTree` 的比较
+
+**裁决：PASS** ｜ 标签：〔独立复现〕＋〔独立加强：代价主张我按输入量过〕
+
+票面要求的是"与票 126 AC#1 同一把尺：缝守侧按攻击面记、归属侧按事故面记"。我分四问核。
+
+**(1) 该不该进？—— 该。** 缝守侧的判决今天被实测能被走过：把两枚比较里的 `|| !sameAbsoluteness` 摘掉，
+`treeOwnershipFailureForPair` 对"第二见证用驱动器相对拼写给探针父那棵树作证"那一枚腿**答 `refusal=""`**
+（红名原文见 4.1/1.2）。这不是文字主张，是裁决函数的返回值。
+
+**(2) 进在哪？—— 进在两枚比较本身，不在任一调用方，也不在 `pathComponents`。三条我都核了：**
+- `grep -n sameAbsoluteness internal/winsec/*.go`（非测试）⇒ 命中只有定义 `resolve.go:519`
+  与两枚调用点 `resolve.go:456`（`sameTree`）、`resolve.go:552`（`answerInsideTree`）＋两枚注释。
+  ⇒ **零枚调用方被改**，票 126 数过的"三处非测试调用者"格局没被移动。
+- `git diff 4824bb8..db9fafc -- internal/winsec/resolve.go` 里被**删掉**的生产行只有三行：
+  `if !sameVolume(a, b) {`、`if !sameVolume(child, parent) {`、一行注释。
+  ⇒ 这两枚 guard 是**加了一枚合取**，不是换了判据。
+- 本轮生产码**只**碰了 `resolve.go`（`absoluteness_*`/`volume_attribution_126` 是测试文件），
+  `pathComponents`（在 `winsec.go`）连文件名都不在 diff 里 ⇒ **边界③守住**，
+  票 108 那枚 `pathpieces_108_test.go` 在我全部读数里始终绿。
+
+**(3) 按尺子分两侧记，它记对了吗？—— 记对了，而且归属侧它比 126 那轮更诚实。**
+- **缝守侧＝攻击面**：成立，且**不需要任何运维巧合** —— 一枚候选自己把第二见证改写成驱动器相对拼写就行，
+  过缝后落点由它说了算。1.2 那一段就是这一句的 icacls 版本。
+- **归属侧＝事故面**：它写"今天仍是只有测试在读的判据"。我独立复算：
+  非测试消费者对 `noticeNamesTree`/`noticesAboutTree` 的命中**只有定义与注释**（见 3.1 问① 第 3 条）⇒ 零枚。
+  并且它**没有**像 126 那样把这一侧说重，反而补了一枚 `TestAttributionFaceNeverSeesAMixedAbsolutenessPair`
+  把"归属面吃不到这一形"从嘴上量成读数（3.4）。**公道要替它说：这一格它比票 126 多做了一步。**
+
+**(4) "代价＝零"是量的还是说的？—— 它说的是"五行读数"，我给的是 297,675 枚判决。**
+见 4.5：315 枚拼写两两成对，**零枚**输入对在改后从 false 变 true、**1,052 枚**从 true 变 false。
+⇒ "形状只许更严"与"这枚新 leg 拒不掉任何能落到磁盘上的答案"两条都成立，
+且成对规则那一半也被 4 枚 `CONTROL RED` 腿钉住（两枚同样驱动器相对、尾段相同的拼写仍算一棵树，
+它们在全绿态里都绿）。D22 ban #2 我也核了：`filepath.IsAbs` 在**改前**的 `resolve.go:621` 就在用，
+新 leg 复用的是同一枚标准库谓词，**没有新增 normalizer**。
+
+**⇒ AC#2 通过。**
+
+### 2.1 顺带把 AC#2 唯一那句"仅自述"量掉了（POSIX 半边）
+
+`resolve.go:513-517` 的注释里有一句 POSIX 后果：
+*"On POSIX `filepath.VolumeName` is empty for every input and this is the same statement `IsAbs` makes about a
+leading separator, so `a/b` and `/a/b` stop reading as one tree here too"*。
+实现者自己在 ⑦/N2 里把它登记成"只有源码依据、没有用例依据"（**这个自陈是准的**，
+129 的两枚测试文件都是 `_windows_test.go`，POSIX 分母确实是 0，见 5.3）。
+
+我没有停在它的自陈上。我把一枚字节全等的探针放进**改前树 `f5bbccd`** 与**改后树 `ea05cf5`**，
+在 `golang:1.27` 容器里真执行（`go env GOOS` 自报 `linux`）：
+
+| 输入对（POSIX） | 改前 `sameTree` | 改后 `sameTree` |
+| --- | --- | --- |
+| `wisp129/store-44440/artifact.txt` ↔ `/wisp129/store-44440/artifact.txt` | **true** | **false** |
+| 反序 | **true** | **false** |
+| 其余四对（一枚绝对一枚相对的前缀关系、两枚同性质但不同对象） | false | false（未动） |
+
+⇒ 注释的前半句也被读数钉住：`VolA=""`/`VolB=""` 两枚都空，`IsAbsA=false`/`IsAbsB=true` 是唯一的差。
+（成对规则"不误伤两枚同性质拼写"这一半不由这四对证 —— 上面那四对两棵本就不同物 ——
+而由 4 枚 `CONTROL RED` 腿 ＋ 4.5 那 297,675 枚判决里**零枚**放宽来证。）
+
+原文（容器里逐字，两枚树同一份字节全等的探针文件）：
+```
+PRE  : POSIXPROBE|true |false|"wisp129/store-44440/artifact.txt"|"/wisp129/store-44440/artifact.txt"|IsAbsA=false|IsAbsB=true|VolA=""|VolB=""
+POST : POSIXPROBE|false|false|"wisp129/store-44440/artifact.txt"|"/wisp129/store-44440/artifact.txt"|IsAbsA=false|IsAbsB=true|VolA=""|VolB=""
+PRE  : POSIXPROBE|true |false|"/wisp129/store-44440/artifact.txt"|"wisp129/store-44440/artifact.txt"|IsAbsA=true |IsAbsB=false|VolA=""|VolB=""
+POST : POSIXPROBE|false|false|"/wisp129/store-44440/artifact.txt"|"wisp129/store-44440/artifact.txt"|IsAbsA=true |IsAbsB=false|VolA=""|VolB=""
+```
+⇒ **那句注释是真的**：`VolA=""`/`VolB=""`（注释的前半句逐字成立 —— POSIX 上 `VolumeName` 对两枚都空，
+所以旧判据在这一对上完全无所作为），`IsAbs` 是唯一的差，`sameTree` 因此从 `true` 变 `false`、两个方向都变。
+⚠ 一处我要把自己的表写准：探针里另四对（一枚绝对一枚相对的前缀关系、两枚同性质但本就不同物）
+在两枚树里都是 `false`/`false`，它们**不是**"成对规则不误伤"的证人 —— 真正的证人是 4.5 那 297,675 枚判决
+（`sameAbsoluteness` 是成对谓词 ⇒ 任何 `IsAbs(a)==IsAbs(b)` 的对**结构上不可能**被收紧，
+对角线 `sameTree(x,x)` 因此永不红），加上 129 自己那 4 枚 `CONTROL RED` 腿。
+
+我还把同一枚语料仪器跑了一遍 POSIX 全量：246 枚唯一拼写 × 246 = **60,516 对 × 3 判决 = 181,548 枚**，
+**LOOSENED 0 枚 / TIGHTENED 852 枚**（按判决分：`sameTree` 4、`answerInsideTree` 424、反向 424）
+⇒ "只许更严"在 POSIX 也成立，且收紧面比 Windows 窄得多（852 对 1,052），与注释说的那句"one root over"同向。
+⚠ 但要看清这枚读数的分量：**它是验收方的仪器，不在树里**。CI 没有 linux 的 winsec 步
+（`scripts/winsec-tests.sh:73-80` 自己把非 windows 判 rc=2），所以这一形今天**仍无回归保护**。
+⇒ 登记为 `R-129-2`（原 N2 仍然欠，只是"这句话是假的"这一种担心被我排除了）。
+
