@@ -187,8 +187,8 @@ func TestAC1AC2DispatchHopGate133(t *testing.T) {
 
 	var lines []string
 	for _, leg := range legs {
-		lines = append(lines, fmt.Sprintf("  leg %-14s %-24s installs=%-5v handoff=%-5v covered=%-62s entries=%s",
-			leg.key, leg.site, leg.installs, leg.handoff, leg.covered, strings.Join(leg.entries, "|")))
+		lines = append(lines, fmt.Sprintf("  leg %-14s %-24s installs=%-5v handoff=%-5v covered=%-62s entries=%s aliases=%s",
+			leg.key, leg.site, leg.installs, leg.handoff, leg.covered, strings.Join(leg.entries, "|"), strings.Join(leg.aliases, "|")))
 	}
 	report := fmt.Sprintf("dispatch ledger, read out of func main's own branches at run time (%d legs, %d claims in this gate's registry):\n", len(legs), len(legCovers133)) +
 		strings.Join(lines, "\n")
@@ -231,6 +231,7 @@ type leg133 struct {
 	key       string
 	site      string
 	isDefault bool
+	aliases   []string // other labels of the same clause that fold into this row
 	entries   []string
 	quals     map[string]bool
 	reached   map[string]bool
@@ -965,10 +966,10 @@ func (p *pkg133) enumerateLegs133() ([]*leg133, []string) {
 	var legs []*leg133
 	var ranges [][2]int
 
-	addLeg := func(key, site string, n ast.Node, isDefault bool, extraReds ...string) {
+	addLeg := func(key, site string, n ast.Node, isDefault bool, aliases []string, extraReds ...string) {
 		reds = append(reds, extraReds...)
 		ranges = append(ranges, [2]int{int(n.Pos()), int(n.End())})
-		leg := &leg133{key: key, site: site, isDefault: isDefault}
+		leg := &leg133{key: key, site: site, isDefault: isDefault, aliases: dedupe133(aliases)}
 		var seeds []*decl133
 		var entries []string
 		ast.Inspect(n, func(x ast.Node) bool {
@@ -1008,9 +1009,9 @@ func (p *pkg133) enumerateLegs133() ([]*leg133, []string) {
 			site := p.site133(s.Pos())
 			switch kind {
 			case condNoArgs133:
-				addLeg(noArgsLeg133, site, s.Body, false)
+				addLeg(noArgsLeg133, site, s.Body, false, nil)
 			case condLiteral133:
-				addLeg(key, site, s.Body, false)
+				addLeg(key, site, s.Body, false, nil)
 			default:
 				reds = append(reds, fmt.Sprintf("%s: func main has an if branch this gate cannot classify (%s). A dispatch outside the leg census needs no nail and no ruling from anything here, which is the hole ticket 131 registered as its first shape, so it is red rather than skipped.",
 					site, p.render133(s.Cond)))
@@ -1027,39 +1028,25 @@ func (p *pkg133) enumerateLegs133() ([]*leg133, []string) {
 					continue
 				}
 				if cc.List == nil {
-					addLeg("default", p.site133(cc.Pos()), cc, true)
+					addLeg("default", p.site133(cc.Pos()), cc, true, nil)
 					continue
 				}
-				key := ""
-				var labelReds []string
-				for _, l := range cc.List {
-					bl, ok := l.(*ast.BasicLit)
-					if !ok || bl.Kind != token.STRING {
-						expr := p.render133(l)
-						resolved := ""
-						if nm := exprIdent(l); nm != "" {
-							if v, ok2 := p.consts[nm]; ok2 {
-								resolved = ", which resolves to the literal " + strconv.Quote(v)
-							}
-						}
-						name := "unparsed-label@" + p.site133(cc.Pos()) + ":" + expr
-						if key == "" {
-							key = name
-						}
-						labelReds = append(labelReds, fmt.Sprintf("%s: the case label %s is not a string literal%s. A leg is identified by a literal command name; a label that has to be resolved through a constant is a leg that can leave the census without saying so, which is ticket 131's second shape. This row carries it as %q instead of folding it into default.",
-							p.site133(l.Pos()), expr, resolved, name))
+				// R-133-4: a clause can carry several labels, and every one of them is a
+				// command an operator can type. Before this only the FIRST literal label
+				// reached the census, so `case "run", "runalt133":` printed one row and the
+				// second command name existed nowhere in this reading - not in the ledger,
+				// not in the usage reconciliation, not as a leg owing a nail. Each label
+				// that reads as a command gets its own row now; only a dash spelling that
+				// abbreviates the clause's own command word is folded, and it is folded
+				// into that row's aliases column rather than dropped.
+				keys, aliases, labelReds := p.caseLabelLegs133(cc)
+				for i, k := range keys {
+					if i == 0 {
+						addLeg(k, p.site133(cc.Pos()), cc, false, aliases, labelReds...)
 						continue
 					}
-					if key == "" {
-						if v, err := strconv.Unquote(bl.Value); err == nil {
-							key = v
-						}
-					}
+					addLeg(k, p.site133(cc.Pos()), cc, false, nil)
 				}
-				if key == "" {
-					key = "unparsed-label@" + p.site133(cc.Pos())
-				}
-				addLeg(key, p.site133(cc.Pos()), cc, false, labelReds...)
 			}
 		}
 	}
@@ -1085,6 +1072,94 @@ func (p *pkg133) enumerateLegs133() ([]*leg133, []string) {
 
 	sort.Slice(legs, func(i, j int) bool { return legs[i].key < legs[j].key })
 	return legs, reds
+}
+
+// caseLabelLegs133 turns one case clause into the legs it dispatches. The rule is
+// the one a CLI reader would state out loud:
+//
+//   - a literal label that reads as a command word is a leg of its own, with its
+//     own coverage obligation and its own line owed in the usage block. That is
+//     what R-133-4 was: `case "run", "runalt133":` used to enumerate "run" only,
+//     so a second command could be wired to any body and appear nowhere.
+//   - a literal label that starts with a dash is a flag SPELLING of the clause's
+//     command word, and it folds into that row's aliases column - but only when
+//     its letters are a prefix of that word ("-v" and "--version" of "version").
+//     The four flag spellings in this package's main.go are documented as the
+//     commands they abbreviate, so folding them keeps today's reconciliation
+//     honest; a dash label that abbreviates nothing ("-x133") is not an alias of
+//     anything and becomes a leg that owes both a nail and a usage line.
+//   - a label that is not a literal at all is its own synthetic leg, and red, as
+//     ticket 131's second shape already required (X8's reading is unchanged).
+//
+// Returned in source order: keys are the legs to add, aliases belong to keys[0].
+func (p *pkg133) caseLabelLegs133(cc *ast.CaseClause) (keys, aliases, reds []string) {
+	site := p.site133(cc.Pos())
+	word := "" // first command-word literal of this clause
+	type label struct {
+		value string
+		flag  bool
+	}
+	var seen []label
+	for _, l := range cc.List {
+		bl, ok := l.(*ast.BasicLit)
+		if !ok || bl.Kind != token.STRING {
+			expr := p.render133(l)
+			resolved := ""
+			if nm := exprIdent(l); nm != "" {
+				if v, ok2 := p.consts[nm]; ok2 {
+					resolved = ", which resolves to the literal " + strconv.Quote(v)
+				}
+			}
+			name := "unparsed-label@" + site + ":" + expr
+			keys = append(keys, name)
+			reds = append(reds, fmt.Sprintf("%s: the case label %s is not a string literal%s. A leg is identified by a literal command name; a label that has to be resolved through a constant is a leg that can leave the census without saying so, which is ticket 131's second shape. This row carries it as %q instead of folding it into default.",
+				p.site133(l.Pos()), expr, resolved, name))
+			continue
+		}
+		v, err := strconv.Unquote(bl.Value)
+		if err != nil {
+			continue
+		}
+		if v == "" {
+			continue
+		}
+		seen = append(seen, label{value: v, flag: strings.HasPrefix(v, "-")})
+		if !strings.HasPrefix(v, "-") && word == "" {
+			word = v
+		}
+	}
+	for _, l := range seen {
+		if !l.flag {
+			keys = append(keys, l.value)
+			continue
+		}
+		short := strings.TrimLeft(l.value, "-")
+		if word != "" && short != "" && strings.HasPrefix(word, short) {
+			aliases = append(aliases, l.value)
+			continue
+		}
+		keys = append(keys, l.value)
+	}
+	if len(keys) == 0 {
+		keys = []string{"unparsed-label@" + site}
+	}
+	return dedupe133Stable133(keys), dedupe133Stable133(aliases), reds
+}
+
+// dedupe133Stable133 is dedupe133 without the sort: which label of a clause comes
+// first is a fact about the source, and the census row order is what a reader
+// compares against the switch.
+func dedupe133Stable133(in []string) []string {
+	seen := map[string]bool{}
+	var out []string
+	for _, s := range in {
+		if seen[s] {
+			continue
+		}
+		seen[s] = true
+		out = append(out, s)
+	}
+	return out
 }
 
 type condKind133 int
