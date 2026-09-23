@@ -178,9 +178,86 @@ go vet rc=0
 
 ⇒ 红名**点到用例自己**（43 枚逐枚点名 + 3 枚已知腿一并回归，不是包级 `FAIL`），且变异前 `grep` 证落地、`go build` / `go vet` rc=0 先于读数。这一发**做了**。
 
-## 7. 门禁读数（票面 AC#5）
+## 7. 门禁读数（票面 AC#5）— 本接续方 `worker-ticket124-ac2b-2-r2` 补（2026-09-23 19:4x–20:3x +8，即 `date -u` 11:4x–12:3x）
 
-待量。
+**测的是哪棵树 / 共树漂移**：开工首读 `git rev-parse --short HEAD` = **`e113b1a`**（与派单给的起点一致，本方一切读数锚在这枚）。测量途中 HEAD 先后漂到 `b45d74d`、`00d3f34`（兄弟票 133 的 docs 与 A128 台账），已核 `git diff --name-only e113b1a HEAD -- internal/ cmd/ go.mod go.sum` **零 hunk**、`git diff --stat dfa3dc4 e113b1a -- internal/` **空** ⇒ 本方量的四包与 §0 那台 POST 快照（`dfa3dc4`）是同一版本码；`e113b1a` 相对 `dfa3dc4` 唯一代码差在 `cmd/wisp/leg_dispatch_gate_133_test.go`（票 133 地界，非本批）。工作树里别人的半成品一个字都不读。
+- 快照：`/d/tmp/wisp124-2b2-r2-post` = `git archive e113b1a | tar -x`（**1048 文件**；`dfa3dc4` 那台是 1046，+2 系兄弟票 docs/报告件）。对照快照 `/d/tmp/wisp124-2b2-r2-pre` = `git archive 5417a3c`（1039 文件，§0 的 pre 锚，只用于 §7.4 的归因那一发）。
+- 容器 `golang:1.27`（`go1.27.1 linux/amd64`、`CGO_ENABLED=1`），复用票 119 的命名卷 `ac119-gomodcache`/`ac119-gocache` ⇒ 离线可编；挂载一律 `/d/...` + `MSYS_NO_PATHCONV=1`；每枚样本进容器第一件事 `ls -l /src/go.mod` = `-rwxrwxrwx 1 root root 883`、`md5sum /src/go.mod` = `f6ef661732b1851e5c3db348113cb605`、`md5sum /src/internal/winsec/resolve.go` = `b6876a5efe759f6e17434d1b50a129c3` ⇒ 与 §0 逐字同字、非空挂自证。
+- 跑法（新建，未改前任任何脚本）：`/d/tmp/wisp124-2b2-r2-gate.sh`（`bash /gate.sh <link|plain|none> <tag>`，`COUNT=2`、`-timeout 60m`）与 `/d/tmp/wisp124-2b2-r2-vet.sh`（容器内 gofmt/vet）。**每形一枚新容器**：软链形容器 `abd20fa8ef62`（19:57:49→20:28:39 +8）、普通形容器 `3e89bc848b1f`（20:28:42→20:29:45 +8）。形状硬断言沿用 §0（`exit 96/97/98/99` 两发均未命中），原文读数：软链形 `SHAPE=link TMPDIR=/varlink/w124tmp resolved=/realpriv/w124tmp` + `lrwxrwxrwx 1 root root 9 ... /varlink -> /realpriv`；普通形 `SHAPE=plain TMPDIR=/plainroot/w124tmp resolved=/plainroot/w124tmp`（`/varlink` 根本不存在、`/plainroot` 是真目录）。日志：`/d/tmp/wisp124-2b2-r2-logs-link/`、`/d/tmp/wisp124-2b2-r2-logs-plain/`、`/d/tmp/wisp124-2b2-r2-logs/`（临时件，只建不删）。
+- ⚠ 为什么必须 60m 且每形新容器：见 §9 未验证项 4——前任 §7 待量期间遗留的那发（`/d/tmp/wisp124-2b2-logs/POST-L2.*`，19:19–19:21）用 `-timeout 25m` ⇒ `panic: test timed out after 25m0s`、四数**被截断**；同一次容器复用又让普通形那一发撞 `exit 99`（`RUN-COUNT2.out.txt` 第二段）⇒ 普通形 `-count=2` 前任**没有读数**。那是补空格，不是复跑 §2-§6；本方这一发 `test timed out` 命中 **0**。
+- 开测前查在飞（本机就是 self-hosted runner）：19:4x 见 `35856629513`（`docs(A128)`，11:47:56z 起）在跑 ⇒ 不计时的静态读数（7.2/7.3/7.4 容器那一发）先跑，**计时敏感的 `-count=2` 两发等它 `completed`（11:57:29z；`test-core=success`、`test-windows=failure`）之后才起**，期间宿主零编译动作。
+
+### 7.1 `-count=2 -v` 四数（四包 × 两形；只能从 `-v` 量，`-count=2` 才不缓存）
+
+| 台 | 形状 | `internal/tools` | `internal/llm` | `internal/perm` | `internal/agent/approval` |
+|---|---|---|---|---|---|
+| `GATE-L2` | 软链 | `rc=1 RUN=158 PASS=118 FAIL=6 SKIP=6 SUBPASS=28 SUBFAIL=0 SUBSKIP=0`（包级 `1806.869 s`） | `rc=0 RUN=144 PASS=126 FAIL=0 SKIP=0 SUBPASS=18 SUBFAIL=0`（`37.009 s`） | `rc=0 RUN=28 PASS=28 FAIL=0 SKIP=0`（`0.253 s`） | `rc=0 RUN=98 PASS=58 FAIL=0 SKIP=2 SUBPASS=38 SUBFAIL=0`（`0.560 s`） |
+| `GATE-P2` | 普通 | `rc=0 RUN=158 PASS=124 FAIL=0 SKIP=6 SUBPASS=28 SUBFAIL=0`（`18.707 s`） | `rc=0 RUN=144 PASS=126 FAIL=0 SKIP=0 SUBPASS=18 SUBFAIL=0`（`38.881 s`） | `rc=0 RUN=28 PASS=28 FAIL=0 SKIP=0`（`0.298 s`） | `rc=0 RUN=98 PASS=58 FAIL=0 SKIP=2 SUBPASS=38 SUBFAIL=0`（`0.561 s`） |
+
+⇒ **每包八个数都是 §2 那一发 `-count=1` 的正好 2 倍**（tools 软链 `79/59/3/3`+`14/0` → `158/118/6/6`+`28/0`、tools 普通 `79/62/0/3`+`14/0` → `158/124/0/6`+`28/0`；llm `72/63/0/0`+`9/0` → `144/126/0/0`+`18/0`；perm `14/14/0/0` → `28/28/0/0`；approval `49/29/0/1`+`19/0` → `98/58/0/2`+`38/0`）⇒ 无缓存读数、无 flake，**与前任 §2/§4 的读数无分歧**（本方未复跑 §2-§6，也没有改它们一行）。
+⇒ **红名逐名**（软链形 6 行 = 票 123 那三枚 300 s 腿 × 2 counts）：`TestL1WriteGoesThroughTheRealBlockWindow`（`300.00s` / `300.01s`）、`TestLateVetoRendersTheApprovalLayersAppliedStepsReport`（`300.02s` / `300.03s`）、`TestFSReadOnlyNeverOpensACard`（`300.03s` / `300.04s`）⇒ **零枚来自本批 43 枚名册**；tools 包级 `rc` 仍为 `1` 就是这三枚 ×2 造成的，其余三包 `rc=0`。普通形四包 `FAIL=0`、`SUBFAIL=0`。
+⇒ **SKIP 名册两形逐名同一组 4 枚 ×2 counts**（tools `TestD34WriteMatrix`、`TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop`、`TestWorkspaceSwitchRefusesAJunctionToOutside` + approval `TestDefaultDeadlineWallClockMeasurement`），与 §4"形状无关、改前改后一字不变"吻合；两形 `RUN` 逐包相等（`158/144/28/98` 对 `158/144/28/98`）⇒ 门禁这一发同样没有"被跳过冒充变绿"。
+⇒ 机制字串计数（本方这一发四包日志，四包合计的行计数）：`not provably resolved` **0**、`refusing to seal` **0**、`审批未通过` **0**、`审批通道尚未接入` **0**（普通形侧亦全 0）。
+⚠ 计时账：软链形 tools 单包 `1806.869 s`，六枚 300 s 腿自身就占 1800 s ⇒ `-count=2` 下包级 `-timeout` **≥ 50m 是硬要求**（25m 必然截断，前任那发的截断读数已按名保留在 `/d/tmp/wisp124-2b2-logs/POST-L2.summary.txt`，本方不改它）。
+
+### 7.2 `gofmt -l`（票面 AC#5 的"整包"：四包各自一发；宿主 + 容器各一组）
+
+| 调用（均在锚点纯净快照里） | 结果 |
+|---|---|
+| 宿主 `gofmt -l internal/tools`、`internal/llm`、`internal/perm`、`internal/agent/approval` | **各 0 行**，`rc=0`（`/d/tmp/wisp124-2b2-r2-logs/GOFMT-HOST.txt`） |
+| 宿主 `gofmt -l internal cmd`（全树参照，非本格要求） | **0 行** |
+| 容器 `gofmt -l` 四包各自 + `gofmt -l internal cmd` | **各 0 行 / 0 行**（`/d/tmp/wisp124-2b2-r2-logs/VET-CONTAINER-RUN.txt` 第三段） |
+
+### 7.3 `"$(go env GOPATH)/bin/gofumpt.exe" -l`（票面 AC#5：真跑；写「未跑」必须引错误原文）
+
+版本行 **`v0.7.0 (go1.27.1)`** ⇒ 工具存在，本格**不是**「未跑」，没有错误原文要引。宿主对四包各自 `gofumpt -l <pkg>` ⇒ **各 0 行**（`/d/tmp/wisp124-2b2-r2-logs/GOFUMPT-HOST.txt`）。
+
+### 7.4 `go vet` 双 GOOS（逐错误行归因；宿主交叉那一发既不算破口也不算清白）
+
+| 调用形状 | rc | 输出 |
+|---|---|---|
+| `GOOS=windows go vet ./...`（宿主原生、全树、锚点快照） | **0** | 0 行（`VET-WINDOWS-HOST-ANCHOR.txt`） |
+| `GOOS=windows go vet ./internal/tools/`、`./internal/llm/`、`./internal/perm/`、`./internal/agent/approval/` | **0** ×4 | 0 行（`VET-WINDOWS-HOST-PKGS.txt`） |
+| `GOOS=linux go vet ./...`（**容器原生**、`CGO_ENABLED=1`、`go1.27.1 linux/amd64`、同一快照） | **0** | 0 行（`VET-LINUX-NATIVE-ALL.txt`；原文贴在 `VET-CONTAINER-RUN.txt` 末段）⇒ **这一发才是 linux 的真类型读数**；四包单跑亦各 `rc=0`、`VET-LINUX-NATIVE-PKG{1,2,3,4}.txt` 全空 |
+| `GOOS=linux CGO_ENABLED=0 go vet ./...`（**宿主交叉**、全树） | **1** | 4 行，逐字见下 |
+| `GOOS=linux CGO_ENABLED=0 go vet <pkg>`（四包各自，宿主交叉） | **0** ×4 | 0 行（`VET-LINUX-HOST-CROSS-PKGS.txt`）⇒ 本批四包在 linux 目标下过 vet |
+| `GOOS=linux go vet ./cmd/balldebug/`（宿主交叉、单跑） | **1** | `package github.com/CarlosShao/wisp/cmd/balldebug: build constraints exclude all Go files in <tree>\cmd\balldebug`（该 main 全文件带 `//go:build windows`）；同一发在 pre 锚 `5417a3c` 快照里**只差路径**、其余逐字相同（`VET-LINUX-HOST-CROSS-BALLDEBUG-wisp124-2b2-r2-{post,pre}.txt`） |
+| `GOOS=linux go vet $(go list ./... \| grep -vE 'cmd/(wisp\|balldebug)$')`（剔掉那两枚包，余 30 枚） | **0** | 0 行（`VET-LINUX-HOST-CROSS-EXCL.txt`；同一发里 `go list ./...` 列得 32 枚包）⇒ 交叉 `rc=1` **全部**由 `cmd/wisp`、`cmd/balldebug` 两枚既有形状贡献 |
+
+宿主交叉全树那一发的全部输出（`VET-LINUX-HOST-CROSS-ANCHOR.txt` 逐字）：
+
+```
+package github.com/CarlosShao/wisp/cmd/wisp
+	imports github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx
+	imports github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files in D:\work\base\gopath\pkg\mod\github.com\k2-fsa\sherpa-onnx-go-linux@v1.13.8
+```
+
+⇒ 死在**包加载**阶段（外部模块 `sherpa-onnx-go-linux@v1.13.8` 的 build constraints），结构上到不了类型检查 ⇒ 按票面纪律**既不算破口也不算清白**；清白由上表容器原生那发 `rc=0` 提供。归因：同一支命令在同一台机器上对 pre 锚 `5417a3c` 的快照输出**逐字节相同**（`diff` 前 3 行 rc=0，`VET-LINUX-HOST-CROSS-PRE5417.txt` vs `VET-LINUX-HOST-CROSS-ANCHOR.txt`）⇒ 与本批无关的既有形状；错误文本点到的是 `cmd/wisp`（2b-4 地界）与一枚外部模块目录，**零行指向本批四包**。
+⚠ 与**批次 1** §7 的交叉读数枚数不同（那发报 2 处：`cmd/wisp` 链 + `cmd/balldebug`；本方 `./...` 这发只报 1 处）——`go vet ./...` 在包加载阶段遇到第一枚不可加载的包即中止，报几处取决于加载顺序；把 `cmd/balldebug` 单独点名时它照样红（本方已逐字量，见上表倒数第二行）。⇒ 这是**调用形状不同**，不是同一支命令的读数分歧；两发都不构成对本批四包的判据。
+
+### 7.5 一次全仓仪器：`sh scripts/d22scan.sh`（作用域是整个 `internal/`；按包门禁结构性看不见它）
+
+调用形状（唯一受支持的形状；票 67 AC#2 把它做成脚本，就是为了堵"从仓根跑独立 module"与"默认 `-root .` 走空树"那两种假成功——本方**没有**撞到 `main module does not contain package`）：在**纯净快照**里 `cd /d/tmp/wisp124-2b2-r2-post && sh scripts/d22scan.sh`（宿主 Git Bash）。脚本自己从所在位置推导仓根，两步依次硬跑（`set -eu`、无跳步、无 `|| true`）：① `sh tools/d22scan/runtests.sh -C tools/d22scan ./...`（播种违规的正向对照）② `go run . -root <推导出的仓根>`（真扫）。
+
+- **rc=0**（全量原文 `/d/tmp/wisp124-2b2-r2-logs/D22-ANCHOR.txt`；脚本推导出的根逐字为 `d22scan.sh: scan of /d/tmp/wisp124-2b2-r2-post` ⇒ 扫的是快照，不是脏工作树）
+- 正向对照那一步：`runtests.sh: OK - packages=[./...] top-level: PASS=21 FAIL=0 SKIP=0, === RUN=31, '[no tests to run]'=0` ⇒ 这把尺**能红**，"clean"不是"眼睛瞎"
+- 真扫规模：`examined 225 production Go files under internal/ and cmd/ of D:/tmp/wisp124-2b2-r2-post`
+- 台账八 scope 逐数对照（本方 `e113b1a` vs 批次 1 §7 在 `fafe2b4` 那发记的数）：
+
+| scope | 批次 1 §7 | 本方（`e113b1a`） | 变化与出处 |
+|---|---|---|---|
+| bans #1-5 `internal/` | 203 | 203 | 0 |
+| bans #1-5 `cmd/` | 22 | 22 | 0 |
+| ban #6 `frontend/` | 40 | 40 | 0 |
+| ban #7 `internal/tools/` | 18 | 18 | 0 |
+| ban #8 `design/` | 16 | 16 | 0 |
+| ban #8 `frontend/` | 40 | 40 | 0 |
+| ban #8 `internal/` | 392 | **397** | **+5 ＝ 本批五枚单行委托 `_test.go` 进树**（`git diff --name-status fafe2b4 e113b1a -- internal/` 里 `^A` 恰为这 5 枚，逐名可点） |
+| ban #8 `cmd/` | 37 | **38** | **+1 ＝ 票 133 新增的 `cmd/wisp/leg_dispatch_gate_133_test.go`**（同一命令 `^A` 清单里唯一一枚 cmd 文件，**非本批**） |
+
+⇒ **八数一枚都不降**；唯二变化都是"多扫了一枚文件"而非"少扫一枚"，且各有可核出处。
+
+**AC#5 小结**：四包两形 `-count=2` 四数齐（软链形红名只剩票 123 那三枚 ×2、普通形零红）；`gofmt -l` 整包四包 × 宿主/容器全 0 行；`gofumpt v0.7.0` 真跑、0 行；`go vet` 双 GOOS——windows 全树 `rc=0`、linux **容器原生**全树 `rc=0`（真类型读数）、linux 宿主交叉 `rc=1` 已逐行归因到两枚与本批无关的既有形状（剔掉即 `rc=0`）；`sh scripts/d22scan.sh` 纯净快照 `rc=0`、正向对照 21 PASS/0 FAIL/0 SKIP、台账八 scope 不降。**本格不为四包翻 AC#2 那一格**（票面 16:33 已定：终判据留到 2b-4 交回后一次性复算）。
 
 ## 8. 改动面与本批用的 helper
 
