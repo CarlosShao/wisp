@@ -121,4 +121,13 @@
   改后整包 `go test -count=2 -v ./internal/winsec/`：`RUN=202 PASS=116 FAIL=0 SKIP=0`（单次 101/58）、`ok … 21.099s`；
   `--- PASS` 名字集合与基线 `diff` ＝ **增 8 枚、移除 0 枚**（`comm -23` 空）；`gofmt -l internal/winsec/` 空输出。
 
+- 2026-09-23 12:2x（agent-ticket129-**接续**，STEP 0 落盘，AC#4/AC#5 在飞）：前任代理确认死亡（转录最后写入 09:03、静默三小时、
+  `git status` 里 `internal/winsec/**` 无未提交 WIP），本段**只接 AC#4/AC#5**，AC#1..AC#3 的判据一字不动。
+  先按"不许引用前任的数"重量基线：`git archive a71b2d8 | tar -x -C /tmp/wisp129c-s23-base`（仓库内零 worktree），
+  快照里 `go test -count=2 -v ./internal/winsec/` **rc=0**，四数按 `scripts/winsec-tests.sh` 那四条 grep 的逐字形状数
+  ＝ `RUN=202 PASS=116 FAIL=0 SKIP=0`、`grep -c '(cached)'`=0、顶层 `--- PASS` 去重 **58 枚**；
+  顺带核了一件事：`git diff --stat db9fafc a71b2d8 -- internal/winsec` **空输出** ⇒ 锚定树里 winsec 就是 AC#3 交件态，
+  我这枚基线与前一行自述的 202/116 同形不是抄的、是独立复现。读数表与后续变异落 `docs/evidence/s1/129-ac4-ac5-mutation-and-gates.md`。
+  Status 与勾框本条不动（AC#4/AC#5 未量完）。
+
 
