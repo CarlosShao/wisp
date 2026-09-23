@@ -451,3 +451,17 @@ $ MSYS_NO_PATHCONV=1 docker run --rm -v /d/tmp/wisp136r2-ac8ac9-anchor:/src \
 9. §3.3 的 **V2 因编不过而作废**，我没有再找一条"把 `backInTime` 摘掉"的**可编译**等价写法——V6 覆盖了同一危害的可达形状，但严格说不是同一条改法。
 10. **AC#1 的 M1/M2/M4/M6/M7/M8/M9 七发未复算**（不是本格账，也没推翻任何结论）。
 11. 探针文件（`zz_acceptor136r2_probe_test.go`、`…probe2_test.go`）只存在于我的仓外快照树，**没进仓库、没进被验版本、不提交**。
+
+---
+
+## §7 新账（`R-136x-x`，带严重度／能否复现／修法方向／归谁）
+
+编号先查过占用：`R-136-1..R-136-6` 已被上一程验收方与本票面用掉（`136-ac1-adversarial-acceptance.md:333-338`），**`R-136-7` 起未被任何人用过** ⇒ 本格新账从 7 开始，不撞号。
+
+| id | 严重度 | 现象（我这程的读数出处） | 能否复现 | 修法方向 | 归谁 |
+| --- | --- | --- | --- | --- | --- |
+| **R-136-7** | **中** | **settle 侧"部分未测"完全无痕**：整窗口只 1 枚可信读数 ⇒ `samples=1 back=60 pass=true`；一半读数 `err!=nil` ⇒ `samples=2 back=40 pass=true`（§3.2 探针原文）。`SettleReport` 的出线 key 里 **`sample_errors`/`last_sample_error`/`dropped_reads` 全部 ABSENT**（字段清点读数）。同包 `StateReport` 早就为这件事加过这两枚字段并写明理由（`sampler.go:164-168`：*"A bare count let an instrument lose samples without saying what it lost（ticket 66：this instrument stops hiding things）"*) ⇒ **同一族病在 settle 侧只做了一半** | **能**：探针文件 `/d/tmp/wisp136r2-ac8ac9-probe/internal/observe/zz_acceptor136r2_probe_test.go`，`go test -count=1 -v -run TestAcceptorR2Probe ./internal/observe/` 即出 | 给 `SettleReport` 补 `sample_errors`/`last_sample_error` 两枚字段，并产出一枚与 `sampling` 同形的自陈门行（要动 `sampler.go:470-501`，**生产码**）；配一发"部分未测"的钉子 | **另立新格**（本票建议 AC#12）。⚠ 我**没有**为此放宽 AC#9 任何条件、也没让作者在本格动生产码——这一格作者交付的东西判得住它自己那句，本账是**下一格**的账 |
+| **R-136-8** | 低 | 腿 A 出线检查里 `else if !isList && wire["samples"] != nil` 那一支**永不响**：空 slice 经 `json.Marshal` 出的是 `"samples":null`（探针原文），于是 `isList=false` 且 `==nil`，两支都不进。真正有牙的是它前面那句"key 在不在"——我把 tag 改成 `omitempty` 后红在 `:102`（§3.3 V4） | 能：V4 那发＋探针 `all-reads-error` 的出线 | 二选一：要么把该支改成"必须是长度 0 的 list"（前提是先有 R-136-7 里"生产码把 `Samples` 初始化成 `[]Sample{}`"那半步），要么删掉这支并在注释里写明它防的是哪种形状（**别留一条看起来在守、其实永不生效的支**） | 与 R-136-7 同格（同一枚 `SettleReport` 形状） |
+| **R-136-9** | 低 | seam 自己的第二枚"吞读数"仪器：`sampler_test.go:31` 的 `f.mu[len(f.mu)-1]`。今天无入口踩得到（§4.2 复核为真），但**新写一枚用 `&fakeTree{}` 的正常采样用例就立刻 `panic: runtime error: index out of range [-1]`**（探针 `TestAcceptorR2ProbeBareFakeTreePanic` 原文）——那会重演 AC#8 刚修掉的那个形状（一枚 panic 吞掉同包其余几十条读数） | 能：`/d/tmp/wisp136r2-ac8ac9-probe/internal/observe/zz_acceptor136r2_probe2_test.go` | 给 `fakeTree.ReadTree` 自己加守卫（空脚本 ⇒ 显式失败或返回错误，**不许**静默返回零值）；只动测试侧，不碰采样器语义 | 下一位在本包加用例行的人；也可并进 AC#11 那一族（"一条仪器把整包读数变成掷硬币"） |
+
+**不另立新账的一条，但要把 n 交回去**：票面 **AC#11** 那枚既有 flake `TestNoopTaskReturnsToBaseline` 在本程命中 **2 枚**读数——① `noguard` 未变异基线那一发：`goroutine_test.go:33: PerTask mid-task = 2, want 3`（`/d/tmp/wisp136r2-ac8ac9-noguard-baseline-v.txt`）；② `anchor` 的 `-count=2` 第一发：同一红点、值不同 `PerTask mid-task = 1, want 3`（`…-anchor-count2-v.txt`，第二发 `-count=2` 复跑 `116/116/0/0` 全绿，`…-count2b-v.txt`）。本程整包级读数 **26 枚**（22 枚存盘宿主日志＋4 枚容器内 `-v`；另有 1 枚容器发因我自己把 `-mod=mod` 打成 `-mod=dev` 而无效、1 枚宿主发取在未还原的变异树上而作废并重取，都不计）。⇒ 交给 AC#11 的累计观测：实现方 2/27 ＋ 本程 2/26，且**两发的取值不同（2 与 1）**这条对"根因＝计数窗口缺 happens-before"是有用的形状，不是"负载高"能解释的。
