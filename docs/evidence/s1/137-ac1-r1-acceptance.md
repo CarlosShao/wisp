@@ -211,3 +211,34 @@ D·软链形包级 `顶 FAIL 3` 的名册就是这三枚（`TestAC3POSIXLinkInsi
 
 ⚠ 我**没有**用 `grep -c '^func Test'` 当分母，也没有沿用它的名单：上表 12 行逐名给了"算／不算"的理由，
 分母那 11 枚的名字在 §2.2 的逐名表里一枚一枚露过脸，名册差集见 §4。
+
+## §4 名册与 SKIP 账（"没响"绝不等于"被跳过"，这条我逐名重走）
+
+- **同形内 RUN 名册逐名相同**：普通形六发（基线＋四发变异＋`MUT-A/B` 的复跑）都是 **52 枚**、软链形六发都是 **45 枚**，
+  每发的名册与同形基线 `diff` **为空** ⇒ 十发里没有任何一枚用例"消失"（没有 panic 吞读数、也没有静默少跑）。
+  `grep -c '^panic|^fatal error'` 在**十四份日志**（含两发复跑的 build/vet 输出另算）里全部 **0**。
+- **两形差 7 枚**逐名（`diff base-plain base-link` 的实录，除这 7 枚外无差集）：
+  `TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/{control_plain_temp, control_unresolved_root_still_refused_by_the_floor_itself, measured_symlink_spelled_temp}`（3）＋
+  `TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125/{control_plain_temp, measured_symlink_spelled_temp}`（2）＋
+  `TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125/{control_plain_temp, measured_symlink_spelled_temp}`（2）＝ **7**。
+  ⇒ 测量方把差 7 枚归给**票 125 那三枚自拒探针的子测试**这条**归因成立**：父项在软链形自己 `t.Skipf` ⇒ 子测试从未被创建，不是"少跑"、也不是本票分母在动。
+- **SKIP 账**：普通形**恒 0 枚**；软链形**恒 3 枚**且**逐名相同**
+  （`TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125`、`TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125`、`TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125`）
+  ⇒ 十发**零新增 SKIP**。
+- ⚠ **本格分母 11 枚在十发里没有任何一发是 SKIP**：逐名 grep（`--- SKIP:` 行里点名 113/108 那几枚）逐发计数 **＝ 0**
+  ⇒ §2.2 表里那些 `PASS` 全是跑出来的 PASS；尤其 **D·软链那 11 枚绿**是"跑了、断言也拿到了它要的拒、但拒因不是它自己种的链接"，不是"被跳过"。
+- **每一发的红都能逐名归因，没有说不去的红**（我的名册实录）：
+
+  | 发·形 | 顶 FAIL | 归因 | 子测 FAIL | 归因 |
+  | --- | --- | --- | --- | --- |
+  | A·普通 | 11 | 分母 5（113 族顶层）＋对照 5（119×3＋118×2）＋票 125 那枚 1 | 5 | 分母 4（depth-1..4）＋125 的 `control_unresolved_root_still_refused_by_the_floor_itself` |
+  | A·软链 | 10 | 分母 5＋对照 5（125 那枚此形是 SKIP） | 4 | 分母 4 |
+  | B·普通／B·软链 | 2／2 | 就是分母的 108 两枚 | 0／0 | — |
+  | AB·普通 | 13 | 分母 7＋对照 5＋125 那枚 1 | 5 | 分母 4＋125 那枚子测 |
+  | AB·软链 | 12 | 分母 7＋对照 5 | 4 | 分母 4 |
+  | **D·普通** | **13** | 与 AB·普通**逐名相同** | **5** | 与 AB·普通逐名相同 |
+  | **D·软链** | **3** | **只有三枚对照**（`TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119`＋`TestAC118…` 两枚），分母 **0** | **0** | — |
+
+- 基线六数对齐**第三本账**：票 124 批次 3b 交件的 `POST-P 普通 52/30/0/0＋22/0`、`POST-L 软链 45/27/0/3＋15/0`
+  （`docs/evidence/s1/124-ac2b-3b-conversion.md:220`、`:229`）与我这一程的基线两行**逐数相同**，测量方的中间那本也对得上
+  ⇒ 三本账同一版被测码，锚点漂移不成立（§0 的差集为空是同一件事的第二种量法）。
