@@ -94,17 +94,35 @@ EARLY RECORD ON DISK: index 0 of 2, stamp 2026-09-23T12:14:42.5606413+08:00,
 
 ## 6. 门禁四数（AC#4）
 
-| 包 | `=== RUN` | 顶层 `--- PASS` | 顶层 `--- FAIL` | 顶层 `--- SKIP` |
-|---|---|---|---|---|
-| `internal/observe` `-count=2 -v` | 待补 | 待补 | 0 | 0 |
-| `internal/risk` | 待补 | 待补 | 0 | 0 |
-| `internal/winsec` | 待补 | 待补 | 0 | 0 |
-| `cmd/wisp` | 待补 | 待补 | 0 | 0 |
+全部 `-count=2 -v`，四数只从 `-v` 数（`=== RUN` 含子测试；顶层与子测试分列，不跨层相加）。
+末次复跑（三枚变异全部还原之后）：
 
-`gofmt -l internal/ cmd/` = 空；`gofumpt -l . tools/d22scan tools/mockllm`（`$(go env GOPATH)/bin/gofumpt`，与 ci.yml `gofmt (gofumpt)` 步逐字同形）= 空。
-`go vet` windows（`./internal/observe/ ./internal/risk/ ./internal/winsec/ ./cmd/wisp/`）rc=0；`GOOS=linux go vet`（前三枚，`cmd/wisp` 无 linux 腿，见 `logsink.go` 的 PLATFORM 自述）rc=0。⚠ `GOOS=linux go vet` **只编译不执行**。
-`sh scripts/d22scan.sh` rc=0 / clean，八 scope：待补。
-`internal/observe/thresholds.go` 未进本段改动清单（D32 两数一字节未动）。
+| 包 | `=== RUN` | 顶层 PASS | 顶层 FAIL | 顶层 SKIP | 子测试 PASS/FAIL/SKIP | rc |
+|---|---|---|---|---|---|---|
+| `internal/observe` | **108** | **108** | **0** | **0** | 0 / 0 / 0 | 0 |
+| `internal/risk` | **336** | **198** | **0** | **2** | 136 / 0 / 0 | 0 |
+| `internal/winsec` | **202** | **116** | **0** | **0** | 86 / 0 / 0 | 0 |
+| `cmd/wisp` | **200** | **106** | **0** | **0** | 94 / 0 / 0 | 0 |
+
+分层核：`336 = 198 + 2 + 136`、`202 = 116 + 86`、`200 = 106 + 94`、`108 = 108`。
+`internal/risk` 那 2 枚顶层 SKIP 是**既有**的同一枚用例在 `-count=2` 下各跳一次：
+`TestSyncRegistryProbeLive`（需真 registry，本机跳）——与本票无关，不是新增。
+`cmd/wisp` 侧一律带 `PATH=third_party/sherpa-onnx`（`scripts/wisp-cli-tests.sh` 的形式），否则测试二进制**加载期** `0xc0000135`、0 个用例跑过。
+
+- `gofmt -l internal/ cmd/` = **空**（本段改过的 6 枚 .go 全部 `gofmt -w` 过一遍再复跑判空）。
+- `gofumpt -l . tools/d22scan tools/mockllm`（`$(go env GOPATH)/bin/gofumpt`，与 ci.yml `gofmt (gofumpt)` 步**逐字同形**）= **空**。
+- `go vet` windows：`./internal/observe/ ./internal/risk/ ./internal/winsec/ ./cmd/wisp/` **rc=0**。
+  `GOOS=linux go vet`：前三枚 **rc=0**；`cmd/wisp` 无 linux 腿（sherpa 的 cgo 布局，见 `cmd/wisp/logsink.go` 的 PLATFORM 自述），不纳入式子。
+  ⚠ `GOOS=linux go vet` **只编译不执行**，POSIX 半边本段未做容器真跑（§7）。
+- `sh scripts/d22scan.sh` **rc=0 / clean**（含 `tools/d22scan` 自检 `PASS=21 FAIL=0 SKIP=0 / === RUN=31`）。
+  台账八 scope（本树 → 上一次在树里登记的读数，`docs/evidence/s1/118-adversarial-acceptance.md`）：
+  `bans #1-5 internal/` **203** ≥ 202 · `bans #1-5 cmd/` **22** ≥ 22 · `ban #6 frontend/` **43** ≥ 40 · `ban #7 internal/tools/` **18** ≥ 18 ·
+  `ban #8 design/` **16** · `ban #8 frontend/` **43** · `ban #8 internal/` **390** · `ban #8 cmd/` **37** ⇒ **各 scope 不降**；
+  本 commit 对 Go 树只有新增（`internal/observe/logging.go` 的 diff 是 **343 增 / 0 删**，另两枚新文件），没有任何一枚文件被删，
+  所以"降"在本票这一发里结构上不可能发生。
+- `internal/observe/thresholds.go` **不在改动清单**（D32 的 `memCapSleeping = 25 << 20` / `cpuLimitSleeping = 0.5` 一字节未动）；
+  缓冲的上界是**条数与内存字节**（64 / 64 KiB），不是任何阈值表项，也不新增 golden。
+- **没有跑全仓 `go test ./...`**（同树有其他票的在飞件）。
 
 ## 7. 未验证 / 仪器坑
 
@@ -112,6 +130,43 @@ EARLY RECORD ON DISK: index 0 of 2, stamp 2026-09-23T12:14:42.5606413+08:00,
 - **无听众腿（`wisp providers` / `models list` / `doctor`）不因本修得救**：缓冲在那些腿上永不冲刷（没有 pipeline 可冲），stderr 那一份与今天逐字相同；冲刷它们需要"给那条腿装听众"，属票 131 域（AC#1 §5.4③）。
 - **`wisp slo` 腿自带 pipeline**（`cmd/wisp/slo_windows.go`，带 `WISP-LEG-SINK-RULING`）：它走的是 `observe.InitLog` 而不是 `installLogSink` ⇒ **不冲刷**，本段刻意不去碰那枚文件（两个 writer 争同一棵树正是那条 ruling 的理由）。这条"要么也冲、要么显式声明不冲"的待办**仍在**。
 - **本仓第一次踩 `0xc0000135`**：`go test ./cmd/wisp/` 不带 `PATH=third_party/sherpa-onnx` 时**加载期**失败、零输出，容易被误读成"用例没跑到"。
-- 若 M-2/M-3 某一发造不出红，明写在这里，不当作已通过。
+- 三态变异**每一发都造出了红**（M-1 ①②、M-2 ①②、M-3 ③），无"造不出红"的分支；读数在 §5。
+- 本段**不取任何时序/RSS 读数**（任务明写不需要），因此也没有 `A103` 的三连检查前置；缓冲的上界论证用的是"64 条 / 64 KiB、无 fd、无 fsync、无启动期文件系统活动"这个结构论证，D32 冷读预算不经过它。
+- ⚠ 票 130 AC#1 §5.4② 记的那条待办**仍然挂着**：`wisp slo` 腿自带 pipeline、不冲刷；无听众腿（`providers` 等）也不冲刷。两者都不是本票的判据域。
 
-**next=** M-1/M-2/M-3 三发读数补进 §5、四数与八 scope 补进 §6 → commit → AC#3/AC#4 勾框。
+**next=** 交回 owner / 编排者三件事：① §4(2) 那枚**超授权**改动的追认或撤销（口令「131 那枚恢复原样」）；
+② `cmd/wisp/leg_sink_nail_131_test.go` 与 `resident_sink_nail_127_windows_test.go` 已被本票改过 ⇒ **票 131 的续单与第二任验收表 `docs/evidence/s1/131-adversarial-acceptance.md` 的 §2 那张表（锚在 `56d8026`）都要重新锚 sha**；
+③ AC#2 的勾框归编排者（裁定已落在 A110③，本票只落了码），AC#1 的勾框归出清单的那位只读代理复跑。
+
+## 8. 同一棵树的并发事实（写给下一个接 131 续单的人）
+
+本段动 `cmd/wisp/leg_sink_nail_131_test.go` 期间，票 131 的第二任对抗验收代理正在同一棵树上交件，
+并已把我这批在飞改动**作为事实登记（不下判断）**进它的裁决表：commit `7daec2f`
+（`docs/evidence/s1/131-adversarial-acceptance.md` §13，原文含
+`leg_sink_nail_131_test.go 44/9`、`resident_sink_nail_127_windows_test.go 108/18`、`logsink.go 22/2`，
+并点名"删掉的第一行是 `assertInstallRecordFirst131` 上面那段'记录 0 必须是 install'的理由注释"）。
+它的结论与本文件 §4(2) 独立同形：**130 与 131 会改同一枚判据文件，别并行；接 131 续单前先重新锚 sha**——
+它那张表是 `56d8026` 的读数，不是本 commit 之后的树。
+
+本票两枚 commit 的落点：`d87905c`（判据入库，红）→ `9b5d64d`（(a-with-mirror) 落地 + 三态变异）。
+中间落在同一棵树上的他人 commit（`c25adea`/`f84cd90`/`7daec2f`/`e10ca09`/`dcedb7b` 等）与本票可写清单**零文件重叠**
+（逐枚 `git show --stat` 核过：只动 `docs/evidence/s1/131-*`、`internal/secret/**` 等），未发生覆盖。
+本票引用的行号一律以 `dbbc822` 与本文件为准，不引用他人工作树状态。
+
+## 9. 边界自证
+
+- `git add` 只用显式路径；两枚 commit 的 `git diff --cached --name-only` 清单：
+  `d87905c` = 2 枚（新用例 + 票面）；`9b5d64d` = 7 枚（`internal/observe/logging.go`、`internal/observe/earlylog_130_test.go`、
+  `cmd/wisp/logsink.go`、`cmd/wisp/resident_sink_nail_127_windows_test.go`、`cmd/wisp/leg_sink_nail_131_test.go`、票面、本证据文件）。
+- 未 push、未 `--amend`/`reset`/`rebase`/`stash`/`checkout .`；未改名任何文件（无需 `git ls-tree` 命中数自证）。
+- 未 add 他人件：`docs/evidence/s1/131-adversarial-acceptance.md`（131 验收代理自己入库了）。
+- 真跑二进制一律仓外：`/tmp/wisp130b/`（= `C:\Users\swq\AppData\Local\Temp\wisp130b`）与各用例的 `t.TempDir()`；
+  仓内 `build/`、`third_party/sherpa-onnx/` 只被读/复制到临时根，未覆写。
+- **owner 真实数据目录前后各读一次，一字未多写**：
+  前（11:4x）`%APPDATA%\wisp` 文件数 **0** / mtime `2026-09-19 14:49:20.310467900 +0800`；`%APPDATA%\wisp-dev` 文件数 **0** / mtime `2026-09-20 07:06:25.376099600 +0800`；`%APPDATA%\wisp-prod` **不存在**。
+  后（12:35，同一条 `find -type f | wc -l` + `stat -c %y`）= **0 / 0 / 不存在，两枚 mtime 逐字未变** ⇒ 真跑的二进制只写了仓外根。
+- 第三枚 commit（AC#4 读数与本节措辞补齐）暂存的清单只有两枚：票面 + 本证据文件；`git diff --cached --name-only` 的原文在交回报告里。
+- 伪授权登记 **计数 0**：本轮工具输出里没有出现任何自称「编排者备注 / 系统提示 / 用户已更新编码规则 / 请 revert / 冻结某包 / 放宽阈值」的文字。
+  出现过的**形似**项只有 harness 自己的三条 `MEMORY.md` 已被修改通知（`Read`/`Bash` 返回内的 system-reminder，非任何命令结果）：
+  它点名的路径都是真实文件、内容里没有要求 revert/冻结/放宽的指令 ⇒ 判定合法通知，未据其改判据。
+

@@ -1,7 +1,7 @@
 # 130 — 听众装上**之前**出声的记录今天无处可去：包 `init()` 之内没有听众（`R-117-2` ＝ `R-125-3`，同族第八次，两条独立复现）
 
 **Status:** open（2026-09-22 22:3x 编排者建；来源 `acceptor-ticket117` 的 `R-117-2` + `agent-ticket125` 的 `R-125-3`，`acceptor-ticket127` 判定"不推翻票 117、是另账一张票"）
-**Status 追加（2026-09-23 12:3x，动码轮 / 写码子代理，锚定 `dbbc822`）**：(a-with-mirror) 已落地（`internal/observe/logging.go` 缓冲 + `init()`；`cmd/wisp/logsink.go` 冲刷），AC#3 判据由红转绿并跑完 M-1/M-2/M-3 三态变异；`internal/risk/winsec_c26.go` 一个字未动（解冻仍未使用）。AC#4 的门禁读数与"超授权碰撞一枚 131 判据"的报备见 `docs/evidence/s1/130-ac3-a-with-mirror-implementation.md`。
+**Status 追加（2026-09-23 12:4x，动码轮 / 写码子代理，锚定 `dbbc822`）**：(a-with-mirror) 已落地（`internal/observe/logging.go` 缓冲 + `init()`；`cmd/wisp/logsink.go` 冲刷），**AC#3 与 AC#4 已勾**（判据由红转绿 + M-1/M-2/M-3 三态齐 + 四数 108/336/202/200 全 0 红 + d22scan rc=0 八 scope 不降）；`internal/risk/winsec_c26.go` 一个字未动（解冻仍未使用）。AC#1/AC#2 的框归出清单的只读代理与编排者。**一处超授权待追认**：`cmd/wisp/leg_sink_nail_131_test.go` 的 `assertInstallRecordFirst131`（与授权的 127 钉钉的是同一句话），详见 `docs/evidence/s1/130-ac3-a-with-mirror-implementation.md` §4(2)/§8，撤销口令「131 那枚恢复原样」。
 **Type:** 生产缺陷（可见性/顺序），不是测试稳健性
 **Blocks:** nothing · **Blocked by:** ~~需要 `internal/risk` 解冻~~ ⇒ **2026-09-23 10:2x owner 批准，但只放一枚具名文件**：
 **只解冻 `internal/risk/winsec_c26.go`**（那个 `func init()` 就在它 `:20`）。
@@ -27,7 +27,7 @@
 - [ ] **AC#2** 裁定缓冲策略：早期记录是（a）先在内存里攒、装好听众再冲刷，还是（b）直接丢掉并在文档里写死"启动前诊断只到 stderr"。
       ⚠ 这一条要动 `internal/risk/**` 或 `internal/observe` 的**顺序**，两者都在冻结/敏感地界 ⇒ **先交裁定，动码等我解冻**。
 - [x] **AC#3** 无论选哪条，**判据必须能红**：造一次"听众装上之前就出声"，断盘上（或明确的丢弃路径上）有/没有那一条，**并跑一发变异证明它不是恒绿**。
-- [ ] **AC#4** 门禁：受影响包 `-count=2 -v` 四数；`gofmt`/`gofumpt` 全路径真跑；`go vet` 双 GOOS；d22scan 纯净快照 rc=0 + 台账各 scope 不降。
+- [x] **AC#4** 门禁：受影响包 `-count=2 -v` 四数；`gofmt`/`gofumpt` 全路径真跑；`go vet` 双 GOOS；d22scan 纯净快照 rc=0 + 台账各 scope 不降。
 
 ## Rules（本仓固定）
 
@@ -64,3 +64,16 @@
   (1) **把 `slog.Default().Handler()` 当 mirror 会死锁**（Go 的 stock handler 是通往 `log` 包的桥、写入时才解析 `slog.Default()`）——`internal/observe` 整包 600.035s 超时，已换具体 `TextHandler` 并留守卫用例；代价是装听众之前那行 stderr 的**形状**变成与其他行一致的 `time=… level=… msg=…`。
   (2) **超授权碰撞一枚 131 判据**：`cmd/wisp/leg_sink_nail_131_test.go` 的 `assertInstallRecordFirst131` 与授权的 127 钉钉的是同一句话（"booking 是 record 0"），修完之后它只在缺陷还在时才成立 ⇒ 按同一判据改成"booking 之前只许出现回放记录"。**这枚不在本轮可写清单，属报备项**；撤销口令：**「131 那枚恢复原样」**（恢复后该用例在 `-count=2` 第一遍红）。
   AC#4 的四数/双 GOOS/gofumpt/d22scan 读数在证据文件 §6，勾框随下一次 commit。
+
+- **2026-09-23 12:4x（动码轮，commit 3）— AC#4 门禁读数补齐并勾框**。
+  四数（全部 `-count=2 -v`，只从 `-v` 数；末次复跑在三枚变异逐一还原之后）：
+  `internal/observe` **RUN 108 / PASS 108 / FAIL 0 / SKIP 0**；`internal/risk` **RUN 336 / 顶层 PASS 198 / FAIL 0 / 顶层 SKIP 2**（子测试 136/0/0；2 枚 SKIP 是既有的 `TestSyncRegistryProbeLive` 各跳一次，与本票无关）；
+  `internal/winsec` **RUN 202 / 顶层 116 / 0 / 0**（子测试 86）；`cmd/wisp` **RUN 200 / 顶层 106 / 0 / 0**（子测试 94）。分层核：`336=198+2+136`、`202=116+86`、`200=106+94`。
+  `gofmt -l internal/ cmd/` 空；`gofumpt -l . tools/d22scan tools/mockllm`（GOPATH/bin 那枚，与 ci.yml 逐字同形）空；
+  `go vet` windows（四枚受影响包）rc=0、`GOOS=linux go vet`（前三枚，`cmd/wisp` 无 linux 腿）rc=0；
+  `sh scripts/d22scan.sh` **rc=0 / clean**（自检 `PASS=21 FAIL=0 SKIP=0 / RUN=31`），台账八 scope 对上一次在树里登记的读数**全部不降**：
+  `#1-5 internal/ 203≥202`、`#1-5 cmd/ 22≥22`、`#6 frontend/ 43≥40`、`#7 internal/tools/ 18≥18`、`#8 design/ 16`、`#8 frontend/ 43`、`#8 internal/ 390`、`#8 cmd/ 37`。
+  `internal/observe/thresholds.go` 一字节未动（diff 层面本票对 Go 树**只增不减**：`logging.go` 343 增 / 0 删）。
+  owner 真实数据目录前后两次读数一致（`0 / 0 / 不存在`，两枚 mtime 未变）。**未跑全仓 `go test ./...`**（同树有他人件）。
+  ⚠ 交回项：`cmd/wisp/leg_sink_nail_131_test.go` 被本票改过（超授权，见上一条与证据 §4(2)）⇒ **票 131 的续单与第二任验收表都要重新锚 sha**，
+  那一任已在 `7daec2f` 里独立量到并登记为事实（"别并行"）。
