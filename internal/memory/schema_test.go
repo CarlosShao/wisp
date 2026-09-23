@@ -11,10 +11,12 @@ import (
 	"time"
 )
 
-// openTestStore opens a Store in a fresh t.TempDir subdirectory.
+// openTestStore opens a Store in a fresh sealableTempDir124 subdirectory. Every
+// case in this package that goes through it inherits ticket 119's resolved data
+// root, which is why no DAO case has to spell the resolution itself.
 func openTestStore(t *testing.T, opts ...Option) *Store {
 	t.Helper()
-	dir := filepath.Join(t.TempDir(), "data")
+	dir := filepath.Join(sealableTempDir124(t), "data")
 	s, err := Open(dir, opts...)
 	if err != nil {
 		t.Fatalf("Open: %v", err)
@@ -378,7 +380,7 @@ func withTestMigration(t *testing.T, next func(tx txExec) error) Option {
 }
 
 func TestMigrationChainWithBackup(t *testing.T) {
-	dir := filepath.Join(t.TempDir(), "data")
+	dir := filepath.Join(sealableTempDir124(t), "data")
 
 	// 1. Create a v1 database with data in it.
 	s1, err := Open(dir)
@@ -454,7 +456,7 @@ func TestMigrationChainWithBackup(t *testing.T) {
 // (SPEC-02 §7): a step that fails mid-way must leave the watermark and the
 // schema untouched, with the pre-backup in place for manual recovery.
 func TestMigrationFailedStepIsAtomic(t *testing.T) {
-	dir := filepath.Join(t.TempDir(), "data")
+	dir := filepath.Join(sealableTempDir124(t), "data")
 	s1, err := Open(dir)
 	if err != nil {
 		t.Fatal(err)
@@ -506,7 +508,7 @@ func TestMigrationFailedStepIsAtomic(t *testing.T) {
 }
 
 func TestMigrationNewerSchemaIsUnmigratable(t *testing.T) {
-	dir := filepath.Join(t.TempDir(), "data")
+	dir := filepath.Join(sealableTempDir124(t), "data")
 	s, err := Open(dir)
 	if err != nil {
 		t.Fatal(err)
@@ -560,7 +562,7 @@ func TestMigrationNewerSchemaIsUnmigratable(t *testing.T) {
 }
 
 func TestMigrationForeignDatabaseIsUnmigratable(t *testing.T) {
-	dir := filepath.Join(t.TempDir(), "data")
+	dir := filepath.Join(sealableTempDir124(t), "data")
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		t.Fatal(err)
 	}

@@ -28,9 +28,12 @@ type errNotFound struct{}
 func (errNotFound) Error() string { return "fake: ref not found" }
 
 // writeConfigFile writes content to a temp config.toml and returns its path.
+// The temp base goes through sealableTempDir124 (ticket 119's resolved data
+// root), so a migration that rewrites this file through SaveFile is not refused
+// by the sealing floor for reasons unrelated to what the caller asserts.
 func writeConfigFile(t *testing.T, content string) string {
 	t.Helper()
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	path := filepath.Join(dir, "config.toml")
 	if err := os.WriteFile(path, []byte(content), 0o600); err != nil {
 		t.Fatal(err)
@@ -273,7 +276,7 @@ func TestLoadFileNewerSchemaVersionRejected(t *testing.T) {
 }
 
 func TestSaveFileRoundTripsThroughLoad(t *testing.T) {
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	path := filepath.Join(dir, "config.toml")
 	c := NewDefaults()
 	c.SchemaVersion = SchemaVersionCurrent

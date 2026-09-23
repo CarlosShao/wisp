@@ -16,7 +16,7 @@ import (
 // from the ticket-04 schema to the ticket-09 schema.
 
 func TestMigrateSeededV1DatabaseToV2(t *testing.T) {
-	dir := filepath.Join(t.TempDir(), "data")
+	dir := filepath.Join(sealableTempDir124(t), "data")
 
 	// 1. Create a genuine v1 database via the production chain pinned to
 	// target 1 (what the ticket-04 binary produced), then seed rows through

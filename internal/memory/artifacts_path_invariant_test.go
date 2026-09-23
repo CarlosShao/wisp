@@ -120,7 +120,7 @@ func inv76Shapes(artifactsDir, dataDir, userDir string) []inv76Shape {
 // and plants one canary per hostile shape plus two legitimate artifacts.
 func inv76Fixture(t *testing.T) (*Store, string, string, string, []inv76Shape) {
 	t.Helper()
-	root := t.TempDir()
+	root := sealableTempDir124(t)
 	dataDir := filepath.Join(root, "data")
 	userDir := filepath.Join(root, "Users", "carlos", "Documents")
 	if err := os.MkdirAll(userDir, 0o755); err != nil {

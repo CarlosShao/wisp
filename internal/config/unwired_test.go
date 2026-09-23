@@ -84,7 +84,7 @@ block_private_ranges = true
 		}
 	})
 	t.Run("SaveFile output reloads", func(t *testing.T) {
-		dir := t.TempDir()
+		dir := sealableTempDir124(t)
 		path := filepath.Join(dir, "config.toml")
 		if err := SaveFile(path, NewDefaults()); err != nil {
 			t.Fatal(err)

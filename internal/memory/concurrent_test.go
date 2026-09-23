@@ -221,7 +221,11 @@ func TestCrashRecoveryKillMidWrite(t *testing.T) {
 	if os.Getenv("WISP_CRASH_CHILD") == "1" {
 		t.Skip("parent test; the child role is TestSubprocessCrashWriter")
 	}
-	dir := filepath.Join(t.TempDir(), "data")
+	// The resolved spelling is what the child receives below: this dir travels
+	// into WISP_CRASH_DIR, and a child handed the unresolved one cannot open the
+	// store at all - it then reports 0 committed rows, which is not the failure
+	// this case is looking for. See sealableTempDir124.
+	dir := filepath.Join(sealableTempDir124(t), "data")
 
 	cmd := exec.Command(os.Args[0], "-test.run=^TestSubprocessCrashWriter$", "-test.timeout=60s")
 	cmd.Env = append(os.Environ(), "WISP_CRASH_CHILD=1", "WISP_CRASH_DIR="+dir)

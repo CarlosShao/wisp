@@ -185,7 +185,7 @@ func fullConfig(t *testing.T) *Config {
 // ticket AC): save -> load -> save -> load yields identical structs.
 func TestRoundTripLoadMarshalLoad(t *testing.T) {
 	c := fullConfig(t)
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	path := filepath.Join(dir, "config.toml")
 	if err := SaveFile(path, c); err != nil {
 		t.Fatalf("save: %v", err)
@@ -233,7 +233,7 @@ func TestRoundTripBytes(t *testing.T) {
 // writes refs, never resolved plaintext.
 func TestResolvedNeverPersists(t *testing.T) {
 	c := fullConfig(t)
-	dir := t.TempDir()
+	dir := sealableTempDir124(t)
 	path := filepath.Join(dir, "config.toml")
 	if err := SaveFile(path, c); err != nil {
 		t.Fatal(err)
