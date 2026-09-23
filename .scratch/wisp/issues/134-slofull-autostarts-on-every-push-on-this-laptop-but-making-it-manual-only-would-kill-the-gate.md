@@ -50,11 +50,22 @@ A 我不做，除非 owner 明说"就要 A"。
 ## AC（1:1，裁决表 `docs/evidence/s1/134-*.md` 由**非实现者**出）
 
 - [x] **AC#1** 形状由 owner 认（A/B/C 或组合），票面 append 一条"批的是哪个、为什么"。**没有这一条不许动 `ci.yml`。**
-- [ ] **AC#2** 改动落地后**必须真跑出一枚 run id + job id + step 名 + 结论**（说不出这四项就当门不存在）。
+- [x] **AC#2** 改动落地后**必须真跑出一枚 run id + job id + step 名 + 结论**（说不出这四项就当门不存在）。
+      ⇒ **run `35810714576` / job `107021435150` / step 5 `SLO full gate (six states + settle + leak)` / 结论 `success`**
+      （self-hosted `wisp-slo`，02:31:49Z→02:34:30Z，162 s；那枚 run 里的 `scripts/slo-check.ps1` 与我 `e951dfa`
+      的 blob **逐字节相同** `560186fa…`）。取证侧 `A103④` 三连读数在 `docs/evidence/s1/134-ac2-ac3-trigger-and-freshness-pin.md` §1a。
       ⚠ 本机 runner 的读数窗口要避编队忙时：`A103④` 三连检查在**取证侧**也要走一遍。
-- [ ] **AC#3** **反静默死用例**：造一枚能红的钉——"若 `slo-full` 连续 N 天没有任何一次被触发的记录，就红"
+      ⚠ 两格边界（不拿本地绿替代）：这枚 run 只含 **C 那一半**改动——`schedule` 那一半在 GitHub 侧**触发次数 0**
+      （cron 只对默认分支求值，见 §2），且 `test-windows` 未收尾 ⇒ 该 run 的**步级日志文本**还没取到。
+- [x] **AC#3** **反静默死用例**：造一枚能红的钉——"若 `slo-full` 连续 N 天没有任何一次被触发的记录，就红"
       （或等价形状：把触发器写进一枚被 CI 自己检查的清单）。**这一条是本票的判据核心**：
       没有它，本票就是在"把门换成没有门"之间做了个没人会发现的交易。
+      ⇒ `scripts/slo-freshness.sh`（两道探针：P1 静态查 `ci.yml` 触发清单 + `slo-full` job 体无 `if:`/`continue-on-error`；
+      P2 动态查 GitHub 上最近一枚 `slo-full` job 的年龄 > 3 天即红、未完成的 job 排队 >12 h 也即红）
+      + `.github/workflows/slo-fresh.yml`（**自带时钟**：`schedule` + `workflow_dispatch`，`ubuntu-latest`，
+      `permissions: actions read`，无 `if:`/无 `continue-on-error`；钉不能住在被测的那枚 job 里，也不能跟它共用触发器）。
+      变异三态（红→绿→红）11 发逐发还原：见同一份证据 §3a（S2 红 → S3 放宽阈值变绿 → S4 还原又红；
+      S5/S7/S10 删触发器/塞 `if:` 结构变异各红一次，全部只在 `/tmp` 副本上做，真文件 `grep` 命中 0 无残留）。
 - [x] **AC#4** 若选 C：`slo-check.ps1` 的有效性检查**只许往"更常拒绝出数"的方向改**，
       **D32 的两个阈值一个字节不动**；并要证明"机器忙 ⇒ 报 `machine-contended` 而不是报一个数字"这一形**真能触发**（造一次并发负载，贴读数）。
       ⇒ 读数在 `docs/evidence/s1/134-ac4-machine-contended-readings.md`（三态：真 `go.exe` 负载 / "runner 目录下的进程" / 安静放行）。
@@ -95,3 +106,28 @@ A 我不做，除非 owner 明说"就要 A"。
   以及**改动后完整六态仍能跑通**（本地那发用的是假 exe）——两格都等 push 后的真 run 回读。
   ⚠ 期间踩到一次仪器坑：造负载的 bash 链整体被 `&` 吞后台 ⇒ 门禁先起跑、报了个假的 `precheck ok`；
   重发前先 `tasklist` 确认 pid 活着才拿到真读数。next=AC#2 的 `schedule` + AC#3 的钉
+- [2026-09-23 10:40 +08] agent=agent-ticket134 did=**AC#2 + AC#3 结**（读数全在
+  `docs/evidence/s1/134-ac2-ac3-trigger-and-freshness-pin.md`）。
+  **AC#2**：`ci.yml` 的 `on:` 只多两行（`schedule: - cron: '37 19 * * *'` = 19:37 UTC = 03:37 +08），
+  `slo-full` 那一段只加注释；YAML 解析器复核三行：`job count = 6`／`all six present = True (missing: [] extra: [])`／
+  `runs-on` 分布 `ubuntu-latest 3 · windows-latest 2 · self-hosted+wisp-slo 1`，且 `group` 与 `cancel-in-progress`
+  两行在 `:50/:51` 原样回显。真 run 四项 = **run `35810714576` / job `107021435150` / step 5
+  `SLO full gate (six states + settle + leak)` / 结论 `success`**（162 s；该 run 的 `scripts/slo-check.ps1` blob
+  与我 `e951dfa` 的**逐字节相同**，`git merge-base --is-ancestor e951dfa 58302cc` rc=0，`origin/dev` 含之）。
+  ⚠ 我**没有 push**：那枚 run 是别人的 commit 把我的 commit 一起带上去才存在的。取证侧 `A103④` 三连读数=
+  1 枚在飞 run + Worker 日志 mtime 距今 2 s + 3 枚 `actions-runner\_work` 下的 `wisp.exe` ⇒ 那一轮之内我零取样。
+  **AC#3**：新钉 `scripts/slo-freshness.sh` + `.github/workflows/slo-fresh.yml`（自带 `schedule` 与
+  `workflow_dispatch`，`ubuntu-latest`，`permissions: actions read`，无 `if:`／无 `continue-on-error`）。
+  变异三态 11 发逐发还原：基线 rc=0 → 喂 10 天前的记录 **rc=1** `slo-full-stale` → `SLO_FULL_MAX_AGE_DAYS=30`
+  **rc=0**（红确实是阈值咬的，不是常数红）→ 还原 **rc=1**；结构变异三次 **rc=1**（删 `cron:`、删 `push:`、
+  给 `slo-full` 塞 `if:`），另两支 `slo-full-never-triggered`、`queued` 13 小时 各 **rc=1**；全部还原后 rc=0，
+  真 `ci.yml` grep 残留命中 0。**地界交代**：本票比简报的可写清单多出**两枚新文件**（那枚脚本 + 那个 workflow），
+  理由是结构性的——钉不能住在 `slo-full` 自己身上（只有被触发才跑＝循环），也不能共用 `ci.yml` 的触发器
+  （会跟门一起死），所以它必须自带时钟；`ci.yml` 的**其他五枚 job 一个字节没动**、"6 枚 job"这条仪器读数原样成立。
+  ⚠ 未验证三格：`schedule` 在 GitHub 侧**触发 0 次**（cron 只对默认分支求值，需进 `main`）、
+  那枚 run 的**步级日志文本**取不到（`run 35810714576 is still in progress`，`test-windows` 未收尾）、
+  钉自己在 CI 上的第一次执行**说不出 run id**；本机 `shellcheck` 没装（只做到 `sh -n` rc=0）。
+  ⚠ 共树插曲：我第一次 `git diff --cached --name-only` 时索引里同时躺着票 128 代理暂存的两枚文件，
+  `git commit -- <显式路径>` 的 pathspec 把它们排除在外（`e951dfa` 实测只含我这 3 枚路径），
+  它们随后由代理自己以 `58302cc` 入库——**我没有替任何人 add 或 commit 它的东西**。
+  next=AC#5 门禁复跑（d22scan 纯净快照 + scope 不降）并把状态改成 ready-for-review

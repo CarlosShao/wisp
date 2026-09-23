@@ -1,0 +1,68 @@
+name: slo-fresh
+
+# Ticket 134 AC#3 - the anti-silent-death nail, and the ONLY reason this file
+# exists.
+#
+# slo-full is the merge gate for D32's two hard thresholds (Sleeping CPU
+# <=0.5%, RSS <=25MB) and it can only run on one machine: the self-hosted
+# wisp-slo runner that is this laptop (ci.yml, A103). Decoupling it from the
+# review fleet's CPU (ticket 134) was accepted only on the condition that the
+# gate can never quietly stop producing verdicts - a job that exists but is
+# never triggered is exactly the disease tickets 85 and 71 were filed about, and
+# ci.yml already says "A skippable job is a job that will one day be skipped".
+#
+# So the nail cannot live inside ci.yml's slo-full job (that job only runs when
+# it is triggered, which is the thing being checked) and it cannot share the
+# `ci` workflow's triggers either, because then it dies in the same commit that
+# kills slo-full. It gets its own clock: a schedule plus a manual entry point,
+# on a hosted runner, asking GitHub when slo-full last ran.
+#
+# What makes it red (stable tokens, see scripts/slo-freshness.sh):
+#   slo-full-trigger-missing   the trigger block / the job body was edited away
+#   slo-full-never-triggered   no slo-full job in the 25 newest ci runs
+#   slo-full-stale             newest trigger record older than 3 days
+#
+# No `if:`, no continue-on-error, no path filter, no skip flag (D22 mode-6).
+# Like every other cron here, this schedule is only evaluated for the config on
+# the DEFAULT BRANCH, so it is inert until this file reaches main - stated as a
+# limit, not as an effect (ticket 134 AC#2 records the same caveat for ci.yml).
+# Until then the nail still runs on every workflow_dispatch.
+
+on:
+  schedule:
+    # 23 past every 6th hour: the first reading lands ~4h after ci.yml's nightly
+    # slo-full run (19:37 UTC), so a missing nightly verdict is reported the same
+    # UTC day instead of a day later.
+    - cron: '23 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  # ------------------------------------------------------------- slo-fresh --
+  slo-fresh:
+    name: slo-full-must-keep-getting-triggered
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: slo-full freshness pin (ticket 134 AC#3)
+        env:
+          # Read-only: the probe asks GitHub when the slo-full job last ran.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: sh scripts/slo-freshness.sh
+
+      - name: Shell lint for the pin
+        # Same instrument CI already uses for the other scripts (ticket 111
+        # AC#5): syntax first, then shellcheck. A missing shellcheck is a hard
+        # error, not a warning - a lint step that quietly does nothing is the
+        # exact shape this whole ticket exists to refuse.
+        run: |
+          sh -n scripts/slo-freshness.sh
+          command -v shellcheck >/dev/null 2>&1 || {
+            echo "shellcheck is not on this runner image: the lint step cannot lint" >&2
+            exit 1
+          }
+          shellcheck -s sh scripts/slo-freshness.sh

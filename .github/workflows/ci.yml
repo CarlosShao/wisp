@@ -11,6 +11,30 @@ on:
   pull_request:
   push:
     branches: [main, dev]
+  # Ticket 134 AC#2 (shape B, owner-approved "C 为主 + B 为辅" 2026-09-23):
+  # a daily trigger nobody has to press. This does NOT replace the push
+  # trigger above - shape C (the sampling-validity precheck in
+  # scripts/slo-check.ps1) is what keeps a contended sample from pretending to
+  # be a verdict, and C's cost is that a busy machine has to be re-run. B pays
+  # for that: at 19:37 UTC (03:37 local on the wisp-slo laptop, when the review
+  # fleet is asleep) the same six-state gate gets one interference-free shot at
+  # D32 every day.
+  #
+  # Three limits stated plainly, none of them is "already in effect":
+  #   1. GitHub evaluates cron ONLY against the config on the DEFAULT BRANCH
+  #      (main). Until this file reaches main this schedule fires zero times -
+  #      on dev it is inert by design, not a bug to be fixed with a push.
+  #   2. Scheduled runs are best-effort and can be delayed at peak times
+  #      (GitHub documents minutes-long latencies), so the pin in
+  #      .github/workflows/slo-fresh.yml is what actually detects a gap.
+  #   3. A scheduled run executes ALL SIX jobs of this workflow, not just
+  #      slo-full: narrowing it would need an `if:`, and D22 mode-6 bans that.
+  #      Accepted cost: hosted minutes for lint/test-core/test-windows/
+  #      slo-smoke/lint-frontend each night.
+  # No `if:`, no continue-on-error, no skip flag anywhere in this block
+  # (D22 mode-6: "A skippable job is a job that will one day be skipped").
+  schedule:
+    - cron: '37 19 * * *'
   workflow_dispatch:
 
 concurrency:
@@ -487,6 +511,17 @@ jobs:
   # (interactive desktop-capable machine, label wisp-slo). Same script as
   # slo-smoke - only the subset differs (SPEC-10 §3: script identical,
   # scope unchanged). Merges require this green locally/self-hosted.
+  #
+  # Ticket 134 (shape C + B): the triggers stay - push keeps the merge gate
+  # live per commit and the daily schedule adds one interference-free sample.
+  # What changed is what a red MEANS: scripts/slo-check.ps1 now refuses to
+  # produce numbers when the machine is busy (its log says "machine-contended",
+  # D32's thresholds are not evaluated at all on that path). A machine-contended
+  # run is a VALIDITY failure, not a performance regression: re-run it when the
+  # laptop is quiet, and never read a D32 number out of it. That refusal is
+  # deliberately not a skip (no `if:`, no continue-on-error, no -Skip switch) -
+  # D22 mode-6. If this job ever stops being triggered altogether, the pin in
+  # .github/workflows/slo-fresh.yml goes red (ticket 134 AC#3).
   slo-full:
     runs-on: [self-hosted, wisp-slo]
     env:
