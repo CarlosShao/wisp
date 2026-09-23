@@ -266,9 +266,41 @@ package github.com/CarlosShao/wisp/cmd/wisp
 - 递根点 30 处（tools 22 行 / llm 1 / perm 6 / approval 1），对应 43 枚（llm 的 1 处 fixture 覆盖 17 枚；tools 的 fs_write 3 处覆盖 4 枚含两子测试）。
 - 未动：`internal/tools/wiring_test.go`（票 123 两枚）、`internal/tools/paths_ticket107b_probes_test.go` 的 ProbeA/ProbeB 与 `ticket107_portable` 非红枚、`fs_write_test.go`/`paths_workspace_test.go`/`pathshape_portable_test.go` 里服务非红用例的 `tempRaw`/`t.TempDir()` 站点、`internal/winsec/**`、`internal/risk/**`、`internal/memory/**`、`internal/config/**`、`cmd/wisp/**`。
 
-## 9. 未验证项 + `next=`
+## 9. 未验证项 + `next=`（本接续方 `worker-ticket124-ac2b-2-r2` 补，2026-09-23 20:3x +8）
 
-待量后写。
+**未验证项（照实列，不含"我相信"）**：
+
+1. **macOS 那一半仍然没有实测。** 仓库只注册一枚 self-hosted runner（`gh api repos/{owner}/{repo}/actions/runners` ⇒ `wisp-selfhosted-01`，`os=Windows`，`status=online`），没有 macOS runner。而票面《事实》第 3 条明写这一族"代表的是 **macOS 的真实形状**（`TMPDIR` 在 `/var` 之下，而 `/var` 是符号链接）"⇒ 本批（前任 §2-§6 ＋ 本方 §7）全部读数都是 **Linux 容器 `golang:1.27` + `ln -s /realpriv /varlink` 的代理形状**，不是 macOS 真机。"这 43 枚在 macOS 上会同样转绿"是**外推**。与 AC#2a §7 未验证项 1、票 119 `R-119-8` 同账。
+2. **CI 两腿对本票判据零信号（不等于"CI 清白"）。** 本批四包都在 CI 清单里（`scripts/portable-tests.sh:173-179` 的 `--scope=core` 逐条含 `./internal/agent/ ./internal/agent/approval/`、`./internal/llm/...`、`./internal/tools/...`、`./internal/perm/`），但 ubuntu 腿 `/tmp` 是真目录、windows 腿 `%TEMP%` 不带链接 ⇒ 软链形在 CI 上**没有分母**，这一族在 CI 恒绿。实测账：近 6 枚 push 触发的 `ci` run（`35840958334`/`35843139130`/`35845195469`/`35848845645`/`35848981451`/`35856629513`）`test-core` **6/6 `success`**、`test-windows` **6/6 `failure`**；其中三枚的 `headSha`（`4a23de5`/`3d43c3f`/`b45d74d`）已用 `git merge-base --is-ancestor dfa3dc4 <sha>` 逐枚核为**带着本批改件码**。本方逐 job 读的那枚（`35856629513`）红在 `lint`（`staticcheck` 一步）与 `test-windows`（逐名只两枚包：`cmd/wisp`、`internal/risk`），**无一枚属本批四包**。⚠ `e113b1a` 已随 `b45d74d` 那次 push 进了两枚远端（`git branch -r --contains e113b1a` ⇒ `origin/dev`、`cnb/dev`），但一次 push 只跑尖端 ⇒ CI 上**不存在**以 `e113b1a` 为 `head_sha` 的 run（最新一枚 `35859261431`，`headSha=03f87f4`，12:14:38z，整体 `failure`）；⇒ "CI 看不见这一族"成立的原因是**形状不在 CI 的任何一台 runner 上**，不是"没推上去"。
+3. **票 123 的 300 s 腿本批一枚都没修，§7 里它们仍是 6 行红。** `TestL1WriteGoesThroughTheRealBlockWindow`、`TestLateVetoRendersTheApprovalLayersAppliedStepsReport`（票面点名的两枚）、`TestFSReadOnlyNeverOpensACard`（§1 新登记的同族第三枚）× `-count=2` ⇒ 各 `300.0x s`。⇒ 已知遗留，不是"43 枚没转绿"，也不是门禁破口；**归口票 123**。
+4. **`-count=2` 的 tools 软链形是计时读数，包级 `-timeout` ≥ 50m 是硬要求。** 前任 §7 待量期间遗留那一发（`/d/tmp/wisp124-2b2-logs/POST-L2.*`，19:19–19:21，`-timeout 25m`）以 `panic: test timed out after 25m0s` 收（该日志 `:390`），四数**被截断**：`RUN=156`（而非 `2×79=158`）、`FAIL=4`（而非 6）、`PASS=117`（而非 118）⇒ 那是**分母缩小**、不是变绿，本方不改它、只按名保留。同一次容器复用还让普通形那发撞了 `exit 99`（`RUN-COUNT2.out.txt` 第二段：`SHAPE_ASSERT_FAILED plain form must not have /varlink at all`）⇒ **普通形 `-count=2` 前任没有读数**。本方 §7 用 60m + 每形一枚新容器补上（`test timed out` 命中 0）。⚠ 这是补 §7 的空格；**§2-§6 的读数一枚未复跑、一行未改**，两形四数与 §2 逐数吻合（正好 2 倍）⇒ 无分歧。
+5. **宿主（Windows）侧没有四包的 `-count=2` 四数**：AC#5 的四数在容器两形取；Windows 的 `%TEMP%` 不属本票形状，未量（票面亦未要求）。同理宿主那一发 `GOOS=linux go vet` 是**交叉**，结构上到不了类型检查（§7.4 已逐行归因），真读数在容器那发。
+6. **全树终判据未复算**（票面 16:33 那条"软链形红名数＝0"）——票面已定"留到 2b-4 交回后一次性复算"⇒ **AC#2 本格不翻**、AC#2b 各批格也不由本方翻。
+7. **判据④（探针台）与判据⑤（变异台）的原始台子本方未复跑、未复核**（派单禁令）。§10 的临时件清单里前任仍写着"（探针/变异台目录待量后登记）"——本方**不动那一节**（它不归本接续方），只按名保留盘上目录 `/d/tmp/wisp124-2b2-{probe,mut}`。
+
+**`next=`（写给 2b-3 与 2b-4；交编排者）**
+
+- **2b-3＝`internal/agent` 26 ＋ `internal/winsec` 17 = 43 枚。**
+  - ⚠⚠ **`internal/winsec` 那 17 枚不许照抄本批这枚委托**（批次 1 的 `next=` 点过；本方把它三条实据逐字核了一遍，全部成立）：
+    ① 票 119 面 `R-119-9`（`.scratch/wisp/issues/119-posix-link-leg-refuses-legitimate-symlinked-data-roots.md:73`）原文——"**不许拿被测函数算 fixture。** 一枚用例的期望值只能来自文件系统或调用方自己声明的字面值，不能来自被测函数（含其幂等组合）：`SealableRoot(base)` 当期望值 ⇒ 把'声明的树原样返回'这条纪律抹掉也照样绿"；
+    ② 这条纪律**已经写进 winsec 的码**：`internal/winsec/dataroot_symlink_119_other_test.go:108-111` 逐字——`cleanSpelling119` "It is **deliberately filepath.EvalSymlinks and not proc.SealableRoot**: the latter is what several of these cases exist to test, and an expectation computed by the function under test cannot fail."（同形还有 `placement_leaf_118_other_test.go:37` 的 `leafLinkTo118` 与 `seam_probe_root_125_other_test.go:84`）；
+    ③ `internal/proc/envfork.go:148` 的边界话是 "…never case-folds, and **nothing in internal/winsec calls it**" ⇒ 一旦 2b-3 让 winsec 的测试去调 `proc.SealableRoot`，这句注释当场腐坏（改注释＝动被冻结的边界话，属于要报的偏离）。
+    ⇒ 那一包**要么**沿用票 125 的先例、自带走法（只用文件系统自己给的答案），**要么停下报编排者**。别为了"四批统一形状"把 R-119-9 那一族恒真用例做回来。
+  - ⚠ winsec（与 config）的 POSIX 用例全在 `*_other_test.go`（`//go:build !windows`）⇒ 在宿主上**连编译都不参与**；改完只在容器里读，别拿宿主 `go build ./...` 的绿当清白。
+  - ⚠ 两形四数要预留**形状自带 SKIP**：AC#1 附带发现 1 记录软链形有 4 枚从"跑"变成"SKIP"（`internal/winsec` 3 枚 `TestAC2POSIX…125` seam 探针 + `internal/config` 1 枚，后者已由批次 1 §4 逐名解释）。2b-3 若见 winsec 两形 `RUN`/`SKIP` 不等（AC#1 那本是 `45→52`），那是**形状副作用**、不是本批破口，但必须逐名写进解释，不许算进"归零"也不许算进"红"。
+  - `internal/agent` 那 26 枚可沿用本批形状，且**只需一枚单行委托**：涉事 7 枚文件（`spill_path_invariant`/`spill_name_injectivity`/`spill_test`/`forensics`/`guard`/`truncation`/`loop_golden`，本方逐枚 `grep '^package '` 核过）全在 `package agent` 内 ⇒ 不存在 tools 那种内/外双包问题。账 §5.2 已写明 26 枚的红只有两种串、且全部落在 setup（`memory.Open` / `NewSpiller`+`Prepare`）⇒ 递根点数应远小于枚数（照 llm 那本账"1 处 fixture 覆盖 17 枚"预期）。
+  - ⚠ 跑法账：把 agent + winsec 并进软链形时，包级 `-timeout` 按**包内最长腿 ×2** 抬（本批 tools 软链形 `-count=1` 就要 `903.5 s`、`-count=2` 要 `1806.9 s`）；判据③要两形各一枚，且**每形一枚新容器**（§9 未验证项 4 那一发就是复用容器撞的 `exit 99`）。
+- **2b-4＝`cmd/wisp` 5 枚。**
+  - 名册（账 §5.9 逐枚）：4 枚顶层 `providers_test.go:133`/`:179`/`:208`/`:228`，全部经同一枚 `newProvidersFixture(t)` ⇒ **一处递根覆盖 4 枚**；另 1 枚子测试 `TestSecretFailurePathsLogAndPrintNoPlaintext/unset_name_(no_such_blob)`，断言原文在 `secret_test.go:679`，软链形实拿 `secret: create /varlink/…: refusing to seal … not provably resolved`。
+  - ⚠ **同包另有 28 枚两形都红**（逐名清单 `docs/evidence/s1/124-ac1-denominator-readings.md:931`；那批错误原文里 `DPAPI is only available on Windows` 命中 20 处）⇒ 与本票形状**无关**（普通形同红），归票 119 `R-119-7` 那本账。2b-4 一枚都不许顺手"修绿"；反过来也不许因为包级 `FAIL≠0` 就把自己那 5 枚判成没转绿：**判据是逐枚点名，不是包级 rc**。
+  - ⚠ 地界是**文件级**：`cmd/wisp/**` 兄弟票正在动——`cmd/wisp/leg_dispatch_gate_133_test.go` 系票 133 在 `fafe2b4..dfa3dc4` 之间新增（§7.5 台账 ban #8 `cmd/` 37→38 就是它，非本批）。票面明写 2b-4 仍排在 `acceptor-ticket131-r3` 交回之后；动码前先按名核清哪枚文件有谁在飞。
+- **全树终判据怎么复算（2b-4 交回后一次性；谁复算谁照这六步，别凭记忆）**：
+  1. 取当时 HEAD 的 `git archive <sha> | tar -x` 纯净快照（**禁读脏工作树**），锚 sha 写进证据；并核 `git diff --stat <改件sha> <锚sha> -- internal/ cmd/ go.mod go.sum` 的 hunk 各归谁（本方这一发就是这么把 `cmd/wisp` 那一枚漂移甩给票 133 的）；
+  2. 容器 `golang:1.27`；软链形 `ln -s /realpriv /varlink` + `TMPDIR=/varlink/w124tmp`，`exit 96/97/98` 断言照用；普通形**换一枚新容器** + `exit 99`（`/varlink` 必须根本不存在、`/plainroot` 不许是链接）；每枚样本进容器先 `ls -l /src/go.mod`（883 字节）＋ `md5sum`（`go.mod`=`f6ef661732b1851e5c3db348113cb605`、`internal/winsec/resolve.go`=`b6876a5efe759f6e17434d1b50a129c3`）证明确实挂上、不是空挂（Git Bash 下 `docker run -v "C:\…"` 会**静默挂空且 rc=0**）；
+  3. 逐包 `-count=1 -v` 跑 **AC#1 那本全树分母**（`internal/**` + `cmd/**` 全部包，AC#1 的 log 记的是"全部 30 枚 `internal/**` + `cmd/**` 包"），从 `-v` 收软链形 `--- FAIL`（顶层 + 子测试）逐名；
+  4. 与名册做差集：账 `124-ac2a-leg-classification.md` §5 那 **131 枚"可转"** ⇒ **期望差 = 空集**，这就是票面 16:33 那句"软链形红名数＝0（本票范围内）"；
+  5. 允许的余红**逐名钉死**、不按枚数四舍五入：(a) 票 123 那族 300 s 审批超时腿 **三枚**——`TestL1WriteGoesThroughTheRealBlockWindow`、`TestLateVetoRendersTheApprovalLayersAppliedStepsReport`、`TestFSReadOnlyNeverOpensACard`（票面 16:33 只点了前两枚；第三枚是本票 §1 新登记的同族腿，**复算时三枚一起豁免，否则会得到"多一枚红"的假破口**）；(b) 两形都红的 29 枚（`internal/panel/` 1 ＋ `cmd/wisp/` 28，`R-119-7` 那本账）；(c) 形状自带的 SKIP（winsec 3 ＋ config 1）——**SKIP 既不是红也不是绿**，必须逐名写在读数旁边；
+  6. 结论必须**两形并列**、`RUN`/`SKIP` 差逐包解释；"归零"不许拿包级 `ok` 冒充逐名点名；判据不成立（差集非空、或多一枚少一枚）就**报回来**，不许改数、不许放宽断言。
 
 ## 10. 临时件清单（只建不删）
 
