@@ -1005,13 +1005,18 @@ func (p *pkg133) enumerateLegs133() ([]*leg133, []string) {
 	for _, st := range p.mainBody.List {
 		switch s := st.(type) {
 		case *ast.IfStmt:
-			key, kind := p.classifyCond133(s.Cond)
+			keys, aliases, kind := p.classifyCond133(s.Cond)
 			site := p.site133(s.Pos())
 			switch kind {
-			case condNoArgs133:
-				addLeg(noArgsLeg133, site, s.Body, false, nil)
-			case condLiteral133:
-				addLeg(key, site, s.Body, false, nil)
+			case condNoArgs133, condLiteral133:
+				// R-133-5: one row per command this condition dispatches.
+				for i, k := range keys {
+					if i == 0 {
+						addLeg(k, site, s.Body, false, aliases)
+						continue
+					}
+					addLeg(k, site, s.Body, false, nil)
+				}
 			default:
 				reds = append(reds, fmt.Sprintf("%s: func main has an if branch this gate cannot classify (%s). A dispatch outside the leg census needs no nail and no ruling from anything here, which is the hole ticket 131 registered as its first shape, so it is red rather than skipped.",
 					site, p.render133(s.Cond)))
@@ -1094,12 +1099,8 @@ func (p *pkg133) enumerateLegs133() ([]*leg133, []string) {
 // Returned in source order: keys are the legs to add, aliases belong to keys[0].
 func (p *pkg133) caseLabelLegs133(cc *ast.CaseClause) (keys, aliases, reds []string) {
 	site := p.site133(cc.Pos())
-	word := "" // first command-word literal of this clause
-	type label struct {
-		value string
-		flag  bool
-	}
-	var seen []label
+	var values []string   // the literal labels, in source order
+	var unparsed []string // one synthetic row per label this reader cannot read as a name
 	for _, l := range cc.List {
 		bl, ok := l.(*ast.BasicLit)
 		if !ok || bl.Kind != token.STRING {
@@ -1111,7 +1112,7 @@ func (p *pkg133) caseLabelLegs133(cc *ast.CaseClause) (keys, aliases, reds []str
 				}
 			}
 			name := "unparsed-label@" + site + ":" + expr
-			keys = append(keys, name)
+			unparsed = append(unparsed, name)
 			reds = append(reds, fmt.Sprintf("%s: the case label %s is not a string literal%s. A leg is identified by a literal command name; a label that has to be resolved through a constant is a leg that can leave the census without saying so, which is ticket 131's second shape. This row carries it as %q instead of folding it into default.",
 				p.site133(l.Pos()), expr, resolved, name))
 			continue
@@ -1123,23 +1124,10 @@ func (p *pkg133) caseLabelLegs133(cc *ast.CaseClause) (keys, aliases, reds []str
 		if v == "" {
 			continue
 		}
-		seen = append(seen, label{value: v, flag: strings.HasPrefix(v, "-")})
-		if !strings.HasPrefix(v, "-") && word == "" {
-			word = v
-		}
+		values = append(values, v)
 	}
-	for _, l := range seen {
-		if !l.flag {
-			keys = append(keys, l.value)
-			continue
-		}
-		short := strings.TrimLeft(l.value, "-")
-		if word != "" && short != "" && strings.HasPrefix(word, short) {
-			aliases = append(aliases, l.value)
-			continue
-		}
-		keys = append(keys, l.value)
-	}
+	keys, aliases = splitCommandLabels133(values)
+	keys = append(keys, unparsed...)
 	if len(keys) == 0 {
 		keys = []string{"unparsed-label@" + site}
 	}
@@ -1173,9 +1161,18 @@ const (
 // classifyCond133 reads the two argv conditions this gate dispatches on: the
 // `len(argv) == 0` GUI branch, and any branch comparing an argv slot to a literal
 // (X4's `if len(args) > 0 && args[0] == "--diag"` is the second form).
-func (p *pkg133) classifyCond133(e ast.Expr) (string, condKind133) {
-	key := ""
-	found := false
+//
+// R-133-5: it used to return ONE key, and it got that one key two different ways -
+// the literal branch overwrote (last match wins), the no-args branch was guarded by
+// `!found` (first match wins). So `if args[0] == "x133a" || args[0] == "version"`
+// enumerated "version" and dropped "x133a" entirely: that command name appeared
+// nowhere in the ledger, owed no nail, and never met the usage block, which is
+// ticket 133's own acceptor reading for the case-label shape (R-133-4) arriving a
+// second time through the if branch. Every classifiable comparison in the condition
+// now yields its own leg, with the same flag-spelling fold R-133-4 uses.
+func (p *pkg133) classifyCond133(e ast.Expr) (keys, aliases []string, kind condKind133) {
+	var literals []string
+	noArgs := false
 	ast.Inspect(e, func(n ast.Node) bool {
 		bin, ok := n.(*ast.BinaryExpr)
 		if !ok {
@@ -1188,27 +1185,61 @@ func (p *pkg133) classifyCond133(e ast.Expr) (string, condKind133) {
 			}
 			if bl, ok := other.(*ast.BasicLit); ok && bl.Kind == token.STRING {
 				if v, err := strconv.Unquote(bl.Value); err == nil {
-					key, found = v, true
+					literals = append(literals, v)
 				}
 			}
 			return true
 		}
 		if call, ok := bin.X.(*ast.CallExpr); ok && exprIdent(call.Fun) == "len" && len(call.Args) == 1 && bin.Op == token.EQL {
 			if id, ok := call.Args[0].(*ast.Ident); ok && id.Name == p.argvName {
-				if bl, ok := bin.Y.(*ast.BasicLit); ok && bl.Value == "0" && !found {
-					key, found = noArgsLeg133, true
+				if bl, ok := bin.Y.(*ast.BasicLit); ok && bl.Value == "0" {
+					noArgs = true
 				}
 			}
 		}
 		return true
 	})
-	if !found {
-		return "", condUnknown133
+	keys, aliases = splitCommandLabels133(literals)
+	switch {
+	case len(keys) > 0 && noArgs:
+		// A condition that both tests for no arguments and compares an argv slot to
+		// a literal dispatches two censuses' worth of commands; neither is dropped.
+		return append([]string{noArgsLeg133}, keys...), aliases, condLiteral133
+	case len(keys) > 0:
+		return keys, aliases, condLiteral133
+	case noArgs:
+		return []string{noArgsLeg133}, nil, condNoArgs133
 	}
-	if key == noArgsLeg133 {
-		return key, condNoArgs133
+	return nil, nil, condUnknown133
+}
+
+// splitCommandLabels133 is the one place that decides which of several spellings in
+// a single dispatch condition is a command of its own and which is a flag alias of
+// the clause's command word. R-133-4 (case labels) and R-133-5 (argv comparisons in
+// an if) read the same rule from here so the two cannot drift apart.
+func splitCommandLabels133(values []string) (keys, aliases []string) {
+	word := ""
+	for _, v := range values {
+		if !strings.HasPrefix(v, "-") && word == "" {
+			word = v
+		}
 	}
-	return key, condLiteral133
+	for _, v := range values {
+		if v == "" {
+			continue
+		}
+		if !strings.HasPrefix(v, "-") {
+			keys = append(keys, v)
+			continue
+		}
+		short := strings.TrimLeft(v, "-")
+		if word != "" && short != "" && strings.HasPrefix(word, short) {
+			aliases = append(aliases, v)
+			continue
+		}
+		keys = append(keys, v)
+	}
+	return dedupe133Stable133(keys), dedupe133Stable133(aliases)
 }
 
 func (p *pkg133) isArgvSlot133(e ast.Expr) bool {
