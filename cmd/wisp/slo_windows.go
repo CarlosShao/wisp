@@ -166,6 +166,19 @@ hermetic data dir via WISP_TEST_DATA_DIR).
 `)
 }
 
+// cmdSLO is `wisp slo`, the SLO sampling driver (ticket 08).
+//
+// WISP-LEG-SINK-RULING: this leg resolves the JSONL pipeline itself
+// (observe.InitLog, slo_windows.go) rather than going through installLogSink,
+// because the pipeline is its OUTPUT and not its listener: the command's job is
+// to sample a subject and print a JSON verdict, and the log files it writes
+// under <data root>\logs are the sweep target its retention rule counts. Giving
+// it a second, process-wide fan-out handler on top of a sink it already opens by
+// hand would duplicate records into the tree it is measuring, which is a
+// different claim from the one ticket 117's install makes on the other legs. The
+// enumeration gate in leg_sink_gate_131_test.go reports this row as "pipeline"
+// rather than "install", and this sentence is the reason that is a decision and
+// not an omission.
 func cmdSLO(args []string) int {
 	fs := flag.NewFlagSet("slo", flag.ContinueOnError)
 	fs.Usage = cmdSLOUsage

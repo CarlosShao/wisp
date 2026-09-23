@@ -492,6 +492,19 @@ func TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink(t *testing.T) {
 	}
 
 	recs := readResidentSink(t, sinkDir)
+	// Ticket 131 adds this guard, and the reason it is here is a measurement:
+	// running this package's full suite on a loaded host, the child took the
+	// CTRL_BREAK and died at 0xc000013a before its own close flushed anything,
+	// so readResidentSink returned a file with zero records and the index below
+	// panicked. A panic in a Go test binary eats the red name of every case that
+	// had not run yet and truncates the package output, which is how a real
+	// failure (this case's own failure to hold its exit budget) reads as "there
+	// were no failures". R-127-4 named this shape; the same guard already exists
+	// at line 370 in the sibling case above.
+	if len(recs) == 0 {
+		t.Fatalf("%s holds a pipeline file with no record in it, so the ordering has nothing to be read out of; the leg exited %s",
+			sinkDir, leg.exitStatus())
+	}
 	if recs[0].Msg != residentInstallMsg {
 		t.Fatalf("record 0 = %q, want the install record: the trail below cannot be read as \"the listener caught the shutdown\" unless it starts with the listener (records: %v)", recs[0].Msg, recs)
 	}

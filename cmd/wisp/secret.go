@@ -196,6 +196,31 @@ func cmdSecret(args []string) int {
 			now:        time.Now,
 		},
 	}
+	// Ticket 131 AC#3, closing R-117-1 (the leg ticket 117 gave a listener to
+	// run and left this one undecided): this command books two audit records
+	// through the process-default logger - the INFO record of a stored DPAPI blob
+	// (runSet) and the WARN record of a --force delete that left config
+	// references dangling (runUnset). Before this line neither of them outlived
+	// the terminal, which is the defect ticket 117 fixed on the run leg. The
+	// verdict is therefore "install", and leg_sink_nail_131_test.go drives this
+	// exact entry point to keep it.
+	//
+	// What the install does NOT change is the C28 boundary, which is why it is
+	// safe here at all: the records name a ref, an env, a portability flag and
+	// config field paths, never a value, and the pipeline behind them is the
+	// redacting one (internal/observe/redact.go). `wisp secret get --show` still
+	// writes its plaintext to stdout and books nothing.
+	//
+	// Degradation is the run leg's, unchanged in kind: a data root whose log
+	// directory cannot be opened is reported loudly and does not stop the
+	// credential operation, because a broken log tree must not lock the owner out
+	// of their own keys. Registered before the dispatch so the close flushes the
+	// records this run booked.
+	if sink, sinkErr := installLogSink(layout.DataDir); sinkErr != nil {
+		fmt.Fprintf(os.Stderr, "wisp secret: 持久日志未启用（%v）：本轮审计记录只会到 stderr，不会落盘\n", sinkErr)
+	} else {
+		defer sink.close()
+	}
 	return c.run(args)
 }
 
@@ -290,6 +315,14 @@ func (c *secretCmd) newFlagSet(name, usage string) *flag.FlagSet {
 
 // runSet stores one credential. The value comes from stdin (--from-stdin) or
 // from two hidden console reads; never from an argument.
+//
+// The record this function books ("wisp secret: stored dpapi blob") carries a
+// ref, an env, a portable flag and an overwrite flag - never a value, which is
+// what TestSecretFailurePathsLogAndPrintNoPlaintext pins through
+// assertNoPlaintext. That C28 boundary is unchanged by ticket 131's decision to
+// give this leg a persistent listener: a sentence that is not allowed in a log
+// line is not made allowed by writing the log line to a file instead of a
+// terminal.
 func (c *secretCmd) runSet(args []string) int {
 	fs := c.newFlagSet("wisp secret set", `Usage: wisp secret set <name> [--from-stdin]
   hidden console input, typed twice to confirm; --from-stdin reads the value
