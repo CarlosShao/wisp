@@ -61,3 +61,61 @@ $ git diff --numstat bcb03aa..HEAD
 
 上一任锚 `56d8026` 的 CI 形状是 `82 / 46`，新基线是 `100 / 53` ⇒ 差 **+18 RUN / +7 顶层 PASS**。
 逐枚查谁在这段区间往 `cmd/wisp` 加了用例：
+我把两枚锚点各跑了一遍同一仪器，然后逐枚对名字集合：
+
+```
+git archive 56d8026 | tar -x -C /tmp/wisp131-r3-old        (+ 三枚 dll)
+go test -count=1 -v ./cmd/wisp/   -> RUN 82 / TOP PASS 46 / FAIL 0 / SKIP 0, rc=0   # 与上一任 §2 的 CI 形状逐字相同
+go test -count=1 -v ./cmd/wisp/   -> RUN 100 / TOP PASS 53 / FAIL 0 / SKIP 0, rc=0  # bcb03aa（§1 基线）
+comm -23 <旧名字集> <新名字集>    -> 空    # 一枚也没丢
+comm -13 <旧名字集> <新名字集>    -> 恰 18 枚
+```
+
+那 18 枚逐字是：**票 128** 的 `4e5d240`（`TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128` +5 子、
+`TestAC2RealProcessRefusesOnEveryLegWithoutAppData128` +4 子、`TestAC2RefusalMarkersAreNotAShortenableList128`、
+`TestAC2ResolveDataDirRefusesInsteadOfFallingBackToCWD128` +2 子、`TestAC2TestDataDirBranchStillResolves128`
+⇒ **16 枚 = 5 顶层 + 11 子用例**）与**票 130** 的 `d87905c`
+（`TestAC3EarlyRecordLandsOnDiskBeforeTheInstallRecord`、`TestAC3EarlyReplayKeepsTheSinkInsideTheDataRoot` ⇒ **2 枚顶层**）。
+逐枚静态反查同数：`func Test` 枚数 `56d8026`=49 → `4e5d240`=54（+5，128）→ `d87905c`=56（+2，130）→ `bcb03aa`=56。
+CI 的 `-skip` 名单与这 18 枚零交集（逐名 grep）。
+
+⇒ **数字结论成立、归因写错了名字。** `+18 RUN / +7 顶层 PASS` 这一笔我逐枚对上，**零枚被洗掉、零枚丢失**；
+但它是**票 128（16）＋票 130（2）**，不是续单证据与票面写的"全归 129/130"。
+`git log 56d8026..b723978 -- cmd/wisp` 里**根本没有 129**（129 的改动面在 `internal/**`，一枚 `cmd/wisp` 用例也没加），
+而 128 被漏名。⇒ 登记为 `R-131r3-4`（措辞/归因级，不改判"四数不降"）。
+另两枚在该区间动了 `cmd/wisp` 的 commit（`11f3927`＝114 只改 `run.go`、`9b5d64d`＝130 只改既有钉文件、
+`717d822`＝本票第 0 件改名）对分母零影响，我也逐枚 `--name-only` 看过。
+
+### 1.2 被驱腿自己的行号也下移了（续单那句话不完整）
+
+续单/票面写"六发红名逐字不变，**只有门与钉自己的 `file:line` 前缀下移**"。前半成立，后半不完整：
+
+```
+bcb03aa vs 56d8026 的 install 点：logsink.go:139->144、models.go:276->284、secret.go:219->226、run.go:164->178、resident_windows.go:57 未动
+X2 红名里的 emit-site：slog.Info@secret.go:321 -> :328, slog.Info@:461 -> :468, slog.Warn@:461 -> :468
+```
+
+⇒ 红名的**文本结构与所点的那条腿一字未变**（我逐字比过，见 §2），但**位移的不止仪器自己的前缀**——
+被驱腿文件的行号也被票 128（`secret.go` +11/-4）与票 130（`models.go` +9/-1、`logsink.go` +22/-2）推着走了 7–14 行。
+这句话要更正，否则下一个人拿"只有前缀动"去核 X2 会以为读数错了一位。并入 `R-131r3-4`。
+
+---
+
+## 2. 结案判据 1：六发红名逐字不变（X1/X2/X3/X6/X9/X10）—— **PASS**
+
+仪器与上一任同形：`git archive bcb03aa` 纯净快照 + 三枚 dll + `go build ./cmd/wisp/` rc=0 之后才读 `go test -count=1 -v ./cmd/wisp/`。
+变异我**按上一任的字节形状重造**（X3/X6/X8/X12 的 `main.go` 与被种的 `fake131.go`/`diag131.go` 直接取上一任快照里那枚文件，
+`diff` 证同形；X1/X2/X3 的删行区间逐字同 `284,292d283` / `226,230d225` / `74,81d73`）。
+
+| 发 | 造法（同上一任） | 上一任四数 | **我这次四数**（RUN/顶层PASS/FAIL/SKIP） | 原来那枚红 | 名字换没换 |
+| --- | --- | --- | --- | --- | --- |
+| **X1** 删 `models.go` 那 9 行 | 删 284-292，`grep -c installLogSink` = 0，334→325 行 | 82/78/**4**/0（3 顶层+1 子） | **100/50/3/0 + 1 子用例红**，rc=1 | `AC#4 RED: nail "TestAC2ModelsLegBooksItsHandOffVerdictOnDisk" claims leg "models", which no longer installs the persistent sink (main.go:74): the nail is now proving something else, or nothing` | **未换**，仅 `214→318`、钉 `307→358`、`455→506` |
+| **X2** 删 `secret.go` 那 5 行 | 删 226-230 | 82/78/**4**/0 | **100/48/5/0 + 1 子用例红**，rc=1 | 门给**两条独立读数**（`:298` 要裁决、`:318` 要钉）文本逐字同 | **未换**；多出的 2 枚红点名归票 130 的两枚 early-record 用例（`d87905c`），方向是查得更多 |
+| **X3** 删掉 `case "models"` 整支、`models.go` 一字不动 | 删 74-81，生产调用者只剩声明 | 82/81/**1**/0 | **100/52/1/0**，rc=1，唯一一枚红在门上 | `... which main.go does not dispatch to any more` 逐字同 | **未换** |
+| **X6** 新腿直呼 install、不给钉 | 取上一任那枚 `fake131.go` + `81a82,83` | 82/81/**1**/0 | **100/52/1/0**，rc=1 | `leg "fake131" (main.go:82) reaches installLogSink on 1 line(s) of this package and no registered nail names it.` 逐字同，行号也是 `main.go:82` | **未换** |
+| **X9** 两处 install 挪去 `<根>-elsewhere` | 各改 1 行 | 门 PASS + 两枚钉红 | **100/48/5/0 + 2 子用例红**；门 `--- PASS`、`AC#4 RED` 命中 **0** | 两枚钉各红一次，红名正文带 `dir=...\001-elsewhere\logs` 原文 | **未换**；+2 枚同样是 130 那两枚 |
+| **X10** 注册一枚不读盘的用例当钉 | `registerLegNail131("models", TestSecretFlagsAreBoolOnly)` | 82/81/**1**/0 | **100/52/1/0**，rc=1 | `nail "TestSecretFlagsAreBoolOnly" for leg "models" calls none of the shared sink readers (readLegSink131, readResidentSink, readSink) ... (leg site main.go:74)` 逐字同 | **未换**；门内**另多一枚**红＝本轮为 `R-131-2` 加的"没带入口符号"那条（同一枚用例内，顶层枚数不变） |
+
+⇒ **判 PASS。** 六发原来那枚红**逐枚还在、名字一个没换**；新增的红全部点名归到票 130 的用例与本轮 `R-131-2` 的新判据上，
+方向是**查得更多**。⚠ 两处措辞要更正（不影响判定）：X2/X9 各多的是**两枚**（`100/48/5` 对上一任 `82/78/4`），
+续单证据与 A122① 一处写"两枚"一处写"一枚"，实测为**两枚**；X10 多的那一枚在**同一枚用例内部**，顶层 FAIL 枚数没变。
