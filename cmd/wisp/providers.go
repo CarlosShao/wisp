@@ -78,7 +78,15 @@ func cmdProviders(argv []string, io_ providersIO) int {
 		io_.now = func() time.Time { return time.Now().UTC() }
 	}
 	if io_.dataDir == "" {
-		io_.dataDir = resolveDataDir(buildinfo.EnvString())
+		dir, dirErr := resolveDataDir(buildinfo.EnvString())
+		if dirErr != nil {
+			// Ticket 128 AC#2: no data root, no provider listing. It lands
+			// before secret.NewStore on purpose, so a start-up directory is
+			// never handed a credential store to create.
+			fmt.Fprintf(io_.err(), "wisp providers: %v\n", dirErr)
+			return 2
+		}
+		io_.dataDir = dir
 	}
 	sub, rest := argv[0], argv[1:]
 	st, err := secret.NewStore(io_.dataDir)

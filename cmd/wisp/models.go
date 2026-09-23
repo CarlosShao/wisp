@@ -107,7 +107,15 @@ func cmdModels(argv []string, io_ modelsIO) int {
 		return 2
 	}
 	if io_.dataDir == "" {
-		io_.dataDir = resolveDataDir(buildinfo.EnvString())
+		dir, dirErr := resolveDataDir(buildinfo.EnvString())
+		if dirErr != nil {
+			// Ticket 128 AC#2: this leg resolves the data root the same way
+			// `wisp run` does, so it refuses the same shape instead of reading
+			// a model store out of the start-up directory.
+			fmt.Fprintf(io_.err(), "wisp models: %v\n", dirErr)
+			return 2
+		}
+		io_.dataDir = dir
 	}
 	sub, rest := argv[0], argv[1:]
 	switch sub {

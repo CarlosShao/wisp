@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -96,10 +97,15 @@ func cmdDoctor() bool {
 		depsCrossCheck(pass, fail, *parsed, path)
 	}
 
-	// Data dir writable (SPEC-03 §5.2).
+	// Data dir writable (SPEC-03 §5.2). Ticket 128 AC#2: resolving the root can
+	// now fail, and this is the leg whose whole job is to be readable, so the
+	// refusal lands here as a FAIL line naming the variable to set rather than
+	// as a crash.
 	env := buildinfo.EnvString()
-	dir := resolveDataDir(env)
-	if err := probeWritable(dir); err != nil {
+	dir, dirErr := resolveDataDir(env)
+	if dirErr != nil {
+		fail("data dir resolvable ("+env+")", dirErr.Error())
+	} else if err := probeWritable(dir); err != nil {
 		fail("data dir writable ("+env+")", dir+": "+err.Error())
 	} else {
 		pass("data dir writable ("+env+")", dir)
@@ -230,27 +236,65 @@ func findDepsToml(exeDir string) (*depsToml, string, bool) {
 // the spelling it is given. Without this, `wisp run`/`wisp providers` fail at
 // the very first sealing call on those systems - secret.NewStore ->
 // winsec.PrivateDirAll - with a refusal that reads like an attack.
-func resolveDataDir(env string) string {
+//
+// Ticket 128 AC#2 (ruled "refuse to start"): when the OS cannot say where the
+// user's config directory is, this function now returns that as an error instead
+// of answering with "." - the fallback that measured (docs/evidence/s1/
+// 128-ac1-consequences.md) as logs, config.toml, the DPAPI store and memory.db
+// moving into whatever directory the process happened to start in, two starts in
+// two directories leaving two same-named log files in two trees, and the second
+// start reading an empty config.
+func resolveDataDir(env string) (string, error) {
 	if exeDir := executableDir(); exeDir != "" {
 		if _, err := os.Stat(filepath.Join(exeDir, "portable.txt")); err == nil {
 			if env == "dev" {
-				return filepath.Join(exeDir, "data-dev")
+				return filepath.Join(exeDir, "data-dev"), nil
 			}
-			return filepath.Join(exeDir, "data")
+			return filepath.Join(exeDir, "data"), nil
 		}
 	}
 	if env == "test" {
-		return proc.TestDataDir()
+		return proc.TestDataDir(), nil
 	}
-	base, err := os.UserConfigDir() // %APPDATA%
+	base, err := userConfigDir() // %APPDATA%
 	if err != nil {
-		base = "."
+		return "", dataDirUnresolved128(env, err)
 	}
 	base = proc.SealableRoot(base)
 	if env == "dev" {
-		return filepath.Join(base, "wisp-dev")
+		return filepath.Join(base, "wisp-dev"), nil
 	}
-	return filepath.Join(base, "wisp")
+	return filepath.Join(base, "wisp"), nil
+}
+
+// userConfigDir is the one OS read behind every data root this package resolves.
+// It is a variable for a single reason: no CI runner can conjure the shape ticket
+// 128 is about by itself - a machine with no %APPDATA% (Windows) and neither
+// $XDG_CONFIG_HOME nor $HOME (POSIX) - and unsetting those for real would move
+// every other case's temp dir with them. Production binds os.UserConfigDir and
+// nothing rebinds it; the mutation AC#3 runs is on resolveDataDir's answer, not
+// on this line.
+var userConfigDir = os.UserConfigDir
+
+// errDataDirUnresolved is the class a caller may test for with errors.Is: the
+// data root has no answer, so this leg refuses. It carries no command prefix
+// because every leg prints it behind its own one.
+var errDataDirUnresolved = errors.New("数据根无法解析：用户配置目录不可得")
+
+// dataDirUnresolved128 words the refusal so it can be acted on. A105 ⑦ booked the
+// cost of AC#2's ruling out loud: the run leg goes on such a machine from
+// "degraded but usable" to "not usable at all", which only holds if the line that
+// stops it names the missing variable, the tree the data root belongs in, and the
+// fact that the start-up directory is deliberately not a fallback any more.
+func dataDirUnresolved128(env string, cause error) error {
+	fork := "wisp"
+	if env == "dev" {
+		fork = "wisp-dev"
+	}
+	return fmt.Errorf("%w（OS 原话：%v）：数据根本应是 <用户配置目录>%s%s，"+
+		"而 Wisp 拒绝把它回落到当前工作目录（票 128 AC#1 量到回落会搬家：日志、config.toml、DPAPI 私钥存储与 memory.db 跟着启动目录走，换目录再启动就读到空配置）。"+
+		"修法：Windows 把 APPDATA 设为一个可写目录，Linux/macOS 设 XDG_CONFIG_HOME 或 HOME，然后重试。",
+		errDataDirUnresolved, cause, string(filepath.Separator), fork)
 }
 
 func probeWritable(dir string) error {
@@ -262,18 +306,6 @@ func probeWritable(dir string) error {
 		return err
 	}
 	return os.Remove(probe)
-}
-
-func dataDirForDisplay() string {
-	// Prefer the real resolution order (per-env fork + portable override,
-	// ticket 06); fall back to the static fork table when env/layout
-	// resolution fails.
-	if env, err := buildinfo.ResolveEnv(); err == nil {
-		if sum, err := proc.Summarize(env); err == nil && sum.DataDir != "" {
-			return sum.DataDir
-		}
-	}
-	return resolveDataDir(buildinfo.EnvString())
 }
 
 func gccVersion() (string, error) {

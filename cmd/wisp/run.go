@@ -152,7 +152,20 @@ func runTextTask(s runSpec) int {
 		return 2
 	}
 	if s.dataDir == "" {
-		s.dataDir = resolveDataDir(buildEnvString())
+		dir, dirErr := resolveDataDir(buildEnvString())
+		if dirErr != nil {
+			// Ticket 128 AC#2: no data root, no run. This is the leg that used
+			// to answer "." and write its logs, config.toml and DPAPI store
+			// into the start-up directory; the resident and `wisp secret` legs
+			// already refused the same shape, so refusing here is what makes
+			// the three agree. 2 is SPEC-05 §3.4's setup-problem class, which
+			// is also what the other two legs return. Booked cost (A105 ⑦): on
+			// such a machine this leg is now unusable, which is why the line
+			// below carries the fix and not just the verdict.
+			fmt.Fprintf(s.stderr, "wisp run: %v\n", dirErr)
+			return 2
+		}
+		s.dataDir = dir
 	}
 
 	// Ticket 117: the persistent listener goes on BEFORE the assembly, not

@@ -119,10 +119,17 @@ func sessionLayout(env buildinfo.Env, configRoot, exeDir string) (proc.Layout, e
 
 // resolveSecretLayout is the production wrapper around sessionLayout: the real
 // user config dir and the real exe directory.
+//
+// Ticket 128 AC#2: the OS read goes through the package's one seam, and a failed
+// read is worded by dataDirUnresolved128 like every other leg's. This leg already
+// refused (AC#1 measured rc=2) - what it refused with was two prefixes and no fix
+// ("wisp secret: wisp secret: user config dir: %AppData% is not defined"), so the
+// three legs agreed on refusing and disagreed on being readable. One sentence for
+// all of them is the cheaper way to keep both halves true.
 func resolveSecretLayout(env buildinfo.Env) (proc.Layout, error) {
-	root, err := os.UserConfigDir()
+	root, err := userConfigDir()
 	if err != nil {
-		return proc.Layout{}, fmt.Errorf("wisp secret: user config dir: %w", err)
+		return proc.Layout{}, dataDirUnresolved128(string(env), err)
 	}
 	// Ticket 119's rework (R-119-1): `wisp secret` is the second production
 	// reader of that OS answer, and it never passes through proc.DefaultLayout,
