@@ -74,3 +74,100 @@ M	internal/observe/sampler_test.go
 
 1. `noguard` 基线**第一发**就是 `rc=1 / 56 / 55 / 1 / SKIP0`，红名 `TestNoopTaskReturnsToBaseline`、红点 `goroutine_test.go:33: PerTask mid-task = 2, want 3` —— 这是票面 **AC#11** 那枚既有 flake 在**本程锚点上的第三次独立命中**（前两枚是实现方量的）。重取一发才得到上表那行 56/56。它不在本格两格判据上（本格三态都判在"红名是本程仪器"的读数上），但下一位读数的人还会撞到。
 2. 我有一发 `go test -count=2 -v` **取在了还没 restore 的变异树上**（读到 52 RUN/47/5＋panic），当场识破、`restore` 后重取（§5 G4 用的是重取那份）。归因：我自己 sequencing 失误，不是被验面的性质。
+
+---
+
+## §1 AC#8 判据②③：逐判据对表（按编排者 23:3x 的「措辞更正」那条性质判）
+
+**本格尺子（更正后的性质）**："**不再由一枚 panic 代答——每枚各红各的、且 `RUN` 名册与基线逐名相同**"。
+派单原文那句"同一发变异下只红这一枚、其余全部照常跑完"我**没有当尺子**；红名不止一枚本身不构成退回。
+但我按派单要求**独立复核了这条更正的前提**：那 6 枚红名是否每一枚都"本就该红"（见 1.3）。
+
+### 1.1 判据①那一侧我只复跑一次，用途是给②当分母（不是重判 AC#8①）
+
+同一发 **M3**＝`internal/observe/sampler.go:290` 的 `} else if m.PrivateWorkingSetBytes <= 0 {` ⇒ `>= 0`（fixture 足迹全为非负 ⇒ 逢读数都丢 ⇒ `rep.Samples` 处处为空）。
+落地先证（`noguard`＝`1d38206`，无守卫那棵树）：
+
+```
+$ grep -n 'PrivateWorkingSetBytes >= 0' …-noguard/internal/observe/sampler.go
+290:		} else if m.PrivateWorkingSetBytes >= 0 {
+$ diff -u <pristine> <tree>/sampler.go      # 只那一行，其余一字未动
+-		} else if m.PrivateWorkingSetBytes <= 0 {
++		} else if m.PrivateWorkingSetBytes >= 0 {
+$ go build ./...   rc=0
+```
+
+读数（原文 `/d/tmp/wisp136r2-ac8ac9-noguard-M3-v.txt`）：
+
+```
+rc=1 / RUN=52 / PASS=47 / FAIL=5 / SKIP=0 / panic: 1 处（我的 grep ^panic 命中 2 行 = "panic:" 表头 + 栈里的 panic({…) 帧；真实 panic 一枚）
+panic: runtime error: index out of range [0] with length 0 [recovered, repanicked]
+  …/internal/observe/sampler_test.go:308        ← panic 源就是那枚无守卫的 [0] 直取
+```
+
+被拖走（`=== RUN` 名册差集，基线 56 − 该发 52 ＝ 4 枚，**逐名**）：
+`TestLiveRegistryBaselineWithinSleepingGate`、`TestThresholdTableCoversAllStates`、`TestSampleStateZeroSampleWindowFailsClosed`（AC#1 那枚钉）、`TestSampleStateTrustworthyWindowNotMarkedUnmeasurable`（AC#1 正向对照腿）。
+⇒ 与实现方 §1、以及上一程验收方 §5.1 的读数**逐位相同**（52/47/5＋panic、同一批 4 枚），实现方"改前"那条不是我借来的。
+
+### 1.2 判据②：守卫在位的同一发 M3（树＝本程锚点 76662d8）
+
+```
+$ grep -n 'PrivateWorkingSetBytes >= 0' …-anchor/internal/observe/sampler.go
+290:		} else if m.PrivateWorkingSetBytes >= 0 {
+$ go build ./...   rc=0
+$ go test -count=1 -v ./internal/observe/     # 原文 /d/tmp/wisp136r2-ac8ac9-anchor-M3-v.txt
+rc=1 / RUN=58 / PASS=52 / FAIL=6 / SKIP=0 / panic=0
+```
+
+- **名册差集**：该发 `=== RUN` 名册 vs 未变异基线名册 `diff` **无输出** ⇒ 一枚都没被拖走（改前是 52/56、拖走 4 枚）。
+- 那枚守卫自己的读数原文（**是 FAIL 不是 panic，也不是 SKIP**）：
+
+```
+=== RUN   TestSamplerGoroutineAccountingFollowsRegistry
+    sampler_test.go:315: sampler recorded 0 samples (sample_errors=3 last_error="read returned a zero private working set for a live tree"): there is no reading to check goroutine accounting against
+--- FAIL: TestSamplerGoroutineAccountingFollowsRegistry (0.03s)
+=== RUN   TestLiveRegistryBaselineWithinSleepingGate      ← 改前被拖走的那枚，现在跑到了
+--- PASS: TestLiveRegistryBaselineWithinSleepingGate (0.00s)
+```
+
+- **守卫"正常路径下不静默放行"这一条单独验**（派单点名要查）：未变异基线里该用例是 `--- PASS`（不是 SKIP）；`t.Skip` 在本包三枚相关文件里的出现次数＝**0**（`grep -c Skip` 在 `sampler_test.go` 命中 1 次，逐看是注释句"never t.Skip, never a silent return"，两枚 `*_136_test.go` 为 0）；本程**每一发**读数的 `--- SKIP` 计数都是 **0**（下表与 §2、§5 同）。⇒ "空 `Samples` 且守卫存在"这一发必须红、也确实红了，不存在被 `Skip` 洗绿的路径。
+
+### 1.3 更正的前提：6 枚红名逐枚查因果（有没有谁是被误伤／靠 panic 顺序侥幸绿过）
+
+逐枚把断言与被改那一行（`:290` ⇒ `rep.Samples` 恒空）对上，红点原文取自 `…-anchor-M3-v.txt`：
+
+| # | 红名 | 红点原文（截取） | 与 M3 的因果 | 判定 |
+| --- | --- | --- | --- | --- |
+| 1 | `TestSampleStateAllMetricsAndVerdicts` | `sampler_test.go:78: expected several samples, got 0` | 直接：它就要 ≥3 枚样本 | **该红** |
+| 2 | `TestSampleStateSleepingDiskWriteGateFails` | `sampler_test.go:121: disk_write_ops verdict wrong: {… Measured:0 … Pass:true …}` | 样本被丢 ⇒ `WriteOpsTotal` 累加不到 ⇒ 门扇开 | **该红** |
+| 3 | `TestSampleStateWorkPeakMemoryIsTargetNotGate` | `sampler_test.go:170: non-gate rows must not fail the report: [… {Metric:sampling Measured:0 valid / 4 errors … Pass:false Gate:true …}]` | 零样本触发了 `:332` 的 `sampling` fail-closed 门行 ⇒ `rep.Pass=false`；断言在 `:169` 就是 `if !rep.Pass` | **该红**（红得对：不可测窗口本就不该绿） |
+| 4 | `TestSampleStateLeakFixtureFlipsRed` | `sampler_test.go:190: memory verdict must be red: {tree_private_bytes Measured:0.0MB … Pass:true …}` | 泄漏 fixture 的读数被丢 ⇒ 内存门看不见泄漏 | **该红** |
+| 5 | `TestSamplerGoroutineAccountingFollowsRegistry` | `sampler_test.go:315`（新加的守卫，`t.Fatalf`） | **本格要的正面** | **该红** |
+| 6 | `TestSampleStateTrustworthyWindowNotMarkedUnmeasurable` | `sampler_zerosample_136_test.go:151: trustworthy reads must be sampled` | AC#1 正向对照腿 | **该红** |
+
+⇒ **6 枚全有因果，无一枚是被连坐的误伤**；也无一枚"靠 panic 顺序侥幸绿过"——改前那发 panic 之前已红的 4 枚（#1–#4）与本发的 #1–#4 同名同点，改后被吞的 2 枚现在各报各的（一枚 PASS、一枚 FAIL）。
+⇒ 编排者那条更正的**前提成立**：M3 同时开掉 `sampling` 门扇 ⇒ 另几枚本就该红；本格按更正后的性质判，**不**按"只红一枚"判。实现方读到的 6 枚与我读到的 6 枚**同名同点**。
+
+### 1.4 判据③：AC#1 那枚钉的 M3 复跑，我从**整包 `-v`** 里直接取到（未跑任何 `-run` 定点）
+
+同一次 §1.2 读数的原文（`…-anchor-M3-v.txt`）：
+
+```
+=== RUN   TestSampleStateZeroSampleWindowFailsClosed
+--- PASS: TestSampleStateZeroSampleWindowFailsClosed (0.05s)
+=== RUN   TestSampleStateTrustworthyWindowNotMarkedUnmeasurable
+    sampler_zerosample_136_test.go:151: trustworthy reads must be sampled
+--- FAIL: TestSampleStateTrustworthyWindowNotMarkedUnmeasurable (0.06s)
+```
+
+⇒ 腿 A 绿、腿 B 红在实现方给的 `sampler_zerosample_136_test.go:151`，**颜色与上一程验收方用定点读数取到的形状一致**，但这次整包读数就够。**本程为 AC#8/AC#9 的所有读数都没有用过 `-run`**（唯一用过 `-run` 的是我自己的探针文件，见 §3/§4，与判据读数分开）。
+
+### 1.5 AC#8 三态齐否 ＋ 还原复证
+
+| 态 | 读数 |
+| --- | --- |
+| 未变异 | `rc=0 / 58 / 58 / 0 / SKIP0 / panic0` |
+| M3 | `rc=1 / RUN=58 / 52 / 6 / SKIP0 / panic0`，红名逐名（上表），名册差集为空 |
+| 还原 | `diff -q` 与 pristine **无输出**，并另证与本程锚点仓库里那枚 `sampler.go` **逐字相同**；复跑 `rc=0 / 58 / 58 / 0 / SKIP0`（`…-anchor-M3-restore-v.txt`） |
+
+**本节小结**：AC#8②③ 两判据我都在自己的锚点上独立复现（终判与"哪几发复现了"见 §9）。
