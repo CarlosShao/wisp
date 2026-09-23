@@ -268,7 +268,160 @@ AC#1/#2 RED: leg "sfx131" is dispatched by func main and documented in no line o
 
 ## 4. 动了哪几枚数（四数账）
 
-（待填）
+**接续方**：`worker-ticket133-ac1-r2`（补 §4/§5/§6；不改 §2/§2.6/§3 任何一行读数）。
+**锚定**：开工 `git rev-parse --short HEAD` = **`e113b1a`**（分支 `dev`、`git status --porcelain` 空）。
+测量时刻 `date -u`：11:49:28z–11:51:55z（本地 19:49–19:51 +08）跑 §4.1；11:53:06z–11:54:06z 跑 §4.2；
+11:54:32z–11:55:46z 跑 §4.3；全部在**工作树本体**、非 `/tmp` 快照（§4 是"今天的树动了哪几枚数"的账，
+不是变异复现，不需要前任那三棵树）。**PATH 就位**：`export PATH="$PWD/third_party/sherpa-onnx:$PATH"`
+（`onnxruntime.dll`、`sherpa-onnx-c-api.dll`、`sherpa-onnx-cxx-api.dll` 三枚齐全，缺一即 `0xc0000135`
+＝环境故障不是发现，见 §1）。
+
+### 4.1 字面 AC#5 命令 `go test -count=2 -v ./cmd/wisp/`（四数只从 `-v` 量）
+
+```
+$ go test -count=2 -v ./cmd/wisp/          rc=0   141.780s   ok github.com/CarlosShao/wisp/cmd/wisp
+grep -cE '^=== RUN'   → 202
+grep -cE '^--- PASS'  → 108     (顶栏；indented subtest 另加 47 枚 = 202 枚 PASS 行)
+grep -cE '^--- FAIL'  → 0
+grep -cE '^--- SKIP'  → 0
+grep -cE '\[no tests to run\]' → 0
+```
+⇒ `count=2` 原始读数 **202 / 108 / 0 / 0**，per-count 归一 **101 / 54 / 0 / 0**，
+逐字复现 §2.0 `S0-ins-pristine`（`RUN=101 TOPPASS=54 TOPFAIL=0 TOPSKIP=0`）；
+本包 54 枚顶层 + 47 枚子用例，`count=2` 下 `=== RUN` 202、顶栏 `--- PASS` 108 都是 per-count ×2。
+
+### 4.2 CI 逐字同形 `sh scripts/wisp-cli-tests.sh`（`-v -count=1`，与基线 100/53/0/0 直接同形）
+
+```
+$ sh scripts/wisp-cli-tests.sh                rc=0   57.707s
+runtests.sh: OK - packages=[./cmd/wisp/ -count=1 -skip ^(TestDefaultDeadlineWallClockMeasurement|
+  TestSubprocessCrashWriter|TestHelperProcess|TestLiveWasapiSmoke|TestRealDownloadVadThroughPipeline|
+  TestRealDownloadPuncArchiveThroughPipeline|TestSyncRegistryProbeLive)$]
+  top-level: PASS=54 FAIL=0 SKIP=0, === RUN=101, '[no tests to run]'=0
+portable-tests.sh: four numbers (all from -v output): === RUN=101  --- PASS=54  --- FAIL=0  --- SKIP=0
+portable-tests.sh:   ok (own line)  github.com/CarlosShao/wisp/cmd/wisp
+```
+⇒ **CI 形状读数 101 / 54 / 0 / 0**（顶栏 PASS=54、RUN=101，SKIP=0，`runtests.sh` 判 OK）。
+CI 的 `-skip` 名单是 `portable-tests.sh` 的账本，**一枚 cmd/wisp 用例都不在里面**（那些 skip 项都在
+`internal/**`），所以新用例在 CI 里真跑、真计。
+
+### 4.3 复现基线：`-count=1 -v -skip '^TestAC1AC2DispatchHopGate133$'`
+
+把本票新增那一枚顶层用例用 `-skip` 摘掉，**工作树未动、任何文件未改**（`-skip` 使 Go 在跑前过滤掉
+它，`--- SKIP` 行不产出，所以是"少跑一枚"而不是"跑成一枚 SKIP"）：
+
+```
+$ go test -count=1 -v -skip '^TestAC1AC2DispatchHopGate133$' ./cmd/wisp/
+  rc=0   57.691s
+grep -cE '^=== RUN'   → 100
+grep -cE '^--- PASS'  → 53
+grep -cE '^--- FAIL'  → 0
+grep -cE '^--- SKIP'  → 0
+```
+⇒ **100 / 53 / 0 / 0**——与票 131 第三任在 `bcb03aa` 量的基线逐字同形。
+这既是基线的**独立复现**（工作树没退步到 `bcb03aa` 那时代码的形状；差异就是新增那一枚用例），
+也是 §4.4 名册 diff 的来源。
+
+### 4.4 名册逐名对（comm，不只给差值）
+
+从 `-v` 顶栏 `--- (PASS|FAIL|SKIP): <name>` 抽名（sed 掉状态与时延）→ `sort -u`：
+- `roster-head.txt` = §4.1 的 54 枚（HEAD 上有仪器）
+- `roster-skip133.txt` = §4.3 的 53 枚（摘掉本票那一枚）
+两份都在 `/d/tmp/wisp133-ac1-r2-sec4/`；命令与逐名输出：
+
+```
+$ comm -23 roster-head.txt roster-skip133.txt     # 只在 head 的
+TestAC1AC2DispatchHopGate133
+
+$ comm -13 roster-head.txt roster-skip133.txt     # 只在 skip133 的（应为空 ⇒ 无回归）
+（空）
+
+$ comm -12 roster-head.txt roster-skip133.txt | wc -l
+53                                                 # 共有 53 枚，一字未变
+```
+
+**54 枚名册全列（`TestAC1AC2DispatchHopGate133` 是本票新增，其余 53 枚与基线同）**：
+
+```
+* TestAC1AC2DispatchHopGate133                      <- 本票新增（ed18727）
+  TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink
+  TestAC1ResidentLegInstallsItsLogListenerOnDisk
+  TestAC1ResidentLegOutlivesItsOwnLogFailure
+  TestAC2AC3DegradedLegsStillDeliverTheirVerdict
+  TestAC2AuditTrailLandsInTheRunLegLogFile
+  TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128
+  TestAC2ModelsLegBooksItsHandOffVerdictOnDisk
+  TestAC2RealProcessRefusesOnEveryLegWithoutAppData128
+  TestAC2RefusalMarkersAreNotAShortenableList128
+  TestAC2ResolveDataDirRefusesInsteadOfFallingBackToCWD128
+  TestAC2RunLegInstallsTheSinkBeforeItsFirstSealingSite
+  TestAC2SealNoticeLandsInTheRunLegLogFile
+  TestAC2TestDataDirBranchStillResolves128
+  TestAC3EarlyRecordLandsOnDiskBeforeTheInstallRecord
+  TestAC3EarlyReplayKeepsTheSinkInsideTheDataRoot
+  TestAC3EmptyDataRootIsARefusalNotAFallback
+  TestAC3InstallingTheFileSinkDoesNotSilenceTheConsole
+  TestAC3LogSinkLandsInsideTheEnvDataRoot
+  TestAC3SecretLegBooksItsAuditRecordsOnDisk
+  TestAC4EveryLegIsNailedOrRuled
+  TestComposedGateBlocksAWriteForTwoSeconds
+  TestHostDispatchThroughTheAssembledBridge
+  TestMissingBlobFailsUnconfiguredNeverSilently
+  TestProcessCommandLineProbeDetectsAPlantedValue
+  TestProcessCommandLineProbeHelperProcess
+  TestProvidersDiscoverListsWhatTheServerServes
+  TestProvidersProbeRecordsMeasuredThinkingFalse
+  TestProvidersProbeRecordsMeasuredThinkingTrue
+  TestProvidersProbeUnconfiguredRefIsNotSilentlyKeyless
+  TestRunTextTaskFailNextIsClassified
+  TestRunTextTaskKeyResolvesInTheStore
+  TestRunTextTaskTextPathEndToEnd
+  TestSecretArgvCarriesNoSecret
+  TestSecretEndToEndConfigRefResolvesAtRequestTime
+  TestSecretFailurePathsLogAndPrintNoPlaintext
+  TestSecretFlagsAreBoolOnly
+  TestSecretFromStdinWritesNoIntermediateFile
+  TestSecretOverwriteIsAnnounced
+  TestSecretPortableModeUsesTicket06Seam
+  TestSecretRealBinaryRefusesValueFlag
+  TestSecretSameNameUnderThreeEnvsIsThreeBlobs
+  TestSecretSetConfirmationMismatchStoresNothing
+  TestSecretSetGetListRoundTrip
+  TestSecretSetRejectsBadNamesAndEmptyInput
+  TestSecretSetWithoutConsolePointsAtFromStdin
+  TestSecretUnsetRefusesWhileReferenced
+  TestSecretUsageAndUnknownSubcommand
+  TestSecretValueCarryingFlagsAreRefusedAndUnechoed
+  TestTicket101ManualSwitchSurvivesRestart
+  TestTicket101ModeSwitchUsesTheRealL2Gate
+  TestTicket101SessionGrantDoesNotCrossRestart
+  TestTicket101UnreadableModeFailsLoudlyAndStrict
+  TestTicket101UntouchedConfigRestartsAtDefault
+```
+
+### 4.5 逐名账对上游两票的意义（票 124 批次与票 131 翻格都靠这两个数）
+
+- **基线 100/53/0/0 → 101/54/0/0**（per-count）：**只动 RUN、PASS 两枚数**（各 +1），
+  FAIL/SKIP **零动**（0/0）。
+- **逐名对上**：新增一枚 `TestAC1AC2DispatchHopGate133`（`cmd/wisp/leg_dispatch_gate_133_test.go:144`，
+  `ed18727` 引入），其余 53 枚逐字未变（`comm -12` = 53、`comm -13` = 空）。
+- **`ed18727` 里 `main.go`/`panel_assets.go`/`slo_windows.go` 的 +19/+8/+6 行都是 `WISP-LEG-COVERAGE-RULING:`
+  注释**（给 version/help/default/panel-assets/slo 五枚腿的裁决句），**不新增用例、不改变四数**；
+  工作树 `cmd/wisp` 从 `c720494`（前任的基线树）到 `e113b1a` 的全部差异文件与行数：
+  ```
+  $ git log --oneline c720494..HEAD -- cmd/wisp/
+  ed18727 feat(133 AC#1/AC#2): 第二把尺——分发跳本身...
+  $ git diff --stat c720494..HEAD -- cmd/wisp/  (只 ed18727 一枚)
+   cmd/wisp/leg_dispatch_gate_133_test.go | 1378 +++++++++++++++++
+   cmd/wisp/main.go                       |   19 +
+   cmd/wisp/panel_assets.go               |    8 +
+   cmd/wisp/slo_windows.go                |    6 +
+  ```
+- **票 124 的批次**：其 §7/§9 的兄弟代理 (`worker-ticket124-ac2b-2-r2`) 会引用 124 自己的 RUN/SKIP 差；
+  **本票 §4 的四数不动那两枚数**——本票的读数域是 `cmd/wisp/`，124 是 `tools/llm`／`internal/*`。
+- **票 131 的翻格**：`TestAC4EveryLegIsNailedOrRuled`（131 的门）仍在这 53 枚共有名里、仍 `--- PASS`；
+  本票仪器**不共用**它的钉清单也不读它的账本（§0 明写、`leg_dispatch_gate_133_test.go:126-133` 注释重申），
+  所以 131 那扇门的名字与判定都不因本票而变——131 的门 `-run` 关掉后本尺的读数见 §2 每一发③栏。
 
 ## 5. 门禁与全仓仪器
 
