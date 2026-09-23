@@ -83,6 +83,34 @@ A 我不做，除非 owner 明说"就要 A"。
       ⚠ 唯一没做到的一格：**本机没装 `shellcheck`**（`command -v shellcheck` rc=1）⇒ 那一格留给
       `.github/workflows/slo-fresh.yml` 的 `Shell lint for the pin` 步（缺它即硬红），**未验证**。
 
+- [ ] **AC#6（09-23 12:5x 编排者追加，来源＝`Q-36`：owner 回「都按推荐」批的就是这一格）**
+      `A115④⑤` 量到一件事：AC#4 那枚"争用即拒采样"的形状 C **单独看是对的**，但它与"runner 就在这台笔记本上、
+      编队几乎一直在编译"组合之后，`slo-full` **每次推送几乎必红**；而 dev 的 `ci` 徽章本来就已连红 ≥2 天（`A115②`）
+      ⇒ 结果是一枚**真伤**（票 131 的 Linux 编译破口，带病 4h17m）被泡在红海里没人看见。
+      ⇒ owner 批的取舍：**"这次没取到样"不再判红，改判"本 run 无结论"。**
+      ⚠ **这一格是两半一起做的一桩交易，只做前一半＝放水**：
+      **放宽的那半**＝徽章颜色不再因"机器忙"而红；
+      **必须同时收紧的那半**＝"没有有效样本"这件事**不许久藏**——今天 `scripts/slo-freshness.sh` 的 P2 探针查的是
+      "最近一枚 `slo-full` **job** 的年龄 > 3 天"，而 job 一改成 exit 0 就**永远算新鲜** ⇒ 那条钉会当场变成装饰。
+      **P2 必须改成按"最近一次*产出有效样本*的记录"计龄**（判据物由你定，但必须是**盘上/接口上取得到的东西**，
+      不是 job 的 conclusion），并且**用一发变异证明它有牙**：造"连续多枚 run 全是 `machine-contended`、没有一份 report"
+      ⇒ 新鲜度钉**必须红**；把阈值放宽一档 ⇒ 必须绿；还原 ⇒ 必须又红（红→绿→红三态贴原文）。
+      - 硬边界（一条不许越）：**D32 的两个阈值一个字不动**（`internal/observe/thresholds.go` 与 `scripts/slo-check.ps1` 里的
+        `CPU ≤ 0.5%`／`private RSS ≤ 25MB`）；AC#4 立的"**有效性检查只许往'更常拒绝出数'的方向改**"这条前进方向**不许反转**——
+        本格只改"拒绝出数之后怎么上色"，不改"什么时候拒绝出数"。
+      - **D22 mode-6 合规**：不许用 `if:` / `continue-on-error` / skip / 路径过滤来做这件事 ⇒ 上色规则的改变要落在
+        **脚本自己的退出码与它写的记录**上，工作流那一步保持**无条件**；`slo-fresh.yml` 的独立性（自带时钟、不与被测 job 共用触发器）不许破坏。
+      - **具名解冻（编排者 09-23 12:5x 出，只给本格）**：本格特批可改
+        ① `scripts/slo-check.ps1` ② `scripts/slo-freshness.sh` ③ `.github/workflows/slo-fresh.yml`
+        ④ `.github/workflows/ci.yml`——**只许 `slo-full` 那一枚 job 体内的那一步**，其余 job/step/触发表一律不许动。
+        前置条件：**先复现"今天 `machine-contended` 会让整枚 job 红"的读数（run id + job + step + 结论四项齐）才许动码**；
+        除此之外任何冻结件（`internal/observe/thresholds.go`、`docs/PLAN.md`、`docs/specs/**`、`internal/risk/**`、
+        `rules_gateway.go`、`tools/d22scan/**`、`allowlist.txt`、`scripts/d22scan.sh` 本体）照旧禁改。
+      - **撤销口令**（回一句即恢复今天的形状，代价＝徽章继续被"机器忙"泡红）：**「slo-full 恢复判红」**。
+      - 门禁照 AC#5 那一套重跑一遍（`sh scripts/d22scan.sh` 纯净快照 rc=0 + 台账八 scope 不降；
+        YAML 改动用解析器复核"6 枚 job 全在、`slo-full` 那一步仍无条件"；`bash -n`；
+        顺带补 AC#5 欠的那格——**本机没有 `shellcheck`**，要么装上再跑，要么如实保持"未验证"，不许拿"装不上"当跳过）。
+
 ## Rules（本仓固定）
 
 - 只 commit 不 push；`git add` 只用显式路径；commit 前 `git diff --cached --name-only`。
