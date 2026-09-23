@@ -57,6 +57,25 @@ func main() {
 		runResident()
 		return
 	}
+	// Three branches below dispatch a command that no case in this package drives.
+	// They are recorded here, in the file that owns the dispatch, because ticket
+	// 133's leg census requires a dispatched command to be nailed, driven by a test
+	// of its own, or ruled out in words by somebody who looked:
+	//
+	// WISP-LEG-COVERAGE-RULING: version prints buildinfo and the sherpa-onnx
+	// runtime version and exits 0. It resolves no data root, opens no file and
+	// books no record, so the failure this family keeps catching - a listener or a
+	// verdict deleted in silence - has no surface here. scripts/build.ps1's own
+	// version block is its consumer.
+	// WISP-LEG-COVERAGE-RULING: help prints the usage block and exits 0. The block
+	// is itself reconciled against the dispatch census by censusVsUsage133 in
+	// leg_dispatch_gate_133_test.go, so a drift in what this branch promises is
+	// red in the other clause rather than unwatched here.
+	// WISP-LEG-COVERAGE-RULING: default is the refusal path: unknown command,
+	// usage, exit 2. Driving it from a case here means an in-process call that
+	// would exit the test binary, and the real-process form is ticket 128's
+	// TestAC2RealProcessRefusesOnEveryLegWithoutAppData128, which covers the other
+	// legs' refusals rather than this one.
 	switch args[0] {
 	case "run":
 		attachParentConsole()

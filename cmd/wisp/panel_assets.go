@@ -12,6 +12,14 @@ package main
 // It is additive by construction: the resident GUI path, the ball and the
 // agent loop are untouched by this file. Ticket 33's WebView2 host is expected
 // to call the same panel.Assets API this command prints.
+//
+// WISP-LEG-COVERAGE-RULING: panel-assets is dispatched by main and driven by no
+// case in this package. It is a read-only diagnostic over bytes the binary already
+// carries (internal/panel's //go:embed bundle), so deleting this branch costs an
+// operator a window on the bundle and books no record anywhere; the bundle itself
+// is checked from the other side by internal/panel's asset tests. This sentence is
+// here because ticket 133's leg census asks every dispatched command to be nailed,
+// driven, or ruled, and this one is ruled.
 
 import (
 	"encoding/json"

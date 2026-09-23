@@ -182,6 +182,12 @@ hermetic data dir via WISP_TEST_DATA_DIR).
 // and ruled=true, and the state word on that line is "ruled" rather than
 // "nailed". This sentence is the reason that is a decision and not an
 // omission.
+//
+// WISP-LEG-COVERAGE-RULING: slo is dispatched by main and driven by no case in
+// this package: its driver is scripts/slo-check.ps1 and the CI SLO jobs, which
+// start a real subject process (ticket 08's protocol), and a second reading of it
+// inside this test binary would sample a process that is not the one the gate
+// measures. The ruling above this one is why it also has no listener nail.
 func cmdSLO(args []string) int {
 	fs := flag.NewFlagSet("slo", flag.ContinueOnError)
 	fs.Usage = cmdSLOUsage
