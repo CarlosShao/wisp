@@ -326,8 +326,8 @@ $ grep -n 'BackWithinCapMS' internal/observe/sampler.go
 ### 3.4 结论（这一问的答复）
 
 1. **对 AC#9① 那句本身：现有哨兵＋这枚钉够用，不需要为翻本格去动生产码。** 依据：3.1 的结构性耦合（零可信样本 ⇒ `Pass=false` 在生产码未改时不可破）＋ 3.3 里四发能破它的改法**每一发都被这枚钉认出来**（红点各不相同时说明它真的是在逐条看 `pass`／`-1`／`samples`，不是看一个笼统的 rc）。⇒ **不构成本格的退回条件**：我没有造出"零可信样本仍 pass 且这枚钉绿着"的读数。
-2. **但有一格真缺口要另立（本格之外）**：settle 侧的"测量诚实度"只有**全丢**这一档会被看见，**部分未测**（1/5、2/4 可信）交出的是一枚看着完全正常的绿报告，而且 `SettleReport` 连 `sample_errors`/`last_sample_error` 都没有——而同包 `StateReport` 早就为这件事加过这两枚字段，注释还写着理由（`internal/observe/sampler.go:165-167`：*"A bare count let an instrument lose samples without saying what it lost（ticket 66：this instrument stops hiding things）"*）。⇒ 这是"同一族病只做了一半"的形状，**另立新格**（我登记为 `R-136-8`，见 §7）。按派单要求我**没有**就地放宽 AC#9 的条件、也**没有**要作者改生产码。
-3. **附带一条小的**：`SettleReport.Samples` 为空时 JSON 出线是 `"samples":null`（Go 对 nil slice 的行为），腿 A 那句 `else if !isList && wire["samples"] != nil` 因此**在本格任何形状下都不会响**——真正起作用的是它前面的"key 在不在"（V4 红在 `:102` 就是那条）。这是"防呆支取不到牙"，不影响本格判定，登记为 `R-136-9`（低）。
+2. **但有一格真缺口要另立（本格之外）**：settle 侧的"测量诚实度"只有**全丢**这一档会被看见，**部分未测**（1/5、2/4 可信）交出的是一枚看着完全正常的绿报告，而且 `SettleReport` 连 `sample_errors`/`last_sample_error` 都没有——而同包 `StateReport` 早就为这件事加过这两枚字段，注释还写着理由（`internal/observe/sampler.go:165-167`：*"A bare count let an instrument lose samples without saying what it lost（ticket 66：this instrument stops hiding things）"*）。⇒ 这是"同一族病只做了一半"的形状，**另立新格**（我登记为 `R-136-7`，见 §7）。按派单要求我**没有**就地放宽 AC#9 的条件、也**没有**要作者改生产码。
+3. **附带一条小的**：`SettleReport.Samples` 为空时 JSON 出线是 `"samples":null`（Go 对 nil slice 的行为），腿 A 那句 `else if !isList && wire["samples"] != nil` 因此**在本格任何形状下都不会响**——真正起作用的是它前面的"key 在不在"（V4 红在 `:102` 就是那条）。这是"防呆支取不到牙"，不影响本格判定，登记为 `R-136-8`（低）。
 4. **`PIDs:0` 那一形我判"生产侧不可达"，但只到读码这一层**：`internal/proc/treemetrics_windows.go:71-74`（job 关闭 ⇒ 直接报错）、`:88`（`inTree[r.selfPID] = true` 无条件把主进程塞进树）、`:121`（`m := observe.TreeMetrics{PIDs: len(inTree)}`）⇒ **一次成功的读必然 `PIDs >= 1`**，"有足迹但 `PIDs:0`"在这个 reader 里组不出来；`:104-112` 另有一条"快照看不见自己 ⇒ 重试后 fail-closed 报错"。所以那一发只在 **seam（`fakeTree`）层**存在，不构成生产缺口；我**没有**（也无法在单测里）驱动真 Job Object，故这条写成"读码判定＋探针形状"，不写成读数结论。
 
 ---
@@ -386,7 +386,7 @@ func (f *fakeTree) ReadTree() (TreeMetrics, error) {
 --- PASS: TestAcceptorR2ProbeExistingBareUsesAreSafe (0.00s)
 ```
 
-⇒ 判定：**不是本格的债**（AC#8 点名的形状是 `rep.Samples[0]` 那枚、已修；`[0]` 普查也确实不含 `len(mu)-1`），但它是**同族第二枚"吞读数"仪器**，且离被踩只差"下一个人多写一枚用 `&fakeTree{}` 的正常采样用例"。登记为 `R-136-10`（低／可复现／修法方向＝给 seam 自己加守卫，别改任何用例语义）。它自报的"当前无入口"我复算成立，所以不记成"它漏了一处普查"。
+⇒ 判定：**不是本格的债**（AC#8 点名的形状是 `rep.Samples[0]` 那枚、已修；`[0]` 普查也确实不含 `len(mu)-1`），但它是**同族第二枚"吞读数"仪器**，且离被踩只差"下一个人多写一枚用 `&fakeTree{}` 的正常采样用例"。登记为 `R-136-9`（低／可复现／修法方向＝给 seam 自己加守卫，别改任何用例语义）。它自报的"当前无入口"我复算成立，所以不记成"它漏了一处普查"。
 
 ---
 
@@ -435,3 +435,19 @@ $ MSYS_NO_PATHCONV=1 docker run --rm -v /d/tmp/wisp136r2-ac8ac9-anchor:/src \
 | `go vet` 双 GOOS | 原生 `./internal/observe/` **rc=0**；`GOOS=linux ./internal/observe/` **rc=0**；`GOOS=linux go vet ./...` **rc=1**，输出**只一条**诊断：`package …/cmd/wisp → imports …/sherpa-onnx-go-linux: build constraints exclude all Go files`；剔掉 `cmd/wisp` ⇒ 只剩 `cmd/balldebug: build constraints exclude all Go files`；剔掉两枚 `cmd/` 后 **30/30 非 cmd 包零输出 rc=0**（`go list ./...`＝33、剔 cmd＝30，输出文件 0 字节） ⇒ **派单那条"交叉 vet 会停在 cgo"的范围过宽，实现方报回得对，我独立复算同结论：失效面恰好这两枚 cmd 包** |
 | `-count=2 -v` 四数与**名册差集** | `noguard`（`1d38206`）＝ `rc=0 / 112 / 112 / 0 / SKIP0`；`anchor` 第一发＝ `rc=1 / 116 / 115 / 1 / SKIP0`，红名 `TestNoopTaskReturnsToBaseline`（`goroutine_test.go:33: PerTask mid-task = 1, want 3`）＝**票面 AC#11 那枚既有 flake 在本程的又一次命中**；第二发＝ `rc=0 / 116 / 116 / 0 / SKIP0`。逐名（`=== RUN` 去重后 `diff`）＝只多两行：`> TestCheckSettleTrustworthyReadsAreRecorded`、`> TestCheckSettleZeroTrustworthySamplesFailsClosed` ⇒ **实现方的 `112→116` 与"逐名只多它这两枚×2 轮"复现成立**，无改名、无消失、无转 SKIP；我第一发与它的 `116/116` 差的那一枚红名是 flake、不是本格仪器，也不在名册差集里 |
 | 判"不再红"分清变绿／被跳过 | 本程**每一发** `-v` 读数的 `--- SKIP` 计数都是 **0**（§0.3 三发、§1 三态、§2 三态＋V 族、§5.2 三发、`-count=2` 三发）；被验的三枚文件里 `t.Skip` 出现次数 0（唯一命中 `sampler_test.go:313` 是注释句 "never t.Skip, never a silent return"） |
+
+---
+
+## §6 我没做的档（诚实列，别当已验）
+
+1. **AC#8① 的"独立第二条路"（上一程验收方的 M9：`:297` 的 append 改成 `_ = sample`）我没复算**，只用 M3 一发取分母 ⇒ "两发独立造出同一形状"这条我沿用上一程，没重走。
+2. **`stateMemCap` 被改坏那一发我没真打**（派单把阈值面列为禁改，我连快照树里的 `thresholds.go` 都没动）⇒ §2.1 里"归因守卫那一跳也不是哑的"是**读码推演**，不是读数。
+3. **没跑 CI 那一步的端到端**（`bash scripts/portable-tests.sh --scope=core` 整条），只在同版本容器里按包跑了 `go test -v ./internal/observe/`；**CI run id 未取**（本程只 commit 未 push）。
+4. `-race`、`-shuffle` 未测 ⇒ 所有"名册差集/逐名红"都是**当前执行顺序**下的账（与实现方 §6.6 同一边界）。
+5. **`cmd/wisp/**` 一个字未跑**（兄弟在飞）：我只读了 commit 版快照里的 `cmd/wisp/slo_windows.go`，用来确认生产侧确实只认 `Settle.Pass`（`:287` `run.Pass = run.Settle.Pass`、`:323-325` `!run.Pass ⇒ exitCode=1`）——**这是读码，不是 AC#10 的端到端读数**。
+6. **linux 全仓两态未跑**：linux 面只有 `internal/observe` 的容器三发＋30 枚非 cmd 包的交叉 `vet`（§5.3）。
+7. **`scripts/slo-check.ps1` 那一腿未跑**：只 grep 到它会读 `settle.pass`/`exit_code`（`scripts/slo-check.ps1:41`），没有 PowerShell 形状的红/绿读数。
+8. **AC#11 那枚 flake 未做 ≥20 发的复现率测量**（不归本格），本程只贡献 2 个新观测点（§7 末）。
+9. §3.3 的 **V2 因编不过而作废**，我没有再找一条"把 `backInTime` 摘掉"的**可编译**等价写法——V6 覆盖了同一危害的可达形状，但严格说不是同一条改法。
+10. **AC#1 的 M1/M2/M4/M6/M7/M8/M9 七发未复算**（不是本格账，也没推翻任何结论）。
+11. 探针文件（`zz_acceptor136r2_probe_test.go`、`…probe2_test.go`）只存在于我的仓外快照树，**没进仓库、没进被验版本、不提交**。
