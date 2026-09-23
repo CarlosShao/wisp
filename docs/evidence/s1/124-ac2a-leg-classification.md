@@ -124,3 +124,48 @@
 - **17 `placement_symlink_113_other_test.go:335` `TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator`**
   摘录：`if err := winsec.SealFile(mine); err != nil { t.Errorf("AC#3 RED: POSIX folded the backslash in %q into a separator and refused the tree's own file: %v", mine, err) }`（`:354-356`）
   判定：**可转**。判据：反向腿。A2L 红在 `:355 … refused the tree's own file: … not provably resolved`。解析后成立。
+
+### 5.2 `./internal/agent/`（26 枚：18 顶层 + 8 子测试）— 全可转
+
+> 这 26 枚的软链形失败串在 A2L 里**只有两种**：`winsec: refusing to seal … the installed risk.c26Pipeline answered …` 与 `… path is not provably resolved … through the link at /varlink`（无第三因）。每一枚的红都落在**开库/开 spill 存储的 setup**（`memory.Open` / `NewSpiller`+`Prepare`）上——底线把未解析的 `t.TempDir()` 拒了 ⇒ 库开不成 ⇒ 测试真正要断言的行为根本没跑起来。断言原文全是「必须成」形 ⇒ 全可转。
+
+- **18 `forensics_test.go:22` `TestFailedTaskBooksOpenCallRowWithDecision`**
+  摘录：`t.Fatalf("memory.Open: %v", err)`（`forensics_test.go:27`）
+  判定：**可转**。判据：setup 开库被未解析根拒（A2L 串含 `not provably resolved`）；测的是「失败任务落 open-call 行」，要成。解析根后开库成 ⇒ 断言成立。
+- **19 `forensics_test.go:82` `TestCancelledTaskPersistsTerminalRows`** — 摘：`t.Fatalf("memory.Open: %v", err)`（`:87`）。判：同上（开库 setup 被拒），要成 ⇒ 可转。
+- **20 `guard_test.go:151` `TestPerToolTimeoutFires`** — 摘：`t.Fatalf("memory.Open: %v", err)`（`:155`）。判：开库 setup 被拒；测工具超时行为，要成 ⇒ 可转。
+- **21 `guard_test.go:211` `TestPerToolTimeoutOfContractHonestToolIsToolClass`** — 摘：`t.Fatalf("memory.Open: %v", err)`（`:215`）。判：同上 ⇒ 可转。
+- **22 `loop_golden_test.go:299` `TestTaskLogAndToolCallRows`** — 摘：`t.Fatalf("memory.Open: %v", err)`（`:303`）。判：开库 setup 被拒，要成 ⇒ 可转。
+- **23 `spill_name_injectivity_test.go:99` `TestSpilledBytesSurviveANameThatUsedToCollide`（顶层）**
+  摘：`dir := t.TempDir()` → `sp := NewSpiller(dir, spill79Budget)` → 子测试 `t.Fatalf("Prepare(%q): %v", pair.idA, err)`（`:114`）。判：顶层红由子测试聚合；`Prepare` 落 spill 到未解析根被拒，要成 ⇒ 可转。
+- **24 `spill_name_injectivity_test.go:277` `TestWriteFileExclusiveIsExclusive`**
+  摘：`t.Fatalf("first exclusive write failed: %v", err)`（`:282`）。判：exclusive 写进未解析根被拒；断言要「写成且二次冲突」，要成 ⇒ 可转。
+- **25 `spill_name_injectivity_test.go:312` `TestSpillSameIDRetryOverwrites`**
+  摘：`t.Fatalf("first spill: spilled=%v err=%v", a.Spilled, err)`（`:318`）。判：spill setup 被未解析根拒，要成 ⇒ 可转。
+- **26 `spill_name_injectivity_test.go:352` `TestSpillAcrossRestartsKeepsRetrySemantics`**
+  摘：`t.Fatal(err)`（`:355`，spill/重开 setup）。判：setup 被拒，要成 ⇒ 可转。
+- **27 `spill_path_invariant_test.go:102` `TestSpillCallIDHostileShapesSanitizedToBareNames`（顶层）**
+  摘：`root := t.TempDir()` → 子测试 `t.Fatalf("Prepare(%q) failed: %v", sh.callID, err)`（`:112`）。判：顶层红由子测试聚合；`Prepare` 写 spill 被未解析根拒。⚠ 名字带「Hostile Shapes」但那是 **callID 文件名注入形状**（`separator`/`dotdot`/`drive_letter`/`unc`），与路径未解析根无关，断言要「净化成裸名且写成功」⇒ 可转。
+- **28 `spill_path_invariant_test.go:199` `TestSpillContainmentByDirectoryListing`**
+  摘：`t.Error(e)`（`:241`，遍历 spill 目录的不变式）。判：spill 根未解析 ⇒ 落盘/列目录不变式破；要成 ⇒ 可转。
+- **29 `spill_path_invariant_test.go:344` `TestSpillIntoRealStoreThenDeleteStaysUnderDataDir`**
+  摘：`t.Fatalf("memory.Open: %v", err)`（`:349`）。判：开库 setup 被拒，要成 ⇒ 可转。
+- **30 `spill_test.go:24` `TestSpillThresholdScalesWithWindow`**
+  摘：`t.Fatalf("4096 window: spilled=%v err=%v, want spill (threshold shrank past the payload)", sp.Spilled, err)`（`:62`）。判：要「必须 spill 成功」；未解析根使 spill 落不下 ⇒ 可转。
+- **31 `spill_test.go:71` `TestSpillTokenBoundary`** — 摘：`t.Fatal(err)`（`:88`，spill setup）。判：setup 被拒，要成 ⇒ 可转。
+- **32 `spill_test.go:97` `TestSpillArtifactAndStubShape`** — 摘：`t.Fatal(err)`（`:111`）。判：setup 被拒，要成 ⇒ 可转。
+- **33 `spill_test.go:186` `TestSpillThroughLoop`** — 摘：`t.Fatalf("tiny window must spill the same result, got %+v", resTiny.ToolLog)`（`:214`）。判：要「loop 里 tiny window 也 spill 成」；未解析根挡落盘 ⇒ 可转。
+- **34 `spill_test.go:241` `TestSpillArtifactRespectsRawCap`** — 摘：`t.Fatal(err)`（`:249`）。判：setup 被拒，要成 ⇒ 可转。
+- **35 `truncation_test.go:26` `TestMaxTokensFailsAllToolCallsOfThatMessage`** — 摘：`t.Fatalf("memory.Open: %v", err)`（`:26`）。判：开库 setup 被拒，要成 ⇒ 可转。
+- **36–38 子测试 `TestSpilledBytesSurviveANameThatUsedToCollide/{slash_id_then_bare_id, bare_id_then_backslash_id, dotdot_id_then_word_id}`**（父 `spill_name_injectivity_test.go:99`）
+  摘：`t.Fatalf("Prepare(%q): %v", pair.idA, err)`（`spill_name_injectivity_test.go:114`）。判：三枚同父——`Prepare` 落 spill 被未解析根拒；断言要「碰撞名前后 spill 都存活」，要成 ⇒ 可转。
+- **39–42 子测试 `TestSpillCallIDHostileShapesSanitizedToBareNames/{separator, dotdot, drive_letter, unc}`**（父 `spill_path_invariant_test.go:102`）
+  摘：`t.Fatalf("Prepare(%q) failed: %v", sh.callID, err)`（`spill_path_invariant_test.go:112`）。判：四枚同父，`Prepare` 被未解析根拒；形状是 callID 名净化、非路径根 ⇒ 要成，可转。
+- **43 子测试 `TestSpillCallIDHostileShapesSanitizedToBareNames/encoded_shapes_stay_bare_and_empty_id_falls_back_to_sequence`**
+  摘：`t.Fatalf("Prepare(%q): %v", id, err)`（`spill_path_invariant_test.go:166`）。判：同上，setup 被未解析根拒，要成 ⇒ 可转。
+
+### 5.3 `./internal/agent/approval/`（1 枚）— 可转
+
+- **44 `batch_test.go` `TestTenOpsInOneToolCallGetOneConfirm`**
+  摘录：`p := ui.wait(t); if p.Level != "L1" { t.Fatalf("level=%q：授权目录内的声明 L1 写应留在 L1", p.Level) }`（`batch_test.go:164-167`）
+  判定：**可转**。判据：软链形它红在 `level="L2"`（A2L `:166`）——写目标在未解析 `t.TempDir()` 里 ⇒ 规范化器不认它「在授权树内」⇒ 声明 L1 被升级到 L2。随后批合并拿不到、`spawn` 的协程卡在待答 ⇒ cleanup 里 `fakes_test.go:193 派生的测试协程未在 3s 内退出` + `:277 闸门退出时仍有 1 个待审批项未清理`。**3 s 是 t.Fatalf 之后 cleanup 的连锁，非独立病因**；根因仍是未解析根→不授权→升级 L2。解析根后目录被认作授权、写留 L1、10 项并一次确认 ⇒ 回到普通形绿。（此枚在 AC#1 两枚样本 L1/L2 同现，非争用 flake。）
