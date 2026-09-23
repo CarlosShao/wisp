@@ -24,11 +24,11 @@
 
 - 容器 `golang:1.27`（`go1.27.1 linux/amd64`、`WSL2 6.6.114.1-microsoft-standard`、`CGO_ENABLED=1`、`GOPROXY=off`），复用票 119 的命名卷 `ac119-gomodcache`/`ac119-gocache` ⇒ 离线可编。
 - 挂载一律 `/d/...` + `MSYS_NO_PATHCONV=1`，`/src` 以 `:ro` 挂；**每枚样本进容器第一件事**打 `ls -l /src/go.mod` = `-rwxrwxrwx 1 root root 883`、`md5sum /src/go.mod` = `f6ef661732b1851e5c3db348113cb605`、`md5sum /src/internal/winsec/resolve.go` = `b6876a5efe759f6e17434d1b50a129c3` ⇒ 与 AC#1／AC#2a／批次 1／批次 2／3a／3b **逐字同字**，非空挂自证（Git Bash 下 `docker run -v "C:\…"` 会静默挂空且 rc=0＝假绿）。另加一发 `ls -d /src/cmd/wisp` 打真实包目录，防「挂对文件、跑错包」。
-- 形状硬断言沿用批次 1／2／3a：软链形 `exit 96/97/98`（链接必须真是链接、`readlink -f /varlink/w124tmp` 必须等于 `/realpriv/w124tmp`）；普通形 `exit 99`（`/varlink` 必须**根本不存在**、`/plainroot` 不许是链接）。批次 3b 自撞那一发新增的 `exit 90`（容器内 `cd /src` 失败即停，防「四数全 0 被当成没红」）**本批写进脚本**。**本批 8 发无一命中**。软链形逐字形状行：`SHAPE=link TMPDIR=/varlink/w124tmp resolved=/realpriv/w124tmp` + `lrwxrwxrwx 1 root root 9 ... /varlink -> /realpriv`；普通形：`SHAPE=plain TMPDIR=/plainroot/w124tmp resolved=/plainroot/w124tmp`。
-- **每形一枚新容器**（批次 2 §9 那本账）。容器名逐枚：`wisp124-2b4-{prelink,preplain,postlink,postplain,probelink,mutproof,mutlink,mutplain}` ＋ 门禁两发（全部 `--rm`）。
+- 形状硬断言沿用批次 1／2／3a：软链形 `exit 96/97/98`（链接必须真是链接、`readlink -f /varlink/w124tmp` 必须等于 `/realpriv/w124tmp`）；普通形 `exit 99`（`/varlink` 必须**根本不存在**、`/plainroot` 不许是链接）。批次 3b 自撞那一发新增的 `exit 90`（容器内 `cd /src` 失败即停，防「四数全 0 被当成没红」）**本批写进脚本**。**本批 9 发测试读数无一命中**（那 2 发非测试容器不建形状、不参与这一断言）。软链形逐字形状行：`SHAPE=link TMPDIR=/varlink/w124tmp resolved=/realpriv/w124tmp` + `lrwxrwxrwx 1 root root 9 ... /varlink -> /realpriv`；普通形：`SHAPE=plain TMPDIR=/plainroot/w124tmp resolved=/plainroot/w124tmp`。
+- **每形一枚新容器**（批次 2 §9 那本账）。本批共 **11 枚容器、全部 `--rm`**：9 发 `-v` 测试读数 `wisp124-2b4-{PRE-L,PRE-P,POST-L,POST-P,PROBE-L,MUT-L,MUT-P,GATE2-LINK,GATE2-PLAIN}`（宿主侧 launcher 用 tag 当容器名）＋ 2 发非测试容器 `wisp124-2b4-mutproof`（判据⑤落地自证）、`wisp124-2b4-vetlinux`（容器原生 vet/gofmt）。⇒ 9 发 `-v` 里软链形 5 枚、普通形 4 枚，**没有任何一发复用上一形的容器**。
 - 跑法脚本（新建，未改前三批任何一支）：`/d/tmp/wisp124-2b4-h.sh`（`bash /h4.sh <link|plain|none> <tag> [pkgs]`，`COUNT=2` 切门禁那一发、`TIMEOUT` 默认 50m）、`/d/tmp/wisp124-2b4-docker.sh`（宿主侧一发一容器）、`/d/tmp/wisp124-2b4-roster.sh`（把 `-v` 日志折成逐名名册）、`/d/tmp/wisp124-2b4-convert.py`（2 处行号锚定替换，锚不中即 `ANCHOR MISS` 且不写盘）、`/d/tmp/wisp124-2b4-probe-patch.py`、`/d/tmp/wisp124-2b4-mutate.py`、`/d/tmp/wisp124-2b4-mutproof.sh`。日志与名册全在 `/d/tmp/wisp124-2b4-logs/`。
-- 包级 `-timeout 50m`：沿用批次 2 那本「软链形含 300 s 腿 ⇒ ≥ 50m」的账。⚠ **本包实测无需要**：`cmd/wisp` 的票 123 三枚 300 s 腿一枚都没有（那三枚全在 `internal/tools`），`-count=1` 两形包级耗时 `10.1 s`／`10.4 s`，`test timed out` 在 8 发 `-v` 日志里命中 **0**。留 50m 是防那 28 枚两形都红的命令面腿里有隐藏的长等待把它截成"没跑完"，不改变任何读数。
-- ⚠ **四数之外还比名册差集**（一条用例 panic 会吞掉同包其余读数）：本批 8 发 `-v` 日志 `grep -ci panic` **全 0**，逐名名册四台恒 71 行，`comm -3` 两两 0 行（见 §2）。
+- 包级 `-timeout 50m`：沿用批次 2 那本「软链形含 300 s 腿 ⇒ ≥ 50m」的账。⚠ **本包实测无需要**：`cmd/wisp` 的票 123 三枚 300 s 腿一枚都没有（那三枚全在 `internal/tools`），`-count=1` 两形包级耗时 `10.1 s`／`10.4 s`，`test timed out` 在 9 发 `-v` 日志里命中 **0**。留 50m 是防那 28 枚两形都红的命令面腿里有隐藏的长等待把它截成"没跑完"，不改变任何读数。
+- ⚠ **四数之外还比名册差集**（一条用例 panic 会吞掉同包其余读数）：本批 9 发 `-v` 日志 `grep -ci panic` **全 0**，逐名名册四台恒 71 行，`comm -3` 两两 0 行（见 §2）。
 - 开测前查在飞（`/d/tmp/wisp124-2b4-logs/GH-RUN-LIST.txt`）：**1 枚 `in_progress`**（`35870138533`，13:52:35z 起，docs push）＋ 3 枚 completed（全 `failure`）。⇒ 本机就是 self-hosted runner，存在同机抢 CPU；本批判据全是**红绿名册**而非耗时（两形同容器同码只差 `TMPDIR` 一个变量），按 AC#2a §0 同处理：**影响单枚耗时、不影响红绿**，照跑并在 §9 登记。
 - 时间戳：先 `date -u`（13:37z 开工、13:54z 本段落笔）再 +8。凭据值不进本报告（本包 `secret_test.go` 的文件头即明写所有 key 值是假占位符 D36#5/R7，本报告未抄任何形似密钥的串）。
 
@@ -119,7 +119,7 @@
 - 普通形红名册：`diff PRE-P.red.txt POST-P.red.txt` ⇒ **0 行**（各 28 名）。
 - 两形都红那一档跨批不变：`diff both-red.txt both-red-post.txt` ⇒ **0 行、rc=0**（PRE 台算出的 28 枚名册与 POST 台算出的**逐名相同**）。
 - 用例名集合：`PRE-P ↔ POST-P`、`PRE-L ↔ POST-L`、`POST-L ↔ POST-P` `comm -3` 各 **0 行** ⇒ 没多一枚、没少一枚。
-- `test timed out`／`panic` 在 8 发 `-v` 日志里各 **0** 命中 ⇒ 没有"一条挂了吞掉同包读数"的形状。
+- `test timed out`／`panic` 在 9 发 `-v` 日志里各 **0** 命中 ⇒ 没有"一条挂了吞掉同包读数"的形状。
 
 **`git diff` 的删除侧全文只有 2 行，两行都是 `t.TempDir()` 那一个表达式**（`git show --numstat 5265c3a` ＝ 3 枚文件、删除列合计 2；下面是 `git diff 54123e0 5265c3a -- cmd/wisp/` 里全部非 `---` 头的 `-` 行，逐字抄，`^I` 是一枚制表符）：
 
@@ -323,7 +323,7 @@ package github.com/CarlosShao/wisp/cmd/wisp
 5. **gofumpt 只有宿主读数**（容器无该工具、`GOPROXY=off` 不联网装），且 **CI 未钉版本**；本批宿主版本 **`v0.12.0 (go1.27.1)`** 与前三批写的 `v0.7.0` **不一致**（宿主那枚二进制的 mtime 是本程开工后 2 分钟，§7.3）⇒ 复现者以自己手上那一枚为准，本批结论（0 行）在 v0.12.0 下成立。
 6. **判据④ 的"实拿"只覆盖本批 5 枚**（5 枚共 6 个入口，每枚都拿到自己要的那一句）。那 28 枚两形都红的用例**没有**逐枚实拿（不在本批分母内，且它们改前改后名册逐名相同）；本包其余 47 处未改的递根点也**没有**做"它们会不会在别的形状下拿到未解析根"的账——那是终判据复算与票 119 `R-119-7` 那本旧账的事。
 7. **全树终判据未复算**（票面 16:33 那条"软链形红名数＝0"）——按派单**不归本批**：要 3a＋3b＋本批合并态才能量，且票 133 的 AC#2 修复**正在改同一枚包** ⇒ **AC#2 本格不翻、AC#2b 不翻、AC#5 不翻**。
-8. **票 123 那三枚 300 s 腿本批零枚命中、也未顺手修**：`TestL1WriteGoesThroughTheRealBlockWindow`（`internal/tools/wiring_test.go:112`）、`TestLateVetoRendersTheApprovalLayersAppliedStepsReport`（`:182`）、`TestFSReadOnlyNeverOpensACard`（`:291`）三枚逐名核过**不在 `cmd/wisp` 的名册里**（`grep -c` 于 PRE-L／POST-L 名册各 **0**），本批 8 发 `-v` 日志 `test timed out` **0** 命中 ⇒ 本包对那三枚**既无豁免需要、也没制造新红**。
+8. **票 123 那三枚 300 s 腿本批零枚命中、也未顺手修**：`TestL1WriteGoesThroughTheRealBlockWindow`（`internal/tools/wiring_test.go:112`）、`TestLateVetoRendersTheApprovalLayersAppliedStepsReport`（`:182`）、`TestFSReadOnlyNeverOpensACard`（`:291`）三枚逐名核过**不在 `cmd/wisp` 的名册里**（`grep -c` 于 PRE-L／POST-L 名册各 **0**），本批 9 发 `-v` 日志 `test timed out` **0** 命中 ⇒ 本包对那三枚**既无豁免需要、也没制造新红**。
 9. 变异自证只发了**一票**（拆掉本批接上去的那一层）。票面 AC#4 要求的最低量是"至少一发把新加的那层解析拆掉"⇒ 已满足；没有发"把 `proc.SealableRoot` 本身拆掉"那一发（属票 119／125 的地界）。
 10. **批次 3b §1.3(b)／§9.1(2)(3) 那本 12 枚 winsec 邻居账（"绿得没有理由"）本批未评、未修、不替它记账** ——派单把本批范围钉死在 `cmd/wisp` 5 枚，那一格仍交编排者裁。
 
@@ -346,7 +346,7 @@ package github.com/CarlosShao/wisp/cmd/wisp
 3. 包级 `rc` 在**改前改后都是 1**（两形），这**不是**没转绿的证据：`./cmd/wisp/` 恒有那 28 枚两形都红。复算请按 (b) 档名册拿。
 4. 机制字串（`refusing to seal /varlink`）**不会**在 `cmd/wisp` 归零（改后软链仍有 21 行，全部逐名归给 (b) 档那 28 枚；§1 ④ 三条核过）。终判据按**红名名册**判，别按 `grep -c` 判。
 5. 本批交出的四个一手数可直接引用：`-count=1` 软链 `71/20/21/0`+`23/7/0`、普通同；`-count=2` 两形 `142/40/42/0`+`46/14/0`；台账 ban #8 `internal/`=400→401、`cmd/`=38→39（余六数不变）。
-6. ⚠ 两条跑法账继续沿用并已在本批各自成立：`exit 99`（普通形那一发**断言 `/varlink` 根本不存在**，本批 4 发普通形无一命中）＋ **每形一枚新容器**（本批 8 发 `-v` ＋ 3 发非测试容器，逐枚不同名）。批次 3b 自撞那一发的防线本批也写进了脚本（`exit 90`：容器内 `cd /src` 不成就停，防"四数全 0 被当成没红"）；本批**未重踩**（8 发四数无一为 0）。
+6. ⚠ 两条跑法账继续沿用并已在本批各自成立：`exit 99`（普通形那一发**断言 `/varlink` 根本不存在**，本批 4 发普通形无一命中）＋ **每形一枚新容器**（本批 9 发 `-v` ＋ 2 发非测试容器，逐枚不同名）。批次 3b 自撞那一发的防线本批也写进了脚本（`exit 90`：容器内 `cd /src` 不成就停，防"四数全 0 被当成没红"）；本批**未重踩**（9 发 `-v` 读数四数无一为 0）。
 
 **建议**：**AC#2 本格、AC#2b、AC#5 继续不翻**，等合并态复算那一格按上面三档逐名核完再一次性翻。
 
