@@ -63,6 +63,10 @@
   从「跑」变成「SKIP」⇒ 「83 枚」这类数**天然低估**受影响用例总量。
   逐包四数与红名清单：`docs/evidence/s1/124-ac1-denominator-readings.md` §2/§3/§4；形状差集 §5.3；副作用 §5.4；复跑仪器 §1。
   **AC#2..AC#6 一格未动，生产码 0 hunks。** `next=` 请裁 AC#2 的方向（解析调用点 vs 逐枚降级为"就是要测拒绝腿"）。
+- 2026-09-23 16:0x `worker-ticket124-ac2a`：**AC#2a 交件（纯清点，零 `.go` 改动）**。锚定 `bcb03aa`（开工 `git rev-parse HEAD` 首读 `6fdb39d`、两秒后即变 ⇒ 记两值）的 `git archive` 纯净快照（1033 文件）+ `golang:1.27` 容器；挂载/形状自证同 AC#1（进容器 `ls -l /src/go.mod`=883、`md5 resolve.go` 同字，`exit 97/98` 断言沿用）。受影响 9 包 `-count=1 -v` **两形各一枚**（`A2L` 软链 / `A2P` 普通）。
+  三档定账：**可转 131 / 拒绝腿 0 / 待裁 1**。逐枚四列（`file:line`+名、断言原文摘录、判定、判据）落 `docs/evidence/s1/124-ac2a-leg-classification.md`（132 行不合并）。要点：① 与那句硬前提一致——132 枚普通形全绿 ⇒ 无一能自证拒绝腿；凡断言带 "Refuses/Rejects/want Err…" 的 6 枚（winsec AC5 注入 `ErrNotSealable`、AC118 leaf-link、AC3 反向、memory `ErrSchemaUnmigratable`、tools 回收站 `回收站`、llm `RefusesSilentRuns`）逐字回看软链形字符串 ⇒ 它们要的都是**另一种拒/成**、非「未解析根必须被拒」，接解析不被洗绿 ⇒ 判可转。② tools 的红分甲（直接 `seal … not provably resolved`）/乙（`c26Pipeline/InAllowlist=false` → 升 L2 → `审批未通过`）两文案、根因同未解析根；`memory.TestCrashRecoveryKillMidWrite` 红串是「子进程 0 行」非字面根，但根因同（须把交给子进程的 `WISP_CRASH_DIR` 也解析）⇒ 标「可转（带落地提醒）」。
+  **对账（vs AC#1 的 132）**：本快照 `A2L\A2P` 逐名差集 = **133**，AC#1 那 132 枚**逐名零差、全在**；多的一枚 = `./internal/tools/TestLateVetoRendersTheApprovalLayersAppliedStepsReport`（软链形 `--- FAIL 300.02s`、普通形 `--- PASS 3.00s`），与已单列的 `TestL1Write`（300.04s）**同属 C18 审批超时族**、红因非未解析根，AC#1 只逮到 `TestL1Write` 漏了这枚。`TestL1WriteGoesThroughTheRealBlockWindow` 按 AC#2裁定 附带发现 2 单列、标"归因待票 123 裁"、不替它下结论（其失败文案逐字为「审批超时（300 秒未确认），C18 一律判拒绝」）。
+  「变绿 vs 被跳过」已分开：软链形相对普通形新增的 4 枚 SKIP（winsec 3 + config 1，皆票 125 seam 自拒探针）**不在 132 内**；本账 133 枚 only-in-link 在 `A2P` **逐枚 = PASS、无一靠 SKIP 蒙绿**。`TestLateVeto` 归口票 123（与 `TestL1Write` 同）。**AC#2b..AC#6 一格未动，生产码 0 hunks。** `next=` 交编排者：三档已出，请放行 AC#2b——131 枚「可转」接票 119 那条纪律；账上 §7 三条硬提醒（子进程根、6 枚"另一种拒"复算须各自仍拿到自要的拒、归零要两形各一枚且逐包解释 RUN/SKIP 差）。
 
 ## AC#2 的裁定（09-23 15:3x 编排者，依据 `worker-ticket124-ac1` 交回的 `docs/evidence/s1/124-ac1-denominator-readings.md`）
 
@@ -70,7 +74,7 @@ AC#1 的读数比票面预期大一个量级：**全 30 枚包里 132 枚只在�
 而**这 132 枚在普通形一枚都不红**。⇒ 它问的那句"是接上解析纪律，还是降级成'就是要测拒绝腿'"**不能整体二选一**，
 因为两半的代价相反：全接解析＝可能把真拒绝腿洗成绿；全降级＝132 枚永久红、分母失去意义。
 
-- [ ] **AC#2a（先做这格，纯清点、不动一行码）** 给这 132 枚逐枚出**断言方向账**：
+- [x] **AC#2a（先做这格，纯清点、不动一行码）** 给这 132 枚逐枚出**断言方向账**：
       每枚记三列——①它把未解析根递给底线是**被测对象**还是**顺手**；②它的断言是"必须拒"还是"必须成"；
       ③改成先解析之后**这条断言还成不成立**（成立＝可转；不成立＝它就是拒绝腿，**一枚都不许多变绿**）。
       ⇒ 判据形式固定：**分类必须可复核**——每行给 `file:line` + 断言原文摘录，不许只给"我判断它是拒绝腿"。
