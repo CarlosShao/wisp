@@ -256,7 +256,7 @@ A2（`refusing to install`，ERROR 支）在这轮容器里**没有**出现（�
 
 **只新建了一枚文件**：`docs/evidence/s1/130-ac1-inventory-and-ruling.md`。既有文件零改动（`internal/`、`cmd/`、票面、`docs/PLAN.md`、`docs/specs/**`、`rules_gateway.go`、`tools/d22scan/**`、`allowlist.txt`、`frontend/**` 全部只读）。
 - `git add` 只用了显式路径；`git diff --cached --name-only` 的输出写在下面（要求：恰好 1 行）。
-- 未 add 的他人 WIP（保持原样）：`cmd/wisp/{doctor,models,providers,run,secret}.go`、两枚 `cmd/wisp/dataroot_128*_test.go`（新，属票 128）、`docs/evidence/s1/131-adversarial-acceptance.md`（属票 131）、`.scratch/wisp/issues/130-*.md` 与 `134-*.md`（票面，本票未勾框）。
+- 未 add 的他人 WIP（保持原样）：`cmd/wisp/{doctor,models,providers,run,secret}.go`、两枚 `cmd/wisp/dataroot_128*_test.go`（新，属票 128）、`docs/evidence/s1/131-adversarial-acceptance.md`（属票 131）、`.scratch/wisp/issues/130-*.md` 与 `134-*.md`（票面，本票未勾框）。口径写清楚：这句是**审计开工时**的工作树状态（那几枚都还是未提交 WIP）；到我 commit 时它们已被各自代理入库，我的 `git add --` 只指了自己那一枚路径，`git diff --cached --name-only` 恰好 1 行。
 - **未 push、未 `--amend`/`reset`/`rebase`/`stash`/`checkout .`**。
 - **owner 真实数据目录**：前后各读一次，`%APPDATA%\wisp` 与 `%APPDATA%\wisp-dev` 的文件数 **0 → 0**，目录 mtime `Sep 19 14:49` / `Sep 20 07:06` **未变**（§3.4）。所有写入都在仓外：`/tmp/wisp130-audit/`（= `C:\Users\swq\AppData\Local\Temp\wisp130-audit`）与 `C:\tmp\wisp130-audit\{data,datap}`、`D:\tmp\wisp130-posix\`（容器挂载点）。`build/wisp.exe` 与 `build/*.dll` 只被**复制**，未覆写。
 
@@ -266,6 +266,8 @@ A2（`refusing to install`，ERROR 支）在这轮容器里**没有**出现（�
 - 本节上一版把 A 组说成"全在 windows-tag 文件里" ⇒ **错**：`internal/winsec/resolve.go` 无 tag、`internal/risk` 在 GOOS=linux 的闭包与编译里都成立，并已用容器真跑证实（§3.3）。已改写为"两支平台都有分母、shipped exe 无 Linux 腿"。
 - 另一处：F1 原本引 `cmd/wisp/logsink.go:10` 的字面量 "the D33 credential migration" ⇒ 该行跨 `:8-9` 两行，`grep -F` 打不到；已改成按行号引（这也是"契约明写要引真的句子"那条坑的又一个实例）。
 - 再一处：`internal/config/migrate.go` 点名 `MigratePlaintext` 的行是 `:85`，不是 `:93`（`:93` 是 `PrivateFile` 那行）。
+
+**锚点自证（本仓踩过的形状，票 114 那条同形）**：本文件的**全部读数**锚在 `ac6f31c`；但它落盘时 HEAD 已被他人推进（`264aec9` test(134 AC#5) 等三枚在前）⇒ 我的 commit 的**父不是 ac6f31c**。这不改动任何读数（`internal/` 全程 `git status --short internal/` 干净、`cmd/wisp/` 的 install 顺序经 `git diff ac6f31c --` 逐行核对未变），但**引用本表时要引 `ac6f31c`，别把本 commit 的父当成锚定 sha**。
 
 **待办（不属本票只读范围，交给 owner 拍板）**：
 1. 勾 AC#1 之前请先核 §2 的式子能否在**你的机器上**复跑（尤其 `go list -deps` 与 `git show ac6f31c:…` 两枚）。
