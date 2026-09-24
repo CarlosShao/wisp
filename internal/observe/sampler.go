@@ -585,7 +585,7 @@ func buildSettleVerdicts(rep SettleReport) []Verdict {
 // foldSettlePass is SettleReport's pass rule: the base verdict stands unless a
 // verdict row that declares itself a gate failed. StateReport folds the same
 // way (:341-346); keeping it a function is what makes the rule testable on a
-// row set the shipped gate constant does not produce yet.
+// row set the test picks itself, whatever settleCoverageRowGates says at HEAD.
 func foldSettlePass(base bool, rows []Verdict) bool {
 	pass := base
 	for _, v := range rows {
