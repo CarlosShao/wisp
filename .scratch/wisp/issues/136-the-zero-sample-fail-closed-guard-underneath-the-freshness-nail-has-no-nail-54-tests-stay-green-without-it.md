@@ -490,3 +490,51 @@
   ②`cmd/wisp` 现在空不缺人但**先派 137 AC#4**（不占 `cmd/wisp`、且已写明两格不许并做）；
   ③AC#2..AC#7 六格是 09-20 那批的旧账，排在 137 AC#4 与 136 AC#10/#14/#15 之后。
 - [2026-09-24T10:41Z] agent=orchestrator did=**只读预检程交回后的四格裁定入库**（`auditor-ticket136-preflight`，表 `docs/evidence/s1/136-ac10-ac14-preflight-r1.md`，306 行／锚 `7cf8075`；**它不翻勾、不裁成立**，只答"这两格能不能派、按什么顺序派"）。**它推翻我简报里四处前提，逐条我在盘上复量一致才落**：P1 我把 **AC#15 的 `:278` 地界句**（"只许动 `internal/observe/**_test.go`"）当成 AC#14 的——现量 AC#14 是 `:232-252`、通篇没那句；P2 "会不会开六态窗口"＝**不开任何窗**（`proc.Boot` 在 `boot_windows.go:57-113` 只做 env 自检/`DefaultLayout`/`OpenJobScope`/`AcquireSingleInstance`，`internal/proc` 全包的 `webview/panel/ball/CreateWindow` 只出现在注释与可为 nil 的钩子字段名上），**但会真取样＋另起两枚子 `wisp.exe`＋每发前 2 秒静置**（`slo_windows.go:374`/`:451`/`:201`）⇒ 编队空那条照旧成立、问法要换；P4 `Settle`/`checkSettle` **两个符号盘上不存在**（实名 `CheckSettle` `sampler.go:462`、`runSettle` `slo_windows.go:599`），票面 `:278` 同错、原句不抹另起 `>` 更正；P5 **"等 133"那半句已被超越**（`cmd/wisp/leg_dispatch_gate_133_test.go` 最后改动是 `fa35557` 09:56，标题属**票 135**）⇒ `cmd/wisp` 现在没有写者。另两处它没提我自己核到：`SPEC-02 §3` 那句引用射程不对（它讲 SQLite DDL，不管 SLO 出线）；"全仓没有 `_test.go` 引用 `slo-check.ps1`"实为 **1 枚命中**（`internal/observe/sampler_test.go:15` 是**注释行**，不影响结论，但按"计数要现跑"记在它名下）。**四格裁定**：①**AC#10 判据② 结构上永远产不出它想量的读数**（方向写反：`sampler.go:332-340` 是"造红门行"，拆掉它 = 让它过 ⇒ 退出码只会 1→0；`samples:[]` 与拆守卫互斥（`FM2` 原文 `samples=0 pass=true`）；且 `134-...:643-645` 已逐字记"这条路在当前码里不通"）⇒ 换成"对 `slo_windows.go:386`／`:323-325` 各落一发变异、读 `go test ./cmd/wisp/` 响不响"，今天 `grep -rn "run\.Pass" cmd/wisp/*_test.go` **0 命中**＝不响、装了才响；同时把"零样表面在 CLI 不可达"**登记为结论＋可复算触发条件**（谁给 `cmdSLO` 加了 reader 注入面谁复活它），不留一枚永不响的 AC；②AC#10 判据① 命令**缺 `-state`**（`:223-225` 现量 return 2）⇒ 换成 `134-...:538` 那发原文，且参照值 `mem_median=4476928` **作废**（行自 09-21 15:06 那枚 `build/wisp.exe`，早于 `5c1529a`）；③**AC#14 给出具名解冻**：`internal/observe/sampler.go:431-456` ＋ `:462-521`，边界＝`StateReport` 那侧（`:189-190`/`:331`/`:341-346`）冻结、`buildVerdicts` 不许改成两用；④**门行做成 `Gate: true` 我先不批"直接做"**——它会把 `wisp slo -settle` 的 exit 0→1，经 `slo-check.ps1:381`→`:396` 打到 `slo-smoke`＋`slo-full`（后者是这台 6C12T 本机），所以**实现程第一发必须先量** ≥5 次 `wisp slo -settle` 的 `sample_errors`：全 0 才按 Gate 落地，任一发非 0 **停手报回**（一台有争用的机器被做成"固定红且红因与 SLO 无关"＝我吃过两天的信号量之病，那一步要人拍板），且 Gate 那枚红句必须把 `sample_errors` 点名印出。**排程反过来**：AC#14 先（不占机、纸已给全）、AC#10 后（要编队安静窗口＋取数期间不推送）；`:252` 那半句"本格读它的出线"按 `grep -rn Verdicts cmd/wisp/*.go`（只命中 `providers_test.go` 的 `probeVerdicts`，同名不同物）**作废**，另起 `>` 不悄改。**新增一枚文件级串行**：AC#14 与 AC#15 共用 `sampler_settle_coverage_136_test.go`，而 AC#14 判据② 要推翻的正是那里 `:208-210` 的 `if !rep.Pass { t.Fatalf("disclosure leg, not a verdict leg…") }` ⇒ **派单预先授权它改那一处断言并点名理由**，否则会被下一位判成放水；AC#15 串行在 AC#14 之后。本票勾数不变（**5 勾／10 未勾**，预检不产勾），`next=` 改成：①派 **AC#14 实现程**（解冻已给完、不占机）；②AC#10 等编队安静窗口；③AC#15 排 AC#14 之后；④AC#2..AC#7 六格旧账仍排最后
+
+- [2026-09-24 19:1x +08] agent=worker-ticket136-ac14 did=**AC#14 那一格交件（门行落地，`Gate` 那一步按读数停手报回）**。
+  锚点链：取基线时 `ca2c55e` → 编队落了 `2e6d171`（＝票面 `:325(b)` 要的那一查，结论与本格同向：
+  `136-slo-output-contract-census-r1.md:80` "没有任何一份文档在 `SPEC-12 §4.1` 意义上管 SLO 报告的出线形状"）→
+  本程码 `aef82f5` → 证据 `d6c83de`＋本次。证据 `docs/evidence/s1/136-ac14-impl.md`（§0 锚点与基线四数／
+  §1 那六发读数／§2 逐段落点与冻结面自查／§3 门禁／§4 六发变异／§5 跨包逐名对照／§6 残留／§7 纪律）。
+  **落了什么**：`SettleReport` 加 `Verdicts []Verdict json:"verdicts"`（票面 `:277` 划的 `:431-456` 内），
+  `buildSettleVerdicts`（**另起一枚构造函数**，`buildVerdicts`/`thresholds.go` 一字节未动）产出一枚与 `sampling` 同形的行，
+  `measured` 逐字沿用 `%d valid / %d errors`，红句按**字段名**印 `sample_errors=` ＋ 最后一次丢读原因；
+  折叠处 `foldSettlePass` 复刻 `:341-346`。探针 6 枚全在新文件 `sampler_settle_gate_136_test.go`（自带 fixture，不挤 AC#15）。
+  **预授权那一处按点名要求报**：`sampler_settle_coverage_136_test.go` 原 `:208-210` 那句
+  `if !rep.Pass` ＋ `t.Fatalf("disclosure leg, not a verdict leg…")` **被本程改掉**，理由＝判据①／②；
+  改后写成**与 `gate` 取值无关**的形状（行必须存在／行必须自己说 not-pass／红句必须印 `sample_errors`／
+  失败 gate 行与 `pass=true` 不得并存），所以翻不翻布尔它都成立——**这是刻意的，不是漏**。
+  那枚文件的头注释 `:25-27`（"a partially covered window still passes today"）本程**没动**，它对另外两形今天仍是真的，
+  改准它属 AC#15 射程，登记不越界。
+  **Gate 那一步（票面 `:281-285`）的读数**：编队安静窗口内 `wisp slo -settle` **六发**（≥5），
+  `sample_errors` 逐发 **0**（`exit=0 pass=true samples=40 back_within_cap_ms 263-269`），
+  每发前后各量一次 `slo-check.ps1:153-155` 那份名单（**盘上 15 枚，不是简报里那 8 枚**）⇒ **12 次全空**、`retries=0`；
+  取数前核 `gh run view 35989390166` ⇒ `slo-full`（这台机）已 **completed/success**、`test-windows` 在托管侧。
+  **但本程没有做成 `Gate: true`**——盘上推翻一处前提：票面 `:287` 记"AC#14 要推翻的既有断言"＝**一处**，
+  现量是**三处同形**（`:143-145` / `:208-210` / `:252-254`，都是"disclosure not verdict"），
+  而任何抓得住"丢一半"的判据必然同时抓住另外两形（覆盖率严格更差：kept=1/lost>=9 对照 kept≈lost），
+  要放过另两形只剩"只红在恰好一半"那种非单调阈值＝**新造阈值**，禁。⇒ 扩授权不由实现程自决，
+  按 `:284` 那一档落**记录行**（`settleCoverageRowGates=false`）交回裁。**代价已量成读数，不靠推理**：
+  打在已含 `:208-210` 改写的树上只翻那一枚布尔（变异 S1）⇒ 恰好红 **2 枚**
+  （`TestCheckSettleSingleTrustworthyReadReportsItsLoss`、`TestCheckSettleZeroFootprintDropsAreCountedToo`），
+  改法＝本程已用的同款三段，生产码只动 `:556` 一枚字面量。**批准口令＝翻 `settleCoverageRowGates` ＋ 授权那 2 枚断言。**
+  **门禁**：`-count=2 -v ./internal/observe/` 两遍各 **142/142/0/0**（顶层 **71 枚 ×2**，基线 65×2=130，净增本程 6 枚）；
+  两遍名册 `comm -3` 空、基线→改动后无一名消失或转 SKIP；`grep -ci panic` 两遍各 8（全是用例名带 `Panic` 的两枚，真 `^panic:`=0）；
+  gofmt/gofumpt（盘上现量 **v0.12.0 (go1.27.1)**）/`go vet` 全清；`sh scripts/d22scan.sh` 在 `git archive` 仓外纯净快照 **rc=0**、
+  八 scope `203/22/40/18/16/40/405/39` 对基线 `…/404/39` 唯一变化＝`ban #8 internal/` ＋1＝本程那枚新 `_test.go`（台账 `:4392` 同形制），一枚不降；
+  `GOOS=linux CGO_ENABLED=0` build＋vet 各 rc=0（容器读数没取，§6-2）。
+  **变异六发**（先 `grep -n` 证落地＋`go build ./...` rc=0 再读数）：M1 摘门行⇒红 4 枚逐名、M2 门行不看丢读⇒红 2 枚、
+  M3a **单点只撤折叠调用点⇒71 枚全绿＝那一处在 HEAD 形状下就是装饰，本程明说不遮**、M3b 同处回退＋gate=true⇒立刻红 3 枚（它变承重的瞬间已有钉子）、
+  S1 见上、正向对照未改树 71/71。**跨包**：`cmd/wisp` 整包改动前后各 95/46/**8**/0，红名逐名 `comm` 双向空（本程零影响），
+  那 8 枚属票 128/winsec 族、`ca2c55e` 上就在；另记宿主直跑 `go test ./cmd/wisp/` 会以 `0xc0000135`（DLL 缺位）收场，
+  与简报 `⚠` 那条同源，AC#10 出去前该知道。`lint` 在 `ca2c55e` 那发 run 上就是 failure（先于本程）。
+  **本格状态**：判据① 落了一半（行会自己说不 pass，但不否决总布尔）、②③④ 全量到位 ⇒ **本程不翻勾，`AC#14` 仍未结**。
+  禁改面全部没碰（`cmd/wisp/**`、`internal/proc/**`、`internal/winsec/**`、`frontend/**`、`design/**`、`docs/PLAN.md`、`docs/specs/**`、
+  `internal/risk/**`、`tools/d22scan/**`、阈值／golden／`thresholds.go`、`scripts/slo-check.ps1`、`.github/workflows/**`、票 128/135/140/119 面）；
+  只 commit 未 push、每枚 `git show --name-only` 只含本程路径；临时件全在 `D:\tmp\wisp136ac14\`（只建不删）、仓库内没建新东西、
+  `build/wisp.exe`（09-21 那枚参照件）没被覆盖。注入两栏：真通知回显 0／判为注入 0。
+  next=①**编排者翻 `settleCoverageRowGates` 那一枚布尔 ＋ 授权那 2 枚断言**（S1 已给逐名代价与改法），随后 `wisp slo -settle` 的
+  exit 色才会随 `sample_errors` 翻，`slo-check.ps1:381`→`:396` 那条链才有新红可打——六发全 0 支持这一步，本程不自决；
+  ②AC#15 重划靶子时把本程 6 枚新探针一起数进去（§6-3 给了本程前提腿比已知会红那枚更松、但样本量小不外推）；
+  ③AC#10 出门前读 §5 那两笔（8 枚既有红＋`0xc0000135` 的 DLL 前置），并知道 settle 侧现在"0 valid / 0 errors"有行可依、
+  `slo_windows.go:623` 那枚合成报告的 `verdicts:null` 要落到同一判据得在 `cmd/wisp` 侧补（本程没碰）；④AC#2..AC#7 六格旧账仍排最后。
