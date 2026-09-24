@@ -338,3 +338,28 @@ B3 尾段与 CI 重叠 ⇒ 其 2/30 只作旁证；`-count=500` 属同进程口�
 **两栏注入计数**：真通知回显 **3** ／ 判为注入 **0**。凭据值零处入文。
 
 next=（本程未做、下一位若要加码可做）：CI 空档里再补一发逐发前后夹闸门的整包批（仪器已就位＝`/d/tmp/wisp136ac11-run-batch3.sh`，本程因 14:26 CI 起跑未发）；把改后样本推到 ≥60 发以把 5% 拒绝水平做硬。
+
+---
+
+## §9 两枚 commit 的原始输出（原样贴，硬规矩 ③）
+
+码那一枚（§3 落点）：
+
+```
+$ git log --oneline -1                       # 于 14:14:14 提交后现取
+f06a8d0 test(136,AC#11): 把 TestNoopTaskReturnsToBaseline 的中段计数从"抢窗口"改成"等判据"
+$ git show --name-only HEAD
+internal/observe/goroutine_test.go
+```
+
+证据那一枚（本文件）：
+
+```
+$ git log --oneline -1                       # 于 14:34:01 提交后现取
+c2a3bd6 docs(136,AC#11): 本格证据表——改前 4/60（逐名红句＋四数＋名册差集）、逐 key 归因（33/500 探针）、修法与反向判据、改后 0/30（前后双 CLEAR 夹住）
+$ git show --name-only --format= HEAD
+docs/evidence/s1/136-ac11-impl.md
+```
+
+⚠ 补记本节的第 3 枚 commit **不自我引用**（它的两行原始输出在交件回文里，盘上 `git log --oneline -1` ＋
+`git show --name-only HEAD` 一发即可复核）。三枚 commit 之后工作树里**没有本程未提交的改动**。
