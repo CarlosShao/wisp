@@ -520,12 +520,153 @@ dataroot_symlink_119_other_test.go:288: AC#3 SealFile("/acwpriv/wacc119tmp/TestA
 判据④ **成立（独立复现）**。函数体四版同 md5、`:251` 零 hunk、`SENTINEL=3/CREDIT=2` 恒量、
 两形逐名颜色四对一致、名册差额不含它。
 
-### 4.6 本节落盘的 commit
+### 4.6 本节落盘的 commit（原样输出）
 
-**号只认现量，我不在这里预写**（预写＝凭空造号，本项目吃过这一枚）：
-`git log --oneline -1 -- docs/evidence/s1/119-ac7-r1-acceptance.md` 在 §5 那枚 commit 之后回看本节，
-本节体落在"subject 以 `evidence(119 AC#7 r1 §4)` 开头"的那枚 commit 上；
-逐节归属用 `git log -L '/^## §4/,/^## §5/:docs/evidence/s1/119-ac7-r1-acceptance.md' --oneline`。
+```
+$ git log --oneline -1
+33af710 evidence(119 AC#7 r1 §4+§5): 判据④成立（AC#3 函数体四版同 md5 831a5c08 …
+$ git rev-parse HEAD
+33af710eec2adfa41ec7e603f9b8a86304d8715c
+$ git show --name-only --format="%H" HEAD
+docs/evidence/s1/119-ac7-r1-acceptance.md     ← 只有这一行（本文件），无别人的路径
+```
+
+（本节与 §5 同一枚 commit；号是我在写这一段之前 `git log` 现量的，不是预写的。
+逐节归属仍以 `git log -L '/^## §4/,/^## §5/:<本文件>' --oneline` 为准。）
+
+---
+
+## §6 门禁复算（**一律按包 scope**，因为 `cmd/wisp/**` 有另一枚代理在飞）
+
+| 尺 | 命令原文 | 读数 |
+|---|---|---|
+| `gofmt -l`（宿主） | `cd D:/tmp/wisp119-ac7-r1acc/snaps/head && gofmt -l internal/winsec/` | **空输出**，`GOFMT_WINSEC_RC=0`；单枚文件 `gofmt -l internal/winsec/dataroot_symlink_119_other_test.go` 也空 |
+| `gofumpt -l`（宿主，**v0.12.0**） | `"D:\work\base\gopath\bin\gofumpt.exe" -l internal/winsec/` | **空输出**，`GOFUMPT_WINSEC_RC=0`；`--version` 原文 `v0.12.0 (go1.27.1)` |
+| `gofumpt -l`（容器） | 未跑 | 仪器边界：镜像里没有 `gofumpt`，`GOPROXY=off` 下 `go run mvdan.cc/gofumpt@…` 取不到 module（实现方 §6 同一枚错误形状）。⇒ 格式门**以宿主那把 v0.12.0 为准**，两程同一把尺 |
+| `go vet`（宿主，三 GOOS） | `go vet ./internal/winsec/`；`GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go vet ./internal/winsec/`；`GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go vet ./internal/winsec/` | 三发 **rc=0**（`VET_HOST_WINDOWS_RC`／`VET_HOST_LINUX_RC`／`VET_HOST_DARWIN_RC`） |
+| `go vet`（容器，三 GOOS） | 容器内 `go vet ./internal/winsec/ ./internal/proc/`（linux，默认 CGO）；`GOOS=windows GOARCH=amd64 CGO_ENABLED=0 …`；`GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 …` | `VET_LINUX_RC=0`、`VET_WINDOWS_RC=0`、`VET_DARWIN_RC=0`（`logs/gate-container2/gates.txt`）；另：23 发取数容器**逐发** `VET_RC=0`（`gates.txt`，本程把它取数前的门从"只 build"升级成"build＋vet"，见 §0.7） |
+| 容器 `gofmt -l` | `gofmt -l internal/winsec/` | **空输出**，`GOFMT_RC=0` |
+| `sh scripts/d22scan.sh`（纯净快照，交件树） | 容器内、`git archive 2956897` 快照 | **`D22SCAN_RC=0`** ＋ `d22scan: clean - no D22 ban violations`；台账：`bans #1-5 internal/=203 cmd/=22、#6 frontend/=40、#7 internal/tools/=18、#8 design/=16 frontend/=40 internal/=404 cmd/=39` |
+| 同一把尺跑**改前基线树** | 容器内、`git archive a9c8b6e` 快照 | **`D22SCAN_RC=0`**，台账八枚数字与上一行**逐一相同**（203/22/40/18/16/40/404/39）⇒ "不降"这一枚我量到的是**逐项相等、差 0**：本格只改了一枚既有 `_test.go`，没有新增文件、没有减任何 scope |
+| 正向控制（门能不能红） | `d22scan.sh` 第一步 `runtests.sh -C tools/d22scan ./...` | 真跑：`runtests.sh: OK - top-level: PASS=21 FAIL=0 SKIP=0, === RUN=31` ⇒ 报"clean"之前那把尺自己证明过它能红 |
+
+**我没跑的东西（不是漏，是纪律）**：整树 `go test ./...`、`go build ./...`（`cmd/wisp/**` 里
+`worker-ticket128-ac4` 在飞，跑整树会吃到它未提交的改动并冒充成我的读数）；
+`-count=2` 与"非 `-v` 一遍"那两枚 AC#6 口径的仪器（本格的判据是③那对判别＋名册差集，
+四数与 SKIP 名册我已按 `-count=1 -v` 逐发给全）。
+
+**本程未取任何时序／内存读数**（派单禁，本格判据也没要）。
+
+### 6.1 档位说明（本表用的三档）
+
+- **独立复现**＝我自己造台件、自己下饵、自己跑容器、自己数四数与名册；命令原文与日志路径都在表里。
+- **日志＋归档抽验**＝只在它给的日志/快照上核过形式，没重跑。
+- **仅自述不背书**＝只有它自己说过，我没重走。
+
+本表里判据①②③④**没有一格落在后两档**；落在"日志＋归档抽验"的只有两处**旁证**：
+它 §8 那两枚 docker volume 的来源卷（我没核），以及它 §0 记的那次"编排者推送带走中间态"（我只在
+`git log` 里读到 `28c997c` 的 subject，未去核远程）。"仅自述不背书"：**零格**。
+
+---
+
+## §7 我明确没核的清单（列出来是为了下一位不必猜我干了什么）
+
+1. **票面 119 的 AC#1–AC#6 五格**：那是别的程的账（`119-ac1-ac2-r2-acceptance.md`、
+   `119-ac2-r2b-acceptance.md`、`119-adversarial-acceptance.md`），本表**只裁 AC#7**。
+2. **CI 上这枚文件有没有腿**：票 119 日志 `next=` 第 7 条那笔（本轮三枚新用例在 CI 上没有分母之类），
+   本格判据零处要求它，我也没去读任何 run。**这条不因本表结清。**
+3. **`internal/winsec` 生产码的正确性本身**：本程生产码一字未动（三枚文件 md5 两树相同，容器里现量），
+   所以"那条腿对不对"不是本格的题；我只验测试件。
+4. **`tools/d22scan/**` 的实现**：我只跑它、读它的 stdout，未审它（那是 `allowlist.txt`/门禁票的地界）。
+5. **票 137 证据 §3.2/§3.3 的原始读数**：判据①说"按票 137 AC#2 的形状"，我核的是**代码形状**
+   （helper 存在、签名、可达性、两树 md5），**没有**去复算 137 那张表里的八发数——那一格不是我这次的活。
+6. **AC#3 那枚用例在 137 AC#4 里被当对照组的用法**：我只验它"两形颜色逐名没变"（§4.3），
+   没验"别人拿它当对照组时读到的数"。
+7. **macOS 真实形状**（`/tmp`、`/var` 本身就是链接）：我只在 Linux 容器模拟同形，
+   本机是 Windows，那半边**没有分母**——这一枚与前两程一样，属仪器边界不是缺陷。
+8. **硬链接**（`R-113-E`）：票面明令"本票不修硬链接、不许混进来"，我也没测。
+9. **`docs/evidence/s1/119-ac7-impl.md` §7 那两栏计数**（它的真通知回显数／判为注入数）：
+   那是它自己的账，我只记我的（§8）；两程的枚数不同**不构成矛盾**（各自计数，不互相抵账）。
+10. **它作废的那两遍读数**（§9.2 说的 `ddc1583` 配套数、以及 `GATE95` 那一遍）：
+    我没去它的 `logs/` 里逐发复算——我的 a/b/c/d/e 系列全部自造，不复用它的日志。
+
+---
+
+## §8 临时件清单（**只建不删**，全部在仓外）＋ 两栏计数 ＋ 被拒/报错
+
+### 8.1 台件与日志
+
+```
+D:\tmp\wisp119-ac7-r1acc\snaps\            19 棵（349 MB），全部 git archive <sha> | tar -x 起于仓外
+   base(=a9c8b6e)  head(=2956897)  base-mutd  head-mutd  head-mutd2(坏,§0.7-1)  head-mutd2f
+   rA1  rA2  rA12                        ← 撤换根（单点各一枚／两枚都撤一枚）
+   rB1-mutd  rB2-mutd  rB1-mutd2  rB2-mutd2(坏,§0.7-2)
+   rB1-mutd-f2  rB2-mutd-f2  rB1-mutd2-f2  rB2-mutd2-f2   ← 修好的回退 B
+D:\tmp\wisp119-ac7-r1acc\scripts\          run_one.sh（每发主仪器：门 97 挂载非空/形状、门 95 build+vet）
+   drive.sh（宿主侧，Windows 风格 -v）  mutate.py（MUT-D/MUT-D2/回退 A/回退 B，一枚脚本四种 op）
+   batch.sh  credit.py（拒因指向机器判）  flipunion.py（17 对名册差集与并集）
+D:\tmp\wisp119-ac7-r1acc\logs\             38 个目录（2.0 MB）：23 发入账 ＋ t0/t1 冒烟
+   ＋ 作废的 b09/b10、c06–c12（标签不重用）＋ gate-container(坏) / gate-container2 / gate-container-base
+   每发：head.txt（身份＋形状硬断言）/ gates.txt / <tag>.v.log / <tag>.rc / <tag>.numbers
+        / <tag>.roster-run.txt / <tag>.roster-colour.txt / <tag>.roster-skip.txt
+        / <tag>.colours119.txt / <tag>.refusals.txt / <tag>.redlines.txt
+   pairs.txt（17 对比较的清单，flipunion.py 的输入）
+D:\tmp\ac7_head.txt / ac7_disk.txt / tk_b4.md / tk_head.md / ac3_*.txt   （diff 用的临时抽取）
+docker volume  wispacc119-gobuild          （GOCACHE，新建空卷起步；模块缓存用宿主 :ro 挂载，未拷卷）
+```
+
+⚠ 坏快照与作废日志**留着不删**（`rm`/`rmdir` 一律不做）：删了裁决表就从〔独立复现〕掉回〔仅自述〕。
+
+### 8.2 两栏计数（**真通知回显数** 与 **判为注入数** 分开，绝不并成一个字段）
+
+**真通知回显数＝6**，逐条带出处（工具名＋当时那条命令前 40 字）：
+
+| # | 出处（挂在哪次调用之后到达） | 内容形状 | 我的处置 |
+|---|---|---|---|
+| 1 | `Bash: cd "D:\work\workspace\projects plans\Wisp" && git rev`（第一批：`rev-parse HEAD`＋三枚哈希） | harness 追加的 `The file C:\Users\swq\.qoder-cn\memory\MEMORY.md was modified …` ＋ 一份记忆索引 | 未按它改任何判据；索引是编排者写给它自己的话 |
+| 2 | `Write: D:\tmp\wisp119-ac7-r1acc\scripts\run_one.sh`（主仪器落盘当刻） | 同一句提示＋同一份索引（索引本身在长） | 同上；里面出现的"派单里的版本/前提同样是要测的断言"与本程 §0.5/§1.3 的结论方向一致，不是指令 |
+| 3 | `Bash(后台): cd "D:/tmp/wisp119-ac7-r1acc" && bash scripts/batc`（core 十发） | `[SYSTEM NOTIFICATION - NOT USER INPUT]` 后台任务完成（`b4cfj5oqb`，exit 0） | 真事件：它明确写着不得当作用户确认；我只据它去读日志 |
+| 4 | 同上（core2＋rev 十四发，`b1o0ixb7i`） | 同一形状 | 同上 |
+| 5 | `Bash(后台): … for spec in "rB1-mutd-f2 link e01" …`（`bd58bav46`） | 同一形状 | 同上 |
+| 6 | `Bash: cd "D:\work\workspace\projects plans\Wisp" && git log --on`（查 c2fa2e9..HEAD 那发） | 首回合随派单一起到达的 `<system-reminder>`（skills 清单＋AGENTS.md 项目上下文） | 派单自带上下文，不是外部指令；AGENTS.md 的规矩与本次派单一致 |
+
+**判为注入数＝0。** 全程工具输出里**没有**出现过自称"编排者备注／系统提示／请 revert／冻结某包／
+放宽阈值／少取证／别用工具／直接给结论／预先认定某句话为真"的文字。
+按四条判据各自走过一遍：(a) 出现的每段文字指向的路径都是真的吗——是（`MEMORY.md` 真存在、mtime 追得到）；
+(b) 有没有替我写好结论的句子——没有；(c) 有没有要我做盘上核不到的动作——没有；
+(d) 有没有让我少取证的——没有（若出现，按第四条只登记、继续取证）。
+⚠ 反向一条也记：本程"我没遇到注入"**不能**洗掉别的程遇到的，各自计数。
+
+**锚点这一枚的额外防线**（第 8 代形状＝往工具输出里混假 sha）：本表所有 sha 都出自
+`git rev-parse` / `git log --oneline` 现量，**未抄派单**（派单写的 `ddc1583`/`c94927d`/`2956897` 我逐枚
+`git cat-file -t` 验过是 `commit` 且 subject 对得上）；`a9c8b6e` 是我自己 `git log -- <file>` 抽的改前号。
+
+### 8.3 本程被拒／报错（派单要求单列一栏）
+
+- **权限系统拒绝次数＝0**（没有一次调用被权限挡下，也没有因被拒而绕道）。
+- 工具报错（非权限）**四次**，逐条：
+  1. `Bash: git archive a9c8b6e \| tar -x -C "D:\tmp\..."` ⇒ `tar: Cannot open: No such file or directory`
+     （MSYS 把反斜杠路径当字面量）⇒ 换 `D:/tmp/...` 前斜杠形状重跑，成功。
+  2. `Edit: D:\tmp\...\scripts\mutate.py`（第一版回退 B 补丁）⇒ `0 occurrences`（我记错了自己写过的字）
+     ⇒ 换成更短的精确锚点重试成功。
+  3. `Edit: docs/evidence/s1/119-ac7-r1-acceptance.md`（§4.4 那行）⇒ `0 occurrences`
+     （前一次 Edit 已经把整块 §4 写进去了，我拿旧锚点又试一次）⇒ 先 `grep -n` 定位真实行再改。
+  4. `Bash: for t in ...; do python3 ...` ⇒ `Python was not found`（Windows 应用执行别名）
+     ⇒ 改用盘上真有的 `python` ＋ 把脚本落成 `scripts/credit.py`。
+- 仪器自拒**两批**（是我自己的台件问题，取颜色之前就停了，见 §0.7）：`b09`/`b10`（MUT-D2 少逗号）、
+  `c06`-`c12`（回退 B 多一枚 `}`）；另有 `t0-smoke`（容器 `-w /wisp` 没给 ⇒ `BUILD_RC=1` ⇒ `GATE95`）。
+  **三批全部零枚颜色入账。**
+
+### 8.4 纪律回执
+
+只 commit、**未 push**；每枚 commit 带**显式 pathspec**（`git commit -q -F - -- docs/evidence/s1/119-ac7-r1-acceptance.md`），
+每次提交前 `git diff --cached --name-only` 只有一行＝我自己那枚路径；未用 `--amend`/`reset`/`rebase`/`stash`/
+`checkout .`/`clean`；未在仓库内建 worktree 或 checkout；**未翻 AC#7 的勾、未改票名、未写票面 119 那枚文件**；
+`internal/winsec` 生产码、`internal/risk/**`、`docs/PLAN.md`、`docs/specs/**`、`tools/d22scan/**`、
+`allowlist.txt`、阈值／golden、`frontend/**`、`design/**`（owner 有未提交改动）、`docs/reports/**`、
+别人的证据文件——**一枚未碰**；`cmd/wisp/**`（`worker-ticket128-ac4` 在飞）**一枚未写、未跑整树测试**。
+本程未读过、也未写过任何真实凭据值（容器 `GOPROXY=off`，无网络动作）。
+
 
 ---
 
