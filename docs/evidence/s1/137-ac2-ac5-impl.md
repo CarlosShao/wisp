@@ -147,3 +147,55 @@ MUT-D 形状按票面更正块与 `R-137-1`：两条走查各只走前 3 个组�
 要让它满足，得先把那 7 处根换成已解析形＝**票面 AC#4 那一格**。按更正块那句"换根与收紧断言各自都能单独成立、也各自都能单独漏 ⇒ 不许并成一格"，
 本程**没有**顺手做 AC#4，只把这条读数留给它。宿主 CI 侧无影响：`internal/winsec` 的 CI 步是 Windows 任务（`.github/workflows/ci.yml:345-386`
 → `scripts/winsec-tests.sh`），这三枚文件带 `//go:build !windows`，在那一步里根本不参与编译；软链形只存在于我们的容器台件里。
+
+## §2 108 那两枚内联腿**单独**给读数（`R-137-2` 的那 2 枚，不走 helper）
+
+终裁方给的位是 `ancestor_separator_108_other_test.go:80-84` 与 `:138-142`（锚点版）。我自己复核过：`f53ad5c` 上
+`:80-84` 与 `:138-142` 确实是两枚 `if err == nil { … } else if !errors.Is(err, winsec.ErrIsReparsePoint) { … }` 的内联断言，
+**一处都不调用 `assertRefused113`**（grep 全仓：helper 调用面只有 113 五处＋118 两处）。收紧后的行号（本程改完）：
+第一枚 `:79` Logf／`:84` 新分支／`:90` 红行；第二枚 `:140` 提 `link` 变量／`:146` Logf／`:151` 新分支／`:156` 红行。
+
+### §2.1 逐发颜色（这两枚单独一行，不混在 §1.3 的大表里）
+
+| 发 | `TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink` | `TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor` |
+| --- | --- | --- |
+| `dorig-link-1`（MUT-D·软链·**锚点断言**） | **PASS** | **PASS** |
+| `dtight-link-1`（MUT-D·软链·收紧后） | **FAIL** | **FAIL** |
+| `dorig-plain-1`（MUT-D·普通·锚点断言） | FAIL | FAIL |
+| `dtight-plain-1`（MUT-D·普通·收紧后） | FAIL | FAIL |
+| `work-plain-1`（无变异·普通·收紧后） | PASS | PASS |
+| `work-link-1`（无变异·软链·收紧后） | FAIL | FAIL |
+| `work-plain-2`／`work-link-2`（`-count=2`，各两遍） | PASS×2／FAIL×2 | PASS×2／FAIL×2 |
+
+⇒ 这两枚**只在收紧那一刀上**由 PASS 翻 FAIL（`dorig-link-1` → `dtight-link-1`，同一棵变异树、只 overlay 测试件），
+普通形两版同色（MUT-D 下 `err=<nil>`，红在第一支既有判据上，与我的新分支无关）＝**新增判据没有把普通形推红一寸**。
+`-count=2` 的两遍逐名同色（`parse.py` 的 `REPETITION_DRIFT=0`）。
+
+### §2.2 红行的归属：这两枚红在**自己的行上**，不是红在 helper 里
+
+`dtight-link-1.v.log` 里 `grep -oE "ancestor_separator_108_other_test.go:[0-9]+: AC#2 RED"` 命中恰两枚：
+
+```
+ancestor_separator_108_other_test.go:90:  AC#2 RED: RemoveUnlinked("/r137link/w137ac2tmp/TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink4055766027/002/root/link/keep-me.txt") refused with winsec: entry is a link to something else, not private data …: the spelling reaches it through the link at /r137link, and whatever lives behind that link is not this tree's data to delete, which does not credit the link this case planted at "/r137link/w137ac2tmp/…/002/root/link": an ambient link above the tree can answer for the refusal while the guard under test never reaches this spelling
+ancestor_separator_108_other_test.go:156: AC#2 RED: RemoveUnlinked("/r137link/w137ac2tmp/TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor3982944564/002/root/x\\y/keep-me.txt") … the link at /r137link … does not credit the link this case planted at "/r137link/…/002/root/x\\y" …
+```
+
+同一发里 113 族那 9 枚的红分别落在 `placement_symlink_113_other_test.go:204/237(×4 子测)/254/271/296`（＝helper 的五个调用点）。
+⇒ 若只按票面字面改 helper，这两枚**没有红可落**（它们的判据在 108 文件里），AC#3 的"11 枚全转红"就必缺 2 枚——这条现在盘上有对点了。
+
+### §2.3 收紧前的"绿得没有理由"在这两枚上读得到（同一发的原文）
+
+`dorig-link-1.v.log:61`（锚点断言版，`t.Logf` 在 `:79`）：
+
+```
+ancestor_separator_108_other_test.go:79: RemoveUnlinked("/r137link/…/root/link/keep-me.txt") -> err=winsec: entry is a link to something else, not private data /r137link/…/root/link/keep-me.txt: the spelling reaches it through the link at /r137link, and whatever lives behind that link is not this tree's data to delete
+```
+
+这一发该用例 **PASS**，而它拿到的拒记名的是宿主的 `/r137link`（`firstLinkAncestor` 被 MUT-D 截到前 3 个组件，压根没看 `root/link`）。
+对照正向：`work-plain-1.v.log` 同一条 Logf 的尾部是
+
+```
+… the link at /r137plain/w137ac2tmp/TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink1063965065/002/root/link, and whatever lives behind … (link this case planted: "/r137plain/w137ac2tmp/…/002/root/link")
+```
+
+记名者＝自己种的那枚 ⇒ 新分支放行。⇒ 这条尺在普通形是**真被满足**而不是"永远不满足"（恒不满足＝`R-137-1` 那类坏尺）。
