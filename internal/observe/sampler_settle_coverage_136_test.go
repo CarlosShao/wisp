@@ -205,8 +205,36 @@ func TestCheckSettleHalfTheReadsFailedReportsItsLoss(t *testing.T) {
 	if !strings.Contains(rep.LastSampleError, "settle probe: transient tree read failure") {
 		t.Fatalf("a dropped read must leave its reason behind, got %q", rep.LastSampleError)
 	}
-	if !rep.Pass {
-		t.Fatalf("disclosure leg, not a verdict leg: this window still passes, report=%+v", rep)
+	// AC#14 overturns what this line used to pin. Until here this leg asserted
+	// "disclosure leg, not a verdict leg: this window still passes", i.e. it
+	// required a half-covered window to say nothing about itself. From AC#14
+	// on, the report's own sampling row is what has to speak: it fails, and it
+	// names sample_errors while failing. The pass bit stays this window's
+	// verdict for as long as the row is recorded rather than gated (ticket 136
+	// issue :281-285 pins which reading decides that, and
+	// docs/evidence/s1/136-ac14-impl.md section 1.3 owns the current state);
+	// what may no longer happen is a report that carries the loss without
+	// stating it as a verdict, and what may never happen is pass=true
+	// alongside a failing GATE row.
+	var coverage *Verdict
+	for i := range rep.Verdicts {
+		if rep.Verdicts[i].Metric == "sampling" {
+			coverage = &rep.Verdicts[i]
+		}
+	}
+	if coverage == nil {
+		t.Fatalf("AC#14: a half-covered settle window must carry its own sampling verdict row, got verdicts=%+v", rep.Verdicts)
+	}
+	if coverage.Pass {
+		t.Fatalf("AC#14: this window dropped %d of %d reads and its own row says it measured enough: %+v", lost, tree.reads, *coverage)
+	}
+	if !strings.Contains(coverage.Measured, " errors") || !strings.Contains(coverage.Note, "sample_errors=") {
+		t.Fatalf(`AC#14: the failing row has to print the count it failed on, got measured=%q note=%q`, coverage.Measured, coverage.Note)
+	}
+	for _, v := range rep.Verdicts {
+		if v.Gate && !v.Pass && rep.Pass {
+			t.Fatalf("a failing gate row and pass=true at once: the fold rule is not applied, row=%+v report=%+v", v, rep)
+		}
 	}
 
 	wire := settleWire(t, rep)

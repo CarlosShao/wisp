@@ -452,7 +452,19 @@ type SettleReport struct {
 	// LastSampleError keeps WHY the most recent read was dropped, so the
 	// number above can be read without guessing.
 	LastSampleError string `json:"last_sample_error,omitempty"`
-	Pass            bool   `json:"pass"`
+
+	// Verdicts is this report's own self-describing rows (ticket 136 AC#14):
+	// one row per gate the report claims to have checked, each naming its
+	// limit and whether it held, so "this window did not measure what it is
+	// reporting on" is a statement the report makes rather than a number the
+	// reader has to remember to look at. Built by buildSettleVerdicts, NOT by
+	// buildVerdicts - the StateReport shape is closed evidence and stays
+	// single-purpose (issue 136 :278-279).
+	Verdicts []Verdict `json:"verdicts"`
+	// Pass is the base settle verdict (memory back under cap in time and the
+	// release path ran) and, from here down, additionally vetoed by every
+	// failing Gate verdict, the same fold StateReport uses (:341-346).
+	Pass bool `json:"pass"`
 }
 
 // CheckSettle samples until the tree memory falls to the target state's cap
@@ -514,9 +526,72 @@ func (s *Sampler) CheckSettle(ctx context.Context, target SLOState, within, inte
 	}
 	rep.ElapsedMS = time.Since(startAt).Milliseconds()
 	rep.FreeOSMemoryCount = FreeOSMemoryCount()
+	rep.Verdicts = buildSettleVerdicts(*rep)
 	backInTime := rep.BackWithinCapMS >= 0 && rep.BackWithinCapMS <= within.Milliseconds()
 	memOK := rep.FinalBytes <= capBytes
 	releaseOK := released && rep.FreeOSMemoryCount > 0
-	rep.Pass = memOK && backInTime && releaseOK
+	// The same fold StateReport uses (sampler.go:341-346): only a verdict that
+	// declares itself a gate can veto this report's pass bit, so flipping
+	// settleCoverageRowGates is the one move that turns the coverage row from
+	// a disclosure into a gate - and nothing else about the shape changes.
+	rep.Pass = foldSettlePass(memOK && backInTime && releaseOK, rep.Verdicts)
 	return rep, nil
+}
+
+// settleCoverageMetric names the row buildSettleVerdicts produces. It reuses
+// the metric name of the sampling row on the other side (:335-339) because it
+// asks the same question - did this window measure what it is reporting on.
+const settleCoverageMetric = "sampling"
+
+// settleCoverageRowGates is the one switch ticket 136 AC#14 ruling 2 hangs on.
+// true turns the coverage row into a gate, which reaches SettleReport.Pass and
+// from there `wisp slo -settle`'s exit code and the slo-smoke/slo-full CI
+// colour (scripts/slo-check.ps1:381 -> :396); false keeps it a recorded row
+// that still states its own not-pass. It is false at HEAD because the
+// measurement that decision asked for came back clean (six settle runs,
+// sample_errors 0 on every one, docs/evidence/s1/136-ac14-impl.md section 1.2)
+// while the ticket pre-authorised one of the THREE existing assertions that a
+// gate here overturns (section 1.3). Flipping it is an orchestrator move, not
+// an implementer move; nothing else about the shape has to change.
+const settleCoverageRowGates = false
+
+// buildSettleVerdicts evaluates SettleReport's own rows. It is deliberately a
+// second constructor and NOT a two-purpose buildVerdicts (thresholds.go:84):
+// the StateReport verdict shape is closed evidence and must keep answering
+// only "does this state window satisfy the frozen table", while the settle
+// side has no threshold to evaluate here at all - its row is about coverage,
+// which is why the frozen limit cannot be phrased as a number to beat.
+func buildSettleVerdicts(rep SettleReport) []Verdict {
+	covered := rep.SampleErrors == 0 && len(rep.Samples) > 0
+	note := fmt.Sprintf("fully measured: sample_errors=0, %d valid reads kept of %d reads taken",
+		len(rep.Samples), len(rep.Samples)+rep.SampleErrors)
+	switch {
+	case rep.SampleErrors > 0:
+		note = fmt.Sprintf("fail-closed disclosure: sample_errors=%d of %d reads taken (%d kept, %d dropped); last dropped read: %s",
+			rep.SampleErrors, rep.SampleErrors+len(rep.Samples), len(rep.Samples), rep.SampleErrors, rep.LastSampleError)
+	case len(rep.Samples) == 0:
+		note = "fail-closed disclosure: sample_errors=0 but 0 valid samples: this window measured nothing"
+	}
+	return []Verdict{{
+		Metric:   settleCoverageMetric,
+		Measured: fmt.Sprintf("%d valid / %d errors", len(rep.Samples), rep.SampleErrors),
+		Limit:    ">=1 valid sample and sample_errors == 0",
+		Pass:     covered,
+		Gate:     settleCoverageRowGates,
+		Note:     note,
+	}}
+}
+
+// foldSettlePass is SettleReport's pass rule: the base verdict stands unless a
+// verdict row that declares itself a gate failed. StateReport folds the same
+// way (:341-346); keeping it a function is what makes the rule testable on a
+// row set the shipped gate constant does not produce yet.
+func foldSettlePass(base bool, rows []Verdict) bool {
+	pass := base
+	for _, v := range rows {
+		if v.Gate && !v.Pass {
+			pass = false
+		}
+	}
+	return pass
 }
