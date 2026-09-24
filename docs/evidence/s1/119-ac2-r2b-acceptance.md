@@ -328,3 +328,70 @@ internal/proc/envfork.go:160      func SealableRoot(path string) string   ← �
   所以：**"落点归属"这件事的*事实*这一格接住了（§2.1(b) 我量到了），它的*归属*还挂在编排者手上**。
   这不影响 AC#2 的射程（AC#2 要求的是"裁 ①/②/③ ＋ 写理由 ＋ winsec 是否一字未动"），
   但**别在台账里把 `R-119-4` 记成"已并案"**——它是"已登记、待人裁归属"。**〔独立复现〕**
+
+### §1／§2 的提交账（按"正文里出现'已提交'就必须带两条原样输出"的规矩补）
+
+```
+$ git show --name-only 4757198 | tail -3        # §1 那枚
+    - 归因腐坏一条：resolve.go 到 034080c 仍是 7eb8a754…、HEAD 已变 b6876a5e…（126/125/129 三枚别的票，205/16）
+    - 同格双派登记：6e04d1a 落了第二枚 119 复判表的 §0，本程未读其结论、快照目录不同名
+
+docs/evidence/s1/119-ac2-r2b-acceptance.md
+
+$ git log --oneline -1 ; git show --name-only HEAD | tail -3      # §2 提交当刻
+024ee87 evidence(119 AC#2 r2b §2): 正向读数在锚点 bc49096 重跑＋第一轮"条件 1"四条逐条对上（四条都闭合）
+    - 2.4 落点归属分两层：登记层有、归属层（并案到票 120/R-108-2）仍挂编排者 ⇒ 台账别记成已并案
+
+docs/evidence/s1/119-ac2-r2b-acceptance.md
+```
+§1 那枚完整号 ＝ `4757198`（`git log --oneline -1` 当时回显的就是它，见上一条命令的 subject 行；
+`git show --name-only` 只列一条路径＝本文件）。两枚都**只有我自己的路径**——
+但 §1 那枚提交**前**的 `git diff --cached --name-only` 回显过**一枚别人的**
+`docs/evidence/s1/137-ac4-r1-acceptance.md`（同机那程自己 staged 的，状态 `MM`），
+本程**没有提交它、没有 unstage 它**（显式 pathspec 挡住的，`git show --name-only 4757198` 可复算），它现在仍在索引里。
+
+---
+
+## §3 顺手两问
+
+### A. 票 119 `AC#7` 判据①"两味药必须一起下……只收紧不换根会在软链形恒红"——成立（我不改它、也不实现它）
+
+锚点 `bc49096`、容器 `go1.27.1 linux/amd64`、`-count=1 -v -run 'TestAC[123]POSIX.*119'`
+（名册永远是那 5 枚，全表见 `/d/tmp/wisp119r2b-work/summary.txt`）：
+
+| 树 | 一味 | 普通形 | **软链形** |
+|---|---|---|---|
+| `t0` 锚点原样 | 两味都没下（今天） | `5/5/0/0 rc=0` | `5/5/0/0 rc=0`——**但 `:203`/`:308` 两枚的拒因打印的是宿主的 `/varlink119r2b`** ⇒ 今天零区分力（这条＝判据②要的那发，我复现了） |
+| `t2` | **只接记名**（同包 `refusalCreditsLink137`，零新增依赖） | `5/5/0/0 rc=0` | `5 RUN / 3 PASS / `**`2 FAIL`**` rc=1`，红名＝**恰好那两枚**，红句原文"refusal did not credit the link this case planted at …" ⇒ **"软链形恒红"实测成立**（普通形不红，所以判据写的"软链形"这个限定词是准的） |
+| `t3` | **只换已解析根** | `5/5/0/0 rc=0` | `5/5/0/0 rc=0`——换根后**打印的拒因已经变成本用例自己种的链接**（`… through the link at /realpriv119r2b/…/001/varlink119`、`…/001/injlink119`），可 sentinel-only 断言在两形都不响 ⇒ **另一味同样不可省**（否则这一格只是把日志换对了） |
+| `t4` | 两味一起 | `5/5/0/0 rc=0` | `5/5/0/0 rc=0` ⇒ **判据可满足，不是一枚结构上永远产不出读数的尺** |
+| `t7` | 两味一起 ＋ MUT-D（抹掉生产文案里的 `" through the link at "` 标记，`grep -c` 由 1→0；`ErrUnresolvedPath` 与判定分支未动） | `5 / 3 PASS / `**`2 FAIL`**` rc=1` | 同左 `2 FAIL rc=1` ⇒ 两味齐了以后**有牙齿**（红名册仍只有那两枚，`:251` 那枚对照组与两枚 becomes-sealable 全程 PASS ⇒ 判据④"AC#3 逐名不变"在我这四发里也没被弄绿） |
+
+⇒ **判据①照原样成立，两条单向分支我都各自量到了红/绿的具体位置。**
+只补一句给落地的人（**不改判据本体**）：`t3`/`t4` 我这发用 `proc.SealableRoot(t.TempDir())` 换根，
+那是**仪器形状**；真要落地该跟同包 `:251` 那枚的先例走 `cleanSpelling119`（`filepath.EvalSymlinks`），
+否则会踩本票 Rules `:94` 那条"不许拿被测函数算 fixture"（`R-119-9`）。**〔独立复现〕**
+
+### B. `dataroot_symlink_119_other_test.go` 里那三枚用例今天在 CI 上有没有分母——**有**
+
+现量两处文件 ＋ 一发真跑过的 run：
+- `.github/workflows/ci.yml:224-225` `test-core:` ＋ `runs-on: ubuntu-latest` → `ci.yml:288`
+  `run: bash scripts/portable-tests.sh --scope=core`；
+- `scripts/portable-tests.sh:180` core scope 数组里明写 `./internal/winsec/`，`:149` `core_pin` 钉
+  `github.com/CarlosShao/wisp/internal/winsec`（少了这行 `portable-tests.sh` 的 pin 守卫会红）；
+- `internal/winsec/dataroot_symlink_119_other_test.go:1` 是 `//go:build !windows` ⇒ 在 ubuntu 上参与编译；
+  文件里两枚 `t.Skipf` 在 `:77`/`:243`，条件都是"这里种不出软链"，不是平台自拒；
+- 真跑过的一发：run **`35967768017`**（dev push，`2026-09-24T07:05:41Z`），job `test-core`（`107530150794`）
+  结论 **success**，日志行 `ok github.com/CarlosShao/wisp/internal/winsec 0.026s`，
+  同发 runtests.sh 汇总行的 `-skip` 正则（`TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|
+  TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestC26RewrittenSyncRootDoesNotDisarmSuspectNet|
+  TestWorkspaceSwitchRefusesAJunctionToOutside|TestD34WriteMatrix|TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop`）
+  **不含 119 的任何一枚**，顶层 `PASS=711 FAIL=0 SKIP=0`。〔独立复现（读的是 run 日志原文）〕
+
+⚠ **"有分母"只覆盖了一半的形状，这句必须跟着上面一起读**：CI 的 ubuntu 上 `/tmp` 是**真目录**，
+所以那 5 枚在 CI 跑的是**普通形**——正是 A 表里 `t2` 那一列（只接记名在普通形 `5/5 PASS`）。
+**"软链形"那一列在 CI 上零分母**，只有容器有（本程 18 发全是容器）。
+另一笔账顺便核了：票面"两处更正"第 2 条说 `cmd/wisp` 那三枚新用例在 CI 上没腿——**今天仍成立**：
+`cmd/wisp` 属 `--scope=cli`（`scripts/portable-tests.sh:195`），CLI 那一步只在 windows 腿
+（`ci.yml:334-335` 的 `test-windows`、`ci.yml:422` `bash scripts/wisp-cli-tests.sh`），
+而 `cmd/wisp/secret_dataroot_119b_test.go:1` 是 `//go:build !windows` ⇒ **那三枚在 windows 腿上根本不编译**。〔独立复现〕
