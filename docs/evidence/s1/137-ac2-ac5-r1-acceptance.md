@@ -329,5 +329,120 @@ FAIL 名册＝只有三枚对照、分母 11 枚全绿、RUN 名册 45 枚逐名
 ②`dataroot_symlink_119_other_test.go:203/:251/:308` 三处仍是 sentinel-only 断言（票 119 地界、本票分母外），
 AC#3/AC#4 记料时别把它们当对照（R-137-1 已点到其中两枚）。
 
+## §7 AC#5 一格：五组门禁，我全部自己跑（对象＝有 `.go` 改动之后的被验版本）
+
+跑形：全部在仓外归档树 `wisp137r2-tree-tight`（＝`4e66817`）上跑，**对照树**＝`wisp137r2-ac2-tree-anchor`
+（＝`f53ad5c`，AC#2 之前那一版）——"各 scope 不降"要有对点才有意义。台件 `gates.sh`，日志
+`gates.out` ＋ `gates-<树>.{pkgs,vet-native,vet-cross,d22scan}.txt`。
+
+### 7.1 `gofmt -l`（整包＋全仓）〔独立复现〕
+
+仪器：宿主 `go version go1.27.1 windows/amd64`（与 `go.mod` 的 toolchain 同版）。
+
+| 命令（逐字，在被验树里） | 输出 | rc |
+| --- | --- | --- |
+| `gofmt -l internal/winsec/` | **零行** | 0 |
+| `gofmt -l .` | **零行** | 0 |
+| `gofmt -l . tools/d22scan tools/mockllm`（**与 CI 那一枚步同形**，`ci.yml:114`） | 零行 | 0 |
+
+对照树 `f53ad5c` 同样两枚零行 ⇒ 整包 0 枚、全仓 0 枚，**这一组成立**。
+
+### 7.2 `gofumpt -l`（**写明版本**）〔独立复现〕
+
+- 用的就是宿主**现成**那枚：`D:\work\base\gopath\bin\gofumpt.exe --version` → **`v0.12.0 (go1.27.1)`**。
+- ⚠ **我没有执行 `go install mvdan.cc/gofumpt@latest`、也没有装任何工具、没动宿主、没动 workflow。**
+  票面那句"CI 那一步在跑但装的是 `@latest`、版本没钉"我核为**事实**：`ci.yml:111-114` 那枚步
+  第一行就是 `go install mvdan.cc/gofumpt@latest` ⇒ 这是**票 122 在追的账，不在本格**，我一个字未动。
+- `gofumpt -l internal/winsec/` → 零行、rc=0；`gofumpt -l .` → 零行、rc=0；
+  CI 同形的三根写法 `gofumpt -l . tools/d22scan tools/mockllm` → 零行、rc=0。**两棵树都是零行。**
+
+### 7.3 `go vet` 双 GOOS（逐包作用域，逐错误行归因）〔独立复现〕
+
+| 发 | 命令 | rc | 输出 |
+| --- | --- | --- | --- |
+| 宿主原生（windows） | `go vet ./...` | **0** | 零行（`VET_NATIVE_LINES=0`）；**两棵树上都是 0** |
+| 宿主交叉 linux ·**逐包**（33 枚逐枚跑，`go list ./...` 现量＝33） | `GOOS=linux GOARCH=amd64 go vet ./<pkg>` ×33 | **31 枚 rc=0 且逐枚 `OUTPUT_LINES=0`／2 枚 rc=1** | 见下面两条归因 |
+| 容器原生（linux 真类型读数） | `docker run … golang:1.27 go vet ./...`（`CGO_ENABLED=1`） | **0** | 零行（`VET_ERR_LINES=0`） |
+| 每发读数前的落地证明 | 容器内 `go vet ./internal/winsec/` | **0** | 12 发全 0（§0） |
+
+两枚 rc=1 的逐行归因（**没有拿"整树 rc=1＝工具链假象"当理由放过**）：
+
+1. `cmd/balldebug`（`OUTPUT_LINES=1`）：
+   `package github.com/CarlosShao/wisp/cmd/balldebug: build constraints exclude all Go files in
+   D:\tmp\wisp137r2-tree-tight\cmd\balldebug` —— 错误文本点到**自家仓库路径**，所以我逐文件量了：
+   `cmd/balldebug/diff_windows.go`／`main.go`／`shot_windows.go` 三枚的**第 1 行全是 `//go:build windows`**
+   ⇒ GOOS=linux 下"无文件可建"是这枚调试命令自己的约束（票 07 的台件），**不是回归**；
+   且本票改动零枚 `cmd/**`（`git diff --name-only f53ad5c 4e66817` 里 `cmd/` 零命中）。
+2. `cmd/wisp`（`OUTPUT_LINES=3`）：导入链
+   `cmd/wisp → github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx → sherpa-onnx-go-linux:
+   build constraints exclude all Go files in …pkg\mod\…@v1.13.8`（宿主交叉时 `CGO_ENABLED=0`）；
+   触发点在 `cmd/wisp/doctor.go:14` 那枚 import。同一条链在**容器原生那一发里 rc=0**（`CGO_ENABLED=1`）。
+3. 第三枚 cmd 包 `cmd/llmrecord` 逐包 **rc=0**，`frontend` 包 rc=0 ⇒ "失效面只有这两枚 cmd 包"这句我在**逐包粒度**复现成立。
+4. ⚠ 一条口径账（给编排者，不是伤）：**整树那一发**（`GOOS=linux go vet ./...`）我这边也跑了（在 `gates.out` 里是逐包那发的
+   副产品对照），它只报出 `cmd/wisp` 那一枚链，`cmd/balldebug` 要**逐包**才看得见 ⇒
+   "整树红＝只有一处"确实是错觉，逐包这一手是必要的，不是形式主义。
+   **并且**：两棵树的逐包账本（把树名归一后）`diff` **逐字节相同** ⇒ 这两枚 rc=1 与 AC#2 那一刀**无关**。
+
+### 7.4 `-count=2 -v` 两形四数（＋名册差集，见 §5 表）〔独立复现〕
+
+- 普通形 `104 / 60/0/0 ＋ 44/0/0、rc=0`；软链形 `90 / 40/14/6 ＋ 22/8/0、rc=1`。
+  ⇒ 与实现方报的这组**逐数相同**；`-count=1` 的两发（`52/30/0/0＋22/0`、`45/20/7/3＋11/4`）也逐数对上了。
+- `REPETITION_DRIFT=0`（两发逐名跨两遍**零换色**）；RUN 名册与 `-count=1` 逐名同集（普通 52、软链 45 枚恒常）。
+- SKIP 逐名：普通形两发恒 **0**；软链形 **6＝3×2**，只有票 125 那三枚自拒探针；**分母 11 枚在这两发里都不是 SKIP**。
+- FAIL 逐名：普通形两发**全空**；软链形两发恰是那 11 枚（§2.4 名册），**没有第 12 枚**。
+- ⚠ 派单里那枚标签错位（八个字属 §5④ 的 MUT-D·普通形）已在 **§3** 独立裁完：值不错、名字错，两组数零冲突。
+
+### 7.5 一次全仓仪器 `sh scripts/d22scan.sh`（**现量各 scope 的 examined，不只看 rc**）〔独立复现〕
+
+| scope | `f53ad5c`（AC#2 之前） | `4e66817`（被验版本） | 差 |
+| --- | --- | --- | --- |
+| bans #1-5 `internal/` | 203 | 203 | 0 |
+| bans #1-5 `cmd/` | 22 | 22 | 0 |
+| ban #6 `frontend/` | 40 | 40 | 0 |
+| ban #7 `internal/tools/` | 18 | 18 | 0 |
+| ban #8 `design/` | 16 | 16 | 0 |
+| ban #8 `frontend/` | 40 | 40 | 0 |
+| ban #8 `internal/` | 404 | 404 | 0 |
+| ban #8 `cmd/` | 39 | 39 | 0 |
+| 合计（`internal/`＋`cmd/` 生产 Go） | 225 | 225 | 0 |
+
+- 两发 `sh scripts/d22scan.sh` 都 **rc=0**（`D22_RC=0`），逐 scope 行数与合计**一枚不降**（也一枚不涨）。
+- **空 scope 是 fatal 这件事我量了两次，不是引来的**：
+  ①我这发的步 1（种子违规阳性对照，走 `tools/d22scan/runtests.sh`，强制 `-count=1`）原文
+  `runtests.sh: OK - packages=[./...] top-level: PASS=21 FAIL=0 SKIP=0, === RUN=31, '[no tests to run]'=0`，
+  其中**包含** `TestBuiltBinaryGoesRedEndToEnd/empty_live_scope_exits_2` 与
+  `TestDeclaredEmojiScopeCannotWalkZeroFiles` 两枚 ⇒ "0 examined 就拒绝出结论"这条规矩**在我这一发里被跑绿过**；
+  ②我自己另搭了一枚假根 `wisp137r2-ac2-fakeroot`（`go.mod`＋`allowlist.txt`＋够数的 `internal/`、`cmd/`，
+  但 `frontend/` 故意留空），现跑 `go run . -root <假根>` → 打印
+  `d22scan: scope ban #6 frontend/ examined 0 text files` ＋
+  `ban #8 scope frontend/ examined 0 files - it is declared in emojiScopes() but walks nothing. … never leave a
+  scope pretending to scan (ticket 71 AC#4)` 并 `exit status 2` ⇒ 仪器没瞎。
+- 与实现方那本账的一处**可对点差异**（不是分歧）：它工作树那一发 `frontend/` 是 **43**，我两棵归档树都是 **40**。
+  归因我现量了：`frontend/dist/` 里被 git 跟踪的只有 `.gitkeep` 一枚，工作树里另外三枚
+  （`dist/index.html`、`dist/assets/index-CEH-Pz8P.css`、`dist/assets/index-UL9kYvYl.js`）逐枚 `git check-ignore` 判给
+  `frontend/.gitignore:12:dist/*` ⇒ 那 ＋3 是本机 `npm run build` 的遗留产物、进不了归档树。
+  ⇒ 它的"各 scope 不降＋两处 ＋3 归因到 dist 产物"这句**成立**，而我的两棵纯树把这条噪声天然排掉了。
+
+### 7.6 一条 CI 侧的事实（它 §1.4 的结论对、理由只说了一半）〔独立复现〕
+
+- 它写"这三枚文件带 `//go:build !windows`，在（`winsec-tests.sh`）那一步里根本不参与编译"——**这半句对**：
+  那一枚步在 `test-windows`（`runs-on: windows-latest`，`ci.yml:334/:386`）。
+- 但**别据此以为 POSIX 半边在 CI 无覆盖**：`scripts/portable-tests.sh:105-110` 明写
+  "`./internal/winsec/` joined the core list for ticket 111 AC#9 … That is a POSIX denominator of 20 assertions,
+  not a compile-only claim"，core 名单里逐字有 `./internal/winsec/`（`:180`）⇒
+  **ubuntu 那条腿会真的编译并运行这三枚文件**。我这一程量到的普通形（＝CI 的形状：非软链 TMPDIR）
+  `-count=1 rc=0`、`-count=2 rc=0` ⇒ 这一刀在 CI 上不会变红；
+  反过来说，**若有人把这条尺改坏，CI 的 core 腿在普通形看得见一部分**（软链形仍只有容器台件里有分母）。
+  顺带这条也更新一记台账里"winsec 的 POSIX 半边在 CI 零覆盖"那句（那已是票 111 AC#9 之前的事）。
+
+### 7.7 AC#5 一格终判：**成立（PASS、无附条件）**
+
+五组门禁逐组成立：`gofmt -l` 整包与全仓 0 枚（＋CI 同形写法 0 枚）／`gofumpt -l` 0 枚且**版本写明 v0.12.0 (go1.27.1)、未 install**／
+`go vet` 宿主原生 rc=0 ＋ 交叉 linux **逐包** 31/33 rc=0、两枚 rc=1 逐行归因到 `file:line`／包约束本身且与对照树逐字节同账／
+容器原生 `go vet ./...` rc=0／`-count=2 -v` 两形四数与名册差集全核／`sh scripts/d22scan.sh` rc=0 且**九个 scope 的
+examined 枚数现量与 AC#2 之前逐枚相等**、空 scope fatal 我另外独立造形量到。
+
+
+
 
 
