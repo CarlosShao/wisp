@@ -8,7 +8,8 @@
    Upstream commit: 05dab2d2b5f1f3e40029776e339a486d70491079
    Local changes  : provenance header added; the Next.js-only "use client"
                     directive removed; line endings normalized to LF;
-                    0 dingbat glyph(s) ASCII-ized for D23/ban #8. (none found in this file)
+                    1 dingbat glyph(s) ASCII-ized for D23/ban #8. (U+2212, by hand: scripts/vendor.mjs's
+                    EMOJI_RE does not carry the math band, so a re-vendor would put it back unnoticed)
                     Nothing else - see scripts/vendor.mjs.
    Panel status   : NOT mounted: demo data intact, see the note above the default export
    ============================================================================ */
@@ -210,7 +211,7 @@ export default function ThinkingState({ variant = "Steps" }: { variant?: string 
                 {row.add !== undefined && (
                   <span className="shrink-0 font-mono text-[11px] tabular-nums">
                     <span className="text-green">+{row.add}</span>{" "}
-                    <span className="text-red">−{row.del}</span>
+                    <span className="text-red">-{row.del}</span>
                   </span>
                 )}
                 </>

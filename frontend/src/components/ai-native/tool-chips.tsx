@@ -8,7 +8,7 @@
    Upstream commit: 05dab2d2b5f1f3e40029776e339a486d70491079
    Local changes  : provenance header added; the Next.js-only "use client"
                     directive removed; line endings normalized to LF;
-                    2 dingbat glyph(s) ASCII-ized for D23/ban #8.
+                    3 dingbat glyph(s) ASCII-ized for D23/ban #8.
                     Nothing else - see scripts/vendor.mjs.
    Panel status   : NOT mounted: demo data intact; tool traces arrive through the C17 bridge (ticket 35)
    ============================================================================ */
@@ -183,7 +183,7 @@ export default function ToolChips() {
             >
               <span className="min-w-0 truncate">{d.file}</span>
               <span className="shrink-0 text-green tabular-nums">+{d.add}</span>
-              {d.del > 0 && <span className="shrink-0 text-red tabular-nums">−{d.del}</span>}
+              {d.del > 0 && <span className="shrink-0 text-red tabular-nums">-{d.del}</span>}
             </span>
           ))}
           <button

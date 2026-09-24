@@ -39,8 +39,8 @@ Owner ruling **R19**: this library is the base of the first version.
 | `src/components/ai-native/shimmer.tsx` | `components/atoms/Shimmer.tsx` | Shimmer | header, dropped `use client`, LF endings | **yes** - `src/components/panel-skeleton.tsx` |
 | `src/components/ai-native/approval-card.tsx` | `components/approval-card.tsx` | ApprovalCard | header, dropped `use client`, LF endings | no - upstream demo questionnaire; it is the visual reference `src/components/l2-approval-card.tsx` was cut from |
 | `src/components/ai-native/loading-state.tsx` | `components/loading-state.tsx` | LoadingState | header, dropped `use client`, LF endings | no - demo strings intact |
-| `src/components/ai-native/thinking.tsx` | `components/thinking.tsx` | Thinking | header, dropped `use client`, LF endings | no - demo strings intact |
-| `src/components/ai-native/tool-chips.tsx` | `components/tool-chips.tsx` | ToolChips | header, dropped `use client`, LF endings, **2 glyphs ASCII-ized** (U+2713 in two demo strings, see the ban #8 note) | no - tool traces arrive with ticket 35 |
+| `src/components/ai-native/thinking.tsx` | `components/thinking.tsx` | Thinking | header, dropped `use client`, LF endings, **1 glyph ASCII-ized by hand** (U+2212 in the diff row; `vendor.mjs`'s `EMOJI_RE` does not carry the math band so it cannot catch or re-apply this) | no - demo strings intact |
+| `src/components/ai-native/tool-chips.tsx` | `components/tool-chips.tsx` | ToolChips | header, dropped `use client`, LF endings, **3 glyphs ASCII-ized** (2x U+2713 via `scripts/vendor.mjs` + 1x U+2212 by hand in the diff row, see the ban #8 note) | no - tool traces arrive with ticket 35 |
 | `src/components/ai-native/task-rows.tsx` | `components/task-rows.tsx` | TaskRows | header, dropped `use client`, LF endings | no - history rows are ticket 35+ |
 | `src/components/ai-native/streaming-text.tsx` | `components/streaming-text.tsx` | StreamingText | header, dropped `use client`, LF endings | no - carries upstream's demo source list with external URLs, which must not render in a desktop panel |
 
@@ -127,3 +127,15 @@ merely because phase one does not use it.
   than register `frontend/` as a permitted-emoji tree. 24 files scanned, 0 hits;
   the two glyphs that upstream shipped in `tool-chips.tsx` were ASCII-ized during
   vendoring, not after.
+  > **2026-09-25 追加更正（前端会话，随本轮那 6 处字符的改动一起落）：上面这段的三句已不成立，原句保留只为旧引用可核。**
+  > ① **`frontend/` 现在在扫描射程里** - 票 96 把它补进了 `emojiScopes()`，且声明为 `everyFile: true`
+  > （`tools/d22scan/main.go:491-498`、`:867-871`），所以"门没照到我们、我们自行执行"这个前提已经作废；
+  > ② **"0 hits" 当时是假的** - 同一把尺在 `composer.tsx:170`、`fixtures/composer-states.html:2/5/8` 的
+  > U+2264 与 `thinking.tsx:213`、`tool-chips.tsx:186` 的 U+2212 上报 6 行，`internal/panel` 那份
+  > `TestFrontendHasNoEmoji` 报 0，因为它的字符类（`frontend_hygiene_test.go:66`）**自称逐字抄自扫描器却没有
+  > `\x{2200}-\x{22FF}`** 那一段（票 141 只加宽了扫描器那一份）。**这一处副本归编排者修（台账 `U1`），不是本文件能自结的。**
+  > ③ **"during vendoring, not after" 现在只对 2 枚** - 本轮这 6 处是**手工在 vendoring 之后**改的，
+  > 且 `scripts/vendor.mjs` 的 `EMOJI_RE` 同样缺数学段 ⇒ **它既看不见 U+2212、也就无法在重新拉取时把它挡回来**：
+  > 一次 `npm run vendor:beautifului` 会把 `thinking.tsx` / `tool-chips.tsx` 的 U+2212 恢复原状，
+  > 而那句"unmapped glyph is fatal rather than silently shipped"对它不生效。
+  > ⇒ 本轮之后**盘上确实 0 命中**，但**这一格的持久性依赖 `U1` 那批把三份副本一起加宽**，不依赖本文件的自述。
