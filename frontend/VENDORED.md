@@ -146,7 +146,7 @@ merely because phase one does not use it.
   > 下次 re-vendor 静默回退"的机制；在今天这棵树上两把尺都报 0，所以加宽**不产生任何新命中**，只买一个前置拦截。
   > 从此"将来 vendor 进来一个带数学符号的文件谁负责拦"有了答案：**`vendor.mjs` 自己**——无映射即 `exit 2`
   > 并指名文件与码位，而不是等 CI 事后红。
-  > ⚠ 一枚本轮才看清的事实：**`ai-native/*.tsx` 头部那段 provenance 注释是 `vendor.mjs` 生成的**
+  > 一枚本轮才看清的事实：**`ai-native/*.tsx` 头部那段 provenance 注释是 `vendor.mjs` 生成的**
   > （`header(job, commit, cleaned.replaced)`），所以**手改那几行是徒劳的**——一次 re-vendor 会整段重写。
   > ⇒ 本轮把 `thinking.tsx:11` 改回生成器会产出的样子（`1 dingbat glyph(s) ASCII-ized`），
   > 说明性文字只写在这里，因为只有本文件是手工维护、不会被机器覆盖。
