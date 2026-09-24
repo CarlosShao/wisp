@@ -266,4 +266,78 @@ fixture does:
   count to 17 and the file count stays 5, which is exactly the kind of silent composite drift this
   section exists to prevent; anyone re-running the census should say which predicate they meant.
 
+---
+
+## 4. Mechanism candidates, ranked, with the code that makes each possible
+
+Section 4 anchor: `git rev-parse HEAD` = `5889559b767586ab73dd859f0a5f00e208612f49`.
+
+First, what the test does **not** do, because the answer decides the fix: it does not sleep, it does not
+poll, it does not use a channel with a timeout, and it does not call a sampler with a fixed interval it
+controls. It opens one real `time.Ticker` window and then asserts a count at the end of it. Everything
+below follows from that single fact.
+
+**C1 (primary). The settle window's read count is produced purely by ticker delivery, with no leading
+read and no lower-bound criterion.**
+Code: `internal/observe/sampler.go:492-500` -
+`deadline := startAt.Add(within)`, `t := time.NewTicker(interval)`, `for { select { case <-ctx.Done(): ...
+case <-t.C:` and the read at `:501` is reachable *only* from a tick. Contrast `SampleState`, which reads
+once before the loop (`:269`) and once to close it (`:306`), so it can never report a zero-read window.
+For this leg (`:208`, `within=100ms`, `interval=10ms`) the realised count is about 10 and the assertion's
+floor at `:213` is 4.
+What has to be true on the machine: the runtime must deliver fewer than 4 ticks of a 10ms ticker inside a
+100ms monotonic budget - either each wake-up running about 25ms late, or one wake-up roughly 70ms late
+(the loop is serial: read, check deadline, block again). Any of a GC stop-the-world, a long syscall on the
+timer goroutine's path, or the OS not giving the process a thread for that span does it. It is not
+"load" as an uncaused cause; it is that the leg asserts a *count* whose only guarantee is a *duration*.
+
+**C2 (the actual AC#15 ② root cause, stated as the missing criterion).**
+Code: the pair that never meet - `sampler.go:493` (`time.NewTicker(interval)`) with `sampler.go:523`
+(`if time.Now().After(deadline) { break }`) on one side, and
+`sampler_settle_coverage_136_test.go:213` (`if tree.reads < 4 {`) on the other.
+Between the window and the assertion there is no statement of the form "this window is allowed to be
+judged once N reads have been observed, and must be declared broken if N have not arrived before
+deadline T". Nothing on the machine has to be true for this to be the defect: the code as written would
+still be missing it under a scheduler that behaved perfectly, because the guarantee `100ms / 10ms => at
+least 4 reads` is not something the program establishes anywhere. Fix shape is dictated by AC#15 ③: the
+test must wait *on a criterion* (poll `tree.reads` until it reaches the floor, bounded by a monotonic
+`observe.Timeout`, `internal/observe/clock.go:25-52`), rather than wait a fixed time and hope.
+
+**C3 (amplifier, not a cause). Windows timer granularity feeding a 10ms ticker.**
+Code: same `:493`. If the effective system tick is 15.6ms rather than 1ms, the expected read count for a
+100ms budget drops from about 10 to about 6, which is 2 shots from the floor of 4 instead of 6.
+What has to be true: the platform's timer resolution being coarse for that process. This cannot be the
+whole story - a systematically coarse clock would make the leg red far more often than 1 in 240 - but it
+sets how much headroom C1 has. It is also the reason "just raise the interval" is not a fix: it moves the
+mean, it does not add the missing criterion.
+
+**C4 (plausible trigger for the single observed shot). A stop-the-world pause inside the window.**
+Code: the window is entered right after `coverage:207` `ReleaseMemory()` and the leg's own allocations;
+`Sample.At` is stamped with `time.Now()` per read (`sampler.go:512`) and the package's other cases keep
+the heap moving. A GC pause longer than about 70ms freezes tick delivery for exactly the length C1 needs.
+What has to be true: one long enough STW inside that 100ms. Not reachable by reading code alone, and
+section 5 is what decides it: `-count=N` in one process makes GC pressure per shot much higher than a
+single whole-package shot, so the two denominators should separate this candidate if it is real.
+
+**C5 (checked and excluded by code, list them so nobody re-litigates them).**
+- The pre-window release is not a stall: `sampler.go:416-419` shows `ReleaseMemory()` only does
+  `freeOSMemoryCalls.Add(1)` plus `debugFreeOSMemory()`, and the leg replaces that with a no-op at
+  `coverage:205-206` (`debugFreeOSMemory = func() {}`, restored by `t.Cleanup`).
+- Cancellation is not a cause: the `<-ctx.Done()` branch (`sampler.go:497-498`) cannot fire, the leg
+  passes `context.Background()` (`:208`).
+- Parallel interference is not a cause: `grep -rc "t.Parallel()" --include=*_test.go internal/observe/`
+  sums to 0, so cases cannot interleave; note in passing that the shared-global dance on
+  `debugFreeOSMemory` (`:205-206`, `:96-97`, `gate:105-107`) is safe *only* because of that, so any future
+  `t.Parallel()` in this package turns into a different flake. This census changes nothing, just records
+  the dependency.
+- A leaked busy goroutine from another case is not a cause: no `TestMain` in the package
+  (`grep -rn "func TestMain" --include=*.go internal/observe/` -> 0), and the only goroutines the tests
+  start are `logging_test.go:273-279` behind a `sync.WaitGroup` and the short-lived workers of
+  `goroutine_test.go`, which is itself the file that documents "no sleep is used to paper over the
+  window" (`goroutine_test.go:24`).
+- Parity is not a cause: `:227` `if kept > lost+1 || lost > kept+1` cannot fire for `alternatingTree`
+  (`:278-284`) at any read count, so the half-and-half property is fixture-guaranteed and only the
+  *count* floors are live.
+
+
 
