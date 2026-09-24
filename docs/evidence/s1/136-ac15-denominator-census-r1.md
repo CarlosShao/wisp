@@ -498,10 +498,10 @@ The decisive way to see that 30 is not a measurement is detection probability, `
 | n | chance of catching it at p = 1/240 | at p = 1/390 |
 |---|---|---|
 | 30 | 11.8% | 7.4% |
-| 100 | 34.2% | 22.6% |
-| 240 | 63.2% | 46.0% |
-| 500 | 87.7% | 72.4% |
-| 1200 | 99.4% | 95.5% |
+| 100 | 34.1% | 22.6% |
+| 240 | 63.3% | 46.0% |
+| 500 | 87.6% | 72.4% |
+| 1200 | 99.3% | 95.4% |
 
 So a 30-shot clean batch is the **expected** outcome roughly 9 times out of 10 even if the defect is
 untouched. Recommendation: **n = 1200 for the pre-fix rate measurement (A), n = 1440 for the post-fix
