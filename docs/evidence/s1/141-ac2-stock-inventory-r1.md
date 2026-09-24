@@ -65,4 +65,84 @@
 
 ---
 
-<!-- 回执：本节随第一枚 commit 落地，下一节带上它的回执 -->
+## 1. 小结① —— 非注释那 38 行的两档
+
+### 1.1 判据（**不是**"看起来会不会显示"）
+
+一条命令、一张 pattern 表，可复跑：
+
+```
+perl /d/tmp/wisp141inv/sink.pl <文件> <行号>
+```
+
+它先沿**字符串拼接续行**（上一行以 `+` 结尾）爬回**打开这枚字面量的那条语句**，
+再按下面的 pattern 顺序给它贴 sink 标签。**分档规则 = 这枚字面量是不是「要被写出去的东西」**：
+
+| 标签 | pattern（语句首行） | 档 |
+|---|---|---|
+| `test-print` | `t\.(Fatalf\|Errorf\|Logf\|Fatal\|Error\|Log\|Skipf\|Skip)\(` | **(i)** 进 `go test -v` 输出＝CI 可见 |
+| `render-field` | `(\w*(Text\|Reason\|reason))\s*:\s*fmt\.(Sprintf\|Sprint)` | **(i)** 进面板/回执 |
+| `audit-ledger` | `se\.record\(` | **(i)** 进步骤账本（渲染证据见 1.3） |
+| `struct-field` | 仅 `(\w*(Text\|Reason\|reason))\s*:`（右边不是 `fmt.`） | **(ii)** 输入 fixture 或表驱动期望值 |
+| `parse-template` | `Sscanf\(` | **(ii)** 解析模板 |
+| `NONE` | 上面都不沾（raw string 里的 SQL DDL 文本） | **(ii)** |
+
+### 1.2 结果：**(i) 31 行／7 枚文件**，**(ii) 7 行／4 枚文件**（合 38／11，与 §0 全等）
+
+**(i) 会进可见输出 —— 31 行**
+
+| 文件 | 行 | sink | 谁把它写出去 |
+|---|---|---|---|
+| `internal/ball/tokens_test.go` | 203,206,216,220,224,228,234,237,247,278（**10 行**） | `t.Errorf` | `go test -v` |
+| `internal/tools/fs_staging_windows_test.go` | 66,73,157,235,246,337,365,371（**8 行**） | `t.Fatalf` | 同上 |
+| `internal/winsec/reparse_windows_test.go` | 121,126,236,245（**4 行**） | `t.Logf` | 同上（`-v` 下**通过时也打印**，比 Fatalf 更外露） |
+| `internal/tools/fs_write.go` | 346,480（`se.record`）、485,567（`Text: fmt.Sprintf`）（**4 行**） | 生产渲染 | 见 1.3 |
+| `internal/agent/approval/ticket97_alias_direction_test.go` | 119,132（**2 行**） | `t.Fatalf` | `go test -v` |
+| `internal/tools/bridge_a18_kill_windows_test.go` | 220,222（**2 行**，同一枚 `t.Fatalf` 的拼接续行，语句首行在 218） | `t.Fatalf` | `go test -v` |
+| `internal/risk/rules_scale.go` | 24（**1 行**） | 生产渲染 | 见 1.3 |
+
+**(ii) 只在源码字符串里 —— 7 行**
+
+| 文件:行 | sink | 为什么落 (ii) |
+|---|---|---|
+| `internal/llm/anthropic/cache_test.go:21,22,23` | `struct-field:Text` | `llm.TextPart{Text: "①identity…"}` 是**喂给 mock 的请求输入**，不是消息文案 |
+| `internal/risk/assessor_test.go:154` | `struct-field:Reason` | 表驱动 `want:` **期望值**，与生产串比对用 |
+| `internal/tools/fs_write_test.go:521` | `parse-template` | `fmt.Sscanf` 的**解析模板**，且整个 `if` 被 `; false` 守卫短路 |
+| `internal/memory/schema.go:29,118` | `NONE`（raw string） | `ddlV1` 的 **SQL DDL 文本**，送进 SQLite，不是任何输出流 |
+
+### 1.3 生产那 5 行的外露证据（逐条点名，不用推测）
+
+- `internal/tools/fs_write.go:346`／`:480` 的 `se.record(...)` → `sideEffect.steps`；`fs_write.go` **最近一版 `ed74595`（09-21 10:58）** 的 `record` 函数自带注释逐字写着「**the report renders these verbatim under 「已执行」**」（`internal/tools/fs_write.go:70-72`，同上一版）。
+- `internal/tools/fs_write.go:485`／`:567` 的 `Text: fmt.Sprintf(...)` → `tools.Result.Text`，定义处 `internal/tools/tool.go:40-43` **最近一版 `0986d63`（09-20 19:16）** 注释逐字：**「Text is the payload the host puts back into the context (the loop caps and spills it, D15(3) …)」** ⇒ 回灌上下文＝会进对话呈现。
+- `internal/risk/rules_scale.go:24`（最近一版 `67ffbd8` 09-20 08:22）的 `reason: fmt.Sprintf("…（`U+2265`%d）")` → `risk.Decision.Reason` → `internal/panel/approval.go:83` `Reason: decision.Reason`；该文件**最近一版 `63ef895`（09-21 13:26）**，`:47` 注释逐字：**「Reason is Decision.Reason verbatim」** ⇒ **审批卡原样渲染这枚 `U+2265`**。这是 38 行里唯一一枚**已经在真面板上外露**的缺口段字形。
+
+### 1.4 两档的**边界声明**（owner 若要换判据，数会怎么变）
+
+`struct-field` 那 4 行**并非绝对不外露**：
+- `internal/risk/assessor_test.go:154` 的期望值，在断言不等时由 `:178-181` 的 `t.Fatalf("%s:\n  want %+v\n  got  %+v", tc.name, tc.want, got)` **整块打印**（`internal/risk/assessor_test.go` 最近一版 `67ffbd8` 09-20 08:22）；
+- `internal/llm/anthropic/cache_test.go:21-23` 的输入 fixture，在解析失败时被 `:54`／`:65` 的 `t.Fatalf("…\n%s", body)` / `("system field: %v\n%s", …)` **连带请求体整块打印**（该文件最近一版 `f342413` 09-21 08:25）。
+
+⇒ 若 owner 把 (i) 定义为「**任何可能到达终端的字面量**」，这 4 行改判 (i)，分布变成 **(i) 35 ／ (ii) 3**（只剩 Sscanf 模板 1 ＋ SQL raw 2）。
+本程**按 sink 位取 (i) 31／(ii) 7**，并把改判路径写清楚——**不替 owner 决定用哪条判据**。
+
+### 1.5 顺手量的两枚**耦合**（清存量时会互相拽一下）
+
+- `internal/tools/fs_write.go:485`／`:567` 与 `internal/tools/fs_write_test.go:521` **看着像镜像、其实不是**：生产侧回收站文案（`fs_write.go:417`，`ed74595` 09-21 10:58）写的是「已放入回收站：%s（还原记录 %s，可在回收站还原）」——**不含缺口段字形**；测试侧那枚模板却写着「…（条目数 %d `U+2192` %d」。⇒ 这是一枚**陈旧模板**，与生产串不同步。清理它不需要与生产同批改，但**动它就在动一枚断言的输入**（AC#4 的"放水"判据会看这个）。
+- `internal/risk/rules_scale.go:24`（生产）与 `internal/risk/assessor_test.go:154`（期望值）是**同一枚 `U+2265` 的两半**：改生产不改期望＝断言红。**必须同批**。两枚文件都在禁改清单（§3）。
+
+---
+
+<!-- 回执 ade897c：本节开头贴上一节那枚 commit 的原样输出 -->
+```
+$ git log --oneline -1
+ade897c docs(141 AC#2 盘点 r1 第1节): 复核实到 41/116/121 全等, 推翻两处—— "12 枚在冻结路径"实为 11(第12枚 tools/d22scan/scan_test.go 不在取数 pathspec 也不在 ban#8 walk scope); 票面 pathspec 漏了 frontend/(ban#8 真射程), 补宽爆炸半径是 51 枚/141 行/1042 处。注释切法改用 Go 词法器, 38 枚非注释 全在字符串字面量内、0 枚在标识符。
+$ git show --name-only HEAD
+    全在字符串字面量内、0 枚在标识符。
+
+docs/evidence/s1/141-ac2-stock-inventory-r1.md
+```
+
+---
+
+<!-- 下一节 -->
+
