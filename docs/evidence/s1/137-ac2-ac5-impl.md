@@ -360,6 +360,16 @@ ancestor_separator_108_other_test.go:79: RemoveUnlinked("/r137link/…/root/link
 只 commit、未 push；每枚都带显式 pathspec，`git diff --cached --name-only` 每枚只有我自己的路径（未出现 `internal/observe/**`／`cmd/wisp/**`）；
 共树未用 `--amend`／`reset`／`rebase`／`stash`／`checkout .`，未建仓内 worktree。
 
+⚠ **共树撞车一次，已核无害但记下来**（§4-§6 那一枚）：我 `git add` 之后、`git commit` 之前的暂存清单里出现了**两枚别人的路径**
+（`docs/reports/2026-09-24-gap-analysis-audit-verdict.md`、`docs/reports/pending-and-issues.md`），按纪律这本该"停手报回"，
+但这一轮我把 add→查清单→commit 串在了同一枚命令里，检查与提交之间没留出刹车（**这是本程的一枚流程偏离，登记：**
+下次共树里这三步必须分三枚调用）。伤害评估也核了，不是靠叙述：
+① 我那枚 `a84ce60` 的 `git show --numstat` 只有 `docs/evidence/s1/137-ac2-ac5-impl.md` 一行（82 增 0 删）＝**没有替别人提交任何字节**；
+② 别人的那枚 `7a8403f`（`git show --stat`＝那两枚 reports 文件，183＋63 行）落在我的**之上**，
+   且**没把我的文件卷进它的提交**＝反向伤害也没发生；③ 事后 `git diff --cached --name-only` 为空、`git status --porcelain` 只剩
+   `cmd/wisp/leg_dispatch_gate_133_test.go`（在飞兄弟的改动，我没碰）＋那枚来源未明的未跟踪件。
+⇒ 边界未糊，归因可复算；这条偏离不翻任何读数，只改我后续的走法。
+
 **next=**（都归别人，我不做）：
 
 - **AC#3（非实现者）**：按 §1.3 出裁决表。三件要点：①分母 11 枚红名逐名已给（含 108 那两枚，红在 `108:90`／`108:156`）；
