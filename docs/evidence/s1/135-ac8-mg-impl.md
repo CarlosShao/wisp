@@ -389,3 +389,189 @@ R2-CPo2  旧尺 + 同一发：rc=0（旧尺本来就放行，说明这枚控制�
 
 ⚠ 本程**没有**做的事，别被本节误导：这枚控制只测了 windows 腿。把同一形换到
 `//go:build` 表达式为假（而不是文件名后缀）那一支、以及 `GOARCH` 那一支，本程未造未读（§8 第 5 条）。
+
+## 6. 还原：证与基线逐字相同、复绿
+
+**本程的还原是结构性的**（派单第 3 节那套规矩的直接后果）：每一发读数都用一棵**新** `cp` 出来的树，
+工作树从头到尾没被种过件 ⇒ 没有"还原漏一行"这种失败可发生。可本程仍然按票面把三样都量了。
+
+### 6.1 变异面逐枚列（`diff -rq 快照树 ↔ 那发用的树`）
+
+```
+$ diff -rq /d/tmp/wisp135mg-r2-tree /d/tmp/wisp135mg-r2-T15        （M-G 本发那棵树）
+DIFF: Files .../cmd/wisp/main.go and .../cmd/wisp/main.go differ        ← usage 一行＋dispatch 两行
+DIFF: Only in T15/cmd/wisp: probe135r2m_linux_test.go                   ← 植物
+DIFF: Only in T15/cmd/wisp: sfx135r2leg.go                              ← 那条腿
+DIFF: Only in T15: wisp.exe                                             ← `go build ./...` 的副产物，非源文件
+
+$ diff -rq /d/tmp/wisp135mg-r2-tree /d/tmp/wisp135mg-r2-T26        （还原发那棵树）
+DIFF-T26: Only in T26: wisp.exe            ← 只有构建副产物；源码与快照逐枚同
+（除这一行外零 DIFF ⇒ 还原发的树与基线树源码逐字相同）
+```
+
+`wisp.exe` 是本程驱动里 `go build ./...` 在**仓外快照树根**落的构建副产物（17 发里每一发都有），
+**从没进过仓库**；§6.3 的残留扫描一并覆盖它。
+
+### 6.2 还原发复绿 ＋ 与基线那发逐字比
+
+`R2-RST`（T26，无种件、新尺、`-count=1 -run=^TestAC1AC2DispatchHopGate133$`）
+⇒ **rc=0，1/1/0/0＋0/0/0，SKIP 行 0、build-failed 0、panic 0**，红名零枚。
+
+```
+$ sed -E 's/\([0-9]+\.[0-9]+s\)//' R2-BL1.log > bl1.norm ; 同一法做 R2-RST.log ; diff -u
+@@ -1,4 +1,4 @@          ← 只差这一枚 slog 行的 time= 戳
+-time=2026-09-24T11:11:44.827+08:00 level=INFO msg="winsec: sealing path resolver installed" …
++time=2026-09-24T11:29:34.558+08:00 level=INFO msg="winsec: sealing path resolver installed" …
+@@ -15,4 +15,4 @@        ← 与这一行 go 自己打的耗时
+-ok  	github.com/CarlosShao/wisp/cmd/wisp	0.135s
++ok  	github.com/CarlosShao/wisp/cmd/wisp	0.126s
+```
+
+⇒ 除时间戳与构建耗时两行，**还原发的日志与基线发逐字相同**（账本 11 legs、4 claims、
+名册枚数、披露行文案全同）。
+
+### 6.3 仓库侧三查
+
+```
+$ git status --porcelain                       （空 ⇒ 工作树只有本程那一枚证据文件、且已提交）
+$ sha1sum cmd/wisp/leg_dispatch_gate_133_test.go
+  23b443ac34787aa9ea60e181b9b8c789f468cd56      ← 与 §1.2 取件时同一枚，一把尺没被动
+$ grep -rIl "sfx135r2" . --exclude-dir=.git | wc -l
+  0                                              ← 种件的腿名/文件名字在仓库里零残留
+```
+
+〔独立复现〕§6 三样都是本程自己量的，命令原样在上面。
+
+## 7. 门禁账
+
+两批门禁各自前的闸门：`GATES post at=2026-09-24 11:31:05 +0800 → GATE-WORKER-HITS: 0`、
+`GATES pre at=11:32:07 → GATE-WORKER-HITS: 0`，两批的 `gh run list` 都是三枚 `completed`
+（零枚 in_progress）。台件 `/d/tmp/wisp135mg-r2-gates.sh <树> <标签>`，
+**两棵树都是仓外归档树**（被审树＝`wisp135mg-r2-tree`＝`8369b24`；对照树＝`wisp135mg-r2-tree-pre`
+＝`fa35557^`＝`d3e3a43`，即"上一程写码之前"那一版）。
+
+**工具版本写明**（派单那条硬规矩）：
+
+```
+go       = go version go1.27.1 windows/amd64        （宿主）
+gofumpt  = v0.12.0 (go1.27.1)  路径 $(go env GOPATH)/bin/gofumpt.exe ＝ D:\work\base\gopath\bin
+         ⇒ 用的是宿主现成 binary，本程没有、也禁止任何人执行 `go install mvdan.cc/gofumpt@…`
+```
+
+| 项 | 被审树（`8369b24`） | 对照树（`d3e3a43`＝改前） | 判 |
+| --- | --- | --- | --- |
+| `gofmt -l ./cmd/wisp/` | 0 行 | 0 行 | 净 |
+| `gofmt -l .`（全仓） | 0 行 | 0 行 | 净 |
+| `gofumpt -l ./cmd/wisp/` | 0 行 | 0 行 | 净 |
+| `gofumpt -l .`（全仓） | 0 行 | 0 行 | 净 |
+| 宿主原生 `go vet ./cmd/wisp/` | **rc=0**，诊断 0 行 | rc=0，0 行 | 净 |
+| 宿主原生 `go vet ./...` | **rc=0**，诊断 0 行 | rc=0，0 行 | 净 |
+| `GOOS=linux go vet` 逐包（33 枚） | 31 枚 rc=0 且输出 0 行；**2 枚 rc=1** | 逐包账本**归一树名后 diff 逐字节相同** | 见下面归因 |
+| `sh scripts/d22scan.sh` | **rc=0**（含阳性对照 `runtests.sh OK top PASS=21/FAIL=0/SKIP=0、=== RUN=31、'[no tests to run]'>=0`） | rc=0，同对照同数 | 净 |
+| 逐枚现量各 scope examined | 见下表 | 见下表 | **差值全 0 ⇒ 不降** |
+
+### 7.1 两枚 rc=1 逐错误行归因（不拿"整树 rc=1＝工具链假象"糊过去）
+
+```
+github.com/CarlosShao/wisp/cmd/balldebug  rc=1 lines=1
+  package …cmd/balldebug: build constraints exclude all Go files in D:\tmp\wisp135mg-r2-tree\cmd\balldebug
+  → 本程逐枚量到该目录三枚文件的第一行全是 `//go:build windows`：
+      cmd/balldebug/diff_windows.go  //go:build windows
+      cmd/balldebug/main.go          //go:build windows
+      cmd/balldebug/shot_windows.go  //go:build windows
+    ⇒ 没有一枚 linux 侧文件 ⇒ 这是这个包**按设计**的构建约束，不是编译破口。
+github.com/CarlosShao/wisp/cmd/wisp  rc=1 lines=3
+  package github.com/CarlosShao/wisp/cmd/wisp
+  	imports github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx
+  	imports github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files in
+  	  D:\work\base\gopath\pkg\mod\github.com\k2-fsa\sherpa-onnx-go-linux@v1.13.8
+  → 触发点是本仓的一行：cmd/wisp/doctor.go:14  sherpa "github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx"
+    死在第三方包的 cgo 构建约束（宿主交叉时 CGO_ENABLED 不为 1），一枚 `cmd/wisp\…go:行` 的诊断都没有。
+```
+
+⇒ 两枚都**早于**被审改动、与那把尺无关，凭据是"两棵树的逐包账本把树名归一后 `diff -u` **空输出**"：
+`/d/tmp/wisp135mg-r2-out/cross-pre.errs` ↔ `cross-post.errs`（同目录另有两棵树的
+`gates-{pre,post}.vet-cross-ledger.txt` 全量 33 枚）。其余 31 枚包（含 `internal/**` 全部、
+`internal/proc`、`internal/winsec`、`tools/signmodels`）linux 交叉 vet **全 rc=0 且 0 行**。
+
+### 7.2 d22scan 各 scope 逐枚现量（票面"examined 枚数不降"）
+
+| scope | 被审树 `8369b24` | 改前树 `d3e3a43` | 差 |
+| --- | --- | --- | --- |
+| bans #1-5 `internal/` | 203 | 203 | 0 |
+| bans #1-5 `cmd/` | 22 | 22 | 0 |
+| ban #6 `frontend/` | 40 | 40 | 0 |
+| ban #7 `internal/tools/` | 18 | 18 | 0 |
+| ban #8 `design/` | 16 | 16 | 0 |
+| ban #8 `frontend/` | 40 | 40 | 0 |
+| ban #8 `internal/` | 404 | 404 | 0 |
+| ban #8 `cmd/` | 39 | 39 | 0 |
+| 合计（`examined 225 production Go files`） | **225** | **225** | 0 |
+
+（八枚 scope ＋ 一枚合计行；本程现量与票 137 验收方那批逐枚同数，本程不据以自证、只算两棵树的差为 0。）
+
+### 7.3 "空 scope 必须 fatal"＝本程自己现跑，不是引用规矩
+
+```
+$ (cd tools/d22scan && go build -o /d/tmp/wisp135mg-r2-out/d22scan-r2.exe .)   BUILT rc=0 sha1=45dd96664752…
+$ ./d22scan-r2.exe -root /d/tmp/wisp135mg-r2-tree            → rc=0（同一枚 binary 的正常形，八 scope 见 7.2）
+$ 搭一枚假根 /d/tmp/wisp135mg-r2-fakeroot：整树复制后把 frontend/ 清空
+  （FAKE-ROOT frontend files=0，目录在、文件零 ⇒ 这是"declared live 但走不到东西"那一形）
+$ ./d22scan-r2.exe -root /d/tmp/wisp135mg-r2-fakeroot        → **rc=2**
+  d22scan: ban #8 scope frontend/ examined 0 files - it is declared in emojiScopes() but walks
+  nothing. Point it at a real tree or delete the entry; never leave a scope pretending to scan
+  (ticket 71 AC#4)
+```
+
+⇒ 空 scope 不是"静悄悄 0 枚"而是**退出码 2 并点名那一枚 scope**，本程第一手读到。
+同一批 `sh scripts/d22scan.sh` 里那枚阳性对照子用例也跑绿了：
+`--- PASS: TestBuiltBinaryGoesRedEndToEnd/empty_live_scope_exits_2`（连同
+`seeded_violation_exits_1`、`frontend_tree_gone_while_declared_live_exits_2` 等六枚，见
+`gates-post.d22scan.txt`）。
+
+### 7.4 `-count=2 -v` 两形四数 ＋ 名册差集（⚠ 四数会翻倍，不当红名变多）
+
+| 发 | 形 | rc | RUN | 顶 P/F/S | 子 P/F/S | 名册枚数 | SKIP 行／build-failed／panic |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `R2-C2N` T24 | 门开着（整包） | 0 | **202** | **108/0/0** | 94/0/0 | 54 | 0/0/0 |
+| `R2-C2C` T25 | 门关着（`-skip=^TestAC4…$`） | 0 | 200 | 106/0/0 | 94/0/0 | 53 | 0/0/0 |
+
+- 逐名账：把顶层 `--- PASS/FAIL/SKIP` 按名字聚合计数，`R2-C2N` 里 54 枚**每一枚恰好 2 次**
+  （`uniq -c | grep -v '^ *2 '` 空输出）⇒ 零换色、零"第二遍少跑"。
+- 名册差集：`R2-C2N.runnames` ↔ 基线 `R2-BLF.runnames` **双向差集为空**；
+  `R2-C2C` ↔ `R2-BLC` 同样为空。
+- 这四数与票 133 验收方 §1.1 第 2 批那两发（202/108/0/0）**同数**；本程没在这两发里碰上那枚既有 flake。
+
+### 7.5 一票本程自加的额外读数：linux 腿**真跑**（容器，不是交叉编译）
+
+派单没要求这一发，本程加它是因为上一程的 commit message 把 linux 推给了"证据 §5"，
+而那一格如果只留"取不到"，读者就永远不知道那把尺在 linux 上是红是绿。
+
+```
+$ MSYS2_ARG_CONV_EXCL='*' docker run --rm -v D:/tmp/wisp135mg-r2-tree:/src:ro \
+      -v D:/work/base/gopath/pkg/mod:/gomod:ro -w /src -e GOFLAGS=-mod=mod -e GOMODCACHE=/gomod \
+      -e GOPROXY=off -e CGO_ENABLED=1 golang:1.27 sh -c 'go test -count=1 -v -run "^TestAC1AC2DispatchHopGate133$" ./cmd/wisp/'
+挂载先证（防 Git Bash 把 -v 吞成空挂载那枚假绿）：
+  /src/go.mod 883 字节、/src/cmd/wisp 34 枚文件、/src/cmd/wisp/leg_dispatch_gate_133_test.go 75627 字节
+  Linux 6.6.114.1-microsoft-standard-WSL2 x86_64 / go version go1.27.1 linux/amd64
+读数：LINUX-RC=0（真跑，不是只编译）
+  run-roster disclosure: GOOS=linux, 41 startable cases read from this binary itself;
+  case names this round's ledger credited through `covered=test`: 1 distinct, 1 of them startable;
+  this gate's registry: 4 claims, **4 of them outside this round's roster** -
+  TestAC1ResidentLegInstallsItsLogListenerOnDisk, TestAC2ModelsLegBooksItsHandOffVerdictOnDisk,
+  TestAC2SealNoticeLandsInTheRunLegLogFile, TestAC3SecretLegBooksItsAuditRecordsOnDisk.
+  A registry nail the build does not take is disclosed here and not reddened …
+  --- PASS: TestAC1AC2DispatchHopGate133 (0.19s)  →  ok  github.com/CarlosShao/wisp/cmd/wisp 0.272s
+```
+
+⇒ 三件事被这一发钉住：**(1)** 名册读数在 linux 上**取到了**（41 枚），
+`os.Executable()`＋`-test.list` 那一形跨平台成立；**(2)** 那处不对称（`covered=nail` 落名册外
+只披露不弄红）**按它注释说的那样发生**，逐枚点名，本程第一手读到；**(3)** linux 上**没有误红**
+（rc=0）。⚠ 这**不**等于"linux 整包没别的问题"——本程只跑了这一枚用例（`-run` 收窄），
+那 19 枚 linux 侧既有 FAIL 一枚没碰（§8 第 6 条）。
+⚠ 这一发采的时候第 3 行 `gh run list` 连报两次 `EOF`（11:39:45／11:41:20），
+前两行（worker=0／toolchain=0）都是 0 ⇒ **这一发的 ci 那一维是"未取到"而不是"确认为空"**，照实登记。
+
+〔独立复现〕§7 每一行都是本程自己跑的；日志：
+`gates-post.*`／`gates-pre.*`／`d22-binary-*.txt`／`linux-run.log`／`linux-run2.log`，
+全在 `/d/tmp/wisp135mg-r2-out/`。
