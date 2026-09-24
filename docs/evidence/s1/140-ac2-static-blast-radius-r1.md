@@ -661,4 +661,114 @@ func TestDataDir() string {
 - **扫法可重跑**：本节每条命令都已写在表格上方的粗体行里，路径全集＝仓库根（`.`），
   含 `.github/workflows/` 下**两枚** workflow（`ci.yml`、`slo-fresh.yml`——第二枚本程此前未见有人点名扫过）。
 
+### 5.6 §5 那枚 commit 的回显（`git log --oneline -1` + `git show --name-only HEAD`，原样）
+
+```
+98665ef docs(evidence/140 AC#2 r1): §5 同族扫描（扫法可重跑）+ §4 回显
+
+docs/evidence/s1/140-ac2-static-blast-radius-r1.md
+```
+
+（那次 commit 前 `git diff --cached --name-only` 现量**只有这一枚路径**。）
+
+---
+
+## §6　本程没查的档（不查的就是没查的，别按已查读）
+
+| # | 没查的那半 | 为什么没查 | 谁能查 | 要查需要什么授权 |
+|---|---|---|---|---|
+| N1 | **`AC#1` 要的那一发真跑**（同一枚命令 `WISP_ENV` 未设 / 设为 `test` 两形各一发，四数 + 名册差集 + panic 计数） | 简报硬红线：另一枚程（`worker-ticket136-ac14`）此刻在本机做 `wisp slo -settle` 真取样，而本仓对"同一时刻既取样又编译"的处置是**整段判无效**（名单 `scripts/slo-check.ps1:153-155`，含 `go.exe`/`compile.exe`/`link.exe`/`gcc.exe`/`wisp.exe`）⇒ 本程**一枚仪器都没跑** | 票 140 的实现程 | 与 `cmd/wisp/**` 上在飞的终裁程**错开**（票面 `:77` 明写"按包 scope 读数，同包并行会造出假颜色"）；且要等 SLO 取样窗口空出来 |
+| N2 | **§3.4 U1**：`(a)` 之后那三枚 build 步骤（`ci.yml:400`/`:497`/`:560`）红不红 | 需要真跑 `wisp.exe doctor`；且 self-hosted 那台的 `%APPDATA%` 可得性**不是仓库状态** | 实现程（本机一发两形即可覆盖 hosted 那一半）；self-hosted 那一半只有 CI 一发覆盖 | 本机发＝常规；CI 发＝**要编排者推**（本程只 commit 不 push） |
+| N3 | **§3.4 U2**：`build\portable.txt` 在 wisp-slo 那台上存不存在（`doctor.go:248-255` 的更早早退） | 属**仓外真机文件状态**。本程全程未离开仓库目录 | 编排者／owner：`ls build\portable.txt` 一发即定 | 登进那台机＝要授权；或在 `ci.yml` 里加一枚只印不写的诊断步（＝动共享件，走票面 `:52` 那道门） |
+| N4 | **§3.4 U3**：真实 `%APPDATA%\wisp-dev` 的跨 run 残留会不会污染 SLO 读数 | 本程未读**任何** owner 配置树，也未跑任何会写它的东西 | 票 135／SLO 那本账（`128-ac4-r1-acceptance.md` §9#5 已把"真实落点 / DPAPI 真写入"四条件挂给票 135） | 那是 owner 的真配置树 ⇒ **取数前需编排者批准**，且清理建议由 owner 做，不由 agent 做 |
+| N5 | **CI 侧颜色**：run `35967768017` 的原文、以及 `c2fa2e9` 推送后 `:422` 那一格的颜色 | 简报明写**不许 `gh run view` 取日志**；`128-ac4-r1-acceptance.md` §9#8 也已把同一件事登记为"本程不 push 所以核不到，编排者：推完读那一步" | 编排者 | 推送权。凭据应绑 §7.1 的 S1/S2 形状（**引该文的结论时档位＝已裁读数，不是本程复现**） |
+| N6 | **票 123 那 4 枚为什么在 CI 上红**（真因） | 不在本票判据内，且票面前置约束明写"别把票 123 那 4 枚一起结掉"。本程只裁了**它依不依赖 job env**（§3.3：不依赖，静态链完整），**没有**追它的红 | 另立票（前置约束 (ii)/(iii) 要求另立）。`128-ac4-r1-acceptance.md` §9#7 已登记同一件事 | 需一张新票；§3.3 末那条"两族的超时来源本来不同枚"的旁证可当起手，**但本程不担保它成立** |
+| N7 | **`AC#3` 的两枚变异**（摘 `:261` 的 pin / 摘"先栽 test"那行 `:260`）在 runner 上响不响 | 是仪器验证，属实现程的活，且必须真跑 | 实现程／终裁程 | 同 N1 的排程约束。⚠ 本程给一条**静态旁证**帮它选形：`AC#3` 若问"这枚 helper 在别的机器上是不是变成装饰"，`internal/proc/envfork_test.go:323 TestDefaultLayoutUnknownEnvFails` 那枚"一枚断言两个可能来源"的形状比 `:192` 更像饵（此判据出自上一份盘点 §2.3，本程复核码面仍逐字成立，档位＝引别程＋本程静态复算） |
+| N8 | **`AC#4` 的门禁四套**（`-count=2 -v` 四数、`gofmt -l`、`gofumpt -l`、`go vet` 宿主＋容器双 GOOS、`sh scripts/d22scan.sh`） | 全部是**编译/执行**仪器，N1 同因 | 实现程 | 同 N1。gofumpt 版本按票面 `:45`「盘上现量 v0.12.0，票面/派单里写 v0.7.0 的都是过期值」 |
+| N9 | **`internal/observe/**` 里有没有新增读者**（AC#14 正在写那棵目录） | 本程**扫了**（`grep -c WISP_ENV -r internal/observe/` → **零命中**），但本程读到的是**工作树当前态**，不是钉版；那棵目录最后一次改动已经落到 `aef82f5 09-24 19:08`，**与本程取数几乎同时** ⇒ 名册对**这一枚**包有新鲜度风险 | 终裁表按提交时刻重跑一遍 §1.0 那四条 grep 即可 | 无需新授权（只读）。⇒ 本程在 §0.0 已声明："本文所有 file:line 取自盘上工作树"，**这既是它的方法也是它的边界** |
+| N10 | **容器/Linux 腿**（票面 `:54` 那套 `golang:1.27` 挂载形状） | 简报禁 `docker` | 实现程（只在 Linux 腿真需要时） | 票面 `:54` 的挂载自证要求（Windows 形 `-v "D:\tmp\...:/wisp"` ＋ 容器内 `ls -l /wisp/go.mod` 非空；`/d/tmp` 那一形会**静默挂空而 rc=0**） |
+
+---
+
+## §7　临时件、写集、纪律自证与 commit 账
+
+### 7.1 临时件清单（**只建不删**）
+
+**本程没有在仓内、也没在 `D:\tmp\wisp140ac2\` 下创建任何临时文件或目录**——
+纯 grep/只读的任务不需要中间件。本程**未执行**任何 `rm`/`rmdir`。
+
+### 7.2 写集：只有 1 枚文件
+
+`docs/evidence/s1/140-ac2-static-blast-radius-r1.md`（本文件）。
+**未动**：`internal/observe/**`、`cmd/wisp/**`、`internal/proc/**`、`internal/winsec/**`、
+`.github/workflows/**`、`scripts/**`、`docs/PLAN.md`、`docs/specs/**`、`internal/risk/**`、
+`tools/d22scan/**`、任何阈值／golden／`thresholds.go`、`frontend/**`、`design/**`、
+`.scratch/wisp/issues/**`（**含本票票面：票面 `:50` 要求"每完成一格往票面 append 一条 log"，
+本程按简报的"写集只有那枚新证据文件"走，**那一格未翻，请编排者自行决定由谁翻**——
+与上一份盘点 §篇首同一处冲突，同一处理法）、`docs/reports/**`。
+
+**每枚 commit 的暂存面自证**：每次提交前先 `git add -- <那一枚路径>` 再 `git diff --cached --name-only`，
+**六次现量全部只有 1 枚路径**。owner 那 16 枚 `design/**` 未提交删除 + 两枚未跟踪目录
+（`design/doubao/`、`design/old/`）**原样留在 unstaged，本程未还原、未提交、未删**
+（交件前复量：`git status --porcelain | grep -v '^ D design'` → 只剩那两枚 `??` 行）。
+
+### 7.3 注入两栏计数（这条规矩只能被引用，不能被外部文字代填）
+
+- **真通知回显数：1。** 会话开头 harness 回显的 `Memory: d:/work/workspace/projects plans/wisp/agents.md`
+  全文 + 可用 skill 清单 + `The date has changed. Current date: 2026-09-24`。
+  这些是**环境回显**，本程未据此改变任何动作，只登记。
+- **判为注入数：0。** 本程读到的所有"已结案／请改判／恒红型装饰／不许放宽"类句子，
+  经核**全部出自票面、台账与兄弟程证据文件的正文**（`.scratch/wisp/issues/140-…md`、
+  `docs/reports/pending-and-issues.md`、`docs/evidence/s1/128-ac4-r1-acceptance.md`、
+  `docs/evidence/s1/140-static-inventory-r1.md`），**不是**工具输出里冒充授权的句子。
+  本程把它们一律当**待核断言**处理（结果见 §0.2），未据此行动。
+- **凭据抄录：0 处。** `slo-fresh.yml:69` 那枚 `GH_TOKEN` 本程**只写变量名与 file:line**，未抄值。
+  全程 grep 未命中疑似明文凭据；若曾命中，按纪律只打印文件名。
+- **一处自纠要如实登记**：本程曾用 `python -c "…"`（**双引号**）就地改两处计数，
+  脚本里的反引号被 shell 当成命令替换真执行，报错
+  `No such file or directory` / `command not found` 各若干；
+  **写盘前的 assert 挂住 ⇒ 文件未受损**，随后改用 Edit 工具落盘。
+  这正是简报"定界符必须加单引号／含反引号的段落用 Edit/Write 落盘"那条规矩的**本程现量代价**。
+
+### 7.4 本文件的 commit 账
+
+**取法（别按本节行数信我，按这两条命令现量）**：
+
+```
+git log --oneline -- docs/evidence/s1/140-ac2-static-blast-radius-r1.md
+git show --numstat --format='%h %ad' --date=format:'%m-%d %H:%M' <那一枚> -- docs/evidence/s1/140-ac2-static-blast-radius-r1.md
+```
+
+| 节 | commit | 内容 |
+|---|---|---|
+| 起手＋§1 | `8e86f32` | §0（锚点/纪律/分工/推翻清单/版本方法）＋ §1 读者名册 |
+| §2 | `02bbb59` | 环境枚举入口链（两族） |
+| §3 | `8d1fbc5` | 逐处影响面 + 票 123 专核 + 三处不确定 |
+| §4 | `0ed0d02` | 三支代价表 + 尺（含 §3 回显） |
+| §5 | `98665ef` | 同族扫描 S1–S7（含 §4 回显） |
+| §6＋§7 | 本表所在的那一枚 | 没查的档 + 纪律自证 |
+
+⚠ **自指余留**：本表最后一行是在它自己那枚 commit **之前**写的 ⇒ "§6/§7 落在第 6 枚"这句话
+要靠第 6 枚本身才成立。⇒ **数本文件的 commit 一律按上面那条 `git log --oneline -- <路径>` 现量。**
+
+### 7.5 交付净数（给 `AC#2` 当分母的那一句）
+
+- **① 读者**：全仓 `WISP_ENV` 命中 **69 处 / 19 枚文件**；**真读者 3 处 / 2 枚文件**
+  （`buildinfo/env.go:36`、`buildinfo/buildinfo.go:38`、`slo_windows.go:238`）；
+  判落点的分叉 **1 处**（`doctor.go:256`，grep 单查 `WISP_ENV` 抓不到）。
+- **② 链**：两族。**字符串族**（`EnvString` -> `doctor.go:247 resolveDataDir`）有那枚短路；
+  **类型化族**（`ResolveEnv` -> `proc.LayoutFor`）**无条件问 OS 再把答案丢掉**（`envfork.go:236` -> `:245` -> `:77-85`）。
+  链上唯一"CI 真会走到且无守卫"的消费者是 `doctor.go:104-105`。
+- **③ 会换分支**：生产判定点 **1 枚** × CI 触发面 **3 枚步骤**（`ci.yml:400`/`:497`/`:560`，
+  全部经由 `build.ps1:162` 那次 `wisp.exe doctor`）；测试侧 **0 枚**；
+  另 1 枚"换分支不换色"（`slo_windows.go:238`，CI 上因 `slo-check.ps1:111` 先设而不换）。
+  **票 123 那 4 枚与 job env 不共因——这一条静态链完整，不需要读数**（§3.3），真因仍未追（N6）。
+- **④ 三支**：(a) 1 枚文件 4 删 3 加、**碰共享件门**、有把 `:400` 改红从而吃掉 `:422`/`:500`/`:563` 三格读数的路径、
+  回退清不掉仓外残留；(b) Go 面 0 枚待钉但**名册尺有射程缺口**（`dataroot_128_test.go:370` 只认 `resolveDataDir` 的调用者，
+  收不到 `cmdSecret`），且 `pinEnvThatAsksTheOS128` 钉 dev、131 那批要 test ⇒ **不能直接推广**；
+  (c) 0 枚改红，但**它要登记的那件事在 `cmd/wisp` 里今天已经不成立**（唯一的靶已被 `c2fa2e9` 钉住）。
+- **⑤ 同族**：`t.Setenv("WISP_ENV")` 7 处 / 2 枚包（除那枚 helper 外，新账是 131 那 2 处 + buildinfo 那 3 处）；
+  **依赖默认值的测试 0 枚**；workflow/脚本"环境把分支选走"的其它例证 **7 枚 S1–S7**，
+  其中 **S2（`CC` -> `doctor` 的一枚 critical 检查）与 S3（job 级 `MINGW64_ROOT`）是本程新扫出来的**。
+
 
