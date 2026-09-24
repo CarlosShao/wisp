@@ -393,3 +393,81 @@ STATE-GATE-FAILED expected=mutd
 ⇒ 机制与票面钉的**一模一样**：被记名的是**容器自己那枚** `/r2ac3link`（软链形里 TMPDIR 的第一段），
 而用例自己种在 `…/002/root/link` 的那一枚**从未被走过**。这就是 MUT-D 那一形，也就是本票标题钉的害。
 
+**本节（§0–§2.2）落在哪枚 commit——`git log --oneline -1` ＋ `git show --name-only HEAD` 原样：**
+
+```
+$ git log --oneline -1
+e375b2a docs(137,AC#3 证据 §0-§2.2): 锚点自量（含"99319c7 不存在"复量）＋争用闸门四轮原样＋取件与五枚文件 md5 对点＋十发容器读数台账＋结案格①逐名表
+$ git show --name-only HEAD | tail -3
+    - 本程一枚未裁别的格、一枚未翻勾、生产码与票面零改动、未 push。
+
+docs/evidence/s1/137-ac3-r2-acceptance.md
+```
+
+### 2.3 结案格 ②：普通形**零新增红**——八数逐数相同 ＋ 三档名册双向差集全空
+
+同一发 MUT-D、两侧唯一变量＝那三处新判据分支在不在位（§0.3 的生产码 md5 两列逐字相同）：
+
+| 读数 | RUN | 顶层 PASS/FAIL/SKIP | 子测 PASS/FAIL/SKIP | 包级 rc |
+|---|---|---|---|---|
+| `s01b-dloose-plain`（未收紧＋D，普通形） | 52 | 17/13/0 | 17/5/0 | 1 |
+| `s03-dtight-plain`（**被验版本**＋D，普通形） | 52 | 17/13/0 | 17/5/0 | 1 |
+| `s06-relax-plain`（反向探针，普通形） | 52 | 17/13/0 | 17/5/0 | 1 |
+| 票面 `:172` 点名的参照值 `52/17/13/0 ＋ 17/5/0、rc=1` | 52 | 17/13/0 | 17/5/0 | 1 |
+
+⇒ **八数逐数相同**，且与我自己的读数**逐数等于票面参照值**（不是我算出来的"应该等于"）。
+
+三档名册**双向差集**（`comm` 对 `parse.py` 落盘的 `*.v.{run,fail,skip}.txt`，普通形三发两两对点）：
+
+```
+== s01b-dloose-plain vs s03-dtight-plain ==   run:  only-in-A=0 only-in-B=0 (A_n=52 B_n=52)
+                                              fail: only-in-A=0 only-in-B=0 (A_n=18 B_n=18)
+                                              skip: only-in-A=0 only-in-B=0 (A_n=0  B_n=0)
+== s01b-dloose-plain vs s06-relax-plain ==    run/fail/skip 三档同上，全部 0/0（52/18/0）
+== s03-dtight-plain  vs s06-relax-plain ==    run/fail/skip 三档同上，全部 0/0（52/18/0）
+```
+
+⇒ **不新增红、不由绿转 SKIP、无用例消失**（普通形三发两两的三档名册**逐名相同**，含反向探针那一列）。
+软链形那一侧同样核过（`s02b` ↔ `s04`、`s04` ↔ `s05`）：`RUN`/`SKIP` 差集为空、
+`FAIL` 差集**只有**分母那 11 枚（`only-in-dtight` 恰好 11 个名字、`only-in-dloose`／`only-in-relax` 全 0）
+⇒ 软链形里"变红"这件事**只发生在本格要判的那 11 枚上**，没有牵连别的名次。
+⚠ SKIP 逐名（软链形四发名册相同、恒 3 枚，全部是票 125 的三枚自拒探针）：
+
+```
+TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125
+TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125
+TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125
+```
+
+⇒ 分母 11 枚在**任何一发**里都不是 SKIP（§2.2 表六列逐名给的只有 PASS/FAIL），
+所以"变绿"与"被跳过"这两个出口在这里只可能是前者——而本格判的是**变红**，与 SKIP 无关。
+
+### 2.4 结案格 ③：变异真落地的凭据 ＋ 反向证据（**判别对**）
+
+**(甲) 三枚对照组（按 `R-137-3` 点名，不按更正块 ③ 的原句）** 逐名颜色：
+
+| 对照用例 | `s01b` 未收紧·普通 | `s02b` 未收紧·软链 | `s03` 收紧·普通 | `s04` 收紧·软链 | `s06` 探针·普通 | `s05` 探针·软链 | `s08` 未变异·普通 | `s07` 未变异·软链 |
+|---|---|---|---|---|---|---|---|---|
+| `TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed` | FAIL | FAIL | FAIL | FAIL | FAIL | FAIL | PASS | PASS |
+| `TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasNamed` | FAIL | FAIL | FAIL | FAIL | FAIL | FAIL | PASS | PASS |
+| `TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119` | FAIL | FAIL | FAIL | FAIL | FAIL | FAIL | PASS | PASS |
+
+⇒ 三枚**根已解析**的对照在 MUT-D 下**两形都仍红**（六发全红），而在两棵**未变异**的树上两形都 PASS
+⇒ 红是**变异**造成的、不是收紧造成的 ⇒ **MUT-D 真落地**，那 11 枚的绿不是"没打到"。
+⇒ 两枚 118 的红行是 `returned nil, i.e. it sealed through a symlink`（`s04` 里 2 次）＝底线**真的没拒**，
+这一形里连"错误类型"那把旧尺都拦不住——正是本票要防的"绿得没有理由"。
+
+**(乙) 反向证据＝判别对**（本格的承重墙）：
+
+| | 软链形·分母 11 枚 | 普通形·八数 |
+|---|---|---|
+| `s02b` **未收紧**＋MUT-D | **11 枚全 PASS**（零检测力＝害复现） | `52/17/13/0＋17/5/0、rc=1` |
+| `s04` **收紧**（＝被验版本）＋**同一发** MUT-D | **11 枚全 FAIL**（逐名见 §2.2） | 同一串八数、三档名册逐名相同 |
+| `s05` 收紧树＋**删掉三处新判据**＋同一发 MUT-D | **11 枚全 PASS** | 同一串八数 |
+
+⇒ `s04` ↔ `s02b` 与 `s04` ↔ `s05` 两对都**只差"新判据在不在位"这一枚变量**（生产码两列 md5 逐字相同、变异标记枚数都是 2），
+软链形颜色从 11 全绿翻成 11 全红、普通形一动不动 ⇒ **把"修好了"与"没修"分开的就是这一对**，AC#3 的牙在这儿。
+⇒ `s05`（同树同变异、只把判据放宽成 AC#2 之前的形状）与 `s02b`（AC#2 之前的整棵树）**逐名同色**
+（`only-in-dloose=0 / only-in-relax=0`，RUN/FAIL/SKIP 三档全等）⇒ 两条独立路径的"没修"参照互相吻合，不是我一枚探针自证。
+
+
