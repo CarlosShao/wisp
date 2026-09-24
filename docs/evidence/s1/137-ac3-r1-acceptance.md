@@ -527,9 +527,25 @@ $ grep -oniE "\bsk-[a-z0-9]+|\btoken\b|\bsecret\b|\bpassword\b|\bapi_key\b|beare
 
 
 
-**commit #2（本枚）追加的就是上面这一块**；它自己的两条命令不在本文里（写了就成循环），
+**commit #2 ＝ `8d62096`**（追加的就是 §9 上面那一大块），落地时刻原样 `Thu Sep 24 13:46:44 2026 +0800`：
+```
+$ git show --name-only --format="%h|%ad" 8d62096
+8d62096|Thu Sep 24 13:46:44 2026 +0800
+
+docs/evidence/s1/137-ac3-r1-acceptance.md          ← 同样只有这一枚路径
+
+$ git show --name-only --format="%h|%ad" 4f61430   ← 把 commit #1 再独立核一遍
+4f61430|Thu Sep 24 13:44:43 2026 +0800
+
+docs/evidence/s1/137-ac3-r1-acceptance.md
+```
+两枚 commit 之后 `git status --porcelain` 只剩 `?? docs/evidence/s1/137-ac3-r2-acceptance.md`
+＝§0.1 那枚兄弟程的未跟踪件，**本程一枚 add／commit／改／删都没碰过它**。
+
+**commit #3（追加本块这一枚）自己的两条命令不在本文里**（写进去就成了循环）；
 读者一条命令可核：`git show --name-only HEAD` ⇒ 期望只出现 `docs/evidence/s1/137-ac3-r1-acceptance.md` 一枚路径。
-本件正文里除本节这两块之外，**没有任何一处**出现"已提交"这句话。
+本件正文里除本节这几块之外，**没有任何一处**出现"已提交"这句话。
+
 
 ---
 
