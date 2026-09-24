@@ -131,3 +131,120 @@ $ grep -n "errors.Is(err, winsec.ErrUnresolvedPath)\|refusalCreditsLink137(err, 
 **入账读数一共 23 发**（`b01`-`b08`、`d01`-`d02`、`c01`-`c05`、`e01`-`e08`）＋ 两枚冒烟（`t0` 被 `GATE95` 停住、
 `t1` 只证明仪器能跑）＋ 三发门禁容器（`gate-container2`、`gate-container-base`）。
 作废的 `b09`/`b10`/`c06`–`c12` 日志与快照**全留**，标签不重用。
+
+### 0.8 本节落盘的那枚 commit（原样输出，先测后写再提交）
+
+```
+$ git log --oneline -1
+27a6f90 evidence(119 AC#7 r1 §0): 身份与仪器——裁决树钉死 git archive 2956897 …
+$ git show --name-only --format="%H" HEAD | tail -3
+27a6f90…（本节 §0 这一枚）
+docs/evidence/s1/119-ac7-r1-acceptance.md
+```
+
+（提交前 `git diff --cached --name-only` 只有一行：`docs/evidence/s1/119-ac7-r1-acceptance.md`。）
+
+---
+
+## §1 判据①「两味药必须一起下」——**成立，且两味都承重**（不是并列装饰）
+
+### 1.1 落点（我自己量的，命令原文见 §0.5）
+
+| 药 | 落在哪两行 | 用的是谁 | 是否改前就有 |
+|---|---|---|---|
+| 已解析基根 | `:225`（AC#1 母项）、`:337`（AC#2 leg 1） | 本文件既有的 `cleanSpelling119`（＝`filepath.EvalSymlinks`） | **是**：`git cat-file -p a9c8b6e:<file> \| grep -n "func cleanSpelling119"` ⇒ `112` |
+| 记名断言 | `:243`（AC#1）、`:363`（AC#2），各带一句点名本用例种的链接的红句 `:244`／`:364` | 同包既有 helper `refusalCreditsLink137` | **是**：`internal/winsec/placement_symlink_113_other_test.go:160`，最后动它的是票 137 的 `9c0f546`，而 `git merge-base --is-ancestor 9c0f546 a9c8b6e` ⇒ 真 |
+
+**零新增依赖**这一枚我另走了一条不引它自述的尺：
+
+```
+$ diff <(git cat-file -p a9c8b6e:<file> | sed -n '/^import (/,/^)/p') <(sed -n '/^import (/,/^)/p' <file>)
+（空输出）⇒ IMPORTS_IDENTICAL
+$ git diff --numstat a9c8b6e..HEAD -- internal/winsec/placement_symlink_113_other_test.go
+（空输出）⇒ helper 那枚文件一字未动；两版 md5 都是 25660e86ad055e68304839e227713059
+$ git diff --name-status a9c8b6e..HEAD -- internal/winsec/
+M	internal/winsec/dataroot_symlink_119_other_test.go     ← 整个 scope 只有这一枚
+```
+
+**换根那味的方向**也对：`cleanSpelling119` 问的是文件系统（`EvalSymlinks`），**不是** `proc.SealableRoot`
+⇒ 不违反票 119 Rules 里 `R-119-9`"不许拿被测函数算 fixture"（那条正是本票返修时立的）。
+
+### 1.2 承重证据 A：**只撤换根、留记名** ⇒ 软链形恒红（＝137 的 `r2` 处境，被这发复算并排除）
+
+台件＝`git archive 2956897` 之上只把 `:225`（或 `:337`）换回 `base := t.TempDir()`，生产码未变异。
+
+| 发 | 撤了哪一枚 | 形 | 四数（RUN／顶P/F/S／子P/F/S／panic） | 名册差集 vs 同形未改（`b06`／`b05`） | 变色的名字 |
+|---|---|---|---|---|---|
+| `c01` | AC#1 的换根 | **软链** | 45／26/**1**/3／15/0/0／0 | 2 行 | **只有** `TestAC1POSIXUnresolvedSymlinkedRootStillRefused119` PASS→FAIL |
+| `c02` | AC#1 的换根 | 普通 | 52／30/0/0／22/0/0／0 | **0 行** | 无 |
+| `c03` | AC#2 的换根 | **软链** | 45／26/**1**/3／15/0/0／0 | 2 行 | **只有** `TestAC2POSIXInjectedTestDataDirStandsAsDeclared119` PASS→FAIL |
+| `c04` | AC#2 的换根 | 普通 | 52／30/0/0／22/0/0／0 | **0 行** | 无 |
+| `c05` | 两枚都撤 | **软链** | 45／25/**2**/3／15/0/0／0 | 4 行 | 两枚母项一起红（＝回到 137 `r2` 的形状） |
+
+**"撤掉这一处，哪一枚用例变了颜色？"答得出**：撤 AC#1 的换根只有 AC#1 红，撤 AC#2 的只有 AC#2 红，
+两枚都撤两枚都红，普通形一枚都不红 ⇒ **两处换根都不是装饰**。
+红句原文（各一枚，未截断）：
+
+```
+c01: dataroot_symlink_119_other_test.go:234: premise broke: the resolved base
+     /acwlink/wacc119tmp/TestAC1POSIXUnresolvedSymlinkedRootStillRefused1192121665142/001
+     is itself refused by the floor (winsec: refusing to seal … premise …)
+c03: dataroot_symlink_119_other_test.go:364: AC#2 RED: the refusal of the declared root
+     "/acwlink/wacc119tmp/TestAC2POSIXInjectedTestDataDirStandsAsDeclared1193044188816/001/injlink119/harness/picked"
+     named ErrUnresolvedPath but did not credit the link this case planted at "…/injlink119" …
+```
+
+⚠ 这里有一条**实现方没写、我也不替它写**的机制差异：AC#1 那枚的恒红停在它新加的前提门
+（`:233-235` 的 `t.Fatalf`，红在 `:234`），所以记名那一支根本没机会跑；AC#2 那枚没有独立前提门
+（它的前提门是 leg 2），所以红直接落在记名那一支（`:364`）。两枚都恒红，**红因不同一处**。
+前提门是 `ddc1583` 加的第三样东西，判据①没要求它；它的作用是让"解析过的基根被宿主链接污染"这件事
+**响得比记名断言更早**，方向是收紧不是放宽 ⇒ 不判它违规，只把机制写清，免得下一位以为两枚都是记名支响的。
+
+### 1.3 承重证据 B：**只撤记名、留已解析根** ⇒ 派单的预期不成立，我照实推翻
+
+派单写"预期 MUT-D 打不红（零区分力回来了）"。**实测：打红。** 撤掉记名那一支之后，MUT-D 在两形
+仍然把两枚母项打红，名册差集为 **0 行**：
+
+| 发 | 撤了哪一枚 | 生产码 | 形 | 四数 | 名册差集 vs `b08`／`b07` | 变色 |
+|---|---|---|---|---|---|---|
+| `e01` | AC#1 的记名支 | MUT-D | 软链 | 45／15/12/3／11/4/0／0 | **0 行** | 无（两枚照旧 FAIL） |
+| `e02` | AC#1 的记名支 | MUT-D | 普通 | 52／17/13/0／17/5/0／0 | **0 行** | 无 |
+| `e03` | AC#2 的记名支 | MUT-D | 软链 | 45／15/12/3／11/4/0／0 | **0 行** | 无 |
+| `e04` | AC#2 的记名支 | MUT-D | 普通 | 52／17/13/0／17/5/0／0 | **0 行** | 无 |
+
+⇒ **MUT-D 的区分力是"换根"那一味给的**（红从哨兵支响，机制见 §3.4），记名那一支在这一发上本来就不响。
+记名那一支的射程在**另一发变异**上，一撤就露：
+
+| 发 | 撤了哪一枚 | 生产码 | 形 | 四数 | 名册差集 vs `d02`／`d01` | 变色 |
+|---|---|---|---|---|---|---|
+| `e05` | AC#1 的记名支 | MUT-D2 | 软链 | 45／19/**8**/3／11/4/0／0 | 2 行 | `TestAC1POSIXUnresolvedSymlinkedRootStillRefused119` **FAIL→PASS** |
+| `e06` | AC#1 的记名支 | MUT-D2 | 普通 | 52／22/**8**/0／18/4/0／0 | 2 行 | 同上 |
+| `e07` | AC#2 的记名支 | MUT-D2 | 软链 | 45／19/**8**/3／11/4/0／0 | 2 行 | `TestAC2POSIXInjectedTestDataDirStandsAsDeclared119` **FAIL→PASS** |
+| `e08` | AC#2 的记名支 | MUT-D2 | 普通 | 52／22/**8**/0／18/4/0／0 | 2 行 | 同上 |
+
+⇒ **把记名那一支摘掉，MUT-D2 就完全打不红那一枚**（另一枚照旧红＝逐枚归属，同时把判据③的"单点回退 C"结掉）。
+这一支**承重**。
+
+### 1.4 本格要害那一问的裁定
+
+> 问：**"两发变异各自能响一支"是否等于"这味药承重"**，还是必须"同一发变异里记名支先响"？
+
+**裁：前者。要求"同一发里记名支先响"是错的判据，我拒绝按它退这一格。** 理由三条，都是量出来的：
+
+1. MUT-D 把两条走查截短之后**底线根本不拒**（`b08` 里 `AC#1 PrivateDirAll(...) -> winsec: … varlink119 is not a directory`，
+   不是 `ErrUnresolvedPath`），而记名那一支的代码形状是 `} else if !refusalCreditsLink137(...)`，
+   挂在 `errors.Is(err, ErrUnresolvedPath)` 之后——**它的触发前提在这发里被变异本身抹掉了**。
+   要求它"先响"＝要求一支在它的前提为假时仍然响，那只能靠把 `else if` 拆成两条独立 `if` 来造，
+   那是**措辞工程**，不是判据。
+2. 承重的**可操作定义**是"拿掉这一味，存不存在一发变异打得它永不响"。§1.3 的 `e05`-`e08` 答"存在"
+   （MUT-D2 摘不得），§1.2 的 `c01`-`c05` 答"换根摘不得"。**两味各自被一发单点回退打回不响**＝两味都承重。
+3. 反向也要有一句：记名那一支**不是恒响的装饰**——未变异的 `b05`/`b06` 里它是绿的（前提真、结论真），
+   MUT-D2 的 `d01`/`d02` 里它单独响。恒绿与恒红都排除了。
+
+⇒ 实现方 §9.1 那句自述（"MUT-D 的红是从哨兵支响的"）**属实**，我独立复算到同一机制；
+它另下一发 MUT-D2 证明记名支有牙，这一枚是对症的，不是搪塞。
+
+### 1.5 判语
+
+判据① **成立（独立复现）**。两味药一起下、都落在**该落的两枚母项**上、方向都不放宽，
+且**两味各被一发单点回退证明承重**；判据里点名的"别复活 137 的 `r2`"由 `c01`-`c05` 五发正面排除。
