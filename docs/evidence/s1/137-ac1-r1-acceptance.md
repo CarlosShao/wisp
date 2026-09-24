@@ -16,7 +16,9 @@
 - **被测面差集（它核过"winsec 侧零 hunk"，这条我重走了、没沿用）**：
   `git log --oneline 1d38206..4a0d7a4 -- internal/winsec/` **输出为空** ⇒ 从它的锚到我的锚，
   `internal/winsec/` 一字未动，两程读的是同一版被测码。
-  （同一个区间里飘进来的提交全在 `docs/**`、`.scratch/**`、`internal/observe/**`、`cmd/wisp/**`，与本格无关。）
+  （同一区间里飘进来的路径实测是 12 枚：`docs/**` 6 ＋ `.scratch/**` 4 ＋ `internal/observe/**` 2，
+  **`cmd/wisp/**` 零枚**、`internal/winsec/**` 零枚 ⇒ 与本格无关。这行按 `git diff --name-only 1d38206 4a0d7a4` 的实测改过，
+  我初稿把它猜成了"含 cmd/wisp"，方向不影响结论但枚举不该靠猜。）
 - 树：**全部**由 `git archive 4a0d7a48d03dc6aee1a3e18ceee1d2a99269b9e6 | tar -x -C /d/tmp/wisp137r2-<名>` 落成，
   仓内**未建 worktree、未 checkout、未 reset**。目录一律只建不删：
   `wisp137r2-tree0`（纯净）／`-tree-muta`／`-tree-mutb`／`-tree-mutab`／`-tree-mutd`，台件与十＋两发日志在 `wisp137r2-io/`。
@@ -37,7 +39,8 @@
   go version go1.27.1 linux/amd64
   ```
 
-  十二发（十发正式＋两发复跑）里这枚 sha256 与字节数**逐发相同**；脚本里另有硬闸
+  本程**一共 22 发**（10 发正式读数＝基线两形＋四发变异×两形；10 发复跑/补头；2 发 §9 探针），
+  落盘的 16 份容器头里这枚 sha256 与字节数**逐发相同**；脚本里另有硬闸
   `[ "$(wc -c < /src/go.mod)" = "883" ] || exit 97` ⇒ 静默挂空取不到读数。
   ⚠ 顺带把一枚容易读成"分歧"的数说清：仓内工作树与 `git show <锚>:go.mod` 都是 **855** 字节，
   而 `git archive | tar -x` 出来的快照里是 **883** 字节（差 28＝`.gitattributes` 第 1 行 `* text=auto` 配 `core.autocrlf=true` 带来的行尾差，
@@ -51,11 +54,11 @@
   - 软链形：`mkdir -p /r2priv/w137r2tmp` ＋ `ln -s /r2priv /r2link` ＋ `[ -L /r2link ]` ＋ `readlink` 逐字核为 `/r2priv`
     ＋ `ls -ld` 打印 `lrwxrwxrwx 1 root root 7 ... /r2link -> /r2priv`，`TMPDIR=/r2link/w137r2tmp`；
   - 普通形：断言 `/r2link` **根本不许存在** ＋ `[ ! -L /r2plain ]`，`TMPDIR=/r2plain/w137r2tmp`。
-  - 十二发**无一命中 97／98／99**。新鲜容器一枚一发（`--rm`，每发从零起），形状目录不许预存在。
+  - **22 发无一命中 97／98／99**。新鲜容器一枚一发（`--rm`，每发从零起），形状目录不许预存在。
 - 模块缓存：`GOPROXY=off` ＋ 我自己的两枚 named volume `wisp137r2-gomod`／`wisp137r2-gobuild`
   （离线复用既有缓存只是省时间，**不是复用别人的读数**；缺件会直接 fail，不存在"网络慢装出来的绿"）。
 - 跑法：`go test -count=1 -v ./internal/winsec/`；读数前先 `go build ./...` 与 `go vet ./internal/winsec/`，
-  两者任一非 0 ⇒ `exit 95`＝**落地不过证就不取颜色**。十二发全部 `BUILD_RC=0` ＋ `VET_RC=0`。
+  两者任一非 0 ⇒ `exit 95`＝**落地不过证就不取颜色**。22 发全部 `BUILD_RC=0` ＋ `VET_RC=0`。
 - 台件（全部在仓外 `D:\tmp\wisp137r2-io\`）：`mutate.py`（变异，逐处锚串唯一性断言）、`make-trees.sh`（建五棵快照）、
   `run.sh`（容器内跑发＋硬闸）、`parse.py`（把 `-v` 日志程序化拆成逐名颜色与名册，非手抄）、`matrix.py`（十发矩阵）。
 
@@ -81,7 +84,7 @@
 用例自种的链接落在**第 6 枚**；截前 3 枚后仍含 `/r2link` ⇒ "照旧拒宿主链接、永远看不到自己那枚"这一形**由源码语义保证**，
 再用读数验一遍（见下）。我的 `mutate.py` 对每处锚串断言"全文只命中 1 次"，命中数不是 1 就直接退出、不出数。
 
-### §2.1 包级四数（我的十二发，逐发自己数出来的）
+### §2.1 包级四数（我的十发正式读数，逐发自己数出来的）
 
 | 发 | 形 | RUN | 顶 PASS | 顶 FAIL | 顶 SKIP | 子 PASS | 子 FAIL | rc |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -96,7 +99,7 @@
 | MUT-D | 普通 | 52 | 17 | 13 | 0 | 17 | 5 | 1 |
 | MUT-D | 软链 | 45 | 24 | 3 | 3 | 15 | 0 | 1 |
 
-另加两发**同树新容器复跑**（`MUT-A`、`MUT-B` 各两形）：四数与首发逐数相同，且**逐名颜色与首发完全相同**（`diff` 名册为空）⇒ 读数可复现。
+另加十二发**同树新容器重跑**（四发复跑＝`MUT-A`／`MUT-B` 各两形；六发补容器头＝基线两形＋`MUT-A`／`MUT-B` 各两形）：**每一发与它对应的那发四数逐数相同、逐名颜色 `diff` 为空** ⇒ 同树新容器可复现；这六发补头是为了让**每一棵被读过的树都有一份落盘的容器头**（早先那六发的头只在我终端里过、没存）。
 这十行的每一格与测量方 §5 那张包级表**逐数相同**（它表里 `基线·普通 52/30/0/22/0/SKIP0`…直到 `MUT-D·软链 45/24/3/15/0/SKIP3`）。
 
 ### §2.2 分母 11 枚的逐名颜色（我这一程的十发，程序化生成、非手抄）
@@ -214,9 +217,9 @@ D·软链形包级 `顶 FAIL 3` 的名册就是这三枚（`TestAC3POSIXLinkInsi
 
 ## §4 名册与 SKIP 账（"没响"绝不等于"被跳过"，这条我逐名重走）
 
-- **同形内 RUN 名册逐名相同**：普通形六发（基线＋四发变异＋`MUT-A/B` 的复跑）都是 **52 枚**、软链形六发都是 **45 枚**，
-  每发的名册与同形基线 `diff` **为空** ⇒ 十发里没有任何一枚用例"消失"（没有 panic 吞读数、也没有静默少跑）。
-  `grep -c '^panic|^fatal error'` 在**十四份日志**（含两发复跑的 build/vet 输出另算）里全部 **0**。
+- **同形内 RUN 名册逐名相同**：普通形 11 发（基线＋四发变异＋四发复跑＋两发补头）都是 **52 枚**、软链形 11 发同构都是 **45 枚**，
+  22 发**逐发**与同形基线 `diff` **为空**（逐名实测，非抽查）⇒ 没有任何一枚用例"消失"（没有 panic 吞读数、也没有静默少跑）。
+  `grep -c '^panic|^fatal error'` 在**全部 22 份 `-v` 日志**里命中总数 **0**。
 - **两形差 7 枚**逐名（`diff base-plain base-link` 的实录，除这 7 枚外无差集）：
   `TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125/{control_plain_temp, control_unresolved_root_still_refused_by_the_floor_itself, measured_symlink_spelled_temp}`（3）＋
   `TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125/{control_plain_temp, measured_symlink_spelled_temp}`（2）＋
@@ -224,8 +227,8 @@ D·软链形包级 `顶 FAIL 3` 的名册就是这三枚（`TestAC3POSIXLinkInsi
   ⇒ 测量方把差 7 枚归给**票 125 那三枚自拒探针的子测试**这条**归因成立**：父项在软链形自己 `t.Skipf` ⇒ 子测试从未被创建，不是"少跑"、也不是本票分母在动。
 - **SKIP 账**：普通形**恒 0 枚**；软链形**恒 3 枚**且**逐名相同**
   （`TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125`、`TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125`、`TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125`）
-  ⇒ 十发**零新增 SKIP**。
-- ⚠ **本格分母 11 枚在十发里没有任何一发是 SKIP**：逐名 grep（`--- SKIP:` 行里点名 113/108 那几枚）逐发计数 **＝ 0**
+  ⇒ 22 发**零新增 SKIP**（普通形 11 发恒 0、软链形 11 发恒 3 且名册逐发同一组）。
+- ⚠ **本格分母 11 枚在 22 发里没有任何一发是 SKIP**：逐名 grep（`--- SKIP:` 行里点名 113/108 那几枚）逐发计数 **＝ 0**
   ⇒ §2.2 表里那些 `PASS` 全是跑出来的 PASS；尤其 **D·软链那 11 枚绿**是"跑了、断言也拿到了它要的拒、但拒因不是它自己种的链接"，不是"被跳过"。
 - **每一发的红都能逐名归因，没有说不去的红**（我的名册实录）：
 
@@ -275,7 +278,7 @@ D·软链形包级 `顶 FAIL 3` 的名册就是这三枚（`TestAC3POSIXLinkInsi
   同样形状的 `TestAC2POSIXInjectedTestDataDirStandsAsDeclared119`（`:286` raw）也是 D·普通 FAIL／D·软链 PASS。
 - ⚠ 若"119 族两枚"指的是 winsec 那枚 `TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119` 加上
   `TestAC3POSIXSecretRouteLinkInsideItsDataRootStillRefused119`（源码注释 `winsec_other.go:139` 点过名）——后者**不在 winsec 包**，
-  它在 `cmd/wisp/secret_dataroot_119b_test.go:201`，**本格十发读数里没有它**（且那枚包正有兄弟代理在飞，我没去跑）。
+  它在 `cmd/wisp/secret_dataroot_119b_test.go:201`，**本格 22 发读数里没有它**（且那枚包正有兄弟代理在飞，我没去跑）。
 - ⇒ 这条按字面写会造出一枚**永远无法满足**的落地凭据，把未来 AC#3 的实现方推向"去修一枚没坏的用例"。已记 **R-137-1**。
   我在 §2.4 用的是**我自己读出来的那三枚**，不是更正块点名的那三枚。
 
@@ -296,7 +299,7 @@ MUT-D·普通形 `RUN=52 顶 PASS=17 顶 FAIL=13 顶 SKIP=0 子 PASS=17 子 FAIL
 4. **宿主侧（Windows）一枚读数都没取**：这 11 枚带 `//go:build !windows`，宿主没有分母；
    也**没跑** `GOOS=windows go test -list`（那是票 124 批次 3b 量过的事，我没重走）。
 5. **门禁五读数全未做**（`gofmt -l` 整包／`gofumpt`（版本未钉明）／`go vet` 双 GOOS／`-count=2 -v` 两形四数／`sh scripts/d22scan.sh`）。
-   容器内 `go vet ./internal/winsec/` 只作为**变异落地证明**跑过（十二发全 rc=0），那不等于门禁。
+   容器内 `go vet ./internal/winsec/` 只作为**变异落地证明**跑过（22 发全 rc=0），那不等于门禁。
 6. **计时类断言一枚未跑**（D32 的 CPU≤0.5%／RSS≤25MB 一个字节没动也没读）：本机两枚兄弟在飞、`slo-full` 会随 push 自启抢 CPU。
 7. **前例只当参照、没重判**：票 124 批次 3b 那本"邻居账"我只对齐了**基线六数**（§4 末条），
    它那 17 枚红名的逐名裁决**我没重走一遍**（派单明令"不要重判它"）。
@@ -322,7 +325,7 @@ MUT-D·普通形 `RUN=52 顶 PASS=17 顶 FAIL=13 顶 SKIP=0 子 PASS=17 子 FAIL
   是 **D·普通 FAIL／D·软链 PASS**，`TestAC2POSIXInjectedTestDataDirStandsAsDeclared119` 同形同色。
 - **为什么它俩不是对照**：两枚都用 raw `t.TempDir()`（`dataroot_symlink_119_other_test.go:194`、`:286`），
   断言的正是"未解析的根必须被拒" ⇒ 软链形里宿主的链接给了它一个**合法的拒**。**它们和分母那 11 枚是同一种病，不是对照。**
-- **能复现**：是（本程十发，台件 `D:\tmp\wisp137r2-io\`，名册程序化生成）。
+- **能复现**：是（本程 22 发，台件 `D:\tmp\wisp137r2-io\`，名册程序化生成）。
 - **危害形状**：AC#3 一旦落地就要按这条判"三枚仍红"，而这一形里其中一枚**结构上不可能红**
   ⇒ 会把实现方推去"修一枚本来没坏的用例"，或把"绿"读成"变异没打到"而误废自己的落地凭据。
 - **修法方向（只给方向，票面归 owner 改）**：对照组改点名上面那三枚；或把凭据降级成"普通形三枚都红＋软链形至少两枚红"。
@@ -353,7 +356,7 @@ MUT-D·普通形 `RUN=52 顶 PASS=17 顶 FAIL=13 顶 SKIP=0 子 PASS=17 子 FAIL
 ### R-137-4 低·边界注释点名的"钉"在另一个包里
 
 `winsec_other.go:139` 用 `TestAC3POSIXSecretRouteLinkInsideItsDataRootStillRefused119` 给"链路进数据根仍被拒"这条路由作保，
-但那枚用例在 **`cmd/wisp/secret_dataroot_119b_test.go:201`**——winsec 自己的分母里**永远读不到它**（我十发里它是 ABSENT，见 §5③）。
+但那枚用例在 **`cmd/wisp/secret_dataroot_119b_test.go:201`**——winsec 自己的分母里**永远读不到它**（我 22 发里它是 ABSENT，见 §5③）。
 不是行为缺陷，是**引用可读性**缺陷：在 winsec 里查这枚名会查不到。修法方向：注释里带包名限定。归 winsec 下一程（不阻塞本票）。
 
 ### R-137-5 中·AC#2 那句"修法必须是一行形状级别（批次 3b 已核过修法是一行）"引的是**另一形**
@@ -431,7 +434,7 @@ MUT-D·普通形 `RUN=52 顶 PASS=17 顶 FAIL=13 顶 SKIP=0 子 PASS=17 子 FAIL
   MUT-A 两形响 9／没响 2、MUT-B 两形响 2／没响 9、MUT-AB 两形响 11／没响 0、
   **MUT-D 普通形响 11／没响 0，软链形响 0／没响 11（全绿）——这一发是我自己落的，红名绿名各枚点名，未照抄**；
   枚数 11＝7 顶层＋4 子测试；两形 RUN 名册与 SKIP 账；基线六数与票 124 批次 3b 逐数相同；winsec 侧零 hunk 的差集。
-  **读数面与测量方零处不一致**（含两发同树新容器的复跑，逐名颜色相同）。
+  **读数面与测量方零处不一致**（含十二发同树新容器重跑，逐名颜色与首发全同）。
 - **我不扩额的**：MUT-C（谓词级 `ancestorIsLink`）与"整枚 `RemoveUnlinked` 直接 `return nil`"那形我没造没跑
   ⇒ 按"验收方没造的支别记成已测"登记，测量方"MUT-C 被 AB 覆盖"那句我不背书（§6 第 2、3 条）。
 - **不一致的三处全在文本上、不在读数上**：R-137-1（更正块③的对照组点名）、R-137-3（更正块①依据句过度概括）、R-137-5（AC#2 的"一行"错引）。
@@ -457,6 +460,6 @@ MUT-D·普通形 `RUN=52 顶 PASS=17 顶 FAIL=13 顶 SKIP=0 子 PASS=17 子 FAIL
    `next=`＝owner 落三处票面文本更正（R-137-1／-3／-5）＋ R-137-2 进 AC#2 范围句 → 再派 AC#2；R-137-4 挂 winsec 下一程，不阻塞。
 
 **可重跑凭据（只建不删）**：快照 `D:\tmp\wisp137r2-tree0`／`-tree-muta`／`-tree-mutb`／`-tree-mutab`／`-tree-mutd`／`-tree-mutd-swap`，
-台件与十四份 `-v` 日志＋`.meta.txt`＋`.colours.txt`＋`.runnames.txt` 全在 `D:\tmp\wisp137r2-io\`；
+台件与 22 份 `-v` 日志＋`.meta.txt`＋`.colours.txt`＋`.runnames.txt` 全在 `D:\tmp\wisp137r2-io\`；
 缓存卷 `wisp137r2-gomod`／`wisp137r2-gobuild`。删与不删归编排者一次做完，本程一枚未删。
 
