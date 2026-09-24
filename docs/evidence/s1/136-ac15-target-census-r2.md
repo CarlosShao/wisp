@@ -186,3 +186,84 @@ Two secondary consequences do matter for AC#15:
    sampling windows. Reusing it as a prediction for the current tree would understate the rate; the
    denominator also now has 6 more cases in it, so the roster diff in section 5 is mandatory.
 
+---
+
+## 3. The two dimensions, measured separately
+
+Section 3 anchor: `git rev-parse HEAD` = `5889559b767586ab73dd859f0a5f00e208612f49`.
+
+The mistake on record tonight was writing one composite number ("4 sites in 2 `.go` files", real answer
+4 sites in 3 files) as if a single command could produce both factors. It cannot: a site count and a file
+count come from two different pipes. Both are therefore run twice below, once per definition of "family".
+Quoted regexes are single-quoted in the shell so `$` and `[` stay literal.
+
+### 3.1 The broad family (every shortfall guard in `internal/observe/`, section 1 lists them all)
+
+Sites:
+
+```
+grep -rn -E "^[[:space:]]*if (reads|tree\.reads|kept|lost|len\(rep\.Samples\)|len\(none\.Samples\))( < | == 0)" \
+  --include=*_test.go internal/observe/ | wc -l
+# 15
+```
+
+Files:
+
+```
+grep -rn -E "^[[:space:]]*if (reads|tree\.reads|kept|lost|len\(rep\.Samples\)|len\(none\.Samples\))( < | == 0)" \
+  --include=*_test.go internal/observe/ | cut -d: -f1 | sort -u | wc -l
+# 5
+```
+
+The file dimension is not derivable from the site dimension, and `uniq -c` on the same stream is what
+shows the skew (6 + 3 + 2 + 2 + 2 = 15 over 5 files):
+
+```
+internal/observe/sampler_settle_coverage_136_test.go        6
+internal/observe/sampler_settle_gate_136_test.go            3
+internal/observe/sampler_settle_zerosample_136_test.go      2
+internal/observe/sampler_test.go                            2
+internal/observe/sampler_zerosample_136_test.go             2
+```
+
+So the composite reading of the broad family is **15 sites in 5 files**, and the two numbers must be
+quoted with their definitions attached, never as "15x5".
+
+### 3.2 The narrow family (the one AC#15 is about: a guard that can fire while the window still took
+at least one read, i.e. a *partial* window is enough)
+
+Sites:
+
+```
+grep -rn -E "^[[:space:]]*if (tree\.reads < [2-9]|reads < [2-9]|kept < [2-9]|lost < [2-9]|kept < 1 [|][|]|len\(rep\.Samples\) < 3)" \
+  --include=*_test.go internal/observe/ | wc -l
+# 8
+```
+
+Files:
+
+```
+grep -rln -E "^[[:space:]]*if (tree\.reads < [2-9]|reads < [2-9]|kept < [2-9]|lost < [2-9]|kept < 1 [|][|]|len\(rep\.Samples\) < 3)" \
+  --include=*_test.go internal/observe/ | wc -l
+# 3
+```
+
+**8 sites in 3 files**, and the 8 are exactly section 1's group A rows 1-8. The third file beyond the two
+`136` settle files is `sampler_test.go:99` - which is why "2 `.go` files" was never going to be right for
+any census of this family that looked at only the two ticket-named files.
+
+Two honesty notes about this instrument, because it is regex-shaped and a regex has no idea what the
+fixture does:
+
+- `sampler_settle_gate_136_test.go:201` is in the narrow family only via the `kept < 1` disjunct: with the
+  alternating tree the first read is always a failure, so `reads == 1` already makes it red. A pure
+  threshold-on-`reads` regex misses it; a pure "message contains reads" regex double-counts the shadowed
+  `:216`/`:221` pair as independent flake surfaces. The hand classification in section 1 is what carries
+  the meaning; the two commands above only prove the counts are reproducible.
+- Guards whose predicate goes red on *surplus* rather than shortfall
+  (`sampler_zerosample_136_test.go:60`, `sampler_settle_zerosample_136_test.go:65`, both
+  `len(rep.Samples) != 0`) are deliberately outside both families. Including them would raise the site
+  count to 17 and the file count stays 5, which is exactly the kind of silent composite drift this
+  section exists to prevent; anyone re-running the census should say which predicate they meant.
+
+
