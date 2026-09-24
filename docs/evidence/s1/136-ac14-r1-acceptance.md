@@ -396,3 +396,34 @@ owner 的 `design/**` 16 枚未提交删除＋`design/doubao/`、`design/old/` �
 （`scripts/portable-tests.sh` 的真实容器读数实现件自己也没取，账在它 §6-2 与本程这里各记一笔）；
 未裁 AC#10／AC#15／`settleCoverageRowGates` 该不该批；未做票面 §3「每片完成后五件事」里的缺口审计与失败预演
 （那两件的授权方另有人，本程只是 `AC#14` 一格的裁决者）。
+
+---
+
+## §8 同形那一维的补量 ＋ 收尾 commit 账
+
+**"与 `sampling` 同形"本程逐字比过两枚格式串**（`internal/observe/sampler.go`，量于 `aef82f5`＝HEAD 同码）：
+
+| 侧 | 站点 | 逐字 |
+| --- | --- | --- |
+| `StateReport`（冻结侧，票面 `:278`） | `sampler.go:336` | `Metric: "sampling", Measured: fmt.Sprintf("%d valid / %d errors", len(rep.Samples), rep.SampleErrors),` |
+| `SettleReport`（本格新造） | `sampler.go:577` | `Measured: fmt.Sprintf("%d valid / %d errors", len(rep.Samples), rep.SampleErrors),` |
+
+⇒ **行名与 `Measured` 格式串逐字同**，且 `buildSettleVerdicts` 另起一枚（`:564`）、`buildVerdicts` 未被做成两用
+（`TestStateReportVerdictBuilderStaysSinglePurpose` 在 §1/§2/§4 九发里全绿）。票面 `:262` 那句"与 `sampling` 同形的门行"
+这一维本程**判成立**（不是"只加了个字段"）。
+
+**本节（§6-§7）的 commit 回显**：
+
+```
+$ git log --oneline -1
+87f1e86 accept(136 AC#14 r1 §6-§7): 五条判据总裁（①-⑤ 全成立·独立复现，本格附条件在编排者手里）＋ AC#15 前提腿 7 站点现量 ＋ 纪律回执 ＋ 推翻简报四句
+$ git show --name-only HEAD
+docs/evidence/s1/136-ac14-r1-acceptance.md
+```
+
+**本程 commit 账（逐枚只带 `docs/evidence/s1/136-ac14-r1-acceptance.md` 一枚路径；`git log --oneline aef82f5..HEAD -- docs/evidence/s1/136-ac14-r1-acceptance.md` 可复算）**：
+`ca09955` §0-§1 → `bb723f7` §2 → `ffe5731` §3 → `24ab73f` §4 → `512d33d` §5 → `87f1e86` §6-§7 →（本节那一枚在最后，hash 由下一位从 `git log` 读）。
+中间穿插的 `ddbd3a1`／`6451625`／`98665ef` 等**都不是本程的 commit**（编排者与票 140 程在飞）；本程七枚（含本节）**枚枚单路径、未 push**。
+
+**收尾回执**（`git status --porcelain` 末次）：`design/**` 16 枚删除 ＋ `design/doubao/`、`design/old/` 两枚未跟踪目录
+**仍在原状**（未还原、未提交、未删）；`internal/observe/**` 与其余禁改面 **0 行改动**。
