@@ -1,6 +1,6 @@
 # SPEC-00 · 产品总纲与用户故事
 
-> 追溯：PLAN.md 全文（D1–D46）；开发方是 AI Agent（D22/D23），本 spec 同时服务于人与 agent。
+> 追溯：PLAN.md 全文（D1–D47）；开发方是 AI Agent（D22/D23），本 spec 同时服务于人与 agent。
 
 ## 1. 问题陈述（Problem Statement）
 

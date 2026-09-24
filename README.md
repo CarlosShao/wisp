@@ -7,7 +7,7 @@
 
 | 入口 | 说明 |
 |---|---|
-| [docs/PLAN.md](docs/PLAN.md) | 实施级方案定稿（D1–D46 决策 + C1–C31 冻结契约，四轮打磨 + 用户全部定案） |
+| [docs/PLAN.md](docs/PLAN.md) | 实施级方案定稿（D1–D47 决策 + C1–C32 冻结契约，四轮打磨 + 用户全部定案） |
 | [docs/specs/](docs/specs/README.md) | 落地规格：骨架、数据存储、语音链路、安全门控、UI、构建与容器化、环境隔离等 13 份 |
 | [design/](design/index.html) | 前端静态原型（11 屏 + 设计系统总览，`tokens.css` 即 C21 DesignTokens 参考实现） |
 
