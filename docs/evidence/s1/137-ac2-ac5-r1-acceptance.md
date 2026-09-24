@@ -378,8 +378,9 @@ AC#3/AC#4 记料时别把它们当对照（R-137-1 已点到其中两枚）。
    build constraints exclude all Go files in …pkg\mod\…@v1.13.8`（宿主交叉时 `CGO_ENABLED=0`）；
    触发点在 `cmd/wisp/doctor.go:14` 那枚 import。同一条链在**容器原生那一发里 rc=0**（`CGO_ENABLED=1`）。
 3. 第三枚 cmd 包 `cmd/llmrecord` 逐包 **rc=0**，`frontend` 包 rc=0 ⇒ "失效面只有这两枚 cmd 包"这句我在**逐包粒度**复现成立。
-4. ⚠ 一条口径账（给编排者，不是伤）：**整树那一发**（`GOOS=linux go vet ./...`）我这边也跑了（在 `gates.out` 里是逐包那发的
-   副产品对照），它只报出 `cmd/wisp` 那一枚链，`cmd/balldebug` 要**逐包**才看得见 ⇒
+4. ⚠ 一条口径账（给编排者，不是伤）：**整树那一发我另跑了一遍**
+   （`GOOS=linux GOARCH=amd64 go vet ./...`，日志 `gates-wisp137r2-tree-tight.vet-cross-whole.txt`）
+   ＝ **rc=1、3 行**，只报出 `cmd/wisp` 那一枚链；`cmd/balldebug` 那枚要**逐包**才看得见 ⇒
    "整树红＝只有一处"确实是错觉，逐包这一手是必要的，不是形式主义。
    **并且**：两棵树的逐包账本（把树名归一后）`diff` **逐字节相同** ⇒ 这两枚 rc=1 与 AC#2 那一刀**无关**。
 
@@ -439,7 +440,7 @@ AC#3/AC#4 记料时别把它们当对照（R-137-1 已点到其中两枚）。
 
 五组门禁逐组成立：`gofmt -l` 整包与全仓 0 枚（＋CI 同形写法 0 枚）／`gofumpt -l` 0 枚且**版本写明 v0.12.0 (go1.27.1)、未 install**／
 `go vet` 宿主原生 rc=0 ＋ 交叉 linux **逐包** 31/33 rc=0、两枚 rc=1 逐行归因到 `file:line`／包约束本身且与对照树逐字节同账／
-容器原生 `go vet ./...` rc=0／`-count=2 -v` 两形四数与名册差集全核／`sh scripts/d22scan.sh` rc=0 且**九个 scope 的
+容器原生 `go vet ./...` rc=0／`-count=2 -v` 两形四数与名册差集全核／`sh scripts/d22scan.sh` rc=0 且**八枚 scope（另含一枚合计行）的
 examined 枚数现量与 AC#2 之前逐枚相等**、空 scope fatal 我另外独立造形量到。
 
 ## §8 三条不许越过的线：我这一程的自证 ＋ 我没核的档
@@ -486,7 +487,7 @@ examined 枚数现量与 AC#2 之前逐枚相等**、空 scope fatal 我另外�
 | 格 | 判定 | 翻不翻勾 | 依据（本件哪一节） |
 | --- | --- | --- | --- |
 | **AC#2** | **成立（PASS、无附条件）** | **建议翻勾** | §1（甲：判据点全覆盖，含 108 那两枚内联腿）＋§2（乙：MUT-D 三态我自己在 4e66817 上重跑，11 枚逐名转红、普通形逐名差集全空）＋§4（丁：恒真那条我拿反向探针重走，进树版不是恒真）＋§5（反向也不是恒不满足）＋§6 汇总表 |
-| **AC#5** | **成立（PASS、无附条件）** | **建议翻勾** | §7 五组门禁全部我自己跑（含容器原生 vet 与逐包 linux vet 的 file:line 归因、九枚 scope 的 examined 现量对点、空 scope fatal 独立造形量到） |
+| **AC#5** | **成立（PASS、无附条件）** | **建议翻勾** | §7 五组门禁全部我自己跑（含容器原生 vet 与逐包 linux vet 的 file:line 归因、八枚 scope 的 examined 现量对点、空 scope fatal 独立造形量到） |
 
 **需要编排者补的几味（都不构成退回项，本格两枚勾的成立不依赖它们）**：
 
@@ -532,7 +533,7 @@ examined 枚数现量与 AC#2 之前逐枚相等**、空 scope fatal 我另外�
 
 **C. 编排者派单里给的错断言 → 记进正文、不进注入数**：那枚参照值的格子标签（§3 裁完，值不错标签错）。
 
-**可重跑凭据（只建不删）**：九棵快照树 ＋ 一枚假根 ＋ 台件目录，路径全在 §0 那张表里
+**可重跑凭据（只建不删）**：八棵快照树 ＋ 一枚假根 ＋ 台件目录，路径全在 §0 那张表里
 （`D:\tmp\wisp137r2-tree-tight`、`D:\tmp\wisp137r2-ac2-tree-{anchor,loose,d-loose,d-tight,naive-d,ab-tight,e-tight}`、
 `D:\tmp\wisp137r2-ac2-fakeroot`、`D:\tmp\wisp137r2-ac2-io\`）；
 docker 卷我自己新建的只有一枚 `wisp137r2-ac2-gobuild`（构建缓存），模块缓存复用了既有 `wisp137r2-gomod`
