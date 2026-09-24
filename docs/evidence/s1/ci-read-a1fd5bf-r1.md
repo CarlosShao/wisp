@@ -534,3 +534,66 @@ slo-check.ps1: NO CONCLUSION (machine-contended): exit 0
 翻勾只是把那盏灯照得更亮了一点。
 
 ---
+
+## 5. 历史对照（一个数，外加两枚必须分开的分母）
+
+### 5.1 我实际读了多少、从什么时候起（先声明窗口，再报数）
+
+仪器：`gh run list --workflow ci --limit 100`（**不带 branch 过滤**，即全分支全事件）。
+
+| 项 | 值 |
+|---|---|
+| 实际读到的 run 数 | **100 枚**（`--limit 100` 就是这个工具的窗口上限，我没有翻第二页，所以这是"最近 100 枚"而不是"全部历史"） |
+| 窗口 | **2026-09-21T12:31:37Z**（最旧，run `35600043583`）到 **2026-09-24T13:11:38Z**（最新＝本审计对象 `36003984868`），跨度约 72 小时 |
+| 窗口内出现的分支 | `["dev"]` 一枚，**没有第二枚分支**（`main` 在本仓不存在，`master` 那支死种子从不触发本 workflow，与记忆条目 `wisp-ci-selfhosted-topology` 一致） |
+| 结论分布 | `failure` 92 枚 ＋ `cancelled` 8 枚 ＝ 100 枚 |
+| **`conclusion=success` 的枚数** | **0** |
+
+所以 **台账那句"`ci` 最近 100 枚 0 枚成功"今天仍然成立**，但要带两条限定才能继续引用：
+其一，台账那次是**截至 2026-09-23**的 100 枚，我今天这 100 枚窗口**整体前移了约 72 小时**，
+**是不同的一批 100 枚**（我今天这窗口把 09-21 那批挤了出去一部分、又收进 09-24 那 21 枚）；
+其二，8 枚 `cancelled` 不是红也不是绿，它们**没有任何 step 级读数可采**（与 skipped 同性质），
+所以"0 枚 success"里含 8 枚"根本没判"的格子——这条台账原文没区分，今后引这数要连它一起说。
+
+### 5.2 run 级与 step 级是两枚不同的分母（这一节存在的理由）
+
+同一个窗口里，下面两句**同时为真**：
+
+- "`ci` 工作流最近 100 枚 **0 枚成功**。"（分母＝run）
+- "`slo-full` 在 09-24 一天 21 枚 dev run 里，门禁步 **21 枚全绿**。"（分母＝step）
+
+我把 09-24 全天 21 枚 dev run 逐枚 `gh api runs/<id>/jobs` 与 `runs/<id>/artifacts` 拉了一遍，现量：
+
+| 量 | 09-24 现量（21 枚 run 全查，零外推） |
+|---|---|
+| `ci` run 级 conclusion | 21 枚 **全 failure** |
+| `slo-full` **job** 级 conclusion | success 19 ／ failure 2 |
+| `slo-full` **step 5（SLO full gate）** conclusion | **success 21 ／ failure 0** |
+| 那 2 枚 job failure 的红因 | **都是 step 6 `Upload SLO report`**（`##[error]Failed to FinalizeArtifact: Unable to make request: ECONNRESET`），**不是 D32 没过** |
+| 真取了样且 `all_pass=True`（判据：日志有 `report written ... (all_pass=True)`；含 9 枚成功上传 artifact ＋ 2 枚 report 写成了但上传被 ECONNRESET 吞了） | **11 枚** |
+| **零取样、走 `NO CONCLUSION (machine-contended)` 而 step 5 仍绿** | **10 枚** |
+
+**"今天这枚 step 绿"与那枚 claim 的关系**（claim＝"slo-full 自改造以来已绿过两枚"）：
+
+1. **数量级不对**：光 09-24 一天，`slo-full` 的门禁步就绿了 **21 枚**、job 绿了 **19 枚**，
+   不是"两枚"。更早的 134 AC#6 证据面（`docs/evidence/s1/134-ac6-contended-no-conclusion.md:812-826`）
+   在 09-23 就已经记了"带 AC#6 代码的三枚 run 3/3 success，它之前那批 8/9 failure"。
+   所以那句"绿过两枚"要么是在说**别的分母**（比如"绿过两枚**且真取到样**"），要么是当时的一次局部读数。
+   本程**不去替它圆**，只把三个分母的现量摆出来：run 0／job 19／step 21，同日真取样 11、拒采 10。
+2. **今天这一枚与那枚 claim 的口径相容性**：本 run 的 step 5 绿是**那 10 枚"没测任何东西"的绿之一**（§4.3 三条物证），
+   所以它**不能**被算进"真过 D32 的绿"。真过 D32 且留了 artifact 的最新一枚是
+   run `35985947228`（`7cf8075`，report 建于 **2026-09-24T10:18:08Z**，比本审计对象早 **2 小时 53 分**）。
+3. **一个必须点破的仪器坑（我这次差点踩）**：**"没有 `slo-full-report` artifact"不等于"没测"**。
+   有两枚 run（`35948947994`、`35946437702`）日志明写 `report written ... (all_pass=True)`，
+   是 `Upload SLO report` 撞了 `ECONNRESET` 才没留 artifact；另外 gate 步真红时上传步会被整枚跳过，也不留 artifact。
+   所以今后**用 artifact 数当"真样品种数"的代理**必须叠加"读 step 5 正文"这一道，
+   单用 artifact 会把 11 枚数成 9 枚，而**探针 P3 恰恰就是用 artifact 计时的**（票 134 AC#6 的设计）。
+   这不是假想风险：那两枚 run 的 D32 结果对 P3 而言**已经丢了**。
+
+### 5.3 本节的一句话
+
+**run 级 0／100 与 step 级 21／21 是同一天同一批 run 的两个真话**；
+`slo-full` 今天的绿灯与"改造后绿过两枚"那说法**不相容地低估了一个量级**，
+而它与"今天真过了 D32"那说法**完全不相容**——今天它一枚样本都没取。
+
+---
