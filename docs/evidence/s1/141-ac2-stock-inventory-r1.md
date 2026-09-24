@@ -586,11 +586,10 @@ docs/evidence/s1/141-ac2-stock-inventory-r1.md
 
 ---
 
-## 9. commit 流水（本程全部 7 枚，含本节这枚的下一枚会补进 §9 之外——见下方"末节说明"）
+## 9. commit 流水（本程落到本文的枚数；号一律现取，不写死）
 
 | 序 | commit | 内容 |
 |---:|---|---|
-7
 | 1 | `ade897c` 20:11 | §0 复核：四数全等 ＋ 推翻"12 枚冻结"与取数 pathspec 漏 `frontend/` ＋ 换掉注释判据 |
 | 2 | `5dfb8ba` 20:12 | §1 小结①：非注释 38 行两档 (i)31／(ii)7 ＋ 外露证据链 ＋ 改判路径 (i)35／(ii)3 |
 | 3 | `e0c4ada` 20:15 | §2 小结②：码点段分布（**第五段 `U+2200–U+22FF` 是简报漏项**）＋ 候选射程爆炸半径 6 行 |
@@ -604,8 +603,40 @@ docs/evidence/s1/141-ac2-stock-inventory-r1.md
 
 ---
 
-## 10. 终局回执（原样贴，含 §9 表里第 8 枚）
-115173b docs(evidence/136 AC#14 Gate impl §5): criterion(5) gates -- gofmt/gofumpt(v0.12.0 go1.27.1 disk-measure)/vet/build rc=0; d22scan clean snapshot rc=0, 8 scopes 203/22/40/18/16/40/405/39 identical to aef82f5 (ban#8 internal/ stays 405), zero new Skip, thresholds untouched
-----
+## 10. 终局回执（原样贴）
 
-docs/evidence/s1/136-ac14b-impl.md
+**先记一件实况**（它本身就是要留给下一位的东西）：本节第一次生成时，我把
+`git log --oneline -1` 与 `git show --name-only HEAD` 直接贴了进来，
+而**在我贴的那一刻 HEAD 已经不是本程的了**——共树里 `acceptor-ticket136-ac14-r1` 刚落了
+`115173b`（`docs/evidence/s1/136-ac14b-impl.md`）与 `92dd40f`。
+⇒ 那一份"回执"记的是**别人那枚 commit**，已作废；下面这一份是**本程自己那枚**，
+取法写死成 `git log -1 --oneline 68ff486` ＋ `git show --name-only 68ff486`（**按号取，不按 HEAD 取**）。
+**这正是简报里"号是读数、会漂，别抄我的"那一句的活样本**，连贴回执都会漂。
+
+```
+$ git log -1 --oneline 68ff486
+68ff486 docs(141 AC#2 盘点 r1 第8节): §6 共树观察与两栏通知计数(自称授权的输出 0 条/真通知 3 条/ 判为注入 0 条)+walkEmoji 走文件系统⇒未跟踪 design/ 草稿 69 处会进 CI 视野(静态推断,未跑); §7 本程没查的档 9 条逐给"为什么/谁能查/要什么授权"; §8 我不替 owner 选支(三处必须他认的岔口); §9 commit 流水。
+
+$ git show --name-only 68ff486 | tail -2
+
+docs/evidence/s1/141-ac2-stock-inventory-r1.md
+```
+
+（第 8 枚之后本程还会再落 1－2 枚**只改本文这 10 行的排版与回执**的 commit；
+它们的号一律用 `git log --format='%h' 99263cc..HEAD -- docs/evidence/s1/141-ac2-stock-inventory-r1.md` 现取，**不写死**。）
+
+---
+
+## 11. 本程的写集自证
+
+- 本程**只写过这一枚文件**：`docs/evidence/s1/141-ac2-stock-inventory-r1.md`。
+- 每一枚 commit 都带显式 pathspec `-- docs/evidence/s1/141-ac2-stock-inventory-r1.md`，
+  且每次 commit 前跑过 `git diff --cached --name-only`（结果只有那一条路径）。
+- 未 push、未 `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`。
+- 临时件全部在 `D:\tmp\wisp141inv\`（**只建不删**，仓内零临时件）：
+  `classify.pl`（Go 词法器）· `sink.pl`（sink 回溯器）· `mktable.pl` · `fe2tsv.pl` ·
+  `classified.tsv`（116 行原始分类）· `fe-classified.tsv`（25 行）· `fe-posmap.tsv` ·
+  `tree/`（41 枚 `git cat-file blob 99263cc:…` 副本）· `fe/`（10 枚）· `tbl-a1.md`·`tbl-a2.md`·`tbl-b.md`·
+  `raw-hits.txt`·`fe-raw.txt`·`mycommits.txt`。
+- 禁改面**一个字节都没动**：`tools/d22scan/**`、`docs/PLAN.md`、`docs/specs/**`、`AGENTS.md`、
+  `internal/**`、`cmd/**`、`frontend/**`、`design/**`、`.scratch/wisp/issues/**`、`docs/reports/**`。
