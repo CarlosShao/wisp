@@ -501,3 +501,29 @@ fc71fa6 -> docs/evidence/s1/119-ac2-r2b-acceptance.md
 所以我没有把"CI 闸门"当成已核，改用 `docker ps` 计数＋每发前 `GATE golang-containers=0` 自证）。
 **没有一次拒发生在取数之前，也没有一次取数因拒而少跑。**
 
+---
+
+## §7 收尾提交账（本节之前那枚＝§4-§6 的提交，两条命令原样输出）
+
+```
+$ git log --oneline -1
+4e5d717 evidence(119 AC#2 r2b §4-§6): 总判＝成立（无附条件）＋ 未核清单十条 ＋ 临时件／注入四条／被拒零次
+
+$ git show --name-only HEAD
+commit 4e5d717…
+    evidence(119 AC#2 r2b §4-§6): 总判＝成立（无附条件）＋ 未核清单十条 ＋ 临时件／注入四条／被拒零次
+    …（正文略，见 git log）
+
+docs/evidence/s1/119-ac2-r2b-acceptance.md
+```
+本节（§7）自己那枚是这条命令之后紧跟着落盘的下一枚，号请这样现取（本程不替自己回填一个看不见的号）：
+`git log --oneline -1 -- docs/evidence/s1/119-ac2-r2b-acceptance.md`。
+
+**本表六枚提交的序列**（`git log --oneline -- docs/evidence/s1/119-ac2-r2b-acceptance.md`）：
+`20f8c22`(骨架) → `fc71fa6`(§0) → `4757198`(§1) → `024ee87`(§2) → `85c1393`(§3) → `4e5d717`(§4-§6) → §7。
+
+**本格终判一句话**：票 119 **AC#2 复判＝成立（无附条件）**；
+闭合的另一半（`R-119-4` 落点归属的**并案归属**）不在 AC#2 射程内、仍挂编排者；
+票面的勾与 `-done` 改名**本程一枚未动**。
+
+
