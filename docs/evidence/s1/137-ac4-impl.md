@@ -307,3 +307,170 @@ internal/winsec/dataroot_symlink_119_other_test.go:308   （母块 :306 + :308�
 **票 125 那三枚探针在普通形带牙**（§2.6 的 `r5`/`r7`），所以"未解析形"不是全仓无人守——
 失守面**只在软链形那一半**。
 
+---
+
+## §4 门禁原文（改完必跑；被验对象＝`9c0f546` 那两枚测试件，生产码零改动）
+
+### 4.1 容器原生 `go test -count=1 -v ./internal/winsec/` 两形各一次
+
+**这一组就是 §2 的 `r3`／`r4` 两发**（同一棵换根树 `wisp137ac4-tree-swap` ＝ `git archive 9c0f546`、
+`-count=1`、`-v`、容器 `go1.27.1 linux/amd64`），本程不重复取数当第二枚凭据：
+
+| 形 | 四数 | 包级 rc | panic |
+|---|---|---|---|
+| 普通 `TMPDIR=/ac4plain/w137ac4tmp` | `RUN=52 ／ 顶 30/0/0 ＋ 子 22/0/0` | **0** | 0 |
+| 软链 `TMPDIR=/ac4link/w137ac4tmp`（`/ac4link -> /ac4priv`） | `RUN=45 ／ 顶 27/0/3 ＋ 子 15/0/0` | **0** | 0 |
+
+⚠ 这一对**只在"门禁绿"这一档生效**；它不能当"换根有牙"的凭据（判据③），那一档在 §2.3／§2.4。
+那 3 枚 SKIP 逐名＝票 125 的三枚自拒探针（§2.6），换根前（`r2`）也是同样那 3 枚、名册 `diff` 为空。
+
+### 4.2 `gofmt -l`（整包＋全仓，宿主与容器各一次）
+
+```
+$ gofmt -l internal/winsec/          # 宿主 windows go1.27.1
+（无输出）
+$ gofmt -l .                         # 宿主，全仓
+（无输出）
+```
+容器原生（`gates.sh`，两棵树各一发，`GOFMT_PKG_EMPTY`／`GOFMT_REPO_EMPTY` 是脚本里的空判自证）：
+
+```
+TREE=wisp137ac4-tree-swap   GO=go version go1.27.1 linux/amd64
+--- gofmt -l internal/winsec/ ---   GOFMT_PKG_EMPTY=yes
+--- gofmt -l whole repo ---         GOFMT_REPO_EMPTY=yes
+--- go vet ./internal/winsec/ (native linux) --- VET_PKG_RC=0
+--- go vet ./... (native linux) ---              VET_ALL_RC=0
+
+TREE=wisp137ac4-tree-base   （同上四行全 yes/0）
+```
+
+⇒ 整包 0 枚、全仓 0 枚；换根树与锚点树在 `gofmt`／容器 `vet` 两档上**读数相同**。
+
+### 4.3 `gofumpt -l`（版本写明；**没有** `go install @latest`）
+
+- 用的二进制＝本机已有的 `$(go env GOPATH)/bin/gofumpt.exe`，`GOPATH=D:\work\base\gopath`。
+- **版本现量原文**：`gofumpt --version` ⇒ **`v0.12.0 (go1.27.1)`**。
+  ⚠ 派单与票面 `:77` 都写明"CI 那一步装的是 `@latest`、版本没钉"⇒ 这一枚版本号只描述**本程这一发**，
+  不主张与 CI 那发同版本（本程没读 CI 日志，见 §5）。
+
+```
+$ gofumpt -l internal/winsec/   （无输出，0 枚）
+$ gofumpt -l .                  （无输出，全仓 0 枚）
+```
+
+### 4.4 `go vet` 双 GOOS（逐错误行归因）
+
+| 那一发 | 命令 | rc | 归因 |
+|---|---|---|---|
+| 宿主原生（windows）全仓 | `go vet ./...` | **0** | — |
+| 宿主原生（windows）本包 | `go vet ./internal/winsec/` | **0** | — |
+| 宿主交叉（linux）本包 | `GOOS=linux CGO_ENABLED=0 go vet ./internal/winsec/` | **0** | **本格改动在交叉这一发上有真读数**（不是"停在 cgo"那条前提能挡的） |
+| 宿主交叉（linux）全仓 `./...` | 同上 | **1** | 整树那一发停在**一枚无关包**上（下面第 1 条），按派单口径既不算破口也不算清白 ⇒ 本程另走**逐包 33 发**把它拆开 |
+| 容器原生（linux）全仓 | `go vet ./...` | **0** | 真 linux 读数是干净的（§4.2 原文） |
+
+逐包交叉（宿主 `GOOS=linux CGO_ENABLED=0`，包名单取自宿主 `go list ./...`）：
+**33 枚里 31 枚 rc=0 且输出 0 行**；非 0 的只有两枚，逐错误行归因：
+
+1. `github.com/CarlosShao/wisp/cmd/wisp`
+   ⇒ 报错 3 行：`package …/cmd/wisp` ／ `imports github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx` ／
+   `imports github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files in
+   D:\work\base\gopath\pkg\mod\github.com\k2-fsa\sherpa-onnx-go-linux@v1.13.8`。
+   仓内起点＝`cmd/wisp/doctor.go:14`（`sherpa "github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx"`）。
+   **归因：cgo 依赖在 `CGO_ENABLED=0` 下被 build constraints 排除——落在模块缓存路径上，不落在本仓任何一枚 `.go`，
+   与本格改动无关**（本包 `internal/winsec/` 单独交叉 rc=0）。
+2. `github.com/CarlosShao/wisp/cmd/balldebug`
+   ⇒ 报错 1 行：`package …/cmd/balldebug: build constraints exclude all Go files in
+   D:\work\workspace\projects plans\Wisp\cmd\balldebug`。
+   仓内起点＝该包**三枚文件全带 `//go:build windows`**（`cmd/balldebug/main.go:1`、
+   `cmd/balldebug/diff_windows.go:1`、`cmd/balldebug/shot_windows.go:1`）
+   ⇒ **按设计约束，不是回归**（与 AC#2 件 §3 那条同判）。
+
+两枚都**不在**本程改动的面上；两枚的坏行里点到的仓内路径本程逐枚 `git grep -n` 现量过（`doctor.go:14`、
+三枚 `//go:build windows` 行号），不是转述。
+
+### 4.5 `sh scripts/d22scan.sh`（全仓仪器；台账各 scope **不降**）
+
+两棵树各一发（容器原生，`d22.sh`）：
+
+```
+LABEL=base  D22_RC=0
+LABEL=swap  D22_RC=0
+```
+
+正向对照（step 1，`runtests.sh -C tools/d22scan ./...`）两发都真跑：
+`runtests.sh: OK - packages=[./...] top-level: PASS=21 FAIL=0 SKIP=0, === RUN=31, '[no tests to run]'=0`
+⇒ "clean" 不是仪器瞎。step 2 的自报 clean 行原文（两发**逐字相同**，故只贴一枚）：
+
+```
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=203, bans #1-5 cmd/=22,
+ban #6 frontend/=40, ban #7 internal/tools/=18, ban #8 design/=16, ban #8 frontend/=40,
+ban #8 internal/=404, ban #8 cmd/=39; ban #8 emoji coverage: design/ 16 text files; frontend/ 40 text files;
+internal/ 404 Go files, comments and _test.go included; cmd/ 39 Go files, comments and _test.go included
+```
+
+- 对点法＝两份全文 `diff`：**逐 scope 枚数八档全等**（203／22／40／18／16／40／404／39），
+  差异只剩 `--- PASS:` 后面的**秒数**与临时夹具目录名（`TestBuiltBinaryGoesRedEndToEnd…/<rand>/001`）⇒
+  **没有一枚 scope 变小**，故无需逐名解释降幅。
+- ⚠ 与 AC#2 那程在**工作树**上量到的 `frontend 40→43` 那一档不同：本程两发都出自 `git archive` 快照，
+  里面**没有** `frontend/dist/**` 那三枚 git-ignored 构建产物 ⇒ 40 是纯树值，两侧同器对点，差值 0。
+- 本程**没有**拿 CI run 日志当凭据（没 push，也没有对应 run）；见 §5 第 6 条。
+
+### 4.6 本节这一枚 commit 的账（`A155` 硬规矩的形状；写在这里是因为它只能在提交之后现量）
+
+（提交后回填，见 §4.7）
+
+### 4.7 §4／§5／§6 那一枚 commit 原样输出
+
+```
+$ git log --oneline -1
+__LOG__
+$ git show --name-only HEAD
+__SHOW__
+```
+
+---
+
+## §5 我没核的清单（诚实列，**别把本表当全裁**）
+
+1. **真 macOS 没验**。软链形是容器里 `ln -s /ac4priv /ac4link` ＋ `TMPDIR=/ac4link/w137ac4tmp` 造的形状；
+   它与 macOS 真机（`/var`、`/tmp` 那族系统链接）同族但**形状复现≠真机读数**。
+2. **只造了 MUT-D 一发**。MUT-A／B／AB／C／E 本程一枚未造（`R-137-1` 明令 AC#3 之后也不许把尺钉在单发 A 或 B 上；
+   AC#1 的 MUT-E 是"文案哑不哑"那一问，与本格无关）。⇒ 任何"A／B／C 那几形今天如何"的问题本件答不出来。
+3. **票 119 一枚字节未改**：那 5 处递根点（`:128`/`:154`/`:194`/`:220`/`:286`）与 3 处 sentinel 内联断言
+   只做了**判定＋读数**（§3），**没有**落进码；票 125 的 2 处、`internal/config/c26_seam_posix_125_test.go`
+   同样一字未动。
+4. **只跑了 `./internal/winsec/`**。全仓测试、`-race`、任何计时／资源类断言（D32 的 CPU≤0.5%／RSS≤25MB、
+   `thresholds.go`、任何 golden）**一字节未动、也未读**；`cmd/wisp/secret_dataroot_119b_test.go:201`
+   那枚 119 姊妹用例没跑（它在 winsec 的读数里永远 ABSENT，`R-137-3` 已钉）。
+5. **`-count=2` 的两形四数没重跑**。派单要的是 `-count=1 -v` 两形各一次（§4.1）；AC#5 那格已裁、本程不重裁。
+6. **CI run 日志没读**，本程**未 push** ⇒ 没有"这次改动在 CI 上真跑过"这一档凭据；`gofumpt` 版本号只描述本机那一发。
+7. **没核兄弟程的地界**：`internal/observe/**`（票 136 一族）、`cmd/wisp/**`（票 135／133 一族）、
+   `design/**`（owner 那侧的挪动）零字未动、也未跑。
+8. **生产码零改动**，所以票面 Rules 那条"`internal/winsec` 生产码要动先报回来"这一步**本程不需要**；
+   若 §3 那格 finding 被采纳，改的仍是测试件（`dataroot_symlink_119_other_test.go`），仍在票 119 名下。
+9. **枚数口径沿用而没重立**：11＝7 顶层＋4 子测试 出自 AC#1 §2 与终裁 §3；本程在开工锚点上重数是那
+   **7 处递根点**（§1.1）与它们覆盖的 11 枚名册（§2.2 的 `r2` FAIL 名册逐名 11 行），
+   没有重跑"12 那枚数法是怎么错的"这一问。
+10. **换根对其它包的影响没测**：`SealableTempDirForTest124` 只在 `internal/winsec` 的测试二进制里；
+    `internal/config`／`internal/memory` 等同形状用例本程一枚未跑。
+11. **窗口竞态没测**：八发各一枚全新容器、串行取数，同一时刻只有一发在跑；
+    闸门那几列 `gh run list` 只证明"取读数那几批没有在飞的 `ci` run"，不证明 CI 与容器不共享别的负载。
+
+---
+
+## §6 临时件路径（**只建不删**；清理由编排者做）
+
+| 路径 | 内容 |
+|---|---|
+| `D:\tmp\wisp137ac4-rig\` | 台件 `run.sh`／`batch.sh`／`mutate.py`／`parse.py`／`gates.sh`／`d22.sh`，＋ 八发的 `*.head.txt`（容器头＋闸门回声）与 `*.v.log`（原始 `-v` 读数）＋每发四档名册 `*.v.{run,pass,fail,skip,colour}.txt`，＋ `batch.out`、`gates-wisp137ac4-tree-{base,swap}.txt`、`d22-{base,swap}.txt`、`pkgs.txt`、`vet-cross-linux.txt` |
+| `D:\tmp\wisp137ac4-tree-base\` | `git archive 182daed`（开工锚，**未换根**）纯净树 |
+| `D:\tmp\wisp137ac4-tree-swap\` | `git archive 9c0f546`（**本程换根后**）纯净树 |
+| `D:\tmp\wisp137ac4-work-base-mutd\` | base ＋ MUT-D（仓外探针，**不是修法**） |
+| `D:\tmp\wisp137ac4-work-swap-mutd\` | swap ＋ MUT-D（仓外探针，**不是修法**） |
+| docker 卷 | `wisp137ac4-gomod`（从 `wisp137ac3r2-gomod` 以 `:ro` 源一次性 `cp -a` 拷出：`726M → CP_RC=0 → 726M`，**源卷没被写过**）、`wisp137ac4-gobuild`（新建空卷） |
+| 假根 | 只在容器内：`/ac4link -> /ac4priv`（软链形）、`/ac4plain`（普通形）——随容器 `--rm` 消失，宿主无残留 |
+
+⚠ 建目录时先把 `git archive` 解进了 `wisp137ac4-tree-base`／`-swap` 各一次，**没有**误解进 `rig`；
+`rig` 目录里只有台件与日志。别家 `wisp137-ac1-*`／`wisp137ac2-*`／`wisp137ac3*-*` 那一族**一枚未写、一枚未删**。
+
+
