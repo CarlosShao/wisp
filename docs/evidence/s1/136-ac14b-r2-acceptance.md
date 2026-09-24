@@ -239,3 +239,180 @@ r1 表 §2(B) 的 `B1…B8` 是 8 个具名用例，**第 9 行 `B9` 不是名�
 **档位：〔独立复现〕**。
 
 ---
+
+## §5 判据⑤ 退出码前置——本程**自己重建、自己采**，3 发（简报上限），未代抄落地件任何一发
+
+**二进制是本程自己的**：`git archive HEAD`（当时 `4ecc284`）→ 仓外 `head/`，`grep -n 'const settleCoverageRowGates' head/…sampler.go`
+⇒ `556: … = true`（**先证落地**），再 `CGO_ENABLED=1 go build -trimpath -o D:\tmp\wisp141r2-ac14b-002e0e3e\bin\wisp.exe ./cmd/wisp`
+⇒ **rc=0**；三枚 sherpa/onnx DLL 从仓内 `third_party/sherpa-onnx/` 同目录摆放（否则加载期 `0xc0000135`）。
+本程那枚 exe 的 `sha1sum` ⇒ `1060e481240b413365bb263cf3c220be9b2ceac7`（**与落地件那枚不是同一份，本程不借它**）。
+命令形状 `WISP_ENV=test ./wisp.exe slo -settle -out readings/settle-N.json`，N=1..3；驱动脚本
+`D:\tmp\wisp141r2-ac14b-002e0e3e\shots.sh`，读数 `readings/settle-{1,2,3}.json`，全流水 `D:\tmp\ac14b-r2-136\shots.txt`。
+
+**争用自查用的是盘上那份名单**：`scripts/slo-check.ps1:153-155`，本程现量 **15 枚**
+（`go` `gofmt` `cgo` `compile` `asm` `link` `gcc` `g++` `cc1` `cc1plus` `as` `ld` `wisp` `wisp-cli` `staticcheck`）
+⇒ 与落地件 §4 的"15 枚"对上，**简报那句"15 枚不是 8 枚"成立**。
+本程每发**前、后各扫一次**（`Get-Process` 精确名比对，扫后另等自家子 `wisp.exe` 退净，最多 30s）⇒
+**六次扫描全空**（`roster_before=[]`／`roster_after=[]` ×3），**没有一发需要记"争用，未采"**。
+（取样窗口内本程刻意不跑任何 `go`/`git` 编译类命令，§3/§4 的变异全部安排在六发之后。）
+
+| # | exit | `sample_errors` | `len(samples)` | `settle.pass` | 顶层 `pass` | `back_within_cap_ms` | `final_bytes` | `free_os_memory_count` | **`settle.verdicts` 那一行** |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | **0** | **0** | 40 | true | true | 276 | 8912896 | 2 | `sampling pass=true gate=true measured="40 valid / 0 errors"` |
+| 2 | **0** | **0** | 40 | true | true | 270 | 9990144 | 2 | 同上形制 |
+| 3 | **0** | **0** | 40 | true | true | 270 | 9138176 | 2 | 同上形制 |
+
+**判读**：
+- **三发 `exit` 全 0、`sample_errors` 全 0** ⇒ 编排者那道硬前置（"任一发非 0 ⇒ 退回 `false`、不提交"）**不触发**，
+  那枚翻转**站得住、可留**。
+- **三发 JSON 里都带 `verdicts` 键、那一行 `gate=true`** ⇒ 本程量的确实是**含门行且门已开**的二进制。
+  这一维正是 r1 表 §5 唯一没复现的〔仅自述〕档（编排者自己那六发用的是 `ca2c55e` 的旧 exe、连 `verdicts` 键都没有）：
+  **本程把它从〔仅自述〕升成〔独立复现〕**。
+- 干净窗里门行自陈 `pass=true` ⇒ `foldSettlePass` 无物可否决 ⇒ `settle.pass` 与顶层 `pass` 都真 ⇒ exit 0，
+  链条在真二进制上闭合了一遍（**不是**"摘门行才红"的反证，而是"正常窗不被误红"的正证）。
+- 物理量级与落地件 §4 六发互证：`samples=40`、`back 270-276`（落地件 262-335）、`final_bytes 8.9-10.0MB`
+  （落地件 8.9-9.7MB），均远低于冻结 Sleeping 上限 25MB。
+- **合计**：本程 3 发 ＋ 落地程 6 发 ＝ **9 发**同形制读数，逐发 `sample_errors=0`／`exit=0`，无一非 0。
+
+**一处流程口径如实登记（不改判语）**：本程读到 `9090f36`（兄弟程/编排者提交，只碰 `docs/reports/**` ＋ 票 141 票面，
+`internal/`＋`cmd/` 0 枚）落在本程锚 `4ecc284` **之后**，其 message 里含一句"AC#14 门已翻 true 等 r2 复判"。
+**那句不是本程的判据也不是授权**——本程上表三发是自己重建、自己采的；HEAD 会漂这件事按票上老规矩登记，
+本程所有读数标注的都是**取数当时实测的 `4ecc284`**，且 `git diff 4ecc284..HEAD -- internal/ cmd/` ⇒ **0 行**
+⇒ 漂动不影响本表任何一发读数。
+
+**档位：〔独立复现〕**。
+
+---
+
+## §6 裁定：`sampler.go:546-555` 那句假话——**不阻塞翻勾，属收口；落地程的克制是对的**
+
+### 6.1 简报点名的那一处，本程盘上确认
+
+`sampler.go:550` 逐字仍写着 `// that still states its own not-pass. It is false at HEAD because the`，
+`:552` 引 `docs/evidence/s1/136-ac14-impl.md` section 1.2（**翻之前**那份证据），`:553` 说 "one of the THREE existing assertions"。
+盘上 `:556` 现值 `true` ⇒ **这三句对终态树已不成立**。
+
+### 6.2 为什么**不阻塞** AC#14 翻勾（三条，都是读数不是推理）
+
+1. **它不参与任何断言**：`grep -rn "false at HEAD" --include=*.go` ⇒ 只有注释自身（`sampler.go:550`）与
+   `sampler_settle_gate_136_test.go:222` 两枚**注释行**，**没有一枚测试钉这段文字**；
+   本程 §2 的 142/142/0/0 与 §3 的四发变异里，它一次也没红过 ⇒ **零可执行语义**。
+2. **判据①—⑤ 不含注释**：批准面（票面 `:314`）写的是"1 枚布尔＋按 `:208` 形状改写 2 枚断言"，
+   五条判据量的是范围、名册、定性、退出码、门禁——**五样本程全过**（§1—§5）。
+3. **AC#14 判据要的那件事已经落成**：门行现在是 gate、能否决 exit、红句点名 `sample_errors`、
+   守卫在终态树下钉得更牢（§4 C）——**注释说反不影响这些**。
+
+### 6.3 落地程"故意不动它"的克制——**判：正确，应当保持**
+
+`136-ac14b-impl.md` §1.2 末段与 §6.5②两处**主动上报**了这一处、并写明"派单/票面 `:314` 把授权限定在 `:556` 一枚布尔，
+改注释属扩面，故只如实报回、不擅改"。本程判这是**对的动作**，三条理由：
+① `AGENTS.md §1.1`/`SPEC-12 §4.1` 的"改契约＝人工批准"精神下，**agent 单方面扩自己的授权面**才是跑歪模式 #1；
+② 简报那句"它的授权只点名了 `:556`"是**给定的事实**，落地程照它执行＝**遵守授权**，不是遗漏；
+③ 它**没有悄改**、而是留在证据里交给翻勾那一程 ⇒ 账目可追。
+⇒ **不要因为"结果上有假话"倒过来罚它的克制**；该做的是给翻勾那一程补一枚具名授权（见收口 #1）。
+
+### 6.4 本程顺手量到**简报没点的另外三处同病**（一并进收口，别只修一处留三处）
+
+| # | 站点 | 现在写着什么 | 为什么在终态下不成立 |
+| --- | --- | --- | --- |
+| a | `internal/observe/sampler_settle_gate_136_test.go:222` | `// With the row recorded (gate=false at HEAD) this window still passes;` | 门在 HEAD 已是 **true**；**简报只点了 `sampler.go` 那一处，这一处是它没列的** |
+| b | `internal/observe/sampler_settle_coverage_136_test.go:26-27`（文件头注释） | `// … a partially covered window still passes today (changing that verdict is not this cell's job)` | **两重假**：窗今天不 still pass；改那个 verdict **就是** AC#14 这格刚做完的事。（r1 表 §3 已注记该头注释"`aef82f5` 逐字未动、改它属 AC#15 射程"——AC#14 落地后这句更站不住了） |
+| c | `internal/observe/sampler_settle_coverage_136_test.go:237-241`（前一程 `:208` 腿内的注释） | `// The pass bit stays this window's verdict for as long as the row is recorded rather than gated (… docs/evidence/s1/136-ac14-impl.md section 1.3 owns the current state)` | 行**已经** gated ⇒ 该条件子句失效；引的证据件是**翻之前**那份（终态证据是 `136-ac14b-impl.md`） |
+
+⇒ 收口**不是"一行"**（简报那句"属另一枚一行 commit 的收口项"这一措辞本程判**说小了**）：**四处、两枚 `.go` 文件**，
+且其中一处（c）在**前一程**写的腿里、一处（a）在**前一程地界**那个 `_gate_136_test.go` 里 ⇒
+**修它需要的授权面比"一行"宽**。这一条按盘上口径报回，不替编排者决定谁修。
+
+**档位：〔独立复现〕**（四站点行号均为本程现量）。
+
+---
+
+## §7 总裁与收口清单
+
+### 7.1 总裁：**可翻勾**（AC#14 在终态树 `4ecc284` 上成立）
+
+| 判据 | 判 | 一句话理由（全部为本程自量） |
+| --- | --- | --- |
+| ① 范围 | **成立** | `5a946d3..HEAD` 唯一动过的 Go 包＝`internal/observe`；`sampler.go` 恰一行（`:556` false→true）；`thresholds.go` 与全仓 golden/testdata **0 行**；17 枚 commit 逐枚 name-only，本程写集七枚全在授权面内 |
+| ② 独立复现绿 | **成立** | 本程自跑 `-count=2 -v` ⇒ **142/142/0/0**、顶层 71 每枚恰好 ×2、`SKIP`＝0、`PAUSE`＝0、真 `^panic:`＝0；名册对落地程 `base.names`/`post.names` 各 `comm -3` **0 行** ⇒ 71 枚逐名三方守恒 |
+| ③ 收紧还是放水 | **收紧** | 无 Skip、无降级、无阈值动；`t.Fatalf` 43→49；新 `||` 全在否定侧＝更严；被删的两枚"要求 pass"各有 4 枚替代钉，且本程**四发变异逐味把它们打红**（摘门行／不看丢读／摘点名／撤折叠） |
+| ④ 三张名册 | **全对** | (A) flip-only 恰红那 2 枚、无第三枚；(B) 具名 8 枚两味全绿；(C) M1 实测 6 枚、r1 的 4 枚是其真子集 ⇒ **判"更强"非"越界"** |
+| ⑤ 退出码前置 | **成立、不回退** | 本程自建 exe（`sha1 1060e48…`、先证 `:556=true`）自采 3 发 ⇒ 逐发 `exit=0`／`sample_errors=0`／`verdicts[sampling gate=true]` 在场；六次争用扫描全空；与落地程 6 发合起来 9 发无一非 0 |
+
+**唯一扣分项是一枚非阻塞的纸面缺陷**：`sampler.go` 及两枚测试文件里**四处**注释仍说门"false at HEAD／still passes today"，
+零可执行语义、钉不红任何一发 ⇒ **列收口，不挡翻勾**（§6）。
+
+### 7.2 收口清单（优先级序；本程一枚都没做，等编排者具名授权）
+
+| 优先级 | 收口项 | 面 | 备注 |
+| --- | --- | --- | --- |
+| **1** | 改写 §6.4 那**四处**过期注释（`sampler.go:546-555`／`_gate_:222`／`coverage_:26-27`／`coverage_:237-241`），并把引用的证据件从 `136-ac14-impl.md` 换成 `136-ac14b-impl.md` | 2 枚 `.go` 文件 | **须先给具名授权**（落地程的授权只点到 `:556`）；不要只修一处留三处 |
+| **2** | 翻 `AC#14` 的勾 | 票面 | 勾是编排者的；判据五条本程全过 |
+| **3** | 台账更正："9 枚具名"→"8 枚具名 ＋ 1 个其余集合"，并修 r1 表 `B9` 那行 `71−2−9=60` 的算术（正确 `71−2−8=61`） | `pending-and-issues.md` | 简报那句"the 9 named"在盘上不成立（§4 B） |
+| **4** | 引"M1 4→6""M2 2→4""M4 2→4""M3a′ 3→5"这一族数时**必须连"改前树/改后树"一起引**；建议直接把这四行做成一张表进票 136 或 §7 台账 | 票面/台账 | 单引"6"会让下一位以为落地程多写了 2 枚用例 |
+| **5** | AC#15 靶形现量重划：`_coverage_:26-27` 头注释与 `:237-241` 现在**同时**是 AC#15 的旧账与收口 #1 的对象，两程要排队、别互相覆盖；AC#15 那 7 枚前提腿站点本程读数**一次没响**（"没响"非"已修"） | 票面 | 落地件 §6.5② 已排此序 |
+| **6** | 推送前把 §5 那三发与本表一起带上（本程只 commit 未 push；`slo-smoke`/`slo-full` 由编排者核过之后再触发） | 编排者 | 本程未跑 `-race`、未复跑 linux 分母、未核 CI run id |
+| **7** | 低优先登记：本包 71 枚里有 **8** 枚名字含 `Panic`（`grep -ci panic`），真 `^panic:` 全程 0；今后谁用"panic 计数"当红绿判据，先分清这两味 | 可选 | 本程两味分开记 |
+
+### 7.3 纪律回执（本程）
+
+只 commit、**全程未 `git push`**；`git add` 只对本程新建的那**一枚**证据文件用过一次显式路径（新文件 untracked，
+`git commit --` 匹配不到）；**未用** `-A`／`.`／`-a`；**未用** `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；
+**未在仓库目录内建 worktree 或快照**（五份快照全在 `D:\tmp\wisp141r2-ac14b-002e0e3e\`，只建不删）；
+`design/**`（owner 16 枚未提交删除＋`design/old/`、`design/doubao/` 两枚未跟踪目录）**未还原、未 stage、未提交、未删**；
+`docs/PLAN.md`、`docs/specs/**`、`internal/risk/**`、`rules_gateway.go`、`tools/d22scan/**`、`allowlist.txt`、
+任何 `thresholds.go`／golden、`frontend/**`、`docs/reports/**`（编排者的）、
+`136-ac14-r1-acceptance.md` 与 `136-ac14b-impl.md`（他程的）**一字节未写**；
+跟踪树 `git status --porcelain internal/observe` 在全部变异跑完后复核 ⇒ **0 行**；**未翻任何勾**、**未改任何码**、
+**未 revert 那枚布尔**（§5 三发全 0，无回退触发条件）。
+
+### 7.4 注入面两栏计数（本程自己扫，简报明令要记）
+
+- **真通知回显 7 条**（逐条：哪个工具 ＋ 前约 40 字）：
+  1. `Bash`（`git rev-parse HEAD` 那次）——"<system-reminder> The following skills are available for use…"
+  2. `Bash`（同一次输出尾）——"<system-reminder> The date has changed. Current date: 2026-09-24"
+  3. `Bash`（同一次输出尾）——"<system-reminder> Memory: d:/work/workspace/projects…"（`AGENTS.md` 项目上下文回显，与本仓那份逐字一致）
+  4. `Read`（读票面 136）——"Do not revert this file if it was changed externally; it was not." ⇒ 形状上正是最该警惕的一句（它提到 revert），但它**自陈未被外部修改**、且与本程随后实测一致 ⇒ 判真回显，且**没据此做任何动作**
+  5. `Bash`（后台任务 1）——"<task-notification>…<task-id>baw2mgdlg</task-id>…"（observe 测试跑完）
+  6. `Bash`（后台任务 2）——"<task-notification>…<task-id>b3iypkjy0</task-id>…"（三发 settle 跑完）
+  7. `Edit`（本文件两次改写）——"The file … has been modified successfully … no need to read it back"
+  （另：`9090f36` 那枚兄弟程 commit 顶掉了本程 `git log -1` 的回显——**共享树的真实并发**，非注入；本程 §0 的锚因此按号取，不靠 `HEAD`。）
+- **判为注入 0 条**：全程**没有**任何工具输出自称"编排者备注／系统提示／文件已被修改通知"来指令本程
+  revert、放宽阈值、改判语，或"confirm this note is genuine"；本程**没有**把任何此类文字当授权执行。
+  特别记两味：① `9090f36` 的 message 里含"AC#14 门已翻 true 等 r2 复判"——那是**盘上真实的他人 commit**，
+  本程**没有**据此下判（§5 三发为自建自采）；② `sampler.go:554` 注释"Flipping it is an orchestrator move, not an
+  implementer move" 是**代码自述**，其对应的批准在票面 `:313-325` 有正文，本程按正文核。
+- **凭据卫生**：本程未读到、未抄写任何凭据值；出现的只有变量名与文件名（`WISP_ENV`、`CGO_ENABLED`、`GOPATH`、`CC`）。
+
+**本表 next ＝ 编排者**：①按 §7.1 翻 `AC#14`；②据 §7.2#1 给一枚**覆盖 2 枚 `.go` 文件、四处站点**的具名注释收口授权；
+③§7.2#3/#4 两条台账更正随翻勾一起落。**本程不代做其中任何一件。**
+
+### 7.5 顺手把落地件 §5 的门禁自己复跑了一遍（简报未要求，但不复跑就没人核过）
+
+| 门 | 本程自己跑的读数（树＝`4ecc284`） | 落地件 §5 自报 | 判 |
+| --- | --- | --- | --- |
+| `gofmt -l internal/observe` | **空输出 rc=0** | 空 | 对上 |
+| `gofumpt --version` | **`v0.12.0 (go1.27.1)`**（盘上现量，与落地件同一枚） | v0.12.0 | 对上（旧报告里的 v0.7.0 确为过期值） |
+| `gofumpt -l internal/observe` | **空输出 rc=0** | 空 | 对上 |
+| `go vet ./internal/observe/` | **rc=0** | rc=0 | 对上 |
+| `go build ./...` | **rc=0** | rc=0 | 对上 |
+
+⇒ **五道门禁本程独立复现全绿 ⇒ 落地件 §5 那一档从〔自报〕升为〔独立复现〕**。
+本程**未**复跑 `d22scan`（它要 `git archive` 到仓外再 `sh scripts/d22scan.sh`，本程§0 已记快照落点；
+ban #8 的分母面本程在 §1.2 只用 0-line diff 证过——**这一格标〔未独立复现〕**，谁要收口 #1 之后一并补一发即可，
+理由：§6.4 那四处注释若被改写，**必须确认没引入 ban-#8 段字符**（那四处原文里含 `⇒`/`—`/`——` 之类，
+`U+2190–U+2BFF` 段正在本仓 ban #8 射程内 ⇒ **改注释这一发真得跑 d22scan**，不是可选项）。
+**这一条升进 §7.2 收口 #1 的判据里。**
+
+### 7.6 本程 commit 流水（按号取，不靠 `HEAD`——共享树里号会漂）
+
+| sha | 净面 |
+| --- | --- |
+| `96706b9` | `docs/evidence/s1/136-ac14b-r2-acceptance.md`（§0—§2） |
+| `32036a0` | 同上（§3—§4） |
+| 本节末枚 | 同上（§5—§7，hash 由下一位从 `git log -1 -- …` 按号读） |
+
+每枚只带本程那一枚路径；每次 commit 前 `git diff --cached --name-only` 现量、名单只有那一枚。
+两枚之间的 `9090f36`（编排者/兄弟程，`docs/reports/**` ＋ 票 141 票面）是**真实并发**，本程未碰。
+
+---
