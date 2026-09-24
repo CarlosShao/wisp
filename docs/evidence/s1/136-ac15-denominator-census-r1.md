@@ -181,8 +181,8 @@ Two places currently assert the 240 is unsupported:
 
 | where | text (trimmed) | state |
 |---|---|---|
-| ticket face `:375` (uncommitted `M` at the time of this section) | "③ 我原先那句"240 发里红 1 发"按本仓口径登记为〔不可复现〕：名册里没有任何记录支撑那个分母，而它来自一条转述" | **not reproducible** ruling |
-| `docs/reports/pending-and-issues.md:5698` ⓑ | ""240 发里红 1 发"没有任何档案支撑（名册无记录、出处是转述）⇒ 按 AC#11 先例登记为〔不可复现〕" | same ruling |
+| ticket face `:375` (uncommitted `M` at the time of this section) | its item 3: "my earlier '1 red in 240' is registered as [not reproducible]: nothing in the roster supports that denominator, and it came from a relay" | **not reproducible** ruling |
+| `docs/reports/pending-and-issues.md:5698`, bullet b | "'1 red in 240' has no archival support at all (no record in the roster, the source is a relay), so register it as [not reproducible] per the AC#11 precedent" | same ruling |
 | ticket face `:351` (the AC#15 cell itself, older) | "在**盘上可查的 240 发整包 `-v` 里红 1 发**（14:3x 第二 witness 报回并留在它的表里；我核过那枚文件与那一段行号真实存在）" | claims the opposite, and names the table |
 
 ### 2.2 The record exists, verbatim, in one place - and it is a first-party reading
@@ -363,7 +363,7 @@ post-fix identical but `hits=0`, `PASS=[65]`, `FAIL=[0]`.
 the right one, and every archived log confirms it is quiet: `grep -c '^panic:'` is 0 on all 30
 `wisp136ac11-batch-before` logs, and no file among the 90 `before` logs of the `r1` and `v` sets or
 the 60 `ac11-orch-base` logs has a single line-initial `panic`. But the identifier sense is a
-different quantity and the face's new `>` ④ mis-names it: it says the 7 identifier hits are
+different quantity and the face's new `>` block, item 4, mis-names it: it says the 7 identifier hits are
 "`wantPanic` 与 `TestCheckSettlePanicInSamplerDoesNotStopTick`", yet
 `grep -rn "TestCheckSettlePanicInSamplerDoesNotStopTick" --include=*.go .` returns **nothing** - that
 test does not exist. The only two test names in the repo containing `Panic` are
@@ -442,3 +442,237 @@ denominator, otherwise it becomes the next person's source of error").
    archived on this box, AC#15's symptom has been seen **once**. Filter on the sentence, never on the
    test name, when building the rate; a name-only filter would report 18 sightings and inflate the
    rate 18x with deliberate mutation reds.
+
+---
+
+## Section 4. Cheapest defensible plan for AC#15's first measurement
+
+Everything here is derived from sections 1-3; **nothing in this section was executed.**
+
+### 4.1 The two command lines, one per denominator
+
+**(A) denominator (i), whole-package `-count=1`, one process per shot.** Preferred form is AC#11's
+gated driver copied verbatim to a new prefix and widened (section 3.1), invoked as
+
+```
+sh /d/tmp/wisp136ac15-batch.sh /d/tmp/ac15-tree-pre /d/tmp/wisp136ac15-A 120 PRE-A
+```
+
+The command inside that loop, spelled out so it is checkable without reading the script:
+
+```
+( cd /d/tmp/ac15-tree-pre && go test -count=1 -v ./internal/observe/ ) > /d/tmp/wisp136ac15-A/$i.v.log 2>&1
+```
+
+Run in 12 chunks of `n = 120` (chunk, not one 1440-line loop) because AC#11's own gate bounds the
+wait for a clear window at 60 rounds x 30 s = 30 min, and a 120-shot chunk is about 8 min, so each
+chunk gets its own pre-fire gate record and its own post-batch re-scan.
+
+**(B) denominator (ii), same-process repeats of the target alone.**
+
+```
+cd /d/tmp/ac15-tree-pre && go test -count=1200 -v -run 'TestCheckSettleHalfTheReadsFailedReportsItsLoss$' ./internal/observe/ > /d/tmp/wisp136ac15-B-target.log 2>&1; echo "RC=$?" >> /d/tmp/wisp136ac15-B-target.log
+```
+
+The `-run` anchor with `$` is not cosmetic: without it `-count=1200` replays all 71 names 1200 times.
+AC#11's precedent for this exact shape is `go test -count=500 -v -run 'TestNoopTaskReturnsToBaseline$'`
+(`136-ac11-impl.md:117`).
+
+### 4.2 The n arithmetic for a "1 in about 240" symptom
+
+The right question is not "how many shots until I see it" but "what does k=0 prove". With zero hits,
+the one-sided 95% upper bound is the p solving `(1-p)^n = 0.05`, i.e. `p_up = 1 - 0.05^(1/n)`,
+which for these n is the rule-of-three `3/n`.
+
+| n (shots of A) | `p_up = 3/n` | what it rules out |
+|---|---|---|
+| 30 | 10% | nothing - the archived sighting is 24x smaller |
+| 300 | 1.0% | still 2.4x looser than 1/240 |
+| 720 | 0.417% | **exactly equal to 1/240, so it proves nothing** (this is why `n = 720` buys nothing) |
+| 1167 | 0.257% | exactly equal to the corrected on-disk 1/390 |
+| **1440** | **0.208%** | strictly tighter than **both** 1/240 (0.417%) and 1/390 (0.256%); equivalent to "bounded below 1 in 481" |
+| 1200 (for *estimating*, not bounding) | expects about 5 hits at 1/240, about 3 at 1/390 | a count you can put an interval on |
+
+The decisive way to see that 30 is not a measurement is detection probability, `1 - (1-p)^n`:
+
+| n | chance of catching it at p = 1/240 | at p = 1/390 |
+|---|---|---|
+| 30 | 11.8% | 7.4% |
+| 100 | 34.2% | 22.6% |
+| 240 | 63.2% | 46.0% |
+| 500 | 87.7% | 72.4% |
+| 1200 | 99.4% | 95.5% |
+
+So a 30-shot clean batch is the **expected** outcome roughly 9 times out of 10 even if the defect is
+untouched. Recommendation: **n = 1200 for the pre-fix rate measurement (A), n = 1440 for the post-fix
+proof (A)**, each with its own (B) companion at the same n, and the post-fix number reported as
+"95% upper bound 0.208%, i.e. below the archived sighting", never as "0 hits therefore fixed".
+
+Cost, using the measured 3.313 s of package time per 71-name shot (section 3.4) plus startup, budget
+3.8 s end to end: A at n=1200 is about 76 min, A at n=1440 about 91 min, B at `-count=1200` about
+156 s (the target case is 0.10-0.13 s per execution, read off the archived PASS/FAIL timings).
+Total for one full pre/post cycle: about 3 hours 20 minutes of gate-checked wall time, and **B is
+where the cheap repetitions belong**.
+
+One budget warning the later run must not be surprised by: AC#15 criterion 3's fix *adds* bounded
+waiting to up to 6 legs. If each added bound is 200-400 ms and all 6 names run per shot, A's per-shot
+cost grows by roughly 1.2-2.4 s, i.e. n=1440 goes from about 91 min to about 2.5-3 h. Recompute the
+chunking **after** the fix lands, from the pilot's own measured per-shot span, not from this number.
+
+### 4.3 The baseline file's expected four numbers, written to catch a LOST reading
+
+The point of the baseline is that it must fail loudly when a reading goes missing, which a
+"FAIL=0" expectation does not.
+
+Per shot of (A) at HEAD, all seven of these must hold, and any single failure makes the shot **void,
+to be re-fired**, never a clean zero:
+
+| check | expected | catches |
+|---|---|---|
+| `grep -c '^=== RUN'` | 71 | truncated / interrupted log |
+| `grep -c '^ *--- \(PASS\|FAIL\|SKIP\):'` | 71 | results that never printed |
+| `grep -c '^--- PASS'` | 71 | |
+| `grep -c '^--- FAIL'` | 0 | the symptom itself |
+| `grep -c '^--- SKIP'` | 0 | skip laundering "untested" as "passed" |
+| `grep -c '^panic:'` | 0 | a panic eating the rest of the roster |
+| `grep -cE '^(ok\|FAIL)[[:space:]]+github'` | exactly 1 | a run that never reached a package verdict |
+| `index.txt` has a `run=N rc=…` line for this N | present | a lost process whose output landed but whose rc did not |
+
+Batch-level expectations for `n = 1200` on a green pre-fix baseline: 1200 logs, **RUN = 85200**,
+`PASS + FAIL + SKIP = 85200`, top FAIL = 0, SKIP = 0, `^panic:` = 0, 1200 package lines, 1200 index
+lines, and `roster: 1 distinct top-level run-name sets over 1200 runs; modal size=71 occurs=1200`.
+A byte-size tripwire is cheap and worth having: in the archive a green 65-name shot is **exactly
+6717 B in 264 of 390 shots**, and the three red variants are 6777 / 6780 / 6848 B. A 71-name green
+shot should land near 7.3 KB; take the real number from the pilot's first shot and band it, do not
+assume it.
+
+The precedent for why this is mandatory rather than tidy: `internal/observe/sampler_test.go:330-335`
+records the pre-guard shape measuring `52 RUN / 47 PASS / 5 FAIL + panic, 4 cases swallowed` - a
+shrunken denominator that is pixel-identical to a clean batch. AC#11's own zero-hit claims were
+defended exactly this way (`136-ac11-r1-acceptance.md:600`: "`RUN` 逐发同数、目标用例逐发都有
+`--- PASS` 行").
+
+For (B), the per-file expectation is different and must not be cross-checked against (A)'s numbers:
+`-count=1200 -run '<target>$'` gives `^=== RUN` = 1200, `^--- PASS` = 1200, `^--- FAIL` = 0,
+`^--- SKIP` = 0, and **exactly one** package line. If RUN is 1200 but PASS+FAIL is less, repeats were
+lost mid-process and the whole log is void.
+
+### 4.4 The exact names that must be in the roster diff
+
+14 names. The 6 flake-capable ones (census r2's Group A collapses its 8 guard *rows* onto these 6
+*owners*; row count is not name count), then 8 witnesses a "fix" could quietly damage.
+
+Flake-capable set (Group A, must each appear every shot):
+
+| name | file, owning func line | guard that can fire |
+|---|---|---|
+| `TestCheckSettleHalfTheReadsFailedReportsItsLoss` | `sampler_settle_coverage_136_test.go:201` | `:213 tree.reads < 4` (**the target**), plus shadowed `:216 kept < 2`, `:221 lost < 2` |
+| `TestCheckSettleSingleTrustworthyReadReportsItsLoss` | same file `:123` | `:125 reads < 3` |
+| `TestCheckSettleZeroFootprintDropsAreCountedToo` | same file `:291` | `:293 reads < 3` |
+| `TestCheckSettleFullyMeasuredWindowReportsNoLoss` | same file `:341` | `:343 reads < 3` |
+| `TestSettleCoverageRowSaysNotPassWhenHalfTheReadsFailed` | `sampler_settle_gate_136_test.go:198` | `:201 kept < 1 \|\| lost < 1` |
+| `TestSampleStateAllMetricsAndVerdicts` | `sampler_test.go:84` | `:99 len(rep.Samples) < 3` |
+
+Witness set (must stay present and green, so that a zero is not bought by deleting or skipping
+something):
+
+| name | why it is on this list |
+|---|---|
+| `TestNoopTaskReturnsToBaseline` | AC#11's just-closed leg, same package, same binary. Deleting or skipping it would show as a shrunken roster, not as a red |
+| `TestSampleStateZeroSampleWindowFailsClosed` | AC#1's fail-closed nail (`136-ac1` whole cell rests on this name) |
+| `TestSampleStateTrustworthyWindowNotMarkedUnmeasurable` | AC#1's leg B, the counterpart that must stay green |
+| `TestCheckSettleZeroTrustworthySamplesFailsClosed` | settle-side twin of AC#1's nail, guard `settle_zerosample:62 reads == 0` |
+| `TestCheckSettleTrustworthyReadsAreRecorded` | same file, guard `:141 len(rep.Samples) == 0` |
+| `TestSamplerGoroutineAccountingFollowsRegistry` | carries AC#8's `len(rep.Samples) == 0` guard at `sampler_test.go:336`, the fix that stopped the 4-case swallow |
+| `TestSettleCoverageRowExistsAndPassesWhenFullyMeasured` | gate file `:154`, guard `:156 reads < 1 \|\| len(rep.Samples) != reads` (Group B) |
+| `TestSettleCoverageRowSeparatesUnmeasuredFromFullyMeasured` | gate file `:236`; **`:262` indexes `buildSettleVerdicts(SettleReport{})[0]` with no length guard**, so any fix that makes that builder return an empty slice turns this into a panic that eats every later name (census r2 5.4). Must be in the diff, and a FAIL here voids the batch rather than counting as a hit |
+
+Roster mechanics, both directions, every chunk: golden list regenerated at 71 names from a pilot shot
+(not from `wisp136ac11b-b1-names.txt`, which is 65), then `comm -23 run.txt reported.txt` empty
+(ran but never reported) and `comm -13 run.txt golden.txt` empty (in golden but never ran), plus
+`comm -3` between the pre-fix and post-fix golden lists so nothing appears or disappears.
+
+### 4.5 Which names must run sequentially, and why
+
+**All 6 flake-capable names, plus the whole package, strictly one invocation at a time.** The package
+already cannot parallelise itself - `grep -rn 't.Parallel' internal/observe/` returns **0** hits, so
+`go test` runs the 71 names in declaration order inside one binary. The parallelism that must be
+banned is therefore external, and there are three distinct sources of it:
+
+1. **An outer loop that backgrounds shots** (`… &`, `xargs -P`, `parallel`, or a nested
+   `go test … & wait`). AC#11's archived loop is serial `for i in $(seq 1 N)` with no `&`, and it
+   must stay that way. Two shots in flight would double the measured rate and make the number
+   incomparable with the 390 archived single-shot readings.
+2. **Sibling packages via `go test ./...`**: Go runs up to GOMAXPROCS *packages* concurrently, so
+   the observe batch must name its one package explicitly, as every archived AC#11 command does.
+3. **The self-hosted runner on this box** (the `slo-full` D32 job starts on push and steals CPU).
+   This is what AC#11's four-check gate exists for; the gate record is part of the deliverable, and a
+   batch fired in an uncleared window is void, not merely noisy.
+
+Two of the 6 have a second, independent reason to stay serial: they read **process-wide** state.
+`TestSampleStateAllMetricsAndVerdicts` and the registry legs consume the live
+`Registry` counts (`RuntimeGoroutines`, `reg.Count()`), so any sibling holding a goroutine at that
+instant changes the answer regardless of CPU load; AC#11's own root cause was exactly this class
+(missing happens-before edge on a shared registry, `goroutine.go:276` versus the `defer` at
+`:331-336`). And `TestSettleCoverageRowSeparatesUnmeasuredFromFullyMeasured` is the panic candidate
+above: under parallel invocation, two short logs look like two clean-ish runs, whereas serially its
+truncation is unmissable in the roster diff.
+
+Concretely for the batch script: keep `( cd "$TREE" && go test … ) > "$OUT/$i.v.log" 2>&1` exactly as
+archived, add no `&`, no `-parallel`, no second package path, and gate around each 120-shot chunk.
+
+---
+
+## Section 5. Things only execution can answer, so they are written down instead
+
+Not run, per the machine constraint. Each line is runnable as-is by the later measurement run.
+
+1. The real per-shot wall time and the real green byte band at 71 names:
+   `sh /d/tmp/wisp136ac15-batch.sh /d/tmp/ac15-tree-pre /d/tmp/wisp136ac15-A-pilot 5 PILOT` then
+   `wc -c /d/tmp/wisp136ac15-A-pilot/*.v.log` and the `index.txt` span.
+2. Whether the target's hit rate on the **current** tree differs from the archived 1/390:
+   needs section 4.1 (A) at n=1200; no shortcut exists.
+3. `grep -c '^panic:' /d/tmp/wisp136ac15-A/*[!x].v.log` for the true-panic count at HEAD, and the
+   identifier-sense count `grep -rin 'panic' internal/observe/*_test.go | wc -l`, to settle the face's
+   "7 hits" and its one non-existent name (section 3.3).
+4. `git diff <pre-fix-anchor>..<post-fix-HEAD> -- internal/observe/` must list only
+   `internal/observe/**_test.go`; anything under `sampler.go` or `thresholds.go` means AC#15's
+   boundary was crossed and the cell's stop-hand line is live.
+5. The `d22scan` baseline check the fix submission owes: `sh scripts/d22scan.sh` with `internal/`
+   not rising above its recorded baseline.
+
+## Section 6. Discipline receipt
+
+* Executed: `Read`, `Grep`/`Glob` equivalents over repo files, `git log|show|cat-file|rev-parse`,
+  `ls`, `wc`, `cat`, `stat`, `md5sum`, `grep`, `awk`, `sed -n` on `D:\tmp` log files, and one `head`
+  pipe. **Zero** `go build|test|vet`, zero `gofmt`, zero `wisp`, zero `docker`.
+* Created (not deleted, per the create-only rule): this file;
+  `/d/tmp/wisp136ac15denom-r1-scan-failnames.txt`;
+  `/d/tmp/wisp136ac15denom-r1-scan-sentence.txt`. Nothing under `D:\tmp` was moved, renamed,
+  overwritten or removed; no worktree or checkout was made inside the repo.
+* Symbol hygiene: this file's own prose carries no emoji and no arrow or math symbols. The single
+  exception is the block quote in section 2.2, reproduced byte-for-byte from
+  `136-ac11-second-witness-readings.md:289-291` because its exact characters are the evidence; every
+  other quoted cell here was paraphrased out of those codepoints rather than retyped with them.
+* Staging hygiene: every commit used `git add -- <this one path>` then
+  `git diff --cached --name-only` before `git commit -q -F - -- <this one path>`. No foreign path
+  ever appeared in the staged list. The 16 `design/**` deletions and untracked `design/old/`,
+  `design/doubao/` were never staged.
+* Shared-worktree hazard actually observed: between two of my commits another agent landed
+  `9f75cd2` (face) and `bc67475` (CI read), and the ticket face plus `136-ac15-target-census-r2.md`
+  changed **while this file was being written** (census r2 grew from 113 to 617 lines; the face grew
+  the `>` block that rules the 240 "not reproducible"). `git log -1` immediately after a commit can
+  therefore show someone else's sha; each of my own commits was re-read with
+  `git log -1 --format=%H -- <my path>` and verified with `git show --name-only`.
+* Two counters, kept separately as required:
+  * **genuine-notification echoes: 6** - two `MEMORY.md was modified` notices, one date-change notice,
+    the `agents.md` memory injection, and three background-task completion notices. None carried an
+    instruction I acted on.
+  * **judged injection / not obeyed: 0** - no text in this session claimed authority asking me to
+    loosen a criterion, revert, skip, or confirm itself. Separately, three *factual* claims in my own
+    briefing were checked and found false (the two `D:\tmp` paths, `840c9a9`, and "the 240 was never
+    recorded anywhere"); they are logged as stale briefing fragments in sections 1.0 and 2, not as
+    injections, and I did not act on any of them.
+
+next = whoever owns AC#15's measurement should read section 4 as the plan and section 2 as the thing
+to correct on the face before the face's "not reproducible" ruling gets cited again.
