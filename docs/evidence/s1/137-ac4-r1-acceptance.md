@@ -37,6 +37,25 @@ rc=0
 ⇒ 被验的 `internal/winsec/` 码面从我开工的锚点 `a9c4d58` 回到交付面最后一枚 `b1010ff` **一字未动**，
 不需要停手上报。**读数全部走 `git archive` 快照，没有一枚取自工作树**（见 0.5）。
 
+两枚 shas 的真实关系（本程现量，别当"锚点在交付面之前"读）：
+
+```
+$ git merge-base --is-ancestor b1010ff HEAD && echo yes
+yes
+$ git log --format='%h %p %ad' -1 b1010ff ; git log --format='%h %p %ad' -1 a9c4d58
+b1010ff 20a6397 Thu Sep 24 15:43:20 2026 +0800
+a9c4d58 d777eb6 Thu Sep 24 15:47:34 2026 +0800
+$ git log --oneline b1010ff..a9c4d58
+a9c4d58 docs(137 AC#4 核收, 119 AC#7 立案): ...
+d777eb6 evidence(125,AC#4 r1 终裁 §4): ...
+a088515 evidence(125,AC#3 r1 终裁 §3): ...
+$ git diff --numstat b1010ff..HEAD -- <137 票面>
+33	0	（纯 append＝编排者那一块 `>` 口径更正）
+```
+
+⇒ 锚点 `a9c4d58` 是交付面 `b1010ff` 的**后代差三枚**，那三枚只动票面与别人的证据件（`internal/winsec/` 逐字节相同，
+就是上面那条空 diff 证的）；本程读的**是交付面那一版码**，不是"我开工时的工作树"。
+
 工作树确实不干净，且**与本程无关**：`git status --porcelain` 现量 **18 行**＝`design/**` 那 16 枚 tracked 文件被
 owner 那侧挪成未跟踪的 `design/old/`（显示为删除）＋ 两枚未跟踪目录 `design/doubao/`、`design/old/`。
 本程**一枚未还原、未提交、未删、没过问**。`git add` 只用显式路径，每枚 commit 前跑 `git diff --cached --name-only`。
@@ -95,4 +114,248 @@ owner 那侧挪成未跟踪的 `design/old/`（显示为删除）＋ 两枚未�
 `git log --oneline -1` 与 `git show --name-only HEAD` 的原样输出见本节下方的 0.8——
 它们必须是**提交之后**的读数，这是共树里"提交账只能在提交后现量"的固有循环，本程按 `A155` 那枚形状留痕。
 
-（占位：0.8 由下一枚 commit 回填。）
+### 0.8 §0 那一枚 commit 的原样输出（提交之后现量）
+
+```
+$ git log --oneline -1
+3a49745 evidence(137 AC#4 r1 终裁 §0): 锚点自量 a9c4d58 + b1010ff..HEAD -- internal/winsec/ 为空 + 闸门 + 被验版本盘上身份
+$ git show --name-only HEAD
+commit 3a497457cfc5ea4564749cbbf80b620cdc210b71
+Author: CarlosShao <1933942520@qq.com>
+
+    evidence(137 AC#4 r1 终裁 §0): 锚点自量 a9c4d58 + b1010ff..HEAD -- internal/winsec/ 为空 + 闸门 + 被验版本盘上身份
+
+docs/evidence/s1/137-ac4-r1-acceptance.md
+```
+
+⇒ 那一枚只带 `docs/evidence/s1/137-ac4-r1-acceptance.md` 一枚路径，别人的 `design/**` 一枚未卷。
+本节（0.8 这几行）本身又走下一枚 commit 落盘——同一枚循环，按 `A155` 那枚形状留痕。
+
+---
+
+## §1 判据①：那 7 处递根点的逐枚判定表复核 ＋ "有没有哪一处本来不该换"　〔独立复现〕
+
+### 1.1 枚数：派单那句"从 `b1010ff` 现 `grep -n`"**照字面产不出 7**，本程换三条独立计数复算
+
+派单写的是"那 7 处 raw `t.TempDir()`（枚数自己从 `b1010ff` 现 `grep -n`，别引我给的数）"。
+**本程照做了，结果是 0 枚命中，不是 7**：
+
+```
+$ git grep -n 'root := filepath.Join(t.TempDir(), "root")' b1010ff -- internal/winsec/placement_symlink_113_other_test.go internal/winsec/ancestor_separator_108_other_test.go
+（无输出，rc=1）
+$ git grep -n 't\.TempDir()' b1010ff -- internal/winsec/placement_symlink_113_other_test.go internal/winsec/ancestor_separator_108_other_test.go
+（无输出，rc=1）
+```
+
+⇒ **票面 `:70` 那条"裸指针会被自己的修法挪走"的教训，在这一格里比"行号挪走"更狠一层**：
+被 AC#4 的修法吃掉的不是行号，是**被数的那个形状本身**（换干净之后全仓那两枚文件里 `t.TempDir()` 一枚不剩）。
+**判据不成立但不是坏事**，本程不硬凑读数，改成三条**各自独立**的计数，三条都给 **7**：
+
+| 计数法 | 命令（本程现跑） | 读数 |
+|---|---|---|
+| ① 改动的行集 | `git show 9c0f546 \| grep -c '^-.*root := filepath.Join(t.TempDir(), "root")'` ＋ 同形 `^+...SealableTempDirForTest124` | **7 ＋ 7** |
+| ② 改前的影像 | `git grep -n 'root := filepath.Join(t.TempDir(), "root")' a02da50 -- <那两枚文件>` | **7**：`108:69/135` ＋ `113:197/220/248/264/289` |
+| ③ 盘上两棵树 | `diff -ru <base>/internal/winsec <swap>/internal/winsec` 里 `^[+-]\s+root := ` 命中 | **7 对**（其余 28 行是两枚文件头的注释） |
+
+**枚数＝7 成立，且"全换、一枚不留"成立**（`b1010ff` 上那两枚文件里 raw `t.TempDir()` ＝ 0 枚，连不是"root"的变量名都没有）。
+⚠ **登记一条给下游的判据缺陷（不改判据、只报名）**：今后 AC#4 这一类"换掉某个形状"的格子，
+**枚数判据必须写成"改前影像 ＋ 改动行集"两路**，写成"从交付面 HEAD 现 grep 那个形状"会随修法一起归零。
+
+### 1.2 逐枚判定表（本程自己的编号；换根前 → 换根后行号都由 1.1 的②／现地 `grep -n` 量出，不抄任何前手）
+
+| # | 递根点（`a02da50` → `b1010ff`） | 它喂的用例／子测（逐名） | 判定 | 一句理由（本程的，不是转述） | 换掉之后"未解析那一形"由谁守（具名） |
+|---|---|---|---|---|---|
+| 1 | `113:197` → `113:212` | `TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone` | **该换** | 它的判据（AC#2 之后）是"拒因必须记名到 `root/link`"；未解析根让 `firstLinkAncestor`/`platformVerifyPlacement` 停在 `/r1link`，记名判据**在任何一版生产码上都只能响**（§2 的 `a-base-link` 读数：这一枚在未变异软链形就是红）⇒ 未解析根是它的**遮蔽**，不是它的分母 |
+| 2 | `113:220` → `113:235` | `TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth` ＋ 4 枚子测 `link-at-depth-1..4` | **该换** | 这枚用例存在的**全部理由**是"链接在根下第 2/3/4 层时走查还得走到"；未解析根把拒点钉在第 2 个组件，**depth-2/3/4 那三层种下的链接从未被走查看过一眼**（子测本身在 `=== RUN` 里、跑的是宿主那枚链接）——本程 §3 的 `R2` 一发把它单独撤回 raw，逐名读到那 5 枚由"能响"退成"两态同色"（＝零区分力） |
+| 3 | `113:248` → `113:263` | `TestAC1POSIXSealDirThroughASymlinkRefuses` | **该换** | 同 1，入口换成 `SealDir(root/link)`；未解析根下 `SealDir` 那条腿不参与读数，绿是宿主链接给的 |
+| 4 | `113:264` → `113:279` | `TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing` | **该换** | 它钉的是"字节落盘**之前** placement 腿就跑完"；未解析根下"没写字节"由宿主链接的拒给出，断言与它声称的因果**脱钩**（脱钩＝它测不到自己名字里那件事） |
+| 5 | `113:289` → `113:304` | `TestAC1POSIXSealFileThroughABackslashNamedLink` | **该换** | 被测的是**名字里带反斜杠的那枚链接**会不会被切成两截（`A74(3)` 的 fail-open 钉）；未解析根让走查在它**之前**就返回 ⇒ 这一枚恰是"永远走不到"的那一枚 |
+| 6 | `108:69` → `108:82` | `TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink` | **该换** | 108 这族的断言**内联、不走 helper**（`R-137-2`），AC#2 给它新接的就是 `refusalCreditsLink137`；未解析根下这把新尺在软链形**只能响、不能绿**（本程 §3 的 `R6` 一发＝把这一枚单独撤回 raw，逐名读到它"两态同色"） |
+| 7 | `108:135` → `108:148` | `TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor` | **该换** | 同 5 ＋ 同 6：反斜杠名 ＋ 未解析根＝两重"走不到"，它测的"那次 `Lstat` 必须用原名字面"在未解析根下**被整个省掉** |
+
+⚠ **表里不给"逐枚 → 逐枚"的承接映射，因为不存在**：这 7 处换完之后，"未解析那一形"由**同一组**用例整体接住
+（具名见 §1.3），不是一枚对一枚。谁要是把这一栏读成"第 3 处由 `119:285` 单独守"，那是本表写坏了，按 §1.3 为准。
+
+⇒ **本程独立得出与实现方同一结论：7 处全部该换，没有一处需要未解析的根来完成它自己的断言。**
+这一条不是"账面整齐"，是 §2／§3 的读法给的（见 §3 的逐枚"撤掉它哪条用例变得不响"）。
+
+### 1.3 反向那一问：换掉之后"未解析那一形"到底还有没有人持有（**具名，不指票号**）
+
+本程不采信实现方那张表的名字，自己在 `b1010ff` 上重新点名并核"真在跑、不是 SKIP"：
+
+1. `TestAC1POSIXUnresolvedSymlinkedRootStillRefused119` ＝ `internal/winsec/dataroot_symlink_119_other_test.go:193`，
+   `base := t.TempDir()`（`:194`，**仍 raw**），自己在基根里种 `var` 那枚链接再拼 `<base>/varlink119/data`；
+2. `TestAC2POSIXInjectedTestDataDirStandsAsDeclared119` ＝ 同文件 `:285`，`base := t.TempDir()`（`:286`，**仍 raw**）；
+3. `TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125` 的子测 `control_unresolved_root_still_refused_by_the_floor_itself`
+   ＝ `internal/winsec/seam_probe_root_125_other_test.go:277`（**只在普通形跑**）。
+
+**本程现量**（`a-swap-link`，即被验那版·未变异·软链形）：
+
+- `119` 那两枚**在 `=== RUN` 名册里**（`grep` 命中，见 1.4 那条名册差集）⇒ 软链形里它们**真跑**，没被跳过；
+- 125 那三枚**在 SKIP 名册里**（逐名：`…SeamAcceptsTheHonestPOSIXAnswer125`／`…SeamGuardStillRefusesEveryHostileShape125`／`…SeamProbeShapesAreBuiltOnAResolvedRoot125`），
+  且父项 SKIP ⇒ **它的子测在软链形一枚都没跑**（名册差集现量 7 枚，逐名全是 125 那三枚的子测）；
+- 两枚文件里剩下的 raw `t.TempDir()` 枚数本程也重数：`119` **5 枚**（`:128/:154/:194/:220/:286`）＋ `125` **2 枚**（`:60/:224`）
+  ⇒ **实现方"不在这 7 处的地界里"那句成立，且它一枚未动**（`9c0f546` 只带那两枚文件）。
+
+⇒ **但这一栏必须连着 §5 第二问读**：119 那两枚**跑、能打印、不能区分**（它们的断言只判 sentinel），
+所以换根之后"未解析那一形"在软链形**只剩日志、不剩判据**。这条代价是真的，实现方自己报回了，编排者已落成票 119 `AC#7`。
+
+### 1.4 本程核过的事实清单（判据①范围内）
+
+- 枚数三条独立计数＝7／7／7；`b1010ff` 上那两枚文件 raw `t.TempDir()`＝**0**。
+- 逐枚行号：改前 `108:69/135`＋`113:197/220/248/264/289`（`git grep -n` 现量），改后 `108:82/148`＋`113:212/235/263/279/304`（换根树上 `grep -n` 现量）。
+- **同两枚文件里早已走已解析根的 2 处**（`113:403`、`108:117`）**不在 7 枚分母里**——本程按"它两形都响＋被当对照组用"逐名核过（见 §2 的 `b-*` 两发）：
+  `113:403` 属于 `TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator`（反向腿），`108:117` 属于 `TestAC2POSIXDoesNotFoldABackslashIntoASeparator`（反向腿）。
+  ⇒ 实现方 §1.1 那句"另有 2 处早已走已解析根、非本格分母"成立。
+- 同树同形复跑一发逐名同色（`c-r2-plain` vs `e-r2-plain2`，名册 `diff` 为空）⇒ 读数不是单发运气（那两发的设计在 §3）。
+- 未解析形持有面 3 枚具名核对存在；`=== RUN`／SKIP 归属用名册差集核，不靠读注释。
+
+### 1.5 本节这一枚 commit 的账（同 0.8 那枚循环，原样输出由下一枚 commit 回填）
+
+```
+$ git log --oneline -1
+18f2531 evidence(137 AC#4 r1 终裁 §1): 枚数三条独立计数=7(派单那句"从 b1010ff 现 grep"照字面产 0 枚)+逐枚判定 7 全该换+未解析形具名持有人现量
+$ git show --name-only HEAD
+commit 18f253126e0626034f6a01d88182c17770175094
+Author: CarlosShao <1933942520@qq.com>
+
+    evidence(137 AC#4 r1 终裁 §1): 枚数三条独立计数=7(派单那句"从 b1010ff 现 grep"照字面产 0 枚)+逐枚判定 7 全该换+未解析形具名持有人现量
+
+docs/evidence/s1/137-ac4-r1-acceptance.md
+```
+
+⇒ 那一枚也只带本程这一枚路径。
+
+---
+
+## §2 判据②：换根这一味药的**两条实质凭据**——两对各自己跑一遍　〔独立复现〕
+
+**先说口径**：票面 `:173` 原句"换根之后 MUT-D 软链形 11 枚转红"**本程一次也没拿它当凭据**，
+按 `:176-187` 那块更正判②a／②b 两条。下面 24 发读数**全部出自本程自己建的树、自己的容器、自己的假根名**
+（`/r1priv`／`/r1link`／`/r1plain`，与实现方的 `/ac4priv`／`/ac4link` 不同名，排除抄日志的可能）。
+**本程总发数＝27**（1 发台件自校 ＋ 6＋8＋10＋2 四批），**每发 panic 计数逐发 0**，每发之前一条 `GATE-PRE`（见 §0.3）。
+
+### 2.1 ②a ＝ 未变异的软链形那 11 枚**由红转绿**
+
+| 本程的发 | 树 | 形 | RUN | 顶 P/F/S | 子 P/F/S | 包级 rc | panic |
+|---|---|---|---|---|---|---|---|
+| `a-base-link` | `base`（`a02da50`，未换根） | 软链 | 45 | 20/**7**/3 | 11/**4**/0 | 1 | 0 |
+| `a-swap-link` | **`swap`＝被验那版**（`b1010ff`） | 软链 | 45 | **27**/0/3 | **15**/0/0 | **0** | 0 |
+| `a-base-plain` | `base` | 普通 | 52 | 30/0/0 | 22/0/0 | 0 | 0 |
+| `smoke-swap-plain` | `swap` | 普通 | 52 | 30/0/0 | 22/0/0 | 0 | 0 |
+
+**名册级证据**（`comm`／`diff` 逐名，不是包级 rc）：
+
+- `a-base-link` 的 11 枚红逐名 ＝ 7 顶层 ＋ 4 枚 `link-at-depth-1..4` 子测；与 `a-swap-link` 做全量 colour 差集
+  ⇒ **恰好这 11 条 `FAIL→PASS`，没有第三枚动**（差集里只出现这 11 个名字，正反两向都是）。
+- 两发 `=== RUN` 名册**逐名相同**（45 枚，`diff` 为空）⇒ **没有谁整发消失**。
+- 两发 SKIP 名册**逐名相同**（3 枚，见 §4）⇒ **那 11 枚不是由红转 SKIP**。
+- 普通形两发全量 colour 名册 `diff` **为空** ⇒ 换根在普通形＝**字面 no-op**（机制：`SealableTempDirForTest124`
+  走 `resolve.go:253 resolveProbeRoot`，无链接时返回同一串）。
+
+⇒ **②a 成立，且是本程亲手量出来的。** 与实现方 `r2→r4` 那一对**逐数相同**（`45/20/7/3＋11/4/0` → `45/27/0/3＋15/0/0`），
+两边是**独立同读**，不是本程抄它。
+
+### 2.2 ②b ＝ 红因换轨：同一形同一批用例，红句从"没记名"换成"根本没拒"
+
+| 本程的发 | 树 | 形 | RUN | 顶 P/F/S | 子 P/F/S | rc | **`returned nil, i.e. it sealed through a symlink`** | **`does not credit the link this case planted`** | 日志里点到 `/r1link` 的行 |
+|---|---|---|---|---|---|---|---|---|---|
+| `b-basemutd-link` | `base` ＋ 本程自造 MUT-D | 软链 | 45 | 17/10/3 | 11/4/0 | 1 | **2**（都是 118 那两枚天生已解析根的对照） | **10** | 22 |
+| `b-swapmutd-link` | **被验那版** ＋ 同一发 MUT-D | 软链 | 45 | 17/10/3 | 11/4/0 | 1 | **10** | **0** | 2 |
+| `b-swapmutd-plain` | 被验那版 ＋ MUT-D | 普通 | 52 | 17/13/0 | 17/5/0 | 1 | 10 | 0 | 0 |
+| `e-basemutd-plain` | `base` ＋ MUT-D | 普通 | 52 | 17/13/0 | 17/5/0 | 1 | 10 | 0 | 0 |
+
+- **两棵 MUT-D 树的软链形全量 colour 名册 `diff` 为空**（14 条红：分母 11 ＋ 对照 3，逐名同）
+  ⇒ 派单那句"`r6↔r8` 名册差集为空"在本程树上成立，**而这恰恰是那句"11 枚转红"不能当凭据的原因**（名册看不出换过根）。
+- **凭据在红句里**：同一批发红的用例，红句从 **10 句"没记名我种的链接"** 换成 **10 句"returned nil＝它穿过链接把密封做完了"**，
+  与被点名对照（`TestAC118POSIXSealFile…`／`TestAC118POSIXPrivateFile…` 天生已解析根）**同一机制、同一句话** ⇒ "每枚各红各的"。
+  `names-/r1link` 从 22 掉到 2（那 2 行属 §5 第二问的 119 两枚）＝宿主链接不再替这批用例作答。
+- **MUT-D 真落地的凭据**（不是"那 11 枚红"）：`a-base-link`（**未变异**·未换根）那 11 枚红，是 `b-basemutd-link` 14 枚红的**真子集**，
+  多出来的三枚逐名＝`TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed`、
+  `TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasNamed`、
+  `TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119`（`comm -13` 原文，正是 `R-137-3` 点名的那三枚对照）。
+- **普通形那一发本程也重量了两棵树**（`b-swapmutd-plain` vs `e-basemutd-plain`）⇒ 四数 `52/17/13/0＋17/5/0、rc=1`
+  与票面 `:197`/`:226` 钉的参照值**逐数相同**，且全量 colour 名册 `diff` 为空。
+- 10 而非 11 句：`TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth` 的顶层 FAIL 由它 depth-1 子测的报错行聚上来，
+  母项自己不打红句（本程在 `b-swapmutd-link` 里逐名看到 4 条子测各打一句、母项零句）。
+
+⇒ **②b 成立，也是本程亲手量出来的。** 两对（②a／②b）**方向相反、都必须一起看**——
+只报②a 读起来像"换根只是把红抹掉"，只报②b 读起来像"换根没付出代价"，这与 `:186` 那句反向话一致（本程独立复核后背书）。
+
+### 2.3 本程读数与实现方 `137-ac4-impl.md` §2 的对点
+
+实现方八发的八行四数，本程**没有引用**，跑完之后逐行对：`a-base-link`↔`r2`、`a-swap-link`↔`r4`、`a-base-plain`↔`r1`、
+`smoke-swap-plain`↔`r3`、`b-basemutd-link`↔`r6`、`b-swapmutd-link`↔`r8`、`b-swapmutd-plain`↔`r7`、`e-basemutd-plain`↔`r5`
+⇒ **八行全同、零冲突**（含 `names-/r1link` 22↔22、`/ac4link` 那一列同位）。
+这一档对本程的判词只算〔日志＋归档，抽验〕（两边独立同读，本程的凭据是自己那 27 发）；
+**判词本身**按上面 §2.1／§2.2 那两表〔独立复现〕落。
+
+---
+
+## §3 判据③：本程自造的**单点回退进攻**（派单要 1–2 处，本程做了 7 处）　〔独立复现〕
+
+### 3.1 打法与"先证落地"
+
+派单原话：**"把这一处撤掉，哪条用例会变得不响？"答不出＝这一处是装饰。**
+本程把被验那版（`swap`＝`git archive b1010ff`）**逐处单独**撤回 raw `t.TempDir()`，一枚树一棵、
+每棵再造一枚"MUT-D 双生树"，问的是**同一枚用例在"有破口／没破口"两态下颜色会不会变**：
+
+- 回退用本程自己的 `revert_spot.py`（按行号定枚，改前先断言那一行确实是已解析根那枚形状，改后回读断言命中 `t.TempDir()`）；
+- **落地先证**（派单要求）：`diff -r <swap>/internal/winsec <回退树>/internal/winsec` **只报一行**（原文见 3.2 各行），
+  容器内再打 `RAWROOTS=1`（其余 6 处仍是已解析根 ⇒ `SWAPPEDROOTS=8`）＋ `go build ./...` ＋ `go vet ./internal/winsec/` 两 rc=0（`gate 95`）才取颜色；
+- MUT-D 双生树另打 `MUTD_MARKERS=2`（本程第五份独立实现，落点 `winsec_other.go platformVerifyPlacement` ＋ `winsec.go firstLinkAncestor`，
+  两条走查都只看**前 3 个前缀**；标记名 `MUTATION-137AC4R1-D`，与实现方的 `MUTATION-137-AC4-D` 不同名）；
+  每棵 `X-m` 与它的 `X` 逐文件 `diff` ＝ **10 行**（两枚 hunk），五棵全同；
+- **AC#2 那把尺八发恒活**：`CREDIT_BRANCHES=3` 在**每一发**里都＝3 ⇒ 回退没有顺手把判据也撤掉（这是"只回退一处"这条要求的关键反面）。
+
+### 3.2 逐枚读数（每枚给"红/绿变化"的**具名**答案）
+
+| 处 | 回退的行（被验版 → 回退后） | **未变异·软链形**：哪几枚由绿转红（逐名） | **MUT-D·软链形**：颜色／红句变化（逐名） | 普通形 | 判定 |
+|---|---|---|---|---|---|
+| 1 | `113:212`→raw | 1 枚：`TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone` | 颜色不变（仍红），但红句从 `returned nil…` 换成 `does not credit…`（`nil` 10→**9**、`not-credit` 0→**1**）⇒ **它两态同色＝不响了** | 逐名不变 | **承重** |
+| 2 | `113:235`→raw | **5 枚**：`TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth` ＋ 子测 `link-at-depth-1/2/3/4` | 颜色不变（14 枚红名册 `diff` 为空），红句 `nil` 10→**6**、`not-credit` 0→**4**；本程逐名看到被换掉的正是那 4 条 depth 子测 ⇒ **depth 全族两态同色＝不响** | 逐名不变 | **承重（最重的一枚）** |
+| 3 | `113:263`→raw | 1 枚：`TestAC1POSIXSealDirThroughASymlinkRefuses` | `nil` 10→9、`not-credit` 0→1 ⇒ 不响 | 未测（见 §7） | **承重** |
+| 4 | `113:279`→raw | 1 枚：`TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing` | `nil` 10→9、`not-credit` 0→1 ⇒ 不响 | 未测 | **承重** |
+| 5 | `113:304`→raw | 1 枚：`TestAC1POSIXSealFileThroughABackslashNamedLink` | `nil` 10→9、`not-credit` 0→1 ⇒ 不响 | 未测 | **承重** |
+| 6 | `108:82`→raw | 1 枚：`TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink` | 颜色不变；**红行从 `ancestor_separator_108_other_test.go:94`（"returned nil"那一支）挪到 `:103`（"does not credit"那一支）**，路径也从 `/r1priv/…` 变 `/r1link/…` ⇒ 不响 | 逐名不变 | **承重** |
+| 7 | `108:148`→raw | 1 枚：`TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor` | `not-credit` 0→**1**、`nil` 恒 10（见 3.4 仪器盲区）；红行同样挪支 ⇒ 不响 | 未测 | **承重** |
+
+**四数原文**（`-count=1 -v`，每发 panic＝0）：
+
+| 发 | 未变异·软链 | MUT-D·软链 | 未变异·普通 |
+|---|---|---|---|
+| 被验那版（参照） | `45/27/0/3＋15/0/0` rc=0 | `45/17/10/3＋11/4/0` rc=1 | `52/30/0/0＋22/0/0` rc=0 |
+| 回退 1 处（`d-s1*`／`d-s3*`／`d-s4*`／`d-s5*`／`d-s7*`） | `45/26/1/3＋15/0/0` rc=1 | `45/17/10/3＋11/4/0` rc=1 | — |
+| 回退第 2 处（`c-r2*`） | `45/26/1/3＋11/4/0` rc=1 | `45/17/10/3＋11/4/0` rc=1 | `52/30/0/0＋22/0/0` rc=0（复跑 `e-r2-plain2` 逐名同色） |
+| 回退第 6 处（`c-r6*`） | `45/26/1/3＋15/0/0` rc=1 | `45/17/10/3＋11/4/0` rc=1 | `52/30/0/0＋22/0/0` rc=0 |
+
+### 3.3 两条硬结论
+
+**一、7 枚全部承重，没有一枚是装饰。** 每撤一处，都有**具名**用例从"能分辨有破口／没破口"退成"两态同色"；
+把 7 次实验翻转的用例取并集，**正好 11 枚**（`5＋1＋1＋1＋1＋1＋1`，本程 `sort｜uniq` 现量 11 行、无第 12 枚、无遗漏）
+⇒ **顺带把 §1.1 那本"枚数账"从第三个方向独立封了口**：7 处递根点与 11 枚分母是一一对得上的一对多划分。
+
+**二、派单那句 ⚠（"若某一处回退后两形读数一模一样＝假绿"）**：**没有一处触发**，但**触发条件本程差点误判，必须登记**——
+
+- 若只看 **MUT-D 那一发的四数**，**7 处回退后读数与被验那版逐数一模一样**（全是 `45/17/10/3＋11/4/0`），
+  名册 `diff` 也为空 ⇒ **"只看 MUT-D 四数"这把仪器对单点回退是盲的**。
+  真正看得见差别的是**未变异的软链形那一对**（`27/0/3＋15/0/0` → `26/1/3＋…`，逐名＝那一处自己喂的那几枚）
+  ＋**红句／红行挪支**。本程两样都读了，所以判"承重"不判"假绿"。
+  ⚠ **给下游一句可复算的话**：这类"逐处换根"的格子，验收方**必须成对跑"未变异"与"变异"**，
+  只跑变异那一发会**同时**放过"装饰"与"回退"两种相反缺陷（前者读数不变会被判装饰、后者读数不变会被判没事）。
+- 普通形那一形对每次回退都**逐名不变**——这是**设计如此**（普通形里 `t.TempDir()` 本来就无链接可解，两版返回同一串），
+  不是"这一处没用"。所以派单那句"两形读数一模一样"里，**看得见的那一形必须是软链形**。
+
+### 3.4 本程自己那把计数器的盲区（照实登记，不藏着判）
+
+`§2.2` 那句"`returned nil, i.e. it sealed through a symlink` 10 句"是 **`assertRefused113` 的措辞**。
+108 那两枚内联腿的 nil 支各写各的句子（`AC#2 RED: a slash-spelled path…returned nil`／
+`AC#2 RED: the link ancestor %q was not checked…`），**不被本程这个 pattern 命中**。
+⇒ 所以第 6、7 处的"回退前 nil"本来就没算进那 10 句里，读数表现为 `nil 恒 10`；
+本程改判这两处时用的是**红行行号挪支**（`:94`→`:103`）＋ `not-credit 0→1` ＋ `names-/r1link 2→4` 三条同向证据。
+**这一条不影响任何判词**，但它是"红句计数"这把尺的口径边界，写下来免得下一位拿它对不出数。
+
+### 3.5 §2／§3 这两节的 commit 账（原样输出由下一枚 commit 回填）
+
+⚠ **一条流程偏离，先自报**：硬规矩是"每裁完一节 commit 一次"，本程把 **§2 与 §3 并成了一枚 commit**
+（两节的读数同批跑完、正文同轮起草）。不遮掩的理由与代价都登记在 §7 第 8 条。
