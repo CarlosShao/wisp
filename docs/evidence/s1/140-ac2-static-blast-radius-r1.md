@@ -219,3 +219,145 @@ job env 在不在，`wisp slo` 这一路都是 `test`。它是**幂等冗余**�
   `leg_sink_nail_131:409/526`、`early_log_nail_130:123`、`resident_sink_nail_127:199`、
   `secret_argv_windows:236/337/371` ⇒ 这 10 行里 `dataroot_128_test.go` 那两枚是"先栽再 pin"，
   其余 8 处是自带值）。
+
+### 1.7 §1 那枚 commit 的回显（`git log --oneline -1` + `git show --name-only HEAD`，原样）
+
+```
+8e86f32 docs(evidence/140 AC#2 r1): 起手 + §1 读者名册（零仪器，只 grep/只读）
+
+docs/evidence/s1/140-ac2-static-blast-radius-r1.md
+```
+
+（那次 commit 前 `git diff --cached --name-only` 现量**只有这一枚路径**。）
+
+---
+
+## §2　②　环境枚举的入口链（从 `os.Getenv` 到那枚 `if env == "test"` 短路，逐格接上）
+
+**先给那一格的答案**：`cmd/wisp/doctor.go:256` 的短路**只在"字符串族"这条链的最末一格**，
+而且它是**全仓唯一**一枚 `env == "test"` 判定（现量：`grep -rn 'env == "test"' --include='*.go' .` → 1 命中）。
+"**类型化族**"（走 `proc.LayoutFor` 的那条）**根本没有这枚短路**——它无条件问 OS、再把答案丢掉。
+两族长得像、行为不一样，这正是 (a) 支代价被低估的地方。
+
+### 2.1 链 A｜字符串族（**决定落点**的那条）
+
+```
+WISP_ENV（进程环境）
+  设值方：ci.yml:227/:337/:482/:540（job 级）· scripts/slo-check.ps1:111 · cmd/wisp/slo_windows.go:239
+          · 测试自己 t.Setenv / cmd.Env（§1.3 那 10 行）
+    |
+    +-> [读点 R1] internal/buildinfo/buildinfo.go:38   EnvString()      （不校验枚举，非空原样返回）
+    |        :41  return DefaultEnv
+    |                   ^  internal/buildinfo/buildinfo.go:20  DefaultEnv = "dev"   （仓内默认值）
+    |                   ^  scripts/build.ps1:107  "-X $BuildInfoPkg.DefaultEnv=$Env" （构建期覆盖）
+    |                      scripts/build.ps1:23-24  [ValidateSet('dev', 'prod')] / [string]$Env = 'dev'
+    |                      ==> 关键：-Env 的合法值里**没有 'test'**。CI 三处 build 全传 `-Env dev`
+    |                          （ci.yml:400 / :497 / :560），所以"取消 job env"落到的那一形是 **dev**，不是 test。
+    |
+    +-> EnvString() 的四枚消费者：
+          cmd/wisp/doctor.go:43        只印（INFO 行，critical=false，doctor.go:37-39）
+          cmd/wisp/main.go:135         只印（printVersions 第二行；调用者 main.go:108 / :128 / resident_windows.go:25）
+          cmd/wisp/run.go:675          buildEnvString() -> 唯一消费者 run.go:156
+          cmd/wisp/doctor.go:104-105   <== **没有守卫的那一枚**，见下
+          cmd/wisp/models.go:109-110   有守卫
+          cmd/wisp/providers.go:80-81  有守卫
+                |
+                v
+    [分叉] cmd/wisp/doctor.go:247 func resolveDataDir(env string) (string, error) {
+             :248-255  portable.txt 分支 —— **比 test 短路更早的一枚早退**（dataroot_128_test.go:76 assertNoPortableOverride128 就是为它造的）
+             :256-258  if env == "test" { return proc.TestDataDir(), nil }   <<== 你问的那一格
+             :259      base, err := userConfigDir() // %APPDATA%             <<== 被上面短路掉的那次 OS 读
+             :261      return "", dataDirUnresolved128(env, err)             拒
+             :263      base = proc.SealableRoot(base)
+             :264-267  fork：dev -> <base>\wisp-dev ；其余 -> <base>\wisp
+                |
+                +-> proc.TestDataDir()  internal/proc/envfork.go:121-126
+                      :122  if dir := os.Getenv(TestDataDirEnv); dir != "" { return dir }   // WISP_TEST_DATA_DIR，**另一枚变量**
+                      :125  return filepath.Join(SealableRoot(os.TempDir()), fmt.Sprintf("wisp-test-%d", os.Getpid()))
+                |
+                +-> userConfigDir  cmd/wisp/doctor.go:277 var userConfigDir = os.UserConfigDir
+                      （生产里无人重绑；唯一重绑点是测试 dataroot_128_test.go:65 failConfigDir128）
+```
+
+**`doctor.go:104-112` 这一格为什么是链上唯一的"无守卫消费者"**（逐字节，行首 1 tab）：
+
+```go
+	env := buildinfo.EnvString()
+	dir, dirErr := resolveDataDir(env)
+	if dirErr != nil {
+		fail("data dir resolvable ("+env+")", dirErr.Error())
+	} else if err := probeWritable(dir); err != nil {
+		fail("data dir writable ("+env+")", dir+": "+err.Error())
+	} else {
+		pass("data dir writable ("+env+")", dir)
+	}
+```
+
+对比 `run.go:155`、`models.go:109`、`providers.go:80` 三处**同一个动作都被 `if …dataDir == ""` 包着**：
+`if s.dataDir == "" {`（`run.go:155`）、`if io_.dataDir == "" {`（`models.go:109`、`providers.go:80`）。
+⇒ **`doctor` 是唯一一枚"无论调用方注入什么都去解析落点"的生产入口**，
+而 `fail()` 在 `doctor.go:34-36` 里 `critical: true` ⇒ `cmdDoctor()` 返回 false ⇒ `main.go:88-89 os.Exit(1)`
+⇒ `scripts/build.ps1:163 if ($LASTEXITCODE -ne 0) { Fail 'wisp doctor reported FAIL.' }`。
+**这一条就是 §3/§4 里 (a) 支的全部风险来源。**
+
+`probeWritable`（`doctor.go:300-309`，行首 0 tab 起）确认会**真的建目录 + 写文件 + 删探针**：
+
+```go
+func probeWritable(dir string) error {
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return err
+	}
+	probe := filepath.Join(dir, "doctor-write-probe.tmp")
+```
+
+### 2.2 链 B｜类型化族（**不决定**落点分叉，因为它没那枚短路）
+
+```
+WISP_ENV -> [读点 R2] internal/buildinfo/env.go:35-40 ResolveEnv()   （严格校验：nonsense 直接报错）
+  +-> cmd/wisp/secret.go:184        -> :189 resolveSecretLayout(env)
+  |        :130 root, err := userConfigDir()      <== **无条件 OS 读，没有 test 早退**
+  |        :132 return … dataDirUnresolved128     拒
+  |        :148 root = proc.SealableRoot(root)
+  |        :155 return sessionLayout(env, root, exeDir)
+  |               :106 func sessionLayout -> :107 proc.LayoutFor(env, configRoot)
+  |                      （sessionLayout 的 :99-101 注释自陈 configRoot/exeDir 是**参数**，
+  |                        "so a test can point dev/test/prod at three temp dirs"）
+  +-> cmd/wisp/resident_windows.go:27 -> :33 proc.Boot(env)
+  |        internal/proc/boot_windows.go:64 枚举止检 -> :77 layout, err := DefaultLayout(env)
+  +-> cmd/wisp/slo_windows.go:238-240 [读点 R3] -> :243 ResolveEnv() -> :248 proc.Boot(env)
+
+[链 B 的公共尾] internal/proc/envfork.go:235 func DefaultLayout(env buildinfo.Env) (Layout, error) {
+        :236   dir, err := os.UserConfigDir()            <== OS 读**无条件执行**
+        :238   return Layout{}, fmt.Errorf("proc: user config dir: %w", err)
+        :245   l, err := LayoutFor(env, SealableRoot(dir))
+        :77-85 case buildinfo.EnvTest:  DataDir: TestDataDir(), MutexEnabled: false   <== 注进来的 root 被**丢掉**
+        :66-76 case buildinfo.EnvDev:   <root>\wisp-dev + `Local\wisp-dev-single-instance` + MutexEnabled: true
+        :57-65 case buildinfo.EnvProd:  <root>\wisp     + `Local\wisp-single-instance`  + MutexEnabled: true
+        :86-88 default:                 unknown env 报错
+```
+
+⇒ **一句话给下一位**：想找"env 把 OS 读短路掉"，只有 `doctor.go:256` 那一枚；
+`proc` 那侧的 `test` 分叉（`envfork.go:77`）**问了 OS 再丢答案**，属于"换落点不换腿"，
+它**不会**因为 (a) 变成装饰——它两形都真问 OS。这是两族最要紧的差别。
+
+### 2.3 链上还有第三枚"早退"，比 `test` 更早（别在裁定时漏了它）
+
+`cmd/wisp/doctor.go:248-255` 的 `portable.txt` 分支在 `:256` **之前** return。
+⇒ 若 self-hosted 那台机器上 `build\wisp.exe` 旁边落过一枚 `portable.txt`，
+`doctor` 连 `test` 短路都不会走到，直接答 `<exeDir>\data-dev`。
+`cmd/wisp/dataroot_128_test.go:76-83 assertNoPortableOverride128` 在**测试**里替这件事兜底
+（`:80` 的报错原文：`premise broke: a portable.txt sits next to the test binary (%s), so resolveDataDir takes the portable branch and never asks the OS for a config dir - these cases would assert nothing`），
+但 **`build.ps1:162` 那次 `wisp.exe doctor` 前没有任何东西检查 `build\` 里有没有 `portable.txt`**（现量：`grep -n 'portable' scripts/build.ps1` → 0 命中）。
+⇒ 这一条是 (a) 支的**第二个不可静态定的余量**，见 §3.4。
+
+### 2.4 §2 的枚数小结
+
+| 环节 | 枚数 | 名字 |
+|---|---|---|
+| 读 `WISP_ENV` 的生产码 | **3** | `buildinfo/env.go:36`、`buildinfo/buildinfo.go:38`、`slo_windows.go:238` |
+| `env == "test"` 型短路 | **2**（且**分属两族、语义不同**） | `doctor.go:256`（字符串族，**短路 OS 读**）、`proc/envfork.go:212`（类型化族，读的是 `WISP_TEST_DATA_DIR`，**不短路 OS 读**） |
+| 被短路掉的 OS 读 | 1 | `doctor.go:259 userConfigDir()` |
+| 无守卫的 `EnvString()` 消费者（CI 上真会走到） | **1** | `doctor.go:104-105` |
+| 有守卫的（测试注入即免疫） | 3 | `run.go:155/156`、`models.go:109/110`、`providers.go:80/81` |
+| 更早的一枚旁路早退 | 1 | `doctor.go:248-255` portable.txt |
+
