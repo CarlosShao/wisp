@@ -311,3 +311,38 @@ grep -c "t.Skip" cmd/wisp/dataroot_128_windows_test.go -> 0
 ②裁定 §9.2（`ci.yml` 那四枚 job 级 `WISP_ENV: test` 收不收）。两件事之外只差**非实现者的裁决表**，
 本程未翻 AC#4 那枚勾（票面 AC#4 仍是 `[ ]`，勾挂在编排者的对账动作上）。
 
+---
+
+## 10. 本程 commit 账 ＋ 更正记录 ＋ 临时件清单
+
+### 10.1 四枚 commit（各带显式 pathspec，逐枚 `git show --name-only` 现量只列自己的路径）
+
+| 节 | commit | `--name-only` 现量 |
+|---|---|---|
+| §0-§1（判定与两边读数） | `e4a4e9a` | `docs/evidence/s1/128-ac4-gates-and-ci-divergence.md` |
+| §3（那枚 `_test.go` 的前提修法） | `c2fa2e9` | `cmd/wisp/dataroot_128_test.go` |
+| §2/§4-§9（四数、门禁、票 123 尺、owner 目录、两栏计数） | `ef26704` | `docs/evidence/s1/128-ac4-gates-and-ci-divergence.md` |
+| 票面 Progress log 追加（未翻勾） | `c23d825` | `.scratch/wisp/issues/128-...-memory.md`（`git diff --numstat` = **1 增 0 删**） |
+
+**只 commit、未 push**；`git add` 全程只用显式路径；未用 `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；
+每次 commit 前看一眼 `git diff --cached --name-only`，**没有出现别人的路径**。
+
+### 10.2 结论修正记录（本文件自己的一处）
+
+§0 表里那行"收尾 HEAD = `b4e692e`"取的是 **17:17 那一刻**的读数，被当成交件收尾值写了；
+本文件真正的收尾两枚是 `ef26704`／`c23d825`（现量时刻 `17:36`）。**以 §10.1 那张表为准**，不要按 §0 那一行。
+
+### 10.3 临时件清单（一律只建不删，路径在此报备）
+
+| 路径 | 是什么 |
+|---|---|
+| `D:\tmp\t128-ci-logfailed.txt` | `gh run view 35967768017 --log-failed` 原文（2283 行，只含失败步） |
+| `D:\tmp\t128-ac4\owner-dirs-before.txt` / `owner-dirs-after.txt` | §7 两次数 |
+| `D:\tmp\t128-ac4\R1-before-local.log` / `R2-before-cienv.log` / `R3-after-cienv.log` / `R4-after-local.log` | 四发 `-count=2 -v` 全文（**四数与名册的可复算凭据**） |
+| `D:\tmp\t128-ac4\names-R*.txt` | 四发的去重名册（各 101 名，§4.1 的 `diff` 比的就是这四枚） |
+| `D:\tmp\t128-ac4\V-fix-cienv.log` | 改后在 CI 形下 `-run` 那五枚用例的定向复算 |
+| `D:\tmp\t128-ac4\d22scan-c94927d.log` / `d22scan-c2fa2e9.log` | 两枚纯净快照的 d22scan 全文（含正控制那步） |
+| `D:\tmp\t128-ac4\vet-native.log` | 本机 `go vet ./...` |
+| `D:\tmp\t128-ac4\snap-c94927d\` / `snap-c2fa2e9\` | `git archive` 出的两棵纯净快照（门禁读的就是它们） |
+| `D:\tmp\t128b\measure2.sh` | 本程第一版测量脚本，**未执行过**（改成逐条命令跑了）；留档，别把它当"跑过的仪器" |
+
