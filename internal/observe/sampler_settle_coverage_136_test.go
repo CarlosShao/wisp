@@ -140,8 +140,33 @@ func TestCheckSettleSingleTrustworthyReadReportsItsLoss(t *testing.T) {
 	if !strings.Contains(rep.LastSampleError, "settle probe: transient tree read failure") {
 		t.Fatalf("the report must carry the reason it dropped reads, got %q", rep.LastSampleError)
 	}
-	if !rep.Pass {
-		t.Fatalf("this leg pins disclosure, not the verdict; a covered-enough window must still pass: %+v", rep)
+	// AC#14 overturns what the next block used to pin. Until here this leg
+	// asserted "a covered-enough window must still pass", i.e. it required a
+	// 1-of-N window to say nothing about itself as a verdict. From AC#14 on the
+	// report's own sampling row is what has to speak: it fails on coverage and
+	// names sample_errors while failing. This shape is gate-independent (it
+	// holds for either value of settleCoverageRowGates), mirroring the AC#14
+	// rewrite of the half-covered leg below, so the flip that lands the gate
+	// does not change what this leg asserts.
+	var coverage *Verdict
+	for i := range rep.Verdicts {
+		if rep.Verdicts[i].Metric == "sampling" {
+			coverage = &rep.Verdicts[i]
+		}
+	}
+	if coverage == nil {
+		t.Fatalf("AC#14: a partially covered settle window must carry its own sampling verdict row, got verdicts=%+v", rep.Verdicts)
+	}
+	if coverage.Pass {
+		t.Fatalf("AC#14: this window dropped %d of %d reads and its own row says it measured enough: %+v", rep.SampleErrors, reads, *coverage)
+	}
+	if !strings.Contains(coverage.Measured, " errors") || !strings.Contains(coverage.Note, "sample_errors=") {
+		t.Fatalf(`AC#14: the failing row has to print the count it failed on, got measured=%q note=%q`, coverage.Measured, coverage.Note)
+	}
+	for _, v := range rep.Verdicts {
+		if v.Gate && !v.Pass && rep.Pass {
+			t.Fatalf("a failing gate row and pass=true at once: the fold rule is not applied, row=%+v report=%+v", v, rep)
+		}
 	}
 
 	wire := settleWire(t, rep)
@@ -277,8 +302,31 @@ func TestCheckSettleZeroFootprintDropsAreCountedToo(t *testing.T) {
 	if rep.LastSampleError != "read returned a zero private working set for a live tree" {
 		t.Fatalf("the settle side must use the reason the sampling side uses, got %q", rep.LastSampleError)
 	}
-	if !rep.Pass {
-		t.Fatalf("report=%+v", rep)
+	// AC#14 overturns what the next block used to pin (it required this
+	// zero-footprint-drops window to "still pass" without ever stating the
+	// loss as a verdict). The report's own sampling row is now what has to
+	// speak, and it names sample_errors while failing. Gate-independent, same
+	// shape as the half-covered leg: it holds for either value of
+	// settleCoverageRowGates.
+	var coverage *Verdict
+	for i := range rep.Verdicts {
+		if rep.Verdicts[i].Metric == "sampling" {
+			coverage = &rep.Verdicts[i]
+		}
+	}
+	if coverage == nil {
+		t.Fatalf("AC#14: a zero-footprint-drops settle window must carry its own sampling verdict row, got verdicts=%+v", rep.Verdicts)
+	}
+	if coverage.Pass {
+		t.Fatalf("AC#14: this window dropped %d of %d reads and its own row says it measured enough: %+v", rep.SampleErrors, reads, *coverage)
+	}
+	if !strings.Contains(coverage.Measured, " errors") || !strings.Contains(coverage.Note, "sample_errors=") {
+		t.Fatalf(`AC#14: the failing row has to print the count it failed on, got measured=%q note=%q`, coverage.Measured, coverage.Note)
+	}
+	for _, v := range rep.Verdicts {
+		if v.Gate && !v.Pass && rep.Pass {
+			t.Fatalf("a failing gate row and pass=true at once: the fold rule is not applied, row=%+v report=%+v", v, rep)
+		}
 	}
 	wire := settleWire(t, rep)
 	if got, ok := wire["sample_errors"]; !ok || got != float64(reads-1) {

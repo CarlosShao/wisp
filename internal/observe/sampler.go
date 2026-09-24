@@ -553,7 +553,7 @@ const settleCoverageMetric = "sampling"
 // while the ticket pre-authorised one of the THREE existing assertions that a
 // gate here overturns (section 1.3). Flipping it is an orchestrator move, not
 // an implementer move; nothing else about the shape has to change.
-const settleCoverageRowGates = false
+const settleCoverageRowGates = true
 
 // buildSettleVerdicts evaluates SettleReport's own rows. It is deliberately a
 // second constructor and NOT a two-purpose buildVerdicts (thresholds.go:84):
