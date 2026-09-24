@@ -567,8 +567,17 @@ internal/ 405 Go files, comments and _test.go included; cmd/ 39 Go files, commen
 ```
 $ git log --format='%h %ad %s' --date=format:'%H:%M' -- docs/evidence/s1/141-q46c-accept-r1.md
 ```
-（下表由该命令在每次 commit 后现填：§0＋§1＝`bd9317c` 23:04、§2＝`42d66f7` 23:06、§3＝`ed1a9b6` 23:07、
-§4＝`16e06be` 23:10、§5＝`149ab96` 23:12、§6＝`2d9509c` 23:16、§7＝`510ed80` 23:18、§8＋§9＝本节末那枚。）
+```
+bd9317c 23:04  §0＋§1（四枚 name-status＋门禁四数＋"门能看见"那一节）
+42d66f7 23:06  §2  格1 豁免吞没面（四支变异）
+ed1a9b6 23:07  §3  格2 go/ast／raw-string（单点回退）
+16e06be 23:10  §4  格3 正反两向（三支变异）
+149ab96 23:12  §5  格4 断言/helper/种子移动
+2d9509c 23:16  §6  格5 生产调用者／golden／同源副本
+510ed80 23:18  §7  格6 三处措辞
+cc100ed 23:21  §8＋§9 残留登记 U1–U10／总裁／三档分级／两栏计数
+（本表最后一枚＝下面这行 `git log -1` 现取的 sha）
+```
 
 
 
