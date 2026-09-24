@@ -741,4 +741,17 @@ docs/evidence/s1/137-ac3-r2-acceptance.md
 - 计数口径补一句：§6.1 第 2 族（skills 清单回显）**到本枚交回时已是第 6 次** ⇒ 那一条我按族给量级、不逐枚计数
   （逐枚计数只会造出一枚永远在漂的数，与本仓那条"计数字段别同时装真通知与注入"同源）。
 
+### 7.4 本节（§7）落在哪枚 commit——`git log --oneline -1` ＋ `git show --name-only HEAD` 原样
+
+```
+$ git log --oneline -1
+58701bc docs(137,AC#3 证据 §7): 交回前两条现场事实＋票面要的那次交叉核对做完＝无冲突
+$ git show --name-only HEAD | tail -2
+
+docs/evidence/s1/137-ac3-r2-acceptance.md
+```
+
+⇒ §7.3 那句"六枚 commit 序列"里最后一枚就是 `58701bc`；**携带这两行的这一枚**只能由读者自己一条命令核到：
+`git log --oneline -1 -- docs/evidence/s1/137-ac3-r2-acceptance.md`（写进正文就成了循环，与 `R-137` 那一族同口径）。
+
 
