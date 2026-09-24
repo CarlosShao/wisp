@@ -199,3 +199,100 @@ ancestor_separator_108_other_test.go:79: RemoveUnlinked("/r137link/…/root/link
 ```
 
 记名者＝自己种的那枚 ⇒ 新分支放行。⇒ 这条尺在普通形是**真被满足**而不是"永远不满足"（恒不满足＝`R-137-1` 那类坏尺）。
+
+## §3 AC#5 五组门禁（原文命令＋读数；对象＝有 `.go` 改动之后的本程工作树）
+
+工作树内容＝`6f3817a`（AC#2 那三枚 `*_test.go`）＋`7d73b5f`／`6fc7f3d`（本文件），生产码＝锚点版
+（`winsec_other.go` `b5056918…`、`winsec.go` `a6144c88…`，§0）。⚠ 在飞兄弟的地界本程未碰：
+`git diff --cached --name-only` 每枚提交只有我自己的路径，`internal/observe/**` 与 `cmd/wisp/**` 零字未动
+（`git status --porcelain` 全程只有那三枚 `internal/winsec/*_test.go` ＋那枚来源未明的未跟踪件——它未读、未提交、未改、未删）。
+
+### §3.1 `gofmt -l`
+
+- 仪器版本：`go version go1.27.1 windows/amd64`（与 `go.mod` 的 `toolchain go1.27.1` 同版）。
+- 整包（票面要求的那一枚）：`gofmt -l ./internal/winsec/` → **零行输出、rc=0**。
+- 顺手加一层全仓：`gofmt -l .` → **零行输出**。
+- 我这轮唯一动过的格式面就是那三枚文件；两枚被测文件在锚点上本来就干净，改完仍干净。
+
+### §3.2 `gofumpt -l`（版本写明）
+
+- 用的就是宿主**现成**那枚：`D:\work\base\gopath\bin\gofumpt.exe --version` → **`v0.12.0 (go1.27.1)`**。
+  ⚠ **没有跑** `go install mvdan.cc/gofumpt@latest`（那会把宿主工具升掉，是这仓刚记下的坑；票面 AC#5 那句"CI 装 `@latest`、版本没钉"我只如实记版本，不去动 CI 的那一步）。
+- `gofumpt -l ./internal/winsec/` → **零行输出、rc=0**；`gofumpt -l .`（全仓）→ **零行输出、rc=0**。
+
+### §3.3 `go vet` 双 GOOS（逐错误行归因，不整树 rc=1 就归给工具链）
+
+| 发 | 命令（逐字） | rc | 输出 |
+| --- | --- | --- | --- |
+| 宿主原生（windows＝GOOS 默认） | `go vet ./...` | **0** | 零行 |
+| 宿主交叉（linux）·整树 | `GOOS=linux GOARCH=amd64 go vet ./...` | 1 | **3 行**，只有 `cmd/wisp` 那一枚导入链 |
+| 宿主交叉（linux）·**逐包**（33 枚逐枚跑） | `GOOS=linux GOARCH=amd64 go vet ./<pkg>` ×33 | 31 枚 rc=0／**2 枚 rc=1** | 见下两条归因 |
+| 容器原生（linux，真类型读数） | `docker run … golang:1.27 go vet ./...`（`CGO_ENABLED=1`） | **0** | 零行 |
+
+- 逐包那一发的账本在 `/d/tmp/wisp137ac2-io/vet-linux-cross-perpkg.txt`（33 行，每行 `PKG=… RC=… OUTPUT_LINES=…`）：
+  **31 枚 rc=0 且逐枚 `OUTPUT_LINES=0`**（不是"没输出因为整树早退"，是每枚自己跑完的零输出）。
+- 两枚 rc=1 的归因，各追到 `file:line`／包约束本身：
+  1. `cmd/wisp`：`package github.com/CarlosShao/wisp/cmd/wisp` → `imports github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx`
+     → `imports github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files in
+     D:\work\base\gopath\pkg\mod\github.com\k2-fsa\sherpa-onnx-go-linux@v1.13.8`。
+     归因＝交叉编译时 `CGO_ENABLED=0`，那枚 linux+cgo 包的文件全被构建约束排除 ⇒ **不是本仓的类型破口**；
+     同一条导入链在容器原生那一发里 rc=0（`CGO_ENABLED=1` 实测打印为 1）。
+  2. `cmd/balldebug`：`package github.com/CarlosShao/wisp/cmd/balldebug: build constraints exclude all Go files in
+     D:\work\workspace\projects plans\Wisp\cmd\balldebug`。错误文本点到**自家仓库路径**，按纪律我没放过：
+     逐文件 `head -5 cmd/balldebug/*.go` 量到 `diff_windows.go`／`main.go`／`shot_windows.go` **三枚全带 `//go:build windows`**
+     ⇒ 这是一枚按设计只在 Windows 建的调试命令（票 07 的台件），GOOS=linux 下"无文件可建"是它自己的约束，不是回归。
+     它也不是本程改动碰到的包（`git diff --numstat f53ad5c HEAD` 零枚 `cmd/**`）。
+- ⚠ 一句给下游的口径：**整树那一发 rc=1 只报出 1 枚**（`cmd/wisp` 的链），`cmd/balldebug` 那枚要逐包才看得见 ⇒ "整树红＝只有一处"是错觉。
+  派单里那句"失效面只有两枚 cmd 包"在本程**逐包粒度复现成立**（第三枚 `cmd/llmrecord` 逐包 rc=0）。
+- 我这轮真正需要的类型读数在容器那一列：三枚改的文件都带 `//go:build !windows`，只有 Linux 原生 vet 会**看到它们**（rc=0）；
+  另外 §1.3 那八发每发读数前的 `go vet ./internal/winsec/` 也全 rc=0。
+
+### §3.4 `-count=2 -v` 两形四数（＋四数之外的名册差集）
+
+| 形·发 | RUN | 顶 PASS/FAIL/SKIP | 子 PASS/FAIL/SKIP | rc |
+| --- | --- | --- | --- | --- |
+| 普通 `work-plain-2`（`go test -count=2 -v ./internal/winsec/`，容器） | 104 | 60/0/0 | 44/0/0 | **0** |
+| 软链 `work-link-2`（同左，`TMPDIR` 在 `/r137link` 之后） | 90 | 40/14/6 | 22/8/0 | 1 |
+| 参照：普通 `work-plain-1`（`-count=1`） | 52 | 30/0/0 | 22/0/0 | 0 |
+| 参照：软链 `work-link-1`（`-count=1`） | 45 | 20/7/3 | 11/4/0 | 1 |
+
+- 四数＝每形那四个数（RUN／顶／子／rc），逐名另算：`-count=2` 两发都是 `-count=1` 的**整两遍**（104＝52×2、90＝45×2），
+  `parse.py` 的 `REPETITION_DRIFT=0`＝**没有任何一枚在两遍之间换色**；`RUN` 名册与 `-count=1` 逐名同集（普通 52 枚恒常、软链 45 枚恒常）。
+- **SKIP 逐名**：普通形两发恒 **0 枚**；软链形两发恒 **6＝3×2 枚**，名册只有票 125 那三枚自拒探针
+  （`…SeamProbeShapesAreBuiltOnAResolvedRoot125`／`…SeamGuardStillRefusesEveryHostileShape125`／`…SeamAcceptsTheHonestPOSIXAnswer125`）；
+  **分母 11 枚在两发里都不是 SKIP** ⇒ "判据变严之后这 11 枚由绿转 SKIP"这条退路被读数排除。
+- **FAIL 名册**：普通形两发全空；软链形两发恰是那 11 枚（§1.3 逐名表），**没有第 12 枚**。
+- ⚠ **与派单给的参照值对不上的是"标签"，不是数**（两边都留）：派单把 `52/17/13/0＋17/5/0、rc=1` 写成 AC#5 `-count=2` 普通形的参照值，
+  而这八字在终裁方自己那份证据里是 **§5④ 的 MUT-D·普通形** 读数（未变异的普通形基线是 `52/30/0/0＋22/0`，票 124 批次 3b 与终裁方十发都是这个数）。
+  我按两种读法都量了：**MUT-D·普通形**（`dorig-plain-1` 与 `dtight-plain-1`）实测 `52/17/13/0＋17/5/0、rc=1` ＝与参照值**逐数相同**，
+  且逐名 FAIL 名册两版相同、也与终裁方那句"与 MUT-AB·普通全同"相符；**未变异·普通形 `-count=2`** 是 `104/60/0/0＋44/0/0、rc=0`（＝基线整两遍）。
+  ⇒ 分歧只在"这八个字属于哪一发"，数值本身零处不一致。
+
+### §3.5 一次全仓仪器 `sh scripts/d22scan.sh`
+
+- 命令逐字（仓根，Git Bash）：`sh scripts/d22scan.sh` → **`D22_RC=0`**；日志 `/d/tmp/wisp137ac2-io/d22scan-worktree.txt`。
+- 步 1（种子违规阳性对照，走 `tools/d22scan/runtests.sh`，强制 `-count=1`）：
+  `runtests.sh: OK - packages=[./...] top-level: PASS=21 FAIL=0 SKIP=0, === RUN=31, '[no tests to run]'=0`
+  ⇒ 对照仍活着：这轮"clean"不是"仪器瞎了"。
+- 步 2（真扫）各 scope 工作量，与**同一台器在纯锚点树**（`tree-0`＝`git archive f53ad5c | tar -x`，未 overlay 任何东西）
+  上跑出来的那一发逐 scope 对点：
+
+  | scope | `tree-0`（纯锚点） | 工作树（AC#2 之后） | 差 |
+  | --- | --- | --- | --- |
+  | `bans #1-5 internal/` | 203 | 203 | 0 |
+  | `bans #1-5 cmd/` | 22 | 22 | 0 |
+  | `ban #6 frontend/` | 40 | **43** | **＋3** |
+  | `ban #7 internal/tools/` | 18 | 18 | 0 |
+  | `ban #8 design/` | 16 | 16 | 0 |
+  | `ban #8 frontend/` | 40 | **43** | **＋3** |
+  | `ban #8 internal/` | 404 | 404 | 0 |
+  | `ban #8 cmd/` | 39 | 39 | 0 |
+  | 合计（`internal/`＋`cmd/` 生产 Go） | 225 | 225 | 0 |
+
+  ⇒ **各 scope 一枚不降**（无一枚变小＝没有任何 scope 被静默清空）。两处 ＋3 归因到位（不是源码、不是任何人在飞的东西）：
+  `frontend/dist/index.html`、`frontend/dist/assets/index-CEH-Pz8P.css`、`frontend/dist/assets/index-UL9kYvYl.js`
+  ＝本机 `npm run build` 的遗留产物，`git check-ignore -v` 三枚逐枚判给 `frontend/.gitignore:12:dist/*`；
+  两侧的 `find frontend -type f` 差集里除这三枚外只剩 `frontend/node_modules/**`（扫描器不把它计入 text 工作量，故 43 而非数千）。
+  同一枚 ＋3 票 77 那程也量过（`docs/evidence/s1/ci-runner-readings-2026-09-21.md:228-245`），我这里独立重取、不引它的数当自己的数。
+- 扫描器自报的 clean 行原文（含逐 scope 的 live work 一串）在日志末行，未截。
+
