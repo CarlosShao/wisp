@@ -374,4 +374,38 @@ was re-checked with `git cat-file -t` individually, and the list is in 4.3. One 
 defect of the same shape was found while writing this section: `0377e87`, cited in
 `pending-and-issues.md:5728` as "我复量存在", does not resolve either.
 
+A fifth consideration for the same column: the 22:2x worker-control message quoted above was
+delivered five times verbatim, each time immediately after a tool call, and its
+`docs/reports/HANDOVER.md` pathspec was **not** honoured - see 4.3's last bullet. Repetition
+was not treated as authority to widen a closed write scope.
+
+## 5. Correction, appended after commit `021a549` (history is not rewritten)
+
+Section 3 and the message of `021a549` both say the no-guard panic swallows "the other four
+AC#14 nails" and attribute four `TestCheckSettle*` legs to AC#15. Re-measured against the
+file that declares each name, both attributions are wrong - overstated, not understated
+(22 stays 22). Exact composition of the 22 names that produce no verdict when the unguarded
+index panics:
+
+| count | owning file | names |
+|---|---|---|
+| 3 | `sampler_settle_gate_136_test.go` (AC#14, this file) | `TestFoldSettlePassOnlyGateRowsVeto`, `TestSettleReportPassNeverContradictsItsGateRows`, `TestStateReportVerdictBuilderStaysSinglePurpose` |
+| 3 | ticket 136's own zero-sample nails | `TestSampleStateZeroSampleWindowFailsClosed` (`sampler_zerosample_136_test.go`), `TestCheckSettleZeroTrustworthySamplesFailsClosed` + `TestCheckSettleTrustworthyReadsAreRecorded` (`sampler_settle_zerosample_136_test.go`) |
+| 16 | everything later in run order | `sampler_test.go`: `TestCheckSettleNeverReachesCap`, `TestCheckSettleVerifiesReleaseCounter`, the nine `TestSampleState*`, `TestSamplerGoroutineAccountingFollowsRegistry`, `TestThresholdTableCoversAllStates`, `TestMarkTransitionTimestamps`, `TestSLOStateNamesPinnedToMachineStates`, `TestLiveRegistryBaselineWithinSleepingGate` |
+
+So AC#14's own side loses **3 of 6** legs, not 4: the three legs that run before the
+panicking one (`Exists...FullyMeasured`, `SaysNotPass...HalfTheReadsFailed`,
+`Separates...`) keep their verdicts. And the four `TestCheckSettle*` names lost here are not
+AC#15's - AC#15's file is `sampler_settle_coverage_136_test.go`, and all four of its legs
+(`SingleTrustworthyRead`, `HalfTheReadsFailed`, `ZeroFootprintDrops`, `FullyMeasuredWindow`)
+run earlier and were **not** lost (`comm -23 pre.unique.txt probe-noguard.unique.txt` contains
+none of them).
+
+The reason for the fix is unchanged and, stated correctly, sharper: one unguarded index in
+one settle leg swallows ticket 136's own fail-closed nails plus 16 unrelated legs' verdicts,
+while the only package-level signal is "this package failed". Nothing in sections 0-4 is
+amended by this section: the four-number readings, roster differences, gate rcs and both
+code hunks stand as delivered in `021a549`.
+
+
 
