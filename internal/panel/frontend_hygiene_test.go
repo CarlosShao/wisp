@@ -61,9 +61,14 @@ var (
 	colourLitRe  = regexp.MustCompile(`#[0-9A-Fa-f]{3,8}\b|\brgba?\(`)
 	importFromRe = regexp.MustCompile(`(?:from|import)\s*\(?\s*["']([^"']+)["']`)
 	cssImportRe  = regexp.MustCompile(`@import\s+["']([^"']+)["']`)
-	// emojiRangesRe is tools/d22scan/main.go's emojiRe, copied verbatim so the
-	// two instruments cannot disagree about what a dingbat is.
-	emojiRangesRe = regexp.MustCompile(`[\x{1F000}-\x{1FAFF}\x{2600}-\x{27BF}\x{2B00}-\x{2BFF}\x{FE0F}\x{1F1E6}-\x{1F1FF}]`)
+	// emojiRangesRe is the character class of tools/d22scan/main.go's emojiRe,
+	// copied verbatim so the two instruments cannot disagree about *what a
+	// dingbat is*. Two axes are NOT shared, and this comment is the only place
+	// that says so: this copy has no comment exemption (the scanner blanks
+	// line-leading //, /*, * and <!-- since ticket 141), and this copy walks
+	// only frontend/src/*.{ts,tsx,css} while the scanner covers all of
+	// frontend/. So this test can be stricter than the gate, never wider.
+	emojiRangesRe = regexp.MustCompile(`[\x{1F000}-\x{1FAFF}\x{2200}-\x{22FF}\x{2600}-\x{27BF}\x{2B00}-\x{2BFF}\x{FE0F}\x{1F1E6}-\x{1F1FF}]`)
 	// panelDecisionIdentifierRe is tools/d22scan's ban #6 pattern (approval.decide).
 	panelDecisionIdentifierRe = regexp.MustCompile(`approval\.decide`)
 )
@@ -267,7 +272,7 @@ func TestFrontendHasNoEmoji(t *testing.T) {
 		}
 	}
 	if len(hits) > 0 {
-		t.Errorf("D23/ban #8 zero-emoji violated in frontend/ (ranges copied from tools/d22scan):\n  %s",
+		t.Errorf("D23/ban #8 zero-emoji violated in frontend/ (character class copied from tools/d22scan):\n  %s",
 			strings.Join(hits, "\n  "))
 	}
 	t.Logf("ban #8 self-armed: %d frontend files scanned, 0 emoji-range characters", len(files))
