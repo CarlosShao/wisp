@@ -186,6 +186,26 @@ Two secondary consequences do matter for AC#15:
    sampling windows. Reusing it as a prediction for the current tree would understate the rate; the
    denominator also now has 6 more cases in it, so the roster diff in section 5 is mandatory.
 
+The arithmetic behind those two numbers, spelled out because the obvious instrument gets it wrong twice:
+
+| file | windows per full-package shot | each | ms |
+|---|---|---|---|
+| `sampler_test.go` | 11 `SampleState`/`CheckSettle` calls (`:95 :134 :153 :168 :182 :203 :234 :273 :286 :307 :323`) | 30-120 | 750 |
+| `sampler_settle_coverage_136_test.go` | 4 (3 via `settleSUT` at `:124 :292 :342`, 1 inline at `:208`) | 100 | 400 |
+| `sampler_settle_zerosample_136_test.go` | 2 (`:54 :137`) | 100 | 200 |
+| `sampler_zerosample_136_test.go` | 2 (`:52 :146`) | 50, 60 | 110 |
+| `observer_cost_test.go` | 1 (`:75`) | 60 | 60 |
+| `sampler_faketree_guard_136_test.go` | 1 (`:101`) | 40 | 40 |
+| `sampler_settle_gate_136_test.go` | 7 (direct `:155 :199 :237 :238` plus 3 iterations of the loop calling `:322`) | 200 | 1400 |
+
+`ca2c55e` = everything except the last row = **1560 ms**. `HEAD` = all rows = **2960 ms**. Two traps in
+getting there mechanically, both hit while producing this table: (i) `grep -c "settleSUT(t,"` and the
+helper's own definition line both match the `CheckSettle(context...` text, so a naive sum double-counts
+each helper once (it inflates coverage by 100 ms and the gate file by 200 ms); (ii) `grep -c` counts
+*lines*, not *executions*, so the 3-iteration `scripts` loop at `:313-322` reads as one window instead of
+three. The naive pipeline yields 1660 / 2860; the corrected per-execution tally is 1560 / 2960. Quote the
+table, not the pipeline, and note that only the ratio matters for the conclusion.
+
 ---
 
 ## 3. The two dimensions, measured separately
@@ -270,7 +290,9 @@ fixture does:
 
 ## 4. Mechanism candidates, ranked, with the code that makes each possible
 
-Section 4 anchor: `git rev-parse HEAD` = `5889559b767586ab73dd859f0a5f00e208612f49`.
+Section 4 anchor: `git rev-parse HEAD` = `77eac9f` (my own section 3 commit; HEAD moves under this run
+because other agents are committing docs, which is why section 7 re-proves `internal/observe/` is
+byte-unchanged since section 1's `a1fd5bf` rather than trusting any single anchor).
 
 First, what the test does **not** do, because the answer decides the fix: it does not sleep, it does not
 poll, it does not use a channel with a timeout, and it does not call a sampler with a fixed interval it
@@ -338,6 +360,125 @@ single whole-package shot, so the two denominators should separate this candidat
 - Parity is not a cause: `:227` `if kept > lost+1 || lost > kept+1` cannot fire for `alternatingTree`
   (`:278-284`) at any read count, so the half-and-half property is fixture-guaranteed and only the
   *count* floors are live.
+
+---
+
+## 5. What the real measurement program must run (this census ran none of it)
+
+Section 5 anchor: `git rev-parse HEAD` = `10612382fa6dae71ddd0650d8ca7d09a71e47bb0` (this census's own
+section 4 commit). `internal/observe/` is byte-identical to section 1's anchor `a1fd5bf` throughout
+sections 3-5; proof command and re-read are in section 7.
+Preconditions the runner must satisfy and record before shot 1, not afterwards: the self-hosted runner is
+idle (`gh run list --limit 20` shows nothing in flight on this machine, and `slo-full` in particular is
+not running), `git rev-parse HEAD` recorded, `git diff <that anchor>..HEAD -- internal/observe/` empty at
+the end of every batch, and one pristine shot whose full `=== RUN` roster is saved as the golden roster.
+
+### 5.1 Denominator A - whole package, one process per shot
+
+```
+mkdir -p /tmp/ac15/A
+for i in $(seq 1 1440); do
+  go test ./internal/observe/ -v -count=1 > /tmp/ac15/A/shot-$(printf %04d $i).log 2>&1
+done
+```
+
+Rate A = (shots whose log contains the red sentence) / 1440, per shot, with:
+
+```
+grep -l "precondition broken: only [0-9]* reads taken" /tmp/ac15/A/shot-*.log | wc -l
+```
+
+One shot is one package process, so this is the denominator the historical `1 red in 240 whole-package
+-v runs` was measured on and it is the only one comparable to it.
+
+### 5.2 Denominator B - same process, repeats
+
+```
+go test ./internal/observe/ -run '^TestCheckSettleHalfTheReadsFailedReportsItsLoss$' -v -count=1200 \
+  > /tmp/ac15/B-target.log 2>&1
+go test ./internal/observe/ -run '^TestCheckSettle' -v -count=120 > /tmp/ac15/B-family.log 2>&1
+```
+
+Rate B = (occurrences of the red sentence) / (occurrences of `--- PASS` plus `--- FAIL` for that name),
+read out of the same log:
+
+```
+grep -c -- "--- FAIL: TestCheckSettleHalfTheReadsFailedReportsItsLoss" /tmp/ac15/B-target.log
+grep -c -- "--- PASS: TestCheckSettleHalfTheReadsFailedReportsItsLoss" /tmp/ac15/B-target.log
+```
+
+**A and B are two rates and must be written as two numbers. They are never added, never averaged, and
+never reported as one percentage** (AC#11 already pinned this, and the reason is physical here: B repeats
+the same case in one process, so its GC heap, timer heap and page-cache state at shot 500 are not the
+state of a fresh process at shot 1 - see C4 in section 4. B is the *mechanism* probe, A is the *rate*).
+The 100 ms window means B-target's 1200 shots cost about 2 minutes of sampling, which is why B is where
+the count is cheap; A is where the number is honest.
+
+### 5.3 How many shots is defensible for a 1-in-240 event
+
+`1/240` is a sighting, not a rate: with 1 hit in 240 shots the 95% interval is roughly 0.01% to 2.3%, so
+it is compatible with anything from 1/10000 to 1/44. Two different goals, two different n:
+
+- To **estimate** the rate to within a factor of about 2 you need at least 5 expected hits, i.e.
+  `n = 1200` shots of A, and the run must report the hit count with its interval, not a bare percentage.
+- To **prove the fix** in the sense of "no longer visible at the historical rate", use the rule of three:
+  after `k = 0` hits the 95% upper bound is `3/n`. `3/720 = 1/240` is exactly the historical value, so 720
+  buys nothing. The bound only clears the historical rate from below at `n > 720`; run **`n = 1440`** for
+  an upper bound of `0.21%`, i.e. strictly tighter than 1/240, and state it as a bound rather than as "0
+  hits so it is fixed".
+- AC#15 ④'s `>= 30 shots with 0 hits` is kept as the **entry ticket, not the verdict**: 30 clean shots only
+  bound p below 10%, which cannot separate "fixed" from "1/240 still sitting there". A submission that
+  brings 30 shots satisfies ④ literally and still fails ① and ② in substance, so the acceptance table
+  should demand ④'s 30 (both denominators, each batch's per-shot readings left in the evidence, named
+  individually) plus the 1440-shot A bound above.
+
+### 5.4 The roster set-difference, and why it is not optional
+
+A case that *panics* takes the test binary down with it, so every case scheduled after it emits no `RUN`
+and no `PASS` line at all: a shrunken denominator looks identical to a clean 0 hits. This package has
+measured experience with it: `internal/observe/sampler_test.go:330-335` records the pre-guard shape as
+"an empty `rep.Samples` panicked here, and the panic killed the test binary, so every case scheduled after
+this one stopped reporting at all (measured: 52 RUN / 47 PASS / 5 FAIL + panic, 4 cases swallowed)".
+So per shot, and against the golden roster:
+
+```
+grep -aoE '^=== RUN  +[^ ]+' $log | awk '{print $3}' | sort -u > /tmp/ac15/run.txt
+grep -aoE '^ *--- (PASS|FAIL): [^ ]+' $log | awk '{print $2, $3}' | sort -u > /tmp/ac15/res.txt
+comm -23 /tmp/ac15/run.txt /tmp/ac15/reported.txt   # ran but never reported: must be empty
+comm -13 /tmp/ac15/run.txt /tmp/ac15/golden-run.txt # in golden but never ran: must be empty
+grep -c -- '--- SKIP' $log                          # must be 0 (this repo: skip launders "untested" into "passed")
+```
+
+Both directions, every batch, plus the count of `--- FAIL` names compared against the historical red list
+so "0 hits" cannot be smuggled in as "the target case silently stopped existing".
+
+On "does any test in that package still index a slice without a length guard": yes, and not in the
+`Samples` path.
+
+- `internal/observe/sampler_test.go:340` `if rep.Samples[0].RuntimeGoroutines < 1 {` is guarded two lines
+  above at `:336` `if len(rep.Samples) == 0 {` - that is AC#8's fix, in place and correct.
+- `internal/observe/earlylog_130_test.go:130-135` (`recs := sink.snapshot()`, then `recs[1]`, `recs[0]`,
+  `recs[2]`) and `:232` (`got := sink.snapshot()[0]`) have **no length guard of their own** on
+  `recs`/`got`. They are safe today only transitively, via `flushed != 3` at `:123`, `len(got) != 3` at
+  `:127` and `flushed != 1` at `:229`, plus the fact that `msgs()` (`:57-59`) is built by ranging over
+  `snapshot()`. If `drain`'s contract ever diverges from the sink's contents these become panics, and they
+  sit in the same binary as the settle family, so they would eat the rest of the roster. Not a bug today;
+  described, not fixed, per this census's rules.
+- The one that matters for a mutation-based fix check:
+  `internal/observe/sampler_settle_gate_136_test.go:262`
+  `never := buildSettleVerdicts(SettleReport{})[0]` indexes the builder's result with no length guard. Any
+  mutation that makes `buildSettleVerdicts` return an empty slice turns that into a panic, which will show
+  up as a *shrunken roster*, not as a readable red. Whoever runs the fix must either expect that or read
+  the roster diff before concluding anything from those shots.
+
+### 5.5 Also required, because section 2 changed the exposure
+
+Re-run 5.1's A batch once on the pre-fix anchor (the commit before the fix lands) and once on the post-fix
+HEAD, both at `n = 1440`, and report the two bounds side by side. Comparing a post-fix number against the
+historical `1/240` alone is not a comparison: as recorded in section 2, the package's ticker-window budget
+per whole-package shot has roughly doubled since those 240 shots were counted (about 1560 ms then, about
+2960 ms now), so the pre-fix rate on the current tree is the only admissible baseline.
+
 
 
 
