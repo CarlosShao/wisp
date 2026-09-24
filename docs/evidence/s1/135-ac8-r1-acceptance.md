@@ -206,10 +206,53 @@ $ grep -c installLogSink cmd/wisp/probe135ac8leg.go        0        ← 第二�
 $ go list -f '{{range .TestGoFiles}}…' .  | grep -c probe135ac8     0        ← 本轮测试文件集里查无此件
 $ go list -f '{{.IgnoredGoFiles}}' .
   [console_other.go notify_other.go probe135ac8tag_test.go resident_other.go
-   secret_daroot_119b_test.go slo_other.go versioninfo_other.go]           ← 植物在 IgnoredGoFiles 里
+   secret_dataroot_119b_test.go slo_other.go versioninfo_other.go]           ← 植物在 IgnoredGoFiles 里
 ```
 
 ⇒ "这枚用例今天编不进去"不是本程从文件名后缀**推**出来的，是 `go list` **量**出来的：它在 `TestGoFiles` 里 0 命中、在 `IgnoredGoFiles` 里点名。这枚读数同时是本程 §4 那几发的**独立对照仪器**（它不属于被审的那把尺，也不是 go/parser 走源码）。
 
 〔独立复现〕§1 每一行都是本程自己跑的（仓外只读命令＋`go list`）。
 〔日志＋归档，抽验〕"两程各自引的哈希都对"这条的**对方那一侧**数字出自被审对象 §9 与编排者 log，本程只自证了 `sha1sum` 三向。
+
+---
+
+## §1.6 判据 ② 的静态面：新读数**没有**折回"只信 AST"（票面写死的那条不许走的路）
+
+这一节不需要读数，只需要把"它到底新在哪"盘清楚。`fa35557`（＝`M-G` 那一发的唯一一枚码改动）新增的函数**恰好五枚**：
+
+```
+$ diff <(grep -oE '^func …' oldgate.go|sort) <(grep -oE '^func …' c8967b8 那枚尺|sort) | grep '^>'
+> func (p *pkg133) runRosterDisclosure135
+> func (p *pkg133) runRosterReds135
+> func compiledRunRoster135
+> func flagValue135
+> func headRunes135
+```
+
+**它有没有开始"自己判断这一枚文件今天编不编"？** 没有——那正是票 133 与本票各裁过一次的"折回只信 AST"：
+
+```
+$ grep -nE 'go/build|build\.Context|MatchFile|Constraint|_linux|_windows|_aix|HasSuffix\(.*_test|runtime\.GOOS|goos133' <新尺> | grep -v '^\s*[0-9]*:\s*//'
+  438:  isTest := strings.HasSuffix(name, "_test.go")      ← 旧尺就有：只是"这是不是测试文件"，不是"今天编不编"
+  1748: if e.IsDir() || !strings.HasSuffix(name,".go") || strings.HasSuffix(name,"_test.go")   ← 旧尺就有
+  1912: func goos133() string { return runtime.GOOS }      ← 旧尺就有（oldgate.go 里 grep -c = 1）
+  1665 / 1688: 只出现在披露文案的 GOOS=%s 里               ← 用于**说话**，不用于**判**
+  1651: 红名句子文本里的 `_linux_test.go`/`//go:build`     ← 用于**给修法举例**，不用于判
+```
+
+⇒ 全尺**没有一处**对文件名后缀或 `//go:build` 表达式求值。新读数**唯一**的来源是一枚子进程：
+
+```
+1574  exe, err := os.Executable()
+1580  cmd := exec.CommandContext(ctx, exe, "-test.list", ".*")
+```
+
+⇒ **判据 ② 的静态面成立**：它不是"把 AST 教得更聪明"，是**多了一把独立的眼睛**。
+
+**两条旁证（本程自己找的，不是引用实现方的话）**：
+
+1. 全仓还有谁也写 `covered=` 这种账？`grep -rn 'covered=' --include=*.go --include=*.sh --include=*.ps1 .` 除 `leg_dispatch_gate_133_test.go` 之外**零命中** ⇒ 本格修的是**唯一一处**会印 `covered=test` 的地方，不是一堆平行账本里挑一枚。
+2. 那把尺的注释（`:1566-1569`）声称 `scripts/portable-tests.sh` 早就在读同一个对象。本程去核了**那句话指着的真文本**：`scripts/portable-tests.sh:30`（"re-verified against the compiled test binary for THIS platform via `go test -list`… bury it behind a build tag, and the entry goes stale and this step goes red"）、`:346`（`go test -list '.*' …`）、`:381`（逐名 `go test -list "^${name}\$"`）⇒ **注释引的是真行为，不是"预先引用尚未产出的读数"那一类假绿前身**。同一读数形状在仓里已有一枚步级用户，本格的修法与既有实践同形。
+
+〔独立复现〕本节每一行都是本程在归档树／`git show` 上自己量的。
+
