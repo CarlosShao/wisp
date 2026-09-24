@@ -153,3 +153,41 @@ grep -rnE "66-full-subset-slo-report|66-settle-1|evidence/s1/66" --include=*.go 
   **但**它们是证据归档、**无 `_test.go` 引用**（命令 7 末发 ⇒ 0 命中），故非 golden、给 `SettleReport` 加字段不会弄坏它们 ⇒ **结论不变、理由要换**（不能再说"都在 build/"）。
 - 简报/票面 `:14` 口径 `.gitignore:14` = `build/` —— **成立**（`.gitignore:14` 逐字 `build/`）。
 - 票面 `:325`／台账 `A180⑨(a)`："`SPEC-02 §3` 引用不成立、是不是另有契约在管＝未决普查" —— **本程即该普查的交付**，判定见 §2 表 C 行＋小结。
+
+## 4. 有没有"已裁过的账"与 AC#14 现判据互相矛盾
+
+单列一节，不塞进 §2 表。
+
+**(a) 没有任何文/spec 把 `wisp slo` 报告的 `pass` 语义定为"只由内存上限决定"。**
+命令 4/§3 的 pattern `pass.{0,12}(只能|仅|只由|only)…(内存|memory|rss|cap)` 扫 `PLAN.md`/`SLO.md`/`docs/specs/` ⇒ 0 命中。
+`pass` 的真值定义只在**生产码**：`internal/observe/sampler.go:190` `Pass bool // all Gate verdicts pass`（StateReport），
+`sampler.go:520` `rep.Pass = memOK && backInTime && releaseOK`（SettleReport，当前与"样本覆盖"无关）。
+⇒ AC#14 要给 settle 加"丢读数⇒自判不 pass"的门行，**不与任何文赋的 pass 契约冲突**（没有那样的文）。
+
+**(b) 真正的矛盾不在"文档 vs AC#14"，在"AC#12 已提交的用例 vs AC#14 方向"，且已被票面预授权。**
+`internal/observe/sampler_settle_coverage_136_test.go:209` 逐字要求"半窗丢读数那一形**仍然 pass**"：
+> `t.Fatalf("disclosure leg, not a verdict leg: this window still passes, report=%+v", rep)`
+
+其注释 `:26` 亦写"changing that verdict is not this cell's job"。这与 AC#14 判据① 要的方向**正相反**
+（AC#14 要这一形由门行**自己说不 pass**）。**但这一处不是本普查要新报的矛盾**——票面 AC#14 `>` 第③条
+（`.scratch/wisp/issues/136-…md:286-287`）已把它挑明：AC#14 判据② 要推翻的正是 `:208-210` 那断言，
+并**预先授权实现程改它**、规定 AC#14 先、AC#15 后。**账已在此，无需另裁。**
+
+**(c) 归档证据报告 vs 新 schema 的"形状漂移"——不是矛盾。**
+`docs/evidence/s1/66/66-full-subset-slo-report.json`、`66-settle-1.json` 内嵌的是票 66 当时的 `SettleReport`
+（字段比今天少）。它们是**只追加不删的证据归档**、无 `_test.go` 拿它们当 golden diff（§3 命令 7）⇒
+AC#14 加字段不会与它们冲突，它们是历史读数快照、非受检契约。
+
+## next=
+
+编排者下一步：把本普查（§2 表＋§3 否定射程）并入票 136 AC#14 的停手线裁定——**"除 `SPEC-02 §3` 外是否另有契约管出线"这一未决档可以销账为"无文赋契约射程"**，
+但"要不要把门行做成 `Gate:true`"仍按票面 AC#14 `>` 第②条那枚**真取样读数**（先量 `wisp slo -settle` 的 `sample_errors` ≥5 次）走人工判断，不由本程代答。
+
+---
+
+### 附：本程 commit 序列（渐进写）
+
+- §0–1 起手：`9b9607a`
+- §2 判定表：`8fff95f`
+- §3 否定射程：`b523fbb`
+- §4＋next：见本枚 commit（`git log --oneline -1` 与 `git show --name-only HEAD` 原样贴下）
