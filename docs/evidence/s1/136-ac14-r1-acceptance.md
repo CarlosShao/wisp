@@ -239,3 +239,72 @@ S1＝本程 §2 的翻布尔（红 2，站点 `coverage:144`／`coverage:281`）
 **正向对照**那一发本程未单独重跑，它就是 §1 在跟踪树（＝`aef82f5` 同码）上取的 **142/142/0/0**——
 形状同一（未改动的码 ⇒ 全绿），本程以此为准，**不另立一发冒充独立复现**。
 
+**§4 的 commit 回显**：
+
+```
+$ git log --oneline -1
+24ab73f accept(136 AC#14 r1 §4): 承重判定五发变异（M1 红4/M2 红2/M3a 全绿/M3a′gate=true 红3/M4 摘红句点名 红2），逐站点同，A182⑧ 预挡的误判未犯
+$ git show --name-only HEAD
+docs/evidence/s1/136-ac14-r1-acceptance.md
+```
+
+---
+
+## §5 判据⑤ 门禁与格式 —— 〔独立复现〕**成立**（未放宽、未转 Skip、未动阈值/golden）
+
+工具链本程盘上现量：`go version go1.27.1 windows/amd64`；
+`"$(go env GOPATH)/bin/gofumpt.exe" -version` ⇒ **`v0.12.0 (go1.27.1)`**
+⇒ **简报写的"盘上现量 v0.12.0"对上；票面/旧报告里的 v0.7.0 确为过期值**（本程不引任何人的转述版本号）。
+
+| 门 | 命令（本程自己跑） | 读数 |
+| --- | --- | --- |
+| gofmt | `gofmt -l internal/observe` ＋ 三枚显式路径单列 | **空输出，rc=0** |
+| gofumpt | `gofumpt -l internal/observe` ＋ 三枚显式路径单列 | **空输出，rc=0** |
+| vet | `go vet ./internal/observe/` | **rc=0** |
+| 构建 | `go build ./...`（`snap-post`／`snap-gate`／五发变异树各自） | **全 rc=0** |
+| d22scan | `git archive` 仓外纯净快照上 `sh scripts/d22scan.sh`：`snap-pre`＝`ca2c55e`、`snap-post`＝`aef82f5` | **两发各 rc=0** |
+
+**八 scope 命中数（本程从 d22scan 自己的 "live scope work" 行逐字取，不抄任何表）**
+
+| scope | `ca2c55e`（改前） | `aef82f5`（改后） | 判 |
+| --- | --- | --- | --- |
+| bans #1-5 `internal/` | 203 | 203 | 不降 |
+| bans #1-5 `cmd/` | 22 | 22 | 不降 |
+| ban #6 `frontend/` | 40 | 40 | 不降 |
+| ban #7 `internal/tools/` | 18 | 18 | 不降 |
+| ban #8 `design/` | 16 | 16 | 不降 |
+| ban #8 `frontend/` | 40 | 40 | 不降 |
+| ban #8 `internal/` | **404** | **405** | ＋1＝新增那枚 `_test.go`，**不降** |
+| ban #8 `cmd/` | 39 | 39 | 不降 |
+
+正对照（同两发日志内）：`runtests.sh: OK - packages=[./...] top-level: PASS=21 FAIL=0 SKIP=0, === RUN=31, '[no tests to run]'=0` ⇒ 两发同值。
+台账口径出处本程也现量了：`docs/reports/pending-and-issues.md`（量于 `ddbd3a1`）**`:3922`** 记
+"台账八 scope `203/22/40/18/16/40/390/37` 逐格不降"——后两格（390/37）**低于**本程今量值（404→405/39），
+即台账那一份是**当天更早的锚**、方向仍是涨不是降。⚠ 因此"不降"这一判**必须连锚一起引**：
+本程用的是**同一把尺的两枚相邻快照**（`ca2c55e` → `aef82f5`），不是"跟任意历史值比"。
+
+**"不许为了变绿放宽断言／改成 Skip／动阈值·golden"这一维，本程逐条量过（不是采信自述）**：
+
+| 检查 | 读数 |
+| --- | --- |
+| 新增 `t.Skip` | `git diff ca2c55e..aef82f5 -- internal/observe/ \| grep -c "^+.*t\.Skip"` ⇒ **0**；三枚路径全文 `t.Skip` ⇒ **0/0/0** |
+| 名册里转 SKIP | §1/§2/§4 九发日志 `^--- SKIP` ⇒ **全 0** |
+| `thresholds.go` | `git diff --stat ca2c55e..aef82f5 -- internal/observe/thresholds.go` ⇒ **空** |
+| 冻结面（`cmd/wisp`、`frontend`、`scripts`、`.github`、`docs/PLAN.md`、`docs/specs`、`internal/risk`、`tools/d22scan`） | 同一条 `--stat` 一次问八枚路径 ⇒ **全空** |
+| 被改的那枚断言（`:208-210`）是放宽还是收紧 | `git diff -U2` ⇒ 该文件**只有一枚 hunk `@@ -206,6 +206,34 @@`**；删的是 `if !rep.Pass { t.Fatalf("…this window still passes…") }` 两行，加的是四道**更强**的钉（行必须存在／行必须自己 `Pass==false`／红句必须含 `sample_errors=`／"失败 gate 行与 `pass=true` 并存"必须永不出现在同一枚报告里）＋ 8 段说明注释 ⇒ **收紧，不是放宽** |
+| `ca2c55e..aef82f5` 整仓 `--stat` 落在 `internal/observe/` 的路径 | **恰 3 枚**（`git diff --numstat`：`sampler.go` **＋77/−2**、`sampler_settle_coverage_136_test.go` **＋30/−2**、`sampler_settle_gate_136_test.go` **＋349/−0**）⇒ 与 `git show --numstat aef82f5` 逐枚同、与 `git show --name-only aef82f5` 的三枚路径一致，无第 4 枚；也与 `A182①` 的"77 增 2 删／30 增 2 删／349 增 0 删"对上 |
+
+**emoji／卫生那一维的一处自述不成立（不属门禁失败，属自述不准）**：实现件 §3 写"新码与新测试文件的注释**逐字 ASCII**"。
+本程现量：`sampler.go` 新增段（`:455-612`）非 ASCII 行 **0** ✓；但新文件
+`sampler_settle_gate_136_test.go:152` 注释含中文词 **`同形`**（非 ASCII）。
+⇒ **这句自述不成立**。要紧的是它**不破任何门**：`同形` 落在 CJK 段，不在 `AGENTS.md §1.2` 禁的
+`U+2190–U+2BFF`／`U+1F300–U+1FAFF`／`U+FE0F` 里，且 `ban #8 internal/` 405 枚文件 rc=0 ＝ **外部读数背书**。
+登记为**自述精度缺陷**，不构成退回理由。
+
+**争用与机时**：本程**没有取任何一发 `wisp slo -settle` 真取样读数**（五条判据都不要求），
+⇒ `scripts/slo-check.ps1` 那份 15 枚争用名单（本程现量：**块在 `:153-155`，不是简报与 `A182⑦` 写的 `:155-157`**；
+枚数 **15 枚**逐名对上：`go`/`gofmt`/`cgo`/`compile`/`asm`/`link` ＋ `gcc`/`g++`/`cc1`/`cc1plus`/`as`/`ld` ＋ `wisp`/`wisp-cli`/`staticcheck`；
+`slo-check.ps1` 的 `git log -1` ＝ **`decb7b9`（Wed Sep 23 13:51:05 2026）**，即那处行号偏差**不是漂移、是引错**）
+对本程不构成取数约束。**反向账本程如实交**：本程在 `19:3x–20:0x` 于这台 6C12T 上跑了 9 发整包 `go test` ＋ 6 发 `go build ./...`
+⇒ **同一时间窗内别的程在这台机取真数，那些数按 `slo-check.ps1:153` 的口径应判"无效样"**（与实现件 §6-4 同一条口径）。
+
