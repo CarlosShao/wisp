@@ -243,3 +243,49 @@ fixture 全部落在冻结 Sleeping cap（25MB）之下，释放腿（`released=
 ### 2.7 一处自纠（append-only，不回改已提交的断言）
 
 `f53ad5c` 里腿 2 把"取到几枚"和"丢了几枚要数出来"合写成一条 `if kept < 2 || lost < 2 { t.Fatalf("precondition broken: …") }`。MD 那一发实测把它判红在合写跳上、消息写成 `precondition broken: kept=5 lost=0 of 10 reads`——**归因含糊**（丢读数没被数到是本腿的本题，不是前提）。`c03aee3` 拆成 `reads<4`（计时前提）／`kept<2`（fixture 前提）／`lost<2`（性质，红点带 `must report its losses`）三跳，断言强度只增不减（MD 复跑因此红点从 `:192` 移到 `:197`，见 §2.4）。生产码未动、阈值未动。第一次 MD 的读数（`tree2`，`rc=1 / 65 / 63 / 2`，红名两枚同名同因）留档 `/d/tmp/wisp136ac1213-tree2-MD-v.txt`，不进结论。
+
+---
+
+## §3 谁在消费 `SettleReport`（加字段会改出线形状 ⇒ 这条不默认"无影响"）
+
+全仓 `grep -rn "SettleReport"`（含 `.go`／`.ps1`／`.sh`／`.md`）命中**非证据**文件只有四处，逐处盘：
+
+| 消费者 | 怎么用 | 加字段会不会让它读不到旧字段 | 我的凭据 |
+| --- | --- | --- | --- |
+| `cmd/wisp/slo_windows.go:118` `Settle *observe.SettleReport json:"settle,omitempty"` | 生产侧**序列化**（`writeSLO` 用 `json.MarshalIndent`） | 否：只**增** key | §2.1 的 key 全清点：改前 11 枚、改后同样 11 枚 ＋ `sample_errors` ＋ `last_sample_error`，**无改名、无删除**（两串原文都在 §2.1 表里） |
+| `cmd/wisp/slo_windows.go:287` `run.Pass = run.Settle.Pass` | 只读 `.Pass` | 否 | 同一枚字段未动（本程 `sampler.go` 的 hunk 不含 `Pass` 的语义行；出线里 `"pass"` 仍在，§2.1 探针两形都打到 `pass=true`） |
+| `cmd/wisp/slo_windows.go:523-534`（`collectReport`，subject 模式把自己的报告**反序列化**回来） | `json.Unmarshal(data, &rep)` 进同一个 `sloRun` 类型 | 否：同版同类型；且 `encoding/json` 默认忽略未知 key、缺 key 留零值 | `git grep -n DisallowUnknownFields` 全仓只有 `internal/config/parse.go:72/:123`（配置解析面），slo 这条链上**没有**严格解析器 |
+| `scripts/slo-check.ps1:348-355` | `ConvertFrom-Json` 后只取 `$settleReport.pass` 与 `$settleReport.settle.free_os_memory_count` | 否：两枚都还是原 key | 上面那段脚本原文（`:341-361`）逐字读过；`git grep -n "\.settle" -- scripts/ frontend/ tools/` 只命中 `:353` 这一行 |
+
+再往外补三刀（派单没点名，但"下游"不能只问 Go 侧）：
+
+- **golden／阈值面**：`git grep -ln "back_within_cap_ms|free_os_memory_requested|free_os_memory_count"` 的 tracked 命中只有 `docs/SLO.md`（那句是**一次 run 的读数叙述**——`settle 行本次实测：peak 126.5MB → 回 cap(25MB) 261ms、free_os_memory_count=2、pass=true`——不是 schema 清单）、`docs/evidence/s1/66/66-settle-1.json` 与 `66-full-subset-slo-report.json`（票 66 归档的**报告原件**；`git grep -n "66-settle-1|66-full-subset"` 显示没有任何仪器读它，命中的是票面叙述与 `docs/SLO.md` 的重跑命令），加本程自己那两枚 `_test.go`。⇒ **没有任何用例或脚本拿旧 settle 报告当期望值比对**，本程因此未动 golden、未动 `slo-check.ps1`（判据⑤）。
+- **`scripts/slo-freshness.sh`**：它的 `--jq` 全在 GitHub API 响应上（`.workflow_runs[]`／`.jobs[]`／`.artifacts[]`，`:221/:231/:312`），不解析报告内容 ⇒ 不受影响。
+- **前端**：`git grep -n settle -- frontend/` 只命中 `frontend/src/components/ai-native/thinking.tsx` 的英文散文（"then settles"，讲动画），不是数据字段。
+- **`cmd/wisp` 的测试**：`grep -rn "Settle\|settle" cmd/wisp/*_test.go` **无输出** ⇒ 没有第二枚仪器对 settle 形状有断言（也意味着：这一族目前没有 cmd 侧的钉，那是 AC#10 的账）。
+
+**必须留的一条副作用（不粉饰）**：`json.Unmarshal` 对**缺 key** 给零值 ⇒ 拿这份改动后的二进制去读**改前**留下的 settle 报告（例如重放 `docs/evidence/s1/66/66-settle-1.json`），`SampleErrors` 会读成 0、`LastSampleError` 空——"看不出丢过"会被读成"没丢过"。今天没有这条路径（`collectReport` 读的是同一次 run 里同一版二进制写的文件；`slo-check.ps1` 不读这两个 key），但它是"字段是后加的"这件事的真实边界，登记为 §5-adjacent 的一条已知限制，不靠"应该没人这么读"糊过去。
+
+**另一条如实观察（本程未动、也不该本程动）**：`cmd/wisp/slo_windows.go:621-623` 在 `CheckSettle` 报错时造一枚合成的失败报告 `&observe.SettleReport{TargetState: …, Pass: false}`——它的 `sample_errors` 是 0，含义是"根本没测"，不是"零丢失"。那一形 `pass=false` 已经挡掉静默绿，且落点在 `cmd/wisp`（票 133/AC#10 地界）⇒ 只登记，不改。
+
+---
+
+## §4 门禁原文（两格各一套；每套都跑在该格自己的纯净快照树上）
+
+`AC#13` 的门禁面＝`tree1`（`git archive f4c7062`）；`AC#12` 的门禁面＝`tree2b`（`git archive c03aee3`）。工具链同一把尺：`go version go1.27.1 windows/amd64`、`/d/work/base/gopath/bin/gofumpt.exe --version` ＝ `v0.12.0 (go1.27.1)`，**全程未 `go install` 任何东西**。
+
+| 门禁 | AC#13（tree1＝`f4c7062`） | AC#12（tree2b＝`c03aee3`） |
+| --- | --- | --- |
+| `gofmt -l internal/observe/` | 无输出 | 无输出 |
+| `gofumpt -l internal/observe/` | 无输出（版本原文 `v0.12.0 (go1.27.1)`；⚠ CI 那一步是 `@latest` 未钉版本 ⇒ 本读数只在该二进制未被改版时有效） | 无输出（同版本、同边界） |
+| `go vet ./internal/observe/`（原生） | rc=0 | rc=0 |
+| `GOOS=linux go vet ./internal/observe/` | rc=0 | rc=0 |
+| `go vet ./...`（原生整树） | rc=0，输出 **0 行** | rc=0，输出 **0 行** |
+| `GOOS=linux go vet ./...`（整树交叉） | **rc=1，输出 3 行、一条诊断**：`package github.com/CarlosShao/wisp/cmd/wisp → imports github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx → imports github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files in D:\work\base\gopath\pkg\mod\github.com\k2-fsa\sherpa-onnx-go-linux@v1.13.8` | 同一形（3 行、一条诊断，逐字同） |
+| 上面那条的逐错误归因（**不整树归因成"工具链假象"**） | 该诊断不含任何本仓 `file:line`，是**外部模块** `sherpa-onnx-go-linux@v1.13.8` 的 build constraint；把它点名的包剔掉后 `GOOS=linux go vet $(除 cmd/wisp)` **rc=1**、只剩一条 `package …/cmd/balldebug: build constraints exclude all Go files in D:\tmp\wisp136ac1213-tree1\cmd\balldebug`（我方树内文件，`cmd/balldebug` 在无 CGO/无 linux 形下没有可编文件）；再剔掉这两枚 ⇒ `go list ./...`=**33**、剔后 **31/31 枚非 cmd 包零输出 rc=0**（输出文件 0 字节） | 同结构：整树 3 行一条诊断；剔 `cmd/wisp` ⇒ 只剩 `cmd/balldebug` 那一条；剔两枚 cmd ⇒ **31/31 零输出 rc=0**（0 字节）。⚠ 与终裁方 §5.3 那句"30/30"差一枚：两枚锚点 `git ls-tree cmd/` 都是 `balldebug`/`llmrecord`/`wisp` 三枚、`go list ./...` 都是 33，差异只在**剔几枚 cmd**，不在包集合；本程按自己点名的两枚（授权失效面＝`cmd/wisp`、`cmd/balldebug`）报 31/31，不据此判谁错 |
+| `go test -count=2 -v ./internal/observe/` 四数（**只从 `-v` 量**） | 第一发 `rc=1 / RUN=122 / PASS=121 / FAIL=1 / SKIP=0`，红名 `TestNoopTaskReturnsToBaseline`（`goroutine_test.go:29: live count mid-task = 2, want 3`，票面 AC#11 那枚既有 flake，见 §1.6）；第二发 `rc=0 / 122 / 122 / 0 / SKIP=0` | `rc=0 / RUN=130 / PASS=130 / FAIL=0 / SKIP=0 / panic=0`（该发未命中 flake） |
+| `-count=2` 的**逐名差集**（四数之外必比的那件） | 基线（`45c8d1c`＝tree0）58 枚 → tree1 去重名册 61 枚，`diff` 只多出本程 3 枚（逐名见 §1.3），**无改名、无消失、无转 SKIP**；`-count=2` 去重后与 `-count=1` 名册逐字相同 | tree1 的 61 枚 → tree2b 的 65 枚，`diff` 只多出本程 4 枚（§2.5 逐名），`-count=2` 去重名册 65 枚与 `-count=1` **逐名相同**（`NAMES-IDENTICAL-vs-count1`） |
+| 每一发的 `SKIP` 计数 | 本程 AC#13 全部读数（基线／探针／MA／AB／还原／`-count=2`×2 共 **7 发**）`--- SKIP` 计数**逐发为 0**；包内 `t.Skip` 出现次数仍只在 `sampler_test.go:313` 那句注释里（"never t.Skip, never a silent return"） | 本程 AC#12 全部读数（基线／探针×2 树／MD／ME／MF／MC／还原／`-count=2` 共 **9 发**）`--- SKIP` 计数**逐发为 0**、`^panic` 命中 0 |
+| `sh scripts/d22scan.sh`（各 scope 不降） | 两形 rc=0；`ban #8 internal/` 由 tree0（`45c8d1c`）的 **402** → tree1 的 **403**＝本程那枚新 `_test.go`；其余 scope 逐字同数（`#1-5 internal/=203`、`cmd/=22`、`#6 frontend/=40`、`#7 internal/tools/=18`、`#8 design/=16`、`#8 frontend/=40`、`#8 cmd/=39`）；`d22scan: clean`，step-1 `runtests.sh: OK … PASS=21 FAIL=0 SKIP=0, === RUN=31, '[no tests to run]'=0` | 两形 rc=0；同一比对继续走到 tree2b 的 **404**（＋本程第二枚新 `_test.go`），**无任何 scope 下降**（其余数字同上，逐字未动） |
+
+两枚 sha 都在写这行之前重新核过（`git cat-file -t f4c7062`／`git cat-file -t c03aee3` 均 `commit`；前者是本程 AC#13 的 commit、后者是 AC#12 的 commit）。本文件**没有**任何未经 `git cat-file -t` 现核的外来 sha；所有快照只从 `45c8d1c` 或我自己那三枚 commit 抽。
