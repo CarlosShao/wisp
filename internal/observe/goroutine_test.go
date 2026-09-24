@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"runtime"
+	"sync"
 	"testing"
 	"time"
 )
@@ -11,26 +12,68 @@ import (
 // TestNoopTaskReturnsToBaseline is the SPEC-01 §7 registry assertion: after
 // boot plus one no-op task, the goroutine count returns to the resident
 // baseline with a tolerance of 1.
+//
+// Ticket 136 AC#11 (was an ever-green-by-luck read): Registry.Spawn registers
+// the key synchronously, but the two legs whose bodies were empty returned
+// immediately, so their deferred unregistration could land BEFORE the mid-task
+// reads. Measured on the pre-fix tree: 33 of 500 replays of that read window
+// saw fewer than 3 per-task legs (tool-exec-noop missing in 31 of the 33,
+// approval-waiter in 9, agent-task-noop in 0). The missing edge is now waited
+// for with a judgment (each leg reports entering its goroutine and stays
+// inside it until the count has been read) under a monotonic timeout bound;
+// no sleep is used to paper over the window and no threshold moved.
 func TestNoopTaskReturnsToBaseline(t *testing.T) {
 	reg := NewRegistry()
 	before := runtime.NumGoroutine()
 
 	root := NewRoot("task-noop")
 	taskRan := make(chan struct{})
+	entered := make(chan string, 3)
+	release := make(chan struct{})
+	var stopOnce sync.Once
+	stop := func() { stopOnce.Do(func() { close(release) }) }
+	defer stop() // failure paths must not leave the 3 legs holding a goroutine
+
+	// hold waits until the test releases it, so a leg that has announced
+	// itself cannot retire during the counting window.
+	hold := func(name string) func(context.Context) {
+		return func(ctx context.Context) {
+			entered <- name
+			<-release
+		}
+	}
 	reg.Spawn("agent-task-noop", "test", root, func(ctx context.Context) {
+		entered <- "agent-task-noop"
 		time.Sleep(5 * time.Millisecond)
 		close(taskRan)
+		<-release
 	})
-	reg.Spawn("tool-exec-noop", "test", root, func(ctx context.Context) {})
-	reg.Spawn("approval-waiter", "test", root, func(ctx context.Context) {})
+	reg.Spawn("tool-exec-noop", "test", root, hold("tool-exec-noop"))
+	reg.Spawn("approval-waiter", "test", root, hold("approval-waiter"))
+
+	// Poll to the condition instead of racing it: all 3 legs have entered and
+	// the registry counts them. Bounded; on timeout the reads below report
+	// exactly what was seen rather than a bare count.
+	tm := NewTimeout(2 * time.Second)
+	seen := make([]string, 0, 3)
+	for (len(seen) < 3 || reg.Count() != 3) && !tm.Expired() {
+		select {
+		case n := <-entered:
+			seen = append(seen, n)
+		case <-time.After(2 * time.Millisecond):
+		}
+	}
+	if len(seen) != 3 {
+		t.Fatalf("mid-task legs entered = %v after %v, want all 3", seen, tm.Budget())
+	}
 
 	// While the task runs, the registry must see its 3 per-task goroutines.
 	if got := reg.Count(); got != 3 {
-		t.Fatalf("live count mid-task = %d, want 3", got)
+		t.Fatalf("live count mid-task = %d, want 3 (live=%v)", got, reg.Snapshot())
 	}
 	rep := reg.RosterReport()
 	if rep.PerTask != 3 {
-		t.Fatalf("PerTask mid-task = %d, want 3", rep.PerTask)
+		t.Fatalf("PerTask mid-task = %d, want 3 (live=%v)", rep.PerTask, reg.Snapshot())
 	}
 	select {
 	case <-taskRan:
@@ -38,7 +81,9 @@ func TestNoopTaskReturnsToBaseline(t *testing.T) {
 		t.Fatal("no-op task fn never ran")
 	}
 
-	// Task completion = all derived goroutines drained (D38c).
+	// Task completion = all derived goroutines drained (D38c). The held legs
+	// are released first; the join below is what proves they drained.
+	stop()
 	if p := root.Wait(3 * time.Second); p != 0 {
 		t.Fatalf("root still has %d pending after task completion", p)
 	}
