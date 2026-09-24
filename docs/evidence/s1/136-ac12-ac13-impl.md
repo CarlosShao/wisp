@@ -133,3 +133,113 @@ panic: runtime error: index out of range [-1] [recovered, repanicked]
 ### 1.6 与 AC#11 分开（派单明令：本格不碰 flake）
 
 本程在 `-count=2 -v` 门禁那一发**命中既有 flake 一枚**：`TestNoopTaskReturnsToBaseline` 红在 `goroutine_test.go:29: live count mid-task = 2, want 3`（第二发 `-count=2` 复跑 `rc=0 / 122 / 122 / 0 / SKIP=0`）。**未修、未 Skip、未调阈值**（那是 AC#11 的账，判据要求 ≥20 发复现率，本程不做）。两处如实登记：①票面 AC#11 记的红点是 `goroutine_test.go:33`（`PerTask mid-task`），本程命中的是同一枚用例里前一跳的 `:29`（`live count mid-task`，`reg.Count()`）——**同函数两跳、缺的都是同一个 happens-before**，不改判、只记差异；②本格所有三态都判在"红名是本程仪器"的读数上，两态复绿那两发 `SKIP=0`、`panic=0`。
+
+（补记，写于 §2 之后、不改上面原文：AC#12 的 MD 变异那一发里同一枚 flake **再次命中同一红点** `goroutine_test.go:29: live count mid-task = 2, want 3`，故本程整包级读数累计命中 **2 发**；AC#12／AC#13 的任何判据都不因此改动——两格的红名都是本程仪器，`SKIP=0`、`panic=0`。）
+
+---
+
+## §2 AC#12：四判据逐判（靶＝`R-136-7`：settle 那侧"这一窗丢了几次读数"在报告里查不到）
+
+### 2.1 先量"改前到底是什么形状"——同一份探针跑在两棵树上（探针文件只在仓外快照树，不进仓库）
+
+探针只经下游真正读的那一面：**`json.Marshal(rep)` → key 清点**，不读任何 Go 字段，所以同一枚文件在两棵树上都编得过（`/d/tmp/wisp136ac1213-ac12probe_test.go`）。这类读数用 `-run TestProbeAC12` 定点取，**与判据用的整包读数分开**。
+
+| 形状（本程自己造的 fixture） | 树 | 探针原文读数 |
+| --- | --- | --- |
+| 整窗只第 1 枚可信（seam 实际取到 10 次读树） | `tree1`＝`f4c7062`（**无 AC#12**） | `seam took 10 reads \| wire samples=1 \| sample_errors ABSENT \| last_sample_error ABSENT \| dropped_reads ABSENT \| back_within_cap_ms=10 final_bytes=4.194304e+06 pass=true` |
+| 同上 | `tree2b`＝`c03aee3`（**有 AC#12**） | `seam took 10 reads \| wire samples=1 \| sample_errors PRESENT=9 \| last_sample_error PRESENT="read: acceptor probe shape: transient tree read failure" \| dropped_reads ABSENT \| … pass=true` |
+| 一半读数报错（按读序号交替，取到 10 次） | `tree1`（无 AC#12） | `seam took 10 reads \| wire samples=6 \| sample_errors ABSENT \| last_sample_error ABSENT \| dropped_reads ABSENT \| … pass=true` |
+| 同上 | `tree2b`（有 AC#12） | `seam took 10 reads \| wire samples=6 \| sample_errors PRESENT=4 \| last_sample_error PRESENT="read: …" \| dropped_reads ABSENT \| … pass=true` |
+| 出线 key 全清点 | 两树 | 改前 11 枚：`[back_within_cap_ms cap_bytes elapsed_ms final_bytes free_os_memory_count free_os_memory_requested pass peak_bytes samples started_at target_state]`；改后 13 枚＝**同样 11 枚 ＋ `sample_errors` ＋ `last_sample_error`**（无改名、无删除） |
+
+⇒ 终裁方 §3.2 那两发探针（`samples=1 back=60 pass=true`／`samples=2 pass=true`）在本程锚点上是**复现成立**的（枚数与毫秒随 ticker 抖动，`pass=true` 与三枚 key 的 ABSENT 是稳定项）；改后同一形状的窗口**丢 9 枚就说丢 9 枚**，`pass` 的颜色不动（本格要的是自陈，不是改判据）。
+⚠ 如实两点：①探针里"一半"那一形取到 `samples=6 / sample_errors=4`（探针的 fixture 让第 1 枚恒可信，故非严格 5/5）；**仓库里的钉**用的是严格按读序号交替的 fixture，实测 `kept=5 lost=5`，并断言 `|kept-lost|<=1`；②`dropped_reads` 这一枚 key **在两形里都仍然 ABSENT**——本程按"与 `StateReport` 同形"办，只搬 `sample_errors`＋`last_sample_error` 两枚（终裁方给 R-136-7 的修法方向也正是这两枚），第三枚名字是探针当初顺手试的候选，不是 `StateReport` 有的东西。若终裁认为必须再有一枚独立计数字段，那是本程未做档（§5），不是被漏掉的。
+⚠ "可信样本数"这一件按同一族形状 rides 在 `samples` 数组（json 标签 `samples`）上，与 `StateReport` 完全同形（那侧也没有独立 count 字段，计数在 `sampling` 门行的 `"%d valid / %d errors"` 里）；本程把这条解释**明写在此请终裁过目**，不当它已成立。
+
+### 2.2 判据①：`SettleReport` 带上字段且有 json 标签；解冻范围实际用了哪几行（＋一处超出授权，报回）
+
+新字段（`internal/observe/sampler.go`，改后坐标 `:442-455`）：
+
+```go
+	Samples               []Sample `json:"samples"`
+	// SampleErrors counts the reads this settle window DROPPED: ... （注释写明理由，指向 :164-168 与 R-136-7）
+	SampleErrors int `json:"sample_errors"`
+	// LastSampleError keeps WHY the most recent read was dropped, so the
+	// number above can be read without guessing.
+	LastSampleError string `json:"last_sample_error,omitempty"`
+	Pass            bool   `json:"pass"`
+```
+
+计数落点（`CheckSettle` 循环，改后坐标 `:488-500`），丢弃判据本身逐字不变（可信样本仍只有 `err == nil && PrivateWorkingSetBytes > 0` 那一支能进 `Samples`）：
+
+```go
+		m, err := s.tree.ReadTree()
+		if err != nil {
+			rep.SampleErrors++
+			rep.LastSampleError = "read: " + err.Error()
+		} else if m.PrivateWorkingSetBytes <= 0 {
+			// Zero-footprint reads of a live tree are untrustworthy (see
+			// SampleState) and are dropped, never recorded as progress.
+			rep.SampleErrors++
+			rep.LastSampleError = "read returned a zero private working set for a live tree"
+		} else {
+			... 原样：append + FinalBytes + BackWithinCapMS ...
+		}
+```
+
+**实际用了哪几行（`git diff -U0 45c8d1c..c03aee3 -- internal/observe/sampler.go` 的旧侧 hunk 头，锚点坐标）**：
+
+| hunk（旧侧） | 内容 | 在 `:470-501` 之内？ |
+| --- | --- | --- |
+| `@@ -442 +442,14 @@` | `SettleReport` 的字段区：旧 `:442` 那一行 `Pass … json:"pass"` 换成 14 行（两枚新字段＋注释；gofmt 重排了同组对齐） | ❌ **不在** |
+| `@@ -477 +490,4 @@` | 旧 `:477` 的 `if err == nil && m.PrivateWorkingSetBytes > 0 {` 拆成 `if err != nil { … } else if … <= 0 { … } else {` | ✅ 在 |
+| `@@ -479,0 +496,3 @@` | 旧 `:479` 之后插入两枚计数＋一句原因 | ✅ 在 |
+
+`git diff --numstat 45c8d1c..c03aee3 -- internal/observe/sampler.go` ＝ **`21 2`**（21 插 2 删；删的两行就是上面 hunk 里被替换掉的旧 `:442` 与旧 `:477`）；AC#12 全范围 `git diff --numstat f4c7062..c03aee3` 里属于本程的只有 `21 2 internal/observe/sampler.go` ＋ `289 0 internal/observe/sampler_settle_coverage_136_test.go`（同范围里另外四枚 `.md` 是兄弟在飞的票 135/137/台账，不是本程）。
+
+> ⚠ **超出授权范围的那一处，在此报回（不自证合理）**：具名解冻写的是 `sampler.go:470-501`，但判据①要求"报告结构体带上字段"，而 `SettleReport` 的声明在锚点坐标 `:431-443`——**加字段必然动 `:442`**。本程判断这是派单给范围时漏写了 struct 那一截（终裁方 R-136-7 的修法方向本身就写着"给 `SettleReport` 补两枚字段"），于是按判据①做了**最小插入**并把越界行号如实钉在这张表里，供终裁按"接受／要求回退"处理。除此之外 `sampler.go` 零改动：`SampleState` 那侧（`:247-348`）**零 hunk**，`thresholds.go`、任何 golden、`scripts/`、`.github/` 在 `45c8d1c..HEAD` 全范围 **`git diff --name-only` 无输出**，D32 的 CPU≤0.5%／RSS≤25MB 未被任何一发触碰（本程所有变异都在仓外快照树，且只落 `sampler.go` 的 `:490-497` 那几行）。
+
+### 2.3 判据②：两发探针各钉一枚用例（另两腿把两支丢弃路与"恒真"堵住）
+
+`internal/observe/sampler_settle_coverage_136_test.go`（commit `f53ad5c`，`289 增 0 删`；`c03aee3` 只做了一处归因精修，`7 增 2 删`，见 §2.7）。四腿：
+
+| 腿 | 对应探针／性质 | 断言落点（本文件内行号；**加粗**＝本程变异读数里真红过的那一条） |
+| --- | --- | --- |
+| `TestCheckSettleSingleTrustworthyReadReportsItsLoss` | 探针①"整窗只 1 枚可信"（`samples=1 pass=true` 那一发） | 前提 `:126`（`reads>=3`）／`:130`（`len(Samples)==1`）；性质 **:134**（`sample_errors==reads-1`）、`:138`（`>=2`）、**:141**（`last_sample_error` 带原因）、`:144`（`pass==true`）；出线 `:150`/`:153`（`samples` 是长度 1 的 list）、`:156`/`:158`（`sample_errors` key 在且与报告同数）、`:161`/`:163`（`last_sample_error` 在且同因）、`:167`/`:169`（`留下＋丢掉==取过`） |
+| `TestCheckSettleHalfTheReadsFailedReportsItsLoss` | 探针②"一半读数报错"（`samples=2 pass=true` 那一发） | 前提 `:189`（`reads>=4`）／`:192`（`kept>=2`）；性质 **:197**（`lost>=2`，消息即"a half-covered window must report its losses"）、`:200`（`kept+lost==reads`）、`:203`（`\|kept-lost\|<=1`）、**:206**（原因在）、`:209`（`pass==true`）；出线 `:214`（`sample_errors==lost`）、`:217`（`samples` 长度==kept） |
+| `TestCheckSettleZeroFootprintDropsAreCountedToo` | **另一支**丢弃路（AC#9 钉住的零足迹 fail-closed）也要被数到 | 前提 `:241`／**:244**（`len(Samples)==1`）；性质 **:247**（`sample_errors==reads-1` 且 `>=2`）、`:250`（原因句**必须与 `StateReport` 那侧逐字同一句**）、`:253`、`:257`（出线同数） |
+| `TestCheckSettleFullyMeasuredWindowReportsNoLoss` | 正向对照（防恒真：逢窗口就报丢读数） | `:268`/`:271`（每枚读树都留下）、`:274`（`SampleErrors==0`）、`:277`（`LastSampleError==""`）、`:280`（绿）、`:284`（出线 `sample_errors==0` **在**）、`:287`（`last_sample_error` **缺席**，omitempty 的形状） |
+
+fixture 全部落在冻结 Sleeping cap（25MB）之下，释放腿（`released=true`＋`FreeOSMemoryCount>0`）与内存比较**恒满足**，所以这些腿能红的地方只有"覆盖率的自陈"；seam 自己也照 AC#13 的纪律不留活雷（`coverageScriptTree` 空脚本直接拒，不索引空切片）。
+
+### 2.4 判据③：落变异 ⇒ 用例转红、红名逐名（每发先 restore、先证落地再读数）
+
+四发都落在 `tree2b`（`git archive c03aee3`）的 `internal/observe/sampler.go`，驱动器 `/d/tmp/wisp136ac1213-mut.py`：锚点文本命中数≠1 ⇒ 拒绝落发并回滚（本程未触发拒绝）。每发落地证明＝`diff -u`（只有那一处 hunk，原文见日志）＋`grep -n` 出被改后那一行＋`go build ./...` rc=0，然后才取整包 `-count=1 -v`。
+
+| 发 | 改法 | 落地证明 | 整包四数 | 红名逐名 ＋ 红点 |
+| --- | --- | --- | --- | --- |
+| **MD**（判据③点名那发："把计数摘掉"） | err 支的 `rep.SampleErrors++` 摘掉（读树仍被丢弃） | `grep -n "MUTATION MD"` ⇒ `491:`；`diff -u` 单 hunk（`-rep.SampleErrors++`）；`go build ./...` rc=0 | `rc=1 / RUN=65 / PASS=62 / FAIL=3 / SKIP=0 / panic=0` | ① `TestCheckSettleSingleTrustworthyReadReportsItsLoss` `sampler_settle_coverage_136_test.go:134`＝`report counted 0 dropped reads but the seam took 10 reads and kept 1: 9 unaccounted`；② `TestCheckSettleHalfTheReadsFailedReportsItsLoss` `:197`＝`the seam lost 5 of 10 reads but the report says sample_errors=0: a half-covered window must report its losses`；③ 既有 flake `TestNoopTaskReturnsToBaseline`（`goroutine_test.go:29`，见 §1.6 补记，非本程仪器、未计入本格）；腿 3／腿 4 同发仍 `--- PASS` |
+| **ME** | 零足迹支的 `rep.SampleErrors++` 摘掉 | `grep -n "MUTATION ME"` ⇒ `496:`；单 hunk；`go build` rc=0 | `rc=1 / 65 / 64 / 1 / SKIP0 / panic0` | 只一枚：`TestCheckSettleZeroFootprintDropsAreCountedToo` `:247`＝`zero-footprint drops must be counted: sample_errors=0 reads=10 kept=1` |
+| **MF** | err 支的原因赋值摘掉（计数留着） | `grep -n "MUTATION MF"` ⇒ `492:`；单 hunk；`go build` rc=0 | `rc=1 / 65 / 63 / 2 / SKIP0 / panic0` | 两枚：`…SingleTrustworthyReadReportsItsLoss` `:141`＝`the report must carry the reason it dropped reads, got ""`；`…HalfTheReadsFailedReportsItsLoss` `:206`＝`a dropped read must leave its reason behind, got ""` |
+| **MC**（派单没要求，本程自加：证 §2.2 的重排没把隔壁 AC#9 那枚钉弄钝） | `} else if m.PrivateWorkingSetBytes <= 0 {` ⇒ `< 0`（放宽 fail-closed 足迹判据） | `grep -n` ⇒ `493:`（`< 0`）；单 hunk；`go build` rc=0 | `rc=1 / 65 / 63 / 2 / SKIP0 / panic0` | ① **`TestCheckSettleZeroTrustworthySamplesFailsClosed` 红在 `sampler_settle_zerosample_136_test.go:66`**（消息就是那串病形：`recorded 5 samples … Pass:true`，红点与终裁方 V3 那一发同一条）；② 本程腿 3 红在 `:244`（`want 1 recorded sample, got 10`）；腿 1／腿 2／腿 4 同发仍绿 |
+
+⇒ **各发只响各的腿**：MD 只碰 err 支 ⇒ 腿 3（零足迹支）不动；ME 只碰零足迹支 ⇒ 腿 1/2 不动；MF 摘原因不摘计数 ⇒ 计数断言仍过、原因断言红；MC 放宽足迹判据 ⇒ AC#9 那枚钉与本程腿 3 同时红，说明本程把 `:477` 拆成三分支之后，**那一族 fail-closed 的牙还在**。
+
+### 2.5 判据④：还原 ⇒ 复绿，三态齐
+
+| 态 | 读数 |
+| --- | --- |
+| 未变异 | `tree2b`：`rc=0 / RUN=65 / PASS=65 / FAIL=0 / SKIP=0 / panic=0`（名册＝`tree1` 的 61 枚 ＋ 本程 4 枚，逐名 diff 只多出那 4 行，无改名无消失无转 SKIP） |
+| 变异 | 上表四发（红名逐名，`SKIP=0`、`panic=0` 每发都是） |
+| 还原 | `python …-mut.py restore` ⇒ `RESTORED`，`diff -q` **23/23** 枚 `.go` 与 pristine 逐字无输出；`go test -count=1 -v` ⇒ `rc=0 / 65 / 65 / 0 / SKIP0 / panic0`；另证 `tree2b/internal/observe/sampler.go` 与仓库工作树那枚**逐字相同** |
+| 门禁级复跑 | `-count=2 -v`（还原后的 tree2b）＝`rc=0 / RUN=130 / PASS=130 / FAIL=0 / SKIP=0 / panic=0`，去重名册 65 枚与 `-count=1` 逐名相同 |
+
+### 2.6 判据⑤：有没有被迫去动 `scripts/slo-check.ps1`／golden／阈值 ⇒ **没有，一处未动**
+
+- `git diff --name-only 45c8d1c..HEAD -- internal/observe/thresholds.go scripts/ .github/` **无输出**；`slo-check.ps1` 全程只读（读它 `:341-361` 那段：只取 `$settleReport.pass` 与 `$settleReport.settle.free_os_memory_count`，**没有 key 集合断言、没有字段计数**）。
+- 全仓没有消费 settle 出线的 golden：`git grep -ln "back_within_cap_ms|free_os_memory_*"` 命中的 tracked 文件只有 `docs/SLO.md`（那是一句**读数**叙述，不是 schema 清单）、`docs/evidence/s1/66/*.json`（票 66 归档的**报告原件**，没有任何仪器读它：`git grep -n "66-settle-1|66-full-subset"` 只命中票面与 `docs/SLO.md` 的重跑命令）、若干 `.md` 证据文件，加 `internal/observe/**` 与本枚新代码。
+- 为了让"旧读者读新报告"这件事不靠推断，本程把 `cmd/wisp`（唯一 Go 侧消费者）的**测试二进制按改动后的 `observe` 重新链接**了一次：`go test -c -o /d/tmp/wisp136ac1213-cmdwisp.test.exe ./cmd/wisp/` rc=0（32,584,099 字节）。**只编不跑**：快照树里没有 `third_party/sherpa-onnx`（`0xc0000135` 是缺 DLL 的宿主现象，不是代码现象），而 `cmd/wisp` 的测试此刻归票 133 在飞——跑它等于踩别人的地界。⇒ "cmd/wisp 端到端在改动后仍全绿"记进 §5 未做档。
+
+### 2.7 一处自纠（append-only，不回改已提交的断言）
+
+`f53ad5c` 里腿 2 把"取到几枚"和"丢了几枚要数出来"合写成一条 `if kept < 2 || lost < 2 { t.Fatalf("precondition broken: …") }`。MD 那一发实测把它判红在合写跳上、消息写成 `precondition broken: kept=5 lost=0 of 10 reads`——**归因含糊**（丢读数没被数到是本腿的本题，不是前提）。`c03aee3` 拆成 `reads<4`（计时前提）／`kept<2`（fixture 前提）／`lost<2`（性质，红点带 `must report its losses`）三跳，断言强度只增不减（MD 复跑因此红点从 `:192` 移到 `:197`，见 §2.4）。生产码未动、阈值未动。第一次 MD 的读数（`tree2`，`rc=1 / 65 / 63 / 2`，红名两枚同名同因）留档 `/d/tmp/wisp136ac1213-tree2-MD-v.txt`，不进结论。
