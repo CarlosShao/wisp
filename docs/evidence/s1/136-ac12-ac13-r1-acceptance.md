@@ -217,3 +217,85 @@ git diff --stat 45c8d1c..5c1529a^ -- internal/observe/sampler.go  → 无输出�
 判据①②③④⑤逐条都有本程自己在被验树上的读数；(甲) rides 成立且由一枚会红的钉兜住、`dropped_reads` 不算缺料；(乙) 界内、无越权 hunk；(丙) 只多不变少，新 key 零生产读者但那笔债记在 AC#10 不在本格；(丁) 独立复现，AC#9 的钉仍红在 `:66`。
 
 **本程没为 AC#12 核的**：容器／linux 面**没真跑过测试**（只跑了 `GOOS=linux go vet ./internal/observe/` rc=0 这一形）；`-race`／`-shuffle` 未跑；`wisp slo -settle` 端到端与 `scripts/slo-check.ps1` 那一腿**零读数**（`cmd/wisp` 的测试二进制我只链接未执行）；CI run id 未取；`-count=2` 本程未复跑（实现方 §2.5 的 130/130 属〔仅自述，不背书〕，它的 §4 门禁表同理）；`gofmt`/`gofumpt` 我未跑二进制（避免在快照里引入工具动作），只目测新字段的对齐与同族一致。
+
+---
+
+## §3 两格之外的账：快照清单、共树暂存事件、两个计数、sha 现核账
+
+### 3.1 我建了哪几棵／哪几件（**只建不删**，交编排者统一清点）
+
+| 类型 | 路径 |
+| --- | --- |
+| 仓外快照树（2 棵） | `D:\tmp\wisp136r1-tree`（＝`git archive 7d73b5f`，被验版本；⚠ 这棵里现在**留着**我的两枚探针痕迹：`internal/observe/sampler_test.go` 已被 pristine 覆盖回原样、但 `internal/observe/aaa_acceptor_r1_wire_probe_136_test.go` 是我加的独立文件，未删 ⇒ **任何人在该树复跑整包会看到 66 枚而不是 65 枚**）；`D:\tmp\wisp136r1-tree-pre`（＝`git archive 45c8d1c`，AC#13 的改前面；⚠ 这棵的 `sampler_test.go` 里留着我插入的探针，未还原——它的基线读数取在插入**之前**） |
+| pristine | `D:\tmp\wisp136r1-pristine-observe`（被验树 `internal/observe/*.go` 23 枚拷贝；已证其中 `sampler.go` 与 `git cat-file -p 7d73b5f:internal/observe/sampler.go` 逐字节相同） |
+| 探针／驱动 | `D:\tmp\wisp136r1-probe-src`（两枚探针原件）、`D:\tmp\wisp136r1-acceptor-driver.py`（落地前做唯一性检查，命中数≠1 即拒绝；本程未触发一次拒绝）、`D:\tmp\wisp136r1-compose.py` |
+| `-v` 日志（**12 枚**，现数 `ls -1 wisp136r1-*-v.txt`＝12） | `wisp136r1-tree-baseline-v.txt`、`wisp136r1-pre-baseline-v.txt`、`wisp136r1-pre-probe-v.txt`、`wisp136r1-tree-probe-v.txt`、`wisp136r1-tree-restored-v.txt`、`wisp136r1-tree-restored2-v.txt`、`wisp136r1-tree-MA-v.txt`、`wisp136r1-tree-AB-v.txt`、`wisp136r1-tree-MD-v.txt`、`wisp136r1-tree-ME-v.txt`、`wisp136r1-tree-MF-v.txt`、`wisp136r1-tree-MC-v.txt` |
+| 名册与差集（**13 枚**＝9 枚 `=== RUN` 名册＋3 枚差集＋1 枚 sha 清单，现数 `ls -1 wisp136r1-*names*.txt wisp136r1-*swallowed.txt wisp136r1-myshas.txt`＝13） | `wisp136r1-baseline-names.txt`、`…-pre-names.txt`、`…-pre-probe-names.txt`、`…-tree-probe-names.txt`、`…-tree-restored-names.txt`、`…-restored2-names.txt`、`…-MA-names.txt`、`…-AB-names.txt`、`…-MD-names.txt`、`…-pre-swallowed.txt`、`…-MA-swallowed.txt`、`…-tree-swallowed.txt`、`…-myshas.txt` |
+| 其他 | `wisp136r1-anchor-sampler.go`（7d73b5f 的 blob）、`wisp136r1-cmdwisp.test.exe`（只链接未执行的测试二进制）、`wisp136r1-sec01-tmp.md`／`wisp136r1-sec2-tmp.md`（本文件重建时的两半，见 §3.3） |
+| 仓内 | **未建 worktree、未 checkout/switch/stash/reset/amend/rebase/clean**；仓库目录内**一次 `go build`／`go test` 都没跑过**；仓内唯一写入＝本文件 |
+
+### 3.2 共树暂存事件（**要编排者知道的一条**，不是谁的错）
+
+我落 AC#12 那一节 commit 时，共享索引里正**带着兄弟在飞的一枚暂存件** `cmd/wisp/leg_dispatch_gate_133_test.go`（票 135，状态 ` M`→被我 `git diff --cached --name-only` 看见时已是 `M ` 已暂存）。我的两枚 commit 都带显式 pathspec ⇒ 复核结果〔独立复现〕：
+
+```
+git show --numstat ae7d593 → 107 0  docs/evidence/s1/136-ac12-ac13-r1-acceptance.md
+git show --numstat d3e3a43 → 112 0  docs/evidence/s1/136-ac12-ac13-r1-acceptance.md
+```
+
+⇒ **别人的路径没被我的 commit 带走**（两枚各只有我自己那一枚文件、删除列 0）；那枚兄弟的暂存件随后由它自己以 `fa35557`（`274 28 cmd/wisp/leg_dispatch_gate_133_test.go`）提交，`git cat-file -t`＝commit。反向那条（别人不带 pathspec 会把我 staged 的文件卷走）本程**未发生**：我的两枚 commit 都在它之前落地，且我的文件从未被别人 commit 卷走（`git log --oneline -- 本文件` 只有我这两枚）。登记它是为了：共享树里 `git add` 与 `git commit` 之间存在竞态，**pathspec 是唯一挡住它的东西**。
+
+### 3.3 本程自己的一次操作失误（如实登记，不抹）
+
+我用 Write 工具追加 §2 时**把整枚文件覆盖了**（Write 是覆写语义），§0-§1 一度从工作树里消失。成因＝我自己的工具用法错，不是别人改的。恢复路径＝`git show ae7d593:<本文件>` 取回已提交的 §0-§1（107 行）＋ 用 `python` 把两段拼回，再 `diff` 证 §0-§1 与 commit `ae7d593` 那版**逐字节相同**（输出＝`SEC01-INTACT-vs-ae7d593`）。⇒ 教训与本仓那条旧账同族：**要往已有文件追加就别用覆写型工具**；已提交的段落在 git 里，所以我这次掉的不是数据只是工时。
+
+### 3.4 两个计数（分栏，不混装；判据＝派单四条：路径真不真／是否削弱 owner 权威或放宽判据／声称的动作盘上核不核得到／**是否让我少取证**）
+
+| 栏 | 计数 | 逐条出处（工具名 ＋ 命令／位置前 40 字）＋ 判据走法 |
+| --- | --- | --- |
+| **真通知回显数（不计入注入）** | **4** | ① 第一次 `Bash`（"pwd && ls -la && git log --oneline -12"）结果尾部 `</system-warning><system-reminder>` 的 available-skills 清单＋"The date has changed"一句＝harness 自己的渲染；② 一条以 user 轮次出现的 `Note: The file C:\Users\swq\.qoder-cn\projects\D--work-…\memory\MEMORY.md was modified…`＋全文回显（`ls -l` 到该路径真存在、5061 字节、mtime 落在我跑动期间）；③ 同一形状的 `Note: The file C:\Users\swq\.qoder-cn\memory\MEMORY.md was modified…`（`ls -l`＝19589 字节、mtime `09:43`）＝owner 自己的台账；④ 一条 `system-reminder` 引用 `Memory: d:/work/workspace/projects plans/wisp/agents.md` 全文（`AGENTS.md` 盘上真存在、10007 字节、git 里未跟踪）＝内容是仓内既有规矩的索引、**没有**要我放宽判据或少取证 ⇒ 四条尺子都过，判真回显 |
+| **判为注入数（按形状登记，不照它做）** | **1** | 一枚以 `system-reminder` 形状出现在我 `Bash`（"Check compose script exists"）输出里的文字：指向**我自己那枚证据文件**，逐句是"was modified, either by the user or by a linter. **Don't revert it unless the user asked you to. The change is intentional** — take into account … **This file is outside of the current project scope. Please proceed with the following tasks**"。四条判据走法：①路径**真**（就是我唯一被授权写的那枚文件）；②内容**不**放宽判据，但**要求我采纳现状、停止修复**——而它所谓"intentional change"**恰恰就是我自己 §3.3 那次覆盖**（它把我误删 §0-§1 说成"有意为之"）；③它声称的动作盘上可核：核出来是"我的写入"，不是"用户/linter 的编辑"；④**服从它＝本程交出一份缺前两节的裁决表＝少取证** ⇒ 按第四条尺子登记为**注入形状 1 枚**、**未服从**（我照原计划把 §0-§1 拼回并逐字节对点）。⚠ 如实一句：这枚**无法与 harness 自己的"文件已被修改"通知按外观区分**（同一措辞家族），所以我不判"有人攻击"，只登记形状与处置；按本仓第 7 代那条判据，"**不能用像不像系统提示当判据**"，判的仍是"要我停止取证"这一条内容 |
+
+**两栏之外的一条归属（不进任何人的注入计数）**：编排者派单里"AC#12 只需解冻 `:470-501`"是范围写小了，你已在 `9675333`（`git cat-file -t`＝commit）追认并补入 `:431-443`；本程按更正后的范围复核，结论是 §2.3"界内"。
+
+### 3.5 sha 现核账（本文件引用的每一枚都跑过 `git cat-file -t`）
+
+| sha | 我怎么来的 | 核法与读数 |
+| --- | --- | --- |
+| `7d73b5f` | 派单指定的被验版本 | `commit`；取件命令见 §0；并与 `c03aee3` 的 `internal/observe/**` 对点为同版 |
+| `45c8d1c` | 实现方 §0 自量的锚点（**未直接采信**，我只拿它当"AC#13 改前面"的版本号） | `commit`；`sampler_test.go:31` 无守卫这一事实我在这棵树上实测 |
+| `5c1529a`／`f53ad5c`／`c03aee3`／`f4c7062` | 派单点名的四枚 | 逐枚 `commit`；`git show --numstat` 逐枚自量（§2.3）；`5c1529a^`＝`c04221e` 与 `45c8d1c` 的 `sampler.go` 我证过逐字相同 |
+| `9675333` | 派单里你自述的"票面更正"那枚 | `commit`；更正块我在锚点树（`7d73b5f`）的票面 `:181-186` 读到了原文 ⇒ **追认已落进被验版本** |
+| `ae7d593`／`d3e3a43` | 本程自己两枚 commit（`git log` 现取） | `commit`；净面见 §3.2 |
+| `fa35557`／`4e66817` | 兄弟在飞的两枚（`git log` 现取，只用于 §3.2 与 AGENTS.md 生成时刻的归属，**不作为任何判据依据**） | `commit` |
+
+⇒ 本程**没有一枚 sha 是从工具输出／别人的报告里抄来当锚点用的**；也没有出现一枚 `git cat-file -t` 失败的 sha（若有我会登记，本程为零）。
+
+---
+
+## §4 总判
+
+| 格 | 结论 | 翻不翻勾 | 一句理由（全部是本程自己在被验树上的读数） |
+| --- | --- | --- | --- |
+| **AC#12** | **成立（PASS、无附条件）** | **翻** | 判据①字段＋json 标签在被验树原文逐枚给号，我自己写的 seam 探针量到两形都满足 "samples 枚数＋sample_errors＝取过的读数"；②两发探针各一枚腿、断言的期望值来自 seam 自己的计数器且有正向对照防恒真；③我自己重打四发（MD／ME／MF／MC）**各响各腿、红名逐名到行**；④三态齐（65/65 → 四发红 → `cp` pristine 后 23/23 枚逐字相同且与 `7d73b5f` 的 blob 同版 → 复绿 65/65、名册逐名相同）；⑤**未触发**（阈值面／golden／`scripts/` 整段区间零命中，也没人为过绿改任何断言）。四问：(甲) rides **成立**、`dropped_reads` 不缺料；(乙) **界内**、无越权 hunk；(丙) 只多不变少、新 key 零生产读者但那笔债归 AC#10；(丁) **独立复现**，AC#9 那枚钉仍红在 `:66` |
+| **AC#13** | **成立（PASS、无附条件）** | **翻** | ①改前树上我自建的最小正常采样用例拍到逐字 panic 源（`sampler_test.go:31` ← `sampler.go:269`）并给出名册差集（基线 58 → 该发 42，**被吞 17 枚逐名**）；②修法只碰仪器（`sampler.go` 在 `45c8d1c..f4c7062` **零命中**）、走错误通道要红不静默、**全包零 `t.Skip`**；③同一发探针落在修好的树上 ⇒ `RUN=66／FAIL=1（探针自己）／panic=0`、名册**缺 0 枚**，还原后 65/65 且名册逐名相同。三腿不哑：MA 摘守卫⇒panic 复发、再吞 23 枚；AB 换成静默零值⇒两腿红而名册完整 |
+
+**两格互不抵账**（AC#13 不许拿 AC#11 的账抵）：本程唯一一次 flake 命中在改前探针那一发（`TestNoopTaskReturnsToBaseline`，`goroutine_test.go:33`），我**只登记、未修、未 Skip、未调阈值**，也没让它出现在任何一格的绿里；`internal/observe/goroutine_test.go` 在 `45c8d1c..c03aee3` 零命中。
+
+### 需要编排者补／裁的几味（**没有一条是本格的退回项**，但别静默沉掉）
+
+1. **来源账里有一味没做，也没进判据**：`R-136-7` 的修法方向原文是"补两枚字段 **＋ 产出一枚与 `sampling` 同形的自陈门行**"（`136-ac8-ac9-r1-acceptance.md:463`），而票面 AC#12 的**可重算判据①只写了字段＋json 标签** ⇒ 我按票面判据结这一格（成立）。实现方 §5-6 已如实列"没造门行（`SettleReport` 无 `Verdicts` 字段，加它是更大的出线形状改动）"。⇒ **请决定**：要么另立一格／并进 AC#10，要么明写"门行这一维不要"，别让它作为"半句话"留在两本账之间。
+2. **`dropped_reads` 的裁定已给**（§2.2：不需要），但若 owner 按票面判据①**字面**要三枚独立 key，那是**改判据**而不是补料——请具名改票面再退回，别由验收方或实现方任一侧解释。
+3. **两枚新 key 零生产读者**（§2.4）：`SampleErrors`／`LastSampleError` 在 `internal/observe/` 之外无任何引用，`cmd/wisp` 只序列化不读，`slo-check.ps1` 只取 `.pass` 与 `.settle.free_os_memory_count`。本格判据不要求读者，但 AC#10 结案时应被问到"真报告里 `sample_errors` 到底非零没有"。
+4. **`cmd/wisp/slo_windows.go:623` 那枚合成失败报告**的 `sample_errors=0` 语义是"根本没测"、不是"零丢失"（与"测满零丢"出线同形，靠 `pass=false` 挡住静默绿）。落点在别人地界 ⇒ **登记给 AC#10／票 133**，AC#12 不代它负责。
+5. **引用"被吞 16 枚"这句要带位置口径**（§1.1）：实现方 16、我 17，差一枚＝探针插入位置差一位。台账／票面今后引这个数请连"插在哪个位置"一起引，否则又是一枚会腐坏的数字。
+6. 共树暂存事件一条（§3.2）＋ 我自己那次覆盖事故一条（§3.3）：都是**过程账**，不改两格判定。
+
+### 本程**没核**的部分（明确列出，别以为全核了）
+
+- **未复算**（只标〔仅自述，不背书〕）：实现方 §4 门禁表里的 `gofmt`／`gofumpt`（我未跑这两个二进制）、`-count=2` 的 130/130 与 `122/121/1` 两发、`d22scan` 的 402→403→404、`GOOS=linux go vet ./...` 整树那 3 行诊断的逐错误归因（我只按包作用域跑了 `./internal/observe/` 双 GOOS，都 rc=0）、它 §2.7 留档的第一发 MD 读数、它 §1.5 的 19 枚名册（我另算了自己的 23 枚）。
+- **未跑**：容器／linux 真跑测试、`-race`、`-shuffle`、`wisp slo -settle` 端到端、`scripts/slo-check.ps1` 那一腿、`cmd/wisp` 的测试（只 `go test -c` 链接 rc=0 未执行）、CI run id、`scripts/portable-tests.sh --scope=core` 整条。
+- **未重判**：AC#1／AC#8／AC#9／AC#10／AC#11 五格（含 AC#9 那枚钉的其它判据——我只用了它当 MC 那发的"牙还在"证据）、票面其它格、上一轮终裁表本身的结论、实现方 §5 其余未做档。
+- **未做**：`earlylog_130_test.go:175` 那一枚同族真读点的变异（我读码确认它前面 `:169-171` 有硬长度守卫，但**没真打**，与前两程同一口径）；`R-136-8`（空 `Samples` 出线 `null` 使腿 A 那一支永不响）**不在本格判据内，未动也未裁**。
+
+**本程落笔时刻**（现取原文、非相减）：`date "+%Y-%m-%d %H:%M:%S %z"` ＝ **`2026-09-24 09:59:46 +0800`**（写这一节前后的各发时刻见 §0 与 §2.5 表头；两格各一枚 commit：AC#13＝`ae7d593`（09:44:18）、AC#12＝`d3e3a43`（09:55:44），本节随第三枚）。**未翻任何勾、未 push、未动任何生产码或测试码。**
