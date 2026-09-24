@@ -333,10 +333,6 @@ docs/evidence/s1/141-ac2-stock-inventory-r1.md
 
 ---
 
-<!-- 下一节 -->
-
-
-
 ## 5. 表 A —— `internal/` + `cmd/` 的 `.go`，逐枚 116 行（**每行一枚命中，不汇总**）
 
 **取数与读法**
