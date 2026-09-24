@@ -348,7 +348,7 @@ step 9 PathResolver junction `PASS=1 FAIL=0 SKIP=0／=== RUN=1`。
 "17 与 21 是两个不同的诚实答案"那课在本趟的对应物是 **16 与 16**——
 两个数相等本身是个事实，不是口径可以省掉的许可；换个有嵌套红的树它立刻分叉，所以口径必须继续一起引。
 
-台账原文（`docs/reports/pending-and-issues.md` 09-24 那节，门禁读数第②条）写的是
+台账原文（`docs/reports/pending-and-issues.md` 09-24 那节，门禁读数第 2 条）写的是
 "`test-windows` 红＝17 枚具名用例（`--- FAIL` 的名字去重＝17；含子项路径是 21 枚，两个数别混）"，
 本程用 `gh run view --log` 对 run `35840958334`（job `107115610835`）逐行 `grep -c` 复算，
 **17／21 两数复现成功**，不是〔仅自述〕。
@@ -404,3 +404,133 @@ the step **FAILS** on windows-latest today"，引的是 run `35551819606`。
 ---
 
 
+
+## 4. 今天的 `internal/observe` 门禁改动有没有造成什么？
+
+### 4.1 先确认改的是什么（读码，不读注释）
+
+- 翻勾处：`internal/observe/sampler.go:556`，`const settleCoverageRowGates = true`，
+  由 **`52191ce`**（`feat(136 AC#14 Gate): flip settleCoverageRowGates true + rewrite 2 coverage legs ...`，
+  commit 时间 `2026-09-24 20:12:18 +0800`，＝ UTC 12:12:18）落地。
+  `git show 52191ce -- internal/observe/sampler.go` 的该常量的增减行**只有那一枚布尔 false 变 true**，与票面"可执行码零行"之外的承诺一致。
+- 它能走到的最远处（逐字引自 `sampler.go:546-555` 的注释自述，再用码面对一遍）：
+  `buildSettleVerdicts`（`:566`）造一枚 `{Metric: "sampling", Pass: covered, Gate: settleCoverageRowGates}`，
+  其中 `covered := rep.SampleErrors == 0 && len(rep.Samples) > 0`（`:567`）；
+  `foldSettlePass`（`:592`）里 `if v.Gate && !v.Pass { pass = false }`，所以该行能否决 `SettleReport.Pass`；
+  `rep.Pass = foldSettlePass(memOK && backInTime && releaseOK, rep.Verdicts)`（`:538`）。
+- 到 CI 颜色的那一跳，我在 `scripts/slo-check.ps1` 里核到了，不是听注释的：
+  `:381` `$allPass = ($failingStates.Count -eq 0) -and $settlePass`，`:396` `if (-not $allPass) { exit 1 }`。
+**所以 settle 的 pass 位真的一票否决整枚 job 的颜色**，这条链在码面上是通的。
+
+**方向判据（重要，决定"有没有造成什么"能怎么答）**：这枚翻勾**只会收紧不会放松**——
+它只可能把 `pass=True` 变成 `pass=False`（把步弄红），**不可能**把红的弄绿。
+所以"今天两步都是绿的"这一事实，配上这个单调性，等于说：**今天没有任何一步是被它弄红的。**
+
+### 4.2 `slo-smoke`：真跑了取样，且**它今天的绿在翻勾之后比昨天更值钱**
+
+`SLO smoke gate`（step 6）正文逐字（取法 `gh run view --log`，job `107647320562`）：
+
+```
+slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+slo-check.ps1: precheck ok - no foreign toolchain/runner process, machine-wide cpu max 3%
+slo-check.ps1: sampling state Sleeping for 4s
+slo-check.ps1: state Sleeping exit=0 pass=True
+slo-check.ps1: sampling state Warm for 4s
+slo-check.ps1: state Warm exit=0 pass=True
+slo-check.ps1: settle check (10s window)
+slo-check.ps1: settle exit=0 pass=True
+slo-check.ps1: leak fixture self-test (100MB, must FAIL)
+slo-check.ps1: leak exit=1 flipped_to_fail=True
+slo-check.ps1: report written to D:\a\wisp\wisp\build\slo\slo-report.json (all_pass=True)
+```
+
+判：**不是零样本 fail-closed，是真的采到了**。而且这一点**今天不需要相信它的措辞**——
+
+- 翻勾之后 `covered` 要求 `len(rep.Samples) > 0 && rep.SampleErrors == 0`，且 `Gate=true`。
+  零样本那一支（`:575` `"fail-closed disclosure: sample_errors=0 but 0 valid samples: this window measured nothing"`）
+  会把 `Pass` 判 false，经 `foldSettlePass` 否决 `rep.Pass`，经 `slo-check.ps1:381/:396` 把这一步**直接弄红**。
+- 它今天**是绿的**（`settle exit=0 pass=True`，步 conclusion=success，
+  artifact `slo-smoke-report` **7179 字节**确实上传了，`Upload SLO report` 无 warning）。
+- 所以"它真采到了样本"这一条，现在是**由门禁反推出来的结论**，不是由脚本自报的措辞接受的读数。
+**所以这是今天这枚翻勾在 CI 上唯一一次真正咬合，而它咬合的方向是收紧**：同一枚绿，判据强度变了。
+- 旁证：precheck 自报 `machine-wide cpu max 3%`（宿主不忙），两步 `state ... pass=True` 之间有真实墙钟推进
+  （13:12:54 到 13:13:07 到 13:13:20 到 13:13:32，与 `-SecondsPerState 4` 加启动开销相容），
+  `leak exit=1 flipped_to_fail=True` 说明泄漏自检那枚"必须红"的反向对照也真响了。
+
+### 4.3 `slo-full`：**这道绿灯下什么都没做**——本节的靶子
+
+`SLO full gate (six states + settle + leak)`（step 5，job `107647320611`，self-hosted `wisp-selfhosted-01`）
+正文逐字：
+
+```
+slo-check.ps1: sampling validity precheck (ticket 134 AC#4)
+slo-check.ps1: NO CONCLUSION (machine-contended) - subset=full refused to sample, no numbers were produced
+slo-check.ps1: machine-contended reason: machine-wide cpu utilisation 99% over a 1s window (>= 50%)
+slo-check.ps1: NO CONCLUSION (machine-contended): 1 reason(s), 0 state file(s) written, slo-report.json NOT written
+slo-check.ps1: NO CONCLUSION (machine-contended): performance result - D32 (CPU <=0.5%, private
+slo-check.ps1: NO CONCLUSION (machine-contended): RSS <=25MB) stays unverified for this run.
+slo-check.ps1: NO CONCLUSION (machine-contended): record written to E:\work\base\actions-runner\_work\wisp\wisp\build\slo\slo-no-conclusion.json (NOT a report; slo-report.json is not written on this path)
+slo-check.ps1: NO CONCLUSION (machine-contended): exit 0
+```
+
+三条独立物证钉住"它没做事却绿了"：
+
+1. `0 state file(s) written, slo-report.json NOT written`，且它**自己声明** `D32 ... stays unverified for this run`。
+2. `Upload SLO report` 步（step 6）正文：`##[warning]No files were found with the provided path: build/slo/slo-report.json. No artifacts will be uploaded.`
+   ——该步 conclusion 仍是 `success`（因为 `ci.yml:597` 把 `if-no-files-found` 从 `error` 改成了 `warn`）。
+3. 整枚 run 名下的 artifact 清单**只有一枚**：`slo-smoke-report`（7179 字节，13:13:45Z）。
+   **没有 `slo-full-report`。** 全仓最新一枚 `slo-full-report` 是 **2026-09-24T10:18:08Z**，
+   属 run `35985947228`（`7cf8075`），比这趟早 2 小时 53 分。所以上一枚真样品之后，
+   `35996231784`（`30e19ef`，11:59Z）与本 run 连续两趟 D32 腿**都没产出数**。
+
+**这不是 skipped，也不是 bug，是票 134 AC#6 的既定形状**（owner Q-36 拍板"都按推荐"：
+有效性拒绝不再判红，改由 `scripts/slo-freshness.sh` 的探针 P3 在"最新上传的 report artifact"上计时来逼账）。
+但**按本仓自己的纪律，它必须被点名成一条 finding**：
+
+> `slo-full` 的 step 5 这一趟 conclusion=success，却**一枚样本都没取**、
+> **一个 D32 数都没评**、**一份 report 都没写**。它是**"passed while doing nothing"那一形**，
+> 而且它 step 层交出了颜色、产出了日志、零枚 skipped——
+> 所以任何只看 `steps[].conclusion` 的读数器都会把它记成"D32 今天过了"。**今天 D32 没过，今天 D32 没被测量。**
+
+同时给一枚**公平的反向记账**，免得这条被读成"AC#6 失败"：那 1 秒窗口 99% 的机器忙判定**大概率就是被这一批 CI 自己抢的**
+（同 run 的 self-hosted `Build wisp.exe` 步在 13:13:26 到 13:17:33 之间跑了 4 分 07 秒，紧接着 13:17:33 取样），
+加上本机同时在飞另一枚只读程。，形状是"自我污染被 precheck 正确拒掉"，不是"测量仪坏了"。
+本仓记忆条目 `wisp-ci-selfhosted-topology` 写的"每次 push 自启抢 CPU"这一条，第一次拿到 **step 正文级**的实证。
+
+### 4.4 那枚翻勾"打到了 CI 颜色"吗？**在它真正为谁而翻的那条腿上，到今天为止一次都没打到**
+
+这是本节最该被读到的一句，我把判据摆全：
+
+- 翻勾的动机（引 `sampler.go:546-550` 的自述，非逐字引用）：让覆盖行能否决 `slo -settle` 的 pass 位，
+  并"打到 slo-smoke / slo-full 的 CI 颜色"。
+- **本 run 是史上第一枚带上这枚 true 的 `ci` run**。依据：`52191ce` 落在 UTC 12:12:18；
+  前一枚 dev run `35996231784` 的头是 `30e19ef`（11:59:10Z，**在翻勾之前**，`52191ce` 不在它树里）；
+  `gh run list --limit 3` 现量证明**本 run 之后没有更晚的 `ci` run**。
+- 而第一枚带上它的 run，**恰恰在 `slo-full` 那条腿上被 precheck 挡在取样之前**（§4.3）。
+  门禁的否决逻辑住在 `buildSettleVerdicts`／`foldSettlePass`，而 AC#6 的拒绝路径在
+  `slo-check.ps1` 的 **precheck**（"refused to sample, no numbers were produced"），
+  发生在 settle 之前，所以**翻勾连被求值的机会都没有**。
+- 结论两条，一分为二：
+  1. **`slo-smoke`（hosted）这一腿：咬合了，且是有效咬合**（§4.2 的反推）。
+     但它跑的是 `-Subset smoke`、只有 `Sleeping`＋`Warm` 两态，**不是 D32 那两个数（CPU 与私有 RSS）的评委**。
+  2. **`slo-full`（D32 合并门禁）这一腿：翻勾至今 CI 颜色层面零次被求值。**
+     码注释里那句 backing（"Nine clean settle runs backed it (sample_errors 0, exit 0, row gate=true)"）
+     指向 `docs/evidence/s1/136-ac14b-impl.md` 第 4 节与 `136-ac14b-r2-acceptance.md` 第 5 节，
+     **那些是本机/自建自采读数，不是 CI step 级颜色**，所以按本仓"说不出 run id 加 step 就当门不存在"的规矩，
+     **这枚门禁目前只在一台 host 上存在过，除 smoke 那条窄腿外还没在 CI 上存在过。**
+- **所以最小建议（本程不动手）**：**在机器安静时手动重跑一次带这枚 true 的 `slo-full`**
+  （`workflow_dispatch`，或趁 fleet 睡觉时推一枚 docs），让它真取一次样并产出 `slo-full-report`。
+  在那之前，任何"`slo-full` 绿＝D32 达标"的表述都不许写进任何交付面。
+  这活该**编排者**做（要挑时间窗、要 push），不该实现程程做。
+- 另注：别把它读成"要撤勾"：撤销口令是"撤 136 Gate 批准"（本程未使用、也不建议——它是收紧方向，
+  今天的证据没有任何一条指向放水）。
+
+### 4.5 本节的直接答案
+
+**今天这 35 枚（其中唯一动可执行码的是那枚翻勾）没有把任何一步弄红；
+它把 `slo-smoke` 那枚 settle 绿的证据强度提高了；
+而它在 `slo-full` 上造成的唯一后果，是让我们撞见"那一步本来就什么都没做"。**
+本节唯一硬 finding 属于 `slo-full`，且**它不是翻勾造成的，是 AC#6 的既定形状加上一次真实的机器争用**——
+翻勾只是把那盏灯照得更亮了一点。
+
+---
