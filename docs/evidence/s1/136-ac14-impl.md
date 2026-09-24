@@ -115,3 +115,148 @@
 - `lint` 在锚点 `ca2c55e` 上就是 **failure**（`gh run view 35989390166 --json jobs`，18:5x 现量）⇒ 本程交件时 `lint`
   的色**不是本程造的**；本程自己的 gofmt/gofumpt/vet/d22scan 逐门读数在 §3。
 - 简报里"进程名单 8 枚"与盘上 15 枚不符（§1.1）⇒ 按更全那份量的，只可能更严，不影响"全 0"这一结论。
+- **锚点在程中漂过一枚，且漂来的那枚与本格直接相关**：本程取基线时 `HEAD=ca2c55e`；
+  18:5x 编队落了 `2e6d171 docs(evidence/136): SLO 出线契约普查 r1`（＝票面 `:325(b)` 要的那一查），
+  本程的码与探针落在 `aef82f5`。普查的判定与本程无关但方向一致：
+  `136-slo-output-contract-census-r1.md:80` 逐字 "**普查结论：排除 `SPEC-02 §3` 之后，没有任何一份文档在 `SPEC-12 §4.1` 意义上管 SLO 报告的出线形状**"
+  ⇒ 给 `SettleReport` 加 `verdicts` **不触**任何文赋契约的停手线（该文件 `:184` 亦明确"要不要做成 `Gate:true` 仍按真取样读数走人工判断"，与本程 §1 的处置同向；
+  它 `:167-174` 把"AC#12 用例与 AC#14 方向相反"记成**一处**并被预授权——这一处正是 §1.3 里被盘上推翻的那枚前提，**是三处不是**一处）。
+
+---
+
+## §2 落点：门行落在哪几段（形状与逐段出处）
+
+本程**只**动了三枚文件（`git show --name-only aef82f5` 原样在 §2.4），逐段落点如下（行号为**改动后** `aef82f5` 上的现量）：
+
+### 2.1 `internal/observe/sampler.go`（解冻面内，7 处改动）
+
+| # | 段（改后行号） | 是什么 | 在票面 `:277` 划的哪一段里 |
+| --- | --- | --- | --- |
+| 1 | `:455-466` `SettleReport.Verdicts []Verdict json:"verdicts"` ＋注释 | 新字段：出线带自陈行 | `:431-456` 声明块内 ✓ |
+| 2 | `:467-469` `Pass bool json:"pass"` 的注释改写（字段本体逐字未动） | 写明"总布尔之外还要被失败 gate 行否决" | 同一声明块 ✓ |
+| 3 | `:529` `rep.Verdicts = buildSettleVerdicts(*rep)` | 行的构造点（在样本/丢读计数都定形之后、折叠之前） | `:462-521` 体内（现 `:475-547`）✓ |
+| 4 | `:534-539` 折叠注释 ＋ `:540` `rep.Pass = foldSettlePass(memOK && backInTime && releaseOK, rep.Verdicts)` | 折叠处（原 `:520` 那三布尔的与，语义逐字保留，只多一道 gate 行否决） | 同上 ✓ |
+| 5 | `:549-552` `const settleCoverageMetric = "sampling"` | 行名（与 `StateReport` 那行同名，同问题） | **文件末尾新增**，见 §2.3 |
+| 6 | `:554-566` `const settleCoverageRowGates = false` | **唯一一枚待裁开关**（§1.3） | 同上 |
+| 7 | `:568-600` `buildSettleVerdicts` ＋ `:602-612` `foldSettlePass` | 另起一枚构造函数（票面 `:279` 明令）＋折叠规则（可单测） | 同上 |
+
+`Measured` 逐字沿用 `StateReport` 那行的格式串（`sampler.go:336` `fmt.Sprintf("%d valid / %d errors", …)`），
+红句（`Note`）把 `sample_errors=` 按**字段名**印出来并带上最后一次丢读原因，绿句也印计数：
+判据① 的"由那一行自己说出不 pass"与 `:285` 的"红句必须点名 `sample_errors`"同一条满足。
+
+### 2.2 冻结面：逐字未动（`git diff ca2c55e..aef82f5 -- internal/observe/sampler.go` 全量在上，可复算）
+
+| 冻结坐标（票面 `:278`） | 现量 |
+| --- | --- |
+| `:189-190` `Verdicts []Verdict` ＋ `Pass bool // all Gate verdicts pass`（`StateReport` 侧） | **不在 diff 的任何 hunk 里**（`git diff -U0` 只有 `@@ -452,7`、`@@ -514,9` 两枚 hunk，起点均在 `SettleReport` 之后） |
+| `:331` `rep.Verdicts = buildVerdicts(st, *rep)` | 未动（同上） |
+| `:341-346` `Gate && !Pass` 的折叠 | 未动 |
+| `internal/observe/thresholds.go`（`buildVerdicts` 的家，`:84`） | `git diff --stat` 里**没有这枚文件**，一字节未动 |
+| `cmd/wisp/**`、`internal/proc/**`、`internal/winsec/**`、`frontend/**`、`design/**`、`docs/PLAN.md`、`docs/specs/**`、`internal/risk/**`、`tools/d22scan/**`、`scripts/slo-check.ps1`、`.github/workflows/**`、任何阈值／golden | 全部未动（§2.4 的三枚路径就是本程全部写集） |
+| `buildVerdicts` 是否被改成两用 | 没有；`TestStateReportVerdictBuilderStaysSinglePurpose` 在**编译期**钉住它的 `(SLOState, StateReport)` 签名，并在断言里挡住"sampling 行/`sample_errors` 字样漏进表行" |
+
+### 2.3 一处坐标偏离，具名登记（不悄改）
+
+票面 `:277` 划的两段是 `:431-456` 与 `:462-521`，而 `:522` 就是 `CheckSettle` 的收尾花括号、`:523` 起是文件边界。
+**一枚新的顶层函数在物理上放不进"`:462-521` 体内"**——放不进去又不许改 `buildVerdicts`（`:279`）只剩两条路：
+闭包（把构造函数藏进 `CheckSettle`，测试就点不到它，变异也打不中它）或**紧邻 `CheckSettle` 之后追加到文件末尾**。
+本程取后者：新增码在 `:549-612`，**超出票面字面坐标 27 行、但不出本格的射程**，
+且它正是 `:279` 那句"要给 settle 造行就**另起一枚构造函数**"所要求的东西。登记在此由编排者裁是不是我的错读。
+
+### 2.4 本程写集（`git show --name-only`，逐枚 commit）
+
+```
+$ git log --oneline -1        # 0ee68e1 evidence(136 AC#14 §0-§1) …   -> docs/evidence/s1/136-ac14-impl.md
+$ git log --oneline -1        # aef82f5 feat(136 AC#14) …            -> 三枚路径，见下
+aef82f5 feat(136 AC#14): settle 报告自陈门行 + 六枚探针（记录行形状，gate 常量留一枚待裁的开关）
+    internal/observe/sampler.go
+    internal/observe/sampler_settle_gate_136_test.go
+    internal/observe/sampler_settle_coverage_136_test.go
+```
+
+**预先授权的那处既有断言改动（按 `:287` 要求逐字点名）**：
+`internal/observe/sampler_settle_coverage_136_test.go` 原 `:208-210` 三行——
+逐字 `if !rep.Pass {` / `t.Fatalf("disclosure leg, not a verdict leg: this window still passes, report=%+v", rep)` / `}`——
+**被本程改掉**。理由＝票面 `AC#14` 判据①／②（票面 `:262-264`）：那一形逐字要求"丢一半读数仍然 pass"，
+与 AC#14 要的方向正相反。改后那段钉的是：门行必须存在、必须**自己**说 not-pass、红句必须印出 `sample_errors`、
+且"失败 gate 行与 `pass=true` 并存"这一形必须永不出现在报告里。
+⚠ **本程没有动那枚文件的头注释**（`:25-27` "a partially covered window still passes today (changing that verdict is not this cell's job)"）
+——它对 `:143-145`/`:252-254` 那两形**今天仍是真的**（门行是记录行），对 `:208-210` 已被改写；
+把它改准属 AC#15 的射程（票面 `:288` 明令"AC#15 到时要现量重划"），本程不越界，登记在此。
+
+---
+
+## §3 门禁读数（改动之后，全部本程自己跑）
+
+取数时刻 `2026-09-24 19:0x +08`，树＝`aef82f5`（锚点链 `ca2c55e` → `2e6d171` → `0ee68e1` → `aef82f5`）。
+
+| 门 | 命令 | 读数 |
+| --- | --- | --- |
+| 四数 run1 | `go test -count=2 -v ./internal/observe/` | **RUN=142 / PASS=142 / FAIL=0 / SKIP=0** ⇒ 顶层 **71 枚 × 2**（基线 65×2=130，净增 6＝本程探针）；`grep -ci panic`=8，`^panic:`=**0** |
+| 四数 run2 | 同上，第二遍 | 逐格相同：**142/142/0/0**，panic 8/0 |
+| 名册差集（两遍之间） | `grep '^--- ' \| awk '{print $2,$3}' \| sort` → `comm -3 p1 p2` | **0 行** ⇒ 两遍名册逐名相同 |
+| 名册差集（基线→改动后） | `comm -23 b1 p1`（谁消失了）／`comm -13 b1 p1`（谁新增） | 消失 **0 枚**（**没有一名转 SKIP、没有一名不见**）；新增恰为本程 6 枚：`TestSettleCoverageRowExistsAndPassesWhenFullyMeasured`、`TestSettleCoverageRowSaysNotPassWhenHalfTheReadsFailed`、`TestSettleCoverageRowSeparatesUnmeasuredFromFullyMeasured`、`TestFoldSettlePassOnlyGateRowsVeto`、`TestSettleReportPassNeverContradictsItsGateRows`、`TestStateReportVerdictBuilderStaysSinglePurpose` |
+| gofmt | `gofmt -l internal/observe` | 空输出 |
+| gofumpt | `"$(go env GOPATH)/bin/gofumpt.exe" -l internal/observe`（盘上现量 **v0.12.0 (go1.27.1)**） | 空输出 |
+| vet | `go vet ./internal/observe/` | rc=0 |
+| 构建 | `go build ./...` | rc=0 |
+| d22scan | `git archive HEAD` → `D:\tmp\wisp136ac14\snap-post`（仓外）→ `sh scripts/d22scan.sh` | **rc=0**；八 scope `203 / 22 / 40 / 18 / 16 / 40 / 405 / 39`，正对照 `runtests.sh` 21/21/0/0 |
+
+**八 scope 的归因（§0.2 台账口径：引命中数必须连归因）**：与基线 `203/22/40/18/16/40/404/39` 逐格比，
+唯一变化是 `ban #8 internal/` **404 → 405**，＋1 枚＝本程新增的 `internal/observe/sampler_settle_gate_136_test.go`；
+其余七格**一枚不降**，`bans #1-5 internal/`（只数生产码）维持 203——本程那 1 枚新文件是 `_test.go`，不进生产码分母，
+这与台账 `:4392`（`ban #8 internal/` 401→402 归因到自己那枚 `_test.go`）是同一形制。
+
+**Emoji / 注释卫生**：新码与新测试文件的注释逐字 ASCII（`AGENTS.md §1.2` 禁的 `U+2190–U+2BFF` 段含 `⇒`、`→`，
+本程在 Go 侧一律写 `->` 或改述）；d22scan ban #8 覆盖 `internal/` 405 枚 Go 文件（注释与 `_test.go` 全算）rc=0，
+这是"零 emoji"那一维的**外部**读数，不靠本程自述。
+
+**跨包后果自查**（本程改了 `cmd/wisp` 消费的那枚结构体，虽不写它的码）：`grep -rln settle cmd/wisp/*_test.go` ⇒ **零命中**
+⇒ `cmd/wisp` 没有任何用例碰 settle 出线，`slo_windows.go:623` 那枚合成报告是具名字面量、加字段不破编译（`go build ./...` rc=0 已证）。
+⚠ 另外量到一件不属本格的事，如实登记：宿主上 `go test ./cmd/wisp/` 直接跑会以 **`exit status 0xc0000135`（STATUS_DLL_NOT_FOUND）**
+收场（本程现量），把三枚 sherpa/onnx DLL 放进 `cmd/wisp` 目录后**在改动前的快照 `snap/`（ca2c55e）上仍然 FAIL（91.19s）**
+⇒ 那枚红**先于本程**、不是本程造的；改动后的逐名对照见 §5。
+
+---
+
+## §4 变异自证（六发，全部落在仓外快照 `D:\tmp\wisp136ac14\mut\*`，工作树未参与）
+
+每一发都按本仓口径**先证落地再读数**：`grep -n` 出被改那一行（下表"落地凭据"列）＋ `go build ./...` rc=0，然后才读红名。
+`-count=1 -v ./internal/observe/`，全 71 枚名册都在，**没有一发用 SKIP 换色**。
+
+| 发 | 改了什么（落地凭据＝改后 grep 出来的那一行） | build | 红名（逐名） | 计数 |
+| --- | --- | --- | --- | --- |
+| **M1 摘掉门行**（判据②后半"把门行摘掉 ⇒ 钉子必须转红"） | 删掉 `rep.Verdicts = buildSettleVerdicts(*rep)` 整行；改后 `grep -n buildSettleVerdicts sampler.go` ⇒ 只剩 `:563` 的函数定义与三处注释，**构造点为零** | rc=0 | `TestCheckSettleHalfTheReadsFailedReportsItsLoss`（`sampler_settle_coverage_136_test.go:226` "must carry its own sampling verdict row, got verdicts=[]"）、`TestSettleCoverageRowExistsAndPassesWhenFullyMeasured`（`_gate_:162`）、`TestSettleCoverageRowSaysNotPassWhenHalfTheReadsFailed`（`_gate_:207`）、`TestSettleCoverageRowSeparatesUnmeasuredFromFullyMeasured`（`_gate_:245`） | 71/67/**4**/0 |
+| **M2 让门行不再关心丢读**（判据②"一半读数报错 ⇒ 该门行红"） | `covered := rep.SampleErrors == 0 && len(rep.Samples) > 0` → `covered := len(rep.Samples) > 0`（`grep -n "covered :=" ⇒ :565`） | rc=0 | `TestCheckSettleHalfTheReadsFailedReportsItsLoss`（"this window dropped 5 of 10 reads and its own row says it measured enough"）、`TestSettleCoverageRowSaysNotPassWhenHalfTheReadsFailed`（"a window that dropped 10 of 20 reads must be judged by its own row as not fully measured"） | 71/69/**2**/0 |
+| **S1 只翻 `settleCoverageRowGates` 一枚布尔**（＝§1.3 交回的那一发，打在**已含 :208-210 改写**的树上） | `const settleCoverageRowGates = true`（`grep ⇒ :556`），其余一字节未动 | rc=0 | `TestCheckSettleSingleTrustworthyReadReportsItsLoss`（`sampler_settle_coverage_136_test.go:144` "this leg pins disclosure, not the verdict; a covered-enough window must still pass"）、`TestCheckSettleZeroFootprintDropsAreCountedToo`（`:281` "report=&{TargetState:Sleeping …}"） | 71/69/**2**/0 |
+| **M3a 单点回退折叠调用点（改动 #4），gate 仍 false** | `rep.Pass = foldSettlePass(…)` → `rep.Pass = memOK && backInTime && releaseOK`（`grep ⇒ :537`） | rc=0 | **无（71/71 全绿）** ⇒ 见下面"哪一处是装饰" | 71/71/0/0 |
+| **M3b 同一处回退、gate 翻 true** | 同上两行同时改（`:537` + `:556=true`） | rc=0 | `TestCheckSettleHalfTheReadsFailedReportsItsLoss`（`:236` "a failing gate row and pass=true at once: the fold rule is not applied"）、`TestSettleCoverageRowSaysNotPassWhenHalfTheReadsFailed`（`_gate_:226`）、`TestSettleReportPassNeverContradictsItsGateRows`（`_gate_:325` "half failed: pass=true alongside a failing gate row"） | 71/68/**3**/0 |
+| 正向对照（尺是活的） | 未改的 `snap-post` | rc=0 | 无 | 71/71/0/0 |
+
+### 4.1 单点回退的答案：**哪一处是装饰**
+
+七处改动里，**改动 #4（`CheckSettle` 末尾那行折叠调用点）在 HEAD 的落地形状下就是装饰**：M3a 撤掉它，
+71 枚**一枚都不变不响**——因为记录行（`gate=false`）按定义不否决总布尔。本程不拿"它有注释"糊这一条，给三样东西：
+
+1. **明说**：#4 今天无测试可感知，它是为 `gate=true` 那一步预备的形状，**不是**已经生效的行为；
+2. **让可感知性先就位**：折叠规则本身被拆成 `foldSettlePass` 并直接被 `TestFoldSettlePassOnlyGateRowsVeto`
+   的 7 个用例钉住（含"失败 gate 行必须否决 / 失败记录行不得否决"两形），**这条单测在 M3a 下仍绿**
+   ⇒ 它钉的是规则，不是调用点，这正是"装饰"的证据形状；
+3. **给出它何时不再是装饰**：M3b＝同一处回退 ＋ `gate=true` ⇒ 立刻红 3 枚并逐名可查。
+   ⇒ 翻那枚布尔之后，#4 从装饰变承重，**且变承重的瞬间就有钉子看着**，不需要到时再补仪器。
+
+其余几处各有独立感知者：#1/#3/#5/#7 由 M1（红 4 枚）与 M2（红 2 枚）覆盖；#6 是 §1.3 那枚待裁开关本身，
+由 S1 量出代价＝**2 枚**命名用例（不是三枚，因为 `:208-210` 那一处已按预授权改成了 gate 无关的形状）；
+#2 是注释（按定义装饰，不参与任何读数，故不与 #4 混记）。
+
+### 4.2 §1.3 的那一发在此改写（读数推翻了自己前面的一句话）
+
+§1.3 写"最小代价是同改三处断言"——那是**在改动之前**数的既有断言。S1 打在改动之后，
+实测代价是**另外 2 枚**：`TestCheckSettleSingleTrustworthyReadReportsItsLoss`（`:143-145`）与
+`TestCheckSettleZeroFootprintDropsAreCountedToo`（`:252-254`）。第 3 枚（`:208-210`）已被本程按预授权改成
+"行必须存在＋行必须自己说不 pass＋不得出现失败 gate 行与 pass=true 并存"，那一形**与 gate 取值无关**，
+所以翻布尔后它照旧绿——**这不是漏，是设计**：授权范围内的改写刻意写成两种取值都成立，
+编排者批不批 `gate=true` 都不需要再回来改这枚文件。⇒ **交回的那一发读数精确化为**：
+批准之后要动的只有那 2 枚断言（改法＝本程已用的同款三段），生产码要动的只有 `:556` 那一枚布尔字面量。
+
+
