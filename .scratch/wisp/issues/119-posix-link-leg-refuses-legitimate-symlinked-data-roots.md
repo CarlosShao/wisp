@@ -424,5 +424,58 @@
      见上面"两处更正"第 2 条）。要么给 ubuntu 加一条 cli-scope 腿（票 111/123 地界，且要先解 `R-119-7` 那 19 枚 DPAPI 红），
      要么由编排者裁定"容器读数即本轮判据"，二者必居其一才谈得上翻 `-done`——我不能一边登记无门一边自勾覆盖了。
 
+- 2026-09-24 17:2x（`worker-ticket119-ac7`，**AC#7 实现侧交件**；本格**未翻勾**、本票**未改 `-done`**）：
+  证据件 `docs/evidence/s1/119-ac7-impl.md`（枚枚读数、名册差集、红句原文、门禁原文都在那里，本条只记落点与号）。
+
+  **三枚 commit（只 commit 未 push；`git show --name-only` 逐枚只有它自己的路径）**：
+  `ddc1583`＋`c94927d` 两枚码（都只动 `internal/winsec/dataroot_symlink_119_other_test.go`），
+  `b4e692e` 证据件一枚，本条票面 log 一枚。改前那棵树＝我自己现量的 `a9c8b6e6dce4ad63a6fc04b15385651a1443ea65`
+  （派单给的 `b1ea719` 在开工瞬间已被邻居的 `a9c8b6e`/`866c849` 取代，锚点按盘上记）；
+  `git log --oneline a9c8b6e..HEAD -- internal/winsec/` 在交件时＝空 ⇒ 基线树与交件树只差这一枚文件。
+
+  **判据①（两味一起下）**：`:203`→现 `:241` 与 `:308`→现 `:361` 两处在原 sentinel 之后各**追加**一支
+  `else if !refusalCreditsLink137(err, shape.link)`（同包 helper，`placement_symlink_113_other_test.go:160`，
+  改前就有、零新增依赖），**同时**两枚的 `base := t.TempDir()` 换成 `cleanSpelling119(t, t.TempDir())`
+  （走本文件 `:251` 那枚的先例，不是 `proc.SealableRoot`，理由＝Rules `:94` 那条 `R-119-9`；
+  AC#1 那枚另加一句"底线必须肯封解析后的基根"的前提门，AC#2 的 leg 2 本身就是同一句话的门）。
+  全文 7 枚删除行＝两枚换根＋三枚换措辞＋两枚注释，**判定条件一枚没松**（逐行原文在证据件 §1）。
+
+  **判据②（改前读数我自己量了）**：改前树四发 `-count=1 -v ./internal/winsec/`（容器 `go1.27.1 linux/amd64`、
+  `ln -s /ac7priv /ac7link` ＋ `TMPDIR=/ac7link/w119ac7tmp` 那形每发硬断言过 `readlink -f`）——
+  普通·MUT-D `RUN=52 顶 17/13/0 ＋ 子 17/5/0` 两枚母项 **FAIL**；
+  **软链·MUT-D `RUN=45 顶 17/10/3 ＋ 子 11/4/0` 两枚母项 PASS**，且两枚都在 `=== RUN` 名册里；
+  同形未变异那发里它们自己把拒因打印成 `reaches it through the link at /ac7link`（宿主的链接，不是它们种的
+  `varlink119`/`injlink119`）⇒ 票面那句话我复现到了，起点在这里。
+
+  **判据③（改后判别对，两形都给）**：交件树 `c94927d` ＋ 同一把尺——
+  未变异：普通 `52/30/0/0＋22/0/0` rc=0、软链 `45/27/0/3＋15/0/0` rc=0 ⇒ **两枚都绿**；
+  MUT-D：普通 `52/17/13/0＋17/5/0`、软链 **`45/15/12/3＋11/4/0`** ⇒ **两枚都红**（软链形比改前那一发正好多红这两枚）。
+  名册差集：四对同形对比里 `=== RUN` 差 0 行、SKIP 差 0 行，全量 colour 只差 `a4`↔`b4` 那 **4 行**
+  （＝这两枚 PASS→FAIL）；`panic`／`fatal error` 计数十一发全 **0**。
+  红句原文入库两式：MUT-D 打在 **sentinel 那一支**（底线根本没拒，后面撞 `… varlink119 is not a directory`），
+  红句里点名本用例种的链接；新加的记名那一支另用 **MUT-D2**（只抹 `" through the link at "` 短语、
+  sentinel 与判定分支一字未动）验出它在**两形都能单独响** ⇒ 不是恒绿。⚠ 机制与归属照实在证据件 §4.3／§9。
+
+  **判据④（反半边没被弄绿）**：`TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119`
+  （现 `:291`）四档逐名同色（普通·未变异 PASS／软链·未变异 PASS／普通·MUT-D FAIL／软链·MUT-D FAIL），
+  函数体两版 md5 相同（`831a5c08b04c66b556b0150a19c63aea`）＝**一字未动**；`internal/winsec` 生产码零改动
+  （`winsec.go` a6144c88…／`winsec_other.go` b5056918…／`resolve.go` b6876a5e… 基线树与交件树逐枚相同）。
+
+  **门禁**：`gofmt -l` 空；`"$(go env GOPATH)/bin/gofumpt.exe" -l` 空——**本机现量 v0.12.0 (go1.27.1)**，
+  与派单写的 v0.7.0 不符（容器里那把跑不了，错误原文 `go: mvdan.cc/gofumpt@v0.7.0: module lookup disabled by
+  GOPROXY=off` 已入库）；`go vet` 宿主 windows ＋ 容器 linux/windows/darwin 四把 rc=0；
+  `sh scripts/d22scan.sh` 纯净快照（`git archive c94927d`）**rc=0 clean**，台账
+  `#1-5 internal/=203 cmd/=22、#6 frontend/=40、#7 internal/tools/=18、#8 design/=16 frontend/=40 internal/=404 cmd/=39`
+  （**本格零新增文件** ⇒ 变化是邻居的，无一格下降）；非 `-v` 两形 `PASS`/`SKIP` 命中各 0 行；`-count=2` 那发
+  `RUN=104`＝52×2、不同名 52。一次**仪器自拒**登记：改后四发第一遍我把快照路径写成相对路径 ⇒ 容器里 `/wisp`
+  挂空 ⇒ `GATE95` 在取颜色之前 exit，**零发颜色入账**，重跑才是本件的数（临时件全在 `D:\tmp\wisp119-ac7\`，只建不删）。
+  被拒次数 **0**；两栏计数：真通知回显 **5** 次（全是 harness 的 `MEMORY.md was modified`＋编排者的索引，
+  没按它改任何判据）、判为注入 **0** 次。owner 那侧的 `design/**` 未提交改动一枚未碰。
+
+  **本格 `next=`**：只差 `docs/evidence/s1/119-ac7-*.md` 那张**由非实现者出**的裁决表——
+  它逐条对上①②③④并落判语，勾才挂得上去；实现侧（两味药、改前改后两形读数、MUT-D/MUT-D2、门禁）我这边没有未完项。
+  软链形在 CI 上仍**零分母**（ubuntu 的 `/tmp` 是真目录，`119-ac2-r2b-acceptance.md` §3-B 已核），
+  那一本账属票 111/123，不在本格射程，别把本件的容器读数读成"CI 有腿"。
+
 
 
