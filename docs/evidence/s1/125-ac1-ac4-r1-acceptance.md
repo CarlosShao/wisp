@@ -402,7 +402,16 @@ seam_probe_root_125_other_test.go:253: AC#2 RED (the refusal side moved): the se
 ```
 $ git log --oneline -1
 20a6397 evidence(125,AC#2 r1 终裁 §2): 三台对照 + 自造 MUT-R1B/R1C 各自红点 + 冻结件三层裁定
-$ git show --name-only HEAD | tail -3
+$ git show --name-only HEAD
+commit 20a63979cc88018b44597ba483246219a72abe20
+Author: CarlosShao <1933942520@qq.com>
+Date:   Thu Sep 24 15:42:00 2026 +0800
+
+    evidence(125,AC#2 r1 终裁 §2): 三台对照 + 自造 MUT-R1B/R1C 各自红点 + 冻结件三层裁定
+
+    技术面成立（判据可红、拒绝侧未放宽、探针失败方向＝退回未解析而非跳过）；
+    纪律面不成立（"别的票刚动过这枚文件"不构成解冻，冻结的单位是这一票批准的行）；
+    可核面缺凭据（派单不在盘上、台账零枚 A##，且"授权"一句比代码落地晚 22 分钟才出现在盘上）。
     AC#2 判成立附条件＝补一枚编排者署名的 A##，处置权在编排者。
 
 docs/evidence/s1/125-ac1-ac4-r1-acceptance.md
@@ -465,3 +474,132 @@ time=2026-09-24T07:29:56.030Z level=INFO msg="wisp: persistent log sink installe
 双击起来的 console 窗口**在进程存活期间是能滚到那行的**。
 ⇒ **"等于无记录"对"持久、可回溯"这一档成立（3.1 的 `NONE` 就是证据）；对"当场有没有一扇窗口"这一档字面过强**。
 按 `A98④` 的口径处理：**结论签、措辞打折**。⚠ Windows 双击那一形**本程没测**（见 §6），这条只是代码级归因，不是读数。
+
+### 3.4 附：实现方留在盘上的归档抽验（这一档是〔日志＋归档，抽验〕）
+
+本程只读地查了实现方声称留下的快照——它们在**宿主 temp**（`/tmp/wisp-t125-*` ＝ `C:\Users\swq\AppData\Local\Temp\`），
+不在 `/d/tmp/`（那里现量 0 枚）：
+```
+wisp-t125-ac1  -blast  -ctrl  -ctrl81b  -final  -final2  -mutA  -mutA2  -mutB  -post  -pre  -s125   （12 枚，全在）
+```
+抽验两枚关键变异的**落地原文与本程独立造的那发同侧**：
+```
+wisp-t125-mutA2/internal/winsec/resolve.go:134: reason = resolverConformanceFailure(r) + " MUTATION-125A2 the install is refused on every candidate"
+wisp-t125-mutB /internal/winsec/resolve.go:300: _ = out // MUTATION-125B the guard no longer re-runs the floor on the candidate answer
+wisp-t125-pre  /internal/winsec/resolve.go: grep -c resolverProbeRoot = 0   （确认是未修版）
+```
+⇒ 票面 `:115-117` 那张三台表里的**变异原文与行号逐字对得上**（`resolve.go:134`／`:300`），
+本程据此把 §2 的实现方那一档从〔仅自述，不背书〕**提升为〔日志＋归档，抽验〕**。
+但**它的读数值（`RUN=14` 那组）本程没有复用到**——§2 的三台数全部是本程自己 `-count=1` 现跑的。
+
+### 3.5 §3 正文所在 commit 的回执（这枚回执由 §4 那一枚 commit 携带）
+
+```
+$ git log --oneline -1
+a088515 evidence(125,AC#3 r1 终裁 §3): 真二进制两形两台独立复现——盘上 winsec 零命中，NONE 成立
+$ git show --name-only HEAD
+commit a08851552323c6ed747c60f0ae1277f8b48aa8c5
+Author: CarlosShao <1933942520@qq.com>
+Date:   Thu Sep 24 15:44:30 2026 +0800
+
+    evidence(125,AC#3 r1 终裁 §3): 真二进制两形两台独立复现——盘上 winsec 零命中，NONE 成立
+
+    自建 wisp-pre(19,092,792B) / wisp-gate(19,097,696B) 两枚容器二进制，软链 temp 形下
+    改前 stderr 第 1 行就是那枚 ERROR、sink 在其后才装上；JSONL 2 行、grep -c winsec=0、
+    grep -rl=NONE（两台都是）。残余缺口具名落到票 130 第一格（init-time 记录可达性）。
+    一处措辞打折：交付的是 console-subsystem 构建，"等于无记录"只对可回溯档成立。
+
+docs/evidence/s1/125-ac1-ac4-r1-acceptance.md
+```
+
+---
+
+## §4 AC#4 —— 门禁
+
+**判**：**成立**（四数、卫生、双 GOOS、d22scan＋台账逐 scope 都独立复现；两处口径要钉，见 4.2／4.4）。
+证据档：**〔独立复现〕**。
+
+### 4.1 受影响包 `-count=2 -v` 四数（容器真跑；数只从 `-v` 取）
+
+树：`bd50c63`（代码＝`4824bb8`，见 §0.4）vs 控制组 `81b4d5f`。每把先 `ls -l /<mnt>/go.mod` = 883 B、`uname -s`=Linux、`go1.27.1 linux/amd64`。
+
+| 包 | `bd50c63` | 控制组 `81b4d5f` | rc |
+|---|---|---|---|
+| `./internal/winsec/` | `RUN=104 顶层PASS=60 顶层FAIL=0 顶层SKIP=0 / 子PASS=44 子FAIL=0` | `RUN=84 顶层PASS=54 … / 子PASS=30` | 两把 rc=**0** |
+| `./internal/config/` | `RUN=202 顶层PASS=110 顶层FAIL=0 顶层SKIP=0 / 子PASS=92 子FAIL=0` | `RUN=194 顶层PASS=106 … / 子PASS=88` | 两把 rc=**0** |
+| 两包合并跑 | `RUN=306 顶层PASS=170 顶层FAIL=0 顶层SKIP=0 / 子PASS=136 子FAIL=0` | `RUN=278 顶层PASS=160 / 子PASS=118` | 两把 rc=**0** |
+| `panic`／`fatal error` 计数 | **0**（三把全 0） | **0** | — |
+
+⇒ 实现方 AC#4 表那四组数（`104/60`、`202/110`、`306/170`、控制组 `84/54`、`194/106`）本程**逐字复现**。
+
+**⚠ 必须钉的口径（否则下一位会把两种分母加成一个数）**：
+实现方这张表的 `RUN` 数的是**所有** `=== RUN` 行（含子用例），`PASS` 只数**顶层** `--- PASS` 行 ⇒
+`RUN=104 / PASS=60` **不是**"44 条没过"，那 44 枚是子用例（`子PASS=44`，顶层+子＝104＝RUN）。
+本表把两档分开写全。**另：本表 §2 用的是 `-count=1`，本节是 `-count=2`，两节不许互比。**
+
+**名册差集（防止"一条 panic 吞掉几十条读数"）**：
+顶层＋子用例名集去重后 `bd50c63` **153 枚** vs `81b4d5f` **139 枚** ⇒ **＋14、丢 0**。
+`comm -13` 现量**空**（没有任何一枚名字从名册上消失）。
+＋14 逐名可点到本票：`TestAC1POSIXSeamHoldsC26Pipeline125`、
+`TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125`、`TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125`、
+`TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125`、`TestAC2POSIXSeamInstallSurvivesASymlinkSpelledTemp125`
+五枚顶层 ＋ 九枚子用例。⇒ 增量对得上，不是"分母做小换来的绿"。
+
+### 4.2 `gofmt` / `gofumpt`（写明版本；CI 那步没钉版本）
+
+| 仪器 | 版本读数 | 范围 | 结果 |
+|---|---|---|---|
+| `gofmt -l internal cmd` | go1.27.1（容器） | 全 `internal/`+`cmd/` | **空**（0 行） |
+| `gofmt -l internal cmd` | go1.27.1（宿主 windows/amd64） | 同上 | **空** |
+| `gofumpt -l internal cmd` | **`v0.12.0 (go1.27.1)`**（`D:\work\base\gopath\bin\gofumpt.exe`，`--version` 现量） | 同上 | **空** |
+
+⚠ 三点具名：
+1. **实现方报的版本是 `v0.7.0`，本程现量这台机器上是 `v0.12.0`**（exe mtime `09-23 22:23`，比票 125 落地晚一天）。
+   ⇒ 它那把读数**在今天这台机器上已经不可复现**（工具换了），本表的清白读数**只属于 v0.12.0**。
+2. CI 那步逐字是 `.github/workflows/ci.yml:113 go install mvdan.cc/gofumpt@latest` ⇒ **这枚门禁按构造就没有固定版本**。
+   两枚版本（v0.7.0／v0.12.0）下都是空的，所以结论稳；但"版本"这一栏**在这张票上不可能长期有效**，
+   这是门禁自身的性质，不是票 125 的缺陷（登记在本表 §6 的"没核"边里：没去核 v0.7.0↔v0.12.0 之间是否有规则差异）。
+3. 容器内没有 `gofumpt`（未 `docker pull`、未 `go install`，避免动网络）⇒ **gofumpt 只有宿主一把**，与实现方同形，如实记。
+
+### 4.3 `go vet` 双 GOOS ＋ **逐错误行归因**
+
+| 把 | 命令 | rc | 归因 |
+|---|---|---|---|
+| 宿主原生 | `GOOS=windows go vet ./internal/winsec/ ./internal/config/` | **0** | 无 |
+| 宿主交叉 | `CGO_ENABLED=0 GOOS=linux go vet ./internal/winsec/ ./internal/config/` | **0** | 无（**只编译不执行**，正向读数只来自 §2/§4.1 的容器真跑） |
+| 宿主交叉·全模块 | `CGO_ENABLED=0 GOOS=linux go vet ./...` | **1** | **1 枚错误、0 枚 `file:line`**：`package github.com/CarlosShao/wisp/cmd/wisp` → `imports …/sherpa_onnx` → `imports github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files in …` ⇒ 指向的是**外部模块目录**，不是本仓任何源文件行 |
+| **容器·真平台全模块** | `go vet ./...`（linux/amd64，`CGO_ENABLED=1`） | **0**，输出 0 行 | **这一把把上面那枚 rc=1 判掉了** |
+| 容器·关 cgo | `CGO_ENABLED=0 go vet ./cmd/wisp/` | **1** | 与宿主交叉那一把**逐字同文**（只有模块目录前缀不同）⇒ 与"交叉编译"无关，纯粹是 cgo 关掉后那枚包的 build constraint |
+
+**归因结论（本程比"既不算破口也不算清白"多走了一步）**：
+- 它**不是破口**：同一枚命令在**控制组 `81b4d5f`（票 125 之前的树）**上现量**同样 rc=1、同样这一行**
+  ⇒ 票 125 既没造成也没掩盖它；且真平台 `go vet ./...` rc=0。
+- 它**也不需要记成"清白未知"**：本程拿到了真平台（容器 cgo on）那枚 rc=0 的正向读数，
+  所以派单里"宿主交叉那发既不算破口也不算清白"这一句，**在本表里被一枚实测定掉了**（不是靠推理）。
+- 错误行里**没有**任何本仓路径 ⇒ 按"错误文本点到自家仓库路径才按真伤处理"的尺，这一发**不升真伤**。
+
+### 4.4 `sh scripts/d22scan.sh` ＋ 台账各 scope 不降
+
+纯净快照两棵各一把（容器），**两把 rc=0**，且**正控制那一步真跑了**：
+`runtests.sh: OK - packages=[./...] top-level: PASS=21 FAIL=0 SKIP=0, === RUN=31, '[no tests to run]'=0`（`TestBuiltBinaryGoesRedEndToEnd` 六枚子用例逐枚 PASS）。
+
+| scope（`d22scan` 自己打的 examined 数） | `bd50c63` | `81b4d5f` | 判 |
+|---|---|---|---|
+| bans #1-5 `internal/` | 202 | 202 | 持平 |
+| bans #1-5 `cmd/` | 22 | 22 | 持平 |
+| ban #6 `frontend/` | 40 | 40 | 持平 |
+| ban #7 `internal/tools/` | 18 | 18 | 持平 |
+| ban #8 `design/` | 16 | 16 | 持平 |
+| ban #8 `frontend/` | 40 | 40 | 持平 |
+| **ban #8 `internal/`** | **385** | **383** | **＋2 ＝ 本票新增两枚 `_test.go`** |
+| ban #8 `cmd/` | 32 | 32 | 持平 |
+
+⇒ **八枚 scope 零枚下降**，唯一变化那一枚的增量**逐名可归因**（`internal/winsec/seam_probe_root_125_other_test.go` ＋
+`internal/config/c26_seam_posix_125_test.go` 都是 `internal/` 下的 `.go`），不需要"逐名解释下降"（因为没有下降）。
+实现方给的基线 383 与本程控制组现量**逐字吻合** ⇒ 它没把基线说高。
+
+### 4.5 AC#4 里本表**不签**的一句
+
+票面 AC#4 那格的 `②软链 temp 形状那一把（信息性）`读数（`RUN=144 PASS=62 FAIL=19 SKIP=4`）本程**没复算**
+（它是票 124 那本 harness 账，不在本票射程；实现方自己标了"信息性"）。
+⇒ 那一组数在本表里的档位是**〔仅自述，不背书〕**，见 §6。
