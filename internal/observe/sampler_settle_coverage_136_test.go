@@ -188,8 +188,13 @@ func TestCheckSettleHalfTheReadsFailedReportsItsLoss(t *testing.T) {
 	if tree.reads < 4 {
 		t.Fatalf("precondition broken: only %d reads taken, half-and-half needs a window to lose in", tree.reads)
 	}
-	if kept < 2 || lost < 2 {
-		t.Fatalf("precondition broken: kept=%d lost=%d of %d reads", kept, lost, tree.reads)
+	if kept < 2 {
+		t.Fatalf("precondition broken: the fixture kept only %d of %d reads, this leg needs trustworthy reads to compare against", kept, tree.reads)
+	}
+	// The property: about half the window failed, and the report has to carry
+	// that instead of just the kept half.
+	if lost < 2 {
+		t.Fatalf("the seam lost %d of %d reads but the report says sample_errors=%d: a half-covered window must report its losses", tree.reads-kept, tree.reads, lost)
 	}
 	if kept+lost != tree.reads {
 		t.Fatalf("kept %d + dropped %d != %d reads taken: the window is still hiding readings", kept, lost, tree.reads)
