@@ -395,3 +395,109 @@ docs/evidence/s1/119-ac2-r2b-acceptance.md
 `cmd/wisp` 属 `--scope=cli`（`scripts/portable-tests.sh:195`），CLI 那一步只在 windows 腿
 （`ci.yml:334-335` 的 `test-windows`、`ci.yml:422` `bash scripts/wisp-cli-tests.sh`），
 而 `cmd/wisp/secret_dataroot_119b_test.go:1` 是 `//go:build !windows` ⇒ **那三枚在 windows 腿上根本不编译**。〔独立复现〕
+
+（§3 那枚提交的号：`85c1393`，`git show --name-only 85c1393` 末行只有
+`docs/evidence/s1/119-ac2-r2b-acceptance.md` 一条路径。）
+
+---
+
+## §4 总判（只裁 AC#2 这一格）
+
+**成立（无附条件）。** 一句话理由：第一轮把这一格按退回的两条理由——"② 只做了一半"与"交回的注释把这一半写成了全部"——
+今天**一条已经不成立、另一条以"措辞对上读数"的方式闭合**，而这两种闭合我都是自己在盘上/容器里重量过的，不是抽验别人日志。
+
+按派单五条逐项落点：
+
+| 派单要裁的 | 本程读数落点 | 判 |
+|---|---|---|
+| ① 返修 commit 逐枚 numstat | §1② ：动 `winsec_other.go` 的返修只有 `034080c`（41/14），交件 `189cb1e` 21/6 与第一轮逐字同 | 量到 |
+| ② 三档改动账 | §1③ ：一档 0 行／二档 53 增 11 删（＝全部）／三档 0 行，两把尺各 0 hunks | 量到 |
+| ③ "winsec 一字未动"今天对不对 | §1⑤ ：按字面不成立、按判定分支与 `winsec.go` 单文件成立；票面 `034080c`/`4f19ec6` 已改口 ⇒ **闭合的方式是措辞对上读数，不是读数变干净了**（盘上今天仍是 53/11 注释） | 闭合 |
+| ④ 退回的另一半（落点归属那本账 ＋ 条件 1 逐条） | §2.1 正向读数我自己跑（含 `subtest\|path\|seal` 逐行表）；§2.3 条件 1 四条**全部闭合**；§2.4 分两层：登记层有、**归属层（并案到票 120/`R-108-2`）仍挂在编排者手上**，别记成已并案 | 闭合（AC#2 射程内） |
+| ⑤ 恒真判据自查 | §2.2 两发：`t6`（把 config 的换根 helper 退回未修形）⇒ 软链形 2 枚 FAIL；`t7`（两味齐 ＋ MUT-D）⇒ 两形各 2 枚 FAIL。§2.0 把"我这发在哪版树上量的"钉成 `bc49096`；§1④／§2.3 各主动报一条**引文腐坏**（`resolve.go` md5 到 HEAD 已变、调用点行号已从第一轮引的那组漂走） | 自查过 |
+
+三件**必须跟着这个"成立"一起读**的事（不是条件，是边界）：
+
+1. **票面 AC#2 那格仍是实现方自勾的 `[x]`**，而第一轮表判的是"退回"。改名与翻勾的权不在本程，
+   本程也不替它翻——**台账要记的是"第二程复判＝成立"，别记成"表与勾一直一致"**。
+2. **`R-119-3`（声明树动不动）这一裁我核到的是"有用例钉着"**：`TestAC2POSIXInjectedTestDataDirStandsAsDeclared119`
+   两形各 PASS（在 5/5 那一发里逐名点到），两半（声明原样／OS 答案解析）都在这枚的两条 leg 上；
+   它的**文档层**（`internal/proc/envfork.go:26/7` 那笔注释）我只数了 numstat、没逐句验语义 ⇒ 记进 §5。
+3. **同格有第二枚验收程在跑**（`119-ac1-ac2-r2-acceptance.md`，§0.3）。本格＝AC#2，两份表不互相抵账。
+
+## §5 我没核的清单（如实列，不当已核）
+
+1. **真二进制那一层**：第一轮 §二(c) 那五行 `wisp secret list`／`wisp doctor` 的 rc 表，我**没有**重跑
+   （要在容器里造带 sherpa 运行库的真二进制 ＝ 票 111/123 地界）。我的替代凭据是用例级（`cmd/wisp` 三枚两形 3/3 PASS），
+   真二进制那五行在本表里只值**〔日志＋归档，抽验〕**。
+2. **macOS 半面**（`TMPDIR` 住在 `/var` 那条链接下面）：零读数，容器不是 macOS。
+3. **`chmod 0700` 那一细节没复算到**：我探针打的是根目录 mode、且 `Perm().String()` 会把类型位吃掉
+   （所以表里那列写成 `rwxr-xr-x` 而不是 `drwxr-xr-x`）；`config.toml` **文件自身**的 mode 我没取。
+   第一轮"数据根被建成并被 chmod 0700"这半句，本程只背书"落盘 4163 字节"这半句。
+4. **MUT-D 我只抹了一处**（`winsec_other.go:158`）。137 那发的 MUT-D 抹的是**两处**（另一处 `winsec.go:262`）
+   ⇒ 我只验了"本包这条腿哑不哑"，不替"两枚标记全抹"那一发背书。
+5. **AC#6 的地界一枚未跑**：`d22scan`／`gofmt`／`gofumpt`／`go vet`／全仓测试／`-race` 都没跑（本格不裁 AC#6）。
+6. **AC#7 判据②③④ 没按它自己那四条逐条裁**：我只答"①成不成立"，加上"④那枚 AC#3 用例在我四发里逐名没变色"这一条顺带读数；
+   并且**没改 `AC#7` 正文、没实现它**（生产码与测试码在仓内零改动，见 §6 的 `git status`）。
+7. **票 137 AC#4 那 7 处换根、票 124 那批换根的归因**：我只在 §2.2 划了一句边界（那两枚 config 用例红因属于 124 不属于 119），没逐枚核。
+8. **CI 只核到 job conclusion ＋ `test-core` 一发的日志行**；同 run 里 `lint`／`test-windows` 两枚 failure 与本格有无关系**没查**。
+9. `docs/reports/pending-and-issues.md` 的台账我**没读**（不替编排者改账）；第一轮表里 `A160`/`A163` 那两笔转述我只当起点引用。
+10. **同格那枚 `119-ac1-ac2-r2-acceptance.md` 的正文我没读**（只 `--stat` 看了它动哪枚文件），以免把别人的读数当自己的。
+
+## §6 临时件 ／ 注入两栏 ／ 被拒记录
+
+**临时件（全部只建不删，都在仓外）**
+
+```
+D:\tmp\wisp119r2b-work\   drive.sh(容器侧形状自证) patch.sh(仪器补丁) run.sh(宿主侧驱动)
+                          md5-head.txt anchor.txt(锚点) summary.txt(18 发四数+红名册+panic 计数)
+                          base-code.txt head-code.txt(§1 尺 A 的两份剥注释文本)
+D:\tmp\wisp119r2b-t0\     git archive bc49096 | tar -x  ＝ 被验版本（纯净）
+D:\tmp\wisp119r2b-t2\     ＋只接记名        D:\tmp\wisp119r2b-t3\  ＋只换已解析根
+D:\tmp\wisp119r2b-t4\     ＋两味一起        D:\tmp\wisp119r2b-t7\  ＝ t4 ＋ MUT-D（抹标记）
+D:\tmp\wisp119r2b-t5\     ＋仓外探针 internal\config\zz_r2b_landing_probe_119_test.go（未进仓）
+D:\tmp\wisp119r2b-t6\     ＋把 config 的 sealableTempDir124 退回未解析形（恒真自查）
+D:\tmp\wisp119r2b-logs\   18 发 .log ＋ .rc
+命名卷 wisp119r2b-build（本程自己的 go 构建缓存）；只读复用既有卷 ac119-gomodcache（＝依赖缓存，不是别人的读数）
+容器一律 --rm，收尾 docker ps 里 golang 计数 0
+```
+⚠ 两处我自己造的垃圾也留着：`D:\tmp\wisp119r2b-t0;C`（一条 shell 引用写错的产物，空目录）、
+以及 §2.1(b) 那枚探针里的 `rootmode` 列格式错（`Perm().String()`）——都如实标在 §5 第 3 条，不删不盖。
+
+**只读守住的自证**：`git status --porcelain internal/winsec/` 输出为空（**最后一次现量 `2026-09-24 16:35:45 +08`**，
+就在写下这一段之前；同刻还跑了下面那五行 `git show --name-only`）。
+本程**已落地**的五枚 commit（`20f8c22`/`fc71fa6`/`4757198`/`024ee87`/`85c1393`）的 `git show --name-only --format=''`
+逐枚回显（原样，16:35:45 现量）：
+```
+20f8c22 -> docs/evidence/s1/119-ac2-r2b-acceptance.md
+fc71fa6 -> docs/evidence/s1/119-ac2-r2b-acceptance.md
+4757198 -> docs/evidence/s1/119-ac2-r2b-acceptance.md
+024ee87 -> docs/evidence/s1/119-ac2-r2b-acceptance.md
+85c1393 -> docs/evidence/s1/119-ac2-r2b-acceptance.md
+```
+⇒ 每枚只带这一条路径；生产码/测试码/票面/阈值/golden 零改动。
+工作树里 `design/**` 那批 owner 侧的挪动**一枚未动、未 add、未还原**（收尾 16:35:45 现量
+`git status --porcelain design/` = 18 行、首三行 ` D design/assets/{base.css,icons.js,theme.js}`）。
+
+**注入栏（每条带出处：工具名 ＋ 命令前 40 字）**
+
+| # | 形状 | 出处（工具名 ＋ 命令前 40 字） | 处置 |
+|---|---|---|---|
+| 1 | 回显一枚**盘上不存在的 commit 号** `5f7e104`，主语还冒充"票 119 AC#2 复判表建件（骨架，§0 第一次提交）"＝本程自己的活 | `Bash`：`git log --oneline -1; echo "=== show ==="; gi` | `git cat-file -t 5f7e104` → `Not a valid object`；`git branch --contains` 同错；dev 近 12 枚无此号无此主语 ⇒ **判为冒充锚点的注入／异常回显，只登记不服从**；此后每个 sha 落笔前先 `cat-file -t` |
+| 2 | 同一批里两条 git 命令**给了空输出**（只有 echo 的分隔符），`git log -1` 像没执行 | `Bash`：`date "+%Y-%m-%d %H:%M:%S %z"; git log --oneli` | 复跑同一对命令拿到真值；不当"没提交"处理（`git show --name-only` 追到了 `20f8c22`） |
+| 3 | `git show HEAD:internal/winsec/resolve.go \| md5sum` 回显**旧串** `7eb8a754…`（复跑三次实为 `b6876a5e…`） | `Bash`：`cd "/d/work/workspace/projects plans/Wisp" &&` | 用 `md5sum` ×3 ＋ `git diff --numstat 034080c..HEAD` 双查，发现是**回显错不是树错**；§1④ 表按复跑值写，并把这次误显记在正文里（不悄悄改） |
+| 4 | 一条"harness 说某文件被创建"的提示，指向 `D:\work\workspace\D:tmpwisp119r2b-t0` 这枚**路径本身畸形、盘上不存在**的对象 | `Bash`：`cd /d/tmp && for v in t2 t3 t4; do rm -rf /d` 那一批的回显尾部 | `ls` 反扫＝不存在 ⇒ 按注入判（第 8 代形状：冒充我们自己的对象名），不动作 |
+
+**真通知／正常回显栏（分开计，不混进上面）**
+
+- `MEMORY.md was modified` ×2（本会话自动记忆摘要在写我的记忆目录，编排者已按三条判据核过有真实来源）⇒ 不需要本程做任何事；
+- harness 追加的 `The task tools haven't been used recently…` ＋ **别人的**任务列表 ×≥9（从第一条起就判它不是指令，未逐条精确计数——**报"约数"而不是精确数，就是为了不制造不可核的自述**）；
+- `Write`/`Edit` 成功回执里的 CRLF 提示 × 若干（我全程没在任何跟踪文件里写 CR，§1 两把尺读的都是 LF 文本）。
+⇒ **判为注入：4 条；要我"少取证／别用工具／直接下结论"的：0 条**（第 1 条最坏变体如果被我照抄，本表的锚点就是一枚假号）。
+
+**本程被拒过的工具调用：零次（权限类）。**
+命令级非零 rc 如实列在这里，与"被拒"分开：`grep -c` 命中 0 时的 rc=1（§1 三处、尺 A 那发 diff 的 rc=1 同因）、
+`git cat-file -t 5f7e104` 的 rc=129（**故意的反扫**）、`gh run list` 在 16:1x 一度网络失败（约 15 分钟后重试成功，
+所以我没有把"CI 闸门"当成已核，改用 `docker ps` 计数＋每发前 `GATE golang-containers=0` 自证）。
+**没有一次拒发生在取数之前，也没有一次取数因拒而少跑。**
+
