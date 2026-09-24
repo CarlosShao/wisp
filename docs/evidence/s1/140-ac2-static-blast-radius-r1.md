@@ -563,4 +563,102 @@ docs/evidence/s1/140-ac2-static-blast-radius-r1.md
 | 回退 | 1 枚追加 commit，**但仓外残留不清理** | 1 枚追加 commit，无残留 | 1 枚追加 commit |
 | 与在飞票撞哪一枚文件 | `ci.yml` 共享件；`slo-full` 那格是 SLO 读数的宿主 | **`dataroot_128_test.go` 在票 135 的 `Packages` 名单里** | 与 135 不撞文件 |
 
+### 4.5 §4 那枚 commit 的回显（`git log --oneline -1` + `git show --name-only HEAD`，原样）
+
+```
+0ed0d02 docs(evidence/140 AC#2 r1): §4 三支代价表 + §3 回显
+
+docs/evidence/s1/140-ac2-static-blast-radius-r1.md
+```
+
+（那次 commit 前 `git diff --cached --name-only` 现量**只有这一枚路径**。）
+
+---
+
+## §5　⑤　同族扫描：还有谁在用"环境把分支选走"这种形状
+
+**票面 `next=` 点名要的那一条是"除 `cmd/wisp` 里为 128 钉的那枚 helper 之外还有谁"。
+扫法全部写成可重跑的命令；**扫到 0 枚的地方也写命令与路径**。**
+
+### 5.1 扫法一：其它包的 `t.Setenv("WISP_ENV", …)`
+
+**命令**：`grep -rn 't.Setenv("WISP_ENV"' --include='*_test.go' .`
+**现量：7 处命中 / 2 枚包。**
+
+| 枚 | file:line（版本见 §1.3） | 钉的是 | 算不算同族 |
+|---|---|---|---|
+| 1-2 | `cmd/wisp/dataroot_128_test.go:260`、`:261` | 先 `test` 再 `dev` | **就是那枚 helper 本体**，票面已点名，不计新账 |
+| 3-4 | `cmd/wisp/leg_sink_nail_131_windows_test.go:409`、`:526` | `test` | **算**。它们是"用 `t.Setenv` 把 Go 分支选走"的**既有第二例**，与 128 那枚**同形不同人**：钉 `test` 而不是 `dev`，所以 §4.2 那条"推广时照抄必红"的形状冲突就是它们造出来的 |
+| 5-7 | `internal/buildinfo/env_test.go:23`、`:28`、`:33` | `test` / `nonsense` / `""` | **算，且是全仓唯一一枚"别包"的**。它是三形优先级自证（`:34 want, err := ParseEnv(DefaultEnv)` 是**相对**断言），**不依赖 ambient** ⇒ (a)/(b)/(c) 都不动它 |
+
+**`cmd/wisp` 之外还有谁 `Setenv` 这枚变量**：`grep -rn 'os.Setenv("WISP_ENV"' --include='*.go' .` →
+**唯一命中 `cmd/wisp/slo_windows.go:239`（生产码，不是测试）**。⇒ 没有第三枚包。
+
+### 5.2 扫法二：依赖 `WISP_ENV` **默认值**的测试（这一形最容易在 (a) 后悄悄变义）
+
+**命令**：`grep -rn 'EnvString\|ResolveEnv\|DefaultEnv' --include='*_test.go' .`
+**现量：命中 17 行 / 3 枚文件**（`cmd/wisp/dataroot_128_test.go` 4 行：`:250`/`:263`/`:266`/`:268`；
+`internal/buildinfo/env_test.go` 11 行：`:19`/`:20`/`:22`/`:24`/`:25`/`:29`/`:30`/`:34`/`:36`/`:38`/`:39`；
+`internal/secret/store_test.go` 2 行：`:142`/`:144`——三枚文件的命中数**加总正好 17**，这条加法尺顺手核过）。逐条判：
+
+| 处 | 判 |
+|---|---|
+| `internal/buildinfo/env_test.go:34` | **唯一一枚真的"依赖默认值"的**，但它比的是 `ParseEnv(DefaultEnv)` 本身（相对）⇒ **不硬编码 `dev`，免疫**。(a) 之后**默认值不变**（`DefaultEnv` 是 ldflags 注入的，见 §5.4 S6），所以这里连"变义"都不会发生 |
+| `cmd/wisp/dataroot_128_test.go:263` | `if got := buildinfo.EnvString(); got != string(buildinfo.EnvDev) {` —— 它读的是**自己 `:261` 刚 pin 的值**，不是默认值 |
+| `internal/secret/store_test.go:144 TestResolveEnvRef` | **名字骗人**：它测的是 `internal/secret/store.go:96 v, ok := os.LookupEnv(value)`——**配置里 `env:` 引用的那枚任意变量名**，与本票这枚无关（凭据：`grep -n WISP_ENV internal/secret/*_test.go` → 只有 `delete_test.go:159` 一枚**注释**） |
+| 其余 | 注释/报错文案 |
+
+⇒ **"依赖 ambient 默认值才成立"的测试：全仓 0 枚。** 这一条是 (a) 支最干净的一面。
+
+### 5.3 扫法三：workflow / 脚本里"job/step 级 env 影响 Go 分支"的**其它例证**（票面要的那条主账）
+
+**命令**：`grep -n 'env:' .github/workflows/ci.yml` → **只有 4 处、全是 job 级**（`:226 :336 :481 :539`），
+**ci.yml 里一枚步骤级 `env:` 都没有**；另一枚 workflow
+`grep -n 'env:' .github/workflows/slo-fresh.yml` → **1 处步骤级（`:67`）**。
+再用 §2 的读者名单反查"这枚变量会不会被 Go 读到"，得**同族 6 枚**：
+
+| # | 设值处（file:line + 版本） | 逐字节原文 | 谁读它、读来判什么 | 与 (a) 的关系 |
+|---|---|---|---|---|
+| **S1** | `scripts/slo-check.ps1:111-112`（`decb7b9 09-23 13:51`） | `$env:WISP_ENV = 'test'` / `$env:WISP_TEST_DATA_DIR = Join-Path $OutDir 'data'` | `internal/buildinfo/buildinfo.go:38` 与 `internal/proc/envfork.go:122` ⇒ 判**落点 + 枚举** | **最贴的同族，且方向相反**：它是"门禁自己设 env"，正是 §3.1 #2 说 `slo-check` 对 job env 免疫的原因 |
+| **S2** | `scripts/build.ps1:116`（`bfcb230 09-20 07:00`） | `$env:CC = $cc` | `cmd/wisp/doctor.go:312 cc := os.Getenv("CC")`（`gccVersion()`，`:316` 拿它起 `exec.Command(cc, "--version")`）⇒ **判 `doctor` 的一枚 `critical` 检查**（`doctor.go:49-53`：`fail("gcc (build-time)", …)`） | **新账，且正落在 (a) 的风险步骤里**。⇒ `ci.yml:400/:497/:560` 那枚 `wisp doctor` **本来就有一枚靠脚本级 env 才成立的 critical 检查**。`grep -rn 't.Setenv("CC"' .` → **0 命中** ⇒ 没有任何测试兜它。这一条不改变 (a) 的分支判定，但**改变"这一步为什么可能红"的归因面** |
+| **S3** | `.github/workflows/ci.yml:550`（`decb7b9`） | `      MINGW64_ROOT: E:\work\base\msys64\mingw64\bin`（行首 6 空格，挂在 `slo-full` 的 `:539 env:` 块里） | `scripts/build.ps1:51` PowerShell 分支 ⇒ 判 **gcc 发现路径**（`:59` 找不到就 `Fail`） | **形状完全同族**（job 级 env、选走一条分支、只在 self-hosted 那枚 job 上需要）。`:546-549` 的注释自陈不设它「the step died before compiling anything」⇒ **它是"job 级 env 是必需件而非装饰"的现成反例**，裁定 (a) 时别把它一起摘 |
+| **S4** | `scripts/wisp-cli-tests.sh:109`（`8fe5c7c 09-21 21:05`） | `export PATH="$dll_dir:$PATH"` | 不是 Go 读的，是 **PE loader** 读的 ⇒ 判**测试二进制起不起得来**（`:103-105` 自陈两形：`pwd -W` 形 → `exit status 0xc0000135`＝票 98 的症状；shell 自己的形 → `PASS=33 FAIL=0 SKIP=0`） | 同族里的**极端例**：它选走的不是分支而是**整条腿的存在**。归票 98/111 的"有没有腿"账 |
+| **S5** | `scripts/build.ps1:115/117/118/119` | `$env:CGO_ENABLED = '1'` / `$env:GOOS = 'windows'` / `$env:GOARCH = 'amd64'` / `if (-not $env:GOPROXY) { $env:GOPROXY = 'https://goproxy.cn,direct' }` | 构建期工具链，不选 Go **运行**分支 | 边缘同族（"脚本报 env 决定产物形状"）。注意 `:119` 是**条件设值**，与 `slo_windows.go:238` 同形 |
+| **S6** | `scripts/build.ps1:107`（配 `:23-24`） | `"-X $BuildInfoPkg.DefaultEnv=$Env",` | `internal/buildinfo/buildinfo.go:20` 的 `DefaultEnv` ⇒ 判**env 未设时落到哪** | **不是 env 变量，是"构建期把默认分支选走"**。`:23-24 [ValidateSet('dev', 'prod')]` / `[string]$Env = 'dev'` ⇒ **`test` 不是合法构建默认**。⇒ (a) 的下家永远是 `dev`，这一条把 §3/§4 全部结论钉死 |
+| **S7** | `.github/workflows/slo-fresh.yml:67-69`（该文件最后改动 `44ab500 09-23 14:04`） | 步骤级 `env:` 块里的 `GH_TOKEN:`（引用 secrets 的表达式，**本程按纪律只写变量名与 file:line，不抄任何值**） | `scripts/slo-freshness.sh`（`slo-fresh.yml:70` 起）判能否向 GitHub 查询 ⇒ **凭据可得性** | 形状同族（step 级 env 决定脚本分支），**与本票无关**，列出来只为让"还有谁"这一问的名册可核 |
+
+### 5.4 两条支撑性引用（逐字节，给上面的判定当底）
+
+`scripts/slo-check.ps1:114-117`（§4.1 的 U3 凭据；证明那台机器**跨 run 复用同一棵树**）：
+
+```
+# --- clear stale numbers ---------------------------------------------------
+# The runner reuses E:\work\base\actions-runner\_work\wisp\wisp across runs, so
+# build\slo can still hold the previous run's JSON when this run refuses to
+# sample. "No numbers" has to mean no numbers on disk, not just no new ones.
+```
+
+`internal/proc/envfork.go:121-126`（S1 里那枚 `WISP_TEST_DATA_DIR` 的读者，也是链 A 的尾）：
+
+```go
+func TestDataDir() string {
+	if dir := os.Getenv(TestDataDirEnv); dir != "" {
+		return dir
+	}
+	return filepath.Join(SealableRoot(os.TempDir()), fmt.Sprintf("wisp-test-%d", os.Getpid()))
+}
+```
+
+### 5.5 同族净数一句话
+
+- 除那枚 helper 之外，**`t.Setenv("WISP_ENV")` 的同族：3 处**（`leg_sink_nail_131:409/:526` 钉 `test`、
+  `internal/buildinfo/env_test.go:23/:28/:33` 三形自证 ⇒ 按**枚**是 5 处、按"另一例形状"是 **3 枚站点**：
+  131 那两枚 + buildinfo 那一组）。⚠ 别把 §1.3 里那 6 处子进程 `cmd.Env` 算进来——那是"自带值"，不是"用 env 选分支"。
+- **依赖 `WISP_ENV` 默认值的测试：0 枚。**
+- **workflow/脚本里"环境把分支选走"的其它例证：7 枚（S1–S7）**，其中
+  **S2（`CC` -> `doctor.go:312` -> critical 检查）与 S3（job 级 `MINGW64_ROOT`）是本次新扫出来的**，
+  上一份盘点没记；S6（`DefaultEnv` 走 ldflags、且合法值里没有 `test`）是把 (a) 的下家钉死的那一枚。
+- **扫法可重跑**：本节每条命令都已写在表格上方的粗体行里，路径全集＝仓库根（`.`），
+  含 `.github/workflows/` 下**两枚** workflow（`ci.yml`、`slo-fresh.yml`——第二枚本程此前未见有人点名扫过）。
+
 
