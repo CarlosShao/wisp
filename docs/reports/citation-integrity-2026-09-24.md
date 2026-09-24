@@ -266,3 +266,71 @@ $ find . -maxdepth 3 -name 'tasks*' -o -name '*.db' | grep -v '^./.git/'
 | 票 141 面 `:79`（`HANDOVER.md:108`"三处同形逐处 grep 到"） | 该行含"面向用户的字符变严／注释面豁免"，与 `docs/evidence/s1/141-q46c-impl.md:10` 同句 | **字面在** |
 | `.scratch/wisp/issues/119-*.md:73`（`:4195`） | 真名 `-done.md` 的 `:73` 是 `>` 收讫块（v0.12.0 那把尺） | **行在，内容需按现名复核一次** |
 | `.scratch/wisp/issues/README.md:178`（`:4538`"同一处漏计我已按实际更正"） | `## Hard global constraints (apply to EVERY ticket)` | **字面在** |
+
+---
+
+## 检查 4：`file:line` 引用的存活抽查（分层 30 条）
+
+```
+$ date "+%Y-%m-%d %H:%M %z"
+2026-09-24 23:30 +0800
+
+$ git log -1 --format='%h %ad' --date=format:'%H:%M'
+7175ce0 23:27
+```
+
+### 4.0 取数方式与分母
+
+- 全体可抽样本：两枚文件里 `path.ext:<line>` 形式的引用 **257 枚去重**（`internal/` 44、`cmd/` 15、`tools/` 9、
+  `scripts/` 7、`docs/` 16、`.github/` 4、`.scratch/` 2，其余 160 枚是只写文件名的简写形）。
+- 分层抽 **30 条**，六组各 ≥3；行内容一律 `git show HEAD:<path> | awk 'NR==<line>'` 现取。
+- 判据：**字面在那一行**＝在；**漂了但在别处/同文件其他行找得到**＝待更正；**内容整枚找不到且无修码档案**＝缺陷。
+
+### 4.1 明细
+
+| # | 引用（台账写法） | 台账说那里是什么 | HEAD 现量 | 判 |
+|---|---|---|---|---|
+| 1 | `internal/observe/sampler.go:556` | `const settleCoverageRowGates = true`（`:5709`） | `const settleCoverageRowGates = true` | **在** |
+| 2 | `internal/observe/sampler.go:332` | 零样本 fail-closed 承重墙 | `if len(rep.Samples) == 0 {` | **在** |
+| 3 | `internal/observe/sampler_settle_gate_136_test.go:262` | `buildSettleVerdicts(SettleReport{})[0]` 无守卫下标 | 该行现为空注释；缺陷本体已由 `021a549` 删行修掉，台账 `:5764①` 自己给出新落点 `:271` | **在（已修，台账自洽）** |
+| 4 | `internal/tools/registry.go:438` | gofmt 点的"缩进注释" | **越界**：该文件 HEAD 只有 297 行 | **已作废**（`:5752` 明说这条前提不存在） |
+| 5 | `internal/proc/envfork.go:125` | `WISP_ENV=test` ⇒ `%TEMP%\wisp-test-<pid>` | `return filepath.Join(SealableRoot(os.TempDir()), fmt.Sprintf("wisp-test-%d", os.Getpid()))` | **在** |
+| 6 | `internal/risk/syncdirs_redteam_windows_test.go:205` | 与 `:208` 两枚未登记 SKIP | `:208`＝`t.Skip("no profile home")` 对；`:205`＝函数声明行，非 SKIP | **待更正**（半漂；另一枚 SKIP 在 `:54`） |
+| 7 | `internal/risk/rules_scale.go:24` | 生产可见文案里那枚 `≥` | 该行现在是 `…（>=%d）…`：行指对了，**字面 `≥` 已被 `1218192` 换成 `>=`** | **待更正** |
+| 8 | `internal/llm/adaptertest/mockllm.go:68` | d22scan 报的 `[bare-goroutine]` | `:68` 现为 `t.Fatalf("build tools/mockllm…")`，全文件已无 `go func(`（`7c9256b fix(67)` 把它改走 `observe.Registry.Spawn`） | **待更正**（有修码档案） |
+| 9 | `internal/ball/renderer_windows.go:368` | `mulA` 唯一定义处 | 该行现为 `func (r *renderer) setSolid(c Color)`；`mulA` 在 HEAD **任何 .go 里都不存在**（只剩 `ci.yml` 注释与工单 70 的文本） | **待更正→符号已消失**（`2201530 fix(78)` 一线） |
+| 10 | `cmd/wisp/slo_windows.go:623` | 合成失败报告 ⇒ `sample_errors=0` 语义 | `return &observe.SettleReport{TargetState: observe.SLOSleeping, Pass: false}` | **在** |
+| 11 | `cmd/wisp/notify_windows.go:13` | 注释自写 "nothing here touches it" | `// internal/ball, and nothing here touches it).` | **在** |
+| 12 | `cmd/wisp/run.go:257` | 用 `approval.NewChannels()`（无参） | `:257` 是无关注释；真身在同文件 **`:339`** | **待更正**（漂 82 行） |
+| 13 | `cmd/wisp/models.go:303` | `cmdModels` 的调用者那一行 | `:303` 现为 `statemachine.New(…)`；调用者现在 **`cmd/wisp/main.go:100`** `os.Exit(cmdModels(…))` | **待更正**（跨文件漂） |
+| 14 | `cmd/balldebug/main.go:104` | `EnablePrototypeVisuals(!*frozen)` | `:104` 现为 `diffAmp := flag.Int(...)`；真身在 **`:122`** | **待更正** |
+| 15 | `tools/d22scan/main.go:115` | `emojiRe` 的定义 | `:115` 是空注释；声明在 **`:124`**（且字符类推到 `1F000–1FAFF` 等，与 `A196②ⓐ` 的实测一致） | **待更正** |
+| 16 | `tools/d22scan/main.go:71` | 同一枚 `emojiRe` | `:71` 现在是 import 块里的 `"os"` | **待更正** |
+| 17 | `tools/d22scan/main.go:449` | `if emojiRe.MatchString(line)` | `:449` 是注释；真身在 **`:892`**，且实参已是 `probe` 不是 `line` | **待更正** |
+| 18 | `tools/d22scan/main.go:215` | "`c.Block` 回退到 `c.Comment`" | HEAD `:215` 无关注释；该句指的是**未提交的工作树半程**（该文件现仍 ` M`，归别人） | **不可判**（HEAD 取数对不上未提交态；按硬规矩我没动它） |
+| 19 | `tools/d22scan/runtests.sh:75` | 强制 `-count=1` | `go test -v -count=1 "$@" >"$out" 2>&1` | **在** |
+| 20 | `tools/paths.go:105` | `const sep` 的 POSIX fail-open | 路径简写（真身 `internal/tools/paths.go`），该行 `const sep = \`\\`` **存在于 `ed74595^`**，`ed74595`（09-21 10:58）删掉；A48 写在 **10:44** ⇒ 引用当时为真 | **待更正**（符号已消失，时刻自洽） |
+| 21 | `scripts/d22scan.sh:38` | `set -eu` | `set -eu` | **在** |
+| 22 | `scripts/portable-tests.sh:105` | 逐字写 `./internal/winsec/` 进 ubuntu core（票 111 AC#9） | `# ./internal/winsec/ joined the core list for ticket 111 AC#9: the ubuntu leg ran` | **在** |
+| 23 | `scripts/slo-check.ps1:129` | 对 `Where-Object` 结果取 `.Count` | `:129` 是注释；`.Count` 现在 **`:119`/`:120`/`:144`**，`Where-Object` 在 `:374/:380` | **待更正** |
+| 24 | `scripts/slo-fresh.yml:5` | gofumpt 点到的文件 | **该文件既不在 HEAD 也不在工作树**（`git ls-files`／`ls` 双空） | **已作废**（`:5732`／`:5752` 三面复量"这两行不存在"） |
+| 25 | `docs/PLAN.md:981` | 技术栈白纸黑字（D29） | `**Raycast/cmdk 视觉语言 + React + TypeScript + Tailwind + shadcn/ui；WebView 宿主 jchv/go-webview2。**` | **在** |
+| 26 | `docs/PLAN.md:1424` | S1 行原文四项 | `\| **S1** \| 最小通路：快捷键 → 文字输入 → Agent → 通知 \| 语音全部、WebView 面板、命令面板、门控 UI…` | **在** |
+| 27 | `docs/PLAN.md:1590` | 「批量聚合（500 个 L1 → 一次确认）」 | 该行含 B2 风险条目且 `grep -c 500` ＝ 1 | **在** |
+| 28 | `docs/PLAN.md:2375` | 路径折叠链（env/~ → 绝对化 → Clean → 句柄） | `展开(env/~) → 绝对化 → Clean → **打开句柄取 GetFinalPathNameByHandle(VOLUME_NAME_DOS)` | **在** |
+| 29 | `docs/specs/SPEC-02-data-storage.md:180` + `SPEC-05-agent-core.md:115` | artifact 磁盘名 `tool-output-<id>.txt` | 两处逐字命中 | **在** |
+| 30 | `docs/evidence/s1/ci-read-a1fd5bf-r1.md:467-473` | `A197①` 引的 slo-full 那七行 NO CONCLUSION | 七行逐字对得上，末行正是 `…: exit 0` | **在** |
+
+### 4.2 计数
+
+| 判 | 枚数 |
+|---|---|
+| 在（含"已修但台账自洽"） | **15** |
+| 待更正（行号漂移／字面因修码而变，内容仍找得到） | **11** |
+| 已作废（台账后续条目自己判定该前提不存在） | **2** |
+| 不可判（指向别人的未提交工作树） | **1** |
+| **缺陷（内容整枚找不到、且无任何更正档案）** | **0** |
+
+⇒ **检查 4 这一类没有产出一枚新缺陷**：30 条里没有一条"行号＋内容都追不回来"。
+最脆的一族是 `tools/d22scan/**` 与 `cmd/wisp/**` 的**跨文件/大跨度漂移**（#12/#13/#17 一漂就是 82～443 行，#13 还换了文件），
+以及 #9 那枚**符号本身已经不在代码里**的引用（`mulA`）。
