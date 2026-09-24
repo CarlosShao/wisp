@@ -352,5 +352,41 @@ sampler_settle_coverage_136_test.go:189: precondition broken: only 2 reads taken
 `foreign-gitstatus-1.txt`、`foreign-md5-1.txt`、`foreign-worktree-edit.patch`（0 字节，成因见 §7）。
 前一程的 `wisp136ac11-*` **一枚未改、未删、未覆盖**。
 
+---
+
+## 11. 携带本表的那一枚 commit（原样输出，14:45 现跑）
+
+**先记一条我自己的坑（不隐）**：第一次提交失败——`git commit -q -F - -- <路径>` 对**未跟踪**文件报
+`error: pathspec '...' did not match any file(s) known to git`（rc=1，HEAD 未动）。
+显式 pathspec 的提交只认索引里的文件，所以新文件必须先 `git add -- <同一枚显式路径>`（**不是** `add -A`／`add .`）。
+
+```
+$ git add -- docs/evidence/s1/136-ac11-second-witness-readings.md
+$ git diff --cached --name-only
+docs/evidence/s1/136-ac11-second-witness-readings.md      ← 暂存清单只有我这一枚，才继续 commit
+
+$ git log --oneline -1
+f581ae6 evidence(136,AC#11 第二 witness): 被派程自己现量的改前 2/30＋改后 0/30＋逐 key 探针 500 发＋本包门禁四件
+
+$ git show --name-only --format='%H%n%ad%n%s' HEAD
+f581ae6cc62fc7179c7b1cda600ad146d9b95747
+Thu Sep 24 14:45:01 2026 +0800
+evidence(136,AC#11 第二 witness): 被派程自己现量的改前 2/30＋改后 0/30＋逐 key 探针 500 发＋本包门禁四件
+
+docs/evidence/s1/136-ac11-second-witness-readings.md
+```
+
+⇒ 全 sha `f581ae6cc62fc7179c7b1cda600ad146d9b95747` 是 `git show` 打出来的，不是我写的；
+读者可用 `git cat-file -t f581ae6`（应 `commit`）＋ `git show --name-only f581ae6` 复算。
+**本节自身那一枚（把这段贴进来的追加提交）不自我引用**；要读它请现跑
+`git log --oneline -2 -- docs/evidence/s1/136-ac11-second-witness-readings.md`。
+（提交时刻工作树里另有 `M docs/evidence/s1/136-ac11-r1-acceptance.md`＝他人未提交的终裁表，**我没碰、也没被我的 commit 带走**。）
+
+**凭据卫生自扫**（同一次扫描，当时文件 **356 行**）：
+`grep -o -E "[A-Za-z0-9+/_-]{20,}"` 命中 20 类，逐条看全是路径／用例名／表格词，无凭据形状；
+`grep -o -i -E "(api[_-]?key|secret|token|passw|bearer|sk-[A-Za-z0-9]|BEGIN [A-Z]+ PRIVATE|ghp_[A-Za-z0-9]|xox[baprs]-|AKIA[0-9A-Z]{16})"` 命中 **2** 处，
+**按形状判为假阳性**——两处的原字符是散文里的 `agent-task-noop`（子串 `sk-n`）；
+`grep -o -E "[0-9a-f]{40}"` 命中 **2** 枚＝§0 那两枚我自量的 git 锚点（不是密钥）。
+
 next= 本文件已由 `Write` 创建并只以显式 pathspec 提交这一枚路径；AC#11 的主表与勾归在飞的程与编排者，
       派单者若要收这一格，请把本表当**第二 witness**并读 §7 的归属冲突说明。
