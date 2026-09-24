@@ -359,6 +359,22 @@ docs/evidence/s1/128-ac4-r1-acceptance.md
 `ls -A %APPDATA%\wisp` 与 `%APPDATA%\wisp-dev` 均 **0 条目**（两枚目录都存在、都空）=> 本程未写入。
 （本程新建的落点只有 `D:\tmp\wt-acc128-ac4-r1*` 那些仓外快照/日志与 `Temp\wisp-test-<pid>`，都在仓外。）
 
+### 7.1 补一发：把 **CI 那一步本身**逐字搬进快照跑（AC#4 那句"四数"之外的同形凭据）
+
+`AC#4` 写的是 `go test -count=2 -v ./cmd/wisp/`（我 §4 已经量了）；但 runner 真正执行的是
+`bash scripts/wisp-cli-tests.sh` -> `portable-tests.sh --scope=cli` -> `tools/d22scan/runtests.sh ./cmd/wisp/ -count=1 -skip <台账造的 pattern>`
+（SKIP 致命、零 PASS 零 FAIL 致命、包必须打出自己的顶层结果行）。两棵树、同一个 `WISP_ENV=test`：
+
+| 发 | 树 | 步级 rc | CI 自己打的四数 |
+|---|---|---|---|
+| **S1** | `snap-post`（被验版） | **0** | `=== RUN=101  --- PASS=54  --- FAIL=0  --- SKIP=0` + `portable-tests.sh:   ok (own line)  github.com/CarlosShao/wisp/cmd/wisp` |
+| **S2** | `snap-pre`（`c2fa2e9^`） | **1** | `=== RUN=101  --- PASS=53  --- FAIL=1  --- SKIP=0` + `FAIL (own line)` + `strict runner exited 1 for scope=[./cmd/wisp/]` |
+
+⇒ **CI 那一步（含它自己的三道 guard 与 -skip 台账）在修前红、修后绿，同一枚 `TestAC2EveryLeg...128` 是唯一差别。**
+这条比"四数"更硬，因为它跑的是 runner 用的那台仪器本身，不是我对它的模仿。
+（S1/S2 的 54/53 与 CI 原文的 49 不是同一口径：CI 那一步还额外红了票 123 那一族 4 枚、并 `-skip` 掉台账里 3 枚，两事各自成立。）
+档位：**独立复现**。⇒ **本格的终判不依赖"推送后去看 CI"**（那是编排者的 next=①，属于加强件不是必需件）。
+
 ---
 
 ## 6. 副产物那一发的连带判断（本格最值钱的一条）—— 两句都要明确裁
