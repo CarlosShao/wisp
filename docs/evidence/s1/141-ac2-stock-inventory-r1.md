@@ -337,3 +337,94 @@ docs/evidence/s1/141-ac2-stock-inventory-r1.md
 
 
 
+## 5. 表 A —— `internal/` + `cmd/` 的 `.go`，逐枚 116 行（**每行一枚命中，不汇总**）
+
+**取数与读法**
+- 锚点 `99263cc`；命中判据 `git grep -nP '[\x{2190}-\x{25FF}]' 99263cc -- 'internal/**.go' 'cmd/**.go'` → 116 行／41 枚／121 处。
+- 文件内容取自 `git cat-file blob 99263cc:<file>`（**读的是锚点那版，不是工作树**）。
+- **位置类别**由 Go 词法器判定（§0.2），不是"前面有没有 `//`"。
+- **原文列**＝该行逐字；超过 84 字符时截命中点前后各 40 字，用 `[截断·前]`／`[截断·后]` 标明；行首缩进 **tab 渲染为 4 空格**（原文是 tab，其余字符未改）；行内的 `|` 转义为 `\|`。
+- 「处」列＝该行命中字符数（116 行共 121 处，多出的 5 处在 5 枚行上）。
+
+### 5.1 注释行 78 枚（`c-line`；`c-block` 实测 0 枚）
+
+| # | `file:line` | 命中字形与码点 | 处 | 位置类别 | 在禁改清单 | 所在行原文 |
+|---:|---|---|---:|---|---|---|
+| 1 | `cmd/wisp/doctor.go:284` | ⑦ U+2466 | 1 | 注释 | 否 |`// dataDirUnresolved128 words the refusal so it can be acted on. A105 ⑦ booked the` |
+| 2 | `cmd/wisp/leg_sink_gate_131_test.go:77` | ① U+2460 | 1 | 注释 | 否 |`// own next= ①, moved to ticket 133 AC#2). The reading to compare against is the` |
+| 3 | `cmd/wisp/run.go:163` | ⑦ U+2466 | 1 | 注释 | 否 |`// is also what the other two legs return. Booked cost (A105 ⑦): on` |
+| 4 | `internal/agent/approval/ticket87_veto_l2_test.go:15` | ⇒ U+21D2 | 1 | 注释 | 否 |`// 票 87: 卡片已经显示，否决却查无此项 ⇒ 人想现在拒也拒不掉` |
+| 5 | `internal/agent/approval/ticket97_alias_direction_test.go:20` | ⇒ U+21D2 | 1 | 注释 | 否 |`// R-2 的实际影响面（宽松解析坐在 Queue.reject 里 ⇒ 全部 5 条拒绝路线）写成一张` |
+| 6 | `internal/agent/approval/ticket97_alias_direction_test.go:147` | ⇒ U+21D2 | 1 | 注释 | 否 |`//    (i) 查不到条目 ⇒ 诚实报错，且队列里那张活卡一格都没被动过（绝不是放行）；` |
+| 7 | `internal/agent/approval/ticket97_alias_direction_test.go:148` | ⇒ U+21D2 | 1 | 注释 | 否 |`//    (ii) 同一路线用卡片自己的别名点名 ⇒ 落地的是拒绝。` |
+| 8 | `internal/agent/control.go:9` | → U+2192 | 1 | 注释 | 否 |`// 确认）→ 直接执行控制语义，不经 LLM（几十毫秒级）"). The word set is exactly` |
+| 9 | `internal/agent/inject.go:17` | → U+2192 | 1 | 注释 | 否 |`// inside the same loop turn (D15(2): "检索未命中 → list_tools 元工具自查完整目` |
+| 10 | `internal/agent/spill.go:109` | ① U+2460 | 1 | 注释 | 否 |`// the parent's DACL granted - ticket 89's A51①, and artifacts are the least` |
+| 11 | `internal/audio/doc.go:28` | ③ U+2462 | 1 | 注释 | 否 |`// technique. Audio buffers are never persisted or logged (D16③).` |
+| 12 | `internal/audio/gate.go:26` | ③ U+2462 | 1 | 注释 | 否 |`// persisted or logged here (D16③).` |
+| 13 | `internal/ball/dock.go:16` | → U+2192 | 1 | 注释 | 否 |`//     单击 → 丝滑弹回完整球"), and a click on the tab pops it out and keeps it` |
+| 14 | `internal/ball/live_windows_test.go:301` | → U+2192 | 1 | 注释 | 否 |`// 自动收缩…鼠标悬停或单击→丝滑弹回完整球"): on a real window, docking each of the` |
+| 15 | `internal/ball/live_windows_test.go:454` | → U+2192 | 1 | 注释 | 否 |`// TestBallLiveEdgeDockHover is the end-to-end half of "悬停 → 弹回完整球": a real` |
+| 16 | `internal/ball/position.go:11` | → U+2192 | 1 | 注释 | 否 |`// 拔插后落到不可见区域 → 自动回主屏可见位置").` |
+| 17 | `internal/ball/position_test.go:63` | → U+2192 | 1 | 注释 | 否 |`// 位置按显示器保存；不可见 → 回主屏).` |
+| 18 | `internal/ball/tokens_test.go:186` | ① U+2460 | 1 | 注释 | 否 |`//    ① prototypeVisuals=false           stateSize -> SleepingDotPx        12px` |
+| 19 | `internal/ball/tokens_test.go:187` | ② U+2461 | 1 | 注释 | 否 |`//    ② =true, free (undocked)           configuredPx*SleepRestRatio   34.72px` |
+| 20 | `internal/ball/tokens_test.go:188` | ③ U+2462 / ② U+2461 | 2 | 注释 | 否 |`//    ③ =true, docked, ramp landed       same as ②: the dock never touches size` |
+| 21 | `internal/ball/tokens_test.go:190` | ③ U+2462 | 1 | 注释 | 否 |`// Column ③ is where the "it shrinks when docked" story actually lives, so the` |
+| 22 | `internal/ball/tokens_test.go:199` | ① U+2460 | 1 | 注释 | 否 |`// ① the frozen micro dot: 12px regardless of the configured size.` |
+| 23 | `internal/ball/tokens_test.go:211` | ② U+2461 | 1 | 注释 | 否 |`// ② the resting glass body at the default size, and the floor that binds` |
+| 24 | `internal/ball/tokens_test.go:231` | ③ U+2462 | 1 | 注释 | 否 |`// ③ docking changes no size: stateSize has no dock input at all, so the` |
+| 25 | `internal/ball/tokens_test.go:262` | ② U+2461 | 1 | 注释 | 否 |`// A.2. Column ② (34.72px) predicts 2130. A 44px body predicts 3421, unclipped` |
+| 26 | `internal/ball/tokens_test.go:267` | ① U+2460 | 1 | 注释 | 否 |`// same frame. The frozen dot (column ①, docs/evidence/s1/62-diff-baseline) has` |
+| 27 | `internal/ball/tokens_test.go:270` | ② U+2461 | 1 | 注释 | 否 |`// 1.5*R is drawGlass's halo fill; 34.72/2 is column ②'s radius.` |
+| 28 | `internal/config/migrate.go:87` | ① U+2460 | 1 | 注释 | 否 |`// (ticket 89, A51①), so 0o600 here was decoration: the bytes landed with` |
+| 29 | `internal/config/parse.go:208` | ① U+2460 | 1 | 注释 | 否 |`// was decoration on Windows (ticket 89, A51① - the mode argument never` |
+| 30 | `internal/config/unwired.go:9` | ② U+2461 | 1 | 注释 | 否 |`// Unwired security keys (ticket 83; ruling A53② = ticket 80's option (C)).` |
+| 31 | `internal/config/unwired_test.go:11` | ② U+2461 | 1 | 注释 | 否 |`// Ticket 83 (ruling A53②, ticket 80 option (C)): a locked-section key that the` |
+| 32 | `internal/observe/sampler_settle_coverage_136_test.go:121` | ① U+2460 | 1 | 注释 | 否 |`// TestCheckSettleSingleTrustworthyReadReportsItsLoss is probe ① ("整窗只 1 枚` |
+| 33 | `internal/observe/sampler_settle_coverage_136_test.go:173` | ② U+2461 | 1 | 注释 | 否 |`// TestCheckSettleHalfTheReadsFailedReportsItsLoss is probe ② ("一半读数报错"):` |
+| 34 | `internal/panel/composer_handlers.go:12` | ② U+2461 | 1 | 注释 | 否 |`// (docs/evidence/s1/114-ac1-status-table.md ②.1): a handler that only` |
+| 35 | `internal/panel/composer_handlers.go:38` | ① U+2460 | 1 | 注释 | 否 |`// (status table ①.1; tickets 33/35 are still ready-for-agent). AC#2 is the` |
+| 36 | `internal/risk/pathresolver_anchor_spelling_windows_test.go:200` | ∩ U+2229 | 1 | 注释 | **是** |`// TestAListWinsWhereBothTablesHit is AC#3's A∩B shape: one path that matches` |
+| 37 | `internal/risk/pathresolver_expansion_test.go:17` | → U+2192 | 3 | 注释 | **是** |`// 「展开(env / ~) → 绝对化 → Clean → ...」, mirrored by PLAN.md:2375), so this test` |
+| 38 | `internal/risk/provenance.go:13` | ① U+2460 | 1 | 注释 | **是** |`// exfiltration channels (SPEC-06 §5, D33/F4, D30①, 16.9#1).` |
+| 39 | `internal/risk/provenance.go:41` | ⑤ U+2464 | 1 | 注释 | **是** |`// The ONE landing-site conditional channel is ⑤ (fs.write into a sync dir);` |
+| 40 | `internal/risk/provenance.go:42` | ⑥ U+2465 | 1 | 注释 | **是** |`// channel ⑥ (HTTP POST body/URL) has no landing condition. Because a call` |
+| 41 | `internal/risk/provenance.go:146` | ⑥ U+2465 | 1 | 注释 | **是** |`// ⑥'s own wording: HTTP POST body/URL). A call carrying one is never exempted` |
+| 42 | `internal/risk/provenance.go:469` | ⑤ U+2464 | 1 | 注释 | **是** |`// (SPEC-06 §5 channel ⑤, the only landing-site conditional channel), which` |
+| 43 | `internal/risk/provenance.go:499` | ⑤ U+2464 | 1 | 注释 | **是** |`// The single conditional channel of SPEC-06 §5 (⑤ fs.write INTO A SYNC DIR)` |
+| 44 | `internal/risk/provenance.go:622` | ⑤ U+2464 | 1 | 注释 | **是** |`// --- the write / sync gate (SPEC-06 §5 channel ⑤) ----------------------------` |
+| 45 | `internal/risk/provenance.go:628` | ⑤ U+2464 / ⑥ U+2465 | 2 | 注释 | **是** |`// landing site: ⑤ fs.write INTO A SYNC DIR. Channel ⑥ (HTTP POST body/URL)` |
+| 46 | `internal/risk/provenance_test.go:165` | ① U+2460 | 1 | 注释 | **是** |`// D30①: search.content marker -> web.search query / notify / clipboard.write` |
+| 47 | `internal/risk/provenance_test.go:483` | ⑥ U+2465 | 1 | 注释 | **是** |`// ⑥ with a local-write parameter in the same call: named or unnamed,` |
+| 48 | `internal/risk/provenance_test.go:527` | ⑤ U+2464 | 1 | 注释 | **是** |`// payload under any name hits on the sync channel (channel ⑤ has no` |
+| 49 | `internal/risk/provenance_test.go:564` | ⑥ U+2465 | 1 | 注释 | **是** |`// write of markdown with URLs in it must stay out of channel ⑥.` |
+| 50 | `internal/risk/syncdirs_other_test.go:27` | ⑧ U+2467 | 1 | 注释 | **是** |`// HOW THIS FILE TURNS LIVE WHEN TICKET 55 LANDS (A51⑧, spelled out so nobody` |
+| 51 | `internal/statemachine/table.go:72` | ③ U+2462 | 1 | 注释 | 否 |`}, // D32③: KWS must NOT be unloaded` |
+| 52 | `internal/tools/bridge_a18_kill_windows_test.go:16` | ③ U+2462 | 1 | 注释 | 否 |`` // A18 (ticket 73 flipped ③): a REAL `taskkill /F` during a staged write, and `` |
+| 53 | `internal/tools/bridge_a18_kill_windows_test.go:25` | ① U+2460 | 1 | 注释 | 否 |`//    ① the target is complete-or-absent (D31 holds: staging + one os.Rename),` |
+| 54 | `internal/tools/bridge_a18_kill_windows_test.go:26` | ② U+2461 | 1 | 注释 | 否 |`` //    ② each interrupted write leaves exactly one `.wisp-tmp-*` behind — the `` |
+| 55 | `internal/tools/bridge_a18_kill_windows_test.go:30` | ③ U+2462 | 1 | 注释 | 否 |`//    ③ the NEXT write through the bridge reclaims it (internal/tools/fs_staging` |
+| 56 | `internal/tools/bridge_a18_kill_windows_test.go:34` | ③ U+2462 | 1 | 注释 | 否 |`// ③ used to be pinned as "the orphan is still there" (761447f), because the` |
+| 57 | `internal/tools/bridge_a18_kill_windows_test.go:37` | ② U+2461 / ③ U+2462 | 2 | 注释 | 否 |`// opposite; ② is kept as the positive control that makes ③ mean something — a` |
+| 58 | `internal/tools/bridge_a18_kill_windows_test.go:39` | ③ U+2462 | 1 | 注释 | 否 |`// that never ran if only ③ were asserted.` |
+| 59 | `internal/tools/bridge_a18_kill_windows_test.go:254` | ① U+2460 | 1 | 注释 | 否 |`// something subtest ① is assumed to have covered.` |
+| 60 | `internal/tools/bridge_junction_windows_test.go:26` | ② U+2461 | 1 | 注释 | 否 |`// on. The difference is exactly the A33② family ("the implementation exists,` |
+| 61 | `internal/tools/bridge_junction_windows_test.go:449` | ⇒ U+21D2 | 1 | 注释 | 否 |`// ⇒ 属安全判定（"红队拒绝该不该在判定阶段就不可批准"），本项目硬规矩要求` |
+| 62 | `internal/tools/fs_staging_windows_test.go:232` | ① U+2460 | 1 | 注释 | 否 |`// POSITIVE CONTROL ①: the junction really reaches the bytes.` |
+| 63 | `internal/tools/fs_staging_windows_test.go:238` | ② U+2461 | 1 | 注释 | 否 |`// POSITIVE CONTROL ②: a plain attributable orphan in the SAME directory gets` |
+| 64 | `internal/tools/fs_staging_windows_test.go:304` | ⇒ U+21D2 | 1 | 注释 | 否 |`//    A: the name embeds the LIVE holder's pid ⇒ the liveness check skips it;` |
+| 65 | `internal/tools/fs_staging_windows_test.go:305` | ⇒ U+21D2 | 1 | 注释 | 否 |`//    B: the name embeds a DEAD pid while a live process holds the handle open ⇒` |
+| 66 | `internal/tools/recycle_windows.go:18` | ② U+2461 | 1 | 注释 | 否 |`// The real shell recycle-bin API (D34 note②: trash is L1 BECAUSE the shell can` |
+| 67 | `internal/winsec/reparse_windows_test.go:34` | ② U+2461 | 1 | 注释 | **是** |`// mode, which is why the A51② leg of ticket 89 *is* constructible on this` |
+| 68 | `internal/winsec/reparse_windows_test.go:47` | ② U+2461 | 1 | 注释 | **是** |`// mkDirSymlink makes a *directory* symbolic link, the second shape of A51② and` |
+| 69 | `internal/winsec/reparse_windows_test.go:113` | ② U+2461 | 1 | 注释 | **是** |`// A51② on the record for *this* object kind: if os.Remove clears it, log` |
+| 70 | `internal/winsec/reparse_windows_test.go:138` | ① U+2460 | 1 | 注释 | **是** |`// ① the whole point: the deletion radius stopped at the link.` |
+| 71 | `internal/winsec/reparse_windows_test.go:146` | ② U+2461 | 1 | 注释 | **是** |`// ② refusing to unlink a symlink must still be a *named* failure.` |
+| 72 | `internal/winsec/reparse_windows_test.go:232` | ② U+2461 | 1 | 注释 | **是** |`// A51② itself, on the record: the plain call cannot clear such an entry.` |
+| 73 | `internal/winsec/reparse_windows_test.go:261` | ① U+2460 | 1 | 注释 | **是** |`// ① the whole point: the deletion radius stopped at the link.` |
+| 74 | `internal/winsec/seam_guard_windows_test.go:284` | ② U+2461 | 1 | 注释 | **是** |`// TestAC1RefusedInstallLeavesTheSealWorking is the leg AC#3② needs to stay green:` |
+| 75 | `internal/winsec/winsec.go:4` | ① U+2460 | 1 | 注释 | **是** |`// Ticket 89 (A51①) is the reason this package exists: the os.OpenFile /` |
+| 76 | `internal/winsec/winsec.go:74` | ② U+2461 | 1 | 注释 | **是** |`// it is left alone. Ticket 79's A51② found that on Windows os.Remove cannot` |
+| 77 | `internal/winsec/winsec_windows.go:186` | ② U+2461 | 1 | 注释 | **是** |`// which is the case that has to be loud (ticket 104's judgment ②).` |
+| 78 | `internal/winsec/winsec_windows.go:639` | ② U+2461 | 1 | 注释 | **是** |`// non-empty directory (A51②): RemoveDirectoryW resolves the reparse point and` |
