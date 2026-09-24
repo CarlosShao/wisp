@@ -196,7 +196,7 @@ whose init() is supposed to hand C26 to the sealing seam, so either the install 
 而"POSIX 有断言"这一格是**这张票自己交的件**（`ff3faf9`）；本表读的是交件之后的树，
 所以 §1 的每一枚"红"都是**交件套件上的红**，不是票 125 之前树上的红。这一点实现方在票面写清了，本表确认它没夸大。
 
-### 1.4 上一节的提交回执（原样输出）
+### 1.4 §0＋§1 正文所在 commit 的回执（这枚回执由 §2 那一枚 commit 携带）
 
 ```
 $ git log --oneline -1
@@ -396,3 +396,72 @@ seam_probe_root_125_other_test.go:253: AC#2 RED (the refusal side moved): the se
 **本表不下处置结论**：不撤、不 revert、不改任何东西——**处置权在编排者**。
 本表只把三层裁清：**技术面成立、纪律面不成立、可核面缺凭据** ⇒ AC#2 记 **成立附条件**，
 条件是 ③ 那枚 `A##`（**或**把生产码那一刀退回成"只出裁定与判据"，判据与本表 §2.1/§2.2 三枚 leg 可以原样留在仓里）。
+
+### 2.4 §2 正文所在 commit 的回执（这枚回执由 §3 那一枚 commit 携带）
+
+```
+$ git log --oneline -1
+20a6397 evidence(125,AC#2 r1 终裁 §2): 三台对照 + 自造 MUT-R1B/R1C 各自红点 + 冻结件三层裁定
+$ git show --name-only HEAD | tail -3
+    AC#2 判成立附条件＝补一枚编排者署名的 A##，处置权在编排者。
+
+docs/evidence/s1/125-ac1-ac4-r1-acceptance.md
+```
+
+---
+
+## §3 AC#3 —— 可见性：那行 `ERROR` 到不到得了人眼前
+
+**判**：**成立**（这一格要的是"复算＋写清哪一格该红"，实现方两件都做了，本程独立复现同向）。
+证据档：**〔独立复现〕**（真二进制是本程自己在容器里 build 的，盘上读数是本程自己 grep 的）。
+
+### 3.1 本程的真二进制复算（容器 `golang:1.27` 真跑，两形两台）
+
+| 台 | 二进制 | `RUN_RC` | stderr 第 1 行 | 盘上 JSONL | `grep -rl winsec <植的树>` |
+|---|---|---|---|---|---|
+| **改前** `ff3faf9` | 19,092,792 B（`go build ./cmd/wisp` rc=0） | 2 | **`ERROR winsec: refusing to install a path resolver into the sealing seam resolver=risk.c26Pipeline …`** | 存在，2 行 | **`NONE`** |
+| **改后** `bd50c63`（码＝`4824bb8`） | 19,097,696 B（rc=0） | 2 | `INFO winsec: sealing path resolver installed resolver=risk.c26Pipeline probes_passed=1` | 存在，2 行 | **`NONE`** |
+
+形状先断言过真是链接（`test -L $b/varlink125`，`readlink` → `$b/real125`）；两把 `TMPDIR` 都是 `$b/varlink125/tmproot125`。
+
+改前那一行的**全文**（逐字，含它拒绝的理由，这是本票的现场读数）：
+```
+2026-09-24 07:29:55 ERROR winsec: refusing to install a path resolver into the sealing seam
+  resolver=risk.c26Pipeline reason="it answered \"<B>/varlink125/tmproot125/../wisp-103-conformance-probe\" with
+  \"<B>/varlink125/wisp-103-conformance-probe\", a spelling the built-in floor itself refuses:
+  winsec: path is not provably resolved, refusing to seal: <B>/varlink125/wisp-103-conformance-probe"
+```
+紧随其后才是持久 sink 自己那行（**顺序就是答案**）：
+```
+time=2026-09-24T07:29:56.030Z level=INFO msg="wisp: persistent log sink installed" dir=<B>/real125/tmproot125/wisp-test-3164/logs min_level=info
+```
+盘上那枚 JSONL（`…/wisp-test-3164/logs/wisp-20260924-001.jsonl`）**全文 2 行**：一条 `wisp: persistent log sink installed`、
+一条 `audit: perm: MODE-READ-FAILED …`；`grep -c winsec` = **0**。改后那台同样 **0**。
+
+⇒ 实现方那枚读数（容器内 `grep -rl winsec <data root>` = `NONE`）**本程独立复现，两形两台都是 `NONE`**。
+
+### 3.2 机制（本程自己量的调用点，不是抄注释）
+
+- 记录发在 `winsec.SetPathResolver` 里；生产侧唯一的调用方是 `internal/risk/winsec_c26.go` 的 **`init()`**（任何 `main()` 之前）。
+- 听众（`installLogSink`）在盘上的**全部**生产安装点：`cmd/wisp/run.go:164`、`cmd/wisp/resident_windows.go:57`（`cmd/wisp/models.go` 走同一族），
+  现量 `grep -rn 'installLogSink' cmd/wisp/*.go` ⇒ **零枚在 `init()` 里**。
+- 顺带补一枚实现方没写的边界事实：`cmd/wisp/main.go` 里那 9 处 `attachParentConsole()`（含无参数＝GUI/常驻入口那一处）**也都发生在 `main()` 之内**
+  ⇒ 那条记录写的是 **rebind 之前**的 `os.Stderr`。⇒ "换听众之前没人听"这一族里，本格比票 127 的 `logging.go:204` 更早，**这一点本表确认**。
+
+### 3.3 具名落点（派单要求的"落进 `R-125-3`／票 130 那一族的哪一格"）
+
+- 台账现量：`R-125-3` 已在 `docs/reports/pending-and-issues.md:3294-3297`（`A99③`，第八次）落地，
+  且 `:3353` 写明 **新建＝票 130（`R-117-2` + `R-125-3` 合一，需 `internal/risk` 解冻）**。
+- ⇒ AC#3 的残余缺口**不属于票 125**，它落在 **票 130 的第一格：init-time 安全记录的可达性**。
+  票 125 该红的部分（"POSIX 侧没人断言这条降级"）已经被 AC#1 的钉子接住（见 §1：软链形改前红、改后绿）。
+- 实现方在本格给的判据形状（`init()` 里走一次拒绝 → 装 sink → 断言盘上看得到那条）本表**认可它是可写的**，
+  并且它今天必然红——本程 3.1 两把读数就是它的红因。**本格零码改动这条也成立**：
+  `git show --name-only a03f7ef` 现量只列票面一枚 `.md`。
+
+### 3.4 要打折的一处措辞（结论不变）
+
+票面 AC#3 `:191-192`：「它唯一的去处是 stderr，而 `wisp run` 的 stderr 在无终端的入口（resident/GUI 双击）**没人接**」。
+本程现量：仓里 `grep -rn 'windowsgui\|-ldflags' scripts/*.sh` **零命中** ⇒ 交付的是 **console-subsystem** 构建，
+双击起来的 console 窗口**在进程存活期间是能滚到那行的**。
+⇒ **"等于无记录"对"持久、可回溯"这一档成立（3.1 的 `NONE` 就是证据）；对"当场有没有一扇窗口"这一档字面过强**。
+按 `A98④` 的口径处理：**结论签、措辞打折**。⚠ Windows 双击那一形**本程没测**（见 §6），这条只是代码级归因，不是读数。
