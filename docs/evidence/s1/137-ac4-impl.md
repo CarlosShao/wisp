@@ -417,16 +417,43 @@ internal/ 404 Go files, comments and _test.go included; cmd/ 39 Go files, commen
 
 ### 4.6 本节这一枚 commit 的账（`A155` 硬规矩的形状；写在这里是因为它只能在提交之后现量）
 
-（提交后回填，见 §4.7）
-
-### 4.7 §4／§5／§6 那一枚 commit 原样输出
+三枚都出自本程，**每枚只带它自己的路径**（共树里 `design/**` 那 16 枚别人的挪动一枚未卷）：
 
 ```
-$ git log --oneline -1
-__LOG__
-$ git show --name-only HEAD
-__SHOW__
+$ git show --name-only --format='%H %s' 9c0f546      # 码（§0.5）
+9c0f5461cbdd7c599fbca9b973adf307a754dd41 test(winsec/137 AC#4): 那 7 处递根点换成已解析根，并写明未解析形归谁守
+
+internal/winsec/ancestor_separator_108_other_test.go
+internal/winsec/placement_symlink_113_other_test.go
+
+$ git show --name-only --format='%H %s' 8e94c82      # §0-§3
+8e94c82df03fa80ab018ab3ea6ff7aaad4d41e2b evidence(137 AC#4 §0-§3): 7 处递根点逐枚判定＝全部换；八发两形读数＋名册差集；119 三处判定与 finding（未改码）
+
+docs/evidence/s1/137-ac4-impl.md
+
+$ git show --name-only --format='%H %s' 98176c8      # §4-§6
+98176c8783ae86798e8893994ca3dbfea4e2deb9 evidence(137 AC#4 §4-§6): 门禁五组原文＋我没核的 11 档＋临时件清单（只建不删）
+
+docs/evidence/s1/137-ac4-impl.md
 ```
+
+`git log --oneline -1` 现量于 §4-§6 提交之后（同刻 `git status --porcelain` 里与本机活无关的
+`design/**` 那 17 行仍在，**未动**）：
+
+```
+98176c8 evidence(137 AC#4 §4-§6): 门禁五组原文＋我没核的 11 档＋临时件清单（只建不删）
+```
+
+⚠ 本节（§4.7 那两行占位被换成上面的原样输出）本身又走了**第四枚 commit** 来落盘——
+"提交账只能在提交之后现量"这一枚循环就这么留痕，读者按 `git log --oneline -6 -- docs/evidence/s1/137-ac4-impl.md`
+可复算谁是哪一发的 HEAD。
+
+### 4.7 交件前的盘上账
+
+- `git status --porcelain` 里属于本程的路径：**0 枚**（`docs/evidence/s1/137-ac4-impl.md` 与那两枚测试件全部已提交）。
+- 票面 AC#4 那一格：**没翻勾**（`[ ]` 原样），只按派单在文末 **append 一条 Progress log**。
+- AC#1／AC#2／AC#3／AC#5 四格：票面**一字未改**。
+
 
 ---
 
