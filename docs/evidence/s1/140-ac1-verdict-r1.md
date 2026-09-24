@@ -247,8 +247,95 @@ grep -rn 'os.Setenv("WISP_ENV"' --include='*.go' .               -> 1 处，且�
 ### 3.4　本节两栏计数增量
 
 真通知回显数：累计 **1**（无新增）。判为注入数：累计 **0**（无新增）。
-本节引用被裁文件的句子时全部**按原文引号抄**并给 §号，未把任何兄弟程的结论当已裁读数用（唯一例外是 §3.2 表末行那句
-「恒红型装饰」，它是被裁文件**转引** `128-ac4-r1-acceptance.md` §6.2 的，本程沿用了它的"引别人已裁读数"档位标注）。
+本节引用被裁文件的句子时全部**按原文引号抄**并给 §号，未把任何兄弟程的结论当已裁读数用
+（唯一例外是 §3.2 表末行那句「恒红型装饰」，它是被裁文件**转引** `128-ac4-r1-acceptance.md` §6.2 的，
+本程沿用了它的"引别人已裁读数"档位标注，没有升格成本程复现）。
+
+---
+
+## 4　④　CI 侧真凭据（零仪器：只读 `ci.yml` 与三枚脚本）
+
+### 4.1　哪几处**真的**在 job 级设 `WISP_ENV`
+
+`grep -n 'env:' .github/workflows/ci.yml` 现量 **4 处**，逐字节打开：
+
+| job | `env:` 块 | `WISP_ENV: test` 那行 | `runs-on`（现量） |
+|---|---|---|---|
+| `test-core` | `ci.yml:226` | `ci.yml:227` | `:225 ubuntu-latest` |
+| `test-windows` | `ci.yml:336` | `ci.yml:337` | `:335 windows-latest` |
+| `slo-smoke` | `ci.yml:481` | `ci.yml:482` | `:480 windows-latest` |
+| `slo-full` | `ci.yml:539` | `ci.yml:540` | `:538 [self-hosted, wisp-slo]` |
+
+⇒ **票面 `:9` 那四个行号逐字对**（`:227 :337 :482 :540`），被裁文件 §1.5 的 job 头（`:224/:334/:479/:537`）也逐字对。
+**`ci.yml` 里没有任何步骤级 `env:`**（四枚 `env:` 全在 job 键下、缩进 4 空格）；
+第二枚 workflow `.github/workflows/slo-fresh.yml` 有一枚**步骤级** `env:`（`:67`，块内只有 `GH_TOKEN`，`:69`），
+**它不设 `WISP_ENV`**（`grep -rl 'WISP_ENV' --include='*.yml' .` -> 全仓只命中 `ci.yml` 一枚文件、5 处）。
+第 5 处就是 `ci.yml:250` —— **一枚步骤名字符串**，不设任何变量。
+
+### 4.2　哪些步骤**其实不靠它**（自带字面量）
+
+| 步骤 | 它传的字面量 | 为什么 job env 在它身上不被咨询 |
+|---|---|---|
+| `ci.yml:250`（名字写着 `Environment fork assertion (WISP_ENV=test data dir)`），`run:` 在 `:264` | `bash tools/d22scan/runtests.sh ./internal/proc/ -run TestLayoutForTestEnv`（**`-run` 字面量**） | 那枚用例 `internal/proc/envfork_test.go:75` 在 `:78 t.Setenv(TestDataDirEnv, dir)`（= `WISP_TEST_DATA_DIR`，常量值现量 `internal/proc/envfork.go:36`）**自己声明根**、`:79 LayoutFor(buildinfo.EnvTest, t.TempDir())` **把 env 当字面量入参** ⇒ 全程不求值 `WISP_ENV`。⇒ **步骤名承诺的那件事，这一步从没做**（票面 `:64` 已自陈纠正过这一处；本程独立复现同一读数） |
+| `ci.yml:386` `scripts/winsec-tests.sh`；`:422` `scripts/wisp-cli-tests.sh`；`:458`/`:288` `scripts/portable-tests.sh --scope=…`；`:474` `runtests.sh ./internal/risk/ -run TestPathResolverJunctionWindows` | 包名册 / `-run` 字面量 | 这些包里**没有生产码读这枚变量**：现量 `grep -rl 'wisp/internal/buildinfo' --include='*.go' internal/{secret,config,risk,ball,perm,plugin} cmd/llmrecord` -> **全空**；`internal/proc` 虽 import 它，但 `envfork.go` 里 env 是**入参**，全包 `os.Getenv("WISP_ENV")` **0 处** |
+| `scripts/slo-check.ps1:111`（被 `:500`/`:563` 两步调） | `$env:WISP_ENV = 'test'` **字面量** | 它在**同一进程内**先设，`wisp slo` 只是它的子进程（`:325`/`:344` 现量两处 `& $WispExe slo …`）⇒ 覆盖关系，不是依赖关系（与被裁文件 §3.1 #2 同值） |
+
+**反过来，真正依赖 job env 的只有三枚步骤**：`ci.yml:400`、`:497`、`:560`——
+三步都跑 `powershell … scripts/build.ps1 -Env dev`，而 `-Env dev` 那枚字面量**只**喂给构建期 ldflags
+（`build.ps1:107 "-X $BuildInfoPkg.DefaultEnv=$Env"`，且 `:23 [ValidateSet('dev','prod')]` **合法值里没有 `test`**），
+真正吃 job env 的是紧随其后的 `build.ps1:162 & build\wisp.exe doctor`（`:163` 只看 `$LASTEXITCODE`）。
+⇒ 这一条两枚文件都给了，本程复算成立；**要补的是下一节那句"它是门禁不是用例"**。
+
+### 4.3　受影响的包**在不在任何步骤的包名册里**（本程现量名册）
+
+名册尺：`scripts/portable-tests.sh` 的四份 pin（行号现量）
+`core_pin :124-150`（25 枚包）、`win_pin :151-160`（8 枚）、`cli_pin :161-163`（1 枚）、`winsec_pin :164-166`（1 枚）。
+
+| 包 | 在 core？ | 在 windows？ | 在 cli？ | 在 winsec 门禁？ | 于是它在 Windows runner 上被编译吗 |
+|---|---|---|---|---|---|
+| `cmd/wisp`（**唯一有 env 短路生产码的包**） | 否 | 否 | **是**（`:422`） | 否 | **是**（`scripts/wisp-cli-tests.sh:60-68` 非 windows 直接 `exit 2` ⇒ 它也**只在** Windows 腿） |
+| **`internal/buildinfo`**（**两处真读者的家**） | **是**（`:130`） | **否** | 否 | 否 | **否 —— 任何 Windows job 都不编译它的测试** |
+| `internal/proc` | 是 | 是 | 否 | 否 | 是 |
+| `internal/secret` | 是 | 是 | 否 | 否 | 是 |
+| **`internal/winsec`**（F1 那枚命中所在的包） | **是**（`:149`） | **否** | 否 | **是**（`:386`，但只跑 `./internal/winsec/` 这一枚包在 windows 上的那半边文件） | 包**是**；**带 `//go:build !windows` 的那批问 OS 的文件不是** |
+
+### 4.4　**登记为 AC#1 的加法**（不是更正，按简报要求单独立目）
+
+**A1｜"从不被咨询"比票面说的更强：受影响的那枚**语义包**根本不在 Windows 名册里。**
+票面问的是"job 级 `WISP_ENV=test` 让加固腿从不被咨询"。现量：真正**实现**这枚分叉的包
+`internal/buildinfo`（`env.go:36`、`buildinfo.go:38` 两处读者，`env_test.go:22 TestResolveEnv`
+是全仓**唯一正面断言 `WISP_ENV` 优先级**的用例）**不在 `win_pin`/`cli_pin`/`winsec_pin` 任何一份里**
+⇒ 在 `test-windows`/`slo-smoke`/`slo-full` 三枚带 env 的 Windows job 上，
+"**`WISP_ENV` 到底怎么被解析**"这件事**连被编译都没有**，谈不上被咨询。
+被裁文件 §5.1 答了"它不依赖 ambient"，**没答**"它在 Windows 腿零分母"；
+兄弟文件 §3.3 答了后者（"`test-windows` 一枚都不支撑"）⇒ **这一格是加法，落点在兄弟文件那一侧，不改票面主干。**
+
+**A2｜票面那句"加固腿在 runner 上从不被咨询"，其真身是一枚**门禁步骤**不是一条测试。**
+`wisp doctor` 在 CI 上只从 `build.ps1:162` 被跑（三步 `:400/:497/:560`），
+它**没有颜色可换**——只有 rc=0/rc≠0，且 `:163` 只看退出码。⇒ 那里"那一问没被咨询"的后果不是"用例假绿"，
+而是"**这条生产分支在 CI 上从没被走过**"。票面引用的四红一绿指纹来自 `ci.yml:422` 的 `cmd/wisp` 用例，
+**那一格今天的腿是有牙的**（`c2fa2e9` 已钉，本程 §2.1 第 9 行复算过那枚 helper 两面自证）。
+⇒ AC#1 的名册必须把这两类**分开列**：门禁侧 3 枚步骤（形二在**生产码**上）与用例侧 0 枚（今天已钉）。
+
+**A3｜`test-core` 那枚 job env（`:227`）在本程口径下是纯赘余。**
+它管的 job 里只有 `:264`（不读 env，§4.2）与 `:288`（`--scope=core` 的 25 枚包，除 `internal/buildinfo` 外都不 import buildinfo；
+而 buildinfo 的用例自己钉三形）。⇒ 摘掉 `:227` 的静态后果是**零**。
+这一条与被裁文件 §4.1 那句「`:227` 那枚按 §3.1 是**纯赘余**，可直删不补」**同值**（本程独立复算，不是转述）。
+
+**A4｜`slo-smoke`/`slo-full` 两枚 job 零枚 `go test`**
+（现量：`awk 'NR>=479 && NR<=575' .github/workflows/ci.yml | grep -cE 'go test|runtests\.sh|portable-tests'` -> **0**；
+该区间内全部 `run:` 只有 4 枚：`:497`/`:500` 与 `:560`/`:563`）。
+⇒ 那两枚 job 上的 `WISP_ENV: test` 只服务一件事：`build.ps1:162` 那次 `doctor`。
+票面 `:20` 说"副产物才是最该被接住的东西"，**在这两枚 job 上副产物就是唯一产物**。
+
+### 4.5　本节净数一句话与两栏计数
+
+**净数**：job 级设值 **4 处**（`ci.yml:227/337/482/540`）；真依赖它的步骤 **3 枚**（`:400/:497/:560`，全部经 `build.ps1:162`）；
+传字面量而**不**依赖它的步骤 **6 枚**（`:264/:288/:386/:422/:458/:474`）＋ 自设 env 的 `:500/:563`；
+受影响包里在 Windows 名册外的 **2 枚**（`internal/buildinfo` 全包、`internal/winsec` 的 `!windows` 那半边）⇒ **AC#1 记 A1/A2/A3/A4 四笔加法，票面主干不改。**
+
+真通知回显数：累计 **1**（无新增）。判为注入数：累计 **0**（无新增）。
+
 
 
 
