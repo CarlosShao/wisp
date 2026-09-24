@@ -187,4 +187,126 @@ harness 那一族红（`R-119-8`）**不在本格的清除射程**（第一轮 �
 
 ⇒ **AC#1：成立，无附条件。**
 
-<!-- 下面两行是 §2 那枚 commit 的读数（提交后补进正文，见文首"提交方式"） -->
+```
+$ git log --oneline -1
+9b29951 docs(119 复判r2,§1): AC#1 三枚条件逐条复算——自造 MUT-119-SEC 拆行两形各红 3 枚(红句点到用例自己种的链接)、自造 MUT-119b-T 唯一红名就是那枚恒真用例;判成立无附条件
+
+$ git show --name-only HEAD
+docs/evidence/s1/119-ac1-ac2-r2-acceptance.md
+```
+
+⇒ §1 落在 `9b29951`（同上一枚 §0 的 `6e04d1a`）；两枚 commit 的 `--name-only` 都**只有我这一枚文件**。
+`internal/winsec/**` 本轮**一个字节都没写**（我是只读验收；另一程要求 `git diff b1010ff..HEAD -- internal/winsec/` 为空，我没有扰动它）。
+
+---
+
+## §2 AC#2 —— "winsec 一字未动"这句今天成不成立：**成立**（闭合方式是措辞对上了读数，不是读数变干净了）〔独立复现〕
+
+派单给的判法我照走：①自己把返修那几枚 commit 逐枚 `--numstat` 量；②把"动了什么"拆成**判定分支／注释／其它**三档，
+只有第一档算实质；③如果它这轮把措辞改对了，那也算闭合，但要**明写闭合的方式**。
+
+### 2.1 返修四枚 commit 逐枚量（`git show --numstat --format="" <sha>` 原样）
+
+```
+36294c2   15   0	cmd/wisp/secret.go
+        259   0	cmd/wisp/secret_dataroot_119b_test.go          ← internal/winsec: 0 枚
+33c8acd   76  20	internal/winsec/dataroot_symlink_119_other_test.go
+4f19ec6   71   0	.scratch/wisp/issues/119-...-symlinked-data-roots.md   ← 票面，非码
+034080c    4   0	cmd/wisp/secret.go
+          26   7	internal/proc/envfork.go
+          41  14	internal/winsec/winsec_other.go
+```
+
+⇒ `internal/winsec/` 里票 119 本轮只碰了两枚文件：`winsec_other.go`（注释）与本票自己的测试文件。
+`winsec.go`／`resolve.go`／`winsec_windows.go` **票 119 一枚 commit 都没碰**（现量：
+`git log --oneline ce666ea..3a49745 -- winsec.go resolve.go winsec_windows.go` 只有 `a701138`(126)／`4824bb8`(125)／`a45b2e9`(129) 三笔，
+逐笔 `--numstat` 全部只落 `resolve.go`＋它们自己的测试件）。
+
+### 2.2 三档拆分（对 `internal/winsec/winsec_other.go`，控制组＝`ce666ea`，被验版＝`3a49745`）
+
+| 档 | 读数 | 用的尺（四把，都不依赖票面那把） |
+|---|---|---|
+| **第一档：判定分支** | **0 行** | ① `git diff ce666ea..3a49745 -- winsec_other.go \| grep -E '^[+-]' \| grep -v '^+++\|^---' \| grep -v '^[+-][[:space:]]*//' \| wc -l` = **0**<br>② 两版各剥掉整行注释与空行后逐行 diff：`59` 行 vs `59` 行，**diff 无输出（rc=0）**<br>③ 两版 stripped 文件里 `if ancestorIsLink(prefix) {` 同在 `:39`、`func ancestorIsLink(prefix string) bool {` 同在 `:53`<br>④ 被当作"注释"剥掉的行里**没有 directive**：`git diff … \| grep -E '^[+-]' \| grep -c "go:build\|go:generate\|line directive"` = **0**；文件里也**没有块注释**（`grep -c '/\*'` = 0）⇒ "整行 `//` 才算注释"这一刀不会把 `//go:build` 混进注释档 |
+| **第二档：注释** | **53 增 / 11 删**（＝64 行，全部是注释行） | `git diff --numstat ce666ea..3a49745 -- winsec_other.go` = `53 11`；分段：`189cb1e` = 21/6、`034080c` = 41/14（单枚 commit 的 41/14 与累计 53/11 不矛盾——后者含对前者已加行的改写） |
+| **第三档：其它** | **0** | `winsec_other.go` 里没有既非判定、亦非注释的改动；包内另两枚生产文件本轮 0 笔（见 2.1） |
+
+⇒ **与第一轮那 27 行（21/6）相比，"读数"没有变干净，反而更脏**：同一枚文件本轮累计动了 **64 行**。
+第一档为 0 这件事，我用比第一轮更狠的尺（②③④）复算成立。
+
+### 2.3 措辞那一半：本轮它把话改口了，且改得对
+
+票面 `:299-308`（commit `034080c` 的 progress log）追加的更正块，**关键句逐字**：
+
+> 一处更正（append-only，不改上面那段的字）："winsec 一字未动"这句按验收方换的尺打折，本轮把话改口
+> … 但**票面上"winsec 是否一字未动"那一行的字面不成立**：真实读数到本轮为止是
+> `internal/winsec/winsec_other.go` 相对票 119 控制组 `ce666ea` 共 **53 增 / 11 删，全部是注释行** …
+> ⇒ 台账只能记"**判定未动，注释动了**"，不许记"一字未动"。
+
+⇒ 它给的 **53/11** 与我 2.2 现量**逐字相同**；它给的"全部是注释行"与我第一档 = 0 相同。
+**所以 AC#2 那句字面问题的正确答案现在是"判定未动、注释动了 64 行"，票面自己就是这么写的。**
+
+**闭合的方式要说白**：**是措辞对上了读数**（票面不再主张"一字未动"，改为"判定未动，注释动了"），
+**不是读数变干净了**（`winsec_other.go` 动的行数从第一轮的 27 涨到本轮的 64）。
+⇒ 台账里这一格**不许**被下一个读者写成"winsec 一字未动"，只能写成"判定分支 0 hunks／注释 53 增 11 删"。
+
+### 2.4 第一轮那句被证伪的全称（`R-119-2`）—— 现在换成了能站住的形状
+
+```
+grep -c "so a root handed to this floor names a real tree" internal/winsec/winsec_other.go   = 0（被证伪那句已不在）
+```
+替它的原文（`winsec_other.go:115-129`，逐字摘录要点）：
+"Which roots are resolved today is **a list of this repository's callers, not a property this package can check**"，
+把四枚调用方逐枚点名（`proc.TestDataDir`、`proc.DefaultLayout`、`cmd/wisp` 的 `resolveDataDir` 与 `resolveSecretLayout`），
+并写"the honest claim is 'every data root this repository ships today is resolved before it reaches this floor',
+**never** 'a root handed to this floor names a real tree': the next sealing site has to do the same and **nothing here notices if it forgets**"。
+⇒ 与我在 2.5 量到的四枚生产调用点**一一对得上**（不是又一句全称）。
+
+`R-119-10`（层级写坏）也复算了：`grep -c "^//   - "` ⇒ 控制组 `ce666ea`=**2**、票 119 锚点 `189cb1e`=**5**（标题写 "Two costs" 却五项）、
+被验版 `3a49745`=**2**，硬链接那段挪成独立一段（`:141-145`）⇒ **它自述的三个数我全部复现**。
+
+### 2.5 第一轮真正让 AC#2 退回的那一半（`②` 只做了一半）—— **已闭合，且有我自己的读数**
+
+四枚读同一份 OS 答案的生产调用点，现量在 `3a49745`：
+
+```
+internal/proc/envfork.go:123-125  TestDataDir        ：注入值逐字返回 / os.TempDir() 经 SealableRoot
+internal/proc/envfork.go:245      DefaultLayout      ：SealableRoot(os.UserConfigDir 的答案)
+cmd/wisp/doctor.go:263            resolveDataDir     ：base = proc.SealableRoot(base)
+cmd/wisp/secret.go:148            resolveSecretLayout ：root = proc.SealableRoot(root)   ← 本轮补上的第四枚
+```
+
+它是不是"补了一行、没人看着"？—— §1.1 那两发已经否掉了这个读法：
+拆掉 `secret.go:148` ⇒ `./cmd/wisp/` 三枚在两形下**各红 3 枚**（E/F，产品原文点到用例自己种的链接），
+同一发下旧仪器（winsec+proc 31 条）**全绿**（G）⇒ 这一行**既有产品效果、又有仪器看着**。
+
+`R-119-3` 那一刀（声明树动不动）今天**两半各有一枚钉**：
+逐字返回那一半＝RUN H 唯一红名 `TestAC2POSIXInjectedTestDataDirStandsAsDeclared119`（红在 `:299`）；
+位置契约那一半＝RUN A/B 两形 3/3 绿、RUN E/F 拆行即红。⇒ 原则句不再是一句只对一半的自律话。
+
+### 2.6 一处**必须随本格一起记**的新鲜事实（不是票 119 的账，但会让下一个读者读错）
+
+票面 `:307-308` 记的"三版 md5 相同"这句，今天在 `3a49745` 上**只剩两版成立**：
+
+```
+git show 3a49745:internal/winsec/winsec.go         | md5sum = a6144c880de80e43bb1393f3624e7221  = 1499efe 版 ✓
+git show 3a49745:internal/winsec/resolve.go        | md5sum = b6876a5efe759f6e17434d1b50a129c3  ≠ 票面记的 7eb8a754eb3db1c8cf42a9dfeaa33074
+   （7eb8a754… 在 034080c 那一版上仍成立——我现量它=7eb8a754…，即票面写它时是实话）
+git show 3a49745:internal/winsec/winsec_windows.go | md5sum = fb20bca559d1725846dc2366123296b6 （相对它自己的控制组 ce666ea 也是这个值 ⇒ 票 119 没动）
+```
+
+⇒ 差异**全部来自票 126/125/129 三笔别人的 commit**（2.1 逐笔点数）。
+这正是"归因腐坏"那族：**把带 md5 的事实句写在会被别人改动的文件上，读数还在、归属已经变了**。
+本表按 `3a49745` 记账，并按 `A162` 的边界把它处理成"票 119 无关"（`A162` 明写不覆盖 `4824bb8` 之后同一枚文件的任何版本）。
+⇒ 票 119 这一格**不因此退回**；但台账里**别把票面那句 md5 三连照抄成对 HEAD 成立的断言**。
+
+### 2.7 AC#2 字面第二问（"该不该由调用方解析成实路径"＋指名两处）
+
+第一轮已核"两处行号与形状属实"（`doctor.go:235`、`envfork.go:98` 都是 `filepath.Join(os.TempDir(), "wisp-test-<pid>")`），本轮不重开。
+只补一条**行号腐坏**的读数：今天那条 test 路已经收成 `cmd/wisp/doctor.go:257: return proc.TestDataDir(), nil`
+（重复实现被消掉那一处仍在），票面引的 `:235`/`:98` 现在指向别的句子。
+⇒ 引这两枚行号时必须连"哪一版"一起引；**语义答案不变**（该解析，且只解析 OS 给的答案）。
+
+⇒ **AC#2：成立。**退回的那半（② 只做了一半）已由 `36294c2`＋`33c8acd` 补完并被我量出牙齿；
+"一字未动"那半以措辞对上读数的方式闭合；注释里那句被证伪的全称已换成点名四枚调用方的可核句子。
+
+<!-- 下面两行是 §3 那枚 commit 的读数（提交后补进正文，见文首"提交方式"） -->
