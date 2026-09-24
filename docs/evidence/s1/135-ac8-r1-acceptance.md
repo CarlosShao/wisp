@@ -81,6 +81,43 @@ VERDICT=BUSY
 
 ---
 
+## §0.5 ⚠ 本程自己犯的一枚仪器错，以及它把哪些读数作废了（append-only，不抹上一条）
+
+### 0.5.1 错在哪
+
+上面 §0.4 那台 `gate.sh`（v1）只做了一半的事：**它把 `VERDICT` 打在批头，但没有任何东西读那个 verdict**。派单写的是"任一命中 ⇒ 那一批发不作数"，而我的驱动是"先跑闸门、下一行就开炮"——**判 BUSY 也照开**。
+
+第二半是：`gh run list` 从 **12:17 起持续 EOF**（本程 12:33 又连试三发，全 `failed to get runs: Get "https://api.github.com/…/actions/runs?…": EOF`）。v1 把"gh 报错"并进 BUSY 是对的（不许把它读成"确认为空"），但它**和"真有 job 在本机"共用一个词**，于是本程看见 12:14 那批 CLEAR、后面几批的 BUSY 没逐批打开看，就一路把炮开了下去。
+
+```
+batch-1.log  gate at=12:12:55  worker=0 toolchain=0 in_progress=0        VERDICT=CLEAR
+batch-2.log  gate at=12:14:20  worker=0 toolchain=0 in_progress=0        VERDICT=CLEAR
+batch-3.log  gate at=12:17:05  worker=0 toolchain=0 in_progress=0        VERDICT=BUSY   ← 因 gh EOF
+batch-4.log  gate at=12:19:49  worker=0 toolchain=0 in_progress=0        VERDICT=BUSY   ← 因 gh EOF
+batch-5.log  gate at=12:22:46  worker=0 toolchain=0 in_progress=0        VERDICT=BUSY   ← 因 gh EOF
+batch-6.log  gate at=12:28:14  worker=0 toolchain=0 in_progress=0        VERDICT=BUSY   ← 因 gh EOF
+```
+
+⇒ **batch-3…batch-6 的全部读数（`MG-*`／`MGF-*`／`U-*`／`1B-*`／`CP-*`／`RST`／`FC`／`NH-*`）按派单口径不作本格的凭据。**
+本程**没有**为腾出窗口杀过进程、改过 workflow、取消过 run；这三行只观察。⚠ 顺带一枚要登记的现场事实：闸门输出里 `Runner.Listener.exe` 的 PID 从 **43288 变成 3952**（内存 99MB→82MB）⇒ **本机 runner 服务在中途重启过一次**。本程不知道是谁动的、也不需要知道，但它是"别把远程取不到当成机器空了"的第二条理由。
+
+### 0.5.2 修法（改的是本程自己的台件，不是被审对象）
+
+- `/d/tmp/wisp135ac8r1-gate/gate2.sh`：把两种失败**拆开**——`BUSY-LOCAL`（worker／toolchain 命中＝真有活在机器上）／`BUSY-REMOTE`（远程确有 in_progress）／`LOCAL-CLEAR-REMOTE-UNKNOWN`（本地空、`gh` 取不到 ⇒ exit 2，**明写"这不是确认为空"**）。
+- `/d/tmp/wisp135ac8r1-gate/batch.sh`：**轮询到条件成立才点火**（`INTERVAL=45` × `MAXROUNDS=26`；`gh` 连续 `UNK_LIMIT=3` 轮取不到才降级为 `CLEAR-LOCAL-ONLY` 点火，并把那句降级写在日志里；到上界仍不满足 ⇒ `exit 3`、**批不发**）。
+- `/d/tmp/wisp135ac8r1-batchR.sh`：**BATCH-R**＝把甲…辛那一整套在点火闸门之下重跑一遍（19 发读数＋2 发邻桶探针），并在批内每 4–6 发复跑一次 gate2。
+
+### 0.5.3 处置
+
+- **本格所有承重读数一律以 BATCH-R 的 `R-*` 为准**（§2 起）。
+- 第一遍那些日志与树**留在盘上不删**（`issues/README` 规则 8），档位在本表里标〔仅自述，不背书〕——对本程自己同样适用：它们是本程自己采的，但采的窗口不合格，所以**不背书**。
+- ⚠ 形状钉在这里，别只当本程的手抖：**"闸门打印了 verdict 但没人读它"是一类会自我安慰的仪器**——它长得完全像"我在守规矩"，输出里每一批都真的有一行 VERDICT。判据是问一句"**这一行如果被印成 BUSY，点火的那一步会停下来吗**"。下一条写闸门的人请直接读 `batch.sh`，不要读打印器。
+
+〔独立复现〕0.5.1 那六行 `batch-*.log` 与 `gate-rounds.log` 都在盘上可逐轮重看；0.5.2 两枚台件的判读规则写在文件注释里。
+
+
+---
+
 ## §1 锚点、取件、以及"那把尺本程一字未动"
 
 ### 1.1 锚点自量（不抄派单），引用到的每一枚 sha 逐枚 `git cat-file -t`
