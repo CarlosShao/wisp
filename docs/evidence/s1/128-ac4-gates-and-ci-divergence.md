@@ -326,6 +326,9 @@ grep -c "t.Skip" cmd/wisp/dataroot_128_windows_test.go -> 0
 
 **只 commit、未 push**；`git add` 全程只用显式路径；未用 `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；
 每次 commit 前看一眼 `git diff --cached --name-only`，**没有出现别人的路径**。
+⚠ 这张表**列不进它自己所在的那一枚**（写表→提交必然自指），所以别按表数：
+可复算的读法是 `git log --oneline -- docs/evidence/s1/128-ac4-gates-and-ci-divergence.md`
+（它列出携带本文件的**全部** commit，含 §10 这一节落盘的那一枚）。
 
 ### 10.2 结论修正记录（本文件自己的一处）
 
