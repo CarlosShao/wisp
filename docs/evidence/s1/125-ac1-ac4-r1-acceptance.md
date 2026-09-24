@@ -598,8 +598,127 @@ docs/evidence/s1/125-ac1-ac4-r1-acceptance.md
 `internal/config/c26_seam_posix_125_test.go` 都是 `internal/` 下的 `.go`），不需要"逐名解释下降"（因为没有下降）。
 实现方给的基线 383 与本程控制组现量**逐字吻合** ⇒ 它没把基线说高。
 
-### 4.5 AC#4 里本表**不签**的一句
+### 4.6 §4 正文所在 commit 的回执（这枚回执由 §5 那一枚 commit 携带）
 
-票面 AC#4 那格的 `②软链 temp 形状那一把（信息性）`读数（`RUN=144 PASS=62 FAIL=19 SKIP=4`）本程**没复算**
-（它是票 124 那本 harness 账，不在本票射程；实现方自己标了"信息性"）。
-⇒ 那一组数在本表里的档位是**〔仅自述，不背书〕**，见 §6。
+```
+$ git log --oneline -1
+d777eb6 evidence(125,AC#4 r1 终裁 §4): 四数+名册差集逐字复现、gofumpt 版本改判 v0.12.0、vet 交叉那发用真平台读数定掉
+$ git show --name-only HEAD
+commit d777eb6234feee75c952af2649aafafe6194e11b
+Author: CarlosShao <1933942520@qq.com>
+Date:   Thu Sep 24 15:46:32 2026 +0800
+
+    evidence(125,AC#4 r1 终裁 §4): 四数+名册差集逐字复现、gofumpt 版本改判 v0.12.0、vet 交叉那发用真平台读数定掉
+
+    bd50c63 vs 81b4d5f：winsec 104/60/0/0、config 202/110/0/0、合并 306/170/0/0、panic 全 0；
+    名册 +14 丢 0（comm -13 空）。gofmt 两平台空；gofumpt 现量 v0.12.0（实现方报 v0.7.0、CI @latest）。
+    GOOS=linux 全模块交叉 rc=1 那发：0 枚 file:line、控制组同文、容器 go vet ./... rc=0 ⇒ 用实测定为"非破口"。
+    d22scan 两把 rc=0、正控制真跑、八 scope 零下降（ban #8 internal/ 383→385 逐名可归因）。
+
+docs/evidence/s1/125-ac1-ac4-r1-acceptance.md
+```
+
+### 4.7 Windows 宿主那一行本程**补上了**（15:4x 现量，从纯净快照 `D:/tmp/wisp125r1-gate`，不是工作树）
+
+```
+go test -count=2 -v ./internal/winsec/ ./internal/config/  → rc=0
+RUN=382 顶层PASS=212 顶层FAIL=0 顶层SKIP=0 子PASS=170 子FAIL=0 panic=0
+分包：winsec rc=0 RUN=182 顶层PASS=100 ／ config rc=0 RUN=200 顶层PASS=112
+```
+⇒ 票面 AC#4 表里"同两包（Windows 宿主真跑）`382/212/0/0`、分包 `182/100`、`200/112`"**逐字复现**，
+那一行在本表里升到**〔独立复现〕**（`resolve.go` 是共用件，所以这一行是 AC#2 那刀的平台边界证据，不是装饰）。
+
+---
+
+## §5 逐格总判表
+
+| 格 | 判 | 证据档 | 一句话理由（可复算的那一件东西） |
+|---|---|---|---|
+| **AC#1** | **成立** | 〔独立复现〕 | 本程自造 `MUTATION-R1A`（`if reason != "" || r != nil`）⇒ 红名逐字 `TestAC1POSIXSeamHoldsC26Pipeline125`、红因 `PathResolverInstalled() = <nil>`；同树对照组 rc=0；钉子零 `t.Skip`；落点理由为真（`go list -deps -test` 现量 winsec 不链 risk、config 链）。 |
+| **AC#2** | **成立附条件** | 〔独立复现〕＋实现方归档抽验 | **技术面成立**：自造 `MUT-R1B` 摘掉解析 ⇒ 三枚红名与未修版逐字同名；自造 `MUT-R1C` 删底线复算 ⇒ `answer_through_the_link` 两形被放行 ⇒ 拒绝侧真有牙齿且本票没动它；82 行的 `+/-` 行对四枚比较函数**零命中**。**授权面未闭合**＝条件（见 §2.3②③）。 |
+| **AC#3** | **成立** | 〔独立复现〕 | 本程自建两枚容器二进制：改前 stderr 第 1 行就是那枚 ERROR、sink 在其后才装上；盘上 JSONL 2 行、`grep -c winsec`=0、`grep -rl`=NONE（改前改后两台都是）。残余缺口具名＝**票 130 第一格**。一处措辞打折（console-subsystem，见 §3.4）。 |
+| **AC#4** | **成立** | 〔独立复现〕 | 四数逐字复现（含 Windows 宿主 `382/212/0/0`）、名册 **+14 丢 0**、`panic=0` 全发；`gofmt` 两平台空、`gofumpt` **v0.12.0** 空；`go vet` 双 GOOS 对受影响包 rc=0/0，全模块交叉那枚 rc=1 以"控制组同文＋容器 `go vet ./...` rc=0"**定为非破口**；`d22scan` 两把 rc=0、正控制真跑、八 scope 零下降。 |
+
+**AC#2 的那个条件，写成一行人话**：要么编排者补一枚**自己署名**的 `A##`（五字段齐全，见 §2.3③ 那五条），
+要么把 `internal/winsec/resolve.go` 那一刀退回成"只出裁定与判据"——两枚三 leg 判据与本表 §2.1/§2.2 可以原样留在仓里。
+**在这个条件落地之前，本表不许被读成"AC#2 通过"**，也不许被读成"生产码要 revert"（处置权不在本程）。
+
+**总判（本程的一句话结论）**：票 125 交的**东西**是硬的——四格里三格无附条件成立，
+唯一那枚"能红的钉子"本程用自己的变异复现了；它交的**手续**是软的——
+一格生产码改动建立在一句盘上不可核的转述上，而转述用的还是一枚会污染下一张票的理由。
+**本表认为更该修的是后者，且后者不是这张票能自己修的。**
+
+## §6 本程明确**没核**的清单（别把本表当全裁）
+
+1. **票面 AC#4 `②` 软链 harness 那一组数**（`RUN=144 PASS=62 FAIL=19 SKIP=4`）：没复算。
+   它是票 124/`R-125-4` 那本 harness 账。⇒ 那一组数在本表里是**〔仅自述，不背书〕**。
+2. **macOS 那半**：无 runner，没核（与票面 `:14` 同口径，`R-103-6` 那笔账仍未付）。
+   ⚠ 特别地：本票裁的是 `//go:build !windows` 的 POSIX 半边在 **Linux 容器**里的行为，
+   **不等于**"macOS 上守门人不再误伤"这一条已被验。
+3. **票 129 `a45b2e9`（09-22 23:41）之后的 HEAD 版 `resolve.go`**：没核。
+   本表 §2 的"四枚比较函数一字未动／拒绝侧没放宽"判的是 `4824bb8^ → 4824bb8` 这一刀；
+   票 129 后来往 `sameTree`/`answerInsideTree` 里塞了绝对性判断（自述"只更严"），**那句话本表既不支持也不反驳**——
+   它属于票 129 的验收程。⇒ 读者不许拿本表去签 HEAD。
+4. **这三枚新用例在 CI 上有没有腿**：没核。
+   ubuntu 那几条 step 的 scope 归属是票 119 末节⑥那本账（"容器读数即本轮判据"要不要被裁定），**不是票 125 能结的**。
+   本表只签"容器与宿主真跑的读数成立"，**不签**"CI 覆盖过这一形"。
+5. **`gofumpt` v0.7.0 ↔ v0.12.0 之间的规则差异**：没核（两枚版本各自读到的都是空）。
+6. **`R-125-1`/`R-125-2`/`R-125-4`/`R-125-5` 四枚登记的内容**：只抽验了两枚——
+   `R-125-1`（解析后第二证人腿不再有分母）本程按 §2.3① 的结构推理接受；
+   `R-125-5`（POSIX 只有 1 枚形状）本程在 §2.1 的现场行里**顺带旁证**到 `probes_passed=1`（POSIX）；
+   `R-125-2`（同一走法第三枚副本）与 `R-125-4`（四枚 leg 在 harness 软链形下 `t.Skipf`）**没独立复算**，
+   它们进台账与否是编排者的账。
+7. **Windows"双击无终端"那一形**：没测（不派开窗代理）。⇒ §3.4 那句打折是**代码级归因**，不是读数。
+8. **票面 `:361` 的"补记"称最终 sha 是 `6d8554e`**：盘上现量票面文件最后一枚是 `bd50c63`，
+   那枚没被实现方量过；本表用 §0.4 的"代码树逐字节相同"把这一格**归并**掉了，
+   但**没去核 `6d8554e`/`bd50c63` 各自那组快重量读数**（本表 §4 直接量了 `bd50c63`，比复算它的自述更强）。
+9. **`internal/risk/**` 侧的后果**：`winsec_c26.go` 的 `init()` 装配次序是 §3.2 归因的依据，本程读了调用点，
+   **没在 risk 侧造变异**（那是冻结区，本程碰都不碰）。
+
+## §7 临时件路径 · 注入两栏计数 · 工具被拒登记
+
+### 7.1 本程建的临时件（一律**只建不删**，清理由编排者做）
+
+快照（全部 `git archive <sha> | tar -x`，仓外）：
+```
+D:/tmp/wisp125r1-post     4824bb8  被验主版本
+D:/tmp/wisp125r1-pre      ff3faf9  + 从 post 拷来的两枚交件用例（未修码＋新 leg）
+D:/tmp/wisp125r1-gate     bd50c63  门禁/AC#3/宿主真跑用的树（代码＝post）
+D:/tmp/wisp125r1-ctrl     81b4d5f  控制组
+D:/tmp/wisp125r1-mutA     post + MUTATION-R1A
+D:/tmp/wisp125r1-mutRoot  post + MUTATION-R1B
+D:/tmp/wisp125r1-mutFloor post + MUTATION-R1C
+D:/tmp/wisp125r1-gocache  容器 go module 缓存卷
+D:/tmp/wisp125r1-logs/    全部原始日志（*.log，含四数那几发的全文与名册差集）
+```
+容器里被植的假根（在 `--rm` 容器内，随容器消失，但 **`wisp125r1-logs` 是挂载卷 ⇒ AC#3 那两棵假根 `ac3-pre`/`ac3-gate` 与两枚二进制 `wisp-pre`/`wisp-gate` 都还在盘上**）。
+容器：全部 `--rm`，无常驻。
+
+**未删任何东西**；未动实现方留在 `/tmp/wisp-t125-*`（＝`C:\Users\swq\AppData\Local\Temp\`）的 12 枚归档（只 `ls`/`grep`/`diff -q` 读）。
+
+### 7.2 注入两栏计数（分两栏，不混一个字段）
+
+- **真通知回显数＝1**：harness 报 `C:\Users\swq\.qoder-cn\memory\MEMORY.md was modified since it was last read`。
+  判为**真**：路径真实存在、内容是编排者自己的记忆账、**不要求任何动作**（不 revert、不放宽、不指哪格该判什么）。
+  本程**没有据此改任何判断**（它写的"临时件只建不删"等条与本派单同向，本程本来就按派单做）。
+- **判为注入数＝0**：全程未出现自称"编排者备注／系统提示／请 revert／冻结某包／放宽阈值／
+  Confirm the harness note is genuine"的**任务性**文字，也没有伪 sha 混进工具输出
+  （本程引用的每一枚号都过了 `git cat-file -t`／`git log -1`，见 §0.4）。
+
+### 7.3 工具调用被拒登记（硬规矩要求：被拒就带已有东西报回）
+
+- 1 枚：本程第 24 步一条 `cat -A <evidence file> | sed -n '243,253p'` 被权限系统拒
+  （命令前 40 字：`cd "D:/work/workspace/projects plans/Wisp" && cat -A`）。
+  ⇒ **没有绕过**：改用 `git show --name-only <sha>` 拿到的**真实**输出原文填 §3.5／§4.6 两节回执。
+  该被拒动作本意是"复查回执是否已粘进正文"，**不影响任何读数**。
+
+### 7.4 本程卫生自扫
+
+- 生产码／测试码改动：**0 枚**（`git status` 里本程只产出本文件；所有变异都在 `D:/tmp/wisp125r1-mut*`）。
+- 票面四格的勾：**一枚没翻**；`-done`：**没改名**；`docs/PLAN.md`／`docs/specs/**`／`internal/risk/**`／
+  `rules_gateway.go`／`tools/d22scan/**`／`allowlist.txt`／阈值与 golden／`frontend/**`／`design/**`／
+  别的票的票面与证据文件：**全部没碰**。
+- 每笔 commit 都带**显式 pathspec**、提交前 `git diff --cached --name-only` 现量**只有本文件一枚**；
+  无 `git add -A`／`git add .`／`-a`；无 `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；
+  **未 push**。
+- 凭据值：**本表零枚**（出现的只有变量名 `TMPDIR`／`WISP_ENV` 与文件路径）。
