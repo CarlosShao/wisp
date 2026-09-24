@@ -16,6 +16,19 @@
 //     and the unlink lands in somebody else's tree - the fail-open this
 //     repository already booked once as A74(3).
 //
+// Both refusal legs below stand on a resolved root (winsec.SealableTempDirForTest124),
+// which is ticket 137 AC#4's judgement: firstLinkAncestor reports the *shortest*
+// link ancestor, so on a host whose TMPDIR is itself spelled through a link the
+// guard stops at that ambient component and never reaches the link this file
+// plants - or, for the backslash-named one, never even splits its name. Standing
+// on an unresolved root bought those two PASSes with a refusal this file makes no
+// claim about. The leg "a root that reaches itself through a link is refused" is
+// owned by ticket 119's TestAC1POSIXUnresolvedSymlinkedRootStillRefused119 and
+// TestAC2POSIXInjectedTestDataDirStandsAsDeclared119, which plant their own link
+// inside the harness base, and by ticket 125's
+// control_unresolved_root_still_refused_by_the_floor_itself subtest in the plain
+// shape; it is not owned here.
+//
 // Run for real (not compile-only) per ledger A79(1): see the ticket's AC#5 row
 // for the container command and its rc.
 package winsec_test
@@ -66,7 +79,7 @@ func assertStillThere108(t *testing.T, path string, why string) {
 // the spelling is entirely forward slashes.
 func TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink(t *testing.T) {
 	_, victim := foreignTree108(t, "foreign")
-	root := filepath.Join(t.TempDir(), "root")
+	root := filepath.Join(winsec.SealableTempDirForTest124(t), "root")
 	if err := os.Mkdir(root, 0o700); err != nil {
 		t.Fatal(err)
 	}
@@ -132,7 +145,7 @@ func TestAC2POSIXDoesNotFoldABackslashIntoASeparator(t *testing.T) {
 // the foreign tree.
 func TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor(t *testing.T) {
 	foreignDir, victim := foreignTree108(t, "foreign")
-	root := filepath.Join(t.TempDir(), "root")
+	root := filepath.Join(winsec.SealableTempDirForTest124(t), "root")
 	if err := os.Mkdir(root, 0o700); err != nil {
 		t.Fatal(err)
 	}

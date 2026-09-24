@@ -21,6 +21,21 @@
 // in would either refuse the real directory named `a\b` (false refusal) or check
 // a rebuilt `x/y` while the link is `x\y` (fail-open, booked as A74(3)).
 //
+// Which root these cases stand on is ticket 137 AC#4's judgement, and it is the
+// resolved one (winsec.SealableTempDirForTest124) everywhere below. The five
+// refusal legs here exist to be answered about a link *they* planted: an ambient
+// link above the tree (the harness's own symlinked TMPDIR, which is macOS' real
+// shape) makes the floor refuse the whole spelling at its first component, so the
+// walk under test never reaches the planted link and the leg cannot fail. A root
+// nobody resolved is therefore not coverage for these five - ticket 137 AC#1's
+// MUT-D measured the combination and it is a green with zero detection power.
+// The unresolved-root leg itself stays pinned where it is named: ticket 119's
+// TestAC1POSIXUnresolvedSymlinkedRootStillRefused119 and
+// TestAC2POSIXInjectedTestDataDirStandsAsDeclared119 plant their own link inside
+// the harness base, so they answer for that leg in both shapes, and ticket 125's
+// control_unresolved_root_still_refused_by_the_floor_itself subtest answers for it
+// in the plain shape (its fixture skips the symlinked-base shape by design).
+//
 // Run for real, not compile-only, in a Linux container: see the ticket's AC#1
 // row for the mount and the rc.
 package winsec_test
@@ -194,7 +209,7 @@ func assertRefused113(t *testing.T, what, spelled, planted string, err error) {
 // middle of the spelling.
 func TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone(t *testing.T) {
 	f := newForeign113(t, "foreign")
-	root := filepath.Join(t.TempDir(), "root")
+	root := filepath.Join(winsec.SealableTempDirForTest124(t), "root")
 	if err := os.Mkdir(root, 0o700); err != nil {
 		t.Fatal(err)
 	}
@@ -217,7 +232,7 @@ func TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth(t *testing.T) {
 	for _, depth := range []int{1, 2, 3, 4} {
 		t.Run(fmt.Sprintf("link-at-depth-%d", depth), func(t *testing.T) {
 			f := newForeign113(t, "foreign")
-			root := filepath.Join(t.TempDir(), "root")
+			root := filepath.Join(winsec.SealableTempDirForTest124(t), "root")
 			if err := os.Mkdir(root, 0o700); err != nil {
 				t.Fatal(err)
 			}
@@ -245,7 +260,7 @@ func TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth(t *testing.T) {
 // through a link exactly the same way.
 func TestAC1POSIXSealDirThroughASymlinkRefuses(t *testing.T) {
 	f := newForeign113(t, "foreign")
-	root := filepath.Join(t.TempDir(), "root")
+	root := filepath.Join(winsec.SealableTempDirForTest124(t), "root")
 	if err := os.Mkdir(root, 0o700); err != nil {
 		t.Fatal(err)
 	}
@@ -261,7 +276,7 @@ func TestAC1POSIXSealDirThroughASymlinkRefuses(t *testing.T) {
 // content exists on the other side.
 func TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing(t *testing.T) {
 	f := newForeign113(t, "foreign")
-	root := filepath.Join(t.TempDir(), "root")
+	root := filepath.Join(winsec.SealableTempDirForTest124(t), "root")
 	if err := os.Mkdir(root, 0o700); err != nil {
 		t.Fatal(err)
 	}
@@ -286,7 +301,7 @@ func TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing(t *testing.T)
 // finding nothing, concluding "not a link" and sealing through `root/x\y`.
 func TestAC1POSIXSealFileThroughABackslashNamedLink(t *testing.T) {
 	f := newForeign113(t, "foreign")
-	root := filepath.Join(t.TempDir(), "root")
+	root := filepath.Join(winsec.SealableTempDirForTest124(t), "root")
 	if err := os.Mkdir(root, 0o700); err != nil {
 		t.Fatal(err)
 	}
