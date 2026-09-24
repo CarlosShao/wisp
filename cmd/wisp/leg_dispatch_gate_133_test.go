@@ -24,6 +24,18 @@ package main
 //	    shot red on its SECOND beat: once the leg's install block is deleted,
 //	    install-based readings go quiet and "nobody anywhere verifies this command"
 //	    does not.
+//	(c) a coverage claim that names a test case has to name a case THIS ROUND'S
+//	    TEST BINARY CAN START. Check (b) is read out of parsed sources, and parsed
+//	    sources are a superset of what runs: a correctly shaped
+//	    `func TestXxx(t *testing.T)` sitting in a file whose name carries an
+//	    implicit GOOS=linux constraint is a declaration this platform never
+//	    compiles, so it can never print `=== RUN`, and ticket 133's second
+//	    acceptance round measured this file booking it as `covered=test ... drives
+//	    ...` while the whole package stayed green (R-133-9, family shot M-G). The
+//	    roster check below is the one reading here that does not come from
+//	    go/parser: it asks the running binary which cases it can start. It is NOT
+//	    folded back into the parser, because the point of a second instrument is a
+//	    second, independent source of truth.
 //
 // WHAT EACH OF THE FIVE SHOTS IN AC#1 HITS, stated before the fact and measured
 // afterwards (readings in docs/evidence/s1/133-ac1-ac2-instrument.md):
@@ -67,21 +79,42 @@ package main
 //   - the records side: what a leg actually books into the sink is ticket 131's
 //     predicate, not this one. Nothing here gets redder because a leg writes
 //     slog.Info without a listener; that row belongs to the other door.
-//   - which nail a covered leg runs: this gate reconciles claims against compiled
-//     test sources. Whether a nailed case asserts anything real is checked by
-//     ticket 131's body check and by the per-leg mutations in ticket 131's face.
+//   - what a covered leg's case ASSERTS. A name this round's binary can start is now
+//     a measured fact (runRosterReds135 asks the running test binary for its own case
+//     roster), but a case that starts, passes and checks nothing is ticket 131's
+//     predicate, not this one; the per-leg body readings live there.
+//   - a round narrowed by -test.run. The roster below is the set of cases this binary
+//     can start in this round, which is the set `=== RUN` is drawn from; it is not a
+//     transcript of the lines this particular process printed, because nothing inside
+//     a running case can see the testing package's own output. A development call of
+//     the shape `-run '^TestAC1AC2DispatchHopGate133$'` therefore proves "startable
+//     here", not "started here" - the disclosure line names the filter in force so the
+//     reading says which of the two it is. Every CI reading of this package runs the
+//     whole package, where the two are the same set.
+//   - the four claims in this gate's OWN registry that live in *_windows_test.go
+//     files. On the windows leg they are in the roster and are counted; on a linux run
+//     they are not, and that is disclosed in the same line rather than reddened,
+//     because a red there would be this instrument claiming a coverage debt on a
+//     platform whose cmd/wisp denominator is the other leg's business (ticket 133
+//     R-133-2's measured "装不下"). The `covered=test` bucket - the one shot M-G was
+//     filed for - has no such exemption.
 //
-// COST: one go/parser pass over this directory's ~30 files per run, no
-// subprocess, no filesystem beyond that. The measurements below are milliseconds.
+// COST: one go/parser pass over this directory's ~30 files per run, plus ONE child
+// process: the test binary re-lists its own cases with `-test.list '.*'` (measured
+// 0.098 s for this package on this host, and it runs no test bodies). There is no
+// other subprocess and no filesystem beyond this directory. The measurements below are
+// milliseconds plus that listing.
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/printer"
 	"go/token"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -89,6 +122,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 )
 
 const (
@@ -185,6 +219,16 @@ func TestAC1AC2DispatchHopGate133(t *testing.T) {
 		t.Errorf("AC#1/#2 RED: %s", r)
 	}
 
+	// Check (c): every case name this round's ledger credited as coverage has to be a
+	// case THIS test binary can start. The roster below is read out of the running
+	// binary, which is the only reading in this file that does not come from go/parser
+	// - the parser is what shot M-G got past, because a parsed declaration and a
+	// compiled case are not the same object.
+	roster, rosterN, rosterErr := compiledRunRoster135()
+	for _, r := range pkg.runRosterReds135(legs, t.Name(), roster, rosterN, rosterErr) {
+		t.Errorf("AC#1/#2 RED: %s", r)
+	}
+
 	var lines []string
 	for _, leg := range legs {
 		lines = append(lines, fmt.Sprintf("  leg %-14s %-24s installs=%-5v handoff=%-5v covered=%-62s entries=%s aliases=%s",
@@ -197,7 +241,7 @@ func TestAC1AC2DispatchHopGate133(t *testing.T) {
 	} else {
 		t.Logf("%s", report)
 	}
-	t.Logf("blindness disclosure: this gate reconciles its nail claims against this directory's test sources, so on GOOS=%s the *_windows_test.go cases it names are parsed but not compiled; scripts/wisp-cli-tests.sh is the windows leg where they run.", goos133())
+	t.Logf("blindness disclosure: %s", pkg.runRosterDisclosure135(legs, roster, rosterN, rosterErr))
 }
 
 // ---------------------------------------------------------------------------
@@ -239,12 +283,21 @@ type leg133 struct {
 	installs  bool
 	handoff   bool
 	covered   string
+	// coveredBy holds the case names this row credited through its `covered=test`
+	// form - the names a reader of the ledger above takes as "a test runs this leg".
+	// It is what runRosterReds135 reconciles against the running binary's case
+	// roster, so that the reconciliation reads the same claim the row prints rather
+	// than re-deriving it from the parser.
+	coveredBy []string
 }
 
 // pkg133 is the parsed directory. Build tags are ignored and same-named
 // declarations are unioned, so a leg inherits the other platform's shape before it
 // loses its own; the approximation runs in the direction that asks for more
-// coverage, never less.
+// coverage, never less, and it is bounded by check (c): a case name this row
+// credits is still reconciled against the roster of cases the running binary can
+// start (runRosterReds135), which is where the borrowed shape stops being
+// coverage.
 type pkg133 struct {
 	fset *token.FileSet
 
@@ -396,13 +449,21 @@ func (p *pkg133) collectTopLevel133(f *ast.File, name string, testingPkg string)
 			decl := &decl133{name: fd.Name.Name, key: key, site: p.site133(fd.Pos()), file: name, prod: !isTest, body: fd.Body}
 			switch {
 			case isTest && isRunnableCase133(fd, testingPkg):
-				// R-133-1: the coverage bucket holds ONLY declarations Go's
-				// testing package can run - a top-level func TestXxx(t *testing.T)
-				// with no receiver and no results. Before this, any declaration in
-				// a _test.go file landed here under its bare name, so a method
-				// (which the testing package never calls) satisfied check (b)'s
+				// R-133-1: the coverage bucket holds ONLY declarations shaped the way
+				// Go's testing package runs them - a top-level func TestXxx(t
+				// *testing.T) with no receiver and no results. Before this, any
+				// declaration in a _test.go file landed here under its bare name, so a
+				// method (which the testing package never calls) satisfied check (b)'s
 				// "a test case drives this leg", and the ledger printed
 				// `covered=test <name>` for a name with no === RUN anywhere.
+				//
+				// Shape is still not existence. This walk reads the directory, not the
+				// build, so a correctly shaped case in a file this platform does not
+				// compile (a `_linux_test.go` suffix, a false //go:build line) lands
+				// here exactly as a real one does - that is R-133-9, family shot M-G,
+				// and it is why a name leaving this bucket as coverage is reconciled
+				// against the running binary's own case roster in runRosterReds135
+				// before the ledger row is believed.
 				p.tests[fd.Name.Name] = append(p.tests[fd.Name.Name], decl)
 			case isTest:
 				// Helpers, methods, benchmarks: still walkable in loose mode, so a
@@ -449,7 +510,9 @@ func testingPkgName133(f *ast.File) string {
 // HasPrefix(fn.Name.Name, "Test")` before a test declaration is a case): no
 // receiver, a Test prefix, one parameter of type *<testing>.T, and no results.
 // Go's testing package runs exactly that shape and nothing else, so this is the
-// difference between "a name that looks like a case" and "a case that runs".
+// difference between "a name that looks like a case" and "a name shaped like a
+// case". Whether a name shaped like one is a case this round can start is the next
+// question down, and it is answered from the binary rather than from here.
 func isRunnableCase133(fd *ast.FuncDecl, testingPkg string) bool {
 	if fd.Recv != nil || !strings.HasPrefix(fd.Name.Name, "Test") {
 		return false
@@ -1297,10 +1360,15 @@ func (p *pkg133) render133(e ast.Expr) string {
 
 // coverageReds133 is check (b): a dispatched leg has to be covered by something.
 // Three forms count, and the ledger names which one it found: a nail claimed by this
-// file's own registry (a name that is a runnable func TestXxx(t *testing.T), see
-// isRunnableCase133), a test case that drives a symbol belonging to that leg alone,
-// or a WISP-LEG-COVERAGE-RULING sentence that both names the leg and sits in a file
-// owning that leg's dispatch or one of its entries.
+// file's own registry (a name that is a func TestXxx(t *testing.T) in this
+// directory's sources, see isRunnableCase133), a test case that drives a symbol
+// belonging to that leg alone, or a WISP-LEG-COVERAGE-RULING sentence that both names
+// the leg and sits in a file owning that leg's dispatch or one of its entries.
+//
+// The names behind the `covered=test` form are recorded on the leg (leg133.coveredBy)
+// for check (c) to reconcile against the running binary's case roster; this function
+// itself cannot see them, because it reads sources and sources say what is declared,
+// not what is compiled.
 //
 // A leg that installs the listener and has no nail is red on its own line, which is
 // the reading ticket 133's fifth shot needs on its first beat. The second beat is
@@ -1332,7 +1400,7 @@ func (p *pkg133) coverageReds133(legs []*leg133) []string {
 			if ds := p.helpers[c.test]; len(ds) > 0 {
 				what = fmt.Sprintf("declares %s, which this file sorts with %s: a helper or a method, not a case Go's testing package runs", ds[0].site, "isRunnableCase133")
 			}
-			reds = append(reds, fmt.Sprintf("this gate claims leg %q is nailed by %q, which is not a test function in this directory's sources: %s. A nail has to name a top-level func TestXxx(t *testing.T); the gate's registry is a list of cases, and the ledger row it produces is a coverage claim. A renamed or build-tag-hidden case has to be red somewhere, and here is where.", c.leg, c.test, what))
+			reds = append(reds, fmt.Sprintf("this gate claims leg %q is nailed by %q, which is not a test function in this directory's sources: %s. A nail has to name a top-level func TestXxx(t *testing.T); the gate's registry is a list of cases, and the ledger row it produces is a coverage claim. A renamed or deleted case is red here, where the registry is compared with the sources. A case that is in the sources but is not in this round's binary is red one check down for the `covered=test` bucket (runRosterReds135) and disclosed, not reddened, for a registry nail - see this file's header, third limit, and the disclosure line this run prints.", c.leg, c.test, what))
 			continue
 		}
 		claimedBy[c.leg] = append(claimedBy[c.leg], c)
@@ -1346,9 +1414,9 @@ func (p *pkg133) coverageReds133(legs []*leg133) []string {
 		// that do not credit it (the nail-plus-ruling contradiction, and the
 		// orphan-ruling red at the bottom) keep seeing a marker in any file.
 		adjacent := p.rulingAdjacentTo133(leg)
-		driver := ""
+		driver, driverProof := "", ""
 		if len(nails) == 0 {
-			driver = p.drivenBy133(leg, shared)
+			driver, driverProof = p.drivenBy133(leg, shared)
 		}
 		switch {
 		case len(nails) > 0:
@@ -1373,7 +1441,10 @@ func (p *pkg133) coverageReds133(legs []*leg133) []string {
 			reds = append(reds, fmt.Sprintf("leg %q (%s) reaches %s on this path: %s\nA listener installed on a dispatched leg has to have a nail in this gate's registry, or the block can be deleted in silence, which is the reading ticket 133 was filed for. Fix: write the case, then add {leg: %q, test: TestYourCase, entry: %q} to legCovers133.",
 				leg.key, leg.site, sinkFunc133, leg.viaPath133(), leg.key, leg.entryName133()))
 		case driver != "":
-			leg.covered = "test " + driver
+			leg.covered = "test " + driverProof
+			// The bare name travels with the row so the run-roster check below
+			// reconciles the same claim the ledger prints, in the same words.
+			leg.coveredBy = []string{driver}
 		case adjacent != "":
 			leg.covered = "ruling " + adjacent
 		default:
@@ -1393,16 +1464,19 @@ func (p *pkg133) coverageReds133(legs []*leg133) []string {
 }
 
 // drivenBy133 answers "which Test case in this directory reaches a symbol that
-// belongs to this leg and to no other leg". Evidence is restricted to plain
-// functions, not methods: the bucket it reads is built by collectTopLevel133,
-// which since R-133-1 admits only a top-level func TestXxx(t *testing.T) with no
-// receiver and no results, i.e. only declarations the testing package can run.
+// belongs to this leg and to no other leg", and returns the bare name next to the
+// sentence the ledger prints, so check (c) can reconcile the very claim the row makes.
+// Evidence is restricted to plain functions, not methods: the bucket it reads is built
+// by collectTopLevel133, which since R-133-1 admits only a top-level func TestXxx(t
+// *testing.T) with no receiver and no results - that is, only declarations shaped the
+// way the testing package runs them, which is not yet the same set as the cases this
+// round's binary can start.
 // The prefix filter below is a second, independent read of the same name, because
 // a method name would be resolved here without receiver types and a coincidental
 // `.stop()` in somebody else's case is not a claim about this leg. Test names are
 // walked in sorted order so the row a reading quotes is the same row the next run
 // quotes.
-func (p *pkg133) drivenBy133(leg *leg133, shared map[string]int) string {
+func (p *pkg133) drivenBy133(leg *leg133, shared map[string]int) (string, string) {
 	var names []string
 	for name := range p.tests {
 		if strings.HasPrefix(name, "Test") {
@@ -1418,11 +1492,11 @@ func (p *pkg133) drivenBy133(leg *leg133, shared map[string]int) string {
 				continue
 			}
 			if prod[k] {
-				return name + " drives " + k
+				return name, name + " drives " + k
 			}
 		}
 	}
-	return ""
+	return "", ""
 }
 
 // testClosure133 is the production symbols one test decl reaches, through this
@@ -1451,6 +1525,178 @@ func (p *pkg133) testClosure133(seeds []*decl133) map[string]bool {
 		}
 	}
 	return prod
+}
+
+// ---------------------------------------------------------------------------
+// check (c): the run roster - is a credited case name a case this round can start?
+// ---------------------------------------------------------------------------
+
+// rosterChildEnv135 marks the listing child this gate starts. Nothing runs a test body
+// in `-test.list` mode, so the guard is belt-and-braces against a future where that
+// stops being true: a child that re-enters this function says so instead of spawning a
+// grandchild.
+const rosterChildEnv135 = "WISP_135_RUN_ROSTER_CHILD"
+
+// rosterReadTimeout135 caps the listing child. The measured cost of the call is 0.098 s
+// for this package on this host; the cap exists so a wedged child turns into a red
+// reading inside this test instead of a hung suite inside the parent's own -timeout.
+const rosterReadTimeout135 = 2 * time.Minute
+
+// rosterName135 matches one printed case name. The child's output also carries package
+// init noise and its own verdict line, so a name counts only when the WHOLE line is an
+// identifier in the testing package's own shape.
+var rosterName135 = regexp.MustCompile(`^Test[A-Za-z0-9_]*$`)
+
+// compiledRunRoster135 asks the test binary that is running this reading which
+// top-level cases it can start, by re-executing itself with `-test.list '.*'`.
+//
+// WHY THIS, AND NOT MORE PARSING. Every other reading in this file is a go/parser walk
+// over this directory, and a walk over sources answers "what is declared", never "what
+// is in the build". That gap is ticket 133's R-133-9, family shot M-G: a correctly
+// shaped `func TestXxx(t *testing.T)` in a file whose name carries the implicit
+// GOOS=linux constraint is invisible to a GOOS=windows build, was booked by this gate as
+// `covered=test ... drives ...`, and left the whole package green at 100 top-level
+// passes. Closing it by teaching the parser to evaluate file-name suffixes and
+// //go:build expressions was refused on this ticket (AC#8) and on ticket 133: a second
+// instrument has to contribute a second, independent source of truth, or the audit is
+// the audited object proving itself clean. The roster below comes from the binary's own
+// generated test main, which is the exact list this round's `=== RUN` lines are drawn
+// from, so it can say something the parser cannot infer.
+//
+// scripts/portable-tests.sh already reads the same object at the step level for the same
+// reason: its -skip ledger "is re-verified against the compiled test binary for THIS
+// platform via `go test -list`", and "Rename the test, delete it, or bury it behind a
+// build tag, and the entry goes stale and this step goes red".
+func compiledRunRoster135() (map[string]bool, int, error) {
+	if os.Getenv(rosterChildEnv135) != "" {
+		return nil, 0, fmt.Errorf("refused a nested run-roster read from inside the listing child")
+	}
+	exe, err := os.Executable()
+	if err != nil {
+		return nil, 0, fmt.Errorf("os.Executable: %w", err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), rosterReadTimeout135)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, exe, "-test.list", ".*")
+	cmd.Env = append(os.Environ(), rosterChildEnv135+"=1")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return nil, 0, fmt.Errorf("%s -test.list '.*': %w (child output opens: %s)", filepath.Base(exe), err, headRunes135(string(out), 300))
+	}
+	names := map[string]bool{}
+	for _, line := range strings.Split(string(out), "\n") {
+		line = strings.TrimRight(line, "\r")
+		if rosterName135.MatchString(line) {
+			names[line] = true
+		}
+	}
+	if len(names) == 0 {
+		return nil, 0, fmt.Errorf("%s -test.list '.*' listed no case at all (child output opens: %s)", filepath.Base(exe), headRunes135(string(out), 300))
+	}
+	return names, len(names), nil
+}
+
+// headRunes135 trims to n runes so a quoted child error can never split a multi-byte
+// rune, which would put invalid UTF-8 into the test log.
+func headRunes135(s string, n int) string {
+	s = strings.TrimSpace(s)
+	rs := []rune(s)
+	if len(rs) > n {
+		return string(rs[:n]) + "..."
+	}
+	return s
+}
+
+// flagValue135 returns the value a flag was given in this process's own command line, in
+// either the -flag=value or the -flag value form, or "" when the flag is absent. The
+// testing package's own flags are visible here, which is how this gate can say out loud
+// whether the round it is reading is a whole-package round or a narrowed one.
+func flagValue135(name string) string {
+	eq := "-" + name + "="
+	for i, a := range os.Args {
+		if strings.HasPrefix(a, eq) {
+			return strings.TrimPrefix(a, eq)
+		}
+		if a == "-"+name || a == "--"+name {
+			if i+1 < len(os.Args) {
+				return os.Args[i+1]
+			}
+		}
+	}
+	return ""
+}
+
+// runRosterReds135 is check (c): every case name this round's ledger credited through
+// its `covered=test` form has to be a case the running binary can start, which is what
+// makes a `=== RUN` line for it possible in this round.
+func (p *pkg133) runRosterReds135(legs []*leg133, self string, roster map[string]bool, n int, rerr error) []string {
+	if rerr != nil {
+		return []string{fmt.Sprintf("the run roster this gate has to reconcile its coverage claims against could not be read: %v\n"+
+			"Red, not skipped: with no roster every `covered=test` row in the ledger below is unverified, and \"the instrument could not look\" is not evidence that a leg is covered.", rerr)}
+	}
+	if !roster[self] {
+		return []string{fmt.Sprintf("the run roster read lists %d startable cases and does not name %q, the case running this reading. The roster cannot be trusted, so none of the `covered=test` rows below were checked against it.", n, self)}
+	}
+	var reds []string
+	for _, leg := range legs {
+		for _, name := range leg.coveredBy {
+			if roster[name] {
+				continue
+			}
+			where := "declared nowhere in this directory's test sources"
+			if ds := p.tests[name]; len(ds) > 0 {
+				where = fmt.Sprintf("declared at %s", ds[0].site)
+			}
+			reds = append(reds, fmt.Sprintf("leg %q (%s) is booked in the ledger below as covered by the case %q, and this round's test binary has no such case: the roster read from the running binary lists %d startable cases and %q is not one of them, so no \"=== RUN   %s\" line exists in this run or can exist in it. The name is %s, which is the point - the declaration is in the sources and the sources are not the build.\n"+
+				"That is ticket 133's R-133-9, family shot M-G: a func TestXxx(t *testing.T) this platform does not compile cannot run, so it reads no disk, books no record and holds no behaviour, and a row crediting it is a coverage claim with no witness. This is also the reading this file cannot get from its own parser, because the parser is what the plant satisfies. Fix: put the case in a file this build takes (the usual shapes are a `_linux_test.go`/`_windows_test.go` suffix and a //go:build line this platform fails), or take the claim out and let the leg be ruled out in words next to the code that owns it.",
+				leg.key, leg.site, name, n, name, name, where))
+		}
+	}
+	sort.Strings(reds)
+	return reds
+}
+
+// runRosterDisclosure135 states, in one measured line, what the roster covered and what
+// it could not see. It replaces the sentence this file used to guess ("on GOOS=windows
+// the *_windows_test.go cases it names are parsed but not compiled"), which shot M-G
+// measured as untrue in one direction and unenforced in the other.
+func (p *pkg133) runRosterDisclosure135(legs []*leg133, roster map[string]bool, n int, rerr error) string {
+	if rerr != nil {
+		return fmt.Sprintf("run-roster disclosure: GOOS=%s, the roster could not be read (%v), so the coverage rows below carry no startable-case reading; that is red above.", goos133(), rerr)
+	}
+	driven := map[string]bool{}
+	for _, leg := range legs {
+		for _, name := range leg.coveredBy {
+			driven[name] = true
+		}
+	}
+	var missing []string
+	for name := range driven {
+		if !roster[name] {
+			missing = append(missing, name)
+		}
+	}
+	sort.Strings(missing)
+	var nailsOut []string
+	for _, c := range legCovers133 {
+		if !roster[c.test] {
+			nailsOut = append(nailsOut, c.test)
+		}
+	}
+	sort.Strings(nailsOut)
+	out := fmt.Sprintf("run-roster disclosure: GOOS=%s, %d startable cases read from this binary itself (`-test.list '.*'`); case names this round's ledger credited through `covered=test`: %d distinct, %d of them startable (one outside the roster is red above); this gate's registry: %d claims, %d of them outside this round's roster",
+		goos133(), n, len(driven), len(driven)-len(missing), len(legCovers133), len(nailsOut))
+	if len(nailsOut) > 0 {
+		out += fmt.Sprintf(" - %s. A registry nail the build does not take is disclosed here and not reddened, because the leg it nails is installed and driven on the leg that does compile it: scripts/wisp-cli-tests.sh is the windows leg where these run (this file's header, third limit).", strings.Join(nailsOut, ", "))
+	} else {
+		out += " - every registry claim this gate makes is a case this round's binary can start."
+	}
+	if f := flagValue135("test.run"); f != "" && f != "*" {
+		out += fmt.Sprintf(" This round was narrowed by -test.run=%s, so the roster proves these cases are startable here, not that each one printed === RUN in this process; a whole-package round (-count=1, no -test.run) is where the two are the same set, which is the shape scripts/wisp-cli-tests.sh runs.", f)
+	} else {
+		out += " This round is a whole-package round (no -test.run filter), so the roster is the set this run's === RUN lines are drawn from."
+	}
+	return out
 }
 
 // censusVsUsage133 reconciles the enumerated dispatch against the operator-facing
