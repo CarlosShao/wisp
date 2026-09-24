@@ -219,3 +219,100 @@ demo 各屏之间同一实体多种写法，逐条列（这些不是审美问题
 
 `grep -rn "允许一次" design/doubao/demo/`（零命中）· `security.js:240-252` 与 `:77/:86/:93/:100/:260/:265` 直读 · `config.js:15-30` 直读 · `config.js` 生效徽标串计数（即时35/重载10/重启3/重启生效1）· `grep -rn "localStorage" design/doubao/demo/`（4 处，全在 `app.js`）· `grep -rn "DPAPI" design/doubao/demo/`（2 处：`firstrun.js:170`、`config.js:423`）。
 仍**未**跑 `npm` / `go` / `d22scan` / Docker，仍**未**写 `frontend/**` 与 `design/**` 任何文件。
+
+---
+
+# 追加三（2026-09-25，编排者四条对账回来 ＋ 最后两枚子代理交件）
+
+## 14. 对编排者四条的逐条答复
+
+| # | 你的条目 | 我采纳否 | 我怎么核的 |
+|---|---|---|---|
+| **1** | 我的 `T4` 不成立，你推翻它 | **采纳，`T4` 作废** | 我按你说的"核它引的出处"直接读票面：`sed -n '50,56p'` 与 `sed -n '1,8p'` 与 `:99,108`。`:52` 确实是 AC#6 定义行、原文与你引的一字不差；`:101` 落在 **Progress log 段**（那条讲的是 AC#2 的 `ModeWriter` 装配），我把它当成了 AC#6 的定义。**根因**：给我这张表的子代理在同一份报告里**既给了正确的 `:52`、又给了错误的 `:101`**（它自己前后矛盾），我挑了后面那半句。**⇒ `R-92-5` 与票 114 `AC#6` 是同一笔欠账，两格的验收方式不重排。** 你这条教训我照收：核推翻要核出处，不是核结论——我这已是本会话第三次栽在"转述的行号没直读"（前两次见 §12）。 |
+| **2** | `T1`/`T2`/`T3` 收下 | **`T3` 的答复我接受为 `P6` 结案** | 票 33／35 归属按**文件**划：`frontend/src/**` 与 `frontend/scripts/**` 归我，`cmd/wisp/**` 与 `internal/panel/**` 归你。我在动的格子上标 `owner-delegated=frontend-session`，**不整票领、不替你那一半打勾**。⚠ 一处措辞请确认：简报 §5 让我写的是 `skipped=frontend-session`（那是"我跳过的格"），你这条让我写 `owner-delegated=frontend-session`（那是"我认领的格"）。**两者语义相反**，我按你的新版走，并在票面同时留一句"另一半归编排者"以免后人误读。 |
+| **3** | `D-2` 与你的 `U1` 是同一枚事实两面 | **完全采纳，边界照你说的划** | 我**不碰** `internal/panel/frontend_hygiene_test.go:64-66`、**不碰** `tools/d22scan/**`、**不碰** `scripts/**`。我这边只结两笔：① 取基线时更正 `frontend/VENDORED.md:127-129` 那句"24 文件 0 命中"；② `frontend/scripts/vendor.mjs:53` 那份旧字符类**只登记不改宽**（"跟着门走"还是"自超集"未定，这条我同意——把它改宽等于让前端脚本变成第三把尺，而它现在唯一职责是 ASCII 化 vendored 组件）。与 `Q-48` 那 6 行同批做，我这边不抢跑。 |
+| **4** | 三条时序约束 | **全部照做** | ① 基线延后（见 §18，我给你一个可判定的触发条件而不是一个时刻）；② `frontend/embed.go` 动前在你看得见的地方说一声——**本轮我不打算动它**，我列的十屏改动里没有一枚必须碰它；③ 只 commit 不 push、显式 pathspec：本会话三枚 commit（`2b1aefe`／`346104c`／下面这枚）**每次提交前都查过 `git diff --cached --name-only`，清单里只出现过我自己那一枚路径，零例外**。 |
+
+## 15. 第三次收回：同一枚子代理还给了我一条假"16 枚工具名"
+
+`追加二` 我收回了 C6/C7/C8/C9。最后两枚子代理交件后，**同一来源（screens 6-10 那枚，已正式报 failed）还有一条我照抄进了 §1.2**，一并作废：
+
+| # | 我写进 §1.2 的原句 | 盘上实况（我本轮亲自复量） |
+|---|---|---|
+| **C10** | security 行"冲突②：`security.js:147-151` 的 **16 枚工具名**（`clipboard.read`、**`clipboard.write`、`mail.send`**…）需逐枚对 D34 与 **`SPEC-06` §7 的 RESERVED 名单**" | **四处全错。** ① "生效授权"表在 **`:44-104`**，`:147-151` 是 B 级黑名单卡的表头，一行工具名都没有；② 表里实数 **3 行**（`:82 fs.read`／`:89 fs.write`／`:96 fs.move`），不是 16 枚；③ **`mail.send` 在整个 demo 目录 0 命中**（`grep -rn "mail\.send" design/doubao/demo/` 空），它的真实身份是 **REJECTED**（`PLAN.md:2610` 自用期不内置、`SPEC-12:88` 核心永不内置），只在 `internal/risk/assessor_test.go:42` 当合成 fixture；④ **`SPEC-06` 没有 §7 RESERVED 名单**——文件名是 `SPEC-06-security-gatekeeping.md`，其 §7 是"C18 ApprovalQueue 与 D31 并发审批"，RESERVED 表实际在 `SPEC-12:80-86` 与 `PLAN.md:1531-1537` |
+| **C11** | config 行"（demo 自己在 **`config.js:338`** 已这么写，两行互斥）" | **行号落不到盘上**（该处现在是隐私节的行）。"config.toml 为唯一真相源"这句在 demo 里确实有（我截图亲眼见过），但**出处点位作废，不再引 `:338`** |
+
+**"16 枚"最合理的解释**：把十屏工具名去重池化恰好 16 枚。那枚子代理把一个跨屏池化计数写成了"某一屏某五行"。**这一类错不会被我"读得更多"挡住，只会被"对该行直读一次"挡住。**
+
+## 16. 补上来的真东西：设置屏与隐私屏的字段级冲突（这两屏的完成线比我原报的低得多）
+
+这两张表是本轮真正的产出——**它们说明"照 demo 做设置屏"会造出一堆写进 `config.toml` 就加载失败的假键**。
+
+**16.1 设置屏：demo 画的键 vs 契约名 vs Go struct**
+
+| demo 键 | 契约/Go 的真实形状 | 后果 |
+|---|---|---|
+| `api_base`（`config.js:194`） | 契约名 **`base_url`**（`PLAN.md:2730`、`SPEC-03:32`、`schema.go:383`） | 键名不存在 |
+| `api_key`（`:204`） | 契约**禁止该字段名**：`PLAN.md:2755-2756`"敏感项存引用不存值 `api_key_ref`，**明文 `api_key` 字段禁止**"；`schema.go:12-17` 注释"no struct has a plaintext `api_key` field, and none ever may" | 照搬即撞 D36 规则 5 |
+| `max_tokens`（`:216`） | 契约名 **`max_output_tokens`**（`SPEC-03:32`、`schema.go:293`） | 键名不存在 |
+| `timeout_seconds`=30（`:224`） | 契约是**毫秒**：`timeout_ms(int)=60000`（`SPEC-03:32`、`schema.go:415`） | 键名与单位制都不对，且值差一半 |
+| `top_p`（`:220`） | **契约与 Go 配置侧都查无**（只在 Anthropic 线协议 `internal/llm/anthropic/request.go:84`） | 假键 |
+| `enable_cache`（`:232`） | 查无；半句"按 cached 价计费"对应的是价卡 `Price.Cached`，不是开关 | 假键 |
+| **`vad_threshold`=0.5（`:153`）** | **`grep -rn vad_threshold docs/PLAN.md docs/specs/ internal/config/` 零命中**；契约侧 VAD 只有时长阈值（`SPEC-04:53` 判停 ~700ms、最短 ≥300ms），不是浮点阈值 | 假键 ⇒ **D36 规则 2"未识别的键 → 报错并指出键名与所在行"，真写进 `config.toml` 会加载失败** |
+| `font_size`=13（`:291`） | `[panel]` 只有 `enabled/width/height/keep_alive_in_session/scale` 五键（`SPEC-03:39`），字号维度契约给的是 `scale` | 假键 |
+| `stream` 当开关（`:228`） | 契约里 `stream` 位在 **`capabilities{}`**，是**探测出来的模型能力位**（`SPEC-03:32`、`schema.go:321-323` 注释"must be verified by probe"） | 把"声明位"冒充"用户可调项" |
+| `provider`/`model` 扁平形状（`:169/:189`） | Go 已是 `SchemaVersionCurrent = 2`（`schema.go:28`），形状是 `text_chain[]` ＋ `roles.{chat,…}{provider,model,…}` ＋ `providers.<name>{}` | demo 画的是 **v1 旧形状**，等于要回退一次配置迁移 |
+
+**16.2 设置屏两处真值冲突**：`web.fetch` demo 标 **L1**（`config.js:263`），D34 `PLAN.md:2544` 是 **L0（私有网段一律拒绝）**——我本轮直读两侧原文确认；`fs.write` demo 只标 L1，D34 分两条（`:2533` 新建 L1／`:2534` **覆盖已存在 L2**），漏一半。另：那张"内置工具默认风险级"表**在 D36 里没有任何 section 承载**，`PLAN.md:2521-2523` 明说级由 C19 运行时算 ⇒ 画进配置编辑器就暗示它可编辑（属产品口径，我不自裁）。
+
+**16.3 设置屏最大的缺口不是键，是整节缺席**：D36 是 **18 个 section**（`PLAN.md:2724-2741`，Go `Config` 18 字段一一对应 `schema.go:110-133`），demo 的 7 节折叠了它们，**完全没画 7 节：`cost`、`models`、`observe` ＋ 四枚 🔒 安全节 `risk`/`fs`/`net`/`plugins`**。而那四枚正是 `PLAN.md:2745-2748` 要求"任何放宽必须触发一次 L2 级重新确认、不得热加载静默生效"的部分（Go 已实现 `manager.go:228-262` `applyLocked`）。⚠ 反向一条：demo `:21` 给"隐私"导航挂了把锁图标，而 🔒 名单**不含 `[privacy]`** ⇒ 锁挂错了节。
+
+**16.4 隐私屏**：`90 天`与`永久`两枚按钮**契约与 Go 都查无**（契约给的窗口只有 30 天／400 天／7 天／常驻；`retention.go:67` 里传 0 会**回落到 30 天**，所以"永久"这个按钮**语义是反的**）。`via: 会话 #132` 这一列**违反 D35 的字段冻结**（`PLAN.md:2689`"不得自行增删字段"，`profile` 只有五列）。tool_call 取证 tab 的 5 枚工具名 `read_file`/`list_dir`/`write_file`/`bash`/`run_command` **没有一枚在 D34**。`privacy.js:6` 的"不上传任何服务器"是绝对化表述，与 `PLAN.md:462`"云端 ASR 启用时必须显式告知音频将上传"相反 ⇒ **照搬会造出与 D16 相反的承诺**。**硬点也有两处**：artifacts 的 **500MB 配额**（`PLAN.md:2708`＋`SPEC-02:160`＋`retention.go:38`＋写路径强制 `artifacts.go:78-81`，三处一致）和"导出 JSON／逐条删／一键清空"五域（`privacy.go:21-27` 与 `SPEC-02:167-168` 逐一对齐）——**这两块可以直接照 demo 做**。
+
+**16.5 一条把上面全压住的硬事实（U7）**：面板入向今天只有 **4 枚 IPC 方法**（`internal/panel/bridge.go:35-38`），`PanelSnapshot` 只有 `pending/results/composer/generatedAt` ⇒ **表 1 里那三十多枚"Go 里有"的字段、表 3 里那一整套真数据，今天一枚都到不了前端**。所以设置屏与隐私屏的完成线不是"字段对不对"，是**要不要新开 route**——那是契约变更（C17 白名单），不是我或你单方面能加的。⇒ 新增待拍板 **P9**。
+
+## 17. `P1` 我撤回原推荐（你那条警告成立，而且我拿到了硬证据）
+
+`tokens_fourway_test.go:1-30` 的头注释把四方写得很清楚：**P1 `design/assets/tokens.css` ＝"the C21 reference implementation"**、P2 `docs/evidence/s1/c21-native-tokens.md` ＝手维护的 C21 表、P3 `internal/ball/tokens.go`、P4 前端生成物；`SPEC-08:26-27` 另有一句"**`design/assets/tokens.css` 为唯一样式真相源**"。
+
+⇒ 我原来提的"复制一份进 `frontend/`"**会造出第二枚 reference implementation**，并且四方对账当场降成三方（P1 与副本同内容时它测不出任何东西，不同内容时它红得没有意义）。**撤回，不再提。**
+
+改后的形状（**权威不动、只把路径钉回来**）：
+- **B 案（推荐）**：owner 那侧把这次迁移**落成一次具名 rename**——`git mv design/assets design/old/assets`（或挪到你们定的新规范路径），然后**一批之内**更新四个读它的点：`SPEC-08:26-27`（冻结件，**要人工批准**）、`frontend/scripts/gen-tokens.mjs:24`（我的）、`internal/panel/tokens_fourway_test.go:48`（你的）、`internal/panel/frontend_hygiene_test.go:212`（你的）。**一份权威、只是搬家。**
+- **D 案（ interim，我现在就走这支）**：**什么都不修，让它在我本机红着**，并把这条写成护栏——**那 16 枚未提交删除在任何人不提交之前是安全的；一旦被提交，红的不是我一枚脚本，是已勾掉的票 77 AC#2 ＋ CI 第 6 步。** ⇒ 请你在推送决策里把这条计入：那 16 枚删除**不该由前端会话提交，也不该被别人的 pathspec-less commit 带走**。
+- 我不再需要"副本何时过期"这一问，因为**不造副本**。
+
+## 18. 基线时间点：给你一个可判定的触发条件，不是一个时刻
+
+你那枚测量程已跑到第 7 小时，我不猜它什么时候完。我这边的闸门写成三条**同时**成立才起跑：
+1. `nproc` ＋ 一次负载读数（`wmic cpu get loadpercentage` 或等价），**空闲负载 < 30%**；
+2. `D:\tmp\wisp136ac15m-*` 目录 **mtime 停止更新**（还在追加＝还在跑）；
+3. 你那侧 `136 AC#15` 交件通知到达，或你回我一句"可以让路了"。
+
+满足后我一次跑完 `npm ci` → `typecheck` → `lint` → `tokens:check` → `build` → `render:l2`，**并把四数逐枚贴进本文件**（`tokens:check` 那一枚预期是**红**，红因＝§17 的 D 案，不是我的改动造成）。**在你回话之前我不跑任何一条。**
+
+## 19. 更正后的十屏判定（覆盖 §11 的汇总，最终版）
+
+净变化：**§1.2 里源自那枚 failed 子代理的断言共 5 条作废**（C6 允许一次、C7 七档、C8 两处 localStorage 点位、C9 行号、C10 十六枚工具名＋mail.send＋SPEC-06 §7、C11 `:338`）。
+
+| 屏 | 判 | 硬冲突（全部我亲自复量过） |
+|---|---|---|
+| 审批 | **已有** | 无 |
+| 对话 | **部分** | 无契约冲突；完成线是 `SPEC-08:186` 的 14 态 |
+| 命令 | **缺** | 无 |
+| 任务 | **缺** | 无（cron 那一支 demo 合规） |
+| 球状态 | **缺** | 转移数 40 vs 42 属**本仓两份权威文本互斥** ⇒ **P7** |
+| 设置 | **缺** | **11 枚假键／错名键**（§16.1）＋ `web.fetch` 级标错（§16.2）＋ **四枚 🔒 安全节整节缺席**（§16.3）＋ 5 行档位错标 |
+| 安全 | **缺** | **无硬冲突**（C6 作废后这一屏是干净的；`:106`"L2 操作永不进授权"与 `SPEC-06:121` 一致） |
+| 隐私 | **缺** | `90 天`/`永久`按钮无契约且"永久"语义反了 ＋ `via` 列违反 D35 字段冻结 ＋ 5 枚工具名不在 D34 ＋ "不上传任何服务器"与 D16 相反 |
+| 成本 | **缺** | 无（字段级未逐枚核，见 §20） |
+| 首次引导 | **缺** | 门用 localStorage（`app.js:40/:242`）＋ DPAPI 当定案画在两处（`firstrun.js:170`、`config.js:423`） |
+
+跨屏 **K1–K8** 不变。**新增 P9**：设置屏／隐私屏要不要新开 C17 route（＝契约变更，你我都不能单方面加），不答的代价是这两屏永远只能停在 fixture 级。
+
+## 20. 本轮纪律自述
+
+- 本轮**仍未**跑 `npm` / `go` / `d22scan` / Docker；**仍未**写 `frontend/**` 与 `design/**` 任何文件；`frontend/embed.go` **未动、本轮无计划动**。
+- 亲自复量清单（新增）：票 114 `:1-8`/`:50-56`/`:99-108` 直读（判 `T4` 作废）· `grep mail\.send design/doubao/demo/` 零命中 · `security.js:44-104` 生效授权表实数 3 行 · `grep vad_threshold` 三处零命中 · `config.js:263` vs `PLAN.md:2544` 的 `web.fetch` 级 · `tokens_fourway_test.go:1-60` 四方定义 · `SPEC-08:26-27` 唯一真相源那句。
+- 子代理读数累计被我以盘上实测推翻 **6 条**（T2、C3 的"立刻点红"、cron 冲突、C6、C7、C10），**我自己写进台账的错 5 条**（C1、C2、T4、§1.2 的 `:338` 与 localStorage 点位）。全部具名收回、原句未抹。
+- 编队状态：4 枚首批子代理全部交件（其中 1 枚收尾段报连接中断，其内容已按"未核"重过一遍并清出 3 条假冲突）；2 枚补核子代理交件。**当前编队全空**——不是失职，是**我手上唯一剩下的活（取基线）被你的测量程闸住**，条件写在 §18，等你的回话或 `AC#15` 交件。
