@@ -110,3 +110,79 @@ correct, but "cannot join the family" is not - rows #7, #9, #10 above are in tha
 floor. The gate file's windows are 200ms at 10ms (2x the target's budget), so its exposure per shot is
 smaller, not zero. This should be reported to the ticket as a wording defect in AC#14's file header,
 not as a code defect.
+
+---
+
+## 2. What changed under it
+
+Section 2 anchor: `git rev-parse HEAD` = `5889559b767586ab73dd859f0a5f00e208612f49`
+(moved past section 1's `a1fd5bf` because other agents landed docs in between; `5889559` verified with
+`git cat-file -t`, which returns `commit`. Every sha cited in this file was checked the same way.)
+
+Range asked for: `git log --follow -p ca2c55e..HEAD -- internal/observe/sampler_settle_coverage_136_test.go`.
+`ca2c55e` = `docs(A179,A180): 128 AC#4 收＋AC#5 追加；136 预检四裁定入库`, verified `git cat-file -t` = `commit`.
+
+Three commits touch this file in the range, and one more touches the package:
+
+| sha | subject (trimmed) | numstat for this file | touched this leg? |
+|---|---|---|---|
+| `aef82f5` | feat(136 AC#14): settle 报告自陈门行 + 六枚探针 | +30 / -2 | no - it added the *sibling* file `sampler_settle_gate_136_test.go` (0 -> new) and the `Verdicts`/gate machinery; in this file it edited the header comment of the three *other* legs |
+| `52191ce` | feat(136 AC#14 Gate): flip settleCoverageRowGates true + rewrite 2 coverage legs | +52 / -4 | yes - one hunk lands **inside** `TestCheckSettleHalfTheReadsFailedReportsItsLoss`, but only below the guards |
+| `f9bc512` | docs(136 AC#14b 收口#1): 改写四处过期注释 | +7 / -7 | comments only |
+| `c28d4e8` | docs(136 收口#2): sampler.go:588 第 5 处过期注释 | not in this file | comments in `sampler.go` only |
+
+Proof the leg's own skeleton is untouched, not an inference from the diff being small:
+
+```
+git show ca2c55e:internal/observe/sampler_settle_coverage_136_test.go | sed -n '176,206p' > /tmp/old_half.txt
+sed -n '201,231p' internal/observe/sampler_settle_coverage_136_test.go > /tmp/new_half.txt
+diff /tmp/old_half.txt /tmp/new_half.txt      # empty
+```
+
+That 31-line span is `func TestCheckSettleHalfTheReadsFailedReportsItsLoss` through the `kept < 2`
+guard: declaration, fixture, `ReleaseMemory()`, the `CheckSettle` call with `100ms/10ms`, `tree.reads < 4`,
+`kept < 2`. It is byte-for-byte identical and simply shifted 25 lines down. `sampler.go`'s settle read
+loop is likewise untouched in the range: `git diff ca2c55e..HEAD -- internal/observe/sampler.go` yields
+exactly two hunks, `@@ -452,7 +452,19 @@` (the `SettleReport` doc + `Verdicts` field) and
+`@@ -514,9 +526,72 @@` (the fold call at what is now `:537`, then `settleCoverageMetric`,
+`settleCoverageRowGates`, `buildSettleVerdicts`, `foldSettlePass` appended after the function). Nothing in
+`491-526` changed. **The mechanism that produces the flake is therefore the same machine that produced it
+when AC#15's face was written; only its address moved.**
+
+### Does the "half the reads failed" leg now depend on the gate row?
+
+It depends on the gate row for its *assertion*, not for its *flake*. Precisely:
+
+- Old form (`ca2c55e:208-210`, the same address the ticket's AC#14 cell names):
+  `if !rep.Pass { t.Fatalf("disclosure leg, not a verdict leg: this window
+  still passes, report=%+v", rep) }`. This required `rep.Pass == true`, i.e. it required
+  `backInTime && memOK && releaseOK` **and** (post-`aef82f5`) whatever the fold let through. Had that line
+  survived the gate flip it would be **deterministically red**, because at `settleCoverageRowGates = true`
+  a half-covered window's pass bit is now vetoed by its own row. So the flip and the rewrite are one
+  indivisible change; that is what `52191ce` did.
+- New form (`HEAD:244-263`): looks up `rep.Verdicts[i].Metric == "sampling"` and asserts
+  `coverage != nil`, `!coverage.Pass`, and that the red row prints `sample_errors`. `buildSettleVerdicts`
+  sets `covered := rep.SampleErrors == 0 && len(rep.Samples) > 0` (`sampler.go:565`), so with
+  `SampleErrors >= 1` the row is `Pass: false` **for either value of the constant**. The last block
+  (`:259-263`, `if v.Gate && !v.Pass && rep.Pass`) is the only gate-sensitive line, and it is an
+  invariant that is vacuous at `false` and enforced at `true`.
+
+So: behaviour at `settleCoverageRowGates = true` vs. at `false` differs for exactly one assertion in this
+leg, and that assertion is an invariant, not a count. **Nothing in the leg changed its timing exposure.**
+Two secondary consequences do matter for AC#15:
+
+1. The old `!rep.Pass` line was itself weakly timing-coupled (`BackWithinCapMS >= 0` needs a *kept* read).
+   The replacement `coverage.Pass` needs only one *dropped* read, which the alternating fixture produces
+   on its very first call. The rewrite therefore *narrowed* the leg's timing surface rather than widening
+   it, and the sole remaining timing-coupled assertions in it are the group-A guards listed in section 1.
+2. Exposure per whole-package shot roughly doubled since the 1-in-240 measurement, because `aef82f5` added
+   `sampler_settle_gate_136_test.go`, which does not exist at `ca2c55e`
+   (`git ls-tree ca2c55e -- ...gate_136_test.go` -> empty) and calls `gateSUT` 7 times
+   (`:155`, `:199`, `:237`, `:238`, and 3 iterations of the `scripts` loop at `:313-322`), each one a
+   200 ms ticker window (`:109`). Counting helper *call sites* rather than definitions, the package's
+   ticker-window budget per full-package run goes from about 1560 ms at `ca2c55e` to about 2960 ms at
+   `5889559`, of which the AC#15 target itself contributes 100 ms in both. Consequence for section 5: the
+   historical `1/240` was a per-package-run rate on a package that spent half as much wall time inside
+   sampling windows. Reusing it as a prediction for the current tree would understate the rate; the
+   denominator also now has 6 more cases in it, so the roster diff in section 5 is mandatory.
+
