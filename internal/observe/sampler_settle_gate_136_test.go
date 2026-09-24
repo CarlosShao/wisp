@@ -259,7 +259,19 @@ func TestSettleCoverageRowSeparatesUnmeasuredFromFullyMeasured(t *testing.T) {
 	// The third shape, at the builder: 0 valid / 0 errors is "never measured",
 	// and must not read the same as a window that measured nothing but lost
 	// reads too. It says so in its own note rather than in a bare pass=false.
-	never := buildSettleVerdicts(SettleReport{})[0]
+	//
+	// Index it through a length guard, never through [0]: an empty slice here
+	// must turn into this one leg stating what it expected, not into a panic
+	// that takes the rest of the package's roster down with it (the AC#13
+	// lesson this file already applies to its own tree seam). "Exactly one
+	// row" is the builder's stated shape and the positive control above pins
+	// len(rep.Verdicts)==1 for a real window, so the guard adds no new
+	// expectation - it only makes an unmet one readable.
+	neverRows := buildSettleVerdicts(SettleReport{})
+	if len(neverRows) != 1 {
+		t.Fatalf("precondition broken: buildSettleVerdicts must return exactly 1 self-describing row for a never-measured report, got %d rows: %+v", len(neverRows), neverRows)
+	}
+	never := neverRows[0]
 	if never.Pass {
 		t.Fatalf("a report with no samples and no errors must not claim to have measured, got %+v", never)
 	}
@@ -317,9 +329,21 @@ func TestSettleReportPassNeverContradictsItsGateRows(t *testing.T) {
 		{"fully measured", &gateScriptTree{steps: []gateStep{gateTrustworthy()}}},
 		{"half failed", &gateAlternatingTree{}},
 		{"all reads untrustworthy", &gateScriptTree{steps: []gateStep{gateZeroFootprint()}}},
+		// The fourth window of this family: every read lost through the error
+		// channel, so nothing is kept and no measurement is ever taken. The
+		// other three cover "kept some" (half failed), "kept none via the
+		// zero-footprint branch" (all untrustworthy) and "kept everything"
+		// (fully measured); this one is what gateFailed was written for.
+		{"all reads failed", &gateScriptTree{steps: []gateStep{gateFailed()}}},
 	}
 	for _, sc := range scripts {
 		rep, _ := gateSUT(t, sc.tree)
+		// Demand a row before examining one: a sweep over an empty verdict
+		// list inspects nothing and still reads green, which is the same
+		// "an empty instrument is not a verdict" hole this batch is closing.
+		if len(rep.Verdicts) == 0 {
+			t.Fatalf("%s: window carried no verdict row at all, so this sweep would have checked nothing: report=%+v", sc.name, rep)
+		}
 		for _, v := range rep.Verdicts {
 			if v.Gate && !v.Pass && rep.Pass {
 				t.Fatalf("%s: pass=true alongside a failing gate row %q, report=%+v", sc.name, v.Metric, rep)
