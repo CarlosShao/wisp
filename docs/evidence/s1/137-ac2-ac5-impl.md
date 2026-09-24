@@ -148,6 +148,23 @@ MUT-D 形状按票面更正块与 `R-137-1`：两条走查各只走前 3 个组�
 本程**没有**顺手做 AC#4，只把这条读数留给它。宿主 CI 侧无影响：`internal/winsec` 的 CI 步是 Windows 任务（`.github/workflows/ci.yml:345-386`
 → `scripts/winsec-tests.sh`），这三枚文件带 `//go:build !windows`，在那一步里根本不参与编译；软链形只存在于我们的容器台件里。
 
+### §1.5 我自加的一发探针 MUT-E（票面没要求，为的是排除"新判据会静默哑掉"这一形）
+
+新判据读的是生产文案里那截 `" through the link at "`。会哑吗？**MUT-E**：把两处错误的措辞改掉
+（`winsec_other.go:158` 与 `winsec.go:262` 改成 `via an ambient link: …`），**拒还是拒、错误身份还是 `ErrUnresolvedPath`／`ErrIsReparsePoint`、
+模式与属主的效果一字未动**，只把标记抹掉（`grep -c " through the link at "` 在两枚文件上都是 **0**，落地 grep 见 `tree-e-tight`）。
+同一棵树上 overlay 我收紧后的测试件，两形各一发 `-count=1 -v`：
+
+| 发 | RUN | 顶 PASS/FAIL/SKIP | 子 PASS/FAIL/SKIP | rc | 读什么 |
+| --- | --- | --- | --- | --- | --- |
+| `e-plain-1`（MUT-E·普通形） | 52 | 21/9/0 | 18/4/0 | 1 | **分母 11 枚全 FAIL**＋118 那两枚也 FAIL（它们走同一支 helper），合计顶 7＋2＝9、子 4；`TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119`（不经我这条判据）仍 PASS |
+| `e-link-1`（MUT-E·软链形） | 45 | 18/9/3 | 11/4/0 | 1 | 同一组名册，颜色不变（软链形本来就红，见 §1.4） |
+
+⇒ 生产文案一旦挪动，这条尺**响成一片**而不是悄悄放行（`refusalCreditsLink137` 取不到标记就返回 false＝fail-closed）。
+反面形状也读得到：若我按省事写法用 `strings.Contains(err.Error(), planted)`，`e-plain-1` 里那句被拒的整条拼写仍含着 planted 子串
+⇒ 那 11 枚会**继续绿**、而且是在标记已经不存在的情况下绿——这就是本程宁可比对"标记之后那一截"的原因。
+（这一发的代价也说清：MUT-E 让 118 两枚一起红＝**三枚对照组全成不了照**，它只能用来判"哑不哑"，不能当落地凭据用。）
+
 ## §2 108 那两枚内联腿**单独**给读数（`R-137-2` 的那 2 枚，不走 helper）
 
 终裁方给的位是 `ancestor_separator_108_other_test.go:80-84` 与 `:138-142`（锚点版）。我自己复核过：`f53ad5c` 上
