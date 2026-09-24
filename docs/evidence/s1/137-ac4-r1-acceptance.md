@@ -359,3 +359,75 @@ docs/evidence/s1/137-ac4-r1-acceptance.md
 
 ⚠ **一条流程偏离，先自报**：硬规矩是"每裁完一节 commit 一次"，本程把 **§2 与 §3 并成了一枚 commit**
 （两节的读数同批跑完、正文同轮起草）。不遮掩的理由与代价都登记在 §7 第 8 条。
+
+那枚 commit 的原样输出：
+
+```
+$ git log --oneline -1
+0b7aa1f evidence(137 AC#4 r1 终裁 §2+§3): 凭据②a/②b 各自己跑一遍（11 枚 FAIL→PASS 逐名、红句 10 credit→10 nil）+ 自造 7 处单点回退进攻全部承重
+$ git show --name-only HEAD
+commit 0b7aa1f2ee0f9ce2213a29a96a617bbea57d08cd
+Author: CarlosShao <1933942520@qq.com>
+
+    （提交说明见 git 对象，正文此处不重抄）
+
+docs/evidence/s1/137-ac4-r1-acceptance.md
+```
+
+⇒ 那一枚只带本程这一枚路径。
+
+---
+
+## §4 判据④：没有一枚 FAIL 被换成 SKIP ＋ 生产码／阈值一字未动　〔独立复现〕
+
+### 4.1 SKIP 账：本程 27 发逐发核
+
+| 发类 | 发数 | SKIP 名册（逐名） | 11 枚分母出现在 SKIP 里？ |
+|---|---|---|---|
+| 软链形（含 `base`／`swap`／各回退树／各 MUT-D 树） | **13** | 恒 **3 枚**：`TestAC2POSIXSeamProbeShapesAreBuiltOnAResolvedRoot125`、`TestAC2POSIXSeamGuardStillRefusesEveryHostileShape125`、`TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125` | **0**（逐发 `grep -c` ＝ 0） |
+| 普通形（含未变异与 MUT-D 各树） | **14**（含 `smoke-swap-plain`） | 恒 **0 枚**（四数 SKIP＝0；那三枚**真跑**） | 0 |
+
+- 全仓 27 发里**出现过的 SKIP 名字并集**只有那三枚 125 探针（`cat *.v.skip.txt｜sort -u` 现量，第三条枚名列在 §4.2）
+  ⇒ **没有任何一枚 FAIL 被换成 SKIP**，也没有任何一枚由 SKIP 转出来冒领。
+- 关键那一对：`a-base-link`（11 枚红）与 `a-swap-link`（0 枚红）**SKIP 名册 `diff` 为空**、`=== RUN` 名册 `diff` 为空
+  ⇒ 那 11 枚的"由红转绿"是**跑出来的绿**，不是"不跑了"。
+- `panic`／`fatal error` 计数：**27 发逐发 ＝ 0**（`grep -cE '^(panic|fatal error)'` 原文在每发 `BATCH-*.txt`）
+  ⇒ 没有任何一发把"同包其余几十条读数"吞掉；四数与名册都是全量。
+- 同树同形复跑（`c-r2-plain` ↔ `e-r2-plain2`）全量 colour 名册 `diff` 为空 ⇒ 读数稳定，不是单发运气。
+
+### 4.2 125 那三枚自拒探针的逐名八发色（对实现方 §2.6 的独立重走，本程另加两形四发）
+
+| 发 | `…SeamProbeShapesAreBuiltOnAResolvedRoot125` | `…SeamGuardStillRefusesEveryHostileShape125` | `…SeamAcceptsTheHonestPOSIXAnswer125` |
+|---|---|---|---|
+| `a-base-plain`／`smoke-swap-plain`（普通·未变异，两棵树） | PASS（＋2 子测 SUBPASS） | PASS（＋2 子测 SUBPASS） | PASS（＋3 子测 SUBPASS） |
+| `a-base-link`／`a-swap-link`（软链·未变异，未换根／换根） | **SKIP** | **SKIP** | **SKIP** |
+| `e-basemutd-plain`／`b-swapmutd-plain`（普通·MUT-D，两棵树） | PASS | PASS | **FAIL**，红的是子测 `control_unresolved_root_still_refused_by_the_floor_itself`（同发另两枚子测 SUBPASS） |
+| `b-basemutd-link`／`b-swapmutd-link`（软链·MUT-D，两棵树） | **SKIP** | **SKIP** | **SKIP** |
+
+⇒ 实现方 §2.6 那本逐名八发表的**形状与颜色本程独立跑出同结果**；
+并且那一枚 `…SeamAcceptsTheHonestPOSIXAnswer125` 在普通形·MUT-D 下**转红恰是它在抓破口**（它守的是 §1.3 里"未解析形"会响的那一枚，只在普通形）。
+
+### 4.3 生产码／阈值／golden：盘上重核（不采信编排者那句"已核过"）
+
+```
+$ git show 9c0f546 --numstat
+15	2	internal/winsec/ancestor_separator_108_other_test.go
+20	5	internal/winsec/placement_symlink_113_other_test.go
+$ git show 9c0f546 --name-only --format="" | grep -v '_test\.go$' | grep -c ''
+0                     ← 非测试件：零枚
+$ git show 9c0f546 | grep -cE '^[+-].*(t\.Errorf|t\.Fatalf|assertRefused113|refusalCreditsLink137|Skipf|Skip\()'
+0                     ← 断言行与 Skip 行：零枚被碰
+$ git show 9c0f546 | grep -E '^\+' | grep -v '^+++' | grep -vE '^\+//'   ← 非注释的新增行
+（正好 7 行，全是 root := filepath.Join(winsec.SealableTempDirForTest124(t), "root")）
+$ git diff --name-only a02da50..b1010ff
+（5 枚：137 票面 / 137 证据 / 125 证据 / 那两枚 winsec 测试件）
+$ git diff --name-only a02da50..b1010ff | grep -iE 'threshold|golden|testdata'
+（空）
+$ git log --oneline -2 -- internal/winsec/winsec.go internal/winsec/winsec_other.go internal/winsec/resolve.go
+a45b2e9 feat(129,AC#1+AC#2) …      ← 早于本格，与 AC#4 无关
+4824bb8 fix(winsec,125,AC#2) …
+```
+
+⇒ **"只改测试"这句话是干净的**：被验那枚码里**新增的非注释行只有那 7 枚递根点**，
+断言一句未动、`Skip` 一句未加、生产 `.go` 零枚、阈值与 golden 在整个交付区间零枚。
+D32 的 CPU≤0.5%／RSS≤25MB 与 `thresholds.go` 本程连读都没读过（不跑计时类断言，见 §7）。
