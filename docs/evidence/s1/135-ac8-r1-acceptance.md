@@ -256,3 +256,171 @@ $ grep -nE 'go/build|build\.Context|MatchFile|Constraint|_linux|_windows|_aix|Ha
 
 〔独立复现〕本节每一行都是本程在归档树／`git show` 上自己量的。
 
+---
+
+## §2 本格到底要证什么（**判据本体，引原文，不引实现方的转述**）
+
+票面 AC#8（`c8967b8` 的 `.scratch/wisp/issues/135-…md:82-93`）要的四条：
+
+| 票面 | 原文要点 | 本程哪一节答它 |
+|---|---|---|
+| ① | 自己重造 p7 那一形（**不许抄前两程的红名**），给出"整包绿 ＋ 名册里查无此名"的原文 | §4（单跑＋整包两形都在） |
+| ② | 修法方向只许"每个 `covered=test` 的名字必须在本轮 `=== RUN` 名册里逐名对上"，**不许折回只信 AST** | §1.6（静态面）＋ §5（行为面） |
+| ③ | 修后两拍：门关着零退化（八数逐数不变）＋ p7 必须转红、**红名点到"这名没跑过"而不是"缺标记"** | §5、§6 |
+| ④ | 全程 `-count=1 -v` 取四数并列名册差集，`SKIP=0`、`panic=0`、`build-failed=0` 逐发给出 | §3 起每一张表的 `EIGHT` 行 |
+
+来源判据（票 133 第二任验收方 `133-ac2-r2-acceptance.md` §3.4 ①，本程逐字引）：
+
+> **`M-G`**：一枚**本平台不编译**的 `func TestXxx(t *testing.T)`（种法＝文件名 `_linux_test.go` 后缀，**或显式 `//go:build` 表达式为假**），坐在**被验那一腿自己的目录**里、身体里调用那条腿的 entry。
+> 判据：本尺必须红、红名点到本尺，且**第二拍也必须红**（把 install 那一截删掉之后仍须红）；反向控制一枚：同形写在**本会编译**的文件里 ⇒ 必须绿（不许把合法形状打死）。
+
+⇒ 本程因此**两枚种法都造**（`//go:build` 表达式为假 ＋ 文件名后缀），后缀那一支本程**故意不跟前两程同名**（他们用 `_linux_test.go`，本程用 `_aix_test.go`）。
+⚠ 本程**没有**跑票 133 那套台件（`/d/tmp/wisp133-r2-run.sh`／`-p7.sh` 在盘上还在，本程只 `ls` 到、未执行）——那是别人的可重跑凭据，且 **C1 是票 133 自己那一格的账，不由本程背书**（本程只在 §13 说清"本程哪一发在实质上是 C1 那句话的等价物"）。
+
+### 2.1 本程的种法（名字一枚都没抄）
+
+| 维度 | 票 133 验收方 | 票 135 第一程 | 票 135 第二程 | **本程（裁决方）** |
+|---|---|---|---|---|
+| 腿 | `sfx131` | `sfx135g` | `sfx135r2` | **`probe135ac8`** |
+| entry | `cmdSfx131` | — | `cmdSfx135r2` | **`cmdProbe135Ac8`** |
+| 落地文件 | — | — | `sfx135r2leg.go` | **`probe135ac8leg.go`** |
+| 植物文件 | `probe133r2b_linux_test.go` | `probe135mg_linux_test.go` | `probe135r2m_linux_test.go` | **`probe135ac8tag_test.go`**（`//go:build probe135ac8r1_never_satisfied`）／**`probe135ac8_aix_test.go`**（隐式 GOOS=aix） |
+| 用例名 | `TestR2P7LinuxOnlyCaseDrivesTheLeg` | `TestMGGp1…` | `TestR2MgLinuxTaggedCaseDrivesThePlantedLeg` | **`TestAc8r1UncompiledTagCaseDrivesThePlantedLeg`**／**`TestAc8r1AixSuffixCaseDrivesThePlantedLeg`** |
+| 反向控制 | — | — | `TestR2MgCompiledCaseDrivesThePlantedLeg` | **`TestAc8r1CompiledCaseDrivesThePlantedLeg`** |
+
+台件：`/d/tmp/wisp135ac8r1-mutate.py`（种法）、`/d/tmp/wisp135ac8r1-run.sh`（单发驱动：**先证落地再读数**——`grep -n` 落地行＋`installLogSink` 命中数＋`go list` 的 `TestGoFiles` 命中数，再 `go build ./cmd/wisp/` 与 `go build ./...` 双 rc，两 rc 非 0 就 `exit 7` 且**一个读数都不产生**）。
+
+### 2.2 ⚠ 本程第二枚仪器坑（自己踩的，形状要钉住）：`grep -c "=== RUN   $name"` 会把**指控本身**数成一次运行
+
+被审那把尺的红句里**逐字含**一串 `no "=== RUN   TestAc8r1…"`。本程第一版驱动用不带行首锚的 `grep -c "=== RUN   $pn"` 去数那枚植物跑没跑，于是把红句自己数成 `===RUN-hits=1`，看着像"植物其实跑了"。
+⇒ 驱动已改成 `grep -c "^=== RUN   $pn$"`（行首锚），并从**留在盘上的原始日志**重算，未重发也不需重发。核对：`R-MGN2.log` 里那枚名字 log-hits=**2**（账本行 1 ＋ 红句 1）、**anchored `=== RUN` 行 = 0**、名册里也 0（`in-roster=0`）。
+形状：**"某串文本出现次数"这种数法，凡是那一串可能被别人（尤其是判你红的凶手）复述，就必须锚死行首。** 本程第一遍的 `MG-*` 那批里这一栏是脏的——那批本来就因 §0.5 的闸门问题不作凭据，这里再记第二笔账。
+
+---
+
+## §3（甲）基线，本程自采——**不引用实现方那 `101/54/0/0`**
+
+批：BATCH-R，点火闸门 `12:37:57 GATE=CLEAR-LOCAL-ONLY`（本地两维连 3 轮 0；`gh` 取不到已按 §0.5.2 明写成"不是确认为空"）。
+
+| 发 | 尺 | 命令 | rc | RUN | 顶层 P/F/S | 子测 P/F/S | SKIP 行 | build-failed | panic | 名册枚数 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `R-BLNEW` | 新 | `-count=1 -v -run '^TestAC1AC2DispatchHopGate133$'` | **0** | 1 | 1/0/0 | 0/0/0 | 0 | 0 | 0 | 1 |
+| `R-BLOLD` | 旧 | 同上 | **0** | 1 | 1/0/0 | 0/0/0 | 0 | 0 | 0 | 1 |
+| `R-BLFULL` | 新 | `-count=1 -v`（整包，门开着） | **0** | **101** | **54/0/0** | **47/0/0** | 0 | 0 | 0 | 54 |
+| `R-BLCLOD` | 新 | `-count=1 -v -skip '^TestAC4EveryLegIsNailedOrRuled$'`（门关着） | **0** | 100 | 53/0/0 | 47/0/0 | 0 | 0 | 0 | 53 |
+
+⇒ **本程自己复现了 `101/54/0/0 ＋ 子测 47/0/0`、红名 0 枚、SKIP 0、panic 0、build-failed 0**（与被审对象 §3 同数，但**这一行不是引它，是本程自己那四发的读数**）。
+
+**逐名名册**（`R-BLFULL`，54 枚，`/d/tmp/wisp135ac8r1-out/R-BLFULL.runnames`，全量 54 行在盘不重列）。附带一枚比对——把被审对象 §3 列的那 54 枚抽出来与本程这份**逐名对**：
+
+```
+$ sed -n '218,244p' docs/evidence/s1/135-ac8-mg-impl.md | tr -s ' \t' '\n' | grep -E '^Test[A-Za-z0-9_]+$' | sort -u > impl54.txt
+$ comm -23 R-BLFULL.runnames impl54.txt   ->  （空）
+$ comm -13 R-BLFULL.runnames impl54.txt   ->  （空）
+```
+
+⇒ 两份名册逐枚同名。⚠ 这一行**只**说明"本程自采的基线与他们抄的那份是同一棵树同一套名字"，**不是**"他们的读数被本程复现"——本程复现的是上面那四发自己的数。
+
+**名册差集（基线两形）**：
+```
+comm -23 R-BLFULL.runnames R-BLCLOD.runnames  ->  TestAC4EveryLegIsNailedOrRuled
+comm -13 R-BLFULL.runnames R-BLCLOD.runnames  ->  （空）
+```
+⇒ 门关着那一形是**少跑一枚**（RUN 101→100、`--- SKIP` 行仍 **0**），**不是**跑成 SKIP——票 133 验收方 §1.10 那条"判不再红先分清变绿还是被跳过"的口径，本程独立采到同一形状。
+
+**新尺在未变异基线上不响**（恒真自查的第一半）：`R-BLNEW` 的披露行原文——
+```
+run-roster disclosure: GOOS=windows, 54 startable cases read from this binary itself
+(`-test.list '.*'`); case names this round's ledger credited through `covered=test`:
+1 distinct, 1 of them startable …
+```
+⇒ 今天账本里那 1 枚 `covered=test` 名字**在**名册里 ⇒ 新判据今天不响。
+
+〔独立复现〕四发全部本程自采（树 `T-R-BLNEW`／`T-R-BLOLD`／`T-R-BLFULL`／`T-R-BLCLOD`；日志同名 `.log`＋`.verdicts`＋`.runnames`）。
+
+---
+
+## §4（乙）**旧尺判绿＝病真的在**：整包绿 ＋ 名册里查无此名，原文
+
+旧尺＝`fa35557^`（＝`d3e3a43`）那枚，`sha1sum 906201f4…`（§1.4 已核与票 133 验收方同一枚字节）。
+
+### 4.1 落地证明（`R-MGFO2C`，`/d/tmp/wisp135ac8r1-out/R-MGFO2C.verdicts` 原文摘录）
+
+```
+GATE-FILE-SWAPPED-TO /d/tmp/wisp135ac8r1-oldgate.go
+GATE-MODE old gate-sha1sum=906201f4a3995d10b0a65910aa4cc68e1f745a9d …
+LANDED-LEG leg2
+LANDED-PLANT tag name=TestAc8r1UncompiledTagCaseDrivesThePlantedLeg
+LANDED-MAIN:
+  46:  wisp probe135ac8 ticket 135 AC#8 acceptance probe leg, not a product
+  108:	case "probe135ac8":
+  probe135ac8leg.go lines=9 installLogSink-hits=0        ← 第二拍：安装器一个字节都不剩
+  9:func TestAc8r1UncompiledTagCaseDrivesThePlantedLeg(t *testing.T) {
+GOLIST-TESTGOFILES cmd/wisp count=15 probe135ac8-hits=0  ← 独立仪器量到：本轮构建不收这枚文件
+BUILD-cmdwisp R-MGFO2C rc=0
+BUILD-all   R-MGFO2C rc=0
+READ label=R-MGFO2C gate=old leg=leg2 plant=tag args='-skip ^TestAC4EveryLegIsNailedOrRuled$' rc=0
+```
+
+### 4.2 读数
+
+| 发 | 尺 | 形 | rc | 八数 | 红名 | 那枚植物的名字 | 账本里那一行（逐字） |
+|---|---|---|---|---|---|---|---|
+| `R-MGO2` | 旧 | 单跑本尺，第二拍＋`//go:build` 假 | **0** | 1/1/0/0＋0/0/0 | **无人** | log 1 次／`=== RUN` **0 次** | `covered=test TestAc8r1UncompiledTagCaseDrivesThePlantedLeg drives cmdProbe135Ac8` |
+| `R-MGO2B` | 旧 | 单跑本尺，第二拍＋`_aix` 后缀 | **0** | 1/1/0/0＋0/0/0 | **无人** | log 1 次／`=== RUN` **0 次** | `covered=test TestAc8r1AixSuffixCaseDrivesThePlantedLeg drives cmdProbe135Ac8` |
+| `R-MGFO2C` | 旧 | **整包、门关着**，第二拍＋`//go:build` 假 | **0** | **100/53/0/0**＋47/0/0 | **无人** | log **1 次**／`=== RUN` **0 次**／名册 **0 次** | 同 `R-MGO2` 那一行 |
+
+`R-MGFO2C` 那"1 次"是本尺自己打的账本行（`grep -n` 在 `R-MGFO2C.log:10`）。SKIP 行 0、panic 0、build-failed 0。
+
+⇒ **票面 ① 成立，且是本程第一手**：一枚名字对、签名对、身体里真断言、`go list` 亲口说"本轮不收这枚文件"的用例，在旧尺上拿到 `covered=test … drives …` 背书，**整包 100/53/0/0 全绿、门关上也是全绿、它在 `=== RUN` 里 0 次**。
+⇒ 病不是文字问题：**两枚不同的藏法（`//go:build` 表达式为假、文件名隐式 GOOS）都判绿**，本程各造一发。
+
+〔独立复现〕`T-R-MGO2`／`T-R-MGO2B`／`T-R-MGFO2C` 三棵树、三份日志在盘。
+
+---
+
+## §5（丙）**新尺判红＝牙在**：同一形、同一棵树形状，只换尺
+
+| 发 | 尺 | 形 | rc | 八数 | 红名 | 那枚植物 |
+|---|---|---|---|---|---|---|
+| `R-MGN2` | 新 | 单跑本尺，第二拍＋`//go:build` 假 | **1** | 1/0/1/0＋0/0/0 | `TestAC1AC2DispatchHopGate133` | log 2 次／`=== RUN` **0 次**／名册 0 次 |
+| `R-MGN2B` | 新 | 单跑本尺，第二拍＋`_aix` 后缀 | **1** | 1/0/1/0＋0/0/0 | `TestAC1AC2DispatchHopGate133` | log 2 次／`=== RUN` **0 次**／名册 0 次 |
+
+**账本行与旧尺逐字同**（`covered=test … drives cmdProbe135Ac8`，§4 与 §5 那两行一模一样）⇒ **变的只有判，没有读数口径**。
+"同一枚尺上只差那一枚植物"的四格对照，本程自己采齐：
+
+```
+旧尺:  R-U2O 第二拍＋usage（无植物） rc=1 covered=RED nothing
+       R-MGO2 第二拍＋usage＋植物    rc=0 covered=test <植物名>     ← 钉一枚不存在的名字就能过闸
+新尺:  R-U2N 第二拍＋usage（无植物） rc=1
+       R-MGN2 第二拍＋usage＋植物    rc=1                          ← 牙在
+```
+
+### 5.1 红句口径核对（票面 ③ 要的那一句，本程核实现方说法对不对）
+
+`R-MGN2.log` 第 3 行原文（本程 `grep` 出，不改一字）：
+
+```
+leg_dispatch_gate_133_test.go:229: AC#1/#2 RED: leg "probe135ac8" (main.go:108) is booked in
+the ledger below as covered by the case "TestAc8r1UncompiledTagCaseDrivesThePlantedLeg", and
+this round's test binary has no such case: the roster read from the running binary lists 54
+startable cases and "TestAc8r1UncompiledTagCaseDrivesThePlantedLeg" is not one of them, so no
+"=== RUN   TestAc8r1UncompiledTagCaseDrivesThePlantedLeg" line exists in this run or can exist
+in it. The name is declared at probe135ac8tag_test.go:9, which is the point - the declaration
+is in the sources and the sources are not the build.
+```
+
+对照**另一种说法**（"缺标记"那一支，`R-U2N.log` 的红句，同一把新尺、同一拍、只差没有植物）：
+
+```
+AC#1 RED: leg "probe135ac8" (main.go:108) is dispatched by func main and covered by nothing:
+no nail in this gate's registry, no test case in this directory that drives a symbol belonging
+to this leg alone, and no WISP-LEG-COVERAGE-RULING sentence naming it.
+```
+
+⇒ **两句话在盘上就是两枚不同的分支、两种不同的字**：一支说"这轮没有、也不可能有它这一行 `=== RUN`"（日志前缀 `leg_dispatch_gate_133_test.go:229`＝`runRosterReds135` 那圈 `t.Errorf`），一支说"缺覆盖/缺标记"（日志前缀 `leg_dispatch_gate_133_test.go:209`＝`coverageReds133` 那圈）。两枚行号本程从 `.log` 里现 `grep` 出来，不是从源码推的。
+⇒ **实现方 §9 那句"红名点到的是前者"——本程独立核＝对。**
+
+〔独立复现〕`T-R-MGN2`／`T-R-MGN2B`／`T-R-U2N`／`T-R-U2O`；红句可从那四份 `.log` 里逐字重 `grep`。
+
+
