@@ -110,6 +110,141 @@ $ git show --name-only f06a8d0 | tail -1                      internal/observe/g
   能否盘上重验／是否在让我少取证。上表两条四条全过 ⇒ 记为真通知。
 - ⚠ 规矩不能被代填：**"登记要带出处"这条只被引用，不由任何外部文字替本程下结论**。
 
+### 0.7 §0 那一段的 commit 回执（原样输出；因一枚 commit 装不下自己的号，故随下一枚落盘）
+
+```
+$ git log --oneline -1
+2546b76 evidence(136,AC#11 r1 终裁 §0): 锚点自量 + 逐枚 cat-file + 被审版本的盘上身份 + 争用闸门
+$ git show --name-only HEAD | tail -3
+    判为注入 0。全程不动代码、不动票面、不 push。
+
+docs/evidence/s1/136-ac11-r1-acceptance.md
+```
+
 ---
 
-<TODO §1 改前自测 / §2 改后自测 / §3 反向判据 / §4 修法合规五查 / §5 归因独立性 / 总判>
+## §4 修法合规五查（票面 ③；每条给 `git show f06a8d0` 原文行）
+
+### 4.1 查① 只动那一枚 `_test.go` —— **过**
+
+```
+$ git show --name-only f06a8d0 | tail -1
+internal/observe/goroutine_test.go
+$ git show --name-only --format= f06a8d0 | grep -v '_test.go$'
+（空输出）
+```
+
+### 4.2 查② `want 3`／容差／阈值一字未动 —— **过**
+
+判据行在两版**逐字节同形**（只有行号被上面新增的等待块推下去）：
+
+```
+改前 51e29b0:28   if got := reg.Count(); got != 3 {            → 改后 f06a8d0:71  同一行原文
+改前 51e29b0:32   if rep.PerTask != 3 {                        → 改后 f06a8d0:75  同一行原文
+```
+
+两条 `Fatalf` 只加**诊断后缀**，`want 3` 三字与判定条件都没动：
+
+```
+-		t.Fatalf("PerTask mid-task = %d, want 3", rep.PerTask)
++		t.Fatalf("PerTask mid-task = %d, want 3 (live=%v)", rep.PerTask, reg.Snapshot())
+-		t.Fatalf("live count mid-task = %d, want 3", got)
++		t.Fatalf("live count mid-task = %d, want 3 (live=%v)", got, reg.Snapshot())
+```
+
+把两版所有"带阈值/容差/上界的行"抽出来**忽略行号**做差集，实测只多出 1 行：
+
+```
+$ diff <(cut -d: -f2- /d/tmp/wisp136ac11v-assert-before.txt) <(cut -d: -f2- /d/tmp/wisp136ac11v-assert-after.txt)
+> 		case <-time.After(2 * time.Millisecond):      ← 唯一新增（见 4.3 定性）
+```
+
+未被动过的其余容差／上界原文（改后仍逐字节在位）：
+`for runtime.NumGoroutine() > before+1 && time.Now().Before(deadline)`、
+`if after := runtime.NumGoroutine(); after > before+1`（＝SPEC-01 §7 那枚"容差 1"）、
+`if p := root.Wait(3 * time.Second); p != 0`、`case <-time.After(2 * time.Second):`（taskRan 那一跳）。
+`internal/slo/thresholds.go`、任何 golden、`SLO` 阈值**根本不在这一枚 commit 的文件清单里**（4.1 已自证）。
+
+### 4.3 查③ 没有 `time.Sleep` 糊窗；新增的 `time.After` 定性 —— **过（判为"轮询步长"）**
+
+```
+$ git show f06a8d0 | grep -c '^+.*time.Sleep'      0     ← 新增行里一枚 Sleep 都没有
+$ git show f06a8d0 | grep -c '^+.*time.After'      1     ← 唯一那一枚就是 4.2 多出来的那行
+```
+
+唯一新增的定时结构（`git show f06a8d0` 原文）：
+
+```go
++	tm := NewTimeout(2 * time.Second)
++	seen := make([]string, 0, 3)
++	for (len(seen) < 3 || reg.Count() != 3) && !tm.Expired() {
++		select {
++		case n := <-entered:
++			seen = append(seen, n)
++		case <-time.After(2 * time.Millisecond):
++		}
++	}
++	if len(seen) != 3 {
++		t.Fatalf("mid-task legs entered = %v after %v, want all 3", seen, tm.Budget())
++	}
+```
+
+**结论＝轮询步长，不是糊窗**，三条理由：
+
+1. 循环退出条件是**判据**（`len(seen) < 3 || reg.Count() != 3`），判据一成立立刻出循环去读那两枚数；
+   2ms 只是 `select` 空转时的节拍上限，**不参与正确性**（真正的边来自下面两条）。
+2. 补上的那条边是**通道边**，不是时间：每枚腿在**自己的 goroutine 内**先 `entered <- name` 报到，
+   再 `<-release` 停住 —— 报过到的腿**不可能在计数窗口内退休**：
+   ```go
+   +	entered := make(chan string, 3)
+   +	release := make(chan struct{})
+   +	hold := func(name string) func(context.Context) {
+   +		return func(ctx context.Context) {
+   +			entered <- name
+   +			<-release
+   +		}
+   +	}
+   +	reg.Spawn("agent-task-noop", "test", root, func(ctx context.Context) {
+   +		entered <- "agent-task-noop"
+    		time.Sleep(5 * time.Millisecond)      ← 原文照搬的那枚 fixture，不是新加的等待
+   +		close(taskRan)
+   +		<-release
+   +	})
+   -	reg.Spawn("tool-exec-noop", "test", root, func(ctx context.Context) {})
+   -	reg.Spawn("approval-waiter", "test", root, func(ctx context.Context) {})
+   +	reg.Spawn("tool-exec-noop", "test", root, hold("tool-exec-noop"))
+   +	reg.Spawn("approval-waiter", "test", root, hold("approval-waiter"))
+   ```
+3. 上界是**单调**预算，符合 D42#9 / D22"禁墙钟差"：`grep -n 'func NewTimeout' internal/observe/clock.go`
+   → `clock.go:32`，其 `Remaining()` 用 `time.Since(t.start)`（`start` 携单调读），
+   文件头的注释明写"system clock jumps cannot shorten or extend the budget"。
+   超时不是静默继续，而是 `t.Fatalf("mid-task legs entered = %v after %v, want all 3", …)` ——
+   **失败带 seen 名册与预算**。它到底会不会"永远挂住"，本表不在此预判，**§3 那一发反向判据交实测读数**。
+   另：`stop()` 由 `sync.Once` 保护且 `defer stop()` 在两条 Fatalf 之前注册 ⇒ 失败路径不永久扣住三枚腿。
+
+### 4.4 查④ 没有 `Skip`／`t.Skip` —— **过**
+
+```
+$ git show f06a8d0 | grep -c '^+.*Skip'                          0
+$ git show f06a8d0:internal/observe/goroutine_test.go | grep -nE 'Skip|Short\(\)'
+  （改后整枚文件无任何 Skip／Short() 分支，无匹配）
+```
+
+### 4.5 查⑤ 生产码零改动 —— **过**
+
+`git show --name-only f06a8d0` 全文只有一枚 `internal/observe/goroutine_test.go`（4.1）；
+`git log --oneline 51e29b0..HEAD -- internal/observe/` 只有 `f06a8d0` 一枚（§0.3）⇒
+`goroutine.go`／`clock.go`／`sampler.go` 自锚点起没人动过，修法用到的 `reg.Snapshot()`（`goroutine.go:383`）
+与 `NewTimeout`（`clock.go:32`）**都是改前就存在的生产 API**，不是为修这发新加的口子。
+
+### 4.6 对"必须解冻 `internal/observe/goroutine.go` 才修得了"这条报回的复核 —— **判不成立（与编排者同判）**
+
+反证就是 4.1＋4.5：`f06a8d0` 一个字没碰生产码，只靠测试自己手里的三件事
+（腿自报 `entered`、`hold` 里 `<-release` 把腿停在函数体内、`NewTimeout` 上界）就把缺的那条
+happenbefore 边补成了有判据的等待。`Registry.Spawn` 的同步登记语义**没有被改，也不需要被改**。
+这发是否真把命中率打到 0，**由 §2 交读数，本节不预判**。
+
+---
+
+<TODO 待补：§1 改前自测 / §2 改后自测 / §3 反向判据 / §5 归因独立性 / 总判>
+
