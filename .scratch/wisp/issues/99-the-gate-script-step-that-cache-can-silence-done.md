@@ -241,3 +241,5 @@ next= 交编排者：`-done` 时把 R-99-1 的 sha 拆账并进台账、按 R-99
   整份日志 `(cached)` 出现 **0** 次，第一步 `runtests.sh: OK - packages=[./...] top-level: PASS=21 FAIL=0 SKIP=0, === RUN=31`，
   末行 `clean - no D22 ban violations`（`ban #6 frontend/=40`、`ban #7 internal/tools/=17`、`ban #8 internal/=340`、`ban #8 cmd/=26`）⇒ 台账不降。
   **未 push**。next= 验收方出 `docs/evidence/s1/99-*.md`。
+
+> **⚠ 23:5x 追加更正（账 `A203`；本票 `:7` 与 `:211` 两处写的 checkpoint `1f8d212` 现量不可解析）**：`git cat-file -t 1f8d212` ＝ **`fatal: Not a valid object name`**。两处原句一字不抹。**无法确定正解**（不猜）：本票归属表 `:187-189` 只记 `d0d8782`／`9e00629`／`06906f7` 三枚，我这轮逐枚现量**全部＝`commit`**；而 `09-21 17:00–18:30` 窗内**无一枚 commit 的 message 提到票 99 的 checkpoint** ⇒ 给不出替代号。⇒ **AC#1/AC#2 的归属结论仍成立（作者＝`agent-ticket99`，凭据是那三枚真号）**，坏的只是"它先交 `1f8d212`"这一枚凭据——**下一位不要按那枚号去找版本**。
