@@ -107,4 +107,109 @@ mtime 2026-09-24 21:11:49 +0800   ⇒ 距开跑 2 小时 22 分无 runner 活动
 `141-acc-*` 22:5x–23:0x。它们都不是 `go test` 进程（闸门第 1 枚空），但**本程每一批的 gate.txt 都留这一枚读数**，
 批末 `gate-post.txt` 复扫；两枚都空才算这批在净窗内。
 
-（下接 §1 试跑与逐批发数。）
+---
+
+## 1. 试跑（口径 A 的形状标定）与口径 B（同进程连发）
+
+```
+$ date "+%Y-%m-%d %H:%M %z"
+2026-09-24 23:47 +0800
+$ git log -1 --format='%h %ad %s' --date=format:'%H:%M'
+f1c9471 23:40 docs(A202): 清点程又挖出 6 枚从未被更正过的旧断言 …（本程只取 sha 与时刻，正文与 internal/observe 无关）
+$ git diff --name-only beac693..HEAD -- internal/observe/ | wc -l
+0                      ⇒ 快照钉 beac693 以来本包字节未动，下面所有读数与 §0 的名册同树
+```
+
+### 1.1 试跑 5 发（`/d/tmp/wisp136ac15m-A-pilot/`，只标定形状，不进分母）
+
+`sh /d/tmp/wisp136ac15m-batch.sh <tree> …/wisp136ac15m-A-pilot 5 PILOT` ⇒ 闸门第一轮即 CLEAR。
+
+| run | bytes | RUN | top PASS | top FAIL | top SKIP | indent | family | 真 `^panic:` | fatal | 包结果线 | rc | 包时 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1-5 | **7547**（五发同一个值） | 71 | 71 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 3.851 / 3.966 / 3.882 / 3.993 / 3.996 s |
+
+* 等式基线七项**逐发全过**；`PASS+FAIL+SKIP=71=RUN`；名册 `1 distinct top-level run-name sets over 5 runs; modal size=71 occurs=5`；
+  逐发对 golden（`/d/tmp/wisp136ac15m-golden.txt`，71 名，从试跑第 1 发现取）**两向 `comm` 全空**。
+* **字节带是单一值 7547**（比靶子表 §4.3 预期的"约 7.3 KB"更紧），⇒ 本程把它当 tripwire 用：任何一发不是 7547 就要打开看，
+  任何一发小于 7547 就是丢读数。**分母表的 65 名基线 6717 B 与我的 71 名 7547 B 不冲突**（名册大 6 名）。
+* 单发端到端墙钟 **8.1-8.5 s**（包时 3.85-4.0 s ＋ 固定开销 4.0-4.5 s）。那枚固定开销我单独量过一次
+  （`go test -count=1 -v -run 'ZZZNosuchTest' ./internal/observe/` ⇒ 包时 0.149 s、端到端 3.98 s，日志
+  `/d/tmp/wisp136ac15m-timing-probe.log`；**这一发是仪器定时探针，不是读数，不进任何分母**）。
+  ⇒ 分母表 §4.2 按 3.8 s/发估的"A 1200 发约 76 分钟"在本机**偏低约 2.2 倍**，本程实测按 8.3 s/发记。
+* 靶子腿试跑五发逐字 `--- PASS: TestCheckSettleHalfTheReadsFailedReportsItsLoss (0.10s)`。
+
+### 1.2 口径 (B)：同进程 `-count=1200 -run '^TestCheckSettleHalfTheReadsFailedReportsItsLoss$'` —— **命中 3 发**
+
+日志 `/d/tmp/wisp136ac15m-B1-target.log`（**完整原始日志留在快照里，未截断、未删**；1200 发 RUN 行全在）。
+命令逐字（分母表 §4.1 (B) 的形状；`-run` 的 `$` 锚是承重的，没有它就会把 71 名各跑 1200 遍）：
+
+```
+cd /d/tmp/wisp136ac15m-tree-beac693 && go test -count=1200 -v -run '^TestCheckSettleHalfTheReadsFailedReportsItsLoss$' ./internal/observe/
+```
+
+等式基线（口径 B 的形状：单名，所以名册只该有这一枚；RUN 与判定必须闭合）：
+
+| 项 | 读数 | 判定 |
+|---|---|---|
+| `^=== RUN` | 1200 | ✅ 名义发数 |
+| `^--- PASS:` 顶层 | 1197 | ✅ |
+| `^--- FAIL:` 顶层 | **3** | 见下 |
+| `^--- SKIP` | 0 | ✅ |
+| 闭合 | 1197＋3＋0 = 1200 = RUN | ✅ **没有丢读数**，⇒ 这 3 枚红不是"读数被吞"的假象 |
+| 真 `^panic:` | 0 | ✅ |
+| 包结果线 | 恰 1（`FAIL … 125.737s`） | ✅ |
+| rc | 1（有红必然为 1，与"丢读数"是两味） | 记 |
+| 闸门 | 批前 `/d/tmp/wisp136ac15m-B-gate.txt`：host procs 空、gh `5 completed`＝in_progress 0、runner `_work` mtime 21:11:49 | ✅ 净窗 |
+
+**三枚命中的原文**（逐字从日志取，`--- FAIL` 前一行是它的 `=== RUN`）：
+
+```
+    sampler_settle_coverage_136_test.go:214: precondition broken: only 2 reads taken, half-and-half needs a window to lose in
+--- FAIL: TestCheckSettleHalfTheReadsFailedReportsItsLoss (0.11s)
+    sampler_settle_coverage_136_test.go:214: precondition broken: only 2 reads taken, half-and-half needs a window to lose in
+--- FAIL: TestCheckSettleHalfTheReadsFailedReportsItsLoss (0.16s)
+    sampler_settle_coverage_136_test.go:214: precondition broken: only 3 reads taken, half-and-half needs a window to lose in
+--- FAIL: TestCheckSettleHalfTheReadsFailedReportsItsLoss (0.10s)
+```
+
+⇒ **口径 (B) 命中率 = 3 / 1200 = 0.250%**，名中的是 §0.2 第一枚前提腿（靶子腿）的 `:213 if tree.reads < 4` 那条前提守卫，
+红在 `:214`。同发的另外两枚影子守卫（`:216 kept<2`、`:221 lost<2`）确实如靶子表 §1(a) 说的**没轮到响**——
+三枚红全部印的是 `:214`，与"被 `:213` 遮住的形状"一致。
+
+命中发生在连发的第 **319 / 511 / 522** 遍（不是开头也不是结尾，不聚簇）。单遍耗时分布（PASS 1197 遍 ＋ FAIL 3 遍 = 1200 闭合）：
+
+| 该遍耗时 | 0.10s | 0.11s | 0.12s | 0.13s | 0.14s | 0.15s | 0.16s | 0.17s | 0.88s |
+|---|---|---|---|---|---|---|---|---|---|
+| PASS | 992 | 168 | 18 | 7 | 6 | 1 | 2 | 2 | 1 |
+| FAIL | **1** | **1** | 0 | 0 | 0 | 0 | **1** | 0 | 0 |
+
+* 众数 0.10s（100 ms 窗 ＋ 收尾），⇒ 三枚红里两枚"读数是 2"、一枚"读数是 3"。
+* 有一枚 PASS 花了 **0.88s**（众数的 8.8 倍）却仍拿到 ≥4 枚读数 ⇒ 本包确实存在**百毫秒级的调度停顿**，
+  但它落在窗外时不影响判定；这与靶子表 §4 C1 从归档那枚目击反推的"一次约 90 ms 的 inter-tick 空档"是同一类物理事件，
+  **不是一次形状的重复**：我今天看到的是 `reads=2`（一枚约 90 ms 空档，与归档同形）**与** `reads=3`（约 33 ms 一拍，整体慢拍，归档没有这一形）。
+  只登记，不外推。
+
+### 1.3 口径 (B) 第二发：六枚前提腿同进程连发 —— **命中 0**
+
+```
+cd /d/tmp/wisp136ac15m-tree-beac693 && go test -count=200 -v -run
+  '^(TestCheckSettleHalfTheReadsFailedReportsItsLoss|TestCheckSettleSingleTrustworthyReadReportsItsLoss|
+    TestCheckSettleZeroFootprintDropsAreCountedToo|TestCheckSettleFullyMeasuredWindowReportsNoLoss|
+    TestSettleCoverageRowSaysNotPassWhenHalfTheReadsFailed|TestSampleStateAllMetricsAndVerdicts)$' ./internal/observe/
+```
+（命令在日志 `/d/tmp/wisp136ac15m-B2-family.log` 头两行原文里，上面为可读性换了行。）
+
+| 项 | 读数 |
+|---|---|
+| RUN | 1200 ＝ 6 名 × 200 遍 ✅ |
+| 顶层 PASS / FAIL / SKIP | 1200 / **0** / 0 ✅ 闭合 |
+| 真 `^panic:` / 包结果线 / rc | 0 / 1 / 0 |
+| 包时 | 146.873 s（`ok`） |
+| family 句命中 | 0 |
+
+⇒ **族口径 (B)：0 命中 / 1200 枚腿执行**；其中靶子腿自己 **0 / 200 遍**。
+**不把 B1 与 B2 相加**：B2 里靶子腿的邻座换了（另外 5 枚腿在同一个进程里交替跑，GC/定时器堆状态与 B1 的"单名独跑"不同），
+两发的分母不同形。作为噪声核对：若真率就是 B1 量的 0.25%，则 200 遍里 0 命中的概率是 `e^-0.5 = 61%` ⇒
+**B2 与 B1 不互相推翻**，也不足以把 B1 拉平。
+
+（下接 §2 口径 A 逐批发数。）
