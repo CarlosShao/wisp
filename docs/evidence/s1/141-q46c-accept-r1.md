@@ -63,6 +63,9 @@ rc=1   PASS=22  FAIL=2  SKIP=0  === RUN=64  '^panic:'=0
 * 全仓**没有一处**为了变绿放宽断言：`ed2c077` 的测试 diff 里被删的断言行 **0 枚**、新增 **10 枚**（§5）。
 * CI 侧后果（现量，不是推演）：`scripts/d22scan.sh` 是 `set -eu`，第一步就是这个正控 ⇒
   **正控红 ⇒ 第二步整树扫描根本不跑**，`.github/workflows/ci.yml:109` 调的正是它。
+  另核一处：`ci.yml:81` 那枚独立 step（"D22 scanner positive control"）**直接**调
+  `runtests.sh -C tools/d22scan ./...` ⇒ 同一次推送里这一步会**独立再红一次**，
+  不是只有一个入口。
 * **若 owner 在 `Q-48` 选"退回射程"（摘掉 `2200–22FF`）会不会自动复绿**：
   **这两枚会自动复绿**（`141-acc-mut-noband` 实测 PASS，见 §4(a)），
   **但另有 3 枚会红**：`TestBan8MathBandAndRemainingGaps`（U+2265/2264/2229/2212 四行）、
@@ -368,7 +371,7 @@ $ grep -rn "单次调用影响"（全树）
    internal/agent/approval/batch.go:16 → 注释里本来就是 ASCII `>=`
    docs/PLAN.md:2980、docs/specs/SPEC-06:40、docs/evidence/s1/141-*.md、.scratch/** → 仍带 `≥`，
      但 `docs/` 与 `.scratch/` **不在 ban #8 的四个 scope 里**（`emojiScopes()` 只有
-     design/ frontend/ internal/ cmd/）⇒ 不是漏改，是**规格文字与仪器仍不一致**（记在格 6 与 §9）。
+     design/ frontend/ internal/ cmd/）⇒ 不是漏改，是**规格文字与仪器仍不一致**（记在格 6 与 §8 的 U9）。
    internal/risk/{rules_scale.go:24,assessor_test.go:154} → 即本批改后的两枚
 ```
 ⇒ **没有第二处期望值被漏改。**
@@ -484,7 +487,89 @@ internal/ 405 Go files, comments and _test.go included; cmd/ 39 Go files, commen
 (ii) 同一批里还躺着 §6(e) 那枚同源副本，三处措辞＋一份副本一次改清，比拆两批少一次误读窗口。
 **本程不动它们**（不在具名解冻①②③的射程内，`AGENTS.md §1.1`＋票面 `:86`）。
 
-## 8. 〔占位〕总裁与证据分级
+## 8. 残留登记（本程只裁不改，逐条给"该落到哪"）
+
+| # | 条目 | 出处（本表现量） | 性质 | 建议落点 |
+|---|---|---|---|---|
+| U1 | ban #8 字符类**同源副本未跟着 widen**：`internal/panel/frontend_hygiene_test.go:66` 仍旧类，且 `:64`/`:270` 自称"copied verbatim from tools/d22scan"，它跑在 CI `core` scope（`scripts/portable-tests.sh:179`） | §6(e)：同一 walk 用①的类命中 3 枚、它报 0 | **仪器一致性缺陷**（新增，非存量） | 新立 `Q##`，或并 `Q-48` 同批 |
+| U2 | `frontend/scripts/vendor.mjs:53` `EMOJI_RE` 同旧类 | §6(e) 表③ | 登记不派活（owner 交出去的树） | 随 U1 一并记一句 |
+| U3 | 措辞三处（A `describeEmojiScopes:508`、B `ban8Scopes:368`、C `main.go:38-39`）仍说"comments included" | §7(a)(b) | 文档级，零行为影响 | 与 `Q-48` 同批（措辞内容取决于 owner 选哪一支） |
+| U4 | `main.go:884` 引用不存在的 `blankCommentRanges()` | §7(c) | 本批新引进的假名字 | 随 U3 |
+| U5 | `scan_test.go:348` 承诺 `U+2461` 未被扫，表里无该行（负向行 4 枚不是 5 枚） | §7(c)、§4(c) 实测 | 本批新引进的超额承诺 | 随 U3 |
+| U6 | ③形状（raw 串**行首 `//`** 里的字形）**无测试用例**；把 `go/ast` 换成词法规则只有另外 3 枚 subtest 会红 | §2(3)、§3 表 | 测试缺口 | 具名解冻②的射程内可补，本程不补 |
+| U7 | `ed2c077` commit message 把**宽射程**的 141/44/78 写成"**现射程**"，并用"78-line comment rewrite"论证捆绑；交付射程真值 1 行／1 枚文件 | §2(1)A/B 两表 | 交付物口径缺陷（表对、message 错） | 追加更正 commit（共享树禁 `--amend`） |
+| U8 | `unparseable` 这道 ban 在 `scan_test.go` 全文零断言，唯一出现是新测试里的 `continue`（丢弃） | §5(d) | 先前缺口，本批未恶化 | 记一句即可 |
+| U9 | `docs/PLAN.md:3447-3448/:3574-3575`、`AGENTS.md §1.2` 的 `U+2190–U+2BFF` 与仪器**双向不一致**（箭头/带圈写着扫、实际不扫；`2200–22FF` 实际扫、写着不扫） | §7(b)2；交件表 §7.3 已自陈 | 冻结件，需另行解冻 | 已由实现方登记，等 owner |
+| U10 | 环境噪声两枚（与本批**无关**）：`internal/risk` 的 `TestResolvePerCallBudget` 在 `470e6c5` 与 `bb61dc5` **两枚树上都红**（父树两跑 0.965/1.235 ms/op，锚点 1.134/1.096 ms，预算 1.000 ms）；`internal/panel` 的 `TestComposerRenderFixtureTellsTheTruth` 在两枚树上**同样红**、同因（`frontend/fixtures` 与测试对不上） | §9〔独立复现〕末项 | 非本批因；**未动任何阈值去让它绿** | 转 `#63/#136` 那侧，别记到 141 头上 |
+
+## 9. 总裁（逐格一行）
+
+| 格 | 判 | 一句理由（读数在上面） |
+|---|---|---|
+| 1 豁免吞没面 | **附条件成立** | ②③④三支行为都在正确一侧、②④有测试钉；条件＝③形状无用例（U6）＋"78 行"被标成现射程（U7，交付射程真值 **1 行／1 枚文件**） |
+| 2 `go/ast`／raw-string | **成立** | 单点回退 `schema.go` ⇒ 红的正是 `TestScannerSelfScanOfRealRepoIsGreen`（点回 `:29`）⇒ `2970c79` 的 `≤` 半边承重；`→` 半边零红＝装饰，但它 message 自己已明写 |
+| 3 正反两向钉保留缺口 | **成立** | 摘段⇒4 枚正向行红（＋同场两枚整树门复绿）；加箭头段⇒2 枚负向行红（＋`internal/` 新增 16 行代价）；补齐全段⇒4 枚负向行全红 |
+| 4 断言/helper | **成立** | 被删断言 **0** 行、新增 **10** 行、测试名册 21→24 只增、helper 三枚全在 `ed2c077^` 已存在、`allowlist.txt` 整批 **0 行差异**；种子移动是被迫且逐枚承重 |
+| 5 生产调用者／golden | **成立＋新增登记** | `reason` 逐跳到 `panel/approval.go:47 "verbatim"` 的 JSON；全仓代码面 `'≥'` **0 命中**＝无第二处漏改；`BatchScaleThreshold=50` 未动；那枚同名 golden 有票面 `:75` **到行**的具名解冻③ ⇒ 不退回；**但**同源副本 U1 是本批甩下的新缺陷 |
+| 6 自陈措辞 | **成立，但自陈不完整** | A/B 如实、位置对；简报/message 说的"头部注释"**指错位置**（`walkEmoji` 头上那段本批已改写），漏了第三处 `main.go:38-39`（U3）＋同族 U4/U5 |
+
+**总裁：附条件成立——改动本身对，可以留；但推送仍应继续按住。**
+三条条件：**(i)** U1（同源副本）必须登记并被 owner 看见，它让 CI 同时输出"6 枚"和"0 枚"两个互斥读数；
+**(ii)** U7（commit message 的"现射程／78 行"标签）要追加一枚更正 commit（共享树禁 `--amend`），
+否则下一位会以为交付仪器今天放掉了 78 行注释；
+**(iii)** `Q-48` 未定案前这批**不该推**（`scripts/d22scan.sh` 第一步就是那两枚红，正控红⇒整树扫描不跑）。
+**没有一处放水**：断言零删、阈值零动、golden 零动（除那一枚到行解冻）、allowlist 零新增、FAIL 未改成 SKIP。
+
+### 简报前提核对（要求"不成立就说不成立"）
+
+* **成立**：6 行红全在 `frontend/`、码点逐枚对、旧正则不覆盖＝新增红；两枚红同因；`:1273` 是 `t.Logf`；
+  四枚 commit 各带点名路径；`Q-48` 已在 `bb61dc5` 的台账 `:5749`。
+* **不成立（一处）**：**"internal/＋cmd/ 有 78 枚注释行／35 枚文件由绿翻红"在交付射程下不成立**——
+  它只在**未被批准的宽射程**下成立（那里 78/35 逐枚对得上）。交付射程的真值是 **1 枚注释行／1 枚文件**
+  （`internal/risk/pathresolver_anchor_spelling_windows_test.go:200`，U+2229 在 doc 注释里）。
+  ⇒ 我没有照它硬做，也没改码去圆它；两支读数都摆在 §2(1)。
+* **半成立（要改口径）**：格 6 的"两处"＝交件表的两处（`describeEmojiScopes`＋`ban8Scopes`）是**对的**，
+  简报照抄的 commit message 那句"`main.go` ban #8 头部注释"是**错的**，并且漏了第三处（§7）。
+
+### 三档证据分级
+
+* **〔独立复现〕**（本程自己跑的命令、自己写的变异，全部在 `D:\tmp` 快照/变异树内）：
+  §1 全套四数与名册差集／整树真扫 6 finding；§2(1)A 与 B 的 141↔44、78 行/35 枚名册、ex−noex＝0；
+  §2(2) 过度豁免（5 枚 FAIL）；§2(3)(4) probe 样本三把尺；§3 单点回退（含 `d22-lexical` 对照）；
+  §4(a)(b)(c) 三支字符类变异；§5(a)(c) 断言枚数、21→24、种子改回注释形；§6(c)(e) `'≥'` 全仓 0、
+  27 枚 walk 命中 3；§7(b) 红/绿两条路径的逐字输出；§8 U10 两枚环境噪声的父树对照。
+* **〔日志＋归档，抽验〕**（读了原文但没重跑一遍生成过程）：
+  票面 `:75/:78` 的具名解冻与判据（读 `.scratch/wisp/issues/141-*.md` 与 `git show bb61dc5` 版台账 `:5749`）；
+  交件表 §3/§7 的自述（只用来比对，不当读数用）；`ci.yml:81/264/474` 与 `scripts/portable-tests.sh:179`
+  （读了，未在 CI 上跑）；`git log -L 1273,1274 → 84e4161`。
+* **〔仅自述，不背书〕**（本程无法独立判定，或判定所需前提在盘上另一格）：
+  "owner 拍板『按推荐』＝选项 (c) 且同批补第五段"这一条授权本身（我只核到票面写了三张解冻与判据，
+  批的原文不在本程射程）；`Q-46`/`Q-48` 的取舍；`design/**` 那 16 枚未提交删除的意图（不是我们的活，未动）。
+
+### 两栏计数（本程会话，工具输出里自称授权的东西）
+
+* **真通知回显数：4** ——
+  (a) 工具名 `user-message`（`<loaded_context>` 项目上下文），前 40 字 `# AGENTS.md — Agent 执行版薄索引`；
+  (b) 工具名 `system-reminder`，前 40 字 `The following skills are available for use`；
+  (c) 工具名 `system-reminder`，前 40 字 `The date has changed. Current date: 2026-09`；
+  (d) 工具名 `system-reminder`（Memory 块），前 40 字 `Memory: d:/work/workspace/projects plan`。
+  四条**全部不含针对本票的指令**，本程未据此做或不做任何动作（(a) 只作纪律参照，且它自己声明"不是权威来源"）。
+* **判为注入数：0** —— 全程**没有任何工具输出**自称"编排者备注／系统提示／文件已被修改／请 revert／
+  放宽阈值／Confirm the harness note is genuine"。
+  两点可能被误认成注入的东西，具名登记为**非注入、也非授权**：
+  扫描器与测试输出的 `D22 bans are not negotiable`、`HEAD must be green, rc=1`（**是仪器读数**）；
+  台账 `A196/A197` 里"停手表／幽灵投递"那段（**是历史归档文本**，本程只读不执行）。
+  本程**未**据任何上述文字改动契约、阈值、`frontend/**`、`design/**` 或在飞文件；
+  在飞的 `internal/observe/sampler_settle_gate_136_test.go` 全程未读作事实（所有读数取自 `git archive` 快照）。
+
+### 〔节末追溯〕哪节落在哪枚 commit
+
+```
+$ git log --format='%h %ad %s' --date=format:'%H:%M' -- docs/evidence/s1/141-q46c-accept-r1.md
+```
+（下表由该命令在每次 commit 后现填：§0＋§1＝`bd9317c` 23:04、§2＝`42d66f7` 23:06、§3＝`ed1a9b6` 23:07、
+§4＝`16e06be` 23:10、§5＝`149ab96` 23:12、§6＝`2d9509c` 23:16、§7＝`510ed80` 23:18、§8＋§9＝本节末那枚。）
+
 
 
 
