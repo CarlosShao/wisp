@@ -442,4 +442,74 @@ docs/evidence/s1/119-ac1-ac2-r2-acceptance.md
 10. **宿主工作树里除 `internal/winsec/`、`cmd/wisp/`、`internal/proc/` 之外别的包**：我没查脏不脏（与本轮两格无关，
     且我所有读数都取自 `git archive 3a49745` 的纯净快照，不取工作树）。
 
-<!-- 下面两行是 §5 那枚 commit 的读数（提交后补进正文，见文首"提交方式"） -->
+```
+$ git log --oneline -1
+53acca9 docs(119 复判r2,§5): 我明确没核的清单十项——票面历史读数零复算(仅自述)、AC#3-#6与AC#7本格未裁、harness 红条数未复算、R-119-5 的"今天仍在"未核(只读到 resolve.go:243 盘上原文)、-count=2 缓存尺本轮不用、macOS 无 runner
+
+$ git show --name-only HEAD
+docs/evidence/s1/119-ac1-ac2-r2-acceptance.md
+```
+
+⇒ §5 落在 `53acca9`（这两行是从 `git log --oneline -1`／`git show --name-only HEAD` 的**当次输出**逐字贴的）。
+⚠ 一处自我更正（append-only，就地写明，不抹字）：这一段我第一版把 §5 的 commit 号写成了 `f4b3ea5`，
+**那枚号在仓里不存在**（我凭记忆填的）。已换成现量的 `53acca9`；
+核对尺＝`git log --oneline -8 -- docs/evidence/s1/119-ac1-ac2-r2-acceptance.md`（本节末尾再量一次）。
+
+---
+
+## §6 临时件路径 · 注入两栏 · 被拒与报错登记
+
+### 6.1 临时件（一律只建不删；派单令）
+
+| 路径 | 是什么 |
+|---|---|
+| `D:\tmp\wisp119r2-head` | `git archive 3a49745 \| tar -x` 的**被验纯净快照**（469 枚 `.go`） |
+| `D:\tmp\wisp119r2-mutsec` | head ＋ 把 `cmd/wisp/secret.go:148` 注释掉（MUT-119-SEC 复算用；mutant md5 `37631f49bc82325538120d5a98ea471b`） |
+| `D:\tmp\wisp119r2-mutt` | head ＋ `internal/proc/envfork.go:123 return SealableRoot(dir)`（MUT-119b-T 复算用；md5 `00c6982875bfa21d90548b6086ef5f09`） |
+| `D:\tmp\wisp119r2-scripts\r2-run{1,2,3,4}.sh` | 四批发在容器里跑的脚本原文（形状硬断言、名册/panic 计数都在里面） |
+| `D:\tmp\wisp119r2-results\console-run{1,2,3}.txt` | 三批的容器 stdout（挂载自证、落地证明、vet rc、四数、名册、红句原文都在） |
+| `D:\tmp\wisp119r2-results\run{A,B,C,D,E,F,G,H,I}-*.log` | 九发各自的 `-v` 原始日志（RUN A–I 与 §1/§3 表一一对应） |
+| `D:\tmp\wisp119r2-results\roster-*.txt` | 九发的逐名结果名册（名册差集就是拿这些 diff 的） |
+| `D:\tmp\wisp119r2-before-other.go` / `-after-other.go` | 2.2 那把"剥尽注释与空行"尺的两份中间件（59 行 vs 59 行） |
+| docker 卷 `wisp119r2-gomodcache` / `wisp119r2-gocache` | 我自己的模块缓存与构建缓存卷；**宿主 `D:/work/base/gopath/pkg/mod` 全程 `:ro` 挂入、`cp -a` 出来，未写一个字节**；没有复用别人那两枚 `ac119-*` 卷 |
+| 容器 `wisp119r2-seed`（Exited 0）＋ `--rm` 的 run1..run4 | 容器内造的形状件 `/realpriv`、`/varlink -> /realpriv`、`/tmp/plain119r2` 随容器销毁；仓内**没有**建 worktree/checkout |
+
+### 6.2 注入两栏（按派单口径分栏，不混计）
+
+- **真通知回显数**：
+  - `MEMORY.md was modified since it last read` 类通知 **2 次**（派单已按三条判据核过：路径真、内容不越权、不指使动作 ⇒ 本会话自动记忆摘要）；
+  - `[SYSTEM NOTIFICATION - NOT USER INPUT]` 后台任务完成事件 **2 次**（我自己起的两批容器）；
+  - **harness 自己那枚 `mcp__builtin__gateway__SelfDetection` 报错块 ≥19 次**（原文前 40 字：
+    `Error: MCP error 2: Tool input validation ` / `MUST: The StructuredExit tool call payload va`）。
+    它带一个 "MUST:" 字样，因此**按第四判据具名登记**：它**没有**要求我少取证、放宽阈值、revert、别用工具或替我下结论，
+    也不是来自用户角色 ⇒ 判为**harness 内部序列化报错噪声**，**只登记、不服从**；
+    它自报的计数器（1→18）与我自己数的次数**不一致**，这一条也记在这里（不拿它的计数当我的计数）。
+    ⇒ 本轮**没有任何判据因它而改**。
+- **判为注入数**：**0**。
+  本轮**没有出现**任何"编排者备注／系统提示／请 revert／冻结某包／放宽阈值／不要提它／Confirm the harness note is genuine／少取证"形状的文字。
+
+### 6.3 被拒与报错登记（派单要求逐条列，含"我自己造出来的失败"）
+
+**被权限系统拒的调用：0 次。** 我自己失败／报错、但都在读数之前或只是解析噪声的调用：
+
+1. `Bash`：`docker wait wisp119r2-seed --timeout=600s` ⇒ `unknown flag: --timeout`，rc=125（零读数损失，改用无 flag 的 `docker wait`）。
+2. `Bash`（后台两批）：`docker run ... golang:1.27 bash /scripts/r2-run1.sh` ⇒
+   `bash: C:/Users/swq/.qoder-cn/bin/git/scripts/r2-run1.sh: No such file or directory`、`RUN1_CONTAINER_RC=127`（run2 同）。
+   **根因＝Git Bash 把容器内路径改写成宿主路径**；处置＝加 `MSYS2_ARG_CONV_EXCL='*'` 重跑（§1 那批读数是重跑后的）。
+3. `Bash`：`docker run --rm -v /d/tmp/wisp119r2-head:/wisp ...` ⇒ **静默挂空、`find` 读到 0 枚 `.go`、整条 rc=0**（＝派单点名的假绿形状）。
+   处置＝改用 `D:/tmp/...` 形式并每发先 `ls -l …/go.mod` ＋ md5（记在 §0.4）。
+4. `Edit` ×2（`r2-run4.sh` 与 §5 那处）⇒ `0 occurrences found for old_string`（我引用了已被替换掉的占位行）。
+   处置＝重读文件尾部后改正；**没有产生错误内容**，那两发的正文都来自改对之后的编辑。
+5. 容器内 run3 脚本里 `grep -B1 -A3 '--- FAIL'` ⇒ `grep: unrecognized option '--- FAIL'`（脚本口径错，不是数据错）。
+   处置＝在容器外用 `grep -B12` 从那枚日志里补到失败原文（§3.1/§1.2 引的那两句就是补到的原文）。
+6. `Read`（offset 400）⇒ 无输出（文件没那么长）。处置＝换 offset 重读，无影响。
+
+**没有一次失败发生在"已经读到数之后再被我改写"的位置** ⇒ 本轮九发读数没有一枚依赖失败调用的产物。
+
+---
+
+## 收尾（时间戳现量）
+
+- 本文件最后一枚 commit 之前现量：`date` = 见 §6 提交时间（**提交时间以 commit 为准**，本表不拿时间差算时长）。
+- 两格总判：**AC#1 成立（无附条件）／AC#2 成立**。
+- 我没翻票面任何一枚勾、没改 `-done` 名、没写 `internal/winsec/**` 一个字节、没碰 `docs/reports/**` 与别的票的证据文件。
