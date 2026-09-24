@@ -60,7 +60,7 @@ git merge-base --is-ancestor 744d79e HEAD → YES
 
 ### 0.2 问题问得对不对
 
-问对了**主干**，但票面 `AC#1` 的措辞比事实宽：**「同一枚 job 级变量还在哪些包里把加固腿变成装饰」——现量答案是「不在任何别的包里」，因为除 `cmd/wisp` 外没有任何生产码读这枚变量**（凭据见 §1.4，三条独立 grep）。
+问对了**主干**，但票面 `AC#1` 的措辞比事实宽：**「同一枚 job 级变量还在哪些包里把加固腿变成装饰」——现量答案是「不在任何别的包里」，因为除 `cmd/wisp` 外没有任何生产码读这枚变量**（凭据见 §1.3，三条独立 grep）。
 所以这张票真正剩下的量，不是"再找几个包"，而是这两件我在盘点里撞到的东西：
 
 1. **一枚从没被任何测试断言过的规范义务**：`SPEC-11 §8` 要求 CI 显式断言 `WISP_ENV=test` 生效（原文见 §2.4），而今天那枚**名字写着这件事的步骤**（`ci.yml:250`）走的码路**根本不读这枚变量**。
@@ -148,7 +148,7 @@ git merge-base --is-ancestor 744d79e HEAD → YES
 
 **其余生产 env 读（都不早退、也都不看 `WISP_ENV`）**：`internal/models/manifest.go:325`（`WISP_MODELS_MANIFEST`）、`internal/tools/fs_staging.go:101-107`（`user.Current()` → `USERNAME`/`USER`/`LNAME`/`LOGNAME`）、`internal/secret/store.go:96`（配置里 `env:` 引用的那枚**变量名**）。
 
-### 1.3 测试码（会去问操作系统／或自称会问的用例，按包）
+### 1.2 测试码（会去问操作系统／或自称会问的用例，按包）
 
 | 包 | 文件 | 它问谁 | 腿型／是否本票靶 |
 |---|---|---|---|
@@ -166,7 +166,7 @@ git merge-base --is-ancestor 744d79e HEAD → YES
 | `internal/tools` | `fs_test.go`、`ticket90_test.go`、`bridge_junction_windows_test.go` | `HOME`/`TMPDIR`/junction | 与 env 无关 |
 | `internal/config` `internal/memory` `internal/llm` `internal/perm` `internal/agent*` | `tempdir_resolved_124_test.go`（7 枚） | `t.TempDir()` 声明根 | 与 env 无关 |
 
-### 1.4 「除 `cmd/wisp` 外没有生产码读这枚变量」的三条凭据　〔独立复现〕
+### 1.3 「除 `cmd/wisp` 外没有生产码读这枚变量」的三条凭据　〔独立复现〕
 
 ```
 git grep -ln 'buildinfo.EnvString\|buildinfo.ResolveEnv' 744d79e -- '*.go' | grep -v 'cmd/wisp'
@@ -235,7 +235,7 @@ git grep -n 'buildinfo' 744d79e -- 'internal/winsec/*.go' | grep -v _test
 ### 2.5 静态答不出、必须真跑的（**我不猜，逐条挂着**）
 
 1. 每一枚"换色"用例在**修后的 `WISP_ENV=test` 本机形**下的四数与名册差集——票 128 `AC#4` 已给过修前那两形（`R1 202/202/0/0`、`R2 202/192/10/0`、`R3 202/202/0/0`、`R4 202/202/0/0`，见 §5），本程**没复跑**。
-2. `ci.yml:250` 那一步在 job env 被摘掉后是否仍绿——静态推断是"仍绿且逐字同字节"（§1.4＋§2.3 的理由），**但这是可跑掉的断言，本程按规矩不下结论**。
+2. `ci.yml:250` 那一步在 job env 被摘掉后是否仍绿——静态推断是"仍绿且逐字同字节"（§1.3＋§2.3 的理由），**但这是可跑掉的断言，本程按规矩不下结论**。
 3. §4.2 那三枚 build 门禁在 (a) 下的真形：会不会红（`wisp doctor` 的其余检查在 hosted runner 上是否本就全绿），本程不跑，只列出会**新增什么写面**。
 
 ---
@@ -267,7 +267,7 @@ git grep -n 'buildinfo' 744d79e -- 'internal/winsec/*.go' | grep -v _test
 |---|---|---|
 | `cmd/wisp/dataroot_128_test.go` 全部 4 枚 top-level ＋ `dataroot_128_test.go:281` 的 5 枚子项 ＋ `dataroot_128_windows_test.go` 的 4 枚子项 | 8 top-level＋9 子项 | **是**（`:422`，全在 `test-windows`）。其中**只有 `:281` 的 4 枚子项曾真中过这枚早退**，现由 `c2fa2e9` 钉住 |
 | `cmd/wisp` 其余 13 枚文件的全部用例（`secret_test.go` 14、`run_test.go` 6、`run_mode101_test.go` 5、`logsink_test.go`＋`logsink_windows_test.go` 3+3、`providers_test.go` 4、`leg_sink_gate_131`＋`leg_sink_nail_131`＋`leg_dispatch_gate_133` 1+3+1、`resident_sink_nail_127` 3、`early_log_nail_130` 2、`secret_argv_windows` 4、`tempdir_resolved_124` 0；按 `git show … | grep -c '^func Test'` 现量） | **49** 枚 top-level | 在**带 env 的 job** 里跑，但**腿型 B／免疫**（§2.2） |
-| `internal/proc`＋`internal/buildinfo` 的 §2.3 那批 | 5 | `test-core`(带 env，`:227`) 与 `test-windows`(带 env，`:458`) 都跑它们 ⇒ **在受影响的 job 里，但不受这枚变量影响**（`proc` 不读 ambient，§1.4） |
+| `internal/proc`＋`internal/buildinfo` 的 §2.3 那批 | 5 | `test-core`(带 env，`:227`) 与 `test-windows`(带 env，`:458`) 都跑它们 ⇒ **在受影响的 job 里，但不受这枚变量影响**（`proc` 不读 ambient，§1.3） |
 | `internal/winsec` 的 119/124/125 那批 `!windows` 用例 | — | 只在 `test-core`(ubuntu) 的 `:288` 与 winsec 门禁；**与 env 无关** |
 | `ci.yml:250` 那一步 | 1 步 | 在带 env 的 job 里，**但从不咨询它**（§2.3/§2.4） |
 
@@ -317,7 +317,7 @@ git grep -n 'buildinfo' 744d79e -- 'internal/winsec/*.go' | grep -v _test
 ### 4.2 (a) 支：取消四枚 job 级 env ⇒ **哪些步骤会拿不到它现在依赖的 `test` 语义**（点名）
 
 **先纠正简报里的一个指向**：简报举例说「`:250` 那一步"Environment fork assertion (WISP_ENV=test data dir)"显然就是靠它」——
-**这一步不靠它**（凭据：`internal/proc/envfork_test.go:75` 那枚用例的 `:79` 传字面量 `EnvTest`、`:78` 自己 `t.Setenv(WISP_TEST_DATA_DIR)`；§1.4 的三条 grep 证明 `internal/proc` 不读 ambient）。
+**这一步不靠它**（凭据：`internal/proc/envfork_test.go:75` 那枚用例的 `:79` 传字面量 `EnvTest`、`:78` 自己 `t.Setenv(WISP_TEST_DATA_DIR)`；§1.3 的三条 grep 证明 `internal/proc` 不读 ambient）。
 **真正靠它的是另外三枚，而且它们都不是 `go test`**：
 
 | 会变的步骤 | file:line | 现在靠 env 做什么 | 摘掉 env 之后 |
@@ -376,10 +376,36 @@ git grep -n 'buildinfo' 744d79e -- 'internal/winsec/*.go' | grep -v _test
 - `C:\Users\swq\.qoder-cn\tmp\D--work-workspace-projects-plans-Wisp\tool-outputs\session-a91d07b8-f536-47da-a2b4-a297d49f5f4f\b5js0lz8f.output`
   —— 一条 `git grep` 输出超限被 harness 转存的文件，**内容是我的第一次全量 grep，无凭据值**。
 
-## §7　commit 账（本程自己的 git 写操作）
+## §7　只读纪律自证：本程被拒过的每一次调用
 
-见本文件末尾追加的那一节（§8）。**取法**：`git log --oneline -- docs/evidence/s1/140-static-inventory-r1.md`。
+- **被拒调用次数：0。**（本程全部命令一次通过，没有一次需要先换路径再试。）
+- **判为注入的工具输出：0 条。** 本程读到过任何形如「编排者备注／系统提示／请 revert／冻结某包／放宽阈值／已解锁」的文字，
+  只有 §0.4 那一处例外——那是**票面与台账自己的句子**（`.scratch/wisp/issues/140-…md:5`、`pending-and-issues.md:5498`），
+  是**待核的状态断言不是授权**，我把它当断言核了并给出反证，没有据此行动。
+- **真通知回显数**：1 次 —— 会话开头一条「`MEMORY.md` was modified since it was last read」的系统回显。
+  它不是指令，本程未据此改变任何动作，仅登记。
+- 跑的命令全集：`git rev-parse` / `git log` / `git show` / `git grep` / `git ls-tree` / `git cat-file -t` /
+  `git merge-base --is-ancestor` / `git diff --name-only` / `git diff --numstat` / `git status --porcelain` /
+  `git add -- <我的路径>` / `git commit -q -F - -- <我的路径>` / `grep` / `sed -n`（读 `git show` 的管道） / `awk` / `wc` / `ls` / `date`。
+  **没有**：`go test`、`go build`、`go vet`、`gofmt`、`gofumpt`、`docker`、`rm`、`rmdir`、`git add -A`、`--amend`、`reset`、`rebase`、`stash`、`checkout .`、`clean`、`push`。
 
 ## §8　本文件的 commit 账　〔独立复现〕
 
-（本节在写完全文后追加，逐枚 `git show --name-only` 现量。）
+**取法（可复算，别按本节行数信我）**：
+
+```
+git log --oneline -- docs/evidence/s1/140-static-inventory-r1.md
+git show --numstat --format='%H %ct' <那一枚> -- docs/evidence/s1/140-static-inventory-r1.md
+```
+
+现量结果（18:0x，本程自己 `git log` 取）：
+
+| 枚 | sha | 时间 | numstat | `--name-only` 里的路径 |
+|---|---|---|---|---|
+| 1 | `7c81c77532ad0345022bb2b2ee6d224c0e7ce417`（`git cat-file -t` = `commit`） | epoch `1790244351` | **385 增 / 0 删** | **只有** `docs/evidence/s1/140-static-inventory-r1.md` 一枚 |
+
+- 删除列为 **0** ⇒ 那一枚 commit 没有吞掉任何既有内容行（本文的六次 Edit 全部发生在它之前）。
+- 提交前后各量一次 `git status --porcelain | grep -c '^ D design'` ＝ **16 → 16**：owner 自己那 16 枚 `design/**` 未提交删除**原样留在 unstaged**，没被我带走。
+- 另一枚在飞文件 `.scratch/wisp/issues/119-…md` 在我 commit 时处于 unstaged modified（兄弟程的活），**未进我的 commit**（pathspec 只写了我那一枚路径）。
+- §8 本身是**写完之后**才补的，所以它会落在**第二枚** commit 里；那一枚同样只带本文件这一条路径。
+  ⇒ 数本文件的 commit 时**别按这张表数**，按上面那条 `git log --oneline -- 本文件` 现量。
