@@ -108,9 +108,20 @@ var (
 	mirrorWordRe     = regexp.MustCompile(`(?i)mirror`)
 	approvalPanelRe  = regexp.MustCompile(`approval\.decide`)
 	artifactToolRe   = regexp.MustCompile(`(?i)"(spill|internal[._-][a-z0-9_.-]+)"`)
-	emojiRe          = regexp.MustCompile(`[\x{1F000}-\x{1FAFF}\x{2600}-\x{27BF}\x{2B00}-\x{2BFF}\x{FE0F}\x{1F1E6}-\x{1F1FF}]`)
 	assignKeyShapeRe = regexp.MustCompile(`^[A-Za-z0-9._~-]{16,}$`)
 )
+
+// emojiRe is ban #8's character class.
+//
+// Q-46(c) widened it by \x{2200}-\x{22FF} (ticket 141): PLAN.md's own list of
+// ranges does NOT contain that band either, so the spec is narrower than what
+// the ban exists to prevent - of the non-comment occurrences of U+2265,
+// U+2264, U+2229 and U+2212 in this repo, 4 are already-rendered panel copy and
+// 1 is the approval card's own reason string. Do not "tidy" the bands into one
+// span: \x{2190}-\x{21FF} (arrows) and \x{2460}-\x{24FF} (circled numbers) are
+// deliberately still absent, because the approval added ONLY the math band, and
+// any further band belongs in scan_test.go's pin, not here.
+var emojiRe = regexp.MustCompile(`[\x{1F000}-\x{1FAFF}\x{2200}-\x{22FF}\x{2600}-\x{27BF}\x{2B00}-\x{2BFF}\x{FE0F}\x{1F1E6}-\x{1F1FF}]`)
 
 func splitSecretWords(name string) []string {
 	// Split CamelCase and non-alphanumeric separators into lowercase words.
@@ -791,18 +802,21 @@ func (s *scanner) walkText(dir, ban string, check func(string) (string, bool), g
 // Two scope decisions live here because both were argued in the ticket and
 // both are things a later reader will otherwise "fix" the wrong way:
 //
-//   - COMMENTS COUNT, and this is not a policy choice but a measurement: the
-//     loop below matches emojiRe against the RAW line and nothing strips
-//     comments first, so a glyph in prose is already a violation in this
-//     instrument's semantics. Ticket 67 AC#3 proposed the opposite ("comments
-//     are not user-visible, exclude them"); implementing that needs new
-//     comment-stripping code, i.e. a coverage NARROWING, which R16#4 forbids.
-//     The measured blast radius of keeping comments in was 3 production lines
-//     (internal/llm/probe_health.go, comment-only, as counted 2026-09-21), and
-//     they were cleaned to ASCII PASS/FAIL rather than exempted - see
-//     docs/evidence/s1/67-emoji-scope-internal-cmd.md. Attribution caveat on
-//     purpose: ban #8 is D23's design-language ban, NOT a console-encoding
-//     check; the encoding argument was specific to cmd/wisp's verdict column.
+//   - COMMENTS ARE EXEMPT AS OF Q-46(c), AND THAT IS A SIGNATURE, NOT AN
+//     IMPROVEMENT. The bullet that used to sit here read "COMMENTS COUNT, and
+//     this is not a policy choice but a measurement", because the loop matched
+//     emojiRe against the RAW line and nothing stripped comments first. Ticket
+//     141 put the opposite to the owner and he answered「按推荐」= option (c),
+//     "注释豁免、字符串从严", in the same breath as adding the math band
+//     U+2200-U+22FF - so the exemption and the widening travel together and
+//     neither stands alone: (c) without the band leaves the gate blind to
+//     exactly the symbols users see, and the band without (c) is a 78-line
+//     comment rewrite. R16#4 forbids an agent narrowing a ban; what happened
+//     here is a human authorising it, which is why the reason lives in the
+//     ticket and in AGENTS.md's ban list rather than only in this comment, and
+//     why the split itself is pinned in scan_test.go (TestBan8CommentExemption*).
+//     _test.go still counts: a test source is a string-literal carrier (verdict
+//     copy-paste), and Q-46(c) exempts prose, not files.
 //   - _test.go COUNTS. Test sources are where a verdict literal gets
 //     copy-pasted FROM, and every expensive false green in this repo's recent
 //     history came from a gate blind to a whole class of file (ban #1 saw only
@@ -865,13 +879,166 @@ func (s *scanner) walkEmoji(sc emojiScope) error {
 			return err
 		}
 		s.emojiSeen[sc.label]++
+		// Q-46(c): comments are blanked before matching, strings are not. The
+		// residue of a line is what a reader or a renderer can see; a comment
+		// is what nobody can. blankCommentRanges() returns nil for a file with
+		// no comments, so the common path is one map lookup per hit line.
+		ranges := commentRangesFor(path, string(src))
 		for i, line := range strings.Split(string(src), "\n") {
-			if emojiRe.MatchString(line) {
-				s.add("emoji", path, i+1, fmt.Sprintf("ban #8 glyph in scope %s is banned (D23): covers comments and _test.go, not only string literals", sc.label))
+			probe := line
+			if rs := ranges[i+1]; len(rs) > 0 {
+				probe = removeRanges(line, rs)
+			}
+			if emojiRe.MatchString(probe) {
+				s.add("emoji", path, i+1, fmt.Sprintf("ban #8 glyph in scope %s is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)", sc.label))
 			}
 		}
 		return nil
 	})
+}
+
+// commentRangesFor returns the byte ranges of one file that are COMMENT text,
+// keyed by 1-based line number, half-open [lo,hi) in byte offsets of that line.
+//
+// This is the "comment vs string" split Q-46(c) was approved for (ticket 141:
+// owner answer「按推荐」, so the exemption is signed, not assumed). Two
+// classifiers, because the two file classes disagree about what a comment is in
+// exactly the place that matters:
+//
+//   - .go files go through go/ast, because Go's own parser is the only
+//     authority on where a comment ends and a string begins. The line
+//     `-- L1 slot, <= 20 rows` inside a raw string is a SQL comment and a Go
+//     string at once; a lexical `--`/prefix rule would have exempted it, and the
+//     owner's own ruling on that exact pair (internal/memory/schema.go:29) is
+//     that it counts as a violation. ast cannot be tricked by string contents,
+//     so a glyph inside any Go string literal always survives.
+//     A .go file that fails to parse yields nil, i.e. NO exemption: a broken
+//     file must not buy a free pass.
+//   - everything else (design/'s mockups, frontend/'s whole tree) has no parser
+//     here, so the rule is deliberately coarse and errs toward reporting: a line
+//     is comment text only from a marker that its own non-whitespace prefix
+//     carries (`//`, `/*`, `*` while inside an open block, `<!--`, `-->`), and
+//     only from that marker onward. Code can therefore share a line with an
+//     exempted comment and still be matched. `#` and `--` are NOT markers: the
+//     first is a markdown heading and a CSS-independent selector, the second is
+//     SQL, and mistaking either for a comment is the blind spot this ticket is
+//     closing, not a feature.
+func commentRangesFor(path, src string) map[int][][2]int {
+	if strings.HasSuffix(path, ".go") {
+		return goCommentRanges([]byte(src))
+	}
+	return textCommentRanges(src)
+}
+
+// goCommentRanges blanks every byte go/ast classifies as a comment.
+func goCommentRanges(src []byte) map[int][][2]int {
+	fset := token.NewFileSet()
+	file, err := parser.ParseFile(fset, "ban8.go", src, parser.ParseComments)
+	if err != nil {
+		return nil
+	}
+	lines := strings.Split(string(src), "\n")
+	out := map[int][][2]int{}
+	for _, group := range file.Comments {
+		for _, c := range group.List {
+			start, end := fset.Position(c.Pos()), fset.Position(c.End())
+			for ln := start.Line; ln <= end.Line; ln++ {
+				if ln < 1 || ln > len(lines) {
+					continue
+				}
+				lo, hi := 0, len(lines[ln-1])
+				if ln == start.Line {
+					lo = start.Column - 1
+				}
+				if ln == end.Line {
+					hi = end.Column - 1
+				}
+				if lo < 0 {
+					lo = 0
+				}
+				if hi > lo {
+					out[ln] = append(out[ln], [2]int{lo, hi})
+				}
+			}
+		}
+	}
+	return out
+}
+
+// textCommentRanges is the marker-plus-block-state rule described on
+// commentRangesFor. open is the kind of block comment spanning the current line
+// ("" when none).
+func textCommentRanges(src string) map[int][][2]int {
+	out := map[int][][2]int{}
+	open := ""
+	for ln, line := range strings.Split(src, "\n") {
+		trimmed := strings.TrimLeft(line, " \t")
+		indent := len(line) - len(trimmed)
+		mark := func(lo, hi int) {
+			if hi > lo {
+				out[ln+1] = append(out[ln+1], [2]int{lo, hi})
+			}
+		}
+		if open != "" {
+			closer := "*/"
+			if open == "<!--" {
+				closer = "-->"
+			}
+			if k := strings.Index(line, closer); k >= 0 {
+				mark(0, k+len(closer))
+				open = ""
+				// Whatever follows a closed block on the same line is code, and
+				// code is never exempted, so the line stops being examined here.
+				continue
+			}
+			mark(0, len(line))
+			continue
+		}
+		switch {
+		case strings.HasPrefix(trimmed, "//"):
+			mark(indent, len(line))
+		case strings.HasPrefix(trimmed, "/*"):
+			if k := strings.Index(line[indent:], "*/"); k >= 0 {
+				mark(indent, indent+k+2)
+			} else {
+				open = "/*"
+				mark(indent, len(line))
+			}
+		case strings.HasPrefix(trimmed, "<!--"):
+			if k := strings.Index(line[indent:], "-->"); k >= 0 {
+				mark(indent, indent+k+3)
+			} else {
+				open = "<!--"
+				mark(indent, len(line))
+			}
+		case strings.HasPrefix(trimmed, "*/"):
+			// A line that only closes a block this walk never opened (the block
+			// started and ended on one line, or the file was truncated): exempt
+			// the closing marker and nothing else.
+			mark(indent, indent+2)
+		}
+	}
+	return out
+}
+
+// removeRanges returns line with the given byte ranges replaced by spaces, so
+// the column of every surviving glyph is unchanged and the finding still points
+// at the right place.
+func removeRanges(line string, ranges [][2]int) string {
+	buf := []byte(line)
+	for _, r := range ranges {
+		lo, hi := r[0], r[1]
+		if lo < 0 {
+			lo = 0
+		}
+		if hi > len(buf) {
+			hi = len(buf)
+		}
+		for i := lo; i < hi && i < len(buf); i++ {
+			buf[i] = ' '
+		}
+	}
+	return string(buf)
 }
 
 func isTextFile(path string) bool {

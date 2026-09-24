@@ -272,22 +272,28 @@ func TestScannerSelfScanOfRealRepoIsGreen(t *testing.T) {
 }
 
 // TestEmojiBanCoversGoSourcesNotJustDesign is registry A23 judgement ① pinned
-// in code: ban #8 must fire inside internal/ AND inside cmd/, on a COMMENT
-// line, on a string literal and in a _test.go file. Before ticket 67 AC#3's
-// coverage step all four of these seeds walked past the gate unnoticed, because
-// the only declared scopes were design/ and frontend/ - and frontend/ does not
-// exist in this repository, so every .go file in the product was invisible to
-// the ban while the footer still claimed "no emoji in design/ or frontend/".
+// in code: ban #8 must fire inside internal/ AND inside cmd/, on a non-test file
+// and in a _test.go file. Before ticket 67 AC#3's coverage step all four of
+// these seeds walked past the gate unnoticed, because the only declared scopes
+// were design/ and frontend/ - and frontend/ does not exist in this repository,
+// so every .go file in the product was invisible to the ban while the footer
+// still claimed "no emoji in design/ or frontend/".
+//
+// Q-46(c) (ticket 141) moved the glyphs in these seeds out of comments and into
+// string literals, because comments are exempt now and a comment seed would
+// prove nothing about coverage. The exemption has its own two tests below
+// (TestBan8CommentExemptionInGoSources, TestBan8CommentExemptionInTextScopes);
+// deleting the coverage seeds instead of moving them would reopen A23.
 func TestEmojiBanCoversGoSourcesNotJustDesign(t *testing.T) {
 	root := t.TempDir()
 	seedFile(t, root, "tools/d22scan/allowlist.txt", "# empty\n")
 
 	// U+2713 CHECK MARK: inside emojiRe's \x{2600}-\x{27BF} band, and the exact
 	// code point that lived in cmd/wisp/providers.go until fff4cad.
-	seedFile(t, root, "internal/ok/comment.go", "package ok\n\n// a verdict reads \u2713 here\n")
+	seedFile(t, root, "internal/ok/decl.go", "package ok\n\nconst doc = \"a verdict reads \u2713 here\"\n")
 	seedFile(t, root, "internal/ok/literal.go", "package ok\n\nconst banner = \"ready \u2713\"\n")
-	seedFile(t, root, "internal/ok/emoji_test.go", "package ok\n\n// \u2713 in a test file comment\nfunc TestNothing(*testing.T) {}\n")
-	seedFile(t, root, "cmd/wisp/glyph.go", "package main\n\n// \u2713 in cmd/\nfunc main() {}\n")
+	seedFile(t, root, "internal/ok/emoji_test.go", "package ok\n\nvar want = \"\u2713 in a test file\"\nfunc TestNothing(*testing.T) {}\n")
+	seedFile(t, root, "cmd/wisp/glyph.go", "package main\n\nconst tail = \"\u2713 in cmd/\"\nfunc main() {}\n")
 
 	// Control for the documented goOnly rule: a non-.go file under internal/ is
 	// testdata goldens / leaked test debris, not source, so it is out of scope.
@@ -298,7 +304,7 @@ func TestEmojiBanCoversGoSourcesNotJustDesign(t *testing.T) {
 		t.Fatal(err)
 	}
 	want := []string{
-		"internal/ok/comment.go",    // comment line, internal/
+		"internal/ok/decl.go",       // string literal in a non-test file, internal/
 		"internal/ok/literal.go",    // string literal, internal/
 		"internal/ok/emoji_test.go", // _test.go
 		"cmd/wisp/glyph.go",         // cmd/
@@ -323,6 +329,271 @@ func TestEmojiBanCoversGoSourcesNotJustDesign(t *testing.T) {
 			continue
 		}
 		t.Errorf("unexpected emoji finding for %s (all: %v)", p, findings)
+	}
+}
+
+// TestBan8MathBandAndRemainingGaps pins emojiRe's character class by code point,
+// which is the "pin any change there in scan_test.go" that main.go's ban #8
+// header asks for (the generated footer cannot pin a range).
+//
+// Two directions are pinned on purpose. The positive one is Q-46(c)'s addition:
+// U+2265/U+2264/U+2229 live in \x{2200}-\x{22FF}, the band ticket 141 added
+// because PLAN.md's own range list does not contain it either while 5 real
+// non-comment glyphs do (the approval card's ">=50", the panel's "<= 64.0 MB").
+// Removing that band from the class must make these rows fail, which is AC#3's
+// reverse proof: the seed is caught by the new band, not by a neighbouring one.
+//
+// The negative rows are the gaps the approval did NOT close, recorded so a
+// later reader cannot mistake them for coverage: U+2192 and U+21D2 (arrow band)
+// and U+2460/U+2461 (circled numbers) are still unscanned, which is why the
+// plan-literal blast radius (141 lines) and the shipped one (9) differ by the
+// 78 comment lines Q-46(c) exempts plus these bands nobody authorised.
+func TestBan8MathBandAndRemainingGaps(t *testing.T) {
+	cases := []struct {
+		name      string
+		glyph     string
+		wantFired bool
+	}{
+		{"U+2265 greater-or-equal, band added by Q-46(c)", "\u2265", true},
+		{"U+2264 less-or-equal, band added by Q-46(c)", "\u2264", true},
+		{"U+2229 intersection, band added by Q-46(c)", "\u2229", true},
+		{"U+2212 minus sign, band added by Q-46(c)", "\u2212", true},
+		{"U+2713 check, pre-existing U+2600-U+27BF band", "\u2713", true},
+		{"U+1F600 emoji, pre-existing U+1F000-U+1FAFF band", "\U0001F600", true},
+		{"U+FE0F variation selector, pre-existing", "\uFE0F", true},
+		{"U+2192 right arrow, gap kept", "\u2192", false},
+		{"U+21D2 rightdouble arrow, gap kept", "\u21D2", false},
+		{"U+2500 box drawing, gap kept", "\u2500", false},
+		{"U+2460 circled one, gap kept", "\u2460", false},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			root := t.TempDir()
+			seedFile(t, root, "tools/d22scan/allowlist.txt", "# empty\n")
+			seedFile(t, root, "internal/ok/glyph.go", "package ok\n\nconst s = \"value "+tc.glyph+" here\"\n")
+			findings, err := Scan(root)
+			if err != nil {
+				t.Fatal(err)
+			}
+			fired := false
+			for _, f := range findings {
+				if f.Ban != "emoji" {
+					t.Errorf("unexpected non-emoji finding: %s", f.String())
+					continue
+				}
+				if strings.HasSuffix(filepath.ToSlash(f.Path), "internal/ok/glyph.go") {
+					fired = true
+				}
+			}
+			if fired != tc.wantFired {
+				t.Errorf("U+%X in a string literal: wantFired=%v got %v (findings %v)", []rune(tc.glyph)[0], tc.wantFired, fired, findings)
+			}
+		})
+	}
+}
+
+// TestBan8CommentExemptionInGoSources is the reading Q-46(c) was signed for,
+// and the reason it is not decoration: the SAME glyph in the SAME file goes red
+// as a string and green as a comment. Every exempt row here was a finding on
+// HEAD before ticket 141 (measured: 78 such lines in 35 files under internal/
+// and cmd/ at the plan-literal range), so deleting the exemption re-drives this
+// test red rather than leaving it vacuously true.
+//
+// The rows that must STAY red are the half that keeps the gate honest: a raw
+// string whose SQL `--` prose looks like a comment (the exact shape of
+// internal/memory/schema.go:29, which the owner ruled a violation, not an
+// exemption), a string sharing a line with a comment, and an unparseable .go
+// file, where failing to locate the comments buys no exemption at all.
+func TestBan8CommentExemptionInGoSources(t *testing.T) {
+	cases := []struct {
+		name         string
+		src          string
+		wantFindings int
+	}{
+		{
+			name:         "line comment",
+			src:          "package ok\n\n// a verdict reads \u2713 here\nfunc f() {}\n",
+			wantFindings: 0,
+		},
+		{
+			name:         "doc comment above a declaration",
+			src:          "package ok\n\n// F returns \u2265 when satisfied.\nfunc F() {}\n",
+			wantFindings: 0,
+		},
+		{
+			name:         "one-line block comment",
+			src:          "package ok\n\nfunc f() { /* \u2192 and \u2264 */ }\n",
+			wantFindings: 0,
+		},
+		{
+			name:         "multi-line block comment, glyph on a middle line",
+			src:          "package ok\n\n/*\nheader\nline with \u2229 in the middle\nfooter\n*/\nfunc f() {}\n",
+			wantFindings: 0,
+		},
+		{
+			name:         "trailing comment after clean code",
+			src:          "package ok\n\nvar x = 1 // \u2713\n",
+			wantFindings: 0,
+		},
+		{
+			name:         "string on the same line as a trailing comment",
+			src:          "package ok\n\nvar x = \"\u2713\" // \u2713\n",
+			wantFindings: 1,
+		},
+		{
+			name:         "raw string that reads as a SQL comment",
+			src:          "package ok\n\nconst ddl = `-- L1 slot\uFF0c \u2264 20 xing\nCREATE TABLE t (id INTEGER);\n`\n",
+			wantFindings: 1,
+		},
+		{
+			name:         "interpreted string containing a comment marker",
+			src:          "package ok\n\nconst url = \"http://example.invalid/x\u2713\"\n",
+			wantFindings: 1,
+		},
+		{
+			name:         "glyph inside a comment AND inside code in one block comment",
+			src:          "package ok\n\n/*\nprose \u2713\n*/\nconst s = \"\u2713\"\n",
+			wantFindings: 1,
+		},
+		{
+			name:         "unparseable file gets no exemption at all",
+			src:          "package ok\n\nfunc broken( {\n// \u2713\n\nconst s = \"\u2713\"\n",
+			wantFindings: 2,
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			root := t.TempDir()
+			seedFile(t, root, "tools/d22scan/allowlist.txt", "# empty\n")
+			seedFile(t, root, "internal/ok/case.go", tc.src)
+			findings, err := Scan(root)
+			if err != nil {
+				t.Fatal(err)
+			}
+			n := 0
+			for _, f := range findings {
+				if f.Ban == "unparseable" {
+					// walkGo reports a .go file it cannot parse under its own
+					// ban; this fixture has exactly one such row, and it is the
+					// point of that row, not noise.
+					continue
+				}
+				if f.Ban != "emoji" {
+					t.Errorf("unexpected non-emoji finding: %s", f.String())
+					continue
+				}
+				n++
+			}
+			if n != tc.wantFindings {
+				t.Errorf("ban #8 fired %d time(s), want %d for src %q", n, tc.wantFindings, tc.src)
+			}
+		})
+	}
+}
+
+// TestBan8CommentExemptionInTextScopes is the same split for the two scopes that
+// are not Go: design/ (all text files) and frontend/ (every file). It is pinned
+// separately because the non-Go classifier is a different rule with a different
+// failure mode - main.go's textCommentRanges only exempts a line from a marker
+// its own indentation-free prefix carries, so `#` (a markdown heading, and the
+// seed glyph of TestScanDetectsAllSeededViolations) and `--` (SQL) are NOT
+// markers, and code after a closed block comment is still examined.
+//
+// The frontend rows matter for ticket 141's acceptance criterion 3: 19 of the
+// 25 glyph lines the widened ban walks there are box-drawing section dividers
+// and they must read green, while the 6 that carry U+2264/U+2212 in rendered JSX
+// and fixture text must read red.
+func TestBan8CommentExemptionInTextScopes(t *testing.T) {
+	cases := []struct {
+		name         string
+		rel          string
+		src          string
+		wantFindings int
+	}{
+		{
+			// U+2713 and U+2264 are chosen over the U+2500 these files really
+			// carry: box drawing sits in a band the approval did NOT add, so a
+			// divider seed here would pass whether or not the exemption works.
+			name:         "tsx line comment",
+			rel:          "frontend/src/a.tsx",
+			src:          "// section \u2713\u2713\u2713\nexport const A = () => null;\n",
+			wantFindings: 0,
+		},
+		{
+			name:         "tsx block divider, glyph on the closing line",
+			rel:          "frontend/src/b.tsx",
+			src:          "/* \u2713\u2713\u2713\n * more \u2264\u2264\u2264\n */\nexport const B = () => null;\n",
+			wantFindings: 0,
+		},
+		{
+			name:         "html comment",
+			rel:          "frontend/fixtures/c.html",
+			src:          "<!-- \u2264 not rendered -->\n<div>ok</div>\n",
+			wantFindings: 0,
+		},
+		{
+			name:         "css comment",
+			rel:          "frontend/src/d.css",
+			src:          "/* \u2713 divider */\n.a { color: red }\n",
+			wantFindings: 0,
+		},
+		{
+			name:         "JSX text node with a math glyph",
+			rel:          "frontend/src/e.tsx",
+			src:          "export const E = () => <span>\u2264 64.0 MB</span>;\n",
+			wantFindings: 1,
+		},
+		{
+			name:         "code after a closed block comment on the same line",
+			rel:          "frontend/src/f.tsx",
+			src:          "/* \u2713 */ export const F = \"\u2713\";\n",
+			wantFindings: 1,
+		},
+		{
+			name:         "markdown heading is not a comment",
+			rel:          "design/screens/g.md",
+			src:          "# Ball \u2713\n",
+			wantFindings: 1,
+		},
+		{
+			name:         "SQL-style dash is not a comment in a text scope",
+			rel:          "design/screens/h.txt",
+			src:          "-- \u2713\n",
+			wantFindings: 1,
+		},
+		{
+			name:         "extension-less file, plain text line",
+			rel:          "frontend/Procfile",
+			src:          "web: node server.js \u2713\n",
+			wantFindings: 1,
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			root := t.TempDir()
+			seedFile(t, root, "tools/d22scan/allowlist.txt", "# empty\n")
+			seedFile(t, root, "internal/ok/ok.go", "package ok\n")
+			seedFile(t, root, "cmd/wisp/main.go", "package main\n\nfunc main() {}\n")
+			seedFile(t, root, tc.rel, tc.src)
+			findings, err := Scan(root)
+			if err != nil {
+				t.Fatal(err)
+			}
+			n := 0
+			for _, f := range findings {
+				if f.Ban != "emoji" {
+					t.Errorf("unexpected non-emoji finding: %s", f.String())
+					continue
+				}
+				if !strings.HasSuffix(f.Path, tc.rel) {
+					t.Errorf("finding %s is not in the seeded file %s", f.Path, tc.rel)
+				}
+				n++
+			}
+			if n != tc.wantFindings {
+				t.Errorf("ban #8 fired %d time(s) in %s, want %d for src %q", n, tc.rel, tc.wantFindings, tc.src)
+			}
+		})
 	}
 }
 
@@ -827,8 +1098,9 @@ func TestRealRepoBan8CoversFrontendTreeAtBan6sCount(t *testing.T) {
 // drops .mjs, extension-less files and dotfiles - measured 5 of the 37 tracked
 // files in frontend/ today, including all three scripts/*.mjs, i.e. the
 // vendoring tooling R18 exists to police. Every class below therefore carries
-// the glyph in a COMMENT, not a string literal, because ban #8's semantics
-// (walkEmoji's first bullet) already count prose.
+// the glyph as plain text, not in a comment, because Q-46(c) (ticket 141) made
+// walkEmoji's comment rule exempt prose; a comment seed would prove coverage of
+// nothing.
 //
 // The `.md` row answers the ticket's third question explicitly: yes, non-.go
 // text is scanned, and the reason is that the panel's most likely emoji are UI
@@ -855,10 +1127,10 @@ func TestBan8FrontendScopeIsNotNarrowedByAnExtensionFilter(t *testing.T) {
 		{"frontend/Procfile", "no extension at all, also scanned"},
 	}
 	for _, c := range cases {
-		seedFile(t, root, c.rel, "// ready \u2713 in a comment\n")
+		seedFile(t, root, c.rel, "ready \u2713\n")
 	}
-	seedFile(t, root, "frontend/node_modules/pk/index.tsx", "// ready \u2713\n")
-	seedFile(t, root, "frontend/testdata/golden.tsx", "// ready \u2713\n")
+	seedFile(t, root, "frontend/node_modules/pk/index.tsx", "ready \u2713\n")
+	seedFile(t, root, "frontend/testdata/golden.tsx", "ready \u2713\n")
 
 	s := scanFixture(t, root)
 	if got := s.emojiSeen["frontend/"]; got != len(cases) {
