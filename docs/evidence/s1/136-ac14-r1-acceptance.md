@@ -183,3 +183,59 @@ docs/evidence/s1/136-ac14-r1-acceptance.md
 ② "分不开 `:143` 与 `:208`"的**原因串同一**这条证据（上面第 2 点）在 `A182③` 与实现件 §1.3 里都没有，
 本程补上——它把"只剩非单调阈值一条路"从**论述**变成了**有串的读数**。
 
+**§3 的 commit 回显**：
+
+```
+$ git log --oneline -1
+ffe5731 accept(136 AC#14 r1 §3): 复核"三处同形"——改前 if !rep.Pass 原始计数 4（第 4 枚＝健康窗），三枚 disclosure 形归类逐名给；"只红一处"不可满足成立，A182③ 确认并补两数
+$ git show --name-only HEAD
+docs/evidence/s1/136-ac14-r1-acceptance.md
+```
+
+---
+
+## §4 判据④ 承重判定（真摘真跑，全在仓外快照）—— 〔独立复现〕**成立**
+
+**口径**：五发变异，每发都是 `cp -r snap-post mut/<名>`（`snap-post`＝`git archive aef82f5` 的纯净快照）→
+`sed` 改那**一行** → `grep -n`/`sed -n` 印出改后那行（下表"落地凭据"）→ `go build ./...` rc=0 →
+`go test -count=1 -v ./internal/observe/`。**一律 `-count=1`，四数里的顶层数＝71（不带 ×2 乘子）**。
+跟踪树在五发里都未参与（每发跑完 `git status --porcelain internal/observe` 复核 0 行）。
+
+| 发 | 摘/改了什么 | 落地凭据（改后盘上现量） | build | 四数（RUN/PASS/FAIL/SKIP） | 红名（逐名） |
+| --- | --- | --- | --- | --- | --- |
+| **M1 摘门行本体** | 删 `sampler.go:529` `rep.Verdicts = buildSettleVerdicts(*rep)`（构造点） | 文件 597→**596** 行；`grep -n buildSettleVerdicts` ⇒ **只剩 3 处注释（`:460`/`:540`/`:557`）＋ `:563` 函数定义，构造点 0** | rc=0 | **71/67/4/0**（去重 71） | `TestCheckSettleHalfTheReadsFailedReportsItsLoss`、`TestSettleCoverageRowExistsAndPassesWhenFullyMeasured`、`TestSettleCoverageRowSaysNotPassWhenHalfTheReadsFailed`、`TestSettleCoverageRowSeparatesUnmeasuredFromFullyMeasured` ⇒ **4 枚，与实现件 §4-M1 逐名同** |
+| **M2 让门行不看丢读** | `:565` `covered := rep.SampleErrors == 0 && len(rep.Samples) > 0` → `covered := len(rep.Samples) > 0` | `sed -n '565p'` ⇒ `covered := len(rep.Samples) > 0` | rc=0 | **71/69/2/0** | `TestCheckSettleHalfTheReadsFailedReportsItsLoss`、`TestSettleCoverageRowSaysNotPassWhenHalfTheReadsFailed` ⇒ **2 枚，与实现件 §4-M2 逐名同** |
+| **M3a 单点回退（gate 仍 false）** | `:537` `rep.Pass = foldSettlePass(memOK && backInTime && releaseOK, rep.Verdicts)` → `rep.Pass = memOK && backInTime && releaseOK`；`:556` 保持 `= false` | `sed -n '537p;556p'` ⇒ 前者已回退、后者仍 `false` | rc=0 | **71/71/0/0 ⇒ 全绿** | 无 |
+| **M3a′ 两味一起动（gate=true 上重做 M3a）** | 同一处回退 **＋** `:556` = `true` | `sed -n '537p;556p'` ⇒ 回退行 ＋ `const settleCoverageRowGates = true` | rc=0 | **71/68/3/0** | `TestCheckSettleHalfTheReadsFailedReportsItsLoss`、`TestSettleCoverageRowSaysNotPassWhenHalfTheReadsFailed`、`TestSettleReportPassNeverContradictsItsGateRows` ⇒ **3 枚，与实现件 §4-M3b 逐名同** |
+| **M4 摘"红句点名"（本程加的一发，简报未要求）** | `:570` 失败分支 note 串里 `sample_errors=%d` → `dropped=%d` | `sed -n '570p'` ⇒ `note = fmt.Sprintf("fail-closed disclosure: dropped=%d of %d reads taken (…` | rc=0 | **71/69/2/0** | `TestCheckSettleHalfTheReadsFailedReportsItsLoss`（站点 `coverage_136_test.go:232`）、`TestSettleCoverageRowSaysNotPassWhenHalfTheReadsFailed`（站点 `gate_136_test.go:215`） |
+
+**五发的 SKIP 全 0、名册逐名守恒（71 枚一枚不少）** ⇒ 没有任何一发用 SKIP 或"用例变少"换色。
+`grep -c "precondition broken: only"` 于五发日志 ⇒ **全 0**（AC#15 那枚已知 flake 在本程 5 发变异 ＋ §1 两发 ＋ §2 一发里都没响；
+如实登记：**没响**，不裁它已修）。
+
+### 4.1 承重结论（按"摘掉任意一味，是否存在一发变异从此打不红"逐味判）
+
+| 味（`sampler.go` 落地点） | 判 | 依据读数 |
+| --- | --- | --- |
+| 门行**构造点** `:529` | **承重** | M1 ⇒ 立刻红 4 枚（含 AC#14 判据② 要的钉子 `TestCheckSettleHalfTheReadsFailedReportsItsLoss`） |
+| 门行**看丢读**那半条件 `:565` `SampleErrors == 0` | **承重** | M2 ⇒ 红 2 枚；且红因正是"行说它测够了"那句自陈，方向对 |
+| 折叠**调用点** `:537` | **终态承重、当前形状下按定义不承重** | M3a′（gate=true）⇒ 红 3 枚 ⇒ **翻布尔后它立刻变承重且有钉子看着**；M3a（gate=false）⇒ 0 红 |
+| 开关常量 `:556` ＋ 行的 `Gate: settleCoverageRowGates` 接线 `:580` | **承重** | §2 只翻 `:556` 一字节 ⇒ 行为改变（红 2 枚），名册不漂 ⇒ 这根线是活的，不是死常量 |
+| 红句**点名 `sample_errors`** `:570` | **承重**（本程新增证据） | M4 ⇒ 红 2 枚，站点逐名可查 ⇒ 票面 `:285` 那一维有钉 |
+| 声明块注释改写（实现件改动 #2，`:464-467`） | **按定义装饰**，本程**同意实现件的自述** | 它是注释，不参与任何断言；实现件 §4.1 末行已自报"按定义装饰，不参与任何读数"，本程不重复记账 |
+
+**⚠ 本程按票面 `A182⑧` 预先挡住的那条误判，这里明确不犯**：M3a（gate=false 撤折叠）⇒ 71 枚全绿，
+**不是**实现件的缺陷。`settleCoverageRowGates=false` ⇒ 门行 `Gate=false` ⇒ 折叠**按定义**永不否决 ⇒
+"撤了没反应"是**编排者暂不批 Gate 的后果**。本程**没有**拿它判"装饰"而退回，而是按简报要求
+**在 `gate=true` 的快照上重做同一发（M3a′）**：那一发红 3 枚 ⇒ **折叠那行在终态里不是装饰**。
+
+### 4.2 关于"不许要求同一发变异里新加那支先响"
+
+本程在 M1/M2 里没有要求"新加那支先响"作判据：M1 的红 4 枚里既有既有钉（`:226` 那一族）也有新探针，
+M2 的 2 枚同理——**承重判据是"摘掉后存在一发变异打不红"，本程五发都取到了红，唯 M3a 那一发的"不红"已由 M3a′ 补掉**。
+⇒ 判据④ **成立**，实现件 §4 的六发本程独立复现到**逐名＋逐站点同**：M1（红 4，站点 `coverage:226`／`gate:162`／`gate:207`／`gate:245`）、
+M2（红 2，站点 `coverage:229`／`gate:209`）、M3a（全绿）、M3b＝本程 M3a′（红 3，站点 `coverage:236`／`gate:226`／`gate:325`）、
+S1＝本程 §2 的翻布尔（红 2，站点 `coverage:144`／`coverage:281`）；
+**正向对照**那一发本程未单独重跑，它就是 §1 在跟踪树（＝`aef82f5` 同码）上取的 **142/142/0/0**——
+形状同一（未改动的码 ⇒ 全绿），本程以此为准，**不另立一发冒充独立复现**。
+
