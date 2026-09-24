@@ -112,3 +112,59 @@ internal/observe/sampler_settle_coverage_136_test.go
 凭据文件：`D:\tmp\wisp141gate\logs\post-v.txt`。
 
 **档位**：判据① 与 判据② 本程**自量**（基线名册、改后名册、四数、panic 两味全出自本程在跟踪树 `5a946d3` 上自己跑的读数）。
+
+---
+
+## §2 两张名册复算（翻布尔后红的确切是哪几枚 / (B) 里有没有意外变红）
+
+**为什么要复算**：本程改写的是终裁表 §2(A) 点名那两枚；要证"改对了、不多不少"，最硬的一发是把
+**前一模的状态**（gate=false、那两枚断言**还没改写**的树）单独翻布尔，看会红的恰好是不是那两枚。
+快照 `git archive aef82f5`（前一程实现件那棵树，`:556=false`、`:143`/`:280` 仍是旧披露腿）→
+仓外 `D:\tmp\wisp141gate\snap-pre`，**只 `sed -i '556s/false/true/'`，两枚断言一字未动**。
+
+**先证落地再读数**：`grep -n "const settleCoverageRowGates"` ⇒ `556: ... = true`；`go build ./...` rc=0；
+`go test -count=1 -v ./internal/observe/`（顶层 71，不带 ×2 乘子）⇒ **RUN=71 / PASS=69 / FAIL=2 / SKIP=0**。
+
+**(A) 红名册恰好 2 枚（与终裁表 §2(A) 逐名同）**：
+
+| # | 红名（逐名） | 站点 |
+| --- | --- | --- |
+| A1 | `TestCheckSettleSingleTrustworthyReadReportsItsLoss` | `sampler_settle_coverage_136_test.go:144` |
+| A2 | `TestCheckSettleZeroFootprintDropsAreCountedToo` | `sampler_settle_coverage_136_test.go:281` |
+
+⇒ **本程改写的正是这两枚**（§1.2 的两处），一枚不多一枚不少。**不是"红了一片"**。
+
+**(B) 点名必须仍绿的 9 枚 —— 本程实测全部仍绿**（FAIL 总数＝2 且都是 (A)，按排除法 (B) 全体绿；
+两枚关键再逐名点名）：`TestCheckSettleFullyMeasuredWindowReportsNoLoss`（健康窗，翻 Gate 后必须仍绿，实测 `--- PASS`）、
+`TestCheckSettleHalfTheReadsFailedReportsItsLoss`（`:208` 已改写腿，实测 `--- PASS`）。另 60 枚与 6 枚 settle/gate 无关的顶层
+用例照常全绿，`SKIP=0`、真 `^panic:=0`。**没有任何 (B) 里的枚意外变红。**
+凭据文件：`D:\tmp\wisp141gate\logs\fliponly-v.txt`。**档位：〔本程自量〕。**
+
+---
+
+## §3 判据③ `M1` 摘门行 ⇒ 钉子必须转红（复核终裁表自报的"4 枚"）
+
+**这一发打在**本程**改后的树**（`git archive HEAD`＝`52191ce` → 仓外 `snap-m1`；`:556` 已是 true、两枚断言已改写），
+落终裁表 §4 同一发变异：删掉 `sampler.go:529` 那行 `rep.Verdicts = buildSettleVerdicts(*rep)`（门行构造点）。
+
+**先证落地再读数**：改后 `grep -n buildSettleVerdicts internal/observe/sampler.go` ⇒ 只剩 `:460`/`:540`/`:557`
+三处注释 ＋ `:563` 函数定义，**构造点 0**；文件 597→**596** 行；`go build ./...` rc=0。
+`go test -count=1 -v ./internal/observe/` ⇒ **RUN=71 / PASS=65 / FAIL=6 / SKIP=0**，顶层 71 守恒、真 `^panic:=0`。
+
+**M1 红名册（6 枚，逐名）**：
+
+| # | 红名 | 是不是本程新引入的消费者 |
+| --- | --- | --- |
+| 1 | `TestCheckSettleSingleTrustworthyReadReportsItsLoss` | **是**——本程 §1.2 改写的两枚之一 |
+| 2 | `TestCheckSettleHalfTheReadsFailedReportsItsLoss` | 否（前一程 `:208` 腿） |
+| 3 | `TestCheckSettleZeroFootprintDropsAreCountedToo` | **是**——本程 §1.2 改写的两枚之一 |
+| 4 | `TestSettleCoverageRowExistsAndPassesWhenFullyMeasured` | 否（前一程 gate 探针） |
+| 5 | `TestSettleCoverageRowSaysNotPassWhenHalfTheReadsFailed` | 否（前一程 gate 探针） |
+| 6 | `TestSettleCoverageRowSeparatesUnmeasuredFromFullyMeasured` | 否（前一程 gate 探针） |
+
+**复核结论**：终裁表 §4-M1 自报红 **4 枚**（= 本表第 2/4/5/6 枚），**本程改后为 6 枚**——差的两枚正是
+本程 §1.2 改写的那两枚断言。**这是更强不是更弱**：那两枚从"只核 `rep.Pass`"改成"核门行存在 + 门行自陈不 pass"后，
+把门行摘掉时它们也会转红（`coverage == nil ⇒ t.Fatalf`）。判据③"摘门行⇒钉子必须转红"**成立**，
+且本程的改写让"钉子的覆盖面"从 4 增到 6。健康窗 `TestCheckSettleFullyMeasuredWindowReportsNoLoss` **未被扫进红名**
+（它不核行、只核 `rep.Pass`，而 nil 门行经 `foldSettlePass` 不否决 ⇒ 仍绿）。凭据：`D:\tmp\wisp141gate\logs\m1-v.txt`。
+**档位：〔本程自量〕。**
