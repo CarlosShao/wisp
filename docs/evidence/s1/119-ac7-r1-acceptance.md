@@ -667,6 +667,25 @@ docker volume  wispacc119-gobuild          （GOCACHE，新建空卷起步；模
 别人的证据文件——**一枚未碰**；`cmd/wisp/**`（`worker-ticket128-ac4` 在飞）**一枚未写、未跑整树测试**。
 本程未读过、也未写过任何真实凭据值（容器 `GOPROXY=off`，无网络动作）。
 
+### 8.5 本文件的 commit 账（`git log --format=… -- <本文件>` 现量，`--name-only` 逐枚复算）
+
+| 号 | 时刻 | 落的节 | `git show --name-only` 的文件清单 |
+|---|---|---|---|
+| `27a6f90` | 17:46 | §0 | 只有本文件 |
+| `62088ce` | 17:48 | §1 | 只有本文件 |
+| `d0f97d3` | 17:49 | §2 | 只有本文件 |
+| `67704c7` | 17:51 | §3 | 只有本文件 |
+| `33af710` | 17:54 | §4 ＋ §5 | 只有本文件 |
+| `fa4ee80` | 17:57 | §6 ＋ §7 ＋ §8 | 只有本文件 |
+| （本行所属那枚） | — | §8.5 | 只有本文件；号由 `git log -1` 现量，不预写 |
+
+复算式（下一位不必信上面这张表）：
+`git log --format="%h %ad %s" --date=format:"%H:%M" --reverse -- docs/evidence/s1/119-ac7-r1-acceptance.md`
+＋ 对每枚 `git show --name-only --format="" <c>`。
+本表**收尾时** HEAD 上还有别的程的 commit 在落（`c2fa2e9`/`79cfa1d` 那批 128 与编排者的），
+`git diff --name-only 2956897..HEAD -- internal/winsec/` 我已复量为**空** ⇒ 被测对象到收尾一字未动。
+
+
 
 ---
 
