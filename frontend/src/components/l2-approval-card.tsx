@@ -158,13 +158,6 @@ export function L2ApprovalCard({
         >
           拒绝
         </Button>
-        <Button
-          className="rounded-control bg-accent text-[var(--accent-fg)] hover:bg-accent-hover"
-          onClick={() => send("grant")}
-          size="sm"
-        >
-          本次允许
-        </Button>
       </CardFooter>
     </Card>
   );
