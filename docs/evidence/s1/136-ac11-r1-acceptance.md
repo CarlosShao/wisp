@@ -527,6 +527,62 @@ PROBE-v missing-at-RosterReport-read   tool-exec-noop     = 12
 
 ---
 
+## §6 回执链（逐枚现量；读者可用同两条命令复算）
+
+本文件每一节各占一枚 commit，回执因"一枚 commit 装不下自己的号"而随下一枚落盘。
+§0 的回执在 §0.7（`2546b76`）、§4 的回执在 §4.7（`4666fe0`）。这里补 §1+§2 那一枚与更正那一枚：
+
+```
+$ git log --oneline -1 e2bb38d
+e2bb38d evidence(136,AC#11 r1 终裁 §1+§2): 改前 2/30、改后 0/30，两批各 30 发逐名读数入库（+§4 回执）
+
+$ git show --name-only --format='%h %s' e2bb38d
+e2bb38d evidence(136,AC#11 r1 终裁 §1+§2): 改前 2/30、改后 0/30，两批各 30 发逐名读数入库（+§4 回执）
+
+docs/evidence/s1/136-ac11-r1-acceptance.md
+
+$ git log --oneline -1 941acf3
+941acf3 evidence(136,AC#11 r1): 补 §4.7 回执 + 自报上一枚 message 跑在内容前面
+
+$ git show --name-only --format='%h %s' 941acf3
+941acf3 evidence(136,AC#11 r1): 补 §4.7 回执 + 自报上一枚 message 跑在内容前面
+
+docs/evidence/s1/136-ac11-r1-acceptance.md
+```
+
+> 本节（§3＋§5＋总判＋本回执链）自己那枚 commit 的回执**只能出现在下一枚里**：
+> 复算不必等我贴 —— `git log --oneline -6` 逐枚再跑上面那两条命令即可，
+> 预期：这一路每枚 commit 的文件清单**只有** `docs/evidence/s1/136-ac11-r1-acceptance.md` 一枚。
+
+---
+
+
+### 6.1 最后一段（§3＋§5＋总判＋本链）那枚 commit 的回执（现量）
+
+```
+$ git log --oneline -1 869206b
+869206b evidence(136,AC#11 r1 终裁 §3+§5+总判): 反向判据 6/6 红在超时诊断、独立 500 发探针同向、四条全成立
+
+$ git show --name-only --format='%h %s' 869206b
+869206b evidence(136,AC#11 r1 终裁 §3+§5+总判): 反向判据 6/6 红在超时诊断、独立 500 发探针同向、四条全成立
+
+docs/evidence/s1/136-ac11-r1-acceptance.md
+```
+
+（本文件到此为止的每一枚 commit 都只带这一枚文件；本枚 §6.1 的回执由下一枚承载 —— 复算不必等我贴：`git log --oneline -8` 再逐枚跑上面两条命令。）
+
+### 6.2 凭据卫生自扫（按**词**扫，不按长度；命中按形状判）
+
+```
+$ grep -nEi "ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[0-9A-Z]{16}|-----BEGIN|xoxb-|Bearer [A-Za-z0-9._-]{20,}|password[[:space:]]*[:=]|secret[[:space:]]*[:=]" \n      docs/evidence/s1/136-ac11-r1-acceptance.md
+  SCAN-CLEAN: 0 hits
+```
+
+- 哪一次扫描＋当时文件多少行：本程 15:0x 前后那一轮 `grep`，**当时该文件 620 行**（自指坑：行数会随我补 §6.1/§6.2 再涨，所以这一句是**那次**扫描的读数，不是这份文件现在的长度）。
+- 本表通篇只引用 sha、路径、进程名、容器名与 `databaseId`，**未写入任何密钥值**；docker 输出里的端口映射是本机常驻服务的公开端口，不是凭据。
+
+---
+
 ## 总判
 
 **逐条对上票面 AC#11 的结案判据：**
@@ -586,35 +642,4 @@ PROBE-v missing-at-RosterReport-read   tool-exec-noop     = 12
 
 ---
 
-## §6 回执链（逐枚现量；读者可用同两条命令复算）
-
-本文件每一节各占一枚 commit，回执因"一枚 commit 装不下自己的号"而随下一枚落盘。
-§0 的回执在 §0.7（`2546b76`）、§4 的回执在 §4.7（`4666fe0`）。这里补 §1+§2 那一枚与更正那一枚：
-
-```
-$ git log --oneline -1 e2bb38d
-e2bb38d evidence(136,AC#11 r1 终裁 §1+§2): 改前 2/30、改后 0/30，两批各 30 发逐名读数入库（+§4 回执）
-
-$ git show --name-only --format='%h %s' e2bb38d
-e2bb38d evidence(136,AC#11 r1 终裁 §1+§2): 改前 2/30、改后 0/30，两批各 30 发逐名读数入库（+§4 回执）
-
-docs/evidence/s1/136-ac11-r1-acceptance.md
-
-$ git log --oneline -1 941acf3
-941acf3 evidence(136,AC#11 r1): 补 §4.7 回执 + 自报上一枚 message 跑在内容前面
-
-$ git show --name-only --format='%h %s' 941acf3
-941acf3 evidence(136,AC#11 r1): 补 §4.7 回执 + 自报上一枚 message 跑在内容前面
-
-docs/evidence/s1/136-ac11-r1-acceptance.md
-```
-
-> 本节（§3＋§5＋总判＋本回执链）自己那枚 commit 的回执**只能出现在下一枚里**：
-> 复算不必等我贴 —— `git log --oneline -6` 逐枚再跑上面那两条命令即可，
-> 预期：这一路每枚 commit 的文件清单**只有** `docs/evidence/s1/136-ac11-r1-acceptance.md` 一枚。
-
----
-
 next=（本程交件后无待补；若要把 §3 再扩两枚变异或去 linux 容器复量，须另派）
-
-
