@@ -211,3 +211,41 @@ CLI 出线是**信封**：顶层 `pass`/`mode`/`settle`，`SettleReport` 嵌在 
   ④ **现已全 0/exit 0 通过** ⇒ `52191ce` 无需回退。
 
 **档位：〔本程自量〕**，原始件留在 `D:\tmp\wisp141gate\readings\settle-1..6.json`（只建不删，可逐枚复算）。
+
+---
+
+## §5 判据⑤ 门禁全套（盘上现量，不抄任何转述）
+
+| 门 | 命令（本程自己跑，树＝HEAD `1e620d6`，含 `52191ce` 的翻转） | 读数 |
+| --- | --- | --- |
+| gofmt | `gofmt -l internal/observe` | **空输出 rc=0** |
+| gofumpt | `"$(go env GOPATH)/bin/gofumpt.exe" --version` → **`v0.12.0 (go1.27.1)`**（盘上现量：`D:\work\base\gopath\bin\gofumpt.exe`）；`gofumpt -l internal/observe` | 版本**对上报简报的 v0.12.0**、票面/旧报告里的 v0.7.0 是过期值 ✓；`-l` **空输出 rc=0** |
+| go vet | `go vet ./internal/observe/` | **rc=0** |
+| 构建 | `go build ./...`（含 `52191ce` 翻转后） | **rc=0** |
+| d22scan | `git archive HEAD` → 仓外 `D:\tmp\wisp141gate\snap-d22` → `sh scripts/d22scan.sh` | **rc=0**，`clean - no D22 ban violations`；正对照 `runtests.sh OK ... PASS=21 FAIL=0 SKIP=0 === RUN=31` |
+
+**d22scan 八 scope 命中数（本程从自己那发的 "live scope work" 行逐字取，不抄表）**：
+
+| scope | HEAD `1e620d6`（本程） | `aef82f5`（前一程/终裁表 §5 现量） | 判 |
+| --- | --- | --- | --- |
+| bans #1-5 internal/ | 203 | 203 | 平 |
+| bans #1-5 cmd/ | 22 | 22 | 平 |
+| ban #6 frontend/ | 40 | 40 | 平 |
+| ban #7 internal/tools/ | 18 | 18 | 平 |
+| ban #8 design/ | 16 | 16 | 平 |
+| ban #8 frontend/ | 40 | 40 | 平 |
+| **ban #8 internal/** | **405** | **405** | 平（本程只改**已在册**的两枚 `.go`，未新增文件、未新增 ban-#8 字符） |
+| ban #8 cmd/ | 39 | 39 | 平 |
+
+⇒ **八 scope 逐格不降**（本程改动对分母零影响：`sampler.go`/`sampler_settle_coverage_136_test.go` 早在 `aef82f5` 就被计入
+`ban #8 internal/=405`，本程**没往任一被改文件里加** ban-#8 禁段字符，命中文件数纹丝不动）。
+台账侧 `docs/reports/pending-and-issues.md`（本程读时其 `git log -1`＝**`5a946d3 09-24 20:03`**）最近两笔在册值是
+`:3923` 的 `…/390/37`（更早锚）与 `:4193` 的 `internal/ 392→397`——本程 405/39 高于二者；按终裁表 §5 立的"同一把尺两枚相邻快照"
+口径，本程的对照对象是 `aef82f5`=405/39，逐格相同 ⇒ **不降成立**，且**引这一判连锚一起引**。
+
+**"不许为变绿放宽断言/转 Skip/动阈值·golden"这一维，本程逐条自量**：
+新增 `t.Skip` = **0**（两枚改写腿无 Skip）；名册 `^--- SKIP`=**0**（§1.3）；
+`internal/observe/thresholds.go` 本程**零改动**（`git diff 1e620d6 aef82f5 -- internal/observe/thresholds.go` 空）；
+两枚被改断言是**收紧不是放宽**（各从 1 道 `if !rep.Pass` 换成 4 道更强的门行自陈钉）；
+写集恰两枚 `.go`（`git diff --numstat aef82f5..HEAD -- internal/observe/` ⇒ `sampler.go 1/1`＋`sampler_settle_coverage_136_test.go 52/4`）。
+**档位：〔本程自量〕。**
