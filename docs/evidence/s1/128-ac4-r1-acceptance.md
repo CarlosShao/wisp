@@ -420,7 +420,7 @@ docs/evidence/s1/128-ac4-r1-acceptance.md
 | 尺 | 读数 |
 |---|---|
 | 本程 diff 是否含 `run_test.go` / `run_mode101_test.go` / `internal/agent/approval/**` | **共享树里 `HEAD` 是动的**，所以两端钉死再数：`git diff --name-only c94927d..c23d825`（它 §6 那把尺用的就是这条区间，末端取它的交件枚）现量 **8 枚路径**（3 枚 `.scratch/wisp/issues/*` + 3 枚 `docs/evidence/s1/*` + `cmd/wisp/dataroot_128_test.go` + 2 枚 `docs/reports/*`，其中 119/HANDOVER/台账是兄弟程在这段区间里落的），对它点名的三类名字 `grep -Ec` = **0**；被验那一枚单独再数：`git show --name-only --format="" c2fa2e9` = **只有 `cmd/wisp/dataroot_128_test.go`**。（它 §6 写"现量 6 枚"，那是在它自己那一刻的 HEAD 上数的，量级差是兄弟程的 commit 挤进同一段区间，**不是它漏了东西**。） |
-| `internal/agent/approval/queue.go` 那个 300 秒 | 现量 `107: DefaultApprovalTimeout = 300 * time.Second`（**一字节未动**，且该文件不在上面那 10 枚里） |
+| `internal/agent/approval/queue.go` 那个 300 秒 | 现量 `107: DefaultApprovalTimeout = 300 * time.Second`（**一字节未动**，且该文件不在上面那 8 枚路径里） |
 | 那四枚用例在修后两形里的颜色 | G1（CI 形）与 G2（本机形）里各 **PASS=2 / FAIL=0**（count=2 => 各两遍）⇒ 它们没被改成 Skip、没被放宽（`t.Skip` 在 `dataroot_128_test.go` / `_windows_test.go` 现量 **0 / 0**） |
 | 它们的 runner 红与本枚变量共不共因 | **在这台机上不共因**：`WISP_ENV=test` 整包跑（G1）那四枚全绿；CI 原文里它们的红句是 `run_test.go:378: an unvetoed L1 window means EXECUTE, got: 审批超时（300 秒未确认）…` 与 `run_mode101_test.go:309`（配置里写着 `confirm_timeout_sec = 1` 却被默认值取代）=> 红因是**那四枚自己读不到自己写的 config**，与本票那枚 seam 无关。**但**：CI 那四条红的真实根因**不在本格判据里**，我只登记现象 + 一句要往下追的话（见 §9） |
 
@@ -555,7 +555,7 @@ docs/evidence/s1/128-ac4-r1-acceptance.md
 | `…\snap-mut-i-drop-pin` / `snap-mut-ii-drop-plant` / `snap-mut-iv-both-removed` | §3 三发变异树 | 各 1 行 / 1 行 / 2 行摘除，均只动 `dataroot_128_test.go` |
 | `…\snap-post-mut-base` / `snap-pre-mut-base` | §5 单点回退树（`doctor.go:261` -> `base = "."`） | 各 1 行 |
 | `…\snap-mut-v-drop-selfcheck`、`snap-W1-selfcheck-kept`、`snap-W2-selfcheck-dropped`、`snap-W3-no-seam-rebind` | §8 承重那五发 | 见 §8 表 |
-| `…\*.log` + `…\*.txt` + `…\*.names` | 全部原始读数：P1/P2、M-*（8 发变异）、G1–G6（6 发整包）、S1/S2（CI 同步形）、D-scan-post、VET-*、N-*/K-* 骨架与名册 | 主目录 30 枚文件、**281 MB** |
+| `…\*.log` + `…\*.txt` + `…\*.names` | 全部原始读数：P1/P2、M-*（§8 那几发变异）、G1–G7（整包，含交回前复跑那发）、S1/S2（CI 同步形）、D-scan-post、VET-*、N-*/K-* 骨架与名册、HEAD-/WT-lines.txt（结构修复那次的内容守恒尺） | **收尾现量**（`ls -1 \| wc -l`）：目录条目 **55** = **11 棵快照树 + 32 枚 `.log` + 12 枚骨架/名册件**，总体积 **441 MB**（`du -sh`） |
 | `D:\tmp\wt-acc128-ac4-r1-ref\` | `gh-selffetch.txt`（421465 字节，我自己取的 CI 原文）+ `gh-selffetch.err`（0 字节）+ `blob_test.go`（`c2fa2e9` 版测试文件原件，438 行） | **436 KB** |
 
 ⇒ **可重跑性**：本表每一枚读数都能从 `snap-*` 加命令原文重算；快照在不在，决定的是这张表的档位（**删了快照，本表从〔独立复现〕掉回〔仅自述〕**）。
@@ -584,5 +584,18 @@ docs/evidence/s1/128-ac4-r1-acceptance.md
 | §9-§10 | `d484edf` | — |
 | §7.1 口径更正 | `9fcb2ed` | 更正"两版数不同口径"那句 |
 | 结构修复（本次这一枚） | 由 `git log --oneline -1` 现量 | **修的是我自己造成的两件事**：(a) 逐节 Edit 的锚点选在已挪过位置的文本上 -> §6 一度落到 §10 之后（现已按 0-10 顺序排回，内容零增删）；(b) 一枚 Edit 的 `new_string` 被我发到一半就截断 -> §10.3 那张账表被换成残句（现已补回并顺手写全） |
+
+**10.5 交回前复跑一发（纪律：状态断言会过期；也为了排掉"G1/G2 当时是两枚后台并发跑的"这一枚方法论阴影）**
+
+| 项 | 时刻（`date` 现量） | 读数 |
+|---|---|---|
+| **G7** = G1 同法同树**单独**跑：`WISP_ENV=test PATH="<snap-post>/third_party/sherpa-onnx:$PATH" go test -count=2 -v ./cmd/wisp/` | `18:27:57` 起、`18:29:59` 止 | 包级 **rc=0**；`=== RUN=202`、`--- PASS=108+94=202`、`--- FAIL=0`、`--- SKIP=0`、`panic` 命中 **0**（日志 `G7-post-cishape-recheck.log`） |
+| 被验那枚用例逐名 | 同发 | 两遍都是 `--- PASS: TestAC2EveryLeg...128` + 四枚子用例 + `resolveSecretLayout` 全 PASS，`FAIL/SKIP` 各 0 |
+| owner 两棵真实目录（`%APPDATA%\wisp`、`wisp-dev`） | `18:21:59` | 均 **0 条目** |
+| 被验那枚码是否仍在历史里（本程未 push） | `18:21` 前后 | `git cat-file -t c2fa2e9` = `commit` |
+
+⇒ **G7 与 G1 逐数相同** => §4 那两发的并发跑没有互相污染；本表所有档位不变。
+⇒ 三处引用别人程的地方（`§9#1` 容器 vet、`§6.1` CI 原文、`§7.2` 兄弟程 staged 事件）取的都是**已落盘的字节**
+（commit 与我那份 `gh-selffetch.txt`），不随时间腐坏。
 
 **交回的话**：`AC#4` 判**成立、无附条件**；勾由编排者按本表打；本程未翻勾、未改票名、未写票面 128 那枚文件、未 push、未碰 `ci.yml`／生产码／`internal/winsec/**`／`internal/risk/**`／阈值／golden／`frontend/**`／`design/**`／`docs/reports/**`／别人的证据件。
