@@ -139,3 +139,18 @@ merely because phase one does not use it.
   > 一次 `npm run vendor:beautifului` 会把 `thinking.tsx` / `tool-chips.tsx` 的 U+2212 恢复原状，
   > 而那句"unmapped glyph is fatal rather than silently shipped"对它不生效。
   > ⇒ 本轮之后**盘上确实 0 命中**，但**这一格的持久性依赖 `U1` 那批把三份副本一起加宽**，不依赖本文件的自述。
+  > **同轮稍后更正（前端会话，选了 A 案）：上面第 ③ 条描述的洞已在本文件同批关掉。**
+  > `scripts/vendor.mjs` 的 `EMOJI_RE` 已补 `\u{2200}-\u{22FF}`，`GLYPH_MAP` 已加 `U+2212 → "-"`。
+  > 取数依据：改前那把旧尺在 `3b59512~1` 的 8 枚 vendored 文件上报 **0** 命中、补宽后报 **2**
+  > （`thinking.tsx` 与 `tool-chips.tsx` 各 1 枚 U+2212）——**旧尺结构性看不见那两枚**，这正是"手工改完、
+  > 下次 re-vendor 静默回退"的机制；在今天这棵树上两把尺都报 0，所以加宽**不产生任何新命中**，只买一个前置拦截。
+  > 从此"将来 vendor 进来一个带数学符号的文件谁负责拦"有了答案：**`vendor.mjs` 自己**——无映射即 `exit 2`
+  > 并指名文件与码位，而不是等 CI 事后红。
+  > ⚠ 一枚本轮才看清的事实：**`ai-native/*.tsx` 头部那段 provenance 注释是 `vendor.mjs` 生成的**
+  > （`header(job, commit, cleaned.replaced)`），所以**手改那几行是徒劳的**——一次 re-vendor 会整段重写。
+  > ⇒ 本轮把 `thinking.tsx:11` 改回生成器会产出的样子（`1 dingbat glyph(s) ASCII-ized`），
+  > 说明性文字只写在这里，因为只有本文件是手工维护、不会被机器覆盖。
+  > 已证：把补宽后的 `asciiize` 跑在改前的文件上，**正文的 `-` 与当前盘上一字不差**（可复现）。
+  > 未证：`tool-chips.tsx` 头部那个 **3** 是**推断**值（上游 2 枚 U+2713 ＋ 1 枚 U+2212），因为本轮
+  > **没有上游 checkout**（取它要联网、且会重写文件），模拟只能拿"已被 ASCII 化过的本地拷贝"当输入、
+  > 只会少数不会多算。生成器下次真跑时若给出别的数，**以它为准**，那一行不归本文件主张。

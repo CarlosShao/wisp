@@ -36,21 +36,31 @@ const JOBS = [
 ];
 
 // D23 / ban #8 zero-emoji, applied to OUR copy: upstream writes U+2713 into two
-// demo strings of tool-chips.tsx. The ticket demands picking a side - ASCII-ize
+// demo strings of tool-chips.tsx and U+2212 into the diff rows of both
+// tool-chips.tsx and thinking.tsx. The ticket demands picking a side - ASCII-ize
 // or register the tree as out of scope - so we ASCII-ize. An unmapped glyph is
 // fatal rather than silently shipped, because a re-vendor must not be able to
 // reopen the hole.
 // Written with escapes rather than the glyphs themselves: internal/panel's
 // TestFrontendHasNoEmoji scans this directory with the scanner's own ranges, and
 // the table that removes the glyphs must not be the thing that reintroduces
-// them. U+2713/U+2714 check, U+2717/U+2715 cross.
+// them. U+2713/U+2714 check, U+2717/U+2715 cross, U+2212 minus.
+//
+// EMOJI_RE's bands are a third copy of tools/d22scan/main.go's emojiRe and must
+// travel with it. It previously omitted U+2200-U+22FF, which made this guard
+// structurally blind to the two U+2212 that upstream ships - the hand-fix in
+// commit 3b59512 would have been reverted silently by the next re-vendor.
+// Measured before widening: on the pre-fix tree the old class reported 0 hits
+// where the widened one reports 2. On today's tree both report 0, so widening
+// costs nothing here and only buys the forward catch.
 const GLYPH_MAP = new Map([
   ["\u2713", "[ok]"],
   ["\u2714", "[ok]"],
   ["\u2717", "[x]"],
   ["\u2715", "[x]"],
+  ["\u2212", "-"],
 ]);
-const EMOJI_RE = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{1F1E6}-\u{1F1FF}]/gu;
+const EMOJI_RE = /[\u{1F000}-\u{1FAFF}\u{2200}-\u{22FF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{1F1E6}-\u{1F1FF}]/gu;
 
 function asciiize(text, dest) {
   let n = 0;
