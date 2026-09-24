@@ -48,6 +48,12 @@
   `make-trees.sh`（建树＋overlay＋落地 grep）、`run.sh`（容器内硬闸 97/98/95）、`go.sh`（宿主侧 docker 驱动）、
   `parse.py`（把 `-v` 日志程序化拆成逐名颜色／名册／四数，含 `-count=N` 的逐名跨复读颜色漂移检查），
   八发原始日志 `*.v.log` 与容器头 `*.head.txt` 均在盘上，可复核。
+- **终局自核（写完全部提交之后现跑，两行都是"我读到过＝我落盘了"这条）**：
+  ① 三枚被测文件在 `HEAD` 里的 blob md5 ＝ 容器八发读数里打印的那三枚，逐字相同
+  （`cb8350cb…`／`20c141df…`／`50d4e54c…`）⇒ 取数的那一版就是进树的那一版；
+  ② `git diff --name-only f53ad5c HEAD -- internal/winsec/` **只有我这 3 枚**，
+  而我读数依赖的生产码两枚（`winsec.go`／`winsec_other.go`）与 `tempdir_resolved_124_other_test.go` 在该区间**零漂移**
+  ⇒ 读数与终局之间没有第三方的 winsec 改动混进来（同期落进来的兄弟提交全在 winsec 之外：136／133／缺口审核那几枚）。
 
 ## §1 AC#2 改了什么 ＋ MUT-D 自证三态
 
