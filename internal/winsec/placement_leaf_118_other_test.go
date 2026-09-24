@@ -78,7 +78,7 @@ func TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed(t *testing.T
 	link := leafLinkTo118(t, root, "artifact.txt", f.victim)
 
 	victimBefore := statFact113(f.victim)
-	assertRefused113(t, "SealFile", link, winsec.SealFile(link))
+	assertRefused113(t, "SealFile", link, link, winsec.SealFile(link))
 
 	if got := statFact113(f.victim); got != victimBefore {
 		t.Errorf("AC#6 RED: SealFile(%q) left the victim at %s, it was %s - the mode change followed the leaf", link, got, victimBefore)
@@ -104,7 +104,7 @@ func TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasNamed(t *testin
 	}
 	factBefore := statFact113(f.victim)
 	err = winsec.PrivateFile(link, []byte("top secret"), 0o600)
-	assertRefused113(t, "PrivateFile", link, err)
+	assertRefused113(t, "PrivateFile", link, link, err)
 
 	contentAfter, err := os.ReadFile(f.victim)
 	if err != nil {

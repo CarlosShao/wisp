@@ -31,6 +31,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"testing"
 
@@ -120,13 +121,59 @@ func linkTo113(t *testing.T, root, linkName, target string) string {
 	return link
 }
 
+// linkAttributionMarker137 is the phrase both POSIX refusal sites put immediately
+// in front of the prefix they credit for the block: platformVerifyPlacement
+// ("... reaches it through the link at <prefix>, which is not the tree this call
+// names", winsec_other.go) and RemoveUnlinked ("... the spelling reaches it
+// through the link at <link>, and whatever lives behind that link ...",
+// winsec.go). Ticket 137 AC#2 is the reason the tests read it: an error type on
+// its own cannot tell those two refusals apart, and they are not the same event.
+const linkAttributionMarker137 = " through the link at "
+
+// refusalCreditsLink137 answers the question ErrUnresolvedPath / ErrIsReparsePoint
+// cannot: WHICH link did the floor refuse this spelling over? A refusal credited to
+// an ambient link above the case (the harness's own symlinked TMPDIR, i.e. macOS'
+// real shape) means the walk stopped before it ever looked at the link the case
+// planted, so the PASS was bought by something other than the leg under test.
+//
+// The expectation side is `planted`, the path the case itself created with
+// filepath.Join - a fixture value, read out of no call into the code under test
+// (ticket 119's R-119-9). Only the answer is parsed, and only from the position
+// after the marker: the input path printed earlier in the same sentence always
+// contains the planted link as a substring, so a bare strings.Contains(err.Error(),
+// planted) would read the ambient refusal as credit for this case's own link.
+func refusalCreditsLink137(err error, planted string) bool {
+	msg := err.Error()
+	i := strings.Index(msg, linkAttributionMarker137)
+	if i < 0 {
+		return false // no attribution at all: nothing here says this link was the reason
+	}
+	credited := msg[i+len(linkAttributionMarker137):]
+	if !strings.HasPrefix(credited, planted) {
+		return false
+	}
+	// The credited token has to END at the planted path. "/varlink" is a string
+	// prefix of "/varlink/tmp/root/link" and is not the same link.
+	if rest := credited[len(planted):]; rest != "" && rest[0] != ',' {
+		return false
+	}
+	return true
+}
+
 // assertRefused113 is the "either refuse, or only touch the link itself" half of
 // AC#1. This floor can only refuse (it never rewrites), so refusal is the
 // outcome this ticket's fix produces and the outcome every case requires; a nil
 // here means the seal walked through the link.
-func assertRefused113(t *testing.T, what, spelled string, err error) {
+//
+// Since ticket 137 AC#2 the refusal is not taken on its own word either: `planted`
+// is the link this case put there itself, and the error has to name that one.
+// Ticket 137 AC#1's MUT-D measured what the old shape cost - with both walks cut
+// short, every one of these cases still got a refusal, still named the expected
+// error, and every refusal was the host's own TMPDIR link. Same assertions, green,
+// zero detection power.
+func assertRefused113(t *testing.T, what, spelled, planted string, err error) {
 	t.Helper()
-	t.Logf("AC#1 %s(%q) -> err=%v", what, spelled, err)
+	t.Logf("AC#1 %s(%q) -> err=%v (link this case planted: %q)", what, spelled, err, planted)
 	if err == nil {
 		t.Errorf("AC#1 RED: %s(%q) returned nil, i.e. it sealed through a symlink and reported success. AC#1 requires either a refusal or an action confined to the link itself.",
 			what, spelled)
@@ -135,6 +182,10 @@ func assertRefused113(t *testing.T, what, spelled string, err error) {
 	if !errors.Is(err, winsec.ErrUnresolvedPath) {
 		t.Errorf("AC#1: %s(%q) refused with %v, which does not name ErrUnresolvedPath: a refusal this call did not make cannot be attributed to the floor",
 			what, spelled, err)
+	}
+	if !refusalCreditsLink137(err, planted) {
+		t.Errorf("AC#1 RED: %s(%q) refused with %v, which does not credit the link this case planted at %q. An ambient link above the tree (the harness's own TMPDIR link is the real shape) can answer for it while the leg under test never runs, so this refusal is not evidence about %s.",
+			what, spelled, err, planted, what)
 	}
 }
 
@@ -150,7 +201,7 @@ func TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone(t *t
 	link := linkTo113(t, root, "link", f.dir)
 	spelled := filepath.Join(link, "keep-me.txt")
 
-	assertRefused113(t, "SealFile", spelled, winsec.SealFile(spelled))
+	assertRefused113(t, "SealFile", spelled, link, winsec.SealFile(spelled))
 
 	f.untouched(t, "AC#1 the foreign tree behind the link")
 	if info, err := os.Lstat(link); err != nil || info.Mode()&os.ModeSymlink == 0 {
@@ -183,7 +234,7 @@ func TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth(t *testing.T) {
 			spelled := filepath.Join(link, "keep-me.txt")
 			t.Logf("AC#1 depth %d: spelled=%s (pieces below root: %d)", depth, spelled, depth+1)
 
-			assertRefused113(t, "SealFile", spelled, winsec.SealFile(spelled))
+			assertRefused113(t, "SealFile", spelled, link, winsec.SealFile(spelled))
 			f.untouched(t, fmt.Sprintf("AC#1 depth %d", depth))
 		})
 	}
@@ -200,7 +251,7 @@ func TestAC1POSIXSealDirThroughASymlinkRefuses(t *testing.T) {
 	}
 	link := linkTo113(t, root, "link", f.dir)
 
-	assertRefused113(t, "SealDir", link, winsec.SealDir(link))
+	assertRefused113(t, "SealDir", link, link, winsec.SealDir(link))
 	f.untouched(t, "AC#1 the foreign directory behind the link")
 }
 
@@ -217,7 +268,7 @@ func TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing(t *testing.T)
 	link := linkTo113(t, root, "link", f.dir)
 	spelled := filepath.Join(link, "secret.txt")
 
-	assertRefused113(t, "PrivateFile", spelled, winsec.PrivateFile(spelled, []byte("top secret"), 0o600))
+	assertRefused113(t, "PrivateFile", spelled, link, winsec.PrivateFile(spelled, []byte("top secret"), 0o600))
 
 	f.untouched(t, "AC#1 the foreign tree behind the link")
 	if _, err := os.Lstat(filepath.Join(f.dir, "secret.txt")); !errors.Is(err, fs.ErrNotExist) {
@@ -239,10 +290,10 @@ func TestAC1POSIXSealFileThroughABackslashNamedLink(t *testing.T) {
 	if err := os.Mkdir(root, 0o700); err != nil {
 		t.Fatal(err)
 	}
-	linkTo113(t, root, `x\y`, f.dir)
+	link := linkTo113(t, root, `x\y`, f.dir)
 	spelled := filepath.Join(root, `x\y`, "keep-me.txt")
 
-	assertRefused113(t, "SealFile", spelled, winsec.SealFile(spelled))
+	assertRefused113(t, "SealFile", spelled, link, winsec.SealFile(spelled))
 	f.untouched(t, "AC#2 the foreign tree behind a backslash-named link")
 }
 

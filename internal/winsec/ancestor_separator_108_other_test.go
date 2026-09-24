@@ -76,11 +76,19 @@ func TestAC2POSIXAncestorGuardRefusesASpellingThroughASymlink(t *testing.T) {
 	}
 	spelled := filepath.ToSlash(filepath.Join(link, "keep-me.txt"))
 	err := winsec.RemoveUnlinked(spelled)
-	t.Logf("RemoveUnlinked(%q) -> err=%v", spelled, err)
+	t.Logf("AC#2 RemoveUnlinked(%q) -> err=%v (link this case planted: %q)", spelled, err, link)
 	if err == nil {
 		t.Errorf("AC#2 RED: a slash-spelled path through a symlink returned nil")
 	} else if !errors.Is(err, winsec.ErrIsReparsePoint) {
 		t.Errorf("AC#2: refusal must name ErrIsReparsePoint, got %v", err)
+	} else if !refusalCreditsLink137(err, link) {
+		// Ticket 137 AC#2: this leg never called assertRefused113, so tightening that
+		// helper alone left it reading the error type only - and under a symlinked
+		// TMPDIR (macOS' real shape) the ancestor guard can be cut down to three
+		// components and this case still sees a refusal naming /r2link, i.e. the
+		// harness's own link, never the one planted a few components below it.
+		t.Errorf("AC#2 RED: RemoveUnlinked(%q) refused with %v, which does not credit the link this case planted at %q: an ambient link above the tree can answer for the refusal while the guard under test never reaches this spelling",
+			spelled, err, link)
 	}
 	assertStillThere108(t, victim, "AC#2 RED the foreign file was deleted through the symlink")
 }
@@ -129,16 +137,24 @@ func TestAC2POSIXABackslashInALinkNameIsStillALinkAncestor(t *testing.T) {
 		t.Fatal(err)
 	}
 	linkName := `x\y`
-	if err := os.Symlink(foreignDir, filepath.Join(root, linkName)); err != nil {
+	link := filepath.Join(root, linkName)
+	if err := os.Symlink(foreignDir, link); err != nil {
 		t.Skipf("no symlink privilege on this host: %v", err)
 	}
 	spelled := filepath.Join(root, linkName, "keep-me.txt")
 	err := winsec.RemoveUnlinked(spelled)
-	t.Logf("RemoveUnlinked(%q) -> err=%v", spelled, err)
+	t.Logf("AC#2 RemoveUnlinked(%q) -> err=%v (link this case planted: %q)", spelled, err, link)
 	if err == nil {
 		t.Errorf("AC#2 RED: the link ancestor %q was not checked because its name was split on the backslash", linkName)
 	} else if !errors.Is(err, winsec.ErrIsReparsePoint) {
 		t.Errorf("AC#2: refusal must name ErrIsReparsePoint, got %v", err)
+	} else if !refusalCreditsLink137(err, link) {
+		// Same leg, same hole as the case above (ticket 137 AC#2): the refusal this
+		// case accepted was creditable to any link nearer the root, and a backslash
+		// in the planted name is exactly where an implementation loses track of
+		// which spelling it is supposed to be answering for.
+		t.Errorf("AC#2 RED: RemoveUnlinked(%q) refused with %v, which does not credit the link this case planted at %q: an ambient link above the tree can answer for the refusal while the guard under test never reaches this spelling",
+			spelled, err, link)
 	}
 	assertStillThere108(t, victim, "AC#2 RED the foreign file was deleted through a backslash-named link")
 }
