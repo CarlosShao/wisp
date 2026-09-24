@@ -100,7 +100,7 @@ $ grep -n "errors.Is(err, winsec.ErrUnresolvedPath)\|refusalCreditsLink137(err, 
   每发容器第一句 `ls -l /wisp/go.mod` 进 `head.txt`，读数固定
   `-rwxrwxrwx 1 root root 883 … /wisp/go.mod` ＋ `gomod_bytes=883` ＋
   `f6ef661732b1851e5c3db348113cb605 /wisp/go.mod`；另有硬门 `[ ! -s /wisp/go.mod ] ⇒ exit 97`（不取颜色）。
-- **台件全在仓外**、全部 `git archive <sha> | tar -x`，共 16 棵快照（清单 §6）；**禁读脏工作树冒充被验版本**。
+- **台件全在仓外**、全部 `git archive <sha> | tar -x`，共 16 棵快照（清单 §8）；**禁读脏工作树冒充被验版本**。
 - **每发 `-count=1 -v ./internal/winsec/`**（整包、不是 `-run` 子集，这样名册差集顺带证明"本格没让别人变色"）；
   四数只从 `-v` 日志取；`=== RUN` 名册／全量 colour 名册／SKIP 名册**每发都落盘**；`panic|fatal error` 每发计数。
 - **形状每发容器里现种并硬断言**（种序：先 `mkdir -p /acwpriv/wacc119tmp` 再 `ln -s /acwpriv /acwlink`）：
@@ -404,14 +404,14 @@ dataroot_symlink_119_other_test.go:362: AC#2: refusal of the declared root "/acw
 
 `b07`（普通·MUT-D）同两支、前缀换成 `/acwplain/...`。**两形都点到本用例自己种的那枚链接**（`varlink119`／`injlink119`）＝达成。
 
-`d01`/`d02`（MUT-D2，红在**新加那一支**）原文两行（软链形）：
+`d01`/`d02`（MUT-D2，红在**新加那一支**）原文两行（软链形，**整行未截断**）：
 
 ```
-dataroot_symlink_119_other_test.go:244: AC#1 RED: the refusal of "/acwpriv/…/varlink119/data" named ErrUnresolvedPath but did not credit the link this case planted at "/acwpriv/…/001/varlink119" (winsec: refusing to seal … reaches it via /acwpriv/…/001/varlink119, which is not the tree this call names): an ambient link above the tree answered for it, so this says nothing about the leg under test
-dataroot_symlink_119_other_test.go:364: AC#2 RED: the refusal of the declared root "/acwpriv/…/injlink119/harness/picked" named ErrUnresolvedPath but did not credit the link this case planted at "/acwpriv/…/001/injlink119" (…): an ambient link above the base answered for it, so the walk under test never ran
+dataroot_symlink_119_other_test.go:244: AC#1 RED: the refusal of "/acwpriv/wacc119tmp/TestAC1POSIXUnresolvedSymlinkedRootStillRefused1191546711540/001/varlink119/data" named ErrUnresolvedPath but did not credit the link this case planted at "/acwpriv/wacc119tmp/TestAC1POSIXUnresolvedSymlinkedRootStillRefused1191546711540/001/varlink119" (winsec: refusing to seal /acwpriv/wacc119tmp/TestAC1POSIXUnresolvedSymlinkedRootStillRefused1191546711540/001/varlink119/data: winsec: path is not provably resolved, refusing to seal: /acwpriv/wacc119tmp/TestAC1POSIXUnresolvedSymlinkedRootStillRefused1191546711540/001/varlink119/data reaches it via /acwpriv/wacc119tmp/TestAC1POSIXUnresolvedSymlinkedRootStillRefused1191546711540/001/varlink119, which is not the tree this call names): an ambient link above the tree answered for it, so this says nothing about the leg under test
+dataroot_symlink_119_other_test.go:364: AC#2 RED: the refusal of the declared root "/acwpriv/wacc119tmp/TestAC2POSIXInjectedTestDataDirStandsAsDeclared119519690961/001/injlink119/harness/picked" named ErrUnresolvedPath but did not credit the link this case planted at "/acwpriv/wacc119tmp/TestAC2POSIXInjectedTestDataDirStandsAsDeclared119519690961/001/injlink119" (winsec: refusing to seal /acwpriv/wacc119tmp/TestAC2POSIXInjectedTestDataDirStandsAsDeclared119519690961/001/injlink119/harness/picked: winsec: path is not provably resolved, refusing to seal: /acwpriv/wacc119tmp/TestAC2POSIXInjectedTestDataDirStandsAsDeclared119519690961/001/injlink119/harness/picked reaches it via /acwpriv/wacc119tmp/TestAC2POSIXInjectedTestDataDirStandsAsDeclared119519690961/001/injlink119, which is not the tree this call names): an ambient link above the base answered for it, so the walk under test never ran
 ```
 
-（上面两行为排版把中段写成 `…`，**逐字原文在 `logs/d02-head-mutd2-link/d02-head-mutd2-link.v.log`**。）
+（`c9` 段里 `reaches it via` ＝ MUT-D2 抹掉记名短语之后的原文形状，正是记名那一支该响的样子。）
 
 ### 3.4 一条必须照实报的机制（否则"红句"会被读成"新支响了"）
 
@@ -438,3 +438,151 @@ MUT-D 那一发的红**从哨兵那一支响**（`:242`／`:362`），不是新�
 判据③ **成立（独立复现）**：未变异两形两枚都绿（`b05`/`b06`，包级 rc=0）；
 MUT-D 两形两枚都红（`b07`/`b08`）且红句点名本用例种的链接；两形都给；四数之外名册差集与 panic 计数都给了。
 附带推翻一条派单预期（"只撤记名 ⇒ MUT-D 打不红"），并把"点名"与"承重"分开算账。
+
+### 3.6 本节落盘的 commit（原样输出）
+
+```
+$ git log --oneline -1
+67704c7 evidence(119 AC#7 r1 §3): 判据③成立——改后六发主读数 …
+$ git show --name-only --format="%H" HEAD | tail -2
+67704c7…
+docs/evidence/s1/119-ac7-r1-acceptance.md
+```
+
+---
+
+## §4 判据④「反半边不许被这一格弄绿」——**成立（独立复现）**
+
+判据点名的两件事：`TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119` **两形颜色逐名不许变**；
+**`:251` 那一处明令不并入本格**。两件事我各自走了一条不引实现方脚本的尺。
+
+### 4.1 那一枚函数体一字未动（四版逐字相同）
+
+```
+$ for r in a9c8b6e c94927d 2956897 HEAD; do git cat-file -p "$r:internal/winsec/dataroot_symlink_119_other_test.go" \
+    | awk '/^func TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119/,/^\}$/'; done | …
+a9c8b6e  body_lines=45 bytes=1934 md5=831a5c08b04c66b556b0150a19c63aea
+c94927d  body_lines=45 bytes=1934 md5=831a5c08b04c66b556b0150a19c63aea
+2956897  body_lines=45 bytes=1934 md5=831a5c08b04c66b556b0150a19c63aea
+HEAD     body_lines=45 bytes=1934 md5=831a5c08b04c66b556b0150a19c63aea     ← HEAD 现为 79cfa1d（邻居 commit 落盘后复量）
+```
+
+⚠ 派单说"a9c8b6e 与 HEAD 两版都是 45 行／1934 字节／`831a5c08`"——**复算成立**，
+我另外把中间两版（`c94927d`、开工锚 `2956897`）也量了，四版同一枚 md5。
+
+### 4.2 `:251`（现 `:291`）没被并入本格：它不在**任何** hunk 里
+
+```
+$ git diff -U0 a9c8b6e..HEAD -- <file> | grep -c '^@@'      ⇒ 11
+$ git diff     a9c8b6e..HEAD -- <file> | grep -c '^@@'      ⇒ 5（默认 -U3）
+-U3 五枚的旧侧区间：28-34 / 41-46 / 190-207 / 282-289 / 300-312   ⇒ 251 一枚都不覆盖
+-U0 十一枚的旧侧起点：31 43 192 194 197 202 204 284 286 303 309    ⇒ 同样不含 251
+```
+
+⇒ **枚数要钉死**（这类"几枚 hunk"的账本项目吃过）：`-U0` 是 **11** 枚、`-U3` 是 **5** 枚。
+实现方 §5 写"九枚 hunk"、派单简报写"hunk 头在旧行 190／282／300 **三处**"——**两个数都不对**，
+但**都不影响判据**：190/282/300 是 `-U3` 里那三枚**碰到被测函数**的（另两枚 28/41 只动注释），
+"九枚"是它把纯插入 hunk 漏计了两枚。结论一致：**`:251` 那处零 hunk**。
+
+第二枚尺（不依赖 diff）：每发容器现量 `SENTINEL_BRANCHES=3` 而 `CREDIT_BRANCHES=2`
+（23 发逐发相同，见各 `head.txt`）⇒ 第三枚哨兵判据（`:291`）**始终没有记名同伴**＝没被并进来。
+
+### 4.3 它的颜色，两形逐名，23 发全量
+
+| 发（形·生产码） | AC#3 颜色 |
+|---|---|
+| `b01` 普通·未变异 / `b05` 普通·未变异（改后） | PASS / PASS |
+| `b02` 软链·未变异 / `b06` 软链·未变异（改后） | PASS / PASS |
+| `b03` 普通·MUT-D / `b07` 普通·MUT-D（改后） | FAIL / FAIL |
+| `b04` 软链·MUT-D / `b08` 软链·MUT-D（改后） | FAIL / FAIL |
+| `d01`/`d02` MUT-D2 两形 | PASS / PASS（它不读记名短语，与 §3.4 一致；新增读数不是变色） |
+| `c01`-`c05`（回退换根，两形） | 全 PASS |
+| `e01`-`e04`（回退记名＋MUT-D，两形） | 全 FAIL（与 `b07`/`b08` 同色） |
+| `e05`-`e08`（回退记名＋MUT-D2，两形） | 全 PASS（与 `d01`/`d02` 同色） |
+
+⇒ **改前↔改后同形同产物的四对里，它逐名逐色一致**；§3.2 那 4 行名册差额里**没有它的名字**。
+它仍是"两形都响"的那枚对照组：MUT-D 四发（改前改后 × 两形）全红，而两枚母项只在 `b08` 才红——
+这一格差异本身就是"本格没有拿它换绿"的形状证明。
+
+### 4.4 反半边的语义本身（它今天仍在拒什么）
+
+软链形未变异那一发（`b06`）里它自己打印的那行（**整行原文，未截断**，`logs/b06-head-link/b06-head-link.v.log`）：
+
+```
+dataroot_symlink_119_other_test.go:288: AC#3 SealFile("/acwpriv/wacc119tmp/TestAC3POSIXLinkInsideAResolvedDataRootStillRefused1194083439489/001/data/out/keep-me.txt") -> winsec: refusing to seal /acwpriv/wacc119tmp/TestAC3POSIXLinkInsideAResolvedDataRootStillRefused1194083439489/001/data/out/keep-me.txt: winsec: path is not provably resolved, refusing to seal: /acwpriv/wacc119tmp/TestAC3POSIXLinkInsideAResolvedDataRootStillRefused1194083439489/001/data/out/keep-me.txt reaches it through the link at /acwpriv/wacc119tmp/TestAC3POSIXLinkInsideAResolvedDataRootStillRefused1194083439489/001/data/out, which is not the tree this call names
+```
+
+⇒ 根解析掉之后，**种在数据根里面的那枚链接（`…/001/data/out`）仍然把密封带出这棵树、仍然被拒**
+（颜色 PASS ＋ 上面这行拒因），票 113 那条腿的反半边在这一格之后照旧钉着。
+
+### 4.5 判语
+
+判据④ **成立（独立复现）**。函数体四版同 md5、`:251` 零 hunk、`SENTINEL=3/CREDIT=2` 恒量、
+两形逐名颜色四对一致、名册差额不含它。
+
+### 4.6 本节落盘的 commit
+
+**号只认现量，我不在这里预写**（预写＝凭空造号，本项目吃过这一枚）：
+`git log --oneline -1 -- docs/evidence/s1/119-ac7-r1-acceptance.md` 在 §5 那枚 commit 之后回看本节，
+本节体落在"subject 以 `evidence(119 AC#7 r1 §4)` 开头"的那枚 commit 上；
+逐节归属用 `git log -L '/^## §4/,/^## §5/:docs/evidence/s1/119-ac7-r1-acceptance.md' --oneline`。
+
+---
+
+## §5 总判
+
+### 5.1 逐格判语与档位
+
+| 格 | 判据本体（票面那一格的原文要点） | 我的凭据（命令原文在对应节） | 档位 | 判语 |
+|---|---|---|---|---|
+| ① | 两味药必须一起下（记名断言＋已解析基根；只收紧不换根会恒红） | §1.1 落点与零新增依赖；§1.2 五发 `c01`-`c05`（撤换根 ⇒ 逐枚恒红、普通形不动）；§1.3 八发 `e01`-`e08`（撤记名 ⇒ MUT-D 照旧红、MUT-D2 由红转绿） | **独立复现** | **成立**，且**两味各自承重**（不是装饰、不是并列摆设） |
+| ② | 改前零区分力那一发要自己复现，不许只引票面那句话 | §2.2 四发 `b01`-`b04`＋`b04` 里两枚"在 RUN 名册且 PASS"＋§2.1 我自己的 MUT-D 落地三证＋`credit.py` 机器判拒因记在宿主 `/acwlink` | **独立复现** | **成立** |
+| ③ | 改后判别对：未变异两枚都绿／MUT-D 两枚都红且红句点到本用例种的链接，两形都给，四数之外给名册差集与 panic 计数 | §3.1 六发主读数（含正向对照与派单数一致）；§3.2 四对名册差集 0/0/0/4；§3.3 `b08` 与 `d02` 红句整行原文；§3.4 机制更正 | **独立复现** | **成立**——附一条**照实记账**：MUT-D 那发的红从哨兵支响、红句点名是措辞（`c94927d` 的目的），**记名那一支的射程由 MUT-D2 与四发回退证明**（§1.3/§3.4） |
+| ④ | 反半边不许被弄绿：AC#3 那枚两形颜色逐名不许变；`:251` 明令不并入本格 | §4.1 函数体四版 md5 `831a5c08`；§4.2 `:251` 在 `-U0` 十一枚／`-U3` 五枚 hunk 里**一枚都不沾**＋`SENTINEL=3/CREDIT=2` 恒量；§4.3 23 发逐名颜色；§4.4 它今天的拒因整行原文 | **独立复现** | **成立** |
+
+### 5.2 那一问："翻转的并集是不是恰好那两枚母项"
+
+**是，不多不少。** 我做了 **17 对**名册比较（`logs/pairs.txt` 原文，每对两侧**生产码相同**，
+只在"药在不在"上不同；`scripts/flipunion.py` 求并集）：
+
+```
+prepost-plain-unmut  delta=0      prepost-link-unmut   delta=0
+prepost-plain-mutd   delta=0      prepost-link-mutd    delta=4   ← 两枚母项 PASS→FAIL
+rA1-link delta=2（只 AC#1）  rA1-plain delta=0  rA2-link delta=2（只 AC#2）  rA2-plain delta=0
+rA12-link delta=4（两枚）
+rB1-mutd-link/-plain delta=0、0    rB2-mutd-link/-plain delta=0、0     ← 撤记名不影响 MUT-D
+rB1-mutd2-link/-plain delta=2（只 AC#1 转绿）   rB2-mutd2-link/-plain delta=2（只 AC#2 转绿）
+
+--- union of names that were PASS on one side / FAIL on the other ---
+PASS-side: ['TestAC1POSIXUnresolvedSymlinkedRootStillRefused119', 'TestAC2POSIXInjectedTestDataDirStandsAsDeclared119']
+FAIL-side: ['TestAC1POSIXUnresolvedSymlinkedRootStillRefused119', 'TestAC2POSIXInjectedTestDataDirStandsAsDeclared119']
+symmetric name set: [同样两枚]
+```
+
+⇒ **17 对里 8 对有翻转、9 对零翻转；翻转并集＝那两枚母项，集合闭合、没有第三枚**（同包另外 45 枚
+在两形 × 三种生产码 × 十一种回退里逐名逐色一动不动）。
+派单问的是"七次翻转"——**实数是 17 对／8 对翻转**，我按实数报，不改成七。
+
+### 5.3 总判语
+
+**AC#7 这一格判：成立（无附条件）。**
+
+- 四条判据**逐条独立复现**（我全部自造台件、自造饵、自己重跑四数与名册，未把实现方日志当凭据引用一次）；
+- 票面这一格最要害的那一问（"两发变异各自能响一支算不算承重"）**裁为算**，
+  理由与反证在 §1.4——**要求同一发里记名支先响，是要求一支在它的前提被变异抹掉时仍然响**，
+  那只能靠改代码形状（把 `else if` 拆成两条 `if`）来造，属措辞工程；
+  承重的可操作定义（"摘掉它之后存不存在打不红的变异"）我量到了：存在，且只在 MUT-D2 上（`e05`-`e08`）。
+- **不给"附条件"章**的理由：本程没有造出任何一格判据声称要防的坏结局（没放宽断言、没洗 SKIP、
+  没动 `:251`、没碰生产码——三枚生产文件 md5 在基线树与交件树逐一相同，我在容器里现量过
+  `winsec.go=a6144c880de80e43bb1393f3624e7221`、`winsec_other.go`（未变异）=`b5056918be4ed13817d236fbcae0f477`，
+  与实现方 §5 报的两个号一致）。
+
+### 5.4 缺陷栏（**都不足以退这一格**，但必须留在表上）
+
+| # | 缺陷 | 归属 | 影响 |
+|---|---|---|---|
+| 1 | 实现方 §5 那句"九枚 hunk"数不对：现量 `-U0` **11** 枚、`-U3` **5** 枚 | 实现件（枚数笔误） | 零——它的结论（`:251` 零 hunk）与两个真数都成立 |
+| 2 | 派单简报两处前提不成立：(a) "实现方 `:241`／`:361` 与盘上差 2 行"（那两个号本来就是哨兵支，它写的 `:243`／`:363` 才是记名支，一字不差）；(b) "单点回退 B 预期 MUT-D 打不红"（实测照旧红） | **派单**，不是实现件 | (b) 若照它硬判就会**错退**实现方；本表按实测推翻 |
+| 3 | 票面 `:65` 那句"本机 v0.7.0 存在"过期；`:68` 已有编排者自己追加的更正块（现量 `v0.12.0 (go1.27.1)`）。⚠ 另两枚历史行（`:199`、`:382`）那两轮的格式读数**是 v0.7.0 那把尺量的** | 票面历史行 | 本格这一格：实现方与我**同一把尺（v0.12.0）**；但"历史门禁与今天同尺"这句**不成立**，别拿它当"一直没变过" |
+| 4 | 票面 AC#7 那一格的行号从 `:61-80` 漂到 `:72-91`（现盘），漂因是编排者自己往同一枚文件插了 11 行 | 票面（append-only 正常生长） | 零——§0.3 那发 `diff` 证明那一格 20 行逐字未变 |
+| 5 | 我这把尺的一处死计数：`run_one.sh` 里 `UNRESOLVED_BASES` 的 grep 用了两个制表符，改前树也报 0（现量真值：`base` 树 **5** 枚、`head` 树 **3** 枚、`rA12` 树 **5** 枚，单制表符缩进） | **本程仪器** | 零——它是冗余计数，没有任何门靠它；承重门 `CREDIT_BRANCHES`／`RESOLVED_BASES`／`SENTINEL_BRANCHES`／`MUT_*` 逐发有效（数值见各 `head.txt`，`b04` 那发是 `0/0/3`、`b08` 是 `2/2/3`） |
