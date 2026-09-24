@@ -36,7 +36,7 @@ diff 事实不冲突。于是后面任何"这枚红是不是今天 35 枚造的"
   `error: pathspec 'docs/evidence/s1/ci-read-a1fd5bf-r1.md' did not match any file(s) known to git`
   ——原因是我那枚文件当时还是 untracked，`git commit -- <path>` 对 untracked 路径不收。**那次失败没有产生任何 commit，
   也没有吞掉别人索引里的东西**（失败后 `git log -1` 仍是那一程自己的 commit，`git show --name-only` 只列它自己那枚文件）。
-    教训值得单记：**在共享工作树里发不带 `git add` 的 pathspec commit，第一次必然踩这枚坑**；
+  教训值得单记：**在共享工作树里发不带 `git add` 的 pathspec commit，第一次必然踩这枚坑**；
   正确形状是先 `git add -- <自己的那一枚路径>` 再 `git commit -- <同一枚路径>`，两步都不许出现 `-A`／`.`。
 - 工作树里 16 枚 `design/**` 的删除与未跟踪的 `design/old/`、`design/doubao/` 是 owner 那侧的活，
   本程一枚未碰、一枚未暂存（见 [[frontend-delegated-to-external-agent]] 09-24 扩展条）。
@@ -155,7 +155,7 @@ positive control（`bash tools/d22scan/runtests.sh -C tools/d22scan ./...`）、
 |---|---|---|
 | 4 positive control | success | `tools/d22scan` 自带测试全跑，含 `TestBuiltBinaryGoesRedEndToEnd` 那一族 |
 | 5 d22scan 禁令＋emoji 扫描 | success | `scripts/d22scan.sh` 走的是被扫面自证形状，正文里 `scan_test.go:250: real repo production Go files in scope: 225`，**分母非零**，所以这一步是真跑了且真干净，不是"匹配到零个文件"的假绿 |
-| 6 `gofmt (gofumpt)` | success | `gofumpt -l` 输出为空（该步的判据就是"输出非空即 exit 1"）⇒ **格式债为零枚** |
+| 6 `gofmt (gofumpt)` | success | `gofumpt -l` 输出为空（该步的判据就是"输出非空即 exit 1"），所以**格式债为零枚** |
 | 7 / 8 `go vet`（两枚 module） | success | `go vet ./...` rc=0 |
 | 9 **`staticcheck`** | **failure** | 见 §2.2 的自报分母 |
 | 10 `mockllm module vet` | success | 在 step 9 红之下仍答了（`if: ${{ !cancelled() }}` 生效），R-4 结案 |
@@ -169,7 +169,7 @@ positive control（`bash tools/d22scan/runtests.sh -C tools/d22scan ./...`）、
 staticcheck self-report: version=staticcheck 2026.2.1 (0.8.1) modules=3 packages=34 findings=44 toolchain-crash-lines=0 (step exit is 1)
 ```
 
-⇒ 这枚门禁**真的执行完了**：`toolchain-crash-lines=0`，票 85a 那枚"export data version 4 is greater than
+所以这枚门禁**真的执行完了**：`toolchain-crash-lines=0`，票 85a 那枚"export data version 4 is greater than
 maximum supported version 2、121 枚 run 零条 finding"的病形状在这一趟**没有复发**。
 44 枚＝41＋2＋1，跨 3 枚 module、34 枚 package。这一步按 `ci.yml` 的票 85a 注释就是 **EXPECTED RED**，
 且明写"lint turning green is NOT a criterion of this ticket"。
@@ -252,7 +252,7 @@ SA1019（弃用 API，三枚全是 `runtime.GOROOT`）3 枚、SA9009 1 枚、SA4
 "A168/A169 编队"附近）已记 `lint` 红＝**44 条 staticcheck 积压**（`##[error]` 计数＝44），
 落点名包括 `cmd/wisp/run.go:110/234/306`、`internal/agent/approval/queue.go:472`、
 `internal/audio/device.go:45/51/126`、`frontend/embed.go:4` —— 与本趟 CI 自报 `findings=44` **数与名都对得上**。
-⇒ 这一步今天**既没变好也没变坏**，本窗口 35 枚对它的贡献是零。
+所以这一步今天**既没变好也没变坏**，本窗口 35 枚对它的贡献是零。
 
 ### 2.4 一处**读数口径**必须点破（别把三个数混着用）
 
@@ -271,11 +271,11 @@ SA1019（弃用 API，三枚全是 `runtime.GOROOT`）3 枚、SA9009 1 枚、SA4
 
 1. `frontend/embed.go:4` SA9009 ineffectual `// go:embed` directive ——
    `ci.yml:171-174` 判它是**已知假阳性**（正文注释恰好以 `// go:embed` 开头，真指令在 `embed.go:19`）；
-   台账同一节判它是"**真隐患不是风格**"。⇒ **两处分歧未并案，本程不裁**，只把它登记成"下一步该有人裁"。
+   台账同一节判它是"**真隐患不是风格**"。**两处分歧未并案，本程不裁**，只把它登记成"下一步该有人裁"。
    （票 77 AC#1 拥有那枚注释，票 122 裁这条，`ci.yml` 已写明它 KEEPS being reported，不设 `//nolint`。）
 2. `internal/observe/thresholds.go:42` U1000 —— 落在**"一字节都不许动"的阈值文件**里。
    本程核过：该文件 `30e19ef..a1fd5bf` **零 diff**，所以这一趟**没人动它**；但这条 finding 的修法
-   天然要碰那枚文件，⇒ **今后任何程要清这枚，必须先走人工批准**，不能当成一次普通 lint 清理。
+   天然要碰那枚文件，所以**今后任何程要清这枚，必须先走人工批准**，不能当成一次普通 lint 清理。
 3. `internal/observe/goroutine_test.go:151` SA4000（逻辑或两侧的表达式逐字相同）——
    在**D38 命名 goroutine 台账**的守卫测试里，两侧同表达式意味着这一判据**有一半是死的**。这不是风格，是**测试判别力**问题。
 4. `internal/llm/anthropic/adapter.go:207` SA4006（赋给 `stop` 的值从未被读）—— 生产码，流式停止条件那一侧。
@@ -283,5 +283,124 @@ SA1019（弃用 API，三枚全是 `runtime.GOROOT`）3 枚、SA9009 1 枚、SA4
    `internal/llm/openaichat/mockllm_integ_test.go:52`、`internal/proc/crossvet_test.go:59`）——
    Go 1.24 起弃用，**随工具链升级只会更响**，且第 3 枚在票 78 AC#3 那把跨-vet 尺上。
 
+### 2.6 补记（本程自纠，追加不删）
+
+`§2` 那枚 commit（`7cc5050`）**落盘时正文里还留着 5 枚 U+21D2 箭头连接符**，与本审计"输出不得含箭头/数学符号"
+的纪律相违，也压在 ban #8 的码点段边界上（`docs/` 不在 ban #8 射程内，所以这不是 CI 违规，是本程违规）。
+本程随后用词替换掉它们（"所以"／就地删），**不 amend、不改写已提交的那一枚**，修正随 §3 那枚 commit 一起落（同一枚文件、同一枚 pathspec）。
+教训单记：**符号自查要在 commit 之前跑，不是之后**——本程在 §1 自查过一次，§2 新增正文后没再跑就交了。
+
 ---
+
+## 3. `test-windows` 红因归因到测试名：两个口径都给，逐名对台账
+
+### 3.1 本 run 的原始读数（job `107647320284`，两枚红步各自的 `runtests.sh` 自报行，逐字）
+
+```
+step 7 cmd/wisp CLI tests        : go test exited 1 - packages=[./cmd/wisp/ ...] top-level: PASS=50 FAIL=4 SKIP=0, === RUN=101, '[no tests to run]'=0
+step 8 Portable windows tests    : go test exited 1 - packages=[./internal/proc/ ./internal/secret/ ./internal/config/ ./internal/risk/ ./internal/ball/ ./internal/perm/ ./internal/plugin/ ./cmd/llmrecord/ ...] top-level: PASS=266 FAIL=12 SKIP=1, === RUN=409, '[no tests to run]'=0
+```
+
+其余三枚测试步都是绿的：step 4 winsec `PASS=58 FAIL=0 SKIP=0／=== RUN=101`、step 6 cgo build smoke success、
+step 9 PathResolver junction `PASS=1 FAIL=0 SKIP=0／=== RUN=1`。
+
+### 3.2 失败测试名清单（16 枚，去重）
+
+**step 7 `cmd/wisp CLI tests`（4 枚）**
+
+| 测试名 | 落点 `file:line` | 耗时 |
+|---|---|---|
+| `TestTicket101ManualSwitchSurvivesRestart` | `cmd/wisp/run_mode101_test.go:207` | 3.80s |
+| `TestTicket101UntouchedConfigRestartsAtDefault` | `cmd/wisp/run_mode101_test.go:328` | 6.63s |
+| `TestTicket101SessionGrantDoesNotCrossRestart` | `cmd/wisp/run_mode101_test.go:389` | 4.71s |
+| `TestComposedGateBlocksAWriteForTwoSeconds` | `cmd/wisp/run_test.go:330` | **301.08s** |
+
+（第 4 枚那枚 **300.0x s** 按本仓已定的判据先怀疑 **C18 审批超时（300s 常量）**，不是性能回归——票 123 那一族，
+台账 1390 行记的同一形状：`TestComposedGateBlocksAWriteForTwoSeconds` 耗时 301.06 秒＝正好撞满那个超时。）
+
+**step 8 `Portable windows tests`（12 枚）**
+
+| 测试名 | 落点 `file:line` |
+|---|---|
+| `TestClassifyAnchorSpellingIsNotVerdict` | `internal/risk/pathresolver_anchor_spelling_windows_test.go:29` |
+| `TestCanonicalInputGainsNoSecondForm` | `internal/risk/pathresolver_anchor_spelling_windows_test.go:125` |
+| `TestAListWinsWhereBothTablesHit` | `internal/risk/pathresolver_anchor_spelling_windows_test.go:204` |
+| `TestPathResolverShortNameAListDenied` | `internal/risk/pathresolver_junction_windows_test.go:123` |
+| `TestPathResolverUNCAListDenied` | `internal/risk/pathresolver_junction_windows_test.go:148` |
+| `TestPathResolverExtendedLengthPrefixAListDenied` | `internal/risk/pathresolver_junction_windows_test.go:174` |
+| `TestBListDefaultDenyAndOverride` | `internal/risk/pathresolver_junction_windows_test.go:272` |
+| `TestSyncFixtureFallbackAndMatch` | `internal/risk/syncdirs_test.go:152` |
+| `TestSyncFallbackNotDisarmableByWeakRoot` | `internal/risk/syncdirs_test.go:198` |
+| `TestSyncUnverifiedRootKeepsFallback` | `internal/risk/syncdirs_test.go:224` |
+| `TestSyncSuspectFallbackIsComponentBounded` | `internal/risk/syncdirs_test.go:344` |
+| `TestSyncSuspectFallbackWhenUndetectable` | `internal/risk/syncdirs_test.go:390` |
+
+### 3.3 两个口径的数（把口径写死，不许只引数字）
+
+| 口径 | 本 run 36003984868 | 台账锚 run 35840958334（`4e9adcc`，09-23 09:06Z） |
+|---|---|---|
+| **A：`--- FAIL:` 的顶层测试名去重枚数** | **16** | **17**（本程独立复算，与台账逐字对上） |
+| **B：含子测试路径的 `--- FAIL:` 行总枚数** | **16** | **21**（本程独立复算，与台账逐字对上） |
+| A 与 B 之差＝嵌套子测试红行数 | **0**（本趟一枚嵌套子测试都没红） | **4**（全是 `TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128/` 下的 `runTextTask`、`cmdModels`、`cmdProviders`、`cmdDoctor`；同族第 5 条腿 `resolveSecretLayout` 当时就是绿的） |
+| 旁证：两步 `runtests.sh` 的顶层 FAIL 计数相加 | 4 加 12 ＝ **16** | 5 加 12 ＝ **17** |
+
+所以本趟的诚实答案是 **16 与 16**，两数相等**只因这一趟没有任何嵌套子测试红**。
+"17 与 21 是两个不同的诚实答案"那课在本趟的对应物是 **16 与 16**——
+两个数相等本身是个事实，不是口径可以省掉的许可；换个有嵌套红的树它立刻分叉，所以口径必须继续一起引。
+
+台账原文（`docs/reports/pending-and-issues.md` 09-24 那节，门禁读数第②条）写的是
+"`test-windows` 红＝17 枚具名用例（`--- FAIL` 的名字去重＝17；含子项路径是 21 枚，两个数别混）"，
+本程用 `gh run view --log` 对 run `35840958334`（job `107115610835`）逐行 `grep -c` 复算，
+**17／21 两数复现成功**，不是〔仅自述〕。
+
+### 3.4 逐名 存量／新增 判定：**新增 0 枚，存量 16 枚，另有一枚存量转绿**
+
+台账锚那 17 枚与本趟 16 枚的差集，本程自己算了（不引台账的结论）：
+
+- 17 减 16 ＝ 唯一少掉的那枚是 **`TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128`**（`cmd/wisp/dataroot_128_test.go`，5 条腿）。
+- **它不是被跳过，是真变绿**（本仓规矩：判"不再红"先分清变绿还是被跳过）。日志正文三条都在：
+  `=== RUN` 母项 1 枚＋5 条子腿全在，随后 `--- PASS` 母项 (0.04s) ＋ 5 条 `--- PASS` 子腿全在，
+  且母项旁边还有真子进程诊断行（`dataroot_128_windows_test.go:69: AC#2 real process, leg "run" ... rc=2`、
+  `leg "doctor" ... rc=1` 等）。所以 **变绿，非 SKIP，非没跑**。
+- 归因到 commit：修好它的是 **`c2fa2e9`**（`test(wisp/128 AC#4): 进程内那五条腿钉住 WISP_ENV —— 先栽 runner 的 test 再 pin 回`，
+  09-24 17:23），**在本窗口之外**（`4e9adcc..30e19ef` 之间，属今天更早的一批推送）。
+  角色按 commit message 前缀 `test(...)` 读＝**实现程**；翻勾那枚是 `d56b6f5`（`docs(128,AC#4 翻勾 + AC#5 追加)`）。
+  所以本审计**不认领这枚绿**，也不许它被算进 35 枚的成绩。
+- 余下 16 枚逐名都在这 35 枚之外的存量集合里（16 枚的落点文件全部**不在**窗口 diff 名单——
+  窗口只碰了 `internal/observe` 的 3 枚 Go 文件，而 16 枚落在 `cmd/wisp/run_mode101_test.go`、
+  `cmd/wisp/run_test.go`、`internal/risk/pathresolver_*.go`、`internal/risk/syncdirs_test.go`）。
+  台账对这一族各归各的票也已在场：`TestPathResolver*` 三枚＝`R-115-2` 的 8.3 短名族，
+  `TestTicket101*` 三枚＝票 101 接线那一族，`TestComposedGateBlocksAWriteForTwoSeconds`＝票 123 那一族，
+  `TestAC2*128`＝`128 AC#4/AC#5`（已清）。
+
+所以 **`test-windows` 这一趟没有任何新增红；有且仅有 1 枚存量红被（别人、更早那批）修真了。**
+
+### 3.5 一枚本趟新暴露、但**归因也是存量**的第二个红因（step 8 单独点名）
+
+step 8 的自报是 `FAIL=12 SKIP=1`。那枚 `SKIP=1` 是 **`TestSyncRedTeamRealOneDrive`**
+（`internal/risk/syncdirs_redteam_windows_test.go:205`，`:208` 处 `t.Skip("no profile home")`）。
+判它要紧，因为 `tools/d22scan/runtests.sh` 的规矩是"**SKIP 不是 pass**"
+（该脚本 `:24` 注释、`:88` 计数 `^--- SKIP`、`:99` 见非零即判死），所以：
+
+- **step 8 今天有两枚彼此独立的红因**：12 枚 FAIL，加 1 枚**未登记的 SKIP**。
+- 那枚 SKIP **不在** `scripts/portable-tests.sh` 的豁免账本里（`grep -n TestSyncRedTeamRealOneDrive scripts/portable-tests.sh`
+  零命中；该步正文自报"11 ledger entries, 7 accounted on this platform"，7 条被点名的都不含它）。
+- 归因：`:205`/`:208` blame 到 **`c091ee2b`（09-20 13:06）**，且同一枚 SKIP 在锚 run `35840958334` 的
+  step 8 正文里**已经在场**（那趟同样是 `FAIL=12 SKIP=1`，八数与今天**逐字相同**：`PASS=266 FAIL=12 SKIP=1／=== RUN=409`）
+  所以 **存量**，与这 35 枚无关。
+- **但这条台账里没有**：台账那两条读数只数了 `--- FAIL` 的名字，没给 SKIP 记账。
+  后果具名：**把那 12 枚 FAIL 全修完，step 8 仍然是红的**，因为那枚未登记的 SKIP 会自己把它判死。
+  建议（本程不动手）：给 `TestSyncRedTeamRealOneDrive` 在 `scripts/portable-tests.sh` 补一行带理由的账，
+  **或者**让它在 windows runner 上真跑；两条路都由实现程走，谁都不许把 `runtests.sh` 的 SKIP 判死放宽。
+
+### 3.6 顺带纠一枚过期内联声明（`ci.yml`，非红、不改）
+
+`ci.yml:466-471` 写着 `PathResolver junction placeholder` 这一步"DO NOT READ THIS WIRING AS A FIX OR A MASK:
+the step **FAILS** on windows-latest today"，引的是 run `35551819606`。
+本程核：run `35840958334`（09-23）与本 run（09-24）该步**两趟都是 success**，正文 `PASS=1 FAIL=0 SKIP=0／=== RUN=1`。
+那句话是**过期声明**（引的是更早的 run），不是今天的事实；照 AGENTS.md 的规矩这里只登记不改文件——
+"注释里说它红"和"CI 读数说它绿"同时在场时，**以 step 级读数为权威**。
+
+---
+
 
