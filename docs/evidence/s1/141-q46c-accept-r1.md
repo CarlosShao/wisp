@@ -269,7 +269,74 @@ rc=1  PASS=21  FAIL=3  SKIP=0
 are still unscanned"，但表里只有 U+2460 一行——注释多报了一枚**没有用例**的码点。
 与格 6 同族（话比仪器宽），方向相反（这里是"承诺的缺口"被多列了一枚，不是"覆盖面"被多报）。
 
-## 5. 〔占位〕裁决格 4：断言有没有被放宽、helper 是不是原有的
+## 5. 裁决格 4：断言有没有被放宽、helper 是不是原有的（本仓放水只看这两条）
+
+### (a) `ed2c077` 里被动过的断言——**逐条枚举，零枚放宽**
+
+```
+$ git show ed2c077 -- tools/d22scan/scan_test.go | grep -cE '^-.*(t\.Error|t\.Fatal)'      → 0
+$ git show ed2c077 -- tools/d22scan/scan_test.go | grep -cE '^\+.*(t\.Error|t\.Fatal)'     → 10
+$ git show ed2c077 -- tools/d22scan/scan_test.go | grep -E '^-func Test'                   → 无（0 枚）
+$ git show ed2c077 -- tools/d22scan/scan_test.go | grep -E '^\+func Test'                  → 3 枚（新增）
+top-level `func Test*` 枚数：ed2c077^ = **21** → bb61dc5 = **24**（只增不减）
+```
+被改到的**非断言**内容一共三类，逐条列全：
+1. `TestEmojiBanCoversGoSourcesNotJustDesign` 的 **4 枚种子里的 3 枚**换了字面（见 (c)），
+   `want` 列表里 `internal/ok/comment.go` → `internal/ok/decl.go`（**枚数仍是 4**，
+   仍含 `internal/`、`internal/` 第二枚、`_test.go`、`cmd/` 四格）；断言体一行未动。
+2. `TestBan8FrontendScopeIsNotNarrowedByAnExtensionFilter` 的 6 枚种子
+   从 `"// ready \u2713 in a comment\n"` 换成 `"ready \u2713\n"`，**文件路径一枚没换、枚数一枚没换**；
+   它的断言 `if got := s.emojiSeen["frontend/"]; got != len(cases)` 原样。
+3. 三处**注释/doc** 改写（`walkEmoji` 头上那条 bullet、上面两枚测试的 doc、
+   `emojiRe` 新增 doc）。注释不是断言，但它们是"下一位读者会照做的话"，所以另计（格 6）。
+
+**没有一处 `t.Errorf`→`t.Logf` 的降档**：`:1273` 那句 `ban #6 examined %d` 一直是 `t.Logf`，
+`git log -L 1273,1274` 指回 `84e4161`（票 88），**不是本批动的手**。
+
+### (b) helper 是不是原有的
+
+* 测试侧：`seedFile`（`scan_test.go:15`）、`scanFixture`（`:472`）、`Scan`（`main.go:158`）
+  **三枚都在 `ed2c077^` 里已存在**（逐枚 `git show ed2c077^:...| grep -n` 复量），新增的三枚测试全部只用这三枚。
+  ⇒ 没有"新造一枚只被测试用、且天生放水的 helper"这种形状。
+* 生产侧新增的 `commentRangesFor`/`goCommentRanges`/`textCommentRanges`/`removeRanges`
+  只被 `walkEmoji` 调用（不是"只被测试调用"的旁路），且 `Scan` 的签名与调用点未变。
+* **抑制通道复核**：`git diff --stat 470e6c5 bb61dc5 -- tools/d22scan/allowlist.txt` ⇒ **0 行差异**。
+  全批**没有新增任何 allowlist 豁免**——这条必须单列，因为把违规塞进 allowlist 是本仓最省事的放水形状。
+
+### (c) "种子从注释移到非注释位置"——覆盖面是升还是降，用"删掉它会红"来答
+
+把 3 枚种子**逐字改回注释形**（`141-acc-mut-backseed`，别的一动不动）：
+
+```
+$ go test -count=1 -v -run TestEmojiBanCoversGoSourcesNotJustDesign ./
+    scan_test.go:322: ban #8 must report internal/ok/decl.go exactly once, got 0
+    scan_test.go:322: ban #8 must report internal/ok/emoji_test.go exactly once, got 0
+    scan_test.go:322: ban #8 must report cmd/wisp/glyph.go exactly once, got 0
+--- FAIL
+```
+⇒ 三点同时成立：**(i)** 这枚移动是**被迫的**（不移动这枚测试就会因豁免而假绿），
+**(ii)** 每枚种子**各自承重**（断言逐枚点名文件，删/糊任一枚都红），
+**(iii)** "注释也算"这一维**没有被丢掉，只是换了地方钉**——
+它在 `TestBan8CommentExemptionInGoSources` 里以 5 枚 `wantFindings: 0` 的行存在
+（line comment / doc comment / 一行块注释 / 多行块注释中间行 / 干净代码后的行尾注释）。
+文件级覆盖面（`internal/` 非测试、`internal/` 测试、`cmd/`、外加 `internal/` 里非 `.go` 的对照件）**四格一枚不少**。
+⇒ 判定：**覆盖不降**；净新增 19 形（10＋9）。
+
+### (d) 一枚该记的"计数口径"（不是放宽，但会让人误读）
+
+新测试里唯一的 `unparseable` 出现是 `if f.Ban == "unparseable" { continue }`——**丢弃**那一行不计数。
+`unparseable` 这道 ban 在 `scan_test.go` 全文**零断言**（`grep -n unparseable` 只出这 3 处，
+两处是注释、一处是这个 continue）。⇒ "解析失败本身仍是 lint 失败"（`scanGoFile` 的话）**没有钉子**。
+这是**先前就有**的缺口，本批没让它变坏（它反而第一次让解析失败文件的 emoji 计数可验证），
+但它的 `wantFindings: 2` 与这句丢弃合在一起读，容易被下一位读者当成"已经断过 unparseable"。记一句。
+
+### 本格判：**成立**
+
+零枚断言被删或降档、helper 全是原有的、无新增 allowlist 豁免、种子移动是被迫且各枚承重、覆盖净增。
+(d) 那一句与格 6 同批收即可，不构成退回。
+
+## 6. 〔占位〕裁决格 5：生产调用者与 golden/阈值
+
 
 
 
