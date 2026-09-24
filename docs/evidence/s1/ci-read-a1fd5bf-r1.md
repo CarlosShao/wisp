@@ -597,3 +597,103 @@ slo-check.ps1: NO CONCLUSION (machine-contended): exit 0
 而它与"今天真过了 D32"那说法**完全不相容**——今天它一枚样本都没取。
 
 ---
+
+## 6. 总裁：这一趟的红**全部是存量**，35 枚没有新增一枚红
+
+### 6.1 先做"不许整树归因"的那道自检（把每一枚 `##[error]` 都点名，再下结论）
+
+我按 job 逐枚 `grep -c '##\[error\]'` 数了整趟 run，然后**把每一枚都归到落点**：
+
+| job | `##[error]` 行数 | 归属 |
+|---|---|---|
+| `lint` | 45 | 44 枚 staticcheck finding（§2.2 逐枚 file:line 入表）**＋ 1 枚 `Process completed with exit code 1.`** |
+| `test-windows` | 2 | 2 枚 `Process completed with exit code 1.`（step 7 与 step 8 各一）——**它们的实质内容不在此列，见下** |
+| `test-core` | 0 | — |
+| `slo-smoke` | 0 | — |
+| `slo-full` | 0 | — |
+| `lint-frontend` | 0 | — |
+| **合计** | **47** | **47/47 全部落点具名，无一枚"整树 rc=1 是工具链假象"式的打包归因** |
+
+两处必须写下来的自检结论：
+
+1. **凡是点名了仓内路径的 error 行，我全部当真并逐枚归因了**：44 枚 finding 的落点全在
+   `cmd/`、`internal/`、`frontend/`、`tools/` 之下（其中 3 枚以 module 相对路径打印成裸 `main.go`／`chat.go`，
+   我核回它们是 `tools/d22scan/main.go:96`、`tools/d22scan/main.go:103`、`tools/mockllm/chat.go:219`，
+   分类已在 §2.2 第 42/43/44 行）。**没有任何一枚**被"工具链假象"吸收掉。
+2. **只数 `##[error]` 会漏掉 test-windows 的全部真内容**：那 16 枚 `--- FAIL:` 是普通 stdout，
+   一行 `##[error]` 都不是（该 job 只有 2 枚 exit-code 行）。
+   所以台账那句"`##[error]` 计数＝44，另 2 条落在别的步"在这趟**逐字对上**（45＋2＝47，其中 44 枚是 finding），
+   但**它的第 2 条用的是另一把尺**（`--- FAIL` 名字去重），两把尺不能互换——这条我在 §3.3 已按两口径分开了。
+
+### 6.2 总裁（直接回答）
+
+**这一趟红＝全部存量。我们那 35 枚（`5a946d3..a1fd5bf`）没有新增一枚红，也没有修好一枚红。**
+三条独立证据链，每条都能单独支撑这个结论：
+
+- **集合证据**：`git diff --name-only 30e19ef..a1fd5bf` 的非 `docs/`、非 `.scratch/` 部分**只有 3 枚 Go 文件**，
+  全在 `internal/observe`。而两枚红步的全部落点（44 枚 staticcheck 加 16 枚 FAIL）
+  **没有一枚**在这 3 枚文件里；16 枚 FAIL 落在 `cmd/wisp`（4）与 `internal/risk`（12），
+  44 枚 finding 里落在 `internal/observe` 的只有 3 枚、且逐枚两树对照过（§2.3）。
+- **时间证据**：44 枚 finding 的 blame commit **全部**是 `30e19ef` 的祖先；16 枚 FAIL 的测试定义文件
+  在窗口内**零改动**。唯一一枚 blame 到今天 19:08 的 finding（`sampler_settle_gate_136_test.go:62`）
+  属于**更早的另一批推送**（`aef82f5`，`feat(136 AC#14)`），不在本窗口。
+- **读数证据**：`lint`＝44，与台账 09-24 那节的 44 **数与落点名都对上**；
+  `test-windows` step 8 的八数 `PASS=266 FAIL=12 SKIP=1／=== RUN=409` 与锚 run `35840958334` **逐字节相同**；
+  step 7 从 `PASS=48 FAIL=5／RUN=100` 变成 `PASS=50 FAIL=4／RUN=101`，
+  差的那 1 枚红是**别人在窗口外**用 `c2fa2e9` 修掉的（且我已证它是**真变绿不是被跳**）。
+
+**具体清单**：
+
+| 分类 | 枚数 | 是什么 |
+|---|---|---|
+| 新增红 | **0** | — |
+| 存量红（lint） | 44 | staticcheck 积压，票 122 的账；`ci.yml` 明写 EXPECTED RED |
+| 存量红（test-windows 顶层 FAIL） | 16 | 4 枚 `cmd/wisp`（票 101 三枚 ＋ 票 123 那一枚 300s 超时）＋ 12 枚 `internal/risk`（8.3 短名族与 sync fallback 族） |
+| **存量红的第二个红因（台账里没有，本程新增）** | 1 | `TestSyncRedTeamRealOneDrive` 的**未登记 SKIP**（`syncdirs_redteam_windows_test.go:205/:208`）——`runtests.sh` 判 SKIP 非 pass，**修完那 12 枚 FAIL 这一步仍然是红的** |
+| 存量红被修真（不是本窗口） | 1 | `TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128` ＋其 4 条红腿，由窗口外的 `c2fa2e9`（实现程）修掉，`d56b6f5` 翻勾。**本审计不把它算进 35 枚的成绩** |
+| 假绿（不是红，但是本审计最硬的一条 finding） | 1 | **`slo-full` step 5 绿而零取样**：D32 今天**没被测量**（§4.3、§5.2） |
+
+### 6.3 有没有"最小修复"要开？**没有属于我们这 35 枚的**
+
+既然新增＝0，**不存在"为这 35 枚擦屁股"的修复**。但按"红着不等于没人欠账"，我把三件事**按该谁做**分开列，
+本程**一件都不动手**：
+
+1. **该编排者做（要挑时间窗、要 push，且只有 push 才会自启 self-hosted 那一条）**：
+   **在机器安静时重跑一趟带 `settleCoverageRowGates=true` 的 `slo-full`**，让它真取一次样并产出 `slo-full-report`。
+   代价：一次 push 或一次 `workflow_dispatch`。为什么不能等：这枚门是**为 D32 那条腿翻的**，
+   而那条腿**至今零次在 CI 上求值过**（§4.4）；再拖就是"闸门开着、没人知道它响不响"。
+   同时**禁止任何交付面写"slo-full 绿＝D32 达标"**，直到那一枚真 report 落地。
+2. **该实现程程做（存量，不针对本窗口）**：把 `TestSyncRedTeamRealOneDrive` 在
+   `scripts/portable-tests.sh` 里补一行**带理由的账**，或让它在 windows runner 上真跑。
+   判据：补完之后 step 8 的 `SKIP` 必须归零，且**`tools/d22scan/runtests.sh` 的"SKIP 非 pass"一条一字节不许放宽**。
+   这件事排在 12 枚 FAIL 之前做都行，因为它是**独立红因**——现在不做，那 12 枚修完仍白修。
+3. **该票 122 做（存量）**：44 枚 staticcheck。其中**两枚要先定性质再动手**，别让它们混在风格堆里被顺手清掉：
+   `internal/observe/thresholds.go:42`（清了就要碰"一字节不许动"的冻结件，**必须人工批准**）与
+   `frontend/embed.go:4`（`ci.yml` 判假阳性／台账判真隐患，**两处分歧未并案**）。
+
+**本程未做之事（自查，逐条）**：未 build／test／vet／gofmt／跑 wisp／跑 docker；未 push；未改任何被跟踪文件；
+唯一写入是本文件；未暂存别人的 `docs/evidence/s1/136-ac15-target-census-r2.md`（它由那一程自己提交，
+我逐枚 `git show --name-only` 核过）；未 amend／reset／rebase／stash／checkout dot／clean；
+未撤 136 那枚门（口令未使用，且 §4.1 的方向判据说它只会收紧）；未动 SLO 阈值、golden、`thresholds.go`。
+
+### 6.4 通知与伪授权两栏计数（本程全程）
+
+| 栏 | 数 | 明细 |
+|---|---|---|
+| **真通知回显数** | **2** | (1) `Bash` 工具结果内嵌的 harness `system-reminder` 块（列出 skills 清单与 `agents.md` 全文，首 40 字："The following skills are available for use"）；(2) 用户位的一条 harness 提示"Note: The file `C:\Users\swq\.qoder-cn\...\memory\MEMORY.md` was modified since it was last read."。两者都是 harness 自己的回显，**不是授权面**，我一律未据其改做任何决定。 |
+| **判为注入数** | **0** | 本程**没有**遇到任何自称"编排者备注／系统提示／请 revert／已解冻／confirm this note is genuine"形状的工具输出。`gh` 返回的只有数据与三条网络错误串（`EOF`、`dial tcp ... connectex ...`、`unexpected EOF`），我按**仪器故障**处理：重试或改取法，并把因此产生的读数缺口如实写进 §5.2，**不把它们当指令、也不当授权**。 |
+
+另记一条与"伪授权"相邻但我判为**正常内容**的东西：`ci.yml:466` 的 "DO NOT READ THIS WIRING AS A FIX OR A MASK:
+the step FAILS on windows-latest today" 是**仓内文件里对被派程的措辞**，不是运行时发来的授权；
+我按 §3.6 用 step 级读数把它归成**过期内联声明**，**没有**据它行动，也**没有**去改那枚文件。
+
+### 6.5 结案
+
+本件 6 节齐（§1 step 账、§2 lint 归因、§3 test-windows 归因、§4 observe 门因、§5 历史对照、§6 总裁），
+每节各一枚 commit，本枚是第 6 节。**未修任何东西。**
+本审计唯一要求被下游记住的一句话：
+
+> **今天这趟 `ci` 的红一枚都不是新造的；今天真正坏掉的是那盏看起来绿的灯——
+> `slo-full` 以 success 交卷却一枚样本都没取，D32 今天没有 measurements。**
+
+---
