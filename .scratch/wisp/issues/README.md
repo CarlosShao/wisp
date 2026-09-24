@@ -16,9 +16,11 @@ All tickets are **vertical tracer bullets**; work the **frontier** (all blockers
 
 **Rules (prevent abandoned/in-progress tech debt):**
 1. Before writing any code: set `Status: in-progress`, fill `Claimed by`, `Last update`,
-   append a Progress-log line → **commit + push (both remotes)** in the same step.
+   append a Progress-log line → **commit in the same step**（子代理**只 commit、不 push**）.
+   ⚠ 2026-09-24 更正：此处原文写「commit + push (both remotes)」——**照它做会绕过编排者的推送闸门**
+   （实际纪律：子代理只提交，推送由编排者在核过之后做，且两远程串行、成功判据要正向形状）。已按实际改掉。
 2. Append a Progress-log line after every meaningful unit (`- [UTC ts] agent=<id> did=… next=…`),
-   commit+push. Sub-agent lines tagged with their id. **Max 2 sub-agents per ticket**（每张票仍按票内
+   **commit**（同上：不 push）. Sub-agent lines tagged with their id. **Max 2 sub-agents per ticket**（每张票仍按票内
    `Parallel slots` 走，同票多写手会在同一工作树里互相踩）；**整体车队宽度 3**（R3，2026-09-20 用户批准，
    旧值 2 是 ZCode 免费配额校准的、已失效）。附加口径：需安静测量的票（SLO 私有工作集/延迟分段/CER）
    **独占 1 个代理**、其余排队；只读检索/审计类可放到 10+。>1 个写码代理必须 worktree 隔离
@@ -175,7 +177,10 @@ multi-task concurrency unlocks only at 47 (SPEC-12 §2).
 
 ## Hard global constraints (apply to EVERY ticket)
 
-- Never modify D1–D46 / C1–C31 / R1–R9 / D43 transition table (contract change = human approval).
+- Never modify D1–D47 / C1–C32 / R1–R9 / D43 transition table (contract change = human approval).
+  ⚠ 2026-09-24 更正：此处原写 `D1–D46 / C1–C31`，**是漏计**——`PLAN.md` 正文已有 D47（Path C 全双工）与 C32，
+  `SPEC-12 §4.1` 逐字写的就是「改 C1–C32 或 D1–D47 = 人工批准」。⚠ 注意 `PLAN.md:3` 那行状态摘要**自己也还写着 D1–D46/C1–C31**
+  （冻结面，**我没有改，等 owner 定**）。按范围收紧比放宽安全：漏计会让人以为"D47 不存在、可以随便动"。
 - Forbidden patterns (auto-checked in CI): bare `go func(` without owner/recover; `filepath.Clean|Abs`
   for fs decisions outside `risk.PathResolver`; plaintext API keys; wall-clock-difference timeouts;
   hashes fetched from mirrors; panel-sourced L2 "allow"; host-internal artifact writes implemented
