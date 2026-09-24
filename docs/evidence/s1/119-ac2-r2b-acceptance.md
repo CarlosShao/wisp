@@ -212,3 +212,119 @@ a701138 09-22 19:59 fix(winsec,126): 把卷段纳入 sameTree/answerInsideTree�
 盘上今天仍然写着"53 增 / 11 删"，只是台账与票面不再把它写成"一字未动"。
 （另外记一笔共树现状，不归我裁：票面 AC#2 那格仍是实现方自勾的 `[x]`，第一轮判的是**退回**——
 "表里退回而票面 `[x]`"这个形状本程不翻转、不代勾，只把事实留在这一行。）
+
+---
+
+## §2 正向读数重跑 ＋ 第一轮"条件 1"逐条对上
+
+### 2.0 这一节的读数是在哪一版树上量的（先把这个钉死，否则下面每个数都会腐坏）
+
+```
+git rev-parse HEAD        = bc4909612d4fb2b230042f2e0c15ec173bc444c9   (git cat-file -t = commit)
+git log -1 --format='%h %s' = bc49096 docs(A165; 更正 A164 的判早): …
+```
+⇒ **§2 与 §3-A 的全部容器读数 ＝ 锚点 `bc49096`（2026-09-24 16:2x，dev）**。
+共树在跑（同机还有 137 AC#4 与另一枚 119 复判程），**HEAD 每几分钟就换人**，
+所以任何后来的人要复算，请 `git archive bc49096` 而不是 `HEAD`。
+容器：`golang:1.27`（`go version go1.27.1 linux/amd64`，本机已有、未 pull），
+挂载一律 **Windows 形式** `-v "D:\tmp\<tree>:/wisp:ro"`，容器内每发自证
+`ls -l /wisp/go.mod` ＝ `-rwxrwxrwx 1 root root 883` ＋ `md5sum = f6ef661732b1851e5c3db348113cb605`。
+⚠ **派单给的 `-v /d/tmp/…:/wisp` 这一发我亲手量到是假绿**：容器里 `/wisp/go.mod` 不存在，
+而 `docker run` **rc=0**（同机那枚 119 复判程也登记了同一发，我这里独立复现一次）。
+四数一律 `-count=1 -v`、按 `^\s*--- ` 计数；每发另加 `grep -c '^panic\|^fatal error'`；
+`GATE golang-containers=0` 在每发前现量（18 发全 0，无一发撞负载）。
+
+### 2.1 正向读数：`internal/config` 那两枚用例 ＋ 落点归属逐行表
+
+**(a) 两枚真用例（锚点原树 `wisp119r2b-t0`，两形各一发）**
+
+| 形 | 读数 |
+|---|---|
+| 普通 `TMPDIR=/tmp/plain119r2b`（`ls -ld` 读到 `drwxr-xr-x`） | `RUN=2 PASS=2 FAIL=0 SKIP=0 panic=0 rc=0`：`TestRoundTripLoadMarshalLoad` PASS、`TestResolvedNeverPersists` PASS |
+| 软链 `TMPDIR=/varlink119r2b/tmp`（`ls -ld` 首列 `l`、`readlink -f` = `/realpriv119r2b/tmp`） | `RUN=2 PASS=2 FAIL=0 SKIP=0 panic=0 rc=0`：同两名逐名 PASS |
+两形的 `=== RUN` 名册与 `--- PASS` 名册**逐名相同**（差集为空），SKIP 名册两形皆空 ⇒ 没有"被跳过冒充变绿"。
+两形都打 `level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=1`
+⇒ **软链形下 C26  seam 也装上了**（第一轮 §七③ 那次"软链 temp 让守门人自伤拒装、打 ERROR"的读数
+在 `bc49096` 上已经不响；那是票 125 AC#2 `4824bb8` 的功劳，**不是票 119 的**，别记错账）。〔独立复现〕
+
+**(b) `subtest | path | seal` 逐行表（探针树 `wisp119r2b-t5`＝锚点树 ＋ 一枚仓外探针文件
+`internal/config/zz_r2b_landing_probe_119_test.go`，该文件**只存在于仓外快照**、未进仓、未 add）**
+探针走的是生产路（`config.SaveFile` → 密封缝），复用包内自己的 helper
+（`fullConfig`、`sealableTempDir124`），不新算任何期望值：
+
+| subtest | 形 | path（SaveFile 的目标） | seal 结果 | 落盘字节 |
+|---|---|---|---|---|
+| `resolved-helper-root`（＝两枚真用例今天递根的形状） | 普通 | `/tmp/plain119r2b/…/001/config.toml` | `seal-err=<nil>` | **4163** |
+| `resolved-helper-root` | **软链** | **`/realpriv119r2b`**`/tmp/…/001/config.toml`（**不是** `/varlink119r2b` 那一拼） | `seal-err=<nil>` | **4163** |
+| `raw-ambient-tempdir`（＝票 124 之前那两枚的形状） | 普通 | `/tmp/plain119r2b/…/001/config.toml` | `seal-err=<nil>`（无线可穿） | 4163 |
+| `raw-ambient-tempdir` | **软链** | `/varlink119r2b/tmp/…/001/config.toml` | **拒**：`winsec: refusing to seal … .wisp-config-….tmp … reaches it through the link at `**`/varlink119r2b`**`，which is not the tree this call names` | **-1（什么都没写）** |
+| `planted-link-inside-resolved-root`（对照，证明"seal-err=<nil>"不等于"这条人不密封"） | 普通 | `/tmp/plain119r2b/…/planted119r2b/config.toml` | **拒**，且记名记的是**本用例自己种的** `…/001/planted119r2b` | -1 |
+| `planted-link-inside-resolved-root` | 软链 | `/realpriv119r2b/…/planted119r2b/config.toml` | **拒**，同上记名自己种的链接 | -1 |
+整支探针：普通 `RUN=4 PASS=4 FAIL=0 SKIP=0 panic=0 rc=0`、软链 `RUN=4 PASS=4 FAIL=0 SKIP=0 panic=0 rc=0`
+（三枚子测试全绿，因为"被拒"本身就是它们的期望；`path/seal` 两列才是这一发的内容）。
+
+⇒ **R-119-4 那半面（"② 换出来的落点归属"）本程自己量到了，方向与第一轮一致**：
+根一旦由调用方解析，**"哪棵树被密封"就交给 `TMPDIR`（这里是 `/varlink119r2b`）的所有者**——
+写进去的是 `/realpriv119r2b/…`、4163 字节真落盘，而**穿过新种的链接照旧拒、且拒了什么都不建**。
+⚠ 第一轮那句"数据根被建成并被 **chmod 0700**"我这发**没有复算到**（我打的是根目录 mode，
+探针的 `Perm().String()` 把类型位吃掉了、读到 `rwxr-xr-x`；`config.toml` 自己的 mode 我没取）⇒ 记进 §5。
+
+### 2.2 恒真自查（派单第 ⑤ 条：判据在未修旧码上今天响不响）
+
+我自己这一发正向读数如果"怎样都绿"就是装饰。**树 `wisp119r2b-t6`＝锚点树 ＋ 把
+`internal/config/tempdir_resolved_124_test.go:33` 的 `proc.SealableRoot(t.TempDir())` 退回 `t.TempDir()`**
+（落地原文：`return func() string { _ = proc.SealableRoot; return t.TempDir() }() // R2B de-resolve`）：
+
+| 形 | 读数 | 红名 |
+|---|---|---|
+| 普通 | `RUN=2 PASS=2 FAIL=0 SKIP=0 rc=0` | — |
+| **软链** | `RUN=2 PASS=0 `**`FAIL=2`**` SKIP=0 rc=1` | `TestRoundTripLoadMarshalLoad`（`boundary_test.go:191 save: …`）、`TestResolvedNeverPersists`（`:239`），两句红因都是 `refuses … reaches it through the link at /varlink119r2b` |
+⇒ 这一发是"**未修码上今天不响、把解析摘掉才响**"的形状 ⇒ §2.1(a) 的"两形都 PASS"**不是恒真**，
+它确实在消费"调用方先解析"这条纪律。⚠ 同时给这条尺**划清归属**：
+它响的是 **票 124 那批 harness 换根**（`sealableTempDir124`），**不是票 119 那三枚生产调用点**——
+把它当"票 119 AC#2 的落地凭据"记就是一次数错对象（这正是本会话今天上午那笔"归因腐坏"的同类）。**〔独立复现〕**
+
+对 §3-A 那几发的恒真自查另有一发：`wisp119r2b-t7` ＝ 两味齐全的树 ＋ **MUT-D**
+（把 `internal/winsec/winsec_other.go:158` 文案里的 `" through the link at "` 抹成 `" reaches it via "`；
+落地证 ＝ 该串在两枚文件里的 `grep -c` 由 1 变 0；**只动措辞、`ErrUnresolvedPath` 与判定分支一字未动**）
+⇒ 两形各 `RUN=5 PASS=3 `**`FAIL=2`**` rc=1`，红名恰是接了记名断言的那两枚
+（`TestAC1POSIXUnresolvedSymlinkedRootStillRefused119`、`TestAC2POSIXInjectedTestDataDirStandsAsDeclared119`），
+而 `:251` 那枚 AC#3 与两枚 becomes-sealable 仍 PASS ⇒ **记名断言有牙齿、不是恒绿**。**〔独立复现〕**
+
+### 2.3 第一轮 `119-adversarial-acceptance.md:100` 那句"条件 1"，逐条对上
+
+第一轮原文（:100-:113）拆成四条，逐条给我自己的读数（**〔独立复现〕**指标本程现量；
+标〔日志＋归档，抽验〕＝我只引第一轮那发的数并核了它的可复算性）：
+
+| # | 第一轮写的 | 今天（锚点 `bc49096`）盘上／容器里是什么 | 闭合？ |
+|---|---|---|---|
+| 1 | `cmd/wisp/secret.go:118 resolveSecretLayout` 把 `os.UserConfigDir()` 原样交给 `proc.LayoutFor`，**不走 `DefaultLayout`** ⇒ ② 有第二个生产读者没被覆盖 | `grep -n` 现量：`cmd/wisp/secret.go:129 func resolveSecretLayout`、**`:148 root = proc.SealableRoot(root)`**（`36294c2` 落的那"一行"，numstat `cmd/wisp/secret.go 15/0`）⇒ 这条生产路现在解析 | **闭合** |
+| 2 | 这条路上"合法数据根被误伤 ⇒ 跑不起来"今天仍被真实造出来（真二进制 `wisp secret list` dev 三形 rc=1） | 我没有重跑真二进制（要 sherpa 运行库＋宿主链接，属票 111/123 地界）；**我用同一条函数的容器用例代替**：`./cmd/wisp/ -count=1 -v -run 'SecretRoute.*119'` 两形各一发＝ `RUN=3 PASS=3 FAIL=0 SKIP=0 panic=0 rc=0`，三枚名册＝ `…SymlinkedHomeBecomesSealable119`、`…SymlinkedXDGConfigHomeBecomesSealable119`、`TestAC3POSIXSecretRouteLinkInsideItsDataRootStillRefused119`。**真二进制那一发仍属第一轮〔日志＋归档，抽验〕**，本程不背书其 rc 数 | **按"结局不再被造出来"闭合；按"我这发亲眼看过的最强凭据"只到用例级** |
+| 3 | `grep os.Symlink cmd/wisp/*_test.go` 命中 **0** 次 ⇒ 这条形状在本仓零用例 | 本程重跑：命中文件 **1 枚**（`cmd/wisp/secret_dataroot_119b_test.go`，`os.Symlink` **3 处**）；`grep resolveSecretLayout\|resolveDataDir cmd/wisp/*_test.go` 由 0 → **18 处**（`dataroot_128_test.go`）＋ **9 处**（`secret_dataroot_119b_test.go`）⇒ 命令面级用例有了 | **闭合** |
+| 4 | 修它要"不许拿被测函数算 fixture"（第一轮 :514；`MUT-119-R` 56/56 全绿就是没守这条的直接后果） | `grep -n SealableRoot cmd/wisp/secret_dataroot_119b_test.go` ＝ 只在 **:24 的注释**里出现（"never from proc.SealableRoot"）；期望值来自 `filepath.EvalSymlinks`（:79）＋ `os.SameFile`；恒真那一族另有 `33c8acd`（`internal/winsec/dataroot_symlink_119_other_test.go` 76/20）把 fixture 换成 `cleanSpelling119`（:112 明写"deliberately filepath.EvalSymlinks and not proc.SealableRoot"） | **闭合** |
+
+**"② 只做了一半"这半句本身**：第一轮点名的覆盖面是 3 枚调用方（`envfork.go:106/:226`、`doctor.go:249`）
+缺第 4 枚。本程在 `bc49096` 现量 `grep -rn "SealableRoot(" --include='*.go' cmd internal | grep -v _test.go` ⇒
+**4 枚生产调用点 ＋ 1 枚定义**，逐枚给号：
+
+```
+cmd/wisp/doctor.go:263            base = proc.SealableRoot(base)
+cmd/wisp/secret.go:148            root = proc.SealableRoot(root)      ← 第一轮点名缺的那一枚
+internal/proc/envfork.go:125      return filepath.Join(SealableRoot(os.TempDir()), …)
+internal/proc/envfork.go:245      l, err := LayoutFor(env, SealableRoot(dir))
+internal/proc/envfork.go:160      func SealableRoot(path string) string   ← 定义，不是调用
+```
+⚠ **行号已经从第一轮引的那组（:106/:226/:249）漂走了**（票 124/125/128/129 都动过这几枚文件）
+⇒ 引"第几枚调用方"要引**枚数与名册**，别引行号。
+而 `winsec_other.go:116-119` 的注释今天**逐名列了这四枚**（含 `resolveSecretLayout`）
+⇒ 半面补全，且注释与盘上数量对得上。**〔独立复现〕**
+
+### 2.4 那本账接住了没有——分两层答，别混
+
+* **账面上的"登记"层**：`R-119-4` 已在 `034080c` 写进 `winsec_other.go` 的"第二条成本"（§1 一档零行、
+  二档 53/11 里就含它），票面 `:421` 也把它列进 `next=` 第 5 条。**这一层有。**
+* **归属层（第一轮 :496/:529 建议并案到的那本账）**：票面 `next=` 第 5 条今天仍写着
+  "**要不要并案到票 120 / `R-108-2` 那本账，请编排者裁**"——**没有并案、没有裁**。
+  所以：**"落点归属"这件事的*事实*这一格接住了（§2.1(b) 我量到了），它的*归属*还挂在编排者手上**。
+  这不影响 AC#2 的射程（AC#2 要求的是"裁 ①/②/③ ＋ 写理由 ＋ winsec 是否一字未动"），
+  但**别在台账里把 `R-119-4` 记成"已并案"**——它是"已登记、待人裁归属"。**〔独立复现〕**
