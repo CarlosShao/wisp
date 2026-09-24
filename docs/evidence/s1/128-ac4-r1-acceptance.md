@@ -335,6 +335,75 @@ docs/evidence/s1/128-ac4-r1-acceptance.md
 
 ---
 
+## 6. 副产物那一发的连带判断（本格最值钱的一条）—— 两句都要明确裁
+
+**先把它主张的那件事实独立量一遍，判真假**：「CI 上那四条红里 `assertDirEmpty128` 没报，
+因为落点被搬去了仓外绝对路径 -> 修之前"当前目录一字节不许多"在 runner 上是**被另一枚回落点满足的，不是被拒绝满足的**」。
+
+| 我的尺 | 读数 |
+|---|---|
+| P1（`snap-pre` + `WISP_ENV=test`，整份日志）里目录类句子命中数：`grep -c "start-up directory\\|did not write\\|dirEmpty\\|not empty" P1-pre-cishape.log` | **0** —— 四条红全是 `:295` 的 marker 缺失，目录那一格一条没响 |
+| 同发的日志里落点被印成什么 | `msg="wisp: persistent log sink installed" dir=C:\Users\<me>\AppData\Local\Temp\wisp-test-<pid>\logs`（我这台机）、CI 原文是 `...\runneradmin\...\wisp-test-8104\logs` -> **两边都是仓外绝对路径** |
+| CI 自己那一步的原文（我 `gh` 取的那份） | 同上，且 `[PASS] data dir writable (test) C:\Users\runneradmin\AppData\Local\Temp\wisp-test-8104` |
+| 目录断言在真进程那一半是不是也做 | **做**：`cmd/wisp/dataroot_128_windows_test.go:79 assertDirEmpty128(t, cwd, "real leg "+leg.name)`，且它跑的是**真删 APPDATA 的子进程** |
+
+⇒ **主张为真**，档位：独立复现（本机 + CI 原文两版都我亲自取到）。下面是两句要裁的话。
+
+### 6.1 ① 这会不会回头动摇票 128 `AC#2` 那格已判成立的裁决？—— **不会。那一半是真实的。**
+
+`AC#2` 的判据本体（票面 `:38-39`）是「同形下**三条腿都拒、拒绝原因可被人读懂**，并且**当前目录里一个字节都不许多出来**」。
+实现方 `T128-ac23` 交回那句"run rc=2 / secret rc=2 / doctor rc=1 / 常驻 rc=1、四枚 CWD 全空"，量的是**真进程 + `WISP_ENV=dev`** 那一半。
+**那一半在我手上有三条独立凭据，没有一条依赖进程内那枚 seam**：
+
+1. **CI 自己的日志**（run `35967768017`，修前那版码）：`TestAC2RealProcessRefusesOnEveryLegWithoutAppData128`
+   顶层 + `run` / `secret-list` / `doctor` / `resident` **五枚全 PASS**，且日志逐条印着
+   `APPDATA unset, WISP_ENV=dev, cwd=C:\Users\RUNNER~1\...\001 -> rc=2`（四枚子用例各一条），拒绝文案含全部自救句。
+   ⇒ runner 上真发生过"拒绝 + CWD 空"，这不是本机专属。
+2. **我这台机**：G5（修前树、`WISP_ENV=test`、整包 count=2）里那枚用例**10 次出现、0 枚红**；
+   G1/G2（修后两形）里同样 10 次全 PASS。⇒ ambient 那枚变量动不到它，因为 `appDataFreeEnv128` 末行
+   （`dataroot_128_windows_test.go:113 return append(kept, "WISP_ENV=dev")`）**给子进程钉了 dev** —— 它的凭据是自足的。
+3. **它有没有牙**：G3/G4（把生产码退回 `base="."`）里 `TestAC2RealProcess...{,/run,/doctor}` **照样红**，
+   红句 `wrote into the start-up directory` 出自上面那枚 `:79`。⇒ 这一半不是"恒绿的装饰"，它咬得住。
+
+⇒ **判语：`AC#2` 那格不动。** 本枚（AC#4）暴露的是**第二见证**（进程内那五条腿）在 runner 上曾经过弱，
+不是**已入账的那一枚凭据**为弱。顺带把 `AC#3` 也过一遍尺（因为它的红名清单与这一枚同源）：
+票面 `:23` 那句"改回 `base="."` -> 判定用例必须红、红名点到它"是在 **dev 形**下量的，那一发我复到了（§5 对照行第一发）；
+而 AC#4 之后它**两形都红**（G3/G4）⇒ **AC#2/AC#3 两格都只会因为本枚被加强，不会因为本枚被追回。**
+唯一要落账的一句限定（写进台账、不改写历史）：**修前那版的"三腿都拒"在 runner 上只有真进程那一半在作证**，
+读到 `AC#2` 那段的人不该以为"进程内那五条腿也在 runner 上作证"。这条限定**不改变档位**（那一格本来就是真进程凭据撑的）。
+
+### 6.2 ②「CI 会看着这条用例」这句话在此之前是不是一句装饰？—— **是装饰，而且是恒红型装饰（比恒绿更贵）**
+
+要把两件事分开，不然这句会被读成"CI 没跑它"：
+- **CI 有没有跑到它**：跑到了。CI 那一步自己打的四数 `=== RUN=101 --- PASS=49 --- FAIL=5 --- SKIP=0` 里就含它，名字、缩进深度、断言行号 `:295` 全在。
+- **CI 有没有"看着"它（=它的判定路径能不能区分被裁的两种行为）**：**没有**。这一发的凭据是我自己造的两份日志：
+
+| 比 | 同一棵 `snap-pre` 树、同一条命令、同一个 `WISP_ENV=test` | 结果 |
+|---|---|---|
+| (a) 生产码**未动** | `P1-pre-cishape.log` | 顶层 FAIL + 4 腿 FAIL + `resolveSecretLayout` PASS |
+| (b) 生产码退回 `base="."`（= AC#2 明令禁止、AC#1 实测过的搬家行为） | `M-PRE-basefallback-testenv.log` | **同上** |
+| 两份的**结构骨架**（`=== RUN` / `--- PASS\|FAIL` / 含 `AC#2 RED` 的断言行） | 各 16 行 | `diff` **rc=0，零输出** |
+| 两份的**逐字节**差 | — | 只差时间戳、`wisp-test-<pid>`、`go-build<hash>`、时长；断言层**一字不差**（`diff` 输出 10 段，全在这四类字节上） |
+
+⇒ **修之前，这条用例在 runner 上对"拒绝 / 回落到 CWD"这一对它是被裁来区分的区别，输出的是一模一样的字。**
+它的红还是**固定红**（那四条腿在 runner 上无论如何都红），所以它同时**吃掉了自己的信号量**：
+下一位真伤（比如有人把 `base="."` 放回去）在这条用例上**不会引起任何颜色变化**。
+这正是本仓记过的那族形状——**"这条用例在这个 runner 上没有分母"**，以及**恒真判据**的近亲（恒红判据）。
+
+**「删掉哪条用例会变红」这一问的答法（两版都给，因为它就是这句判据的正反两面）**：
+- **修前**：把 `doctor.go:261` 那枚 `return "", dataDirUnresolved128(env, err)` 删掉/退回 `base="."`
+  -> **CI 形下没有任何一条用例改变颜色**（(a) 与 (b) 逐字同形）。⇒ 那一格当时在 runner 上答不出这一问。
+- **修后**：同一处同一撤 -> CI 形下 **7 枚 FAIL**（`TestAC2ResolveDataDir...128{,/dev,/prod}`、
+  `TestAC2EveryLeg...128`、`TestAC2RealProcess...128{,/run,/doctor}`），0 SKIP、0 panic（= 我的 G4）。
+  ⇒ 这一问现在答得出，且答法是"三条腿里两半都响"（进程内那枚 + 真进程那两枚）。
+
+**判语（这两句一起构成我对本格的终判依据）**：`c2fa2e9` 买的不是"把 CI 那四条红洗绿"，
+而是**给这条用例在 runner 上装回了分母**；副产物那句登记我判它**为真、且是本次交付里信息量最大的一条**，
+它不追回任何已入账的格子，但它把"门禁颜色变绿"这一件事从判据里**降级**了：
+以后引用本格，凭据应当是 §5/§6 这两发（红因换轨 + 由红转绿），不是四数。
+
+---
+
 ## 7. 其余三套门禁与四把尺（AC#4 那一格逐项，全部我自己真跑）
 
 | 门禁 | 我在哪棵树上跑的 | 命令原文 | rc | 读数 |
@@ -500,87 +569,20 @@ docs/evidence/s1/128-ac4-r1-acceptance.md
 | **本程被拒次数** | **0** | 没有任何一次工具调用被权限系统挡下。 |
 | **自伤记录（不算被拒、算仪器账）** | **4** | ① python 里用 `/d/tmp` 形路径 -> `FileNotFoundError`（改 `D:/tmp` 即通）；② `grep -oE` 的模式以 `-` 开头被当选项 -> `unknown option`；③ 后台命令尾部 `grep -c` 命中 0 让整发"看起来 failed"（读数其实在）；④ **W3 第一发忘 `export PATH` -> `exit status 0xc0000135` 且 0 行测试结果**——正是 `scripts/wisp-cli-tests.sh` 头部写明的 ticket 98 形状；我把它当成"rc=1 红"读了一次，**当场发现并复跑**（`M-W3-noseam-*.log` 是复跑后的那对，第一次那对已被覆盖，登记在此）。另两发是我的 `assert` 下标数错（变异未落地、文件未被改坏），故未产生错误读数。 |
 
-**10.3 本文件的 commit 账**（**别按这张表数，按命令数**：`git log --oneline -- docs/evidence/s1/128-ac4-r1-acceptance.md`）
+**10.3 本文件的 commit 账**（**别按这张表数，按命令数**：`git log --oneline -- docs/evidence/s1/128-ac4-r1-acceptance.md`；`git show --name-only --format="" <每枚>` 逐枚现量都只列本文件）
 
-| 节 | commit | `--name-only` |
+| 节 | commit | 备注 |
 |---|---|---|
-| §0-§1 | `d9f008d` | 只本文件 |
-| §2 | `d3dd1cc` | 只本文件 |
-| §3 | `e220bf5` | 只本文件 |
-| §4 | `87339ba` | 只本文件 |
-| §5-§6 | `9695369` | 只本文件（**这枚之前 staged 里出现过兄弟程的 `140-static-inventory-r1.md`，我带 pathspec 提交，事后双量两边归属都没被卷走**，见 §5.1） |
-| §7 | `9c8eb3f` | 只本文件 |
-| §7.1 | `f0d023e` | 只本文件 |
-| §8 | `27a880a` | 只本文件 |
-| §9-§10（本枚） | 由 `git log --oneline -1` 现量，**一枚列不进它自己** | 只本文件 |
+| §0-§1 | `d9f008d` | — |
+| §2 | `d3dd1cc` | — |
+| §3 | `e220bf5` | — |
+| §4 | `87339ba` | — |
+| §5-§6 | `9695369` | **这枚之前 staged 里出现过兄弟程的 `140-static-inventory-r1.md`**：我带 pathspec 提交，事后双量两边归属都没被卷走（见 §5.1） |
+| §7 | `9c8eb3f` | — |
+| §7.1 | `f0d023e` | — |
+| §8 | `27a880a` | — |
+| §9-§10 | `d484edf` | — |
+| §7.1 口径更正 | `9fcb2ed` | 更正"两版数不同口径"那句 |
+| 结构修复（本次这一枚） | 由 `git log --oneline -1` 现量 | **修的是我自己造成的两件事**：(a) 逐节 Edit 的锚点选在已挪过位置的文本上 -> §6 一度落到 §10 之后（现已按 0-10 顺序排回，内容零增删）；(b) 一枚 Edit 的 `new_string` 被我发到一半就截断 -> §10.3 那张账表被换成残句（现已补回并顺手写全） |
 
 **交回的话**：`AC#4` 判**成立、无附条件**；勾由编排者按本表打；本程未翻勾、未改票名、未写票面 128 那枚文件、未 push、未碰 `ci.yml`／生产码／`internal/winsec/**`／`internal/risk/**`／阈值／golden／`frontend/**`／`design/**`／`docs/reports/**`／别人的证据件。
-
----
-
-## 6. 副产物那一发的连带判断（本格最值钱的一条）—— 两句都要明确裁
-
-**先把它主张的那件事实独立量一遍，判真假**：「CI 上那四条红里 `assertDirEmpty128` 没报，
-因为落点被搬去了仓外绝对路径 -> 修之前"当前目录一字节不许多"在 runner 上是**被另一枚回落点满足的，不是被拒绝满足的**」。
-
-| 我的尺 | 读数 |
-|---|---|
-| P1（`snap-pre` + `WISP_ENV=test`，整份日志）里目录类句子命中数：`grep -c "start-up directory\\|did not write\\|dirEmpty\\|not empty" P1-pre-cishape.log` | **0** —— 四条红全是 `:295` 的 marker 缺失，目录那一格一条没响 |
-| 同发的日志里落点被印成什么 | `msg="wisp: persistent log sink installed" dir=C:\Users\<me>\AppData\Local\Temp\wisp-test-<pid>\logs`（我这台机）、CI 原文是 `...\runneradmin\...\wisp-test-8104\logs` -> **两边都是仓外绝对路径** |
-| CI 自己那一步的原文（我 `gh` 取的那份） | 同上，且 `[PASS] data dir writable (test) C:\Users\runneradmin\AppData\Local\Temp\wisp-test-8104` |
-| 目录断言在真进程那一半是不是也做 | **做**：`cmd/wisp/dataroot_128_windows_test.go:79 assertDirEmpty128(t, cwd, "real leg "+leg.name)`，且它跑的是**真删 APPDATA 的子进程** |
-
-⇒ **主张为真**，档位：独立复现（本机 + CI 原文两版都我亲自取到）。下面是两句要裁的话。
-
-### 6.1 ① 这会不会回头动摇票 128 `AC#2` 那格已判成立的裁决？—— **不会。那一半是真实的。**
-
-`AC#2` 的判据本体（票面 `:38-39`）是「同形下**三条腿都拒、拒绝原因可被人读懂**，并且**当前目录里一个字节都不许多出来**」。
-实现方 `T128-ac23` 交回那句"run rc=2 / secret rc=2 / doctor rc=1 / 常驻 rc=1、四枚 CWD 全空"，量的是**真进程 + `WISP_ENV=dev`** 那一半。
-**那一半在我手上有三条独立凭据，没有一条依赖进程内那枚 seam**：
-
-1. **CI 自己的日志**（run `35967768017`，修前那版码）：`TestAC2RealProcessRefusesOnEveryLegWithoutAppData128`
-   顶层 + `run` / `secret-list` / `doctor` / `resident` **五枚全 PASS**，且日志逐条印着
-   `APPDATA unset, WISP_ENV=dev, cwd=C:\Users\RUNNER~1\...\001 -> rc=2`（四枚子用例各一条），拒绝文案含全部自救句。
-   ⇒ runner 上真发生过"拒绝 + CWD 空"，这不是本机专属。
-2. **我这台机**：G5（修前树、`WISP_ENV=test`、整包 count=2）里那枚用例**10 次出现、0 枚红**；
-   G1/G2（修后两形）里同样 10 次全 PASS。⇒ ambient 那枚变量动不到它，因为 `appDataFreeEnv128` 末行
-   （`dataroot_128_windows_test.go:113 return append(kept, "WISP_ENV=dev")`）**给子进程钉了 dev** —— 它的凭据是自足的。
-3. **它有没有牙**：G3/G4（把生产码退回 `base="."`）里 `TestAC2RealProcess...{,/run,/doctor}` **照样红**，
-   红句 `wrote into the start-up directory` 出自上面那枚 `:79`。⇒ 这一半不是"恒绿的装饰"，它咬得住。
-
-⇒ **判语：`AC#2` 那格不动。** 本枚（AC#4）暴露的是**第二见证**（进程内那五条腿）在 runner 上曾经过弱，
-不是**已入账的那一枚凭据**为弱。顺带把 `AC#3` 也过一遍尺（因为它的红名清单与这一枚同源）：
-票面 `:23` 那句"改回 `base="."` -> 判定用例必须红、红名点到它"是在 **dev 形**下量的，那一发我复到了（§5 对照行第一发）；
-而 AC#4 之后它**两形都红**（G3/G4）⇒ **AC#2/AC#3 两格都只会因为本枚被加强，不会因为本枚被追回。**
-唯一要落账的一句限定（写进台账、不改写历史）：**修前那版的"三腿都拒"在 runner 上只有真进程那一半在作证**，
-读到 `AC#2` 那段的人不该以为"进程内那五条腿也在 runner 上作证"。这条限定**不改变档位**（那一格本来就是真进程凭据撑的）。
-
-### 6.2 ②「CI 会看着这条用例」这句话在此之前是不是一句装饰？—— **是装饰，而且是恒红型装饰（比恒绿更贵）**
-
-要把两件事分开，不然这句会被读成"CI 没跑它"：
-- **CI 有没有跑到它**：跑到了。CI 那一步自己打的四数 `=== RUN=101 --- PASS=49 --- FAIL=5 --- SKIP=0` 里就含它，名字、缩进深度、断言行号 `:295` 全在。
-- **CI 有没有"看着"它（=它的判定路径能不能区分被裁的两种行为）**：**没有**。这一发的凭据是我自己造的两份日志：
-
-| 比 | 同一棵 `snap-pre` 树、同一条命令、同一个 `WISP_ENV=test` | 结果 |
-|---|---|---|
-| (a) 生产码**未动** | `P1-pre-cishape.log` | 顶层 FAIL + 4 腿 FAIL + `resolveSecretLayout` PASS |
-| (b) 生产码退回 `base="."`（= AC#2 明令禁止、AC#1 实测过的搬家行为） | `M-PRE-basefallback-testenv.log` | **同上** |
-| 两份的**结构骨架**（`=== RUN` / `--- PASS\|FAIL` / 含 `AC#2 RED` 的断言行） | 各 16 行 | `diff` **rc=0，零输出** |
-| 两份的**逐字节**差 | — | 只差时间戳、`wisp-test-<pid>`、`go-build<hash>`、时长；断言层**一字不差**（`diff` 输出 10 段，全在这四类字节上） |
-
-⇒ **修之前，这条用例在 runner 上对"拒绝 / 回落到 CWD"这一对它是被裁来区分的区别，输出的是一模一样的字。**
-它的红还是**固定红**（那四条腿在 runner 上无论如何都红），所以它同时**吃掉了自己的信号量**：
-下一位真伤（比如有人把 `base="."` 放回去）在这条用例上**不会引起任何颜色变化**。
-这正是本仓记过的那族形状——**"这条用例在这个 runner 上没有分母"**，以及**恒真判据**的近亲（恒红判据）。
-
-**「删掉哪条用例会变红」这一问的答法（两版都给，因为它就是这句判据的正反两面）**：
-- **修前**：把 `doctor.go:261` 那枚 `return "", dataDirUnresolved128(env, err)` 删掉/退回 `base="."`
-  -> **CI 形下没有任何一条用例改变颜色**（(a) 与 (b) 逐字同形）。⇒ 那一格当时在 runner 上答不出这一问。
-- **修后**：同一处同一撤 -> CI 形下 **7 枚 FAIL**（`TestAC2ResolveDataDir...128{,/dev,/prod}`、
-  `TestAC2EveryLeg...128`、`TestAC2RealProcess...128{,/run,/doctor}`），0 SKIP、0 panic（= 我的 G4）。
-  ⇒ 这一问现在答得出，且答法是"三条腿里两半都响"（进程内那枚 + 真进程那两枚）。
-
-**判语（这两句一起构成我对本格的终判依据）**：`c2fa2e9` 买的不是"把 CI 那四条红洗绿"，
-而是**给这条用例在 runner 上装回了分母**；副产物那句登记我判它**为真、且是本次交付里信息量最大的一条**，
-它不追回任何已入账的格子，但它把"门禁颜色变绿"这一件事从判据里**降级**了：
-以后引用本格，凭据应当是 §5/§6 这两发（红因换轨 + 由红转绿），不是四数。
