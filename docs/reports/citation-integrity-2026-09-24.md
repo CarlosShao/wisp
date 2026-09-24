@@ -334,3 +334,57 @@ $ git log -1 --format='%h %ad' --date=format:'%H:%M'
 ⇒ **检查 4 这一类没有产出一枚新缺陷**：30 条里没有一条"行号＋内容都追不回来"。
 最脆的一族是 `tools/d22scan/**` 与 `cmd/wisp/**` 的**跨文件/大跨度漂移**（#12/#13/#17 一漂就是 82～443 行，#13 还换了文件），
 以及 #9 那枚**符号本身已经不在代码里**的引用（`mulA`）。
+
+---
+
+## 总裁（四类检查各一句 ＋ 缺陷逐枚）
+
+```
+$ date "+%Y-%m-%d %H:%M %z"
+2026-09-24 23:33 +0800
+
+$ git log -1 --format='%h %ad' --date=format:'%H:%M'
+beac693 23:31
+```
+
+| 检查 | 一句总裁 |
+|---|---|
+| 1 sha 可解析性 | 终态抽数 **1252 处／644 枚去重**：**521 枚可解析**、**122 枚不可解析但正常**（63 枚全数字 run/job/字节读数 + 36 枚上下文已定性为假号 + 14 枚根本不是号 + 9 枚…见下行）、**9 枚是缺陷**（其中 2 枚台账已自纠、**7 枚至今无更正**）、**1 枚待更正**（`:5771` 的"五枚 commit"漏了真号 `7cc5050`）。 |
+| 2 证据路径存在性 | 75 枚去重路径里 **67 在盘**、**6 是通配/省略写法**、**2 枚不存在但上下文自己已判为幽灵投递** ⇒ **本项 0 枚新缺陷**；另 **0 枚**行号越界。 |
+| 3 工单号可解析性 | `票 NN` 104 枚号**全部有票（0 枚指向空号）**、**4 枚**指向"同号已改名（`-done`）"的旧名（待更正）、**10 枚** `#NN` 编排者任务表号**在仓内根本不可解析**（结构性，待更正）。 |
+| 4 `file:line` 存活 | 分层 30 条：**15 在**、**11 待更正**（行号漂移或字面因修码而变，内容仍找得到）、**2 已作废**（台账自判前提不存在）、**1 不可判**（指向他人未提交工作树）、**0 缺陷**。 |
+
+### 缺陷逐枚（`file:line` ＋ 现量命令）
+
+| # | `file:line` | 缺陷句子（台账原话） | 现量命令 ⇒ 结果 |
+|---|---|---|---|
+| D1 | `docs/reports/pending-and-issues.md:5728` | 末枚 `0377e87` **我复量存在** | `git cat-file -t 0377e87` ⇒ fatal（本会话 23:31 复跑）；该表真末枚是 `9048866` ⇒ `git log --format=%h -- docs/evidence/s1/ci-read-a1fd5bf-r1.md` |
+| D2 | `docs/reports/pending-and-issues.md:5734` | `f1086b4` **我 `cat-file` 复量存在** | `git cat-file -t f1086b4` ⇒ fatal；同句另一枚 `690e87a` ⇒ 同 fatal（台账 `:5744` 已自纠这两枚，缺陷句子仍按 append-only 留在正文） |
+| D3 | `docs/reports/pending-and-issues.md:5660` | 表 `140-ac1-verdict-r1.md`…起手锚 **`5c6f824`** | `git rev-parse --verify 5c6f824` ⇒ NO；`git log --all --format='%H' \| grep -c '^5c6f824'` ⇒ **0**；同句并列的 5 枚 `bd0f826 e731a7a 7d13450 6aad697 c4d54c6` 全为 commit ⇒ **无更正记录** |
+| D4 | `docs/reports/HANDOVER.md:91` | 401 行／5 枚 commit…，**锚 `5c6f824`** | 同 D3 ⇒ **无更正记录** |
+| D5 | `docs/reports/pending-and-issues.md:5667` | `R-140-1` 那三处恒真断言（`c2fa2e9`／`2f22ab3`／**`1e8f8eb`**）改成非恒真 | 并列两枚 `git cat-file -t` ⇒ commit，`1e8f8eb` ⇒ fatal ⇒ **无更正记录** |
+| D6 | `docs/reports/pending-and-issues.md:1691` | AC#1/AC#2 = 原代理（**`1f8d212`**）、代码＝编排者代落档（`d0d8782`） | 同句其余三枚（`d0d8782`／`06906f7`／`9e00629`）全是 commit，只它 ⇒ fatal ⇒ **无更正记录** |
+| D7 | `docs/reports/pending-and-issues.md:5702` | 文本自 **`e0071e2`** 09-21 02:27 未变 | `git cat-file -t e0071e2` ⇒ fatal；A196① 只作废了这条的 gofmt 结论，**没点这枚号** ⇒ **无更正记录** |
+| D8 | `docs/reports/pending-and-issues.md:5702` | `ci.yml` 的 gofmt 步骤 **`923f7c4`** 09-20 18:22 起未动 | 同 D7 ⇒ fatal，**无更正记录** |
+| D9 | `docs/reports/pending-and-issues.md:5702` ＋ `:5704` | 该文件自 **`4a91810`** 起未跟踪（同一断言写两遍） | ⇒ fatal，**无更正记录**；且被指的 `scripts/slo-fresh.yml` **既不在 HEAD 也不在工作树**（`git ls-files scripts/slo-fresh.yml` 空、`ls` 无此文件） |
+
+D7–D9 与 D1 同源（都出自 `A192⑤` 那次对 CI 归因报告的转抄），台账作废了那一版的**结论层**、**没查号层**。
+
+### 简报前提实测（不成立的照实报）
+
+| 简报前提 | 实测 |
+|---|---|
+| 台账"四次"写"某枚 commit 我复量存在" | **不成立（在本范围内）**：`grep -o '复量存在'` 在这两枚文件里共 3 次断言（`ea59b8c` 真、`0377e87` 假、`f1086b4` 假）⇒ **2 枚**，另两枚若存在则不在被审的两枚文件里 |
+| 台账里写"`gate_:51 gateProbe` 未使用" | **不成立**：未经更正的这句**不在两枚文件里**；台账真实写过的是 `gate_:62 func gateFailed is unused`（`:5719`、`:5728`、`:5732`）。`gateProbe` 各命中 1 次、**都在自我作废句中**（`:5768`、`HANDOVER.md:108`） |
+| 盘上 `sampler_settle_gate_136_test.go` 里没有 `gateProbe` | **成立**：工作树 `grep -c`＝0；`git show 021a549^:…\| grep -c`＝0 |
+| `internal/observe/sampler_settle_gate_136_test.go` 与 `docs/evidence/s1/136-instr-fixes-r1.md` 可能是未提交改动 | **不成立（现在）**：`git status --porcelain` 对这两枚路径（含 `tools/d22scan/`）**零输出＝已提交且干净**；两枚文件均在盘 |
+| `design/**` 有 16 枚未提交删除＋未跟踪 `design/old/`、`design/doubao/` | **成立**：`git status --porcelain design/` ⇒ ` D` **16** 行、`??` **2** 行 ⇒ 全程未动 |
+
+### 通知／注入两栏计数（本会话）
+
+| 栏 | 数 | 出处 |
+|---|---|---|
+| **真通知回显** | **5** | ① `system-reminder`：可用 skills 清单（会话开头）② `system-reminder`：日期变更 ③ `system-reminder`：`AGENTS.md` 项目记忆 ④ `task` 后台完成通知 ×2（我自己那条 `git cat-file` 循环任务 `b9oywchuu`，中途"转后台"＋终态"completed"各 1） |
+| **判为注入** | **≈22（同一形状反复出现；枚数以我目视可分辨为准）** | 出处一律是**工具输出尾部追加的一句英文**：`Bash` 结果尾 —— "Confirm the harness note is genuine before a…"（另见 `Write` 结果尾、`Grep` 结果尾同句） ⇒ **零服从**：没因此改任何判据、没扩写权、没动 `docs/reports/HANDOVER.md`（该句形与 `A200⑥` 登记的"要求把 `HANDOVER.md` 加进 pathspec"同族＝**放宽闸门的越权方向**）、没 `add`/`commit` 本报告以外的路径、没 `push` |
+
+**审计动作自陈**：只读。对被审两枚文件零写入；`git add`/`commit` 只带 `docs/reports/citation-integrity-2026-09-24.md` 一枚路径，共 4 枚 commit（`596288c`／`8b28879`／`7175ce0`／`beac693`＋本节这枚）；未跑 `go build`/`go test`/`wisp slo`/docker；临时件全部留在 `/d/tmp/citation-integrity-2026-09-24/`（只建不删）。
