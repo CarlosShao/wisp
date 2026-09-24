@@ -5375,6 +5375,21 @@ A40② 说最近三个 **push** run 是 `cancelled`。我又查了两步，**排
 - **⑧ 推送**：`A169③` 那两条按住的理由**都随 `r1` 交件消失了**（它不再取读数；`internal/winsec` 码面未动的证明已经落在那份表里，`#50` 之后要动也是**新账**，不能拿旧表背书）。
   推前把门禁现状读了：最近一枚已推 run `35967768017` 六步里 **`lint`／`test-windows` 红**，而 `test-core`／`slo-smoke`／**`slo-full`／`lint-frontend` 绿**
   ⇒ **`Q-36` 那笔改造后 `slo-full` 不再是每推必红的那枚**，推 `dev` 不会新增红因。本轮连前面攒的一共 **42＋枚**推平两远程，终判据＝两枚远程 tip 逐字等于本地 HEAD。owner 侧**无待办**。
+- [2026-09-24 17:1x +08] **A171｜推送做完了（两远程 tip 逐字＝本地 HEAD `a9c8b6e`），并把门禁那两枚红**逐条归因到名字**，不是"整体工具链假象"：`ci` 今天从头红到尾（12 枚 push run 全 failure，最早一枚 08:53 本机时区），所以 `test-windows` 那 17 枚红与 `lint` 那 44 条 staticcheck**都不是今天这批改动造的**。
+- **推送本身**：`git push cnb dev` 一次成（`182daed..a9c8b6e`）；`git push origin dev` **第一次 TLS 握手失败**（`schannel: failed to receive handshake`），**重试一次即成**。⇒ 两远程现同为 `a9c8b6e`，终判据我按老规矩核了：`git ls-remote <每个> dev` 逐字相等。
+  ⚠ 这条要如实记：**`A170⑧` 说"本轮连攒的一共 42＋枚推平"，真值 43 枚**（`git rev-list --count 182daed..HEAD` 现量），而且**积压里有一部分是网络失败不是我让路**。
+- **门禁读数（把"红"拆成可归单的三因，成本两枚 `gh` 调用）**：
+  ① **`lint` 红＝44 条 staticcheck 积压**（`##[error]` 计数＝44，另 2 条落在别的步）：形状是 `U1000` 未用字段/函数 ＋ `ST1012` 错误变量命名 ＋ `S1011` 循环写法，
+     落点在 `cmd/wisp/run.go:110/234/306`、`internal/agent/approval/queue.go:472`、`internal/audio/device.go:45/51/126`、`frontend/embed.go:4`（`// go:embed` 多一个空格＝** ineffectual directive**，这条是**真隐患**不是风格）等既有文件；
+     同一步里 `runtests.sh` 的自检是 **PASS=21 FAIL=0 SKIP=0／`=== RUN`=31＝绿** ⇒ 红只来自 staticcheck。
+  ② **`test-windows` 红＝17 枚具名用例**（`--- FAIL` 的**名字去重**＝17；含子项路径是 21 枚，两个数别混）：
+     `TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128`（**5 个子项**，落点 `cmd/wisp/dataroot_128_test.go`）· `TestTicket101{ManualSwitchSurvivesRestart,SessionGrantDoesNotCrossRestart,UntouchedConfigRestartsAtDefault}` ·
+     `TestSync{UnverifiedRootKeepsFallback,SuspectFallbackWhenUndetectable,SuspectFallbackIsComponentBounded,FallbackAndMatch,FallbackNotDisarmableByWeakRoot}` · `TestPathResolver{UNC,ShortName,ExtendedLengthPrefix}AListDenied` · `TestAListWinsWhereBothTablesHit` · `TestBListDefaultDenyAndOverride` · `TestCanonicalInputGainsNoSecondForm` · `TestClassifyAnchorSpellingIsNotVerdict` · `TestComposedGateBlocksAWriteForTwoSeconds`。
+  ③ **`test-core`／`slo-smoke`／`slo-full`／`lint-frontend` 绿** ⇒ `Q-36` 那笔改造**已把 `slo-full` 从"每推必红"里摘出来**（这条我上面按 `A120①` 说过一次，今天是在**已推 tip 的读数**上第二次核到）。
+- **为什么我先把"不是今天造的"坐实了才推**：`189cb1e`／`33c8acd`（票 119 那两枚）**确实在已推 tip 的祖先里**（`git merge-base --is-ancestor` 逐枚 YES），光看"红了很多枚"是分不清旧账与新伤的；
+  ⇒ 决定性证据不是这个 is-ancestor，而是**同一枚 `ci` 工作流今天 12 枚 push run 全红、且最早那枚（`5c1529a`，08:53）早于今天所有 119/125/129/131/133/136/137 批次**。
+  ⚠ 反向义务照旧：**红着不等于没人欠账**——这 17＋44 条按第①②条的分组各归各的票（128 那 5 个子项就是我队列里的 `128 AC#4/AC#5`，`TestPathResolver*` 三枚是 `R-115-2` 的 8.3 短名族，`TestTicket101*` 三枚是票 101 接线那一族）。
+- **在飞**：`worker-ticket119-ac7`（写码）＋ `auditor-ticket119-next`（只读）各一席；**新 run `35977957915`（`a9c8b6e`）正在跑**，读到终态后我再核一次"红因有没有变"。owner 侧**无待办**。
 - [2026-09-24 16:4x +08] **A169｜两格终裁都真落地了：票 137 AC#4 判成立、我已翻勾；票 119 AC#1／AC#2 的复判表交齐（同一 task-id 第二次、又长了一截）。⇒ 编队空，本轮把 35 枚推平两远程。**
 - **① 137 AC#4＝成立、无附条件**（表 `137-ac4-r1-acceptance.md` **679 行／§0–§8 齐／八枚分节 commit、末枚 `4e6b65d`**；`git status` 对该路径空 ⇒ **它交件语里那句"§1–§8 未提交"也过期了**）。
   四条判据它自己各跑到：凭据②按的是我 `:173` 更正后的那两条（11 枚 **FAIL→PASS 逐名** ＋ 红句 **10 credit→10 nil**）、
