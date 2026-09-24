@@ -188,3 +188,204 @@ $ git show fa35557^:cmd/wisp/leg_dispatch_gate_133_test.go | sha1sum   906201f4a
 〔独立复现〕上面每一行行号与 sha 都是本程自己在 `8369b24` 的归档树／仓外只读命令上量的。
 〔日志＋归档，抽验〕"上一程为何这么修"的理由文本来自 `fa35557` 的 commit message 与本文件源码注释，
 本程只核了字节与行为，不背书它的措辞。
+
+## 3. 基线（未变异）—— 四数 ＋ 逐名名册 ＋ 差集
+
+台件：`/d/tmp/wisp135mg-r2-run.sh <标签> <树> none none - <go test 参数>`
+（每发一棵从 `wisp135mg-r2-tree` 新 `cp` 的树，树名已存在即拒跑；每发先 `go build ./cmd/wisp/`
+再 `go build ./...` 各取一次 rc，才读红绿）。
+本批四发前的闸门：`prebatch round=4 at=11:11:30 worker=0 toolchain=0 inprog=0 VERDICT=CLEAR`，
+逐发 `GATE-CHECK` 全部 `worker=0 toolchain=0`；整包三发在
+`round=1 at=11:17:23 … VERDICT=CLEAR` 之后的窗口里。
+
+| 发 | 树 | 命令 | rc | RUN | 顶层 PASS/FAIL/SKIP | 子测试 P/F/S | SKIP 行 | build-failed | panic | 名册枚数 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `R2-BL1` | T02 | `-count=1 -run=^TestAC1AC2DispatchHopGate133$` 新尺 | 0 | 1 | 1/0/0 | 0/0/0 | 0 | 0 | 0 | 1 |
+| `R2-BL1o` | T03 | 同上，**旧尺**（`fa35557^`） | 0 | 1 | 1/0/0 | 0/0/0 | 0 | 0 | 0 | 1 |
+| `R2-BLF` | T18 | `-count=1`（整包，门开着） | **0** | **101** | **54/0/0** | 47/0/0 | 0 | 0 | 0 | 54 |
+| `R2-BLC` | T19 | `-count=1 -skip=^TestAC4EveryLegIsNailedOrRuled$`（门关着） | 0 | 100 | 53/0/0 | 47/0/0 | 0 | 0 | 0 | 53 |
+| `R2-RST` | T26 | 还原发，同 `R2-BL1` | 0 | 1 | 1/0/0 | 0/0/0 | 0 | 0 | 0 | 1 |
+
+**`R2-BLF` 的 54 枚逐名名册**（`=== RUN` 去重后逐名，全量列，不缩写；
+文件 `/d/tmp/wisp135mg-r2-out/R2-BLF.runnames`）：
+
+```
+TestAC1AC2DispatchHopGate133            TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink
+TestAC1ResidentLegInstallsItsLogListenerOnDisk  TestAC1ResidentLegOutlivesItsOwnLogFailure
+TestAC2AC3DegradedLegsStillDeliverTheirVerdict  TestAC2AuditTrailLandsInTheRunLegLogFile
+TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128  TestAC2ModelsLegBooksItsHandOffVerdictOnDisk
+TestAC2RealProcessRefusesOnEveryLegWithoutAppData128   TestAC2RefusalMarkersAreNotAShortenableList128
+TestAC2ResolveDataDirRefusesInsteadOfFallingBackToCWD128  TestAC2RunLegInstallsTheSinkBeforeItsFirstSealingSite
+TestAC2SealNoticeLandsInTheRunLegLogFile  TestAC2TestDataDirBranchStillResolves128
+TestAC3EarlyRecordLandsOnDiskBeforeTheInstallRecord  TestAC3EarlyReplayKeepsTheSinkInsideTheDataRoot
+TestAC3EmptyDataRootIsARefusalNotAFallback  TestAC3InstallingTheFileSinkDoesNotSilenceTheConsole
+TestAC3LogSinkLandsInsideTheEnvDataRoot  TestAC3SecretLegBooksItsAuditRecordsOnDisk
+TestAC4EveryLegIsNailedOrRuled  TestComposedGateBlocksAWriteForTwoSeconds
+TestHostDispatchThroughTheAssembledBridge  TestMissingBlobFailsUnconfiguredNeverSilently
+TestProcessCommandLineProbeDetectsAPlantedValue  TestProcessCommandLineProbeHelperProcess
+TestProvidersDiscoverListsWhatTheServerServes  TestProvidersProbeRecordsMeasuredThinkingFalse
+TestProvidersProbeRecordsMeasuredThinkingTrue  TestProvidersProbeUnconfiguredRefIsNotSilentlyKeyless
+TestRunTextTaskFailNextIsClassified  TestRunTextTaskKeyResolvesInTheStore
+TestRunTextTaskTextPathEndToEnd  TestSecretArgvCarriesNoSecret
+TestSecretEndToEndConfigRefResolvesAtRequestTime  TestSecretFailurePathsLogAndPrintNoPlaintext
+TestSecretFlagsAreBoolOnly  TestSecretFromStdinWritesNoIntermediateFile
+TestSecretOverwriteIsAnnounced  TestSecretPortableModeUsesTicket06Seam
+TestSecretRealBinaryRefusesValueFlag  TestSecretSameNameUnderThreeEnvsIsThreeBlobs
+TestSecretSetConfirmationMismatchStoresNothing  TestSecretSetGetListRoundTrip
+TestSecretSetRejectsBadNamesAndEmptyInput  TestSecretSetWithoutConsolePointsAtFromStdin
+TestSecretUnsetRefusesWhileReferenced  TestSecretUsageAndUnknownSubcommand
+TestSecretValueCarryingFlagsAreRefusedAndUnechoed  TestTicket101ManualSwitchSurvivesRestart
+TestTicket101ModeSwitchUsesTheRealL2Gate  TestTicket101SessionGrantDoesNotCrossRestart
+TestTicket101UnreadableModeFailsLoudlyAndStrict  TestTicket101UntouchedConfigRestartsAtDefault
+```
+
+`--- FAIL` 名册：**零枚**（基线三发都无红名）。名册差集：`R2-BLF` 54 ＼ `R2-BLC` 53 ＝
+只多 `TestAC4EveryLegIsNailedOrRuled`（131 的门被 `-skip` ⇒ **少跑**，`--- SKIP` 行仍 0），
+反向差集空。⇒ 基线与 133 验收方 §1.1 第 2 批的 `101/54/0/0`、§1.9 的"关门是少跑不是 SKIP"
+**本程独立复现**（本程基线没碰上那枚既有 flake，`R2-BLF` 零红）。
+
+**恒真自查第一条落在这里**：新判据 (c) 在未变异基线上**不响**（`R2-BL1`／`R2-BLF` rc=0，
+且 disclosure 明写"1 distinct, 1 of them startable"）⇒ 它不是一枚"今天已经全响"的装饰。
+
+〔独立复现〕本程自己跑的五发（表里 `R2-RST` 是 §6 那枚还原发，顺带落在同一张表里）；
+另有 §0.4 记的那一发争用态读数 `R2-B1` **作废、不在本表任何结论里**。
+
+## 4. `M-G` 本发 ＋ 两拍 ＋ 旧尺对照（先证落地，再读数）
+
+### 4.1 种法（本程自造，前两程的名字一枚都没用）
+
+台件 `/d/tmp/wisp135mg-r2-mutate.py`（生产形）、`/d/tmp/wisp135mg-r2-probe.py`（用例形）。
+票 133 验收方用的是 `sfx131`／`probe133r2b_linux_test.go`／`TestR2P7LinuxOnlyCaseDrivesTheLeg`，
+票 135 上一程用的是 `sfx135g`／`probe135mg_linux_test.go`／`TestMGGp1…` ⇒ **本程一枚都不复用**：
+腿 `sfx135r2`、entry `cmdSfx135r2`、落地文件 `sfx135r2leg.go`、
+植物文件 `probe135r2m_linux_test.go`、用例名 `TestR2MgLinuxTaggedCaseDrivesThePlantedLeg`。
+
+- `mgleg1` ＝ **第一拍**：新腿被 `func main` 分发、身体里装了监听器、钉表里没有它。
+- `mgleg2` ＝ **第二拍**（票面写死那一枚）：把那截 install 整个删掉 ⇒ 落地件里
+  `installLogSink` 出现 **0 次**（本程的落地闸要求 `any-hits=0`，注释里提一嘴都不许）。
+- `usage` ＝ 只加给人看的那行 usage（对照：这条腿今天**确实**没人覆盖）。
+- `mgp1` ＝ `M-G` 本发：签名完全正确、带 import、身体里真断言的 `func Test…(t *testing.T)`，
+  坐在**文件名自带隐式 GOOS=linux 约束**的文件里 ⇒ windows 的 `TestGoFiles` 不收它。
+- `mgp2` ＝ 反向控制：同一形，写在**本程会编译**的文件里（§5）。
+
+⚠ **本程自己的一发落地失败，登记不藏**：batch b1 的前六发（树 T04…T09）
+在 `LANDED` 之后被**本程自己的落地闸**拒掉（`installLogSink-hits=1` ⇒ `MUTATION-WRONG mgleg2`，
+驱动 `exit 6`，**没读任何红绿**）。原因是第二拍那枚文件的**注释里**写了安装器的名字。
+⇒ 修种法（注释换成"the listener install block"）后**另起 T12…T17 重发**（`R2-*2` 系列），
+T04…T09 那六棵作废树留着不删。这一条按派单口径也算一次自证：
+**没证到落地的那批发确实一个读数都没产生**。
+
+### 4.2 落地证明（每一发都先看这三行，再看数）
+
+以 `R2-MGn2`（新尺 × 第二拍 × `M-G` 植物）为例，`/d/tmp/wisp135mg-r2-out/batch-b1r.txt` 原文：
+
+```
+LANDED-MAIN mgleg2 (dispatch sfx135r2 owns the leg):
+  main.go:81: 		case "sfx135r2":
+  sfx135r2leg.go lines=19 installLogSink-code-hits=0 installLogSink-any-hits=0
+  main.go:44:   wisp sfx135r2    ticket 135 M-G probe leg, not a product command
+  probe135r2m_linux_test.go:9: func TestR2MgLinuxTaggedCaseDrivesThePlantedLeg(t *testing.T) {
+PROBE mgp1 applied
+GATE-FILE sha1=23b443ac34787aa9ea60e181b9b8c789f468cd56
+BUILD-cmdwisp R2-MGn2 rc=0
+BUILD-all   R2-MGn2 rc=0
+```
+
+第一拍那两发的落地行是 `sfx135r2leg.go lines=25 installLogSink-code-hits=1 installLogSink-any-hits=1`
+＋ `sfx135r2leg.go:17: sink, err := installLogSink(args[0])`。旧尺那几发在落地行之前多一行
+`GATE-FILE-SWAPPED-TO /d/tmp/wisp135mg-r2-oldgate.go`、之后 `GATE-FILE sha1=906201f4…`。
+**19 发读数全部 `BUILD-cmdwisp rc=0` ＋ `BUILD-all rc=0`**，无一发出现 `build failed`。
+
+### 4.3 读数（单跑本尺那一形，八数＋红名）
+
+| 发 | 尺 | 种件 | rc | 八数（RUN/顶P/顶F/顶S/子P/子F/子S） | 红名 | 账本里那一行 |
+| --- | --- | --- | --- | --- | --- | --- |
+| `R2-Uo2` T12 | 旧 | 第二拍＋usage | **1** | 1/0/1/0/0/0/0 | 本尺 | `leg sfx135r2 … covered=RED nothing` |
+| `R2-Un2` T13 | 新 | 第二拍＋usage | **1** | 1/0/1/0/0/0/0 | 本尺 | `leg sfx135r2 … covered=RED nothing` |
+| `R2-MGo2` T14 | **旧** | 第二拍＋`M-G` | **0** | 1/1/0/0/0/0/0 | **无人** | `leg sfx135r2 … covered=test TestR2MgLinuxTaggedCaseDrivesThePlantedLeg drives cmdSfx135r2` |
+| `R2-MGn2` T15 | **新** | 第二拍＋`M-G` | **1** | 1/0/1/0/0/0/0 | 本尺 | 同上那一行（账本一字未变） |
+| `R2-1Bn` T10 | 新 | 第一拍＋`M-G` | **1** | 1/0/1/0/0/0/0 | 本尺 | `leg sfx135r2 … installs=true covered=RED sink with no nail` |
+| `R2-1Bo` T11 | 旧 | 第一拍＋`M-G` | **1** | 1/0/1/0/0/0/0 | 本尺 | 同上 |
+
+**这一族里最省字的一句**：`R2-MGo2` 与 `R2-Un2` 之间只差那一枚植物，
+旧尺上"红 → 绿"（钉一枚不存在的用例名就过了闸），新尺上"红 → 仍红"。
+
+### 4.4 红名逐字（`R2-MGn2.log` 第 3 行，本程 `grep` 出来的原文）
+
+```
+leg_dispatch_gate_133_test.go:229: AC#1/#2 RED: leg "sfx135r2" (main.go:81) is booked in the
+ledger below as covered by the case "TestR2MgLinuxTaggedCaseDrivesThePlantedLeg", and this
+round's test binary has no such case: the roster read from the running binary lists 54
+startable cases and "TestR2MgLinuxTaggedCaseDrivesThePlantedLeg" is not one of them, so no
+"=== RUN   TestR2MgLinuxTaggedCaseDrivesThePlantedLeg" line exists in this run or can exist
+in it. The name is declared at probe135r2m_linux_test.go:9, which is the point - the
+declaration is in the sources and the sources are not the build.
+```
+
+⇒ 红名**逐名指到那枚名字**、说的是"这轮没有、也不可能有它这一行 `=== RUN`"，
+不是"缺标记"（票面 ③ 要的那个口径）。同一发的披露行：
+
+```
+run-roster disclosure: GOOS=windows, 54 startable cases read from this binary itself
+(`-test.list '.*'`); case names this round's ledger credited through `covered=test`:
+2 distinct, 1 of them startable (one outside the roster is red above); this gate's registry:
+4 claims, 0 of them outside this round's roster - every registry claim this gate makes is a
+case this round's binary can start. This round was narrowed by -test.run=…, so the roster
+proves these cases are startable here, not that each one printed === RUN in this process…
+```
+
+### 4.5 整包两形（票面那条"第二拍也必须红"必须在整包形上也成立）
+
+| 发 | 尺 | 形 | rc | 八数 | 红名 | SKIP 行／build-failed／panic |
+| --- | --- | --- | --- | --- | --- | --- |
+| `R2-MGFc` T20 | 新 | 门关着（`-skip=^TestAC4…$`）第二拍＋`M-G` | **1** | 100/52/1/0＋47/0/0 | `TestAC1AC2DispatchHopGate133` | 0/0/0 |
+| `R2-MGFo` T21 | **旧** | 同上 | **0** | **100/53/0/0**＋47/0/0 | **无人** | 0/0/0 |
+| `R2-MGF-n` T22 | 新 | **摘掉本尺**（`-skip=^TestAC1AC2…$`） | 0 | 100/53/0/0＋47/0/0 | 无人 | 0/0/0 |
+| `R2-1BFc` T23 | 新 | 门关着，**第一拍**＋`M-G` | **1** | 100/52/1/0＋47/0/0 | 本尺 | 0/0/0 |
+
+- `R2-MGFo` 那一发**就是票 133 §1.12 那两发 `100/53/0/0` 的独立复现**（本程自己的树、自己的名字、
+  自己的日志：`/d/tmp/wisp135mg-r2-out/R2-MGFo.log`，`grep -c '^--- FAIL'` = **0**，
+  那枚植物名在整份日志里出现 **1 次**、唯一那次是本尺自己打的账本行 `:85`，
+  `=== RUN` 名册里 **0 次**）。
+- `R2-MGF-n`：摘掉本尺之后整包 rc=0 ⇒ **131 的门不接这一形**。本程还直接读到它确实看见了这条腿：
+  131 的门在同一次运行里打了 `leg sfx135r2 main.go:81 install=false records=false ruled=false nails=- -> no records`
+  （`R2-MGF-n.log:94`）然后 **PASS** ⇒ "看见了但不管"是盘上读数，不是本程的推断。
+- 名册差集（对 `R2-BLC` 基线）：`R2-MGFc`／`R2-MGFo`／`R2-1BFc` 三发的 `=== RUN` 名册都是 53 枚，
+  **与基线逐名相同、零缩小、零新增**；逐名换色只有
+  `TestAC1AC2DispatchHopGate133 PASS→FAIL` 一枚（旧尺那发连这一枚都没有）。
+  ⇒ 植物那枚用例**没有**进名册（这正是被验的那件事），也**没有**吞掉任何一条别的读数。
+
+### 4.6 恒真判据自查（每一发动手前问的那句"这一发今天响不响"）
+
+| 这一发 | 在**未修**那侧（旧尺）响不响 | 在**修了**这侧（新尺）响不响 | 能不能当"修好了的证据" |
+| --- | --- | --- | --- |
+| `R2-Un2`／`R2-Uo2`（只加 usage） | 响（rc=1，`covered=RED nothing`） | 响 | **不能单独当**——两側都响，它只证"这条腿今天确实没人覆盖"，是对照不是凭据 |
+| `R2-1Bn`／`R2-1Bo`（第一拍） | 响 | 响 | 不能当 (c) 的凭据（它响在 `installs` 那一支，比这次改动老）；它算"两拍里第一拍没被改坏"的证据 |
+| **`R2-MGo2`→`R2-MGn2`（第二拍＋`M-G`）** | **不响（旧尺 rc=0 全绿）** | **响（新尺 rc=1，红名逐点到那枚名字）** | **能——这一枚才是"今天不响、修了才响"那一枚** |
+| `R2-CPn2`（反向控制，见 §5） | 不响 | **不响**（必须不响） | 它是"不许打死合法形状"的证据，不是修复证据 |
+
+⇒ 本格没有拿"旧码上已经全响"的发当凭据；也没有拿"两拍里第一拍的红"去抵第二拍（票 133 §3.4 那条
+"同一枚事实的两种写法不许互相抵账"在这里是可算的：`R2-1Bn` 与 `R2-MGn2` 各各独立、
+红名分别落在 `installs` 那一支与 `runRosterReds135`）。
+
+〔独立复现〕以上每一发都是本程自己建树、自己种、自己 `grep` 红名；
+日志在 `/d/tmp/wisp135mg-r2-out/batch-b1.txt`（作废六发）、`batch-b1r.txt`、`batch-b2.txt` 与同名 `.log`。
+
+## 5. 反向控制：同一形写在**本会编译**的文件里 ⇒ 必须绿
+
+```
+R2-CPn2  新尺 + 第二拍 + mgp2（probe135r2m_test.go，无平台后缀）
+         EIGHT rc=0 RUN=1 TOPPASS=1 TOPFAIL=0 TOPSKIP=0
+         leg sfx135r2 … covered=test TestR2MgCompiledCaseDrivesThePlantedLeg drives cmdSfx135r2
+         run-roster disclosure: GOOS=windows, 55 startable cases …;
+         case names this round's ledger credited through `covered=test`: 2 distinct, 2 of them startable
+R2-CPo2  旧尺 + 同一发：rc=0（旧尺本来就放行，说明这枚控制不是新尺造出来的偏门）
+```
+
+⇒ 新尺的分辨力**只在"这枚名字在不在本轮二进制里"这一维**上：
+`mgp1` 那发名册 **54 枚**／`mgp2` 这发名册 **55 枚**（多出的正是本程那枚编译得进去的用例），
+一红一绿，其余字节全同（同一棵基线树、同一条腿、同一个 entry 调用、同一行 usage）。
+⇒ "不许把合法形状打死"这一条成立。
+
+⚠ 本程**没有**做的事，别被本节误导：这枚控制只测了 windows 腿。把同一形换到
+`//go:build` 表达式为假（而不是文件名后缀）那一支、以及 `GOARCH` 那一支，本程未造未读（§8 第 5 条）。
