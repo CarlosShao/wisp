@@ -165,3 +165,106 @@ separate denominators and must never be summed - AC#11 already nailed that rule 
 (`136-ac11-orchestrator-readings.md:101-103`): whole-package single-shot 6.7% versus same-process
 500-repeat 0.4% for the *same* case is a 16x spread, which is precisely why a merged percentage is
 meaningless.
+
+---
+
+## Section 2. Is the "1 in 240" claim salvageable from any archived source?
+
+**Short answer: yes - and this contradicts the ruling currently in the tree.** The face's newest
+`>` block and the truth-source ledger both now state that the 240 has *no* archival support. That
+statement is checkable, and it is wrong on the checkable part. Details, then the caveat that keeps
+this from being a clean number.
+
+### 2.1 What the repo was asked to look like versus what it says
+
+Two places currently assert the 240 is unsupported:
+
+| where | text (trimmed) | state |
+|---|---|---|
+| ticket face `:375` (uncommitted `M` at the time of this section) | "③ 我原先那句"240 发里红 1 发"按本仓口径登记为〔不可复现〕：名册里没有任何记录支撑那个分母，而它来自一条转述" | **not reproducible** ruling |
+| `docs/reports/pending-and-issues.md:5698` ⓑ | ""240 发里红 1 发"没有任何档案支撑（名册无记录、出处是转述）⇒ 按 AC#11 先例登记为〔不可复现〕" | same ruling |
+| ticket face `:351` (the AC#15 cell itself, older) | "在**盘上可查的 240 发整包 `-v` 里红 1 发**（14:3x 第二 witness 报回并留在它的表里；我核过那枚文件与那一段行号真实存在）" | claims the opposite, and names the table |
+
+### 2.2 The record exists, verbatim, in one place - and it is a first-party reading
+
+`docs/evidence/s1/136-ac11-second-witness-readings.md:289-291`:
+
+```
+它是**票 136 AC#12** 那格今天新装的用例（`f53ad5c`／`c03aee3`），红因形状是"100 ms 窗口只取到 2 次读数"
+（窗口／间隔计时形状，不是 §4 那条注册表边）。我在盘上可查的 **240 发**（r1 60 ＋ 他人 120 ＋ 本程 60）里
+只命中这一发 ⇒ 罕见、**未立案**。⚠ **本格不修、票面不勾、也不替它开 AC**——只登记现象与出处，
+```
+
+This is not a relay. It is the second witness writing about a batch it selected, counted and
+re-scanned off disk ("盘上现重扫（不是我抄谁的数）", same file `:137`). Two further citations of the
+same figure exist, both downstream of it and both honest about that:
+`136-ac14-impl.md:252` and `136-ac14-r1-acceptance.md:383` (the latter re-locates the face's pointer
+from `:266` to the cell's own line). A repo-wide `grep -rn "240" docs/ .scratch/` returns **no other**
+candidate source: every other hit is a line number, a sha (`4e5d240`), a byte count, or an unrelated
+240-line CI log (`134-ac6-contended-no-conclusion.md:17`).
+
+### 2.3 The 240 reconstructs off disk, file by file, with no gaps
+
+Reading the `r1 60 / 他人 120 / 本程 60` decomposition against section 1.1's sets:
+
+| leg | sets it names | shots |
+|---|---|---|
+| r1 60 | `wisp136ac11-batch-before` (30) + `wisp136ac11-batch-before2` (30) | 60 |
+| 他人 120 | `ac11-orch-base.log.1..60` (60) + `ac11-orch-after.log.1..60` (60) | 120 |
+| 本程 60 | `wisp136ac11b-batch-before` (30) + `wisp136ac11b-batch-after` (30) | 60 |
+| total | | **240** |
+
+Verified mechanically, not eyeballed: a loop over exactly those 240 files counting `^=== RUN` per
+file returned `240-subset: files with RUN=65 = 240 ; others = 0`. All 240 are whole-package
+`-count=1` invocations of `./internal/observe/`, i.e. one denominator, the right one. The single hit
+is `wisp136ac11-batch-before/25.v.log:89-90`, quoted in section 1.5.
+
+Two things make the 240 *internally admissible* rather than a grab bag:
+* The four legs run on **three different trees** (AC#11 pre-fix `51e29b0`, fix `f06a8d0`, post
+  `e2a7463`), but the AC#15 target file is **byte-identical on all three**: md5
+  `79711ce3a032fdfe3e632cc59912b7eb` at each of `51e29b0`, `f06a8d0`, `e2a7463`
+  (`git show <a>:internal/observe/sampler_settle_coverage_136_test.go | md5sum`). AC#11's fix touched
+  only `internal/observe/goroutine_test.go` (`git diff --name-only 51e29b0 f06a8d0` = one path). So
+  pooling them is legitimate **for the AC#15 symptom**, even though pooling would be illegitimate for
+  AC#11's own rate.
+* 150 of the 240 are on pre-fix trees and 90 on post-fix trees; the one hit sits in the 150. Stated
+  both ways: 1/240 pooled, 1/150 on the pre-fix subset, 0/90 on the post-fix subset.
+
+### 2.4 Where the face's wording genuinely overreaches (four points, all checkable)
+
+1. **"1 in 240" is a chosen subset, not the archive.** 150 more whole-package invocations of the same
+   identical target file are sitting on disk and were left out: `wisp136ac11-batch-after` (30),
+   `-after2` (30), `wisp136ac11b-batch-before-DISCARDED-contended` (30), `wisp136ac11v-batch-before`
+   (30), `wisp136ac11v-batch-after` (30). The full honest on-disk figure is **1 hit in 390**
+   invocations (0.256%), all 390 verified at RUN=65. The subset direction is anti-conservative for
+   the claim's *authority* (a smaller denominator flatters the rate) and irrelevant to its
+   *existence* (0 extra hits either way).
+2. **It is a sighting, not a rate.** 1 hit in 240 has a 95% interval of roughly 0.01% to 2.3%, so it
+   is compatible with 1/10000 and with 1/44. Anyone reusing it must carry that.
+3. **It is denominator (i) only.** Zero of the 240 are same-process repeats. The 1004 same-process
+   repeats on disk (`*-count500.log`, two `count2` logs) contain **0** occurrences of the AC#15
+   symptom, so the (ii) reading of this event is 0/1004 and no composite number is lawful.
+4. **It is stale as a baseline.** `internal/observe/` has moved since `51e29b0`:
+   `git diff --name-only 51e29b0 HEAD -- internal/observe/` returns 4 paths, and the target file
+   itself is now md5 `a31968022574b99b7969d0ccddb27eb0`, 365 lines against 289. Per this repo's own
+   reuse rule (check `git diff <anchor>..HEAD -- <pkg>` is empty before reusing an archived reading),
+   the 240 fails the check for *current-tree* use, and census r2 section 2 quantifies why it matters:
+   the package's ticker-window budget per shot has roughly doubled (about 1560 ms then, about
+   2960 ms now), so 1/240 more likely *understates* today's rate than overstates it.
+
+### 2.5 Verdict for section 2
+
+The repair the ledger asked for is available without running anything: **restore the 240 as a sourced
+sighting and correct its pointer, do not delete it.** Concretely, the admissible sentence is
+"1 hit in 240 whole-package `-count=1` invocations of `./internal/observe/`, pooled from four
+archived batches (`136-ac11-second-witness-readings.md:290`; all 240 logs re-counted on disk at
+RUN=65 on 2026-09-24 by this table); **1 hit in 390** across the complete on-disk set;
+sighting not rate, 95% interval about 0.01% to 2.3%; denominator (i) only; taken on a package
+version whose sampling exposure is about half the current one." The *inadmissible* form is the
+bare "1 in 240" that the cell currently prints, and equally inadmissible is the replacement the
+ledger now carries ("no archival support"), because the archival support is a named file, a named
+line, and 240 files that are all still on disk.
+
+I am not editing the face or the ledger for that - both are outside my one writable path, and the
+face's `>` blocks are append-only by rule. This section is the counter-evidence, filed for whoever
+owns those two files.
