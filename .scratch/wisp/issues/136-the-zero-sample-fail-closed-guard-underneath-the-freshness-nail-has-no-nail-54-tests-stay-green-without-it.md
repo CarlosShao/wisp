@@ -573,3 +573,24 @@
   ③AC#10 出门前读 §5 那两笔（8 枚既有红＋`0xc0000135` 的 DLL 前置），并知道 settle 侧现在"0 valid / 0 errors"有行可依、
   `slo_windows.go:623` 那枚合成报告的 `verdicts:null` 要落到同一判据得在 `cmd/wisp` 侧补（本程没碰）；④AC#2..AC#7 六格旧账仍排最后。
 - [2026-09-24T12:0xZ] agent=orchestrator did=**AC#14 非实现者终裁收讫 ⇒ `Gate` 那一支批准入库**（表 `docs/evidence/s1/136-ac14-r1-acceptance.md`，429 行／7 枚单路径 commit `ca09955`→`30e19ef`，锚"首量 `6451625`／程中漂 `ddbd3a1`"＋`git diff aef82f5..HEAD -- internal/observe/` 为空证两版同立）。档位：①—⑤ 全〔独立复现〕；唯一〔仅自述〕＝§1.2 那六发 `sample_errors`（它没复现并如实标出）。**我上一轮扣着不批的那一半它交出来了**：仓外快照里独立翻 `:556`（先证落地＋`go build` rc=0 ⇒ 142/138/4/0、名册 71 守恒、`SKIP 0`），**(A) 红名册恰好 2 枚**（`…SingleTrustworthyRead…` `:144`、`…ZeroFootprintDrops…` `:281`）＋ **(B) 点名 9 枚必须仍绿**（含 `:307` 健康窗、`:208` 已改写腿）⇒ `A182⑤` 的"答不出 (B) 就退回"不触发。**它另做了一发我没要求的**：在 `gate=true` 快照上重做 `M3a` ⇒ 红 3 ⇒ 折叠行在终态承重（我 `A182⑧` 预挡的误判没发生，还反证了终态）；自加 `M4` 摘红句点名 ⇒ 红 2 ⇒ 那味也承重。**推翻我派单四句，全认**：⑴ 我给它指的"19:2x 段第 `⑤` 条"**票面上不存在**（那段只有 ①—④，新判据落在 `:300`）——**我派单时引了一枚自己的空号**；⑵ "三处同形"原始枚数是 **4**（`ca2c55e` 的 `:143/:208/:252/:279`，第 4 枚是健康窗）⇒ 完整形状是"三处该被门抓＋一处必须放过"；⑶ 争用名单在 `slo-check.ps1:153-155`（**15 枚对、我引的行号错**，文件自 `decb7b9` 未动）；⑷ flake 账在 `:328` 不是 `:266`（实现件 §6-3 同错、我没抓到）。**实现件三处自述不成立**（不改判语、但别当事实抄）：§2.1 行号整体偏早（`:540`→实 `:537`）、§1.3"三枚"与 §4.2"2 枚"自相矛盾、§3"注释逐字 ASCII"不成立（`_gate_:152` 含中文『同形』——非 ban #8 段、`d22scan` rc=0，故不是违规只是说满）。**那枚〔仅自述〕我补了一半并说清补的是什么**：用实现程留下的同一枚二进制（`bin/wisp.exe` mtime 18:53）自跑六发 ⇒ 逐发 `sample_errors=0`／`samples=40`／`pass=true`／`back 267-288`（读件 `D:\tmp\wisp136gate\s1..s6.json`，19:55:57→19:57:10，前后各扫争用名单皆空）；⚠ **但 JSON 里连 `verdicts` 键都没有 ⇒ 该 exe 早于 `aef82f5`（19:08）**，所以这六发复现的是"真窗口会不会丢读数"这个物理问题（成立理由：`git diff ca2c55e..HEAD -- sampler.go` 四枚 hunk 全在 `:455`/`:516-522` 及尾插，**没碰 `:287-294` 读取循环**），**不是"带闸的终态二进制会不会变红"** ⇒ **落地程被要求翻完之后重建再量 ≥6 发、逐发记 `sample_errors` 与 exit code，任一发非 0 就把开关退回 `false` 并交回读数**。批准内容＝**1 枚布尔＋按 `:208` 形状改写另 2 枚断言**，实现件无需返工；票面 AC#14 格下方新增 `>` 块（判据五条＋撤销口令「撤 136 Gate 批准」）。**本格仍 `[ ]`**（勾等落地程交回）；票 136 **5 勾／10 未勾**；`ca2c55e..30e19ef` 共 30 枚已推两远程（推前核 `HEAD..origin==0` 且在飞盘点程零 commit 未落 ⇒ 没有半份表被发布）。next=①派落地程（票面新 `>` 那五条判据）；②落地程交回后翻 `AC#14`；③`AC#15` 排其后、靶形要现量重划；④`AC#10` 等编队安静窗口
+
+- [2026-09-24 20:2x +08] agent=worker-ticket136-ac14b did=**AC#14 `Gate` 那一支落地程交回**（锚点自量 `5a946d3`，`internal/observe/` 与 `aef82f5` 逐字节同）。
+  按 `:313-325` 批准做了三件事：**翻 `sampler.go:556` 一枚布尔** `settleCoverageRowGates` false→true（`git diff` 净面 `sampler.go 1/1`）＋
+  **按 `:208` 已建立形状改写两枚断言**（`sampler_settle_coverage_136_test.go` `:143-145`＝`TestCheckSettleSingleTrustworthyRead…`、
+  `:280-282`＝`TestCheckSettleZeroFootprintDrops…`，净面 `52/4`）——两枚都从"要求这窗仍 pass"改成"门行必须存在＋门行**自己**说 not-pass＋
+  红句必须印 `sample_errors`＋失败 gate 行与 `pass=true` 不得并存"，**是换成会自己判失败、不是删/放宽/Skip**；
+  健康窗 `TestCheckSettleFullyMeasuredWindowReportsNoLoss`（(B) 那一枚）**一字未动**。commit 链 `52191ce`(码)→`b9ca0b0/1e620d6/1657135/115173b/92dd40f`(证据 §0-§6)。
+  **五条判据齐**（证据 `docs/evidence/s1/136-ac14b-impl.md`）：① 翻前 `grep -n` 出 `=false`＋`go build ./...` rc=0；
+  ② 改后 `go test -count=2 -v ./internal/observe/`＝**142/142/0/0**、顶层 **71×2 守恒**、名册 `comm -3` **空**、真 `^panic:` **0**；
+  ③（复算两张名册＋复核 M1）翻-only 快照红名册**恰好＝本程改写那两枚**、(B) 9 枚全绿；`M1` 摘门行在本程改后树上红 **6 枚**
+  ＝终裁表 §4 的 4 枚（`…HalfTheReadsFailed…` ＋ 3 枚 gate 探针）＋ 本程改写后新增依赖门行的 2 枚（更强，非放水）；
+  ④ **用含门行的新 exe 跑 6 发 `wisp slo -settle`**（`WISP_ENV=test`，CGO 重建、三枚 DLL 同目录）：逐发 **`sample_errors=0`、`exit=0`、`samples=40`、`pass=true`，
+  且 `.settle.verdicts=[sampling gate=true]` 逐发在场**（正是编排者 19:5x 那六发缺的 `verdicts` 键 ⇒ 带闸终态二进制不误伤干净窗）；
+  ⑤ 门禁全套 gofmt/gofumpt（盘上现量 **v0.12.0 (go1.27.1)**）/vet/build rc=0、`d22scan` 仓外纯净快照 rc=0、八 scope `203/22/40/18/16/40/405/39` 与 `aef82f5` **逐格相同**（本程未加 ban-#8 字符/未加文件，`ban #8 internal/` 稳 405）。
+  **争用自查**：6 发前后各扫 `slo-check.ps1:153-155` 那份 15 枚名单 ⇒ 12 次全空、无 ABORT；本程不 push（`slo-full` 不触发）。
+  **本格状态：`AC#14` 仍 `[ ]`**（本程未翻勾，勾归编排者据 §4 落终态）；票 136 现值不变 **5 勾／10 未勾**。
+  **两处如实登记**：⑴ `sampler.go:546-555` 常量注释仍写 "It is false at HEAD…"，翻完即与盘上相悖——授权面只给 `:556` 一枚字面量，本程**没改注释**，交翻勾那一程收口；
+  ⑵ 判据④ 简报写"全 0 才许提交"，本程按"每节 commit"先提了码再跑 ④（④ 已过 ⇒ 无需回退；共享树禁 amend/reset，若 ④ 失败只能追加更正 commit）。
+  注入两栏：真回显 1（自家 `cat >>` 后 Edit 报"file changed"，与授权无关）／判为注入 0。
+  next=①编排者据 §4（新 exe、`verdicts[sampling gate=true]`、sample_errors/exit 逐发 0）翻 `AC#14` 的勾 ＋ 顺带收口 `:546-555` 注释；
+  ②`AC#15` 排后、靶形现量重划（本程 2 枚改写腿仍用同一前提腿，§6.2 那 7 枚站点一起数）；③`AC#10` 等编队安静窗口。
