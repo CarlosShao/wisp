@@ -180,5 +180,47 @@ internal/probeC/broken.go:4: [emoji] ban #8 glyph in scope internal/ is banned (
   并据此论证"补段不豁免＝78 行改写"；交付射程下的真值是 **1 行／1 枚文件**。
   数字本身可复现，**标签与推论不可复现** ⇒ 按 `AGENTS.md` 头三句"以权威文件为准"处理为记缺陷，不算伪报。
 
-## 2b. 〔占位〕裁决格 2：`go/ast` 那条"raw string 里的 SQL `--` 不算注释"
+## 3. 裁决格 2：`go/ast` 那条"raw string 里的 SQL `--` 不算注释"——单点回退试验
+
+**做法**：只把 `internal/memory/schema.go` 一枚文件回退到含 `≤` 的旧写法
+（`141-acc-rev-schema` ＝ 锚点全树 ＋ `git show 470e6c5:internal/memory/schema.go` 覆盖那一枚），
+别的一字不动。
+
+```
+$ sh tools/d22scan/runtests.sh -C tools/d22scan ./...      # 在 141-acc-rev-schema
+rc=1  PASS=22  FAIL=2  SKIP=0  === RUN=64
+--- FAIL: TestScannerSelfScanOfRealRepoIsGreen
+--- FAIL: TestRealRepoLedgerIsHonest
+    scan_test.go:269: repo HEAD violates: internal/memory/schema.go:29: [emoji] ban #8 glyph in scope internal/ ...
+```
+独立复核（同一份回退树，直接跑二进制，三把尺）：
+
+| 仪器 | `internal/memory/schema.go:29` | 整树 finding 数 |
+|---|---|---|
+| `d22-base`（交付，走 `go/ast`） | **红** | 7（6 frontend ＋ 这枚） |
+| `d22-lexical`（词法行首规则替换 `go/ast`） | **红** | 7 |
+| `d22-strlen`（②的过度豁免：字符串也抹） | 绿 | 6 |
+
+**答得出"哪一枚测试会红"**：`TestScannerSelfScanOfRealRepoIsGreen`（`TestRealRepoLedgerIsHonest` 同因）。
+⇒ **`2970c79` 那枚清理的 `≤` 那一半不是装饰**——它是"HEAD 必须绿"这道门的承重件。
+另一重钉子也在：`TestBan8CommentExemptionInGoSources/raw_string_that_reads_as_a_SQL_comment`
+（`wantFindings: 1`，用的就是这一形），它在格 3(a) 摘段变异下会红（见 §4），
+所以"raw 串里的 `--` 不外"这一判既有**整树门**钉、又有**单元用例**钉。
+
+**`→`（U+2192）那一半另判**：把 `:118` 一并回退后**零枚测试红**（箭头段按批复不扫）。
+这一条 `2970c79` 的 message 自己写了（"属批复明确保留的缺口段，本 commit 清它纯粹是'顺带收紧'，
+不清也不会红"）⇒ **自述与盘上一致，不算虚报**；但它确实只是装饰，不计入承重。
+
+**必须记的一条措辞超额**：`commentRangesFor`/`walkEmoji` 头上那句
+"`.go` 走 `go/ast`（唯一能分辨 raw string 里的 SQL `--` 不是 Go 注释的权威——
+`internal/memory/schema.go:29` 就是这一形）"，**对这一枚样本被实测反驳**：
+词法规则（`d22-lexical`）在同一枚上给出**同一个红**，因为它根本不认 `--` 是标记。
+真正只有 `go/ast` 能救、词法会漏的形状是"**raw 串行首 `//`**"（§2(3) 的 probeA/probeB），
+而那一形**没有用例**、且盘上今天 0 处。⇒ 判：**结论对（豁免只认 ast、不认词法 `--`）但举的证据样本不承重**，
+换一枚真能区分的样本或给 probeA 那形补用例，二选一即可。
+
+### 本格判：**成立**（附一句要改的证据文案，见上）
+
+## 4. 〔占位〕裁决格 3：正反两向有没有钉住"保留缺口"
+
 
