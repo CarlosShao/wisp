@@ -388,6 +388,21 @@ $ git show f06a8d0:internal/observe/goroutine_test.go | grep -nE 'Skip|Short\(\)
 happenbefore 边补成了有判据的等待。`Registry.Spawn` 的同步登记语义**没有被改，也不需要被改**。
 这发是否真把命中率打到 0，**由 §2 交读数，本节不预判**。
 
+### 4.7 §4 那一段的 commit 回执（现量；`--format` 已注明，不抄全 message）
+
+```
+$ git log --oneline -1 4666fe0
+4666fe0 evidence(136,AC#11 r1 终裁 §4): 修法合规五查全过 + §0 回执
+
+$ git show --name-only --format='%h %s' 4666fe0
+4666fe0 evidence(136,AC#11 r1 终裁 §4): 修法合规五查全过 + §0 回执
+
+docs/evidence/s1/136-ac11-r1-acceptance.md
+```
+
+> ⚠ **本程自报一条错，append-only、不改写**：§1+§2 那枚 commit（`e2bb38d`）的 message 末尾写了"（+§4 回执）"，但那一枚**实际没带上 §4.7** —— 插入回执的 python 在 `os.popen()` 读 git 输出时抛了 `UnicodeDecodeError`（本机默认 cp936），而 `&&` 链后半的 `git add`＋`git commit` 是另一行、照样跑了 ⇒ **message 比内容多说了一句**。已提交历史不改写，在此追加更正，并记进总判「自报」一节。
+
+
 ---
 
 <TODO 待补：§1 改前自测 / §2 改后自测 / §3 反向判据 / §5 归因独立性 / 总判>
