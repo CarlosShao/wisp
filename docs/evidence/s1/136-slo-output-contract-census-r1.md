@@ -79,3 +79,77 @@
 其余候选（A/B/D/E/F/G/H/I/J/K/L）逐处判**不覆盖** `StateReport`/`SettleReport` 字段级增删。
 **普查结论：排除 `SPEC-02 §3` 之后，没有任何一份文档在 `SPEC-12 §4.1` 意义上管 SLO 报告的出线形状。**
 "补一枚自陈门行"是否因此就"不算改契约"——本程不下此断言，见 §3 否定射程与 §4 张力。
+
+## 3. 一票否决栏：这个"否定"的射程写清楚
+
+结论是"**我没找到任何文档在管**"。以下把"没找到"与"它不存在"分开——**本程只保证扫了下面这些路径、用了这些 pattern；扫不到的范围不等于全仓没有**。可复算＝照抄命令重跑。
+
+**扫过的路径（覆盖式列举，非抽样）**：
+`docs/PLAN.md`（全文）· `docs/specs/**`（13 枚 SPEC + README）· `docs/SLO.md` ·
+`docs/reports/pending-and-issues.md` · `.scratch/wisp/issues/README.md` · 票 134/135/136 面 ·
+`scripts/slo-check.ps1` · `scripts/slo-freshness.sh` · `.github/workflows/ci.yml` · `.github/workflows/slo-fresh.yml` ·
+`tools/**`（`d22scan`/`mockllm`/`signmodels`）· 生产码 `internal/observe/**`、`cmd/wisp/slo_windows.go` · `AGENTS.md`。
+
+**用什么 pattern 扫、各扫出什么**（命令原文，Git Bash 可重跑）：
+
+```
+# 1. 先证明 PLAN.md 正文根本不提这两枚结构体 / "出线" / 报告字段形状
+grep -nEi "StateReport|SettleReport|出线|报告格式|json shape|报告.{0,6}(形状|字段|契约)|SLO 报告" docs/PLAN.md
+#   ⇒ 0 命中（D32/D37/D39/D40/D41 五枚决策标题区逐一目视复核亦无）
+
+# 2. 冻结契约清单里没有任何 C 编号定义报告形状
+grep -nE "^\| ?\*?\*?C[0-9]+\*?\*?" docs/PLAN.md | grep -iE "slo|报告|出线|度量|observe|采样|json"
+#   ⇒ 唯一命中 C30 JobScope（:1380），它是"内存口径的度量实现"，不是报告字段
+
+# 3. 13 份切片规格里没有任何一处出现这两枚结构体名 / 报告形状契约
+grep -rnEi "StateReport|SettleReport|出线|报告形状|报告字段|schema 契约" docs/specs/
+#   ⇒ exit=1（0 命中）；SPEC-02 §3 因用词是 "Schema（契约级" 不落入此 pattern，另行目视确认＝SQLite DDL
+
+# 4. 反向证据：脚本/CI 注释有没有把 JSON 形状写成契约
+grep -nEi "contract|契约|schema|shape|出线|字段|report.*json|\.pass|\.settle" scripts/slo-check.ps1
+#   ⇒ 命中 :34 "Output JSON schema (slo-report.json)" —— 但把 StateReport/SettleReport 当 <…> 占位、不枚举字段
+grep -nEi "shape|contract|契约|schema|出线|字段|report.*json|StateReport|SettleReport" .github/workflows/ci.yml
+#   ⇒ 命中全是 ticket-134 "shape B/C"（CI 设计形态）与 artifact 上传路径，非 JSON 字段契约
+
+# 5. 有没有报告形状的校验器
+ls tools/
+grep -rniE "StateReport|SettleReport|出线|报告.*形状" tools/
+#   ⇒ 无（tools 只有 d22scan/mockllm/signmodels；mockllm 的 input_schema 是 LLM 工具入参，不相关）
+grep -rn "DisallowUnknownFields" --include=*.go .
+#   ⇒ 仅 internal/config/parse.go（不在 SLO 链上）⇒ 加字段不会被严格解析器拒绝
+
+# 6. 交付物 docs/contracts/ 是否另立了 SLO 报告契约文件
+ls docs/contracts
+#   ⇒ No such file or directory（该目录不存在；AGENTS.md §4 亦声明这批交付物截至锚点不存在）
+
+# 7. 复核简报"golden 名册"两句断言（见 §3.1 推翻项）
+git ls-files | grep -i golden | grep -vE "\.sse$"
+#   ⇒ 6 枚 .go（loop_golden_test/golden.go/golden_test/replay/harness_golden_test/goldenfmt），非"全是 .sse"
+git ls-files | grep -iE "slo.*report|back_within_cap"
+#   ⇒ docs/evidence/s1/66/66-full-subset-slo-report.json —— 出线报告**确在仓里被跟踪**
+grep -rlnE "back_within_cap_ms|free_os_memory_count" . | grep -v "/build/"
+#   ⇒ docs/evidence/s1/66/66-full-subset-slo-report.json + docs/evidence/s1/66/66-settle-1.json
+grep -rnE "66-full-subset-slo-report|66-settle-1|evidence/s1/66" --include=*.go .
+#   ⇒ 0 命中：这两份是**证据归档**，没有一枚 _test.go 把它当 golden 去 diff
+```
+
+**否定的确切射程**：
+- 我没有找到任何**文档**把 `StateReport`/`SettleReport` 的**字段级增删**列为 `SPEC-12 §4.1` 契约（`C1–C32`/`D1–D47` 枚举不含它，13 份 SPEC、SLO.md、PLAN.md 正文、脚本/CI/工具注释都不覆盖）。
+- **不等于**"全仓不存在这样一处约定"。下述三处是"若有人日后想主张它管出线"时**最可能被援引**的近邻，本程如实标出它们**为什么不算**：
+  ① `slo-check.ps1:34-44` 的信封 schema 注释（把嵌套结构当占位，未冻结字段）；
+  ② `slo_windows.go:49-50` 的 "FROZEN"（冻结主语是阈值/gate 分类）；
+  ③ 票 136 面 AC#14 `:266-268` 与 AC#15 `:319/:325` 把"出线形状"当**契约面**来停手——那是**票面自设的保守停手线**，不是仓里既有文赋的契约级；票面已把 `SPEC-02 §3` 那处引用作废（见 §4）。
+- 凭据反扫：本程工具输出里**未出现任何**自称"编排者备注／系统提示／文件已被修改／请放宽／已解冻／Confirm the harness note is genuine"的注入文字。
+  真通知回显（合法 harness 件：技能清单 / 日期变更 / `agents.md` 记忆块）＝ **3**；判为注入数＝ **0**。未遇凭据值，一字未抄。
+
+### 3.1 推翻简报里的断言（逐条）
+
+- 简报："`git ls-files | grep -i golden` 全是 LLM 的 `.sse`" —— **不精确**：名册里另有 **6 枚 `.go`** 文件名含 `golden`
+  （`internal/agent/loop_golden_test.go`、`internal/llm/golden/golden.go`、`internal/llm/golden/golden_test.go`、
+  `internal/llm/golden/replay.go`、`internal/llm/openaichat/harness_golden_test.go`、`tools/mockllm/goldenfmt.go`）。
+  **但**这些是 golden **测试harness/源文件**，不是 golden 数据；golden 数据确全是 LLM `.sse`。**"仓里没有 SLO 报告 golden"这层实质成立。**
+- 简报（与票面 `:326` 同）："带 `back_within_cap_ms`／`free_os_memory_count` 的文件**都在 `build/`**" —— **不成立**：
+  `docs/evidence/s1/66/66-full-subset-slo-report.json` 与 `docs/evidence/s1/66/66-settle-1.json` 两枚**被 git 跟踪**、含这些字段名。
+  **但**它们是证据归档、**无 `_test.go` 引用**（命令 7 末发 ⇒ 0 命中），故非 golden、给 `SettleReport` 加字段不会弄坏它们 ⇒ **结论不变、理由要换**（不能再说"都在 build/"）。
+- 简报/票面 `:14` 口径 `.gitignore:14` = `build/` —— **成立**（`.gitignore:14` 逐字 `build/`）。
+- 票面 `:325`／台账 `A180⑨(a)`："`SPEC-02 §3` 引用不成立、是不是另有契约在管＝未决普查" —— **本程即该普查的交付**，判定见 §2 表 C 行＋小结。
