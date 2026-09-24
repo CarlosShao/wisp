@@ -309,4 +309,76 @@ git show 3a49745:internal/winsec/winsec_windows.go | md5sum = fb20bca559d1725846
 ⇒ **AC#2：成立。**退回的那半（② 只做了一半）已由 `36294c2`＋`33c8acd` 补完并被我量出牙齿；
 "一字未动"那半以措辞对上读数的方式闭合；注释里那句被证伪的全称已换成点名四枚调用方的可核句子。
 
-<!-- 下面两行是 §3 那枚 commit 的读数（提交后补进正文，见文首"提交方式"） -->
+```
+$ git log --oneline -1
+fc48fc0 docs(119 复判r2,§2): AC#2 三档拆分——判定分支 0 行(四把尺)、注释 53 增/11 删、其它 0;措辞已改口故闭合方式是"措辞对上读数"而非"读数变干净";另记 resolve.go 的 md5 三连今天在 HEAD 已不成立(来自票126/125/129,非本票)
+
+$ git show --name-only HEAD
+docs/evidence/s1/119-ac1-ac2-r2-acceptance.md
+```
+
+⇒ §2 落在 `fc48fc0`（前两枚：§0 `6e04d1a`、§1 `9b29951`）。
+
+---
+
+## §3 顺手两问（各一段，不写长文）
+
+### 3.1 你开的 `AC#7` 判据①对不对？—— **对，成立；我给了自己的读数，不替你圆**
+
+判据①说：**两味药必须一起下**（接记名断言 **＋** 换已解析根），"只收紧不换根会在软链形恒红"。
+我在被验版 `3a49745` 上把这两枚用例（`:193` 那枚的 `:203` 一腿、`:285` 那枚的 `:308` 一腿）在两形下各跑一遍
+（`-count=1 -v`，用例自己把拒因打进日志），只看一句：**底线点名的链接是不是本用例种的那枚**。
+
+```
+plain 形（TMPDIR=/tmp/plain119r2）:
+  :200  PrivateDirAll("…/001/varlink119/data")         → "…reaches it through the link at …/001/varlink119"     ← 用例自己种的
+  :305  PrivateDirAll("…/001/injlink119/harness/picked") → "…the link at …/001/injlink119"                      ← 用例自己种的
+软链形（TMPDIR=/varlink/w119tmp，ls -ld 现量 lrwxrwxrwx /varlink -> /realpriv）:
+  :200  → "…reaches it through the link at /varlink"      ← 宿主的链接，不是它种的
+  :305  → "…reaches it through the link at /varlink"      ← 同上
+```
+
+⇒ 软链形里这两枚**永远拿不到"点到本用例那枚链接"的拒因**（底线先撞见宿主的 `/varlink` 就停），
+所以**只加记名断言、不换根 ⇒ 未变异也红 ⇒ 恒红**，判据①那半句成立；两味一起下才是可伪的。
+
+**同一发白捡的反向对照**：`:251` 那一腿（`TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119`，
+根已由 `cleanSpelling119` 换成已解析形）在**两形下都点到本用例种的链接**
+（plain：`…/001/data/out`；软链：`/realpriv/w119tmp/…/001/data/out`）
+⇒ "换过根之后记名断言就有区分力"这一半也被同一次运行钉住；顺带说明你把 `:251` 排除在 `AC#7` 之外是对的（它两形都响、是 137 的对照组）。
+
+⚠ 一句边界（不改变结论）：判据①成立于**它自己指定的修法**（同包 helper `refusalCreditsLink137` 那种"必须等于我种的这枚"的形状）。
+理论上还有第三条路——把断言写成"点到 `base` 之下的第一枚链接"就不换根也能伪，但要另造 helper、与 137 的形状不一致，
+且把"宿主链接先撞见"这族遮蔽留在原地。**所以在判据自己的口径下，"必须一起下"是对的。**
+
+### 3.2 那三枚用例今天有没有 CI 分母？—— **要看是哪三枚：`cmd/wisp` 那三枚＝没有；`internal/winsec` 那五枚＝有**
+
+⚠ **先纠派单的前提**：派单写"这三枚用例（`dataroot_symlink_119_other_test.go` 里那三枚）"——
+**那枚文件里是 5 枚**（`internal/winsec/dataroot_symlink_119_other_test.go:127/:153/:193/:219/:285`）；
+票面 `next=` 第 6/7 条与 `36294c2` 说的"本轮三枚新用例"在 **`cmd/wisp/secret_dataroot_119b_test.go`**。两本账分开答。
+
+**（a）`cmd/wisp` 那三枚 ⇒ 没有 CI 分母（票面那句"没有腿"成立）**
+
+| 环节 | 现量出处 |
+|---|---|
+| 三枚的名字与枚数 | 容器内 `go test -list 'TestAC.*119' ./cmd/wisp/` ⇒ count=3：`TestAC1POSIXSecretRouteSymlinkedHomeBecomesSealable119`、`…SymlinkedXDGConfigHome…`、`TestAC3POSIXSecretRouteLinkInsideItsDataRootStillRefused119` |
+| 它们在 `cli` scope、不在 core | `scripts/portable-tests.sh:191-196`（`cli` 分支 `scope=(./cmd/wisp/)`）；core 名单 `scripts/portable-tests.sh:172-181` **无 `cmd/wisp`** |
+| `cli` scope 只有一个人调用 | `scripts/wisp-cli-tests.sh:113`（`bash "$portable" --scope=cli`），并且 `scripts/wisp-cli-tests.sh:60` 是硬闸：`if [ "$(go env GOOS)" != windows ]` 就拒跑（`:65-66` 原文 "do not relax this line"） |
+| CI 上唯一一步 | `.github/workflows/ci.yml:422` `run: bash scripts/wisp-cli-tests.sh`，属 `test-windows` job（`ci.yml:334` `test-windows:`／`ci.yml:422`；core 那步在 `ci.yml:288`，job 见 `ci.yml:224`） |
+| **决定性一发：windows 上这三枚连文件都不存在** | 同一枚快照、同一容器：`GOOS=windows go list -f '{{.TestGoFiles}} {{.XTestGoFiles}}' ./cmd/wisp/` 里 `119b` 命中 **0**，`GOOS=linux` 命中 **1**（文件头 `cmd/wisp/secret_dataroot_119b_test.go:1` = `//go:build !windows`） |
+
+⇒ **唯一执行 `cli` scope 的 runner 是 windows，而那三枚在 windows 构建里不存在 ⇒ 零分母**（与 `R-119-7`／`R-113-A` 同族）。
+
+**（b）`internal/winsec` 那五枚 ⇒ 有 CI 分母（ubuntu）**
+
+| 环节 | 现量出处 |
+|---|---|
+| 五枚的名字与枚数 | 容器内 `go test -list 'TestAC.*119' ./internal/winsec/` ⇒ count=5（三枚 `TestAC1POSIX…119` ＋ `TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119` ＋ `TestAC2POSIXInjectedTestDataDirStandsAsDeclared119`） |
+| 包在 core scope 里 | `scripts/portable-tests.sh:180`（`… ./cmd/llmrecord/ ./internal/winsec/`）；`:105` 注释写明 "internal/winsec joined the core list for ticket 111 AC#9"；core 钉住的包集 `scripts/portable-tests.sh:149`、`:164-166` |
+| core 那步在 ubuntu 上 | `.github/workflows/ci.yml:224-225`（`test-core:` / `runs-on: ubuntu-latest`）→ `ci.yml:288` `run: bash scripts/portable-tests.sh --scope=core` |
+| 平台看得见这枚文件 | `GOOS=linux` 命中 1、`GOOS=windows` 命中 0（`internal/winsec/dataroot_symlink_119_other_test.go:1` = `//go:build !windows`） |
+| 没有被台账请出射程 | `scripts/portable-tests.sh` 里 `119` 只出现在 `:105/:108/:110` 三行来历注释，NOT IN SCOPE 台账**无 119 行** |
+
+⇒ **但**这台 ubuntu 的 `TMPDIR` 不是软链 ⇒ **只有 plain 那一形有分母**；本轮 E/F/H 所量的软链形今天仍只在容器里。
+⇒ 这一条与票 125 结案挂着的那本账是同一笔（"命令面级 POSIX 无门"），别记成两笔。
+
+<!-- 下面两行是 §4 那枚 commit 的读数（提交后补进正文，见文首"提交方式"） -->
