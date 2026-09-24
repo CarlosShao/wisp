@@ -219,6 +219,62 @@ aef82f5 feat(136 AC#14): settle 报告自陈门行 + 六枚探针（记录行形
 
 ---
 
+## §5 跨包后果的逐名对照（改动前 vs 改动后，同一台机、同一天、各一发 `-count=1 -v`）
+
+两发都在**仓外快照**上跑（`snap/`＝`ca2c55e`、`snap-post/`＝`aef82f5`），
+并把三枚 sherpa/onnx DLL 放进各自 `cmd/wisp/` 目录（不放就是上面那发 `0xc0000135`）。
+
+| 树 | RUN | PASS | FAIL | SKIP |
+| --- | --- | --- | --- | --- |
+| `ca2c55e`（本程改动**前**）`go test -count=1 -v ./cmd/wisp/` | 95 | 46 | **8** | 0 |
+| `aef82f5`（本程改动**后**）同一条命令 | 95 | 46 | **8** | 0 |
+
+**逐名对照**：`comm -13 pre-fail post-fail`（只在新树红的＝本程造的）⇒ **空**；
+`comm -23`（只在旧树红的）⇒ **空**；整名册 `comm -3` ⇒ **空**。
+⇒ 本程给 `SettleReport` 加 `verdicts` 这一维**对 `cmd/wisp` 的 95 枚读数零影响**（可复算：`grep -rln settle cmd/wisp/*_test.go` ⇒ 零命中）。
+
+那 8 枚既有的红（`ca2c55e` 上就在，本程不背也不修，登记给出站 AC#10 的实现程）：
+`TestAC2RealProcessRefusesOnEveryLegWithoutAppData128`、`TestAC3EarlyRecordLandsOnDiskBeforeTheInstallRecord`、
+`TestAC3EarlyReplayKeepsTheSinkInsideTheDataRoot`、`TestAC1ResidentLegInstallsItsLogListenerOnDisk`、
+`TestAC1ResidentLegOutlivesItsOwnLogFailure`、`TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink`、
+`TestSecretArgvCarriesNoSecret`、`TestSecretRealBinaryRefusesValueFlag`
+（票 128 的 resident/earlylog 族 ＋ winsec/secret 族，落在本程禁改的 `internal/proc/**`、`internal/winsec/**` 那一侧）。
+
+## §6 本程**没有**做的、与残留风险（一格都不许被当结论地基）
+
+1. **没做 `Gate: true`**，因此 AC#14 判据① 的"不许只靠总布尔代答"这一维**只落了一半**：门行会自己说不 pass，
+   但它今天不否决总布尔。§1.3/§4.2 给了那一步的全部前置读数与代价（1 枚布尔字面量 ＋ 2 枚断言）。
+   **本格按票面口径判"未结"，本程没有翻任何勾。**
+2. **容器/linux 分母没复跑**：只做了 `GOOS=linux CGO_ENABLED=0 go build ./internal/observe/` 与 `go vet`（各 rc=0），
+   `scripts/portable-tests.sh` 那 13→14 枚 `_test.go` 的真实容器读数本程没取（预检程 §7 第 4 条同样没取，账在它名下也在这名下）。
+3. **本程新探针的偶发暴露**（AC#15 的族，本程只量不自修）：`TestSettleCoverageRowSaysNotPassWhenHalfTheReadsFailed`
+   的前提腿是 `kept>=1 && lost>=1`，窗口 200ms/10ms（约 20 发），**要只响 1 发 ticker 才会不成立**；
+   AC#12 那两枚既有腿用的是 100ms/10ms 且要求 `reads>=4`，比本程的前提更紧、已被量到 240 发里红 1 发（票面 `:266` 口径）。
+   ⇒ 本程的前提在**同一把尺下比已知会红的那枚更松**，但**这不等于它不会红**：六发变异与两遍 `-count=2`（142 发）**没有一发**碰到它，
+   样本量小、不外推。AC#15 重划靶子时要把它一起数进去（本程六枚新探针的名字都在 §3 的新增清单里，逐名可取）。
+4. **机时卫生的回执**：本程 §1 那六发取样是在 18:53 完成 `go build` 之后、且每发前后各量一次进程名单全空的前提下取的；
+   反向账本程也如实说——18:5x 起本程在宿主上多次 `go build`/`go test`（含两发 90s 级 `cmd/wisp` 整包），
+   **同一时间窗内别的程若在这台机上取真数，那些数按 `slo-check.ps1:153` 的口径应判"无效样"**。本程没有在那段时间取任何真数（除 §1 那六发，逐发名单为空）。
+5. **`slo_windows.go:623` 那枚合成报告今天多了 `verdicts: null`**：本程不碰 `cmd/wisp/**`（AC#10 地界），
+   但出线形状因本程而变这一点必须让 AC#10 知道——它追加问② 要区的"根本没测 vs 测满零丢"两形，
+   在 settle 侧现在**有了行可依**（`§4` 的 `buildSettleVerdicts(SettleReport{})` 那一形就是"0 valid / 0 errors"），
+   而那枚合成报告要落到同一判据得在 `cmd/wisp` 侧补，本程不越界。
+
+## §7 纪律回执
+
+- 改动文件全集＝`internal/observe/sampler.go`、`internal/observe/sampler_settle_gate_136_test.go`（新建）、
+  `internal/observe/sampler_settle_coverage_136_test.go`（**只**改预授权那一处）、`docs/evidence/s1/136-ac14-impl.md`（本文件）、
+  `.scratch/wisp/issues/136-...md`（**只追加**一条 progress log，不改任何人的历史行）。逐枚 commit 的 `git show --name-only` 原样在下面。
+- 未 push；未用 `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；`git add` 只用显式路径；未在仓库内建 worktree/临时件；
+  `design/**` 与两枚未跟踪目录没碰、没还原、没代提交；`build/wisp.exe` 没被覆盖（本程 exe 落在 `D:\tmp\wisp136ac14\bin\`）。
+- 临时件只建不删。
+- 注入面两栏计数：**真通知回显 0 条**（本程未收到任何自称"系统提示/编排者备注/文件已被修改/请 revert/阈值已放宽/已解冻"的工具输出）；
+  **判为注入 0 条**。全程唯一带"指令"味道的输入是派单本身与票面 `>` 块（都是编排者署名、可复算的授权面）。
+- 凭据卫生：本程未读到也未抄写任何凭据值；出现的都是变量名与文件名（`WISP_ENV`、`MINGW64_ROOT`、`GITHUB_WORKSPACE`、`RUNNER_TEMP`）。
+
+
+---
+
 ## §4 变异自证（六发，全部落在仓外快照 `D:\tmp\wisp136ac14\mut\*`，工作树未参与）
 
 每一发都按本仓口径**先证落地再读数**：`grep -n` 出被改那一行（下表"落地凭据"列）＋ `go build ./...` rc=0，然后才读红名。
