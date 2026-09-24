@@ -239,7 +239,7 @@ func TestAC1POSIXUnresolvedSymlinkedRootStillRefused119(t *testing.T) {
 	if err == nil {
 		t.Errorf("AC#1 RED: PrivateDirAll(%q) was accepted, so the floor no longer refuses an unresolved root: the link this case planted at %s is invisible to it", unresolved, shape.link)
 	} else if !errors.Is(err, winsec.ErrUnresolvedPath) {
-		t.Errorf("AC#1: refusal did not name ErrUnresolvedPath: %v", err)
+		t.Errorf("AC#1: refusal of %q did not name ErrUnresolvedPath: %v. Nothing answered for the link this case planted at %q, so this is not the placement leg speaking", unresolved, err, shape.link)
 	} else if !refusalCreditsLink137(err, shape.link) {
 		t.Errorf("AC#1 RED: the refusal of %q named ErrUnresolvedPath but did not credit the link this case planted at %q (%v): an ambient link above the tree answered for it, so this says nothing about the leg under test", unresolved, shape.link, err)
 	}
@@ -359,7 +359,7 @@ func TestAC2POSIXInjectedTestDataDirStandsAsDeclared119(t *testing.T) {
 	if err == nil {
 		t.Errorf("AC#2 RED: the floor accepted a declared root that reaches itself through the link at %s, so the placement leg is gone on the route option 2 leaves untouched", shape.link)
 	} else if !errors.Is(err, winsec.ErrUnresolvedPath) {
-		t.Errorf("AC#2: refusal did not name ErrUnresolvedPath: %v", err)
+		t.Errorf("AC#2: refusal of the declared root %q did not name ErrUnresolvedPath: %v. Nothing answered for the link this case planted at %q, so this is not the placement leg speaking", declared, err, shape.link)
 	} else if !refusalCreditsLink137(err, shape.link) {
 		t.Errorf("AC#2 RED: the refusal of the declared root %q named ErrUnresolvedPath but did not credit the link this case planted at %q (%v): an ambient link above the base answered for it, so the walk under test never ran", declared, shape.link, err)
 	}
