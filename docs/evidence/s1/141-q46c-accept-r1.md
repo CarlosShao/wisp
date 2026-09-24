@@ -422,7 +422,70 @@ widen 只做了一半（两份同源副本没跟着走）。这条**必须登记
 **＋ 一条必须新增的登记项**：②`internal/panel/frontend_hygiene_test.go:66` 与 ① 已不同源却自称同源，
 且它跑在 CI 的 core scope 里。（③`vendor.mjs` 一并列出，但它属 owner 交出去的树，只登记不派活。）
 
-## 7. 〔占位〕裁决格 6：自陈的两处措辞缺陷
+## 7. 裁决格 6：它自陈的两处未修措辞缺陷——现在是不是假话，CI 会被读成什么
+
+### (a) 先把"哪几处"数对（三处，不是两处；实现方的两处在**交件表**里、不在 commit message 里）
+
+| 处 | 位置 | 现在还在说什么 | 是不是假话 | 谁自陈的 |
+|---|---|---|---|---|
+| A | `tools/d22scan/main.go:503-508` `describeEmojiScopes()` | `kind = "Go files, comments and _test.go included"` | **"comments" 那半是假的**；`_test.go included` 仍是真的（测试文件照走，只是里面的注释豁免） | 交件表 §7.2 逐字点名 ✔ |
+| B | `tools/d22scan/main.go:368` `ban8Scopes()` | 同一句字面量 | 同 A，**真假同判** | 交件表 §7.2 逐字点名 ✔ |
+| C | `tools/d22scan/main.go:38-39`（文件头 ban 清单里 ban #8 那一条，即 `ed2c077` message 说的"头部注释"）**实际写的是** `... in the Go sources of internal/ + cmd/ - comments and _test.go INCLUDED (D23)` | 同一件事 | **也是假的** | **两处自陈都没有它** ✗ |
+
+`ed2c077`/`bb61dc5` 的 commit message 把第二处写成"**`main.go` ban #8 头部注释**"——**这一句指错了位置**：
+`walkEmoji` 头上那段（`:800-836`）本批**已经改写**，现在第一行是
+`COMMENTS ARE EXEMPT AS OF Q-46(c), AND THAT IS A SIGNATURE, NOT AN IMPROVEMENT`，**不多报**。
+真正的第二处在 `:368`，而**交件表 §7.2 写的正是 `:368`**（"台账那侧的 `ban8Scopes()`"）⇒
+**表对、message 错**（与 §2(1) 同一形状的错法：message 比表松）。
+⇒ 本格对简报前提的更正：**不是"两处未修"，是"两处已如实自陈 ＋ 一处（C）未自陈"**。
+
+### (b) CI 的输出会被下一位读者误读成什么（现量原文，不是我推演）
+
+红的那次（锚点快照，`go run . -root <bb61dc5 树>`）逐字含：
+```
+d22scan: scope ban #8 internal/         examined 405 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined  39 Go files, comments and _test.go included
+```
+绿的那次（同一棵树、只把本批新增的段摘掉 ⇒ 0 finding）逐字含：
+```
+d22scan: clean - no D22 ban violations; live scope work: ... ban #8 internal/=405, ban #8 cmd/=39;
+ban #8 emoji coverage: design/ 16 text files; frontend/ 40 text files;
+internal/ 405 Go files, comments and _test.go included; cmd/ 39 Go files, comments and _test.go included
+```
+⇒ 这句话在**红与绿两条路径上都会打印**，而且 `:35-41` 那条 ban 清单还是本工具**给人读的第一屏**。
+可预见的三种误读，按危害排序：
+1. **"注释里放字形会被 CI 抓住"是假的**——于是任何一次"把可疑串藏进注释"的复审会以 CI 绿为准；
+   §2(1) 已现量今天真实存在这样一枚（`_test.go` 里一枚 U+2229 在 doc 注释中，交付仪器**不红**）。
+2. **与本仓禁改清单对不上**：`AGENTS.md §1.2` 与 `docs/PLAN.md:3447-3448/:3574-3575` 说的是
+   `U+2190–U+2BFF`，仪器扫的是 `1F000–1FAFF/2200–22FF/2600–27BF/2B00–2BFF/FE0F/1F1E6–1F1FF`
+   ⇒ 同一份输出里**两个方向都不一致**（箭头/带圈不红却写着红；`≥` 会红却写着不红）。
+   交件表 §7.3 已把这条登记为"冻结件，未动"，**这一点它说得对**（票面 `:86` 明令 `docs/PLAN.md` 要另发解冻）。
+3. **计数被当成覆盖面**：`405`/`39` 是 **examined 文件数**（真），紧跟其后的
+   "comments ... included" 是**性质描述**（假）。读者会把两个数读成一个断言："这 405 枚文件里
+   注释也算进去了"。实现方 §7.2 那句"覆盖面计数（405）不受影响，受影响的是那半句的可信度"
+   ——**前半句真、后半句把它说小了**：受影响的是**唯一一句人话**。
+
+### (c) 同族、本批新引进的两枚"话比仪器宽"（一并记，都只记不修）
+
+* `main.go:884` 新写的注释引用了一枚**不存在的函数** `blankCommentRanges()`
+  （`grep -rn blankCommentRanges tools/` ⇒ 只有这一处出现，真名是 `commentRangesFor`）。
+* `scan_test.go:348` 新写的 doc 注释承诺"U+2460/**U+2461** (circled numbers) are still unscanned"，
+  表里只有 **U+2460** 一行（§4(c) 实测：4 枚负向行，不是 5 枚）。
+
+### 本格判：**成立，但自陈不完整**
+
+两句"多报覆盖面"确实存在、确实未修（A、B 两处如实自陈 ✔）；
+**简报里"两处"的第二处位置写错了**（真位置是 `ban8Scopes():368`，交件表写对了、message 写错了），
+并且**第三处 `main.go:38-39` 谁都没提**（C）⇒ 这是本程唯一能算"新缺陷"的一格，但它是**文档级**、
+零行为影响（改它不动任何断言、不动 scope 列表、不动计数）。
+**要不要与 `Q-48` 同批收**：**要同批**。理由两条——
+(i) A/B/C 三句该改成什么，取决于 owner 在 `Q-48` 选哪一支：
+若选"摘掉第五段＝退回射程"，那 `describeEmojiScopes` 该说的就不是"comments exempt"而是整段射程都没变；
+(ii) 同一批里还躺着 §6(e) 那枚同源副本，三处措辞＋一份副本一次改清，比拆两批少一次误读窗口。
+**本程不动它们**（不在具名解冻①②③的射程内，`AGENTS.md §1.1`＋票面 `:86`）。
+
+## 8. 〔占位〕总裁与证据分级
+
 
 
 
