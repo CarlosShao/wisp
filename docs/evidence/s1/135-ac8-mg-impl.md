@@ -146,7 +146,11 @@ $ git show fa35557^:cmd/wisp/leg_dispatch_gate_133_test.go | sha1sum   906201f4a
 
 开工第一刻 `git status --porcelain` 是**空**。本程 §0 提交之后，工作树出现
 `M docs/PLAN.md`（4 增 4 删，`D1–D46`→`D1–D47`／`C1–C31`→`C1–C32` 那类指针计数修正），
-**不是本程写的**；本程未改它、未提交它，随后它由编排者自己以 `45623e4` 入库。
+**不是本程写的**；本程未改它、未提交它，随后它由编排者自己以 `45623e4` 入库
+（⚠ 精度补一句：本程当时在工作树里只看到 `docs/PLAN.md` 这一枚，`git show --name-only 45623e4`
+现量那枚 commit 实际带三枚路径——`docs/PLAN.md`＋`docs/reports/HANDOVER.md`＋
+`docs/reports/pending-and-issues.md`；后两枚本程**从未见它们在未提交态里出现过**，
+只登记"我看到的这一枚后来进了哪 commit"，不推断别的）。
 本程每一枚 commit 都带显式 pathspec（`git add -- docs/evidence/s1/135-ac8-mg-impl.md` ＋
 `git commit -q -F - -- <同一路径>`），`git diff --cached --name-only` 每枚都只有本文件。
 
