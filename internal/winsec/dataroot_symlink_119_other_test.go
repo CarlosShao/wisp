@@ -28,7 +28,7 @@
 // be refused, or the fix would have traded the leg away on exactly the route it
 // touched.
 //
-// Two instrument notes, because both have bitten this repository:
+// Three instrument notes, because all three have bitten this repository:
 //   - these containers run as uid 0, and root is not stopped by a mode bit. The
 //     0700 assertions below are about the mode the filesystem agreed to store on
 //     the directory the seal created, which is what winsec verifies; they are not
@@ -41,6 +41,18 @@
 //     fixtures that asked proc.SealableRoot for their expectations stayed green
 //     while production was mutated into resolving the declared roots it is
 //     supposed to leave alone, because SealableRoot is idempotent.
+//   - which base a case stands on is part of its judgement, not a default. A case
+//     whose subject is a link it plants itself must stand on a resolved base: on
+//     a host whose temp dir is behind a link (macOS' real shape, and the
+//     container's TMPDIR=/ac7link shape) the floor refuses the whole spelling at
+//     that first component, the walk never reaches the planted link, and the
+//     refusal the case reads belongs to somebody else. Ticket 137 AC#4 resolved
+//     the roots of the cases that were not about the unresolved-root shape; the
+//     two here that are (TestAC1POSIXUnresolvedSymlinkedRootStillRefused119 and
+//     TestAC2POSIXInjectedTestDataDirStandsAsDeclared119) got the same treatment
+//     from ticket 119 AC#7, together with the attribution check
+//     refusalCreditsLink137, because root and reading only mean anything as a
+//     pair.
 package winsec_test
 
 import (
@@ -190,18 +202,46 @@ func TestAC1POSIXSymlinkedConfigDirRouteBecomesSealable119(t *testing.T) {
 // of swallowing - our own suites pass t.TempDir() straight to the floor, so on a
 // host whose temp dir is behind a symlink they are red until their roots are
 // resolved the same way (ticket 118/111's harness land, not option 2's).
+//
+// Ticket 119 AC#7 tightened the *reading* of that refusal, and it is a different
+// claim than the one above: this case is now one of only two places in the
+// package that still answer for the unresolved-root shape (ticket 137 AC#4 moved
+// the other POSIX roots onto resolved spellings), so a PASS here has to be about
+// the link this case planted. On a host whose temp dir is behind a link the floor
+// refuses the whole spelling at that first component and never walks down to the
+// planted link, which is why the two assertions below come as a pair:
+//   - the base is resolved (cleanSpelling119, the same precedent as the AC#3 case
+//     in this file), so the only link left in the spelling is the one planted
+//     here, and the case can go green *and* go red;
+//   - the refusal is read for attribution with refusalCreditsLink137, so it
+//     cannot be answered by an ambient link above the tree.
+//
+// Either half on its own is worthless, and ticket 137 AC#1's MUT-D is the
+// measurement that says so: with only the sentinel check this case stayed green
+// through that mutation in the symlinked shape (the host link refunded the
+// refusal), and with only the named assertion it would be red there whatever the
+// implementation does.
 func TestAC1POSIXUnresolvedSymlinkedRootStillRefused119(t *testing.T) {
-	base := t.TempDir()
+	base := cleanSpelling119(t, t.TempDir())
 	shape := newLinkShape119(t, base, "var")
 	foreign := newLinkShape119(t, base, "fgn")
 	unresolved := shape.spelledThrough("data")
+	// Premise, not expectation: if anything above this tree were still a link,
+	// every refusal below it would belong to that link and the attribution check
+	// would be reading a sentence this case did not earn. Asked of the floor, and
+	// the AC#3 case below uses the same gate for the same reason.
+	if err := winsec.PrivateDirAll(filepath.Join(base, "premise"), 0o700); err != nil {
+		t.Fatalf("premise broke: the resolved base %s is itself refused by the floor (%v), so the link planted here is not the only link in these spellings", base, err)
+	}
 
 	err := winsec.PrivateDirAll(unresolved, 0o700)
 	t.Logf("AC#1 PrivateDirAll(%q) -> %v", unresolved, err)
 	if err == nil {
-		t.Errorf("AC#1 RED: an unresolved data root through a symlink was accepted, so the leg is gone")
+		t.Errorf("AC#1 RED: PrivateDirAll(%q) was accepted, so the floor no longer refuses an unresolved root: the link this case planted at %s is invisible to it", unresolved, shape.link)
 	} else if !errors.Is(err, winsec.ErrUnresolvedPath) {
 		t.Errorf("AC#1: refusal did not name ErrUnresolvedPath: %v", err)
+	} else if !refusalCreditsLink137(err, shape.link) {
+		t.Errorf("AC#1 RED: the refusal of %q named ErrUnresolvedPath but did not credit the link this case planted at %q (%v): an ambient link above the tree answered for it, so this says nothing about the leg under test", unresolved, shape.link, err)
 	}
 	if _, statErr := os.Lstat(shape.inRealTree("data")); !errors.Is(statErr, fs.ErrNotExist) {
 		t.Errorf("AC#1 RED: the refusal created %s anyway (%v)", shape.inRealTree("data"), statErr)
@@ -282,8 +322,19 @@ func TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119(t *testing.T) {
 // well" and this case read green, because its expectation used to be computed by
 // proc.SealableRoot, which is idempotent: as declared and resolved-and-rejoined
 // were the same string, so no implementation could contradict it.
+//
+// Ticket 119 AC#7 is the same disease on the other half of this case: the
+// placement leg of leg one was only checked for its sentinel, so on a host whose
+// temp dir is behind a link the floor refused leg one at that ambient component,
+// the planted link was never reached, and the case stayed green through ticket
+// 137 AC#1's MUT-D. Both medicines are in, for the reason spelled out on
+// TestAC1POSIXUnresolvedSymlinkedRootStillRefused119: a resolved base, and a
+// refusal read for which link it credits. Leg two is this case's premise gate -
+// it requires the floor to seal a plain path under the same base, so an ambient
+// link above the tree reddens the case rather than letting leg one pass for the
+// wrong reason.
 func TestAC2POSIXInjectedTestDataDirStandsAsDeclared119(t *testing.T) {
-	base := t.TempDir()
+	base := cleanSpelling119(t, t.TempDir())
 	shape := newLinkShape119(t, base, "inj")
 
 	// Leg one: declared through the link, so "verbatim" and "resolved" are
@@ -300,13 +351,17 @@ func TestAC2POSIXInjectedTestDataDirStandsAsDeclared119(t *testing.T) {
 	}
 	// The price of "as declared", pinned rather than implied: the floor answers a
 	// root that reaches itself through a link with a refusal, and refuses without
-	// creating anything in the tree the link names.
+	// creating anything in the tree the link names. Since ticket 119 AC#7 the
+	// refusal is also read for *which* link it credits: leg one planted it, so an
+	// answer bought by a link above the base is not this case's answer.
 	err := winsec.PrivateDirAll(declared, 0o700)
 	t.Logf("AC#2 PrivateDirAll(%q) -> %v", declared, err)
 	if err == nil {
 		t.Errorf("AC#2 RED: the floor accepted a declared root that reaches itself through the link at %s, so the placement leg is gone on the route option 2 leaves untouched", shape.link)
 	} else if !errors.Is(err, winsec.ErrUnresolvedPath) {
 		t.Errorf("AC#2: refusal did not name ErrUnresolvedPath: %v", err)
+	} else if !refusalCreditsLink137(err, shape.link) {
+		t.Errorf("AC#2 RED: the refusal of the declared root %q named ErrUnresolvedPath but did not credit the link this case planted at %q (%v): an ambient link above the base answered for it, so the walk under test never ran", declared, shape.link, err)
 	}
 	if _, statErr := os.Lstat(asTheKernelSpellsIt); !errors.Is(statErr, fs.ErrNotExist) {
 		t.Errorf("AC#2 RED: the refusal created %s anyway (%v)", asTheKernelSpellsIt, statErr)
