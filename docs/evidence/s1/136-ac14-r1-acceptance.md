@@ -126,3 +126,60 @@
 **翻 Gate 的争用/前提自查**：该发日志内 `grep -c "precondition broken: only"` ⇒ **0**（AC#15 那枚已知 flake
 本程四发主读数＋§4 四发变异里**一次没响**）；真 `^panic:` ⇒ 0。
 
+**§2 的 commit 回显**（原样贴，供核"每枚 commit 只带自己那枚路径"）：
+
+```
+$ git log --oneline -1
+bb723f7 accept(136 AC#14 r1 §2): 主靶——仓外快照独立翻 settleCoverageRowGates，红名册(A)恰 2 枚、必须仍绿名册(B)点名 9 枚，71 名册守恒 0 SKIP
+$ git show --name-only HEAD
+docs/evidence/s1/136-ac14-r1-acceptance.md
+```
+
+---
+
+## §3 判据③ 复核"三处同形"——它推翻过一张落进票面的裁定 —— 〔独立复现〕**结论成立，但简报给的"三处"这个数不成立**
+
+被验版本：`git show ca2c55e:internal/observe/sampler_settle_coverage_136_test.go`（该文件在 `ca2c55e` 的
+`git log -1` ＝ 本程即用此版本；全文 289 行）。
+
+**先给本程自己量的原始数**：`grep -c "if !rep.Pass {"` ⇒ **4**，逐处行号 **`:143` / `:208` / `:252` / `:279`**。
+⇒ **简报里"数 `if !rep.Pass {`（意在得三处）这句按字面跑出来是 4 枚，不是 3 枚。**
+差的第 4 枚（`:279`）不是漏网的同形，它正是 (B) 名册那一枚健康窗口。**"三处同形"这句作为"三枚要求'部分未测'的窗口必须 pass"的实质论断成立；作为 grep 计数不成立。** 下表逐处给改前行号＋红句原文＋归类：
+
+| 改前行号 | 所属用例（func 行） | 红句原文（逐字） | 归类（本程判） |
+| --- | --- | --- | --- |
+| `:143-145` | `TestCheckSettleSingleTrustworthyReadReportsItsLoss`（`:123`） | `this leg pins disclosure, not the verdict; a covered-enough window must still pass: %+v` | **部分未测却要求 pass**（10 枚读数只 1 枚可信、丢 9）⇒ **该被门抓** |
+| `:208-210` | `TestCheckSettleHalfTheReadsFailedReportsItsLoss`（`:176`） | `disclosure leg, not a verdict leg: this window still passes, report=%+v` | **部分未测却要求 pass**（丢一半，`kept≈lost`）⇒ **该被门抓；＝票面 `:287` 唯一预先授权改的那一处** |
+| `:252-254` | `TestCheckSettleZeroFootprintDropsAreCountedToo`（`:238`） | `report=%+v` | **部分未测却要求 pass**（1 可信 / 2 枚零足迹、丢 9）；红句没写理由，但形状与判据同 ⇒ **该被门抓** |
+| `:279-281` | `TestCheckSettleFullyMeasuredWindowReportsNoLoss`（`:265`） | `a measurable, settled, released window must pass, report=%+v` | **健康窗口要求 pass**（`sample_errors=0`、reads≥3 前提腿）⇒ **翻 Gate 后必须仍绿**＝§2 的 B1 |
+
+改后（`aef82f5`）现量：`if !rep.Pass {` ⇒ **3 处**，行号 `:143` / `:280` / `:307`。
+⇒ **票面 `:299` 那句"HEAD 上还剩 `:143`、`:280` 两枚要求 pass，另有 `:307` 一枚是健康窗口必须 pass"逐名逐行对上**；
+`git diff -U2 ca2c55e..aef82f5` 于该文件**只有一枚 hunk `@@ -206,6 +206,34 @@`**，头注释 `:25-27`
+（"a partially covered window still passes today (changing that verdict is not this cell's job)"）**逐字未动**
+⇒ 实现件 §2.4 自述的"没动头注释、把它改准属 AC#15 射程"**成立**。
+
+**"任何抓得住'丢一半读数'的门必然把这几形一起抓红"成不成立？——成立（本程既有测量支撑，也给了判据形状）。**
+
+1. 门行的判据是 `sampler.go:565` `covered := rep.SampleErrors == 0 && len(rep.Samples) > 0`（本程盘上现量，行号已核）。
+   三枚"部分未测"形的 `SampleErrors` 都 **>0** ⇒ **同一条件同时命中三形**，不存在"只命中一半那一形"的取值。
+2. 想只红一处，只有两条路，都不许走：
+   - **按丢读比例设阈值**（例：只红在 `lost/reads ≈ 0.5`）：`{1/10, 5/10, 1/10}` 里要红中间那一枚而放过两端的 9/10，
+     这是**非单调**判据 ⇒ 新造阈值，`AGENTS.md §1.1` 与票面 `:279` 的禁面。
+   - **按丢读原因分流**：本程从 gate=true 的输出逐字取到——`:143` 腿与 `:208` 腿的 `LastSampleError` **同为**
+     `read: settle probe: transient tree read failure`，只有 `:252` 腿是 `read returned a zero private working set for a live tree`。
+     ⇒ 按原因**最多把"零足迹"那一形分开，永远分不开 `:143` 与 `:208`**（同原因、只差比例，又回到上一条）。
+3. **实测印证**：§2 翻布尔后 → `:143`/`:252`（现为 `:280`）**两枚一起红**、健康窗 `:307` **仍绿**，
+   一枚不多一枚不少。这正是"没有只红一处的中间形状"的读数形式。
+
+⇒ **判定：票面 `:287`"派单预先授权它改**那一处**断言"这句在盘上不可满足**——任何满足 AC#14 判据①②的门行，
+都会同时把另两形抓红，而那两形不在授权面内。实现程选择"落在记录行＋停手报回"是**对的动作**，
+不构成"擅自扩面"，也不构成"放水"。
+**这一处是编排者的纸的缺陷，账已在本仓口径下成立**：`docs/reports/pending-and-issues.md` **`A182③`**
+（量于 `ddbd3a1`，该条目起于 `:5580`）已如实写下"它推翻我那句'一处断言'，成立"。
+**本程独立复核后确认 `A182③` 站得住**，并补两条 `A182③` 没量的数：
+① 改前 `if !rep.Pass {` 的**原始计数是 4 不是 3**（第 4 枚是健康窗，`A182③` 与票面 `:296` 数的是"三处同形"，
+两个口径都真，但**今后谁引这句得连口径一起引**，否则下一位 `grep -c` 会以为少了一枚）；
+② "分不开 `:143` 与 `:208`"的**原因串同一**这条证据（上面第 2 点）在 `A182③` 与实现件 §1.3 里都没有，
+本程补上——它把"只剩非单调阈值一条路"从**论述**变成了**有串的读数**。
+
