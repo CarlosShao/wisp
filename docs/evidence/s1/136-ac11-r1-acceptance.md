@@ -267,6 +267,69 @@ tag=AFTER tree=/d/tmp/wisp136ac11v-tree-after runs=30 date=2026-09-24T14:37:46+0
 ---
 
 
+## §3 反向判据 —— 证明新装的那道等待不是装饰（本程自己造的那一发）〔独立复现〕
+
+**先做恒真自查**（"复跑必须红"里的变异体若在旧码上本来就响，那一发就是装饰）：
+本程不用旧码当变异体 —— §2 已量到**改后树照原样跑 30/30 全绿**，所以本节的两个变异
+**只可能因为新装的那道等待而红**，是"今天不响、动了才响"的那一发。
+
+- 插桩只落 `/d/tmp`（两枚变异体各是一棵 `git archive e2a7463` 树里的 `goroutine_test.go`），**没进仓库**；
+  文件里逐字写了 "PROBE NEGATIVE CONTROL (not a fix)"。变异后 md5：
+  `negC1 → 1fa51dcf13a4c560762ff566191cc5d9`、`negC2 → 4be5c694058cfa9eec93cfed1ca99530`
+  （干净改后树是 `336a50f5…`，§0.3）⇒ 变异确实落了盘。
+- 命令：`go test -count=1 -v -run 'TestNoopTaskReturnsToBaseline' ./internal/observe/`，各 **3 发**，
+  目录 `/d/tmp/wisp136ac11v-negctl/`（6 份 `.v.log` + `gate.txt`）。
+- **发火前闸门（14:40:35 现量，四项原样）**：① 宿主争用进程 **空输出（0 枚）**（`Runner.Worker`／`go`／`compile`／`cgo` 全无）；
+  ② `docker ps` 6 枚 ＝ 与 14:27 同一批别的项目常驻服务、没有一枚是 wisp CI；③ `gh` = `0 in_progress`，
+  `35964449249 / e2a7463` 已 `completed`；④ `_work` mtime 仍 `2026-09-24 14:26:03`（未推进）。
+
+### 3.1 两枚变异与红句原文
+
+**C1：把 `:24`／`:25` 那两枚腿的"我进来了"抽掉**（腿仍停在 `hold` 内，只是不报到）
+
+```diff
+ 		return func(ctx context.Context) {
+-			entered <- name
++			// PROBE NEGATIVE CONTROL (not a fix): announce deleted
+ 			<-release
+```
+
+3 发**全红**，红句原文（第 3 发与前两发同名册）：
+
+```
+    goroutine_test.go:67: mid-task legs entered = [agent-task-noop] after 2s, want all 3
+--- FAIL: TestNoopTaskReturnsToBaseline (2.00s)
+```
+
+**C2：把 `:24` 那枚腿还原成改前的空体形状**（既不报到也不停住＝旧 bug 原样搬回来）
+
+```diff
+-	reg.Spawn("tool-exec-noop", "test", root, hold("tool-exec-noop"))
++	reg.Spawn("tool-exec-noop", "test", root, func(ctx context.Context) {}) // PROBE NEGATIVE CONTROL (not a fix): pre-fix shape restored for this leg
+```
+
+3 发**全红**：
+
+```
+    goroutine_test.go:67: mid-task legs entered = [agent-task-noop approval-waiter] after 2s, want all 3
+--- FAIL: TestNoopTaskReturnsToBaseline (2.00s)
+```
+
+（其中一发名序是 `[approval-waiter agent-task-noop]` —— 通道收取顺序不同，同一枚事实：缺的就是 `tool-exec-noop`。）
+
+### 3.2 三条要判的性质逐条对上
+
+| 要判的性质 | 本程实测 |
+|---|---|
+| 不变异时**不响**（排除恒真） | 改后树同一发整包 30/30 绿（§2） |
+| 变异后**必须红**、且红在**新装那道等待的超时诊断**上 | **6/6 红在 `goroutine_test.go:67`**，句子带 `want all 3` 与 seen 名册；无一枚走回旧那两条 `:28`／`:33` 计数红 |
+| **不许永远挂住**（把偶发换成死等也不算修） | 每发自带 `--- FAIL: TestNoopTaskReturnsToBaseline (2.00s)`、包级 `FAIL … 2.031s–2.041s`；外层 `timeout 120` **一次都没用到**；6 发 rc 全 1、`panic` 0 枚、包正常收尾 ⇒ `defer stop()` 真把三枚腿放了 |
+
+⇒ **那道等待不是装饰**：任一枚腿的报到被抽掉，这一发立刻从"绿"变成"2 秒后带诊断的红"；
+也**不是拿挂死换偶发**：`NewTimeout(2 * time.Second)` 的上界真实生效。
+
+---
+
 ## §4 修法合规五查（票面 ③；每条给 `git show f06a8d0` 原文行）
 
 ### 4.1 查① 只动那一枚 `_test.go` —— **过**
@@ -405,5 +468,153 @@ docs/evidence/s1/136-ac11-r1-acceptance.md
 
 ---
 
-<TODO 待补：§1 改前自测 / §2 改后自测 / §3 反向判据 / §5 归因独立性 / 总判>
+## §5 归因独立性 —— 本程自己重跑的 500 发归因探针（票面 ②）〔独立复现〕
+
+前一程留在盘上的 `/d/tmp/wisp136ac11-probe-whichkey.log`（500 发）是**别人的凭据，只读、不改**；
+本程在**自己的树**里另造同形探针重跑：`/d/tmp/wisp136ac11v-tree-probe/`（`git archive 51e29b0`）
+＋ `internal/observe/zz_probe136ac11v_test.go`（文件头逐字写着 "PROBE, NOT A FIX. 探针，不是修法"），
+命令 `go test -count=1 -v -run TestProbeAC11vAttribution ./internal/observe/`，
+读数 `/d/tmp/wisp136ac11v-probe-500.log`（该发自己那行 `RUN-DATE 2026-09-24T14:41:19+0800`，rc 0，用时是测试自报的 `2.77s`）。
+
+### 5.1 本程读数（原样）
+
+```
+PROBE-v iters=500
+PROBE-v shape count=1 perTask=1            = 1
+PROBE-v shape count=2 perTask=2            = 5
+PROBE-v shape count=3 perTask=1            = 5
+PROBE-v shape count=3 perTask=2            = 1
+PROBE-v shape count=3 perTask=3            = 488
+PROBE-v reads-that-would-fail: Count()!=3 6/500, PerTask!=3 12/500
+PROBE-v missing-at-Count-read          approval-waiter    = 1
+PROBE-v missing-at-Count-read          tool-exec-noop     = 6
+PROBE-v missing-at-RosterReport-read   approval-waiter    = 6
+PROBE-v missing-at-RosterReport-read   tool-exec-noop     = 12
+```
+
+（自查：`perTask != 3` 的四枚形状 1+5+5+1 ＝ 12 ✓；`count != 3` 的两枚 1+5 ＝ 6 ✓。
+名册里**没有** `agent-task-noop` 这一项、也**没有**任何 `perTask > count` 的形状 ⇒ 缺腿方向单调。
+复核命令：`cat /d/tmp/wisp136ac11v-probe-500.log`。）
+
+### 5.2 关键的那条排序：**先读的那处少响、后读的那处多响**
+
+- `Count()`（改前 `:28`，先读）＝ **6/500**；`RosterReport().PerTask`（改前 `:31-33`，后读）＝ **12/500** ⇒ 后读**多响一倍**。
+- 形状集合里存在 `count=3 perTask=1`（5 发）与 `count=3 perTask=2`（1 发）＝**同一枚 registry 上第一读看见 3、第二读只看见 1/2**；
+  而**没有任何一枚** `perTask > count` 的形状 ⇒ 腿只在这两读**之间**流失，方向单调。
+- 缺的是谁：只有 `tool-exec-noop`（6/12）与 `approval-waiter`（1＋6）—— **正是改前那两枚"函数体为空、进 fn 即返回"的腿**；
+  `agent-task-noop`（它 `time.Sleep(5ms)` 后才退）**0 次**。
+- 本程整包 30 发改前批同向独立命中：2 发红**全在 `:33`（后读那处）**、`:28` 0 发（§1.1 末行）。
+
+⇒ 归因落在**计数窗口那一类**：`Registry.Spawn` 是同步登记的（所以第一读常常已经＝3），
+缺的是"腿已登记"与"腿已退休"之间那条 **happens-before**：那两枚空体腿的**反登记可以在两次读之间落地**。
+这**不是**"机器负载高"这种不可核的说法，三条反证：
+
+1. 只是负载 ⇒ 缺的腿应任意分布；实际**只落在那两枚空体腿上**，睡 5ms 的那枚 0 次。
+2. 只是负载 ⇒ 不该出现"第一读 3、第二读 1"这种同一枚 registry 上的**单调下降**形状（负载不改读序）。
+3. 抽掉报到边 ⇒ 6/6 必红；补上边 ⇒ 0/30 绿（§2／§3）。负载不在这两个方向上做变动因。
+
+### 5.3 与前一程／编排者那 500 发对照（各数不互算）
+
+| 来源 | `Count()!=3` | `PerTask!=3` | 缺的 key | 方向 |
+|---|---|---|---|---|
+| 本程（独立重跑，500 发） | **6/500** | **12/500** | `tool-exec-noop`、`approval-waiter`；`agent-task-noop` 0 次 | 后读多响 |
+| 前一程盘上产物 `wisp136ac11-probe-whichkey.log`（500 发） | 11/500 | 33/500 | `:24 tool-exec-noop` 24／两枚都缺 7／`:25 approval-waiter` 2 | 后读多响 |
+
+⇒ **方向同向、绝对值不同**（本程 12 vs 它 33）。本程只取"排序方向"与"缺的是哪两枚腿"这两条**结构性**结论当凭据，
+**不取绝对命中数**（绝对数依机器状态漂，这也是为什么票面 ① 要求逐名给 n 而不是给一句率）。
+另注：探针的率（12/500＝2.4%）与整包批的率（2/30＝6.7%）**不是同一枚分布**、不互相换算 ——
+探针在紧循环里复用 registry、每发还多等 `<-taskRan`。
+
+---
+
+## 总判
+
+**逐条对上票面 AC#11 的结案判据：**
+
+| 判据 | 本程凭据 | 判 |
+|---|---|---|
+| ① 先量复现率并给出 n（同一棵纯净快照连跑 ≥20 发整包 `-v`，逐名记命中，别用单次读数下结论） | **2/30**（`git archive 51e29b0` 树，30 发逐名表在 §1，含四数＋`panic`＋名册；红在第 09、22 发，红句原文入库）；单次读数一条没用 | **成立** |
+| ② 根因归到**计数窗口**那一类（缺 happens-before），不许归成"机器负载高" | §5：本程自己 500 发重跑给出 `Count()` 6/500 < `PerTask` 12/500、存在 `count=3 perTask=1` 而**无**任何 `perTask>count` 形状、缺的只落在那两枚空体腿上；另有"负载说"的三条反证 | **成立** |
+| ③ 修法只许把等待变成**有判据的等待**（轮询到条件成立＋超时上界），绝对不许 `time.Sleep` 糊窗／`Skip`／调阈值换绿 | §4 五查全过：新增行里 `time.Sleep` **0** 枚、`Skip` **0** 枚、阈值/容差行逐字节未动（`want 3`／`!= 3`／`before+1` 原样）、只动那一枚 `_test.go`；唯一新增的 `time.After(2ms)` 判为**轮询步长**（退出条件是判据、边由 `entered`/`release` 两条通道边补、上界 `NewTimeout` 单调） | **成立** |
+| ④ 修完同一发复跑 ≥20 发命中必须为 **0**，两次逐名读数都留在证据里 | **0/30**（`git archive e2a7463` 树＝含 `f06a8d0`）；名册闭合：30 发顶层名册是**同一枚 65 枚集合**、`PASS+FAIL` 恒 65、`SKIP` 全 0、`panic` 全 0、rc 全 0、目标用例逐发都有 `--- PASS` 行 ⇒ 那个 0 不是把分母做小或把用例跳掉换来的 | **成立** |
+
+**附加那一发（判"附条件 vs 退回"的分界）＝本程造出来了**：§3 两枚变异各 3 发 **6/6 红在
+`goroutine_test.go:67` 的超时诊断**、每发 `(2.00s)` 有界收尾 ⇒ 新装的那道等待不是装饰。
+
+### 结论：**成立**（四条全对上新装那道等待被反向判据证实为真在把关；两批命中率都是本程自己的数）
+
+一句话理由：改前本程自己量到 **2/30** 且红只落在"后读的那处"、改后 **0/30** 且名册逐发闭合、
+修法只碰那一枚测试文件（阈值/容差一字未动、无 Sleep 糊窗、无 Skip、生产码零改动）、
+而把任一枚腿的报到抽掉就 6/6 必红并在 2s 上界带诊断地收尾 ⇒ 这一格是**真把偶发换成了有判据的等待**，不是换绿的装饰。
+
+### 编排者那条"必须解冻 `internal/observe/goroutine.go` 才修得了"的复核：**不成立**（与编排者同判，本程未动生产码）
+
+反证＝`f06a8d0` 只带测试文件（§4.1／§4.5）＋ §2 的 0/30：修法用到的 `Snapshot()`、`NewTimeout()` 都是改前就存在的生产 API，
+`Registry.Spawn` 的同步登记语义不需要被改。本程**未动任何代码**，若还要动生产码须按 finding 报回、由人批。
+
+### 自报（本程自己这两小时的错，append-only）
+
+1. **`e2bb38d` 的 message 比内容多说了一句**（写了"＋§4 回执"而那枚里没有 §4.7）：插入回执的 python 在
+   `os.popen()` 读 git 输出时抛 `UnicodeDecodeError`（本机默认 cp936）就中断了，`&&` 链后半的 add/commit 在另一行照跑。
+   ⇒ 已由 `941acf3` 追加 §4.7 与这段更正；已提交历史**未改写**。教训：一条命令失败后**不许**让后半继续。
+2. **第一版闸门 ③ 缺 `-R`** 导致 `GH-UNAVAILABLE`（§0.4 明写）：那一批**一个读数都没产生**就被本程自己停掉重跑。
+3. 本程第一版汇总脚本把 `--- PASS` / `--- FAIL` 写成了带尾空格的 pattern ⇒ 四数里那两列一度读到 0；
+   现表（§1／§2）用的是修正后的 pattern，且与每发的 `rc`、目标用例逐名结果互相对得上（65＝PASS+FAIL）。
+
+### 我没核的清单（照这条读，别把本表当全裁）
+
+1. **票 136 其余各格一枚没裁**（含编排者另派的 AC#10／AC#14）；票面那一格的勾**不由本表翻**。
+2. 两枚实现程报的 5 枚号（`d667888`／`17b61a4`／`3c3e388`／`d0ca6a3`／`2644207`）只做到"盘上不存在"，
+   **没追**它们本应指向什么（无从追）。
+3. 只量了 `internal/observe` 这一包里 **`TestNoopTaskReturnsToBaseline` 那一枚**的偶发率。
+   本包其余 64 枚**有没有别的既有偶发失败**没量（名册同形只证明"没少跑"，不证明"别人不偶发红"）。
+4. **没在 linux 容器里复跑**（该包纯 Go、宿主直跑；`*_other_test.go`／`//go:build !windows` 那半边不在本格判据里，也没被本表判过）。
+5. **没在 CI 争用窗口里复测 0 命中**：两批都拿在 `0 in_progress` 的清窗口里（票面没要求争用下的率，
+   但"负载下的复现率上界"仍属未测——这发量的恰恰是时序，负载会改命中率）。
+6. 反向判据只造了 **2 枚变异**（C1 抽报到、C2 还原一枚空体腿，各 3 发）。
+   **"三枚腿全不报到"**那一枚、以及**"腿报到了但不 `hold` 住"**那一枚本程**没造**（前者被 C1 覆盖同一机制、后者即 C2 的推广，都不等于测过）。
+7. `wisp slo` 端到端那一环（AC#8 那一族）与本格无关，**没核**。
+8. **没核** `f06a8d0` 之后是否有别的程再动过本包（只核到 §0.3 的 `51e29b0..HEAD` 该包只有它一枚 ＋ 那枚文件 md5 与 `HEAD` 相同）。
+
+### 注入两栏（本表结案时的累计）
+
+- **真通知回显数 ＝ 3**：① 本程自己 `TaskStop` 那程的后台事件（追得到出处：`TaskStop` 调用＋`chain.out`）；
+  ②③ 两条 `MEMORY.md` "modified since last read"（路径真：仓库级与用户级各一枚）。
+- **判为注入数 ＝ 0**：全程未遇到要求 revert／放宽阈值／"Confirm the harness note is genuine"／让本程少取证的文字。
+  四条辨别力（路径真不真／是否削弱 owner 权威或放宽判据／能否盘上重验／是否让我少取证）逐条走过；
+  "登记要带出处"这条规矩**只被引用、未被任何外部文字代填**。
+
+---
+
+## §6 回执链（逐枚现量；读者可用同两条命令复算）
+
+本文件每一节各占一枚 commit，回执因"一枚 commit 装不下自己的号"而随下一枚落盘。
+§0 的回执在 §0.7（`2546b76`）、§4 的回执在 §4.7（`4666fe0`）。这里补 §1+§2 那一枚与更正那一枚：
+
+```
+$ git log --oneline -1 e2bb38d
+e2bb38d evidence(136,AC#11 r1 终裁 §1+§2): 改前 2/30、改后 0/30，两批各 30 发逐名读数入库（+§4 回执）
+
+$ git show --name-only --format='%h %s' e2bb38d
+e2bb38d evidence(136,AC#11 r1 终裁 §1+§2): 改前 2/30、改后 0/30，两批各 30 发逐名读数入库（+§4 回执）
+
+docs/evidence/s1/136-ac11-r1-acceptance.md
+
+$ git log --oneline -1 941acf3
+941acf3 evidence(136,AC#11 r1): 补 §4.7 回执 + 自报上一枚 message 跑在内容前面
+
+$ git show --name-only --format='%h %s' 941acf3
+941acf3 evidence(136,AC#11 r1): 补 §4.7 回执 + 自报上一枚 message 跑在内容前面
+
+docs/evidence/s1/136-ac11-r1-acceptance.md
+```
+
+> 本节（§3＋§5＋总判＋本回执链）自己那枚 commit 的回执**只能出现在下一枚里**：
+> 复算不必等我贴 —— `git log --oneline -6` 逐枚再跑上面那两条命令即可，
+> 预期：这一路每枚 commit 的文件清单**只有** `docs/evidence/s1/136-ac11-r1-acceptance.md` 一枚。
+
+---
+
+next=（本程交件后无待补；若要把 §3 再扩两枚变异或去 linux 容器复量，须另派）
+
 
