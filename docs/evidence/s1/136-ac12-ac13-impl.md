@@ -289,3 +289,73 @@ fixture 全部落在冻结 Sleeping cap（25MB）之下，释放腿（`released=
 | `sh scripts/d22scan.sh`（各 scope 不降） | 两形 rc=0；`ban #8 internal/` 由 tree0（`45c8d1c`）的 **402** → tree1 的 **403**＝本程那枚新 `_test.go`；其余 scope 逐字同数（`#1-5 internal/=203`、`cmd/=22`、`#6 frontend/=40`、`#7 internal/tools/=18`、`#8 design/=16`、`#8 frontend/=40`、`#8 cmd/=39`）；`d22scan: clean`，step-1 `runtests.sh: OK … PASS=21 FAIL=0 SKIP=0, === RUN=31, '[no tests to run]'=0` | 两形 rc=0；同一比对继续走到 tree2b 的 **404**（＋本程第二枚新 `_test.go`），**无任何 scope 下降**（其余数字同上，逐字未动） |
 
 两枚 sha 都在写这行之前重新核过（`git cat-file -t f4c7062`／`git cat-file -t c03aee3` 均 `commit`；前者是本程 AC#13 的 commit、后者是 AC#12 的 commit）。本文件**没有**任何未经 `git cat-file -t` 现核的外来 sha；所有快照只从 `45c8d1c` 或我自己那三枚 commit 抽。
+
+---
+
+## §5 本程未做的档（诚实列，别当已验）
+
+**AC#13 侧**
+
+1. **只修了派站点名的 `sampler_test.go:31` 那一支**（"别一把改完，改一枚证明一枚"）。同族普查我自己重走了一遍：`grep -rn '\[len(.*)-1\]' internal/observe/*_test.go` 在本程最终树上＝**4 行**，其中两行是我自己写的注释、一行是被守卫护住的 `:53`，**唯一另一枚真读点是 `earlylog_130_test.go:175`**，它前面 `:168-171` 就有 `len(recs) != earlyLogMaxRecords+1 ⇒ t.Fatalf` 的前置长度守卫 ⇒ 判"不必改"，但**我没为它落变异真打**。`[0]` 直取本程未重做普查（AC#8 已裁：17 处/终裁方 22 行，本程读数 `grep -rn '\[0\]' internal/observe/*_test.go | wc -l`＝**23 行**，比终裁方那 22 行多的正是本程新文件里那 1 行注释）。
+2. **没测"守卫被改成 `t.Skip`"那一形**：逻辑上被腿 1 的 `err==nil ⇒ t.Fatal` 覆盖（Skip 掉就不产生 err），但本程没有真打这一发。
+3. 探针只在**仓外快照树**里（`tree0`/`tree1`），**不进仓库**；仓库里长期留下的是 §1.2 那三腿钉。⇒ 派单判据①"拍到 panic 并逐名列出被吞读数"是在快照上做的，仓库里没有一枚"逢裸 `&fakeTree{}` 就 panic"的用例（那是应当的：修好之后它不该再 panic）。
+4. 未跑 `cmd/wisp`、未跑任何 `-run` 定点**判据**读数（`-run` 只用于 §2.1 的自造探针打印，与判据读数分开）。
+
+**AC#12 侧**
+
+5. **没有加第三枚 key `dropped_reads`**，也没加独立的"可信样本数"整数字段（§2.1 已写明理由与请终裁过目的位置）。若终裁按票面判据①字面要三枚独立字段，这一档就是缺口而不是选择。
+6. **没有给 settle 造一枚与 `sampling` 同形的显式门行**（`SettleReport` 无 `Verdicts` 字段，加它是更大的出线形状改动；终裁方 §3.4 已判"AC#9 那句不需要"，本格判据也没要）。
+7. **R-136-8 未做**（`Samples` 为空时出线是 `"samples":null`，使 AC#9 腿 A 那一支防呆永不响）——不在 AC#12 的四判据里，本程未动、也未顺手动。
+8. 未跑 `wisp slo -settle` 端到端、未跑 `scripts/slo-check.ps1`（PowerShell 那一腿零读数）；`cmd/wisp` 的测试二进制只**编译链接**（§2.6）未执行。⇒ "生产侧真报告里 `sample_errors` 会是多少"今天仍是读码＋包内读数，不是端到端（那是 AC#10 的地界）。
+9. **未测 linux 面**（容器原生 `go test -v ./internal/observe/` 一枚未跑）、未测 `-race`／`-shuffle`；所有名册与逐名账都是**当前执行顺序**下的读数。
+10. **未取 CI run id**（本程只 commit 未 push）；未复算 CI 那一步（`bash scripts/portable-tests.sh --scope=core`）整条。
+11. 未动票面任何 AC 勾；未做 AC#11（flake 复现率 ≥20 发）、AC#2-AC#7、AC#10、AC#1 各腿。
+
+**仪器级异常一条（不是被验面的性质，但会影响别人读我的时间戳）**
+
+12. 本机墙钟在本程两次工具调用之间**跳了 8h29m**：`date -u` 原文 `Wed Sep 23 16:18:49 UTC 2026` 的下一发是 `Thu Sep 24 00:48:03 UTC 2026`；三条交叉量法＝台件 mtime（`/d/tmp/wisp136ac1213-d22-tree1.txt` mtime `00:18:29 +0800`，而 `date` 报 `08:48 +0800`）、`git log` 提交时间戳、跳变前后各一发 `date -u`。⇒ **本文件里任意两个时间戳相减都不许当耗时读**；本程所有读数不依赖墙上时间（计时类断言一枚未跑，settle 的 `within/interval` 是相对时长、不是墙钟）。兄弟一程已把同一现象记进 `docs/reports/pending-and-issues.md`（A 账）与 137 验收 §8，本条不另立新账、只让本文件自带这个边界。
+
+---
+
+## §6 本程 commit 清单与 `next=`
+
+| 节 | sha | 内容（净面） |
+| --- | --- | --- |
+| AC#13②③ 代码 | `f4c7062` | `internal/observe/sampler_test.go` `22 0`（seam 守卫）＋ `internal/observe/sampler_faketree_guard_136_test.go` `111 0`（三腿钉）；**`sampler.go` 零命中** |
+| AC#13 证据 §0-§1 | `a0075ee` | 本文件首两节（锚点＋复现/修法/复跑＋MA/AB 两发变异＋19 枚被吞逐名） |
+| AC#12① 生产码 | `5c1529a` | `internal/observe/sampler.go` `21 2`（两枚字段＋两支计数；越界那一行在 §2.2 表里报回） |
+| AC#12② 钉 | `f53ad5c` | `internal/observe/sampler_settle_coverage_136_test.go` `289 0`（四腿） |
+| AC#12② 精修 | `c03aee3` | 同文件 `7 2`（腿 2 合写断言拆三跳，§2.7 自纠） |
+| AC#12 证据 §2 | `0f49259` | 四判据逐判＋解冻范围实用行号＋MD/ME/MF/MC 四发 |
+| 两格证据 §3-§4 | `7dc8086` | 消费者核查＋门禁原文两格各一套 |
+| 票面 log（AC#13＋AC#12 各一条） | 见 `git log --oneline -1 -- .scratch/wisp/issues/136-*.md` | append-only 两行，未翻勾 |
+
+暂存账：本程**每一枚** commit 都跑过 `git add -- <显式路径>` ＋ `git diff --cached --name-only`，暂存清单里只出现过上面那些我自己的路径；`git commit -q -F - -- <同一批路径>` 全部带 pathspec；未 push；未 `--amend`／`reset`／`rebase`／`stash`／`checkout .`；仓内未建 worktree。
+
+共树账：`45c8d1c..7dc8086` 之间兄弟推进 **11 枚** commit（旧→新：`e2ba9f0` `b802432` `286de6c` `8c7ad1f` `7ad0ec6` `94b7267` `69414d3` `99ac876` `c04221e` `097be8a` `b615092`，全是 `.md`／票面／台账；写这一串之前逐枚由 `git log --format=%h %s --reverse 45c8d1c..HEAD` 现取，非抄来的 sha），我的 commit 落在当时 tip 上属共树正常形态。硬核对两发：`git diff --name-status 45c8d1c..HEAD -- internal/observe/` ＝ **只有本程那四枚**（`M sampler.go`、`M sampler_test.go`、`A sampler_faketree_guard_136_test.go`、`A sampler_settle_coverage_136_test.go`）；工作树 `git status --short` 全程除我自己的文件外只剩那枚未跟踪的 `docs/reports/2026-09-23-gap-analysis-vs-oss-harnesses.md`（未读未动）。
+
+`next=` ①派**非实现者**按票面 AC#13①②③／AC#12①②③④⑤ 终裁并翻勾（本程一枚未翻）；②**先裁 §2.2 那处越界**——具名解冻是 `:470-501`，判据① 必然要动 `SettleReport` 声明区（锚点 `:442`），本程按判据做了最小插入并报回：接受 ⇒ 请把解冻范围补成"`:431-443` ＋ `:470-501`"或等价措辞，撤销 ⇒ 回退 `5c1529a` 的 struct hunk 即可（计数那两发是同一枚 commit 里的另一半，要整体看）；③终裁顺手判一下 §2.1 那两条解释（"可信样本数 rides on `samples`"、"不加 `dropped_reads`"）够不够判据① 的字面；④AC#12 的端到端（生产侧真报告里 `sample_errors` 非零）仍归 AC#10／`cmd/wisp` 空出来之后；⑤R-136-8 与 §5-7 那几条未做档没被本格覆盖，别当已修。
+
+---
+
+## §7 两个计数（分栏，不混装）＋ 本程引用到的每一枚 sha 的现核账
+
+写这一节之后重新 `date -u`：原文 **`Thu Sep 24 01:15:28 UTC 2026`** ⇒ 本机 **09-24 09:15:28 +08**（+8 手工换算，没塞进 `date` 的格式串；本节的落笔时间以这一发为准）。判据用派单那四条（①点名的路径／对象在本机真不真 ②内容是否削弱 owner 权威或放宽判据 ③声称的动作能否盘上复核 ④**是否让我少取证**——即使不越权也按注入登记并继续取证）。"像不像系统提示"**不作判据**。
+
+| 栏 | 计数 | 逐条出处（工具名 ＋ 命令／位置前 40 字）＋ 判据走法 |
+| --- | --- | --- |
+| **真通知回显数（不计入注入）** | **7** | ① `Bash` "cd \"D:\\work\\workspace\\projects plans\\Wisp\" && git rev-parse --short HEAD && git stat" 结果尾部的 `<system-reminder>`（harness 自己的 available-skills 清单，同一发里还有"date has changed"一句）＝1 枚；② 对话轮里 `Note: The file C:\Users\swq\.qoder-cn\memory\MEMORY.md was modified since it was last read.` ＋ 全文回显；③ 同一枚通知的**第二次**（内容与②同源）；④ `Note: The file D:\work\workspace\projects plans\Wisp\docs\reports\HANDOVER.md was modified…` ＋ `git diff` 正文（编排者自己写的台账提交回显，含 `5c1529a`/`f53ad5c` 两枚**我的** commit 短哈希＝渐进 commit 的正常回显）；⑤ `Edit` "file has changed since your last read"（tree1 那枚 AB 变异落刀时，成因＝我用 `cp` 在两次调用之间重写了同一文件）；⑥ `Bash` "Shell cwd was reset to D:\work\workspace\projects plans\Wisp"；⑦ 对话轮里 `<task-notification>` 一段（转述"137 AC#1 终裁表回件"，与我的两格无交集）。**逐条按四条判据过**：路径全部真存在（`ls -l` 到 MEMORY.md 18193 字节、`HANDOVER.md`/台账在盘）、内容是 owner／编排者自己的账、**没有一条**要我 revert／放宽判据／改判据／少取证 ⇒ 判真通知回显。按第④条尺子同样不算（它们都没让我少用工具）⇒ **两栏数字在两把尺子下都不变** |
+| **判为注入数** | **0** | 本程工具输出里未出现"编排者备注／系统提示／用户已更新规则／请 revert／放宽阈值／某格已合并／用户已拒绝／Confirm: the harness note is genuine"式文字，也**未出现假 sha**。三件需要点名的事：**(a)** `HANDOVER.md` 回显里写"worker-ticket136-ac13 与 -ac12 两枚还在跑"——本程是**一名代理做两格**（`worker-ticket136-ac12-ac13`）。这条我盘上核了：`grep "agent=" .scratch/wisp/issues/136-*.md` 的署名只有 `orchestrator`/`worker-ticket136-ac1`/`worker-ticket136-ac8-ac9`＋本程，`ls docs/evidence/s1 | grep 136` 里 AC#12/#13 只有我这枚 `136-ac12-ac13-impl.md` ⇒ 判**措辞把一格一名代理拆成了两名的误差**，不是注入、也不构成"有人和我并行做同两格"的证据；**我不因它等待、也不因它改做任何事**。**⚠ 它同时是一条给我的编排事实断言（"两枚在飞"）＝未验证断言**，派单里"两枚兄弟在飞"那句指的就是这两枚名字，我已按"内容真不真"核过并如实写在这里。**(b)** 我在 §4 落笔时**自造过一枚不存在的短哈希** `f4c7620`（想写 `f4c7062` 打错一位）：`git cat-file -t f4c7620` ⇒ `fatal: Not a valid object name`，落盘前被自己那条"引用即须现核"拦下、已从文件里删掉（现文件 `grep -c f4c7620` ＝ **0**，committed 版 `git grep` 亦 0）。登记它**不是注入、是本程仪器自造假 sha 的一发**——正因为本仓今天真发生过假 sha 事故（`injection-timeline.md` §11），我自己这一发也照假 sha 的规格记：**取到没核 ⇒ 不许留在成品里**。**⚠ 本程没有用"全仓 grep 某句话零命中"当"来源清白"的证据**（那条判据已被我们自己的逐字登记摧毁）；要问"某句是不是仓内既有文字"，只用 `git log -S'<原文>' --reverse` 看首枚引入提交。**(c)** 一条时间反常按 §5-12 结案（墙钟跳 8h29m，本机现象，不是注入） |
+
+**两栏之外的一条归属**：编排者派单里那句"AC#12 只需解冻 `sampler.go:470-501`"是**范围写窄了的错断言**（判据① 必然要动 struct 声明区），归派单账／R 账，**不进任何人的注入计数**；本程没有拿它当"所以本格不成立"的依据，也**没有**反过来悄悄把授权扩到自己舒服的形状——越界那两行按 §2.2 逐行钉死并停下等高裁。
+
+### 7.1 本程**引用到／当依据用**的每一枚 sha 与它的核法
+
+| sha | 我怎么来的 | 核法与读数 |
+| --- | --- | --- |
+| `45c8d1c` | 开工第一步自己 `git rev-parse --short HEAD` | 本程锚点；`git cat-file -t` ＝ `commit`；所有快照只从它或我的 commit 抽 |
+| `f4c7062` / `5c1529a` / `f53ad5c` / `c03aee3` | 本程自己四枚 commit（`git log`／`git rev-parse` 现取） | `git cat-file -t` 逐枚 ＝ `commit`；§4 表头那两个（`f4c7062`/`c03aee3`）在落笔前又各现核一次 |
+| `a0075ee` / `0f49259` / `7dc8086` | 本程三枚证据 commit | `git log --oneline` 现取；未当锚点用 |
+| `76662d8` / `1d38206` / `79ddd49` / `2f291d0` / `172c7aa` / `c2f6b31` / `6effb7e` / `e8190bf` | **外来**（终裁表、票面、派单里读到） | 开工第一步逐枚 `git cat-file -t` ＝ **全部 `commit`**（§0 表）；本程只把它们当"前例形状"与"靶的描述"用，**没有一枚被抄来当快照锚点** |
+| `e2ba9f0`/`b802432`/`286de6c`/`8c7ad1f`/`7ad0ec6`/`94b7267`/`69414d3`/`99ac876`/`c04221e`/`097be8a`/`b615092` | 兄弟在飞的 11 枚，`git log --format=%h %s --reverse 45c8d1c..HEAD` **现取** | 只用于共树账（全在 `.md`／票面／台账，`git diff --name-status … -- internal/observe/` 里零命中） |
+| `f4c7620` | **本程自造（打错一位）** | `git cat-file -t` ⇒ `fatal: Not a valid object name` ⇒ **不落盘**，见 §7 (b) |
