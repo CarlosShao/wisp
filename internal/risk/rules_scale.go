@@ -21,6 +21,6 @@ func ruleBatchScale(ctx *assessCtx) *contribution {
 	return &contribution{
 		rules:  []RuleID{R7},
 		level:  L2,
-		reason: fmt.Sprintf("R7: 单次调用影响 %d 个文件（≥%d）", n, BatchScaleThreshold),
+		reason: fmt.Sprintf("R7: 单次调用影响 %d 个文件（>=%d）", n, BatchScaleThreshold),
 	}
 }

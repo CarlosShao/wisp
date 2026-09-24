@@ -151,7 +151,7 @@ func TestDecisionGoldenSnapshots(t *testing.T) {
 			name: "R7 at threshold",
 			a:    wired, tool: "fs.delete",
 			facts: Facts{BatchCount: 50},
-			want:  Decision{Level: L2, RulesHit: []RuleID{R7}, Reason: "R7: 单次调用影响 50 个文件（≥50）"},
+			want:  Decision{Level: L2, RulesHit: []RuleID{R7}, Reason: "R7: 单次调用影响 50 个文件（>=50）"},
 		},
 		{
 			name: "R8 send class",
