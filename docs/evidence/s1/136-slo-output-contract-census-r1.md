@@ -191,3 +191,18 @@ AC#14 加字段不会与它们冲突，它们是历史读数快照、非受检�
 - §2 判定表：`8fff95f`
 - §3 否定射程：`b523fbb`
 - §4＋next：见本枚 commit（`git log --oneline -1` 与 `git show --name-only HEAD` 原样贴下）
+
+§4 落笔 commit 原样：
+
+```
+$ git log --oneline -1
+8708344 docs(evidence/136): SLO 出线契约普查 r1 §4 矛盾核查 + next
+
+$ git show --name-only HEAD   (tail)
+    docs(evidence/136): SLO 出线契约普查 r1 §4 矛盾核查 + next
+
+    (a) 无文/spec 把 slo 报告 pass 定为只由内存；(b) 真矛盾是 AC#12 用例
+    vs AC#14 方向，已被票面 >③ 预授权；(c) 归档证据报告非受检契约。
+
+docs/evidence/s1/136-slo-output-contract-census-r1.md
+```
