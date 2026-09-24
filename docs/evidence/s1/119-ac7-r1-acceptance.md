@@ -338,3 +338,103 @@ PASS TestAC2POSIXInjectedTestDataDirStandsAsDeclared119
 判据② **成立（独立复现）**。改前那一发我在自己的容器、自己的快照、自己的饵上量到了；
 四数、名册、拒因指向三样都对上，且**没有任何一枚被改成 SKIP**（`b02`/`b04` 的 SKIP 名册与 `b06`/`b08`
 逐字节同一枚 md5 `194a396dc3380b91d23145d5d42ca2ff`，三枚都是票 125 的自拒探针）。
+
+### 2.5 本节落盘的 commit（原样输出）
+
+```
+$ git log --oneline -1
+d0f97d3 evidence(119 AC#7 r1 §2): 判据②成立（独立复现）——改前树 git archive a9c8b6e ＋ 我自己那发 MUT-D …
+$ git show --name-only --format="%H" HEAD | tail -2
+d0f97d3…
+docs/evidence/s1/119-ac7-r1-acceptance.md
+```
+
+（记录本身随 §3 那枚 commit 入库；`git log -L` 的复算式同上。）
+
+---
+
+## §3 判据③「改后的判别对」——**成立（独立复现）**，含一条实现方自述属实的机制更正
+
+台件＝`git archive 2956897`（＝交件树，被测文件 md5 `4995e4f5…` 每发容器现量），
+两形 × {未变异、MUT-D、MUT-D2}。
+
+### 3.1 六发主读数
+
+| 发 | 形 | 生产码 | RUN | 顶 P/F/S | 子 P/F/S | panic | 包级 rc | 两枚母项 |
+|---|---|---|---|---|---|---|---|---|
+| `b05-head-plain` | 普通 | 未变异 | 52 | 30/**0**/0 | 22/0/0 | 0 | **0** | PASS／PASS |
+| `b06-head-link` | 软链 | 未变异 | 45 | 27/**0**/3 | 15/0/0 | 0 | **0** | PASS／PASS |
+| `b07-head-mutd-plain` | 普通 | MUT-D | 52 | 17/**13**/0 | 17/5/0 | 0 | 1 | **FAIL／FAIL** |
+| `b08-head-mutd-link` | **软链** | MUT-D | 45 | **15/12/3** | 11/4/0 | 0 | 1 | **FAIL／FAIL** |
+| `d01-head-mutd2-plain` | 普通 | MUT-D2 | 52 | 21/9/0 | 18/4/0 | 0 | 1 | **FAIL／FAIL** |
+| `d02-head-mutd2-link` | 软链 | MUT-D2 | 45 | 18/9/3 | 11/4/0 | 0 | 1 | **FAIL／FAIL** |
+
+**正向对照**：派单给的期望数是 `52/30/0/0＋22/0/0`（普通）与 `45/27/0/3＋15/0/0`（软链），
+我量到的 `b05`/`b06` **逐格相同**，**没有不一致要报**。
+
+### 3.2 名册差集（改前 ↔ 改后，同形同产物；四数之外那一枚）
+
+| 对比 | `=== RUN` 名册 | 全量 colour 名册 | SKIP 名册 |
+|---|---|---|---|
+| `b01` vs `b05`（普通·未变异） | 差 **0** 行 | 差 **0** 行 | 差 **0** 行 |
+| `b02` vs `b06`（软链·未变异） | 差 **0** 行 | 差 **0** 行 | 差 **0** 行 |
+| `b03` vs `b07`（普通·MUT-D） | 差 **0** 行 | 差 **0** 行 | 差 **0** 行 |
+| `b04` vs `b08`（软链·MUT-D） | 差 **0** 行 | 差 **4 行** | 差 **0 行** |
+
+那 4 行原文（`comm -3`，左＝只在 `b04`、右＝只在 `b08`）：
+
+```
+PASS TestAC1POSIXUnresolvedSymlinkedRootStillRefused119        （只在 b04）
+PASS TestAC2POSIXInjectedTestDataDirStandsAsDeclared119        （只在 b04）
+FAIL TestAC1POSIXUnresolvedSymlinkedRootStillRefused119        （只在 b08）
+FAIL TestAC2POSIXInjectedTestDataDirStandsAsDeclared119        （只在 b08）
+```
+
+⇒ 差额**恰好是那两枚母项由 PASS 转 FAIL**，一枚不多、一枚不少；
+`=== RUN` 名册 23 发两两不差（没有谁整发不见），`panic|fatal error` 计数 **23 发全 0**（逐发 `numbers` 文件）。
+
+### 3.3 红句原文入库（判据③要的那句"点到我自己种的那枚链接"）
+
+`b08`（软链·MUT-D）里那两行，**未截断**（我把整行从 `-v` 日志里 grep 出来）：
+
+```
+dataroot_symlink_119_other_test.go:242: AC#1: refusal of "/acwpriv/wacc119tmp/TestAC1POSIXUnresolvedSymlinkedRootStillRefused1193191947254/001/varlink119/data" did not name ErrUnresolvedPath: winsec: /acwpriv/wacc119tmp/TestAC1POSIXUnresolvedSymlinkedRootStillRefused1193191947254/001/varlink119 is not a directory. Nothing answered for the link this case planted at "/acwpriv/wacc119tmp/TestAC1POSIXUnresolvedSymlinkedRootStillRefused1193191947254/001/varlink119", so this is not the placement leg speaking
+dataroot_symlink_119_other_test.go:362: AC#2: refusal of the declared root "/acwpriv/wacc119tmp/TestAC2POSIXInjectedTestDataDirStandsAsDeclared1193821381434/001/injlink119/harness/picked" did not name ErrUnresolvedPath: winsec: /acwpriv/wacc119tmp/TestAC2POSIXInjectedTestDataDirStandsAsDeclared1193821381434/001/injlink119 is not a directory. Nothing answered for the link this case planted at "/acwpriv/wacc119tmp/TestAC2POSIXInjectedTestDataDirStandsAsDeclared1193821381434/001/injlink119", so this is not the placement leg speaking
+```
+
+`b07`（普通·MUT-D）同两支、前缀换成 `/acwplain/...`。**两形都点到本用例自己种的那枚链接**（`varlink119`／`injlink119`）＝达成。
+
+`d01`/`d02`（MUT-D2，红在**新加那一支**）原文两行（软链形）：
+
+```
+dataroot_symlink_119_other_test.go:244: AC#1 RED: the refusal of "/acwpriv/…/varlink119/data" named ErrUnresolvedPath but did not credit the link this case planted at "/acwpriv/…/001/varlink119" (winsec: refusing to seal … reaches it via /acwpriv/…/001/varlink119, which is not the tree this call names): an ambient link above the tree answered for it, so this says nothing about the leg under test
+dataroot_symlink_119_other_test.go:364: AC#2 RED: the refusal of the declared root "/acwpriv/…/injlink119/harness/picked" named ErrUnresolvedPath but did not credit the link this case planted at "/acwpriv/…/001/injlink119" (…): an ambient link above the base answered for it, so the walk under test never ran
+```
+
+（上面两行为排版把中段写成 `…`，**逐字原文在 `logs/d02-head-mutd2-link/d02-head-mutd2-link.v.log`**。）
+
+### 3.4 一条必须照实报的机制（否则"红句"会被读成"新支响了"）
+
+MUT-D 那一发的红**从哨兵那一支响**（`:242`／`:362`），不是新加的记名那一支：`credit.py` 在 `b08` 里
+连一行 refusal 都没抓到，因为底线在截短之后根本不拒，`PrivateDirAll` 往下走到自己那一级撞到
+`… varlink119 is not a directory`。⇒ **实现方 §9.1 那句自述属实**，我独立复现到同一机制；
+`c94927d`（只改措辞那枚）存在的理由就是这个——第一版 `ddc1583` 的红句在 MUT-D 下打不到本用例种的链接。
+
+**这一枚怎么算？** 我按判据的文字裁：判据③要的是"MUT-D ⇒ 两枚都红**且红句点到本用例自己种的那枚链接**"，
+`b07`/`b08` 达成（两形、四枚红句原文都在上面）。但**"红句点名"本身不是承重证据**——
+把链接名塞进一条由别的机制触发的消息里，只改措辞就能做到。承重证据是我另造的**单点回退**（§1.3）：
+摘掉记名那一支之后 MUT-D 照旧红（⇒ 点名只是措辞），而摘掉之后 **MUT-D2 由红转绿**（⇒ 那一支真有牙）。
+所以本格判"成立"，**依据是 §1.2/§1.3 的十发回退，不是 `:242` 那句话好看**。
+
+⚠ 另一枚只写一遍、别记成"已测"：MUT-D2 打的是**全仓共用的记名短语**，
+`b06`→`d02` 的名册差集是 **26 行**（13 枚条目转红：票 113 那族 5 枚含 4 枚子测、票 118 那 2 枚、本程这 2 枚），
+`b05`→`d01`（普通形）逐名相同 13 枚。⇒ **MUT-D2 那一发的射程不是本格的判据**，
+它只用作"新那一支在两形都能单独响、不是恒绿"的旁证；
+`TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119` 在 MUT-D2 下 **PASS**（它不读那条短语），
+这一格差异本身就是"短语只被记名断言消费"的证据。
+
+### 3.5 判语
+
+判据③ **成立（独立复现）**：未变异两形两枚都绿（`b05`/`b06`，包级 rc=0）；
+MUT-D 两形两枚都红（`b07`/`b08`）且红句点名本用例种的链接；两形都给；四数之外名册差集与 panic 计数都给了。
+附带推翻一条派单预期（"只撤记名 ⇒ MUT-D 打不红"），并把"点名"与"承重"分开算账。
