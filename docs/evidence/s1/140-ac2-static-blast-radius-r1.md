@@ -385,7 +385,7 @@ docs/evidence/s1/140-ac2-static-blast-radius-r1.md
 |---|---|---|---|---|
 | 1 | **`cmd/wisp/doctor.go:256`（经 `doctor.go:104-105`）** | `return proc.TestDataDir(), nil`（`:257`），**`:259` 的 OS 读不执行** | 落到 `:259 userConfigDir()` -> `:263 SealableRoot` -> `:264-267` 答 `%APPDATA%\wisp-dev` -> `:108 probeWritable` **`MkdirAll` + 写 `doctor-write-probe.tmp` + 删** | **会换**（唯一一处 CI 上真被触发的） |
 | 2 | `cmd/wisp/slo_windows.go:238-239` | 条件 `os.Getenv("WISP_ENV") == ""` 为 **false** -> **不执行** `:239` | CI 上**仍为 false**——`scripts/slo-check.ps1:111 $env:WISP_ENV = 'test'` 在**同一进程内先设**，子进程 `wisp.exe slo` 继承它（`:563`/`:500` 都是从 slo-check 里起的） | **CI 不换**。**但**：直接跑 `wisp slo` 而不经 slo-check（本机手测形）时会**换分支不换色**（`:239` 自己补 `test`，`:243` 结果仍是 `test`） |
-| 3 | `cmd/wisp/secret.go:184 ResolveEnv` -> `:129 resolveSecretLayout` | env=`test` -> `LayoutFor` 的 `:81-85` case -> `DataDir: TestDataDir()` | env=`dev` -> `LayoutFor` 的 `:66-76` case -> `%APPDATA%\wisp-dev` + **`MutexEnabled: true`** | **CI 不换**：CI 上没有任何步骤跑 `wisp secret`（`grep -n 'wisp secret' .github/workflows/ci.yml` -> 0 命中）。**且**受影响的测试自己钉（§3.2 第 5 行）。⚠ 若实现程改成"顺手加一步 `wisp secret` 冒烟"，这一处立刻从"不换"变"会换" |
+| 3 | `cmd/wisp/secret.go:184 ResolveEnv` -> `:129 resolveSecretLayout` | env=`test` -> `LayoutFor` 的 `:81-85` case -> `DataDir: TestDataDir()` | env=`dev` -> `LayoutFor` 的 `:66-76` case -> `%APPDATA%\wisp-dev` + **`MutexEnabled: true`** | **CI 不换**：CI 上没有任何步骤跑 `wisp secret`（`grep -n 'wisp secret' .github/workflows/ci.yml` -> 0 命中）。**且**受影响的测试自己钉（§3.2 第 5 行）。注意 若实现程改成"顺手加一步 `wisp secret` 冒烟"，这一处立刻从"不换"变"会换" |
 | 4 | `cmd/wisp/resident_windows.go:27 ResolveEnv` -> `:33 proc.Boot` | `test` -> `boot_windows.go:77 DefaultLayout` -> 注册**零枚** mutex（`envfork.go:84 MutexEnabled: false`） | `dev` -> `Local\wisp-dev-single-instance`（`envfork.go:70`）**会真注册** | **CI 不换**：CI 无步骤跑裸 `wisp`（常驻腿只在测试里以**子进程 + 自带 `WISP_ENV=test`** 起：`resident_sink_nail_127_windows_test.go:199`；`dataroot_128_windows_test.go:113` 反向钉 dev） |
 | 5 | `cmd/wisp/run.go:155-156`（`buildEnvString()`） | 守卫 `:155 if s.dataDir == ""` **为 false**（测试注入） -> 整块跳过 | 同左，**守卫先挡住，env 根本没被求值** | **不换** |
 | 6 | `cmd/wisp/models.go:109-110` / `providers.go:80-81` | 同 #5 | 同左 | **不换** |
@@ -414,7 +414,7 @@ docs/evidence/s1/140-ac2-static-blast-radius-r1.md
 | 2 | 同文件 `:151` / `:192` / `:209` | env 是**字面量入参**（`:158 resolveDataDir(env)`、`:195 resolveDataDir("test")`），压根不求值环境 |
 | 3 | `cmd/wisp/dataroot_128_windows_test.go:113 return append(kept, "WISP_ENV=dev")` | 子进程 `cmd.Env` 自带，且**反向**钉 dev。`:108` 还把 `WISP_TEST_DATA_DIR` 摘掉 |
 | 4 | `secret_argv_windows_test.go:236/337/371`、`early_log_nail_130:123`、`resident_sink_nail_127:199` | 子进程 `cmd.Env = append(os.Environ(), "WISP_ENV=test", …)`；同名键在 `exec.Cmd.Env` 里**后出现者胜** ⇒ ambient 被盖 |
-| 5 | **`leg_sink_nail_131_windows_test.go:425/:457/:534` 三处 in-process `cmdSecret(...)`** | **这是 §3.1 #3 唯一的真实暴露面**——`cmdSecret` 会走 `secret.go:184 ResolveEnv()`。现量：`TestAC3SecretLegBooksItsAuditRecordsOnDisk` 在 **`:409 t.Setenv("WISP_ENV", "test")`**、`:524` 那个 `t.Run("secret")` 子项在 **`:526 t.Setenv("WISP_ENV", "test")`** ⇒ **两形都是 `test`，不换**。⚠ 但它是**全仓唯一一枚"依赖 job env 的值恰好等于自己钉的值"才成立的 in-process 生产入口调用**——这一枚的免疫是**靠它自己钉**，不是靠"生产入口没被调用" |
+| 5 | **`leg_sink_nail_131_windows_test.go:425/:457/:534` 三处 in-process `cmdSecret(...)`** | **这是 §3.1 #3 唯一的真实暴露面**——`cmdSecret` 会走 `secret.go:184 ResolveEnv()`。现量：`TestAC3SecretLegBooksItsAuditRecordsOnDisk` 在 **`:409 t.Setenv("WISP_ENV", "test")`**、`:524` 那个 `t.Run("secret")` 子项在 **`:526 t.Setenv("WISP_ENV", "test")`** ⇒ **两形都是 `test`，不换**。注意 但它是**全仓唯一一枚"依赖 job env 的值恰好等于自己钉的值"才成立的 in-process 生产入口调用**——这一枚的免疫是**靠它自己钉**，不是靠"生产入口没被调用" |
 | 6 | `cmd/wisp/secret_test.go:932 TestSecretSameNameUnderThreeEnvsIsThreeBlobs`（`:935 t.Setenv("WISP_TEST_DATA_DIR", testData)` 却**没钉 `WISP_ENV`**） | 这是简报让我专门找的那一形。**现量结论：不换**——它**不经** `cmdSecret`/`ResolveEnv`，三枚 env 是**字面量**喂进去的：`:942 layout, err := sessionLayout(env, configRoot, "")`（`env` 来自 `:937 envs := []buildinfo.Env{EnvDev, EnvTest, EnvProd}`），落点再显式回填 `:961 newProbe(t, env, dirs[env], …)`。`:935` 那枚 `t.Setenv` 只为让 `LayoutFor` 的 `:83 TestDataDir()` 落在**声明过的**目录上（否则是 `%TEMP%\wisp-test-<pid>`），**与 `WISP_ENV` 无关** |
 | 7 | `internal/buildinfo/env_test.go:22` | `:23/:28/:33` 三形自钉；`:34 want, err := ParseEnv(DefaultEnv)` 是**相对断言**（跟自己的默认比），不硬编码 `"dev"` ⇒ 连 `DefaultEnv` 变了都不红 |
 | 8 | `cmd/wisp/` 其余 12 枚测试文件 | 上一份盘点 §4.1 已给"要么注入 `dataDir`/`env` 字段、要么自己 `Setenv`"的净数（**0 枚待钉**），本程**不重抄**；本程独立复核的是 §3.1 #5/#6 两枚**具体**暴露面 |
@@ -465,7 +465,7 @@ docs/evidence/s1/140-ac2-static-blast-radius-r1.md
 
 | # | 不确定的那一处 | 为什么静态定不了 | 谁能定、要什么授权 |
 |---|---|---|---|
-| U1 | `doctor.go:104-105` 换支之后，那三枚 build 步骤（`ci.yml:400/:497/:560`）**颜色变不变** | 静态只能证"**落点从 `%TEMP%` 搬到 `%APPDATA%\wisp-dev`**"。红不红取决于**该 runner 上 `%APPDATA%` 是否可得且可写**——hosted 上大概率可得（大概率仍绿），**self-hosted 那台（`ci.yml:538`）无从静态推断** | 实现程：一发 `wisp.exe doctor` 的两形对照（本机即可，**不需要 CI**）。⚠ 但本程按红线**没跑**，也不建议在本机对 self-hosted 那台做写试验 |
+| U1 | `doctor.go:104-105` 换支之后，那三枚 build 步骤（`ci.yml:400/:497/:560`）**颜色变不变** | 静态只能证"**落点从 `%TEMP%` 搬到 `%APPDATA%\wisp-dev`**"。红不红取决于**该 runner 上 `%APPDATA%` 是否可得且可写**——hosted 上大概率可得（大概率仍绿），**self-hosted 那台（`ci.yml:538`）无从静态推断** | 实现程：一发 `wisp.exe doctor` 的两形对照（本机即可，**不需要 CI**）。注意 但本程按红线**没跑**，也不建议在本机对 self-hosted 那台做写试验 |
 | U2 | **`portable.txt` 会不会已经躺在那台机器的 `build\` 旁边**（`doctor.go:248-255` 的更早早退） | 那是**机器状态**不是仓库状态。`grep -n 'portable' scripts/build.ps1` 现量 **0 命中** ⇒ 没有任何东西在 `doctor` 前检查/清除它；测试侧的兜底（`dataroot_128_test.go:76-83`）只保**测试二进制旁边**，不保 `build\wisp.exe` 旁边 | 实现程/编排者：在 wisp-slo 那台 `ls build\portable.txt` 一发即定。本程**未查**（那是仓外真机） |
 | U3 | (a) 之后 `%APPDATA%\wisp-dev` 的**跨 run 残留**会不会污染别的读数 | `ci.yml:560` 那枚 job 跑在真机且**跨 run 复用工作树**（凭据是 `scripts/slo-check.ps1:115` 的自陈注释，原文见 §5.4）。残留本身**不是红**（`probeWritable` 自己 `:308 os.Remove(probe)`），但同树里**攒下来的 `config.toml` / `secrets/`** 会不会被后面的读数当成"已有状态"读，静态不知 | 票 135／SLO 那本账（`128-ac4-r1-acceptance.md` §9#5 已把"真实落点/DPAPI 真写入"类四条件挂给票 135）。**要授权**：那是 owner 的真配置树，取数前需编排者批准 |
 
@@ -474,5 +474,93 @@ docs/evidence/s1/140-ac2-static-blast-radius-r1.md
 **会换分支：判定点 1 枚（`cmd/wisp/doctor.go:256`）× CI 触发面 3 枚步骤（`ci.yml:400`/`:497`/`:560`）；
 外加 1 枚（`slo_windows.go:238`）在 CI 上不换、本机直跑形上"换分支不换色"。
 测试侧会换分支：0 枚。不确定：3 处（U1/U2/U3，全部集中在 self-hosted 那台机器的状态，不在仓库里）。**
+
+### 3.6 §3 那枚 commit 的回显（`git log --oneline -1` + `git show --name-only HEAD`，原样）
+
+```
+8d1fbc5 docs(evidence/140 AC#2 r1): §3 取消 job 级 env 的逐处影响面（会换/不换/不确定）
+
+docs/evidence/s1/140-ac2-static-blast-radius-r1.md
+```
+
+（那次 commit 前 `git diff --cached --name-only` 现量**只有这一枚路径**。）
+
+---
+
+## §4　④　三支各自的代价表
+
+**要裁的原句（票面 `:32` 逐字节）**：
+
+```
+- [ ] **AC#2** 裁"收哪一支"并写代价，三选一：**(a)** 把那四枚 job 级 `WISP_ENV: test` 取消、改成**只有需要它的步骤**显式设；**(b)** 保持 env，但**每条受影响用例自己钉环境**（票 128 `c2fa2e9` 那枚 helper 的形状推广）；**(c)** 维持现状＋把"这条腿在 CI 上测的不是它声称的东西"做成**响亮失败**的显式登记。
+```
+
+### 4.0 先立一把"红会吃掉什么"的尺（本仓自己的原文，不是平台常识）
+
+`ci.yml:257-261`（版本 `decb7b9 09-23 13:51`，逐字节）已经把这利害写死在仓里：
+
+```
+        # MOVED ABOVE the portable step (ticket 93, tightening, no step removed
+        # and no threshold changed): it sat below a step that bare `go test` lets
+        # go red, and GitHub stops at the first failed step - so on any run where
+        # the portable step was red, this gate had literally never produced a
+        # verdict, which is the A44-1 shape ticket 71 already fixed once in the
+```
+
+`ci.yml:327-328`（同一版，逐字节）：
+
+```
+  # WHY THIS IS NOT A DOOR REMOVED (the two forbidden shapes, both absent): no
+  # step was deleted, and NO step here carries `continue-on-error`, whose entire
+```
+
+⇒ 两条合起来：**这一步红 ⇒ 后面所有步骤不产出 ⇒ 不产日志 ⇒ 那一格的读数这一发永久采不到，且没有
+`continue-on-error` 可以兜**。⇒ 任何让 `ci.yml:400`（在 `test-windows` 里、位置在 `:422` **之上**）变红的改法，
+**吃掉的是 `:422` 那格 `cmd/wisp` CLI 读数本身**——那一格正是票 128（已裁）／票 123（open）／票 135
+（`Status: ready-for-agent`，`Packages` 行点名 `cmd/wisp/dataroot_128_test.go` 与 `cmd/wisp/doctor.go`）
+三本账共同的落点。**这就是简报说的"整包红连坐后续步骤"的机制凭据。**
+
+### 4.1 支 (a)｜取消四枚 job 级 env、改成只有需要的步骤显式设
+
+| 项 | 内容 |
+|---|---|
+| **要动哪几枚文件** | **1 枚：`.github/workflows/ci.yml`**。形状：删 `:227`/`:337`/`:482`/`:540` 四枚，**并在三枚 build 步骤上各加一枚步骤级 `env:`**（`:395-400` cgo build smoke、`:496-497` Build wisp.exe、`:559-560` Build wisp.exe deps cached）。⇒ 净账 **4 删 3 加**（`:227` 那枚按 §3.1 是**纯赘余**，`test-core` 里没有一个步骤读它，可直删不补）。<br>**Go 面：0 枚**（§3.2 已给"测试侧会换分支 0 枚"）。<br>**脚本面：0 枚**（§1.4 现量 `*.sh` 零命中；`slo-check.ps1:111` 自己设）。 |
+| **共享件纪律** | **`.github/workflows/ci.yml` 属共享件，改前要交回编排者——票面 `:52` 逐字节**：「`.github/workflows/ci.yml` 属**共享件**：本票 `AC#2` 若选 (a)，**改前先登记交回编排者**，不许自行改 workflow。」⇒ 本程（只读）**不提议、不改**；这一行是给实现程的**前置门**。 |
+| **会不会把已经绿的改红** | **有这一支独一份的风险面**。静态能定的：`ci.yml:400`/`:497`/`:560` 三步的 `wisp.exe doctor`（`build.ps1:162`）从"答 `%TEMP%\wisp-test-<pid>`"换成"问 `%APPDATA%`、答 `%APPDATA%\wisp-dev`、`probeWritable` 真 `MkdirAll`+写+删（`doctor.go:300-309`）"。<br>**红不红＝§3.4 的 U1（本程未定）**。<br>**一旦红**：`:400` 红吃 `:422`/`:458`/`:474`（见 §4.0）；`:497` 红吃 `:500`（SLO smoke 门禁）；`:560` 红吃 `:563`（**SLO full，六态 + settle + leak，是这台机上最贵的一发读数**）。<br>**副作用不是红而是写面**：落点搬进真实配置树；`slo-full` 跑在 `[self-hosted, wisp-slo]`（`ci.yml:538`）且跨 run 复用工作树（`slo-check.ps1:115` 自陈，原文见 §5.4）。 |
+| **还有两枚静态排不掉的余量** | **U2**：`doctor.go:248-255` 的 `portable.txt` 分支比 `:256` 更早 return，而 `grep -n 'portable' scripts/build.ps1` **0 命中** ⇒ (a) 之后到底走 `dev` 还是走 `<exeDir>\data-dev`，取决于那台机器 `build\` 旁的**文件状态**。<br>**U3**：残留树会不会被后面的读数当既有状态。 |
+| **回退路径** | **一步**：`ci.yml` 只有 1 枚文件、改动是 4 删 3 加，**单独成一枚 commit** ⇒ 回退＝追加一枚把 `:227`/`:337`/`:482`/`:540` 加回去的 commit（**按仓纪禁 `--amend`/`reset`，已推送历史不改写，要更正就追加**）。<br>**但代码回不去的那半**：如果那一发已经**写进了真实 `%APPDATA%\wisp-dev`（或 self-hosted 那台的）**，回退 commit **不清理**它——清理属仓外真机操作，**要单独授权**，且本程建议由 owner 而非 agent 做（票 135 的 `Packages` 行也把 `doctor.go` 标成"只读其判定，不改语义"）。 |
+
+### 4.2 支 (b)｜保持 env，每条受影响用例自己钉（推广 `pinEnvThatAsksTheOS128` 的形状）
+
+| 项 | 内容 |
+|---|---|
+| **今天真正"该钉而未钉"的枚数** | **0 枚**——这一条上一份盘点 §4.1 已经裁过并给了凭据，**本程不重抄、不复算**。本程只补它没算的那一维（下一行）。 |
+| **本程新给的一条：推广时的射程缺口** | 现成的名册尺 `cmd/wisp/dataroot_128_test.go:352 resolveDataDirConsumers128` 收的是**"调用了 `resolveDataDir` 的函数"**（判据在 `:370` 逐字节：`		if fn.calls["resolveDataDir"] {`）。<br>⇒ **它按构造收不到那三枚"直接求值 ambient env、不经 `resolveDataDir`"的生产入口**：`secret.go:182 cmdSecret`（`:184 ResolveEnv()`）、`resident_windows.go:24 runResident`（`:27`）、`cmdSlo`（`slo_windows.go:243`，另带 `:238` 自设兜底）。<br>该文件自己**知道**这件事——`:288-292`（逐字节）：`	// resolveSecretLayout is not a caller of resolveDataDir - it is the second,` / `	// independent reader of the same OS answer, and AC#1's third leg. It is named` / `	// here rather than left out, so the set below is checked for equality rather` / `	// than containment.` / `	want["resolveSecretLayout"] = true`<br>⇒ 它是**手写补进名册的一枚**，不是名册扫出来的。<br>**后果（给裁定用）**：上一份盘点 §4.1 提议的那条"名册里每一行都得先过 `pinEnvThatAsksTheOS128`"判据，**若照 `:352` 的射程写，会漏掉 `cmdSecret`**——而 `cmdSecret` 恰是全仓唯一一枚**被测试 in-process 调用、且真的走 `ResolveEnv()`** 的生产入口（`leg_sink_nail_131_windows_test.go:425/:457/:534`，见 §3.2 第 5 行）。它的免疫目前**来自 `:409`/`:526` 那两枚 `t.Setenv`**，不来自任何门禁。<br>⇒ (b) 的**真实分母**不是 0，是「0 枚待钉 + **1 枚名册尺需要扩射程**」。这一条本程只量面、**不建议改法**。 |
+| **要动哪几枚文件** | `cmd/wisp/dataroot_128_test.go`（名册尺那半）＋**可能需要 1 枚新用例**补 ambient 生效断言（规范义务那半上一份盘点已登记，本程不重抄）。**都不碰 `ci.yml`** ⇒ 不触发共享件门。注意 但 `dataroot_128_test.go` **正在票 135 的 `Packages` 名单里** ⇒ (b) 与 135 **同文件相撞**，要先排串行。 |
+| **会不会把已经绿的改红** | 对**既有**步骤：不改红（0 枚待钉，动的是测试自身仪器）。<br>对**新写的名册判据**：**有把既有绿改红的一条真路径**——若判据写成"名册里每个 entry 必须显式过 pin helper"，`cmdSecret` 那三处过的是 `t.Setenv("WISP_ENV","test")` 而**不是** `pinEnvThatAsksTheOS128`，按字面匹配就会**当场把 `leg_sink_nail_131` 判红**。这是"新仪器咬错人"，不是既有回归。<br>另一条形状冲突（本程现量、票面没写）：`pinEnvThatAsksTheOS128` 钉的是 **dev**（`dataroot_128_test.go:261`），而 131 那批要的是 **test**（`leg_sink_nail_131:409`/`:526`）⇒ **同一枚 helper 不能直接推广**，照抄必红。 |
+| **票 123 那 4 枚** | **不在 (b) 的分母里**（票面前置约束 (ii) 要这一句）。凭据：§3.3 的静态链——它们的断言路径上根本没有 env 读点，"每条用例自己钉环境"对它们是**空操作**。 |
+| **回退路径** | 一步：(b) 的改动全在测试文件、自成 commit ⇒ 追加一枚反向 commit 即回。无仓外写面，**无残留**。 |
+
+### 4.3 支 (c)｜维持现状＋响亮失败登记
+
+| 项 | 内容 |
+|---|---|
+| **要动哪几枚文件** | 登记面：**0 枚码**。台账 `docs/reports/pending-and-issues.md` 与本程禁改名单里的 `docs/reports/**` 重合 ⇒ **落点须由编排者定，不由 agent 自落**。<br>若要"响亮失败"落地成码：`ci.yml:250` 那枚步骤名对不上它跑的东西（现量：该步骤 `:264` 跑 `bash tools/d22scan/runtests.sh ./internal/proc/ -run TestLayoutForTestEnv`，而那枚用例不看 ambient）——**要么换用例要么改名字**，两处都比现状响。改名字＝动 `ci.yml` ⇒ **重新触发共享件门**，与 (a) 同纪律。<br>外加 ambient 生效的正面断言（无论选哪一支都要落地；`docs/specs/**` 禁改 ⇒ 只能落在 `ci.yml` + 测试）。 |
+| **会不会把已经绿的改红** | **登记本身：0 枚改红**（不动码）。<br>**风险在"响亮失败"的形状**：票面 `:44` 逐字节写着「**不许**用 `t.Skip`、不许改期望值换绿」⇒ 若实现成 skip 或翻转断言，就是把恒绿型装饰换成恒红型装饰，两样都白。<br>注意 现量补一条：那一步**已经有恒红型判决在前**——`128-ac4-r1-acceptance.md` §6.2 的标题句（档位＝**引别人已裁读数**）：「**是装饰，而且是恒红型装饰（比恒绿更贵）**」。⇒ (c) 若落在那一步，必须**同时**处理名字问题，否则登记与响亮各说一半。 |
+| **票 123 那 4 枚** | **登记清单里不许出现它们的名字**（票面前置约束 (iii)）。支持该判据的凭据是同一条静态链（§3.3）：既然它们不读这枚变量，把它们登记进"因这枚变量而测的不是它声称的东西"就是**记错主人**。 |
+| **回退路径** | 一步：登记是文本、改名是 1 枚 `ci.yml` 行。 |
+| **本程量到的一条"这支可能在登记一件已经不成立的事"** | (c) 的登记命题是"这条腿在 CI 上测的不是它声称的东西"。但 §2/§3 的量面显示：`test-windows` 的 `:422` 那一格里 `cmd/wisp` 的加固腿**今天有牙**（`c2fa2e9` 已钉，`dataroot_128_test.go:263`/`:266-268` 两面自证），而**除它之外全仓再无第二枚走短路的用例**（§3.2 = 0 枚）。⇒ **(c) 现在能登记的只剩两样**：ambient 生效从未被断言那笔规范义务，与 `ci.yml:250` 那枚名字。**不再是"加固腿变装饰"**。这一句与上一份盘点 §4.1「(b) 单独开出去几乎是一枚空枪」是同一件事的两面；档位＝静态高置信、**可被 `AC#1` 两形真跑证伪**（"换分支不换色"那族的定义就是看起来一直绿）。 |
+
+### 4.4 三支并排（只给本程量得出的那几列）
+
+| | (a) 取消四枚 | (b) 每条自己钉 | (c) 现状＋登记 |
+|---|---|---|---|
+| 动的文件数 | **1**（`ci.yml`，4 删 3 加） | **1–2**（测试，含 1 枚新用例） | **0 码** ＋ 1 处可选 `ci.yml` 步骤名 |
+| 碰不碰共享件门 | **碰**（票面 `:52` 明写先交回编排者） | 不碰 | 只在"改步骤名"那一支碰 |
+| 会换分支的判定点 | **1**（`doctor.go:256`）＋ 1 枚换分支不换色（`slo_windows.go:238`，本机形） | 0 | 0 |
+| 新增仓外写面 | **有**：真实 `%APPDATA%\wisp-dev`；self-hosted 那台跨 run | 无 | 无 |
+| 改红既有步骤的可能 | **有**（U1 未定；红则连坐 `:422` / `:500` / `:563` 三格读数） | 无（除非新名册判据咬错人，见 §4.2） | 无 |
+| 回退 | 1 枚追加 commit，**但仓外残留不清理** | 1 枚追加 commit，无残留 | 1 枚追加 commit |
+| 与在飞票撞哪一枚文件 | `ci.yml` 共享件；`slo-full` 那格是 SLO 读数的宿主 | **`dataroot_128_test.go` 在票 135 的 `Packages` 名单里** | 与 135 不撞文件 |
 
 
