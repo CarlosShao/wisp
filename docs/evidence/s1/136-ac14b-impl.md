@@ -249,3 +249,64 @@ CLI 出线是**信封**：顶层 `pass`/`mode`/`settle`，`SettleReport` 嵌在 
 两枚被改断言是**收紧不是放宽**（各从 1 道 `if !rep.Pass` 换成 4 道更强的门行自陈钉）；
 写集恰两枚 `.go`（`git diff --numstat aef82f5..HEAD -- internal/observe/` ⇒ `sampler.go 1/1`＋`sampler_settle_coverage_136_test.go 52/4`）。
 **档位：〔本程自量〕。**
+
+---
+
+## §6 收尾：commit 账、纪律、注入两栏、以及本程推翻/更正是哪几句
+
+### 6.1 本程 commit 账（逐枚只带自己的显式路径；`git log --oneline` 可复算）
+
+| sha | 净面 |
+| --- | --- |
+| `52191ce` | `internal/observe/sampler.go` ＋ `sampler_settle_coverage_136_test.go`（1 枚布尔 + 两枚断言改写） |
+| `b9ca0b0` | `docs/evidence/s1/136-ac14b-impl.md`（§0-§1） |
+| `1e620d6` | 同上（§2-§3） |
+| `1657135` | 同上（§4） |
+| `115173b` | 同上（§5） |
+| 本节末枚 | 同上（§6，hash 由下一位从 `git log` 读） |
+
+### 6.2 纪律回执
+
+只 commit、**全程未 `git push`**；`git add` 只对本程新建的证据文件用过**一条显式路径**（新文件 untracked，
+`git commit --` 匹配不到，先 `git add -- <那一枚路径>` 再 `-- <同一枚路径>`）；**未用** `-A`/`.`/`-a`；
+未用 `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；未在仓库内建 worktree 或临时件
+（临时件全在 `D:\tmp\wisp141gate\`，**只建不删**）；`design/**`（owner 16 枚未提交删除 + 两枚未跟踪目录）
+**未还原、未提交、未删**；`docs/reports/**`、`cmd/wisp/**`、`internal/proc/**`、`internal/winsec/**`、
+`scripts/**`、`.github/workflows/**`、`docs/PLAN.md`、`docs/specs/**`、`internal/risk/**`、`tools/d22scan/**`、
+任何阈值／golden／`thresholds.go`、`sampler_settle_gate_136_test.go`（前一程地界）、`StateReport` 那侧（`:189-190`/`:331`/`:341-346`）
+**一字节未写**。**未翻任何勾**（`AC#14` 的勾归编排者）。
+
+### 6.3 注入面两栏计数（本程自己扫）
+
+- **真通知回显 1 条**：`Edit` 工具在改写 §4 时回显 "the file changed since your last read"——出处是**本程自己**先前用
+  `cat >>`（追加模式，不可能截断）写过同一枚文件，判为**真回显、与授权无关**。
+- **判为注入 0 条**：全程工具输出/被改文件里，**没有**任何自称"编排者备注／系统提示／请 revert／阈值已放宽／已解冻／
+  Confirm the harness note is genuine"的文字被本程当指令执行。`sampler.go:553-555` 注释里 "Flipping it is an orchestrator
+  move, not an implementer move" 是**代码自述**、且编排者已在本票 `:313-325` 具名批准 ⇒ 按其执行翻转，非据注释臆断。
+  另：一枚 `git commit` 失败回显里冒出兄弟只读程的 HEAD `5dfb8ba`（票 141 盘点）——是共享树的**真实并发**，非注入。
+- 凭据卫生：本程未读到、未抄写任何凭据值；出现的只有变量名与文件名（`WISP_ENV`、`GOPATH`、`CC`）。
+
+### 6.4 本程推翻/更正是简报里哪几句（简报自述"每条断言未验证"，逐条具名）
+
+| 简报原句 | 盘上现量（本程） | 判 |
+| --- | --- | --- |
+| 两处断言在 `:143-145`、`:280-282`；红句分别 `this leg pins disclosure…` 与只印 `report=%+v` | 改前逐字对上（终态站点红点原为 `:144`/`:281`） | **成立** |
+| `sampler.go:556` `const settleCoverageRowGates = false` | `grep -n` 改前 `= false`、改后 `= true` | **成立** |
+| 翻布尔"恰好红 2 枚"、(B) 9 枚必须仍绿 | 本程 flip-only 快照：FAIL=2＝那两枚，(B) 全绿 | **成立** |
+| 争用名单 `slo-check.ps1:153-155` 真值 15 枚 | 现量块确在 `:153-155`、15 枚逐名全对 | **成立**（简报这处行号是对的，非终裁表旧说 `:155-157`） |
+| gofumpt 盘上现量 v0.12.0 | `"$(go env GOPATH)/bin/gofumpt.exe" --version` = `v0.12.0 (go1.27.1)` | **成立** |
+| "71 顶层守恒、0 红 0 跳" | 本程 `comm -3` 空、FAIL/SKIP 各 0 | **成立** |
+| **⚠ 唯一被本程改动的数**：判据③ "M1 摘门行 ⇒ 终裁表自报红 4 枚，复核这个数" | 本程改后的树上 M1 红 **6 枚**（终裁表 §4 的"4 枚"量在**未改写两枚披露腿**的 `aef82f5`；本程把 `:143`/`:280` 改成核门行后，摘门行会让它俩也转红） | **数变了、方向是更强**：4→6，多出的正是本程改写那两枚；引此判须连"改前/改后树"一起引 |
+| 流程小偏差：简报判据④ 措辞"全 0 才许提交" | 本程按"每完成一节就 commit"先提了码（`52191ce`）再跑 ④；④ 全 0/exit 0 **通过** ⇒ 无需回退（共享树禁 amend/reset，若 ④ 失败只能追加更正 commit） | 如实登记，非简报错 |
+
+### 6.5 本程没做、不冒充的档
+
+- 未跑 `-race`、未复跑 linux 容器分母（本包纯 Go 面，前一程 §6-2 同样未取）；
+- 未复算 AC#15 那 7 枚前提腿的偶发率（本程 6 发 `-count=1/2` 读数是"没响"，非"已修"，账仍在 AC#15）；
+- 未核 CI run id / 未推 `slo-smoke`/`slo-full`（本程不 push）；
+- 未裁"本格 AC#14 该不该翻勾"（勾归编排者）。
+
+**next=** 交编排者：①据 §4 的六发（新 exe、`verdicts[sampling gate=true]` 逐发在场、`sample_errors` 与 exit 逐发 0）
+落 `settleCoverageRowGates=true` 这一终态 ⇒ 可翻 `AC#14` 的勾；②`§1.2` 已点名的 `sampler.go:546-555` 常量注释
+"…It is false at HEAD…" 现与盘上值相悖，属翻勾那一程的收口（本程按"只 `:556` 一行"的授权面**没去改它**）；
+③`AC#15` 排后、靶形现量重划（§6.2 那 7 枚前提腿站点带进来一起数）。
