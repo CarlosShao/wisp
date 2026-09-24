@@ -423,4 +423,187 @@ to this leg alone, and no WISP-LEG-COVERAGE-RULING sentence naming it.
 
 〔独立复现〕`T-R-MGN2`／`T-R-MGN2B`／`T-R-U2N`／`T-R-U2O`；红句可从那四份 `.log` 里逐字重 `grep`。
 
+---
+
+## §6（丁）⚠ 票面写死的那条反向判据：**拆掉 install 的第二拍也必须红**——两粒度都量，并比名册差集
+
+这一发是票 133 AC#2 第二次退回时加的形状（`133-ac2-r2-acceptance.md` §3.4 ①"且**第二拍也必须红**"），**不做＝本格不成立**。本程两粒度都做了。
+
+### 6.1 第二拍"install 真被拆掉"的落地证明（不是本程嘴上说拆了）
+
+```
+R-MGFN2C 落地行：  probe135ac8leg.go lines=9 installLogSink-hits=0
+                   108:	case "probe135ac8":            ← 腿还在分发里
+                   GOLIST-TESTGOFILES cmd/wisp count=15 probe135ac8-hits=0
+```
+⇒ 那条腿**还在被 `func main` 分发**、身体里**一个安装器字节都没有**、植物**不进本轮构建**。三样都是盘上行，不是推。
+
+### 6.2 两粒度读数（新尺）
+
+| 粒度 | 发 | 命令 | rc | 八数 | 红名 | 名册枚数 | SKIP/panic/build-failed |
+|---|---|---|---|---|---|---|---|
+| 单跑本尺 | `R-MGN2` | `-run '^TestAC1AC2DispatchHopGate133$'` | **1** | 1/0/1/0＋0/0/0 | `TestAC1AC2DispatchHopGate133` | 1 | 0/0/0 |
+| 整包·门关着 | `R-MGFN2C` | `-skip '^TestAC4EveryLegIsNailedOrRuled$'` | **1** | **100/52/1/0**＋47/0/0 | `TestAC1AC2DispatchHopGate133` | 53 | 0/0/0 |
+| 整包·两门都活 | `R-MGFN2O` | 无筛 | **1** | 101/53/1/0＋47/0/0 | `TestAC1AC2DispatchHopGate133` | 54 | 0/0/0 |
+
+⇒ **第二拍在整包形上也红**（旧尺同一形是 `R-MGFO2C` rc=0 100/53/0/0）⇒ 没有被"另一种写法已经红过"抵掉。
+
+### 6.3 第一拍**独立**红（另一拍，不互相抵账）
+
+| 发 | 尺 | 形 | rc | 账本那一行（逐字） |
+|---|---|---|---|---|
+| `R-1BN` | 新 | 第一拍（装了听众）＋植物，单跑 | **1** | `installs=true … covered=RED sink with no nail` |
+| `R-1BO` | 旧 | 同上 | **1** | 同上（两枚尺逐字同） |
+
+⇒ 第一拍那枚红**两把尺都响**（它响在 `installs` 那一支，比这次改动老）⇒ **本程按票面口径：它不能当 (c) 的修复凭据**，只当"改完没把第一拍弄哑"的证据。它落在 `installs` 那一支、`R-MGN2` 落在 `runRosterReds135`（`:229` vs `:209`），**两拍各自独立、不互相抵账**——这一条本程是用两发独立读数量的，不是引用谁的断言。
+
+### 6.4 名册差集（票 133 §1.10 那口径：既看"新红的"，也看"被吞掉的"）
+
+```
+R-MGFN2C vs R-BLCLOD(53/53)  only-in-shot=[]  only-in-base=[]
+R-MGFN2O vs R-BLFULL(54/54)  only-in-shot=[]  only-in-base=[]
+R-MGFO2C vs R-BLCLOD(53/53)  only-in-shot=[]  only-in-base=[]
+```
+
+⇒ **零缩小、零新增**；每一发 `--- SKIP` 行 0、`panic` 0、`build-failed` 0（§3–§6 全部 19 发的 `EIGHT` 行都带这三栏，无一非零）。
+⇒ 逐名换色只有一枚：`TestAC1AC2DispatchHopGate133` `--- PASS`→`--- FAIL`（`R-BLCLOD` 的 `REDNAMES:` 空、`R-MGFN2C` 的那一栏只有它）。植物那枚用例**没进名册**（正是被验的那件事），也**没吞掉**任何一条别的读数。
+⇒ **票面 ③ 的"门关着零退化"另有硬证**：把新尺装在**未变异**的树上，门关着仍是 `R-BLCLOD` 100/53/0/0、门开着仍是 `R-BLFULL` 101/54/0/0（§3），与旧尺基线（`R-BLOLD` rc=0）一致 ⇒ 这把尺今天**没有改变任何一格既有读数**（BATCH-S 的 `R-BLOLDF`／`R-BLOLDC` 再补一整包粒度的旧尺基线，见 §7.2）。
+
+〔独立复现〕`T-R-MGFN2C`／`T-R-MGFN2O`／`T-R-MGFO2C`／`T-R-1BN`／`T-R-1BO`＋`analyseR.txt` 第 3 节。
+
+---
+
+## §7（戊）反向控制：同一形写进**这轮会编译**的文件 ⇒ 必须判绿
+
+| 发 | 尺 | 植物 | `go list` 的 `TestGoFiles` | rc | 八数 | 披露行名册枚数 | 账本那一行 |
+|---|---|---|---|---|---|---|---|
+| `R-CPN` | 新 | `probe135ac8ok_test.go`（无平台约束） | count=**16**，probe135ac8-hits=**1** | **0** | 1/1/0/0＋0/0/0 | **55** startable | `covered=test TestAc8r1CompiledCaseDrivesThePlantedLeg drives cmdProbe135Ac8` |
+| `R-CPO` | 旧 | 同一发 | count=16，hits=1 | **0** | 1/1/0/0 | —（旧尺无名册读数） | 同一行 |
+
+⇒ **新尺不是"一味喊红"**：植物编得进去 ⇒ 名册 54→**55**、判绿；藏得起来 ⇒ 名册 54、判红。两发其余字节同（同一棵基线树、同一条腿、同一个 entry、同一行 usage、同一拍）。
+⇒ 且**旧尺本来也放行这一发**（`R-CPO` rc=0）⇒ 这枚绿不是新尺偏门造出来的。
+
+**一枚本程自己踩出来的附带控制（形状要留，别当漂亮）**：`MG-N2A`／`MG-O2A`（第一遍批内）本意是"文件名后缀那一支"，但本程把文件写成 `probe135ac8aix_test.go`——`_aix` 前面没有下划线，**不匹配 `<name>_<GOOS>_test.go>` 形状**，于是那枚文件**照常进构建**（驱动里那行 `GOLIST … probe135ac8-hits=1` 当场把它量了出来，而新尺对它判绿＝行为正确）。⇒ 那两发**不是** M-G 一发，而是**又变成一枚反向控制**；本程修成 `probe135ac8_aix_test.go` 后重发＝`R-MGO2B`／`R-MGN2B`（§4/§5 用的是这两发）。这枚坑值得钉：**"文件名后缀自带平台约束"这件事不能靠肉眼看文件名，必须 `go list` 量**——否则裁决方自己会造出一发假红/假绿。
+
+### 7.2 （BATCH-S 补，整包粒度）
+
+`R-BLOLDF`／`R-BLOLDC`＝旧尺整包两形基线；`R-CPNF`／`R-CPFO`＝编译得进去那枚植物的**整包**形（预期名册 55、RUN 102）；`R-MGOFC`／`R-MGNFC`＝`_aix` 那一支的**整包·门关着**两尺。读数见 §7.2 附表（BATCH-S 落盘后填，点火闸门 `12:54:04 GATE=CLEAR-LOCAL-ONLY`）。
+
+〔独立复现〕`T-R-CPN`／`T-R-CPO`／`T-R-MGO2B`／`T-R-MGN2B`；`T-MG-N2A`／`T-MG-O2A` 两棵作废树留盘不删（§0.5.3 同一处置）。
+
+---
+
+## §8（己）恒真自查：**本程独立重走**，并正面回答"有没有哪一发在未修旧码上就已经响"
+
+票面这一问的形状是：**"修完后复跑 X 必须红"里的 X 若在未修旧码上已经全响，那一发就不是修复凭据。** 本程每一发动手前都问了一句，答案按发列在盘上（旧尺那一列全部是本程自己发的 `R-*O*` 发，不是抄实现方 §4.6）。
+
+| 这一发（本程自造） | 在**未修**那侧（旧尺 `906201f4…`）响不响 | 在**修了**这侧（新尺 `23b443ac…`）响不响 | 能不能当"修好了"的凭据 |
+|---|---|---|---|
+| 第二拍＋`//go:build` 假植物（`R-MGO2` → `R-MGN2`） | **不响**（rc=0，账本给它 `covered=test`） | **响**（rc=1，红名逐点到那枚名字，`:229`） | **能——本格的承重墙** |
+| 第二拍＋`_aix` 文件名后缀植物（`R-MGO2B` → `R-MGN2B`） | **不响**（rc=0） | **响**（rc=1，同一支 `:229`） | **能**（同族第二枚藏法，且是**实现方自己 §8.1 第 3 条列为未测支**的那一支） |
+| 整包·门关着（`R-MGFO2C` → `R-MGFN2C`） | **不响**（rc=0 100/53/0/0） | **响**（rc=1 100/52/1/0） | **能**（反向判据那一发的整包形） |
+| 第二拍＋只加 usage、无植物（`R-U2O` → `R-U2N`） | **响**（rc=1，`covered=RED nothing`，`:209`） | 响 | **不能**——两侧都响。它只证"这条腿今天确实没人覆盖"，是对照 |
+| 第一拍（`R-1BO` → `R-1BN`） | **响**（rc=1，`installs=true covered=RED sink with no nail`） | 响 | **不能**当 (c) 的凭据；只算"改完没把第一拍弄哑" |
+| 编译得进去的植物（`R-CPO` → `R-CPN`） | 不响 | **不响（必须不响）** | 不是修复凭据，是"不许打死合法形状"的凭据 |
+| 基线（`R-BLOLD`／`R-BLNEW`／`R-BLFULL`／`R-BLCLOD`） | 不响 | **不响** | 恒真自查第一半：新判据今天不响 ⇒ 不是装饰 |
+| `rerr != nil` 那一支（`R-FC-CHILDENV`，只注入环境变量、树未变异） | （旧尺无此支，无从响） | **响**（rc=1，`could not be read … Red, not skipped`） | 它证的是**这条判据不靠"看不见就当没事"**；不是 M-G 本形的凭据 |
+
+**正面回答那句问：** **有**——`R-U2N`／`R-U2O`（无植物对照）与 `R-1BN`／`R-1BO`（第一拍）**两发在未修旧码上就已经响**。本程已把它们**明确排除在修复凭据之外**（上表第 4、5 行）。
+⇒ **本格不只剩这种发**：承重的是"旧侧不响、新侧响"那三行（`R-MGO2→R-MGN2`、`R-MGO2B→R-MGN2B`、`R-MGFO2C→R-MGFN2C`），本程各各第一手。
+
+〔独立复现〕八行全部对上盘上的 `R-*.verdicts`；旧侧那一列是本程自己发的，未引用实现方 §4.6 任何一格。
+
+---
+
+## §9（庚）还原：变异面逐枚列、还原发与快照源码逐枚同、仓库残留 0 枚
+
+本程的还原是**结构性**的——每一发一棵新 `cp` 的树，工作树从头到尾没种过件。仍按票面把三样量了。
+
+### 9.1 变异面逐枚（`diff -rq 归档树 ↔ 那一发的树`，全文在 `analyseR.txt` 第 8 节）
+
+```
+R-BLNEW / R-BLFULL / R-BLCLOD / R-RST      （无差异，只剩 wisp.exe 构建副产物）
+R-BLOLD                                    只差 cmd/wisp/leg_dispatch_gate_133_test.go（旧尺换上来）
+R-U2N / R-1BN                              main.go differ | + probe135ac8leg.go          (+ tag 植物，仅 1BN)
+R-MGN2 / R-MGN2B                           main.go differ | + probe135ac8leg.go | + 植物一枚
+R-MGO2 / R-MGO2B / R-MGFO2C / R-1BO / R-U2O / R-CPO   同上，再多一行“尺文件 differ”（旧尺那侧）
+R-CPN                                      main.go differ | + probe135ac8leg.go | + probe135ac8ok_test.go
+R-MGFN2C / R-MGFN2O / R-MGF131             main.go differ | + probe135ac8leg.go | + probe135ac8tag_test.go
+R-NH1                                      只差 cmd/wisp/leg_sink_nail_131_windows_test.go（邻桶探针，§11）
+```
+⇒ **没有任何一发把改动漏在快照之外**：每棵树的差异面恰好＝本程种的那几枚文件（外加旧尺那侧多一行尺文件差异），零意外路径、零仓内路径。
+
+### 9.2 还原发复绿 ＋ 与基线那发逐字比
+
+```
+$ R-RST: 新尺、无种件、-count=1 -v -run 本尺  ->  rc=0，1/1/0/0＋0/0/0，SKIP 0、panic 0、build-failed 0
+$ diff -rq /d/tmp/wisp135ac8r1-tree /d/tmp/wisp135ac8r1-T-R-RST      ->  （除 wisp.exe 外零差异）
+$ sed -E 's/time=[^ ]+//; s/\([0-9.]+s\)//; s/[0-9.]+s$//' R-BLNEW.log > bl.norm ; 同一法做 R-RST.log
+$ diff -u bl.norm rst.norm      ->  **空输出，diff_rc=0**
+```
+⇒ 还原发与基线发**只差时间戳与构建耗时两栏**，其余逐字相同（11→11 legs、4 claims、名册枚数、披露句全同）。
+
+### 9.3 仓库侧三查（收尾时再量一次，同一组命令）
+
+```
+$ git status --porcelain                          （只有本文件那一枚路径，且已带 pathspec 提交）
+$ sha1sum cmd/wisp/leg_dispatch_gate_133_test.go  23b443ac34787aa9ea60e181b9b8c789f468cd56  ← 与 §1.3 取件时同
+$ grep -rIl 'probe135ac8\|TestAc8r1' . --exclude-dir=.git
+  ./docs/evidence/s1/135-ac8-r1-acceptance.md     ← 唯一命中＝本程证据文件自己；生产码/测试码残留 **0 枚**
+```
+
+〔独立复现〕§9 三样本程自量，命令原样在上面。
+
+---
+
+## §10（辛）实现方自报的那条，本程独立重走：**131 的那道门接不接这一形**
+
+被审对象 §4.5 报："摘掉本尺整包 rc=0 ⇒ 131 的门不接这一形（还读到它打了这行腿又 PASS）"。这一条决定**本格的必要性与归谁**——若 131 的门其实接得住，这一格就是重复装钉。本程自己发一发：
+
+```
+R-MGF131：新尺（**装好但整包时被 -skip 掉**）、第二拍＋M-G 植物、-count=1 -v -skip '^TestAC1AC2DispatchHopGate133$'
+  -> rc=0，100/53/0/0 ＋ 子 47/0/0，SKIP 行 0、panic 0、build-failed 0
+  -> 名册 53 枚 vs R-BLCLOD 53 枚：only-in-shot=[TestAC4EveryLegIsNailedOrRuled] only-in-base=[TestAC1AC2DispatchHopGate133]
+     （只是"哪一枚门被 -skip 掉"的对调，零缩小）
+  -> 那枚植物名字在**整份日志里出现 0 次**
+  -> 131 的门自己打了这一行腿、然后 PASS：
+     leg probe135ac8  main.go:108   install=false records=false ruled=false nails=-   -> no records   (:91)
+     --- PASS: TestAC4EveryLegIsNailedOrRuled (0.02s)                                  (:97)
+```
+
+⇒ **判：131 的门真的不接这一形**——不是"它没看见"（它看见了这条腿、把它归成 `no records`），也不是"它被跳过"（`--- SKIP` 行 0，它是 `--- PASS` 真跑真绿）。
+⇒ 两枚门的分工是**盘上事实**：131 的门问"这条腿到没到听众、有没有记录"；本形里那条腿**既不到听众也没记录**（第二拍就是把 install 拆掉的那一拍），于是在 131 那里落进"无记录"这一合法桶。能把这条腿钉住的只剩"账本里那枚 `covered=test` 的名字今天编不编"这一问，而那一问**只有新尺答**。
+⇒ **本格的必要性成立、不是重复装钉。**
+
+〔独立复现〕`T-R-MGF131`＋`analyseR.txt` 第 3、5 节。
+
+---
+
+## §11 本程自造的一枚**邻桶**探针（不是本格判据要的，但它关乎"这格还剩多少"）
+
+实现方 §2 登记了那把尺自己写明的一处不对称：`covered=test` 落名册外 ⇒ **红**；`covered=nail`（这枚尺自己那 4 条登记表 `legCovers133`）落名册外 ⇒ **只披露不弄红**。本程不去辩护也不去复述，直接**造一发量它**：给那枚住过 windows 的钉文件 `leg_sink_nail_131_windows_test.go` 头上插一行本机器永不满足的 `//go:build`（其余一字不动）。
+
+```
+R-NH1（单跑本尺，未变异树＋只那一行改动，go list 量到它不再进 TestGoFiles）
+  -> rc=0（**本尺判绿**），1/1/0/0，红名零枚
+  -> 披露行：run-roster disclosure: GOOS=windows, 51 startable cases …; this gate's registry:
+     4 claims, **2 of them outside this round's roster - TestAC2ModelsLegBooksItsHandOffVerdictOnDisk,
+     TestAC3SecretLegBooksItsAuditRecordsOnDisk. A registry nail the build does not take is
+     disclosed here and not reddened …
+  -> 而账本那两行照印：leg models … covered=nail TestAC2ModelsLeg… -> cmdModels ／ leg secret … covered=nail TestAC3SecretLeg…
+
+R-NH2（同一棵树、整包两门都活）
+  -> **rc=1**，51 枚顶层跑、50 PASS/1 FAIL、子 45/0/0、SKIP 0、panic 0
+  -> 唯一红名＝ TestAC4EveryLegIsNailedOrRuled（**131 的门**），红句原文：
+     AC#4 RED (the instrument, not the code): zero nails registered in this test binary, so the
+     gate has nothing to reconcile and would pass on an empty list. GOOS=windows compiled no nail
+     file … This reading stays red on purpose: a gate that cannot see is not a gate that has seen
+     nothing to complain about.
+```
+
+⇒ **三句结论，分开说**：
+1. 邻桶那一形**本尺确实放行**（rc=0）⇒ 实现方 §2 那句不对称**本程独立重走＝成立**，不是文字托词。
+2. 但**整包在这一形上不会静默全绿**——131 的门**接**它（它的钉是 `registerLegNail131` **运行时注册**，藏起文件就＝注册数为 0 ⇒ fail-closed 红）。⇒ 这一形**不是**双叠假绿，本格不因它扣分。
+3. 但两枚门的分工在这里正好**反**了一回（§10：`covered=test` 那形只有 133 接；§11：`covered=nail` 这形只有 131 接）。⇒ **建议登记成家族新的一发（下枚编号 `M-H`），形状＝"两枚门各接一桶，但没有一桶是两枚门都接"**；本程只量不修，也不把它当本格的破口。
+
 
