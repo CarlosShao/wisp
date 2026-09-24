@@ -73,3 +73,56 @@
 那几发的账记在 §2/§4。
 
 **档位**：**〔独立复现〕判据① 成立**（四数 ×2、名册三向差集、panic 两味、flake 未响，全部本程自己跑出来的数）。
+
+---
+
+## §2 判据②【主靶】独立翻那枚开关 ＋ 交两张名册 —— 〔独立复现〕**成立**
+
+**只在仓外快照里翻**：`git archive aef82f5` → `D:\tmp\wisp136ac14r1\snap-gate`，
+`sed -i '556s/false/true/'`。跟踪树**未参与**：翻完之后 `git status --porcelain internal/observe cmd/wisp` ⇒ **0 行**，
+本程在跟踪树上对 `internal/observe/**` 一字节未写、也未 commit 任何一支的 Gate。
+
+**先证落地再读数**（本仓口径）：
+`grep -n "const settleCoverageRowGates" snap-gate/internal/observe/sampler.go` ⇒ **`556:const settleCoverageRowGates = true`**；
+`diff -r snap-gate/internal/observe ../snap-post/internal/observe` ⇒ **只有 556c556 一处**（其余一字节同）；
+`go build ./...` ⇒ **rc=0**。三条都在，才读下面的数。
+
+命令：`go test -count=2 -v ./internal/observe/`（同一快照，一发）
+⇒ **RUN=142 / PASS=138 / FAIL=4 / SKIP=0**，去重顶层 **71** 枚（红 **2** 枚 ×2 计数 ＝ 4 行 FAIL），耗时 6.762s。
+`grep -c '^--- SKIP'` ＝ **0** ⇒ 没有一名用 SKIP 换色；红∩绿 ＝ **0**；名册逐名与 §1 的 71 枚**同一份**
+（`comm -3` 只吐出那两枚由 PASS 转 FAIL 的名字，**无人消失**）。
+
+### (A) 红名册"恰好"＝哪几枚（**2 枚**，顶层去重）
+
+| # | 用例 | 断言站点（本程从 `-v` 输出逐字取出） | 红句（原文截断处） | 报告实值 |
+| --- | --- | --- | --- | --- |
+| A1 | `TestCheckSettleSingleTrustworthyReadReportsItsLoss` | `sampler_settle_coverage_136_test.go:144` | `this leg pins disclosure, not the verdict; a covered-enough window must still pass` | `SampleErrors:9`、行 `Pass:false Gate:true`、`Pass:false` |
+| A2 | `TestCheckSettleZeroFootprintDropsAreCountedToo` | `sampler_settle_coverage_136_test.go:281` | `report=&{TargetState:Sleeping …}` | `SampleErrors:9`、行 `Pass:false Gate:true`、`Pass:false` |
+
+⇒ **实现件 §4 变异 S1 自报"恰好红 2 枚"成立**（本程独立翻，枚数与逐名都对上；红因是 `Pass` 被折叠否决，
+不是编译破裂、不是前提腿）。⚠ 顺带更正实现件自己的一处口径混用：它 §1.3 写"批准之后会红哪**三**枚"，
+§4.1/§4.2 又写代价＝**2** 枚——**2 枚**是盘上值，"三枚"是它在改动之前数既有断言的口径（它 §4.2 自己已改写）。
+
+### (B) 必须仍绿的名册（翻 Gate 后**实测仍绿**，本程逐名点名）
+
+**尺的用法**：(B) 是"折叠过头"的探测器——若下列任何一枚在翻布尔后转红，就说明折叠否决了**不该被否决**的东西，
+门行的判据写宽了。本程读数：**下列全部仍绿**（每枚 `--- PASS` 出现 2 次 ＝ `-count=2`，`--- FAIL` 0 次）。
+
+| # | 用例 | 站点 | 为什么它必须仍绿 |
+| --- | --- | --- | --- |
+| B1 | `TestCheckSettleFullyMeasuredWindowReportsNoLoss` | `sampler_settle_coverage_136_test.go:307`（红句 `a measurable, settled, released window must pass`） | **健康窗口**：`SampleErrors=0`、行自己 pass ⇒ 折叠无东西可否决。**它就是简报与 `A182⑤` 要的那一枚**，实测绿 |
+| B2 | `TestCheckSettleHalfTheReadsFailedReportsItsLoss` | 同文件 `:208-236`（AC#14 改写后的那一形） | 改写刻意写成**与 gate 取值无关**（要求"行存在＋行自己说 not-pass＋印 `sample_errors`＋不得出现失败 gate 行与 `pass=true` 并存"）。翻布尔后仍绿 ⇒ 印证实现件 §4.2"这不是漏，是设计"这句**成立** |
+| B3 | `TestSettleCoverageRowExistsAndPassesWhenFullyMeasured` | `sampler_settle_gate_136_test.go:154`（其 `:179` 也是 `a measurable, settled, released window must pass`） | 满测窗口的正对照 ＋ 形状钉 |
+| B4 | `TestSettleCoverageRowSaysNotPassWhenHalfTheReadsFailed` | `_gate_:198`（`:225` 写作 `if row.Gate && rep.Pass`） | 同一形制：两味取值都成立 |
+| B5 | `TestSettleCoverageRowSeparatesUnmeasuredFromFullyMeasured` | `_gate_:236` | 行只判覆盖率，与是否否决无关 |
+| B6 | `TestFoldSettlePassOnlyGateRowsVeto` | `_gate_:281`（**7** 个用例，本程逐字数过：含"失败 gate 必须否决"与"失败记录行不得否决"两形） | 钉的是折叠**规则**本身 |
+| B7 | `TestSettleReportPassNeverContradictsItsGateRows` | `_gate_:312` | 跨一致性腿 |
+| B8 | `TestStateReportVerdictBuilderStaysSinglePurpose` | `_gate_:337` | 冻结面守卫，翻 Gate 不该碰它 |
+| B9 | 其余 **60** 枚与 settle/gate 无关的顶层用例 | — | 全绿（71 − 2 红 − 9 点名 ＝ 60） |
+
+⇒ **(A) 2 枚 ＋ (B) 至少 9 枚点名 ＋ 总数守恒（69 绿 / 2 红 / 0 SKIP / 71 名册不变）**。
+**判据② 的两张名册本程都交得出 ⇒ 不触发"答不出 (B) 就退回"那一支。**
+
+**翻 Gate 的争用/前提自查**：该发日志内 `grep -c "precondition broken: only"` ⇒ **0**（AC#15 那枚已知 flake
+本程四发主读数＋§4 四发变异里**一次没响**）；真 `^panic:` ⇒ 0。
+
