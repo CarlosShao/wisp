@@ -24,6 +24,14 @@ package main
 // APPDATA - which is also where the resident leg can be driven at all, since it
 // ends in os.Exit.
 //
+// THE SECOND AMBIENT PREMISE (ticket 128 AC#4, measured on both sides). Rebinding
+// the seam only puts a leg on the refusal path if the leg ever asks the OS at all,
+// and that is decided by WISP_ENV: resolveDataDir answers env "test" with
+// proc.TestDataDir() before it reads userConfigDir. The test-windows job exports
+// WISP_ENV=test for the whole run, so these legs ran green on a dev host and red
+// on the runner until pinEnvThatAsksTheOS128 existed. Readings:
+// docs/evidence/s1/128-ac4-gates-and-ci-divergence.md.
+//
 // AC#3 MUTATION ANCHOR: restore `base = "."` in resolveDataDir (cmd/wisp/doctor.go,
 // the branch under `base, err := userConfigDir()`) and these named cases go red:
 // TestAC2ResolveDataDirRefusesInsteadOfFallingBackToCWD128 (no error returned),
@@ -228,6 +236,42 @@ func allMarkersPresent128(text string, markers []string) bool {
 	return true
 }
 
+// pinEnvThatAsksTheOS128 pins the one ambient variable that decides whether any
+// leg below ever asks the OS for its config dir, and proves the pin took.
+//
+// WHY, measured on both sides rather than reasoned out: .github/workflows/ci.yml
+// gives the whole test-windows job `WISP_ENV: test`, and resolveDataDir answers
+// env "test" with proc.TestDataDir() *before* it reads userConfigDir, so on the
+// runner the seam this case rebinds was never consulted. Four legs went red over
+// their missing markers there while the fifth, resolveSecretLayout, stayed green -
+// it passes buildinfo.EnvDev explicitly and so never looks at the environment.
+// That is the whole of the "green on the laptop, red on CI" report this case
+// earned: run 35967768017 versus the same command on a dev host where WISP_ENV is
+// unset and buildinfo.DefaultEnv is "dev".
+//
+// The case PLANTS the runner's value first and only then pins over it, so the pin
+// has a tooth on every platform: delete the pin and this case goes red on a laptop
+// too, instead of staying green here and going red only where nobody is looking.
+// Nothing below changes what a leg has to print (that is AC#2's ruling), and no
+// failure here is turned into a skip.
+func pinEnvThatAsksTheOS128(t *testing.T) {
+	t.Helper()
+	ambient, hadAmbient := os.LookupEnv("WISP_ENV")
+	t.Setenv("WISP_ENV", "test")                   // the value the windows job exports
+	t.Setenv("WISP_ENV", string(buildinfo.EnvDev)) // the pin that has to beat it
+	failConfigDir128(t)
+	if got := buildinfo.EnvString(); got != string(buildinfo.EnvDev) {
+		t.Fatalf("premise broke: the pin did not hold - WISP_ENV resolves to %q (ambient on entry was %q, present=%t), so no leg below ever asks the OS and its markers prove nothing", got, ambient, hadAmbient)
+	}
+	dir, err := resolveDataDir(buildinfo.EnvString())
+	if !errors.Is(err, errDataDirUnresolved) {
+		t.Fatalf("premise broke: with WISP_ENV=%q and a failed OS read, resolveDataDir returned (%q, %v) instead of errDataDirUnresolved - the resolution stopped asking userConfigDir, and the five legs below would then be watching nothing", buildinfo.EnvString(), dir, err)
+	}
+	if dir != "" {
+		t.Fatalf("premise broke: a refusing resolution handed back %q", dir)
+	}
+}
+
 // TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128 is the three-legs-in-one
 // picture AC#2 was ruled on. The leg table is validated against this package's own
 // call graph before a single leg runs: every production function that resolves the
@@ -276,7 +320,7 @@ func TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128(t *testing.T) {
 			len(stale), strings.Join(stale, ", "))
 	}
 
-	failConfigDir128(t)
+	pinEnvThatAsksTheOS128(t)
 	for _, leg := range refusalLegs128() {
 		t.Run(leg.entry, func(t *testing.T) {
 			cwd := t.TempDir()
