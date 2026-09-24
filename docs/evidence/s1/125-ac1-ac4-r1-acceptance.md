@@ -722,3 +722,32 @@ D:/tmp/wisp125r1-logs/    全部原始日志（*.log，含四数那几发的全�
   无 `git add -A`／`git add .`／`-a`；无 `--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean`；
   **未 push**。
 - 凭据值：**本表零枚**（出现的只有变量名 `TMPDIR`／`WISP_ENV` 与文件路径）。
+
+## §8 本节回执（硬规矩③：正文里出现"已提交"必须带 `git log`＋`git show --name-only` 原样输出）
+
+§5／§6／§7 三节正文所在的那一枚：
+```
+$ git log --oneline -1
+d463694 evidence(125 r1 终裁 §5+§6+§7): 逐格总判（AC#1/#3/#4 成立、AC#2 成立附条件）+ 没核清单九条 + 临时件与注入两栏
+$ git show --name-only HEAD
+commit d463694ed97348e8b1e6f8b6b29300d7d79f99cf
+Author: CarlosShao <1933942520@qq.com>
+Date:   Thu Sep 24 15:49:19 2026 +0800
+
+    evidence(125 r1 终裁 §5+§6+§7): 逐格总判（AC#1/#3/#4 成立、AC#2 成立附条件）+ 没核清单九条 + 临时件与注入两栏
+
+    Windows 宿主那一行本程补上了：纯净快照 go test -count=2 -v 两包 rc=0、382/212/0/0、
+    分包 winsec 182/100、config 200/112、panic=0 ⇒ 升到〔独立复现〕。
+    条件写成一行：补一枚编排者署名的 A##，或把 resolve.go 那一刀退回"只出裁定"。
+    本程零码改动、零翻勾、零 push；工具被拒 1 枚（cat -A）未绕过、改用 git show 取真实回执。
+
+docs/evidence/s1/125-ac1-ac4-r1-acceptance.md
+```
+**本节（§8）自己那一枚不自我引用**：它按 `--name-only` 只带本文件一枚，号在交件后的 `git log` 里可查
+（本表五枚 commit 依次是 `6c0ad3a`→`20a6397`→`a088515`→`d777eb6`→`d463694`→本节这一枚）。
+
+**本表落盘时刻**：`date '+%H:%M +08'` 现量 **15:49 +08**（首枚 commit）／本节写于其后同一小时窗，
+取数期间 `gh run list --branch dev` 无 `in_progress` 的 `ci` run、`docker ps` 无同类容器（§0.2）。
+
+**本表共 8 节、724 行**（`wc -l` 现量于本节之前），覆盖派单要求的四格 AC ＋ AC#2 的三层裁定；
+**没核的部分全部列在 §6，共九条**——本表不是票 125 的全裁，只是它的第一份独立裁决。
