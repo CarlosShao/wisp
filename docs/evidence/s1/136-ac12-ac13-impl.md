@@ -328,7 +328,18 @@ fixture 全部落在冻结 Sleeping cap（25MB）之下，释放腿（`released=
 | AC#12② 精修 | `c03aee3` | 同文件 `7 2`（腿 2 合写断言拆三跳，§2.7 自纠） |
 | AC#12 证据 §2 | `0f49259` | 四判据逐判＋解冻范围实用行号＋MD/ME/MF/MC 四发 |
 | 两格证据 §3-§4 | `7dc8086` | 消费者核查＋门禁原文两格各一套 |
-| 票面 log（AC#13＋AC#12 各一条） | 见 `git log --oneline -1 -- .scratch/wisp/issues/136-*.md` | append-only 两行，未翻勾 |
+| 票面 log（AC#13＋AC#12 各一条） | `1f7875d` | append-only 两行（`16 增 0 删`，别人原文一字未改），未翻勾 |
+
+### 6.1 收尾补记（这一段写在上表之后，故把表里来不及登记的最后一枚一并列出）
+
+| 节 | sha | 内容 |
+| --- | --- | --- |
+| 证据 §5-§7 | `888486c` | 未做的档 12 条 ＋ 共树/暂存账 ＋ 两个计数 ＋ §7.1 sha 核法表 |
+| 本节（§6.1 收尾补记） | 见 `git log --oneline -1 -- docs/evidence/s1/136-ac12-ac13-impl.md` | 收尾复跑（下表）＋共树噪声一条 |
+
+收尾复跑（**仓库工作树**，此刻 `HEAD=1f7875d`；`date -u` 原文 `Thu Sep 24 01:19:44 UTC 2026` ⇒ 本机 **09:19:44 +08**）：`gofmt -l internal/observe/` 无输出；`go build ./...` rc=0；`go test -count=1 -v ./internal/observe/` ＝ **`rc=0 / RUN=65 / PASS=65 / FAIL=0 / SKIP=0 / ^panic=0`**（原文 `/d/tmp/wisp136ac1213-final-worktree-v.txt`）；并证工作树那枚 `internal/observe/sampler.go` 与 §2 全部变异读数所依据的 `pristine-tree2b` 拷贝 `diff -q` **逐字相同** ⇒ 本文件的读数面与最终交付面同版。
+
+共树噪声一条（不是注入、也不是谁的错）：本程收尾时工作树里有**兄弟在飞**的三枚 `internal/winsec/*_test.go` 处于 ` M`（`ancestor_separator_108_other_test.go`、`placement_leaf_118_other_test.go`、`placement_symlink_113_other_test.go`，票 137 的地界）。本程九枚 commit 每一枚的 `git diff --cached --name-only` 都只列出我自己的路径，没把它们带走；本程也**没有**读它们的内容来支撑任何结论。
 
 暂存账：本程**每一枚** commit 都跑过 `git add -- <显式路径>` ＋ `git diff --cached --name-only`，暂存清单里只出现过上面那些我自己的路径；`git commit -q -F - -- <同一批路径>` 全部带 pathspec；未 push；未 `--amend`／`reset`／`rebase`／`stash`／`checkout .`；仓内未建 worktree。
 
