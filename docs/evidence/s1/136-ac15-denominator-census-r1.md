@@ -268,3 +268,177 @@ line, and 240 files that are all still on disk.
 I am not editing the face or the ledger for that - both are outside my one writable path, and the
 face's `>` blocks are append-only by rule. This section is the counter-evidence, filed for whoever
 owns those two files.
+
+---
+
+## Section 3. Portability: what AC#11 can AC#15 reuse verbatim, and what it cannot
+
+### 3.1 (a) The outer-loop command shape - two variants are archived, only one is reusable
+
+Both drive `go test -count=1 -v ./internal/observe/` against a `git archive` tree in `D:\tmp`
+(never the repo work tree), one `.v.log` per shot.
+
+**Shape 1, the plain loop** - `/d/tmp/wisp136ac11b-run-batch.sh` (15 lines, r1 and second witness):
+
+```
+for i in $(seq 1 "$N"); do
+  ( cd "$TREE" && go test -count=1 -v ./internal/observe/ ) > "$OUT/$i.v.log" 2>&1
+  rc=$?
+  printf 'run=%s rc=%s at=%s\n' "$i" "$rc" "$(date '+%Y-%m-%d %H:%M:%S %z')" >> "$OUT/index.txt"
+done
+```
+
+Gate is a separate hand-run script. `date` is written per shot and **never subtracted** (both scripts
+carry the comment "host wall clock jumps, so no durations are derived").
+
+**Shape 2, the gated loop** - `/d/tmp/wisp136ac11v-batch.sh` (about 110 lines, the AC#11 acceptance
+run). Same core loop plus four things AC#15 needs and shape 1 lacks:
+* a bounded contention gate, four checks: (1) `powershell Get-Process` matching
+  `Runner.Worker|^go$|compile|^cgo$`; (2) `docker ps` (container load is invisible in the host list);
+  (3) `gh run list -R CarlosShao/wisp --limit 5 --json databaseId,status,headSha` counting
+  `"status":"in_progress"`, degrading to `CLEAR-LOCAL-ONLY` when `gh` errors, which is explicitly
+  **not** an assertion that the queue is empty; (4) `ls -ld` mtime of
+  `/e/work/base/actions-runner/_work`;
+* poll every 30 s, max 60 rounds (30 min), `exit 8` if it never clears - "never takes numbers inside a
+  contention window";
+* **tree identity captured into `gate.txt` at fire time**: md5 of the target `_test.go` plus
+  `find internal/observe -name '*.go' | sort | xargs md5sum`;
+* post-batch gate re-scan into `gate-post.txt`, and per-log `BATCH-TAG`/`RUN-DATE` header + `RC=` trailer.
+
+Verdict: **reuse shape 2 verbatim**, changing only `<tree> <outdir> <runs> <tag>`. Reusing shape 1
+would reproduce AC#11's own weakest moment - the second witness had to void a whole 30-shot batch
+(`wisp136ac11b-batch-before-DISCARDED-contended`) because it had no in-loop gate and someone else's
+44 log files landed during its window.
+
+One thing AC#15 must add and AC#11 did not need: AC#11's target was in `goroutine_test.go`, which the
+fix itself rewrote, so pre/post used two different trees by design. AC#15's fix will also change
+`internal/observe/**_test.go`, so the md5 block must name **all four** timing-family files, not one,
+otherwise a pre-fix batch and a post-fix batch can silently differ in more than the intended hunk.
+
+### 3.2 (b) Shell-loop `-count=1` versus same-process `-count=N`: AC#11 ran BOTH, and the archive settles the census's structural claim
+
+| denominator | did AC#11 run it | archived volume | exact archived command |
+|---|---|---|---|
+| (i) shell loop of `-count=1` | yes | 390 invocations (section 1.1) | `go test -count=1 -v ./internal/observe/` |
+| (ii) same-process `-count=N` | yes, **but `-run`-filtered** | 4 invocations / 1004 repeats | `go test -count=500 -v -run 'TestNoopTaskReturnsToBaseline$' ./internal/observe/` (both `*-count500.log`), and `go test -count=2 -v ./internal/observe/` (two `count2` logs, RUN=130) |
+
+So AC#15 can reuse both shapes, but note the asymmetry: AC#11's same-process volume was taken on
+**one test name**, not on the whole package. For AC#15 that is exactly the right precedent, because
+`-count=1440` on the whole 71-name package would cost about 80 minutes of ticker windows in one
+process and would also drift the process's own heap/timer state across the run.
+
+**Confirming the census claim "one `go test` invocation can never yield 30 `-count=1` runs": CONFIRMED
+from the archive, not by argument.** Counting package result lines (`^(ok|FAIL)[[:space:]]+github`) per
+file: `wisp136ac11-batch-before/1.v.log` = **1**, `wisp136ac11-before-count500.log` = **1**. A
+`-count=500` log has RUN=500 and 500 per-name verdicts but exactly one package outcome, one `rc`, one
+process. Conversely, 30 whole-package outcomes occupy 30 separate files. The two readings are
+therefore not interconvertible, which is the physical content of AC#15 criterion 1's ban on summing.
+
+The size of the difference is already measured, for the *same* case, in AC#11's own table
+(`136-ac11-impl.md:119-120`): whole-package single-shot **4/60 = 6.7%** versus same-process 500
+repeats **2/500 = 0.4%**, a 16.7x spread on one identical defect. For AC#15's symptom the archive
+gives (i) 1/390 and (ii) 0/1004.
+
+### 3.3 (c) AC#11's roster and panic counting rules, verbatim from the instrument
+
+Source: `/d/tmp/wisp136ac11-summarize.py` and its declared copy `/d/tmp/wisp136ac11b-summarize.py`
+(the copy's only stated change is writing the roster dump under a new prefix).
+
+| rule | regex / predicate | portability note for AC#15 |
+|---|---|---|
+| RUN names | `^=== RUN\s+(Test\w+)` | portable as-is; `\w+` cannot cross `/`, so subtests are excluded from RUN by construction |
+| verdicts | `^\s*--- (PASS\|FAIL\|SKIP):\s+(\S+)` | **latent bug**: the leading `\s*` lets indented subtest verdicts into the same counters that RUN excludes them from. Harmless today - `internal/observe/**_test.go` has **0** `t.Run(` occurrences (measured file by file: 14 files, all 0) - but it silently mis-tallies the first time anyone adds a subtest. Fix or note it before reusing |
+| hit | `nm == target or nm.startswith(target + "/")` | portable; pass the full name `TestCheckSettleHalfTheReadsFailedReportsItsLoss` |
+| panic | `line.startswith('panic')` or (`' [running]:' in line and line.startswith('goroutine ')`) | already the *true-panic* sense. Keep it |
+| fatal error | `line.startswith('fatal error')` | keep |
+| roster closure | `Counter` of sorted per-run name tuples, then prints `roster: K distinct top-level run-name sets over N runs; modal size=S occurs=M` and per-run `missing=` / `extra=` against the modal set; dumps `<prefix>-<label>-roster.txt` | portable verbatim |
+| cross-batch | `comm -3` on flattened per-run name lists, e.g. `/d/tmp/wisp136ac11b-b1-names.txt`, `-a1-names.txt`, `-r1-names.txt` (2350 B, 65 names each) | portable; the golden list must be regenerated at 71 names, see 3.5 |
+
+Two archived outputs to copy the reporting format from:
+pre-fix `TOTAL runs=30 hits=2 (rate 2/30)` / `four-number spread: RUN=[65] PASS=[64, 65] FAIL=[0, 1]
+SKIP=[0]` / `roster: 1 distinct top-level run-name sets over 30 runs; modal size=65 occurs=30`;
+post-fix identical but `hits=0`, `PASS=[65]`, `FAIL=[0]`.
+
+**The panic two-senses rule, and one name the face gets wrong.** The instrument's line-initial rule is
+the right one, and every archived log confirms it is quiet: `grep -c '^panic:'` is 0 on all 30
+`wisp136ac11-batch-before` logs, and no file among the 90 `before` logs of the `r1` and `v` sets or
+the 60 `ac11-orch-base` logs has a single line-initial `panic`. But the identifier sense is a
+different quantity and the face's new `>` ④ mis-names it: it says the 7 identifier hits are
+"`wantPanic` 与 `TestCheckSettlePanicInSamplerDoesNotStopTick`", yet
+`grep -rn "TestCheckSettlePanicInSamplerDoesNotStopTick" --include=*.go .` returns **nothing** - that
+test does not exist. The only two test names in the repo containing `Panic` are
+`TestPanicInWorkerSurvivesAndCancelsRoot` (`internal/observe/goroutine_test.go`) and
+`TestFakeTreeEmptyScriptFailsClosedAndNotPanics` (`internal/observe/sampler_faketree_guard_136_test.go:54`),
+and the identifier mass in `internal/observe/**_test.go` is `PanicCount` (3), `PanicEvent` (2),
+`panic(` (2 sites) plus those two names. Whoever runs AC#15 should re-measure this and not carry the
+7.
+
+### 3.4 (d) What "30 shots with 0 hits" must mean numerically, per denominator
+
+Cost basis, measured not guessed: `/d/tmp/ac14b-r2-136/test-head.txt` is a `-count=2 -v` whole-package
+run at 20:32 today - RUN=142, top PASS=142, top FAIL=0, SKIP=0, one package line,
+`ok github.com/CarlosShao/wisp/internal/observe 6.626s`, i.e. **3.313 s of package time per
+whole-package shot at 71 names** (against 2.67 s/shot observed across the archived 65-name batch
+spans). Budget 3.3-4.0 s per invocation including process startup.
+
+**Denominator (i), 30 shell-loop `-count=1` invocations at today's HEAD.** Expected file shape:
+30 logs; per log `^=== RUN` = 71, top `--- PASS` = 71, top `--- FAIL` = 0, top `--- SKIP` = 0,
+`^panic:` = 0, exactly 1 package result line, index 30 lines all `rc=0`. Batch totals: RUN 2130,
+PASS 2130, FAIL 0, SKIP 0; `1 distinct set over 30 runs`, modal size 71 occurs 30; both `comm`
+directions empty. Statistical content: with k=0 the 95% one-sided upper bound is `3/30` = **10%**.
+That number is *blind* to the effect it is meant to detect: the archived sighting is 1/240 = 0.417%
+and the corrected on-disk figure is 1/390 = 0.256%. So 0 hits in 30 whole-package shots is an entry
+ticket, not a measurement.
+
+**Denominator (ii), `-count=30 -v -run '<target>$' ./internal/observe/` in ONE invocation.**
+Expected: RUN 30, top PASS 30, FAIL 0, SKIP 0, `^panic:` 0, **one** package result line, one `rc`,
+about 30 x 0.13 s = 4 s of wall time. Same `3/30` = 10% arithmetic, but the distribution being bounded
+is the insensitive one - AC#11 measured that same shape as roughly 16x less likely to show the defect
+than (i), and AC#15's symptom has 0 occurrences in the 1004 same-process repeats already on disk.
+Reporting this as "30 shots, 0 hits, fixed" is the single most misleading thing this cell could do.
+
+**So criterion 4's ">= 30 shots with 0 hits" is satisfiable literally twice over and means something
+different each time.** Write it as: `(A) 0 hits in n_A whole-package -count=1 invocations, giving an
+upper bound of 3/n_A; (B) 0 hits in n_B same-process repeats, reported separately as a mechanism
+probe, never merged.` AC#11's precedent for that wording is
+`136-ac11-orchestrator-readings.md:101-103` ("any 'this cell is X%' phrasing must carry its
+denominator, otherwise it becomes the next person's source of error").
+
+### 3.5 What is NOT portable
+
+1. **The roster size.** AC#11's golden list is 65 names; today's package is 71
+   (`grep -c '^func Test' internal/observe/*_test.go` = 71 across 14 files, and independently
+   confirmed by `ac14b-r2-136/snap*-v.txt` at RUN=71 and `test-head.txt` at 142 for `-count=2`).
+   The 6-name delta is AC#14's `sampler_settle_gate_136_test.go`. Every AC#11 `comm -3` baseline must
+   be regenerated; reusing `wisp136ac11b-b1-names.txt` as the golden set would report 6 phantom
+   "extra" names on every shot.
+2. **The tree-identity check.** AC#11's 240/390 shots all sit on `sampler_settle_coverage_136_test.go`
+   md5 `79711ce3…`; at HEAD it is `a3196802…` (289 lines to 365), and
+   `git diff --name-only 51e29b0 HEAD -- internal/observe/` lists 4 paths. Under this repo's reuse
+   rule the archived rate is therefore historical, not a baseline.
+3. **Exposure per shot has doubled.** Census r2 section 2 tallies the package's ticker-window budget
+   at about 1560 ms then versus about 2960 ms now, of which the AC#15 target itself contributes 100 ms
+   in both. Reusing 1/240 as a *prediction* for the current tree would understate the rate, and the
+   pre-fix-on-current-tree rate is the only admissible baseline.
+4. **The `-run` filter AC#11 used for (ii) is load-bearing**, not decoration: `AC#15`'s target shares
+   its binary with 70 other cases, so an unfiltered `-count=1440` would be a 130-minute run that also
+   measures 1440 executions of 70 unrelated legs.
+5. **Do not count AC#14's mutation reds as sightings.** An exhaustive (uncapped) scan of all of
+   `D:\tmp` over `*.log` and `*.txt` finds **18** files containing
+   `^--- FAIL: TestCheckSettleHalfTheReadsFailedReportsItsLoss`, written to
+   `/d/tmp/wisp136ac15denom-r1-scan-failnames.txt` (created, not deleted):
+   AC#11's `wisp136ac11-batch-before/25.v.log`, plus 17 mutation-anchored reds from other runs
+   (`ac14b-r2-136/snapC-v.txt` `snapD` `snapE` `snapF`, `wisp136ac1213-tree2-MD-v.txt`,
+   `-tree2b-MD-v.txt`, `-tree2b-MF-v.txt`, `wisp136ac14/mut/M1.log`, `M2.log`,
+   `M3b-gate-true-fold-out/M3b-gate-true-fold-out.log`, `wisp136ac14r1/logs/mut-M1.txt`, `mut-M2.txt`,
+   `mut-M3a-t.txt`, `mut-M4.txt`, `wisp136r1-tree-MD-v.txt`, `wisp136r1-tree-MF-v.txt`,
+   `wisp141gate/logs/m1-v.txt`). That is 18 exactly: the one flake plus 17 deliberate reds. They fail
+   on a *different sentence*, e.g. snapC line 91 at
+   `sampler_settle_coverage_136_test.go:251`
+   `AC#14: a half-covered settle window must carry its own sampling verdict row, got verdicts=[]`.
+   Re-scanning all of `D:\tmp` for AC#15's own flake sentence
+   (`precondition broken: only 2 reads taken, half-and-half`) returns **exactly 1 file**, the same
+   `25.v.log` (list at `/d/tmp/wisp136ac15denom-r1-scan-sentence.txt`). So across everything ever
+   archived on this box, AC#15's symptom has been seen **once**. Filter on the sentence, never on the
+   test name, when building the rate; a name-only filter would report 18 sightings and inflate the
+   rate 18x with deliberate mutation reds.
