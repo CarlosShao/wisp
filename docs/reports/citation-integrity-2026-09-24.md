@@ -140,3 +140,66 @@ $ git log --format='%h %ad' --date=format:'%H:%M' -- docs/evidence/s1/ci-read-a1
 $ wc -l < docs/evidence/s1/ci-read-a1fd5bf-r1.md
 699
 ```
+
+---
+
+## 检查 2：`docs/evidence/**` 路径存在性
+
+```
+$ date "+%Y-%m-%d %H:%M %z"
+2026-09-24 23:25 +0800
+
+$ git log -1 --format='%h %ad' --date=format:'%H:%M'
+4013b1d 23:21
+```
+
+（本审计第 3 节的全部取数就在这枚 HEAD 上做；两枚被审文件自 `faf66d3` 起只增长过尾部，早段行号未漂。）
+
+### 2.0 分母
+
+| 项 | 数 | 现量命令 |
+|---|---|---|
+| `docs/evidence/…\*.md` 形式引用（出现处） | 103 | `grep -n -o -E 'docs/evidence/[A-Za-z0-9_./*-]+\.md' <两枚文件>` |
+| 去重路径 | 75 | 同上 `\| sort -u` |
+| 具体（非通配）路径 | 69 | — |
+| ┗ 盘上存在 | **67** | `[ -f <p> ]` 逐条 |
+| ┗ 不存在＝ⓒ（上下文已说是幽灵） | **2** | 见 §2.1 |
+| 通配/省略写法＝ⓓ | 6 | 见 §2.2 |
+
+另有 **98 枚**裸文件名（`NN-slug.md`，不带 `docs/evidence/s1/` 前缀）引用：
+**72 枚**在 `docs/evidence/s1/` 命中、**2 枚**在 `docs/evidence/{s0,s2,s3}/`、**24 枚**不在 evidence 目录但已逐枚定家（见 §2.3）。
+
+### 2.1 ⓒ 不存在的两枚（上下文自己已经判定不存在＝正常）
+
+| 路径 | 引用处 | 上下文的定性 |
+|---|---|---|
+| `docs/evidence/s1/140-m1m2m4-r1.md` | `pending-and-issues.md:5726` | "`docs/evidence/s1/140-m1m2m4-r1.md` 不存在"（幽灵投递） |
+| `docs/evidence/s1/141-q46c-blocked-r1.md` | `:5734`（作为存在引用）、`:5744`、`:5760`、`HANDOVER.md:104` | `:5734` 那一行当时把它当**真表**引用（"以下数字一律以它的表为准…449 行"），`:5744` 起作废 ⇒ 该行的**引用形状**已被后文钉死，不再单独计缺陷 |
+
+`docs/evidence/s1/141-q46c-impl.md`（真身）**在盘上**，`wc -l`＝**245**，与 `HANDOVER.md:108` 的"`bb61dc5` 落了…245 行"逐字相符；
+`git show --stat bb61dc5` ⇒ `1 file changed, 245 insertions(+)`。⇒ 该条**不是缺陷**。
+
+### 2.2 ⓓ 通配与省略写法（6 枚，不是坏引用）
+
+`docs/evidence/s1/*.md`（`:3908`）、`102-*.md`（`:1865`）、`119-ac7-*.md`（`:5474`）、`125-*.md`（`:5135`）、
+`130-ac3-*.md`（`HANDOVER.md:448`）、`134-*.md`（`HANDOVER.md:425`）——全是"这一族文件"的 glob 写法，
+上下文要么在描述判据范围、要么明说"这样的文件一枚都没有"。
+另有 `140-job-level-wisp-env-test-...md`（票 140 文件名的手写省略形，真身在盘）。
+
+### 2.3 裸文件名的 24 枚去处（逐族给结论）
+
+| 族 | 枚数 | 实落点 | 现量 |
+|---|---|---|---|
+| `SPEC-NN-<slug>.md` 只写了 slug | 6 | `docs/specs/SPEC-00…12` 全部在盘 | `ls docs/specs/ \| grep -F <slug>` |
+| `2026-09-2X…` 只写了日期尾巴 | 5 | `docs/reports/2026-09-19-t14-dev-minisign-key.md`、`2026-09-23-gap-analysis-vs-oss-harnesses.md`、`2026-09-24-gap-analysis-audit-verdict.md`、`docs/evidence/s1/ci-runner-readings-2026-09-21.md`、`ci-step-readings-2026-09-22.md` 全在盘 | `ls docs/evidence/s1/ \| grep -E 'ci-(runner\|step)-readings'` |
+| 工单文件名（`.scratch/wisp/issues/`） | 10 | 见检查 3 | — |
+| `62-adversarial-acceptance.md` | 1 | **盘上从来没有过**：`:743` 与 `HANDOVER.md:856` 都明写"根本不存在" | ⓒ 正常 |
+| 本报告文件名尾巴 `09-24.md` | 1 | `citation-integrity-2026-09-24.md`（`:5772` 派单原文） | ⓓ |
+
+### 2.4 顺手复量的三处"我复量存在"的行数／枚数断言（检查 2 的延伸，非新增缺陷）
+
+| 台账断言 | 现量 | 判定 |
+|---|---|---|
+| `:5725` "表 `136-ac15-denominator-census-r1.md`，678 行／5 枚 commit，末枚 `ea59b8c`" | `wc -l`＝**678**；`git log --format=%h -- <该表>`＝`ea59b8c dac2d89 c071d2d 38c71b4 8d7660e`＝**5 枚**、末枚正是 `ea59b8c` | **全部对上** |
+| `:5660` "表 `140-ac1-verdict-r1.md` 401 行／5 枚单路径 commit" | 现为 **508 行／7 枚**（`e6fa582`、`fffe3a6` 后落）；台账 `:5670`（A189）已写"508 行／7 枚（末枚 `fffe3a6`）" | **已被后文追平**，不算缺陷 |
+| `:5771` "其五枚 commit `2d05932`/`bc67475`/`61db519`/`41b1869`/`9048866`" | 该表真 commit **6 枚**，名单漏 `7cc5050`（21:49 §2） | **待更正**（详见 §1.7） |
