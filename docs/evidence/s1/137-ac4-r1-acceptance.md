@@ -431,3 +431,75 @@ a45b2e9 feat(129,AC#1+AC#2) …      ← 早于本格，与 AC#4 无关
 ⇒ **"只改测试"这句话是干净的**：被验那枚码里**新增的非注释行只有那 7 枚递根点**，
 断言一句未动、`Skip` 一句未加、生产 `.go` 零枚、阈值与 golden 在整个交付区间零枚。
 D32 的 CPU≤0.5%／RSS≤25MB 与 `thresholds.go` 本程连读都没读过（不跑计时类断言，见 §7）。
+
+### 4.4 §4 这一枚 commit 的原样输出
+
+```
+$ git log --oneline -1
+d9126db evidence(137 AC#4 r1 终裁 §4): 27 发逐发 SKIP 与 panic 账（软链恒 3 枚 125 探针、普通形恒 0、分母 11 枚从未进 SKIP）+ 生产码/阈值/golden 盘上重核
+$ git show --name-only HEAD
+commit d9126dbb4a142cfc705eff9a7d76fe8803daa3ba
+Author: CarlosShao <1933942520@qq.com>
+
+docs/evidence/s1/137-ac4-r1-acceptance.md
+```
+
+⇒ 只带本程这一枚路径。
+
+---
+
+## §5 附加两问（各答一句，加凭据）
+
+### 5.1 问一：`winsec.SealableTempDirForTest124` 是不是改前就存在的 helper？
+
+**答：是，改前就在树上、不是这一格新造的 ⇒ "只改测试"这句话干净。**〔独立复现〕
+
+```
+$ git log --oneline -S 'SealableTempDirForTest124' -- internal/winsec/ | tail -1
+8ced405 test(124): AC#2b 批次 3b——internal/winsec 的 17 枚接上"先解析再递底线"，但不接 proc
+$ git merge-base --is-ancestor 8ced405 182daed && echo YES
+YES                                        ← 早于本格开工锚点，改前已在
+$ git grep -n 'func SealableTempDirForTest124' b1010ff -- internal/winsec/
+b1010ff:internal/winsec/tempdir_resolved_124_other_test.go:33
+b1010ff:internal/winsec/tempdir_resolved_124_windows_test.go:23
+```
+
+- 定义在**两枚 `_test.go`** 里（`//go:build !windows` 与它的 windows 孪生），**不在任何生产文件里**
+  ⇒ 本格换过去的这枚符号本身也是测试件，"只改测试"两半都成立（改的是测试、换到的也是测试里的东西）。
+- ⚠ **一处口径边界，本程只登记不重裁**：helper 体是 `return resolveProbeRoot(t.TempDir())`，
+  而 `resolveProbeRoot` 住在**生产文件** `internal/winsec/resolve.go:253`。
+  这**不是**"拿被测函数算期望值"（这两枚腿的被测面是 `platformVerifyPlacement`／`firstLinkAncestor`，
+  helper 产出的是 **fixture 输入**），且这段理由与"故意不接 `internal/proc`"的边界纪律都逐字写在
+  `tempdir_resolved_124_other_test.go:14-29` 的注释里。**那枚 helper 是票 124 批次 3b 落的、已被本格之外裁过，本程不重裁**；
+  本程只在"本格有没有新造 helper"这一问上落"没有"。
+
+### 5.2 问二：编排者把"未解析形的持有面"落成票 119 的 `AC#7`，那一格开对没有？
+
+**答：开对了。判据①那句"两味药必须一起下（记名断言 ＋ 换已解析根）"成立，本程有直接读数、不是推理；
+"只加记名断言就够"这一支被本程的读数否掉。**〔独立复现〕
+
+否掉它的那两条读数：
+
+1. **未换根 ＋ 记名断言（活的）＝ 软链形恒红。** `a-base-link`（`base` 树，AC#2 那把尺 `CREDIT_BRANCHES=3` 恒活，
+   **零变异**）⇒ 未变异软链形 11 枚红、红句 10 句全是"没记名我种的链接"。
+   同一批用例**没有破口也红** ⇒ 那一形下它**不可能绿**＝不可满足。这正是 119 那两枚若"只收紧不换根"会掉进去的那个坑。
+2. **那两枚的具体形状本程逐名抓到现案。** 在被验那版·未变异·软链形的整份日志里，
+   点到宿主链接 `/r1link` 的**只剩 2 行**（实现方在 `r4` 上量到同位、名字是 `/ac4link`），
+   逐名就是那两枚自己的日志行：
+   `dataroot_symlink_119_other_test.go:200` 的 `PrivateDirAll("/r1link/…/varlink119/data")`、
+   `:305` 的 `PrivateDirAll("/r1link/…/injlink119/harness/picked")` ⇒ 它们的拒因**打的是宿主那枚链接**，
+   而 `:203`/`:308` 只看 sentinel ⇒ **能打印、不能区分**。给它们接记名断言而 `base` 仍 raw，判到的就是 `/r1link`，恒红。
+
+AC#7 那一格里其余事实前提，本程逐条核（都在 `a9c4d58` 落的那块文字里）：
+
+| AC#7 的前提 | 本程现量 |
+|---|---|
+| `:203`、`:308` 是"只判 sentinel、不判记名"的内联断言 | `git show b1010ff:…119…` 逐字看到 `if err == nil {…} else if !errors.Is(err, winsec.ErrUnresolvedPath) {…}`，两枚都**没有** `refusalCreditsLink137` ✅ |
+| `:251` 那一处不并入（它是 137 的对照组） | `:251` 属 `:219` 的 `TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119`，其根走 `cleanSpelling119`（已解析）；本程四发 MUT-D 里它**逐名全红**、未变异四发**全绿**＝它确实是活着的对照 ✅ |
+| 记名 helper 同包可达、零新增依赖 | 119 文件 `:44` ＝ `package winsec_test`，helper 在 `placement_symlink_113_other_test.go:160` ⇒ 同包直接调用 ✅ |
+| "普通·MUT-D 那两枚 FAIL" | 本程 `b-swapmutd-plain`／`e-basemutd-plain` 的 FAIL 名册里**逐名**有 `TestAC1POSIXUnresolvedSymlinkedRootStillRefused119` 与 `TestAC2POSIXInjectedTestDataDirStandsAsDeclared119` ✅ |
+| "软链·MUT-D 那两枚 PASS 且都在 `RUN` 名册里" | `b-swapmutd-link`：两枚**在 RUN**、**不在 FAIL**、**不在 SKIP** ✅ |
+| 那一格会不会是"永远退回的坏尺" | 同一形（未变异·软链）里根已解析的 `TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119` **真跑且 PASS** ⇒ 那味"换已解析根"在软链形**能绿**，本格可满足 ✅ |
+
+⚠ **一句边界**：AC#7 的判据④（"119 AC#3 那枚反半边不许被这一格弄绿"）要等它自己被实现时才有读数，
+本程**没测**那一支（本程只测了它的前提）；本程也没代 119 那一格改任何码（票 119 票面**一字未动**）。
