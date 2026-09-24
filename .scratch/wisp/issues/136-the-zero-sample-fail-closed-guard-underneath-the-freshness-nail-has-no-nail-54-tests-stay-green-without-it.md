@@ -155,6 +155,25 @@
       ⚠ 这一发**不许**用 `internal/observe` 包内的仪器代（那是 AC#1 已付过的账），它要证的是"包外那一环也认这个 pass"；
       需要 `cmd/wisp` 空出来（此刻 133 修方在飞）＋ Windows Job Object ⇒ **排在 133 落地之后**。
 
+> **AC#10 判据改写（09-24 18:4x 编排者；来源＝`auditor-ticket136-preflight` §4.1／§1.2／§4.3，四条我逐条在盘上复量过；原判据一字未改）**
+> **① 那条命令照字面跑不出读数**——`cmd/wisp/slo_windows.go:223` 逐字 `if !*settle && *state == "" {` ⇒ `:224` 打 `-state is required (or use -settle)`、`:225` `return 2`。
+> 补正：命令换成 `134-adversarial-acceptance.md:538` 那发原文 `wisp slo -state Sleeping -seconds 0.05 -interval-ms 250`；
+> 而**参照值 `mem_median=4476928` 不许再用**——那发行自 09-21 15:06 那枚 `build/wisp.exe`（`27881312 B`，本程现量仍在盘上），早于 AC#12 的生产码 `5c1529a` ⇒ **它不属于任何一枚当前树上的二进制**，实现程必须**重建后再量**（今天已为同一枚病作废过 `A175`）。
+> **② 结构上永远产不出它自己想量的读数**（这就是我自己那条"恒真判据"的坑，且是它最坏的那种：**在未修树上它连红都红不出来**）：
+> (a) **方向写反**——`sampler.go:332-340` 那行是"造出红门行"，`:341-346` 只把 `Gate && !Pass` 折进总布尔 ⇒ 把守卫**拆掉**是让它**过**，退出码只会 **1→0**；
+> (b) `samples:[]` 与"拆掉守卫"**互斥**——AC#1 的 `FM2` 那发读数原文就是 `samples=0 pass=true`（票面 `:32`）；
+> (c) 最硬的一条：**真 CLI 今天跑不出零样**，`134-adversarial-acceptance.md:643-645` 逐字记着"这条路在当前码里不通"，要造那形**必须先把 `sampler.go:332` 拆掉**——那是包内探针，不是 CLI。
+> ⇒ **换成这一发（今天不响、装了才响，是真正的一枚）**：对 `cmd/wisp/slo_windows.go:386`（`run.Pass = rep.Pass && observer.Pass`）与 `:323-325`（`!run.Pass ⇒ exitCode=1`）**各落一发变异，读 `go test ./cmd/wisp/` 响不响**。
+> 今天一枚都不响，凭据是我自己现量：`grep -rn "run\.Pass" cmd/wisp/*_test.go` ⇒ **0 命中**。
+> ⚠ **强度必须同时写这一句，否则是造第二枚假绿**：那两跳在 **CI 面上今天不是裸的**——`scripts/slo-check.ps1:364-370` 的 leak 自检就是拿"强制 100MB ⇒ 退出码必须翻成 1"当判据（`:367` `$leakFlipped = ($leakCode -eq 1)`），而那一发在 `ci.yml:479-500` 的 `slo-smoke`（托管 `windows-latest`）里。
+> ⇒ **本格装的是"`go test`／门禁面的第一 catcher、CI 层的第二 catcher"，不是"第一枚仪器"**（`slo-smoke` 最近绿没绿＝未核，要 `gh`）。
+> **③ 一句登记，不是一枚 AC**：**"零样本那一面在 CLI 上不可达"是结论**（缺的是一枚能把假 `TreeReader` 注进 `cmdSLO` 的缝——`cmdSLO` 直接 `observe.NewSampler(proc.NewTreeSampler(rt.Job), …)`（`:270`）／`proc.NewExternalSampler(subject.pid)`（`:372`），**没有任何注入面**；造那缝＝新增生产码或测试后门 env，属**接缝决策**，`AGENTS §1.3` 的注入面清单里也没有这一项）。
+> **可复算触发条件**：哪一天有人给 `cmdSLO` 加了 reader 注入面，本登记立刻复活成判据，不必另开 AC。
+> **追加问② 换判据**：盘上现量那枚合成报告（`:623`）逐字段是 `samples:null`、`sample_errors:0`、`back_within_cap_ms:`**`0`**（不是真零样窗口的 `-1`，因为 `:477` 的初始化没走到）、`cap_bytes:0`、`final_bytes:0` ⇒ **今天两形"能区分"，但区分手段全是"忘了赋值的零"**。
+> ⇒ 原句"这两形必须能被区分开"**在今天就已经满足**（拿它当牙＝恒真型装饰）。改成：**"区分依据必须是显式标记，不能是未初始化零值"**——这一句今天不满足，装了才响。
+> **排程更正**：`:156` 那句"排在 133 落地之后"**已被超越**——`cmd/wisp/leg_dispatch_gate_133_test.go` 最后一次改动是 `fa35557` 09:56，标题是**票 135** 的 AC#8 M-G ⇒ **`cmd/wisp` 现在没有写者**（133 面自身停在 09-23 22:23、未结）。本格现在等的是：①**编队安静窗口**（`slo-check.ps1:153-155` 的争用名单含 `go.exe`/`compile.exe`/`link.exe`/`wisp.exe`，命中即 `:250-310` 整段 "NO CONCLUSION (machine-contended)"＝不出数）；②**取数期间不推送**（`slo-full` 是 `ci.yml:537-538` `[self-hosted, wisp-slo]`＝同一台 6C12T 本机，`push` 触发会并发开六态取样）。
+> 撤销口令：**「撤 136 AC#10 判据改写」** ⇒ 判据① /②／③ 与追加问② 全部退回原句（本 `>` 块保留不删，作为"改过又撤"的记录）。
+
 > **AC#8② 措辞更正（编排者自纠，append-only、原文不抹；09-23 23:3x）**
 > 上面 AC#8② 我写的"**只红这一枚、其余全部照常跑完**"这句**按实测不成立，而且不该成立**：M3 那一发变异同时把 `sampling` 那道门开掉
 > ⇒ 另有若干枚**本就该红**（实现方实测：改前那发在 panic 之前已有 4 枚红、改后共 6 枚红）。
@@ -251,6 +270,28 @@
       **不许照抄 AC#12 那两段的坐标**（那是我已记在册的"我把范围划小的一课"）。
       ⚠ **排程**：排在 AC#10 之后（AC#10 要 `cmd/wisp` 空出来，而本格读它的出线）。
 
+> **AC#14 具名解冻＋三裁定（09-24 18:4x 编排者；来源＝`auditor-ticket136-preflight` §3.3／§3.4／§3.5，全部我在盘上复量；本格原判据一字未改）**
+> **先认一枚**：`:250-251` 那句"派单时由编排者按'这条判据要落盘必须碰哪几段'现划"——我上一版派单简报里把 **AC#15 的 `:278` 地界句（"只许动 `internal/observe/**_test.go`"）当成了 AC#14 的**。
+> 现量：AC#14 是 `:232-252`，通篇**没有**那句；后果很实在——照它派，实现程会以为不许动生产码，而这一格**非动不可**（下面第二行就是证据），它要么停手报回、要么自己越界。**这条记在我身上，不记在它名下。**
+> **① 具名解冻（本票面此前一个字没给，现在给）**：只解冻 `internal/observe/sampler.go` 的**两段**——
+> `:431-456`（`SettleReport` 声明块，`Verdicts` 字段今天不在里面）＋ `:462-521`（`(*Sampler).CheckSettle` 体内，`:517-520` 那三布尔的折叠处在里面）。
+> **边界（越界即停手报回）**：`StateReport` 那一侧**冻结**——`:189-190`（`Verdicts` ＋ `Pass bool // all Gate verdicts pass`）、`:331`（`buildVerdicts`）、`:341-346`（`Gate && !Pass` 折叠）一字节不许改；
+> 要给 settle 造行就**另起一枚构造函数**，不许把 `buildVerdicts` 做成两用的（那是把已结案的 `StateReport` 形状拖进本格的射程）。
+> **为什么非动不可**（盘上现量，不是推理）：`sed -n '431,456p' internal/observe/sampler.go | grep -c Verdicts` ⇒ **0**；`:520` 逐字 `rep.Pass = memOK && backInTime && releaseOK`——**三个布尔的与，与门行无关** ⇒ "补一枚会自己判失败的行"在这枚结构体上**无法只用测试实现**。
+> **② 门行做成 `Gate: true`，但落地顺序被一枚读数钉死**（这一支是**门禁行为变更**，不是"补仪器"）：
+> 现量后果链＝`scripts/slo-check.ps1:381` `$allPass = ($failingStates.Count -eq 0) -and $settlePass` → `:396` `if (-not $allPass) { exit 1 }` ⇒ **`wisp slo -settle` 在"部分未测"的真窗口上从 exit 0 变 exit 1，颜色会打到 CI 的 `slo-smoke`（托管，每推送/PR）与 `slo-full`（本机 self-hosted）**。
+> 所以我**不批准"先做成 Gate 再看"**：**实现程第一发必须先量**——编队安静窗口内跑 `wisp slo -settle` **≥5 次**、逐次记 `sample_errors`。
+> 全 0 ⇒ 按 `Gate: true` 落地（这一形今天不会误伤存量合法窗口）；**任一发非 0 ⇒ 停手报回**，因为那等于把一台有争用的机器变成"固定红、且红因与 SLO 无关"＝**我自己吃过的那枚信号量之病**（`ci` 连红两天让新真伤失去信号），那一步要人拍板、不由实现程自决。
+> **并且**：门行做成 Gate 时，**红句必须把 `sample_errors` 点名印出来**（"丢了 N 次读数"），否则下一位看不出这枚红是"测不满"还是"内存超了"。
+> **③ 与 AC#15 串行，不并行**：两格共用 `internal/observe/sampler_settle_coverage_136_test.go`——AC#14 判据② 要的正是**推翻**那里 `:208-210` 那句 `if !rep.Pass { t.Fatalf("disclosure leg, not a verdict leg: this window still passes, ...") }`（它现在逐字要求"丢一半读数那一形**仍然 pass**"，与 AC#14 方向相反）。
+> ⇒ **AC#14 先做**，且**派单预先授权它改那一处断言**、交件里必须点名"断言被动了、理由是票面 `:243-244`"——不然下一位验收方会拿"实现方改了既有断言"这一条把它判成放水（这正是我记在册的"判放水只看两条"里的那一条）。
+> AC#15（那里 `:189` 的 `precondition broken: only %d reads taken` 偶发红）**排在 AC#14 之后**，且 `AC#14` 落地后它的靶子形状可能已经变了 ⇒ 到时要现量重划，不许照抄今天的行号。
+> **④ 排程反过来：AC#14 先、AC#10 后**。`:252` 那半句"**而本格读它的出线**"按盘上量**不成立**：`grep -rn "Verdicts" cmd/wisp/*.go` ⇒ 只命中 `providers_test.go` 的 `probeVerdicts`（`wisp providers probe` 那一族，与 SLO 无关）⇒ `cmd/wisp` 今天**一枚 `Verdicts` 都不读**。
+> 只有当 AC#10 顺手把"根本没测"标进 `slo_windows.go:623` 时那枚耦合才存在，而按上面的改写 AC#10 收敛成"只装仪器、不动生产码" ⇒ **耦合消失，两格不同目录、可并行**；
+> 但 AC#10 要占机（真取样）、AC#14 不要，**机时是稀缺资源** ⇒ 先派 AC#14（只缺一张纸，那张纸上面已经给完了），AC#10 等编队安静窗口。
+> 撤销口令：**「撤 136 AC#14 解冻」** ⇒ 解冻与②③④ 一并作废（本格退回"不可派＝缺一张授权"那个状态，票面原文不动）。
+
+
 > **AC#10 追加两问（09-24 10:0x 编排者，来源＝`acceptor-ticket136-ac12-ac13-r1` §4 第 3、4 条；原判据一字未改）**
 > 终裁方量到两件事**不属 AC#12 的债、但 AC#10 结案时必须逐名回答**：
 > ① **两枚新 key 今天零生产读者**：`SampleErrors`／`LastSampleError` 在 `internal/observe/` 之外**无任何引用**，
@@ -278,6 +319,14 @@
       ⚠ **地界**：只许动 `internal/observe/**_test.go`；`sampler.go` 的 `Settle`/`checkSettle` 语义若必须变 ⇒ **停手报回**（那与 AC#14 的出线形状、`SPEC-02 §3` 的 schema 契约同侧，属人工批准面）。
       ⚠ **排程**：**不排在今日队里**，挂在 AC#11 结案之后、与 AC#10／AC#14 同批裁；本格是"登记"不是"承诺日期"。
       **撤销口令**：回"撤 136 AC#15" ⇒ 我把它退回成第二 witness 表里的一条报名（票面这一格删掉，报名与出处不动）。
+
+> **AC#15 这一格里有三处要更正（09-24 18:4x 编排者；原句一字不抹，出处＝`auditor-ticket136-preflight` §3.2／§3.4，我复量一致）**
+> **(a) 符号名是我的错，盘上不存在那两个名字**：`grep -n 'Settle' internal/observe/sampler.go cmd/wisp/slo_windows.go` 现量 ⇒ 生产码只有 **`(*Sampler).CheckSettle`（`sampler.go:462`）**，cmd 侧另有 **`runSettle`（`slo_windows.go:599`）**；`Settle`／`checkSettle` 两个符号**一枚都没有**（`Settle` 只是 `slo_windows.go:118` 那个字段名）。今后本族引它一律写实名。
+> **(b) "`SPEC-02 §3` 同侧"这句引用不成立**：`docs/specs/SPEC-02-data-storage.md:22` 的 §3 标题确实是"Schema（契约级，不得自行增删字段）"，可它 `:23-` 起讲的是 **`CREATE TABLE schema_meta / profile / …` 的 SQLite DDL**，**不管 SLO 报告的出线形状** ⇒ SLO 报告的形状落不进它的射程。（**是不是另有契约在管**——`PLAN.md` D32/D39 那一族、`SPEC-10`、`SPEC-11`——预检程只排除了 `SPEC-02 §3` 这一处，**没做全仓契约面普查**，登记为未决，AC#14 落地前补那一查。）
+> **(c) 真正该停手的那一支，这一格反倒没写**：另两处触发线今天**不触发**——`slo-check.ps1` 对 settle 只读 `.pass`（`:351`）与 `.settle.free_os_memory_count`（`:353`）、**全仓没有严格解析**（`DisallowUnknownFields` 只有 `internal/config/parse.go:72,123` 两处，都不在这条链上）⇒ 加字段不弄坏它；golden 也不动（`git ls-files | grep -i golden` 名册里全是 LLM 的 `.sse`，带 `back_within_cap_ms` 的文件都在 `build/` 而 `build/` 被 `.gitignore:14` 忽略 ⇒ 仓里没有 SLO 报告 golden）。
+> ⇒ 该站住的是**门行做成 `Gate: true` 会把 exit 色打到 CI**（账在 AC#14 格下方 `>` 第②条，那里给了"先量 `sample_errors` 再决定"的前置）。本格的停手线**照旧有效**，只是理由换成那一支。
+> **(d) 排程**：本格改**串行在 AC#14 之后**（共用文件，账在 AC#14 格 `>` 第③条），不再与它"同批"。
+
 
 - [2026-09-23 22:3x +08] agent=orchestrator did=**AC#1 翻勾**（`[ ]`→`[x]`）＋ 落笔 AC#9/AC#10 ＋ **更正我自己上一条登记里的一处错**。
   **AC#1 终裁依据**＝验收方 `acceptor-ticket136-r1`（锚 `e8190bf`，四枚 commit `5b28331`/`fa65384`/`5125899`/`ae6a01e`，
@@ -440,3 +489,4 @@
   next＝①**AC#15 不单独起**，与 AC#10／AC#14 同批（那两格要 `cmd/wisp`，AC#14 的解冻范围要现量重划）；
   ②`cmd/wisp` 现在空不缺人但**先派 137 AC#4**（不占 `cmd/wisp`、且已写明两格不许并做）；
   ③AC#2..AC#7 六格是 09-20 那批的旧账，排在 137 AC#4 与 136 AC#10/#14/#15 之后。
+- [2026-09-24T10:41Z] agent=orchestrator did=**只读预检程交回后的四格裁定入库**（`auditor-ticket136-preflight`，表 `docs/evidence/s1/136-ac10-ac14-preflight-r1.md`，306 行／锚 `7cf8075`；**它不翻勾、不裁成立**，只答"这两格能不能派、按什么顺序派"）。**它推翻我简报里四处前提，逐条我在盘上复量一致才落**：P1 我把 **AC#15 的 `:278` 地界句**（"只许动 `internal/observe/**_test.go`"）当成 AC#14 的——现量 AC#14 是 `:232-252`、通篇没那句；P2 "会不会开六态窗口"＝**不开任何窗**（`proc.Boot` 在 `boot_windows.go:57-113` 只做 env 自检/`DefaultLayout`/`OpenJobScope`/`AcquireSingleInstance`，`internal/proc` 全包的 `webview/panel/ball/CreateWindow` 只出现在注释与可为 nil 的钩子字段名上），**但会真取样＋另起两枚子 `wisp.exe`＋每发前 2 秒静置**（`slo_windows.go:374`/`:451`/`:201`）⇒ 编队空那条照旧成立、问法要换；P4 `Settle`/`checkSettle` **两个符号盘上不存在**（实名 `CheckSettle` `sampler.go:462`、`runSettle` `slo_windows.go:599`），票面 `:278` 同错、原句不抹另起 `>` 更正；P5 **"等 133"那半句已被超越**（`cmd/wisp/leg_dispatch_gate_133_test.go` 最后改动是 `fa35557` 09:56，标题属**票 135**）⇒ `cmd/wisp` 现在没有写者。另两处它没提我自己核到：`SPEC-02 §3` 那句引用射程不对（它讲 SQLite DDL，不管 SLO 出线）；"全仓没有 `_test.go` 引用 `slo-check.ps1`"实为 **1 枚命中**（`internal/observe/sampler_test.go:15` 是**注释行**，不影响结论，但按"计数要现跑"记在它名下）。**四格裁定**：①**AC#10 判据② 结构上永远产不出它想量的读数**（方向写反：`sampler.go:332-340` 是"造红门行"，拆掉它 = 让它过 ⇒ 退出码只会 1→0；`samples:[]` 与拆守卫互斥（`FM2` 原文 `samples=0 pass=true`）；且 `134-...:643-645` 已逐字记"这条路在当前码里不通"）⇒ 换成"对 `slo_windows.go:386`／`:323-325` 各落一发变异、读 `go test ./cmd/wisp/` 响不响"，今天 `grep -rn "run\.Pass" cmd/wisp/*_test.go` **0 命中**＝不响、装了才响；同时把"零样表面在 CLI 不可达"**登记为结论＋可复算触发条件**（谁给 `cmdSLO` 加了 reader 注入面谁复活它），不留一枚永不响的 AC；②AC#10 判据① 命令**缺 `-state`**（`:223-225` 现量 return 2）⇒ 换成 `134-...:538` 那发原文，且参照值 `mem_median=4476928` **作废**（行自 09-21 15:06 那枚 `build/wisp.exe`，早于 `5c1529a`）；③**AC#14 给出具名解冻**：`internal/observe/sampler.go:431-456` ＋ `:462-521`，边界＝`StateReport` 那侧（`:189-190`/`:331`/`:341-346`）冻结、`buildVerdicts` 不许改成两用；④**门行做成 `Gate: true` 我先不批"直接做"**——它会把 `wisp slo -settle` 的 exit 0→1，经 `slo-check.ps1:381`→`:396` 打到 `slo-smoke`＋`slo-full`（后者是这台 6C12T 本机），所以**实现程第一发必须先量** ≥5 次 `wisp slo -settle` 的 `sample_errors`：全 0 才按 Gate 落地，任一发非 0 **停手报回**（一台有争用的机器被做成"固定红且红因与 SLO 无关"＝我吃过两天的信号量之病，那一步要人拍板），且 Gate 那枚红句必须把 `sample_errors` 点名印出。**排程反过来**：AC#14 先（不占机、纸已给全）、AC#10 后（要编队安静窗口＋取数期间不推送）；`:252` 那半句"本格读它的出线"按 `grep -rn Verdicts cmd/wisp/*.go`（只命中 `providers_test.go` 的 `probeVerdicts`，同名不同物）**作废**，另起 `>` 不悄改。**新增一枚文件级串行**：AC#14 与 AC#15 共用 `sampler_settle_coverage_136_test.go`，而 AC#14 判据② 要推翻的正是那里 `:208-210` 的 `if !rep.Pass { t.Fatalf("disclosure leg, not a verdict leg…") }` ⇒ **派单预先授权它改那一处断言并点名理由**，否则会被下一位判成放水；AC#15 串行在 AC#14 之后。本票勾数不变（**5 勾／10 未勾**，预检不产勾），`next=` 改成：①派 **AC#14 实现程**（解冻已给完、不占机）；②AC#10 等编队安静窗口；③AC#15 排 AC#14 之后；④AC#2..AC#7 六格旧账仍排最后
