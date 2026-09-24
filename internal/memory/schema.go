@@ -26,7 +26,7 @@ CREATE TABLE schema_meta (
 );
 -- 内置行：('schema_version', '1')
 
--- L1 用户画像（D20）：slot 有限枚举，≤20 行由应用层强制
+-- L1 用户画像（D20）：slot 有限枚举，<=20 行由应用层强制
 CREATE TABLE profile (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
   slot       TEXT NOT NULL UNIQUE,      -- 'pref.language'|'pref.tone'|'habit.work_hours'|'fact.family'|…
@@ -115,7 +115,7 @@ CREATE TABLE plugin_state (
   capabilities_json  TEXT NOT NULL,
   net_allowlist_json TEXT,
   installed_at       INTEGER NOT NULL,
-  hash               TEXT NOT NULL,      -- manifest 哈希，加载时不符 → 拒绝加载并告警
+  hash               TEXT NOT NULL,      -- manifest 哈希，加载时不符 -> 拒绝加载并告警
   exe_hash           TEXT                -- 【SPEC】D46 command 插件的目标 exe sha256（安装时钉死）
 );`
 
