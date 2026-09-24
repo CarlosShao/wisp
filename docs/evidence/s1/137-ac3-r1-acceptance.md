@@ -544,11 +544,16 @@ $ git show --name-only --format="%h|%ad" 4f61430   ← 把 commit #1 再独立�
 
 docs/evidence/s1/137-ac3-r1-acceptance.md
 ```
-两枚 commit 之后 `git status --porcelain` 只剩 `?? docs/evidence/s1/137-ac3-r2-acceptance.md`
+上面这两枚（#1／#2）落地之后我核过一次 `git status --porcelain`，只剩 `?? docs/evidence/s1/137-ac3-r2-acceptance.md`
 ＝§0.1 那枚兄弟程的未跟踪件，**本程一枚 add／commit／改／删都没碰过它**。
 
-**commit #3（追加本块这一枚）自己的两条命令不在本文里**（写进去就成了循环）；
-读者一条命令可核：`git show --name-only HEAD` ⇒ 期望只出现 `docs/evidence/s1/137-ac3-r1-acceptance.md` 一枚路径。
+**后面的几枚（同一枚文件、同样逐枚核过 `--name-only`）**：
+`#3 = 6155a86`（13:47:26，补的就是上面那两块）、
+`#4 = 4c9ea23`（13:48:09，只往总判节首加了"本节落点 ＋ 为什么 §9 排在总判之后"那一行指针，**判定一字未动**）、
+`#5 = 本枚`（把"两枚 commit 之后"这句改成带时刻的准确说法 ＋ 写下这段枚数账）。
+**最后一枚自己的两条命令不在本文里**（写进去就成了循环）；
+读者一条命令可核全链：`git log --oneline -- docs/evidence/s1/137-ac3-r1-acceptance.md`
+＋ `git show --name-only HEAD` ⇒ 期望每枚都只出现 `docs/evidence/s1/137-ac3-r1-acceptance.md` 一枚路径。
 本件正文里除本节这几块之外，**没有任何一处**出现"已提交"这句话。
 
 
