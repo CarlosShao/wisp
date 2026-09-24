@@ -221,6 +221,55 @@ rc=1  PASS=22  FAIL=2  SKIP=0  === RUN=64
 
 ### 本格判：**成立**（附一句要改的证据文案，见上）
 
-## 4. 〔占位〕裁决格 3：正反两向有没有钉住"保留缺口"
+## 4. 裁决格 3：正反两向有没有钉住"保留缺口"（`TestBan8MathBandAndRemainingGaps`，两支都真跑）
+
+钉的是同一枚 `emojiRe`，反方向只改了**一行**（字符类），其余一律原样。
+
+### (a) 摘掉 `\x{2200}-\x{22FF}` 那一段（`141-acc-mut-noband`）⇒ **红**
+
+```
+rc=1  PASS=21  FAIL=3  SKIP=0  === RUN=64
+--- FAIL: TestBan8MathBandAndRemainingGaps
+      ↳ subtest: U+2265 greater-or-equal / U+2264 less-or-equal / U+2229 intersection / U+2212 minus sign  (4 枚)
+--- FAIL: TestBan8CommentExemptionInGoSources      ↳ raw_string_that_reads_as_a_SQL_comment
+--- FAIL: TestBan8CommentExemptionInTextScopes     ↳ JSX_text_node_with_a_math_glyph
+```
+同一次运行里 `TestScannerSelfScanOfRealRepoIsGreen` 与 `TestRealRepoLedgerIsHonest` **变成 PASS**
+（6 枚 `frontend/` finding 归 0）⇒ 这既是"正控有效"的证明，也是 §1 那句"6 行是本批新增红"的反向证明。
+**AC#3 的反证成立**：那 4 枚种子是被**新段**抓到的，不是被邻段顺手抓的。
+
+### (b) 把箭头段 `2190–21FF` 也加进去（`141-acc-mut-witharrow`）⇒ **应该红，实测红**
+
+```
+rc=1  PASS=21  FAIL=3  SKIP=0
+--- FAIL: TestBan8MathBandAndRemainingGaps
+      ↳ subtest: U+2192 right arrow, gap kept / U+21D2 rightdouble arrow, gap kept
+--- FAIL: TestScannerSelfScanOfRealRepoIsGreen
+--- FAIL: TestRealRepoLedgerIsHonest
+```
+"补箭头的代价"现量（同一份 witharrow 真扫，锚点树新增）：**`internal/` 新增 16 行红**
+＝ `internal/tools/fs_write.go`×4（票面 §61 点名的"外露到步骤账本与 `Result.Text`"那一族）＋
+`fs_staging_windows_test.go`×8 ＋ `ticket97_alias_direction_test.go`×2 ＋
+`bridge_a18_kill_windows_test.go`×1 ＋ `fs_write_test.go`×1。⇒ 保留缺口**不是空口说的**，
+它一边被 `wantFired:false` 钉着、一边有可数的代价。
+
+### (c) 追加一支（简报没点名，但"两支都要真跑"只做箭头段会漏掉带圈/制表符那一族）
+
+把整段 PLAN 字面射程 `2190–2BFF` 都加进去（`141-acc-mut-wide`）：
+`TestBan8MathBandAndRemainingGaps` 的 **4 枚负向行全红**
+（U+2192、U+21D2、**U+2500 box drawing**、**U+2460 circled one**），正向 7 行仍绿；
+同一把尺真扫锚点树＝ **40 finding**（对 `470e6c5` 宽射程＋豁免是 44，差 4 枚正是本批清掉的
+`schema.go:29`、`schema.go:118`、`rules_scale.go:24`、`assessor_test.go:154`）。
+⇒ 保留缺口的**三族**（箭头／制表符／带圈数字）都在钉子覆盖内，实测一致。
+
+### 本格判：**成立**
+
+正反两向都真跑、都按预期一侧红一侧绿，且我额外把"带圈数字／制表符"两族也真跑了一遍。
+**附带一枚小缺陷（只记不修）**：`scan_test.go:348` 的注释写着"U+2460/**U+2461** (circled numbers)
+are still unscanned"，但表里只有 U+2460 一行——注释多报了一枚**没有用例**的码点。
+与格 6 同族（话比仪器宽），方向相反（这里是"承诺的缺口"被多列了一枚，不是"覆盖面"被多报）。
+
+## 5. 〔占位〕裁决格 4：断言有没有被放宽、helper 是不是原有的
+
 
 
