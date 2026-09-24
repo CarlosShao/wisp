@@ -356,7 +356,8 @@ ancestor_separator_108_other_test.go:79: RemoveUnlinked("/r137link/…/root/link
 | `3f838bc` | 证据 §1.5 自加的 MUT-E 探针（fail-closed 证明） |
 | 本枚之上 | `a84ce60` §4-§6 ｜ `754a2ec` §5 附记（共树偏离）｜ `c17a21b` 票面 Progress log 那一行 ｜ 再上面就是**把此表补到终局数的这一枚**（它自己的 sha 写完才有，不预引） |
 
-只 commit、未 push；每枚都带显式 pathspec，`git diff --cached --name-only` 每枚只有我自己的路径（未出现 `internal/observe/**`／`cmd/wisp/**`）；
+只 commit、未 push；每枚都带显式 pathspec。**除下面那一枚已登记的偏离之外**，`git diff --cached --name-only` 每枚只有我自己的路径
+（`internal/observe/**` 与 `cmd/wisp/**` 两块在飞地界始终没进过我的暂存清单，也始终没进过我的任何一枚提交）；
 共树未用 `--amend`／`reset`／`rebase`／`stash`／`checkout .`，未建仓内 worktree。
 
 ⚠ **共树撞车一次，已核无害但记下来**（§4-§6 那一枚）：我 `git add` 之后、`git commit` 之前的暂存清单里出现了**两枚别人的路径**
@@ -403,4 +404,6 @@ ancestor_separator_108_other_test.go:79: RemoveUnlinked("/r137link/…/root/link
 - 另记 **R 账 2 条**（编排者派单里的断言，本程实测所得；**不进注入数**）：见 §3.4 的参照值标签错位、§3.3 的"整树只报一枚"口径补充。
   派单点的两处位置我复核**成立**、不记账：`assertRefused113` 在 `placement_symlink_113_other_test.go:127`（锚点上确是 127；
   我改完后的新行号是 `:174`），108 那两枚内联断言确在 `:80-84` 与 `:138-142`（锚点版）。
+- 终局补记（同一件、**不回头改上面已提交的数**）：第 2 条那枚 `MEMORY.md 已被修改` 的回显在我写完 §6 之后又出现了一次
+  （编排者在写记忆），形状与出处同样可盘上核（`ls -l` 那枚路径）；我按"各自计数"只报自己的出现次数下界，不把它并进任何一条读数里。
 
