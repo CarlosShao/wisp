@@ -248,3 +248,93 @@ c03: dataroot_symlink_119_other_test.go:364: AC#2 RED: the refusal of the declar
 
 判据① **成立（独立复现）**。两味药一起下、都落在**该落的两枚母项**上、方向都不放宽，
 且**两味各被一发单点回退证明承重**；判据里点名的"别复活 137 的 `r2`"由 `c01`-`c05` 五发正面排除。
+
+### 1.6 本节落盘的 commit（原样输出）
+
+```
+$ git log --oneline -1
+62088ce evidence(119 AC#7 r1 §1): 判据①成立且两味都承重——落点 :225/:337 与 :243/:363 …
+$ git show --name-only --format="%H" HEAD | tail -2
+62088ce…
+docs/evidence/s1/119-ac7-r1-acceptance.md
+```
+
+⚠ 归属只认现量，不认本节这句话：`git log -L '/^## §1/,/^## §2/:docs/evidence/s1/119-ac7-r1-acceptance.md' --oneline`。
+这一行 commit 记录本身是**随 §2 那枚 commit 入库**的（渐进写的必然错位，写清就不含糊）。
+
+---
+
+## §2 判据②「改前零区分力那一发要复现」——**成立（我自己复现的，不是引票面那句话）**
+
+台件＝`git archive a9c8b6e`（改前那棵纯净树，快照里那枚 `_test.go` md5 = `cec75e819aef89584cde7796878ef78a`
+＝ `git cat-file -p a9c8b6e:<file> | md5sum`）＋**我自己那一发 MUT-D**（不是复用它的脚本）。
+`CREDIT_BRANCHES=0`、`RESOLVED_BASES=0`、`SENTINEL_BRANCHES=3` 每发容器里现量（`head.txt`）＝
+**改前那两枚只有哨兵判据、没有记名判据**。
+
+### 2.1 我的 MUT-D 与它的 MUT-D 是同一形，两处落点（先证落地，才读颜色）
+
+```
+$ grep -n "MUTATION-WACC119-D" snaps/base-mutd/internal/winsec/winsec_other.go snaps/base-mutd/internal/winsec/winsec.go
+winsec_other.go:156:	sealPrefixes := pathPieces(path) // MUTATION-WACC119-D: walk cut short, first 3 prefixes only
+winsec_other.go:157:	if len(sealPrefixes) > 3 { // MUTATION-WACC119-D
+winsec_other.go:158:		sealPrefixes = sealPrefixes[:3] // MUTATION-WACC119-D
+winsec_other.go:159:	} // MUTATION-WACC119-D
+winsec_other.go:160:	for _, prefix := range sealPrefixes { // MUTATION-WACC119-D
+winsec.go:284:	if len(prefixes) > 3 { // MUTATION-WACC119-D: same cut on the unlink route
+winsec.go:285:		prefixes = prefixes[:3] // MUTATION-WACC119-D
+winsec.go:286:	} // MUTATION-WACC119-D
+```
+
+第二证＝同一发容器里 `go build ./internal/winsec/ ./internal/proc/` ⇒ `BUILD_RC=0` 且
+`go vet ./internal/winsec/` ⇒ `VET_RC=0`（`gates.txt`，非 0 就 `GATE95` 停住不取颜色）；
+第三证＝每发 `head.txt` 里的 `MUT_other=5 / MUT_winsec=3` 树身份门
+（未变异树恒为 `0/0`；`WINSEC_PROD_MD5_other` 从 `b5056918…` 变到 `2665ec1e…` ＝ 生产码真的被改过，
+不是"我以为改了"）。⚠ 与我前两枚饵不同的一枚：我的截短**带长度守卫**（`if len > 3`），
+它的 `sealPrefixes[:3]` 没守卫；被测拼写永远 ≥3 段 ⇒ 两版在这一格等价，我用守卫版是为了不让饵自己 panic。
+
+### 2.2 改前四发（同一把尺、同两种形状）
+
+| 发 | 形 | 生产码 | RUN | 顶 P/F/S | 子 P/F/S | panic | 包级 rc |
+|---|---|---|---|---|---|---|---|
+| `b01-base-plain` | 普通 | 未变异 | 52 | 30/0/0 | 22/0/0 | 0 | 0 |
+| `b02-base-link` | 软链 | 未变异 | 45 | 27/0/3 | 15/0/0 | 0 | 0 |
+| `b03-base-mutd-plain` | 普通 | MUT-D | 52 | 17/13/0 | 17/5/0 | 0 | 1 |
+| `b04-base-mutd-link` | **软链** | MUT-D | 45 | 17/**10**/3 | 11/4/0 | 0 | 1 |
+
+**那一发本身**（票面钉的形状：软链形里两枚母项零区分力）：
+
+```
+$ grep -E "TestAC1POSIXUnresolved|TestAC2POSIXInjected" b04-base-mutd-link/b04-base-mutd-link.roster-run.txt
+RUN TestAC1POSIXUnresolvedSymlinkedRootStillRefused119
+RUN TestAC2POSIXInjectedTestDataDirStandsAsDeclared119
+$ grep -E "TestAC1POSIXUnresolved|TestAC2POSIXInjected" b04-base-mutd-link/b04-base-mutd-link.roster-colour.txt
+PASS TestAC1POSIXUnresolvedSymlinkedRootStillRefused119
+PASS TestAC2POSIXInjectedTestDataDirStandsAsDeclared119
+```
+
+⇒ 两枚**都在 `=== RUN` 名册里**（跑了）、颜色**都是 PASS**（打不红）＝**零区分力复现**，
+不是我 SKIP 掉、也不是它们没上场。同形未变异的 `b02` 里它们也是 PASS（这一对的期望本来就恒绿，
+这正是"没有区分力"的意思）。
+
+**同一发里它们自己把拒因打印成宿主的链接**（脚本 `scripts/credit.py` 机器判，不靠肉眼）：
+
+```
+## b04-base-mutd-link
+   AC#1 credited=/acwlink, which is not the tree this call names  ambient_host_link=True  names_own_planted_link=False
+   AC#2 credited=/acwlink, which is not the tree this call names  ambient_host_link=True  names_own_planted_link=False
+```
+
+⇒ 走查在**第一枚组件**（宿主那枚 `/acwlink`）就停了，用例自己种的 `varlink119`／`injlink119`
+**从没被看过**。这一枚是"为什么只加记名断言不算修好"的正面读数。
+
+### 2.3 与实现方 §3 的对点（**只当对表，不当凭据**）
+
+它的 `a1`-`a4`＝`52/30/0/0＋22/0/0`、`45/27/0/3＋15/0/0`、`52/17/13/0＋17/5/0`、`45/17/10/3＋11/4/0`，
+我的 `b01`-`b04` **八格四数逐字相同**，包级 rc 也相同（0/0/1/1）。
+它是 `/ac7link`、我是 `/acwlink`，它是 `w119ac7tmp`、我是 `wacc119tmp` ⇒ 不是抄它的日志。
+
+### 2.4 判语
+
+判据② **成立（独立复现）**。改前那一发我在自己的容器、自己的快照、自己的饵上量到了；
+四数、名册、拒因指向三样都对上，且**没有任何一枚被改成 SKIP**（`b02`/`b04` 的 SKIP 名册与 `b06`/`b08`
+逐字节同一枚 md5 `194a396dc3380b91d23145d5d42ca2ff`，三枚都是票 125 的自拒探针）。
