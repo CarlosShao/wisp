@@ -219,9 +219,9 @@ func TestSettleCoverageRowSaysNotPassWhenHalfTheReadsFailed(t *testing.T) {
 	}
 	// The verdict consequence, stated as an invariant rather than a hard-coded
 	// gate flag: a report may only pass while every gate row of its own passes.
-	// With the row recorded (gate=false at HEAD) this window still passes; the
-	// moment settleCoverageRowGates flips, the same line reads the other way,
-	// and no leg here has to change to keep proving it.
+	// settleCoverageRowGates is true at HEAD and this row does not pass, so the
+	// invariant is live here: rep.Pass has to be false. Recorded rather than
+	// gated, the fold has nothing to veto; no leg here had to change for it.
 	if row.Gate && rep.Pass {
 		t.Fatalf("a failing gate row and pass=true at once: the fold at foldSettlePass is not being applied, row=%+v report=%+v", row, rep)
 	}

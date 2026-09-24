@@ -547,12 +547,12 @@ const settleCoverageMetric = "sampling"
 // true turns the coverage row into a gate, which reaches SettleReport.Pass and
 // from there `wisp slo -settle`'s exit code and the slo-smoke/slo-full CI
 // colour (scripts/slo-check.ps1:381 -> :396); false keeps it a recorded row
-// that still states its own not-pass. It is false at HEAD because the
-// measurement that decision asked for came back clean (six settle runs,
-// sample_errors 0 on every one, docs/evidence/s1/136-ac14-impl.md section 1.2)
-// while the ticket pre-authorised one of the THREE existing assertions that a
-// gate here overturns (section 1.3). Flipping it is an orchestrator move, not
-// an implementer move; nothing else about the shape has to change.
+// that still states its own not-pass. It is true at HEAD: AC#14b - an
+// orchestrator move, not an implementer move - landed the flip, so a
+// dropped-read window has its pass bit vetoed by its own row; nothing else
+// about the shape changed. Nine clean settle runs backed it (sample_errors 0,
+// exit 0, row gate=true): docs/evidence/s1/136-ac14b-impl.md section 4 (six)
+// and docs/evidence/s1/136-ac14b-r2-acceptance.md section 5 (three).
 const settleCoverageRowGates = true
 
 // buildSettleVerdicts evaluates SettleReport's own rows. It is deliberately a

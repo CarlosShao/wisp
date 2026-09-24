@@ -22,9 +22,9 @@ import (
 // dropped_reads were all ABSENT on the wire) while the neighbouring
 // StateReport had carried the first two since ticket 66 (sampler.go:164-168).
 //
-// What these legs nail is the disclosure, not the verdict: a partially covered
-// window still passes today (changing that verdict is not this cell's job), but
-// it can no longer pass silently. The counting branches in CheckSettle
+// What these legs nail is the disclosure, and AC#14 turned that disclosure
+// into a gate: settleCoverageRowGates is true at HEAD (AC#14b landed it), so
+// a partially covered window is vetoed. The counting branches in CheckSettle
 // (sampler.go:488-500) are what these legs stand on; removing either counter
 // turns its own leg red (evidence §2.4, mutations MD/ME/MF).
 //
@@ -234,10 +234,10 @@ func TestCheckSettleHalfTheReadsFailedReportsItsLoss(t *testing.T) {
 	// "disclosure leg, not a verdict leg: this window still passes", i.e. it
 	// required a half-covered window to say nothing about itself. From AC#14
 	// on, the report's own sampling row is what has to speak: it fails, and it
-	// names sample_errors while failing. The pass bit stays this window's
-	// verdict for as long as the row is recorded rather than gated (ticket 136
-	// issue :281-285 pins which reading decides that, and
-	// docs/evidence/s1/136-ac14-impl.md section 1.3 owns the current state);
+	// names sample_errors while failing, and the row IS gated at HEAD, so it
+	// is exactly what vetoes this window's pass bit. Nine clean settle runs
+	// cleared that flip: docs/evidence/s1/136-ac14b-impl.md section 4 (six)
+	// and docs/evidence/s1/136-ac14b-r2-acceptance.md section 5 (three);
 	// what may no longer happen is a report that carries the loss without
 	// stating it as a verdict, and what may never happen is pass=true
 	// alongside a failing GATE row.
