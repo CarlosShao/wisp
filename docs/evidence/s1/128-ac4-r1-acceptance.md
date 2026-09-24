@@ -322,7 +322,42 @@ docs/evidence/s1/128-ac4-r1-acceptance.md
 
 ### 5.1 §5 那枚 commit 的回显
 
-（本节落盘时那一枚 commit 尚未发生，回显由下一节的 commit 带进来 —— 文件头有这条规矩。）
+```
+96953695e24b40c97c38d9bd0e5cbbcfff66fc6c evidence(128 AC#4 r1 §5-§6): 单点回退＋副产物两判。…（全文见 git log）
+
+docs/evidence/s1/128-ac4-r1-acceptance.md
+```
+
+⇒ **只列这一枚路径**（那枚 commit 前 `git diff --cached --name-only` 里出现过兄弟程 staged 的
+`docs/evidence/s1/140-static-inventory-r1.md`，我按带 pathspec 的 `git commit -- <我的路径>` 提交，
+事后双量：我这枚 `--name-only` 只有本文件；兄弟程随后那枚 `29d8938` 的 `--name-only` 只有它自己的文件。
+**两边的归属都没被卷走**，登记在这里是因为这条尺在共享树里只有事后核才算数。）
+
+---
+
+## 7. 其余三套门禁与四把尺（AC#4 那一格逐项，全部我自己真跑）
+
+| 门禁 | 我在哪棵树上跑的 | 命令原文 | rc | 读数 |
+|---|---|---|---|---|
+| `gofmt` | `snap-post`（`c2fa2e9` 纯净快照） | `gofmt -l cmd/wisp/` | **0** | **空输出**（0 枚文件被点名） |
+| `gofumpt` | 同上 | `"$(go env GOPATH)/bin/gofumpt.exe" --version` -> **`v0.12.0 (go1.27.1)`**；`… -l cmd/wisp/` | **0** | **空输出**。⇒ **盘上现量就是 v0.12.0**，票面/派单写的 v0.7.0 是过期值；它 §2 那处更正我复到了 |
+| `go vet`（本机 GOOS=windows） | 同上 | `go vet ./cmd/wisp/` | **0** | 空输出（0 字节，`wc -c` 现量） |
+| `go vet`（GOOS=linux，**只编译不执行**） | `snap-post` 与 `snap-pre` 各一发 | `GOOS=linux go vet ./cmd/wisp/` | 1 / 1 | 两版**逐字相同**：`build constraints exclude all Go files in …sherpa-onnx-go-linux@v1.13.8`（`diff` rc=0）=> **既有宿主交叉形状，不是本枚造的**；本表**不拿它当代跑** |
+| `sh scripts/d22scan.sh`（纯净快照） | `snap-post`（`git archive` 出来的，工作树里 owner 那 16 枚 `design/**` 未提交删除进不了它） | `sh scripts/d22scan.sh` | **0** | `clean - no D22 ban violations`；**正控制真跑了**：`runtests.sh: OK - packages=[./...] top-level: PASS=21 FAIL=0 SKIP=0, === RUN=31, '[no tests to run]'=0` |
+| 台账各 scope 不降 | 同上（d22scan 自打的 examined 数） | `grep -oE "examined +[0-9]+ …"` | — | `bans #1-5 internal/=203`、`bans #1-5 cmd/=22`、`ban #6 frontend/=40`、`ban #7 internal/tools/=18`、`ban #8 design/=16`、`ban #8 frontend/=40`、`ban #8 internal/=404`、`ban #8 cmd/=39` —— **与它 §5 那张表八枚数逐字同**，且都 >= 台账 `:4192` 记的口径（404 vs 397、39 vs 38） |
+
+**票 123 那批不许被放宽（四条尺，我各量一遍）**：
+
+| 尺 | 读数 |
+|---|---|
+| 本程 diff 是否含 `run_test.go` / `run_mode101_test.go` / `internal/agent/approval/**` | **共享树里 `HEAD` 是动的**，所以两端钉死再数：`git diff --name-only c94927d..c23d825`（它 §6 那把尺用的就是这条区间，末端取它的交件枚）现量 **8 枚路径**（3 枚 `.scratch/wisp/issues/*` + 3 枚 `docs/evidence/s1/*` + `cmd/wisp/dataroot_128_test.go` + 2 枚 `docs/reports/*`，其中 119/HANDOVER/台账是兄弟程在这段区间里落的），对它点名的三类名字 `grep -Ec` = **0**；被验那一枚单独再数：`git show --name-only --format="" c2fa2e9` = **只有 `cmd/wisp/dataroot_128_test.go`**。（它 §6 写"现量 6 枚"，那是在它自己那一刻的 HEAD 上数的，量级差是兄弟程的 commit 挤进同一段区间，**不是它漏了东西**。） |
+| `internal/agent/approval/queue.go` 那个 300 秒 | 现量 `107: DefaultApprovalTimeout = 300 * time.Second`（**一字节未动**，且该文件不在上面那 10 枚里） |
+| 那四枚用例在修后两形里的颜色 | G1（CI 形）与 G2（本机形）里各 **PASS=2 / FAIL=0**（count=2 => 各两遍）⇒ 它们没被改成 Skip、没被放宽（`t.Skip` 在 `dataroot_128_test.go` / `_windows_test.go` 现量 **0 / 0**） |
+| 它们的 runner 红与本枚变量共不共因 | **在这台机上不共因**：`WISP_ENV=test` 整包跑（G1）那四枚全绿；CI 原文里它们的红句是 `run_test.go:378: an unvetoed L1 window means EXECUTE, got: 审批超时（300 秒未确认）…` 与 `run_mode101_test.go:309`（配置里写着 `confirm_timeout_sec = 1` 却被默认值取代）=> 红因是**那四枚自己读不到自己写的 config**，与本票那枚 seam 无关。**但**：CI 那四条红的真实根因**不在本格判据里**，我只登记现象 + 一句要往下追的话（见 §9） |
+
+**owner 真实数据目录**（本格要求"两次数都记"）：开工时与全部读数跑完后各一次，
+`ls -A %APPDATA%\wisp` 与 `%APPDATA%\wisp-dev` 均 **0 条目**（两枚目录都存在、都空）=> 本程未写入。
+（本程新建的落点只有 `D:\tmp\wt-acc128-ac4-r1*` 那些仓外快照/日志与 `Temp\wisp-test-<pid>`，都在仓外。）
 
 ---
 
