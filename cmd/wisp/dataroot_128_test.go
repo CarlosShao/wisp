@@ -34,10 +34,10 @@ package main
 //
 // AC#3 MUTATION ANCHOR: restore `base = "."` in resolveDataDir (cmd/wisp/doctor.go,
 // the branch under `base, err := userConfigDir()`) and these named cases go red:
-// TestAC2ResolveDataDirRefusesInsteadOfFallingBackToCWD128 (no error returned),
-// TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128 (every leg), and
-// TestAC2RefusalMarkersAreNotAShortenableList128 (the marker floor). The mutation
-// readings are in docs/evidence/s1/128-ac2-refusal-and-ac3-mutation.md.
+// TestAC2ResolveDataDirRefusesInsteadOfFallingBackToCWD128 (no error returned) and
+// TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128 (every leg). Shortening the
+// marker floor is a separate mutation and reddens only ShortenableList; every reading
+// is in docs/evidence/s1/128-ac2-refusal-and-ac3-mutation.md.
 
 import (
 	"bytes"
