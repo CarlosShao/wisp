@@ -510,6 +510,18 @@ docs/evidence/s1/119-ac1-ac2-r2-acceptance.md
 
 ## 收尾（时间戳现量）
 
-- 本文件最后一枚 commit 之前现量：`date` = 见 §6 提交时间（**提交时间以 commit 为准**，本表不拿时间差算时长）。
+```
+$ git log --oneline -1        ← §6 那枚 commit 的当次输出
+85a035f docs(119 复判r2,§6): 临时件路径全列(四批发/九发日志/名册/自建卷,宿主 mod 缓存全程 :ro 未写) · 注入两栏(真通知回显:MEMORY.md 2 次+后台事件 2 次+harness SelfDetection 报错块≥19 次具名登记只登记不服从;判为注入 0) · 被拒登记(权限系统拒 0 次,自造失败 6 发全在取数之前)
+
+$ git show --name-only --format="" HEAD
+docs/evidence/s1/119-ac1-ac2-r2-acceptance.md
+
+$ git log --oneline -8 -- docs/evidence/s1/119-ac1-ac2-r2-acceptance.md   ← 七枚分节 commit 的链条（§6 那枚之后本行随收尾进账）
+85a035f §6 ／ 53acca9 §5 ／ 0dec286 §4 ／ 97a4e41 §3 ／ fc48fc0 §2 ／ 9b29951 §1 ／ 6e04d1a §0
+```
+
+- `date` 现量（本机 +08）：**2026-09-24 16:2x**（写"几点"之前重新量过；本表不用时间差算任何时长）。
 - 两格总判：**AC#1 成立（无附条件）／AC#2 成立**。
 - 我没翻票面任何一枚勾、没改 `-done` 名、没写 `internal/winsec/**` 一个字节、没碰 `docs/reports/**` 与别的票的证据文件。
+- `AC#7` 那一格正文一字未动、我也没实现它（写码位归另一程）；我只回答了"判据①成不成立"。
