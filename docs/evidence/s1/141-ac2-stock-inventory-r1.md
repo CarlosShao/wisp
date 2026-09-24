@@ -428,3 +428,86 @@ docs/evidence/s1/141-ac2-stock-inventory-r1.md
 | 76 | `internal/winsec/winsec.go:74` | ② U+2461 | 1 | 注释 | **是** |`// it is left alone. Ticket 79's A51② found that on Windows os.Remove cannot` |
 | 77 | `internal/winsec/winsec_windows.go:186` | ② U+2461 | 1 | 注释 | **是** |`// which is the case that has to be loud (ticket 104's judgment ②).` |
 | 78 | `internal/winsec/winsec_windows.go:639` | ② U+2461 | 1 | 注释 | **是** |`// non-empty directory (A51②): RemoveDirectoryW resolves the reparse point and` |
+
+### 5.2 非注释行 38 枚（`s-dq` 36 ＋ `s-raw` 2；标识符位实测 0 枚）
+
+**两档归属见 §1**：本表列的是**同一批 38 行**的逐枚明细，`位置类别`＝Go 词法状态，不是"会不会显示"。
+
+| # | `file:line` | 命中字形与码点 | 处 | 位置类别 | 在禁改清单 | 所在行原文 |
+|---:|---|---|---:|---|---|---|
+| 1 | `internal/agent/approval/ticket97_alias_direction_test.go:119` | ⇒ U+21D2 | 1 | 非注释·双引号串 | 否 |`t.Fatalf("精确键的 Allow 失败: %v（前题破：卡片不可批准 ⇒ 本用例零信息）", err)` |
+| 2 | `internal/agent/approval/ticket97_alias_direction_test.go:132` | ⇒ U+21D2 | 1 | 非注释·双引号串 | 否 |`t.Fatalf("Veto by the alias: %v（拒绝侧读不到这张表 ⇒ 下面的方向断言无从谈起）", err)` |
+| 3 | `internal/ball/tokens_test.go:203` | ① U+2460 | 1 | 非注释·双引号串 | 否 |`t.Errorf("① stateSize(%d, Sleeping) = %v, want t[截断·后]` |
+| 4 | `internal/ball/tokens_test.go:206` | ① U+2460 | 1 | 非注释·双引号串 | 否 |`t.Errorf("① VisualFor(%d, Sleeping) = %vpx @ %v, want %vpx @ %v",` |
+| 5 | `internal/ball/tokens_test.go:216` | ② U+2461 | 1 | 非注释·双引号串 | 否 |`t.Errorf("② stateSize(56, Sleeping) = %v, want %v", got, rest56)` |
+| 6 | `internal/ball/tokens_test.go:220` | ② U+2461 | 1 | 非注释·双引号串 | 否 |`t.Errorf("② stateSize(%d, Sleeping) = %v, want t[截断·后]` |
+| 7 | `internal/ball/tokens_test.go:224` | ② U+2461 | 1 | 非注释·双引号串 | 否 |`t.Errorf("② the floor must stop binding above 48px, got %v", got)` |
+| 8 | `internal/ball/tokens_test.go:228` | ② U+2461 | 1 | 非注释·双引号串 | 否 |`t.Errorf("② VisualFor(56, Sleeping) = %+v, want %v[截断·后]` |
+| 9 | `internal/ball/tokens_test.go:234` | ③ U+2462 | 1 | 非注释·双引号串 | 否 |`t.Errorf("③ the dock must not move stateSize, got %v", got)` |
+| 10 | `internal/ball/tokens_test.go:237` | ③ U+2462 | 1 | 非注释·双引号串 | 否 |`t.Errorf("③ DockSquash endpoints = %v/%v, want 1 a[截断·后]` |
+| 11 | `internal/ball/tokens_test.go:247` | ③ U+2462 | 1 | 非注释·双引号串 | 否 |`t.Errorf("③ a landed tab keeps %d px on screen, wa[截断·后]` |
+| 12 | `internal/ball/tokens_test.go:278` | ② U+2461 | 1 | 非注释·双引号串 | 否 |`t.Errorf("column ② predicts %.0f imaged px, want within[截断·后]` |
+| 13 | `internal/llm/anthropic/cache_test.go:21` | ① U+2460 | 1 | 非注释·双引号串 | 否 |`llm.TextPart{Text: "①identity: Wisp voice agent. Never write code."},` |
+| 14 | `internal/llm/anthropic/cache_test.go:22` | ⑤ U+2464 | 1 | 非注释·双引号串 | 否 |`llm.TextPart{Text: "⑤safety: confirm before destructive actions."},` |
+| 15 | `internal/llm/anthropic/cache_test.go:23` | ⑥ U+2465 | 1 | 非注释·双引号串 | 否 |`llm.TextPart{Text: "⑥style: short spoken answers."},` |
+| 16 | `internal/memory/schema.go:29` | ≤ U+2264 | 1 | 非注释·raw 串 | 否 |`-- L1 用户画像（D20）：slot 有限枚举，≤20 行由应用层强制` |
+| 17 | `internal/memory/schema.go:118` | → U+2192 | 1 | 非注释·raw 串 | 否 |`hash               TEXT NOT NULL,      -- manifest 哈希，加载时不符 → 拒绝加载并告警` |
+| 18 | `internal/risk/assessor_test.go:154` | ≥ U+2265 | 1 | 非注释·双引号串 | **是** |`[截断·前]Hit: []RuleID{R7}, Reason: "R7: 单次调用影响 50 个文件（≥50）"},` |
+| 19 | `internal/risk/rules_scale.go:24` | ≥ U+2265 | 1 | 非注释·双引号串 | **是** |`reason: fmt.Sprintf("R7: 单次调用影响 %d 个文件（≥%d）", n, BatchScaleThreshold),` |
+| 20 | `internal/tools/bridge_a18_kill_windows_test.go:220` | ③ U+2462 | 1 | 非注释·双引号串 | 否 |`"这条是 ③ 的阳性对照：kill 本身没留下残口的话，\"扫干净了\"就什么都不是。"+` |
+| 21 | `internal/tools/bridge_a18_kill_windows_test.go:222` | ⇒ U+21D2 | 1 | 非注释·双引号串 | 否 |`"（清扫挂在每次写盘上，见 fs_write.go 的 reclaimStaging）⇒ 到这一步盘上必须"+` |
+| 22 | `internal/tools/fs_staging_windows_test.go:66` | ⇒ U+21D2 | 1 | 非注释·双引号串 | 否 |`t.Fatalf("前置条件缺失：判活本身报错（pid %d: %v）⇒ 清扫器会把它当活的，"+` |
+| 23 | `internal/tools/fs_staging_windows_test.go:73` | ⇒ U+21D2 | 1 | 非注释·双引号串 | 否 |`t.Fatalf("pid %d 退出 5s 后仍被判为存活（OpenProcess 还打得开）⇒ "+` |
+| 24 | `internal/tools/fs_staging_windows_test.go:157` | ⇒ U+21D2 | 1 | 非注释·双引号串 | 否 |`t.Fatalf("该扫掉的孤儿没被扫掉 %s（err=%v）⇒ 清扫器根本没跑", orphan, err)` |
+| 25 | `internal/tools/fs_staging_windows_test.go:235` | ⇒ U+21D2 | 1 | 非注释·双引号串 | 否 |`t.Fatalf("阳性对照失败：junction 没通向 %s（%v）⇒ 后面的\"没删\"什么也没证明",` |
+| 26 | `internal/tools/fs_staging_windows_test.go:246` | ⇒ U+21D2 | 1 | 非注释·双引号串 | 否 |`t.Fatalf("同目录的普通孤儿都没被扫掉（err=%v）⇒ 清扫没跑，上面的\"没删\"就是空跑", err)` |
+| 27 | `internal/tools/fs_staging_windows_test.go:337` | ⇒ U+21D2 | 1 | 非注释·双引号串 | 否 |`t.Fatalf("正被活进程持有的暂存文件被删了（名字里的 pid 已死 ⇒ 只有重试后跳过这一道防线）: %v", err)` |
+| 28 | `internal/tools/fs_staging_windows_test.go:365` | ⇒ U+21D2 | 1 | 非注释·双引号串 | 否 |`t.Fatalf("持有者已退出 5s，%s 仍打不开 ⇒ 无法验证\"释放后能扫掉\": %v", held, err)` |
+| 29 | `internal/tools/fs_staging_windows_test.go:371` | ⇒ U+21D2 | 1 | 非注释·双引号串 | 否 |`t.Fatalf("持有者退出后下一次写盘仍没扫掉它（err=%v）⇒ 上一条的\"幸存\"是名字不对，不是句柄", err)` |
+| 30 | `internal/tools/fs_write.go:346` | → U+2192 | 1 | 非注释·双引号串 | 否 |`se.record("原子重命名 %s → %s（目标此刻起为新内容）", baseOf(tmpName), target)` |
+| 31 | `internal/tools/fs_write.go:480` | → U+2192 | 1 | 非注释·双引号串 | 否 |`se.record("同卷重命名 %s → %s（再用一次反向重命名即可改回）", from, to)` |
+| 32 | `internal/tools/fs_write.go:485` | → U+2192 | 1 | 非注释·双引号串 | 否 |`Text:         fmt.Sprintf("已移动（同卷重命名）：%s → %s", from, to),` |
+| 33 | `internal/tools/fs_write.go:567` | → U+2192 | 1 | 非注释·双引号串 | 否 |`Text:         fmt.Sprintf("已跨卷移动：%s → %s（源已永久删除，不进回收站）", from, to),` |
+| 34 | `internal/tools/fs_write_test.go:521` | → U+2192 | 1 | 非注释·双引号串 | 否 |`[截断·前]:= fmt.Sscanf(out.Text, "已放入回收站：%s（条目数 %d → %d", &before, &after); false {` |
+| 35 | `internal/winsec/reparse_windows_test.go:121` | ② U+2461 | 1 | 非注释·双引号串 | **是** |`[截断·前] cleared the directory symlink directly; A51② does not reproduce for it on this box"[截断·后]` |
+| 36 | `internal/winsec/reparse_windows_test.go:126` | ② U+2461 | 1 | 非注释·双引号串 | **是** |`t.Logf("A51② reproduced for a directory symlink: os.Remove = %v", err)` |
+| 37 | `internal/winsec/reparse_windows_test.go:236` | ② U+2461 | 1 | 非注释·双引号串 | **是** |`t.Logf("A51② reproduced: os.Remove(%s) = %v", filepath.Base(link), err)` |
+| 38 | `internal/winsec/reparse_windows_test.go:245` | ② U+2461 | 1 | 非注释·双引号串 | **是** |`[截断·前]s.Remove cleared this junction directly; A51② does not reproduce for it")` |
+
+> 表 A.2 里 `internal/memory/schema.go:29`／`:118` 两枚的**词法状态是 raw string（字符串）**，
+> 但命中的那个字符位于串内一段以 `--` 起始的 **SQL 注释**里——**这就是 §0.2 说的"分支要 owner 认"的 2 行**。
+
+---
+
+### 5.3 表 B —— `frontend/` 逐枚 25 行（票面 pathspec 漏量、ban #8 `everyFile` 真射程）
+
+**取数**：`git grep -nP '[\x{2190}-\x{25FF}]' 99263cc -- 'frontend/'` → 25 行／10 枚／921 处。
+**位置类别**按 JS/TS/TSX/HTML 的行首形态判：行首（去空白）为 `/*`、`*`、`//`、`<!--` 者记「注释」，其余记「非注释·渲染文本」——**这条判据可复跑**，实测 **19 注释 ＋ 6 渲染文本**。
+
+| # | `file:line` | 命中字形与码点 | 处 | 位置类别 | 在禁改清单 | 所在行原文 |
+|---:|---|---|---:|---|---|---|
+| 1 | `frontend/fixtures/composer-states.html:2` | ≤ U+2264 | 1 | 非注释·渲染文本 | 否 |`[截断·前]ept=""/><span class="text-ink-3">支持 ，单个 ≤ 0 B</span><button type="button" class="ml-[截断·后]` |
+| 2 | `frontend/fixtures/composer-states.html:5` | ≤ U+2264 | 1 | 非注释·渲染文本 | 否 |`[截断·前]text-ink-3">支持 image/png / video/mp4，单个 ≤ 64.0 MB</span><button type="button" class=[截断·后]` |
+| 3 | `frontend/fixtures/composer-states.html:8` | ≤ U+2264 | 1 | 非注释·渲染文本 | 否 |`[截断·前]text-ink-3">支持 image/png / video/mp4，单个 ≤ 64.0 MB</span><button type="button" class=[截断·后]` |
+| 4 | `frontend/src/components/ai-native/approval-card.tsx:18` | ─ U+2500 | 57 | 注释 | 否 |`/* ─────────────────────────────────────────────────────────` |
+| 5 | `frontend/src/components/ai-native/approval-card.tsx:21` | ↑ U+2191 | 1 | 注释 | 否 |`* the circular arrow up top advances (↑ sends on the last).` |
+| 6 | `frontend/src/components/ai-native/approval-card.tsx:23` | ─ U+2500 | 57 | 注释 | 否 |`* ───────────────────────────────────────────────────────── */` |
+| 7 | `frontend/src/components/ai-native/loading-state.tsx:18` | ─ U+2500 | 57 | 注释 | 否 |`/* ─────────────────────────────────────────────────────────` |
+| 8 | `frontend/src/components/ai-native/loading-state.tsx:31` | ─ U+2500 | 57 | 注释 | 否 |`* ───────────────────────────────────────────────────────── */` |
+| 9 | `frontend/src/components/ai-native/shimmer.tsx:16` | ─ U+2500 | 57 | 注释 | 否 |`/* ─────────────────────────────────────────────────────────` |
+| 10 | `frontend/src/components/ai-native/shimmer.tsx:22` | ─ U+2500 | 57 | 注释 | 否 |`* ───────────────────────────────────────────────────────── */` |
+| 11 | `frontend/src/components/ai-native/stream-text.tsx:18` | ─ U+2500 | 57 | 注释 | 否 |`/* ─────────────────────────────────────────────────────────` |
+| 12 | `frontend/src/components/ai-native/stream-text.tsx:25` | ─ U+2500 | 57 | 注释 | 否 |`* ───────────────────────────────────────────────────────── */` |
+| 13 | `frontend/src/components/ai-native/streaming-text.tsx:18` | ─ U+2500 | 57 | 注释 | 否 |`/* ─────────────────────────────────────────────────────────` |
+| 14 | `frontend/src/components/ai-native/streaming-text.tsx:22` | ─ U+2500 | 57 | 注释 | 否 |`* ───────────────────────────────────────────────────────── */` |
+| 15 | `frontend/src/components/ai-native/task-rows.tsx:18` | ─ U+2500 | 57 | 注释 | 否 |`/* ─────────────────────────────────────────────────────────` |
+| 16 | `frontend/src/components/ai-native/task-rows.tsx:22` | → U+2192 | 1 | 注释 | 否 |`*   600ms   row 1 ring sweeps 0 → 66%` |
+| 17 | `frontend/src/components/ai-native/task-rows.tsx:27` | ─ U+2500 | 57 | 注释 | 否 |`* ───────────────────────────────────────────────────────── */` |
+| 18 | `frontend/src/components/ai-native/thinking.tsx:18` | ─ U+2500 | 57 | 注释 | 否 |`/* ─────────────────────────────────────────────────────────` |
+| 19 | `frontend/src/components/ai-native/thinking.tsx:21` | → U+2192 | 1 | 注释 | 否 |`*   Steps      step list with spinner → muted checks` |
+| 20 | `frontend/src/components/ai-native/thinking.tsx:27` | ─ U+2500 | 57 | 注释 | 否 |`* ───────────────────────────────────────────────────────── */` |
+| 21 | `frontend/src/components/ai-native/thinking.tsx:213` | − U+2212 | 1 | 非注释·渲染文本 | 否 |`<span className="text-red">−{row.del}</span>` |
+| 22 | `frontend/src/components/ai-native/tool-chips.tsx:18` | ─ U+2500 | 57 | 注释 | 否 |`/* ─────────────────────────────────────────────────────────` |
+| 23 | `frontend/src/components/ai-native/tool-chips.tsx:24` | ─ U+2500 | 57 | 注释 | 否 |`* ───────────────────────────────────────────────────────── */` |
+| 24 | `frontend/src/components/ai-native/tool-chips.tsx:186` | − U+2212 | 1 | 非注释·渲染文本 | 否 |`[截断·前]ssName="shrink-0 text-red tabular-nums">−{d.del}</span>}` |
+| 25 | `frontend/src/components/composer.tsx:170` | ≤ U+2264 | 1 | 非注释·渲染文本 | 否 |`[截断·前]acceptedAttachmentMimes.join(" / ")}，单个 ≤ {bytes(state.maxAttachmentBytes)}` |
