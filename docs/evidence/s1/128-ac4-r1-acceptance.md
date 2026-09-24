@@ -173,3 +173,64 @@ rc=0   --- PASS: TestAC2EveryLeg...128 + 5 枚子用例全 PASS（共 6 行结�
 | 「四红一绿是指纹」这句 | **成立**，CI 与我两边都是 4 红 1 绿，绿的正好是显式传 `EnvDev` 那一枚 | **独立复现** |
 | 报告 §1.2「本机也红，但只在把那枚变量搬过来之后」 | **成立**（我的 P1 就在这台机上） | **独立复现** |
 | 它的落盘 `D:\tmp\t128-ci-logfailed.txt`（2283 行） | 我**没读**，也不需要用：同一条 `gh` 命令我自己取到 421465 字节、一次成功没重试 | 仅自述（不影响判定） |
+
+### 2.7 §2 那枚 commit 的回显（`git log --oneline -1` + `git show --name-only HEAD`，原样；标题被终端截了一刀，全名见上一条命令）
+
+```
+d3dd1cc evidence(128 AC#4 r1 §2): 主张一「本机绿/CI 红，根因＝ci.yml job 级 WISP_ENV=test」我独立复现——先按 blob 号核身份（CI run 35967768017 的 headSha 182daed 三枚相关文件 blob 与我的 snap-pre 逐字节同：686b3fd/c8bdccc/c5a9806），再在仓外快照上跑：WISP_ENV=test 下 4 红 1 绿、断言点 dataroot_128_test.go:295；把 CI 原文与我的日志各砍成 16 行结构骨架，diff rc=0 零输出＝逐字同形；snap-post 同形 rc=0 全绿；CI 侧 gh 自取 421465 字节一次成功，编排者那份台件一枚字节未读
+
+docs/evidence/s1/128-ac4-r1-acceptance.md
+```
+
+（那次 commit 前 `git diff --cached --name-only` 现量只有这一枚路径。）
+
+---
+
+## 3. 「pin 有牙」这句话本身 —— 我自己造了三发，**没有默认它成立**
+
+被裁的主张（报告 §3/§4.2）：`pinEnvThatAsksTheOS128` **先栽 `WISP_ENV=test`、再 pin 回 dev**，
+「栽在前 => 摘掉 pin 本机就红（`dataroot_128_test.go:323`）」，因而这枚 pin 在**任何平台**都咬得住。
+
+三发变异都在我自己的 `snap-post` 拷贝上、都**只动测试文件**（生产码一枚字节未动）：
+
+| 发 | 我摘掉的行（HEAD 版行号） | 本机形（`WISP_ENV` 未设） | CI 形（`WISP_ENV=test`） |
+|---|---|---|---|
+| **(i) 摘 pin** | `:261 t.Setenv("WISP_ENV", string(buildinfo.EnvDev))` | **rc=1 红** | **rc=1 红** |
+| **(ii) 摘「先栽」** | `:260 t.Setenv("WISP_ENV", "test")` | **rc=0 全绿**（6 行结果全 PASS） | **rc=0 全绿**（6 行结果全 PASS） |
+| **(iv) 两行都摘**（我另加的一发） | `:260` + `:261` | **rc=0 全绿**（6 行结果全 PASS） | **rc=1 红**，但红的**不是** CI 原来那 4 红 1 绿，而是 `:321 premise broke: the pin did not hold - WISP_ENV resolves to "test" (ambient on entry was "test", present=true)` -> 顶层一枚 FAIL、5 枚子用例一行都不出现 |
+
+**(i) 的红句（两形各一条，原样）：**
+
+```
+    dataroot_128_test.go:322: premise broke: the pin did not hold - WISP_ENV resolves to "test"
+      (ambient on entry was "", present=false), ...      <- 本机形
+      (ambient on entry was "test", present=true), ...   <- CI 形
+--- FAIL: TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128 (顶层，5 枚子用例一行都没出现)
+```
+
+⇒ **MUT-4 复现成立**，红的正是 helper 里那句自证（不是 CI 原来那句含混的 marker 缺失）。
+**一处行号细节要如实记**：我量到的是 `:322`，报告写的是 `:323`。**两个数都对，框不同**：
+`t.Fatalf` 在 `t.Helper()` 标记的函数里 -> Go 报的是**调用点**那枚文件行；我把 `:261` 摘掉之后，
+调用点 `pinEnvThatAsksTheOS128(t)` 自己从 `:323` 上移一行变成 `:322`。它引的是**未变异文件**的 `:323`
+（读者在 HEAD 上翻到的就是那一行），我引的是**我这棵变异树**的 `:322`。这一处不判它错。
+
+**(ii) 的读数就是本格最该量的一句话**：把「先栽 `test`」那一行摘掉，**在 `WISP_ENV` 未设的机器上它照样绿**，
+连 CI 形也绿（因为剩下那行 pin 单独就够盖住 ambient）。⇒ **「helper 在自己家里变成装饰」这一句，量出来是真的**：
+没有栽在前那一步，`:263-265` 那枚 `buildinfo.EnvString() != EnvDev` 自证在 dev 主机上**恒真**，
+它既不证明 pin 存在、也不证明 pin 有效。**这不是 c2fa2e9 的缺陷**（栽在前正是为了避免这个形状），
+而是它那句「栽在前 ⇒ pin 有牙」的**反面被我这发正面量出来了**。
+
+**(iv) 把这两发合起来才是答案**：两行都摘掉 -> **本机全绿（零信号）**，CI 形才红。
+（红句由 premise 那句代劳，不再是我 §2.2 抄的那条含混的 marker 缺失 —— 这一点我原先写成了"逐字红回 CI 那一发"，
+读日志后**改口**：`M-IV-both-removed-testenv.log` 现量只有 1 行 `--- FAIL`、断言点 `:321`，5 枚子用例根本没跑。）
+⇒ 「栽在前」买到的东西，用一条读数说完：
+**它把「这枚 pin 有没有生效」从一枚只在没人盯的 runner 上才响的主张，变成一枚在写码的人自己机器上就响的主张。**
+没有它，(i) 那一发（摘 pin）在本机零信号，只有 (iv) 那种"两行一起消失"才会漏到 CI ——
+而这正是票 140 立起来的那族形状（加固腿在 runner 上从不被咨询）。**判语：这一枚前提成立，且方向是加强（多红、不放宽、零 SKIP）。**
+
+| 判据 | 判语 | 档位 |
+|---|---|---|
+| 摘掉 pin -> 本机即红 | **成立**（两形都红，红句自证那句） | **独立复现**（我自己造的变异） |
+| 摘掉「先栽」-> 本机是否照样绿（= helper 成装饰） | **是，两形都绿**；栽在前的价值由 (iv) 那发正面量出 | **独立复现** |
+| 「pin 有牙」这句话本身 | **成立**，但**必须连同 (iv) 一起读**才不是修辞：单看 (ii)，pin 自己是无牙的，牙是"栽在前 + pin"这一对给的 | 独立复现 + 我的补充判语 |
+| 它的 MUT-4 落地三证（`grep -n` 命中 `:260,261`、`go build` rc=0、`go vet` rc=0 再读数） | 我这发用 `go test` 直接编译并跑到断言（编译不过就拿不到红句）-> **等价可核**；它引的 `dataroot_128_test.go:260,261` 与 HEAD 行号逐字对上 | 日志＋归档抽验 |
