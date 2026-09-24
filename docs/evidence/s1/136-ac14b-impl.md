@@ -168,3 +168,46 @@ internal/observe/sampler_settle_coverage_136_test.go
 且本程的改写让"钉子的覆盖面"从 4 增到 6。健康窗 `TestCheckSettleFullyMeasuredWindowReportsNoLoss` **未被扫进红名**
 （它不核行、只核 `rep.Pass`，而 nil 门行经 `foldSettlePass` 不否决 ⇒ 仍绿）。凭据：`D:\tmp\wisp141gate\logs\m1-v.txt`。
 **档位：〔本程自量〕。**
+
+---
+
+## §4 判据④（本程真正的产出）：用**含门行的新 exe** 跑 ≥6 发 `wisp slo -settle`
+
+**为什么必须重建再量**：编排者 19:5x 那六发复现用的 `D:\tmp\wisp141gate\bin\wisp.exe` 前身是从 `ca2c55e` 编的
+（早于 AC#14 的码），它的 JSON **连 `verdicts` 键都没有** ⇒ 那六发只答了"真窗口会不会丢采样"这个物理问题，
+**没答"带闸的终态二进制会不会变红"**。本程从**改后的 HEAD**（`52191ce` 的码，锚在 `1e620d6`）重建二进制：
+`CGO_ENABLED=1 go build -trimpath -o D:\tmp\wisp141gate\bin\wisp.exe ./cmd/wisp` ⇒ rc=0，
+三枚 sherpa/onnx DLL 同目录（否则加载期 `0xc0000135`）。
+
+**命令形状（照实现件 §1.2）**：`WISP_ENV=test` ＋ `wisp.exe slo -settle -out readings/settle-N.json`（N=1..6）。
+CLI 出线是**信封**：顶层 `pass`/`mode`/`settle`，`SettleReport` 嵌在 `.settle` 下（`slo-check.ps1` 读 `.settle.free_os_memory_count` 同一形制）。
+
+**争用自查**：驱动脚本 `D:\tmp\wisp141gate\slo-shots.ps1` 每发前后各扫一次 `slo-check.ps1:153-155` 那份
+**盘上现量 15 枚**名单（`go`/`gofmt`/`cgo`/`compile`/`asm`/`link`/`gcc`/`g++`/`cc1`/`cc1plus`/`as`/`ld`/`wisp`/`wisp-cli`/`staticcheck`），
+且扫前先等自家子 `wisp.exe` 退净（最多 30s）⇒ **六发 `roster_before=[]` / `roster_after=[]` 全 12 次空、无一发 ABORT**。
+本程**不 push**（`slo-full` 是 `push`/schedule 触发，编排者这轮不推）⇒ 取数窗内无并发取样。
+
+**逐发读数（含 exit code，逐枚取自 `readings/settle-N.json` 的 `.settle`）**：
+
+| # | 起时(本机) | exit | `sample_errors` | `len(samples)` | `settle.pass` | 顶层 `pass` | `back_within_cap_ms` | `final_bytes` | **`settle.verdicts`** |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 20:18:49 | **0** | **0** | 40 | true | true | 265 | 9326592 | `sampling:pass=true gate=true` |
+| 2 | 20:19:02 | **0** | **0** | 40 | true | true | 262 | 9236480 | `sampling:pass=true gate=true` |
+| 3 | 20:19:15 | **0** | **0** | 40 | true | true | 271 | 9117696 | `sampling:pass=true gate=true` |
+| 4 | 20:19:27 | **0** | **0** | 40 | true | true | 263 | 8937472 | `sampling:pass=true gate=true` |
+| 5 | 20:19:40 | **0** | **0** | 40 | true | true | 263 | 9068544 | `sampling:pass=true gate=true` |
+| 6 | 20:19:52 | **0** | **0** | 40 | true | true | 335 | 9662464 | `sampling:pass=true gate=true` |
+
+**判读**：
+- **六发 `sample_errors` 逐发 0**，**干净窗口 `exit code` 逐发 0** ⇒ 票面 `:323` 的"任一发非 0 或干净窗 exit 变 1 ⇒ 退回 false"**不触发**，
+  那枚翻转**成立、可留**。
+- **每发都带 `verdicts` 键，且那一行是 `sampling / gate=true`** ⇒ 这次量的确实是**含门行、门已开**的终态二进制
+  （正是编排者 §1.2/§6.1 标〔仅自述〕、终裁表 §5 那档没复现的那一维）。全测窗口里门行自陈 `pass=true` ⇒
+  `foldSettlePass` 无东西可否决 ⇒ `settle.pass` 与顶层 `pass` 都真 ⇒ exit 0。
+- `samples=40`、`back_within_cap_ms 262-335`、`final_bytes ~9.0-9.3MB`（均 < 冻结 Sleeping 上限 25MB），与实现件 §1.2 /
+  编排者 19:5x 那六发同量级互证 ⇒ 真取样物理没被本程弄坏。
+- ⚠ **一处诚实登记**：本程**先 commit 了码（`52191ce`）再跑 ④**（共享树里按"每完成一节就 commit"落盘，且
+  `--amend`/`reset` 禁用 ⇒ 若 ④ 失败只能追加一枚"把 `:556` 退回 false"的更正 commit，不能改写已提的那枚）。
+  ④ **现已全 0/exit 0 通过** ⇒ `52191ce` 无需回退。
+
+**档位：〔本程自量〕**，原始件留在 `D:\tmp\wisp141gate\readings\settle-1..6.json`（只建不删，可逐枚复算）。
