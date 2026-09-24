@@ -354,8 +354,7 @@ ancestor_separator_108_other_test.go:79: RemoveUnlinked("/r137link/…/root/link
 | `6fc7f3d` | 证据 §2 108 那两枚内联腿单独读数 |
 | `7ef6f4f` | 证据 §3 AC#5 五组门禁原文 |
 | `3f838bc` | 证据 §1.5 自加的 MUT-E 探针（fail-closed 证明） |
-| 本枚 | 证据 §4-§6 |
-| 紧随其后 | 票面文末 Progress log 那一行 |
+| 本枚之上 | `a84ce60` §4-§6 ｜ `754a2ec` §5 附记（共树偏离）｜ `c17a21b` 票面 Progress log 那一行 ｜ 再上面就是**把此表补到终局数的这一枚**（它自己的 sha 写完才有，不预引） |
 
 只 commit、未 push；每枚都带显式 pathspec，`git diff --cached --name-only` 每枚只有我自己的路径（未出现 `internal/observe/**`／`cmd/wisp/**`）；
 共树未用 `--amend`／`reset`／`rebase`／`stash`／`checkout .`，未建仓内 worktree。
