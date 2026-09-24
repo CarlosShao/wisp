@@ -335,7 +335,95 @@ $ go test -count=1 -v -run TestEmojiBanCoversGoSourcesNotJustDesign ./
 零枚断言被删或降档、helper 全是原有的、无新增 allowlist 豁免、种子移动是被迫且各枚承重、覆盖净增。
 (d) 那一句与格 6 同批收即可，不构成退回。
 
-## 6. 〔占位〕裁决格 5：生产调用者与 golden/阈值
+## 6. 裁决格 5：生产调用者（审批卡文案）＋ golden/阈值
+
+### (a) `1218192` 的 diff 原文（两枚、各一枚单行）
+
+```
+internal/risk/rules_scale.go:24   - reason: fmt.Sprintf("R7: 单次调用影响 %d 个文件（≥%d）", n, BatchScaleThreshold)
+                                  + reason: fmt.Sprintf("R7: 单次调用影响 %d 个文件（>=%d）", n, BatchScaleThreshold)
+internal/risk/assessor_test.go:154 - want: Decision{... Reason: "R7: 单次调用影响 50 个文件（≥50）"}
+                                   + want: Decision{... Reason: "R7: 单次调用影响 50 个文件（>=50）"}
+```
+`BatchScaleThreshold = 50` 那枚 `const`（`rules_scale.go:8`）**一字未动**，
+`if n < BatchScaleThreshold` 的边沿判断**一字未动** ⇒ **改的是显示串，不是阈值**。
+
+### (b) `reason` 下游到底渲染到哪里（逐跳，全在盘上核）
+
+`rules_scale.go:24 contribution.reason`
+→ `internal/risk/assessor.go:304 Decision{Reason: d.Reason}`
+→ `internal/agent/approval/gate.go:556 Reason: d.Reason`（`queue.go:455` 同一条）
+→ `internal/panel/approval.go:47`：注释逐字写着 **"Reason is Decision.Reason verbatim"**，
+字段 `Reason string json:"reason"` ⇒ **进面板审批卡的 JSON**。
+⇒ 结论：这一枚**确实是用户看得见的串**，不是日志内部物。
+`internal/panel/approval_test.go:71-75` 只断言"非空＋没被 `\x00` 削坏"，**没有硬编码文案** ⇒ 不漏改。
+
+### (c) 全仓现量：还有没有别处硬编码着 `≥` 而漏改
+
+```
+$ grep -rn '≥' internal cmd frontend tools scripts models        →  **0 行**
+$ python 逐字节取 U+2265/U+2264/U+2212/U+2229（四枚 ban #8 scope 内）→ 只剩 §1 那 6 枚 frontend 行
+$ grep -rn "单次调用影响"（全树）
+   design/screens/approval.html:806  → 写的是"50 个及以上"，**不含字形** ⇒ 设计稿与卡片不冲突
+   internal/agent/approval/batch.go:16 → 注释里本来就是 ASCII `>=`
+   docs/PLAN.md:2980、docs/specs/SPEC-06:40、docs/evidence/s1/141-*.md、.scratch/** → 仍带 `≥`，
+     但 `docs/` 与 `.scratch/` **不在 ban #8 的四个 scope 里**（`emojiScopes()` 只有
+     design/ frontend/ internal/ cmd/）⇒ 不是漏改，是**规格文字与仪器仍不一致**（记在格 6 与 §9）。
+   internal/risk/{rules_scale.go:24,assessor_test.go:154} → 即本批改后的两枚
+```
+⇒ **没有第二处期望值被漏改。**
+
+### (d) golden／SLO／阈值：动没动
+
+```
+$ git diff --name-only 470e6c5 bb61dc5 | grep -iE 'threshold|golden|slo'   → 无（0 枚文件）
+```
+本批 4 枚 commit 的全部路径见 §0：没有 `thresholds.go`、没有 `*.sse` golden 夹具、没有 SLO 配置。
+**但有一枚必须单独判**：`assessor_test.go:154` 所在的测试函数名叫 **`TestDecisionGoldenSnapshots`**，
+按名字它是"golden"。裁它合不合规的依据只有一条——票面有没有**具名解冻到那一行**：
+
+> `.scratch/wisp/issues/141-...md:75`（随 `Q-46` 批复生效的三张具名解冻）**逐字**：
+> "③ `internal/risk/rules_scale.go:24`（格式串，**会改变审批卡上显示的文案**）**＋**
+> `internal/risk/assessor_test.go:154`（表驱动期望值）——**同一枚 `≥` 的两半、必须同批**，改一半必红。"
+> 票面 `:78` 判据(4) 亦逐字要求"审批卡那枚 `≥` 换掉之后，`assessor_test.go:154` 期望值同批改"。
+
+⇒ **解冻存在、范围封闭到行、且实现方改的正是那两行，没多改一枚**（hunk `@@ -151,7 +151,7 @@` 与 `@@ -21,6 +21,6 @@`）。
+**不构成"动 golden 直接退回"**。方向也不是放宽：期望值从 `≥50` 换成 `>=50`，
+断言仍是**逐字节相等**，严度不变。
+
+### (e) 本格查出的一处**未登记**缺陷（本程现量，票面/交件表/台账都没提）
+
+ban #8 的字符类在仓里**有三份副本**，本批只 widen 了第一份：
+
+| 副本 | 位置 | 现在的类 | 是否 CI 活门 |
+|---|---|---|---|
+| ① 仪器本体 | `tools/d22scan/main.go:124` | 含 `2200–22FF` | 是（`ci.yml:81`） |
+| ② 面板自检 | `internal/panel/frontend_hygiene_test.go:66` `emojiRangesRe` | **旧类，无 `2200–22FF`** | **是**——`scripts/portable-tests.sh` 的 `core` scope 第 179 行含 `./internal/panel/...` |
+| ③ 供应商工具 | `frontend/scripts/vendor.mjs:53` `EMOJI_RE` | 旧类 | 否（owner 交出去的树，不归本程） |
+
+②在 `:64` 逐字自称 **"emojiRangesRe is tools/d22scan/main.go's emojiRe, copied verbatim"**、
+`:270` 的失败文案又写着 **"ranges copied from tools/d22scan"**——**这两句话现在是假的**。
+现量它今天的行为（同一份锚点快照）：
+```
+$ go test -v ./internal/panel/ -run TestFrontendHasNoEmoji   →  PASS
+   frontend_hygiene_test.go:273: ban #8 self-armed: 27 frontend files scanned, 0 emoji-range characters
+$ 用①的类去跑它同一次 walk（我自己的 python，同 27 枚文件）→ **3 枚命中**：
+   frontend/src/components/composer.tsx:170 (U+2264)、ai-native/thinking.tsx:213 (U+2212)、
+   ai-native/tool-chips.tsx:186 (U+2212)   ← 正是 §1 那 6 枚里落在它 walk 内的全部
+```
+⇒ 现在 CI 里**同时**存在"ban #8 在 frontend/ 命中 6 枚"（①红）与
+"ban #8 在 frontend/ 命中 0 枚"（②绿）两个**互斥读数**，且②自称与①同源。
+它**不是**本批写坏的代码（②一字未动），是**本批把它甩下了**：
+widen 只做了一半（两份同源副本没跟着走）。这条**必须登记**（与 `Q-48` 同批收，
+因为一旦 owner 选"清那 6 行"，②会立刻从"假绿"变成"无人看的绿"；选"退回射程"则②又自洽了——
+**两难都得让 owner 知道**）。
+
+### 本格判：**成立**（生产串只两处、同源无漏改；golden 有一张到行的具名解冻）
+**＋ 一条必须新增的登记项**：②`internal/panel/frontend_hygiene_test.go:66` 与 ① 已不同源却自称同源，
+且它跑在 CI 的 core scope 里。（③`vendor.mjs` 一并列出，但它属 owner 交出去的树，只登记不派活。）
+
+## 7. 〔占位〕裁决格 6：自陈的两处措辞缺陷
+
 
 
 
