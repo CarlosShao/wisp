@@ -439,7 +439,20 @@ type SettleReport struct {
 	ElapsedMS             int64    `json:"elapsed_ms"`
 	FinalBytes            int64    `json:"final_bytes"`
 	Samples               []Sample `json:"samples"`
-	Pass                  bool     `json:"pass"`
+	// SampleErrors counts the reads this settle window DROPPED: either the
+	// tree read failed, or it reported a zero footprint and so is not a
+	// measurement (see the same branch in SampleState). Without it a window
+	// that measured one read out of five handed back a report that looked
+	// exactly like one that measured all five - "partial coverage leaves no
+	// trace" (ticket 136 AC#12, R-136-7). StateReport carries the same two
+	// fields for the same reason (see :164-168, ticket 66: this instrument
+	// stops hiding things). The trustworthy count itself is len(Samples),
+	// which is the `samples` list above; errors + samples = reads taken.
+	SampleErrors int `json:"sample_errors"`
+	// LastSampleError keeps WHY the most recent read was dropped, so the
+	// number above can be read without guessing.
+	LastSampleError string `json:"last_sample_error,omitempty"`
+	Pass            bool   `json:"pass"`
 }
 
 // CheckSettle samples until the tree memory falls to the target state's cap
@@ -474,9 +487,15 @@ func (s *Sampler) CheckSettle(ctx context.Context, target SLOState, within, inte
 		case <-t.C:
 		}
 		m, err := s.tree.ReadTree()
-		if err == nil && m.PrivateWorkingSetBytes > 0 {
+		if err != nil {
+			rep.SampleErrors++
+			rep.LastSampleError = "read: " + err.Error()
+		} else if m.PrivateWorkingSetBytes <= 0 {
 			// Zero-footprint reads of a live tree are untrustworthy (see
 			// SampleState) and are dropped, never recorded as progress.
+			rep.SampleErrors++
+			rep.LastSampleError = "read returned a zero private working set for a live tree"
+		} else {
 			sm := Sample{
 				At:               WallTimestampUTC(time.Now()),
 				TreePrivateBytes: m.PrivateWorkingSetBytes,
