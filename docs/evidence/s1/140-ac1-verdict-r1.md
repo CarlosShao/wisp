@@ -134,5 +134,71 @@ grep -rn 'os.Setenv("WISP_ENV"' --include='*.go' .               -> 1 处，且�
 
 ### 1.6　本节 commit 回显
 
-（本节落盘后按 `git log --oneline -1` ＋ `git show --name-only HEAD` 原样贴回，
-并在 commit 前 `git diff --cached --name-only` 自证暂存面只有本文件一枚路径。）
+本节那枚 commit 的 `git diff --cached --name-only` 现量只有本文件一枚路径，commit = `bd0f826`
+（回执 `git show --name-only bd0f826` 同样只含本文件）。
+**全篇六节的 commit 账集中记在 §6.5**，取法给的是命令不是本文件的行文——
+每节的 sha 会随本节写在其下一节的开头，不另开 commit 贴回显（否则"一节一枚"就变成十二枚了）。
+
+### 1.5b　本节两栏计数
+
+见篇首累计（本节无新增）。
+
+---
+
+## 2　②　引证真实性抽验
+
+### 2.0　抽法（先写给下一位可复跑的抽法，再给结果）
+
+1. **全集**：从被裁文件正文里抽出所有**全限定** `路径:行` 引证
+   （`grep -oE '([A-Za-z0-9_.-]+\.(go|ps1|sh|yml)):[0-9]+(-[0-9]+)?'` 只留带目录前缀的那种），
+   `sed 's|^\./||' | sort -u | nl` => **74 枚**。
+2. **取样规则（定距，非挑选）**：按下标取 **3, 9, 15, 21, 27, 33, 39, 45, 51, 57, 63, 69**
+   （起点 3、步长 6，12 枚），规则先于结果确定，**不许我挑**。
+   表格里同时给出下标 1 与 74（两端边界），本程也开了，共 **13 枚**读数。
+3. 每枚都用 `awk 'NR>=a && NR<=b {print NR"\t"$0}'` 直读**盘上工作树**，逐字节比对被裁文件所引的那句。
+
+### 2.1　12 枚抽样读数（不平均，逐枚报）
+
+| 下标 | 引证 | 被裁文件拿它证什么 | 盘上真内容（摘） | 判 |
+|---|---|---|---|---|
+| 3 | `.github/workflows/slo-fresh.yml:67-69` | §5.3 S7：第二枚 workflow 里那枚**步骤级** `env:`（`GH_TOKEN`，按纪律只写名不抄值）；同表又指 `:70` 起 `scripts/slo-freshness.sh` | `:67 env:` / `:68 # Read-only: …` / `:69 GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}` / `:70 run: sh scripts/slo-freshness.sh` | **对** |
+| 9 | `cmd/wisp/dataroot_128_test.go:76-83` | §2.3：portable.txt 那枚更早早退的测试兜底，并逐字引 `:80` 的报错原文 | `:76 func assertNoPortableOverride128` / `:80 t.Fatalf("premise broke: a portable.txt sits next to the test binary (%s), so resolveDataDir takes the portable branch and never asks the OS for a config dir - these cases would assert nothing", …)` | **对**（引文逐字节） |
+| 15 | `cmd/wisp/doctor.go:256` | 全篇的主靶：`if env == "test"` 短路掉 `:259` 那次 OS 读 | `:247 func resolveDataDir(env string)` / `:248-251 portable 分支` / `:256 if env == "test" {` / `:257 return proc.TestDataDir(), nil` / `:259 base, err := userConfigDir() // %APPDATA%` / `:261 拒` / `:263 SealableRoot` / `:264-267 dev 分叉` | **对**（连带 §2.1 那条链的每一格都对） |
+| 21 | `cmd/wisp/leg_sink_nail_131_windows_test.go:409` | §3.2 第 5 行：全仓唯一"被测试 in-process 调、且真走 `ResolveEnv()`"的生产入口靠**自己钉**才免疫 | `:408 func TestAC3SecretLegBooksItsAuditRecordsOnDisk(t *testing.T) {` / `:409 t.Setenv("WISP_ENV", "test")` | **对** |
+| 27 | `cmd/wisp/resident_windows.go:27` | §2.2 链 B / §3.1 #4：常驻腿走 `ResolveEnv -> proc.Boot` | `:24 func runResident() {` / `:27 env, err := buildinfo.ResolveEnv()` / `:33 rt, err := proc.Boot(env)` | **对**（§4.2 顺手引的 `:24` 也对） |
+| 33 | `cmd/wisp/secret.go:289-290` | §1.2：印的是 `c.env` 字段，**不是** `EnvString()` | `:289 return fmt.Sprintf("Active environment: WISP_ENV=%s, data dir=%s, portable=%v\n",` / `:290 c.env, c.dataDir, c.portable)` | **对**（逐字节，含空格） |
+| 39 | `cmd/wisp/secret_test.go:200` | §1.3：五处 `strings.Contains` 断言的是字段 ⇒ 与 ambient 无关 | `:200 if !strings.Contains(out, "WISP_ENV=dev") {` | **对** |
+| 45 | `cmd/wisp/slo_windows.go:239` | §1.1C：全仓唯一"读来判、然后自己补写"的形状 | `:238 if os.Getenv("WISP_ENV") == "" {` / `:239 _ = os.Setenv("WISP_ENV", "test")` / `:243 env, err := buildinfo.ResolveEnv()` | **对** |
+| 51 | `internal/buildinfo/env_test.go:22` | §3.2 第 7 行：相对断言 ⇒ 连 `DefaultEnv` 变了都不红 | `:22 func TestResolveEnv(t *testing.T) {` / `:23/:28/:33` 三形 `t.Setenv` / `:34 want, err := ParseEnv(DefaultEnv)` | **对** |
+| 57 | `internal/proc/envfork.go:122` | §5.3 S1：`TestDataDir()` 读的是**另一枚**变量 | `:121 func TestDataDir() string {` / `:122 if dir := os.Getenv(TestDataDirEnv); dir != "" {` / `:125 filepath.Join(SealableRoot(os.TempDir()), "wisp-test-<pid>")`；常量 `envfork.go:36 TestDataDirEnv = "WISP_TEST_DATA_DIR"` | **对**（含常量值另验） |
+| 63 | `scripts/build.ps1:107` | §5.3 S6：`(a)` 的下家被 ldflags 钉死成 `dev` | `:107 "-X $BuildInfoPkg.DefaultEnv=$Env",` / `:23 [ValidateSet('dev', 'prod')]` / `:24 [string]$Env = 'dev'`（合法值里**没有** `test` 这一句成立） | **对** |
+| 69 | `scripts/slo-check.ps1:111` | §1.4：门禁自己把进程环境设成 `test` ⇒ 对 job env 是覆盖不是依赖 | `:111 $env:WISP_ENV = 'test'` / `:112 $env:WISP_TEST_DATA_DIR = Join-Path $OutDir 'data'`；§5.4 引的 `:114-117` 四行注释也逐字节对 | **对** |
+
+边界两枚一并报：下标 1 `.github/workflows/ci.yml:227`（对，行首 6 空格，`:226 env:`/`:224 test-core`/`:225 runs-on: ubuntu-latest` 三格同对）；
+下标 74 `scripts/wisp-cli-tests.sh:109`（对，`export PATH="$dll_dir:$PATH"`，且 §5.3 S4 所指 `:103-105` 两形自陈确在该区间内）。
+
+### 2.2　抽验净数
+
+- **抽样 12 枚 ＋ 边界 2 枚 ＝ 14 枚打开，全部 对。零枚"不存在"，零枚路径捏造。**
+- 为写 §1/§4/§5 另开 **11 枚**未抽到的引证，逐枚：
+  `doctor.go:37-39`（`info(… critical: false)`）**对**、`doctor.go:49-53`（`fail("gcc (build-time)")`）**对**、
+  `doctor.go:300-309`（`probeWritable` 三行引文）**对**、`doctor.go:308`（`return os.Remove(probe)`）**对**、
+  `dataroot_128_test.go:257/259/260/261/263/264/266/268`（那枚 helper 全文）**对**、
+  `dataroot_128_test.go:281/323`（5 枚腿 ＋ 调用点）**对**、`dataroot_128_test.go:288-292`（四行注释引文）**对**、
+  `dataroot_128_test.go:352/370`（`resolveDataDirConsumers128` 与 `if fn.calls["resolveDataDir"] {`）**对**、
+  `envfork.go:55/57-65/66-76/77-85/86-88/235/236/238/245`、`boot_windows.go:64/77`、
+  `run.go:155-156`、`models.go:109-110`、`secret.go:129-132`、`build.ps1:115-119/162/163` 全 **对**；
+  两处否定式现量（`grep -rn 'wisp secret' .github/workflows/ci.yml` -> 0 命中、
+  `grep -rn 'data dir writable\|data dir rules'` 在测试/脚本/.workflow 里 0 命中）**对**（与被裁文件 §3.1 #3/#7 同值）。
+- **一枚 偏（本程唯一一处行号偏差，写在 §4.2）**：`ci.yml:546-549` 被引作"不设 `MINGW64_ROOT` 就 `the step died before
+  compiling anything`"的出处，那句原文其实在 **`:545`**（`:546-549` 讲的是 "build.ps1's documented knob / Verified locally…"）。
+  差 1 行，**语义不塌**（同段 `:541-549` 在 §1.5 里另一处引用是对的）。
+
+**本节净数一句话**：**25 枚引证打开、24 对 1 偏（差 1 行、不影响任何判定）、0 枚不存在 ⇒ 这份名册没有编造痕迹。**
+（本项不是加分项：它是"这份账能不能被下一位照着复核"的及格线，它过了。）
+
+### 2.3　本节两栏计数增量
+
+真通知回显数：累计 **1**（无新增）。判为注入数：累计 **0**（无新增）。
+本节 commit = 见 §6.5 账（写本节时 HEAD 上一枚是 §1 的 `bd0f826`）。
+
