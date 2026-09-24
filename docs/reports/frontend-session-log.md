@@ -364,3 +364,73 @@ demo 各屏之间同一实体多种写法，逐条列（这些不是审美问题
 本轮**仍未**跑 `npm`/`go`/`d22scan`/Docker；**仍未**写 `frontend/**` 与 `design/**` 一字节；`frontend/embed.go` 未动。
 **本会话累计具名收回**：子代理读数被盘上实测推翻 **6 条**（T2、C3 的"立刻点红"、cron 冲突、C6、C7、C10）；我自己写进台账的错 **10 处**（C1、C2 的框法、C6、C7、C8、C9、C10、C11、T4、§14 那条键名承诺——其中 C2 属"结论对、靶子框错"，本轮第二次更正）。
 编队仍全空：唯一剩下的取基线被 §21 条 1 的闸门闸住。**你需要做什么见对话正文，不在这里重复。**
+
+---
+
+# 追加五（2026-09-25，owner 六条决定落地）
+
+## 25. owner 的口径，写进本文件头部效力
+
+owner 原话：**"我只负责我能看得懂的非技术性问题。"**
+⇒ 本会话以后向 owner 提问，**每条必须先翻译成"谁变好／谁变坏／怎么回来"三行**，否则不算问完（本轮 §21 的 P7 那条我就写得偏技术，重写过一次）。
+⇒ 同时反向生效：**凡只有我能判的技术细节，不再拿去占他的时间**——本轮起，"改哪份文档""三份副本谁先动""C17 白名单具体集"这类我一律走"编排者起草 ＋ 前端会话出需求清单"，不 escalate。
+
+## 26. 六条决定的执行情况
+
+| # | 决定（谁批） | 执行 |
+|---|---|---|
+| **1 P2** | 那 6 行**前端会话改**（owner 批"不改"指的是**编排者不写前端**；owner 另说"其它前端问题都按你的推荐来"） | **已改，commit `3b59512`**。只动 6 处字符、零连带（`git diff` 删除行逐枚核过，全是有意替换的那几行）。`≤`→`<=` 4 枚、`−`→`-` 2 枚。改完现量 `frontend/` 全树（排 `node_modules`/`dist`）两枚字符**命中 0 行** |
+| **2 P1** | 走 interim：不复制、不 rename，**让它红着**（我推荐、owner 默认） | 照做。`tokens:check` 那枚红的红因写"§17 token 源缺失"，不写"我的改动造成"。`SPEC-08:26-27` 未获 owner 批 ⇒ 我不碰 |
+| **3 P3** | **React Bits 不解冻**（owner 按推荐） | 照做。`VENDORED.md` 里"二期引入前需 owner 复核"那行**不许消失**——本轮我改的是同文件另一段（ban #8 自述），那行未动 |
+| **4 P4** | **C 案：firstrun 屏上不写加密方式**（owner 按推荐） | 记为**界面规格**：firstrun 那一行**留空 ＋ 标 `DEFERRED`**。⚠ 同一枚问题还藏在 `config.js:423` 的注释里（"仅存 DPAPI 凭据"），做设置屏时一并留空 |
+| **5 P9** | owner 批了"扩"，红线见 §27 | 清单已出，见 §28 |
+| **6 P5** | 真机签收**今天 15:00**，编排者建了一次性提醒 | 本轮**不开任何窗**、不用渲染级证据顶替。R-92-5＝票 114 AC#6 这一格只能真机结 |
+
+⚠ **一条 owner 可能没意识到的连带**（写出来，不擅自扩权）：`thinking.tsx` 与 `tool-chips.tsx` 是 **vendored 上游拷贝**，而 `scripts/vendor.mjs` 的 `EMOJI_RE` 缺 `\x{2200}-\x{22FF}` ⇒ 它**看不见 U+2212**，所以那句"unmapped glyph is fatal rather than silently shipped"对它不生效。**一次 `npm run vendor:beautifului` 会把这 2 枚 U+2212 原样拉回来。** 按编排者"vendor.mjs:53 只登记不改宽"的明示我**没动它**，所以 `3b59512` 的准确定性是：**当下盘上干净**，不是**洞已封**。封洞依赖 `U1` 那批把三份副本一起加宽——**这与我改的 6 行是因果耦合，不只是同批美观**。
+
+## 27. C17 扩口的四条红线，本会话逐字接受并作为自查项
+
+只能扩**读**（Go→面板的只读快照/取数）。**永不扩**：① 任何能做出审批决定的口（`approval.decide` 在 `frontend/` 是 ban #6 硬禁）；② 面板侧**设定**权限档位或工作区（R20：那两者是"权限输入口"，只许显示＋发起请求）；③ 任何写配置／写密钥／暴露宿主内部产物路径的口；④ **由面板侧来源的 L2「允许」**（`AGENTS.md` §1.2 硬禁项）。
+
+⇒ 下面 §28 那 15 枚**全部是 `*.get`/`*.snapshot`/`*.list` 形状，零枚 `*.set`/`*.decide`/`*.write`**。任何一枚在起草时被改成可写，请按违反红线退回，不要当我笔误。
+⚠ 流程也照收：**清单＝我出、白名单具体集＝你起草、定稿＝切片卡批准项**（`AGENTS.md` §2 具名），**你我都不得自己加完就用**。定稿前新屏一律**数据源留空 ＋ 标 `PENDING-C17`**，**不造假数据当真实字段**（票 77 AC#3 就是为这格存在的）。
+
+## 28. `C17 只读需求清单`：**15 枚**
+
+"源"列全部是我本轮亲自 `[ -e ]` 或 `grep` 核过的路径；标 **PENDING** 的是 Go 侧对应实现所属工单尚未 `-done`，**不是我不需要它**。
+
+| # | 只读方法（建议名） | 服用的屏 | 需要的字段 | 源（已核） | 状态 |
+|---|---|---|---|---|---|
+| R-01 | `panel.config.snapshot` | 设置 | 18 个 section 的逐键值 ＋ **每键生效档位** ＋ **哪几枚是硬编码只读**（`half_duplex`/`keep_transcript`/`keep_audio`/`verify_signature`）＋ 校验错误（未识别键的**键名与所在行**，D36 规则 2） | `internal/config/schema.go:110-133`、`manager.go:203-211`（档位表）、`:228-262`（🔒 节） | 源在，**四枚 🔒 节 demo 没画**（§16.3） |
+| R-02 | `panel.privacy.list` | 隐私（5 tab 共用） | 按 domain 的条目列表 | `internal/memory/privacy.go:29` `PrivacyDomains()`、`:47` `ListPrivacy` | **已有真函数，只差 route** |
+| R-03 | `panel.privacy.storage` | 隐私"存储位置" | `wisp.db` 路径与体积、artifacts 已用/配额、**真实保留期常量**（不是 demo 那三枚按钮） | `internal/memory/retention.go:32`/`:36`/`:38` | 源在 |
+| R-04 | `panel.toolcall.evidence` | 隐私取证 tab、安全时间线 | `tool`/`risk_level`/`args_json`/`decision`/`outcome`/`decided_at` | `internal/memory/schema.go:73-80` | 源在 |
+| R-05 | `panel.grants.list` | 安全"本会话生效授权" | 工具、路径通配、级、**剩余时间/会话结束失效** | `internal/agent/approval/approval.go:218-237`、`gate.go:448-462` | **PENDING**：现形状是一次性 nonce，非 (工具,路径,会话) 三元组 ⇒ 依赖票 49（D45-2，未 `-done`） |
+| R-06 | `panel.perm.mode` | 安全三档卡、composer 档位徽标 | 当前档位（三档枚举）＋ 档位变更审计 | `internal/perm`（票 101：生产零 importer） | **PENDING**：依赖票 101/114 接线 |
+| R-07 | `panel.cost.summary` | 成本三卡、对话每条脚注 | 今日/本月/累计、预算与 80% 告警线、**是否已暂停新任务** | `internal/agent/cost.go`（⚠ 没有 `internal/cost` 这个包，我核过） | 源在 |
+| R-08 | `panel.cost.series` | 成本柱状图、日/月视图 | 逐日 token 分解 `in/out/cached`、按模型分解 | 同上 ＋ `cost_daily` 表（`SPEC-02:157`） | 源在 |
+| R-09 | `panel.cost.top` | 成本 Top5 任务榜 | 任务名、花费、排序键 | 同上 | 源在 |
+| R-10 | `panel.tasks.list` | 任务、命令面板"最近任务" | 六态、**在等谁**（路径锁持有者）、队位、子任务进度、可取消位 | TaskScheduler/PathLock | **PENDING**：票 47 未 `-done` |
+| R-11 | `panel.ball.state` | 球状态、对话工作状态 chip | 当前态 ＋ **合法转移集** | `internal/ball` | ⚠ **被 P7 卡住**：合法转移集到底是 40 还是 42 未定 ⇒ 这枚方法的**返回集**本身待定，别先定 schema |
+| R-12 | `panel.conversation.history` | **对话屏（最大缺口）** | 用户消息原文、多轮线程、按日期分组 | `task_log.query_text`（已脱敏） | ⚠ **契约内部矛盾**：`PLAN.md:1871-1873` 承诺会话历史全量可见，但 D35 八表里没有对应表、`PrivacyDomains()` 也只有 5 域 ⇒ **先补表还是改承诺，是契约面，我不自裁** |
+| R-13 | `panel.palette.commands` | 命令面板 | 5 组命令、快捷键、工具级标 | 命令表可前端静态；工具级标要接 D34/C19 | 半：命令静态、**级标要读** |
+| R-14 | `panel.firstrun.status` | 首次引导、设置 `api_key` 行 | 模型清单逐项下载进度与 **minisign 验签状态**、已授权目录、**密钥是否存在（掩码＋后 4 位，永不回传值）** | 票 14/63 已 `-done`；`internal/secret/configrefs.go:14` 路径形状 | 源在 ⚠ **红线③**：只许回"存在与否＋后 4 位" |
+| R-15 | `panel.env.badge` | 面板标题、悬浮球 tooltip | 环境标识（`Wisp · dev`） | `WISP_ENV`（票 6/140） | 源在；`SPEC-03:120` 是**硬要求**，不是可选装饰 |
+
+**合计 15 枚**（`grep -c '^| R-'` 现量＝15，逐号 `uniq` 无重号）。拆开是：**10 枚 Go 侧源已存在**（现量 `grep -v` 三条排除后＝10）、**3 枚标 `PENDING` 依赖未闭工单**（R-05→票 49、R-06→票 101/114、R-10→票 47）、**2 枚"schema 先别定"**（R-11 被 P7 卡、R-12 是契约内部矛盾）。⇒ 10＋3＋2＝15。
+⇒ **给你起草时的取舍建议**：先批 R-02/R-03/R-04/R-07/R-08/R-09/R-14/R-15 这 8 枚（源已存在、纯加 route、不依赖别人），R-01 单独议（🔒 节的只读快照要不要连校验错误一起回），R-05/R-06/R-10 跟着各自工单走，R-11/R-12 **先别定 schema**。
+
+## 29. 起草 C17 白名单之前，有一枚现状必须先定性（我没能定论）
+
+**前端发 5 枚方法，Go 侧白名单常量只有 4 枚。** `frontend/src/lib/panel.ts` 发：`panel.approval.request`（`:181`）、`panel.mode.request`、`panel.workspace.request`、`panel.attachment.add`、`panel.message.send`；而 `internal/panel/bridge.go:35-38` 只声明后 4 枚，`knownComposerMethod`（`:97`）按这 4 枚收。`panel.approval.request` 在 Go 树里只出现在 **`composer_test.go:417`（用例键）** 与 `frontend_hygiene_test.go:32` 的注释里。
+
+⇒ 三种可能我区分不了：① 它走 `internal/panel/approval.go` 那条**另一 handler**（那就是白名单分散在两处、起草时会漏）；② 它**根本没人接**（那就是前端有一条死方法，票 114 的"零调用者"病在同一枚上复发一次）；③ 它在别处注册而我没 grep 到关键字。
+**本轮我未追到定论**，且它是 `internal/**`（你的地界）。**请你起草白名单具体集时先把这一枚定性**——因为"现在到底几枚"直接决定这次是"扩 15 枚"还是"扩 15 枚 ＋ 收编 1 枚来历不明的"。
+
+## 30. 本轮纪律自述
+
+- 亲自核过：`[ -e ]` 七条路径（其中 **`internal/cost` 不存在**，真名 `internal/agent/cost.go` ⇒ 我差点引一枚假路径进清单）· `privacy.go` 五枚导出函数 · `bridge.go:35-38` 四枚常量 · `panel.ts` 发出的 5 枚方法 · `render-composer.tsx` 断言串不含这 6 枚字符 · `vendor.mjs` 的 `GLYPH_MAP`（4 枚勾叉）与 `EMOJI_RE`（缺数学段）· 改前改后 `frontend/` 行尾同为全 CRLF（HEAD 亦 CRLF ⇒ **未引入行尾变化**）。
+- 每笔改动落盘前查 `git diff --cached --name-only`：暂存清单**只出现我自己的 5 枚路径**（`frontend/` 下），零他人路径；`git diff` 删除行逐枚看过，全是有意替换。
+- **未跑** `npm ci`/`build`/`render:*`/`go test`/`d22scan`/Docker（编排者测量程仍在跑）。⇒ 因此 §26 那格"盘上 0 命中"是**字符级 grep 现量**，**不是 d22scan 的 rc**；真绿要等闸门解除后复跑，且**编排者的 `U1` 那批落地前，`internal/panel` 那把尺仍会报 0**（两把尺继续互斥）。
+- **待闸门解除必须补的一条复算**（已写进 commit 正文）：`npm run render:composer && git diff --exit-code -- frontend/fixtures/composer-states.html` —— 那 3 枚 fixture 字符是我手工改成"与渲染器会输出的一致"的，没跑过渲染器就不算证。
+- 本轮**未**开任何窗（P5 约定 15:00）；`frontend/embed.go` 未动、无计划动。
