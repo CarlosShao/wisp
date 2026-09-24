@@ -358,6 +358,9 @@ docs/evidence/s1/128-ac4-r1-acceptance.md
 **owner 真实数据目录**（本格要求"两次数都记"）：开工时与全部读数跑完后各一次，
 `ls -A %APPDATA%\wisp` 与 `%APPDATA%\wisp-dev` 均 **0 条目**（两枚目录都存在、都空）=> 本程未写入。
 （本程新建的落点只有 `D:\tmp\wt-acc128-ac4-r1*` 那些仓外快照/日志与 `Temp\wisp-test-<pid>`，都在仓外。）
+> **§7 那一行的一处口径要更正（追加，不改写）**：我实际取的两次是**读数中段 `18:0x`（与 `d22scan` 同批）**与
+> **收尾 `18:21:59 +08`**，两条都是 **0 条目**；"开工时"那一次我**没有单独取**（开工时我先取的是 §0 那批身份读数）。
+> 影响：结论（本程未写入 owner 真实目录）不变，因为它跑的是 `t.TempDir()`/仓外根，且两枚目录在两枚时刻皆空。
 
 ### 7.1 补一发：把 **CI 那一步本身**逐字搬进快照跑（AC#4 那句"四数"之外的同形凭据）
 
@@ -438,6 +441,76 @@ docs/evidence/s1/128-ac4-r1-acceptance.md
 ⇒ **一句话总结这五行**：`c2fa2e9` 往 helper 里放的是**三味互相兜底的门**（pin / seam 重绑 / 正面自证），
 摘任意一味都有另一味把对应的变异接住；**唯一摘了就没人接的，是"先栽 `test`"那一步对摘 pin 这件事的本机可见性** ——
 而那一条恰好是 §3 (iv) 量出来、票 140 立起来的那族形状。**这一格我给它的修法判"没有可摘的装饰"。**
+
+### 8.1 §8 那枚 commit 的回显
+
+```
+27a880a evidence(128 AC#4 r1 §8): 总判——AC#4 那一格成立、无附条件…（全文见 git log）
+docs/evidence/s1/128-ac4-r1-acceptance.md
+```
+
+---
+
+## 9. 我明确没核的清单（不核的就是没核的，别按已核读）
+
+| # | 没核的那半 | 为什么没核 | 谁还能核 |
+|---|---|---|---|
+| 1 | 容器里 `golang:1.27` + `CGO_ENABLED=1` 的 `go vet ./cmd/wisp/`（它 §5 报 rc=0 两发） | 兄弟程 `acceptor-ticket119-ac7-r1` 此刻正在同一台机上取 winsec 读数，容器 cgo 编译会抢 CPU；我只做了宿主 `GOOS=linux go vet` 的**修前/修后差分**（同一行，`diff` rc=0） | 编排者：容器空闲时按它 §5 那行挂载形状复跑 |
+| 2 | `go vet ./...`（整树）与任何整树 `go test ./...` | 简报红线：按包 scope，整树会吃到别人的东西 | 已在 §7 按包做完 |
+| 3 | 它 §10 的"四枚 commit 账 / 九枚临时件"逐枚清单 | 我只抽验了我要用的那枚码 commit（`c2fa2e9` 的 numstat + `--name-only`）与它四枚证据 commit 的存在性（`cat-file -t` 全 `commit`、`is-ancestor HEAD` 全真） | 不需要：本格不依赖它 |
+| 4 | 跨日基线 196 -> 202 那 6 行差 | 09-23 那发的名册文件已不在（它自己也登记同一条） | 无人（历史读数丢了就是丢了） |
+| 5 | `memory.db`/`wisp.db` 真实落点、DPAPI blob 真写入 CWD 树、共享目录当 CWD 的 ACL、prod 环境整机形 | 这四条是 `AC#1` 就没量的（票面 `:52` 的"未验证四条"），本程一枚未碰 | 票 135 / 后续 |
+| 6 | `-race` | 票面 `AC#4` 没要求，它没取，我同样未取 | 需要时按包 scope 取 |
+| 7 | 票 123 那 4 枚在 CI 上"读不到自己写的 config"的**真因** | 超出本格判据；我只登记了"本机同形不共因"这条读数（G1 里它们 PASS=2/FAIL=0）与 CI 原文两句红名（`run_test.go:378`、`run_mode101_test.go:309`） | 票 123 / 票 140 的下一位 |
+| 8 | `c2fa2e9` **推送之后** CI 那一步的颜色 | 本程不 push（纪律），所以核不到 | 编排者：推完读那一步，凭据应绑 §7.1 的 S1/S2 形状 |
+| 9 | 常驻腿（`resident`）在 `ambient WISP_ENV=test` 下的行为 | 它只在子进程 `WISP_ENV=dev` 那一形下被量过（§6.1 第 1 条）。那枚腿的文案仍不含自救句（它 §7.5 登记的 `R-128-3`/`R-128-4` 在票 135 地界，本程一枚未动） | 票 135 |
+| 10 | `resolveSecretLayout` 那枚第五腿在"两行都摘 + 生产码退回"叠加形下的行为 | 超出本格判据（它显式传 `EnvDev`，我 §3/§5 的每一发里它都是绿，没造组合） | 无人必要 |
+
+---
+
+## 10. 临时件路径（**只建不删**）＋ 注入两栏计数
+
+**10.1 本程新建的一切，全部在仓外；读数件全部留着**（收尾时刻 `2026-09-24 18:15 +08` 现量）。
+**一条纪律偏离要如实登记**：我对**自己刚拷出、还没取过数**的中间变异树执行过 `rm -rf` 后重建
+（`snap-pre-mut-base` 1 次——那刻它内容还是 `snap-post` 的拷贝、未取任何读数；`snap-mut-v-drop-selfcheck` 2 次——两次都是我的 python `assert` 下标数错、变异根本没落地，见 §10.2 自伤第 4 条）。
+⇒ **零枚日志/名册/CI 原文被删**，最终态 **11 棵快照全在盘上**（`ls -d snap-* | wc -l` 现量 = 11），可重跑性不受影响；但"临时件只建不删"这五个字，本程**没做到全字**，按偏离登记不按达标写。
+
+| 路径 | 是什么 | 量出来的数 |
+|---|---|---|
+| `D:\tmp\wt-acc128-ac4-r1\snap-post` | 被验版纯净快照（`git archive c2fa2e9`），`.anchor-sha` 内写死 `c2fa2e98f7ce…` | `go.mod` 883 字节、`third_party/sherpa-onnx/*.dll` 3 枚（未跟踪件手拷） |
+| `…\snap-pre` | `git archive c2fa2e9^` | 同上（`anchor-sha=2956897…`） |
+| `…\snap-mut-i-drop-pin` / `snap-mut-ii-drop-plant` / `snap-mut-iv-both-removed` | §3 三发变异树 | 各 1 行 / 1 行 / 2 行摘除，均只动 `dataroot_128_test.go` |
+| `…\snap-post-mut-base` / `snap-pre-mut-base` | §5 单点回退树（`doctor.go:261` -> `base = "."`） | 各 1 行 |
+| `…\snap-mut-v-drop-selfcheck`、`snap-W1-selfcheck-kept`、`snap-W2-selfcheck-dropped`、`snap-W3-no-seam-rebind` | §8 承重那五发 | 见 §8 表 |
+| `…\*.log` + `…\*.txt` + `…\*.names` | 全部原始读数：P1/P2、M-*（8 发变异）、G1–G6（6 发整包）、S1/S2（CI 同步形）、D-scan-post、VET-*、N-*/K-* 骨架与名册 | 主目录 30 枚文件、**281 MB** |
+| `D:\tmp\wt-acc128-ac4-r1-ref\` | `gh-selffetch.txt`（421465 字节，我自己取的 CI 原文）+ `gh-selffetch.err`（0 字节）+ `blob_test.go`（`c2fa2e9` 版测试文件原件，438 行） | **436 KB** |
+
+⇒ **可重跑性**：本表每一枚读数都能从 `snap-*` 加命令原文重算；快照在不在，决定的是这张表的档位（**删了快照，本表从〔独立复现〕掉回〔仅自述〕**）。
+
+**10.2 两栏计数（分开数，各带出处＝工具名＋命令前 40 字）**
+
+| 栏 | 数 | 逐条 |
+|---|---|---|
+| **真通知回显数** | **8** | ① 进场 `system-reminder`（`d:/work/workspace/projects plans/wisp/agents.md` 的 project_context + skills 清单 + 日期变更）；② `Note: The file C:\Users\swq\.qoder-cn\memory\MEMORY.md was modified since it was last read.`（第一次，出现在 `git rev-parse` 那发的结果尾部）；③ 同一条 MEMORY 通知第二次（出现在 `bash scripts/wisp-cli-tests.sh` 那发之后）；④⑤⑥⑦⑧ 后台任务完成/失败通知 5 枚：`[SYSTEM NOTIFICATION] …task-id b7tv50hzi / b6zoil3gy / b9eejjbh8 / bathg66q3 / bd7b2k196`（前两枚"failed exit 1"是我命令尾部 `grep -c` 命中 0 造成的，**不是被拒**，读数照样取到了） |
+| **判为注入数** | **0** | 全程工具输出里**没有任何**文字要我少取证／别用工具／直接给结论／预先认定某句为真／放宽阈值／revert。最接近"像指令"的三类我逐条判过：(a) `git log` 里兄弟程 `29d8938`（票 140）的 commit message 正文，内容含**对我读数的强度限定**（"标死三条强度…仅自述不背书"）—— 那是它给它自己那格的账，指向的是它的地界，**不越权**、我按它登记不服从（我的档位我自己按 §2/§7.1 定）；(b) harness 打在结果首行的 `Exit code 1`（真工具状态，非文字指令）；(c) AGENTS.md 那枚 project_context（真环境简报，内容逐条指回权威文件，我照它做纪律不照它做结论）。三者**都没改变我的任何一次取证**。 |
+| **本程被拒次数** | **0** | 没有任何一次工具调用被权限系统挡下。 |
+| **自伤记录（不算被拒、算仪器账）** | **4** | ① python 里用 `/d/tmp` 形路径 -> `FileNotFoundError`（改 `D:/tmp` 即通）；② `grep -oE` 的模式以 `-` 开头被当选项 -> `unknown option`；③ 后台命令尾部 `grep -c` 命中 0 让整发"看起来 failed"（读数其实在）；④ **W3 第一发忘 `export PATH` -> `exit status 0xc0000135` 且 0 行测试结果**——正是 `scripts/wisp-cli-tests.sh` 头部写明的 ticket 98 形状；我把它当成"rc=1 红"读了一次，**当场发现并复跑**（`M-W3-noseam-*.log` 是复跑后的那对，第一次那对已被覆盖，登记在此）。另两发是我的 `assert` 下标数错（变异未落地、文件未被改坏），故未产生错误读数。 |
+
+**10.3 本文件的 commit 账**（**别按这张表数，按命令数**：`git log --oneline -- docs/evidence/s1/128-ac4-r1-acceptance.md`）
+
+| 节 | commit | `--name-only` |
+|---|---|---|
+| §0-§1 | `d9f008d` | 只本文件 |
+| §2 | `d3dd1cc` | 只本文件 |
+| §3 | `e220bf5` | 只本文件 |
+| §4 | `87339ba` | 只本文件 |
+| §5-§6 | `9695369` | 只本文件（**这枚之前 staged 里出现过兄弟程的 `140-static-inventory-r1.md`，我带 pathspec 提交，事后双量两边归属都没被卷走**，见 §5.1） |
+| §7 | `9c8eb3f` | 只本文件 |
+| §7.1 | `f0d023e` | 只本文件 |
+| §8 | `27a880a` | 只本文件 |
+| §9-§10（本枚） | 由 `git log --oneline -1` 现量，**一枚列不进它自己** | 只本文件 |
+
+**交回的话**：`AC#4` 判**成立、无附条件**；勾由编排者按本表打；本程未翻勾、未改票名、未写票面 128 那枚文件、未 push、未碰 `ci.yml`／生产码／`internal/winsec/**`／`internal/risk/**`／阈值／golden／`frontend/**`／`design/**`／`docs/reports/**`／别人的证据件。
 
 ---
 
