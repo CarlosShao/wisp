@@ -516,3 +516,93 @@ d22scan 那一枚要补三行，因为它是 `set -eu`（`scripts/d22scan.sh:38`
 | 加载期失败有没有被偷偷避开 | 四份读数里 `0xc0000135`／`error while loading shared libraries` **各 0 命中**（两棵树都装了 DLL）⇒ 派单预告的那枚"改前也红、一条尺都不执行"的形状**本程没遇到**，也因此**没有复现它**（列 §7） |
 
 ---
+
+## 6. 上游简报与上一程自述里，哪一句不成立（逐句复算）
+
+判据：**每句都当未验证断言重走一遍**；不成立的写清"不成立的是数值还是结论"，因为这两件事的处置不一样。
+
+| # | 那句原话（出处） | 复算结果 |
+|---|---|---|
+| E1 | "日志管道把任何单条字符串截到 512 字符"（上一程中断前最后一句） | **成立**。现量见 §2.2（900 rune → 落盘 543，含 `truncate` 自加的 31 rune 后缀）。唯一要补的是口径：512 是**保留部分**的上限、不是落盘总长 |
+| E2 | "`NewSnapshot`/`NewComposerState`/`NewModeView`/`ModeUnknownView`/`UnsetWorkspaceView` 从此有**包外**调用者"（`5821e24` 的 commit message） | **一半不成立**，逐枚见 §6.1。真正成立的表述是"这些建造者从此有**非测试**调用者、且那条链由生产驱动"；"包外"只对 `UnsetWorkspaceView` 一枚字面为真，`NewModeView` 那枚**前后一枚数、调用点没动过** |
+| E3 | "ledger 单串上限 512 而最小包 **831** 字节"（`37a4705` message，成立）／代码注释写"最小包 **534** 字节、带卡那枚 **997**"（`cmd/wisp/panel_pump.go:138-139`、`cmd/wisp/panel_pump_test.go:27`） | **结论成立、注释里两枚数值都不成立**。实测：库层最小包 **585 字节 / 551 rune**；带卡的包实测七档 **803／811／812／830／831／837／893**（§6.2 有逐枚来路），**534 与 997 一次都没出现**。⇒ 这是**注释里的读数腐坏**、不是判断错：即使按 rune 口径 551 > 512，那个包仍装不进 ledger，所以"落有界摘要"的决定仍然对。**本程不改那两行注释**（改码不在本程三件交付物里，且上一程已把 831 写进 commit message、注释与它自相矛盾，谁对要由实现者那一族定）⇒ **报回** |
+| E4 | "6 枚新用例入 `internal/panel` 名册（53 → 59）" | **成立**，且本程补了派单要的两本差集（§5.4）：六枚逐枚点得出名字、**消失 0 枚**、子测试 46 → 46（+0/−0）；`cmd/wisp` 自称的 60 → 63 同样成立（新增三枚具名、子测试 53 → 53） |
+| E5 | "`Snapshot` 四键与 `panel.ts` 未动、双向尺 `composer_test.go:73-78` 仍绿" | **成立**，且本程加了一发反向证明它**不是恒绿**（§4.3 的 M6：改一枚 json 键 → `composer_test.go:74` 与另一向 `approval_test.go:132` 同时响）。⚠ 附一条口径：`cmd/wisp` 那三枚在 M6 下**不响**，别把它们的绿当第二枚凭证 |
+| E6 | "逐字段拿另一路生产读数对账，**无一是本文件填的值**"（`37a4705` message） | **过宽**。真的是另一路生产读数的有 5 处（level／tool／reason／rulesHit 对 `consoleCard145` 那枚控制台卡、mode 对 `perm: MODE-READ` 审计行、results 的 correlationId 对 run 打印的 task id、results 的 text 对 stdout 流出的正文）；**但另有 4 处比的是本文件自己写的字面量或常量**：`panel_pump_test.go:218` `card.CorrelationID != "pump-corr"`（那枚 id 是本文件交给真 `bridge.Execute` 的）、`:295` `!= risk.ModeAskHighRiskName`、`:327` `strings.Contains(chunk.Text, "echo:")`、`:279` `!= panel.MaxAttachmentBytes`。⇒ **这四处不是缺陷**（值确实穿过生产对象，只是终点是一枚本文件写的期望值），但"无一"那两个字说过满了 ⇒ 按现量报名排者 |
+| E7 | "顺手把 `workspace canonical` 其实是 `foldPath` 折过的比较键这一处复算不符**钉进用例与证据件**"（`37a4705` message） | **用例那半成立，证据件那半在落盘时不存在**。`cmd/wisp/panel_pump_test.go:372-378` 逐字写着"written up in `docs/evidence/s1/35-panel-snapshot-pump-r1.md` **§3**"，而本件当时只有 §0／§1（`ddf8b6f`，派单自己也是这样记的）。⇒ **这正是派单点名要防的那一族（注释预先引用尚未产出的读数），上一程自己犯了一次。** 本程：①把这条 finding 真核为假（§6.1′）②写进本节 ③**不改那枚已提交的注释**，只点名"编号与指向仍不符（它指 §3、内容在本节）" |
+| E8 | §1.1"那份 C17 冻结名册 Go 侧 0 枚"，配的是 6 枚名字的抽样 | **仍然成立，且本程从 6 枚量到 18 枚全量**（§6.3）。两枚看似非零的逐枚处置掉了。⚠ 另记一条仪器坑：原命令 `grep -rn --include=*.go "panel.resync"` 里的 `.` 是**正则通配**，会误命中 `internal/agent/approval/queue.go:288` 那种路径 ⇒ 复测改用 `-F`（固定串） |
+| E9 | §1 的总结论"通道不存在"——**这条现在是否已被它自己改变**？ | **一半变了、一半没变，逐格给**（§6.4）。⇒ 准确说法：**"那份包有没有人在生产里造"这一格被本批改掉了；"Go → 面板这条通道不存在"没有被改掉**（`PanelBridge` 类型声明前后各 0 枚、C17 名册 18 枚全 0、`ParseComposerRequest` 非测试调用者前后各 0、`Marshal()`／`lastPanelSnapshot()`／`snapshotCount()` 非测试调用者各 0） |
+| E10 | 派单"`internal/panel/` **改前就有 1 枚红**" | **只在其中一棵树成立**：本机工作树 1 枚、锚点副本 0 枚（§5.2 已按两口径写）。这一条派单自己也预告了"两个数都对、拼成单值才错"⇒ 本程照写，并**另在 HEAD 副本复量第三格**（59／63 枚、0 红）钉住"它只由工作树形状造成" |
+| E11 | 派单"上一程说 `Go→面板` 这一跳不存在（WebView2 API 0 命中、无 HTTP/SSE/ws、`runResident` 原本不 import `panel`）" | **三条全部复算为真**（§2.1.1）。其中"原本"两字有下文了：`runResident` 现在**仍然**不 import `internal/panel`（0 命中），被接上的是 **`wisp run` 那条腿**、不是常驻腿 ⇒ 若有人以为"常驻进程已经在推快照"，那是**不成立**的 |
+
+### 6.1 E2 的逐枚现量（"包外调用者"这一句为什么只算一半成立）
+
+改前的数取自 `D:\tmp\wisp-35-pump-r2\base`（锚点副本），改后取自工作树；
+尺：`grep -rn --include=*.go "<sym>(" .` 去 `_test.go`、去注释行、去 `func ` 定义行。
+
+| 建造者 | 改前非测试调用点 | 改后非测试调用点 | 新增那几枚在**包外**吗 |
+|---|---|---|---|
+| `NewSnapshot` | **0** | 2（`internal/panel/pump.go:138`、`:182`） | ❌ 同包 |
+| `NewComposerState` | **0** | 1（`pump.go:171`） | ❌ 同包 |
+| `NewModeView` | **1**（`composer.go:202`） | **1**（还是 `composer.go:202`） | ❌ **一枚都没新增**——那句对它不成立 |
+| `ModeUnknownView` | **0** | 1（`pump.go:175`） | ❌ 同包 |
+| `UnsetWorkspaceView` | 2 | 4（新增 `cmd/wisp/panel_pump.go:84` 与 `pump.go:163`） | ✅ **`cmd/wisp` 那一枚是包外** |
+| `CardViewFromDecision` | 1 | 2（新增 `pump.go:72`） | ❌ 同包 |
+| `WorkspaceViewFromRoot` | 1 | 2（新增 `cmd/wisp/panel_pump.go:86`） | ✅ 包外 |
+
+⇒ **成立的那半**（也是本票段真正要的那格）：`panel.Snapshot` 今天有了一条**从运行进程出发可达**的建造路径——
+`cmd/wisp/run.go:421` `panel.NewSnapshotPump(...)` → `Publish()` → `Snapshot()` → `NewSnapshot(...)`。
+`NewSnapshotPump` 本身非测试调用点 1 枚、且在包外（`run.go:421`）。
+⇒ **不成立的那半**：五枚里只有 2 枚真 gained 包外调用者，1 枚（`NewModeView`）什么也没多。
+**这不是行为缺陷、是自述过宽**，写下来是为了让下一程别拿这句话当"名册已外扩"的凭据。
+
+### 6.1′ E7 里那条 finding 本身：复算为**真**
+
+`internal/tools/paths_workspace.go`：`:82 SetWorkspaceRoot(root)` 里 `:86 f := foldPath(root)`、`:93 p.workspace = f`；
+`:40 WorkspaceRoot()` 直接 `return p.workspace`。⇒ 泵经
+`cmd/wisp/panel_pump.go:86 panel.WorkspaceViewFromRoot(rt.paths.WorkspaceRoot())` 拿到的是
+**折过的比较键（小写形）**、不是 C26 授权的那个拼写。用例 `panel_pump_test.go:379-387` 因此
+按 `strings.EqualFold` 比、并在两枚拼写**相同**时才 `t.Log` 记"没复现"。
+本程现量：`post_cmd.txt` 里那句 `fold-key finding did not reproduce on this run` **0 次出现**
+⇒ 本机这一发两枚拼写确实不同 ⇒ finding **可复现**，不是纸面推断。
+
+### 6.2 E3 那两枚数值的逐枚来路（免得不成立被读成"没量过"）
+
+| 观测到的包大小 | 来路 |
+|---|---|
+| 585 B / 551 rune | 库层最小包（`pending:[]`、`results:[]`、默认 composer），从 M4 那发的 `pump_test.go:292` 红句里取串量字节 |
+| 803 | M5（面板侧重算那发，卡里 rules 变空、reason 变短） |
+| 811 / 812 | M1 / M1b（reason 换成常量句） |
+| 830 | E0 / M3b / M4 / M4b / M7 |
+| 831 | 工作树现状（`post_cmd.txt`）、M3、M3_no_wfix —— 也就是 `37a4705` message 里那枚 831 |
+| 837 | M6（json 键改名，多出来的 6 字节就是 `Renamed`） |
+| 893 | M2（results 被换成常量 chunk） |
+⇒ 七档全是**同一枚用例的同一枚采样**在不同变异下的值，且每一枚的 `packet bytes (N)` 与打印串的 UTF-8 长度**逐枚相等**（脚本比过，13/13 match）⇒ `len(data)` 这个字段自己是诚实的；不诚实的是那两行注释里的 534／997。
+
+### 6.3 E8 的 18 枚全量（改前只抽了 6 枚）
+
+尺：`grep -rnF --include=*.go "<名字>" internal cmd`，去 `_test.go`、去 `tools/d22scan`（那是 ban #6 的扫描模式串，不是路由）。
+
+| 名字 | 非测试命中 | 处置 |
+|---|---|---|
+| `panel.resync` `tasks.list` `tasks.detail` `history.query` `transcript.get` `approval.current` `approval.decide` `config.get` `config.set` `grants.list` `grants.revoke`(见下行) `privacy.purge` `privacy.export` `cost.summary` `models.list` `models.delete` `diagnostics.export` | **各 0** | ⇒ 名册确实一枚都没落地 |
+| `approval.queue` | 1 | **前缀巧合**：命中的是 `internal/statemachine/events.go:43 EvQueueDrained Event = "approval.queue-drained"`（D43 转移表的事件名），不是 `approval.queue` 那枚方法 |
+| `grants.revoke` | 2 | **不是字符串**：命中的是 `internal/agent/approval/queue.go:288`／`:374` 的 Go 方法调用 `it.grants.revoke()` |
+
+### 6.4 "0 枚调用者"这一条被它自己改掉了什么（派单点名要答的那格）
+
+| 那一格 | 改前 | 改后 | 判定 |
+|---|---|---|---|
+| `Snapshot` 有没有生产可达的建造者 | **无**（`NewSnapshot` 非测试调用点 0） | **有**（`run.go:421` → `Publish` → `Snapshot()`） | **已被本批改掉** |
+| 那份包有没有被真运行驱动 | 无 | 有（三处生产触发点，`snapshotCount()` 由 0 走到 ≥1，`TestThePumpIsDrivenNotJustAssembled` 钉住） | **已被本批改掉** |
+| 全量字节有没有人接 | — | **仍无**（`lastPanelSnapshot()`／`Marshal()`／`snapshotCount()` 非测试调用者各 0） | 未改掉 |
+| `Go → 面板`这条通道 | 不存在（§1.2 四条） | **仍不存在**（§2.1.1 四条重测，全 0） | 未改掉 |
+| `PanelBridge` 类型声明 | 0 | **0** | 未改掉 |
+| C17 冻结名册（18 枚） | 0 | **0** | 未改掉 |
+| `ParseComposerRequest` 非测试调用者 | 0 | **0**（前后同一枚数，且 `run.go:225` 那句"Nothing calls it yet"**未被推翻**） | 未改掉 |
+
+⇒ 给编排者的一句话：**§1 那份探针的结论没有被推翻，被推翻的是它的第 4 格（"那份包只有测试能造"）。**
+如果下一程或票面把这两件事混成"通道已存在"，那是错的；反过来，如果还有人拿 §1.1 说
+"`Snapshot` 没人造"，那也过期了——过期时刻就是 `5821e24`／`37a4705`。
+
+---
