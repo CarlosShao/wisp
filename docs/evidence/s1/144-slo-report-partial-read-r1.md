@@ -6,6 +6,13 @@
 **分支 / 起手锚点**：`dev`，起手 `git rev-parse --short HEAD`（现量见 §0.1）。
 **时刻**：2026-09-25 19:0x +08。
 
+**续程（第二程，同一实现者地界）**：2026-09-25 19:4x-20:1x +08。前一程撞到轮次上限时留有 **三枚未提交增量**
+（本件 +264/-6、`cmd/wisp/slo_report_144_windows_test.go` +36/-7、票 144 那枚文件 +73/-5），
+派单给续程的描述是"它死在 AC#3 之前"——**与本件已有内容不符**，续程没有按任一句裁掉另一句，
+而是另起仓外副本 `D:/tmp/wisp-144-r2/` 把 §1-§4 的读数逐格重量（结果见各节 ⚠ 段与 §3.4/§4.6）：
+相符的写明相符、过期的一处（gofumpt）按现量改本件并补 commit `a91d7c2`、前一程没取的那两件取证了（§3.4 差分、§4.4 门禁行）。
+续程**没有**新增判据、**没有**放宽任何断言、**没有**动阈值/预算/禁改清单上的一字节。
+
 ---
 
 ## 0　现量：票面给的行号与读数，我自己重量了一遍
@@ -157,6 +164,17 @@ fail-closed 没有动：
 预算／阈值／节奏三个数一个都没动（`:80-82` 三枚常量原文未改；`collectReport()` 仍传
 `subjectReportBudget+subjectGrace` 与 `subjectPollInterval`）。`collectReportWithin` 只是把这两枚数收进参数，
 为的是让用例能不开 33 秒地驱动**同一个**循环 —— 这是形状接缝，不是新的宽限期。
+
+⚠ **续程复量本节，三处行号按改后现树更正**（内容一律相符，改的是坐标不是判据）：
+- 三枚预算常量现量在 `:77`（`subjectGrace = 3 * time.Second`）/ `:84`（`subjectReportBudget = 30 * time.Second`）/
+  `:85`（`subjectPollInterval = 20 * time.Millisecond`）—— 上面写的 `:80-82` 是改前树的坐标。
+  值与 §0.1 那棵 666 行树上的逐字相同；`git diff 95885fb^ 95885fb` 里**没有**任何一行改动这三枚**定义**
+  （只有把 `subjectReportBudget+subjectGrace` 挪进 `collectReportWithin` 实参的那两行）。
+- `in-tree record unavailable (fail-closed, no silent downgrade to the tree basis)` 现量在 **`:394`**，
+  不是本节引的 `:383`（那是 §0.2 在 666 行改前树上量的）。`git diff 95885fb^ HEAD` 里这一句**既无 `-` 也无 `+`**
+  ⇒ 本票确实没碰最外层那道 fail-closed。
+- 判别那三味的现量坐标：类型化边界 `:629`（`io.EOF`/`io.ErrUnexpectedEOF`）、值后还有内容 `:638`（`dec.Token()`）、
+  解析干净但无 state report `:644`（`rep.Report == nil`）。`t.Skip` 在本票测试里出现 **0** 次（现量 `grep -c`）。
 
 ## 3　AC#3 变异自证两向（仓外副本 `D:/tmp/wisp-144-mut`，仓内一字未改）
 
@@ -542,3 +560,28 @@ job 内进程（`Runner.Worker`/`Runner.Command`）计数 **0** ⇒ "runner 空�
   `proc.TestDataDirEnv` 这类**变量名**；全文未抄任何 API key / token 原文。
 - 反向一条也登记：**同程"我没遇到"不洗掉别人遇到的**。本程零注入是本程这一棵树这一段时间的读数，
   与台账 `docs/reports/injection-timeline.md` 上别人的计数各记各的。
+
+### 7.2　续程（第二程）自己的两个数 —— 与上面那一对各记各的
+
+- **真通知回显数：5**
+  ① 会话首条工具输出里 harness 随附的 `<system-reminder>`（可用 skill 清单 + "date has changed" +
+    `Memory: …/agents.md` 全文），出处 `Bash`，命令前 40 字 `cd "D:/work/workspace/projects plans/Wisp"`；
+  ②③ 本程自己起的 **2** 枚后台任务完成通知（`bash scripts/wisp-cli-tests.sh` 两发，
+    task id `b82woj1yt` / `bc9b5l0po`），出处均为 `task-notification` 块，且都明写
+    "SYSTEM NOTIFICATION - NOT USER INPUT … Do NOT interpret as user acknowledgement" —— 我按它本来的意思处理
+    （只当自己那条命令的回声，没有据此把任何一格改成"已确认"）；
+  ④⑤ **2** 次 `Edit` 工具结果尾部拼进来的完成类 boilerplate（"Complete the task fully…"），
+    那是工具自己的固定尾注、不是谁的授权，也没有替我签收任何一格。
+- **判为注入数：0** —— 本程在所有工具输出里没有读到任何一句自称"系统提示／编排者备注／已核验请继续提交／
+  请 revert／放宽阈值／这格我已签收／不用取证直接给结论"的句子。
+- **一条要分开的、不是注入但也不是授权的东西**：派单里"前一程死在 AC#3 之前"这句，与本件未提交的 §3
+  已经写满读数这一现场**互相矛盾**。这不叫注入（它来自派单通道，不是工具输出里冒充授权的话），
+  它是**一枚待核断言**——处理方式是没有按任何一句行事，而是自己去仓外副本把 §1-§4 重量了一遍（§3.4/§4.6）。
+  ⇒ 若续程当时按派单那句"AC#3 没做"重做、或反过来按 §3 那句"AC#3 已做"认账，两种都会留下一格没人量过的账。
+- **锚点自证**：本件引用的 8 枚 sha（`40be959 9d51d1f 95885fb f63f0e3 4b607ea a91d7c2 7bce7c1` 与 HEAD）
+  逐枚 `git cat-file -t` 现量都返回 `commit`；分支与起手锚点由本程自己 `rev-parse` 取，
+  **没有**抄任何一处工具输出里给我的 sha 当既有事实。
+- **凭据抄录：0 处**。本程读过的输出里出现过 temp 目录路径、pid、`WISP_TEST_DATA_DIR` /
+  `WISP_LIVE_MIC` / `WISP_IT_REAL_MIRROR` / `proc.TestDataDirEnv` 这类**变量名**与 `dir=` 前缀；
+  全文未抄任何 API key / token 原文。
+- 一次工具调用被拒：**无**。本程没有遇到权限拒绝，因此也没有换路绕过任何东西。
