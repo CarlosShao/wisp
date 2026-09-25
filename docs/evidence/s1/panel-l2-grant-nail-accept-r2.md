@@ -473,3 +473,69 @@ grep -rn "func TestFrontendComposerRequestsMatchTheEnvelope" internal/panel/   -
 **文件保留、不删、不许当"这批已验收"凭据引用**；要恢复它 `:8`/`:73`/`:81` 的承诺，
 要么补出 §7/§9（本程的 §2/§6 就是同一批读数的独立版本），要么就地在那三行后追加
 "（本程未产出，见 `panel-l2-grant-nail-accept-r2.md` §2/§6）"。**只能追加，不许改写已提交的四行。**
+
+---
+
+## §6 闸门 + 名册 + 契约轴（本程自己量，锚点旁注）
+
+### §6.1 五枚被验 commit 的 name-only（逐枚现跑 `git show --name-only`）
+
+| commit | 带的.path | 枚数 | 判 |
+|---|---|---|---|
+| `9d85789` (a) | `docs/evidence/s1/panel-l2-grant-nail-fix-r2.md`、`internal/panel/l2_grant_boundary_test.go` | 2 | 只带自己两枚 |
+| `67c1d20` (b) | 同上 | 2 | 只带自己两枚 |
+| `2de984c` (c) 码 | **只有** `internal/panel/l2_grant_boundary_test.go` | 1 | **只带一枚**——码与证据分两枚落，证据由 `ad42e6f` 后补；这不是缺陷，但派单那句"只带自己**两枚**路径"对它字面不成立，我按"没带别家"判成立 |
+| `c4b959a` (c′) | 证据 + 测试件 | 2 | 只带自己两枚 |
+| `598620e` (d)(e) | 证据 + 测试件 | 2 | 只带自己两枚 |
+| 证据四枚 `3c0b630 ad42e6f cc6dc16 fa46fe3` | 各自只有 `panel-l2-grant-nail-fix-r2.md` | 1 | 只带自己一枚 |
+
+`9d85789…598620e` 逐枚 numstat（`-- internal/panel/`）：`142/20`、`202/2`、`386/27`、`315/5`、`36/10`——
+**分母里只出现那一枚 `_test.go`**。
+
+### §6.2 契约轴（零容忍面，每条都带正控）
+
+```
+git diff --numstat d88c356..HEAD -- internal/panel/
+   1068   49   internal/panel/l2_grant_boundary_test.go        ← 一枚路径，生产码零字节
+git diff --numstat d88c356..HEAD -- internal/observe/thresholds.go internal/risk/rules_gateway.go \
+     tools/d22scan/allowlist.txt internal/risk/ docs/PLAN.md docs/specs/ '*.sse'
+   （空）                                                     ← 零命中
+正控（同一把尺、同一个区间）：
+git diff --numstat d88c356..HEAD -- internal/panel/l2_grant_boundary_test.go
+   1068   49   …                                              ← 尺是活的
+```
+- 被点的三面先证明它们**存在**才敢说"零命中"：`git ls-files | grep -i 'thresholds.go|allowlist.txt|rules_gateway.go'`
+  → `internal/observe/thresholds.go`、`internal/risk/rules_gateway.go`、`tools/d22scan/allowlist.txt`；
+  golden `*.sse` 计数 = **52 枚**，未动。
+- **断言没有少**：`git show d88c356:…` vs `HEAD:…` 的
+  `t.Fatalf 21→31`、`t.Errorf 21→38`、`t.Fatal( 3→5`，合计 **45 → 74**；
+  `t.Skip` **0 → 0**（本包唯一一枚 `t.Skipf` 在 `attachments_test.go:191`，先存在）；
+  `func Test` **5 → 6**（diff 里只有一行 `>`、**零行 `<`**）。
+- **删掉的 49 行**我逐枚看过（原文在 `out/`）：6 枚 `t.Fatalf` + 1 枚 `t.Errorf` 的**消息改写**、
+  `jsonOr`/`inboundEnvelopes` 的判据替换、`routeNamesInFunc`→`routeLabelsInFunc` 的更名——
+  没有一枚断言被**去掉**，只有同一枚断言换了措辞或更强的判据。
+- **没有任何豁免表**：`git diff d88c356..HEAD -- internal/panel/ | grep '^+' | grep -i
+  't.Skip|exempt|allowlist|//nolint|except'` = **空**。
+- **helper 全是本批为钉子自造**：新增 26 枚 `func`（`collectPackageVars`/`collectDecodeSites`/
+  `resolveDestination`/`routeLabelsInFunc`/`routeShapedName`/`routeNamePool`/`poolJudgedByRealGuard`/
+  `answeredOutsidePool`/`inboundTypeRegistry`/`astTopKeys`/`reflectionTopKeys`/`decoderKnowsKey`… ），
+  旧名 `routeNamesInFunc` 全包引用 **0 处**（彻底退休、没留一条还能被叫到的弱版）；
+  numstat 只有那一枚 `_test.go` ⇒ **不可能是"改弱了一枚先存在的 helper"**，因为别的文件一字节未动。
+
+### §6.3 三门 + 名册（终态复跑；锚点写在数字旁边）
+
+| 量 | 锚点 | 读数 |
+|---|---|---|
+| `gofmt -l internal/panel/` 与 `gofmt -l .` | `0b95e9e` | 空，rc=0 |
+| `go vet ./internal/panel/` | `0b95e9e` | 空，rc=0 |
+| `go test ./internal/panel/ -count=2 -v` | `0b95e9e` | `RUN=196 TOPPASS=102 SUBPASS=92 FAIL=2 SKIP=0 ^panic:=0 distinct=98` |
+| 同上的"改前对照"（同一棵副本，钉换回 `5b618d14`） | 副本 | `RUN=180 TOPPASS=100 FAIL=2 SKIP=0 panic=0 distinct=90` |
+| `sh scripts/d22scan.sh` | `0b95e9e` | **rc=0**；`bans #1-5 internal/=203 cmd/=22`、`#6 frontend/=43`、`#7 internal/tools/=18`、`#8 design/=32 frontend/=43 internal/=407 cmd/=39` |
+
+- `FAIL=2` = `TestC21DesignTokensFourWayAgree` ×2（`out/clean-count2.txt` 第 249／510 行）。
+  **它必须是红的**：本程未修未跳未放宽，也没把它算进任何一格收益。⛔ 若下一位读到它是绿的，那是放水。
+- ⚠ 关于 `d22scan.sh` 的两条口径（照抄本仓已定案的读法，不是本程新造）：
+  bans #1–5 **不扫 `_test.go`**，所以本批这枚文件的墙钟/裸 goroutine 形状**不在它们分母里**；
+  只有 ban #8 含测试文件与注释；墙钟那条只认 `.Sub(time.Now())` 一种拼写。
+  `frontend/=43` 会长（第三家在写），本件只当"我这一发的分母"。
+- ⚠ 本程**没有**跑 `go test ./...`（派单明令，另两路 agent 在飞）。
