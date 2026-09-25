@@ -9,10 +9,10 @@
   逐枚点名核过，全部落在 `git log --format=%h 6103120..HEAD`（锚点 `fe4a301` 现量，那一段共 23 枚，含别程的 commit，此处不逐枚点名）；
   `6f9a703` 与 `a2a7489` 两枚是读完那条链之后新落上去的锚点，`git rev-parse --short HEAD` 现量。
   成对读数（改前/改后）的两半取自不同 HEAD，所以每半单独标；这不是笔误，是并发。
-- 三枚 commit（各枚 `git show --name-only` 现量都只带本程的路径，别家路径 0 枚）：
+- commit 落点（各枚 `git show --name-only` 现量都只带本程的路径，别家路径 0 枚）：
   - `9be3288` `feat(票143 AC#1+AC#2)` — `cmd/wisp/panel_assets.go` + `cmd/wisp/panel_assets_143_test.go`（387 insertions / 4 deletions）
   - `4037539` `fix(票143 AC#2 追正)` — `cmd/wisp/panel_assets.go` 一枚（旗标说明按现量改写，见 §2.3）
-  - 本件 `docs/evidence/s1/143-panel-assets-r4-leg-r1.md` 是第三枚
+  - `4350bc2` 与 `4bdb458` — 本件（追加式，只改这一枚 md，两枚都各带 `--name-only` 单行）
 
 ---
 
