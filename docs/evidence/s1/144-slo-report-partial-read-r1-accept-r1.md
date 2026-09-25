@@ -221,7 +221,7 @@ $ sh scripts/d22scan.sh                               → rc=0
 | AC#2 的约束 | 本程现量 | 判定 |
 |---|---|---|
 | 只许"没写完留预算里重读 / 坏了当场红"这一个方向 | §0.3 ACC2（修后 spending 33s 重读、修前一发即死）＋ ACC3（尾巴真到达时修后收到、修前丢掉）＋ ACC5 三态 tally | 成立 |
-| 两者**分得开且有凭据** | `readSubjectReport` 的边界是 `errors.Is(err, io.EOF)/io.ErrUnexpectedEOF`（本程现量在 `post/cmd/wisp/slo_windows.go:625`，**类型化错误、不是字符串比对**）；凭据是 `subjectReportRead{bytes, offset}` 随最后一发一路带进错误句 | 成立 |
+| 两者**分得开且有凭据** | `readSubjectReport` 的边界是 `errors.Is(err, io.EOF)/io.ErrUnexpectedEOF`（本程现量在 `post/cmd/wisp/slo_windows.go:629`，**类型化错误、不是字符串比对**）；凭据是 `subjectReportRead{bytes, offset}` 随最后一发一路带进错误句 | 成立 |
 | 不许"解析失败就 `continue` 到预算尽头"而不留最后一发读数 | 见下面"AC#1/AC#3 变异复量"那一节的 N2 一发：本程把那一支真造出来量过 | 成立 |
 | 不许加 `t.Skip`、不许动阈值/预算常量当修法 | `grep -c 't\.Skip' cmd/wisp/slo_report_144_windows_test.go` = **0**；那把尺的正控＝同包另外三枚文件里 `t.Skip` 命中 1/1/2 枚（尺能命中）；三枚预算常量在两棵树定义逐字相同（§4 末） | 成立 |
 | fail-closed 不许放宽 | 最外层那句 `in-tree record unavailable (fail-closed, no silent downgrade to the tree basis)` 现量在 `post:394`，`git diff 95885fb^ 1e94672 -- cmd/wisp/slo_windows.go` 里**既无 `-` 也无 `+` 命中它**（唯一命中 `fail-closed` 的是新注释那一行 `+`）；`internal/observe/**`、`*thresholds.go`、`*golden*` 在本票区间 `git diff --name-only` **读空** | 成立 |
@@ -491,7 +491,7 @@ mtime 才是。本程**没有真跑那枚脚本**（见 §9 第 11 条）。
 `writeSLO` 落盘又量了一遍同一形状，两者形状一致）；循环那一侧 `TestSLO144LoopGiveUpSentencesOnRealFiles`
 用**真文件＋真 `os.ReadFile`**（走 `collectReportWithin`，只是把预算收进参数），
 `…CorruptReportIsJudgedOnTheFirstRead` 用**新增的 `readReportFile` 接缝**——
-本程核过那一枚接缝**在生产里是 `nil`**（`post:686-688` `if read == nil { read = os.ReadFile }`）
+本程核过那一枚接缝**在生产里是 `nil`**（`post:683-685` `read := s.readReportFile; if read == nil { read = os.ReadFile }`）
 ⇒ 不是"用 mock 代替真的"那一形。**轴②：过。**
 
 **⚠ 与本票叙述不符的一处（这是本程造出来的洞，不是怀疑）：`a91d7c2` 不是"只有空白"那一枚 commit。**
@@ -643,3 +643,27 @@ E3 那一发它确实红了，本程只把红句原文引在 §8 末（`--warm-s
   `NOT-RUN` 那一条的判定**不受影响**：18 次里只有电池 1 的 `MB` 那一次出现 4 枚未取到，其余每次 7 枚都在册。
   ⇒ 记这一条是因为**同一个"数"本程连错两次**，而两次都是"凭印象乘/加出来的"、不是量出来的；
   留在纸上给下一个写变异电池的人：**枚数与次数要分开数，且都从 `ls mut*/*.log` 现量。**
+
+## 11　禁改清单与地界的残余核对（本程自己现量，不采信任何一程的"规矩自证"）
+
+| 项 | 本程现量 | 判定 |
+|---|---|---|
+| 有没有新增 `DEFERRED(D-xx)` 标记（有的话要五字段＋1:1 对台账） | `git diff 95885fb^ 1e94672 -- cmd/wisp/ \| grep -cE '^\+.*DEFERRED'` = **0** | 不触发登记义务 |
+| 有没有用"墙钟时间差"实现超时（D22 禁令） | diff 里新增行中 `time.Since` / `time.Now().` / `.Sub(` 命中 **0**；预算那一侧现量是 `observe.NewTimeout(budget)`（`post:687`，与同文件 `waitReady` 的 `:515` 同一枚单调 helper，D42#9） | 合规 |
+| 测试那枚新接缝会不会被生产误用 | `grep -rn readReportFile post/cmd/wisp/` ⇒ 声明在 `slo_windows.go:140`、默认走 `:683` 的 `if read == nil`；**赋值点只有 3 处、全在 `_test.go`（:294/:314/:337）**，生产装配路径 0 处 | 接缝只在测试里被接上 |
+| 新测试里那枚裸 `go func(` | 现量 `slo_report_144_windows_test.go:180`，`defer` 的是 `written <- nil`（带缓冲 1 的 channel 收口），**确实没有 `recover`**；d22scan ban #1 不含 `_test.go` 所以不响 | 实现件 §6 第 5 条**已如实登记**、没写成"过了 ban #1" ⇒ 这一条本程记成**诚实项**，不是缺陷 |
+| 地界：AC#1 写的是"只改 `collectReport` 那一段" | 实际改动面除那一段外，还给 `sloSubject` 加了 1 枚字段（注释 `:133-140`、字段本体 `:140`）。票面「规矩」那节写的是**文件级**（"只写 `cmd/wisp/slo_windows.go`、`cmd/wisp/**` 下新增的那一枚测试"），本程按文件级判**合规**；但**AC 那一节的措辞比规矩窄**，这一处差一寸本程登记给编排者，**不改判** | 合规（措辞窄于规矩，已登记） |
+| 票面禁改清单：`thresholds.go`／golden／`internal/observe/**`／`scripts/slo-check.ps1`／`tools/d22scan/**`／`internal/panel/**`／`internal/agent/approval/**`／`frontend/**`／`design/**`／`docs/PLAN.md`／`docs/specs/**` | `git diff --name-only 95885fb^ 1e94672` 全量 = **8 枚路径**：票 144/146 两枚工单、`cmd/wisp/` 那两枚、`docs/evidence/s1/144-*`／`146-*`（各两枚）、`docs/reports/pending-and-issues.md` ⇒ **上面每一枚禁改路径都读空** | 合规 |
+
+⇒ **禁改面：本程没造出任何一处越界。**
+中间那批发到一半时本程曾把"`build/slo` 里有报告"当成可能的污染——现量 mtime 后**排除了**（§8 末那一枚），
+那一处推理本程没有写成表里的断言，按规矩记在这里。
+
+---
+
+next= **本程交件**：五格已逐格出档（五枚全部**成立**、票面 `[x]` 本次无可撕对象），
+两枚**五格外的退回**（① `a91d7c2` 的三处自述为假；② `offset` 恒 0 ＋ 新注释多带一枚承诺）
+已在"判决一览"那张表里各给最小闭合集合，**处置权在编排者**：
+本程建议 ② **另开票**（它同时动码与注释、且要重跑变异再生成转录），① **只追加两句更正**（不动码、不动勾）。
+本程**没有**留下的东西：CI 上真撞一次那一发（只有 push 之后能看）、`wisp slo` 其余五态、
+`slo-check.ps1` 的一发本程自取的对照（§9 第 11 条）——**这三件不是本件能补的，别把本件当补过了**。
