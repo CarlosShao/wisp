@@ -753,5 +753,43 @@ band hits: 6  ->  U+26A0(⚠)×3、U+2260(≠)×1、U+2261(≡)×2
 
 ---
 
+## 9　落盘名册与复跑法（本程自己的 commit／临时件，取法随文）
+
+**commit 名册现量**（`git log --format='%h %s' e572aa94..HEAD -- <本件>`，逐枚 `git show --name-only` 自核）：
+本程共 **7 枚**，**每一枚的文件列表只有 `docs/evidence/s1/147-offset-naming-r1-accept-r1.md` 这一枚路径**；
+区间里另有 1 枚不是本程的（`f77a003` 台账 `A264`，路径 `docs/reports/pending-and-issues.md`）。
+本名册（第 9 节）就是第 7 枚。
+
+```
+0447040 第 0 格锚点  e2bfa58 第 1 格尺  2f23611 第 2 格判定  c62b884 第 3 格四件
+c107761 第 4 格门禁  1642886 第 5-8 格  + 本枚（第 9 格落盘名册）
+```
+
+**临时件名册（只建不删，35＋枚目录，全部在仓外）**：
+`/tmp/wisp147`（被验版本快照）· `snap2`（父码＋新尺）· `snap3`（完整改前基线）· `snap4/base`（基线＋MG）·
+`wisp147-corr`（本程探针＋它的探针）· `wisp147-mut/r1`（18 枚变异）· `r2`（7 枚组合）· `r3`（2 枚腿检）。
+
+**复跑本件最硬那两发的最小路径**：
+
+```
+git -c core.autocrlf=false -c core.eol=lf archive e572aa94 | tar -x -C <新目录>      # 被验版本
+git show ae968f9:cmd/wisp/slo_windows.go > <新目录>/cmd/wisp/slo_windows.go            # 只换码、留尺
+mkdir -p <新目录>/third_party && cp -r "<repo>/third_party/sherpa-onnx" <新目录>/third_party/
+export PATH="<repo>/third_party/sherpa-onnx:$PATH"
+cd <新目录> && go test -v -count=1 -run 'TestSLO147|TestSLO144' ./cmd/wisp/            # 期望 3 红（恒真那一问）
+python <仓外>/harness.py r1 && bash <仓外>/run.sh r1 A0-control-asis B4-MG-drop-at-offset   # 期望 0 红 / 3 红
+```
+
+⇒ 变异尺的原件在 `C:/Users/swq/AppData/Local/Temp/wisp147-mut/harness.py` 与 `run.sh`（**仓外、未入库**）；
+每发变异的字面替换都写在 `harness.py` 的 `MUT`／`COMBO` 里，**每次替换强制"该字面量在本文件中恰好出现 1 次"**，
+否则直接 FATAL 退出——这一条是为了让"下一位复算时改错地方也不会得到一个看起来像绿的答案"。
+
+⚠ 一处**已知的本件形状缺陷**（自报，不等谁来抓）：本件写作过程中 `docs/evidence/` 那批**行号引用**
+（§7 的凭据反扫、§3.2 的 `:189/:283`）都取自"落盘前那一版"或 `e572aa94` 的树，**不随本件自身增长而重编号**。
+按 §3.3 那条本仓共识（"别人给的行号也是读数、天然带版本"）处理：复算请一律按 sha 重取。
+
+
+---
+
 
 ---
