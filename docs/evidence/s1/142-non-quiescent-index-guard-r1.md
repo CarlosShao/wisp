@@ -195,3 +195,98 @@ cat D:\tmp\ticket-142\battery\M-A-no-guard.log
   零读数有意义。按本仓"承重"的口径：摘掉它们，块 2 与块 4 就退化成"永远为真"，
   存在一种变异（永远拒绝装配）能打不红任何其它东西——所以它们承的是"这一格可证伪"的重。
 
+
+## 4. AC#4 — 门禁与四枚数：改动前后同一把尺的读数
+
+### 4.1 扫描器自家测试（`sh tools/d22scan/runtests.sh -C tools/d22scan ./...`）
+
+两枚读数都取在 **`git archive HEAD | tar -x` 的纯净快照**里（同一形态、同一台机器），
+因为工作树在动（前端会话正在往 `frontend/` 落未追踪文件）：
+
+| 锚点 | PASS | FAIL | SKIP | === RUN | `^panic:` | 名册枚数 |
+|---|---|---|---|---|---|---|
+| `1b98c7b`（改前，我的第一枚 commit 之前） | 29 | 0 | 0 | 69 | 0 | 29 |
+| `640cff1`（改后，含本票两枚代码 commit） | 30 | 0 | 0 | 70 | 0 | 30 |
+
+**名册差集**（`grep -oE '^--- (PASS|FAIL|SKIP): NAME' | sort -u` 之后 `diff`）：
+
+```
+15a16
+> TestIndexChangingBetweenTheTwoGitReadsAppliesNoRules
+```
+
+⇒ **+1 枚、-0 枚**。四枚数之外还给名册，是因为一枚 panic 会吞掉同包其余读数：
+两枚快照的 `^panic:` 都是 0，且没有任何既有名字从名册里消失。
+工作树形态（非快照）在锚点 `21617e5` 上是同一组数：`PASS=30 FAIL=0 SKIP=0 === RUN=70`。
+`go vet ./...`（在 `tools/d22scan` 目录内，它是自己的 module）干净，`gofmt -l .` 空。
+
+### 4.2 门的读数（八枚数 + rc，每枚都带锚点）
+
+| 取数形态 | 锚点 / 树 | bans #1-5 internal/ | cmd/ | ban #6 frontend/ | ban #7 | ban #8 design/ | frontend/ | internal/ | cmd/ | rc |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 工作树（改前代码） | `0fe7629` | 203 | 22 | 43 | 18 | 32 | 43 | 407 | 39 | 0 |
+| 纯净快照（改前代码） | `1b98c7b` | 203 | 22 | 43 | 18 | 30 | 43 | 407 | 39 | 0 |
+| 纯净快照（改后代码） | `640cff1` | 203 | 22 | 43 | 18 | 30 | 43 | 407 | 39 | 0 |
+| 工作树 A/B（同一枚树，两版码） | `d61281c` | 203 | 22 | 46 | 18 | 32 | 46 | 407 | 39 | 0 |
+
+- **纯净快照那一行是本票 AC#4 指名要的形态**：`git archive` 出来的树没有 `.git`，
+  改前改后都必须"响亮自陈"。两版都自陈，逐字同形：
+  `d22scan: gitignore rules NOT APPLIED - git cannot be consulted in ...: git rev-parse --show-prefix: fatal: not a git repository ...`
+  且它是扫描输出的**第一行**（A218(7) 那条性质没被本票动到）。八枚数两版一字不差。
+  ⚠ 快照那行 `design/=30`（工作树是 32）：owner 手里那 16 枚未提交的 `design/` 挪动不进 archive，
+  不是回归，与本票无关。
+- **A/B 那一行是"正常树上的零行为改动"的正面证据**：同一枚工作树、同一条命令、
+  跑两遍——一遍用 `1b98c7b` 的 `gitignore.go`+`main.go`（副本 `D:	mp	icket-142b-before-1b98c7b`），
+  一遍用交付码——`diff` 八枚数与那行 provenance **完全为空**（`EIGHT_IDENTICAL`）。
+  原因就是 §0 那枚底数：静止索引上子集关系成立，新分支零次触发。
+- `frontend/` 今天一天里从 43 长到 46（`git ls-files frontend` 恒为 43，多的全是未追踪的工作树文件），
+  是前端会话在落文件，本票的 A/B 已经把这条与码分开。⛔ 没有为变绿动任何断言、阈值或豁免。
+
+## 5. 契约轴：断言删改枚数、Skip、以及"哪些生产行被删了"
+
+### 5.1 `git diff --numstat`，逐枚点名（本票是生产行为改动，所以全列）
+
+| commit | 文件 | + | - |
+|---|---|---|---|
+| `9d06544` | `tools/d22scan/gitignore.go` | 108 | 15 |
+| `9d06544` | `tools/d22scan/main.go` | 13 | 1 |
+| `9d06544` | `tools/d22scan/scan_test.go` | 214 | **0** |
+| `64b404d` | `tools/d22scan/scan_test.go` | 37 | **0** |
+| `640cff1` | `docs/evidence/s1/142-non-quiescent-index-guard-r1.md` | 197 | 0 |
+
+三枚 commit 的全部路径（`git show --name-only --format="" 9d06544 64b404d 640cff1 | sort -u`）
+只有上面这四枚文件，没碰 `allowlist.txt`、任何 `thresholds.go`、任何 golden、
+`docs/PLAN.md`、`docs/specs/**`、`internal/**`（含 `internal/risk/**`、`internal/panel/**`）、
+`frontend/**`、`design/**`、`rules_gateway.go`、`emojiRe` 那一行（`git show | grep -c emojiRe` = 0）。
+
+**测试文件删除列 = 0 ⇒ 断言删改枚数 = 0。** 这是可从numstat 直接读出的强结论：
+删除列为 0 意味着没有任何一行既有测试被改过或删过，我加的 251 行全部是插在既有行之间的新行。
+
+**那 16 枚生产删除逐枚归因**（`git diff -U0 1b98c7b 64b404d -- tools/d22scan/{gitignore,main}.go | grep '^-'`）：
+
+| 哪几枚 | 被删的原句 | 去哪了 |
+|---|---|---|
+| 1-2 | `// that list. Two shapes are known to do it, ... somewhere` / `// else:` | 措辞改成 "Three shapes ..."，同一句注释的续写，无语义 |
+| 3-10 | `ab9d5f4` 那 8 行 bounded 话（含 `:240 and :244` 两枚裸行号） | 换成 §2.2 那段：限定语保留、"被承认"改"被执行"、补残余、裸行号换成不腐烂的指法 |
+| 11-13 | `fail := func(format string, args ...any) *gitIndexState { return ... }` | 提成包级 `gitIndexUnavailable`，`fail := gitIndexUnavailable` 一行接上，`runGitIndex` 里 5 处 `fail(...)` 调用一字未改 |
+| 14-15 | `return fail("cannot parse git ls-files ...")` 两枚 | 随装配一起搬进 `buildGitIndexState`，只把 `fail(` 换成 `gitIndexUnavailable(`，消息文本逐字保留 |
+| 16 | `ign: newGitIgnore(root),`（main.go） | 搬到 `scanWithStats` 里那一行 `return scanWithIgnore(root, newGitIgnore(root))`，struct 字面量改成 `ign: ign` |
+
+⇒ **没有一枚被删的行携带语义判断**：十枚是注释、六枚是搬家。删除列里没有任何一条断言、
+任何一条 `return`/`fail` 的判定条件被去掉。
+
+### 5.2 `t.Skip` 枚数前后，以及"这把尺看得见它"的正控
+
+| 形态 | `grep -c 't\.Skip'` |
+|---|---|
+| `1b98c7b` 的 `scan_test.go` | 8 |
+| 交付（`64b404d`）的 `scan_test.go` | 8 |
+
+同 8 枚：7 枚既有 `t.Skipf(...)`（"not inside the wisp repo" 五枚 + 另两处）+ 1 枚注释里提到这个词；
+本票新增 0 枚。⚠ 这枚 0 用同一把尺在**副本**里种了一枚真的验过：
+`D:	mp	icket-142\skipcontrol\planted.go` 在 `TestScanCleanRepoIsGreen` 头里插一行
+`t.Skip("planted known-positive for the grep ruler")`，同一条 grep 立刻报出
+`113:	t.Skip("planted known-positive for the grep ruler")`（行号在此点名）。
+交付文件里那 7 枚 `t.Skipf` 的行号（改后）：`241 / 261 / 677 / 1044 / 1189 / 2169 / 2242`
+——前 5 枚与改前同行号，后 2 枚只是被我插在上面的新用例推下去（改前是 `1918 / 1991`）。
+并且两枚快照的 `--- SKIP` 计数都是 **0**，即这些分支今天都不响。
