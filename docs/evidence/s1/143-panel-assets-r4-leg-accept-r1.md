@@ -197,4 +197,54 @@ M1 退回的那张卡（红因原文里的 stdout 逐字节，`acc2-M1-full.log`
 ⇒ 判：**承重两发成立**（红因都能指到具体用例，票面 AC#3 要的"答得出是哪条用例"成立），
 但**"help 会撒谎"这一支只有测试在守，外部面一条都不守**——这是接线这件事唯一的仪器，属结构性残余，不退回。
 
+---
+
+## §5 攻点 5：渲染那一行 + 新旗标的射程
+
+### 5.1 `panel.NewApprovalCardView` 一字未加未改——用 git 证
+
+```
+git diff --name-only 9be3288^ HEAD -- internal/panel/approval.go      → 0 行
+git log --format='%h %s' 9be3288^..HEAD -- internal/panel/            → 空（整段区间没人动过 internal/panel）
+```
+
+⇒ 渲染函数本体（`internal/panel/approval.go:64-67` 那三行 + `CardViewFromDecision` `:72-99`）**与本票无关、零改动**。
+另加一枚交叉核：`go test -count=1 -run 'TestApprovalCardView' ./internal/panel/` 在实树现量 **ok**（rc=0）
+⇒ 卡面键名与字节契约没被这条 CLI 路的改动碰坏（实现方 §6.1 说"没跑 internal/panel 的测试"，本程替它跑的就是这一条线，只这一条线）。
+
+**但"渲染那一行一字未动"这句要说准**：调用行本身确实变了形，`git diff 9be3288^ 4037539 -- cmd/wisp/panel_assets.go` 的 hunk 逐字是
+
+```
+-		view := panel.NewApprovalCardView(risk.NewRiskAssessor(), panel.ApprovalSubject{
++		view := panel.NewApprovalCardView(assessor, panel.ApprovalSubject{
+```
+
+变的只有**第一个实参**（原来当场 new，现在 new 完可选地接一枚 detector 再传进去），
+`panel.ApprovalSubject{…}` 那整块 subject 字面量（`:69-77`）与后面的 `enc.Encode(view)`（`:79-84`）**一字未动**，
+`else` 分支（资产那几支）也一字未动。⇒ 票面 AC#2 那句"**一行渲染代码都不许加**"：**成立**（新增 0 行渲染）；
+自证表 §1 的"渲染那行没动，仍是 `panel.NewApprovalCardView`"要读成"函数没动"才准确，**调用表达式本身是动过一枚实参的**——这是措辞精度，不是伤。
+
+### 5.2 新旗标渗进 `-h`／`usage` 之外的地方了吗
+
+- stdout 面：§3 的五发 `cmp` 已证**逐字节不变**（含完全不进 `-l2` 分支的 P 发）⇒ 没渗。
+- rc 面：`-h` 前后都是 **2**；五发默认路径前后都是 **0** ⇒ 没渗。
+- stderr 面：`-h` 的读数**从 2 行变成 14 行**（改前：一行 `winsec` 日志 + 一行 usage；改后：那两行 + **6 枚旗标的说明**）。这是本票唯一的对外可见变化。
+  逐字 diff 已存 `/d/tmp/acc-143/hm1.diff` 之外的 `H-before.err`/`H-after.err`（两枚二进制现跑）。
+
+**判"补 `fs.PrintDefaults()` 是不是顺带修了别的东西"**：
+
+1. **必要性成立**：AC#2 要求旗标"在 `-h`/`usage` 里看得见（并且）说明它是'输入事实'不是'结论'"。
+   `fs.Var` 的说明串只有 `PrintDefaults()` 才会印出来。自加变异 **M3**（摘掉那一行）现量：
+   恰好 `TestAC2TaintSourceIsVisibleInTheUsageBlock` 一枚红，报的就是"help does not say the flag is an input fact"
+   /"does not disclaim that the flag carries a conclusion"（`panel_assets_143_test.go:228`、`:231`）
+   ⇒ **"那一改有自己的用例"这一条：成立**（它不是没测的顺带手）。
+2. **射程确实比"最小"宽**：`PrintDefaults()` 是**一把**印全部旗标，于是 5 枚**既存**旗标的说明一并进了 `-h`，
+   其中两枚的措辞本票没核过：`-l2` 那句 "print **the L2** card JSON"（实测不带 `-irreversible`/`-taint-source` 时打的是 `L1` 卡，
+   措辞与实际不符，`C-after.json` 现量）与 `-irreversible` 那句 "(**R8**'s input)"。两句都是**票 114 时代的既存文案**
+   （`git show 9be3288^` 里逐字同在），本票只是**把它们从注释级提到了界面级**。
+   ⇒ 判：**不是"顺手改行为"**（行为面只有 help 变长），但**是"顺手扩大了 exposure"**，且这层 exposure 无断言（M3 只钉新旗标那三枚 token）。
+   登记为**残余 R-143-a（不退回）**：要么把 `-l2` 那句 help 的 "the L2 card JSON" 改成不带承诺的说法（属 `cmd/wisp` 地界、一行的事、**要人工拍**因为改的是既存旗标文案），
+   要么补一枚"`-h` 全集逐字快照"的用例把界面级说明钉住。本程**一字节没改**。
+
+
 
