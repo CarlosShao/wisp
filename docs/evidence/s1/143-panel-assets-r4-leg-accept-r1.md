@@ -246,5 +246,74 @@ git log --format='%h %s' 9be3288^..HEAD -- internal/panel/            → 空（
    登记为**残余 R-143-a（不退回）**：要么把 `-l2` 那句 help 的 "the L2 card JSON" 改成不带承诺的说法（属 `cmd/wisp` 地界、一行的事、**要人工拍**因为改的是既存旗标文案），
    要么补一枚"`-h` 全集逐字快照"的用例把界面级说明钉住。本程**一字节没改**。
 
+---
+
+## §6 攻点 6：门禁与名册（自量，用的那一支写在标题里）
+
+### 6.1 先把我用的是哪一把尺说死（编排者点名要的"要么带 DLL、要么改跑脚本"）
+
+**两支都跑了**，两支持平：
+
+| 尺 | 命令（原文） | 读数 |
+|---|---|---|
+| 甲：带 DLL 的整包 verbose | `PATH="/d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx:$PATH" go test -count=1 -v ./cmd/wisp/` | 实树（内容＝锚点 `d242168`）**rc=0**、RUN=113 PASS=60 FAIL=0 SKIP=0；`ok github.com/CarlosShao/wisp/cmd/wisp 74.749s`（这行时长是命令自印，**不作判据**） |
+| 乙：CI 那一步 | `sh scripts/wisp-cli-tests.sh` | **rc=0**；末两行逐字：`runtests.sh: OK - packages=[./cmd/wisp/ -count=1 -skip ^(…7 枚…)]: PASS=60 FAIL=0 SKIP=0, === RUN=113, '[no tests to run]'=0` ＋ `portable-tests.sh: four numbers (all from -v output): === RUN=113 --- PASS=60 --- FAIL=0 --- SKIP=0` |
+
+**票面 `>` 更正③（"改前跑 `go test ./cmd/wisp/` 这条口令在本机字面跑不通"）——本程独立复量成立**：
+
+```
+$ go test ./cmd/wisp/            （不带任何 PATH 帮助，实树，HEAD=3855dc6）
+exit status 0xc0000135
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.035s
+```
+
+⇒ 这一条是**派单口令过期**，不是被验物的伤；本程所有 cmd/wisp 读数都是补过 DLL 路径之后取的。
+
+### 6.2 改前 / 改后各一次（同一把尺、同一环境，两半都从 git 现构）
+
+| 读数 | 版本来源 | RUN | 顶层 PASS | 顶层 FAIL | SKIP | panic |
+|---|---|---|---|---|---|---|
+| 改前 | `git archive 9be3288^` 副本（补 `frontend/dist` ＋ `third_party/`） | **101** | **54** | 0 | 0 | 0 |
+| 改后（副本） | `git archive d242168` 同一副本还原成 md5 `7f200f27…` | **113** | **60** | 0 | 0 | 0 |
+| 改后（实树交叉） | 工作树内容＝锚点（`git diff d242168..HEAD -- cmd/wisp/` 在 `0e17914`、`3855dc6` 两处都 0 行） | **113** | **60** | 0 | 0 | 0 |
+
+⇒ 与实现方 §4.1 那三行（101/54、113/60、113/60）**逐枚同值**，但本程是自己重跑的，没引用它。
+⚠ **一条流程坑要报回**（我踩过、实现方也绕过的同一形）：`git archive` 出来的副本**不带 `third_party/` 时整包会有 8 枚与本票无关的红**
+（`TestAC2RealProcessRefusesOnEveryLegWithoutAppData128`、3 枚 `TestAC*Early*/ResidentLeg*`、`TestSecretArgvCarriesNoSecret`、`TestSecretRealBinaryRefusesValueFlag` 等，
+红因逐字 `no native DLLs in ..\..\third_party\sherpa-onnx - run scripts/fetch-deps.ps1 first`）。
+把"整包 rc 红"当结论就会把这 8 枚算到被验物头上——**本仓记过这一族**，此处补一枚现量：补过 `third_party` 之后 54/60 全绿。
+
+### 6.3 点名册差集（四数之外的那一栏）
+
+```
+$ grep -E '^=== RUN   [A-Za-z]' <改前/改后两本 log> | sed 's/^=== RUN   //' | sort | diff -
+只增不减，新增 12 行 = 6 枚顶层 + 6 枚子用例：
+> TestAC1AC2TaintSourceLegProducesAJudgedR4
+> TestAC1CmdSideEmitsNoVerdictTokens
+> TestAC1MalformedTaintSourceIsRefused (+ /empty_content /empty_tool /no_separators /two_parts)
+> TestAC2TaintFlagDoesNotLeakIntoTheDefaultCard
+> TestAC2TaintSourceIsVisibleInTheUsageBlock
+> TestAC3TaintSourceThatTheCallDoesNotCarryIsNotAHit (+ /declared_but_absent_from_the_outgoing_call /fragment_below_the_contract_floor_cannot_match)
+消失：0 枚
+```
+
+第三枚独立仪器同向：包内那条覆盖率闸门自己印的披露行，改前印 **`54 startable cases`**、改后印 **`60 startable cases`**
+（`leg_dispatch_gate_133_test.go:244` 的 run-roster disclosure，副本与实树两处读数一致）。
+包内 `^func Test` 声明数现量 **63** 枚（实现方 §4.1 那行的"声明 57、跑到 54"是改前的形状，57+6=63 对得上）。
+`grep -c "t.Skip" cmd/wisp/panel_assets_143_test.go` = **0**；两本 log 的 `--- SKIP` = **0**；`panic` 字样 = **0**
+⇒ 没有"改成 `t.Skip` 把读数抹掉"，也没有"一枚 panic 吞掉同包几十条"那种缺口——**本程不需要记任何"未取到"**。
+
+### 6.4 另外三道门（本程现量，HEAD 见每一行）
+
+| 门 | 命令 | HEAD | 读数 |
+|---|---|---|---|
+| 格式 | `gofmt -l cmd/wisp/` | `3855dc6` | **空** |
+| vet | `go vet ./cmd/wisp/` | `3855dc6` | **空，rc=0**（没在根目录碰 `tools/d22scan/`，那是独立 module） |
+| D22 | `sh scripts/d22scan.sh` | `3855dc6` | **rc=0**。第一步正控先过：`runtests.sh: OK - packages=[./...] top-level: PASS=30 FAIL=0 SKIP=0, === RUN=70`；第二步真扫描 `d22scan: clean - no D22 ban violations`，分母逐枚 `bans #1-5 internal/=203, bans #1-5 cmd/=22, ban #6 frontend/=46, ban #7 internal/tools/=18, ban #8 design/=32, ban #8 frontend/=46, ban #8 internal/=407, ban #8 cmd/=40`（ban #8 那几项逐字写着 "comments and _test.go included" ⇒ 本票新增的 `_test.go` 真在 40 枚射程里）；另印一行 `skipped as git-ignored: 1 file(s) … frontend/dist/assets/` |
+
+⇒ **攻点 6 判成立**：四数（113/60/0/0）、名册差集（+6/−0）、三道门（空/空/rc=0）全部自量同值，
+且用的是"带 DLL"那一支并把另一支（`scripts/wisp-cli-tests.sh`）也对了一遍。
+
+
 
 
