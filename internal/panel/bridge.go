@@ -30,7 +30,14 @@ import (
 const ComposerRequestSource = "panel-composer"
 
 // Methods the composer route answers. Renaming one on either side goes red in
-// TestComposerMethodNamesMatchFrontend, which greps the frontend for them.
+// TestTheRendererHoldsExactlyOneDoorToTheHost (composer_test.go:502), whose
+// composerRouteLiterals() is built from these four constants and refuses any
+// "panel.*" literal the Go side does not answer; that nail's own positive
+// control is TestPlantedRendererDoorShapesGoRed (composer_test.go:533), which
+// points the same scan at a knowingly wrong tree. (This pointer used to name a
+// test that does not exist in this repository; ticket 35's snapshot pump was the
+// step that checked it, and the behaviour was already covered - only the name
+// was wrong.)
 const (
 	MethodModeRequest      = "panel.mode.request"
 	MethodWorkspaceRequest = "panel.workspace.request"
