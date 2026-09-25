@@ -227,9 +227,27 @@ type agentRuntime struct {
 	// not a path: the host that gets wired later cannot assemble a wider档 without
 	// a confirmation leg.
 	modeWrites *panel.ModeWriteHandler
-	notify     notifyPoster
-	stdout     io.Writer
-	stderr     io.Writer
+	// pump assembles the packet the panel is rendered from, out of the live
+	// objects this struct already holds (ticket 35's data half). It is the first
+	// thing in this repository that calls panel.NewSnapshot /
+	// panel.NewComposerState from a running process rather than from a test -
+	// see panel_pump.go for what its exit is and what it deliberately is not.
+	pump *panel.SnapshotPump
+	// stream is the results section's producer: the deltas this run streams,
+	// accumulated so a snapshot can carry them.
+	stream *panel.StreamLog
+	// lastSnap / lastSnapBytes are the most recent packet this run built, kept
+	// for the same reason consoleApprovalUI.cards is kept: the production path
+	// records what it did, and a reader asks afterwards. The ledger cannot hold
+	// the packet (internal/observe bounds one logged string at 512 chars), so
+	// this is where the bytes are while the transport is still missing.
+	snapMu        sync.Mutex
+	lastSnap      panel.Snapshot
+	lastSnapBytes []byte
+	snapSeen      bool
+	notify        notifyPoster
+	stdout        io.Writer
+	stderr        io.Writer
 	// logf receives the bridge's audit lines.
 	logf func(string, ...any)
 }
@@ -392,6 +410,23 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	rt.auditf("perm: MODE-READ origin=startup mode=%s source=%q",
 		modeStore.PermissionMode(), cfgPath)
 
+	// The panel's snapshot pump (ticket 35's data half). Every reader below is a
+	// live object this process is actually running - the approval queue, the perm
+	// store, the C26 canonicalizer, the stream this run is writing - so the
+	// packet is built from state, not from a test's arguments. What it does NOT
+	// have is a page to go to: this tree carries no WebView2 host (tickets 33/35),
+	// so the bytes are booked to the run's persistent ledger and the last mile is
+	// still open. panel_pump.go states the whole rule.
+	rt.stream = panel.NewStreamLog(panel.DefaultStreamKeys)
+	rt.pump = panel.NewSnapshotPump(panel.PumpSources{
+		Verdicts:  rt.liveVerdicts,
+		Mode:      rt.modes.PermissionMode,
+		Workspace: rt.workspaceView,
+		Results:   rt.stream.Chunks,
+		Out:       rt.bookPanelSnapshot,
+	})
+	rt.ui.publish = rt.publishPanelSnapshot
+
 	rt.bridge = tools.New(tools.Options{
 		Registry: reg,
 		Paths:    rt.paths,
@@ -512,7 +547,7 @@ func (rt *agentRuntime) execute(task string) int {
 	loop, err := agent.New(agent.Options{
 		Provider: prov,
 		Tools:    rt.bridge,
-		Sink:     consoleSink{out: rt.stdout},
+		Sink:     consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot},
 		// The loop's own tool_call rows are deliberately NOT booked: the
 		// bridge already writes the authoritative one (assessed level, gate
 		// decision, outcome, correlation id). Two rows per call would make
@@ -676,26 +711,54 @@ func buildEnvString() string { return buildinfo.EnvString() }
 
 // consoleSink streams the reply. It must never block (the loop publishes
 // synchronously on the task goroutine).
-type consoleSink struct{ out io.Writer }
+type consoleSink struct {
+	out io.Writer
+	// stream collects the reply's deltas into the snapshot's results section, and
+	// publish puts a packet on the wire where a visible state moved. Both are nil
+	// on a sink built without the pump (see assembleRuntime).
+	stream  *panel.StreamLog
+	publish func()
+}
 
 func (c consoleSink) Publish(e agent.Event) {
+	changed := false
 	switch e.Kind {
 	case agent.EvTextDelta:
 		fmt.Fprint(c.out, e.Text)
+		if c.stream != nil {
+			c.stream.Append(e.TaskID, e.Text)
+		}
 	case agent.EvReasoningDelta:
 		// Reasoning is shown as it is what the thinking probe measures; it is
-		// never mixed into the reply text.
+		// never mixed into the reply text. It is equally kept out of the
+		// snapshot's results section, whose contract is an assistant RESULT
+		// (panel.ResultChunk, composer.go:51-56); the reasoning field is
+		// ticket 145 row 3, which is a key the snapshot does not have.
 		fmt.Fprint(c.out, e.Text)
 	case agent.EvToolStart:
 		fmt.Fprintf(c.out, "\n[工具 %s]\n", e.ToolName)
+		changed = true
 	case agent.EvToolEnd:
 		fmt.Fprintf(c.out, "[工具 %s -> %s]\n", e.ToolName, e.Outcome)
+		changed = true
 	case agent.EvStuck:
 		fmt.Fprintf(c.out, "\n[停滞] %s\n", e.Text)
+		changed = true
 	case agent.EvError:
 		if e.Err != nil {
 			fmt.Fprintf(c.out, "\n[错误 %s] %s\n", e.Err.Class, e.Err.Detail)
 		}
+		changed = true
+	case agent.EvDone:
+		// The reply is over; the packet the panel renders has to carry that, or
+		// the result region would stream forever on a finished task.
+		if c.stream != nil {
+			c.stream.Close(e.TaskID)
+		}
+		changed = true
+	}
+	if changed && c.publish != nil {
+		c.publish()
 	}
 }
 
@@ -709,6 +772,10 @@ type consoleApprovalUI struct {
 	// gate".
 	mu    sync.Mutex
 	cards int
+	// publish puts one snapshot on the wire after the approval state moved. The
+	// assembly root attaches it (assembleRuntime); nil means this surface is
+	// standing alone, which is what every pre-ticket-35 console run was.
+	publish func()
 }
 
 // shown reports how many prompts have been displayed.
@@ -735,12 +802,27 @@ func (u *consoleApprovalUI) Prompt(_ context.Context, p approval.Prompt) error {
 		fmt.Fprintf(u.out, "  影响路径：%s\n", strings.Join(p.Paths, ", "))
 	}
 	fmt.Fprintf(u.out, "  窗口 %.1fs\n", p.Window.Seconds())
+	// The card is on screen, so the queue now has one more pending item than it
+	// did a microsecond ago: this is the first moment a snapshot about this task
+	// is worth sending.
+	if u.publish != nil {
+		u.publish()
+	}
 	return nil
 }
 
 // Update prints the transient states (countdown, warning, dismissal, handoff).
 func (u *consoleApprovalUI) Update(_ context.Context, e approval.Event) error {
 	fmt.Fprintf(u.out, "[%s] %s\n", e.Kind, e.Text)
+	// Only the two kinds that move the queue publish a packet. A tick or a
+	// warning changes a countdown the four-key snapshot has no field for, so
+	// publishing on it would book the same packet over and over while claiming
+	// nothing new - and inventing that field is Q-51, not this ticket.
+	if e.Kind == approval.EventDismissed || e.Kind == approval.EventStarted {
+		if u.publish != nil {
+			u.publish()
+		}
+	}
 	return nil
 }
 
