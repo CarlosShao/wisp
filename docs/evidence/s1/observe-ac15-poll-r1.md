@@ -429,3 +429,21 @@ after `142/142/0/0`、`^panic:` 前后皆 0、名册 71 枚两向差集为空；
    改后仍 0 枚；`-race` 本程一枚都没跑）。
 7. **没测 `settleWindowWaitBound` 该不该随 OS 变**：2s 是本机现量推的； ubuntu runner 上同一判据是否够，
    未量（见第 3 条）。
+
+### 7.6 一枚枚数自纠（§7.4 的"13 枚改成 await"说满了一枚，原句不抹，正确形状在这里）
+
+现量：`grep -rn 'awaitSettleReads(t \|awaitStateReads(t ' internal/observe/*_test.go \| grep -v window_wait`
+⇒ **13 个调用点**，逐点站点为：
+
+```
+sampler_settle_coverage_136_test.go:143  :237  :321  :374      （4 枚腿 / 4 个窗）
+sampler_settle_gate_136_test.go:166      :217  :264  :269      （3 枚腿 / 4 个窗：RowSeparates 两窗）
+sampler_test.go:87                       :334                  （2 枚腿 / 2 个窗）
+sampler_zerosample_136_test.go:158                             （1 枚腿 / 1 个窗）
+sampler_settle_zerosample_136_test.go:43 :140                  （2 枚腿 / 2 个窗）
+```
+
+⇒ 精确形状是 **家族 13 枚腿 / 15 处守卫 / 14 个窗；本程包了 12 枚腿 / 13 个窗**，
+少的那一枚腿与那一枚窗是 §2 表里第 13 行 `TestSampleStateZeroSampleWindowFailsClosed`
+（`reads == 0` 那枚守卫在 `SampleState` 侧结构上不可能由调度造成，§2 已给理由，原地留了注释、守卫未动）。
+§7.4 把"家族 13 枚"与"改了 12 枚"并写成一句，读起来像 13 枚全改了——**那是本程写错的枚数，不是漏了一枚没改**。
