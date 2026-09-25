@@ -655,3 +655,27 @@ jobs:
         # this step goes red if the card ever renders library props.
         run: npm run render:l2 -- fixtures/l2-card-fs-delete.json
 
+      # Three more render harnesses existed as package.json scripts with no step
+      # calling them (orchestrator, 2026-09-25): the gate could not go red for a
+      # regression in any of them. Each one derives its expectations from frozen
+      # text and throws when that text moves, so an unrun step here would be a
+      # silent denominator. Local colors before wiring: all three exit 0 on
+      # Windows at cd87354; the run itself is the cross-platform proof.
+      - name: Composer states paint the real envelope (render evidence)
+        # react-dom/server paints the composer over fixtures/composer-states.html:
+        # no-host attached, workspace chosen with a stored video, and an
+        # unsupported attachment told to the user. Red if a state stops painting.
+        run: npm run render:composer
+
+      - name: Streaming output honours PLAN.md's SSE row (render evidence)
+        # Reads PLAN.md's "SSE 流式输出" row and throws if that row or the tokens
+        # it names are gone, so this cannot pass by quietly checking nothing.
+        run: npm run render:stream
+
+      - name: Nav rail names only icons PLAN.md's frozen list carries (render evidence)
+        # Q1 = 甲: 9 rail rows are checked against the frozen PLAN.md §17.4 list,
+        # the two interim substitutions (chat, cost) must be exactly two, and the
+        # nav layer must hold no view state of its own. Throws when the parser
+        # loses a name the list does carry - a broken ruler refuses to conclude.
+        run: npm run render:nav
+
