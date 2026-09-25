@@ -69,6 +69,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/printer"
@@ -152,12 +153,17 @@ func bindableKeysOf(typ reflect.Type, depth int, prefix string, seen map[reflect
 			continue
 		}
 		tag := f.Tag.Get("json")
-		if tag == "-" {
-			continue
-		}
 		jsonName := ""
 		if tag != "" {
 			jsonName = strings.Split(tag, ",")[0]
+		}
+		// The name-part rule, shared with jsonOr and with the AST half: "-" is
+		// skipped, an empty name is the Go field name. The first version of this
+		// helper compared the WHOLE tag to "-", so `json:"-,omitempty"` fell
+		// through as a key named "-" - harmless for this ban (no verdict word
+		// lives in that spelling) but it is a second instrument that disagreed.
+		if jsonName == "-" {
+			continue
 		}
 		path := prefix + "." + f.Name
 		// An embedded type with no JSON name is not addressable by its own name:
@@ -249,6 +255,9 @@ type astField struct {
 	Text     string
 	TypeName string // same-package struct type it embeds or points at, "" if none
 	NoTag    bool
+	// Anonymous is the AST's own record of an embedded field, which is how
+	// astTopKeys knows not to mint a key for a promoted type.
+	Anonymous bool
 }
 
 // structShape is one declared struct type.
@@ -675,16 +684,18 @@ func parseBoundaryPackage(dir string) (boundaryPackage, error) {
 						text = strings.TrimSpace(lines[line-1])
 					}
 					typeName := structNameOf(fld.Type)
+					anon := len(fld.Names) == 0
 					for _, nm := range fld.Names {
 						sh.fields = append(sh.fields, astField{
 							JSONKey: jsonOr(nm.Name, jsonName, tagged), GoName: nm.Name,
 							Line: line, Text: text, TypeName: typeName, NoTag: !tagged,
 						})
 					}
-					if len(fld.Names) == 0 {
+					if anon {
 						sh.fields = append(sh.fields, astField{
 							JSONKey: jsonName, GoName: "embedded:" + typeName,
 							Line: line, Text: text, TypeName: typeName, NoTag: !tagged,
+							Anonymous: true,
 						})
 					}
 				}
@@ -704,8 +715,17 @@ func parseBoundaryPackage(dir string) (boundaryPackage, error) {
 	return pkg, nil
 }
 
+// jsonOr is the AST half's JSON-key rule, and it has to be the SAME rule
+// encoding/json runs, because the reflection half in this file gets it right by
+// asking the real decoder. encoding/json resolves a tag whose name part is empty
+// (`json:",omitempty"`) to the Go field name, not to "no key". The first version
+// of this helper returned "" for that spelling, which made the AST half blind to
+// exactly the shape acceptance r1 planted as M7/M8: the field bound "Outcome" on
+// the wire, reflection went red, the AST reported zero findings, and the two
+// instruments that claim to state one rule in two ways disagreed in the
+// under-reporting direction (their F-5).
 func jsonOr(goName, jsonName string, tagged bool) string {
-	if tagged {
+	if tagged && jsonName != "" {
 		return jsonName
 	}
 	return goName
@@ -1247,6 +1267,252 @@ func TestGrantVocabularyIsNotSatisfiedByTheRealEnvelopes(t *testing.T) {
 	}
 }
 
+// ---------------------------------------------------------------------------
+// The two instruments, held to one rule.
+// ---------------------------------------------------------------------------
+
+// inboundTypeRegistry names the production types this file can talk to by
+// reflection. The AST reads type names out of the package; reflection cannot
+// enumerate a package's types, so the pairing has to be written down - and
+// TestJSONKeyDerivationAgreesWithEncodingJSON goes loud when an inbound type is
+// missing from it, so the list cannot rot into covering less than the scan.
+func inboundTypeRegistry() map[string]reflect.Type {
+	return map[string]reflect.Type{
+		"ComposerRequest":   reflect.TypeOf(ComposerRequest{}),
+		"ModeRequest":       reflect.TypeOf(ModeRequest{}),
+		"AttachmentPayload": reflect.TypeOf(AttachmentPayload{}),
+		"AttachmentRef":     reflect.TypeOf(AttachmentRef{}),
+	}
+}
+
+// astTopKeys lists the JSON keys one declared struct can be addressed by at its
+// own level: no recursion, no promoted fields, so the three sides of this check
+// are comparing one thing. Embedded fields without a name are promoted and are
+// left out, exactly as encoding/json leaves them out of the parent's key set.
+func astTopKeys(sh structShape) []string {
+	var out []string
+	for _, f := range sh.fields {
+		if f.JSONKey == "-" {
+			continue
+		}
+		if f.Anonymous && f.JSONKey == "" {
+			continue // promoted: encoding/json gives the parent no key of its own
+		}
+		if !f.Anonymous && f.GoName != "" && !token.IsExported(f.GoName) {
+			continue // reflection skips unexported fields; so does encoding/json
+		}
+		out = append(out, f.JSONKey)
+	}
+	sort.Strings(out)
+	return out
+}
+
+// reflectionTopKeys is the same list built by asking the field tags the compiler
+// sees, with the fallback encoding/json applies to a name-less tag.
+func reflectionTopKeys(typ reflect.Type) []string {
+	var out []string
+	for i := 0; i < typ.NumField(); i++ {
+		f := typ.Field(i)
+		if !f.IsExported() {
+			continue
+		}
+		name := strings.Split(f.Tag.Get("json"), ",")[0]
+		if name == "-" {
+			continue
+		}
+		if f.Anonymous && name == "" {
+			continue
+		}
+		if name == "" {
+			name = f.Name
+		}
+		out = append(out, name)
+	}
+	sort.Strings(out)
+	return out
+}
+
+// decoderKnowsKey asks encoding/json itself - DisallowUnknownFields tells the
+// difference between "no field answers to that name" and "a field answered and
+// the value did not fit", and both of the latter mean the key is bindable.
+func decoderKnowsKey(typ reflect.Type, key string) (bool, error) {
+	doc := "{" + strconv.Quote(key) + ":\"grant\"}"
+	dec := json.NewDecoder(strings.NewReader(doc))
+	dec.DisallowUnknownFields()
+	err := dec.Decode(reflect.New(typ).Interface())
+	switch {
+	case err == nil:
+		return true, nil
+	case strings.Contains(err.Error(), "unknown field"):
+		return false, nil
+	case strings.Contains(err.Error(), "cannot unmarshal"):
+		return true, nil
+	default:
+		return false, fmt.Errorf("%s: %w", key, err)
+	}
+}
+
+// TestJSONKeyDerivationAgreesWithEncodingJSON pins F-5 from the other side. The
+// header of this file has always claimed the AST scan and the reflection walk are
+// "the same rule, written twice"; acceptance r1's M8 showed a spelling where they
+// were not, in the direction that hides a field. Three things have to agree now,
+// and each one is checked against a different authority:
+//
+//	(i)   jsonOr's rule, spelled out as a table;
+//	(ii)  the AST's key list and the reflect.StructTag key list, per inbound type;
+//	(iii) encoding/json's own verdict, via DisallowUnknownFields, on every name
+//	      each of the two produced - and on a list of approval-shaped names that
+//	      must NOT be bindable.
+func TestJSONKeyDerivationAgreesWithEncodingJSON(t *testing.T) {
+	t.Run("i the AST key rule matches encoding/json's, spelling by spelling", func(t *testing.T) {
+		cases := []struct {
+			goName, jsonName string
+			tagged           bool
+			want             string
+			why              string
+		}{
+			{"Outcome", "", false, "Outcome", "no tag: the Go field name is the key"},
+			{"Outcome", "outcome", true, "outcome", "named tag"},
+			{"Outcome", "", true, "Outcome", `name-less tag json:",omitempty" - the F-5 shape`},
+			{"Outcome", "-", true, "-", `json:"-" is skipped by the caller, not renamed`},
+			{"sizeBytes", "sizeBytes", true, "sizeBytes", "the caller already split the options off the tag"},
+		}
+		for _, tc := range cases {
+			if got := jsonOr(tc.goName, tc.jsonName, tc.tagged); got != tc.want {
+				t.Errorf("jsonOr(%q,%q,%v) = %q, want %q (%s)", tc.goName, tc.jsonName, tc.tagged, got, tc.want, tc.why)
+			}
+		}
+		// The reflection side must land on the same answers, or the two halves of
+		// this file are still two rules.
+		type f5Probe struct {
+			Named     string `json:"named,omitempty"`
+			Nameless  string `json:",omitempty"`
+			Untagged  string
+			Skipped   string `json:"-"`
+			Recursive string `json:"rec,-"`
+		}
+		want := map[string]bool{"named": true, "Nameless": true, "Untagged": true, "rec": true}
+		for _, k := range reflectionTopKeys(reflect.TypeOf(f5Probe{})) {
+			if !want[k] {
+				t.Errorf("reflection produced key %q, which encoding/json would not address it as", k)
+			}
+			delete(want, k)
+		}
+		for k := range want {
+			t.Errorf("encoding/json can address %q but the reflection walk did not list it", k)
+		}
+	})
+
+	root := panelRepoRoot(t)
+	dir := filepath.Join(root, "internal", "panel")
+	pkg, err := parseBoundaryPackage(dir)
+	if err != nil {
+		t.Fatalf("parse %s: %v", dir, err)
+	}
+	requireReadableInstrument(t, dir, pkg)
+	reg := inboundTypeRegistry()
+
+	// The registry cannot be allowed to rot into covering less than the scan.
+	for seed := range pkg.inboundSeeds {
+		if _, ok := reg[seed]; !ok {
+			t.Fatalf("decode destination %s has no reflection twin in inboundTypeRegistry: this test would compare the two instruments over different trees, and the AST half would be unchecked", seed)
+		}
+	}
+
+	t.Run("ii the AST list and the reflection list are one list", func(t *testing.T) {
+		for name, typ := range reg {
+			sh, ok := pkg.structs[name]
+			if !ok {
+				t.Fatalf("%s is in the registry but not in the parsed package - the registry names a type that is gone", name)
+			}
+			astKeys, reflKeys := astTopKeys(sh), reflectionTopKeys(typ)
+			if !equalStrings(astKeys, reflKeys) {
+				t.Errorf("%s: the AST half reads %v and the reflection half reads %v. Two instruments that claim one rule are disagreeing, which is the F-5 defect class regardless of which side is wrong",
+					name, astKeys, reflKeys)
+			}
+			t.Logf("%s: %d keys agreed by both instruments %v", name, len(astKeys), astKeys)
+		}
+	})
+
+	t.Run("iii the decoder is the third vote and the verdict words are not bindable", func(t *testing.T) {
+		// Names a page would use to hand Go an approval decision. Both spellings of
+		// each: encoding/json falls back to the Go field name, so a field called
+		// Outcome is addressable as "outcome" and as "Outcome".
+		candidates := []string{
+			"outcome", "Outcome", "allow", "Allow", "allowOnce", "AllowOnce",
+			"approved", "Approved", "grant", "Grant", "verdict", "Verdict",
+			"decision", "Decision", "decide", "Decide", "bypass", "Bypass",
+			"override", "Override", "permit", "Permit", "authorize", "Authorize",
+		}
+		for _, name := range sortedRegistryNames(reg) {
+			typ := reg[name]
+			sh := pkg.structs[name]
+			astKeys, reflKeys := astTopKeys(sh), reflectionTopKeys(typ)
+			for _, key := range reflKeys {
+				known, err := decoderKnowsKey(typ, key)
+				if err != nil {
+					t.Fatalf("%s: asking encoding/json about %q: %v", name, key, err)
+				}
+				if !known {
+					t.Errorf("%s: both instruments list %q but the decoder refuses it - the key rule in this file is not encoding/json's rule", name, key)
+				}
+			}
+			for _, key := range candidates {
+				known, err := decoderKnowsKey(typ, key)
+				if err != nil {
+					t.Fatalf("%s: asking encoding/json about %q: %v", name, key, err)
+				}
+				if known {
+					t.Errorf("%s binds the wire key %q, so a panel can address an approval decision through it (D33/F2, AGENTS.md ban #6). If %s is inbound, this is the finding; if it is not inbound any more, drop it from inboundTypeRegistry instead of dropping the check", name, key, name)
+				}
+			}
+			if extra := minusStrings(astKeys, reflKeys); len(extra) > 0 {
+				t.Errorf("%s: the AST lists %v, which the reflection walk and the decoder both refuse to confirm", name, extra)
+			}
+			t.Logf("%s: %d listed keys confirmed bindable, %d verdict spellings confirmed not bindable",
+				name, len(reflKeys), len(candidates))
+		}
+	})
+}
+
+func equalStrings(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func minusStrings(a, b []string) []string {
+	var out []string
+	for _, x := range a {
+		found := false
+		for _, y := range b {
+			if x == y {
+				found = true
+				break
+			}
+		}
+		if !found {
+			out = append(out, x)
+		}
+	}
+	return out
+}
+
+func sortedRegistryNames(reg map[string]reflect.Type) []string {
+	out := make([]string, 0, len(reg))
+	for name := range reg {
+		out = append(out, name)
+	}
+	sort.Strings(out)
+	return out
+}
+
 // TestGrantWireShapesAreRefusedAtTheDoor is facet 3, behavioural: what actually
 // happens on the wire today when a request carries a verdict.
 func TestGrantWireShapesAreRefusedAtTheDoor(t *testing.T) {
@@ -1533,6 +1799,50 @@ func TestPlantedGrantWiringGoesRedInASnapshot(t *testing.T) {
 			t.Errorf("plant G is the F-4 shape and produced no finding - the renamed route key is still out of range:%s", joinFindings(hits))
 		}
 		t.Logf("seeded from its own decode and red as required:%s", joinFindings(hits))
+	})
+
+	// Plant H: the F-5 shape written into an inbound envelope. The verdict field
+	// carries the name-less tag spelling `json:",omitempty"`, which encoding/json
+	// resolves to the GO FIELD NAME. The first version of jsonOr called that "no
+	// key", so the AST half of facet 2 saw nothing while the reflection half went
+	// red on the same tree - two instruments claiming one rule, disagreeing in the
+	// direction that hides a field. What is asserted is the finding keyed on
+	// "Outcome", the spelling the wire actually uses.
+	const plantHHandler = "package panel\n\n" +
+		"import \"encoding/json\"\n\n" +
+		"// throwaway: a verdict field with no name in its tag.\n" +
+		"type grantByFieldName struct {\n" +
+		"\tMethod  string `json:\"method\"`\n" +
+		"\tOutcome string `json:\",omitempty\"`\n" +
+		"}\n\n" +
+		"func handleGrantByFieldName(raw string) error {\n" +
+		"\tvar e grantByFieldName\n" +
+		"\treturn json.Unmarshal([]byte(raw), &e)\n" +
+		"}\n"
+
+	t.Run("H a verdict tagged without a name is still found under its field name", func(t *testing.T) {
+		dir := copyGoSources(t, src, files, string(bridgeReal), "l2-plant-h.go", plantHHandler)
+		pkg, err := parseBoundaryPackage(dir)
+		if err != nil {
+			t.Fatalf("parse %s: %v", dir, err)
+		}
+		requireReadableInstrument(t, dir, pkg)
+		var got []string
+		for _, f := range pkg.structs["grantByFieldName"].fields {
+			got = append(got, f.JSONKey)
+		}
+		sort.Strings(got)
+		// "method" is tagged and keeps its spelling; "Outcome" has no name in its
+		// tag and falls back to the Go field name. Before the fix this came out as
+		// ["", "method"], which is a key that addresses nothing.
+		if !equalStrings(got, []string{"Outcome", "method"}) {
+			t.Fatalf("the AST key rule resolved the planted struct to %v, want [Outcome method] - jsonOr is not following encoding/json", got)
+		}
+		hits := scanGrantBoundary(t, dir)
+		if !findingsName(hits, "l2-plant-h.go", `"Outcome"`) {
+			t.Errorf("plant H is the F-5 shape and produced no finding for the field-name spelling:%s", joinFindings(hits))
+		}
+		t.Logf("red as required, on the spelling the wire uses:%s", joinFindings(hits))
 	})
 
 	t.Run("C a wired grant door goes red on both halves", func(t *testing.T) {

@@ -244,3 +244,82 @@ M8  仍 0 findings（`grep -c 'has a grant-carrying face' afterC-M8.txt` = 0，�
 ```
 
 ⇒ 三发对照把话说死了：**(c) 治 M6/M13 的封套半，(c') 治 M7/M8，两枚各自承重、互相替不了。**
+
+---
+
+## §5 修法 (c′)：`jsonOr` 的空 tag 名（F-5），并把"两台仪器一条规矩"做成三向互印
+
+### §5.1 缺陷本体与最小修
+
+`json:",omitempty"` 的**名字部分是空**，`encoding/json` 于是回落到 Go 字段名（线上键 `Outcome`）。
+旧 `jsonOr(goName, jsonName, tagged)` 判的是 `if tagged { return jsonName }` ⇒ 返回 `""`，
+AST 那半就此**看不见这枚键**（验收 M8：反射红、AST 0 findings）。修成一格：
+
+```go
+if tagged && jsonName != "" { return jsonName }   // 空名字 = 回落到字段名
+return goName
+```
+
+顺手把反射那半的一处**同族但方向相反**的不一致钉平（这条验收没量到，是我读它邻行读出来的）：
+`bindableKeysOf` 旧写法是 `if tag == "-" { continue }`，比的是**整枚 tag**，
+所以 `json:"-,"`／`json:"-,omitempty"` 在它眼里是"一枚名叫 `-` 的键"。
+现在两半都按**名字段**判（`name == "-"` 即跳过），一台尺一个规矩。
+⚠ 代价说清：`json:"-,"` 在 `encoding/json` 里其实是"键名就叫 `-`"，我现在两边都当它不存在——
+但一名为 `-` 的键**装不进任何审批词**（`carriesGrantWord("-")` = false），
+所以这个取舍对本禁令是无害的，写进 §10"没测什么"。
+
+### §5.2 三向互印 `TestJSONKeyDerivationAgreesWithEncodingJSON`（新顶层测试）
+
+F-5 的病不在"某个键算错"，在**两台自称同一条规矩的仪器可以分开**。所以补的不是一个用例，是一枚三向裁判：
+
+- (i) `jsonOr` 的**规则表**：无 tag／有名 tag／`json:",omitempty"`／`json:"-"`，
+  外加一枚 `f5Probe` struct（含 `Nameless string \`json:",omitempty"\``、`Untagged`、`Skipped json:"-"`、
+  `Recursive json:"rec,-"`）逐键核反射那半；
+- (ii) **AST 键表 == 反射键表**，逐枚 inbound 类型比（只比本层键，不做递归，两把尺比同一格东西才判得动）；
+- (iii) **第三个裁判是 `encoding/json` 自己**：`DisallowUnknownFields()` 分得出
+  "没有字段应答这个名字"与"有字段应答了、值不合适"，两者后者＝可绑。
+  对每一枚列出的键问它"真能绑吗"，再对 **24 枚审批拼写**（`outcome/Outcome/allow/Allow/allowOnce/
+  AllowOnce/approved/Approved/grant/Grant/verdict/Verdict/decision/Decision/decide/Decide/
+  bypass/Bypass/override/Override/permit/Permit/authorize/Authorize`，两向拼写是因为回落规则让
+  `Outcome` 同时接 `outcome`）问它"这也能绑？"。
+
+外加一枚**防腐**断言：`pkg.inboundSeeds` 里任何一枚类型若不在 `inboundTypeRegistry()` 里 ⇒ `t.Fatalf`。
+（反射枚举不了一枚包里有哪些类型，这份名单只能手写；手写的东西会烂，所以给它配了引信——
+M7 那一发当场把这枚引信踩响了。）
+
+### §5.3 现量
+
+干净树（`-count=1`）：
+
+```
+ComposerRequest:   7 keys agreed by both instruments [attachments method path requestId source text to]
+ModeRequest:       2 keys [correlationId to]      AttachmentPayload: 4 [dataBase64 declaredMime name sizeBytes]
+AttachmentRef:     9 [artifact deduplicated id kind mime name reason sizeBytes stored]
+每枚：N listed keys confirmed bindable, 24 verdict spellings confirmed not bindable
+```
+
+变异树（同一副本，`bridge.go` 每发还原 `d2cd6362…`）：
+
+```
+M7 --- FAIL: TestNoInboundEnvelopeCanBindAnApprovalVerdict
+   :1211 the panel's inbound Go boundary has a grant-carrying face:
+           bridge.go:129: inbound envelope acceptM7Envelope can bind the JSON key "Outcome" ...
+   --- FAIL: TestJSONKeyDerivationAgreesWithEncodingJSON
+   :1418 decode destination acceptM7Envelope has no reflection twin in inboundTypeRegistry …(引信，见 §5.2)
+   +  --- FAIL: TestPlantedGrantWiringGoesRedInASnapshot （真树已脏的前置引信）
+M8 --- FAIL: TestNoInboundEnvelopeCanBindAnApprovalVerdict   （AST 那半从此不再 0 findings）
+   --- FAIL: TestJSONKeyDerivationAgreesWithEncodingJSON/iii_…
+   :1466 ComposerRequest binds the wire key "outcome" … / binds the wire key "Outcome" …（2 条，两向拼写各一）
+   --- FAIL: TestGrantWireShapesAreRefusedAtTheDoor/every_answered_route_drops_a_smuggled_verdict
+```
+
+⇒ 改前 M7 是**零枚红**（§0.3），改后 3 枚红；M8 改前反射红而 AST 静默，改后 AST 也红、
+且**运行中的解码器自己出来作证**。植物 H 把同一形状钉在快照里（断言 AST 键表就是
+`[Outcome method]`，改前是 `["", method]`）。
+
+### §5.4 (c′) 与 (c) 的分工（不许混着领功）
+
+派单说 (c) 的推论是"M6/M7/M13 都带自己的 `json.Unmarshal` ⇒ 换尺之后**三枚全在射程内**"。
+现量是：**换尺之后三枚确实都进了射程，但只有 M6/M13 当场红**；
+M7 在射程里仍然**静默**，因为射程只决定"看不看这枚 struct"，词表判的是"这枚 struct 的键算出来叫什么"。
+⇒ §4 那半句我按读数改过（`cc6dc16`），(c′) 是独立承重的一枚，不是 (c) 的零头。
