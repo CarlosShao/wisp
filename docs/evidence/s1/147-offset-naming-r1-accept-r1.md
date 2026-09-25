@@ -502,5 +502,109 @@ $ git diff --name-only 80fa0551 ae968f9 | grep -E '\.(go|ps1|sh)$|golden|thresho
 
 ---
 
+## 4　门禁与仪器坑（AC#5 逐发独立重跑，本程自己换尺）
+
+### 4.1　`bash scripts/wisp-cli-tests.sh`（CI 同形跑法），两边各一次
+
+```
+被验版本 e572aa94（/tmp/wisp147，自带 third_party/sherpa-onnx）:
+  portable-tests.sh: four numbers (all from -v output): === RUN=133  --- PASS=73  --- FAIL=0  --- SKIP=0
+  runtests.sh: OK    rc=0    （包体 81.771s）
+
+同一测试文件 + 父码 ae968f9（/tmp/wisp147-snap2）:
+  portable-tests.sh: four numbers (all from -v output): === RUN=133  --- PASS=70  --- FAIL=3  --- SKIP=0
+  strict runner exited 1    rc=1    （包体 81.220s）
+```
+
+⇒ **`=== RUN` 两发都非零（133／133）⇒ 都是"跑到了"**；本程**没有**遇到 `0xc0000135` ＋ 0 条 `=== RUN` 那一发，
+区分依据按票面用的是 `=== RUN` 枚数而不是返回码。
+⇒ 实现件的 `130 → 133` 与本程的 `133 / 133+3红` 不矛盾：它的"改前"是**父码＋父测试文件**（70 枚顶层），
+本程的"改前"是**父码＋新测试文件**（73 枚顶层、3 枚红）——本程那一发正是恒真凭据（§1.2），
+它的 130 与本程 `go test -list` 在完整改前基线上数出的 **70 枚顶层**同源相符。
+
+### 4.2　本程自己造的一发**假红**，以及如何把它与"活失败"分开（这条是新增读数）
+
+在被验版本的快照上**裸跑** `go test -v ./cmd/wisp/`（快照里没有那 22MB 未跟踪的 native 件）：
+
+```
+RUN=127 TOPPASS=65 TOPFAIL=8 TOPSKIP=0 PANIC=0
+--- FAIL: TestAC2RealProcessRefusesOnEveryLegWithoutAppData128 … 共 8 枚
+原因逐枚同一个：dataroot_128_windows_test.go:50: no native DLLs in ..\..\third_party\sherpa-onnx
+```
+
+⇒ **8 枚红全是环境件**，不是代码失败；补上 `third_party/sherpa-onnx` 后 CI 同形跑法给出 `FAIL=0`（§4.1）。
+⇒ 记进仪器坑：**仓外快照跑 `cmd/wisp` 必须自己补 `third_party/`**，否则会拿到"改后 8 枚红"这种
+**看起来像活失败**的读数。`PANIC=0` 一并记：那 8 枚不是 panic 吞读数。
+
+### 4.3　名册差集（两向 `comm`，本程自己 `-list`，不读它的 `.names`）
+
+```
+pre（完整改前基线 /tmp/wisp147-snap3）= 70 枚顶层   post（被验版本）= 73 枚顶层
+comm -23（消失）：（空）
+comm -13（新增）：TestSLO147LoopGiveUpSentenceAgreesWithTheBytesItRead
+                 TestSLO147OffsetSemanticsRenderThreeDifferentSentences
+                 TestSLO147UnwrittenSentenceNamesTheOffsetTheDocumentStoppedAt
+```
+
+### 4.4　那把"永远绿"的假尺，本程换尺复现（与实现件 §5.2 有一处归属差）
+
+```
+                       naive（子串）        anchored（行首）
+被验版本(全绿) 日志:   FAIL=1 SKIP=2 RUN=136   ->   FAIL=0 SKIP=0 RUN=133
+父码+新尺     日志:   FAIL=4 SKIP=2 RUN=136   ->   FAIL=3 SKIP=0 RUN=133
+```
+
+⇒ 实现件 §5.2 说"多出来的**都**来自 `-skip` 说明文字"——本程现量：**只有一半对**。
+`SKIP` 多出的 2 枚确实来自散文（`portable-tests.sh:11` 那行 ＋ 汇总行）；
+**`FAIL` 多出的那 1 枚来自它自己的汇总行** `… --- FAIL=0 --- SKIP=0`，与 `-skip` 散文无关。
+（派单第 4 节把这条写作"那是 `-skip` 那句散文"，同源不准，记进第 6 格。）
+⇒ 判红绿只认 `^--- FAIL: <名>`；本程全部矩阵按**用例名**逐个判（§1.1），不按枚数。
+
+### 4.5　另外三发
+
+```
+$ D:/work/base/gopath/bin/gofumpt.exe --version
+v0.12.0 (go1.27.1)                                                     <- 版本先跑再读数，没背
+$ D:/work/base/gopath/bin/gofumpt.exe -l . tools/d22scan tools/mockllm
+（空）  rc=0
+$ go vet ./cmd/wisp/
+（空）  rc=0
+$ sh scripts/d22scan.sh                                                 rc=0
+  正对照（先证明这把尺能红）: runtests.sh: OK - packages=[./...] top-level: PASS=30 FAIL=0 SKIP=0, === RUN=70
+  d22scan: examined 228 production Go files under internal/ and cmd/
+  bans #1-5 internal/=205  cmd/=23 | ban #6 frontend/=52 | ban #7 internal/tools/=18
+  ban #8 design/=30  frontend/=52  internal/=412  cmd/=43
+  d22scan: clean - no D22 ban violations
+```
+
+⇒ 八个作用域 `examined N` **全非零** ⇒ `clean` 不是"什么都没扫"。跑的是 **gofumpt**，没拿 `gofmt` 交差。
+⇒ **一处读数差异要说清**：本程 `ban #8 design/ = 30`，实现件 §5.3 是 `35`。
+原因＝`d22scan` 扫的永远是**工作树**，而本程扫的是**被验版本的仓外快照**：
+工作树里 `design/` 此刻正被另一会话写（16 枚未提交删除＋`design/old/`、`screenshots/` 等未跟踪新增），
+多出来的那几枚是**别人家的文件**。方向上是"多扫"不是"少扫"，不影响 `clean` 的可信度，
+但它意味着：**任何"design/ 与 frontend/ 零命中"的宣称都不等于被验版本的宣称**（本程的 30 才是锚点的数）。
+另：快照不是 git 仓，`d22scan` 因此打了一行 `gitignore rules NOT APPLIED … every path in every scope is being scanned`
+⇒ 它自己说的"这是响的那一面"，本程接受。
+
+### 4.6　AC#4 契约轴
+
+见 §0.4（三枚 commit 的 `--name-only` 全集）＋这一发本程自己的现量：
+
+```
+$ git show --name-only --format= 2dc2b28 1f3ede9 e572aa94 | sort -u \
+    | grep -E '^(internal/risk/|internal/panel/|internal/agent/approval/|tools/d22scan/|.*thresholds\.go$|\
+.*golden.*|.*allowlist\.txt$|scripts/slo-check\.ps1$|docs/PLAN\.md$|docs/specs/|frontend/|design/)'
+（空）
+```
+
+⇒ 票面 AC#4 点名的禁改面**逐枚零字节**；`frontend/**`／`design/**` 那两枚本程**没碰、没还原、
+也没把它们算进任何"零命中"宣称**（本程的宣称只覆盖上面那枚交集为空的事实）。
+阈值与预算：`thresholds.go` 不在改动名册里；`subjectReportBudget`／`subjectGrace` 未出现在
+`git diff 2dc2b28^ 2dc2b28`（4 枚删除逐枚点名见 §1.5，全是注释加那一行移位）。
+
+**本格判定：成立。** 两处随文上报（§4.2 假红那味、§4.5 `design/` 分母那味）都是**仪器读数**问题，不是活失败。
+
+---
+
 
 ---
