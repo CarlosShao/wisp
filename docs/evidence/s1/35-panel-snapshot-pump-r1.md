@@ -245,3 +245,66 @@
   那根管子做决定）。
 
 ---
+
+## 3. 落地集与没落的那半（续程核过的版本）
+
+### 3.1 落地集（三枚 commit，逐枚现量）
+
+| commit | 文件 | 行 | 这一枚做了什么（续程读过、不是转述 commit message） |
+|---|---|---|---|
+| `5821e24` | `internal/panel/pump.go` | 341（新） | `NativeVerdict` / `PumpSources` / `SnapshotPump`（`Snapshot` / `Marshal` / `Publish` / `Publishes`）/ `StreamLog`（有界合并） |
+| | `internal/panel/pump_test.go` | 309（新） | 6 枚用例（名册见 §5） |
+| | `internal/agent/approval/pending_read.go` | 60（新） | `(*Queue).LiveApprovals()` 只读枚举 `statePending` 项，返回 `tools.Decision` 原样拷贝 |
+| | `internal/panel/bridge.go` | 8/1 | **只改注释**：把点名不存在的 `TestComposerMethodNamesMatchFrontend`… 的旧指向改指真存在的两枚门（自证见 §3.3）；本程复算：这枚文件的**行为**未变（`ParseComposerRequest` 与其 4 枚方法常量逐字未动） |
+| `37a4705` | `cmd/wisp/panel_pump.go` | 252（新） | 四个读数器接活对象 ＋ 有界摘要出口 `bookPanelSnapshot` |
+| | `cmd/wisp/panel_pump_test.go` | 430（新） | 3 枚用例 ＋ 两把 helper 尺 |
+| | `cmd/wisp/run.go` | 94/6 | `agentRuntime` 加 `pump/stream/lastSnap*/snapSeen`；装配根 `:420-428`；`consoleSink` 加 `stream/publish`；`consoleApprovalUI` 加 `publish` |
+| `6e348f1` | `cmd/wisp/panel_pump_test.go` | 16/5 | 把 `shortenL2Window145` 改名 `nonDefaultConfig145`，**新增**一枚断言 `:295-298`（档必须是夹具设的非默认档） |
+
+> ⚠ `6e348f1` 那一枚**只落了断言、没落夹具写入**——它的注释（`panel_pump_test.go:120-125`）
+> 声称给了两个值，代码里 `:133` 只往 `[risk]` 追加了 `confirm_timeout_sec = 2` 一个，
+> `permission_mode` **一个字都没写**。后果与隔离实验见 §5.2 与 §4 的 `M3_no_wfix`。
+> **本程没有、也不会把它"顺手改回去"**；派单写死了这条理由不许推翻，本节只报它落了一半。
+
+### 3.2 冻结面：本批有没有碰到不该碰的（逐条现量）
+
+| 面 | 命令 | 读数 |
+|---|---|---|
+| `internal/panel/composer.go`（`Snapshot` 四键的家） | `git diff --stat aeba6ff..HEAD -- internal/panel/composer.go` | **空** |
+| `frontend/src/lib/panel.ts` | 同上换路径 | **空**（且 `git status --porcelain -- frontend/src/lib/panel.ts` 空 ⇒ 双向尺读的工作树是干净的，那发绿说明得了事） |
+| `internal/risk/**`（含 `rules_gateway.go`） | `git diff --stat aeba6ff..HEAD -- internal/risk/` | **空** |
+| `thresholds.go` / golden / `allowlist.txt` | `git diff --name-only aeba6ff..HEAD \| grep -iE "thresholds\|golden\|allowlist"` | **0 命中** |
+| `internal/panel/l2_grant_boundary_test.go`（别族依据件） | `git diff --stat aeba6ff..HEAD -- internal/panel/l2_grant_boundary_test.go` | **空** |
+| `docs/PLAN.md` / `docs/specs/**` | `git diff --name-only aeba6ff..HEAD` 全 13 枚路径里无这两类 | **0 命中** |
+| `design/**`（owner 16 枚未提交删除） | `git status --porcelain` 逐枚原样 | **一格没碰、也没算进任何零命中** |
+| `DEFERRED(` 标记总数 | 前后各数一遍 | **29 → 29**（本批 0 枚新增；缺的那根管子早登记在 `internal/panel/doc.go:16 DEFERRED(host/bridge): implemented by ticket 33 (host), ticket 35 (bridge)`，该件未被本批改动）⇒ `SPEC-12 §5` 登记表无需新增条目 |
+
+### 3.3 `bridge.go` 那处注释的新指向（本程自证，不留同型 bug）
+
+派单点名的这一条要单独证：**"注释预先引用尚未产出的读数"是本仓假绿前身**，而这次改的正是那类 bug。
+
+```
+$ grep -n "func TestTheRendererHoldsExactlyOneDoorToTheHost\|func TestPlantedRendererDoorShapesGoRed" \
+      internal/panel/composer_test.go
+502:func TestTheRendererHoldsExactlyOneDoorToTheHost(t *testing.T) {
+533:func TestPlantedRendererDoorShapesGoRed(t *testing.T) {
+$ sed -n '502p;533p' internal/panel/composer_test.go      # 行号与声明同行，两枚都对
+$ grep -rn "TestComposerMethodNamesMatchFrontend" --include=*.go . | wc -l
+0                                                          # 旧指向仍 0 处（改前也是 0，见 §1.1）
+```
+
+⇒ 两枚真存在、真在那两行、与 `bridge.go:31-36` 的**新**指向一字不差。这一处**成立**。
+
+### 3.4 没落的那半（仍然没落，且本程没替它做决定）
+
+| 缺的层 | §1.3 的归口 | 现在的状态 |
+|---|---|---|
+| L1 宿主（WebView2 环境、C27 单例、`Resolve` 接进请求过滤） | 票 33 | **未落**，本批 0 处宿主代码（§2.1.1 现量 WebView2 API 仍 0 命中） |
+| L2 出站通道（Go 主动把字节交给页面） | 票 35 名下 | **未落**。今天 `src.Out` 接的是 ledger，全量字节只有测试在读（§2.1） |
+| L3 C17 名册（含 `panel.resync`） | 票 35，且白名单**定稿**在 AGENTS §2「未定义即停」清单里 | **未落**：`PanelBridge` 类型声明前后各 0 枚（§2.1.1）；`bridge.go` 仍只有入站那 4 枚 composer 方法名 |
+| L4 快照的构造与真来源 | 本票段 | **落了**，承重自证见 §4 |
+
+⇒ 派单写死的那一条本程**照做**：把字节送到界面是票 33／票 35 出站那一跳，本程没有、也不该
+自选发明替代管子（`§2.3` 那条零命中的现量就是这条的凭证）。
+
+---
