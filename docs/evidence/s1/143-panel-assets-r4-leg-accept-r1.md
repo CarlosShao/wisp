@@ -314,6 +314,70 @@ $ grep -E '^=== RUN   [A-Za-z]' <改前/改后两本 log> | sed 's/^=== RUN   //
 ⇒ **攻点 6 判成立**：四数（113/60/0/0）、名册差集（+6/−0）、三道门（空/空/rc=0）全部自量同值，
 且用的是"带 DLL"那一支并把另一支（`scripts/wisp-cli-tests.sh`）也对了一遍。
 
+---
+
+## §7 攻点 7：新缺口 F-143-1 该不该现在动（本程**一字节没碰 `internal/tools/**`**，只裁形状）
+
+现场复量（全部直读 `internal/tools/bridge.go`，实树＝锚点，`git status --porcelain -- internal/tools/` = **0 行**）：
+
+| 位置 | 读数 |
+|---|---|
+| `internal/tools/bridge.go:193-196` | 第二枚 assessor：`b.assess = risk.NewRiskAssessor().WithCanonicalizer(o.Paths).WithSensitiveClassifier(b.classifier)`——**没有** `WithTaintDetector` |
+| `:663-671`（`assessorFor`） | `if b.injected \|\| b.prov == nil \|\| taskID == "" { return b.assess }`，否则才 new 一枚带 `WithTaintDetector(b.prov.Detector(taskID))`（`:670`） |
+| `:243`/`:272` | 唯一生产入口是 `func (b *Bridge) Execute(...)`（`:243`），判定行 `verdict := b.assessorFor(req.TaskID).Assess(req.Name, params, …)`（`:272`） |
+| `:551-553`（`mark`） | `if b.prov == nil \|\| dec.TaskID == "" \|\| !risk.IsSensitiveSource(dec.Tool) { return }`——**空 `taskID` 时连 `Mark` 都不做**（⇒ 那条 scope 本来就是空的，缺口是"整个 R4 输入缺席"，不只是"检测器没接"） |
+
+### ⓐ 今天是否真不可达——调用者清单（本程现量）
+
+`Bridge.Execute` 的生产调用者**只有 2 行**，都在同一枚函数里：
+
+```
+internal/agent/loop.go:727	return l.opt.Tools.Execute(ctx, req)      ← func (l *Loop) dispatch（:723）
+internal/agent/loop.go:731	out, err := l.opt.Tools.Execute(tctx, req)
+```
+
+`req` 的来源只有一处：`internal/agent/loop.go:643-646`（在 `executeCalls`，`:583`）里 `TaskID: taskID, CorrelationID: taskID`，
+而 `taskID` 是 `newTaskID()`（`loop.go:1104-1117`，`crypto/rand` 16 字节 → hex UUID 形状，**结构上不可能为空串**）；
+上游生产入口只有 `cmd/wisp/run.go:541 loop.Run(ctx, task)`（`RunAsync` 同形，`:321`）。
+Bridge 的生产构造点也只有 1 处：`cmd/wisp/run.go:395 rt.bridge = tools.New(tools.Options{…})`，
+其中 **`Provenance:` 在场**（`run.go:407`，`risk.NewProvenance(risk.ProvOptions{NoProbe: true})`），
+`Options.Assessor`（`injected` 那味）在非测试代码里**零命中**（唯一命中是 `bridge.go:120` 那行字段注释）。
+全仓非测试的 `ToolRequest{` 构造点：`grep` 现量**只有 `loop.go:643` 一枚**。
+
+⇒ **ⓐ 成立：今天不可达**，三个 disjunct 里 `taskID==""` 与 `injected` 在生产侧都到不了，
+`prov == nil` 只在"未来的另一枚 composition root 省略 `Provenance`"时才成立（今天的唯一 composition root 没省）。
+
+⚠ 顺带复量出**一处文字与代码相互矛盾**（**既存件、与本票无关**）：`cmd/wisp/run.go:404-406` 那三行注释逐字写着
+"R4 stays dormant … a dormant R4 is the honest state"，而紧跟的 `:407` 就把 C25 引擎接了进去。
+`git show 9be3288^:cmd/wisp/run.go` 里这七行逐字同在 ⇒ **票 143 之前就是这样**，不是本票弄的；
+但它正是简报那句"生产里是接了的"需要说准的第二处（第一处是 F-143-1 本身）。
+
+### ⓑ 若可达，最坏后果是什么形状
+
+用本程 §4 的 M1 现量当尺子（同一条外呼，摘掉接线前后的两张卡）：
+
+```
+接了： "level":"L2"  rulesHit=[R1,R4]  reason="…; R4: 包含来自 web.fetch https://files.example.com/q3-notes.txt 的内容"  sessionOverrideBlocked:true
+没接： "level":"L1"  rulesHit=[R1]     reason="R1: 工具声明为下界（L1）"                                              sessionOverrideBlocked:false
+```
+
+⇒ 形状就是简报猜的那个：**R4 漏判成 L1**，而且漏的不止等级——`sessionOverrideBlocked` 一起塌成 `false`，
+于是这条本"任何授权都不可覆盖"（SPEC-06 §8.3 / `rules_gateway.go:113`）的外呼，
+在权限模式/会话授权（D45）下可以被**静默放行**。等级掉一格是可见的，布尔掉一枚是不可见的——后者更贵。
+
+### ⓒ 该开新票还是登记即可——判：**登记即可，现在不开票**（三条理由，都带现量出处）
+
+1. 今天不可达（ⓐ 那串调用者清单），开出来没有能红的用例可写，只能写成"注释级/构造级"断言；
+2. 修法在 `internal/tools/**`，**不在任何人的本程地界里**（简报原文，本程亦未碰）；
+3. 真正要拍的是一枚**口径**而不是代码："`TaskID` 为空的调用该怎么办"——fail-closed 升 L2、还是直接拒绝执行并报缺件？
+   后者会让所有无 scope 的新入口（例如未来的单发工具探针）第一天就撞墙，属于 D22 闸门③/D33 那一层的决定，**得人工拍**。
+
+给编排者的落点建议（不是我的决定）：把 F-143-1 挂**触发条件**存着——
+"任何非测试的 `ToolRequest{`/`Bridge.Execute` 调用者出现且不带非空 `TaskID`"，或"任何 `tools.Options` 构造点省略 `Provenance`"，
+两者任一成立即把这条从登记转成票；届时最便宜的形状是 `assessorFor` 开头那三个 disjunct 里
+后两味改成 fail-closed（宁可拒答也不裸判），而不是给无 scope 调用配一枚全局 detector——**本程不给 patch，不动那棵树**。
+
+
 
 
 
