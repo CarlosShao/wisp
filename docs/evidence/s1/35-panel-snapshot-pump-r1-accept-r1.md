@@ -261,5 +261,134 @@ A3 是 M4 与 M4b 的**合体**（注入钟读法与生产默认钟一起摘）�
    与被验件 §4.1 的 M2 首发 `[setup failed]` 是同一族失手，本程照它的处置：**那发不算数、留着说明哪发不算**。
 3. 沿用上一程的口径：**`grep -c` 为 0 时回显会冒出非 bash 形状的 `No matches found`** ⇒
    本程关键计数一律 `| wc -l` 或 python 复算（§1.6 的三枚 0、§2.3 的 `LiveApprovals` 枚数都是这么来的）。
+   ⚠ 本程又见到一次（`grep -c "WARNING: DATA RACE" race_cmd.log` 打出 `0` 之后多出一句那句），
+   处置相同：该格以同一次跑里的 `ok … cmd/wisp 75.715s` ＋ `rc=0` 两行为准。
+
+---
+
+## 3. 第三格：§7 第 2 条那枚并发形状——**给裁，不记"残余"**
+
+### 3.1 派单摆出来的那个假设，先答它：**不成立**
+
+派单写："若全程单 goroutine，那'混合两个瞬间'在生产里根本发生不了，就该写成**射程边界**而不是洞"。
+
+**本程现量：这条不是射程边界，它可达。** 链子逐环给 file:line（锚点副本）：
+
+| 环 | 位置 | 现量 |
+|---|---|---|
+| 1 每次工具调用**各起一枚 worker** | `internal/agent/loop.go:647` `h := l.reg.Spawn("tool-exec-"+taskID, "agent", root, func(c context.Context){ sem <- struct{}{} … l.dispatch(...) })` | 一个 `turn.ToolCalls` 一枚，带 owner＋recover（不是裸 `go func`） |
+| 2 并行上限**不是 1** | `loop.go:669` `sem := make(chan struct{}, guard.Concurrency())` → `guard.go:129 return g.cfg.ToolConcurrency` → `guard.go:107-108` 未设或越界即取 `MaxToolConcurrency` → `budgets.go:47 const MaxToolConcurrency = 4` | `cmd/wisp/run.go:560-567` 的 `agent.Config{…}` **一个字都没设 `ToolConcurrency`** ⇒ 生产那把闸 = **4** |
+| 3 worker 会走到"问用户" | `internal/tools/bridge.go:395` `a, why := b.gate.PendingApproval(ctx, *dec)`（L2 分支；`:380` 是 L1 `PendingWindow`） | 在 `l.dispatch` 之下 ⇒ **在 worker goroutine 上** |
+| 4 问用户会驱动泵 | `gate.go:486` `g.ui.Prompt(ctx, p)` ＋ `:504/:516/:523` `g.ui.Update(...)` → `cmd/wisp/run.go` 的 `consoleApprovalUI` → `run.go` 那两处 `u.publish()`（`Prompt` 末尾、`Update` 的 `EventDismissed`/`EventStarted`）→ `panel_pump.go:237 rt.pump.Publish()` → `pump.go:136 Snapshot()` | 全链无一处换 goroutine、也无一处串行化 |
+
+⇒ **只要一个 turn 里 Declare 出 ≥2 枚工具调用、其中 ≥2 枚撞到 L2 卡片，
+`Snapshot()` 就有并发调用者**，队列本身还为此设计了 FIFO 与 depth badge（`pending_read.go:28-29` 的
+`Position` 就是"第几张卡"）。⇒ **这一格判"可达"，不判"射程边界"。**
+
+⚠ **这一句是对编排者简报前提的复算不符，按规矩报名、不按简报的样子改**：
+简报里那句"三个触发点是不是同一 goroutine 顺序调用"的**倾向答案（是）在盘上不对**。
+
+### 3.2 但"可达"分两种，本程把它们量开了：**混合两个瞬间 ≠ 数据竞争**
+
+**(a) 内存安全这一支：`-race` 今天全绿——这是 §7 第 2 条自陈"没跑 `-race`"，本程补了。**
+
+| 发 | 范围 | 读数 |
+|---|---|---|
+| `-race ./internal/panel/` **整包** `-count=1` | 全 59 枚 | **`ok … 4.809s`、`rc=0`、`WARNING: DATA RACE` 0 次、`--- FAIL:` 0 枚** |
+| `-race ./cmd/wisp/` **整包** `-count=1` | 全 63 枚 | **`ok … 75.715s`、`rc=0`、DATA RACE 0、FAIL 0**（含那枚 `TestAC1ResidentLeg…`，这一发**没红** ⇒ 印证 §2.5 第 1 条那枚红是并发跑包造成的，不是用例的） |
+| `-race` 两包合跑、`-run 'Pump\|Snapshot\|Panel\|Run\|Card\|Mode\|Composer'` | 泵相关名册 | `ok 8.106s` ＋ `ok 16.311s`、rc=0 |
+
+**(b) 为什么 `-race` 打不到它**——四个读数器**各自带锁**，本程逐枚读到行：
+
+| 泵读的 | 锁在哪 |
+|---|---|
+| `Queue.LiveApprovals()` | `pending_read.go:46-47` `q.mu.Lock(); defer q.mu.Unlock()` |
+| `StreamLog.Chunks()` | `pump.go:318-319` `s.mu.Lock(); defer s.mu.Unlock()` |
+| `PathCanonicalizer.WorkspaceRoot()` | `paths_workspace.go:39-40` `p.mu.RLock(); defer p.mu.RUnlock()` ⇒ ⚠ 顺带纠一处上一程措辞：§6.1′ 写"`:40 WorkspaceRoot()` 直接 `return p.workspace`"，`:40` 那行**是** return，但它头上 `:39` 是 RLock——**不是无锁直读**；它的 finding（拿到的是 fold 过的键）不受影响 |
+| `Store.PermissionMode()` | `store.go:155` 本体不持锁，但它读的是 `s.mgr.Config()`，`config/manager.go:92-95` 持 `m.mu` |
+| 出口 `bookPanelSnapshot` | `panel_pump.go:152-154` `rt.snapMu.Lock()` 包住 `lastSnap`/`lastSnapBytes`/`snapSeen` |
+
+⇒ **`SnapshotPump.mu` 只守 `publishes` 那一个计数器**（`pump.go:230-238`），**不守装配** ——
+所以两发 `Publish()` 可以各自拿到"一半是 t、一半是 t+Δ"的字段组合，而**每一枚字段自己都不是脏读**。
+这正是 `pending_read.go:38-41` 承认的那件事。**"承认了 ≠ 量过"这一句被验方说得对，本程把"量"补上了：
+可达性＝已量（§3.1 那四行链），内存安全＝已量（上面三发 `-race`），**唯一没量的是"混出来的包到底长什么样"**
+（要造它得在两个读数器之间插一次状态变化，今天没有这样的钩子——见 F-PUMP-4 的闭合集合）。
+
+### 3.3 本程量的是哪条腿，那条腿之外的今天是什么形状
+
+- **量的是 `wisp run` 这条腿**（`assembleRuntime` → `execute` → `loop.Run`）。
+- **§7 第 6 条复算为真**：常驻腿今天**不 import** `internal/panel`——
+  `cmd/wisp/resident_other.go` **0 命中**、`cmd/wisp/resident_windows.go` **0 命中**、
+  `cmd/wisp/resident_sink_nail_127_windows_test.go` **0 命中**；并且更硬的一层：**两枚
+  `runResident()` 都不调 `assembleRuntime`**（`resident_windows.go:24`、`resident_other.go:22`
+  里 `assembleRuntime`/`rt.pump`/`publishPanelSnapshot` 各 **0 命中**）⇒ 常驻进程里**没有那台泵**，
+  连"顺手被装配到"的可能都没有。**被接上的确实只有 `wisp run`。**
+
+**这一格的裁定：§7 第 2 条从"没测什么"**升格**为一条已定性的洞（F-PUMP-4），
+严重度＝**显示层撕裂（混合两个瞬间）已可达、无内存不安全、无授权后果**。**
+最坏后果形状（写清，别让人以为更狠）：票 33 把那根管子接上之后，那块面板可能显示
+"一张其实刚被拒绝/刚超时的卡片还挂在待确认里"、或"卡片是 12:00:03.1 的队列、档位是 12:00:03.4 的档位"。
+**它不会多签一次批准**（§1 那一格已裁：整条结算链非测试调用者 0 枚），
+**它会让一张安全卡在这一秒说的话和下一秒做的事对不上**——所以修它要趁票 33 之前，不是之后。
+
+---
+
+## 4. 顺手核的另外两件事（不展开，但每条现量）
+
+### 4.1 §6.4 那格"0 枚调用者被改掉了什么"——**两句都要现量，因为编排者要拿它改 `A248③`**
+
+| 那一句 | 本程现量（锚点副本，非测试） | 判 |
+|---|---|---|
+| "`Snapshot` 现在有生产可达建造者（`run.go:421` → `Publish` → `Snapshot()` → `NewSnapshot`）" | `run.go:421 panel.NewSnapshotPump(...)`（**全仓唯一非测试调用点**）→ `panel_pump.go:237 rt.pump.Publish()` → `pump.go:205 p.Snapshot()` → `pump.go:182 NewSnapshot(cards, results, composer, now())` | **成立**，链子逐环有行 |
+| "`PanelBridge` 声明 0 枚" | `grep -rn "type PanelBridge" --include=*.go . \| wc -l` → **0** | **成立** |
+| "C17 名册 18 枚全 0" | 抽 3 枚（`panel.resync`／`approval.decide`／`cost.summary`，`-F` 固定串、去 `_test.go`）→ **各 0** | **抽查内成立**（其余 15 枚沿用被验件 §6.3 的全量，本程未复跑） |
+| "`ParseComposerRequest` 非测试调用者 0" | 全仓 `.go` 非测试命中 6 行，**逐枚读**：`bridge.go:84` 是定义、`run.go:225`／`bridge.go:16`／`composer_handlers.go:37` 是注释 ⇒ **调用者 0**，且 `run.go:225` 那句 "Nothing calls it yet - the WebView2 event -> ParseComposerRequest hop does not exist in this tree" **未被本批推翻** | **成立** |
+| "`Marshal()` 非测试调用者 0"（＝"全量字节仍无人接"那一格的一半） | `pump.go:190` 定义；调用点：`Snapshot()` 内部两处 `json.Marshal`（**不是 `Marshal()`**）、`Publish()` 里也是 `json.Marshal(snap)` ⇒ `Marshal()` 自己 **0 枚非测试调用者** | **成立** |
+| "`lastPanelSnapshot()`／`snapshotCount()` 非测试调用者 0" | 两枚各自只有"注释行＋定义行"，**0 枚调用** | **成立** |
+| "Go→面板通道仍不存在"（本程**另造**四条，不复用 §1.2/§2.1.1） | ① `http.Server`／`ListenAndServe` 非测试 **0**；② `go.mod` 里 webview 依赖 **0**（`grep -ci webview go.mod` → 0）；③ 全仓非测试的 `PostMessage` 命中 **只有 `internal/ball/` 那三枚 Win32 `PostMessageW`**（`sta_windows.go:142/:159`、`tray_windows.go:105`、`win32_windows.go:33` 声明）——**那是球的消息泵，不是 WebView2 的 host→page**；④ `text/event-stream` 命中 7 处全在**出站** LLM 适配器与 golden 夹具（`anthropic/adapter.go:152`、`openaichat/adapter.go:87`、`openairesponses/adapter.go:123`、`golden/golden.go:80/:218`、`cmd/llmrecord/main.go:95`），**没有一枚是服务端往页面推** | **成立**（另：`internal/proc/shutdown.go:55` 那枚 `"destroy-panel-webview"` 只是**步骤名册里一个还没有模块的名字**，实测 `wisp run`/resident 测试日志里它回的是 `shutdown step skipped (module not present)`） |
+
+⇒ **给编排者改 `A248③` 用的那句话**：这两句**都现量成立**，方向相反、不互相抵消——
+**"那份包在生产里被造出来并被驱动"＝已成立；"那份包能走到页面"＝仍不成立。**
+
+### 4.2 `bridge.go` 那处注释的新指向——**两枚真存在、真在那两行**
+
+| 指针对 | 现量（锚点副本 `sed -n '502p;533p'`） | 判 |
+|---|---|---|
+| `composer_test.go:502` | `func TestTheRendererHoldsExactlyOneDoorToTheHost(t *testing.T) {` | **真存在、行号逐字对** |
+| `composer_test.go:533` | `func TestPlantedRendererDoorShapesGoRed(t *testing.T) {` | **真存在、行号逐字对** |
+| 旧指向（那枚不存在的名字） | `grep -rn "TestComposerMethodNamesMatchFrontend" --include=*.go . \| wc -l` → **0**（⚠ 不加 `--include=*.go` 是 **16**，那 16 枚全在 `docs/evidence/**` 的历史自述里 ⇒ **口径必须写"Go 源码 0 枚"**，被验件 §3.3 那句"仍全仓 0 处"是**过宽**、但不是假） | 空指针已修、没留同型 |
+
+### 4.3 §6.1 与 §6.3 抽查——**一枚算术不符，报名**
+
+本程自造一把区分**同包裸调用**与**跨包带点调用**的尺（`(^|[^A-Za-z0-9_.])<sym>\(` 与 `panel\.<sym>\(`，
+两向都去 `_test.go`）：
+
+| 建造者（`5821e24` message 点名的那五枚） | 同包非测试调用点 改前→改后 | **跨包**非测试调用点 改前→改后 |
+|---|---|---|
+| `NewSnapshot` | 0 → 2（`pump.go:138`、`:182`） | 0 → **0** |
+| `NewComposerState` | 0 → 1（`pump.go:171`） | 0 → **0** |
+| `NewModeView` | **1 → 1**（只有 `composer.go:202`） | 0 → **0** |
+| `ModeUnknownView` | 0 → 1（`pump.go:175`） | 0 → **0** |
+| `UnsetWorkspaceView` | 2 → 3（新增 `pump.go:163`） | 0 → **1**（`cmd/wisp/panel_pump.go:84`） |
+
+⇒ 锚点上"跨包新增的非测试调用点"**总共 4 枚**：`panel_pump.go:84`（`UnsetWorkspaceView`）、
+`panel_pump.go:86`（`WorkspaceViewFromRoot`）、`run.go:420`（`NewStreamLog`）、`run.go:421`（`NewSnapshotPump`）。
+后两枚是**新符号自己**、不是"某枚既有建造者 gained 包外调用者"。
+⇒ **所以 §6.1 结论句"五枚里只有 2 枚真 gained 包外调用者"是算错的**：
+**按它自己那张表，五枚里只有 1 枚（`UnsetWorkspaceView`）；第 2 枚 ✅ 打在了 `WorkspaceViewFromRoot` 上，
+而那枚不在 commit message 点名的五枚里。** 表行的读数都对、**汇总句的分子/分母配错了**。记 **F-PUMP-5**（措辞级）。
+⇒ 它对**一句话不成立**的复算（`NewModeView` 前后各 1 枚、调用点没动过）**本程独立复算为真**。
+
+### 4.4 顺手量出一枚**没被任何一格登记**的零执行分支（同 §7 第 3 条那一族）
+
+`37a4705` 的 commit message 写着触发点之一是 "`consoleSink.Publish` 的 **tool-start**/end/stuck/error/done"。
+现量：`agent.EvToolStart` 在全仓 `.go` 里只有 **3 命中**——`internal/agent/sink.go:24`（注释）、
+`:25`（常量定义）、`cmd/wisp/run.go:738`（`case` 消费），**`internal/agent` 里 0 枚 publish**
+（同一把尺逐枚量：`EvToolEnd` 3 枚、`EvStuck` 2、`EvError` 2、`EvDone` 1、`EvTextDelta` 1、`EvControl` 1，
+**只有 `EvToolStart` 是 0**）。
+⇒ 这一批在 `run.go:741` 那行新加的 `changed = true` **今天零次执行**，且**没有任何仪器**管得住
+"一枚 sink 事件种类从来没人发"这件事（它不是分支覆盖问题，是**词表里一枚死名**）。
+⇒ 后果很小（那行只是"少推一次包"），但它和被验件 §7 第 3 条给 `panelSnapshotSummary` 那格的是
+**同族**，而 §7 那张表**没有这一条**，commit message 还把它列成了活的触发点。记 **F-PUMP-6**。
 
 ---
