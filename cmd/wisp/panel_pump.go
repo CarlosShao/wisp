@@ -135,8 +135,16 @@ func stringList(v any) ([]string, bool) {
 // reaches it goes through internal/observe's redacting handler, which bounds a
 // single string at observe.MaxLoggedString = 512 characters by rule 4 of its own
 // header ("long argument strings are truncated (bounded log lines)"). A panel
-// packet is routinely longer than that - the smallest one this ticket produced is
-// 534 bytes, and one with a card in it is 997 - so the ledger physically cannot
+// packet is routinely longer than that. Measured on this wiring, both units
+// written down (票 35 fix r1, docs/evidence/s1/35-panel-snapshot-pump-fix-r1.md
+// §1.5): the smallest packet this shape produces is 552 bytes / 518 runes, and
+// one carrying a single L2 card is 792 bytes / 734 runes (793/759 with an ASCII
+// reason). The bound is counted in runes by the handler, so the smallest case
+// clears it by 6 - thin, and thin on purpose: it is the empty-pending,
+// empty-results, unset-workspace packet, which no `wisp run` books. The pair
+// this comment used to carry (534 / 997) is not what any measurement on record
+// produced, which is why it is now stated with its units and its source.
+// So the ledger physically cannot
 // carry the packet. That is not a reason to raise a global log bound for one
 // ticket's convenience, and it is definitely not a reason to start writing
 // files for a renderer to poll.

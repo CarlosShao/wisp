@@ -24,7 +24,10 @@ package main
 //
 // The ledger record is a bounded summary, not the packet: internal/observe's
 // redacting handler caps any single logged string at 512 characters (rule 4 of
-// its header), and the smallest packet this ticket produced was 534 bytes. The
+// its header), and the smallest packet this shape produces is 552 bytes / 518
+// runes - a single L2 card takes it to 792 / 734 (measured on this wiring, both
+// units, 票 35 fix r1 §1.5; the 534 this comment used to carry is on no record).
+// The
 // summary therefore carries the packet's byte length and sha256, and the cases
 // below check those against the retained bytes - so "the durable record and the
 // packet I am asserting on are the same event" is itself asserted, not assumed.
