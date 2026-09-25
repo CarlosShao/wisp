@@ -490,3 +490,45 @@ assertions(总)       76          79        +3
         d22scan-committed.txt、postcommit-count2.txt(.roster)）＝ 5 枚，正是 §7/§8 两条追加所产
 判：写"50"的当时是对的，§7/§8 之后没回来改 —— 形状与它自己在 §6 拒给 commit 3 预写 sha 是同一条规律的两侧
 ```
+
+---
+
+## §8 攻点 8：`ban #8 cmd/ 39→40` 那处分母时效 —— **差值与归因判对；"带 sha"这条它自己没做到**
+
+### §8.1 我这一版复跑到同值（两次，各自带当场 HEAD）
+
+```
+HEAD=f50c037  sh scripts/d22scan.sh -> rc=0   （out/d22scan-head.txt）
+HEAD=0e17914  sh scripts/d22scan.sh -> rc=0   （out/d22scan-0e17914.txt，即本件 §7 那枚 commit 入树之后）
+两发八枚数一字同：bans #1-5 internal/=203 cmd/=22 | ban #6 frontend/=46 | ban #7 internal/tools/=18
+                    ban #8 design/=32 frontend/=46 internal/=407 cmd/=40
+⇒ 与实现件 §8（交付版钉 9fd6defb／2081 行）那一发**逐枚同值**；§1.4 那一发唯一的差别就是 cmd/ 39。
+```
+
+### §8.2 差值归因（它只说"别家在 `cmd/` 里多提了一枚文件"，我把它没点的名点出来）
+
+```
+git ls-tree -r --name-only <rev> cmd/ | grep '\.go$' | wc -l
+   cb60b94 -> 39      （§1.4 那一发的锚点）
+   1785a77 -> 39      （实现程进场）
+   9be3288 -> 40      ← 分母在这一枚掉头
+   a5e1c8c -> 40      （我的锚点）    HEAD(0e17914) -> 40
+git log --format="%h %s" --name-status --diff-filter=A cb60b94..a5e1c8c -- cmd/
+   9be3288 feat(票143 AC#1+AC#2): panel-assets 那条 CLI 路接上 C25 引擎…
+   A	cmd/wisp/panel_assets_143_test.go
+```
+
+⇒ **归因对**：多出来那枚是 `cmd/wisp/panel_assets_143_test.go`，由票 143 那一程在 `9be3288` 提入；
+它是一枚 `_test.go`，所以只进 ban #8 的分母（`cmd/=40`），**不进** bans #1-5 那枚 `cmd/=22`——
+这正好与 §6.1 我用文件枚数复算出的口径咬合（22 那枚数在 `9be3288` 前后都是 22，因为我这一发的 `cmd/=22`
+与它 §1.4 那发 `cmd/=22` 同值，而 `cmd/=39→40`）。**它这句"不是本程造的"成立。**
+
+### §8.3 "分母随锚点变"这条它有没有写成可复算 —— **半格**
+
+它 §8 给的是**两枚钉的 blob**（`9c06f3f6`／2080 行 ↔ `9fd6defb`／2081 行）加一句规矩
+（"引本件任何一枚 d22scan 分母时连锚点一起引"）。问题是：**扫描分母取决于整棵树，不取决于那枚钉**——
+把钉的 blob 当锚点引，下一程照样对不上（我今天这两发就是钉同值 `9fd6defb`、而 `cmd/` 与 §1.4 差一枚）。
+⇒ 缺的是**那一发自己的 `git rev-parse HEAD`**。它 §1.4 那发写了 `锚点 cb60b94`（合格），
+§8 这发只写了 blob（不合格）。补法是一行、append-only：在 §8 那段末尾追加"取于 HEAD `<sha>`（当时现量）＋
+差值文件 `cmd/wisp/panel_assets_143_test.go`（`9be3288`）"。这一格记入账 **F-ACC-4**，
+属读数/口径级，**不推翻它任何一条结论**（我今天两发独立跑到同值就是证据）。
