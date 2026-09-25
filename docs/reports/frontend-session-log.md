@@ -1213,3 +1213,76 @@ owner 拍的甲＝「先删掉这个请求」，撤销口令「撤 Q-50 甲」�
 > ⚠ 另记一句索引事实（不是我造的）：本轮 `git diff --cached --name-only` 里出现了别人的
 > `.scratch/wisp/issues/143-*.md`（staged 的删除）。我没替它提交、也没 `restore --staged` 去动它，
 > commit 带显式 pathspec 只提我自己的三条路径；`8b35f52` 之后它仍在索引里，逐字可见。
+
+---
+
+## 52. 编排者 14:0x 那单（只一件：把 `frontend/dist/` 刷到当前 `src`）——**做完，但他的担心在字节上不成立**
+
+读数时刻 `2026-09-25 14:16–14:18 +08`（`date` 现跑），HEAD `0ebe581`，工作树 `frontend/` 干净。
+
+### 52.1 构建与三条读数
+
+`npm run build`（＝`tsc -b && vite build`）**rc=0**：vite `8.3.0`、`1996 modules transformed`、`built in 485ms`。
+
+| 产物 | 构建前（他量的那版） | 构建后 |
+|---|---|---|
+| `dist/index.html` | 1043 B ＠12:55:23 | **1043 B ＠14:16:53**，sha256 `24bbe34620c3f58a…` |
+| `dist/assets/index-cBzgeJVW.js` | 277294 B ＠12:55:23 | **277294 B ＠14:16:53**，sha256 `69dcc5d9b49838e8c6aefef08e42d67272a543f08267332b791b34c6f0f68516` |
+| `dist/assets/index-nH5U2d7r.css` | 40027 B ＠12:55:23 | **40027 B ＠14:16:53**，sha256 `56f0a02526295d22…` |
+
+**② 新的 JS 文件名哈希：没有变**——还是 `index-cBzgeJVW.js`。而且**改前的 JS 我留了 sha256，
+`69dcc5d9…f68516`，构建后逐字节同一个值**。vite 的文件名哈希是按内容算的，所以"同名"这条不是巧合，
+是"内容没变"的证据。
+
+### 52.2 于是结论反过来了：12:55 那版 dist **已经**含 `f1cdafa`
+
+他数的是对的（`frontend/src` 在 12:55 之后落了 2 枚 commit），但那两枚都不改产物字节：
+
+1. **`f1cdafa`（Q-50＝甲）的改动在 12:55 那份产物里就有**——三条按字符串探：
+   被删的那枚出站路由名 `panel.view.request` 在 `dist/assets/*.js` 里 **0 命中**；
+   甲那一版才有的两句 `换屏要等原生宿主接线` 与 `点不动` **各 1 命中**。
+   ⚠ "0 命中"只说**产物**，不说仓库：这个名字在 `frontend/src/lib/panel.ts` 里**还剩 1 处、在注释内**
+   （甲那段的记账），现量 `git grep -c` 对 `d61281c`=2 处、对 `f1cdafa`=1 处；构建时被压掉是因为压缩器丢注释，
+   不是因为漏删。那句"甲版才有"的对照也是现量的：`换屏要等原生宿主接线` 在 `d61281c` **0 命中**、在 `f1cdafa` 1 命中。
+   ⇒ **归因我不写死**（12:55:23 那一刻是谁跑的构建，我没有凭据），但字节给的结论不依赖归因：
+   **那份产物来自"甲的源码状态已在树上"的那一版**——若 12:55 真是甲之前的样子，
+   今天从含甲的源码重跑构建不可能得到同一个 sha256。
+2. **`8b35f52`（F5）只改了 `theme.css` 的一段注释**，压缩阶段把注释剥掉 ⇒ CSS 也是同一哈希。
+
+⚠ **但他指的那枚机制是真的、而且下一次就会咬人**：`scripts/build.ps1:74` 那句无条件
+`frontend step skipped (no frontend yet; embed lands in S5 per SPEC-11 §2.2)` 我读了，一字没改，
+它确实从不跑 `npm run build`。⇒ 今天 dist 恰好不落后，**不代表流程安全**；任何后续 `frontend/src` 提交
+都要人记得手动刷 dist。这条我不动、不修，等他归口开票（他说票 92 已经记过这件事，我不重开）。
+
+### 52.3 `wisp panel-assets` 的两条输出（先报一枚坑）
+
+裸跑 `go run ./cmd/wisp panel-assets -manifest` 得到的是 **`exit status 0xc0000135`**——本机缺
+`sherpa-onnx-c-api.dll`（本仓记忆里那条 `cmd/wisp` 加载期红是同一枚）。**修法不是装东西**：
+这仓自己就带 DLL，把它目录放进 PATH 就跑了（`third_party/sherpa-onnx/`，另有 `build/` 里一份，
+正是 `build.ps1:132` 拷进去的）。放好后两条命令的原文：
+
+```
+$ wisp panel-assets -manifest        # rc=0
+.gitkeep 0 e3b0c44298fc1c14
+assets/index-cBzgeJVW.js 277294 69dcc5d9b49838e8
+assets/index-nH5U2d7r.css 40027 56f0a02526295d22
+index.html 1043 24bbe34620c3f58a
+
+$ wisp panel-assets -check           # rc=0
+panel assets check: entry=index.html built=true 2 asset refs resolve [./assets/index-cBzgeJVW.js ./assets/index-nH5U2d7r.css]
+```
+
+⇒ 四行清单里的字节数与 sha256 前缀**逐条等于我 14:16 构建出来的那三枚文件**，
+所以 `//go:embed all:dist` 带进这次这个二进制的就是当前版。`built=true`、两枚 asset ref 都能解析。
+
+### 52.4 边界自陈（他划的那几条我逐条对）
+
+- **没 commit 任何 dist 里的东西**：本轮只提交这枚 log；`git status --porcelain -- frontend/` 交件后为空
+  （忽略规则在 `frontend/.gitignore:12` 的 `dist/*` 与根 `.gitignore:22-23`）。
+- **`.gitkeep` 的 mtime 也变了，但不是我动的**：`vite.config.ts:11-17` 那段插件写在 vite 清空 outDir 之后
+  把它重新 `writeFileSync(..., "")` 出来。内容仍是 0 字节 ⇒ git 无差。记在这里是因为"谁碰了跟踪锚点"
+  在这种仓里必须能一句话答上来。
+- **没为"让构建通过"改过 `frontend/src` 一字**（构建本来就是 rc=0），**没碰 `scripts/build.ps1`**。
+- ⚠ 给 15:00 的一句提醒：`build/wisp.exe` 是**上一次 Go 构建**的产物（`build.ps1:123` 用 `-trimpath`
+  编到 `build/`），它 embed 的是**它被编那一刻**的 dist ⇒ 真机签收要么先重跑 `build.ps1`，
+  要么至少知道"exe 的 embed 时刻 ≠ dist 的时刻"这件事。我只刷了 dist，没有重编那颗 exe。
