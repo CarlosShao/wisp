@@ -268,7 +268,7 @@ FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.035s
 |---|---|---|---|
 | 格式 | `gofmt -l cmd/wisp/` | `b293784` 与 `5ef1632`（两遍） | **空**（改前 `6103120` 也空） |
 | vet | `go vet ./cmd/wisp/` | `b293784` 与 `5ef1632`（两遍） | **空**（没在根目录跑 `go vet ./tools/d22scan/`，那是独立 module，按简报是设计不是伤） |
-| D22 | `sh scripts/d22scan.sh` | 第一遍 `ae9f27f`、第二遍 `5ef1632` | 两遍都 **rc=0**；第一步正控先过：`runtests.sh: OK ... top-level: PASS=30 FAIL=0 SKIP=0, === RUN=70`；第二步真扫描 `d22scan: clean - no D22 ban violations`，分母两遍同为 `bans #1-5 internal/=203, cmd/=22, ban #6 frontend/=46, ban #7 internal/tools/=18, ban #8 design/=32, frontend/=46, internal/=407, cmd/=40`（ban #8 那几项逐字写着 "comments and _test.go included" ⇒ 我新增的 `_test.go` 真被扫过） |
+| D22 | `sh scripts/d22scan.sh` | 第一遍 `ae9f27f`、第二遍 `5ef1632`、第三遍 `4350bc2`（本件已入树之后） | 三遍都 **rc=0**；第一步正控先过：`runtests.sh: OK ... top-level: PASS=30 FAIL=0 SKIP=0, === RUN=70`；第二步真扫描 `d22scan: clean - no D22 ban violations`，分母三遍同为 `bans #1-5 internal/=203, cmd/=22, ban #6 frontend/=46, ban #7 internal/tools/=18, ban #8 design/=32, frontend/=46, internal/=407, cmd/=40`（ban #8 那几项逐字写着 "comments and _test.go included" ⇒ 我新增的 `_test.go` 真被扫过；`docs/` 不在 ban #8 的四棵树里，本件那枚 md 不是它的射程）。**下一行这句话本身在 `4350bc2` 之后，没再跑第四遍** |
 | CI 那一步 | `sh scripts/wisp-cli-tests.sh` | `6e5c1d2` | **rc=0**，`portable-tests.sh: four numbers: === RUN=113 --- PASS=60 --- FAIL=0 --- SKIP=0`（与 §4.1 那枚改后用另一把尺独立复现；它的 `-skip` 名单里 5 枚名字在 `cmd/wisp` 里 `grep "func <name>("` 全部无命中，所以两把尺的分母是同一套。这一遍跑的是 `9be3288` 的内容，`4037539` 之后没重跑它——重跑的是 §4.1 那把 `-count=1 -v` 尺） |
 
 ### 4.3 契约轴：先证明那些东西存在，再说本程零命中，同一把尺跑一枚正控
