@@ -120,3 +120,181 @@ YES e572aa94 is an ancestor of HEAD
 **本格判定：成立。**
 
 ---
+
+## 1　AC#2 那把尺的承重（首要攻击点；本程价值排序第一）
+
+**判据（按本仓操作定义逐条，答不出＝没测）**：
+① 恒真判据——三枚新用例在**未修的旧码**上响不响；
+② 承重——**摘掉任意一味**（ⓐ 那一行填充／三枚用例里任意一枚／两枚新 helper 里任意一枚），
+是否存在一发变异从此打不红；
+③ 单点回退——只撤一处，问"撤掉这处哪条用例变得不响"；
+④ 票面点名的那发 MG——修完之后该红还是该绿，一句话说清**并跑给人看**；
+⑤ 有没有拿"永远绿"的断言凑数。
+
+反面约束本程遵守了：**没有**要求"同一发变异里新加那支先响"（那支挂在 `if errors.Is(err, io.EOF)` 里，
+前提正是被抹掉的东西）。本程要的读数是"摘掉这味之后，这发变异还响不响"，两味都响＝其中一味冗余，
+不＝其中一味是装饰。
+
+### 1.1　跑法（两条命令，可复算）
+
+变异全部落在**仓外快照**，每枚一份目录、只建不删（`harness.py` 拒绝在已有目录上覆盖，改新编号）。
+被验树本体（控制组）与 18＋7 枚变异共用同一把尺：
+
+```
+$ python C:/Users/swq/AppData/Local/Temp/wisp147-mut/harness.py r1            # 造 18 枚变异快照
+$ bash C:/Users/swq/AppData/Local/Temp/wisp147-mut/run.sh r1 <names...>        # 每枚跑 147+144 全组
+```
+
+`run.sh` 里的尺＝`go test -v -count=1 -run 'TestSLO147|TestSLO144' ./cmd/wisp/`，
+按**用例名**逐个判 RED／GREEN／NORUN（不是只数 `--- FAIL` 枚数），并且**单独报 144 那 7 枚的红绿**
+（"新增断言把既有断言改反方向"是另一类假绿，必须分开看）。
+PATH 里注入 `third_party/sherpa-onnx`，与 `scripts/wisp-cli-tests.sh` 同形。
+
+### 1.2　① 恒真那一问：**响**。三枚都在未修码上红（本程独立重走，未用它的日志）
+
+`/tmp/wisp147-snap2` ＝ 被验版本的全部测试文件 ＋ **只有 `cmd/wisp/slo_windows.go` 换回父 commit `ae968f9`**：
+
+```
+$ cd /tmp/wisp147-snap2 && go test -v -count=1 -run 'TestSLO147|TestSLO144' ./cmd/wisp/
+--- PASS: TestSLO144EveryPrefixOfARealReportIsUnwrittenNotCorrupt (0.01s)
+--- PASS: TestSLO144ReportsThatContradictThemselvesAreCorruptNow (0.00s)
+--- PASS: TestSLO144LoopRetriesAnUnfinishedFileAndReadsTheWholeReport (0.03s)
+--- PASS: TestSLO144LoopGiveUpSentencesOnRealFiles (0.05s)
+--- PASS: TestSLO144CorruptReportIsJudgedOnTheFirstRead (0.00s)
+--- PASS: TestSLO144UnfinishedReportKeepsPollingThenNamesBudgetAndBytes (0.06s)
+--- PASS: TestSLO144ReportThatArrivesAfterMissingReadingsIsCollected (0.00s)
+    slo_report_144_windows_test.go:446: 1977 of 1978 unwritten sentences do not name the offset the document stopped at; first: prefix of 1 bytes: subjectReportRead.offset is 0
+--- FAIL: TestSLO147UnwrittenSentenceNamesTheOffsetTheDocumentStoppedAt (0.01s)
+    slo_report_144_windows_test.go:470: give-up error says 8 bytes read, document open at offset 0; want both 8 (the prefix the loop was handed)
+--- FAIL: TestSLO147LoopGiveUpSentenceAgreesWithTheBytesItRead (0.06s)
+    slo_report_144_windows_test.go:502: unfinished sentence says 989 bytes, offset 0; want both 989
+--- FAIL: TestSLO147OffsetSemanticsRenderThreeDifferentSentences (0.04s)
+```
+
+⇒ **三枚全响**，且 144 那 7 枚在未修码上保持绿（⇒ 响的不是"把旧断言改严"换来的）。
+⇒ 红句原文与实现件 §2.2 逐字相符（`:446`／`:470`／`:502` 三处），它的自述这一条**复算成立**。
+⇒ `1977 of 1978`：恰有一枚前缀（0 字节）在旧码上"过"，因为那一发 `offset==bytes==0`。本程确认这个数字不是笔误：
+0 字节那发走的是 `io.EOF` 而非 `ErrUnexpectedEOF`，旧码 `dec.InputOffset()` 给 0，新码给 `int64(0)`＝同一个 0。
+
+CI 同形跑法（`bash scripts/wisp-cli-tests.sh`，快照内自带 `third_party/sherpa-onnx`）两边各一次：
+
+```
+改后（被验版本 e572aa94）:  === RUN=133  --- PASS=73  --- FAIL=0  --- SKIP=0        rc=0  runtests.sh: OK
+改前（同一测试文件+父码）:  === RUN=133  --- PASS=70  --- FAIL=3  --- SKIP=0        rc=1  strict runner exited 1
+```
+
+⇒ 两枚都是 **`=== RUN=133`、非 0**，与"根本没跑到"（`0xc0000135` ＋ 0 条 `=== RUN`）不是一回事；
+返回码的差（0 vs 1）与 3 枚红名逐枚对得上。
+
+**名册差集（两向 `comm`，本程自己跑 `-list`，不抄它的 `.names`）**：
+
+```
+$ cd /tmp/wisp147-snap3 && go test -list '.*' ./cmd/wisp/ | grep -E '^Test' | sort > /tmp/names-prefix.txt   # 改前全基线
+$ cd /tmp/wisp147       && go test -list '.*' ./cmd/wisp/ | grep -E '^Test' | sort > /tmp/names-postfix.txt   # 被验版本
+pre=70 post=73
+comm -23 (消失):   （空）
+comm -13 (新增):   TestSLO147LoopGiveUpSentenceAgreesWithTheBytesItRead
+                  TestSLO147OffsetSemanticsRenderThreeDifferentSentences
+                  TestSLO147UnwrittenSentenceNamesTheOffsetTheDocumentStoppedAt
+```
+
+⇒ 消失 0／新增 3，逐枚 `TestSLO147*`。**没有一枚既有用例被改名或被挤掉**。
+
+### 1.3　④ 票面点名的那发 MG：跨版本翻转，两边都跑了
+
+一句话判定：**修前该绿、修后该红**——修前没有任何断言读那半句里的第二个数，所以删掉它无人可响；
+ⓐ 之后钉它的断言存在了，删掉就断在"句子不再是那一句的形状"上。
+
+```
+修前（snap4 ＝ 父码＋父测试文件，只撤 `at offset %d`）:
+  $ go test -v -count=1 -run 'TestSLO144' ./cmd/wisp/
+  rc=0   --- PASS=7   --- FAIL=0   （子用例）--- PASS=7   ⇒ 0 红／14 绿
+  变异确实生效：grep -c 'document still open: the tail' cmd/wisp/slo_windows.go = 1
+
+修后（被验版本 ＋ 同一发变异，r1/B4-MG-drop-at-offset）:
+  rc=1  RUN=17 TOPPASS=7 TOPFAIL=3   144-block: 0 red / 7 green
+    :446  1978 of 1978 … sentence carries no byte/offset pair: "0 bytes read, document still open: the tail had not arrived"
+    :467  give-up error "…within 60ms (last read: 8 bytes read, document still open: the tail had not arrived)" does not read as bytes-then-offset
+    :500  unfinished sentence "989 bytes read, document still open: the tail had not arrived" is not the unwritten shape
+```
+
+⇒ **同一发变异：修前 0 红／14 绿，修后 3 红。AC#2 的牙就在这两枚读数的差上，成立。**
+⇒ 再补一发（编排者要求"别挂在单一枚上"）：把**三枚新用例同时**改成不跑（`X6-all-three-inertxMG`），
+在被验版本上重新得到 `rc=0 TOPPASS=7 TOPFAIL=0` ⇒ 那 3 枚红**恰好且全部**来自新增用例，无一来自别处。
+
+### 1.4　②③ 承重矩阵：摘掉任意一味，逐味答一句
+
+每行＝一发变异；"响的是哪几枚"按用例名读，不靠枚数。
+
+| 变异（摘掉／打坏的东西） | 结果 | 响的用例 | 144 那 7 枚 |
+|---|---|---|---|
+| `B1` `obs.offset = dec.InputOffset()`（ⓐ 那一行还原成旧取值） | 3 红 | 8／9／10 全响 | 0 红 |
+| `B2` **只删那一行填充**（offset 停在 `-1`） | 3 红 | 8／9／10 全响 | 0 红 |
+| `C3` **只撤那枚 hunk**（填充删＋`InputOffset()` 搬回 EOF 判定之前，注释全留） | 3 红 | 8／9／10 全响 | 0 红 |
+| `B7` 填充 off-by-5（`+ 5`） | 3 红 | 8／9／10 全响 | 0 红 |
+| `B4` **票面那发 MG**（撤 `at offset %d`） | 3 红 | 8／9／10 全响 | 0 红 |
+| `B10` 句子长出一条尾巴 | **只有 case 8 红** | 8 | 0 红 |
+| `B11` 两发合谋：句子把字节数印两遍＋字段烂回 0 | **只有 case 8 红** | 8（字段 leg） | 0 红 |
+| `B6` `note` 那支被关（`-1` 开始外印位置） | **只有 case 10 红** | 10 | 0 红 |
+| `B5` loop 到点句不再带最后读数（`offset` 归 0） | 2 红 | 9＋10（case 8 看不见） | 0 红 |
+| `B9` 红句两个实参对调（`o.offset, o.bytes`） | **0 红** | — | 0 红 |
+| `B13` loop 的**另一支**（`s.exited()`）丢掉 `last.summary()` | **0 红** | — | 0 红 |
+| `CB` 只把 `offset` 字段注释改回旧文 | 0 红 | — | 0 红 |
+| `CC` 只把结构体头上 `document`／`decoder` 那一词改回 | 0 红 | — | 0 红 |
+| `B12` 撤 `at offset %d` 却少传一个实参 | **编译不过** | `go vet` 的 printf 检查拦住，0 条 `=== RUN` | — |
+| `H1` `slo147PairOf` 的 `whole` 恒真 | 未修码上 0 红（该味单独摘不掉任何事） | — | — |
+| `X1` = `H1` × `B10` | **0 红** ⇒ `whole` 那味**是承重的**：摘了它 `B10` 打不红 | — | 0 红 |
+| `H3` case 8 的字段 leg 恒不响 | 未修码上 0 红 | — | — |
+| `X2` = `H3` × `B11` | **0 红** ⇒ 字段 leg **是承重的**：摘了它"句子保住、字段烂掉"那发打不红 | — | 0 红 |
+| `X3` = 撤 case 9 × `B5` | 仍 1 红（case 10 接住） | 10 | 0 红 |
+| `X4` = 撤 case 10 × `B6` | **0 红** ⇒ case 10 **是承重的** | — | 0 红 |
+| `X5` = 撤 case 8 × `B4` | 仍 2 红（9＋10 接住） | 9／10 | 0 红 |
+
+**逐味答一句**（"摘掉它，是否存在一发变异从此打不红？"）：
+
+- **ⓐ 那一行填充（`slo_windows.go:646`）**：存在——`B1`／`B2`／`C3`／`B7` 四发全打不红就没了牙；实测四发都红。
+  单点回退问"只撤这处哪条用例变得不响"：**三条一起不响**（`C3`＝只撤这枚 hunk 的读数）。**不是装饰。**
+- **case 8**：存在——`B10`（句子长尾）与 `B11`（字段烂回 0 而句子保住）**只有它响**（`X1`／`X2` 证明不是别的味顶上的）。承重。
+- **case 9**：**本程没造出来**。上面 13 发里，凡让 case 9 红的（`B1/B2/B4/B5/B7/C3`），
+  case 8 或 case 10 至少一枚同红；把 case 9 单独摘掉（`X3`）没有任何一发从红翻绿。
+  ⇒ 按编排者的分界（**造没造出来**）：**这一味不判退回、不判装饰**，记为"当前变异集内冗余"。
+  它冗余的原因是结构性的：它的判据（"到点句里两个数都等于递给 loop 的字节数"）被 case 10 的第一支
+  （同一枚 loop、同一支 `note` 反检）与 case 8（同一支分类器）从两边夹住了。
+  ⚠ 冗余≠无用：它是**唯一**从生产入口 `collectReportWithin` 断言"数字＝递给 loop 的字节"的一枚（`B5` 让它红），
+  只是那一发恰好也被 case 10 接住。**若有人要收这味，必须先造出一发只有它响的变异**——本程造不出来，
+  所以本程不要求收。
+- **case 10**：存在——`B6`（`-1` 那一支开始外印位置）**只有它响**（`X4` 复算：摘 case 10 后 `B6` 打不红）。承重。
+- **两枚新 helper**：`slo147UnwrittenRe`／`slo147PairOf` 是三枚用例共用的**唯一**解析器，
+  摘掉任一枚都编译不过（不存在"打不红的变异"问题，而是"尺不存在"）；
+  真正的弱化读数是 `X1`（`whole` 恒真 ⇒ `B10` 逃逸）与 `X2`（字段 leg 恒不响 ⇒ `B11` 逃逸）：**两味都承重**。
+  实现件 §2.1 自己写过"字段 leg 关住的那条后门＝把句子印成 `%d … offset %d", o.bytes, o.bytes`"——
+  **本程独立造出 `B11` 并复算：那条后门确实只被字段leg 关住（`X2` 逃逸、`B11` 单发只 case 8 红）。它的断言成立。**
+- **注释那两处（`CB`／`CC`）**：撤掉**零枚**用例变红。读数如实记：**注释不受仪器管**。
+  这不构成"装饰"判定——AC#2 的硬核心要求的是"码＋用例"有牙，注释是被修正的**承诺文本**，
+  不是修法本身。**但见第 3 格**：新注释里关于 `corrupt` 支那半句，本程实测与读数不符，那一处是**新的无仪器承诺**。
+
+### 1.5　⑤ 有没有"永远绿"的断言凑数
+
+- 三枚都在未修码上红（§1.2）⇒ **没有一枚今天恒绿**。
+- 三枚的判据方向全是"更严"：既有 10 枚（含 7 子用例）一字未改，
+  `git diff --numstat 2dc2b28^ 2dc2b28` 现量 **测试文件 169 加／0 删**、**生产码 21 加／4 删**；
+  4 枚删除逐枚点名（本程自己 `grep -E '^-[^-]'`）：
+  `// them the decoder stopped…`、`// offset is the decoder's stop position…`、`// decoder ran, i.e. …`、
+  `obs.offset = dec.InputOffset()`（那行的移位）。**没有一条断言被放宽或被改反方向。**
+- `t.Skip` 枚数 0（CI 四数里 `--- SKIP=0`；被验版本与改前那一次都是 0）。
+- 预算常量：`subjectReportBudget`／`subjectGrace` 不在 147 三枚 commit 的改动路径里（`git show --name-only` 已核），
+  新用例递给 `collectReportWithin` 的是**形参**（`60ms`／`40ms`），与票 144 用例同一形写法。
+
+### 1.6　本格判定
+
+**AC#2 成立。** 凭据是四组读数：未修码上 3 红（§1.2）、MG 修前 0 红／修后 3 红（§1.3）、
+三枚同时摘掉后 MG 回到 0 红（`X6`）、承重矩阵里 5 味各自至少关住一发（§1.4）。
+
+两处**如实记下的洞**，都不翻转本格判定，都在第 3／5 格具名登记：
+`B9`（红句两实参对调）0 红＝**ⓐ 语义下的等价变异**，不是尺漏了（见第 2 格对 AC#1 第二半句的读数）；
+`B13`（loop 的 `s.exited()` 支丢掉同一枚 `last.summary()`）0 红＝**五格之外的另一发**，票 144 的地盘。
+
+---
+
+
+---
