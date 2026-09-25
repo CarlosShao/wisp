@@ -9,7 +9,7 @@
 |---|---|---|
 | 开工锚点（我读到的 HEAD） | `43a60432ac0c08a8f5f465660e7f30b885cd98ce` | `git rev-parse HEAD` @2026-09-25 10:00(+08) |
 | 每节刷新 | §1=`888bbd5`，§2/§3=`888bbd5`，§4/§5/§6=`888bbd5` | 每节现跑 |
-| 临时件（只建不删，全在仓库外） | `D:\tmp\d22scan-close-r1\` | `probe\`（真 git 前提台件）／`mut\`（首轮四发变异）／`mut2\`（终稿四发变异）／`gitignore.go.final-orig`（变异前 pristine 拷贝）／`rowA-D.log`／`baseline-gate.log`／`final-gate.log`／`full.lst` `narrow.lst`／`*-code-only.go`／`roster-{before,after}.txt` |
+| 临时件（只建不删，全在仓库外） | `D:\tmp\d22scan-close-r1\` | `probe\`（真 git 前提台件）／`mut\`（首轮四发变异）／`mut2\`（终稿四发变异，末态已复原并按 hash 核过）／`gitignore.go.orig` `gitignore.go.final-orig`（变异前 pristine 拷贝）／`rowA-D.log` `final-rowA-D.log`／`baseline-gate.log` `final-gate.log`／`full.lst` `narrow.lst`／`*-code-only*.go`／`roster-{before,after}.txt` |
 
 **地界现量**（开工前）：`git status --porcelain -- tools/d22scan docs/evidence/s1` 空 ⇒ 我接手时这两处无未提交改动；
 `git ls-files tools/d22scan` ＝ 6 枚（`d22scan.exe` 未入库）。
@@ -62,13 +62,16 @@ $ comm -23 full.lst narrow.lst                   .gitignore / frontend/.gitignor
 ⇒ "普通 `git add -A` 就追踪、而 `-i -c` 一辈子看不见"这一形在真 git 2.52.0 上成立；
 subset 那一枚 0 命中是拿反方向非空正控一起量的（两把尺各一枚）。
 
-### 1.4 双向变异读数（四行，全在仓库外副本 `mut2\`，被测码逐字＝交付版）
+### 1.4 双向变异读数（四行，全在仓库外副本 `mut2\`，被测码逐字＝交付版；**终稿又跑了一遍**）
+
+首轮在条件②③的注释落地前跑（`rowA-D.log`），终稿落地后按同一串命令重跑（`final-rowA..D.log`，
+`gitignore.go` 终稿 hash `6d07693`）⇒ **两遍四行读数逐枚同值**，下面引的是终稿那一遍：
 
 | 行 | 树上代码 | 新测试 | 上一枚 F1 测试 | `TestGitIgnoreRuleSemantics` |
 |---|---|---|---|---|
 | **A** | 交付原样 | **PASS** | PASS | PASS |
-| **B** | **M1**：`parseIndexPaths(all)` → `(withIndex)`（`gitignore.go:245`，＝摘掉全量那一腿；另加 `_ = all` 仅为让副本编译） | **FAIL** `scan_test.go:1633`（`holds()` 认不出索引明明持有的件） | PASS | PASS |
-| **C** | **M4a**：`TrimRight(raw," \t\r")` → `TrimSpace(raw)`（`gitignore.go:577`，语义修回退，全量腿仍在） | **PASS**（正是全量腿把它救回来的） | PASS | **FAIL** 两支（`lead/inside.txt` / `"  lead/inside.txt"`，`scan_test.go:1787`） |
+| **B** | **M1**：`parseIndexPaths(all)` → `(withIndex)`（终稿 `gitignore.go:248`；首轮量在 `:245`，差三行是条件②③的注释加出来的；另加 `_ = all` 仅为让副本编译） | **FAIL** `scan_test.go:1633`（`holds()` 认不出索引明明持有的件） | PASS | PASS |
+| **C** | **M4a**：`TrimRight(raw," \t\r")` → `TrimSpace(raw)`（终稿 `gitignore.go:580`，语义修回退，全量腿仍在） | **PASS**（正是全量腿把它救回来的） | PASS | **FAIL** 两支（`lead/inside.txt` / `"  lead/inside.txt"`，`scan_test.go:1787`） |
 | **D** | **M4a ＋ M1** | **FAIL** 四枚：`scan_test.go:1606`（ban #6 分母 3 vs 3）、`:1609`（ban #8 同）、`:1619`（finding 没点名，findings 里只剩 dist 那一枚）、`:1633`（`holds()`） | PASS | FAIL |
 
 ⇒ **要求的两向都拿到了**：摘掉全量 `ls-files` 那一味 ⇒ 新测试**必红**（B 行）；它在 ⇒ 新测试**红不着**（A/C 行）。
@@ -85,3 +88,73 @@ step 1（正控）：**PASS=29 FAIL=0 SKIP=0 ＝ 29，`=== RUN`=69**（开工基
 名册差集 **＋1／−0**（唯一新增名 `TestFullTrackedListCoversWhatTheNarrowListCannot`，**没有一枚消失**）。
 step 2 rc=0、八数未动（§4 逐枚）。整道门 rc=0。
 日志：`D:\tmp\d22scan-close-r1\final-gate.log`（变异前的基线在 `baseline-gate.log`）。
+
+---
+
+## 2. 条件②：`gitignore.go` 那句"唯一形状"改成两支并列、并归对治理者（现号 `:103-119`）
+
+**它点名的行号没漂**：`git show HEAD:tools/d22scan/gitignore.go | awk 'NR==103||NR==105'` 现量首尾正是
+验收抄的那三行（"The one shape that could make it skip MORE than git …"）。**被换掉的原文（HEAD `:103-105`）**：
+
+> The one shape that could make it skip MORE than git - not being able to reach the index at all -
+> is handled by the rule above it, not by this list: no rule is applied then, so the tool over-scans and says why.
+
+**换成的新文（工作树 `:103-119`）**：两支并列，**无最高级**，各自点名治理者与钉它的测试——
+
+1. **问不到 index**（无仓库／无 git 二进制／超时／别人仓库的子目录）
+   ⇒ 治理者＝`skip()` 的 `!ix.ok` 分支（一条规则都不应用）＋ `note()` 的第一行自陈。
+   这一支**照旧成立**，验收 §3 四支各测过。
+2. **匹配器把自己的规则读得比 git 宽**（＝它 §4 第四发 M4a 那一类，也是 F3 抓过的两枚实例：行首空白被 trim 成
+   另一个模式、尾随 `**` 吃掉自己的父目录）⇒ 治理者**不是**"问不到就不套规则"那一支（这一支里 git 明明问得到、
+   并且回答"没忽略"），治理者＝`holds()` 查**全量** `git ls-files` 集合而不只是"受追踪∩撞规则"那枚子集。
+   钉它的是 `TestGitIgnoreRuleSemantics`（两枚读法本身）＋ §1 新加的那枚（挡下一枚的保险）。
+
+**末尾明写这不是穷尽**：`// This is a list of the shapes seen so far, not a claim that there are no others.`
+——理由：验收要的是"不要最高级"，而我若写"只有两支"仍然是同一枚未钉的 blanket（今天能举出两枚，
+明天 F3 家族第三枚照样会长出来）。⇒ 措辞是"two shapes are known to do it"。
+**真树证据＝§1.4 的 C/D 两行**：M4a 单独发时行为不变（全量腿挡着＝第二支的治理者真的是它），
+M4a＋M1 时同一发当场隐身（第二支没有第一支可替）。
+
+**未碰的同类句子（登记，不擅自扩大）**：`scan_test.go:1179` 与 `:1194` 里还有两句 "the one shape …" 式措辞，
+属**上一批**（`3bb99aa`）写的注释、讲的是独立对照 walk 在 F1 树上的形状，**不在验收点名的三件之内**，本件一字未动。
+
+---
+
+## 3. 条件③：`-i -c` 那句"独立并集成员"换成真理由 ＋ `:11` 的引用改回 `:22`
+
+### 3.1 `gitignore.go:180-194`（原 `:166-171`）
+
+被换掉的原文末两行：
+> … the set the self-report names, **and an independent union member so one command's parsing bug cannot blind the other**
+
+我自己复算过它站不住（**不是只抄验收**，两把尺各一枚，`D:\tmp\d22scan-close-r1\probe\` 真 git 2.52.0）：
+
+| 读数 | 命令 | 结果 |
+|---|---|---|
+| 子集关系 | `comm -13 full.lst narrow.lst` | **空** ⇒ `-i -c` 相对 `ls-files -z` 一枚新的都带不进 `holds()` |
+| **正控**（防"0 命中＝尺子瞎"） | `comm -23 full.lst narrow.lst` | **非空 3 行**（`.gitignore`／`frontend/.gitignore`／`frontend/weird/inside.tsx`） |
+| 枚数 | `wc -l` | full=4、narrow=1（同一棵树、同一次 `git add -A` ＋ 一枚 force-add） |
+| 同一枚解析器 | `grep -n parseIndexPaths` 现量（终稿行号） | `parseIndexPaths` 定义在 `gitignore.go:301`，其第 302 行调的就是 `parseIndexPathsList`（定义 `:324`）；窄清单在 `:252` 直接叫同一枚函数 ⇒ 解析 bug 同打两枚 |
+
+⇒ 新文改成两件事实：**它不是 `holds()` 里的第二意见**（严格子集 ＋ 同一枚 `parseIndexPathsList`），
+**它承重的是 `note()` 点名的那三行里的第三行**（CI 日志里能看见"哪几枚交付字节正压在活规则下"，`gitignore.go:448`），
+并指回 §1 那枚测试去钉"让跳过判定安全的是全量那一腿的射程，不是这份清单"。
+原句里"the ticket's named instrument"与"the set note() names"两句是**真话**，保留。
+`note()` 那一行本身**一字未改**，M6 那枚 pinner（`scan_test.go` 里 `note "" must name "TRACKED and matching an ignore rule"`）仍咬得住。
+
+### 3.2 `gitignore.go:11` 的 `.gitignore:24` → `.gitignore:22`
+
+现量（本仓根 `.gitignore`）：`22:frontend/dist/*`、`24:assets/web/dist/` ⇒ 旧引用指到了**另一条规则**上
+（那是 `3bb99aa` 留下的，验收 N5 已登记"不是 ca84b75 写的"）。同段另一枚引用 `frontend/.gitignore:12`（`dist/*`）
+现量**同值**，未动。
+
+### 3.3 这一节的两枚条件都是纯文字：生产码零改动的证法
+
+- `git diff --numstat -- tools/d22scan/gitignore.go` ＝ **＋30/−7**；
+- 把两版的**非整行注释**都剥掉再 diff：
+  `git show HEAD:…gitignore.go | grep -vE '^[[:space:]]*//' > A`、`grep -vE '^[[:space:]]*//' <work> > B`、`diff A B` ⇒ **空**（481 行 → 481 行）；
+- `git diff -U0` 的改动行里**没有一枚非 `//` 开头的行**（`grep -vE '^[+-][[:space:]]*//'` 现量空）；
+- `gofmt -l tools/d22scan` **空输出**、`go vet ./...` 与 `go build ./...` 在 `tools/d22scan` 内**全过**；
+- 变异台件的 pristine 拷贝与真树文件做 `git hash-object` 三向同值（`baac05c3ae99ab775c2092759dada4a11a592f12`），
+  **我从未把工作树文件改成变异态**——四发变异全在 `D:\tmp\d22scan-close-r1\mut2\` 里跑，因此也**没有用过 `checkout`/`reset`/`stash`**。
+

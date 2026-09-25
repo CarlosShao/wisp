@@ -8,7 +8,7 @@ package main
 // makes "0 findings" mean anything (ticket 67 AC#2, ticket 71 AC#4). Those
 // denominators were computed from the FILESYSTEM, so they counted whatever the
 // machine happened to hold - and `frontend/dist/` is build output, ignored by
-// `frontend/.gitignore:12` (`dist/*`) and `.gitignore:24` (`frontend/dist/*`),
+// `frontend/.gitignore:12` (`dist/*`) and `.gitignore:22` (`frontend/dist/*`),
 // with `dist/.gitkeep` re-included by a negation in both files because
 // go:embed needs the directory to exist in a clean checkout (ticket 77 AC#1).
 // Measured at anchor 7771409 with one binary on one source tree:
@@ -100,9 +100,23 @@ package main
 // spaces, and comments after a pattern. Each of those can only ever make this
 // matcher skip LESS than git does, which is the loud direction: the path stays
 // scanned and the worst outcome is a denominator that counts one file too many.
-// The one shape that could make it skip MORE than git - not being able to reach
-// the index at all - is handled by the rule above it, not by this list: no rule
-// is applied then, so the tool over-scans and says why.
+// SKIPPING MORE than git is the dangerous direction, and it is not handled by
+// that list. Two shapes are known to do it, and each has its own guard somewhere
+// else:
+//   - the index cannot be reached at all (no repository, no git binary, a
+//     timeout, a subdirectory of somebody else's repository). skip() then applies
+//     NO rule and says so in the first line of note(), so the tool over-scans.
+//   - this matcher reads one of its own rules more widely than git binds it -
+//     the two shapes acceptance F3 caught, a rule line's leading whitespace
+//     trimmed into a different pattern, and a trailing `**` pruning its own
+//     parent directory. That case is not reachable by the bullet above (git IS
+//     reachable and says "not ignored"); it is held by holds() consulting the
+//     FULL `git ls-files` set rather than only the tracked-and-matched subset,
+//     because a path this matcher over-reads is exactly a path the narrow
+//     listing cannot report. TestGitIgnoreRuleSemantics pins the two readings
+//     themselves and TestFullTrackedListCoversWhatTheNarrowListCannot pins the
+//     guard that has to catch the next one.
+// This is a list of the shapes seen so far, not a claim that there are no others.
 
 import (
 	"context"
@@ -166,9 +180,18 @@ type gitIgnore struct {
 //	rev-parse --show-prefix                       is root a repository top?
 //	ls-files -z                                   every tracked path (the guard)
 //	ls-files -z -i -c --exclude-standard          tracked paths that also match
-//	                        an ignore rule (the ticket's named instrument, the set
-//	                        the self-report names, and an independent union member
-//	                        so one command's parsing bug cannot blind the other)
+//	                        an ignore rule: the ticket's named instrument, and the
+//	                        set note() names by path so a reader of the CI log can
+//	                        see WHICH delivered bytes sit under a live rule. It is
+//	                        not a second opinion inside holds(): its output is
+//	                        strictly a subset of `ls-files -z`, and both streams
+//	                        are read by the same parseIndexPathsList, so one
+//	                        command's parsing bug would blind the other just as
+//	                        fast. Nothing in a skip decision comes from this list
+//	                        that did not already come from the guard; what makes a
+//	                        skip decision safe is the guard's reach, and that leg
+//	                        is pinned by
+//	                        TestFullTrackedListCoversWhatTheNarrowListCannot.
 type gitIndexState struct {
 	ok        bool
 	why       string          // why it could not be consulted; one line, always shown
