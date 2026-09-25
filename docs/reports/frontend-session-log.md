@@ -1200,3 +1200,16 @@ owner 拍的甲＝「先删掉这个请求」，撤销口令「撤 Q-50 甲」�
 `render:nav` OK（9 行／70 枚冻结名／interim=2）、`render:l2` OK（1 张卡、15085 B）、`render:stream` OK。
 ⚠ 一句可复现性提醒：`npm run render:l2` **不带参数会 exit=2**（usage），CI 同形是
 `npm run render:l2 -- fixtures/l2-card-fs-delete.json`（`ci.yml:656`）。
+
+> [2026-09-25 13:5x +08] **落码之后在新 HEAD `8b35f52` 的净快照上复跑了一遍**（三枚参与比较的文件按
+> `git cat-file blob 8b35f52:<path>` 放回，避开 §51.4(2) 那枚 CRLF 假红）：`tokens:check` **rc=0**
+> （129 dark + 65 light）；`internal/panel` 那四枚 hygiene 尺同跑 **全 PASS**——
+> `scanned 25 frontend/src files for 7 persistence APIs: 0 hits`、
+> `18 files reachable from main.tsx carry colour literals only in the generated theme`、
+> `vendored ai-native: 1 mounted (shimmer.tsx), 7 unmounted`、
+> `ban #8 self-armed: 33 frontend files scanned, 0 emoji-range characters`，
+> 包级 `ok github.com/CarlosShao/wisp/internal/panel 0.124s`。⇒ §51.2 那张表不是"改前"的读数，
+> 与我落的那枚注释在**同一版字节**上成立。
+> ⚠ 另记一句索引事实（不是我造的）：本轮 `git diff --cached --name-only` 里出现了别人的
+> `.scratch/wisp/issues/143-*.md`（staged 的删除）。我没替它提交、也没 `restore --staged` 去动它，
+> commit 带显式 pathspec 只提我自己的三条路径；`8b35f52` 之后它仍在索引里，逐字可见。
