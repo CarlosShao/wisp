@@ -127,3 +127,128 @@ tickets 33/35 接线时要同时新增依赖，那是一枚会被 `go.mod` diff 
   ⇒ **"被划成已覆盖"的防线有两枚（台账＋证据件）站得住，文件内那枚差一句**。总裁见 §8。
 
 锚点刷新：本节现量取自 `dev` @ `43a6043`。
+
+---
+
+## §2 变异台（本程怎么种的、怎么收的）
+
+全部变异只落在**两枚文件**：`internal/panel/bridge.go`（生产码，5 发）与
+`internal/panel/l2_grant_boundary_test.go`（被验物自己，3 发）。纪律：
+
+- 动手前备份到仓外 `D:\tmp\panel-l2-accept-r1\backup\`，两枚原件的 `git hash-object` 与我进场读到的一致：
+  `bridge.go = d2cd6362ecc6941a0cee58073a2bf8ab6669a590`（与实现件 §3.2 记录的**同值**，两路互印）、
+  测试件 `= 5b618d14b742f60cac22d2e58a1f2863dd311c63`（＝HEAD blob）。
+- 每发一条命令内完成"变异 → 跑 → `cp` 还原"，还原后当场 `git hash-object` 复算 ⇒
+  **8 发全部回到 `d2cd6362` / `5b618d14`，`git status --porcelain -- internal/panel/` 每发之后为空**。
+  未用 `checkout`/`reset`/`stash`，未 push，未碰 `frontend/**`、`design/**`、`internal/observe/**`、`tools/d22scan/**`（只跑了它们的只读检查）。
+- ⚠ **一次失败的变异我没当成读数**：M10 第一次落地时我猜错了缩进，python 的 `assert` 当场拒写，
+  那一发跑出来的"5 枚全绿"是**干净树**的读数，已作废重跑（重跑结果见 §5）。
+- **"变异真的生效了吗"这一问我用探针量，不靠推测**：临时新建 `internal/panel/zz_accept_l2probe_test.go`
+  打印 `knownComposerMethod(...)` 的真实返回值（该文件是 `_test.go`，被 `goSourceFiles` 排除，不污染 AST 扫描），
+  跑完 `mv` 到我自己的 `removed/` 里留着。两向都有：干净树上 4 枚候选名全 `false`（负控），变异树下目标名 `true`（正控）。
+  ⇒ 下面每一条"没红"都配一条"但是 Go 真的答了/真的绑了"的探针读数。
+
+| 发 | 形状 | 结果 |
+|---|---|---|
+| MA | 实现件 §3.2 那枚（封套长 `Outcome json:"outcome,omitempty"` **且**守卫答 `panel.approval.request`），**整包跑** | 红＝4 枚本件 + `C21`(先存在留红) ⇒ **先存在 46 枚因它而红＝0 枚**，§6 复算 |
+| M1 | 守卫 switch 内联字面量 `"panel.approval.resolve"` | **红**（3 枚） |
+| M1b | 同上但换成**候选名单里没有**的名字 `"panel.review.approve"` | **红**（3 枚，含 `no Method* constant` 那一句）⇒ 派生真在起作用，不是硬编码名单在起作用 |
+| M2+M3 | 同一条 case 里放 `dynRoute`（包级 **var**）与 `"panel.review."+routeTail`（常量拼接） | **4 枚生产面全绿**；唯一红是快照测试的**陈旧性引信**（`plant B has no anchor…`），不是"发现了送字门"。探针：两枚名 `true` |
+| M4 | 第二枚函数 `extraComposerGateM4` 自己的 switch 答 `"panel.review.allow"`，`knownComposerMethod` 末尾 `return` 它 | **5 枚全绿、整包 rc=0**。探针：`knownComposerMethod("panel.review.allow") = true` |
+| M6 | 新入站封套 `acceptM6Envelope{Cmd json:"cmd"; Outcome json:"outcome"}` + 真 `json.Unmarshal` 的处理函数 | **5 枚全绿**。探针：`Cmd="panel.review.allow" Outcome="grant"` 真的绑上了 |
+| M7 | 新入站封套 `acceptM7Envelope{Method json:"method"; Outcome json:",omitempty"}`（**它确实绑 `method`**） | **5 枚全绿**。探针：线上键 `"outcome"` 绑定成功 `Outcome="grant"` |
+| M8 | 同一形状放到**正主** `ComposerRequest` 上（`Outcome string json:",omitempty"`） | **反射那半红、AST 那半 0 findings** ⇒ 两台"逐字同规矩"的仪器当场分家（见 §3.2） |
+| M9 | 词表砍掉 `"outcome"` | 自校验 1 子红 + 快照 A/C 红；三面生产面绿（今天真树没有 outcome 键可找） |
+| M10 | 反射那半**去掉对内嵌结构的递归** | **只有自校验的第 3 枚植物红**，其余 4 枚顶层全绿 ⇒ §5 的承重凭据 |
+| M11 | 路由词表加一枚 `"mode"`（放宽） | 面 1 红 + 面 2 红 + 自校验红 ⇒ 自校验的"合法路由不该被命中"那一半是**镜子** |
+| M12 | `ParseComposerRequest` 不再问守卫（删掉那 3 行 `if !knownComposerMethod(...)`），守卫函数原样留着 | **只有面 3 红**（4 枚线上形状被放行），面 1/2/4 全绿 ⇒ 面 3 的承重凭据 |
+
+---
+
+## §3 四面逐格判
+
+### §3.1 facet 1「被答方法集是派生的、不是抄的」——**附条件成立**
+
+**先说它站住的部分（我给足）：** AST 那台仪器**确实**不是抄名单。M1b 是决定性的一发：
+我用的是**它 11 枚硬编码候选里没有的名字** `panel.review.approve`，
+红句是 `l2_grant_boundary_test.go:569`（派生集的词表判）与 `:604`（"没有一枚 `Method*` 常量声明它"），
+**不是** `:590` 那条候选名单的读数（虽然那条也同时红）。⇒ 派生链（`switch` case 标签 → 经本包 `const` 解析）
+是活的、能咬的，这一条实现件没吹。
+
+**再说 finding。四条攻击的路径与读数：**
+
+| 攻击 | 造形 | 打红了吗 | 判 |
+|---|---|---|---|
+| (i) case 里内联字面量 | M1 / M1b | **红了** | 站住 |
+| (ii) 路由经**变量/计算串**可达 | M2+M3 | **没红**（4 枚生产面全绿，只有陈旧性引信叫） | **F-1** |
+| (iii) **第二枚 switch/if 链**在别处答同一个方法名 | M4 | **完全没红**（5 枚全绿、rc=0） | **F-2（最重）** |
+| (iv) 路由**在 `knownComposerMethod` 之外**被答（守卫不再被问） | M12 | 面 3 红、面 1/2/4 绿 | **F-3**（面 3 兜住了行为，词表面没兜住） |
+
+根因是**两句可复算的代码事实**，不是我的推测：
+
+- `routeNameOf`（`:429-441`）只认两种 case 标签：`*ast.BasicLit`（字符串字面量）与
+  `*ast.Ident` **且**能在 `pkg.consts` 里查到。而 `pkg.consts` 只在 `decl.Tok == token.CONST` 时填
+  （`:294-296`）⇒ 包级 **`var`** 与**任何表达式**（`"a"+b`、函数调用）解析不出来，`routeNamesInFunc`
+  就把它**当不存在**（不报"读不懂"，是静默丢弃）。
+- 那条互印**只朝一个方向**跑：`:564-567` 是 `for _, name := range answered { if !knownComposerMethod(name) … }`
+  ＝ **派生 ⊆ 运行期**。反方向"运行期还多答了谁"**在结构上无法被这行发现**（它没有别的枚举源）。
+- `parseBoundaryPackage` 只把**函数名恰好等于 `knownComposerMethod`** 的那一枚函数里的 switch 当路由来源（`:318`）。
+  `guardSeen` 那道引信只在**改名/删掉**时叫（`scanGrantBoundary:485`），**被绕过时它不叫**——
+  M4 就是"被绕过"，M12 是"被不闻"，两发都绿。
+
+⇒ 文件头那句 "the set of inbound methods Go actually answers - derived from this package's own route guard …
+and **agrees with** knownComposerMethod at runtime"（`:40-42`）在盘上是**过强的**：
+真实语义是"某一枚具名函数的 switch 里、能写成字面量或包级常量的那批标签，且单向 ⊆"。
+**这一格我判附条件成立**：正向（"抄的名单看不见新门"）被 M1b 证否了、是真派生；
+但"看不见的那类门"存在，且其中 M4 那一类正是 tickets 33/35 接线时最可能写的形状（处理函数注册表）。
+
+### §3.2 facet 2「入站封套绑不出结论键」——**附条件成立**，另带一枚**仪器缺陷**
+
+它的结构判据是"绑 `method` 键的类型即入站"（`inboundEnvelopes:447-474`，用 `strings.EqualFold(f.JSONKey,"method")`），
+再向下闭包取内嵌/嵌套类型。两条攻击：
+
+- **F-4（判据本身）**：M6 造了一枚**绑 `cmd` 不绑 `method`** 的入站封套（`{Cmd json:"cmd"; Outcome json:"outcome"}`），
+  带真 `json.Unmarshal` 的处理函数。探针证明线上键真的绑得进去（`Outcome="grant"`），
+  **5 枚测试全绿**。⇒ "换一枚键名承载路由"就离开射程。这不是吹毛求疵：文件自己在注释里说
+  "路由字段自己就是标记"（`:446`）——那枚标记**恰好就是它可以被换掉的那一枚**。
+- **F-5（仪器缺陷，比 F-4 更硬）**：`jsonOr`（`:377-382`）在**有 tag 但 tag 名为空**
+  （`json:",omitempty"`）时返回 `""`，而 `encoding/json` 在这种写法下**回落到 Go 字段名**，
+  线上键 `"outcome"` 照样绑得进来（M7 探针实测 `Outcome="grant"`）。反射那半算对了
+  （`bindableKeysOf:152-172`：`jsonName==""` ⇒ `key = f.Name`）。
+  **M8 把这处分家钉出来了**：同一形状放进正主 `ComposerRequest` ⇒ **反射红、AST 那半 0 findings**。
+  ⇒ 两台自称"同一条规矩的两种写法"（文件头 `:44-46`、证据件 §1 表第二行"反射 + AST 双写"）
+  **今天并不等价**，AST 那台在空 tag 名上是**假阴性**。
+  ⚠ 方向要说准：这个缺陷**只会少报、不会多报**，所以它不是"放水"，是"自称双写、实为一台半"。
+- 顺带一条**不是缺陷的观察**：反射只对 `ComposerRequest`/`ModeRequest`/`AttachmentPayload` 三枚跑，
+  AST 才覆盖全包 —— 两台各自的覆盖面不重叠（M6/M7 都在 AST 的覆盖面里而都漏），
+  所以"双写"买到的冗余比它字面承诺的小。
+
+### §3.3 facet 3「行为面拒收历史线上形状」——**成立**，但"历史字节"那一枚不是它的牙齿
+
+先复推它承诺的"同一串字节"（派单要求我别信转述）：
+
+- `git show 53a1359^:frontend/src/components/l2-approval-card.tsx` 的 `:161-167` **逐字复现**
+  （`:163` = `onClick={() => send("grant")}`，`:166` = 「本次允许」；53a1359 的 numstat = `0 7` 纯删 7 行），
+  `send` 在 `:96-100`、`:98` 调 `requestApprovalResolution(view.correlationId, outcome)`。
+- `frontend/src/lib/panel.ts:169-186` 在 53a1359 里**一字未改**：
+  `diff <(git show 53a1359^:…panel.ts|sed -n '169,186p') <(sed -n '169,186p' …panel.ts)` → **rc=0**。
+  ⇒ 发出的字节 ＝ `{"method":"panel.approval.request","correlationId":"<id>","outcome":"grant"}`，
+  **键集与键序都和钉住的第 1 枚一致**。所以**"钉的是历史那串字节"这句成立**（保真度没问题）。
+
+但**诊断力**这一层有一条要报：
+
+- **F-6**：M12（把门整个打开）之下，5 枚钉住的线上形状里 **4 枚变红、第 1 枚仍绿**——
+  仍绿的正是文件注释里点名"verbatim from the deleted button"的那一枚，
+  因为它**不带 `requestId`/`source`**，守卫不问了它仍会被身份检查拒掉。
+  ⇒ "我们拒收历史形状"这面旗实际由**第 2 枚**（补了身份字段的那枚）扛着；
+  第 1 枚是**装饰性的 witness**。实现件在注释里诚实写了"plus the identity fields the current envelope demands"，
+  所以这不是隐瞒，但下一位读者会以为"历史字节被打过靶"。
+- 一条小口径：`:746-749` 那句 `strings.Contains(string(back), "\""+key+"\"")` 是**整串子串匹配**，
+  键名与**值**都能命中（M8 的红句里它命中的其实是 `"Outcome":"grant"` 那个值位）。
+  方向是**多报不是少报**，判可接受，但它不是"只按键判"的尺，措辞别写成只按键。
+- **承重证据（面 3 独有的那一发）**：M12 之下**只有面 3 叫**。
+  删掉面 3 ⇒ "主机不再问守卫"这一类变异在全树零仪器覆盖。⇒ 面 3 = **承重**。
+  （M8/M9 的红句也都在面 3，但那些枚别的面也叫，只有 M12 是面 3 独有。）
+
+锚点刷新：§2–§3 的变异与读数全部取自 `dev` @ `43a6043`（`bridge.go` 每发之后 `=d2cd6362…`、
+测试件每发之后 `=5b618d14…`、`git status --porcelain -- internal/panel/` 逐发为空）。
