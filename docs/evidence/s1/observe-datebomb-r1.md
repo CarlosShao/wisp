@@ -295,8 +295,12 @@ $ go vet ./internal/observe/
         scripts/portable-tests.sh:175   （core scope：./internal/observe/...）
    $ awk 定位 → ci.yml:288  bash scripts/portable-tests.sh --scope=core
                 ci.yml:458  bash scripts/portable-tests.sh --scope=windows
-   $ sed -n '184,188p' scripts/portable-tests.sh   → windows scope 只有 proc/secret/config/risk/ball/perm/plugin/cmd/llmrecord，**不含 observe**
+   $ sed -n '184,189p' scripts/portable-tests.sh   # windows scope 块：proc/secret/config/risk/ball/perm/plugin/cmd/llmrecord，**不含 observe**
+   $ awk '/^windows\)/{f="windows"} /^core\)/{f="core"} f && /internal\/observe/{print f": line "NR}'  scripts/portable-tests.sh
+        core: line 175                             ← 全文件里 observe 只出现在 core 这一块
    ```
+   （我最初在 §9 落笔时把块号写成 `184,188p`；现按 `sed -n '184,189p'` 重跑核对后改正——块到 `:189` 的 `;;` 为止。
+   这一处是本程自己的笔误，不是事实差错：`internal/observe` 确实**只**在 `core` 作用域里，上面那发 `awk` 是全文件扫描给的旁证。）
    另一条 `./...` 型步骤（`ci.yml:81`）是 `runtests.sh -C tools/d22scan ./...`，**那是 d22scan 自己那个 module**，
    摸不到 `internal/observe`。⇒ **全 CI 只有 `test-core` 一步覆盖它**，`slo-*`/`lint*` 都不跑 Go 测试。
 
