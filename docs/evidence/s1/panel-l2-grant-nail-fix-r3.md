@@ -357,3 +357,20 @@ row V（原文 out/V-delivered-MDEC.txt）：在副本的 bridge.go 里加一枚
    红名仍是 §1.3 那三枚（各 ×2）、新测试那行仍是 `asked=528 assembled route names, answeredByRealGuard=0, hits=[]`
    （原文 `out/committed-count2.txt`）；`git hash-object internal/panel/bridge.go` = `d2cd6362ecc6941a0cee58073a2bf8ab6669a590`、
    交付钉 = `9fd6defbd8dd113a7bd9c70c619ab92ac01f32d7`、`git status --porcelain -- internal/panel` **空**。
+
+---
+
+## §8 §1.4 那发 `d22scan.sh` 的时效（又一处"行号/分母是读数不是常量"）
+
+`§1.4` 记的那一发跑在**头段改准之前**的那版钉上（blob `9c06f3f6`，2080 行）。在交付版（`9fd6defb`，2081 行）上
+本程又跑了一遍（原文 `out/d22scan-committed.txt`）：**rc=0**，逐枚分母与 §1.4 的差别只有一处，
+而那一处**不是本程造的**——是别家在 `cmd/` 里多提了一枚文件：
+
+```
+bans #1-5 internal/=203  cmd/=22 | ban #6 frontend/=46 | ban #7 internal/tools/=18
+ban #8 design/=32  frontend/=46  internal/=407  **cmd/=40**（§1.4 那发是 39）
+d22scan: clean - no D22 ban violations
+```
+
+⇒ 引本件任何一枚 d22scan 分母时**连锚点一起引**（台账里已有这条规矩：`引用"某区间几枚红"必须连口径一起引并带锚点 sha`）。
+本程未碰 `tools/d22scan/**` 一字节：`git log --oneline 1785a77..HEAD -- tools/d22scan/` 的命中全属于别家。
