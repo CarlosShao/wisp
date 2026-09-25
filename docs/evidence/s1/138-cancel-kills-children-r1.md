@@ -575,4 +575,100 @@ D46 命令插件是**已采纳**项并有票 50），"只留接口位、无实�
 3. **没验 `cancelled` 文案那半与本格有没有牵连**：本程一字未动 `D37` 那 17 类（见 §5 零改动自证），
    所以那半截契约变更**没有被触发**；但本程也没去证明"它不可能被牵连"——那是验收表那侧的活。
 
+---
+
+## 5　AC#2／AC#3 处置 ＋ 零改动自证
+
+### 5.1　AC#2（修法形状）：**条件句的前件被判假 ⇒ 本格未触发**
+
+票面 AC#2 原文的引导条件是 *"如果 AC#1 判定确有可走路径"*。§4.1 的三发现把这枚条件判**假**，
+故本程**未落任何修法**。但 AC#2 那四条约束是"将来落地时必须满足"的，本程把它们各自的**现状**量出来留给拍板的人：
+
+| AC#2 约束 | 本程量到的现状 | 现量命令 |
+|---|---|---|
+| ① 不动 D4／C19 门控，`risk` 侧一个字不改 | 本程 `internal/risk/**` **零字节**（见 §5.4 那发） | `git diff --name-only 64858d6..HEAD -- internal/risk` |
+| ② 不新增重量级依赖（D22 闸门②白名单） | `go.mod`／`go.sum` 自锚点以来**未动一枚** | `git diff --name-only 64858d6..HEAD -- go.mod go.sum` ⇒ 空 |
+| ③ Windows 专属 API 留在 `internal/proc/**` 的 `_windows.go` 半边；非 Windows 侧要么等价、要么"此平台无此能力"**且必须可见**（不许静默 no-op） | 现状：`JobScope` 全在 `jobscope_windows.go`；`internal/proc` 无 tag 的文件只有 `doc.go`／`envfork.go`／`shutdown.go`（＋三枚测试）。**已有的"答案而不是缺席"先例在别处**：`internal/tools/platform_other.go:30 shellTrash` 在非 Windows 上返回一条点名平台的错误，其文件头写着 *"What it must never do is pretend"*。**仪器**：`internal/proc/crossvet_test.go:52 TestCrossVetForLinux` 会把 `./internal/proc/` 拿 `GOOS=linux` 过一遍 vet——本程现跑它 **PASS**（读数在 §5.2），但它只保证**编译与 vet 干净**，**不保证运行语义**：文件缺席在它是绿的。⇒ 将来落地者若选"此平台无此能力"，光让 crossvet 绿**不算交差**，得有一个会响的东西（错误／告警／可见状态） | `ls internal/proc \| grep -v _windows`；`go test -count=1 -run TestCrossVet -v ./internal/proc/` |
+| ④ 需要改 `cancelled` 文案或错误分类 ⇒ 停手上报 | 本程**没有走到这一步**：裁决停在"未触发"，`internal/observe`（D37 分类的家）零字节 | `git diff --name-only 64858d6..HEAD -- internal/observe` |
+
+### 5.2　AC#2③ 那枚仪器的现跑读数（别拿"没测"当"过了"）
+
+```
+$ go test -count=1 -run 'TestCrossVet' -v ./internal/proc/
+=== RUN   TestCrossVetForLinux
+--- PASS: TestCrossVetForLinux (0.78s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/proc	0.926s
+rc=0
+```
+
+⇒ 它绿，是因为 `internal/proc` 今天在 Linux 下**本来就什么都还没做**（Job 那半边整个被 `//go:build windows` 圈走）。
+这条读数的用处**不是**证明 AC#2③ 满足，而是钉住"满足它的判据长什么样"：
+**这枚仪器看不见"缺席"，只看不见"编译不过"**——写进本件，是因为本仓抓过的正是"一步存在却从不产出结论"那种形状。
+
+### 5.3　AC#3（牙）：**未触发，且本程一枚用例都没写**
+
+票面 AC#3 要求"必须有一枚用例在'级联'被摘掉时转红，且逐名列出它红在哪一行"，并要求
+"先证变异落地（`grep -n` 到你改那一行的原文 ＋ `go build ./...` rc=0）再读数"。
+
+**本票今天没有"级联"可摘**（§2.2 表最后一行 ＋ §4.1）。本程**不**为凑这格造用例，理由两条：
+
+1. 造出来的只能是"给一段本无人调用的新码配一枚自证用例"——摘掉它当然会红，但那红**与真实危害无关**，
+   正是票面 AC#1 末段禁止的"为了结案去造一条假的现实危害"。
+2. 简报第 3 条把这一族的危险性写得很直白：这活的本体是"杀掉被取消任务自己起的子进程"。
+   在**没有任务子进程**的今天，任何这样的用例都要自己造进程再杀自己造的进程——
+   那是一条只在本机跑得出"自我实现"红绿的形状，出一台机器就不成立。
+
+⇒ AC#3 的判语：**未落地、未触发、未做**。谁批准了 AC#2 那族修法，这一格才有对象。
+
+### 5.4　零改动自证（本程交付物＝一枚证据件，代码面零枚）
+
+```
+$ git diff --name-only 64858d6..HEAD -- internal cmd tools scripts docs/PLAN.md docs/specs .scratch
+（空输出）
+rc=0
+
+$ git status --porcelain -- internal cmd tools scripts
+ M cmd/wisp/slo_report_144_windows_test.go
+ M cmd/wisp/slo_windows.go
+```
+
+⇒ 锚点到 HEAD 之间，**代码面改动枚数＝0**；工作树里那两枚脏文件是**票 149 的写者**正在改的（简报点名的落点冲突面），
+本程未碰、未 add、未还原。本程自己的四枚 commit 只动过一枚文件：`docs/evidence/s1/138-cancel-kills-children-r1.md`。
+
+### 5.5　锚点漂移（本程在场期间 HEAD 被推走一次，如实记）
+
+```
+$ git log --oneline 64858d6..HEAD
+69aefae9 evidence(138 AC#1 总裁决 第 4 格): 判为"给未来功能预留的洞"（三发支撑：agent 闭包无 proc、生产 NewDisposalScope 零枚、shell.exec 无注册）；AC#2/AC#3 按条件句未触发；SPEC-12 §5 登记行按表内语义取 DEFERRED、五字段备妥待编排者落笔
+d8e39579 evidence(138 AC#1③ 第 3 格): 生产 exec 路径逐名七枚、任务路径六枚 fs.* 零子进程；shell.exec 与 D46 均未注册；import 图那把尺量出会给出反结论、已换调用点普查；票面 unwired.go 路径打偏一处另起登记
+1ff7c714 evidence(138 AC#1② 第 2 格): AssignProcessToJobObject 普查——产品侧唯一分配门 StartInJob、唯一调用者 wisp slo；等价形状(挂起后归属)零枚；三枚原有 Job 用例现跑 rc=0 作正面控制
+c9237a93 evidence(138 AC#1① 第 1 格): JobScope 创建点数与调用者现量——生产 1 枚整机、调用者 3 处两个用途，票面 §0 那半截断言落成读数
+2fb80c21 docs(台账 A266): 第二推逐名比红名集合又是零变化；slo-full 连拒两次，而我那句"这次真跑完了"是推断错、当面收回
+
+$ git show --stat --format='%h %s' 2fb80c21 | tail -3
+
+ docs/reports/pending-and-issues.md | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+```
+
+⇒ 编排者那枚台账 commit（`2fb80c21`，A266）在本程第 1、2 格之间落进来，**只动 `docs/reports/pending-and-issues.md` 一枚文件**。
+本件的读数全部在 `64858d6` 之后取得，与那枚漂移无冲突；本程未 rebase、未 cherry-pick、未碰它那一行。
+
+### 5.6　放水两问自答
+
+- **断言方向动没动**：**没动，因为本程没碰过任何一枚断言**。可复算：§5.4 那发 `git diff` 在 `internal/` 上为空。
+- **helper 是不是原有的那枚**：本程没新增、也没改任何 helper；§2.4 与 §5.2 跑的两发用的都是**票 03／票 78 原有的**用例，
+  `-run` 过滤只是**缩样**，不是换尺——所以两处都跟着写了"它不代表整包"。
+
+### 5.7　本格没测什么
+
+1. **没做全包 `go build ./...`**（本程零代码改动，构出来的只是别人正在改的 `cmd/wisp`）；`go build ./...` 会在
+   149 的半路上取数，那枚红绿既不是我的也不是它的——**故意不取**，改在 §6 用"分四棵构 `./internal/... ./tools/... ./scripts/... .`"绕开。
+2. **没验"将来若在 Linux 上落地，此平台无此能力"那句话该怎么出**：本格只量出现有先例（`platform_other.go` 的拒绝式）
+   与现有仪器的射程（crossvet 看不见缺席），**没有**替拍板的人选出那个形状。
+3. **没测 `wisp slo` 那条已经用了整机 Job 的路径在取消语义上是否也有同样的洞**：它不在"任务"里，本票范围外，
+   但它是**今天唯一真实存在的"父进程持有子进程"的产品路径**——若有人要写"级联"的回归网，那是唯一有真实对象的样本。
+
+
 
