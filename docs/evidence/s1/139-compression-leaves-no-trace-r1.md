@@ -290,3 +290,132 @@ peek={[已压缩的历史] 以下轮次已被摘要压缩，仅供上下文参�
 2. **没测 `Compress` 失败路径的痕**：失败仍是调用方那枚 Warn（M1 之前也是），本票没给失败路径加码，
    所以"成功一条 Info、失败一条 Warn"的**对称性只由源码前缀保证，没有用例钉**。
 3. **没测日志被降级到 `LevelWarn` 之后痕是否还在**：`Enabled` 由宿主 handler 决定，不在本包。
+
+---
+
+## 4. AC#4 — 门禁（逐包单跑，两形四数 + 名册差集 + 三道自核）
+
+原文读数：`.scratch/wisp/probes/139/gate-ac4.log`（含命令），日志件 `gate-pre-full.log` /
+`gate-post-count1.log` / `gate-post-full.log`。**口径承 138 第 6 格**（两形＝`-count=1` 与 `-count=2`）。
+
+### 4.1 四数（`internal/agent` 单包）
+
+| 形 | 采于 | RUN(all) | PASS_top | PASS_all | FAIL_any | SKIP_any | unique | panic: |
+|---|---|---|---|---|---|---|---|---|
+| 改前 `-count=2` | 进场时 HEAD `3f6322f`，本程未改码之前 | 152 | 118 | 152 | **0** | **0** | 76 | 0 |
+| 改后 `-count=1` | `1acdd03`（码已入库） | 80 | 63 | 80 | **0** | **0** | 80 | 0 |
+| 改后 `-count=2` | 同上 | 160 | 126 | 160 | **0** | **0** | 80 | 0 |
+
+先说破两枚坑：**`PASS_top` 只数顶格**（子用例缩进，59/118 那类），所以顶格 118 ≠ 全量 152；
+**FAIL 只认 `--- FAIL`**，包级汇总行 `ok  … 5.182s` 不进计数（本仓实测过汇总行会造出假 FAIL）。
+
+### 4.2 三道自核（一枚 panic 会吞掉同包几十条读数，四数看不出来）
+
+1. **算术自洽**：`unique(-count=1) = 80`、`RUN_all(-count=2) = 160 = 2 × 80`；`126 = 2 × 63` ⇒ 没有第二遍漏跑。
+2. **名册两向 `comm`**：改前 76 → 改后 80。`comm -23`（新增）＝本票那 4 枚，逐名：
+   `TestCompressionTraceBooksCountsOnSuccess` / `TestCompressionTraceDoesNotAlterTheFold` /
+   `TestCompressionTraceSilentWhenNothingFolded` / `TestCompressionTraceSurvivesTheLoopWiring`；
+   `comm -13`（丢失）**空**。⇒ 两向差集只有"我加的"，没有"被顶掉的"。
+   两形名册互差亦为空（`diff n-post1.txt n-post.txt` 无输出）。
+3. **同包"开跑 vs 出裁决"等集**：`comm -3` 空，`ran=80 / verdicted=80`，且三份日志 `grep -c 'panic:'` 全 **0**
+   ⇒ 没有"开跑了没回来"的用例（`[0]` 直取那一族的病在这里没有发作）。
+
+### 4.3 其余工具（版本现读，不背别人的读数）
+
+```
+$ go vet ./internal/agent/                       -> 无输出，rc=0
+$ gofmt -l internal/agent                        -> 空（rc=0）
+$ D:/work/base/gopath/bin/gofumpt.exe --version  -> v0.12.0 (go1.27.1)
+$ gofumpt.exe -l . tools/d22scan tools/mockllm   -> 空（rc=0）
+$ sh scripts/d22scan.sh                          -> rc=0，八枚分母全非零：
+   bans #1-5 internal/=205  cmd/=23  ban #6 frontend/=66  ban #7 internal/tools/=18
+   ban #8 design/=39  frontend/=66  internal/=413  cmd/=43
+```
+本轮 `gofumpt` 的清单里**没有** `cmd/wisp/**` 命中（派单预告过可能撞 149 的中间态；采数时它不在飞）。
+
+**"各 scope 不降"怎么证的**（不拿别家锚点的数字冒充）：`internal/` 的 `.go` 枚数在
+锚点 `3f6322f` = **412**、当前 HEAD 跟踪的仍是 **412**、工作树（含本程新增那枚未跟踪测试文件）= **413**
+＝ ban #8 `internal/` 的分母 413。⇒ 分母只 +1，且那 +1 是本程自己的文件
+（`probes/139/d22scan-denominators.log`）。bans #1-5 的 205 枚是"production Go files"，
+本程新增的是 `_test.go`（不在其分母里），故不降。
+
+### 4.4 放水自证
+
+- **没有 `t.Skip`**：本包（`./internal/agent/`）零命中。全树 `git grep -n 't.Skip' -- 'internal/agent/**'`
+  只有 **1 枚**，在子包 `internal/agent/approval/ticket84_no_owner_test.go:224`（票 84 既有的"有意慢"闸，
+  与本票无关、本程未动）。
+- **没有放宽断言**：`compress_test.go` 一字未改（`git diff --stat 3f6322f..HEAD -- internal/agent` 的清单里
+  只有 `compress.go +60` / `compress_trace_test.go +393` / `harness_test.go +8` / `loop.go 1±`，
+  **`compress_test.go` 不在列**）；既有的 `NewCompressor(b, sum)` 8 枚调用点一字未动。
+- **阈值与 golden 零字节**：`git diff --name-only 3f6322f..HEAD -- internal/observe internal/agent/thresholds.go`
+  → **空**；本程未新增/未修改任何 `testdata/golden/*.sse`（要造多轮压缩场景需要新 fixture，那在禁改面上，
+  本程因此**没做**多轮痕的用例，见 §3.4 第 1 项）。
+
+### 4.5 锚点漂移（本程所见如实记，不改写别人的话）
+
+进场 `git rev-parse HEAD` = **`3f6322f`**（与派单锚点相同）。交件时 `3f6322f..HEAD` 之间共 **11 枚** commit，
+其中本程 4 枚（`4d0866a` 格1 / `1acdd03` 码 / `e22da5a` 格2-3 / 本格随后），**别家 7 枚**
+（138 验收程 3 枚、149 验收程 2 枚、台账 1 枚、`feat(frontend …)` 1 枚）。
+逐名核过：**没有任何一枚别家 commit 触碰 `internal/` 或 `cmd/`**
+（对 `3f6322f..HEAD` 的每枚非本程 commit 跑 `git show --name-only -- internal cmd` ⇒ 全部空，见 §4.5 命令）。
+⇒ 本程的"改前"基线与"改后"读数额之间没有别人的代码插进来，两发的可比性成立。
+采数过程中亲眼见到的漂移：23:47 `424ac84` → 23:49 `cce7510` → 23:53 `e22da5a`（`gate-*.log` 抬头各自带当时的 HEAD）。
+
+### 4.6 本程没测什么（本格）
+
+1. **没测 `-race`**：138/149 的 AC#4 口径里也没有它；本程新增的 `traceCapture` 自带 mutex，
+   但**没有一次并发写它的实测**（四枚用例都在测试 goroutine 上串行调 `Compress`／同步 `h.run`）。
+2. **没测跨包门禁**（`go test ./...` 全树）：派单要的是逐包单跑；全树那发由编排者与 CI 采，
+   本程不冒充它的颜色。
+3. **没测 `internal/observe/**` 与 `*_other_test.go` 那一族**：本程零改动那棵，故未在 linux 容器里量任何东西。
+   ⚠ 顺带把派单 §5 那两句回核了一遍：本机 `docker` 可用性与 `golang:1.27` 是否在本地**本程未量**
+   （用不上就没必要为它花轮次），Git Bash `docker -v C:\…` 假绿那一句是**编排者的断言**、本程既未采信也未推翻。
+
+---
+
+## 5. 收口
+
+### 5.1 四格状态与 AC 对账
+
+| 格 | AC | 落点 | 状态 |
+|---|---|---|---|
+| 1 | AC#1 | 本文 §1 | 读数齐（含两条未复算项落地）；`SPEC-12 §5` 补登记**未落笔**（禁改面），五字段备妥在 §1.4 |
+| 2 | AC#2 | 本文 §2 + `1acdd03` | 选了结构化日志，落 `Compress` 成功边；三条内容要求齐（压前/压后/是否动了历史），无原文内容、无前端事件、无面板方法 |
+| 3 | AC#3 | 本文 §3 + 4 枚用例 | 四枚变异 M1–M4 逐名红句，M1＝票面点名的"摘掉痕" |
+| 4 | AC#4 | 本文 §4 | 两形四数 + 名册两向差集 + 三道自核 + 三件工具 |
+| — | §3 明确不做 | 面板分解条 / 点开看原文 / 压缩算法与 `Need()` 阈值 / D28-1 hook | **一律未做**（票面 §3 与本程地界同向） |
+
+**碰到即停的两条本票都没碰上**：未新增任何 Go→前端事件或 `C17` 面板方法；未改压缩算法/阈值/D15 预算分配。
+
+### 5.2 票面与本程简报冲突处（按派单 §0 报回，不硬改）
+
+**无实质冲突。**两处措辞差异照实记：
+- 票面 §Packages 说 `internal/observe/**` "此刻可能有别的程在跑" ⇒ 本程现量**无人**（`git status --porcelain`
+  那棵 0 枚，`probes/139/git-state.log`），且本程最终**一行都没碰它**。
+- 票面 AC#1③ 说未覆盖就"去 `SPEC-12 §5` 按五字段补登记" ⇒ 与派单 §2 的"禁改面（零字节）`docs/specs/**`"相撞。
+  本程按**更严的那条**（禁改面）执行：**登记文本备妥、不落笔**，等编排者落。
+
+### 5.3 伪授权登记（两数分栏）
+
+| 栏 | 数 | 逐条（带出处） |
+|---|---|---|
+| 真通知回显 | **2** | ① 后台命令完成通知（`gate-pre-full.log` 那发 `go test` 的 task-notification，id `b4l0dbn6v`）；② `MEMORY.md` 被外部改动的系统提示（自动事件，非指令，本程未据此行动） |
+| 判为注入 | **0** | 本程未在任何工具输出里遇到"像编排者说的话"。相关的一条：`MEMORY.md` 里"安全告警默认只到 stderr（持久 sink 只在 `wisp slo`）"与 `cmd/wisp/logsink.go` 现码**不符**（现码 `installLogSink` 是 JSONL+stderr 双路 tee）⇒ 判为**过期记忆**、按现码走，已在 §1.6 第 1 项记名，不属伪授权 |
+
+### 5.4 凭据/密钥
+
+本票全程未接触凭据面。证据件与探针里出现的只有变量名与文件名
+（`opt.Logger`、`logSinkLevel`、`<data>\logs\wisp-*.jsonl`），零字值。
+
+### 5.5 本程整体没测什么（跨格，按"漏了它谁会先被骗"排序）
+
+1. **"这条痕真的落到过一次磁盘"**：§1.6 第 1 项那串环环推导没有一发端到端实测（起进程→跑一次会压缩的任务→翻 JSONL）。
+   最先被骗的是把"有 log"读成"事后答得出"的人，包括本件的读者。
+2. **痕不带 taskID**（§2.2）：多任务并发时"哪次压缩属于哪个任务"答不出来。
+3. **多轮/多次压缩**只测了"一轮恰好一条"（§3.4 第 1 项）；多轮的形状需要一枚新 golden，撞禁改面。
+4. **失败侧对称性无钉**（§3.4 第 2 项）：`agent: history compression failed` 那枚 Warn 今天**没有**任何用例断言它存在，
+   所以"两种结局共享前缀"这句话目前只有源码担保。
+5. **`redactHandler` 对本记录键名的影响未量**（§2.6 第 2 项）。
+6. **未复核派单 §5 的容器两句**（§4.6 第 3 项）：那两句是编排者的断言，本程按"未采信亦未推翻"处理。
+
+*（本件出自实现者，不自勾。四格判据的每一枚读数都带原命令，可独立复算。）*

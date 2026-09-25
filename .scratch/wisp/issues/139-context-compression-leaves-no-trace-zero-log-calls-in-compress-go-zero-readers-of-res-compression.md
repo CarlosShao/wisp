@@ -74,3 +74,16 @@ Warm-window hook 才该拥有这次调用"。⇒ **本票不改这个决定**，
   而是**全文零条日志**（那条 Warn 在调用方 `loop.go:398`）——这条使缺口**变深**，故照实写进票面。
   两条未复算项（`refHistoryTokens` 等比缩放、D28-1 登记覆盖度）**没有当事实写**，已落成 AC#1。
   next＝排在 138 之后、今日队列之后。
+- [2026-09-25 23:5x +08] agent=implementer-139 did=四格全落（AC#1 读数 / AC#2 落点 / AC#3 牙 / AC#4 门禁），**框不自勾**。
+  进场现量：HEAD `3f6322f`（＝派单锚点）、`internal/observe/**` 与 `internal/agent/**` 各 0 枚改动 ⇒ 票面那句"observe 此刻可能在飞"按现量为无人，本程最终也没碰它。
+  §0 五条锚逐条复算成立（`loop.go:393/396/398/400-401`、`.Compression` 非测试唯一命中＝赋值那行、`compress.go` 日志 0 枚），且**报 0 之前先打正控**：同一把尺在 `loop.go` 给 14、在 `.Rounds`/`.Usage` 给 3/54。
+  AC#1 两条未复算项都落成了读数：① `refHistoryTokens` **确为等比缩放**（`budgets.go:36→:107`，实证用例 PASS）⇒ 本票新增用例里 `12000` 贡献 0 枚、触发点一律从 `Budgets` 读；
+  ② `DEFERRED(D28-1)` 在 `SPEC-12 §5` **根本没有那一格**（`grep -c 'D28-1'` = 0，同文件表体 47 行）⇒ "压缩无留痕"未被覆盖，且顺报 `D11-3` 同缺（只报不修）。
+  **AC#2 三选一选了 (a) 结构化日志**，落点在 `Compress` 的成功边而不是调用方：理由三条全出自现量——(b) 那枚字段已存在且生产侧既无字段级读者也无整结构 `%+v` 打印者（加了不兑现）、(c) `diagnostics.go` 在禁改面且它记的是检查项、(a) 是唯一已落磁盘那条路（`logsink.go:144` tee + `:82` min_level=info + `cmd/wisp` 非测试从不设 `Options.Logger`）。
+  字段：tokens_before/tokens_after/threshold/msgs_before/msgs_after/compressed_msgs/kept_raw_rounds/history_changed，**只有计数与布尔**（keep_transcript 硬约束），与失败那条 Warn 共前缀 `agent: history compress`。
+  **AC#3 四枚变异逐名报红**：M1 摘痕→2 发红（=未修码那一发响）、M2 只断 loop 的接线→只红端到端那发、M3 恒真化（`if rep.Ran`→`if true`）→被反向那发独立咬住、M4 把一段历史塞进记录→被隐私探针咬住。零 `t.Skip`、零断言方向改动（`compress_test.go` 一字未动，8 枚 `NewCompressor(b, sum)` 调用点未动）。
+  两处自打：(i) 我第一版断言"`out` 必须不再 `Need()`"是**错判据**，真码第一发就红——D15(4) 的退出条件含"只剩 KeepRawRounds 枚原始轮"这第二支，`tokens_after=780 > threshold=384` 合法，**这正是记录要带 threshold 的理由**；(ii) "往正文尾部埋哨兵"单用会漏，因为 `structuralTrim` 截到 80 rune，所以隐私检是两枚探针。
+  AC#4：两形四数（改前 unique 76 / 改后 80，FAIL 0、SKIP 0、`panic:` 0）＋名册两向 `comm`（新增 4 枚逐名、丢失空）＋同包开跑/裁决等集；`go vet`/`gofmt`/`gofumpt v0.12.0(go1.27.1)` 皆空；`sh scripts/d22scan.sh` rc=0 八枚分母非零，"不降"是这么证的：`internal/` 的 .go 枚数 412→412（跟踪）→413（工作树，多的那 1 枚是本程测试文件）。
+  锚点漂移如实记：交件时 `3f6322f..HEAD` 共 11 枚（本程 4 枚），**别家 7 枚无一触碰 `internal/` 或 `cmd/`**（逐名 `git show --name-only -- internal cmd` 全空）⇒ 改前/改后两发可比。
+  **交编排者的两件事**：① `SPEC-12 §5` 的 D28-1 五字段本程已备妥但 `docs/specs/**` 是本程零字节禁改面，未落笔（同 138 那格的处置形状）；② 本程没测的第五项值得先看——失败侧那条 Warn 今天没有任何用例钉，"两种结局共享前缀"目前只有源码担保。
+  next＝等非实现者程复算并按其裁决表定框。证据件 `docs/evidence/s1/139-compression-leaves-no-trace-r1.md`，原始读数 `.scratch/wisp/probes/139/`（含 `run-mutations.sh` 与 `mut/*.orig`，只建不删）。

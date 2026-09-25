@@ -1,0 +1,45 @@
+# 139 AC#4 门禁 — 两形四数 + 三道自核 — 2026-09-25T23:53+08:00 HEAD=e22da5a
+
+形 A 改后 -count=1 ; 形 B 改后 -count=2 ; 形 0 改前 -count=2（进场时 HEAD 3f6322f，本程未改码之前采的）
+
+### gate-pre-full
+RUN_all=152 PASS_top=118 PASS_all=152 FAIL_any=0 SKIP_any=0 unique=76
+  panic: 0  package line: ok   github.com/CarlosShao/wisp/internal/agent 5.041s
+
+### gate-post-count1
+RUN_all=80 PASS_top=63 PASS_all=80 FAIL_any=0 SKIP_any=0 unique=80
+  panic: 0  package line: ok   github.com/CarlosShao/wisp/internal/agent 1.815s
+
+### gate-post-full
+RUN_all=160 PASS_top=126 PASS_all=160 FAIL_any=0 SKIP_any=0 unique=80
+  panic: 0  package line: ok   github.com/CarlosShao/wisp/internal/agent 5.182s
+
+## 自核 1 算术自洽：count=2 的每一枚计数应恰为 count=1 的两倍
+unique(count1)=80 vs RUN_all(count2)=160
+
+## 自核 2 名册两向差集（改前 vs 改后）
+comm -23 post pre (新增):
+TestCompressionTraceBooksCountsOnSuccess
+TestCompressionTraceDoesNotAlterTheFold
+TestCompressionTraceSilentWhenNothingFolded
+TestCompressionTraceSurvivesTheLoopWiring
+comm -13 post pre (丢失，必须为空):
+comm 两形自洽 (-count=1 vs -count=2 名册差):
+  两形名册全等
+
+## 自核 3 同包『开跑 vs 出裁决』等集
+comm -3 两边 (必须为空):
+  ran=80 verdicted=80
+
+## 放水面自证：t.Skip / Short / 阈值文件未动
+$ git grep -n 't.Skip' -- 'internal/agent/**'
+internal/agent/approval/ticket84_no_owner_test.go:224:		t.Skip("有意慢：300s 墙钟计量，只在 WISP_84_MEASURE=1 时跑（票 84 AC#1；见 docs/evidence/s1/84-ac1-bounded-wait.md）")
+  rc=0 (1 = 全包零枚)
+$ git diff --name-only 3f6322f..HEAD -- internal/observe thresholds.go
+  (空 = 未越界)
+$ git diff --stat 3f6322f..HEAD -- internal/agent
+ internal/agent/compress.go            |  60 +++++-
+ internal/agent/compress_trace_test.go | 393 ++++++++++++++++++++++++++++++++++
+ internal/agent/harness_test.go        |   8 +
+ internal/agent/loop.go                |   2 +-
+ 4 files changed, 460 insertions(+), 3 deletions(-)
