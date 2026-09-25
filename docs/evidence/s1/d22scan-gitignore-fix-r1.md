@@ -463,6 +463,14 @@ CI 那一侧（`ci-shapes`，无 `.git`、场内同样两枚）：修前 rc=0/40
 note 里 `skipped as git-ignored: 1 file(s)` 就是它）。单元层同一对形状由
 `TestTrackedPathsAreNeverSkippedByTheIgnoreFilter` 以**两棵字节相同的树 + 分母 +1** 钉住。
 
+**明确没测**：`-root` 落在别人仓库子目录那一支、PATH 里没有 git 那一支、10s 超时那一支、
+`.git/info/exclude` 与 `core.excludesFile` 两支（含它们与新诊断行的新耦合）、
+linked worktree / submodule / sparse-checkout、大小写与长路径、`/foo` 锚定仍无测试、
+F4（note 量纲）原样活着、⑦ `internal/panel/frontend_hygiene_test.go` 与 root module 全套今天是否仍绿。
+**F9（`ban #8 design/` 走 0 枚将硬退出 2）一字未动**，处置权在前端会话与编排者。
+**本件的合上与否由非实现者裁**；若裁决者认为 §11.3 那枚超出票面的实现选择不可接受，
+按 §11.3 给出的那一行删除路径退回即可。
+
 **净快照八数（票面 #4）**：`bans #1-5 internal/=203 cmd/=22 / ban #6 frontend/=40 / ban #7 internal/tools/=18 /
 ban #8 design/=16 frontend/=40 internal/=405 cmd/=39`，rc=0 —— **修前修后逐枚相同，没有一枚需要解释**。
 门的端到端：step 1 `PASS=28 FAIL=0 SKIP=0 / === RUN=68`（修前 26/0/0 与 66），step 2 rc=0，名单只增两行无消失。
@@ -474,5 +482,51 @@ ban #8 design/=16 frontend/=40 internal/=405 cmd/=39`，rc=0 —— **修前修�
 linked worktree / submodule / sparse-checkout、大小写与长路径、`/foo` 锚定仍无测试、
 F4（note 量纲）原样活着、⑦ `internal/panel/frontend_hygiene_test.go` 与 root module 全套今天是否仍绿。
 **F9（`ban #8 design/` 走 0 枚将硬退出 2）一字未动**，处置权在前端会话与编排者。
-**本件的合上与否由非实现者裁**；若裁决者认为 §11.3 那枚超出票面的实现选择不可接受，
-按 §11.3 给出的那一行删除路径退回即可。
+---
+
+## 14. 落盘之后重导的一节（锚 `ca84b75`＝本批代码 commit，时刻 09:2x +08）
+
+票面要求"引用只从我真正读过的那一版"，而 HEAD 在我脚下又走了一次（`d8390aa` → 我这枚 `ca84b75`），
+所以 §7/§8 的读数在**已提交的代码**上重跑一遍，全部真跑：
+
+| 格 | 命令（树） | 读数 | 判 |
+|---|---|---|---|
+| step 1 在**无 `.git` 的净快照**里 | `cd snap-post && sh tools/d22scan/runtests.sh -C tools/d22scan ./...` | rc=0，`PASS=28 FAIL=0 SKIP=0, === RUN=68, '[no tests to run]'=0` | ✅ 新那两枚要 `git init` 的测试是在 temp 夹具里自建仓库，**不依赖被扫树本身是不是仓库**；而 `TestLedgerCountsMatchAnIndependentWalk`/`TestRealRepoLedgerIsHonest` 在这种树上两侧一起"规则不应用"，等式仍成立（§1 那条"同批接上同一条件"的代价在这里被实测） |
+| 整道门在同一棵净快照里 | `cd snap-post && sh scripts/d22scan.sh` | rc=0；step 2 **第一行**是 `d22scan: gitignore rules NOT APPLIED - git cannot be consulted in D:/tmp/…/snap-post: \`git rev-parse --show-prefix\`: fatal: not a git repository …` ⇒ 票面 #3 在**门**这一层也成立（不是只有单元层） | ✅ 响亮，且**没有**因此变红 |
+| 八数（已提交代码，新锚） | 同上 step 2 | `bans #1-5 internal/=203 cmd/=22 / ban #6 frontend/=40 / ban #7 internal/tools/=18 / ban #8 design/=16 frontend/=40 internal/=**406** cmd/=39`，rc=0 | ⚠ 见下面那条归因 |
+| **406 的归因（不是我）** | `bin/d22scan-pre.exe -root snap-post`（**修前**二进制跑同一棵新快照） | 同样 `ban #8 internal/ 406`、`bans #1-5 internal/ 203`、rc=0 | ✅ +1 来自**树变了**：`d8390aa`（`internal/observe/**` 那一程）新落 `internal/observe/window_wait_136_test.go`（`git ls-tree HEAD` 现量存在；`_test.go` 进 ban #8 不进 bans #1-5，故只有 405→406 这一枚动）⇒ 同一棵新快照上**修前与修后两版二进制八数逐枚相同**，这比 §7 那发并排更强：基线的移动有具名主人，不是我这枚仪器 |
+
+**票面 #4 的判据仍然按 §7 那一发来读**：`git archive ee5a25e`（与被验代码同锚）上
+修前/修后两版二进制的八数**逐枚同值**（`203/22/40/18/16/40/405/39`，rc=0），没有一个数需要我解释移动；
+新锚上那枚 `internal/=406` 已被上面那发并排证明与本批无关。
+
+**本批 commit 与 pathspec 自查（票面纪律格）**：
+
+```
+$ git show --numstat --format='%h %s' ca84b75      # 唯一一枚代码 commit
+478 0  docs/evidence/s1/d22scan-gitignore-fix-r1.md
+304 33 tools/d22scan/gitignore.go
+44  22 tools/d22scan/main.go
+340 2  tools/d22scan/scan_test.go
+```
+
+⇒ 四枚路径，无第五枚混入。**没碰**：`internal/**`（含 `internal/panel/frontend_hygiene_test.go`，票面点名不许改，
+只登记＝§10 的 ⑦）、`docs/reports/**`（台账 `A##` 追加归编排者，需要的文字在 §1/§11/§12.12）、
+`frontend/**`、`design/**`（那 16 枚 ` D` 与两枚 `??` 一枚都没被带走）。
+提交前 `git diff --cached --name-only` 现量只有 `docs/evidence/s1/d22scan-gitignore-fix-r1.md` 一枚；
+提交用的是 `git commit -q -F - -- <四枚显式路径>`，因此**别家此刻正躺在 index 里的暂存条目**
+（当时可见 `M docs/evidence/s1/observe-ac15-poll-r1.md`、`M internal/observe/window_wait_136_test.go`）
+**没有被我这枚 commit 带走**——与本仓 `13673e9` 那节记录的口径一致。
+未 push、未 `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`、无 `git add -A`/`add .`、
+临时件只建不删（`D:\tmp\d22scan-index-fix-r1\` 下 `snap-prebase shapes ci-shapes stillbites snap-post
+mut-indexoff mut-semantics bin logs probe1 probe2 probe3` 全部留在原地）。
+
+**本节之后没有再改任何代码。** 若裁决者需要，复现路径就是上面那五行命令加 §2 的两枚 `git add -f`。
+
+补一发**工作树**读数（同一枚已提交代码，`cd <真树> && sh scripts/d22scan.sh`，
+`logs/post-commit-gate-worktree.log`，rc=0）：step 1 `PASS=28 FAIL=0 SKIP=0 / === RUN=68`；
+step 2 `bans #1-5 internal/=203 cmd/=22 / ban #6 frontend/=40 / ban #7 internal/tools/=18 /
+ban #8 design/=32 frontend/=40 internal/=406 cmd/=39`，rc=0，
+打印 `skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/], decided by frontend/.gitignore (2 path(s))` 且
+**不打印** NOT APPLIED ⇒ 工作树问得到 index（该沉默时沉默），A207 的 `frontend/=40` 两枚合流**未退**；
+`design/=32` 是 §7 那枚已定性残留（100% 未追踪且未被忽略），本批吞不到也不该吞。
