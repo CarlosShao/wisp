@@ -450,6 +450,8 @@ $ t.Parallel：六枚被裁文件 0 枚，改前亦 0 枚
 ⇒ ⚠ 那 4 处既有 sleep 属 `clock_test.go`／`goroutine_test.go`，**不属本批也不在本格射程**——
 本程点名是为了下一位不把"包里有 sleep"错记成"这批留的口子"。
 
+---
+
 ### 3.7 契约轴（派单点名的"不许"清单，逐枚现量）
 
 | 不许 | 本程读数 | 判定 |
@@ -484,3 +486,140 @@ design/doubao/**（前端会话）  tools/d22scan/{gitignore,main,scan_test}.go�
 ```
 
 ⇒ **poll 程那句"生产码零字节"成立**，且本程是按**两枚 commit 各自的 numstat** 加的，不是按它那句自述。
+
+---
+
+## 4. 那一问：最长腿（两枚 200 ms 窗＝400 ms）的真实预算——**本程现量，不做推理**
+
+### 4.0 问题原文（从 `observe-ac15-linux-r1.md` §3.5 逐字引；它承诺答而没答的就是这一问）
+
+> **要登记的余量（本程给的算术，用的全是 Linux 现量）**：家族里 nominal 最长的腿
+> `TestSettleCoverageRowSeparatesUnmeasuredFromFullyMeasured` 是**两枚 200ms 窗＝400ms**（§3.6 的净窗家族表），
+> 它的预算只有 **2s/400ms ≈ 5 枚窗**；靶子腿是 **2s/100ms＝20 枚**。
+> ⇒ "预算≈20 次中位尝试"这句在**家族里不均匀**——那枚 400ms 腿只有 5 次、两枚 200ms 腿只有 10 次。
+> …§4 落地后在 §5 给"要不要按最长腿／按 OS 加余量"的答复。
+
+派单把这一问交给本程的开放半边是：**能不能真把那枚 400 ms 腿饿到 5 枚窗以外，饿到的时候失败长什么样。**
+本程的答案全部出自**仓外副本**（`git archive` 到 `/scratch/final-r1/` 与 `D:\tmp\observe-ac15-final\`），
+**交付码一字未动**（§0.1 的字节账在每次读数前后都成立）。
+
+### 4.1 第一发（结构下界）：**一枚 `CheckSettle` 窗交不回 0 枚读**
+
+`sampler.go:495-525` 的环是 `select{<-ctx.Done(); <-t.C}` → `ReadTree()` → 之后才 `if time.Now().After(deadline) { break }`
+⇒ **第一枚 tick 一定会被等、等到了就一定读一次**。本程不去读码定罪，把它**打到盘上**：
+把 tick 拉长到**比窗还长**（`within=200ms` 不动、`interval` 10ms→250ms），此时那一枚 `want=1` 的判据**该不该饿**？
+
+```
+Linux （t-floor）
+--- PASS: TestSettleCoverageRowSeparatesUnmeasuredFromFullyMeasured (0.50s)
+Windows（tw-floor，同一改动，3 发）
+--- PASS: … (0.52s)   --- PASS: … (0.60s)   --- PASS: … (0.51s)
+```
+
+⇒ **两 OS 都不饿**：腿时＝2×250ms＝0.5s（**两枚窗各只跑了一发，零重开**），判据 `want=1` 在"整个窗期只交付一次读"的极端下**仍成立**。
+⇒ 同形的那一枚 `SampleState` 腿（`sampler_test.go:341`，`want=3`＝环外 2 枚＋tick 1 枚）本程照同一招量：
+`interval` 10ms→100ms 而 `duration` 留 30ms ⇒ **5 发全 PASS、每发 0.10s（无重开）**。
+⇒ **结构结论（现量支持，非推理）**：`CheckSettle` 窗的下界＝1 枚读、`SampleState` 窗的下界＝3 枚读
+（`sampler.go:267` 开窗读 ＋ 第一枚 tick 读 ＋ 收窗读）。
+**⇒ 派单问的那枚"最长腿"用的是 `want=1` ⇒ 它是家族里最不可能饿的一枚，不是最容易饿的一枚。**
+
+### 4.2 第二发（真实窗长下的预算）：**2 s 放得下 10 枚 200 ms 窗，两 OS 同值——不是 5**
+
+判据既然饿不到，本程就**把判据换成不可达**（`gate:264` 的 `want` 1→9999，窗长仍 200 ms／10 ms 一字未动），
+直接量"这一枚 await 在 2 s 里重开了几整窗"：
+
+```
+Linux （t-200ms）
+    sampler_settle_gate_136_test.go:264: precondition broken: 10 windows opened inside the 2s monotonic
+      bound (clock.go Timeout) all fell short of 9999; counts seen: [20 20 20 20 20 20 20 20] (+2 more, all of them short of 9999)
+--- FAIL: TestSettleCoverageRowSeparatesUnmeasuredFromFullyMeasured (2.01s)
+
+Windows（tw-200ms，两发；此刻容器内 12 枚自旋仍在跑）
+    sampler_settle_gate_136_test.go:264: precondition broken: 10 windows opened inside the 2s monotonic bound
+      … counts seen: [2 11 14 10 13 13 14 16] (+2 more, all of them short of 9999)
+--- FAIL: … (2.11s)
+    …  counts seen: [18 12 9 20 15 13 20 12] (+2 more …)
+--- FAIL: … (2.17s)
+```
+
+⇒ **两 OS 各 10 枚整窗／2 s**（Linux 每窗 20 枚读；Windows 每窗 2–20 枚读——那一枚 `n=2` 的窗就是被容器自旋压出来的）。
+⇒ **那一问的前提"2 s/400 ms ≈ 5 枚窗"在两 OS 都不成立**：`awaitWindow` 每次调用**新起一枚** `NewTimeout`
+（`window_wait_136_test.go:99`），**预算是"每一枚窗 2 s"，不是"每一条腿 2 s"**。
+⇒ 而且红**印在第一枚 await 的站点**（`gate:264`）——第二枚窗（`:267`）**根本没轮到**：
+一条腿只有在"第一枚窗成功、第二枚窗饿死"这一串里才会花到 2 s＋2 s，本程没造出那一串（§7 第 4 条）。
+
+### 4.3 第三发（真负载能不能饿到它）：**不能，量到的是 500 发零重开**
+
+| 发 | 命令（逐字） | 负载标签 | 读数 |
+|---|---|---|---|
+| Linux | `go test ./internal/observe/ -count=300 -cpu=1 -v -run '^TestSettleCoverageRowSeparatesUnmeasuredFromFullyMeasured$'` | 容器内 12 枚纯 CPU 自旋、无 `--cpus` 限额；批前 `3.65`、批后 `12.85`（1min 档）；测试压到 1 枚 P | **RUN 300／PASS 300／FAIL 0／SKIP 0／`^panic:` 0**；腿时 p50 **0.40s** p99 0.42s **max 0.43s**；包时 121.564s ⇒ **重开 0 枚**（重开会多烧一整枚 200 ms 窗＝≥0.60s） |
+| Windows | 同命令，同容器自旋在跑（`/proc/loadavg` 13.58 那段），`-cpu=1`，`-count=200` | 本机 6C12T 被容器拿走 12 枚线程 | 未加仪器那一版：p50 0.42／p90 0.46／p99 0.61／max 0.68，**3 发 ≥0.60s**（＝重开的时长签名？） |
+| Windows·仪器版 | `t-instr`：在 `awaitWindow` 每次尝试印一行 `AWAITCOUNT want= try= n=`（**只在仓外副本**） | 同上 | **400 行 await ＝ 200 发 × 2 枚窗，try 全 ＝1** ⇒ **那 3 发 ≥0.60s 不是重开，是慢窗**；每窗交付枚数 **min 2**、均值 13、max 20（判据要 1）⇒ FAIL 0 |
+
+⇒ **"能不能真把那枚 400 ms 腿饿到 5 枚窗以外"的正面答复：本程造不出来**（在两台机、两种 OS、
+可造的最重负载下 500 发**一枚重开都没有**），唯一造得出来的那一发是**把判据改成不可达**（§4.2），
+而那已经不是"负载"而是"假题目"。
+⇒ 失败形状（本程真叫出来过 13 发）逐字是：`<站点>: precondition broken: N windows opened inside the 2s monotonic bound
+(clock.go Timeout) all fell short of <want>; counts seen: [前 8 枚每窗实收] (+M more, all of them short of <want>)`，
+**红在 await 的调用点**（`t.Helper()` 归因），腿时 ~2.0–2.2 s，包 rc=1，**名册不缩**（§4.5）。
+
+### 4.4 第四发（本程最强的一枚）：**同一台机、同一负载、同一命令——改前 16 枚红，改后 0 枚红**
+
+派单要"每个 0 都要有正控"。本程的正控不是另造一发，而是**把被修的旧版本扔进同一副负载**：
+
+| 树 | 命令（逐字同形） | 读数 |
+|---|---|---|
+| **`t-pre`**＝`git archive ee5a25e`（**改前**、无 `window_wait_136_test.go`） | `go test ./internal/observe/ -count=200 -cpu=1 -v -run '^TestCheckSettleHalfTheReadsFailedReportsItsLoss$'`，容器 12 自旋在跑（批时 `loadavg 13.58`） | **PASS 184／FAIL 16／SKIP 0／`^panic:` 0**，rc=1；红句逐字：`sampler_settle_coverage_136_test.go:214: precondition broken: only 3 reads taken, half-and-half needs a window to lose in`（另有 `only 2 reads taken`） |
+| **交付码**（`t-instr`，判据未动＝`want=4`） | 同命令、同负载、同机 | **PASS 200／FAIL 0／SKIP 0／`^panic:` 0**；await 行 **208＝200 枚 try=1 ＋ 8 枚 try=2** ⇒ **8 次重开、8 发全被救回**；每窗枚数直方：**n=1 ×1、n=2 ×4、n=3 ×3**（＝那 8 枚低于 4 的窗）、n=4 ×5、n=5 ×5、n=6 ×15、n=7 ×17、n=8 ×20、n=9 ×37、**n=10 ×101** |
+| 交付码·**净窗**（自旋已停，`loadavg` 回落） | 同命令 | await 行 **200＝200 枚 try=1、0 枚重开**，PASS 200／FAIL 0，包时 20.144s |
+
+⇒ 三行合起来把**两程都没能给的**那格交出来了：
+1. **这枚 flake 在本机可造**（不需要人造停顿——把容器自旋加上就够：改前 200 发**红 16 发＝8%**）；
+   红因逐字就是归档与票面那一句（`only 2/3 reads taken`）。
+2. **重开路径今天真被执行过**：poll 程 §6.3 与 Linux 程 §4.4 各自量的"每枚腿 p50＝max ⇒ 一次重开都没发生"
+   在**这副负载下不成立**——本程量到 **8/200 发重开**、**每发恰好 1 次**（无 try≥3），且**一枚没红**。
+   那一枚 **n=1** 的窗（100 ms 里只交付 1 枚读）在**改前**必红、在**改后**被下一枚窗救回。
+3. **净窗仍 0 重开**（200 发）⇒ "改后全绿"不是"等待没执行"，两味本程分开量、分开报。
+
+⚠ **口径与不合并**（票面判据①／`:377` ④）：上面是**口径 B（同进程 `-count=N`）·忙窗·Windows·`-cpu=1`**，
+分母 **200 发／枚**，与 poll 程的 40 发口径 A、Linux 程的 4000 发口径 B **各记各的**，**不并成一枚百分比**。
+⇒ 本程不写"率从 8% 降到 0"（同一副负载只跑过一次、且负载不是本程控制的实验变量，Linux 程 §4.6 那句限定同样适用于本程）。
+
+### 4.5 第五发（预算的代价上限＝为什么不该按最长腿去缩它）
+
+`t-blast`：把 **13 个 await 站点的判据全改成不可达**（`want`→9999），整包一发，Linux：
+
+```
+RUN=71  PASS=59  FAIL=12  SKIP=0  ^panic:=0     bound 红＝12 枚
+包时 26.867s   （同一命令净窗基线＝9.849s，§1.1）
+12 枚红名册＝家族那 12 枚腿，逐枚红在**自己第一枚 await 的站点**：
+  coverage:143 :237 :321 :374   gate:166 :217 :264   settle_zerosample:43 :140
+  sampler_test:93  :335          zerosample:152
+（gate:267 零枚 ⇒ §4.2 那句"第二枚窗没轮到"在这发里是读数不是推断）
+```
+
+⇒ **最坏代价是量出来的**：整包被这枚上界顶到 **26.867s ＝ 净窗的 2.7 倍**，
+而红名册**恰好**＝12 枚被包的腿、**一枚不多一枚不少**、`RUN` 仍 71、`SKIP` 仍 0、`panic` 仍 0。
+⇒ 这一发同时是**本程计数仪器的第二枚正控**（同一条 grep 式子在真红上响 12 次、名册不缩）。
+⇒ **对本问的意义**：上界若"按最长腿推导"（把 2 s 换成按 400 ms 计的更小值），
+省下来的是**今天 0 概率那条路径**的代价上限，砍掉的却是**今天 8% 概率那条路径**的重开预算——
+方向与判据③（"多等一会儿并且等到"）**相反**。
+
+### 4.6 答复（一句话＋三行账）
+
+> **一句话**：**这枚 2 s 上界不改、也不按最长腿缩、也不按 OS 加余量**——因为"2 s/400 ms≈5 枚窗"这个前提**在两 OS 上都被现量否掉**（同一枚 200 ms 窗实测放得下 **10 枚**，预算是**每枚 await** 而非**每条腿**），而那条"最长腿"用的是 `want=1`、`CheckSettle` 窗**结构上交不回 0 枚读**（本程把 tick 拉到比窗还长，两 OS 仍零重开、仍 PASS），**它恰是家族里最饿不到的一枚**。
+
+要登记的三行账：
+1. **不均匀是真命题、但方向反了**：每窗预算 = 2 s ÷ 窗长 ⇒ 100 ms 窗 20 枚、200 ms 窗 10 枚（§4.2 实测），
+   而**判据高低与窗长成反比**（want=4/5 的腿都跑在 100/120 ms 窗上，want=1 的腿跑在 200 ms 窗上）
+   ⇒ "最长腿预算最少"这句要换成"**最长腿的判据最低、且它有结构性下界 1 枚读**"。
+2. **两味该修的措辞（都是文档/账面，不是码）**：
+   (a) `window_wait_136_test.go:53-55` 那句 "2s is 10x the p99 of the slowest leg (200ms) … buys roughly 20 median-cost attempts"
+   ——**20 只对 100 ms 那一族成立**，200 ms 那一族是 10 枚（本程实测两 OS 同值）；
+   (b) Linux 程 §3.5 的 "2s/400 ms ≈ 5 枚窗"——把**每-await** 的预算当成了**每-腿**。
+   本程**不改那两枚文件的字**（一枚是交付码、一枚是别程的证据件），只在此具名登记。
+3. **OS 余量不加**：两 OS 的"窗数／2 s"逐枚同值（10 对 10），差别在**每窗交付几枚读**
+   （Linux 净窗 20 枚、Windows 忙窗 2–20 枚）与**饿穿所需的停顿**（Linux ≥80 ms、Windows 60 ms 就红——归档两程的读数），
+   这两味差别都被"重开一整窗"的形状吸收掉了，不需要在**常数**里再加 OS 分支；
+   加一枚 OS 分支反而会把 §4.5 那枚"最坏代价 26.9 s"变成**每台机不同**的一个数。
+   ⚠ 但**这一支只到"今天两枚 OS 各 10"为凭**，不等于"任意 runner 上够"（§7 第 3 条）。
