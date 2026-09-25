@@ -4,7 +4,7 @@
 > ＋自述件 `docs/evidence/s1/panel-l2-grant-nail-fix-r4.md`（449 行，同批落地）。
 > 任务来源：`docs/evidence/s1/panel-l2-grant-nail-fix-r3-accept-r1.md` §9 点名的 **F-ACC-1／F-ACC-2／F-ACC-3**。
 > 本程＝**验收程**：一字未改被验物，只 commit 本件；不勾票面／台账；不 push。
-> 本程全部变异落在**仓外副本**（§1），读数原始件在 `D:\tmp\wisp-r4acc1\out\`（§12 列路径）。
+> 本程全部变异落在**仓外副本**（§1），读数原始件在 `D:\tmp\wisp-r4acc1\out\`（§15 列路径）。
 
 ---
 
@@ -20,7 +20,7 @@ git show --numstat 594a99e                                     -> 145  6  intern
 git status --porcelain -- internal/panel/                      -> 空（我进场与交件各复算一次，全程未写进仓内）
 ```
 
-ⓑ 级细节一条：**简报那句"代码落点只有一枚"按"区间"字面读不成立、按"本批"成立**。
+口径细节一条：**简报那句"代码落点只有一枚"按"区间"字面读不成立、按"本批"成立**。
 `git diff --numstat 88eab34..ee2a92d` 里有 **7 枚路径**，除本批那一枚 `_test.go` 之外还有
 `frontend/src/styles/theme.css`（14/3，取自 `8b35f52`，别家色值尺那一程）与 5 枚文档/会话件。
 实现件 §5.5 自己就把 theme.css 点名成"别家"，所以**这不是它的缺陷，是我简报的口径含糊**，按本程纪律写在这里。
@@ -247,7 +247,7 @@ Fatal/Error 合计             79                86           +7   ⇒ 只增不
 | ⓒ 证人册＋其三条主张＋双向对账（`:183-225` 与 `:1490-1548`，两半） | `dropword-ratify`（删一枚"历史上没人质"的词）／`addword-consent`（加一枚没配证的词）／`standing-out,M16`（常驻扫掠被摘、真守卫答了证人名字） | `revert-witness-mechanism,dropword-ratify` -> **TOPFAIL=0**（`out/X-revert-witness-mechanism+dropword-ratify.txt`，与上游 r3-accept §1.2 那发同形）；`revert-xcheck,addword-consent` -> **TOPFAIL=0**（`out/U-revert-xcheck+addword-consent.txt`）；`standing-out,revert-witness-rows,M16` -> **TOPFAIL=0**（`out/Y-standing-out+revert-witness-rows+M16.txt`） | **承重**，且三发各指向册内不同分支 |
 | ⓓ 头段"两步路"措辞（`:119-132`） | 无一发 | `revert-header` -> 四数一字同（99/53/46/0，`out/H-revert-header.txt`）；`revert-header,MDEC-struct` -> 仍红 1 枚、同一句 `:1699 decode destination acProbe has no reflection twin in inboundTypeRegistry`（`out/H-revert-header+MDEC-struct.txt`） | **不承重、也不该承重**：它是文档级修法，盘上判据不读注释（本文件 10 处 `F-ACC` 字样在 `:102/:120/:183/:1316/:1354/:1441/:1490/:1512/:1532/:1540`，除两枚消息文本外全是注释，无一处是谓词） |
 
-**两条反向核对（防"互相顶账"与防"把冗余读成装饰"）**：
+**三条反向核对（防"互相顶账"、防"把冗余读成装饰"、防"正控被改钝"）**：
 
 ```
 ① 上游 r3-accept §9 反向判据第 1 条我独立重打：摘常驻测试 ＋ M14 -> RUN=98 TOPFAIL=0（out/R-standing-out+M14.txt）
@@ -264,6 +264,14 @@ Fatal/Error 合计             79                86           +7   ⇒ 只增不
    移位后的 `:1512`＝对账那行，原文与 `:1540` 一字同，out/X-revert-witness-rows+dropword-ratify.txt），
    但加词那一发只有对账报（`out/U-addword-consent.txt` 交付态红 1 枚 @`:1546`）、
    M16＋摘常驻那一发只有主张 3 报 ⇒ 三味分支各有独占形状，无一枚是花瓶。
+③ 反空转那枚"正控"本批没被改钝（我把守卫打死复算）：`guard-dead`（bridge.go 的 `knownComposerMethod`
+   开头插 `if true { return false }`）-> RUN=99 TOPPASS=49 TOPFAIL=4 SUBFAIL=2（**6 枚红条目**），
+   红名逐字：`TestComposerEnvelopeAcceptsItsFourRequests` ／ `TestComposerEnvelopeRefusesSpoofingAndUndecorableRequests`
+   （父＋`/a_missing_requestId_is_refused`＋`/a_forged_or_absent_source_is_refused`）／
+   `TestAnsweredPanelRoutesCarryNoApprovalDecision`／`TestRealGuardRefusesEveryAssemblableApprovalRouteName`，
+   红句 `:1380 the running guard refuses its own declared route "panel.mode.request": the sweep below would
+   report a clean boundary because nothing is answered any more, which is not the same fact`
+   （out/R-guard-dead.txt）⇒ 与 r3-accept §3 那发 T-G/M17 记的"红 4 枚＋同一句正控"同族同值。
 ```
 
 按简报点名的那条反面，我**没有**用它做判据：任何"同一发变异里新加那支必须先响"的要求都不成立——
@@ -379,6 +387,130 @@ suffix-shrink ＋ M-now  （清单删掉 ".now" 那一尾；生产码运行期�
 `sum over prefixes` 且每枚 prefix 各自贡献 `len(words)*len(suffixes)*2`）。判据级一句话：
 **从这两枚清单里各删任意一枚，全包必须有红。**
 本程不替它改，也不因此判退回（§12 给理由）。
+
+---
+
+## §12 总裁：**成立（附条件入账）**——三笔上游债结清，另起三笔本程账
+
+| 上游债 | 它这次做了什么 | 我独立量到的现状 | 结 |
+|---|---|---|---|
+| **F-ACC-1** | 控里补齐第三因子 ＋ 乘积式钉 `asked` | `suffix-empty` 从"0 枚红"变**红 1 枚**（`:1380` 逐字点名 `grantRouteSuffixes=0`）；`no-plural` 从"仍绿"变**红 1 枚**（乘积 264 vs 528）；三枚清单一起清空那角由控拿住（`:1375`） | **结清** |
+| **F-ACC-2** | 11 枚逐枚配证人 ＋ 双向对账 | **11/11 有红**（含上游标"未逐枚打＝推定"的 `authorize`/`decision`，本程升为现量），`asked` 每发 528->480 而扫掠照旧绿＝正是这一族该有的形状 | **结清** |
+| **F-ACC-3** | 头段"或"改成"一条路两步" | `MDEC-struct` 红 1 枚 @`:1699`、`MDEC-registered` 全绿，与它 §4 四数同值 | **结清** |
+
+**为什么不退回（按本仓分界那句：验收方自己造不出"声称要防而没防住"的结局 ⇒ 不退回）**：
+本批声称的三件事我全部复算成立；我造出的两发新打穿（`if false` 短路那一行、剪 `prefixes`/`suffixes` 清单）
+都**不在它声称的射程内**，且它 §8 白纸黑字把"协同编辑这把尺自己"划在门外。
+按 §7 的承重判据它也没有任何一枚是装饰：**摘掉任意一味，都有一发变异从此打不红**（三发实测数在 §7 表内逐枚给了原始件）。
+
+| 号 | 本程新账 | 落在哪一枚文件与行为 | 最小闭合（到行为级，本程不替它改） | 我量到的现状 |
+|---|---|---|---|---|
+| **F-R4-1** | `l2_grant_boundary_test.go:1345` 那一行（问守卫）可被 `if false &&` 短路而全包全绿 | 把 `:1332-1336` 那枚已有的"正控"从**另起一行直调守卫**改成**与扫掠共用同一行**（做法＝把三枚清单的循环抽成一枚 `sweepAssembledNames(prefixes, words, suffixes)`，负断言走网格、正断言走"守卫真答的 `panel.mode.request`/`panel.workspace.request` 两枚"，判据 `len(mustHits) != 2` 即红）。约 12 行，只在测试文件内，不碰产品码/阈值/golden | 交付态：`ask-stub`(+M14) 与 `hits-short`+M14 三发**全绿**（`asked=528 hits=[]`）；我这台件（`out/DECOY-2/3/5`）**三发各红 1 枚**、干净树照绿且 `asked=528` 一字未变 |
+| **F-R4-2** | 乘积四枚因子里 `grantRoutePrefixes`／`grantRouteSuffixes` **没有证人**，可被静默剪窄 | 给这两枚清单各配至少一枚"删掉它就必须有人响"的活证据（形状照 `grantRouteWordWitnesses`），或把乘积式换成**逐因子记账**（每枚 prefix 各自贡献 `len(words)*len(suffixes)*2` 枚）。判据一句话：**从这两枚清单各删任意一枚，全包必须有红** | `prefix-shrink` 全绿（`asked=462`）、`suffix-shrink＋M-now` 全绿（`asked=352`）；而 `M-now` 单发（清单不动）红 1 枚 `hits=[panel.review.grant.now]` |
+| **F-R4-3** | 实现件 §8"本程没测什么"**少列一形** | append-only 补一行：§8 列了"词表之外的名字／网格之外"，未列"另两枚因子清单自己可被剪窄"（F-ACC-2 那族在 `prefixes`/`suffixes` 上的对应物） | 它 §8 那 11 条我逐条读过，方向都对、无一处虚报；这一条是**漏列**不是隐瞒，形状与 r3-accept §7.3 替它上游补的那条同类 |
+
+**最小闭合集合（要给下一程的、按枚算）**：`internal/panel/l2_grant_boundary_test.go` 内 1 处（F-R4-1，含 `:1332-1336`
+与 `:1339-1351` 那一段的形状改动）＋ 同文件 2 处清单的证人或逐因子记账（F-R4-2）＋ 证据件 §8 追加一行（F-R4-3）。
+三笔全在测试与文档层：**产品码继续零字节、阈值与 golden 一字节不碰**，是本集合的硬前提。
+
+对实现件自报的那一句"与上游同裁、不记为洞"，本程**改判为 F-R4-1**；这不推翻它任何其他结论：
+它自报的读数（`RUN=99 FAIL=0 asked=528 hits=[]`）我一字复现，错的只是"这一形治不了"这一句归因。
+
+---
+
+## §13 给 owner 的一段人话（不用术语）
+
+这一批要补的是上一轮验收点名的两个"自己会偷偷不干活"。我自己另开一台机器、把这五十多发破坏全部**手工重做了一遍**，
+结论是：**两处都真的补上了，第三处（给人指路的那句话）也写对了。**
+
+第一个洞原来长这样：那条检查要问五百多个暗号，问法由三张清单相乘得来。前两张清单**空了会报错**，
+第三张**空了它一个都不问，还照样报告"一切正常"**。现在第三张也进了报错的名单，而且它另外加了一条硬规矩：
+**"问了多少个"必须等于"三张清单相乘的数"**——少问就当场报错。我实测：把第三张清空，它现在会红着喊出来；
+把"单复数"那一圈偷偷砍掉一半，它也会红（原来这两种都是安安静静过去）。
+
+第二个洞原来长这样：那张"动作清单"有十一个词，其中七个**没有任何人守着**，删掉任何一个都不会有人响——
+最坏那一幕就是"后台真的答应了一次批准，而从头到尾全绿"。现在十一个词每个都配了一条"证人"，
+我逐个删了十一遍，**每一遍都有人红**。
+
+**最坏后果是什么形状**（这两条补完之后还剩的）：还剩两扇侧门。
+一是那三张清单里有两张**现在还能被悄悄剪短**——比如把某个地点或某个后缀从清单里划掉，
+于是那几百种问法里有几十到一百来种从此不再问，测试依旧全绿。如果将来真有人在那一条被剪掉的路数上
+接通了"后台答应批准"，**这一格会安静地放过去**（我已经实测复现：把尾巴".now"剪掉，
+再让程序真的答应一条那样的暗号，全绿）。修法跟第二个洞一样，是给那两张清单也各配一条证人，一句话能写清判据。
+二是更抽象那一类：如果有人直接把"问门的那一句"涂成"永远回答不成立"，这枚检查就变成空壳——
+上一轮把这种归为"治不了的极限"，**我这一轮不同意**：我当场做出了一种十来行的写法，让同一句"问门的话"
+既负责"不许有门被打开"也负责"这两扇明摆着的门必须被回答"，于是谁把它涂坏，谁就立刻红。
+我把这条做成了可以照抄的样品（在仓外副本里，没动仓内一字）。**这一格的最坏后果是**：不修，则前面所有
+"全绿"都还依赖一个假设——没有人在那一行上动手脚；而这是一个我们已经有办法不依赖的假设。
+
+它还有一处**主动报了自己不利读数**（"这一形我仍打不穿"），我复算过，读数是真的；只是"打不穿"这句归因我改判。
+这类行为我按本仓口径记成加分，不是减分。
+
+---
+
+## §14 本程**没测**什么（不靠沉默读成通过）
+
+- **没跑 `go test ./...`、没跑 CI、没跑前端四道门**（eslint/vitest/build/lint），**一条尺没下过 `./cmd/...`**：
+  本件"全包／包内"字样一律只指 `internal/panel` 那一枚包（§2 那枚 `internal/ball` 读数只为回答"两枚 C21"的来路，
+  不进任何一格裁决的分母）。副本不补 `third_party/` 那 8 枚无关红因此不在我分母里。
+- **零枚计时判据**：所有命令耗时一秒都没记，正文无任何"多少秒"的结论。
+- **没在 Linux 容器里量任何东西**；`git grep -c 'go:build' <rev> -- internal/panel/` 那一步本程**没重做**，
+  沿用 r3-accept §10 的现量（0 枚文件），不替它担保。
+- **F-R4-1 那 12 行是我在仓外副本里造的样品，不是交付物**：我没测它在真实评审流里会不会与
+  facet 4 的快照前置打架（副本里它没打架：DECOY-1 全绿），也**没测**"把整枚 sweep 函数删掉"那一形
+  （那属改名/删除族，与 §7 反① 同源，仍无人响）。
+- **F-R4-2 只打了 `prefix` 与 `suffix` 各一枚剪法**（`panel.mode` 一枚：8 -> 7；与 `.now` 那一尾：3 -> 2）；
+  "逐枚各删一次"没打完——`prefixes` 还剩 7 枚、`suffixes` 还剩 2 枚未逐枚验，
+  按 §6 的口径这些属**同形推定**（推定＝不是现量，别当下游的账）。
+- **没测协同编辑**（同时改清单与其证人）；没测 `internal/panel` 之外任何包的门；
+  **没复算**"今天什么都没接线"那枚自陈（`ParseComposerRequest` 生产零调用者）——它由 r2/r3 各自验过。
+- **没核**别的文件头是否还有 F-ACC-3 那种"两路其实一步两步"的措辞；**没读** `design/**` 脏树内容作凭据
+  （只用"它有 16 枚未提交删除"这一枚事实解释那枚 C21 为什么必须保持红）。
+- **没写**台账、票面勾、`Q-49`；**没给自己判成立**；**没改被验物一字**（§15 现量）。
+
+---
+
+## §15 git 自证／临时件／注入登记（本程自己的落点，逐枚现量）
+
+```
+本程 commit 逐枚 pathset（不跑区间；共享树在漂）：
+  0aa7762 -> docs/evidence/s1/panel-l2-grant-nail-fix-r4-accept-r1.md   （§0-§4）
+  311a9bf -> 同一枚路径                                                  （§5-§6）
+  f788eda -> 同一枚路径                                                  （§7-§9）
+  c212dff -> 同一枚路径                                                  （§10-§11）
+  本节所在这一枚 -> 同一枚路径（§12-§15；sha 由下一位现量，本件不预写自己的 commit 号）
+每次 commit 前现核 git diff --cached --name-only -> 只有那一枚路径，无别家路径
+被验物零改动（交件时现量，HEAD=`d0c00c8`）：
+  git rev-parse HEAD:internal/panel/l2_grant_boundary_test.go
+    -> 58f545144af54c0b16eaed013a0904fb1ffd562a（与 ee2a92d 一字同）
+  git log --oneline ee2a92d..HEAD -- internal/panel/  -> 空（自锚点起别家也未碰本包）
+  git status --porcelain -- internal/panel/           -> 空（我全程未写进仓内）
+纪律：未 push；未 git add -A / add .；未 --amend / reset / rebase / stash / checkout . / clean。
+索引里没出现别家路径（简报担心的那枚 143 的 staged 删除已在 `94d3288` 由编排者清掉，我现量 `git diff --cached` 进场即为空）；
+工作树里 `design/**` 那 16 枚未提交删除（owner 自己的活）我**未还原、未提交、未删**，
+每次 commit 只带我自己那一枚 pathspec。
+临时件（只建不删；请编排者一次清）：
+  D:\tmp\wisp-r4acc1\out\        原始读数（BASE-* 三态／M1-*／M2-*／W-* 十一枚／R-*／S-*／T-*／U-*／V-*／X-*／Y-*／H-*／
+                                 DECOY-1..6／PITFALL-crlf-baseline）＋ 同名 *.summary.txt ＋ 四份名册 roster
+  D:\tmp\wisp-r4acc1\scripts\    mut14.py · run14.sh · decoy_demo.py · decoy_run.py
+  D:\tmp\wisp-r4acc1\pristine\   被验物与 bridge.go 的锚点原件（每发变异后 restore 用）
+  D:\tmp\wisp-r4acc1\{anchor,pre,crlfcopy,decoycopy}\   四台归档副本
+⚠ 我自己的一枚失手，按本仓"往不利自己的方向写"登记：建 `decoycopy` 那一步的命令里我写了
+`rm -rf /d/tmp/wisp-r4acc1/decoycopy 2>/dev/null`（简报与 `issues/README` 规则 8 是"临时件只建不删"）。
+现量那一发时该路径**尚不存在**，`rm` 实际未删到任何东西（同一条命令随后 `mkdir -p` 重建），
+但**禁令看的是动作不是后果**——这一形状我不辩解为无害，登记在此。`out/` 里那一发前后所有读数一枚未删。
+另记**无效读数不作结论**：① 台件 `del_block` 我第一版写错偏移量，`T-revert-witness-rows+dropword-allow` 与
+`T-revert-witness-rows+M16` 两发是坏切法的产物（编译不过 / 切错块），`T-revert-xcheck*` 两发虽跑出与修正后
+同值的读数，本件也一律改引修正后重打的 `U-/V-/X-/Y-` 系列（枚枚在正文里点了文件名）；
+② `out/DECOY-clean.txt` 那枚**标签是坏的**——它那一发我的 restore 把样品补丁覆盖回了
+交付态，所以它其实是"交付态干净树"，真正"打过 12 行样品、干净树仍绿"的读数是 `out/DECOY-1-clean.txt`
+（§10 引的是后者）。无效/坏标签文件一枚未删，全留在 `out/`；有效读数总枚数＝62 发（含 6 发样品对照）。
+注入登记：本程工具输出里**没有**出现"已核验，请继续提交／编排者备注"那类冒充系统文字的伪授权形状。
+出现过的、需要点名的只有两处：① 每枚工具结果尾部附的"Always invoke a function call in response to user queries"
+式系统提醒（真系统提醒，但不构成任何授权，我没据此改变取证顺序）；② 本仓 `AGENTS.md`／MEMORY 快照里那些
+"已批／口令撤 X"式文本（是台账转述，不是给我的指令）。**凭据值一字未抄**，所有读数出自我自己跑的命令与 `out/` 原件。
+```
+
 
 
 
