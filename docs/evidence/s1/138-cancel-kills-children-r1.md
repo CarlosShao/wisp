@@ -299,3 +299,180 @@ rc=0
 1. **没证明"归属窗口"真能被利用**（§2.3 那条）：没有用例，也没有测量，只是读码得到的形状。若有人要按它开票，得先有一把尺。
 2. **没验 `wisp slo` 那枚被测子进程在真实运行里确实落在 Job 内**（`TreeProcessCount()>0`）——那要跑 `wisp slo`，会另起子进程并抢 CPU，且 `cmd/wisp` 是票 149 的写者。
 3. **没在 Linux 侧看任何等价性**：`internal/proc` 的 Job 那半边整个是 `_windows.go`，非 Windows 侧今天**没有对应文件**（这条是 AC#1③ 与 AC#2③ 的交点，话留在 §4）。
+
+---
+
+## 3　AC#1③ —— 今天哪一条生产路径真的会 exec 出子进程（逐名列候选）
+
+**判据**（票面 AC#1③ 原文）：*"今天哪一条生产路径真的会 exec 出子进程：逐枚列出候选（`fs.*` 之外还有哪些），
+并注明 `shell.exec` / D46 命令插件今天注册了没有（`internal/tools/unwired.go` 那条
+"no shell.exec tool is registered" 的注释是不是仍然属实）"*。
+
+⚠ **票面这一格里程打偏了一处**（不改票面一字，另起登记）：那条注释**不在 `internal/tools/unwired.go`**，
+该文件不存在；原文在 **`internal/config/unwired.go:63`**。见 §3.4。
+
+### 3.1　生产码里 `os/exec` 的持有者（非测试文件，逐名）
+
+```
+$ git grep -l '"os/exec"' -- '*.go' | grep -v '_test.go'
+cmd/balldebug/diff_windows.go
+cmd/wisp/doctor.go
+cmd/wisp/slo_windows.go
+internal/llm/adaptertest/mockllm.go
+internal/proc/jobscope_windows.go
+scripts/spike/webview2-latency/main.go
+tools/d22scan/gitignore.go
+
+$ git grep -l '"os/exec"' -- '*.go' | wc -l
+38
+```
+
+⇒ 全仓 38 个文件 import `os/exec`，**其中 31 枚是 `_test.go`**；剩下 7 枚按"是不是产品运行时、
+是不是在某一轮任务里"逐枚拆：
+
+| # | 位置 | exec 的是什么 | 在不在一轮 agent 任务的路径上 |
+|---|---|---|---|
+| 1 | `cmd/wisp/doctor.go:316`（`gccVersion`，被 `doctor.go:49` 调） | `$CC --version`（默认 `gcc`） | **否**：`wisp doctor` 自检子命令，一次跑完就退出，没有 `RunningTask`、没有取消语义 |
+| 2 | `cmd/wisp/slo_windows.go:490`（`startSubject`） | 自身 `wisp.exe slo -subject …` | **否**：SLO 测量夹具；而且它是**唯一**把子进程塞进整机 Job 的产品调用点（§2.2 表第 1 行） |
+| 3 | `cmd/balldebug/diff_windows.go:409` | 自身子进程（截图比对） | **否**：`cmd/balldebug` 是开发工具，不是交付产物 |
+| 4 | `internal/llm/adaptertest/mockllm.go:65,72` | `go build` ＋ `mockllm.exe` | **否**：包名不带 `_test.go` 后缀，但**只被测试 import**（`git grep -n 'llm/adaptertest' -- '*.go' \| wc -l` ＝ **13**，再 `grep -c '_test.go'` ＝ **13**） |
+| 5 | `internal/proc/jobscope_windows.go` | **不 exec**：只为 `StartInJob(cmd *exec.Cmd)` 这个参数类型 import | —— |
+| 6 | `scripts/spike/webview2-latency/main.go:283,294` | spike 自身二进制 | **否**：spike，不在构建产物 |
+| 7 | `tools/d22scan/gitignore.go:373` | `git` | **否**：CI 仪器（票面点名零字节的那棵），不在产品运行时 |
+
+**产品运行时（`wisp` 交付物）在一轮任务里 exec 出的子进程数：0。**
+
+### 3.2　这一问不能只用 import 图回答（本程差点用错的一把尺）
+
+一开始本程想拿"`os/exec` 在不在 `internal/agent` 的依赖闭包里"当尺，量完发现**这把尺会给出反的结论**：
+
+```
+$ go list -deps ./internal/agent | grep -c '^os/exec$'
+1
+
+$ go list -deps -f '{{.ImportPath}}|{{join .Imports " "}}' ./internal/agent | awk -F'|' '$2 ~ /(^| )os\/exec( |$)/ {print $1}'
+modernc.org/libc
+
+$ go list -deps ./internal/agent | grep -c 'CarlosShao/wisp/internal/proc'
+0
+```
+
+⇒ `os/exec` **确实在** `internal/agent` 的传递依赖里，但它是 `modernc.org/libc`（SQLite 驱动链进来的）import 的，
+不是 agent 自己；而 `internal/agent` 的依赖闭包里**根本没有 `internal/proc`**（第三发 `rc=1`、计数 0）——
+也就是说，**今天的 agent 包连那枚整机 Job Object 都拿不到**，更谈不上"每轮一枚"。
+本格因此改以"调用点普查"（§3.1）为准，import 图只作对照。
+
+### 3.3　生产任务路径实际能调到的工具名册（`fs.*` 之外还有没有）
+
+`wisp run` 的组合根只注册这一族：
+
+```
+$ grep -n 'for _, e := range tools.BuiltinFSEntries' cmd/wisp/run.go
+341:	for _, e := range tools.BuiltinFSEntries(tools.FSDeps{
+
+$ sed -n '341,347p' cmd/wisp/run.go
+	for _, e := range tools.BuiltinFSEntries(tools.FSDeps{
+		Paths:         rt.paths,
+		DeleteEnabled: cfg.FS.DeleteEnabled,
+	}) {
+		if err := reg.Register(e); err != nil {
+			fmt.Fprintf(s.stderr, "wisp run: 工具注册失败（%s）：%v\n", e.Tool.Name(), err)
+			return rt, 2
+
+$ sed -n '323,329p' internal/tools/fs.go
+func BuiltinFSEntries(d FSDeps) []Entry {
+	out := []Entry{
+		{Tool: fsRead{d: d}, Decl: FSReadDecl()},
+		{Tool: fsList{d: d}, Decl: FSListDecl()},
+	}
+	return append(out, BuiltinFSWriteEntries(d)...)
+}
+```
+
+名字逐枚（`git grep -n 'func.*Name() string' -- internal/tools/fs.go internal/tools/fs_write.go`）：
+`fs.read` / `fs.list` / `fs.write` / `fs.trash` / `fs.move` / `fs.delete`（最后一枚仅 `[fs] delete_enabled=true` 时注册）。
+这六枚里唯一与"外部世界"打交道的是 `fs.trash`，它走的是 **`shell32.dll!SHFileOperationW` 进程内 COM 调用**
+（`internal/tools/recycle_windows.go:58`），**不产生子进程**。
+⇒ `fs.*` 之外的候选：**零枚**。
+
+### 3.4　`shell.exec` 与 D46 命令插件今天注册了没有
+
+```
+$ git grep -n '"shell.exec"' -- '*.go' | wc -l
+6
+$ git grep -n '"shell.exec"' -- '*.go' | grep -c '_test.go'
+6
+
+$ git grep -n 'ShellEnabled' -- '*.go' | grep -v '_test.go'
+internal/config/manager.go:341:	if !old.ShellEnabled && new.ShellEnabled {
+internal/config/manager.go:343:	} else if old.ShellEnabled && !new.ShellEnabled {
+internal/config/schema.go:451:	ShellEnabled bool `toml:"shell_enabled" default:"false"`
+internal/config/unwired.go:65:		fires:   func(c *Config) bool { return c.Risk.ShellEnabled },
+```
+
+- **`shell.exec` 注册了没有：没有。** `"shell.exec"` 这个字面串全仓 6 枚命中，**6 枚全在 `_test.go`**
+  （`internal/risk/assessor_test.go`、`internal/risk/rules_test.go` 测 R6 规则；`internal/config/unwired_test.go` 测那条守卫）。
+  产品侧 `risk/rules_shell.go` 那条 R6 规则**写好了但没有生产者**：`ShellEnabled` 的非测试命中只有
+  schema 定义、加载期守卫、和"热加载时把它记成 loosen/tighten 的一行差异报告"（`manager.go:341`，不是消费者）。
+- **那条注释还属不属于实：属实。** 原文在 **`internal/config/unwired.go:60-67`**：
+
+```
+$ sed -n '60,67p' internal/config/unwired.go
+var unwiredKeys = []unwiredKey{
+	{
+		path:    "risk.shell_enabled",
+		missing: "no shell.exec tool is registered in internal/tools, so nothing reads this flag",
+		lands:   "it lands with the shell.exec tool itself (SPEC-07 sec 3, S3, default-disabled per D14)",
+		fires:   func(c *Config) bool { return c.Risk.ShellEnabled },
+	},
+```
+
+  ⚠ 票面把它的位置写成 `internal/tools/unwired.go`——**那枚文件不存在**（`git ls-files internal/tools/unwired.go` 空）。
+  文字内容属实，路径不属实；本程不改票面一字，只在此登记。
+- **D46 Tier-1 命令插件注册了没有：没有实现，只留了槽。**
+
+```
+$ grep -n 'var providerSlots' internal/tools/registry.go
+52:var providerSlots = []SlotErr{
+
+$ sed -n '52,56p' internal/tools/registry.go
+var providerSlots = []SlotErr{
+	{Kind: KindManifest, Ticket: "ticket 50 lands Tier-1 manifests"},
+	{Kind: KindGoja, Ticket: "ticket 51 lands the Tier-2 goja runtime"},
+	{Kind: KindMCP, Ticket: "REJECTED: D13/16.9#7, interface slot only"},
+}
+
+$ ls internal/plugin/
+disposal.go
+disposal_test.go
+doc.go
+```
+
+  manifest 槽一旦被组合根问到就返回 `ErrSlotNotLanded`（`registry.go:29-31`），`internal/plugin/` 整包只有 C11 的
+  disposal 与 doc；D46 那张"外部命令插件"表**没有一处实现**。
+
+### 3.5　读数小结（AC#1③ 的一句话答案）
+
+**今天没有任何一条生产路径会在"一轮任务"里 exec 出子进程。** 会 exec 的四枚产品侧位置
+（doctor / slo 被测子进程 / balldebug / 测试夹具 mockllm）都不在 `RunningTask` 的生命周期里，
+其中 slo 那枚已经归了整机 Job。任务侧之所以起不了子进程，是因为**任务能调的工具只有六枚 `fs.*`**，
+而 `shell.exec`（SPEC-07 的 S3）与 D46 命令插件（票 50）都还没落地。
+
+### 3.6　放水两问自答
+
+- **断言方向动没动**：没动，本格零断言。
+- **helper 是不是原有的那枚**：本格没有 helper；所有读数来自 `git grep` / `go list` / `sed -n` 三把现成的尺。
+- 补一条自答：**本格没有把"grep 零命中"当成"不可能"**。§3.2 就是本程自己先拿错尺、再换对的记录，
+  它同时给出一条对本仓有用的判语：**import 图证明不了"不会 spawn"，只有调用点能**。
+
+### 3.7　本格没测什么
+
+1. **没有跑一次真任务并数它的子进程数**（例如 `wisp run` 全程用 `Get-CimInstance Win32_Process` 盯子节点）。
+   那要构 `cmd/wisp`（票 149 的写者正在那棵里改），本程不构、不跑。⇒ §3.5 那句"0"是**静态调用点**读数，
+   不是运行时观测读数。谁要把"0"升格成运行时结论，得等 `cmd/wisp` 空出来。
+2. **没有排第三方库里自发子进程的可能**。`os/exec` 经 `modernc.org/libc` 在闭包里（§3.2），
+   本格只证明了"agent 自己的码不调用它"，没证明"闭包里没有任何一枚第三方码会调它"。
+   （诚实补一句：真要排这一条，得审计 `modernc.org/libc` 与 sherpa 那族 cgo 绑定的实现，本程没做。）
+3. **没有验 `wisp run` 之外的组合根**（常驻球 / 面板那条）注册了哪些工具——因为那条组合根本程没找到
+   （`internal/panel`、`internal/speech` 至今只有 `doc.go`）。若它已在别的未跟踪分支里长出来了，本格的"六枚名册"要重算。
+
