@@ -343,3 +343,89 @@ dcb95ae...    ← 稳定性批次用的 archive 树；本程自己的 commit 序
 ⇒ **不能说什么**：不能说"率从 0.049% 降到 0"。要把 0 压到归档合并率的**上界以下**需要
 `n > 3/0.00049 ≈ 6100` 枚同形窗（本程 3950，不够），要分辨 0.25% 与 0.033% 两层的差更要几千枚；
 本程对"改后是否更不 flake"的可辩护证据是 §4 那枚**确定性对照**，不是这批计数。
+
+---
+
+## 7. 纪律回执、变异复算、总判、以及"本程没有测什么"
+
+```
+$ date "+%Y-%m-%d %H:%M %z"
+2026-09-25 09:45 +0800
+$ git log --oneline -3
+（本程三枚 commit 全带显式 pathspec、每枚只带本程自己的路径；序列见下）
+```
+
+### 7.1 §5 那五发变异在**最终代码**上复算了两发
+
+§5 表里的读数是**截短红句之前**那一版跑的（§4 末说明了这枚先后）。M1 与 M5 用最终树
+（`tree-post2` @ `dcb95ae` 的副本 `tree-v3-M1`／`tree-v3-M5`）重跑：
+
+| 变异 | 首跑（§5 表） | 最终代码复算 | 差在哪 |
+|---|---|---|---|
+| M1 | 71 RUN / 68 PASS / 3 FAIL / 0 SKIP / 0 panic | **同值**，站点同为 `coverage:156`／`coverage:251`／`gate:223` | 无差别 |
+| M5 | 71 / 61 / 10 / 0 / 0，9 枚 bound 红 | **同值**，站点同一批；尝试枚数从 193-195 变 191-195（**同量级**），红句尾部变成 `counts seen: [0 0 0 0 0 0 0 0] (+183 more, all of them short of 3)` | 只有消息文本被截短，判据与红名册一字未变 |
+
+### 7.2 硬约束回执（`A212④` 那四条 ＋ 派单第 4 条的禁形）
+
+| # | 约束 | 本程 |
+|---|---|---|
+| (i) | 超时不许用墙钟差 | `awaitWindow` 只用 `clock.go` 的 `NewTimeout/Expired/Remaining`（单调）；**全包 `grep -n '\.Sub(time\.Now())'` 于本程改动的 6 枚文件＝0 命中**，`time.Since` 也只出现在既有生产码里。形状照 `goroutine_test.go:57-66`（AC#11 已裁定的同族修法）。`d22scan` 真扫 clean（§0：正控那发因别家在动而 build failed，**没跑通就是没跑通**，本程不洗） |
+| (ii) | 上界由本程现量推 | 2s，推导与倍数写在 `window_wait_136_test.go:44-69` 头上；本程现量＝靶子腿 n=2000 p99 100ms、六腿 n=1800 p99 200ms（§1.2）；倍数＝**最慢腿 10x p99／靶子腿 20x p99** |
+| (iii) | 不许把场景洗掉 | §4 确定性对照（改前红＝归档逐字同形；改后绿）＋ §5 五发变异（M1 的红句里仍写着 `5 of 10 reads`＝半丢仍在）＋ 判据一律取**接缝自己的计数器**（产品坏掉满足不了等待，M5 那一发把 9 枚等待全打成 bound 红） |
+| (iv) | 禁 Skip／禁改 `< 4`／禁删断言／禁动 `sampler.go`／禁动 golden·阈值·allowlist | 名册 `t.Skip` 执行位 0 枚（注释枚数见 §1.1 的自纠）；阈值 13 枚逐枚原样（§3 的机械 diff 表）；`git diff --name-only ee5a25e -- internal/observe/ \| grep -v _test.go` **空**；`thresholds.go`、golden、`tools/d22scan/allowlist.txt`、`.scratch/**`（含票面勾数 7/8 未变）、`docs/PLAN.md`、`docs/specs/**`、`cmd/**`、`scripts/**` **一枚都没写过**（`git status --porcelain` 逐径核过为空） |
+| 派单机制 | 只 commit 不 push／显式 pathspec／禁形清单 | 遵守。每枚 commit 前 `git diff --cached --name-only` 核过；**本程没有一次 `git add -A`/`.`、没有 `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`/`push`**。共享树里 HEAD 一直在漂（`ee5a25e`→`885f50b`→…，别家台账与 d22scan 程在动），所以本程每次都用 `git log -1 -- <本文件>` 单读自己那一枚 |
+| 快照 | 只建不删、仓外 | `D:\tmp\observe-ac15-poll-s1\`：`tree-base`(未改)／`tree-post`／`tree-post2`／`tree-post-v2`／`tree-pre-stall`／`tree-post-stall`／`tree-pre-stall-all`／`tree-post-stall-all`／`tree-mut-M1..M5`／`tree-v3-M1`／`tree-v3-M5` ＋ `logs/` ＋ 4 份仪器；**没有一枚被删**，**没有在仓库目录内建 worktree 或 checkout** |
+
+### 7.3 本程 commit 序列
+
+| 段 | commit | 时刻 |
+|---|---|---|
+| §0-§3（代码落地＋基线＋普查＋修法） | `d8390aa` | 09:13 |
+| §4-§5（确定性对照＋五发变异＋红句截短） | `333dfe3` | 09:21 |
+| §6（前后四数＋名册差集＋两口径批次） | 见 `git log -1 -- docs/evidence/s1/observe-ac15-poll-r1.md` 于本节之前那枚 | 09:39 |
+| §7（本节） | 本枚 | 09:4x |
+
+### 7.4 总判
+
+**改了什么**：`internal/observe/**_test.go` 六枚文件——新增 `window_wait_136_test.go`（一枚有界单调等待仪器，
+零用例），13 枚"数了但不等"的前提腿改成 `awaitSettleReads/awaitStateReads`（判据＝接缝自己的读枚数），
+`gate_136_test.go` 表头那句"这些腿进不了这一族"按本程实测改成实话，coverage 文件的开窗器合并出一枚
+`settleTreeSUT`。**生产码一字未动**；`sampler.go` 一行都没碰（候选 2 属人工批准面，只登记不落地）。
+
+**家族枚数更正**：派单说六枚，本程现量 **13 枚腿／15 处守卫／14 个窗**（Group B 的尾巴没被数进去）；
+其中 12 枚已包、1 枚（`SampleState` 侧 `reads == 0`）**结构上不可能由调度造成**故没包并留了说明。
+另登记 4 枚"连前提守卫都没有"的同类暴露腿（`TestCheckSettleVerifiesReleaseCounter` 等，§2 末表），
+其中一枚在 M5 那一发里真的自己红了——**那一族属下一格，不属本格**。
+
+**变异读数（最终代码复算）**：M1 68/3、M2 69/2、M3 67/4、M4 67/4、M5 61/10 ——
+**没有一枚变异把改写的腿洗绿**；靶子腿在 M1 下红在 `coverage:251`，红句照旧印着 `the seam lost 5 of 10 reads`。
+
+**四数前后（同一命令 `go test ./internal/observe/ -count=2 -v`）**：净窗里 before `142/142/0/0`、
+after `142/142/0/0`、`^panic:` 前后皆 0、名册 71 枚两向差集为空；整包单发 20＋20 发逐发同值，
+包时中位 3.476→3.475 s（绿路代价量不出差别）。
+
+**`AC#15` 本格状态：`[ ]` 未勾**（票面 7 勾／8 未勾未变，`git status --porcelain -- .scratch/` 为空）。
+翻勾属**非实现者终裁**，本程不翻。
+
+### 7.5 本程**没有**测什么（按"会被下一位当事实引用"的尺度逐条列）
+
+1. **没有量出"率降了"**：改前 20 发 A ＋ 3800 枚 B 在净窗里 0 命中，改后 20 发 A ＋ 3950 枚 B 也 0 命中。
+   两批 0 对 0 不构成比较。要压过归档合并率（0.049%）的上界需要 `n > 6100` 枚同形窗，本程没跑够；
+   要压过 1/390 需要 `n > 1169` 枚**整包单发**，本程只有 20。
+2. **没有忙窗读数**：派单要"逐批记负载状态"，本程四批全部落在净窗（争用名单逐批 0 枚），
+   所以**归档那枚"忙窗 3/1200 vs 净窗 1/7000"的分层，本程无法在改后树上复现**——改后的忙窗行为是**未量**的。
+   （唯一例外是 §4 那枚人造停顿，那是**确定性**的饿窗，不是随机负载。）
+3. **没在 ubuntu/CI 上量过任何东西**：本程所有读数出自 Windows 本机；`internal/observe` 在 CI 上只被
+   `test-core`（ubuntu-latest，`ci.yml:288` → `scripts/portable-tests.sh --scope=core`，包列在 `:175`）问津，
+   `--scope=windows`（`ci.yml:458`）**不含本包**。⇒ **承重的分母在 ubuntu，本程给的分母在 windows，两味 OS 不同**；
+   定时器粒度（Windows 常见 15.6ms）在 ubuntu 上不同形，改后率要在这台之外另量。
+4. **没做门禁全套**：`gofmt`／`go vet` 跑了（净），**`scripts/d22scan.sh` 的正控那一发没跑通**（别家在动的
+   `scan_test.go:1197` build failed），本程只补了真扫那一发；`lint`/`golangci-lint`、`go test ./...` 全包、
+   `wisp slo`（本程禁跑）一律未跑。
+5. **没量"改前遇到同样变异会红几枚"**：§5 五发变异只打在**改后**的树上（要证的是"仍咬"）。
+   改前树打 M1-M4 的红名册**没量** ⇒ "改后比改前咬得多"这句本程只能给方向（M5 在改前树上必然只红靶子族、
+   不会有 9 枚 bound 红），不能给差值。
+6. **没动那 4 枚"没有前提守卫"的暴露腿**，也**没动** `t.Parallel`／`-race`（本包 `t.Parallel` 现量 0 枚，
+   改后仍 0 枚；`-race` 本程一枚都没跑）。
+7. **没测 `settleWindowWaitBound` 该不该随 OS 变**：2s 是本机现量推的； ubuntu runner 上同一判据是否够，
+   未量（见第 3 条）。
