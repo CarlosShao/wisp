@@ -289,3 +289,93 @@ MEXT（`json.RawMessage`，"把字节留着稍后再解"的正规写法，零新
 不是"误伤好人"的那种红；但它意味着 **`internal/panel` 里今天不能出现第二枚 decode**，
 除非它落到同包 struct。这条约束是本批新加上生产码的，**派单与 r1 都没写过它**，
 r2 的文件头 `DOES NOT COVER` 也没写它。⇒ 记为**文档级缺陷**（见 §7 F-R2-1），不改判。
+
+---
+
+## §3 新尺子的误伤审计（本程认为最值钱的一格）
+
+固定问法：**判据一收紧，就必须答"哪一类**今天本来就合法**的数据今天会被拒、回退路径是什么"。**
+
+### §3.1 (b) 今天到底扫进多少东西 —— 分母是我量出来的，不是推的
+
+同一棵副本树上放一枚 `_test.go` 审计探针（`_test.go` 被 `goSourceFiles` 排除，
+探针自己进不了它正在量的池），跑完 `mv` 进 `removed/`。原文 `out/audit-pool.txt`、`out/audit-filter.txt`。
+
+```
+池与判定（真树，HEAD 版钉）
+AUDIT answered=4 pool=5 literals=5 consts=7 structs=18 decodes=1
+POOL index.html                  answeredByRealGuard=false  sites=[assets.go:29 const EntryFile]
+POOL panel.attachment.add        answeredByRealGuard=true   sites=[bridge.go:37 const MethodAttachmentAdd]
+POOL panel.message.send          answeredByRealGuard=true   sites=[bridge.go:38 const MethodMessageSend]
+POOL panel.mode.request          answeredByRealGuard=true   sites=[bridge.go:35 const MethodModeRequest]
+POOL panel.workspace.request     answeredByRealGuard=true   sites=[bridge.go:36 const MethodWorkspaceRequest]
+```
+
+```
+过滤器自己的分母
+FILTER files=8 stringLiterals=295 withDot=16 routeShapedKept=5 rejected=11
+REJECTED approval.go:21  "github.com/CarlosShao/wisp/internal/risk"
+REJECTED assets.go:25    "github.com/CarlosShao/wisp/frontend"
+REJECTED composer.go:37 / composer_handlers.go:47 / workspace.go:31  同上那条 risk 导入路径
+REJECTED assets.go:79   "./"      assets.go:80 "."    assets.go:83 ".."
+REJECTED assets.go:105  "."       assets.go:166 "."   attachments.go:260 "."
+```
+
+⇒ **今天被 (b) 纳进射程的"合法但非路由"数据 = 恰好一枚：`index.html`**
+（`internal/panel/assets.go:29` 的 `const EntryFile`，一个真正的文件名）。
+它过 `routeShapedName` 是因为 `词.词` 这条形状**天生分不清"路由"与"带扩展名的文件名"**——
+`panel.ts`、`wisp.db`、`manifest.json`、`golden.sse` 只要将来被写成一枚生产码字面量就会进池。
+
+**它被拒了吗？没有。** 判语只有一句：
+`if !knownComposerMethod(name) { continue }`（`:1024`）——**在池里不等于被起诉**，
+被守卫应答才成立，而守卫应答的判据与它是不是字面量无关。⇒ 这条判据的"回退路径"今天用不上，
+因为它**不拒任何东西**；代价是"多算几次哈希"。这一条我在 §3.3 用一发反证钉死。
+
+**过滤器不滤掉什么**（说破比留白好）：`词.词`、`词.词.词`、段内允许 `_`、数字、**非行首**的 `-`。
+所以 `a.b-c`、`photo.png`、`shell.run`、`config.toml` 全过；被滤掉的 11 枚今天**全是因为带 `/`、
+`\`、`%` 或整枚就是一个点**——也就是说它滤的是**路径**，不是**名字**。
+⚠ 两处今天没被扫到、但**换个写法就会进池**的东西：`shell.run`（`approval.go:31`）与
+`"C:\dir\photo.png"`／`"photo.png"`（`attachments.go:315-316`）——它们在**注释**里，AST 看不见，
+`noB`/`noA` 系列也没报错。⇒ **注释天然豁免**这条在 (b) 上成立，方向是"少扫"，与 ban #8 的注释豁免同族。
+
+### §3.2 (c) 今天的射程，以及"加第二枚 decode"会变成什么
+
+```
+SEEDS（decode 派生）      [ComposerRequest]
+INBOUND（向下闭包）        [AttachmentPayload AttachmentRef ComposerRequest]
+OLD-criterion seeds（旧判据）[ComposerRequest]        ← 两把判据今天外延相同
+DECODE bridge.go:79 dst=&r type=ComposerRequest       ← 全包唯一一枚 decode
+FIELD ApprovalCardView.SessionOverrideBlocked json="sessionOverrideBlocked" at approval.go:54
+FIELD ApprovalCardView.DecidedBy              json="decidedBy"               at approval.go:58
+```
+
+- `decodes=1` ⇒ 换尺今天**零成本**（fix-r2 §4.1 那句"外延完全相同"我独立复现，两把判据同一个格）。
+- **r1 警告的"别用查所有 struct 那版"我复算成立，并且第二枚反例是真的**：
+  全包今天恰好 **2 枚**字段名带审批词（`sessionOverrideBlocked` 命中 `override`、`decidedBy` 命中 `decide`），
+  两枚都在 `ApprovalCardView`（**出站**渲染视图，既不是 decode 目的、也不绑 `method`）⇒
+  现在的两把判据都够不到它们；若判据换成"包里所有 struct 都查"，**今天就是两枚红**。
+  r1 只点了 `decidedBy` 一枚，fix-r2 §4 补了第二枚；我数到的仍是这两枚，没有第三枚。
+- **加第二枚 decode 会发生什么**（我造了两发合法形状，见 §2.4）：
+  *新同包 struct* ⇒ (i) 进 `inboundSeeds`；(ii) 若带审批键 ⇒ `TestNoInboundEnvelope` 点名 `file:line`；
+  (iii) 若忘了登记 ⇒ `:1444` 那枚 `t.Fatalf` 先叫，**红句直接把出路写出来**
+  （"drop it from inboundTypeRegistry instead of dropping the check" / "has no reflection twin"）。
+  *非同一包的目的地（`map[string]any`、`json.RawMessage`）* ⇒ 三枚 ban 测试全 `t.Fatalf`，
+  方向 **fail-closed**。⇒ 存量合法数据被"拒"的唯一一类是**第二枚 decode 本身**，
+  代价是"必须落到同包 struct 或另找一把尺"，**不报错的形状不存在**（它是响，不是忍）。
+
+### §3.3 "池里有名字但要命的是别的东西" —— 一发证明池本身无罪
+
+我把 11 枚被滤掉的东西里最像路由的那枚（`shell.run`）从注释搬进代码，看会不会凭空造红：
+
+⇒ 这一发我没跑（`mutate2.py` 只支持两枚种子；跑它要再改台件），**记在 §8"没测什么"里**，
+不当已证。我手上等效的证据是两条盘上事实：(i) `index.html` 今天在池里且 `answeredByRealGuard=false`、
+包体全绿（§3.1 现量）；(ii) `poolJudgedByRealGuard` 第一句就是 `if !knownComposerMethod(name) { continue }`。
+⇒ 判："进池不产生代价"这一条我给**代码事实＋一枚真实驻留样本**，不给穷尽证明。
+
+### §3.4 这一格总裁
+
+**没有误伤，但有一条新的、没人声明过的生产码约束**（§2.4 的 F-R2-1）。
+判：**成立（附一条文档级要求）**——(b) 与 (c) 今天的存量代价都是零，
+而它们对**将来**的合法形状施加的约束（第二枚 decode 必须落到同包 struct / 新入站类型必须进
+`inboundTypeRegistry`）都**响在明处且自带出路**。这不是"放宽断言"，是"把新约束写进文件头"的事，
+所以是文档级、不退回。
