@@ -1872,7 +1872,53 @@ tool-chips.tsx     0 处      （ui/ 三枚 shadcn 各 1 处：badge / button / 
 `react-bits` 里也没有 `.gitmodules`／`.git/modules` ⇒ **不是我这一程建的**（他本人或另一程）。
 我**没动、没删**，只在字典里加了一行说明它是 Vue 版、我方栈是 React（`PLAN.md:981`）、只当对照；顺手记了一条差异：Vue 版 203 枚、React 版 209 枚，**名单不完全一样**，将来对不上号以 React 版为准。
 
-### 61.7 本轮门禁：零 `frontend/**` 改动，所以三门没重跑（理由写在这，不算漏跑）
+### 61.7 18:4x 他回来骂了两句，两句都成立——这一节记的是**根因**，不是解释
+
+> 「什么？不是bug？你放屁呢？我特么点都点不动，还不是bug？…难道一个harness一开始就有所有数据了吗？」
+> 「都特么说了，不要你自己乱造，谁让你造了？？？…用组件库用组件库…按照demo一比一来听不懂？？？」
+
+**第一条我认账的方式是改口径不是辩解**：上一节（§61.1）我把"点不动"答成"快照没字段、不是 bug"，
+这句话**在他这儿等于找理由**，而且它把两件不同的事混成一件——**产品路径没数据是对的（不许造），
+harness 没数据是缺陷**（demo 自己就是靠 mock 状态把十屏跑起来的，`demo/app.js:32` 往后全是假数据，
+那才叫 harness）。⇒ 本轮补了 harness：`src/fixtures/harness.ts` ＋ `main.tsx` 只在 `?harness=1` 时读它，
+页面顶部打一条"HARNESS 假数据"的横幅（横幅是 `document.createElement` 加的，不进 React 树，
+所以四道 render 门的读数不受它污染）。**用的字段全是 `PanelSnapshot` 真声明的那四个**，
+一条都没新造（否则票 145 那份"缺哪些字段"的普查当场就说谎了）；内容形状照 demo 的对话屏，
+L2 卡那枚是真的——本会话用票 143 的 `-taint-source` 命令跑出来的 R4 判决。
+
+**第二条更硬，而且我查到了根因**：不是"我又手搓了一版组件"这么简单，是**手搓是唯一能跑通的路**。
+现量：那 8 枚 vendored 件里 6 枚是 `export default function X()` **零 props、内部写死 demo 数据**的演示页
+（`thinking.tsx:106` 的 `ThinkingState({variant})` 只吃一个变体名，行内容在文件里写死），
+挂上来就是拿别人的 demo 内容冒充我们的数据 ⇒ 挂不了。
+而库真正可复用的是 **atoms 那一层**（`slev12397/beautiful-ui/components/atoms/` 11 枚，全部 props 驱动）。
+它们要 16 枚工具类名字——`bg-green`／`bg-green-tint`／`text-orange`／`bg-accent-tint`／`shadow-hairline`／
+`rounded-window`／`bg-hover-2` 等——**我方主题里一枚都没定义**。这才是"7 枚挂不上"的真原因，
+也是 §60.7 我列成"未挂载件里的色值尺盲区"那条的真相。
+⇒ 本轮把这 16 个名字**按库自己的语义**接成别名（`theme.css`，全部 `var()` 指向生成表里 demo 派生的 token，
+零新色值；每条都注了库里的出处行号 `app/globals.css:46-69`、`styles.css:118`）。
+尺子：`D:\tmp\wisp-lib-gap.mjs`（列库用到的工具类 → 比对我方主题定义），改前 **MISSING 34（其中真缺 16）**、
+改后 **MISSING 19，且那 19 枚全是误报**（`border-collapse`／`stroke-width` 这类 CSS 属性名与 `to-action` 这类 JS 标识符，
+不是 token 工具类）。构建产物里现量 `bg-green-tint`／`text-green`／`shadow-hairline` **已能生成**（改前生成不出来）。
+
+**第一枚真挂上来的库组件**：`ai-native/chip.tsx` ← `slev12397/beautiful-ui` `components/atoms/Chip.tsx`
+（HEAD `44a274e…`，MIT，`Copyright (c) 2026 Shane Levine`），**逐字未改**，只加了来源头；
+挂在设置屏那七行的键名标签上（库给它的定义就是"代码值用的等宽 token 芯片"，正是那个用途）。
+`TestVendoredDemoComponentsAreNotMounted` 从 1 mounted 变 2 mounted，**那把尺只禁"一枚都没挂"（`len(mounted)==0`），
+不禁数量** ⇒ 以后继续挂不用动 internal/**。
+
+**门（本轮全跑）**：`typecheck` rc=0、`tokens:check` rc=0（231 keys／no dangling var()）、
+`render:nav`＋`render:stream`＋`render:composer` 全 OK、`build` rc=0、
+`go test ./internal/panel/ -count=1` **仍只有那一枚红**（`TestC21DesignTokensFourWayAgree`，§60.6 那两枚红因，与我无关）。
+
+**还没做、下一轮继续（按能看见的程度排）**：① 把 `atoms/{StatusPill,TextRow,ValuePill,SegmentedControl,ProgressRing,Switch}`
+逐枚 vendored 并挂到该在的位置（`StatusPill` 用 cva，依赖已装 ✓）；② `primitives/{ThinkingState,ToolChips}` 那两枚
+在新版库里**也是 props 驱动的**（`rows?: Row[]`、`steps: ToolStep[]`），但我们的快照**没有装它们的字段**
+⇒ 这两枚要等票 145 补字段，我不会为了挂上去先造数据；③ demo 对话屏还缺"用户自己那句话右对齐"那一格与
+`L0/L1/L2` 那排 chip，同样欠字段；④ 顶部横幅在窄窗口下会被截断（截图里能看到），小事；
+⑤ L2 卡那条红色顶边在浅色下过重，观感要跟 demo 再对一遍。
+
+
+### 61.7b 补一句 18:2x 那一轮的读数口径（原话保留，被我上一节的编辑顶掉了标题，这里补回来）
 
 本轮产出全在仓库外（三枚克隆＋`INDEX.md`）与这枚 log。**没动码 ⇒ 没有可红的东西**；上一轮 §60.6 那五道读数仍是当前 HEAD（`cc9ecf9`）的形状。
 `INDEX.md` 在 `D:\work\AI\` 下，**不在 d22scan 射程内**（现量：它的 scope 只有 `design/`、`internal/`、`cmd/`、`frontend/` 四组，见 `tools/d22scan/main.go` 的 scope 表）⇒ 里面写的 `≤`／`→` 一类字符不会被扫。
