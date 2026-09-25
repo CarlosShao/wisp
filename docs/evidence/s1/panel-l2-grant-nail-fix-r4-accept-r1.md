@@ -305,4 +305,80 @@ MDEC-registered （同上一发，再把 acProbe 写进 inboundTypeRegistry—�
 `l2_grant_boundary_test.go:1560`，不在 `bridge.go`；我第一次把注册那一步打进生产码，被我自己那把
 "锚点计数不等于 1 即拒"的尺挡下（`REFUSED anchor MDEC-reg: count=0`），改对后才有的上面那两行读数。
 
+---
+
+## §10 ⓕ 它自报"仍被打穿的一形"：我独立重走，并且**不认同"Go 通用极限"这一裁**
+
+先复现它的读数（台件＝§1.1 那台副本，`-count=1 -v`）：
+
+```
+ask-stub   （`:1345` 那一句改成 `if false && knownComposerMethod(name) {`）
+  RUN=99 TOPPASS=53 SUBPASS=46 TOPFAIL=0 SKIP=0 PANIC=0
+  :1389 behavioural sweep of the running guard: asked=528 assembled route names, answeredByRealGuard=0, hits=[]
+                                                          （out/R-ask-stub.txt）
+ask-stub ＋ M14（真守卫运行期答 `panel.review.allow`）
+  RUN=99 TOPPASS=53 SUBPASS=46 TOPFAIL=0 SKIP=0  asked=528 hits=[]   （out/R-ask-stub+M14.txt）
+hits-short ＋ M14（把 `hits = append(hits, name)` 那一支短路）
+  RUN=99 TOPPASS=53 SUBPASS=46 TOPFAIL=0 SKIP=0  asked=528 hits=[]   （out/R-hits-short+M14.txt）
+```
+
+⇒ 实现件 §6 末与上游 r3-accept §1.1 对 V5/V8 的读数**逐字复现**（它记 `RUN=99 FAIL=0 asked=528 hits=[]`）。
+它没有夸大连环、也没有把这形藏起来——**自报得对**。
+
+**但"这与 V5/V8 同裁：Go 通用极限、不记为洞"这一句我判不成立。** 我在仓外副本里造出了那一枚检，四发读数：
+
+台件：`D:\tmp\wisp-r4acc1\decoycopy`（同一锚点归档，只加 12 行，产品码一字未动，脚本
+`scripts/decoy_demo.py`＋`scripts/decoy_run.py`）。改法＝把"问守卫"那一行抽成
+`sweepAssembledNames(prefixes, words, suffixes)`，让**负断言（网格内不许有名字被答）与一枚正断言
+（`{"panel"} x {"mode","workspace"} x {".request"}` 这两枚守卫真答的名字必须出现在 hits 里）
+共用同一行 `if knownComposerMethod(name)`**。
+
+```
+DECOY-1-clean            RUN=99 rc=0 TOPPASS=53 TOPFAIL=0  asked=528 hits=[]  ← 零误伤，asked 一字未变
+DECOY-2-askstub          TOPFAIL=1  TestRealGuardRefusesEveryAssemblableApprovalRouteName
+   :1398 the sweep's own accumulation line answered [] of the two names this package really declares
+         ([panel.mode.request panel.workspace.request]): the line that asks the guard is not the line that reports the verdict
+DECOY-3-askstub+M14      TOPFAIL=1  同一枚、同一句红因            （out/DECOY-3-askstub-M14.txt）
+DECOY-5-patched+hits-short TOPFAIL=1 同一枚、同一句（V8 一并钉住）  （out/DECOY-5-patched-hitsshort.txt）
+DECOY-6-delivered+hits-short  TOPFAIL=0（对照：差别只来自那 12 行，不是别的）（out/DECOY-6-delivered-hitsshort.txt）
+```
+
+**裁（ⓕ）**：**有**机器可读的检能把这一形也钉住，成本＝测试文件内约 12 行、不碰产品码、不碰阈值、不碰 golden；
+`asked=528` 与全包颜色在干净树上不变（DECOY-1 为证）。
+它的原理不是"再加一枚断言"，而是**把已有那枚正控（`:1332-1336` 那四枚声明路由）从"另起一行直调守卫"
+改成"经过扫掠自己的那一行"**——今天那枚正控与扫掠**不共用执行点**，所以短路扫掠那一行时正控照绿。
+这是"asked= 只是打印"同一族病根的最后一枚，不是极限。
+真正的通用极限仍然只有那一族：**把整枚用例删掉或改名**（§7 反①复算：`standing-out` 单发 `RUN=98 TOPFAIL=0`，
+全包无人响）——那一族本仓的 backstop 还是人工名册差集，我这一程也没造出仪器治它，我不假报。
+记入账 **F-R4-1**（可加强项，不推翻本批任何一条已成立的结论）。
+
+---
+
+## §11 本程新账：**乘积的四枚因子里，只有两枚有证人**
+
+上游 F-ACC-2 的闭合判据逐字是"**从 `grantRouteWords` 删掉任意一枚，全包必须有红**"——这一条本批结清了（§6）。
+同一把尺量到 `grantRoutePrefixes`／`grantRouteSuffixes` 上，**今天仍然打不红**，我两发都造了：
+
+```
+prefix-shrink          （把 `grantRoutePrefixes` 第一行那 5 枚前缀删成 4 枚，去掉 "panel.mode"：8 -> 7）
+  RUN=99 TOPPASS=53 TOPFAIL=0  asked=462（＝7x11x3x2 与清单自算同值）    （out/T-prefix-shrink.txt）
+suffix-shrink ＋ M-now  （清单删掉 ".now" 那一尾；生产码运行期答 `panel.review.grant.now`）
+  RUN=99 TOPPASS=53 TOPFAIL=0  asked=352（＝8x11x2x2）                   （out/S-suffix-shrink+M-now.txt）
+  对照：M-now 单发（清单不动）-> TOPFAIL=1 红在常驻扫掠，hits=[panel.review.grant.now]（out/M2-M-now.txt）
+```
+
+⇒ **同一枚生产码形状（守卫真答了一条运行期拼出的批准路由），只要那枚名字落在被剪掉的那一尾上，
+全绿。** 乘积式（ⓑ）在这里是**自指**的：`asked` 永远等于"当下清单相乘"，所以剪清单它量不到——
+它能治的是"清单在、循环没走"（V1/V4 那一族），治不了"清单被改窄"。
+`grantRouteWords` 因为本批配了证人册而从此剪不动，另两枚因子没有对应物。
+
+**裁**：这不是"上游判据没做到"，是"上游判据只写了三枚因子中的一枚"。按本仓对承重的操作定义
+（摘掉任意一味还有没有一发变异打不红），三枚因子应当**同权**。记入账 **F-R4-2**，
+最小闭合（到行为级）：给 `grantRoutePrefixes`／`grantRouteSuffixes` 各配至少一枚"删掉它就必须有人响"的
+活证据（形状可照抄 `grantRouteWordWitnesses`），或把乘积式换成逐因子记账（`asked` 必须等于
+`sum over prefixes` 且每枚 prefix 各自贡献 `len(words)*len(suffixes)*2`）。判据级一句话：
+**从这两枚清单里各删任意一枚，全包必须有红。**
+本程不替它改，也不因此判退回（§12 给理由）。
+
+
 
