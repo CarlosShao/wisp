@@ -10,7 +10,7 @@
 | 开工锚点（我读到的 HEAD） | `43a60432ac0c08a8f5f465660e7f30b885cd98ce` | `git rev-parse HEAD` @2026-09-25 10:00(+08) |
 | 条件① 落地 | `304aeec`（`scan_test.go` ＋ 本件 §0-§1） | `git show --name-only 304aeec`，见 §5 首行 |
 | 条件②③ 落地 | `b7c06d2`（`gitignore.go` ＋ 本件 §2-§3） | 同上 |
-| 各节刷新时刻 | §1 的门读数＝`888bbd5`；§2/§3 的行号与工具读数＝`304aeec`→工作树；§4/§5/§6＝`b7c06d2` | 每节现跑，HEAD 每节现查（本仓一天里一直在动，不假定单调） |
+| 各节刷新时刻 | §1 的门读数＝`888bbd5`；§2/§3 的行号与工具读数＝`304aeec`→工作树；§4/§5/§6＝`b7c06d2`；§4.4 复跑＝`cec5e78`；本表的措辞修订与 §5 首行重导＝10:19(+08)、其时 HEAD `479c06b`（他人的证据件，与本批无关） | 每节现跑，HEAD 每节现查（本仓一天里一直在动，不假定单调） |
 | 临时件（只建不删，全在仓库外） | `D:\tmp\d22scan-close-r1\` | `probe\`（真 git 前提台件）／`mut\`（首轮四发变异）／`mut2\`（终稿四发变异，末态已复原并按 hash 三向核过）／`gitignore.go.orig` `gitignore.go.final-orig`（变异前 pristine 拷贝）／`rowA-D.log` `final-rowA-D.log`／`baseline-gate.log` `final-gate.log` `close-gate.log`／`full.lst` `narrow.lst`／`*-code-only*.go`／`roster-before.txt` `roster-after.txt` `roster-close.txt`（盘上现量 3 目录 ＋ 22 文件） |
 
 **地界现量**（开工前）：`git status --porcelain -- tools/d22scan docs/evidence/s1` 空 ⇒ 我接手时这两处无未提交改动；
@@ -213,8 +213,9 @@ M4a＋M1 时同一发当场隐身（第二支没有第一支可替）。
 
 `sh scripts/d22scan.sh` rc=**0**；step 1 **PASS=29 FAIL=0 SKIP=0 === RUN=69**、step 2 八数
 `203/22/40/18 · 32/40/407/39` ⇒ 与 §4.1/§4.2 同值（这一枚是"全部落库之后"的读数，也是下一位复算时对表的那一行）。
-本批三枚 commit：`304aeec`（条件①）→ `b7c06d2`（条件②③）→ `cec5e78`（§4-§6），
-每枚的 `git show --name-only` 现量都只带我自己的路径（`tools/d22scan/scan_test.go`／`gitignore.go`／本件）。
+本批**代码与文字三枚**：`304aeec`（条件①）→ `b7c06d2`（条件②③）→ `cec5e78`（§4-§6），
+之后是只动本件这张表的追加枚（`38f340b` ＝ §4.4 的读数，等）；
+每枚的 `git show --name-only` 现量都只带我自己的路径（前两枚各带一枚 `tools/d22scan/**` ＋ 本件，其余枚只带本件）。
 
 ---
 
@@ -222,7 +223,7 @@ M4a＋M1 时同一发当场隐身（第二支没有第一支可替）。
 
 | 判据 | 现量 | 判 |
 |---|---|---|
-| 我这两枚 commit 的路径 | `304aeec` ＝ `{tools/d22scan/scan_test.go, 本件}`、`b7c06d2` ＝ `{tools/d22scan/gitignore.go, 本件}` ⇒ 全程只我自己地界 | ✅ |
+| 我这几枚 commit 各自带的路径 | `git show --name-only 304aeec b7c06d2 cec5e78 …` 逐枚现量：枚枚只有 `{tools/d22scan/scan_test.go | tools/d22scan/gitignore.go} ＋ 本件`，**没有第四枚路径**；每枚 commit 前 `git diff --cached --name-only` 都单独跑过（见末行） | ✅ |
 | `emojiRe` 那一行 | 四锚（`3bb99aa`/`ca84b75`/`43a6043`/HEAD）抽 `^var emojiRe` 行做 hash **全同 `7355202a062eed144b52bdd81a386800b52643ae`** | ✅ 一字未动 |
 | `allowlist.txt` / `main.go` / `internal/observe/thresholds.go` | `git diff --stat 43a6043..HEAD -- <这三枚>` **空输出**（golden `*.sse` 不在我的路径集里） | ✅ 零新增豁免、零阈值改动 |
 | 断言只增不减 | `scan_test.go` 里 `t.Error*/t.Fatal*` 计数 **164 → 173**（＋9，逐枚在我新加的那枚内）；`git diff --numstat` ＝ **＋101/−0**（删除列为空＝没有一行被删） | ✅ |
