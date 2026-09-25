@@ -185,5 +185,167 @@ $ go vet ./internal/observe/
 （无输出＝干净）
 ```
 
-`newRollingWriter`（`:172`）仍被 `TestRollingWriterSizeRoll`（现读 `logging_test.go:133`）与生产 `InitLogWithRegistry` 使用，
+`newRollingWriter`（`:172`，把 `time.Now` 烧进去的那一枚）仍被 `TestRollingWriterSizeRoll`（现读 `logging_test.go:133`）与生产 `InitLogWithRegistry` 使用，
 换掉本用例这一处调用**不产生未使用符号**（vet 已证）。
+
+---
+
+## 8. 兄弟炸弹普查（派单 `next=①` 点名要的那枚"枚数"）
+
+**本节时刻锚点**：`2026-09-25 08:4x +0800`，HEAD `038eb02`（+ 我这枚未提交的证据文件）。
+普查在 §6 的修后树上跑，也在 `HEAD~1`（修前）上重跑过对照，两组的差只可能是本票那 3 枚字面量。
+
+### 8.1 扫了哪些形状（每形的**现跑枚数**，不是目测加总）
+
+| 形状 | 命令要点 | 现测量 | 处理 |
+|---|---|---|---|
+| 紧凑 `YYYYMMDD` | `grep -rEno '2[0-9]{3}(0[1-9]|1[0-2])(0[1-9]\|[12][0-9]\|3[01])' --include='*.go' internal cmd tools` | **修前 6 枚 → 修后 5 枚** | 逐枚分类见 8.2；5 枚里有 1 枚是 Go 参考布局 `20060102`（`logging.go:33`，惰性）、1 枚是**我新写的注释里复述死掉的那枚 `20260918`**（`:193`，惰性）⇒ 真夹具 5→3 |
+| ISO `YYYY-MM-DD` | 同域同法 | **48 行命中** | 拆：**30 行是注释正文**（记的是裁定/测量日期，惰）＋**18 行是代码行**，18 里再减 **6 行 Go 参考布局**（`prompt.go:262`／`retention.go:209`／`retention_test.go:136,137,138`）⇒ **真 ISO 字面量 12 枚**，逐枚见 8.3 |
+| `time.Date(` | `grep -rEn 'time\.Date\('` | **6 枚**（修前后同数；炸弹那枚 `time.Date(2026,1,1,…)` 被换成 `fixedNow` 派生，本文件仍留 2 枚 `time.Date`） | 逐枚见 8.4 |
+| `time.Unix(` | `grep -rEn 'time\.Unix\('` | **13 枚** | 8.4 末行：全是注入的假时钟或纯换算 |
+| 相对窗 `Add(-N*24h)`（测试里） | `grep -rEn 'Add\(-?[0-9]+ \* 24 \* time\.Hour\)' --include='*_test.go'` | **修前 0 枚 → 修后 2 枚**（都是我的 `oldDay`/`freshDay`，锚在注入时钟上） | 见 8.5 那条"相对形"单独结论 |
+| 混合启发式（同文件既有日期字面量又调 `time.Now()`） | 两遍 grep 取交集 | **3 个文件** | 这把"哪枚日期真的挨着活时钟"的合同收缩到 3 份文件里逐一读码，是 8.2–8.4 定性成立的依据 |
+| 覆盖面 | `grep -rEl` 三种形状任一 | **38 个文件**含日期形状 | 38 文件全部过一遍上面 5 形，无遗漏 |
+
+**分类结论（本程实际量到的）**：
+
+- **(1) 炸弹：1 枚用例／3 枚字面量** —— 就是本票修的 `TestRollingWriterRetentionSweep`
+  （`:190` `20260101`、`:198` `20260918` 两枚夹具名，加 `:194` 那枚配套 mtime `time.Date(2026,1,1,…)`）。
+  **除它之外，全仓 `internal`/`cmd`/`tools` 再没有第二枚炸弹。**派单"一枚写死的日期不会是唯一一枚"这一条**没有兑现**：
+  这个形状确实成族（见下"同族病"），但成族的是**同一个函数的历史病例**，不是散落的兄弟。
+- **(2) 安全：其余全部**（紧凑 3 枚 + ISO 12 枚 + `time.Date` 4 枚 + `time.Unix` 13 枚 = **32 枚站点**，逐条见 8.3/8.4）。
+- **(3) 已过期但仍绿：0 枚。** 判据是读码给出的、不是"它现在是绿的"给出的：
+  一枚夹具要落进 (3)，必须"它已经出窗，而断言恰好因此变得空洞"。全仓只有 `sweepLocked`（`logging.go:317`）
+  与 `memory/retention.go` 两套日期淘汰逻辑，后者**已经**是相对形（8.5），前者只有本票这一枚用例在测——
+  ⇒ 没有第三处日期淘汰码可被写空，(3) 天然为 0。
+- **⚠ 同族病（已修，但不是"兄弟"）**：`TestRollingWriterDayRoll` 的注释（现读 `logging.go:176-180`）逐字记着
+  它当年正是**同一枚病**——"green only on the two dates its fixture hardcoded"，修法是那枚 `newRollingWriterClock` 缝。
+  ⇒ 本票的修法不是新发明，是把同一剂药打到这个函数剩下的那一枚用例上。**这也解释了为什么只剩 1 枚**：这一族早被清过一轮。
+
+### 8.2 紧凑日期逐枚（修后剩下的 5 枚）
+
+| 站点 | 值 | 类 | 为什么（读码，非猜测） |
+|---|---|---|---|
+| `logging.go:33` | `20060102` | (2) | Go 的**参考布局**（2006-01-02 是 Go 规定的那个绝对时刻），不是日期；它定义 `logDayLayout` 本身 |
+| `diagnostics_test.go:24` | `20260919` | (2) **但见下方"潜伏"警告** | `BuildDiagnosticsBundle` 抄日志那一段（`diagnostics.go:99-130`）**没有任何日期谓词**：它按前缀/后缀挑文件、只按 `MaxLogBytes` 跳过大文件。`o.Now` 只喂 `manifest.json` 的 `created_at`（`:69-71`、`:88`），而用例不断言那一句 ⇒ 文件名里写哪一年都不承重 |
+| `logging_test.go:183`（两枚） | `20260919`/`20260920` | (2) | DayRoll 的**期望渲染值**，两侧都由注入时钟 `day1`/`day2`（`:159-160`、`:172`）生成；窗内两枚文件相对注入时刻同向，且 boot sweep 用的是注入时刻 ⇒ 墙钟再走也不翻 |
+| `logging_test.go:193` | `20260918` | (2) | **是注释**——我在 §2 里复述那枚死掉的常量做溯源。惰性的，但**会**被下一轮同样的 grep 命中，所以在这里先自报，别被当成第二枚炸弹 |
+
+> **潜伏项上报（不属本票射程，故不改）**：`diagnostics_test.go:24` 现在是 (2)，
+> 但它是**同一枚引信只是还没接上药**：诊断包未来若加"只收最近 N 天日志"这类特性（`BundleOptions.Now` 已经在场，
+> 加日期谓词是一行的事），这枚 `20260919` 立刻变成第二枚炸弹，而且**今天这枚的翻脸时刻表它要重走一遍**。
+> 我没动它，因为今天那条特性不存在、改了就是给一段没有的行为写守卫（过度工程）。归编排者决定要不要立账。
+
+### 8.3 ISO 日期字面量逐枚（12 枚真代码行）
+
+| 站点 | 值 | 类 | 判据 |
+|---|---|---|---|
+| `llm/anthropic/adapter.go:90` | `2023-06-01` | (2) | `anthropic-version` 请求头常量，协议规定的绝对值；与墙钟无关 |
+| `memory/dao_test.go:413,416,422` | `2026-09-19` ×3 | (2) | `BumpCostDay`/`CostDay` 的 `day` 是**主键参数**：`dao_misc.go:154-166` 是 `WHERE day=?` 的纯查，**不默认今天** ⇒ 任意时刻同结果 |
+| `memory/dao_test.go:429` | `2026-01-01` | (2) | 同一枚纯查的**反控制**（断言那行不存在）；它不是"相对窗"，是"没种过的键" |
+| `models/downloader_test.go:550` | `tiny-model-2024-01-01` | (2) | 上游产物**名字**的一部分，测的是解包扁平化，不读时钟 |
+| `models/manifest_real_test.go:42` | `…-3.3M-2024-01-01` | (2) | 同上，manifest 里的模型键名 |
+| `models/minisign_test.go:27` | `timestamp: 2026-09-19` | (2) | 签名 payload 的**注释字段**，签完再验同一段文本；不是时间戳判定 |
+| `panel/approval_test.go:148` | `2026-09-21T13:00:00Z` | (2) | 结构体字面量字段，只做 JSON 往返（`Marshal`→`Unmarshal`→`DeepEqual`）。**且 `internal/panel` 的生产码里 `time.Now` 现量 0 处**（grep 全包空），时钟只能从 `NewSnapshot(…, now)` 参数进 ⇒ 永不出窗 |
+| `observe/thresholds.go:103` | `2026-09-19` | (2) | `Note:` 字段里记 SLO 裁定日期的**散文**，不是判据。⚠ 而且 `AGENTS.md` §1.1 明写 `thresholds.go` 一字节都不许动 ⇒ **本程对它零改动**；普查扫到它、并**刻意不碰**它，这两件事都要记下来 |
+| `tools/d22scan/main.go:370,378` | `2026-09-21`/`2026-09-25` | (2) | 在**字符串里的散文**（"armed by ticket 88 on …"），是 `note:` 文案，不是判据。⚠ `tools/d22scan/**` 此刻由另一枚验收程持有，本程**只读不写**，这里只给它定性 |
+
+> 上表 12 枚逐枚对上 8.1 那笔"18 代码行 − 6 参考布局 = 12"的算术，**枚枚具名、无一项是目测加总**。
+
+### 8.4 `time.Date` 6 枚 / `time.Unix` 13 枚
+
+| 站点 | 类 | 判据 |
+|---|---|---|
+| `observe/logging_test.go:159` | (2) | DayRoll 的 `day1`，**是注入时钟本身**（`:165` 进 `newRollingWriterClock`），不是"最近的"墙钟替身 |
+| `observe/logging_test.go:199` | (2) | 本票新增的 `fixedNow`，同上——它是**锚**，其余两枚夹具由它派生 |
+| `agent/prompt_test.go:54,57` | (2) | `TestCachePrefixIsByteStableAcrossTurns` 用两个固定时刻造两 turn，断言**缓存前缀字节相同**（时间必须落在 volatile 尾巴外）。`agent/prompt*.go` 生产码不读 `time.Now`（现量：全 `internal/agent` 只有 `approval.go:38` 的 `SystemClock`、`loop.go:1108` 的 id 发生器、`tools.go:134` 的 EchoProvider 出厂戳，都不在 prompt 组装路径上）⇒ 纯函数固定输入，永不出窗 |
+| `panel/composer_test.go:209` | (2) | 传给 `NewSnapshot(…, now)`，`composer.go:83` 只把它渲染成 `GeneratedAt` 字符串；该断言看的是 mode/workspace/附件，不比时间 |
+| `perm/store_test.go:104` | (2) | 注入 `Options.Now` 给**审计戳**用：`store.go:283-288` 的 `stamp()` 只在 `now==nil` 才落 `time.Now`。perm 里**没有任何 TTL/过期判定**（`grep 'Now\b'` 非测试文件只命中那三行声明/装配）⇒ 绝对值输入，惰 |
+| `time.Unix` 13 枚 | (2) | 三类，全是惰的：①假时钟基值 `time.Unix(0,0)`/`(1700000000,0)`（`approval/fakes_test.go:39`、`prompt_test.go:128,165,228,317`、`llm/matrix_14_2_test.go:67`、`ratelimit_pace_test.go:125,213,252`、`observe/earlylog_130_test.go:97`）——`earlylog` 那枚的用途是"严格递增的可分辨时间戳"（同文件 `:86-88` 注释写明），只断言**顺序**；②生产换算 `memory/dao_providerhealth.go:213,217`（存进库的 unix 秒读回来）；③`secret/ctime_windows.go:24`（NTFS FILETIME→time.Time，纯换算；全 `internal/secret` 无一处把它和窗口比） |
+
+### 8.5 相对形（`now.Add(-N*24h)`）单独一条结论
+
+`memory/retention_test.go:136-138` 是唯一用相对形搭窗内/窗外的族（`-399/-400/-401*day` 对 `CostTTL`），
+它做对了一件本票该学的细节：`:117-120` **先播种、再把时钟钉成播种时读到的 `observe.NowWallUTC()`**，
+并注入 `RetentionConfig{Now: …}`（`:150`）⇒ 播种与 cutoff 同源自同一枚钉住的时刻，**跟着墙钟走而不是挨着墙钟写死**。
+⇒ 类 (2)，**不动**。派单问的"相对形是否跨 UTC 午夜耦合"：这一族不耦合，因为它压根不比真实午夜，它比的是自己钉住的那一枚。
+（同文件 `:200-201`、`:238` 用 `time.Now()` 做轮询预算与播种，是另一件事；`:200` 那对
+`deadline := time.Now().Add(2*time.Second)` / `for time.Now().Before(deadline)` 是**用墙钟差实现超时**的形状，
+与 `AGENTS.md` §1.2 那条禁令同形——**本程未动、也未判定**，因为它在 `internal/memory`，越出派单给我
+"stay inside `internal/observe/**`" 的范围；**具名上报，请编排者归位**。它不是日期炸弹，不会在某一天翻，
+但它是那一族被 CI 禁的形状。）
+
+---
+
+## 9. 归因：这枚红是**墙钟漂移今天新造的**，不在任何已计数的名册里
+
+派单要的那句判定：**新红，且不是此前被计数的那批失败之一。**三条独立证据链：
+
+1. **名册里没有它。** 全 `docs/` 搜这枚用例名，只命中两处，且**两处都是今天由编排者本人写的**：
+   `docs/evidence/s1/136-ac15-rate-r1.md:567`（§5.1，08:1x）与 `docs/reports/pending-and-issues.md:5890`（`A212③`，08:3x）。
+   ⇒ 它**从未进过** `test-windows` 那批具名红（台账 `:5404` 的 17 枚、`:5513` 降到 16 枚、`:5743` 提到的 12 枚 FAIL），
+   也不在 `A52③`（`:2639`）那批 `test-core` 归族红里——那几处的名单里都没有 `internal/observe` 的任何用例。
+   编排者自己在 `A212③` 写的原话是"**不在任何登记里**，我已 08:22 现场复现"，与本程独立核对一致。
+
+2. **覆盖它的那道门是 `test-core`，不是 `test-windows`**（这一条把 `136-ac15-rate-r1.md` §5.1 末尾**明说没查**的那一半查完）：
+   ```
+   $ grep -n 'observe' .github/workflows/ci.yml          → 空（ci.yml 从不按名点名 internal/observe）
+   $ grep -rn 'internal/observe' scripts/ .github/workflows/
+        scripts/portable-tests.sh:140   （包清单里）
+        scripts/portable-tests.sh:175   （core scope：./internal/observe/...）
+   $ awk 定位 → ci.yml:288  bash scripts/portable-tests.sh --scope=core
+                ci.yml:458  bash scripts/portable-tests.sh --scope=windows
+   $ sed -n '184,188p' scripts/portable-tests.sh   → windows scope 只有 proc/secret/config/risk/ball/perm/plugin/cmd/llmrecord，**不含 observe**
+   ```
+   另一条 `./...` 型步骤（`ci.yml:81`）是 `runtests.sh -C tools/d22scan ./...`，**那是 d22scan 自己那个 module**，
+   摸不到 `internal/observe`。⇒ **全 CI 只有 `test-core` 一步覆盖它**，`slo-*`/`lint*` 都不跑 Go 测试。
+
+3. **`test-core` 是今天从绿翻红的**：`ci.yml:224-225` `test-core: runs-on: ubuntu-latest`，
+   而台账 `:5407`（对已推 run `35967768017` 的读数）明记 **`test-core`/`slo-smoke`/`slo-full`/`lint-frontend` 绿**、红的只有 `lint`/`test-windows`。
+   ⇒ 后果比"又一枚存量红"更重：**一枚本来绿的 job，因为日期走到 2026-09-25 00:00 UTC，在没有commit、没有改动的前提下翻红**。
+   翻脸分钟数与编排者一致：`136-ac15-rate-r1.md` §5.1 量到 A08 批（07:46–07:57）零枚 `--- FAIL`、A08b（08:00 起）发发红，
+   两批之间 `git diff beac693..HEAD -- internal/observe/` 全程为空——**这条是归因最硬的一块**，本程不重复取它。
+
+> ⚠ 一处**平台差**值得记给台账，免得将来对不上数：本机（Windows）红点是 `logging_test.go:216`（旧行号）的
+> `fresh file wrongly pruned`，而 M1/M4 那两发变异让我量到——**同一段生产逻辑在 Windows 上会先撞上活文件锁、
+> 把红点挪到 sweep 的错误返回**（本表 §5）。`test-core` 跑在 ubuntu-latest，Linux 上 `os.Remove` 对打开文件不报错，
+> 所以 **CI 上的红点会是那条干净的 `fresh file wrongly pruned` 断言**，与本机形态不同、结论相同。
+
+---
+
+## 10. 总判
+
+**改了什么**：`internal/observe/logging_test.go` 里 `TestRollingWriterRetentionSweep` 一枚函数体（`+23/−5`）。
+两枚夹具名从墙钟字面量（`20260101`／`20260918`）改为**由注入常量 `fixedNow` 派生**（`-12d` 窗外／`-2d` 窗内），
+构造子从 `newRollingWriter` 换成 `newRollingWriterClock(dir, 0, 7, func(){return fixedNow})`；配套 mtime 同改为派生日。
+**生产码零改动**——那枚缝本来就够（`ensureFileLocked`/`sweepLocked`/`Close` 全走 `w.now()`，用例不起 `flushLoop`）。
+**断言一条没松**：仍是"窗外必删／窗内必活"两条相反断言；无 Skip；`days=7`、`retentionSweepPeriod`、`thresholds.go`、
+golden、`tools/d22scan/allowlist.txt` 一律未动。
+
+**兄弟普查的数**（现量，非目测）：**炸弹 1 枚（即本票那枚，含 3 枚字面量）；安全 32 枚站点；已过期但仍绿 0 枚。**
+扫过的形状与枚数：紧凑 `YYYYMMDD` 6→5 枚（内含 1 枚 Go 布局 + 1 枚我自己的注释复述）、ISO 48 行命中拆出 **12 枚真字面量**、
+`time.Date` 6 枚、`time.Unix` 13 枚、测试里的相对 `Add(-N*24h)` 0→2 枚（都是我的）、含日期形状的文件 **38 个**。
+派单"一枚写死的日期不会是唯一一枚"这一条**没有兑现**：成族的只有同一函数的历史病例 `TestRollingWriterDayRoll`（已由 `newRollingWriterClock` 治过），
+本票是把同一剂药打到该函数剩下那一枚用例上。另上报 **1 枚潜伏**（`diagnostics_test.go:24` 的 `20260919`，今天惰性，
+一旦诊断包加"只收最近 N 天"就复燃）+ **1 枚形状越界**（`memory/retention_test.go:200-201` 的墙钟差超时，越出本程 `internal/observe/**` 射程，未动未判）。
+
+**四数（同命令 `-count=2 -v`，两趟都是 71 枚 distinct）**：
+修前 `rc=1 / RUN=142 / PASS=140 / FAIL=2 / SKIP=0 / ^panic:=0` →
+修后 `rc=0 / RUN=142 / PASS=142 / FAIL=0 / SKIP=0 / ^panic:=0`。distinct 名册 **71→71，未缩、未增**；
+两趟 `^panic:` 都是 0，所以本包这次**不存在**"panic 吞掉兄弟读数"的缺口（与 `A212` 那枚空切片形状不是同一件事）；
+修后与编排者 09-24 22:52 记录的 142/142/0/0 基线（`:5767`）逐字对齐。
+`gofmt -l` 对我碰过的文件为空，`go vet ./internal/observe/` 干净。
+
+**我没测什么（不许读成"已测"）**：
+1. **没在真实未来的墙钟上跑过**。未来免疫靠两件事论证——结构（注入常量覆盖该路径全部时钟面）+ 那发把 `fixedNow` 挪到 **2031** 仍绿的实证；
+   我**没有**、也无法在本机改系统时钟来复现 2026-09-26 之后。
+2. **没跑 CI**。§9 的 job 归属是把 `ci.yml`／`portable-tests.sh` 的射程**读码**读出来的，不是 `gh run view` 量出来的；
+   本程按派单**只 commit 不 push**，`test-core` 翻绿要等编排者推。Linux 侧红点形状（§9 那条 ⚠）同理属**推演**，未实测。
+3. **没测 `flushLoop` 里那枚每小时的定期 sweep**（`logging.go:301`）——它由 `w.now()` 驱动、需要 registry/计时器才走得起来，
+   本票这枚用例从来不调它，我也没为它新增用例（不在派单射程）。**"retention 在长跑进程里是否正确"这条，本包今天仍无覆盖**。
+4. **没重跑另外 4 形之外的存储侧日期逻辑**：`memory/retention.go` 我只定性到"相对形＋播种后钉时钟＝安全"，
+   **没有**跑 `internal/memory` 的测试来证明（越界，且 `A212⑤` 明说本包与 `AC#15` 那程共享工作树，越跑越野）。
+5. **没测 `A212④` 那枚 `AC#15` 抖动**：修后两趟整包 0 FAIL，所以我**没**撞见它，也**不能**据此说它好了或坏了——
+   它的 4/8200 命中率不是本包 `-count=2` 量得出的样本（8200 发才是）。按 `A212⑤` 的顺序，它在**本票落地之后**才派。
+6. 变异那 5 发是**同一枚 sweeper 的 5 种打断**，不等于"sweepLocked 的所有可能错误都能被这枚用例抓到"；
+   我只证了派单点名的那一形（永远删／永远留／窗缩／无视注入时钟），**没做穷举变异**。
