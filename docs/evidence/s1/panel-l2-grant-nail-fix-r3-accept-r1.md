@@ -164,3 +164,45 @@ nail standing 又抹掉，那一发实测等同 T-E"）**在这台机器上是�
 
 ⇒ 简报那句"点名'这把尺的存活由它自己守'是不是够"——我的裁法：**枚数级不够、清单级不够、清空级（两枚因子）够**。
 补齐只需要两行，见 §9 的 F-ACC-1／F-ACC-2。
+
+---
+
+## §2 攻点 2：§2.4 选"删"那一支的反噬 —— **判"挪"不判"删"；独占性的三种暴露里只有一种真裸**
+
+### §2.1 ⓐ 删掉那三行之后，植物 F 那枚 subtest 还剩什么在主张
+
+按枚数（脚本 `git show <rev>:…` 取块，块＝`t.Run("F a route named outside the guard` 到其 `}`）：
+
+```
+A 版（81ad6fd^，进场版）：块内 24 行、断言 5 枚  {t.Fatal, t.Fatalf, t.Error, t.Errorf}
+B 版（121006d，交付版）：块内 21 行、断言 4 枚  {t.Fatal, t.Fatalf, t.Errorf}
+少的那一枚＝被搬走的那句 t.Error（与 §6 全局尺 t.Error 2 -> 1 同一枚，不是第二枚）
+```
+
+剩下四枚主张的仍是"pool 那半边"，逐枚点名（交付版行号）：`:1884` 副本 parse 不掉就 `t.Fatalf`、
+`:1886` `requireReadableInstrument`（读不动树就响亮失败）、`:1889` **pool 没在别的函数里看见这枚名字就 `t.Fatal`**、
+`:1892` pool 必须报出在哪个文件找到它（`t.Errorf`）、`:1895` 快照里守卫自己的 case list **不许**把这枚植进去的链
+解析成已答（`t.Errorf`）。⇒ **"pool 那半边"照旧被钉住，没有因为删三行而少问一个形状。**
+
+**并且没有任何形状从此没人问**：被删那句问的是"真守卫不许答 `panel.review.allow`"，而这枚名字
+**落在新测试那张网里**（`panel.review` × `allow` × `""` × 单数）——不是我推的，是我在**自己的副本**里
+把 M14 打进去现量到的（§3 的 T-B 那发 `hits=[panel.review.allow]`）。
+反向也成立：交付版在 M14 树下，植物 F 那枚 subtest **照旧 PASS**
+（`out/T-B-M14.txt:247` `--- PASS: TestPlantedGrantWiringGoesRedInASnapshot/F_a_route_named_outside_the_guard_still_reaches_the_pool`，
+同发 A/B/C/D/E/G/H 七枚 subtest 也全 PASS）⇒ 搬走那半句没有把快照那台仪器一起拖走。
+
+### §2.2 ⓑ 禁令独占在新测试里 ⇒ "改名 / t.Skip / 整段摘掉"三种情况各有没有人响
+
+| 情况 | 我怎么打 | 现量 | 谁响 |
+|---|---|---|---|
+| **整段摘掉** | `scripts/mut.py standing-out`（helper 故意留在原地），再叠 M14／M16 | `out/T-C2-out-M14.txt`、`out/T-E-standingout-M16.txt`：`FAIL=0`、**全包包内一声不响** | **只有被摘那枚**。⇒ 承重成立（这是本格的正解），但见下两行的不对称 |
+| **被改名** | `func TestRealGuard…` → `func notARealGuardRefuses`（锚点全留，编译照过） | `out/V6-rename-clean.txt`：RUN 99→98、红 0；**再叠 M14**：`out/V6-rename-M14.txt` 仍 0 枚红 | **没人响**。包内没有第二枚测试钉"这枚用例存在"；`grantRouteSuffixes` 之外，我把 `scripts/`、`tools/`、`.github/workflows/` 全 grep 过一遍，**没有任何一道门把顶层用例名册钉成常量**（`portable-tests.sh` 的 census 只数每包 PASS/FAIL 枚数，−1 那枚混在里面看不见） |
+| **被 `t.Skip`** | 测试第一行插 `t.Skip(…)` | `out/V7-skip-clean.txt`：SKIP=1，而 **`go test ./internal/panel/` 退出码 = 0**（Go 把 SKIP 记成 ok）；换成 CI 那把严尺 `bash tools/d22scan/runtests.sh ./internal/panel/ -run TestRealGuard…` ⇒ **rc=1**，原文 `runtests.sh: 1 test(s) SKIPPED and SKIP is not a pass (ticket 71 AC#3)`；**同一道命令在干净钉上 rc=0**（正控，`out/T-A-runtests.txt`） | **CI 那一步响**（`scripts/portable-tests.sh:80` 把 verdict 交给 `runtests.sh`，`--scope=core` 的名单里逐字写着 `./internal/panel/...`，同文件 `:179`）。⇒ 这一形不是裸的 |
+
+⇒ 三种里只有一种真裸，而那一种是**全仓通用形状**（任何一枚 Go 测试被改名都不会有人响；本仓至今是靠
+"名册差集 +1/−0"这一枚人工动作在防，实现件 §1.2 自己就做了那一步）。它**不是本批独有的洞**，
+所以我不拿它当退回理由；但**它使 §2.4 那句"删掉才量得出来"变成一条必须长期保留的账**：
+这枚新测试一旦被改名，`out/V6-rename-M14.txt` 那种"守卫真答了 panel.review.allow 而全包绿"的读数会**静默回来**。
+另记一枚附带的自指残留：交付版里那枚名字被 6 处文字引用（`:47`/`:95`/`:1250`/`:1288`/`:1865`/`:1898`，
+最后一处在 `t.Logf` 的**字符串**里），改名之后这 6 处全部指向一枚不存在的测试而无任何人响——
+形状与验收件 r2 §7.3 记过的那枚"`bridge.go:33` 指向不存在的用例"同类，属读数/文档级。
