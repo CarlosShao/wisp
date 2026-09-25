@@ -167,7 +167,7 @@ export function Composer({
           onChange={(e) => void attach(e.target.files)}
         />
         <span className="text-ink-3">
-          支持 {state.acceptedAttachmentMimes.join(" / ")}，单个 <= {bytes(state.maxAttachmentBytes)}
+          支持 {state.acceptedAttachmentMimes.join(" / ")}，单个 {"<="} {bytes(state.maxAttachmentBytes)}
         </span>
         <button
           type="button"
