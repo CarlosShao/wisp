@@ -188,3 +188,103 @@ $ sh scripts/d22scan.sh                               → rc=0
 `git diff -U0 95885fb^ 1e94672 | grep '^[+-].*(subjectGrace|subjectReportBudget|subjectPollInterval)'`
 只命中 4 行、**全是引用处不是定义处**（两 `-` 两 `+`，即"把两枚数挪进 `collectReportWithin` 实参"那一步）
 ⇒ **没有用放宽预算当修法**。
+
+## 2　AC#2 修法只有一个方向 —— **成立**
+
+票面这一格的四条约束，本程**逐条**用自己的现量判，不采信自证件的表格：
+
+| AC#2 的约束 | 本程现量 | 判定 |
+|---|---|---|
+| 只许"没写完留预算里重读 / 坏了当场红"这一个方向 | §0.3 ACC2（修后 spending 33s 重读、修前一发即死）＋ ACC3（尾巴真到达时修后收到、修前丢掉）＋ ACC5 三态 tally | 成立 |
+| 两者**分得开且有凭据** | `readSubjectReport` 的边界是 `errors.Is(err, io.EOF)/io.ErrUnexpectedEOF`（本程现量在 `post/cmd/wisp/slo_windows.go:625`，**类型化错误、不是字符串比对**）；凭据是 `subjectReportRead{bytes, offset}` 随最后一发一路带进错误句 | 成立 |
+| 不许"解析失败就 `continue` 到预算尽头"而不留最后一发读数 | 见下面"AC#1/AC#3 变异复量"那一节的 N2 一发：本程把那一支真造出来量过 | 成立 |
+| 不许加 `t.Skip`、不许动阈值/预算常量当修法 | `grep -c 't\.Skip' cmd/wisp/slo_report_144_windows_test.go` = **0**；那把尺的正控＝同包另外三枚文件里 `t.Skip` 命中 1/1/2 枚（尺能命中）；三枚预算常量在两棵树定义逐字相同（§4 末） | 成立 |
+| fail-closed 不许放宽 | 最外层那句 `in-tree record unavailable (fail-closed, no silent downgrade to the tree basis)` 现量在 `post:394`，`git diff 95885fb^ 1e94672 -- cmd/wisp/slo_windows.go` 里**既无 `-` 也无 `+` 命中它**（唯一命中 `fail-closed` 的是新注释那一行 `+`）；`internal/observe/**`、`*thresholds.go`、`*golden*` 在本票区间 `git diff --name-only` **读空** | 成立 |
+
+**"分得开"这句话本程不是读注释判的，是把两侧各问一遍判的**：
+正控侧 = §0.3 的 1949 字节真前缀 ⇒ `unwritten`；
+反控侧 = ACC5 顺手问的一发（`<html>…`，17 字节）⇒
+
+```
+ACC5 corrupt branch: state=corrupt offset=0 summary="17 bytes read, report corrupt:
+   17 bytes contradict a subject report at offset 0: invalid character '<' looking for beginning of value"
+```
+
+⇒ 两态给的是**两个不同的句子、两个不同的动作**（一个回预算、一个当场红），
+且红句点名"这些字节自相矛盾"，不是"再等等"。这一格本程没有异议。
+
+⚠ 一处**本票自己已在册、本程复算相符**的软处：`subjectReportRead.summary()` 的 `unwritten` 那一支
+写的 `…at offset %d…` 里的 `offset` **在 unwritten 分支上不携带信息**（详见 §6 那一格，本程用全 1978 枚前缀量过）。
+它**不构成 AC#2 违背**（AC#2 要的凭据是"分得开"，AC#1ⓐ 要的是"预算＋字节数"，两样都在），
+但它让 AC#5 新注释的最后那句（见下一格）说了一件实现没做到的事。
+
+## 5　AC#5 那句注释 —— **成立（但新注释自己多带了一枚过期承诺，见 §6）**
+
+```
+$ grep -rn "never races" prer/cmd/wisp/      → :522 "// window, so this never races the observer's last sample."   hits=1
+$ grep -rn "never races" snap/ --include=*.go → 0 命中                                                        hits=0
+```
+
+⇒ 被点名那句**已从代码里删掉**，且那把尺先拿"它确实在修前树里"打过正控（不是"正则恒不匹配"那种空核验）。
+
+新措辞现量在 `post/cmd/wisp/slo_windows.go:663-681`（`collectReportWithin` 头上）。票面 AC#5 要的两件**都在**：
+① **分得开的是哪两种状态** ⇒ "reportUnwritten stays inside the budget and is re-read.
+reportCorrupt returns an error on the spot"；
+② **为什么"文件存在"不等于"报告完整"** ⇒ "'the file is there' and 'the bytes are all there' are two different
+states (os.WriteFile creates the file, then fills it)"，并且把原来那对错了的观察者换成了
+"the race this loop has to handle is not observer-vs-observer, it is reader-vs-writer"。
+⇒ **AC#5 成立**。
+
+⚠ 但同一段注释的最后一句写着：*"if this gives up, the sentence names the budget it spent,
+**the byte count of its last read and where inside those bytes the document stopped**"*。
+本程量到的第三样**不成立**：`unwritten` 分支上"文档停在哪一字节"恒为 0（§6 那一格给全 1978 枚的分布）。
+⇒ 这是**同一枚票刚修掉的那类毛病的自家用版**——注释写了一件实现没保证的事。
+它不推翻 AC#5（AC#5 只要求"改掉 never races ＋说明那两件事"，两条都满足），
+但它把 §6 那一格里"要不要修 offset"从" cosmetic 取舍"抬成"注释与实现不一致"，
+**本程因此不采纳"改了只会弄乱凭据"作为不改的充分理由**（理由本身合不合规矩，见 §6 的判定）。
+
+## 7　常规必查两轴 ＋ 一枚与本票叙述不符的 commit 形状
+
+**轴① 已有断言有没有被动过方向**（只许加、不许减、不许把极性改成永真）：
+本程不读自证件的自述，直接用树对树：
+`git diff --name-status 95885fb^ 1e94672 -- cmd/wisp/` 只有 `A`（新增那枚测试）＋ `M slo_windows.go` 两枚
+⇒ **没有任何既有测试文件被改**，既有的 `if rep.Report == nil` 那一腿在 `post:644` 仍在（本程现量、
+且 MD 那一发变异证明它今天仍在响）。`thresholds.go`／golden／`internal/observe/**` 本票区间零改动（§2 表末行）。
+⇒ **轴①：没有放水**。
+
+**轴② 用的 helper 是不是原有那枚**：夹具走**主体自己那枚序列化器**
+（`json.MarshalIndent` 的入参是 `sloRun`+真 `observe.StateReport`，与 `writeSLO` 同一调用；本程 ACC1 用真
+`writeSLO` 落盘又量了一遍同一形状，两者形状一致）；循环那一侧 `TestSLO144LoopGiveUpSentencesOnRealFiles`
+用**真文件＋真 `os.ReadFile`**（走 `collectReportWithin`，只是把预算收进参数），
+`…CorruptReportIsJudgedOnTheFirstRead` 用**新增的 `readReportFile` 接缝**——
+本程核过那一枚接缝**在生产里是 `nil`**（`post:686-688` `if read == nil { read = os.ReadFile }`）
+⇒ 不是"用 mock 代替真的"那一形。**轴②：过。**
+
+**⚠ 与本票叙述不符的一处（这是本程造出来的洞，不是怀疑）：`a91d7c2` 不是"只有空白"那一枚 commit。**
+
+```
+$ git diff -w a91d7c2^ a91d7c2 -- cmd/wisp/slo_report_144_windows_test.go
+   → 非空：新增 6 行注释 ＋ 把夹具从 2 字段扩到含 Samples/Verdicts/SubjectPID 等，
+     并把原来那一发 `if !strings.Contains(doc, `"report"`)` 换成
+     `len(doc) < 300` 前置 + 5 枚字面量循环
+$ git diff a91d7c2^ a91d7c2 --numstat     → 42 插入 / 13 删除
+$ <两版各 tr -d 所有空白后 cmp>           → differ: byte 1406   ← 剥掉全部空白也不相同
+```
+
+票面（Progress log 续程段）与证据件 §4.2 都写着 **"改动只有空白（前后两版 `diff -w` 逐字相同）"**，
+commit `a91d7c2` 的标题句是 **"复量与票面不符，只改对齐"**。**两句都不成立。**
+真实形状：`a91d7c2` 把**前一程未提交的夹具升级（+36/−7）与 `gofumpt -w` 的空白改动混进了同一枚 commit**，
+所以"只有空白"是对**半枚**改动的描述，被当成了对**整枚**改动的描述。
+
+**实质影响本程判过：没有放水。** 那处替换把一发断言换成**更严**的三件
+（长度下限 ＋ 5 枚字面量，原来那枚 `"report"` 仍在集合里），极性没变、没减；
+且 §0.3/§4 里"1978 字节"这个分母**正是这次升级的产物**——
+本程在 `1e94672` 树上现量夹具 = **1978 字节**（ACC5），与全件所有引用相符。
+**被记进的账**：一处"自证凭据是空白-only"的陈述为假 ⇒
+它同时是 §4.2 那三行"gofmt/gofumpt 全空"读数的**适用范围问题**（见下），
+所以**AC#4 那一格本程按"成立"出，但把这一处按缺陷退回给编排者**（缺陷在证据件与票面的措辞，不在码）。
+
+顺带把 §4.2 那三行的适用范围钉清楚（本程现量，且是**改后现树**）：
+`gofmt -l cmd/wisp/` 空、`gofumpt -l cmd/wisp/` 空、`gofumpt -l . tools/d22scan tools/mockllm` 空——
+**三发都在 `1e94672` 的 archive 树上取的**，不是"升级夹具之前"。
+前一程那三行读数确实过期（续程自己也这么写），但**过期已被现量补上**，这一处不再挂账。
