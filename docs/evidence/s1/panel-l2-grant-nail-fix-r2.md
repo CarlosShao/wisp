@@ -195,7 +195,7 @@ commit 后本件的行号会继续漂，引用时以 `l2_grant_boundary_test.go`
 | 待验断言 | 我的命令 | 现量 |
 |---|---|---|
 | "全包只有 `bridge.go:79` 一处 json.Unmarshal" | `grep -rn "json.Unmarshal" internal/panel/*.go \| grep -v _test.go` | **1 处**，`bridge.go:79`，目的 `&r`（`var r ComposerRequest`）⇒ 成立 |
-| 换尺之后**今天**的入站集合会不会变 | 见下表的两把判据在同一棵树上的外延 | **完全相同**：`{ComposerRequest}` ∪ 闭包 `{AttachmentPayload, AttachmentRef}` ⇒ **这不是收紧也不是放宽，是把同一格外延换了个判据**，M6/M7/M13 三枚植物从此进射程 |
+| 换尺之后**今天**的入站集合会不会变 | 临时探针 `zz_seedcomparison_probe_test.go`（跑完 `mv` 进 `removed/`）在同一棵树上并排算两把判据的闭包 | **逐枚相同**：`old-criterion inbound = [AttachmentPayload AttachmentRef ComposerRequest]`、`new-criterion inbound = [AttachmentPayload AttachmentRef ComposerRequest]`、`identical=true`（`t.Errorf` 那一支没触发），且 `decodes=1` 就是 `bridge.go:79 dst=&r type=ComposerRequest` ⇒ **这不是收紧也不是放宽，是把同一格外延换了个判据**，M6/M13 从此进射程（M7 见 §4.3，它不归 (c) 管） |
 | 反例：为什么不能"查包里所有 struct" | `internal/panel/approval.go:54` `SessionOverrideBlocked bool json:"sessionOverrideBlocked"` 归一化含 `override`、`:58` `DecidedBy json:"decidedBy"` 含 `decide`，两枚都在 `ApprovalCardView`（**出站渲染视图**，不是任何 decode 的目的） | 派单警告成立，**而且我量到第二枚**（验收只点了 `decidedBy`）。⇒ 那一版今天会红两枚存量合法键，未采纳 |
 
 ⇒ 验收 §7.3(c) 的**判据选择成立**，但它给的理由（"M6/M7/M13 三枚植物都带自己的 json.Unmarshal ⇒ 三枚全在射程内"）
