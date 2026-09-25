@@ -799,6 +799,80 @@ N7 摘常驻行（红 2）· N8 改名掉「查看完整参数」（红 1）。
 `sh scripts/d22scan.sh` **rc=0**，ban #6 与 ban #8 的 `frontend/` 分母**仍 43**（本件零新增文件）。
 `grant` 那半（`panel.ts:50`）**一字未动**，按他 11:2x 的话归他。
 
+## 46. 换屏层（Q1＝甲）上线，commit `d61281c`；顺带把 §45.7 那格的前提推翻两次
+
+### 46.1 §45.7 那格：**两说的前提都不成立**，我原来那条"要 Go 侧先加字段"是错的
+
+编排者 11:60 给了四条指针，我逐枚重跑（不引他的转述）：`approval.go:47-53` 的 `Reason`／`ReasonKnown`
+确在、`panel.ts:34-39` TS 侧确接、卡上 `ReasonLine`（现 `l2-approval-card.tsx`）确实在渲染它、
+R4 那句真身在 `internal/risk/rules_gateway.go:112`。**⇒ 我说的"没字段"不成立，收回。**
+但他的修法也落不了地："补一枚 `rulesHit:["R4"]` 的 fixture、走 `wisp panel-assets` 同一条路"——
+现量 `cmd/wisp/panel_assets.go:54` 构造的是**裸** `risk.NewRiskAssessor()`，没接
+`WithTaintDetector`，`Facts` 里也没有污染通道；而 `ruleTaint`（`rules_gateway.go:97-101`）
+在 `ctx.taint == nil` 时直接 `return nil`。**那枚检测器在生产里是接了的**（`internal/tools/bridge.go:670`），
+缺的只是**产 fixture 这条 CLI 路**没接。
+⇒ 今天想拿 R4 只有一条路：手写字节。而手写字节正是他自己警告的那枚**假件**，也正撞 owner P9
+"不得造假数据当真实字段"。
+**最小真修法（一处、他的地界）**：`cmd/wisp/panel_assets.go` 那枚 assessor 接上
+`WithTaintDetector` 并给一个 `-taint-source` 旗标。我给的是推演，不成立就报回来。
+第三说也要记：`PLAN.md:3481` 那句写的是"**如**「R4：…」"——那是**举例**不是要求字面。
+卡上已经在渲染 `reason` 全文，所以严格讲这一格**从未欠着**，我 §45.7 是在量一枚不存在的要求。
+
+### 46.2 六枚还是两枚：他的"那两枚"我核出一个更大的数，然后收回更大的那个
+
+现量（`D:/tmp/wisp-fe-icon-setdiff.mjs`）：**demo 侧栏九枚里有 6 枚的图标名不在 §17.4 冻结清单里**
+（`message-square-text` `shield-check` `list-checks` `orbit` `settings` `chart-column`）。
+但其中 4 枚清单里有同名近亲（`shield` / `list` / `circle-dot` / `settings-2`），语义不缺。
+⇒ **真正"没有贴切形状可用"的仍是他说的两枚**：对话、成本。他的裁定成立，只是理由要换成
+"6 枚替换、其中 2 枚不贴切"，我按这个数落痕。
+痕记落在**数据**上不是文档上：`note` 在"画的名字 ≠ demo 的名字"时必填、`interim` 只准出现在那两行，
+多一枚少一枚都红（`render-nav` C 段）。
+
+### 46.3 换屏层本体
+
+九行照 `app.js:18-26` 逐条搬。旧 `PANEL_TABS`（命令/结果/历史/配置＝乙）**删掉不并存**——
+一个面板两种换屏方式等于对"当前在哪一屏"给两个答案。
+Q2 的纯函数约束落成判据：`nav-rail.tsx` / `panel-views.ts` / `App.tsx` **零 `useState`**，
+`view` 只从 `currentView(snapshot)` 进。`PanelSnapshot.view` 仍不存在（他那半、票 35 的泵），
+所以今天走的是"快照没命名就用默认值"这一支。
+**两样东西故意不随换屏隐藏**：审批卡与输入行。把强确认卡藏到另一屏后面＝拿导航改动偷带安全改动；
+队列深度改由竖条角标承担（demo `approval.js:188` 同一形状）。
+七屏未接数据的行渲染一句人话，不空 div、也不造内容（P9）。
+
+⚠ **本件加了一枚第 6 个出站方法名 `panel.view.request`**，我不当既成事实：Go 白名单仍 4 枚，
+今天**完全惰性**（无宿主这里抛、有宿主那边拒），删掉它是 `panel.ts` 一个函数 ＋ `App` 一处调用。
+`source` 覆盖成 `panel-view` 是因为封套默认 `"panel-composer"` 是一句"谁在说话"的取证断言（D31）。
+**要不要真给它路由，是他那边的字。**
+
+### 46.4 变异自证 9 发，8 发有牙；V8 我**不硬造**
+
+V1 清单外名 / V2 摘 cost 的痕 / V3 多加一枚痕 / V4 摘替换说明 / V5 新旧并存 / V6 自己记屏 /
+V7 改 `display:none` / V9 两行同图标 ⇒ 全红。
+**V8（摘掉 `.nav-rail-item:focus-visible` 那一行）PASSED 零牙齿，我保留这个读数**：同组里还留着
+`:focus`，键盘聚焦照样出名字，这发变异**行为等价**。把判据收窄成"必须有 `:focus-visible`"能逼出一枚红，
+那是措辞工程不是判据。（与 V1 一处次序诚实交代：V1 打出来的是 `nav-rail` 自己那句"画不出来就抛"的
+运行时红，判据那条 A 本来也会红，但抛错在打印之前把程掐了——两条都红，顺序掩盖了判据本身。）
+
+### 46.5 两枚我自己的尺坏了，都是当场被自己的仪器抓到
+
+(a) **解析器按空白切分时把中文组名和第一枚图标粘在一起**（`状态：circle-dot`），于是每组第一枚被吞——
+它先报"`circle-dot` 不在清单里"，而 `circle-dot` 明摆在纸上。修法：剥组名前缀 ＋ **12 枚正控必须在、
+6 枚必须不在，解析器坏掉时本件拒绝给结论**。（同一类我还踩过一次：本会话早前一把 `grep` 手写尺
+把 `shimmer` 判成未挂载，真仪器说是 1 mounted / 7 unmounted。）
+(b) "`PANEL_TABS` 必须消失"起初用裸子串判，被**我自己注释里那句解释性提及**撞红。改判声明行。
+(c) 还有一枚不在判据里但同类：`--border-hair-color` 是我凭空写的名字，真名 `--border-hair`。
+
+### 46.6 现量与边界
+
+`typecheck` / `lint` / `build` / `render:l2` / `render:composer` / `render:stream` / `render:nav`
+**全 rc=0**（`render:nav` 读数：`9 rail rows against 70 frozen §17.4 names, interim=2 (chat,cost),
+no view state in the nav layer`）。批量脚本第一遍记 `render:l2 rc=2` 是**我漏传 fixture 参数**
+（使用错退出），补跑 rc=0。`sh scripts/d22scan.sh` **rc=0**，ban #6 与 ban #8 的 `frontend/` 分母
+**43 → 46**（本件新增 `panel-views.ts` / `nav-rail.tsx` / `render-nav.tsx`）。
+未 push、未开窗、未碰 `internal/**` `cmd/**` `tools/d22scan/**` `.github/**` `design/**` `embed.go`。
+他改的那枚步名 `6291dc7` 我解过：`ci.yml:645` 现名确为
+`L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)`。
+
 两枚 commit：`d6c52ef`（8 枚路径，全在 `frontend/`）、`a21336e`（2 枚路径）。
 `git status --porcelain -- frontend/` 交件时为空。未 push。未碰 `internal/**`、`cmd/**`、
 `tools/d22scan/**`、`allowlist.txt`、`docs/PLAN.md`、`docs/specs/**`、`design/**`、`embed.go`。
