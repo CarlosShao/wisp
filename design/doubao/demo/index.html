@@ -1,0 +1,165 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一缕 Wisp · 高保真交互原型</title>
+
+<!-- Tailwind Play CDN (本地) -->
+<script>
+  tailwind = {
+    config: {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            border: 'hsl(var(--border))',
+            input: 'hsl(var(--input))',
+            ring: 'hsl(var(--ring))',
+            background: 'hsl(var(--background))',
+            foreground: 'hsl(var(--foreground))',
+            primary: {
+              DEFAULT: 'hsl(var(--primary))',
+              foreground: 'hsl(var(--primary-foreground))'
+            },
+            secondary: {
+              DEFAULT: 'hsl(var(--secondary))',
+              foreground: 'hsl(var(--secondary-foreground))'
+            },
+            destructive: {
+              DEFAULT: 'hsl(var(--destructive))',
+              foreground: 'hsl(var(--destructive-foreground))'
+            },
+            muted: {
+              DEFAULT: 'hsl(var(--muted))',
+              foreground: 'hsl(var(--muted-foreground))'
+            },
+            accent: {
+              DEFAULT: 'hsl(var(--accent))',
+              foreground: 'hsl(var(--accent-foreground))'
+            },
+            card: {
+              DEFAULT: 'hsl(var(--card))',
+              foreground: 'hsl(var(--card-foreground))'
+            },
+            popover: {
+              DEFAULT: 'hsl(var(--popover))',
+              foreground: 'hsl(var(--popover-foreground))'
+            }
+          },
+          borderRadius: {
+            lg: 'var(--radius)',
+            md: 'calc(var(--radius) - 2px)',
+            sm: 'calc(var(--radius) - 4px)'
+          },
+          fontFamily: {
+            sans: ['Inter', 'PingFang SC', 'Microsoft YaHei UI', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Cascadia Code', 'Consolas', 'monospace']
+          }
+        }
+      }
+    }
+  };
+</script>
+<script src="lib/tailwind.js"></script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="w-screen h-screen overflow-hidden font-sans antialiased">
+<!-- 首载 Preloader（仅首次显示 1-1.2s） -->
+<div id="preloader" class="preloader">
+  <div class="preloader-ball"></div>
+  <div class="preloader-text">一缕 · 正在唤醒<span class="preloader-dots"><span></span><span></span><span></span></span></div>
+</div>
+
+
+<!-- 桌面背景 -->
+<div id="desktop" class="fixed inset-0 desktop-bg"><div class="fog-sphere fog-sphere-1"></div><div class="fog-sphere fog-sphere-2"></div></div>
+
+<!-- 悬浮球（右缘） -->
+<div id="floating-ball" class="fixed floating-ball cursor-pointer" title="点击打开一缕">
+  <div class="ball-inner"></div>
+</div>
+
+<!-- 主窗口 -->
+<div id="main-window" class="fixed main-window">
+  <!-- 标题栏 -->
+  <div class="title-bar">
+    <div class="flex items-center gap-2.5">
+      <div class="w-4 h-4 rounded-full ball-dot"></div>
+      <span class="text-[13px] font-medium text-foreground/80">一缕</span>
+    </div>
+    <div class="flex items-center gap-1">
+      <button id="theme-toggle" class="title-bar-btn" title="切换主题">
+        <i data-lucide="sun" class="w-4 h-4 icon-light"></i>
+        <i data-lucide="moon" class="w-4 h-4 icon-dark hidden"></i>
+      </button>
+      <button class="title-bar-btn" title="最小化" onclick="toast('演示原型，仅作展示')">
+        <i data-lucide="minus" class="w-4 h-4"></i>
+      </button>
+      <button class="title-bar-btn" title="最大化" onclick="toast('演示原型，仅作展示')">
+        <i data-lucide="square" class="w-3.5 h-3.5"></i>
+      </button>
+      <button class="title-bar-btn title-bar-close" title="关闭" onclick="toggleWindow()">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- 窗口主体 -->
+  <div class="window-body">
+    <!-- 左侧导航 -->
+    <nav id="side-nav" class="side-nav"></nav>
+    <!-- 内容区 -->
+    <main id="app" class="content-area"></main>
+  </div>
+</div>
+
+<!-- 命令面板 Modal -->
+<div id="command-palette" class="modal-overlay hidden">
+  <div class="command-palette">
+    <div class="flex items-center gap-2.5 px-4 h-12 border-b border-border">
+      <i data-lucide="search" class="w-4 h-4 text-muted-foreground"></i>
+      <input id="palette-input" type="text" placeholder="输入命令或搜索…"
+        class="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none">
+      <kbd class="kbd">ESC</kbd>
+    </div>
+    <div id="palette-list" class="palette-list"></div>
+    <div class="flex items-center gap-4 px-4 h-9 border-t border-border text-[11px] text-muted-foreground">
+      <span class="flex items-center gap-1"><kbd class="kbd-xs">↑↓</kbd> 导航</span>
+      <span class="flex items-center gap-1"><kbd class="kbd-xs">Enter</kbd> 执行</span>
+      <span class="flex items-center gap-1"><kbd class="kbd-xs">ESC</kbd> 关闭</span>
+    </div>
+  </div>
+</div>
+
+<!-- 首次引导 Modal -->
+<div id="firstrun-modal" class="modal-overlay hidden">
+  <div class="firstrun-dialog" id="firstrun-content"></div>
+</div>
+
+<!-- Toast 容器 -->
+<div id="toast-container" class="toast-container"></div>
+
+<!-- 脚本 -->
+<script src="lib/lucide.min.js"></script>
+<script src="app.js"></script>
+<!-- 屏幕文件（子代理产出，集成时追加） -->
+<script src="screens/chat.js"></script>
+<script src="screens/approval.js"></script>
+<script src="screens/palette.js"></script>
+<script src="screens/tasks.js"></script>
+<script src="screens/ball.js"></script>
+<script src="screens/config.js"></script>
+<script src="screens/security.js"></script>
+<script src="screens/privacy.js"></script>
+<script src="screens/cost.js"></script>
+<script src="screens/firstrun.js"></script>
+<script>
+  // 启动
+  document.addEventListener('DOMContentLoaded', function() {
+    App.init();
+  });
+</script>
+</body>
+</html>
