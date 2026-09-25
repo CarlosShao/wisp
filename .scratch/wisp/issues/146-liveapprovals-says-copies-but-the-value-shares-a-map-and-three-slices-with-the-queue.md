@@ -152,5 +152,24 @@
   复跑：`go test -count=1 ./internal/agent/approval/` → `ok 0.451s`。本程提交共 5 枚 commit、碰过的文件总数仍是 4 枚。
   **未 push；五枚 AC 框仍一枚未勾。** next=**编排者**（无剩余格可我做）。
 
+- [2026-09-25T12:35Z] agent=ticket146-fix did=**修复程：补上对抗验收退回的两枚洞**（`docs/evidence/s1/146-liveapprovals-r1-accept-r1.md` 逐格判据＋它自造的反例为凭）。
+  **只动一枚文件** `internal/agent/approval/ticket146_liveapprovals_backing_test.go`（`queue.go`／`approval.go`／`pending_read.go` 一字节未动）。
+  **洞①（AC#2 变异 F 真假绿）**：probe 2 就地写之前加一枚 `reflect.DeepEqual(返回值 Decision, 队列存储项 .Dec)`（新尺 `:285`）——把 "copies" 的**值保真**那一半钉住。
+  **洞②（进攻④ "第 9 枚会静静进来"）**：选**甲（穷尽普查、非降级文字）**——`refSlots`/`slotPaths`（按值走、只认 Map/Slice/Struct、nil 槽与 Ptr/Interface/Chan/Func/私有字段静默跳过）
+  换成 `declaredRefSlots`/`typeCensus`（按 `reflect.TypeOf` 数声明、逐枚 `NumField`、命名 Map/Slice/Ptr/Chan/Func/Interface、下降 Struct/Array、**未知 kind 一律 `t.Fatalf` fail-closed**）＋ 一枚 fixture 完整性守卫（`:245`）。
+  **判"穷尽普查是测试侧那把尺、还是生产少拷一枚"＝前者**：`cloneDecision` 现有 8 枚今天一枚没少（验收件 §1 独立普查同判），故 `pending_read.go` 不动。
+  **先证洞真在**：纯净副本复现变异 F（两发全绿、逐包 rc=0）与变异 M-a（新 map 槽静静进来、两发全绿）。**再证修完会红**：改后重跑——
+  F→probe2 值保真红、M-a→probe1 名册 9 vs 8 红（这就是派单单要的"新增一枚不拷的引用槽位会红"凭据）、
+  E→不再 panic 吞读数（`=== RUN` 恒 54）、**合体 M-a+F→32/2/1**（旧尺下是 34/0/1 与"改后健康态"一模一样 ⇒ **"四数一模一样"不再成立**）。
+  名册差集改前/改后两向 comm 皆空（未增删用例函数）。门禁逐包单跑于隔离纯净副本（避别人在改的 cmd/wisp/frontend）：
+  `gofumpt -l . tools/d22scan tools/mockllm` 空、`gofmt -l internal/agent/approval/` 空、`go vet` rc=0、`sh scripts/d22scan.sh` rc=0 clean 且 examined N 全非零。
+  **两处文字更正**：实现件 §2 之后追加 `>` 更正（理由②"ⓑ 摘掉注释任何用例都不会红"、理由③"ⓑ 拿不到任何仪器"＝**假**，验收件 §6.3 造出删 239 字节纪律句就红的 doc-pin、且两枚 ⓑ 支仪器都在本包内跑通、`tools/d22scan/**` 一字节未碰；
+  ⓐ 方向仍成立、由理由①独自撑住；正确取舍句＝"ⓐ 是票面两支里唯一同时收得下 AC#2 字面的那一支"）；台账 `A255`（编排者自写的"第三条理由也成立"）**本程未碰、未在任何新文字里重复那句假理由**。
+  **AC 框一枚未勾**；提交时 dev 已被另一程推进 3 枚（`1e94672`/`1b3fccc`/`1f76c06`，全为票 144/台账 docs、与本包交集空）。
+  本程共 3 枚 commit（`b694378` 代码 / `73e0d7be` 两枚 docs / 本枚进度），碰过的文件＝测试件 + 两枚证据件 + 本票面 = 4 枚。权限系统拒绝 0 次（一次自伤 pathspec 手误已如实登记，未换路子绕过）。
+  next=**编排者**：①AC#1/AC#2/进攻④ 的勾按"第二轮验收"定；**若编排者认为 AC#2 此刻可勾**，理由已备——验收件给的最小闭合集合（`reflect.DeepEqual` 值保真，一次收 E/F/M-a）本程已落地并复跑证红。
+  ②"返回值继续往外送 `Params` 是否收窄"（ⓓ）＝下一票。③`Params` 一层深、`replay` 同族出口＝下一票（验收件 §12）。
+
+
 
 
