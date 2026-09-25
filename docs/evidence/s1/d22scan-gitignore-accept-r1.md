@@ -454,7 +454,7 @@ runtests.sh: OK - top-level: PASS=3 FAIL=0 SKIP=0, === RUN=3
 ```
 
 ⇒ **oracle 真有牙，而且是精确的牙**：规则吃进被扫 scope ⇒ 当场红并说出"这是基线变更"；
-规则在 scope 之外 ⇒ 不冤枉。`d22scan-gitignore-r1.md:56-62` 那段设计说明**兑现了**。
+规则在 scope 之外 ⇒ 不冤枉。`d22scan-gitignore-r1.md:57-62` 那段设计说明**兑现了**。
 
 **但同一枚 oracle 对 §1.3 那一支完全无力**（这才是关键，实测不是推理）——
 `forcedfull\` 是一枚**真的 git 仓库**，`git ls-files -i -c --exclude-standard` 现量点名
@@ -564,3 +564,61 @@ d22scan: clean - no D22 ban violations; ...
 顺带一枚与本批无关但普查路上撞见的**好消息**：`internal/panel/frontend_hygiene_test.go:71` 的
 `emojiRangesRe` 与 `tools/d22scan/main.go:149` 的 `emojiRe` 我把两串正则抽出来做逐字比较，
 **IDENTICAL**（`U1` 那一族同源字符类今天没有漂）。本批没碰它，也没有把它碰漂。
+
+---
+
+## 8. 缺陷清单 + 每枚的最小修法（本件一律不动手）
+
+| # | 严重度 | 缺陷 | 证据 | 最小修法（点名，不代做） |
+|---|---|---|---|---|
+| **F1** | **阻断** | matcher 只按**模式**判忽略，从不查**受追踪状态**；于是 `git add -f`（或"先提交后补规则"）进来的交付件对门**永久隐身**，且 `scripts/d22scan.sh` **step 1 的正向对照也看不见** | §1.3 二进制两读（修前 rc=1/41、修后 rc=0/40）；§6.8 套件级四枚守卫全绿 vs 修前两枚 FAIL；§6.9 同一形状打到 bans #1-5（`internal/build/leak.go`，note 还报 "0 file(s)"） | `newGitIgnore`/`skip()` 前加一道**"这棵树是不是一次导出"**：`root` 下无 `.git` 目录时**不套用任何 ignore 规则**。对本修目标无损——净快照今天 note 为空（§6.4），即"CI 树里模式命中件 = 0"，所以加闸后 CI 仍 40、工作树仍 40，而 §1.3 那发重新变红。代价必须同批：`scan_test.go:1458` `ignoredLikeGit` 接上同一条 `.git` 闸门，否则两份副本在净快照上当场打架（那是设计要的摩擦，不是 bug）；再补一枚**能表达"受追踪且模式命中"**的断言（可用 `TestBuiltBinaryGoesRedEndToEnd` 那台真跑二进制的形状，在仓库外 `git init` 一棵 fixture 树）。 |
+| **F2** | **阻断（文本面）** | 交付里两处**未被任何断言钉住的担保**：`main.go:61-64` "it does not suppress a finding on a TRACKED path"（它点名的测试实际是 `!` 否定捞回的 `.gitkeep`，夹具无 index，表达不了这一支）、`gitignore.go:33-34` "the instrument and the repository's ignore rules cannot disagree"（git 的 policy 是 模式 **+ index**，只跟了前半） | §1.4 代码事实；§1.3 实测直接反证 | 二选一，不许并存：把 F1 实现掉（担保随之为真），或把这两句改成可被证伪的真话（"按模式判；受追踪且模式命中的形状今天为 0 枚，`git ls-files -i -c` 为这条的口径"）。 |
+| **F3** | 中 | 两条**少扫方向**的语义偏差，且 `gitignore.go:61-64` 自称"every unsupported shape fails in the loud direction: … never less"——**对它自己的文件不成立** | 探针 P1：规则 `  dist/*`（git 意为名叫 `"  dist"` 的路径）⇒ `decide("dist/index.html")=ignored true`；根因 `gitignore.go:296` 的 `TrimSpace`。探针 P2：规则 `dist/**` ⇒ `dist` **目录本身**被剪、`!dist/.gitkeep` 失效 ⇒ 写下这种规则的当天 CI 40→39（正是 `gitignore.go:50` 自己担心的那件事，没防住） | `:296` 改 `strings.TrimRight(raw, " \t")`（git 只剥尾随未转义空白）；`pathMatch` 的 `**` 分支加一条"`**` 不得吃掉整个待匹配路径的父目录"（即 `foo/**` 不匹配 `foo` 自身）。两条各配一枚 `TestGitIgnoreRuleSemantics` 的用例。 |
+| **F4** | 低-中 | `note()` 的数与移动的分母不是同一个量纲：`gitignore.go:173` 那句 "N file(s) **under** M ignored director(ies)" 把 walk 访问数和目录名数读成了包含关系 | §6.6 三例：真工作树 note 说 1、分母动 3；seeded 树说 2、动 4；§6.9 说 **0 file(s)** 而整包被剪 | 对被剪目录做一次 `os.ReadDir` 把里面的文件数并进 note，或改措辞为 `N path(s) skipped individually, M ignored director(y|ies) pruned`。这枚 note 的唯一职责就是解释动过的数（`main.go:1302-1309` 自述），现在只解释了三枚里的第一枚。 |
+| **F5** | 低（登记性） | `.git/info/exclude` / `core.excludesFile` 不支持（`:61-64` 已声明），但**没写它会让 A207 的病在这一支原样活着** | 探针 P6：`.git/info/exclude` 写 `dist/*` ⇒ `ignored=false` ⇒ 工作树继续数、CI 树里根本没有该件 ⇒ 两形状又不同数 | 文档补一句射程限定即可（不改行为）；或者在 `note()` 里报一声"检测到 `.git` 存在但本仪器不读 `info/exclude`"。 |
+| **F6** | 低（信息） | `TestRealRepoBan8CoversFrontendTreeAtBan6sCount` 只断言两枚 walk **相等**，两边一起降时它不报 | §6.8 正向对照真回显：`19 vs 19` ⇒ 该枚 **PASS**，而基线已从 40 掉到 19 | 不是错（等式守卫本来的职责就窄），但它意味着**全仓没有一枚断言钉住 `frontend/` 的绝对基线**——所以台账重标（`A211`① 已做）就是唯一的锚，别把它省掉。 |
+| **F7** | 信息 | 普查口径：本批确实**新增了一枚手抄副本** `ignoredLikeGit`，实现程的"6 份"是按 owner 数、不是按位置数（我按位置数是 9 处） | §7 表 | 台账里给 `ignoredLikeGit` 单列一行（它能独立于 ⑤ 移动）。 |
+| **F8** | 不属于本批 | `internal/panel/frontend_hygiene_test.go:289` 用**子串** `/dist/` 跳，本来就会把受追踪的 `frontend/dist/x.tsx` 从它自己的对照里跳掉，且比 `.gitignore` 更宽（任何深度的 `/dist/`） | §7 (a)(b)(c) + 该行现号 | **记给⑦的主人（编排者/前端会话），早于本修存在**。本批不许动它，本件也不动。 |
+
+### 8.1 本批**确实做到**的事（免得沉默被读成不必说）
+
+- A207 的主目标**达成且被我独立复现**：工作树 `ban #6/#8 frontend/` 43→40，与三枚锚点上的 CI 读数 40 合流；CI 形状八数**逐字未变**、`rc=0`、净快照上不打印排除行。
+- 契约面**零越界**：`emojiRe` 三枚锚上同一串（sha 前缀 `a6150ef689cc20c9`）、`allowlist.txt` 0 字节差异、`internal/**`/`frontend/**`/`design/**`/`docs/reports/**` 零字节、9 枚删除行无一枚摘掉带分母的行为、测试零删除零 `t.Skip` 零阈值。
+- 规则是**读出来的不是抄来的**（`gitignore.go:271`），并且**故意留了第二份手抄副本当证伪器**，这枚证伪器被我用正/负两发实测证明**真有牙**（§6.8）。
+- 不依赖 `git` 可执行文件，且 `tools/d22scan` 零依赖 module ⇒ 420 行**没有**重复任何已 vendored 之物（§4）。
+- 取证件诚实：design/ 残留是它**自己先说出来的**（`d22scan-gitignore-r1.md:186-189`），note 重复计数那半枚缺陷也是**它自捉的**（`:127-130`），连自己 commit 标题写成 `A2207` 都在正文点名更正（`:225-228`）。
+
+---
+
+## 9. 总裁（一格一词）
+
+| 格 | 判 | 一理由 |
+|---|---|---|
+| §1 主攻击：按模式还是按受追踪状态 | **退回** | 纯模式、无 index，`git add -f` 的交付件对门与对 step 1 **双双永久隐身**（§1.3/§6.8/§6.9 三发实测，非推理）。 |
+| §2 语义覆盖 | **附条件成立** | 15 支里 11 支有实现且其中 9 支被测试钉住；**行首空白与 `foo/**` 剪父目录**这两支是少扫方向、无测试、且与 `:61-64` 的自述矛盾（F3）。 |
+| §3 非 git 树 / `-root` 指错 | **成立** | 无 `.gitignore` 时不排除也不说（响亮），指错树由 `checkRoot` `rc=2` 硬拒；"静默全放行"不是本实现的行为。 |
+| §4 shell out 还是重写 / 是否重复 | **成立** | 重写（import 无 `os/exec`），`tools/d22scan/go.mod` 零 require ⇒ 没有重复任何已 vendored 库；不用 `git check-ignore` 的理由被我独立复现成立。 |
+| §5 契约轴（emojiRe/allowlist/删除行/断言） | **成立** | 字符类三锚同串、allowlist 0 字节、9 枚删除行全是加严或注释、测试零删零 Skip 零阈值。 |
+| §6 读数（四数/两对照/工作树 vs 净快照） | **成立** | step 1 `24/64→26/66`、名单 +2 无消失；still-bites 仍 rc=1 点名 `frontend/`；no-longer-counted 差集恰为那枚 ignore 件；八数 7 同。 |
+| §6.5 design/ 残留算不算缺陷 | **成立**（不算） | 现量 32 = 16 受追踪 + 16 未追踪且 `!!` 行 0，正落 `design/doubao`+`design/old` ⇒ ignore 过滤器不能也不该吞；交付文本与台账 A211③ **都没过度声明**。 |
+| §6.6 note 自述精度 | **附条件成立** | 数出的是 walk 访问数不是文件数，最坏实例 "0 file(s)" 而整包被剪（F4）；不影响 rc，只影响可解释性。 |
+| §7 同源副本与地界 | **成立** | 只碰自己三枚文件、root module 零 import 关系；新增那枚手抄副本是披露的且被证明有牙（口径应按位置数成 9 枚，F7）。 |
+| **本批交付整批** | **退回** | F1+F2 一起才是要害：**门把自己的"我没看"重新命名成了"这里没有东西"**，而它为此写的两句担保恰好在它唯一没能表达的那一支上失效。 |
+
+---
+
+## 10. 我**没有**测什么（绝不让裁决者的沉默被读成批准）
+
+1. **没有把 F1 的修法实现或验证**——我只证明它可被构造、且现网形状为 0 枚（`git ls-files -i -c --exclude-standard` 与 `check-ignore --no-index` 两枚口径都空）。修法在 `.git` 存在性加闸之后是否让八数仍然逐枚不动，**未量**。
+2. **没有跑 root module 的任何测试**（`internal/**`、`cmd/**` 全 suite）：本修代码在独立 module、`grep` 现量无 import 关系，但"因此不可能影响 root module"是我的**推理**，不是我的读数。特别是 `internal/panel/frontend_hygiene_test.go`、`composer_test.go` 今天是否仍绿，**未跑**。
+3. **没有跑完整 CI**（GitHub Actions 那套步骤），只跑了 `scripts/d22scan.sh` 这一个门的两步。
+4. **没有测 Linux/macOS 行为**：全部在 win32 + `git 2.52.0.windows.1` + `go1.27.1 windows/amd64`。探针 P7（mode-000 的 `.gitignore`）在 Windows 上**仍能读**（`ignored=true`），所以"不可读规则文件 ⇒ 无规则 ⇒ 路径继续被扫"这条**在 Linux 上的响亮与否未证**。
+5. **没有测并发/共享工作树场景**（本修是读文件的代码，我没查它在别人正在 commit 时读树的一致性）。
+6. **没有测大小写/路径分隔符分支**：Windows 上 `filepath.Rel` 与 `ToSlash` 我依赖实现，未针对"盘符大小写不一致"、UNC、长路径（>260）构造用例。
+7. **没有穷举 gitignore(5) 的其它细分支**：`!` 否定一个**目录**（`!logs/`）、`[!a-z]` 与 `[a-]` 这类畸形类、`**` 出现在段**内部**（`a**b`，代码按 git 文档折叠成单 `*`，我**没实测**）、以 `\` 结尾的转义尾随空白（`:61-64` 已声明不支持，未证方向）。
+8. **没有验证 `design/` 那 16 枚未追踪件该不该进交付**——那是 owner 与前端会话的范围决定，本件只判"ignore 过滤器有没有权利吞它"（没有）。
+9. **没有复算 37 这个历史读数**来自哪一枚锚点（票面只说 37/40/43 三个读数打架；我只量到 40 与 43，**37 未出现在我任何一发读数里**）。
+10. **没有把 §6.9 那发做到"真实提交"级别**：我只在仓库外快照里 `git add -f` 造出形状并跑门；真仓 `dev` 分支上今天**不存在**这种件（第 1 条的两枚口径均为空），所以我不能说"CI 现在正在漏一个真违规"，只能说"门现在有这个洞、且 step 1 不再兜它"。
+11. **没有测 `core.excludesFile` 被真的设过之后**的读数（只测了 `.git/info/exclude` 一支的 `ignored=false`）。
+12. **权限**：本程**没有任一枚工具调用被权限系统拒绝**，因此也没有"因被拒而绕行"的事可报。
+13. **本件没动过任何已存在的文件**、没 push、没 `git add -A`/`.`、没 `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；每次提交前 `git diff --cached --name-only` 均只列 `docs/evidence/s1/d22scan-gitignore-accept-r1.md` 一枚路径（四次全中，无第二枚混入）。
