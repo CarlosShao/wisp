@@ -315,11 +315,160 @@ cmd/wisp/slo_report_144_windows_test.go      anchor=4d07365e12e9e156771020f3b638
 
 ---
 
+## 第 3 格　派单 §2 之(3)：复算完之后答那句——"摘掉任意一味，是否存在一发变异从此打不红？"
+
+**判据**（本仓对"承重"的操作定义，票面 AC#2 原文）：摘掉本票选定的一味 ⇒ 是否存在一发变异从此打不红。
+本格只用第 2 格**本程自己**的读数（`mylogs/`），不引实现件 §2.4 那张表。
+
+### 3.1 现量（本程 16 发里与本问相关的 9 发）
+
+```
+$ python myharness.py m-branch-syntax-off m-branch-type-off m-branches-both-off m-fallback-to-zero \
+                      m-case11-notatest m-zero-case11notest m-combo m-combo-bytes m-combo-revert
+m-branch-syntax-off  files=1 rc=1 RUN=20 PASS=12 FAIL=1 case11=RAN   "5 of 8 corrupt shapes"
+m-branch-type-off    files=1 rc=1 RUN=20 PASS=12 FAIL=1 case11=RAN   "3 of 8 corrupt shapes"
+m-branches-both-off  files=1 rc=1 RUN=20 PASS=12 FAIL=1 case11=RAN   "8 of 8 corrupt shapes"
+m-fallback-to-zero   files=1 rc=0 RUN=20 PASS=13 FAIL=0 case11=RAN   reds=-        （grep -cE '---FAIL|first:' -> 0）
+m-case11-notatest    files=1 rc=0 RUN=19 PASS=12 FAIL=0 case11=NORUN reds=-
+m-zero-case11notest  files=2 rc=0 RUN=19 PASS=12 FAIL=0 case11=NORUN reds=-
+m-combo              files=2 rc=0 RUN=20 PASS=13 FAIL=0 case11=RAN   reds=-
+m-combo-bytes        files=2 rc=0 RUN=20 PASS=13 FAIL=0 case11=RAN   reds=-
+m-combo-revert       files=2 rc=0 RUN=20 PASS=13 FAIL=0 case11=RAN   reds=-
+```
+
+### 3.2 答句（分两侧答，因为答案不同）
+
+- **测试码一侧：存在。** 摘掉 **case 11 的两条 leg（合起来算一味）** ⇒ `p1`（常量 0）、`p2`（换成 `obs.bytes`）、
+  `p3`（退回 `dec.InputOffset()`）**三发全部打不红**（本程 `m-combo`／`m-combo-bytes`／`m-combo-revert` 三发各 0 红）；
+  摘掉**整枚 case 11**（`m-zero-case11notest`）同样 0 红，且 `case11=NORUN`＋`RUN` 从 20 掉到 19
+  ⇒ 那一枚用例确实是那三发的**唯一持有者**，不是装饰。
+  ⇒ **所以本票选定的"一味"确实承重。** 实现件 §2.4 的方向对，但它只报了 `p1` 一发逃逸，
+  **本程把它扩到三发**（该腿**整体**脱保，见第 2 格 §2.3 第 2 条）。
+- **生产码一侧：不存在（除一行例外）。** `contradictionOffset` 的两条分支各摘一枚**都当场红**，
+  且红的枚数**互不重叠**：摘 `SyntaxError` 支红 `5 of 8`、摘 `UnmarshalTypeError` 支红 `3 of 8`、两支全摘红 `8 of 8`
+  （5+3=8 ⇒ 那 8 发里每一发的错值**只来自一条支**，两腿是**划分**而不是冗余）。
+  ⇒ 这一侧每一味都被管着：**摘掉必响**。
+- **那一枚例外**：`contradictionOffset` 最后的 `return inputOffset` 那一行——本程把它换成 `return 0`
+  （overlay 建完**回读证明该替换进了编译字节**，否则尺会 FATAL）⇒ **全组 0 红、`RUN`/`PASS` 与 `m-asis` 逐枚相同**，
+  **没有任何外部可见读数变过**。⇒ 判为**装饰腿**，详见第 5 格。
+
+**放水两问自答**：① 本程未动任何断言方向（本程不写码，只造变异）；② 本程的尺是自己写的，
+且**比实现程那把多一道 proof**（overlay 落盘后回读、`new in / old not in` 才允许出数）。
+
+**第 3 格判定**：**成立**（承重的答句为真，且本程给出比实现件更宽的逃逸集与一个"摘了也不响"的反例）。
+
+**本程没测什么（本格）**：没试"把两条分支合成一条／调换两分支顺序"这类**等价重构**变异（本程只试"摘掉"与"换值"）；
+没试 `contradictionOffset` 的**入参**变异（`dec.InputOffset()` 换成别的表达式）；
+`m-fallback-to-zero` 之外没试 `-1`／`int64(obs.bytes)` 等其它替换形状（结论不依赖那一枚，见第 5 格）。
+
+---
+
+## 第 4 格　第二攻击点：case 11 的期望值**是不是自己对自己**
+
+**判据**（派单 §3）：现量核期望常数写在哪、**有没有任何一条路径让同一枚解码器既产 offset 又产期望值**
+（那枚就是恒真判据的形状）。
+
+### 4.1 期望常数写在哪（现量）
+
+```
+$ git show c3f7224:cmd/wisp/slo_report_144_windows_test.go | sed -n '600,614p'
+	cases := []struct {
+		name string
+		body []byte
+		want int
+	}{
+		{"second-comma-at-26", []byte(`{"mode":"subject-in-tree",,"pass":true}`), 27},
+		{"html-first-byte",    []byte("<html>the runner wrote an error page</html>"), 1},
+		{"0xff-after-key-at-40", append(append([]byte(nil), doc[:40]...), 0xff), 41},
+		{"bad-byte-at-500",    slo149Poke(doc, 500, '@'), 501},
+		{"mode-number-at-9",   []byte(`{"mode": 123}`), 12},
+		{"array-at-0",         []byte(`[1,2,3]`), 1},
+		{"seconds-string-at-49", []byte(`{"mode":"subject-in-tree","seconds":"not a number"}`), 50},
+		{"bad-escape-at-10",   []byte(`{"mode":"\q","pass":true}`), 11},
+	}
+```
+
+⇒ 期望值是**写在测试源里的字面量**，运行时没有任何一行代码把它们喂给解码器或从解码器读回来。
+比较式是 `if obs.offset != int64(tc.want)`（`:634`）与 `case offset != tc.want`（`:641`，
+`offset` 由 `slo149ContradictionOf(obs.summary())` **解析句子**得到）。
+
+### 4.2 恒真那一问：**运行时不成立**（两发现证）
+
+1. **期望值是活的**：`m-wantcanary-live`（只把 `27` 改成 `999`，其余不动）⇒ **红，且红句是 `1 of 8`**。
+   如果判据恒真，改期望值不会有任何反应。
+2. **判据能只凭生产码变坏而响**：`m-corrupt-zero`／`m-corrupt-revert` ⇒ 各红 8 发，测试文件一字未动。
+
+⇒ **运行时形状上没有"同一枚解码器既产 offset 又产期望值"的路径。** 这一问派单担心的东西**不存在**。
+
+### 4.3 但**出处**那一问：实现件 §2.1 那句辩护是**假的**
+
+实现件 §2.1 写："case 11 的 8 发每发的期望位置是**本文件自己声明的构造**（坏字节在 index K ⇒ 期望 K+1），
+**不是从解码器读回来的数**——这是它和 §1.4 那把"永远绿"的假尺的区别。"
+本程把那 8 枚与探针实测的 `eo`（＝解码器自己那枚错误带的位置）逐枚对：
+
+```
+$ git show c3f7224:.scratch/wisp/probes/149/probe-corrupt-census.log | grep -oE "P149 [a-z0-9-]+ .*eo=[0-9-]+" | awk '{print $2,$NF}'
+html-head eo=1        wrong-type eo=12        trunc40-plus-0xff eo=41   deep-at-500-at eo=501
+deep-late-2-0xff eo=1342   bad-escape-in-string eo=11   colon-then-comma eo=26  array-into-struct eo=1
+number-into-struct eo=3    string-doc eo=15    brace-first-then-good eo=1  late-type-break eo=50
+```
+
+| case 11 用例 | 它的 body ＝ 探针里哪一发 | 测试写的 `want` | 探针实测 `eo` | 相等？ | 它自己的用例名说的 index | `K+1`？ |
+|---|---|---|---|---|---|---|
+| `second-comma-at-26` | `double-comma-39B` | 27 | 27 | 是 | 26 | 是 |
+| `html-first-byte` | `html-head` | 1 | 1 | 是 | 0 | 是 |
+| `0xff-after-key-at-40` | `trunc40-plus-0xff` | 41 | 41 | 是 | 40 | 是 |
+| `bad-byte-at-500` | `deep-at-500-at` | 501 | 501 | 是 | 500 | 是 |
+| `mode-number-at-9` | `wrong-type` | 12 | 12 | 是 | **9** | **否（K+3）** |
+| `array-at-0` | `array-into-struct` | 1 | 1 | 是 | 0 | 是 |
+| `seconds-string-at-49` | `late-type-break` | 50 | 50 | 是 | 49 | 是 |
+| `bad-escape-at-10` | `bad-escape-in-string` | 11 | 11 | 是 | 10 | 是 |
+
+⇒ **8 枚 `want` 与探针实测 `eo` 逐枚相等**（`double-comma` 那发探针的 `want` 列记的是 25，
+因为探针那列标的是**第一个**逗号、解码器反对的是**第二个**——两枚表口径不同，本程按 body 对）。
+⇒ 所以"不是从解码器读回来的数"这句**在出处意义上不成立**：那 8 枚数**就是**从解码器读数抄进来的。
+⇒ 更要紧的是**它给的替代依据自己漏了一发**：`mode-number-at-9` 的名字声明坏值起在 index 9，
+`want` 却是 12，直接违反测试文件 `:590` 那行自己写的规则
+（"Every want below is stated by how the shape was built: **the bad byte sits at index want-1**"；
+这里 `want-1 = 11 ≠ 9`）。⇒ **8 发里 7 发能用那条规则推出来，1 发不能**，
+而那 1 发恰好只能由解码器读数解释 ⇒ §2.1 的辩护不是"略有夸张"，是**规则与数据自相矛盾**。
+
+### 4.4 这一格真正要留的两味（不是退回，是更正）
+
+1. **§2.1 的辩护要改口**（**未验证断言**：改文字不动判据，治不到任何一发变异，但治得到"下一位以为
+   期望值是独立推导的、于是放心把 case 11 当产品不变量"这一发）。诚实的写法是它自己在 §7.3 已经写过的：
+   "K+1 是**这一版 encoding/json 的 scanner 约定**……Go 升级可能改它——那时 case 11 会红"。
+   ⇒ **§2.1 与 §7.3 互相矛盾**：一处说"不是从解码器读回来的数"，一处说"这判据钉的就是解码器版本约定"。
+   同一枚件里两处对同一件事两种说法，**§7.3 是对的、§2.1 是辩护性的**。
+2. **`named != read` 那条腿（`:645`）是刻意地"自己对自己"**——它比的是**同一句话里的两个字节数**（句子内部一致性），
+   不比任何外部真值。⇒ 这条腿**结构上永远不可能提供"期望值来自哪里"的证据**，它响的是 `p12` 那一发（句子里两个计数打架）。
+   实现件 §2.4 把它和另外三条并列成"case 11 的四条 leg"，**没说这条是自比腿**；
+   本格点名，免得下一位拿"四条 leg 都是判据"当"四条都能独立验真"。
+
+**放水两问自答**：① 本程未动断言方向，且**没有**因为"期望值出自解码器读数"就判这条检恒真——
+恒真与不恒真是两件事，本程用 `m-wantcanary-live` 与 `m-corrupt-zero` 分开了；
+② 本程用的对表尺是**body 相同**这一条（不是用例名相同），因为两枚表的 `want` 列口径不同。
+
+**第 4 格判定**：**附条件入账**。AC#2 那枚检**不是恒真判据**（两发现证），实现件该收的收到了；
+但 §2.1 那句"不是从解码器读回来的数"**记为不实**，且与 §7.3 自相矛盾（进 §N-1 第 2 行）。
+
+**本程没测什么（本格）**：
+1. **没验"K+1"在别的 Go 版本／别的 stdlib 版本下是否仍是 8 发同值**——本程只证了**当前** blob 上二者相等。
+   ⇒ 谁先被骗：升级 toolchain 后把 case 11 的红当产品回归的人（§7.3 已自我登记这一味，本程没推进）。
+2. **没逐枚重算 8 发的 index**（`second-comma-at-26` 等 5 发本程手数过、`late-type-break`/`bad-escape` 按 body 对表）。
+3. **没查 case 12 的期望值出处**（本格只按派单射程做 case 11）；case 12 的 `offset-assert` 用
+   `int64(len(doc))`——那一枚是**构造可独立推导**的，本程没验它有没有同类问题。
+4. **没验 `slo144Report(t)` 那枚 fixture 是不是被本票动过**（它跨票共用；本程只核了两枚被测文件的 blob）。
+
+---
+
 ## N-1　结论修正记录（推翻实现件／推翻本程派单，都写这里）
 
 | # | 原话（谁说的） | 本程现量 | 结论 |
 |---|---|---|---|
 | 1 | **实现件 §8 第 6 行**＋**派单 §2**＋**台账 A268②**："第一版 combos 里 `x-p1-d11a-d11b` 的那一发『0 红』是尺坏了的产物"（派单还写明"修好后在 `combos2/` 复算"） | `post/x-p1-d11a-d11b.log`（＝入库的第一遍，时间戳 23:13:38 早于 `combos2/` 23:15:36）顶层 **FAIL＝1**、红句是字段腿那句 `offset is 0, want 27`；`combos2/` 同一发 **FAIL＝0** | **推翻（方向相反）**：坏尺那遍交回的是**1 红**（假安心），**0 红 逃逸是修好尺之后才出现的读数**。三处（实现件／派单／台账）同源于实现程一句自述，本程按日志字节判 ⇒ 自述与它自己点名的凭据文件不符。派单 §2 那句"那一版 `x-p1-d11a-d11b` 的『0 红』是尺坏了"**不成立**，别照它做 |
+| 2 | **实现件 §2.1**："case 11 的 8 发每发的期望位置是本文件自己声明的构造…**不是从解码器读回来的数**" | 8 枚 `want` 与探针实测 `eo` **逐枚相等**（第 4 格 §4.3 那张对表）；且 `mode-number-at-9` 的 `want=12` 违反测试文件 `:590` 自己声明的"bad byte sits at index want-1"（名字说 index 9） | **推翻**：那 8 枚数**在出处上就是**解码器读数；给出的"构造推导"替代依据 8 发里只对 7 发成立。实现件**自己的 §7.3** 已写明"K+1 是这一版 encoding/json 的 scanner 约定"⇒ **§2.1 与 §7.3 自相矛盾**，§7.3 对、§2.1 是辩护性文字。⚠ **不影响 AC#2 的牙**：本程另用两发现证该检非恒真（§4.2） |
+| 3 | **派单 §2 第 2 条**：`probes/149/post/` 与 `probes/149/combos2/` 里**同名 `x-*` 各有一份** | 现量：`post/` 的 9 枚 `x-*` 全部在 `combos2/` 有对应（为真）；**但派单没点到的还有 4 组**——`post-asis`（`post/`×`post-final/`）、`p1`／`p7`（各三份）、`p10`（两份）⇒ 全树 **13 组同名、28 枚副本** | **说小了**（不是错）：坏尺/多副本的范围比派单点的宽，`x-*` 只是其中一族。本程按整棵树清点（第 1 格 §1.1） |
 
 ## N-2　伪授权登记（两个数分开栏）
 
