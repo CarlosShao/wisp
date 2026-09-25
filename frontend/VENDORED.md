@@ -35,12 +35,12 @@ Owner ruling **R19**: this library is the base of the first version.
 
 | File here | Upstream source | Component | Changes | Mounted? |
 |---|---|---|---|---|
-| `src/components/ai-native/stream-text.tsx` | `components/atoms/StreamText.tsx` | StreamText | header, dropped `use client`, LF endings | **yes** - `src/components/result-stream.tsx` |
+| `src/components/ai-native/stream-text.tsx` | `components/atoms/StreamText.tsx` | StreamText | header, dropped `use client`, LF endings | no - replaced on 2026-09-25, not rejected: it builds reveal units with `text.split(" ")`, and a Chinese answer has no spaces, so `PLAN.md:3476`'s 逐段 was unsatisfiable in the product's main language. Our own `src/components/reveal-text.tsx` now carries that job; the atom stays as the visual reference it was cut from, body bytes unchanged |
 | `src/components/ai-native/shimmer.tsx` | `components/atoms/Shimmer.tsx` | Shimmer | header, dropped `use client`, LF endings | **yes** - `src/components/panel-skeleton.tsx` |
 | `src/components/ai-native/approval-card.tsx` | `components/approval-card.tsx` | ApprovalCard | header, dropped `use client`, LF endings | no - upstream demo questionnaire; it is the visual reference `src/components/l2-approval-card.tsx` was cut from |
 | `src/components/ai-native/loading-state.tsx` | `components/loading-state.tsx` | LoadingState | header, dropped `use client`, LF endings | no - demo strings intact |
-| `src/components/ai-native/thinking.tsx` | `components/thinking.tsx` | Thinking | header, dropped `use client`, LF endings, **1 glyph ASCII-ized by hand** (U+2212 in the diff row; `vendor.mjs`'s `EMOJI_RE` does not carry the math band so it cannot catch or re-apply this) | no - demo strings intact |
-| `src/components/ai-native/tool-chips.tsx` | `components/tool-chips.tsx` | ToolChips | header, dropped `use client`, LF endings, **3 glyphs ASCII-ized** (2x U+2713 via `scripts/vendor.mjs` + 1x U+2212 by hand in the diff row, see the ban #8 note) | no - tool traces arrive with ticket 35 |
+| `src/components/ai-native/thinking.tsx` | `components/thinking.tsx` | Thinking | header, dropped `use client`, LF endings, **1 glyph ASCII-ized** (U+2212 in the diff row). As of 2026-09-25 this one IS re-applied by the generator: `vendor.mjs`'s `EMOJI_RE` now carries `U+2200-U+22FF` and `GLYPH_MAP` maps U+2212 to `-`. The cell used to say the opposite ("the regex does not carry the math band, so a re-vendor cannot re-apply this") - that was true before `67192a5` and false after it. Both files' generated headers now read `1 dingbat glyph(s)` and `3 dingbat glyph(s)` respectively, which is what the widened `EMOJI_RE` counts; no upstream checkout was available to re-run the generator for this note, so those numbers were read off the files, not produced by a run | no - demo strings intact |
+| `src/components/ai-native/tool-chips.tsx` | `components/tool-chips.tsx` | ToolChips | header, dropped `use client`, LF endings, **3 glyphs ASCII-ized** (2x U+2713 and 1x U+2212, all three by `scripts/vendor.mjs` since 2026-09-25; the U+2212 was a hand-fix before that and is now generator-owned, see the ban #8 note) | no - tool traces arrive with ticket 35 |
 | `src/components/ai-native/task-rows.tsx` | `components/task-rows.tsx` | TaskRows | header, dropped `use client`, LF endings | no - history rows are ticket 35+ |
 | `src/components/ai-native/streaming-text.tsx` | `components/streaming-text.tsx` | StreamingText | header, dropped `use client`, LF endings | no - carries upstream's demo source list with external URLs, which must not render in a desktop panel |
 
@@ -52,8 +52,8 @@ tokens with `var(...)` only - `--surface: var(--bg-raised-color)` - so the vendo
 components render in C21's palette. That mapping is asserted literal-free by
 `TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`.
 
-The 6 unmounted files are kept in the tree on purpose (R19 makes this library the
-base, and ticket 35+ mounts them), and `TestVendoredDemoComponentsAreNotMounted`
+The 7 unmounted files are kept in the tree on purpose (R19 makes this library the
+base, and ticket 35+ mounts most of them), and `TestVendoredDemoComponentsAreNotMounted`
 proves which ones are unreachable, so "unmounted" is a fact the gate maintains
 rather than a claim in this table. Vite tree-shakes an unimported module out of the
 bundle entirely, so no demo string reaches the binary.
