@@ -86,6 +86,33 @@ $ diff status-before.txt status-after.txt      -> 空输出 ⇒ STATUS_IDENTICAL
 （`design/doubao/01-ball-states.jpg`、`design/doubao/demo/lib/`、`design/doubao/demo/screenshots/`、`design/old/`）。
 ⇒ **`frontend/**` 与 `.gitignore` 在本轮任何一次测试运行里都没有被写过**（机制见 §2）。
 
+### 0.5 ⚠ 我这一程跑完之后，真树的八数**变了**——变得与被验那批无关，但必须写在这里
+
+交件前我又整道跑了一遍 `sh scripts/d22scan.sh`（锚点已从 `310816f` 走到 `4fab445`，
+其间分支上落了 **21 枚** commit，其中 **4 枚是我自己这张表**、其余 17 枚是他人的）：
+
+```
+$ sh scripts/d22scan.sh ; echo "rc=$?"
+rc=0
+（末行逐字）
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=203, bans #1-5 cmd/=22, ban #6 frontend/=43, ban #7 internal/tools/=18, ban #8 design/=32, ban #8 frontend/=43, ban #8 internal/=407, ban #8 cmd/=39
+$ git ls-files --others --exclude-standard -- frontend
+frontend/scripts/render-stream.tsx
+frontend/src/components/reveal-text.tsx
+frontend/src/lib/reveal.ts
+$ git diff --name-status 310816f..HEAD -- frontend        -> 空输出
+$ git ls-files frontend | wc -l                            -> 40（与 310816f 上 ls-tree 的同值）
+$ git status --porcelain | wc -l                           -> 30（我开始时是 20）
+```
+
+⇒ **两枚 `frontend/` 从 40 变 43，差的是 3 枚"未追踪也没被 ignore"的工作树文件**（第三方正在往 `frontend/**` 写；
+`A227` 那格刚把前端会话从 cold 切成 running，我这程没去核它）。**归因清楚**：区间内没有一枚 commit 碰过 `frontend/`
+（`git diff --name-status … -- frontend` 空），被验那批的两枚代码路径是 `tools/d22scan/**`（§9），
+所以**这不是那批的回归、也不是我这程造的**。
+⇒ 两条读法账：① §0.2 那八数只对**我量它的那一刻与那枚锚点**负责（本仓 `A220⑤` 已经为这件事改过做法，我照做）；
+② 任何人今天重跑这道门会看到 `43/43`，**不要把它读成收尾批把门改坏了**。
+`ban #8 internal/` 仍是 407（那枚并行的 panel 文件到我现在为止没有再长）。
+
 ---
 
 ## 1. 生死格：那枚白盒钉是承重还是镜子
@@ -347,8 +374,9 @@ dist/*$
 > It is not possible to re-include a file if a parent directory of that file is excluded.
 
 ⇒ 三点：①规范只把**行尾**空白列为被忽略，**行首**空白不在这条清单里 ⇒ 它是模式数据；
-②这一节自 git 1.8.2 起就是这个形状（"trailing spaces are ignored"从未反向过），
-ubuntu-latest 无论 22.04（git 2.34）还是 24.04（git 2.43）都带着同一节 ⇒ **跨平台同意是可依赖的，不是运气**；
+②这一节自 git 1.8.2 起就是这个形状（"trailing spaces are ignored"从未反向过）⇒ **跨平台同意是有据的，不是运气**。
+⚠**runner 上那枚 git 的版本号我没有量过**（这台机不是那台机），所以这句话的力度止于"该规则在文档里存在且从未变向"，
+不是"我在 ubuntu 上复现了"（另见 §7.2 与 §11-2）；
 ③同一节那句"parent directory 被排除时不能重新包含"倒是**我们主动偏离 git** 的一支——
 我们的 `match()`（`gitignore.go:504-538`）从最深一层规则文件先答，`weird/` ＋ `!weird/inside.tsx` 会答"未忽略"，
 git 答"已排除"。**方向＝多扫**（§1.4 那 431 形里 `neg-dir-then-file` 落在 agree，因为强制追踪后 `-i -c` 也没举它），
@@ -558,23 +586,31 @@ $ GIT_CONFIG_GLOBAL=... GIT_CONFIG_SYSTEM=... HOME=/nonexistent-xyz ... go test 
 --- PASS: TestFullTrackedListCoversWhatTheNarrowListCannot (0.96s)      # 以及空配置文件的第二遍 (0.99s) PASS
 ```
 
-⇒ **不吃身份、不吃全局配置**。`-b main` 需要 git ≥ 2.28（2020-06），本机 `git version 2.52.0.windows.1`，
-ubuntu-latest 无论 22.04（2.34）还是 24.04（2.43）都在那之后 ⇒ 这条硬依赖不构成新风险。
+⇒ **不吃身份、不吃全局配置**。`-b main` 需要 git ≥ 2.28（2020-06），本机 `git version 2.52.0.windows.1`。
+CI 那一侧我**只量到"这道门整道跑在 ubuntu-latest"**（现读 `.github/workflows/ci.yml`：`:66` `runs-on: ubuntu-latest`、
+`:68` `actions/checkout@v4`、`:81` 步 1＝`bash tools/d22scan/runtests.sh -C tools/d22scan ./...`、`:109` 步 2＝`sh scripts/d22scan.sh`），
+**那台 runner 上的 git 版本号我没有量过**（本机不是那台机，§11-1/§11-2）⇒ 只能说"任何现代 git 都支持 `-b`"，不能说"CI 上实测通过"。
+⇒ 附带一条要紧的：**下一推这枚新测试就会在 ubuntu 上跑**，所以交件件 §6-2 那句"没在 Linux 上跑过"是**仍然开着的一格**，
+不能由它自己或我这一程关掉。
 
 **唯一真吃的全局项我自己造出来了**：`--exclude-standard` 的射程**包含 `core.excludesFile`**。
 我在仓库外挂了一枚全局 excludes（内容一行 `inside.tsx`）再跑：
 
 ```
-$ git check-ignore -v --no-index frontend/weird/inside.tsx
-D:/tmp/d22scan-close-r1-accept/mygitignore:1:inside.tsx	frontend/weird/inside.tsx   rc=0
+$ git check-ignore --no-index -v frontend/weird/inside.tsx        # 在带那枚全局 excludes 的环境里
+D:/tmp/d22scan-close-r1-accept/mygitignore:1:inside.tsx	frontend/weird/inside.tsx
+（上一条命令的 rc=0 ⇒ git 认为这枚件"被规则 bind 住了"，来源是那枚全局文件）
 $ GIT_CONFIG_GLOBAL=<that config> go test -run '^TestFull...$' -v .
     scan_test.go:1597: a plain `git add -A` must track frontend/weird/inside.tsx (git matches no rule on it), ls-files="..."
 --- FAIL: TestFullTrackedListCoversWhatTheNarrowListCannot (0.55s)
-$ 撤掉那枚配置再跑 -> ok ... 0.890s
+$ 撤掉那枚配置再跑同一枚测试 -> ok  github.com/CarlosShao/wisp/tools/d22scan 0.890s
 ```
 
 ⇒ **机器配置能把台件前提撬动，但撬动时它红在前提句上（`t.Fatalf`，还点名 ls-files 现场），不会静默通过。**
 方向＝fail-closed，符合门的规矩；代价＝若哪天真给 runner 挂一枚撞名的全局 excludes，这枚测试要人来看一眼才知道是环境不是代码。
+（另一枚我自己踩过的坑记在这里免得下位重踩：全局 excludes 写 `weird/*` 是**撬不动**的——
+`--exclude-standard` 里的模式带 `/` 就是相对仓库顶锚定的，而临时仓库的顶下面没有 `weird/`；
+换成不带斜杠的 `inside.tsx` 才命中。这是我第一遍"没测出来"的原因，不是测试的漏洞。）
 
 ### 7.3 它和 `A221③` 那支"没有 git ⇒ 全扫并响亮自陈"的关系
 
@@ -587,10 +623,18 @@ $ PATH="/d/work/base/go/bin:/c/Windows/System32:/c/Windows" go test -run '^TestF
 ```
 
 ⇒ 缺 git 时它**红**（`t.Fatalf`），不 Skip ⇒ `runtests.sh` 的 `SKIP != 0 即退出 1` 与 `PASS=0&&FAIL=0 即退出 1` 都还有牙。
-**门的意思变了吗？没有换方向、只多了一枚实例**：本包里今天共 **3 枚**测试走到 git
-（`TestWalksSkipGitIgnoredPaths`／`TestTrackedPathsAreNeverSkippedByTheIgnoreFilter`／本枚），
-前两枚是 `ca84b75`/`3bb99aa` 就有的 ⇒ "**正控需要 git**"这条环境依赖是上一批登记的（验收 §8），
-本批**没有新造一类**，只是把那一支的实例数从 2 加到 3。
+**门的意思变了吗？没有换方向、只多了一枚实例**：本包里今天共 **3 枚**测试直接 spawn git（现量：按"函数体内出现过
+`gitCommand`/`gitIndexFixture`/`gitForceAdd`"归并到所属 `func Test`）
+⇒ `TestWalksSkipGitIgnoredPaths`／`TestTrackedPathsAreNeverSkippedByTheIgnoreFilter`／本枚。前两枚的归属我用 blame 钉了：
+
+```
+$ git blame -L 1279,1279 tools/d22scan/scan_test.go   -> 3bb99aa   （TestWalksSkipGitIgnoredPaths 的行）
+$ git blame -L 1439,1439 tools/d22scan/scan_test.go   -> ca84b75   （TestTrackedPaths... 的行）
+```
+
+⇒ **"正控需要 git"这条环境依赖是上一批登记的**（验收 §8 那格），本批**没有新造一类**，只把实例数从 2 加到 3。
+（口径写清：还有一枚 `TestBuiltBinaryGoesRedEndToEnd` 会把扫描器**建成二进制**去跑，那枚二进制内部也会问 git——
+那是**间接**依赖，不在上面这 3 枚里，我也没为它单独归账。）
 
 ### 7.4 顺手划掉交件件 §6-2 那条"没测"
 
@@ -612,3 +656,185 @@ $ git -C outer/inner/probe rev-parse --show-prefix  -> inner/probe/     # 说明
 
 **成立**：`-count=2` 稳、不吃身份与全局配置、缺 git 响亮红、不新增门的环境依赖；
 外加两枚我给的信息：`core.excludesFile` 是它唯一真吃的机器配置（红得响亮）、§7.4 那条"没测"可以结案。
+
+---
+
+## 8. 程序格：五枚 commit 与"顶回上游措辞还自批不必停"这笔账（题面格 7）
+
+### 8.1 逐枚 name-only（我现跑，`git show --name-only --pretty=format:`）
+
+| commit | 它带的路径 | 枚数 | 判 |
+|---|---|---|---|
+| `304aeec` | `docs/evidence/s1/d22scan-gitignore-fix-close-r1.md` ＋ `tools/d22scan/scan_test.go` | 2 | ✅ 全是自己的 |
+| `b7c06d2` | 同上，代码那枚换 `tools/d22scan/gitignore.go` | 2 | ✅ |
+| `cec5e78` | 只有那枚证据件 | 1 | ✅ |
+| `38f340b` | 只有那枚证据件 | 1 | ✅ |
+| `6a5b321` | 只有那枚证据件 | 1 | ✅ |
+
+另核：五枚**全是单父、线性**（`git rev-list --parents -n1` 逐枚＝2 个词）⇒ 没有 merge、
+没有"改写已推送历史"的形状；整窗口（含并行的 panel 三枚）`git diff --numstat 304aeec^..6a5b321` **只有 4 枚路径**（§9.1）
+⇒ **owner 那 16 枚 `design/**` 未提交删除、那 4 枚未追踪件，一枚都没被卷进这五枚 commit**。
+这是"带 pathspec"最硬的一条旁证：`git commit -- <两枚路径>` 在形状上就吞不掉别家。
+
+**我不能核的那一半，明写**：每枚 commit 之前那一刻 `git diff --cached --name-only` 里有没有出现过别家路径——
+索引历史不落盘，事后无法复原。所以我**只核得到"零泄漏"，核不到"有没有触发 `A220④(a)` 那条停手条件"**；
+交件件 §5 那行自称"枚枚只带我自己的路径"，与盘上一致，但它自述的是**索引态**，那一层 remains 〔仅自述〕。
+
+### 8.2 题面那句"自批不报告"，盘上比它说的好——先把事实摆正
+
+题面的表述是"contradict the previous acceptance's sentence, then self-approve **not reporting it**"。我查了发布物本体：
+
+```
+$ git log -1 --format=%B 304aeec | grep -n "不同意"
+11:一处不同意验收的文字：它 §4 末"从此摘掉 all 那一味必红"与它自己读数表第 4 行矛盾，盘上复算同它表一致
+12:（纯行为断言在 B 行全不响），所以加了 holds() 那一枚白盒断言，否则这条闭不上。
+$ git show 304aeec:docs/evidence/s1/d22scan-gitignore-fix-close-r1.md | sed -n '77,80p'
+⚠ 一处对验收文字的不同意（照单收会收错）：… 这不是扩大范围，是它那张表已经量到、但文字写歪了的那一位。
+```
+
+⇒ 偏离与理由**写进了那枚 commit 的正文与它同时落盘的证据件 §1.4**（不是交件后补、不是只写在聊天里）。
+所以"没报告"不成立；成立的是**"报告了但没停下来等批准"**。这两件事在该归的账上差一档，我要按盘上那一档记。
+
+### 8.3 判：**方向对、程序欠一手，但真正该补的不是这一程的账，是一条没有规则的空白**
+
+- **实质那一半我完全认**（并且我把它独立复现到了二进制输出层，§1.3）。
+  照字面执行"必红"只有两条路：要么在测试里**顺手把匹配器改坏**再造红——那是本仓最忌讳的"为凑判制造形状"；
+  要么承认打不红然后把那味删掉——§1.3 第 2 条读数证明删了就真丢牙。两害相比，**加一枚最小的真到达它的白盒断言是唯一正确答案**。
+- **程序那一半确实欠一次报回**：`A220④(a)` 的升格句式管的是"别家暂存条目"，本批**没有触发它**（我也无法证否）；
+  本批触发的是**另一件事**——上游工作单内部两句话打架，实现方自选一支继续走。
+  而**现行规矩里没有这一条**：AGENTS.md §0.1/§2 的"未定义即停"讲的是"方案没覆盖的情况"，
+  没说"方案自相矛盾时算不算"。⇒ 这一程不该被记成"违反了 `A220④(a)`"（那会把账记到错的格子里），
+  该记的是**"这里有一类没写下来的情形，本程用一次个人判断填了"**。
+- **我建议给编排者一条可复算的判据**（把这次的正当条件写成规则，而不是把这次当先例供人自由引用）：
+  下游顶回上游措辞**只在同时满足三件时才允许不亦步亦趋地照做、且不必停手**——
+  ① 顶回依据是**盘上可复算**的读数（本批：变异表；我这轮：全复现＋二进制 diff）；
+  ② 偏离与理由**写进造成它的那枚 commit**（本批：满足，见 §8.2）；
+  ③ **不放宽任何既有断言**（本批：删除列 0、`SKIP=0`、阈值/golden/allowlist 零字节，见 §9）。
+  三条缺一即回到"停手报回"。反过来说：**这三条不写下来，下一程就只会引用这次的结论，不会引用这次的边界。**
+- 一处小瑕疵（不判退回）：`git log --oneline` 只看**标题**是看不出这次顶回的（标题只说"从此有断言要求它"），
+  要看正文才看得见。若编排者希望这类偏离在 `log --oneline` 一层就可见，那是**措辞习惯**问题，可提一句。
+
+---
+
+## 9. 契约轴（题面格 8）
+
+区间＝本批全部五枚 `304aeec^..6a5b321`（＝`22be55e..6a5b321`）。**整窗口改了什么的完整清单**：
+
+```
+$ git diff --numstat 304aeec^..6a5b321
+267	0	docs/evidence/s1/d22scan-gitignore-fix-close-r1.md
+382	0	docs/evidence/s1/panel-l2-grant-nail-accept-r1.md   <- 并行那位的证据件，不算我的账
+30	7	tools/d22scan/gitignore.go
+101	0	tools/d22scan/scan_test.go
+```
+
+| 契约面 | 我的量法 | 读数 | 判 |
+|---|---|---|---|
+| `internal/observe/thresholds.go` | `git diff --numstat 304aeec^..6a5b321 -- <path>` ＋ blob 比对 `304aeec^` vs `6a5b321` vs `HEAD` | 空输出；blob **同值** | ✅ 零字节 |
+| golden（`*.sse`） | `git ls-files | grep -c '\.sse$'` ＋ `git diff --numstat … -- '*.sse'` | 仓里 **52 枚**；diff **空** | ✅ 一枚未动 |
+| `tools/d22scan/allowlist.txt` | numstat ＋ blob | 空；blob 同值 | ✅ 零新增豁免 |
+| `internal/risk/rules_gateway.go` | numstat ＋ blob | 空；blob 同值 | ✅ |
+| `internal/risk/**` | `git diff --numstat … -- internal/risk` | 空 | ✅ |
+| `docs/PLAN.md` ／ `docs/specs/**` | 各一枚 numstat | 空／空 | ✅ 未碰契约与规格 |
+| `frontend/**` | `git diff --numstat … -- frontend` | 空 | ✅（工作树里也没有：§2 那两问） |
+| `design/**` | `git diff --numstat … -- design` | 空 ⇒ owner 那 16 枚删除**没被卷进任何一枚 commit** | ✅ |
+| `main.go`（`emojiRe` 所在文件） | blob `304aeec^` vs `HEAD` | 同值 | ✅ 仪器未动 |
+| `tools/d22scan/gitignore.go` | blob 比对 | `DIFF`（＋30/−7，且 §6 末行那三把尺证明**全在注释行**） | ✅ 生产**行为**零改动 |
+
+⇒ **题面列的九面全零字节**（阈值／golden／allowlist／`rules_gateway.go`／`internal/risk/**`／`PLAN.md`／`specs/**`／`frontend/**`／`design/**`），
+**另加一面**：仪器所在的 `main.go` 也 blob 同值。唯一 DIFF 的是 `gitignore.go`，而它每一行都是注释（§6 末行）。
+`DEFERRED(D-xx)` 那一条我一并扫了：`git diff 304aeec^..6a5b321 | grep -c 'DEFERRED('` ＝ **0** ⇒ 本批没新增/删除任何推迟标记（登记表的 1:1 双向不受影响）。
+
+---
+
+## 10. 总裁
+
+| 格 | 判 | 一句凭据（全是我自己现量的，锚点写在正文里） |
+|---|---|---|
+| §0 闸门重跑 | **成立** | step1 `29/0/0/69 rc=0`、step2 八数逐枚同值、`gofmt`(整仓)/`vet`/`build` 全清、测试前后 `git status` 逐字节同值 |
+| §1 生死格（白盒钉＝承重还是镜子） | **成立**（读法 (i)，带一枚明写的 (iii) 形限定；**读法 (ii) 的"删掉那味"被我的读数正面否掉**） | 四行变异表连行号逐枚复现；我多量一层到二进制：`post≡M1`（真树＋种子树）但 `post≡M4a` 而 `M4a≠M4aM1`（分母 4→3、finding 消失、note 改口）；431 枚规则形里造不出过度匹配 ⇒ "今天无可观察差异"为真、"那味无行为后果"为假 |
+| §2 夹具是否合成 | **成立** | `liveFixture`→`t.TempDir`→`os.TempDir()` 实测在仓库外；新测试区零 `Abs/Getwd/Chdir`；包级 helper 51→52；按路径问 status 只余 owner 那 20 枚 |
+| §3 空白种子 | **成立** | `git ls-files` / `-i -c` / `check-ignore` 三读数逐字复现；`gitignore(5)` 原文只豁免**行尾**空白 ⇒ 跨平台有据；等值断言塌时红在 `:1591`/`:1597`（实测），fail-closed |
+| §4 行号与引用完整性 | **退回（措辞级，两枚具名）** | `scan_test.go:1547` 的 `gitignore.go:225` 被**本批自己的** `b7c06d2` 漂成 `:248`（五锚现量），同批证据件用 248 ⇒ 两份文件两个号；交件件 §2 把 `scan_test.go:1179/1194` 归给 `3bb99aa`，`git blame` ＝ **`ca84b75`**。其余 20 余枚 `file:line` 逐枚同值 |
+| §5 子集／并集重导 | **附条件成立** | 方向复现（`comm -13` 空、`comm -23` 非空 10 行）；"共用解析器"那一腿**承重**（它打死的是"两路互为备份"那句假担保）；但新写的 `strictly a subset` / `nothing … already came from the guard` 是无条件话，而 `:240`/`:244` 是**两枚非原子的 spawn**——白盒造竞态量得出来：`holds(file)=true` 但 `holds(dir)=false` ⇒ 目录支不兜、方向＝少扫。补一句限定即闭合 |
+| §6 数与尺 | **成立** | 每一枚我另配一把尺＋正控；其中"28 那一枚"我从〔仅自述〕提到〔独立复现〕（两棵 `git archive` 快照在仓库外各跑一次） |
+| §7 新测试稳度 | **成立** | `-count=2` 两遍同过；不吃身份/全局配置（空配置＋假 HOME 实测）；唯一真吃的 `core.excludesFile` 我造出来了 ⇒ 红在前提句；缺 git ⇒ 红在 `:1586` 不 Skip；本包 git 依赖测试 2→3 枚 ⇒ 门未新造一类依赖；§7.4 顺手把它一条"没测"结案 |
+| §8 程序 | **成立（实质）＋程序那半按下面这条改写** | 五枚 commit 逐枚 name-only 只有自己的路径、单父线性、owner 那 16 枚删除零卷入；**"自批不报告"这句按盘上要降级为"报告了但没停下来等批准"**（偏离与理由写在 `304aeec` 的正文与同枚落盘的证据件 §1.4 里） |
+| §9 契约轴 | **成立** | 九面零字节；`*.sse` 52 枚未动；`DEFERRED(` 本区间 0 命中；两枚允许动的面各有尺 |
+
+**总体＝退回（措辞级），三件最小闭合集合，全部注释／文档级，零生产行为改动：**
+
+1. `tools/d22scan/scan_test.go:1547`：`gitignore.go:225` → `:248`，**或**去掉裸行号、改写"`runGitIndex` 里 `parseIndexPaths(all)` 那一句"（这批自己已经演示了行号在一枚 commit 内就会烂）。
+2. `docs/evidence/s1/d22scan-gitignore-fix-close-r1.md` §2 末段：`3bb99aa` → `ca84b75`（**只追加更正、不改写原句**，按台账老规矩）。
+3. `tools/d22scan/gitignore.go:186-188`：给 `strictly a subset`／`Nothing in a skip decision …` 那两句加上"同一枚静止索引上"这一限定，
+   并（可选、更大的一手）记一句"`:240` 与 `:244` 是两枚独立 spawn，中间不容 commit"。这一条**不是本批造的行为**，是 `ca84b75` 的两读形状；
+   要真补牙就是生产码改动 ⇒ **该单开一格由编排者拍，不在这一程顺手做**。
+
+**三件之外，本批交件质量我按"上一程那三枚条件"逐条对齐**：条件①（补第三枚半）**闭合并且比我预期的诚实**——
+它没有照那句话去造一个假红；条件②（"唯一形状"改两支）**闭合**，末行那句不声称穷尽达到了这批自立的尺；
+条件③（子集/联合换真理由）**实质闭合、措辞差一枚限定**（它确实自己重导了，不是抄验收的推论——我把两把尺都跑了一遍）。
+
+**`A221②` 那格"批准保留"现在有没有数？**（题面点名要我判的一句）
+
+- **"它是防御、不是装饰"这一句：有了，而且比我见过的任何一版都硬。**
+  不是靠 M4a＋M1 那一行测试红，而是靠**门输出层**那对读数：同一棵树上 `post ≡ M4a`（那味把语义退回吞掉了）、
+  `M4a ≠ M4aM1`（摘掉那味，受追踪的交付字节当场从分母与 finding 里消失）。
+  外加一条**不需要量的**结构论证（§1.5）：那一味买的是"不隐身"与规则形状**无关**这件事本身。
+- **但"今天有没有一棵真树能看出差别"这一句：没有，这是我量出来的否答（431 形）。**
+  ⇒ `A221②` 里那句"现在有数了，不再是我觉得合理"如果被人读成"已经证明该留着"，**读过头了**；
+  它真正的依据是三样东西叠起来：**一条码级不变式（最硬）＋ 一发已发生的同类缺陷家族（M4a/`post≡M4a`）＋ 一句预报（第三枚会不会长出来，这一枚仍是判断）**。
+  ⇒ 建议把 `A221②` 就地追加这一句分层，别再让"数"和"判断"混在同一格里（**原话不改**）。
+- **代价那一栏没变**：＋0.34 s/次、6 枚只读 spawn，仍只付在 step 2 与本地跑门（`A221②` 记的数，**我没有重测**——
+  我这轮的读数全部在"改不改输出"这一层，没有去数 spawn）。我能给的担保是两条更基本的：
+  `main.go` 的 blob 在本区间**同值**（仪器一行没动），`gitignore.go` 的 diff **每一行都是注释行**（§6 末行那三把尺），
+  且我自己跑的整道门 step 2 rc=0 与八数同值（§0.2）⇒ 那笔"每次多花 0.34 秒"的账**没有理由在本批变化**，但它是引用不是复测。
+
+**最后一层，也是我最想让编排者看到的一层**：这批真正值得入账的不是那枚测试，是**它拒绝把上游的一句话当成判据去凑**。
+本仓反复记"审计给的修法也是未验证断言"，这次是同一规矩在**反方向**上兑现了一次（下游推翻上游）。
+但它兑现得比规矩多走了一步（没停手）——**该补的是规矩，不是这一程的账**。§8.3 那三条可复算判据就是我要交的实物。
+
+---
+
+## 11. 我没有测什么（绝不让沉默被读成批准）
+
+1. **GitHub CI 零次**：没跑过、没读过任何 run id／step 日志。§3.2 的"ubuntu 会同意"是从**这台机自带的 `gitignore(5)` 原文**推的，**不是 ubuntu 上实测的**。
+2. **没在 Linux 上跑过任何一枚测试**：全部 win32 ＋ `git 2.52.0.windows.1`。已知两枚平台相关量我没验：
+   `core.ignorecase`（本机 true ⇒ §1.4 那枚 `WEIRD/*` 落在 under-read；linux 上它变成 agree，谁都不吃亏）、
+   以及 ubuntu 上 `/tmp` 的属主与 `git` 的 `safe.directory` 那一支（本机全局有 `safe.directory=*`，**我没有一台没有它的机器可测**）。
+3. **§5.3 那枚竞态是我用白盒手造的状态，不是在真 git 上跑出来的**：我没做"`:240` 与 `:244` 之间塞一枚 commit"的端到端复现。
+   所以那一格的力度止于"码上可查＋态可构造"，**不是"这仓现在正漏着什么"**。
+4. **过度匹配只搜了 431 枚规则形**（55 手挑 ＋ 384 乘积枚举）。"造不出"只在**我搜过的形状**内成立；穷尽性我不敢说，这正是 §1.5 那条不变式存在的理由。
+5. **没跑整树 `go test ./...`**（题面禁令：并行的 panel 程在编译，读数不可归因）。`go vet ./...`/`go build ./...` 我跑了（rc=0），但那只是编译。
+6. **`ban #8 internal/=407` 与 `design/` 的 32/30 分家我没有自己重造**：前者我引 §0.2 的现量值并写明归属与锚点，
+   后者我没有一枚"净快照"树可扫（`git archive` 出来的树没有 `.git`，扫描会走"问不到 index ⇒ 全扫"那一支，八数根本不可比）。
+7. **每枚 commit 之前 `git diff --cached --name-only` 的索引态不可复原**（§8.1）：我只核到零泄漏。
+8. **上一程的 M2/M3/M4b/M5/M6 我没重跑**：依据＝§6 末行那三把尺证的"生产行为零改动"＋`main.go`/`gitignore.go` 的 blob 面（行为路径未变）。
+   这不等于"那五发今天仍红"，只等于"本批没有改变它们红不红的任何东西"。
+9. **新测试对 `holds()` 的目录位（`dirs`）没有覆盖**（§1.7）——我量到了这一层缺口存在、也量到它由上一程的 `:1485/:1488` 钉着，
+   但我**没有**独立重跑那一发来证明它今天仍咬得住。
+10. **`runtests.sh`/`d22scan.sh` 这两枚脚本自身没被我改过也没被我逐行审**（不在本批射程）；我只用它们取数。
+11. **owner 的 `NO CONCLUSION`／`slo-full` 那一套与本批无关**，我一次没碰。
+
+---
+
+## 12. 给人看的那一段（零术语）
+
+这一批没有给用户做出任何新功能，也没有改动任何会跑起来的东西。它做的事用一句话说：
+**项目里有一台"看代码有没有犯规"的检查器，它以前有一种可能被悄悄骗过去的走法——某份文件明明在交付清单里，
+却被检查器当成"这是构建垃圾，不看"而整份跳过。上一批把这条堵上了，但堵住它的那道闩本身没有任何测试在看着，
+谁都可以哪天顺手拆了而没有人报警；这一批就是去给那道闩装上一根会报警的针。**
+针装好了：我把它拆下来重跑了一遍，检查器立刻尖叫（我复现了它的每一声）；针留着，检查器和拆掉闩的结果在你现在这棵树上
+一个字都不差（这也量了）。
+
+**还能不能被绕过？** 能，两条，都不新：① 如果哪天有人让检查器把某类文件"看漏"（这类失误这个项目已经犯过两次、
+也都修了两次），闩仍然会拦住"漏看交付文件"这一种后果，而那根针保证下一次有人改坏时会响；
+② 检查器读文件清单时问了两回 git，两回之间如果恰好有人往清单里加文件，理论上存在一个极小的窗口——
+这一条我构造出来了但没有在真环境里跑出来，而且它属于**更早一批**留下的形状，这一批只是把话说得太满（我要求它补一句限定）。
+
+**对你机器的安全性改变了什么？** 今天：**零**。这台检查器是开发期的一道门，不在你运行的产品里；
+更重要的是，本项目这一带**今天什么都没有接到真的审批路径上**——防"面板替你按下同意"的那扇门压根还没装（见 `A217`/`A220`/`A222` 那三格），
+所以这里没有任何东西在今天保护或危害你的机器。它保护的是**将来接上那一天**没人偷偷改坏判定逻辑。
+
+**我要你做什么？** 不用你拍任何新的题。只有两枚一句话的更正需要走一遍实现程（改一个行号、改一处"这句是谁写的"的归属），
+外加一处措辞补半个从句；三件都是文字，不碰行为。我建议顺手把 §10 里那三条"下游可以顶回上游"的条件写成规矩——
+不写的话，下一程只会学到"顶回可以"，不会学到"在什么条件下才可以"。
