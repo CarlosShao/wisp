@@ -323,3 +323,59 @@ M8 --- FAIL: TestNoInboundEnvelopeCanBindAnApprovalVerdict   （AST 那半从此
 现量是：**换尺之后三枚确实都进了射程，但只有 M6/M13 当场红**；
 M7 在射程里仍然**静默**，因为射程只决定"看不看这枚 struct"，词表判的是"这枚 struct 的键算出来叫什么"。
 ⇒ §4 那半句我按读数改过（`cc6dc16`），(c′) 是独立承重的一枚，不是 (c) 的零头。
+
+---
+
+## §6 修法 (d)(e)：文件头补"今天什么都没接线"，`:604` 那处指向不存在测试的引用改掉
+
+### §6.1 (d) 一句大白话，且每个字都可复算
+
+派单要的是"nothing is wired today"这一句，验收 §1.1 判它是"下一位把 `Q-49` 划成 covered 的入口"。
+我写成一段并把**每个断言都配一枚可复算命令**，不写"据称"：
+
+```
+grep -rn ParseComposerRequest --include=*.go .   ->  ./cmd/wisp/run.go(1,注释) ./internal/panel/bridge.go(4)
+                                                      bridge_test.go(6) composer_handlers.go(1,注释)
+                                                      l2_grant_boundary_test.go(6)
+   非测试命中里除去定义本身(bridge.go:77)，其余四处全是注释  =>  生产调用者 = 0
+grep -c webview go.mod                            ->  0        (主模块今天连 WebView2 依赖都没有)
+sed -n '225,227p' cmd/wisp/run.go -> "Nothing calls it yet - the WebView2 \"event -> ParseComposerRequest\"
+                                       hop does not exist in this tree (tickets 33/35)"
+```
+
+头段落同时改了一句**过去可能被读反**的措辞：绿"不等于 panel 拿不到批准权"，绿的意思是
+"这道边界**被接线**时不可能不红"。并把"两枚补强之后仍然开着的洞"写进 `WHAT THIS FILE DOES *NOT* COVER`：
+运行期拼出来的路由名（config／网络上来的）与词表之外的结论键名（`proceed`/`yes`/`ok`）——
+这两格**不是我没做，是判据本身只看得见"写下来的东西"**，写明白比留白好。
+
+### §6.2 (e) 指向不存在测试的那句
+
+旧句（`5b618d14` 的 `:604`）：`… past the naming gate TestComposerMethodNamesMatchFrontend`。
+那枚测试**定义 0 处**（派单已核；我进场先复算：见下）。新句不再把人往不存在的地方领，
+而是把**这一行为什么是唯一一道闸**说清：
+
+```
+Go answers %q but no Method* constant declares it: a route written straight into the guard's case list.
+Nothing else in this package would notice - TestFrontendComposerRequestsMatchTheEnvelope (bridge_test.go:131)
+is the test that reads the frontend for these names, and it only ever iterates the four declared constants,
+so a fifth route that never became a constant is invisible to it. This line is the only gate on that shape
+```
+
+- 指向的是**存在**的那枚：`grep -rn "func TestFrontendComposerRequestsMatchTheEnvelope" internal/panel/` = 1 处定义
+  （`bridge_test.go:131`），且它的行为与我写的描述对得上（我读了全文：它 `for _, m := range []string{Method…}`
+  四枚常量去 grep `frontend/src/lib/panel.ts`，**从不读守卫**）。
+- "只迭代那四枚常量"这半句就是 M1b 那发的红句能立住的原因，不是我替它编的赞美。
+
+### §6.3 顺手核到但**不修**的一处生产码失效引用
+
+`internal/panel/bridge.go:33` 同一枚不存在的名字（票 92 留的，先存在）：
+
+```
+// Methods the composer route answers. Renaming one on either side goes red in
+// TestComposerMethodNamesMatchFrontend, which greps the frontend for them.
+```
+
+派单明令我**别碰** `bridge.go:33`（生产码、别家地界）。现量：全仓 `grep -rn TestComposerMethodNamesMatchFrontend`
+= **1 处（就是这一行）+ 我改掉的这处引用**，定义 **0 处**。
+⇒ 上报为遗留缺陷：注释承诺了一枚不存在的门禁，实际干这活的是 `bridge_test.go:131`；
+修它要动生产文件的注释，属票 92/接线切片卡那一程，**不在本程**。

@@ -37,19 +37,36 @@ package panel
 //
 // WHAT THIS FILE PINS (four facets, all Go-side, all green at this anchor):
 //
-//	(1) the set of inbound methods Go actually answers - derived from this
-//	    package's own route guard, not from a list copied into a test - contains
-//	    no approval-shaped name, and agrees with knownComposerMethod at runtime;
-//	(2) the envelope type every answered method decodes into cannot BIND a key
-//	    whose name carries an approval verdict, recursively through embedded and
-//	    nested types - checked by reflection over the production type and by an
-//	    AST scan that can name file:line;
+//	(1) the set of inbound methods Go actually answers. It is derived from this
+//	    package's own route guard rather than copied into a test, it goes LOUD
+//	    when a case label cannot be resolved, and it is cross-checked against
+//	    knownComposerMethod in BOTH directions - plus the wider oracle, which
+//	    takes every route-shaped name written anywhere in the package and asks the
+//	    running guard about it. No answered name is approval-shaped;
+//	(2) the envelope every answered method decodes into cannot BIND a key whose
+//	    name carries an approval verdict, recursively through embedded and nested
+//	    types. "The envelope" is found by locating this package's own JSON decode
+//	    calls, not by recognising a route field, and it is checked three ways: an
+//	    AST scan that can name file:line, reflection over the production types,
+//	    and encoding/json itself via DisallowUnknownFields;
 //	(3) behaviour: the historical wire shape is refused by ParseComposerRequest,
 //	    and for every answered route an envelope that adds outcome:"grant" parses
 //	    into a value that no longer holds it;
 //	(4) teeth: the same AST instrument, pointed at a COPY of this package with a
-//	    grant-carrying envelope, an answered approval route, and a throwaway
-//	    handler planted, must name the planted lines.
+//	    grant-carrying envelope, an answered approval route, a renamed route key,
+//	    an unreadable case label and a second route chain planted, must go red or
+//	    say why it could not read the tree.
+//
+// NOTHING IS WIRED TODAY - THIS PIN PROTECTS NOTHING YET. No production code
+// calls ParseComposerRequest, so no request from the page reaches these routes at
+// all: at this anchor `grep -rn ParseComposerRequest --include=*.go .` yields the
+// definition (bridge.go:77) plus test call sites, and every other hit is a
+// comment - including cmd/wisp/run.go:225, which says so itself ("Nothing calls it
+// yet - the WebView2 \"event -> ParseComposerRequest\" hop does not exist in this
+// tree"), and `grep -c webview go.mod` is 0, so the module cannot even receive a
+// postMessage today. A green run here therefore does NOT mean "the panel cannot
+// grant"; it means "this boundary cannot be WIRED to grant without a red test".
+// Read the two rounds in docs/evidence/s1/ before treating any of it as covered.
 //
 // WHAT THIS FILE DOES *NOT* COVER - read this before citing it as coverage:
 // the ban's wording is wider than this instrument. A violation drawn entirely in
@@ -59,6 +76,15 @@ package panel
 // historical button lines are planted into the same tree and the instrument
 // reports nothing about them. Registered as zero-instrument coverage on the UI
 // side in docs/evidence/s1/panel-l2-grant-nail-r1.md.
+//
+// Two holes stay open after the r2 fixes, and both are rules about what is
+// WRITTEN rather than what can be MADE to happen: a route name assembled at
+// runtime (out of config, or off the wire) appears in no literal pool and no
+// static scan reaches it, and a verdict field whose spelling is not in
+// grantFieldWords ("proceed", "yes", "ok") is a name this file has never heard
+// of. The vocabulary is deliberately narrow - see its own comment - so these are
+// judgement calls, not oversights, and widening them is a slice card rather than
+// a quiet edit here.
 //
 // NOTHING here keys on frontend/src/lib/panel.ts:50's ApprovalOutcome union: that
 // union still contains "grant" by the frontend session's explicit choice, so an
@@ -1169,7 +1195,7 @@ func TestAnsweredPanelRoutesCarryNoApprovalDecision(t *testing.T) {
 	}
 	for _, name := range answered {
 		if !declared[name] {
-			t.Errorf("Go answers %q but no Method* constant declares it - a route written straight into the guard, past the naming gate TestComposerMethodNamesMatchFrontend", name)
+			t.Errorf("Go answers %q but no Method* constant declares it: a route written straight into the guard's case list. Nothing else in this package would notice - TestFrontendComposerRequestsMatchTheEnvelope (bridge_test.go:131) is the test that reads the frontend for these names, and it only ever iterates the four declared constants, so a fifth route that never became a constant is invisible to it. This line is the only gate on that shape", name)
 		}
 	}
 	t.Logf("answered inbound routes = %v; %d declared Method* constants; 0 approval-shaped names on either side",
