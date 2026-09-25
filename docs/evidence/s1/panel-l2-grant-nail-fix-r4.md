@@ -401,3 +401,39 @@ shell 文本**——heredoc 我该用 `MSGEOF` 收尾却写了 `EOF`，于是终
 
 **给下一程的一句**：判"是不是授权"不看它长在哪枚输出里、看它**能不能被我自己的命令复算**——复算不到的就当形状登记，
 不要当指令。本节就是按这条做的。
+
+---
+
+## §11（追加）交付态复量与三枚落点的逐枚自证（写完全文之后现跑，不是抄 §5）
+
+```
+本程那三枚 commit 逐枚 git show --name-only（**不跑区间、不按 author**：共享树里 author 是同一枚 git config，
+`git log --author=` 会把别家那一程的 4263d82/f94cf18/188ceb6 一起捞进来，用它自证必假）：
+  594a99e -> internal/panel/l2_grant_boundary_test.go                       （145 增 / 6 删）
+  1875908 -> docs/evidence/s1/panel-l2-grant-nail-fix-r4.md                  （378 增 / 0 删）
+  ffe9f42 -> docs/evidence/s1/panel-l2-grant-nail-fix-r4.md                  （§10 那一节的追加）
+区间复算（取于 HEAD=ffe9f42）：
+  git log --oneline 88eab34..HEAD -- internal/panel/  -> **只有 594a99e 一枚** ⇒ 别家全程未碰本包
+  git diff --numstat 88eab34 HEAD -- internal/panel/  -> 145  6  internal/panel/l2_grant_boundary_test.go（一枚路径，正控非空）
+  git hash-object internal/panel/bridge.go            -> d2cd6362ecc6941a0cee58073a2bf8ab6669a590
+  git rev-parse HEAD:internal/panel/bridge.go         -> d2cd6362…            ⇒ 生产码零字节，且与我全程对齐的就是这一版
+  git rev-parse HEAD:internal/panel/l2_grant_boundary_test.go -> 58f545144af54c0b16eaed013a0904fb1ffd562a
+  git status --porcelain -- internal/panel/           -> 空
+```
+
+**交付态三门四数（全部现跑，取于 HEAD=`ffe9f42`，原始件 `D:\tmp\panel-l2-grant-nail-fix-r4-dwl\out\`）**：
+
+```
+go test ./internal/panel/ -count=1 -v   rc=1  out/delivered-repo-count1.txt
+  RUN=99 TOPPASS=52 SUBPASS=46 FAIL=1 SKIP=0 ^panic:=0
+  唯一红名 = TestC21DesignTokensFourWayAgree（脏树缺 design/assets/tokens.css，未修未跳未放宽＝保持红）
+  l2_grant_boundary_test.go:1389: behavioural sweep of the running guard: asked=528 … answeredByRealGuard=0, hits=[]
+gofmt -l internal/panel/                 -> 空（out/gofmt-final.txt，0 字节）
+go vet  ./internal/panel/                -> 空（out/vet-final2.txt，0 字节）
+sh scripts/d22scan.sh                    -> rc=0（out/d22scan-delivered.txt，取于 HEAD=ffe9f42）
+  bans #1-5 internal/=203 cmd/=22 | ban #6 frontend/=46 | ban #7 internal/tools/=18
+  ban #8 design/=32 frontend/=46 internal/=407 cmd/=40  |  d22scan: clean - no D22 ban violations
+```
+
+⇒ §5.1 那两发（改前 `88eab34`／改后 `7eec871`）与这一发（交付态 `ffe9f42`）**三发四数一字同、名册同、唯一红名同**。
+`internal/=407` 与 `cmd/=40` 自 r3-accept 那两发以来未变（本批只动一枚 `_test.go` ⇒ 只进 ban #8 的 internal/ 分母）。
