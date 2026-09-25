@@ -512,3 +512,103 @@ $ go test -count=1 -v -run TestProbeRaceDirLeg .
 **附条件成立**：重导方向真、两把尺各一枚、"共用解析器"那一步确实在打死一句假担保（承重）；
 两处 `strictly a subset` / `nothing … that did not already come from the guard` 的措辞过头（§5.3），
 与本批被判的两枚行号账同属注释级，一起修一程即可。
+
+---
+
+## 6. 闸门与那几把尺（题面格 5）——每枚数旁边都写我量它的锚点
+
+| 判据（交件件的声明） | 我的现量 | 锚点／时刻 | 判 |
+|---|---|---|---|
+| step 1 `PASS=28→29 FAIL=0 SKIP=0 RUN=68→69` | **三处各量一遍**：① 真树整道门＝`29/0/0/69 rc=0`（§0.1）；② `fullhead\`＝`git archive HEAD` 全量快照里 `go test -count=1 -v ./...`＝**29 / 0 / 0 / 69**；③ `fullpre\`＝`git archive 304aeec^` 快照同命令＝**28 / 0 / 0 / 68**（`SKIP=0`！） | `310816f`；快照＝HEAD 与 `22be55e` | ✅ **复现，而且我把"28 那一枚"从〔仅自述〕提到〔独立复现〕**：交件件是在活树上前后来各跑一次量的，我是拿两棵**已提交快照**在仓库外各跑一次，中间没有"我自己的改动"这个混杂量 |
+| 名册差集 ＋1／−0（28 枚旧名逐枚仍在） | `diff` 两棵快照的 `--- PASS/SKIP` 名册 ⇒ 唯一一行 `> --- PASS: TestFullTrackedListCoversWhatTheNarrowListCannot`，无删除行；再与真树名册对（29 枚）⇒ 差的 6 枚在快照里是 SKIP（它们在副本里找不到 `../..` 那棵真仓库），**一枚没消失** | `fullpre` → `fullhead` | ✅（这一条按台账教训必做：一枚 panic 会吞掉同包其余读数，四数看不出来） |
+| "新测试内部没有 `t.Run`，所以两数各 ＋1" | `sed -n '1541,1641p' scan_test.go | grep -c 't\.Run('` ＝ **0** | HEAD | ✅ 解释了为什么不是 ＋2 |
+| step 2 八数 `203/22/40/18 · 32/40/407/39`、`rc=0` | §0.2 逐字，**八枚同值**；`ban #8 internal/=407` 的归属＝`internal/panel/l2_grant_boundary_test.go`（盘上 10:09 那版），**不是本批**（本批对 `internal/**` 零动作，见 §9） | `310816f` | ✅（并注明：`design/=32` 是工作树形状，净快照 30——这一对我没法在活树上分开量，我引 `A221⑥`/验收 §9 那两笔已登记的读数，不当自己的证据用） |
+| `gofmt -l` 空 | `tools/d22scan` 空；**整仓 `gofmt -l .` 也空** | HEAD | ✅（我把它扩到全仓量的） |
+| `go vet ./...`／`go build ./...` 过 | 都 rc=0，`vet.log` 行数 0；`tools/d22scan` 内单独 `go vet ./...` 也 rc=0 | HEAD；⚠ 整树 vet 会编译 `internal/panel`，那是并行程的提交态，**我只据 rc=0 说"编译干净"，不拿它当行为读数** | ✅ |
+| 断言 `164→173`（＋9，逐枚在新测试里）、删除列 0 | 我这把尺 `grep -cE 't\.(Error|Fatal)[A-Za-z]*\('` 在 `git show` 上量：`304aeec^`=**164**／`HEAD`=**173**；`sed -n '1541,1641p' | grep -c` 同一把尺＝**9**（⇒ ＋9 全在那一枚内，一枚没在别处加）；`git diff --numstat 304aeec^..b7c06d2 -- scan_test.go`＝`101  0`（删除列空） | HEAD | ✅ |
+| `t.Skip[f]?(` 7→7，且**第一把尺恒不匹配已作废重做** | 正控我两问：① 字面 `t\.Skip(` 在整个 `tools/d22scan/*.go` 里 **0 命中** ⇒ 第一把尺不是"读到 0"，是**结构性不可能命中**（本包 7 枚全是 `t.Skipf(`）；② 修好的尺打印出那 7 枚行号 `241,261,677,1044,1189,1916,1989`，**与交件件列的七枚逐枚同值** | HEAD | ✅ 这一格我原本打算抓它一把，结果抓到的是它自己已经抓过的那把 |
+| `emojiRe` 那一行四锚同值 | 我量了**六锚**（`3bb99aa`/`ca84b75`/`43a6043`/`304aeec^`/`b7c06d2`/`HEAD`）：`git show $r:tools/d22scan/main.go | grep '^var emojiRe' | git hash-object --stdin` ⇒ 六枚全是 `7355202a062eed144b52bdd81a386800b52643ae` | 六锚 | ✅ **一字未动**，且 hash 与件里写的那枚逐字符同 |
+| 条件②③"生产码零字节改动" | `git diff b7c06d2^..b7c06d2 -- gitignore.go | grep -E '^[+-]' | grep -v '^+++|^---' | grep -vE '^[+-][[:space:]]*//'` ⇒ **空**；**正控**（同一把尺打在真代码差 `304aeec^..304aeec -- scan_test.go` 上）⇒ **63 行**，尺是活的；再把两版**整行注释剥光**做 diff ⇒ **481 行 vs 481 行、空输出** | HEAD | ✅ 三把尺各一枚，"注释级"这句话在盘上站得住 |
+
+---
+
+## 7. 那枚新 spawn-git 的测试稳不稳（题面格 6）
+
+### 7.1 `-count=2`
+
+```
+$ go test -run '^TestFullTrackedListCoversWhatTheNarrowListCannot$' -count=2 -v ./...
+=== RUN   TestFullTrackedListCoversWhatTheNarrowListCannot
+--- PASS: TestFullTrackedListCoversWhatTheNarrowListCannot (1.02s)
+=== RUN   TestFullTrackedListCoversWhatTheNarrowListCannot
+--- PASS: TestFullTrackedListCoversWhatTheNarrowListCannot (0.97s)
+ok  github.com/CarlosShao/wisp/tools/d22scan  2.032s   rc=0
+```
+
+⇒ 两遍同值、不依赖上一遍留下的东西（每遍自己 `t.TempDir()` ＋ 自己 `git init`）。多次复跑的耗时区间 0.51-1.44 s。
+
+### 7.2 它到底吃不吃 git 的身份与全局配置
+
+静态先看清它 spawn 了什么：`git init -q -b main`／`git add -A`／`git add -f --`／`git ls-files -i -c --exclude-standard`／`git ls-files`
+——**没有 `commit`**，所以 `user.name`/`user.email` 在结构上就用不到。我照"CI 可能什么都没有"再实测一遍：
+
+```
+# 全局＋系统配置各指到一枚空文件、HOME/USERPROFILE/XDG_CONFIG_HOME 指到不存在的目录
+$ GIT_CONFIG_GLOBAL=... GIT_CONFIG_SYSTEM=... HOME=/nonexistent-xyz ... go test -run '^TestFull...$' -v .
+--- PASS: TestFullTrackedListCoversWhatTheNarrowListCannot (0.96s)      # 以及空配置文件的第二遍 (0.99s) PASS
+```
+
+⇒ **不吃身份、不吃全局配置**。`-b main` 需要 git ≥ 2.28（2020-06），本机 `git version 2.52.0.windows.1`，
+ubuntu-latest 无论 22.04（2.34）还是 24.04（2.43）都在那之后 ⇒ 这条硬依赖不构成新风险。
+
+**唯一真吃的全局项我自己造出来了**：`--exclude-standard` 的射程**包含 `core.excludesFile`**。
+我在仓库外挂了一枚全局 excludes（内容一行 `inside.tsx`）再跑：
+
+```
+$ git check-ignore -v --no-index frontend/weird/inside.tsx
+D:/tmp/d22scan-close-r1-accept/mygitignore:1:inside.tsx	frontend/weird/inside.tsx   rc=0
+$ GIT_CONFIG_GLOBAL=<that config> go test -run '^TestFull...$' -v .
+    scan_test.go:1597: a plain `git add -A` must track frontend/weird/inside.tsx (git matches no rule on it), ls-files="..."
+--- FAIL: TestFullTrackedListCoversWhatTheNarrowListCannot (0.55s)
+$ 撤掉那枚配置再跑 -> ok ... 0.890s
+```
+
+⇒ **机器配置能把台件前提撬动，但撬动时它红在前提句上（`t.Fatalf`，还点名 ls-files 现场），不会静默通过。**
+方向＝fail-closed，符合门的规矩；代价＝若哪天真给 runner 挂一枚撞名的全局 excludes，这枚测试要人来看一眼才知道是环境不是代码。
+
+### 7.3 它和 `A221③` 那支"没有 git ⇒ 全扫并响亮自陈"的关系
+
+```
+$ PATH="/d/work/base/go/bin:/c/Windows/System32:/c/Windows" go test -run '^TestFull...$' -v .   # PATH 里没有 git
+    scan_test.go:1586: git init -q -b main in C:\Users\...\TestFullTrackedListCoversWhatTheNarrowListCannot203388652\001:
+                       exec: "git": executable file not found in %PATH% ((no stderr)) -
+                       the tracked-path guarantees of A214 cannot be built without a git binary
+--- FAIL: TestFullTrackedListCoversWhatTheNarrowListCannot (0.01s)
+```
+
+⇒ 缺 git 时它**红**（`t.Fatalf`），不 Skip ⇒ `runtests.sh` 的 `SKIP != 0 即退出 1` 与 `PASS=0&&FAIL=0 即退出 1` 都还有牙。
+**门的意思变了吗？没有换方向、只多了一枚实例**：本包里今天共 **3 枚**测试走到 git
+（`TestWalksSkipGitIgnoredPaths`／`TestTrackedPathsAreNeverSkippedByTheIgnoreFilter`／本枚），
+前两枚是 `ca84b75`/`3bb99aa` 就有的 ⇒ "**正控需要 git**"这条环境依赖是上一批登记的（验收 §8），
+本批**没有新造一类**，只是把那一支的实例数从 2 加到 3。
+
+### 7.4 顺手划掉交件件 §6-2 那条"没测"
+
+件里写："`t.TempDir()` 落点（TMPDIR 在真仓库里时会走子目录那一支）未验"。我实测：
+
+```
+# 把 TMP/TEMP 指到一枚真仓库的子目录里（D:/tmp/.../outer 已 git init，outer/inner 是它子目录）
+$ TMP=... TEMP=... go test -run '^TestFull...$' -v .
+--- PASS: TestFullTrackedListCoversWhatTheNarrowListCannot (0.65s)
+$ git -C outer/inner/probe rev-parse --show-prefix  -> inner/probe/     # 说明这一支的守卫本身是活的
+```
+
+⇒ **它不是"没验所以不知道"，而是结构上打不开**：台件自己在临时根里 `git init`，
+所以从临时根问 `rev-parse --show-prefix` 永远是空串（自己是仓库顶），那枚"子目录"分支（`gitignore.go:233-239`）
+不可能被 `t.TempDir()` 的位置触发。**这一支可以从"没测"清单里划掉。**
+（另注：Go 在 Windows 上认 `TMP`/`TEMP`、**不认** `TMPDIR`——我先用 `TMPDIR` 试时它根本没挪窝，`os.TempDir()` 那枚小工具量出来的。）
+
+### 7.5 判
+
+**成立**：`-count=2` 稳、不吃身份与全局配置、缺 git 响亮红、不新增门的环境依赖；
+外加两枚我给的信息：`core.excludesFile` 是它唯一真吃的机器配置（红得响亮）、§7.4 那条"没测"可以结案。
