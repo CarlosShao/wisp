@@ -539,3 +539,126 @@ git diff --numstat d88c356..HEAD -- internal/panel/l2_grant_boundary_test.go
   只有 ban #8 含测试文件与注释；墙钟那条只认 `.Sub(time.Now())` 一种拼写。
   `frontend/=43` 会长（第三家在写），本件只当"我这一发的分母"。
 - ⚠ 本程**没有**跑 `go test ./...`（派单明令，另两路 agent 在飞）。
+
+---
+
+## §7 总裁
+
+### §7.1 先交我最强那一发：两枚**已声明**的洞合起来，仍然是一扇绿的送字门（M18）
+
+派单要求："**≥2 枚各自算附条件的洞，必须单造一发组合变异**"（r1 就是这样把 M13 造出来的）。我造了。
+
+```
+M18（全部静态写下的代码、零反射花招，两半都在 bridge.go 里）
+  (i)  路由名运行期拼：strings.Join({"panel","review","conclude"}, ".")  → 池里没有一枚字面量拼得出它
+  (ii) 结论键写在词表外：Conclusion string `json:"conclusion"` + 真 json.Unmarshal
+
+第一拍（原样）：
+  PROBE-M18 accepted=true method="panel.review.conclude" err=<nil>
+  PROBE-M18 envelope route="panel.review.conclude" conclusion="grant"
+  PROBE-M18 viaDispatcher verdict="grant"
+  PROBE-M18 knownComposerMethod(panel.review.conclude)=true  grantShapedByName=false
+  包体红榜 = TestJSONKeyDerivationAgreesWithEncodingJSON + C21(先存在)
+  ↑ 那枚红是"新 decode 目的地没登记"的防腐引信，不是"发现了 verdict"
+
+第二拍（照引信自己的话把类型登记进 inboundTypeRegistry，一步、一行）：
+  包体红榜 = TestC21DesignTokensFourWayAgree        ← **本件 6 枚全绿**
+```
+
+⇒ **今天存在这样一发明明的变异：Go 真答了一条网页侧可寻址的入站路由、真把 `conclusion:"grant"` 从线上读进 Go，
+而全包除那枚先存在的 C21 之外一声不响。** 同族还有一发更窄的：**M16**
+（只把名字运行期拼成 `panel.review.ratify`，而 `ratify` **在** `grantRouteWords` 里）⇒
+**全包只有 C21 红**、`accepted=true`、钉零反应。
+
+**但这不是 r1 那种"声称与盘上打反"**：这两格都在文件头 `WHAT THIS FILE DOES *NOT* COVER` 里被**逐字声明**
+（"a route name assembled at runtime … appears in no literal pool and no static scan reaches it" /
+"a verdict field whose spelling is not in grantFieldWords … is a name this file has never heard of"），
+且 r1 §8 明写过它**不判这一形必须能挡**。⇒ 按本仓那条分界（"被验物**声称**要防的结局被造出来 ⇒ 退回"），
+M18/M16 **不落在那句声称之内**，所以不构成退回理由；它们构成的是**一枚必须登记、不许悄悄留白的开放残余**。
+
+### §7.2 顺带钉出来的一枚真缺陷：那条 tripwire 是**借用**的，不是常驻的
+
+M14（同样运行期拼，但拼的是 `panel.review.allow`）**是被抓住的**——抓它的那三行不在任何一枚
+ban 断言里，而在 **facet 4 植物 F 的 subtest 内部**当负控用（`:1779-1781`，
+`if knownComposerMethod("panel.review.allow") { t.Error("… this is no longer a clean tree …") }`）。
+我把**只这一处**摘掉（`notrip.py`，−3 行，锚点出现次数断言 =1）：
+
+```
+noPlantFTripwire + M2  : 仍 4 枚红          ← 静态写下 allow 的形状还有 (b) 兜
+noPlantFTripwire + M14 : 全包只剩 C21 红    ← "守卫答 panel.review.allow"这一枚今天最要命的名字，
+                                              从此没有任何一枚常驻断言拦得住
+```
+
+⇒ **"守卫不许答 `panel.review.allow` 这条禁令，今天的实际承重位置是别人测试里的一句负控"**：
+植物 F 被改写、被 Skip、或那枚 subtest 换了名字，这条 tripwire 就消失，且**没有任何另一枚测试会因此变红**。
+本仓那条规矩正好管这个：**"新加一把尺要固定问它的最小可见单位是什么"**——这把尺的最小可见单位
+现在是"某枚植物恰好跑到了那一行"。⇒ 记 **F-R2-3**。修法很小且**我这次自己量过**（不再犯 r1 §7.3 那回"验收给的修法也是未验证断言"）：
+把那三行提升到一枚常驻顶层测试，并把它要问的名字从硬编码 11 枚换成"前缀 × `grantRouteWords`"的**行为扫**：
+
+```
+副本内探针，问 528 枚候选名的真守卫：
+  clean 树 :  SWEEP asked=528 answeredByRealGuard=0 hits=[]                  ← 今天零误伤
+  M16 树   :  SWEEP asked=528 answeredByRealGuard=1 hits=[panel.review.ratify]  ← 抓得到那发逃逸
+```
+
+### §7.3 逐格总裁（每格旁边是本程自己那发的凭据，不是它的）
+
+| 格 | 判 | 凭据 |
+|---|---|---|
+| **§1 生死格：M13 现在红不红** | **成立** | 六发种子全部至少 2 枚红；M13 四处叫（`:1179`/`:1182` 路由半、`:1237 bridge.go:131` 封套半、`:1444`、`:1625`）；探针两向（干净树 4 枚名全 `false`／M13 `accepted=true`＋`outcome="grant"`）。**没有任何一发还绿** ⇒ 按派单"任何一发还绿就退回"这一格不退 |
+| **§2 反向对照（补那枚死掉的程没做的一格）** | **成立**（四味全承重、无镜子） | `noA`⇒M3 真树全绿；`noB`⇒M4 真树全绿；`noC_full`⇒M6 真树全绿；`noCp_both`⇒M7 真树全绿；`noABCp`⇒M2/M4/M6/M13 全回到 r1 那种"只剩植物" |
+| **(c) 的措辞精度** | **成立，但要补一句** | (c′) 的 `:1444` 引信**读的是 (c) 喂的数据** ⇒ "半摘 (c) 还有人兜"是伪象，承重只在**整味摘**时成立（`noC_full`）。这层耦合两枚文件都没写 |
+| **(c′) 测试半的定性** | **承重但白盒**（不是镜子） | `noCp_test` 在 CLEAN＋我全部 6 发种子上**一枚颜色都不改**；但 `noCp_rule` 下它是唯一响的那枚 ⇒ 它拦的是"仪器自己以后被改坏"。**不许**写成"M8 因为它才被拦下"（M8 一直是反射半拦的，摘掉 (c′) 颜色不变） |
+| **§3 (b) 新判据的误伤审计** | **成立** | 池今天 5 枚（4 枚路由 + **`index.html`**）；过滤器分母 295 枚字面量／16 枚带点／**5 枚过**／11 枚拒（全是含 `/` 或纯 `.`/`..`/`./`）；"在池里≠被起诉"有代码事实（`:1024` 第一句）＋一枚真实驻留样本 |
+| **§3 (c) 新判据的误伤审计** | **成立（附 F-R2-1）** | 今天外延与旧判据同格（`SEEDS=[ComposerRequest]`）；r1 警告的"别查所有 struct"复算成立且**恰 2 枚**反例（`sessionOverrideBlocked`/`decidedBy`，均在出站的 `ApprovalCardView`）；**但**新增 decode 若落到 `map[string]any`/`json.RawMessage` 这类**合法**目的地 ⇒ 三枚 ban 测试全 `t.Fatalf`。方向是 fail-closed、消息自带出路，**不是放宽断言**，可这条对生产码的新约束 r1/派单/文件头都没写 |
+| **§4 (c)/(c′) 分账** | **成立**（实现者自己那次更正 `cc6dc16` **判对**） | M7 只属于 (c′)（`noC_full` 下仍红：它绑 method，旧判据看得见）；M6 只属于 (c)（`noCp_rule`/`noCp_test` 下仍红）；M13 封套半属 (c) |
+| **§5 (d) 每个断言配可复算命令** | **成立（附 F-R2-2 两枚读数错）** | 三条命令逐字跑完全中；但文件写 `l2_grant_boundary_test.go(6)` 盘上是 **9**（在**它自己那枚 commit** 上就是 9）、"其余四处全是注释"实为**五处**。"nothing is wired today" **可证伪**：`grep -rn ParseComposerRequest --include=*.go .` 出现任一非注释／非测试／非定义命中即假（今天=0）；我另加一条更硬的：`PanelBridge` 在非测试生产码只有 3 处注释命中、零实现零调用者 |
+| **§5 (e) `:604` 改指存在的测试** | **成立** | `TestFrontendComposerRequestsMatchTheEnvelope` 定义 1 处 = `bridge_test.go:131`；方法那一圈 `range` 恰那四枚 `Method*` 常量、从不读守卫 ⇒ "只迭代四枚常量"为真；旧名全仓只剩 `bridge.go:33` 一处、定义 0 处 |
+| **`bridge.go:33` 被故意留下** | **同意，且它确是缺陷** | 改它＝动生产码一字节＝撞本批契约轴；归属＝**票 33/35 那一跳被接线的那一程**（`cmd/wisp/run.go:225`、`composer_handlers.go:37` 两处注释自己点名 tickets 33/35），修法就一句：把那行注释改点名 `bridge_test.go:131` |
+| **§0.4／§5.4 悬空 §9 与 §7** | **退回（文件级，不推翻码）** | 三枚**自指**悬空（`:8`→§9 numstat、`:73`→§7 反向对照、`:81`→§9 staged 清单），两枚外指有效；另 §5.3 的 `:1211`/`:1466` 在 `c4b959a` 上逐枚对得上、在 HEAD 上漂到 `:1237`/`:1492`，**漂是它自己下一枚 `598620e`（+36/−10）造的**。形状＝本仓已登记那条"文档预先引用尚未产出的读数＝假绿前身"，且 `:73` 指的正是它没写完那一格 |
+| **闸门 / 名册 / 契约轴** | **成立** | 锚点 `0b95e9e` 与交付锚点 `1b98c7b` 两发同值 `RUN=196 TOPPASS=102 FAIL=2 SKIP=0 panic=0 distinct=98`（改前对照 180/100/2/0/distinct 90）；名册 **+8/−0**；`gofmt`/`vet` 空；`d22scan rc=0`；断言 45→74、`t.Skip` 0→0、`func Test` 5→6、`internal/panel` 区间内**只一枚 `_test.go`**、保护面零命中（先证存在、同尺正控活） |
+
+### §7.4 总裁：**成立（附条件入账）—— r1 那三件最小闭合全部闭上，四味逐味验过承重**
+
+**不是退回。** 判据摆在这里：r1 定性的那发（M13）**现在四处红**；r1 列的 (a)(b)(c)(c′)(d)(e) 我逐件
+"摘一味 → 有一发真树变异转绿"验过承重，没有一枚是镜子；契约轴、名册、三门无可指摘；实现者自己的
+那次更正（`cc6dc16` 把 M7 从 (c) 划给 (c′)）我独立复算**判对**。
+
+入账要带这五句限定，**缺一句就变成下一次假绿**：
+
+1. **F-R2-1（文档级）**：新判据对生产码加了一条没人声明过的约束——`internal/panel` 里**第二枚 JSON decode
+   必须落到同包 struct**，否则三枚 ban 测试 `t.Fatalf`（MDEC/MEXT 现量）。消息自解释、方向 fail-closed，
+   但应写进文件头 `WHAT THIS FILE DOES NOT COVER` 或票面。
+2. **F-R2-2（读数级）**：`panel-l2-grant-nail-fix-r2.md` 两条明细数与盘上不符（`l2=6` → 9；"四处" → 五处）。
+3. **F-R2-3（形状级，最该修的一枚）**：拦"守卫答 `panel.review.allow`"那三行是**借来的负控**（在植物 F 里）。
+   摘掉它 + 名字运行期拼 ⇒ 全包只剩 C21。修法与凭据在 §7.2（528 枚候选、clean 零命中、M16 一枚命中）。
+4. **F-R2-4（开放残余，须登记不许留白）**：M16／M18 两形今天仍在，且**第二拍之后全包绿**。
+   它被文件声明、被 r1 明示不判"必须能挡"，所以**不是被验物说谎**，但它是"覆盖"这词下面
+   **唯一一块真还开着的**东西。
+5. **文件级退回**：`panel-l2-grant-nail-fix-r2.md` 的 `:8`/`:73`/`:81` 三枚自指悬空要**就地追加更正**
+   （不许改写已提交的行），它承诺的 §7/§8/§9 要么补出、要么改指本件 §2/§8。
+
+### §7.5 `Q-49` 的 Go 侧那半，现在能不能记 covered —— **能，但只能记成"对静态写下的形状已覆盖"，并且第二句仍要留着**
+
+**问一：今天还存不存在一发变异，能让 Go 答一条携带批准的入站路由而包保持绿？**
+**存在，我造出来了**：M16（`panel.review.ratify`，名字运行期拼、词表内）与 M18（路由名运行期拼 +
+结论键在词表外，**并且按引信要求把类型登记进去的第二拍**）——两发的运行期探针都是 `accepted=true`，
+红榜都只剩先存在的 C21。
+**但**：这两形的共同前提是"名字／键**从未以静态字面量写进包里**"，那是一枚**任何静态尺都够不到**的形状，
+r1 §8 已明示不判它必须能挡，文件头也已逐字声明。**r1 那一发（M13）不需要任何运行期输入、纯静态写下即成立，
+今天已被闭上**——那才是 r1 判退回时称的"两枚结构性绕过"。⇒ **结构性绕过归零；
+残余是一枚声明过的静态尺极限，且可用 §7.2 的行为扫再收一大截（那一扫今天零误伤，我已量）。**
+
+**问二：台账要的那句"面板侧那半仍未覆盖——`ApprovalOutcome` 仍导出 `"grant"`、C17 白名单仍未定稿"，
+这一批之后还成立吗？** **成立，逐枚现量**：`git show HEAD:frontend/src/lib/panel.ts` 第 **50** 行仍
+`export type ApprovalOutcome = "grant" | "refuse";`，第 171 行仍把 `outcome: ApprovalOutcome` 用在
+请求位上；C17 白名单在 `docs/specs/SPEC-08-ui-ball-panel.md:156` 仍写着**【SPEC 提案，S5 定稿走契约批准】**、
+`SPEC-12:48` 仍列在待人拍板项里。⇒ 那句话**一个字都不必改**。
+（⚠ `frontend/**` 此刻正被第三方在写；我这两枚事实**取自 `git show HEAD:`**，不取工作树脏文件。）
+
+⇒ **给编排者的一句**（我不勾、不写台账）：`Q-49` 的 Go 侧那半可以记为
+**「Go 侧已覆盖——限静态写下的形状；残余＝路由名／结论键在包里根本不曾出现（M16／M18，文件已声明，
+`next=` 建议按本件 §7.2 的行为扫收口）；面板侧那半仍按原句未覆盖」**。
+不得记成"无条件覆盖"；也不得把 `A220` 那句"两枚结构性绕过已被验收造出来"**原样留着**——那两枚我今天造不出来了。
+
+---
