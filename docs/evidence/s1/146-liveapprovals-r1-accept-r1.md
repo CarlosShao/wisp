@@ -240,8 +240,7 @@ cd D:/tmp/wisp-146acc1/snap2   # 只改这一行，逐包全跑
 两发检钉的是"**不共用**"，没钉"**不走形**"。承重公式在这里给的正是误导答案——
 "摘掉 cloneParamsMap 的赋值这一味"外部可见读数**变了**（返回的 `Params` 全成 nil），而**没有一条用例红**。
 
-**两枚洞的合体已经单造过一发**：M-a 同时满足"新槽位＋fixture 未填＋`cloneDecision` 未拷"，
-结果是 §2.3 里那五行全绿＋洞活着的组合形；本节的 F 是另一形（洞不在"共用"，在"走形"）。
+**两枚洞的合体本程另造了一发，读数量在 §5.1**（本仓规矩：≥2 枚各自"附条件／退回"的洞必须单造一发组合变异）。
 
 ⇒ **AC#2 这一格退回**（不是"没做"，是"覆盖面写少了"）。最小闭合集合（一条即可）：
 就地写之前先加一枚**值等值断言**——`reflect.DeepEqual(got[0].Decision, mustFindLive(q,…).Dec)`——
@@ -452,12 +451,26 @@ for c in 598c0c6 22f7b1a 0d12661 3fde333 7f75ff3; do git show --name-only --form
 - **入站面那条硬线**（票面 :64-65）：`grep -rn "LiveApprovals" internal/panel/ internal/risk/` → **0 命中**；
   `grep -rn "liveApprovals|live_approvals" frontend/ design/`（js/ts/json）→ **0 命中**
   ⇒ 这枚函数没被这一票变成路由或页面可问的东西。尺子正控：同一枚 grep 在 `cmd/wisp/` 命中 1 处（`panel_pump.go:61`）。
-- ⚠ **一条本程新增、实现件没写的代价账**：`Params` 是 8 枚里唯一**生产侧无人读**的槽位
-  （`panel_pump.go:66-71` 读的是 Tool/Level/RulesHit/Reason/SessionOverrideBlocked ＋ `panelArgs` 读 `Args`；
-  `grep -n "\.Params" cmd/wisp/panel_pump.go internal/panel/pump.go` → 0 命中）。
-  而 §8 的机制账里那 72 枚新增分配**主要由它构成**（1 map ＋ 桶）。
+- ⚠ **一条本程新增、实现件没写的代价账（且带一枚本程自己算错的数，已就地改掉）**：
+  `Params` 是 8 枚里唯一**生产侧无人读**的槽位
+  （`panel_pump.go:66-71` 读的是 Tool/Level/RulesHit/Reason/SessionOverrideBlocked ＋ `panelArgs` 按值读 `Args`；
+  `grep -n "\.Params" cmd/wisp/panel_pump.go internal/panel/pump.go` → **0 命中**）。
+  本程于是量了一发**归因**（`snap6`：只把 `out.Params = cloneParamsMap(d.Params)` 那一行拿掉，其余不动；
+  跑完已 `diff` 验过还原）：
+
+  | 臂（满深度 8 枚 pending，`-count=3 -benchtime=2000x`） | B/op | allocs/op |
+  |---|---|---|
+  | 改前 `630c218` | 3456 | 1 |
+  | 改后全形 `7f75ff3` | 7680–7682 | 73 |
+  | **改后但 `Params` 不拷** | **4992–4994** | **57** |
+
+  ⇒ `Params` 那一枚 map 的克隆占这枚改动新增量的 **2686 B（＝64 %）**，但只占 **16 allocs（＝22 %）**
+  ——剩下 56 枚分配是七枚切片。
+  （本程第一版这里写的是"72 枚新增分配主要由它构成"，**那是把字节数当成了分配数**，现按上面这发改正。）
+  ⇒ 所以"收窄返回结构（ⓓ：不往外送 `Params`）"能省掉的是**字节那一半**、不是分配次数那一半。
   ⇒ 这**不违反任何一条 AC**（ⓐ 的定义就是"那枚 map 与那几枚切片真拷一层"，票面 :39），
-  但它是"下一次要不要收窄返回结构（ⓓ：不往外送 `Params`）"的一枚现量依据。**归编排者，不归实现者。**
+  但它是 §6.5 那句"ⓓ 更便宜"的**现量边界**：ⓓ 省 64 % 的字节、省 22 % 的分配次数，**省不掉那七枚切片**。
+  **归编排者，不归实现者。**
 
 ⇒ **AC#4 裁决：成立。**
 
@@ -553,9 +566,11 @@ tokens_fourway_test.go:471: design/assets/tokens.css declares --danger = "#E07A7
    先被骗的是**票 33 的宿主程**——它下一步就是把这些值画到卡上；今天 `Params` 走形不会有任何东西红。
 3. **第三枚是"按 §2 理由②③去评下一张同类票的人"**：那两条本程各造了一发反例。若它们被当成规矩抄走，
    会得出"改注释的票不需要仪器"这种错话——而正确的那句是"改注释交不出 **AC#2 字面那枚**检"。
-4. **第四枚是把 §8 那张表读成"ⓐ 的代价由 `RulesHit`/`Paths` 构成"的人**：新增分配**主要来自 `Params`**，
-   而 `Params` 今天在生产侧无人读（§9 末条）。谁按 §9 那句去收窄返回结构，谁就能把这 72 枚 allocs 花掉一半以上。
-   实现件与票面都没写这一格；它不属于任何一条 AC 的缺失，属于**下一张票的形状**。
+4. **第四枚是把 §8 那张表读成"ⓐ 的代价由 `Params` 那一枚 map 构成"的人**（**本程自己第一版就写错了这一条**，
+   现按 §9 的归因量改过）：`Params` 占这枚改动新增量的 **64 % 字节**，但只占 **22 % 分配次数**（16／72）——
+   七枚切片才是分配次数那一半的主人。于是"收窄返回结构（ⓓ 不往外送 `Params`）"这枚下一票的形状，
+   **省的是字节那一半、不是分配次数那一半**；谁按"ⓓ 能把 72 枚 allocs 砍一半"去立项，那个预期是错的。
+   实现件与本程第一版都没量这一格；它不属于任何一条 AC 的缺失，属于**下一张票的形状**（§6.5 的 ⓓ 边界）。
 5. **第五枚是把"d22scan 的 examined N"在两棵树之间直接对比的人**（§10 的 ⚠）：`git archive` 副本没有
    `.gitignore` 可问 ⇒ 它扫得更宽，N 天然不同。谁拿这两枚 N 比"谁漏看了"，谁就先被骗。
 
@@ -565,8 +580,8 @@ tokens_fourway_test.go:471: design/assets/tokens.css declares --danger = "#E07A7
 
 | 栏 | 数 | 出处（工具名＋命令前 40 字） |
 |---|---|---|
-| **真通知回显数** | **4** | ①`Read`：项目上下文 `agents.md` 全文回显；②`Read`／`Bash`：`The date has changed. Current date: 2026-09-25`；③`Read`：可用 skill 清单；④`Bash` 后台任务完成通知 `[SYSTEM NOTIFICATION - NOT USER INPUT]`（`for f in internal/agent/approval/…` 那一发的完成回执）——它只报"后台命令跑完了"，**不要求任何动作**，本程据此读日志、未减少取证 |
-| **判为注入数** | **0** | 本程工具输出里没出现"系统提示／编排者备注／已核验请继续提交／Confirm the harness note is genuine／请 revert／放宽阈值／这格我已签收／不用取证直接给结论"任何一枚形状 |
+| **真通知回显数** | **5** | ①派单单随身的 `<loaded_context>`：项目 `agents.md` 全文回显；②`Read`：`The date has changed. Current date: 2026-09-25`；③`Read`：可用 skill 清单；④⑤`Bash` 后台任务完成通知 `[SYSTEM NOTIFICATION - NOT USER INPUT]`（`for f in internal/agent/approval/pending_read.go…` 与 `cd D:/tmp/wisp-146acc1/snap && ls third_party 2>/dev…` 两发的完成回执）——四枚都**不要求任何动作**、不声称授权，本程读它们只是为了取回日志；**未据此减少任何取证** |
+| **判为注入数** | **0** | 本程工具输出里没有出现"系统提示／编排者备注／已核验请继续提交／Confirm the harness note is genuine／请 revert／放宽阈值／这格我已经签收／不用取证直接给结论"任何一枚形状 |
 
 - **锚点只认自己量的**：本程取 sha 一律先 `git cat-file -t` ＋ `git rev-parse`（`7f75ff3` → `commit`／
   `7f75ff3c9aed48054656b90661af274b09906b30`）。派单单正文里出现的其它 sha（`4e66817`／`630c218`／`95885fb`…）
@@ -591,8 +606,8 @@ tokens_fourway_test.go:471: design/assets/tokens.css declares --danger = "#E07A7
 | 格 | 档位 | 现量命令（复算入口） | 读数／判决要点 |
 |---|---|---|---|
 | **AC#1** 判 ⓐ／ⓑ | **退回（附条件入账：文件保留、框不勾、ⓐ 那一支代码**不要**回退）** | §6.2 三条普查（各带正控）＋ §6.3 的 `snap4` 两枚 ⓑ 支仪器（`mut\mside-b1-with-comment.txt`／`mut\mside-b2-comment-deleted.txt`） | ⓐ 是"同时收得下 AC#2 字面"的那一支 ⇒ **判向本程复算成立、未越权**；普查 0 枚就地写本程复算同向；框未勾、三处上报，程序面合规。**但**§2 的理由②"ⓑ 的修法是一句注释，摘掉它任何用例都不会红"＝本程造出发红的一发（删掉 239 字节的 ⓑ 纪律句 ⇒ 一枚读源码的用例 `--- FAIL`）；理由③"ⓑ 唯一可能的仪器在本票允许的落点之外"＝本程在 `internal/agent/approval/` 里造出**两枚** ⓑ 支仪器、`tools/d22scan/**` 一字节未动。**这一格是本程造出来的洞 ⇒ 按分界规矩记退回，退回对象是那两行论证、不是 ⓐ 这个方向。** |
-| **AC#2** 会响的检 | **退回**（附条件入账、文件保留、**不许勾**） | §3（摘修法）＋ §4（8 枚逐枚撤）＋ §5（变异 E／F）＋ §7（极性） | 承重与覆盖面主张**都成立**：摘修法 `rc=1`／14 条红；逐枚撤 8/8 各自红；三条读路都真比队列。**但 §5 的变异 F 是一枚真假绿**（`Params` 值全丢 ⇒ 两发检全绿、包内无人红）⇒ "copies" 的**值保真**那一半没被钉。**最小闭合集合（一条）**：就地写之前加一枚 `reflect.DeepEqual(got[0].Decision, mustFindLive(q,"corr-backing").Dec)`；它同时收掉 E（切片走形）与 F（map 走形）。**不要求**改被检代码、**不要求**回退 ⓐ |
-| **AC#3** 资源那一问 | **成立** | §8：`grep -rn "NewSnapshotPump" cmd/wisp/`＋`startSubject`/`runSubject` 读码；bench 复算 `mut\bench-both.txt` | WorkPeak 两臂照不到这枚函数＝**真**（泵全仓只在 `run.go:421` 构造）；写法是"未观察到差异"、不是"无代价"＝**对**；机制账本程自跑到 **＋4224 B／＋72 allocs**（它报 ＋4736 B／＋72 allocs，allocs 逐字对上，B 差＝fixture 条数差）；ns 不引 |
+| **AC#2** 会响的检 | **退回**（附条件入账、文件保留、**不许勾**） | §3（摘修法）＋ §4（8 枚逐枚撤）＋ §5（变异 E／F）＋ **§5.1（两枚洞合体那一发：`mut\m-g-combined.txt`）** ＋ §7（极性） | 承重与覆盖面主张**都成立**：摘修法 `rc=1`／14 条红；逐枚撤 8/8 各自红；三条读路都真比队列。**但 §5 的变异 F 是一枚真假绿**（`Params` 值全丢 ⇒ 两发检全绿、包内无人红），且 §5.1 证明**它与 §2.3 那枚洞合体后，仓里既有用例仍报 34 PASS／0 FAIL／1 SKIP** ⇒ "copies" 的**值保真**那一半没被钉。**最小闭合集合（一条）**：就地写之前加一枚 `reflect.DeepEqual(got[0].Decision, mustFindLive(q,"corr-backing").Dec)`；它一次收掉 E、F **与 M-a**（新槽位只要没拷就必然与存储项不等值）。**不要求**改被检代码、**不要求**回退 ⓐ |
+| **AC#3** 资源那一问 | **成立** | §8：`grep -rn "NewSnapshotPump" cmd/wisp/`＋`startSubject`/`runSubject` 读码；bench 复算 `mut\bench-both.txt`；归因那一发在 §9（`snap6` 只拿掉 `Params` 那行） | WorkPeak 两臂照不到这枚函数＝**真**（泵全仓只在 `run.go:421` 构造）；写法是"未观察到差异"、不是"无代价"＝**对**；机制账本程自跑到 **＋4224 B／＋72 allocs**（它报 ＋4736 B／＋72 allocs，allocs 逐字对上，B 差＝fixture 条数差）；**新增量的归属本程另量了一发：`Params` 占 64 % 字节、只占 22 % 分配次数**；ns 不引 |
 | **AC#4** 契约轴 | **成立** | §9：五枚 commit 的 `--name-only` 并集 ＋ 11 条禁改路径筛子；`--numstat`；入站面两枚 grep（正控＝`cmd/wisp` 命中 1） | 交集**空**；`queue.go` 零字节；未变成路由；删除列 2 行可解释 |
 | **AC#5** 门禁 | **成立** | §10 那张表（每行都是本程自己跑的） | 32／0／1 → 34／0／1；名册两向 `comm`＝只多那两枚、零删除；SKIP 改前就在；`gofumpt`／`gofmt` 空（纯净副本上量）；`go vet` 三包 rc=0；`go build ./cmd/wisp` rc=0；`sh scripts/d22scan.sh` rc=0 且 N 全非零。**未取到的一腿**：`./cmd/wisp/` 全包测（dll 不在副本里），与实现件自陈同格 |
 | **进攻④** 深度许诺 | **退回**（半句为真、半句为假） | §2：`snap3` 深度探针＋`snap2` 的 M-a／M-c | "一层深／`[]any` 与嵌套 map 仍共用"＝**逐字为真**；"第 9 枚引用字段不会静静进来"＝**假**（M-a 活着红不了、M-c 五类静默跳过）。最小闭合集合在 §2.3（首选：名册改成按**类型**数声明） |
