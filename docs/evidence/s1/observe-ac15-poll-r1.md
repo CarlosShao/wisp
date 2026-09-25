@@ -216,3 +216,74 @@ sampler_zerosample_136_test.go      before=11  after=11  diff: (空)
 "建一枚 `tree` → 开一窗 → 读 `tree.reads`"；改后是"每次尝试建**一枚新** `tree` → 开一窗 → 带回那一窗的
 `rep` 与 `reads`"。**没有**把多次尝试的计数累加后再去比单窗的 `rep.Samples`——那会让
 `kept+lost == reads` 这枚承重等式变成跨窗假账（也就会把本腿的题洗掉）。每一枚被包的腿同此。
+
+---
+
+## 4. 确定性对照：把那一枚红**按按钮叫出来**，再看改前后各自怎么答
+
+```
+$ date "+%Y-%m-%d %H:%M %z"
+2026-09-25 09:16 +0800
+$ git log -1 --format='%h %ad' --date=format:'%H:%M'      （本程 §0-§3 已落地为 d8390aa；HEAD 此刻 885f50b＝别家台账 commit）
+```
+
+§1.3 已经自陈：本程在净窗里 3800 枚窗口一枚没抓到 ⇒ **"率"这一味本程给不出前后对比**。
+这一节给的是能给出的那一味：**同一个物理事件、同一份补丁、两棵树，改前红、改后绿**。
+
+仪器 `arm_stall.py`（**只在仓外快照里存在，绝不进树**；`D:\tmp\observe-ac15-poll-s1\arm_stall.py`）：
+把 `alternatingTree.ReadTree` 的**前 N 枚读**各睡 60ms。`CheckSettle` 的环是
+"tick → 读 → 比 deadline"（`sampler.go:499-525`），deadline = 起点的 +100ms ⇒ **一枚慢读＝一枚没收到的读**，
+窗口带着 `reads=2` 回来——与归档四枚目击逐字同形（`only 2 reads taken`）。
+靶子只此一枚 fixture：`gateAlternatingTree` 是另一枚类型，别家腿一枚都不受影响（改后整包 142 枚守恒，见 §6）。
+
+| 树 | 补丁 | 读数 |
+|---|---|---|
+| `tree-pre-stall`（未改的 `ee5a25e` 快照） | `stallArm(1)`：这一枚窗的第一读睡 60ms | **RED** `sampler_settle_coverage_136_test.go:214: precondition broken: only 2 reads taken, half-and-half needs a window to lose in`／`--- FAIL: TestCheckSettleHalfTheReadsFailedReportsItsLoss (0.13s)`／包时 0.166s rc=1（日志 `logs/stall-pre.log`） |
+| `tree-post-stall`（本程改后的快照，同一份补丁） | 同上 | **GREEN** `--- PASS: TestCheckSettleHalfTheReadsFailedReportsItsLoss (0.43s)`（日志 `logs/stall-post.log`）。0.43s ≈ 3 枚饿死的窗＋1 枚满窗 ⇒ **等待真的重开了窗，而重开后的那一窗仍然一边keep一边lose**（`kept>=2 / lost>=2 / kept+lost==reads / 门行点名 sample_errors` 那几枚断言全过了，否则不会绿） |
+
+⇒ **改前那一枚红，就是归档 4/8200 里的那一枚红**（同站点、同句子、同 `reads=2`）；
+⇒ **改后同一事件不再红，且它不是因为"场景被洗掉"才不红**——洗掉的读法会让下面 §5 的变异一起变绿，
+而 §5 五发变异没有一枚变绿。
+
+**救援不是无限的**（约束 (i) 的另一半：有界）：`tree-post-stall-all`（每枚读都睡，永不救援）——
+
+```
+sampler_settle_coverage_136_test.go:237: precondition broken: 16 windows opened inside the 2s monotonic
+  bound (clock.go Timeout) all fell short of 4; counts seen: [2 2 2 2 2 2 2 2] (+8 more, all of them short of 4)
+--- FAIL: TestCheckSettleHalfTheReadsFailedReportsItsLoss (2.10s)      rc=1
+```
+
+⇒ 2s 之后**它自己收场并印出判据**：16 枚尝试、每枚各拿到几枚，全在红句里。
+不是 `t.Skip`、不是挂死、不是"多试几次直到绿"。同一棵树未加消息截短版跑出的那一发是
+`16 windows ... counts seen: [2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2]`（16 项全列）；
+把列表截到 8 项是**本程随后追加的可读性修**（§5 之后那枚 commit），只动消息文本，不动判据。
+
+---
+
+## 5. 变异：把生产侧的计数/披露打断，改写腿必须还咬（约束 (iii)）
+
+仪器 `mutate.py`（仓外快照；每枚变异各一棵树 `tree-mut-M1..M5`，全留不删）。
+**每一发都是 `-count=1 -v` 整包**（不是 `-run` 摘名册），红名册/站点由 `pair_reds.py` 从日志回读
+（Go 把用例日志印在 `--- FAIL:` **之前**，第一版配对器按"FAIL 后一行"读会把站点错配给下一枚用例——
+这个自纠记在这里，下面表中的配对是修正后重跑日志得到的）。
+
+| 变异 | 打断的是哪一味 | 整包读数 | 靶子腿与站点（本程改写后的行号） |
+|---|---|---|---|
+| **M1** | `CheckSettle` 的读错误分支不再 `SampleErrors++` | 71 RUN / **68 PASS / 3 FAIL** / 0 SKIP / 0 panic | `TestCheckSettleHalfTheReadsFailedReportsItsLoss` 红在 `coverage:251`：**"the seam lost 5 of 10 reads but the report says sample_errors=0"** ⇒ 半丢的场景**还在**（10 枚读、5 枚丢），红的是"没披露"。另两枚：`coverage:156`（Single 腿"9 unaccounted"）、`gate:223`（kept=10 lost=0） |
+| **M2** | 零足迹分支不再计数 | 71 / **69 / 2** / 0 / 0 | `coverage:332` "zero-footprint drops must be counted: sample_errors=0 reads=10 kept=1" ＋ `gate:275` |
+| **M3** | 出线键名改掉（披露从线上消失） | 71 / **67 / 4** / 0 / 0 | `coverage:203` "wire report has no `sample_errors`"、`:296`、`:365`、`:395` 四枚全红 |
+| **M4** | 门行把丢了一半的窗判成"测满了" | 71 / **67 / 4** / 0 / 0 | `coverage:183`、**`:283`**（靶子腿："this window dropped 5 of 10 reads and its own row says it measured enough"）、`:353`、`gate:230` |
+| **M5** | `CheckSettle` 一整窗一枚读都不交付 | 71 / **61 / 10** / 0 / 0 | **9 枚红逐字是新增的那句 bound 红**（`193-195 windows ... fell short of 1/2/3/4`、`counts seen: [0 0 ...]`），站点：`coverage:143/:237/:321/:374`、`gate:166/:217/:264`、`settle_zerosample:43/:140`；第 10 枚是本程**没包**的那枚 `TestCheckSettleVerifiesReleaseCounter`（`sampler_test.go:303` "settle should pass"），它靠自己的 `!rep.Pass` 断言逮到了同一件事 ⇒ 正好是 §2 末登记的那 4 枚"连前提都没有"的暴露腿之一 |
+
+**这一节要证的三件事，各自落在哪：**
+
+1. **改写腿没有变成常绿**——M1 打断的正是"报告说没丢"那一味，靶子腿红在 `coverage:251`（披露断言），
+   且红句里 `5 of 10 reads` 说明**窗口的半丢形状仍在**：等待没有把场景洗成"全收到了"。
+2. **等待不能被产品侧坏掉满足**——M1/M2/M3/M4 里等待一律**一次过**（判据是接缝计数器，那几发红句里的
+   reads=10/20 就是证据），红的是等待**下面**的断言；只有 M5（接缝真的没读到）才走到 bound 那一支。
+   两支是分开的，这正是"轮询不吞产品 bug"的形状。
+3. **每枚被改写的腿都还咬得动**——M5 一发把 9 枚新增等待全打成 bound 红＋1 枚未包腿自己红，
+   没有一枚在"整窗零读数"这种废掉的产品上保持绿。
+
+对照基线：同一批变异打在**未改**的树上会红几枚，本程**没有量**（见 §7"没测什么"）。
+本程只声明必要的一面：改后仍咬。

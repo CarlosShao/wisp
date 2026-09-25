@@ -1,6 +1,7 @@
 package observe
 
 import (
+	"fmt"
 	"testing"
 	"time"
 )
@@ -105,8 +106,17 @@ func awaitWindow[R any](t *testing.T, want int, open func() R, short func(R) int
 		}
 		seen = append(seen, n)
 		if tm.Expired() {
-			t.Fatalf("precondition broken: %d windows opened inside the %v monotonic bound (clock.go Timeout) all fell short of %d; counts seen: %v",
-				tries, settleWindowWaitBound, want, seen)
+			// Cap the ledger: a window that never delivers reads reaches ~200
+			// attempts inside the bound, and 200 numbers in one log line bury
+			// the sentence that explains them. The attempt count is the
+			// load-bearing number in this message, not the list.
+			tail := ""
+			if len(seen) > 8 {
+				tail = fmt.Sprintf(" (+%d more, all of them short of %d)", len(seen)-8, want)
+				seen = seen[:8]
+			}
+			t.Fatalf("precondition broken: %d windows opened inside the %v monotonic bound (clock.go Timeout) all fell short of %d; counts seen: %v%s",
+				tries, settleWindowWaitBound, want, seen, tail)
 		}
 	}
 }
