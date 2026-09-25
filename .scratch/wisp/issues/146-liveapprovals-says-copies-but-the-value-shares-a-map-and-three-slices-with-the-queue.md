@@ -142,4 +142,15 @@
   next=**交给编排者**：①核 AC#1 那一支方向（本票唯一一处我逆着票面默认走的）；②`Status`/AC 框/台账归你；
   ③下一位从工作树建 `cmd/wisp` 之前，先把 `slo_windows.go` 那枚 WIP 收了。本程到此收笔，**无剩余格**。
 
+- [2026-09-25T11:40Z] agent=ticket146 did=**收笔前复量：把我自己留在证据件里的两条告警就地核了一遍，一条自行解除、一条仍在**
+  （`3fde333` 之后又落了别人的 commit，不改证据就等于留两条过期读数）。
+  ①`cmd/wisp/slo_windows.go` 那枚半死 WIP 已被 `95885fb` 收进历史 ⇒ 现在 `go build ./cmd/wisp` **rc=0**、
+  `git status --short -- cmd/wisp` 为空；证据件 §6.3／§8 第 4 条**各追加一行复量**（原文不删，只标"今天不再成立"），
+  并顺手把 §5 第 4 条升级成实话：我**没有**从当前工作树复跑 `cmd/wisp` 全包测，那一格仍是"未复核"。
+  ②`internal/panel` 的 `TestC21DesignTokensFourWayAgree` **仍红**，根因不变（`design/assets/tokens.css` 工作树缺文件，
+  owner 未提交的 `design/**` 移动）⇒ **推送前只剩这一枚要处理，而它归 owner**（`design/**` 与 `frontend/**` 同为本程零字节边界）。
+  复跑：`go test -count=1 ./internal/agent/approval/` → `ok 0.451s`。本程提交共 5 枚 commit、碰过的文件总数仍是 4 枚。
+  **未 push；五枚 AC 框仍一枚未勾。** next=**编排者**（无剩余格可我做）。
+
+
 

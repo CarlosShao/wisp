@@ -317,6 +317,10 @@ go test -count=5 -run '^$' -bench BenchmarkLiveApprovalsDepth8 -benchtime=2000x 
 4. **`cmd/wisp` 的跨包回归只测到一半。** 我跑到 `ok github.com/CarlosShao/wisp/cmd/wisp 134.596s`（注入 dll 路径后），
    但那是**别人的工作树**：约十分钟后同一棵树的 `cmd/wisp/slo_windows.go` 被改成不能编译（3 枚未用 import）。
    ⇒ 我的 PASS 对**当时那棵树**有效，对现在的工作树**未复核**（复核它就得等那一枚 WIP 落地，不是我的活）。
+   **⟶ 收笔前补测**：`95885fb` 之后 `go build ./cmd/wisp` rc=0、我这枚包 `ok 0.451s`；
+   **但我没有从当前工作树再跑一遍 `cmd/wisp` 的全包测**（134 秒那一发是在另一棵树上取的，且那期间 `cmd/wisp`
+   已被另一程改过两次）⇒ 这一格的"跨包全绿"仍是**未复核**，需要下一位或编排者补一发。
+
 5. **`internal/panel` 有一枚红我判为"非本票"，但没有反证它。** `TestC21DesignTokensFourWayAgree` 红于
    `design/assets/tokens.css` 在工作树里不存在（owner 未提交的 `design/` 移动；本票对 `design/**` 与
    `internal/panel/**` 零字节，见 §6.1）。先被骗的是**下一位读门禁的人**：它可能被误读成票 146 造的绿/红。
@@ -376,6 +380,10 @@ for c in 598c0c6 22f7b1a 0d12661; do git show --name-only --format= $c; done | s
   ⇒ 我**没有救它、没有还原、没有提交它**（票面 :79-80 的 git 纪律＋"别人的活"），只把 AC#3 的建法改成
   从 `git archive` 的纯净快照建两棵仓外副本。**这条要报编排者**：它现在在 `dev` 的工作树里，
   下一次从工作树建的 `cmd/wisp` 会红。
+  **⟶ 收笔前复量（`19:3x +08`）：这条已被别人解除。** `95885fb fix(144 AC#2/AC#5)` 把那枚 WIP 落进了历史，
+  现在 `go build ./cmd/wisp` **rc=0**、`git status --short -- cmd/wisp internal/panel` 为空。
+  上面那句"下一次从工作树建的 `cmd/wisp` 会红"**今天不再成立**，保留原文是为了记清我为什么改走 `git archive`，
+  不是为了留一条过期告警。**但 AC#3 的两臂读数不受影响**：它们本来就是从 `630c218`/`22f7b1a` 两棵纯净快照建的。
 
 ### 6.4 被拒的调用
 
@@ -415,4 +423,8 @@ for c in 598c0c6 22f7b1a 0d12661; do git show --name-only --format= $c; done | s
 4. **工作树里现在有两枚不是我造的坑**：`cmd/wisp/slo_windows.go` 不能编译（§6.3）、
    `internal/panel` 的 C21 四方对账因 `design/` 移动而红（§5 第 5 条）。**推送前请先处理这两枚**，
    否则下一趟 CI 的红会被误归到票 146 头上。
+   **⟶ 收笔前复量（同一时刻）**：第①枚已由 `95885fb` 自行解除（现在 `go build ./cmd/wisp` rc=0）；
+   **第②枚仍在**——`design/assets/tokens.css` 在工作树里不存在（`git status` 那 16 枚 `D design/**` ＋
+   `design/old/`、`design/doubao/` 未跟踪），`internal/panel` 的 `TestC21DesignTokensFourWayAgree` 因此仍红。
+   **⇒ 推送前只剩那一枚要处理，而它归 owner（`design/**` 与 `frontend/**` 一样是本程零字节的归属边界）。**
 
