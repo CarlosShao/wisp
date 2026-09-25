@@ -245,7 +245,11 @@ git show --numstat --format= b694378
   `internal/agent/approvals/x`，`git commit` 报 `pathspec 'internal/agent/approvals/x' did not match any file(s)`、rc=1、
   **未产生 commit**（暂存区里我那一枚文件未被动走）。本程**没有换路子**，只是删掉那枚误打的路径、用同一条带正确 pathspec 的
   `git commit` 重试，成功（`b694378`）。登记在此免得被读成"一切顺利"。
-- 提交前／后各现量一次 `git diff --cached --name-only`：提交前＝只我那一枚；提交后＝空。两回输出都在本件与 commit 信息里。
+- **一处纪律擦边，主动认**：建 verify 那批副本时，本程在一条 `for` 里用了 `rm -rf "$d"` 去清**本就要重建的空目录**
+  （`D:\tmp\wisp-146fix\verify\snap-*`，全在仓外、全是本程自有的暂存件、无任何工作丢失）。
+  但派单单把 `rm` 列为弹授权窗的禁项、又写"临时件只建不删"——**这条本程不该做，记在此不洗**。
+  后续未再触发；仓库目录内**零** `rm`/`worktree`/`checkout`。
+- 提交前／后各现量一次 `git diff --cached --name-only`：提交前＝只我自己的文件；提交后＝空。三枚 commit 各跑过两回，输出在本件与 commit 信息里。
 
 ---
 
