@@ -381,3 +381,138 @@ $ grep -rn "TestComposerMethodNamesMatchFrontend" --include=*.go . | wc -l
 把同一枚用例打红 ⇒ **补那一行不会把任何一根钉子磨钝**（这一句是给编者的，本程不动手）。
 
 ---
+
+## 5. 三门 ＋ 改前改后四数 ＋ 名册差集
+
+### 5.1 取数形状（两支正路里选了哪一支、为什么）
+
+**改前基线在仓外副本取**：
+
+```
+mkdir -p /d/tmp/wisp-35-pump-r2/base
+git -c core.autocrlf=false -c core.eol=lf archive aeba6ff | tar -x -C /d/tmp/wisp-35-pump-r2/base
+```
+
+副本字节＝锚点字节，用 `git hash-object --no-filters` 逐枚比 `git rev-parse aeba6ff:<path>`，
+**全 1174 枚都核**（不是抽样）：
+
+| 读数 | 值 |
+|---|---|
+| 树内文件总数（`git ls-tree -r aeba6ff`） | 1174 |
+| `hash-object --no-filters` 与锚点 blob 不符的枚数 | **6** |
+| 那 6 枚是什么 | `scripts/build.ps1`、`scripts/dev/ball-cycle.ps1`、`scripts/fetch-deps.ps1`、`scripts/sign-models.ps1`、`scripts/slo-check.ps1`、`scripts/spike/run.ps1` —— **全部 `*.ps1`** |
+| 差的确实只有行尾吗 | 抽两枚核：`git show aeba6ff:<f> \| tr -d '\r' \| md5sum` 与 `tr -d '\r' <副本/<f> \| md5sum` **相同**（`build.ps1 → 136c48e2…`、`slo-check.ps1 → 2635bcc3…`） |
+| 为什么正好 6 枚 | `.gitattributes:2` 写着 `*.ps1 text eol=crlf` —— 那是 **checkout 属性**，单给 `core.autocrlf=false` 压不住，必须连 `-c core.eol=lf` 一起给；而**不带 `--no-filters` 就根本看不出这件事**。派单预告的"那 6 枚 `eol=crlf` 差是预期"复算为真 |
+
+副本里没有 `third_party/sherpa-onnx/`（DLL 不入库）⇒ 从工作树拷三枚进去（`onnxruntime.dll`、
+`sherpa-onnx-c-api.dll`、`sherpa-onnx-cxx-api.dll`）。
+
+**用的正路＝②（把仓里那几枚 DLL 放进 `PATH` 再 `go test`）**，并且**逐包分开跑**：
+
+```
+cd <tree> && export PATH="<tree>/third_party/sherpa-onnx:$PATH" \
+  && go test -count=1 -v ./internal/panel/      # 再单独跑 ./cmd/wisp/
+```
+
+- **为什么不用①（`scripts/wisp-cli-tests.sh`）**：它末行是 `bash "$portable" --scope=cli`，
+  而 `scripts/portable-tests.sh:195` 里 `cli` 那档的范围是 `scope=(./cmd/wisp/)` **一枚包**
+  ⇒ 拿不到 `internal/panel/` 那一半，派单要的是**两包四数**。
+- ⚠ 代价本程写明：②不经 `portable-tests.sh` 的 GUARD A/B，也不经 `tools/d22scan/runtests.sh`
+  那三道（顶层 SKIP 即红、PASS 与 FAIL 同时为 0 即红）。本程用**手工等价尺**补：判红只认
+  `^--- FAIL:`、SKIP 与 RUN 各自单列（见 5.2／5.4），四数之外点名册差集。
+- ⚠ **一枚取数坑（本程踩过、写下来给别程）**：第一次把两包合成一发
+  `go test -v ./internal/panel/ ./cmd/wisp/`，两包并行输出**交错**、`ok\t<pkg>` 尾行落在测试行
+  **之后**，按"上一个 ok 行"归包会量出 `internal/panel = 113 枚 / cmd/wisp = 0 枚`这种荒谬读数。
+  ⇒ **逐包跑才是可归因的形状**；聚合跑的总枚数（113＝53＋60）虽然对，分包数全错。
+
+### 5.2 四数（改前基线取自锚点副本，改后取自本机工作树）
+
+| 树／包 | `=== RUN`（行首精确） | 顶层 PASS | **顶层 FAIL** | 顶层 SKIP | 子测试 P/F/S | 包 rc |
+|---|---|---|---|---|---|---|
+| 改前 `internal/panel`（副本 `aeba6ff`） | 99 | **53** | **0** | **0** | 46/0/0 | 0 |
+| 改后 `internal/panel`（工作树，代码 = `6e348f1`） | 105 | **58** | **1** | **0** | 46/0/0 | 1 |
+| 改前 `cmd/wisp`（副本 `aeba6ff`） | 113 | **60** | **0** | **0** | 53/0/0 | 0 |
+| 改后 `cmd/wisp`（工作树，代码 = `6e348f1`） | 116 | **62** | **1** | **0** | 53/0/0 | 1 |
+
+⚠ "代码 = `6e348f1`"这一句本程现量过：`git diff --name-only 6e348f1 HEAD -- cmd/wisp internal/panel internal/agent/approval`
+→ **0 行**。HEAD 之后又落了别家的 `docs/**` 提交（写本件这一程自己那几枚也在里面），
+但那三枚路径下的**码**一字未动 ⇒ 这一行读数既可标 `6e348f1` 也可标 HEAD，**标错才是要防的**。
+
+两枚红，逐枚点名：
+
+1. **`TestC21DesignTokensFourWayAgree`**（`internal/panel`）——改前就有、**保持红、未修未跳**。
+   ⚠ **引用枚数必须带口径**：**锚点／HEAD 副本 0 枚红／本机工作树 1 枚红**，两个数都对、
+   拼成单值才错。因由：`tokens_fourway_test.go:441` 读 `design/assets/tokens.css`，
+   而那批文件被 owner 以**未提交删除**挪走（`git status --porcelain` 里 16 枚 `D design/**`，
+   本程一格没碰）。副本里 `design/assets/` 在归档内 ⇒ 同一枚用例在副本里绿。
+   本程另在 `D:\tmp\wisp-35-pump-r2\mut`（**HEAD** 副本）复量：`internal/panel` 59 枚、
+   `cmd/wisp` 63 枚、**0 红**（§4.6 的 E0 那一发）⇒ 与"锚点副本 0 枚"同口径，钉住了这条红
+   **只由工作树形状造成、与代码版本无关**。
+2. **`TestRunBooksWithASnapshotOfItsLiveQueue`**（`cmd/wisp`）——**本批新造的红**，逐字红句：
+   `panel_pump_test.go:296: composer.mode.current = "ask_every_step", want the non-default档 this config set`。
+   归因与隔离见 §4.6／§5.4 末段：**不是泵的缺陷**，是 `6e348f1` 只落了断言、没落夹具写入
+   （`panel_pump_test.go:133` 只追加 `confirm_timeout_sec = 2`，`permission_mode` 一个字没写）。
+   **本程不修**（改配置夹具让断言变绿在禁改清单上；改回去派单又明令禁止）⇒ **报回编队定夺**。
+   最小闭合集合只有一行，且方向是收紧：把那枚键真写进 `[risk]`。
+
+⚠ 判红只认 `--- FAIL:` 这条规矩在本批**当场救了一次**：两棵树的 `cmd/wisp` 输出里都有
+一行 `        [FAIL] onnxruntime.dll version            file version 1.28.2.0 does not match build pin unknown`
+（`TestAC2RealProcessRefusesOnEveryLegWithoutAppData` 内部 `t.Log` 打的自检文本），
+**改前改后同一枚、字节相同** ⇒ 它是文本噪声不是红；按 `[FAIL]` 或按 `file:line` 判会凭空多一枚红。
+另：`=== RUN` 若按"行里含 `=== RUN`"数会各多 1 枚（99→99、113→114），多的那枚是落在日志正文里的
+同名字符串 ⇒ 本表用的是**行首精确**那支。
+
+### 5.3 三门（本机，工作树 = `6e348f1`）
+
+| 门 | 命令 | 读数 |
+|---|---|---|
+| `gofmt` | `gofmt -l internal/panel cmd/wisp internal/agent/approval` | **空**（rc=0） |
+| `go vet` | `go vet ./internal/panel/ ./cmd/wisp/` | **空**（rc=0） |
+| d22scan | `sh scripts/d22scan.sh` | **rc=0**，`d22scan: clean - no D22 ban violations` |
+
+d22scan 那一枚要补三行，因为它是 `set -eu`（`scripts/d22scan.sh:38`）且**第一步就是正控**
+（`:14` "the seeded-violation positive"）——正控红则真扫描根本不跑：
+
+- **正控先响过才算数**：`runtests.sh: OK - packages=[./...] top-level: PASS=30 FAIL=0 SKIP=0, === RUN=70, '[no tests to run]'=0`
+  ⇒ 真扫描确实跑了。
+- **live scope 分母（带 HEAD）**：`bans #1-5 internal/=205 cmd/=23`、`ban #6 frontend/=46`、
+  `ban #7 internal/tools/=18`、`ban #8 design/=32 frontend/=46 internal/=410 cmd/=42`。
+- ⚠ `design/=32` 与门钉 r5 那件记的 **30** 差 2 枚：**因由已核不是本批**——本批对 `design/**`
+  零改动（§3.2），差的是 owner 未跟踪的 `design/old/`、`design/doubao/demo/{lib,screenshots}/`
+  等目录（`git status --porcelain` 里 4 枚 `??`）。分母随锚点变 ⇒ 引用时必须带"哪一版、工作树还是树内"。
+
+### 5.4 名册差集（两本，逐枚列新增／消失）
+
+**本 1：跑出来的名册（`-v` 里的顶层结果行）**
+
+| 包 | 顶层枚数 改前 → 改后 | **新增**（逐枚） | **消失** | 子测试 改前 → 改后 | 新增／消失 |
+|---|---|---|---|---|---|
+| `internal/panel` | 53 → **59** | `TestThePumpBuildsThePacketFromWhatTheHostHolds`、`TestAPumpWithNoReadersSaysSoInsteadOfInventingState`、`TestAnUnreadableModeFromALiveReaderStillRendersUnknown`、`TestTheStreamLogMergesInsteadOfDropping`、`TestPublishWithoutAnExitReportsInsteadOfPretending`、`TestPublishHandsTheBytesToTheAttachedExit` | **无** | 46 → 46 | **+0 / −0** |
+| `cmd/wisp` | 60 → **63** | `TestRunBooksWithASnapshotOfItsLiveQueue`、`TestSnapshotWorkspaceSectionReportsTheNarrowing`、`TestThePumpIsDrivenNotJustAssembled` | **无** | 53 → 53 | **+0 / −0** |
+
+⇒ **上一程自称的"6 枚新用例入名册 53→59"核过：成立**（六枚逐枚点得出名字、无一枚消失、
+子测试本 0 增 0 减）；`cmd/wisp` 自称的"60 → 63"同样成立。两包都**没有 panic 吞读数**的形状
+（顶层结果行枚数与 `=== RUN` 顶层枚数逐包相等：99=53+46、105=59+46、113=60+53、116=63+53）。
+
+**本 2：源码里的静态声明（`^func Test`，含被 build tag 挡掉的）**
+
+| 包 | 改前 → 改后 | 新增 | 与"本 1"的差 |
+|---|---|---|---|
+| `internal/panel` | 53 → 59 | 同上六枚 | **0**（两本一致） |
+| `cmd/wisp` | 63 → 66 | 同上三枚 | **−3**，改前改后**同一枚数** |
+
+⇒ 那 3 枚的口径已查明、**不是本批造成**：`cmd/wisp/secret_dataroot_119b_test.go` 带
+`//go:build !windows`、内含 3 枚 `func Test`，本机（windows）根本不编译它们；
+其余 6 枚带 tag 的测试件是 `windows` tag，本机照跑。⇒ **引用"某包几枚用例"必须说得出是哪一本。**
+
+### 5.5 本程有没有污染被验物
+
+| 检查 | 读数 |
+|---|---|
+| 仓库工作树里本程改过的代码件 | `git status --porcelain -- cmd/wisp internal/panel internal/agent/approval` → **空**（11 发变异全在 `D:\tmp\…\mut` 里，每发后还原） |
+| 变异副本有没有停在改过的状态 | 五枚被改文件逐枚 `diff <(git show HEAD:<f>) mut/<f>` → **五枚全等** |
+| 本程的 commit 各带了什么 | 每枚 `git commit -q -F - -- docs/evidence/s1/35-panel-snapshot-pump-r1.md`；`git show --numstat` 逐枚只列这一枚路径，删除列 **0** |
+| 别人的东西有没有被卷走 | `design/**` 16 枚 owner 未提交删除 ＋ 4 枚未跟踪目录 ＋ `docs/reports/frontend-session-log.md`（别家在写）**全程原样**，未出现在任何一次暂存清单里 |
+| 加载期失败有没有被偷偷避开 | 四份读数里 `0xc0000135`／`error while loading shared libraries` **各 0 命中**（两棵树都装了 DLL）⇒ 派单预告的那枚"改前也红、一条尺都不执行"的形状**本程没遇到**，也因此**没有复现它**（列 §7） |
+
+---
