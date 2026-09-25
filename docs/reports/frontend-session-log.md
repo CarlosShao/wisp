@@ -593,3 +593,131 @@ owner 原话：**"我只负责我能看得懂的非技术性问题。"**
 **时间**：本轮 08:0x 落盘，**距 15:00 真机签收还有约 7 小时**。这一格我判断**不能等到签收之后再报**——签收要看的正是这张卡。
 **未跑** `npm`/`go`/`d22scan`/Docker，**未开任何窗**，未碰 `design/**`，`embed.go` 未动。
 **我自己写进台账的错累计 12 处**（新增：§40 把"字段齐"当成"可判已有"，漏核"该不该画"）。
+
+## 44. 11:0x 那单的三件回复（11:0x–11:4x 执行，commit `d6c52ef` + `a21336e`）
+
+### 44.1 先核他给的盘上凭据（他自己要求"别信转述"）
+
+四条全对，现量：`grep -rn "panel\.resync"` 排除 node_modules 后 **0 命中**（规格里有名字、盘上没实现）；
+`TestComposerMethodNamesMatchFrontend` **定义 0 处**，引用 3 处（`internal/panel/bridge.go:33`、
+`internal/panel/l2_grant_boundary_test.go:1172`、以及两枚证据/台账件）；他点的三枚凭据 commit
+`4e629a1` / `78ea612` / `310816f` 逐枚 `git log -1` 解得到。
+补一条他没说破的：`bridge.go:33-40` 的白名单是 **4 枚**（mode.request / workspace.request /
+attachment.add / message.send），`frontend/src/lib/panel.ts` 实际发 **5 枚**（多
+`:181 panel.approval.request`）。**两便都数对，只是那把该钉住它的尺是空的**——这条与 §44.4 的
+"第 6 枚方法"是同一件事的两头。
+
+### 44.2 两枚真 bug 的修法，以及为什么不改那枚 vendored atom
+
+| 位置 | 病 | 现量依据 |
+|---|---|---|
+| `stream-text.tsx:38` | `text.split(" ")` 造 reveal 单元；中文无空格 ⇒ 整段 = 1 单元，"逐段"在主动语言里做不到，光标 46ms 后消失 | 改前 `revealSegments` 不存在；老规则对 §44.3 语料里三条中文各产 1 单元 |
+| `theme.css:205-207` + `:76` | `.stream-caret.is-streaming { animation: none }` 正好打在光标唯一被挂载的那段；几何是上游 2px×1.05em `--ink` step-end，不是 `PLAN.md:3476` 的 1px×14px `--accent` 1→0.2→1 呼吸 1s | `PLAN.md:3476` 逐字；`caret-blink` 全树仅 2 命中（定义 + 那枚被撤的引用） |
+
+形状：**不手改 vendored 文件**。`scripts/vendor.mjs:10-12` 自述原则"No reformatting, no value
+edits"，且 `:51-52` 已经记着一笔账——`3b59512` 那次手改 U+2212 会被下一次 re-vendor 静默复原。
+所以走仓里已有的路子（`approval-card.tsx` 参考件 NOT mounted ＋ `l2-approval-card.tsx` 适配件）：
+新增 `src/lib/reveal.ts`（纯函数切段）＋ `src/components/reveal-text.tsx`（自己的组件），
+`result-stream.tsx` 改挂它。`stream-text.tsx` 的 body 字节一字未动，只把它头部那行
+`Panel status` 改成 NOT mounted——**那行是用 generator 的模板现算的，不是手抄**（脚本从
+`vendor.mjs` 的 JOBS 里正则取出 note 再写进去，跑完当场比对相等）。`vendor.mjs` 的 JOBS note
+同批改，两边一致。
+
+英文观感**零变化**是有意钉住的：46ms 节奏、`stream-in` 420ms、光标标记、空格分隔文本的词节奏
+全部保持，语料里三条含空格的输入逐条比过。
+
+### 44.3 变异自证 8 发（每发只撤一处，跑完按 sha256 复原）
+
+| 发 | 撤掉哪一处 | 结果 |
+|---|---|---|
+| M1a | `CLAUSE_END` 换成永不命中的私用区类（关子句边界，留长度上限） | rc=1，红 1 条：`...must reveal in many (bracketed)` |
+| M1b | `MAX_SEGMENT` 12 → 100000（关长度上限，留子句边界） | rc=1，红 2 条 |
+| M2 | 光标宽度回 2px | rc=1，红 1 条：`caret width must equal the spec` |
+| M3 | 恢复 `animation: none` | rc=1，红 4 条（animate / infinite / duration / keyframes 命名） |
+| M4 | 呼吸改成 `50% { opacity: 0 }`（＝闪烁） | rc=1，红 1 条：`must breathe to the spec's mid opacity, not blink to zero` |
+| M5 | 颜色回 `var(--ink)` | rc=1，红 1 条：`caret colour must be the spec's token` |
+| M6 | 两行一起改回挂那枚 vendored atom | rc=1，红 1 条：`must not mount the vendored split-on-space atom` |
+| M7 | 摘掉组件里的光标标记 | rc=1，红 2 条 |
+
+M1a 与 M1b 各自只被**不同的**语料条目咬住（子句边界靠 `bracketed` 那条、长度上限靠
+`chinese unpunctuated` 那条）⇒ 切段的两味都承重，摘掉任一味都有一发从此不响。
+
+**其中一发是我自己判据的缺陷，不是代码的**：M1b 第一版 **PASSED（零牙齿）**。那条判据当时写的是
+`revealSegments(longRun).every(s => len(s) <= MAX_SEGMENT)`——它读的正是被这发变异改掉的同一枚常量，
+把上限调到 100000 后它恒真。这就是"恒真判据"那一族，我自己在派单里写过、还是当场踩的。
+已改成字面量 20 的上界 ＋ `units > 1`，并把 `MAX_SEGMENT <= 20` 单列为一条（常量本身也要被考）。
+
+**这把尺看不见什么，写清楚**：`react-dom/server` 只渲染初始态 `count = 0`，reveal 动画在这里从不推进，
+所以没有任何 markup 断言能证明"一段一段出现"——那一半靠纯函数断言（这也是切段为什么放 `src/lib/`
+而不是写在组件里）。而**光标在真机上长什么样，本件零证明**：那仍是 `R-92-5` / 票 114 `AC#6` 的差分截屏。
+
+### 44.4 收回我今天早上的一枚错（`a21336e`，与上面那单无关）
+
+`3b59512` 按 owner 的 P2 把 `composer.tsx:170` 的 `≤` 换成 ASCII 时，我写成了 JSX 文本里的裸 `<=`。
+`<` 在文本节点里开启标签 ⇒ `tsc` 报 `src/components/composer.tsx(170,62): error TS1003`。
+**也就是说 `frontend/` 的 typecheck 从 07:2x 那枚 commit 起一路红到现在**，红到 11:1x 我第一次跑
+`npm run typecheck` 才现量到——那段时间正是"CPU 要给测量的程让路"所以我没跑门禁的六小时。
+改成 `{"<="}`，屏幕上的字仍是 `<=`。
+
+同一枚旧 commit 还有第二半：我当时**手改** `fixtures/composer-states.html` 的三行去"对齐"渲染器会
+产出的东西，却没当轮复算。真跑 `npm run render:composer` 后现量：React 的 SSR 把 `<` 转义成
+`&lt;`，所以正确的产物是 `单个 &lt;= 64.0 MB`，不是我手写的 `单个 <= 64.0 MB`。diff 恰好 3/3 行，
+收的是生成器自己写出的那版。
+**教训**：改用户看得见的字符时，"手改产物去对齐源码"与"源码改完不重跑产物"是同一种病的两面；
+`render:composer` 存在的意义就是替我核这一跳，跳过它＝把证据让位给记忆。
+
+### 44.5 Q2「当前屏纯函数化」落不落得地：落，但省不掉两件事（他给了推演、要我报回来）
+
+**落得地**：`App.tsx` 现量零 `useState`（`grep -n "useState" App.tsx` 空），所以把每屏写成
+`(snapshot, view) => 渲染结果` 的纯函数、`view` 只从 props 进，不与现有任何形状冲突。这一条我照做。
+
+**但它免不掉返工，两处，都得具名**：
+1. **切屏这一跳在盘上不存在**。前端出站到 Go 一共 5 枚方法名（`panel.ts:181/237/246/263/291`），
+   Go 白名单 4 枚（`bridge.go:34-39`），**里面没有一枚是"换到第几屏"**。纯函数只解决"当前屏"这件事
+   **存在哪里**；用户点一下侧栏图标之后要有反应，还需要第 6 枚出站方法＋Go 侧那半条路由。按 owner
+   给 P9 划的四条红线，读类可以扩（红线①），但它**必须被点名扩**，不能顺手。
+2. **"前端不持本地 state"这句按字面做不到，今天就已经做不到**：`composer.tsx:65-67` 有 3 枚
+   `useState`（`draft` / `busy` / `workspaceDraft`），本件新增的 `reveal-text.tsx:24` 有 1 枚
+   `count`。可见的口径只能是"**不持有从世界派生的 state**"（输入框草稿与动画时钟都不是对世界的
+   判断）。**请他把 Q2 那句话收窄成这个形状再落给我**，否则我按 `SPEC-08:150` 与 `PLAN.md:1044` 的
+   原文读，会和按他那句的字面读产出两种不同的代码。
+   另一枚相关事实：`panel.resync` 全仓 0 命中（§44.1），所以"每次显示都重推一遍快照"这半也还没实现——
+   `view` 字段进来之后，**没有 resync 就会造出一块"记住上一屏"的界面**，而那正是那句约束想防的东西。
+
+### 44.6 差距表还剩哪几屏没量（他第 ③ 问）
+
+十屏里 **8 屏做过字段级**（ball / chat / approval / config / security / privacy / palette / tasks）。
+**没量的 2 屏**：
+- **`cost`（成本屏）**：只做过"demo 里有什么"的登记，没有逐字段对过 `PLAN.md:3473-3488` 那张表里的
+  成本行（`IN`/`OUT`/`CACHED` 三枚 micro label、tabular-nums、真数值来自 C23）。**下一格就是它。**
+- **`firstrun`（首启屏）**：字段级做了，但 owner 的 P4（不许写死加密方式、留白＋`DEFERRED`）
+  落地后要重扫一遍——那一屏的"缺"里有几项已经变成"故意空着"，表里现在标的是旧判读。
+
+外加一张**冲突项表**（§16 那张）今天被推翻了 6 条（C6/C7/C8/C9/C10/C11，逐条在 §31/§35/§40 有原句
+不抹的更正），所以那张表**目前的状态是"已核 4 条 / 已推翻 6 条"，不是"已核 10 条"**。这句要写在表头，
+否则下一位会拿它当已完成的底稿。
+
+### 44.7 本轮现量与边界
+
+`npm run typecheck` rc=0（**改前 rc=2**，红句 `composer.tsx(170,62) TS1003`）·
+`npm run lint` rc=0（6 条 warning，全在先存在的 `ui/button.tsx:77`、`ui/badge.tsx:61`、
+`ai-native/tool-chips.tsx:89`，本件三枚新文件零条）· `npm run build` rc=0 ·
+`npm run render:stream` rc=0（现量读数 `spec 1x14 --accent 1->0.2->1 1s, 8 corpus input(s)`）·
+`npm run render:composer` rc=0 · `sh scripts/d22scan.sh` **rc=0**，
+ban #8 与 ban #6 的 `frontend/` 分母 **40 → 43**（正是本件新增的三枚：`src/lib/reveal.ts`、
+`src/components/reveal-text.tsx`、`scripts/render-stream.tsx`）。
+`tokens:check` **未跑**——它的红因（`gen-tokens.mjs:24` 指向已被 owner 挪走的 `design/assets/tokens.css`）
+与本轮无关，见 §17 的 D 案。
+
+**一处我自己定的规矩被我自己破了，登记**：§18 写过"满足三个触发条件之前不跑基线、在你回话之前我不跑
+任何一条"。本轮跑了五步、没等回话。依据是三条读数而不是我的心情：`/d/tmp/wisp136ac15m-*` 最新 mtime
+停在 **08:16:55**（取数已停近三小时）、`dc44c24` 已把 `AC#15` 的 §4 率交件、编排者 11:0x 那单直接派了
+"第一格就做这两枚"。**但有两笔欠账没被这三条覆盖**：(1) `npm ci` **没跑**，上面五个 rc 是在
+09-2x 装下的 `node_modules`（48 个顶层目录）上取的，不是锁文件重装的树——所以"CI 同形"这句我只能算
+〔日志＋归档，抽验〕，不能算〔独立复现〕；(2) §18 那串步序里的 `render:l2` 我**没跑**（本件没动 L2 卡，
+但那四项形状是下一格，跑在它前面才对得上账）。下一轮补 `npm ci` 一发全量，再把 `render:l2` 补上。
+
+两枚 commit：`d6c52ef`（8 枚路径，全在 `frontend/`）、`a21336e`（2 枚路径）。
+`git status --porcelain -- frontend/` 交件时为空。未 push。未碰 `internal/**`、`cmd/**`、
+`tools/d22scan/**`、`allowlist.txt`、`docs/PLAN.md`、`docs/specs/**`、`design/**`、`embed.go`。
+未开任何窗（P5 的 15:00 签收在等 L2 卡那四项）。
