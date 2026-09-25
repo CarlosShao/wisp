@@ -1538,6 +1538,107 @@ func TestTrackedPathsAreNeverSkippedByTheIgnoreFilter(t *testing.T) {
 	}
 }
 
+// TestFullTrackedListCoversWhatTheNarrowListCannot is the third half of the
+// ingredient pair (acceptance d22scan-gitignore-fix-accept-r1.md §4 and its N3,
+// 2026-09-25). runGitIndex asks git TWO listing questions and the union feeds
+// holds(): `ls-files -z` (every tracked path) and `ls-files -z -i -c
+// --exclude-standard` (the tracked paths that also match a rule). Until this
+// test existed, nothing required the first one - removing it
+// (parseIndexPaths(all) -> parseIndexPaths(withIndex), gitignore.go:225) left
+// the whole delivered roster green, which acceptance mutant M1 measured and this
+// file does not accept as "unneeded".
+//
+// WHY THE FULL LIST IS LOAD-BEARING AND THE NARROW ONE STRUCTURALLY CANNOT
+// REPLACE IT: `-i -c` can only report a path git itself calls matched, so the
+// class it is blind to is "this matcher skips a tracked path that git does not
+// match". That class is not hypothetical - F3 ① and F3 ② (a rule line's leading
+// whitespace trimmed into a different pattern, a trailing `**` pruning its own
+// parent directory) are two instances of it fixed in the same batch that added
+// the guard, so a third instance is guarded against by data, not by faith.
+//
+// THE SEED: `frontend/.gitignore` carries `  weird/*` - TWO leading spaces, which
+// git keeps as pattern data (measured: `git check-ignore -v
+// frontend/weird/inside.tsx` exits 1 in this shape, and the same rule binds a
+// directory literally named `  weird`). A plain `git add -A` therefore tracks the
+// file while `-i -c` names nothing for it. Both halves are asserted: the byte must
+// be scanned and named, and holds() must know about it from the full list. The
+// force-added `frontend/dist/` sibling inside the SAME tree is the positive
+// control for the zero reading - the exact-`-i -c`-content assertion below is what
+// stops "no hits" here from meaning "the instrument was not looking".
+func TestFullTrackedListCoversWhatTheNarrowListCannot(t *testing.T) {
+	seed := func(t *testing.T, withWeird bool) string {
+		t.Helper()
+		root := liveFixture(t)
+		seedFile(t, root, ".gitignore", "frontend/dist/*\n!frontend/dist/.gitkeep\nbuild/\n")
+		fe := "dist/*\n!dist/.gitkeep\n"
+		if withWeird {
+			fe += "  weird/*\n" // two leading spaces ARE the pattern's first characters
+		}
+		seedFile(t, root, "frontend/.gitignore", fe)
+		seedFile(t, root, "frontend/dist/tracked-or-not.tsx", "export const doc = \"ready \u2264\";\n")
+		if withWeird {
+			seedFile(t, root, "frontend/weird/inside.tsx", "export const doc = \"ready \u2264\";\n")
+		}
+		gitIndexFixture(t, root) // plain `git add -A`: this path is tracked WITHOUT a force-add
+		gitForceAdd(t, root, "frontend/dist/tracked-or-not.tsx")
+		return root
+	}
+	base := seed(t, false)
+	root := seed(t, true)
+
+	// git's own instruments, both readings in one assertion so the empty half is
+	// only ever read against a non-empty control on the same tree and command.
+	if got := strings.TrimSpace(gitCommand(t, root, "ls-files", "-i", "-c", "--exclude-standard")); got != "frontend/dist/tracked-or-not.tsx" {
+		t.Fatalf("the premise of this case is `-i -c` naming the force-added path and NOTHING else, got %q - "+
+			"if the weird/ path appears here the seed no longer pins the full-list leg, and if the dist/ path vanished "+
+			"the instrument is not reading this tree at all", got)
+	}
+	if out := gitCommand(t, root, "ls-files"); !strings.Contains(out, "frontend/weird/inside.tsx") {
+		t.Fatalf("a plain `git add -A` must track frontend/weird/inside.tsx (git matches no rule on it), ls-files=%q", out)
+	}
+
+	sB := scanFixture(t, base)
+	s := scanFixture(t, root)
+
+	// 1. counted: exactly one more file in both frontend/ walks than the same tree
+	//    without that seed and rule.
+	if a, b := sB.examined["panel-approval"], s.examined["panel-approval"]; b != a+1 {
+		t.Errorf("ban #6 counted %d frontend/ files without the seed and %d with it, want +1 - the whitespace rule swallowed a tracked delivered byte", a, b)
+	}
+	if a, b := sB.emojiSeen["frontend/"], s.emojiSeen["frontend/"]; b != a+1 {
+		t.Errorf("ban #8 counted %d frontend/ files without the seed and %d with it, want +1", a, b)
+	}
+	// 2. read: a tracked byte that breaks a ban has to be named, not just counted.
+	saw := false
+	for _, f := range s.findings {
+		if f.Path == "frontend/weird/inside.tsx" && f.Ban == "emoji" {
+			saw = true
+		}
+	}
+	if !saw {
+		t.Errorf("ban #8 did NOT fire at the tracked path frontend/weird/inside.tsx - that is the invisible-delivered-byte shape of A214/F1, and only the full `git ls-files` list can see it (findings=%v)", s.findings)
+	}
+	// 3. the ingredient itself: holds() must answer this path from the FULL list.
+	//    This is the assertion that mutant M1 (loading `holds()`' guard from
+	//    `-i -c` instead of `ls-files`) has to break on, because nothing else in
+	//    either list can know about a path git does not call matched.
+	ix := s.ign.index()
+	if !ix.ok {
+		t.Fatalf("this fixture must be a readable repository for the guard leg to be testable: %s", ix.why)
+	}
+	if ix.ignored["frontend/weird/inside.tsx"] {
+		t.Fatal("the narrow list now reports this path too, so this case no longer pins the full-list leg - re-seed with a rule git declines to match")
+	}
+	if !ix.holds("frontend/weird/inside.tsx", false) {
+		t.Error("holds() does not know a path the index plainly holds: the guard leg is being loaded from `git ls-files -i -c --exclude-standard` instead of `git ls-files -z`, which cannot see a tracked path git does not match a rule against - precisely the matcher-over-skips class F3 ① and F3 ② are two instances of")
+	}
+	// 4. and the tree goes red, so a regression here is a loud failure and not a
+	//    silently unchanged denominator.
+	if _, errOut, code := runVerdict(t, root, s); code != 1 {
+		t.Errorf("verdict must be 1 (the tracked byte breaks ban #8), got %d err=%s", code, errOut)
+	}
+}
+
 // TestIgnoreRulesAreOffWhenTheIndexCannotBeAsked pins the failure direction of
 // A214/F1's fix. `git archive HEAD | tar -x` - the shape every evidence run and
 // mutation check in this repository is taken on - has no `.git`, so the tool
