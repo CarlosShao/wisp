@@ -183,15 +183,25 @@ type gitIgnore struct {
 //	                        an ignore rule: the ticket's named instrument, and the
 //	                        set note() names by path so a reader of the CI log can
 //	                        see WHICH delivered bytes sit under a live rule. It is
-//	                        not a second opinion inside holds(): its output is
+//	                        not a second opinion inside holds(): on an index that
+//	                        does not change between the two reads, its output is
 //	                        strictly a subset of `ls-files -z`, and both streams
 //	                        are read by the same parseIndexPathsList, so one
 //	                        command's parsing bug would blind the other just as
 //	                        fast. Nothing in a skip decision comes from this list
-//	                        that did not already come from the guard; what makes a
-//	                        skip decision safe is the guard's reach, and that leg
-//	                        is pinned by
+//	                        that did not already come from the guard, on that same
+//	                        unchanged index; what makes a skip decision safe is the
+//	                        guard's reach, and that leg is pinned by
 //	                        TestFullTrackedListCoversWhatTheNarrowListCannot.
+//	                        ⚠ "does not change between the two reads" is load-bearing
+//	                        and NOT guaranteed by the code: :240 and :244 are two
+//	                        independent spawns, so a commit landing in between can
+//	                        leave holds(dir) false for a path the narrow read never
+//	                        saw. Measured (2026-09-25, white-box race): direction =
+//	                        fewer paths scanned, never more. Removing that window is
+//	                        a production change, not a comment fix, and is tracked
+//	                        separately; until then the claim is bounded to a
+//	                        quiescent index rather than dropped.
 type gitIndexState struct {
 	ok        bool
 	why       string          // why it could not be consulted; one line, always shown

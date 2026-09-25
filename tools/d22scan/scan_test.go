@@ -1544,9 +1544,11 @@ func TestTrackedPathsAreNeverSkippedByTheIgnoreFilter(t *testing.T) {
 // holds(): `ls-files -z` (every tracked path) and `ls-files -z -i -c
 // --exclude-standard` (the tracked paths that also match a rule). Until this
 // test existed, nothing required the first one - removing it
-// (parseIndexPaths(all) -> parseIndexPaths(withIndex), gitignore.go:225) left
+// (the `all` argument of the parseIndexPaths pair inside runGitIndex) left
 // the whole delivered roster green, which acceptance mutant M1 measured and this
-// file does not accept as "unneeded".
+// file does not accept as "unneeded". Deliberately no bare line number here:
+// this same batch moved that call site twice within one commit, so a number
+// would rot faster than the fact it points at (acceptance r1 §4.1, 退回枚 1).
 //
 // WHY THE FULL LIST IS LOAD-BEARING AND THE NARROW ONE STRUCTURALLY CANNOT
 // REPLACE IT: `-i -c` can only report a path git itself calls matched, so the
