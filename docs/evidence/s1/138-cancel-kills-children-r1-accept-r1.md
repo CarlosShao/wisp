@@ -577,3 +577,224 @@ internal/risk/provenance.go:387  logf("risk/C25: scope %q not open (CloseScope r
    所以 §4.1②"连整机 Job 都拿不到"要说准：**拿不到的是 `JobScope`，不是 scope 容器**。
 4. **本程自纠一处**：我第一次跑 spawn 普查时把 `':!*_test.go'` 与 `-- '*.go'` 的顺序写反了一次，
    输出仍含测试文件；发现后重跑（§2.1e 贴的是重跑那发）。**没有拿那一发下过任何结论。**
+
+---
+
+## 3　派单第 4 节的两判 —— 那笔 `DEFERRED` 登记能不能落地 ／ 本票该"作废并登记"还是"改判保留"
+
+**判据**（派单 §4）：ⓐ 登记是否只能摆成 owner 的 `Q##`，说清为什么不能由 agent 单方落；
+ⓑ 作废并登记 vs 改判保留，按本仓规矩各适用哪一条，**别混**。
+
+### 3.1　第一发：`docs/specs/**` 到底被什么冻着（把两枚不同来源的冻结分开）
+
+```
+$ T=.scratch/wisp/issues/138-cancelling-a-task-kills-nothing-the-task-itself-spawned-single-jobscope-no-terminatejobobject.md
+$ git show 3f6322f:"$T" | sed -n '9,12p'
+**Packages:** `internal/proc/**`（`jobscope_windows.go`）· `internal/agent/loop.go`（取消路径）·
+              `cmd/wisp/**` 若有接线点。**⚠ 冻结面照旧禁改**：`internal/risk/**` · `rules_gateway.go` ·
+              `tools/d22scan/**` · `allowlist.txt` · D32 阈值（CPU≤0.5%／RSS≤25MB）· `thresholds.go` ·
+              任何 golden · `frontend/**`（owner 已交外部 agent）· `docs/PLAN.md` · `docs/specs/*.md`。
+$ git show 3f6322f:docs/specs/SPEC-12-roadmap-governance.md | sed -n '36,39p'
+### 4.1 契约变更流程
+改 C1–C32 或 D1–D47 = **人工批准**；同步更新 PLAN.md、`docs/DECISIONS.md`、受影响切片卡。
+agent 单方面改契约 = 跑歪模式 #1，对抗验收判失败。
+```
+
+**读数（两枚冻结不是一枚）**：
+1. **路径冻结：成立、且就写在本票票面**（`docs/specs/*.md` 在那行"冻结面照旧禁改"里）。
+   ⇒ 对**实现程**与对**本验收程**这都是硬边界，不需要引任何别处的条文。
+2. **"§4.1 契约变更"这一枚：不覆盖这笔登记。** `SPEC-12 §4.1:38` 的射程是**由 `C1–C32`／`D1–D47` 那两份枚举报决定的**
+   （这个判法不是我发明的，是本仓 `A181②` 已经这么裁过一次并把方法写进了台账）。
+   `SPEC-12 §5` 的 DEFERRED/RESERVED 表行**不在那两份名单里** ⇒
+   **"往 §5 加一行"按 §4.1 的字面不构成契约变更**。
+3. 反过来，同一份 SPEC-12 又把登记列为**每片完成的强制动作**：
+
+```
+$ git show 3f6322f:docs/specs/SPEC-12-roadmap-governance.md | grep -n '登记表更新'
+57:5. DEFERRED/RESERVED/REJECTED 登记表更新（有新增推迟必须五字段齐全）
+```
+
+⇒ 那一节是 `### 4.3 每切片完成后的强制动作`（`:51`），第 5 项在 `:57`。
+
+⇒ **所以这件事不是"没人有权做"，是"做的人不能是想要它的那一枚"**（实现者给自己开推迟条＝裁决者≠实现者，`AGENTS §0.3`）。
+⇒ ⚠ 本票内部还有一处**自相矛盾**要登记：**票面 `:12` 冻结 `docs/specs/*.md`，票面 `:44-46` 又命令"必须去 `SPEC-12 §5` 登记"**。
+两枚出自同一张票的要求**今天不可能同时满足**——与它 §3.4 抓到并登记的那枚 `internal/tools/unwired.go` 路径打偏同类，
+是**票面缺陷、不是实现缺陷**；解的人只能是编排者（改 AC#1 那句的落笔者，或给票面加一枚 `>` 具名豁免）。
+
+### 3.2　第二发：`AGENTS §1.1` 那条"1:1 双向"到底挡不挡这笔登记（我把两个方向都量了）
+
+权威文本（不在 AGENTS，AGENTS 自称薄索引）：
+
+```
+$ git show 3f6322f:.scratch/wisp/issues/README.md | sed -n '188p'
+- `DEFERRED(D-xx)` code markers must map 1:1 to SPEC-12 §5 registry (bidirectional check).
+```
+
+**方向 A（标记 → 表行）：今天已经违着两条。**
+
+```
+$ git grep -n 'DEFERRED(D28-1)\|DEFERRED(D11-3)' 3f6322f -- 'internal/**'
+3f6322f:internal/agent/compress.go:26:  // DEFERRED(D28-1): move the call into the Warm window hook; keep this
+3f6322f:internal/agent/loop.go:394:               // DEFERRED(D28-1): the Warm-window hook owns this call; the
+3f6322f:internal/agent/control.go:15:     // this ticket (DEFERRED(D11-3), see the ticket report).
+$ git show 3f6322f:docs/specs/SPEC-12-roadmap-governance.md | grep -n 'D28\|D11'
+91:| REJECTED | 意图分类四级流水线 | D11 过度设计已废 | — | D11 两层替代 | 无前置分类器（特性非缺失） |
+```
+
+⇒ `D28-1`／`D11-3` 两枚**代码标记在 `SPEC-12 §5` 里没有对应行**（`:91` 那枚是 D11 的 REJECTED 行，不管 `D11-3`）。
+⇒ 这一枚**在飞的票 139 今天也独立量到了**（`4d0866a` 的 commit 标题："D28-1 在 SPEC-12 §5 里根本没有那一格"）。
+⇒ 历史上它被判过一次：`docs/evidence/s1/10-adversarial-acceptance.md:106`——
+"`DEFERRED(D28-1)` … 符合契约明文豁免 … **不算违规**"。⇒ 也就是说**这条 1:1 今天没有任何仪器在守**
+（我扫过：`git grep -rn 'DEFERRED' 3f6322f -- scripts tools .github` 只命中 `scripts/portable-tests.sh:50/:95` 的**注释**，
+没有一把尺）。
+
+**方向 B（表行 → 标记）：这条要求根本不成立。**
+
+```
+$ git show 3f6322f:docs/specs/SPEC-12-roadmap-governance.md | sed -n '66,92p' | grep -c '^|'
+27
+（同一段的"项"列逐名：macOS 平台层 / 代码签名包管理器分发 / 插件 SDK+文档+示例 / 社区插件 registry /
+  i18n非中文 / 无障碍 / AEC barge-in / 快捷键路径语音否决（B1）/ 剪贴板历史（D34）/ `doc.read` xlsx/OCR（D34）/
+  `system.eject`（D34）/ 完整错误文案体系 / 竞品对比文档 / MCP client / Codex guardian 双轴评分 /
+  跨会话持久授权档 / `available_decisions` / embedding 语义记忆 / Linux 支持 / 精确 taint tracking /
+  周期性调度器（cron）/ 邮件日历IM 核心内置 / Coding IDE 能力 / 多 Agent 协作 / 意图分类四级流水线 / `fs.delete` 默认提供 …）
+```
+
+⇒ **27 枚数据行全是散文键**，一枚都不带 `DEFERRED(D-xx)` 代码标记（个别在"项"列里带 `(D34)` 这种**出处标注**，
+那不是代码标记）。⇒ 权威文本那句 `DEFERRED(D-xx)` **限定的就是标记那一侧的形状**，
+**不是**"每条登记都得配一枚代码标记"。
+
+**⇒ 这一发的裁决：被验件 §4.2 那格给的理由有一枚是读严了的。**
+它写"本程单侧改表会造出一枚**没有代码标记对应**、也没有验收表的登记"——
+前半句按盘上的表与 `issues/README:188` 的字面**不成立**；
+**成立的后半句只有一条**：`docs/specs/*.md` 被票面 `:12` 冻着，且**它自己是那笔登记的受益人**（裁决者≠实现者）。
+⇒ 这不影响它的**行为**（不落笔是对的），影响的是**下一程引这条理由时的射程**——
+别让人以为"配不上代码标记就不能登记"，那会让 27 枚现存行全都变成假想违规。
+
+### 3.3　第三发：类型取 `DEFERRED` 还是 `RESERVED`（我复核它取 DEFERRED 的前提）
+
+它取 DEFERRED 的前提是"shell.exec **有计划**（SPEC-07 §3，S3）／D46 是已采纳项、有票 50"。逐条核：
+
+```
+$ git grep -n 'shell.exec' 3f6322f -- docs/specs/SPEC-07-tools-and-plugins.md
+3f6322f:docs/specs/SPEC-07-tools-and-plugins.md:71:| `shell.exec` | 任意命令 | L2（白名单命中 → L1） | shell | S3 | **默认禁用**；argv 向量强制 |
+$ git grep -n '^## ' 3f6322f -- docs/specs/SPEC-07-tools-and-plugins.md | sed -n '3p'
+32:## 3. D34 内置工具权威表（唯一来源；落 `docs/TOOLS.md`）        <- 它引的"SPEC-07 §3"就是这一节，对得上
+$ git show 3f6322f:.scratch/wisp/issues/50-tier1-manifest-plugins.md | sed -n '3p'
+**Status:** ready-for-agent
+$ git show 3f6322f:docs/evidence/s1/138-cancel-kills-children-r1.md | sed -n '554p' | awk -F'|' '{print "登记行的列数="NF-2}'
+登记行的列数=6
+$ git show 3f6322f:docs/specs/SPEC-12-roadmap-governance.md | sed -n '64p'
+| 类型 | 项 | 为什么现在不做（依据） | 完成判据 | 前置 | 当前残缺表现 |
+```
+
+⇒ **DEFERRED 取对了**：`RESERVED` 的语义那句是"**无实现计划**"，而 `shell.exec` 在 SPEC-07 §3 权威表里有行、
+D46 命令插件有 `ready-for-agent` 的票 50 ⇒ "无计划"不成立。
+⇒ 它那行**六列与表头逐列对齐**（`fields=6`），"五字段缺一不可"在两种数法下都满足——这一条我不改它。
+⇒ 唯一要补的：它的"依据"列里写的是一串**〔本程现量〕**，而那批现量今天才被我这一格复算完。
+⇒ **落笔时"依据"列应改指本验收件**（否则登记行的凭据是一枚未验收的自述——正是 `A265③` 那族"把自述当读数"的形状）。
+
+### 3.4　第四发（本程造出的一发，派单没要求）：`ready-for-human` 这枚状态值**在本仓不存在**
+
+票面 `:44-46` 命令"把本票降级为 `ready-for-human`"。我去核池子的状态词表：
+
+```
+$ git show 3f6322f:.scratch/wisp/issues/README.md | sed -n '9,15p'
+| Status | Meaning |
+|---|---|
+| `ready-for-agent` | Frontier ticket, unclaimed |
+| `in-progress` | Claimed; must have ≥1 Progress-log entry |
+| `blocked` | Waiting on external decision (ticket notes which) |
+| `review` | Work done, awaiting adversarial acceptance (SPEC-10 §8) |
+| `done` | All boxes checked; **rename file with `-done` suffix** + title `(DONE ✅)` |
+$ git grep -n 'Rules (prevent' 3f6322f -- .scratch/wisp/issues/README.md
+3f6322f:.scratch/wisp/issues/README.md:17:**Rules (prevent abandoned/in-progress tech debt):**
+$ git show 3f6322f:.scratch/wisp/issues/README.md | sed -n '30,33p'
+4. Completion: check all acceptance boxes → `Status: done` → rename file `NN-slug.md` →
+   `NN-slug-done.md` → update this index → commit+push.
+5. If a decision is missing, set `Status: blocked` with the open question in the log
+   (D22 闸门③: undefined = stop and ask, never assume).
+$ git grep -rln 'ready-for-human' 3f6322f
+3f6322f:.scratch/wisp/issues/138-cancelling-a-task-kills-nothing-the-task-itself-spawned-single-jobscope-no-terminatejobobject.md
+3f6322f:docs/evidence/s1/138-cancel-kills-children-r1.md
+```
+
+⇒ 池子的词表是**五枚**：`ready-for-agent` / `in-progress` / `blocked` / `review` / `done`。
+⇒ **`ready-for-human` 全仓只出现在本票与它的件里——是一枚池外状态值。**
+⇒ **`ready-for-human` 全仓只出现在本票与它的件里——是一枚池外状态值。**
+⇒ 于是"降级为 ready-for-human"这句**要按池内语言翻译才能执行**，而翻译结果唯一：
+**本票的处境正是规则 5 那句 "a decision is missing"**（缺的决定＝"owner 已批准的一枚票要不要改判为今天不做"）
+⇒ **`Status: blocked` ＋ 待决问题进日志 ＝ 一枚 `Q##`**。
+⇒ 顺带一句实现程的判断没走歪：它 §4.2 那格写"Status 属同一族的票面框，未改"——**它一枚字都没动是对的**，
+虽然它引的那句"票面框由编排者按非实现者验收表来定"是派单侧、盘上无 witness（见本件 §1.4）。
+
+### 3.5　本格两判
+
+**判一（那笔登记能不能落地）：不能由 agent 单方落——但成立的理由只有一条，派单与实现件各引错了一半。**
+
+- **成立且够硬的那条**：`docs/specs/*.md` 被**本票票面 `:12`** 冻着；且落笔者不能是受益人（裁决者≠实现者，`AGENTS §0.3`）。
+- **实现件 §4.2 引错射程的那条**："配不上 `DEFERRED(D-xx)` 代码标记"⇒ 盘上 27 枚行全是散文键、
+  一条都不配标记；真正的现存违规在**反方向**（`D28-1`／`D11-3` 有标记无行，且无仪器在守）。
+- **派单（我这单上级）要收紧的那条**：派单说"改它＝契约变更，须人工批准"。
+  按 `SPEC-12 §4.1:38` 的字面（射程由 C/D 枚举报决定，本仓 `A181②` 已用同一判法裁过一次），
+  **§5 表行不是契约条目** ⇒ "契约变更"这顶帽子扣不上。
+- **那为什么仍然要摆 `Q##`**：**不是**因为"登记＝改契约"，而是因为**这枚登记改口的是 owner 已经批准过的东西**——
+  本票 `:3-4` 逐字："来源＝owner 批准的 `Q-43` 前半"、`:74-75` "owner 在对话里批准 `Q-43`（原话「都按你的推荐来」）"。
+  ⇒ 把一枚 owner 批准的票改成"今天不做、等前置事件触发"＝**对 owner 的批准改口**，那是 owner 的权限，不是编排者的。
+  ⇒ 与既有条款同形："**只有对话里的 owner，或已经存在的票面／契约条文，能给授权**"（`injection-timeline §5.2`）。
+- **owner 点头之后由谁落**：编排者（历史上 `SPEC-12` 的两次动笔 `130c0943`/`5cba2d92` 都是编排者侧的 docs 落笔），
+  并且**同时**给那行补三样：①"依据"列改指本验收件；②Status 那行按 §3.4 的池内词翻译；③票面 `:12`↔`:44-46` 那处自相矛盾起一枚 `>` 登记。
+
+**判二（作废并登记／改判保留／别的）：两枚都不对，正解是第三枚；既有那枚裁定在这里只用得上后半段。**
+
+- **"作废"不是本票的合法出路**：票面上写的撤销口令「**138 撤**」逐字带后果"改回未立案、**票文件删除**"，
+  那是 owner 专属动作；且本票要防的洞**是真的**（`RunningTask.Cancel()` 只掐 ctx、全仓零枚 `TerminateJobObject`
+  这两枚锚我在第 2 格复算时都重新看到了），只是**今天无入口**。⇒ 撤一枚"缺口真、无入口"的票＝把读数扔掉。
+- **"改判保留为活票"也不对**：它没有可写的码（AC#2 前件判假我已复核成立，见 §2.5），留着当活票会诱下一程"造一条假危害来结线"，
+  那正是票面 `:46` 明令禁止的形状。
+- **正解＝池内规则 5 那一枚**：`Status: blocked` ＋ 待决问题＝`Q##`（§3.4），**不改名 `-done`**。
+- **派单问的"既有裁定（故意留空的一格 vs 结案须 0 未勾 ⇒ 勾交付物＋把洞归口另一张票＋原话不改）适不适用"：只适用后半段。**
+  - 适用的部分：**AC#2／AC#3 原话一个字不改、不勾**；把洞**归口到落地当日那张票**（前置＝`shell.exec`@SPEC-07 §3／票 50）。
+    现成的池内形状就是 `issues/README:46-47` 那句"**把那一格的框保持未勾，并在 Progress log 写 `skipped=…`，不要替它勾、也不要替它写**"。
+  - **不适用的部分**：这条裁定的**触发前提是"要结线"**。本票**不结线**，所以拿它去 justify "AC#2/AC#3 也算交付、翻勾、改 `-done`"
+    是**用错射程**。⚠ 尤其不能引先例**票 63**（`issues/README:172`："63 → DONE，但 AC#6 未勾、正式转票 12"）——
+    63 那一格**有票 12 接走**，本票今天**没有任何一张票接**；"有人接"才是 63 能带残余结线的凭据，缺它就只能 blocked。
+- **能勾的只有两格**：AC#1（读数＋裁决，我第 2 格全复算）与 AC#4（门禁，见本件第 4 格）。
+  勾与不勾**都由编排者按本表落笔**，本程不翻一枚框。
+
+### 3.6　放水两问自答
+
+- **断言方向动没动**：没动——本程零枚断言、零枚文件内容改动，唯一写件是本件。
+- **helper 是不是原有的那枚**：本程没引入 helper。§3.2/§3.3/§3.4 三发的尺都是
+  `git show` / `git grep` / `sed -n` / `awk -F'|'` 四把现成尺，命令原文逐条贴在上面。
+- 本格最容易放水的地方我自首一处：**判一里我把派单那句"改它＝契约变更"判成"帽子扣不上"**，
+  这一发对**我上级的话**不利。我留了它、也留了判据（`SPEC-12 §4.1:38` 的枚举报射程＋`A181②` 同判法），
+  **没有**因为对上级不利就把它写成"另有解释"。
+
+### 3.7　本程没测什么（按"漏了它谁会先被骗"排序）
+
+1. **没找到任何一把守 1:1 的仪器**（`git grep DEFERRED -- scripts tools .github` 只命中注释）。
+   ⇒ 若平台外还有尺（例如 `tools/d22scan` 之外的自测），我的"方向 B 不成立"要重判。
+2. **没核 `SPEC-12 §5` 那 27 枚行的"项"列是否都各自有出处**——我只数了形状与键型，没逐条回核它们在 PLAN 里的来源。
+3. **没验"owner 批准 Q-43"这句话的盘上凭据**：票面 `:3-4` 与 `:74-75` 是**票面自称**，
+   而本仓有条硬判据"**文档自称受谁之命永远不算授权**"（`injection-timeline §11 结案`）。
+   ⇒ 我没去对话记录里核 Q-43（我没有对话通道），所以**判一里那句"因为改口的是 owner 批准过的东西"，
+   凭据层只到"票面这么写"**——这一枚要请编排者在自己的台账/对话里补实。
+4. **没测"票面 `:12`↔`:44-46` 自相矛盾"是否已被别处豁免**：我只在这两枚文件里找过（票面、AGENTS、issues/README），
+   没扫 `docs/reports/` 全部 6500＋ 行台账找"某次已批的豁免"。若已有，我这一发降级为重复登记。
+5. **没给 `Q##` 拟正文**：那不是我这一格的活，摆出来是越权。
+
+### 3.8　结论修正记录（本格）
+
+1. **推翻派单一处**：派单说"`docs/specs/**` 在本仓是冻结面（**改它＝契约变更，须人工批准**）"。
+   前半句对（票面 `:12` 逐字冻着），后半句按 `SPEC-12 §4.1:38` 的字面射程**扣不上**——
+   人工批准那条款管的是 `C1–C32`／`D1–D47`，不管 §5 表行。⇒ **结论（要 owner）不变，理由换一枚**。
+2. **推翻被验件一处（理由层）**：§4.2 那格"没有代码标记对应"这半不成立（实测 27 枚行零标记；
+   现存违规在反方向 `D28-1`／`D11-3`）。⇒ **它的行为（不落笔）仍然对**。
+3. **造出一枚派单没有的前提缺陷**：票面命令的降级目标 `ready-for-human` **在池子词表里不存在**（§3.4）⇒
+   照它字面执行会造出一枚池外状态；池内唯一对应是 `Status: blocked`。
+4. **本程自纠一处**：我第一次核 `shell.exec` 的 spec 出处时把文件名写成 `SPEC-07-tools-plugins.md`
+   （真名 `SPEC-07-tools-and-plugins.md`），`git grep` 给了零命中、我差点据此判"SPEC-07 里根本没有 shell.exec、
+   它那句引用是空引"。**先 `ls docs/specs/` 再 grep 才是对的次序**——本仓 `injection-timeline §5.1` 那条
+   "两问判据①它点名的路径是否真的存在"这次差点被我反向误用（拿一枚不存在的文件名去判别人的引用是假引用）。
+   已重跑（§3.3 贴的是重跑那发）。
