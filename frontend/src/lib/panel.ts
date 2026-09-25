@@ -225,32 +225,14 @@ function sendRequest(method: string, payload: Record<string, unknown>): void {
   );
 }
 
-/**
- * Ask the native side to switch the panel's view (Q1 = 甲 rail, 2026-09-25).
- *
- * ASK, NOT DECIDE - and note what this file is doing that it has not done
- * before: `panel.view.request` is a SIXTH outbound method name, and Go's
- * whitelist (internal/panel/bridge.go) has four. Today the request is inert:
- * no host means it throws here, and with a host it is refused there, so no
- * screen ever changes. That is deliberate - see the report to the orchestrator.
- * The reason a sixth name exists at all is that PLAN.md:1044 and SPEC-08:150
- * forbid the panel from keeping its own "current view", so a rail that switched
- * screens locally would be the first state the panel ever held, and a rail that
- * did nothing would be a dead control. Asking is the only shape left that is
- * neither.
- *
- * It overrides `source` on purpose: the envelope's default identity is
- * "panel-composer", which is a routing claim about who spoke, and a click on a
- * navigation icon is not the composer speaking. Audit lines key off it (D31).
- *
- * Owner's P9 red line admits this kind of widening (a view is a read of what to
- * display, not a decision about what may run) - the four that are never
- * available are an approval decision, a mode or workspace SET, a config/secret
- * write or host artefact path, and a panel-side L2 "allow".
- */
-export function requestViewChange(to: string): void {
-  sendRequest("panel.view.request", { source: "panel-view", to });
-}
+// There is deliberately NO fifth outbound route here. A `panel.view.request`
+// existed for about an hour on 2026-09-25; owner ruled Q-50 = 甲 ("先删掉这个请求"),
+// because Go's whitelist (internal/panel/bridge.go) answers four names, and a
+// fifth means the renderer names a route the native side does not answer - which
+// is exactly what internal/panel/composer_test.go:522 exists to catch (it was
+// red on two tests before this comment was written, green after). Re-adding one
+// is not a frontend change: it reopens C17's method whitelist, a contract-level
+// human-approval surface. Undo phrase: 「撤 Q-50 甲」.
 
 /**
  * Ask the native side to switch the permission mode. This is intent only: the

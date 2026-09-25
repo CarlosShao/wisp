@@ -20,7 +20,6 @@ import { Composer } from "@/components/composer";
 import { L2ApprovalCard } from "@/components/l2-approval-card";
 import { PanelSkeleton } from "@/components/panel-skeleton";
 import { ResultStream } from "@/components/result-stream";
-import { requestViewChange } from "@/lib/panel";
 import { currentView, viewOf, type PanelViewId } from "@/lib/panel-views";
 import type { ComposerState, PanelSnapshot } from "@/lib/panel";
 
@@ -73,7 +72,6 @@ export default function App({
   return (
     <PanelSkeleton
       active={view}
-      onSelectView={(id) => requestViewChange(id)}
       pendingCount={snapshot.pending.length}
       waitingLabel={snapshot.pending.length > 0 ? "等待确认" : undefined}
     >

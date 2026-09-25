@@ -25,13 +25,11 @@ import type { ReactNode } from "react";
 export function PanelSkeleton({
   active,
   children,
-  onSelectView,
   pendingCount,
   waitingLabel,
 }: {
   active: PanelViewId;
   children: ReactNode;
-  onSelectView: (id: PanelViewId) => void;
   pendingCount?: number;
   waitingLabel?: string;
 }) {
@@ -41,11 +39,18 @@ export function PanelSkeleton({
         className="glass-raised flex w-full max-w-[var(--panel-w)] overflow-hidden rounded-xl border-0"
         style={{ animation: "fade-up 350ms cubic-bezier(0.23,1,0.32,1) both" }}
       >
-        <NavRail active={active} onSelect={onSelectView} pendingCount={pendingCount} />
+        <NavRail active={active} pendingCount={pendingCount} />
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="flex items-center gap-3 border-b border-line px-4 py-2.5">
             <span className="text-[12.5px] font-medium text-ink">Wisp</span>
             <span className="text-[11.5px] text-ink-3">{railTitle(active)}</span>
+            {/* Saying so out loud beats looking live. The rail's rows are disabled
+                because changing screen needs a route the native side does not
+                answer (owner's Q-50 = 甲), and holding it locally is what Q2
+                forbids - so the honest shape is an unavailable control that
+                names why, not one that eats the click silently (ticket 83's
+                disease, named in src/lib/panel.ts's own comments). */}
+            <span className="text-[11px] text-ink-3">换屏要等原生宿主接线，这一排图标今天点不动。</span>
             {waitingLabel && (
               <Shimmer className="ml-auto text-[11.5px]">{waitingLabel}</Shimmer>
             )}

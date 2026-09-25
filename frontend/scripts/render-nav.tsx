@@ -211,6 +211,29 @@ check("hover AND focus must reveal the label (keyboard users get the name too)",
   /\.nav-rail-item:hover > \.nav-rail-label/.test(css) &&
     /\.nav-rail-item:focus(-visible)? > \.nav-rail-label/.test(css));
 
+// Q-50 = 甲 (owner, 2026-09-25): the panel sends NO fifth route. This is a
+// frontend-side belt for internal/panel/composer_test.go:522, which reads the
+// same literals from the Go side - if someone re-adds a view request, both
+// should go red, and the one in this tree fails before a push does.
+const libSource = readFileSync("src/lib/panel.ts", "utf8");
+const routes = [...libSource.matchAll(/"(panel\.[a-z.]+)"/g)].map((m) => m[1] as string);
+check("panel.ts must keep naming the routes Go already answers", routes.length >= 4, routes.join(" "));
+check("no view-change route may come back without owner's ruling (Q-50 = 甲, undo: 撤 Q-50 甲)",
+  !routes.some((r) => r.includes("view")), routes.join(" "));
+
+// The rail is a control that is not live. It must LOOK unavailable and SAY so:
+// a disabled row that also fires nothing is the ticket 83 disease with new paint.
+const railSource = readFileSync("src/components/nav-rail.tsx", "utf8");
+check("the rail must not carry a click handler while no route exists", !railSource.includes("onClick={() =>"));
+const firstRail = renderToStaticMarkup(<App snapshot={{ ...base, view: "chat" } as PanelSnapshot} />);
+const railMarkup = firstRail.match(/aria-label="面板视图"[\s\S]*?<\/nav>/)?.[0] ?? "";
+check("every rail row must say disabled",
+  (railMarkup.match(/ aria-disabled="true"/g) ?? []).length === PANEL_VIEWS.length &&
+    (railMarkup.match(/ disabled=""/g) ?? []).length === PANEL_VIEWS.length,
+  `aria-disabled=${(railMarkup.match(/ aria-disabled="true"/g) ?? []).length} disabled=${(railMarkup.match(/ disabled=""/g) ?? []).length}`);
+check("the panel must state in words why the rail is inert",
+  firstRail.includes("换屏要等原生宿主接线，这一排图标今天点不动。"));
+
 if (failures.length > 0) {
   for (const f of failures) console.error("render-nav: FAIL " + f);
   console.error(`render-nav: FAIL, ${failures.length} check(s) failed (${frozen.size} frozen icon names)`);

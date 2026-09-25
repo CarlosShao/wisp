@@ -42,11 +42,9 @@ const ICONS = {
 
 export function NavRail({
   active,
-  onSelect,
   pendingCount,
 }: {
   active: PanelViewId;
-  onSelect: (id: PanelViewId) => void;
   pendingCount?: number;
 }) {
   return (
@@ -60,14 +58,15 @@ export function NavRail({
         return (
           <button
             aria-current={on ? "page" : undefined}
+            aria-disabled
             aria-label={v.label}
             className={cn(
               "nav-rail-item relative flex size-8 shrink-0 items-center justify-center rounded-control",
               on ? "bg-overlay text-ink" : "text-ink-3 hover:bg-hover hover:text-ink",
             )}
+            disabled
             key={v.id}
-            onClick={() => onSelect(v.id)}
-            title={v.interim ? `${v.label} - ${v.interim}` : v.label}
+            title={`${v.label}（换屏待接线）`}
             type="button"
           >
             <Icon size={16} />
