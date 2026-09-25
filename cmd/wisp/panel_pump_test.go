@@ -130,7 +130,7 @@ func nonDefaultConfig145(t *testing.T, dataDir string) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(cfgPath, []byte(string(old)+"\n[risk]\nconfirm_timeout_sec = 2\n"), 0o600); err != nil {
+	if err := os.WriteFile(cfgPath, []byte(string(old)+"\n[risk]\nconfirm_timeout_sec = 2\npermission_mode = \"ask_high_risk\"\n"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 }
