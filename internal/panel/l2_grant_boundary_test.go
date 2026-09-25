@@ -106,6 +106,20 @@ package panel
 // goes red inside the sweep instead of quietly printing asked=0 over a grid that
 // stopped existing.
 //
+// Two more nails, both from docs/evidence/s1/panel-l2-grant-nail-fix-r4-accept-r1.md
+// §10/§11. (F-R4-1) The ask-the-guard step is now one function, sweepAssembledNames,
+// and the positive control reaches the guard through it rather than from a line of
+// its own - so short-circuiting the sweep's ask or accumulate step reddens the
+// control, and "hits=[]" can no longer mean "never asked". (F-R4-2) A factor list
+// can no longer be narrowed quietly: every member of grantRoutePrefixes and
+// grantRouteSuffixes has a witness row that the sweep must still be able to
+// assemble, and wantGrantRoute* writes the three counts down as numbers, because
+// asked= always equals the lists as they now stand. What stays open is the
+// three-piece edit inside this file - member, witness row and written count moved
+// together - which this round's own rig measured green (X-list+row+pin); it is the
+// same family grantRouteWordWitnesses has always shared, and the backstop is the
+// human roster diff, not a ruler here.
+//
 // ONE CONSTRAINT THIS FILE PUTS ON PRODUCTION CODE, DECLARED HERE BECAUSE
 // NOTHING ELSE WRITES IT DOWN (F-R2-1, docs/evidence/s1/panel-l2-grant-nail-
 // accept-r2.md §2.4 + §7.4): the inbound half of this instrument starts from the
@@ -1295,7 +1309,10 @@ func TestAnsweredPanelRoutesCarryNoApprovalDecision(t *testing.T) {
 // allow through. They are NAMESPACES, not route names: this file hard-codes no
 // candidate it later asks about, because the shape being nailed here is exactly
 // the one where a name is never written down in one piece (F-R2-3). The set is a
-// judgement call and is allowed to grow; nothing in here claims it is exhaustive.
+// judgement call; growing it is allowed but is a deliberate two-line edit - the
+// member goes into grantRoutePrefixWitnesses (F-R4-2) and the count into
+// wantGrantRoutePrefixes below, which is what makes a NARROWING impossible to
+// write quietly, even together with its witness row.
 var grantRoutePrefixes = []string{
 	"panel", "panel.review", "panel.approval", "panel.l2", "panel.mode",
 	"panel.workspace", "panel.attachment", "panel.message",
@@ -1305,6 +1322,19 @@ var grantRoutePrefixes = []string{
 // ("request", "add", "send" - the first is a suffix here and the others are not,
 // which is why "now" is along: a wiring commit reaches for whatever reads well).
 var grantRouteSuffixes = []string{"", ".request", ".now"}
+
+// wantGrantRoute* are the grid's three factors as a written-down number, which is
+// the part the product assertion cannot do: asked= always equals the lists as
+// they now stand, so a member deleted together with its witness row leaves the
+// product true. Acceptance r4 measured the same silence one level up (its
+// §11: prefix-shrink asked=462, suffix-shrink asked=352, both green). The three
+// lengths are named separately so the red says which factor moved. Widening the
+// grid means moving these numbers on purpose; that friction is the whole design.
+const (
+	wantGrantRoutePrefixes = 8
+	wantGrantRouteWords    = 11
+	wantGrantRouteSuffixes = 3
+)
 
 // gridFactorWitness is one member of a grid factor plus one route name that only
 // that member lets the sweep assemble.
@@ -1453,6 +1483,11 @@ func knownComposerRefusesAssembledGrantNames(t *testing.T) (int, []string) {
 	if len(grantRouteWords) == 0 || len(grantRoutePrefixes) == 0 || len(grantRouteSuffixes) == 0 {
 		t.Fatalf("the sweep vocabulary is empty (grantRouteWords=%d, grantRoutePrefixes=%d, grantRouteSuffixes=%d): a sweep that asks nothing answers clean forever",
 			len(grantRouteWords), len(grantRoutePrefixes), len(grantRouteSuffixes))
+	}
+	if len(grantRoutePrefixes) != wantGrantRoutePrefixes || len(grantRouteWords) != wantGrantRouteWords || len(grantRouteSuffixes) != wantGrantRouteSuffixes {
+		t.Fatalf("the sweep grid is %d prefixes x %d words x %d suffixes per plural form, not the %d x %d x %d written down in wantGrantRoute*: a factor list moved without the pin moving with it. The product assertion below cannot see this, because asked= always equals the lists as they now stand - a narrowing paired with the deletion of its own witness row is what this line is for (F-R4-2)",
+			len(grantRoutePrefixes), len(grantRouteWords), len(grantRouteSuffixes),
+			wantGrantRoutePrefixes, wantGrantRouteWords, wantGrantRouteSuffixes)
 	}
 	// Anti-vacuity, positive control: the same sweep line that must find no
 	// approval-shaped name below has to find the four routes this package really
