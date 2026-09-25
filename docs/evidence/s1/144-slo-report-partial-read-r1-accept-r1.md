@@ -116,3 +116,75 @@ snap/  ACC4 partial reads observed during 3s of concurrent writeSLO = 871
    `io.ErrUnexpectedEOF` 那一支在本机今天走不到；两支同归 `reportUnwritten`，所以修法仍然对得上，
    但**"半截文件"这个票面措辞与实测量到的形状不完全是一回事**，登记给归因；
 ③ 这两发**没拿"多少秒"当判据**：871/998 是**次数**，且两版数量同级 ⇒ 它证的是"这形造得出"，不是"哪版快"。
+
+## 4　AC#4 门禁与名册 —— **成立**
+
+本程**没有**采信前一程 §4.1/§4.6 的表，也没有"同树取两次"：改前用 `95885fb^` 的 archive 现造一棵
+不含本票测试的树（`prer/`，现量 `ls prer/cmd/wisp | grep -c slo_report_144` = **0**），
+改后用 `1e94672` 的 archive（`post/`，**不带本程那枚驱动**，避免把我自己的 4 枚用例混进名册）。
+两发都只叫 `./cmd/wisp/`，**没有**一次把 `./internal/panel/` 放进同一次调用。
+
+```
+$ cd prer  && PATH=<tree>/third_party/sherpa-onnx:$PATH go test -count=1 -v ./cmd/wisp/   → rc=0
+$ cd post  && PATH=<tree>/third_party/sherpa-onnx:$PATH go test -count=1 -v ./cmd/wisp/   → rc=0
+$ grep -oE '\-\-\- (FAIL|PASS|SKIP): [A-Za-z0-9_/]+' <log> | sort -u > <t>.roster      # 票面指定的那把尺
+
+prer:  RUN=116  --- PASS=116(含子格)  --- FAIL=0  --- SKIP=0  ^panic|^\[signal=0  roster=106
+post:  RUN=130  --- PASS=130(含子格)  --- FAIL=0  --- SKIP=0  ^panic|^\[signal=0  roster=120
+$ comm -23 prer.roster post.roster | wc -l   → 0        ← 消失 0 枚
+$ comm -13 prer.roster post.roster           → 14 枚，逐枚 --- PASS: TestSLO144*
+```
+
+新增那 14 枚逐枚在册（顶格 7 ＋ `ReportsThatContradictThemselves…` 的子格 7），
+**没有一枚 `SKIP`、没有一枚 `FAIL`、两遍 `^panic|^\[signal` 均 0**
+⇒ 票面担心的"一枚用例 panic 吞掉同包几十条读数"这一形**今天没发生**，所以也没有"未取到"的债。
+
+⚠ **判红绿只认 `--- FAIL:` 那一行**：`post-full.log` 里带 `^\s+<file>.go:<NN>:` 前缀的行有 **28** 枚（`t.Logf` 也带这个前缀），
+而 `^ *--- FAIL` 是 **0** 枚 ⇒ 按"有没有 `file:line:`"判红会把 28 枚 Logf 读成红。两棵树的日志本程都按这一条判。
+
+**CI 同形那发（`bash scripts/wisp-cli-tests.sh`，只 call `./cmd/wisp/`，在 `post/` 纯净树上）**：
+
+```
+runtests.sh: OK - packages=[./cmd/wisp/ -count=1 -skip ^(TestDefaultDeadline…|…|TestSyncRegistryProbeLive)$]
+             top-level: PASS=70 FAIL=0 SKIP=0, === RUN=130, '[no tests to run]'=0
+portable-tests.sh: four numbers (from -v): === RUN=130  --- PASS=70  --- FAIL=0  --- SKIP=0
+```
+
+⇒ 与 §4.4 自述的终态读数**逐字相符**（PASS=70／FAIL=0／RUN=130）。
+本程**没有**在这一发里复现出续程报过的那枚并发假红
+（`TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink`，续程那一发是 `PASS=69 FAIL=1`）——
+这一条与本票归因有关，单独在 §8 回答，不在这里记账。
+
+**那把"0 命中"的尺先拿正控打过**（本仓当天两枚空核验的教训）：
+- `grep -c TestSLO144 post.roster` = **14**（尺能命中本票新增）；
+- `grep -c TestSecretOverwriteIsAnnounced prer.roster post.roster` = **1 / 1**（尺能命中既有用例，两册都在）
+⇒ `comm -23` 读空是"确实没消失"，不是"尺不响"。
+
+**门禁其余四发（全部在 `post/`＝`1e94672` 纯净树上现量，不采信自证件）**：
+
+```
+$ gofmt   -l cmd/wisp/                                → 空
+$ gofumpt -l cmd/wisp/                                → 空
+$ gofumpt -l . tools/d22scan tools/mockllm            → 空        ← CI 那枚全树尺（两把尺都跑，不是一把）
+$ go vet ./cmd/wisp/                                  → rc=0 空
+$ sh scripts/d22scan.sh                               → rc=0
+    runtests.sh: OK - packages=[./...] top-level: PASS=30 FAIL=0 SKIP=0, === RUN=70   ← d22scan 自带正控
+    d22scan: examined 228 production Go files under internal/ and cmd/
+    d22scan: scope ban #8 cmd/  examined  43 Go files, comments and _test.go included  ← 本票新增那枚测试确实在射程里
+    d22scan: clean - no D22 ban violations（真树 8 枚作用域 examined 全非零）
+```
+
+⇒ §4.6 那三行（改前 106／改后 120／消失 0／新增 14）**与本程现量逐格相符**；
+四道门禁相符；唯一一处与本票叙述不符的数字差异是 `ban #8 design/`＝**30**（自证件写 32）——
+原因是本程那棵树是 archive 出来的**已提交树**，而工作树里 `design/**` 有 16 枚别家程的未提交删除/移动，
+**与本票无关，不记在本票账上**（按"引一枚红要连红句"的规矩，这一发根本不是红：rc=0、clean）。
+
+**`slo_windows.go` 的改动面（本程现量，票面地界核销）**：
+`git diff --name-status 95885fb^ 1e94672 -- cmd/wisp/` = `A slo_report_144_windows_test.go` ＋ `M slo_windows.go` 两枚，
+**没有任何既有测试文件被改**（`| grep -v 'slo_windows.go\|slo_report_144'` 读空，
+且该 grep 的正控＝去掉 `-v` 后它确实吐出那两枚路径）。
+预算三常量 `subjectGrace=3s` / `subjectReportBudget=30s` / `subjectPollInterval=20ms`
+在两棵树里**定义逐字相同**（`pre:74/81/82`、`post:77/84/85`，只是行号平移），
+`git diff -U0 95885fb^ 1e94672 | grep '^[+-].*(subjectGrace|subjectReportBudget|subjectPollInterval)'`
+只命中 4 行、**全是引用处不是定义处**（两 `-` 两 `+`，即"把两枚数挪进 `collectReportWithin` 实参"那一步）
+⇒ **没有用放宽预算当修法**。
