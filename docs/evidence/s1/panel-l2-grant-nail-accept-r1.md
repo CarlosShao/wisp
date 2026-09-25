@@ -142,7 +142,7 @@ tickets 33/35 接线时要同时新增依赖，那是一枚会被 `go.mod` diff 
   **8 发全部回到 `d2cd6362` / `5b618d14`，`git status --porcelain -- internal/panel/` 每发之后为空**。
   未用 `checkout`/`reset`/`stash`，未 push，未碰 `frontend/**`、`design/**`、`internal/observe/**`、`tools/d22scan/**`（只跑了它们的只读检查）。
 - ⚠ **一次失败的变异我没当成读数**：M10 第一次落地时我猜错了缩进，python 的 `assert` 当场拒写，
-  那一发跑出来的"5 枚全绿"是**干净树**的读数，已作废重跑（重跑结果见 §5）。
+  那一发跑出来的"5 枚全绿"是**干净树**的读数，已作废重跑（重跑结果见 §2 表的 M10 行与 §3.4）。
 - **"变异真的生效了吗"这一问我用探针量，不靠推测**：临时新建 `internal/panel/zz_accept_l2probe_test.go`
   打印 `knownComposerMethod(...)` 的真实返回值（该文件是 `_test.go`，被 `goSourceFiles` 排除，不污染 AST 扫描），
   跑完 `mv` 到我自己的 `removed/` 里留着。两向都有：干净树上 4 枚候选名全 `false`（负控），变异树下目标名 `true`（正控）。
@@ -250,5 +250,128 @@ and **agrees with** knownComposerMethod at runtime"（`:40-42`）在盘上是**�
   删掉面 3 ⇒ "主机不再问守卫"这一类变异在全树零仪器覆盖。⇒ 面 3 = **承重**。
   （M8/M9 的红句也都在面 3，但那些枚别的面也叫，只有 M12 是面 3 独有。）
 
-锚点刷新：§2–§3 的变异与读数全部取自 `dev` @ `43a6043`（`bridge.go` 每发之后 `=d2cd6362…`、
-测试件每发之后 `=5b618d14…`、`git status --porcelain -- internal/panel/` 逐发为空）。
+> **§3.3 就地更正（追加，原句不删；这是本程自己的一枚假阳性结论）**：
+> 上一版那句"M12 之下**只有面 3 叫**、删掉面 3 这类变异全树零仪器覆盖"**是错的**。
+> 我当时只跑了本件的 5 枚测试就下了全称结论；补跑**整包**（`M12-fullv.txt`）现量：
+> 红的顶层是 3 枚 —— `TestComposerEnvelopeRefusesSpoofingAndUndecorableRequests`（**先存在**，
+> `bridge_test.go:77`）、`TestGrantWireShapesAreRefusedAtTheDoor`（本件）、`TestC21DesignTokensFourWayAgree`（留红）。
+> ⇒ 先存在那枚的子测试 `:78` "a request that names an approval decision is not a composer method"
+> **也在这一发上叫**（它断言 `approval.decide` 被拒且错误句里含"不是面板 composer 通路"）。
+> **改判**：面 3 对 M12 **不是唯一**防线，是**第二**防线；先存在那枚是**单一拼写的字面匹配**
+> （它只写了 `approval.decide` 一个名字，所以 MA 那发答 `panel.approval.request` 时它不响，见 §4.2）。
+> 面 3 的承重**判据本身不变**（M12 确实只有行为面红、词表三面绿），但"全树零仪器覆盖"那句作废。
+
+### §3.4 facet 4（本件的词表自校验）——**附条件成立：三枚植物里两枚承重，"合法路由不被命中"那一枚是镜子**
+
+派单给的 4 号格子问的是"承重还是镜子"，我这仓的定义＝**摘掉它，有没有哪发变异从此打不红**。三发定向变异：
+
+| 发 | 造形 | 本件的自校验 | 其余三面 + 快照牙齿 | 判 |
+|---|---|---|---|---|
+| **M10** | 反射那半**去掉对内嵌结构的递归**（`bindableKeysOf` 的 `f.Anonymous` 分支不再下钻） | **只有第 3 枚植物红**：`:683 planted a grant-carrying envelope (a verdict smuggled inside an embedded struct) and the predicate reported nothing - the check is decoration` | **面 1/2/3/4 全绿**（含快照 A/B/C——植物 A 是**直挂字段**，不是内嵌偷渡，所以咬不到这一发） | **承重（唯一防线）** |
+| M9 | 词表砍掉 `"outcome"` | 第 1 枚植物红 | 快照 A + C 也红（`:833`/`:863`） | 冗余，但方向对（两处都会叫） |
+| M11 | 路由词表**放宽**加一枚 `"mode"` | "cry wolf" 那一枚红（`:697`） | **面 1（`:569`）与面 2 的 AST（`bridge.go:97`）同时红**，用的是同一句谓词、同一批 4 枚名字 | **镜子**（摘掉它这发照样红） |
+
+⇒ **结论：`TestGrantVocabularyIsNotSatisfiedByTheRealEnvelopes` 整体＝承重**，凭据是 M10 那一发
+（**摘掉这枚测试，M10 那类"内嵌偷渡"变异从此在全包零反应**）；
+但它的**第四条腿（4 枚合法路由不被命中）是镜子**——它与面 1 的词表判是同一个谓词打在同一个名单上，
+冗余不加分。"三枚植物必须被点名 + 四枚合法不许被点名"这两向里，**只有前两向（植物）在挣钱**。
+实现件 §1 表里那句"谓词自己不能退化成匹配不到任何东西"是准的；
+它没有声称第四枚腿独挡任何变异，所以这不算吹，只算**可以删掉一行而不丢任何牙齿**。
+
+另记一条 M10 的**顺带产物**：全包唯一在"内嵌偷渡"这条轴上有覆盖的，就是这枚自校验。
+M10 之所以是活的可疑形状，是因为 `ComposerRequest` 今天**真的内嵌**了 `AttachmentPayload`（`bridge.go:70`），
+"把结论键藏进内嵌类型"是那枚封套上唯一一处不需要新写 `method` 键就能加字段的地方。
+
+锚点刷新：§2–§3.4 的变异与读数全部取自 `dev` @ `43a6043`（`bridge.go` 每发之后 `=d2cd6362…`、
+测试件每发之后 `=5b618d14…`、`composer_test.go` W1 前后 `=ecfd0f7a…` 同值、
+`git status --porcelain -- internal/panel/` 逐发为空）。
+
+---
+
+## §4 那一格侧读："真变异之下 46 枚先存在测试零反应"——**复现成立**，但它是**一半辩护词、一半被说过头**
+
+### §4.1 复算（MA 发，整包、`-count=1 -v`，输出 `out/MA-full.txt`）
+
+```
+变异 = ComposerRequest 长 Outcome json:"outcome,omitempty" + 守卫 case 追加 "panel.approval.request"
+红的顶层（5 枚）：TestAnsweredPanelRoutesCarryNoApprovalDecision / TestNoInboundEnvelopeCanBindAnApprovalVerdict
+                 / TestGrantWireShapesAreRefusedAtTheDoor / TestPlantedGrantWiringGoesRedInASnapshot   <- 本件 4 枚
+                 / TestC21DesignTokensFourWayAgree                                                    <- 先存在，改前已红
+先存在 46 枚中因这枚变异而红 = 0 枚        （46 = 全包 51 枚 func Test - 本件 5 枚，我现量）
+```
+
+⇒ **实现件 §7/§8 那句"因变异而红的先存在测试＝0 枚"独立复现，一字不差**。
+且它 §8 自己把措辞从"46 枚一枚都没红"收窄成"没有一枚是因它而红"——**那个收窄是对的**，
+我在 §0.5 量的 C21 就是"改前改后都红"的那枚，别把它算进任何一方的账。
+
+### §4.2 判：是这枚钉的**辩护词**，也是对**同族三枚仪器**的一份**具名指控**（不是对整个测试包的）
+
+我不接受"46 枚零反应 ⇒ 测试包很糟"这种整体归因（"整树 rc=1＝工具链假象"那族的最省事藏身处，反方向同理）。
+把这一格拆成三枚**具名**仪器，各判一条：
+
+| 具名仪器 | 它对不对得上这个形状 | 我量到的证据 |
+|---|---|---|
+| `TestTheRendererHoldsExactlyOneDoorToTheHost`（`composer_test.go:502`） | **对得上轴、方向反了**。它第 (iv) 条判"每枚 `panel.*` 字面量都是 Go 答的那条路"，而它判"Go 答哪条路"用的**神谕是一份抄来的白名单** `composerRouteLiterals()`（`:409-419`），里面白名单了 `"panel.approval.request"`（`:417`） | 它今天**只读 `frontend/src`**、全文没有一处读 Go 的路由守卫 ⇒ MA 那发改 Go，**它结构上不可能响**（这就是派单问的那格，答案：不该由它响，它响不了）。**W1 变异**（只删 `:417` 那行白名单，别的一动不动）⇒ 它当场红、点名 `src/lib/panel.ts:181 method: "panel.approval.request"`，还原后 `ecfd0f7a…` 同值。⇒ **那枚白名单今天正在为一根活线放行**：界面仍在发这条路（拒绝键/关闭键，`l2-approval-card.tsx:98` 我现读），发的字节里就带 `outcome` |
+| `TestComposerEnvelopeRefusesSpoofingAndUndecorableRequests`（`bridge_test.go:77`，子测 `:78` 名 "a request that names an approval decision is not a composer method"） | **对得上，但只钉了一枚拼写**。它是全包唯一先存在的、判"审批结论词不许被这条路答"的行为腿 | MA 之下它**不响**（它测 `approval.decide`，变异答的是 `panel.approval.request`）；**M12 之下它响**（见 §3.3 更正）。⇒ 这正是 owner 那句"要结构性、不要字面匹配"的**具体理由**：字面匹配的单枚拼写已经被写过一次了，它挡不住换拼写的下一发 |
+| `TestFrontendNeverNamesAnApprovalDecision`（`frontend_hygiene_test.go:281`，ban #6 的包内拷贝） | **两向都看不见**：判据是正则 `approval\.decide`（`:73`），走的是 `frontend/**` | 历史违规文件里 `approval.decide` **0 命中**（我先用 `grep -cF 'send("grant")'` = **1** 证明尺子活着，再量那枚 0），今天 `frontend/src/` 亦 0；`tools/d22scan/main.go:149` 同一条正则、消费点 `:814`（两枚行号我按 HEAD 现读，与实现件 §4.2 引的一致） |
+
+⇒ **我的结论形状**：这枚钉**是**它的辩护词（它填的确实是全包唯一那个洞：读"这条路上递的是什么字"）；
+但"46 枚零反应"**不能读成"全树零覆盖"**——同一格里 `bridge_test.go:78` 是一枚**已经存在、只是太窄**的腿，
+`composer_test.go:417` 是一枚**已经存在、正在放行**的白名单。
+**最该有反应而没有的那一枚是 `composer_test.go:417`**，而修它要动的是前端那半
+（`ApprovalOutcome` 收窄 + C17 白名单），台账 `A217⑤`/`A220⑥` 已记成待切片卡
+⇒ **本程不改、不扩，只把"零反应"的三个层次分开钉住**。
+
+### §4.3 一条我自己造的读数纪律（写给下一位，不是谁的缺陷）
+
+§3.3 那条更正就是这一格的后半课：**"整包有没有别的反应"必须整包跑**。
+我第一发 M12 只 `-run` 了本件 5 枚就下了"全树零仪器覆盖"的全称结论，那是**我这程的假阳性**，
+补跑整包当场推翻（`bridge_test.go:77` 也红）。⇒ 固定动作：
+**凡结论句式里出现"只有／零／唯一"，取数命令必须覆盖全部分母，不许用 `-run` 子集。**
+
+---
+
+## §5 契约轴 + 门（六项逐项现量）
+
+| 项 | 判据 | 现量 |
+|---|---|---|
+| 落地范围 | 本批只允许碰自己的路径 | `git show --numstat d88c356` = `126 0` 证据件 + `945 0` 测试件；`660ffa1` = `201 1` + `4 2` ⇒ **两枚 commit 只带这 2 枚路径，生产码零字节** |
+| 断言只增不减 | `internal/panel` 区间内删除行 | `git diff 004c6ec HEAD -- internal/panel/` 删除行 **0 行**（净态 +947/−0）；`660ffa1` 里那 2 行被删的是 `:645-648` 的 `t.Logf`（日志、非断言），改后仍打印同一句、只是加了条件 |
+| 无新增 `t.Skip` | `grep -rn "t.Skip" internal/panel/` | **1 枚**，在 `attachments_test.go:191`（先存在）；本件 **0 枚** |
+| 阈值 / golden / `thresholds.go` | `git diff --name-only 004c6ec HEAD` 全清单里**无** threshold/golden 字样 | **空** ⇒ 一字节未动；区间内被改的 25 枚路径全在 `design/doubao/**`(14，别家)、`docs/**`(7)、`internal/panel`(1)、`tools/d22scan`(2，别家) |
+| `allowlist.txt` | `git rev-parse 004c6ec:… HEAD:…` | 两枚 blob **同值** `6b61fad57085a52a62d4ff513209a817b96a3067` |
+| `emojiRe` | 区间内 `tools/d22scan/main.go` **根本没出现在改动清单**里（那里只动了 `gitignore.go`、`scan_test.go` = 另一程） | **未动**，与 `A221⑦` 的"五锚同值"同向 |
+
+### §5.1 门与格式（真跑）
+
+```
+gofmt -l internal/panel/  ->  空（rc=0）
+go vet  ./internal/panel/ ->  空（rc=0）
+sh scripts/d22scan.sh     ->  rc=0
+   runtests.sh: OK packages=[./...] top-level: PASS=29 FAIL=0 SKIP=0, === RUN=69
+   d22scan: clean - no D22 ban violations
+   live scope: bans#1-5 internal/=203 cmd/=22 / #6 frontend/=40 / #7 internal/tools/=18
+              / #8 design/=32 frontend/=40 internal/=407 cmd/=39
+```
+
+- `ban #8 internal/ = 407` ⇒ 与 `A220⑤`（`406 -> 407`，因本件新增一枚 `*_test.go`）**同值**：分母进新文件，不是回归。
+- `design/=32`（台账 `A218⑥` 写 30）＝本区间内 `design/doubao/**` 被另一程动过 ⇒ **与本钉无关，只登记口径**，
+  正是 `A220⑤` 那句"引用时现跑一遍、把当时 HEAD 一起写进判据本体"的形状。
+- `PASS=29 / RUN=69`（实现件 §5 记 `28 / 68`）＝别家 `tools/d22scan` 那批又落地一枚测试，不是本件造成。
+- 本件新文件**未被 ban #8 点名**（整树 `clean`，零 finding）。
+
+### §5.2 两处**指向不存在测试**的引用（一枚本批新抄，一枚先存在）
+
+- **`TestComposerMethodNamesMatchFrontend` 这枚测试在仓里不存在。**
+  正控先跑（同族真名 `TestComposerContractTypesMatchFrontend` → 3 命中）；本名 `grep -rn` 命中 **3 处引用、0 处定义**
+  （`grep -rn "func TestComposerMethodNamesMatchFrontend"` → 0）。三处引用：
+  `internal/panel/bridge.go:33`（**先存在**，票 92 留的）、
+  **`internal/panel/l2_grant_boundary_test.go:604`（本批新抄进红句里的）**、实现件 §3.2 的引用块。
+  ⇒ 实际干那件事的测试叫 `TestFrontendComposerRequestsMatchTheEnvelope`（`bridge_test.go:131`）。
+  **后果说准**：这条红句是给"未来把路由直接写进 switch、绕过命名门"的人看的，它把人指向一枚不存在的门禁。
+  判 **缺陷（措辞级），不判退回**——断言本身有效（`:604` 在 M1b 下真红过，§3.1 引的就是它）。
+- 同族一处（**先存在**，不属本批）：`composer_test.go:415-416` 那句
+  "The approval card's route, whose exact spelling is pinned by `TestFrontendComposerRequestsMatchTheEnvelope`"
+  **不成立**——我读了那枚测试全文（`bridge_test.go:131-175`），它从不提 `panel.approval.request`，
+  只核四枚 composer 方法在界面出现、核 `bridge.postMessage` 计数 == 2。
+  ⇒ 那行白名单**既在放行、又自称有主**（与 §4.2 第一行合起来读）。**本程不改**（动它是 `composer_test.go`/票 92 的地界）。
