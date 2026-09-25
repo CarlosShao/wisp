@@ -1795,3 +1795,86 @@ the renderer names a route the Go side does not answer:
 
 面板现在打开是**浅色的**（跟那份 demo 一样），磨砂还在但**没那么透了**（跟他量的一样是 0.72），左边那一排图标**现在点得动**，点齿轮进去是**设置·外观**，里面第一行能拖的就是透明度——拖完立刻变，关掉面板回到默认。想撤回暗色只改一个地方，告诉我一句就行。
 
+## 61. 18:0x 他回来确认了三件事：① 预览的性质（真码＋空数据，不是 mock 图）② 默认浅色留、滑杆形状对 ③ **把三枚组件库整到本地当字典，我自己学、自己找动画**
+
+### 61.1 他那句"这个页面只是你初步搞出来的吧？…就是假的给我看一下面板长啥样对吗"——逐条答，不含糊
+
+**是"真码"，不是"假图"；但数据是空的。** 分开说：
+
+| 屏上那些东西 | 是真的还是空的 | 为什么 |
+|---|---|---|
+| 布局、颜色、磨砂、圆角、字号、竖条、滑杆 | **真代码渲染出来的**，产品里跑的就是同一套（`npm run build` 的产物被 `internal/panel` 的 `//go:embed all:dist` 嵌进 exe） | 预览只是"换个宿主"：浏览器直接加载 `dist/`，WebView2 里是 Go 加载同一份 `dist/` |
+| 「档位未知」 | **空**，不是 bug | 快照里没有档位字段，我不猜（R20 那条：档位是**权限输入口**，面板只许显示＋发起请求） |
+| 「尚无结果。」 | **空**，不是 bug | `snapshot.results` 是空数组，票 35 的泵还没往这里推东西 |
+| 「支持，单个 <= 0 B」 | **空**，不是 bug | 上限来自快照的 `maxAttachmentBytes`，现在是 0；0 就是 0，我没替它编一个 |
+| 「换工作区」按钮灰着 | **该灰**，不是 bug | 那条要走 C17 的路由，Go 侧不认（Q-50＝甲之后前端不发第五路由） |
+| 滑杆拖了会变 | **真会变** | 它改的就是本页那一层 `--panel-alpha`，产品里也一样会变；**不同的是产品里关掉面板会回到 72%**（不落盘，见 §60.3） |
+
+⇒ 他那句"如果是的话，嗯，就对了"——**是**：这是一份用空数据跑起来的真界面，用来给他看"长什么样"，不是截图拼的。
+
+### 61.2 他那句"你是按照组件库引用的组件吧，别自己造就行"——**这句我今天答"不成立"，而且是量出来的**
+
+现量 `frontend/src` 全树对那 8 枚 vendored 件的 import：
+
+```
+shimmer.tsx        被活树引用 1 处（panel-skeleton 的等待标签）
+approval-card.tsx  0 处      loading-state.tsx  0 处
+stream-text.tsx    0 处      streaming-text.tsx 0 处
+task-rows.tsx      0 处      thinking.tsx       0 处
+tool-chips.tsx     0 处      （ui/ 三枚 shadcn 各 1 处：badge / button / card）
+```
+
+⇒ **8 枚 Beautiful UI 原件里只有 1 枚真挂着**；审批卡、思考态、工具条、结果流这些**界面形状是我照 demo 手写的**。
+这不是新事实——`internal/panel/frontend_hygiene_test.go` 的 `TestVendoredDemoComponentsAreNotMounted` 一直在数它（1 mounted／7 unmounted），
+当时是**故意钉住的待办**（原件要的 props 与我们快照字段对不上，先落文件后接线）。
+但他今天当面问这一句，说明**"钉住待办"和"用上了"在他脑子里是一件事**，所以我把它挑明，并给出下一步：
+**库已经整到本地了（§61.3），逐枚对 props 从今天起可行** ⇒ 该把 7 枚里对得上的换成真件，换不动的点名为什么换不动。
+⚠ 设置屏那七行**也是手写的**（照 demo 的 `config.js:273-309` 的形状），库里没有"设置项行"这种件——`SegmentedControl`／`Switch` 可以顶其中两行的控件，这条我列进下一步。
+
+### 61.3 三枚库落盘（他指定的目录 `D:\work\AI\component library`，全在仓库外、不进 git、不参与门禁）
+
+| 目录 | 上游 | HEAD | 许可 | 版权行 | 规模 |
+|---|---|---|---|---|---|
+| `turbo-kach-ai-native/` | `TurboKach/ai-native-react-components` | `05dab2d…` | MIT | `Copyright (c) 2026 Turbo` | 21 枚 |
+| `beautiful-ui/` | `slev12397/beautiful-ui` | `44a274e…` | MIT | `Copyright (c) 2026 **Shane Levine**` | 11 atoms + 22 primitives |
+| `react-bits/` | `DavidHDev/react-bits` | `5480708…` | **MIT + Commons Clause** | `Copyright (c) 2026 David Haz` | **209 枚源码** + 301 个 Pro 预览图 |
+
+⚠ **他给的那枚 `slev12397/beautiful-ui` 不是截图里那个站的上游**：截图页脚写"Built by Turbo"，而该仓版权人是 Shane Levine、homepage 是 `beautiful-ui-five.vercel.app`；
+目录形状（`components/atoms/`、`public/r/*.json`）与组件名却和 Turbo 那套**一模一样** ⇒ 形状上是同一套东西的**再发布／超集**（它多出 `GlideMenu`／`SearchList`／`Flowchart`／`RecordsTable` 等）。
+两枚都是 MIT，取源码不堵，**但来源头必须写清是哪一枚**——所以我**把两枚都克隆了**。
+
+**顺手把我方 8 枚 vendored 件的正身验了**（探针＝每枚文件中部一条 >48 字符的代码行，去两枚库里 `grep -F`）：
+6 枚逐字命中 `turbo-kach-ai-native/components/<同名>.tsx`；`shimmer.tsx`／`stream-text.tsx` 命中 `components/atoms/{Shimmer,StreamText}.tsx`（文件名不同：我方落盘时改成了 kebab-case）。
+且 `shimmer.tsx` 头部写的"上游 commit `05dab2d2b5f1f3e40029776e339a486d70491079`"与我今天克隆到的 HEAD **逐字相同** ⇒ **登记的上游至今未动**。
+
+### 61.4 react-bits 本地复算：我把自己的结论写错过一次，同轮改回
+
+克隆完我先写进字典的是"这推翻了 F6 那句'10 枚没有源码'"——**那句是错的**，两个原因：① 我按记忆列名单，列成了 12 枚（R19 权威名单是 **11 枚**，这条错 09-21 就犯过一次）；② 我把 `SplashCursor`／`StaggeredMenu` 当成名单里的（它们不在）。
+按票 77 `:236-244` 的权威 11 行逐枚重测后：**F6 那句一字未变**——`Animated List` 有源码（`src/content/Components/AnimatedList/`），其余 **10 枚在 `src/content` 里 0 目录**，只以 `public/assets/pro/components/*.webp` 存在并被 `src/constants/Pro.js` 列成 Pro 档。
+新增的事实只有一条：**上游总共有 209 枚源码**，所以"取不到"不是"这库没货"，而是"**他挑的那 10 枚恰好都在 Pro 档**"。
+正控同轮打了：`AnimatedList`／`SplashCursor`／`StaggeredMenu` 三枚都能命中目录 ⇒ 那把尺是响的，0 命中是真 0。
+字典里那张 11 行的表（每枚：定案／有没有源码／证据）在 `D:\work\AI\component library\INDEX.md` §4 末。
+
+### 61.5 学完之后的"哪一格用哪一枚"（他要我自己找，这是我找到的）
+
+| 规格那一格 | 找到的对象 | 判定 |
+|---|---|---|
+| #1 思考中：光带左→右循环流动 **1.2s** | **`Shimmer`（我方树里已有）**；次选 `react-bits/TextAnimations/ShinyText` | **不用去拿**：规格差的是时长（现在 1.4s）。⚠ vendored 件不许手改 ⇒ 时长由调用方传或 `theme.css` 外层覆盖 |
+| #8 L1 阻止窗口：**倒计时环** | **`beautiful-ui/components/atoms/ProgressRing.tsx`** | **本轮字典里最值的一枚**：28px SVG 环、`progress: 0..1`、四档 tone，正是规格那格要的形状。⚠ 但 L1 提示条按 D29 是**原生**的，"这格由谁画"要先定（属票 21/37 一族），我只是把对象找出来 |
+| #6 审批等待：**脉冲只跑一次**（❌ 无限循环） | `react-bits/Components/BorderGlow`、`Animations/StarBorder` | **库里全是 infinite，正是被禁那一形** ⇒ 这格不该去库里拿；改成一次性是 CSS 去掉 `infinite`，**但那是换观感，我不擅自动**（§59.5 那条口径不变） |
+| #4 工具调用运行中：旋转弧 1s linear | `react-bits/Micro/LatticeLoader`（`StarBorder` 是边框光、不是弧） | 待逐枚读源码定；今天没定，**不猜** |
+| #3/#5 展开 180ms | `beautiful-ui/primitives/ThinkingState.tsx` 自带展开态 | 先读原件，大概率不需要外部动画 |
+| R19 那 10 枚 Pro 件 | —— | **仍然没有对象**（§61.4）。近亲有（`Aurora`／`SoftAurora`／`GradualBlur`／`SplitText`／`ShinyText`），**但我不拿相似品冒充他挑的那一枚** |
+
+### 61.6 盘上多了一枚不是我建的目录，登记、没动
+
+`D:\work\AI\component library\vue-bits`（108 MB，`DavidHDev/vue-bits`，HEAD `07c0f76…`，mtime **18:14**）——夹在我那三枚克隆之间出现，而且是**完整克隆**（我三枚都用 `--depth 1`），
+`react-bits` 里也没有 `.gitmodules`／`.git/modules` ⇒ **不是我这一程建的**（他本人或另一程）。
+我**没动、没删**，只在字典里加了一行说明它是 Vue 版、我方栈是 React（`PLAN.md:981`）、只当对照；顺手记了一条差异：Vue 版 203 枚、React 版 209 枚，**名单不完全一样**，将来对不上号以 React 版为准。
+
+### 61.7 本轮门禁：零 `frontend/**` 改动，所以三门没重跑（理由写在这，不算漏跑）
+
+本轮产出全在仓库外（三枚克隆＋`INDEX.md`）与这枚 log。**没动码 ⇒ 没有可红的东西**；上一轮 §60.6 那五道读数仍是当前 HEAD（`cc9ecf9`）的形状。
+`INDEX.md` 在 `D:\work\AI\` 下，**不在 d22scan 射程内**（现量：它的 scope 只有 `design/`、`internal/`、`cmd/`、`frontend/` 四组，见 `tools/d22scan/main.go` 的 scope 表）⇒ 里面写的 `≤`／`→` 一类字符不会被扫。
+
+
