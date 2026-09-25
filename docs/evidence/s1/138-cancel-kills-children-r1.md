@@ -476,3 +476,103 @@ doc.go
 3. **没有验 `wisp run` 之外的组合根**（常驻球 / 面板那条）注册了哪些工具——因为那条组合根本程没找到
    （`internal/panel`、`internal/speech` 至今只有 `doc.go`）。若它已在别的未跟踪分支里长出来了，本格的"六枚名册"要重算。
 
+---
+
+## 4　AC#1 总裁决 —— "已实现功能里的缺口"还是"给未来功能预留的洞"
+
+**判据**（票面 AC#1 末段原文）：*"这一格允许得出的结论是'今天无入口踩得到'——那也是有效交付，但要**同时**答：
+那它是'已实现功能里的缺口'还是'给未来功能预留的洞'？若是后者 ⇒ **必须**去 `SPEC-12 §5` 按五字段
+登记为 RESERVED／DEFERRED，并把本票降级为 `ready-for-human`，**不许**为了结案去造一条假的现实危害。"*
+
+### 4.1　裁决：**预留的洞**，不是已实现功能里的缺口
+
+三发读数支撑（全部现量于 §1/§2/§3，逐条可复算）：
+
+1. **任务侧起不了子进程**：一轮任务能调的工具只有六枚 `fs.*`（§3.3），唯一碰外部世界的 `fs.trash` 走进程内 COM（`SHFileOperationW`）。
+   会 exec 的四枚产品侧位置（doctor / slo / balldebug / 测试夹具）**没有一枚在 `RunningTask` 的生命周期里**（§3.1）。
+2. **任务侧连整机 Job 都拿不到**：`go list -deps ./internal/agent | grep -c 'internal/proc'` ＝ **0**（§3.2 第三发）。
+   "每轮任务一枚自己的 Job"这个形状，**今天缺的不只是那枚 Job，还缺一条从组合根把 `internal/proc` 递进 `agent.Options` 的通路**。
+3. **连"任务 scope"这个容器都还没有生产构造点**：SPEC-01 §6 写死了层级
+   （`docs/specs/SPEC-01-architecture.md:196`：*"层级：会话 scope（C31）⊃ 任务 scope ⊃ 工具 scope ⊃ 插件 scope"*），
+   C11 `plugin.DisposalScope` 也确实实现了（`internal/plugin/disposal.go:155 NewDisposalScope`），但——
+
+```
+$ git grep -n 'NewDisposalScope' -- '*.go'
+internal/memory/retention_test.go:193:	scope := plugin.NewDisposalScope("test-retention", nil,
+internal/plugin/disposal.go:128:// not usable; use NewDisposalScope.
+internal/plugin/disposal.go:152:// NewDisposalScope creates a scope derived from parent (nil = detached). The
+internal/plugin/disposal.go:155:func NewDisposalScope(name string, parent context.Context, opts ...Option) *DisposalScope {
+internal/plugin/disposal_test.go:17:	s := NewDisposalScope(name, context.Background(), opts...)
+internal/plugin/disposal_test.go:168:	s := NewDisposalScope("task-tail", context.Background(),
+internal/risk/provenance_test.go:307:	scope := plugin.NewDisposalScope("session-1", context.Background())
+```
+
+⇒ 生产码里 `NewDisposalScope` 的调用者 **0 枚**（七枚命中：1 枚函数声明、2 枚注释、4 枚测试）。
+"任务级归属"这件事在这仓里**目前只有契约文本，没有任何生产载体**。
+
+### 4.2　为什么本程**不**把它做成代码（AC#2 那族的修法未触发的三条理由）
+
+票面 AC#2 的引导句是条件句：*"**如果** AC#1 判定确有可走路径 ⇒ 修法只许落在'每轮任务一枚自己的 Job Object、取消时级联'这一族"*。
+§4.1 的裁决把这个条件判**假**，于是本程按票面后半走"登记＋上报"，不写码。三条独立理由：
+
+1. **没有生产者**：级联要杀的那些子进程今天不存在（§3.5）。实现了也没人调用它，
+   正好落成本仓抓过的那族"一步存在却从不产出结论"（票面 AC#2③ 的括号里点名的就是这族）。
+2. **AC#3 的牙造不出来**（不是不想造，是没有可摘的东西）：AC#3 要求"必须有一枚用例在'级联'被摘掉时转红"。
+   今天没有级联，"摘掉级联"这发变异**在物理上无法落笔**。若为了让 AC#3 响而先造一级联再摘它，
+   那就是票面禁止的"造一条假的现实危害来结案"。
+3. **落点与在飞的票 149 硬撞**：任何"每轮一枚 Job"的接线都要经过 `cmd/wisp` 的组合根——现量：
+   `agent.New` 在产品码里**只有一枚调用者**，`agent.Options` 也只在那里填一次。
+
+```
+$ git grep -n 'agent.New(' -- '*.go' | grep -v '_test.go'
+cmd/wisp/run.go:547:	loop, err := agent.New(agent.Options{
+```
+
+   而 `cmd/wisp/**` 此刻是票 149 的写者。这不是判据不足，是**同一时刻同一文件两枚写者**——本仓的规矩是切开落点，不是叠上去。
+
+⚠ **本程没有做的两件事，以及为什么没做**（这两件都在票面 AC#1 的字面要求里，但都落在本程被冻的面上）：
+
+| 票面要求 | 本程动作 | 理由 |
+|---|---|---|
+| "去 `SPEC-12 §5` 按五字段登记" | **未落笔**，只在 §4.3 备好可直接粘贴的那一行 | `docs/specs/**` 是简报点名的零字节面；且 `AGENTS.md §1.1` 把"登记表与代码标记 1:1 双向"列成受审项，本程单侧改表会造出一枚**没有代码标记对应、也没有验收表**的登记 |
+| "把本票降级为 `ready-for-human`" | **未改 Status 一行**，只在 §9 与票面进度日志里把判据与请求报回编排者 | 简报第 0 条："票面框由编排者按非实现者验收表来定"；Status 属同一族的票面框 |
+
+### 4.3　可直接粘贴的登记行（五字段齐全，类型＝DEFERRED）
+
+`SPEC-12 §5` 的类型语义（逐字，`docs/specs/SPEC-12-roadmap-governance.md:61`）：
+**DEFERRED** ＝ 有计划不做；**RESERVED** ＝ 只留接口位、无实现计划、不得误读为待办。
+
+⇒ 按这语义，本条该记 **DEFERRED**，不是 RESERVED：这件事**有计划**（`shell.exec` 排在 SPEC-07 的 S3、
+D46 命令插件是**已采纳**项并有票 50），"只留接口位、无实现计划"那句套不上。票面写的是"RESERVED／DEFERRED"两可，
+本程按表内语义取 DEFERRED，理由如上，**若编排者要取 RESERVED，改的是这一格类型列，不是内容**。
+
+表头是六列（`类型｜项｜为什么现在不做（依据）｜完成判据｜前置｜当前残缺表现`），本行**逐列填满**，
+"五字段缺一不可"在任何一种数法下都成立：
+
+```markdown
+| DEFERRED | 任务级子进程归属（每轮任务一枚 Job Object、取消时级联） | 票 138 AC#1 现量：今天没有任何一条生产路径在一轮任务里 exec 子进程——任务可调的工具只有六枚 `fs.*`（`fs.trash` 走进程内 `SHFileOperationW`）、`shell.exec` 未注册（`internal/config/unwired.go:63` 守卫仍在拦）、D46 Tier-1 manifest 槽返回 `ErrSlotNotLanded`、`internal/agent` 依赖闭包里没有 `internal/proc`、连 C11"任务 scope"都没有生产构造点 ⇒ 属预留洞不是实装缺口。另：AC#1 硬约束不许顺手改 `cancelled` 文案（那半是 D37 17 类表＝契约级） | 一轮任务自己起的每枚子进程，在 `RunningTask.Cancel()` 之后随该轮那枚 Job 一起没了；且有一枚用例在"级联"被摘掉时转红（票 138 AC#3 那族的牙） | `shell.exec`（SPEC-07 §3，S3）或 D46 命令插件（票 50）任一先落地，并给 `agent.Options` 一条从组合根拿 `internal/proc` 的通路 | 按"停"只掐 context，那一轮若起了子进程没人负责关；**今天无入口踩得到**，落地当日才成真伤 |
+```
+
+**并且**：这条登记一旦落下，票 138 本身的结案形状就是"AC#1 成立、AC#2/AC#3 按条件句未触发、票转 `ready-for-human`"。
+本程把这行原样交给编排者，**不代他按批准键**。
+
+### 4.4　放水两问自答
+
+- **断言方向动没动**：没动。本格是"判有没有"，不是"判好坏"；三发支撑都是 `git grep` / `go list` 的原始输出。
+- **helper 是不是原有的那枚**：本格无 helper、无测试、无码改。
+- 反向自答（这格最容易被判"放水"的地方）：**本格有没有为了不做工而把'缺口'说成'预留'？**
+  判据是外部的、可复算的：`internal/agent` 闭包里 `internal/proc`＝0、生产 `NewDisposalScope`＝0、
+  `"shell.exec"` 生产注册＝0。三发都是"数出来的"，不是"选出来的"。
+  若这三发里任何一枚被复算推翻，本格的裁决就要翻（复算命令逐字贴在 §3.2 与 §4.1③）。
+
+### 4.5　本格没测什么
+
+1. **没排除"别的分支上已经有 shell.exec"**：本格读的是 `dev`@`64858d6` 的跟踪文件。
+   若某条未合并分支落了 `shell.exec`，"无入口"那条当场失效——这也是本程把裁决交回人拍板而不是自己结案的原因之一。
+2. **没量"未来落地时该挂在哪"**：SPEC-01 §6 那句层级文本与 C11 的实现都在盘上，
+   但"每轮任务的 Job 该由 `DisposalScope.Defer` 收、还是由 `RunningTask` 自己收"是**设计选择**，
+   票面 AC#2 只给了族名没给归属 ⇒ 本程不替人拍这一枚。
+3. **没验 `cancelled` 文案那半与本格有没有牵连**：本程一字未动 `D37` 那 17 类（见 §5 零改动自证），
+   所以那半截契约变更**没有被触发**；但本程也没去证明"它不可能被牵连"——那是验收表那侧的活。
+
+
