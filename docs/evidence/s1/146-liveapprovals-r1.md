@@ -162,15 +162,144 @@ grep -rn "&it\.Decision\|&items\[\|&got\[" --include="*.go" .
 
 ---
 
-## 3. AC#2 裁决：会响的检
+## 3. AC#2 裁决：会响的检 —— **两发都量过"摘掉修法必红"**
 
-（实现与用例落地后填写：判据／命令原文／**改前必红的真读数**／"承重"那一句的操作性答案。）
+落点：`internal/agent/approval/ticket146_liveapprovals_backing_test.go`（`package approval` 白盒，
+与 `pending_read_test.go` 同一棵尺、复用它的 `mustPush`/`mustFindLive`）。
+
+### 3.1 两发是什么
+
+| 发 | 名字 | 判据 |
+|---|---|---|
+| probe 1 | `TestLiveApprovalsSharesNoReferenceSlotWithTheQueue` | 反射走 `tools.Decision`，点名返回值里**哪几枚引用槽位仍与队列存储项共用底层**（`reflect.Value.Pointer()` 比数据指针/hmap 指针）。槽位**名册本身按集合断言**（8 枚，见 §1.2）⇒ walker 失效或 `Decision` 加/减引用字段都会红，不做恒真判据。 |
+| probe 2 | `TestLiveApprovalsInPlaceWriteCannotReachTheQueueRecord` | AC#2 的字面：**只通过返回值**就地写全部 8 枚槽位（map 改键＋插键、`copy()` 进 `Args`、下标写 6 枚切片），然后从**三条路**读回队列那条记录：白盒 `qitem.Dec`、队列自己的不可信投影 `view()`/`head()`、第二次 `LiveApprovals()`，要求原样。 |
+
+### 3.2 "承重"那一句，按票面 :52-53 的操作定义答
+
+**问**：把 AC#1 选定的修法（ⓐ 的 `cloneDecision`）摘掉，这一发是不是从此打不红？
+**答：会红。且这条不是推理，是量过的。** 我先写检、后装修法，中间那一发的真读数：
+
+命令：
+
+```
+go test -count=1 -v -run 'TestLiveApprovals(SharesNoReferenceSlot|InPlaceWriteCannotReachTheQueueRecord)' ./internal/agent/approval/
+```
+
+改前（`pending_read.go` 仍是 `Decision: it.Dec`）：`rc=1`，两行 `--- FAIL:`，**14 条** `AC#2 RED` 明细，
+probe 1 逐字点名全 8 枚：
+
+```
+--- FAIL: TestLiveApprovalsSharesNoReferenceSlotWithTheQueue (0.00s)
+--- FAIL: TestLiveApprovalsInPlaceWriteCannotReachTheQueueRecord (0.00s)
+ticket146_liveapprovals_backing_test.go:196: AC#2 RED: ... 共用底层：[Args Blacklist.Absolute
+  Blacklist.AlreadyUnlocked Blacklist.Unlockable Capabilities Params Paths RulesHit]
+ticket146_liveapprovals_backing_test.go:233/237: 队列存的 Params 被塞键 / argv 被就地改成 "clobbered"
+ticket146_liveapprovals_backing_test.go:240: 队列存的 Args 前 8 字节被就地改成 "XXXXXXXX"
+ticket146_liveapprovals_backing_test.go:243: 队列存的 RulesHit[0]="R9"（期望 R2）
+ticket146_liveapprovals_backing_test.go:247: 队列存的 Paths[0]="C:/clobbered"
+ticket146_liveapprovals_backing_test.go:250: 队列存的 Capabilities[0]="notify"（期望 shell）
+ticket146_liveapprovals_backing_test.go:259: Blacklist.Absolute / Unlockable / AlreadyUnlocked 三枚均被就地改
+ticket146_liveapprovals_backing_test.go:272: PanelItem.Paths=[C:/clobbered]      ← 投影也被污染（见 §3.4）
+ticket146_liveapprovals_backing_test.go:292/295/298: 第二次读到的三枚都是上一枚读者改过的值
+```
+
+日志：`D:\tmp\wisp-146-agent-a\ac2-before-fix.txt`（只建不删）。装上 ⓐ 之后同一对用例 PASS
+（`D:\tmp\wisp-146-agent-a\after.txt`，`rc=0`）。
+
+⇒ 检**不是装饰**：它对"修法在不在"是敏感的，且敏感面是 8/8 全覆盖，不是随手挑的一枚字段。
+
+### 3.3 三条读路的用意（防止这枚检被读薄）
+
+- 白盒 `qitem.Dec` 那一发是票面要的那句本体。
+- `view()`/`head()` 那一发是**第二把尺**：`queue.go:viewLocked` 早就给 `PanelItem.Paths` 做了 `append([]string(nil), …)`，
+  所以"投影会拷"这件事**并不能保护队列的记录**——改前那一发照样红，因为它读的是**已被改掉的源**。
+  这一发同时钉住另一件事：将来谁把 `viewLocked` 那枚拷贝摘掉，卡片会直接把调用方的改写画给批准者看。
+- 第二次 `LiveApprovals()` 那一发对应泵的**真实用法**（`cmd/wisp/panel_pump.go:61` 每次状态变动重读一次）：
+  一次污染会**跨帧**留在面板上，不是一次性的。
+
+### 3.4 这一格没买到的东西（写清楚，别让它被读成"全隔离"）
+
+拷贝是**一层**深。`Params` 的 value 里那层容器（`decodeArgs` 留下的 `[]any`／嵌套 `map[string]any`，
+`bridge.go:262`）**仍与队列共用**——调用方把 `Params["argv"].([]any)[0]` 改掉，队列的记录还是会动，
+而本票这两发**不探这一层**。原因：真要做穿到底，得递归克隆任意 `any`（面对 cycle／chan／func 都得另写一套），
+代价与本票 AC#1 判出来的那一点收益不成比例；今天也没有任何调用方走这条路（§1.3 普查）。
+⇒ 这一条同时写在 `pending_read.go` 的头部注释里（"Treat those values as read-only too"），
+不藏在证据件里。**如果编排者认为这一层也要钉，那是一枚新票的体量，不是本票剩下的半格。**
 
 ---
 
-## 4. AC#3 裁决：WorkPeak 前后读数
+## 4. AC#3 裁决：WorkPeak 前后读数 —— **未观察到差异，且这台仪器结构上看不见这枚改动**
 
-（填写中。）
+### 4.1 测量前提（先确认安静，再取数）
+
+```
+gh api repos/<owner>/<repo>/actions/runners --jq '.runners[] | {status,busy}'
+→ {"busy":false,"status":"online"}          # wisp-selfhosted-01，取数前确认，取数后再确认一次仍 busy:false
+gh run list --limit 8 → 全部 status=completed（最近一枚 10:26Z，取数时刻约 11:15Z）
+```
+
+⇒ **runner 空着，这一格不是脏数。** 本机另有两件事同时发生，都记在这里：
+① `cmd/wisp/slo_windows.go` 当时**被别人改着且不能编译**（`git status` = ` M`，3 枚未用 import），
+   所以我**不在工作树上建 `wisp`**，改从两棵 `git archive` 的**纯净快照**建（见 4.2）；那一枚 WIP 我一字节未动。
+② `internal/panel` 的 `TestC21DesignTokensFourWayAgree` 当时红着，根因是 owner 未提交的 `design/` 移动
+   （`design/assets/tokens.css` 在工作树里不存在）——与本票无关，登记在 §6.3。
+
+### 4.2 命令原文与读数
+
+**A. 票面点名的那台仪器（`wisp slo`，WorkPeak 档，同形发法，双臂各 3 次交替）**
+
+```
+git archive 630c218 | tar -x -C /d/tmp/wisp-146-agent-a/tree-before      # 改前那棵树
+git archive 22f7b1a | tar -x -C /d/tmp/wisp-146-agent-a/tree-after       # 改后那棵树（只差本票那一枚 commit）
+go build -o wisp-before.exe ./cmd/wisp   （在 tree-before 内）
+go build -o wisp-after.exe  ./cmd/wisp   （在 tree-after  内）
+for i in 1 2 3; do for arm in before after; do
+  WISP_TEST_DATA_DIR=…/data/$arm-$i ./wisp-$arm.exe slo -state WorkPeak -seconds 5 > run-$arm-$i.json
+done; done
+```
+
+| arm | `mem_median_bytes`（3 次） | 均值 | arm 内极差 | `tree_private_bytes` 判据行 |
+|---|---|---|---|---|
+| before | 4112384 / 4075520 / 4214784 | **4134229** | 139264 | 3.9MB / 3.9MB / 4.0MB，`pass=true`，**`gate=false`** |
+| after | 4038656 / 4067328 / 4153344 | **4086443** | 114688 | 3.9MB / 3.9MB / 4.0MB，`pass=true`，**`gate=false`** |
+
+⇒ **均值差 −47787 字节（−1.16%），小于任一臂的组内极差（115 KB／139 KB）** ⇒ 按票面 :56 的要求写：
+**"未观察到差异"**，**不写**"无代价"。CPU 两臂都是 0，`handles_max` 140 vs 140/146，`threads_max` 12 vs 12/13。
+**阈值与 golden 一字节未动**（`memCapWorkPeak = 700<<20` 那一行我没读过就没资格碰，见 AC#4 清单）。
+
+⚠ **更要紧的一句：这一档结构上照不到这枚改动。** WorkPeak 的 subject 是
+"the REAL runtime skeleton … boot the real process, apply settle, then **sit still**"
+（`cmd/wisp/slo_windows.go:344`，`posture:"skeleton"`，`goroutines_max=1`），
+而 `LiveApprovals()` 的唯一生产调用者是 `agentRuntime.liveVerdicts`，它**只被 `wisp run` 接线**
+（`cmd/wisp/run.go:422` `Verdicts: rt.liveVerdicts`）。⇒ 被采样那 5 秒里**这枚函数一次都没被调用**，
+所以两臂同形不是"代价可忽略"的证据，只是"仪器与改动不在同一条路上"的证据。**这句话必须和上面那张表一起读。**
+
+**B. 这枚改动的机制账（分配／耗时），在同一对纯净快照上做，唯一变量是 `cloneDecision`**
+
+```
+cp /d/tmp/wisp-146-agent-a/bench146_liveapprovals_test.go <tree-{before,after}>/internal/agent/approval/bench146_test.go
+go test -count=5 -run '^$' -bench BenchmarkLiveApprovalsDepth8 -benchtime=2000x ./internal/agent/approval/
+```
+
+| arm | B/op | allocs/op | ns/op（5 次） |
+|---|---|---|---|
+| before | **3456** | **1** | 6330/2698/3037/5225/3354 |
+| after | **8192** | **73** | 15998/22098/24382/17002/15150 |
+
+⇒ 满深度（8 枚 pending，`DefaultMaxPending`）一次 `LiveApprovals()` 多 **4736 字节 / 多 72 次分配**
+（8 项 × 9：1 map + 7 slice + map 的桶），约 **+11～18 µs**。这份账**跑在仓外副本上**，
+`bench146_liveapprovals_test.go` **没有进仓**（本票只交两枚 `.go` 改动，见 §6.1）。
+分配是**暂态**的（快照建完即可回收），留存集不随泵动增长；上限是"队列深度 × 一份"，不是"泵次数 × 一份"。
+
+### 4.3 这一格的结论怎么写才算诚实
+
+- 机制上：**有代价，量到了**（+4736 B / +72 allocs / 一次满深度调用）。
+- 档位上：**WorkPeak 那一档未观察到差异**（读数在组内噪声之下），而且这台仪器今天**根本不经过**这枚函数。
+-  ⇒ **不许**把这两条合并成"代价可忽略"。合并它需要的证据（一个真会调用 `LiveApprovals` 的 WorkPeak 姿势）
+  本票没有，也不该由我在证据件里现造。
+- 如果编排者要那一档的真前后对比，缺的不是时间而是**仪器**：`wisp slo` 得有一个"带 pending 审批的 run 姿势"
+  才照得到这枚函数。那是登记项，不是本票 AC#3 能顺手收的半格。
+
 
 ---
 
