@@ -30,6 +30,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -344,5 +346,172 @@ func TestSLO144ReportThatArrivesAfterMissingReadingsIsCollected(t *testing.T) {
 	}
 	if rep == nil || rep.Report == nil || rep.Report.State != observe.SLOSleeping {
 		t.Fatalf("collected the wrong report: %+v", rep)
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Ticket 147, cases 8-10. Same fixture, same helpers, one different subject:
+// the NUMBER inside the unwritten sentence rather than the retry it describes.
+//
+// subjectReportRead.offset on the reportUnwritten branch used to be the
+// decoder's own InputOffset(), which a probe measured over the fixture's whole
+// prefix range: 1978 readings, one distinct value, 0. The give-up sentence
+// printed "1949 bytes read, document still open at offset 0" - a byte position
+// that was not a byte position, and one that points a reader at "nothing was
+// written" when the truth is "all of it but the tail is there". AC#1 resolves
+// this to (a), the field carries the information, so the sentence's two numbers
+// each answer one question: how many bytes landed, and where inside them the
+// document stopped.
+//
+// These three are the teeth ticket 144's acceptance run measured as missing
+// then: deleting "at offset %d" from that sentence, and putting the raw decoder
+// value back, both turn them red (each measured, transcribed in
+// docs/evidence/s1/147-offset-naming-r1.md). Nothing here waits on wall-clock
+// agreement about the budget, which is ticket 144's ground; the only new
+// assertion is about an offset and the bytes that sentence was made from.
+// ---------------------------------------------------------------------------
+
+// slo147UnwrittenRe captures BOTH numbers of the unwritten sentence. Case 8
+// requires it to span the whole string, so the sentence cannot lose either half
+// or grow a tail; case 9 requires only a match, because there the sentence sits
+// inside the loop's longer give-up error.
+var slo147UnwrittenRe = regexp.MustCompile(`([0-9]+) bytes read, document still open at offset ([0-9]+): the tail had not arrived`)
+
+// slo147PairOf reads the two numbers an unwritten sentence promises, and says
+// whether they are the whole sentence or a fragment inside a longer one. It is
+// a parser and nothing else: no expectation of its own, so an expectation that
+// fails has somewhere to be wrong.
+func slo147PairOf(sentence string) (bytesRead, offset int, whole bool, ok bool) {
+	loc := slo147UnwrittenRe.FindStringSubmatchIndex(sentence)
+	if loc == nil {
+		return 0, 0, false, false
+	}
+	b, berr := strconv.Atoi(sentence[loc[2]:loc[3]])
+	o, oerr := strconv.Atoi(sentence[loc[4]:loc[5]])
+	if berr != nil || oerr != nil {
+		return 0, 0, false, false
+	}
+	return b, o, loc[0] == 0 && loc[1] == len(sentence), true
+}
+
+// Case 8 - every prefix of the real fixture, aggregated into one report so the
+// claim is "all of them", not "the three I picked". For a truncated document
+// the position the decoder stopped at IS the last byte on disk, so the two
+// numbers must agree with each other and with the length handed to the
+// classifier.
+func TestSLO147UnwrittenSentenceNamesTheOffsetTheDocumentStoppedAt(t *testing.T) {
+	doc := slo144Report(t)
+	prefixes := 0
+	wrong := 0
+	first := ""
+	for i := 0; i <= len(doc); i++ {
+		obs := readSubjectReport(doc[:i])
+		if obs.state != reportUnwritten {
+			continue // case 1 owns the classification; the whole document is case 10's
+		}
+		prefixes++
+		sentence := obs.summary()
+		b, o, whole, ok := slo147PairOf(sentence)
+		switch {
+		case obs.offset != int64(i):
+			// The field leg: printing the byte count twice would keep the
+			// sentence true while the value it is made from rots back to the
+			// constant this ticket is about.
+			wrong++
+			if first == "" {
+				first = fmt.Sprintf("prefix of %d bytes: subjectReportRead.offset is %d", i, obs.offset)
+			}
+		case !ok:
+			wrong++
+			if first == "" {
+				first = fmt.Sprintf("prefix of %d bytes: sentence carries no byte/offset pair: %q", i, sentence)
+			}
+		case !whole:
+			wrong++
+			if first == "" {
+				first = fmt.Sprintf("prefix of %d bytes: %q is more or less than the unwritten sentence", i, sentence)
+			}
+		case b != i || o != i:
+			wrong++
+			if first == "" {
+				first = fmt.Sprintf("prefix of %d bytes: sentence says %d bytes and offset %d", i, b, o)
+			}
+		}
+	}
+	if prefixes < len(doc) {
+		t.Fatalf("only %d of %d readings were unwritten - case 1's denominator is not what this asserts over",
+			prefixes, len(doc))
+	}
+	if wrong > 0 {
+		t.Errorf("%d of %d unwritten sentences do not name the offset the document stopped at; first: %s",
+			wrong, prefixes, first)
+	}
+}
+
+// Case 9 - the same two numbers as a human meets them: the give-up error the
+// real loop returns, not the classifier's return value. The byte count is the
+// one the scripted reader handed the loop, so "the offset in that sentence
+// equals the bytes that sentence counted" is checked on the production path.
+func TestSLO147LoopGiveUpSentenceAgreesWithTheBytesItRead(t *testing.T) {
+	head := []byte(`{"mode":`) // 8 bytes whose tail never arrives
+	r := &scriptedReader{t: t, repeatLast: true, got: []func() ([]byte, error){
+		scriptMissing, scriptBytes(head),
+	}}
+	s := &sloSubject{pid: 4248, outPath: "scripted.json", readReportFile: r.read}
+	_, err := s.collectReportWithin(60*time.Millisecond, time.Millisecond)
+	if err == nil {
+		t.Fatal("a report that never grew past a prefix passed the loop")
+	}
+	b, o, _, ok := slo147PairOf(err.Error())
+	if !ok {
+		t.Fatalf("give-up error %q does not read as bytes-then-offset", err.Error())
+	}
+	if b != len(head) || o != len(head) {
+		t.Errorf("give-up error says %d bytes read, document open at offset %d; want both %d (the prefix the loop was handed)",
+			b, o, len(head))
+	}
+}
+
+// Case 10 - the field's three readings have to stay tellable apart from the
+// sentences alone: -1 means no decoder ran at all and must not print a position
+// it does not have, N on an unfinished document is where it stopped inside
+// exactly N bytes, N on a complete one is the end of the document. Three
+// different shapes, three different sentences; a reader should never have to
+// guess which of the three a bare number is.
+func TestSLO147OffsetSemanticsRenderThreeDifferentSentences(t *testing.T) {
+	doc := slo144Report(t)
+
+	// -1: the loop never got bytes to classify (file absent the whole budget).
+	missing := &scriptedReader{t: t, repeatLast: true, got: []func() ([]byte, error){scriptMissing}}
+	_, err := (&sloSubject{pid: 4249, outPath: "scripted.json", readReportFile: missing.read}).
+		collectReportWithin(40*time.Millisecond, time.Millisecond)
+	if err == nil {
+		t.Fatal("a report file that never appeared passed the loop")
+	}
+	if strings.Contains(err.Error(), "offset") {
+		t.Errorf("the no-decoder-ran give-up prints a byte position it does not have: %q", err.Error())
+	}
+
+	// N on an unfinished document, taken from the middle of the prefix range so
+	// it cannot be the constant 0 the old shape reported.
+	mid := len(doc) / 2
+	unfinished := readSubjectReport(doc[:mid]).summary()
+	if b, o, _, ok := slo147PairOf(unfinished); !ok {
+		t.Errorf("unfinished sentence %q is not the unwritten shape", unfinished)
+	} else if b != mid || o != mid {
+		t.Errorf("unfinished sentence says %d bytes, offset %d; want both %d", b, o, mid)
+	}
+
+	// N on the complete document, which is a different sentence about the same
+	// two numbers.
+	whole := readSubjectReport(doc).summary()
+	if !strings.Contains(whole, fmt.Sprintf("%d bytes read, complete document at offset %d", len(doc), len(doc))) {
+		t.Errorf("complete sentence %q does not name %d bytes and offset %d", whole, len(doc), len(doc))
+	}
+
+	for _, pair := range [][2]string{{err.Error(), unfinished}, {err.Error(), whole}, {unfinished, whole}} {
+		if pair[0] == pair[1] {
+			t.Errorf("two of the three offset meanings render the same sentence: %q", pair[0])
+		}
 	}
 }

@@ -567,7 +567,7 @@ func (s subjectReportState) String() string {
 }
 
 // subjectReportRead is one observation of the file: the bytes, where inside
-// them the decoder stopped, and what that means. It is a value, not a side
+// them the document stopped, and what that means. It is a value, not a side
 // effect, so the loop can carry its LAST reading into the error that gives up -
 // which is the difference between "unexpected end of JSON input" and "waited
 // 33s, the file never grew past 1 431 bytes".
@@ -575,8 +575,15 @@ type subjectReportRead struct {
 	state  subjectReportState
 	report *sloRun
 	bytes  int
-	// offset is the decoder's stop position inside these bytes (-1 when no
-	// decoder ran, i.e. there was nothing to read yet).
+	// offset is where inside these bytes the document stopped. It means exactly
+	// two things (ticket 147 pins both): -1 when no decoder ran at all - nothing
+	// read yet, no file yet, a file that would not open - and N >= 0 when one
+	// did. On reportComplete N is the end of the document; on reportUnwritten
+	// the document ran out of input, so N is the last byte that arrived and the
+	// missing part is what follows it; on reportCorrupt it is the decoder's own
+	// answer, which is 0 whenever it could not begin reading a value at all.
+	// Only the -1 leg is never printed: a note-bearing observation renders its
+	// note instead (see summary).
 	offset int64
 	// note is what the loop adds for observations the classifier never saw
 	// (no file yet, file unreadable this instant).
@@ -625,11 +632,21 @@ func readSubjectReport(data []byte) subjectReportRead {
 	dec := json.NewDecoder(bytes.NewReader(data))
 	var rep sloRun
 	if err := dec.Decode(&rep); err != nil {
-		obs.offset = dec.InputOffset()
 		if errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF) {
+			// The document ran out of input: every byte that arrived was
+			// consumed, so the position it stopped at IS the last byte on disk,
+			// and the missing part is what would have followed it (ticket 147).
+			// dec.InputOffset() is deliberately not used here - measured over all
+			// 1978 prefixes of ticket 144's fixture, it reports 0 for every
+			// truncated document (it names the end of the last COMPLETED token,
+			// and a truncated document has none), so on this branch it carries no
+			// information and printing it pointed a reader at "nothing was
+			// written" when the truth was "1949 bytes are here, the tail is not".
 			obs.state = reportUnwritten
+			obs.offset = int64(obs.bytes)
 			return obs
 		}
+		obs.offset = dec.InputOffset()
 		obs.state = reportCorrupt
 		obs.err = fmt.Errorf("%d bytes contradict a subject report at offset %d: %w", obs.bytes, obs.offset, err)
 		return obs
