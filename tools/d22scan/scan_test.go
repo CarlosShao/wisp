@@ -1160,6 +1160,18 @@ func TestBan8FrontendScopeIsNotNarrowedByAnExtensionFilter(t *testing.T) {
 // it a ledger that counts the wrong thing (every .go including _test.go, or a
 // directory skipped by mistake) stays internally consistent and still prints a
 // confident number - "examined N" only means something if N is the truth.
+//
+// A207 ADDS A SECOND COPY OF THE IGNORE RULE HERE, ON PURPOSE. The scanner reads
+// .gitignore itself (gitignore.go); the walk below carries a hand-written literal
+// of what that file says today. That is the only way this test keeps its teeth:
+// if both sides called the same function, an ignore rule that swallowed a live
+// scope's files would be counted by the instrument and confirmed by its own
+// oracle. A disagreement between the two copies is the signal A207 ② demands -
+// the ignore policy now reaches inside a scanned scope, which moves a baseline
+// number, and that must be a deliberate ledger-visible decision rather than
+// something the instrument absorbed silently. So: when someone adds an ignore
+// rule that binds design/, frontend/, internal/ or cmd/, THIS LIST MUST MOVE IN
+// THE SAME BATCH and the scope baselines in the ledger get re-stated with it.
 func TestLedgerCountsMatchAnIndependentWalk(t *testing.T) {
 	root, err := filepath.Abs(filepath.Join("..", ".."))
 	if err != nil {
@@ -1180,6 +1192,9 @@ func TestLedgerCountsMatchAnIndependentWalk(t *testing.T) {
 				if d.Name() == "testdata" || d.Name() == ".git" || d.Name() == "node_modules" {
 					return filepath.SkipDir
 				}
+				return nil
+			}
+			if ignoredLikeGit(relToRepo(root, p)) {
 				return nil
 			}
 			if accept(p) {
@@ -1229,6 +1244,222 @@ func TestLedgerCountsMatchAnIndependentWalk(t *testing.T) {
 		}
 		t.Logf("verified %s: %d files", c.label, c.report)
 	}
+}
+
+// TestWalksSkipGitIgnoredPaths is A207's mutation pair inside one fixture: the
+// SAME glyph and the SAME forbidden call, once on a gitignored path and once on a
+// path the repository would track. The ignored copy must move no number and raise
+// no finding; the non-ignored copy must do both. The second half is the load-bearing
+// one - an "ignore" rule that also swallowed tracked files would turn this gate
+// into a blindfold wearing a denominator fix, and this repository has already been
+// caught twice with a scope that was "armed but blind" (ticket 88, A207 ①'s
+// 37/40/43).
+//
+// The .gitignore contents mirror the real ones (root .gitignore `frontend/dist/*`
+// + `!frontend/dist/.gitkeep`, frontend/.gitignore `dist/*` + `!dist/.gitkeep`)
+// so this pins the rule SHAPE the scanner reads, not a convenient invention. The
+// negation matters for the counts: `frontend/dist/.gitkeep` is one of the 40 files
+// CI reports, so excluding it would move CI's number as well as the local one.
+func TestWalksSkipGitIgnoredPaths(t *testing.T) {
+	root := liveFixture(t)
+	seedFile(t, root, ".gitignore", "# fixture copy of the repository's own rules\n\nfrontend/dist/*\n!frontend/dist/.gitkeep\nbuild/\n*.generated.go\n")
+	seedFile(t, root, "frontend/.gitignore", "dist/*\n!dist/.gitkeep\n")
+
+	// U+2264 (inside emojiRe's math band, Q-46(c)/ticket 141) plus, where the ban
+	// owns one, a forbidden call shape. Ignored side first:
+	seedFile(t, root, "frontend/dist/index.html", "<p>ready \u2264</p>\n<script>approval.decide({allow: true})</script>\n")
+	seedFile(t, root, "frontend/dist/probe.txt", "ready \u2264\n")
+	seedFile(t, root, "internal/build/probe.go", "package build\n\nconst doc = \"ready \u2264\"\n\nfunc worker() {}\n\nfunc leak() { go worker() }\n")
+	seedFile(t, root, "internal/pkg/x.generated.go", "package pkg\n\nconst doc = \"ready \u2264\"\n")
+	// Non-ignored side, including the re-included anchor and a plain tracked file:
+	seedFile(t, root, "frontend/dist/.gitkeep", "ready \u2264\n")
+	seedFile(t, root, "frontend/src/live.tsx", "export const doc = \"ready \u2264\";\n")
+	seedFile(t, root, "frontend/src/decide.tsx", "export function d() { return approval.decide({allow: true}); }\n")
+	seedFile(t, root, "internal/pkg/keep.go", "package pkg\n\nconst doc = \"ready \u2264\"\n\nfunc worker() {}\n\nfunc leak() { go worker() }\n")
+
+	s := scanFixture(t, root)
+
+	// 1. the denominators. frontend/ = panel.tsx (liveFixture) + .gitkeep +
+	// live.tsx + decide.tsx + frontend/.gitignore itself, which is a tracked file
+	// in the tree and both frontend walks take EVERY file (no suffix allowlist -
+	// ticket 96 AC#2), so it is one of the counted five; the two dist/ seeds are
+	// out. internal/'s Go count is ok/ok.go + tools/ok.go + pkg/keep.go;
+	// build/probe.go and pkg/x.generated.go are out. Ban #6 and ban #8 read the
+	// same tree with the same rule, so their numbers must be ONE integer (the
+	// invariant the real-repo test above also demands).
+	if got, want := s.emojiSeen["frontend/"], 5; got != want {
+		t.Errorf("ban #8 examined %d frontend/ files, want %d", got, want)
+	}
+	if got, want := s.examined["panel-approval"], 5; got != want {
+		t.Errorf("ban #6 examined %d frontend/ files, want %d", got, want)
+	}
+	if ban6, ban8 := s.examined["panel-approval"], s.emojiSeen["frontend/"]; ban6 != ban8 {
+		t.Errorf("the two frontend/ walks disagree (%d vs %d): one of them grew an exclusion the other did not", ban6, ban8)
+	}
+	if got, want := s.examined[goScopeKey(filepath.Join(root, "internal"))], 3; got != want {
+		t.Errorf("bans #1-5 examined %d internal/ production Go files, want %d", got, want)
+	}
+	if got, want := s.emojiSeen["internal/"], 3; got != want {
+		t.Errorf("ban #8 examined %d internal/ Go files, want %d", got, want)
+	}
+
+	// 2. the findings, by path.
+	byBan := map[string]map[string]int{}
+	for _, f := range s.findings {
+		if byBan[f.Ban] == nil {
+			byBan[f.Ban] = map[string]int{}
+		}
+		byBan[f.Ban][f.Path]++
+	}
+	for ban, want := range map[string][]string{
+		"emoji":          {"frontend/dist/.gitkeep", "frontend/src/live.tsx", "internal/pkg/keep.go"},
+		"panel-approval": {"frontend/src/decide.tsx"},
+		"bare-goroutine": {"internal/pkg/keep.go"},
+	} {
+		got := byBan[ban]
+		if len(got) != len(want) {
+			t.Errorf("ban %q fired at %v, want exactly %v", ban, got, want)
+		}
+		for _, p := range want {
+			if got[p] == 0 {
+				t.Errorf("ban %q did NOT fire at the tracked path %s - an ignore rule that hides non-ignored files is a blindfold, not a fix (all findings %v)", ban, p, s.findings)
+			}
+		}
+	}
+	for _, f := range s.findings {
+		for _, leak := range []string{"frontend/dist/index.html", "frontend/dist/probe.txt", "internal/build/probe.go", "internal/pkg/x.generated.go"} {
+			if f.Path == leak {
+				t.Errorf("ban %q fired at the gitignored path %s - the exclusion did not take (all findings %v)", f.Ban, leak, s.findings)
+			}
+		}
+	}
+
+	// 3. provenance: a number that moved must say which rule file moved it, or
+	// A207's "three readings, no explanation" is back. The fixture excludes 3 files
+	// (dist/index.html, dist/probe.txt, pkg/x.generated.go) plus one pruned
+	// directory (internal/build/), decided by two rule files.
+	note := s.ign.note()
+	if note == "" {
+		t.Fatal("the matcher excluded 4 paths but the self-report says nothing about it")
+	}
+	for _, want := range []string{"3 file(s)", "internal/build/", "frontend/.gitignore"} {
+		if !strings.Contains(note, want) {
+			t.Errorf("note %q must name %q", note, want)
+		}
+	}
+	t.Logf("note: %s", note)
+}
+
+// TestGitIgnoreRuleSemantics pins the matcher against gitignore(5) directly, path
+// by path, because the counts depend on the fine print: a matcher that excluded
+// the `dist` DIRECTORY instead of its contents would drop
+// `frontend/dist/.gitkeep` and move CI's 40 to 39, and one that could not read a
+// negation would do the same thing for the wrong reason.
+func TestGitIgnoreRuleSemantics(t *testing.T) {
+	root := t.TempDir()
+	seedFile(t, root, ".gitignore", strings.Join([]string{
+		"# a comment line",
+		"",
+		"dist/*",
+		"!dist/.gitkeep",
+		"build/",
+		"logs",
+		"*.log",
+		"**/gen/*.go",
+		"secret?.txt",
+		"a/b/mid.txt",
+		"notes/blocked.md",
+	}, "\n")+"\n")
+	// The deepest rule file wins, so this negation re-includes a path the root
+	// file excludes.
+	seedFile(t, root, "notes/.gitignore", "!blocked.md\n")
+
+	g := newGitIgnore(root)
+	cases := []struct {
+		rel   string
+		isDir bool
+		want  bool
+		why   string
+	}{
+		{"dist/index.html", false, true, "`dist/*` excludes build output"},
+		{"dist/.gitkeep", false, false, "the negation keeps the go:embed anchor - THIS is what preserves CI's 40"},
+		{"dist", true, false, "the anchor's parent directory is NOT itself excluded, so the walk must enter it"},
+		{"dist/assets", true, true, "`dist/*` matches the directory, so it is pruned"},
+		{"dist/assets/b.js", false, true, "an ignored directory takes its contents with it"},
+		{"web/build", true, true, "non-anchored `build/` matches a directory at any depth"},
+		{"web/build/x.go", false, true, "via the excluded parent"},
+		{"src/build", false, false, "`build/` is directory-only, so a FILE named build stays scanned"},
+		{"web/logs", true, true, "`logs` matches the base name at depth"},
+		{"x.log", false, true, "`*.log` at the root"},
+		{"sub/y.log", false, true, "`*.log` at depth"},
+		{"sub/gen/a.go", false, true, "`**/gen/*.go` crosses directories"},
+		{"gen/a.go", false, true, "a leading `**/` matches zero directories"},
+		{"secret1.txt", false, true, "`?` matches exactly one character"},
+		{"secret.txt", false, false, "`?` requires a character there"},
+		{"a/b/mid.txt", false, true, "a pattern with an internal `/` is anchored to its own directory"},
+		{"c/a/b/mid.txt", false, false, "and therefore does NOT match at depth"},
+		{"notes/blocked.md", false, false, "the deeper notes/.gitignore negation outranks the root exclusion"},
+		{"comment", false, false, "a `#` line is a comment, not a rule"},
+		{"src/app.tsx", false, false, "nothing here touches a tracked source file"},
+	}
+	for _, c := range cases {
+		if got := g.decide(c.rel, c.isDir); got.ignored != c.want {
+			t.Errorf("decide(%q, isDir=%v) = ignored %v, want %v (%s)", c.rel, c.isDir, got.ignored, c.want, c.why)
+		}
+	}
+
+	// And the origin is reported, not just the verdict: `dist/index.html` is
+	// excluded by the ROOT file here, and the note has to say so.
+	if v := g.decide("dist/index.html", false); v.origin != ".gitignore" {
+		t.Errorf("origin = %q, want .gitignore", v.origin)
+	}
+	if v := g.decide("notes/anything-else.md", false); v.ignored {
+		t.Errorf("notes/.gitignore only re-includes blocked.md; got %v", v)
+	}
+
+	// nil receiver and the walk's own root must never skip: skipping the starting
+	// directory would abort the walk before it examined anything, which is the
+	// empty-instrument failure shape ticket 71 AC#4 made fatal.
+	if (*gitIgnore)(nil).skip(filepath.Join(root, "dist"), true) {
+		t.Error("a nil matcher must not skip anything")
+	}
+	if newGitIgnore(root).skip(root, true) {
+		t.Error("the walk's starting directory must never be skipped")
+	}
+}
+
+// relToRepo is the walked path as a slash path relative to the repository root,
+// which is the form .gitignore patterns are written against.
+func relToRepo(root, p string) string {
+	rel, err := filepath.Rel(root, p)
+	if err != nil {
+		return filepath.ToSlash(p)
+	}
+	return filepath.ToSlash(rel)
+}
+
+// ignoredLikeGit is the hand-written second copy of this repository's ignore
+// policy for the four scanned trees, used ONLY by the independent walk above.
+//
+// Measured at anchor 7771409 (`git status --porcelain --ignored=matching` on a
+// worktree that had run a frontend build, cross-checked with
+// `git ls-files -i -c --exclude-standard` -> empty, i.e. NO tracked file is
+// excluded by any rule): inside a scanned scope the only exclusions are
+// `frontend/node_modules/` (skipped by directory name above, as it always was)
+// and `frontend/dist/*` minus the `!frontend/dist/.gitkeep` go:embed anchor.
+// Everything else .gitignore names (build/, third_party/, *.exe, the
+// scripts/spike/bin/ dumps) lives outside design/ frontend/ internal/ cmd/.
+//
+// If this list and .gitignore ever disagree, the failure message is
+// TestLedgerCountsMatchAnIndependentWalk's "the number in the self-report is
+// wrong" line - read it as "the ignore policy now covers a scanned scope", decide
+// whether that is intended, move this list, and re-state the scope baselines in
+// docs/reports/pending-and-issues.md in the same batch (A207 ②).
+func ignoredLikeGit(rel string) bool {
+	if strings.HasPrefix(rel, "frontend/dist/") {
+		return filepath.Base(rel) != ".gitkeep"
+	}
+	return false
 }
 
 // TestRealRepoLedgerIsHonest is AC#4 on this repository, restated by ticket 88

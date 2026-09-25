@@ -27,8 +27,13 @@
 //	                      the exemption ticket 67 registered ("the tree does not
 //	                      exist, keeping this would be pretending to scan")
 //	                      became a false claim, and its own drift guard fired.
-//	                      The walk now examines 35 text files in this repo
-//	                      (measured 2026-09-21 on a `git archive HEAD` snapshot)
+//	                      The walk now examines 40 text files in this repo
+//	                      (measured 2026-09-25 at 467f8a4 on a `git archive HEAD`
+//	                      snapshot, and the SAME 40 on a worktree that has run a
+//	                      frontend build - ledger A207: before the walks excluded
+//	                      gitignored paths a built worktree read 43 here, and the
+//	                      ledger therefore carried 37 / 40 / 43 as three mutually
+//	                      irreconcilable readings of one scope)
 //	                      and an empty scope is fatal - see declaredScopes)
 //	7 internal-artifact-tool  host-internal artifact writes implemented as
 //	                      gated tool names (D34 note 2) - scope: internal/tools/
@@ -46,6 +51,19 @@
 // Findings are suppressed only via allowlist.txt entries of the form
 // "ban-id<TAB>repo-relative path prefix<TAB>reason" (committed, reviewable,
 // never wildcards beyond the path prefix).
+//
+// What the walks DESCEND into is a second, separate question, and it is answered
+// by the repository's own .gitignore files (gitignore.go): a path git would
+// refuse to track is not counted into a scope's denominator and not read. Before
+// that, "ban #6 frontend/ examined N" meant whatever the machine held - a tree
+// with a frontend build in it read 43 where CI reads 40, which is why the ledger
+// could cite 37 / 40 / 43 for one scope (A207). Note the two directions this is
+// NOT: it does not suppress a finding on a TRACKED path (an exclusion that could
+// hide a violation would be the D22 run-away this tool exists to catch, so
+// scan_test.go's TestWalksSkipGitIgnoredPaths seeds the ignored and the tracked
+// copy of one byte and demands the first stay silent and the second go red), and
+// it does not hide untracked-but-not-ignored work - `git add` has not happened
+// yet is not the same claim as "this is not part of the deliverable".
 //
 // Invocation (ticket 67 AC#2 - the shape of this command is load-bearing):
 // this package is its OWN Go module (tools/d22scan/go.mod), so from the repo
@@ -96,6 +114,13 @@ type scanner struct {
 	failAddOn string         // unused placeholder guard
 	emojiSeen map[string]int // ban #8: scope label -> files actually line-scanned
 	examined  map[string]int // bans #1-7: scope key -> files actually walked
+	// ign answers "is this path git-ignored?" from the scanned tree's own
+	// .gitignore files. Every walk consults it, so the denominators count the
+	// files a verdict can be about instead of whatever a developer's machine
+	// holds (ledger A207: frontend/ read 43 on a built worktree and 40 on a
+	// clean checkout, which made 37/40/43 indistinguishable from a coverage
+	// change). See gitignore.go for why the rule is read, not copied.
+	ign *gitIgnore
 }
 
 var (
@@ -181,6 +206,7 @@ func scanWithStats(root string) (*scanner, error) {
 	s := &scanner{
 		root: root, allow: map[string]map[string]bool{},
 		emojiSeen: map[string]int{}, examined: map[string]int{},
+		ign: newGitIgnore(root),
 	}
 	if err := s.loadAllowlist(filepath.Join(root, "tools", "d22scan", "allowlist.txt")); err != nil {
 		return nil, err
@@ -346,9 +372,13 @@ func declaredScopes(root string) []scanScope {
 				"ground that the tree did not exist, and that ground is gone. live:true means " +
 				"exactly one thing here: 0 examined files is fatal. The ban TEXT is unchanged " +
 				"(D22: not an agent's to shorten), and walkText gives it every file under " +
-				"frontend/ that is not node_modules/ or testdata/ - .tsx, .ts, .mjs, .css, " +
+				"frontend/ that is not node_modules/, testdata/ or a gitignored path " +
+				"(A207) - .tsx, .ts, .mjs, .css, " +
 				".md, .json and extension-less files included, no suffix allowlist to shrink " +
-				"the ban into (35 files as measured 2026-09-21).",
+				"the ban into (35 files as measured 2026-09-21; 40 as measured 2026-09-25 at " +
+				"467f8a4, and that 40 is now the reading on a worktree that HAS run a frontend " +
+				"build too, which it was not: a built tree read 43 here until the walks started " +
+				"excluding what .gitignore excludes).",
 		},
 		{
 			label: "ban #7 internal/tools/", dir: filepath.Join(root, "internal", "tools"),
@@ -488,6 +518,15 @@ func describeScopes(scopes []scanScope, s *scanner) []string {
 // frontend/dist/.gitkeep) and would make ban #8's view of this tree a strict
 // subset of ban #6's over the same files. Widening a ban is allowed; handing it a
 // filter is not (R16#4).
+//
+// SUPERSEDED IN PART BY A207 (2026-09-25), kept above because the paragraph is a
+// measurement claim and a correction that erases the claim leaves no trace: the
+// "40 text files" it quotes for ban #6 was true ONLY of a tree with no build
+// output in it. Measured at 467f8a4 the same binary read 43 on the worktree where
+// ticket 96's ban #8 frontend/ entry was being argued and 40 on a
+// `git archive HEAD` snapshot, so every count in this paragraph was machine-
+// dependent, which is what a denominator must never be. The walks now exclude
+// what .gitignore excludes (gitignore.go), and 40 is the reading of both shapes.
 func emojiScopes(root string) []emojiScope {
 	return []emojiScope{
 		{dir: filepath.Join(root, "design"), label: "design/"},
@@ -591,12 +630,18 @@ func (s *scanner) walkGo(dir string) error {
 			return err
 		}
 		if d.IsDir() {
-			if d.Name() == "testdata" || d.Name() == ".git" {
+			if d.Name() == "testdata" || d.Name() == ".git" || s.ign.skip(path, true) {
 				return filepath.SkipDir
 			}
 			return nil
 		}
 		if !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
+			return nil
+		}
+		// A git-ignored .go file is not on anyone's delivery path - it is either
+		// build output or a scratch copy - and counting it is what made the
+		// denominator move between machines (A207).
+		if s.ign.skip(path, false) {
 			return nil
 		}
 		s.examined[key]++
@@ -775,12 +820,19 @@ func (s *scanner) walkText(dir, ban string, check func(string) (string, bool), g
 			return err
 		}
 		if d.IsDir() {
-			if d.Name() == "testdata" || d.Name() == "node_modules" || d.Name() == ".git" {
+			if d.Name() == "testdata" || d.Name() == "node_modules" || d.Name() == ".git" || s.ign.skip(path, true) {
 				return filepath.SkipDir
 			}
 			return nil
 		}
 		if goOnly && (!strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go")) {
+			return nil
+		}
+		// The same exclusion ban #8 applies to this very tree (walkEmoji's
+		// everyFile branch over frontend/): scan_test.go demands the two counts be
+		// one integer, so the ignore rule has to be consulted by both walks or the
+		// equality guard goes red on a built worktree.
+		if s.ign.skip(path, false) {
 			return nil
 		}
 		src, err := os.ReadFile(path)
@@ -846,7 +898,7 @@ func (s *scanner) walkEmoji(sc emojiScope) error {
 			return err
 		}
 		if d.IsDir() {
-			if d.Name() == "node_modules" || d.Name() == ".git" {
+			if d.Name() == "node_modules" || d.Name() == ".git" || s.ign.skip(path, true) {
 				return filepath.SkipDir
 			}
 			// testdata is skipped for the scopes whose sibling bans skip it
@@ -873,6 +925,14 @@ func (s *scanner) walkEmoji(sc emojiScope) error {
 			if !isTextFile(path) {
 				return nil
 			}
+		}
+		// Git-ignored paths are out of ban #8's denominator too, and this is the
+		// scope the drift actually bit: `frontend/dist/` is vite output, so on a
+		// machine that ran a build the count read 43 where CI reads 40 (A207).
+		// The `.gitignore` files themselves and the `frontend/dist/.gitkeep`
+		// anchor stay in, because no rule excludes them.
+		if s.ign.skip(path, false) {
+			return nil
 		}
 		src, err := os.ReadFile(path)
 		if err != nil {
@@ -1072,18 +1132,23 @@ func checkRoot(root string) (int, error) {
 		}
 	}
 	files := 0
+	// The same ignore rule the walks use, so this headline number cannot drift
+	// from the per-scope denominators it is supposed to corroborate (A207: the
+	// whole point of printing the number is that it means the same thing on every
+	// machine).
+	ign := newGitIgnore(root)
 	for _, dir := range []string{filepath.Join(root, "internal"), filepath.Join(root, "cmd")} {
 		err := filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {
 			if err != nil {
 				return err
 			}
 			if d.IsDir() {
-				if d.Name() == "testdata" || d.Name() == ".git" {
+				if d.Name() == "testdata" || d.Name() == ".git" || ign.skip(path, true) {
 					return filepath.SkipDir
 				}
 				return nil
 			}
-			if strings.HasSuffix(path, ".go") && !strings.HasSuffix(path, "_test.go") {
+			if strings.HasSuffix(path, ".go") && !strings.HasSuffix(path, "_test.go") && !ign.skip(path, false) {
 				files++
 			}
 			return nil
@@ -1233,6 +1298,14 @@ func main() {
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "d22scan:", err)
 		os.Exit(2)
+	}
+	// Provenance for the numbers below, printed only when the matcher actually
+	// excluded something: "frontend/ went 43 -> 40" must never again be a
+	// mystery that costs a ticket to explain (A207). Deliberately outside
+	// verdict(), whose output is generated from the scanScope ledger and pinned
+	// line-for-line by the tests in scan_test.go.
+	if n := stats.ign.note(); n != "" {
+		fmt.Println(n)
 	}
 	os.Exit(verdict(os.Stdout, os.Stderr, abs, files, stats))
 }
