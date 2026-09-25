@@ -661,12 +661,14 @@ b417d31 第 1 枚  cmd/wisp 两枚（码＋三枚用例）
 区间里另有**不是本程的** 5 枚（`d8e39579`/`69aefae9`/`c4540a6e`/`f8623c77`/`3f6322f`，全是 138 那枚会话的证据件＋台账，
 **零 Go 文件**）——见 §8 第 8 行。
 
-**入库件名册**（`find .scratch/wisp/probes/149 -type f | wc -l` ＝ **63**，现量于本件入库那一枚）：
+**入库件名册**（`find .scratch/wisp/probes/149 -type f | wc -l` ＝ **66**，现量于 §12 那一格入库前；
+本件第一枚（`a055d9f`）时是 **63**——差的那 3 枚就是 §12 的 `logs-verify/`，**名册自己会随件增长**）：
 变异尺 1 枚（`harness.py`）＋探针源 1 枚（`zz149probe_windows_test.go`）＋名册 2 枚（`roster-pre.txt`／`roster-post.txt`）＋
 覆盖剖面 2 枚（`coverage-exited-branch-{pre,post}.out`）＋
 根层原始日志 12 枚（`pre-*` 5 枚、`newtests-on-unfilled-code.log`、`probe-corrupt-census.log`、`d22scan-worktree.log`、门禁 4 枚）＋
 逐发变异日志 45 枚（`post/` 31 枚 ＝12 发生产变异＋9 发 leg 摘除＋9 发组合的第一遍（坏的，见 §8 第 6 行）＋1 发 `post-asis`；
-`post-final/` 3 枚＝gofumpt 之后重跑的三发；`combos2/` 11 枚＝串联替换修好之后的组合遍）。
+`post-final/` 3 枚＝gofumpt 之后重跑的三发；`combos2/` 11 枚＝串联替换修好之后的组合遍；
+`logs-verify/` 3 枚＝§12 那一格在**入库字节**上重跑的三发）。
 ⚠ 这些枚数**本来就是读数**，随本件增长的那一枚 commit 一起入库；复算请一律 `find` 现量，别背这里的加总。
 
 **复跑本件最硬那三发的最小路径**：
@@ -697,5 +699,44 @@ python /tmp/wisp149r/harness.py /tmp/wisp149r/post /tmp/wisp149r/logs/post p1-co
 ⚠ 复跑时**先把 dll 目录进 PATH**：本程量到不带它时连 `go test -list` 都返回 0 枚（§6.2）。
 
 ---
+
+## 12　追加一格：入库那版**再跑一遍**（行号随版本，这条是本仓的既有规矩）
+
+本件 §1–§11 落盘之后，本程把**入库的字节**重新导出成第四枚快照又跑了一遍三发关键变异。
+**命令原文**：
+
+```
+$ mkdir -p /tmp/wisp149/verify && git -c core.autocrlf=false -c core.eol=lf archive HEAD | tar -x -C /tmp/wisp149/verify
+$ mkdir -p /tmp/wisp149/verify/third_party && cp -r third_party/sherpa-onnx /tmp/wisp149/verify/third_party/
+$ python .../harness.py /tmp/wisp149/verify .../logs/verify p1-corrupt-fill-to-zero p7-exited-drops-summary p10-multidoc-takes-error-offset
+p1-corrupt-fill-to-zero            rc=1 RUN=20 topPASS=12 topFAIL=1 144red=0 147red=0 new=...:FAIL ...:PASS ...:PASS
+p7-exited-drops-summary            rc=1 RUN=20 topPASS=12 topFAIL=1 144red=0 147red=0 new=...:PASS ...:PASS ...:FAIL
+p10-multidoc-takes-error-offset    rc=1 RUN=20 topPASS=12 topFAIL=1 144red=0 147red=0 new=...:PASS ...:FAIL ...:PASS
+```
+
+**逐枚红句的行号**（入库那版；日志原文 `probes/149/logs-verify/`）：
+
+```
+:655  8 of 8 corrupt shapes do not name the byte position the decoder objected at; first: second-comma-at-26: …
+:686  trailing-garbage: offset is 1981, want 1978 (the end of the document that did close)
+:691  trailing-garbage: sentence "2003 bytes read, report corrupt: …" does not name "…a value closed at offset 1978 and 25 bytes follow"
+:747  exited give-up "wisp slo: subject 3804 exited (code 7) without writing its report" does not carry the last reading "8 bytes read, …"
+:769  … does not carry the note-bearing last reading "0 bytes read, no report file yet"
+:780  the two exited shapes render the same sentence: "…"
+:783  the exited sentences no longer separate position from note: "…"
+```
+
+⇒ **判据本身没有随版本变化**：三发的红/绿归属与 §1、§2.4 逐枚相同（`p1`→case 11、`p7`→case 13、`p10`→case 12），
+`=== RUN=20`、144/147 全绿也一致。
+⇒ **变的只是行号**：本件正文里引的 `:646`/`:738`/`:760`/`:771` 取自 **gofumpt `-w` 之前**那一版测试文件
+（`probes/149/post/`、`post-final/` 那些日志是那一时点的），入库那版同一句落在 `:655`/`:747`/`:769`/`:780`。
+按 §8 第 8 行那条本仓共识（"别人给的行号也是读数、天然带版本"）处理：**复算请一律按 sha 重取，别背本件正文里的行号。**
+⇒ 本格顺带补一句 §2.3 的凭据：入库那版的整组 SLO 用例在新鲜导出树上跑 **13 枚顶层 PASS／0 红**
+（`go test -count=1 -v -run 'TestSLO144|TestSLO147|TestSLO149' ./cmd/wisp/`，与 §6.1 的 136/76/0/0 同向）。
+
+**放水两问自答**：① 断言方向未动（本格只重跑、未改任何判据）；② 未新增 helper（三发用的是 §2.4 那批 `MUT` 条目原文）。
+
+---
+
 
 
