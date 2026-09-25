@@ -206,3 +206,30 @@ B 版（121006d，交付版）：块内 21 行、断言 4 枚  {t.Fatal, t.Fatal
 另记一枚附带的自指残留：交付版里那枚名字被 6 处文字引用（`:47`/`:95`/`:1250`/`:1288`/`:1865`/`:1898`，
 最后一处在 `t.Logf` 的**字符串**里），改名之后这 6 处全部指向一枚不存在的测试而无任何人响——
 形状与验收件 r2 §7.3 记过的那枚"`bridge.go:33` 指向不存在的用例"同类，属读数/文档级。
+
+---
+
+## §3 攻点 3：零误伤与抓得住，**独立重跑并对账**（我自己的副本目录，不复用它的）
+
+台件：`D:\tmp\panel-l2-nail-fix-r3-accept-dwl\headcopy`（`git archive a5e1c8c` ＋ §0.2 归一化），
+钉 `9fd6defbd8dd113a7bd9c70c619ab92ac01f32d7` ＝ **它交付的那枚 blob**（`git rev-parse HEAD:…` 现量，§0.1），
+`bridge.go = d2cd6362…`（同它的十二次读数）。全部 `-count=1 -v`。
+
+| 发 | 我这边的读数 | 它的读数（实现件 §2.2） | 对账 |
+|---|---|---|---|
+| **T-A** 交付态＋干净守卫 | `FAIL=0`，`asked=528 assembled route names, answeredByRealGuard=0, hits=[]`（`out/A2-baseline-lf.txt:178`、`out/T-A-clean.txt`）| `asked=528 / 0 / hits=[]` → PASS | **逐字同值** |
+| **T-B** ＋M14（运行期拼 `panel.review.allow`） | 红 **1 枚**＝`TestRealGuardRefusesEveryAssemblableApprovalRouteName`；红句两行：`:1310 … answers "panel.review.allow" …` 与 `:1315 … plant F plants is now answered by the guard …`（`out/T-B-M14.txt:178-179`）| 同测试红，`hits=[panel.review.allow]` | **同值**（那枚"共红诊断"我也量到，同发同一处） |
+| **T-D** ＋M16（运行期拼 `panel.review.ratify`） | 红 **1 枚**＝同一枚；`asked=528 … answeredByRealGuard=1, hits=[panel.review.ratify]`（`out/T-D-M16.txt:178-179`）| 同值 | **同值** |
+| **T-G** ＋M17（死守卫控） | 红 **4 枚**：`TestComposerEnvelopeAcceptsItsFourRequests`、`TestComposerEnvelopeRefusesSpoofingAndUndecorableRequests`、`TestAnsweredPanelRoutesCarryNoApprovalDecision`、`TestRealGuardRefuses…`；本测试的红因**不是** hits，而是那句 `the running guard refuses its own declared route "panel.mode.request" …`，**报在 `:1308`**（＝调用点，`t.Helper()` 生效）（`out/T-G-M17.txt:192`）| 它记"红因是 `:1266` 那枚反空转 `t.Fatalf`，读数报在调用点 `:1308`"，同发还红 `TestAnsweredPanelRoutes…`/`TestComposerEnvelope…` | **同值**，含"`t.Helper()` 把行号搬到调用点"这一枚细节：我把词表掏空那一发（少 3 行）里同一句控报在 **`:1305`**（`out/V2-words-empty.txt`）⇒ 调用点跟着文件漂，它这句描述是活的不是抄的 |
+| 加分行 前缀 8→14 | `asked=924 … hits=[]` → PASS（`out/W-widen14.txt`）| 924 / 0 | **同值**，分母可复算＝`14×11×3×2` |
+
+**分母对账（不许"差不多"）**：`grantRoutePrefixes` 现量 **8 枚**（`:1239-1242`）、`grantRouteWords` **11 枚**
+（`:162-165`）、`grantRouteSuffixes` **3 枚**（`:1247`）、单复数 ×2 ⇒ `8×11×3×2 = 528`。
+⇒ 我这枚 528 与它那枚 528 是**同一版词表的同一张网**（钉 blob 同值，前缀/词/后缀三枚清单逐枚同）。
+**没有"前缀集不同"或"词表版本不同"这类差**；唯一两处不同都 attributable 到台件而非尺，且我在别处归了因：
+① 先存在的红枚数（我这里 0 枚、它那里 3 枚）→ §4；② 我那发 M14/M16 的**植入文本**与它不同（我 7 行、它记 `+352B/9 行`）
+——都是"三段字面量 `strings.Join` 拼出一枚 map，守卫末尾返回 `map[m]`"，行为同形，文本不必同。
+
+**"asked=528"这枚数今天仍然只是 `t.Logf` 里的一个读数，没有任何断言钉它**（§1.1 的 V4/V1 就是这么打穿的）。
+实现件 §2.1 那句"乘积写死在 `t.Logf` 里，人事后可复算"——**可复算这句对**（清单就在 `:1239/:162/:1247`，
+我按枚数过），但请把"写死"两字读成"打印"，别读成"断言"。
