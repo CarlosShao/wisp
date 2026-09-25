@@ -10,9 +10,12 @@
         instead of copying it - a copied list would drift into agreeing with
         whatever the rail happened to import.
 
-     B. The panel holds no "which screen am I" of its own (Q2). Checked as text:
-        no useState anywhere in the navigation layer, and the view reaches the
-        tree only through currentView(snapshot).
+     B. Nothing in the navigation layer remembers the screen (Q2). Checked as
+        text: no useState in nav-rail or panel-views, and the view reaches the
+        tree only through currentView(snapshot). App is the one named exception -
+        a single transient pick, counted and pinned by identifier - because
+        owner asked for a settings screen a click can reach (2026-09-25), and a
+        snapshot naming a view still outranks it.
 
      C. A row whose icon had to be substituted says so. `interim` is required
         exactly when the demo's own name is not in the frozen list, and is
@@ -145,11 +148,29 @@ check("rail icons must be distinct", new Set(glyphs).size === glyphs.length,
 // B. Purity: nothing in the navigation layer remembers the screen.
 // ---------------------------------------------------------------------------
 
-for (const f of ["src/components/nav-rail.tsx", "src/lib/panel-views.ts", "src/App.tsx"]) {
+for (const f of ["src/components/nav-rail.tsx", "src/lib/panel-views.ts"]) {
   const src = readFileSync(f, "utf8");
   check(`${f} must not hold view state (Q2)`, !/\buseState\b|\buseReducer\b/.test(src),
     `${(src.match(/\buseState\b/g) ?? []).length} useState`);
 }
+
+// App is the one place allowed to know which of its own screens it is showing,
+// and only as a single transient pick (owner, 2026-09-25: 设置里要能调透明度 -
+// a settings screen no click reaches is not a setting). The blanket ban above
+// stays for everything else; this one is narrowed to an exact count and an
+// exact name so the exception cannot grow sideways. Q2's real subject - nothing
+// survives a WebView restart, and a snapshot that names a view outranks the
+// pick (PLAN.md:1043-1044) - is checked at the markup loop below and in
+// currentView's own three cases. Undo: 撤「rail 可点」.
+const appSrc = readFileSync("src/App.tsx", "utf8");
+check("App may hold exactly one piece of state, and it must be the view pick",
+  (appSrc.match(/= useState</g) ?? []).length === 1 &&
+    /const \[picked, setPicked\] = useState<PanelViewId \| null>\(null\)/.test(appSrc),
+  `useState calls=${(appSrc.match(/= useState</g) ?? []).length}`);
+check("App must keep the ban on persisting anything (no storage API may appear)",
+  !/\b(localStorage|sessionStorage|indexedDB|document\.cookie|caches|navigator\.serviceWorker)\b/.test(appSrc));
+check("a view named by the snapshot must outrank the local pick",
+  appSrc.includes("hostView !== undefined ? currentView(snapshot)"));
 const skeleton = readFileSync("src/components/panel-skeleton.tsx", "utf8");
 // Matched on the declaration, not the word: this file's own header comment
 // names PANEL_TABS to explain what it replaced, and a plain substring test read
@@ -193,9 +214,22 @@ for (const v of PANEL_VIEWS) {
       new RegExp(`aria-current="page"[^>]*aria-label="${v.label}"|aria-label="${v.label}"[^>]*aria-current="page"`).test(rows));
   check(`row ${v.id}: its hidden name must still be in the markup`,
     rows.includes(`>${v.label}</span>`));
-  if (!v.fed) {
+  if (!v.fed && !v.selfFed) {
     check(`row ${v.id}: an unfed screen must say it is unfed rather than show nothing`,
       html.includes("还没有接到数据"));
+  }
+  if (v.selfFed) {
+    check(`row ${v.id}: a self-fed screen must name the one thing it can actually do`,
+      html.includes("即时") && html.includes("未接线"));
+    // The config keys are stored in two halves so they do not read as host routes
+    // (see src/components/config-screen.tsx). That split is only safe while the
+    // JOINED text still appears, so it is asserted from the markup side - after
+    // dropping the `<!-- -->` React puts between adjacent text nodes, which is
+    // what makes the joined string invisible otherwise.
+    const joined = html.replace(/<!--\s*-->/g, "");
+    check(`row ${v.id}: the config keys must still render joined, not as halves`,
+      joined.includes("panel.opacity") && joined.includes("ball.opacity_idle"),
+      joined.slice(joined.indexOf("font-mono"), joined.indexOf("font-mono") + 120));
   }
 }
 
@@ -221,18 +255,23 @@ check("panel.ts must keep naming the routes Go already answers", routes.length >
 check("no view-change route may come back without owner's ruling (Q-50 = 甲, undo: 撤 Q-50 甲)",
   !routes.some((r) => r.includes("view")), routes.join(" "));
 
-// The rail is a control that is not live. It must LOOK unavailable and SAY so:
-// a disabled row that also fires nothing is the ticket 83 disease with new paint.
+// The rail is a live control now (owner, 2026-09-25: 设置里要能调透明度 - a
+// settings screen nobody can reach is not a setting). It must be a real button,
+// and it must hand the choice UP rather than keep it: the nav layer holding no
+// view state is what keeps Q2 true while the click works. Undo the click half:
+// 撤「rail 可点」, and the two checks below flip back with it.
 const railSource = readFileSync("src/components/nav-rail.tsx", "utf8");
-check("the rail must not carry a click handler while no route exists", !railSource.includes("onClick={() =>"));
+check("the rail must carry a click handler", railSource.includes("onClick={() =>"));
+check("the nav layer must hold no view state of its own", !/\buseState\b/.test(railSource));
 const firstRail = renderToStaticMarkup(<App snapshot={{ ...base, view: "chat" } as PanelSnapshot} />);
 const railMarkup = firstRail.match(/aria-label="面板视图"[\s\S]*?<\/nav>/)?.[0] ?? "";
-check("every rail row must say disabled",
-  (railMarkup.match(/ aria-disabled="true"/g) ?? []).length === PANEL_VIEWS.length &&
-    (railMarkup.match(/ disabled=""/g) ?? []).length === PANEL_VIEWS.length,
-  `aria-disabled=${(railMarkup.match(/ aria-disabled="true"/g) ?? []).length} disabled=${(railMarkup.match(/ disabled=""/g) ?? []).length}`);
-check("the panel must state in words why the rail is inert",
-  firstRail.includes("换屏要等原生宿主接线，这一排图标今天点不动。"));
+check("no rail row may claim disabled now that clicking works",
+  (railMarkup.match(/ disabled=""/g) ?? []).length === 0 &&
+    (railMarkup.match(/aria-disabled="true"/g) ?? []).length === 0,
+  `aria-disabled=${(railMarkup.match(/aria-disabled="true"/g) ?? []).length} disabled=${(railMarkup.match(/ disabled=""/g) ?? []).length}`);
+check("exactly one row must be lit, and lit must be the row the snapshot named",
+  (railMarkup.match(/aria-current="page"/g) ?? []).length === 1 &&
+    railMarkup.includes("aria-label=\"对话\""));
 
 if (failures.length > 0) {
   for (const f of failures) console.error("render-nav: FAIL " + f);

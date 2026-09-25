@@ -61,6 +61,12 @@ export interface PanelView {
   /** Whether Go has anything to push for this screen yet. False renders a
       named empty state - never invented content (owner's P9 red line). */
   fed: boolean;
+  /** Whether the panel can put something real on this screen WITHOUT Go. Only
+      设置 qualifies today: its one live control moves a style on this page and
+      reads nothing from anywhere. `fed: false, selfFed: true` is therefore the
+      honest shape for a screen that is neither empty nor fed - the gap notice
+      would be a lie, and claiming `fed` would be a lie the other way. */
+  selfFed?: boolean;
 }
 
 const NOT_APT = "INTERIM(图标不贴切，Q1=甲 2026-09-25)";
@@ -107,6 +113,7 @@ export const PANEL_VIEWS: readonly PanelView[] = [
     demoIcon: "settings",
     note: "清单里只有 settings-2 这一枚齿轮，没有裸的 settings",
     fed: false,
+    selfFed: true,
   },
   { id: "security", label: "安全", icon: "shield-alert", demoIcon: "shield-alert", fed: false },
   { id: "privacy", label: "隐私", icon: "lock", demoIcon: "lock", fed: false },

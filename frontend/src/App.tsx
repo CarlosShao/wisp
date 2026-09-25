@@ -16,7 +16,9 @@
    the rail's 审批 badge is what carries the queue depth instead.
    ============================================================================ */
 
+import { useState } from "react";
 import { Composer } from "@/components/composer";
+import { ConfigScreen } from "@/components/config-screen";
 import { L2ApprovalCard } from "@/components/l2-approval-card";
 import { PanelSkeleton } from "@/components/panel-skeleton";
 import { ResultStream } from "@/components/result-stream";
@@ -68,10 +70,19 @@ export default function App({
   // back to the empty view, which says so in words; inventing a mode here would
   // be the panel guessing about a permission it was never told.
   const composer = snapshot.composer ?? EMPTY_COMPOSER;
-  const view = currentView(snapshot);
+  // Which screen is showing. A snapshot that names one outranks anything local,
+  // because the host is the truth source (Q2). The pick below only applies while
+  // no snapshot names a view - today that is every snapshot, since ticket 35's
+  // field does not exist yet - and it dies with the document, which is what
+  // PLAN.md:1043-1044 asks for: nothing may be REMEMBERED across a WebView
+  // restart, but "which of my own screens am I on" is not a memory.
+  const [picked, setPicked] = useState<PanelViewId | null>(null);
+  const hostView = (snapshot as { view?: string }).view;
+  const view = hostView !== undefined ? currentView(snapshot) : (picked ?? currentView(snapshot));
   return (
     <PanelSkeleton
       active={view}
+      onSelect={setPicked}
       pendingCount={snapshot.pending.length}
       waitingLabel={snapshot.pending.length > 0 ? "等待确认" : undefined}
     >
@@ -79,7 +90,8 @@ export default function App({
         <L2ApprovalCard key={v.correlationId} view={v} />
       ))}
       {view === "chat" && <ResultStream chunks={snapshot.results} />}
-      {view !== "chat" && view !== "approval" && <UnfedScreen id={view} />}
+      {view === "config" && <ConfigScreen />}
+      {view !== "chat" && view !== "approval" && view !== "config" && <UnfedScreen id={view} />}
       <Composer state={composer} />
     </PanelSkeleton>
   );

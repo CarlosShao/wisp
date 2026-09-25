@@ -1,34 +1,38 @@
 /* ============================================================================
    Wisp panel theme shell (ticket 77)
    ----------------------------------------------------------------------------
-   Two rules govern this file, and both are machine-checked by
-   internal/panel's TestC21DesignTokensFourWayAgree:
+   Two rules govern this file, and both are machine-checked:
 
      1. NO colour literal is written here. Every value is var(...) and every
-        var(...) resolves to a token that design/assets/tokens.css declares
-        (copied verbatim into tokens.generated.css by `npm run tokens`).
-        C21 is the only style truth source of this repo (SPEC-08 §2,
-        PLAN.md:1038-1040), so a second palette in frontend/ is a contract
-        break, not a styling choice.
+        var(...) resolves to a key that tokens.generated.css declares. That is
+        signed by TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme in
+        internal/panel/frontend_hygiene_test.go, which walks the import closure
+        of src/main.tsx, and by scripts/gen-tokens.mjs --check, which refuses a
+        var() pointing at a key it does not emit.
      2. This file may only ALIAS vocabulary. The left-hand names below are the
         vocabulary of the vendored Beautiful UI components (surface / ink /
-        line ...); mapping them onto C21 tokens is what lets those components
-        render in Wisp's palette without importing Beautiful UI's own
-        :root block, which would have been a second source.
+        line ...) and of shadcn (card / muted / destructive); mapping them onto
+        the token table is what lets those components render in Wisp's palette
+        without importing a second :root block.
+
+   The table itself is re-sourced from design/doubao/demo/styles.css as of
+   2026-09-25 (owner: "全推翻了，前端重新设计 token ... 按照 demo 改"). See the
+   header of the generated file for what that means and where each value came
+   from - it is not restated here, because that is how the last copy went stale.
    ============================================================================ */
 
 @import "./tokens.generated.css";
 @import "tailwindcss";
 
-/* ---------- Beautiful UI vocabulary -> C21 tokens (aliases only) ---------- */
+/* ---------- Beautiful UI vocabulary -> token table (aliases only) ---------- */
 :root {
   --page: var(--bg-base);
   --canvas: var(--bg-inset);
-  --surface: var(--bg-raised-color);
-  --surface-overlay: var(--bg-overlay-color);
+  --surface: var(--bg-raised);
+  --surface-overlay: var(--bg-overlay);
   --inset: var(--bg-inset);
   --hover: var(--bg-subtle);
-  --hover-2: var(--bg-overlay-color);
+  --hover-2: var(--bg-overlay);
   --field: var(--bg-inset);
 
   --ink: var(--fg-primary);
@@ -45,32 +49,13 @@
   --caution: var(--warn);
   --stop: var(--danger);
   --keep-warm: var(--warm);
-  --on-solid: var(--on-solid);
   --accent-ink: var(--accent);
 }
 
-[data-theme="light"] {
-  --surface: var(--bg-raised-color);
-  --surface-overlay: var(--bg-overlay-color);
-  --canvas: var(--bg-inset);
-  --inset: var(--bg-inset);
-  --hover: var(--bg-subtle);
-  --hover-2: var(--bg-overlay-color);
-  --field: var(--bg-inset);
-  --ink: var(--fg-primary);
-  --ink-2: var(--fg-secondary);
-  --ink-3: var(--fg-tertiary);
-  --ink-disabled: var(--fg-disabled);
-  --line: var(--border-hair);
-  --line-strong: var(--border-soft);
-  --edge: var(--border-strong);
-  --muted: var(--fg-tertiary);
-  --ok: var(--success);
-  --caution: var(--warn);
-  --stop: var(--danger);
-  --keep-warm: var(--warm);
-  --accent-ink: var(--accent);
-}
+/* The alias block above is theme-invariant on purpose: every line is var() over
+   a key whose own value already flips with [data-theme="dark"]. A second copy
+   of this list under [data-theme="light"] was the first generation's shape, and
+   it bought nothing but drift. */
 
 /* ---------- Tailwind namespaces fed by the aliases above ----------
    radius / font stacks already come from tokens.generated.css (@theme). */
@@ -106,9 +91,9 @@
 @theme inline {
   --color-background: var(--bg-base);
   --color-foreground: var(--fg-primary);
-  --color-card: var(--bg-raised-color);
+  --color-card: var(--bg-raised);
   --color-card-foreground: var(--fg-primary);
-  --color-popover: var(--bg-raised-color);
+  --color-popover: var(--bg-overlay);
   --color-popover-foreground: var(--fg-primary);
   --color-primary: var(--accent);
   --color-primary-foreground: var(--accent-fg);
@@ -116,53 +101,38 @@
   --color-secondary-foreground: var(--fg-primary);
   --color-muted: var(--bg-subtle);
   --color-muted-foreground: var(--fg-secondary);
-  --color-accent: var(--accent);
+  --color-accent: var(--accent-soft);
   --color-accent-foreground: var(--accent-fg);
   --color-destructive: var(--danger);
   --color-destructive-foreground: var(--on-solid);
-  --color-border: var(--border-hair);
+  --color-border: var(--border-soft);
   --color-input: var(--border-soft);
   --color-ring: var(--ring);
   --color-on-solid: var(--on-solid);
 }
 
 
-/* ---------- the panel's own frost, measured 1:1 off the high-fidelity demo ----
-   ---------- (owner 2026-09-25: 磨砂保留，"当前是透明度太高了")             ----
-   demo/styles.css:30 (light) and :60 (dark) both give the window layer an alpha
-   of 0.72 over the desktop; this tree was sitting on --bg-raised's 0.38, which is
-   the number he was reacting to. The hue still comes from C21 (--bg-base) - no
-   colour literal is written here, and the four-way token reconciliation is
-   untouched because nothing in the generated theme changed.
-   --panel-alpha is the ONE knob: if the settings screen ever gets an opacity
-   control (owner's 有透明度的调节), that is the only line it needs to write.
-   The value itself belongs to Go, not to this file - the panel remembers nothing
-   (PLAN.md:1044), so a slider is a C17 request plus a persisted key, both of
-   which are owner/orchestrator decisions recorded as unanswered in
-   docs/reports/frontend-session-log.md §59.4. */
-:root {
-  --panel-alpha: 72%;
-  --panel-surface: color-mix(in srgb, var(--bg-base) var(--panel-alpha), transparent);
-}
-
-/* ---------- glass surfaces: C21's sheen + blur are a background STACK, ----
-   ---------- which no single background-color utility can carry ---------- */
+/* ---------- the panel's own frost, ported off the high-fidelity demo --------
+   demo paints its window as --window-bg (an alpha of 0.72 over the desktop) +
+   blur(28px) saturate(1.25) + a hairline border + --window-shadow, and puts no
+   sheen gradient under it. --panel-surface in the generated table is that same
+   colour with the alpha lifted out into --panel-alpha, so the number the
+   settings row moves is the only thing that separates the two.
+   Owner 2026-09-25: 磨砂保留，"当前这个属于是透明度太高了"，"不是做成切换，应该是
+   有透明度的调节" - the old value here was --bg-raised's 0.38, which is the
+   number he was reacting to. The default now is demo's own 0.72. */
 .glass-raised {
-  /* The demo's window layer has no sheen gradient over it (demo/styles.css:118-121
-     is colour + blur + border + shadow, nothing else), so this stopped reading
-     --bg-raised, which stacks the sheen on top of a colour. The sheen stays
-     available to whoever wants it; the default is now what the demo draws. */
   background-color: var(--panel-surface);
   backdrop-filter: var(--glass-blur);
   box-shadow: var(--shadow-card);
 }
 .glass-overlay {
-  background: var(--bg-overlay);
+  background-color: var(--bg-overlay);
   backdrop-filter: var(--glass-blur-sm);
   box-shadow: var(--shadow-pop);
 }
 .glass-inset {
-  background: var(--bg-inset);
+  background-color: var(--bg-inset);
   box-shadow: var(--shadow-inset);
 }
 .glass-divider {
@@ -173,23 +143,16 @@
   outline-offset: 2px;
 }
 
-/* The desktop behind the panel is never pure black: C21's ambient lights are what
-   makes the frost read as frost (tokens.css, "环境光 v2.3"). The grain layer is
-   the noise overlay; --grain is its opacity.
-   Count and strength now follow the demo rather than all four tokens: the demo
-   draws TWO lights (demo/styles.css:71-78, alpha 0.08 and 0.07 over the dark base;
-   0.06/0.05 in light), while this tree was drawing four at the tokens' native
-   0.20-0.36 - which is the other half of what owner called 花里胡哨. The dimming
-   is done with color-mix over `transparent`, so --ambient-a/--ambient-b stay the
-   only colours and no new value enters the style source. --ambient-c and
-   --ambient-d are simply not referenced any more; they belong to C21 and Go. */
+/* What sits behind the frost. demo draws this at .desktop-bg: TWO ambient
+   lights, not four, at their own alphas, over a three-stop linear gradient.
+   Every one of those numbers is a token in the generated table with the demo
+   line it came from, so this rule is a transcription and adds nothing. */
 .wisp-shell {
-  background-color: var(--bg-base);
+  background-color: var(--desktop-2);
   background-image:
-    radial-gradient(ellipse 80% 60% at 20% 30%,
-      color-mix(in srgb, var(--ambient-a) 22%, transparent) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 80% 70%,
-      color-mix(in srgb, var(--ambient-b) 23%, transparent) 0%, transparent 55%);
+    radial-gradient(var(--ambient-a-geo), var(--ambient-a) 0%, transparent var(--ambient-a-stop)),
+    radial-gradient(var(--ambient-b-geo), var(--ambient-b) 0%, transparent var(--ambient-b-stop)),
+    linear-gradient(var(--desktop-geo), var(--desktop-1) 0%, var(--desktop-2) 50%, var(--desktop-3) 100%);
   color: var(--fg-primary);
   font-family: var(--font-sans);
   font-size: var(--t-body);
@@ -277,11 +240,11 @@
    markup that scripts/render-nav.tsx counts - a screen reader and a render
    harness must both still see the name. */
 .nav-rail-label {
-  background: var(--bg-raised-color);
+  background: var(--bg-raised);
   border: 1px solid var(--border-hair);
   border-radius: var(--r-sm);
   color: var(--fg-primary);
-  font-size: 11.5px;
+  font-size: var(--t-small);
   left: calc(100% + 6px);
   line-height: 1;
   opacity: 0;
