@@ -52,6 +52,54 @@
   --accent-ink: var(--accent);
 }
 
+/* ---------- the library's colour vocabulary -> our tokens (aliases only) ----
+   The vendored Beautiful UI atoms and primitives ask for bg-green / text-orange
+   / bg-accent-tint / shadow-hairline and eleven other names. Until now this
+   tree defined none of them, which is the whole reason 7 of the 8 vendored
+   components "could not be mounted" - they rendered unstyled, so the screens
+   were hand-written instead. Each mapping below is a name-for-name alias onto a
+   token the generated table already derives from the demo; the semantics being
+   aliased are the library's own, cited so nobody has to guess:
+     --green / --orange / --red        app/globals.css:49-54   (a hue + its tint)
+     --*-tint = the hue at ~0.14 alpha app/globals.css:96-101  (= our -soft rule,
+                                       which demo spells as /0.1 at styles.css:439)
+     --accent-tint                     app/globals.css:46, :94
+     --hover-2                         app/globals.css:27, :79
+     --shadow-hairline/raised/overlay  app/globals.css:65-69   (ring + elevation)
+   rounded-window is demo's own window radius, not the library's: 12px,
+   design/doubao/demo/styles.css:118. */
+:root {
+  --hover-2: var(--bg-overlay);
+  --green: var(--success);
+  --green-tint: var(--success-soft);
+  --orange: var(--warn);
+  --orange-tint: var(--warn-soft);
+  --red: var(--danger);
+  --red-tint: var(--danger-soft);
+  --accent-tint: var(--accent-soft);
+}
+
+/* The three elevation aliases go straight into Tailwind's --shadow-* namespace:
+   naming them in :root as well would make `--shadow-hairline: var(--shadow-hairline)`
+   a self-reference, which resolves to nothing. */
+@theme inline {
+  --shadow-hairline: 0 0 0 1px var(--border-hair);
+  --shadow-raised: 0 0 0 1px var(--border-hair), var(--shadow-card);
+  --shadow-overlay: 0 0 0 1px var(--border-hair), var(--shadow-pop);
+}
+
+@theme inline {
+  --color-green: var(--green);
+  --color-green-tint: var(--green-tint);
+  --color-orange: var(--orange);
+  --color-orange-tint: var(--orange-tint);
+  --color-red: var(--red);
+  --color-red-tint: var(--red-tint);
+  --color-accent-tint: var(--accent-tint);
+  --color-hover-2: var(--hover-2);
+  --radius-window: var(--r-xl);
+}
+
 /* The alias block above is theme-invariant on purpose: every line is var() over
    a key whose own value already flips with [data-theme="dark"]. A second copy
    of this list under [data-theme="light"] was the first generation's shape, and

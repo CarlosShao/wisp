@@ -31,6 +31,7 @@
    ============================================================================ */
 
 import { useState } from "react";
+import { Chip } from "@/components/ai-native/chip";
 
 /** The knob the frost reads. Kept as one name so nothing else can drift. */
 const ALPHA_VAR = "--panel-alpha";
@@ -104,9 +105,12 @@ export function ConfigScreen() {
               key={`${row.group}/${row.name}`}
             >
               <div className="min-w-0">
-                <div className="font-mono text-[12px] text-ink">
+                {/* The key label is a code value, so it is drawn by the library's
+                    own token chip rather than by a mono class I typed here
+                    (owner, 2026-09-25: "组件都按照真组件库的来"). */}
+                <Chip>
                   {row.group}.{row.name}
-                </div>
+                </Chip>
                 <div className="mt-0.5 text-[11px] text-ink-3">{row.desc}</div>
               </div>
               <div className="flex shrink-0 items-center gap-2">
