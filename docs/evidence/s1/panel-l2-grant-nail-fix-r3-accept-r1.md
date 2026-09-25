@@ -352,3 +352,94 @@ route the bytes through a same-package struct **or** to register the type in inb
 以为"换成 struct 就完事"，然后在第二道引信上多吃一枚红。修法是一行措辞：把 "or" 改成
 "and then"（或补一句"新目的地进了包就得进 `inboundTypeRegistry`，`:1560` 那枚引信会替你说"）。
 这一条**与"三枚/四枚"那处自纠同级**，属文档级、不改判据、不放宽断言。
+
+---
+
+## §6 攻点 6：门禁／名册／契约轴／断言尺 —— **四门全过，名册 +1/−0，契约轴零命中且正控活**
+
+### §6.1 三门（都在仓库工作树上跑，`internal/panel/` 全程干净）
+
+```
+gofmt -l internal/panel/     -> （空）rc=0
+go vet  ./internal/panel/    -> （空）rc=0
+sh scripts/d22scan.sh        -> rc=0（原文 out/d22scan-head.txt，取于 HEAD=f50c037）
+  d22scan: examined 225 production Go files under internal/ and cmd/
+  bans #1-5 internal/=203  cmd/=22 | ban #6 frontend/=46 | ban #7 internal/tools/=18
+  ban #8 design/=32  frontend/=46  internal/=407  cmd/=40
+  d22scan: clean - no D22 ban violations
+  runtests.sh: OK - packages=[./...] top-level: PASS=30 FAIL=0 SKIP=0, === RUN=70
+```
+
+⚠ 简报那句"`tools/d22scan` 是独立 module、别在根目录 `go vet ./tools/d22scan/`"**复算对**：
+`tools/d22scan/go.mod` 在 `git ls-files` 里；本程没有对它下过任何一条根目录尺。
+⚠ 简报那句"bans #1-5 不含 `_test.go`，只有 ban #8 含"也**复算对，我用文件枚数证的**：
+`git ls-files internal/ | grep '\.go$' | grep -vc '_test.go$'` = **203**（＝bans #1-5 的 internal/ 分母），
+`git ls-files internal/ | grep -c '\.go$'` = **407**（＝ban #8 的 internal/ 分母）。
+⇒ 本批改的恰好是一枚 `_test.go`，**这次改动只进 ban #8 那一枚分母**，实现件 §1.4 那句口径正确。
+另：`scripts/d22scan.sh:14-16` 逐字写明它的第一步＝`runtests.sh -C tools/d22scan ./...` 是**植入违规的正控**
+（"proves the gate CAN go red"），所以我这一发的 rc=0 不是"门是瞎的"那种绿。
+
+### §6.2 第四门：包体四数 ＋ 名册差集（两种口径都取运行输出，不取 `t.Skip`）
+
+| 台件 | 四数（`-count=1 -v`） | 红名 |
+|---|---|---|
+| 仓库工作树，锚点 `a5e1c8c`（`out/R-repo-head.txt`）| `RUN=99 TOPPASS=52 SUBPASS=46 FAIL=1 SKIP=0 ^panic:=0 distinct=99` | `TestC21DesignTokensFourWayAgree`（脏树机制，§4.1ⓑ） |
+| 我的 archive 副本（同钉、归一化，`out/A2-baseline-lf.txt`）| `RUN=99 TOPPASS=53 SUBPASS=46 FAIL=0 SKIP=0 ^panic:=0` | 无 |
+| 它交付那一版 `121006d` 的 archive 副本（`out/S-r3anchor-121006d.txt`）| 同上口径 | 2 枚 renderer（§4.1ⓐ）|
+
+```
+名册差集（简报要的 ^func Test 逐名对比，两枚版本都取 git show）：
+  单文件：81ad6fd^ 6 枚 -> 121006d 7 枚      diff = 7a8 > TestRealGuardRefusesEveryAssemblableApprovalRouteName
+  整包  ：git grep -h '^func Test' <rev> -- internal/panel/  -> 52 枚 -> 53 枚，diff 同上**一行**、删除侧**空**
+```
+
+**panic 那一格按简报要求明写**：两发都 `^panic:` = **0**，所以**没有**"一条用例 panic 吞掉同包其余几十条"的
+情况发生，上面那 99 条 `=== RUN` 是真取到的；我也**没有**用 `-run`/`-skip` 排除任何用例（`-run` 只在
+§1.3 那三发单点复算与 §2.2 的 `runtests.sh` 那两发里出现，且那两发的完整包体读数在同表另有整跑）。
+⇒ 实现件 §1.2 那句"名册 +1/−0、FAIL 改前后同值"**成立**（它那里 6→6 是 count=2、三枚红 ×2；我这里 1→1 是 count=1，
+换算同值）。
+
+### §6.3 契约轴（先证存在，再说零命中，同尺带正控）
+
+```
+本批自己的落点（逐枚 commit 现量，git show --numstat）：
+  81ad6fd  130  14  internal/panel/l2_grant_boundary_test.go        （show --name-only 只有这一枚路径）
+  121006d    3   2  internal/panel/l2_grant_boundary_test.go        （同上）
+  合并 81ad6fd^..121006d，把保护面一次性写进 pathspec：
+    git diff --numstat 81ad6fd^ 121006d -- internal/ frontend/ design/ cmd/ docs/PLAN.md docs/specs/ \
+        internal/risk/ internal/observe/thresholds.go internal/risk/rules_gateway.go \
+        tools/d22scan/allowlist.txt '*.sse' '*.go'
+      -> 只有一行： 131 14  internal/panel/l2_grant_boundary_test.go
+      ⇒ **正控就是这一行**（同一把尺、同一区间、指自己那枚文件，非空）
+先证存在（不是"找不到就当零命中"）：
+  git ls-files | grep -icE 'thresholds\.go$|allowlist\.txt$|rules_gateway\.go$'  -> 3（三枚逐名都在）
+  git ls-files | grep -c '\.sse$'                                                -> 52 枚 golden
+  git ls-files frontend | wc -l -> 46   design -> 30   internal/risk -> 37   cmd/wisp -> 35   docs/specs -> 14
+```
+
+⇒ `cmd/wisp/**`（143 那程在写）**存在且本批零命中**，`git status --porcelain -- cmd/wisp/` 亦空（它的活已入库）。
+**生产码零字节**：`internal/panel/bridge.go` 在我副本里每发变异之后复算，
+`git hash-object` 全程 `d2cd6362…`（副本被 `restore` 之后再次现量仍为该值）。
+
+### §6.4 断言尺（我自己的正则，两版都从 `git show` 取，不取工作树）
+
+```
+                A(81ad6fd^)  B(121006d)  delta
+t.Fatalf(            31          33        +2
+t.Fatal(              5           5        +0
+t.Errorf(            38          40        +2
+t.Error(              2           1        -1     <- 唯一那枚减少
+t.Logf(              14          15        +1
+t.Skip                0           0        +0
+func Test(            6           7        +1
+assertions(总)       76          79        +3
+行数               1964        2081
+```
+
+⇒ 与实现件 §1.5 **逐格同值**（我原本用一枚写坏的正则数过一次 `t.Fatalf`＝0，发现是自己的式子错了，
+换成 `t\.Fatalf\(` 才是上面这行——**这条自纠写在这里免得下游把这格当成对它的复算不符**）。
+**那 3 行是"挪"不是"删"**，凭三条现量：① 全局减少的恰好只有 `t.Error` 一枚，枚数与 §2.1 植物 F 块内
+`5 → 4` 对得上；② `81ad6fd` 的 14 枚删除行我逐枚看过（10 枚注释 ＋ 1 枚 `t.Logf` 改写 ＋ 3 枚那句
+`if knownComposerMethod("panel.review.allow") / t.Error / }`），**它 §1.5 那句"11＋3＝14、没有第 15 枚删除"
+逐字对**；③ 那句谓词在交付态仍然会红，且红在新测试 `:1310`——我在自己的副本上把 M14 打进去量到了
+（§3 T-B）。**判：挪判据，可以**。
