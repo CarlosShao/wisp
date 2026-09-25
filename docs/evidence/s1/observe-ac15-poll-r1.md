@@ -464,3 +464,35 @@ sampler_settle_zerosample_136_test.go:43 :140                  （2 枚腿 / 2 �
 ⇒ 形状结论不变：**家族 13 枚腿／15 处守卫／14 个窗，本程包 12 枚腿／13 个窗**；
 ⇒ 但**行号只有这一张表的算本程读过盘**，§7.6 那张按 §4/§5 时的记忆写，其中三行不成立。
 这一处属派单"只引自己读过的版本"的同一条规矩，自逮自报。
+
+---
+
+## 8. 交件态复核（在提交后的 HEAD 上重跑，不是引用 §6 的旧日志）
+
+```
+$ date "+%Y-%m-%d %H:%M %z"
+2026-09-25 09:5x +0800
+$ git log -1 --format='%h'                     ← 本程最后一枚证据 commit 之后
+$ git diff --name-only <stability-pin>..HEAD -- internal/observe/
+(空)   ⇒ §6 那两批稳定性读数跑的就是交件态的码，本程在其后只追加过本文件
+```
+
+| 检查 | 读数 |
+|---|---|
+| `go vet ./internal/observe/` | rc **0** |
+| `gofmt -l internal/observe/` | **空** |
+| `go test ./internal/observe/ -count=2 -v`（HEAD，工作树） | **142 / 142 / 0 / 0**，`^panic:` **0**，包时 6.885s（`-count=2` 两遍合计） |
+| `d22scan` 真扫（`go run . -root .`） | **clean - no D22 ban violations**；`ban #8 internal/ examined 407 Go files, comments and _test.go included`（406→407 是别家新增的 `internal/panel/l2_grant_boundary_test.go`，与本程无关） |
+| `scripts/d22scan.sh` 全形 | **仍未跑通**（正控那发被 `tools/d22scan/scan_test.go:1197` 的 build failure 挡住，`set -eu` 使真扫不执行）。这是别家地界的在飞态，本程不修、不洗，只把两味分开报 |
+| 票 136 勾数 | **7 勾／8 未勾**，`AC#15` 在 `:348` 仍 `[ ]`；`git status --porcelain -- .scratch/` 空 |
+| 本程写过的路径 | 只有 `docs/evidence/s1/observe-ac15-poll-r1.md` ＋ 6 枚 `internal/observe/**_test.go`（每枚 commit 前 `git diff --cached --name-only` 核过，逐枚 `git show --name-only` 可复算） |
+
+### 8.1 负载标签里那一枚含糊，按含糊报
+
+§6.2 那两批逐发扫的争用名单里，A-pre 有 **2 发**、A-post 有 **1 发**印 `foreign=go:1`。
+这**不一定**是别家：`go test` 返回后它派生的 `go.exe`/`link.exe` 会多活一瞬间，而扫描发生在
+**上一发返回之后、下一发发出之前**那个缝里。两批都各有一发 `foreign=`（空）夹在旁边、包时同带
+（3.447-3.580s），所以这 3 发**没有证据是争用**，也没有证据不是。
+⇒ 处置：**不剔发、不重跑、不改标签**，按"净窗内、3 发的 `go:1` 身份未定"报。
+⇒ 顺带一条给下一位修仪器的人：要把这一味钉死，扫描得带 pid 与启动时刻并按父进程链排除自己，
+本程没有那枚仪器，所以没有那个结论。
