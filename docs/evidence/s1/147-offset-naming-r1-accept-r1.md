@@ -359,5 +359,148 @@ CASE nested-then-break        len=45   state=unwritten offset=45
 
 ---
 
+## 3　实现方报回来的四件，逐件独立重走
+
+### 3.1　同族第二发落在 `corrupt` 那一支（它没修，说出界了）
+
+**它说的**：39 字节 `{"mode":"subject-in-tree",,"pass":true}`（错在第 25 字节附近）仍印 `at offset 0`；
+并推翻票 144 验收件那句"corrupt 分支也报 0"的旁读。
+
+**本程自己的探针（21 发 corrupt-ish 形状，`/tmp/wisp147-corr`，与被验版本同一棵树）**：
+
+```
+fixture length = 1978 bytes
+all-prefix state census (0..len inclusive) = map[complete:1 unwritten:1978]     <- 票面"现量的形状"第 2 条复算相符
+corrupt offsets among fixture prefixes = map[]                                   <- 前缀里没有一枚走 corrupt
+
+CASE double-comma-39B   len=39  state=corrupt offset=0
+   summary "39 bytes read, report corrupt: 39 bytes contradict a subject report at offset 0: invalid character ',' looking for beginning of object key string"
+CASE html-head          len=25  state=corrupt offset=0
+CASE trunc40-plus-0xff  len=41  state=corrupt offset=0   ("invalid character '\xff' after object key")
+CASE wrong-type         len=42  state=corrupt offset=42
+CASE two-documents      len=3956 state=corrupt offset=1978
+CASE empty-object       len=2   state=corrupt offset=2   summary 里根本没有 offset 这个词
+CENSUS over 21 corrupt-ish shapes: prints-no-offset=2  prints-offset-0=9  prints-a-position=10
+```
+
+它的探针我**也拿来在本程重跑了一遍**（`git show e572aa94:.scratch/wisp/probes/147/zz147probe_windows_test.go`
+放进快照）：`corrupt 43/39/13/2003/57/2 → obs.offset = 0/0/13/1978/57/2` ⇒ **它那六个取值逐枚复现**。
+`TestP147DoesMinusOneEverPrint` 同样复现（三支 note 都不含 `-1`）。
+
+**这一发今天响不响？——不响。这是本程造的尺，不是它的**：
+
+```
+B14  corrupt 支的 obs.offset 强制成常量 0（把 :649 的 dec.InputOffset() 换成 0）
+     rc=0  RUN=17 TOPPASS=10 TOPFAIL=0  三枚新用例全绿、144 那 7 枚全绿        <- 打不红
+B15  complete 支的 obs.offset 强制成常量 0（对照，证明这把尺不是整把坏）
+     rc=1  TestSLO147OffsetSemanticsRenderThreeDifferentSentences RED
+          :509 complete sentence "1978 bytes read, complete document at offset 0" does not name 1978 bytes and offset 1978
+```
+
+⇒ 三条腿里 **`unwritten` 有牙、`complete` 有牙、`corrupt` 零牙**：把 corrupt 的取值换成常量 0，
+本仓没有任何一条断言会变红。B14 与 B15 的对照就是凭据。
+
+**ⓐ 的字段注释算不算把它说圆了？——不算。** 两处：
+1. **它给的规则与读数不符**。注释写 "on reportCorrupt it is the decoder's own answer,
+   **which is 0 whenever it could not begin reading a value at all**"。本程实测有两发 **offset 是 0，
+   但解码器显然已经开始读一个值**：`double-comma-39B`（已在 object 内、已读完一个 key，错在等下一个 key）、
+   `trunc40-plus-0xff`（`invalid character '\xff' after object key`）。⇒ 那句 "whenever" 是一条**不成立的规律**，
+   而它的存在正好会让下一位把"印 0"读成"什么都没到"——**这就是本票成立的理由，换了条腿又长回来一次**。
+2. **它把承诺写进了一句没有仪器的话里**。票面明写"不许用'注释留着、字段以后再说'来收"、
+   并点名"注释预先承诺尚未产出的行为"在本仓有名字。`corrupt` 这一味今天**零仪器**（B14），
+   所以这句注释今天的地位与 `A258④` 那条"绑了但没牙"的条件相同。
+
+⇒ **"要不要为这一发单开一票"的建议（决定权在编排者，本程未开票、未动票面框）**：**建议开一枚**。
+射程建议三味，缺一枚就还会留同族第三发：
+① `corrupt` 支的 offset（要么像 ⓐ 那样填成有位置的信息、要么把 `%d bytes contradict … at offset %d`
+那半句改成它真做到的，并配一枚会响的检——即 `B14` 摘不掉的那一发）；
+② 上面那句 `whenever` 注释，改成读数支持的形状或删掉那半句；
+③ `B13`（loop 的 `s.exited()` 那支丢掉 `last.summary()`，全组 0 红，见 §1.4）——同一枚 `summary()` 的
+第二个调用点，今天两票都没钉，与①同属"到点句里的位置信息"，放一起最省一枚票。
+**来源归属**：②③ 是本程造的（实现件 §6 只说了 corrupt 文本没修，没量到 ③，也没量到那句 `whenever` 与读数不符）。
+
+**本格判定：它自述的三条读数（39 字节印 0／推翻"corrupt 也恒 0"／在射程外）全部复算成立；
+"在射程外所以没修"接受为边界、不接受为收口——建议单开一票，见上。**
+
+### 3.2　AC#3 的枚数：三处 vs 四处文本＋一枚标题
+
+```
+$ git diff -w --numstat a91d7c2^ a91d7c2
+31     2       cmd/wisp/slo_report_144_windows_test.go     <- 与编排者本轮另一程独立量到的同一个数相符
+$ git log -1 --format='%H %s' a91d7c2
+a91d7c2d… fix(144 AC#4): 前一程留下的测试文件不是 gofmt/clean —— 复量与票面不符，只改对齐   <- 标题句仍在，未被改写
+```
+
+append-only 复核（**原句一字不许抹**）：
+
+```
+$ git show --numstat 1f3ede9 -- .scratch/wisp/issues/144-….md docs/evidence/s1/144-slo-report-partial-read-r1.md
+23     0       .scratch/wisp/issues/144-….md
+12     0       docs/evidence/s1/144-slo-report-partial-read-r1.md
+$ git show 1f3ede9 -- <那两枚> | grep -cE '^-[^-]'      ->  0     <- 删除行数 0，两枚都是纯追加
+
+原句仍在位（被验版本上逐枚 grep）：
+  144 票面 :189  "改动只有空白（前后两版 `diff -w` 逐字相同）。"                        <- 未抹
+  144 票面 :283  "…唯一一次代码面改动是 `a91d7c2` 那枚 `gofumpt -w`，只有空白"           <- 未抹
+       （票面与实现件都写 ":260"，本程现量在 :283 ⇒ 差 23 ＝ 那 23 行纯追加正好插在它前面，
+        算得出、可复算。**别人给的行号也是读数**，两处都按 sha 重取过。）
+  144 证据件 :375 "**改动只有空白**——改前后两版 `diff -w` 逐字相同，断言、预算、Skip 一个没动"  <- 未抹
+  追加的更正：144 票面 :236 起（`>` 逐字引 :189 与 :260 两处）、144 证据件 :378 起；`>` 行数现量 9／12。
+  a91d7c2 的标题：已推送 ⇒ 只登记不改写（实现件 §3.2 末行），符合 AGENTS.md §1.4。
+```
+
+⇒ **枚数：票面少计，实现方把数数对了、把名字叫错了。本程现量（`git grep -n "只有空白" e572aa94` 全仓逐枚点名）**：
+**作为自述**存在"只有空白"这句话的落点是 **三处文本＋一枚标题＝四处落点**——
+`144 票面 :189`、`144 票面 :260`（现量 :283）、`144 证据件 :375`、`a91d7c2` 的标题"只改对齐"。
+其余含这五个字的行本程逐枚看过，**都不是又一处自述**：
+`:236`/`:238`/`:239`/`:378` 是本次追加的更正与 `>` 引文；
+`144-…-accept-r1.md:25`/`:497`/`:508`/`:511` 是**非实现者引用它自述为假**；
+`144-slo-report-partial-read-r1.md:141`「| 0 字节 / 只有空白 |」是状态表的一行，与 `a91d7c2` 无关。
+⇒ 实现件 §3.2 的**表**（四行）与本程现量**逐枚相符**，动作也没多做也没少做；
+它的**标题句**"现量是四处文本＋一枚标题"（共五枚）**比它自己的表多一枚**——正确说法是"四处落点（三处文本＋一枚标题）"。
+⚠ **这一味编排者也照抄了**（派单第 3 节第 2 件写作"四处文本＋一枚 commit 标题"）⇒ 记进第 6 格，
+`A264` 台账那一句如需更正由编排者定，本程不动票面、不动台账。
+**本格判定：成立（附条件：落点数对、标签多算一枚，纯文字不影响收口）。**
+
+### 3.3　"两处 `offset: -1`" 实为四处，且 `-1` 从不进被打印的句子
+
+```
+$ git show e572aa94:cmd/wisp/slo_windows.go | grep -n "offset: -1"
+631:  obs := subjectReportRead{bytes: len(data), offset: -1}
+705:  last := subjectReportRead{state: reportUnwritten, offset: -1, note: "nothing read yet"}
+711:          obs = subjectReportRead{state: reportUnwritten, offset: -1, note: "no report file yet"}
+716:          obs = subjectReportRead{state: reportUnwritten, offset: -1, note: fmt.Sprintf("report file unreadable: %v", err)}
+枚数 = 4      <- 实现方的"实为四处"复算成立；票面"另外两处"少计两枚（它点名的是 :705/:711 那两支）
+```
+
+"`-1` 从不进被打印的句子"本程**没有只信它的探针**，另造了两发：
+`B2`（只删 `:646` 的填充）实测让 `at offset -1` **第一次印出来**并被 case 9／case 10 双双抓住
+（`:467`／`:500` 两句原文在 §1.4 表里）⇒ 这条承诺是**可打红的**，不是永远绿；
+`B6`（关掉 note 支）⇒ 只有 case 10 红 ⇒ "不外印"这一味由 case 10 单独守着。
+**本格判定：成立。**
+
+### 3.4　锚点中途被推走：它进场 `80fa0551`，真实父 `ae968f9`，中间三枚零代码
+
+```
+$ git log --oneline 80fa0551..ae968f9
+ae968f9e ticket(146 -done): 结线改名——5 枚 AC 框全 [x]、两张非实现者表在 docs/evidence/s1/、真未勾 0 枚
+9ca50691 docs(台账 A263): 59 枚这一推红名集合动过零枚、分母涨 16 枚且逐枚归到 144/146；slo-full 今天第一次拒采
+c3a51e68 docs(台账 A262): 59 枚一次批量推到两边（同停 80fa0551）；三枚前端会话的活逐枚点名不隐身
+
+$ git show --name-only --format='COMMIT %h %s' 80fa0551..ae968f9
+ae968f9e  .scratch/wisp/issues/146-liveapprovals-…-done.md          <- 146 结线改名
+9ca50691  docs/reports/pending-and-issues.md                        <- 台账
+c3a51e68  docs/reports/pending-and-issues.md                        <- 台账
+
+$ git diff --name-only 80fa0551 ae968f9 | grep -E '\.(go|ps1|sh)$|golden|thresholds'
+   （空 ⇒ 三枚里零代码，与它自述相符）
+```
+
+路径自核的另一半（三枚 147 commit 没有一枚含派单之外的路径）已在 **§0.4** 现量：**成立**。
+另记：本程自己的锚点也被推走过一次（`f77a003` 台账 `A264`，见 §0.5），被验版本不变。
+**本格判定：成立。**
+
+---
+
 
 ---
