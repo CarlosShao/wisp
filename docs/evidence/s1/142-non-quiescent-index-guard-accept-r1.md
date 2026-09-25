@@ -49,13 +49,12 @@ $ git log --oneline cd87354..HEAD -- tools/d22scan
 | 路径 | 是什么 | 现量 |
 |---|---|---|
 | `tools/d22scan/` | `git archive cd87354 tools/d22scan \| tar -x` 的 pristine 基座；三枚 .go 与工作树 `cmp` 逐字节相同 | `cmp` 三枚全 IDENTICAL |
-| `mut-accept/{M-A-no-guard,M-B-seam-ignored,M-C-merge-strays,M-D-plain-join}` | 复算实现方那四发变异（**我自己的脚本** `battery-accept.py`，不复用它的 `D:\tmp\ticket-142`） | 每枚一份 `.log` |
-| `mut-accept/{S-1-cap-raised,S-2-no-quote,S-2b-no-quote,S-3-no-sort,S-4-runGitIndex-bypasses-guard,S-5-reversed-subset-check}` | 本程自己加的单点回退／方向变异 | 同上 |
-| `mut-accept/{AR-1,AR-3,AR-4,AR-5}` | 本程自己加的"控制块到底有没有牙"变异 | 同上 |
-| `snap-head/` `snap-old/` | `git archive cd87354`／`1b98c7b` 全量纯净快照（无 `.git`），各跑 `runtests.sh`＋`scripts/d22scan.sh` | `gate.log` `scan.log` `roster.txt` |
+| `mut-accept/`（**现量 23 枚子目录**，每枚一份同名 `.log`） | 台件全集：**复算实现方那四枚** `M-A-no-guard`／`M-B-seam-ignored`／`M-C-merge-strays`／`M-D-plain-join`（脚本 `battery-accept.py`，**不复用**它的 `D:\tmp\ticket-142`）；**本程自造单点回退／方向变异** `S-1-cap-raised`／`S-2-no-quote`(废)／`S-2b-no-quote`／`S-3-no-sort`／`S-4-runGitIndex-bypasses-guard`／`S-5-reversed-subset-check`／`S-6a-spawn-order-swapped`／`S-7-narrow-failure-swallowed`／`S-8-full-failure-swallowed`／`S-9-seed-without-force-add`／`S-9b-no-rule-in-the-seed`(废)／`S-9b2-no-rule-in-the-seed`／`S-9c-read1-after-commit`／`S-10-runGitIndex-injected-refusal`；**"控制块到底有没有牙"** `AR-1-always-refuse`／`AR-2-always-refuse-no-block3`(废)／`AR-3-always-refuse-block3-removed`／`AR-4-rules-dead`／`AR-5-rules-dead-block4-removed`。标(废)的三枚是我自己台件编译不过（`§10` 第 14 项），**不计入 20 枚有效** | 每枚一份 `.log`；红行枚数见 §2/§3/§4/§6 |
+| `snap-head/` `snap-old/` | `git archive cd87354`／`1b98c7b` 全量纯净快照（无 `.git`），各跑 `runtests.sh`＋`scripts/d22scan.sh`（脚本 `snap-gate.sh`） | `gate.log` `scan.log` `roster.txt` |
 | `snap-skip/` | `snap-head` 的拷贝，真植一枚 `t.Skip` 当尺子的正控 | `skip-gate.log` |
-| `ab/{head-code,old-code}` | 仓外两版码，`go run . -root <仓库>` 打同一枚工作树（A/B 与稳定性） | `*.digest` `ab.diff` |
-| `shim/` | 本程自造的 `git` PATH shim（`bin/git.exe`）＋一发**端到端探针**（§1.3），跑在 `cd87354` 与 S-4 两版码上 | `delivered.log` `s4.log` |
+| `ab/{head-code,old-code}` | 仓外两版码，`go run . -root <仓库>` 打同一枚工作树（A/B 与稳定性，脚本 `ab-worktree.sh`） | `*.digest` `ab.diff` |
+| `shim/` | 本程自造的 `git` PATH shim（`bin/git.exe`，源在 `cmd/gitshim/`）＋一发**端到端探针**（`probe/zz_shim_probe_test.go`，跑在 `shim/delivered` 与 `shim/s4` 两版码上；脚本 `run-probe.sh`） | `delivered.log` `s4.log` |
+| `linux-leg.sh` ＋ `sec{6,7,8,9}.md` | 容器那一发的挂卷证明脚本（§8.4）；四段正文的草稿（写正文时为了避免 shell 吞反斜杠才落盘，见 §10 第 12 项那次教训） | `D:\tmp\accept142\` 根下 |
 
 `git archive` 出来的快照里 `.git` 不存在（现量 `NO .git (pure snapshot)`），这是 AC#4 指名要的形态。
 
