@@ -888,6 +888,79 @@ no view state in the nav layer`）。批量脚本第一遍记 `render:l2 rc=2` �
 他改的那枚步名 `6291dc7` 我解过：`ci.yml:645` 现名确为
 `L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)`。
 
+## 47. F3：`PLAN.md:3473-3488` 十四态逐行盘点（13:1x）
+
+只读盘点程跑的（`未改文件、未跑构建/测试`），**三条承重结论我自己复量过原文**（下列标 ✅ 的）。
+尺＝`:3473-3488` 那张表 ＋ `:3490-3494` 那段 D32 规矩。
+
+### 47.1 十四行的判定（一行不省）
+
+| 行 | 状态 | 判定 | 一条依据 |
+|---|---|---|---|
+| 1 | 思考中 | **缺** | 挂载侧 `grep 思考` 零命中；`loading-state.tsx` 有实时计时但**没挂**，且配的是像素格 loader |
+| 2 | SSE 流式 | **部分**（缺 1 条） | 逐段＋光标已合规（§44 那格）；**右下角实时 token 计数**零落点，`ResultChunkView` 也没有 token 字段 |
+| 3 | 推理过程 | **缺** | `grep 推理` 零命中；`thinking.tsx` 有左侧 1px 竖线但没挂、且展开时长是 400ms 不是尺上的 180ms |
+| 4 | 工具调用 | **缺** | 无 tool-call 条目、无状态四值。子件里只有"徽标 1px 描边不填实底"已合规（`l2-approval-card.tsx` 的 `LevelBadge`） |
+| 5 | 工具调用（展开） | **缺** | 唯一现成的展开块是 L2 卡的 argv；⚠ 若行 5 落地时复用它，`JSON.stringify` 那行会**一字不差**撞 ❌"直接 dump 未着色 JSON" |
+| 6 | 审批等待（L2） | **矛盾 ＋ 部分** ✅ | 见 47.2 第一条 |
+| 7 | L2 确认卡（面板内） | **已有**（14 行里唯一基本齐的） | 9 条视觉＋1 条动效＋1 条禁令逐条对上；❌"面板上的允许按钮"硬：两处 `send` 传的都是 `"refuse"` |
+| 8 | L1 阻止窗口 | **缺** ＋ 一条待裁决 | 无倒计时/KWS 落点；⚠ 卡对 `pending` 一视同仁不看 `level`——若 L1 被塞进 pending，会被画成 L2 强确认卡（红条＋"需要你的确认"） |
+| 9 | L2 原生降级卡 | **缺，且不属前端** | 原生 Direct2D 侧；该行**要求有**"允许"按钮（允许权在原生），与行 7 的禁令不冲突——别混 |
+| 10 | 错误 | **缺** ＋ 一条独立缺陷 ✅ | 见 47.2 第二条 |
+| 11 | Stuck | **缺** | 无重复计数字段；`refresh-cw` 从未 import |
+| 12 | 成本 | **缺**，三条禁令全合规 ✅ | 无 token/金额字段；`tabular-nums` 挂载侧**零命中**；全树无进度条；emoji 全树零命中 |
+| 13 | 已取消/被打断 | **缺** | `ResultChunkView.done` 是"写完了"，**不表达被取消** |
+| 14 | 注入检出 | **部分 ＋ 矛盾** ✅ | 见 47.2 第三条 |
+
+**"缺"的理由不是"组件没写"**：`internal/panel/composer.go:44-49` 的快照只有
+`pending/results/composer/generatedAt` 四字段，与 `lib/panel.ts:129-137` 逐键对齐 ⇒
+14 行里 **11 行的输入在契约面上不存在**，做了就是造假数据（owner P9 红线最后一句）。
+这一条正是 `App.tsx` 里 `UnfedScreen` 那枚人话空态存在的原因。
+
+### 47.2 三条**真挂载**的冲突（我逐枚读过原文，不是代理转述）
+
+1. **审批等待的"等待确认"标签在跑一条无限循环动画。**
+   `ai-native/shimmer.tsx:38` ＝ `animation: "shimmer-text 1.4s linear infinite"`，
+   经 `panel-skeleton.tsx:21` import、`:50` 真挂载 ⇒ 面板开着且有 pending 卡时**永不停**。
+   撞 `PLAN.md:3480` 的动效栏"脉冲**只跑一次**（2s，然后静止）"与 ❌ 第一格"无限循环脉冲
+   （视觉噪音 ＋ 违背 D32 的 CPU 约束）"。
+   ⚠ 两点限定：形式上它是文字渐变横扫、不是 `box-shadow` 扩散，所以**是否算字面撞 ❌ 要人裁**；
+   但"只跑一次然后静止"这半句是**明确被违反**的——没有任何一次性机制。
+   另：`PLAN.md:3491` 把"审批等待"列进允许循环动画的非空闲态，所以**宽尺放行、严尺撞**，
+   按本项目"取更严那份"的既有口径处理。
+   ⚠ 修法不自作：`shimmer.tsx` 是 **vendored**，手改会被下一次 re-vendor 静默复原（§44.2 那条教训）；
+   而把它**摘掉挂载**会撞另一枚门——`TestVendoredDemoComponentsAreNotMounted` 断言
+   `len(mounted) > 0`（"这库是基座"的前提），届时 mounted 归零。⇒ 三个选项都在桌上，**要一个字的决定**。
+2. **附件报错被静默吞掉。** `composer.tsx:63` 把 `onUserError` 定成可选 prop、`:92` 调用它，
+   而 `App.tsx` **一处都没传** ⇒ `sendAttachmentBytes`／`requestWorkspaceChange` 在无宿主时抛的那句
+   （`panel.ts:213-217`）被 catch 之后**屏上什么都不显示**。
+   这不是 ❌"暴露 stack trace"也不是 ❌"只说出错了"，是**第三种**：什么都没说。
+   同一组件里 `send()` 走 `sendMessage` 且不套 try，那条抛的是未捕获异常——两半行为不一致。
+3. **C25 那句提示不指明来源。** `l2-approval-card.tsx:216-220` 写
+   "本调用带 C25 污染标记，会话级授权对它无效。"——而 `PLAN.md:3488` 要求
+   「本次操作包含来自 `<url>` 的内容」**必须指明来源**，❌ 第一格正是
+   "只说检测到风险（用户无法判断是不是误报）"。**撞。**
+   ⚠ 但"改成一句带 URL 的话"前端做不到：`ApprovalCardView`（`lib/panel.ts:24-47`）
+   **没有任何承载来源 URL 或命中片段的字段**。所以这一条与 §46.1 的 R4 那格是**同一枚堵点**：
+   契约面缺字段，改文案就是编数据。（我上一轮为 §45.7 收到过同一条纠正，这次别再犯一遍。）
+
+### 47.3 一条"坏了但没人看见"的附带事实，会影响后面所有 vendored 决策
+
+全树 `@keyframes` 只有 6 枚（`theme.css:171/175/179/183/212/229`）。而 `thinking.tsx`、
+`task-rows.tsx`、`loading-state.tsx` 里那几枚 `animation: "spin …"`／`"pixel-on …"`
+**引用的动画名从来没被定义过**。⇒ 今天"转圈 spinner 被搬上屏"最坏情况**不可能发生**；
+但**补一枚 `@keyframes spin` 就会同时复活三枚**（三格里两枚是 ❌ 名单上的）。
+`--color-green` / `--color-red` / `--color-red-tint` 同理：类名在 vendored 文件里用着，
+`theme.css` 的 `@theme inline` 里**没有对应定义** ⇒ 挂上也是空解析。
+
+### 47.4 我没量到的（不假装量过）
+
+屏上真实像素一律未量（本轮零开窗）；行 7 那枚 2px `--danger` 横条在真玻璃背景上看不看得见
+＝15:00 那格的差分截屏才能答。行 8/9 到底归不归前端**未终定**（我只读了 `approval/ui.go` 的头，
+没量"L1 那一行由谁画"）。`sessionOverrideBlocked=true` 与 L0/L1 上卡的真数据形状**没拿到**——
+唯一 fixture 是 R1/R8、`false`、reason 里没有 URL。`PLAN.md:3493`"面板关闭后不得有动画在跑"
+只证到"前端没做门控"，证不到关闭后是否还在跑（票 33 的宿主还没接）。
+
 两枚 commit：`d6c52ef`（8 枚路径，全在 `frontend/`）、`a21336e`（2 枚路径）。
 `git status --porcelain -- frontend/` 交件时为空。未 push。未碰 `internal/**`、`cmd/**`、
 `tools/d22scan/**`、`allowlist.txt`、`docs/PLAN.md`、`docs/specs/**`、`design/**`、`embed.go`。
