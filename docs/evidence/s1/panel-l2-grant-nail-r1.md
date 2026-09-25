@@ -355,8 +355,28 @@ FAIL 的 2 行不属本件（`A208③` P1 刻意留红）。
   `bans #1-5 internal/=203 cmd/=22 / #6 frontend/=40 / #7 internal/tools/=18 /
    #8 design/=30 frontend/=40 cmd/=39`）。谁再拿 `405`/`406` 当"不该变"的对照，那是分母进了新文件，不是回归。
 
-- **§3.2 那枚真树变异，事后回看还有第三个用途**：它同时是**"本包旧仪器接不住这个形状"的正证**。
-  变异跑完之后，红着的只有我新加的 4 枚 + 那枚本就红的 `TestC21DesignTokensFourWayAgree`；
-  `internal/panel` 里**先存在的 46 枚测试一枚都没红**——包括白名单了 `panel.approval.request` 的
-  `TestTheRendererHoldsExactlyOneDoorToTheHost`、与 `TestComposerEnvelopeAcceptsItsFourRequests`。
-  ⇒ 换句话说：给面板开一扇送字上门的门，在这个包里**今天只有本件会叫**。
+- **§3.2 那枚真树变异，事后回看还有第三个用途**：它同时是**"本包旧仪器接不住这个形状"的正证**，
+  现量到枚数级（`grep -h -o '^func Test' internal/panel/*_test.go | sort -u` = **51 枚**，减本件 5 枚 =
+  **先存在 46 枚**）：变异跑完全包顶层红 = 5 枚，逐名对上——
+
+```
+--- FAIL: TestAnsweredPanelRoutesCarryNoApprovalDecision   （本件）
+--- FAIL: TestNoInboundEnvelopeCanBindAnApprovalVerdict    （本件）
+--- FAIL: TestGrantWireShapesAreRefusedAtTheDoor           （本件）
+--- FAIL: TestPlantedGrantWiringGoesRedInASnapshot         （本件）
+--- FAIL: TestC21DesignTokensFourWayAgree                  （先存在，但它在变异之前就已红：A208③ P1）
+```
+
+  ⇒ **因这枚变异而变红的先存在测试 = 0 枚**；先存在那 46 枚里唯一红的 C21 是"改前改后都红"的那枚留红，
+  与本形状无因果。包括白名单了 `panel.approval.request` 的
+  `TestTheRendererHoldsExactlyOneDoorToTheHost`、以及把 `{outcome:"grant"}` 当 extra 塞进合法方法的
+  `TestComposerEnvelopeAcceptsItsFourRequests`，**都不响**。
+  ⇒ 换句话说：给面板开一扇送字上门的门，今天这个包里**只有本件会叫**。（本句口径修正记录见 §8。）
+
+## §8 本件自己的措辞更正（追加，不回删上一节的原句）
+
+§7 上一版我把那条正证写成"先存在的 46 枚测试**一枚都没红**"。**不准确**：
+变异那次跑的顶层红一共 5 枚，其中 1 枚（`TestC21DesignTokensFourWayAgree`）是先存在的测试，
+它只是**改前就已经红**（A208③ P1 那枚刻意留的红），不是这枚变异打红的。
+⇒ 现量口径改成两句可复算的：**先存在 46 枚 / 因变异而红的先存在测试 0 枚**（逐名清单见 §7 那块代码）。
+性质不变，措辞从"一枚都没红"收窄成"没有一枚是因它而红"——前一句读起来像"C21 也绿了"，那是假的。
