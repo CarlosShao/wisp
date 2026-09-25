@@ -260,3 +260,43 @@ S-4-runGitIndex-bypasses-guard   PASS     redlines=0        # Windows，go test 
 本程量到的更准确的撤净口令是：**撤那 6 行 ⇒ 用例红 14 条（M-A）；只撤 seam ⇒ 红 3 条（M-B）；
 两处都撤干净（回到 `1b98c7b` 的码）⇒ `scan_test.go` 里 `buildGitIndexState` 三处引用直接编译不过**。
 它给的那句留作读者口令够用，但**别把它当判据抄进下一张票**。
+
+---
+
+## 4. AC#2 —— "只许一个方向"：实现对了，但"别的形状谁挡"要分四支写清
+
+它实现的是：`narrow ⊄ full` ⇒ `gitIndexUnavailable(...)` ⇒ 一条 ignore 规则都不应用、全扫、走 `note()` 第一行。
+这一支**票面钦定的四禁全部没碰**（没重试、没锁、没"比较后任选一枚读数"、没豁免名单、没把方向反过来）：
+`buildGitIndexState` 里那 6 行只做一件事——返回 `ok=false`；`git diff 1b98c7b..cd87354 -- tools/d22scan/gitignore.go`
+里没有任何 `for` 重试、没有 `sync.`、没有新表。它举的"问到了但两个答案对不上＝问不到"这条类比
+（`ca84b75` 的既定失败方向）我对着 `note()` 的现文核过：撕裂态与"没有 .git"走的是**同一枚**首行机制
+（`gitignore.go:531-534` 那一支），§1.3 端到端探针量到的第一行与快照里那一行同前缀，只差 `why` 内容。
+
+### 4.1 反方向（全量里有、窄查里没有）：今天有人挡，且挡的是"不许响"
+
+窄查本来就是全量上的一个过滤器，所以这一方向**绝大多数时候都在发生**（每一枚未被规则盖住的 tracked 文件都是）。
+挡它不许响的是三处断言：块 3（`:1768` 静止对必须 `ok=true`，`t.Fatalf`）、块 5 的前提（`:1812` 静止扫描必须 `examined==4`）、
+块 5a（`:1860` 生产那扇门在静止树必须给回可信状态）。**我把反方向真造出来量了一遍**：
+`S-5-reversed-subset-check`（把 `straysOutsideTheFullRead` 的差集方向掉个头＝"全量里窄查没有的"也算 stray）⇒
+
+```
+S-5 reversed check: FAIL redlines=2
+    scan_test.go:1752: the refusal must name "frontend/dist/assets/shipped.tsx", got "the git index changed between the two …"
+    scan_test.go:1769: a quiescent pair was refused (…) - the subset check fires on more than the race and every real scan would lose its ignore filter
+```
+
+⇒ 反方向**有人挡**，且 `:1769` 那一枚正是为它立的牌位（它在静止树上就红，不用等到撕裂树）。
+
+### 4.2 第三种形状（本票没碰、票面也没要求）：三枚我自己造出来，逐支说"该不该挡"
+
+| 形状 | 我的变异 | 读数 | 该不该挡 |
+|---|---|---|---|
+| 两枚 spawn **先后顺序**被换（窄读在前、全量在后 ⇒ 窄是旧树、全量是新树） | `S-6a-spawn-order-swapped`（整包跑） | `PASS=24 FAILset=[]`，与基座**一模一样**（基座同形态 `PASS=24 FAILset=[] SKIP=6`）⇒ **今天没人挡** | **不该为它开 AC**：这一支伤不到少扫那一侧——`dirs` 与 `tracked` 由**更新的**那枚全量喂，能持住的路径只多不少 ⇒ 方向仍是多扫。要写的是注释，不是断言：`gitignore.go:119-129` 那第三枚 bullet 现在只登记了"窗口里那枚 commit 只加了不匹配任何规则的路径"这一族残余，"两读顺序反过来也是同一族（子集不破 ⇒ 检查看不见）"没写。⇒ 记进 §9 的 F-142-3（措辞级、不阻塞本票） |
+| 全读失败被吞（`all=""` 继续装配） | `S-8-full-failure-swallowed` | `PASS=24 FAILset=[]` ⇒ **没人挡** | 伤害面：全量为空 ⇒ 窄集里任何一枚都成 stray ⇒ **本票这枚守卫反而把它兜住了**（除非两串都空）。所以这一支现在比改前更安全，只是"更安全"这件事没人测。该不该挡：**该**，但注入面只有 shim（见 §1.3），与 F-142-1 是同一枚小腿，别单开票 |
+| 窄读失败被吞（`withIndex=""` 继续装配） | `S-7-narrow-failure-swallowed` | `PASS=24 FAILset=[]` ⇒ **没人挡** | 伤害面**不是少扫**：`holds()` 的文件位读 `tracked \|\| ignored`、目录位只由全量喂，所以吞掉窄读只让 `note()` 少掉第三行（那枚"哪些受追踪件坐在忽略规则下"的出处），覆盖面一点没丢。⇒ 与本票无关的**先存在**缺口：那句"three read-only questions are all-or-nothing, a half-loaded index would be a new blindfold"在 `1b98c7b:176` 就写着，本票一字未碰（`git diff … \| grep -c all-or-nothing` = **0**）。记进 §9 的 F-142-2，别算在本票账上 |
+
+### 4.3 判
+
+**AC#2 成立**：方向只有一处、落点是既有的 `ok=false` 机制、四禁未碰、反方向有专断言挡着且我量到它红。
+"别的形状"我按四支分开写了——**两支该补的是注释和一枚小注入腿，一支与本票无关**，
+没有一支值得我为它硬开一道今天不响的 AC（票面 §AC#1 的 ⚠ 就是禁这件事）。
