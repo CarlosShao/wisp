@@ -163,3 +163,38 @@ C 卡现量：`L1 / [R1]`、`sessionOverrideBlocked: false`。
 ⇒ **"不带新旗标时 stdout 与改前逐字节相同"这一格：成立**，且比实现方那三发多两发（D 是路径形状、P 是完全不进 `-l2` 分支的那一支），
 rc 也逐发对齐。它自报的 `4712ea6`／`5ef1632` 两枚二进制我不引用——本程的两枚是从 `9be3288^` 与 `d242168` 现构的。
 
+---
+
+## §4 攻点 4：承重两发独立重跑（仓外副本 `D:\tmp\acc-143\mutA`，不复用它的 `D:\tmp\ticket-143\mut`）
+
+台件：`git archive d242168` 解出的副本 ＋ 补 `frontend/dist` ＋ 补 `third_party/`（**这两步是必需的**：
+不带 `third_party` 时副本里 **8 枚**与本票无关的用例会红，红因逐字是
+`secret_argv_windows_test.go:271: no native DLLs in ..\..\third_party\sherpa-onnx - run scripts/fetch-deps.ps1 first`；
+补上之后同一副本控制跑＝全绿。⇒ **归档副本天生不是等效环境，必须补这两味**，本程与实现方各自的数都是在补过之后取的。）
+
+| 发 | 变异（只落副本） | 顶层六枚（`-run` 六枚那把尺） | 整包四数（`-count=1 -v ./cmd/wisp/`） |
+|---|---|---|---|
+| 控制 | 无（md5 `7f200f27…` 与锚点同值） | 12 枚 RUN（6 顶层＋6 子用例）**全绿** | **RUN=114 PASS=60 FAIL=0 SKIP=0**（无 panic） |
+| **M1 摘接线** | `:66` `assessor = assessor.WithTaintDetector(det)` → `_ = det // MUTANT-ACC-M1` | **唯一红**：`TestAC1AC2TaintSourceLegProducesAJudgedR4`；其余 **5 枚全绿** | **RUN=114 PASS=59 FAIL=1 SKIP=0**（红的就是那一枚） |
+| **M2 换永真 detector** | `detector()` 末尾改成返回 `mutantAlwaysHit{}`（恒 `(src="MUTANT-ACC-M2 always-hit", true)`，`prov` 整块不接） | **红两枚**：`TestAC3TaintSourceThatTheCallDoesNotCarryIsNotAHit` 的**两个子用例都红**（`:189` 与 `:212` 两条 RED 原文都印出 `rulesHit = [R1 R4]`）**以及** `TestAC1AC2…` 一起红；默认路径那枚仍绿 | **RUN=114 PASS=58 FAIL=2 SKIP=0** |
+| **M2b（本程自加，更贴"cmd 自写 detector"那一形）** | `detector()` 返回 `mutantEcho{f.sources}`：**永远命中，但把声明的 `tool + " " + origin` 原样吐回去** | **只红 AC3**（两子用例），`TestAC1AC2…` **仍绿** ⇒ 见 §1.3 | 未跑整包（子集已定性） |
+| **M3（本程自加，钉攻点 5 那一格）** | 摘掉 `fs.Usage` 里的 `fs.PrintDefaults()` 一行 | **只红 `TestAC2TaintSourceIsVisibleInTheUsageBlock`**（`:228`/`:231` 两条："help does not say the flag is an input fact"／"does not disclaim that the flag carries a conclusion"） | 未跑整包 |
+| 还原 | `cp ../pristine-panel_assets-acc143.go` 回去 | — | 副本 md5 复量 `7f200f27…`＝锚点同值 |
+
+M1 退回的那张卡（红因原文里的 stdout 逐字节，`acc2-M1-full.log`）：
+`"level": "L1"`、`rulesHit` 只剩 `R1`、`reason` 只剩 `R1: 工具声明为下界（L1）`、`sessionOverrideBlocked: false`。
+⇒ 实现方 §3 表里"卡退回 `L1 / [R1]`、其余 5 枚全绿"这一行：**复算成立**；M2 那行的"两枚红＋连带的另一枚一起红"：**复算成立**。
+
+**补问的那条（编排者点名要判、实现方没给过读数的）：摘掉接线这一发，外部可见读数动过哪些？**
+
+| 外部面 | M1 前后的读数 | 结论 |
+|---|---|---|
+| `-taint-source … -l2 notify …` 的 stdout | `L2 / [R1 R4] / sessionOverrideBlocked:true` → `L1 / [R1] / false`（本程用 `wisp-acc-M1.exe` 现跑现量） | **变了**——真伤，看得见 |
+| `panel-assets -h` 的 stderr | 与未变异二进制 `diff`：只差第一行那条 `winsec: sealing path resolver installed` 的**时间戳**，usage 正文 14 行一字未动 | **没变**⇒ help 仍然承诺 `-taint-source` 能用，而接线已被摘掉 |
+| 门禁四数 | `PASS 60→59`、`FAIL 0→1`（RUN/SKIP 不变） | **变了**⇒ 门确实有牙 |
+| 不带新旗标的默认路径 stdout | A/B/C/D/P 五发与 M1 二进制仍逐字节相同 | 没变（本来就不该变） |
+
+⇒ 判：**承重两发成立**（红因都能指到具体用例，票面 AC#3 要的"答得出是哪条用例"成立），
+但**"help 会撒谎"这一支只有测试在守，外部面一条都不守**——这是接线这件事唯一的仪器，属结构性残余，不退回。
+
+
