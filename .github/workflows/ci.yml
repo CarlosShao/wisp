@@ -642,7 +642,12 @@ jobs:
       - name: build (vite build -> frontend/dist, the bytes go:embed carries)
         run: npm run build
 
-      - name: L2 card renders the real risk fields (AC#3 render evidence)
+      - name: L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)
+        # Renamed 2026-09-25: the step's content grew at 430ad57 (frontend session,
+        # render-l2.tsx +126/-0, additions only) to assert the PLAN.md:3481 shapes
+        # and the absence of a panel-side allow button. The old name read as if it
+        # only checked fields. Runs before this commit report the previous
+        # spelling, "L2 card renders the real risk fields (AC#3 render evidence)".
         # react-dom/server paints src/App.tsx over fixtures/l2-card-fs-delete.json,
         # which is verbatim `wisp.exe panel-assets -l2 fs.delete -irreversible delete`
         # output. Every assertion is derived from that JSON, and the vendored

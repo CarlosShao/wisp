@@ -37,6 +37,12 @@ job 之间互不影响，所以这条门**不许被挪到别的门禁底下**，
 `npm ci` → `typecheck (tsc -b, noEmit per tsconfig.*.json)` → `lint (oxlint)` →
 `token drift guard (generated theme must equal the C21 table)` → `build (vite build -> frontend/dist, the bytes go:embed carries)` →
 `L2 card renders the real risk fields (AC#3 render evidence)`。
+> ⚠ **这一步的名字在 2026-09-25 被编排者改过**（`ci.yml` 那枚 step 现名
+> `L2 card renders the real risk fields, its shapes, and no allow button (AC#3 render evidence)`）。
+> 起因不是改名好看：前端会话把判据加进了 `render:l2`（`render-l2.tsx` `+126/0`，**只加不删**），
+> 内容已经包括"四项形状"和"**不许有面板侧允许按钮**"，旧名读起来像只查字段 ⇒ 名字比内容窄。
+> ⇒ **引 run 时按时刻取名字**：那一步之前的 run 报旧拼写，之后的报新拼写；两串都能一字不差引出来，
+> 这句就是为"`上次真跑过的 run id ＋ step`"这句话留的。**新开一步要动 `ci.yml`＝编排者地界**，前端不许自开。
 
 **两条静态禁改门（由 `tools/d22scan` 执行，那工具与它的 allowlist 是编排者地界，你别改）**：
 - **ban #6**：`approval.decide` **不许出现在 `frontend/` 任何文件里**。面板只能"显示 + 发起请求"，
