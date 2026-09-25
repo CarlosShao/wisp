@@ -1286,3 +1286,120 @@ panel assets check: entry=index.html built=true 2 asset refs resolve [./assets/i
 - ⚠ 给 15:00 的一句提醒：`build/wisp.exe` 是**上一次 Go 构建**的产物（`build.ps1:123` 用 `-trimpath`
   编到 `build/`），它 embed 的是**它被编那一刻**的 dist ⇒ 真机签收要么先重跑 `build.ps1`，
   要么至少知道"exe 的 embed 时刻 ≠ dist 的时刻"这件事。我只刷了 dist，没有重编那颗 exe。
+
+---
+
+## 53. `F6`（看门狗 14:45 派）：React Bits 二期许可清单——**只出表，一期零代码不变；但四枚前提我先拧了**
+
+读数时刻 `2026-09-25 14:4x–15:0x +08`（`date` 现跑），起点 HEAD `b4af8b1`。
+本轮**没动过一行代码**：`frontend/` 里唯一的改动是 `VENDORED.md` 那段 React Bits 台账的**文字**（下面 53.5 逐条列）。
+
+### 53.0 四枚前提核对——三枚不成立，逐条报回来
+
+1. ✅ **成立**：F6 那句「MIT ＋ Commons Clause 那一半至今没人复核过」。台账里 `Q-21`
+   （`docs/reports/pending-and-issues.md:976`）与 `frontend-handoff.md:65` 都写着"审查还没做"。
+   本节是**第一次**逐字复核。
+2. ⚠ **不成立**：F6 点名当出处的 `frontend/VENDORED.md` **把上游仓库写错了**。原 `:83` 行是
+   ``dillionverma/react-bits`（reactbits.dev), 47.7k stars`。现量：`gh api repos/dillionverma/react-bits`
+   返回 **404**，且该用户仓库列表里没有 react-bits；真仓库是 **`DavidHDev/react-bits`**
+   （`gh api repos/DavidHDev/react-bits`：`homepage=https://reactbits.dev`、`stars=48058`、
+   `created=2024-08-06`、`fork=false`、`default=main`、`license=NOASSERTION`）。
+   ⇒ 全仓只有这一处带错名（`grep -rn dillionverma docs/ .scratch/ frontend/` 只回到那一行），
+   **`docs/PLAN.md` 从头到尾没有为 React Bits 点过任何上游所有者** ⇒ 不需要人工批准契约，我按 53.5 就地改了台账文字。
+3. ⚠ **不成立（这条改变本票的性质）**：**清单里的 11 枚，有 10 枚今天在上游根本没有可取的源码**。
+   三条现量（都跑在 `main` 分支、`pushed=2026-09-24`）：① `src/content/**` 里只有 `AnimatedList` 有源码目录
+   （`src/content/Components/AnimatedList/{AnimatedList.jsx,AnimatedList.css}`）；
+   ② jsrepo 分发面 `public/r/registry.json` 共 **832 项**，按 **name＋title＋description 三向**大小写不敏感地搜
+   `thinking / fog / preloader / agentic / neural / aura / glass flow / staggered text / blur highlight`
+   ——**全部 NO HIT**（同一次搜索里 `SplashCursor`、`GlowCursor`、`AnimatedList`、`StaggeredMenu` 等都能命中，
+   所以尺是响的）；③ 这 10 个名字在上游仓里**只以预览图存在**，路径段带 `pro`：
+   `public/assets/pro/components/thinking-dots.webp`、`…/fog-sphere.webp`、`…/agentic-ball.webp` 等。
+   ⇒ 我不替上游定性"它就是付费 Pro 件"，但结论对二期一样硬：**那 10 枚的第一问是"有没有对象可取、是不是 Pro 渠道"，
+   不是"Commons Clause 允不允许"**。许可表能签的只是"若能取到，怎么用"。
+4. ⚠ **口径**：名单枚数在盘上有三种写法，权威那枚是票 77。`design/doubao/README.md:124` 写"R19 表定案的
+   **5 个**动画"却列了 11 行，且那 11 行混进了 demo 自己手写的 CSS 效果（`Screen Transition`／`Card Spotlight`／
+   `Button Micro-magnetic`／`Sidebar Glide`／`Count-up`／`Tooltip`——**都不在 R19 名单里**）。
+   权威表在 `.scratch/wisp/issues/77-*.md:236-244`：**留 5／缓 4／砍 2＝11**，且票面 `:246-248` 自己就把我早先
+   报给 owner 的"12 条"拧成了 11（"别为了凑够砍 3 去砍一个本没在清单上的东西，也别凭空发明第 12 条"）。
+   ⚠ 同一枚票的 `:20` 与 `:39` 仍写着"12 条清单"＝**票内自相矛盾**；票面不是我的地界，我只登记不改。
+   ⇒ 本节那张表按 **11 行**交，来源是票面 `:236-244` 逐字。
+
+### 53.1 许可原文（逐字，不是我复述的）
+
+对象：`DavidHDev/react-bits@main` 的 `LICENSE.md`，blob sha `6425315416e94469f28d0223a09f7285b2f785ab`，
+**1303 字节**，副本留在 `D:\tmp\wisp-fe-f6-reactbits-LICENSE.md`（只建不删）。标题行
+`MIT + Commons Clause License Condition v1.0`，版权行 `Copyright (c) 2026 David Haz`。
+绑定我方的就三句，下面用 `G`／`C`／`N` 指代（逐字抄）：
+
+- **`G`（授权句）**：`Permission is hereby granted, free of charge, to any person obtaining a copy of this
+  software … to deal in the Software without restriction, including without limitation the rights to use,
+  copy, modify, merge, publish, and distribute the Software` **`as part of an application, website, or product`**`,`
+  ——注意它比标准 MIT **少了 `sublicense` 与 `sell`** 两个词，并加了那句限定用途的斜体。
+- **`C`（限制句，标题 `## Commons Clause Restriction`）**：`You may use this Software, including for any
+  commercial purpose,` **`so long as you do not sell, sublicense, or redistribute the components themselves`**
+  **`-whether alone, in a bundle, or as a ported version.`**
+- **`N`（随行句）**：`The above copyright notice and this permission notice shall be included in all copies
+  or substantial portions of the Software.`
+- 另有一段 `## No Warranty`（`THE SOFTWARE IS PROVIDED "AS IS" …`），是**免责声明不是限制**，别当门槛读。
+
+### 53.2 清单：11 行（来源＝票 77 `:236-244` 的 R19 定案；上游仓库统一为 `DavidHDev/react-bits`）
+
+| # | 组件 | R19 定案 | 上游对象今天取不取到（53.0(3) 的现量） | 绑哪几句 | 我方能不能这么用 |
+|---|---|---|---|---|---|
+| 1 | `Thinking Dots` | **留**（二期第一批） | **取不到**：registry 832 项三向不命中、`src/content` 无；仅有 `public/assets/pro/components/thinking-dots.webp` | `G`＋`N`＋`C` | **能，但前提先落在"有没有对象"**：取到之后按 Wisp 应用的一部分随产品发布不触 `C`；每个落树文件带完整 `G`＋`N` 头 |
+| 2 | `Staggered Text` | **留**（`delay:30ms`） | 取不到（同 `#1`，仅 `staggered-text.webp`） | 同上 | 同上。⚠ 这枚**我方已有等价实现**：`src/components/reveal-text.tsx` ＋ `stream-in`，二期真要换的只是节奏 ⇒ 引它买的是省事不是必需 |
+| 3 | `Animated List` | **留**（`maxItems` 兼渲染上限） | **取到**：`src/content/Components/AnimatedList/AnimatedList.{jsx,css}` | 同上 | **能**——这是 11 枚里唯一一枚"今天就能逐条走完 vendoring 流程"的；也是唯一该被 owner 第一个复核的 |
+| 4 | `Blur Highlight` | **留**（tool call 参数/代码高亮） | 取不到（仅 `blur-highlight.webp`） | 同上 | 同 `#1` |
+| 5 | `Preloader` | **留**（"在装模型/在起引擎"） | 取不到（仅 `preloader.webp`） | 同上 | 同 `#1` |
+| 6 | `Glass Flow` | **缓**（性能门之后，同屏≤1 竞争 4 选 1） | 取不到（仅 `glass-flow.webp`） | 同上＋**D32 的技术门** | 许可不拦，**技术门拦**：R19 已写"其余 3 个在'同屏≤1'规则下届时判死"，而"面板隐藏即销毁"那一条**今天无人守**（见 §50.3：我守不到，要票 33/35 补）⇒ 在票 33/35 之前不该进任何一批 |
+| 7 | `Aura Blob` | **缓**（同上，非首选） | 取不到（仅 `aura-blob.webp`） | 同 `#6` | 同 `#6`，且它不是首选 ⇒ 二期默认**判死**那一支 |
+| 8 | `Neural Float` | **缓**（同上，非首选） | 取不到（仅 `neural-float.webp`） | 同 `#6` | 同 `#7` |
+| 9 | `Fog Sphere` | **缓、首选**（owner 把它定为主页"呼吸氛围"） | 取不到（仅 `fog-sphere.webp`；demo 里的两枚极淡色块是**手写 CSS**，不是它的代码） | 同 `#6` | 首选≠可引。三条件件都要有用例（同屏≤1／隐藏即销毁／隐藏后 CPU 回落可测），后两条**都依赖宿主** ⇒ 与 `#6` 同一支：等票 33/35 |
+| 10 | `Glass Cursor` | **砍**（桌面常驻工具里是纯噪音，不表达任何状态） | 取不到（registry 里有 `BlobCursor`／`GlowCursor`／`SplashCursor`，**没有** `GlassCursor`） | 不适用 | **不引 ⇒ 许可不适用**。登记这一行是为了防"砍 2"被数成"砍 3"（票面 `:247` 专门警告过） |
+| 11 | `Agentic Ball` | **砍**（作为桌面那颗球的替代品判死；面板内次级指示＝**另案新票**） | 取不到（仅 `agentic-ball.webp` ＋ 一张 poster） | 若另案成立才适用 | **桌面球维持 Win32/Direct2D 一字不动**（D32：休眠 CPU≤0.5%／RSS≤25MB，WebGL 一定爆）。这一枚的门槛顺序是**先预算、后许可**；今天不产生任何许可动作 |
+
+### 53.3 "我方能不能这么用"的总结论（这段是给 owner 看的，尽量不说术语）
+
+- **今天这一步（自用期，D23）**：`C` 那句管的是"卖、再许可、把组件本身拿去重新分发"。我们既不卖也不分发，
+  所以**三句里没有任何一条被触发**。这也是 `Q-21` 当初"现在只登记、不阻塞"的理由，复核之后仍然成立。
+- **将来发布（D17：winget／Scoop／Homebrew Cask＋GitHub Releases＋免费 SignPath 开源签名）**：
+  `G` 那句把"用、拷贝、改、合并、发布、分发"都给了，条件是**用途**那句斜体——`as part of an application,
+  website, or product`；`C` 又明写"包括任何商业用途"。**所以把 Wisp 连同里面的组件一起免费发出去＝允许。**
+  红线只有一条：**不能把那几个组件单独拿出去发**——单发、成捆发、**或者"改过版的"发**
+  （`C` 结尾那三个词 `alone, in a bundle, or as a ported version` 是刻意把"移植版"也算进去的，
+  而"移植"恰恰是我们的 house pattern：JSX 改 TS、颜色重指到 C21 token）。
+  ⇒ 具体禁止形状：把 React Bits 组件包成我们自己的 npm 包／示例站／组件库对外发布。
+  装在 `frontend/src/components/` 里、跟 Wisp 一起发，不在此列。
+- **必做的一件小事（`N`）**：每一枚落树的文件都要带上那份**完整的**版权声明与许可句（`Copyright (c) 2026 David Haz`
+  ＋那三句）。我们已有这个纪律——`Q-20` 定的"vendored 到 `frontend/src/components/`，**每文件头注明来源＋许可**"，
+  Beautiful UI 那 8 枚就是这么做的（`VENDORED.md` 的逐文件台账就是它的落地）。⇒ 引 React Bits 时同一条照做即可，
+  **但它必须是整份 notice、不是一句"来源：reactbits"**。
+- **唯一需要 owner 本人回答的一句（只有他能答，我不替他推）**：
+  **"以后有没有哪一种产品形态，是把别人这几枚动画组件本身拿去卖、或者当成一个组件库分发？"**
+  答"没有"⇒ 上面这张表整路绿灯，二期只剩技术门与"对象存不存在"两问；
+  答"有"⇒ 那要**先找上游谈单独授权**，不是我们先写码再谈。
+  代价：这个问题不答，二期任何一枚 React Bits 组件在**发布前**都只是"暂时能用"，不是"确认能用"。
+
+### 53.4 一期"零代码进树"这条不变式，本轮交件时又跑了一遍
+
+```
+$ git grep -in "react-bits\|reactbits" -- frontend/ | grep -v VENDORED.md
+(零命中)
+
+$ sh scripts/d22scan.sh
+runtests.sh: OK - packages=[./...] top-level: PASS=30 FAIL=0 SKIP=0, === RUN=70
+d22scan: clean - no D22 ban violations; … ban #6 frontend/=46, ban #8 design/=32,
+ban #8 frontend/=46, ban #8 internal/=407, ban #8 cmd/=40
+```
+⇒ 一期仍然**一行 React Bits 代码都不在树里**；我这轮往 `frontend/` 写的字只有台账那三行文字，
+所以七枚禁令全绿（ban #8 会扫 `frontend/**.md`，`tools/d22scan/main.go:1136` 把 `.md` 列进文本判定、
+markdown 又从不享受注释豁免——这正是我 11:5x 那轮在 `VENDORED.md` 用了一枚 `⚠` 把门点红的原因，这次避开了）。
+
+### 53.5 本轮改动清单（一枚文件、三行文字、零代码）
+
+`frontend/VENDORED.md` React Bits 段：`Repository` 行改正为 `DavidHDev/react-bits` 并写明"旧名不是仓库、
+现量 404、`PLAN.md` 从未点过上游所有者"；新增 `Licence text as measured` 行（blob sha／1303 字节／标题行／版权行，
+指回 §53.1 而不复述）；新增 `Availability of the 11, measured 2026-09-25` 行（10/11 无源码、`pro` 路径段、
+表在 §53.2）。**没有**删改 `VENDORED.md` 里任何别的段（含 P3 那轮定的"二期引入前需 owner 复核"那行，因我插入两行而
+从 `:86` 漂到 **`:88`**，内容一字未动）；
+**没有**新增组件、没动 `package.json`、没动 `src/**`、没动 `.github/workflows/ci.yml`。
