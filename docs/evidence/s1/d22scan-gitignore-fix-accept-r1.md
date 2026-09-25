@@ -218,7 +218,7 @@ d22scan: 3 finding(s)  -> internal/build/leak.go:7 [bare-goroutine] + 两枚 [em
   ⇒ 它是**活家族的保险**，不是想象中的保险。M4a 那行一旦将来被谁改回去，只有它挡着（第三行读数）。
 - **代价核过**：一次运行 spawn **恰好 6 枚** git（`logger\git.exe` 记账现量：3 枚一组、两组，
   cwd 全在 root，命令＝`rev-parse --show-prefix`／`ls-files -z`／`ls-files -z -i -c --exclude-standard`），
-  来源是 **2 枚 matcher**（`checkRoot` 自建一枚 `main.go:1160` ＋ scan 一枚），每枚懒加载后缓存（`gitignore.go:382-387`）；
+  来源是 **2 枚 matcher**（`checkRoot` 自建一枚 `main.go:1161` ＋ scan 一枚），每枚懒加载后缓存（`gitignore.go:382-387`）；
   对 1144 枚受追踪件的树，**同树同机对照实测 修后 0.76s vs 修前 0.42s ⇒ ＋0.34 s/次**（编排者票面的"~0.5 s"同一量级）；
   最坏一支是 git 挂住：实测 `real 20.7s`（10 s × 2 枚 matcher，§3.3）。
   ⇒ **只付在 `scripts/d22scan.sh` step 2 与每次本地跑门**（整道门实测 13.9s，step 1 的 go test 才是大头），
@@ -398,7 +398,7 @@ d22scan: 3 finding(s)  -> internal/build/leak.go:7 [bare-goroutine] + 两枚 [em
 |---|---|---|---|---|
 | R1 | **`live:true` scope 走 0 枚 ⇒ 硬退出 2**（上一程编号 **F9**；编排者 `A218⑨` 把它记成了 "`F3`"——**同一台账里 `F3` 另有所指**，见下面 R2） | 否（也不该由它动） | 现量 `ban #8 design/` 净快照 **30**、`git ls-tree HEAD design` 文本件 30；把那 16 枚未提交删除**假设入库**后仍剩 **14** 枚（`comm -23` 现量）⇒ **雷被 `5d463bb` 拆了，不是被本批拆的**；`!!`（被忽略的 design 件）现量 0 ⇒ ignore 过滤器仍然吞不到、也不该吞它 | **不是本批缺陷**；⚠ 台账那一处 `F3`/`F9` 同号相撞请编排者追一行 `>` 更正（append-only，不改写） |
 | R2 | 上一程 **F3**＝两枚"少扫"语义（行首空白被 `TrimSpace`、尾随 `**` 吃掉父目录） | **是，本批正是来修它的** | M4a 红（`scan_test.go:1686` 两支）、M4b 红（`decide("deep",isDir=true)` 被吞）⇒ **两枚都实现且有断言**；且拿真 git 复核过方向（`  weird/*` 只绑真名叫 `  weird` 的目录、`git check-ignore -v dist` 对 `dist/**` 的实测） | **成立（旧账已结）** |
-| R3 | `/foo` 前导斜杠锚定**无断言** | 否 | `TestGitIgnoreRuleSemantics` 的规则表（`:1626-1641`）逐枚看过：**没有一枚以 `/` 开头**；实现支在 `gitignore.go:570-572` | **登记过的兄弟账，仍在**（本批没让它变坏，也没顺手补）——最小修一：表里加 `"/root-only.log"` ＋ 两支用例 |
+| R3 | `/foo` 前导斜杠锚定**无断言** | 否 | `TestGitIgnoreRuleSemantics` 的规则表（`:1626-1642`）逐枚看过：**没有一枚以 `/` 开头**；实现支在 `gitignore.go:570-572` | **登记过的兄弟账，仍在**（本批没让它变坏，也没顺手补）——最小修一：表里加 `"/root-only.log"` ＋ 两支用例 |
 | R4 | `.git/info/exclude` ＋ `core.excludesFile` 不作为跳过来源 | 否（`gitignore.go:97-102` 明示不支持） | 现测：往 `f3repo/.git/info/exclude` 写 `excluded-probe.tsx` ⇒ `git check-ignore -v` 点名 `.git/info/exclude:8`（rc=0，git 认它被忽略），**扫描器仍算进分母（41）并点名为 finding** ⇒ 方向＝**少跳＝响亮**；代价＝这一支上"工作树 41 / CI 40"的 A207 病仍活着 | **登记过的兄弟账（上一程 F5），方向安全** |
 | R5 | 上一程 **F4**＝`note()` 的数与移动的分母不同量纲 | 否（模板 `:421-422` 一字未改） | 本批新独立复现一发：`f3ci`(规则关) 44 → `f3repo` 40，note 说 **"2 file(s) under 1 ignored director(ies)"** ⇒ 动掉 4 枚只报了 2 枚 | **登记过的兄弟账，本批未恶化也未修**；票面没点它，不算越界 |
 | R6 | 上一程 **F8**＝`internal/panel/frontend_hygiene_test.go:289` 用子串 `/dist/` 跳，早于本修且比 `.gitignore` 宽 | **否，正确地没碰**（`git diff --name-only ca84b75^..ca84b75` 不含 `internal/**`） | 该行现号仍在；归它的主人（`A217④` 已把新仪器记在 panel 名下） | **不是本批的账** |
