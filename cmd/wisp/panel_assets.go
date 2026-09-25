@@ -13,8 +13,9 @@ package main
 // agent loop are untouched by this file. Ticket 33's WebView2 host is expected
 // to call the same panel.Assets API this command prints.
 //
-// WISP-LEG-COVERAGE-RULING: panel-assets is dispatched by main and driven by no
-// case in this package. It is a read-only diagnostic over bytes the binary already
+// WISP-LEG-COVERAGE-RULING: panel-assets is dispatched by main; the card branch
+// below is driven by cmd/wisp's panel_assets_143_test.go and the asset branch is
+// still ruled. It is a read-only diagnostic over bytes the binary already
 // carries (internal/panel's //go:embed bundle), so deleting this branch costs an
 // operator a window on the bundle and books no record anywhere; the bundle itself
 // is checked from the other side by internal/panel's asset tests. This sentence is
@@ -39,8 +40,11 @@ func cmdPanelAssets(args []string) int {
 	render := fs.String("render", "", "write the embedded bytes for this request path to stdout")
 	l2 := fs.String("l2", "", "assess this tool name with the remaining args as its argv and print the L2 card JSON")
 	l2Irreversible := fs.String("irreversible", "", "with -l2: comma-separated irreversible operations the CALLER declares in its risk.Facts (R8's input)")
+	taintSources := &taintSourceFlag{}
+	fs.Var(taintSources, "taint-source", "with -l2: repeatable INPUT FACT of the shape <source-tool>|<origin>|<content>, meaning \"this task read <content> from <source-tool> at <origin>\". It feeds the C25 provenance engine the taint rule judges; it declares no verdict, no rule id and no level, and the taint rule stays dormant without it. Flags after the -l2 tool name are that tool's argv, so put every flag before -l2.")
 	fs.Usage = func() {
-		fmt.Fprintln(os.Stderr, "usage: wisp panel-assets [-manifest] [-check] [-render <path>] [-l2 <tool> <args...>] [-irreversible <ops>]")
+		fmt.Fprintln(os.Stderr, "usage: wisp panel-assets [-manifest] [-check] [-render <path>] [-taint-source <source-tool>|<origin>|<content>]... [-irreversible <ops>] -l2 <tool> <args...>")
+		fs.PrintDefaults()
 	}
 	if err := fs.Parse(args); err != nil {
 		return 2
@@ -52,7 +56,16 @@ func cmdPanelAssets(args []string) int {
 	// is why the frontend's ApprovalCardView keys are pinned against it.
 	if *l2 != "" {
 		rest := fs.Args()
-		view := panel.NewApprovalCardView(risk.NewRiskAssessor(), panel.ApprovalSubject{
+		// Same assembly the production bridge uses (internal/tools/bridge.go's
+		// assessorFor): a bare assessor plus the C25 engine bound to one scope.
+		// With no -taint-source there is nothing to bind, so the assessor stays
+		// exactly what it was before ticket 143 and the printed card is
+		// unchanged, byte for byte.
+		assessor := risk.NewRiskAssessor()
+		if det := taintSources.detector(); det != nil {
+			assessor = assessor.WithTaintDetector(det)
+		}
+		view := panel.NewApprovalCardView(assessor, panel.ApprovalSubject{
 			CorrelationID: "panel-assets-l2",
 			Tool:          *l2,
 			Args:          rest,
@@ -144,4 +157,81 @@ func splitFacts(value string) []string {
 		}
 	}
 	return out
+}
+
+// taintSourceScopeID is the C25 scope this command opens for its one card. In
+// the product the scope id is a task id owned by the agent loop (ticket 19's
+// DEFERRED(C25-loop-wiring) item 1); a CLI probe has no task, so it names one
+// and closes nothing - the engine lives and dies inside this process.
+const taintSourceScopeID = "panel-assets-l2"
+
+// taintSource is one declared sensitive-source read: the operator says which
+// tool produced content, where it came from, and what the content was. Those
+// three fields are exactly C25's Mark(scope, tool, origin, content) input, and
+// nothing else - no level, no rule id, no explanation text. The taint rule's
+// sentence and its hit are produced by internal/risk, which is the only thing
+// in this binary allowed to decide them (SPEC-06 §3).
+type taintSource struct {
+	tool    string
+	origin  string
+	content string
+}
+
+// taintSourceFlag collects repeatable -taint-source values as a flag.Value so
+// one probe can declare several sources, which is what the engine's
+// oldest-mark-first hit order is for.
+type taintSourceFlag struct {
+	sources []taintSource
+}
+
+// String keeps flag's default-printing honest: the default is "no source
+// declared", and printing the collected values here would echo declared
+// content back at whoever ran the command.
+func (f *taintSourceFlag) String() string { return "" }
+
+// Set parses <tool>|<origin>|<content>. SplitN(3) means the content may itself
+// contain a pipe; only the first two separators are structure. The origin may
+// be empty (a source with no location); the tool and the content may not,
+// because an unnamed source prints an empty slot on the card and empty content
+// is a fact nobody declared. Content shorter than C25's fragment floor cannot
+// match anything (internal/risk/taintmatch.go documents that residual); this
+// probe does not pretend to re-judge it and passes it to the engine as given.
+func (f *taintSourceFlag) Set(raw string) error {
+	parts := strings.SplitN(raw, "|", 3)
+	tool := strings.TrimSpace(parts[0])
+	if tool == "" {
+		return fmt.Errorf("-taint-source needs <source-tool>|<origin>|<content>, the source tool name is empty")
+	}
+	if len(parts) < 3 {
+		return fmt.Errorf("-taint-source %q needs three |-separated parts: <source-tool>|<origin>|<content>", tool)
+	}
+	content := parts[2]
+	if strings.TrimSpace(content) == "" {
+		return fmt.Errorf("-taint-source %q has empty content: nothing can match against it", tool)
+	}
+	f.sources = append(f.sources, taintSource{tool: tool, origin: strings.TrimSpace(parts[1]), content: content})
+	return nil
+}
+
+// detector builds the C25 engine over the declared sources and returns it bound
+// to this command's scope - the same call shape the production bridge uses
+// (risk.NewProvenance(...).Detector(taskID), see internal/tools/bridge.go's
+// assessorFor). Returns nil when no source was declared, which is the caller's
+// signal to wire nothing at all.
+//
+// ProvOptions.NoProbe is the one difference from the bridge, and it cannot
+// change a verdict on this path: the panel builds its parameters from the
+// argv (internal/panel's paramsFromArgs yields the "command" and "argv" keys
+// only), neither of which is a write target, so the sync-directory gate this
+// option would feed is never consulted for a call of that shape.
+func (f *taintSourceFlag) detector() risk.TaintDetector {
+	if len(f.sources) == 0 {
+		return nil
+	}
+	prov := risk.NewProvenance(risk.ProvOptions{NoProbe: true})
+	prov.OpenScope(taintSourceScopeID)
+	for _, s := range f.sources {
+		prov.Mark(taintSourceScopeID, s.tool, s.origin, s.content)
+	}
+	return prov.Detector(taintSourceScopeID)
 }
