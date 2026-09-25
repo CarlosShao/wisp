@@ -42,7 +42,12 @@ package panel
 //	    when a case label cannot be resolved, and it is cross-checked against
 //	    knownComposerMethod in BOTH directions - plus the wider oracle, which
 //	    takes every route-shaped name written anywhere in the package and asks the
-//	    running guard about it. No answered name is approval-shaped;
+//	    running guard about it. No answered name is approval-shaped. Facet 1 has a
+//	    second, STANDING half that reads no source at all:
+//	    TestRealGuardRefusesEveryAssemblableApprovalRouteName assembles its
+//	    candidate names out of grantRouteWords and asks the running guard about
+//	    each one, so an approval-shaped route that Go answers is a red test even
+//	    when the package never spells its name (F-R2-3);
 //	(2) the envelope every answered method decodes into cannot BIND a key whose
 //	    name carries an approval verdict, recursively through embedded and nested
 //	    types. "The envelope" is found by locating this package's own JSON decode
@@ -85,6 +90,29 @@ package panel
 // of. The vocabulary is deliberately narrow - see its own comment - so these are
 // judgement calls, not oversights, and widening them is a slice card rather than
 // a quiet edit here.
+//
+// One sentence of qualification on the first hole, because it is now part-static:
+// TestRealGuardRefusesEveryAssemblableApprovalRouteName asks the RUNNING guard
+// about every name grantRoutePrefixes x grantRouteWords x grantRouteSuffixes can
+// build (528 candidates at this anchor), and it reads no source, so an answered
+// name inside that grid is red even when the package never spells it. The hole
+// that stays open is the grid's outside: another namespace, another vocabulary,
+// or a route that only exists once config is read.
+//
+// ONE CONSTRAINT THIS FILE PUTS ON PRODUCTION CODE, DECLARED HERE BECAUSE
+// NOTHING ELSE WRITES IT DOWN (F-R2-1, docs/evidence/s1/panel-l2-grant-nail-
+// accept-r2.md §2.4 + §7.4): the inbound half of this instrument starts from the
+// JSON decode calls it finds in this package, so a SECOND decode destination in
+// internal/panel has to be a struct in this package. A decode into a
+// map[string]any or a json.RawMessage - both perfectly legal Go, neither
+// enumerable by a key scan - makes three of the ban tests here t.Fatalf with "a
+// JSON decode destination ... cannot be enumerated". That direction is
+// deliberate: the file refuses to call the boundary clean over bytes it cannot
+// read, and the message carries its own way out, which is to route the bytes
+// through a same-package struct or to register the type in
+// inboundTypeRegistry and judge it in a test that can see it. Loosening the
+// scan is not a test edit either, it is the same slice-card decision as the
+// vocabulary above.
 //
 // NOTHING here keys on frontend/src/lib/panel.ts:50's ApprovalOutcome union: that
 // union still contains "grant" by the frontend session's explicit choice, so an
@@ -1202,6 +1230,93 @@ func TestAnsweredPanelRoutesCarryNoApprovalDecision(t *testing.T) {
 		answered, len(declared))
 }
 
+// grantRoutePrefixes are the namespaces a wiring commit would address a panel-side
+// allow through. They are NAMESPACES, not route names: this file hard-codes no
+// candidate it later asks about, because the shape being nailed here is exactly
+// the one where a name is never written down in one piece (F-R2-3). The set is a
+// judgement call and is allowed to grow; nothing in here claims it is exhaustive.
+var grantRoutePrefixes = []string{
+	"panel", "panel.review", "panel.approval", "panel.l2", "panel.mode",
+	"panel.workspace", "panel.attachment", "panel.message",
+}
+
+// grantRouteSuffixes are the verb tails the four declared routes actually use
+// ("request", "add", "send" - the first is a suffix here and the others are not,
+// which is why "now" is along: a wiring commit reaches for whatever reads well).
+var grantRouteSuffixes = []string{"", ".request", ".now"}
+
+// knownComposerRefusesAssembledGrantNames is the behavioural sweep behind
+// TestRealGuardRefusesEveryAssemblableApprovalRouteName. It builds
+// len(grantRoutePrefixes) x len(grantRouteWords) x len(grantRouteSuffixes) x 2
+// plural/no-plural names by concatenating at run time and asks the RUNNING guard
+// about each one. Nothing here reads a file: a route the guard answers is enough,
+// however the production code got that name.
+func knownComposerRefusesAssembledGrantNames(t *testing.T) (int, []string) {
+	t.Helper()
+	if len(grantRouteWords) == 0 || len(grantRoutePrefixes) == 0 {
+		t.Fatalf("the sweep vocabulary is empty (grantRouteWords=%d, grantRoutePrefixes=%d): a sweep that asks nothing answers clean forever",
+			len(grantRouteWords), len(grantRoutePrefixes))
+	}
+	// Anti-vacuity, positive control: the same guard that must refuse every name
+	// below has to answer the four routes this package really declares, or "0
+	// hits" would only mean the guard stopped working.
+	for _, legit := range []string{MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend} {
+		if !knownComposerMethod(legit) {
+			t.Fatalf("the running guard refuses its own declared route %q: the sweep below would report a clean boundary because nothing is answered any more, which is not the same fact", legit)
+		}
+	}
+	var hits []string
+	asked := 0
+	for _, p := range grantRoutePrefixes {
+		for _, w := range grantRouteWords {
+			for _, suffix := range grantRouteSuffixes {
+				for _, form := range []string{w, w + "s"} {
+					name := p + "." + form + suffix
+					asked++
+					if knownComposerMethod(name) {
+						hits = append(hits, name)
+					}
+				}
+			}
+		}
+	}
+	sort.Strings(hits)
+	return asked, hits
+}
+
+// TestRealGuardRefusesEveryAssemblableApprovalRouteName is the standing half of
+// facet 1's wider oracle, and it exists because that oracle only reads what this
+// package WRITES. Acceptance r2 (§7.2, F-R2-3) found that the one assertion
+// refusing "the real knownComposerMethod answers panel.review.allow" was living
+// inside facet 4's plant F subtest as a negative control: rewrite that subtest,
+// Skip it, or rename it and the ban on the guard answering an approval route
+// through a runtime-assembled name disappears with no other test going red.
+//
+// So the check is a top-level test now, and it asks no name written into this
+// file: it concatenates prefixes out of grantRoutePrefixes with the words in
+// grantRouteWords and puts the question to the running guard. That is what makes
+// it cover the shape a literal pool cannot see - production code that assembles
+// "panel.review.allow" out of pieces is answering a name no scan ever reads -
+// and it is also why the sweep must stay free of false reds: it is only worth
+// anything while a clean tree answers none of it.
+//
+// What it does NOT cover is the same line the file header draws: a name outside
+// grantRoutePrefixes x grantRouteWords ("wisp.review.ok", or one read off config)
+// is not asked here either. This sweep narrows that hole, it does not close it.
+func TestRealGuardRefusesEveryAssemblableApprovalRouteName(t *testing.T) {
+	asked, hits := knownComposerRefusesAssembledGrantNames(t)
+	for _, hit := range hits {
+		t.Errorf("knownComposerMethod answers %q, an approval-shaped route name this file assembled at run time out of grantRoutePrefixes and grantRouteWords: Go answers a panel-side allow door whose spelling never appears in the package, so no literal pool, no case-list enumeration and no vocabulary scan reaches it (D33/F2, R20, AGENTS.md §1.2 ban #6)", hit)
+	}
+	// plant F's pool half depends on this name being unanswered but never written
+	// into the guard, so say out loud which half of that pair this test owns.
+	if strings.Contains(strings.Join(hits, " "), "panel.review.allow") {
+		t.Errorf("the refused name plant F plants is now answered by the guard, so facet 4's plant F subtest and facet 1's answeredElsewhere half are describing different trees")
+	}
+	t.Logf("behavioural sweep of the running guard: asked=%d assembled route names, answeredByRealGuard=%d, hits=%v",
+		asked, len(hits), hits)
+}
+
 // TestNoInboundEnvelopeCanBindAnApprovalVerdict is facet 2 on the production
 // types: the single envelope every answered method decodes into, and everything
 // reachable from it, cannot bind a key whose name carries an allow.
@@ -1737,15 +1852,19 @@ func TestPlantedGrantWiringGoesRedInASnapshot(t *testing.T) {
 	})
 
 	// Plant F: the M4 shape - a SECOND chain, in its own function, answering an
-	// approval-shaped route. A snapshot is only parsed, never compiled, so the
-	// running guard it is audited against is still this package's real one; what
-	// plant F can therefore pin is the half that was actually missing - the pool
-	// the oracle reads is built from the whole package, so it sees a name written
-	// in any function at all, where the guard's own case list sees nothing.
-	// The runtime half of the check is exercised on the real tree in
-	// docs/evidence/s1/panel-l2-grant-nail-fix-r2.md §6 (M4 and M13 both red), and
-	// this same subtest goes red there too, because its negative control asks the
-	// real guard to still refuse the name.
+	// approval-shaped route. A snapshot is only parsed, never compiled, so what
+	// plant F can pin is the half that was actually missing - the pool the oracle
+	// reads is built from the whole package, so it sees a name written in any
+	// function at all, where the guard's own case list sees nothing.
+	// It used to also carry the runtime half ("and the real guard still refuses
+	// this name") as its negative control, which acceptance r2 §7.2 recorded as
+	// F-R2-3: a ban on production code borrowed another subtest's line, so
+	// rewriting or skipping this subtest would have deleted the only thing
+	// refusing an answered panel-side allow door. That assertion lives in
+	// TestRealGuardRefusesEveryAssemblableApprovalRouteName now, where nothing has
+	// to reach it through this plant. The runtime half of the pair was exercised
+	// on real trees in docs/evidence/s1/panel-l2-grant-nail-fix-r2.md §6 (M4 and
+	// M13 both red).
 	const plantFChain = "package panel\n\n" +
 		"// acceptFGate is the second chain a wiring commit writes when it does not\n" +
 		"// want to touch the guard's own case list.\n" +
@@ -1775,10 +1894,7 @@ func TestPlantedGrantWiringGoesRedInASnapshot(t *testing.T) {
 		if pkg.answered["panel.review.allow"] {
 			t.Errorf("the guard's own case list resolved the planted chain, so the answeredElsewhere half below would be testing nothing")
 		}
-		if knownComposerMethod("panel.review.allow") {
-			t.Error("the real knownComposerMethod answers panel.review.allow - this is no longer a clean tree, and the negative control below is void")
-		}
-		t.Logf("pool sees %q at %v while pkg.answered does not; the running guard still refuses it, which is what makes answeredElsewhere the load-bearing half",
+		t.Logf("pool sees %q at %v while the snapshot's guard case list does not; the half that asks the RUNNING guard about that name - and about every other name grantRoutePrefixes x grantRouteWords can build - is TestRealGuardRefusesEveryAssemblableApprovalRouteName, which is standing rather than a negative control here (F-R2-3)",
 			"panel.review.allow", sites)
 	})
 
