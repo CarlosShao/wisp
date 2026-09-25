@@ -191,4 +191,111 @@ scripts/spike/xy-verdict/main.go:95:	job, err := common.AttachToKillOnCloseJob()
 ### 1.4　本格没测什么（按"漏了它谁会先被骗"排序）
 
 1. **没在运行时数过 Job 里真有几枚进程**。读数全部来自静态普查；`TreeProcessCount()` 在真机上会返回几，本程没量（量它要 `wisp slo`，那会另起两枚子 `wisp.exe` 并抢 CPU，且 `cmd/wisp` 此刻是票 149 的写者）。
-2. **没验 `Boot` 之外有没有别的路径能拿到第二枚 Job Object**——例如"某人自己 `windows.CreateJobObject` 再塞进 `JobScope{handle:…}`"。本格的 `CreateJobObject` 普查覆盖了这个形状，但 `x/sys/windows` 的 `NewLazySystemDLL` 动态取符号这类**语法上抓不到**的绕法没排（仓内 `modpsapi` 就是这种形状，所以它不是假设）。
+2. **没穷尽"绕开 `OpenJobScope` 拿到第二枚 Job Object"的写法**。本格的 `CreateJobObject` 普查能抓到 `windows.CreateJobObject`，也能抓到 lazy-proc 那族（`scripts/spike/common/winshell.go:50` 的 `NewProc("CreateJobObjectW")` 就是被它抓到的——符号名是**字面串**，grep 打得着）。打不着的是**把符号名拼出来**的写法（`"Create"+"JobObjectW"`）与不经这些名字的第三方封装；本程没排那条，因为仓内没有任何一枚这样的现存代码，排它要先造一台仪器。
+
+---
+
+## 2　AC#1② —— 仓内有没有 `AssignProcessToJobObject`（及等价形状）；有 ⇒ 谁被分配进去过
+
+**判据**（票面 AC#1② 原文）：*"仓内有没有 `AssignProcessToJobObject`（及等价形状）；有 ⇒ 谁被分配进去过"*。
+
+### 2.1　命令原文与读数
+
+```
+$ git grep -n 'AssignProcessToJobObject' -- '*.go'
+internal/proc/jobscope_windows.go:100:		if err := windows.AssignProcessToJobObject(j.handle, windows.Handle(handle)); err != nil {
+internal/proc/jobscope_windows.go:101:			assignErr = fmt.Errorf("proc: AssignProcessToJobObject(pid %d): %w", p.Pid, err)
+scripts/spike/common/winshell.go:490:	if err := windows.AssignProcessToJobObject(jobHandle, windows.CurrentProcess()); err != nil {
+
+$ git grep -nE '\.Assign\(|\.StartInJob\(' -- '*.go'
+cmd/wisp/slo_windows.go:498:	p, err := rt.Job.StartInJob(cmd)
+internal/proc/jobscope_windows.go:117:	if err := j.Assign(cmd.Process); err != nil {
+internal/proc/jobscope_windows_test.go:41:		if _, err := job.StartInJob(cmd); err != nil {
+internal/proc/jobscope_windows_test.go:207:	if _, err := job.StartInJob(cmd); err == nil {
+
+$ git grep -nE 'CREATE_SUSPENDED|ResumeThread|CreationFlags' -- '*.go'
+cmd/balldebug/diff_windows.go:412:	cmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: 0x00000200} // NEW_PROCESS_GROUP
+cmd/wisp/resident_sink_nail_127_windows_test.go:200:	cmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: windows.CREATE_NEW_PROCESS_GROUP}
+```
+
+### 2.2　读数
+
+**有。** 产品码里唯一一处 `AssignProcessToJobObject` 在 `internal/proc/jobscope_windows.go:100`，包在 `(*JobScope).Assign` 里；
+`Assign` 的调用者**只有一枚**（`StartInJob` 内部那处，`:117`），**外部直调零枚**
+（`\.Assign\(` 的普查里除 `:117` 再无别的 `Assign` 命中）。
+⇒ 进 Job 的唯一门 = `StartInJob`。
+
+| 谁被分配进去过 | 位置 | 性质 |
+|---|---|---|
+| `wisp slo` 的被测子进程（`wisp.exe slo -subject …`） | `cmd/wisp/slo_windows.go:498` | **唯一的产品侧分配点**，落在 SLO 测量夹具里 |
+| 测试夹具：重执行的测试二进制自身（`-test.run=^TestHelperProcess$`） | `internal/proc/jobscope_windows_test.go:41`（经 `startHelper`） | 测试，非产品 |
+| spike：把 **spike 进程自己**塞进 kill-on-close Job | `scripts/spike/common/winshell.go:490` | 夹具，不在构建产物 |
+| **一轮 agent 任务起的子进程** | —— | **零枚**（本格不宣称"不可能"，只报"现存代码里没有调用者"） |
+
+**"等价形状"这一问的答案是否。** 把进程塞进 Job 的等价写法是 `CREATE_SUSPENDED` 起、`AssignProcessToJobObject`、再 `ResumeThread`
+（先挂起再归属，才没有归属前就跑起来的窗口）。`-E 'CREATE_SUSPENDED|ResumeThread|CreationFlags'` 那发普查
+**零枚** `CREATE_SUSPENDED`、**零枚** `ResumeThread`，两枚 `CreationFlags` 命中都是 `CREATE_NEW_PROCESS_GROUP`（进程组，与 Job 无关）。
+
+### 2.3　顺带量到的一处现存形状（不是本票的修法，是给 AC#2 判料）
+
+`StartInJob` 的门是"**先 `cmd.Start()` 再 `Assign`**"（`jobscope_windows.go:114`→`:117`）：
+
+```
+$ sed -n '114,121p' internal/proc/jobscope_windows.go
+	if err := cmd.Start(); err != nil {
+		return nil, fmt.Errorf("proc: StartInJob: %w", err)
+	}
+	if err := j.Assign(cmd.Process); err != nil {
+		_ = cmd.Process.Kill()
+		_ = cmd.Wait()
+		return nil, err
+	}
+```
+
+⇒ 在 `Start` 与 `Assign` 之间，那枚子进程**已经在无 Job 状态下运行**；它若在这条窗口里自己再 fork，
+生下来的孙进程就**永远不在**这枚 Job 里（Job 归属是"起我的时候我在哪，我就在哪"）。
+`Assign` 失败时它会被 `Kill`+`Wait` 收掉，所以票 03 那句"防逃逸"就"**分配失败不留孤儿子进程**"这半是属实的；
+就"**没有任何逃逸窗口**"这半，本格的读数是**它没覆盖这一层**。那两枚出处的原文（现跑）：
+
+```
+$ grep -n '防逃逸' docs/evidence/s0/03-adversarial-acceptance.md
+97:  `StartInJob` = Start 后立即 Assign，**Assign 失败先 Kill+Wait 再返回错误**（防逃逸）；
+
+$ grep -n 'escape-proof' .scratch/wisp/issues/03-skeleton-runtime-rules-done.md
+60:- [2026-09-19T07:18:37Z] agent=T03-impl did=JobScope-C30-proc (OpenJobScope KILL_ON_JOB_CLOSE, Assign/StartInJob escape-proof, TreePrivateBytes+TreeProcessCount via pid-list+psapi PrivateUsage; tests: READY-handshaked child killed on job close, multi-child accounting, empty-job zero, failed-start leaves no child; race-clean) next=single-instance+env-fork
+```
+
+⚠ 本程**没有**为这条造用例（造它要真起进程并卡那条窗口），也没有把它算成本票的缺口——它记在 §7"没测什么"里，
+并把话留在 AC#2 那族修法真被批准时一起裁。
+
+### 2.4　正面控制：这条门今天真的通着电
+
+普查只说"有没有人调用"，不说"调用有没有用"。所以本格真跑一次那三枚 Job 用例（宿主原生 Windows）：
+
+```
+$ go test -count=1 -run 'TestJobScope|TestStartInJob' -v ./internal/proc/
+=== RUN   TestJobScopeKillsChildOnClose
+--- PASS: TestJobScopeKillsChildOnClose (0.04s)
+=== RUN   TestJobScopeTreeAccounting
+--- PASS: TestJobScopeTreeAccounting (0.07s)
+=== RUN   TestStartInJobRejectsBadCommand
+--- PASS: TestStartInJobRejectsBadCommand (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/proc	0.162s
+rc=0
+```
+
+⇒ 三枚全过、`rc=0`、无 `--- FAIL:`。整机 Job 的"关了就杀"这条**在真机上是活的**；
+本票要找的"任务级级联"**没有对应的用例**，因为它没有对应的实现——这条判语在 AC#3 那格落字。
+
+### 2.5　放水两问自答
+
+- **断言方向动没动**：没动。本格跑的是**原有**的三枚 `TestJobScope*` 用例，一字未改（`git diff` 在 §5 零改动自证里出）。
+- **helper 是不是原有的那枚**：是——`internal/proc/jobscope_windows_test.go:27 startHelper` 是票 03 交付的那枚，本程未改它、也未新造注入面。
+- 补一条：`-run` 的正则是"这三枚"，不是"这一包"；本格的 `rc=0` 只代表这三枚，**不代表 `internal/proc` 整包**（整包读数在 §6 的门禁格里另出）。
+
+### 2.6　本格没测什么
+
+1. **没证明"归属窗口"真能被利用**（§2.3 那条）：没有用例，也没有测量，只是读码得到的形状。若有人要按它开票，得先有一把尺。
+2. **没验 `wisp slo` 那枚被测子进程在真实运行里确实落在 Job 内**（`TreeProcessCount()>0`）——那要跑 `wisp slo`，会另起子进程并抢 CPU，且 `cmd/wisp` 是票 149 的写者。
+3. **没在 Linux 侧看任何等价性**：`internal/proc` 的 Job 那半边整个是 `_windows.go`，非 Windows 侧今天**没有对应文件**（这条是 AC#1③ 与 AC#2③ 的交点，话留在 §4）。
