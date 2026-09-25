@@ -121,3 +121,67 @@ RUN=180  顶层 PASS=100  子 PASS=78  FAIL=2  SKIP=0  panic=0  distinct=90
   从此当场 `t.Fatalf`（M2/M3 的形状）。
 - 不治：标签在**另一枚函数**里（M4/M13 的形状）。那一发 `knownComposerMethod` 自己的 switch 一字未动，
   drop 列表是空的。⇒ 这是 §3 那把新尺的活，(a) 不是全部。
+
+---
+
+## §3 修法 (b)：神谕换成"包内每一枚像路由的字面量，都拿去问**真的**守卫"（治 F-2 / M4 / M13）
+
+### §3.1 先独立推演验收的断言，再动手
+
+验收 §7.3(b) 的原话是"**我推演它咬得住 M4 与 M13**（`"panel.review.allow"` 就是包内的字面量、守卫真答它）"，
+并自己标了"这是未验证断言"。我独立推了三条，其中**一条它没说、而它说的两条我复算成立**：
+
+| 待验 | 推演 | 现量（§3.3） |
+|---|---|---|
+| M4：字面量在包内？ | `acceptM4Gate` 的 `case "panel.review.allow":` 就在 `bridge.go`（非 `_test.go`，正是 AST 的分母） | 命中 `written at bridge.go:125` |
+| M4：真守卫答它？ | `knownComposerMethod` 末尾 `return acceptM4Gate(m)` ⇒ 运行期 `true` | 探针 `= true`（§0.3）；红句直接引用真函数 |
+| M13：同一发？ | M13 的路由半**就是** M4 的形状（第二条链 + 同一个名字），所以 (b) 应当只治它的**路由半** | 红句同形（`bridge.go:123`）；**封套半仍 0 findings**，那一半是 §4 的 (c) |
+| 验收没说的一条 | 反过来还有一格：**守卫答了、名字却从没被整枚拼出来**（`"panel.review." + tail` 且 tail 在别处）⇒ pool 比 answered 小，整把尺退化成装饰 | `answeredOutsidePool` 那一判就是它，见 §3.2 第三条 |
+
+⇒ **(b) 的判据不需要换**，但我把它从"一条"扩成了"三条互印"（见下），因为只加验收写的那一条会留下
+"pool 小于 answered 时静默退化"这个新洞。**没有换方案，是加了一格。**
+
+### §3.2 改了什么
+
+- `pkg.literals []routeLiteral`：`collectRouteLiterals` 在**每枚文件解析后单独走一遍**，
+  收全包（含别的函数、含 const/var 初始化式）里所有 `routeShapedName` 通过的字符串字面量，带 `file:line`。
+  `routeShapedName`＝"至少两段、点分、只含字母数字下划线（段内不许以 `-` 开头）"，
+  所以 struct tag（含 `:`）、mime（含 `/`）、带目录的路径、printf 动词全都进不来。
+  **它只是筛子不是判据**：判据是真守卫，混进来一枚也无所谓。
+- `routeNamePool(pkg)`：字面量 ∪ 包级 string 常量的值（守卫可能只经由一枚常量答一个名字），名字 → 出处列表。
+- `poolJudgedByRealGuard(pool, answered)` 两向：
+  1. `answeredElsewhere` —— 真守卫答了、**派生集没看见** ⇒ 红（M4/M13 那一发）；
+  2. `answeredGrantDoor` —— 真守卫答了、**名字本身是审批形状** ⇒ 红（禁令本体）。
+- `answeredOutsidePool` 第三向（防退化）：派生集里若有名字**不成枚出现在包里** ⇒ 红，
+  外加面 1 里 `len(pool) < len(answered)` 直接 `t.Fatalf`。
+  这一格是验收那版没有的：**神谕换成一枚更小的尺子时，最容易的就是没人发现它变小了。**
+- 植物 F（`…/F_a_route_named_outside_the_guard_still_reaches_the_pool`）：把第二条链种进快照，
+  断言 pool 收下了 `panel.review.allow` 并点到 `l2-plant-f.go:7`，同时断言
+  `pkg.answered` **没有**它（证明这一发的确是旧枚举的盲区）。快照只解析不编译，
+  所以运行期那半的真红在 §6 的真树变异里，这一枚钉的是"神谕看得见别的函数"这一格 ingredient。
+
+### §3.3 现量：M4 与 M13 的真红
+
+读数状态＝**(a) 已提交（`9d85789`）、(b) 在当时的测试树里**（blob 我在 commit 后当场复算，见本节末）。
+副本 `headcopy` 与仓库只差这一枚被同步过的 `_test.go`，`bridge.go` 三处仍同值 `d2cd6362…`。
+
+```
+M4  --- FAIL: TestAnsweredPanelRoutesCarryNoApprovalDecision
+    :817 knownComposerMethod answers "panel.review.allow" (written at bridge.go:125) but the guard's own
+         case list, which is what this file enumerates, never named it: ... the answered set read here is
+         INCOMPLETE, not clean (D33/F2, R20)
+    :820 knownComposerMethod answers "panel.review.allow" (written at bridge.go:125), an approval decision
+         addressed from the panel, and the name was found written in this package rather than guessed here
+    +  --- FAIL: …/F_a_route_named_outside_the_guard_still_reaches_the_pool   （它的负控：真守卫现在答这个名字）
+M13 --- FAIL: TestAnsweredPanelRoutesCarryNoApprovalDecision    （同两行，出处 bridge.go:123）
+    仍 0 findings 的那一半：:878 "…AST scan of internal/panel: 0 findings"  ⇒ 那是 §4 (c) 的活
+```
+
+M2M3 那一发同时红了三枚（`TestAnswered… / TestNoInbound… / TestPlanted…`），红句是 (a) 的
+`the inbound route guard … has 2 case label(s) this instrument cannot resolve to a string:
+bridge.go:99: "panel.review." + acceptM3Tail / bridge.go:99: acceptM2Route`。
+⇒ 验收 §0.3 里"4 枚生产面全绿、只有陈旧性引信叫"那一格，现在是**三枚叫、而且叫的是门**。
+
+本节的锚点：`TestAnswered…` 里那两枚红句的行号（817/820）与 `:878`、`:839` 都按当时代码现读，
+commit 后本件的行号会继续漂，引用时以 `l2_grant_boundary_test.go` 的**句子**为准，不要拿行号当句子的指纹。
+

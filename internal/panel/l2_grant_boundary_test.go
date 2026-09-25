@@ -280,6 +280,7 @@ type boundaryPackage struct {
 	structs   map[string]structShape
 	consts    map[string]string
 	answered  map[string]bool
+	literals  []routeLiteral
 	dropped   []unresolvedLabel
 	guardFile string
 	guardLine int
@@ -306,6 +307,8 @@ func parseBoundaryPackage(dir string) (boundaryPackage, error) {
 			return pkg, err
 		}
 		rel := filepath.ToSlash(filepath.Base(path))
+
+		collectRouteLiterals(af, fset, rel, &pkg)
 
 		ast.Inspect(af, func(n ast.Node) bool {
 			switch decl := n.(type) {
@@ -564,6 +567,133 @@ func inboundEnvelopes(pkg boundaryPackage) map[string]bool {
 	return inbound
 }
 
+// routeLiteral is one string literal in this package's Go sources that is
+// spelled like a route, and the line it was written on.
+type routeLiteral struct {
+	File  string
+	Line  int
+	Value string
+}
+
+// routeShapedName reports whether s is spelled like a route name: two or more
+// dot-separated segments of letters, digits and underscores (a leading hyphen in
+// a segment is not allowed). Struct tags, printf verbs, paths, mimes and file
+// names with a directory all fail this shape, which is what keeps the pool from
+// drowning in noise.
+//
+// Being route-shaped is only the filter. What decides anything is whether the
+// real guard answers the name - see poolJudgedByRealGuard - so a stray match
+// here costs nothing.
+func routeShapedName(s string) bool {
+	segments := strings.Split(s, ".")
+	if len(segments) < 2 {
+		return false
+	}
+	for _, seg := range segments {
+		if seg == "" {
+			return false
+		}
+		for i, r := range seg {
+			switch {
+			case r >= 'a' && r <= 'z', r >= 'A' && r <= 'Z', r >= '0' && r <= '9', r == '_':
+			case r == '-' && i > 0:
+			default:
+				return false
+			}
+		}
+	}
+	return true
+}
+
+// collectRouteLiterals records every route-shaped string literal in one parsed
+// file, INCLUDING the ones sitting inside functions this instrument never reads.
+// That is the whole point: the guard's own switch is not the only place a route
+// name is written down, and acceptance r1's M4 planted its door in a second
+// function whose case list the old enumeration had no business seeing.
+func collectRouteLiterals(af *ast.File, fset *token.FileSet, rel string, pkg *boundaryPackage) {
+	ast.Inspect(af, func(n ast.Node) bool {
+		lit, ok := n.(*ast.BasicLit)
+		if !ok || lit.Kind != token.STRING {
+			return true
+		}
+		v := unquoteGo(lit.Value)
+		if !routeShapedName(v) {
+			return true
+		}
+		pkg.literals = append(pkg.literals, routeLiteral{
+			File: rel, Line: fset.Position(lit.Pos()).Line, Value: v,
+		})
+		return true
+	})
+}
+
+// routeNamePool is every candidate route name this package spells out: each
+// route-shaped literal, plus each package-level string constant with the same
+// shape (a guard may answer a name that only ever appears in a const). It maps a
+// name to the places it was found, so a failure can point.
+func routeNamePool(pkg boundaryPackage) map[string][]string {
+	pool := map[string][]string{}
+	for _, l := range pkg.literals {
+		key := l.File + ":" + strconv.Itoa(l.Line)
+		pool[l.Value] = append(pool[l.Value], key)
+	}
+	for name, val := range pkg.consts {
+		if routeShapedName(val) {
+			pool[val] = append(pool[val], "const "+name)
+		}
+	}
+	return pool
+}
+
+// poolJudgedByRealGuard is the oracle. It asks the RUNNING guard, not the AST,
+// about every name the package spells out, and reports two things:
+//
+//	answeredElsewhere - the guard answers a name the derived enumeration never
+//	  saw. This is F-2: a second switch/if chain that knownComposerMethod hands
+//	  its decision to is invisible to a scan pointed at that one function, and it
+//	  is exactly the shape a handler registry takes.
+//	answeredGrantDoor - the guard answers a name whose own spelling is an
+//	  approval decision. This is the ban itself (D33/F2, AGENTS.md ban #6).
+//
+// The direction matters and is written down so nobody re-reads this as a
+// two-way proof: names come from what the package WRITES. A route assembled at
+// runtime from a config value or the network is not in the pool and cannot be,
+// and no static ruler reaches it either.
+func poolJudgedByRealGuard(pool map[string][]string, answered map[string]bool) (answeredElsewhere, answeredGrantDoor []string) {
+	for name, sites := range pool {
+		if !knownComposerMethod(name) {
+			continue
+		}
+		sort.Strings(sites)
+		where := strings.Join(sites, ", ")
+		if !answered[name] {
+			answeredElsewhere = append(answeredElsewhere, strconv.Quote(name)+" (written at "+where+")")
+		}
+		if carriesGrantWord(name, grantRouteWords) {
+			answeredGrantDoor = append(answeredGrantDoor, strconv.Quote(name)+" (written at "+where+")")
+		}
+	}
+	sort.Strings(answeredElsewhere)
+	sort.Strings(answeredGrantDoor)
+	return answeredElsewhere, answeredGrantDoor
+}
+
+// answeredOutsidePool names the degenerate case the other two directions cannot
+// see: a route the enumeration resolved that the package never spells in one
+// piece (a case label built from a concatenation whose pieces are each
+// route-shaped). If that happened, the pool would be a smaller universe than the
+// guard and every check built on it would be decoration.
+func answeredOutsidePool(pool map[string][]string, answered map[string]bool) []string {
+	var out []string
+	for name := range answered {
+		if _, ok := pool[name]; !ok {
+			out = append(out, strconv.Quote(name))
+		}
+	}
+	sort.Strings(out)
+	return out
+}
+
 // scanGrantBoundary runs the AST instrument over one Go directory and reports
 // every grant-carrying face: an inbound envelope field, or an answered route
 // whose own name is an approval decision.
@@ -629,8 +759,10 @@ func sortedSet(m map[string]bool) []string {
 
 // TestAnsweredPanelRoutesCarryNoApprovalDecision is facet 1: the inbound methods
 // Go actually answers contain no approval-shaped name. The set is read out of
-// this package's own route guard, and cross-checked against the function that
-// runs, so a door opened in one place cannot be invisible in the other.
+// this package's own route guard (and goes loud when a label cannot be read),
+// and then cross-checked in BOTH directions against the function that runs: the
+// enumeration may not name a door the guard refuses, and the guard may not
+// answer a door the enumeration never saw.
 func TestAnsweredPanelRoutesCarryNoApprovalDecision(t *testing.T) {
 	root := panelRepoRoot(t)
 	dir := filepath.Join(root, "internal", "panel")
@@ -669,6 +801,28 @@ func TestAnsweredPanelRoutesCarryNoApprovalDecision(t *testing.T) {
 		if knownComposerMethod(cand) {
 			t.Errorf("knownComposerMethod answers %q - an approval decision addressed from the panel", cand)
 		}
+	}
+
+	// The oracle, pointed the other way: every name this package spells out gets
+	// asked of the RUNNING guard, not of the AST. The loop above can only ever
+	// report what its own enumeration found, so a second chain that
+	// knownComposerMethod hands its decision to (acceptance r1's M4, and the M13
+	// that combines it with a renamed route key) used to leave this test green
+	// while ParseComposerRequest accepted the route.
+	pool := routeNamePool(pkg)
+	if len(pool) < len(answered) {
+		t.Fatalf("the route-name pool holds %d names but the guard answers %d - the pool is smaller than the thing it is supposed to audit, so every finding below is decoration",
+			len(pool), len(answered))
+	}
+	answeredElsewhere, answeredGrantDoor := poolJudgedByRealGuard(pool, pkg.answered)
+	for _, hit := range answeredElsewhere {
+		t.Errorf("knownComposerMethod answers %s but the guard's own case list, which is what this file enumerates, never named it: a route answered through another function, or another expression, is a door no vocabulary in this package reviewed - the answered set read here is INCOMPLETE, not clean (D33/F2, R20)", hit)
+	}
+	for _, hit := range answeredGrantDoor {
+		t.Errorf("knownComposerMethod answers %s, an approval decision addressed from the panel, and the name was found written in this package rather than guessed here (D33/F2, R20, AGENTS.md §1.2 ban #6)", hit)
+	}
+	if strays := answeredOutsidePool(pool, pkg.answered); len(strays) > 0 {
+		t.Errorf("the guard's case list resolves to %v, which this package never spells as one route-shaped string: the pool and the enumeration are not the same universe and the audit above is not measuring the guard", strays)
 	}
 
 	// The answered set and the declared route constants must be one vocabulary:
@@ -974,6 +1128,52 @@ func TestPlantedGrantWiringGoesRedInASnapshot(t *testing.T) {
 			}
 		}
 		t.Logf("loud as required, and the names are not invented:%s", joinUnresolved(pkg.dropped))
+	})
+
+	// Plant F: the M4 shape - a SECOND chain, in its own function, answering an
+	// approval-shaped route. A snapshot is only parsed, never compiled, so the
+	// running guard it is audited against is still this package's real one; what
+	// plant F can therefore pin is the half that was actually missing - the pool
+	// the oracle reads is built from the whole package, so it sees a name written
+	// in any function at all, where the guard's own case list sees nothing.
+	// The runtime half of the check is exercised on the real tree in
+	// docs/evidence/s1/panel-l2-grant-nail-fix-r2.md §6 (M4 and M13 both red), and
+	// this same subtest goes red there too, because its negative control asks the
+	// real guard to still refuse the name.
+	const plantFChain = "package panel\n\n" +
+		"// acceptFGate is the second chain a wiring commit writes when it does not\n" +
+		"// want to touch the guard's own case list.\n" +
+		"func acceptFGate(m string) bool {\n" +
+		"\tswitch m {\n" +
+		"\tcase \"panel.review.allow\":\n" +
+		"\t\treturn true\n" +
+		"\t}\n" +
+		"\treturn false\n" +
+		"}\n"
+
+	t.Run("F a route named outside the guard still reaches the pool", func(t *testing.T) {
+		dir := copyGoSources(t, src, files, "", "l2-plant-f.go", plantFChain)
+		pkg, err := parseBoundaryPackage(dir)
+		if err != nil {
+			t.Fatalf("parse %s: %v", dir, err)
+		}
+		requireReadableGuard(t, dir, pkg)
+		pool := routeNamePool(pkg)
+		sites, ok := pool["panel.review.allow"]
+		if !ok || len(sites) == 0 {
+			t.Fatal("the pool never saw a route name written in another function: the oracle would be reading the same one case list as before")
+		}
+		if !strings.Contains(strings.Join(sites, " "), "l2-plant-f.go") {
+			t.Errorf("the pool must name where it found the route, got %v", sites)
+		}
+		if pkg.answered["panel.review.allow"] {
+			t.Errorf("the guard's own case list resolved the planted chain, so the answeredElsewhere half below would be testing nothing")
+		}
+		if knownComposerMethod("panel.review.allow") {
+			t.Error("the real knownComposerMethod answers panel.review.allow - this is no longer a clean tree, and the negative control below is void")
+		}
+		t.Logf("pool sees %q at %v while pkg.answered does not; the running guard still refuses it, which is what makes answeredElsewhere the load-bearing half",
+			"panel.review.allow", sites)
 	})
 
 	t.Run("C a wired grant door goes red on both halves", func(t *testing.T) {
