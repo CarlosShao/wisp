@@ -554,5 +554,15 @@ ban #8 design/=32 frontend/=40 internal/=406 cmd/=39
 在"该说"的树上（§2/§4/§14）逐枚出声。`ban #8 design/=32` 与 A216 那一格（30 枚入库、36 枚截图未入库）
 仍在动，**归前端会话与编排者**，本批一字未碰。
 
-**本程到此收工**：两枚 commit（`ca84b75` 代码＋取证、`ca06fcd` 追加 §14/§15），无第三枚代码改动，未 push。
-裁决请由**非实现者**做（`AGENTS.md` §0.3），复现装置在 `D:\tmp\d22scan-index-fix-r1\`（只建不删）。
+**本程共四枚 commit**：`ca84b75`（三枚代码文件＋本件初版）／`ca06fcd`（追加 §14）／
+`b6f596d`（追加 §15）／本枚（下面的更正）。**没有第三枚代码改动**，未 push。
+裁决请由**非实现者**做（`AGENTS.md` §0.3），复现装置在两枚仓库外目录里（只建不删）：
+`D:\tmp\d22scan-index-fix-r1\` ＝ `bin ci-shapes logs mut-indexoff mut-semantics shapes snap-post snap-prebase stillbites`，
+`D:\tmp\wisp-d22scan-index-r1\` ＝ `plain probe1 probe2 probe3`。
+
+> **收工后自查出的一枚本件自身的 prose 错（不改代码，追加不删原句）**：§14 末段把
+> `probe1 probe2 probe3` 列进了 `D:\tmp\d22scan-index-fix-r1\` 那份清单，**实际在**
+> `D:\tmp\wisp-d22scan-index-r1\probe{1,2,3}`——那是 §0.3 表里那三发 `git check-ignore` 实测的落地目录
+> （我先建的 scratch 用了那个名字，主工作区后来另建一枚，我在 §14 里凭记忆合并了两枚目录名，
+> **没现跑 `ls`** ⇒ 与本仓抓过多次的"引用前没现跑"同一形状，记在我自己名下）。
+> 上面那段已按现量重写。同一枚更正也覆盖 §15 里"两枚 commit"那句——现量是四枚。
