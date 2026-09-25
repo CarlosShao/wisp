@@ -35,26 +35,35 @@ import (
 
 // TestCheckSettleZeroTrustworthySamplesFailsClosed is leg A, the nail.
 func TestCheckSettleZeroTrustworthySamplesFailsClosed(t *testing.T) {
-	reads := 0
-	ft := &fakeTree{current: func() TreeMetrics {
-		reads++
-		// A live tree (PIDs 1) reporting no private working set: every read
-		// is untrustworthy and must be dropped, never recorded as progress.
-		return TreeMetrics{PIDs: 1, PrivateWorkingSetBytes: 0}
-	}}
-	s := NewSampler(ft, NewRegistry())
+	// AC#15: unlike SampleState, CheckSettle has no read before the first tick
+	// (sampler.go:493-501), so the "the tree was never read" floor below IS a
+	// scheduling outcome and is waited for. The window is reopened whole -
+	// fresh tree, fresh sampler, fresh report - so the count the wait judged and
+	// the count the assertions below read are the same window's.
+	win := awaitSettleReads(t, 1, func() (*SettleReport, int) {
+		reads := 0
+		ft := &fakeTree{current: func() TreeMetrics {
+			reads++
+			// A live tree (PIDs 1) reporting no private working set: every read
+			// is untrustworthy and must be dropped, never recorded as progress.
+			return TreeMetrics{PIDs: 1, PrivateWorkingSetBytes: 0}
+		}}
+		s := NewSampler(ft, NewRegistry())
 
-	// Keep the release leg satisfied so Pass=false cannot be attributed to
-	// it: the gate's own FreeOSMemory counter must be >0 and released=true.
-	prev := debugFreeOSMemory
-	debugFreeOSMemory = func() {}
-	t.Cleanup(func() { debugFreeOSMemory = prev })
-	ReleaseMemory()
+		// Keep the release leg satisfied so Pass=false cannot be attributed to
+		// it: the gate's own FreeOSMemory counter must be >0 and released=true.
+		prev := debugFreeOSMemory
+		debugFreeOSMemory = func() {}
+		t.Cleanup(func() { debugFreeOSMemory = prev })
+		ReleaseMemory()
 
-	rep, err := s.CheckSettle(context.Background(), SLOSleeping, 100*time.Millisecond, 20*time.Millisecond, true, TreeMetrics{}, 100<<20)
-	if err != nil {
-		t.Fatal(err)
-	}
+		rep, err := s.CheckSettle(context.Background(), SLOSleeping, 100*time.Millisecond, 20*time.Millisecond, true, TreeMetrics{}, 100<<20)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return rep, reads
+	})
+	rep, reads := win.rep, win.reads
 
 	// Precondition legs: this really is a zero-trustworthy-sample window.
 	// (Relaxing sampler.go:477 so zero-footprint reads are recorded turns
@@ -123,21 +132,32 @@ func TestCheckSettleZeroTrustworthySamplesFailsClosed(t *testing.T) {
 // the release-counter contract and :276 pins the never-reaches-cap shape,
 // neither asserts that a trustworthy read lands in Samples.
 func TestCheckSettleTrustworthyReadsAreRecorded(t *testing.T) {
-	ft := &fakeTree{current: func() TreeMetrics {
-		// Under the frozen Sleeping cap on purpose: the only reason this
-		// window may not pass is a broken recording branch.
-		return TreeMetrics{PIDs: 1, PrivateWorkingSetBytes: 4 << 20, Handles: 10}
-	}}
-	s := NewSampler(ft, NewRegistry())
-	prev := debugFreeOSMemory
-	debugFreeOSMemory = func() {}
-	t.Cleanup(func() { debugFreeOSMemory = prev })
-	ReleaseMemory()
+	// AC#15: CheckSettle's samples are the tick reads that passed the
+	// fail-closed comparison, so a window that took no tick has no sample to
+	// check and the floor below is a scheduling outcome. Waited for; the
+	// criterion is the seam's own read count, so a recording branch that stops
+	// recording can never be the thing that satisfies the wait.
+	win := awaitSettleReads(t, 1, func() (*SettleReport, int) {
+		reads := 0
+		ft := &fakeTree{current: func() TreeMetrics {
+			reads++
+			// Under the frozen Sleeping cap on purpose: the only reason this
+			// window may not pass is a broken recording branch.
+			return TreeMetrics{PIDs: 1, PrivateWorkingSetBytes: 4 << 20, Handles: 10}
+		}}
+		s := NewSampler(ft, NewRegistry())
+		prev := debugFreeOSMemory
+		debugFreeOSMemory = func() {}
+		t.Cleanup(func() { debugFreeOSMemory = prev })
+		ReleaseMemory()
 
-	rep, err := s.CheckSettle(context.Background(), SLOSleeping, 100*time.Millisecond, 20*time.Millisecond, true, TreeMetrics{}, 100<<20)
-	if err != nil {
-		t.Fatal(err)
-	}
+		rep, err := s.CheckSettle(context.Background(), SLOSleeping, 100*time.Millisecond, 20*time.Millisecond, true, TreeMetrics{}, 100<<20)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return rep, reads
+	})
+	rep := win.rep
 	if len(rep.Samples) == 0 {
 		t.Fatal("trustworthy settle reads must be recorded in samples")
 	}

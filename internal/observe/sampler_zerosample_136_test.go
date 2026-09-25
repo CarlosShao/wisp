@@ -60,6 +60,14 @@ func TestSampleStateZeroSampleWindowFailsClosed(t *testing.T) {
 	if len(rep.Samples) != 0 {
 		t.Fatalf("precondition broken: unmeasurable window produced %d samples", len(rep.Samples))
 	}
+	// AC#15 census note: this one floor is NOT behind awaitStateReads, because
+	// it cannot come out of scheduling. SampleState reads the tree before the
+	// ticker loop starts (sampler.go:269) and again to close the window
+	// (:306), so any window that returns at all has taken at least 2 reads;
+	// the tick-dependent floor of this leg is the sample count above, which
+	// leg B (TestSampleStateTrustworthyWindowNotMarkedUnmeasurable) is now
+	// waited for. Wrapping this guard in a wait would be a wait that can never
+	// be the one that saves you.
 	if reads == 0 {
 		t.Fatal("precondition broken: the tree was never read")
 	}
@@ -139,14 +147,22 @@ func TestSampleStateZeroSampleWindowFailsClosed(t *testing.T) {
 // one is not a gate). Mutating the discard branch so that every read is
 // dropped turns this red - evidence §3.
 func TestSampleStateTrustworthyWindowNotMarkedUnmeasurable(t *testing.T) {
-	ft := &fakeTree{current: func() TreeMetrics {
-		return TreeMetrics{PIDs: 1, PrivateWorkingSetBytes: 16 << 20, GDIObjects: 5, Handles: 420, Threads: 23}
-	}}
-	s := NewSampler(ft, NewRegistry())
-	rep, err := s.SampleState(context.Background(), SLOSleeping, 10*time.Millisecond, 60*time.Millisecond)
-	if err != nil {
-		t.Fatal(err)
-	}
+	// AC#15: samples only ever come from the ticker loop, so this floor is
+	// waited for (3 reads = the 2 SampleState takes outside the loop + 1 tick).
+	win := awaitStateReads(t, 3, func() (*StateReport, int) {
+		reads := 0
+		ft := &fakeTree{current: func() TreeMetrics {
+			reads++
+			return TreeMetrics{PIDs: 1, PrivateWorkingSetBytes: 16 << 20, GDIObjects: 5, Handles: 420, Threads: 23}
+		}}
+		s := NewSampler(ft, NewRegistry())
+		rep, err := s.SampleState(context.Background(), SLOSleeping, 10*time.Millisecond, 60*time.Millisecond)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return rep, reads
+	})
+	rep := win.rep
 	if len(rep.Samples) == 0 {
 		t.Fatal("trustworthy reads must be sampled")
 	}

@@ -86,10 +86,23 @@ func failedRead() coverageStep {
 
 // settleSUT runs one CheckSettle over the given script with the release leg
 // satisfied, and returns the report plus how many reads the seam actually took.
+//
+// AC#15: this is ONE window. Every caller that goes on to state a precondition
+// about how many reads landed has to go through awaitSettleReads, which reopens
+// it until that precondition holds; see window_wait_136_test.go.
 func settleSUT(t *testing.T, steps []coverageStep) (*SettleReport, int) {
 	t.Helper()
-	ft := &coverageScriptTree{steps: steps}
-	s := NewSampler(ft, NewRegistry())
+	return settleTreeSUT(t, &coverageScriptTree{steps: steps})
+}
+
+// settleTreeSUT is settleSUT for a leg that drives the seam with its own
+// stateful fixture (the alternating tree) instead of a script, so AC#15 can
+// reopen that window without duplicating the opening lines or borrowing AC#14's
+// gateSUT - whose own file header rules the two fixture sets apart across this
+// boundary (sampler_settle_gate_136_test.go:29-31).
+func settleTreeSUT(t *testing.T, tree TreeReader) (*SettleReport, int) {
+	t.Helper()
+	s := NewSampler(tree, NewRegistry())
 	// The FreeOSMemory counter and released=true must stay satisfied, so the
 	// only thing these legs can ever be red about is coverage disclosure.
 	prev := debugFreeOSMemory
@@ -100,7 +113,13 @@ func settleSUT(t *testing.T, steps []coverageStep) (*SettleReport, int) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	return rep, ft.reads
+	switch x := tree.(type) {
+	case *coverageScriptTree:
+		return rep, x.reads
+	case *alternatingTree:
+		return rep, x.reads
+	}
+	return rep, 0
 }
 
 // settleWire marshals the report the way `wisp slo -settle` writes it, and
@@ -121,7 +140,10 @@ func settleWire(t *testing.T, rep *SettleReport) map[string]any {
 // TestCheckSettleSingleTrustworthyReadReportsItsLoss is probe ① ("整窗只 1 枚
 // 可信"): one trustworthy read followed by nothing but failures.
 func TestCheckSettleSingleTrustworthyReadReportsItsLoss(t *testing.T) {
-	rep, reads := settleSUT(t, []coverageStep{trustworthyRead(), failedRead(), failedRead()})
+	win := awaitSettleReads(t, 3, func() (*SettleReport, int) {
+		return settleSUT(t, []coverageStep{trustworthyRead(), failedRead(), failedRead()})
+	})
+	rep, reads := win.rep, win.reads
 	if reads < 3 {
 		t.Fatalf("precondition broken: the window only took %d reads, it must lose some", reads)
 	}
@@ -198,34 +220,41 @@ func TestCheckSettleSingleTrustworthyReadReportsItsLoss(t *testing.T) {
 // TestCheckSettleHalfTheReadsFailedReportsItsLoss is probe ② ("一半读数报错"):
 // every other read fails, so no matter how many ticks fired, about half the
 // window is missing and the report has to say so.
+//
+// AC#15: this is the leg that went red 4 times in 8200 same-process shots on
+// snapshot beac693, always on the read-count precondition below. The window is
+// now reopened until that precondition is met instead of being counted the
+// moment it closes. That is only half the fix, and the other half is what this
+// comment is here to keep visible: the wait makes the window LONG ENOUGH, it
+// does not make the window LOSE HALF ITS READS. The losing is engineered by
+// alternatingTree (:276-284 below), which answers every other read with a
+// failure, and the assertions underneath the guards are about the report
+// DISCLOSING that loss - not about the loss having happened. If the wait ever
+// starts satisfying itself some other way, the mutation in
+// docs/evidence/s1/observe-ac15-poll-r1.md section 5 is the reading that says
+// so: break the counting branch in sampler.go and this leg still goes red.
 func TestCheckSettleHalfTheReadsFailedReportsItsLoss(t *testing.T) {
-	tree := &alternatingTree{}
-	s := NewSampler(tree, NewRegistry())
-	prev := debugFreeOSMemory
-	debugFreeOSMemory = func() {}
-	t.Cleanup(func() { debugFreeOSMemory = prev })
-	ReleaseMemory()
-	rep, err := s.CheckSettle(context.Background(), SLOSleeping, 100*time.Millisecond, 10*time.Millisecond, true, TreeMetrics{}, 100<<20)
-	if err != nil {
-		t.Fatal(err)
-	}
+	win := awaitSettleReads(t, 4, func() (*SettleReport, int) {
+		return settleTreeSUT(t, &alternatingTree{})
+	})
+	rep, reads := win.rep, win.reads
 	kept, lost := len(rep.Samples), rep.SampleErrors
-	if tree.reads < 4 {
-		t.Fatalf("precondition broken: only %d reads taken, half-and-half needs a window to lose in", tree.reads)
+	if reads < 4 {
+		t.Fatalf("precondition broken: only %d reads taken, half-and-half needs a window to lose in", reads)
 	}
 	if kept < 2 {
-		t.Fatalf("precondition broken: the fixture kept only %d of %d reads, this leg needs trustworthy reads to compare against", kept, tree.reads)
+		t.Fatalf("precondition broken: the fixture kept only %d of %d reads, this leg needs trustworthy reads to compare against", kept, reads)
 	}
 	// The property: about half the window failed, and the report has to carry
 	// that instead of just the kept half.
 	if lost < 2 {
-		t.Fatalf("the seam lost %d of %d reads but the report says sample_errors=%d: a half-covered window must report its losses", tree.reads-kept, tree.reads, lost)
+		t.Fatalf("the seam lost %d of %d reads but the report says sample_errors=%d: a half-covered window must report its losses", reads-kept, reads, lost)
 	}
-	if kept+lost != tree.reads {
-		t.Fatalf("kept %d + dropped %d != %d reads taken: the window is still hiding readings", kept, lost, tree.reads)
+	if kept+lost != reads {
+		t.Fatalf("kept %d + dropped %d != %d reads taken: the window is still hiding readings", kept, lost, reads)
 	}
 	if kept > lost+1 || lost > kept+1 {
-		t.Fatalf("this leg is about a half-covered window, kept=%d lost=%d reads=%d", kept, lost, tree.reads)
+		t.Fatalf("this leg is about a half-covered window, kept=%d lost=%d reads=%d", kept, lost, reads)
 	}
 	if !strings.Contains(rep.LastSampleError, "settle probe: transient tree read failure") {
 		t.Fatalf("a dropped read must leave its reason behind, got %q", rep.LastSampleError)
@@ -251,7 +280,7 @@ func TestCheckSettleHalfTheReadsFailedReportsItsLoss(t *testing.T) {
 		t.Fatalf("AC#14: a half-covered settle window must carry its own sampling verdict row, got verdicts=%+v", rep.Verdicts)
 	}
 	if coverage.Pass {
-		t.Fatalf("AC#14: this window dropped %d of %d reads and its own row says it measured enough: %+v", lost, tree.reads, *coverage)
+		t.Fatalf("AC#14: this window dropped %d of %d reads and its own row says it measured enough: %+v", lost, reads, *coverage)
 	}
 	if !strings.Contains(coverage.Measured, " errors") || !strings.Contains(coverage.Note, "sample_errors=") {
 		t.Fatalf(`AC#14: the failing row has to print the count it failed on, got measured=%q note=%q`, coverage.Measured, coverage.Note)
@@ -289,7 +318,10 @@ func (t *alternatingTree) ReadTree() (TreeMetrics, error) {
 // sentence StateReport uses, or a window could still lose reads silently while
 // sample_errors stays 0.
 func TestCheckSettleZeroFootprintDropsAreCountedToo(t *testing.T) {
-	rep, reads := settleSUT(t, []coverageStep{trustworthyRead(), zeroFootprint(), zeroFootprint()})
+	win := awaitSettleReads(t, 3, func() (*SettleReport, int) {
+		return settleSUT(t, []coverageStep{trustworthyRead(), zeroFootprint(), zeroFootprint()})
+	})
+	rep, reads := win.rep, win.reads
 	if reads < 3 {
 		t.Fatalf("precondition broken: the window only took %d reads", reads)
 	}
@@ -339,7 +371,10 @@ func TestCheckSettleZeroFootprintDropsAreCountedToo(t *testing.T) {
 // claims loss: a window whose reads all land must show sample_errors=0 and no
 // last_sample_error at all.
 func TestCheckSettleFullyMeasuredWindowReportsNoLoss(t *testing.T) {
-	rep, reads := settleSUT(t, []coverageStep{trustworthyRead()})
+	win := awaitSettleReads(t, 3, func() (*SettleReport, int) {
+		return settleSUT(t, []coverageStep{trustworthyRead()})
+	})
+	rep, reads := win.rep, win.reads
 	if reads < 3 {
 		t.Fatalf("precondition broken: only %d reads taken", reads)
 	}

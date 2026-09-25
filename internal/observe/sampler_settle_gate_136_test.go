@@ -31,10 +31,16 @@ import (
 //     touches theirs;
 //   - no threshold, no golden, nothing under thresholds.go or cmd/wisp.
 //
-// Every window below is deliberately generous (200ms at 10ms, about 20 reads)
-// and every precondition is stated as "at least", never as an exact read
-// count, so these legs cannot join the "the window only took N reads" family
-// AC#15 is chasing.
+// Every window below is generous (200ms at 10ms, about 20 reads) and every
+// precondition is stated as "at least", never as an exact read count. That
+// used to be followed by "so these legs cannot join the 'the window only took
+// N reads' family AC#15 is chasing", and that half-sentence was wrong: an
+// "at least" floor read the moment the window closes is exactly that family,
+// only with a lower floor and so a smaller exposure per shot (measured: 4/8200
+// for the coverage file's floor-4 leg, 0 hits anywhere in this file's
+// 200ms/10ms windows across the batches of the table cited above). AC#15 put
+// the three windows here behind the same bounded monotonic wait
+// (window_wait_136_test.go) rather than leaving the claim to hold by luck.
 
 // errGateProbeRead is this file's own distinctive failure text, so no other
 // leg's reason can satisfy these assertions by accident.
@@ -152,7 +158,15 @@ func gateRowWire(t *testing.T, v Verdict) map[string]any {
 // the StateReport row it is meant to be 同形 with, and the wire form shows the
 // row's own gate/limit/pass fields rather than only the report's total boolean.
 func TestSettleCoverageRowExistsAndPassesWhenFullyMeasured(t *testing.T) {
-	rep, reads := gateSUT(t, &gateScriptTree{steps: []gateStep{gateTrustworthy()}})
+	// AC#15: the floor below is a read count, so it is waited for, in the same
+	// bounded-monotonic-wait shape the rest of this package now uses
+	// (window_wait_136_test.go). The file header's claim that these legs
+	// "cannot join the family" was half-true at most - see section 2 of
+	// docs/evidence/s1/observe-ac15-poll-r1.md; this is the correction.
+	win := awaitSettleReads(t, 1, func() (*SettleReport, int) {
+		return gateSUT(t, &gateScriptTree{steps: []gateStep{gateTrustworthy()}})
+	})
+	rep, reads := win.rep, win.reads
 	if reads < 1 || len(rep.Samples) != reads {
 		t.Fatalf("precondition broken: this leg needs a window that recorded every read, got samples=%d reads=%d", len(rep.Samples), reads)
 	}
@@ -196,7 +210,14 @@ func TestSettleCoverageRowExistsAndPassesWhenFullyMeasured(t *testing.T) {
 // names sample_errors, because a red that cannot be attributed is a red that
 // gets widened.
 func TestSettleCoverageRowSaysNotPassWhenHalfTheReadsFailed(t *testing.T) {
-	rep, reads := gateSUT(t, &gateAlternatingTree{})
+	// AC#15: two reads is this window's own floor - with an alternating fixture
+	// one read can only ever be a loss, so "kept >= 1 and lost >= 1" below needs
+	// a window that reached 2. Waited for; the guard stays, and the row
+	// assertions underneath it are what this leg is about.
+	win := awaitSettleReads(t, 2, func() (*SettleReport, int) {
+		return gateSUT(t, &gateAlternatingTree{})
+	})
+	rep, reads := win.rep, win.reads
 	kept, lost := len(rep.Samples), rep.SampleErrors
 	if kept < 1 || lost < 1 {
 		t.Fatalf("precondition broken: an alternating tree must both keep and lose reads within the window, kept=%d lost=%d reads=%d", kept, lost, reads)
@@ -234,8 +255,19 @@ func TestSettleCoverageRowSaysNotPassWhenHalfTheReadsFailed(t *testing.T) {
 // can produce it - the loop always reads at least once - and the synthetic
 // report in cmd/wisp/slo_windows.go:623 is the one that does (AC#10's ground).
 func TestSettleCoverageRowSeparatesUnmeasuredFromFullyMeasured(t *testing.T) {
-	full, _ := gateSUT(t, &gateScriptTree{steps: []gateStep{gateTrustworthy()}})
-	none, reads := gateSUT(t, &gateScriptTree{steps: []gateStep{gateZeroFootprint()}})
+	// AC#15: both windows here are counted without waiting today. The one whose
+	// count is discarded (`full`) is not innocent either - a window that took no
+	// read at all yields the never-measured row, and the distinction this leg
+	// exists to pin ("measured everything" vs "measured nothing") would then be
+	// drawn between two unmeasured windows. Both are waited for now; only the
+	// `none` window ever printed a precondition red.
+	fullWin := awaitSettleReads(t, 1, func() (*SettleReport, int) {
+		return gateSUT(t, &gateScriptTree{steps: []gateStep{gateTrustworthy()}})
+	})
+	noneWin := awaitSettleReads(t, 1, func() (*SettleReport, int) {
+		return gateSUT(t, &gateScriptTree{steps: []gateStep{gateZeroFootprint()}})
+	})
+	full, none, reads := fullWin.rep, noneWin.rep, noneWin.reads
 	if reads < 1 || len(none.Samples) != 0 {
 		t.Fatalf("precondition broken: this leg needs a window that recorded nothing, samples=%d reads=%d", len(none.Samples), reads)
 	}

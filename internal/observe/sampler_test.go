@@ -83,19 +83,31 @@ func TestSLOStateNamesPinnedToMachineStates(t *testing.T) {
 
 func TestSampleStateAllMetricsAndVerdicts(t *testing.T) {
 	// A clean skeleton tree: everything under the frozen caps.
-	ft := &fakeTree{current: func() TreeMetrics {
-		return TreeMetrics{
-			PIDs: 1, PrivateWorkingSetBytes: 16 << 20,
-			CPUTotalNanos: 5_000_000, GDIObjects: 5, USERObjects: 14,
-			Handles: 420, Threads: 23,
+	//
+	// AC#15: the sample floor below is a count of what the ticker loop
+	// delivered, so the window is reopened until it holds. SampleState reads 2 +
+	// ticks times (once before the loop at sampler.go:269, once to close it at
+	// :306) while only the tick reads become samples, so 3 samples asks for 5
+	// reads. The fixture is rebuilt per attempt because a counter carried over
+	// from a discarded window would be a different window's number.
+	win := awaitStateReads(t, 5, func() (*StateReport, int) {
+		reads := 0
+		ft := &fakeTree{current: func() TreeMetrics {
+			reads++
+			return TreeMetrics{
+				PIDs: 1, PrivateWorkingSetBytes: 16 << 20,
+				CPUTotalNanos: 5_000_000, GDIObjects: 5, USERObjects: 14,
+				Handles: 420, Threads: 23,
+			}
+		}}
+		s := NewSampler(ft, NewRegistry())
+		rep, err := s.SampleState(context.Background(), SLOSleeping, 20*time.Millisecond, 120*time.Millisecond)
+		if err != nil {
+			t.Fatal(err)
 		}
-	}}
-	reg := NewRegistry()
-	s := NewSampler(ft, reg)
-	rep, err := s.SampleState(context.Background(), SLOSleeping, 20*time.Millisecond, 120*time.Millisecond)
-	if err != nil {
-		t.Fatal(err)
-	}
+		return rep, reads
+	})
+	rep := win.rep
 	if len(rep.Samples) < 3 {
 		t.Fatalf("expected several samples, got %d", len(rep.Samples))
 	}
@@ -317,13 +329,23 @@ func TestCheckSettleNeverReachesCap(t *testing.T) {
 // goroutine metric is the D38b registry count (the gate's source of truth),
 // not runtime.NumGoroutine (runtime workers would poison the baseline).
 func TestSamplerGoroutineAccountingFollowsRegistry(t *testing.T) {
-	reg := NewRegistry()
-	ft := &fakeTree{current: func() TreeMetrics { return TreeMetrics{PIDs: 1, PrivateWorkingSetBytes: 1 << 20} }}
-	s := NewSampler(ft, reg)
-	rep, err := s.SampleState(context.Background(), SLOSleeping, 10*time.Millisecond, 30*time.Millisecond)
-	if err != nil {
-		t.Fatal(err)
-	}
+	// AC#15: the guard below counts samples, which only the tick reads of a
+	// SampleState window produce, so the window is reopened until at least one
+	// sample is on the table (3 reads = the 2 outside the loop + 1 tick).
+	win := awaitStateReads(t, 3, func() (*StateReport, int) {
+		reads := 0
+		ft := &fakeTree{current: func() TreeMetrics {
+			reads++
+			return TreeMetrics{PIDs: 1, PrivateWorkingSetBytes: 1 << 20}
+		}}
+		s := NewSampler(ft, NewRegistry())
+		rep, err := s.SampleState(context.Background(), SLOSleeping, 10*time.Millisecond, 30*time.Millisecond)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return rep, reads
+	})
+	rep := win.rep
 	if rep.GoroutinesMax != 0 {
 		t.Fatalf("empty registry must report 0, got %d", rep.GoroutinesMax)
 	}
