@@ -276,6 +276,14 @@ rc=1
 而形 B 在 §1.1 的锚点树上是 **0 红／14 绿**。**同一发变异、修前 0 红、修后 3 红**，这就是本票要的牙。
 两形里票 144 那 7 枚（14 计数）**都保持绿** ⇒ 牙长在新增断言上，不是把既有断言改反方向换来的。
 
+**本格三枚凭据的位置**（`mg147-pre-1.log`／`red-before-fix-final.log`／`mut-A2-final.log`／`mut-B2-final.log`／
+`baseline-green-final.log`／探针原文 `zz147probe_windows_test.go`）**都已随本件收进
+`.scratch/wisp/probes/147/`**（原件在 `/d/work/workspace/snap147-1/`，两处 `cmp` 逐字节相同）。
+复跑法：`git archive 80fa0551 | tar -x -C <仓外目录>`，把探针文件放进那棵树的 `cmd/wisp/`，
+`export PATH="<repo>/third_party/sherpa-onnx:$PATH"` 后 `go test ./cmd/wisp/ -run 'TestP147|TestSLO147|TestSLO144' -count=1 -v`。
+⇒ **本程没在仓内留任何变异副本**：`cmd/wisp/slo_windows.go` 的两次变异都只落在快照，
+每形跑完 `cp` 还原＋`cmp` 与仓内文件验同（读数在 §2.3 各段末）。
+
 ### 2.4　放水两问自答（AC#2）
 
 - **断言方向动没动？** 没动。既有 10 枚（含 7 枚子用例）一字未改（§1.4 的 **0 删** 读数）；

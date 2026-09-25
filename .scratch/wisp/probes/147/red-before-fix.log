@@ -1,0 +1,13 @@
+time=2026-09-25T21:32:14.311+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSLO147UnwrittenSentenceNamesTheOffsetTheDocumentStoppedAt
+    slo_report_144_windows_test.go:438: 1977 of 1978 unwritten sentences do not name the offset the document stopped at; first: prefix of 1 bytes: sentence says 1 bytes and offset 0
+--- FAIL: TestSLO147UnwrittenSentenceNamesTheOffsetTheDocumentStoppedAt (0.04s)
+=== RUN   TestSLO147LoopGiveUpSentenceAgreesWithTheBytesItRead
+    slo_report_144_windows_test.go:462: give-up error says 8 bytes read, document open at offset 0; want both 8 (the prefix the loop was handed)
+--- FAIL: TestSLO147LoopGiveUpSentenceAgreesWithTheBytesItRead (0.06s)
+=== RUN   TestSLO147OffsetSemanticsRenderThreeDifferentSentences
+    slo_report_144_windows_test.go:494: unfinished sentence says 989 bytes, offset 0; want both 989
+--- FAIL: TestSLO147OffsetSemanticsRenderThreeDifferentSentences (0.04s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.279s
+FAIL

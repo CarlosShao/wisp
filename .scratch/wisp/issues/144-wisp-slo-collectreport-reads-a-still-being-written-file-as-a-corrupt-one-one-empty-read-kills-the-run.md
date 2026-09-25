@@ -233,6 +233,29 @@ next= **交回编排者**（续程收笔）：① 本票五格的证据全在盘
 是**另开票**还是记台账，请裁（本程没顺手改，理由在那条里）；④ `Status` 行（`ready-for-agent`）与
 `-done` 改名的地界不在本程；`internal/agent/approval/**`、`internal/panel/**`、`design/**`、`frontend/**` 本程一字未碰。
 
+- [2026-09-25 22:1x] **票 147 实现程追加：本件那两处"只有空白"的说法不准（只追加、上面一字未抹）**。
+  被更正的两句原文：
+  > `:189`「⇒ `gofumpt -w` 之（`a91d7c2`），改动只有空白（前后两版 `diff -w` 逐字相同）。」
+  > `:260`「也没有为任何一格新增或放宽断言；唯一一次代码面改动是 `a91d7c2` 那枚 `gofumpt -w`，只有空白。」
+
+  现量（票 147 实现程在锚点 `80fa0551` 上跑，与编排者 21:0x 那发相符）：
+
+  ```
+  $ git diff -w --numstat a91d7c2^ a91d7c2   →  31	2	cmd/wisp/slo_report_144_windows_test.go
+  $ git diff --numstat    a91d7c2^ a91d7c2   →  42	13	cmd/wisp/slo_report_144_windows_test.go
+  ```
+
+  ⇒ "**前后两版 `diff -w` 逐字相同**"为假：忽略空白之后仍有 31 枚新增行。真实形状是
+  **夹具升级 ＋ `gofumpt -w` 混在同一枚 commit**：`slo144Report` 从 6 枚字段扩到含 `SubjectPID`／`ObserverCost`／
+  `MemMedianBytes`／`CPUMeanPercent`／`GDIMax`／`WriteOpsTotal`／`SampleErrors`／`Pass` ＋ `Samples`（2 条）＋
+  `Verdicts`（2 条），头上多一枚 6 行注释块，并把一发 `strings.Contains(doc, "report")` 换成"长度下限＋5 枚字面量"。
+  ⇒ **"实质无放水"那一句复算仍成立**：新检包含被删那枚的 `"report"` 字面量、再多 4 枚字面量与一枚 `len(doc) < 300`
+  下限 ⇒ **严格更严、断言极性未变**，所以本追加**不**要求回退那枚夹具、也**不**改动任何断言（票 147 AC#3 明写）。
+  ⇒ 同族的第三枚落点是 `a91d7c2` 的 **commit 标题**（"…复量与票面不符，只改对齐"）：它已推送
+  （`git log origin/dev` 顶点＝本锚点 `80fa055`），按 `AGENTS.md §1.4`「已推送的历史不改写」**只登记、不改写**。
+  ⇒ 与票 147 AC#3 的"三处"略有射程差：本程现量是**四处文本＋一枚标题**（票面 `:189`、票面 `:260`、
+  证据件 §4.2、commit 标题；票面只点了第一处）。证据与复算命令在 `docs/evidence/s1/147-offset-naming-r1.md` §3。
+
 ## 续程收笔自证：本程落盘的 commit 用 sha 名册，不用序数
 
 上面正文里原本有三处"第 N 枚／N 枚 commit"的写法（`落盘 5 枚`、`本程 4 枚`、`四枚 commit 落定`），

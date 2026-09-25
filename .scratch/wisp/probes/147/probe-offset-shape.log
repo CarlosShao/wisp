@@ -1,0 +1,44 @@
+time=2026-09-25T21:28:47.446+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestP147OffsetShapeAcrossEveryPrefix
+    zz147probe_windows_test.go:42: P147 fixture length = 1978 bytes (positive control: must be > 0 and non-trivial)
+    zz147probe_windows_test.go:68: P147 readings over 0..len inclusive = 1979, state tally: map[complete:1 unwritten:1978]
+    zz147probe_windows_test.go:74: P147 state=unwritten obs.offset   distinct=1 -> 0(1978) 
+    zz147probe_windows_test.go:75: P147 state=unwritten decoder own =0(1978) 
+    zz147probe_windows_test.go:71: P147 state=corrupt   never reached
+    zz147probe_windows_test.go:74: P147 state=complete  obs.offset   distinct=1 -> 1978(1) 
+    zz147probe_windows_test.go:75: P147 state=complete  decoder own =1978(1) 
+    zz147probe_windows_test.go:81: P147 positive control: whole document -> state=complete offset=1978 bytes=1978
+    zz147probe_windows_test.go:88: P147 prefix 1     state=unwritten bytes=1     obs.offset=0     summary="1 bytes read, document still open at offset 0: the tail had not arrived"
+    zz147probe_windows_test.go:88: P147 prefix 44    state=unwritten bytes=44    obs.offset=0     summary="44 bytes read, document still open at offset 0: the tail had not arrived"
+    zz147probe_windows_test.go:88: P147 prefix 100   state=unwritten bytes=100   obs.offset=0     summary="100 bytes read, document still open at offset 0: the tail had not arrived"
+    zz147probe_windows_test.go:88: P147 prefix 989   state=unwritten bytes=989   obs.offset=0     summary="989 bytes read, document still open at offset 0: the tail had not arrived"
+    zz147probe_windows_test.go:88: P147 prefix 1977  state=unwritten bytes=1977  obs.offset=0     summary="1977 bytes read, document still open at offset 0: the tail had not arrived"
+--- PASS: TestP147OffsetShapeAcrossEveryPrefix (0.03s)
+=== RUN   TestP147OffsetShapeOnTheCorruptShapes
+    zz147probe_windows_test.go:109: P147 corrupt 43   bytes state=corrupt   obs.offset=0     decoder=0     decoderErr=invalid character '<' looking for beginning of value
+    zz147probe_windows_test.go:112:     summary="43 bytes read, report corrupt: 43 bytes contradict a subject report at offset 0: invalid character '<' looking for beginning of value"
+    zz147probe_windows_test.go:113:     err    ="43 bytes contradict a subject report at offset 0: invalid character '<' looking for beginning of value"
+    zz147probe_windows_test.go:109: P147 corrupt 39   bytes state=corrupt   obs.offset=0     decoder=0     decoderErr=invalid character ',' looking for beginning of object key string
+    zz147probe_windows_test.go:112:     summary="39 bytes read, report corrupt: 39 bytes contradict a subject report at offset 0: invalid character ',' looking for beginning of object key string"
+    zz147probe_windows_test.go:113:     err    ="39 bytes contradict a subject report at offset 0: invalid character ',' looking for beginning of object key string"
+    zz147probe_windows_test.go:109: P147 corrupt 13   bytes state=corrupt   obs.offset=13    decoder=13    decoderErr=json: cannot unmarshal number into Go struct field sloRun.mode of type string
+    zz147probe_windows_test.go:112:     summary="13 bytes read, report corrupt: 13 bytes contradict a subject report at offset 13: json: cannot unmarshal number into Go struct field sloRun.mode of type string"
+    zz147probe_windows_test.go:113:     err    ="13 bytes contradict a subject report at offset 13: json: cannot unmarshal number into Go struct field sloRun.mode of type string"
+    zz147probe_windows_test.go:109: P147 corrupt 2003 bytes state=corrupt   obs.offset=1978  decoder=1978  decoderErr=<nil>
+    zz147probe_windows_test.go:112:     summary="2003 bytes read, report corrupt: 2003 bytes hold more than one document: a value closed at offset 1978 and 25 bytes follow (next token <nil>, invalid character 'o' in literal null (expecting 'u'))"
+    zz147probe_windows_test.go:113:     err    ="2003 bytes hold more than one document: a value closed at offset 1978 and 25 bytes follow (next token <nil>, invalid character 'o' in literal null (expecting 'u'))"
+    zz147probe_windows_test.go:109: P147 corrupt 57   bytes state=corrupt   obs.offset=57    decoder=57    decoderErr=<nil>
+    zz147probe_windows_test.go:112:     summary="57 bytes read, report corrupt: 57 bytes parsed as a subject run but carry no state report"
+    zz147probe_windows_test.go:113:     err    ="57 bytes parsed as a subject run but carry no state report"
+    zz147probe_windows_test.go:109: P147 corrupt 2    bytes state=corrupt   obs.offset=2     decoder=2     decoderErr=<nil>
+    zz147probe_windows_test.go:112:     summary="2 bytes read, report corrupt: 2 bytes parsed as a subject run but carry no state report"
+    zz147probe_windows_test.go:113:     err    ="2 bytes parsed as a subject run but carry no state report"
+    zz147probe_windows_test.go:109: P147 corrupt 72   bytes state=unwritten obs.offset=0     decoder=0     decoderErr=unexpected EOF
+--- PASS: TestP147OffsetShapeOnTheCorruptShapes (0.00s)
+=== RUN   TestP147DoesMinusOneEverPrint
+    zz147probe_windows_test.go:123: P147 note="nothing read yet"                       summary="0 bytes read, nothing read yet" contains-(-1)=false
+    zz147probe_windows_test.go:123: P147 note="no report file yet"                     summary="0 bytes read, no report file yet" contains-(-1)=false
+    zz147probe_windows_test.go:123: P147 note="report file unreadable: open x: The system cannot find the file specified." summary="0 bytes read, report file unreadable: open x: The system cannot find the file specified." contains-(-1)=false
+--- PASS: TestP147DoesMinusOneEverPrint (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.261s

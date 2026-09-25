@@ -375,6 +375,18 @@ $ D:/work/base/gopath/bin/gofumpt.exe -l . tools/d22scan tools/mockllm      → 
 改完三发重新全空；**改动只有空白**——改前后两版 `diff -w` 逐字相同，断言、预算、Skip 一个没动。
 这是本件里唯一一处"前一程写 X、续程复量 Y"的不相符，且 Y 是仪器读数不是判断。
 
+> **[2026-09-25 22:1x 票 147 实现程追加] 上面那句"改动只有空白——改前后两版 `diff -w` 逐字相同"不准，就地更正（原文一字未抹）。**
+> 现量在锚点 `80fa0551` 上：`git diff -w --numstat a91d7c2^ a91d7c2` ＝ **31 加／2 删**（非空）、
+> `git diff --numstat` ＝ **42 加／13 删**。真实形状是**夹具升级 ＋ `gofumpt -w` 混在同一枚 commit**：
+> `slo144Report` 多出的字段是 `SubjectPID`、`ObserverCost`、`MemMedianBytes`、`CPUMeanPercent`、`GDIMax`、
+> `WriteOpsTotal`、`SampleErrors`、`Pass`、`Samples`（2 条 `observe.Sample`）、`Verdicts`（2 条 `observe.Verdict`），
+> 加头上一枚 6 行注释块，并把一发 `strings.Contains(doc, "report")` 换成"长度下限＋5 枚字面量"。
+> ⇒ 同一节里**其余那句仍然成立**："断言、预算、Skip 一个没动"——替换那发是**严格更严**
+> （新检含被删那枚的 `"report"` 字面量、另加 4 枚字面量与一枚 `len(doc) < 300` 下限），极性未变，
+> 所以**不回退夹具、不改断言**（票 147 AC#3 明写）。复算命令与全表在 `147-offset-naming-r1.md` §3；
+> 这条更正的出处＝票 144 对抗验收件（`144-slo-report-partial-read-r1-accept-r1.md`）五格之外的退回①。
+> ⚠ 同族第三处落点是 `a91d7c2` 的 **commit 标题**（"…只改对齐"），它已推送、按 `AGENTS.md §1.4` 不改写，只在此登记。
+
 ### 4.3　vet / d22scan
 
 ```
