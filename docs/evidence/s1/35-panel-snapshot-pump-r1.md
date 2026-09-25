@@ -308,3 +308,76 @@ $ grep -rn "TestComposerMethodNamesMatchFrontend" --include=*.go . | wc -l
 自选发明替代管子（`§2.3` 那条零命中的现量就是这条的凭证）。
 
 ---
+
+## 4. 承重自证：逐字段答"哪一枚用例断言了它来自真来源"（票 145 AC#6 那一问）
+
+全部在**仓外副本** `D:\tmp\wisp-35-pump-r2\mut`（`git -c core.autocrlf=false -c core.eol=lf archive HEAD`
+抽的，含 `design/assets/`）里打；仓库工作树**一字未动**（§5.5 给它单独现量）。
+驱动件 `D:\tmp\wisp-35-pump-r2\mutate.py`，每发一枚 `.log` ＋ 一枚 `.raw.txt`。
+
+### 4.1 四枚字段各一发（派单点名的 pending／results／composer／generatedAt）
+
+| # | 字段 | 被换掉的真来源读法 | 结果 |
+|---|---|---|---|
+| **M1** | `pending` | `cmd/wisp/panel_pump.go:70` `Reason: it.Decision.Reason` → 常量句 | **红** `TestRunBooksWithASnapshotOfItsLiveQueue`，红句 `panel_pump_test.go:240: reason: console="R2: 目标路径在授权目录之外: C:\\Windows\\win.ini" packet="hardcoded by M1, not read from the queue", want the same native reason on both surfaces` |
+| **M1b** | `pending`（不带 §4.5 那枚夹具补全，再打一遍） | 同上 | **仍红、同一句** ⇒ `pending` 的承重**不依赖** `6e348f1` 那半件 |
+| **M2** | `results` | `cmd/wisp/run.go:425` `Results: rt.stream.Chunks` → 常量 chunk | **红**同一枚用例，红句三处：`:321 results correlationId = "M2-fixed", want the task id the run printed "b4520d56-…"`、`:328 chunk text "M2 fixed text", want the provider's reply the console also showed`、`:331 the booked text "M2 fixed text" is not the text this run streamed to the console`。（首发因替换串非法 Go 报 `[setup failed]`，**那不算读数**，修正后重跑才是这一发。） |
+| **M3** | `composer.mode` | `cmd/wisp/run.go:423` `Mode: rt.modes.PermissionMode` → 常量 `risk.ModeAskEveryStep` | **红**同一枚用例，红句两枚：`:293 composer.mode.current = "ask_every_step", want the boot read "ask_high_risk"` ＋ `:296 …, want the non-default档 this config set` |
+| **M4** | `generatedAt`（注入钟那一支） | `internal/panel/pump.go:179-181` `if p.src.Now != nil { now = p.src.Now }` → 恒常量钟（读数器被摘掉） | **红两枚**：`TestThePumpBuildsThePacketFromWhatTheHostHolds` 响 `pump_test.go:102: generatedAt = "2026-01-01T00:00:00Z", want the injected clock, RFC3339 UTC`；`TestPublishHandsTheBytesToTheAttachedExit` 响 `pump_test.go:292: …, want the injected clock's stamp` |
+
+> 抽取红句的窗口是被测名之前 14 行，因此会把相邻的 `t.Logf` 一起带进来。本表**只收真正的断言行**；
+> 已核对的一条噪声：`l2_grant_boundary_test.go:2332` 那句 `ZERO INSTRUMENT COVERAGE…` 在**干净基线**
+> （`post_panel.txt`）里同样出现 1 次 ⇒ 它是常驻自述日志、不是变异红。
+
+### 4.2 另外两枚派单点名的形状
+
+| # | 摘掉的是什么 | 结果 |
+|---|---|---|
+| **M3b** | `composer.workspace` 的真来源：`run.go:424 Workspace: rt.workspaceView`（→ `panel_pump.go:86 panel.WorkspaceViewFromRoot(rt.paths.WorkspaceRoot())`）→ 常量 `panel.UnsetWorkspaceView()` | **红** `TestSnapshotWorkspaceSectionReportsTheNarrowing`，红句 `panel_pump_test.go:369: packet workspace = {Set:false … Reason:未选择工作区：本轮按 [fs] allowed_dirs 授权的目录判定}, want the narrowing this run applied` |
+| **M5** | `NativeVerdict.CardView` 那条"原样搬运已决断 verdict"的路径（`internal/panel/pump.go:72-85`，走 `CardViewFromDecision(subject, risk.Decision{Level: v.Level, RulesHit: v.RulesHit, …})`）→ **改成在面板侧重算**：`NewApprovalCardView(risk.NewRiskAssessor(), subject)` | **红六处，本票段最重的一发**：`internal/panel` 的 `TestThePumpBuildsThePacketFromWhatTheHostHolds` 响 `pump_test.go:71 level = "L0", want the assessed level rendered by risk`、`:74 rulesHit = [], want the rules verbatim and in the assessor's order`、`:77 reason = "无规则命中（L0 直接执行）" known=true, want the native reason carried as-is`、`:80 sessionOverrideBlocked was lost between the verdict and the card (R4's flag)`；`cmd/wisp` 的 `TestRunBooksWithASnapshotOfItsLiveQueue` 响 `panel_pump_test.go:234 level: packet="L0" console="L2"`、`:240`（reason 对不上）、`:262 the card showed rule R2 on the console but the packet carries []`。 ⇒ **数值后果写出来**：泵一旦在面板侧自判，一枚真 **L2**（R2 命中）的卡在快照里会报成 **L0 · 无规则 · "直接执行"**。这就是"搬运不重算"那条设计的承重证明 |
+
+### 4.3 "Snapshot 四键与 `panel.ts` 未动、双向尺仍绿"——本程自己复算了
+
+| 复算项 | 读数 |
+|---|---|
+| 四键未动 | `git diff --stat aeba6ff..HEAD -- internal/panel/composer.go` → **空**；`frontend/src/lib/panel.ts` → **空**（且工作树该文件 `git status --porcelain` 空 ⇒ 尺读的是干净树，那发绿说明得了事） |
+| 双向尺仍绿 | `TestComposerContractTypesMatchFrontend` 在改后的 `internal/panel` 里 `--- PASS`，`t.Logf` 自报 `Snapshot <-> PanelSnapshot: 4 JSON keys reconciled`（4 枚键，逐字对得上 `composer.go:44-49`） |
+| **这把尺不是恒绿的**（M6 反向一发） | 把 `composer.go:48` 的 `json:"generatedAt"` 改名 `generatedAtRenamed` ⇒ **派单点名的 `composer_test.go:74` 响**：`Go Snapshot emits [generatedAtRenamed] that interface PanelSnapshot does not declare`；另一向同时响（`approval_test.go:129` 同一句 ＋ `:132 interface PanelSnapshot reads [generatedAt] that Go Snapshot never sends - those fields render as undefined`）；泵自己的两枚键集钉 `pump_test.go:119` / `:271` 一起响（`TestThePumpBuildsThePacketFromWhatTheHostHolds`、`TestPublishHandsTheBytesToTheAttachedExit`）。⇒ 派单引的 `:73-78` **两向都是活的** |
+| ⚠ 口径：`cmd/wisp` 那 3 枚**不响** | M6 下 `cmd/wisp` rc=0 全绿 —— 它们断言的是解析后的 Go struct 字段、不是 JSON 键名。⇒ "键名被改"只有 `internal/panel` 那把尺管得住，**别拿 `cmd/wisp` 的绿当第二枚凭证** |
+
+### 4.4 答不出的字段＝装饰品（本程实测出来的，逐枚给依据）
+
+| 字段 | 裁定 | 依据 |
+|---|---|---|
+| `generatedAt` 的**生产那一支** | **装饰品（本程新量出来的洞）** | `assembleRuntime`（`cmd/wisp/run.go:421-427`）**从不设 `PumpSources.Now`** ⇒ 生产走的永远是 `internal/panel/pump.go:178` 的 `now := time.Now`。把**这一支**换成常量（M4b：`now := func() time.Time { return time.Date(2020,1,1,…) }`）⇒ **两包 59／63 枚全绿、0 红 0 跳**。M4 之所以响，响的是"注入的钟被读没有"，不是"生产那枚钟是活的"。⇒ `generatedAt` 在**库**一层承重、在 **`wisp run` 的实际装配上不被任何用例管**：`panel_pump_test.go:283` 只断言非空，`assertPacketMatchesLedger145`（`:84-100`）比的是 bytes／sha256／depth／mode，**没比 `at`** |
+| `pending[].sessionOverrideBlocked` 的**生产那一支** | **装饰品（M7 量出来），且今天造不出承重** | 见下一行 |
+| ↑ **M7** 单发：`cmd/wisp/panel_pump.go:71` `SessionOverrideBlocked: it.Decision.SessionOverrideBlocked` → 常量 `false` | **两包 59／63 枚全绿、0 红 0 跳**（副本内，夹具已按 §4.6 补全，故红因不可能是别处） | **因不只是"少一枚断言"**：`cmd/wisp/run.go:439-440` 逐字写着 "**R4 stays dormant**: probing every result for sensitive sources needs the C25 detector's own wiring (ticket 25)" ⇒ 今天 `wisp run` 这条路上**没有任何生产者能把这一位置真**，真来源与常量 `false` 在本路径上**可观测地等价** ⇒ 任何断言都恒真、写了也是假绿。唯一的现量仪器 `-taint-source` 只挂在 `wisp panel-assets` 那枚 CLI 诊断上（`cmd/wisp/panel_assets.go:44`，自建 Facts），走不到队列。**⇒ 这一格归口票 25（C25 探测器接线），本程不造 mock 顶它**（"用 mock 代替真的"是禁形）。库那一层另有 `pump_test.go:79-81` 钉"搬运不丢位"，M5 里它以 `:80 sessionOverrideBlocked was lost between the verdict and the card (R4's flag)` 响过 ⇒ 承重的是**搬运**、不是**生产来源** |
+| `pending[].decidedBy` | **本来就是常量，且不是本批造的** | 值来自 `internal/panel/approval.go:88 DecidedBy: "native"`——纯函数里写死。两枚用例（`pump_test.go:82`、`panel_pump_test.go:221`）断言的是"它等于 native"，不是"它来自某处"。这是票 77 冻结的形状、本批只搬运它 ⇒ 记为**既有事实**，不计入本票段的装饰品 |
+| `pending[].callChain` | **诚实的空** | 生产恒 nil（`panel_pump.go` 不填、`pump.go:53-59` 写明理由），两枚用例断言 `len(…) == 0`（`pump_test.go:85`、`panel_pump_test.go:224`）。⇒ 它**没有来源可换**、也就没有"换成常量"这一发可打；缺的是生产者本身（`tools.Decision` 无 chain 字段），那是另一格 |
+| `composer.maxAttachmentBytes` | 承重、但来源是**同一枚常量的两次引用** | 生产**不设** `PumpSources.AttachmentMax`（`run.go:421-427`）⇒ `pump.go:167-170` 回落 `MaxAttachmentBytes`；`panel_pump_test.go:278-279` 断言的也是 `panel.MaxAttachmentBytes`。值对（与 `attachments.go` 的 broker 默认一致），但**它没有经过任何"读"的动作** ⇒ 若哪天 broker 的默认与常量分家，这枚包与这条用例都不会响。列 §7 没测 |
+
+### 4.5 `6e348f1` 那半件到底承不承重（派单写死"这条理由不许顺手改回去"，本程独立复核）
+
+**它的理由成立，且现在有了实测支撑**：
+
+| 实验 | 配置夹具状态 | 变异 | 哪枚断言响 |
+|---|---|---|---|
+| **M3** | 副本里补全（`[risk]` 真写上 `permission_mode = "ask_high_risk"`） | mode 读数器 → 常量 `ask_every_step` | `:293` **与** `:296` 两枚都响 |
+| **M3_no_wfix** | **仓库现状**（`[risk]` 里没有 `permission_mode` 这个键） | 同一发变异 | **只有 `:296` 响**，`:293` **不响** |
+
+⇒ `:293` 那枚"对 boot 的 `perm: MODE-READ` 审计行"的交叉核对，在**默认档**下对这一发变异是
+**结构性打不响的**（boot 真读出来的就是 `ask_every_step`，硬编码的泵与它对得上眼）。
+**今天唯一抓得住"把档硬编码成默认值"的一枚，正是 `6e348f1` 新增的 `:295-298`。**
+⇒ 派单那句理由（"默认档正是一枚硬编码 `ask_every_step` 的泵会打出来的值；档位在夹具里是非默认的，
+包里的 mode 才必须真有人读它才对"）**复算为真**，本程不改它、不删它。
+⚠ 同一次复算也量出它**只落了一半**（夹具写入没做）——后果与那枚新红见 §5.2。
+
+### 4.6 隔离实验 E0（把 §5.2 那枚新红的因与果钉死）
+
+副本里**只**补那一行夹具写入、不改任何生产码：
+`internal/panel` rc=0 / 59 枚 / **0 红** ／ `cmd/wisp` rc=0 / 63 枚 / **0 红**。
+⇒ 那枚红**不是泵的缺陷**（泵的 mode 读数器一配上非默认档就读对了：M1/M2/M3b 的 booked record 里
+`mode:ask_high_risk`），**是夹具写入缺了一行**；而补上它之后，M1／M2／M3／M3b／M5 每一发仍然各自
+把同一枚用例打红 ⇒ **补那一行不会把任何一根钉子磨钝**（这一句是给编者的，本程不动手）。
+
+---
