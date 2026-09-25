@@ -209,6 +209,13 @@ M4a＋M1 时同一发当场隐身（第二支没有第一支可替）。
 `gofmt -l tools/d22scan` 空；`go vet ./...` 与 `go build ./...` 在 `tools/d22scan` 内全过（终稿各跑一遍）。
 日志留档：`baseline-gate.log`（开工）、`final-gate.log`（只加了测试那版）、`close-gate.log`（交件态，四数与八数引自这一枚）。
 
+### 4.4 三枚 commit 落地后再整道跑一遍（`cec5e78`，`confirm-gate.log`）
+
+`sh scripts/d22scan.sh` rc=**0**；step 1 **PASS=29 FAIL=0 SKIP=0 === RUN=69**、step 2 八数
+`203/22/40/18 · 32/40/407/39` ⇒ 与 §4.1/§4.2 同值（这一枚是"全部落库之后"的读数，也是下一位复算时对表的那一行）。
+本批三枚 commit：`304aeec`（条件①）→ `b7c06d2`（条件②③）→ `cec5e78`（§4-§6），
+每枚的 `git show --name-only` 现量都只带我自己的路径（`tools/d22scan/scan_test.go`／`gitignore.go`／本件）。
+
 ---
 
 ## 5. 契约轴与卫生（只量我这一批碰得到的那一圈）
