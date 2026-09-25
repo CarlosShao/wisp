@@ -1,33 +1,40 @@
 /* ============================================================================
-   Composer v2 (ticket 92) — the main panel's input row: 档位显示 + 附件 +
-   工作区选择, exactly as owner ruled it in R20/M5, with git 分支/仓库切换 left
-   out because he cut it ("我们产品不要求 coding 能力").
+   Composer (ticket 92; demo look pass 2026-09-25)
+   ----------------------------------------------------------------------------
+   The main panel's input row: attachment strip, workspace row, prompt bar and
+   the permission-mode row, laid out like the demo chat screen's composer
+   (design/doubao/demo/screens/chat.js:296-378). The mode and the workspace
+   stay PERMISSION INPUTS, exactly as owner ruled it in R20/M5: everything
+   shown is read from the snapshot Go pushes, and every interaction is a
+   REQUEST through lib/panel's one envelope - requestModeSwitch /
+   requestWorkspaceChange / submitAttachment / sendMessage - with the
+   confirmation, the C26 resolution and the audit line happening natively.
 
-   The rule this component is written against, and the reason it looks dull:
-   the mode and the workspace are PERMISSION INPUTS. PLAN.md:1588 keeps an allow
-   decision on the native side, and the same logic says a renderer must not be
-   able to move the session onto a looser档 or a different tree by itself - a
-   compromised page that could do either would hold a permanent approval pass.
-   So:
-
-     - everything shown here is read out of the snapshot the Go side pushes
-       (AC#4: a closed panel reopens with the same mode and the same workspace,
-       because neither was ever stored here);
-     - every interaction sends a REQUEST through lib/panel's one envelope -
-       requestModeSwitch / requestWorkspaceChange / submitAttachment - and the
-       confirmation, the C26 resolution and the audit line happen natively;
-     - there is no page-side mode setter in this file, and no second channel to
-       hang one on; internal/panel/composer_test.go plants that mistake in a
-       fixture and asserts two separate instruments go red when it appears.
+   Demo affordances with no route behind them are absent rather than wired to
+   a toast: no @ source button, no slash command button, no model chip, no mic
+   button, no stop button, and no attachment remove button (there is no
+   removal route; the strip renders the native verdicts only). A button that
+   fakes a request would be worse than a missing button.
 
    Attachment BYTES do leave this file: submitAttachment reads the File and the
    payload travels as base64 in the same postMessage envelope, where the native
-   side decodes, sniffs and stores it (internal/panel/attachments.go). The rows
-   rendered below are the native verdicts, so an unsupported type is reported to
-   the user with its reason rather than disappearing.
+   side decodes, sniffs and stores it. The rows below are the native verdicts,
+   so an unsupported type is reported to the user with its reason rather than
+   disappearing.
    ============================================================================ */
 
 import { useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  ChevronRight,
+  Film,
+  FolderCog,
+  Image,
+  Paperclip,
+  Send,
+  type LucideIcon,
+} from "lucide-react";
+import { cn } from "@/lib/cn";
 import {
   requestModeSwitch,
   requestWorkspaceChange,
@@ -55,6 +62,12 @@ function bytes(n: number): string {
   return `${(n / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function attachmentIcon(kind: string): LucideIcon {
+  if (kind === "image") return Image;
+  if (kind === "video") return Film;
+  return Paperclip;
+}
+
 export function Composer({
   state,
   onUserError,
@@ -71,10 +84,16 @@ export function Composer({
   // rows both come back through the snapshot, and each renders as itself.
   const accepted = state.attachments.filter((a) => a.stored);
 
+  // The vocabulary plus the current value when the host has not listed it, so
+  // an unreadable mode still shows as its own pill instead of vanishing.
+  const modeNames = state.mode.names.includes(state.mode.current)
+    ? state.mode.names
+    : [state.mode.current, ...state.mode.names];
+
   function askMode(to: string) {
     // Request only. The native side raises the L2 card when `to` is the档 that
-    // stops asking, and nothing here learns the outcome except through the next
-    // snapshot.
+    // stops asking, and nothing here learns the outcome except through the
+    // next snapshot.
     if (to === state.mode.current) return;
     requestModeSwitch(to);
   }
@@ -104,128 +123,159 @@ export function Composer({
   }
 
   return (
-    <div className="glass-inset flex w-full flex-col gap-2 rounded-control border border-line p-3">
-      <div className="flex items-center gap-2 text-[11.5px]">
-        <label className="flex items-center gap-1.5" title="档位由原生侧决定并记录；这里只能发起请求">
-          <span className="text-ink-3">档位</span>
-          <select
-            aria-label="权限档位（只读显示，点击仅发起切换请求）"
-            className="rounded-control border border-line bg-bg-inset px-1.5 py-0.5 text-ink"
-            value={state.mode.current}
-            onChange={(e) => askMode(e.target.value)}
-          >
-            {(state.mode.names.includes(state.mode.current)
-              ? state.mode.names
-              : [state.mode.current, ...state.mode.names]
-            ).map((m) => (
-              <option key={m} value={m}>
-                {modeLabel(m)}
-                {state.mode.l2ConfirmNames.includes(m) ? "（需原生 L2 强确认）" : ""}
-              </option>
-            ))}
-          </select>
-        </label>
-        <span className="text-ink-3">工作区</span>
-        <span className="truncate text-ink" title={state.workspace.canonical || state.workspace.reason}>
-          {state.workspace.set ? state.workspace.canonical : state.workspace.reason}
-        </span>
-        {state.workspace.reparse ? (
-          <span className="text-caution">经 reparse 点（例外名单）</span>
-        ) : null}
-      </div>
-
-      <textarea
-        aria-label="给 Wisp 的指令"
-        className="min-h-[52px] w-full resize-y rounded-control border border-line bg-bg-inset px-2 py-1.5 text-[12.5px] leading-[var(--lh-body)] text-ink"
-        placeholder="要做什么？可加附件（图片/视频），或改工作区"
-        value={draft}
-        onChange={(e) => setDraft(e.target.value)}
-        onPaste={(e) => {
-          const items = e.clipboardData?.files;
-          if (items && items.length > 0) {
-            e.preventDefault();
-            void attach(items);
-          }
-        }}
-      />
-
-      <div className="flex flex-wrap items-center gap-2 text-[11.5px]">
-        <button
-          type="button"
-          className="rounded-control border border-line px-2 py-1 text-ink"
-          onClick={() => fileInput.current?.click()}
-          disabled={busy}
-        >
-          添加附件
-        </button>
-        <input
-          ref={fileInput}
-          type="file"
-          multiple
-          className="hidden"
-          accept={state.acceptedAttachmentMimes.join(",")}
-          onChange={(e) => void attach(e.target.files)}
-        />
-        <span className="text-ink-3">
-          支持 {state.acceptedAttachmentMimes.join(" / ")}，单个 {"<="} {bytes(state.maxAttachmentBytes)}
-        </span>
-        <button
-          type="button"
-          className="ml-auto rounded-control border border-line px-2 py-1 text-ink"
-          onClick={send}
-        >
-          发送
-        </button>
-      </div>
-
+    <div className="mt-2 flex w-full flex-col gap-2 border-t border-border px-1 pb-1 pt-3">
       {state.attachments.length > 0 ? (
-        <ul className="flex flex-col gap-1 text-[11.5px]">
+        <ul className="m-0 flex list-none flex-wrap items-center gap-2 p-0">
           {state.attachments.map((a) => (
             <AttachmentRow key={a.id} a={a} />
           ))}
         </ul>
       ) : null}
-      {state.attachmentError ? <p className="text-caution">{state.attachmentError}</p> : null}
+      {state.attachmentError ? (
+        <p className="text-[11px] text-destructive">{state.attachmentError}</p>
+      ) : null}
 
-      <div className="flex items-center gap-2 text-[11.5px]">
+      {/* 工作区行: the C26-authorized scope, plus the one real route that can
+          move it. The new path is typed into the small mono field; the request
+          goes out verbatim and the verdict comes back in the next snapshot. */}
+      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <FolderCog aria-hidden="true" className="size-3.5 shrink-0" />
+        <span
+          className="min-w-0 flex-1 truncate font-mono"
+          title={state.workspace.set ? state.workspace.canonical : state.workspace.reason}
+        >
+          {state.workspace.set ? state.workspace.canonical : state.workspace.reason}
+        </span>
+        {state.workspace.reparse ? (
+          <span className="shrink-0 text-warn">经 reparse 点（例外名单）</span>
+        ) : null}
         <input
           aria-label="工作区路径（由原生侧解析与校验）"
-          className="min-w-0 flex-1 rounded-control border border-line bg-bg-inset px-2 py-1 text-ink"
+          className="w-32 shrink-0 rounded-md border border-border bg-card px-1.5 py-0.5 font-mono text-[11px] text-foreground outline-none focus:border-ring"
+          onChange={(e) => setWorkspaceDraft(e.target.value)}
           placeholder={state.workspace.spelling || "D:\\work\\project"}
           value={workspaceDraft}
-          onChange={(e) => setWorkspaceDraft(e.target.value)}
         />
         <button
-          type="button"
-          className="rounded-control border border-line px-2 py-1 text-ink"
+          className="flex shrink-0 items-center gap-0.5 transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
           disabled={workspaceDraft.trim() === ""}
           onClick={() => {
             requestWorkspaceChange(workspaceDraft.trim());
             setWorkspaceDraft("");
           }}
+          type="button"
         >
-          换工作区
+          <ChevronRight aria-hidden="true" className="size-3" />
+          切换
         </button>
+      </div>
+
+      {/* Prompt bar (demo .prompt-bar): attachment pick and send are the two
+          affordances with real routes; the textarea is the message itself. */}
+      <div className="prompt-bar">
+        <button
+          aria-label="添加附件"
+          className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          disabled={busy}
+          onClick={() => fileInput.current?.click()}
+          title={`支持 ${state.acceptedAttachmentMimes.join(" / ")}，单个 <= ${bytes(state.maxAttachmentBytes)}`}
+          type="button"
+        >
+          <Paperclip aria-hidden="true" className="size-4" />
+        </button>
+        <input
+          accept={state.acceptedAttachmentMimes.join(",")}
+          className="hidden"
+          multiple
+          onChange={(e) => void attach(e.target.files)}
+          ref={fileInput}
+          type="file"
+        />
+        <textarea
+          aria-label="给 Wisp 的指令"
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              send();
+            }
+          }}
+          onPaste={(e) => {
+            const items = e.clipboardData?.files;
+            if (items && items.length > 0) {
+              e.preventDefault();
+              void attach(items);
+            }
+          }}
+          placeholder="输入消息或粘贴图片…"
+          rows={1}
+          value={draft}
+        />
+        <div className="prompt-actions">
+          <Button aria-label="发送" onClick={send} size="icon-sm" variant="default">
+            <Send aria-hidden="true" className="size-4" />
+          </Button>
+        </div>
+      </div>
+
+      {/* 底部行: the permission档 read out of the snapshot, then the input
+          hint. The group label is the accessibility contract: pills only ever
+          ASK, the native side answers. */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div
+          aria-label="权限档位（只读显示，点击仅发起切换请求）"
+          className="flex flex-wrap items-center gap-1"
+          role="group"
+        >
+          {modeNames.map((m) => (
+            <button
+              className={cn("sub-tab", m === state.mode.current && "active")}
+              key={m}
+              onClick={() => askMode(m)}
+              type="button"
+            >
+              {modeLabel(m)}
+              {state.mode.l2ConfirmNames.includes(m) ? (
+                <span className="ml-1 text-[10px] text-warn">需原生 L2 强确认</span>
+              ) : null}
+            </button>
+          ))}
+        </div>
+        <span className="shrink-0 text-[11px] text-muted-foreground">
+          Enter 发送 · Shift+Enter 换行
+        </span>
       </div>
     </div>
   );
 }
 
-/** One attachment row: the native verdict, including the loud "no". */
+/** One attachment: the native verdict, including the loud "no", in the demo
+    strip's thumbnail shape. There is no remove button on purpose - the panel
+    has no attachment removal route, and faking one would eat the user's file. */
 function AttachmentRow({ a }: { a: ComposerAttachment }) {
+  const Icon = attachmentIcon(a.kind);
   return (
-    <li className={a.stored ? "flex gap-2 text-ink-3" : "flex gap-2 text-caution"}>
-      <span className="truncate">
-        {a.name}
-        {a.stored ? ` · ${a.mime} · ${bytes(a.sizeBytes)}` : ""}
-      </span>
-      <span className="text-ink-3">
-        {a.stored
-          ? a.deduplicated
-            ? "已存在相同内容的附件"
-            : "已存入附件目录"
-          : `未发送：${a.reason}`}
-      </span>
+    <li className="flex items-center gap-2 rounded-md border border-border bg-muted/40 px-2 py-1">
+      <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+        <Icon aria-hidden="true" className="size-4" />
+      </div>
+      <div className="flex min-w-0 flex-col leading-tight">
+        <span className="truncate text-xs font-medium text-foreground">{a.name}</span>
+        {a.stored ? (
+          <span className="font-mono text-[10px] text-muted-foreground">
+            {a.mime} · {bytes(a.sizeBytes)}
+          </span>
+        ) : null}
+        <span
+          className={a.stored ? "text-[10px] text-muted-foreground" : "text-[10px] text-destructive"}
+        >
+          {a.stored
+            ? a.deduplicated
+              ? "已存在相同内容的附件"
+              : "已存入附件目录"
+            : `未发送：${a.reason}`}
+        </span>
+      </div>
     </li>
   );
 }

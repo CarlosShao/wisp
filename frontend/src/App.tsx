@@ -1,5 +1,5 @@
 /* ============================================================================
-   Panel root (ticket 77; navigation per Q1 = 甲).
+   Panel root (ticket 77; navigation per Q1 = 甲, icons per owner 2026-09-25).
 
    State policy: NONE (PLAN.md:1044). The only data this component renders is
    the snapshot the Go side hands it, and the only way to change what is on
@@ -14,14 +14,21 @@
    the composer row. Hiding a strong-confirmation card because the user clicked
    to another screen would be a safety change smuggled into a navigation change;
    the rail's 审批 badge is what carries the queue depth instead.
+
+   `chrome` is the harness switch: main.tsx passes it only under ?harness=1,
+   and it buys the floating-window dressing a browser needs (desktop backdrop,
+   fog, window radius and shadow). In production the WebView2 window IS the
+   panel, so the shell renders bare - the chrome a real window gets comes from
+   Win32, not from CSS.
    ============================================================================ */
 
 import { useState } from "react";
+import { ApprovalScreen } from "@/components/approval-screen";
+import { ChatScreen } from "@/components/chat-screen";
 import { Composer } from "@/components/composer";
 import { ConfigScreen } from "@/components/config-screen";
 import { L2ApprovalCard } from "@/components/l2-approval-card";
 import { PanelSkeleton } from "@/components/panel-skeleton";
-import { ResultStream } from "@/components/result-stream";
 import { currentView, viewOf, type PanelViewId } from "@/lib/panel-views";
 import type { ComposerState, PanelSnapshot } from "@/lib/panel";
 
@@ -54,7 +61,7 @@ const EMPTY: PanelSnapshot = {
 function UnfedScreen({ id }: { id: PanelViewId }) {
   const v = viewOf(id);
   return (
-    <p className="text-[12px] text-ink-3">
+    <p className="text-[12px] text-muted-foreground">
       {v.label}屏还没有接到数据。面板不许自己造内容，所以这一屏只说明它缺
       C17 的读口与票 35 的推送。
     </p>
@@ -63,8 +70,10 @@ function UnfedScreen({ id }: { id: PanelViewId }) {
 
 export default function App({
   snapshot = EMPTY,
+  chrome = false,
 }: {
   snapshot?: PanelSnapshot;
+  chrome?: boolean;
 }) {
   // A snapshot from a host that has not filled the composer section yet falls
   // back to the empty view, which says so in words; inventing a mode here would
@@ -82,16 +91,25 @@ export default function App({
   return (
     <PanelSkeleton
       active={view}
+      chrome={chrome}
       onSelect={setPicked}
       pendingCount={snapshot.pending.length}
-      waitingLabel={snapshot.pending.length > 0 ? "等待确认" : undefined}
     >
+      {/* Pending cards stay ABOVE the view switch and on every view: hiding a
+          strong-confirmation card because the user clicked to another screen
+          would be a safety change smuggled into a navigation change. */}
       {snapshot.pending.map((v) => (
         <L2ApprovalCard key={v.correlationId} view={v} />
       ))}
-      {view === "chat" && <ResultStream chunks={snapshot.results} />}
-      {view === "config" && <ConfigScreen />}
-      {view !== "chat" && view !== "approval" && view !== "config" && <UnfedScreen id={view} />}
+      {view === "chat" ? (
+        <ChatScreen snapshot={snapshot} chrome={chrome} />
+      ) : view === "approval" ? (
+        <ApprovalScreen snapshot={snapshot} />
+      ) : view === "config" ? (
+        <ConfigScreen />
+      ) : (
+        <UnfedScreen id={view} />
+      )}
       <Composer state={composer} />
     </PanelSkeleton>
   );

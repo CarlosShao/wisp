@@ -12,8 +12,11 @@
      1. Every field below is a field PanelSnapshot really declares. Nothing here
         invents a key Go has not got (that would be the P9 line "不得造假数据当真实
         字段", and it would also make ticket 145's field census lie). The content
-        is shaped off the demo's own 对话 screen and off a genuine R4 verdict this
-        session produced with ticket 143's -taint-source command.
+        is shaped off the demo's own 对话 and 审批 screens and off genuine
+        verdicts: the fs.delete card is a real R4 taint shape this session
+        produced with ticket 143's -taint-source command, and the shell.exec
+        card is demo approval.js's clean.ps1 entry cast into ApprovalCardView's
+        argv shape.
      2. It is reachable only through ?harness=1 in the URL, and the page prints a
         banner saying so. main.tsx is the only reader. The Go host never sets
         that query string, so the product path still shows the empty states.
@@ -38,10 +41,36 @@ export const HARNESS_SNAPSHOT: PanelSnapshot = {
       callChain: ["wisp.run", "agent.turn", "tool.fs.delete"],
       decidedBy: "native",
     },
+    {
+      // demo approval.js's second queue entry (clean.ps1), as argv elements.
+      correlationId: "harness-0004",
+      tool: "shell.exec",
+      args: [
+        "powershell",
+        "-NoProfile",
+        "-File",
+        "clean.ps1",
+        "-Target",
+        "C:\\Windows\\Temp",
+        "|",
+        "Out-File",
+        "clean.log",
+      ],
+      level: "L2",
+      rulesHit: ["R6", "R1"],
+      reason: "脚本包含管道、重定向与元字符，并写入系统临时目录，需逐条确认，不可聚合。",
+      reasonKnown: true,
+      sessionOverrideBlocked: false,
+      callChain: ["wisp.run", "agent.turn", "tool.shell.exec"],
+      decidedBy: "native",
+    },
   ],
   results: [
     { correlationId: "harness-0001", text: ANSWER, done: true },
     { correlationId: "harness-0002", text: "其中 3 张是同一目录的重复截图，要不要一并处理？", done: true },
+    // A not-done chunk so the streaming state - the segment caret, the
+    // reveal-in - is visible on the harness screen too.
+    { correlationId: "harness-0003", text: "正在为你逐条列出三项待办，稍等。", done: false },
   ],
   composer: {
     mode: {

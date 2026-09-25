@@ -106,6 +106,24 @@ merely because phase one does not use it.
 - `lucide-react` (ISC) is a genuine npm dependency, used for the D23 icon rule
   (SVG icons, never emoji). It is not copy-paste code, so it is not in this ledger.
 
+## Beautiful UI - `slev12397/beautiful-ui` (MIT)
+
+Upstream commit vendored: `44a274e598395ab61e7c96c26fda2758780253b7`
+License text: upstream `LICENSE`, "MIT License, Copyright (c) 2026 Shane Levine".
+A second Beautiful-UI checkout, distinct from the `TurboKach/ai-native-react-components`
+table above; the two atoms below were cut from this one because owner's 2026-09-25
+ruling ("组件都按照真组件库的来") asked for the library pieces by name.
+
+| File here | Upstream source | Component | Changes | Mounted? |
+|---|---|---|---|---|
+| `src/components/ai-native/chip.tsx` | `components/atoms/Chip.tsx` | Chip | provenance header; upstream doc comment kept verbatim; nothing else (row appended 2026-09-25 - the file shipped earlier the same day with its header but without this ledger row) | **yes** - `src/components/config-screen.tsx` |
+| `src/components/ai-native/status-pill.tsx` | `components/atoms/StatusPill.tsx` | StatusPill | provenance header; `from "@/lib/utils"` re-pointed to `from "@/lib/cn"` | **yes** - `src/components/panel-skeleton.tsx` (title-bar pending-approval pill) |
+
+Every utility class StatusPill names (the `green`/`orange`/`red`/`accent`/`neutral`
+tones and their dot colours) resolves through `src/styles/theme.css`'s
+library-vocabulary alias block; nothing was missing at mount time and no alias had
+to be added for it.
+
 ## Gate notes for this tree (AC#4)
 
 - **ban #6 (the panel-side approval-decision identifier, `frontend/`)** - the very

@@ -1,25 +1,32 @@
 /* ============================================================================
-   GENERATED FILE - DO NOT EDIT BY HAND  (second generation, owner 2026-09-25)
+   GENERATED FILE - DO NOT EDIT BY HAND  (third generation, owner-delegated)
    ----------------------------------------------------------------------------
    Source:  design/doubao/demo/styles.css - the high-fidelity demo, which owner
             ruled the style truth source on 2026-09-25 ("全推翻了，前端重新设计
-            token ... 按照 demo 改"). The first generation's source,
-            design/assets/tokens.css, was moved to design/old/ by that same
-            ruling and this script does not read it.
-   Command: node scripts/gen-tokens.mjs          (npm run tokens)
+            token ... 按照 demo 改") and confirmed again when handing the
+            frontend to a new owner-agent the same day ("以原型demo为主").
+            Font stacks and window geometry cite design/doubao/demo/index.html.
 
-   Layer 1 (--demo-*) is demo's own custom properties, verbatim; a bare shadcn
-   HSL triplet is wrapped in hsl() and nothing else is done to it. Every other
-   line is a name frontend/src speaks, written over layer 1, and carries either
-   the demo line it was read off or an INTERIM marker saying demo draws no such
-   thing. scripts/gen-tokens.mjs refuses to emit an entry with neither, and
-   --check re-runs every citation, so a value that stops existing in the demo
-   sheet fails the build instead of quietly staying in the table.
+   Shape (third generation): the table speaks the demo's OWN names.
+     layer 1  demo's custom properties, verbatim - same names, same values,
+              HSL triplets left as triplets (the point of use spells hsl(),
+              also exactly as demo does)
+     layer 2  values demo paints without declaring (success green, warn amber,
+              syntax colours, fog, ball, layered shadow, the alpha knob) - each
+              cited to the demo text it was read off
+     layer 3  shared scales (type / radius / motion / geometry), each cited
 
-   :root is LIGHT, because demo's :root is light (demo/app.js:32 theme:'light').
-   Dark is the opt-in through [data-theme="dark"], which demo also puts on <html>
-   - the same element :root matches, which is why the theme-invariant lines below
-   need no dark twin: they say var(--demo-x), and --demo-x is what changes.
+   The second generation's renaming layer (--bg-base / --fg-primary) is
+   retired with owner's delegation; scripts/gen-tokens.mjs refuses an entry
+   with neither a demo citation nor an INTERIM marker, and --check re-runs
+   every citation, so a value that stops existing in the demo fails the build
+   instead of quietly staying in the table.
+
+   :root is LIGHT (demo/app.js:32 theme:'light'; owner confirmed the default).
+   Dark is the opt-in through [data-theme="dark"] (demo toggles .dark on the
+   same element). Theme-invariant entries are declared in BOTH blocks on
+   purpose: a var() inside a custom property resolves where it is declared, so
+   the dark block's re-declaration is what lets a color-mix() see dark hues.
 
    A colour, radius, font-size or duration literal written anywhere else under
    frontend/src is a second style truth source. That is signed by
@@ -28,72 +35,46 @@
    ============================================================================ */
 
 :root {
-  --demo-background: hsl(210 20% 98%);  /* styles.css:8 */
-  --demo-foreground: hsl(222 47% 11%);  /* styles.css:9 */
-  --demo-card: hsl(0 0% 100%);  /* styles.css:10 */
-  --demo-card-foreground: hsl(222 47% 11%);  /* styles.css:11 */
-  --demo-popover: hsl(0 0% 100%);  /* styles.css:12 */
-  --demo-popover-foreground: hsl(222 47% 11%);  /* styles.css:13 */
-  --demo-primary: hsl(173 34% 55%);  /* styles.css:14 */
-  --demo-primary-foreground: hsl(0 0% 100%);  /* styles.css:15 */
-  --demo-secondary: hsl(210 20% 96%);  /* styles.css:16 */
-  --demo-secondary-foreground: hsl(222 47% 11%);  /* styles.css:17 */
-  --demo-muted: hsl(210 20% 96%);  /* styles.css:18 */
-  --demo-muted-foreground: hsl(215 16% 47%);  /* styles.css:19 */
-  --demo-accent: hsl(173 34% 94%);  /* styles.css:20 */
-  --demo-accent-foreground: hsl(173 34% 28%);  /* styles.css:21 */
-  --demo-destructive: hsl(0 72% 51%);  /* styles.css:22 */
-  --demo-destructive-foreground: hsl(0 0% 100%);  /* styles.css:23 */
-  --demo-border: hsl(214 32% 88%);  /* styles.css:24 */
-  --demo-input: hsl(214 32% 88%);  /* styles.css:25 */
-  --demo-ring: hsl(173 34% 55%);  /* styles.css:26 */
-  --demo-radius: 0.5rem;  /* styles.css:27 */
-  --demo-window-bg: rgba(255, 255, 255, 0.72);  /* styles.css:30 */
-  --demo-window-border: rgba(0, 0, 0, 0.06);  /* styles.css:31 */
-  --demo-window-shadow: 0 12px 40px rgba(0, 0, 0, 0.10), 0 2px 8px rgba(0, 0, 0, 0.04);  /* styles.css:32 */
-  --demo-titlebar-bg: rgba(255, 255, 255, 0.5);  /* styles.css:33 */
-  --demo-nav-bg: rgba(248, 249, 251, 0.6);  /* styles.css:34 */
-  --demo-nav-active: rgba(134, 194, 185, 0.12);  /* styles.css:35 */
-  --bg-base: var(--demo-background);  /* styles.css:8 */
-  --bg-subtle: var(--demo-secondary);  /* styles.css:16 */
-  --bg-inset: var(--demo-muted);  /* styles.css:18 */
-  --bg-raised: var(--demo-card);  /* styles.css:10 */
-  --bg-overlay: var(--demo-popover);  /* styles.css:12 */
-  --panel-hue: rgb(255,255,255);  /* styles.css:30 + styles.css:60 demo's window colour with its own alpha taken off, so the alpha can move */
-  --panel-alpha: 72%;  /* styles.css:30 0.72 written as a percentage; the settings row is the only thing allowed to move it */
-  --panel-surface: color-mix(in srgb, var(--panel-hue) var(--panel-alpha), transparent);  /* styles.css:30 */
-  --fg-primary: var(--demo-foreground);  /* styles.css:9 */
-  --fg-secondary: var(--demo-muted-foreground);  /* styles.css:19 */
-  --fg-tertiary: color-mix(in srgb, var(--demo-muted-foreground) 70%, transparent);  /* INTERIM(无 demo 对应值): demo 只有一级灰 --muted-foreground，这一级是它再淡三成 */
-  --fg-disabled: color-mix(in srgb, var(--demo-muted-foreground) 40%, transparent);  /* INTERIM(无 demo 对应值): demo 表达禁用写的是 style=opacity 0.4，不是另一枚颜色 */
-  --on-solid: var(--demo-primary-foreground);  /* styles.css:15 同一枚白两个名字：面板词表叫 on-solid，shadcn 词表叫 primary-foreground */
-  --accent: var(--demo-primary);  /* styles.css:14 */
-  --accent-fg: var(--demo-primary-foreground);  /* styles.css:15 */
-  --accent-soft: var(--demo-accent);  /* styles.css:20 */
-  --accent-line: color-mix(in srgb, var(--demo-primary) 30%, transparent);  /* styles.css:439 */
-  --accent-hover: color-mix(in srgb, var(--demo-primary) 88%, var(--demo-foreground));  /* INTERIM(无 demo 对应值): demo 的按钮悬停改的是阴影，不是色阶 */
-  --accent-pressed: color-mix(in srgb, var(--demo-primary) 80%, var(--demo-foreground));  /* INTERIM(无 demo 对应值): 同上，只按『压得比悬停重一档』排 */
-  --danger: var(--demo-destructive);  /* styles.css:22 */
-  --danger-soft: color-mix(in srgb, var(--demo-destructive) 10%, transparent);  /* styles.css:440 */
-  --danger-line: color-mix(in srgb, var(--demo-destructive) 30%, transparent);  /* styles.css:440 */
-  --success: hsl(142 71% 45%);  /* styles.css:650 + styles.css:444 */
+  --background: 210 20% 98%;  /* styles.css:8 */
+  --foreground: 222 47% 11%;  /* styles.css:9 */
+  --card: 0 0% 100%;  /* styles.css:10 */
+  --card-foreground: 222 47% 11%;  /* styles.css:11 */
+  --popover: 0 0% 100%;  /* styles.css:12 */
+  --popover-foreground: 222 47% 11%;  /* styles.css:13 */
+  --primary: 173 34% 55%;  /* styles.css:14 */
+  --primary-foreground: 0 0% 100%;  /* styles.css:15 */
+  --secondary: 210 20% 96%;  /* styles.css:16 */
+  --secondary-foreground: 222 47% 11%;  /* styles.css:17 */
+  --muted: 210 20% 96%;  /* styles.css:18 */
+  --muted-foreground: 215 16% 47%;  /* styles.css:19 */
+  --accent-soft: 173 34% 94%;  /* styles.css:20 demo 叫 --accent；--accent 留给 C21 冻结行的品牌青 */
+  --accent-foreground: 173 34% 28%;  /* styles.css:21 */
+  --destructive: 0 72% 51%;  /* styles.css:22 */
+  --destructive-foreground: 0 0% 100%;  /* styles.css:23 */
+  --border: 214 32% 88%;  /* styles.css:24 */
+  --input: 214 32% 88%;  /* styles.css:25 */
+  --ring: 173 34% 55%;  /* styles.css:26 */
+  --radius: 0.5rem;  /* styles.css:27 */
+  --window-bg: rgba(255, 255, 255, 0.72);  /* styles.css:30 */
+  --window-border: rgba(0, 0, 0, 0.06);  /* styles.css:31 */
+  --window-shadow: 0 12px 40px rgba(0, 0, 0, 0.10), 0 2px 8px rgba(0, 0, 0, 0.04);  /* styles.css:32 */
+  --titlebar-bg: rgba(255, 255, 255, 0.5);  /* styles.css:33 */
+  --nav-bg: rgba(248, 249, 251, 0.6);  /* styles.css:34 */
+  --nav-active: rgba(134, 194, 185, 0.12);  /* styles.css:35 */
+  --accent: hsl(var(--primary));  /* styles.css:14 C21 冻结行的 --accent＝品牌青，即 demo 的 --primary */
+  --glass-blur: blur(28px) saturate(1.25);  /* styles.css:120 */
+  --glass-blur-sm: blur(4px);  /* styles.css:242 */
+  --success: hsl(142 71% 45%);  /* styles.css:1060 + styles.css:444 */
+  --success-ink: hsl(142 71% 38%);  /* styles.css:442 文字/图标用的深一档绿 */
   --success-soft: color-mix(in srgb, var(--success) 10%, transparent);  /* styles.css:442 */
   --success-line: color-mix(in srgb, var(--success) 30%, transparent);  /* styles.css:442 */
   --warn: #b8860b;  /* styles.css:441 + styles.css:443 */
-  --warn-soft: color-mix(in srgb, var(--warn) 10%, transparent);  /* styles.css:441 */
-  --warn-line: color-mix(in srgb, var(--warn) 30%, transparent);  /* styles.css:441 */
-  --warm: #f78c6c;  /* styles.css:834 demo 唯一的暖色在代码块高亮里，沿用它的色相 */
-  --warm-soft: color-mix(in srgb, var(--warm) 10%, transparent);  /* styles.css:834 */
-  --warm-line: color-mix(in srgb, var(--warm) 30%, transparent);  /* styles.css:834 */
-  --info: rgb(138,170,210);  /* styles.css:72 demo 没有 info，这是它第二枚环境光的色相 */
-  --info-soft: color-mix(in srgb, var(--info) 10%, transparent);  /* styles.css:72 */
-  --info-line: color-mix(in srgb, var(--info) 30%, transparent);  /* styles.css:72 */
-  --border-hair: var(--demo-window-border);  /* styles.css:31 */
-  --border-soft: var(--demo-border);  /* styles.css:24 */
-  --border-strong: color-mix(in srgb, var(--demo-border) 55%, var(--demo-foreground));  /* INTERIM(无 demo 对应值): demo 只画了一级 --border */
-  --ring: var(--demo-ring);  /* styles.css:26 */
-  --glass-blur: blur(28px) saturate(1.25);  /* styles.css:120 */
-  --glass-blur-sm: blur(4px);  /* styles.css:242 */
+  --warn-soft: rgba(217, 178, 106, 0.1);  /* styles.css:441 */
+  --warn-line: rgba(217, 178, 106, 0.3);  /* styles.css:441 */
+  --warn-chip: rgba(217, 178, 106, 0.14);  /* styles.css:1093 bu-chip-blocked 的底 */
+  --tok-key: #c792ea;  /* styles.css:832 */
+  --tok-str: #c3e88d;  /* styles.css:833 */
+  --tok-num: #f78c6c;  /* styles.css:834 demo 唯一的暖色，暖语义沿用它 */
   --ambient-a: rgba(134, 194, 185, 0.08);  /* styles.css:71 + styles.css:77 */
   --ambient-b: rgba(138, 170, 210, 0.07);  /* styles.css:72 + styles.css:78 */
   --ambient-a-geo: ellipse 80% 60% at 20% 30%;  /* styles.css:71 */
@@ -104,103 +85,96 @@
   --desktop-2: #e8eaed;  /* styles.css:73 + styles.css:79 */
   --desktop-3: #eef0f3;  /* styles.css:73 + styles.css:79 */
   --desktop-geo: 160deg;  /* styles.css:73 */
-  --nav-bg: var(--demo-nav-bg);  /* styles.css:34 */
-  --nav-active: var(--demo-nav-active);  /* styles.css:35 */
-  --titlebar-bg: var(--demo-titlebar-bg);  /* styles.css:33 */
-  --shadow-card: var(--demo-window-shadow);  /* styles.css:32 */
-  --shadow-pop: 0 8px 24px rgba(0,0,0,.12);  /* styles.css:1019 */
-  --shadow-inset: inset 0 1px 2px rgba(255,255,255,0.3);  /* styles.css:91 */
-  --shadow-btn: 0 1px 3px rgba(0,0,0,0.08);  /* styles.css:987 */
-  --r-xs: 3px;  /* styles.css:233 */
-  --r-sm: 4px;  /* styles.css:341 */
-  --r-md: 6px;  /* styles.css:154 */
-  --r-lg: 8px;  /* styles.css:281 */
+  --fog-1: radial-gradient(circle, rgba(134,194,185,0.5), transparent 70%);  /* styles.css:644 */
+  --fog-2: radial-gradient(circle, rgba(90,106,180,0.35), transparent 70%);  /* styles.css:645 */
+  --ball-grad: linear-gradient(135deg, rgba(134, 194, 185, 0.9), rgba(108, 168, 160, 0.9));  /* styles.css:90 */
+  --ball-dot-grad: linear-gradient(135deg, #86C2B9, #6CA8A0);  /* styles.css:107 */
+  --ball-dot-shadow: 0 1px 3px rgba(134,194,185,0.4);  /* styles.css:108 */
+  --ball-glow: 0 4px 16px rgba(134, 194, 185, 0.35), inset 0 1px 2px rgba(255,255,255,0.3);  /* styles.css:91 */
+  --ball-glow-hover: 0 6px 20px rgba(134, 194, 185, 0.45), inset 0 1px 2px rgba(255,255,255,0.4);  /* styles.css:97 */
+  --preloader-grad: radial-gradient(circle at 32% 28%, rgba(255,255,255,.75), rgba(134,194,185,.9) 46%, rgba(108,168,160,.95));  /* styles.css:636 */
+  --preloader-glow: 0 0 32px rgba(134,194,185,.4), inset 0 2px 6px rgba(255,255,255,.5);  /* styles.css:636 */
+  --shadow-window-v4: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06), 0 24px 64px rgba(0,0,0,0.10);  /* styles.css:735 v4 的三层窗口投影，压过 :root 里那枚单层 --window-shadow */
+  --shadow-menu: 0 8px 24px rgba(0,0,0,.12);  /* styles.css:1019 */
+  --shadow-toast: 0 4px 16px rgba(0,0,0,0.15);  /* styles.css:323 */
+  --shadow-knob: 0 1px 3px rgba(0,0,0,0.2);  /* styles.css:469 */
+  --shadow-subtab: 0 1px 2px rgba(0, 0, 0, 0.06);  /* styles.css:1183 */
+  --shadow-btn: 0 1px 3px rgba(0,0,0,0.08);  /* styles.css:987 sub-tab.active 的微投影，也作库组件的按钮投影词 */
+  --shadow-ctx: 0 2px 8px rgba(0,0,0,0.04);  /* styles.css:892 */
+  --panel-alpha: 72%;  /* styles.css:30 demo 窗口 rgba alpha 拎出来的旋钮；设置屏唯一能动的就是它 */
+  --panel-surface: rgb(255 255 255 / var(--panel-alpha));  /* styles.css:30 + styles.css:60 窗口磨砂面：同 demo 三个通道，alpha 换成旋钮 */
+  --r-xs: 4px;  /* styles.css:341 */
+  --r-sm: 6px;  /* styles.css:154 */
+  --r-md: 8px;  /* styles.css:281 */
+  --r-lg: 10px;  /* styles.css:195 */
   --r-xl: 12px;  /* styles.css:118 */
   --r-full: 999px;  /* styles.css:451 */
-  --panel-w: 720px;  /* styles.css:116 */
-  --t-body: 13px;  /* styles.css:283 */
-  --t-small: 12px;  /* styles.css:400 */
+  --r-nav: 60px;  /* styles.css:179 左竖条宽 */
   --t-micro: 11px;  /* styles.css:270 */
+  --t-small: 12px;  /* styles.css:400 */
+  --t-body: 13px;  /* styles.css:283 */
   --t-title: 20px;  /* styles.css:512 */
   --t-display: 28px;  /* styles.css:911 */
   --lh-body: 1.6;  /* styles.css:648 */
   --lh-mono: 1.4;  /* styles.css:1171 */
-  --fw-body: 500;  /* styles.css:362 */
-  --fw-title: 600;  /* styles.css:271 */
-  --font-sans: ui-sans-serif, system-ui, sans-serif;  /* INTERIM(无 demo 对应值)：demo 在 body 上写 class=font-sans 且从不覆盖，这就是它的解析值 */
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;  /* styles.css:1104 */
+  --lh-code: 1.7;  /* styles.css:816 */
+  --fw-medium: 500;  /* styles.css:362 */
+  --fw-semibold: 600;  /* styles.css:271 */
   --dur-fast: 120ms;  /* styles.css:368 */
   --dur-base: 150ms;  /* styles.css:873 */
   --dur-slow: 200ms;  /* styles.css:775 */
+  --dur-screen: 220ms;  /* styles.css:685 屏切换 */
+  --dur-glide: 280ms;  /* styles.css:672 nav-glide 滑翔条 */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);  /* styles.css:672 */
+  --ease-stream: cubic-bezier(0.22,0.61,0.25,1);  /* styles.css:619 stream-word 逐词 */
+  --ease-fadeup: cubic-bezier(0.23, 1, 0.32, 1);  /* styles.css:1049 animated-list-item */
+  --panel-w: 720px;  /* styles.css:116 */
+  --panel-h: 780px;  /* styles.css:117 */
+  --titlebar-h: 40px;  /* styles.css:138 */
+  --font-sans-stack: Inter, 'PingFang SC', 'Microsoft YaHei UI', system-ui, sans-serif;  /* index.html:56 */
+  --font-mono-stack: 'JetBrains Mono', 'Cascadia Code', 'Consolas', monospace;  /* index.html:57 */
 }
 
 [data-theme="dark"] {
-  --demo-background: hsl(222 47% 8%);  /* styles.css:40 */
-  --demo-foreground: hsl(210 20% 96%);  /* styles.css:41 */
-  --demo-card: hsl(222 47% 10%);  /* styles.css:42 */
-  --demo-card-foreground: hsl(210 20% 96%);  /* styles.css:43 */
-  --demo-popover: hsl(222 47% 10%);  /* styles.css:44 */
-  --demo-popover-foreground: hsl(210 20% 96%);  /* styles.css:45 */
-  --demo-primary: hsl(173 34% 55%);  /* styles.css:14 */
-  --demo-primary-foreground: hsl(0 0% 100%);  /* styles.css:15 */
-  --demo-secondary: hsl(217 33% 17%);  /* styles.css:48 */
-  --demo-secondary-foreground: hsl(210 20% 96%);  /* styles.css:49 */
-  --demo-muted: hsl(217 33% 17%);  /* styles.css:50 */
-  --demo-muted-foreground: hsl(215 20% 65%);  /* styles.css:51 */
-  --demo-accent: hsl(173 34% 20%);  /* styles.css:52 */
-  --demo-accent-foreground: hsl(173 34% 85%);  /* styles.css:53 */
-  --demo-destructive: hsl(0 62% 45%);  /* styles.css:54 */
-  --demo-destructive-foreground: hsl(0 0% 100%);  /* styles.css:23 */
-  --demo-border: hsl(217 33% 20%);  /* styles.css:56 */
-  --demo-input: hsl(217 33% 20%);  /* styles.css:57 */
-  --demo-ring: hsl(173 34% 55%);  /* styles.css:26 */
-  --demo-window-bg: rgba(22, 24, 29, 0.72);  /* styles.css:60 */
-  --demo-window-border: rgba(255, 255, 255, 0.08);  /* styles.css:61 */
-  --demo-window-shadow: 0 12px 40px rgba(0, 0, 0, 0.40), 0 2px 8px rgba(0, 0, 0, 0.20);  /* styles.css:62 */
-  --demo-titlebar-bg: rgba(22, 24, 29, 0.5);  /* styles.css:63 */
-  --demo-nav-bg: rgba(18, 20, 25, 0.6);  /* styles.css:64 */
-  --demo-nav-active: rgba(134, 194, 185, 0.15);  /* styles.css:65 */
-  --bg-base: var(--demo-background);  /* styles.css:8 */
-  --bg-subtle: var(--demo-secondary);  /* styles.css:16 */
-  --bg-inset: var(--demo-muted);  /* styles.css:18 */
-  --bg-raised: var(--demo-card);  /* styles.css:10 */
-  --bg-overlay: var(--demo-popover);  /* styles.css:12 */
-  --panel-hue: rgb(22,24,29);  /* styles.css:30 + styles.css:60 demo's window colour with its own alpha taken off, so the alpha can move */
-  --panel-alpha: 72%;  /* styles.css:30 0.72 written as a percentage; the settings row is the only thing allowed to move it */
-  --panel-surface: color-mix(in srgb, var(--panel-hue) var(--panel-alpha), transparent);  /* styles.css:30 */
-  --fg-primary: var(--demo-foreground);  /* styles.css:9 */
-  --fg-secondary: var(--demo-muted-foreground);  /* styles.css:19 */
-  --fg-tertiary: color-mix(in srgb, var(--demo-muted-foreground) 70%, transparent);  /* INTERIM(无 demo 对应值): demo 只有一级灰 --muted-foreground，这一级是它再淡三成 */
-  --fg-disabled: color-mix(in srgb, var(--demo-muted-foreground) 40%, transparent);  /* INTERIM(无 demo 对应值): demo 表达禁用写的是 style=opacity 0.4，不是另一枚颜色 */
-  --on-solid: var(--demo-primary-foreground);  /* styles.css:15 同一枚白两个名字：面板词表叫 on-solid，shadcn 词表叫 primary-foreground */
-  --accent: var(--demo-primary);  /* styles.css:14 */
-  --accent-fg: var(--demo-primary-foreground);  /* styles.css:15 */
-  --accent-soft: var(--demo-accent);  /* styles.css:20 */
-  --accent-line: color-mix(in srgb, var(--demo-primary) 30%, transparent);  /* styles.css:439 */
-  --accent-hover: color-mix(in srgb, var(--demo-primary) 88%, var(--demo-foreground));  /* INTERIM(无 demo 对应值): demo 的按钮悬停改的是阴影，不是色阶 */
-  --accent-pressed: color-mix(in srgb, var(--demo-primary) 80%, var(--demo-foreground));  /* INTERIM(无 demo 对应值): 同上，只按『压得比悬停重一档』排 */
-  --danger: var(--demo-destructive);  /* styles.css:22 */
-  --danger-soft: color-mix(in srgb, var(--demo-destructive) 10%, transparent);  /* styles.css:440 */
-  --danger-line: color-mix(in srgb, var(--demo-destructive) 30%, transparent);  /* styles.css:440 */
-  --success: #7DB896;  /* styles.css:650 + styles.css:444 */
+  --background: 222 47% 8%;  /* styles.css:40 */
+  --foreground: 210 20% 96%;  /* styles.css:41 */
+  --card: 222 47% 10%;  /* styles.css:42 */
+  --card-foreground: 210 20% 96%;  /* styles.css:43 */
+  --popover: 222 47% 10%;  /* styles.css:44 */
+  --popover-foreground: 210 20% 96%;  /* styles.css:45 */
+  --primary: 173 34% 55%;  /* styles.css:14 */
+  --primary-foreground: 0 0% 100%;  /* styles.css:15 */
+  --secondary: 217 33% 17%;  /* styles.css:48 */
+  --secondary-foreground: 210 20% 96%;  /* styles.css:49 */
+  --muted: 217 33% 17%;  /* styles.css:50 */
+  --muted-foreground: 215 20% 65%;  /* styles.css:51 */
+  --accent-soft: 173 34% 20%;  /* styles.css:52 demo 叫 --accent；--accent 留给 C21 冻结行的品牌青 */
+  --accent-foreground: 173 34% 85%;  /* styles.css:53 */
+  --destructive: 0 62% 45%;  /* styles.css:54 */
+  --destructive-foreground: 0 0% 100%;  /* styles.css:23 */
+  --border: 217 33% 20%;  /* styles.css:56 */
+  --input: 217 33% 20%;  /* styles.css:57 */
+  --ring: 173 34% 55%;  /* styles.css:26 */
+  --window-bg: rgba(22, 24, 29, 0.72);  /* styles.css:60 */
+  --window-border: rgba(255, 255, 255, 0.08);  /* styles.css:61 */
+  --window-shadow: 0 12px 40px rgba(0, 0, 0, 0.40), 0 2px 8px rgba(0, 0, 0, 0.20);  /* styles.css:62 */
+  --titlebar-bg: rgba(22, 24, 29, 0.5);  /* styles.css:63 */
+  --nav-bg: rgba(18, 20, 25, 0.6);  /* styles.css:64 */
+  --nav-active: rgba(134, 194, 185, 0.15);  /* styles.css:65 */
+  --accent: hsl(var(--primary));  /* styles.css:14 C21 冻结行的 --accent＝品牌青，即 demo 的 --primary */
+  --glass-blur: blur(28px) saturate(1.25);  /* styles.css:120 */
+  --glass-blur-sm: blur(4px);  /* styles.css:242 */
+  --success: #7DB896;  /* styles.css:1060 + styles.css:444 */
+  --success-ink: #7DB896;  /* styles.css:442 文字/图标用的深一档绿 */
   --success-soft: color-mix(in srgb, var(--success) 10%, transparent);  /* styles.css:442 */
   --success-line: color-mix(in srgb, var(--success) 30%, transparent);  /* styles.css:442 */
   --warn: #D9B26A;  /* styles.css:441 + styles.css:443 */
-  --warn-soft: color-mix(in srgb, var(--warn) 10%, transparent);  /* styles.css:441 */
-  --warn-line: color-mix(in srgb, var(--warn) 30%, transparent);  /* styles.css:441 */
-  --warm: #f78c6c;  /* styles.css:834 demo 唯一的暖色在代码块高亮里，沿用它的色相 */
-  --warm-soft: color-mix(in srgb, var(--warm) 10%, transparent);  /* styles.css:834 */
-  --warm-line: color-mix(in srgb, var(--warm) 30%, transparent);  /* styles.css:834 */
-  --info: rgb(138,170,210);  /* styles.css:72 demo 没有 info，这是它第二枚环境光的色相 */
-  --info-soft: color-mix(in srgb, var(--info) 10%, transparent);  /* styles.css:72 */
-  --info-line: color-mix(in srgb, var(--info) 30%, transparent);  /* styles.css:72 */
-  --border-hair: var(--demo-window-border);  /* styles.css:31 */
-  --border-soft: var(--demo-border);  /* styles.css:24 */
-  --border-strong: color-mix(in srgb, var(--demo-border) 55%, var(--demo-foreground));  /* INTERIM(无 demo 对应值): demo 只画了一级 --border */
-  --ring: var(--demo-ring);  /* styles.css:26 */
-  --glass-blur: blur(28px) saturate(1.25);  /* styles.css:120 */
-  --glass-blur-sm: blur(4px);  /* styles.css:242 */
+  --warn-soft: rgba(217, 178, 106, 0.1);  /* styles.css:441 */
+  --warn-line: rgba(217, 178, 106, 0.3);  /* styles.css:441 */
+  --warn-chip: rgba(217, 178, 106, 0.14);  /* styles.css:1093 bu-chip-blocked 的底 */
+  --tok-key: #c792ea;  /* styles.css:832 */
+  --tok-str: #c3e88d;  /* styles.css:833 */
+  --tok-num: #f78c6c;  /* styles.css:834 demo 唯一的暖色，暖语义沿用它 */
   --ambient-a: rgba(134, 194, 185, 0.06);  /* styles.css:71 + styles.css:77 */
   --ambient-b: rgba(138, 170, 210, 0.05);  /* styles.css:72 + styles.css:78 */
   --ambient-a-geo: ellipse 80% 60% at 20% 30%;  /* styles.css:71 */
@@ -211,88 +185,52 @@
   --desktop-2: #0f1115;  /* styles.css:73 + styles.css:79 */
   --desktop-3: #121419;  /* styles.css:73 + styles.css:79 */
   --desktop-geo: 160deg;  /* styles.css:73 */
-  --nav-bg: var(--demo-nav-bg);  /* styles.css:34 */
-  --nav-active: var(--demo-nav-active);  /* styles.css:35 */
-  --titlebar-bg: var(--demo-titlebar-bg);  /* styles.css:33 */
-  --shadow-card: var(--demo-window-shadow);  /* styles.css:32 */
-  --shadow-pop: 0 8px 24px rgba(0,0,0,.12);  /* styles.css:1019 */
-  --shadow-inset: inset 0 1px 2px rgba(255,255,255,0.3);  /* styles.css:91 */
-  --shadow-btn: 0 1px 3px rgba(0,0,0,0.08);  /* styles.css:987 */
-  --r-xs: 3px;  /* styles.css:233 */
-  --r-sm: 4px;  /* styles.css:341 */
-  --r-md: 6px;  /* styles.css:154 */
-  --r-lg: 8px;  /* styles.css:281 */
+  --fog-1: radial-gradient(circle, rgba(134,194,185,0.5), transparent 70%);  /* styles.css:644 */
+  --fog-2: radial-gradient(circle, rgba(90,106,180,0.35), transparent 70%);  /* styles.css:645 */
+  --ball-grad: linear-gradient(135deg, rgba(134, 194, 185, 0.9), rgba(108, 168, 160, 0.9));  /* styles.css:90 */
+  --ball-dot-grad: linear-gradient(135deg, #86C2B9, #6CA8A0);  /* styles.css:107 */
+  --ball-dot-shadow: 0 1px 3px rgba(134,194,185,0.4);  /* styles.css:108 */
+  --ball-glow: 0 4px 16px rgba(134, 194, 185, 0.35), inset 0 1px 2px rgba(255,255,255,0.3);  /* styles.css:91 */
+  --ball-glow-hover: 0 6px 20px rgba(134, 194, 185, 0.45), inset 0 1px 2px rgba(255,255,255,0.4);  /* styles.css:97 */
+  --preloader-grad: radial-gradient(circle at 32% 28%, rgba(255,255,255,.75), rgba(134,194,185,.9) 46%, rgba(108,168,160,.95));  /* styles.css:636 */
+  --preloader-glow: 0 0 32px rgba(134,194,185,.4), inset 0 2px 6px rgba(255,255,255,.5);  /* styles.css:636 */
+  --shadow-window-v4: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06), 0 24px 64px rgba(0,0,0,0.10);  /* styles.css:735 v4 的三层窗口投影，压过 :root 里那枚单层 --window-shadow */
+  --shadow-menu: 0 8px 24px rgba(0,0,0,.12);  /* styles.css:1019 */
+  --shadow-toast: 0 4px 16px rgba(0,0,0,0.15);  /* styles.css:323 */
+  --shadow-knob: 0 1px 3px rgba(0,0,0,0.2);  /* styles.css:469 */
+  --shadow-subtab: 0 1px 2px rgba(0, 0, 0, 0.06);  /* styles.css:1183 */
+  --shadow-btn: 0 1px 3px rgba(0,0,0,0.08);  /* styles.css:987 sub-tab.active 的微投影，也作库组件的按钮投影词 */
+  --shadow-ctx: 0 2px 8px rgba(0,0,0,0.04);  /* styles.css:892 */
+  --panel-alpha: 72%;  /* styles.css:30 demo 窗口 rgba alpha 拎出来的旋钮；设置屏唯一能动的就是它 */
+  --panel-surface: rgb(22 24 29 / var(--panel-alpha));  /* styles.css:30 + styles.css:60 窗口磨砂面：同 demo 三个通道，alpha 换成旋钮 */
+  --r-xs: 4px;  /* styles.css:341 */
+  --r-sm: 6px;  /* styles.css:154 */
+  --r-md: 8px;  /* styles.css:281 */
+  --r-lg: 10px;  /* styles.css:195 */
   --r-xl: 12px;  /* styles.css:118 */
   --r-full: 999px;  /* styles.css:451 */
-  --panel-w: 720px;  /* styles.css:116 */
-  --t-body: 13px;  /* styles.css:283 */
-  --t-small: 12px;  /* styles.css:400 */
+  --r-nav: 60px;  /* styles.css:179 左竖条宽 */
   --t-micro: 11px;  /* styles.css:270 */
+  --t-small: 12px;  /* styles.css:400 */
+  --t-body: 13px;  /* styles.css:283 */
   --t-title: 20px;  /* styles.css:512 */
   --t-display: 28px;  /* styles.css:911 */
   --lh-body: 1.6;  /* styles.css:648 */
   --lh-mono: 1.4;  /* styles.css:1171 */
-  --fw-body: 500;  /* styles.css:362 */
-  --fw-title: 600;  /* styles.css:271 */
-  --font-sans: ui-sans-serif, system-ui, sans-serif;  /* INTERIM(无 demo 对应值)：demo 在 body 上写 class=font-sans 且从不覆盖，这就是它的解析值 */
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;  /* styles.css:1104 */
+  --lh-code: 1.7;  /* styles.css:816 */
+  --fw-medium: 500;  /* styles.css:362 */
+  --fw-semibold: 600;  /* styles.css:271 */
   --dur-fast: 120ms;  /* styles.css:368 */
   --dur-base: 150ms;  /* styles.css:873 */
   --dur-slow: 200ms;  /* styles.css:775 */
+  --dur-screen: 220ms;  /* styles.css:685 屏切换 */
+  --dur-glide: 280ms;  /* styles.css:672 nav-glide 滑翔条 */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);  /* styles.css:672 */
-}
-
-@theme inline {
-  --color-bg-base: var(--bg-base);
-  --color-bg-subtle: var(--bg-subtle);
-  --color-bg-inset: var(--bg-inset);
-  --color-bg-raised: var(--bg-raised);
-  --color-bg-overlay: var(--bg-overlay);
-  --color-panel-hue: var(--panel-hue);
-  --color-panel-surface: var(--panel-surface);
-  --color-fg-primary: var(--fg-primary);
-  --color-fg-secondary: var(--fg-secondary);
-  --color-fg-tertiary: var(--fg-tertiary);
-  --color-fg-disabled: var(--fg-disabled);
-  --color-on-solid: var(--on-solid);
-  --color-accent: var(--accent);
-  --color-accent-fg: var(--accent-fg);
-  --color-accent-soft: var(--accent-soft);
-  --color-accent-line: var(--accent-line);
-  --color-accent-hover: var(--accent-hover);
-  --color-accent-pressed: var(--accent-pressed);
-  --color-danger: var(--danger);
-  --color-danger-soft: var(--danger-soft);
-  --color-danger-line: var(--danger-line);
-  --color-success: var(--success);
-  --color-success-soft: var(--success-soft);
-  --color-success-line: var(--success-line);
-  --color-warn: var(--warn);
-  --color-warn-soft: var(--warn-soft);
-  --color-warn-line: var(--warn-line);
-  --color-warm: var(--warm);
-  --color-warm-soft: var(--warm-soft);
-  --color-warm-line: var(--warm-line);
-  --color-info: var(--info);
-  --color-info-soft: var(--info-soft);
-  --color-info-line: var(--info-line);
-  --color-border-hair: var(--border-hair);
-  --color-border-soft: var(--border-soft);
-  --color-border-strong: var(--border-strong);
-  --color-ring: var(--ring);
-  --color-ambient-a: var(--ambient-a);
-  --color-ambient-b: var(--ambient-b);
-  --color-desktop-1: var(--desktop-1);
-  --color-desktop-2: var(--desktop-2);
-  --color-desktop-3: var(--desktop-3);
-  --color-nav-bg: var(--nav-bg);
-  --color-nav-active: var(--nav-active);
-  --color-titlebar-bg: var(--titlebar-bg);
-  --radius-xs: var(--r-xs);
-  --radius-sm: var(--r-sm);
-  --radius-md: var(--r-md);
-  --radius-lg: var(--r-lg);
-  --radius-xl: var(--r-xl);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
+  --ease-stream: cubic-bezier(0.22,0.61,0.25,1);  /* styles.css:619 stream-word 逐词 */
+  --ease-fadeup: cubic-bezier(0.23, 1, 0.32, 1);  /* styles.css:1049 animated-list-item */
+  --panel-w: 720px;  /* styles.css:116 */
+  --panel-h: 780px;  /* styles.css:117 */
+  --titlebar-h: 40px;  /* styles.css:138 */
+  --font-sans-stack: Inter, 'PingFang SC', 'Microsoft YaHei UI', system-ui, sans-serif;  /* index.html:56 */
+  --font-mono-stack: 'JetBrains Mono', 'Cascadia Code', 'Consolas', monospace;  /* index.html:57 */
 }

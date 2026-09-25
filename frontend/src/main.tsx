@@ -30,6 +30,6 @@ if (harness) {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App snapshot={harness ? HARNESS_SNAPSHOT : undefined} />
+    <App snapshot={harness ? HARNESS_SNAPSHOT : undefined} chrome={harness} />
   </StrictMode>,
 );

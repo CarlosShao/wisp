@@ -42,8 +42,26 @@ function check(label: string, ok: boolean, detail = ""): void {
 }
 
 // ---------------------------------------------------------------------------
-// A. The frozen icon list, parsed out of PLAN.md.
+// A. The frozen icon list, parsed out of PLAN.md - plus the owner-approved
+//    extension. On 2026-09-25 owner ruled the demo wins where it collides with
+//    the frozen spec and rebuilt the rail on the demo's own icons; that ruling
+//    is branch 乙's human approval for exactly the seven names below, nothing
+//    more. A name outside frozen + approved is still a failure.
 // ---------------------------------------------------------------------------
+
+/** owner 2026-09-25（前端移交对话）: 「以原型demo为主」 - the demo's own rail
+    names are approved into use. life-buoy is listed for completeness (the
+    demo's bottom firstrun entry); the rail draws it only when that screen
+    ships. Keep this list EXACT and cited - it is the record of the approval. */
+const APPROVED_EXTENSION: ReadonlySet<string> = new Set([
+  "message-square-text",
+  "shield-check",
+  "list-checks",
+  "orbit",
+  "settings",
+  "chart-column",
+  "life-buoy",
+]);
 
 function frozenIcons(): Set<string> {
   let plan: string;
@@ -101,42 +119,34 @@ const frozen = frozenIcons();
 check("the rail must draw something", PANEL_VIEWS.length > 0, String(PANEL_VIEWS.length));
 
 for (const v of PANEL_VIEWS) {
-  check(`icon ${JSON.stringify(v.icon)} (row ${v.id}) must be a frozen §17.4 name`, frozen.has(v.icon));
+  check(
+    `icon ${JSON.stringify(v.icon)} (row ${v.id}) must be a frozen §17.4 name or an owner-approved extension`,
+    frozen.has(v.icon) || APPROVED_EXTENSION.has(v.icon),
+  );
 }
 
-// C. The substitution ledger.
+// C. The substitution ledger, after owner's 2026-09-25 ruling.
 //
-// Two different facts, kept in two different fields, because owner approved a
-// count ("那两枚") and a count needs a rule that cannot drift:
-//   note    - required whenever the row draws a different name than the demo
-//             did. This is arithmetic: demoIcon !== icon.
-//   interim - required on top of that only where the substitute is NOT apt,
-//             i.e. the frozen list has nothing chat-shaped or money-shaped at
-//             all. Owner's ruling named exactly two such rows. Whether a
-//             near-relative counts as apt is a judgement, so it is recorded in
-//             the data and the harness checks the SHAPE of the record, not the
-//             judgement: interim must be a subset of substituted, and a row
-//             that drew the demo's own name may carry neither.
+// The ruling drew every row with the demo's own icon, which retires the Q1 = 甲
+// substitutions (layers -> 对话, cpu -> 成本) and their interim markers. The
+// ledger shape stays so a future substitution cannot happen silently:
+//   substituted - arithmetic: demoIcon !== icon. Must carry a `note`.
+//   interim     - RETIRED. No row may carry one again; the marker's meaning
+//                 ("the frozen list has nothing apt") is now handled by the
+//                 approved-extension list above, which is a human-approval
+//                 record rather than an apology.
 for (const v of PANEL_VIEWS) {
   const substituted = v.demoIcon !== v.icon;
   if (substituted) {
     check(`row ${v.id}: drew ${JSON.stringify(v.icon)} where the demo drew ${JSON.stringify(v.demoIcon)}, so it must record why`,
       Boolean(v.note), v.note ?? "no note");
   } else {
-    check(`row ${v.id}: ${JSON.stringify(v.demoIcon)} is frozen and is what is drawn, so it must not claim a substitution`,
+    check(`row ${v.id}: ${JSON.stringify(v.demoIcon)} is what the demo drew and what is drawn, so it must not claim a substitution`,
       !v.note && !v.interim, `${v.note ?? ""} ${v.interim ?? ""}`);
   }
-  if (v.interim) {
-    check(`row ${v.id}: interim without a substitution`, substituted, v.interim);
-    check(`row ${v.id}: the interim marker must name the ruling and the date`,
-      /INTERIM\(图标不贴切，Q1=甲 2026-09-25\)/.test(v.interim ?? ""), v.interim);
-  }
+  check(`row ${v.id}: the Q1 = 甲 interim marker is retired (owner 2026-09-25)`,
+    !v.interim, v.interim ?? "");
 }
-const interimRows = PANEL_VIEWS.filter((v) => v.interim).map((v) => v.id);
-const substitutedRows = PANEL_VIEWS.filter((v) => v.demoIcon !== v.icon).map((v) => v.id);
-check("the interim set must be exactly the two rows owner's ruling covers (对话 and 成本)",
-  interimRows.slice().sort().join(",") === "chat,cost",
-  `interim=${interimRows.join(" ") || "none"} substituted=${substitutedRows.join(" ")}`);
 
 // No two rows may light up with the same glyph: the rail is icons-only, so a
 // duplicate is not a smaller label, it is the same picture meaning two places.
@@ -275,10 +285,10 @@ check("exactly one row must be lit, and lit must be the row the snapshot named",
 
 if (failures.length > 0) {
   for (const f of failures) console.error("render-nav: FAIL " + f);
-  console.error(`render-nav: FAIL, ${failures.length} check(s) failed (${frozen.size} frozen icon names)`);
+  console.error(`render-nav: FAIL, ${failures.length} check(s) failed (${frozen.size} frozen + ${APPROVED_EXTENSION.size} approved icon names)`);
   process.exit(1);
 }
 console.error(
-  `render-nav: OK, ${PANEL_VIEWS.length} rail rows against ${frozen.size} frozen §17.4 names, ` +
-    `interim=${interimRows.length} (${interimRows.join(",")}), no view state in the nav layer`,
+  `render-nav: OK, ${PANEL_VIEWS.length} rail rows against ${frozen.size} frozen §17.4 names + ${APPROVED_EXTENSION.size} owner-approved (2026-09-25 demo ruling), ` +
+    `no substitutions, no view state in the nav layer`,
 );

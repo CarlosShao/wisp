@@ -1,94 +1,160 @@
 /* ============================================================================
-   Wisp panel theme shell (ticket 77)
+   Panel theme shell (third generation, owner-delegated rebuild 2026-09-25)
    ----------------------------------------------------------------------------
    Two rules govern this file, and both are machine-checked:
 
      1. NO colour literal is written here. Every value is var(...) and every
-        var(...) resolves to a key that tokens.generated.css declares. That is
-        signed by TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme in
+        var(...) resolves to a key that tokens.generated.css declares (or to an
+        alias declared below, which itself is var()-only). That is signed by
+        TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme in
         internal/panel/frontend_hygiene_test.go, which walks the import closure
         of src/main.tsx, and by scripts/gen-tokens.mjs --check, which refuses a
-        var() pointing at a key it does not emit.
-     2. This file may only ALIAS vocabulary. The left-hand names below are the
-        vocabulary of the vendored Beautiful UI components (surface / ink /
-        line ...) and of shadcn (card / muted / destructive); mapping them onto
-        the token table is what lets those components render in Wisp's palette
-        without importing a second :root block.
+        var() pointing at a key nothing declares.
 
-   The table itself is re-sourced from design/doubao/demo/styles.css as of
-   2026-09-25 (owner: "全推翻了，前端重新设计 token ... 按照 demo 改"). See the
-   header of the generated file for what that means and where each value came
-   from - it is not restated here, because that is how the last copy went stale.
+     2. This file may only WIRE namespaces and ALIAS vocabulary. The generated
+        table speaks the demo's own names (third generation); what this file
+        adds is (a) Tailwind's colour, radius, shadow and font namespaces
+        pointed at those names, exactly the way the demo's own
+        tailwind.config maps them, and (b) the two component libraries'
+        vocabulary (beautiful-ui atoms, shadcn primitives) aliased onto the
+        same names so a vendored file renders in Wisp's palette without
+        importing a second :root block. Everything below that is component
+        shape is a transcription of design/doubao/demo/styles.css with its
+        inline literals swapped for the tokens that carry them - section
+        headers name the demo block each one came from.
    ============================================================================ */
 
 @import "./tokens.generated.css";
 @import "tailwindcss";
 
-/* ---------- Beautiful UI vocabulary -> token table (aliases only) ---------- */
-:root {
-  --page: var(--bg-base);
-  --canvas: var(--bg-inset);
-  --surface: var(--bg-raised);
-  --surface-overlay: var(--bg-overlay);
-  --inset: var(--bg-inset);
-  --hover: var(--bg-subtle);
-  --hover-2: var(--bg-overlay);
-  --field: var(--bg-inset);
+/* Theming is attribute-driven (index.html: data-theme="light"), the same
+   element demo toggles with a .dark class. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
-  --ink: var(--fg-primary);
-  --ink-2: var(--fg-secondary);
-  --ink-3: var(--fg-tertiary);
-  --ink-disabled: var(--fg-disabled);
+/* ---------- Tailwind namespaces, wired the way demo's config maps them ----- */
+@theme inline {
+  /* shadcn vocabulary: demo stores a bare HSL triplet, the call spelled at the
+     point of use - this is that spelling, one place instead of everywhere. */
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
 
-  --line: var(--border-hair);
-  --line-strong: var(--border-soft);
-  --edge: var(--border-strong);
+  /* the values demo draws but never names (tokens.generated.css layer 2) */
+  --color-success: var(--success);
+  --color-success-ink: var(--success-ink);
+  --color-warn: var(--warn);
+  --color-accent-soft: var(--accent-soft);
+  --color-tok-key: var(--tok-key);
+  --color-tok-str: var(--tok-str);
+  --color-tok-num: var(--tok-num);
 
-  --muted: var(--fg-tertiary);
-  --ok: var(--success);
-  --caution: var(--warn);
-  --stop: var(--danger);
-  --keep-warm: var(--warm);
-  --accent-ink: var(--accent);
+  /* radius = demo's own stops (kbd 4 / title-bar-btn 6 / btn 8 / nav-item 10 /
+     card 12). Owner ruled 2026-09-25 the demo wins where it collides with
+     PLAN.md §17.3.2. */
+  --radius-xs: var(--r-xs);
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
+
+  --font-sans: var(--font-sans-stack);
+  --font-mono: var(--font-mono-stack);
+
+  --shadow-window: var(--shadow-window-v4);
+  --shadow-menu: var(--shadow-menu);
+  --shadow-toast: var(--shadow-toast);
+  --shadow-knob: var(--shadow-knob);
+  --shadow-subtab: var(--shadow-subtab);
+  --shadow-btn: var(--shadow-btn);
+  --shadow-ctx: var(--shadow-ctx);
 }
 
-/* ---------- the library's colour vocabulary -> our tokens (aliases only) ----
-   The vendored Beautiful UI atoms and primitives ask for bg-green / text-orange
-   / bg-accent-tint / shadow-hairline and eleven other names. Until now this
-   tree defined none of them, which is the whole reason 7 of the 8 vendored
-   components "could not be mounted" - they rendered unstyled, so the screens
-   were hand-written instead. Each mapping below is a name-for-name alias onto a
-   token the generated table already derives from the demo; the semantics being
-   aliased are the library's own, cited so nobody has to guess:
-     --green / --orange / --red        app/globals.css:49-54   (a hue + its tint)
-     --*-tint = the hue at ~0.14 alpha app/globals.css:96-101  (= our -soft rule,
-                                       which demo spells as /0.1 at styles.css:439)
-     --accent-tint                     app/globals.css:46, :94
-     --hover-2                         app/globals.css:27, :79
-     --shadow-hairline/raised/overlay  app/globals.css:65-69   (ring + elevation)
-   rounded-window is demo's own window radius, not the library's: 12px,
-   design/doubao/demo/styles.css:118. */
+/* ---------- the libraries' vocabulary -> demo tokens (aliases only) --------
+   The vendored components speak their own theme's names. Mapping them here is
+   what lets a vendored atom render in Wisp's palette; until this block
+   existed, 7 of the 8 then-vendored components "could not be mounted" because
+   sixteen of these names had no definition at all (frontend session log
+   §61.7). Sources of the vocabulary:
+     --surface/--ink/--line/--green/...   beautiful-ui app/globals.css
+     --accent-tint/--hover-2              beautiful-ui app/globals.css:46,94,27,79
+     --*-tint = the hue at ~0.14 alpha    app/globals.css:96-101
+   rounded-window is the demo's own window radius (12px), not the library's. */
 :root {
-  --hover-2: var(--bg-overlay);
+  --page: hsl(var(--background));
+  --canvas: hsl(var(--secondary));
+  --surface: hsl(var(--card));
+  --surface-overlay: hsl(var(--popover));
+  --inset: hsl(var(--muted));
+  --hover: hsl(var(--muted));
+  --hover-2: hsl(var(--secondary));
+  --field: hsl(var(--muted));
+
+  --ink: hsl(var(--foreground));
+  --ink-2: hsl(var(--muted-foreground));
+  --ink-3: color-mix(in srgb, hsl(var(--muted-foreground)) 70%, transparent);
+  --ink-disabled: color-mix(in srgb, hsl(var(--muted-foreground)) 40%, transparent);
+
+  --line: hsl(var(--border));
+  --line-strong: hsl(var(--border));
+  --edge: color-mix(in srgb, hsl(var(--border)) 55%, hsl(var(--foreground)));
+
+  --ok: var(--success);
+  --caution: var(--warn);
+  /* scripts/render-l2.tsx pins the stop colour spelled THROUGH --danger (the
+     old vocabulary's name for the destructive red). The third-generation table
+     no longer carries that name, so the alias chain is rebuilt here instead of
+     rewriting the instrument: --danger is the name, --stop its frozen spelling. */
+  --danger: hsl(var(--destructive));
+  --stop: var(--danger);
+  --keep-warm: var(--tok-num);
+  --accent-ink: hsl(var(--primary));
+
   --green: var(--success);
-  --green-tint: var(--success-soft);
+  --green-tint: color-mix(in srgb, var(--success) 14%, transparent);
   --orange: var(--warn);
-  --orange-tint: var(--warn-soft);
-  --red: var(--danger);
-  --red-tint: var(--danger-soft);
+  --orange-tint: color-mix(in srgb, var(--warn) 14%, transparent);
+  --red: hsl(var(--destructive));
+  --red-tint: color-mix(in srgb, hsl(var(--destructive)) 14%, transparent);
   --accent-tint: var(--accent-soft);
 }
 
-/* The three elevation aliases go straight into Tailwind's --shadow-* namespace:
-   naming them in :root as well would make `--shadow-hairline: var(--shadow-hairline)`
-   a self-reference, which resolves to nothing. */
 @theme inline {
-  --shadow-hairline: 0 0 0 1px var(--border-hair);
-  --shadow-raised: 0 0 0 1px var(--border-hair), var(--shadow-card);
-  --shadow-overlay: 0 0 0 1px var(--border-hair), var(--shadow-pop);
-}
-
-@theme inline {
+  --color-page: var(--page);
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-overlay: var(--surface-overlay);
+  --color-inset: var(--inset);
+  --color-hover: var(--hover);
+  --color-hover-2: var(--hover-2);
+  --color-field: var(--field);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-ink-disabled: var(--ink-disabled);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-edge: var(--edge);
+  --color-ok: var(--ok);
+  --color-caution: var(--caution);
+  --color-stop: var(--stop);
+  --color-keep-warm: var(--keep-warm);
+  --color-accent-ink: var(--accent-ink);
   --color-green: var(--green);
   --color-green-tint: var(--green-tint);
   --color-orange: var(--orange);
@@ -96,146 +162,862 @@
   --color-red: var(--red);
   --color-red-tint: var(--red-tint);
   --color-accent-tint: var(--accent-tint);
-  --color-hover-2: var(--hover-2);
+
+  --shadow-hairline: 0 0 0 1px var(--line);
+  --shadow-raised: 0 0 0 1px var(--line), var(--shadow-ctx);
+  --shadow-overlay: 0 0 0 1px var(--line), var(--shadow-menu);
   --radius-window: var(--r-xl);
 }
 
-/* The alias block above is theme-invariant on purpose: every line is var() over
-   a key whose own value already flips with [data-theme="dark"]. A second copy
-   of this list under [data-theme="light"] was the first generation's shape, and
-   it bought nothing but drift. */
+/* ============================================================================
+   Window material - demo .main-window / .desktop-bg / .floating-ball
+   (styles.css:112-134, 69-80, 83-109). In production the WebView2 window IS
+   the panel, so the frost is the page itself; the floating-window chrome
+   (radius + hairline + layered shadow + the desktop behind it) exists only in
+   harness chrome, where a browser has to fake what Win32 composes.
+   ============================================================================ */
 
-/* ---------- Tailwind namespaces fed by the aliases above ----------
-   radius / font stacks already come from tokens.generated.css (@theme). */
-@theme inline {
-  --color-page: var(--page);
-  --color-canvas: var(--canvas);
-  --color-surface: var(--surface);
-  --color-overlay: var(--surface-overlay);
-  --color-inset: var(--inset);
-  --color-hover: var(--hover);
-  --color-field: var(--field);
-  --color-ink: var(--ink);
-  --color-ink-2: var(--ink-2);
-  --color-ink-3: var(--ink-3);
-  --color-line: var(--line);
-  --color-line-strong: var(--line-strong);
-  --color-accent-ink: var(--accent-ink);
-  --color-ok: var(--ok);
-  --color-caution: var(--caution);
-  --color-stop: var(--stop);
-  --radius-control: var(--r-md);
-  --radius-chip: var(--r-sm);
-  --radius-card: var(--r-lg);
-}
-
-/* ---------- shadcn/ui vocabulary -> C21 (the vendored ui/ primitives) ------
-   button.tsx / card.tsx / badge.tsx were cut from shadcn's new-york-v4
-   registry, which speaks primary / secondary / destructive / muted / card.
-   Mapping those names onto C21 is what keeps a vendored primitive from
-   bringing its own palette in through the back door; overriding Tailwind's
-   own --radius-* scale with C21's --r-* values is the same idea for geometry,
-   so even a class written as "rounded-md" by upstream resolves to a token. */
-@theme inline {
-  --color-background: var(--bg-base);
-  --color-foreground: var(--fg-primary);
-  --color-card: var(--bg-raised);
-  --color-card-foreground: var(--fg-primary);
-  --color-popover: var(--bg-overlay);
-  --color-popover-foreground: var(--fg-primary);
-  --color-primary: var(--accent);
-  --color-primary-foreground: var(--accent-fg);
-  --color-secondary: var(--bg-subtle);
-  --color-secondary-foreground: var(--fg-primary);
-  --color-muted: var(--bg-subtle);
-  --color-muted-foreground: var(--fg-secondary);
-  --color-accent: var(--accent-soft);
-  --color-accent-foreground: var(--accent-fg);
-  --color-destructive: var(--danger);
-  --color-destructive-foreground: var(--on-solid);
-  --color-border: var(--border-soft);
-  --color-input: var(--border-soft);
-  --color-ring: var(--ring);
-  --color-on-solid: var(--on-solid);
-}
-
-
-/* ---------- the panel's own frost, ported off the high-fidelity demo --------
-   demo paints its window as --window-bg (an alpha of 0.72 over the desktop) +
-   blur(28px) saturate(1.25) + a hairline border + --window-shadow, and puts no
-   sheen gradient under it. --panel-surface in the generated table is that same
-   colour with the alpha lifted out into --panel-alpha, so the number the
-   settings row moves is the only thing that separates the two.
-   Owner 2026-09-25: 磨砂保留，"当前这个属于是透明度太高了"，"不是做成切换，应该是
-   有透明度的调节" - the old value here was --bg-raised's 0.38, which is the
-   number he was reacting to. The default now is demo's own 0.72. */
-.glass-raised {
+.wisp-shell {
   background-color: var(--panel-surface);
   backdrop-filter: var(--glass-blur);
-  box-shadow: var(--shadow-card);
-}
-.glass-overlay {
-  background-color: var(--bg-overlay);
-  backdrop-filter: var(--glass-blur-sm);
-  box-shadow: var(--shadow-pop);
-}
-.glass-inset {
-  background-color: var(--bg-inset);
-  box-shadow: var(--shadow-inset);
-}
-.glass-divider {
-  border-color: var(--border-hair);
-}
-.ring-focus:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
+  -webkit-backdrop-filter: var(--glass-blur);
+  color: hsl(var(--foreground));
+  font-family: var(--font-sans-stack);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
 }
 
-/* What sits behind the frost. demo draws this at .desktop-bg: TWO ambient
-   lights, not four, at their own alphas, over a three-stop linear gradient.
-   Every one of those numbers is a token in the generated table with the demo
-   line it came from, so this rule is a transcription and adds nothing. */
-.wisp-shell {
+.wisp-window {
+  border-radius: var(--r-xl);
+  border: 1px solid var(--window-border);
+  box-shadow: var(--shadow-window-v4);
+  overflow: hidden;
+}
+
+.harness-desktop {
   background-color: var(--desktop-2);
   background-image:
     radial-gradient(var(--ambient-a-geo), var(--ambient-a) 0%, transparent var(--ambient-a-stop)),
     radial-gradient(var(--ambient-b-geo), var(--ambient-b) 0%, transparent var(--ambient-b-stop)),
     linear-gradient(var(--desktop-geo), var(--desktop-1) 0%, var(--desktop-2) 50%, var(--desktop-3) 100%);
-  color: var(--fg-primary);
-  font-family: var(--font-sans);
-  font-size: var(--t-body);
+}
+
+.ball-dot {
+  background: var(--ball-dot-grad);
+  box-shadow: var(--ball-dot-shadow);
+}
+
+/* ============================================================================
+   Component shapes transcribed from demo styles.css. Every literal demo drew
+   inline is replaced by the token that carries it; the geometry and rhythm are
+   otherwise verbatim. Section names name the demo block.
+   ============================================================================ */
+
+/* --- kbd (styles.css:337-354) --- */
+.kbd {
+  font-size: var(--t-micro);
+  font-family: var(--font-mono-stack);
+  padding: 2px 6px;
+  border-radius: var(--r-xs);
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  border: 1px solid hsl(var(--border));
+}
+.kbd-xs {
+  font-size: 10px;
+  font-family: var(--font-mono-stack);
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  border: 1px solid hsl(var(--border));
+}
+
+/* --- badge + semantic variants (styles.css:427-444) --- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: var(--r-sm);
+  font-size: var(--t-micro);
+  font-weight: var(--fw-medium);
+  border: 1px solid hsl(var(--border));
+  color: hsl(var(--muted-foreground));
+  background: hsl(var(--muted));
+}
+.badge-primary {
+  background: color-mix(in srgb, hsl(var(--primary)) 10%, transparent);
+  color: hsl(var(--primary));
+  border-color: color-mix(in srgb, hsl(var(--primary)) 30%, transparent);
+}
+.badge-destructive {
+  background: color-mix(in srgb, hsl(var(--destructive)) 10%, transparent);
+  color: hsl(var(--destructive));
+  border-color: color-mix(in srgb, hsl(var(--destructive)) 30%, transparent);
+}
+.badge-warn {
+  background: var(--warn-soft);
+  color: var(--warn);
+  border-color: var(--warn-line);
+}
+.badge-success {
+  background: var(--success-soft);
+  color: var(--success-ink);
+  border-color: var(--success-line);
+}
+
+/* --- Switch (styles.css:447-471) --- */
+.switch {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  border-radius: var(--r-full);
+  background: hsl(var(--muted));
+  border: 1px solid hsl(var(--border));
+  cursor: pointer;
+  transition: background var(--dur-base) ease;
+  flex-shrink: 0;
+}
+.switch.on {
+  background: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+}
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: white;
+  transition: transform var(--dur-base) ease;
+  box-shadow: var(--shadow-knob);
+}
+.switch.on::after {
+  transform: translateX(16px);
+}
+
+/* --- Progress bar (styles.css:524-535) --- */
+.progress-bar {
+  height: 6px;
+  border-radius: var(--r-full);
+  background: hsl(var(--muted));
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: var(--r-full);
+  background: hsl(var(--primary));
+  transition: width 300ms ease;
+}
+
+/* --- Tool chip (styles.css:538-551) + detail block (:647-650) --- */
+.tool-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: var(--r-sm);
+  font-size: var(--t-micro);
+  font-weight: var(--fw-medium);
+  border: 1px solid hsl(var(--border));
+  background: color-mix(in srgb, hsl(var(--muted)) 50%, transparent);
+  color: hsl(var(--muted-foreground));
+}
+.tool-chip svg {
+  width: 12px;
+  height: 12px;
+}
+.tool-detail {
+  margin-top: 4px;
+  margin-left: 22px;
+  padding: 6px 0 6px 12px;
+  border-left: 1px solid hsl(var(--border));
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.tool-detail-line {
+  font-size: 11.5px;
   line-height: var(--lh-body);
+  color: hsl(var(--muted-foreground));
+}
+.tool-detail-line.mono {
+  font-family: var(--font-mono-stack);
+}
+.tool-detail-line.add {
+  color: var(--success-ink);
 }
 
-/* ---------- motion vocabulary of the vendored components ---------- */
-@keyframes shimmer-text {
-  0% { background-position: 150%; }
-  to { background-position: -50%; }
+/* --- Prompt Bar (styles.css:931-961) --- */
+.prompt-bar {
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--r-xl);
+  background: hsl(var(--card));
+  padding: 8px 10px;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  transition:
+    border-color var(--dur-base) ease,
+    box-shadow var(--dur-base) ease;
 }
-@keyframes fade-up {
-  0% { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+.prompt-bar:focus-within {
+  border-color: color-mix(in srgb, hsl(var(--ring)) 50%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, hsl(var(--ring)) 10%, transparent);
 }
-@keyframes pop-in {
-  0% { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+.prompt-bar textarea {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  resize: none;
+  font-size: var(--t-body);
+  line-height: 1.5;
+  color: hsl(var(--foreground));
+  font-family: inherit;
+  max-height: 120px;
 }
-@keyframes stream-in {
-  0% { opacity: 0; filter: blur(4px); }
-  to { opacity: 1; filter: blur(0); }
+.prompt-bar .prompt-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
-/* The streaming caret. Upstream ships this block at ai-native-react-components
-   app/globals.css:148 (MIT) as a 2px x 1.05em bar in --ink that blinks on a
-   step-end curve; the geometry, colour and animation below are OURS, because
-   PLAN.md:3476 (the frozen SSE row) fixes the caret at 1px x 14px in --accent
+
+/* --- Pagination dots (styles.css:766-781) --- */
+.pagination-dots {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+.pagination-dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: color-mix(in srgb, hsl(var(--muted-foreground)) 30%, transparent);
+  transition: all 200ms ease;
+}
+.pagination-dots span.active {
+  width: 18px;
+  border-radius: 3px;
+  background: hsl(var(--primary));
+}
+
+/* --- Confidence bar (styles.css:917-928) --- */
+.confidence-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: hsl(var(--muted));
+  overflow: hidden;
+}
+.confidence-bar .conf-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: hsl(var(--primary));
+  transition: width 400ms var(--ease-out);
+}
+
+/* --- Context card (styles.css:883-900) --- */
+.context-card {
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--r-lg);
+  padding: 12px 14px;
+  background: hsl(var(--card));
+  transition:
+    border-color var(--dur-base) ease,
+    box-shadow var(--dur-base) ease;
+}
+.context-card:hover {
+  border-color: color-mix(in srgb, hsl(var(--primary)) 30%, transparent);
+  box-shadow: var(--shadow-ctx);
+}
+.context-card .ctx-source {
+  font-size: 10px;
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: hsl(var(--primary));
+}
+
+/* --- Code block (styles.css:810-835) --- */
+.code-block {
+  background: color-mix(in srgb, hsl(var(--muted)) 50%, transparent);
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--r-md);
+  font-family: var(--font-mono-stack);
+  font-size: var(--t-small);
+  line-height: var(--lh-code);
+  overflow: auto;
+}
+.code-block .code-line {
+  display: flex;
+  padding: 0 12px;
+}
+.code-block .code-line:hover {
+  background: hsl(var(--muted));
+}
+.code-block .line-num {
+  width: 32px;
+  flex-shrink: 0;
+  text-align: right;
+  padding-right: 12px;
+  color: color-mix(in srgb, hsl(var(--muted-foreground)) 50%, transparent);
+  user-select: none;
+}
+.code-block .tok-key {
+  color: var(--tok-key);
+}
+.code-block .tok-str {
+  color: var(--tok-str);
+}
+.code-block .tok-num {
+  color: var(--tok-num);
+}
+.code-block .tok-com {
+  color: color-mix(in srgb, hsl(var(--muted-foreground)) 60%, transparent);
+  font-style: italic;
+}
+
+/* --- Sub-tabs / bu-pill (styles.css:964-988, 1159-1184) --- */
+.sub-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: color-mix(in srgb, hsl(var(--muted)) 60%, transparent);
+  border-radius: var(--r-md);
+  width: fit-content;
+}
+.sub-tab {
+  padding: 4px 10px;
+  border-radius: var(--r-sm);
+  font-size: var(--t-micro);
+  font-weight: var(--fw-medium);
+  color: hsl(var(--muted-foreground));
+  cursor: pointer;
+  transition: all var(--dur-base) ease;
+  border: none;
+  background: transparent;
+}
+.sub-tab:hover {
+  color: hsl(var(--foreground));
+}
+.sub-tab.active {
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
+  box-shadow: var(--shadow-subtab);
+}
+.bu-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+}
+.bu-pill {
+  padding: 3px 11px;
+  border-radius: var(--r-full);
+  font-size: var(--t-micro);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-mono);
+  color: hsl(var(--muted-foreground));
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition:
+    color var(--dur-base) ease,
+    background var(--dur-base) ease,
+    border-color var(--dur-base) ease,
+    box-shadow var(--dur-base) ease;
+}
+.bu-pill:hover {
+  color: hsl(var(--foreground));
+}
+.bu-pill.active {
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
+  border-color: hsl(var(--border));
+  box-shadow: var(--shadow-subtab);
+}
+.bu-think-head .bu-think-time {
+  font-weight: var(--fw-medium);
+}
+.bu-churn-label {
+  font-size: 10px;
+  color: hsl(var(--muted-foreground));
+  white-space: nowrap;
+}
+
+/* ============================================================================
+   Motion vocabulary - demo styles.css:598-656 (ReactBits 留5 + BeautifulUI
+   基座) and the v4 additions (:664-724, :1190-1251). The CSS simulations stay
+   the production path for the R19 items whose upstream ships no source;
+   react-bits free-tier code is vendored only where an item has a free twin.
+   ============================================================================ */
+
+@keyframes buFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes buFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes buStreamIn {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+@keyframes buShimmerText {
+  from {
+    background-position: 200% 50%;
+  }
+  to {
+    background-position: 0% 50%;
+  }
+}
+@keyframes buSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes buDotBreathe {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes buSkeleton {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+@keyframes buFogBreathe {
+  0%,
+  100% {
+    opacity: 0.1;
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    opacity: 0.2;
+    transform: scale(1.06) translate(8px, -5px);
+  }
+}
+@keyframes rbScreenIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes rbTooltipIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes buChurnPixel {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* --- Thinking / Churning Loading (styles.css:1190-1251) ---
+   The 3x3 pixel wave replaced demo's own three-dot breathing, and it is also
+   what PLAN.md:3475 demands: 思考中 must not be 三个跳动的点, and the same
+   block carries the thinking header icon slot (demo drew `sparkles` there,
+   which §17.4 names as a banned AI-cliché icon - owner's 2026-09-25 ruling
+   keeps that ban, so the header uses this grid, 纯动效, no icon). */
+.thinking-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 16px;
+}
+.thinking-dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: hsl(var(--muted-foreground));
+  animation: buDotBreathe 1.2s ease-in-out infinite;
+}
+.thinking-dots span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.thinking-dots span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.churning-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 4px);
+  grid-auto-rows: 4px;
+  gap: 3px;
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+.churning-grid i {
+  width: 4px;
+  height: 4px;
+  border-radius: 1px;
+  background: hsl(var(--foreground));
+  opacity: 0.15;
+  animation: buChurnPixel 1.1s ease-in-out infinite;
+}
+.churning-grid i:nth-child(1) {
+  animation-delay: 0ms;
+}
+.churning-grid i:nth-child(2) {
+  animation-delay: 120ms;
+}
+.churning-grid i:nth-child(3) {
+  animation-delay: 240ms;
+}
+.churning-grid i:nth-child(6) {
+  animation-delay: 360ms;
+}
+.churning-grid i:nth-child(5) {
+  animation-delay: 480ms;
+}
+.churning-grid i:nth-child(4) {
+  animation-delay: 600ms;
+}
+.churning-grid i:nth-child(7) {
+  animation-delay: 720ms;
+}
+.churning-grid i:nth-child(8) {
+  animation-delay: 840ms;
+}
+.churning-grid i:nth-child(9) {
+  animation-delay: 960ms;
+}
+.churning-grid.v-dots i {
+  border-radius: 50%;
+}
+.churning-grid.v-orbit i {
+  animation: none;
+  opacity: 0.12;
+}
+.churning-grid.v-orbit i:nth-child(1),
+.churning-grid.v-orbit i:nth-child(2),
+.churning-grid.v-orbit i:nth-child(3),
+.churning-grid.v-orbit i:nth-child(6),
+.churning-grid.v-orbit i:nth-child(9),
+.churning-grid.v-orbit i:nth-child(8),
+.churning-grid.v-orbit i:nth-child(7),
+.churning-grid.v-orbit i:nth-child(4) {
+  animation: buChurnPixel 0.95s ease-in-out infinite;
+}
+.churning-grid.v-orbit i:nth-child(2) {
+  animation-delay: 110ms;
+}
+.churning-grid.v-orbit i:nth-child(3) {
+  animation-delay: 220ms;
+}
+.churning-grid.v-orbit i:nth-child(6) {
+  animation-delay: 330ms;
+}
+.churning-grid.v-orbit i:nth-child(9) {
+  animation-delay: 440ms;
+}
+.churning-grid.v-orbit i:nth-child(8) {
+  animation-delay: 550ms;
+}
+.churning-grid.v-orbit i:nth-child(7) {
+  animation-delay: 660ms;
+}
+.churning-grid.v-orbit i:nth-child(4) {
+  animation-delay: 770ms;
+}
+.churning-grid.v-surfer i:nth-child(1),
+.churning-grid.v-surfer i:nth-child(4),
+.churning-grid.v-surfer i:nth-child(7) {
+  animation-delay: 0ms;
+}
+.churning-grid.v-surfer i:nth-child(2),
+.churning-grid.v-surfer i:nth-child(5),
+.churning-grid.v-surfer i:nth-child(8) {
+  animation-delay: 130ms;
+}
+.churning-grid.v-surfer i:nth-child(3),
+.churning-grid.v-surfer i:nth-child(6),
+.churning-grid.v-surfer i:nth-child(9) {
+  animation-delay: 260ms;
+}
+
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted-foreground)) 35%,
+    hsl(var(--foreground)) 50%,
+    hsl(var(--muted-foreground)) 65%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: buShimmerText 1.4s linear infinite;
+}
+
+.stream-word {
+  display: inline;
+  animation: buStreamIn 420ms var(--ease-stream) both;
+}
+
+.animated-list-item {
+  animation: buFadeUp 320ms var(--ease-fadeup) both;
+}
+
+.blur-highlight {
+  position: relative;
+}
+.blur-highlight .bh-item {
+  transition:
+    filter 250ms ease,
+    opacity 250ms ease;
+}
+.blur-highlight.has-focus .bh-item:not(.bh-focused) {
+  filter: blur(1.5px);
+  opacity: 0.45;
+}
+.blur-highlight .bh-focused {
+  filter: none;
+  opacity: 1;
+}
+
+.shimmer-line {
+  height: 14px;
+  border-radius: var(--r-xs);
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 25%,
+    color-mix(in srgb, hsl(var(--muted)) 50%, transparent) 50%,
+    hsl(var(--muted)) 75%
+  );
+  background-size: 200% 100%;
+  animation: buSkeleton 1.4s ease-in-out infinite;
+}
+.shimmer-block {
+  border-radius: var(--r-md);
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 25%,
+    color-mix(in srgb, hsl(var(--muted)) 50%, transparent) 50%,
+    hsl(var(--muted)) 75%
+  );
+  background-size: 200% 100%;
+  animation: buSkeleton 1.4s ease-in-out infinite;
+}
+
+.spinner-ring {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid hsl(var(--border));
+  border-top-color: hsl(var(--primary));
+  animation: buSpin 0.8s linear infinite;
+}
+
+/* --- Preloader (styles.css:634-641) --- */
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: hsl(var(--background));
+  transition:
+    opacity 400ms ease,
+    visibility 400ms ease;
+}
+.preloader.hidden-loader {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.preloader .preloader-ball {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--preloader-grad);
+  box-shadow: var(--preloader-glow);
+  animation: buDotBreathe 2s ease-in-out infinite;
+}
+.preloader .preloader-text {
+  font-size: 14px;
+  font-weight: var(--fw-medium);
+  color: hsl(var(--muted-foreground));
+  letter-spacing: 0.02em;
+}
+.preloader .preloader-dots {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 4px;
+}
+.preloader .preloader-dots span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: hsl(var(--muted-foreground));
+  animation: buDotBreathe 1.2s ease-in-out infinite;
+}
+.preloader .preloader-dots span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.preloader .preloader-dots span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+/* --- Fog spheres (styles.css:643-645) --- */
+.fog-sphere {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+  animation: buFogBreathe 12s ease-in-out infinite;
+}
+.fog-sphere-1 {
+  width: 420px;
+  height: 420px;
+  top: -80px;
+  left: -60px;
+  background: var(--fog-1);
+}
+.fog-sphere-2 {
+  width: 360px;
+  height: 360px;
+  bottom: -60px;
+  right: 20%;
+  background: var(--fog-2);
+  animation-delay: -4s;
+}
+
+/* --- Sidebar nav glide (styles.css:663-678) --- */
+.nav-glide {
+  position: absolute;
+  top: 0;
+  left: 10px;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-lg);
+  background: color-mix(in srgb, hsl(var(--primary)) 12%, transparent);
+  transition: transform var(--dur-glide) var(--ease-out);
+  pointer-events: none;
+  z-index: 0;
+}
+.nav-rail-item {
+  position: relative;
+  z-index: 1;
+}
+
+/* --- Screen transition (styles.css:681-685) --- */
+.screen-enter {
+  animation: rbScreenIn var(--dur-screen) var(--ease-out) both;
+}
+
+/* --- Card spotlight (styles.css:688-701) --- */
+.card-spotlight {
+  position: relative;
+  overflow: hidden;
+}
+.card-spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(400px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, hsl(var(--primary)) 8%, transparent), transparent 60%);
+  opacity: 0;
+  transition: opacity 200ms ease;
+  pointer-events: none;
+}
+.card-spotlight:hover::after {
+  opacity: 1;
+}
+
+/* --- Button micro-magnetic (styles.css:704-705) --- */
+.btn-magnetic {
+  transition: transform var(--dur-base) var(--ease-out);
+}
+.btn-magnetic:active {
+  transform: scale(0.97);
+}
+
+/* --- Tooltip (styles.css:708-724) --- */
+.tooltip {
+  position: absolute;
+  z-index: 100;
+  padding: 5px 10px;
+  border-radius: var(--r-sm);
+  background: hsl(var(--foreground));
+  color: hsl(var(--background));
+  font-size: var(--t-micro);
+  font-weight: var(--fw-medium);
+  white-space: nowrap;
+  pointer-events: none;
+  animation: rbTooltipIn var(--dur-base) var(--ease-out) both;
+}
+
+/* --- Focus ring (styles.css:727-730) --- */
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, hsl(var(--ring)) 30%, transparent);
+}
+.ring-focus:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+   Frozen PLAN.md rows these classes implement - the two blocks below are NOT
+   demo transcriptions and must not be "aligned to demo" away.
+   ============================================================================ */
+
+/* PLAN.md:3476 (the frozen SSE row) fixes the caret at 1px x 14px in --accent
    breathing 1 -> 0.2 -> 1 over 1s and names a hard blink under "明确不用".
-
-   Upstream's step-end rule is gone rather than overridden, and it is not a lost
-   behaviour: its own atom mounts the caret only while text is still arriving
-   (stream-text.tsx:76) and tags it .is-streaming, which upstream then matched
-   with `animation: none` -- so on upstream's page the blink never ran during the
-   only interval the caret existed. Provable by grep: `caret-blink` had exactly
-   two hits in this tree, this block's declaration and its @keyframes. */
+   --accent is the brand teal (see tokens.generated.css: demo spells it
+   --primary; the frozen row's name wins). demo's own .stream-cursor (2px x
+   13px, foreground) loses to the frozen row; demo never shipped a production
+   build, PLAN did freeze this cell. */
 .stream-caret {
   background: var(--accent);
   vertical-align: text-bottom;
@@ -250,48 +1032,47 @@
   animation: caret-breathe 1s ease-in-out infinite;
 }
 @keyframes caret-breathe {
-  0%, to { opacity: 1; }
-  50% { opacity: 0.2; }
+  0%,
+  to {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
 }
 
-/* The 20px ball glyph on the L2 card breathes a ring on a 2s period
-   (PLAN.md:3481's 动效 cell: "悬浮球图示的环 2s 呼吸"). Colour is inherited from
-   the element so the component decides it with a token class; "no colour
-   literal here" is NOT a claim this comment gets to make on its own - it is
-   signed by TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme in
-   internal/panel/frontend_hygiene_test.go, which walks the import closure of
-   src/main.tsx (this file included: main.tsx imports it) and rejects hex and
-   rgb / rgba colour calls outside the generated theme. Measured on HEAD: 18
-   reachable files, 0 offenders; and it does ring - a hex written into the
-   keyframes below fails it by name and line number.
-   transform-box/origin are what make a scale() on an SVG circle grow from the
-   circle's own centre instead of the viewport corner. Loop animation is
-   permitted here by PLAN.md:3491, which lists 审批等待 among the non-idle states.
-   What this rule can NOT see: the panel gets no machine-state field (see
-   lib/panel.ts's PanelSnapshot), so the mount condition below is "a card is in
-   pending", not "the machine is in 审批等待" - the two are only the same claim
-   as long as Go never pushes a pending card in an idle state. docs/reports/
-   frontend-session-log.md §50 records that as a dependency, not as a guard. */
+/* PLAN.md:3481's 动效 cell: "悬浮球图示的环 2s 呼吸" on the L2 card's 20px
+   ball glyph. transform-box/origin make the scale grow from the circle's own
+   centre. Loop animation is permitted here by PLAN.md:3491 (审批等待 is a
+   non-idle state). */
 .l2-ball-ring {
   animation: l2-ball-ring 2s ease-in-out infinite;
   transform-box: fill-box;
   transform-origin: center;
 }
 @keyframes l2-ball-ring {
-  0%, to { opacity: 0.2; transform: scale(0.85); }
-  50% { opacity: 1; transform: scale(1); }
+  0%,
+  to {
+    opacity: 0.2;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-/* Q1 = 甲: the rail shows icons and keeps each row's Chinese name hidden until
-   the pointer or the keyboard reaches it. opacity/visibility rather than
-   display:none so the label stays in the accessibility tree and in the static
-   markup that scripts/render-nav.tsx counts - a screen reader and a render
-   harness must both still see the name. */
+/* Q1 = 甲, restated under the 2026-09-25 demo-icon ruling: the rail shows the
+   demo's own icons and keeps each row's Chinese name hidden until the pointer
+   or the keyboard reaches it. opacity/visibility rather than display:none so
+   the label stays in the accessibility tree and in the static markup that
+   scripts/render-nav.tsx counts - a screen reader and a render harness must
+   both still see the name. */
 .nav-rail-label {
-  background: var(--bg-raised);
-  border: 1px solid var(--border-hair);
+  background: hsl(var(--card));
+  border: 1px solid var(--window-border);
   border-radius: var(--r-sm);
-  color: var(--fg-primary);
+  color: hsl(var(--foreground));
   font-size: var(--t-small);
   left: calc(100% + 6px);
   line-height: 1;
@@ -312,12 +1093,39 @@
   visibility: visible;
 }
 
+/* --- reduced-motion (styles.css:652-656, 991-995, 1249-1252) ---
+   D32: the panel closed means no animation is running at all; the loops that
+   exist here only run while the panel is open, and this is the floor. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
-    animation-duration: 0.001ms !important;
+    animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .fog-sphere {
+    animation: none;
+    opacity: 0.08;
+  }
+  .shimmer-text {
+    -webkit-text-fill-color: hsl(var(--foreground));
+    animation: none;
+  }
+  .nav-glide {
+    transition: none;
+  }
+  .screen-enter {
+    animation: none;
+  }
+  .card-spotlight::after {
+    display: none;
+  }
+  .churning-grid i {
+    animation: none !important;
+    opacity: 0.35;
+  }
+  .bu-pill {
+    transition: none;
   }
 }
