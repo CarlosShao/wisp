@@ -71,3 +71,53 @@ RUN=180  顶层 PASS=100  子 PASS=78  FAIL=2  SKIP=0  panic=0  distinct=90
 
 ⇒ 这一节的全部意义：下面 §2–§5 那几把新尺子如果哪一枚咬不动上面某一发，
 它就不是钉，是镜子；改完之后同样的种子必须当场红（§7）。
+
+---
+
+## §1 进场锚点与地界
+
+- 进场 HEAD `310816f`（`dev`），被验物 blob `5b618d14…`，生产码 blob `d2cd6362…`。
+- 本程写的路径只有两枚：`internal/panel/l2_grant_boundary_test.go` 与本件。
+  逐枚 commit、每次 commit 前 `git diff --cached --name-only` 现核（读数在 §9）。
+- 未跑前端（`npm`/`vitest`/`tsc` 一律未跑），未跑 `go test ./...`（两路 agent 在飞）。
+
+---
+
+## §2 修法 (a)：不可解析的 case 标签**不许静默丢弃**（治 F-1 / M2M3）
+
+### §2.1 改了什么
+
+`routeNamesInFunc` 旧形状（`5b618d14` 的 `:406-427`）把 `routeNameOf` 返回 `false` 的标签
+`if s, ok := …; ok { out = append(…) }` 一句吃掉，全包零条痕。现在：
+
+- `routeLabelsInFunc(fn, consts, fset, rel) ([]string, []unresolvedLabel)` —— 解析不出来的标签
+  带着 `file:line` 与 **`go/printer` 打回来的原文表达式**返回，不再消失；
+- 新增 `guardReadabilityProblem(dir, pkg) string` 一枚纯函数（返回"这棵树的 answered 集为什么不可信"，
+  没问题时返回 `""`），`requireReadableGuard(t, dir, pkg)` 只负责把它变成 `t.Fatalf`。
+  拆成两半是**为了牙齿可测**：植物要断言"消息里点了那两枚表达式的名"，而 `t.Fatalf` 会把断言它的那枚
+  子测试一起打死（Go 没有"吸收一发子测试失败"的写法）。
+- `scanGrantBoundary` 与面 1 各自的三枚/两枚 fail-fast 收进同一枚 `requireReadableGuard`，
+  所以**每一次真扫描都走这条路**，植物只是额外证明消息体存在。
+- 新增植物 E（`TestPlantedGrantWiringGoesRedInASnapshot/E_…`）：把 M2M3 的形状种进快照
+  （`case …, acceptE2Route, "panel.review." + acceptE3Tail:` + 一枚包级 `var` + 一枚 `const` 尾巴），
+  断言 `len(pkg.dropped)==2`、`answered` 仍是 4 枚（**不许靠"不再读守卫"通过**）、
+  且 problem 里必须同时出现 `acceptE2Route` 与 `"panel.review." + acceptE3Tail`。
+
+### §2.2 现量（`-count=1 -v`，锚点＝本节末的 HEAD）
+
+```
+--- PASS: TestPlantedGrantWiringGoesRedInASnapshot/E_a_guard_route_reached_through_a_var_or_a_concatenation_is_named,_not_dropped
+    l2_grant_boundary_test.go:976: loud as required, and the names are not invented:
+          bridge.go:99: "panel.review." + acceptE3Tail
+          bridge.go:99: acceptE2Route
+```
+
+⇒ 表达式是被 printer 打出来的原文，不是我抄的字符串（同一行两个标签都指到 `bridge.go:99`，
+因为种子的 case 标签写在同一行——这正说明**只有行号不够，必须点名表达式**）。
+
+### §2.3 (a) 能治什么、治不了什么（写清楚，别让它替谁说话）
+
+- 治：`case <包级 var>:`、`case "a" + b:`、`case f():` —— 任何**写在正主守卫里**而 AST 读不懂的标签，
+  从此当场 `t.Fatalf`（M2/M3 的形状）。
+- 不治：标签在**另一枚函数**里（M4/M13 的形状）。那一发 `knownComposerMethod` 自己的 switch 一字未动，
+  drop 列表是空的。⇒ 这是 §3 那把新尺的活，(a) 不是全部。

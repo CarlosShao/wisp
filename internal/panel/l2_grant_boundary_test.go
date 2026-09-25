@@ -66,10 +66,12 @@ package panel
 // ---------------------------------------------------------------------------
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"go/ast"
 	"go/parser"
+	"go/printer"
 	"go/token"
 	"io/fs"
 	"os"
@@ -257,11 +259,28 @@ type structShape struct {
 	fields []astField
 }
 
+// unresolvedLabel is one case label of the route guard that this instrument
+// cannot turn into a string. It used to be dropped on the floor, which made the
+// enumeration silently narrower than the guard (acceptance r1, F-1: a route
+// reaching through a package-level var or a concatenation is invisible to a scan
+// that only reads literals and package-level constants). Recording it lets every
+// caller choose to go loud, and lets the teeth plant name the shape.
+type unresolvedLabel struct {
+	File string
+	Line int
+	Expr string
+}
+
+func (u unresolvedLabel) String() string {
+	return u.File + ":" + strconv.Itoa(u.Line) + ": " + u.Expr
+}
+
 // boundaryPackage is one parsed directory.
 type boundaryPackage struct {
 	structs   map[string]structShape
 	consts    map[string]string
 	answered  map[string]bool
+	dropped   []unresolvedLabel
 	guardFile string
 	guardLine int
 	guardSeen bool
@@ -323,9 +342,11 @@ func parseBoundaryPackage(dir string) (boundaryPackage, error) {
 					pkg.guardFile = rel
 					pkg.guardLine = fset.Position(decl.Pos()).Line
 				}
-				for _, name := range routeNamesInFunc(decl, pkg.consts) {
+				names, dropped := routeLabelsInFunc(decl, pkg.consts, fset, rel)
+				for _, name := range names {
 					pkg.answered[name] = true
 				}
+				pkg.dropped = append(pkg.dropped, dropped...)
 				return true
 
 			case *ast.TypeSpec:
@@ -401,10 +422,13 @@ func structNameOf(expr ast.Expr) string {
 	return ""
 }
 
-// routeNamesInFunc reads a switch guard and resolves each case label to a
-// string, through the package's own constants.
-func routeNamesInFunc(fn *ast.FuncDecl, consts map[string]string) []string {
-	var out []string
+// routeLabelsInFunc reads a switch guard and resolves each case label to a
+// string, through the package's own constants. Anything it cannot resolve is
+// RETURNED, not dropped: the caller decides how loud to be, and the teeth plant
+// needs to read the drop list without aborting its own subtest.
+func routeLabelsInFunc(fn *ast.FuncDecl, consts map[string]string, fset *token.FileSet, rel string) ([]string, []unresolvedLabel) {
+	var names []string
+	var dropped []unresolvedLabel
 	ast.Inspect(fn, func(n ast.Node) bool {
 		sw, ok := n.(*ast.SwitchStmt)
 		if !ok {
@@ -417,15 +441,35 @@ func routeNamesInFunc(fn *ast.FuncDecl, consts map[string]string) []string {
 			}
 			for _, e := range cs.List {
 				if s, ok := routeNameOf(e, consts); ok {
-					out = append(out, s)
+					names = append(names, s)
+					continue
 				}
+				dropped = append(dropped, unresolvedLabel{
+					File: rel, Line: fset.Position(e.Pos()).Line, Expr: renderExpr(fset, e),
+				})
 			}
 		}
 		return true
 	})
-	return out
+	return names, dropped
 }
 
+// renderExpr prints one expression back the way it was written, so a loud
+// failure can name the thing it could not read instead of a line number alone.
+func renderExpr(fset *token.FileSet, e ast.Expr) string {
+	var buf bytes.Buffer
+	if err := printer.Fprint(&buf, fset, e); err != nil || buf.Len() == 0 {
+		// No fmt import for one fallback: name the shape that defeated the
+		// resolver rather than hiding it behind an empty string.
+		return "<unprintable " + reflect.TypeOf(e).String() + ">"
+	}
+	return buf.String()
+}
+
+// routeNameOf resolves one case label to the route string it stands for. It
+// understands exactly two shapes - a string literal, and an identifier naming a
+// package-level string constant - because those are the two the guard uses
+// today. Everything else is a drop, and every drop is reported.
 func routeNameOf(e ast.Expr, consts map[string]string) (string, bool) {
 	switch t := e.(type) {
 	case *ast.BasicLit:
@@ -438,6 +482,53 @@ func routeNameOf(e ast.Expr, consts map[string]string) (string, bool) {
 		}
 	}
 	return "", false
+}
+
+// joinUnresolved renders a drop list for a failure message.
+func joinUnresolved(items []unresolvedLabel) string {
+	out := make([]string, 0, len(items))
+	for _, it := range items {
+		out = append(out, "\n  "+it.String())
+	}
+	sort.Strings(out)
+	return strings.Join(out, "")
+}
+
+// guardReadabilityProblem names why this tree's answered-set enumeration cannot
+// be trusted, or "" when it can. It is a function rather than a pile of t.Fatal
+// calls so the teeth plant in facet 4 can assert the *message* exists without
+// aborting its own subtest.
+//
+// The two ways the enumeration is narrower than the guard it reads are both here:
+// no guard at all, and a guard carrying case labels this scan cannot resolve
+// (F-1 in docs/evidence/s1/panel-l2-grant-nail-accept-r1.md: a route reaching
+// through a package-level var or a concatenation used to be dropped without a
+// word, and the file then reported the boundary as clean).
+func guardReadabilityProblem(dir string, pkg boundaryPackage) string {
+	if !pkg.guardSeen {
+		return "no inbound route guard (knownComposerMethod) under " + dir +
+			": the instrument can no longer tell which methods Go answers, so a clean report here would be silence, not safety"
+	}
+	if len(pkg.dropped) > 0 {
+		return "the inbound route guard under " + dir + " has " + strconv.Itoa(len(pkg.dropped)) +
+			" case label(s) this instrument cannot resolve to a string: " + joinUnresolved(pkg.dropped) +
+			". This scan reads string literals and package-level string constants; a route reaching through a var, a call, or a concatenation is a door facet 1 cannot see, and it will not be reported as clean. Give the label a const, or teach routeNameOf the expression - and if it was deliberate, say so in the test that owns it (D33/F2, AGENTS.md ban #6)"
+	}
+	if len(pkg.answered) == 0 {
+		return "the route guard under " + dir + " resolved to 0 answered routes - the enumeration is broken, not clean"
+	}
+	if len(pkg.structs) == 0 {
+		return "no struct types under " + dir + " - a scan that parses nothing reports nothing"
+	}
+	return ""
+}
+
+// requireReadableGuard turns guardReadabilityProblem into an abort.
+func requireReadableGuard(t *testing.T, dir string, pkg boundaryPackage) {
+	t.Helper()
+	if problem := guardReadabilityProblem(dir, pkg); problem != "" {
+		t.Fatalf("%s", problem)
+	}
 }
 
 // inboundEnvelopes returns the struct types this package treats as an INBOUND
@@ -482,15 +573,7 @@ func scanGrantBoundary(t *testing.T, dir string) []boundaryFinding {
 	if err != nil {
 		t.Fatalf("parse %s: %v", dir, err)
 	}
-	if !pkg.guardSeen {
-		t.Fatalf("no inbound route guard (knownComposerMethod) under %s: the instrument can no longer tell which methods Go answers, so a clean report here would be silence, not safety", dir)
-	}
-	if len(pkg.answered) == 0 {
-		t.Fatalf("the route guard under %s resolved to 0 answered routes - the enumeration is broken, not clean", dir)
-	}
-	if len(pkg.structs) == 0 {
-		t.Fatalf("no struct types under %s - a scan that parses nothing reports nothing", dir)
-	}
+	requireReadableGuard(t, dir, pkg)
 
 	var findings []boundaryFinding
 	for _, route := range sortedSet(pkg.answered) {
@@ -555,10 +638,7 @@ func TestAnsweredPanelRoutesCarryNoApprovalDecision(t *testing.T) {
 	if err != nil {
 		t.Fatalf("parse %s: %v", dir, err)
 	}
-	if !pkg.guardSeen || len(pkg.answered) == 0 {
-		t.Fatalf("enumeration failed on the real package (guardSeen=%v, answered=%d): this test has no set to judge",
-			pkg.guardSeen, len(pkg.answered))
-	}
+	requireReadableGuard(t, dir, pkg)
 
 	answered := sortedSet(pkg.answered)
 	for _, name := range answered {
@@ -802,6 +882,17 @@ func TestPlantedGrantWiringGoesRedInASnapshot(t *testing.T) {
 	plantBBridge := strings.Replace(string(bridgeReal), guardAnchor,
 		strings.Replace(guardAnchor, ":", ", \"panel.approval.request\":", 1), 1)
 
+	// Plant E: the F-1 shape. The guard reaches two routes through expressions
+	// this scan cannot resolve - a package-level var and a concatenation - which
+	// is exactly how a wiring commit hides a door from a literals-and-constants
+	// enumeration. Unlike plant B this one never compiles into the snapshot's
+	// runtime truth, so what is asserted below is the drop list, not a finding.
+	plantEBridge := strings.Replace(string(bridgeReal), guardAnchor,
+		strings.Replace(guardAnchor, ":", ", acceptE2Route, \"panel.review.\" + acceptE3Tail:", 1), 1) +
+		"\n// planted by facet 4: a route no literals-and-constants scan can name.\n" +
+		"var acceptE2Route = \"panel.review.allow\"\n\n" +
+		"const acceptE3Tail = \"grant\"\n"
+
 	// Plant C: a throwaway inbound handler - the shape a follow-up commit writes
 	// when it "just needs" the panel to pass a verdict through.
 	const plantCHandler = "package panel\n\n" +
@@ -852,6 +943,37 @@ func TestPlantedGrantWiringGoesRedInASnapshot(t *testing.T) {
 			t.Errorf("plant B adds no field, so an outcome-field finding here means the scan is not reading what it is given:%s", joinFindings(hits))
 		}
 		t.Logf("red as required:%s", joinFindings(hits))
+	})
+
+	// The F-1 plant: the guard's own switch now carries two labels this scan
+	// cannot turn into strings. Before this file's fix they were dropped silently
+	// and the boundary read clean, which is how acceptance r1 got four facets to
+	// pass while ParseComposerRequest accepted a panel route. The drop list is the
+	// load-bearing ingredient: guardReadabilityProblem is what turns it into the
+	// abort that facet 1 and facet 2 run on every real scan.
+	t.Run("E a guard route reached through a var or a concatenation is named, not dropped", func(t *testing.T) {
+		dir := copyGoSources(t, src, files, plantEBridge, "", "")
+		pkg, err := parseBoundaryPackage(dir)
+		if err != nil {
+			t.Fatalf("parse %s: %v", dir, err)
+		}
+		if len(pkg.dropped) != 2 {
+			t.Fatalf("planted 2 unreadable case labels, the enumeration reported %d - the drop list is not reading the guard:%s",
+				len(pkg.dropped), joinUnresolved(pkg.dropped))
+		}
+		if got := len(sortedSet(pkg.answered)); got != 4 {
+			t.Errorf("the plant must still resolve the 4 declared routes so this run cannot be passing by having stopped reading the guard, got %d", got)
+		}
+		problem := guardReadabilityProblem(dir, pkg)
+		if problem == "" {
+			t.Fatal("an unreadable case label produced no problem: facet 1 would report this boundary clean")
+		}
+		for _, want := range []string{"acceptE2Route", `"panel.review." + acceptE3Tail`} {
+			if !strings.Contains(problem, want) {
+				t.Errorf("the loud failure must name the expression it could not resolve (%s), got: %s", want, problem)
+			}
+		}
+		t.Logf("loud as required, and the names are not invented:%s", joinUnresolved(pkg.dropped))
 	})
 
 	t.Run("C a wired grant door goes red on both halves", func(t *testing.T) {
