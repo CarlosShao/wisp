@@ -20,6 +20,11 @@ git rev-parse ee2a92d:internal/panel/l2_grant_boundary_test.go
 交件前  git hash-object --no-filters internal/panel/bridge.go -> d2cd6362ecc6941a0cee58073a2bf8ab6669a590
 交件前  git rev-parse HEAD:internal/panel/bridge.go            -> d2cd6362ecc6941a0cee58073a2bf8ab6669a590
                                               ⇒ 产品码零字节：工作树与索引两条输出、开工与交件各一次，四枚同值。
+最后复算（写完本件、commit 921791a 之后现跑）：HEAD=921791a 下
+  git hash-object --no-filters internal/panel/bridge.go -> d2cd6362ecc6941a0cee58073a2bf8ab6669a590
+  git rev-parse HEAD:internal/panel/bridge.go            -> d2cd6362ecc6941a0cee58073a2bf8ab6669a590
+  git status --porcelain -- internal/panel/ docs/        -> 空（本程两枚落点全部已入库，未 push）
+  上表"交件前"那两行取于 HEAD=a72c110（本件那一枚 commit 之前），同一枚 blob，不构成两个读数。
 交付 blob                                    -> f87301df6be0ba1ceb00cba7f9ddda877df521c6（2380 行）
 本程 commit 逐枚 pathset（不跑区间）：
   ddea3c3 -> internal/panel/l2_grant_boundary_test.go            （+149 −24，F-R4-1 全形＋F-R4-2 证人册）
