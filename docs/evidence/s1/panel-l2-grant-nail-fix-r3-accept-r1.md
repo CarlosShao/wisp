@@ -233,3 +233,69 @@ B 版（121006d，交付版）：块内 21 行、断言 4 枚  {t.Fatal, t.Fatal
 **"asked=528"这枚数今天仍然只是 `t.Logf` 里的一个读数，没有任何断言钉它**（§1.1 的 V4/V1 就是这么打穿的）。
 实现件 §2.1 那句"乘积写死在 `t.Logf` 里，人事后可复算"——**可复算这句对**（清单就在 `:1239/:162/:1247`，
 我按枚数过），但请把"写死"两字读成"打印"，别读成"断言"。
+
+---
+
+## §4 攻点 4：那句"验收件说只剩 C21、今天要说只剩三枚" —— **判成立（连归因一起复算），且形状结论我这边更强**
+
+### §4.1 三枚红名的归因，逐枚独立复算
+
+**ⓐ 那两枚 renderer 红：我在它交付那一版（`121006d`）的纯净副本上重新造出来。**
+
+```
+git archive 121006d -> /d/tmp/…/headcopy-r3anchor（同样只归一化 .html）
+go test ./internal/panel/ -count=1 -v   -> FAIL=2：
+    TestTheRendererHoldsExactlyOneDoorToTheHost
+    TestPlantedRendererDoorShapesGoRed
+红句原文（out/S-r3anchor-121006d.txt:152/156）：
+    src/lib/panel.ts:252:   sendRequest("panel.view.request", …)  names "panel.view.request"
+```
+
+⇒ 实现件 §1.3 那三行归因（同一枚红因行 `:252`、`git log -1 -S'panel.view.request'` 指到 `d61281c`、
+两枚用例都定义在 `internal/panel/composer_test.go`、"不在本程地界、未修未跳未放宽"）**逐条对得上**；
+它引的台账出处我也核了：`docs/reports/pending-and-issues.md:6124`（`A237②`，那一句正是"那道门被前端
+会话那枚第六个方法名打响"）与 `:1084`（`Q-50`）都是真条目，不是它编的指针。
+
+**ⓑ C21 那枚：它的"今天的机制是脏树，不是内容缺陷"这句，我用台件差集证明，不是听来的。**
+
+```
+同一枚钉、同一次归档，只差 design/ 在不在：
+  我的 git archive 副本（design/assets/tokens.css 在，HEAD 里跟踪着）
+      -> TestC21DesignTokensFourWayAgree **PASS**（out/A2-baseline-lf.txt / out/S-r3anchor-121006d.txt 两版皆 PASS）
+  仓库工作树（design/ 那 16 枚未提交删除，别家在飞）
+      -> 同一枚用例 **FAIL**（out/R-repo-head.txt，锚点 a5e1c8c，红句 read design/assets/tokens.css: … cannot find the path）
+```
+
+⇒ 它 §1.3 末段那句"编排者若按'C21 两枚红'核账会数不上，特此报备"**报备得对**，而且它把机制
+（脏树）与内容缺陷分开写、没有顺手把 C21 记成自己那批发现的、也没修它（不在地界）——这是加分。
+
+### §4.2 简报第 4 句（"另两枚应是 renderer 那两枚"）**在我这一版已过期**，与它无关
+
+```
+git show HEAD:frontend/src/lib/panel.ts | grep -n 'view\.request'
+  -> 只剩 :228 那行注释（"There is deliberately NO fifth outbound route here…"），sendRequest 的实参只剩四枚
+git log --oneline 5ef1632..a5e1c8c  -> f1cdafa fix(前端·Q-50=甲): 删掉第五枚出站路由 panel.view.request
+```
+
+⇒ **`f1cdafa` 已经落了 owner 那句"删掉那个请求"**，于是在我的锚点 `a5e1c8c` 上，归一化后的纯净副本
+**`FAIL=0`、包内一枚红都没有**（§0.2 第二发）。⇒ 简报那句前提在 `121006d`/`5ef1632` 上成立、在 `a5e1c8c` 上作废。
+**编排者若现在去复核"三门"，四数与实现件 §1.2/§7 那两发必然不同**（我这里 `count=1` 是
+`RUN=99 TOPPASS=53 SUBPASS=46 FAIL=0 SKIP=0`，它那里 `count=2` 是 `RUN=198 TOPPASS=100 FAIL=6`），
+差别**全部**由这两枚别家 commit（`f1cdafa` 关红、`design/` 脏树决定 C21 那枚的红/绿）解释，
+与被验物无关——这句话必须连着锚点 `a5e1c8c` 一起引用，别只引数字。
+
+### §4.3 "形状结论不变"那句是否诚实 —— **诚实，而且我把它推到更强的那一头**
+
+它写的是："⚠ 验收件 §7.2 那句'只剩先存在的 C21 红'在今天要读作'只剩先存在的**三枚**红'，**形状结论不变**"。
+我这边的复算不必借用它的分母：在我的纯净副本上，**先存在的红是 0 枚**，于是
+
+```
+摘掉常驻测试 ＋ M14  -> 包内 0 枚红（out/T-C2-out-M14.txt）
+摘掉常驻测试 ＋ M16  -> 包内 0 枚红（out/T-E-standingout-M16.txt）
+交付态（不摘） ＋ M14/M16 -> 各自恰好 1 枚红＝那枚常驻测试（§3 T-B/T-D）
+```
+
+⇒ 形状结论不但"不变"，在干净台件上是它的最强形：**没有那枚新测试，Go 真答一条面板侧批准路由时，
+整个 `internal/panel` 包会一声不响地全绿**。它那三枚先存在的红反而**稀释**了它自己的读数（读起来像"还有别人兜"），
+我这里连那点稀释都没有。它没有把这件事说重，也没有借我的口径改自己的数——按本仓"量出与上游不同就照自己读数写"
+那条，这一格判**成立**。
