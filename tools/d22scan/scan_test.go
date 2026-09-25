@@ -1852,6 +1852,43 @@ func TestIndexChangingBetweenTheTwoGitReadsAppliesNoRules(t *testing.T) {
 	if qn := sQuiet.ign.note(); strings.Contains(qn, "NOT APPLIED") || !strings.Contains(qn, "skipped as git-ignored") {
 		t.Errorf("the quiescent scan must skip what it has always skipped and say only that, got %q", qn)
 	}
+
+	// 5b. THE SEAM IS NOT DECORATIVE: handing the same walks a fresh matcher must
+	//     read the tree the way production does, so block 5's delta measures the
+	//     torn index and not a door that ignores what is behind it.
+	sSeam, err := scanWithIgnore(root, newGitIgnore(root))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := sSeam.examined["panel-approval"], sQuiet.examined["panel-approval"]; got != want {
+		t.Errorf("scanWithIgnore with a fresh matcher counted %d frontend/ files, want %d (identical to the production path)", got, want)
+	}
+	if sn := sSeam.ign.note(); sn != sQuiet.ign.note() {
+		t.Errorf("the same tree reports two different provenance lines through the two doors: seam=%q production=%q", sn, sQuiet.ign.note())
+	}
+
+	// 6. THE ONE-LINE RULE, on the only input that can break it. A git path may
+	//    contain a newline, and this refusal is printed as the first line of the
+	//    scan's self-report, which every reader (and one existing assertion in this
+	//    file) treats as exactly one line.
+	newline := buildGitIndexState(root, "", "we\nird.tsx")
+	if newline.ok {
+		t.Errorf("a stray path reached the note layer unrefused: %q", newline.why)
+	}
+	if strings.Contains(newline.why, "\n") {
+		t.Errorf("the reason must survive a newline in a path, got %q", newline.why)
+	}
+	if !strings.Contains(newline.why, `we\nird.tsx`) {
+		t.Errorf("the reason must still name the stray, escaped, got %q", newline.why)
+	}
+
+	// 7. THE CAP. The COUNT is what tells a reader how big the disagreement is, so
+	//    spelling out only the first maxStraysNamed paths may not be allowed to hide
+	//    the rest of them.
+	capped := quotePathList([]string{"p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8", "p9"}, maxStraysNamed)
+	if !strings.Contains(capped, `"p1"`) || !strings.Contains(capped, `"p8"`) || !strings.HasSuffix(capped, "(+1 more)") {
+		t.Errorf("quotePathList must name the first %d and announce the remainder, got %q", maxStraysNamed, capped)
+	}
 }
 
 // TestIgnoreRulesAreOffWhenTheIndexCannotBeAsked pins the failure direction of
