@@ -712,6 +712,19 @@ d22scan 那一枚要补三行，因为它是 `set -eu`（`scripts/d22scan.sh:38`
 
 **你需要做什么**：回一个"**甲**"或"**乙**"就行。其余不用你动手。
 
+> **编排者处置（17:1x 追加，原段落一字不抹）**：**这一格不该问 owner，我按甲做了**（commit `1485921`）。
+> 理由一句话：**乙 那一支是"删掉一条断言换取红色消失"**，而"为了变绿放宽断言"在 owner 自己定的硬禁清单上
+> （`AGENTS §1.1`）⇒ 这一支**没有第二个可选项**，摆给他看等于让他替我做一件本不该有选项的事。
+> 落地后的现量两发（本机把仓里 `third_party/sherpa-onnx` 三枚 DLL 放进 PATH）：
+> `go test ./cmd/wisp/ -run TestRunBooksWithASnapshotOfItsLiveQueue` ⇒ **rc=0，PASS**，
+> 且包体里 `"current":"ask_high_risk"`、日志行 `mode:ask_high_risk` ⇒ 那条断言是**被真读出来的值满足的**，
+> 不是被常量喂绿的；`go test ./internal/panel/ ./cmd/wisp/ -count=1` ⇒ `cmd/wisp` **ok（71.0 s）**，
+> `internal/panel` 唯一红仍是 `TestC21DesignTokensFourWayAgree`（本机样式表被挪走，改前也红，保持红）。
+> ⚠ **一句归因要在前面**：那枚恒红**是我造的**——我代提那程的 WIP 时只跑了 `go vet`、没跑该包测试
+> （见 `6e348f1` 正文里我自己写的那句"我没跑这个包的用例"）。⇒ 结论没变（**代提方向仍是对的**：
+> 共享树里留未提交件的真风险是被下一枚不带 pathspec 的 commit 卷走），但**"vet 过"不等于"测试过"**
+> 这一条今天又付了一次学费，落进 §7 那一族。
+
 ---
 
 ## 9. 临时件路径（只建不删，请编排者一次清）
