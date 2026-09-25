@@ -300,3 +300,161 @@ d22scan: 3 finding(s)  -> internal/build/leak.go:7 [bare-goroutine] + 两枚 [em
    `docs/reports/**` **零字节**（现量）。本件自己全程只写 `docs/evidence/s1/d22scan-gitignore-fix-accept-r1.md` 一枚路径。
 
 **判：成立。**
+
+---
+
+## 7. 契约轴（我自己重导的，不抄上一程）
+
+| 判据 | 现量 | 判 |
+|---|---|---|
+| `emojiRe` 逐字节 | `main.go:164` 现串＝ ``var emojiRe = regexp.MustCompile(`[\x{1F000}-\x{1FAFF}\x{2200}-\x{22FF}\x{2600}-\x{27BF}\x{2B00}-\x{2BFF}\x{FE0F}\x{1F1E6}-\x{1F1FF}]`)``；**五枚锚点（`3bb99aa^`/`3bb99aa`/`ca84b75^`/`ca84b75`/HEAD）抽该行做 sha 全同**（`c8fb5593539afd07`，len 136）；`git diff ca84b75^..ca84b75 -- main.go \| grep -E '^[+-].*(emojiRe\|1F000)'` ⇒ **rc=1 零命中** | ✅（上一程 §5.1 的 sha 前缀与我不同＝它那侧管道不同，**"五锚同值"这一条两把尺独立同结论**） |
+| `allowlist.txt` | `git diff ca84b75^..HEAD -- tools/d22scan/allowlist.txt` ＝ **0 字节** | ✅ 零新增豁免 |
+| 断言有没有被删 | `scan_test.go` 里 `t.Error*/t.Fatal*` 计数 `ca84b75^=139 → ca84b75=164 → HEAD=164`；该文件删除行**逐字只有两枚**（旧 `ignoredLikeGit` 调用行＋旧签名行），**没有一枚断言、没有一枚 `func Test` 消失**（`grep -E '^-func Test'` 空） | ✅ 只加不减 |
+| 新增 `t.Skip` | `t.Skip(f)(` 计数 **7 → 7 → 7** 三锚同值；`git show ca84b75 \| grep '^\+.*t\.Skip'` 只命中一枚**注释行**（`:1381` 那句"No t.Skip on this path, on purpose"） | ✅ |
+| 阈值 / golden | `internal/observe/thresholds.go` 与 `*slo*` 路径 `git diff ca84b75^..HEAD` **0 字节**；`internal/agent/testdata/golden/*.sse` 根本不在被碰的 4 枚路径里 | ✅ |
+| `main.go` 的 −22 | **22 枚全是注释行**（12 枚旧 DESCEND 段、6 枚 `ign` 字段注释、3 枚 `walkGo` 注释、1 枚 "…machine)." 被并入长句）——**没有一枚代码/分母行为被摘掉**；`walkGo/walkText/walkEmoji/checkRoot` 四枚 `skip` 接入点（`:648/662/841/853/919/952/1168/1173`）一行未动 | ✅ 逐枚点名 |
+| `gitignore.go` 的 −33 | 24 枚注释（含上一程 F2 点名的两句：删除行 #2 逐字就是 `the instrument and the repository's ignore rules cannot disagree`，#14 就是 `never less`）＋ 9 枚 `note()` 函数体行（`if g == nil \|\| (files==0 && pruned==0)` 的守卫挪进函数内、`dirs`/`src` 组装与 `Sprintf` 原样保留在新 `if g.files > 0 \|\| len(g.pruned) > 0` 块里）⇒ **note 的旧那一行文案一字未改**（`:421-422`），新增的是第 1、3 两行 | ✅ |
+| 函数面 | `gitignore.go` 顶层 `func` 13 → 20（＋7：`holds`/`runGitIndex`/`runGitAt`/`firstLine`/`parseIndexPaths`/`parseIndexPathsList`/`index`）；**全部只读**（三枚命令我逐字核过：`rev-parse`／`ls-files`／`ls-files -i -c`，无任何写操作、无 `--force` 类参数） | ✅ |
+
+---
+
+## 8. 新环境依赖：门的正控现在要 `git`
+
+**编排者已判"可接受"，我复核后同意结论、更正它给的理由。**
+
+- 现量（真工作树 `2206cd4`，同一命令 `sh tools/d22scan/runtests.sh -C tools/d22scan ./...`）：
+
+  | 环境 | 四数 | rc |
+  |---|---|---|
+  | PATH 有 git（`/mingw64/bin/git`，`git version 2.52.0.windows.1`） | **PASS=28 FAIL=0 SKIP=0 ＝ 28 枚 `^--- PASS` 我自己数过（正控）**，RUN=68 | 0 |
+  | **PATH 无 git**（正控：`env PATH=… git --version` ⇒ `No such file or directory`；`go version` 仍在） | **PASS=25 FAIL=3 SKIP=0**，RUN=68 | **1** |
+
+  三枚红：`TestWalksSkipGitIgnoredPaths`、`TestTrackedPathsAreNeverSkippedByTheIgnoreFilter`、
+  `TestIgnoreRulesAreOffWhenTheIndexCannotBeAsked`。红句点名要什么：
+  `scan_test.go:1450: git init -q -b main in …: exec: "git": executable file not found in %PATH% …
+  - the tracked-path guarantees of A214 cannot be built without a git binary`。
+- **没有一枚走 `t.Skip`**（SKIP=0，且 `gitCommand` `:1384-1402` 只有 `t.Fatalf`）⇒ 缺 git 不会被 `runtests.sh` 读成通过
+  （票 71 AC#3 那条"SKIP 不是 pass"在这里真的用上了）。
+- **实现程那句自述我逐字复核为真**："扫描器本体不要求 git，变的是门自己那一步"——
+  §3.2 现量：把 git 从 PATH 摘掉，**二进制照跑、rc 只朝红、分母只涨不落**。
+- ⚠ **CI 那一侧的更正**：编排者 `A218③` 的理由是"本机 runner 是 self-hosted Windows、本来就靠 git 克隆"——
+  **跑 `d22scan` 的那一枚 job 不在 self-hosted Windows 上**：`.github/workflows/ci.yml:65-66` `lint: runs-on: ubuntu-latest`，
+  step `:81`＝正控、step `:109`＝`sh scripts/d22scan.sh`；self-hosted 那枚是 `ci.yml:538 [self-hosted, wisp-slo]`（`slo-full`）。
+  ⇒ **结论仍成立但依据要换**：GitHub 托管的 `ubuntu-latest` 镜像必带 git，且 step `:68` 用的就是 `actions/checkout@v4`
+  （它自己就得调 git 才能建出带 `.git` 的检出）——**这一步同时保证了 CI 侧扫的是一枚真仓库**，
+  于是 §3.1 那枚"规则全关"的形状**在 CI 上不发生**（这是 `A214②` 否决 `.git` 闸门时说的同一件事，我在读数层复核到）。
+  我**没有**跑过 GitHub CI（见 §12）。
+- 方向判断：**红而不静＝对的方向**。三枚红的代价（缺 git 时门跑不动）换来的是"受追踪"这一判据可被证伪；
+  反过来（缺 git 时静默少扫）正是这仓抓过多次的那枚假绿。**判：成立（含上面那句 runner 归属更正）。**
+- 顺带一枚脆性（低，登记不升级为缺陷）：`TestIgnoreRulesAreOffWhenTheIndexCannotBeAsked` 把 git 的错误文案
+  `not a git repository`（`scan_test.go:1588` 那一支）写进了断言。⇒ 若某台机器的 `TMPDIR` 落在一枚真仓库里面，
+  `liveFixture` 的临时树会走"子目录"那一支、文案换成 `is the subdirectory … not its top` ⇒ **行为仍正确、测试却红**
+  （FAIL 而非静默，方向安全）。本机与 ubuntu 都不属这形（本机现量 `C:/Users/swq/AppData/Local/Temp/…`，非仓库内）。
+
+---
+
+## 9. 读数：用**当下**基线，逐枚归因
+
+**我的两种形状、两个二进制（同树同参数）**：
+
+| scope | 真工作树（`77e89f9` 与 `2206cd4` 两时刻各一次，`sh scripts/d22scan.sh` step 2） | 净快照 `git archive HEAD`（`5d463bb` 一次、`2206cd4` 一次） |
+|---|---|---|
+| bans #1-5 internal/ | 203 | 203 |
+| bans #1-5 cmd/ | 22 | 22 |
+| ban #6 frontend/ | 40 | 40 |
+| ban #7 internal/tools/ | 18 | 18 |
+| ban #8 design/ | **32** | **30** |
+| ban #8 frontend/ | 40 | 40 |
+| ban #8 internal/ | **407** | **406**（@`5d463bb`）／**407**（@`2206cd4`） |
+| ban #8 cmd/ | 39 | 39 |
+| rc | 0（整道门含 step 1 也 0） | 0（step 2 与整道门都是 0） |
+
+- 编排者在 `A218⑥` 给的基线 `bans #1-5 internal/=203 cmd/=22 / #6 frontend/=40 / #7 internal/tools/=18 /
+  #8 design/=30 frontend/=40 internal/=406 cmd/=39`：**在 `5d463bb` 的净快照上我逐枚复现同值**（`gate-snapshot.log`），
+  并复现到"输出的第一行＝NOT APPLIED 自陈"（`A218⑦` 那一发我独立量到同一行）。
+- **`internal/=406 → 407` 是 `d88c356`（panel 会话新加 `internal/panel/l2_grant_boundary_test.go`）造成的**，
+  不是本批：`find internal -name '*.go'` 两树差集现量**恰那一枚文件**；工作树 `407` 与净快照 `407` 现已同值。
+- **`design/` 30（＝HEAD 里 16 枚旧件 ＋ `5d463bb` 入库的 14 枚 doubao）**、工作树 32（盘上另有 18 枚未追踪的
+  `design/old/**` 文本 − 16 枚已删除未提交）⇒ `git ls-tree` 口径两枚现量：**HEAD=30 / disk=32**。
+- **`ca84b75` 有没有动任何一枚读数？没有——这条我用两把尺各量一次**：
+  ①**真工作树**上 `d22scan-pre.exe` 与 `d22scan-post.exe` 输出 **`diff` 现量 0 行**（八数、账本行、rc 全同，均 rc=0）；
+  ②**净快照**（`2206cd4`）上两版 `diff` **唯一差异就是多出的第 1 行自陈**（`0a1`），八数一字不动。
+  原因也钉住了：真仓 `git ls-files -i -c --exclude-standard` 现量**空**（今天没有一枚"受追踪且撞规则"的件），
+  净快照里没有未追踪件可被规则吞 ⇒ 两版判据在这些树上必然同值。
+  ⇒ **§1 那两发的分母只涨在"有人真去 `git add -f`"的树上，今天这仓没有这种树**——这既是好消息也是本批价值所在（洞堵上了，读数没动）。
+- `git ls-files -i -c --exclude-standard` 在两枚锚点（我自己的会话开始与写本节时）都现量空；
+  上一程 §1.2 用过的第二枚口径（逐件 `git check-ignore --no-index`）我**没重跑**（见 §12 第 6 条）。
+- 正控与"没输出≠过了"：`scripts/d22scan.sh` 是 `set -eu`、step 1 就是正控——
+  本节所有 step 2 读数我都是**分开取的**（step 2 单独用二进制、step 1 单独用 `runtests.sh`），
+  两次整门运行（`gate-worktree.log`/`gate-snapshot.log`）都是 **step 1 绿（28/0/0/68）之后 step 2 才有输出**。
+  另外缺 git 那一发恰好是一枚天然的反证：`step1 rc=1` 时 step 2 根本不该被期望有输出。
+  **格判：成立。**
+
+---
+
+## 10. 往前账：哪些是本批的缺陷、哪些是登记过的兄弟
+
+| # | 项 | 本批动了吗 | 我量到的现状 | 判 |
+|---|---|---|---|---|
+| R1 | **`live:true` scope 走 0 枚 ⇒ 硬退出 2**（上一程编号 **F9**；编排者 `A218⑨` 把它记成了 "`F3`"——**同一台账里 `F3` 另有所指**，见下面 R2） | 否（也不该由它动） | 现量 `ban #8 design/` 净快照 **30**、`git ls-tree HEAD design` 文本件 30；把那 16 枚未提交删除**假设入库**后仍剩 **14** 枚（`comm -23` 现量）⇒ **雷被 `5d463bb` 拆了，不是被本批拆的**；`!!`（被忽略的 design 件）现量 0 ⇒ ignore 过滤器仍然吞不到、也不该吞它 | **不是本批缺陷**；⚠ 台账那一处 `F3`/`F9` 同号相撞请编排者追一行 `>` 更正（append-only，不改写） |
+| R2 | 上一程 **F3**＝两枚"少扫"语义（行首空白被 `TrimSpace`、尾随 `**` 吃掉父目录） | **是，本批正是来修它的** | M4a 红（`scan_test.go:1686` 两支）、M4b 红（`decide("deep",isDir=true)` 被吞）⇒ **两枚都实现且有断言**；且拿真 git 复核过方向（`  weird/*` 只绑真名叫 `  weird` 的目录、`git check-ignore -v dist` 对 `dist/**` 的实测） | **成立（旧账已结）** |
+| R3 | `/foo` 前导斜杠锚定**无断言** | 否 | `TestGitIgnoreRuleSemantics` 的规则表（`:1626-1641`）逐枚看过：**没有一枚以 `/` 开头**；实现支在 `gitignore.go:570-572` | **登记过的兄弟账，仍在**（本批没让它变坏，也没顺手补）——最小修一：表里加 `"/root-only.log"` ＋ 两支用例 |
+| R4 | `.git/info/exclude` ＋ `core.excludesFile` 不作为跳过来源 | 否（`gitignore.go:97-102` 明示不支持） | 现测：往 `f3repo/.git/info/exclude` 写 `excluded-probe.tsx` ⇒ `git check-ignore -v` 点名 `.git/info/exclude:8`（rc=0，git 认它被忽略），**扫描器仍算进分母（41）并点名为 finding** ⇒ 方向＝**少跳＝响亮**；代价＝这一支上"工作树 41 / CI 40"的 A207 病仍活着 | **登记过的兄弟账（上一程 F5），方向安全** |
+| R5 | 上一程 **F4**＝`note()` 的数与移动的分母不同量纲 | 否（模板 `:421-422` 一字未改） | 本批新独立复现一发：`f3ci`(规则关) 44 → `f3repo` 40，note 说 **"2 file(s) under 1 ignored director(ies)"** ⇒ 动掉 4 枚只报了 2 枚 | **登记过的兄弟账，本批未恶化也未修**；票面没点它，不算越界 |
+| R6 | 上一程 **F8**＝`internal/panel/frontend_hygiene_test.go:289` 用子串 `/dist/` 跳，早于本修且比 `.gitignore` 宽 | **否，正确地没碰**（`git diff --name-only ca84b75^..ca84b75` 不含 `internal/**`） | 该行现号仍在；归它的主人（`A217④` 已把新仪器记在 panel 名下） | **不是本批的账** |
+| **N1（新）** | `gitignore.go:103-105` "The one shape that could make it skip MORE than git" 是本批**新增行**，"唯一"为假、且把治它的那一味归错了地方（真治它的是全量 tracked 支，不是"问不到就不套规则"） | **是，本批写的** | §4 的 M4a＋M1 交叉发＝它的反例；交付名册里没有任何断言能证伪这句 | **本批的文本面缺陷（低-中）**，修法见 §5（一句文字＋§4 那发测试） |
+| **N2（新）** | `gitignore.go:166-171` "an independent union member so one command's parsing bug cannot blind the other" 站不住 | **是，本批写的** | `-i -c` 严格 ⊆ `ls-files`（现量 `comm -13` 为空）⇒ `holds()` 文件支里那一味**空转**；两枚清单过同一枚 `parseIndexPathsList`（`:279`→`:301`）⇒ 解析 bug 同打两枚 | **本批的文本面缺陷（低）**；窄清单真正承重的是 note（M6 红），把理由改成这句即可 |
+| **N3（新）** | 全量清单的**文件**那一半没有任何断言要求（M1 全绿） | 本批引入的代码，非回归 | §4 表 | **附条件**（§4 的最小修一即解） |
+| **N4（新，信息）** | `gitignore.go:346-348` "costs no git call"、`:199-201` "any failure yields ok=false plus one reason"（含 `parseIndexPathsList` 对绝对路径/`..` 的拒读）没有测试喂过畸形 git 流 | 本批写的 | 前者被 §4 末节的 6-spawn 记账**旁证为真**；后者方向安全（拒读⇒不套规则⇒多扫） | **不升级为缺陷，登记** |
+| **N5（旧账，点名归属）** | `gitignore.go:11` 引 `.gitignore:24` 指 `frontend/dist/*`，**现量该行在 `.gitignore:22`** | 不是本批写的（`ca84b75^` 逐字同串）⇒ 是 `3bb99aa` 留下的引用 | `sed -n '22,24p' .gitignore` 现量：22＝`frontend/dist/*` | 上一程的引用缺陷，本批重写了这段头的上下邻居却没顺手改；**登记，一句话改** |
+
+---
+
+## 11. 总裁
+
+| 格 | 判 | 一理由 |
+|---|---|---|
+| 1 F1 真关了吗（复现） | **成立** | 仓库外重造 `git add -f` 两枚件：修后 `rc=1`、三枚 finding 点名（**含 `internal/build/leak.go` 那枚 AGENTS.md §1.2 的裸 goroutine**）、分母各 ＋1、note 点名"TRACKED and matching an ignore rule"；修前同树同参数 `rc=0`/40/203 |
+| 2 是不是换方向的蒙眼／伪装退回 | **成立** | 未追踪且被忽略那一头：两版输出 `diff` **0 行**（40/203/406/39、`skipped as git-ignored` 行逐字同） |
+| 3 "问不到"够响、朝多扫 | **成立** | 四支各测：无 `.git`（首行自陈＋44 vs 40＋rc 1）、**PATH 无 git 而 `.git` 在**（自陈点名 `exec: "git" … not found in %PATH%`、40→41、rc 0→1）、10 s 超时（`real 20.7s`、自陈 `timed out after 10s`）、别人仓库的子目录（自陈 `not its top`）；note 与账本同在 stdout |
+| 4 那味偏离（全量 `ls-files`） | **附条件成立** | 摘掉它**今天不打红任何一发**（M1 全绿）＝按本仓定义它未被测试要求；但 M4a 单跑绿／M4a＋M1 探针红证明它挡的是**这一批刚犯过两次的活家族**（匹配器比 git 多跳）⇒ **防御不是装饰，条件＝补那第三枚半**；代价实测 6 枚只读 spawn／＋0.34 s 每次、只付在 step 2 |
+| 5 F2 那两句现在可证伪吗 | **附条件成立** | 两句各有 pinner（M2 8 条红含 `:1534 got 0`；M5/M6 各咬一半）；**但本批新写了一句同族未钉 blanket（`:103-105`）＋一枚站不住的 union 理由（`:166-171`）** ⇒ 旧账结、新账两行文字 |
+| 6 同批改副本这条规矩 | **成立** | `ignoredLikeGit` 签名同批加 `tracked`/`rulesOn`；在 F1 树上把副本那一半抽掉 ⇒ 正控 41/41 PASS、**副本退回纯模式即 `41 vs 40` 当场分家**；名册普查无第 7 份；`internal/panel/**` 零字节 |
+| 7 契约轴 | **成立** | `emojiRe` 五锚同值且 diff 不碰它；allowlist 0 字节；断言 139→164 只增、`t.Skip` 7→7、无 `func Test` 消失；thresholds/golden 零字节；`main.go` −22 全注释、`gitignore.go` −33 逐枚点名（含被删的那两句担保） |
+| 8 新环境依赖（缺 git 就红） | **成立（含更正）** | 有 git：28/0/0/68 rc=0；无 git：**25/3/0/68 rc=1**、零 Skip、红句点名"cannot be built without a git binary"；扫描器本体无 git 照跑朝多扫。⚠ 依据要换：CI 那枚 job 是 `ci.yml:66 ubuntu-latest`（不是 self-hosted Windows），但托管镜像必带 git 且 `actions/checkout` 就是 git ⇒ 结论不变 |
+| 9 当下基线与归因 | **成立** | `A218⑥` 的八数我在 `5d463bb` 净快照逐枚复现（含首行自陈）；现锚 `2206cd4` 净快照＝`203/22/40/18 · 30/40/407/39`（`406→407` 归 `d88c356`、`16→30` 归 `5d463bb`）；**`ca84b75` 一枚读数都没动**：真工作树两版 `diff` 0 行、净快照仅多首行自陈 |
+| 10 往前账 | **成立** | R2（旧 F3 两枚语义）结；R1/R3/R4/R5/R6 是登记过的兄弟账、本批未恶化；**新账只有 N1/N2 两枚文本面 ＋ N3 一枚缺断言**，都不改判据方向 |
+| **本批整批** | **附条件成立（可入账，不需再来一程）** | 主攻击格（F1）在我自己重造的变异上真的关了，且没把另一头蒙上；两枚 F2 担保兑现；副本同批接上并实测有牙；契约轴零越界。**条件三件，全在一枚小 commit 里**：①补 §4 那发第三枚半（把全量 `ls-files` 那一味钉住，约 15 行测试、零生产码）；②`gitignore.go:103-105` 的"唯一形状"改成两支并列并归对治理者；③`gitignore.go:166-171` 的"独立并集成员"理由换成"note 点名"（顺带 `:11` 的 `.gitignore:24`→`:22`）。**这三件没有一件让门今天少看见东西**，所以不判退回。 |
+
+---
+
+## 12. 我**没有**测什么（绝不让沉默被读成批准）
+
+1. **没跑 GitHub CI**（一行都没跑）。§8 关于 ubuntu 的两句是**推理**：镜像带 git ＋ `actions/checkout@v4` 依赖 git。
+   我没读到任何一枚 run id / step 日志，也没核 `GITHUB_TOKEN` 侧的检出形状。
+2. **没测 `core.excludesFile` 真被设过之后的读数**（只测了 `.git/info/exclude` 那一支，R4）。
+   也不打算动任何 git 配置（本程禁改 git config）。
+3. **没测并发/共享树**：本批代码在别人正在 commit 时读 index 的一致性我没造场景（`index()` 每枚 matcher 只问一次 ⇒ 中途
+   有人 commit，同一趟扫描里前一半与后一半可能踩着两枚 index；方向应仍是"多扫或按老 index 少扫"，**未证**）。
+4. **没测大小写／长路径／盘符大小写不一致／UNC** 下的 `filepath.Rel` ＋ `ToSlash` ＋ git 输出三者的对账（依赖实现，未构造用例）。
+5. **没在 Linux 上跑过任何一发**：全部 win32 ＋ `git 2.52.0.windows.1` ＋ `go1.27.1 windows/amd64`。
+   CI 那枚 job 恰好在 ubuntu ⇒ **`exec: "git": executable file not found in %PATH%` 这类文案在 linux 上是另一串**，
+   而 `TestIgnoreRulesAreOffWhenTheIndexCannotBeAsked` 只锁了 `not a git repository` 那一支（§8 末的脆性发我只在本机论证）。
+6. **没重跑上一程的第二枚"今天有没有这种件"口径**（逐件 `git check-ignore --no-index`）；我只用了 `git ls-files -i -c --exclude-standard`（现量空）。
+7. **没测 `git ls-files -z` 输出畸形流**（绝对路径／`..` 那两条 `parseIndexPathsList` 守卫）——我没有办法让真 git 吐出那种流，
+   也没造桩（stub）。⇒ N4 那句"any failure yields ok=false"只有代码事实，没有读数。
+8. **没测 git 仓库巨大时的形状**（十万级受追踪件的 `ls-files -z` 内存/耗时），也没测 worktree（`.git` 是文件）那一支。
+   我只在 1142-1144 枚受追踪件上量过 6-spawn／0.34 s。
+9. **没测 step 1 在超时那一支下的表现**（10 s × 若干枚 fixture）——我只量了 step 2 的 20.7 s 最坏形状；
+   门的 step 1 若有 fixture 撞上慢 git，总时长会涨，**未量**。
+10. **没核 §4 那发探针在生产口径下会不会误伤**：我的探针是"匹配器读宽规则"这一类的**存在性**证明，
+    今天交付版没有这种规则（M4a 单独跑才响），所以我**不能**说"这仓现在正漏着什么"，只能说"这一味今天没断言、将来靠它挡"。
+11. **没读实现程 `d22scan-gitignore-fix-r1.md` 的每一枚自述去逐条对账**（我只把它当声明用，本件所有格都是现跑）；
+    它 §11.3 的"删一行即退回"路径我没有替它验证删除后的**全套**门（我只跑了摘那一味的相关六枚测试＋我的探针）。
+12. **没跑 root module 的任何测试**（`internal/**`、`cmd/**` 整包）：本批代码在独立 module、无 import 关系（上一程 §7 已量），
+    但"因此不可能影响 root module"仍是**推理**不是我的读数；何况另有两程此刻正在那两个包里写码。
+13. **没测 `--no-index` 之外的 git 版本差异**（不同 git 主版本对 `ls-files -i -c` 的 `--exclude-standard` 语义）。
+14. **权限**：本程**没有任何一枚工具调用被权限系统拒绝**；也没 push、没 `git add -A`/`.`、没 `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；
+    每枚 commit 前 `git diff --cached --name-only` 只列 `docs/evidence/s1/d22scan-gitignore-fix-r1.md`（逐次核过，无第二枚混入），
+    每次都是**显式 pathspec 提交**；对 owner 那 16 枚未提交的 `design/**` 删除**未做任何动作**（不 stage、不 commit、不还原）。
+    ⚠ 一处我自己的手滑如实记：搭 `mut\` 时我跑过一次 `rm -f README*`，**该目录里没有 README ⇒ 实际零删除**；此后一律只建不删。
