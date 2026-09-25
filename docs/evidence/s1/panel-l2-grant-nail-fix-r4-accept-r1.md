@@ -157,3 +157,78 @@ Fatal/Error 合计             79                86           +7   ⇒ 只增不
 ```
 
 ⇒ 实现件 §5.4 那一格**逐格同值**。本程没有为了变绿动过任何断言、任何阈值、任何 golden（§0 路径集合为证）。
+
+---
+
+## §5 ⓒ F-ACC-1：乘积第三因子——**四发掏空我全部自己造、自己打，不抽它的数**
+
+被验控（交付版逐字，`l2_grant_boundary_test.go:1325`）：
+`if len(grantRouteWords) == 0 || len(grantRoutePrefixes) == 0 || len(grantRouteSuffixes) == 0 {`
+＋乘积式（`:1353`）：`if want := len(grantRoutePrefixes) * len(grantRouteWords) * len(grantRouteSuffixes) * 2; asked != want {`。
+下面每一发都是 `D:\tmp\wisp-r4acc1\anchor`（§1.1 那台件）现跑 `go test ./internal/panel/ -count=1 -v`。
+
+| 发（我这边的编号） | 我只改哪一行 | 四数 | 红名（逐字） | 红因首句（逐字） | 原始件 |
+|---|---|---|---|---|---|
+| `M1-suffix-empty` **本轮真正的新账** | `grantRouteSuffixes` -> `[]string{}` | RUN=99 TOPPASS=52 SUBPASS=46 **FAIL=1** | `TestRealGuardRefusesEveryAssemblableApprovalRouteName` | `:1380 the sweep vocabulary is empty (grantRouteWords=11, grantRoutePrefixes=8, grantRouteSuffixes=0): a sweep that asks nothing answers clean forever` | `out/M1-suffix-empty.txt` |
+| `M1-no-plural` | `for _, form := range []string{w, w + "s"}` -> `[]string{w}` | RUN=99 TOPPASS=52 SUBPASS=46 **FAIL=1** | 同上 | `:1380 the sweep asked 264 names but the three lists it reads multiply to 528 (8 prefixes x 11 words x 3 suffixes x 2 plural forms): a factor that stopped being ranged is a grid that silently shrank, and hits=[] …` | `out/M1-no-plural.txt` |
+| `M1-words-empty` | `grantRouteWords` -> `[]string{}` | RUN=99 TOPPASS=50 SUBPASS=44 TOPFAIL=3 SUBFAIL=2（**5 枚红条目**） | `TestRealGuardRefuses…` ＋ `TestGrantVocabularyIsNot…` ＋ `TestPlantedGrantWiringGoesRedInASnapshot`（父＋`/B_Go_answering_panel.approval.request_goes_red`＋`/C_a_wired_grant_door_goes_red_on_both_halves`） | `:1377 the sweep vocabulary is empty (grantRouteWords=0, grantRoutePrefixes=8, grantRouteSuffixes=3)` | `out/M1-words-empty.txt` |
+| `M1-prefix-empty` | `grantRoutePrefixes` -> `[]string{}`（8 枚全删） | RUN=99 TOPPASS=52 SUBPASS=46 **FAIL=1** | `TestRealGuardRefuses…` | `:1378 the sweep vocabulary is empty (grantRouteWords=11, grantRoutePrefixes=0, grantRouteSuffixes=3)` | `out/M1-prefix-empty.txt` |
+| `M2-all-three-empty`（简报没要求，我加：ⓑ 那枚"0==0 空转角"） | 三枚清单一起清空 | RUN=99 TOPPASS=50 SUBPASS=44 TOPFAIL=3 SUBFAIL=2 | 同 `M1-words-empty` 那 5 枚 | `:1375 the sweep vocabulary is empty (grantRouteWords=0, grantRoutePrefixes=0, grantRouteSuffixes=0)` | `out/M2-words-empty+prefix-empty+suffix-empty.txt` |
+
+**裁（ⓒ）**：
+- 上游 r3-accept §1.1 的 **V1**（掏空第三因子 -> 本测试 PASS、`asked=0`、全包 0 枚红）**今天不成立**：我这一发
+  现量 **红 1 枚**，红句逐字点名 `grantRouteSuffixes=0`。⇒ **实现件 §2 那格"复判原来记的『这一形 0 枚红』已死"复算成立**，
+  而且它选的方案（ⓑ 乘积式 ＋ 控里补齐第三因子）确实是把 V1 与 V4 一并堵死的那一支。
+- 上游的 **V4**（分母减半 `asked=264` 仍绿）同样**今天不成立**：现量红 1 枚，红因是乘积式而不是那句"空"。
+- 它 §2 那句"ⓑ 不能单独存在：三枚清单一起清空时 `asked == 0 == want`，它会绿，所以 ⓐ 是前提"——我加发了
+  `M2-all-three-empty` 验这一角：**这一角由控（ⓐ）拿住**（红在 `:1375`），不是由乘积式拿住。⇒ 它"两枚互为前提"
+  的说法是**活的判断**，不是我抄来的修辞：摘掉任一枚都会掉一发（见 §7 的 ⓔ）。
+- 行号口径：同一句控在 words 那发报 `:1377`、prefix 那发 `:1378`、suffix 与 no-plural 两发 `:1380`、
+  三枚一起清空 `:1375`——**调用点跟着我自己那一刀的宽度漂**（我删的行数与它不同：它 §2 记 prefix-empty 一发
+  `delta_lines=-3` 报 `:1377`，我这发删 2 行报 `:1378`）。这不是读数冲突，是两把台件切法不同；
+  它那句"行号会跟着文件漂、读数活的不是抄的"我这一发复现到同一形状。
+
+---
+
+## §6 ⓓ F-ACC-2：11 枚证人我**全部逐枚删过**（不只抽样），含它自称 4 枚红的那枚
+
+台件同上。脚本只动 `var grantRouteWords` 那一块内的字面量（块内计数不等于 1 即拒），证人册里那枚同名词**不碰**。
+
+| 删掉的词 | 四数 | 红条目数 | 红名 | `asked=`（扫掠自己那一发） |
+|---|---|---|---|---|
+| `approve` | 99/52/46/1 | 1 | `TestGrantVocabularyIsNotSatisfiedByTheRealEnvelopes` | 480 |
+| **`approval`**（必查那枚） | 99/51/44/2 | **4** | 同左 ＋ `TestPlantedGrantWiringGoesRedInASnapshot`（父＋`/B_Go_answering_panel.approval.request_goes_red`＋`/C_a_wired_grant_door_goes_red_on_both_halves`） | 480 |
+| `grant` | 99/52/46/1 | 1 | `TestGrantVocabularyIsNot…` | 480 |
+| `allow` | 99/52/46/1 | 1 | 同左 | 480 |
+| `permit` | 99/52/46/1 | 1 | 同左 | 480 |
+| `ratify` | 99/52/46/1 | 1 | 同左 | 480 |
+| `authorize`（上游标"未逐枚打＝推定"，我实跑） | 99/52/46/1 | 1 | 同左 | 480 |
+| `authorised` | 99/52/46/1 | 1 | 同左 | 480 |
+| `decide` | 99/52/46/1 | 1 | 同左 | 480 |
+| `decision`（上游同样标"推定"，我实跑） | 99/52/46/1 | 1 | 同左 | 480 |
+| `verdict` | 99/52/46/1 | 1 | 同左 | 480 |
+
+红因逐字（两枚代表，`out/W-approval.txt` / `out/W-verdict.txt`）：
+
+```
+:1512 witness route "panel.approval.request" is flagged by [] under grantRouteWords as it stands, and this file
+      wrote down [approval] for it: the vocabulary and the evidence attached to it are no longer the same list … (F-ACC-2)
+:1540 grantRouteWords no longer carries "approval" while "panel.approval.request" still stands here as its witness:
+      the sweep stopped asking the 48 names that word used to build … this roster is the only thing in the package
+      that noticed (F-ACC-2)
+:1512 witness route "panel.verdict" is flagged by [] … wrote down [verdict] …
+:1522 the route name assembled here from the vocabulary word "verdict" ("panel.verdict.request") does not read as
+      an approval door - that word no longer carries the meaning the sweep assumes …
+```
+
+**裁（ⓓ）**：**11/11 有红，无一枚装饰**——实现件 §3 那一整表（含 `approval` 4 枚、其余各 1 枚）我逐枚复跑到同值，
+连"`asked` 每发都从 528 掉到 480 而扫掠本身照旧绿"这句也复现到（`out/W-*.txt` 里那枚 `asked=480` 就是扫掠自己的
+`t.Logf`）。上游 r3-accept §1.2 明标"未逐枚打＝推定"的两枚（`authorize`/`decision`）本程**从推定升级为现量**。
+证人册的三条主张不是"表自证含它自己"：判决者确实是盘上的谓词与真守卫（`out/W-verdict.txt` 那发一次报出
+主张 1/主张 2/双向对账三处，各是不同行号、不同判据）。
+
+顺带把它 §3 末那枚"加分读数"也复算成现量：**M16（生产码运行期拼 `panel.review.ratify`）在交付态红 2 枚**
+（`out/M2-M16.txt`：`TestRealGuardRefuses…` 的 `hits=[panel.review.ratify]` ＋ `TestGrantVocabularyIsNot…`
+@`:1515` 那句 witness 主张），**M14 红恰好 1 枚**（`out/M2-M14.txt`，只有常驻扫掠响）。
+⇒ 同一枚生产码形状现在有两名独立证人、M14 那一形仍只有一名——它 §6 那句"必须照实写的差别"是真的。
+
