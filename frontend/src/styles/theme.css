@@ -214,6 +214,23 @@
   50% { opacity: 0.2; }
 }
 
+/* The 20px ball glyph on the L2 card breathes a ring on a 2s period
+   (PLAN.md:3481's 动效 cell: "悬浮球图示的环 2s 呼吸"). Colour is inherited from
+   the element so the component decides it with a token class - no literal here.
+   transform-box/origin are what make a scale() on an SVG circle grow from the
+   circle's own centre instead of the viewport corner. Loop animation is
+   permitted here by PLAN.md:3491, which lists 审批等待 among the non-idle states;
+   the card is not mounted while the panel is idle. */
+.l2-ball-ring {
+  animation: l2-ball-ring 2s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes l2-ball-ring {
+  0%, to { opacity: 0.2; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
