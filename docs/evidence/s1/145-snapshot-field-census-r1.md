@@ -620,3 +620,28 @@ it never invents an exchange rate"。⇒ 尺上那个 `¥0.31` 的 `¥` **正是
 ⚠ 另记一枚同源风险：尺读工作树 ⇒ 共享工作树里若前端会话把 `panel.ts` 改脏而未提，
 本包的 Go 测试会**对着他们未提交的版本变绿**。AC#5 取"改前改后各一次"名册差集时，
 `git status --porcelain -- frontend/src/lib/panel.ts` 必须一并留证，否则那发绿说明不了任何事。
+
+---
+
+## 5. 本程**没**核什么（不假装核过）
+
+按"如果下一位以为我核了就会出事"的严重度排序，不按类别排。
+
+| # | 没核的事 | 为什么没核 | 对读表的影响 |
+|---|---|---|---|
+| N1 | **任何门禁读数**：`go test ./internal/panel/ ./cmd/wisp/`、`gofmt -l`、`go vet`、`sh scripts/d22scan.sh` 的 rc 与四数、**名册差集一枚未取** | AC#1 射程外（那是 AC#5）；且本程零生产码改动，跑了也只能得到与本件无关的绿 | ⚠ §4.4 那条"Go 加字段必红"是**代码语义推论**（`subtract` 定义已核到 `approval_test.go:213-225`），**不是实跑读数**。实跑归 AC#5 |
+| N2 | **`cmd/wisp` 的基线用哪一支**（带 sherpa DLL vs `scripts/wisp-cli-tests.sh`） | 本程没跑测试，所以没说清是必然的。工单 AC#5 自己提醒"不带 DLL 时改前就是红的" | ⚠ 本件**没有**引用任何 `cmd/wisp` 的红绿数；`cmd/wisp/run.go`、`panel_assets.go` 的引用全是**代码位置**，不是门禁读数 |
+| N3 | **AC#6 反向判据一枚未答** | 本程没加字段，"哪枚用例断言新字段来自真源"这个问题**还没被提出** | §4.2 甲组每行我都写了"落地还要几行"，但**没有一枚新字段有对应用例** |
+| N4 | **R4 在端到端上是否真能抵达面板**（我只证到字段链通） | 未实跑、未开窗。已证的是三段静态链：`rules_gateway.go:112` 产 reason → `approval.go:83` verbatim → `l2-approval-card.tsx:159`＋`:208` 渲染；以及 R4 判据在**带 taskID 的桥接路径**确实被接线（`internal/tools/bridge.go:670 WithTaintDetector(b.prov.Detector(taskID))`，CLI 侧 `cmd/wisp/panel_assets.go:66`） | ⚠ 但**生产里把决策变成 `ApprovalCardView` 的唯一代码点是 CLI 诊断分支**（`panel_assets.go:68`）。⇒ 行 14"来源已到面板"要读成"**字段链已通、缺泵把它送过去**"，不是"面板上现在看得见"。这一枚措辞若被读成后者，就是假报 |
+| N5 | **屏上真实像素／视觉一律未量**（零开窗、零截图） | 本程是只读盘点 | 继承 §47.4 的同一处未量。行 7 那枚 2px 横条可见性、行 12 的 `tabular-nums` 实际观感等，本件**一个字都没判** |
+| N6 | **§47.3 那枚"@keyframes 未定义"的附带事实未复量** | 不属 AC#1 的四栏（它不是快照字段问题） | 本件**未确认也未否认** `theme.css` 那 6 枚 `@keyframes` 与 `spin`/`pixel-on` 的缺口；引用 §47.3 时请直接读原文 |
+| N7 | **`PLAN.md §17.4` 那枚冻结图标名册未重新抽取**（约 55 枚那个数） | 只需知道"名册存在且增枚＝人工批准"，出处 `panel-views.ts:13-15` | 行 4 `IconClass` 判"词表不在仓里"只依赖**"Go 侧没有 tool→icon 映射表"**（现量：`internal/panel/` 与 `internal/tools/` 无此类）＋名册冻结这一条 |
+| N8 | **`DEFERRED(kws-veto, B1)` 与 `SPEC-12 §5` 登记表的 1:1 双向未核** | 那是 AGENTS §1.1 的独立约束，本程只**引用**了 `approval.go:99-102` 那处标记原文 | 行 8 乙组"已登记推迟"这一格写的是"标记在代码里存在"，**不等于**登记表对得上 |
+| N9 | **票 35（泵）通读未做**：我只读了 `.scratch/wisp/issues/35-panel-bridge-c17.md:14,18,29` 那几行含 `panel.resync` 的原文 | AC#1 要的是字段普查，泵的具体形状是 AC#2/AC#3 的事 | ⚠ 所以"甲组落地还要几行"里那个"＋泵"是**未展开的量**。别把本件读成"票 35 已经能承载这些字段" |
+| N10 | **`internal/panel/l2_grant_boundary_test.go`（另一程在写）未读、其判据未采用** | 派单硬约束 | §2 凡引 `internal/panel` 测试处，引的都是**已提交**的 `composer_test.go`／`approval_test.go`（sha `88eab34` 树内） |
+| N11 | **`design/**` 那 16 枚未提交删除**：只数了枚数（`git status --porcelain -- design/ \| grep -c '^ D'` = 16），**未读内容、未算进任何证据** | owner 的东西，派单明令 | 行 9／`IconClass` 涉及设计稿处，本件只引了**已被前端提交进仓**的 `design/doubao/demo/app.js:17-27`（`git ls-files` 确认 tracked），未碰工作树里那些删除 |
+| N12 | **台账 `A##`／`Q##` 一条未登记、工单一个未勾** | 派单未授权（台账与勾归编排者） | §1.3、§3.3、§3.5、§4.4 这四条**都该进台账**，本件只把它们写成待编排者落账的形 |
+| N13 | **行 8"那一行到底谁画"未终定**（面板画 L1 那行，还是原生画） | 本程只证到**数据侧有源**（`ChannelRegistry.Statuses()`／`Prompt.Window`），未证渲染归属；§47.4 自己也标着"未终定" | 行 8 的 ⓒ 写的是"无字段＋无泵"，**没有**写"面板该画它" |
+| N14 | **`agent.Event` → `statemachine.State` 的映射表不存在这件事，我只证到"两端都在"** | 未穷举是否存在我未见到的第三处（例如注释里的非正式映射） | 行 1/2/4/11/13 的 ⓐᐟ 若涉及"哪一相"，本件一律判**第四态"无生产者"**而非"完全无源"——**这个判法依赖 `Dispatch` 非测试调用者只有 5 处这一条现量**（`models/bridge.go:40,46,59,64` ＋ `balldebug/main.go:618`） |
+| N15 | **`internal/llmrecord/` 不存在**这一条已核（P9），但**该由谁承载 LLM 录制读数未查** | 超出 AC#1 四栏 | §2 未使用任何 llmrecord 假定的接口 |
+| N16 | **单位口径（micro-USD vs CNY）到底哪一切片定案，我说不出** | `cost.go:16-20` 只说"open question registered in the ticket report"，我没去把那份 ticket report 找出来 | 行 12 的归口栏因此写的是"**等哪一切片？本件说不出**"，这是**故意的空**，不是漏 |
