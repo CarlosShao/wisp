@@ -191,9 +191,12 @@ so the worst this matcher can do is examine too much, never less" ——**这句
    照常套用规则。探针 P5 + §6.4 现量：净快照里 note 为空 ⇒ 树内无模式命中件，读数与修前逐字相同。
 2. **树里根本没有 `.gitignore`**：探针 P5 `decide(...)=false`、`note()=""` ⇒ **什么都不排除、什么都不说**。
    方向 = 全扫 = 响亮（多扫不误判，不会把违规藏掉）。这是安全的那一支。
-3. **`-root` 指到不是一枚 wisp 仓的地方**：响亮且 `rc=2`。我的迷你件（只有 `.gitignore` + `frontend/`，
-   没有 `internal/`、`cmd/`、`go.mod`、`allowlist.txt`）实测被 `checkRoot` 拒绝：
-   `go run . -root forced/ci` → 无任何 scope 行、`rc=2`（`main.go:1124-1129` 的 required 列表）。
+3. **`-root` 指到不是一枚 wisp 仓的地方**：响亮（仪器自己的码是 2；
+   我的迷你件（只有 `.gitignore` + `frontend/`，没有 `internal/`、`cmd/`、`go.mod`、`allowlist.txt`）
+   实测被 `checkRoot` 拒绝：`go run . -root forced/ci` → 无任何 scope 行 +
+   `is not a wisp repository root: missing go.mod`（`main.go:1124-1129` 的 required 列表）。
+   ⚠ 我初稿在这里写的是"shell `rc=2`"，那是**我的引用口径错**，`§11.1` 已更正：`go run` 把子进程的 2 拍平成 1，
+   仪器自己的码 2 要用仓库外二进制才看得见。
    补出 10 枚以下 production `.go` 也一样拒绝（`minProductionGoFiles = 10`，`main.go:1117`）。
    ⇒ **"静默全放行"这个危险答案不是本实现的行为**。
 
@@ -370,7 +373,10 @@ git status --porcelain --ignored design  的 !! 行          = 0
 comm -13 <tracked 文本> <on-disk 文本>  按二级目录分组     = 16 design/doubao + 16 design/old
 ```
 
-⇒ 32 = 16 枚受追踪 + 16 枚**未追踪且未被忽略**，后 16 枚正正落在票面猜的 `design/old/`、`design/doubao/`。
+⇒ 磁盘上那 32 枚**全部是"未追踪且未被忽略"**，正正落在票面猜的 `design/old/`(16)、`design/doubao/`(16)。
+   ⚠ 我初稿把这一行写成"32 = 16 受追踪 + 16 未追踪"，是 prose 错、与上面那行 `comm` 读数自相矛盾；
+   重跑发现 HEAD 里那 16 枚受追踪 `design/**` 此刻**已被另一程从磁盘删除且尚未 commit**（16 枚 ` D`），
+   与磁盘 32 枚的交集实测为 **0**。`§11.2` 已更正并追加 F9。
 `!!` 行为 0 ⇒ 没有任何一枚是 ignore 过滤器能吞的；**ignore 过滤器不能也不该吞它**。
 票面假设 **成立**，"worktree 恒等于 CI"这句话作为一般命题是**假的**（八枚里 7 枚同，`ban #8 design/` 不同）。
 
@@ -622,3 +628,85 @@ d22scan: clean - no D22 ban violations; ...
 11. **没有测 `core.excludesFile` 被真的设过之后**的读数（只测了 `.git/info/exclude` 一支的 `ignored=false`）。
 12. **权限**：本程**没有任一枚工具调用被权限系统拒绝**，因此也没有"因被拒而绕行"的事可报。
 13. **本件没动过任何已存在的文件**、没 push、没 `git add -A`/`.`、没 `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`；每次提交前 `git diff --cached --name-only` 均只列 `docs/evidence/s1/d22scan-gitignore-accept-r1.md` 一枚路径（四次全中，无第二枚混入）。
+
+---
+
+## 11. 追加更正与追加发现（脚下 HEAD 与工作树状态都动过，这一节是现跑重导的）
+
+写下 §1–§10 之后 HEAD 从 `42d141d` 走到 `686d7e7`，`design/` 的磁盘状态也被另一程改了。
+按"每个 `file:line`/每个读数都必须从我真正读过的那一版重导"的规矩，这里改两处我写错的地方，并追加一枚发现。
+**我未对别人那 16 枚未提交的删除做任何动作**（不 stage、不 commit、不恢复）；
+本件四枚 commit 每次 `git diff --cached --name-only` 均只有 `docs/evidence/s1/d22scan-gitignore-accept-r1.md` 一枚路径。
+
+### 11.1 更正 §3 第 3 支：我把 `go run` 的壳层退出码当成了仪器自己的码
+
+`scripts/d22scan.sh` step 2 用的是 `go run . -root`，而 **`go run` 把子进程的 2 拍平成 shell 的 1**。现跑两遍：
+
+```
+$ go run . -root <非 wisp 树>
+d22scan: "...\forced\ci" is not a wisp repository root: missing go.mod
+d22scan: this tool is its own Go module; run `scripts/d22scan.sh` or ...
+exit status 2
+shell rc=1            <-- 壳层
+
+$ ./bin/d22scan-acc.exe -root <同一棵树>       (仓库外自建二进制)
+d22scan: "...\forced\ci" is not a wisp repository root: missing go.mod
+binary rc=2           <-- 仪器自己给的码
+```
+
+⇒ §3 那句"响亮且 `rc=2`"里，**"响亮"成立**（两行错误文字 + 一行"该怎么跑"的提示，不是静默），
+但**经 `go run` 时 shell 看到的数是 1**。`set -eu` 之下 1 与 2 都致命，门不会因此变绿，
+所以这不是新缺陷，是**我引用读数时的口径错**；顺带一枚可登记的既有事实：
+**CI 日志里 step 2 的 rc 永远区分不出"发现问题(1)"和"仪器没跑成(2)"**——这是 `scripts/d22scan.sh` 的形状，不是本修引入的。
+本件其余各发凡是 `rc=0` 的读数不受影响（`go run` 不拍平 0）。
+
+### 11.2 更正 §6.5 那句"32 = 16 受追踪 + 16 未追踪"
+
+`42d141d`/`686d7e7` 现跑（`EXT` = `isTextFile` 那 15 类后缀）：
+
+```
+git ls-files design | <EXT>            = 16      （HEAD 里受追踪的文本件）
+find design -type f | <EXT>            = 32      （磁盘上的文本件）
+comm -12 tracked disk                  =  0      <-- 交集为空！
+comm -23 tracked disk                  = 16      <-- 16 枚受追踪的**今天不在磁盘上**
+comm -13 tracked disk                  = 32      <-- 磁盘上 32 枚**全部未追踪**
+   按二级目录分组: 16 design/doubao + 16 design/old
+git status --porcelain design          = 16 枚 " D"（未提交的删除） + 2 枚 "??"
+git status --porcelain --ignored design 的 !! 行 = 0
+```
+
+⇒ 正确表述是：**磁盘上那 32 枚 100% 是"未追踪且未被忽略"**（`design/doubao/` + `design/old/`），
+而 HEAD 里那 16 枚受追踪的 `design/**` 此刻**已被前端会话从磁盘删除、但尚未 commit**。
+票面给的那个假设（"gap 是 owner 未追踪但没被忽略的 `design/old/`、`design/doubao/`"）
+因此比我原先写的**更成立**：32 这个数字里没有一枚受追踪件。
+`!!` 行仍为 0 ⇒ 结论不变：**ignore 过滤器既吞不到、也不该吞**；§9 那一格的判词（成立/不算缺陷）**不改**。
+我 §6.5 正文那句加法是 prose 错（我把 `comm -13` 的 32 读成了"16+16"），
+而同一个代码块里那行 `= 16 design/doubao + 16 design/old` 其实已经把真相贴出来了——现场自相矛盾，以本条为准。
+
+### 11.3 追加发现 F9（不属于本修的账，但和本批的台账数字在同一小时内相撞）
+
+现量：`internal/panel` 之外没人碰的这 16 枚 ` D` 一旦被 commit，`design/**` 在 HEAD 里就**一枚文本件都不剩**
+（`design/doubao/`、`design/old/` 是 `??`，不跟着进去）。此时 CI 的检出树里 `design/` 目录整个不存在。
+仓库外用二进制实测这一形状（`nodesign\` = `git archive HEAD -- . ':(exclude)design'`，**不删任何东西**）：
+
+```
+$ ./bin/d22scan-acc.exe -root nodesign          rc=2
+d22scan: scope ban #8 design/           examined   0 text files
+d22scan: ban #8 scope design/ examined 0 files - it is declared in emojiScopes() but walks nothing.
+         Point it at a real tree or delete the entry; never leave a scope pretending to scan (ticket 71 AC#4)
+```
+
+⇒ **那一枚 commit 落下去的同一刻，`scripts/d22scan.sh` 会硬红在 step 2**（`ban #8 design/` 是 `live:true` scope，
+空走即致命，`main.go:402`），而 `A211` 刚重标进去的 `#8 design/=16` 同时作废。
+**判：这不是本修的缺陷，是守卫在干它该干的事**（`TestExemptScopeCannotOutliveItsAbsentTree` /
+`TestDeclaredEmojiScopeCannotWalkZeroFiles` 正是为此而在）——但它和本批的台账重标撞在同一小时，
+而且它是 **A207 那一族病的第二个实例**："印出来的数踩在*这台机器/这一分钟*的树是什么形状"上。
+处置归属：**前端会话 + 编排者**（要么把那 16 枚新 mockup `git add` 进 `design/`，
+要么在同一批里把 `ban #8 design/` 改 `live:false` 并登记 exempt 理由——`driftedAbsentScope` 那套机制就是为这个准备的）。
+本件不动手，只点名。
+
+### 11.4 总裁补一格（F9）
+
+| 格 | 判 | 一理由 |
+|---|---|---|
+| §11.3 `design/` 空 scope 即将致命（F9） | **成立**（不算本修的账） | 守卫按设计变红、现量 rc=2 且报错点名 scope；责任在前端会话那 16 枚未提交删除与同批的 scope 处置。 |
