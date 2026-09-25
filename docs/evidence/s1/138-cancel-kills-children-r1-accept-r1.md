@@ -341,3 +341,239 @@ $ grep -n 'name:' .github/workflows/ci.yml | grep -ic build
 3. **推翻派单隐含的一处**：派单把可判的假设列了 (甲)(乙)(丙) 三支。现量**必须补第 (丁) 支**
    （编排者当日有"把因果句当事实写进派单"的两次自记，`A265④`），否则本格的"未定性"会被读成"只剩甲乙"。
 4. **没推翻任何一处自己的**：本格 §1.5 那三发我第一次就复算到与被验件逐字同，没有中途改口。
+
+---
+
+## 2　三发支撑独立重走（"预留的洞"那枚裁决的承重点）
+
+**判据**（派单 §2）：三发逐发独立重走，**不复算结论、复算命令**；
+⚠ **只要有一发不成立**（例如某条生产路径今天其实能 exec），"预留的洞"这个裁决就塌，本票要改回"已实现功能里的缺口"。
+
+### 2.1　支撑① —— "任务侧起不了子进程"：我自己从 `run.go` 走到名册，再换一把更宽的尺
+
+**(a) 组合根只有一处注册工具，且那处只注册 `fs.*`**（149 已把 `cmd/wisp` 动过两枚文件，所以这一发我按 `3f6322f` 重取）：
+
+```
+$ git grep -n '\.Register(' 3f6322f -- '*.go' ':!*_test.go'
+3f6322f:cmd/wisp/run.go:345:            if err := reg.Register(e); err != nil {
+3f6322f:tools/mockllm/main.go:51:       srv.Register(mux)
+$ git grep -n 'Builtin[A-Za-z]*Entries' 3f6322f -- '*.go' ':!*_test.go'
+3f6322f:cmd/wisp/run.go:341:    for _, e := range tools.BuiltinFSEntries(tools.FSDeps{
+3f6322f:internal/tools/fs.go:323:func BuiltinFSEntries(d FSDeps) []Entry {
+3f6322f:internal/tools/fs_write.go:766:func BuiltinFSWriteEntries(d FSDeps) []Entry {
+```
+
+⇒ 生产码里 `Registry.Register` 的调用者**只有 `run.go:345` 那一枚**（`tools/mockllm` 那枚是 HTTP mux，不是工具注册表）。
+
+**(b) 环路拿到的 Tools 就是那枚桥**：
+
+```
+$ git show 3f6322f:cmd/wisp/run.go | sed -n '547,550p'
+        loop, err := agent.New(agent.Options{
+                Provider: prov,
+                Tools:    rt.bridge,
+                Sink:     consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot},
+$ git grep -n -A28 'type Options struct' 3f6322f -- internal/agent/loop.go
+internal/agent/loop.go:149:   // Tools is the C4 surface ...
+internal/agent/loop.go-150-  Tools ToolProvider
+```
+
+⇒ `agent.Options` 的全部字段里**没有任何 Job／scope／进程属主入口**（只有 `Tools`、`Registry *observe.Registry`、
+`AdmitTask`、`Journal`、`Sink`、`Summarizer`、`Control`、`Logger`、`Config`）。
+
+**(c) 名册逐名**（我不引它的表，自己从 `Name()` 抽）：
+
+```
+$ git grep -n -A2 'func .*Name() string' 3f6322f -- 'internal/tools/*.go' ':!*_test.go'
+fs.go:122        func (fsRead) Name() string  { return "fs.read" }
+fs.go:188        func (fsList) Name() string  { return "fs.list" }
+fs_write.go:233  func (fsWrite) Name() string { return "fs.write" }
+fs_write.go:368  func (fsTrash) Name() string { return "fs.trash" }
+fs_write.go:439  func (fsMove) Name() string  { return "fs.move" }
+fs_write.go:582  func (fsDelete) Name() string{ return "fs.delete" }
+```
+
+⇒ **六枚，全是 `fs.*`**，`internal/tools` 整包没有第七枚工具实现。
+
+**(d) `fs.trash` 那一枚"碰外部世界"的：进程内 COM，不起进程**；非 Windows 侧是**拒绝**不是静默 no-op：
+
+```
+$ git grep -n 'procSHFileOperationW = ' 3f6322f -- internal/tools/recycle_windows.go
+3f6322f:internal/tools/recycle_windows.go:58: procSHFileOperationW = windows.NewLazySystemDLL("shell32.dll").NewProc("SHFileOperationW")
+$ git show 3f6322f:internal/tools/platform_other.go | sed -n '29,33p'
+// shellTrash refuses. It returns an error before touching the disk.
+func shellTrash(canonical string) (trashDetail, error) {
+        return trashDetail{}, errors.New(
+                "本平台无 Shell 回收站 API（Wisp 的 trash 只走回收站，绝不做删除），已拒绝执行：" + canonical)
+```
+
+**(e) 我这把尺比它的宽**：它 §3.1 用 `git grep -l '"os/exec"'`（只能抓 import 了 `os/exec` 的码）。
+我改普查**所有 spawn 形状**（`exec.Command`／`StartProcess`／`CreateProcess`／`ShellExecute`／`WinExec`／
+`plugin.Open`／`os.ForkExec`／`forkExec`），仍然**非测试文件全出**：
+
+```
+$ git grep -nE 'CreateProcess|ShellExecute|WinExec|StartProcess|exec\.Command|plugin\.Open|forkExec|os\.ForkExec' 3f6322f -- '*.go' ':!*_test.go'
+cmd/balldebug/diff_windows.go:409            cmd := exec.Command(exe, childArgs...)
+cmd/wisp/doctor.go:316                       out, err := exec.Command(cc, "--version").Output()
+cmd/wisp/slo_windows.go:490                  cmd := exec.Command(exe, args...)
+internal/llm/adaptertest/mockllm.go:65,72    exec.Command(goBin, "build", …) / exec.Command(exe, "-addr", …)
+scripts/spike/webview2-latency/main.go:283,294
+tools/d22scan/gitignore.go:373               cmd := exec.CommandContext(ctx, "git", args...)
+```
+
+⇒ 命中集**与它 §3.1 那张七枚表同一集合**（`internal/proc/jobscope_windows.go` 那枚在这把尺上**根本不出现在**，
+因为它只 import `os/exec` 当参数类型、不 exec——这一点它自己写对了）。
+⇒ **`internal/agent/**`、`internal/tools/**`、`internal/plugin/**`、`internal/panel/**`、`internal/llm/**`（生产半边）
+在两种尺下都是零枚 spawn。**
+`internal/llm/adaptertest` 只被测试 import：
+
+```
+$ git grep -l 'llm/adaptertest' 3f6322f -- '*.go' | wc -l        → 13
+$ git grep -l 'llm/adaptertest' 3f6322f -- '*.go' | grep -c '_test.go'  → 13
+```
+
+**(f) 三枚 C4 槽不会"被问到就吐出一段可执行的东西"**（它 §3.4 只贴了 `providerSlots` 的字面，我补上射程内的消费者）：
+
+```
+$ git grep -n 'Slot(\|ErrSlotNotLanded\|SlotErr' 3f6322f -- '*.go' ':!*_test.go'
+internal/tools/registry.go:29/33/35/40/42/44/47/48/52/161/169   ← 全部在 registry.go 自己那一棵
+```
+
+⇒ 生产码里除 `registry.go` 自身**没有任何消费者问到那三枚槽**，槽的答案是 `SlotErr`（`errors.Is` 得 `ErrSlotNotLanded`），
+不是一个空 Provider。
+
+**⇒ 支撑①：成立。** 而且比我进来前预期的更硬：不是"我没找到入口"，是**两把不同颗粒度的尺给出同一个空集**。
+
+### 2.2　支撑② —— `internal/agent` 的依赖闭包里没有 `internal/proc`
+
+```
+$ go list -deps ./internal/agent | grep -c 'internal/proc'
+0
+
+$ go list -deps ./internal/agent | grep 'CarlosShao/wisp' | sort
+github.com/CarlosShao/wisp/internal/agent
+github.com/CarlosShao/wisp/internal/config
+github.com/CarlosShao/wisp/internal/llm
+github.com/CarlosShao/wisp/internal/memory
+github.com/CarlosShao/wisp/internal/observe
+github.com/CarlosShao/wisp/internal/plugin
+github.com/CarlosShao/wisp/internal/risk
+github.com/CarlosShao/wisp/internal/secret
+github.com/CarlosShao/wisp/internal/winsec
+```
+
+**⇒ 支撑②成立**（我那发 `grep -c` 给 0，与它逐字同）。
+⚠ 但第二发**给它这句加了一条它没写的限定**，我把它说清楚免得下游读歪：
+**闭包里有 `internal/plugin`**（C11 的容器类型 `DisposalScope` 就在里面）。
+⇒ 所以"任务级归属今天缺什么"的准确答案是：
+**缺的不是 import 通路、不是容器类型，是"有人在新建这枚容器"以及"往这枚容器上挂一件 OS 级杀进程的动作"**。
+它 §4.1② 那句"还缺一条从组合根把 `internal/proc` 递进 `agent.Options` 的通路"是对的；
+但**读成"agent 连容器都拿不到"会偏**——容器拿得到，`JobScope` 拿不到。
+
+### 2.3　支撑③ —— `NewDisposalScope` 生产码调用者 0 枚
+
+```
+$ git grep -n 'NewDisposalScope' 3f6322f -- '*.go'
+internal/memory/retention_test.go:193   scope := plugin.NewDisposalScope("test-retention", nil,
+internal/plugin/disposal.go:128         // not usable; use NewDisposalScope.            <- 注释
+internal/plugin/disposal.go:152         // NewDisposalScope creates a scope derived…    <- 注释
+internal/plugin/disposal.go:155         func NewDisposalScope(…)                        <- 声明
+internal/plugin/disposal_test.go:17     s := NewDisposalScope(name, …)
+internal/plugin/disposal_test.go:168    s := NewDisposalScope("task-tail", …)
+internal/risk/provenance_test.go:307    scope := plugin.NewDisposalScope("session-1", …)
+```
+
+⇒ **七枚命中＝1 声明＋2 注释＋4 测试**，与它逐字同。**生产调用者 0 枚：成立。**
+
+**我把它往下多问了一层**（它没问：除 `NewDisposalScope` 之外还有没有别的生产载体）：
+
+```
+$ git grep -ln 'wisp/internal/plugin' 3f6322f -- '*.go' | grep -v '_test.go'
+internal/memory/retention.go
+$ git grep -n 'StartRetentionJob' 3f6322f -- '*.go' | grep -v '_test.go'
+internal/memory/retention.go:98:func (s *Store) StartRetentionJob(scope *plugin.DisposalScope, cfg RetentionConfig) {
+internal/memory/retention.go:100:       panic("memory: StartRetentionJob requires a DisposalScope")
+internal/memory/retention.go:234:// command); production scheduling goes through StartRetentionJob.
+$ git grep -n 'CloseTask' 3f6322f -- '*.go'
+internal/tools/bridge.go:642:// CloseTask closes one task's taint scope. …
+internal/tools/bridge.go:646:func (b *Bridge) CloseTask(taskID string) {
+```
+
+⇒ **唯一 import `internal/plugin` 的生产文件是 `internal/memory/retention.go`**，
+而它那道 `StartRetentionJob(scope *plugin.DisposalScope)` 在**生产码里零枚调用者**（只有 `retention_test.go:198`）。
+⇒ **`Bridge.CloseTask`（把 per-task taint scope 关掉的唯一门）在全仓零枚调用者——连测试都没有**；
+`OpenTask` 却在派发热路径上被调（`bridge.go:559`）。
+⇒ **支撑③成立**："任务级归属"这仓里确实**只有契约文本、没有生产载体**。
+
+### 2.4　本程造出的一发（它没做、也不该由它做的）：**同一枚"无载体"另有一处今天是实伤**
+
+§2.3 那枚 `CloseTask` 零调用者，不是"给未来预留"的形状——`OpenTask` **今天就在生产路径上被调**：
+
+```
+$ git grep -n 'OpenScope\|CloseScope' 3f6322f -- '*.go' ':!*_test.go'
+cmd/wisp/panel_assets.go:232   prov.OpenScope(taintSourceScopeID)
+internal/tools/bridge.go:638           b.prov.OpenScope(taskID)     <- 由 OpenTask 调，OpenTask 由 bridge.go:559 调
+internal/tools/bridge.go:655           b.prov.CloseScope(taskID)    <- 只有 CloseTask 调它，而 CloseTask 无人调
+internal/risk/provenance.go:387  logf("risk/C25: scope %q not open (CloseScope raced or composition gap); taint stored — it cannot leak into other scopes", scopeID)
+```
+
+⇒ 读数：**per-task 污点 scope 今天只开不关**（关它的那道门唯一的接线说明是
+`bridge.go:642-643` 那句"the composition root defers this on the task's DisposalScope"——而那枚 DisposalScope 生产零枚）。
+⇒ **这不是本票的对象**（本票管"进程还活着吗"，这管"污点记录还在不在内存里"），
+但它是**同一枚缺失载体的第二个消费者**，且**今天可达**。
+⇒ 处置：按本仓既有裁定（**勾交付物＋把洞归口另一张票＋原话不改**），我**不**把它塞进 138 的裁决里，
+只登记并指名归属：`internal/risk/provenance.go` 的 C25 族（票 19/25/26 那一线，`provenance.go:56` 自己点名"tickets 12/19/21/22/26"）。
+⚠ 本程**没有量它的后果边界**（见 §2.6）。
+
+### 2.5　本格裁决
+
+**三发支撑全部成立**（各自独立复算，命令原文在上）⇒
+**"今天没有任何一条生产路径能在一轮任务里 exec 出子进程"这句话成立**，
+于是票面 AC#2 的条件句前件**确实为假**、"给未来功能预留的洞"这枚裁决**不塌**。
+派单给的那道"只要一发不成立就翻案"**没有被触发**。
+
+**档位：成立（附两处点名，不构成退回）**：
+1. 被验件 §3.7③ 那句 **"`internal/panel`、`internal/speech` 至今只有 `doc.go`" 是事实错**——
+   `internal/panel` 有 **9 枚生产 `.go`**（`approval.go`／`assets.go`／`attachments.go`／`bridge.go`／
+   `composer.go`／`composer_handlers.go`／`doc.go`／`pump.go`／`workspace.go`），只有 `internal/speech` 是 `doc.go` 一枚。
+
+   ```
+   $ git ls-tree -r --name-only 3f6322f -- internal/panel | cat        （20 枚，其中 9 枚非 _test.go）
+   $ git ls-tree -r --name-only 3f6322f -- internal/speech | cat       （1 枚：doc.go）
+   ```
+
+   ⚠ **它那句错话在哪、要紧在哪**：它出现在 §3.7「本格没测什么」第③条的理由里
+   （"因为那条组合根本程没找到"）。**结论没受影响，但理由是错的**：
+   面板那棵**今天确实不是第二枚工具组合根**，正确的凭据是**它不 import `internal/agent` 也不 import `internal/tools`**：
+
+   ```
+   $ git grep -n 'wisp/internal/agent\|wisp/internal/tools' 3f6322f -- internal/panel
+   （空输出，rc=1）
+   ```
+
+   ⇒ 下游若照它那句"panel 只有 doc.go"去排"第二枚组合根"，会在**panel 已经有 20 枚文件的今天**排错面。
+2. §2.2 那枚限定：`internal/plugin` **在** agent 的闭包里，所以"缺通路"要说准是缺 **`internal/proc` 的通路**、不是缺容器。
+
+### 2.6　本程没测什么（按"漏了它谁会先被骗"排序）
+
+1. **没有运行时观测**：没跑一次真任务数子进程数。`cmd/wisp` 今天仍是在飞写者（149 已交、139 在写），
+   构它取到的是中间态。⇒ §2.1 那个"0"与它一样，是**静态调用点**读数。谁把它升格成"运行时也没有"，谁就在替本程说谎。
+2. **没排第三方自发子进程**：`modernc.org/libc`、sherpa 那族 cgo/native 绑定里有没有 `CreateProcess`。
+   它 §3.7② 同处自陈没排；**我也没排**，所以"任务不会起子进程"严格说只覆盖**本仓自己写的码**。
+3. **没量 §2.4 那枚实伤的后果**：provenance map 会不会无上界长大、`TreeProcessCount` 类仪器看不看得见它，
+   本程一枚都没测。⇒ 若有人据此开票，得先有尺，别抄我的"零调用者"当危害。
+4. **没验槽位在真被 `ProviderFor` 问到时的行为**：我只证明了生产码无人问（§2.1f）。
+   真要落 D46，那枚 SlotErr 会不会被某个上层当成"空插件"咽掉，是落地当天的判据，不是今天的。
+5. **没在别的分支取数**（`git branch -a` 都没扫）。它与它 §4.5① 同一枚限制。
+
+### 2.7　结论修正记录（本格）
+
+1. **推翻被验件一处（事实层）**：`internal/panel` 绝非"只有 `doc.go`"（§2.5 点名 1 的读数为凭）。
+   受影响的只是它 §3.7③ 的**理由**，不影响它 §3.5 的**结论**——我用另一条凭据（panel 不 import agent/tools）
+   把它那句"没找到第二枚组合根"的**结论救回来了**。**这一处该记在它表上，但记的是"理由错、结论对"，不是"结论错"。**
+2. **加强被验件一处**：它 §3.1 那把尺（`os/exec` importer 普查）覆盖面窄于本案需要；
+   我换成 spawn 形状普查后**命中集不变** ⇒ 支撑①比我进来前预期的更硬。这一条是**给它加分**，不是挑刺。
+3. **收紧被验件一处措辞**：`internal/plugin` 在 `internal/agent` 闭包里（§2.2），
+   所以 §4.1②"连整机 Job 都拿不到"要说准：**拿不到的是 `JobScope`，不是 scope 容器**。
+4. **本程自纠一处**：我第一次跑 spawn 普查时把 `':!*_test.go'` 与 `-- '*.go'` 的顺序写反了一次，
+   输出仍含测试文件；发现后重跑（§2.1e 贴的是重跑那发）。**没有拿那一发下过任何结论。**
