@@ -232,3 +232,77 @@ Fatal/Error 合计             79                86           +7   ⇒ 只增不
 @`:1515` 那句 witness 主张），**M14 红恰好 1 枚**（`out/M2-M14.txt`，只有常驻扫掠响）。
 ⇒ 同一枚生产码形状现在有两名独立证人、M14 那一形仍只有一名——它 §6 那句"必须照实写的差别"是真的。
 
+---
+
+## §7 ⓑ 承重判定：摘掉任意一味，是否还存在一发变异从此打不红
+
+本仓对"承重"的操作定义就这一句，我按枚判。交付的 5 处改动我按盘上形状归成 **4 味**
+（证人册那枚清单变量与读它的断言块**拆不开**：`revert-roster` 单发我打了，包直接编译不过
+（`out/V-revert-roster.txt`：`RUN=0`，`grantRouteWordWitnesses` 未定义）⇒ 它俩是一味的两半，不是两味）。
+
+| 味 | 摘掉它之后**唯一由它拿住**的那一发 | 我那一发的读数 | 判 |
+|---|---|---|---|
+| ⓐ 控里补齐第三因子（`:1325` 那枚 `\|\| len(grantRouteSuffixes) == 0`） | `suffix-empty`（掏空后缀清单） | `revert-empty-ctrl,suffix-empty` -> **RUN=99 TOPFAIL=0 全绿**（`out/T-revert-empty-ctrl+suffix-empty.txt`） | **承重** |
+| ⓑ 乘积式断言（`:1353`） | `no-plural`（砍掉复数那一圈） | `revert-product,no-plural` -> **TOPFAIL=0 全绿**（`out/T-revert-product+no-plural.txt`） | **承重** |
+| ⓒ 证人册＋其三条主张＋双向对账（`:183-225` 与 `:1490-1548`，两半） | `dropword-ratify`（删一枚"历史上没人质"的词）／`addword-consent`（加一枚没配证的词）／`standing-out,M16`（常驻扫掠被摘、真守卫答了证人名字） | `revert-witness-mechanism,dropword-ratify` -> **TOPFAIL=0**（`out/X-revert-witness-mechanism+dropword-ratify.txt`，与上游 r3-accept §1.2 那发同形）；`revert-xcheck,addword-consent` -> **TOPFAIL=0**（`out/U-revert-xcheck+addword-consent.txt`）；`standing-out,revert-witness-rows,M16` -> **TOPFAIL=0**（`out/Y-standing-out+revert-witness-rows+M16.txt`） | **承重**，且三发各指向册内不同分支 |
+| ⓓ 头段"两步路"措辞（`:119-132`） | 无一发 | `revert-header` -> 四数一字同（99/53/46/0，`out/H-revert-header.txt`）；`revert-header,MDEC-struct` -> 仍红 1 枚、同一句 `:1699 decode destination acProbe has no reflection twin in inboundTypeRegistry`（`out/H-revert-header+MDEC-struct.txt`） | **不承重、也不该承重**：它是文档级修法，盘上判据不读注释（本文件 10 处 `F-ACC` 字样在 `:102/:120/:183/:1316/:1354/:1441/:1490/:1512/:1532/:1540`，除两枚消息文本外全是注释，无一处是谓词） |
+
+**两条反向核对（防"互相顶账"与防"把冗余读成装饰"）**：
+
+```
+① 上游 r3-accept §9 反向判据第 1 条我独立重打：摘常驻测试 ＋ M14 -> RUN=98 TOPFAIL=0（out/R-standing-out+M14.txt）
+   摘常驻测试单发（不叠码）：RUN=98 TOPFAIL=0（out/R-standing-out.txt）⇒ 摘它本身不造红。
+   ⇒ **新加的证人册没有替常驻测试兜这一发**（册里 `allow` 那行写的是 `panel.l2.allow`，M14 答的是
+      `panel.review.allow`，两条主张各自只对各自的名字负责）⇒ 实现件 §6① 那句"新旧不互相顶账"复算成立。
+   同一台件下 `standing-out,M16` -> **TOPFAIL=1**（红句 `:1502 the running guard answers "panel.review.ratify",
+   the witness name for the vocabulary word "ratify"`，out/Y-standing-out+M16.txt；行号比交付态的 `:1515`
+   低 13＝我那一刀摘掉的正是上面那 13 行常驻用例，调用点跟着漂，与 §5 那格同一条规律），
+   而 r3-accept §4.3 那两行记的是 0 枚红 ⇒ 这一格**读数确实变了**，实现件 §6 不但没藏，还自己写清了归因
+   （M16 那枚名字正是它给 `ratify` 挑的活证据名字）⇒ 加分，不是缺陷。
+② 冗余不等于装饰：删词这一发被主张 1（`:1512`）与双向对账（`:1540`）**同时**报，两枚各自单独摘掉都还有红
+   （`revert-xcheck,dropword-ratify` 红在 `:1512`＝主张 1 那行；`revert-witness-rows,dropword-ratify` 红在
+   移位后的 `:1512`＝对账那行，原文与 `:1540` 一字同，out/X-revert-witness-rows+dropword-ratify.txt），
+   但加词那一发只有对账报（`out/U-addword-consent.txt` 交付态红 1 枚 @`:1546`）、
+   M16＋摘常驻那一发只有主张 3 报 ⇒ 三味分支各有独占形状，无一枚是花瓶。
+```
+
+按简报点名的那条反面，我**没有**用它做判据：任何"同一发变异里新加那支必须先响"的要求都不成立——
+乘积式挂在 `sort.Strings(hits)` 之后、控的 `||` 第三项前提正是被抹掉的东西，这类"后响"不作数。
+
+---
+
+## §8 ⓔ 单点回退：只回退 5 处里的 1 处，答"哪条用例变不响"
+
+| 回退哪一处 | 变不响的那条用例（逐字名） | 凭哪一发变异量出来 | 读数 |
+|---|---|---|---|
+| 第 1 处：控里补齐第三因子 | `TestRealGuardRefusesEveryAssemblableApprovalRouteName` | `suffix-empty` | 交付态红 1 枚 -> 回退后 **FAIL=0**（`out/T-revert-empty-ctrl+suffix-empty.txt`，该用例由红转绿，全包无第二枚响） |
+| 第 2 处：乘积式断言 | 同上那一条 | `no-plural` | 交付态红 1 枚 -> 回退后 **FAIL=0**（`out/T-revert-product+no-plural.txt`） |
+| 第 3＋4 处：证人册与其断言（必须同回，单回编译不过） | `TestGrantVocabularyIsNotSatisfiedByTheRealEnvelopes` | `dropword-ratify`（另 `approve`/`permit`/`authorize`/`authorised`/`decide`/`decision`/`verdict` 同形，§6 枚枚有红） | 交付态红 1 枚 -> 回退后 **FAIL=0**＝上游 §1.2 那形原样复活（`out/X-revert-witness-mechanism+dropword-ratify.txt`） |
+| 第 5 处：头段措辞 | **没有用例变不响**（注释无人读） | `revert-header` 单发 ＋叠 `MDEC-struct` | 四数一字同（`out/H-revert-header.txt`）；`:1699` 那枚红句一字未变（`out/H-revert-header+MDEC-struct.txt`） |
+
+⇒ **没有一枚是装饰**（第 5 处按它自己的修法性质豁免这一问：它自始是文档级，判据是"措辞与盘上一致"，
+我在 §9 单独验它）。第 3、4 两处编译上互为一体，按"一处"计不构成对它的不利读法，因为它俩共同负责的形状
+（`dropword-*`）我实测要**两处一起回**才打得穿。
+
+---
+
+## §9 F-ACC-3 那格：两步路的措辞与盘上一字同（本程独立复跑两发）
+
+```
+MDEC-struct     （bridge.go 末尾加 type acProbe + 一枚 json.Unmarshal 目的地，不注册）
+  RUN=97 TOPPASS=52 SUBPASS=44 TOPFAIL=1 SKIP=0 PANIC=0   唯一红名 = TestJSONKeyDerivationAgreesWithEncodingJSON
+  红句 l2_grant_boundary_test.go:1699: decode destination acProbe has no reflection twin in inboundTypeRegistry: …
+  原始件 out/S-MDEC-struct.txt                       ⇒ 头段"只走第一步会红在这一枚、红句是这一句"逐字成立
+MDEC-registered （同上一发，再把 acProbe 写进 inboundTypeRegistry——它在本文件 :1560，不在 bridge.go）
+  RUN=99 TOPPASS=53 SUBPASS=46 TOPFAIL=0 SKIP=0 PANIC=0  包内零红   原始件 out/T-MDEC-registered.txt
+                                                    ⇒ 第二步确实把包带回全绿
+```
+
+**裁**：实现件 §4 那两发的四数与红名**复算同值**（它记 `RUN=97/…/FAIL=1` 与 `RUN=99/…/FAIL=0`）。
+头段那句"两步、且新目的地要与注册同一枚 commit 落地"不是一句宣言：它给的第 1 步后果我打出来了、
+第 2 步的出口我也走通了。F-ACC-3 这笔**文档账结掉**。
+⚠ 一处台件教训写在这里（与实现件无关，是我自己的）：`inboundTypeRegistry` 住在
+`l2_grant_boundary_test.go:1560`，不在 `bridge.go`；我第一次把注册那一步打进生产码，被我自己那把
+"锚点计数不等于 1 即拒"的尺挡下（`REFUSED anchor MDEC-reg: count=0`），改对后才有的上面那两行读数。
+
+
