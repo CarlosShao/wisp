@@ -1,0 +1,98 @@
+# git state at 139 session start — 2026-09-25T23:38+08:00
+$ git rev-parse HEAD
+a055d9fe9629943d322d0db2eedfca581a3a7330
+
+$ git rev-parse --abbrev-ref HEAD
+dev
+
+$ git log --oneline -10
+a055d9f evidence(149 第 0-11 格): 三发今天读数、corrupt 支的承重矩阵、exited 支的可达性剖面、门禁四数与名册差集
+612590c docs(台账 A267): 票 138 撞顶＝落盘不是重派；它引用了三句我从未说过的"简报说"，归属未核掉之前那格不结
+3f6322f evidence(138 落盘代理未提交的尾段): 它把"锚点漂移发生在哪两格之间"改准了，并就地自认一次口误
+2f5c7f9 probes(149): 变异尺与逐发原始读数落盘（57 枚，只建不删）
+f8623c7 evidence(138 AC#4 门禁 第 6 格): 两形四数+名册两向差集+同包开跑/裁决等集；gofumpt 唯一命中落在 149 在飞的 cmd/wisp 测试文件（HEAD 版干净）；d22scan rc=0 八枚分母非零并点破夹具数与主扫描之别；gh 现量锚点那 run 本就红在 4 枚步骤、workflow 里没有 go build ./... 那一步
+b417d31 fix(149 AC#2+AC#3+AC#4): corrupt 支的 offset 改填解码器自己点名的位置，并补三枚会响的用例
+c4540a6 evidence(138 AC#2/AC#3 处置 第 5 格): 条件句前件判假故未落修法，四条约束各配现状读数；AC#3 无级联可摘故未造用例；零改动自证 internal/cmd/tools/scripts 面 0 枚、锚点漂移一枚纯台账 commit 如实记
+69aefae evidence(138 AC#1 总裁决 第 4 格): 判为"给未来功能预留的洞"（三发支撑：agent 闭包无 proc、生产 NewDisposalScope 零枚、shell.exec 无注册）；AC#2/AC#3 按条件句未触发；SPEC-12 §5 登记行按表内语义取 DEFERRED、五字段备妥待编排者落笔
+d8e3957 evidence(138 AC#1③ 第 3 格): 生产 exec 路径逐名七枚、任务路径六枚 fs.* 零子进程；shell.exec 与 D46 均未注册；import 图那把尺量出会给出反结论、已换调用点普查；票面 unwired.go 路径打偏一处另起登记
+1ff7c71 evidence(138 AC#1② 第 2 格): AssignProcessToJobObject 普查——产品侧唯一分配门 StartInJob、唯一调用者 wisp slo；等价形状(挂起后归属)零枚；三枚原有 Job 用例现跑 rc=0 作正面控制
+
+$ git status --porcelain
+A  .scratch/wisp/probes/149/logs-verify/p1-corrupt-fill-to-zero.log
+A  .scratch/wisp/probes/149/logs-verify/p10-multidoc-takes-error-offset.log
+A  .scratch/wisp/probes/149/logs-verify/p7-exited-drops-summary.log
+ D design/assets/base.css
+ D design/assets/icons.js
+ D design/assets/theme.js
+ D design/assets/tokens.css
+ M design/doubao/README.md
+ M design/doubao/demo/app.js
+ M design/doubao/demo/index.html
+ M design/doubao/demo/styles.css
+ D design/index.html
+ D design/screens/approval.html
+ D design/screens/ball.html
+ D design/screens/chat.html
+ D design/screens/config.html
+ D design/screens/cost.html
+ D design/screens/firstrun.html
+ D design/screens/palette.html
+ D design/screens/privacy.html
+ D design/screens/security.html
+ D design/screens/states.html
+ D design/screens/tasks.html
+M  docs/evidence/s1/149-three-unpinned-outlets-r1.md
+ M docs/reports/frontend-session-log-zcode.md
+ M frontend/VENDORED.md
+ M frontend/scripts/gen-tokens.mjs
+ M frontend/scripts/vendor.mjs
+ M frontend/src/App.tsx
+ M frontend/src/components/ai-native/loading-state.tsx
+ M frontend/src/components/ai-native/streaming-text.tsx
+ M frontend/src/components/ai-native/thinking.tsx
+ M frontend/src/components/ai-native/tool-chips.tsx
+ M frontend/src/components/approval-screen.tsx
+ M frontend/src/components/chat-screen.tsx
+ M frontend/src/components/composer.tsx
+ M frontend/src/components/config-screen.tsx
+ M frontend/src/components/l2-approval-card.tsx
+ M frontend/src/components/nav-rail.tsx
+ M frontend/src/components/panel-skeleton.tsx
+ M frontend/src/components/result-stream.tsx
+ M frontend/src/fixtures/harness.ts
+ M frontend/src/main.tsx
+ M frontend/src/styles/theme.css
+ M frontend/src/styles/tokens.generated.css
+?? .scratch/wisp/probes/139/
+?? .zcodeignore
+?? design/doubao/01-ball-states.jpg
+?? design/doubao/demo/lib/
+?? design/doubao/demo/rb-files.js
+?? design/doubao/demo/rb-plugins.js
+?? design/doubao/demo/rb-review.js
+?? design/doubao/demo/rb-terminal.js
+?? design/doubao/demo/rightbar.js
+?? design/doubao/demo/screens/home.js
+?? design/doubao/demo/screenshots/
+?? design/doubao/demo/sidebar.js
+?? design/old/
+?? docs/evidence/s1/139-compression-leaves-no-trace-r1.md
+?? frontend/src/components/ai-native/button.tsx
+?? frontend/src/components/ai-native/code-block.tsx
+?? frontend/src/components/ai-native/context-cards.tsx
+?? frontend/src/components/ai-native/diff-table.tsx
+?? frontend/src/components/ai-native/entity-chip.tsx
+?? frontend/src/components/ai-native/progress-ring.tsx
+?? frontend/src/components/ai-native/segmented-control.tsx
+?? frontend/src/components/ai-native/switch.tsx
+?? frontend/src/components/ai-native/text-row.tsx
+?? frontend/src/components/ai-native/value-pill.tsx
+?? frontend/src/components/ball-screen.tsx
+?? frontend/src/components/palette-screen.tsx
+?? frontend/src/components/showcase.tsx
+?? frontend/src/components/tasks-screen.tsx
+
+## derived boundary check
+internal/agent/** changed: 0
+internal/observe/** changed: 0
+cmd/wisp/** changed: 0

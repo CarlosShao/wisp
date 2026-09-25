@@ -1,0 +1,36 @@
+# 139 AC#1 raw readings — captured 2026-09-25T23:37+08:00 HEAD=a055d9f
+
+## [P1] positive controls for the reader-ruler (git grep, go files, tests excluded)
+$ git grep -n "\.Rounds\b" -- "*.go" ":!*_test.go" | wc -l
+3
+$ git grep -n "\.Usage\b" -- "*.go" ":!*_test.go" | wc -l
+54
+$ git grep -n "\.Compression\b" -- "*.go" ":!*_test.go"
+internal/agent/loop.go:401:				res.Compression = rep
+
+## [P2] the one hit is a WRITE, not a read
+401:				res.Compression = rep
+
+## [P3] compress.go log-call ruler, applied to itself and to a control file
+$ git grep -cE "Info\(|Warn\(|Debug\(|Error\(" -- internal/agent/loop.go
+internal/agent/loop.go:14
+$ git grep -nE "Info\(|Warn\(|Debug\(|Error\(" -- internal/agent/compress.go
+rc=1 (1 = no matches)
+
+## [P4] production readers of agent.Result
+cmd/wisp/run.go:576:	res := loop.Run(ctx, task)
+cmd/wisp/run.go:647:func notifyBody(res agent.Result) string {
+cmd/wisp/run.go:658:func costLine(res agent.Result) string {
+
+## [P5] panel bridge / diagnostics: compression hits
+rc=1 (1 = none)
+## [P5-control] diagnostics.go key literals (ruler is live)
+"fmt" "os" "strings" "time" "id" "ticket" "summary" "registered" "false" "reason" 
+
+## [P6] persisted sink: does an agent Info record reach disk?
+82:const logSinkLevel = "info"
+cmd/wisp/run.go:178:	sink, sinkErr := installLogSink(s.dataDir)
+cmd/wisp/models.go:284:	if sink, sinkErr := installLogSink(io_.dataDir); sinkErr != nil {
+cmd/wisp/resident_windows.go:57:	sink, sinkErr := installLogSink(rt.Layout.DataDir)
+$ git grep -n "Logger:" -- "cmd/wisp/*.go" ":!*_test.go"   (agent.Options.Logger never set => loop uses slog.Default = the tee)
+rc=1 (1 = none)

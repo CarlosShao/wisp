@@ -1,0 +1,361 @@
+time=2026-09-25T23:34:44.131+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestCompressFoldsOldestKeepsLastThreePreservesIDs
+--- PASS: TestCompressFoldsOldestKeepsLastThreePreservesIDs (0.00s)
+=== RUN   TestCompressPreservesIDsEvenWhenSummarizerDropsThem
+--- PASS: TestCompressPreservesIDsEvenWhenSummarizerDropsThem (0.00s)
+=== RUN   TestCompressTriggerScalesWithWindow
+--- PASS: TestCompressTriggerScalesWithWindow (0.00s)
+=== RUN   TestCompressNoopUnderThreshold
+--- PASS: TestCompressNoopUnderThreshold (0.00s)
+=== RUN   TestControlWordsNeverReachTheProvider
+--- PASS: TestControlWordsNeverReachTheProvider (0.02s)
+=== RUN   TestNearMissUtterancesGoToTheLoop
+--- PASS: TestNearMissUtterancesGoToTheLoop (0.01s)
+=== RUN   TestDefaultControlCancelsRunningTask
+--- PASS: TestDefaultControlCancelsRunningTask (0.01s)
+=== RUN   TestControlWithoutAConsumerIsVisible
+--- PASS: TestControlWithoutAConsumerIsVisible (0.00s)
+=== RUN   TestSteeringInsertsIntoNextRound
+--- PASS: TestSteeringInsertsIntoNextRound (0.41s)
+=== RUN   TestSteeringDisabled
+--- PASS: TestSteeringDisabled (0.00s)
+=== RUN   TestRecordSinkToleratesConcurrentPublishers
+--- PASS: TestRecordSinkToleratesConcurrentPublishers (0.01s)
+=== RUN   TestFailedTaskBooksOpenCallRowWithDecision
+--- PASS: TestFailedTaskBooksOpenCallRowWithDecision (0.10s)
+=== RUN   TestCancelledTaskPersistsTerminalRows
+--- PASS: TestCancelledTaskPersistsTerminalRows (0.10s)
+=== RUN   TestLoopGuardLadderRemindersThenStuck
+--- PASS: TestLoopGuardLadderRemindersThenStuck (0.02s)
+=== RUN   TestLoopGuardLadderIsConfigurable
+--- PASS: TestLoopGuardLadderIsConfigurable (0.01s)
+=== RUN   TestLoopGuardResetsOnDifferentCall
+--- PASS: TestLoopGuardResetsOnDifferentCall (0.00s)
+=== RUN   TestLoopGuardTokenBudgetScalesWithWindow
+--- PASS: TestLoopGuardTokenBudgetScalesWithWindow (0.00s)
+=== RUN   TestPerToolTimeoutFires
+--- PASS: TestPerToolTimeoutFires (0.15s)
+=== RUN   TestPerToolTimeoutOfContractHonestToolIsToolClass
+--- PASS: TestPerToolTimeoutOfContractHonestToolIsToolClass (0.14s)
+=== RUN   TestLoopGuardCanonicalizesEquivalentArgs
+--- PASS: TestLoopGuardCanonicalizesEquivalentArgs (0.00s)
+=== RUN   TestLoopGuardKeepsDistinctArgsDistinct
+--- PASS: TestLoopGuardKeepsDistinctArgsDistinct (0.00s)
+=== RUN   TestLoopGuardRepeatsNonJSONArgs
+--- PASS: TestLoopGuardRepeatsNonJSONArgs (0.00s)
+=== RUN   TestGoldenTextReply
+--- PASS: TestGoldenTextReply (0.00s)
+=== RUN   TestGoldenSingleToolCall
+--- PASS: TestGoldenSingleToolCall (0.01s)
+=== RUN   TestGoldenParallelToolCalls
+--- PASS: TestGoldenParallelToolCalls (0.01s)
+=== RUN   TestGoldenToolResultFeedsNextTurn
+--- PASS: TestGoldenToolResultFeedsNextTurn (0.01s)
+=== RUN   TestGoldenConcurrencyCeiling
+--- PASS: TestGoldenConcurrencyCeiling (0.13s)
+=== RUN   TestToolExecutionRunsFourAcross
+--- PASS: TestToolExecutionRunsFourAcross (0.01s)
+=== RUN   TestGoldenBudgetExhaustionStuck
+--- PASS: TestGoldenBudgetExhaustionStuck (0.01s)
+=== RUN   TestGoldenCancellationEndToEnd
+--- PASS: TestGoldenCancellationEndToEnd (0.01s)
+=== RUN   TestGoroutineBudgetDrains
+--- PASS: TestGoroutineBudgetDrains (0.01s)
+=== RUN   TestTaskLogAndToolCallRows
+time=2026-09-25T23:34:45.338+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTaskLogAndToolCallRows144502574\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-25T23:34:45.351+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-25T15:34:45Z duration_ms=13
+time=2026-09-25T23:34:45.361+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTaskLogAndToolCallRows144502574\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-25T23:34:45.369+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-25T15:34:45Z duration_ms=8
+time=2026-09-25T23:34:45.375+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-25T23:34:45.378+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTaskLogAndToolCallRows (0.10s)
+=== RUN   TestGoldenProviderFailureIsVisible
+--- PASS: TestGoldenProviderFailureIsVisible (0.01s)
+=== RUN   TestCachePrefixIsByteStableAcrossTurns
+--- PASS: TestCachePrefixIsByteStableAcrossTurns (0.00s)
+=== RUN   TestPromptSectionCanonicalOrder
+--- PASS: TestPromptSectionCanonicalOrder (0.00s)
+=== RUN   TestVolatileSuffixPutsSceneLast
+--- PASS: TestVolatileSuffixPutsSceneLast (0.00s)
+=== RUN   TestD39SectionBudgetsAndTotalCeiling
+--- PASS: TestD39SectionBudgetsAndTotalCeiling (0.00s)
+=== RUN   TestEnforceTotalTerminatesAtEveryWindow
+--- PASS: TestEnforceTotalTerminatesAtEveryWindow (0.00s)
+=== RUN   TestEnforceTotalTerminatesOnABelowBudgetSection
+--- PASS: TestEnforceTotalTerminatesOnABelowBudgetSection (0.00s)
+=== RUN   TestAC3SpillArtifactLandsPrivate
+    spill_acl_windows_test.go:29: icacls tool-output-call_acl.txt -> [NT AUTHORITY\SYSTEM BUILTIN\Administrators DESKTOP-LVS7839\swq]
+    spill_acl_windows_test.go:30: icacls artifacts -> [NT AUTHORITY\SYSTEM NT AUTHORITY\SYSTEM BUILTIN\Administrators BUILTIN\Administrators DESKTOP-LVS7839\swq DESKTOP-LVS7839\swq]
+    spill_acl_windows_test.go:37: icacls tool-output-call_acl.txt -> [NT AUTHORITY\SYSTEM BUILTIN\Administrators DESKTOP-LVS7839\swq]
+--- PASS: TestAC3SpillArtifactLandsPrivate (0.62s)
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/p_slash_vs_pq
+    spill_name_injectivity_test.go:90: names: map[tool-output-p%2Fq.txt:p/q tool-output-pq.txt:pq]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/p_backslash_vs_pq
+    spill_name_injectivity_test.go:90: names: map[tool-output-p%5Cq.txt:p\q tool-output-pq.txt:pq]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/p_slash_vs_p_backslash
+    spill_name_injectivity_test.go:90: names: map[tool-output-p%2Fq.txt:p/q tool-output-p%5Cq.txt:p\q]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/the_whole_report_triple
+    spill_name_injectivity_test.go:90: names: map[tool-output-p%2Fq.txt:p/q tool-output-p%5Cq.txt:p\q tool-output-pq.txt:pq]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/dot_and_dotdot_vs_empty
+    spill_name_injectivity_test.go:90: names: map[tool-output-%2E%2E.txt:.. tool-output-%2E.txt:. tool-output-seq.1.txt:]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/colon_and_unc_shape
+    spill_name_injectivity_test.go:90: names: map[tool-output-%5C%5Ca%5Cb.txt:\\a\b tool-output-a%3Ab.txt:a:b]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/underscore_dash_and_percent
+    spill_name_injectivity_test.go:90: names: map[tool-output-a%25b.txt:a%b tool-output-a-b.txt:a-b tool-output-a_b.txt:a_b]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/case_folding
+    spill_name_injectivity_test.go:90: names: map[tool-output-%50%51.txt:PQ tool-output-pq.txt:pq]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/digits_vs_letters
+    spill_name_injectivity_test.go:90: names: map[tool-output-0o.txt:0o tool-output-o0.txt:o0]
+--- PASS: TestArtifactNameDoesNotFoldDistinctIDs (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/p_slash_vs_pq (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/p_backslash_vs_pq (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/p_slash_vs_p_backslash (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/the_whole_report_triple (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/dot_and_dotdot_vs_empty (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/colon_and_unc_shape (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/underscore_dash_and_percent (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/case_folding (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/digits_vs_letters (0.00s)
+=== RUN   TestSpilledBytesSurviveANameThatUsedToCollide
+=== RUN   TestSpilledBytesSurviveANameThatUsedToCollide/slash_id_then_bare_id
+=== RUN   TestSpilledBytesSurviveANameThatUsedToCollide/bare_id_then_backslash_id
+=== RUN   TestSpilledBytesSurviveANameThatUsedToCollide/dotdot_id_then_word_id
+--- PASS: TestSpilledBytesSurviveANameThatUsedToCollide (0.06s)
+    --- PASS: TestSpilledBytesSurviveANameThatUsedToCollide/slash_id_then_bare_id (0.01s)
+    --- PASS: TestSpilledBytesSurviveANameThatUsedToCollide/bare_id_then_backslash_id (0.02s)
+    --- PASS: TestSpilledBytesSurviveANameThatUsedToCollide/dotdot_id_then_word_id (0.02s)
+=== RUN   TestArtifactNameRoundTripsToTheExactID
+--- PASS: TestArtifactNameRoundTripsToTheExactID (0.00s)
+=== RUN   TestArtifactNameIsCanonicalAndBounded
+--- PASS: TestArtifactNameIsCanonicalAndBounded (0.00s)
+=== RUN   TestWriteFileExclusiveIsExclusive
+--- PASS: TestWriteFileExclusiveIsExclusive (0.01s)
+=== RUN   TestSpillSameIDRetryOverwrites
+--- PASS: TestSpillSameIDRetryOverwrites (0.02s)
+=== RUN   TestSpillAcrossRestartsKeepsRetrySemantics
+--- PASS: TestSpillAcrossRestartsKeepsRetrySemantics (0.02s)
+=== RUN   TestSpillCallIDHostileShapesSanitizedToBareNames
+=== RUN   TestSpillCallIDHostileShapesSanitizedToBareNames/separator
+=== RUN   TestSpillCallIDHostileShapesSanitizedToBareNames/dotdot
+=== RUN   TestSpillCallIDHostileShapesSanitizedToBareNames/drive_letter
+=== RUN   TestSpillCallIDHostileShapesSanitizedToBareNames/unc
+=== RUN   TestSpillCallIDHostileShapesSanitizedToBareNames/encoded_shapes_stay_bare_and_empty_id_falls_back_to_sequence
+--- PASS: TestSpillCallIDHostileShapesSanitizedToBareNames (0.17s)
+    --- PASS: TestSpillCallIDHostileShapesSanitizedToBareNames/separator (0.01s)
+    --- PASS: TestSpillCallIDHostileShapesSanitizedToBareNames/dotdot (0.04s)
+    --- PASS: TestSpillCallIDHostileShapesSanitizedToBareNames/drive_letter (0.01s)
+    --- PASS: TestSpillCallIDHostileShapesSanitizedToBareNames/unc (0.02s)
+    --- PASS: TestSpillCallIDHostileShapesSanitizedToBareNames/encoded_shapes_stay_bare_and_empty_id_falls_back_to_sequence (0.05s)
+=== RUN   TestSpillContainmentByDirectoryListing
+    spill_path_invariant_test.go:284: control: escape id "..\\..\\..\\..\\CONTROL-escape" resolves to "C:\\Users\\swq\\AppData\\Local\\Temp\\TestSpillContainmentByDirectoryListing3875410469\\001\\CONTROL-escape.txt" (root is "C:\\Users\\swq\\AppData\\Local\\Temp\\TestSpillContainmentByDirectoryListing3875410469\\001")
+    spill_path_invariant_test.go:307: literal-backslash control: id "..\\..\\..\\..\\CONTROL-literal" resolves to "C:\\Users\\swq\\AppData\\Local\\Temp\\TestSpillContainmentByDirectoryListing3875410469\\001\\CONTROL-literal.txt"
+--- PASS: TestSpillContainmentByDirectoryListing (0.16s)
+=== RUN   TestSpillIntoRealStoreThenDeleteStaysUnderDataDir
+--- PASS: TestSpillIntoRealStoreThenDeleteStaysUnderDataDir (0.19s)
+=== RUN   TestSpillAPITakesNoCallerControlledDestinationPath
+    spill_path_invariant_test.go:545: audited 3 filesystem-mutating call(s) in spill.go
+--- PASS: TestSpillAPITakesNoCallerControlledDestinationPath (0.00s)
+=== RUN   TestSpillThresholdScalesWithWindow
+--- PASS: TestSpillThresholdScalesWithWindow (0.01s)
+=== RUN   TestSpillTokenBoundary
+--- PASS: TestSpillTokenBoundary (0.01s)
+=== RUN   TestSpillArtifactAndStubShape
+--- PASS: TestSpillArtifactAndStubShape (0.01s)
+=== RUN   TestSpillRawHardCap
+--- PASS: TestSpillRawHardCap (0.00s)
+=== RUN   TestSpillThroughLoop
+--- PASS: TestSpillThroughLoop (0.03s)
+=== RUN   TestSpillArtifactRespectsRawCap
+--- PASS: TestSpillArtifactRespectsRawCap (0.01s)
+=== RUN   TestMaxTokensFailsAllToolCallsOfThatMessage
+time=2026-09-25T23:34:46.788+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestMaxTokensFailsAllToolCallsOfThatMessage1802252627\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-25T23:34:46.799+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-25T15:34:46Z duration_ms=11
+time=2026-09-25T23:34:46.809+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestMaxTokensFailsAllToolCallsOfThatMessage1802252627\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-25T23:34:46.817+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-25T15:34:46Z duration_ms=7
+time=2026-09-25T23:34:46.821+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-25T23:34:46.826+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestMaxTokensFailsAllToolCallsOfThatMessage (0.09s)
+=== RUN   TestOpenToolCallAfterFailureIsFailed
+--- PASS: TestOpenToolCallAfterFailureIsFailed (0.01s)
+=== RUN   TestCompressFoldsOldestKeepsLastThreePreservesIDs
+--- PASS: TestCompressFoldsOldestKeepsLastThreePreservesIDs (0.00s)
+=== RUN   TestCompressPreservesIDsEvenWhenSummarizerDropsThem
+--- PASS: TestCompressPreservesIDsEvenWhenSummarizerDropsThem (0.00s)
+=== RUN   TestCompressTriggerScalesWithWindow
+--- PASS: TestCompressTriggerScalesWithWindow (0.00s)
+=== RUN   TestCompressNoopUnderThreshold
+--- PASS: TestCompressNoopUnderThreshold (0.00s)
+=== RUN   TestControlWordsNeverReachTheProvider
+--- PASS: TestControlWordsNeverReachTheProvider (0.02s)
+=== RUN   TestNearMissUtterancesGoToTheLoop
+--- PASS: TestNearMissUtterancesGoToTheLoop (0.01s)
+=== RUN   TestDefaultControlCancelsRunningTask
+--- PASS: TestDefaultControlCancelsRunningTask (0.01s)
+=== RUN   TestControlWithoutAConsumerIsVisible
+--- PASS: TestControlWithoutAConsumerIsVisible (0.00s)
+=== RUN   TestSteeringInsertsIntoNextRound
+--- PASS: TestSteeringInsertsIntoNextRound (0.41s)
+=== RUN   TestSteeringDisabled
+--- PASS: TestSteeringDisabled (0.01s)
+=== RUN   TestRecordSinkToleratesConcurrentPublishers
+--- PASS: TestRecordSinkToleratesConcurrentPublishers (0.01s)
+=== RUN   TestFailedTaskBooksOpenCallRowWithDecision
+--- PASS: TestFailedTaskBooksOpenCallRowWithDecision (0.14s)
+=== RUN   TestCancelledTaskPersistsTerminalRows
+--- PASS: TestCancelledTaskPersistsTerminalRows (0.14s)
+=== RUN   TestLoopGuardLadderRemindersThenStuck
+--- PASS: TestLoopGuardLadderRemindersThenStuck (0.01s)
+=== RUN   TestLoopGuardLadderIsConfigurable
+--- PASS: TestLoopGuardLadderIsConfigurable (0.01s)
+=== RUN   TestLoopGuardResetsOnDifferentCall
+--- PASS: TestLoopGuardResetsOnDifferentCall (0.00s)
+=== RUN   TestLoopGuardTokenBudgetScalesWithWindow
+--- PASS: TestLoopGuardTokenBudgetScalesWithWindow (0.00s)
+=== RUN   TestPerToolTimeoutFires
+--- PASS: TestPerToolTimeoutFires (0.18s)
+=== RUN   TestPerToolTimeoutOfContractHonestToolIsToolClass
+--- PASS: TestPerToolTimeoutOfContractHonestToolIsToolClass (0.17s)
+=== RUN   TestLoopGuardCanonicalizesEquivalentArgs
+--- PASS: TestLoopGuardCanonicalizesEquivalentArgs (0.00s)
+=== RUN   TestLoopGuardKeepsDistinctArgsDistinct
+--- PASS: TestLoopGuardKeepsDistinctArgsDistinct (0.00s)
+=== RUN   TestLoopGuardRepeatsNonJSONArgs
+--- PASS: TestLoopGuardRepeatsNonJSONArgs (0.00s)
+=== RUN   TestGoldenTextReply
+--- PASS: TestGoldenTextReply (0.02s)
+=== RUN   TestGoldenSingleToolCall
+--- PASS: TestGoldenSingleToolCall (0.01s)
+=== RUN   TestGoldenParallelToolCalls
+--- PASS: TestGoldenParallelToolCalls (0.01s)
+=== RUN   TestGoldenToolResultFeedsNextTurn
+--- PASS: TestGoldenToolResultFeedsNextTurn (0.01s)
+=== RUN   TestGoldenConcurrencyCeiling
+--- PASS: TestGoldenConcurrencyCeiling (0.13s)
+=== RUN   TestToolExecutionRunsFourAcross
+--- PASS: TestToolExecutionRunsFourAcross (0.01s)
+=== RUN   TestGoldenBudgetExhaustionStuck
+--- PASS: TestGoldenBudgetExhaustionStuck (0.01s)
+=== RUN   TestGoldenCancellationEndToEnd
+--- PASS: TestGoldenCancellationEndToEnd (0.01s)
+=== RUN   TestGoroutineBudgetDrains
+--- PASS: TestGoroutineBudgetDrains (0.01s)
+=== RUN   TestTaskLogAndToolCallRows
+time=2026-09-25T23:34:48.200+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTaskLogAndToolCallRows3563632836\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-25T23:34:48.211+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-25T15:34:48Z duration_ms=11
+time=2026-09-25T23:34:48.222+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTaskLogAndToolCallRows3563632836\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-25T23:34:48.231+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-25T15:34:48Z duration_ms=8
+time=2026-09-25T23:34:48.237+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-25T23:34:48.240+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTaskLogAndToolCallRows (0.09s)
+=== RUN   TestGoldenProviderFailureIsVisible
+--- PASS: TestGoldenProviderFailureIsVisible (0.01s)
+=== RUN   TestCachePrefixIsByteStableAcrossTurns
+--- PASS: TestCachePrefixIsByteStableAcrossTurns (0.00s)
+=== RUN   TestPromptSectionCanonicalOrder
+--- PASS: TestPromptSectionCanonicalOrder (0.00s)
+=== RUN   TestVolatileSuffixPutsSceneLast
+--- PASS: TestVolatileSuffixPutsSceneLast (0.00s)
+=== RUN   TestD39SectionBudgetsAndTotalCeiling
+--- PASS: TestD39SectionBudgetsAndTotalCeiling (0.00s)
+=== RUN   TestEnforceTotalTerminatesAtEveryWindow
+--- PASS: TestEnforceTotalTerminatesAtEveryWindow (0.00s)
+=== RUN   TestEnforceTotalTerminatesOnABelowBudgetSection
+--- PASS: TestEnforceTotalTerminatesOnABelowBudgetSection (0.00s)
+=== RUN   TestAC3SpillArtifactLandsPrivate
+    spill_acl_windows_test.go:29: icacls tool-output-call_acl.txt -> [NT AUTHORITY\SYSTEM BUILTIN\Administrators DESKTOP-LVS7839\swq]
+    spill_acl_windows_test.go:30: icacls artifacts -> [NT AUTHORITY\SYSTEM NT AUTHORITY\SYSTEM BUILTIN\Administrators BUILTIN\Administrators DESKTOP-LVS7839\swq DESKTOP-LVS7839\swq]
+    spill_acl_windows_test.go:37: icacls tool-output-call_acl.txt -> [NT AUTHORITY\SYSTEM BUILTIN\Administrators DESKTOP-LVS7839\swq]
+--- PASS: TestAC3SpillArtifactLandsPrivate (0.18s)
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/p_slash_vs_pq
+    spill_name_injectivity_test.go:90: names: map[tool-output-p%2Fq.txt:p/q tool-output-pq.txt:pq]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/p_backslash_vs_pq
+    spill_name_injectivity_test.go:90: names: map[tool-output-p%5Cq.txt:p\q tool-output-pq.txt:pq]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/p_slash_vs_p_backslash
+    spill_name_injectivity_test.go:90: names: map[tool-output-p%2Fq.txt:p/q tool-output-p%5Cq.txt:p\q]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/the_whole_report_triple
+    spill_name_injectivity_test.go:90: names: map[tool-output-p%2Fq.txt:p/q tool-output-p%5Cq.txt:p\q tool-output-pq.txt:pq]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/dot_and_dotdot_vs_empty
+    spill_name_injectivity_test.go:90: names: map[tool-output-%2E%2E.txt:.. tool-output-%2E.txt:. tool-output-seq.1.txt:]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/colon_and_unc_shape
+    spill_name_injectivity_test.go:90: names: map[tool-output-%5C%5Ca%5Cb.txt:\\a\b tool-output-a%3Ab.txt:a:b]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/underscore_dash_and_percent
+    spill_name_injectivity_test.go:90: names: map[tool-output-a%25b.txt:a%b tool-output-a-b.txt:a-b tool-output-a_b.txt:a_b]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/case_folding
+    spill_name_injectivity_test.go:90: names: map[tool-output-%50%51.txt:PQ tool-output-pq.txt:pq]
+=== RUN   TestArtifactNameDoesNotFoldDistinctIDs/digits_vs_letters
+    spill_name_injectivity_test.go:90: names: map[tool-output-0o.txt:0o tool-output-o0.txt:o0]
+--- PASS: TestArtifactNameDoesNotFoldDistinctIDs (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/p_slash_vs_pq (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/p_backslash_vs_pq (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/p_slash_vs_p_backslash (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/the_whole_report_triple (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/dot_and_dotdot_vs_empty (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/colon_and_unc_shape (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/underscore_dash_and_percent (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/case_folding (0.00s)
+    --- PASS: TestArtifactNameDoesNotFoldDistinctIDs/digits_vs_letters (0.00s)
+=== RUN   TestSpilledBytesSurviveANameThatUsedToCollide
+=== RUN   TestSpilledBytesSurviveANameThatUsedToCollide/slash_id_then_bare_id
+=== RUN   TestSpilledBytesSurviveANameThatUsedToCollide/bare_id_then_backslash_id
+=== RUN   TestSpilledBytesSurviveANameThatUsedToCollide/dotdot_id_then_word_id
+--- PASS: TestSpilledBytesSurviveANameThatUsedToCollide (0.05s)
+    --- PASS: TestSpilledBytesSurviveANameThatUsedToCollide/slash_id_then_bare_id (0.01s)
+    --- PASS: TestSpilledBytesSurviveANameThatUsedToCollide/bare_id_then_backslash_id (0.02s)
+    --- PASS: TestSpilledBytesSurviveANameThatUsedToCollide/dotdot_id_then_word_id (0.02s)
+=== RUN   TestArtifactNameRoundTripsToTheExactID
+--- PASS: TestArtifactNameRoundTripsToTheExactID (0.00s)
+=== RUN   TestArtifactNameIsCanonicalAndBounded
+--- PASS: TestArtifactNameIsCanonicalAndBounded (0.00s)
+=== RUN   TestWriteFileExclusiveIsExclusive
+--- PASS: TestWriteFileExclusiveIsExclusive (0.01s)
+=== RUN   TestSpillSameIDRetryOverwrites
+--- PASS: TestSpillSameIDRetryOverwrites (0.02s)
+=== RUN   TestSpillAcrossRestartsKeepsRetrySemantics
+--- PASS: TestSpillAcrossRestartsKeepsRetrySemantics (0.02s)
+=== RUN   TestSpillCallIDHostileShapesSanitizedToBareNames
+=== RUN   TestSpillCallIDHostileShapesSanitizedToBareNames/separator
+=== RUN   TestSpillCallIDHostileShapesSanitizedToBareNames/dotdot
+=== RUN   TestSpillCallIDHostileShapesSanitizedToBareNames/drive_letter
+=== RUN   TestSpillCallIDHostileShapesSanitizedToBareNames/unc
+=== RUN   TestSpillCallIDHostileShapesSanitizedToBareNames/encoded_shapes_stay_bare_and_empty_id_falls_back_to_sequence
+--- PASS: TestSpillCallIDHostileShapesSanitizedToBareNames (0.09s)
+    --- PASS: TestSpillCallIDHostileShapesSanitizedToBareNames/separator (0.01s)
+    --- PASS: TestSpillCallIDHostileShapesSanitizedToBareNames/dotdot (0.01s)
+    --- PASS: TestSpillCallIDHostileShapesSanitizedToBareNames/drive_letter (0.01s)
+    --- PASS: TestSpillCallIDHostileShapesSanitizedToBareNames/unc (0.01s)
+    --- PASS: TestSpillCallIDHostileShapesSanitizedToBareNames/encoded_shapes_stay_bare_and_empty_id_falls_back_to_sequence (0.03s)
+=== RUN   TestSpillContainmentByDirectoryListing
+    spill_path_invariant_test.go:284: control: escape id "..\\..\\..\\..\\CONTROL-escape" resolves to "C:\\Users\\swq\\AppData\\Local\\Temp\\TestSpillContainmentByDirectoryListing3064372388\\001\\CONTROL-escape.txt" (root is "C:\\Users\\swq\\AppData\\Local\\Temp\\TestSpillContainmentByDirectoryListing3064372388\\001")
+    spill_path_invariant_test.go:307: literal-backslash control: id "..\\..\\..\\..\\CONTROL-literal" resolves to "C:\\Users\\swq\\AppData\\Local\\Temp\\TestSpillContainmentByDirectoryListing3064372388\\001\\CONTROL-literal.txt"
+--- PASS: TestSpillContainmentByDirectoryListing (0.09s)
+=== RUN   TestSpillIntoRealStoreThenDeleteStaysUnderDataDir
+--- PASS: TestSpillIntoRealStoreThenDeleteStaysUnderDataDir (0.11s)
+=== RUN   TestSpillAPITakesNoCallerControlledDestinationPath
+    spill_path_invariant_test.go:545: audited 3 filesystem-mutating call(s) in spill.go
+--- PASS: TestSpillAPITakesNoCallerControlledDestinationPath (0.00s)
+=== RUN   TestSpillThresholdScalesWithWindow
+--- PASS: TestSpillThresholdScalesWithWindow (0.01s)
+=== RUN   TestSpillTokenBoundary
+--- PASS: TestSpillTokenBoundary (0.01s)
+=== RUN   TestSpillArtifactAndStubShape
+--- PASS: TestSpillArtifactAndStubShape (0.01s)
+=== RUN   TestSpillRawHardCap
+--- PASS: TestSpillRawHardCap (0.00s)
+=== RUN   TestSpillThroughLoop
+--- PASS: TestSpillThroughLoop (0.02s)
+=== RUN   TestSpillArtifactRespectsRawCap
+--- PASS: TestSpillArtifactRespectsRawCap (0.01s)
+=== RUN   TestMaxTokensFailsAllToolCallsOfThatMessage
+time=2026-09-25T23:34:48.940+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestMaxTokensFailsAllToolCallsOfThatMessage2631558142\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-25T23:34:48.951+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-25T15:34:48Z duration_ms=10
+time=2026-09-25T23:34:48.966+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestMaxTokensFailsAllToolCallsOfThatMessage2631558142\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-25T23:34:48.972+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-25T15:34:48Z duration_ms=6
+time=2026-09-25T23:34:48.977+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-25T23:34:48.979+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestMaxTokensFailsAllToolCallsOfThatMessage (0.09s)
+=== RUN   TestOpenToolCallAfterFailureIsFailed
+--- PASS: TestOpenToolCallAfterFailureIsFailed (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent	5.041s

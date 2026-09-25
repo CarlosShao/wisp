@@ -1,0 +1,31 @@
+# 139 AC#1 (2) trigger-scaling + DEFERRED registry coverage — 2026-09-25T23:37+08:00 HEAD=a055d9f
+
+## [P7] refHistoryTokens is config-derived, not a bare literal
+36:	refHistoryTokens  = 12000 // D15(4) compression trigger
+74:	HistoryCompressTokens int
+91:		Scale:         float64(ctxWindow) / float64(ReferenceContextWindow),
+107:	b.HistoryCompressTokens = s(refHistoryTokens)
+$ go test ./internal/agent/ -run TestCompressTriggerScalesWithWindow -v
+time=2026-09-25T23:37:32.863+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestCompressTriggerScalesWithWindow
+--- PASS: TestCompressTriggerScalesWithWindow (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent	0.060s
+
+## [P8] what a real threshold is at the windows the product uses (derived, not 12000)
+
+## [P9] DEFERRED(D28-1): code markers vs SPEC-12 §5 registry
+internal/agent/compress.go:26:// DEFERRED(D28-1): move the call into the Warm window hook; keep this
+internal/agent/loop.go:394:			// DEFERRED(D28-1): the Warm-window hook owns this call; the
+$ grep -c "D28-1" docs/specs/SPEC-12-roadmap-governance.md
+0
+rc=1
+$ grep -c "D11-3" docs/specs/SPEC-12-roadmap-governance.md
+0
+--- the §5 table rows total ---
+47
+--- nearest mentions of D28-1 outside specs ---
+docs/evidence/s1/10-adversarial-acceptance.md:106:- 另：`DEFERRED(D28-1)`（压缩暂同步调用）符合契约「synchronous fallback for S1 acceptable but flagged」的明文豁免，登记在 `compress.go:22-27`，**不算违规**；`DEFERRED(D11-3)`（force_tool/force_chat 规则表）代码与 Progress log 都有交代，但契约的 `## Out of scope` 未列它 —— 建议把「D11(3) 不在本票」补进 Out-of-scope 一行，别让它从验收面上蒸发（流程项，不计缺陷）。
+docs/reports/2026-09-24-gap-analysis-audit-verdict.md:69:| 18 上下文占用看不见 | **真，而且比它自己写的更强**：`compress.go` 已实现，成功路径**连日志都没有**（只在失败 `Warn`），`res.Compression` 全仓**零生产读取者** | 「12000 token」是 §4.3 原文，但 `budgets.go:36 refHistoryTokens` 按 `context_window` **等比缩放**（D15①强制）⇒ 实际触发点常低于 12000；**撞 A102 前端冻结**（分解条正解落 `frontend/**`，你已交外部 agent）＋票 35（bridge 方法一个都没实现） | **直接可开** | **不实**：新增 Go→前端事件要改 SPEC-08 §5.2 枚举白名单＝契约变更 | **拆两半**：Go 侧先开（压缩成功记 log／接进诊断面，可钉进票 28 的 `DEFERRED(D28-1)` Warm-window hook）；**面板那半退回，不派** |
+docs/reports/pending-and-issues.md:4631:  与 **GAP-18 的 Go 侧那半**（压缩成功记 log／接进诊断面，可钉进票 28 的 `DEFERRED(D28-1)` Warm-window hook；
+docs/reports/pending-and-issues.md:4708:     并把两半截**未复算的**（`refHistoryTokens` 等比缩放、`DEFERRED(D28-1)` 登记覆盖度）**写成 AC 而不是写成事实**。
