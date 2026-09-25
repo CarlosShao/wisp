@@ -6483,3 +6483,24 @@ A40② 说最近三个 **push** run 是 `cancelled`。我又查了两步，**排
   **⑤ "推后逐名比红名集合"这一件固定动作：本条只做完一半，我不假装它结了。** 基线（上一推 `36124009826`）已落盘可复算：`test-core` 红名 **1 枚**（`TestC21DesignTokensFourWayAgree`，已知常红、owner 把设计源件挪走那一族）；`test-windows` 红名 **16 枚**（`TestPathResolver*` 三枚、`TestSync*` 五枚、`TestAListWinsWhereBothTablesHit`、`TestBListDefaultDenyAndOverride`、`TestClassifyAnchorSpellingIsNotVerdict`、`TestComposedGateBlocksAWriteForTwoSeconds`、`TestCanonicalInputGainsNoSecondForm`、`TestTicket101*` 三枚）；`lint` 的 `gofumpt` 那一步当时点的文件是 `internal/panel/pump_test.go`。新推那枚 run `36140078431` 到 21:3x **仍 `in_progress`**（`test-windows` 未完）⇒ **红名差集待 run 终态再做**，且 `slo-full` 当时报 `success` **不算结论**——既有条"step 层的绿可以等于什么都没测（`NO CONCLUSION (machine-contended)` ＋ `exit 0`）"仍然管它，要读 report 正文才许写"这一推 D32 那条腿被求值了"。
 
   `next=`＝①**票 147 已派**（锚 `80fa0551`，落点 `cmd/wisp/`，五格含"把 144 那三处'只有空白'的声明就地 `>` 更正"）；②**票 146 可 `-done`**（现量 AC 框 **5 枚全 `[x]`、真未勾 0 枚**；那把尺第一次用 `grep -c '\[ \]'` 报 3，是正文引文里的三处命中，改用 `^- \[ \]` 才切得开——**又是一个"计数口径不写清就会自欺"的形状**）；③run 终态后**补完⑤那半件**并把 `slo-full` 的正文读到；④票 148 仍 `blocked`（`Q-53`／`Q-54` 等 owner，`AC#2` 那格不需批准）；⑤票 144 的 `-done` 改名等 147 的 `AC#3` 落地后再做。
+
+- [2026-09-25 21:4x +08] **A263｜`A262⑤` 那半件补完了：这一推 59 枚把红名集合动过零枚、把分母涨了 16 枚且 16 枚全归到 144/146；代价是 `slo-full` 这条腿今天第一次拒采，而争用源我定不下**
+
+  **① 逐名比红名集合：两枚 job 的集合与基线**逐字相同**〔我本轮现跑过，两向 `comm` 皆空〕。** 基线＝上一推 `36124009826`，新侧＝`36140078431`（本批 59 枚），run 终态 `completed|failure`。
+  - `test-core`：红名 **1 → 1**，仍是那枚已知常红的 `TestC21DesignTokensFourWayAgree`（owner 把设计源件挪走那一族，见 `Q-52` 撤回那条）。
+  - `test-windows`：红名 **16 → 16**，`diff -q` 判"两版红名集合逐字相同"。
+  ⇒ **人话**：这一大批（含 144/146 两票的全部新尺、泵那两程、以及三枚前端会话随行的活）**没有新增任何一枚红，也没有让任何一枚既有红变绿**。⚠ 这句只在**逐名**这一层成立；`lint` 那枚 job 的步级变化在 `A262④` 已经记过（gofumpt 红→绿、两枚 `go vet` 由 skipped 拿回裁决），**"颜色没变"与"什么都没变"是两回事**。
+
+  **② 分母涨了 16 枚，而且 16 枚我逐枚归到了票上——这条是防"下一位把 +16 当成噪声"。** `=== RUN` `test-core 1151→1153`、`test-windows 530→544`，两包各 **+2／+14**；我用"名字里带 `144|146|LiveApprovals|SLO144|Backing`"这把尺在两版日志上各数一遍：`test-core 3→5`、`test-windows 0→14`——**两枚增量与 `=== RUN` 的增量逐包相等**，所以这 16 枚不是漂移，是 144 与 146 新买的钉子，且**全部 PASS**。
+
+  **③ 一枚读数口径坑，趁它还小记下：`staticcheck` 的"枚数"有两个数，别混。** 原始 `##[error]` 行 **49 → 48**，但去重后 **48 → 48**、两向差集 **0/0**——那"少掉的一枚"是基线日志里**同一枚发现被打印了两次**。⇒ 本仓既有那条"同一次失败的两个数（17 枚名字去重 vs 21 条含子项路径）"是同一个形状，**引用 `staticcheck` 积压时一律写"唯一枚数"并带上这把尺**（`#65` 那格仍按 48 枚唯一算）。
+
+  **④ `slo-full` 这一推报了 `success`，但它一个字都没测。** 逐字（`--log --job 108087467038`，拒采窗口 21:18:52→21:19:04）：
+  `NO CONCLUSION (machine-contended) - subset=full refused to sample, no numbers were produced` ／ `machine-contended reason: machine-wide cpu utilisation 66% over a 1s window (>= 50%)` ／ `1 reason(s), 0 state file(s) written, slo-report.json NOT written` ／ `exit 0`。
+  ⇒ 这正是既有条 **"step 层的绿可以等于什么都没测"** 的第四次实发；也意味着 **D32 那两个数（RSS／唤醒）在这一推上没有被求值**——**不许**把这枚绿写成"slo-full 绿＝D32 达标"。
+  ⇒ ⚠ **对照组我也现跑了**：同一条腿在上一推（`108035845419`，10:27Z）是 `precheck ok - no foreign toolchain/runner process...` 之后**逐状态真取样**的（`state Sleeping exit=0 pass=True`）。⇒ **今天这次拒采是新发生的，不是这台机器的常态**，别拿它去支撑"`slo-full` 反正每次都拒采"那句省事的话。
+
+  **⑤ 争用源我定不下，所以两枚候选都摆出来，不写成结论。** 最近的一枚我方的重活是**我在 21:18–21:20 之间派出票 147 那程**（推送完成 21:18:0x，拒采窗口只有 12 秒，正好压在它头上）；另一枚候选是本机桌面/杀软一类我没数的活动。⇒ **我缺的是 21:18:5x 那一刻的进程读数**，没有它就不许写"是我派单造成的"。
+  ⇒ 但**排程这条我现在就能定，且它不依赖归因**：**推送与派写码程不许挤在同一分钟**——`slo-full` 从 run 起到出结论约 3 分钟，本轮实发的形状是"推完不到 60 秒就把写码程放出去了"。往后按"**先派单、再推送**"或"推完等 slo-full 那枚 job 落到终态再派"排。这条是既有条"测量要编队安静"的**编排者版**：以前我只防编队里有人在跑，没防**我自己放单的那一下**。
+
+  `next=`＝①`A262⑤` 那半件**已闭合**（本条①②③），台账里"推后逐名比红名集合"这一动作本轮结清；②票 147 在飞（锚 `80fa0551`，落点 `cmd/wisp/`）；③票 146 的 `-done` 改名我这轮做（现量 5 枚 `[x]`、真未勾 0 枚，两张非实现者表在 `docs/evidence/s1/`）；④票 144 的 `-done` 仍按住（等 147 `AC#3` 那三处 `>` 更正）；⑤`D32` 那条腿**下一推必须读到真取样**才许写达标——若再拒采就连续登记，别攒成"slo-full 反正绿"；⑥票 148 仍 `blocked`（`Q-53`／`Q-54` 等 owner）。
