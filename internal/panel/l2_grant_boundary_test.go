@@ -642,8 +642,10 @@ func TestNoInboundEnvelopeCanBindAnApprovalVerdict(t *testing.T) {
 	if len(findings) > 0 {
 		t.Errorf("the panel's inbound Go boundary has a grant-carrying face:%s", joinFindings(findings))
 	}
-	t.Logf("ComposerRequest binds %d JSON keys %v; 0 verdict-shaped; AST scan of internal/panel: 0 findings",
-		len(keys), sortedKeys(keys))
+	if hits := grantCarryingKeys(keys); len(hits) == 0 && len(findings) == 0 {
+		t.Logf("ComposerRequest binds %d JSON keys %v; 0 verdict-shaped; AST scan of internal/panel: 0 findings",
+			len(keys), sortedKeys(keys))
+	}
 }
 
 // TestGrantVocabularyIsNotSatisfiedByTheRealEnvelopes is the predicate's own

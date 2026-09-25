@@ -15,7 +15,7 @@
 | 被摘的按钮不是死装饰，有完整链路 | **成立** | `git show 53a1359^:frontend/src/components/l2-approval-card.tsx` 现读：`:161-167` 一枚 `bg-accent` Button、`onClick={() => send("grant")}` 在 `:163`；`send` 定义在 `:96-100`，体内 `:98` 调 `requestApprovalResolution(view.correlationId, outcome)` |
 | `panel.ts:169-186` 发 `{method:"panel.approval.request", outcome}` | **成立** | `frontend/src/lib/panel.ts:169-186`，`bridge.postMessage` 在 `:179`，方法字面量在 `:181` |
 | 违反点与合法点只差union成员（`send("grant")` vs `send("refuse")`） | **成立** | 同一文件 `:112`（关闭键）与 `:155`（拒绝键）都是 `send("refuse")`，`:163` 是 `send("grant")` |
-| `ApprovalOutcome` 今天仍导出 `"grant"` | **成立，所以枚举键的检查今天会红** | `frontend/src/lib/panel.ts:50` `export type ApprovalOutcome = "grant" | "refuse";` |
+| `ApprovalOutcome` 今天仍导出 `"grant"` | **成立，所以枚举键的检查今天会红** | `frontend/src/lib/panel.ts:50`：`export type ApprovalOutcome =` 后接 `"grant"` 与 `"refuse"` 两个成员 |
 | `knownComposerMethod` 是入站方法门 | **成立** | `internal/panel/bridge.go:97-103`；被答方法名在 `:35-38`（`MethodModeRequest`/`MethodWorkspaceRequest`/`MethodAttachmentAdd`/`MethodMessageSend`，const 块从 `:34` 开） |
 | `ParseComposerRequest` 无生产调用者 | **成立（派单要我自验的那条）** | 见 §0.1 |
 | 最强仪器在 `:417` 白名单了 `panel.approval.request`、对 `outcome` 字段色盲 | **成立** | `internal/panel/composer_test.go:409-419`（`composerRouteLiterals`，`panel.approval.request` 在 `:417`），测试体在 `:502` |
@@ -124,3 +124,203 @@ distinct=90
   刻意留红。改前改后同枚同名同数，计 2 行 = 1 枚确定性红 x 2 遍。
 - `gofmt -l internal/panel/` -> **空**（本文件在内）。
 - `go vet ./internal/panel/` -> **空**（rc 0；过程中它先抓出我一处 `reflect.StructTag.Get` 误用为双返回值，已改 `Lookup`）。
+
+---
+
+## §3 牙齿：变异读数（两向都必须是真的红）
+
+### §3.1 快照内种植（`TestPlantedGrantWiringGoesRedInASnapshot`，同一台仪器指副本）
+
+快照 = `t.TempDir()/snapshot` 下的 `internal/panel/*.go` 副本；**仓内 Go 源与 frontend/、design/ 一字未写**。
+先跑"未种植的副本必须干净"，脏了就直接 `t.Fatalf`（否则下面每一枚红都不知是种出来的还是本来就在）。
+
+三种植，各验一条，全部在 `-v` 里点名到 `file:line`：
+
+```
+A: bridge.go 的 ComposerRequest 多出 `Outcome string json:"outcome,omitempty"`
+   （锚点行 :69 `Text string ...`，种植后落 :70）
+   -> bridge.go:70: inbound envelope ComposerRequest can bind the JSON key "outcome"
+      - a verdict a page can set, which D33/F2 and R20 keep native-side only:
+        Outcome string `json:"outcome,omitempty"`
+
+B: knownComposerMethod 的 case 追加 "panel.approval.request"（即派单要的"throwaway 入站处理器"的门那一半）
+   -> bridge.go:97: Go answers the inbound route "panel.approval.request",
+      whose own name is an approval decision - a panel-side allow door (AGENTS.md §1.2 ban #6, D33/F2)
+
+C: B 的门 + 一个新文件 grant_handler.go（`type grantThrough struct { Method string json:"method"; Outcome string json:"outcome" }`
+   + handlePanelGrant 直接 json.Unmarshal 信它）——完整的那枚"接了线的送字上门"
+   -> bridge.go:97:（同 B）
+      grant_handler.go:8: inbound envelope grantThrough can bind the JSON key "outcome" ...
+```
+
+种植必须"真咬"，所以每一条红都有对应的反向断言：A 不许顺带把 B 的路由也答了（`findingsName(...,"panel.approval.request")` 必须假），
+B 不许顺带长出字段（否则说明仪器读的不是我给的字节）。
+
+### §3.2 真树变异（把正向断言逼红一次，跑完即恢复）
+
+§3.1 是"仪器对副本报红"。派单还要的是"**你的测试自己会变红并点到那一行**"，
+而生产面（面 2/面 3）读的是真类型，只有改真树才逼得动。做法与后果逐字记录：
+
+1. 改前先把 `internal/panel/bridge.go` 备份到仓外 `D:\tmp\panel-l2-nail-r1\backup\bridge.go.orig`
+   （sha1 `233d7fbb...`，与仓内原件一致后我才动手）。
+2. 两枚变异一次成型（sed 就地、单条命令内完成"变异 -> 跑 -> 恢复"，缩短共享工作树里的窗口）：
+   `ComposerRequest` 加 `Outcome string json:"outcome,omitempty"`，
+   `knownComposerMethod` 的 case 追加 `"panel.approval.request"`。
+3. `go test ./internal/panel/ -count=1 -v`：**我新加的 5 枚测试里 4 枚当场红**，红的都是正主：
+
+```
+--- FAIL: TestAnsweredPanelRoutesCarryNoApprovalDecision (0.00s)
+    Go answers the inbound route "panel.approval.request", whose own name is an approval decision (D33/F2, R20, AGENTS.md §1.2 ban #6)
+    knownComposerMethod answers "panel.approval.request" - an approval decision addressed from the panel
+    Go answers "panel.approval.request" but no Method* constant declares it - a route written straight into the guard, past the naming gate TestComposerMethodNamesMatchFrontend
+--- FAIL: TestNoInboundEnvelopeCanBindAnApprovalVerdict (0.00s)
+    a panel request can carry an approval verdict through 1 field(s); ... AGENTS.md §1.2 bans the shape:
+          ComposerRequest.Outcome binds "outcome"
+    the panel's inbound Go boundary has a grant-carrying face:
+--- FAIL: TestGrantWireShapesAreRefusedAtTheDoor (0.00s)
+    ParseComposerRequest accepted "{\"method\":\"panel.approval.request\",...,\"outcome\":\"grant\"}"
+      (parsed as {Method:panel.approval.request ... Text: Outcome:grant ...}) - a grant request walked through the door D33/F2 keeps shut
+    panel.mode.request: a request arriving with "outcome" comes back out still holding it ... (re-encoded: {"method":"panel.mode.request",...,"outcome":"grant",...})
+    panel.mode.request parsed into a type with a verdict field: [{outcome ComposerRequest.Outcome}]
+    （workspace/attachment/message 三枚同判，共 8 行）
+--- FAIL: TestPlantedGrantWiringGoesRedInASnapshot (0.01s)
+    the snapshot of the real package is already dirty before any planting:
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)     <- 与本件无关，A208③ P1 那枚留红，改前改后都在
+```
+
+   红出来的行数**点到的是真树那一行**（`ComposerRequest.Outcome`、`bridge.go` 的守卫），不是副本；
+   而且第四枚红是**先拒绝继续**（"未种植的副本已经脏"），这条正是我要的行为：脏树上演示出来的红不能算演示。
+   `TestGrantVocabularyIsNotSatisfiedByTheRealEnvelopes` 保持绿——它种在测试自己身上，真树脏不脏都与它无关，这是设计而非漏检。
+
+4. 恢复用备份 `cp` 回来，**没有用 `git checkout`/`reset`/`stash`**（禁用清单 §1.4）。恢复证据：
+
+```
+git hash-object internal/panel/bridge.go  ->  d2cd6362ecc6941a0cee58073a2bf8ab6669a590
+改前记录                                     ->  d2cd6362ecc6941a0cee58073a2bf8ab6669a590   （同值）
+git diff --stat -- internal/panel/bridge.go  ->  （空）
+```
+
+5. 恢复后整包重跑（`-count=2 -v`）回到 §5 的读数，`FAIL=2` 即只有 A208③ 那一枚跑两遍。
+
+## §4 反向读数：本仪器抓不抓得到 53a1359^ 那一枚？——抓不到，且这不是笔者的地界能补的
+
+派单要我把这层"反向"读出来，不许悄悄换成一条会过的判据。现量：
+
+### §4.1 我的仪器对它色盲（自己量，不猜）
+
+种植 D（`TestPlantedGrantWiringGoesRedInASnapshot/D_...`）把 `git show 53a1359^:...l2-approval-card.tsx`
+的 `:161-167` **逐字 7 行**（含 `onClick={() => send("grant")}` 与文案「本次允许」）种进快照，
+Go 侧保持干净，仪器**必须**报 0 才过——它今天就是报 0：
+
+```
+--- PASS: TestPlantedGrantWiringGoesRedInASnapshot/D_the_historical_JSX_button_is_invisible_to_this_instrument
+    ZERO INSTRUMENT COVERAGE, measured not assumed: a tree holding the verbatim 53a1359^ button
+    (send("grant") -> panel.approval.request carrying outcome:"grant") reads CLEAN to this
+    instrument, because it reads Go and the violation is drawn in JSX.
+```
+
+这条子测试的**方向**要说清：它断言的是"我看不到 JSX"，所以将来若有人把仪器扩到 JSX，它会**变红并要求改写本件与 §4.2 的口径**——
+而不是让"扩了射程"这件事静悄悄发生。它不是安全保证，是射程声明。
+
+### §4.2 而且全仓没有任何仪器在看这个形状（这才是"零仪器覆盖"那句的根据）
+
+三发独立现量：
+
+1. **ban #6 的正则与那枚按钮无关**。`tools/d22scan/main.go:149` 是
+   `approvalPanelRe = regexp.MustCompile(`+"`approval\.decide`"+`)`，消费点 `:814`（`panelCheck`）。
+   被摘的那 7 行里**一次都没有** `approval.decide` 这个字串：
+   `git show 53a1359^:frontend/src/components/l2-approval-card.tsx | grep -c 'approval\.decide'` -> **`0`**。
+   包内那份同规矩的复制品 `internal/panel/frontend_hygiene_test.go:73`（`panelDecisionIdentifierRe`）
+   今天同样 0 命中（`grep -rn 'approval\.decide' frontend/src/` -> **0**）。
+   => **"面板侧 L2 允许"曾经真的画出来了，而按名字找它的那道门找的是另一个词。**
+2. **没有任何仪器读 outcome 这个字段**。`grep -rn outcome tools/d22scan/*.go`（非测试）只命中 3 行**注释里的英文散文**
+   （`gitignore.go:102`、`main.go:494`、`main.go:521`），无一处是判据。
+   `grep -rn '"grant"' tools/d22scan/main.go` -> **0**。
+   `grep -rn ApprovalOutcome --include=*.go internal/ tools/` -> 只命中我本件写的注释。
+3. **最强那枚仪器把这条路列进白名单**：`internal/panel/composer_test.go:417` 的
+   `"panel.approval.request": true` 就在 `composerRouteLiterals()`（`:409-419`）里，
+   而 `TestTheRendererHoldsExactlyOneDoorToTheHost`（`:502`）只判"走哪条路 / 是不是字面量 / 路由词表"，
+   对 `outcome` 携带什么完全色盲——与 §0 表最后一行同向。
+
+**登记（本件是唯一登记处，笔者不碰 `docs/reports/pending-and-issues.md`，那不在我地界）**：
+
+> **零仪器覆盖 · UI 侧的 approval-outcome 字段。** 形状 = JSX 里一枚 affordance 把
+> `ApprovalOutcome` 的 grant 成员递进一次合法的 `requestApprovalResolution`
+> （历史实例 `53a1359^:frontend/src/components/l2-approval-card.tsx:161-167`，经 `panel.ts:169-186` 发出
+> `{method:"panel.approval.request", outcome:"grant"}`）。今天**没有任何仪器**会因为它被画出来而变红：
+> ban #6 找的是 `approval.decide` 这个字串（该文件 0 命中），
+> composer 的门只核路由词表且在 `composer_test.go:417` 白名单了这条路，
+> 本件（`l2_grant_boundary_test.go`）刻意只读 Go。
+> 补它需要的两件事都在笔者的地界之外：(a) `frontend/**` 里 outcome 参数位的结构判据
+> ——`AGENTS.md` §1.2 已记明"合法控件都带着'只发起请求'的声明"这个约定在树里**不存在**（台账 A216 ①(b)），
+> 所以那把尺没有一致的命名可站；(b) `tools/d22scan` 若要扩射程是仪器变更，现由另一路 agent 持有。
+> **未定案，不自裁。**
+
+## §5 最终闸门（本件全部落定后重跑）
+
+`internal/panel/bridge.go` 恢复后（hash 对上 `d2cd6362`、`git diff --stat` 空），再跑一遍全套：
+
+```
+go test ./internal/panel/ -count=2 -v
+RUN=180  PASS=100  FAIL=2  SKIP=0  PANIC=0
+distinct=90
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)      x2  （A208③ P1，owner 移走 design/assets/tokens.css，刻意留红）
+```
+
+- 名册差集：`comm -13 base after` = **14 枚新增**（5 顶层 + 9 子测试，逐名见 §2）；
+  `comm -23 base after` = **空**——名册没有缩水。
+- 顶层 PASS 90 -> 100 = 本件 5 枚顶层 x2，无别枚进出。FAIL 2 行 = 同一枚确定性红跑两遍，未修未跳、不属本件。
+- `^panic:` = **0**。本包历史上 panic 会吞掉兄弟读数，所以这一枚单独计数；改前也是 0，两向都无吞读事故。
+- `gofmt -l internal/panel/` -> **空**。`go vet ./internal/panel/` -> **空**。
+- D22 门（唯一受支持的方式 `sh scripts/d22scan.sh`，跑别人地界的只读检查）：
+  `runtests.sh ... PASS=28 FAIL=0 SKIP=0, === RUN=68`，真扫 `d22scan: clean - no D22 ban violations`，
+  `scope ban #8 internal/ examined 407 Go files, comments and _test.go included`——本件那枚新文件在 407 里，
+  且 `grep -c "l2_grant_boundary_test" /tmp/d22.txt` -> **0**（没被点名）。
+  注：我先试 `go run ./tools/d22scan --root .`，它回
+  `main module (github.com/CarlosShao/wisp) does not contain package .../tools/d22scan`——
+  因为 `tools/d22scan` 是独立模块（脚本头注 `:4-8` 就写着这条陷阱），不是我漏了依赖。
+- 我的新文件里非 ASCII 只有 `§`(U+00A7) 与 CJK（`本次允许` 是种植用的 fixture 文本，不是判据）；
+  ban #8 的字符类（U+1F000-1FAFF / U+2200-22FF / U+2600-27BF / U+2B00-2BFF / U+FE0F / U+1F1E6-1F1FF）在盘上
+  对本文件 **0 命中**。
+
+## §6 总判
+
+**钉住了什么（Go 边界，今天可绿）**
+
+1. **被答方法的词表里不许出现审批结论**——被答集由 AST 现读 `knownComposerMethod` 的 switch、经本包 const 解析成字面量，
+   再与运行期 `knownComposerMethod` 逐个互印；加第 5 枚 case 会被读到，把路由直接写进 switch 绕过 const 命名的也会被读到
+   （§3.2 的第 3 行红就是这个判据在叫）。
+2. **入站封套绑不出结论键**——`ComposerRequest`（今天绑 20 个键）及其内嵌/嵌套类型，反射与 AST 各一遍；
+   "入站封套"按结构认定（绑 `method` 键者），不靠类型名。
+3. **行为面**：历史线上形状（含刚被摘那枚发的原文 JSON）被 `ParseComposerRequest` 拒；
+   每一枚被答方法偷渡 `outcome/allowOnce/decision/verdict/approved/grant` 后重新 marshal，值里不再含这些键。
+4. **词表自身的牙齿**：当场种 3 枚带结论字段的类型逼红谓词，并要求 4 枚合法路由不被误伤——
+   两个方向都在一条测试里，谓词既不能退化成匹配 0 个，也不能宽到被放宽。
+
+**牙齿读数**：§3.1 快照三枚种植各自点名到行（`bridge.go:70`、`bridge.go:97`、`grant_handler.go:8`）；
+§3.2 真树变异把 4 枚生产面测试逼红、点的是真树那一行（`ComposerRequest.Outcome binds "outcome"`），
+并按备份 `cp` 恢复（`git hash-object` 前后同值 `d2cd6362…`），全程未用 `checkout`/`reset`/`stash`。
+
+**没覆盖什么（写明，不藏）**：见 §4。UI 侧那枚真正的历史违反**至今零仪器覆盖**，本仪器也不例外（只读 Go）；
+补它要动 `frontend/**` 的结构判据与/或 `tools/d22scan` 的射程，两件都在我地界外，且"合法控件自带声明"这个可站脚
+的约定在树里不存在（A216 ①(b)）⇒ **未定案，不自裁**。
+另两处本件不判：`internal/agent/approval` 的 grant nonce 本身（已有它自己那套测试，且不在我地界）、
+`panel.mode.request` 的 `to=auto_approve` 变宽方向（§1 末段：今天没接线 + ticket-114 变宽闸门已在，
+归 C17 白名单定稿那批）。
+
+**四数与名册**：见 §5——`RUN=180 PASS=100 FAIL=2 SKIP=0`、`panic=0`、`distinct=90`，名册只增不减（+14/0）。
+FAIL 的 2 行不属本件（`A208③` P1 刻意留红）。
+
+**本程没有测什么**：
+- 没跑前端：`npm test`/`vitest`/`tsc`/build 一律未跑（`frontend/**` 不属我地界，且我的检查一个都不需要它）。
+- 没有把仪器扩到 JSX/TS：§4.1 是**声明色盲**，不是补上了色盲。
+- 没有新增/改动任何 SLO 阈值、golden、`thresholds.go`、`tools/d22scan` 判据、allowlist（派单与我地界都不许）。
+- 没有接 `event -> ParseComposerRequest -> handler` 那根线（tickets 33/35 的活，也不是本钉的要求）；
+  §0.1 只测了"今天没接线"。
+- 没有做并发/进程级验证（本件是纯静态+纯函数测试，不拉 goroutine）。
+- `TestC21DesignTokensFourWayAgree` 那枚红未修未跳未放宽，只做了归因（§2/§5）。
+- 没有动 `docs/reports/pending-and-issues.md`：§4.2 那条登记落在本件里，等编排者入台账。
+
+**临时件只建不删**：`D:\tmp\panel-l2-nail-r1\backup\bridge.go.orig`（§3.2 的恢复源）、
+`/tmp/base-v.txt`、`/tmp/after-v.txt`、`/tmp/final-v.txt`、`/tmp/mut-v.txt`、`/tmp/d22.txt`、
+`/tmp/base-roster.txt`、`/tmp/after-roster.txt`、`/tmp/final-roster.txt`。全部保留，未曾 `rm`。
