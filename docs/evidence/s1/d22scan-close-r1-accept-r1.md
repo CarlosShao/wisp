@@ -272,3 +272,243 @@ $ (cd mut/SN3-M1 && go test ... 同一枚台件、M1 代码)
   而**不是**"**当前**任何一棵真树使这味改变门的输出"（后者我今天专门去量了，答案是否）。
   ⇒ **留在判断里的那一块不是零，但也不是这张表**：它是"这一类会不会再长第三枚"的预报。
   这句要如实写回 `A221②`。
+
+---
+
+## 2. 那枚夹具到底是不是合成的（题面格 1）
+
+`TestFullTrackedListCoversWhatTheNarrowListCannot` 的断言里点名了 `frontend/weird/inside.tsx` 与 `.gitignore`。
+`frontend/**` 属另一位的地界，测试运行**绝不能**往那里写。我逐层查机制，再查盘。
+
+**机制层**（每一层都在 HEAD 的文件上现读到）：
+
+| 环节 | 现量 | 结论 |
+|---|---|---|
+| 树从哪来 | `liveFixture`（`scan_test.go:723-741`）第一行就是 `root := t.TempDir()` | 临时目录，不是仓库 |
+| 谁写文件 | `seedFile(t, root, rel, content)`（`:15-24`）＝ `filepath.Join(root, rel)` ＋ `MkdirAll` ＋ `WriteFile` | 只能写在 root 之下 |
+| 新测试内部 | `sed -n '1541,1641p' scan_test.go` 里 `grep -nE 'filepath.Abs｜os.Getwd｜"\\.\\./"｜os.Chdir｜WriteFile｜Remove'` ⇒ **空输出** | 没有一处绕过 root |
+| git 台件 | `gitIndexFixture`（`:1411-1415`）＝ `git init -q -b main` ＋ `git add -A`，cwd＝root；`gitForceAdd`（`:1421`）＝ `git add -f --` | 建的是**临时目录自己的仓库** |
+| 扫描入口 | `scanFixture(t, root)`（`:743`）＝ `scanWithStats(root)`，root 一直是那枚临时根 | 没有第二棵树 |
+| `t.TempDir()` 落在哪 | 我用一枚极小的 Go 程序问 `os.TempDir()`：`C:\Users\swq\AppData\Local\Temp` | **在仓库外**，且不在任何 `.git` 之下 |
+
+**helper 是否新造**（交件件 §1.2 的自陈）：`git show <ref>:tools/d22scan/scan_test.go | grep -c '^func '` ⇒
+`304aeec^` **51** ／ `HEAD` **52**，＋1 恰是那枚新测试本身 ⇒ **包级 helper 一枚没新增**，复现成立。
+"形状照抄上一枚测试的同名局部 `seed`"也对：`grep -n "seed := func"` ⇒ `:1440`（`TestTrackedPathsAreNeverSkippedByTheIgnoreFilter` 内部）
+＋ `:1569`（新测试内部），两枚都是函数内闭包。
+
+**盘上层**（题面要的前后对照）：见 §0.4 —— 整道门（含 step 1 那一遍全量测试）跑完，
+`git status --porcelain` 20 行 → 20 行、`diff` 空。我再单独按路径问一次：
+
+```
+$ git status --porcelain -- frontend .gitignore design
+ （design 那 16 枚 D ＋ 4 枚 ?? ——全是 owner 自己的）
+$ git ls-files --others --exclude-standard -- frontend
+ （空）
+```
+
+⇒ **判：夹具是合成的，`frontend/**` 与根 `.gitignore` 一字节未写，真树零残渣。**
+补一条我自己造的场景（交件件把它列在"没测"里）：见 §7.3，把 `TMPDIR` 指进"别人的仓库"里跑一遍——
+结论是这一支**结构上打不开**（台件自己 `git init`，`rev-parse --show-prefix` 在任何临时根都返回空），
+所以那条"没测"其实可以划掉。
+
+---
+
+## 3. `.gitignore` 那枚空白种子（题面格 2）
+
+### 3.1 我自己在仓库外复现了 git 的三个读数（`probe\seed1`，逐字照 §1.1 的台件建，git 2.52.0.windows.1）
+
+```
+$ git ls-files
+.gitignore cmd/wisp/main.go design/index.html frontend/.gitignore frontend/dist/tracked-or-not.tsx
+frontend/src/panel.tsx frontend/weird/inside.tsx go.mod internal/ok/ok.go internal/tools/ok.go tools/d22scan/allowlist.txt
+                                        <- 11 枚，含 frontend/weird/inside.tsx（普通 git add -A 就追踪）
+$ git ls-files -i -c --exclude-standard
+frontend/dist/tracked-or-not.tsx        <- 只此一枚
+$ git check-ignore -v frontend/weird/inside.tsx ; echo rc=$?
+rc=1                                    <- git 明说"我没忽略它"
+$ cat -A frontend/.gitignore
+dist/*$
+!dist/.gitkeep$
+  weird/*$                              <- 行首两枚空格，没有被 $ 前的任何 CR 混淆
+```
+
+⇒ 交件件 §1.3 那三行读数**逐字复现**（它那张表的枚数是一棵 4 枚的最小树，见 §5.2，关系同、枚数不同）。
+"两枚前导空格的规则不被 git 匹配、但把空白削掉之后就成了我们匹配器的一条真规则"——**这一形在真 git 上成立**。
+
+### 3.2 ubuntu 上的 git 会不会同意（题面点名要我推一下）
+
+不是我猜：这台机上的 git 自带文档（`gitignore(5)`，PATTERN FORMAT 一节，
+`C:\Users\swq\.qoder-cn\bin\git\mingw64\share\doc\git-doc\gitignore.html`）逐字是：
+
+> A blank line matches no files, so it can serve as a separator for readability.
+> A line starting with # serves as a comment. …
+> **Trailing spaces are ignored unless they are quoted with backslash ("\").**
+> An optional prefix "!" which negates the pattern; …
+> It is not possible to re-include a file if a parent directory of that file is excluded.
+
+⇒ 三点：①规范只把**行尾**空白列为被忽略，**行首**空白不在这条清单里 ⇒ 它是模式数据；
+②这一节自 git 1.8.2 起就是这个形状（"trailing spaces are ignored"从未反向过），
+ubuntu-latest 无论 22.04（git 2.34）还是 24.04（git 2.43）都带着同一节 ⇒ **跨平台同意是可依赖的，不是运气**；
+③同一节那句"parent directory 被排除时不能重新包含"倒是**我们主动偏离 git** 的一支——
+我们的 `match()`（`gitignore.go:504-538`）从最深一层规则文件先答，`weird/` ＋ `!weird/inside.tsx` 会答"未忽略"，
+git 答"已排除"。**方向＝多扫**（§1.4 那 431 形里 `neg-dir-then-file` 落在 agree，因为强制追踪后 `-i -c` 也没举它），
+和 `gitignore.go:97-102` 那段自陈的"UNSUPPORTED ON PURPOSE … 只能让我们少跳"是同一族。
+
+### 3.3 那枚"整串等值"断言稳不稳、塌的时候响不响
+
+断言在 `scan_test.go:1591-1595`：`git ls-files -i -c --exclude-standard` 去空白后必须 **恰好等于**
+`frontend/dist/tracked-or-not.tsx`，塌了是 `t.Fatalf` 且消息把两种塌法分开解释。
+
+- **它比前提需要的更严**：前提只要求"weird 那枚不在里面"。所以任何一次 git 升级只要多报一枚**无关**的受追踪件，
+  这条就会红——**代价是维护性（false alarm），不是牙齿**。它换来的是"0 读数自带正控"（dist 那枚必须在，否则就是仪器没在看这棵树），
+  这个交换我认为是对的，符合本仓"0 命中必须配已知正控"的规矩。
+- **塌得响不响，我量了**：把种子里那两枚前导空格删掉（＝git 开始真的匹配），交付态与 M1 态**都红**，
+  且红在前提句上、消息点名原因（读数见 §1.7）。⇒ **fail-closed**，不会静默把"前提变了"读成"通过"。
+- **另一支我也确认了**：`:1629-1631` 的第三枚 `t.Fatal` 在"窄清单也开始举这枚件"时点名"换形状"。
+  两支合起来＝这条台件一旦不再钉住全量腿，**没有一条路能安静走过去**。
+
+⇒ **判：那枚空白种子是真形、跨平台有文档依据、等值断言稳定度换成正控收益且塌时响亮。附条件：无。**
+
+---
+
+## 4. 行号与引用完整性（题面格 3）——**本件唯一判退回的一格，两枚都是注释级**
+
+节内编号说明：题面把 8 枚格子列在 §2..§8、总裁列在 §9；我按"生死格＝§1、题面 8 格＝§2..§9"排，
+所以题面的格 3 落在本件 §4、格 4 落在 §5，总裁在 §10、没测在 §11、给人看在 §12。
+
+### 4.1 逐枚现量（全部在 HEAD `310816f`，另附漂移史）
+
+| 引用（谁写的） | 声称指着什么 | 我量到的 | 判 |
+|---|---|---|---|
+| `gitignore.go:11` → `.gitignore:22` | 根 `.gitignore` 第 22 行＝`frontend/dist/*` | `sed -n '20,26p' .gitignore` ⇒ 22=`frontend/dist/*`、24=`assets/web/dist/` | ✅ 改对了（旧文 `:24` 指的确实是另一条规则） |
+| `gitignore.go:11` → `frontend/.gitignore:12` | `dist/*` | 现量 12=`dist/*` | ✅ 未动且同值 |
+| `gitignore.go:103-119`（新文） | 两支并列＋末行不声称穷尽 | 现读 103-119 正是新文，119 行＝`// This is a list of the shapes seen so far, not a claim that there are no others.` | ✅ |
+| 旧 `:103-105` | 被换掉的那三行 | `git diff b7c06d2^..b7c06d2` 的 hunk 头 `@@ -100,9 +100,23 @@`，删的三行正是"The one shape that could make it skip MORE than git - not being able to reach the index at all - …" | ✅ 交件件"行号没漂"那句成立（在它落地那一刻） |
+| `gitignore.go:180-194`（新文） | `-i -c` 那位的真理由 | 块起 180 ✓，但**被改的行是 183-194**，180-182 是三行未动的命令表 | ⚠ 松一格（块起点对、范围含未改行）；旧号同理：hunk `@@ -166,9 +180,18 @@`，实删的是旧 168-170，件里写"原 :166-171" |
+| `gitignore.go:448` | `note()` 点名路径那一行 | 现量 447-450 是第三条 self-report，448 就是那句 `lines = append(... "TRACKED and matching an ignore rule" ...)` | ✅ |
+| `gitignore.go:580`（M4a 落点） | `TrimRight(raw," \t\r")` | 现量 580 逐字是它 | ✅ |
+| `gitignore.go:248`（M1 落点，§1.4 与台账 `A223③` 用的是这枚） | `parseIndexPaths(all)` | 现量 248 逐字是它 | ✅ |
+| `gitignore.go:301 / :302 / :324 / :252` | `parseIndexPaths` 定义／它调 `parseIndexPathsList`／后者定义／窄清单调同一枚 | 301=`func parseIndexPaths(`、302=`list, err := parseIndexPathsList(z)`、324=`func parseIndexPathsList(`、252=`ignored, err := parseIndexPathsList(withIndex)` | ✅ 四枚全对 |
+| 新测试内部 `:1568/:1591/:1596/:1606/:1609/:1619/:1626/:1629/:1632/:1633`、语义测试 `:1787` | 各自行上的那枚断言 | 逐枚现读同值；`:1787` 正是 `t.Errorf("decide(%q, isDir=%v) …")`，其 `lead/inside.txt` / `"  lead/inside.txt"` 两支在 1782-1783 | ✅ 11 枚全对 |
+| 交件件 §1.1 说新测试＝`scan_test.go:1541-1640` | 那一枚测试的范围 | `git diff --unified=0 304aeec^..304aeec` ⇒ **只有一个 hunk `@@ -1540,0 +1541,101 @@`** ⇒ 实占 1541-1641（末行是分隔空行） | ⚠ 差一枚尾行，无实质影响；顺证：**101 行全在这一段里，没有任何夹带的第四处改动** |
+
+### 4.2 退回枚 ①：新测试的注释里那枚 `gitignore.go:225` **在本批内部漂掉了**
+
+`scan_test.go:1547` 写的是"removing it (parseIndexPaths(all) -> parseIndexPaths(withIndex), **gitignore.go:225**)"。
+五锚现量：
+
+```
+ca84b75    call@225   line225=[	tracked, dirs, err := parseIndexPaths(all)]
+43a6043    call@225   line225=[	tracked, dirs, err := parseIndexPaths(all)]
+304aeec^   call@225   line225=[	tracked, dirs, err := parseIndexPaths(all)]
+b7c06d2    call@248   line225=[func runGitIndex(root string) *gitIndexState {]
+HEAD       call@248   line225=[func runGitIndex(root string) *gitIndexState {]
+```
+
+⇒ 这枚号**写下那一刻是对的**（`304aeec` 时 gitignore.go 还没动），
+被**同一批的第二枚 commit `b7c06d2`**（＋23 行注释，全在该调用之上）漂到 248——
+`225 + 14（②那一支）+ 9（③那一段）= 248` 我按 hunk 头算过，对得上。
+而**同一批的证据件 §1.4 与台账 `A223③` 用的是 248** ⇒ 一批之内的两份文件对同一枚变异给了两个号，
+码里那枚是过期的。今天 `:225` 落在 `runGitIndex` 的函数声明行（同一个函数、不是那句调用）。
+**为什么这在本仓算一格而不是笔误**：条件②整枚条件就是"自我描述的注释不许过保"，
+上一程 panel 那批也因 `:604` 指着一枚不存在的测试被判退回；本枚是同一族（号漂了、内容还找得回）。
+**最小修法（点名，不动手）**：`scan_test.go:1547` 里把号改成 `gitignore.go:248`，
+或按我这轮的教训**干脆不写裸行号**、改写"`runGitIndex` 里 `parseIndexPaths(all)` 那一句"——
+这批自己已经演示了行号在一枚 commit 之内就会烂。
+
+### 4.3 退回枚 ②（轻）：`3bb99aa` 那笔归属错了
+
+交件件 §2 末段："`scan_test.go:1179` 与 `:1194` 里还有两句 'the one shape …' 式措辞，
+属**上一批**（`3bb99aa`）写的注释"。现量：
+
+```
+$ git blame -L 1179,1179 -L 1194,1194 --porcelain tools/d22scan/scan_test.go
+ca84b75  1179  1179  1     summary: fix(d22scan,A214/F1): skip() 改问 git index ...
+ca84b75  1194  1194  1
+```
+
+⇒ 两句都是 **`ca84b75`**（＝被上一份验收裁的那一批）写的，不是 `3bb99aa`（再上一批），错了一代。
+内容旁证也对：那两句讲的是"A214/F1 EXTENDS THAT DUTY TO THE INDEX, IN THE SAME COMMIT AS THE CODE"，
+`ca84b75` 才是"同批改副本"那一枚。
+**它真正的那句话（不在验收点名的三件之内、本件一字未动）我核过＝成立**（`:1179`/`:1194` 在 `git diff` 里没出现）。
+⇒ 记**登记性缺陷**：把别人的账记到第三个人头上，会直接影响下一程"该谁修"的分派。
+
+### 4.4 另两枚没到退回、但必须留名的数
+
+1. **`§1.4` 的"首轮量在 :245"在任何一枚已提交锚点上都复现不出来**（提交态只有 225 与 248 两个号）。
+   它必然是某一刻工作树的号 ⇒ 与本仓"`归因腐坏`"那族同形（一个数没带它是在哪棵/哪一刻量的）。
+2. **`§3.1` 那张表的枚数（full=4、narrow=1、`comm -23` 三行）是一棵 4 枚的最小树**，
+   不是交付测试那棵 `liveFixture` 树。我在**照 §1.1 逐字重建的 11 枚树**上重量（见 §5.1）：
+   full=11、narrow=1、`comm -23`＝10 行。**关系两遍同向**（子集为空／反向非空），但**枚数不可复算**——
+   下一位若想复算 §3.1 那三行，得先知道那是一棵最小树而不是台件那棵。
+
+### 4.5 判
+
+**这一枚格子＝退回（措辞级，两枚具名：`scan_test.go:1547` 的 `:225`、交件件 §2 末段的 `3bb99aa`）。**
+其余 20 余枚 `file:line` 引用**逐枚现量同值**（含 §4.1 那 11 枚测试行号与 4 枚解析器行号），
+两枚新写的散文段整体**没有虚高**（判据见 §5.4）；上面 4.4 两枚是登记性提醒，不绑修。
+**本件没有一处是我"读着像对"就放过的**：每枚号我都落到行上看了一遍。
+
+---
+
+## 5. 子集／并集那次重导（题面格 4）
+
+### 5.1 我自己重跑了一遍，两把尺各一枚（`probe\seed1`＝§3.1 那棵 11 枚树）
+
+```
+$ git ls-files -z | tr '\0' '\n' | sort > full.lst        # full=11
+$ git ls-files -i -c --exclude-standard | sort > narrow.lst  # narrow=1
+$ comm -13 full.lst narrow.lst
+（空）                                    <- 窄 ⊆ 全，一枚新的都带不进来
+$ comm -23 full.lst narrow.lst | tee c23.txt
+.gitignore / cmd/wisp/main.go / design/index.html / frontend/.gitignore / frontend/src/panel.tsx
+frontend/weird/inside.tsx / go.mod / internal/ok/ok.go / internal/tools/ok.go / tools/d22scan/allowlist.txt
+count=10                                  <- 反方向正控非空（两清单不等价）
+```
+
+⇒ 交件件 §3.1 那对的**方向**复现成立（空／非空各一枚），枚数按 4.4-2 那笔账换成我这棵树的数。
+
+### 5.2 "共用一枚解析器"这条理由，是把子集说成免费的还是把它钉住的
+
+两问要拆开：
+- **子集关系本身**是 **git 的语义**（`-i -c` 举的是"受追踪 ∧ 撞规则"），跟我们的解析器无关 ⇒
+  在**静止的索引**上它确实近乎免费。我在注释里看到 `:302` 与 `:252` 都叫同一枚 `parseIndexPathsList`（现量在 §4.1），
+  这条的作用**不是**证子集，而是**把原句那句"so one command's parsing bug cannot blind the other"打死**——
+  同一个解析器 ⇒ 一次解析 bug 同打两枚，两枚从来不是彼此的后盾。**这一步是承重的**：
+  被换掉的那句如果留着，就是一个假的安全属性（"两路互为备份"），下一程会照着它省掉一路。
+- 所以我的判是：**"子集"这一腿近乎免费，"共用解析器 ⇒ 原来那句不成立"这一腿承重**，
+  而它俩被写进同一段注释里，各自都对着。这段注释**没有**把免费的当昂贵的吹（它只说 "not a second opinion inside holds()"），
+  也没把昂贵的当免费的略。
+
+### 5.3 但我量出这句新注释**说过头了一格**：那两枚读不是原子的
+
+`runGitIndex` 是**两次独立 spawn**：`:240` 读 `ls-files -z`，`:244` 读 `ls-files -z -i -c`。
+中间若有一枚 commit 落地，窄清单就能含一枚全量清单没见过的路径 ⇒ **`its output is strictly a subset of ls-files -z`
+这句无条件的话在 wire 层面不保证**。我在仓库外把这枚态**白盒造出来量了**（`fuzz\zz_race_probe_test.go`，
+手写一枚 `gitIndexState{ok:true, tracked:{}, dirs:{}, ignored:{file:true}}` 塞进 matcher）：
+
+```
+$ go test -count=1 -v -run TestProbeRaceDirLeg .
+    holds(file,false)=true holds(dir,true)=false
+    raced: file NOT skipped (holds() consults ignored for files) - safe
+    raced: DIRECTORY pruned -> holds(dir,true) reads only dirs, which the narrow list never feeds
+--- PASS
+```
+
+⇒ 分两支：**文件支仍安全**（`holds()` 文件位读 `tracked || ignored`，窄清单能兜住）；
+**目录支不兜**（`holds(:211-213)` 目录位只看 `dirs`，而 `dirs` 只由全量喂）⇒ 那一枚竞态下整目录被 `SkipDir`，
+窄清单明明知道里面有受追踪件也救不回来，方向＝**少扫**（危险那一侧，`gitignore.go:103` 自己定义的那一侧）。
+同一枚竞态还捎上下一句："`Nothing in a skip decision comes from this list that did not already come from the guard`"——
+静止索引上对，竞态下那枚文件位就是"从这张清单多出来的"（且是好事）。
+
+**这条不是本批造的行为**：两枚 spawn 是 `ca84b75` 的形状，交件件 §6-4 也明写了"并发 commit 中途读 index 的一致性"没测。
+**本批写的是那句无条件的话**。按这批自己立的尺（`:119` "a list of the shapes seen so far, not a claim there are no others"），
+`:186-188` 那两句缺同一枚限定。⇒ **最小修法（点名，不动手）**：把那两句加上"on a quiescent index"
+／或改说"between the two reads nothing may commit"。**我没有**把这枚竞态在真 git 上跑出来（见 §11），
+所以它是"码上可查＋白盒已造态"级，不是"端到端复现"级。
+
+### 5.4 判
+
+**附条件成立**：重导方向真、两把尺各一枚、"共用解析器"那一步确实在打死一句假担保（承重）；
+两处 `strictly a subset` / `nothing … that did not already come from the guard` 的措辞过头（§5.3），
+与本批被判的两枚行号账同属注释级，一起修一程即可。
