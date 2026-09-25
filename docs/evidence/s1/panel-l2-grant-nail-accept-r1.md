@@ -495,3 +495,17 @@ M6/M7 各只打掉另一面；M13 是**两条同时用**，正好落在两面各
 **你需要做什么**：三句话——①那道题（`Q-49`）先别划掉，我已在 §7 列了补强的三件事，都只动 Go 侧那一格、
 不碰前端也不碰扫描器；②要不要派一程去补那三件事，你点个头就行；③全程没人动过你的任何文件，
 所有试验都还原了（每次还原我都对了指纹），也没有推送。
+
+---
+
+## §10 交件态（10:2x，HEAD `479c06b`）
+
+- 本件 4 枚单路径 commit：`888bbd5`(§0-§1) → `086d05a`(§2-§3) → `2f2b221`(§3.4-§5) → `479c06b`(§6-§9)。
+  逐枚 `git show --name-only` **只含本件一枚路径**；每次 commit 前的 `git diff --cached --name-only`
+  全程未出现别家条目（与 `A220④(a)` 那条升格后的规矩一致）。
+- 变异还原终核（三枚被改过的文件，`git hash-object` vs `HEAD:` 同值）：
+  `bridge.go d2cd6362…`、`composer_test.go ecfd0f7a…`、`l2_grant_boundary_test.go 5b618d14…` **三对三同值**；
+  `git status --porcelain` 整树只剩 owner 那 16 枚 `design/**` 未提交移动（我一个字未动、不还原、不提交、不删）。
+- 交件态在 HEAD 上重跑 `go test ./internal/panel/ -count=1 -v` ⇒ **唯一红仍是 `TestC21DesignTokensFourWayAgree`**
+  （`A208③` P1 留红，非本批），包体 `FAIL github.com/CarlosShao/wisp/internal/panel`，**panic 0**。
+- 未推送（子代理只 commit）。台账 `A22x` 由编排者派号，本件是它的证据源。
