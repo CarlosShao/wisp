@@ -81,3 +81,86 @@ git hash-object …/headcopy/internal/panel/bridge.go                 -> d2cd636
 ```
 （本程全部 12 发变异／复算结束时）git status --porcelain -- internal/panel/  -> 空
 ```
+
+---
+
+## §1 攻点 1：这枚新测试自己会不会静默空转 —— **部分会，且我造出了两形；判入账不判退回**
+
+被验体（交付版 `121006d`，本程现读）：`grantRouteWords` `:162`（11 枚词）· `grantRoutePrefixes` `:1239`（8 枚）·
+`grantRouteSuffixes` `:1247`（3 枚：`""`/`.request`/`.now`）· helper `knownComposerRefusesAssembledGrantNames`
+`:1255`，体内两枚 `t.Fatalf`：`:1257` 词表空控、`:1264` 死守卫反空转控；测试本体 `:1307`。
+下面每一发都是**我的仓外副本**（`git archive a5e1c8c` ＋ §0.2 的 `.html` 归一化，钉 = `9fd6defb…`）现跑
+`go test ./internal/panel/ -count=1`，脚本 `scripts/mut.py`（锚点计数＝1 才落盘，落盘后打印 `delta_lines`）。
+
+### §1.1 ⓐ "asked=0 还报绿"这一格：**前两枚清单有牙，第三枚没有**
+
+| 发 | 我只改哪一行 | 本测试 | 全包红名（-count=1） | 原始件 |
+|---|---|---|---|---|
+| V2 | `grantRouteWords` → `[]string{}` | **红**，`:1305`（＝调用点，helper 的 `t.Helper()` 生效）| 3 枚：`TestRealGuardRefuses…` ＋ `TestGrantVocabularyIsNotSatisfiedByTheRealEnvelopes` ＋ `TestPlantedGrantWiringGoesRedInASnapshot` | `out/V2-words-empty.txt`、`out/FULL-V2-words-empty.txt` |
+| V3 | `grantRoutePrefixes` → `[]string{}` | **红**，同一句 `the sweep vocabulary is empty (grantRouteWords=11, grantRoutePrefixes=0)` | — | `out/V3-prefix-empty.txt` |
+| **V1** | **`grantRouteSuffixes` → `[]string{}`** | **绿**，日志 `asked=0 assembled route names, answeredByRealGuard=0, hits=[]` | **0 枚** | `out/V1-suffix-empty.txt`、`out/FULL-V1-suffix-empty.txt` |
+| V4 | 复数那一圈 `[]string{w, w+"s"}` → `[]string{w}` | 绿，`asked=264` | 0 枚 | `out/V4-no-plural.txt` |
+| V5 | 问守卫那一句改成 `if false && knownComposerMethod(name)` | 绿，`asked=528 hits=[]`——**与干净树同一枚读数** | 0 枚 | `out/V5-guard-stubbed.txt` |
+| V8 | `hits = append(…)` 那一支短路 | 绿，`asked=528` | 0 枚 | `out/V8-assert-false.txt` |
+
+⇒ **简报那句"asked=0 还报绿＝尺不存在"在这一格成立**：`:1257` 那枚反空转控逐字只写了
+`len(grantRouteWords) == 0 || len(grantRoutePrefixes) == 0`，**乘积的第三枚因子没人问**，
+所以把 `grantRouteSuffixes` 掏空 ⇒ 这枚测试照问 0 枚、照报绿，且**全包没有任何别的测试变红**
+（现量：`grantRouteSuffixes` 在包内的代码引用只有 `:1273` 那一处 `range`，其余全是注释）。
+V4/V5/V8 是同一族的更广义形状：`asked=` 那行只统计"循环走了多少趟"，没有任何断言把它钉在
+`len(prefixes)×len(words)×len(suffixes)×2` 上，所以分母减半、甚至把守卫那一问短路掉，
+报出来的都还是同一句"asked=528 / hits=\[\]"。**V5/V8 我不记入账**——那是"任何断言都能被 `if false` 短路"
+这一类，任何 Go 测试都治不了；**V1 记入账**，因为它不是短路而是**它自己那枚防呆少写了一枚变量**，
+而同一枚 helper 里另外两枚因子已经被防住了（形状就摆在自己三行之上）。
+
+### §1.2 ⓐ 追加大获：词表**内容**只剩 4/11 枚有人质，删掉第 5 枚就放走 M16
+
+`TestGrantVocabularyIsNotSatisfiedByTheRealEnvelopes` `:1400` 用的是"逐枚点名几枚路由名，它们必须仍然读成批准门"
+这一招——这正是本仓对付"词表被人悄悄改窄"的既有武器。本程按枚复算它到底覆盖了几枚词
+（`scripts/routevocab.py`，只重排 `var grantRouteWords` 那一块，一次删一枚）：
+
+| 删掉的词 | 全包读数 | 判 |
+|---|---|---|
+| `allow` | **红 1 枚**：`TestGrantVocabularyIsNotSatisfiedByTheRealEnvelopes`（`:1402` 那句 "reads as an innocent name"）| 有人质 |
+| `approval` / `decide` / `grant` | 同一枚证人测试点名这四枚路由（`panel.approval.request` / `panel.l2.allow` / `approval.decide` / `panel.grant`）| 有人质（`allow` 那发＝现量，其余三枚＝同一圈代码，未逐枚打） |
+| **`ratify`** | **0 枚红**；再叠上**被验物自己那发 M16**（生产码运行期拼 `panel.review.ratify` 并被守卫回答）⇒ **全包 53 枚顶层全绿、`asked=480 hits=[]`** | **没人质** |
+| `permit` / `verdict` / `approve` / `authorised` | 各 0 枚红 | 没人质（现量四枚）；`authorize` / `decision` 同形状**未逐枚打＝推定** |
+
+原始件：`out/RV-ratify-M16.txt`（那一发既是"删词"又是"M16"，是全包绿的那一发）、`out/RV-allow.txt`、
+`out/RV-permit.txt`、`out/RV-verdict.txt`、`out/RV-approve.txt`、`out/RV-authorised.txt`。
+
+⇒ **实现件 §2.2 那行 T-D（"抓得住 M16"）在交付态成立，但它承重的不只是那三行代码，还承着 11 枚词一枚都不能少；
+而"少一枚"这件事今天只有 4 枚词有人质。** 记入账（F-ACC-2），最小闭合在 §9。
+⚠ 这不是"退回"：删词是**编辑这把尺自己**，被验物从头到尾没声称它防得住人把词表改窄（`:91` 那句
+"widening them is a slice card rather than a quiet edit here" 说的正是这一族的处置权），
+而**生产码形状**（M14/M16 那两发）在交付态确实被抓得住——那是 §3 的独立复算，不是我推的。
+
+### §1.3 ⓑ 那两枚锚点／长度守卫是不是真在——我把它自己的摘除逻辑接过来打台件
+
+我端口径复用它的 `plant.py nail standing`（同样两枚锚点、同样"切完函数名不许还在"、同样打印
+`delta_lines`），然后**故意把台件弄坏**看它拒不拒（原始件 `out/`，读数在下面这段里逐字贴）：
+
+```
+P1 backup 里那枚起始锚点出现两次  -> rc=1  removal: anchor count=2 expected 1        ← 拒
+P2 backup 里收尾锚点被改写（计数 0）-> rc=1  removal: anchor count=0 expected 1        ← 拒
+P4 backup 里只少一枚闭括号          -> rc=1  removal: anchor count=0 expected 1        ← 拒
+P3 backup 里函数被改名、锚点完好     -> rc=0  removal: delta_lines=-32, textual mentions left=5   ← 不拒
+```
+
+⇒ "零变化即拒绝报告"那句**是真的**（三发坏台件全被 `anchor count` 挡下，报的是退出码 1 而不是"-32"）。
+**P3 那一形它挡不住，而它本来也不声称挡**：守卫验的是"我这刀落下去了"，不是"那枚禁令还活着"。
+另——它的脚本是**从 `backup/` 整枚重写副本**的，所以 §2.4 那次 row U 的自曝（"plantf 塞回去的三行被
+nail standing 又抹掉，那一发实测等同 T-E"）**在这台机器上是机械必然**，我复算了它的写文件路径
+（`open(NAIL_OUT).write(from_backup.replace(…))`）才敢这样判；那一发自曝本身是加分不是减分。
+
+### §1.4 ⓒ 词表被清空／被改名，有没有**另一枚**测试变红
+
+| 形状 | 现量 | 判 |
+|---|---|---|
+| `grantRouteWords` 清空 | 全包 **3 枚红**（本测试 ＋ §1.1 那两枚）| **不是"存活由它自己守"**，这一格它说得过去 |
+| `grantRouteWords` 枚数 11→10（删 `ratify`） | 全包 **0 枚红**（§1.2） | **只有它自己守，而它自己没守** |
+| `grantRouteWords` 整体改名（18 处一起改） | `ok github.com/CarlosShao/wisp/internal/panel`（**rc=0，包全绿**）| 改名＝无害重构，不构成空转；**真正可乘的是删内容** |
+| `grantRouteSuffixes` 清空 | 全包 **0 枚红**（§1.1 V1） | **只有它自己守，而它自己没守** |
+
+⇒ 简报那句"点名'这把尺的存活由它自己守'是不是够"——我的裁法：**枚数级不够、清单级不够、清空级（两枚因子）够**。
+补齐只需要两行，见 §9 的 F-ACC-1／F-ACC-2。
