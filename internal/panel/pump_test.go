@@ -47,12 +47,16 @@ func TestThePumpBuildsThePacketFromWhatTheHostHolds(t *testing.T) {
 		},
 		Mode: func() risk.Mode { return risk.ModeAskHighRisk },
 		Workspace: func() WorkspaceView {
-			return WorkspaceView{Set: true, Spelling: "D:\\work\\Wisp", Canonical: `D:\work\Wisp`,
-				Reason: "已收窄到该工作区：范围外的路径按 R2 判定"}
+			return WorkspaceView{
+				Set: true, Spelling: "D:\\work\\Wisp", Canonical: `D:\work\Wisp`,
+				Reason: "已收窄到该工作区：范围外的路径按 R2 判定",
+			}
 		},
 		Results: func() []ResultChunk {
-			return []ResultChunk{{CorrelationID: "task-1", Text: "前半", Done: false},
-				{CorrelationID: "task-1", Text: "后半", Done: true}}
+			return []ResultChunk{
+				{CorrelationID: "task-1", Text: "前半", Done: false},
+				{CorrelationID: "task-1", Text: "后半", Done: true},
+			}
 		},
 		AttachmentMax: 1234,
 		Now:           fixedClock(time.Date(2026, 9, 25, 12, 0, 0, 0, time.UTC)),
