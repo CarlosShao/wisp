@@ -447,3 +447,5 @@ sh scripts/d22scan.sh                    -> rc=0（out/d22scan-delivered.txt，�
 错的是我第一版的子串推演（`approve` 不在 `approval` 里），它不构成对简报的复算不符。
 已提交的行为不改写，读法以本节为准：**简报五枚前提里，四枚成立、一枚（C21 枚数）不成立。**
 其余读数（`88eab34`、`:1257`/`:1400` 两处定位、16 枚 design 删除、`asked=528`、独立 module）全部成立。
+
+> 【F-R4-3 追加一行·r5 那一批·§8 原句一字未抹、位置未动】§8 那份"没测什么"少列一形：它列了 `ask-stub` 那一形与"协同编辑＝词表与其证人册同删"，**未列另两枚因子清单自己可被剪窄**——`grantRoutePrefixes`／`grantRouteSuffixes` 各删任意一枚（8→7 前缀、3→2 后缀）时全包全绿（该程现量 `asked=462`／`asked=352`），于是同一枚生产码形状只要落在被剪掉的那一截上就无人响；出处＝`panel-l2-grant-nail-fix-r4-accept-r1.md` §11（账 F-R4-2），修法与逐枚现量见 `panel-l2-grant-nail-fix-r5.md` §1、§2。
