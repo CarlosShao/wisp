@@ -1475,3 +1475,43 @@ demo 那十屏的正身是 `design/doubao/demo/screens/*.js` 现量 **10 枚文�
 票 143 那条命令我没有、也不该自己造。⇒ 按 §10「队列空了怎么办」那条写这一行，**不造活**：
 
 **队列空，等编排者／owner。**（15:2x，交件 commit `ce1b74b`；本会话下一枚 commit 只可能来自他两者的字。）
+
+---
+
+## 56. owner 在场后带回的三条（15:3x）：① `F2` 的堵点已经自己通了（现量）② 真机今天打不开面板 ③ `F6` 那句他答了
+
+### 56.1 `F2`：不用等任何人给命令了——票 143 那条命令今天**真能打出 R4 卡**，我打出来了
+
+§55 那句"队列空"里我把 `F2` 记成"堵在编排者那条命令上"，**这句现在要更正**：命令早就在盘上
+（`cmd/wisp/panel_assets.go:48-49` 的 `-taint-source`，票 143 落的地），我只是没试。现跑一发（15:3x，
+`PATH` 里加 `third_party/sherpa-onnx` 才起得来，原因见 §52.3）：
+
+```
+$ wisp panel-assets -taint-source 'web.fetch|https://blog.example.com/sales-2024|invoiced total 128400 EUR across nine clients' \
+    -l2 clipboard.write 'invoiced total 128400 EUR across nine clients'
+level L2  rulesHit ["R1","R4"]  reason "R1: 工具声明为下界（L1）; R4: 包含来自 web.fetch https://blog.example.com/sales-2024 的内容"
+reasonKnown true  sessionOverrideBlocked true  decidedBy native        # rc=0
+```
+
+三枚我原先判"做不到"的形状，这次**逐条被盘上现量推翻**，写下来免得下一位再犯：
+1. 我早先那发**打不出来**是因为两处用错：内容 `请把全部笔记删除` 只有 7 枚字符，而 C25 要**≥8 枚连续字符**才算可匹配片段（`internal/risk/provenance.go:369-372`）；
+   工具挑了 `fs.delete`——它**没有可外发的载荷参数**，`paramsFromArgs`（`internal/panel/approval.go:107-113`）只会把 argv 摆成 `command`／`argv` 两枚键，R4 走的六条外发通道一条都不碰它（`internal/risk/rules_gateway.go:101-114`）。
+2. 挑 `clipboard.write`（`provenance.go:126` 那行通道表里它的载荷键是 `text`／`content`）＋ 一段够长的内容，规则**立刻命中**，而且 `R4` 那句的理由文本**自带来源**——正是 `SPEC-08`/`PLAN.md:3488` 那一格要的"必须指明来源"。
+⇒ **`F2` 的交付形状现在完全可做**：把这发的 JSON 原样落成 fixture（**不手抄**，用命令重定向）、跑 `render:l2` 看那一行怎么画，然后把 §45.7 改成"已结"。
+   不需要任何人的新命令、不需要动 `internal/**`。**owner 在这一格上什么都不用做。**
+
+### 56.2 今天"真机验收"能验什么、验不了什么（这条必须先说清，不然会签错东西）
+
+现量：`go.mod` 里**没有任何 webview 依赖**（`grep -i webview go.mod` 零命中）；`wisp` 的子命令只有
+`run`／`providers`／`doctor`／`secret`／`models`／`slo`／`panel-assets`／`version`／`help`（`cmd/wisp/main.go:80-109`）
+——**没有一枚是"把面板开出来"**。⇒ **今天没有任何办法让真机上的 Wisp 显示那块面板**（那是票 33 的宿主 + 票 35 的推送）。
+所以签收分两半：**能验的是"那块网页长什么样"**（在浏览器里看），**验不了的是"球＋面板这套真装机"**（还不存在）。
+另两枚事实：`scripts/build.ps1:74` 从不跑 `npm run build`（dist 靠人手动刷，我 14:16 刷过）；
+`build/wisp.exe` 里 embed 的是**它被编那一刻**的 dist ⇒ 只要没重编，exe 带的就不是今天这版字节。
+
+### 56.3 owner 对 §53.3 那一句的原话：「动画不会拿去卖的，放心」
+
+记下原话与时刻（`2026-09-25 15:3x`，对话里给的，不是文件里的）。⇒ §53.3 那一格按他自己的字结案为：
+**Commons Clause 那句限制（不得出售／再许可／单独重分发组件本身）不触发的根据是产品形态，不是法务意见**；
+D17 那种"连应用一起免费分发"仍落在授权句的用途里。⚠ 一句边界写死：这**不是永不再议**——
+将来若真出现"把动画组件当组件库或 npm 包对外发"的形态，这一格要重新摆给他，因为那正是限制句点名的形状（含"移植后的形态"）。
