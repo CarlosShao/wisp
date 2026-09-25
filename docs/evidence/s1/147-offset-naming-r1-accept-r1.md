@@ -296,5 +296,68 @@ comm -13 (新增):   TestSLO147LoopGiveUpSentenceAgreesWithTheBytesItRead
 
 ---
 
+## 2　AC#1 判定是否诚实（它选了 ⓐ）
+
+**判据**：ⓐ／ⓑ／ⓒ 三选一不许自己填；ⓐ 要求**两味**——"字段真填成已读到的最后一字节位置" **且**
+"红句两个数各自负责一件事"；ⓑ 单独存在不算收；判完之后"MG 那发该红还是该绿"要能一句话说清（已在第 1 格跑给人看）。
+
+### 2.1　它确实走的是 ⓐ，不是把 ⓑ 混进来交差
+
+```
+$ diff <(git show ae968f9:cmd/wisp/slo_windows.go | sed -n '/^\/\/ summary renders/,/^}/p') \
+       <(git show e572aa94:cmd/wisp/slo_windows.go | sed -n '/^\/\/ summary renders/,/^}/p')
+   （无输出 ⇒ 三句 summary() 文本逐字节未变）
+
+$ git show e572aa94:cmd/wisp/slo_windows.go | grep -nE "obs.offset = |o.bytes, o.offset"
+602:  return fmt.Sprintf("%d bytes read, document still open at offset %d: the tail had not arrived", o.bytes, o.offset)
+606:  return fmt.Sprintf("%d bytes read, complete document at offset %d", o.bytes, o.offset)
+646:          obs.offset = int64(obs.bytes)          <- ⓐ 那一行（unwritten 支）
+649:          obs.offset = dec.InputOffset()         <- corrupt 支（在 EOF 判定之后）
+654:  obs.offset = dec.InputOffset()                 <- complete／trailing-garbage 支
+```
+
+⇒ **文本一字未改、改的是喂它的数** ⇒ 是 ⓐ，不是 ⓑ。它自述的"红句文本没改"这一条**复算成立**。
+⇒ 顺带复算第 3 节那件"`-1` 从不进被打印的句子"：`readSubjectReport` 的每一条 return 之前都有一枚
+`obs.offset = …`（`:646`／`:649`／`:654`），`-1` 只剩 `:631` 的初值而它带不出去；带 `note` 的三支（`:705`／`:711`／`:716`）
+走 `summary()` 第一支只印 note。`B2`（删掉 `:646`）实测让 `at offset -1` 第一次印出来并被 case 10 抓住
+⇒ **这条是活的可核事实，不是自述**。（新注释末尾那两句"Only the -1 leg is never printed…"与此相符。）
+
+### 2.2　一处**票面文字与实现语义**不符——不是实现跑歪，是 AC#1 ⓐ 的第二半句造不出被满足的形状
+
+被验版本在真实前缀上印出来的句子（本程探针的直接读数，非推导）：
+
+```
+CASE deep-prefix-1949-garbage len=1950 state=unwritten offset=1950
+  summary "1950 bytes read, document still open at offset 1950: the tail had not arrived"
+CASE nested-then-break        len=45   state=unwritten offset=45
+  summary "45 bytes read, document still open at offset 45: the tail had not arrived"
+```
+
+⇒ 两个数**恒等**。原因在写侧形状本身（`readSubjectReport` 头上那段 credential）：一次 `os.WriteFile` 从 0 写全量，
+读者能看到的只能是前缀，前缀里每一枚已到达字节都被消费掉了 ⇒
+"停在第几字节"＝"到了第几字节"。ⓐ 的**第一半句**（字段带信息）因此成立且可核（`B1`／`B2`／`B7`／`C3` 四发都红），
+ⓐ 的**第二半句**（"两个数**各自**负责一件事"）**在这一支上无法成立**——那两个数是同一个数的两种问法。
+
+仪器侧的直接后果（本程造的那发）：`B9`＝把红句的两个实参对调（`o.offset, o.bytes`）⇒ **0 红／14 绿**。
+这不是尺漏了，是**等价变异**：对调后输出逐字节相同。**别把它当退回**，按编排者的分界（造没造出来＝"这味摘掉后有变异打不红"）
+它不属于任何一味的摘除。
+
+**这一处的判定**：ⓐ 成立（字段带信息＋有牙＋文本未动＋MG 该红已跑）；
+票面 AC#1 ⓐ 那句"并让红句两个数各自负责一件事"**措辞过强**，本程按"票面缺陷上报、不照它做"处理（`AGENTS.md` 头三行），
+**不要求实现方回头改句子**（改文本＝ⓑ，票面明写不算收）。⇒ **本格：成立（附一句票面文字过强，见第 6 格修正记录）。**
+
+### 2.3　 ⓒ 有没有被躲过去
+
+票面 ⓒ＝"三语义是有意的 ⇒ 必须留下一枚会红的检钉住三语义各自成立"。实现件 §1.2 答"没把 ⓒ 当独立支，
+因为 `0＝读到一半` 正是缺陷本身，钉住它＝钉住假话"。本程复算：case 10 钉的**正是**"三语义各说各的话"
+（`-1` 那支不许出现 `offset` 这个词／半截文档印 `at offset 989`／完整文档印 `complete document at offset 1978`／三句两两不等），
+且 `B6`（把 note 支关掉，让 `-1` 外印位置）实测**只有 case 10 红**（`X4` 证明摘掉 case 10 后这发打不红）。
+⇒ ⓒ 要求的"钉住三语义各自成立"这一味**被 case 10 做到了**，只是钉的是"三者可分辨"而不是"旧的 0 恒成立"。
+**不构成躲判。**
+
+**本格判定：成立。**
+
+---
+
 
 ---
