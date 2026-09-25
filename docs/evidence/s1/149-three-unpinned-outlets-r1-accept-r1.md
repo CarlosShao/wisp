@@ -231,6 +231,90 @@ $ git show c3f7224:cmd/wisp/slo_report_144_windows_test.go | sed -n '634,641p'
 
 ---
 
+## 第 2 格　派单 §2 之(1)：**独立重建**那发组合变异（不拿它的 `combos2/` 日志当凭据）
+
+**判据**：AC#2 承重的全部依据是"两条 leg 同摘 ⇒ `p1` 打不红"这一发**逃逸**读数。派单明令别拿实现程的复算日志
+当凭据 ⇒ 本格用**本程自己写的尺**、自己按 sha 建的快照重做那一发，并且**给尺加一道它自己没装的证明**：
+overlay 建完之后**回读要交给 Go 编译的那枚文件**，断言"新文本在里面、旧文本不在里面"，否则 FATAL 不输出读数。
+⇒ 这一步是针对第 1 格那个失效模式（同文件两枚替换静默剩一枚）设计的：**本程的尺结构上就不可能悄悄少摘一条腿。**
+
+### 2.1 快照与字节相符性（先证被验版本，再谈读数）
+
+```
+$ git -c core.autocrlf=false -c core.eol=lf archive c3f7224 | tar -x -C <仓外>/snap-c3f7224-a
+$ cp -r <repo>/third_party/sherpa-onnx <仓外>/snap-c3f7224-a/third_party/     # dll 3 枚，先补再跑
+$ for f in cmd/wisp/slo_windows.go cmd/wisp/slo_report_144_windows_test.go; do
+    a=$(git show c3f7224:$f | md5sum|cut -d' ' -f1); b=$(md5sum < $S/$f|cut -d' ' -f1); echo "$f anchor=$a snap=$b"; done
+cmd/wisp/slo_windows.go                      anchor=0403d5196f4bc0c20993dca7ceeea2b8 snap=0403d5196f4bc0c20993dca7ceeea2b8
+cmd/wisp/slo_report_144_windows_test.go      anchor=4d07365e12e9e156771020f3b638dcfa snap=4d07365e12e9e156771020f3b638dcfa
+```
+
+⇒ 快照里那两枚文件与**锚点 blob 逐字节相同**（md5 相等）；跑法一律 `go test -count=1 -overlay … -v
+-run 'TestSLO144|TestSLO147|TestSLO149' ./cmd/wisp/`，`PATH` 里带 dll 目录（第 0 格那条坑）。
+本程的尺落在仓外 `D:\work\tmp\wisp149-accept\myharness.py`，日志落在同目录 `mylogs/`（只建不删）。
+
+### 2.2 本程名册（12 发，含 4 发对照与 2 发探针）
+
+`m-combo` ＝ 实现程那发的等价物：同一枚 GO 替换（`contradictionOffset(err, dec.InputOffset())` → `obs.offset = 0`）
+＋同一枚 TEST 文件里的**两条 leg 各摘一枚**（`:634` 字段腿 `if obs.offset != int64(tc.want) {` → `if false {`；
+`:641` 句子腿 `case offset != tc.want:` → `case false:`）。
+
+| 本程编号 | 内容 | 顶层 FAIL | RUN | case 11 | 红句出自哪条腿（按消息文本认） |
+|---|---|---|---|---|---|
+| `m-asis` | 无 overlay（对照） | **0** | 20 | RAN | — |
+| `m-corrupt-zero` | ＝它的 `p1`（靶） | **1** | 20 | RAN | `subjectReportRead.offset is 0, want 27 (the byte the decoder objects at)` ← **字段腿** |
+| `m-legs-both` | 只摘两条腿、码不动（对照） | **0** | 20 | RAN | — |
+| **`m-combo`** | **`p1` ＋ 两条腿全摘** | **0 ⇒ 逃逸复算成立** | **20** | **RAN** | 全程无 `first:` 行（`grep -c "first:" m-combo.log` → **0**） |
+| `m-combo-bytes` | 取值→`int64(obs.bytes)` ＋两条腿全摘（＝它的 `x-p2-d11a-d11b`） | **0 ⇒ 逃逸** | 20 | RAN | — |
+| `m-combo-revert` | 取值→`dec.InputOffset()` ＋两条腿全摘（＝它的 `x-p3-d11a-d11b`） | **0 ⇒ 逃逸** | 20 | RAN | — |
+| `m-corrupt-revert` | ＝它的 `p3`（撤掉本票修法） | **1** | 20 | RAN | 字段腿 |
+| `m-zero-fieldoff` | `p1` ＋ **只摘字段腿** | **1** | 20 | RAN | `sentence says offset 0, want 27` ← **句子腿单独接住** |
+| `m-zero-sentenceoff` | `p1` ＋ **只摘句子腿** | **1** | 20 | RAN | 字段腿单独接住 |
+| `m-wantcanary-live` | 只把 case 11 自己的期望常数 27 改成 999 | **1（`1 of 8`）** | 20 | RAN | 期望值是**活的**，不是摆设 |
+| **`m-combo-canary`** | **两条腿全摘 ＋ GO 句子撤掉 `at offset %d`** | **2** | 20 | **RAN** | `sentence "…" is not the contradiction shape` ← **剩下那条 `!ok` 腿在响** |
+
+（最后一行另红一枚 `TestSLO144ReportsThatContradictThemselvesAreCorruptNow`，`:156`，同一发 GO 句子的同族检。）
+
+### 2.3 读数与判定
+
+1. **逃逸是真的**：`m-combo` 用**本程自己的尺**跑出 **0 红**，且 `RUN=20`、`case 11=RAN`
+   ⇒ 实现件 §2.4 那一行"两条 leg 全摘 ⇒ 0 红 ⇒ 逃逸"**独立复算成立**，AC#2 的承重依据**不塌**。
+   本程**没有**读它的 `combos2/` 日志来得到这个数（那是第 1 格的事）。
+2. **而且不只在常量 0 那一发上逃逸**：`m-combo-bytes`／`m-combo-revert` 同样 0 红
+   ⇒ 两条腿一摘，那条腿上的取值**换成任何本程试过的错值都不再有人管**（`p1`/`p2`/`p3` 三发全逃逸）。
+   实现件只报了 `p1` 那一发的逃逸＋另两发同形状；**本程把它加强成"该腿整体脱保"**。
+3. **那颗 0 红不是"什么都没跑"**——这是本格最要紧的一道反向证明。`m-combo-canary` 保持**同样两条腿摘掉**、
+   只在 GO 侧再撤一句 `at offset %d`，case 11 **立刻红**（`!ok` 腿那句），
+   ⇒ 说明 `m-combo` 那一遍里 case 11 的 fixture、`readSubjectReport` 调用、剩下的腿**全都活着**，
+   0 红是**判据射程不到**，不是执行没到。（对照：`m-legs-both` 也是 0 红，但那是"码没坏 ⇒ 本来就该绿"，
+   与 `m-combo` 的 0 红**不同因**，靠 canary 那一发分开。）
+4. **两条腿各自单独都能接住 `p1`**（`m-zero-fieldoff`／`m-zero-sentenceoff` 各 1 红），
+   且**两腿量的不是同一个可观测量**：一腿读**结构体字段** `obs.offset`，另一腿**解析渲染出来的句子**再比。
+   ⇒ 实现件 §2.4 那句"少任一条都有兜"**复算成立**，而且它不是一句冗余：两腿在"句子写歪但字段对／字段对但句子没写"
+   这两类形状上不等价（本程在 `p6`／`p12` 那一族上没重做，见下"没测什么"）。
+5. **期望常数是活的**：`m-wantcanary-live` 只改一枚期望值就红 `1 of 8` ⇒ 本格所有"响"都不是自证式判据的产物
+   （第 4 格正面处理那一问）。
+
+**放水两问自答**：① 本程零断言方向改动、零代码改动（第 2 格全部读数走 `-overlay`，快照树里**没有一枚文件被改写**，
+本程的尺连写都只往仓外 `myoverlay/` 里写）；② 本程**没有复用实现程那枚 `harness.py`**——尺是本程按锚点字节
+现写的（`harness.py` 在本格里只被当作**读物**：第 1 格据它的 `MUT` 定义确认"本程那发与它那发是不是同一味"，
+字面量本程自己从 `git show c3f7224:` 里取）。
+
+**第 2 格判定**：**成立**（实现件 AC#2 那枚承重读数经独立重建后为真）。
+⚠ 但**同一格里本程把它的自述推翻了一次**（第 1 格 §1.2：0 红是修好尺之后的读数，不是坏尺的产物）——
+两件事不冲突：**读数是实的，讲故事的人把方向说反了**。
+
+**本程没测什么（本格）**：
+1. **没重做 `p4`–`p9`／`p11`／`p12` 与 `d12`／`d13` 那批发**（只复算了承重的三条腿＋三发取值变异＋两发 canary）。
+   ⇒ 谁先被骗：把"第 2 格全对"读成"§2.4 整张 25 行表都被独立复算过"的人——**没有**，本程只独立钉了那枚**承重行**。
+2. **没验"两腿在别的形状上是否也互为兜"**：`m-combo` 只证了取值维；句子文本维（`p6`/`p12`）本程没在
+   双腿摘掉的组合下跑 ⇒ 那两发是否也整体脱保**未知**。
+3. **canary 的覆盖面**：`m-combo-canary` 只证明"`!ok` 腿在那配置下活"，没证明"剩下三条腿全活"
+   （`read != len(tc.body)`／`named != read` 两条未单独探针）。
+4. **没跑 `-race`、没跑真子进程那枚 case 13 的变异组合**（`m-*` 全部只动 corrupt 支与 case 11 的腿）。
+
+---
+
 ## N-1　结论修正记录（推翻实现件／推翻本程派单，都写这里）
 
 | # | 原话（谁说的） | 本程现量 | 结论 |
