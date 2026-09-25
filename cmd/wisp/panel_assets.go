@@ -41,7 +41,7 @@ func cmdPanelAssets(args []string) int {
 	l2 := fs.String("l2", "", "assess this tool name with the remaining args as its argv and print the L2 card JSON")
 	l2Irreversible := fs.String("irreversible", "", "with -l2: comma-separated irreversible operations the CALLER declares in its risk.Facts (R8's input)")
 	taintSources := &taintSourceFlag{}
-	fs.Var(taintSources, "taint-source", "with -l2: repeatable INPUT FACT of the shape <source-tool>|<origin>|<content>, meaning \"this task read <content> from <source-tool> at <origin>\". It feeds the C25 provenance engine the taint rule judges; it declares no verdict, no rule id and no level, and the taint rule stays dormant without it. Flags after the -l2 tool name are that tool's argv, so put every flag before -l2.")
+	fs.Var(taintSources, "taint-source", "with -l2: repeatable INPUT FACT of the shape <source-tool>|<origin>|<content>, meaning \"this task read <content> from <source-tool> at <origin>\". It feeds the C25 provenance engine the taint rule judges; it declares no verdict, no rule id and no level, and the taint rule stays dormant without it. Every flag has to come before the tool's own arguments: parsing stops at the first argument that does not start with a dash, and everything after it is argv.")
 	fs.Usage = func() {
 		fmt.Fprintln(os.Stderr, "usage: wisp panel-assets [-manifest] [-check] [-render <path>] [-taint-source <source-tool>|<origin>|<content>]... [-irreversible <ops>] -l2 <tool> <args...>")
 		fs.PrintDefaults()
