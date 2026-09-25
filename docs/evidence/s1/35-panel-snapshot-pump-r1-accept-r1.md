@@ -505,6 +505,23 @@ F-PUMP-6 是措辞、F-PUMP-4 归票 33。⇒ 所以是**附条件入账**，不
 
 ---
 
+## 7.1 更正上面第 2 条（三门后来交了，**当场补、不改写那一格**）
+
+§7 第 2 条那句"三门未交"在**写下之后**被本程自己推翻——三门随后现跑并全交。
+按本仓"台账未提交前可就地改、已提交只追加更正"的规矩，原句一字不动，追加这一节：
+
+| 门 | 现量 | 口径 |
+|---|---|---|
+| `gofmt -l` | **0 行**（五枚被验文件 `pump.go`／`pending_read.go`／`panel_pump.go`／`run.go`／`bridge.go`） | 本机工作树 |
+| `go vet` | **rc=0**（`./internal/panel/ ./cmd/wisp/ ./internal/agent/approval/`，PATH 装了仓里那三枚 sherpa DLL） | **本机工作树 = 当前 HEAD，不是锚点 `9ed2098`**；`9ed2098..HEAD` 之间只有别家的 `docs/` 与 `frontend/` 提交 ⇒ 对这三枚 Go 包**同字节**，本程未逐枚 hash 复证这一句 |
+| `sh scripts/d22scan.sh` | **rc=0、`clean - no D22 ban violations`**，且分母逐档读得出（`bans #1-5 internal/=205`、`cmd/=23`、`ban #6 frontend/=47`、`#7 internal/tools/=18`、`#8 design/=32 frontend/=47 internal/=410 cmd/=42`） | 本机工作树（`design/` 那 32 枚含 owner 未提交形状）；`scripts/d22scan.sh` 是 `set -eu` 且**第一步就是正控** ⇒ 真扫描确实跑了 |
+
+⇒ **三门不改变任何一格的裁定**，只是把"本程没交"这件事从"没测"改记成"测了、全交、口径如上"。
+⚠ 注意 `ban #8 design/=32` 与被验件 §5 记的那枚"live scope 分母 `design/`=32 vs 门钉 r5 的 30"是同一族
+（owner 未跟踪目录所致），**本批对 `design/**` 零改动**。
+
+---
+
 ## 8. 自证与临时件
 
 | 项 | 读数 |
