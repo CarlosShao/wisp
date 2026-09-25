@@ -39,28 +39,57 @@ import (
 
 // slo144Report is the payload writeSLO would put on disk for a self-sampling
 // subject: a complete sloRun with a state report in it.
+//
+// The fixture is built by CALLING THE SAME SERIALIZER the subject calls
+// (json.MarshalIndent of a sloRun with a real observe.StateReport inside, with
+// samples and verdicts, like runSubject's run.Report), and it is checked to be
+// non-trivial before it is used: an empty or hand-written toy document would
+// make the all-prefix scan below true for the wrong reason.
 func slo144Report(t *testing.T) []byte {
 	t.Helper()
 	doc, err := json.MarshalIndent(&sloRun{
-		Mode:      "subject-in-tree",
-		State:     "Sleeping",
-		Posture:   "skeleton",
-		StartedAt: "2026-09-25T00:00:00Z",
-		Seconds:   5,
-		Pass:      true,
+		Mode:       "subject-in-tree",
+		State:      "Sleeping",
+		Posture:    "skeleton",
+		StartedAt:  "2026-09-25T00:00:00Z",
+		Seconds:    5,
+		Pass:       true,
+		SubjectPID: 4242,
 		Report: &observe.StateReport{
-			State:       observe.SLOSleeping,
-			StartedAt:   "2026-09-25T00:00:00Z",
-			DurationSec: 5,
-			IntervalSec: 0.25,
-			Basis:       observe.BasisInTree,
+			State:          observe.SLOSleeping,
+			StartedAt:      "2026-09-25T00:00:00Z",
+			DurationSec:    5,
+			IntervalSec:    0.25,
+			Basis:          observe.BasisInTree,
+			ObserverCost:   true,
+			MemMedianBytes: 7 << 20,
+			CPUMeanPercent: 0.52,
+			GDIMax:         12,
+			WriteOpsTotal:  141,
+			SampleErrors:   0,
+			Pass:           true,
+			Samples: []observe.Sample{
+				{At: "2026-09-25T00:00:00Z", TreePrivateBytes: 7 << 20, CPUPercent: 0.4, Handles: 210, TCPConnections: 1},
+				{At: "2026-09-25T00:00:00.250Z", TreePrivateBytes: 8 << 20, CPUPercent: 0.6, Handles: 211, TCPConnections: 2},
+			},
+			Verdicts: []observe.Verdict{
+				{Metric: "mem_private_working_set", Measured: "7864320", Limit: "<= 30 MB", Pass: true, Gate: true},
+				{Metric: "cpu_percent_all_core", Measured: "0.52", Limit: "<= 0.5", Pass: false, Gate: false, ObserverCost: true},
+			},
 		},
 	}, "", "  ")
 	if err != nil {
 		t.Fatalf("fixture marshal (the same call writeSLO makes): %v", err)
 	}
-	if !strings.Contains(string(doc), `"report"`) {
-		t.Fatalf("fixture has no report field, so it proves nothing: %s", doc)
+	// Non-triviality of the fixture, so the all-prefix scan cannot be true
+	// because the document is short or one-valued.
+	if len(doc) < 300 {
+		t.Fatalf("fixture is only %d bytes - too short for the all-prefix claim to mean anything: %s", len(doc), doc)
+	}
+	for _, want := range []string{`"report"`, `"samples"`, `"verdicts"`, `"pass": true`, `"cpu_percent": 0.4`} {
+		if !strings.Contains(string(doc), want) {
+			t.Fatalf("fixture does not look like a real subject report (missing %s):\n%s", want, doc)
+		}
 	}
 	return doc
 }
