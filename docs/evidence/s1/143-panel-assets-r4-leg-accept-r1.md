@@ -88,3 +88,78 @@ cmd 侧只交第 1-4 跳的事实。`cmd/wisp` 里 **没有任何实现 `TaintHi
 自证表 §1 末句"塞一枚返回常量的 detector ⇒ §3 那两枚用例**会一起红**"对**它那枚**变异（返回一个与声明无关的固定串）成立（§4 的 M2 复算就是两枚红），
 但作为一般陈述**说过头了**：返回"声明的来源串＋永远 true"的 detector 只红一枚。判**不构成退回**（用例集合整体有牙，红的那枚本就是票面 AC#3(ii) 要的防过度匹配），
 记为**残余精度**：若将来要更强，只需在 AC3 之外补一枚"detector 的类型必须是 `prov.Detector` 的返回值"的白盒断言（本程不修）。
+
+---
+
+## §2 攻点 2："注入事实、不注入结论"——grep 逐枚
+
+尺子：`grep -n -E 'R4|R9|包含来自|rulesHit|sessionOverrideBlocked|L2:' cmd/wisp/panel_assets.go`（锚点 `3855dc6`，`cmd/wisp/` 0 行脏）。
+
+**命中数 = 0 行**——而且这是**连注释一起算**的 0（票面与自证表口径只要求"输出路径 0"）。逐枚点名这三类"结论字样"：
+
+| 结论字样 | 在 `panel_assets.go` 的命中 | 判定 |
+|---|---|---|
+| `R4` | 0 | 卡上那句 `R4: 包含来自 …` 不可能由这枚文件拼出（拼装点唯一：`internal/risk/rules_gateway.go:112`） |
+| `rulesHit` | 0 | JSON 键名来自 `internal/panel/approval.go:46` 那枚结构体 tag，不在这条 CLI 路上 |
+| `L2`／`sessionOverrideBlocked`（作值） | 0 | 等级与布尔都由 `fuse`（`internal/risk/assessor.go:320-325,351`）产出 |
+
+**点名区分（注释／既存的、不属于本票的字样，与"输出路径"不是一回事）**：
+
+- `L2` 单独出现 **3 枚**：`:4`（文件头注释）、`:41`（`-l2` 的 help 串 "print the L2 card JSON"）、`:146`（`splitFacts` 的注释）。
+  三枚**逐枚对改前文件核过是既存件**：`git show 9be3288^:cmd/wisp/panel_assets.go` 里同一批句子的行号是 `:4`/`:40`/`:133`
+  （本票只是把它们往下推了 1 行或原地未动）⇒ **本票没有新增任何 `L2` 字样**，`:41` 那枚 help 串也不是输出路径上的值——
+  它是 `-l2` 这枚旗标的名字与说明，卡上等级实际打印的是 `decision.Level.String()`（`internal/panel/approval.go:81`）。
+- `R8` 出现 **2 枚**：`:42`（既存 `-irreversible` 的 help 串 "(R8's input)"）、`:145`（`splitFacts` 注释）。
+  同样核过是**票 114 时代的既存件**（改前文件 `:41`/`:132` 同句），不是本票造的。
+
+**这条 CLI 路的 stdout 写出点**（`panel_assets.go:79-81`）只有 `enc.Encode(view)` 一枚；
+`view` 的九个字段来源逐枚点名：`CorrelationID`/`Tool`/`Args`/`CallChain` ← 调用方给的（`:69-72`，其中 `Args` 就是 argv），
+`Level`/`RulesHit`/`Reason`/`SessionOverrideBlocked` ← `risk.Decision`，`ReasonKnown`/`DecidedBy` ← `internal/panel`
+（`approval.go:77-88`）。**没有一枚字段由 cmd 侧填判据字符串。**
+
+**仪器本身**：`TestAC1CmdSideEmitsNoVerdictTokens`（`panel_assets_143_test.go:264-293`）用 `go/ast` 扫 `panel_assets.go` 的
+**每一枚字符串字面量**（注释豁免、字面量不豁免），禁词表 `:265` = `R4 / R9 / 包含来自 / rulesHit / sessionOverrideBlocked / L2:`。
+本程独立复跑该枚：**绿**；并复算 M1（摘接线）与 M2（永真 detector）两发变异下它都**仍然绿**（它只钉字面量形状，钉不出接线缺失，这是设计内的分工）。
+
+⚠ **一枚要报回给编排口的口径差**：那张禁词表只封了 `R1–R9` 里的 **两枚**（`R4`、`R9`），
+而 `R8` 恰好以既存 help 串的形状活在同一个文件里（`:42`）。也就是说：**仪器不是"禁所有规则号"，是"禁本票这条路的规则号"**——
+今天够用（`R8` 那枚是输入事实的说明、不是判据输出），但它给下一个人的保护比表面上看起来窄一格：
+将来若有人在 cmd 侧把 `R2:`／`R3:`／`R8:` 拼进输出，这枚仪器不会红。登记为**残余（不退回）**，归口建议见 §8 末。
+
+## §3 攻点 3：默认路径不许渗——本程重造的 `cmp`（不收它的"三发相同"）
+
+台件（都是 `git archive` 出去的仓外副本，同一台机器同一环境同一把尺）：
+
+```
+before/ = git archive 9be3288^   → go build -o wisp-acc-before.exe ./cmd/wisp/   （md5 源文件 1372bf92…）
+after/  = git archive d242168    → go build -o wisp-acc-after.exe  ./cmd/wisp/   （md5 源文件 7f200f27…）
+两份副本各自 cp 了仓里的 frontend/dist（embed 内容同值），构建 rc 都是 0
+运行 PATH 里带 third_party/sherpa-onnx（票 98 那一族：不带则进程连加载都过不去）
+```
+
+| 发 | 命令（`panel-assets` 之后） | 改前 stdout 字节 | 改后 stdout 字节 | `cmp` | rc |
+|---|---|---|---|---|---|
+| A | `-l2 shell.run rm -rf D:/tmp/x` | 365 | 365 | **identical** | 0 / 0 |
+| B | `-irreversible delete,overwrite -l2 fs.write D:/notes/a.txt` | 418 | 418 | **identical** | 0 / 0 |
+| C | `-l2 notify hello world` | 348 | 348 | **identical** | 0 / 0 |
+| **D（本程自加）** | `-l2 fs.write D:/secret/key.txt payload` | 366 | 366 | **identical** | 0 / 0 |
+| **P（本程自加，不进 `-l2` 分支）** | `panel-assets`（裸的资产摘要那一支） | 60 | 60 | **identical** | 0 / 0 |
+
+原文读数（`/d/tmp/acc-143/`）：
+
+```
+$ for x in A B C D P; do if cmp -s $x-before.json $x-after.json; then echo "$x stdout: identical"; fi; done
+A stdout: identical (365 bytes)
+B stdout: identical (418 bytes)
+C stdout: identical (348 bytes)
+D stdout: identical (366 bytes)
+P stdout: identical (60 bytes)
+```
+
+B 卡现量（两枚二进制同一串字节）：`"level": "L2"`、`rulesHit` = `R1`,`R8`、
+`reason` = `R1: 工具声明为下界（L1）; R8: 不可逆操作（永久删除、覆盖已有内容）`、`sessionOverrideBlocked: false`；
+C 卡现量：`L1 / [R1]`、`sessionOverrideBlocked: false`。
+
+⇒ **"不带新旗标时 stdout 与改前逐字节相同"这一格：成立**，且比实现方那三发多两发（D 是路径形状、P 是完全不进 `-l2` 分支的那一支），
+rc 也逐发对齐。它自报的 `4712ea6`／`5ef1632` 两枚二进制我不引用——本程的两枚是从 `9be3288^` 与 `d242168` 现构的。
+
