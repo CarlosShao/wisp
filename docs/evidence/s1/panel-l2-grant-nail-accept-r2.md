@@ -379,3 +379,97 @@ FIELD ApprovalCardView.DecidedBy              json="decidedBy"               at 
 而它们对**将来**的合法形状施加的约束（第二枚 decode 必须落到同包 struct / 新入站类型必须进
 `inboundTypeRegistry`）都**响在明处且自带出路**。这不是"放宽断言"，是"把新约束写进文件头"的事，
 所以是文档级、不退回。
+
+---
+
+## §4 (c) 与 (c′) 有没有把功劳记混
+
+实现程自己纠过一次（`cc6dc16` 把 M7 从 (c) 的收益里划给 (c′)）。我用**自己的种子**复核这个更正，
+并回答派单那一问："(c) 单独有没有任何行为后果？"
+
+| 种子 | 今天谁让它红 | 摘掉 (c) 整味 | 摘掉 (c′) 两半 | 归属（本程判） |
+|---|---|---|---|---|
+| `M6`（`cmd` 路由键 + 显式 `outcome` 标签） | `TestNoInboundEnvelope` 点名 `bridge.go:122` | **真树全绿**（只剩植物 G） | 仍 3 枚红（ban 那枚在） | **只属于 (c)** |
+| `M7`（绑 `method`，但 `Outcome json:",omitempty"`） | `TestNoInboundEnvelope` 点名 `bridge.go:122` "Outcome" | 仍红（旧判据也看得见它，它绑 method） | **真树全绿**（只剩植物 H） | **只属于 (c′)** ⇒ `cc6dc16` 那半句更正**成立** |
+| `M8`（同形状放进正主 `ComposerRequest`） | 反射半 `:1218`（**这半先存在就红**）＋ AST 半 `:1237`（新增）＋ 三向 `:1492` 两条 | 4 枚红，不变 | **颜色不变**（反射半一直兜着），变的是"AST 不再 0 findings" | **不是任何一发新增拦截**，是两台仪器不再分家 |
+| `M13` 封套半 | `:1237 bridge.go:131` | 转绿 | 仍红（M13 用显式 `json:"outcome"`，不需要 (c′)） | **(c)** |
+
+⇒ **(c) 单独有没有行为后果**：在**今天的真树**上没有（`SEEDS`/`INBOUND` 与旧判据同一枚格，§3.2 现量），
+但在**我的台件上有一发唯一目击**：**M6**（以及 M13 的封套半）。
+⇒ 所以 (c) **不是镜子**，判**承重**；措辞要精确到这句：
+**(c) 今天不拦任何已存在的写法，它拦的是"第二枚 decode"——而第二枚 decode 正是票 33/35 接线那一步必然写下的东西。**
+"defense-in-depth 而非 today-caught mutation" 这个说法对 (c) 只对一半：它对 *clean tree* 成立，
+对 *M6* 不成立。我按现量给结论，不给那句顺口话。
+
+⇒ **(c′) 的两半不许混着领功**：规矩半（`jsonOr` 回落 Go 字段名）是 M7 的唯一 ban 级目击者；
+测试半（三向互印 `TestJSONKeyDerivationAgreesWithEncodingJSON`）**在我全部 6 发种子 + CLEAN 上
+都不改变任何一枚的颜色**（`noCp_test` 行：CLEAN=0 红、M6/M7=2、M8=3、M13=3，ban 那枚始终在）。
+它改变的是"**摘掉 jsonOr 的回落之后有没有人响**"（`noCp_rule|CLEAN` 三枚红，其中 `TestJSONKeyDerivation`
+是那枚**唯一**响的 ban 无关者）。⇒ 判：**承重、但白盒（instrument-integrity）**，
+不写"M8 因为它才被拦下"（M8 今天被反射半拦下，与它无关）。
+
+---
+
+## §5 (d)(e) 两格 + 那枚悬空的 §9
+
+### §5.1 (d)："每个断言配一枚可复算命令"——我把三条都跑了
+
+| 文件里的断言 | 它的命令（逐字照抄去跑） | 我量到的 | 判 |
+|---|---|---|---|---|
+| `ParseComposerRequest` 无生产调用者 | `grep -rn ParseComposerRequest --include=*.go .` | 非测试命中 6 处：`bridge.go:77`(定义) + `run.go:225`、`bridge.go:16/74/106`、`composer_handlers.go:37` **五处全 `//` 注释** | **结论成立**（生产调用者=0），**明细两处对不上**：文件写 `l2_grant_boundary_test.go(6)`，盘上是 **9**；文件写"其余四处全是注释"，盘上是**五处** |
+| 主模块收不到 postMessage | `grep -c webview go.mod` | `0`（`go.sum` 也 0；仓内另有 3 枚独立模块 `scripts/spike`、`tools/d22scan`、`tools/mockllm`，与主模块无关） | 成立 |
+| 那跳不存在是生产码自己说的 | `sed -n '225,227p' cmd/wisp/run.go` | 逐字复现 `Nothing calls it yet - the WebView2 "event -> ParseComposerRequest" hop does not exist in this tree (tickets 33/35)` | 成立 |
+| 头段的 "NOTHING IS WIRED TODAY" | 同上三条 | 三条独立复算全中；另加我本程自己跑的：`PanelBridge` 在非测试生产码里**只有 3 处注释命中**（`internal/agent/approval/gate.go:595`"a future PanelBridge"、`doc.go:2/:9`），**零实现零调用者** | 成立，且比它自己声明的更硬 |
+
+**那两处对不上算不算缺陷**：算，但只算**读数级**。它们都是**明细的枚数**，不改任何一条判语的成立；
+且 `l2_grant_boundary_test.go(6)` 那枚错**在它自己那一枚 commit 上就已经错了**
+（`git show 598620e:internal/panel/l2_grant_boundary_test.go \| grep -c ParseComposerRequest` = **9**，
+不是它写进文件的 6）⇒ 不是"后来漂了"，是**抄错**。记 **F-R2-2**（读数级，见 §7）。
+
+### §5.2 (d) 那句是不是可证伪的，还是装饰
+
+**可证伪。** 让这句话为假的充分条件已经写在同一行里：`grep -rn ParseComposerRequest --include=*.go .`
+出现任一**非注释、非测试、非定义**的命中（也就是票 33/35 那跳被接上）⇒ 这句当场失效。
+我把它当判据复算过（上表第一行 = 今天的读数是 0）。
+
+⚠ 但有一句要收窄，不然它会被读大：这句话的**主语是 `ParseComposerRequest`**。
+理论上"接上另一条不经过 `ParseComposerRequest` 的入站路"（例如新写一枚 `handleHostMessage`）
+**不会**让这句话变假，而它确实违反"什么都没接线"的精神。⇒ 今天堵这个形状的不是 (d)，
+是 (c)+(c′) 那两枚 decode 引信（§2.4 的 MDEC/MEXT 现量：任何第二枚 decode 都会响）。
+所以我判 (d) **成立且可证伪**，并建议补半句"（这句话的主语是 `ParseComposerRequest`；
+任何第二枚 decode 由 (c)/(c′) 的引信管）"——**这是建议，不是这一格的退回理由**。
+
+### §5.3 (e) 与 `bridge.go:33`
+
+```
+grep -rn "func TestFrontendComposerRequestsMatchTheEnvelope" internal/panel/   -> 1 处，bridge_test.go:131
+读全文：方法那一圈是 for _, m := range []string{MethodModeRequest, MethodWorkspaceRequest,
+        MethodAttachmentAdd, MethodMessageSend}   —— 恰四枚常量，从不读守卫
+```
+⇒ **"它只迭代那四枚常量"这半句为真**（那枚测试还查 `requestId`/`source`/第二通道/
+`bridge.postMessage` 计数，但那些都不是路由名枚举，读者的结论"第五枚直接写进 switch 的路由它看不见"成立）。
+旧名 `TestComposerMethodNamesMatchFrontend` 现量全仓 **1 处命中 = `bridge.go:33` 自己**，定义 0 处
+⇒ `:604` 那一处引用**确实被修掉了**，不是换了个错名字。
+
+**`bridge.go:33` 我判：同意本批不碰、且它确实是缺陷。**
+理由：改它 = 动生产文件一个字节 = 撞本批自己那条"生产码零字节"契约轴；而 r1/派单明令我等
+不扩生产码地界。归属：**它属"把 `event -> ParseComposerRequest` 那一跳接上"的那一程**
+（`cmd/wisp/run.go:225` 与 `composer_handlers.go:37` 两处注释都点名 **tickets 33/35**），
+不是门钉这一程。最小修法就一句：把 `bridge.go:33` 那句改成点名
+`TestFrontendComposerRequestsMatchTheEnvelope`（`bridge_test.go:131`）。
+**不要**把它夹进任何一枚门钉 commit——那正是本批靠"零字节"守住的边界。
+
+### §5.4 悬空的 §9 / §7（格级判）
+
+见 §0.4 现量：**三枚自指悬空**（`:8`→§9 numstat、`:73`→§7 反向对照、`:81`→§9 staged 清单），
+**两枚外指有效**（`:4`/`:131`/`:201` 指 accept-r1 §7.x，存在）。我另扫了它引用的**行号**：
+§5.3 里的 `:1211`/`:1466` 在 `c4b959a` 那版逐枚对得上（我 `git show c4b959a:… \| sed -n '1211p;1466p'` 现量），
+但**在 HEAD 上漂到 `:1237`/`:1492`**——漂移是它自己**下一枚 commit `598620e`**（+36/−10 行）造的。
+⇒ 这不是抄错，是"**引用自己没写完的东西，又自己把它挤走了**"。
+
+**格级判：退回（文件级，不推翻码）。** 三枚悬空自指正好落在"码写完、读数没跑完"那个断点上，
+形状与本仓已登记那条（"文档预先引用尚未产出的读数 = 假绿前身"）**同类**；
+而它已经被 `4deada9`/`0fe7629` 之前的两次同类登记钉过，所以处置固定：
+**文件保留、不删、不许当"这批已验收"凭据引用**；要恢复它 `:8`/`:73`/`:81` 的承诺，
+要么补出 §7/§9（本程的 §2/§6 就是同一批读数的独立版本），要么就地在那三行后追加
+"（本程未产出，见 `panel-l2-grant-nail-accept-r2.md` §2/§6）"。**只能追加，不许改写已提交的四行。**
