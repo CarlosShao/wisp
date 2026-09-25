@@ -1,6 +1,9 @@
 # 146 — `Queue.LiveApprovals()` 的注释说"返回副本"，实现是**按值拷贝一个含引用字段的结构**：那张 map 与那三枚切片都和队列共用底层
 
-- Status: ready-for-agent（**未派**）
+- Status: in-progress（**已派**，issues/README 规则 1）
+- Claimed by: `agent=ticket146`（实现程，写码）
+- Last update: `2026-09-25T11:00Z`（＝`2026-09-25 19:00 +08`）
+- Parallel slots: 本票只此一枚写手；`internal/panel/l2_grant_boundary_test.go` 与 `frontend/**`/`design/**` 零接触
 - 来源：票 35 快照泵收尾程 `docs/evidence/s1/35-panel-snapshot-pump-fix-r1.md` 留给下一程的空格 ②；
   它**没改行为、也没在两个方向任一处下断言**，所以这一格今天仍是空的（原话："这格今天仍是空的"）。
   ⚠ **本票面把它写大了**：它只点了两枚切片，编排者 18:2x 逐字段读被拷贝的结构后是**一枚 map ＋ 三枚切片**（见下）。
@@ -79,3 +82,20 @@
 显式 pathspec、禁 `add -A`/`.`/`--amend`/`reset`/`stash`/`checkout .`/`clean`、禁 push、
 **临时件只建不删**（变异落仓外副本）、台账与勾归编排者、简报里任何一句前提复算不符 ⇒ 写进证据件并报回，
 **不要按我认为的样子改**。
+
+## Progress log（append-only；每个 commit 一行 `- [ISO-UTC] agent=... did=... next=...`）
+
+- [2026-09-25T11:00Z] agent=ticket146 did=**认领 + 现量（本 commit 零代码改动）**。三组读数，命令原文与落盘副本见
+  `docs/evidence/s1/146-liveapprovals-r1.md`：
+  ① `LiveApprovals(` 在 `*.go` 里 **10 处**（1 定义 `pending_read.go:42` + 1 生产 `cmd/wisp/panel_pump.go:61` + 8 本包测试）
+  ⇒ **票面说 11，我量到 10**，差 1 枚在测试侧（票面记 9 处测试，现树 8 处）；票面 :30 自己写了"下一程一律现量"，按现量走。
+  ② **被拷贝的结构的引用字段是 8 枚、不是票面表里的 5 枚**：`tools.Decision`（`internal/tools/gate.go:15-53`）除
+  `Params`/`Args`/`RulesHit`/`Paths`/`Capabilities` 之外还有 `Blacklist BlacklistNote`（`gate.go:43`），而
+  `BlacklistNote`（`internal/tools/mode.go:66-81`）自己带 `Absolute`/`Unlockable`/`AlreadyUnlocked` **三枚 `[]string`**
+  ⇒ 票面表漏计三枚（它只在 `Capabilities` 那行写了"元素本票没量"，没往 `Blacklist` 看）。形状仍然成立（确实共用底层），
+  只是比票面更大，所以**修法是同一族、只是范围宽一格**，不必停手；这一条按"复算不符"登记并上报。
+  ③ **AC#1 那句可核的判据：现量＝0 枚调用方（含测试）就地写过返回值里的 map/切片**（普查命令见证据件 §1.3），
+  `dec.Params` 在生产里**确有真值**（`internal/tools/bridge.go:267` 每次调用现解一份 JSON），所以那不是死字段、风险是活的。
+  next=**裁 AC#1**（ⓐ／ⓑ）。当前倾向 **ⓐ**，理由与"这跟票面默认方向 ⓑ 相反"的分歧一起写进证据件 §2 交编排者复核；
+  若我判不下去就停手，不自己填。AC 的框**一枚都不勾**——本票 :81 明写"台账与勾归编排者"。
+
