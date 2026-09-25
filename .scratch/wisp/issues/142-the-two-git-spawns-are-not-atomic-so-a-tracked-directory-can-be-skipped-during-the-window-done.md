@@ -29,16 +29,16 @@
 
 ## AC（1:1；裁决表 `docs/evidence/s1/142-*.md` 须出自**非实现者**）
 
-- [ ] **AC#1** 先把这一形**钉成能响的用例**，或诚实登记它打不开。判据：白盒构造两次读之间索引发生变化的状态（本仓已有同风格先例：直接问 `holds()`，见 `scan_test.go` 里 `TestFullTrackedListCoversWhatTheNarrowListCannot` 的 `ix.holds(...)` 那一手）。
+- [x] **AC#1** 先把这一形**钉成能响的用例**，或诚实登记它打不开。判据：白盒构造两次读之间索引发生变化的状态（本仓已有同风格先例：直接问 `holds()`，见 `scan_test.go` 里 `TestFullTrackedListCoversWhatTheNarrowListCannot` 的 `ix.holds(...)` 那一手）。
       ⚠ **不许硬开一道永不响的 AC**：若结构上打不开（像 close-r1 验收 §7.4 把交件件那条"TMPDIR"没测项直接划掉那样），
       正解是**原句不抹＋写明为什么产不出读数＋指出实质凭据是哪两发**，而不是把判据换成能通过的那版。
-- [ ] **AC#2** 修法**只许一个方向：fail toward more scanning**。
+- [x] **AC#2** 修法**只许一个方向：fail toward more scanning**。
       把 `narrow ⊄ full` 读成"这棵树在两读之间不静止"⇒ **一条 ignore 规则都不应用、全扫，并走 `note()` 那条响亮路径点名原因**。
       ⛔ 不许：加重试、加锁、比较后任选其一读数、加豁免名单、把方向反过来（少扫）。
       理由逐字引自 `ca84b75` 的既定失败方向：**问不到 git ⇒ 全扫并自陈**；本票是它的姊妹形——**问到了，但两个答案互相对不上**。
-- [ ] **AC#3** 变异自证**两向**：(i) 造出 `narrow ⊄ full` 的种子 ⇒ 门必须走全扫那一支且自陈行出现；
+- [x] **AC#3** 变异自证**两向**：(i) 造出 `narrow ⊄ full` 的种子 ⇒ 门必须走全扫那一支且自陈行出现；
       (ii) 摘掉新加的那味守卫 ⇒ AC#1 那枚用例必须**从绿变红**（按"承重"定义：摘掉它若什么都照旧，它就是装饰，本票直接作废并登记为什么是装饰）。
-- [ ] **AC#4** 门禁：`tools/d22scan` 自家测试（`sh tools/d22scan/runtests.sh -C tools/d22scan ./...`）＋ `sh scripts/d22scan.sh` **纯净快照**（`git archive`，无 `.git` 那一支必须仍响亮自陈）；
+- [x] **AC#4** 门禁：`tools/d22scan` 自家测试（`sh tools/d22scan/runtests.sh -C tools/d22scan ./...`）＋ `sh scripts/d22scan.sh` **纯净快照**（`git archive`，无 `.git` 那一支必须仍响亮自陈）；
       台账各 scope 命中数不降——⚠ **引数必须带锚点**，`A218⑥`/`A220⑤` 之后本仓基线一天内换了四次数，裸数字一律视为过期。
       ⛔ 不许为变绿放宽任何断言／加 Skip／动阈值。
       ⚠ 本票**是生产行为改动**（与 `ab9d5f4` 那批"注释级"不同形），所以 `git diff --numstat` 里生产文件的每一枚增删都要逐枚点名归因。
