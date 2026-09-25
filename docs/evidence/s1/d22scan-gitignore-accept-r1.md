@@ -212,3 +212,211 @@ so the worst this matcher can do is examine too much, never less" ——**这句
   而 `vendor/` 在本仓是被忽略的（`.gitignore:9`），所以"用库"在本仓并不可得。
 - `TestGitIgnoreRuleSemantics`（`scan_test.go:1358`）直接调 `newGitIgnore` / `g.decide`，
   是包内白盒测试，不需要真 `git` ⇒ 语义可证伪性不依赖外部程序。这一条我认可。
+
+---
+
+## 5. 另一根轴：有没有碰它不许碰的契约
+
+### 5.1 ban #8 字符类：**逐字节未动**
+
+```
+$ for a in 3bb99aa^ 3bb99aa HEAD; do git show $a:tools/d22scan/main.go \
+      | grep 'emojiRe = regexp.MustCompile' | sha256sum; done
+3bb99aa^  len=135  sha256[:16]=a6150ef689cc20c9
+3bb99aa   len=135  sha256[:16]=a6150ef689cc20c9
+HEAD      len=135  sha256[:16]=a6150ef689cc20c9
+```
+
+三枚锚点上同一串，且与票面期望值逐字相同（HEAD 现号 `tools/d22scan/main.go:149`）：
+
+```go
+var emojiRe = regexp.MustCompile(`[\x{1F000}-\x{1FAFF}\x{2200}-\x{22FF}\x{2600}-\x{27BF}\x{2B00}-\x{2BFF}\x{FE0F}\x{1F1E6}-\x{1F1FF}]`)
+```
+
+`git diff 3bb99aa^..3bb99aa -- tools/d22scan/main.go` 里 **没有任何一行 `+`/`-` 触及 `emojiRe` 或 `1F000`**
+（`grep -E '^[+-].*(emojiRe|1F000)'` 现量 rc=1）。⇒ 这一条不构成退回项。
+
+### 5.2 `allowlist.txt`：`git diff 3bb99aa^..3bb99aa -- tools/d22scan/allowlist.txt` 输出 **0 字节**，
+且 `git diff --name-status 3bb99aa^..3bb99aa` 根本不列它。⇒ **零豁免新增**，成立。
+
+### 5.3 `main.go` 那 9 行删除：逐枚点名（旧号来自 `git diff -U0 3bb99aa^..3bb99aa`）
+
+| # | 旧号 | 删除的原文 | 有没有"带分母的行为"被摘掉 |
+|---|---|---|---|
+| 1 | 30 | `//	                      The walk now examines 35 text files in this repo` | 注释，无分母 |
+| 2 | 31 | `//	                      (measured 2026-09-21 on a \`git archive HEAD\` snapshot)` | 注释，无分母 |
+| 3 | 349 | `"frontend/ that is not node_modules/ or testdata/ - .tsx, .ts, .mjs, .css, " +` | ban #6 的**说明文字**，替换成 `"… or testdata/ or a gitignored path (A207) - …"`（`main.go:375`），射程只增不减 |
+| 4 | 351 | `"the ban into (35 files as measured 2026-09-21).",` | 同一串说明，替换为 `"(35 files as measured 2026-09-21; 40 as measured 2026-09-25 at 467f8a4, …)"`，旧数**保留在文里**（不是抹掉） |
+| 5 | 594 | `if d.Name() == "testdata" \|\| d.Name() == ".git" {` | walkGo 目录判定 → `:633` 变为 `… \|\| s.ign.skip(path, true)`：**三支全在，追加第四支** |
+| 6 | 778 | `if d.Name() == "testdata" \|\| d.Name() == "node_modules" \|\| d.Name() == ".git" {` | walkText → `:823` 同上，三支原样保留 |
+| 7 | 849 | `if d.Name() == "node_modules" \|\| d.Name() == ".git" {` | walkEmoji → `:901` 同上，两支原样保留 |
+| 8 | 1081 | `if d.Name() == "testdata" \|\| d.Name() == ".git" {` | checkRoot → `:1146` 同上 |
+| 9 | 1086 | `if strings.HasSuffix(path, ".go") && !strings.HasSuffix(path, "_test.go") {` | checkRoot 计数条件 → `:1151` 追加 `&& !ign.skip(path, false)`，前两支原样 |
+
+⇒ **没有一枚删除摘掉过"带分母的行为"**：5–9 是 `\|\|`/`&&` 单向加严（剪掉更多，不是更少），1–4 是测量文字。
+"摘掉任意一味是否存在一发变异从此打不红"这一问，答案落在**新增的那一味**上（§1.3 那发），不是删除上——
+即：本修的红/绿差异不是"少了一条排除"造成的，而是"多了一条会吞掉交付件的排除"造成的。
+
+### 5.4 断言有没有放水（本仓口径只有两问：断言被改过吗 / helper 是否为通过而新造）
+
+- **删除行数**：`scan_test.go` `+231 / -0` ⇒ 旧断言一枚未删、一枚未改号。
+- **新增 `t.Skip` / 阈值 / golden**：`git show 3bb99aa | grep -E '^\+.*(t\.Skip|SKIP|threshold|golden)'` 现量 **rc=1（零命中）**。
+  新增两枚测试用的是 `t.Errorf`/`t.Fatal`（更强），不是放宽。
+- **唯一一处"断言逻辑被改"的地点** = `TestLedgerCountsMatchAnIndependentWalk` 的对照走查里插进了
+  `if ignoredLikeGit(relToRepo(root, p)) { return nil }`（`tools/d22scan/scan_test.go:1197`）。
+  这一支是**给 oracle 加了排除**，性质上属于"两边一起改才能维持一致"，所以它是否有牙必须实测，不能靠自述。
+  ⇒ 见 §6.8 那发"牙齿对照"：我在快照里往 `.gitignore` 追加一条落进被扫 scope 的规则，看这枚 oracle 是否当场打脸。
+- **helper 是否为通过而新造**：`relToRepo`(`:1433`) 与 `ignoredLikeGit`(`:1458`) 确为本批新造，
+  但它们的用途是给 oracle **加**约束（不是给被测方加豁免），且实现程在 `scan_test.go:1163-1173` 那段
+  注释里明写了这是"故意的第二份手抄副本 +  disagreement 即打脸"。判定：
+  **不是为通过而造，但它与实现共用同一条"纯模式"前提**（§1.4），所以它证伪不了 §1.3 那一支——
+  这枚局限是实现程自述里没有点破的。
+
+---
+
+## 6. _required_ 读数（全部现跑，日志在 `D:\tmp\d22scan-gitignore-accept-r1-snapshots\`）
+
+### 6.1 仪器自己那套的四数 + 名单枚数，与修前对比
+
+`scripts/d22scan.sh`（`set -eu`）两步：**step 1 = 正向对照**（`sh tools/d22scan/runtests.sh -C tools/d22scan ./...`），
+**step 2 = 真扫**（`go run . -root`）。四数**只由 step 1 产出**，八枚 per-scope 读数**只由 step 2 产出**。
+
+| 锚点 / 树 | 命令 | PASS | === RUN | FAIL | SKIP | 顶层名单枚数 |
+|---|---|---|---|---|---|---|
+| 修前 `467f8a4`，净快照 `pre\` | `sh scripts/d22scan.sh` 全流程 | **24** | **64** | 0 | 0 | **24** |
+| 修后 `ab785bf`，净快照 `head\` | `sh scripts/d22scan.sh` 全流程 | **26** | **66** | 0 | 0 | **26** |
+
+两枚 `rc=0`。差值 **+2/+2/0/0**，与自述（24→26 / 64→66）一致。
+名单差集（`diff pre-roster.txt head-roster.txt`）现量恰为两行、**只有新增没有消失**：
+
+```
+12a13
+> TestGitIgnoreRuleSemantics
+24a26
+> TestWalksSkipGitIgnoredPaths
+```
+
+⚠ 诚实记一枚我自己量错形状的地方：我用 `grep -c '\[no tests to run\]'` 复算 step 1 日志得 **1**，
+那枚 1 是 `runtests.sh` 自己的 OK 行里那句 `'[no tests to run]'=0` 的字面，**不是真实事件**；
+`runtests.sh` 报的 0 才是对的。step 1 里"哪一步产出哪个数"因此必须按上面的归属读，不能按我的复算读。
+
+⚠ 另一枚流程性事实（票面已写，本件复现）：step 1 红 ⇒ `set -eu` 让 step 2 **根本不跑**。
+`head-seeded-runtests.log` 就是这一形状的真例：我种了违规探针后 step 1 rc=1（两枚 FAIL：
+`TestScannerSelfScanOfRealRepoIsGreen` 报 `repo HEAD violates: frontend/src/still-bites.tsx:1`，
+`TestRealRepoLedgerIsHonest` 报 `HEAD must be green, rc=1`），**"step 2 没输出"绝不能读成"step 2 过了"**。
+
+### 6.2 still-bites（非忽略件仍必须打红）
+
+树 = `head\`（净快照 + 真实 `frontend/dist/` 构建产物 3 枚 + `frontend/dist/probe.txt`(≤) + `frontend/src/still-bites.tsx`(≤)）。
+扫描器 = `head\tools\d22scan`（修后代码）。
+
+```
+rc=1
+d22scan: skipped as git-ignored: 2 file(s) under 1 ignored director(ies) [frontend/dist/assets/], decided by frontend/.gitignore (3 path(s))
+d22scan: scope ban #6 frontend/         examined  41 text files
+d22scan: scope ban #8 frontend/         examined  41 text files
+frontend/src/still-bites.tsx:1: [emoji] ban #8 glyph in scope frontend/ is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)
+d22scan: 1 finding(s); D22 bans are not negotiable (...)
+```
+
+⇒ **成立**：不被忽略的 `≤` 照样 rc=1，点名的 scope 是 `frontend/`，分母随种子涨到 41。
+
+### 6.3 no-longer-counted（同一棵树、修前报 / 修后不报）
+
+同一串字节、同一份种子的 `pre\`（修前代码）：
+
+```
+rc=1
+d22scan: scope ban #6 frontend/         examined  45 text files
+d22scan: scope ban #8 frontend/         examined  45 text files
+frontend/dist/probe.txt:1: [emoji] ban #8 glyph in scope frontend/ is banned (D23): ...
+frontend/src/still-bites.tsx:1: [emoji] ban #8 glyph in scope frontend/ is banned (D23): ...
+d22scan: 2 finding(s); ...
+```
+
+修前 45 / 2 条 finding，修后 41 / 1 条。**finding 名单差集恰为 `frontend/dist/probe.txt` 一枚**
+⇒ "被 git 忽略的路径不再算进分母、不再被读"这条**行为变更是真的**，而 §6.2 那枚仍红说明它**目前**不是眼罩。
+分母差 45−41 = 4 = `index.html` + 2 枚 bundle + `probe.txt`（`.gitkeep` 因 `!` 否定留在 40 里），
+与"CI 的 40 含 `.gitkeep`"这一实现约束对得上。
+
+### 6.4 工作树 vs 净快照：八数并排（修后代码，读数锚点 `ab785bf`）
+
+| scope | 真工作树（只读 `-root`） | 净快照 `head\` | 同数？ |
+|---|---|---|---|
+| bans #1-5 internal/ | 203 | 203 | ✅ |
+| bans #1-5 cmd/ | 22 | 22 | ✅ |
+| ban #6 frontend/ | **40**（修前 43） | 40 | ✅（**本修要合流的就是这一枚**） |
+| ban #7 internal/tools/ | 18 | 18 | ✅ |
+| ban #8 design/ | **32** | **16** | ❌ **残留** |
+| ban #8 frontend/ | **40**（修前 43） | 40 | ✅ |
+| ban #8 internal/ | 405 | 405 | ✅ |
+| ban #8 cmd/ | 39 | 39 | ✅ |
+| examined production Go | 225 | 225 | ✅ |
+| rc | 0 | 0 | ✅ |
+
+修前对照（真工作树，`pre\` 代码）：`ban #6 frontend/=43`、`ban #8 frontend/=43`、`ban #8 design/=32`、其余同值、rc=0。
+⇒ **A207 的成因复现成立**（差 3 枚、正是那 3 枚被忽略的构建产物）。
+净快照修后 **不打印排除行**（`head-d22scan.log` step 2 全文无 `skipped as git-ignored`）⇒ 该沉默时沉默，成立。
+
+### 6.5 design/ 残留：票面假设**证实**；交付文本与台账**都没有过度声明**（我草稿里那句判错了，已在正文收回）
+
+现量（`42d141d`，只读）：
+
+```
+find design -type f                                        = 68
+git ls-files design | <isTextFile 的 15 类后缀>            = 16
+find design -type f | <同后缀>                            = 32
+git status --porcelain --ignored design  的 !! 行          = 0
+comm -13 <tracked 文本> <on-disk 文本>  按二级目录分组     = 16 design/doubao + 16 design/old
+```
+
+⇒ 32 = 16 枚受追踪 + 16 枚**未追踪且未被忽略**，后 16 枚正正落在票面猜的 `design/old/`、`design/doubao/`。
+`!!` 行为 0 ⇒ 没有任何一枚是 ignore 过滤器能吞的；**ignore 过滤器不能也不该吞它**。
+票面假设 **成立**，"worktree 恒等于 CI"这句话作为一般命题是**假的**（八枚里 7 枚同，`ban #8 design/` 不同）。
+
+- **交付文本自己**：`docs/evidence/s1/d22scan-gitignore-r1.md:186-189` 明写
+  "`ban #8 design/` 在这棵工作树上是 **32**、净快照是 **16**，本修**不动它，也不该动**"，并给出 `!!` 行=0 的现量。
+  ⇒ **实现程没有过度声明**，这一条不记在它头上。
+- **代码注释**：`main.go:529` "and 40 is the reading of both shapes" 所在段通篇只谈 `frontend/`
+  两枚数，语境里成立；`main.go:30-36` 同理。**但** `gitignore.go:33-34`
+  "`.gitignore` IS the policy; the scanner follows it, so the instrument and the repository's ignore rules cannot disagree"
+  是**一枚过度声明**：git 的 policy = 模式 **+ index**，实现只跟了前者（§1.3），所以"cannot disagree"当场就不成立。
+- **台账 A211**：**我这条草稿原本要判它过度声明，现跑之后收回**。
+  `docs/reports/pending-and-issues.md:5878` ② 末句 "**这道门的分母现在在工作树与干净检出上是同一个数。**"
+  单看是歧义的，但同一格 ③（`:5879`）逐字写着
+  "**一枚残留要说清，别让下一位以为'从此两边永远相等'**：工作树 `ban #8 design/=32` vs 净快照 `16`……
+  '跳 ignore' 治不了它，这是另一个因"。⇒ **台账没有过度声明，它自己就把射程划完了**；
+  ④（`:5880`）还预先登记了本件这发主攻击（"被跟踪的文件永远不会被 git 忽略……`git add -f` 的
+  `frontend/dist/*.txt` 会对门永久隐身＝把量尺换成蒙眼布"）。
+  ⇒ 本件的结论是：**编排者猜中了形状，但交付里没有任何一枚测试或一行代码防住它**（§1.3/§1.4）。
+
+### 6.6 note() 的自述数字与移动的分母不是同一个量纲（现量两例）
+
+`gitignore.go:173` 的模板：`skipped as git-ignored: %d file(s) under %d ignored director(ies) [%s] …`。
+
+| 树 | note 说的 file(s) | 分母实际移动 | 差额来源 |
+||---|---|---|
+| §6.2 seeded `head\` | 2 | 45 → 41（**4** 枚） | `assets/` 里 2 枚 bundle 被 SkipDir 剪掉，**从未被 visit**，不进 `files` |
+| 真工作树（§6.4） | 1 | 43 → 40（**3** 枚） | 同上 2 枚 bundle |
+| §1.3 forcedfull-ci | 1 | 41 → 40（1 枚） | 无被剪目录，恰好对得上 |
+
+⇒ `files` 记的是**walk 访问次数**，`pruned` 记的是目录名，模板那句 "N file(s) **under** M ignored director(ies)"
+把这二者读成了包含关系。实现程在 `d22scan-gitignore-r1.md:127-130` 自捉过**另一种**错（两份 walk 重复计数，
+`counted` 去重后修好），但这一枚"剪掉的目录里不再计数"没修也没登记。
+最小修法：note 里对每个被剪目录补一句它里面**还有多少枚文件**（walk 已 visit 过该目录本身，`os.ReadDir` 一次即得），
+或者把措辞改成 `N path(s) skipped individually, M ignored director(y|ies) pruned`——
+这枚 note 存在的唯一理由就是"移动了的数必须能被解释"（`main.go:1302-1309` 那段自述），
+所以它现在**只解释了三枚里的第一枚**。
+
+### 6.7 构建产物存在时，正向对照还绿不绿（修后代码）
+
+`headbuild\` = `git archive` + 真 `frontend/dist/{index.html,assets/×2}`，**不种违规**：
+
+```
+$ sh tools/d22scan/runtests.sh -C tools/d22scan ./...      rc=0
+runtests.sh: OK - packages=[./...] top-level: PASS=26 FAIL=0 SKIP=0, === RUN=66, '[no tests to run]'=0
+```
+
+⇒ 有构建产物的树上 step 1 仍绿。附带一枚对我有利的否证：`head-seeded-runtests.log:116-122,130`
+现量 `ban #6 frontend/=41`、`ban #8 frontend/=41`、独立对照 `verified ban #6 frontend/: 41 files`
+⇒ 三方（两枚 walk + oracle）在**带构建产物**的树上给出同一个 41，等式那两枚守卫没被绕过。
