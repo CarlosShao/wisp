@@ -1129,3 +1129,74 @@ owner 拍的甲＝「先删掉这个请求」，撤销口令「撤 Q-50 甲」�
 `done` 恒假；`render-stream.tsx:247` 是**顺带成立**（靠 `result-stream.tsx:24` 的三元式，不靠组件自己那扇门）。
 ⇒ 结论未变：**终态那格目前是零覆盖**，修法是把 `segments × count → markup` 抽成纯函数（在 `src/lib/reveal.ts`），
 让 `C1` 变红。这一格要不要现在做，等他排；我没有顺手改判据。
+
+---
+
+## 51. `F5`（看门狗 13:4x 派）：让门禁替「没引入颜色字面量」签字——**签的那道门不是 `tokens:check`**
+
+读数时刻 `2026-09-25 13:4x–13:5x +08`（`date` 重跑过），起点 HEAD `28858f7`。
+
+### 51.1 先报前提：`F5` 那一格把两把尺当成一把了
+
+票面写的是「跑 `npm run tokens:check` ＋那把色值尺，让门禁替『没引入颜色字面量』那句话签字」。
+现量 `scripts/gen-tokens.mjs:166-181`：`--check` 做的事是**把 `design/assets/tokens.css` 重新生成一遍，
+与 `src/styles/tokens.generated.css` 逐字节比**，它**不读 `theme.css` 里手写的那段规则**——也就是说
+我 11:39 加的那 8 行 `@keyframes l2-ball-ring` 落不落在这把尺的射程里，答案是**不落**。
+真正守「颜色字面量只能活在生成主题里」的是**另一枚**仪器：
+`internal/panel/frontend_hygiene_test.go:196-220` 的
+`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`——它从 `src/main.tsx` 走 **import 闭包**
+（`:101-137`，含 CSS 的 `@import` 与 `./`／`@/` 两种拼写），除 `tokens.generated.css` 外任何一行的
+`colourLitRe`（`:61`：`#[0-9A-Fa-f]{3,8}\b|\brgba?\(`）命中即 `t.Errorf`。
+⇒ 两半我都跑了，但**签字的是后一枚**；`tokens:check` 那半只签「生成主题没被手改过」这一句。
+挂点（读出来的，不是我推的）：`ci.yml:636` 步名 `token drift guard (generated theme must equal the C21 table)`
+在 `lint-frontend` 里；色值尺在 `internal/panel`，`scripts/portable-tests.sh:179` 把它列进 `--scope=core`，
+对应 `ci.yml:288` 那一步（步名在 `:266`）。
+
+### 51.2 读数（HEAD 的字节，两枚都绿）
+
+| 仪器 | 命令 | 读数 |
+|---|---|---|
+| `token drift guard` | `node scripts/gen-tokens.mjs --check`（HEAD 净快照） | **rc=0**：`matches design/assets/tokens.css (129 dark + 65 light declarations)` |
+| 色值尺 | `go test ./internal/panel/ -run TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme -v` | **rc=0**：`18 files reachable from main.tsx carry colour literals only in the generated theme` |
+| 同文件的挂载尺（顺带） | 同上 `-run TestVendoredDemoComponentsAreNotMounted` | **rc=0**：`1 mounted (shimmer.tsx), 7 unmounted upstream demos` ⇒ 与 §50.1 我那两条 grep **不同仪器、同一结论** |
+
+### 51.3 三发变异：这两把尺各咬什么
+
+| 号 | 变异（只在 `D:\tmp` 的净快照里做，真树零污染） | 结果 |
+|---|---|---|
+| `M1` | 往生成主题 `--bg-overlay` 那一行塞**一个空格** | `tokens:check` **rc=1**（"is not what design/assets/tokens.css generates"）；还原后 rc=0，`sha256` 与 HEAD blob 同值 ⇒ 那把尺不是恒绿 |
+| `M2` | 往**我自己那 8 行**的 `0%` 帧里塞 `color: #3b82f6` | 色值尺 **`--- FAIL`**，红句逐字：`frontend/src/styles/theme.css:230: 0%, to { opacity: 0.2; color: #3b82f6; transform: scale(0.85); }` ⇒ **`theme.css` 确实在闭包里**，"顺带成立"这一支排除 |
+| `M3` | 同一位置换成 `rgba(59,130,246,1)` 拼写 | 同样 `--- FAIL` 指到 `:230` ⇒ `colourLitRe` 两个分支都有牙 |
+
+还原凭据：`git cat-file blob HEAD:frontend/src/styles/theme.css` 与快照那份 `sha256` 同为
+`4b96f674…48f679`；三发变异之后快照外没有任何文件被动过（`git status --porcelain -- frontend/` 只在
+本节那枚注释上是 `M`，其余为空）。
+
+### 51.4 两枚当场撞出来的坑（都记成仪器事实，不改任何门）
+
+1. **`tokens:check` 在当前工作树上根本跑不了**：`rc=1`，但**不是漂移**——是 `ENOENT ... design\assets\tokens.css`。
+   生成器唯一的输入就是那枚文件，而它正躺在 owner 那 16 枚未提交的 `design/**` 删除里（我按口径**不还原、不提交、不删**）。
+   ⇒ 「每次动 `theme.css` 都跑 `tokens:check`」这条**本机今天做不到**，CI 不受影响（它检出 HEAD）。
+   要本机量只能走净快照，且见下条。
+2. **Windows 上 `git archive` 出来的 `tokens.generated.css` 是 CRLF**：HEAD blob `11276 B / CR=0`，
+   archive 落盘 `11574 B / CR=298` ⇒ 直接跑 `--check` 得到的是**假红**。`git -c core.autocrlf=false archive` 也救不回来
+   （本机 `core.autocrlf=true`、`.gitattributes` 是 `* text=auto`）。可复现的做法：把参与比较的那两枚文件
+   按 `git cat-file blob HEAD:<path>` 的字节放回快照，再跑——**这才是 CI 看到的字节**。
+3. 顺带一枚我自己差点造的假红：新注释第一版写了「`rgb()/rgba()`」这种**散文里的括号**，
+   而色值尺**没有注释豁免**（`frontend_hygiene_test.go:67-70` 自己明写"this copy has no comment exemption"）
+   ⇒ 那把尺会因一句解释文字判红。已改成"rgb / rgba colour calls"，改后现扫三把尺
+   （ban #8 字符类／PLAN 宽射程含箭头／色值尺）对 `theme.css` **全部 0 命中**。
+4. 那把尺的**射程上界**也报清楚：它只认 hex 与 `rgb`/`rgba` 两种拼写，`oklch(`/`hsl(`/`color-mix(`/裸色名
+   **不在其内**。今天不亏：现扫 `frontend/src`（排除生成文件）对这四种拼写 **0 命中**。
+   要收紧得动 `internal/**`——不是我的地界，不碰。
+
+### 51.5 这轮真正落进 `frontend/` 的一处改动（一枚文件）
+
+`src/styles/theme.css:217-233` 那段注释重写：**把"没引入颜色字面量"这句话从自述改成指到仪器与读数**
+（点名 `TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`、18 枚文件、0 违规、以及 `M2` 会指到行号），
+并且**收回**上一版那句"the card is not mounted while the panel is idle"——§50.2 已经量明：面板没有"态"字段，
+那句是我替 Go 侧做的推断，不该以事实的语气写在样式表里；换成"挂载条件是 `pending` 里有卡，两者只在 Go
+不在空闲态推卡时才等值，这条依赖记在 §50"。改后四道门复跑：`typecheck` rc=0、
+`render:nav` OK（9 行／70 枚冻结名／interim=2）、`render:l2` OK（1 张卡、15085 B）、`render:stream` OK。
+⚠ 一句可复现性提醒：`npm run render:l2` **不带参数会 exit=2**（usage），CI 同形是
+`npm run render:l2 -- fixtures/l2-card-fs-delete.json`（`ci.yml:656`）。

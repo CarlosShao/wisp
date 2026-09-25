@@ -216,11 +216,22 @@
 
 /* The 20px ball glyph on the L2 card breathes a ring on a 2s period
    (PLAN.md:3481's 动效 cell: "悬浮球图示的环 2s 呼吸"). Colour is inherited from
-   the element so the component decides it with a token class - no literal here.
+   the element so the component decides it with a token class; "no colour
+   literal here" is NOT a claim this comment gets to make on its own - it is
+   signed by TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme in
+   internal/panel/frontend_hygiene_test.go, which walks the import closure of
+   src/main.tsx (this file included: main.tsx imports it) and rejects hex and
+   rgb / rgba colour calls outside the generated theme. Measured on HEAD: 18
+   reachable files, 0 offenders; and it does ring - a hex written into the
+   keyframes below fails it by name and line number.
    transform-box/origin are what make a scale() on an SVG circle grow from the
    circle's own centre instead of the viewport corner. Loop animation is
-   permitted here by PLAN.md:3491, which lists 审批等待 among the non-idle states;
-   the card is not mounted while the panel is idle. */
+   permitted here by PLAN.md:3491, which lists 审批等待 among the non-idle states.
+   What this rule can NOT see: the panel gets no machine-state field (see
+   lib/panel.ts's PanelSnapshot), so the mount condition below is "a card is in
+   pending", not "the machine is in 审批等待" - the two are only the same claim
+   as long as Go never pushes a pending card in an idle state. docs/reports/
+   frontend-session-log.md §50 records that as a dependency, not as a guard. */
 .l2-ball-ring {
   animation: l2-ball-ring 2s ease-in-out infinite;
   transform-box: fill-box;
