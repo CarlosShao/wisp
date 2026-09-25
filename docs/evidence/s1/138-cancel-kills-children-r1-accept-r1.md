@@ -580,6 +580,208 @@ internal/risk/provenance.go:387  logf("risk/C25: scope %q not open (CloseScope r
 
 ---
 
+⚠ **物理次序说明（本格排在第 3 格之前）**：我追加本格时 Edit 锚点选错（锚在 §2.7 第 4 条那句上），
+于是整格 §4 被插进了 §2 与 §3 之间；**同一次误锚还把 §2.7 的第 4 条覆盖成了 §3.8 第 4 条的拷贝**，
+已在 commit 之前修回。可复算凭据（**不在此引具体 grep 式样，免得本段自身成为第二枚命中**）：
+①`git diff HEAD -- <本件>` 删除行 0 枚＝已 commit 的文字一枚未动；
+②§2.7 第 4 条现在是"spawn 普查尺序写反"那条（原样回归），§3.8 第 4 条是"SPEC-07 文件名写错"那条，
+两件各在其位、件内不重复。
+两格内容互不依赖，编号按"第 N 格"读；**已 commit 的第 3 格不移动、不改写**，所以物理次序是
+`0 → 1 → 2 → 4 → 3 → 5`。这一枚同时记在 §4.8 与本件 §5.6。
+
+## 4　AC#4（门禁）复跑 —— 先核它的原始件，再在**被验版本的快照**里自己跑一遍
+
+**判据**（派单 §5＋票面 AC#4）：只读地跑；**判红绿只认 `--- FAIL:` 行**；
+⚠ 不用裸 `grep -c '--- FAIL'` 数枚数；`gofumpt -l` 若点到 `cmd/wisp/**` 那是 149 的中间态、不归本票。
+
+### 4.0　为什么本程**不能**在工作树里跑（这一发是派单 §0 那条纪律的实发）
+
+```
+$ git status --porcelain -- internal tools scripts
+（空——因为 139 的活已经 commit 了，不是"脏"）
+$ git diff --stat 3f6322f -- internal tools scripts
+ internal/agent/compress.go            |  60 +++++-
+ internal/agent/compress_trace_test.go | 393 ++++++++++++++++++++++++++++++++++
+ internal/agent/harness_test.go        |   8 +
+ internal/agent/loop.go                |   2 +-
+ 4 files changed, 460 insertions(+), 3 deletions(-)
+```
+
+⇒ **票 139 已把 `internal/agent/` 改过四枚文件**（含 `loop.go`——正是本票 §0 那枚锚所在的那文件）。
+⇒ 在工作树里跑 `go test ./internal/agent/` 量到的是**139 的版本**，不是被验版本 `3f6322f`。
+⇒ 本程因此建**仓外快照**（只建不删，编号 `snap1`）：
+
+```
+$ mkdir -p /tmp/t138accept-r1/snap1
+$ git -c core.autocrlf=false -c core.eol=lf archive 3f6322f | tar -x -C /tmp/t138accept-r1/snap1
+$ grep -c 'func (t \*RunningTask) Cancel' /tmp/t138accept-r1/snap1/internal/agent/loop.go
+1        （与 `git grep -c ... 3f6322f -- internal/agent/loop.go` 的 1 同）
+```
+
+### 4.1　第一发（最值钱的一发）：**它的原始读数还在盘上，我拿它自己的日志复算了它的四数**
+
+`/tmp/ticket138-r1/` 是它留的仓外临时件，**本程一枚未动**：
+
+```
+$ ls -l /tmp/ticket138-r1
+agent-after-c2.log 25524 Sep 25 23:19   agent-after-c2.rc 5 Sep 25 23:19
+agent-before.log   12860 Sep 25 22:57   agent-before.rc      5 Sep 25 22:57
+d22scan.log        22263 Sep 25 23:16   r1.txt 3191 / r2.txt 3191
+shellexec.txt        650 Sep 25 23:07   slo144_head.go 22205 Sep 25 23:19
+$ for f in agent-before.log agent-after-c2.log; do echo "$f RUN=$(grep -c '=== RUN' $f) TOPPASS=$(grep -c '^--- PASS' $f) ALLPASS=$(grep -c '^[ \t]*--- PASS' $f) FAIL_colon=$(grep -c -- '--- FAIL:' $f) FAIL_nocolon=$(grep -c -- '--- FAIL' $f) SKIP=$(grep -c -- '--- SKIP' $f) panic=$(grep -c '^panic:' $f)"; done
+agent-before.log    RUN=76  TOPPASS=59   ALLPASS=76   FAIL_colon=0  FAIL_nocolon=0  SKIP=0  panic=0
+agent-after-c2.log  RUN=152 TOPPASS=118  ALLPASS=152  FAIL_colon=0  FAIL_nocolon=0  SKIP=0  panic=0
+$ echo "rc-before=[$(cat agent-before.rc)] rc-after=[$(cat agent-after-c2.rc)]"
+rc-before=[rc=0] rc-after=[rc=0]
+$ awk '/^=== RUN/{print $3} /^[ \t]*--- (PASS|FAIL|SKIP)/{print $3}' agent-before.log  | sort -u > b.names   # 76
+$ awk '/^=== RUN/{print $3} /^[ \t]*--- (PASS|FAIL|SKIP)/{print $3}' agent-after-c2.log | sort -u > a.names   # 76
+$ comm -23 b.names a.names   （空）
+$ comm -13 b.names a.names   （空）
+$ for f in agent-before.log agent-after-c2.log; do
+    awk '/^=== RUN/{print $3}' $f | sort -u > r.txt
+    awk '/^[ \t]*--- (PASS|FAIL|SKIP)/{print $3}' $f | sort -u > v.txt
+    comm -3 r.txt v.txt ; done      （两发皆空）
+```
+
+⇒ **它 §6.1 的四数、两向名册差集、同包"开跑 vs 出裁决"等集、`panic:`＝0、两枚 rc＝0，
+我拿它自己留下的原始日志逐发复算，全部对上。** 这一发判的是**诚实性**，不是"门禁绿不绿"。
+
+### 4.2　第二发：我自己在快照里跑（与被验版本同树）
+
+```
+$ cd /tmp/t138accept-r1/snap1
+$ go test -v -count=1 ./internal/agent/ > .../acc-agent-c1.log ; rc=0
+RUN=76  TOPPASS=59  ALLPASS=76  FAIL:=0  FAIL(nocolon)=0  SKIP=0  panic:=0
+ok      github.com/CarlosShao/wisp/internal/agent       2.315s
+
+$ go test -v -count=2 ./internal/agent/ > .../acc-agent-c2.log ; rc=0
+RUN=152 TOPPASS=118 ALLPASS=152 FAIL:=0 SKIP=0 panic:=0   unique 名册=76
+$ comm -3 <(我的 c2 名册) <(它 agent-after-c2.log 的名册)
+（空）
+```
+
+⇒ **两形四数与它逐字同**，且**名册两向差集为空**（我的 c2 ↔ 它的 c2，76 枚同名）。
+⇒ `152 = 2 × 76`、`118 = 2 × 59` 算术自洽也在我这一发里成立。
+⇒ 派单那条"别用裸 `grep -c '--- FAIL'` 数枚数"我照办了：**两个口径都取了**（`--- FAIL:` 与 `--- FAIL`），
+本票这一包两口径同为 0 ⇒ 这发没有假红可拆；那把坑我在 §4.6 留了防法说明。
+
+### 4.3　第三发：`go vet`／`gofmt -l`／`gofumpt -l`（快照＝被验版本）
+
+```
+$ go vet ./internal/agent/ ; echo rc=$?
+rc=0
+$ D:/work/base/gopath/bin/gofumpt.exe --version
+v0.12.0 (go1.27.1)
+$ D:/work/base/gopath/bin/gofumpt.exe -l .        （整棵快照树）
+（空）
+$ gofmt -l .                                      （整棵快照树）
+（空）
+```
+
+⇒ 三发全空／rc=0。⚠ **这一发比它 §6.3 更干净**：它在工作树里跑，唯一命中是
+`cmd/wisp/slo_report_144_windows_test.go`（149 的中间态），而**被验版本里那一枚文件是干净的**——
+它在 §6.3 用第三发（`git show HEAD:… > /tmp/…/slo144_head.go` 再 gofumpt）已经自证过同一件事，
+我这发从快照侧独立对上。**没有一枚红需要归给本票。**
+
+### 4.4　第四发：`sh scripts/d22scan.sh`——顺带实地看到那条"问不到 git 就全扫并响亮自陈"
+
+```
+$ cd /tmp/t138accept-r1/snap1 && sh scripts/d22scan.sh ; rc=0
+d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/.../snap1:
+  `git rev-parse --show-prefix`: fatal: not a git repository …; every path in every scope is
+  being scanned, so the counts below may include build output (A207's machine-dependent denominator).
+  This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+d22scan: examined 228 production Go files under internal/ and cmd/ of C:/Users/.../snap1
+d22scan: scope bans #1-5 internal/      examined 205 production Go files
+d22scan: scope bans #1-5 cmd/           examined  23 production Go files
+d22scan: scope ban #6 frontend/         examined  52 text files
+d22scan: scope ban #7 internal/tools/   examined  18 production Go files
+d22scan: scope ban #8 design/           examined  30 text files
+d22scan: scope ban #8 frontend/         examined  52 text files
+d22scan: scope ban #8 internal/         examined 412 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined  43 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations
+
+$ grep -E '^d22scan' /tmp/ticket138-r1/d22scan.log     （它那一发，工作树）
+d22scan: skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/] …
+d22scan: examined 228 …  bans #1-5 internal/=205  cmd/=23  ban #7 internal/tools/=18
+                         ban #6 frontend/=66  ban #8 design/=39  frontend/=66  internal/=412  cmd/=43
+```
+
+**读数（两发的差集正好把"哪些分母随树走"钉住了）**：
+- **Go 侧六枚分母逐枚相同**：`228 / 205 / 23 / 18 / 412 / 43` ⇒ 本票射程内那几棵在两棵树下同形。
+- **两枚不同**：`frontend/ 52（快照）↔ 66（它的工作树）`、`design/ 30（快照）↔ 39（工作树）`
+  ⇒ 差的全是**别人在飞的东西**（外部前端会话的未跟踪新组件、owner 挪动的 `design/**`）。
+  它 §6.4 那句"这两枚分母随工作树走、不在本程控制内"**成立**，我这发是它的独立对照。
+- ⚠ **它那句"八个作用域分母全非零"在我的快照发里同样成立**，但我的发**多了一行它没有的自陈**
+  （快照无 `.git` ⇒ gitignore 不生效、全扫）。⇒ 这不是它的缺陷；
+  是一条**给下一程的仪器话**：**在 `git archive` 快照里跑 `d22scan` 会得到"更大的分母＋一条 loud 自陈"，
+  拿它和工作树发直接比 `frontend/`、`design/` 两枚数是错的**（我今天核差集时就是按这口径分开的）。
+
+### 4.5　第五发：构建（AC#4 没列它，但 §6.5 声明过，我复算）
+
+```
+$ cd /tmp/t138accept-r1/snap1
+$ go build ./internal/... ; echo rc=$?   → rc=0
+$ go build ./...          ; (无输出)  rc=0
+```
+
+⇒ 与被验版本同树的整树构建 **rc=0**（它的 §6.5 那发成立）。
+⇒ ⚠ 顺带把台账 `A265⑤` 那枚"快照缺 `third_party/` 会造 8 枚假红"的坑**在 build 这一层排除掉**了：
+我的快照确实没有 `third_party/`（`ls -d …/snap1/third_party` ⇒ No such file），构建仍 rc=0
+⇒ **那枚坑只咬测试运行期（要 DLL 的那族），不咬构建**。本程 §4.2 的测试发也没有 DLL 类红。
+
+### 4.6　本格裁决 ＋ 一枚落点规矩没走
+
+**档位：AC#4 成立。** 四数两形、名册两向差集、vet／gofmt／gofumpt、d22scan 八枚分母、构建，
+**全部由我在被验版本同树里独立复算到与它同值**；再加上 §4.1 那发"拿它自己留的原始日志复算它的四数"，
+本格的诚实性与正确性**两层都有读数**。没有一枚红需要归给本票。
+
+⚠ **但有一处要报名字**：本票的原始读数（`agent-before.log`／`agent-after-c2.log`／`d22scan.log`／
+名册 `r1.txt`／`r2.txt`）**只活在 `/tmp/ticket138-r1/`，没有进仓**。
+
+```
+$ ls .scratch/wisp/probes/
+147   149          ← 只有这两族；不存在 probes/138/
+$ git ls-files .scratch/wisp/probes | sed 's#.scratch/wisp/probes/##' | cut -d/ -f1 | sort -u
+147
+149
+```
+
+⇒ 台账 `A264③`（编排者 22:2x 自己定的规矩）逐字："**往后写码程一律按 `probes/<票号>/` 放原始件**，
+理由：验收方要能**不依赖临时目录**复核原始读数（临时件会被清…）"。
+⇒ 本程今天**恰好**还能做 §4.1 那一发，纯因 `/tmp` 那一目录还没被清——**规矩要的就是把这枚运气拿掉**。
+⇒ 这不改本票任何判语（我用快照自己跑了一遍，不依赖它的临时件），但**该记在它名下**：
+它是新规矩生效后**第一枚没按新规矩落原始件的程**（147／149 两枚都落了）。
+
+### 4.7　本程没测什么（按"漏了它谁会先被骗"排序）
+
+1. **没跑 `-race`**，没跑 CI 那六步里的任何一步（`staticcheck`／`portable-tests.sh`／`cmd/wisp CLI tests`）。
+   本票零代码改动 ⇒ 那些步的颜色与它无关；但我**没有**为"无关"取过数，只报了 §1.5 那步级结论。
+2. **没在 linux 容器里跑 `*_other_test.go` 那族**（AC#4 没要求，`A265` 那族"Windows 上没分母"的形状仍在）。
+3. **没复算 §6.1 之外它另两发的原始件**（`r1.txt`／`r2.txt` 我没展开对，`shellexec.txt` 同）。
+   我只对了我能独立判的四数＋名册＋d22scan 三类。
+4. **没验 `go build ./...` 在**带 `third_party/` 的真树**上的行为**——我跑的是无 DLL 的快照，rc=0 只证到那一棵。
+5. **没测 139 的改动会不会把本票的"任务侧零子进程"结论推动**：`internal/agent/compress.go` 那 60 行
+   是留痕相关、不是 spawn 相关（我扫过 diff 的统计），但**我没读那 460 行的内容**。
+   ⇒ 若 139 后来接了任何外部通道，本件第 2 格要在**它的锚点**上重走一次，不能引我这份。
+
+### 4.8　结论修正记录（本格）
+
+1. **给它补了一发本可省掉的证据**：§4.1 用**它自己留的原始日志**复算它的四数——这一发它没法从自己件里复核
+   （它只贴了汇总行），我把它做成了可比对的两枚名册文件。
+2. **修正台账 `A265⑤` 那枚坑的射程**（一处收窄，不是推翻）：那条说"仓外快照不补 `third_party/` 会拿到 8 枚假红"。
+   现量：同一条快照（`ls -d snap1/third_party` ⇒ 不存在）**构建 `rc=0`、`./internal/agent/` 测试 76/76 全绿**
+   ⇒ 那 8 枚假红的射程是**要加载原生 DLL 的那族测试**（`cmd/wisp` 一类），**不是"快照里的任何 Go 命令"**。
+   这句对下一程有用：别因为怕那 8 枚假红而放弃在快照里跑 `internal/**`。
+3. **本程自报一处工具伤（不是读数伤）**：本格追加时 Edit 锚点选错，插到了 §2 与 §3 之间，
+   并一度把 §2.7 的第 4 条覆盖成 §3.8 第 4 条的拷贝。修回过程与本格的自查都在件首那块"物理次序说明"里；
+   可复算凭据＝`git diff HEAD -- <本件>` 的**删除行 0 枚**（已 commit 的文字一枚未动）＋两枚 `grep` 计数。
+   ⇒ 留这条的原因不是道歉，是**形状**：共享工作树里"追加到件尾"这件事**用文字锚做 Edit 是会咬到前文的**，
+   下一程要么锚在**文件唯一尾串**上，要么每次 Edit 完立刻 `git diff --numstat` ＋ `grep -c` 自查。
+
+---
+
 ## 3　派单第 4 节的两判 —— 那笔 `DEFERRED` 登记能不能落地 ／ 本票该"作废并登记"还是"改判保留"
 
 **判据**（派单 §4）：ⓐ 登记是否只能摆成 owner 的 `Q##`，说清为什么不能由 agent 单方落；
