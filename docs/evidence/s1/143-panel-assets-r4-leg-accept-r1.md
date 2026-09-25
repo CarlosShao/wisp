@@ -372,10 +372,75 @@ Bridge 的生产构造点也只有 1 处：`cmd/wisp/run.go:395 rt.bridge = tool
 3. 真正要拍的是一枚**口径**而不是代码："`TaskID` 为空的调用该怎么办"——fail-closed 升 L2、还是直接拒绝执行并报缺件？
    后者会让所有无 scope 的新入口（例如未来的单发工具探针）第一天就撞墙，属于 D22 闸门③/D33 那一层的决定，**得人工拍**。
 
+后者会让所有无 scope 的新入口（例如未来的单发工具探针）第一天就撞墙，属于 D22 闸门③/D33 那一层的决定，**得人工拍**。
+
 给编排者的落点建议（不是我的决定）：把 F-143-1 挂**触发条件**存着——
 "任何非测试的 `ToolRequest{`/`Bridge.Execute` 调用者出现且不带非空 `TaskID`"，或"任何 `tools.Options` 构造点省略 `Provenance`"，
 两者任一成立即把这条从登记转成票；届时最便宜的形状是 `assessorFor` 开头那三个 disjunct 里
 后两味改成 fail-closed（宁可拒答也不裸判），而不是给无 scope 调用配一枚全局 detector——**本程不给 patch，不动那棵树**。
+
+---
+
+## §8 攻点 8：契约轴（先点名分母再说零命中，同尺跑正控）+ 实现方"没测什么"八项逐条归口
+
+锚点 `00cfc7b`（本程读数一路从 `d242168` 跟到这里；`cmd/wisp/` 全程 0 行脏）。
+
+### 8.1 分母（`git ls-files`，不是 `ls`；逐枚点名）
+
+| 那把尺要照的东西 | 分母 | 存在性 |
+|---|---|---|
+| `internal/risk` 的文件枚数 | **37** | `rules_gateway.go`／`assessor.go`／`provenance.go`／`taintmatch.go` 各 tracked=1（最后改动 `67ffbd8 09-20 08:22`／`f342413 09-21 08:25`／`c091ee2 09-20 13:06`）⇒ **全部早于本票** |
+| golden 枚数 | **58**（`git ls-files -- '*golden*'`） | 最后改动 golden 的是 `62dda11 09-23 20:58` |
+| `thresholds.go` | 1（`internal/observe/thresholds.go`） | 最后改动 `00bbb76 09-20 22:52` |
+| `rules_gateway.go` | 1 | 同上 |
+| `allowlist.txt` | 1（`tools/d22scan/allowlist.txt`——它是 d22scan 自己的豁免表，不是 C 系契约件） | 最后改动 `38b3715 09-21 09:00` |
+| `docs/PLAN.md` | 1 | 最后改动 `45623e4 09-24 11:01`（早于本票开） |
+| `docs/specs/**` | **14** | — |
+| `frontend/**` | **46** | — |
+| `design/**` | **30** | **本程不算进任何零命中证据**（见 8.3） |
+| `tools/d22scan/**` | 6 | — |
+
+### 8.2 零命中（两把尺）+ 同尺正控
+
+```
+尺一（工作树）：git status --porcelain -- internal/risk internal/panel tools/d22scan frontend docs/PLAN.md docs/specs internal/observe/thresholds.go
+读数 = 0 行；补两把同形状：git status --porcelain -- '*golden*' internal/observe/  = 0 行
+尺二（提交轴， immune 到别程脏树）：git diff --name-only 9be3288^ 4037539 -- internal/risk internal/panel tools/d22scan frontend docs/PLAN.md docs/specs internal/observe/thresholds.go '*golden*'
+读数 = 0 行
+正控（同一把尺二，pathspec 末尾多带 cmd/wisp/）：
+  git diff --name-only 9be3288^ 9be3288 -- <上面那串> cmd/wisp/
+  → cmd/wisp/panel_assets.go
+    cmd/wisp/panel_assets_143_test.go            ← 尺子看得见改动，所以上面那两枚零不是"尺子坏了"
+正控（golden 那把单独验）：git diff --name-only 62dda11^ 62dda11 -- '*golden*' → internal/agent/loop_golden_test.go（1 行）
+```
+
+⇒ **契约轴零命中成立**，且是两把尺互相验（工作树尺证明"现在没人动"，提交轴尺证明"票 143 这两枚 commit 没动"，
+正控证明两把尺都有牙）。`internal/risk/**` 一字未动这一句：**独立复量成立**
+（`git log --oneline 9be3288^..HEAD -- internal/risk/` = **空**，比"实现方说没动"更硬）。
+
+### 8.3 `design/**` 那一格按简报排除，并单独给读数
+
+`git status --porcelain -- design | wc -l` = **20**（16 枚未提交的 ` D` 删除 ＋ 4 枚 `??`）——**owner 的现场**。
+本程既没还原、没提交、没删，**也没把它算进 8.2 的任何零命中证据**（8.2 那条 pathspec 串里根本没有 `design/`，
+`design/` 只在 §6.4 的 d22scan 分母里以"它自己扫到 32 枚 text files"出现）。
+
+### 8.4 实现方 §6 那"没测什么"八项——逐条裁：必须现在补 / 归口 / 已被本程替掉
+
+| # | 它说没测的 | 本程裁 | 依据（现量出处） |
+|---|---|---|---|
+| 1 | 没验卡面字节键与前端 `panel.ts` 一致（`internal/panel` 的测试） | **部分已被本程替掉**：本程跑了 `go test -run 'TestApprovalCardView' ./internal/panel/` = ok；**整包 `internal/panel` 仍未跑**（另一程的地界，本程不越） | §5.1 |
+| 2 | **同时含 R2+R3+R4 的卡这条路仍产不出** | **判：不必现在补**，但简报点名要判的这一条本程量到了实处：`-l2 fs.write` 打 `C:/Users/dev/.ssh/id_rsa` 这种 A 档敏感路径，卡上只有 `R1`+`R4`、等级 L2 完全来自 R4，`R2/R3` 一次都没出现（红因在源码：`rules_gateway.go:33` 与 `:61` 两行 `ctx.canon == nil`/`ctx.classifier == nil` 的休眠门，而 `panel_assets.go:64` 那枚 assessor 两样都没接）。⇒ 这不是本票的伤（票面地界就只给 cmd 侧那两枚文件），**但它也不需要同步解冻 `internal/risk`**：`tools.NewPathCanonicalizer`（`internal/tools/paths.go:53`）与 `tools.NewSensitiveClassifier()`（同文件 `:307`）都是**导出的**，下一程完全可以再走 ⓐ 那支补上。归口：若前端真要这张卡，另开一枚同形状小票 | 本程探针（`wisp-acc-after.exe`，`acc-*`）＋源码行 |
+| 3 | **`-taint-source` 多来源命中顺序** | **判：登记为低优先，不必现在补**，但把它的性质说准：本程黑盒量了两形——两枚来源都被调用携带时，卡上点名的是**先声明那枚**；把声明顺序调过来，点名的就换一枚（`aaa.order`→`bbb.order`）⇒ 顺序**确定、可复现、由引擎决定**（`matchText` 按 mark 插入顺序遍历，`provenance.go:595-599`；`Mark` 是 append，`:394`）。全仓**找不到钉这枚顺序的用例**（`grep SrcTool internal/risk/*_test.go` 六枚命中里只有一处两 mark 形状 `:697/:717`，测的是深度嵌套不是顺序）⇒ 残余性质＝"哪枚来源被点名"未钉，**不是**"R4 会不会漏判"未钉 | §1.2 探针＋源码行 |
+| 4 | 没测 `NoProbe` 之外那枚全配 Provenance（带真同步目录探针）的路 | **本程以源码形状复核（不以量复核）**：`paramsFromArgs` 只产 `command`/`argv`（`approval.go:107-114`），两者都不在 `pathKeys`（`provenance.go:143`：path/file/filepath/dest/destination）⇒ `writeGate` 走 `:660-667` 的 `!hasPath` 分支返回 `(true, ChUnknown)` 通用扫描，`IsSyncPath`（唯一消费 sync 集合＝`NoProbe` 影响的那味）在 `:674-678`，**只有 `hasPath` 才到得了** ⇒ 它"改变不了这条路的判据"那句成立；本程没造带同步目录的全配副本跑，**这条记〔形状复核，非量〕** | 源码四行 |
+| 5 | 没在 linux 侧跑过 | **归口包 owner，不是本票的账**：`scripts/wisp-cli-tests.sh` 自己逐字写着 ubuntu 半边 `19 of 29 top-level cases FAIL` 并为此只接 windows leg（非 windows 直接 GUARD `exit 2`）。本程也没跑 linux 半边 ⇒ 未取到，如实记 | §6.1 那份脚本头 |
+| 6 | 没测并发 | **归口治理层**（本仓共享树并发是常态，且本程全部判据是 rc/枚数/颜色/字节，无计时）。低 | §0 漂移记录 |
+| 7 | 没跑全仓 `go test ./...` | **本程同样没跑，也未判**（共享树里别程正在写 `internal/panel/**`、`docs/reports/**`，归不了因）。`scripts/d22scan.sh` 第一步那枚全仓正控（`packages=[./...]` 是 d22scan 自己的 fixture 包，**不是全仓**）不能顶替这一条——别把两回事混起来 | §6.4 读数原文 |
+| 8 | 对抗验收没做 | **本件就是它**，这一项闭合 | 本件 §1-§8 |
+
+⇒ 简报让我挑"必须现在补的"：**八项里没有一项构成必须现在补代码**；
+两项简报点名的（#2、#3）本程都给出了实处读数并判定为**归口/登记**，
+另外替它跑掉了 #1 的一条线（`TestApprovalCardView*`）。
+
 
 
 
