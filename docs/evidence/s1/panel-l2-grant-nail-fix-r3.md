@@ -342,3 +342,18 @@ row V（原文 out/V-delivered-MDEC.txt）：在副本的 bridge.go 里加一枚
 | commit 3 | 本件自己那一枚，路径只有 `docs/evidence/s1/panel-l2-grant-nail-fix-r3.md`。⚠ **本程不给它预先写 sha**——那正是验收件 §0.4 记过的那枚"文档自指悬空"缺陷的形状；要账就在交件后现跑 `git log --oneline -1 -- docs/evidence/s1/panel-l2-grant-nail-fix-r3.md` |
 | 生产码 | `internal/panel/bridge.go` `d2cd6362…` 全程同值；每一发变异之后当场复算 `git status --porcelain -- internal/panel`（只有本件那一枚 ` M`，commit 3 之后为空） |
 | 未做 | 未 push、未 `add -A`/`.`、未 `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`、未 `rm`、未写台账/票面/`Q-49` |
+
+---
+
+## §7 交件后追加的两条（本仓规矩：已提交的行不改写，要更正就往下追加）
+
+1. **§6 那行"commit 3 不预先写 sha"现在量到了**：本件那一枚 commit = **`062d389`**
+   （`git show --name-only 062d389` → 只有 `docs/evidence/s1/panel-l2-grant-nail-fix-r3.md` 一枚路径）。
+   本程在 dev 上的三枚 = `81ad6fd` → `121006d` → `062d389`，`§6` 表里那句"到 `b293784`"是**写本件当时**的读数，
+   现在已经往后走了好几枚别家的 commit（共享树，`git log --oneline -1` 现跑＝`062d389`，其父＝`2dbb6af` 别家的票 142 验收）。
+2. **committed 态把三门又跑了一遍**（不是引用 §1 那发，是又一发）：
+   `gofmt -l internal/panel/` 空 rc=0、`go vet ./internal/panel/` 空 rc=0、
+   `go test ./internal/panel/ -count=2 -v` = `RUN=198 TOPPASS=100 SUBPASS=92 FAIL=6 SKIP=0 ^panic:=0 distinct=99`、
+   红名仍是 §1.3 那三枚（各 ×2）、新测试那行仍是 `asked=528 assembled route names, answeredByRealGuard=0, hits=[]`
+   （原文 `out/committed-count2.txt`）；`git hash-object internal/panel/bridge.go` = `d2cd6362ecc6941a0cee58073a2bf8ab6669a590`、
+   交付钉 = `9fd6defbd8dd113a7bd9c70c619ab92ac01f32d7`、`git status --porcelain -- internal/panel` **空**。
