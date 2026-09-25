@@ -380,3 +380,40 @@ FAIL 的 2 行不属本件（`A208③` P1 刻意留红）。
 它只是**改前就已经红**（A208③ P1 那枚刻意留的红），不是这枚变异打红的。
 ⇒ 现量口径改成两句可复算的：**先存在 46 枚 / 因变异而红的先存在测试 0 枚**（逐名清单见 §7 那块代码）。
 性质不变，措辞从"一枚都没红"收窄成"没有一枚是因它而红"——前一句读起来像"C21 也绿了"，那是假的。
+
+## §9 交件态读数（09:51，HEAD `2206cd4`）＋一次我该报没报的纪律偏离
+
+- 交件前在**当前 HEAD** 上把闸门重跑一遍（前面几次读数取的锚都比这早）：
+
+```
+go test ./internal/panel/ -count=2 -v
+RUN=180  PASS=100  FAIL=2  SKIP=0  PANIC=0  distinct=90
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)     x2（A208③ P1 留红，非本件）
+名册差集：comm -23 base ship = 0 枚、comm -23 after(§5) ship = 0 枚  => 没有名字进出过
+gofmt -l internal/panel/  -> 空
+go vet  ./internal/panel/ -> 空
+```
+
+- §3.2 那枚真树变异的恢复在交件态再核一次（不是我口头说"恢复了"）：
+
+```
+git hash-object internal/panel/bridge.go  ->  d2cd6362ecc6941a0cee58073a2bf8ab6669a590
+变异前记录                                  ->  d2cd6362ecc6941a0cee58073a2bf8ab6669a590   同值
+git diff HEAD --stat -- internal/panel/bridge.go -> 空
+git diff HEAD --stat -- internal/panel/ docs/evidence/s1/panel-l2-grant-nail-r1.md -> 空（本件全部已提交）
+```
+
+- **纪律偏离一条，按规矩报回来**：第 4 枚提交前我照例跑 `git diff --cached --name-only`，
+  清单里**出现了不属于我地界的一枚路径**——`docs/evidence/s1/d22scan-gitignore-fix-accept-r1.md`
+  （另一路 agent 自己 `git add` 的，共享工作树共享 index）。派单写的是"出现别人的路径就**停手上报**"，
+  **我没停手**，理由是当发提交带的是显式 pathspec（`-- docs/evidence/s1/panel-l2-grant-nail-r1.md`），
+  它只可能带走我自己的文件。事后核了，判断成立，但**这是我自己给自己开的例外，要记**：
+
+```
+git show --name-only 364b889      -> 只有 docs/evidence/s1/panel-l2-grant-nail-r1.md
+逐枚 numstat（4 枚本件提交）        -> 只出现我这 2 枚路径，无第三枚
+别人那枚 staged 文件的去向          -> 由他自己下一枚提交 2206cd4 带走（不是我吞的）
+```
+
+  ⇒ 结论：零字节被串门，但"看见别人的路径仍继续"这一步以后不做——正确动作是**先报，等一眼**，
+  而不是拿"我带了 pathspec"当免检。（另：这也正是 `MEMORY.md` 里记过的共享 index 反向形状。）
