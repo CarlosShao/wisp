@@ -35,4 +35,25 @@
 （design/assets/tokens.css 被 owner 挪走 + 表形状已换）在第三代下同样存在，需 Go 侧同步
 internal/ball/tokens.go 与 docs/evidence/s1/c21-native-tokens.md 才能绿。前端不擅自凑绿。
 
-## §2 第一批施工读数（续）
+## §2 第一批施工读数（2026-09-25 晚，commit ab7afca + 62431e9）
+
+- 门禁现量：typecheck rc=0｜tokens:check rc=0（191 键）｜render:nav OK（70 冻结 + 7 批准图标）｜
+  render:stream OK（1×14 --accent 1→0.2→1 1s）｜render:composer OK（三态）｜
+  render:l2 OK（真夹具 l2-card-fs-delete.json）｜vite build rc=0（gz 94.5KB）｜
+  oxlint 0 errors｜d22scan rc=0｜go test ./internal/panel/ = 58 PASS / 1 FAIL
+  （TestC21DesignTokensFourWayAgree，已知 Go 侧债）。
+- 踩坑两枚（都在前端文件注释里）：①theme.css 注释写了 `--color-*/--radius-*`，
+  `*/` 把注释提前闭合，lightningcss 把后面英文当 CSS 解析报「Unterminated string」；
+  ②panel-views/render-nav 注释里写了 `∪`（U+222A，在 U+2200-22FF 扫描段）——
+  前端文件的注释不豁免 emoji 尺（Go 侧那把尺和 d22scan CLI 的注释豁免口径不同）。
+- render-l2 的 needle「点击悬浮球以批准」要求每卡恰好一次：info 行不能复读这句
+  （球图示 footer 已有一次），F2 字样已从 info 行撤（原生未接线，A222#7）。
+- lucide-react 1.47 命名换代：AlertTriangle→TriangleAlert、AlertCircle→CircleAlert、
+  Trash2 不存在（用 Trash）。render:nav 的 PLAN 解析器正控反控都没动。
+- 浏览器实检（vite preview 4173）：harness 七屏结构/滑翔条/L2 卡/审批队列/设置滑杆
+  全部渲染正确；生产空态 composer 钉底（62431e9）；生产磨砂透浏览器画布底色发灰
+  属 --panel-alpha 设计本意，真实 backdrop 归票 33。
+- 在挂 vendored 件：Shimmer（骨架切换过渡）＋ StatusPill（标题栏待审批）＋
+  Chip（设置屏键名）＝3 枚，挂载尺安全。
+- 第二批待做：palette/tasks/ball/config 全节/security/privacy/cost/firstrun 八屏
+  ＋L1 阻止窗口条（等 owner 答"谁画"）＋R19 动画 react-bits 免费近亲 vendoring。
