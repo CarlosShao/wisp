@@ -12,18 +12,30 @@ package approval
 // the symptom of forgetting it once is a silently rewritten entry in the
 // approval queue - the record a native L2 card is rendered from.
 //
-// TWO PROBES, BOTH REQUIRED TO GO RED IF THE COPY IS REMOVED:
+// THREE MECHANISMS, EACH REQUIRED TO GO RED FOR A DIFFERENT BREAKING SHAPE:
 //
 //	probe 1  names every reference-typed slot of the returned Decision whose
-//	         backing pointer is still the queue's. It walks by reflection, so a
-//	         future reference field on tools.Decision that cloneDecision forgets
-//	         is named by this case rather than discovered by an exploit; the
-//	         slot list it expects is asserted as a set, so growing or shrinking
-//	         Decision cannot pass silently either.
+//	         backing pointer is still the queue's. It walks by DECLARED TYPE
+//	         (reflect.TypeOf), not by value, so a ninth reference field on
+//	         tools.Decision is counted even when the fixture leaves it nil, and
+//	         a slot of a kind the census has never seen (pointer / interface /
+//	         chan / func / unexported) FAILS CLOSED instead of being skipped
+//	         silently. That is what makes "a future reference field that
+//	         cloneDecision forgets is named by this case rather than discovered
+//	         by an exploit" an instrument and not a promise. The slot list it
+//	         expects is asserted as a set, so growing or shrinking Decision
+//	         cannot pass silently either.
 //	probe 2  is ticket 146 AC#2's literal assertion: write IN PLACE through every
 //	         one of those slots, then read the record back out of the queue
 //	         (its stored qitem.Dec, its own view()/head() projection, and a
-//	         second LiveApprovals() call) and require it unchanged.
+//	         second LiveApprovals() call) and require it unchanged. BEFORE the
+//	         write it also pins VALUE FIDELITY with reflect.DeepEqual: the
+//	         returned Decision must equal the queue's stored record field for
+//	         field. The backing-pointer check only proves the two do not SHARE
+//	         memory; DeepEqual is what proves the copy did not drop the values
+//	         on the way out (a cloneParamsMap that keeps keys and nils the
+//	         values, or a cloneBacking that allocates an empty slice, shares
+//	         nothing and so sails through probe 1 untouched).
 //
 // What is NOT claimed here: the copy is ONE level deep (see cloneDecision).
 // The containers reachable *through* Params' values - the []any / map[string]any
@@ -46,8 +58,12 @@ import (
 )
 
 // sharedDecision is one admitted verdict with EVERY reference-typed slot of
-// tools.Decision filled, including the three that live inside Blacklist. A slot
-// left nil here would make probe 1 blind to it, so the fixture is the census.
+// tools.Decision filled, including the three that live inside Blacklist. The
+// TYPE census (declaredRefSlots) no longer depends on the fixture to notice a
+// slot, but probe 1's backing-pointer comparison still does: a slot left nil or
+// empty here would make that comparison blind to it, so probe 1 asserts this
+// fixture fills every slot the type census names. The fixture is not the census
+// any more - it is the test of the census.
 func sharedDecision() tools.Decision {
 	return tools.Decision{
 		CorrelationID:          "corr-backing",
@@ -74,35 +90,60 @@ func sharedDecision() tools.Decision {
 	}
 }
 
-// refSlots lists every reference-typed slot of v that is non-nil, by dotted
-// path. Structs are descended into (that is how Blacklist.Absolute is reached);
-// map and slice ELEMENTS are not, because one-level copying is the promise
-// pending_read.go makes.
-func refSlots(prefix string, v reflect.Value, into *[]string) {
-	switch v.Kind() {
-	case reflect.Map, reflect.Slice:
-		if !v.IsNil() {
-			*into = append(*into, prefix)
-		}
+// declaredRefSlots lists, by dotted path, every slot of type t whose DECLARED
+// kind carries memory shared with the source: map, slice, pointer, chan, func,
+// interface. Structs and arrays are descended into (that is how
+// Blacklist.Absolute is reached, and how a reference hiding behind a struct or
+// a fixed array is still caught); map and slice ELEMENTS are not, because
+// one-level copying is the promise pending_read.go makes.
+//
+// It walks by TYPE, not by value, and it FAILS CLOSED: any kind outside the
+// explicit value-safe list is either named or a t.Fatalf, never skipped. That
+// is deliberate. The old value walker skipped pointer / interface / chan / func
+// and unexported fields with no branch at all, and skipped any reference slot a
+// fixture left nil - so a ninth reference field on tools.Decision could arrive
+// quietly. Here it cannot: a newly declared map/slice/pointer/... is counted
+// (census set grows -> mismatch -> red), and a newly declared kind nobody has
+// reasoned about stops the test with an error naming the kind.
+//
+// Unexported struct fields are descended too, even though reflect can't read
+// their values here: cloneDecision lives in package approval and cannot assign
+// a tools.Decision private field anyway, so a private reference slot is exactly
+// the shape that must be surfaced rather than walked past.
+func declaredRefSlots(t *testing.T, prefix string, ty reflect.Type, into *[]string) {
+	t.Helper()
+	switch ty.Kind() {
+	case reflect.Map, reflect.Slice, reflect.Ptr, reflect.Chan, reflect.Func, reflect.Interface:
+		*into = append(*into, prefix)
 	case reflect.Struct:
-		for i := 0; i < v.NumField(); i++ {
-			f := v.Type().Field(i)
-			if !f.IsExported() {
-				continue
+		for i := 0; i < ty.NumField(); i++ {
+			f := ty.Field(i)
+			child := f.Name
+			if prefix != "" {
+				child = prefix + "." + f.Name
 			}
-			child := prefix + "." + f.Name
-			if prefix == "" {
-				child = f.Name
-			}
-			refSlots(child, v.Field(i), into)
+			declaredRefSlots(t, child, f.Type, into)
 		}
+	case reflect.Array:
+		declaredRefSlots(t, prefix+"[]", ty.Elem(), into)
+	case reflect.Bool, reflect.String,
+		reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
+		reflect.Float32, reflect.Float64, reflect.Complex64, reflect.Complex128:
+		// Copied by value into the returned struct; nothing shared, nothing to name.
+	default:
+		t.Fatalf("引用槽位普查(%s): 未预期的 reflect.Kind %s —— 普查必须显式命名或下降它，"+
+			"不许静默跳过；这是 fail-closed，新增字段类型要连这把尺一起改。", prefix, ty.Kind())
 	}
 }
 
-// slotPaths runs the walker and hands back the sorted census of one value.
-func slotPaths(v reflect.Value) []string {
+// typeCensus runs the walker over a TYPE and hands back the sorted census of
+// every declared reference-typed slot. It is the census probe 1 asserts against
+// the hand-maintained set below.
+func typeCensus(t *testing.T, ty reflect.Type) []string {
+	t.Helper()
 	var found []string
-	refSlots("", v, &found)
+	declaredRefSlots(t, "", ty, &found)
 	return sorted(found)
 }
 
@@ -136,10 +177,16 @@ func slotValue(t *testing.T, root reflect.Value, path string) reflect.Value {
 	return cur
 }
 
-// queueSlotPaths is what the census in ticket 146 §1.2 measured on
-// tools.Decision. It is asserted as a SET on both sides of the probe so that
-// neither a field added to Decision nor a walker that quietly stopped
-// descending can turn probe 1 into an always-green check.
+// queueSlotPaths is the hand-maintained census of tools.Decision's reference
+// slots (ticket 146 §1.2). probe 1 compares it, as a SET, against the census
+// the TYPE walker (declaredRefSlots) derives live from reflect.TypeOf. The
+// whole point of deriving it by type is that neither of the two ways this used
+// to be an always-green check survives: a field ADDED to Decision now grows the
+// derived set and trips the mismatch (the old value walker missed it whenever
+// the fixture left it nil), and a kind the walker has no branch for stops the
+// test with an error instead of being descended past. When Decision genuinely
+// gains a reference slot, this list and cloneDecision must change together, in
+// the same review - which is the review the mismatch forces.
 var queueSlotPaths = []string{
 	"Args",
 	"Blacklist.Absolute",
@@ -168,12 +215,12 @@ func TestLiveApprovalsSharesNoReferenceSlotWithTheQueue(t *testing.T) {
 		t.Fatalf("期望 1 行，得 %d：%+v", len(got), got)
 	}
 
-	live := slotPaths(reflect.ValueOf(got[0].Decision))
+	live := typeCensus(t, reflect.TypeOf(got[0].Decision))
 	found := live
 	expect := sorted(queueSlotPaths)
 	if len(found) != len(expect) {
 		t.Fatalf("返回值里的引用槽位数 %d (%v)，期望 %d (%v)。\n"+
-			"数目不符说明 fixture 或 refSlots 自己失效了 —— 这条用例就会变成恒真判据，"+
+			"数目不符说明 tools.Decision 增删了引用字段而 queueSlotPaths / cloneDecision 没跟上 —— 这条用例正是为此而红，"+
 			"必须和 tools.Decision 的字段表一起改，不许放宽。",
 			len(found), found, len(expect), expect)
 	}
@@ -188,6 +235,16 @@ func TestLiveApprovalsSharesNoReferenceSlotWithTheQueue(t *testing.T) {
 	for _, path := range found {
 		a := slotValue(t, reflect.ValueOf(got[0].Decision), path)
 		b := slotValue(t, stored, path)
+		// The backing-pointer comparison below only has teeth on a non-empty
+		// slot: a nil or zero-length slice/map has a zero (or shared-empty)
+		// data pointer, so "pa != 0 && pa == pb" would report no alias even if
+		// the slot were handed back straight from the queue. Refuse to run the
+		// comparison blind - if the fixture stops filling a declared slot, this
+		// goes red instead of quietly weakening probe 1.
+		if b.IsNil() || b.Len() == 0 {
+			t.Fatalf("fixture 未填引用槽 %q（nil 或空）：backing 指针对它是失明的，"+
+				"probe 1 会退化成恒真。sharedDecision 必须填满 typeCensus 点名的每一枚槽位。", path)
+		}
 		if pa, pb := backingPointer(a), backingPointer(b); pa != 0 && pa == pb {
 			shared = append(shared, path)
 		}
@@ -214,6 +271,23 @@ func TestLiveApprovalsInPlaceWriteCannotReachTheQueueRecord(t *testing.T) {
 		t.Fatalf("期望 1 行，得 %d：%+v", len(got), got)
 	}
 	row := got[0]
+
+	// VALUE FIDELITY, before anything is clobbered. "copies" is a two-sided
+	// promise: not only must the returned row not SHARE the queue's memory
+	// (probe 1's backing-pointer check), the copy must also CARRY the same
+	// values. A cloneParamsMap that keeps every key and nils every value, or a
+	// cloneBacking that allocates a fresh-but-empty slice, shares nothing - so
+	// probe 1 stays green - yet hands the panel a deformed verdict. DeepEqual on
+	// the returned Decision vs the queue's stored record is the one ruler that
+	// goes red for that shape, and it is checked here, before the in-place write
+	// below, so a genuine clobber is never mistaken for a lost value.
+	if !reflect.DeepEqual(row.Decision, mustFindLive(q, "corr-backing").Dec) {
+		t.Fatalf("AC#2 RED (值保真): LiveApprovals() 交出的 Decision 与队列存储的那条不逐字段相等。\n"+
+			"返回值:  %+v\n存储项: %+v\n"+
+			"这就是注释里 \"copies\" 的第二半没人钉的形状：不共用底层，却把值拷丢了。\n"+
+			"修法在 cloneDecision／cloneBacking／cloneParamsMap：分配的每一份都得把原值带上。",
+			row.Decision, mustFindLive(q, "corr-backing").Dec)
+	}
 
 	// Clobber each slot IN PLACE, through the returned value only. No
 	// re-assignment of whole fields: that would prove nothing about aliasing.
