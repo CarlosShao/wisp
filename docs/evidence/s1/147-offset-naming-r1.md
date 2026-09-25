@@ -57,6 +57,11 @@ D design/assets/base.css
 
 **简报与票面无冲突**（唯一需要点名的差别：票面 AC#3 说"三处"，本程现量是**四处文本＋一枚 commit 标题**，见 §3）。
 
+> **[追加，收笔时] 锚点在会话中途被推走过**：进场读数 `80fa0551` 是真的，但本程两枚 commit 的**实际父**是
+> `ae968f9e`（另一枚程在 21:32 把票 146 改名 `-done`）。那三枚第三家的 commit 一枚码都没动，
+> 复算与逐枚名册在 §8；这一格是"工作树是活的"的形状，不是本程的偏差，但验收方按 `80fa0551` 复算会多看见三枚，
+> 所以在这里点名，不让它藏在表里。
+
 ---
 
 ## 1　AC#1　判定：ⓐ（字段该带信息）
@@ -495,4 +500,71 @@ $ sh scripts/d22scan.sh                             rc=0                   # 日
 
 ## 8　落盘名册（本程 commit，取法随文）
 
-（收笔时填：`git log --format="%h %s" 80fa055..HEAD` ＋ 每枚 `git show --name-only`；枚数不写在正文里。）
+```
+$ git log --format="%h %ad %s" --date=format:'%H:%M' 80fa0551..HEAD | cat
+1f3ede9e 21:46 docs(147 AC#3): 那三处（现量是四处文本＋一枚标题）"只有空白"的声明就地追加更正 + 票面交件记录 + 读数随件
+2dc2b28f 21:43 fix(147 AC#1+AC#2): unwritten 支的 offset 改填"文档停在第几字节"，并补三名会响的用例
+ae968f9e 21:32 ticket(146 -done): 结线改名——5 枚 AC 框全 [x]、两张非实现者表在 docs/evidence/s1/、真未勾 0 枚
+9ca50691 21:31 docs(台账 A263): 59 枚这一推红名集合动过零枚、分母涨 16 枚且逐枚归到 144/146；slo-full 今天第一次拒采
+c3a51e68 21:27 docs(台账 A262): 59 枚一次批量推到两边（同停 80fa0551）；三枚前端会话的活逐枚点名不隐身
+```
+
+⇒ **⚠ 锚点在会话中途被别家程推走了**（本件 §0 的进场读数是 `80fa0551`，那是真的；本程两枚 commit 的**实际父**是
+`ae968f9e`）。那三枚不是本程写的，逐枚 `git show --name-status` 现量它们只动
+`docs/reports/pending-and-issues.md` 与 `.scratch/wisp/issues/146-*.md` 的改名，**没动一行码**：
+
+```
+$ git diff --name-only 80fa0551 HEAD -- cmd/ internal/ scripts/ tools/ docs/specs
+cmd/wisp/slo_windows.go
+cmd/wisp/slo_report_144_windows_test.go
+```
+
+⇒ 两句要紧的话：① §5.1 那发"改前基线"跑的 cmd/ 树与锚点 `80fa0551` **同一枚**（上表只有两枚码路径、全是本程的），
+所以"改前 130／改后 133"那一对读数中间没有第三家的码混进来；② §5.4 的零字节轴本程**按实际父重取一遍**：
+
+```
+$ git diff --name-only ae968f9 HEAD -- internal/risk internal/panel internal/agent/approval tools/d22scan \
+    scripts/slo-check.ps1 docs/PLAN.md docs/specs internal/observe frontend      → 空
+$ git diff --name-only 2dc2b28 HEAD -- cmd/ internal/ scripts/ tools/            → 空   （落盘之后再没动过码）
+$ stat -c '%y %n' cmd/wisp/*.go .scratch/wisp/probes/147/*.log     （下面是本程全部码与读写的 mtime）
+    21:26:06  gate-pre-1-baseline.log      ← §5.1 改前那发门禁（当时 cmd/ 还是锚点树原样）
+    21:32:14  red-before-fix.log           ← 测试 v1（未含字段 leg）的改前红，**不作最终凭据**
+    21:33:42  cmd/wisp/slo_windows.go      ← 本程最后一次改生产码（ⓐ 那一支＋两处注释）
+    21:34:02  green-after-fix.log          ← 测试 v1 的改后绿，同样**不作最终凭据**
+    21:36:01  cmd/wisp/slo_report_144_windows_test.go  ← 最后一次改测试（补字段 leg，再把 EOF 归一）
+    21:36:14  green-after-fix-r2.log       ← **最终版**改后绿（§2.2）
+    21:36:32  red-before-fix-final.log     ← **最终版**改前红（§2.2，快照）
+    21:36:58 / 21:37:19  mut-A2-final.log / mut-B2-final.log  ← §2.3 两形变异
+    21:39:13  gate-post-1.log              ← §5.2 改后那发门禁（包体 81.456s ⇒ 开跑约 21:37:50）
+```
+
+⇒ "§5.2 那发门禁跑的就是最终落盘的码树"这一句是靠 **mtime 先后**立的（21:36:01 < 21:37:50），
+`git diff 2dc2b28 HEAD -- cmd/` 只能证"落盘后没再改"，两味分开写清。
+⚠ 测试文件在 21:34→21:36 之间被本程加过一枚**字段 leg**（§2.1 表末列那条后门），
+所以 21:32/21:34 那两枚红绿日志是**前一版**测试取的：原件保留（只建不删、不覆写），
+最终凭据一律是 21:36 之后的三枚。这一格本程自己重跑了一遍，出处见 §7 末条。
+
+本程两枚的归属（每枚 `git show --name-only` 可复算；**没有一枚**带进 `frontend/**`、`.zcodeignore`、`design/**`、
+`internal/risk/**`、`tools/d22scan/**`、`internal/observe/**`）：
+
+| sha | 落了什么 |
+|---|---|
+| `2dc2b28f` | `cmd/wisp/slo_windows.go`（21 加／4 删）＋ `cmd/wisp/slo_report_144_windows_test.go`（**169 加／0 删**）＋ 本件（首版） |
+| `1f3ede9e` | 票 144 票面（**23 加／0 删**）＋ 票 147 票面 Progress log（**24 加／0 删**）＋ 票 144 证据件 §4.2（**12 加／0 删**）＋ 本件 §2.3 追加（8 加／0 删）＋ `.scratch/wisp/probes/147/`（17 枚读数与探针原文，只建不删） |
+
+**⚠ 上面这张表是"写下它的这枚 commit 之前"取的**，所以承载这段的这枚 commit 自己不在表里（自引用逃不掉，只能这样标）。
+复跑取法：`git log --format="%h %s" 80fa0551..HEAD | grep "(147"` ⇒ 会多出一枚，那一枚就是这段的载体。
+
+**收笔现量**（本程可写路径全部干净，别人的东西仍在工作树里、一枚未动）：
+
+```
+$ git status --porcelain -- cmd/wisp .scratch/wisp/probes docs/evidence/s1/147-offset-naming-r1.md \
+    .scratch/wisp/issues/144-*.md .scratch/wisp/issues/147-*.md
+（空）
+$ git status --porcelain | grep -v "design/\|.zcodeignore"
+（空）        ← 剩下的全是 design/** 与 .zcodeignore：owner 与另一枚前端会话的活
+```
+
+**没 push**（`AGENTS.md §1.4`：子代理只 commit，推送由编排者核过之后做）。
+**票面五框本程未勾**（交件形状明写"票面框由编排者按非实现者验收表定，实现方不自勾"）。
+
