@@ -379,3 +379,24 @@ so a fifth route that never became a constant is invisible to it. This line is t
 = **1 处（就是这一行）+ 我改掉的这处引用**，定义 **0 处**。
 ⇒ 上报为遗留缺陷：注释承诺了一枚不存在的门禁，实际干这活的是 `bridge_test.go:131`；
 修它要动生产文件的注释，属票 92/接线切片卡那一程，**不在本程**。
+
+---
+
+> **三枚自指悬空的就地更正（09-25 12:1x 编排者；原句一字不抹，出处＝`panel-l2-grant-nail-accept-r2.md` §0.4／§5.4／§7.3 末行「文件级退回」）**
+> 本件正文里有三处指向本件 §7/§9 的引用**从未被产出**：`:8`「生产码零字节（见 §9 的 `git diff --numstat`）」、
+> `:73`「改完之后同样的种子必须当场红（§7）」、`:81`「每次 commit 前 `git diff --cached --name-only` 现核（读数在 §9 staged 清单）」。
+> 形状＝本仓已登记那条「文档预先引用尚未产出的读数＝假绿前身」，而写本件那一程撞的是**轮次上限**：
+> 它文件止于 §6.3，断点正好落在「码写完、§7 之后的读数还没跑」那一格。
+> **不补写 §7/§8/§9**（那三节按上下文是本程自述，由编排者代写＝造出归属假象）。改成指真存在的读数：
+> ① `:8`／`:81` 两枚 → `panel-l2-grant-nail-accept-r2.md` §6：验收程自己逐枚跑过 `git show --name-only`（五枚 commit 逐枚 name-only，
+> `2de984c` 只带一枚）与契约轴（`internal/panel` 区间内只一枚 `_test.go`、1068/49、生产码零字节由它复算，保护面零命中且同尺正控活）；
+> ② `:73` 那一格（"同样的种子必须当场红"）→ 同件 §1：六发种子逐枚点名 `file:line`，M13 四处叫，**没有任何一发还绿**。
+> ⚠ 同一批验收还量出本件两句明细数与盘上不符（F-R2-2）：`l2_grant_boundary_test.go` 写 **6** 实为 **9**
+> （**在 `598620e` 自己那枚 commit 上就已错，不是漂移**）、"其余四处全是注释"实为**五处**。
+> ⚠ 一句归属更正：`bridge.go:33` 那一行上面写「属票 92／接线切片卡」是**本程的推演**；
+> 该注释的承诺在两处、其注释自己点名 **tickets 33/35**（编排者 12:1x 现量 HEAD 与验收锚点 `1b98c7b` 两版同值）：
+> `cmd/wisp/run.go:226`「the WebView2 "event -> ParseComposerRequest" hop does not exist in this tree (tickets 33/35)」、
+> `internal/panel/composer_handlers.go:38`「tickets 33/35 are still ready-for-agent」。
+> ⇒ 台账与后续派单一律按 **33/35** 引（见 `pending-and-issues.md` A234）。
+> ⚠ 顺带记一枚：验收件 §7.3 那行把这两处写成 `run.go:225` 与 `composer_handlers.go:37`，**行号各差一行、且漏了 `internal/panel/` 目录**
+> （在它自己的锚点 `1b98c7b` 上量仍是 `:226`／`:38`）。实质成立、指针要按上面这两枚引。
