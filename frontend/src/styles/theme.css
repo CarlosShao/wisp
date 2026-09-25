@@ -127,10 +127,32 @@
 }
 
 
+/* ---------- the panel's own frost, measured 1:1 off the high-fidelity demo ----
+   ---------- (owner 2026-09-25: 磨砂保留，"当前是透明度太高了")             ----
+   demo/styles.css:30 (light) and :60 (dark) both give the window layer an alpha
+   of 0.72 over the desktop; this tree was sitting on --bg-raised's 0.38, which is
+   the number he was reacting to. The hue still comes from C21 (--bg-base) - no
+   colour literal is written here, and the four-way token reconciliation is
+   untouched because nothing in the generated theme changed.
+   --panel-alpha is the ONE knob: if the settings screen ever gets an opacity
+   control (owner's 有透明度的调节), that is the only line it needs to write.
+   The value itself belongs to Go, not to this file - the panel remembers nothing
+   (PLAN.md:1044), so a slider is a C17 request plus a persisted key, both of
+   which are owner/orchestrator decisions recorded as unanswered in
+   docs/reports/frontend-session-log.md §59.4. */
+:root {
+  --panel-alpha: 72%;
+  --panel-surface: color-mix(in srgb, var(--bg-base) var(--panel-alpha), transparent);
+}
+
 /* ---------- glass surfaces: C21's sheen + blur are a background STACK, ----
    ---------- which no single background-color utility can carry ---------- */
 .glass-raised {
-  background: var(--bg-raised);
+  /* The demo's window layer has no sheen gradient over it (demo/styles.css:118-121
+     is colour + blur + border + shadow, nothing else), so this stopped reading
+     --bg-raised, which stacks the sheen on top of a colour. The sheen stays
+     available to whoever wants it; the default is now what the demo draws. */
+  background-color: var(--panel-surface);
   backdrop-filter: var(--glass-blur);
   box-shadow: var(--shadow-card);
 }
@@ -151,16 +173,23 @@
   outline-offset: 2px;
 }
 
-/* The desktop behind the panel is never pure black: C21's four ambient
-   lights are what makes the frost read as frost (tokens.css, "环境光 v2.3").
-   The grain layer is the noise overlay; --grain is its opacity. */
+/* The desktop behind the panel is never pure black: C21's ambient lights are what
+   makes the frost read as frost (tokens.css, "环境光 v2.3"). The grain layer is
+   the noise overlay; --grain is its opacity.
+   Count and strength now follow the demo rather than all four tokens: the demo
+   draws TWO lights (demo/styles.css:71-78, alpha 0.08 and 0.07 over the dark base;
+   0.06/0.05 in light), while this tree was drawing four at the tokens' native
+   0.20-0.36 - which is the other half of what owner called 花里胡哨. The dimming
+   is done with color-mix over `transparent`, so --ambient-a/--ambient-b stay the
+   only colours and no new value enters the style source. --ambient-c and
+   --ambient-d are simply not referenced any more; they belong to C21 and Go. */
 .wisp-shell {
   background-color: var(--bg-base);
   background-image:
-    radial-gradient(52% 44% at 12% 8%, var(--ambient-a), transparent 70%),
-    radial-gradient(46% 40% at 88% 12%, var(--ambient-b), transparent 72%),
-    radial-gradient(58% 46% at 72% 92%, var(--ambient-c), transparent 70%),
-    radial-gradient(40% 36% at 22% 84%, var(--ambient-d), transparent 74%);
+    radial-gradient(ellipse 80% 60% at 20% 30%,
+      color-mix(in srgb, var(--ambient-a) 22%, transparent) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 70%,
+      color-mix(in srgb, var(--ambient-b) 23%, transparent) 0%, transparent 55%);
   color: var(--fg-primary);
   font-family: var(--font-sans);
   font-size: var(--t-body);
