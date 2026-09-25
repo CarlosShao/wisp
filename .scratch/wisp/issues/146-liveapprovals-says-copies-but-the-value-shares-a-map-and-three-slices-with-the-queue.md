@@ -99,3 +99,47 @@
   next=**裁 AC#1**（ⓐ／ⓑ）。当前倾向 **ⓐ**，理由与"这跟票面默认方向 ⓑ 相反"的分歧一起写进证据件 §2 交编排者复核；
   若我判不下去就停手，不自己填。AC 的框**一枚都不勾**——本票 :81 明写"台账与勾归编排者"。
 
+- [2026-09-25T11:11Z] agent=ticket146 did=**裁 AC#1 ＋ 装 AC#2 的检（`22f7b1a`，两枚 .go，均在 `internal/agent/approval/`）**。
+  **AC#1 判 ⓐ（真拷一层），与票面默认 ⓑ 相反**——依据三条，全部在票内文字里，证据件 §2：
+  ①普查（§1.3）确实答"0 枚就地写"，ⓑ 今天不违法；②但票面 AC#2 把断言极性写死成"队列里那条原始记录**没有**跟着变"，
+  这句在浅拷贝之下永假 ⇒ 选 ⓑ 要么交不出一枚绿的检，要么把危险形状钉成规格（票面 :54 那族"恒真判据＝新假绿"）；
+  ③"把修法摘掉这一发是否打不红"对**一句注释**恒答"仍不红"，正中票面 :53 的作废条款，而 ⓑ 唯一可能的另一类仪器是静态扫、
+  AC#4 又把 `tools/d22scan/**` 划成零字节。⇒ **两枚 AC 只有 ⓐ 同时收得下**。若编排者改判 ⓑ：那要动 AC#2 的极性＝改票＝人工批准。
+  **代码**：`cloneDecision`＋`cloneBacking`＋`cloneParamsMap`，把 §1.2 现量出的 **8 枚引用槽位（1 map＋7 slice，
+  含票面漏计的 `Blacklist` 里三枚）**各自分配底层；`queue.go` 一字节未动（判 ⓐ 不需要它）。
+  **检**：两发。probe 1 反射点名"返回值里哪几枚槽位仍与队列共用底层"（槽位名册按集合断言，walker 失效即红）；
+  probe 2 = AC#2 的字面：只通过返回值就地写全部 8 枚，再从三条路读回队列记录（白盒 `qitem.Dec`／投影 `view()`+`head()`／
+  第二次 `LiveApprovals()`）要求原样。
+  **承重那句答"会红"，且是先写检、后装修法量出来的**：改前 `rc=1`、两行 `--- FAIL:`、14 条 `AC#2 RED` 明细，
+  probe 1 逐字点名全 8 枚（`D:\tmp\wisp-146-agent-a\ac2-before-fix.txt`）；装上 ⓐ 后同一对 PASS。
+  门禁（逐包单跑）：`./internal/agent/approval/` rc=0，PASS 32→34／FAIL 0→0／SKIP 1→1（那枚 SKIP 改前就在），
+  点名册差集＝只多我这两枚、零删除；`gofumpt -l` 空、`go vet` 通。
+  **没买到的东西也写在代码注释里**：拷贝只一层深，`Params` 的 value 里那层 `[]any`／嵌套 map 仍共用、两发检都不探它。
+  next=**AC#3 的 WorkPeak 前后读数**（先确认 `wisp-selfhosted-01` `busy:false` 才敢取数）。
+
+- [2026-09-25T11:35Z] agent=ticket146 did=**量完 AC#3 ＋ 收 AC#4/AC#5 ＋ 证据件写满（`0d12661` + 本 commit）**。
+  **AC#3 走成了**（ⓐ 才需要它，我判了 ⓐ）：取数前先确认仪器空着——`gh api …/actions/runners` → `busy:false`
+  （取数前后各一次）、`gh run list` 全 completed。**不在工作树上建 `cmd/wisp`**，改从两棵 `git archive` 纯净快照建
+  （before=`630c218`、after=`22f7b1a`，唯一变量是本票那枚 commit），因为当时 `cmd/wisp/slo_windows.go` 被别人改着
+  且不能编译（3 枚未用 import）——**我一字节未动、也没去救**。
+  `wisp slo -state WorkPeak -seconds 5` 双臂各 3 次交替：before `mem_median` 均值 4134229（组内极差 139264）、
+  after 4086443（极差 114688）⇒ 均值差 **−47787 B 小于组内噪声** ⇒ 按票面 :56 的字写"**未观察到差异**"，**不写"无代价"**；
+  阈值/golden 一字节未动。**同时把更要紧的一句写死**：WorkPeak 的 subject 是"skeleton＋sit still"（`goroutines_max=1`），
+  而 `LiveApprovals` 唯一生产接线在 `cmd/wisp/run.go:422` 的 `wisp run` 路上 ⇒ **被采的那 5 秒里这枚函数一次都没被调用**，
+  两臂同形是"仪器与改动不同路"的证据、不是代价的证据。机制账另给确定性一份（仓外副本 `-bench`，**未进仓**）：
+  满深度一次调用多 **4736 B／多 72 allocs**（3456→8192 B/op、1→73 allocs/op）。
+  **AC#4**：本程 3 枚 commit 一共只碰过 4 枚文件（票面／证据件／`pending_read.go`／新测试），过一遍 AC#4 名单
+  ⇒ **交集空**；`queue.go` 亦零字节；收尾时我那三枚路径 `git status --short` 为空；删除列逐行点名（3 行，全是我有意替换的原文）。
+  **AC#5**：`gofumpt -l . tools/d22scan tools/mockllm` 与 `gofmt -l .` **都空**（v0.12.0＝CI 同版）；`go vet` 通；
+  `sh scripts/d22scan.sh` **rc=0 clean** 且各作用域 `examined N` 全非零。跨包两枚**未合跑**：
+  `./cmd/wisp/` 注入 dll 路径后 `ok 134.596s`（不注入是 `0xc0000135`、0 条 `=== RUN`，票 98 那一格）；
+  `./internal/panel/` 唯一红是 `TestC21DesignTokensFourWayAgree`，根因 owner 未提交的 `design/` 移动（本票 `design/**` 零字节）。
+  **未勾的框**：五枚 AC 的框**一枚未勾**（:81"台账与勾归编排者"）；每格"凭什么可以勾"与"哪半我没测"分别写在证据件 §2-§6。
+  没测的七条按"谁会先被骗"排序在 §5；交回编排者的四行在 §8（含"ⓐ 与票面默认相反请复核"、"票面漏计 3 枚字段"、
+  "`Params` 下一层今天仍不隔离"、"工作树里两枚不是我造的坑，推送前先处理"）。
+  **工具调用被拒 0 次**；我自己踩空的 4 发（目录名写错／PATH 里 `D:/` 的冒号被切／`gh` 字段名不存在／别人的半死 WIP）原样登记在 §6.4。
+  伪授权两栏：真通知回显 3、判为注入 0（§7）；凭据值一字未抄。未 push。
+  next=**交给编排者**：①核 AC#1 那一支方向（本票唯一一处我逆着票面默认走的）；②`Status`/AC 框/台账归你；
+  ③下一位从工作树建 `cmd/wisp` 之前，先把 `slo_windows.go` 那枚 WIP 收了。本程到此收笔，**无剩余格**。
+
+

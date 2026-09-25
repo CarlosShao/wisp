@@ -305,16 +305,114 @@ go test -count=5 -run '^$' -bench BenchmarkLiveApprovalsDepth8 -benchtime=2000x 
 
 ## 5. 本程没测什么（按"如果我漏了它，谁会先被骗"排序）
 
-（填写中。）
+1. **`Params` 再往下一层没测。** 拷贝只一层深（§3.4），所以"穿进 `Params` 的 value 去改队列记录"这条路
+   **今天仍然开着，且没有任何用例探它**。先被骗的是**验收程**：它若按本件标题读成"返回值已与队列隔离"，
+   就会把这个洞记成已闭。⇒ 我在 §3.4 与 `pending_read.go` 头部各写了一遍，标题不背这个字。
+2. **`wisp slo` 的 WorkPeak 双臂对比照不到这枚改动**（§4.2 A：subject 是 skeleton、5 秒里 `LiveApprovals`
+   一次都没被调用）。先被骗的是**读 SLO 那一栏的人**：两臂 `3.9MB/4.0MB` 同形极易被写成"代价未观察到＝无代价"。
+   ⇒ 同一节里 B 那份机制账（+4736 B／+72 allocs）才是这枚改动的真实代价；两半必须一起读。
+3. **并发下的这条路径没测。** 两发检都是单 goroutine 同步跑；`LiveApprovals()` 拿 `q.mu`、`cloneDecision`
+   在锁内做分配，理论上会把锁持有时间从 ~0 拉到 ~µs 级。今天没有测过"高并发泵动 + 审批答复抢锁"的形状。
+   先被骗的是**票 33 的宿主程**（它是要把这条泵接上真页面的人）。
+4. **`cmd/wisp` 的跨包回归只测到一半。** 我跑到 `ok github.com/CarlosShao/wisp/cmd/wisp 134.596s`（注入 dll 路径后），
+   但那是**别人的工作树**：约十分钟后同一棵树的 `cmd/wisp/slo_windows.go` 被改成不能编译（3 枚未用 import）。
+   ⇒ 我的 PASS 对**当时那棵树**有效，对现在的工作树**未复核**（复核它就得等那一枚 WIP 落地，不是我的活）。
+5. **`internal/panel` 有一枚红我判为"非本票"，但没有反证它。** `TestC21DesignTokensFourWayAgree` 红于
+   `design/assets/tokens.css` 在工作树里不存在（owner 未提交的 `design/` 移动；本票对 `design/**` 与
+   `internal/panel/**` 零字节，见 §6.1）。先被骗的是**下一位读门禁的人**：它可能被误读成票 146 造的绿/红。
+6. **`Queue.replay` 那条同族路径没动也没测。** `queue.go:488-498` 也在按值传 `it.Dec`（同样共用 8 枚底层），
+   本票范围只有 `LiveApprovals`。⇒ 这是**下一张票的形状**，不是本件的残余；我在 §2 判 AC#1 时看过它，
+   没顺手改（票面 :83"不要顺手重构"）。
+7. **`tools/d22scan` 的 emoji/裸 goroutine 门我跑了、没扩它。** rc=0，各作用域 `examined N` 都非零（见 §6.2）。
+   本票新加的两枚 `.go` 文件里的中文注释与符号不在任何禁止带上——这一条是**跑出来的**，不是推理。
 
 ---
 
-## 6. 契约轴与门禁（AC#4 / AC#5）
+## 6. 契约轴（AC#4）与门禁（AC#5）
 
-（填写中。）
+### 6.1 AC#4 零字节核对
+
+命令与读数——本程一共只提交过 3 枚 commit（`598c0c6`/`22f7b1a`/`0d12661`），全量文件清单：
+
+```
+for c in 598c0c6 22f7b1a 0d12661; do git show --name-only --format= $c; done | sort -u
+→ .scratch/wisp/issues/146-….md
+  docs/evidence/s1/146-liveapprovals-r1.md
+  internal/agent/approval/pending_read.go
+  internal/agent/approval/ticket146_liveapprovals_backing_test.go
+```
+
+把这 4 枚过一遍 AC#4 的禁改名单（`internal/risk/**`、`rules_gateway.go`、`thresholds.go`、golden、
+`allowlist.txt`、`docs/PLAN.md`、`docs/specs/**`、`frontend/**`、`design/**`、`tools/d22scan/**`、
+`internal/panel/l2_grant_boundary_test.go`）⇒ **交集为空**。另加两条：
+`internal/agent/approval/queue.go` **零字节**（AC#1 选 ⓐ 不需要动队列本体，票面 :84 的提醒成立），
+本程**未提交任何 `git status` 里不是我改的路径**（每次 commit 前 `git diff --cached --name-only` 都逐字看过，
+收尾时 `git status --short -- internal/agent/approval docs/evidence/s1 .scratch/wisp/issues` 为空）。
+
+删除列核对（`git diff --numstat`）：`pending_read.go` 64/2、测试文件 305/0、票面 21/1、本件 191/0（写本段前）。
+**三枚"删除"逐行点名**：① `pending_read.go` 删的两行是我有意替换的
+`// verbatim, ticket 17's frozen-contract note in tools/gate.go); Position is the` 与 `Decision:      it.Dec,`；
+② 票面删的那行是我有意替换的 `- Status: ready-for-agent（**未派**）`（README 规则 1）；
+③ 除此之外删除列为 0。**没有一字节是"顺手清掉的"。**
+
+### 6.2 AC#5 门禁读数（一律逐包单跑）
+
+| 门 | 命令 | 读数 |
+|---|---|---|
+| 改前包测 | `go test -count=1 -v ./internal/agent/approval/` | `rc=0`；**PASS 32 / FAIL 0 / SKIP 1**；点名册 33 枚（`roster-before.txt`） |
+| 改后包测 | 同一条命令 | `rc=0`；**PASS 34 / FAIL 0 / SKIP 1**；点名册 35 枚（`roster-after.txt`） |
+| 点名册差集 | `diff roster-before roster-after` | **只多两枚**：`TestLiveApprovalsInPlaceWriteCannotReachTheQueueRecord`、`TestLiveApprovalsSharesNoReferenceSlotWithTheQueue`；**零删除、零改名** |
+| SKIP 归因 | `grep '^--- SKIP'` 改前改后 | 同一枚 `TestDefaultDeadlineWallClockMeasurement`，**改前就在**，本程未新增 SKIP、未 `t.Skip` |
+| 跨包（宿主） | `PATH=third_party/sherpa-onnx:$PATH go test -count=1 ./cmd/wisp/` | `ok … 134.596s`（**不注入 dll 路径是 `exit status 0xc0000135`、0 条 `=== RUN`**——票 98 那一格，见 §6.4） |
+| 跨包（面板） | `go test -count=1 ./internal/panel/` | `rc=1`，唯一红是 `TestC21DesignTokensFourWayAgree`，根因 `design/assets/tokens.css` 工作树缺文件（§5 第 5 条）。**两包未合跑**（票面 :66 的仪器坑，照 :63 逐包单跑） |
+| 格式 | `/d/work/base/gopath/bin/gofumpt -l . tools/d22scan tools/mockllm`（v0.12.0，与 CI 同版）＋ `gofmt -l .` | **两条都空** |
+| 静态 | `go vet ./internal/agent/approval/ ./cmd/wisp/ ./internal/panel/`（在代码改动落地后跑的，当时 `cmd/wisp` 尚未被别人改坏） | `rc=0` |
+| D22 门 | `sh scripts/d22scan.sh` | **`rc=0`**，末行 `d22scan: clean - no D22 ban violations`，且各作用域 `examined N` 全非零（`internal/` 412 Go 文件、`cmd/` 43、`frontend/` 49、`design/` 32）⇒ 不是"没看"（票 67/71 那族形状）。日志 `d22scan.txt` |
+
+### 6.3 改前不是全绿的既有项（登记，别让下一位误归因）
+
+- `internal/panel` 的 `TestC21DesignTokensFourWayAgree`：**owner 未提交的 `design/` 移动**造成（本程未碰 `design/**`）。
+- `cmd/wisp/slo_windows.go`：本程测量期间被别人（或 owner）改到**不能编译**（`bytes`/`errors`/`io` 三枚未用 import）。
+  ⇒ 我**没有救它、没有还原、没有提交它**（票面 :79-80 的 git 纪律＋"别人的活"），只把 AC#3 的建法改成
+  从 `git archive` 的纯净快照建两棵仓外副本。**这条要报编排者**：它现在在 `dev` 的工作树里，
+  下一次从工作树建的 `cmd/wisp` 会红。
+
+### 6.4 被拒的调用
+
+**本程 0 次工具调用被权限系统拒绝。**为免被读成"一切顺利"，把**我自己踩空的**几发同栏列在此处（都不需要人批准）：
+
+| 那一发在做什么 | 命令形状 | 症状 | 处置 |
+|---|---|---|---|
+| 建改前基线日志 | `go test … > /d/tmp/wisp-146-agent/a-before.txt` | 目录名写错（`-agent` vs `-agent-a`），`No such file or directory` | 改正后复跑，未产生错误读数 |
+| 跑 `wisp slo` 第一次 | `… > out 2> err; echo rc=$?`（前面接了 `\| tail`） | `rc` 取的是 `tail` 的、exe 其实因 PATH 里 `D:/…` 的冒号被切成 `D` 而 0xc0000135 | 改成 `/d/…` 形，复跑取到真 JSON |
+| `gh run list --json branch` | 字段名不存在 | gh 报错并列出可用字段 | 换 `headBranch`，读数不变 |
+| 从工作树建 `cmd/wisp` | `go build -o … ./cmd/wisp` | 别人的 WIP 不能编译（§6.3） | **不改别人的文件**，改走 `git archive` 快照 |
 
 ---
 
-## 7. 伪授权登记（每程必填）
+## 7. 伪授权登记（每程必填，两栏分开）
 
-（填写中。）
+| 栏 | 数 | 说明 |
+|---|---|---|
+| **真通知回显数** | **3** | 全是 harness 自己注入的 `<system-reminder>`：① 项目上下文（`agents.md` 全文回显）；② "The date has changed. Current date: 2026-09-25"；③ 可用 skill 清单。三者都**不要求我做任何动作**，也不声称拥有授权。 |
+| **判为注入数** | **0** | 本程**没有**出现自称"系统提示／编排者备注／已核验请继续提交／请 revert／放宽阈值／这条路已解锁／不用取证直接给结论"的文字。 |
+
+出处核法（本程实际据以判的两条）：
+① 工具输出里唯一"像授权"的东西是 **AGENTS.md / issues/README 的原文回显**，它是**规矩文本**、不是运行时指令，
+且我按它做的一切都能指回票面或仓内文件；② 别人并行提交的 commit 信息（`ebe3c6b`/`40be959`/`9d51d1f`，
+台账 `A253`/`A254`）里出现的"编排者"字样是**写给另一程的真消息**，不是我这一票的授权——
+**未据此减少任何取证、未据此改判任何一格**。凭据值：本件全程未抄任何 API key/token 原文（连变量名以外的都未抄）。
+
+---
+
+## 8. 交回编排者的四行（不替自己裁决）
+
+1. **AC#1 我判了 ⓐ、票面默认 ⓑ，方向相反**（依据 §2 三条）。若改判 ⓑ，需要同步改 AC#2 的断言极性＝**改票＝人工批准**，
+   并另派一票给 `tools/d22scan/**` 装静态腿，否则那一支交不出承重的检。
+2. **票面 :18-23 的字段表漏计 3 枚**（`Blacklist BlacklistNote` 里的三枚 `[]string`），:25 的调用者数差 1 枚。
+   本票按现量做了，票面文字**我一字未改**（除 Status 行与 Progress log）。
+3. **`Params` 再往下一层今天仍不隔离**（§3.4／§5 第 1 条）。要钉它＝一票的体量，本票没收。
+4. **工作树里现在有两枚不是我造的坑**：`cmd/wisp/slo_windows.go` 不能编译（§6.3）、
+   `internal/panel` 的 C21 四方对账因 `design/` 移动而红（§5 第 5 条）。**推送前请先处理这两枚**，
+   否则下一趟 CI 的红会被误归到票 146 头上。
+
