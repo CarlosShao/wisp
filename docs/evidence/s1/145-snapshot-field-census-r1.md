@@ -143,7 +143,9 @@ dev
 **(1) 今天没有任何一处生产代码构造快照。**
 `panel.NewSnapshot`（`internal/panel/composer.go:63`）的**非测试调用者 = 0**（现量：
 `grep -rn NewSnapshot --include=*.go . | grep -v _test` 只命中 `:58` 注释与 `:63` 定义两行）。
-`Snapshot{}` 字面量在 `cmd/` 与 `internal/**`（除 `internal/panel` 的测试）里零命中。
+全树 `Snapshot{` 非测试字面量 2 处，**没有一处是"别人在构造面板快照"**：
+`composer.go:79` 是 `NewSnapshot` 自己的 return；`internal/perm/store.go:247` 返回的是
+`internal/perm` 里另一枚**同名**类型 `perm.Snapshot{Mode, History}`（`store.go:236-239`），与面板无关。
 `internal/panel` **不 import `internal/agent`**（现量零命中），面板侧唯一的生产数据路径是
 `cmd/wisp/panel_assets.go:57-88`——它 `json.Encoder` 打印**一枚** `ApprovalCardView` 到 stdout，
 那是 CLI 诊断件，不是推送（其 `:53-56` 注释自己写着"Ticket 35 replaces the printing with a bridge push"）。
@@ -426,3 +428,107 @@ it never invents an exchange rate"。⇒ 尺上那个 `¥0.31` 的 `¥` **正是
 ⓒ 三分：来源＝**已通（缺的只是别盖住它）**；结构化 `Source/Channel`＝无源（`Hit` 不外露，要 `risk` 侧开口子，
 ⚠ 而 `internal/risk/**` 在本票零命中面上 ⇒ **本程不碰、AC#2 也不该顺手碰**）；片段＝**等人工批准**。
 ⇒ **本行是 §2 里唯一一枚"ⓐ 判已有、ⓑ 判禁入"同时成立的**，读表时别被 §47 那句"没有任何承载字段"带偏。
+
+---
+
+## 3. "当前屏"这一维（AC#3）：ⓐ 与 ⓑ 是两件事，且 ⓐ 单独存在**换不了屏**
+
+### 3.1 先把两件事命名清楚
+
+| | 方向 | 谁发起 | 今天的状态 |
+|---|---|---|---|
+| **ⓐ** | **Go → 面板**：快照里带"现在该显示哪一屏" | 宿主 | **字段不存在**（`Snapshot` 四枚键里没有 `view`，`composer.go:44-49`） |
+| **ⓑ** | **面板 → Go**：用户点了导航条，请 Go 换屏 | 用户 | **曾经存在、已被删除**（`Q-50` 甲，commit `f1cdafa`） |
+
+⚠ 本票按 AC#3 只做 ⓐ。下面 3.2 与 3.3 分开写，**3.4 是硬答案**。
+
+### 3.2 ⓐ Go→面板：唯一一枚"TS 侧不用改"的字段——但**值无源**
+
+**消费端今天就位**（这是本件在 ⓐ 上的新读数，工单没写）：
+`frontend/src/lib/panel-views.ts:145-153 currentView(snapshot)` **已经在读 `snapshot.view`**——
+签名是 `PanelSnapshot & { view?: string }`（`:145`），`named === undefined` 时回落到
+`DEFAULT_VIEW = "chat"`（`:127`，注释逐字"it is a fallback for a missing field, **not a memory** of where the user last was"），
+命中 `PANEL_VIEWS` 就返回（`:148`），不命中则 `console.error` 报契约漂移再回落（`:149-152`）。
+`App.tsx:71 const view = currentView(snapshot)` 是**唯一**读取点，全树无组件自己持有或推导 view
+（`panel-views.ts:142-144` 逐字："no component holds a view, and none derives one either"）。
+⇒ **Go 侧加一枚 `View string json:"view"`，前端一行都不用动就能被读到。**（对齐 `panel.ts:129-137` 时另计。）
+
+**但值本身无源，且没有任何东西能校验它。** 现量两路：
+1. `grep -rn 'palette|privacy|"tasks"|"cost"|"security"' --include=*.go internal/panel/ cmd/wisp/`（排除测试）
+   → **零命中**。⇒ **Go 全仓不知道这九枚屏的存在。**
+2. 九枚 id 的出处是**纯前端表**：`panel-views.ts:32-41` 的 `PanelViewId` 联合类型与 `:68-122` 的 `PANEL_VIEWS`，
+   其头部注释（`:6-7`）逐字说它们"taken entry-for-entry from the demo's own list"，
+   现量核实于 `design/doubao/demo/app.js:17-27`（九行 `NAV_ITEMS`，id 与前端逐枚相同）。
+
+⇒ ⓐ 落地形态只能是"`View string`、值由宿主随便给"：**一枚无校验的自由字符串进入 C17 对外形状**，
+拼错的表现是 `panel-views.ts:151` 那句 `console.error` ＋ 回落 chat，**不是一枚测试红**。
+⇒ **本件判：ⓐ 与 §2 行 4 的 `IconClass` 同性质——词表不在仓里。**
+建议（**不替编排者定，只是把代价摆出来**）：ⓐ 要落就得同时在 Go 侧立一枚具名枚举
+（`internal/panel` 里一份 `ViewNames()`，与 `panel-views.ts:32-41` 用 `TestComposerContractTypesMatchFrontend`
+同一条尺双向钉住，`internal/panel/composer_test.go:48-81`），否则 ⓐ 比 §2 里任何一枚 ❗ 更坏：
+❗ 是"值假"，ⓐ 是"**名字都没定**"。
+
+### 3.3 ⓑ 面板→Go：被 `Q-50` 甲删掉的那条，且它**不是前端能自己加回来的**
+
+- 出站名册现量：`internal/panel/bridge.go:97-103 knownComposerMethod` 只答 **4 枚**
+  （`MethodModeRequest`/`MethodWorkspaceRequest`/`MethodAttachmentAdd`/`MethodMessageSend`）。
+- 全树 `panel.view` **仅存 1 处＝`frontend/src/lib/panel.ts:228` 的注释**（解释"为什么故意没有第五枚"）。
+- 门存在且**已经在响过**：`internal/panel/composer_test.go:521-523`
+  ——`"the renderer names a route the Go side does not answer"`。`panel.ts:230-233` 记着它的战绩：
+  "a fifth means the renderer names a route the native side does not answer - which is exactly what
+  internal/panel/composer_test.go:522 exists to catch (**it was red on two tests before this comment was written**, green after)"。
+- 用户侧的体感：`frontend/src/components/nav-rail.tsx` 每枚按钮 `aria-disabled`（`:61`）、`disabled`（`:67`）、
+  `title={`${v.label}（换屏待接线）`}`（`:69`）。⇒ **点下去不会动，且它自己说出为什么。**
+- ⚠ **ⓑ 不是"等泵"，是"等人工批准"**：`panel.ts:234-235` 逐字
+  "Re-adding one is not a frontend change: **it reopens C17's method whitelist, a contract-level human-approval surface**"。
+  而 `C17 方法白名单定稿`正列在 AGENTS §2／`SPEC-12 §4.2` 的**"未定义即停"清单**里
+  （原文："`C24 GojaHostAPI` 初始集与 `C17` 方法白名单定稿（S7/S5 切片卡批准）"）。
+  ⇒ **本程不申请、不假设、不改工单**，只把"ⓑ 撞那闸门"这一条钉在这儿给下一位读。
+
+### 3.4 硬答案（AC#3 要求的那一句，不许读成"换屏已通"）
+
+> **只做 ⓐ，界面真换不了屏。**两条独立理由，任一成立就够：
+
+1. **快照根本还没到过面板。** §2.0(1) 现量：`panel.NewSnapshot`（`composer.go:63`）**非测试调用者 = 0**，
+   全树 `Snapshot{` 字面量只有两处、**都不是面板的那枚在被人构造**：
+   `internal/panel/composer.go:79`（就是 `NewSnapshot` 自己的 return）、
+   以及 `internal/perm/store.go:247`——后者返回的是 `internal/perm` 里**另一枚同名类型**
+   `perm.Snapshot{Mode, History}`（`store.go:236-239`），与 `panel.Snapshot` 无关，只是**同名**。
+   ⚠ 提这一枚是为了让下一位别把它误读成"perm 侧已经在造面板快照"；
+   顺带它确是 `Composer.Mode` 的真上游（`Store.Snapshot()` `:242`），但那是票 92 已经接好的路，不是新读数。
+   ⇒ 今天没有任何一条推送会把 `view` 送进去；`currentView` 会**永远**走 `panel-views.ts:147` 那行回落，
+   屏**一直停在 chat**。加 ⓐ ＝ 加一枚**永远读不到的键**。
+2. **即便泵存在（票 35 落地后），ⓐ 也只让 Go 有权"切到某一屏"，用户的点击仍然无处可去。**
+   换屏这个动作的两个发起方是宿主与用户；ⓐ 只覆盖前者。
+   后者要的那条路由在 §3.3：名册只有 4 枚、第五枚被 `f1cdafa` 删、加回来撞 C17 白名单人工批准。
+
+⇒ **请照这句写进任何下游读数**：
+**「ⓐ 落地后界面仍点不动；缺的是 ⓑ，而 ⓑ 不是泵（票 35）能顺带解决的——它是 `C17` 方法白名单，属人工批准。」**
+工单 AC#3 原话是"ⓑ **留给泵（票 35）**"，本件据 3.3 现量**部分推翻这个归口**：
+泵能送达 ⓐ，泵**造不出** ⓑ 那条被删掉的路由（那是白名单，不是推送）。
+
+### 3.5 顺带一枚，且这枚对本票有用：`panel.resync` **不是"全仓找不到"**，它已在 `SPEC-08` 的推送表里挂了名
+
+`panel-views.ts:136-138` 断言"`panel.resync` … is still **zero-hit repo-wide**"；
+`frontend-session-log.md:684` 写"全仓 0"；`frontend-session-brief.md:230` 写"**全仓零命中**（规格里有名字、盘上没实现）"。
+
+现量（`grep -rn "panel\.resync"`，排除本件自身）：**13 处命中、分布在 5 类位置**。
+"zero-hit repo-wide" 这个写法**不成立**，成立的是它后半句"规格里有名字、盘上没实现"：
+
+| 位置 | 读数 | 判 |
+|---|---|---|
+| **Go 代码**（`*.go`） | **0 处** | ✅ 未实现，这条为真 |
+| **TS/TSX 代码** | **1 处，且是注释**：`frontend/src/lib/panel-views.ts:137`（就是那句自证自己） | ✅ 无实现 |
+| **规格** | `docs/specs/SPEC-08-ui-ball-panel.md:150`（"每次 `show` Go 侧推 `panel.resync` 全量状态"）、**`:163` 推送表里独立一行 `| panel.resync | Go→前端推送 | — |`**、`docs/PLAN.md:2966`（"④ 前端无状态的强制手段：面板每次 show 必须发 `panel.resync`"） | **已命名、已规定** |
+| **工单** | `.scratch/wisp/issues/35-panel-bridge-c17.md:14,18,29`（`:18` 把它列进 **C17 方法白名单**、`:29` "on EVERY show"）、`issues/34-frontend-scaffold.md:36` | **票 35 名下已立项** |
+| **台账/报告** | `docs/reports/pending-and-issues.md:6009,6012`、`frontend-session-log.md:501,684`、`frontend-session-brief.md:230` | 已登记 |
+
+⇒ **这一处口径差别对下一位是实质性的**：ⓐ（快照带"该显示哪一屏"）的**运载工具已经在 `SPEC-08:163` 挂名、
+在 `PLAN.md:2966` 被定为强制**，它不是 §2 里那种"等哪一枚票"的悬案，而是**票 35 名下已立项、尚未落地**的那根线。
+⇒ 所以本件对 ⓐ 的判语要读成"**泵是已立项的，缺的是泵里的这一枚键＋Go 侧那枚屏枚举**"，
+不是"没人打算接"。
+
+⚠ 顺带把 `SPEC-08:150-151` 那条"前端必须无状态"与 ⓐ 的落地形状钉在一起，免得下一位走出第三种形状：
+`PLAN.md:2966` 与 `SPEC-08:150` 规定的是"**每次 show 全量推**"，
+对应 `App.tsx:71` 每次从快照现读、`panel-views.ts:127` 那句"not a memory of where the user last was"。
+⇒ ⓐ 落地时 `view` **必须由 Go 每枚快照都带上**；前端记住上一次的值会同时违 `SPEC-08:150`、`PLAN.md:2966` 与票 92 的 AC#4。
