@@ -267,7 +267,7 @@ var emojiRe = regexp.MustCompile(`[\x{1F000}-\x{1FAFF}\x{2200}-\x{22FF}\x{2600}-
   这一支是**给 oracle 加了排除**，性质上属于"两边一起改才能维持一致"，所以它是否有牙必须实测，不能靠自述。
   ⇒ 见 §6.8 那发"牙齿对照"：我在快照里往 `.gitignore` 追加一条落进被扫 scope 的规则，看这枚 oracle 是否当场打脸。
 - **helper 是否为通过而新造**：`relToRepo`(`:1433`) 与 `ignoredLikeGit`(`:1458`) 确为本批新造，
-  但它们的用途是给 oracle **加**约束（不是给被测方加豁免），且实现程在 `scan_test.go:1163-1173` 那段
+  但它们的用途是给 oracle **加**约束（不是给被测方加豁免），且实现程在 `scan_test.go:1164-1173` 那段
   注释里明写了这是"故意的第二份手抄副本 +  disagreement 即打脸"。判定：
   **不是为通过而造，但它与实现共用同一条"纯模式"前提**（§1.4），所以它证伪不了 §1.3 那一支——
   这枚局限是实现程自述里没有点破的。
@@ -420,3 +420,147 @@ runtests.sh: OK - packages=[./...] top-level: PASS=26 FAIL=0 SKIP=0, === RUN=66,
 ⇒ 有构建产物的树上 step 1 仍绿。附带一枚对我有利的否证：`head-seeded-runtests.log:116-122,130`
 现量 `ban #6 frontend/=41`、`ban #8 frontend/=41`、独立对照 `verified ban #6 frontend/: 41 files`
 ⇒ 三方（两枚 walk + oracle）在**带构建产物**的树上给出同一个 41，等式那两枚守卫没被绕过。
+
+### 6.8 那枚"故意留成第二份手抄"的 oracle 到底有没有牙（实测两发）
+
+> **行号口径**（本件唯一一处跨版本引用，先说清免得被当成漂移）：
+> §6.8 里 `scan_test.go:269`/`:1273`/`:1277` 三枚是**修前那份文件**（`3bb99aa^` = `467f8a4`）的现号，
+> 来自 `blind-suite-pre.log` 的真回显；`:1239`/`:1504` 是**修后**（`ab785bf`/`42d141d`）的现号，来自 `blind-suite.log`。
+> 两版 scan_test.go 差 `+231` 行，所以同一句断言在两边不可能是同一个号——这里贴的是日志，不是我重数出来的号。
+
+不自述，直接改树跑 step 1 的三枚守卫。
+
+**牙齿正向对照** — `headtooth\` = `git archive` + 往根 `.gitignore` 追加一行 `frontend/src/`
+（一条**落进被扫 scope** 的新 ignore 规则）：
+
+```
+rc=1
+--- PASS: TestRealRepoBan8CoversFrontendTreeAtBan6sCount (0.44s)
+--- FAIL: TestLedgerCountsMatchAnIndependentWalk       (0.44s)
+--- PASS: TestRealRepoLedgerIsHonest                  (0.41s)
+    scan_test.go:1239: scope ban #6 frontend/ reported examining 19 files, independent walk says 40 - the number in the self-report is wrong, not just small
+    scan_test.go:1239: scope ban #8 frontend/ reported examining 19 files, independent walk says 40 - the number in the self-report is wrong, not just small
+runtests.sh: go test exited 1 - top-level: PASS=2 FAIL=1 SKIP=0
+```
+
+**牙齿负向对照** — `headtoothout\` = 同样的 archive，但追加 `/docs/` 与 `/models/`（scope 之外的规则）：
+
+```
+rc=0
+--- PASS: TestRealRepoBan8CoversFrontendTreeAtBan6sCount
+--- PASS: TestLedgerCountsMatchAnIndependentWalk
+--- PASS: TestRealRepoLedgerIsHonest
+runtests.sh: OK - top-level: PASS=3 FAIL=0 SKIP=0, === RUN=3
+```
+
+⇒ **oracle 真有牙，而且是精确的牙**：规则吃进被扫 scope ⇒ 当场红并说出"这是基线变更"；
+规则在 scope 之外 ⇒ 不冤枉。`d22scan-gitignore-r1.md:56-62` 那段设计说明**兑现了**。
+
+**但同一枚 oracle 对 §1.3 那一支完全无力**（这才是关键，实测不是推理）——
+`forcedfull\` 是一枚**真的 git 仓库**，`git ls-files -i -c --exclude-standard` 现量点名
+`frontend/dist/tracked-forced.tsx`（受追踪 且 模式命中），该文件里就写着 `≤`：
+
+```
+rc=0
+--- PASS: TestScannerSelfScanOfRealRepoIsGreen        (0.46s)
+--- PASS: TestRealRepoBan8CoversFrontendTreeAtBan6sCount (0.43s)
+--- PASS: TestLedgerCountsMatchAnIndependentWalk      (0.47s)
+--- PASS: TestRealRepoLedgerIsHonest                  (0.46s)
+    scan_test.go:1504: ban #6 examined 40 frontend/ text files in the real repo
+runtests.sh: OK - top-level: PASS=4 FAIL=0 SKIP=0
+```
+
+**同一棵树在修前的代码上**（`pre2\` = `git archive 3bb99aa^`，只加这一枚文件，别的都没动）：
+
+```
+rc=1
+    scan_test.go:269: repo HEAD violates: frontend/dist/tracked-forced.tsx:1: [emoji] ban #8 glyph in scope frontend/ is banned (D23): ...
+--- FAIL: TestScannerSelfScanOfRealRepoIsGreen (0.44s)
+--- PASS: TestRealRepoBan8CoversFrontendTreeAtBan6sCount (0.39s)
+--- PASS: TestLedgerCountsMatchAnIndependentWalk        (0.41s)
+    scan_test.go:1273: ban #6 examined 41 frontend/ text files in the real repo
+--- FAIL: TestRealRepoLedgerIsHonest (0.42s)
+    scan_test.go:1277: HEAD must be green, rc=1
+runtests.sh: go test exited 1 - top-level: PASS=2 FAIL=2 SKIP=0
+```
+
+⇒ **回退发生在 `scripts/d22scan.sh` step 1 自己身上**：修前两枚守卫红、step 2 也会红；
+修后 step 1 的四枚守卫全绿（`ban #6 examined 40`），CI 的两步门**没有任何一层看得见这一发违规**。
+所以 §1 那一条不是"读数变了"级别的问题，是"门从两层看变成零层看"。
+
+### 6.9 同一枚过配打到 Go scope（比 `frontend/dist/` 更要命的一发）
+
+根 `.gitignore:14` 是不锚定的目录规则 `build/`，射程直达 `internal/build/`。
+两棵 fresh archive（`headmut\` 修后代码 / `premut\` 修前代码），只加同一枚文件：
+
+```
+internal/build/leak.go:  package build / func worker() {} / func leak() { go worker() }
+$ git ls-files -i -c --exclude-standard   ->  internal/build/leak.go   (受追踪 且 模式命中)
+```
+
+**修前**：
+
+```
+d22scan: scope bans #1-5 internal/      examined 204 production Go files
+internal/build/leak.go:5: [bare-goroutine] bare `go worker(...)` is banned (D22/D38b, R16: named calls count too): use observe.Registry.Spawn (...)
+d22scan: 1 finding(s); ...
+```
+
+**修后**：
+
+```
+rc=0
+d22scan: skipped as git-ignored: 0 file(s) under 1 ignored director(ies) [internal/build/], decided by .gitignore (1 path(s))
+d22scan: scope bans #1-5 internal/      examined 203 production Go files
+d22scan: scope ban #8 internal/         examined 405 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; ...
+```
+
+⇒ 一枚 **AGENTS.md §1.2 明列的禁止形状**（裸 `go func`/`go worker`）在修后**对 bans #1-5 与 ban #8 双双不可见**，
+`rc=0`，且 note 说的是 **"0 file(s)"** —— 整包被剪，note 一个文件都没报。
+这条同时是 §6.6 那枚量纲缺陷的最坏实例：**被剪目录里可以藏着 N 枚文件而 note 报 0**。
+实现程并非不知道这枚规则会打到 `internal/`：它的夹具 `scan_test.go:1265` 就往 `.gitignore` 里写了 `build/`、
+并在 `:1272` 种 `internal/build/probe.go`——只不过**当作"该被排除的正面例子"来种的**，
+没把"这枚件同时是受追踪交付件"那一支写进任何断言。
+
+---
+
+## 7. 同源副本普查：这修有没有造出第 7 份
+
+票面给的命令跑完是 30 行命中，但**其中 12 行是注释、5 行是夹具种子字符串**，
+真正的**可执行跳过逻辑**我按位置重新点一遍（HEAD 现号）：
+
+| # | 位置 | 抄的是哪条规则 | 归属 | 本批是否动 |
+|---|---|---|---|---|
+| ① | `tools/d22scan/main.go:633` `walkGo` 目录名 | `testdata`/`.git`（+ 新接的 ignore） | 实现程 | **动了** |
+| ② | `tools/d22scan/main.go:823` `walkText` 目录名 | `testdata`/`node_modules`/`.git`（+ ignore） | 实现程 | **动了** |
+| ③ | `tools/d22scan/main.go:901` `walkEmoji` 目录名 | `node_modules`/`.git`（+ ignore） | 实现程 | **动了** |
+| ④ | `tools/d22scan/main.go:1146` + `:1151` `checkRoot` | `testdata`/`.git` + `.go` 后缀判（+ ignore） | 实现程 | **动了** |
+| ⑤ | `tools/d22scan/scan_test.go:1192` 独立对照走查 | `testdata`/`.git`/`node_modules` 目录名（+ `:1197` 调 `ignoredLikeGit`） | 实现程 | **动了** |
+| ⑥ | **`tools/d22scan/scan_test.go:1458` `ignoredLikeGit`** | **`frontend/dist/` 前缀 + `.gitkeep` 例外——手抄的 gitignore 政策** | 实现程（本批**新造**） | **新建** |
+| ⑦ | `internal/panel/frontend_hygiene_test.go:289` | 子串 `/node_modules/`、`/dist/` | **编排者/前端会话地界** | 未动（正确） |
+| ⑧ | `internal/panel/composer_test.go:286`/`:434`/`:606` | case 表列 `node_modules`/`.git`/`dist`/`fixtures` | 同上 | 未动（正确） |
+| ⑨ | `internal/risk/pathresolver_rewrite_account_test.go:223` | case 表列 `.git`/`.scratch`/`node_modules`/`dist`/`build`/`testdata`/`design`/`docs` | 同上 | 未动（正确） |
+
+**判：有没有造出第 7 份？按"手抄的跳过规则"这个口径，答案是有一份新的 = ⑥ `ignoredLikeGit`。**
+实现程报的"6 份"不是假账，但它的口径有两处会让人少算一枚：③ 那行把 `main.go` **两处**（594/1081）合成一枚 ③，
+而 ⑥ `ignoredLikeGit` 被折进它自己的 ④ 里（`d22scan-gitignore-r1.md:268` 有写，表里没列）。
+⇒ 台账口径建议按位置数（我这枚表是 9 行、其中新增 1 行）。
+**这份新副本是披露的、不是偷藏的**（`scan_test.go:1164-1173` 整段论证 + r1 §1 脚注），而且 §6.8 证明它**真有牙**。
+它的缺陷不在"多抄了一份"，在**抄的是同一条纯模式前提**（§1.4），所以它对 §1.3/§6.8 那一支天生看不见。
+
+**归属边界是否被尊重：是。** `git diff --name-status 3bb99aa^..3bb99aa` 只有 `tools/d22scan/` 三枚路径，
+`internal/**` 一字节未动；`grep -rn 'tools/d22scan' --include='*.go' internal cmd` 现量只有注释命中，
+**没有任何 Go 文件 import 这枚 module** ⇒ ⑦⑧⑨ 不可能因本修变红（与 r1 §7 的自述一致）。
+
+**⑦ 需不需要同批改？判：不需要，也不应该在本批改。** 三条理由：
+(a) 它跳的是**子串** `/dist/`，本就比 `.gitignore` 宽，本修没让它变得更不一致；
+(b) 它是 root module 的测试，与 tools/d22scan 零依赖；
+(c) 它归编排者/前端会话，按票面"不许动别人地界"。
+但必须登记一条**它自己那一族的既有暴露**（不是本批引入）：`internal/panel/frontend_hygiene_test.go:289`
+同样会把一枚受追踪的 `frontend/dist/x.tsx` 从它自己的 ban #6/#8 对照里跳掉 ——
+即 §1.3 那发在**第二台仪器**上本来就成立，且早于本修。这一条应记给⑦的主人，别记在本批头上。
+
+顺带一枚与本批无关但普查路上撞见的**好消息**：`internal/panel/frontend_hygiene_test.go:71` 的
+`emojiRangesRe` 与 `tools/d22scan/main.go:149` 的 `emojiRe` 我把两串正则抽出来做逐字比较，
+**IDENTICAL**（`U1` 那一族同源字符类今天没有漂）。本批没碰它，也没有把它碰漂。
