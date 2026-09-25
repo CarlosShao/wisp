@@ -1,0 +1,14 @@
+time=2026-09-25T23:47:26.577+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestCompressionTraceBooksCountsOnSuccess
+    compress_trace_test.go:206: "agent: history compressed" records = 0, want exactly 1 (all records: [trace-capture-ruler-control])
+--- FAIL: TestCompressionTraceBooksCountsOnSuccess (0.00s)
+=== RUN   TestCompressionTraceSilentWhenNothingFolded
+--- PASS: TestCompressionTraceSilentWhenNothingFolded (0.00s)
+=== RUN   TestCompressionTraceSurvivesTheLoopWiring
+    compress_trace_test.go:328: a real Run that folded history left no "agent: history compressed" record; captured: [trace-capture-ruler-control]
+--- FAIL: TestCompressionTraceSurvivesTheLoopWiring (0.01s)
+=== RUN   TestCompressionTraceDoesNotAlterTheFold
+--- PASS: TestCompressionTraceDoesNotAlterTheFold (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent	0.226s
+FAIL

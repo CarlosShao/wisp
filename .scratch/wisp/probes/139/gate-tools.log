@@ -1,0 +1,37 @@
+# 139 门禁 other tools — 2026-09-25T23:49+08:00 HEAD=cce7510
+
+$ go vet ./internal/agent/
+vet_rc=0
+
+$ D:/work/base/gopath/bin/gofumpt.exe --version
+v0.12.0 (go1.27.1)
+$ gofumpt.exe -l . tools/d22scan tools/mockllm   (expect: nothing from internal/agent)
+gofumpt_rc=0
+
+$ gofmt -l internal/agent
+gofmt_rc=0 (empty list = clean)
+
+$ sh scripts/d22scan.sh
+d22scan_rc=0
+--- PASS: TestBuiltBinaryGoesRedEndToEnd (2.42s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/seeded_violation_exits_1 (0.23s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/empty_live_scope_exits_2 (0.29s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/armed_ban_6_goes_red_on_the_panel_violation_exits_1 (0.18s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/frontend_tree_gone_while_declared_live_exits_2 (0.15s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/ban_7_tree_gone_while_declared_live_exits_2 (0.17s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/fully_live_fixture_exits_0 (0.16s)
+PASS
+ok  	github.com/CarlosShao/wisp/tools/d22scan	16.444s
+runtests.sh: OK - packages=[./...] top-level: PASS=30 FAIL=0 SKIP=0, === RUN=70, '[no tests to run]'=0
+d22scan.sh: scan of /d/work/workspace/projects plans/Wisp
+d22scan: skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/], decided by frontend/.gitignore (2 path(s))
+d22scan: examined 228 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
+d22scan: scope bans #1-5 internal/      examined 205 production Go files
+d22scan: scope bans #1-5 cmd/           examined  23 production Go files
+d22scan: scope ban #6 frontend/         examined  66 text files
+d22scan: scope ban #7 internal/tools/   examined  18 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined  66 text files
+d22scan: scope ban #8 internal/         examined 413 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined  43 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=205, bans #1-5 cmd/=23, ban #6 frontend/=66, ban #7 internal/tools/=18, ban #8 design/=39, ban #8 frontend/=66, ban #8 internal/=413, ban #8 cmd/=43; ban #8 emoji coverage: design/ 39 text files; frontend/ 66 text files; internal/ 413 Go files, comments and _test.go included; cmd/ 43 Go files, comments and _test.go included

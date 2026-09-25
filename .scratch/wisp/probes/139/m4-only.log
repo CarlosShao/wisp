@@ -1,0 +1,19 @@
+# [M4-only] history content joined the record — 2026-09-25T23:48+08:00
+$ diff vs orig:
+ 			"msgs_after", len(out),
+ 			"compressed_msgs", rep.CompressedMsgs,
+ 			"kept_raw_rounds", rep.KeptRawRounds,
+-			"history_changed", rep.TokensAfter != rep.TokensBefore || len(out) != len(hist))
++			"history_changed", rep.TokensAfter != rep.TokensBefore || len(out) != len(hist), "peek", fmt.Sprint(out[0].Content[0]))
+ 	}
+ 	return out, rep, nil
+ }
+$ go build:
+build_rc=0
+=== RUN   TestCompressionTraceBooksCountsOnSuccess
+    compress_trace_test.go:256: trace leaked a user turn body: "agent: history compressed msgs_before=18 msgs_after=10 compressed_msgs=9 peek={[已压缩的历史] 以下轮次已被摘要压缩，仅供上下文参考：\nuser: 问题 0 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx…\ntool_call c00 name=echo args=13字节\ntool_result c00 ok (101 token)\nuser: 问题 1 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx…\ntool_call c01 name=echo args=13字节\ntool_result c01 ok (101 token)\nuser: 问题 2 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx…\ntool_call c02 name=echo args=13字节\ntool_result c02 ok (101 token)\n[tool_call 记录（不得丢弃）] c00(echo); c00; c01(echo); c01; c02(echo); c02} tokens_before=1284 threshold=384 kept_raw_rounds=3 history_changed=true tokens_after=804"
+--- FAIL: TestCompressionTraceBooksCountsOnSuccess (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent	0.082s
+FAIL
+RESTORED OK

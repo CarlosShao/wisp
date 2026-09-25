@@ -1,0 +1,20 @@
+# 139 门禁 two-shape four numbers + roster diff — 2026-09-25T23:49+08:00 HEAD=cce7510
+
+$ go test ./internal/agent/ -count=2 -v   -> gate-pre-full.log
+RUN=152 PASS=152 FAIL=0 SKIP=0  (both forms: top-level + indented subtests)
+  top-level only: RUN=152 PASS=118
+  package summary line: ok  	github.com/CarlosShao/wisp/internal/agent	5.041s 
+
+$ go test ./internal/agent/ -count=2 -v   -> gate-post-full.log
+RUN=160 PASS=160 FAIL=0 SKIP=0  (both forms: top-level + indented subtests)
+  top-level only: RUN=160 PASS=126
+  package summary line: ok  	github.com/CarlosShao/wisp/internal/agent	5.182s 
+
+## roster (unique test names), two-way comm
+pre names=76  post names=80
+$ comm -23 post pre  (only in post = additions)
+TestCompressionTraceBooksCountsOnSuccess
+TestCompressionTraceDoesNotAlterTheFold
+TestCompressionTraceSilentWhenNothingFolded
+TestCompressionTraceSurvivesTheLoopWiring
+$ comm -13 post pre  (only in pre = losses, must be empty)

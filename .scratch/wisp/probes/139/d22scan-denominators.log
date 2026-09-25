@@ -1,0 +1,13 @@
+# 139 d22scan denominator non-decrease argument — 2026-09-25T23:50+08:00
+$ git ls-tree -r --name-only 3f6322f -- internal | grep -c "\.go$"   (tracked Go files under internal/ at the ticket anchor)
+412
+$ same, at current HEAD (cce7510 or later)
+412
+$ working tree .go files under internal/ (tracked + my untracked new test)
+413
+$ my new files under internal/
+ M internal/agent/compress.go
+ M internal/agent/harness_test.go
+ M internal/agent/loop.go
+?? internal/agent/compress_trace_test.go
+(ban #8 internal/ examined 413 == working-tree count above)

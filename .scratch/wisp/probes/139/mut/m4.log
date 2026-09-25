@@ -1,0 +1,4 @@
+# github.com/CarlosShao/wisp/internal/agent [github.com/CarlosShao/wisp/internal/agent.test]
+internal\agent\compress.go:185:41: syntax error: unexpected ), expected := or = or comma
+FAIL	github.com/CarlosShao/wisp/internal/agent [build failed]
+FAIL

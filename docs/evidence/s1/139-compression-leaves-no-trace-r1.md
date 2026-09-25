@@ -150,3 +150,143 @@ $ grep -n '^FAIL\|^ok ' gate-pre-full.log
 361:ok  	github.com/CarlosShao/wisp/internal/agent	5.041s
 ```
 ⚠ 按派单 §5 的坑：包级汇总行 `ok` 不参与 FAIL 计数，FAIL 只数 `--- FAIL`（本基线 0 枚）。
+
+---
+
+## 2. AC#2 — 最小落盘面：三选一选了"结构化日志字段"，且落在 `Compress` 的成功边上
+
+**判据**（票面原文）：只要求"事后答得出"、不要求任何 UI；压缩**成功**时留下一条可核的痕，
+内容至少含 **压前 token / 压后 token / 是否真的动了历史**；三者选一（结构化日志字段／`Result` 出线可读字段／诊断包一项）
+**并在票面说明为什么选它**。硬约束两条：禁新增 Go→前端事件或面板方法（＝契约变更）、禁把原文内容落进日志。
+
+### 2.1 三选一的裁决与代价（为什么不是另外两枚）
+
+| 候选 | 裁决 | 依据（全部出自 §1 的现量，不是偏好） |
+|---|---|---|
+| (b) `Result` 出线上的可读字段 | **不选：这一味等于零改动** | 字段**已经存在**（`loop.go:100` 声明、`:401` 赋值，含 `TokensBefore/TokensAfter/Ran`）。§1.2 现量它在生产侧**既无字段级读者、也无整结构 `%+v` 打印者** ⇒ 再往这条线上加字段仍然是零读取者，"事后答得出"一句都不兑现。要让它可答就得去 `cmd/wisp/**` 加打印 ⇒ **那是别家的地界**（149 在飞），且改的是 CLI 输出面。 |
+| (c) 诊断包里的一项 | **不选：越界且无落点** | `internal/observe/**` 是本程零字节禁改面（派单 §2；票面 §Packages 另加"注意地界"）。且 `diagnostics.go` 现量 `compression` **0 命中**、它的字面量键名只有 `"id" "ticket" "summary" "registered" "reason"` —— 那是一张**检查项**表，不是 agent 侧观测的收件处，硬塞要先动它的形状。 |
+| (a) 结构化日志字段 | **选它** | 三条支撑读数：① 它是**唯一已经落到磁盘**的那条路——`installLogSink` 把 `slog.Default()` 换成"红删 JSONL 文件 + stderr"的 tee（`cmd/wisp/logsink.go:144`），门槛 `logSinkLevel = "info"`（`:82`）⇒ Info 级真的写进 `<data>\logs\wisp-*.jsonl`；② `cmd/wisp/**` 非测试代码**从不设 `agent.Options.Logger`**（`git grep -n "Logger:" -- 'cmd/wisp/*.go' ':!*_test.go'` rc=1）⇒ loop 用的就是那枚持久 sink，不需要为新痕开任何线；③ 落点在 Go 侧，不碰 SPEC-08 §5.2 的枚举白名单 ⇒ 不是契约变更。 |
+
+### 2.2 为什么写在 `compress.go` 而不是 `loop.go` 的成功分支
+
+票面 §0 自己把这一格挖深了一寸：那条失败 Warn **在调用方**，`compress.go` 从头到尾不产生日志。
+痕落在 `Compress` 内部换来三件调用方给不了的事：
+1. **未来的调用方自动继承**——D28-1 那句"Warm-window hook 才该拥有这次调用"落地那天，不必记得补打；
+2. **与失败那一发同前缀**：`agent: history compressed` / `agent: history compression failed`
+   共享搜索前缀 `agent: history compress`，一次 grep 拿到两种结局；
+3. **"没折叠就不打"由数据决定**：`rep.Ran` 是本函数内的折叠事实，不是调用方事后推断的条件。
+
+代价（照实记）：**痕里没有 taskID**。`Compress` 的签名不带任务号，加一枚参数要动 `Summarizer` 之外
+的第二条构造线，且会牵动 `compress_test.go` 全部 8 枚调用点。⇒ 归因靠同一次 run 里相邻的
+`task` 字段（失败 Warn 亦不带 task，二者对称）。这一条落进 §2.5「没测什么」第 1 项，并在 §1.4 的
+五字段"当前残缺表现"里写了同一句话。
+
+### 2.3 码的形状（`git show --stat 1acdd03`）
+
+```
+internal/agent/compress.go            |  +CompressorOpt/WithLogger（变参）+ log() + 成功边一条 Info
+internal/agent/loop.go                |  1 行：New() 把 opt.Logger 交给 NewCompressor
+internal/agent/compress_trace_test.go |  新增，4 枚用例
+internal/agent/harness_test.go        |  新增 withLogger（纯追加，默认仍 discard）
+```
+构造器选**变参 opt** 而不是加第 3 枚必填参数，是为了让 8 枚既有 `NewCompressor(b, sum)` 调用点
+（`compress_test.go` 7 枚 + `loop.go` 1 枚）**一字不改**：`git grep -n "NewCompressor(" -- '*.go'`
+在改动后仍全部编译，`go build ./internal/agent/` rc=0。
+"helper 是不是原有的那枚"自答：`harness_test.go` 里既有的 `withConfig/withTools/withRegistry` 等**语义未动**，
+`o.Logger = slog.New(slog.NewTextHandler(io.Discard, nil))` 那行默认值也**未动**，只是多了一枚 opt。
+
+### 2.4 记录本身（真发一条出来长什么样，非人工排版）
+
+`TestCompressionTraceDoesNotAlterTheFold` 里那枚未注入 logger 的 `NewCompressor(b, nil)` 走的是
+`slog.Default()` 回退支，故 `-v` 输出里能看到原样一行（`.scratch/wisp/probes/139/mut/m0.log`，摘）：
+```
+time=2026-09-25T23:45:23.573+08:00 level=INFO msg="agent: history compressed" \
+tokens_before=1236 tokens_after=780 threshold=384 msgs_before=18 msgs_after=10 \
+compressed_msgs=9 kept_raw_rounds=3 history_changed=true
+```
+⚠ 这一行同时给出一个**读数级**的事实：`tokens_after=780` 仍**高于** `threshold=384`。
+⇒ D15(4) 的退出条件是"预算够了 **或** 只剩 `KeepRawRounds` 枚原始轮"，两者都能收工，
+所以"压后 token"合法地可以停在阈值之上。**这就是记录里必须带 `threshold` 的理由**：
+没有它，读到 `784`（这里 780）的人无从判断"压够了"还是"撞到轮数地板"。
+我第一版断言写的正是"`out` 必须不再 `Need()`"，它在真码上是**错判据**，跑出来第一发就红：
+`trace booked 1284 -> 804 against threshold 384, but the output still needs compressing (804 tokens)`
+—— 这条红是测试写错、不是码写错，改成了阈值感知的形状（`c.Need(out) && rep.KeptRawRounds > b.KeepRawRounds` 才红）。
+
+### 2.5 放水两问自答（AC#2 这一格）
+
+- **这一发在未修码上响不响？** 本格的"痕"本身没有判据（判据在 §3），但它的**不存在**被 §1.1 的尺量过：
+  同一枚 `Info\(|Warn\(|Debug\(|Error\(` 正控在 `loop.go` 给 14、在 `compress.go` 给 0。
+- **摘掉本票这一味，是否存在一发变异从此打不红？** 见 §3 的 M1：摘掉这条 `Info` 后有**两发**转红。不是装饰。
+
+### 2.6 本程没测什么
+
+1. **没测这条痕能回答"是哪个任务压的"**（无 taskID，见 §2.2 代价）。
+2. **没测红删 handler 会不会改我的字段名**：`observe.redactHandler` 在写盘前会处理路径类内容，
+   本程只读了它存在（`logging.go:132`），没量过一次真写盘后 JSONL 里的键名。
+3. **没测 `LevelInfo` 在别的宿主入口被调低的可能**：`logSinkLevel` 是 `cmd/wisp` 的常量，不归本程核。
+
+---
+
+## 3. AC#3 — 牙：摘掉痕必须转红（四枚变异，逐名报红行）
+
+**判据**（票面）：一枚用例钉住"压缩成功 ⇒ 痕必须存在"；反向判据是把痕摘掉，该用例必须转红并**逐名报出红行**；
+先证变异落地（`grep -n` 原文 + `go build` rc=0）再读数；不许 `t.Skip`、不许放宽断言。
+
+四枚变异全部用脚本施加，每枚跑完从 `probes/139/mut/*.orig` 还原并 `cmp` 自证（`RESTORED OK`）。
+原文与逐发读数：`.scratch/wisp/probes/139/mutations.log`、`m4-only.log`、`mut/m0..m4.log`。
+
+| 变异 | 施加与"落地证明" | build | 红名（逐名） | 判 |
+|---|---|---|---|---|
+| **M0** 基线（未变异） | — | rc=0 | 无 | 四枚全绿（`test_rc=0`） |
+| **M1 摘痕**：删掉 `if rep.Ran { … }` 整块（＝票面点名的那一味） | `grep -q 'c.log().Info'` 无命中才算落地；diff 只减 16 行 | rc=0 | `TestCompressionTraceBooksCountsOnSuccess`<br>`TestCompressionTraceSurvivesTheLoopWiring` | **两发红** ⇒ 痕是承重的 |
+| **M2 只断接线**：`loop.go` 去掉 `WithLogger(opt.Logger)` | diff 1 行 | rc=0 | `TestCompressionTraceSurvivesTheLoopWiring` | **只红这一发** ⇒ 端到端那发确实在测"接线"，不是重复测 M1 |
+| **M3 恒真化**：`if rep.Ran {` → `if true {` | `grep -q 'if rep.Ran {'` 无命中 | rc=0 | `TestCompressionTraceSilentWhenNothingFolded` | 反向那一发**独立咬住**恒真判据 |
+| **M4 泄内容**：记录里追加 `"peek", fmt.Sprint(out[0].Content[0])` | diff 1 行 | rc=0 | `TestCompressionTraceBooksCountsOnSuccess` | 隐私探针**咬得住** |
+
+**红句原文**（这四句就是"改前那一发"的形状：M1 与 HEAD 版 `compress.go` 的唯一差异就是这味药）：
+```
+M1  compress_trace_test.go:206: "agent: history compressed" records = 0, want exactly 1 (all records: [trace-capture-ruler-control])
+M1  compress_trace_test.go:328: a real Run that folded history left no "agent: history compressed" record; captured: [trace-capture-ruler-control]
+M2  compress_trace_test.go:328: a real Run that folded history left no "agent: history compressed" record; captured: [trace-capture-ruler-control]
+M3  compress_trace_test.go:286: no-op pass left 1 trace record(s), want none: [agent: history compressed]
+```
+⇒ **放水第一问**（未修码上响不响）：M1 = 未修码，**响**，两发同时红。
+注意每条红句里都印着 `captured: [trace-capture-ruler-control]`——那是 §3.1 的正控记录，
+它证明"0 枚痕"是**尺读到的 0**，不是尺本身没接上。
+
+⚠ **诚实标注一处不等价**：M1 不是字面意义的"HEAD 版跑同一发用例"——HEAD 版里那四枚用例还不存在，
+所以任何"新码+新用例"票的"改前红"都只能是**行为等价的模拟**。此处等价性可核：M1 的 diff 只删
+`compress.go` 里我加的 16 行，`rep.Ran` 之外无别的行为改动，且 `harness_test.go` 的默认 discard 未动。
+
+### 3.1 正控先行（本仓对"零读数"的规矩）
+
+四枚用例都在断言痕之前先调 `recs.assertRulerLive(t)`：往同一枚 handler 打一条
+`trace-capture-ruler-control`，打不进 capture 就 `t.Fatalf`。M1/M2 的红句里能看到这条控制记录仍在场。
+另两枚已知正控在 §1.1（grep 尺：`.Rounds`=3 / `.Usage`=54 / `loop.go` 日志 14 枚）。
+
+### 3.2 隐私探针为什么要放两枚（M4 教出来的）
+
+M4 那次泄漏**不是被哨兵字符串抓住的**：`structuralTrim` 把每条正文截到 80 rune，
+我埋在正文尾部的 `PRIVACY-SENTINEL-do-not-log-this` 被截掉了，所以第一枚探针没响；
+响的是第二枚——查记录里是否出现正文里必然存在的 `问题`。红句原文（`m4-only.log`）：
+```
+compress_trace_test.go:256: trace leaked a user turn body: "agent: history compressed …
+peek={[已压缩的历史] 以下轮次已被摘要压缩，仅供上下文参考：\nuser: 问题 0 xxxxx…
+```
+⇒ 记一条对本件自身的读数：**"往正文尾部埋哨兵"这一形对截断型摘要无效**，两枚探针不能省成一枚。
+
+### 3.3 放水两问自答（AC#3 这一格）
+
+- **断言方向动没动**：没动任何既有断言。`compress_test.go` 4 枚既有用例一字未改（`git show --stat 1acdd03` 里它不在改动清单）；
+  新增用例只加不改。全仓 `t.Skip` 命中数：见 §4。
+- **helper 是不是原有的那枚**：既有用例用的仍是原有 `buildRoundHistory` / `BudgetsFor` / `newHarness`（默认 discard 未动）；
+  新加的 `traceCapture` 是本件自己的尺，并且每次先被正控驱动。
+
+### 3.4 本程没测什么
+
+1. **没测"痕重复打"**：`len(hits) != 1` 在端到端用例里是**排在功能断言之后的最后一条**，
+   若某次改动让一轮里打了 3 条痕，会先被前面的断言放过、由这一条抓到；但**多轮压缩**（一轮一次）没测——
+   那需要一条多轮的 golden fixture，而**任何 golden 在零字节禁改面上**，本程不新增。
+2. **没测 `Compress` 失败路径的痕**：失败仍是调用方那枚 Warn（M1 之前也是），本票没给失败路径加码，
+   所以"成功一条 Info、失败一条 Warn"的**对称性只由源码前缀保证，没有用例钉**。
+3. **没测日志被降级到 `LevelWarn` 之后痕是否还在**：`Enabled` 由宿主 handler 决定，不在本包。

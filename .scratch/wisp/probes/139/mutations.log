@@ -1,0 +1,145 @@
+# 139 mutation battery — 2026-09-25T23:47+08:00 HEAD=424ac84
+### [M0] baseline: trace IN place, all four new tests
+
+### [M0] unmutated  (go test -run 'TestCompressionTrace')
+$ go build ./internal/agent/ ; echo rc=$?
+build_rc=0
+$ go test ./internal/agent/ -count=1 -v -run 'TestCompressionTrace'
+test_rc=0
+--- red lines (--- FAIL only) ---
+--- PASS: TestCompressionTraceBooksCountsOnSuccess (0.00s)
+--- PASS: TestCompressionTraceSilentWhenNothingFolded (0.00s)
+--- PASS: TestCompressionTraceSurvivesTheLoopWiring (0.02s)
+--- PASS: TestCompressionTraceDoesNotAlterTheFold (0.00s)
+--- failure bodies ---
+ok  	github.com/CarlosShao/wisp/internal/agent	0.169s
+
+$ diff of mutation M1 (trace emission deleted):
+--- .scratch/wisp/probes/139/mut/compress.go.orig	2026-09-25 23:45:48.059627900 +0800
++++ internal/agent/compress.go	2026-09-25 23:47:18.866788300 +0800
+@@ -167,22 +167,6 @@
+ 	rep.KeptRawRounds = len(rawRoundIndexes(rounds))
+ 	rep.PreservedIDs = dedupe(append(allToolCallIDs(out), ledger...))
+ 	rep.RawIDsInsideSummary = dedupe(ledger)
+-	if rep.Ran {
+-		// The one trace a successful pass leaves (AC#2): counts only, never the
+-		// folded text. "history_changed" is recomputed from what this call
+-		// actually returned instead of echoing rep.Ran, so it can contradict
+-		// the fold flag and a reader is never told the history moved when the
+-		// bytes coming back are the same size.
+-		c.log().Info("agent: history compressed",
+-			"tokens_before", rep.TokensBefore,
+-			"tokens_after", rep.TokensAfter,
+-			"threshold", c.b.HistoryCompressTokens,
+-			"msgs_before", len(hist),
+-			"msgs_after", len(out),
+-			"compressed_msgs", rep.CompressedMsgs,
+-			"kept_raw_rounds", rep.KeptRawRounds,
+-			"history_changed", rep.TokensAfter != rep.TokensBefore || len(out) != len(hist))
+-	}
+ 	return out, rep, nil
+ }
+ 
+
+### [M1] emission deleted (= pre-fix behaviour)  (go test -run 'TestCompressionTrace')
+$ go build ./internal/agent/ ; echo rc=$?
+build_rc=0
+$ go test ./internal/agent/ -count=1 -v -run 'TestCompressionTrace'
+test_rc=1
+--- red lines (--- FAIL only) ---
+--- FAIL: TestCompressionTraceBooksCountsOnSuccess (0.00s)
+--- PASS: TestCompressionTraceSilentWhenNothingFolded (0.00s)
+--- FAIL: TestCompressionTraceSurvivesTheLoopWiring (0.01s)
+--- PASS: TestCompressionTraceDoesNotAlterTheFold (0.00s)
+--- failure bodies ---
+    compress_trace_test.go:206: "agent: history compressed" records = 0, want exactly 1 (all records: [trace-capture-ruler-control])
+    compress_trace_test.go:328: a real Run that folded history left no "agent: history compressed" record; captured: [trace-capture-ruler-control]
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent	0.226s
+FAIL
+
+$ diff of mutation M2 (loop no longer hands its logger down):
+--- .scratch/wisp/probes/139/mut/loop.go.orig	2026-09-25 23:45:48.117673800 +0800
++++ internal/agent/loop.go	2026-09-25 23:47:28.206730400 +0800
+@@ -236,7 +236,7 @@
+ 		provider: opt.Provider,
+ 		asm:      NewAssembler(model, b, info.Cache),
+ 		sp:       NewSpiller(opt.Config.ArtifactsDir, b),
+-		comp:     NewCompressor(b, opt.Summarizer, WithLogger(opt.Logger)),
++		comp:     NewCompressor(b, opt.Summarizer),
+ 		guard: GuardConfig{
+ 			RepeatThresholds: opt.Config.RepeatThresholds,
+ 			MaxRounds:        opt.Config.MaxRounds,
+
+### [M2] wiring deleted  (go test -run 'TestCompressionTrace')
+$ go build ./internal/agent/ ; echo rc=$?
+build_rc=0
+$ go test ./internal/agent/ -count=1 -v -run 'TestCompressionTrace'
+test_rc=1
+--- red lines (--- FAIL only) ---
+--- PASS: TestCompressionTraceBooksCountsOnSuccess (0.00s)
+--- PASS: TestCompressionTraceSilentWhenNothingFolded (0.00s)
+--- FAIL: TestCompressionTraceSurvivesTheLoopWiring (0.02s)
+--- PASS: TestCompressionTraceDoesNotAlterTheFold (0.00s)
+--- failure bodies ---
+    compress_trace_test.go:328: a real Run that folded history left no "agent: history compressed" record; captured: [trace-capture-ruler-control]
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent	0.096s
+FAIL
+
+$ diff of mutation M3 (emitted even when nothing folded):
+--- .scratch/wisp/probes/139/mut/compress.go.orig	2026-09-25 23:45:48.059627900 +0800
++++ internal/agent/compress.go	2026-09-25 23:47:37.087523300 +0800
+@@ -167,7 +167,7 @@
+ 	rep.KeptRawRounds = len(rawRoundIndexes(rounds))
+ 	rep.PreservedIDs = dedupe(append(allToolCallIDs(out), ledger...))
+ 	rep.RawIDsInsideSummary = dedupe(ledger)
+-	if rep.Ran {
++	if true {
+ 		// The one trace a successful pass leaves (AC#2): counts only, never the
+ 		// folded text. "history_changed" is recomputed from what this call
+ 		// actually returned instead of echoing rep.Ran, so it can contradict
+
+### [M3] unconditional emission  (go test -run 'TestCompressionTrace')
+$ go build ./internal/agent/ ; echo rc=$?
+build_rc=0
+$ go test ./internal/agent/ -count=1 -v -run 'TestCompressionTrace'
+test_rc=1
+--- red lines (--- FAIL only) ---
+--- PASS: TestCompressionTraceBooksCountsOnSuccess (0.00s)
+--- FAIL: TestCompressionTraceSilentWhenNothingFolded (0.00s)
+--- PASS: TestCompressionTraceSurvivesTheLoopWiring (0.01s)
+--- PASS: TestCompressionTraceDoesNotAlterTheFold (0.00s)
+--- failure bodies ---
+    compress_trace_test.go:286: no-op pass left 1 trace record(s), want none: [agent: history compressed]
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent	0.177s
+FAIL
+
+$ diff of mutation M4 (a history part joined the record):
+--- .scratch/wisp/probes/139/mut/compress.go.orig	2026-09-25 23:45:48.059627900 +0800
++++ internal/agent/compress.go	2026-09-25 23:47:44.273830600 +0800
+@@ -181,7 +181,8 @@
+ 			"msgs_after", len(out),
+ 			"compressed_msgs", rep.CompressedMsgs,
+ 			"kept_raw_rounds", rep.KeptRawRounds,
+-			"history_changed", rep.TokensAfter != rep.TokensBefore || len(out) != len(hist))
++			"history_changed", rep.TokensAfter != rep.TokensBefore || len(out) != len(hist)),
++			"peek", fmt.Sprint(out[0].Content[0]))
+ 	}
+ 	return out, rep, nil
+ }
+
+### [M4] history content leaked into the record  (go test -run 'TestCompressionTrace')
+$ go build ./internal/agent/ ; echo rc=$?
+# github.com/CarlosShao/wisp/internal/agent
+internal\agent\compress.go:185:41: syntax error: unexpected ), expected := or = or comma
+build_rc=1
+$ go test ./internal/agent/ -count=1 -v -run 'TestCompressionTrace'
+test_rc=1
+--- red lines (--- FAIL only) ---
+--- failure bodies ---
+FAIL	github.com/CarlosShao/wisp/internal/agent [build failed]
+FAIL
+
+### tree restored to pre-mutation state:  M internal/agent/compress.go  M internal/agent/harness_test.go  M internal/agent/loop.go ?? internal/agent/compress_trace_test.go 
