@@ -633,3 +633,7 @@ git diff --numstat 5b4352f^ HEAD -- internal/ cmd/ frontend/ design/ tools/ docs
     docs/reports/pending-and-issues.md .scratch/   -> **空**（本程未落任何一枚代码或台账）
 git status --porcelain -- internal/panel/          -> 空（每发变异之后复算，最后一次取于 70bebf7 之前）
 ```
+
+> **本件自己的一处结构错位，登记不擦**：上面那节编号是 §10.1，却因"先测后写、按测完顺序追加"落在 §11 之后，
+> 正确编号应是 **§11.1**。按本仓"已提交的行不改写，要更正就往下追加"那条，我不回去改那枚标题行，
+> 就在这里说明读法。形状与被验件 §8 那一族同源（追加会把顺序与编号拽歪），只是这次是我自己的。
