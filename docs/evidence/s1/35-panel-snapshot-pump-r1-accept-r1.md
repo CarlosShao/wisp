@@ -175,3 +175,91 @@ so this refuses"，与 `gate.go:487`/`:522` 的 abandon／expire 路径对得上
 **但那一发今天不构成凭据**。
 
 ---
+
+## 2. 第二格：§4 的逐字段承重自证——三发自己复现 ＋ 三发它没打的
+
+### 2.0 台件与取数形状（先自报我这一发的尺是什么形状）
+
+| 项 | 读数 |
+|---|---|
+| 靶树 | `D:\tmp\wisp-accept-35pump\mut` = `git archive 9ed2098` 解出来的副本 ＋ 从工作树拷进去的 `third_party/sherpa-onnx/*.dll` **三枚**（锚点副本里 0 枚，`git ls-files third_party/sherpa-onnx \| wc -l` → `0`，**它们是未跟踪件**） |
+| 用哪支正路 | **不是 CI 那支**。是"把三枚 DLL 放进 `PATH`、逐包 `go test -count=1 -v`"那一支，与被验件 §5.1 选的是同一支（**不经 GUARD A/B、不经 `runtests.sh`**）⇒ 本节的表**不等于 CI 会打出的表**，这一条与被验件 §7 第 1 条同罪，本程不替它免 |
+| 判红绿 | 只认 `^--- FAIL:`；`[build failed]` / `setup failed` **单列、不算红**（这一条是本程自己踩出来的，见 §2.5 仪器记录） |
+| 基线（锚点副本、**逐包**跑） | `./internal/panel/` **ok、0 红** ／ `./cmd/wisp/` **ok、0 红** |
+| 被验物有没有被我改过 | 六枚被碰文件逐枚 `git hash-object --no-filters` 对 `9ed2098:<path>` **全等**（`pump.go`／`pump_test.go`／`pending_read.go`／`panel_pump.go`／`run.go`／`bridge.go`） |
+
+### 2.1 复现它表里那三发（我自己造、自己取红名红句，没读它的日志）
+
+| 我的编号 | 摘掉的真来源读法（file:line） | 我量到的 | 它的编号／它的读数 | 判 |
+|---|---|---|---|---|
+| **A1** | `cmd/wisp/panel_pump.go:70` `Reason: it.Decision.Reason` → 常量 `"A1 hardcoded"` | 红 **1 枚** `TestRunBooksWithASnapshotOfItsLiveQueue`，红句 `panel_pump_test.go:240: reason: console="R2: 目标路径在授权目录之外: C:\\Windows\\win.ini" packet="A1 hardcoded", want the same native reason on both surfaces` | M1，红句同一枚 `:240` | **复现** |
+| **A2** | `cmd/wisp/run.go:423` `Mode: rt.modes.PermissionMode` → `func() risk.Mode { return risk.ModeAskEveryStep }` | 红 **1 枚** 同名用例，红句**两枚**：`:293 composer.mode.current = "ask_every_step", want the boot read "ask_high_risk"` ＋ `:296 …, want the non-default档 this config set`；booked record 自报 `mode:ask_every_step` | M3，`:293` 与 `:296` 都响 | **复现**（且这一发是在 `1485921` 已补夹具的树上打的 ⇒ 与被验件 §4.5 的 `M3` 同形，不是 `M3_no_wfix` 那形） |
+| **A3** | `internal/panel/pump.go:178-181` 整块（`now := time.Now` **与** `if p.src.Now != nil` 两支一起）→ 恒常量钟 | `internal/panel` 红 **2 枚**：`TestThePumpBuildsThePacketFromWhatTheHostHolds`、`TestPublishHandsTheBytesToTheAttachedExit` ／ `cmd/wisp` **0 红、rc=0** | M4 响两枚（它给的红句在 `pump_test.go:102`、`:292`，枚数与名一致）／ §4.4 M4b 说生产那一支换成常量**全绿** | **两发一次复现**，见 §2.2 |
+
+### 2.2 A3 这一发顺手把 §4.4 那枚"装饰品"裁定也独立量了
+
+A3 是 M4 与 M4b 的**合体**（注入钟读法与生产默认钟一起摘）。分腿读数：
+
+- `internal/panel` **2 枚红** ⇒ M4 那一支是承重的（"注入的钟有没有被读"有钉子）。
+- `cmd/wisp` **0 枚红** ⇒ §4.4 那句"`generatedAt` 在 `wisp run` 的实际装配上不被任何用例管"**复算为真**：
+  生产的包即便钟被焊死成常量也不会红。红名/红句都不是 `generatedAt`（本程现量 `cmd/wisp` 那三枚
+  泵用例只断言非空与 bytes/sha/depth/mode，不比对 `at`）。
+
+⇒ **这一格我给的不是"照抄它的表"，是"它的表里两行都响对了，且合体的那一发把它们分开来了"。**
+
+### 2.3 自加三发它表里没有的
+
+**B1（替换级，但换的是**装配根**那一层，不是它换的库层）**
+摘掉 `cmd/wisp/panel_pump.go:68-71` 那四行"原样搬运"（`Level`／`RulesHit`／`Reason`／
+`SessionOverrideBlocked` 一起不抄，别的都不动）。
+⇒ 红 **1 枚** `TestRunBooksWithASnapshotOfItsLiveQueue`，红句两枚：
+`:234 level: packet="L0" console="L2", want the same native level on both surfaces`、
+`:240 reason: console="R2: …" packet="", want the same native reason on both surfaces`。
+⇒ **为什么这发不是 M5 的第二遍**：M5 打的是 `internal/panel/pump.go:72-85`（把搬运换成
+"面板侧重算"），响在**两包共 6 处**；B1 打的是 `cmd/wisp` 那一层的**赋值语句**，
+`internal/panel` 一行没动 ⇒ 它验的是"**装配根有没有把 verdict 抄进泵**"这一格。
+**结论：搬运在两层各有一枚独立的钉，摘任何一层都会红**（库层 M5 响两包、装配层 B1 只响 `cmd/wisp`）。
+本程未复跑 M5，所以"库层那一发"仍只算〔仅自述〕；**B1 是本程现量**。
+
+**B2／B3（移除级——§7 第 10 条自陈没做那一发，今天补）**
+
+| 发 | 摘掉的是什么 | `internal/agent/approval` | `internal/panel` | `cmd/wisp` |
+|---|---|---|---|---|
+| **B2** | 整枚 `internal/panel/pump.go` ＋ `pump_test.go`（只删实现会 `[setup failed]` 把整包读数吃掉，所以两枚一起摘，量"还有谁notice"） | 未测（不引用） | **ok、0 红、用例少 6 枚** | **`[build failed]`**，5 条 `undefined:`（`run.go:235 panel.SnapshotPump`、`:238 panel.StreamLog`、`:420 panel.NewStreamLog`/`DefaultStreamKeys`、`:421 panel.NewSnapshotPump`），**测试红 0 枚** |
+| **B3** | 整枚 `internal/agent/approval/pending_read.go`（`Queue.LiveApprovals` 的定义） | **ok、0 红** | **ok、0 红** | **`[build failed]`**（`panel_pump.go:61` 引用不到） |
+
+⇒ **对 §7 第 10 条那一问的答案**（"删掉整枚 `pump.go` 会不会有别的包变红"）：
+**不会有任何别的包"变红"——只有一个别的包"编译不过"。**
+按本仓"改后全绿可能是那条新路径零次执行"那一族的规矩，这条**必须写成形状而不是写成"有编译器守着"**：
+`[build failed]` 在 `runtests.sh` 那把尺里是**另一色**，它不等于"某枚用例守住了这件事"。
+
+⇒ **顺手量出一枚它没登记的事实**：`LiveApprovals` 在**它自己的包里零枚用例**
+（`grep -rn "LiveApprovals" internal/agent/approval/ \| wc -l` → **2**，两枚都在
+`pending_read.go` 自己身上：`:36` 注释、`:42` 定义 ⇒ 该包**没有**任何 `*_test.go` 引用它）。
+它的行为今天只被**别人家的**用例间接管（`internal/panel/pump_test.go` 用自造的 `NativeVerdict`、
+`cmd/wisp/panel_pump_test.go` 经真队列）。B3 里 `internal/agent/approval` **ok、0 红**就是这一句的实测。
+记 **F-PUMP-2**。
+
+### 2.4 第二格结论
+
+§4 那张表**抽的三发全部复现**（M1→A1 同枚同名同红句、M3→A2 两枚红句同两处、M4→A3 两枚红名同两名），
+§4.4 那枚"生产钟是装饰品"顺带被 A3 的另一腿**独立证实**。
+自加三发里：**B1 新增一格承重（装配层搬运有自己的钉）**、**B2/B3 答掉 §7 第 10 条那一发**、
+并量出 **`LiveApprovals` 自己包里零用例**这一枚未登记事实。
+
+### 2.5 本程自己踩的仪器坑（写下来给下一程，不是我修的洞）
+
+1. **两包合跑会凭空多一枚红**：`go test ./internal/panel/ ./cmd/wisp/` 并发跑，
+   `TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink` 红在
+   `resident_sink_nail_127_windows_test.go:569`"the child exited through the shutdown path
+   with exit status 0xc000013a"；**同一枚用例逐包单跑 ⇒ PASS**（`:549 resident leg exit: exited 0`）。
+   ⇒ 本程基线一律**逐包**跑。与被验件 §5.4 末尾记的那枚"合成一发跑会量出荒谬读数"是同一族、
+   但**这一枚更狠**：它不是归包错，是**多出一枚不存在的红**。
+   ⚠ 那枚用例与本批**零关系**（`git log 5821e24^..9ed2098 -- cmd/wisp/resident_sink_nail_127_windows_test.go cmd/wisp/resident_windows.go` → **0 枚**）。
+2. **A3 第一版我把 `time` 的 import 一起删了** ⇒ 三行 `undefined: time`、`--- FAIL:` 计数 0。
+   那**不算**变异读数（是变异本身非法）。修正成"只换钟、不动 import"才是上面那一发。
+   与被验件 §4.1 的 M2 首发 `[setup failed]` 是同一族失手，本程照它的处置：**那发不算数、留着说明哪发不算**。
+3. 沿用上一程的口径：**`grep -c` 为 0 时回显会冒出非 bash 形状的 `No matches found`** ⇒
+   本程关键计数一律 `| wc -l` 或 python 复算（§1.6 的三枚 0、§2.3 的 `LiveApprovals` 枚数都是这么来的）。
+
+---
