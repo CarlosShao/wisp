@@ -105,8 +105,9 @@ package panel
 // JSON decode calls it finds in this package, so a SECOND decode destination in
 // internal/panel has to be a struct in this package. A decode into a
 // map[string]any or a json.RawMessage - both perfectly legal Go, neither
-// enumerable by a key scan - makes three of the ban tests here t.Fatalf with "a
-// JSON decode destination ... cannot be enumerated". That direction is
+// enumerable by a key scan - makes four of this file's tests abort with "a
+// JSON decode destination ... cannot be enumerated": facet 1, facet 2, the
+// three-way key test, and facet 4's pristine-snapshot precheck. That direction is
 // deliberate: the file refuses to call the boundary clean over bytes it cannot
 // read, and the message carries its own way out, which is to route the bytes
 // through a same-package struct or to register the type in
