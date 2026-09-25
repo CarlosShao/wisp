@@ -350,6 +350,13 @@ $ D:/work/base/gopath/bin/gofumpt.exe -l cmd/wisp/                          → 
 $ D:/work/base/gopath/bin/gofumpt.exe -l . tools/d22scan tools/mockllm      → 空（CI 那条全树命令；gofumpt v0.12.0）
 ```
 
+⚠ **续程复量：这三发在"最终要提交的那棵树"上不成立。** 上面三行是**升级夹具之前**取的；
+带着未提交的 `+36/-7` 夹具改动（`slo144Report` 从 676 字节长到 1978 字节、字段变多）再量，
+`gofmt -l cmd/wisp/` 与 `gofumpt -l cmd/wisp/` **都报出 `cmd/wisp/slo_report_144_windows_test.go`**
+（新增结构体字面量的列对齐没排）。⇒ 已按现量处理：`gofumpt -w` 该枚测试文件（commit `a91d7c2`），
+改完三发重新全空；**改动只有空白**——改前后两版 `diff -w` 逐字相同，断言、预算、Skip 一个没动。
+这是本件里唯一一处"前一程写 X、续程复量 Y"的不相符，且 Y 是仪器读数不是判断。
+
 ### 4.3　vet / d22scan
 
 ```
@@ -389,10 +396,74 @@ rc=0
 按票面"计时类读数不作凭据"与"要取颜色先确认 runner 空着"，我**没有**在这种情况下硬取那一发，
 也**没有**为了拿到读数去改脚本或加豁免（脚本本体在禁改清单上）。这一格因此按"未取到"登记，不当绿、也不当红。
 
+⚠ **续程把这发取到了（20:0x，前一程那段保留作历史）。** 我没有改那枚脚本一个字
+（它在禁改清单上），只是等自己是唯一在跑的程、然后用它的两个合法入参把两版对照喂进去：
+`-WispExe` 指 §3.4 那两枚仓外二进制、`-OutDir` 指 `D:/tmp/wisp-144-r2/slo/…`（报告不落仓内）。
+
+```
+state Sleeping exit=0 pass=True          state Warm exit=0 pass=True
+report written to …\slo\fixed\slo-report.json  (all_pass=True)     ← 修后二进制
+report written to …\slo\prefix\slo-report.json (all_pass=True)     ← 95885fb^ 的修前二进制
+```
+
+**两版逐字相同。** 我又各跑了三轮 `-SecondsPerState 2` 想撞那一发竞态，得到 **5 完成 / 3 拒绝**：
+`all_pass=True` 五发（fixed 2、prefix 3），三发没出报告（`r1-fixed`、`r1-prefix`、`r2-fixed` 目录里没有
+`slo-report.json`）＝ 走了 `NO CONCLUSION (machine-contended)` 那一支。
+⇒ 两件事同时成立，都登记：**① 那一发红在两版上都没召出来**（`state … pass=` 对照到此为止，
+本票不声称"从此 `slo-full` 不红"，§6 第 1 条不变）；**② 那枚脚本的拒绝前置连"只有我一个程在跑"都会触发**，
+而且三发拒绝两版都摊到了（fixed 2 发、prefix 1 发）——它筛的是机器，不是本票那一味。
+
+⇒ AC#3 那句"另问"因此在**三件外部仪器**上都有了读数，而不是 §3.3 那一件：
+`wisp slo` 的 exit 码（6 发两版全 rc=0，另有一发 rc=2 归 `NtQuerySystemInformation`，见 §3.4）、
+`slo-check.ps1` 的 `state … pass=`（两版逐字相同）、以及 §3.4 那发差分——**它是唯一会让外部读数变的那一件**，
+而它需要"半截文件真的被读到"这个前提。无争抢时前两件不变、恰恰是这个形状的反证。
+
 ### 4.5　`!windows` 对照腿
 
 **没有补**。被检对象（`slo_windows.go`）本身 `//go:build windows`，新代码没有任何 `!windows` 对照面，
 所以本票不需要 linux 容器那一发；`GOOS=windows go vet` 那类只编译的仪器也**没有**拿来代答任何一格。
+
+### 4.6　续程复量 AC#4（19:5x-20:0x 第二程，读数在 `D:/tmp/wisp-144-r2/`）
+
+改前不再借 `40be959` 那一发，而是**用 `95885fb^` 的 archive 现造一棵修前树**跑全量
+（那棵树里 `slo_report_144_windows_test.go` 不存在，现量 `ls | grep -c slo_report_144` = 0，
+所以它是真改前）；改后在**仓内真树**跑。两发都只叫 `./cmd/wisp/`，**没有**与 `./internal/panel/` 同一次调用。
+
+| 发 | rc | `=== RUN` | `--- PASS` | `--- FAIL` | `--- SKIP` | `^panic\|^\[signal` | 名册 |
+|---|---|---|---|---|---|---|---|
+| 改前（修前树全量 `-v`） | **0** | 116 | 63 | **0** | **0** | 0 | **106** |
+| 改后（仓内树全量 `-v`） | **0** | 130 | 70 | **0** | **0** | 0 | **120** |
+
+差集两向（票面指定的那把 grep → `sort -u` → `comm`）：
+
+```
+$ comm -23 r2-before.roster r2-after.roster | wc -l
+0                      ← 消失 0 枚：没有一枚既有用例被改名、被删、被转成 SKIP
+$ comm -13 r2-before.roster r2-after.roster
+14 枚，逐枚都是 --- PASS: TestSLO144*（顶格 7 + 子格 7；那把 grep 在 - 与 . 处截断长名，两遍同一把尺可比）
+```
+
+⇒ §4.1 那张表（改前 106／改后 120／消失 0／新增 14／FAIL 0／SKIP 0／panic 0）**逐格复量相符**，
+而且这一回改前那一发是在真·修前树上量的，不是"同一棵树上取两次"。
+
+**门禁其余三发（本程现量）**：`go vet ./cmd/wisp/` rc=**0** 空；
+`sh scripts/d22scan.sh` rc=**0**、clean，正对照 `runtests.sh: OK - packages=[./...] PASS=30 FAIL=0 SKIP=0, === RUN=70`，
+真树作用域 `examined` 全部非零（bans #1-5 internal/=205、cmd/=23、ban #6 frontend/=49、ban #7 internal/tools/=18、
+ban #8 design/=32、frontend/=49、internal/=412、**cmd/=43 含 `_test.go`** ⇒ 本票新增那枚测试确实被 ban #8 扫过）。
+⚠ 日志里另有几行 `examined 0` —— 那是**正对照自己的种子夹具**（`TestBuiltBinaryGoesRedEndToEnd…` 等临时目录，
+它们存在的目的就是把"空仪器"判红），不是真树作用域；我把两类分开数过，没有当成 0 放行。
+`tools/d22scan` 是独立 module，本程**没有**在根目录 `go vet ./tools/d22scan/`。
+
+**票面那把 `go test ./cmd/wisp/` 不挂 DLL 仍然起不来**（`0xc0000135`、`=== RUN` 0 条）——本程所有读数都挂
+`/d/work/…` 形式的 PATH 取；编排者给的"CI 同形脚本"那一条我在**最终状态**又跑了一遍，结果见 §4.4 的续程发。
+
+**`slo-check.ps1` 那行 `state … pass=`：本程取到了，两版逐字相同。**
+写法与限制在 §4.4 的续段（含我补的三轮重复：5 完成 / 3 拒绝，拒绝两版都摊到）。
+本程**没有**改那枚脚本一个字（它在禁改清单上），只用了它自己的 `-WispExe` / `-OutDir`，
+报告全落 `D:/tmp/wisp-144-r2/slo/`。取之前量的 runner 状态：`Runner.Listener` 常驻 1 枚、
+job 内进程（`Runner.Worker`/`Runner.Command`）计数 **0** ⇒ "runner 空着"这一条是按**进程表**判的，
+不是按 run id（前一程 §6 第 9 条那条保留意见对我这一发同样成立）。
+本程**没有**拿任何"多少秒"当判据：§3.4 表里那个 `33s` 是被花掉的预算常量，不是计时读数。
 
 ## 5　AC#5 那句注释 —— **结**
 
@@ -422,9 +493,19 @@ rc=0
    而 `exited()` 在循环里恒 false（§0.5 现量：`StartInJob` 不 `Wait`，`cmd.Wait()` 只在 `stop()` 里）——
    那一味**我没当凭据用**，也**没顺手修**（修它要动进程等待拓扑，不在本票地界）。
    谁先被骗：以为 `collectReportWithin` 里那两行 `if s.exited()` 是真早退的人（我读代码时差点就这么以为）。
-3. **`slo-check.ps1` 那行 `state … pass=` 的两版对照：未取到**（§4.4 写了为什么：采样有效性前置会判 machine-contended，
-   而票面禁止在这种编队下取计时类读数）。⇒ §3.3 的"外部读数没变"只站在**两发 `wisp slo -state Sleeping` 的 exit 码**上，
-   分量比"六态链两版对照"轻，别把它读成后者。谁先被骗：拿 §3.3 当"整条链我也对照过"的人。
+3. **`slo-check.ps1` 那行 `state … pass=` 的两版对照：前一程未取到、续程取到了，结论是"两版相同"。**
+   读数与做法在 §4.4 续段（`-WispExe`/`-OutDir` 两个合法入参，脚本一字未改）。⇒ §3.3 的"外部读数没变"
+   现在同时站在**两发 `wisp slo` exit 码**与**五发 `all_pass=True` 的门禁行**上，不再只是前者。
+   ⚠ 但它**仍然不等于**"那一发红修好了"：三轮重复里 5 完成 / 3 拒绝，两版都没把 `Armed` 那发召出来。
+   谁先被骗：把"两版相同"读成"这一味不承重"的人 —— 承重的那一发在 §3.4 的差分表里，
+   它要的前提是"半截文件真的被读到"，而那正是无争抢机器上造不出来的东西。
+11. **`subjectReportRead.offset` 这个字段在 `unwritten` 分支上不携带信息**（续程现量，不是前一程的账）：
+    仓外探针把**全部 1978 枚前缀**各问一遍，`offset` 的取值分布是 **1 个不同值 = 0**（1978 枚全是 0），
+    只有完整文档报 `offset 1978`。⇒ 到点那句红 `…document still open at offset 0: the tail had not arrived`
+    里的 **offset 那一半是常量**，携带信息的只有 `%d bytes read` 那一半（预算与字节数才是 AC#1ⓐ 要的两样，
+    所以**不构成 AC 违背**）。`:578-580` 的字段注释"offset is the decoder's stop position inside these bytes"
+    比实现能给的多。**本程没改它**：改错误文本会让 §3.2/§3.4 那批已落盘的红句逐字变样，
+    而那批红句正是变异自证的凭据；这一条要动应该另开票，不该藏。
 4. **报告的语义正确性没验**：`report` 字段齐、里面的数字/判决是假的，`readSubjectReport` 不看；
    嵌套的 `observer` 子报告也没验。本票只分"没写完 / 坏了"两态，AC#1ⓑ 的"内容不对"只到"没有 state report"这一层。
 5. **测试里那一枚裸 `go func(`（用例 3 的写入侧）不在 ban #1 射程内**——bans #1-5 不含 `_test.go`（票面明写），
