@@ -242,9 +242,12 @@ Go 侧保持干净，仪器**必须**报 0 才过——它今天就是报 0：
    而 `TestTheRendererHoldsExactlyOneDoorToTheHost`（`:502`）只判"走哪条路 / 是不是字面量 / 路由词表"，
    对 `outcome` 携带什么完全色盲——与 §0 表最后一行同向。
 
-**登记（本件是唯一登记处，笔者不碰 `docs/reports/pending-and-issues.md`，那不在我地界）**：
+**登记去向（先纠一句我自己写错的话）**：这句"本件是唯一登记处"**是错的，已在 §7 就地更正**——
+台账 `A217⑤`（`docs/reports/pending-and-issues.md:5937`，另在 `:5948` 仍列为未收口）**早就把界面侧那半登记成零仪器覆盖了**，
+本件买的是它缺的那样东西：**把这个"看不见"量出来的读数**（§4.1 的种植 D + §4.2 的三条 grep 现量）。
+笔者**不碰 `docs/reports/pending-and-issues.md`**：那不在我地界，且台账号由编排者派（§7 记我 commit message 里那枚错号）。
 
-> **零仪器覆盖 · UI 侧的 approval-outcome 字段。** 形状 = JSX 里一枚 affordance 把
+> **零仪器覆盖 · UI 侧的 approval-outcome 字段（读数补充，非首次登记）。** 形状 = JSX 里一枚 affordance 把
 > `ApprovalOutcome` 的 grant 成员递进一次合法的 `requestApprovalResolution`
 > （历史实例 `53a1359^:frontend/src/components/l2-approval-card.tsx:161-167`，经 `panel.ts:169-186` 发出
 > `{method:"panel.approval.request", outcome:"grant"}`）。今天**没有任何仪器**会因为它被画出来而变红：
@@ -324,3 +327,36 @@ FAIL 的 2 行不属本件（`A208③` P1 刻意留红）。
 **临时件只建不删**：`D:\tmp\panel-l2-nail-r1\backup\bridge.go.orig`（§3.2 的恢复源）、
 `/tmp/base-v.txt`、`/tmp/after-v.txt`、`/tmp/final-v.txt`、`/tmp/mut-v.txt`、`/tmp/d22.txt`、
 `/tmp/base-roster.txt`、`/tmp/after-roster.txt`、`/tmp/final-roster.txt`。全部保留，未曾 `rm`。
+
+## §7 锚点刷新 + 两处就地更正（写下来之后才被现量推翻的东西）
+
+- 本件三枚锚点，各段所依据的版本：
+  - 进场 / §0 现量：`dev` @ `004c6ec`（改前基线那一发）与 `86e0990`（本件第一次提交时的头）；
+    落地提交 `d88c356`。
+  - §3/§4/§5 的读数：`247f8a6` 前后（另一路 agent 在 `tools/d22scan`、`internal/observe` 连续提交，
+    HEAD 在我脚下动了 `004c6ec -> 86e0990 -> a4ce35f -> 8a62d3d -> 247f8a6`）；牙齿提交 `660ffa1`。
+  - §7 这一节：写它时 `HEAD = 660ffa1`（我的第二枚提交之后）。
+  ⇒ 上面任何一条 `file:line` 只对它点名的那一枚锚负责，跨锚引用请重新 `grep -n` 再抄。
+
+- **更正 1（我自己的 commit message 写错了一枚编号）**：`660ffa1` 的标题写着 `A217候选`。
+  现量：台账里 **`A217` 早已存在**（`docs/reports/pending-and-issues.md:5932`，
+  `[2026-09-25 09:3x +08] A217｜Q-49 只读取证交件…`）——而且它**正是派下我这一程（`task #78` "Go 侧门钉"）的那条**，
+  其后 `A218`（`:5940`）、`A219`（`:5951`）也已占用。⇒ 我这程**没有资格给自己派号**，台账也不是我的地界；
+  要入账请编排者按下一个空号（看起来是 `A220`）落，本件是它的证据源。
+  已推送历史不改写（AGENTS.md §1.4），这条更正就写在这里，不回去 edit commit。
+
+- **更正 2（我 §4.2 那句"本件是唯一登记处"是错的）**：界面侧那半的零仪器覆盖**在 `A217⑤` 已经登记过**
+  （`:5937` "已按规矩登记成零仪器覆盖，不拿'Go 侧钉上了'当两半都收口"，`:5948` 仍列为未收口）。
+  ⇒ 本件的角色是**补读数**，不是首次登记；§4.2 正文已就地改写，不在文件里留一句假话覆盖过去。
+
+- **顺带一条给门禁分母的用（另一路 agent 会需要）**：本件新增 1 枚 `internal/panel/*_test.go`，
+  于是 `sh scripts/d22scan.sh` 真扫现量 **`ban #8 internal/ = 407`**，
+  比 `A218⑥`（`:5946`）写下的新基线 `406` **多 1，且只多这 1 枚**（其余逐条同值：
+  `bans #1-5 internal/=203 cmd/=22 / #6 frontend/=40 / #7 internal/tools/=18 /
+   #8 design/=30 frontend/=40 cmd/=39`）。谁再拿 `405`/`406` 当"不该变"的对照，那是分母进了新文件，不是回归。
+
+- **§3.2 那枚真树变异，事后回看还有第三个用途**：它同时是**"本包旧仪器接不住这个形状"的正证**。
+  变异跑完之后，红着的只有我新加的 4 枚 + 那枚本就红的 `TestC21DesignTokensFourWayAgree`；
+  `internal/panel` 里**先存在的 46 枚测试一枚都没红**——包括白名单了 `panel.approval.request` 的
+  `TestTheRendererHoldsExactlyOneDoorToTheHost`、与 `TestComposerEnvelopeAcceptsItsFourRequests`。
+  ⇒ 换句话说：给面板开一扇送字上门的门，在这个包里**今天只有本件会叫**。
