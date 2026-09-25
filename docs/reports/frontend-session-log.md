@@ -1049,3 +1049,83 @@ owner 拍的甲＝「先删掉这个请求」，撤销口令「撤 Q-50 甲」�
 `git status --porcelain -- frontend/` 交件时为空。未 push。未碰 `internal/**`、`cmd/**`、
 `tools/d22scan/**`、`allowlist.txt`、`docs/PLAN.md`、`docs/specs/**`、`design/**`、`embed.go`。
 未开任何窗（P5 的 15:00 签收在等 L2 卡那四项）。
+
+---
+
+## 50. 编排者 14:1x 要的那份三行自证：面板里每一枚循环动画的挂载／卸载根据（全指代码位置）
+
+先收下他那三条前提：`PLAN.md:3491` 那句我按原文读作**「允许，但必须门控」**，不是三选一；
+`PLAN.md:3492-3493` 的「≥2s 周期且只用 `opacity`」主语是**悬浮球**，不是我这棵树——我一个字没动那颗球。
+本节全部读数是 `2026-09-25 13:1x +08` 现量（`date` 重跑过），HEAD 为 `5b4352f`。
+
+### 50.1 普查：9 行 `infinite`，其中只有 3 枚挂在活树上
+
+`grep -rn infinite frontend/src` 现量 **9 行**。判定"挂没挂上"不靠注释，靠从入口走 import 闭包：
+`src/main.tsx:7` 只 `render(<App />)`；`App` 引 4 枚（`src/App.tsx:19-22`）、`PanelSkeleton` 引 2 枚
+（`panel-skeleton.tsx:20-21`）、`ResultStream` 引 1 枚（`result-stream.tsx:10`），到此闭合。
+四条现量把其余那 6 行排除掉：`grep -rn "components/(thinking|loading-state|task-rows|tool-chips)" src scripts`
+与 `grep -rn 'from "./(thinking|loading-state|task-rows|tool-chips)"' src`（含相对路径那一形）**都只回到
+`scripts/vendor.mjs` 自己** ⇒ `thinking.tsx:141/199`、`loading-state.tsx:81/92`、`task-rows.tsx:49/134`
+这六行**今天画都画不出来**（vendored 原件，未挂载，保留字节不改）。
+
+挂在树上的 3 枚，逐个"哪个条件挂载、哪个条件卸载"：
+
+| 循环动画 | CSS 位置 | 挂载条件（代码位置） | 卸载条件（代码位置） |
+|---|---|---|---|
+| `shimmer-text 1.4s infinite` | `ai-native/shimmer.tsx:38` | `panel-skeleton.tsx:54` 的 `{waitingLabel && <Shimmer …>}`；`waitingLabel` 全仓只有**一处赋值**＝`App.tsx:76` `snapshot.pending.length > 0 ? "等待确认" : undefined` | 同一处反过来：`pending` 空 ⇒ 传 `undefined` ⇒ `:54` 短路，`<Shimmer>` 不进树 |
+| `l2-ball-ring 2s infinite` | `theme.css:225` | `l2-approval-card.tsx:90` 上 `className="l2-ball-ring"`，由 `:225` 的 `<BallApproveHint />` 画；这张卡由 `App.tsx:78-80` 的 `snapshot.pending.map(...)` 挂载 | Go 把那条从 `pending` 里摘走 ⇒ `:78` 的 map 不再产出，环随之出树（**不受换屏影响**：`App.tsx:13-16` 明写卡不随屏走） |
+| `caret-breathe 1s infinite` | `theme.css:210`（`.stream-caret`） | `reveal-text.tsx:51` `{!done && <span className="stream-caret is-streaming" />}`；`done` 定义在 `:25` `count >= segments.length`；`RevealText` 本身经 `result-stream.tsx:24` 的三元式挂载（`chunk.done ? 纯文本 : <RevealText>`），`ResultStream` 只在 `App.tsx:81` 的 chat 屏挂 | **三扇门**：①本地 `reveal-text.tsx:25` 的 `done` 转真 ⇒ `:51` 短路；②宿主 `result-stream.tsx:24` 里 Go 推的 `chunk.done` 转真 ⇒ 整枚 `RevealText` 被纯文本替换；③屏的门 `App.tsx:81` `view === "chat"` ⇒ 换屏即整棵出树 |
+
+另两枚动画**不是循环**，一并数出来免得被读成"没查"：`panel-skeleton.tsx:40` 的 `fade-up 350ms … both`
+与 `reveal-text.tsx:45` 的 `stream-in 420ms … both`（无 iteration ⇒ 各播一次）。
+
+还有一句要紧的：**这三枚循环里两枚的上限不在我手里**。shimmer 与那枚环跑多久，只取决于 Go 何时把卡
+从 `pending` 摘走——那一支有数值：C18 超时 300s、一律判拒绝（`internal/agent/approval/gate.go:30-32`
+的 `ApprovalTimeout`；`docs/PLAN.md:1368` 原文「超时 = 300s，一律判拒绝」）。caret 不需要它：
+`reveal-text.tsx:32-36` 的计时器在 `done` 后自己 `return`，不再排下一次。
+
+⚠ 一处**推演**要标出来，别当现量读：上表最后一列写"审批等待／结果正在到达"是我把三枚挂载条件去对
+`PLAN.md:3491` 那五格名单（`Thinking`/`Acting`/`Speaking`/`Listening`/审批等待）的**解释**，不是代码里
+有的映射——代码里根本没有那个映射（见 50.2）。三枚里只有前两枚是**逐字**落在名单第 5 格「审批等待」上
+（`pending` 非空就是那一句）；caret 那枚对应哪一格（`Speaking`？还是"结果呈现"根本不在名单里）我答不确认。
+
+### 50.2 `Sleeping`／`Warm` 里有没有任何一枚挂载得到？
+
+**今天这一版：一枚都没有。但原因不是我门住了它，而是面板读不到态。** 现量：`PanelSnapshot` 只有 4 个键
+（`src/lib/panel.ts:129-137`：`pending`／`results`／`composer`／`generatedAt`），`composer.mode.current`
+装的是 R20 那三档权限档、不是 D43 的态。⇒ 我这三枚的挂载条件全是**"数据在不在"**，没有一枚是"态是什么"。
+
+- **规格里唯一写明"面板在 `Sleeping` 有内容"的那一格**＝`PLAN.md:1497` 崩溃恢复「重启回 `Sleeping`；
+  上次未完成任务标记为「中断」并在面板可见」。它呈现的是**已落定的文字** ⇒ 走 `result-stream.tsx:24`
+  `chunk.done === true` 那一支＝纯文本、无 caret。⇒ 按现量：`Sleeping` 可以有内容、**零循环**。
+- **推演出来的那一支我不藏**：若哪天 Go 在 `Warm` 窗口里推来一份 `pending` 非空（或一条 `done:false`
+  且不再更新的 chunk）的快照，**我这层不拒、也无力拒**，环与 shimmer 就会跑。真正该判"此态能否有此快照"
+  的是 C18/C31 的转移表与票 35 的泵那一侧。我没有读态的口子（快照无该键、白名单里也没有"面板问当前态"
+  的路由），而自己造一个态＝撞 owner 的 P9 红线「不得造假数据当真实字段」。⇒ 所以这一条以**结构性依赖**
+  交出，不记成"我已守住"。
+
+### 50.3 「面板关闭后不得有任何动画在跑」今天靠什么守？
+
+**实答：我守不到，要宿主补；而且"关闭"这件事今天在 Go 侧还不存在。** 三条现量：
+
+1. `frontend/src/` 里**没有任何生命周期监听**：`grep -rn "visibilitychange|document.hidden|pagehide|freeze|resume" src`
+   只回到 vendored 演示字符串，**没有一处 `addEventListener`**。页面被隐藏时我这棵树不会主动停动画；
+   Chromium/WebView2 那侧的节流属宿主行为，不是我能签字的证据。
+2. **没有宿主可关**：`cmd/wisp/main.go` 里 `WebView2` 只出现在一枚开关的说明文字（`:39`
+   `-render <path> writes the bytes the WebView2 would show`）；
+   `grep -rni "TryClose|put_IsVisible|SetVisible|Hide\(\)|panel.close|panel.hide" cmd internal tools --include=*.go`
+   只回到 `internal/panel/composer_test.go:228` 的一句注释。造这枚宿主的是**票 33**，推快照的是**票 35**。
+3. `theme.css:264-271` 的 `prefers-reduced-motion` 块确实会把 `animation-iteration-count` 掐成 1，
+   **但那是无障碍偏好，不是"关闭即停"的闸门**——别拿它当这一问的答案。
+
+⇒ 要真守住那一句，形状只有两种（都在他那边）：**票 33** 在面板隐藏/关闭时真的销毁或冻结 WebView2，
+或**票 35** 给一枚入站"面板已隐藏"事件、我在 `App` 那层把三枚条件短路。这两个口子盘上都没有，我不自己开
+——上一次我自己往 C17 白名单加了第 6 枚名字，结果就是 Q-50，owner 拍的是删。
+
+### 50.4 顺带把 `F4b` 那句的位置钉一下
+
+那一问的答**已经交了**：本节上一节 §49（commit `af1925c`），三发变异现量在内——`C1`（摘掉
+`reveal-text.tsx:51` 的 `!done` 门）打到 **rc=0、零枚红**，因为 SSR 只渲染 `useState(0)` 那一帧、
+`done` 恒假；`render-stream.tsx:247` 是**顺带成立**（靠 `result-stream.tsx:24` 的三元式，不靠组件自己那扇门）。
+⇒ 结论未变：**终态那格目前是零覆盖**，修法是把 `segments × count → markup` 抽成纯函数（在 `src/lib/reveal.ts`），
+让 `C1` 变红。这一格要不要现在做，等他排；我没有顺手改判据。
