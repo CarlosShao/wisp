@@ -25,7 +25,7 @@ const LICENSE = "MIT (upstream LICENSE: Copyright (c) 2026 Turbo)";
 
 // dest -> { src, component, note }
 const JOBS = [
-  { src: "components/atoms/StreamText.tsx", dest: "src/components/ai-native/stream-text.tsx", component: "StreamText", note: "mounted: the result stream reuses it (src/components/ResultStream.tsx)" },
+  { src: "components/atoms/StreamText.tsx", dest: "src/components/ai-native/stream-text.tsx", component: "StreamText", note: "NOT mounted: it builds segments with split on a single space, so a Chinese answer reveals as one unit; PLAN.md:3476 逐段 is served by our own src/components/reveal-text.tsx" },
   { src: "components/atoms/Shimmer.tsx", dest: "src/components/ai-native/shimmer.tsx", component: "Shimmer", note: "mounted: the waiting label in src/components/PanelSkeleton.tsx" },
   { src: "components/approval-card.tsx", dest: "src/components/ai-native/approval-card.tsx", component: "ApprovalCard", note: "NOT mounted: upstream demo questionnaire; kept as the visual reference the adapted src/components/l2-approval-card.tsx was cut from" },
   { src: "components/loading-state.tsx", dest: "src/components/ai-native/loading-state.tsx", component: "LoadingState", note: "NOT mounted: ships with upstream demo strings; the panel's own loading state is PanelSkeleton.tsx until ticket 35 feeds it" },

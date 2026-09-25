@@ -10,7 +10,7 @@
                     directive removed; line endings normalized to LF;
                     0 dingbat glyph(s) ASCII-ized for D23/ban #8. (none found in this file)
                     Nothing else - see scripts/vendor.mjs.
-   Panel status   : mounted: the result stream reuses it (src/components/ResultStream.tsx)
+   Panel status   : NOT mounted: it builds segments with split on a single space, so a Chinese answer reveals as one unit; PLAN.md:3476 逐段 is served by our own src/components/reveal-text.tsx
    ============================================================================ */
 
 import { useEffect, useState } from "react";

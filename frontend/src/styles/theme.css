@@ -184,26 +184,34 @@
   0% { opacity: 0; filter: blur(4px); }
   to { opacity: 1; filter: blur(0); }
 }
-@keyframes caret-blink {
-  0%, to { opacity: 1; }
-  50% { opacity: 0; }
-}
+/* The streaming caret. Upstream ships this block at ai-native-react-components
+   app/globals.css:148 (MIT) as a 2px x 1.05em bar in --ink that blinks on a
+   step-end curve; the geometry, colour and animation below are OURS, because
+   PLAN.md:3476 (the frozen SSE row) fixes the caret at 1px x 14px in --accent
+   breathing 1 -> 0.2 -> 1 over 1s and names a hard blink under "明确不用".
 
-/* Vendored from ai-native-react-components app/globals.css:148 (MIT) - the
-   caret that trails atoms/StreamText, colour taken from the alias above. */
+   Upstream's step-end rule is gone rather than overridden, and it is not a lost
+   behaviour: its own atom mounts the caret only while text is still arriving
+   (stream-text.tsx:76) and tags it .is-streaming, which upstream then matched
+   with `animation: none` -- so on upstream's page the blink never ran during the
+   only interval the caret existed. Provable by grep: `caret-blink` had exactly
+   two hits in this tree, this block's declaration and its @keyframes. */
 .stream-caret {
-  background: var(--ink);
+  background: var(--accent);
   vertical-align: text-bottom;
   border-radius: 1px;
-  width: 2px;
-  height: 1.05em;
+  width: 1px;
+  height: 14px;
   margin-left: 1.5px;
-  animation: caret-blink 1s step-end infinite;
   display: inline-block;
   translate: 0 -0.5px;
 }
 .stream-caret.is-streaming {
-  animation: none;
+  animation: caret-breathe 1s ease-in-out infinite;
+}
+@keyframes caret-breathe {
+  0%, to { opacity: 1; }
+  50% { opacity: 0.2; }
 }
 
 @media (prefers-reduced-motion: reduce) {
