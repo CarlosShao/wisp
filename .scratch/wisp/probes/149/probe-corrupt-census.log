@@ -1,0 +1,48 @@
+time=2026-09-25T23:06:58.282+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestP149CorruptShapesOffsetCensus
+    zz149probe_windows_test.go:84: P149 FIXTURE len=1343
+    zz149probe_windows_test.go:146: P149 double-comma-39B       len=39    state=corrupt z(offset)=0     errkind=SyntaxError         eo=27    want=25    offsetWord=true
+    zz149probe_windows_test.go:147:      SENT 39 bytes read, report corrupt: 39 bytes contradict a subject report at offset 0: invalid character ',' looking for beginning of object key string
+    zz149probe_windows_test.go:146: P149 html-head              len=43    state=corrupt z(offset)=0     errkind=SyntaxError         eo=1     want=0     offsetWord=true
+    zz149probe_windows_test.go:147:      SENT 43 bytes read, report corrupt: 43 bytes contradict a subject report at offset 0: invalid character '<' looking for beginning of value
+    zz149probe_windows_test.go:146: P149 wrong-type             len=13    state=corrupt z(offset)=13    errkind=UnmarshalTypeError  eo=12    want=10    offsetWord=true
+    zz149probe_windows_test.go:147:      SENT 13 bytes read, report corrupt: 13 bytes contradict a subject report at offset 13: json: cannot unmarshal number into Go struct field sloRun.mode of type string
+    zz149probe_windows_test.go:146: P149 empty-object           len=2     state=corrupt z(offset)=2     errkind=none                eo=-1    want=-1    offsetWord=false
+    zz149probe_windows_test.go:147:      SENT 2 bytes read, report corrupt: 2 bytes parsed as a subject run but carry no state report
+    zz149probe_windows_test.go:146: P149 no-state-report        len=57    state=corrupt z(offset)=57    errkind=none                eo=-1    want=-1    offsetWord=false
+    zz149probe_windows_test.go:147:      SENT 57 bytes read, report corrupt: 57 bytes parsed as a subject run but carry no state report
+    zz149probe_windows_test.go:146: P149 trailing-garbage       len=1368  state=corrupt z(offset)=1343  errkind=none                eo=-1    want=-1    offsetWord=true
+    zz149probe_windows_test.go:147:      SENT 1368 bytes read, report corrupt: 1368 bytes hold more than one document: a value closed at offset 1343 and 25 bytes follow (next token <nil>, invalid character 'o' in literal null (expecting 'u'))
+    zz149probe_windows_test.go:146: P149 second-document        len=2686  state=corrupt z(offset)=1343  errkind=none                eo=-1    want=-1    offsetWord=true
+    zz149probe_windows_test.go:147:      SENT 2686 bytes read, report corrupt: 2686 bytes hold more than one document: a value closed at offset 1343 and 1343 bytes follow (next token {, <nil>)
+    zz149probe_windows_test.go:146: P149 trunc40-plus-0xff      len=41    state=corrupt z(offset)=0     errkind=SyntaxError         eo=41    want=40    offsetWord=true
+    zz149probe_windows_test.go:147:      SENT 41 bytes read, report corrupt: 41 bytes contradict a subject report at offset 0: invalid character '\xff' after object key
+    zz149probe_windows_test.go:134: P149 deep-at-100-bang       len=1343  state=complete  (not corrupt - classified elsewhere)
+    zz149probe_windows_test.go:146: P149 deep-at-500-at         len=1343  state=corrupt z(offset)=0     errkind=SyntaxError         eo=501   want=500   offsetWord=true
+    zz149probe_windows_test.go:147:      SENT 1343 bytes read, report corrupt: 1343 bytes contradict a subject report at offset 0: invalid character '@' looking for beginning of value
+    zz149probe_windows_test.go:134: P149 deep-at-1000-hash      len=1343  state=complete  (not corrupt - classified elsewhere)
+    zz149probe_windows_test.go:146: P149 deep-late-2-0xff       len=1343  state=corrupt z(offset)=0     errkind=SyntaxError         eo=1342  want=1341  offsetWord=true
+    zz149probe_windows_test.go:147:      SENT 1343 bytes read, report corrupt: 1343 bytes contradict a subject report at offset 0: invalid character '\xff' after object key:value pair
+    zz149probe_windows_test.go:146: P149 bad-escape-in-string   len=25    state=corrupt z(offset)=0     errkind=SyntaxError         eo=11    want=10    offsetWord=true
+    zz149probe_windows_test.go:147:      SENT 25 bytes read, report corrupt: 25 bytes contradict a subject report at offset 0: invalid escape sequence `\q` in string
+    zz149probe_windows_test.go:146: P149 colon-then-comma       len=39    state=corrupt z(offset)=0     errkind=SyntaxError         eo=26    want=26    offsetWord=true
+    zz149probe_windows_test.go:147:      SENT 39 bytes read, report corrupt: 39 bytes contradict a subject report at offset 0: invalid character ':' after object key:value pair
+    zz149probe_windows_test.go:146: P149 array-into-struct      len=7     state=corrupt z(offset)=7     errkind=UnmarshalTypeError  eo=1     want=6     offsetWord=true
+    zz149probe_windows_test.go:147:      SENT 7 bytes read, report corrupt: 7 bytes contradict a subject report at offset 7: json: cannot unmarshal array into Go value of type main.sloRun
+    zz149probe_windows_test.go:146: P149 number-into-struct     len=3     state=corrupt z(offset)=3     errkind=UnmarshalTypeError  eo=3     want=2     offsetWord=true
+    zz149probe_windows_test.go:147:      SENT 3 bytes read, report corrupt: 3 bytes contradict a subject report at offset 3: json: cannot unmarshal number into Go value of type main.sloRun
+    zz149probe_windows_test.go:146: P149 null-doc               len=4     state=corrupt z(offset)=4     errkind=none                eo=-1    want=3     offsetWord=false
+    zz149probe_windows_test.go:147:      SENT 4 bytes read, report corrupt: 4 bytes parsed as a subject run but carry no state report
+    zz149probe_windows_test.go:146: P149 string-doc             len=15    state=corrupt z(offset)=15    errkind=UnmarshalTypeError  eo=15    want=14    offsetWord=true
+    zz149probe_windows_test.go:147:      SENT 15 bytes read, report corrupt: 15 bytes contradict a subject report at offset 15: json: cannot unmarshal string into Go value of type main.sloRun
+    zz149probe_windows_test.go:146: P149 brace-first-then-good  len=1344  state=corrupt z(offset)=0     errkind=SyntaxError         eo=1     want=0     offsetWord=true
+    zz149probe_windows_test.go:147:      SENT 1344 bytes read, report corrupt: 1344 bytes contradict a subject report at offset 0: invalid character '}' looking for beginning of value
+    zz149probe_windows_test.go:146: P149 late-type-break        len=51    state=corrupt z(offset)=51    errkind=UnmarshalTypeError  eo=50    want=50    offsetWord=true
+    zz149probe_windows_test.go:147:      SENT 51 bytes read, report corrupt: 51 bytes contradict a subject report at offset 51: json: cannot unmarshal string into Go struct field sloRun.seconds of type float64
+    zz149probe_windows_test.go:149: P149 CENSUS corrupt-ish shapes=20 prints-no-offset-word=3 prints-offset-0=8 prints-a-position=7
+    zz149probe_windows_test.go:158: P149 ALL-PREFIX state census (0..len=1343) = map[complete:1 unwritten:1343]
+    zz149probe_windows_test.go:171: P149 RAWDECODE double-comma-39B: err=invalid character ',' looking for beginning of object key string InputOffset=0 SyntaxError.Offset=27 bytes=39
+    zz149probe_windows_test.go:171: P149 RAWDECODE trunc40-plus-0xff: err=invalid character '\xff' after object key InputOffset=0 SyntaxError.Offset=41 bytes=41
+--- PASS: TestP149CorruptShapesOffsetCensus (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.079s
