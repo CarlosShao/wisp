@@ -303,7 +303,7 @@ AttachmentRef:     9 [artifact deduplicated id kind mime name reason sizeBytes s
 ```
 M7 --- FAIL: TestNoInboundEnvelopeCanBindAnApprovalVerdict
    :1211 the panel's inbound Go boundary has a grant-carrying face:
-           bridge.go:129: inbound envelope acceptM7Envelope can bind the JSON key "Outcome" ...
+           bridge.go:125: inbound envelope acceptM7Envelope can bind the JSON key "Outcome" ...
    --- FAIL: TestJSONKeyDerivationAgreesWithEncodingJSON
    :1418 decode destination acceptM7Envelope has no reflection twin in inboundTypeRegistry …(引信，见 §5.2)
    +  --- FAIL: TestPlantedGrantWiringGoesRedInASnapshot （真树已脏的前置引信）
