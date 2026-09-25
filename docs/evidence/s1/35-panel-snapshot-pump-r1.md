@@ -606,3 +606,61 @@ d22scan 那一枚要补三行，因为它是 `set -eu`（`scripts/d22scan.sh:38`
 "`Snapshot` 没人造"，那也过期了——过期时刻就是 `5821e24`／`37a4705`。
 
 ---
+
+## 7. 本程没测什么（按"如果我漏了它，谁会先被骗"排序）
+
+1. **没跑 CI 那支形状（正路①）**。`scripts/wisp-cli-tests.sh` 与它背后的
+   `portable-tests.sh`（GUARD A"这一档必须有已编译的测试文件"、GUARD B"cmd/wisp 必须打出自己的
+   锚定顶层结果行"）与 `tools/d22scan/runtests.sh`（顶层 SKIP 即红、PASS 与 FAIL 同时为 0 即红）
+   **都以手工等价尺替代了、没有以 CI 同形跑过**。⇒ 本件的 5.2 那张表**不等于 CI 会打出的那张表**；
+   尤其"某包一枚测试都没有"这一类失败，本程那把尺抓不到。
+2. **没跑 `-race`**。`grep -rn -- "-race" scripts/portable-tests.sh tools/d22scan/runtests.sh` → **0 命中**，
+   本程也没单加。而 `StreamLog` 与 `SnapshotPump` 都是带锁对象、`Snapshot()` 又
+   **不持泵锁**地先后调 `Verdicts()` 与 `Results()` ⇒ 一份包可以混合两个瞬间的状态
+   （`pending_read.go:38-41` 的注释承认了这件事、并说这是设计）。**承认了 ≠ 量过**：
+   本程没造这一发竞态用例、也没造这一发变异。
+3. **`panelSnapshotSummary` 那条"超钳就丢 ids"的分支从未被走到**。
+   `grep -rn "summaryClamp\|440" --include=*_test.go cmd/wisp` → **0 命中**；
+   13 发变异 + 工作树那发里，落盘记录里的 `pending=` 字段**只出现过一枚值** `pump-corr`
+   （`grep -hoE "pending:[^ ]*" … | sort -u` → 1 行）。⇒ `cmd/wisp/panel_pump.go:186-192`
+   那一整块（深度 >3、或多枚长 correlation id 把行撑过 440）今天是**零执行**的分支。
+   ⚠ 按本仓教训"改后全绿可能是那条新路径零次执行"，这一格**不能**被算成"已经守住了"。
+4. **rune/byte 分叉那一发没造**（§2.2 口径第 2 条）。今天所有字段都是 ASCII ⇒
+   `len(line) > summaryClamp`（byte）与 `truncate`（rune）不会分出不同结果；
+   一旦 correlation id 或 mode 名里出现非 ASCII，两把尺会开始说不一样的话。未测。
+5. **没测多任务并发**。`DefaultStreamKeys = 32`（`pump.go:265`）对今天的唯一生产者（`wisp run`
+   一个 task）是 1∶32 的空档；`TestTheStreamLogMergesInsteadOfDropping` 用 50 枚 key 量了折叠
+   本身，但**没有任何一发**量"生产里真的会有几路流"。
+6. **没测常驻腿、便携腿、Linux 腿**。`cmd/wisp/resident_windows.go` 今天不 import `internal/panel`
+   （§2.1.1 现量 0）⇒ 被接上的只有 `wisp run`；三枚 `*_other_test.go` / `//go:build !windows`
+   那 3 枚（§5.4 本 2 的差）**本程未在容器里跑**。
+7. **没跑 SLO／D32 那两个数**，也没跑 `wisp slo`（且按台账既有裁定：`wisp slo` 全仓 100% 不被
+   `go test` 执行 ⇒ 这一条腿只有推送触发的 `slo-check.ps1` 管，本程未推、未读）。
+8. **没跑全树门禁**：`go vet ./...`、全仓 `go test ./...`、`staticcheck`/`gofumpt` 都**未跑**
+   （本程范围是派单点名的两包＋三门）。
+9. **没复现派单预告的加载期失败**（`0xc0000135`）：两棵树都装了 DLL，四份读数各 0 命中。
+   ⇒ 那一句在本件里是**引用**、不是复算。
+10. **变异只打在 `internal/panel` ＋ `cmd/wisp` 两包**（外加 `approval/pending_read.go` 被 M7 间接触碰）。
+    没有把每一发变异打遍"引用过这些符号的其它包"（`go build ./...` 意义上的全树），
+    也没有做"删掉整枚 `pump.go` 会不会有别的包变红"这一发**移除级**实验
+    （M5/M6 是替换级、不是移除级）。
+11. ~~没量那枚新红在别的机器上的形状／它吃不吃 `design/**`~~ —— **本程把这一刀补了**，记在这儿因为它差点变成误归因：
+    在 HEAD 副本里（`design/assets/tokens.css` **存在**，`ls` 现量过）单跑那枚用例
+    `go test -count=1 -v -run 'TestRunBooksWithASnapshotOfItsLiveQueue' ./cmd/wisp/`
+    ⇒ **仍红、同一句 `panel_pump_test.go:296`，且它是唯一一句红**（`:293` 不响，与 §4.5 的 `M3_no_wfix` 同形）。
+    ⇒ 那枚红与 `design/**` 的形状**无关**，§5.2 第 2 条的归因（夹具写入缺一行）成立。
+    **仍未测的**只剩：这一枚红在别的机器／别的 runner 上是否同样唯一（本程只有本机一块地）。
+12. **没测那枚有界摘要在真实 ledger 文件里的行长**。`ledgerSummaries145`（`panel_pump_test.go:53-79`）
+    读了真文件、比了字段，但**没断言过那条 `msg` 的 rune 长度** ⇒ "摘要自己永远不会被 `truncate` 截到"
+    这件事今天是**推论**（440 < 512），不是断言。§2.2 的探针量到的是**探针自己造的**那枚摘要（180 rune），
+    不是 `wisp run` 真落的那一枚。
+
+### 7.1 一条仪器异常（登记，不据此下任何结论）
+
+本轮若干次 `grep -c` 为 0 时，工具回显里除 `0` 之外还出现过一句
+`No matches found`——那**不是** bash `grep` 的输出形状。本程处置：凡关键计数都用
+`| wc -l` 或 python 复算过一遍（§3.2、§5.2、§6.3 的每个零都是这么来的），
+未把该句当结果读。⚠ 出处：`Bash` 工具、命令形如 `grep '^--- FAIL' pre_test_v.txt`。
+只登记形状，不猜成因。
+
+---
