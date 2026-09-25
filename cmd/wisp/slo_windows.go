@@ -3,10 +3,13 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -127,6 +130,14 @@ type sloSubject struct {
 	dir       string
 	readyPath string
 	outPath   string
+	// readReportFile is the report loop's ONLY touch of the subject's report
+	// file. Production leaves it nil and the loop calls os.ReadFile; a test
+	// hands in a scripted sequence of readings instead. The seam exists for one
+	// claim that cannot be made any other way on this host: "a report that is
+	// genuinely corrupt fails closed ON THE SPOT" has to be shown by counting
+	// reads, because the machine ticket 144 runs on is not allowed to be
+	// trusted for elapsed-time readings (three other processes may be sampling).
+	readReportFile func(path string) ([]byte, error)
 }
 
 func cmdSLOUsage() {
@@ -517,31 +528,194 @@ func (s *sloSubject) waitReady() error {
 	}
 }
 
-// collectReport waits for the subject to write its own in-tree report and
-// parses it. The subject only writes after subjectGrace past the end of its
-// window, so this never races the observer's last sample.
+// subjectReportState classifies ONE look at the subject's report file. The two
+// states this ticket separates are reportUnwritten and reportCorrupt: before
+// ticket 144 the loop had no word for the first one, so a report whose tail was
+// still in flight was reported with the same sentence as a report that is
+// actually broken.
+type subjectReportState int
+
+const (
+	// reportUnwritten - what is on disk is a PREFIX of the document the subject
+	// is still writing: zero bytes, padding only, or a value the decoder ran
+	// out of input inside. Nothing in these bytes contradicts a subject report,
+	// so the only honest reading is "look again", and the budget is what
+	// decides whether looking again was worth it.
+	reportUnwritten subjectReportState = iota
+	// reportCorrupt - what is on disk CONTRADICTS the document the subject
+	// writes: a head that cannot begin it, a syntax error that is not at the end
+	// of the input, a second value after the first one closed, or a document
+	// that parsed cleanly and carries no state report. No amount of waiting
+	// changes any of those, so they fail closed on the spot (ticket 128 / 136:
+	// never a silent downgrade to the tree basis).
+	reportCorrupt
+	// reportComplete - exactly one sloRun and nothing after it.
+	reportComplete
+)
+
+// String keeps a failure in a test reading like a sentence about the file, not
+// like a number the reader has to look up.
+func (s subjectReportState) String() string {
+	switch s {
+	case reportUnwritten:
+		return "unwritten"
+	case reportCorrupt:
+		return "corrupt"
+	default:
+		return "complete"
+	}
+}
+
+// subjectReportRead is one observation of the file: the bytes, where inside
+// them the decoder stopped, and what that means. It is a value, not a side
+// effect, so the loop can carry its LAST reading into the error that gives up -
+// which is the difference between "unexpected end of JSON input" and "waited
+// 33s, the file never grew past 1 431 bytes".
+type subjectReportRead struct {
+	state  subjectReportState
+	report *sloRun
+	bytes  int
+	// offset is the decoder's stop position inside these bytes (-1 when no
+	// decoder ran, i.e. there was nothing to read yet).
+	offset int64
+	// note is what the loop adds for observations the classifier never saw
+	// (no file yet, file unreadable this instant).
+	note string
+	// err is non-nil only for reportCorrupt.
+	err error
+}
+
+// summary renders an observation for an error message.
+func (o subjectReportRead) summary() string {
+	if o.note != "" {
+		return fmt.Sprintf("%d bytes read, %s", o.bytes, o.note)
+	}
+	switch o.state {
+	case reportUnwritten:
+		return fmt.Sprintf("%d bytes read, document still open at offset %d: the tail had not arrived", o.bytes, o.offset)
+	case reportCorrupt:
+		return fmt.Sprintf("%d bytes read, report corrupt: %v", o.bytes, o.err)
+	default:
+		return fmt.Sprintf("%d bytes read, complete document at offset %d", o.bytes, o.offset)
+	}
+}
+
+// readSubjectReport classifies one read of the subject's report file. It waits
+// for nothing, touches nothing and keeps no state: the same bytes always give
+// the same answer, which is what makes the retry loop below a decision instead
+// of a hope.
+//
+// The credential for telling the two apart is the shape of writeSLO's single
+// os.WriteFile (slo_windows.go, writeSLO): the whole JSON document is produced
+// in memory first, then written by ONE open+write from offset 0, with no
+// temporary file and no rename. A reader therefore sees either nothing or a
+// PREFIX of the final document - a prefix can be missing its tail, but it can
+// never have a head that the finished document does not also have. So:
+//
+//   - the decoder ran out of input (io.EOF on zero bytes / padding,
+//     io.ErrUnexpectedEOF inside a value) => reportUnwritten, keep polling;
+//   - anything else the decoder objects to, or a whole document whose content
+//     is wrong => reportCorrupt, fail closed now.
+//
+// The one shape this cannot tell apart from a prefix is a subject that DIED
+// part-way through its write; that waits out the budget and still reports red,
+// now with the budget and the last byte count in the sentence.
+func readSubjectReport(data []byte) subjectReportRead {
+	obs := subjectReportRead{bytes: len(data), offset: -1}
+	dec := json.NewDecoder(bytes.NewReader(data))
+	var rep sloRun
+	if err := dec.Decode(&rep); err != nil {
+		obs.offset = dec.InputOffset()
+		if errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF) {
+			obs.state = reportUnwritten
+			return obs
+		}
+		obs.state = reportCorrupt
+		obs.err = fmt.Errorf("%d bytes contradict a subject report at offset %d: %w", obs.bytes, obs.offset, err)
+		return obs
+	}
+	obs.offset = dec.InputOffset()
+	if tok, terr := dec.Token(); !errors.Is(terr, io.EOF) {
+		obs.state = reportCorrupt
+		obs.err = fmt.Errorf("%d bytes hold more than one document: a value closed at offset %d and %d bytes follow (next token %v, %v)",
+			obs.bytes, obs.offset, int64(obs.bytes)-obs.offset, tok, terr)
+		return obs
+	}
+	if rep.Report == nil {
+		// Parsed cleanly, complete, and still not a subject report: this is the
+		// leg AC#2 of ticket 144 refuses to let the retry leg swallow.
+		obs.state = reportCorrupt
+		obs.err = fmt.Errorf("%d bytes parsed as a subject run but carry no state report", obs.bytes)
+		return obs
+	}
+	obs.state = reportComplete
+	obs.report = &rep
+	return obs
+}
+
+// collectReport is the production entry point: the budget and the cadence are
+// the ones this file has always used, named exactly once (ticket 144 moves no
+// threshold and no budget).
 func (s *sloSubject) collectReport() (*sloRun, error) {
-	budget := observe.NewTimeout(subjectReportBudget + subjectGrace)
+	return s.collectReportWithin(subjectReportBudget+subjectGrace, subjectPollInterval)
+}
+
+// collectReportWithin waits for the subject to write its own in-tree report and
+// parses it, and it does NOT treat "the file exists" as "the report is there".
+//
+// What the three lines above this function used to claim - that the write
+// lands after subjectGrace past the end of the subject's window, "so this never
+// races the observer's last sample" - was argued about the wrong pair of facts.
+// It says something about WHEN the write starts relative to the observer's last
+// read; it says nothing about what a reader sees while that single write is in
+// flight, and "the file is there" and "the bytes are all there" are two
+// different states (os.WriteFile creates the file, then fills it). So the race
+// this loop has to handle is not observer-vs-observer, it is reader-vs-writer,
+// and the two states stay separable for the reason spelled out on
+// readSubjectReport: the writer produces the whole document in memory and
+// writes it once from offset 0, so whatever is visible is a prefix of it.
+//
+// reportUnwritten stays inside the budget and is re-read. reportCorrupt returns
+// an error on the spot - fail-closed is NOT relaxed here, it is only given a
+// reason: if this gives up, the sentence names the budget it spent, the byte
+// count of its last read and where inside those bytes the document stopped.
+func (s *sloSubject) collectReportWithin(budget, poll time.Duration) (*sloRun, error) {
+	read := s.readReportFile
+	if read == nil {
+		read = os.ReadFile
+	}
+	timeout := observe.NewTimeout(budget)
+	last := subjectReportRead{state: reportUnwritten, offset: -1, note: "nothing read yet"}
 	for {
-		if data, err := os.ReadFile(s.outPath); err == nil {
-			var rep sloRun
-			if err := json.Unmarshal(data, &rep); err != nil {
-				return nil, fmt.Errorf("wisp slo: subject report: %w", err)
-			}
-			if rep.Report == nil {
-				return nil, fmt.Errorf("wisp slo: subject report carries no state report")
-			}
-			return &rep, nil
+		data, err := read(s.outPath)
+		var obs subjectReportRead
+		switch {
+		case errors.Is(err, os.ErrNotExist):
+			obs = subjectReportRead{state: reportUnwritten, offset: -1, note: "no report file yet"}
+		case err != nil:
+			// An unreadable file is transient here exactly as it was before this
+			// ticket (the writer has it open); the loop polls and says so at the
+			// end instead of staying silent about what it last saw.
+			obs = subjectReportRead{state: reportUnwritten, offset: -1, note: fmt.Sprintf("report file unreadable: %v", err)}
+		default:
+			obs = readSubjectReport(data)
+		}
+		last = obs
+		switch obs.state {
+		case reportComplete:
+			return obs.report, nil
+		case reportCorrupt:
+			return nil, fmt.Errorf("wisp slo: subject report is corrupt (failing closed on the first read, not a partial write): %w", obs.err)
 		}
 		if s.exited() {
-			return nil, fmt.Errorf("wisp slo: subject %d exited (code %d) without writing its report",
-				s.pid, s.exitCode())
+			return nil, fmt.Errorf("wisp slo: subject %d exited (code %d) without writing its report (%s)",
+				s.pid, s.exitCode(), last.summary())
 		}
-		if budget.Expired() {
-			return nil, fmt.Errorf("wisp slo: subject %d did not write its report within %s",
-				s.pid, budget.Budget())
+		if timeout.Expired() {
+			return nil, fmt.Errorf("wisp slo: subject %d never wrote a complete report within %s (last read: %s)",
+				s.pid, timeout.Budget(), last.summary())
 		}
-		time.Sleep(subjectPollInterval)
+		time.Sleep(poll)
 	}
 }
 
