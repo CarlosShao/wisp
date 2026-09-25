@@ -257,3 +257,102 @@ C05 words 三处同删（去 ratify ＋ 去它的行 ＋ wantGrantRouteWords 11-
 补进实现件 §6——那是 F-R5-1（文档级，见 §11）。理由：本轮它已经把"单点删除"这一族全部收口（§4 的 22 发全红），
 剩下的那一族要么搬到文件外（新仪器，需另开一格裁决），要么靠人看 diff（本仓既有 backstop）；
 把它继续记成"待闭债"会让下一程在同一枚文件里再加第四处自指事实，而 §7.3(a) 说明那只是把边界挪一位。
+
+---
+
+## §8 ⓖ 三态四数、名册差集，与那枚 C21 的**口径边界**（本程把因果也做了）
+
+| 台件 | 四数（`go test ./internal/panel/ -count=1 -v`） | 红名 | `asked=` | 原始件 |
+|---|---|---|---|---|
+| 改前副本 `ee2a92d`（blob `58f54514`，2220 行） | rc=0 99/53/46/0/0/0，`^panic:`=0 | 无 | 528，hits=[]，打印在 `:1389` | `out/PRE-ee2a92d.txt` |
+| **交付态副本 `aeba6ff`（锚点，判据用的就是这一行）** | rc=0 99/53/46/0/0/0，`^panic:`=0 | 无 | 528，hits=[]，打印在 `:1540` | `out/BASE-anchor.txt` |
+| 仓库工作树（**这是工作树、不是锚点**；HEAD 取于我量这一发时＝`ddf8b6f`，`internal/panel/` 当时还没有别家未提交件） | rc=1 99/**52**/46/**1**/0/0，`^panic:`=0 | 唯一一枚逐字 `TestC21DesignTokensFourWayAgree` | 528，hits=[] | `out/W-BASE-worktree.txt` |
+
+```
+名册差集（两份运行输出，未用 -run / -skip）：
+   `^=== RUN` 归一化名（含子测试）99 枚 -> 99 枚，diff 为**空** ⇒ +0/−0   out/roster-PRE-ee2a92d.txt · out/roster-BASE-anchor.txt
+   `func Test` 名册（git grep -h '^func Test' <rev> -- internal/panel/）：ee2a92d=53 枚 -> aeba6ff=53 枚，diff 为空
+   本文件内 func Test 7 -> 7 ⇒ 它 §3 那三格逐格复算成立；本程在副本上重打，不采信它的工作树口径
+```
+
+### §8.1 为什么"锚点副本 99/53/46/**0**"与"工作树 99/52/46/**1**"同时成立——因果本程自己做了
+
+```
+事实 1：design/assets/tokens.css 在锚点里是**跟踪着的**（aeba6ff 的 tree 里有，blob 0ad0112379e4df056ead3fdc2dc6e1f223f2040c，12942 字节）
+事实 2：`git status --porcelain` 里那 16 枚 ` D design/**`（含 ` D design/assets/tokens.css`）是**未提交的工作树删除**（owner 的活）
+事实 3：归档副本从 tree 取件 ⇒ 该文件存在；工作树被那 16 枚删除掏空 ⇒ 该文件不存在
+事实 4（本程做的因果实验，全程在仓外副本里，未碰仓内）：
+   在 anchor 副本内把 design/assets/tokens.css 移走 ->
+     --- FAIL: TestC21DesignTokensFourWayAgree
+     tokens_fourway_test.go:441: read design/assets/tokens.css: open …\anchor\design\assets\tokens.css:
+       The system cannot find the file specified.
+   移回来 -> git hash-object --no-filters = 0ad01123…（＝锚点 blob，逐值相同）
+```
+
+**口径边界（写死这一句，下一程不要再在这个包里找第二枚红）**：
+`internal/panel/` 的"几枚红"取决于**读哪一台件**，不取决于本批代码——
+锚点归档副本 **0 枚**；本机工作树 **1 枚**且唯一红名是那枚 C21，红因是 owner 未提交的 `design/**` 删除，
+与 `l2_grant_boundary_test.go` 无因果（它在三态里都是 99 枚 RUN、`asked=528`）。
+⇒ 引用"几枚红"必须连台件口径一起写；两个数都对，**拼成单值就错**（r4 交付验收 §2 那格同一族病，本程复现到第三形态）。
+⚠ 另记一枚本程现量的漂移：`internal/panel` 里本程跑完后已出现别家未提交件（`pump.go`／`pump_test.go`），
+⇒ 今天再打工作树口径那一行，四数**允许与 §8 第三行不同**，那不是本批的账（本程没有用它当任何判据）。
+
+---
+
+## §9 ⓗ 三门、断言尺、以及"删掉的 25 行"逐枚读过
+
+```
+（以下三门全部在锚点归档副本里跑；跑前跑后各复算一次两枚被验物哈希＝f87301df…/d2cd6362…，见 §1 末次全树复算）
+gofmt -l internal/panel/  -> 空，rc=0
+go vet  ./internal/panel/ -> 空，rc=0
+sh scripts/d22scan.sh     -> rc=0，原始件 out/GATE-d22scan-anchorcopy.txt
+   第一步（正控）确实跑了：runtests.sh: OK - packages=[./...] top-level: PASS=30 FAIL=0 **SKIP=0**, === RUN=70
+     ⇒ 简报点名的坑（set -eu、正控红则真扫描根本不跑）本程验证方式是"看见 30 枚 PASS 才读第二步"
+   第二步（真扫描）逐枚分母：bans #1-5 internal/=203 cmd/=22 | ban #6 frontend/=46 | ban #7 internal/tools/=18
+     | ban #8 design/=**30** frontend/=46 internal/=407 cmd/=40 → "d22scan: clean - no D22 ban violations"
+   ⚠ 副本没有 .git ⇒ 扫描器**自陈**"gitignore rules NOT APPLIED … every path in every scope is being scanned"（A207 那枚机器相关分母）
+     ⇒ design/ 我量到 30、实现件与工作树量到 32，差值来自工作树里 owner 新增的未跟踪 design/ 目录（design/old/ 等），
+       与本批无关；本批**零枚新增文件**（§0 pathset 为证）⇒ 它只能进 internal/=407 那一枚分母，而 407 与 r4 交付验收 §4 同值。
+   对照（这是工作树口径、非判据）：仓内再跑一次 -> rc=0，bans #1-5 internal/=**205** | ban #8 design/=32 internal/=**409**
+     ⇒ 那 +2 是别家未提交的 `internal/panel/pump.go` 等，本程不计入自己也不计入被验物的零命中主张。
+```
+
+断言尺（两版都从 git 取，`grep -oF | wc -l`，不数行）：
+
+```
+                     ee2a92d(58f54514)  aeba6ff(f87301df)  delta   实现件 §4 记的   判
+t.Fatalf(                    35                36           +1          +1          ✅
+t.Fatal(                      5                 5            0           0          ✅
+t.Errorf(                    45                49           +4          +4          ✅
+t.Error(                      1                 1            0           0          ✅
+t.Logf(                      15                15            0           0          ✅
+t.Skip                        0                 0            0           0          ✅ 保持 0（没有一枚被跳掉）
+func Test(本文件)             7                 7            0           0          ✅
+Fatal/Error 合计             86                91           +5          +5          ✅ **只变长，没变短**
+行数                        2220              2380                   2220/2380     ✅
+```
+
+**"只变长"这句话本程不止信计数**——把 `ee2a92d..aeba6ff` 删掉的 25 行**逐枚读过**（`git diff -U0`）：
+
+```
+1 行 注释：… "is allowed to grow; nothing in here claims it is exhaustive"（被"变窄要动两处"那段替代；
+          范围声明本身仍在文件里 :1527-1529"What it does NOT cover"，未失）
+8 行 旧正控（for 四枚常量 + 每枚直调 + 那句 Fatalf）：被 :1496-1502 的 DeepEqual(24 枚邻域)==恰好四枚 取代
+          ⇒ 本程实测这是**超集**：旧正控负责的四枚"必须被答"两版都红（F02 vs F07），新形状多拿住
+            "守卫多答一枚邻域名"那一发（F05 红 / F06 绿）⇒ 没有任何一枚旧断言被丢掉
+16 行 旧循环（asked++/四个 for/sort.Strings(hits)）：原样搬进 sweepAssembledNames(:1433-1450)，一字未改语义
+⇒ 结论：本批没有为变绿放宽任何断言；阈值/golden/thresholds.go 一字节未碰（§0 pathset 只有那一枚 _test.go）。
+```
+
+---
+
+## §10 简报三枚前提＋实现件 §5 那六条：本程自己判，不替谁圆
+
+| # | 谁的说法 | 本程的判 | 依据 |
+|---|---|---|---|
+| ⓐ | 简报"约 12 行"；实现件自报"毛 +49／净 +29，仍在 60 行停手线内" | **实现件方向对、数值低报**；**停手线的适用范围未定** | 本程按 hunk 边界归属：`ddea3c3` 三枚 hunk 是 +125/−0（@old1306）、+15/−24（@old1320）、+9/−0（@old1546）；F-R4-1 只占 hunk1 的后 **41** 行（`sweepAssembledNames` 28 ＋ 邻域网格 12 ＋ 空行）＋ hunk2 的 +15/−24 ⇒ **毛 +56／净 +32**，比它自报的 49/29 多 7 行；仍 <60 ⇒ 那一枚洞没越线。**但整批是 +185/−25＝净 +160**：若"60 行停手线"按整批读，本批早已越线，而实现件只给了单枚洞那个口径、没把工作树口径的那一枚摊出来 ⇒ 这条属**未定义即停**的适用域问题，见 §11 的 F-R5-2（要编排者定口径，不是实现程的错，也不是它有权自己定的） |
+| ⓑ | 简报"②③ 那样写钉不住 M14 那一形；标签式 M14 会得 4 枚红、其中 3 枚与 F-R4-1 无关" | **成立** | G03/G04 现量 TOPFAIL=4，逐枚比红因文本：只有 `:1531` 那枚带 `(F-R4-1)`；另三枚（`:1244`/`:1285`/`:1301`）是静态尺读到 case 列表里的名字。用运行期拼名那一形（G01/A02/A03）→ **恰 1 枚红** |
+| ⓒ | 简报"证人 或 逐因子记账"是等价选项 | **不成立（实现件对）** | §3 全表：证人那一支单独存在时三发协同删全绿（WO-B01/02/03），加上写死的数才红（A-B06/07/08），且单点回退那一处 `if` 即复活（E03）⇒ 两枚选项**不等价**，简报该改口径 |
+| ⓓ | 实现件 §1.1 理由 1："砍掉 `panel.attachment.add`／`panel.message.send` 会悄悄磨钝锚点已有的正控" | **半对——本程把它换成一条更强的依据** | 那两枚若从正控里去掉，"守卫**少答**一枚声明路由"这一形**不会**无人响：F07（两枚形状＋`guard-loses-attachment_add`）仍红 **2 枚**（`TestComposerEnvelopeAcceptsItsFourRequests` @`bridge_test.go:68` ＋ plant B 的 stale-enumeration @`:2053`）⇒ 它说的那半事实被别人兜住了。**真正只有四枚形状兜住的是反向那一发**：守卫**多答**一枚运行期拼出的邻域名 `panel.mode.add`——交付态红（F05），两枚形状全绿（F06）。⇒ 取舍站得住（本程判它应当保留四枚），但**理由要换成 F05/F06 那一发**，否则下游以为"少答路由"只有这一处兜 |
+| ⓔ | 实现件 §5.3"两个数都对，口径不同" | **成立** | §8 三行＋§8.1 的因果实验 |
+| ⓕ | 实现件 §5.5"验收给的修法只到它自己判据的一半" | **成立** | §3（它把 `ddea3c3` 真身留在盘上，本程得以在同一状态重打，这是这条结论能被复查的前提） |
