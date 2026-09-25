@@ -670,5 +670,190 @@ $ git show --stat --format='%h %s' 2fb80c21 | tail -3
 3. **没测 `wisp slo` 那条已经用了整机 Job 的路径在取消语义上是否也有同样的洞**：它不在"任务"里，本票范围外，
    但它是**今天唯一真实存在的"父进程持有子进程"的产品路径**——若有人要写"级联"的回归网，那是唯一有真实对象的样本。
 
+---
+
+## 6　AC#4（门禁）—— 逐包现跑，改前／改后各一次
+
+⚠ 前提读数：**本程零代码改动**（§5.4），所以"改前"与"改后"应当**逐字相同**；本格的用处是把这句话变成可比的两发，
+不是把门禁做轻。改前那发取在进场时（HEAD `64858d6`，本程第一枚 commit 之前），改后那发取在 §5 落盘之后。
+
+### 6.1　`go test ./internal/agent/` 两形四数 ＋ 名册差集
+
+```
+$ go test -v -count=1 ./internal/agent/ > /tmp/ticket138-r1/agent-before.log 2>&1 ; echo rc=$?   # 改前（进场时）
+rc=0
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent	3.193s
+
+$ go test -v -count=2 ./internal/agent/ > /tmp/ticket138-r1/agent-after-c2.log 2>&1 ; echo rc=$?  # 改后（§5 落盘后）
+rc=0
+
+$ for f in agent-before.log agent-after-c2.log; do
+    echo "RUN(all)=$(grep -c '=== RUN' $f)"
+    echo "PASS_top=$(grep -c '^--- PASS' $f)"
+    echo "PASS_all=$(grep -c '^[ \t]*--- PASS' $f)"
+    echo "FAIL_any=$(grep -c -- '--- FAIL' $f)"
+    echo "SKIP_any=$(grep -c -- '--- SKIP' $f)"
+    echo "unique=$(awk '/^=== RUN/{print $3} /^[ \t]*--- (PASS|FAIL|SKIP)/{print $3}' $f | sort -u | wc -l)"
+  done
+改前 ：RUN(all)=76   PASS_top=59   PASS_all=76   FAIL_any=0  SKIP_any=0  unique=76
+改后 ：RUN(all)=152  PASS_top=118  PASS_all=152  FAIL_any=0  SKIP_any=0  unique=76
+```
+
+**四数怎么读（本仓的坑，先说破）**：`PASS_top` 只数顶格的 `--- PASS`（**59 / 118**），
+子用例是缩进的，得用 `PASS_all`（**76 / 152**）才看得全 —— 59 顶格 ＋ 17 缩进 ＝ 76，正好等于 `RUN(all)`。
+本票的"红绿"**只认 `--- FAIL` 那两枚 0**，不认包级 rc 之外的任何"看起来绿"。
+
+**四数之外的三道自核**（本仓的坑：一枚 panic 会吞掉同包其余几十条读数，包级 rc 只说"这一包失败"）：
+
+1. **算术自洽**：`152 = 2 × 76`、`118 = 2 × 59` ⇒ 没有"跑第二遍时少跑了几枚"的缓存假绿。
+2. **名册差集（两向 `comm`）**：把两发日志各自抽成唯一名册（`awk '/^=== RUN/{print $3} /^[[:space:]]*--- (PASS|FAIL|SKIP)/{print $3}' | sort -u`），
+   两发各自 **76 枚**，`comm -23` 与 `comm -13` **两侧皆空** ⇒ 改前改后**同一份名册**。
+3. **同包内"开跑 vs 出裁决"等集**：`comm -3 <(=== RUN 唯一名) <(--- PASS|FAIL|SKIP 唯一名)` ⇒ **空**，
+   且两份日志 `grep -c 'panic:'` 都是 **0** ⇒ 没有任何一条用例"开跑了没回来"。
+
+### 6.2　`go vet`（宿主原生）
+
+```
+$ go vet ./internal/agent/
+rc=0
+$ go vet ./internal/proc/ ./internal/tools/
+rc=0
+```
+
+### 6.3　`gofmt -l` / `gofumpt -l`：一枚现形，落在**别人在飞的那棵**
+
+```
+$ D:/work/base/gopath/bin/gofumpt.exe -l . tools/d22scan tools/mockllm      # v0.12.0 (go1.27.1)
+cmd\wisp\slo_report_144_windows_test.go
+
+$ gofmt -l . tools/d22scan tools/mockllm
+cmd\wisp\slo_report_144_windows_test.go
+
+$ git show HEAD:cmd/wisp/slo_report_144_windows_test.go > /tmp/ticket138-r1/slo144_head.go
+$ D:/work/base/gopath/bin/gofumpt.exe -l /tmp/ticket138-r1/slo144_head.go
+（空）
+```
+
+⇒ 唯一那枚不合规的是 **`cmd/wisp/slo_report_144_windows_test.go`**，它就是 §5.4 里那两枚脏文件之一
+（`git status` 显 ` M`）＝**同时在跑的票 149 的工作树中间态**。HEAD 里那一版是干净的（第三发空输出）。
+本程**未碰、未格式化、未 add**：那是别人的落点，简报点名"你不要碰那棵"。
+
+### 6.4　`sh scripts/d22scan.sh`
+
+```
+$ sh scripts/d22scan.sh ; echo rc=$?
+rc=0
+d22scan: examined 228 production Go files under internal/ and cmd/
+d22scan: scope bans #1-5 internal/      examined 205 production Go files
+d22scan: scope bans #1-5 cmd/           examined  23 production Go files
+d22scan: scope ban #6 frontend/         examined  66 text files
+d22scan: scope ban #7 internal/tools/   examined  18 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined  66 text files
+d22scan: scope ban #8 internal/         examined 412 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined  43 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations
+```
+
+⇒ `rc=0`，**八个作用域分母全非零**（205／23／66／18／39／66／412／43）。
+
+⚠ **这发读数里有一处会把人骗了，本程差点上**：同一份日志里还有一段**缩进 8 空格**的
+`d22scan: scope bans #1-5 internal/ examined 14 …` ／ `ban #8 design/ examined 1` —— 那**不是主扫描**，
+是脚本顺带跑的 `tools/d22scan` 自测在**临时夹具树**里打的数（`grep -n 'scope ban #8 design' d22scan.log`
+的 148–214 行全在测试输出里，主扫描从不缩进、落在 228 行之后）。
+判"各作用域 `examined N` 非零"时**只认顶格那组**；把夹具的 `14/1/1` 当全树分母，就会把"扫了 205 枚"读成"扫了 14 枚"，
+反过来若哪天夹具树缺项，`0 枚干净`又会像"什么都没扫"。
+另：`ban #8 design/=39`、`ban #8 frontend/=66` 这两枚分母**随工作树走**（owner 挪动 `design/**`、
+另一会话在写 `frontend/**`），不在本程控制内，本程一枚未碰。
+
+### 6.5　分树构建（绕开别人在飞的那一枚文件）
+
+```
+$ go build ./internal/... ; echo rc=$?   → rc=0
+$ go build ./tools/...    ; echo rc=$?   → rc=0
+$ go build ./cmd/...      ; echo rc=$?   → rc=0
+$ go build ./scripts/...                 → "go: warning: \"./scripts/...\" matched no packages" rc=0
+```
+
+另两发（一枚在**仓外精确快照**里跑，一枚交叉到 Linux）：
+
+```
+$ mkdir -p /tmp/ticket138-snap1 && git archive HEAD | tar -x -C /tmp/ticket138-snap1
+$ cd /tmp/ticket138-snap1 && go build ./... ; echo rc=$?
+rc=0
+
+$ cd /tmp/ticket138-snap1 && GOOS=linux go build ./... ; echo rc=$?
+package github.com/CarlosShao/wisp/cmd/wisp
+	imports github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx
+	imports github.com/k2-fsa/sherpa-onnx-go-linux: build constraints exclude all Go files in ...\sherpa-onnx-go-linux@v1.13.8
+rc=1
+```
+
+⇒ 本程交付那版（HEAD，含本件五枚 commit）在**干净树**里 `go build ./...` **rc=0**。
+交叉到 Linux 的那发 **rc=1 且只报在 `cmd/wisp` 的 sherpa 构建约束**——这正是票面 AC#4 那条 ⚠ 的形状
+（"Linux 交叉 vet 对 `cmd/wisp` 与 `cmd/balldebug` 本来就 rc=1，与被审对象无关"）。
+⚠ 但**别把它读成 CI 那一发的成因**：本机交叉构是 `CGO_ENABLED=0`，`ubuntu-latest` 真机不一定同形，这条只复现"形状"不复现"那一发"。
+
+### 6.6　CI 现量（`gh`，只读）—— 编排者简报里那两句话，一句对不上
+
+简报说"CI 那两枚红成因是别人的代码、`go build ./...` rc≠0"。本程现量锚点那一 run：
+
+```
+$ gh run view 36149256584 -R CarlosShao/wisp --json headSha,conclusion -q '.headSha, .conclusion'
+64858d6838ced46fbe7bcce38dc4f7bb163d2f9c
+failure
+
+$ gh run view 36149256584 -R CarlosShao/wisp --json jobs \
+    -q '.jobs[] | .name + " => " + .conclusion + " | " + ([.steps[] | select(.conclusion=="failure") | .name] | join(", "))'
+lint         => failure | staticcheck
+slo-full     => success |
+test-core    => failure | Portable package tests (core scope; ...)
+test-windows => failure | cmd/wisp CLI tests (needs the sherpa DLLs staged above, ticket 111 AC#4), Portable windows tests (proc/secret/config/risk/ball/perm/plugin/llmrecord)
+lint-frontend=> success |
+slo-smoke    => success |
+
+$ gh run view 36149256584 -R CarlosShao/wisp --json jobs \
+    -q '.jobs[] | .name as $j | .steps[] | select(.name | test("Build all")) | $j + " | " + .name + " => " + .conclusion'
+（空输出：这份 workflow 里没有名为 "Build all packages" 的步骤）
+
+$ grep -n 'name:' .github/workflows/ci.yml | grep -i build
+395:      - name: "cgo build smoke (build.ps1 fetch-deps + mingw link + doctor)"
+496:      - name: Build wisp.exe
+559:      - name: Build wisp.exe (deps cached on the runner)
+```
+
+**读数**：
+
+| 简报的说法 | 现量 | 判定 |
+|---|---|---|
+| "CI 那两枚红" | 锚点 `64858d6` 那一 run 就是 `failure`，红在 **3 枚 job／4 枚步骤**：`lint/staticcheck`、`test-core/Portable package tests`、`test-windows/cmd/wisp CLI tests` ＋ `test-windows/Portable windows tests` | **成立（且更早）**：本程进场前就已红 |
+| "成因是 `go build ./...` rc≠0" | 这份 workflow **没有** `go build ./...` 那一步（三枚带 build 字样的步骤是 `cgo build smoke`／`Build wisp.exe`×2，且所在 job 全绿）；本程干净树 `go build ./...` **rc=0** | **对不上**——红的那四枚步骤里没有一枚是"构整树" |
+| "gofmt／go vet／d22scan 三步在 CI 是绿的" | 该 run 的 `lint` 步骤结论：`gofmt (gofumpt) => success`、`go vet (module) => success`、`go vet (tools/d22scan module) => success`、`D22 seven-ban + emoji scan => success`、`staticcheck => failure` | **成立**；另报一枚简报没点的：**`staticcheck` 在锚点就是红的** |
+
+⇒ 本程**不改任何一枚红为绿**（零代码改动），也**没有让任何一枚绿变红**。
+上面那三处对不上的地方按简报第 0 条"冲突时报回"处理，本程只是登记，不去"顺手修 CI"。
+
+### 6.7　放水两问自答
+
+- **断言方向动没动**：没动——本格一条断言都没写、没改、没删；`-count=1` 与 `-count=2` 用的是**同一条命令**，只是次数不同。
+- **helper 是不是原有的那枚**：是，且本程没新增任何 helper。名册差集那三发是**临时件**（仓外 `/tmp/ticket138-r1/`），
+  不落进仓、不进 CI。
+- 第三条自答（本格最容易骗自己的地方）：**"rc=0" 不等于"绿"**。`gofumpt -l` 列出了一枚文件仍返回 rc=0，
+  所以 §6.3 判的是**列表是否为空**，不是 rc；`go build ./scripts/...` 的 rc=0 配的是"匹配零枚包"的警告，
+  那一发**没有证明任何构建**。两处都在正文里点破了，不留"看着像绿"的读法。
+
+### 6.8　本格没测什么
+
+1. **没在 Docker/linux 容器里跑 `*_other_test.go` 那族**（简报点名的"Windows 上没有分母"那一族）。
+   本程零代码改动，那族用例的**输入没变**，所以本程没为它们取数——但这**不等于**它们此刻是绿的。
+   复核命令在 `internal/proc/crossvet_test.go:52` 之外，真要在 linux 上量得 `docker`＋`golang:1.27`（本机可用），本程没跑。
+2. **没跑 `-race`**。本仓 CI 用 `TestRaceDetectorClean` 自己 `go test -race` 起子进程；本程没跑那一条整链。
+3. **`cmd/wisp` 的读数不是终态**：那两枚脏文件属于在飞的票 149，§6.3 的 `gofumpt` 命中与 §6.5 之外任何
+   `cmd/wisp` 相关读数都会随它移动。别把本件的 §6 当成对 `cmd/wisp` 的判断。
+4. **没读 CI 的日志原文**（只读了 `gh run view --json` 的步骤级结论）。`staticcheck` 红在哪一行、
+   `portable-tests.sh` 红在哪一枚用例，本程**没有**取——那是编排者或另派程的活，本程只负责说清"不是我推红的"。
+
+
 
 
