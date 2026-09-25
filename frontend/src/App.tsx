@@ -110,7 +110,13 @@ export default function App({
       ) : (
         <UnfedScreen id={view} />
       )}
-      <Composer state={composer} />
+      {/* The composer row is the demo's bottom-docked bar: mt-auto pins it to
+          the window floor while the content is shorter than one screen and
+          lets it scroll normally once the stream outgrows the viewport
+          (panel-skeleton's main is a flex column for exactly this). */}
+      <div className="mt-auto">
+        <Composer state={composer} />
+      </div>
     </PanelSkeleton>
   );
 }

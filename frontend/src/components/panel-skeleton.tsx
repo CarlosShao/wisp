@@ -119,7 +119,7 @@ export function PanelSkeleton({
             （rbScreenIn）随之重放。滚动条照 demo .content-area：6px、圆头、
             border 色拇指、悬停加深（styles.css:229-235）。 */}
         <main
-          className="screen-enter min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-7 pb-8 pt-6 [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb:hover]:bg-muted-foreground [&::-webkit-scrollbar-track]:bg-transparent"
+          className="screen-enter flex min-h-full min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto px-7 pb-8 pt-6 [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb:hover]:bg-muted-foreground [&::-webkit-scrollbar-track]:bg-transparent"
           key={active}
         >
           {children}
