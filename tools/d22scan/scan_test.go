@@ -1853,6 +1853,17 @@ func TestIndexChangingBetweenTheTwoGitReadsAppliesNoRules(t *testing.T) {
 		t.Errorf("the quiescent scan must skip what it has always skipped and say only that, got %q", qn)
 	}
 
+	// 5a. PRODUCTION'S OWN DOOR on the now-quiescent tree: runGitIndex is what every
+	//     real scan calls, and its answer here must be the assembled, trusted one -
+	//     the leg that keeps this ticket from being true only of the function the
+	//     test calls directly.
+	if ix := runGitIndex(root); !ix.ok {
+		t.Errorf("runGitIndex refused a quiescent index (%q) - every scan of a normal tree would now lose its ignore filter", ix.why)
+	} else if !ix.holds(stray, false) || !ix.holds("frontend/dist/assets", true) {
+		t.Errorf("runGitIndex assembled an index that misses the delivered path or its directory (file=%v dir=%v)",
+			ix.holds(stray, false), ix.holds("frontend/dist/assets", true))
+	}
+
 	// 5b. THE SEAM IS NOT DECORATIVE: handing the same walks a fresh matcher must
 	//     read the tree the way production does, so block 5's delta measures the
 	//     torn index and not a door that ignores what is behind it.
