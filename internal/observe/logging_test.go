@@ -187,19 +187,37 @@ func TestRollingWriterDayRoll(t *testing.T) {
 
 func TestRollingWriterRetentionSweep(t *testing.T) {
 	dir := t.TempDir()
-	old := filepath.Join(dir, logFilePrefix+"20260101-001"+logFileExt)
+	// Both fixture days are DERIVED from one injected instant, never written as
+	// a wall-clock-adjacent literal. A literal ages out of the 7-day window and
+	// says nothing while it does: this case hardcoded its "fresh" file as
+	// 20260918 and flipped at 2026-09-25 00:00 UTC, deterministically red on
+	// every machine and every runner afterwards
+	// (docs/reports/pending-and-issues.md A212 ③). TestRollingWriterDayRoll had
+	// the same disease earlier, which is the only reason newRollingWriterClock
+	// (logging.go:181) takes a clock at all. fixedNow is an arbitrary pinned
+	// instant; nothing on this path may consult the real wall clock.
+	fixedNow := time.Date(2026, 9, 18, 12, 0, 0, 0, time.UTC)
+	// The window is 7 days, so the two fixtures sit 5 days clear of the edge on
+	// their own sides (cutoff = fixedNow-7d = 2026-09-11 12:00 UTC). Do not
+	// tighten these offsets toward 7: the margins are what keep both halves of
+	// the assertion true regardless of where the real clock has walked to.
+	oldDay := fixedNow.Add(-12 * 24 * time.Hour) // outside: must be pruned
+	old := filepath.Join(dir, logFilePrefix+oldDay.Format(logDayLayout)+"-001"+logFileExt)
 	if err := os.WriteFile(old, []byte("stale\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	past := time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)
-	if err := os.Chtimes(old, past, past); err != nil {
+	// The mtime agrees with the name: sweepLocked parses the day from the name
+	// and falls back to mtime only when that fails, so a fixture that
+	// contradicts itself pins neither signal.
+	if err := os.Chtimes(old, oldDay, oldDay); err != nil {
 		t.Fatal(err)
 	}
-	fresh := filepath.Join(dir, logFilePrefix+"20260918-001"+logFileExt)
+	freshDay := fixedNow.Add(-2 * 24 * time.Hour) // inside: must survive
+	fresh := filepath.Join(dir, logFilePrefix+freshDay.Format(logDayLayout)+"-001"+logFileExt)
 	if err := os.WriteFile(fresh, []byte("keep\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	w, err := newRollingWriter(dir, 0, 7)
+	w, err := newRollingWriterClock(dir, 0, 7, func() time.Time { return fixedNow })
 	if err != nil {
 		t.Fatal(err)
 	}
