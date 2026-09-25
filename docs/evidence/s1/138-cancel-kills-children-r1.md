@@ -71,7 +71,8 @@ $ git status --porcelain
 ?? design/old/
 ```
 
-**读数**：HEAD **就是**简报给的 `64858d6`，分支 `dev`，没有别人的 commit 插进来。
+**读数**：HEAD **就是**简报给的 `64858d6`，分支 `dev`，没有别人的 commit 插进来（这一发取于 22:5x）。
+⚠ 本程在场期间 HEAD 于 22:57:52 被编排者推走**一次**（纯台账一枚），逐名与时间戳在 §5.5。
 工作树脏在 `design/**`（owner 自己挪动的 16 枚删除）、`frontend/**`＋`docs/reports/frontend-session-log-zcode.md`
 （另一枚前端会话在写）、`.zcodeignore`（未跟踪）——**本程一枚未碰**；`cmd/wisp/**` 归同时在跑的票 149，本程未写一枚。
 
@@ -652,8 +653,23 @@ $ git show --stat --format='%h %s' 2fb80c21 | tail -3
  1 file changed, 16 insertions(+)
 ```
 
-⇒ 编排者那枚台账 commit（`2fb80c21`，A266）在本程第 1、2 格之间落进来，**只动 `docs/reports/pending-and-issues.md` 一枚文件**。
-本件的读数全部在 `64858d6` 之后取得，与那枚漂移无冲突；本程未 rebase、未 cherry-pick、未碰它那一行。
+⇒ 编排者那枚台账 commit（`2fb80c21`，A266）**只动 `docs/reports/pending-and-issues.md` 一枚文件**，
+且它是本程第一枚 commit 的**直接父**——现量它落在什么时候：
+
+```
+$ git rev-parse --short c9237a9^
+2fb80c21
+
+$ git log --format='%h %ci %s' -1 2fb80c2 ; git log --format='%h %ci %s' -1 c9237a9
+2fb80c21 2026-09-25 22:57:52 +0800 docs(台账 A266): 第二推逐名比红名集合又是零变化；slo-full 连拒两次，而我那句"这次真跑完了"是推断错、当面收回
+c9237a93 2026-09-25 23:01:38 +0800 evidence(138 AC#1① 第 1 格): JobScope 创建点数与调用者现量——生产 1 枚整机、调用者 3 处两个用途，票面 §0 那半截断言落成读数
+```
+
+⇒ 漂移发生在**本程进场读锚点（`git rev-parse HEAD` ＝ `64858d6`，22:5x）与第 1 格 commit（23:01:38）之间**，
+不是"第 1、2 格之间"（本程先前的口误，就地改在这里，不抹那一格正文）。
+本件 §1 起的读数全部取自 `2fb80c21` 之后的工作树，与那枚纯台账 commit 无冲突；
+本程未 rebase、未 cherry-pick、未碰它那一行。（上面那发 `git log --oneline 64858d6..HEAD` 取于第 5 格落盘时，
+本件还会再长两枚 commit，见 §9 的终态读数。）
 
 ### 5.6　放水两问自答
 
