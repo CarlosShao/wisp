@@ -843,6 +843,21 @@ Q2 的纯函数约束落成判据：`nav-rail.tsx` / `panel-views.ts` / `App.tsx
 今天**完全惰性**（无宿主这里抛、有宿主那边拒），删掉它是 `panel.ts` 一个函数 ＋ `App` 一处调用。
 `source` 覆盖成 `panel-view` 是因为封套默认 `"panel-composer"` 是一句"谁在说话"的取证断言（D31）。
 **要不要真给它路由，是他那边的字。**
+> **`>` 更正（同日 13:1x；编排者 13:0x 第【2】条给读数，我在盘上逐枚复量过）**：上面那句
+> **"完全惰性"是错的，收回**。它不惰性——它每推一次撞**两道 Go 门**：
+> `TestTheRendererHoldsExactlyOneDoorToTheHost`（`internal/panel/composer_test.go:502`）与
+> `TestPlantedRendererDoorShapesGoRed`（`:533`），红句 `:522`
+> `the renderer names a route the Go side does not answer:` ＋ `:524` 那句
+> `5 panel.* route literals` 对上 `bridge.go:35-38` 的 4 枚。命中的字节就是我写的 `panel.ts:252`。
+> 两枚定义、两条红句、白名单枚数我都自己读了原文（`sed -n '520,526p'`、`sed -n '34,39p'`）。
+> ⇒ 连带一处判断作废：编排者 12:5x 的"丙＝零成本零行为变化"，他 13:0x 自己收回了——**而错因在我
+> 这条自陈**：我把"Go 不会因此换屏"讲成了"没有后果"，他就着我这句把它记成免费。
+> **那道门存在的目的正是拦"网页对 Go 说了一句 Go 不认识的话"，它响了是在干活，不是它坏了。**
+> 所以正确处置既不是灭灯，也不是我悄悄把名字删掉（那等于把 FAIL 洗成没写过），而是摆到有权定
+> C17 白名单的人面前。owner 回话前：**不删、不扩、不动 Go 侧**。
+> ⚠ 一笔该被看见的代价：`ci` 的 run 级结论从"failure 但与我无关"变成**"failure 里有我两枚"**
+> （`lint-frontend` 那枚 job 仍 8 步全绿）。本项目有过教训——门禁连红会让人对新真伤失去信号量，
+> 所以这笔按"每次推送两枚具名红"记，不按"反正整条都在红"糊过去。
 
 ### 46.4 变异自证 9 发，8 发有牙；V8 我**不硬造**
 
