@@ -619,3 +619,17 @@ git log --format="%h %s" --name-status --diff-filter=A cb60b94..a5e1c8c -- cmd/
 
 顺带替它说句公道话：这一程有两次**主动报了自己不利的读数**（跑错顺序把一发读数废掉、
 "三枚"改成"四枚"），这两处我都复算过、都是真的，而且都往不利于自己的方向改。这类行为在这份工作上比结论值钱。
+
+### §10.1 交件时的 git 自证（共享树，逐枚现量，不按"我带了 pathspec"免责）
+
+```
+本程那十枚 commit 逐枚 git show --name-only：
+  5b4352f / a6eb92e / 243e423 / b777f9b / 01d5adf / f280c18 / 9a90e2a / 0e17914 / d59d99a / 70bebf7
+  -> 每一枚的路径集合都只有 docs/evidence/s1/panel-l2-grant-nail-fix-r3-accept-r1.md（一字同）
+commit 前现核 git diff --cached --name-only：十次皆只有那一枚路径，无别家路径
+区间内混进过别人两枚（43e5bc0、9657b67，落点是 docs/reports/frontend-session-*.md 与 frontend-watchdog.md）
+  ⇒ 用 <range> --name-only 看会误报成"我带了别家路径"，所以这条自证必须**逐枚**跑，不能跑区间
+git diff --numstat 5b4352f^ HEAD -- internal/ cmd/ frontend/ design/ tools/ docs/PLAN.md docs/specs/ \
+    docs/reports/pending-and-issues.md .scratch/   -> **空**（本程未落任何一枚代码或台账）
+git status --porcelain -- internal/panel/          -> 空（每发变异之后复算，最后一次取于 70bebf7 之前）
+```
