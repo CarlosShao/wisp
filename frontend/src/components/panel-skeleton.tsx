@@ -1,57 +1,57 @@
 /* ============================================================================
-   Panel skeleton (ticket 77) - the frame R19 scoped the first version to:
-   a glass shell on C21's ambient background, four tabs (command / result /
-   history / settings) and the slot the L2 card occupies above them.
+   Panel skeleton (ticket 77; navigation re-cut for Q1 = 甲 on 2026-09-25)
+   ----------------------------------------------------------------------------
+   The frame R19 scoped the first version to: a glass shell on C21's ambient
+   background, the slot the L2 card occupies, and - since Q1 - a vertical icon
+   rail down the LEFT edge instead of four text tabs across the top.
 
-   It is a layout, not a router: which tab shows what is decided by the
-   snapshot the Go side pushes, so a reload loses nothing (PLAN.md:1044).
-   The full-screen WebGL ambience R19 lists for phase two is deliberately
-   absent - the CSS radial-gradient ambient below is C21's own four lights,
-   which cost no frame loop at all.
+   The old header tabs (PANEL_TABS: 命令 / 结果 / 历史 / 配置) were 乙, the branch
+   owner deprecated: text labels, no icons, and only four of the nine screens
+   the demo has. They are gone rather than kept alongside, because two ways of
+   changing screen in one panel is two answers to "which screen is this".
+
+   It is still a layout, not a router: which view shows is decided by the
+   snapshot the Go side pushes (Q2: no component holds it), so a reload loses
+   nothing (PLAN.md:1044). The full-screen WebGL ambience R19 lists for phase
+   two is deliberately absent - the CSS radial-gradient ambient is C21's own
+   four lights, which cost no frame loop at all.
    ============================================================================ */
 
+import { NavRail, railTitle } from "@/components/nav-rail";
 import { Shimmer } from "@/components/ai-native/shimmer";
+import type { PanelViewId } from "@/lib/panel-views";
 import type { ReactNode } from "react";
-
-export const PANEL_TABS = ["命令", "结果", "历史", "配置"] as const;
-export type PanelTab = (typeof PANEL_TABS)[number];
 
 export function PanelSkeleton({
   active,
   children,
+  onSelectView,
+  pendingCount,
   waitingLabel,
 }: {
-  active: PanelTab;
+  active: PanelViewId;
   children: ReactNode;
+  onSelectView: (id: PanelViewId) => void;
+  pendingCount?: number;
   waitingLabel?: string;
 }) {
   return (
     <div className="wisp-shell flex min-h-screen w-full items-start justify-center p-4">
       <div
-        className="glass-raised flex w-full max-w-[var(--panel-w)] flex-col overflow-hidden rounded-xl border-0"
+        className="glass-raised flex w-full max-w-[var(--panel-w)] overflow-hidden rounded-xl border-0"
         style={{ animation: "fade-up 350ms cubic-bezier(0.23,1,0.32,1) both" }}
       >
-        <header className="flex items-center gap-3 border-b border-line px-4 py-2.5">
-          <span className="text-[12.5px] font-medium text-ink">Wisp</span>
-          <nav className="flex items-center gap-1" aria-label="面板分区">
-            {PANEL_TABS.map((tab) => (
-              <span
-                aria-current={tab === active ? "page" : undefined}
-                className={
-                  "rounded-chip px-2 py-0.5 text-[11.5px] " +
-                  (tab === active ? "bg-overlay text-ink" : "text-ink-3")
-                }
-                key={tab}
-              >
-                {tab}
-              </span>
-            ))}
-          </nav>
-          {waitingLabel && (
-            <Shimmer className="ml-auto text-[11.5px]">{waitingLabel}</Shimmer>
-          )}
-        </header>
-        <main className="flex flex-col gap-3 p-4">{children}</main>
+        <NavRail active={active} onSelect={onSelectView} pendingCount={pendingCount} />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <header className="flex items-center gap-3 border-b border-line px-4 py-2.5">
+            <span className="text-[12.5px] font-medium text-ink">Wisp</span>
+            <span className="text-[11.5px] text-ink-3">{railTitle(active)}</span>
+            {waitingLabel && (
+              <Shimmer className="ml-auto text-[11.5px]">{waitingLabel}</Shimmer>
+            )}
+          </header>
+          <main className="flex flex-col gap-3 p-4">{children}</main>
+        </div>
       </div>
     </div>
   );
