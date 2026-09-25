@@ -195,3 +195,97 @@ d88c356 版钉 = dc4e0ccf…                          distinct = 90   ← 同一
 最硬的一枚证据不是"红了多少"，是 **M3**：它的名字 `panel.review.allow`
 **从来没有以一枚 route-shaped 字面量的形式写进包里**（`"panel.review."` 尾段为空、`"allow"` 只有一段），
 所以 (b) 的池看不见它 —— 红它的是 (a) 自己。⇒ (a) 不是 (b) 的影子（见 §2）。
+
+## §2 反向对照（那枚死掉的程唯一没做完的一格，本程自建）
+
+### §2.1 怎么"摘掉一味"
+
+`denail.py` 对**钉文件本身**做单点摘除（每处摘除都断言锚点、产出零变化就拒绝报告），
+`mutate.py` 对副本的 `bridge.go` 种种子，两向都还完当场复算 hash。摘除口径：
+
+| 摘除 | 具体动作 | 是不是"只动这一味" |
+|---|---|---|
+| `noA` (a) | 删 `instrumentBlindnessProblem` 里 `if len(pkg.dropped) > 0 {…}` 那一支 | 是，−5 行 |
+| `noB` (b) | 删 facet 1 里从 `pool := routeNamePool(pkg)` 到 `answeredOutsidePool` 整块 | 是，−15 行（`routeNamePool`/`poolJudgedByRealGuard` 函数体留着，facet 4 的植物 F 仍走它们） |
+| `noC` (c) 局部 | `inboundEnvelopes` 的种子退回"绑 `method` 键"，并删两枚 decode 引信 | 半摘：`classifyDecodes` 仍在填 `pkg.inboundSeeds` |
+| **`noC_full` (c) 整味** | 上面那些 **+** `pkg.inboundSeeds[d.TypeName] = true` 停填 | **是**——(c′) 那枚防腐引信读的就是 (c) 喂的数据 |
+| `noCp_rule` (c′) 规矩 | `jsonOr` 退回 `if tagged { return jsonName }`；反射侧 `if tag == "-"` 整枚比法退回 | 是 |
+| `noCp_test` (c′) 测试 | 整枚 `TestJSONKeyDerivationAgreesWithEncodingJSON`（含 `:1444` 防腐 `t.Fatalf`）删掉 | 是，−113 行 |
+| `noABCp` | 四味全摘 | 用来验"我能不能回到 r1 那发零反应" |
+
+**先给两枚台件自己的失败读数**（不藏）：
+① `noCp_test` 第一版我拿 `"// TestJSONKeyDerivationAgreesWithEncodingJSON"` 当起点，命中了
+`:1303` 那枚**别的**注释（`inboundTypeRegistry` 的文档注释也点名它），切错了边界 ⇒ 四发全是
+`builderr=1 nail_red=0`。**如果我按"零枚红"读数，就会把"我把包切坏了"报成"这味是镜子"。**
+② `mutate2.py` 的 MEXT 那发我留了个 `assert "acceptMEXTDecision"`（函数后来改名 `acceptMEXTDelay`），
+它**在写文件之前**抛异常，于是那一行 `MEXT` 的读数其实是 MDEC 的重播。两处都由**后验断言**
+（`builderr` / `assert` 在写盘前）当场抓住，重跑后的数在下面。
+
+### §2.2 摘一味 → 哪一发种子不再红（`-count=1 -v`，锚点 `0b95e9e`，原文 `out/rc-*.txt`、`out/full-noC-*.txt`）
+
+`nail_red` = 本件 6 枚顶层测试里红的枚数（C21 已排除）；"只剩植物"= 只有
+`TestPlantedGrantWiringGoesRedInASnapshot`（它测的是快照树，不是真树）红 ⇒ **真树全绿**。
+
+| 摘除 | CLEAN | M2 | M3 | M4 | M6 | M7 | M8 | M13 |
+|---|---|---|---|---|---|---|---|---|
+| **无（交付态）** | 0 | 4 | 4 | 2 | 3 | 3 | 4 | **4** |
+| `noA` (a) | 只剩植物 E | 2 | **只剩植物** | 2 | 3 | 3 | 4 | 4 |
+| `noB` (b) | 0 | 4 | 4 | **只剩植物** | 3 | 3 | 4 | 3 |
+| `noC` (c) 局部 | 只剩植物 G | 4 | 4 | 2 | 2 | 3 | 4 | 3 |
+| **`noC_full` (c) 整味** | 只剩植物 G | — | — | — | **只剩植物** | 2 | 4 | 2 |
+| `noCp_rule` (c′)规矩 | 3 | — | — | — | 3 | **2（ban 那枚绿）** | 4 | 4 |
+| `noCp_test` (c′)测试 | 0 | — | — | — | 2 | 2 | 3 | 3 |
+| `noCp_both` (c′)全摘 | 只剩植物 H | — | — | — | — | **只剩植物** | 3 | 3 |
+| **`noABCp` 四味全摘** | — | **只剩植物** | — | **只剩植物** | **只剩植物** | — | — | **只剩植物** |
+
+### §2.3 逐味判（本仓那句定义 + 那句"公式会骗人"的补语）
+
+> 定义：摘掉任意一味，都存在一发变异从此打不红 ⇒ 那味承重。反面：摘掉它在**任何输入上**都不改变任何
+> 可观察读数 ⇒ 那是镜子，要说破，不许它当钉交付。
+> 补语（兄弟程刚立的）：公式可能给误导答案——还要问"摘掉它到底有没有任何**外部可见**读数变过"。
+
+- **(a) 承重，且是 M3 的唯一目击者。** `noA` 下 M3 真树全绿（只剩植物 E），
+  而 M3 的名字 `panel.review.allow` **从未以 route-shaped 字面量写进包里**（`"panel.review."` 尾段为空、
+  `"allow"` 只有一段）⇒ (b) 的池结构上看不见它。M2 在 `noA` 下仍被 (b) 咬住 ⇒ (a)(b) 对 M2 冗余、
+  对 M3 不冗余。**不是镜子**：摘掉它有一发真树变异由红转绿。
+- **(b) 承重，且是 M4 的唯一目击者。** `noB` 下 M4 真树全绿；M13 在 `noB` 下仍红（(c) 兜住封套半），
+  但 `:1179`/`:1182` 那两句路由侧的红**只有 (b) 会报**。⇒ 对 M13 两味各够；这不是缺陷，是要写清的冗余。
+- **(c) 承重——但只有在"整味摘"时才看得见。** `noC`（局部摘）下 M6 仍红，因为 (c′) 的防腐引信
+  `:1444` 读的是 (c) 喂的 `pkg.inboundSeeds`；把那味数据也停填（`noC_full`），**M6 真树全绿**。
+  ⇒ 结论要带这句：**"摘掉 (c) 还有人兜"是一个半摘伪象**，两味之间有单向依赖（(c′) 的引信靠 (c) 的数据活着），
+  记进 §7 的缺陷面：将来有人只删 (c) 的判据而留着 `classifyDecodes`，会以为"没人管也不碍事"。
+  另一发同向证据：按 `:1444` 那句话**把新类型注册进去**之后（`REG+`），摘掉 (c) 仍只剩
+  `TestNoInboundEnvelope` 一枚由绿转红↔红转绿之差（`REG+NONE|M6`＝3 枚红含 ban 那枚，
+  `REG+noC|M6`＝2 枚红不含 ban 那枚）⇒ (c) 的红不是靠"你忘了注册"这一脚。
+- **(c′) 承重，但两半互相顶班；且它的"M8 那一半"是白盒。**
+  `noCp_both` 下 M7 真树全绿 ⇒ 整味承重。`noCp_rule` 下 **M7 的 ban 断言（`TestNoInboundEnvelope`）转绿**、
+  只剩那枚三向测试红 ⇒ "AST 算对键名"是 (c′) 规矩半的行为后果，量出来了。
+  `noCp_test` 下**没有任何一发**转绿、CLEAN 也全绿 ⇒ **那枚新测试自己不拦任何今天的变异**：
+  它拦的是"jsonOr 以后再被改坏"（`noCp_rule|CLEAN` 三枚红就是它在工作）与"新增入站类型不许悄悄不进反射对照"。
+  ⇒ 判：**测试半 = 承重但白盒（instrument-integrity，不是 ban-catching）**，措辞只许这么写；
+  它**不是镜子**，因为我量到了它的触发输入（摘规矩 ⇒ 它响）。而 **M8 这一发**：摘掉 (c′) 规矩后包体颜色不变
+  （反射半一直红）⇒ (c′) 对 M8 买的是"**两台仪器不再分家**"（红句从只有 `:1218` 变成 `:1218`＋
+  `bridge.go:70` 那条带行号的 AST 诊断），**不是新增一次拦截**。这句必须写在明处，否则 (c′) 就领了它没挣的红。
+- **四味合起来＝r1 那发的完整复现。** `noABCp` 下 M2/M4/M6/M13 全部只剩植物、真树全绿 ⇒
+  这四味**恰好**是闭上 r1 那个洞的东西，一枚不多一枚不少（(d)(e) 是文档，不在这个判据里）。
+
+### §2.4 顺手钉出来的一枚新缺陷（不是我替谁加条件）
+
+`classifyDecodes` 把"解不到同包 struct"一律算 `holes` ⇒ **任何**入站外的合法 decode 都会把
+`requireReadableInstrument` 踩响。我用两发**合法形状**量了代价：
+
+```
+MDEC（`var m map[string]any` + json.Unmarshal，最常见的"先看一眼再说"写法）
+  -> 本件 4 枚红：:1133 / :1235 / :1438 / 快照，全同一句
+     "a JSON decode destination in 1 place(s) cannot be enumerated: bridge.go:123:
+      decodes into &m (type \"map[string]any\"), which is not a same-package struct: ...
+      Judge it in a test that can see that type, or route the bytes through a same-package
+      struct - do not let this file report the boundary clean"
+MEXT（`json.RawMessage`，"把字节留着稍后再解"的正规写法，零新依赖）
+  -> 同样 4 枚红，红句 bridge.go:125 decodes into &d (type "json.RawMessage")
+```
+
+⇒ 方向要说准：这是 **fail-closed（宁可吵也不放行）**，消息自解释、给的出路可执行，
+不是"误伤好人"的那种红；但它意味着 **`internal/panel` 里今天不能出现第二枚 decode**，
+除非它落到同包 struct。这条约束是本批新加上生产码的，**派单与 r1 都没写过它**，
+r2 的文件头 `DOES NOT COVER` 也没写它。⇒ 记为**文档级缺陷**（见 §7 F-R2-1），不改判。
