@@ -580,8 +580,25 @@ type subjectReportRead struct {
 	// read yet, no file yet, a file that would not open - and N >= 0 when one
 	// did. On reportComplete N is the end of the document; on reportUnwritten
 	// the document ran out of input, so N is the last byte that arrived and the
-	// missing part is what follows it; on reportCorrupt it is the decoder's own
-	// answer, which is 0 whenever it could not begin reading a value at all.
+	// missing part is what follows it. On reportCorrupt N is the byte position the
+	// decoder objects AT, counted the way the decoder counts it - the byte it
+	// objects to is included, so a bad byte at index K is named K+1 (see
+	// contradictionOffset). Of the 20 shapes .scratch/wisp/probes/149 hands in, 18
+	// classify as corrupt and none of those 18 produced a name smaller than 1; the
+	// two corrupt legs with no decoder error keep the end of what DID close (a
+	// second value after the first, or a document that parsed cleanly and carries
+	// no state report), and only the first of those prints its position.
+	// What this comment claimed until ticket 149 - that on reportCorrupt the
+	// number "is 0 whenever it could not begin reading a value at all" - was
+	// measured false the same week it was written: 8 of those 18 printed 0, and two
+	// of them had a perfectly good object head behind the 0 (a document whose only
+	// fault is 0xff landing at index 40, and one whose first 500 bytes parse and
+	// whose byte 500 is '@'). It is recorded here rather than deleted quietly,
+	// because the next reader meeting "at offset 0" would otherwise re-derive the
+	// same wrong rule. Case 11
+	// (TestSLO149CorruptSentenceNamesThePositionTheDecoderObjectedAt) is the
+	// instrument that makes the rule above a checkable fact, and case 12 the one
+	// that keeps the fill off the two legs that have no decoder error.
 	// Only the -1 leg is never printed: a note-bearing observation renders its
 	// note instead (see summary).
 	offset int64
@@ -605,6 +622,41 @@ func (o subjectReportRead) summary() string {
 	default:
 		return fmt.Sprintf("%d bytes read, complete document at offset %d", o.bytes, o.offset)
 	}
+}
+
+// contradictionOffset is the position INSIDE THE BYTES that a decoder error
+// names, for a document that contradicts a subject report.
+//
+// Why not dec.InputOffset(), which is what the corrupt leg used to print:
+// measured over the 20 corrupt shapes of .scratch/wisp/probes/149 (see
+// probe-corrupt-census.log there), InputOffset() reports 0 for 8 of them - among
+// them a document whose first 500 bytes parse as a perfectly good object head
+// ('@' written at index 500), one whose only fault is a second comma at index 26,
+// and one whose whole head is the subject's own document until 0xff lands at index
+// 1341. On this leg that 0 is an artefact of how the decoder buffers, not a fact
+// about the file, and it is precisely the number a reader of "at offset 0" takes
+// to mean "nothing arrived" - the same misdirection ticket 147 removed from the
+// unwritten leg.
+//
+// What the decoder's own error names IS a position, and it counts the byte it
+// objected to as consumed: a bad byte at index K is named as K+1 (measured over
+// the same 20 shapes; the smallest name ever produced was 1, for a file whose
+// very first byte is not JSON, and no shape produced 0). *json.SyntaxError covers
+// a head or a byte that cannot be part of the document, *json.UnmarshalTypeError
+// covers a value that closes where a field of another type should be; both name
+// their position. When an error names neither - no shape in that probe reached it,
+// so this fallback leg carries no witness today and ticket 149's acceptance note
+// says so - the position the decoder stopped at is all there is, so it is kept.
+func contradictionOffset(err error, inputOffset int64) int64 {
+	var syn *json.SyntaxError
+	if errors.As(err, &syn) {
+		return syn.Offset
+	}
+	var typ *json.UnmarshalTypeError
+	if errors.As(err, &typ) {
+		return typ.Offset
+	}
+	return inputOffset
 }
 
 // readSubjectReport classifies one read of the subject's report file. It waits
@@ -646,8 +698,10 @@ func readSubjectReport(data []byte) subjectReportRead {
 			obs.offset = int64(obs.bytes)
 			return obs
 		}
-		obs.offset = dec.InputOffset()
 		obs.state = reportCorrupt
+		// The position this sentence prints is the one the decoder objected at,
+		// not the one it buffered up to - see contradictionOffset.
+		obs.offset = contradictionOffset(err, dec.InputOffset())
 		obs.err = fmt.Errorf("%d bytes contradict a subject report at offset %d: %w", obs.bytes, obs.offset, err)
 		return obs
 	}

@@ -29,6 +29,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -513,5 +514,272 @@ func TestSLO147OffsetSemanticsRenderThreeDifferentSentences(t *testing.T) {
 		if pair[0] == pair[1] {
 			t.Errorf("two of the three offset meanings render the same sentence: %q", pair[0])
 		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Ticket 149, cases 11-13. The two outlets ticket 147's ⓐ does not reach: the
+// corrupt leg's own number, and the loop's SECOND call site of summary().
+//
+// Ticket 147's acceptance run (docs/evidence/s1/147-offset-naming-r1-accept-r1.md
+// §3.1) measured three things that are true of the shipped code and of this test
+// file at the same time. Ticket 149 re-measured all three against this commit's
+// PARENT (HEAD 64858d6, code and tests as shipped, nothing of ticket 149's in the
+// tree) before writing a line of what follows, and the raw runs are in
+// .scratch/wisp/probes/149/:
+//
+//   - pre-B14-corrupt-fill-to-zero.log - replacing the corrupt leg's value with a
+//     constant 0 reddens nothing (17 === RUN, 10 top-level PASS, 0 FAIL);
+//   - pre-B15-complete-fill-to-zero.log - the same move on the complete leg
+//     reddens case 10, so the group is not simply deaf;
+//   - pre-B13-exited-drops-summary.log - deleting "last.summary()" from the
+//     s.exited() branch of the retry loop reddens nothing, because before case 13
+//     no test in this package ever reached that branch at all;
+//   - pre-B5-timeout-drops-summary.log - the same deletion on the timeout branch
+//     reddens three, which is what makes the previous line a hole and not a style;
+//   - probe-corrupt-census.log - 8 of 20 corrupt shapes report 0 from
+//     dec.InputOffset() while the decoder had plainly read into the document,
+//     which is the sentence this file's field comment used to claim as a rule.
+//
+// So case 11 pins the corrupt leg's number against byte positions this file
+// states by construction (not numbers read back out of the decoder), case 12
+// pins the two corrupt legs that have no decoder error so the fill cannot be
+// smuggled onto them, and case 13 is the same promise at the second call site.
+// Nothing here touches a budget or a threshold: subjectReportBudget and
+// subjectGrace are not referenced, and the waits handed to the loop are
+// parameters, exactly as in cases 4-10.
+// ---------------------------------------------------------------------------
+
+// slo149ContradictionRe captures the THREE numbers of a corrupt sentence and
+// anchors the sentence from its first byte, so neither half can be dropped and
+// nothing can be appended: "<bytes> bytes read, report corrupt: <bytes> bytes
+// contradict a subject report at offset <position>: <decoder text>".
+var slo149ContradictionRe = regexp.MustCompile(
+	`^([0-9]+) bytes read, report corrupt: ([0-9]+) bytes contradict a subject report at offset ([0-9]+): `)
+
+// slo149ContradictionOf parses those numbers out of a rendered observation. Like
+// slo147PairOf it is a parser with no expectation of its own, so an expectation
+// that fails has somewhere to be wrong; it returns ok=false rather than guessing
+// when the sentence is not the contradiction shape at all.
+func slo149ContradictionOf(sentence string) (read, named, offset int, ok bool) {
+	m := slo149ContradictionRe.FindStringSubmatch(sentence)
+	if m == nil {
+		return 0, 0, 0, false
+	}
+	a, err1 := strconv.Atoi(m[1])
+	b, err2 := strconv.Atoi(m[2])
+	c, err3 := strconv.Atoi(m[3])
+	if err1 != nil || err2 != nil || err3 != nil {
+		return 0, 0, 0, false
+	}
+	return a, b, c, true
+}
+
+// slo149Poke returns a copy of body with the byte at index i replaced, so a
+// corruption can be stated as an index ("the document is the subject's own up to
+// byte 500, and byte 500 is not JSON") instead of as a number copied out of the
+// decoder.
+func slo149Poke(body []byte, i int, b byte) []byte {
+	out := append([]byte(nil), body...)
+	out[i] = b
+	return out
+}
+
+// Case 11 - the corrupt leg names a byte position, and it is the position the
+// decoder objected at. Every want below is stated by how the shape was built:
+// the bad byte sits at index want-1, because the decoder counts the byte it
+// objects to as consumed (measured over 20 shapes in probes/149; the smallest
+// name any of them produced was 1, for a file whose first byte is '<').
+//
+// Before ticket 149's fill, five of these eight printed "at offset 0" and three
+// printed the end of the bytes handed in instead of the position objected to -
+// the red run of this case against the unfilled code is
+// probes/149/newtests-on-unfilled-code.log, and probe-corrupt-census.log reads
+// the same shapes' numbers one by one.
+func TestSLO149CorruptSentenceNamesThePositionTheDecoderObjectedAt(t *testing.T) {
+	doc := slo144Report(t)
+	cases := []struct {
+		name string
+		body []byte
+		want int
+	}{
+		{"second-comma-at-26", []byte(`{"mode":"subject-in-tree",,"pass":true}`), 27},
+		{"html-first-byte", []byte("<html>the runner wrote an error page</html>"), 1},
+		{"0xff-after-key-at-40", append(append([]byte(nil), doc[:40]...), 0xff), 41},
+		{"bad-byte-at-500", slo149Poke(doc, 500, '@'), 501},
+		{"mode-number-at-9", []byte(`{"mode": 123}`), 12},
+		{"array-at-0", []byte(`[1,2,3]`), 1},
+		{"seconds-string-at-49", []byte(`{"mode":"subject-in-tree","seconds":"not a number"}`), 50},
+		{"bad-escape-at-10", []byte(`{"mode":"\q","pass":true}`), 11},
+	}
+	wrong := 0
+	shapeWrong := false
+	first := ""
+	report := func(i int, msg string) {
+		if !shapeWrong {
+			wrong++
+			shapeWrong = true
+		}
+		if first == "" {
+			first = fmt.Sprintf("%s: %s", cases[i].name, msg)
+		}
+	}
+	for i, tc := range cases {
+		shapeWrong = false
+		obs := readSubjectReport(tc.body)
+		if obs.state != reportCorrupt {
+			report(i, fmt.Sprintf("state %s, want corrupt (%s)", obs.state, obs.summary()))
+			continue
+		}
+		if obs.offset != int64(tc.want) {
+			report(i, fmt.Sprintf("subjectReportRead.offset is %d, want %d (the byte the decoder objects at)", obs.offset, tc.want))
+		}
+		read, named, offset, ok := slo149ContradictionOf(obs.summary())
+		switch {
+		case !ok:
+			report(i, fmt.Sprintf("sentence %q is not the contradiction shape", obs.summary()))
+		case offset != tc.want:
+			report(i, fmt.Sprintf("sentence says offset %d, want %d", offset, tc.want))
+		case read != len(tc.body):
+			report(i, fmt.Sprintf("sentence says %d bytes read, want %d", read, len(tc.body)))
+		case named != read:
+			// The two byte counts in one sentence about one file must not
+			// disagree - the second one is the claim, the first is the read.
+			report(i, fmt.Sprintf("sentence reads %d bytes then contradicts %d bytes", read, named))
+		}
+		if obs.err == nil {
+			report(i, "corrupt without an error: the loop would retry this forever")
+		}
+	}
+	if wrong > 0 {
+		t.Errorf("%d of %d corrupt shapes do not name the byte position the decoder objected at; first: %s",
+			wrong, len(cases), first)
+	}
+}
+
+// Case 12 - the two corrupt legs that have NO decoder error keep their own
+// meaning, so the fill cannot be smuggled onto them: a second value after the
+// first closed prints the end of the value that DID close (and how many bytes
+// follow it), and a document that parsed cleanly but carries no state report
+// keeps that position in its field while printing no position at all - the same
+// "never print a position the leg does not have" promise ticket 147 pinned for
+// the -1 leg, now on this leg.
+func TestSLO149CorruptLegsWithoutADecoderErrorKeepTheirOwnEnd(t *testing.T) {
+	doc := slo144Report(t)
+
+	// Second value after the first closed: the position IS len(doc), and the
+	// sentence prints it, so a parser-anchored read of it is possible.
+	for _, tc := range []struct {
+		name    string
+		body    []byte
+		follows int
+	}{
+		{"second-document", append(append([]byte(nil), doc...), doc...), len(doc)},
+		{"trailing-garbage", append(append([]byte(nil), doc...), []byte("\nnot part of the document")...), 25},
+	} {
+		obs := readSubjectReport(tc.body)
+		if obs.state != reportCorrupt {
+			t.Errorf("%s: state %s, want corrupt (%s)", tc.name, obs.state, obs.summary())
+			continue
+		}
+		if obs.offset != int64(len(doc)) {
+			t.Errorf("%s: offset is %d, want %d (the end of the document that did close)", tc.name, obs.offset, len(doc))
+		}
+		want := fmt.Sprintf("%d bytes hold more than one document: a value closed at offset %d and %d bytes follow",
+			len(tc.body), len(doc), tc.follows)
+		if !strings.Contains(obs.summary(), want) {
+			t.Errorf("%s: sentence %q does not name %q", tc.name, obs.summary(), want)
+		}
+	}
+
+	// Parsed cleanly, complete, and not a subject report: field carries the end
+	// of the document, sentence carries no position.
+	for _, body := range []string{`{}`, `{"mode":"subject-in-tree","state":"Sleeping","pass":true}`} {
+		obs := readSubjectReport([]byte(body))
+		if obs.state != reportCorrupt {
+			t.Fatalf("%q: state %s, want corrupt", body, obs.state)
+		}
+		if obs.offset != int64(len(body)) {
+			t.Errorf("%q: offset is %d, want %d (the closed document's end)", body, obs.offset, len(body))
+		}
+		if strings.Contains(obs.summary(), "offset") {
+			t.Errorf("%q: the no-state-report sentence prints a byte position it does not have: %q", body, obs.summary())
+		}
+		if !strings.Contains(obs.summary(), "no state report") {
+			t.Errorf("%q: sentence %q does not name the contradiction it found", body, obs.summary())
+		}
+	}
+}
+
+// Case 13 - AC#3's ruling is ⓐ: the s.exited() branch SHOULD name where the last
+// reading stopped, for the reason readSubjectReport's own doc comment gives - a
+// subject that died part-way through its write is exactly the shape that looks
+// like a prefix, and "exited (code 7) without writing its report" with no reading
+// attached points a reader at an empty directory when the truth is "8 bytes are
+// here". Before this case nothing in this package reached that branch (a scripted
+// subject has s.cmd == nil, so exited() is false and every give-up in cases 4-10
+// comes out of the timeout leg).
+//
+// The child is a real process, so exited() and exitCode() are the production
+// reading rather than a hand-made ProcessState; the report file is still scripted,
+// because counting the reads is how "on the spot" is shown without a wall-clock
+// claim (same reason as case 5).
+func TestSLO149ExitedGiveUpSentenceCarriesTheLastReading(t *testing.T) {
+	dead := exec.Command("cmd.exe", "/c", "exit", "7")
+	_ = dead.Run() // a non-zero exit is the fixture, not a failure of this test
+	if dead.ProcessState == nil || !dead.ProcessState.Exited() {
+		t.Fatalf("fixture child never reached an exited ProcessState: %v", dead.ProcessState)
+	}
+	if got := dead.ProcessState.ExitCode(); got != 7 {
+		t.Fatalf("fixture child exited with %d, want 7 - the sentence names this number", got)
+	}
+
+	// 13a - the last reading is an unfinished document: its position must arrive.
+	head := []byte(`{"mode":`) // 8 bytes whose tail never arrives
+	r := &scriptedReader{t: t, repeatLast: true, got: []func() ([]byte, error){scriptBytes(head)}}
+	s := &sloSubject{cmd: dead, pid: uint32(dead.Process.Pid), outPath: "scripted.json", readReportFile: r.read}
+	_, err := s.collectReportWithin(30*time.Second, time.Millisecond)
+	if err == nil {
+		t.Fatal("a subject that exited without writing its report passed the loop")
+	}
+	withPosition := err.Error()
+	if want := "8 bytes read, document still open at offset 8: the tail had not arrived"; !strings.Contains(withPosition, want) {
+		t.Errorf("exited give-up %q does not carry the last reading %q", withPosition, want)
+	}
+	if !strings.Contains(withPosition, "code 7") {
+		t.Errorf("exited give-up %q does not name the exit code", withPosition)
+	}
+	if strings.Contains(withPosition, "never wrote a complete report within") {
+		t.Errorf("an exited subject was reported as a spent budget, not as a dead child: %q", withPosition)
+	}
+	if r.calls != 1 {
+		t.Errorf("exited subject was read %d times, want exactly 1 (the loop sees ProcessState and gives up on the spot)", r.calls)
+	}
+
+	// 13b - the last reading is a note (no file yet): the note arrives, and no
+	// position is invented for a leg that has none.
+	missing := &scriptedReader{t: t, repeatLast: true, got: []func() ([]byte, error){scriptMissing}}
+	s2 := &sloSubject{cmd: dead, pid: uint32(dead.Process.Pid), outPath: "scripted.json", readReportFile: missing.read}
+	_, err = s2.collectReportWithin(30*time.Second, time.Millisecond)
+	if err == nil {
+		t.Fatal("a subject that exited before its report file existed passed the loop")
+	}
+	withNote := err.Error()
+	if want := "0 bytes read, no report file yet"; !strings.Contains(withNote, want) {
+		t.Errorf("exited give-up %q does not carry the note-bearing last reading %q", withNote, want)
+	}
+	if strings.Contains(withNote, "offset") {
+		t.Errorf("the exited give-up prints a byte position for a reading that never had one: %q", withNote)
+	}
+
+	// 13c - the two exited sentences must not collapse into one, which is the
+	// same promise case 10 makes about the timeout leg, at this call site: a
+	// reader must be able to tell "bytes arrived and stopped" from "never a file"
+	// without any other context.
+	if withNote == withPosition {
+		t.Errorf("the two exited shapes render the same sentence: %q", withNote)
+	}
+	if strings.Contains(withNote, "document still open") || !strings.Contains(withPosition, "document still open") {
+		t.Errorf("the exited sentences no longer separate position from note: %q / %q", withPosition, withNote)
 	}
 }
