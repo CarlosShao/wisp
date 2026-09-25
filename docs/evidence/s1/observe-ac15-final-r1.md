@@ -779,3 +779,18 @@ RUN=71  PASS=68  FAIL=3  SKIP=0  ^panic:=0
 | 容器 | 复用 `wisp-obs-ac15-linux-r1`（`docker start`），**未新建、未 `rm`**；12 枚自旋**起了也停了**（末次 `loadavg 5.86/10.75/8.05` 且在回落） |
 | 临时件（只建不删） | `D:\tmp\observe-ac15-final\`：`logs/`（Windows 六发日志）／`panicctl/`（正控模块）／`assertdiff/`（改前后条件行对照）／`t-instr`（ await 计数版副本）／`tw-floor`／`tw-200ms`／`tw-floorstate`／`t-pre`（`ee5a25e` 副本）／`t-mut1`（M1 副本）；容器侧 `/scratch/final-r1/{t-floor,t-200ms,t-blast,t-mut1,blast.log,mut1.log,busy-400ms-leg.log,starve.sh}` |
 | 凭据 | 本程**未**读取、**未**复制任何密钥值（本格不需要） |
+
+### 9.1 交件态复核（在本文件最后一枚 commit 之后的 HEAD 上重跑，不引用 §1 的旧日志）
+
+```
+$ date "+%H:%M:%S"                       2026-09-25 11:44 +0800
+$ git diff --name-only 333dfe3..HEAD -- internal/observe/      （无输出）
+   ⇒ 本程所有读数跑的就是交件态那版码，其后落地的全是别家地界与本文件
+$ go test ./internal/observe/ -count=2 -v        rc=0
+   RUN=142  PASS=142  FAIL=0  SKIP=0  ^panic:=0    包时 6.865s
+$ git status --porcelain -- docs/evidence/s1/observe-ac15-final-r1.md .scratch/     （无输出）
+   ⇒ 本文件已入库、票面 136 一格未动
+```
+
+⇒ §1.1 那组数在这一发里**同值复现**（本程在 Windows 上共跑了这一族 **三发** `-count=2 -v`：11:06、11:44，
+以及 §4.4 那两批忙/净窗单腿批次）。
