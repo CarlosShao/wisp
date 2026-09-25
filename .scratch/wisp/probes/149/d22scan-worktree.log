@@ -1,0 +1,238 @@
+d22scan.sh: positive control - runtests.sh -C tools/d22scan ./...
+=== RUN   TestScanDetectsAllSeededViolations
+--- PASS: TestScanDetectsAllSeededViolations (0.18s)
+=== RUN   TestScanCleanRepoIsGreen
+--- PASS: TestScanCleanRepoIsGreen (0.09s)
+=== RUN   TestAllowlistSuppressesOnlyListedPaths
+--- PASS: TestAllowlistSuppressesOnlyListedPaths (0.24s)
+=== RUN   TestCheckRootRejectsBlindRoots
+=== RUN   TestCheckRootRejectsBlindRoots/empty_dir
+=== RUN   TestCheckRootRejectsBlindRoots/go.mod_only
+=== RUN   TestCheckRootRejectsBlindRoots/the_d22scan_module_itself
+=== RUN   TestCheckRootRejectsBlindRoots/repo_skeleton_with_two_go_files
+--- PASS: TestCheckRootRejectsBlindRoots (0.11s)
+    --- PASS: TestCheckRootRejectsBlindRoots/empty_dir (0.00s)
+    --- PASS: TestCheckRootRejectsBlindRoots/go.mod_only (0.00s)
+    --- PASS: TestCheckRootRejectsBlindRoots/the_d22scan_module_itself (0.01s)
+    --- PASS: TestCheckRootRejectsBlindRoots/repo_skeleton_with_two_go_files (0.09s)
+=== RUN   TestScanAloneIsNotAFalsifier
+--- PASS: TestScanAloneIsNotAFalsifier (0.01s)
+=== RUN   TestCheckRootAcceptsRealRepo
+    scan_test.go:250: real repo production Go files in scope: 228
+--- PASS: TestCheckRootAcceptsRealRepo (0.30s)
+=== RUN   TestScannerSelfScanOfRealRepoIsGreen
+--- PASS: TestScannerSelfScanOfRealRepoIsGreen (2.32s)
+=== RUN   TestEmojiBanCoversGoSourcesNotJustDesign
+--- PASS: TestEmojiBanCoversGoSourcesNotJustDesign (0.16s)
+=== RUN   TestBan8MathBandAndRemainingGaps
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2265_greater-or-equal,_band_added_by_Q-46(c)
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2264_less-or-equal,_band_added_by_Q-46(c)
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2229_intersection,_band_added_by_Q-46(c)
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2212_minus_sign,_band_added_by_Q-46(c)
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2713_check,_pre-existing_U+2600-U+27BF_band
+=== RUN   TestBan8MathBandAndRemainingGaps/U+1F600_emoji,_pre-existing_U+1F000-U+1FAFF_band
+=== RUN   TestBan8MathBandAndRemainingGaps/U+FE0F_variation_selector,_pre-existing
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2192_right_arrow,_gap_kept
+=== RUN   TestBan8MathBandAndRemainingGaps/U+21D2_rightdouble_arrow,_gap_kept
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2500_box_drawing,_gap_kept
+=== RUN   TestBan8MathBandAndRemainingGaps/U+2460_circled_one,_gap_kept
+--- PASS: TestBan8MathBandAndRemainingGaps (1.25s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2265_greater-or-equal,_band_added_by_Q-46(c) (0.19s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2264_less-or-equal,_band_added_by_Q-46(c) (0.13s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2229_intersection,_band_added_by_Q-46(c) (0.10s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2212_minus_sign,_band_added_by_Q-46(c) (0.10s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2713_check,_pre-existing_U+2600-U+27BF_band (0.15s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+1F600_emoji,_pre-existing_U+1F000-U+1FAFF_band (0.08s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+FE0F_variation_selector,_pre-existing (0.09s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2192_right_arrow,_gap_kept (0.13s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+21D2_rightdouble_arrow,_gap_kept (0.10s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2500_box_drawing,_gap_kept (0.09s)
+    --- PASS: TestBan8MathBandAndRemainingGaps/U+2460_circled_one,_gap_kept (0.09s)
+=== RUN   TestBan8CommentExemptionInGoSources
+=== RUN   TestBan8CommentExemptionInGoSources/line_comment
+=== RUN   TestBan8CommentExemptionInGoSources/doc_comment_above_a_declaration
+=== RUN   TestBan8CommentExemptionInGoSources/one-line_block_comment
+=== RUN   TestBan8CommentExemptionInGoSources/multi-line_block_comment,_glyph_on_a_middle_line
+=== RUN   TestBan8CommentExemptionInGoSources/trailing_comment_after_clean_code
+=== RUN   TestBan8CommentExemptionInGoSources/string_on_the_same_line_as_a_trailing_comment
+=== RUN   TestBan8CommentExemptionInGoSources/raw_string_that_reads_as_a_SQL_comment
+=== RUN   TestBan8CommentExemptionInGoSources/interpreted_string_containing_a_comment_marker
+=== RUN   TestBan8CommentExemptionInGoSources/glyph_inside_a_comment_AND_inside_code_in_one_block_comment
+=== RUN   TestBan8CommentExemptionInGoSources/unparseable_file_gets_no_exemption_at_all
+--- PASS: TestBan8CommentExemptionInGoSources (1.35s)
+    --- PASS: TestBan8CommentExemptionInGoSources/line_comment (0.10s)
+    --- PASS: TestBan8CommentExemptionInGoSources/doc_comment_above_a_declaration (0.11s)
+    --- PASS: TestBan8CommentExemptionInGoSources/one-line_block_comment (0.13s)
+    --- PASS: TestBan8CommentExemptionInGoSources/multi-line_block_comment,_glyph_on_a_middle_line (0.24s)
+    --- PASS: TestBan8CommentExemptionInGoSources/trailing_comment_after_clean_code (0.08s)
+    --- PASS: TestBan8CommentExemptionInGoSources/string_on_the_same_line_as_a_trailing_comment (0.14s)
+    --- PASS: TestBan8CommentExemptionInGoSources/raw_string_that_reads_as_a_SQL_comment (0.12s)
+    --- PASS: TestBan8CommentExemptionInGoSources/interpreted_string_containing_a_comment_marker (0.14s)
+    --- PASS: TestBan8CommentExemptionInGoSources/glyph_inside_a_comment_AND_inside_code_in_one_block_comment (0.14s)
+    --- PASS: TestBan8CommentExemptionInGoSources/unparseable_file_gets_no_exemption_at_all (0.15s)
+=== RUN   TestBan8CommentExemptionInTextScopes
+=== RUN   TestBan8CommentExemptionInTextScopes/tsx_line_comment
+=== RUN   TestBan8CommentExemptionInTextScopes/tsx_block_divider,_glyph_on_the_closing_line
+=== RUN   TestBan8CommentExemptionInTextScopes/html_comment
+=== RUN   TestBan8CommentExemptionInTextScopes/css_comment
+=== RUN   TestBan8CommentExemptionInTextScopes/JSX_text_node_with_a_math_glyph
+=== RUN   TestBan8CommentExemptionInTextScopes/code_after_a_closed_block_comment_on_the_same_line
+=== RUN   TestBan8CommentExemptionInTextScopes/markdown_heading_is_not_a_comment
+=== RUN   TestBan8CommentExemptionInTextScopes/SQL-style_dash_is_not_a_comment_in_a_text_scope
+=== RUN   TestBan8CommentExemptionInTextScopes/extension-less_file,_plain_text_line
+--- PASS: TestBan8CommentExemptionInTextScopes (1.45s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/tsx_line_comment (0.18s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/tsx_block_divider,_glyph_on_the_closing_line (0.19s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/html_comment (0.12s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/css_comment (0.10s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/JSX_text_node_with_a_math_glyph (0.13s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/code_after_a_closed_block_comment_on_the_same_line (0.17s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/markdown_heading_is_not_a_comment (0.12s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/SQL-style_dash_is_not_a_comment_in_a_text_scope (0.28s)
+    --- PASS: TestBan8CommentExemptionInTextScopes/extension-less_file,_plain_text_line (0.15s)
+=== RUN   TestDeclaredEmojiScopeCannotWalkZeroFiles
+--- PASS: TestDeclaredEmojiScopeCannotWalkZeroFiles (0.37s)
+=== RUN   TestScopeReportMatchesRealCoverage
+--- PASS: TestScopeReportMatchesRealCoverage (2.55s)
+=== RUN   TestVerdictGreenOnFullyLiveFixture
+--- PASS: TestVerdictGreenOnFullyLiveFixture (0.13s)
+=== RUN   TestVerdictRedOnEmptyBan7Scope
+--- PASS: TestVerdictRedOnEmptyBan7Scope (0.13s)
+=== RUN   TestVerdictRedOnGoScopeWithOnlyTestFiles
+--- PASS: TestVerdictRedOnGoScopeWithOnlyTestFiles (0.12s)
+=== RUN   TestExemptScopeCannotOutliveItsAbsentTree
+--- PASS: TestExemptScopeCannotOutliveItsAbsentTree (0.24s)
+=== RUN   TestBan6ScopeIsNotNarrowedByAnExtensionFilter
+    scan_test.go:1002: ban #6 examined 7 and fired in all 7 extension classes
+--- PASS: TestBan6ScopeIsNotNarrowedByAnExtensionFilter (0.18s)
+=== RUN   TestVerdictRedOnUndeclaredCounter
+--- PASS: TestVerdictRedOnUndeclaredCounter (0.13s)
+=== RUN   TestRealRepoBan8CoversFrontendTreeAtBan6sCount
+--- PASS: TestRealRepoBan8CoversFrontendTreeAtBan6sCount (2.05s)
+=== RUN   TestBan8FrontendScopeIsNotNarrowedByAnExtensionFilter
+    scan_test.go:1155: ban #8 examined 7 and fired in all 7 frontend/ file classes, incl. .mjs, .md and extension-less
+--- PASS: TestBan8FrontendScopeIsNotNarrowedByAnExtensionFilter (0.30s)
+=== RUN   TestLedgerCountsMatchAnIndependentWalk
+    scan_test.go:1261: verified bans #1-5 internal/: 205 files
+    scan_test.go:1261: verified bans #1-5 cmd/: 23 files
+    scan_test.go:1261: verified ban #7 internal/tools/: 18 files
+    scan_test.go:1261: verified ban #8 internal/: 412 files
+    scan_test.go:1261: verified ban #8 cmd/: 43 files
+    scan_test.go:1261: verified ban #6 frontend/: 66 files
+    scan_test.go:1261: verified ban #8 frontend/: 66 files
+--- PASS: TestLedgerCountsMatchAnIndependentWalk (3.36s)
+=== RUN   TestWalksSkipGitIgnoredPaths
+    scan_test.go:1375: note: d22scan: skipped as git-ignored: 3 file(s) under 1 ignored director(ies) [internal/build/], decided by .gitignore (2 path(s)), frontend/.gitignore (2 path(s))
+--- PASS: TestWalksSkipGitIgnoredPaths (0.79s)
+=== RUN   TestTrackedPathsAreNeverSkippedByTheIgnoreFilter
+--- PASS: TestTrackedPathsAreNeverSkippedByTheIgnoreFilter (2.06s)
+=== RUN   TestFullTrackedListCoversWhatTheNarrowListCannot
+--- PASS: TestFullTrackedListCoversWhatTheNarrowListCannot (1.92s)
+=== RUN   TestIndexChangingBetweenTheTwoGitReadsAppliesNoRules
+--- PASS: TestIndexChangingBetweenTheTwoGitReadsAppliesNoRules (2.25s)
+=== RUN   TestIgnoreRulesAreOffWhenTheIndexCannotBeAsked
+--- PASS: TestIgnoreRulesAreOffWhenTheIndexCannotBeAsked (0.23s)
+=== RUN   TestGitIgnoreRuleSemantics
+--- PASS: TestGitIgnoreRuleSemantics (0.01s)
+=== RUN   TestRealRepoLedgerIsHonest
+    scan_test.go:2207: ban #6 examined 66 frontend/ text files in the real repo
+--- PASS: TestRealRepoLedgerIsHonest (1.52s)
+=== RUN   TestBuiltBinaryGoesRedEndToEnd
+=== RUN   TestBuiltBinaryGoesRedEndToEnd/seeded_violation_exits_1
+    scan_test.go:2363: rc=1 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndseeded_violation_exits_11025567788/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 16 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndseeded_violation_exits_11025567788/001
+        d22scan: scope bans #1-5 internal/      examined  15 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   1 text files
+        d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   1 text files
+        d22scan: scope ban #8 internal/         examined  15 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+        internal/bad/leak.go:5: [bare-goroutine] bare `go worker(...)` is banned (D22/D38b, R16: named calls count too): use observe.Registry.Spawn (named, owner, recover boundary)
+        stderr=d22scan: 1 finding(s); D22 bans are not negotiable (see PLAN.md D22, tools/d22scan/allowlist.txt)
+=== RUN   TestBuiltBinaryGoesRedEndToEnd/empty_live_scope_exits_2
+    scan_test.go:2363: rc=2 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndempty_live_scope_exits_21166330829/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 14 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndempty_live_scope_exits_21166330829/001
+        d22scan: scope bans #1-5 internal/      examined  13 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   1 text files
+        d22scan: scope ban #7 internal/tools/   examined   0 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   1 text files
+        d22scan: scope ban #8 internal/         examined  13 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+        stderr=d22scan: scope ban #7 internal/tools/ examined 0 files but is declared live in declaredScopes() - an empty instrument is not a verdict (ticket 71 AC#4)
+=== RUN   TestBuiltBinaryGoesRedEndToEnd/armed_ban_6_goes_red_on_the_panel_violation_exits_1
+    scan_test.go:2363: rc=1 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndarmed_ban_6_goes_red_on_the_panel2826909008/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 15 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndarmed_ban_6_goes_red_on_the_panel2826909008/001
+        d22scan: scope bans #1-5 internal/      examined  14 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   2 text files
+        d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   2 text files
+        d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+        frontend/src/app.js:1: [panel-approval] `approval.decide` in frontend/ is banned (D33/F2: allow decisions are native-side only)
+        stderr=d22scan: 1 finding(s); D22 bans are not negotiable (see PLAN.md D22, tools/d22scan/allowlist.txt)
+=== RUN   TestBuiltBinaryGoesRedEndToEnd/frontend_tree_gone_while_declared_live_exits_2
+    scan_test.go:2363: rc=2 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndfrontend_tree_gone_while_declared3742917713/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 15 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndfrontend_tree_gone_while_declared3742917713/001
+        d22scan: scope bans #1-5 internal/      examined  14 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   0 text files
+        d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   0 text files
+        d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+        stderr=d22scan: ban #8 scope frontend/ examined 0 files - it is declared in emojiScopes() but walks nothing. Point it at a real tree or delete the entry; never leave a scope pretending to scan (ticket 71 AC#4)
+=== RUN   TestBuiltBinaryGoesRedEndToEnd/ban_7_tree_gone_while_declared_live_exits_2
+    scan_test.go:2363: rc=2 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndban_7_tree_gone_while_declared_li2753634478/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 14 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndban_7_tree_gone_while_declared_li2753634478/001
+        d22scan: scope bans #1-5 internal/      examined  13 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   1 text files
+        d22scan: scope ban #7 internal/tools/   examined   0 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   1 text files
+        d22scan: scope ban #8 internal/         examined  13 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+        stderr=d22scan: scope ban #7 internal/tools/ examined 0 files but is declared live in declaredScopes() - an empty instrument is not a verdict (ticket 71 AC#4)
+=== RUN   TestBuiltBinaryGoesRedEndToEnd/fully_live_fixture_exits_0
+    scan_test.go:2363: rc=0 stdout=d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndfully_live_fixture_exits_0390589560/001: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+        d22scan: examined 15 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/TestBuiltBinaryGoesRedEndToEndfully_live_fixture_exits_0390589560/001
+        d22scan: scope bans #1-5 internal/      examined  14 production Go files
+        d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+        d22scan: scope ban #6 frontend/         examined   1 text files
+        d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+        d22scan: scope ban #8 design/           examined   1 text files
+        d22scan: scope ban #8 frontend/         examined   1 text files
+        d22scan: scope ban #8 internal/         examined  14 Go files, comments and _test.go included
+        d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+        d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=14, bans #1-5 cmd/=1, ban #6 frontend/=1, ban #7 internal/tools/=1, ban #8 design/=1, ban #8 frontend/=1, ban #8 internal/=14, ban #8 cmd/=1; ban #8 emoji coverage: design/ 1 text files; frontend/ 1 text files; internal/ 14 Go files, comments and _test.go included; cmd/ 1 Go files, comments and _test.go included
+        stderr=
+--- PASS: TestBuiltBinaryGoesRedEndToEnd (4.80s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/seeded_violation_exits_1 (0.29s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/empty_live_scope_exits_2 (0.25s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/armed_ban_6_goes_red_on_the_panel_violation_exits_1 (0.40s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/frontend_tree_gone_while_declared_live_exits_2 (0.39s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/ban_7_tree_gone_while_declared_live_exits_2 (0.88s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/fully_live_fixture_exits_0 (0.40s)
+PASS
+ok  	github.com/CarlosShao/wisp/tools/d22scan	30.765s
+runtests.sh: OK - packages=[./...] top-level: PASS=30 FAIL=0 SKIP=0, === RUN=70, '[no tests to run]'=0
+d22scan.sh: scan of /d/work/workspace/projects plans/Wisp
+d22scan: skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/], decided by frontend/.gitignore (2 path(s))
+d22scan: examined 228 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
+d22scan: scope bans #1-5 internal/      examined 205 production Go files
+d22scan: scope bans #1-5 cmd/           examined  23 production Go files
+d22scan: scope ban #6 frontend/         examined  66 text files
+d22scan: scope ban #7 internal/tools/   examined  18 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined  66 text files
+d22scan: scope ban #8 internal/         examined 412 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined  43 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=205, bans #1-5 cmd/=23, ban #6 frontend/=66, ban #7 internal/tools/=18, ban #8 design/=39, ban #8 frontend/=66, ban #8 internal/=412, ban #8 cmd/=43; ban #8 emoji coverage: design/ 39 text files; frontend/ 66 text files; internal/ 412 Go files, comments and _test.go included; cmd/ 43 Go files, comments and _test.go included
+rc=0
