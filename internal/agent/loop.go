@@ -236,7 +236,7 @@ func New(opt Options) (*Loop, error) {
 		provider: opt.Provider,
 		asm:      NewAssembler(model, b, info.Cache),
 		sp:       NewSpiller(opt.Config.ArtifactsDir, b),
-		comp:     NewCompressor(b, opt.Summarizer),
+		comp:     NewCompressor(b, opt.Summarizer, WithLogger(opt.Logger)),
 		guard: GuardConfig{
 			RepeatThresholds: opt.Config.RepeatThresholds,
 			MaxRounds:        opt.Config.MaxRounds,

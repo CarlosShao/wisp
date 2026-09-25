@@ -3,6 +3,7 @@ package agent
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"strings"
 
 	"github.com/CarlosShao/wisp/internal/llm"
@@ -39,6 +40,20 @@ type Summarizer interface {
 }
 
 // CompressionReport describes one compression pass (assertion + log surface).
+//
+// Trace placement (ticket 139 AC#2): a pass that actually folded history is
+// booked as ONE slog.Info record ("agent: history compressed") emitted right
+// here, on the success edge, so it carries the counts and never the text.
+// Three things follow from putting it in the compressor rather than at a call
+// site: the record exists even for a caller that forgets to log (the
+// Warm-window hook DEFERRED(D28-1) installs will get it for free); it pairs
+// with the caller's failure Warn ("agent: history compression failed") so both
+// outcomes of one call answer to the search prefix "agent: history compress";
+// and it cannot be emitted for a pass that folded nothing, because the fold is
+// decided inside this function (rep.Ran), not inferred afterwards.
+//
+// Privacy: [privacy] keep_transcript forbids putting history text on this
+// line, so every attribute is a count or a flag.
 type CompressionReport struct {
 	Ran            bool
 	CompressedMsgs int
@@ -55,11 +70,36 @@ type CompressionReport struct {
 type Compressor struct {
 	b   Budgets
 	sum Summarizer
+	lg  *slog.Logger
+}
+
+// CompressorOpt tweaks a Compressor at construction.
+type CompressorOpt func(*Compressor)
+
+// WithLogger sends the compression trace to lg instead of the process default
+// (nil lg = slog.Default(), which is where the host's persistent JSONL sink
+// lives). The two-argument call sites keep compiling: the option list is open
+// by design, so a caller with no logger changes nothing.
+func WithLogger(lg *slog.Logger) CompressorOpt {
+	return func(c *Compressor) { c.lg = lg }
 }
 
 // NewCompressor builds a compressor; sum may be nil (structural trim).
-func NewCompressor(b Budgets, sum Summarizer) *Compressor {
-	return &Compressor{b: b, sum: sum}
+func NewCompressor(b Budgets, sum Summarizer, opts ...CompressorOpt) *Compressor {
+	c := &Compressor{b: b, sum: sum}
+	for _, o := range opts {
+		o(c)
+	}
+	return c
+}
+
+// log is the compressor's trace sink: the injected one if a caller provided it,
+// else the process default. Never nil, so call sites need no guard.
+func (c *Compressor) log() *slog.Logger {
+	if c.lg != nil {
+		return c.lg
+	}
+	return slog.Default()
 }
 
 // TotalTokens estimates the history cost.
@@ -127,6 +167,22 @@ func (c *Compressor) Compress(ctx context.Context, hist []llm.Message) ([]llm.Me
 	rep.KeptRawRounds = len(rawRoundIndexes(rounds))
 	rep.PreservedIDs = dedupe(append(allToolCallIDs(out), ledger...))
 	rep.RawIDsInsideSummary = dedupe(ledger)
+	if rep.Ran {
+		// The one trace a successful pass leaves (AC#2): counts only, never the
+		// folded text. "history_changed" is recomputed from what this call
+		// actually returned instead of echoing rep.Ran, so it can contradict
+		// the fold flag and a reader is never told the history moved when the
+		// bytes coming back are the same size.
+		c.log().Info("agent: history compressed",
+			"tokens_before", rep.TokensBefore,
+			"tokens_after", rep.TokensAfter,
+			"threshold", c.b.HistoryCompressTokens,
+			"msgs_before", len(hist),
+			"msgs_after", len(out),
+			"compressed_msgs", rep.CompressedMsgs,
+			"kept_raw_rounds", rep.KeptRawRounds,
+			"history_changed", rep.TokensAfter != rep.TokensBefore || len(out) != len(hist))
+	}
 	return out, rep, nil
 }
 

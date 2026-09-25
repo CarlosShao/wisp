@@ -80,6 +80,14 @@ func withRegistry(r *observe.Registry) harnessOpt {
 	return func(h *harness, o *Options) { h.reg = r; o.Registry = r }
 }
 
+// withLogger overrides the harness logger. The default a harness builds is a
+// discard handler (so a normal run stays quiet); a test that asserts on a
+// record the loop produces installs its own handler here, which is also what
+// proves the loop hands that logger down to the components it wires.
+func withLogger(lg *slog.Logger) harnessOpt {
+	return func(_ *harness, o *Options) { o.Logger = lg }
+}
+
 // newHarness loads a golden fixture and serves its responses sequentially.
 func newHarness(t *testing.T, fixture string, opts ...harnessOpt) *harness {
 	t.Helper()
