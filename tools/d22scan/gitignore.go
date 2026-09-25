@@ -101,8 +101,8 @@ package main
 // matcher skip LESS than git does, which is the loud direction: the path stays
 // scanned and the worst outcome is a denominator that counts one file too many.
 // SKIPPING MORE than git is the dangerous direction, and it is not handled by
-// that list. Two shapes are known to do it, and each has its own guard somewhere
-// else:
+// that list. Three shapes are known to do it, and each has its own guard
+// somewhere else:
 //   - the index cannot be reached at all (no repository, no git binary, a
 //     timeout, a subdirectory of somebody else's repository). skip() then applies
 //     NO rule and says so in the first line of note(), so the tool over-scans.
@@ -116,6 +116,17 @@ package main
 //     listing cannot report. TestGitIgnoreRuleSemantics pins the two readings
 //     themselves and TestFullTrackedListCoversWhatTheNarrowListCannot pins the
 //     guard that has to catch the next one.
+//   - the index MOVES between the two `git ls-files` spawns, so the second read
+//     names a tracked-and-ignored path the first read never saw and the full set
+//     has no entry for its parent directory either: holds(dir) is then false for
+//     a directory git really does track, and a rule prunes a live tree. The two
+//     reads disagreeing IS detectable, and buildGitIndexState treats it as such:
+//     it returns ok=false, which collapses into the first bullet's response (no
+//     rule applied, note() names the reason on the loud path) rather than picking
+//     either read's answer. Ticket 142. What it cannot detect - a commit landing
+//     in the window that adds only paths git matches against NO rule, which keeps
+//     the subset relation intact - is stated in gitIndexState's comment, and
+//     holds() keeps being loaded from the FULL list for exactly that reason.
 // This is a list of the shapes seen so far, not a claim that there are no others.
 
 import (
@@ -125,6 +136,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -194,14 +206,28 @@ type gitIgnore struct {
 //	                        guard's reach, and that leg is pinned by
 //	                        TestFullTrackedListCoversWhatTheNarrowListCannot.
 //	                        ⚠ "does not change between the two reads" is load-bearing
-//	                        and NOT guaranteed by the code: :240 and :244 are two
-//	                        independent spawns, so a commit landing in between can
-//	                        leave holds(dir) false for a path the narrow read never
-//	                        saw. Measured (2026-09-25, white-box race): direction =
-//	                        fewer paths scanned, never more. Removing that window is
-//	                        a production change, not a comment fix, and is tracked
-//	                        separately; until then the claim is bounded to a
-//	                        quiescent index rather than dropped.
+//	                        and still NOT guaranteed by the code: the two
+//	                        `ls-files` calls in runGitIndex are two independent
+//	                        spawns, so a commit landing in between can leave
+//	                        holds(dir) false for a path the narrow read names.
+//	                        Measured (2026-09-25, white-box race): direction =
+//	                        fewer paths scanned, never more. What changed since is
+//	                        that the disagreement is now CHECKED, not just
+//	                        admitted: buildGitIndexState refuses any pair where a
+//	                        narrow entry is missing from the full read, because two
+//	                        answers that contradict each other describe no tree at
+//	                        all - ok=false is then the same response as "git could
+//	                        not be asked" (no rule applied, note() says why).
+//	                        Ticket 142, pinned by
+//	                        TestIndexChangingBetweenTheTwoGitReadsAppliesNoRules.
+//	                        The RESIDUE this cannot see, and why the claim stays
+//	                        bounded: a commit in the window that adds only paths
+//	                        git matches against no rule keeps narrow a subset of
+//	                        full, so holds() can still be false for a path the
+//	                        index now has. Only making the two reads one atomic
+//	                        answer closes that, and these two commands do not have
+//	                        that shape; the full-list guard above is what stands
+//	                        between this residue and a silent skip.
 type gitIndexState struct {
 	ok        bool
 	why       string          // why it could not be consulted; one line, always shown
@@ -233,9 +259,7 @@ const indexTimeout = 10 * time.Second
 // ok=false with a single-line reason, because the caller's only legal response is
 // "apply no rules and say so".
 func runGitIndex(root string) *gitIndexState {
-	fail := func(format string, args ...any) *gitIndexState {
-		return &gitIndexState{why: fmt.Sprintf(format, args...)}
-	}
+	fail := gitIndexUnavailable
 	prefix, err := runGitAt(root, "rev-parse", "--show-prefix")
 	if err != nil {
 		return fail("git cannot be consulted in %s: %s", filepath.ToSlash(root), err)
@@ -255,13 +279,46 @@ func runGitIndex(root string) *gitIndexState {
 	if err != nil {
 		return fail("git ls-files -i -c --exclude-standard failed in %s: %s", filepath.ToSlash(root), err)
 	}
+	return buildGitIndexState(root, all, withIndex)
+}
+
+// gitIndexUnavailable is the ONE failure shape of this file's index layer: an
+// unusable answer, ok=false, carrying one line of reason that note() prints
+// verbatim. Package-level because both runGitIndex and buildGitIndexState return
+// it, and a half-loaded index must not be assembled anywhere.
+func gitIndexUnavailable(format string, args ...any) *gitIndexState {
+	return &gitIndexState{why: fmt.Sprintf(format, args...)}
+}
+
+// buildGitIndexState assembles skip()'s view of the tree from the two raw
+// `git ls-files` streams. It is a function rather than inline in runGitIndex for
+// one reason: those two streams come from TWO independent spawns, and only a test
+// that captures them across a real commit can say what happens when the index
+// moves in between (ticket 142 AC#1). runGitIndex is its only production caller.
+//
+// THE INVARIANT (AC#2, and the only direction it may fail in): `-i -c` is a
+// filter over the same index the full list came from, so every path it names must
+// be in that full list. A stray is not a second opinion to reconcile and not
+// something to retry - it is proof that the two answers describe two different
+// trees, so NEITHER can be trusted to decide a skip. The response is therefore the
+// one this file already has for "git could not be asked": ok=false, no ignore rule
+// applied, everything scanned, reason on the loud path. Under-scanning is the
+// failure this repository keeps paying to kill (A207/A214/ca84b75), and picking
+// either read's answer is how you get there quietly.
+func buildGitIndexState(root, all, withIndex string) *gitIndexState {
 	tracked, dirs, err := parseIndexPaths(all)
 	if err != nil {
-		return fail("cannot parse git ls-files output in %s: %s", filepath.ToSlash(root), err)
+		return gitIndexUnavailable("cannot parse git ls-files output in %s: %s", filepath.ToSlash(root), err)
 	}
 	ignored, err := parseIndexPathsList(withIndex)
 	if err != nil {
-		return fail("cannot parse git ls-files -i -c output in %s: %s", filepath.ToSlash(root), err)
+		return gitIndexUnavailable("cannot parse git ls-files -i -c output in %s: %s", filepath.ToSlash(root), err)
+	}
+	if strays := straysOutsideTheFullRead(tracked, ignored); len(strays) > 0 {
+		return gitIndexUnavailable("the git index changed between the two `git ls-files` reads of %s: %d path(s) "+
+			"the second read reports as tracked are missing from the first read, so no single answer describes "+
+			"this tree (a commit landed mid-scan) - strays: %s",
+			filepath.ToSlash(root), len(strays), quotePathList(strays, maxStraysNamed))
 	}
 	set := map[string]bool{}
 	for _, p := range ignored {
@@ -269,6 +326,42 @@ func runGitIndex(root string) *gitIndexState {
 	}
 	sort.Strings(ignored)
 	return &gitIndexState{ok: true, tracked: tracked, dirs: dirs, ignored: set, ignoreSet: ignored}
+}
+
+// maxStraysNamed caps how many stray paths the one-line reason spells out. The
+// COUNT is always in the line, so a cap cannot hide how big the disagreement is;
+// it only keeps a pathological tree from turning the first line of the scan's
+// self-report into a file listing.
+const maxStraysNamed = 8
+
+// straysOutsideTheFullRead is the subset test above, as a list: paths the narrow
+// read names that the full read does not hold. Empty is the normal case.
+func straysOutsideTheFullRead(full map[string]bool, narrow []string) []string {
+	var strays []string
+	for _, p := range narrow {
+		if !full[p] {
+			strays = append(strays, p)
+		}
+	}
+	sort.Strings(strays)
+	return strays
+}
+
+// quotePathList renders up to n paths for the self-report on ONE line: note() is
+// asserted to be one line, and a git path may legally contain a newline.
+func quotePathList(paths []string, n int) string {
+	if len(paths) <= n {
+		return strings.Join(quoteEach(paths), ", ")
+	}
+	return strings.Join(quoteEach(paths[:n]), ", ") + fmt.Sprintf(" (+%d more)", len(paths)-n)
+}
+
+func quoteEach(paths []string) []string {
+	out := make([]string, 0, len(paths))
+	for _, p := range paths {
+		out = append(out, strconv.Quote(p))
+	}
+	return out
 }
 
 // runGitAt runs one read-only git command with root as the working directory and

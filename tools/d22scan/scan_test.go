@@ -1641,7 +1641,221 @@ func TestFullTrackedListCoversWhatTheNarrowListCannot(t *testing.T) {
 	}
 }
 
+// gitCommitAll commits whatever the fixture's index holds. The identity and the
+// gpgsign flag are passed on the command line instead of trusted from the machine:
+// on a runner with no `user.email` configured a bare `git commit` dies with
+// "Please tell me who you are", and a fixture whose commit does not land is a
+// fixture that quietly stops testing the thing it was written for.
+func gitCommitAll(t *testing.T, dir, msg string) {
+	t.Helper()
+	gitCommand(t, dir, "-c", "user.name=d22scan fixture", "-c", "user.email=fixture@invalid",
+		"-c", "commit.gpgsign=false", "commit", "-q", "-m", msg)
+}
+
+// TestIndexChangingBetweenTheTwoGitReadsAppliesNoRules is ticket 142: runGitIndex
+// asks git TWO listing questions in two independent spawns, so a commit landing
+// between them leaves the second answer naming a tracked path the first answer
+// never saw - and since `dirs` is derived from the first answer only, holds(dir)
+// is FALSE for a directory the index really holds. A rule then prunes a live tree
+// and the scan says nothing, which is the exact direction this repository has been
+// killing since A207 (measured by a non-implementer at anchor 310816f, quoted in
+// the ticket: holds(file)=true, holds(dir)=false, one-directional under-scan).
+//
+// WHY THIS SHAPE AND NOT A TIMED RACE. The window is ~one subprocess spawn wide;
+// a test that commits "in the hope" of hitting it is a test that passes when the
+// machine is idle and flakes when it is not, which is worse than no test here
+// because the guard it claims to pin is the loud kind. So the two reads are taken
+// deliberately, across a commit that is certainly in between, and handed to the
+// SAME function runGitIndex uses to assemble them (buildGitIndexState). What the
+// test does that production does not is *not* run the two spawns back to back;
+// everything after that is production code, including the walks in block 5.
+//
+// CONTROLS, because three of the readings below are zeroes: block 1 demands that
+// the narrow read really names the path and the full read really does not (if the
+// seed stops landing in the window the test fails OUT rather than passing on an
+// empty premise); block 3 demands that the same narrow stream against a matching
+// full read assembles fine (so "refused" is not "always refused"); block 4 demands
+// that the ignore rule being declined is LIVE on this directory (so "skipped
+// nothing" is not "there was nothing to skip"); and block 5 keeps an untracked
+// ignored file in the tree so the quiescent scan still skips something - this guard
+// may not pass by having ignore filtering switched off globally.
+func TestIndexChangingBetweenTheTwoGitReadsAppliesNoRules(t *testing.T) {
+	const stray = "frontend/dist/assets/shipped.tsx"
+	root := liveFixture(t)
+	seedFile(t, root, ".gitignore", "frontend/dist/*\n!frontend/dist/.gitkeep\nbuild/\n")
+	seedFile(t, root, "frontend/.gitignore", "dist/*\n!dist/.gitkeep\n")
+	// Tracked from the start and re-included by the negation, so the walk enters
+	// frontend/dist/ in every reading of this tree: the directory that gets pruned
+	// is the one BELOW it, which is the shape the acceptance measured.
+	seedFile(t, root, "frontend/dist/.gitkeep", "")
+	gitIndexFixture(t, root)
+	gitCommitAll(t, root, "the tree as it stands while the first read is taken")
+
+	// READ 1, word for word what runGitIndex issues.
+	read1, err := runGitAt(root, "ls-files", "-z")
+	if err != nil {
+		t.Fatalf("read 1: %s", err)
+	}
+
+	// THE COMMIT THAT LANDS IN THE WINDOW. `shipped.tsx` is force-added because
+	// that is the only way a path under a live rule enters the index (A214/F1), and
+	// it breaks ban #8, so "was it scanned?" has a visible answer. `build-output.tsx`
+	// is the same bytes and stays untracked: a normal run must still exclude it.
+	seedFile(t, root, stray, "export const doc = \"ready \u2264\";\n")
+	seedFile(t, root, "frontend/dist/assets/build-output.tsx", "export const doc = \"ready \u2264\";\n")
+	gitForceAdd(t, root, stray)
+	gitCommitAll(t, root, "lands between the two reads")
+
+	// READ 2.
+	read2, err := runGitAt(root, "ls-files", "-z", "-i", "-c", "--exclude-standard")
+	if err != nil {
+		t.Fatalf("read 2: %s", err)
+	}
+
+	// 1. THE PREMISE, measured on the two raw streams before any skip logic sees
+	//    them. If either half stops holding, the whole case below is vacuous and
+	//    this block is what says so.
+	tracked1, dirs1, err := parseIndexPaths(read1)
+	if err != nil {
+		t.Fatalf("read 1 does not parse: %s", err)
+	}
+	narrow2, err := parseIndexPathsList(read2)
+	if err != nil {
+		t.Fatalf("read 2 does not parse: %s", err)
+	}
+	sawStray := false
+	for _, p := range narrow2 {
+		if p == stray {
+			sawStray = true
+		}
+	}
+	if !sawStray {
+		t.Fatalf("the narrow read does not name %s (got %v) - the seed no longer produces a tracked path under a live rule, "+
+			"so there is no disagreement for the guard to find and this test would pass on an empty premise", stray, narrow2)
+	}
+	if tracked1[stray] || dirs1["frontend/dist/assets"] {
+		t.Fatalf("read 1 already holds the new path (tracked=%v dirs=%v) - the commit did not land in the window, "+
+			"so this pair is not the race shape and a passing test here would prove nothing", tracked1[stray], dirs1["frontend/dist/assets"])
+	}
+
+	// 2. THE GUARD: those two reads describe two different trees, and assembling
+	//    them is not this tool's call to make. Red before buildGitIndexState
+	//    checked the subset relation (ticket 142 AC#1/AC#2).
+	racy := buildGitIndexState(root, read1, read2)
+	if racy.ok {
+		t.Errorf("an index that moved between the two reads was ACCEPTED (holds(%q, dir)=%v, holds(file)=%v): the walks "+
+			"prune a directory the index holds on the strength of a read that never saw it - A207/A214's under-scan "+
+			"direction, silently", "frontend/dist/assets", racy.holds("frontend/dist/assets", true), racy.holds(stray, false))
+	}
+	for _, want := range []string{"changed between the two", stray} {
+		if !strings.Contains(racy.why, want) {
+			t.Errorf("the refusal must name %q, got %q", want, racy.why)
+		}
+	}
+	if strings.Contains(racy.why, "\n") {
+		t.Errorf("the reason goes on the scan's first line, so it must be one line, got %q", racy.why)
+	}
+
+	// 3. CONTROL AGAINST "ALWAYS REFUSES": the same narrow stream against a full
+	//    read taken AFTER the commit is a quiescent pair, it assembles, and its
+	//    holds() answers are the ones A214/F1 demands. This is also the reading
+	//    that shows what the first read was missing.
+	read3, err := runGitAt(root, "ls-files", "-z")
+	if err != nil {
+		t.Fatalf("read 3: %s", err)
+	}
+	quiet := buildGitIndexState(root, read3, read2)
+	if !quiet.ok {
+		t.Fatalf("a quiescent pair was refused (%q) - the subset check fires on more than the race and every real "+
+			"scan would lose its ignore filter", quiet.why)
+	}
+	if !quiet.holds("frontend/dist/assets", true) || !quiet.holds(stray, false) {
+		t.Errorf("holds() is wrong on a quiescent index (dir=%v file=%v) - A214/F1's guarantee is the baseline this "+
+			"ticket adds to, not the one it replaces", quiet.holds("frontend/dist/assets", true), quiet.holds(stray, false))
+	}
+
+	// 4. THE DECISION skip() makes with each state, and the live rule the racy one
+	//    refuses to apply.
+	racyMatcher := newGitIgnore(root)
+	racyMatcher.idx = racy
+	if v := racyMatcher.decide("frontend/dist/assets", true); !v.ignored {
+		t.Fatal("no rule matches frontend/dist/assets in this seed, so block 4's 'skipped nothing' would be a tautology")
+	}
+	if racyMatcher.skip(filepath.Join(root, "frontend/dist/assets"), true) {
+		t.Errorf("skip(dir) pruned a directory on a torn index - the guard was not reached")
+	}
+	if racyMatcher.skip(filepath.Join(root, stray), false) {
+		t.Errorf("skip(file) excluded a delivered byte on a torn index")
+	}
+	n := racyMatcher.note()
+	if !strings.HasPrefix(n, "d22scan: gitignore rules NOT APPLIED") {
+		t.Errorf("the mechanism must be the FIRST line of the self-report (A218(7)), got %q", n)
+	}
+	for _, want := range []string{"changed between the two", "every path in every scope is being scanned"} {
+		if !strings.Contains(n, want) {
+			t.Errorf("note must say %q, got %q", want, n)
+		}
+	}
+	if strings.Contains(n, "\n") {
+		t.Errorf("this run skipped nothing, so the note must be exactly the one loud line, got %q", n)
+	}
+
+	// 5. END TO END, over the walks main() actually runs, same tree, two states.
+	//    The quiescent half is production's own path (scanFixture -> runGitIndex),
+	//    so the pair below is the ticket's claim in one line: a torn read now costs
+	//    the same coverage as a clean one, and says so.
+	sQuiet := scanFixture(t, root)
+	sRacy, err := scanWithIgnore(root, racyMatcher)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := sQuiet.examined["panel-approval"], 4; got != want {
+		t.Fatalf("the quiescent scan counted %d frontend/ text files, want %d (panel.tsx + frontend/.gitignore + "+
+			"dist/.gitkeep + shipped.tsx, with the untracked build output excluded) - the seed moved, so the deltas "+
+			"below measure nothing", got, want)
+	}
+	if got, want := sRacy.examined["panel-approval"], sQuiet.examined["panel-approval"]+1; got != want {
+		t.Errorf("ban #6 counted %d frontend/ files on the torn index and %d on a clean one, want +1 - the torn read "+
+			"must fail toward MORE scanning, never fewer", got, want)
+	}
+	if got, want := sRacy.emojiSeen["frontend/"], sQuiet.emojiSeen["frontend/"]+1; got != want {
+		t.Errorf("ban #8 counted %d frontend/ files on the torn index and %d on a clean one, want +1", got, want)
+	}
+	paths := func(s *scanner) map[string]bool {
+		out := map[string]bool{}
+		for _, f := range s.findings {
+			if f.Ban == "emoji" {
+				out[f.Path] = true
+			}
+		}
+		return out
+	}
+	qf, rf := paths(sQuiet), paths(sRacy)
+	if !qf[stray] {
+		t.Errorf("ban #8 did not fire at %s on a QUIESCENT index (findings=%v) - that is A214/F1's guarantee, and it has to survive this ticket", stray, sQuiet.findings)
+	}
+	if qf["frontend/dist/assets/build-output.tsx"] {
+		t.Errorf("the quiescent scan read the untracked build output; A207's exclusion is gone (findings=%v)", sQuiet.findings)
+	}
+	if !rf[stray] || !rf["frontend/dist/assets/build-output.tsx"] {
+		t.Errorf("the torn-index scan must read BOTH delivered and untracked bytes under the pruned directory, got %v", sRacy.findings)
+	}
+	if _, errOut, code := runVerdict(t, root, sRacy); code != 1 {
+		t.Errorf("verdict on the torn index must be 1 (it scanned more, and more is what it found), got %d err=%s", code, errOut)
+	}
+	if _, errOut, code := runVerdict(t, root, sQuiet); code != 1 {
+		t.Errorf("verdict on the clean index must also be 1 (the delivered byte is a finding either way), got %d err=%s", code, errOut)
+	}
+	// And the clean run must not complain about this ticket's guard: the loud line
+	// is for torn or unreachable indexes only, or every ordinary scan would carry
+	// it and nobody would read it.
+	if qn := sQuiet.ign.note(); strings.Contains(qn, "NOT APPLIED") || !strings.Contains(qn, "skipped as git-ignored") {
+		t.Errorf("the quiescent scan must skip what it has always skipped and say only that, got %q", qn)
+	}
+}
+
 // TestIgnoreRulesAreOffWhenTheIndexCannotBeAsked pins the failure direction of
+
 // A214/F1's fix. `git archive HEAD | tar -x` - the shape every evidence run and
 // mutation check in this repository is taken on - has no `.git`, so the tool
 // cannot know whether the bytes in front of it are tracked. Guessing "ignored"

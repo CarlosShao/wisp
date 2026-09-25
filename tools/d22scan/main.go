@@ -218,10 +218,22 @@ func Scan(root string) ([]Finding, error) {
 // "nothing was looked at" stay distinguishable (ticket 67 AC#2 bought the same
 // property for the Go scope with checkRoot; main.go enforces it for ban #8).
 func scanWithStats(root string) (*scanner, error) {
+	return scanWithIgnore(root, newGitIgnore(root))
+}
+
+// scanWithIgnore is scanWithStats with the ignore matcher supplied by the caller
+// instead of built on the spot. Production reaches the walks through exactly one
+// door - scanWithStats above, which supplies a fresh matcher - and the other
+// caller is scan_test.go's ticket-142 case, which must run THOSE SAME WALKS over
+// an index state captured across a real commit. Nothing on disk can produce that
+// state by quiescing, so the seam has to exist; naming it in the function name is
+// the same rule fixtureVerdict follows (ticket 88 AC#3: a test-only door is
+// allowed, an invisible one is not).
+func scanWithIgnore(root string, ign *gitIgnore) (*scanner, error) {
 	s := &scanner{
 		root: root, allow: map[string]map[string]bool{},
 		emojiSeen: map[string]int{}, examined: map[string]int{},
-		ign: newGitIgnore(root),
+		ign: ign,
 	}
 	if err := s.loadAllowlist(filepath.Join(root, "tools", "d22scan", "allowlist.txt")); err != nil {
 		return nil, err
