@@ -44,6 +44,7 @@ import (
 
 	"github.com/CarlosShao/wisp/internal/agent"
 	"github.com/CarlosShao/wisp/internal/panel"
+	"github.com/CarlosShao/wisp/internal/risk"
 )
 
 // ledgerSummaries145 returns the bounded panel records this run booked, oldest
@@ -113,10 +114,16 @@ func executeOn145(t *testing.T, rt *agentRuntime, taskID, corr, callID, tool, ar
 	})
 }
 
-// shortenL2Window145 gives this run a 2s C18 window instead of the contract's
-// 300s, because the case has to watch a card open and close. Tightening a
-// timeout is not a loosening, and nothing in the assertions depends on the value.
-func shortenL2Window145(t *testing.T, dataDir string) {
+// nonDefaultConfig145 gives this run two values the fixture's config does not
+// carry, and both are there to make an assertion falsifiable rather than
+// accidentally true:
+//
+//   - confirm_timeout_sec = 2, so the case can watch an L2 card open and close
+//     (tightening the C18 window is not a loosening);
+//   - permission_mode = ask_high_risk, because the default档 is exactly what a
+//     pump that hardcoded "ask_every_step" would print. With a non-default档 in
+//     the file, the packet's mode is only right if something read it.
+func nonDefaultConfig145(t *testing.T, dataDir string) {
 	t.Helper()
 	cfgPath := filepath.Join(dataDir, configFileName)
 	old, err := os.ReadFile(cfgPath)
@@ -130,7 +137,7 @@ func shortenL2Window145(t *testing.T, dataDir string) {
 
 func TestRunBooksWithASnapshotOfItsLiveQueue(t *testing.T) {
 	f := newRunFixture(t, "openai-chat")
-	shortenL2Window145(t, f.dir)
+	nonDefaultConfig145(t, f.dir)
 	target := "C:/Windows/win.ini"
 	var (
 		live      panel.Snapshot
@@ -284,6 +291,10 @@ func TestRunBooksWithASnapshotOfItsLiveQueue(t *testing.T) {
 	}
 	if live.Composer.Mode.Current != mm[1] {
 		t.Errorf("composer.mode.current = %q, want the boot read %q", live.Composer.Mode.Current, mm[1])
+	}
+	if live.Composer.Mode.Current != risk.ModeAskHighRiskName {
+		t.Errorf("composer.mode.current = %q, want the non-default档 this config set",
+			live.Composer.Mode.Current)
 	}
 	if strings.Join(live.Composer.Mode.Names, ",") != "ask_every_step,ask_high_risk,auto_approve" {
 		t.Errorf("mode.names = %v, want risk's vocabulary", live.Composer.Mode.Names)
