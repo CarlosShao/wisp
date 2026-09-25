@@ -90,7 +90,37 @@ $ grep -rn "\.Wait()" cmd/wisp/slo_windows.go
 
 ---
 
-## 1　AC#1 钉成能响的用例（结／不结 + 现量读数）
+## 1　AC#1 钉成能响的用例 —— **结**
+
+落点：`cmd/wisp/slo_report_144_windows_test.go`（新增，319 行，`//go:build windows`）。
+落点（现量，改后 `cmd/wisp/slo_windows.go` 840 行）：
+三态 `subjectReportState` `:536`（`String()` `:558`）、观测量 `subjectReportRead` `:574`（`summary()` `:589`）、
+判别函数 `readSubjectReport` `:623`、生产入口 `collectReport` `:659`、循环 `collectReportWithin` `:682`、
+测试用读数接缝字段 `readReportFile` `:140`。
+（`git log --format=%h -1 -- cmd/wisp/slo_report_144_windows_test.go` 现量 = `f63f0e3`。）
+
+判据一句一发读数：
+
+| 用例 | 钉的是 AC#1 的哪一支 | 现量读数 |
+|---|---|---|
+| `TestSLO144EveryPrefixOfARealReportIsUnwrittenNotCorrupt` | ⓐ"没写完"这一支的**全部分母** | 真报告 676 字节，`0..675` 每一枚前缀逐一问判别函数，全 676 发都是 `unwritten`；整枚是 `complete`。`--- PASS` |
+| `TestSLO144ReportsThatContradictThemselvesAreCorruptNow` | ⓑ"内容确实是坏的仍然当场红" | 7 发子格全 `--- PASS`（html 头 / 多余逗号 / 类型不对 / 值后面还有内容 / 两份文档 / 没有 state report / 只有一对花括号），每发都要求错误点名**字节数** |
+| `TestSLO144LoopRetriesAnUnfinishedFileAndReadsTheWholeReport` | ⓐ 的端到端（真文件） | 空文件 → 半截 → 全量，循环带回报告、`Mode="subject-in-tree"`、`Pass=true`。`--- PASS` |
+| `TestSLO144LoopGiveUpSentencesOnRealFiles` | ⓐ 的另一形：等不齐时红得**有理由** | 半截 44 字节：错误点名 `within 50ms` + `44 bytes` + `tail had not arrived`，且断言**不得再是** `unexpected end of JSON input`；坏字节 26：点名 `corrupt` + `26 bytes`、且不得含 `within`。`--- PASS` |
+| `TestSLO144CorruptReportIsJudgedOnTheFirstRead` | ⓑ 的"当场"凭据（**数读取次数**，不数秒） | `calls == 1`，且脚本读取器一被叫到第 2 发就 `Fatalf`。`--- PASS` |
+| `TestSLO144UnfinishedReportKeepsPollingThenNamesBudgetAndBytes` | ⓐ 的"回预算里重试"凭据 | 缺档 2 发 + 前缀 1 发起持续：`calls > 3`，红句点名 `within 60ms` / `8 bytes`。`--- PASS` |
+| `TestSLO144ReportThatArrivesAfterMissingReadingsIsCollected` | ⓐ 的收口：重试真的能收到 | 恰好读满 4 发后拿到 `report.state=Sleeping`。`--- PASS` |
+
+`$ go test -count=1 -v -run 'TestSLO144' ./cmd/wisp/`（PATH 挂 DLL，见 §4）→
+`ok github.com/CarlosShao/wisp/cmd/wisp 0.239s`，顶格 7 枚 + 子格 7 枚，`--- FAIL` 0、`--- SKIP` 0。
+
+**这一形造得出可重放用例** ⇒ 不走票面"AC#1 自证作废"那一支。可重放的依据不是运气：判别函数的输入是**一枚字节切片**，
+所以"文件存在但字节没齐"这一态是被**全体前缀**直接问出来的（用例 1），循环那一侧用真文件 + 读数计数器复现，
+不需要真等一次真实调度竞态。
+
+⚠ 明说这一格**没有**证的东西：**没有在真进程上复现那一发竞态**（`wisp slo` 真跑时读半个文件）。
+§3 的外证那一问会给出为什么，以及它落在"本程没测什么"第 1 条。
+
 
 ## 2　AC#2 修法：只分"没写完"与"坏了"，不放宽 fail-closed
 
