@@ -394,3 +394,102 @@ $ git diff 1b98c7b..cd87354 -- tools/d22scan/gitignore.go | grep -c "none of the
 ⚠ **行号口径**（本仓那条"引行号必须同引它取于哪一版"在这里同样要守）：表里 `AR-3` 的 `:1799` 与 `AR-5` 的
 `:1810` 是**那两枚变异各自删掉一段断言之后的**行号；同一枚因在**交付版**上的站点都是 `:1813`
 （块 5 的静止前提 `t.Fatalf`）。`S-10` 没删测试文件的行，所以它的 `:1813` 就是交付版行号。
+
+---
+
+## 7. 门禁与契约轴：我自己跑的那一遍（四数／名册／Skip／冻结件）
+
+### 7.1 `sh tools/d22scan/runtests.sh -C tools/d22scan ./...`（两枚纯净快照，同一台机器）
+
+命令与形态：`git archive <锚> | tar -x` 到 `D:\tmp\accept142\snap-{old,head}`，进快照目录跑同一条脚本
+（快照里没有 `.git`，现量 `NO .git (pure snapshot)`；这是 AC#4 指名要的形态）。
+
+| 锚点 | PASS | FAIL | SKIP | === RUN | `^panic:` | `[no tests to run]` | runner 结论 |
+|---|---|---|---|---|---|---|---|
+| `1b98c7b`（改前） | 29 | 0 | 0 | 69 | 0 | 0 | `runtests.sh: OK` rc=0 |
+| `cd87354`（交付） | **30** | 0 | 0 | **70** | 0 | 0 | `runtests.sh: OK` rc=0 |
+
+**名册差集**取的是运行输出的 `--- PASS/FAIL/SKIP: NAME` 集合（不是我 grep 源码猜的），两枚快照各一份：
+`diff` ⇒ `15a16 > TestIndexChangingBetweenTheTwoGitReadsAppliesNoRules`，**`+1 枚、`−` 0 枚**，
+roster 枚数 29→30。⇒ 与它 §4.1 同值；源码级 `^func Test` 那把尺我也跑了（同 29→30、同名册），两把尺一致。
+
+根目录 `go vet ./tools/d22scan/` 现量 **rc=1**，报文 `main module (github.com/CarlosShao/wisp) does not contain
+package …/tools/d22scan`；`go.work` 不存在（`test -e go.work` ⇒ NO）。
+⇒ 这是设计不是伤（简报这条前提我复算过，`.github/workflows/ci.yml:124-126` 那一步就是
+`working-directory: tools/d22scan` 里跑 `go vet ./...`）。module 内 `go vet ./...` **rc=0**、`gofmt -l .` **空**。
+
+### 7.2 `sh scripts/d22scan.sh` 的八枚数（四形态，每枚带锚点）
+
+| 形态 | 锚点/树 | #1-5 internal/ | #1-5 cmd/ | #6 frontend/ | #7 internal/tools/ | #8 design/ | #8 frontend/ | #8 internal/ | #8 cmd/ | rc |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 纯净快照 改前 | `1b98c7b` | 203 | 22 | 43 | 18 | 30 | 43 | 407 | 39 | 0 |
+| 纯净快照 交付 | `cd87354` | 203 | 22 | **46** | 18 | 30 | **46** | 407 | 39 | 0 |
+| 工作树（交付码，仓外副本 `go run . -root <仓库>`） | 工作树 | 203 | 22 | 46 | 18 | **32** | 46 | 407 | 39 | 0 |
+| 工作树（同一枚树、改前码） | 工作树 | 203 | 22 | 46 | 18 | 32 | 46 | 407 | 39 | 0 |
+
+- **A/B 独立复算**：两版码各跑一遍、同一枚工作树，`diff` 出的 scope 行＋自陈行＋`clean` 行
+  **完全为空**（我打的标 `A_B_IDENTICAL`）；同一版码再跑第三遍仍 `HEAD_RUNS_IDENTICAL`
+  ⇒ 它 §4.2 那行 `EIGHT_IDENTICAL` 我复现了，而且"静止索引上新分支零次触发"这句话在**当下这枚脏工作树**上
+  也是真的（现量自陈第一行是 `skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/]`，
+  **没有** `NOT APPLIED`）。
+- **快照 `design/=30` 对工作树 `32`**：owner 那 16 枚未提交的 `design/` 挪动不进 archive（`git status` 现量在列），
+  与本票无关，它 §4.2 的 ⚠ 已自报，我核过口径成立。
+- **`43→46` 归因**：`git ls-tree -r --name-only <c> -- frontend | wc -l` 逐枚
+  `1b98c7b`=43、`640cff1`=43、`d61281c`=46、`173a77d`=46、`cd87354`=46；
+  `git log --oneline 1b98c7b..cd87354 -- frontend` 只列出 **`d61281c`** 一枚（前端会话的换屏层，
+  新增 `render-nav.tsx`／`nav-rail.tsx`／`panel-views.ts` 三枚受追踪文件＝43+3）。
+  ⇒ **这条差值不是本票造成的**，引用它时必须带这层归因（我核过，它 §4.2／§8 两处都写了）。
+
+### 7.3 `t.Skip`：它自报 8→8，我把"这把尺看得见它"那一发自己复算
+
+| 量法 | 读数 |
+|---|---|
+| `grep -c 't\.Skip'` 改前／交付 | **8 / 8**（本票新增 0 枚） |
+| 我在副本里真植一枚（`snap-skip`，往该用例头里插一行 `t.Skip("planted known-positive for the acceptance ruler")`） | 同一条 grep ⇒ **9**，行号 `1683` |
+| 同一份植入后的严格 runner | **rc=1**，`--- SKIP: TestIndexChangingBetweenTheTwoGitReadsAppliesNoRules`（`skip-gate.log:133`），verdict 行 `1 test(s) SKIPPED and SKIP is not a pass (ticket 71 AC#3)`（`:226`），四数 `PASS=29 FAIL=0 SKIP=1 RUN=70` |
+
+⇒ 简报那条 ⚠ 我照办：**没拿 `--- SKIP`＝0 当"没有跳过"**，而是把正控种进副本量。
+两把尺（grep 与 runner）都看得见一枚真的 Skip。既有那 7 枚 `t.Skipf` 今天都不响（两枚快照 `--- SKIP` 均 0）。
+
+### 7.4 断言只增不减（我自己数，不抄它的表）
+
+`scan_test.go` 的删除列在三枚 commit 上都是 **0**（`git show --numstat` 现量：`9d06544` 214/0、
+`64b404d` 37/0、`1ed231e` 11/0；区间累计 `262/0`）⇒ **没有任何一行既有测试被改或被删**，
+这是能从 numstat 直接读出的强结论，我复算成立。计数字典（`git show <c>:… | grep -oE … | wc -l`）：
+
+| 尺 | `1b98c7b` | `cd87354` | 差 |
+|---|---|---|---|
+| `Fatalf` | 43 | 52 | +9 |
+| `Errorf` | 90 | 115 | +25 |
+| `t.Fatal(` | 36 | 39 | +3 |
+| `t.Skip` | 8 | 8 | 0 |
+| `^func Test` | 29 | 30 | +1 |
+
+⇒ **只增不减**，三枚计数差（`+9/+25/+3`）相加＝**37 枚断言调用点**，正好等于新用例体内
+（`sed -n '1682,1903p' | grep -oE 't\.(Fatal|Fatalf|Errorf)\('`）现量的 `Fatalf 9／Fatal 3／Errorf 25`
+⇒ 新增的每一枚断言都在这枚新用例里，旧用例一枚未动。
+另：既有 7 枚 `t.Skipf` 我单独数过（`grep -c 't\.Skipf'` = **7**，加注释里那一枚词＝8），与本票无关。
+
+### 7.5 契约轴：先证明东西存在，再说零命中，再拿同一把尺跑正控
+
+**存在性（本程现量）**：`tools/d22scan/allowlist.txt` EXISTS、`docs/PLAN.md` EXISTS、`docs/specs` 目录 EXISTS、
+`internal/observe/thresholds.go`（`git ls-files` 命中的唯一一枚 `thresholds.go`）EXISTS、
+`grep -c 'emojiRe' tools/d22scan/main.go` = **4**、golden 一族 `git ls-files | grep -icE 'golden|testdata/.*\.(sse|json|txt|wav)'` = **52**。
+
+**零命中（对 `1b98c7b..cd87354` 整区间，不只是对本票三枚 commit）**：
+
+```
+$ git diff --numstat 1b98c7b..cd87354 -- tools/d22scan/allowlist.txt internal/observe/thresholds.go docs/PLAN.md docs/specs '*/testdata/golden/*'
+（空）
+```
+
+`emojiRe` 的定义块（`sed -n '/emojiRe = regexp/,/^$/p'`）两枚锚点**同一枚 sha1**（`61c0b60c…`）
+⇒ 字符类一字节未动。`internal/**` 在区间内**零文件**（`git log --oneline 1b98c7b..cd87354 -- internal` 空；
+工作树里那枚 `M internal/panel/l2_grant_boundary_test.go` 是**另一程未提交**的活，不记在本票头上）。
+
+**本票自己三枚 commit 的路径集合**（`git show --name-only --format='' 9d06544 64b404d 1ed231e | sort -u`）：
+`tools/d22scan/gitignore.go`／`main.go`／`scan_test.go` —— 只有这三枚。
+
+**同一把尺的正控（防"尺根本没看"）**：对隔壁前端会话那一枚 `d61281c` 跑同一条
+`git show --name-only` ⇒ 打出 8 枚路径（`frontend/package.json`、`frontend/src/App.tsx`…）。
+⇒ 这枚"路径集合差集"尺子看得见越界，本票的零命中不是瞎读。
