@@ -52,18 +52,31 @@
 // "ban-id<TAB>repo-relative path prefix<TAB>reason" (committed, reviewable,
 // never wildcards beyond the path prefix).
 //
-// What the walks DESCEND into is a second, separate question, and it is answered
-// by the repository's own .gitignore files (gitignore.go): a path git would
-// refuse to track is not counted into a scope's denominator and not read. Before
-// that, "ban #6 frontend/ examined N" meant whatever the machine held - a tree
-// with a frontend build in it read 43 where CI reads 40, which is why the ledger
-// could cite 37 / 40 / 43 for one scope (A207). Note the two directions this is
-// NOT: it does not suppress a finding on a TRACKED path (an exclusion that could
-// hide a violation would be the D22 run-away this tool exists to catch, so
-// scan_test.go's TestWalksSkipGitIgnoredPaths seeds the ignored and the tracked
-// copy of one byte and demands the first stay silent and the second go red), and
-// it does not hide untracked-but-not-ignored work - `git add` has not happened
-// yet is not the same claim as "this is not part of the deliverable".
+// What the walks DESCEND into is a second, separate question, answered by the
+// repository's own .gitignore files PLUS this tree's git index (gitignore.go): a
+// path is skipped only when a rule matches it AND git confirms the index does not
+// hold it. Before that, "ban #6 frontend/ examined N" meant whatever the machine
+// held - a tree with a frontend build in it read 43 where CI reads 40, which is
+// why the ledger could cite 37 / 40 / 43 for one scope (A207).
+//
+// THE TWO SENTENCES BELOW ARE ASSERTED, NOT ASPIRATIONAL (A214/F2 called the
+// earlier version of them unfalsifiable, and it was right - nothing pinned them):
+//   - it never suppresses a finding on a TRACKED path. skip() asks
+//     `git ls-files -z` and `git ls-files -i -c --exclude-standard` and refuses to
+//     skip anything either one reports, so a `git add -f` file under `dist/`, or a
+//     force-added `internal/build/*.go` under the root `build/` rule, is read and
+//     can go red. scan_test.go's TestTrackedPathsAreNeverSkippedByTheIgnoreFilter
+//     builds exactly that shape with a real `git init` + `git add -f` and demands
+//     the findings AND the denominators move; TestWalksSkipGitIgnoredPaths is the
+//     other half (ignored-and-untracked stays silent, non-ignored goes red).
+//   - when git cannot be asked at all (no binary, not a repository, -root is a
+//     subdirectory of a foreign one, the command fails, times out, or the output
+//     does not parse) NO ignore rule is applied: every path is scanned and the
+//     run prints a loud line saying so. The degradation is over-coverage, never a
+//     quiet clean - see gitignore.go's note().
+//
+// And it still does not hide untracked-but-not-ignored work - `git add` has not
+// happened yet is not the same claim as "this is not part of the deliverable".
 //
 // Invocation (ticket 67 AC#2 - the shape of this command is load-bearing):
 // this package is its OWN Go module (tools/d22scan/go.mod), so from the repo
@@ -114,12 +127,14 @@ type scanner struct {
 	failAddOn string         // unused placeholder guard
 	emojiSeen map[string]int // ban #8: scope label -> files actually line-scanned
 	examined  map[string]int // bans #1-7: scope key -> files actually walked
-	// ign answers "is this path git-ignored?" from the scanned tree's own
-	// .gitignore files. Every walk consults it, so the denominators count the
-	// files a verdict can be about instead of whatever a developer's machine
-	// holds (ledger A207: frontend/ read 43 on a built worktree and 40 on a
-	// clean checkout, which made 37/40/43 indistinguishable from a coverage
-	// change). See gitignore.go for why the rule is read, not copied.
+	// ign answers "would git decline to track this path?" - the scanned tree's own
+	// .gitignore files for the pattern half and `git ls-files` for the index half.
+	// Every walk consults it, so the denominators count the files a verdict can be
+	// about instead of whatever a developer's machine holds (ledger A207: frontend/
+	// read 43 on a built worktree and 40 on a clean checkout, which made 37/40/43
+	// indistinguishable from a coverage change), and so that a tracked file is
+	// never hidden behind a pattern (A214/F1). See gitignore.go for why the rule is
+	// read, not copied, and for the no-index fallback that applies no rule at all.
 	ign *gitIgnore
 }
 
@@ -638,9 +653,12 @@ func (s *scanner) walkGo(dir string) error {
 		if !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
 			return nil
 		}
-		// A git-ignored .go file is not on anyone's delivery path - it is either
-		// build output or a scratch copy - and counting it is what made the
-		// denominator move between machines (A207).
+		// A .go file this walk skips is one git itself would decline to track: build
+		// output or a scratch copy. A tracked file under an ignore rule (the
+		// force-added `internal/build/leak.go` shape, A214/F1) never reaches this
+		// line, which is the whole reason the skip is index-aware and not a pattern
+		// match - counting it is what made the denominator move between machines
+		// (A207), reading it is what makes a delivered byte visible.
 		if s.ign.skip(path, false) {
 			return nil
 		}
@@ -1135,7 +1153,11 @@ func checkRoot(root string) (int, error) {
 	// The same ignore rule the walks use, so this headline number cannot drift
 	// from the per-scope denominators it is supposed to corroborate (A207: the
 	// whole point of printing the number is that it means the same thing on every
-	// machine).
+	// machine). Its own matcher means its own index probe (three read-only git
+	// calls, cached for its lifetime - see gitignore.go's index()); main() runs one
+	// checkRoot and one scan, so a whole run asks git twice, always the same
+	// questions, and a disagreement between the two answers would show up as the
+	// headline number and the scope counts parting company.
 	ign := newGitIgnore(root)
 	for _, dir := range []string{filepath.Join(root, "internal"), filepath.Join(root, "cmd")} {
 		err := filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {

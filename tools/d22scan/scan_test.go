@@ -1172,6 +1172,14 @@ func TestBan8FrontendScopeIsNotNarrowedByAnExtensionFilter(t *testing.T) {
 // something the instrument absorbed silently. So: when someone adds an ignore
 // rule that binds design/, frontend/, internal/ or cmd/, THIS LIST MUST MOVE IN
 // THE SAME BATCH and the scope baselines in the ledger get re-stated with it.
+//
+// A214/F1 EXTENDS THAT DUTY TO THE INDEX, IN THE SAME COMMIT AS THE CODE. The copy
+// above now takes the tracked set and a "were any rules applied at all" flag, the
+// same two facts gitignore.go's skip() uses. That is not decoration: an oracle that
+// keeps only the pattern half agrees with the instrument on the one shape the
+// acceptance built by hand, so the equality guard endorses the blindfold instead of
+// catching it (d22scan-gitignore-accept-r1.md §1.4, §6.8 - four guards, all green,
+// on a tree with a force-added `<=` in it).
 func TestLedgerCountsMatchAnIndependentWalk(t *testing.T) {
 	root, err := filepath.Abs(filepath.Join("..", ".."))
 	if err != nil {
@@ -1181,6 +1189,14 @@ func TestLedgerCountsMatchAnIndependentWalk(t *testing.T) {
 		t.Skipf("not inside the wisp repo: %v", err)
 	}
 	s := scanFixture(t, root)
+
+	// A214/F1: the oracle has to know what the index holds, or it agrees with the
+	// instrument on the one shape that matters and both go green over a delivered
+	// byte. Same three questions gitignore.go asks, asked here by hand.
+	tracked, indexOK, indexWhy := gitTrackedIndex(root)
+	if !indexOK {
+		t.Logf("independent walk: no index to consult (%s) - applying no ignore rule, exactly as the instrument must", indexWhy)
+	}
 
 	count := func(dir string, accept func(string) bool) int {
 		n := 0
@@ -1194,7 +1210,7 @@ func TestLedgerCountsMatchAnIndependentWalk(t *testing.T) {
 				}
 				return nil
 			}
-			if ignoredLikeGit(relToRepo(root, p)) {
+			if ignoredLikeGit(relToRepo(root, p), tracked, indexOK) {
 				return nil
 			}
 			if accept(p) {
@@ -1277,6 +1293,15 @@ func TestWalksSkipGitIgnoredPaths(t *testing.T) {
 	seedFile(t, root, "frontend/src/decide.tsx", "export function d() { return approval.decide({allow: true}); }\n")
 	seedFile(t, root, "internal/pkg/keep.go", "package pkg\n\nconst doc = \"ready \u2264\"\n\nfunc worker() {}\n\nfunc leak() { go worker() }\n")
 
+	// A214/F1 turned this fixture into a repository. "Ignored" is not a fact a
+	// .gitignore file alone carries - git's criterion is the rule AND the index -
+	// so the matcher now asks git, and a tree whose index cannot be asked gets no
+	// rules at all (see TestIgnoreRulesAreOffWhenTheIndexCannotBeAsked for that
+	// half). `git add -A` is what makes the claim below mean something: everything
+	// the rules do NOT cover becomes tracked, everything they DO cover stays
+	// untracked, which is the state a real worktree is in after a build.
+	gitIndexFixture(t, root)
+
 	s := scanFixture(t, root)
 
 	// 1. the denominators. frontend/ = panel.tsx (liveFixture) + .gitkeep +
@@ -1350,6 +1375,246 @@ func TestWalksSkipGitIgnoredPaths(t *testing.T) {
 	t.Logf("note: %s", note)
 }
 
+// gitCommand runs one git command inside dir and fails the test OUT LOUD if git
+// is not there. No t.Skip on this path, on purpose: runtests.sh counts SKIP as not
+// a pass (ticket 71 AC#3), and a branch that silently stops being exercised is
+// the same shape this file exists to catch. The scanner itself does NOT require a
+// git binary - it degrades to scanning everything and says so - but proving the
+// tracked-path guarantee needs the index to be real, and a real index needs git.
+func gitCommand(t *testing.T, dir string, args ...string) string {
+	t.Helper()
+	cmd := exec.Command("git", args...)
+	cmd.Dir = dir
+	var stdout, stderr strings.Builder
+	cmd.Stdout, cmd.Stderr = &stdout, &stderr
+	if err := cmd.Run(); err != nil {
+		t.Fatalf("git %s in %s: %v (%s) - the tracked-path guarantees of A214 cannot be built without a git binary",
+			strings.Join(args, " "), dir, err, firstLineOf(stderr.String()))
+	}
+	return stdout.String()
+}
+
+func firstLineOf(s string) string {
+	s = strings.ReplaceAll(s, "\r\n", "\n")
+	for _, line := range strings.Split(s, "\n") {
+		if line = strings.TrimSpace(line); line != "" {
+			return line
+		}
+	}
+	return "(no stderr)"
+}
+
+// gitIndexFixture turns a fixture tree into a repository and stages everything
+// git would take on its own - i.e. everything the ignore rules do NOT cover. It
+// does not commit, because `git ls-files` reads the index, and the index is the
+// only thing the matcher asks.
+func gitIndexFixture(t *testing.T, root string) {
+	t.Helper()
+	gitCommand(t, root, "init", "-q", "-b", "main")
+	gitCommand(t, root, "add", "-A")
+}
+
+// gitForceAdd is `git add -f`: the one documented way a path ends up tracked while
+// an ignore rule still covers it, which is the shape the r1 acceptance built by
+// hand outside the repository (d22scan-gitignore-accept-r1.md §1.3) and the shape
+// this batch was退回 for not defending against.
+func gitForceAdd(t *testing.T, root string, rels ...string) {
+	t.Helper()
+	gitCommand(t, root, append([]string{"add", "-f", "--"}, rels...)...)
+}
+
+// TestTrackedPathsAreNeverSkippedByTheIgnoreFilter is A214/F1's mutation pair and
+// the assertion that makes the two sentences F2 called unfalsifiable checkable:
+// main.go's "it does not suppress a finding on a TRACKED path" and gitignore.go's
+// "for a path git reports as tracked, skip() returns false".
+//
+// ONE PAIR, ONE DIFFERENCE. Both halves hold the same bytes on disk under the same
+// ignore rules; the only thing that changes is whether the index holds them. The
+// untracked half must stay out of the denominators (that is A207, and a fix that
+// loses it is a revert wearing a coat); the tracked half must be counted, must go
+// red, and must be named by the self-report. Before this batch the tracked half
+// read `frontend/=40` / `internal/`=203 and rc=0, hiding a `<=` in a `.tsx` under
+// `dist/` and a bare `go worker()` under the root `build/` rule - a glyph ban and a
+// SECURITY ban, both invisible, in the tool's own positive-control layer too.
+func TestTrackedPathsAreNeverSkippedByTheIgnoreFilter(t *testing.T) {
+	seed := func(t *testing.T) string {
+		t.Helper()
+		root := liveFixture(t)
+		seedFile(t, root, ".gitignore", "frontend/dist/*\n!frontend/dist/.gitkeep\nbuild/\n")
+		seedFile(t, root, "frontend/.gitignore", "dist/*\n!dist/.gitkeep\n")
+		seedFile(t, root, "frontend/dist/tracked-or-not.tsx", "export const doc = \"ready \u2264\";\n")
+		seedFile(t, root, "internal/build/leak.go", "package build\n\nconst doc = \"ready \u2264\"\n\nfunc worker() {}\n\nfunc leak() { go worker() }\n")
+		gitIndexFixture(t, root)
+		return root
+	}
+	untracked := seed(t)
+	tracked := seed(t)
+	gitForceAdd(t, tracked, "frontend/dist/tracked-or-not.tsx", "internal/build/leak.go")
+
+	// git's own instruments first, so the test cannot pass on a split the scanner
+	// invented: the same two paths, untracked in one tree and tracked-while-matched
+	// in the other. `git check-ignore` is the same question git itself answers, and
+	// the index-aware form must say "not ignored" for a force-added path while the
+	// --no-index form (what the r1 matcher implemented) says "ignored".
+	if got := strings.TrimSpace(gitCommand(t, untracked, "ls-files", "-i", "-c", "--exclude-standard")); got != "" {
+		t.Fatalf("the untracked half must have nothing tracked-and-ignored, got %q", got)
+	}
+	both := gitCommand(t, tracked, "ls-files", "-i", "-c", "--exclude-standard")
+	for _, want := range []string{"frontend/dist/tracked-or-not.tsx", "internal/build/leak.go"} {
+		if !strings.Contains(both, want) {
+			t.Fatalf("git ls-files -i -c --exclude-standard must name %s, got %q", want, both)
+		}
+		if out := gitCommand(t, tracked, "check-ignore", "--no-index", "-v", want); !strings.Contains(out, want) {
+			t.Fatalf("git check-ignore --no-index must still match %s (the pattern half), got %q", want, out)
+		}
+	}
+
+	sA := scanFixture(t, untracked)
+	sB := scanFixture(t, tracked)
+	goKey := func(root string) string { return goScopeKey(filepath.Join(root, "internal")) }
+
+	// 1. the denominators, as a DELTA between the halves so a future change that
+	//    moves both together cannot pass by shrinking the pair.
+	if a, b := sA.examined["panel-approval"], sB.examined["panel-approval"]; b != a+1 {
+		t.Errorf("ban #6 counted %d frontend/ files tracked and %d untracked - the force-added .tsx must add exactly 1", b, a)
+	}
+	if a, b := sA.emojiSeen["frontend/"], sB.emojiSeen["frontend/"]; b != a+1 {
+		t.Errorf("ban #8 counted %d frontend/ files tracked and %d untracked, want +1", b, a)
+	}
+	if a, b := sA.examined[goKey(untracked)], sB.examined[goKey(tracked)]; b != a+1 {
+		t.Errorf("bans #1-5 counted %d internal/ production Go files tracked and %d untracked, want +1 (leak.go under the root `build/` rule)", b, a)
+	}
+	if a, b := sA.emojiSeen["internal/"], sB.emojiSeen["internal/"]; b != a+1 {
+		t.Errorf("ban #8 counted %d internal/ Go files tracked and %d untracked, want +1", b, a)
+	}
+	if b, a := sB.emojiSeen["frontend/"], sB.examined["panel-approval"]; b != a {
+		t.Errorf("the two frontend/ walks disagree on a tracked-ignored tree (%d vs %d)", b, a)
+	}
+
+	// 2. the findings. Tracked means visible: both bans must fire at both paths.
+	byPath := map[string]map[string]bool{}
+	for _, f := range sB.findings {
+		if byPath[f.Path] == nil {
+			byPath[f.Path] = map[string]bool{}
+		}
+		byPath[f.Path][f.Ban] = true
+	}
+	for path, bans := range map[string][]string{
+		"frontend/dist/tracked-or-not.tsx": {"emoji"},
+		"internal/build/leak.go":           {"emoji", "bare-goroutine"},
+	} {
+		for _, ban := range bans {
+			if !byPath[path][ban] {
+				t.Errorf("ban %q did NOT fire at the tracked path %s - a rule that hides a delivered byte is a blindfold, not a fix (all findings %v)", ban, path, sB.findings)
+			}
+		}
+	}
+	for _, f := range sA.findings {
+		if strings.Contains(f.Path, "tracked-or-not.tsx") || strings.Contains(f.Path, "build/leak.go") {
+			t.Errorf("ban %q fired at %s in the UNTRACKED half: A207's exclusion was lost, ignored build output is back in the denominator (%v)", f.Ban, f.Path, sA.findings)
+		}
+	}
+
+	// 3. provenance, both directions. The untracked half names what it skipped;
+	//    the tracked half must name what it REFUSED to skip, because "the count went
+	//    up by one and nothing said why" is the A207 ① complaint all over again.
+	if n := sA.ign.note(); !strings.Contains(n, "skipped as git-ignored") {
+		t.Errorf("the untracked half must report its exclusions, got %q", n)
+	}
+	nb := sB.ign.note()
+	for _, want := range []string{"TRACKED and matching an ignore rule", "frontend/dist/tracked-or-not.tsx", "internal/build/leak.go"} {
+		if !strings.Contains(nb, want) {
+			t.Errorf("note %q must name %q", nb, want)
+		}
+	}
+
+	// 4. the exit codes: red where a delivered byte breaks a ban, green where the
+	//    same byte is untracked build output.
+	if _, errOut, code := runVerdict(t, tracked, sB); code != 1 {
+		t.Errorf("verdict on the tracked half must be 1 (findings), got %d err=%s", code, errOut)
+	}
+	if _, errOut, code := runVerdict(t, untracked, sA); code != 0 {
+		t.Errorf("verdict on the untracked half must stay 0, got %d err=%s", code, errOut)
+	}
+}
+
+// TestIgnoreRulesAreOffWhenTheIndexCannotBeAsked pins the failure direction of
+// A214/F1's fix. `git archive HEAD | tar -x` - the shape every evidence run and
+// mutation check in this repository is taken on - has no `.git`, so the tool
+// cannot know whether the bytes in front of it are tracked. Guessing "ignored"
+// there is what made a force-added deliverable invisible (acceptance §1.3, and the
+// second instance at §6.9 where a bare goroutine under the root `build/` rule
+// turned rc=1 into rc=0). So: no rule is applied, EVERY path is scanned, and the
+// run says out loud that it could not ask. A quiet green in this shape is a failed
+// cell, which is why the last block below demands the note even when the tree is
+// clean.
+func TestIgnoreRulesAreOffWhenTheIndexCannotBeAsked(t *testing.T) {
+	// No gitIndexFixture anywhere in this test: the absence of an index IS the
+	// subject. Same rules and the same two shapes as the test above.
+	root := liveFixture(t)
+	seedFile(t, root, ".gitignore", "frontend/dist/*\n!frontend/dist/.gitkeep\nbuild/\n")
+	seedFile(t, root, "frontend/.gitignore", "dist/*\n!dist/.gitkeep\n")
+	seedFile(t, root, "frontend/dist/copied-delivery.tsx", "export const doc = \"ready \u2264\";\n")
+	seedFile(t, root, "internal/build/copied-leak.go", "package build\n\nconst doc = \"ready \u2264\"\n\nfunc worker() {}\n\nfunc leak() { go worker() }\n")
+
+	s := scanFixture(t, root)
+
+	// 1. scanned, not skipped: both ignored paths are in the denominators.
+	if got, want := s.examined["panel-approval"], 3; got != want {
+		t.Errorf("ban #6 examined %d frontend/ files, want %d - with no index to consult nothing may be excluded", got, want)
+	}
+	if got, want := s.emojiSeen["frontend/"], 3; got != want {
+		t.Errorf("ban #8 examined %d frontend/ files, want %d", got, want)
+	}
+	if got, want := s.examined[goScopeKey(filepath.Join(root, "internal"))], 3; got != want {
+		t.Errorf("bans #1-5 examined %d internal/ production Go files, want %d (internal/build/copied-leak.go included)", got, want)
+	}
+
+	// 2. and reported as findings, because counting a file and not reading it would
+	//    be the same blindfold wearing a bigger number.
+	saw := map[string]bool{}
+	for _, f := range s.findings {
+		saw[f.Path] = true
+	}
+	for _, want := range []string{"frontend/dist/copied-delivery.tsx", "internal/build/copied-leak.go"} {
+		if !saw[want] {
+			t.Errorf("the index-less tree must go red at %s, findings=%v", want, s.findings)
+		}
+	}
+
+	// 3. the loud self-report: what could not be asked, and what that did to the
+	//    numbers. One line, naming the reason.
+	n := s.ign.note()
+	for _, want := range []string{"gitignore rules NOT APPLIED", "not a git repository", "every path in every scope is being scanned"} {
+		if !strings.Contains(n, want) {
+			t.Errorf("note must say %q, got %q", want, n)
+		}
+	}
+	if strings.Contains(n, "\n") {
+		t.Errorf("the index note must be one line, got %q", n)
+	}
+	if _, _, code := runVerdict(t, root, s); code != 1 {
+		t.Errorf("verdict must be 1 on findings, got %d", code)
+	}
+
+	// 4. the shape a quiet green would take: a clean index-less tree with paths the
+	//    rules would have skipped. Green is allowed; silence is not.
+	clean := liveFixture(t)
+	seedFile(t, clean, ".gitignore", "frontend/dist/*\n!frontend/dist/.gitkeep\n")
+	seedFile(t, clean, "frontend/dist/bundle.js", "export const Panel = () => null;\n")
+	sc := scanFixture(t, clean)
+	out, errOut, code := runVerdict(t, clean, sc)
+	if code != 0 {
+		t.Fatalf("a tree with no banned shape must still be 0, got %d out=%s err=%s", code, out, errOut)
+	}
+	if nc := sc.ign.note(); !strings.Contains(nc, "gitignore rules NOT APPLIED") {
+		t.Errorf("an index-less run that reports clean must still say the rules were off, got %q", nc)
+	}
+	if got := sc.examined["panel-approval"]; got != 2 {
+		t.Errorf("ban #6 examined %d frontend/ files, want 2 (panel.tsx + bundle.js counted, nothing skipped)", got)
+	}
+}
+
 // TestGitIgnoreRuleSemantics pins the matcher against gitignore(5) directly, path
 // by path, because the counts depend on the fine print: a matcher that excluded
 // the `dist` DIRECTORY instead of its contents would drop
@@ -1369,6 +1634,12 @@ func TestGitIgnoreRuleSemantics(t *testing.T) {
 		"secret?.txt",
 		"a/b/mid.txt",
 		"notes/blocked.md",
+		// A214/F3's two shapes, both of which r1 got in the SILENT direction: a
+		// trailing `**` that pruned its own parent directory, and a rule line whose
+		// leading whitespace was trimmed into a different pattern.
+		"deep/**",
+		"!deep/.gitkeep",
+		"  lead/*",
 	}, "\n")+"\n")
 	// The deepest rule file wins, so this negation re-includes a path the root
 	// file excludes.
@@ -1401,6 +1672,14 @@ func TestGitIgnoreRuleSemantics(t *testing.T) {
 		{"notes/blocked.md", false, false, "the deeper notes/.gitignore negation outranks the root exclusion"},
 		{"comment", false, false, "a `#` line is a comment, not a rule"},
 		{"src/app.tsx", false, false, "nothing here touches a tracked source file"},
+		// A214/F3 ②: `deep/**` must not be allowed to prune `deep` itself.
+		{"deep", true, false, "a TRAILING `**` never matches its own parent directory (measured: `git check-ignore -v dist` exits 1 for the rule `dist/**`) - pruning it swallows the re-included anchor below and moves CI's 40 to 39"},
+		{"deep/.gitkeep", false, false, "the negation still reaches it, because nothing above pruned the directory"},
+		{"deep/x", true, true, "`deep/**` does ignore the directories INSIDE deep"},
+		{"deep/x/y.js", false, true, "and everything below them"},
+		// A214/F3 ①: leading whitespace in a rule line is data.
+		{"lead/inside.txt", false, false, "git does NOT strip leading whitespace, so `  lead/*` is a pattern beginning with two spaces and binds nothing here (r1's TrimSpace made it swallow live/lead/inside.txt)"},
+		{"  lead/inside.txt", false, true, "and it does bind the directory whose name really starts with those two spaces"},
 	}
 	for _, c := range cases {
 		if got := g.decide(c.rel, c.isDir); got.ignored != c.want {
@@ -1450,16 +1729,75 @@ func relToRepo(root, p string) string {
 // Everything else .gitignore names (build/, third_party/, *.exe, the
 // scripts/spike/bin/ dumps) lives outside design/ frontend/ internal/ cmd/.
 //
+// A214/F1 ADDS THE INDEX HALF TO THIS COPY, IN THIS BATCH, ON PURPOSE. A pattern
+// alone was exactly the premise that let the r1 batch hide a force-added
+// deliverable, and this copy shares every premise of the thing it is supposed to
+// falsify - so as delivered it agreed with the instrument on the very tree the
+// acceptance had built by hand (§1.4: "it returns true for
+// frontend/dist/tracked-forced.tsx"). Two arguments now bind it to git's criterion
+// instead of to a pattern:
+//   - rulesOn mirrors gitignore.go's fallback: when the index cannot be consulted
+//     the instrument applies NO rule, so this copy must skip nothing either, or the
+//     two numbers split on every `git archive` snapshot for the wrong reason.
+//   - tracked is the index. A path git holds is never ignored, so this copy may not
+//     skip it either. If gitignore.go ever forgets that, the two copies disagree by
+//     exactly one file and the failure message is the "the number in the self-report
+//     is wrong" line in the test above - the designed friction, not a bug.
+//
+// What is NOT mirrored and why: the two A214/F3 semantic fixes (leading whitespace,
+// trailing `**`) live in the matcher this list does not call. The list encodes
+// today's policy, and today's policy has no rule whose meaning those fixes change
+// inside design/ frontend/ internal/ cmd/ - so if such a rule is ever added, this
+// list moves in the same batch, exactly as the paragraph above has always demanded.
+//
 // If this list and .gitignore ever disagree, the failure message is
 // TestLedgerCountsMatchAnIndependentWalk's "the number in the self-report is
 // wrong" line - read it as "the ignore policy now covers a scanned scope", decide
 // whether that is intended, move this list, and re-state the scope baselines in
 // docs/reports/pending-and-issues.md in the same batch (A207 ②).
-func ignoredLikeGit(rel string) bool {
+func ignoredLikeGit(rel string, tracked map[string]bool, rulesOn bool) bool {
+	if !rulesOn {
+		return false
+	}
 	if strings.HasPrefix(rel, "frontend/dist/") {
+		if tracked[rel] {
+			return false
+		}
 		return filepath.Base(rel) != ".gitkeep"
 	}
 	return false
+}
+
+// gitTrackedIndex is this file's own hand-asked copy of the three git questions
+// gitignore.go's runGitIndex asks, so the oracle above is not secretly calling the
+// code under test. It never fails the test: an unreachable index is the normal
+// state of a `git archive` snapshot, and both sides then agree on "no rules".
+func gitTrackedIndex(root string) (tracked map[string]bool, ok bool, why string) {
+	tracked = map[string]bool{}
+	for _, step := range []struct {
+		name string
+		args []string
+	}{{"rev-parse", []string{"rev-parse", "--show-prefix"}}, {"ls-files", []string{"ls-files", "-z"}}} {
+		cmd := exec.Command("git", step.args...)
+		cmd.Dir = root
+		var stdout, stderr strings.Builder
+		cmd.Stdout, cmd.Stderr = &stdout, &stderr
+		if err := cmd.Run(); err != nil {
+			return tracked, false, firstLineOf(stderr.String()) + " (`git " + step.name + "`)"
+		}
+		if step.name == "rev-parse" {
+			if p := strings.TrimRight(stdout.String(), "\r\n"); p != "" {
+				return tracked, false, "root is the subdirectory " + p + " of a repository, not its top"
+			}
+			continue
+		}
+		for _, p := range strings.Split(stdout.String(), "\x00") {
+			if p != "" {
+				tracked[p] = true
+			}
+		}
+	}
+	return tracked, true, ""
 }
 
 // TestRealRepoLedgerIsHonest is AC#4 on this repository, restated by ticket 88

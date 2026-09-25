@@ -30,16 +30,36 @@ package main
 // disease). Writing a second literal list of {"dist","node_modules"} would
 // re-open it the day somebody ignores a new directory inside a scanned scope:
 // the scanner would keep counting it and the baseline would move again for a
-// reason nobody can see. `.gitignore` IS the policy; the scanner follows it, so
-// the instrument and the repository's ignore rules cannot disagree.
+// reason nobody can see. `.gitignore` IS the policy this tool reads.
 //
-// WHY `git check-ignore` IS NOT USED, even though it is the authoritative
-// implementation. The snapshot shape CI's evidence and every mutation check
-// here runs on is `git archive HEAD | tar -x`, which has NO `.git` directory
-// (measured: `ls <snap>/.git` -> "No such file or directory"), so a git call
-// would either fail or silently return "nothing is ignored" - making the reading
-// depend on whether the tree is a checkout, which is exactly the defect being
-// fixed. A lint gate must not require a git binary to run.
+// WHAT THAT LEAVES OUT, AND WHAT THE r1 ACCEPTANCE FOUND (ledger A214, F1). Git's
+// criterion for "is this path ignored?" is the rule file **AND the index**: a path
+// the index already holds is never ignored, which is exactly what `git add -f`
+// means - someone declared that file part of the deliverable, and git honours it
+// (measured on this machine, `git check-ignore -v <force-added>` exits 1 while the
+// same command with `--no-index` exits 0 naming the rule). A pattern-only matcher
+// therefore skips files git does not skip, and every one of those is a shipped
+// byte the gate stops reading. `skip()` asks both questions now: the rule files in
+// this tree, and git's own instruments for what this tree's index holds
+// (askGitIndex). The claim this file makes - and the one
+// scan_test.go's TestTrackedPathsAreNeverSkippedByTheIgnoreFilter pins by force
+// adding a file under an ignored path and demanding it go red - is the narrow,
+// testable one: **for a path git reports as tracked, skip() returns false.**
+//
+// WHY git IS CALLED, and what happens when it cannot be. `git check-ignore` was
+// not used in the r1 batch because the snapshot shape this repo's evidence and
+// every mutation check runs on is `git archive HEAD | tar -x`, which has NO `.git`
+// (measured in d22scan-gitignore-accept-r1.md §4), and gating the filter on the
+// presence of `.git` is not a fix either: a real CI checkout is a clone WITH
+// `.git`, so that gate leaves the dangerous case - a tracked file matching a rule,
+// in the tree CI and every developer actually scans - filtered out and only
+// re-blinds the archive copy (A214 ②, which is why the named minimal fix was not
+// adopted). This batch does the opposite instead: git is asked, and when it cannot
+// answer - no git binary, not a repository, `-root` pointing at a subdirectory of
+// somebody else's repository, a failing command, an expired deadline, output that
+// does not parse - **no ignore rule is applied at all** and the self-report says
+// so loudly (see note()). The failure direction is always MORE scanning, never a
+// quiet green: a scanner that could not ask does not get to claim a clean count.
 //
 // SEMANTICS IMPLEMENTED (the gitignore(5) subset that can bind a path inside
 // design/ frontend/ internal/ cmd/):
@@ -56,20 +76,43 @@ package main
 //     matches the base name at any depth.
 //   - "*" and "?" do not cross "/" (git matches with FNM_PATHNAME); "**" does.
 //     "[...]" classes support a leading "!" or "^" negation and "a-z" ranges.
+//   - a TRAILING "**" matches everything inside its directory and never the
+//     directory itself (`dist/**` does not ignore `dist`), measured against
+//     `git check-ignore -v dist` -> exit 1. Pruning `dist` would swallow the
+//     `!dist/.gitkeep` re-inclusion below it and take CI's 40 down to 39, which is
+//     the shape gitignore.go's own r1 header warned about and did not implement
+//     (acceptance §2 probe P2, F3 ②). A "**" in the MIDDLE of a pattern still
+//     matches zero directories, because `a/**/b` matching `a/b` is git's documented
+//     behaviour (`git check-ignore -v a/b` -> exit 0) and was already pinned.
+//   - a rule line's LEADING whitespace is part of the pattern; only trailing
+//     unquoted whitespace and one trailing CR are removed. `git check-ignore -v`
+//     on a file under `dist/` with the rule `  dist/*` exits 1 (that rule names a
+//     directory whose name starts with two spaces), while a directory really called
+//     `  dist` is ignored by it. Trimming the front, as r1 did, turns a rule that
+//     git binds to nothing into a rule that swallows a live tree (F3 ①, probe P1).
 //   - an ignored directory takes its contents with it and no negation below it
 //     can bring them back (git's documented parent-directory rule).
-// UNSUPPORTED ON PURPOSE: `.git/info/exclude` and `core.excludesFile` (they live
-// outside the scanned tree, so honouring them would make the count depend on the
-// machine again), backslash-escaped trailing spaces, and comments after a
-// pattern. Every unsupported shape fails in the loud direction: the path stays
-// scanned, so the worst this matcher can do is examine too much, never less.
+//   - a path the index holds is never skipped, whatever the rules say, and a
+//     directory containing one is never pruned (F1).
+// UNSUPPORTED ON PURPOSE: `.git/info/exclude` and `core.excludesFile` as SOURCES
+// OF A SKIP (they live outside the scanned tree, so honouring them would make the
+// count depend on the machine again - A207's disease), backslash-escaped trailing
+// spaces, and comments after a pattern. Each of those can only ever make this
+// matcher skip LESS than git does, which is the loud direction: the path stays
+// scanned and the worst outcome is a denominator that counts one file too many.
+// The one shape that could make it skip MORE than git - not being able to reach
+// the index at all - is handled by the rule above it, not by this list: no rule
+// is applied then, so the tool over-scans and says why.
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 	"unicode/utf8"
 )
 
@@ -91,12 +134,15 @@ type ignoreVerdict struct {
 }
 
 // gitIgnore answers "would git decline to track this path?" for the tree under
-// root, using only the .gitignore files inside that tree.
+// root, using the .gitignore files inside that tree AND that tree's git index -
+// the two halves of git's own criterion. The index half is asked lazily (see
+// index), and if it cannot be asked, no rule is applied at all.
 type gitIgnore struct {
 	root   string
 	rules  map[string][]ignoreRule // rule file dir (slash, "" = root) -> its rules
 	probed map[string]bool         // rule file dir already looked for
 	cache  map[string]ignoreVerdict
+	idx    *gitIndexState // git's answer about tracked paths, nil until first asked
 	// The three counters below describe the TREE, not the number of walk visits:
 	// four walks share one matcher (walkGo, walkText, walkEmoji x4 scopes), so
 	// without `counted` a file sitting in a scope two bans read - which is exactly
@@ -106,6 +152,172 @@ type gitIgnore struct {
 	files   int             // excluded files
 	pruned  map[string]bool // excluded directory -> pruned
 	origins map[string]int  // rule file -> how many distinct paths it excluded
+}
+
+// gitIndexState is git's own answer about the tree under root: which paths the
+// index already holds. It is what turns "the rule matched" into "git would decline
+// to track this path", and it is the only thing that can prove the difference -
+// no in-tree file states whether a path is tracked.
+//
+// Three read-only questions are asked (runGitIndex), and they are all-or-nothing:
+// a half-loaded index would be a new blindfold, so any failure yields
+// ok=false plus one reason, and skip() then applies NO ignore rules at all.
+//
+//	rev-parse --show-prefix                       is root a repository top?
+//	ls-files -z                                   every tracked path (the guard)
+//	ls-files -z -i -c --exclude-standard          tracked paths that also match
+//	                        an ignore rule (the ticket's named instrument, the set
+//	                        the self-report names, and an independent union member
+//	                        so one command's parsing bug cannot blind the other)
+type gitIndexState struct {
+	ok        bool
+	why       string          // why it could not be consulted; one line, always shown
+	tracked   map[string]bool // every path in the index, slash-separated, relative to root
+	dirs      map[string]bool // every ancestor directory of a tracked path
+	ignored   map[string]bool // `ls-files -i -c --exclude-standard`
+	ignoreSet []string        // ignored, sorted (the note must not depend on map order)
+}
+
+// holds is the whole of F1's fix in one predicate: this path, or something inside
+// this directory, is in the index, so it is part of the delivery and a pattern may
+// not hide it.
+func (ix *gitIndexState) holds(rel string, isDir bool) bool {
+	if ix == nil || !ix.ok {
+		return false
+	}
+	if isDir {
+		return ix.dirs[rel]
+	}
+	return ix.tracked[rel] || ix.ignored[rel]
+}
+
+// indexTimeout bounds one git call. A gate that hangs is not a gate. The deadline
+// is a context timer (monotonic), never a wall-clock delta, which AGENTS.md §1.2
+// bans as a shape - so nothing here compares two time.Now() readings.
+const indexTimeout = 10 * time.Second
+
+// runGitIndex asks the three questions above. Every error path collapses to
+// ok=false with a single-line reason, because the caller's only legal response is
+// "apply no rules and say so".
+func runGitIndex(root string) *gitIndexState {
+	fail := func(format string, args ...any) *gitIndexState {
+		return &gitIndexState{why: fmt.Sprintf(format, args...)}
+	}
+	prefix, err := runGitAt(root, "rev-parse", "--show-prefix")
+	if err != nil {
+		return fail("git cannot be consulted in %s: %s", filepath.ToSlash(root), err)
+	}
+	if p := strings.TrimRight(prefix, "\r\n"); p != "" {
+		// root is a SUBDIRECTORY of somebody else's repository. Its index governs
+		// more than this tree and lists paths against the repository top, so the
+		// answer cannot be resolved against root-relative rules - treat it as
+		// unreachable rather than half-trust it.
+		return fail("%s is the subdirectory %q of a git repository, not its top, so that index is not this tree's index", filepath.ToSlash(root), filepath.ToSlash(p))
+	}
+	all, err := runGitAt(root, "ls-files", "-z")
+	if err != nil {
+		return fail("git ls-files failed in %s: %s", filepath.ToSlash(root), err)
+	}
+	withIndex, err := runGitAt(root, "ls-files", "-z", "-i", "-c", "--exclude-standard")
+	if err != nil {
+		return fail("git ls-files -i -c --exclude-standard failed in %s: %s", filepath.ToSlash(root), err)
+	}
+	tracked, dirs, err := parseIndexPaths(all)
+	if err != nil {
+		return fail("cannot parse git ls-files output in %s: %s", filepath.ToSlash(root), err)
+	}
+	ignored, err := parseIndexPathsList(withIndex)
+	if err != nil {
+		return fail("cannot parse git ls-files -i -c output in %s: %s", filepath.ToSlash(root), err)
+	}
+	set := map[string]bool{}
+	for _, p := range ignored {
+		set[p] = true
+	}
+	sort.Strings(ignored)
+	return &gitIndexState{ok: true, tracked: tracked, dirs: dirs, ignored: set, ignoreSet: ignored}
+}
+
+// runGitAt runs one read-only git command with root as the working directory and
+// returns its stdout. Errors are collapsed to one line because they end up in the
+// self-report.
+func runGitAt(root string, args ...string) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), indexTimeout)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "git", args...)
+	cmd.Dir = root
+	var stdout, stderr strings.Builder
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	if err := cmd.Run(); err != nil {
+		if ctx.Err() != nil {
+			return "", fmt.Errorf("timed out after %s running `git %s`", indexTimeout, strings.Join(args, " "))
+		}
+		reason := firstLine(stderr.String())
+		if reason == "" {
+			reason = err.Error()
+		}
+		return "", fmt.Errorf("`git %s`: %s", strings.Join(args, " "), reason)
+	}
+	return stdout.String(), nil
+}
+
+func firstLine(s string) string {
+	s = strings.ReplaceAll(s, "\r\n", "\n")
+	for _, line := range strings.Split(s, "\n") {
+		if line = strings.TrimSpace(line); line != "" {
+			return line
+		}
+	}
+	return ""
+}
+
+// parseIndexPaths reads a NUL-separated `git ls-files` stream into the tracked set
+// plus the set of every directory above it (a tracked file anywhere below a
+// directory means that directory may never be pruned).
+func parseIndexPaths(z string) (map[string]bool, map[string]bool, error) {
+	list, err := parseIndexPathsList(z)
+	if err != nil {
+		return nil, nil, err
+	}
+	tracked := make(map[string]bool, len(list))
+	dirs := map[string]bool{}
+	for _, p := range list {
+		tracked[p] = true
+		acc := ""
+		segs := strings.Split(p, "/")
+		for i := 0; i < len(segs)-1; i++ {
+			if acc == "" {
+				acc = segs[i]
+			} else {
+				acc += "/" + segs[i]
+			}
+			dirs[acc] = true
+		}
+	}
+	return tracked, dirs, nil
+}
+
+func parseIndexPathsList(z string) ([]string, error) {
+	var out []string
+	for _, p := range strings.Split(z, "\x00") {
+		if p == "" {
+			continue
+		}
+		// Nothing git prints here may be a path outside the tree; if it is, this
+		// matcher is reading a stream it does not understand and must stop trusting
+		// it rather than resolve it into a skip decision.
+		if strings.HasPrefix(p, "/") {
+			return nil, fmt.Errorf("absolute path %q in git output", p)
+		}
+		for _, seg := range strings.Split(p, "/") {
+			if seg == ".." {
+				return nil, fmt.Errorf("path %q in git output reaches above the root", p)
+			}
+		}
+		out = append(out, p)
+	}
+	return out, nil
 }
 
 func newGitIgnore(root string) *gitIgnore {
@@ -131,7 +343,18 @@ func (g *gitIgnore) skip(path string, isDir bool) bool {
 	if rel == "" {
 		// The walk's own starting directory (rel == ""), and anything the root
 		// prefix did not survive: never skipped, because skipping it would abort
-		// the walk before it examined anything.
+		// the walk before it examined anything. Asked BEFORE the index, so this
+		// branch costs no git call and cannot be reached by a failed one.
+		return false
+	}
+	ix := g.index()
+	if !ix.ok {
+		// No rule is applied when git could not be asked whether the path is
+		// tracked: the only safe answer to "would git decline to track this?" is
+		// then "unknown", and unknown must not become a skip.
+		return false
+	}
+	if ix.holds(rel, isDir) {
 		return false
 	}
 	v := g.decide(rel, isDir)
@@ -152,26 +375,58 @@ func (g *gitIgnore) skip(path string, isDir bool) bool {
 	return true
 }
 
-// note renders one self-report line about what the matcher excluded, or "" when
-// it excluded nothing. It is deliberately NOT part of the scanScope ledger:
-// guard 0 (undeclaredKeys) makes a counter that no scope reports fatal, and this
-// is not coverage - it is provenance for a coverage number.
+// index loads git's answer once per matcher and keeps it: the walks are
+// sequential and four of them share one matcher, so re-asking per path would be
+// thousands of subprocess calls, and re-asking mid-walk would let a path skipped
+// early disagree with the same path seen again under another ban.
+func (g *gitIgnore) index() *gitIndexState {
+	if g.idx == nil {
+		g.idx = runGitIndex(g.root)
+	}
+	return g.idx
+}
+
+// note renders the self-report lines about what this matcher did and did not get
+// to decide, "" when there is nothing to say. It is deliberately NOT part of the
+// scanScope ledger: guard 0 (undeclaredKeys) makes a counter that no scope reports
+// fatal, and this is not coverage - it is provenance for a coverage number.
+//
+// Three lines are possible, and the first two are the ones that keep this tool
+// honest after A214: an index it could not read must be announced even when the
+// run is otherwise green (a quiet "clean" from a scanner that could not ask is the
+// false green this repository keeps catching), and a tracked path sitting under an
+// ignore rule must be named, because that is precisely the file the r1 batch made
+// invisible.
 func (g *gitIgnore) note() string {
-	if g == nil || (g.files == 0 && len(g.pruned) == 0) {
+	if g == nil {
 		return ""
 	}
-	dirs := make([]string, 0, len(g.pruned))
-	for d := range g.pruned {
-		dirs = append(dirs, d+"/")
+	var lines []string
+	if g.idx != nil && !g.idx.ok {
+		lines = append(lines, fmt.Sprintf("d22scan: gitignore rules NOT APPLIED - %s; every path in every scope is being scanned, "+
+			"so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: "+
+			"a scanner that cannot ask git which paths are tracked does not get to skip any.", g.idx.why))
 	}
-	sort.Strings(dirs)
-	src := make([]string, 0, len(g.origins))
-	for o, n := range g.origins {
-		src = append(src, fmt.Sprintf("%s (%d path(s))", filepath.ToSlash(o), n))
+	if g.files > 0 || len(g.pruned) > 0 {
+		dirs := make([]string, 0, len(g.pruned))
+		for d := range g.pruned {
+			dirs = append(dirs, d+"/")
+		}
+		sort.Strings(dirs)
+		src := make([]string, 0, len(g.origins))
+		for o, n := range g.origins {
+			src = append(src, fmt.Sprintf("%s (%d path(s))", filepath.ToSlash(o), n))
+		}
+		sort.Strings(src)
+		lines = append(lines, fmt.Sprintf("d22scan: skipped as git-ignored: %d file(s) under %d ignored director(ies) [%s], decided by %s",
+			g.files, len(g.pruned), strings.Join(dirs, ", "), strings.Join(src, ", ")))
 	}
-	sort.Strings(src)
-	return fmt.Sprintf("d22scan: skipped as git-ignored: %d file(s) under %d ignored director(ies) [%s], decided by %s",
-		g.files, len(g.pruned), strings.Join(dirs, ", "), strings.Join(src, ", "))
+	if g.idx != nil && len(g.idx.ignoreSet) > 0 {
+		lines = append(lines, fmt.Sprintf("d22scan: %d path(s) git reports as TRACKED and matching an ignore rule (git ls-files -i -c --exclude-standard) "+
+			"- a tracked path is part of the delivery, so none of them was skipped: %s",
+			len(g.idx.ignoreSet), strings.Join(g.idx.ignoreSet, ", ")))
+	}
+	return strings.Join(lines, "\n")
 }
 
 // rel turns a walk path into a slash path relative to root ("" when it is root).
@@ -293,7 +548,13 @@ func lenNonEmpty(dir string) int {
 func parseIgnoreFile(src string, dirSegs int) []ignoreRule {
 	var out []ignoreRule
 	for _, raw := range strings.Split(src, "\n") {
-		line := strings.TrimRight(strings.TrimSpace(raw), " \t")
+		// Strip a trailing CR and then trailing unquoted whitespace ONLY. Git keeps
+		// leading whitespace as pattern data (measured: the rule `  dist/*` ignores
+		// a directory whose name really begins with two spaces and binds nothing
+		// else), so TrimSpace here silently widens a rule that git binds to nothing
+		// into one that swallows a live tree - A214/F3 ①, probe P1, where
+		// `  dist/*` swallowed dist/index.html.
+		line := strings.TrimRight(raw, " \t\r")
 		if line == "" || strings.HasPrefix(line, "#") {
 			continue
 		}
@@ -328,7 +589,17 @@ func pathMatch(pat, name []string) bool {
 		return len(name) == 0
 	}
 	if pat[0] == "**" {
-		for i := 0; i <= len(name); i++ {
+		// A `**` in the middle of a pattern may match zero directories (`a/**/b`
+		// matches `a/b` - pinned by TestGitIgnoreRuleSemantics and confirmed against
+		// git), but a `**` at the END of one must consume at least one segment:
+		// `dist/**` matches everything inside dist and never dist itself, so it
+		// cannot prune the directory that the `!dist/.gitkeep` negation lives under
+		// (A214/F3 ②, probe P2, where it took CI's 40 to 39).
+		start := 0
+		if len(pat) == 1 {
+			start = 1
+		}
+		for i := start; i <= len(name); i++ {
 			if pathMatch(pat[1:], name[i:]) {
 				return true
 			}
