@@ -1306,6 +1306,131 @@ var grantRoutePrefixes = []string{
 // which is why "now" is along: a wiring commit reaches for whatever reads well).
 var grantRouteSuffixes = []string{"", ".request", ".now"}
 
+// gridFactorWitness is one member of a grid factor plus one route name that only
+// that member lets the sweep assemble.
+type gridFactorWitness struct {
+	factor string
+	route  string
+}
+
+// grantRoutePrefixWitnesses and grantRouteSuffixWitnesses are the floor under the
+// other two factors of the product (F-R4-2, docs/evidence/s1/panel-l2-grant-
+// nail-fix-r4-accept-r1.md §11). grantRouteWords has had a witness per member
+// since F-ACC-2; the two lists here had none, and acceptance r4 measured what
+// that costs: deleting "panel.mode" (asked 528 -> 462) or the ".now" tail (asked
+// 528 -> 352) leaves the package green, so a production guard that answers an
+// approval route spelled through the pruned piece is silently unasked - its own
+// M-now reading was hits=[panel.review.grant.now] red with the list intact and
+// clean with ".now" gone. The product assertion cannot see this: asked= always
+// equals the lists as they now stand, so it nails "a factor that stopped being
+// ranged", never "a factor that got narrower".
+//
+// This is not a table asserting that it contains itself, for the same reason the
+// word roster is not (F-ACC-2): each row is judged by three things outside the
+// list it defends - the names the sweep really assembled (checkGridFactor
+// Witnesses), the real predicate over the real vocabulary, and the RUNNING
+// production guard.
+//
+// A row is one name, not the whole grid: it says "this piece is still in play",
+// so the lists may still gain members freely - widening the grid is safe and
+// needs no new row - while narrowing it reds. Rows are spelled out rather than
+// templated, and each names a door the guard must refuse, panel.review.grant.now
+// being the spelling acceptance r4 planted.
+var (
+	grantRoutePrefixWitnesses = []gridFactorWitness{
+		{"panel", "panel.grant"},
+		{"panel.review", "panel.review.approve"},
+		{"panel.approval", "panel.approval.grant"},
+		{"panel.l2", "panel.l2.approve"},
+		{"panel.mode", "panel.mode.approve"},
+		{"panel.workspace", "panel.workspace.approve"},
+		{"panel.attachment", "panel.attachment.approve"},
+		{"panel.message", "panel.message.approve"},
+	}
+	grantRouteSuffixWitnesses = []gridFactorWitness{
+		{"", "panel.decide"},
+		{".request", "panel.authorize.request"},
+		{".now", "panel.review.grant.now"},
+	}
+)
+
+// checkGridFactorWitnesses is the ruler over one factor list: four claims per
+// row, and a deleted member breaks the first two at once - the piece is gone
+// from the list, and the name this file calls its evidence is no longer among
+// the names the sweep put to the guard.
+func checkGridFactorWitnesses(t *testing.T, listName string, list []string, rows []gridFactorWitness, names []string, perMember int) {
+	t.Helper()
+	for _, row := range rows {
+		inList := false
+		for _, f := range list {
+			if f == row.factor {
+				inList = true
+			}
+		}
+		if !inList {
+			t.Errorf("%s no longer carries %q while this file still keeps %q as its witness: the sweep stopped asking the %d names that piece built, and a panel-side door spelled that way is now unasked rather than refused (F-R4-2)",
+				listName, row.factor, row.route, perMember)
+		}
+		asked := false
+		for _, n := range names {
+			if n == row.route {
+				asked = true
+			}
+		}
+		if !asked {
+			t.Errorf("the standing sweep never asked %q, the witness name for the %s entry %q: it is assembled out of grantRoutePrefixes x grantRouteWords x grantRouteSuffixes, so one of those three lists has narrowed away from the evidence written next to it (F-R4-2)",
+				row.route, listName, row.factor)
+		}
+		if !carriesGrantWord(row.route, grantRouteWords) {
+			t.Errorf("the %s entry %q is witnessed by %q, which the real predicate does not read as an approval door: this row is evidence of nothing", listName, row.factor, row.route)
+		}
+		if knownComposerMethod(row.route) {
+			t.Errorf("the running guard answers %q, the witness name for the %s entry %q: this row stands as proof that the grid that piece builds is refused, and it is not (D33/F2, R20, AGENTS.md §1.2 ban #6)", row.route, listName, row.factor)
+		}
+	}
+}
+
+// sweepAssembledNames is the ONE place this file puts the assembled name to the
+// RUNNING guard. It exists so the positive control and the negative assertion
+// below cannot drift apart onto separate execution points (F-R4-1, docs/
+// evidence/s1/panel-l2-grant-nail-fix-r4-accept-r1.md §10): while the control
+// called knownComposerMethod on a line of its own, short-circuiting this
+// function's ask step (if false && knownComposerMethod(name)) or its accumulate
+// step left the control green and the sweep reporting hits=[] as a clean
+// boundary, asked=528 and all. It returns how many names it built, the names
+// themselves (so a narrowed factor list is detectable by membership, F-R4-2),
+// and the names the guard answered, sorted.
+func sweepAssembledNames(prefixes, words, suffixes []string) (int, []string, []string) {
+	var names, hits []string
+	for _, p := range prefixes {
+		for _, w := range words {
+			for _, suffix := range suffixes {
+				for _, form := range []string{w, w + "s"} {
+					name := p + "." + form + suffix
+					names = append(names, name)
+					if knownComposerMethod(name) {
+						hits = append(hits, name)
+					}
+				}
+			}
+		}
+	}
+	sort.Strings(hits)
+	return len(names), names, hits
+}
+
+// declaredRoutePrefixes / declaredRouteWords / declaredRouteSuffixes are the
+// positive control's grid: the same three kinds of pieces the sweep multiplies,
+// aimed at the namespaces of the four routes this package really declares.
+// Exactly four of its 24 names are answered today, so the control says both
+// halves of the fact - the guard still answers its own routes, and the
+// neighbourhood around them is still refused.
+var (
+	declaredRoutePrefixes = []string{"panel"}
+	declaredRouteWords    = []string{"mode", "workspace", "attachment", "message"}
+	declaredRouteSuffixes = []string{".request", ".add", ".send"}
+)
+
 // knownComposerRefusesAssembledGrantNames is the behavioural sweep behind
 // TestRealGuardRefusesEveryAssemblableApprovalRouteName. It builds
 // len(grantRoutePrefixes) x len(grantRouteWords) x len(grantRouteSuffixes) x 2
@@ -1320,36 +1445,27 @@ var grantRouteSuffixes = []string{"", ".request", ".now"}
 // factors are now named in the empty-vocabulary control below, and the returned
 // count is checked against the product, because a factor that stops being ranged
 // is a grid that silently shrank and hits=[] over it is a different fact.
+//
+// The control that proves "hits=[] means refused" and not "means never asked" is
+// sweepAssembledNames' own ask line, reached from both sides at once (F-R4-1).
 func knownComposerRefusesAssembledGrantNames(t *testing.T) (int, []string) {
 	t.Helper()
 	if len(grantRouteWords) == 0 || len(grantRoutePrefixes) == 0 || len(grantRouteSuffixes) == 0 {
 		t.Fatalf("the sweep vocabulary is empty (grantRouteWords=%d, grantRoutePrefixes=%d, grantRouteSuffixes=%d): a sweep that asks nothing answers clean forever",
 			len(grantRouteWords), len(grantRoutePrefixes), len(grantRouteSuffixes))
 	}
-	// Anti-vacuity, positive control: the same guard that must refuse every name
-	// below has to answer the four routes this package really declares, or "0
-	// hits" would only mean the guard stopped working.
-	for _, legit := range []string{MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend} {
-		if !knownComposerMethod(legit) {
-			t.Fatalf("the running guard refuses its own declared route %q: the sweep below would report a clean boundary because nothing is answered any more, which is not the same fact", legit)
-		}
+	// Anti-vacuity, positive control: the same sweep line that must find no
+	// approval-shaped name below has to find the four routes this package really
+	// declares, in a grid of its own. It is the same line on purpose - see
+	// sweepAssembledNames.
+	wantAnswered := []string{MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend}
+	sort.Strings(wantAnswered)
+	_, _, legit := sweepAssembledNames(declaredRoutePrefixes, declaredRouteWords, declaredRouteSuffixes)
+	if !reflect.DeepEqual(legit, wantAnswered) {
+		t.Fatalf("the running guard answers %v of the %d names sweepAssembledNames builds from the four declared route namespaces (got %v, want %v): a sweep whose ask-or-accumulate step has been short-circuited reports hits=[] and reads as a clean boundary, which is not the same fact (F-R4-1)",
+			len(legit), len(declaredRoutePrefixes)*len(declaredRouteWords)*len(declaredRouteSuffixes)*2, legit, wantAnswered)
 	}
-	var hits []string
-	asked := 0
-	for _, p := range grantRoutePrefixes {
-		for _, w := range grantRouteWords {
-			for _, suffix := range grantRouteSuffixes {
-				for _, form := range []string{w, w + "s"} {
-					name := p + "." + form + suffix
-					asked++
-					if knownComposerMethod(name) {
-						hits = append(hits, name)
-					}
-				}
-			}
-		}
-	}
-	sort.Strings(hits)
+	asked, _, hits := sweepAssembledNames(grantRoutePrefixes, grantRouteWords, grantRouteSuffixes)
 	if want := len(grantRoutePrefixes) * len(grantRouteWords) * len(grantRouteSuffixes) * 2; asked != want {
 		t.Fatalf("the sweep asked %d names but the three lists it reads multiply to %d (%d prefixes x %d words x %d suffixes x 2 plural forms): a factor that stopped being ranged is a grid that silently shrank, and hits=%v over the smaller grid is not the verdict this file documents (F-ACC-1)",
 			asked, want, len(grantRoutePrefixes), len(grantRouteWords), len(grantRouteSuffixes), hits)
@@ -1546,6 +1662,15 @@ func TestGrantVocabularyIsNotSatisfiedByTheRealEnvelopes(t *testing.T) {
 			t.Fatalf("grantRouteWords carries %q with no witness row in grantRouteWordWitnesses: no name built from it has been put to the running guard here, so this file cannot claim the grid it multiplies that word into is clean", word)
 		}
 	}
+
+	// F-R4-2, the same rule over the two factors that had no witnesses: the names
+	// below are taken from the standing sweep's own output, so this is the sweep
+	// reporting what it asked rather than this file re-deriving a product.
+	_, names, _ := sweepAssembledNames(grantRoutePrefixes, grantRouteWords, grantRouteSuffixes)
+	checkGridFactorWitnesses(t, "grantRoutePrefixes", grantRoutePrefixes, grantRoutePrefixWitnesses, names,
+		len(grantRouteWords)*len(grantRouteSuffixes)*2)
+	checkGridFactorWitnesses(t, "grantRouteSuffixes", grantRouteSuffixes, grantRouteSuffixWitnesses, names,
+		len(grantRoutePrefixes)*len(grantRouteWords)*2)
 }
 
 // ---------------------------------------------------------------------------
