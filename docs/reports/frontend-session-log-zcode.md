@@ -57,3 +57,29 @@ internal/ball/tokens.go 与 docs/evidence/s1/c21-native-tokens.md 才能绿。�
   Chip（设置屏键名）＝3 枚，挂载尺安全。
 - 第二批待做：palette/tasks/ball/config 全节/security/privacy/cost/firstrun 八屏
   ＋L1 阻止窗口条（等 owner 答"谁画"）＋R19 动画 react-bits 免费近亲 vendoring。
+
+## §3 路线转向：demo 废弃，beautiful-ui 主题收编（2026-09-25 晚，owner 第四次裁决）
+
+owner 看过第一批 harness 后原话（意）：「推翻再重来，不按照 demo 来了…按照你的想法
+重新以 beautiful ui 组件库…重新设计一下 token…必须是极简风的，就两种风格，暗色/浅色…
+所有动画用 reactbits，但是这些动画是在 beautiful ui 没有的前提下再用…越看越觉得这个
+harness 有点四不像，起码要有主流 harness 的样子」。
+
+**落地方案**：
+1. **token 第四代**：收编 turbo-kach（beautiful-ui 官网那套）自己的 app/globals.css 主题
+   逐字为主题——极简纯面、明暗两态、蓝 accent #0285ff、hairline 系投影、6/8/10 圆角。
+   demo 主题（青雾磨砂/雾团/环境光）全部废弃；demo 不再是任何意义上的样式来源。
+   生成器真身改为「本脚本即设计定案」，来源与上游 commit（05dab2d2）在头注声明。
+2. **组件**：turbo 19 构件全部零 props 演示页（grep 证实：TaskRows({variant}) 一族），
+   但纯 MIT 允许改写 → **改写成 props 驱动版**（视觉动画照抄蓝本、数据进 props、
+   无 props 不渲染），头部 derived-from 登记；slev 11 atoms 全 props 驱动 → 逐字
+   vendored（Button/EntityChip/Switch 各 1 处字面量做换 token 微改并登记）。
+3. **动画**：beautiful-ui 自带（fade-up/pop-in/stream-in/pixel-on/shimmer-text/spin/
+   eq-bounce）先用；react-bits 只补库没有的（缺口清单后补）。
+4. **harness 重定义**：?harness=1 渲染 **showcase**（官网式组件展示页：header+章节索引+
+   编号章节+框式 demo 卡+明暗切换），main.tsx 已接；生产面板（App）永不吃假数据。
+   面板自身的浮窗/磨砂/雾球 chrome 全部删除。
+5. **不动的**：render-* 四把尺全部 needle（点击悬浮球以批准/拒绝/查看完整参数/
+   l2-ball-ring/bg-stop/档位字符串族/1.0 MB 格式化等）、panel.ts 契约、panel-views、
+   App 安全设计（L2 卡全局渲染）、六把尺、git 纪律。
+6. 转向口令：「撤 beautiful-ui 转向」⇒ 回 demo 路线（token 第三代 + 第一批提交）。

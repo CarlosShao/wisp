@@ -28,11 +28,11 @@ const JOBS = [
   { src: "components/atoms/StreamText.tsx", dest: "src/components/ai-native/stream-text.tsx", component: "StreamText", note: "NOT mounted: it builds segments with split on a single space, so a Chinese answer reveals as one unit; PLAN.md:3476 逐段 is served by our own src/components/reveal-text.tsx" },
   { src: "components/atoms/Shimmer.tsx", dest: "src/components/ai-native/shimmer.tsx", component: "Shimmer", note: "mounted: the waiting label in src/components/PanelSkeleton.tsx" },
   { src: "components/approval-card.tsx", dest: "src/components/ai-native/approval-card.tsx", component: "ApprovalCard", note: "NOT mounted: upstream demo questionnaire; kept as the visual reference the adapted src/components/l2-approval-card.tsx was cut from" },
-  { src: "components/loading-state.tsx", dest: "src/components/ai-native/loading-state.tsx", component: "LoadingState", note: "NOT mounted: ships with upstream demo strings; the panel's own loading state is PanelSkeleton.tsx until ticket 35 feeds it" },
-  { src: "components/thinking.tsx", dest: "src/components/ai-native/thinking.tsx", component: "Thinking", note: "NOT mounted: demo data intact, see the note above the default export" },
-  { src: "components/tool-chips.tsx", dest: "src/components/ai-native/tool-chips.tsx", component: "ToolChips", note: "NOT mounted: demo data intact; tool traces arrive through the C17 bridge (ticket 35)" },
+  { src: "components/loading-state.tsx", dest: "src/components/ai-native/loading-state.tsx", component: "LoadingState", adapted: true, note: "ADAPTED 2026-09-25 (props-driven, demo timer removed, P9): a re-run must not clobber it - vendor.mjs skips adapted dests without --force" },
+  { src: "components/thinking.tsx", dest: "src/components/ai-native/thinking.tsx", component: "Thinking", adapted: true, note: "ADAPTED 2026-09-25 (props-driven, sparkles head replaced by the pixel grid, P9)" },
+  { src: "components/tool-chips.tsx", dest: "src/components/ai-native/tool-chips.tsx", component: "ToolChips", adapted: true, note: "ADAPTED 2026-09-25 (props-driven four-state tool chips, P9)" },
   { src: "components/task-rows.tsx", dest: "src/components/ai-native/task-rows.tsx", component: "TaskRows", note: "NOT mounted: demo data intact; history rows are ticket 35+" },
-  { src: "components/streaming-text.tsx", dest: "src/components/ai-native/streaming-text.tsx", component: "StreamingText", note: "NOT mounted: demo answer text + external source links; the panel must not render upstream URLs" },
+  { src: "components/streaming-text.tsx", dest: "src/components/ai-native/streaming-text.tsx", component: "StreamingText", adapted: true, note: "ADAPTED 2026-09-25 (props-driven, sources downgraded to spans, caret served by reveal-text, P9)" },
 ];
 
 // D23 / ban #8 zero-emoji, applied to OUR copy: upstream writes U+2713 into two
@@ -105,6 +105,14 @@ const commit = execFileSync("git", ["-C", upstream, "rev-parse", "HEAD"], { enco
 
 mkdirSync(join(frontendRoot, "src", "components", "ai-native"), { recursive: true });
 for (const job of JOBS) {
+  // 2026-09-25 pivot: four of these dests are no longer verbatim copies - they
+  // were ADAPTED into props-driven components (demo data removed, P9). A
+  // mechanical re-vendor would silently restore upstream demo pages over the
+  // adaptations, so adapted dests are skipped unless --force.
+  if (job.adapted && !argv.includes("--force")) {
+    stdout.write(`skipped ${job.dest}  (adapted by hand - see VENDORED.md; pass --force to overwrite)\n`);
+    continue;
+  }
   const raw = readFileSync(join(upstream, job.src), "utf8");
   // \r\n tolerance: upstream is a Windows checkout, so the directive can end
   // with either line ending (a plain \n regex silently matches nothing). Line

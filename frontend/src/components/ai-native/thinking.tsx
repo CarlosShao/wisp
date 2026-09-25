@@ -1,139 +1,119 @@
 /* ============================================================================
-   Vendored file - ticket 77 AC#7 (ledger: frontend/VENDORED.md).
+   Adapted component.
    ----------------------------------------------------------------------------
-   Source repo    : github.com/TurboKach/ai-native-react-components  (registry name "ai-native", beautifului.dev)
-   Source file    : components/thinking.tsx
-   Component      : Thinking
-   License        : MIT (upstream LICENSE: Copyright (c) 2026 Turbo)
-   Upstream commit: 05dab2d2b5f1f3e40029776e339a486d70491079
-   Local changes  : provenance header added; the Next.js-only "use client"
-                    directive removed; line endings normalized to LF;
-                    1 dingbat glyph(s) ASCII-ized for D23/ban #8.
-                    Nothing else - see scripts/vendor.mjs.
-   Panel status   : NOT mounted: demo data intact, see the note above the default export
+   来源 = derived from TurboKach/ai-native-react-components
+          components/thinking.tsx (MIT, Copyright (c) 2026 Turbo,
+          upstream commit 05dab2d2).
+   本地改动：
+   - props 化: { seconds?, steps?, reasoning?, sources? } - 上游是定时器驱动
+     的四变体演示（STAGES 分幕自动展开收起），这里全部由 props 决定；全部
+     缺省时不渲染任何主体（宁缺毋造）。working = steps 里还有未完成步。
+   - 数据移除: VARIANTS 演示数据（Steps/Reasoning/Search/Coding 四套）、
+     Search 的外链 href、"+7 more" 演示尾巴、Coding 变体全部删除。
+   - 图标替换: 上游折叠头的 sparkles 四角星按 D23 图标规则禁用，换成
+     loading-state 点阵 Drive 图案的缩微版（2px 单元 + pixel-on 关键帧）。
+   - 字面量换 token: 全部走 bg-hover-2 / bg-line / text-ink / text-ink-2 /
+     text-ink-3 / bg-accent / bg-orange / bg-green 等 token 工具类，无颜色
+     字面量；上游用 JS 量高画的展开竖线改为纯 CSS 定位线（SSR 安全）。
+   - 三个子页签（步骤/推理/检索）按 bu-pill 词汇用 Tailwind 手写：
+     rounded-full、bg-hover、active 为 bg-surface + shadow-btn。
    ============================================================================ */
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 
-/* ─────────────────────────────────────────────────────────
- * THINKING — expandable agent trace, four variants
- *
- *   Steps      step list with spinner → muted checks
- *   Reasoning  prose reasoning that expands, then settles
- *   Search     web-search trace: query + sources read
- *   Coding     tool trace: files read, edits, commands
- *
- * The trace runs once, settles, and remains expandable.
- * ───────────────────────────────────────────────────────── */
-
-const STAGES = [800, 600, 1800, 2600, 1600];
-
-function useSequence(steps: number[]) {
-  const [stage, setStage] = useState(0);
-  useEffect(() => {
-    if (stage >= steps.length - 1) return;
-    const t = setTimeout(() => setStage((s) => s + 1), steps[stage]);
-    return () => clearTimeout(t);
-  }, [stage, steps]);
-  return stage;
+/** One step row: done shows a muted check, not-done the rotating arc. */
+export interface ThinkingStep {
+  text: string;
+  done: boolean;
 }
 
-type Row = {
-  primary: string;
-  secondary?: string;
-  mono?: boolean;
-  add?: number;
-  del?: number;
-  href?: string;
+/** One search-source row: title plus a body snippet, no URL in the model. */
+export interface ThinkingSource {
+  title: string;
+  body: string;
+}
+
+type TabId = "steps" | "reasoning" | "search";
+
+const TAB_LABELS: Record<TabId, string> = {
+  steps: "步骤",
+  reasoning: "推理",
+  search: "检索",
 };
 
-const VARIANTS: Record<
-  string,
-  { active: string; done: string; rows: Row[]; query?: string }
-> = {
-  Steps: {
-    active: "Thinking",
-    done: "Thought for 4 seconds",
-    rows: [
-      { primary: "Reading flavor briefs" },
-      { primary: "Scanning supplier lists" },
-      { primary: "Comparing tasting notes", secondary: "6 flavors" },
-      { primary: "Writing the scoop report" },
-    ],
-  },
-  Reasoning: {
-    active: "Thinking",
-    done: "Thought for 4 seconds",
-    rows: [
-      { primary: "Summer demand spikes for stone-fruit flavors — peach and apricot lead." },
-      { primary: "I should check cone inventory before promoting a waffle-bowl special." },
-    ],
-  },
-  Search: {
-    active: "Searching the web",
-    done: "Searched the web",
-    query: "best waffle cone supplier",
-    rows: [
-      { primary: "Joy Cone", secondary: "joycone.com", href: "https://joycone.com/fs_products/waffle-cones/" },
-      { primary: "WebstaurantStore", secondary: "webstaurantstore.com", href: "https://www.webstaurantstore.com/ice-cream-shop-supplies.html" },
-      { primary: "The Konery", secondary: "thekonery.com", href: "https://www.thekonery.com/" },
-    ],
-  },
-  Coding: {
-    active: "Running tools",
-    done: "Ran 3 tools",
-    rows: [
-      { primary: "Read", secondary: "flavors.ts", mono: true },
-      { primary: "Edit", secondary: "ChurnSchedule.tsx", mono: true, add: 74, del: 41 },
-      { primary: "Run", secondary: "npm run freeze", mono: true },
-    ],
-  },
-};
+/* loading-state Drive 点阵的延迟表（(列 + 与中行的行距) * 90ms），缩微复用。 */
+const PIXEL_DELAYS: number[] = Array.from({ length: 9 }, (_, i) => {
+  const r = Math.floor(i / 3);
+  const c = i % 3;
+  return (c + Math.abs(r - 1)) * 90;
+});
 
-function Dot({ tone }: { tone: string }) {
+function PixelGlyph({ working }: { working: boolean }) {
   return (
-    <span className={`flex size-3.5 shrink-0 items-center justify-center rounded-full text-white ${tone}`}>
-      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-        <circle cx="12" cy="12" r="9" />
-        <path d="M3.5 12h17M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
-      </svg>
+    <span aria-hidden="true" className="grid shrink-0 grid-cols-[repeat(3,2px)] gap-[1px]">
+      {PIXEL_DELAYS.map((d, i) => (
+        <span
+          className="size-[2px] rounded-[0.5px] bg-ink"
+          key={i}
+          style={{
+            opacity: 0.15,
+            animation: working ? `pixel-on 650ms ease-in-out ${d}ms infinite` : "none",
+          }}
+        />
+      ))}
     </span>
   );
 }
 
-const TONES = ["bg-accent", "bg-orange", "bg-green"];
+/* 检索行的圆点三色，照上游 Search 变体的 TONES。 */
+const DOT_TONES = ["bg-accent", "bg-orange", "bg-green"];
 
-export default function ThinkingState({ variant = "Steps" }: { variant?: string }) {
-  const stage = useSequence(STAGES);
+export function Thinking({
+  seconds,
+  steps,
+  reasoning,
+  sources,
+}: {
+  seconds?: number;
+  steps?: ThinkingStep[];
+  reasoning?: string;
+  sources?: ThinkingSource[];
+}) {
   const [manualExpanded, setManualExpanded] = useState<boolean | null>(null);
-  const [selectedTool, setSelectedTool] = useState<string | null>(null);
-  const v = VARIANTS[variant] ?? VARIANTS.Steps;
-  const autoExpanded = stage >= 1 && stage < 4;
-  const expanded = manualExpanded ?? autoExpanded;
-  const working = stage < 3;
-  const visible = stage < 2 ? 0 : stage === 2 ? Math.min(2, v.rows.length) : v.rows.length;
-  const traceRef = useRef<HTMLDivElement>(null);
-  const [lineHeight, setLineHeight] = useState(0);
-  useLayoutEffect(() => {
-    if (traceRef.current) setLineHeight(traceRef.current.offsetHeight);
-  }, [visible, expanded, variant, stage]);
+  const [picked, setPicked] = useState<TabId | null>(null);
+
+  const tabs: TabId[] = [];
+  if (steps && steps.length > 0) tabs.push("steps");
+  if (reasoning && reasoning.trim() !== "") tabs.push("reasoning");
+  if (sources && sources.length > 0) tabs.push("search");
+
+  const working = steps ? steps.some((s) => !s.done) : false;
+  const expanded = manualExpanded ?? true;
+  const active: TabId | null = picked !== null && tabs.includes(picked) ? picked : (tabs[0] ?? null);
+
+  if (tabs.length === 0) return null;
+
+  const headerLabel = working
+    ? "思考中"
+    : seconds !== undefined
+      ? `已思考 ${seconds} 秒`
+      : "已完成";
 
   return (
-    <div key={variant} className="flex min-h-[176px] w-full max-w-95 flex-col">
-      {/* header — shared across variants */}
+    <div className="flex w-full flex-col">
+      {/* 折叠头：点阵 + shimmer 文案 + 旋转箭头，蓝本的头部骨架 */}
       <button
-        type="button"
         aria-expanded={expanded}
-        onClick={() => setManualExpanded((current) => !(current ?? autoExpanded))}
         className="-mx-1.5 flex w-fit items-center gap-2 rounded-control px-1.5 py-1
           transition-colors duration-100 hover:bg-hover-2"
+        onClick={() => setManualExpanded((current) => !(current ?? true))}
+        type="button"
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill={working ? "var(--ink-2)" : "var(--ink-3)"}>
-          <path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" />
-        </svg>
+        <PixelGlyph working={working} />
         {working ? (
           <span
-            className="bg-clip-text text-[13px] font-medium whitespace-nowrap text-transparent"
+            className="bg-clip-text whitespace-nowrap text-[13px] font-medium text-transparent"
             style={{
               backgroundImage:
                 "linear-gradient(90deg, var(--ink-3) 35%, var(--ink) 50%, var(--ink-3) 65%)",
@@ -141,125 +121,118 @@ export default function ThinkingState({ variant = "Steps" }: { variant?: string 
               animation: "shimmer-text 1.4s linear infinite",
             }}
           >
-            {v.active}
+            {headerLabel}
           </span>
         ) : (
           <span
-            className="text-[13px] font-medium whitespace-nowrap text-ink-2"
+            className="whitespace-nowrap text-[13px] font-medium text-ink-2"
             style={{ animation: "fade-in 350ms ease-out both" }}
           >
-            {v.done}
+            {headerLabel}
           </span>
         )}
-        <svg
-          width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
-          className="transition-transform duration-300"
-          style={{ transform: expanded ? "rotate(180deg)" : "rotate(0)" }}
-        >
-          <path d="M6 9l6 6 6-6" />
-        </svg>
+        <ChevronDown
+          aria-hidden="true"
+          className="text-ink-3 transition-transform duration-300"
+          size={14}
+          strokeWidth={2.2}
+          style={{ transform: expanded ? "rotate(180deg)" : "rotate(0deg)" }}
+        />
       </button>
 
-      {/* expandable trace */}
+      {/* 展开体：子页签 + 竖线走带，grid-rows 收展动画照蓝本 */}
       <div
         className="grid transition-[grid-template-rows,opacity] duration-400"
         style={{
           gridTemplateRows: expanded ? "1fr" : "0fr",
           opacity: expanded ? 1 : 0,
-          transitionTimingFunction: "cubic-bezier(0.23, 1, 0.32, 1)",
+          transitionTimingFunction: "var(--ease-out-strong)",
         }}
       >
         <div className="overflow-hidden">
+          <div className="flex items-center gap-1 pt-1.5">
+            {tabs.map((id) => (
+              <button
+                aria-pressed={active === id}
+                className={`inline-flex h-6 items-center rounded-full px-2.5 text-[11px] font-medium
+                  transition-colors duration-100 ${
+                    active === id
+                      ? "bg-surface text-ink shadow-btn"
+                      : "bg-hover text-ink-2 hover:bg-hover-2"
+                  }`}
+                key={id}
+                onClick={() => setPicked(id)}
+                type="button"
+              >
+                {TAB_LABELS[id]}
+              </button>
+            ))}
+          </div>
+
           <div className="relative mt-1 ml-[5px] pl-4">
-            <span
-              aria-hidden
-              className="absolute left-[3px] w-px bg-line"
-              style={{ top: -8, height: lineHeight ? lineHeight - 2 : 0, transition: "height 500ms cubic-bezier(0.23,1,0.32,1)" }}
-            />
-            <div ref={traceRef} className="flex flex-col gap-1 py-1">
-            {v.query && (
-              <div className="flex h-6 items-center gap-2 px-1.5" style={{ animation: expanded ? "fade-up 300ms cubic-bezier(0.23,1,0.32,1) both" : undefined }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" strokeWidth="2" strokeLinecap="round" className="shrink-0">
-                  <circle cx="11" cy="11" r="7" />
-                  <path d="M21 21l-4.3-4.3" />
-                </svg>
-                <span className="text-[12.5px] text-ink-2">{v.query}</span>
-              </div>
-            )}
-            {v.rows.slice(0, visible).map((row, i) => {
-              const content = (
-                <>
-                {variant === "Search" && <Dot tone={TONES[i % 3]} />}
-                {variant === "Steps" && (
-                  i < visible - 1 || !working ? (
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
-                      <path d="M20 6L9 17l-5-5" />
-                    </svg>
-                  ) : (
-                    <span className="size-3 shrink-0 rounded-full border-[1.5px] border-line-strong border-t-ink-2" style={{ animation: "spin 700ms linear infinite" }} />
-                  )
-                )}
-                <span className={`min-w-0 truncate text-[12.5px] ${variant === "Reasoning" ? "whitespace-normal leading-relaxed text-ink-2" : "font-medium text-ink"} ${variant === "Search" ? "animated-underline" : ""}`}>
-                  {row.primary}
-                </span>
-                {row.secondary && (
-                  <span className={`shrink-0 text-[11.5px] text-ink-3 ${row.mono ? "font-mono" : ""}`}>
-                    {row.secondary}
-                  </span>
-                )}
-                {row.add !== undefined && (
-                  <span className="shrink-0 font-mono text-[11px] tabular-nums">
-                    <span className="text-green">+{row.add}</span>{" "}
-                    <span className="text-red">-{row.del}</span>
-                  </span>
-                )}
-                </>
-              );
-              const rowClass = "flex min-h-7 w-full items-center gap-2 rounded-[6px] px-1.5 py-0.5 text-left";
-              const animation = { animation: `fade-up 320ms cubic-bezier(0.23,1,0.32,1) ${i * 120}ms both` };
+            <span aria-hidden="true" className="absolute bottom-1 left-[3px] top-1 w-px bg-line" />
+            <div className="flex flex-col gap-1 py-1">
+              {active === "steps" && steps
+                ? steps.map((step, i) => (
+                    <div
+                      className="flex min-h-7 w-full items-center gap-2 rounded-[6px] px-1.5 py-0.5 text-left"
+                      key={`${i}-${step.text}`}
+                      style={{ animation: `fade-up 320ms var(--ease-out-strong) ${i * 120}ms both` }}
+                    >
+                      {step.done ? (
+                        <svg
+                          className="shrink-0"
+                          fill="none"
+                          height="14"
+                          stroke="var(--ink-3)"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2.5"
+                          viewBox="0 0 24 24"
+                          width="14"
+                        >
+                          <path d="M20 6L9 17l-5-5" />
+                        </svg>
+                      ) : (
+                        <span
+                          aria-hidden="true"
+                          className="size-3 shrink-0 rounded-full border-[1.5px] border-line-strong border-t-ink-2"
+                          style={{ animation: "spin 700ms linear infinite" }}
+                        />
+                      )}
+                      <span className="min-w-0 truncate text-[12.5px] font-medium text-ink">
+                        {step.text}
+                      </span>
+                    </div>
+                  ))
+                : null}
 
-              if (variant === "Search") {
-                return (
-                  <a
-                    key={row.primary}
-                    href={row.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={`${rowClass} transition-colors duration-150 hover:bg-hover`}
-                    style={animation}
-                  >
-                    {content}
-                  </a>
-                );
-              }
+              {active === "reasoning" && reasoning ? (
+                <p className="whitespace-normal px-1.5 py-1 text-[12.5px] leading-relaxed text-ink-2">
+                  {reasoning}
+                </p>
+              ) : null}
 
-              if (variant === "Coding") {
-                const selected = selectedTool === row.primary;
-                return (
-                  <button
-                    key={row.primary}
-                    type="button"
-                    aria-pressed={selected}
-                    onClick={() => setSelectedTool(selected ? null : row.primary)}
-                    className={`${rowClass} transition-colors duration-150 ${selected ? "bg-inset" : "hover:bg-hover"}`}
-                    style={animation}
-                  >
-                    {content}
-                  </button>
-                );
-              }
-
-              return (
-                <div key={row.primary} className={rowClass} style={animation}>
-                  {content}
-                </div>
-              );
-            })}
-            {variant === "Search" && stage >= 3 && (
-              <span className="text-[12px] text-ink-3" style={{ animation: "fade-in 300ms ease-out both" }}>
-                +7 more
-              </span>
-            )}
+              {active === "search" && sources
+                ? sources.map((source, i) => (
+                    <div
+                      className="flex min-h-7 w-full items-center gap-2 rounded-[6px] px-1.5 py-0.5 text-left"
+                      key={`${i}-${source.title}`}
+                      style={{ animation: `fade-up 320ms var(--ease-out-strong) ${i * 120}ms both` }}
+                    >
+                      <span
+                        aria-hidden="true"
+                        className={`size-2 shrink-0 rounded-full ${DOT_TONES[i % DOT_TONES.length]}`}
+                      />
+                      <span className="min-w-0 truncate text-[12.5px] font-medium text-ink">
+                        {source.title}
+                      </span>
+                      <span className="max-w-[40%] shrink-0 truncate text-right text-[11.5px] text-ink-3">
+                        {source.body}
+                      </span>
+                    </div>
+                  ))
+                : null}
             </div>
           </div>
         </div>

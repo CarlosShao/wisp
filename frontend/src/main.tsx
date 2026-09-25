@@ -1,7 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "@/App";
-import { HARNESS_BANNER, HARNESS_SNAPSHOT } from "@/fixtures/harness";
+import { Showcase } from "@/components/showcase";
+import { HARNESS_BANNER } from "@/fixtures/harness";
 import "./styles/theme.css";
 
 /**
@@ -9,8 +10,12 @@ import "./styles/theme.css";
  *   - inside Wisp, WebView2 serves the embedded dist and Go pushes snapshots
  *     through the C17 bridge - no query string, so this file renders <App />
  *     with its empty frame and every unfed screen says so out loud;
- *   - in a browser with ?harness=1, the same bundle renders the fixture in
- *     src/fixtures/harness.ts so the layout can be judged without a backend.
+ *   - in a browser with ?harness=1, the bundle renders the showcase: the
+ *     library-style component walkthrough (owner 2026-09-25: "起码要有主流
+ *     harness 的样子") fed by the fixtures in src/fixtures/harness.ts. The
+ *     showcase is a walkthrough page, NOT the panel - the panel itself has no
+ *     fixture mode, because a fixture behind the real UI would be exactly the
+ *     "假数据当真实字段" the P9 red line forbids.
  * The banner is added to the document, not to React's tree, so a render
  * harness that counts markup never sees it.
  */
@@ -30,6 +35,6 @@ if (harness) {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App snapshot={harness ? HARNESS_SNAPSHOT : undefined} chrome={harness} />
+    {harness ? <Showcase /> : <App />}
   </StrictMode>,
 );

@@ -1,236 +1,115 @@
 /* ============================================================================
-   GENERATED FILE - DO NOT EDIT BY HAND  (third generation, owner-delegated)
+   GENERATED FILE - DO NOT EDIT BY HAND  (fourth generation, owner pivot)
    ----------------------------------------------------------------------------
-   Source:  design/doubao/demo/styles.css - the high-fidelity demo, which owner
-            ruled the style truth source on 2026-09-25 ("全推翻了，前端重新设计
-            token ... 按照 demo 改") and confirmed again when handing the
-            frontend to a new owner-agent the same day ("以原型demo为主").
-            Font stacks and window geometry cite design/doubao/demo/index.html.
+   Design system: MINIMAL, light/dark only (owner 2026-09-25: "必须是极简风的，
+   就两种风格，暗色/浅色…不搞花里胡哨的"). The demo-faithful generations are
+   retired with that ruling; the high-fidelity demo is no longer a style
+   source.
 
-   Shape (third generation): the table speaks the demo's OWN names.
-     layer 1  demo's custom properties, verbatim - same names, same values,
-              HSL triplets left as triplets (the point of use spells hsl(),
-              also exactly as demo does)
-     layer 2  values demo paints without declaring (success green, warn amber,
-              syntax colours, fog, ball, layered shadow, the alpha knob) - each
-              cited to the demo text it was read off
-     layer 3  shared scales (type / radius / motion / geometry), each cited
+   Provenance: layer 1 is the beautiful-ui component library's own theme,
+   adopted verbatim from TurboKach/ai-native-react-components (MIT, Copyright
+   (c) 2026 Turbo) app/globals.css at upstream commit 05dab2d2 - adopting the
+   library's theme is what makes every vendored beautiful-ui component render
+   natively, with no per-component remapping. Layer 2 carries the names the
+   frozen PLAN.md rows and our own files require; each carries a note.
 
-   The second generation's renaming layer (--bg-base / --fg-primary) is
-   retired with owner's delegation; scripts/gen-tokens.mjs refuses an entry
-   with neither a demo citation nor an INTERIM marker, and --check re-runs
-   every citation, so a value that stops existing in the demo fails the build
-   instead of quietly staying in the table.
-
-   :root is LIGHT (demo/app.js:32 theme:'light'; owner confirmed the default).
-   Dark is the opt-in through [data-theme="dark"] (demo toggles .dark on the
-   same element). Theme-invariant entries are declared in BOTH blocks on
-   purpose: a var() inside a custom property resolves where it is declared, so
-   the dark block's re-declaration is what lets a color-mix() see dark hues.
-
-   A colour, radius, font-size or duration literal written anywhere else under
-   frontend/src is a second style truth source. That is signed by
+   Command: node scripts/gen-tokens.mjs          (npm run tokens)
+   Check:   this file must equal what the script emits, and every var() under
+   src/ must resolve to a key declared here or aliased in theme.css. The
+   colour-literal rule itself is signed by
    TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme in
-   internal/panel/frontend_hygiene_test.go, not by this comment.
+   internal/panel/frontend_hygiene_test.go - this file is the one place a
+   colour literal may live.
    ============================================================================ */
 
 :root {
-  --background: 210 20% 98%;  /* styles.css:8 */
-  --foreground: 222 47% 11%;  /* styles.css:9 */
-  --card: 0 0% 100%;  /* styles.css:10 */
-  --card-foreground: 222 47% 11%;  /* styles.css:11 */
-  --popover: 0 0% 100%;  /* styles.css:12 */
-  --popover-foreground: 222 47% 11%;  /* styles.css:13 */
-  --primary: 173 34% 55%;  /* styles.css:14 */
-  --primary-foreground: 0 0% 100%;  /* styles.css:15 */
-  --secondary: 210 20% 96%;  /* styles.css:16 */
-  --secondary-foreground: 222 47% 11%;  /* styles.css:17 */
-  --muted: 210 20% 96%;  /* styles.css:18 */
-  --muted-foreground: 215 16% 47%;  /* styles.css:19 */
-  --accent-soft: 173 34% 94%;  /* styles.css:20 demo 叫 --accent；--accent 留给 C21 冻结行的品牌青 */
-  --accent-foreground: 173 34% 28%;  /* styles.css:21 */
-  --destructive: 0 72% 51%;  /* styles.css:22 */
-  --destructive-foreground: 0 0% 100%;  /* styles.css:23 */
-  --border: 214 32% 88%;  /* styles.css:24 */
-  --input: 214 32% 88%;  /* styles.css:25 */
-  --ring: 173 34% 55%;  /* styles.css:26 */
-  --radius: 0.5rem;  /* styles.css:27 */
-  --window-bg: rgba(255, 255, 255, 0.72);  /* styles.css:30 */
-  --window-border: rgba(0, 0, 0, 0.06);  /* styles.css:31 */
-  --window-shadow: 0 12px 40px rgba(0, 0, 0, 0.10), 0 2px 8px rgba(0, 0, 0, 0.04);  /* styles.css:32 */
-  --titlebar-bg: rgba(255, 255, 255, 0.5);  /* styles.css:33 */
-  --nav-bg: rgba(248, 249, 251, 0.6);  /* styles.css:34 */
-  --nav-active: rgba(134, 194, 185, 0.12);  /* styles.css:35 */
-  --accent: hsl(var(--primary));  /* styles.css:14 C21 冻结行的 --accent＝品牌青，即 demo 的 --primary */
-  --glass-blur: blur(28px) saturate(1.25);  /* styles.css:120 */
-  --glass-blur-sm: blur(4px);  /* styles.css:242 */
-  --success: hsl(142 71% 45%);  /* styles.css:1060 + styles.css:444 */
-  --success-ink: hsl(142 71% 38%);  /* styles.css:442 文字/图标用的深一档绿 */
-  --success-soft: color-mix(in srgb, var(--success) 10%, transparent);  /* styles.css:442 */
-  --success-line: color-mix(in srgb, var(--success) 30%, transparent);  /* styles.css:442 */
-  --warn: #b8860b;  /* styles.css:441 + styles.css:443 */
-  --warn-soft: rgba(217, 178, 106, 0.1);  /* styles.css:441 */
-  --warn-line: rgba(217, 178, 106, 0.3);  /* styles.css:441 */
-  --warn-chip: rgba(217, 178, 106, 0.14);  /* styles.css:1093 bu-chip-blocked 的底 */
-  --tok-key: #c792ea;  /* styles.css:832 */
-  --tok-str: #c3e88d;  /* styles.css:833 */
-  --tok-num: #f78c6c;  /* styles.css:834 demo 唯一的暖色，暖语义沿用它 */
-  --ambient-a: rgba(134, 194, 185, 0.08);  /* styles.css:71 + styles.css:77 */
-  --ambient-b: rgba(138, 170, 210, 0.07);  /* styles.css:72 + styles.css:78 */
-  --ambient-a-geo: ellipse 80% 60% at 20% 30%;  /* styles.css:71 */
-  --ambient-a-stop: 60%;  /* styles.css:71 */
-  --ambient-b-geo: ellipse 60% 50% at 80% 70%;  /* styles.css:72 */
-  --ambient-b-stop: 55%;  /* styles.css:72 */
-  --desktop-1: #f0f2f5;  /* styles.css:73 + styles.css:79 */
-  --desktop-2: #e8eaed;  /* styles.css:73 + styles.css:79 */
-  --desktop-3: #eef0f3;  /* styles.css:73 + styles.css:79 */
-  --desktop-geo: 160deg;  /* styles.css:73 */
-  --fog-1: radial-gradient(circle, rgba(134,194,185,0.5), transparent 70%);  /* styles.css:644 */
-  --fog-2: radial-gradient(circle, rgba(90,106,180,0.35), transparent 70%);  /* styles.css:645 */
-  --ball-grad: linear-gradient(135deg, rgba(134, 194, 185, 0.9), rgba(108, 168, 160, 0.9));  /* styles.css:90 */
-  --ball-dot-grad: linear-gradient(135deg, #86C2B9, #6CA8A0);  /* styles.css:107 */
-  --ball-dot-shadow: 0 1px 3px rgba(134,194,185,0.4);  /* styles.css:108 */
-  --ball-glow: 0 4px 16px rgba(134, 194, 185, 0.35), inset 0 1px 2px rgba(255,255,255,0.3);  /* styles.css:91 */
-  --ball-glow-hover: 0 6px 20px rgba(134, 194, 185, 0.45), inset 0 1px 2px rgba(255,255,255,0.4);  /* styles.css:97 */
-  --preloader-grad: radial-gradient(circle at 32% 28%, rgba(255,255,255,.75), rgba(134,194,185,.9) 46%, rgba(108,168,160,.95));  /* styles.css:636 */
-  --preloader-glow: 0 0 32px rgba(134,194,185,.4), inset 0 2px 6px rgba(255,255,255,.5);  /* styles.css:636 */
-  --shadow-window-v4: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06), 0 24px 64px rgba(0,0,0,0.10);  /* styles.css:735 v4 的三层窗口投影，压过 :root 里那枚单层 --window-shadow */
-  --shadow-menu: 0 8px 24px rgba(0,0,0,.12);  /* styles.css:1019 */
-  --shadow-toast: 0 4px 16px rgba(0,0,0,0.15);  /* styles.css:323 */
-  --shadow-knob: 0 1px 3px rgba(0,0,0,0.2);  /* styles.css:469 */
-  --shadow-subtab: 0 1px 2px rgba(0, 0, 0, 0.06);  /* styles.css:1183 */
-  --shadow-btn: 0 1px 3px rgba(0,0,0,0.08);  /* styles.css:987 sub-tab.active 的微投影，也作库组件的按钮投影词 */
-  --shadow-ctx: 0 2px 8px rgba(0,0,0,0.04);  /* styles.css:892 */
-  --panel-alpha: 72%;  /* styles.css:30 demo 窗口 rgba alpha 拎出来的旋钮；设置屏唯一能动的就是它 */
-  --panel-surface: rgb(255 255 255 / var(--panel-alpha));  /* styles.css:30 + styles.css:60 窗口磨砂面：同 demo 三个通道，alpha 换成旋钮 */
-  --r-xs: 4px;  /* styles.css:341 */
-  --r-sm: 6px;  /* styles.css:154 */
-  --r-md: 8px;  /* styles.css:281 */
-  --r-lg: 10px;  /* styles.css:195 */
-  --r-xl: 12px;  /* styles.css:118 */
-  --r-full: 999px;  /* styles.css:451 */
-  --r-nav: 60px;  /* styles.css:179 左竖条宽 */
-  --t-micro: 11px;  /* styles.css:270 */
-  --t-small: 12px;  /* styles.css:400 */
-  --t-body: 13px;  /* styles.css:283 */
-  --t-title: 20px;  /* styles.css:512 */
-  --t-display: 28px;  /* styles.css:911 */
-  --lh-body: 1.6;  /* styles.css:648 */
-  --lh-mono: 1.4;  /* styles.css:1171 */
-  --lh-code: 1.7;  /* styles.css:816 */
-  --fw-medium: 500;  /* styles.css:362 */
-  --fw-semibold: 600;  /* styles.css:271 */
-  --dur-fast: 120ms;  /* styles.css:368 */
-  --dur-base: 150ms;  /* styles.css:873 */
-  --dur-slow: 200ms;  /* styles.css:775 */
-  --dur-screen: 220ms;  /* styles.css:685 屏切换 */
-  --dur-glide: 280ms;  /* styles.css:672 nav-glide 滑翔条 */
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);  /* styles.css:672 */
-  --ease-stream: cubic-bezier(0.22,0.61,0.25,1);  /* styles.css:619 stream-word 逐词 */
-  --ease-fadeup: cubic-bezier(0.23, 1, 0.32, 1);  /* styles.css:1049 animated-list-item */
-  --panel-w: 720px;  /* styles.css:116 */
-  --panel-h: 780px;  /* styles.css:117 */
-  --titlebar-h: 40px;  /* styles.css:138 */
-  --font-sans-stack: Inter, 'PingFang SC', 'Microsoft YaHei UI', system-ui, sans-serif;  /* index.html:56 */
-  --font-mono-stack: 'JetBrains Mono', 'Cascadia Code', 'Consolas', monospace;  /* index.html:57 */
+  --page: #fafafb;
+  --canvas: #f1f2f3;
+  --surface: #ffffff;
+  --inset: #f7f8f9;
+  --hover: #f4f5f6;
+  --hover-2: #e7e9eb;
+  --ink: #1f2124;
+  --ink-2: #62656b;
+  --ink-3: #9a9da3;
+  --line: #ecedef;
+  --line-strong: #e0e2e5;
+  --field: #f2f2f3;
+  --stripe: #49494913;
+  --stripe-bg: #f5f5f5;
+  --accent: #0285ff;  /* PLAN.md:3476 冻结行的 --accent 即此色（SSE 光标） */
+  --accent-ink: #0170dd;
+  --accent-tint: #e9f3ff;
+  --green: #189a4d;
+  --green-tint: #e8f5ed;
+  --orange: #ef720c;
+  --orange-tint: #fdf1e5;
+  --red: #e3474c;
+  --red-tint: #fcecec;
+  --tooltip-bg: #25272b;
+  --tooltip-fg: #f6f7f8;
+  --tooltip-muted: #a5a8ad;
+  --tooltip-border: #3a3c40;
+  --shadow-hairline: 0 0 0 1px var(--line);
+  --shadow-btn: 0 0 0 1px var(--line-strong), 0 1px 2px #1018280d;
+  --shadow-card: 0 0 0 1px var(--line), 0 1px 2px #1018280a, 0 2px 6px #10182808;
+  --shadow-raised: 0 0 0 1px var(--line), 0 2px 10px #0000000b;
+  --shadow-overlay: 0 0 0 1px var(--line), 0 8px 28px #0001;
+  --shadow-inset-field: inset 0 1px 2px #0000001f;
+  --warn: var(--orange);  /* 冻结行语义名→库的 orange */
+  --warn-soft: var(--orange-tint);  /* 同上 */
+  --warn-line: color-mix(in srgb, var(--orange) 30%, transparent);  /* 冻结行要 1px 描边，30% 是描边惯用浓度 */
+  --danger: var(--red);  /* render-l2 仪器经 --stop→--danger 钉色 */
+  --stop: var(--danger);  /* render-l2 钉死的拼法 */
+  --success: var(--green);  /* 冻结行语义名→库的 green */
+  --success-soft: var(--green-tint);
+  --panel-alpha: 100%;  /* 设置屏滑杆的旋钮，作用于 .wisp-shell */
+  --font-sans-stack: Inter, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei UI', system-ui, sans-serif;  /* 库主题用 Inter（next/font）；我们无网打包，同族回退 */
+  --font-mono-stack: ui-monospace, 'SF Mono', 'Cascadia Code', Consolas, monospace;  /* 库的 --font-mono 回退族 */
 }
 
 [data-theme="dark"] {
-  --background: 222 47% 8%;  /* styles.css:40 */
-  --foreground: 210 20% 96%;  /* styles.css:41 */
-  --card: 222 47% 10%;  /* styles.css:42 */
-  --card-foreground: 210 20% 96%;  /* styles.css:43 */
-  --popover: 222 47% 10%;  /* styles.css:44 */
-  --popover-foreground: 210 20% 96%;  /* styles.css:45 */
-  --primary: 173 34% 55%;  /* styles.css:14 */
-  --primary-foreground: 0 0% 100%;  /* styles.css:15 */
-  --secondary: 217 33% 17%;  /* styles.css:48 */
-  --secondary-foreground: 210 20% 96%;  /* styles.css:49 */
-  --muted: 217 33% 17%;  /* styles.css:50 */
-  --muted-foreground: 215 20% 65%;  /* styles.css:51 */
-  --accent-soft: 173 34% 20%;  /* styles.css:52 demo 叫 --accent；--accent 留给 C21 冻结行的品牌青 */
-  --accent-foreground: 173 34% 85%;  /* styles.css:53 */
-  --destructive: 0 62% 45%;  /* styles.css:54 */
-  --destructive-foreground: 0 0% 100%;  /* styles.css:23 */
-  --border: 217 33% 20%;  /* styles.css:56 */
-  --input: 217 33% 20%;  /* styles.css:57 */
-  --ring: 173 34% 55%;  /* styles.css:26 */
-  --window-bg: rgba(22, 24, 29, 0.72);  /* styles.css:60 */
-  --window-border: rgba(255, 255, 255, 0.08);  /* styles.css:61 */
-  --window-shadow: 0 12px 40px rgba(0, 0, 0, 0.40), 0 2px 8px rgba(0, 0, 0, 0.20);  /* styles.css:62 */
-  --titlebar-bg: rgba(22, 24, 29, 0.5);  /* styles.css:63 */
-  --nav-bg: rgba(18, 20, 25, 0.6);  /* styles.css:64 */
-  --nav-active: rgba(134, 194, 185, 0.15);  /* styles.css:65 */
-  --accent: hsl(var(--primary));  /* styles.css:14 C21 冻结行的 --accent＝品牌青，即 demo 的 --primary */
-  --glass-blur: blur(28px) saturate(1.25);  /* styles.css:120 */
-  --glass-blur-sm: blur(4px);  /* styles.css:242 */
-  --success: #7DB896;  /* styles.css:1060 + styles.css:444 */
-  --success-ink: #7DB896;  /* styles.css:442 文字/图标用的深一档绿 */
-  --success-soft: color-mix(in srgb, var(--success) 10%, transparent);  /* styles.css:442 */
-  --success-line: color-mix(in srgb, var(--success) 30%, transparent);  /* styles.css:442 */
-  --warn: #D9B26A;  /* styles.css:441 + styles.css:443 */
-  --warn-soft: rgba(217, 178, 106, 0.1);  /* styles.css:441 */
-  --warn-line: rgba(217, 178, 106, 0.3);  /* styles.css:441 */
-  --warn-chip: rgba(217, 178, 106, 0.14);  /* styles.css:1093 bu-chip-blocked 的底 */
-  --tok-key: #c792ea;  /* styles.css:832 */
-  --tok-str: #c3e88d;  /* styles.css:833 */
-  --tok-num: #f78c6c;  /* styles.css:834 demo 唯一的暖色，暖语义沿用它 */
-  --ambient-a: rgba(134, 194, 185, 0.06);  /* styles.css:71 + styles.css:77 */
-  --ambient-b: rgba(138, 170, 210, 0.05);  /* styles.css:72 + styles.css:78 */
-  --ambient-a-geo: ellipse 80% 60% at 20% 30%;  /* styles.css:71 */
-  --ambient-a-stop: 60%;  /* styles.css:71 */
-  --ambient-b-geo: ellipse 60% 50% at 80% 70%;  /* styles.css:72 */
-  --ambient-b-stop: 55%;  /* styles.css:72 */
-  --desktop-1: #14161b;  /* styles.css:73 + styles.css:79 */
-  --desktop-2: #0f1115;  /* styles.css:73 + styles.css:79 */
-  --desktop-3: #121419;  /* styles.css:73 + styles.css:79 */
-  --desktop-geo: 160deg;  /* styles.css:73 */
-  --fog-1: radial-gradient(circle, rgba(134,194,185,0.5), transparent 70%);  /* styles.css:644 */
-  --fog-2: radial-gradient(circle, rgba(90,106,180,0.35), transparent 70%);  /* styles.css:645 */
-  --ball-grad: linear-gradient(135deg, rgba(134, 194, 185, 0.9), rgba(108, 168, 160, 0.9));  /* styles.css:90 */
-  --ball-dot-grad: linear-gradient(135deg, #86C2B9, #6CA8A0);  /* styles.css:107 */
-  --ball-dot-shadow: 0 1px 3px rgba(134,194,185,0.4);  /* styles.css:108 */
-  --ball-glow: 0 4px 16px rgba(134, 194, 185, 0.35), inset 0 1px 2px rgba(255,255,255,0.3);  /* styles.css:91 */
-  --ball-glow-hover: 0 6px 20px rgba(134, 194, 185, 0.45), inset 0 1px 2px rgba(255,255,255,0.4);  /* styles.css:97 */
-  --preloader-grad: radial-gradient(circle at 32% 28%, rgba(255,255,255,.75), rgba(134,194,185,.9) 46%, rgba(108,168,160,.95));  /* styles.css:636 */
-  --preloader-glow: 0 0 32px rgba(134,194,185,.4), inset 0 2px 6px rgba(255,255,255,.5);  /* styles.css:636 */
-  --shadow-window-v4: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06), 0 24px 64px rgba(0,0,0,0.10);  /* styles.css:735 v4 的三层窗口投影，压过 :root 里那枚单层 --window-shadow */
-  --shadow-menu: 0 8px 24px rgba(0,0,0,.12);  /* styles.css:1019 */
-  --shadow-toast: 0 4px 16px rgba(0,0,0,0.15);  /* styles.css:323 */
-  --shadow-knob: 0 1px 3px rgba(0,0,0,0.2);  /* styles.css:469 */
-  --shadow-subtab: 0 1px 2px rgba(0, 0, 0, 0.06);  /* styles.css:1183 */
-  --shadow-btn: 0 1px 3px rgba(0,0,0,0.08);  /* styles.css:987 sub-tab.active 的微投影，也作库组件的按钮投影词 */
-  --shadow-ctx: 0 2px 8px rgba(0,0,0,0.04);  /* styles.css:892 */
-  --panel-alpha: 72%;  /* styles.css:30 demo 窗口 rgba alpha 拎出来的旋钮；设置屏唯一能动的就是它 */
-  --panel-surface: rgb(22 24 29 / var(--panel-alpha));  /* styles.css:30 + styles.css:60 窗口磨砂面：同 demo 三个通道，alpha 换成旋钮 */
-  --r-xs: 4px;  /* styles.css:341 */
-  --r-sm: 6px;  /* styles.css:154 */
-  --r-md: 8px;  /* styles.css:281 */
-  --r-lg: 10px;  /* styles.css:195 */
-  --r-xl: 12px;  /* styles.css:118 */
-  --r-full: 999px;  /* styles.css:451 */
-  --r-nav: 60px;  /* styles.css:179 左竖条宽 */
-  --t-micro: 11px;  /* styles.css:270 */
-  --t-small: 12px;  /* styles.css:400 */
-  --t-body: 13px;  /* styles.css:283 */
-  --t-title: 20px;  /* styles.css:512 */
-  --t-display: 28px;  /* styles.css:911 */
-  --lh-body: 1.6;  /* styles.css:648 */
-  --lh-mono: 1.4;  /* styles.css:1171 */
-  --lh-code: 1.7;  /* styles.css:816 */
-  --fw-medium: 500;  /* styles.css:362 */
-  --fw-semibold: 600;  /* styles.css:271 */
-  --dur-fast: 120ms;  /* styles.css:368 */
-  --dur-base: 150ms;  /* styles.css:873 */
-  --dur-slow: 200ms;  /* styles.css:775 */
-  --dur-screen: 220ms;  /* styles.css:685 屏切换 */
-  --dur-glide: 280ms;  /* styles.css:672 nav-glide 滑翔条 */
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);  /* styles.css:672 */
-  --ease-stream: cubic-bezier(0.22,0.61,0.25,1);  /* styles.css:619 stream-word 逐词 */
-  --ease-fadeup: cubic-bezier(0.23, 1, 0.32, 1);  /* styles.css:1049 animated-list-item */
-  --panel-w: 720px;  /* styles.css:116 */
-  --panel-h: 780px;  /* styles.css:117 */
-  --titlebar-h: 40px;  /* styles.css:138 */
-  --font-sans-stack: Inter, 'PingFang SC', 'Microsoft YaHei UI', system-ui, sans-serif;  /* index.html:56 */
-  --font-mono-stack: 'JetBrains Mono', 'Cascadia Code', 'Consolas', monospace;  /* index.html:57 */
+  --page: #17181a;
+  --canvas: #1c1d1f;
+  --surface: #232427;
+  --inset: #1f2022;
+  --hover: #2a2b2e;
+  --hover-2: #313236;
+  --ink: #f2f3f4;
+  --ink-2: #a5a8ad;
+  --ink-3: #6c6f75;
+  --line: #2e3033;
+  --line-strong: #3a3c40;
+  --field: #2b2c2f;
+  --stripe: #ffffff0e;
+  --stripe-bg: #1b1c1e;
+  --accent: #3d9aff;  /* PLAN.md:3476 冻结行的 --accent 即此色（SSE 光标） */
+  --accent-ink: #7ec0ff;
+  --accent-tint: #3d9aff29;
+  --green: #3dbb72;
+  --green-tint: #3dbb7224;
+  --orange: #f68f3c;
+  --orange-tint: #f68f3c24;
+  --red: #ee5c61;
+  --red-tint: #ee5c6124;
+  --tooltip-bg: #111214;
+  --tooltip-fg: #f2f3f4;
+  --tooltip-muted: #a5a8ad;
+  --tooltip-border: #2e3033;
+  --shadow-hairline: 0 0 0 1px var(--line);
+  --shadow-btn: 0 0 0 1px var(--line-strong), 0 1px 2px #0000004d;
+  --shadow-card: 0 0 0 1px var(--line), 0 1px 2px #0003, 0 2px 6px #0003;
+  --shadow-raised: 0 0 0 1px var(--line), 0 2px 10px #00000038;
+  --shadow-overlay: 0 0 0 1px var(--line-strong), 0 8px 28px #00000057;
+  --shadow-inset-field: inset 0 1px 2px #0006;
+  --warn: var(--orange);  /* 冻结行语义名→库的 orange */
+  --warn-soft: var(--orange-tint);  /* 同上 */
+  --warn-line: color-mix(in srgb, var(--orange) 30%, transparent);  /* 冻结行要 1px 描边，30% 是描边惯用浓度 */
+  --danger: var(--red);  /* render-l2 仪器经 --stop→--danger 钉色 */
+  --stop: var(--danger);  /* render-l2 钉死的拼法 */
+  --success: var(--green);  /* 冻结行语义名→库的 green */
+  --success-soft: var(--green-tint);
+  --panel-alpha: 100%;  /* 设置屏滑杆的旋钮，作用于 .wisp-shell */
+  --font-sans-stack: Inter, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei UI', system-ui, sans-serif;  /* 库主题用 Inter（next/font）；我们无网打包，同族回退 */
+  --font-mono-stack: ui-monospace, 'SF Mono', 'Cascadia Code', Consolas, monospace;  /* 库的 --font-mono 回退族 */
 }

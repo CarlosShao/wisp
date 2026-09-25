@@ -1,102 +1,55 @@
 /* ============================================================================
-   Vendored file - ticket 77 AC#7 (ledger: frontend/VENDORED.md).
+   Adapted component.
    ----------------------------------------------------------------------------
-   Source repo    : github.com/TurboKach/ai-native-react-components  (registry name "ai-native", beautifului.dev)
-   Source file    : components/loading-state.tsx
-   Component      : LoadingState
-   License        : MIT (upstream LICENSE: Copyright (c) 2026 Turbo)
-   Upstream commit: 05dab2d2b5f1f3e40029776e339a486d70491079
-   Local changes  : provenance header added; the Next.js-only "use client"
-                    directive removed; line endings normalized to LF;
-                    0 dingbat glyph(s) ASCII-ized for D23/ban #8. (none found in this file)
-                    Nothing else - see scripts/vendor.mjs.
-   Panel status   : NOT mounted: ships with upstream demo strings; the panel's own loading state is PanelSkeleton.tsx until ticket 35 feeds it
+   来源 = derived from TurboKach/ai-native-react-components
+          components/loading-state.tsx (MIT, Copyright (c) 2026 Turbo,
+          upstream commit 05dab2d2).
+   本地改动：
+   - props 化: { label? } - 上游默认变体 Drive 与 label="Churning" 改为可选
+     props；未给 label 时只画点阵，不造文案（宁缺毋造）。
+   - 数据移除: useElapsed 计时器（setInterval 100ms）与耗时读数整体删除 -
+     生产面板无状态（PLAN.md:1044），耗时只能由父级把秒数写进 label 传入，
+     本组件内部不计时；Dots/Orbit 两个演示变体一并删除，只保留 Drive。
+   - 字面量换 token: 点阵 bg-ink、shimmer 渐变走 var(--ink-3)/var(--ink)，
+     全文件无颜色字面量。pixel-on 关键帧已在 src/styles/theme.css 全局存在。
    ============================================================================ */
 
-import { useEffect, useState } from "react";
-
-/* ─────────────────────────────────────────────────────────
- * LOADING STATE — pixel-grid loader for long-running work
- *
- * Variants:
- *   Drive  — square cells, chevron wavefront driving right;
- *            the 650ms cycle is shorter than the sweep, so
- *            two fronts are always in flight
- *   Dots   — same wavefront, circular cells
- *   Orbit  — a comet lapping the grid perimeter
- *
- * Paired with a shimmering label and a live elapsed timer
- * in mono tabular figures. Reduced motion freezes the grid
- * to its dim state; the timer still ticks.
- * ───────────────────────────────────────────────────────── */
-
-const chevron = Array.from({ length: 9 }, (_, i) => {
-  const r = Math.floor(i / 3), c = i % 3;
+/* Drive 波前的延迟表：列号加与中行的行距，乘 90ms；650ms 周期短于扫过
+   时间，所以永远有两道波前在飞（上游注释的形状，逐字保留）。 */
+const PIXEL_DELAYS: number[] = Array.from({ length: 9 }, (_, i) => {
+  const r = Math.floor(i / 3);
+  const c = i % 3;
   return (c + Math.abs(r - 1)) * 90;
 });
 
-const ORBIT_ORDER = [0, 1, 2, 5, 8, 7, 6, 3];
-const orbit = Array.from({ length: 9 }, (_, i) => {
-  const k = ORBIT_ORDER.indexOf(i);
-  return k === -1 ? null : k * 110;
-});
-
-const PATTERNS: Record<string, { delays: (number | null)[]; dur: number; round: boolean }> = {
-  Drive: { delays: chevron, dur: 650, round: false },
-  Dots: { delays: chevron, dur: 650, round: true },
-  Orbit: { delays: orbit, dur: 950, round: false },
-};
-
-function useElapsed() {
-  const [ds, setDs] = useState(0);
-  useEffect(() => {
-    const t = setInterval(() => setDs((d) => d + 1), 100);
-    return () => clearInterval(t);
-  }, []);
-  const total = ds / 10;
-  if (total < 60) return `${total.toFixed(1)}s`;
-  return `${Math.floor(total / 60)}m ${(total % 60).toFixed(1)}s`;
-}
-
-export default function LoadingState({
-  label = "Churning",
-  variant = "Drive",
-}: {
-  label?: string;
-  variant?: string;
-}) {
-  const elapsed = useElapsed();
-  const { delays, dur, round } = PATTERNS[variant] ?? PATTERNS.Drive;
-
+export function LoadingState({ label }: { label?: string }) {
   return (
     <div className="flex w-fit items-center gap-2.5">
-      <span aria-hidden className="grid grid-cols-[repeat(3,4px)] gap-[1.5px]">
-        {delays.map((d, i) => (
+      <span aria-hidden="true" className="grid grid-cols-[repeat(3,4px)] gap-[1.5px]">
+        {PIXEL_DELAYS.map((d, i) => (
           <span
+            className="size-[4px] rounded-[1px] bg-ink"
             key={i}
-            className={`size-[4px] bg-ink ${round ? "rounded-full" : "rounded-[1px]"}`}
             style={{
-              opacity: d === null ? 0.07 : 0.15,
-              animation:
-                d === null ? "none" : `pixel-on ${dur}ms ease-in-out ${d}ms infinite`,
+              opacity: 0.15,
+              animation: `pixel-on 650ms ease-in-out ${d}ms infinite`,
             }}
           />
         ))}
       </span>
-      <span
-        className="bg-clip-text text-[13px] font-medium text-transparent"
-        style={{
-          backgroundImage:
-            "linear-gradient(90deg, var(--ink-3) 35%, var(--ink) 50%, var(--ink-3) 65%)",
-          backgroundSize: "200% 100%",
-          animation: "shimmer-text 1.4s linear infinite",
-        }}
-      >
-        {label}
-      </span>
-      <span className="font-mono text-[12px] text-ink-3 tabular-nums">
-        {elapsed}
-      </span>
+      {label ? (
+        <span
+          className="bg-clip-text text-[13px] font-medium text-transparent"
+          style={{
+            backgroundImage:
+              "linear-gradient(90deg, var(--ink-3) 35%, var(--ink) 50%, var(--ink-3) 65%)",
+            backgroundSize: "200% 100%",
+            animation: "shimmer-text 1.4s linear infinite",
+          }}
+        >
+          {label}
+        </span>
+      ) : null}
     </div>
   );
 }

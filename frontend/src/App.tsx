@@ -15,11 +15,9 @@
    to another screen would be a safety change smuggled into a navigation change;
    the rail's 审批 badge is what carries the queue depth instead.
 
-   `chrome` is the harness switch: main.tsx passes it only under ?harness=1,
-   and it buys the floating-window dressing a browser needs (desktop backdrop,
-   fog, window radius and shadow). In production the WebView2 window IS the
-   panel, so the shell renders bare - the chrome a real window gets comes from
-   Win32, not from CSS.
+   The visual acceptance surface is the library-style showcase (main.tsx renders
+   it under ?harness=1); this tree is the production panel - the WebView2 window
+   IS the panel, there is no fake desktop or floating window to draw.
    ============================================================================ */
 
 import { useState } from "react";
@@ -70,10 +68,8 @@ function UnfedScreen({ id }: { id: PanelViewId }) {
 
 export default function App({
   snapshot = EMPTY,
-  chrome = false,
 }: {
   snapshot?: PanelSnapshot;
-  chrome?: boolean;
 }) {
   // A snapshot from a host that has not filled the composer section yet falls
   // back to the empty view, which says so in words; inventing a mode here would
@@ -91,7 +87,6 @@ export default function App({
   return (
     <PanelSkeleton
       active={view}
-      chrome={chrome}
       onSelect={setPicked}
       pendingCount={snapshot.pending.length}
     >
@@ -102,7 +97,7 @@ export default function App({
         <L2ApprovalCard key={v.correlationId} view={v} />
       ))}
       {view === "chat" ? (
-        <ChatScreen snapshot={snapshot} chrome={chrome} />
+        <ChatScreen snapshot={snapshot} />
       ) : view === "approval" ? (
         <ApprovalScreen snapshot={snapshot} />
       ) : view === "config" ? (
@@ -110,7 +105,7 @@ export default function App({
       ) : (
         <UnfedScreen id={view} />
       )}
-      {/* The composer row is the demo's bottom-docked bar: mt-auto pins it to
+      {/* The composer row is the bottom-docked bar (library chat anatomy): mt-auto pins it to
           the window floor while the content is shorter than one screen and
           lets it scroll normally once the stream outgrows the viewport
           (panel-skeleton's main is a flex column for exactly this). */}
