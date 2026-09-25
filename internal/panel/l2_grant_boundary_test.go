@@ -99,6 +99,13 @@ package panel
 // that stays open is the grid's outside: another namespace, another vocabulary,
 // or a route that only exists once config is read.
 //
+// The size of that grid is itself nailed now (F-ACC-1, docs/evidence/s1/panel-
+// l2-grant-nail-fix-r3-accept-r1.md §1.1): the helper multiplies the three lists
+// and refuses to report a verdict when the number of names it asked is not that
+// product, so emptying any one of them, or dropping one of the two plural forms,
+// goes red inside the sweep instead of quietly printing asked=0 over a grid that
+// stopped existing.
+//
 // ONE CONSTRAINT THIS FILE PUTS ON PRODUCTION CODE, DECLARED HERE BECAUSE
 // NOTHING ELSE WRITES IT DOWN (F-R2-1, docs/evidence/s1/panel-l2-grant-nail-
 // accept-r2.md §2.4 + §7.4): the inbound half of this instrument starts from the
@@ -109,9 +116,18 @@ package panel
 // JSON decode destination ... cannot be enumerated": facet 1, facet 2, the
 // three-way key test, and facet 4's pristine-snapshot precheck. That direction is
 // deliberate: the file refuses to call the boundary clean over bytes it cannot
-// read, and the message carries its own way out, which is to route the bytes
-// through a same-package struct or to register the type in
-// inboundTypeRegistry and judge it in a test that can see it. Loosening the
+// read, and the message carries its own way out. That way out is ONE PATH IN
+// TWO STEPS, not a choice between two (F-ACC-3, docs/evidence/s1/panel-l2-grant-
+// nail-fix-r3-accept-r1.md §5.2; the wording here used to say "or", and the
+// second step is what the first one runs into): step one, route the bytes
+// through a struct in this package, which is the only thing that makes the
+// destination enumerable by a key scan; step two, register that type in
+// inboundTypeRegistry, which is what lets the reflection half of the three-way
+// key test see it. Step one ALONE leaves this file red - one test,
+// TestJSONKeyDerivationAgreesWithEncodingJSON, "decode destination <name> has no
+// reflection twin in inboundTypeRegistry" - so a second decode destination that
+// enters the package has to enter the registry in the same commit, and the
+// registered type is then judged by both instruments at once. Loosening the
 // scan is not a test edit either, it is the same slice-card decision as the
 // vocabulary above.
 //
@@ -162,6 +178,50 @@ var grantFieldWords = []string{
 var grantRouteWords = []string{
 	"approve", "approval", "grant", "allow", "permit",
 	"ratify", "authorize", "authorised", "decide", "decision", "verdict",
+}
+
+// grantRouteWordWitnesses is the roster behind F-ACC-2 (docs/evidence/s1/panel-
+// l2-grant-nail-fix-r3-accept-r1.md §1.2): one route name per member of
+// grantRouteWords, so that deleting a word from that list cannot quietly remove
+// the 48 candidate names that word contributes to the sweep.
+//
+// It is not "a table asserting the table contains itself". Each row is judged by
+// two things that live outside it - the REAL predicate over the REAL vocabulary
+// (carriers must equal exactly the set of grantRouteWords entries that flag
+// route today, so both shrinking and growing that list breaks a row that is now
+// describing a different vocabulary), and the RUNNING production guard, which
+// must refuse every name here: that refusal is the live evidence this file claims
+// for each word, and it is a fact about bridge.go, not about this list.
+//
+// carriers is the set of grantRouteWords entries that flag route, written out
+// rather than derived: no word in this vocabulary is a substring of another
+// ("approve" is not inside "approval", "decide" is not inside "decision", and
+// authorize/authorised diverge before the ending), so each row names exactly one
+// word today. Recording the set anyway is the point - if the vocabulary grows a
+// member that also matches one of these names, the row that did not ask for it
+// goes red and says so.
+//
+// route names here are deliberate, not templated: "panel.review.ratify" is the
+// spelling acceptance r3 planted as its M16, and "panel.approval.request" is the
+// spelling the removed 53a1359^ button emitted. Widening grantRouteWords means
+// adding a row in the same edit, and TestGrantVocabularyIsNotSatisfiedByTheReal
+// Envelopes goes red when the two lists disagree in either direction.
+var grantRouteWordWitnesses = []struct {
+	word     string
+	route    string
+	carriers []string
+}{
+	{"approve", "panel.mode.approve", []string{"approve"}},
+	{"approval", "panel.approval.request", []string{"approval"}},
+	{"grant", "panel.grant", []string{"grant"}},
+	{"allow", "panel.l2.allow", []string{"allow"}},
+	{"permit", "panel.permits", []string{"permit"}},
+	{"ratify", "panel.review.ratify", []string{"ratify"}},
+	{"authorize", "panel.authorize.request", []string{"authorize"}},
+	{"authorised", "panel.authorised.request", []string{"authorised"}},
+	{"decide", "panel.decide", []string{"decide"}},
+	{"decision", "panel.decision", []string{"decision"}},
+	{"verdict", "panel.verdict", []string{"verdict"}},
 }
 
 // carriesGrantWord reports whether name, normalised, contains a verdict word.
@@ -1252,11 +1312,19 @@ var grantRouteSuffixes = []string{"", ".request", ".now"}
 // plural/no-plural names by concatenating at run time and asks the RUNNING guard
 // about each one. Nothing here reads a file: a route the guard answers is enough,
 // however the production code got that name.
+//
+// That product is an ASSERTION and not merely the shape of the loops (F-ACC-1).
+// Before it, asked= was only a t.Logf reading, so emptying grantRouteSuffixes -
+// the one factor the old control did not name - or dropping the plural ring made
+// the sweep ask 0 or 264 names and still report a clean boundary. All three
+// factors are now named in the empty-vocabulary control below, and the returned
+// count is checked against the product, because a factor that stops being ranged
+// is a grid that silently shrank and hits=[] over it is a different fact.
 func knownComposerRefusesAssembledGrantNames(t *testing.T) (int, []string) {
 	t.Helper()
-	if len(grantRouteWords) == 0 || len(grantRoutePrefixes) == 0 {
-		t.Fatalf("the sweep vocabulary is empty (grantRouteWords=%d, grantRoutePrefixes=%d): a sweep that asks nothing answers clean forever",
-			len(grantRouteWords), len(grantRoutePrefixes))
+	if len(grantRouteWords) == 0 || len(grantRoutePrefixes) == 0 || len(grantRouteSuffixes) == 0 {
+		t.Fatalf("the sweep vocabulary is empty (grantRouteWords=%d, grantRoutePrefixes=%d, grantRouteSuffixes=%d): a sweep that asks nothing answers clean forever",
+			len(grantRouteWords), len(grantRoutePrefixes), len(grantRouteSuffixes))
 	}
 	// Anti-vacuity, positive control: the same guard that must refuse every name
 	// below has to answer the four routes this package really declares, or "0
@@ -1282,6 +1350,10 @@ func knownComposerRefusesAssembledGrantNames(t *testing.T) (int, []string) {
 		}
 	}
 	sort.Strings(hits)
+	if want := len(grantRoutePrefixes) * len(grantRouteWords) * len(grantRouteSuffixes) * 2; asked != want {
+		t.Fatalf("the sweep asked %d names but the three lists it reads multiply to %d (%d prefixes x %d words x %d suffixes x 2 plural forms): a factor that stopped being ranged is a grid that silently shrank, and hits=%v over the smaller grid is not the verdict this file documents (F-ACC-1)",
+			asked, want, len(grantRoutePrefixes), len(grantRouteWords), len(grantRouteSuffixes), hits)
+	}
 	return asked, hits
 }
 
@@ -1362,6 +1434,13 @@ func TestNoInboundEnvelopeCanBindAnApprovalVerdict(t *testing.T) {
 // teeth, kept inside a green run: the planted grant shapes below must be flagged
 // and the four legitimate routes must not, or the vocabulary is either decorative
 // or so wide it gets widened away.
+//
+// Its last block answers for the SWEEP vocabulary rather than the field one:
+// every member of grantRouteWords carries a witness route that the RUNNING guard
+// refuses, and the roster and the vocabulary are compared in both directions
+// (F-ACC-2). Acceptance r3 measured that the four historical names above cover
+// four of eleven words, so deleting, say, "ratify" from grantRouteWords left 48
+// candidate names unasked with nothing in the package going red.
 func TestGrantVocabularyIsNotSatisfiedByTheRealEnvelopes(t *testing.T) {
 	type Decision struct{ Verdict string }
 	type plantedOutcomeEnvelope struct {
@@ -1405,6 +1484,66 @@ func TestGrantVocabularyIsNotSatisfiedByTheRealEnvelopes(t *testing.T) {
 	for _, route := range []string{MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend} {
 		if carriesGrantWord(route, grantRouteWords) {
 			t.Errorf("legitimate composer route %q reads as an approval door - the vocabulary would cry wolf", route)
+		}
+	}
+
+	// F-ACC-2, the sweep vocabulary's own witnesses. grantRouteWords is multiplied
+	// out into the grid by TestRealGuardRefusesEveryAssemblableApprovalRouteName,
+	// so a word that disappears from it takes 48 candidate names with it - and
+	// until this block nothing in the package could tell that had happened
+	// (acceptance r3 §1.2 deleted "ratify", stacked its own M16 on top of that, and
+	// read 53 top-level PASSes). Each row makes three claims and only the last one
+	// is about this list: the REAL predicate over the REAL vocabulary must flag
+	// route by exactly the recorded set of words, the name assembled from the word
+	// at run time must read as an approval door and be refused by the RUNNING
+	// guard, and the written-out route must be refused by it too. That refusal is
+	// a fact about bridge.go, not about the roster.
+	for _, row := range grantRouteWordWitnesses {
+		var flagged []string
+		for _, word := range grantRouteWords {
+			if carriesGrantWord(row.route, []string{word}) {
+				flagged = append(flagged, word)
+			}
+		}
+		want := append([]string(nil), row.carriers...)
+		sort.Strings(flagged)
+		sort.Strings(want)
+		if !reflect.DeepEqual(flagged, want) {
+			t.Errorf("witness route %q is flagged by %v under grantRouteWords as it stands, and this file wrote down %v for it: the vocabulary and the evidence attached to it are no longer the same list, which is what a silently narrowed sweep looks like from outside (F-ACC-2)", row.route, flagged, want)
+		}
+		if knownComposerMethod(row.route) {
+			t.Errorf("the running guard answers %q, the witness name for the vocabulary word %q: this row stands as evidence that a panel-side allow door spelled that way is refused, and it is not (D33/F2, R20, AGENTS.md §1.2 ban #6)", row.route, row.word)
+		}
+		// The same claim over a name no list hands this file: built from the word
+		// at run time, so a widened vocabulary puts its own word in front of the
+		// guard instead of waiting for someone to remember the roster.
+		assembled := "panel." + row.word + ".request"
+		if !carriesGrantWord(assembled, grantRouteWords) {
+			t.Errorf("the route name assembled here from the vocabulary word %q (%q) does not read as an approval door - that word no longer carries the meaning the sweep assumes when it multiplies it into a grid", row.word, assembled)
+		}
+		if knownComposerMethod(assembled) {
+			t.Errorf("the running guard answers %q, assembled at run time from the vocabulary word %q (D33/F2, R20, AGENTS.md §1.2 ban #6)", assembled, row.word)
+		}
+	}
+
+	// Roster and vocabulary, both directions: a word with no witness is a hole in
+	// the grid nobody asks about, a witness with no word is a claim about a name
+	// nothing sweeps any more. Deleting a member of grantRouteWords is the shape
+	// F-ACC-2 is about, and it lands on the second message.
+	inVocab := map[string]bool{}
+	for _, word := range grantRouteWords {
+		inVocab[word] = true
+	}
+	rostered := map[string]bool{}
+	for _, row := range grantRouteWordWitnesses {
+		if !inVocab[row.word] {
+			t.Errorf("grantRouteWords no longer carries %q while %q still stands here as its witness: the sweep stopped asking the %d names that word used to build (len(grantRoutePrefixes) x len(grantRouteSuffixes) x 2 plural forms), and this roster is the only thing in the package that noticed (F-ACC-2)", row.word, row.route, len(grantRoutePrefixes)*len(grantRouteSuffixes)*2)
+		}
+		rostered[row.word] = true
+	}
+	for _, word := range grantRouteWords {
+		if !rostered[word] {
+			t.Fatalf("grantRouteWords carries %q with no witness row in grantRouteWordWitnesses: no name built from it has been put to the running guard here, so this file cannot claim the grid it multiplies that word into is clean", word)
 		}
 	}
 }
