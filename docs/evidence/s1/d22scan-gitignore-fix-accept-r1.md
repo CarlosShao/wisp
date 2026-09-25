@@ -177,3 +177,126 @@ d22scan: 3 finding(s)  -> internal/build/leak.go:7 [bare-goroutine] + 两枚 [em
 未发现任何一支能安静变绿。上一程点名的 `.git` 存在性加闸确实治不到 `A214②` 说的那一支
 （真检出永远带 `.git`，那扇闸只在 `git archive` 副本上生效）——**编排者否决它、改问 index，判据方向正确**。
 **判：成立。**
+
+---
+
+## 4. 那味偏离（编排者已批准保留）：摘掉它，有没有一发变异从此打不红
+
+票面点名的是 `git ls-files -i -c --exclude-standard`（受追踪 ∩ 撞规则）。实现**额外**问了全量 `git ls-files -z`
+（`gitignore.go:217`，理由写在 `:166-171`：窄清单挡不住"匹配器比 git 多跳"那一类）。
+本仓的承重定义＝**摘掉一味，是否存在一发变异从此打不红**。我用六发变异量（全部在 `mut\`＝`head\tools\d22scan` 的副本里跑，
+被测代码逐字等于交付版；`TestLedgerCountsMatchAnIndependentWalk` 等三枚真树守卫在我副本的相对路径上会 `t.Skipf`，
+下面凡是涉及它们的读数我改到 `f1repo\tools\d22scan` 里跑，那里 `../..` 就是一枚真仓库）。
+
+| 发 | 摘掉/改坏的东西 | 改动（一行） | 读数 |
+|---|---|---|---|
+| **M1** | **只摘"全量清单"这一味**：`parseIndexPaths(all)` → `parseIndexPaths(withIndex)` | `gitignore.go:225` | **全绿**：`ok … 1.578s`——交付的六枚相关测试一枚都不红，我的探针也不红 |
+| **M2** | `holds()` 整个短路（`if false && ix.holds(...)`） | `:357` | **红**，8 条：`scan_test.go:1479/1482/1485/1488`（四枚分母 ＋1 全灭）、`:1508`×3（三枚点名"did NOT fire at the tracked path"）、`:1534` `verdict on the tracked half must be 1 (findings), got 0` |
+| **M3** | `if !ix.ok` 短路（问不到照样套规则＝上一程的形状） | `:351` | **红**，8 条，含 `:1594` 与 `:1597`（note 变成两行、rc 从 1 掉到 0） |
+| **M4a** | 行首空白那枚语义修回退（`TrimSpace`） | `:557` | **红**：`scan_test.go:1686` 两支（`lead/inside.txt` 应为不忽略、`"  lead/inside.txt"` 应为忽略） |
+| **M4b** | 尾随 `**` 那枚语义修回退（`start = 1` → `0`） | `:600` | **红**：`decide("deep", isDir=true)` 被吞、`deep/.gitkeep` 跟着没 |
+| **M5** | 只摘**目录**那一半（`holds()` 的 `isDir` 支 → `false`） | `:189` | **红**：`internal/build/leak.go` 又隐形（分母 ＋1 灭、两枚点名灭） |
+| **M6** | 只摘**窄清单**的一半（`ignoreSet` 不再进 note） | `:237-238` | **红**：`scan_test.go:1527` `note "" must name "TRACKED and matching an ignore rule"` |
+
+**M1 与 M4a 的交叉发（这一发才是这一味的真正判据）**——我在 `mut\zz_accept_probe_test.go` 造了
+"匹配器比 git 多跳"的形状：规则 `frontend/.gitignore` = `  weird/*`（**行首两空格是模式数据**，
+拿真 git 现量钉过：`git add -A` 之后 `weird/a.txt` 受追踪、`git ls-files -i -c` 现量空、
+`git check-ignore -v weird/a.txt` ⇒ rc=1；而一枚**真名叫 `  weird` 的目录**才 rc=0 被忽略），
+种子 `frontend/weird/inside.tsx` 含 `≤`：
+
+| 配置 | 探针读数 |
+|---|---|
+| 交付原样 | PASS：`ban #6 examined=3`、finding 点名 `frontend/weird/inside.tsx` |
+| **只 M4a**（语义修回退，**全量清单还在**） | **仍 PASS**——`holds()` 的全量 tracked 支把它救回来了（分母 3、finding 在） |
+| **M4a ＋ M1**（语义修回退，**只剩窄清单**） | **红**：`ban #6 examined=2`、`findings=[]`、note 说 `skipped as git-ignored: 1 file(s)`——**一枚受追踪的交付字节对门永久隐身，而这正是 git 亲手说"我没忽略它"的那一支** |
+| 只 M1（语义修完好） | PASS（探针与交付名册都不红） |
+
+**判：这一味不是装饰，是防御——但它防的那一发今天没有任何一枚断言钉着。**
+- 摘掉它**今天**不打红任何一发已交付的变异（M1 全绿），按这仓的承重定义**它是未被测试要求的代码**；
+- 可它唯一的作用恰好是"窄清单天生看不见的那一类"（`-i -c` 是 `ls-files` 的**真子集**，现量 `comm -13` 空 ⇒
+  它永远举不出"git 不忽略而匹配器忽略"的件），而那一类**这一批刚修过两枚实例**（F3 的行首空白与尾随 `**`）
+  ⇒ 它是**活家族的保险**，不是想象中的保险。M4a 那行一旦将来被谁改回去，只有它挡着（第三行读数）。
+- **代价核过**：一次运行 spawn **恰好 6 枚** git（`logger\git.exe` 记账现量：3 枚一组、两组，
+  cwd 全在 root，命令＝`rev-parse --show-prefix`／`ls-files -z`／`ls-files -z -i -c --exclude-standard`），
+  来源是 **2 枚 matcher**（`checkRoot` 自建一枚 `main.go:1160` ＋ scan 一枚），每枚懒加载后缓存（`gitignore.go:382-387`）；
+  对 1144 枚受追踪件的树，**同树同机对照实测 修后 0.76s vs 修前 0.42s ⇒ ＋0.34 s/次**（编排者票面的"~0.5 s"同一量级）；
+  最坏一支是 git 挂住：实测 `real 20.7s`（10 s × 2 枚 matcher，§3.3）。
+  ⇒ **只付在 `scripts/d22scan.sh` step 2 与每次本地跑门**（整道门实测 13.9s，step 1 的 go test 才是大头），
+  CI 的 lint job（`.github/workflows/ci.yml:66` `ubuntu-latest`，step 见 `:81`/`:109`）不受影响。
+- **它没有让任何既有担保重新变得不可证伪**：窄清单那味仍被 `:1527`（M6 红）钉着，全量清单的**目录**那半被 `:1485/1488`（M5 红）钉着。
+  没被钉住的只有全量清单的**文件**那半（M1 全绿）。
+
+**最小修法（点名，不动手）**：把 M4a＋M1 那一发做成第三枚半——在
+`TestTrackedPathsAreNeverSkippedByTheIgnoreFilter` 里加一个 seed 分支（`frontend/.gitignore` 写 `  weird/*`、
+种子 `frontend/weird/inside.tsx` 含 `≤`、只跑普通 `git add -A`，并**断言 `git ls-files -i -c` 现量为空**
+＋**断言 finding 点名该件**）。约 15 行测试、零生产码改动；从此摘掉 `all` 那一味必红。
+**格判：附条件成立**——保留是对的（防御、不是装饰），条件是那枚防御今天无断言可及，须按上面一发补上。
+
+---
+
+## 5. F2 那两句担保，现在证伪得动吗
+
+| 句子（现号） | 原文 | 钉它的断言 | 变异证据 |
+|---|---|---|---|
+| `main.go:64-71` | "it never suppresses a finding on a TRACKED path. skip() asks `git ls-files -z` and `git ls-files -i -c --exclude-standard` and refuses to skip anything either one reports…" | `scan_test.go:1439 TestTrackedPathsAreNeverSkippedByTheIgnoreFilter`：分母增量 `:1477-1492`、findings `:1494-1512`、provenance `:1519-1529`、退出码 `:1531-1537` | **M2 红**（8 条，含 `:1534` 那句 `got 0`）；上一程的 F2 说"它点名的测试是 `!` 否定捞回的 `.gitkeep`、夹具无 index"——本批同一枚夹具真 `git init` ＋ `git add -f`（`:1411 gitIndexFixture`、`:1421 gitForceAdd`），形状表达能力补上了 |
+| `gitignore.go:44-47` | "…is the narrow, testable one: **for a path git reports as tracked, skip() returns false.**" | 同一枚测试（`skip()` 是四枚 walk 的唯一入口，`main.go:648/662/841/853/919/952/1168/1173` 现量），祖先目录那一半另由 `TestWalksSkipGitIgnoredPaths`（`:1279`）与 M5 钉 | **M2 红 ＋ M5 红**；句子自陈的 pinner 存在且咬得住 |
+
+⇒ 上一程点名的两枚未钉担保：**一句兑现（M2 可红）、一句从"过度声明"换成窄命题并被同一枚测试钉住**（`cannot disagree` 那句已被删除，
+`git diff ca84b75^..ca84b75 -- gitignore.go` 的删除行 #2 逐字就是它）。**这两枚：成立。**
+
+**但本批自己又新写了一句同族的、未被任何断言钉住的 blanket**（这是文本面的新账，不是旧账）：
+
+- `gitignore.go:103-105`：`The one shape that could make it skip MORE than git - not being able to reach the index at all -
+  is handled by the rule above it, not by this list`。**这句是 ca84b75 新增行**（`git diff … | grep -n '^\+.*The one shape'` ⇒ 命中）。
+  它的"唯一"是**假**的：§4 第四发的 M4a（匹配器把自己的规则读宽）就是**第二种** skip-MORE 形状，
+  而它**不是**被"一条规则都不应用"治住的，是被 `holds()` 的全量 tracked 支治住的
+  （M4a 单独跑仍绿 ⇒ 今天没有匹配器多跳；M4a＋M1 ⇒ 隐身）。
+  **它也不可证伪**：交付名册里没有任何断言能区分这句的真假（M1 全绿就是这件事的形状）。
+  最小修法＝把 §4 那发补上，并把这句改成"…is handled by `holds()` 的全量清单 ＋ 问不到时不套规则"两支并列。
+- `gitignore.go:166-171`：`an independent union member so one command's parsing bug cannot blind the other`——**窄清单在 `holds()` 的文件支里是空转的**：
+  `ls-files -i -c` 严格 ⊆ `ls-files`（现量 `comm -13` 空），且两枚都过同一枚 `parseIndexPathsList`（`:279` 由 `:301` 调用），
+  所以"一枚命令的解析 bug 盲不了另一枚"这个理由在代码里不成立（另一枚也瞎）。
+  窄清单真正承重的作用是 **note 点名**（M6 红钉着）与测试里的 git 侧前提（`:1465`）。⇒ 同一枚一句话级的修法。
+- 顺带两句**属于成本陈述、不属于安全担保**的未钉文字，记下不升级为缺陷：
+  `gitignore.go:346-348`（`rel==""` 早退"costs no git call"）、`:199-201`（"any failure yields ok=false plus one reason"，
+  其中 `parseIndexPathsList` 对绝对路径/`..` 的拒读没有任何测试喂过畸形流——方向是安全的：拒读⇒不套规则⇒多扫）。
+
+**格判：附条件成立**——F2 点名的两句都从"担保"变成"有 pinner 的窄命题"（M2/M5 各咬一次），
+但同一批新写了一句"唯一形状"式 blanket（`:103-105`）与一句站不住的"独立并集成员"理由（`:166-171`），
+两枚各一行文字修法、并共用 §4 那发补测试。
+
+---
+
+## 6. 同批改副本这条规矩（本仓栽过两次的那条）
+
+1. **副本确实动了，而且在同一枚 commit 里**：`ignoredLikeGit` 的签名从 `(rel string)` 变成
+   `(rel string, tracked map[string]bool, rulesOn bool)`（`scan_test.go:1758`，现量 `git diff ca84b75^..ca84b75 -- scan_test.go`
+   删除行只有两枚，逐字是 `if ignoredLikeGit(relToRepo(root, p)) {` 与旧签名行——**没有第三枚手抄新造**）。
+   配套新增 `gitTrackedIndex`（`:1775`，**手抄的第二份 git 问答**，不调被测码）。
+2. **副本这次真有牙（实测，不是推理）**：把副本那一半的 index 摘掉（只在 `f1repo-mut\` 的测试里改，
+   `ignoredLikeGit(relToRepo(root, p), nil, indexOK)` ＋ `_ = tracked`），**同一棵 F1 树**上：
+
+   ```
+   --- FAIL: TestLedgerCountsMatchAnIndependentWalk
+       scan_test.go:1255: scope ban #6 frontend/ reported examining 41 files,
+                          independent walk says 40 - the number in the self-report is wrong, not just small
+   ```
+
+   正控（原样）在同一棵树上 PASS 且 oracle 自己报 `verified ban #6 frontend/: 41`、`bans #1-5 internal/: 204`、
+   `ban #8 internal/: 407` ⇒ 两边在 F1 形状上**合流到同一个 41**，
+   而一旦副本退回"纯模式"就当场分家——**上一程 §1.4 那句"两份副本共用同一条纯模式前提"被这一发改掉了**。
+3. **名册普查（票面命令我自己跑的）**：命中 113 行（正控：`grep -rn 'ignoredLikeGit' --include='*.go' tools` 先打出 3 行，
+   证明这把尺不瞎）。按**位置**数，真正的"可执行跳过逻辑"仍是
+
+   | # | 位置 | 抄的是什么 | 本批 |
+   |---|---|---|---|
+   | ①②③④ | `main.go:648/841/919/1168`（目录名）＋ `:662/853/952/1173`（文件） | `testdata`/`node_modules`/`.git` 目录名 ＋ 全部接同一枚 `ign.skip` | ①②③④ 的 ignore 那一支语义变了（判据加 index），**代码只有一枚 `skip()`** |
+   | ⑤ | `scan_test.go:1213` 独立对照走查 | 目录名 ＋ `ignoredLikeGit` | **同批改了** |
+   | ⑥ | `scan_test.go:1758 ignoredLikeGit` | 手抄的 `frontend/dist/` ＋ `.gitkeep` 政策 ＋ **现在加上了 index/rulesOn** | **同批改了**（不是新造） |
+   | ⑦⑧⑨ | `internal/panel/frontend_hygiene_test.go:289`、`internal/panel/composer_test.go:286/434/606`、`internal/risk/pathresolver_rewrite_account_test.go:223` | 子串 `/dist/`、case 表列名 | **一字未动（正确）**，且 `A217④` 已把 `internal/panel` 那枚新仪器记在另一程名下 |
+
+   ⇒ **没有造出新的不受控副本**；`internal/panel/**` 那条既有暴露（上一程 F8）仍归它的主人，本批没碰也没该碰。
+4. **地界**：`git diff --name-only ca84b75^..ca84b75` ＝ 4 枚路径，`internal/`、`internal/panel/`、`cmd/`、`frontend/`、`design/`、
+   `docs/reports/**` **零字节**（现量）。本件自己全程只写 `docs/evidence/s1/d22scan-gitignore-fix-accept-r1.md` 一枚路径。
+
+**判：成立。**
