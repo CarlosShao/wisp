@@ -531,4 +531,92 @@ it never invents an exchange rate"。⇒ 尺上那个 `¥0.31` 的 `¥` **正是
 ⚠ 顺带把 `SPEC-08:150-151` 那条"前端必须无状态"与 ⓐ 的落地形状钉在一起，免得下一位走出第三种形状：
 `PLAN.md:2966` 与 `SPEC-08:150` 规定的是"**每次 show 全量推**"，
 对应 `App.tsx:71` 每次从快照现读、`panel-views.ts:127` 那句"not a memory of where the user last was"。
-⇒ ⓐ 落地时 `view` **必须由 Go 每枚快照都带上**；前端记住上一次的值会同时违 `SPEC-08:150`、`PLAN.md:2966` 与票 92 的 AC#4。
+---
+
+## 4. 给 AC#2 的可执行分组（＋构造点点名，AC#2 要求"表里必须点名"）
+
+### 4.1 构造点：谁建、几处（现量，非测试调用者数）
+
+| 构造函数 | 定义 | **非测试调用者** | 说明 |
+|---|---|---|---|
+| `panel.NewSnapshot` | `internal/panel/composer.go:63` | **0** | 唯一的快照建造者。`grep -rn NewSnapshot --include=*.go`（排除 `_test.go`）只剩 `:58` 注释＋`:63` 定义 |
+| `panel.NewComposerState` | `composer.go:197` | **0** | 只有 `composer_test.go:210` 一处用（测试）。⇒ `Snapshot.Composer` 那枚"必带段"（AC#4）今天也没有生产建造者 |
+| `panel.NewApprovalCardView` | `approval.go:64` | **1** | **`cmd/wisp/panel_assets.go:68`** —— 且它在 CLI 诊断分支里（`-l2`），打印到 stdout，不是推送 |
+| `panel.CardViewFromDecision` | `approval.go:72` | 1（包内） | 被 `NewApprovalCardView`（`:66`）调；无包外调用者 |
+| `panel.NewModeView` | `composer.go:110` | 1（包内） | 被 `NewComposerState`（`:202`）调 |
+| `panel.ModeUnknownView` | `composer.go:120` | **0** | AC#4 的"读不到就当 unknown"那支，今天无人调 |
+
+⇒ **AC#2 的"构造点填真值"这一条，真实工作量不是"改一处构造点"，而是"第一次让这些构造函数在生产路径上被调用"**。
+本件判：这件事**不在 `internal/panel/**` 里能做**——它要求有人（宿主/泵）import 并驱动，
+而 `internal/panel` 现在**不 import `internal/agent`**（现量零命中）。
+⇒ **AC#2 的落地集无论选哪一组字段，都改不动"零生产调用者"这一条。**
+把它写在最前面，是为了让 AC#2 的证据件不许用"字段加好了、构造点填了真值（在测试里）"来交件——
+那正是票 92 把 `Snapshot` 从 `approval_test.go` 搬进生产码时要治的那病（`composer.go:41-43` 原话），
+**搬了文件没搬调用者，病还在**。
+
+### 4.2 分组甲：**今天就能扩**（真源在、生产者也在跑，只缺快照字段＋泵）
+
+按"扩了之后 AC#6 那一问（哪枚用例断言值来自真源）最容好答"排序：
+
+| 行 | 字段 | 真源（生产者已跑） | 落地还要几行 |
+|---|---|---|---|
+| 6 | `Approval.Depth` | `approval.Queue.Depth()`（`queue.go:133`）；**或直接用已有的** `Snapshot.Pending` 长度（`composer.go:45`，`App.tsx:75-76` 已在算） | 0（用长度）～1（要精确深度则从 Queue 取） |
+| 11 | `Run.Stuck{Tool,Repeat,Level,Text}` ＋ `Run.Brake` | `agent.Reminder`（`guard.go:47-58`）真发于 `loop.go:470-478,883-886`；`Result.Brake/ReminderLevels`（`loop.go:96,98`） | 1 个 view 结构 ＋ 泵 |
+| 12 | `Cost{In,Out,Cached,Micros,Currency}` | `agent.Cost`（`cost.go:23-30`）、`llm.Usage` 三枚（`events.go:92-96`）、`Result.CostMicros/Currency`（`loop.go:92-93`）、历史读口 `CostDay/ListCostDaily`（`dao_misc.go:154,169`） | 1 个 view ＋ 泵；⚠ **`Micros` 与 `Currency` 必须成对**（§2.13 单位雷） |
+| 13 | `Run.Status`（取消/完成之分） | `StatusCancelled`（`loop.go:46`，真发 `:378,422,494`）、`llm.StopCancelled`（`events.go:77`）、`OutcomeCancelled`（`journal.go:42`）、`ClassCancelled`（`errors.go:30`） | **先定"走 `Event.Stop` 还是走 `Result.Status`"**（§2.14 那处取向），再 1 枚字段＋泵 |
+| 3 | `Run.Reasoning`（**只要文本**） | 三适配器发 `EvReasoningDelta`（`anthropic/stream.go:296`、`openaichat/adapter.go:301`、`openairesponses/stream.go:242`），**`loop.go:544` 已在转发**；聚合在 `TurnResult.Reasoning`（`events.go:189`） | 0 行新逻辑（已转发）＋ 1 枚字段＋泵 |
+| 2 | `Run.Usage`（实时 token） | `EvUsage` 五处发（`anthropic/stream.go:247,350`、`openaichat/adapter.go:189`、`openairesponses/stream.go:372,395`） | **1 行转发**（`loop.stream` 的 switch `:540-545` 加一支）＋字段＋泵 |
+| 4 | `Tools[]` 的 `Status`/`Level`/`Name`/`CallID`/`ArgSummary` | `ToolResultLog`（`loop.go:69-79`，含 `Rejected`）、词表 `journal.go:39-44`、`ToolOutcome.RiskLevel`（`tools.go:71`）、`memory.ToolCall.RiskLevel/ArgsJSON`（`models.go:79-80`）；运行中＝`llm.EvToolCallStart` 三适配器全发（`anthropic/stream.go:262`、`openaichat/toolasm.go:71`、`openairesponses/stream.go:301,327`） | 1 行转发（补 `agent.EvToolStart` 发送点，`sink.go:25` 声明已在那）＋ 1 个 view＋泵 |
+| 5 | `Tools[]` 的 `ArgsJSON`/`ResultSummary`/`CorrelationID` | `memory.ToolCall.ArgsJSON/CorrelationID`（`models.go:79,87`）读口 `ToolCallByID`/`ListToolCallsByTask`（`dao_toolcall.go:98,111`）；`ToolResultLog.Text`（`loop.go:74`） | 1 枚字段＋泵（⚠ **不含时长**，见分组乙） |
+| 8 | `Approval.RemainingMs`/`WindowMs`/`Channels[]` | `approval.Prompt.Window/Deadline`（`ui.go:38-39`）、`Event.Remaining/EventTick`（`:64,71-76`）、`ChannelRegistry.Statuses()`（`approval.go:190`）＋ B1 原句（`:103-106`）；窗口值 `timeouts.go:48`；**`cmd/wisp/run.go:723-738` 今天就在把这些打给控制台** | 1 个 view＋泵 |
+| 10 | `Failures[]` 的 `ErrorClass`/`Technical`/`Retryable` | `observe.Error.Class/Detail/ProviderCode`（`errors.go:171-174`）、`RetryPolicy()/Retryable()`（`:103,121`）、`MappedStates()`（`:131`）、载体 `Event.Err`（`sink.go:58`）真发于 `loop.go:895` | 1 个 view＋泵（⚠ **不含人话文案**） |
+| 7 | **无需新字段** | `ApprovalCardView` 十字段全在（`approval.go:39-59`） | **只缺泵** |
+| 14 | 来源：`pending[].reason` **已经到面板** | `rules_gateway.go:112` → `approval.go:83` → `l2-approval-card.tsx:159`＋`:208` | Go 侧 **0 行**；剩下是前端别用硬编码行盖住它（§1.3） |
+
+⇒ **分组甲合计 12 行**（1、9 两行不在内）。其中**行 7 与行 14 的 Go 侧改动量是 0**。
+
+### 4.3 分组乙：**必须有源之后才扩**（今天扩＝造假，按 §2.0(3) 禁入落地集）
+
+| 字段 | 行 | 缺什么 | 归口 |
+|---|---|---|---|
+| `Run.ThinkingMs` | 1 | 无人为"等首 token"开 `observe.Timeout`（11 个调用点逐一核过，见 §2.2） | **另开票**：`loop.stream`（`:536-548`）发请求处开计时 |
+| `Run.ReasoningMs` | 3 | 同上（同一个计时起点缺口） | 与上行**同一枚票** |
+| `ToolCallView.DurationMs` | 5 | `tool_call.started_at` **生产路径零写者**（`journal.go:75-82` 不填 → `dao_toolcall.go:28-29` 写 NULL；只有 `ended_at` 在 `:78,81` 被写；`ToolOutcome` `tools.go:68-80` 无时长） | **另开票**：补 `started_at` 写点（`internal/agent`＋`internal/memory` 两侧） |
+| `FailureView.HumanText` | 10 | class→中文用户文案的映射**在仓里不存在**（`observe/errors.go:19-35` 只有 17 枚枚举，无人给它配文案） | **另开票**：17 枚文案是产品决策，**须人工过目** |
+| `Pending.Taint.Fragment` | 14 | 字段被自己的注释禁止外流（`provenance.go:251-252` "native confirmation card only — NEVER write this into the DB/args_json"）；`risk.Hit` 包外**零消费者** | **等人工批准**（安全取向；⚠ 且 `internal/risk/**` 在本票零命中面上） |
+| `ToolCallView.IconClass` | 4 | tool→图标映射表不在仓里，而 §17.4 名册是冻结清单（`panel-views.ts:13-15` 自证增枚＝人工批准） | **等人工批准**（不是编码活） |
+| `Snapshot.View`（ⓐ） | §3 | 九枚屏 id 在 Go 全仓零命中，值无人产出、名字无校验 | **等定案**：要么先在 Go 立枚举＋双向尺，要么与 ⓑ 一并处理（§3.2） |
+| L1 窗口/KWS 的**能力**（非显示） | 8 | `DEFERRED(kws-veto, B1)`（`approval.go:99-102`）、`ChannelPanel`＝ticket 37（`:56`）、`DefaultChannels()` 注释"…are not [up]"（`:161`） | **已登记推迟**，本件不动登记表；⚠ 显示侧（那句"语音取消不可用"）**不属乙组**，它在甲组 |
+| 原生降级卡（全部） | 9 | `approval.UI` 的唯一生产实现是文本的 `consoleApprovalUI`（`cmd/wisp/run.go:723`），win32/D2D 卡片不存在 | **另开票／原生侧**；⚠ 且**不该以扩 `Snapshot` 的方式做**（§2.10） |
+
+⇒ **分组乙 9 条里，没有一条是"加个字段就行"**；把它们误分进甲组的唯一途径是填常量或挪文案，
+这正是 §2.0(3) 与 owner 的 P9 红线要拦的那一步。
+
+### 4.4 ⚠ 一处**结构性冲突**要报：AC#2 的字面与 AC#4③ 的字面互斥
+
+工单 AC#4③ 写"**TS 侧对齐之前，Go 先加字段不会弄红任何门**"，并要求回答"这把尺今天是否存在？不存在就登记"。
+
+**现量：这把尺存在，且它的作用方向正好相反。**
+`internal/panel/composer_test.go:48 TestComposerContractTypesMatchFrontend`：
+- `:60` 配对 `{"Snapshot", Snapshot{}, "PanelSnapshot"}`（另有 5 对，`:61-65`）；
+- `:68` `goKeys := jsonKeysOf(p.goType)`，`:69` `tsKeys, ok := tsInterfaceKeys(text, p.tsIface)`；
+- **`:73-75` 正向**：`if missing := subtract(goKeys, tsKeys); len(missing) > 0 { t.Errorf("Go %s emits %v that interface %s does not declare") }`；
+- `:76-78` 反向：TS 读了 Go 不发的键也 `t.Errorf`；
+- 语义核过：`jsonKeysOf` 取 `json:` 标签（`internal/panel/approval_test.go:174-191`），
+  `subtract(a,b)`＝**"a 有 b 无"**（`:213-225`）。
+
+⇒ **在 `Snapshot` 上加任何一枚新 `json` 键而不同批改 `frontend/src/lib/panel.ts:129-137`，
+`go test ./internal/panel/` 必红**（`t.Errorf`，非 skip、非 Fatalf）。
+且该测试**读工作树文件**（`composer_test.go:50 os.ReadFile`），panel.ts 缺失则 `:52` 直接 `t.Fatalf`——**不会静默跳过**。
+
+⇒ 与 AC#2 的字面"**不写 `frontend/**`**，只在证据件里给出逐键清单，由前端会话自己落"直接相撞：
+按 AC#2 字面做完，AC#5 那两遍门禁的"改后"必然带红。
+
+**本件不替谁裁这一条**，只把三个可行读法摆出来（**每个都要人工或编排者点头，本程无授权改 AC**）：
+1. 把 AC#4③ 那句读成**笔误**：它真正要的是"有一枚用例会响"（这与尺的存在一致），"不会弄红任何门"那句删掉；
+2. 让 AC#2 与前端那批 `panel.ts` 改动**同批入树**（违 AC#2 字面，但不违"前端会话自己落 `panel.ts`"的归属账 `A102`）；
+3. AC#2 只在**一枚 commit 内**同时改两处，把 `frontend/src/lib/panel.ts` 那一行**让给前端会话提**（拆两枚 commit 则中间那枚必红，CI 上会留下一发假红）。
+
+⚠ 另记一枚同源风险：尺读工作树 ⇒ 共享工作树里若前端会话把 `panel.ts` 改脏而未提，
+本包的 Go 测试会**对着他们未提交的版本变绿**。AC#5 取"改前改后各一次"名册差集时，
+`git status --porcelain -- frontend/src/lib/panel.ts` 必须一并留证，否则那发绿说明不了任何事。
