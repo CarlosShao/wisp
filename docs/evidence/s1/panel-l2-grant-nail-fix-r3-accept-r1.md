@@ -299,3 +299,56 @@ git log --oneline 5ef1632..a5e1c8c  -> f1cdafa fix(前端·Q-50=甲): 删掉第�
 整个 `internal/panel` 包会一声不响地全绿**。它那三枚先存在的红反而**稀释**了它自己的读数（读起来像"还有别人兜"），
 我这里连那点稀释都没有。它没有把这件事说重，也没有借我的口径改自己的数——按本仓"量出与上游不同就照自己读数写"
 那条，这一格判**成立**。
+
+---
+
+## §5 攻点 5：F-R2-1 那一格（文件头 `:102` 起那段）—— **自纠后的"四枚"判对；那句出路要补一步**
+
+### §5.1 我自己造的那发 MDEC：红名枚数与逐枚名册
+
+```
+scripts/mut.py MDEC   -> 副本 bridge.go 里加一枚合法的 var acProbeMap map[string]any + json.Unmarshal
+go test ./internal/panel/ -count=1 -v   （out/T-V-MDEC.txt）
+FAIL=4：TestAnsweredPanelRoutesCarryNoApprovalDecision   （facet 1）
+        TestNoInboundEnvelopeCanBindAnApprovalVerdict    （facet 2）
+        TestJSONKeyDerivationAgreesWithEncodingJSON      （三向对照）
+        TestPlantedGrantWiringGoesRedInASnapshot         （facet 4 的 pristine-snapshot 前置）
+四处同一句，报在 :1162 / :1351 / :1554 / :1740 —— 与实现件 §3 引的四枚行号**逐字同值**
+红句：a JSON decode destination in 1 place(s) cannot be enumerated: bridge.go:110:
+      decodes into &acProbeMap (type "map[string]any"), which is not a same-package struct
+```
+
+⇒ **`121006d` 那次"三枚 → 四枚"自纠判对**；验收件 r2 §7.4 第 1 句原文的"三枚 ban 测试 `t.Fatalf`"确实是错的
+（错在把 facet 4 那枚快照前置漏计了，它走的是同一道 `requireReadableInstrument`）。
+它 §3 末段那句"本程那枚常驻测试在此发仍绿（它不读 decode）"我也复现：`out/T-V-MDEC.txt:179` `--- PASS: TestRealGuard…`。
+⚠ 读数口径提醒：这一发 `=== RUN` 从 99 掉到 **89**（四枚父用例 `t.Fatalf` 后它们体内 10 枚子测试不再跑），
+`^panic:` = 0 —— **MDEC 那一行的四数不能和干净态那行的四数直接比**，别下游谁把它当"少了 10 枚用例"来记账。
+
+**另两发我把它声称的两种目的地都打了**（头段原话是 "a decode into a `map[string]any` **or** a `json.RawMessage`"）：
+
+```
+MDEC2（目的地换成 json.RawMessage）-> 同一批 4 枚红、同四处行号、红句 … decodes into &acRaw (type "json.RawMessage")
+                                      （out/T-V2-MDEC-raw.txt）  ⇒ 头段那句"两种合法形状都算"是真的
+```
+
+### §5.2 那条约束写进文件头的措辞**可证伪**吗 —— 可，且我按它的句子造了反例方向
+
+头段那句（交付版 `:104-111`）的主语是**一形代码**（"a SECOND decode destination in `internal/panel`"）、
+谓语是一枚**可数的后果**（"makes **four** of this file's tests abort with `<逐字引出的消息>`"）——
+两样我都在副本上量到了，所以它不是宣言。**它没有写成"必须怎样才对"那种无从否证的句子。**
+
+**但它的出路那半句少写了一步**（记入账 F-ACC-3）：头段说 `the message carries its own way out, which is to
+route the bytes through a same-package struct **or** to register the type in inboundTypeRegistry …`。现量：
+
+```
+只走第一路（新增同包 struct 作目的地）      -> FAIL=1：TestJSONKeyDerivationAgreesWithEncodingJSON
+      红句 :1560 decode destination acProbe has no reflection twin in inboundTypeRegistry
+                                              （out/T-V3-MDEC-struct.txt，RUN=97）
+两路一起走（同包 struct + 注册进 inboundTypeRegistry） -> FAIL=0，且那枚类型真被两把尺对着判：
+      :1576 acProbe: 1 keys agreed by both instruments [text]（out/T-V4-MDEC-registered.txt，RUN=99）
+```
+
+⇒ 出路**存在**（我按它给的材料走通了，零红），但它是一条**两步**的路，头段那个 "or" 会让下一个撞上来的人
+以为"换成 struct 就完事"，然后在第二道引信上多吃一枚红。修法是一行措辞：把 "or" 改成
+"and then"（或补一句"新目的地进了包就得进 `inboundTypeRegistry`，`:1560` 那枚引信会替你说"）。
+这一条**与"三枚/四枚"那处自纠同级**，属文档级、不改判据、不放宽断言。
