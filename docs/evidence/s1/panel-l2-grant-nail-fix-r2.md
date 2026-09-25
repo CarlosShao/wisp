@@ -185,3 +185,62 @@ bridge.go:99: "panel.review." + acceptM3Tail / bridge.go:99: acceptM2Route`。
 本节的锚点：`TestAnswered…` 里那两枚红句的行号（817/820）与 `:878`、`:839` 都按当时代码现读，
 commit 后本件的行号会继续漂，引用时以 `l2_grant_boundary_test.go` 的**句子**为准，不要拿行号当句子的指纹。
 
+
+---
+
+## §4 修法 (c)：入站封套的判据换成"本包里作为 JSON decode 目的的那枚类型"（治 F-4 / M6 / M13 的封套半）
+
+### §4.1 先复算验收给的两个数，再换尺
+
+| 待验断言 | 我的命令 | 现量 |
+|---|---|---|
+| "全包只有 `bridge.go:79` 一处 json.Unmarshal" | `grep -rn "json.Unmarshal" internal/panel/*.go \| grep -v _test.go` | **1 处**，`bridge.go:79`，目的 `&r`（`var r ComposerRequest`）⇒ 成立 |
+| 换尺之后**今天**的入站集合会不会变 | 见下表的两把判据在同一棵树上的外延 | **完全相同**：`{ComposerRequest}` ∪ 闭包 `{AttachmentPayload, AttachmentRef}` ⇒ **这不是收紧也不是放宽，是把同一格外延换了个判据**，M6/M7/M13 三枚植物从此进射程 |
+| 反例：为什么不能"查包里所有 struct" | `internal/panel/approval.go:54` `SessionOverrideBlocked bool json:"sessionOverrideBlocked"` 归一化含 `override`、`:58` `DecidedBy json:"decidedBy"` 含 `decide`，两枚都在 `ApprovalCardView`（**出站渲染视图**，不是任何 decode 的目的） | 派单警告成立，**而且我量到第二枚**（验收只点了 `decidedBy`）。⇒ 那一版今天会红两枚存量合法键，未采纳 |
+
+⇒ 验收 §7.3(c) 的**判据选择成立**，但它给的理由（"M6/M7/M13 三枚植物都带自己的 json.Unmarshal ⇒ 三枚全在射程内"）
+**只对了两枚**：M7 换了尺之后**仍然全绿**，因为它逃的不是种子判据、是 `jsonOr` 那枚空 tag 名（F-5）。
+这一格我用现量把它钉在 §4.3，没有顺着验收的话写。
+
+### §4.2 改了什么
+
+- `boundaryPackage` 多三格：`pkgVars`（包级 var 的声明类型）、`decodes []decodeSite`、
+  `inboundSeeds map[string]bool` + `decodeProblem string`。
+- 解析改成**两遍**：第一遍逐文件收 struct/const/路由字面量/包级 var 并把 `*ast.File` 攒下；
+  第二遍 `collectDecodeSites` 走每一枚函数体（含 `FuncLit`、含参数表），先收集局部件名→类型
+  （`var x T`、`x := T{}`、`x := &T{}`、`x := new(T)`，同名两型记冲突），再把每一枚 decode 调用的
+  目的表达式解析成类型。**为什么必须两遍**：目的可以是**另一个文件**里的包级 `var`，
+  而"它到不到位得上同包 struct"要等 struct 集齐才能判（`classifyDecodes`）。
+- 认哪些调用：`json.Unmarshal(x, &v)`；以及在**导了 `encoding/json` 的文件**里、receiver 文本含 `json`
+  的 `.Decode(&v)`（`json.NewDecoder(r).Decode(&v)` 与先存成 `d := json.NewDecoder(r)` 两种写法都收）。
+  `hex.Decode` / `base64.*.DecodeString` 进不来（名字与 receiver 都不满足）。今天全包 1 处，
+  所以这一条对存量是零风险；写在这儿是为了**下一枚** decode 落地时自动进射程。
+- **读不懂的目的**（`map[string]any` 这种能绑任意键的、别包的 struct、找不到声明的变量、冲突件名）
+  ⇒ `instrumentBlindnessProblem` 点名 `file:line + 表达式 + 类型文本`并 `t.Fatalf`。
+  原 `guardReadabilityProblem`/`requireReadableGuard` 因而改名
+  `instrumentBlindnessProblem`/`requireReadableInstrument`：它现在判的是**两类失明**
+  （守卫读不懂的标签、decode 目的枚举不出键），不只守卫。
+- `inboundEnvelopes` 的种子从"绑 `method` 键"改成 `pkg.inboundSeeds`；**内嵌/嵌套闭包原样保留**
+  （验收 §3.4 那发 M10 证明闭包承重，这一格不许动）。
+- 植物 G：`{Cmd json:"cmd"; Outcome json:"outcome"}` + 自己的 `json.Unmarshal`。三条断言钉死它是谁：
+  seed 认它（`inboundSeeds`）、它**不**绑 method 键（否则新旧两把判据分不开，植物就白种了）、
+  扫描当场点名 `"outcome"`。
+
+### §4.3 现量（副本树 = 仓库 test 文件同 blob；`bridge.go` 每发还原 `d2cd6362…`）
+
+```
+M6  --- FAIL: TestNoInboundEnvelopeCanBindAnApprovalVerdict
+    :1191 the panel's inbound Go boundary has a grant-carrying face:
+            bridge.go:124: inbound envelope acceptM6Envelope can bind the JSON key "outcome" -
+            a verdict a page can set, ... : Outcome string `json:"outcome"`
+    +  --- FAIL: TestPlantedGrantWiringGoesRedInASnapshot （它的前置引信先叫：
+            :1333 "the snapshot of the real package is already dirty before any planting" —— 真树已脏，
+            植物不能再用，这一发是**正确**的反应，不是误伤）
+M13 两半同时红：:1133/:1136（(b) 那半）+ :1191 "bridge.go:133: inbound envelope acceptM13Envelope …"
+M7  仍然**零枚红** —— 它的封套就是 acceptM7Envelope、就是 decode 目的、已经在射程里，
+    但 AST 把 `json:",omitempty"` 算成空键名 ⇒ 词表判的是 ""。**这一发归 (c')**，见 §5。
+M8  仍 0 findings（`grep -c 'has a grant-carrying face' afterC-M8.txt` = 0，改前 before-M8.txt 亦 0）
+    ⇒ 同上，(c) 治不了 F-5。
+```
+
+⇒ 三发对照把话说死了：**(c) 治 M6/M13 的封套半，(c') 治 M7/M8，两枚各自承重、互相替不了。**
