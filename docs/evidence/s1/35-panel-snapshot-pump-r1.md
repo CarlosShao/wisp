@@ -803,3 +803,32 @@ D:\tmp\wisp-35-pump-r2\
 参数重跑即可，靶树是干净的。
 
 ---
+
+> **收尾程登记（F-PUMP-6，2026-09-25 18:1x，锚点 `7af2e13`）：`37a4705` 的 commit message 把触发点写宽了一格。**
+> 原文逐字（`git log -1 --format=%B 37a4705` 第 3-4 行）："触发点是生产自己的两处
+> (consoleApprovalUI.Prompt/Update 与 consoleSink.Publish 的 **tool-start**/end/stuck/error/done)"。
+>
+> **① 本程自己现量那三枚读数**（不沿用别程）：`EvToolStart` 在全仓 `.go` 里命中 **3 枚**——
+> `internal/agent/sink.go:24`（注释）、`sink.go:25`（常量定义）、`cmd/wisp/run.go:738`（`case` 消费）；
+> 无深度上限的 python 复扫同为 3 枚，与 `grep -rn EvToolStart --include=*.go .` 逐枚一致。
+> **发射者 0 枚**——尺：`grep -rn "Kind: Ev" --include=*.go internal/agent` 去 `_test.go` → **19 枚发射点**，
+> 逐枚点名 EvToolEnd ×3（`loop.go:714/:837/:872`）、EvStuck ×2（`:476/:884`）、EvError ×2（`:452/:895`）、
+> EvDone ×1（`:936`）、EvControl／EvTextDelta／EvReasoningDelta／EvReminder 各 1（另 4 枚是 `approval/gate.go`
+> 的审计事件 `Event*`，不是 sink 事件词表）——**`EvToolStart` 在这 19 枚里一枚都没有**。
+> ⇒ `run.go:740` 那行 `changed = true` 今天零次执行，"tool-start 触发一次快照"这条今天不可达。
+> 今天真会推一次包的是 **6 处**：sink 里 end／stuck／error／done（`run.go:743/:746/:751/:758` 置 `changed`，
+> 经 `:760-761` 的 `c.publish()`）＋ `consoleApprovalUI` 的 Prompt／Update（`:809`、`:823`）。
+>
+> **② 代码里没有一句注释把 tool-start 说成"现在会触发"，所以没有可追加说明的落点**：
+> 本程扫 `cmd/wisp`／`internal` 全部非测试件里提到 `tool-start`／`stuck` 的注释行，
+> `sink.go:24` 那句 "EvToolStart announces an executed call" 是对**常量语义**的描述、
+> 不是"泵今天被它驱动"的断言。⇒ 本程**没有改 `cmd/wisp/run.go` 一个字**：
+> `case agent.EvToolStart` 那一支与 `panel_pump.go:186-192` 同族（零次执行的分支），
+> 已由编排者转进**票 33 的 AC#7／AC#8**，等那根管子接上那天才有真读数。
+>
+> **③ 过宽的是那枚已提交的 message、不是这份自述**：**本程动笔之前**的那版本文（HEAD，806 行）里
+> **没有出现过 "tool-start" 这一形**（python 正则 `tool.{0,3}start` → 0 命中；`EvToolStart`、`stuck` 亦各 0）。
+> 同一次扫描的正控：`consoleSink` 命中 **3** 枚、`触发点` 命中 **3** 枚 ⇒ 那把尺不是恒不匹配。
+> ⚠ **口径必须这样带**：本文现在确实有 10 处 "tool-start"——**全在本块里**（`809-827` 行），
+> 是本程这次登记自己写进去的，不是上一程留下的。已提交的历史不改写，那格的账记在本行这里：
+> **谁要引用"泵有几个触发点"，按 6 处引、不按 7 处引。**
