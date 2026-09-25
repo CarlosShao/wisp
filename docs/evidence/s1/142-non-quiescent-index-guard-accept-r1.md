@@ -493,3 +493,88 @@ $ git diff --numstat 1b98c7b..cd87354 -- tools/d22scan/allowlist.txt internal/ob
 **同一把尺的正控（防"尺根本没看"）**：对隔壁前端会话那一枚 `d61281c` 跑同一条
 `git show --name-only` ⇒ 打出 8 枚路径（`frontend/package.json`、`frontend/src/App.tsx`…）。
 ⇒ 这枚"路径集合差集"尺子看得见越界，本票的零命中不是瞎读。
+
+---
+
+## 8. 它自报的偏差，逐件裁（其中两件我直接把它"没跑"的那半跑掉了）
+
+### 8.1 动了 `main.go`（超出最小修法）：**认，但要按 §6 的账给它打折**
+
+票面 §地界 只写 `tools/d22scan/**`，没禁动 `main.go`；它给的理由是"别只加断言"（票 §已知会撞上的东西 第二条）
+＋"测试要走的必须是生产那四条 walk，不是在测试里另抄一份走查"（与既有的 `verdict`/`fixtureVerdict` 同形）。
+我这一格的两条凭据：
+
+- **零行为改动**：§7.2 的 A/B（同一枚工作树、两版码、`go run . -root <仓库>`）三遍跑，
+  scope 行＋自陈行＋`clean` 行 `diff` 全空；`main.go` 的删除列只有 **1 枚**（`ign: newGitIgnore(root),` → `ign: ign,`），
+  我逐枚看过 `git diff 1b98c7b..cd87354 -- tools/d22scan/main.go` 的 13 枚新增：一枚 `return`、一段函数注释、
+  一处 `scanWithIgnore` 签名，没有第二处判断逻辑。
+- **seam 确实有牙**：M-B（把塞进去的 matcher 换回新建的）⇒ 红 3 条（`:1818/:1822/:1841`）。
+
+⚠ **但它换来的那枚 5b 断言今天不可能响**（§6：`scanWithStats` 的正文就是 `scanWithIgnore(root, newGitIgnore(root))`，
+5b 比的是 `X` 与 `X`）。⇒ seam 的凭据记在**块 5 与 M-B** 头上，不记在 5b 头上；它 §3.2 的表恰好也是这么记的（没串线）。
+
+### 8.2 用 5a 代替 PATH-shim 那腿：**方向对、力度不足，且不足处我已量化**
+
+5a（`runGitIndex(root)` 静止态必须 `ok=true` 且 `holds` 认新路径）是往"生产那一跳"靠的正确姿势，
+但它不是那一腿：§1.2 的 `S-4`（把装配口从 `runGitIndex` 挪走、`buildGitIndexState` 一字不动）
+在它上面全绿，18 枚变异里 5a 一次都没红过。而我 §1.3 自造的 PATH-shim 端到端探针
+**在交付码上 PASS、在 `S-4` 上 FAIL（`examined 3 对 5`、`findings=[]`）**
+⇒ 那腿不是"造不出来"，是"这程没造"（它自己也是这么登记的，§6 第 1 项）。
+**这一件的判语：不退回，但 F-142-1 必须作为开放残余入账**，理由：票 142 是"少扫"这一族的守卫，
+而"守卫被搬走"正好又落回同一族，且这条腿的成本我已经实测（77＋102 行，全在仓外可搬进仓）。
+
+### 8.3 "没跑 CI"——**这条自报现在已过期，本程把它结掉了**
+
+它写 §6 第 2 项时确实一枚 CI 都没跑过（子程只 commit 不 push）。但现在被验锚点已经在两个远程上：
+
+```
+$ git branch -r --contains 9d06544   →  cnb/dev  origin/dev        # 生产码那枚
+$ git branch -r --contains cd87354   →  cnb/dev  origin/dev        # 交件锚点
+$ git merge-base --is-ancestor 9d06544 cd87354  →  YES
+```
+
+于是我去把 CI 的读数取回来（`gh run view 36094258734`，headSha 逐字＝`cd87354ffbe1f0529159f38872dfcdd70c7298cb`，
+event=push，`2026-09-25T04:23:42Z`，job `lint`＝`107943039081`）：
+
+| CI 步（ubuntu-latest） | 结论 | 与本票有关的读数 |
+|---|---|---|
+| D22 scanner positive control（`runtests.sh -C tools/d22scan ./...`） | **success** | `--- PASS: TestIndexChangingBetweenTheTwoGitReadsAppliesNoRules (0.05s)`；`runtests.sh: OK - … PASS=30 FAIL=0 SKIP=0, === RUN=70`（与我本地纯净快照**四数逐枚同值**） |
+| D22 seven-ban + emoji scan | **success** | 真扫描八枚数 `internal/=203, cmd/=22, ban#6 frontend/=46, ban#7 18, design/=30, ban#8 frontend/=46, internal/=407, cmd/=39` —— 与我 `git archive cd87354` 快照**一字不差**；该步里 6 枚 `gitignore rules NOT APPLIED` 全部来自 `scan_test.go:2363` 的 `/tmp/TestBuiltBinary…` 台件（我逐枚核过路径），**真扫描那一支在 CI 上是应用了忽略规则的**（没有 NOT APPLIED） |
+| gofmt (gofumpt) | **success** | ⇒ 新码在 `gofumpt` 下也干净。**这条我本机量不了**（`which gofumpt` 无、`~/go/bin` 无），只有 CI 凭据，故按"门跑过、我没复算"记 |
+| go vet (tools/d22scan module) | **success** | 与我 module 内 `go vet ./...` rc=0 同向 |
+| staticcheck | failure | 同 job 里唯一红的一步，在 D22 两步**之后**，且不是 d22scan 的码（本仓已知这步的坑）。⇒ 不影响本票，但**别拿"lint job 绿"当凭据**，该 job 整体 conclusion 是 failure |
+
+同一 run 里 `test-core`／`test-windows`／`slo-full` 三枚 job 也是 failure，红点全在
+`cmd/wisp CLI tests`、`Portable package tests`、`SLO full gate` —— 与本票无一路径关系，
+**本程没有为它们判因**（那是别人的账），写在这里只为防止有人把"CI 红"读成"这批红"。
+
+### 8.4 "没跑 Linux"——**本程自己真跑了容器，两向都有数**
+
+先按简报那条 ⚠ 把挂卷证明做实（Git Bash 下 `docker -v C:\…` 会静默挂空且 rc=0＝假绿）：
+
+```
+$ sh linux-leg.sh
+== mount proof ==
+17                                   # /w 目录条目数，非空
+  2382 /w/tools/d22scan/scan_test.go  # 枚数与仓内同值
+   817 /w/tools/d22scan/gitignore.go   # （wc -l，末行无换行故比编辑器行数少 1；基座与工作树我另用 cmp 证过逐字节相同）
+== ticket 142 case ==  (golang:1.27, linux 6.6.114, git 2.47.3)
+PASS=1 FAIL=0
+--- PASS: TestIndexChangingBetweenTheTwoGitReadsAppliesNoRules
+== whole module ==
+ok  	github.com/CarlosShao/wisp/tools/d22scan
+```
+
+再把 M-A 也带进去（同一枚挂卷形态）：`linux-M-A-redlines=14`、`--- FAIL`
+⇒ **这条守卫在 linux 下不但有分母，还能红**；`S-4` 在 linux 同样是 `--- PASS`（与 §1.2 的残余一致）。
+形状侧我另外扫了一遍：`grep -rn '//go:build|\+build' tools/d22scan/` 只命中 `d22scan.exe`（二进制），
+`ls` 无 `*_windows.go`／`*_linux.go`／`*_other_test.go` ⇒ 这批**没有**任何"只能在 linux 量"的腿，
+所以它 §6 第 2 项那句"`git archive` 那两发是在 Git Bash + Windows git 上量的"是个真缺口（不是"无所谓"），
+现已由 CI＋我这发容器一起补上。
+
+### 8.5 没跑全树 `go test ./...`：**我不判，也不替它跑**
+
+理由不是省事：工作树此刻有另一程未提交的 `internal/panel`／`cmd/wisp` 改动（`git status` 现量 `M cmd/wisp/panel_assets.go`、
+`M internal/panel/l2_grant_boundary_test.go`），全树读数在这种编队下**归不了因**。
+本票的三枚 commit 只碰 `tools/d22scan/**`，而那枚 module 的 `./...` 我已经跑过（本机纯净快照 30 枚、CI ubuntu 30 枚、
+容器 `ok`）⇒ 这一件按"未跑，但在本票地界外"入账，不列进 §9 的最小闭合集合。
