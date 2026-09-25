@@ -961,6 +961,46 @@ no view state in the nav layer`）。批量脚本第一遍记 `render:l2 rc=2` �
 唯一 fixture 是 R1/R8、`false`、reason 里没有 URL。`PLAN.md:3493`"面板关闭后不得有动画在跑"
 只证到"前端没做门控"，证不到关闭后是否还在跑（票 33 的宿主还没接）。
 
+## 48. Q-50＝甲 落地（commit `f1cdafa`）：删路由 ＋ 竖条改成"点不动且自己说明为什么"
+
+owner 拍的甲＝「先删掉这个请求」，撤销口令「撤 Q-50 甲」（已写进 `panel.ts` 源码注释，不只在这份 log）。
+删的是 `panel.ts` 那枚导出函数 ＋ `App.tsx` 那一处调用；**换屏层本体不动**（他点名要求的）。
+
+**改前改后都取了读数**（不然没法证明是我这两行让门红）：
+改前 `TestTheRendererHoldsExactlyOneDoorToTheHost` 与 `TestPlantedRendererDoorShapesGoRed` 双 `--- FAIL`，
+红句逐字 `composer_test.go:522 the renderer names a route the Go side does not answer:` ＋
+`:524 ... 5 panel.* route literals`，点中的字节是 `src/lib/panel.ts:252`；
+改后同一命令 `ok github.com/CarlosShao/wisp/internal/panel 0.246s`。**两道门由红转绿。**
+没往 Go 白名单加名字、没动那道门、没动 `ci.yml`。
+
+### 48.1 他要求我提前推演的那一句：删完之后"点了没反应"该长什么样
+
+结论是**只有两种不装的形**，我选了第一种：
+1. **整排不可用**（选了）：每行 `disabled` ＋ `aria-disabled`，头部一行大白话，字是**渲染出来的**、被 `render:nav` 逐字核：
+   > 换屏要等原生宿主接线，这一排图标今天点不动。
+2. 把竖条从屏上撤掉——owner 批的是"删请求"不是"撤层"，且 `d61281c` 他明说不动，没选。
+3. （**没走**）本地自己记当前屏：那正是 Q2 禁的、也正是 §46.3 那枚冲突的根。
+
+**为什么这一支值得单写**：ticket 83 那族病叫"**静默接受用户意图**"。这里做的是反面——
+明确不接受，并且**当场说出来**。所以我没把它推演成"没有不装好的选项"：有的，就是"不可用 ＋ 说清楚"。
+
+### 48.2 两枚我自己的判据错，被自己的仪器当场抓到（没改生产码）
+
+(a) 起初硬编码"必须正好 4 枚路由"，实际是 **5 枚**——我漏数了 `panel.message.send`。
+    而"前端 5 枚 / Go 白名单 4 枚"这条分歧本身是我 §44.1 报过、台账 `A222#7` 记着的**既有事实**，
+    我顺手把它当成了 4。改成"≥4 且不许含 `view`"，**不再拿一个会变的数当判据**。
+(b) 数 `disabled` 时用裸子串，把 `aria-disabled` 一起数成了 18。改判两个完整属性。
+(c) 另一枚 `ReferenceError: esc is not defined`——那枚 helper 只在 `render-l2` 里有，我凭空用了。
+
+### 48.3 现量与两件顺带
+
+`render:nav` 由红转绿（`9 rail rows against 70 frozen §17.4 names, interim=2 (chat,cost)`）·
+`render:l2` rc=0（15085 bytes）· `render:stream`／`render:composer` rc=0 · typecheck／lint／build rc=0 ·
+`sh scripts/d22scan.sh` rc=0。**未 push。**
+顺带两条读数：① 编排者已把三枚 `render:*` 挂进 CI（`20f8033 ci(F4)`），我 §46.6 报的"无门禁分母"这一支结了；
+② 票 143 在落（`4037539` 是它的 `-taint-source` 追正）——**F2 那格的解锁条件就是它给出的那条命令**，
+我这边不手写字节，等命令。
+
 两枚 commit：`d6c52ef`（8 枚路径，全在 `frontend/`）、`a21336e`（2 枚路径）。
 `git status --porcelain -- frontend/` 交件时为空。未 push。未碰 `internal/**`、`cmd/**`、
 `tools/d22scan/**`、`allowlist.txt`、`docs/PLAN.md`、`docs/specs/**`、`design/**`、`embed.go`。
