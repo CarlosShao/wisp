@@ -285,16 +285,311 @@ type boundaryPackage struct {
 	guardFile string
 	guardLine int
 	guardSeen bool
+
+	// pkgVars holds a package-level var's declared type, so a decode destination
+	// written at file scope still resolves.
+	pkgVars map[string]ast.Expr
+	// decodes is every JSON decode this package performs and what it lands in;
+	// inboundSeeds and decodeProblems are derived from it after the parse.
+	decodes       []decodeSite
+	inboundSeeds  map[string]bool
+	decodeProblem string
+}
+
+// decodeSite is one JSON decode call in the package: the expression it decodes
+// into, and the same-package struct type that expression resolves to ("" when it
+// resolves to nothing this instrument can enumerate).
+type decodeSite struct {
+	File     string
+	Line     int
+	DstExpr  string
+	TypeName string
+	TypeText string
+}
+
+// parsedFile keeps one file's tree so the decode pass can run after every
+// package-level var in the directory is known.
+type parsedFile struct {
+	af          *ast.File
+	fset        *token.FileSet
+	rel         string
+	importsJSON bool
+}
+
+// importsEncodingJSON reports whether a file names encoding/json, which is what
+// makes a bare ".Decode(&x)" call worth treating as a JSON decode at all.
+func importsEncodingJSON(af *ast.File) bool {
+	for _, imp := range af.Imports {
+		if unquoteGo(imp.Path.Value) == "encoding/json" {
+			return true
+		}
+	}
+	return false
+}
+
+// collectPackageVars records package-level var types across one file. Only the
+// single-name, explicitly-typed spelling matters here, because that is how a
+// hidden module-level destination gets written.
+func collectPackageVars(af *ast.File, pkg *boundaryPackage) {
+	for _, decl := range af.Decls {
+		gd, ok := decl.(*ast.GenDecl)
+		if !ok || gd.Tok != token.VAR {
+			continue
+		}
+		for _, spec := range gd.Specs {
+			vs, ok := spec.(*ast.ValueSpec)
+			if !ok {
+				continue
+			}
+			for _, ident := range vs.Names {
+				if vs.Type != nil {
+					pkg.pkgVars[ident.Name] = vs.Type
+					continue
+				}
+				if vi := indexOf(vs.Names, ident); vi < len(vs.Values) {
+					pkg.pkgVars[ident.Name] = valueExprType(vs.Values[vi])
+				}
+			}
+		}
+	}
+}
+
+func indexOf(names []*ast.Ident, want *ast.Ident) int {
+	for i, n := range names {
+		if n == want {
+			return i
+		}
+	}
+	return -1
+}
+
+// valueExprType narrows an initialiser to the type expression it implies. It
+// understands new(T), &T{} and a bare ident; anything else yields nil, which
+// makes the site loud rather than guessed at.
+func valueExprType(expr ast.Expr) ast.Expr {
+	switch t := expr.(type) {
+	case *ast.UnaryExpr:
+		if t.Op == token.AND {
+			return valueExprType(t.X)
+		}
+	case *ast.CompositeLit:
+		return t.Type
+	case *ast.CallExpr:
+		if id, ok := t.Fun.(*ast.Ident); ok && id.Name == "new" && len(t.Args) == 1 {
+			return t.Args[0]
+		}
+	}
+	return nil
+}
+
+// collectDecodeSites walks every function body in one file and records the
+// destination of each JSON decode. The seed criterion for "what is an inbound
+// envelope" used to be "a struct that binds a method key", which a renamed route
+// field walks straight past (F-4 in the acceptance: {Cmd, Outcome} with a real
+// json.Unmarshal, five tests green). A decode call cannot be walked past that
+// way - it is the thing the ban is about.
+func collectDecodeSites(pf parsedFile, pkg *boundaryPackage) {
+	add := func(fn *ast.FuncType, body *ast.BlockStmt) {
+		if body == nil {
+			return
+		}
+		scope := map[string]ast.Expr{}
+		conflicts := map[string]bool{}
+		record := func(name string, typ ast.Expr) {
+			if typ == nil {
+				return
+			}
+			if prev, seen := scope[name]; seen && exprText(pf.fset, prev) != exprText(pf.fset, typ) {
+				conflicts[name] = true
+			}
+			scope[name] = typ
+		}
+		if fn != nil && fn.Params != nil {
+			for _, f := range fn.Params.List {
+				for _, n := range f.Names {
+					record(n.Name, f.Type)
+				}
+			}
+		}
+		ast.Inspect(body, func(n ast.Node) bool {
+			switch st := n.(type) {
+			case *ast.DeclStmt:
+				gd, ok := st.Decl.(*ast.GenDecl)
+				if !ok || gd.Tok != token.VAR {
+					return true
+				}
+				for _, spec := range gd.Specs {
+					vs, ok := spec.(*ast.ValueSpec)
+					if !ok {
+						continue
+					}
+					for i, ident := range vs.Names {
+						if vs.Type != nil {
+							record(ident.Name, vs.Type)
+						} else if i < len(vs.Values) {
+							record(ident.Name, valueExprType(vs.Values[i]))
+						}
+					}
+				}
+			case *ast.AssignStmt:
+				if st.Tok != token.DEFINE {
+					return true
+				}
+				for i, lhs := range st.Lhs {
+					id, ok := lhs.(*ast.Ident)
+					if !ok || id.Name == "_" || i >= len(st.Rhs) {
+						continue
+					}
+					if len(st.Rhs) == 1 {
+						record(id.Name, valueExprType(st.Rhs[0]))
+						continue
+					}
+					record(id.Name, valueExprType(st.Rhs[i]))
+				}
+			}
+			return true
+		})
+		ast.Inspect(body, func(n ast.Node) bool {
+			call, ok := n.(*ast.CallExpr)
+			if !ok {
+				return true
+			}
+			sel, ok := call.Fun.(*ast.SelectorExpr)
+			if !ok {
+				return true
+			}
+			var dst ast.Expr
+			switch {
+			case sel.Sel.Name == "Unmarshal" && identName(sel.X) == "json" && len(call.Args) >= 2:
+				dst = call.Args[1]
+			case sel.Sel.Name == "Decode" && pf.importsJSON && len(call.Args) >= 1 &&
+				strings.Contains(exprText(pf.fset, sel.X), "json"):
+				dst = call.Args[0]
+			default:
+				return true
+			}
+			site := decodeSite{
+				File: pf.rel, Line: pf.fset.Position(call.Pos()).Line,
+				DstExpr: exprText(pf.fset, dst),
+			}
+			site.TypeName, site.TypeText = resolveDestination(dst, scope, pkg.pkgVars, pf.fset, conflicts)
+			pkg.decodes = append(pkg.decodes, site)
+			return true
+		})
+	}
+	for _, decl := range pf.af.Decls {
+		if fd, ok := decl.(*ast.FuncDecl); ok {
+			add(fd.Type, fd.Body)
+		}
+	}
+	ast.Inspect(pf.af, func(n ast.Node) bool {
+		if fl, ok := n.(*ast.FuncLit); ok {
+			add(fl.Type, fl.Body)
+		}
+		return true
+	})
+}
+
+func identName(e ast.Expr) string {
+	if id, ok := e.(*ast.Ident); ok {
+		return id.Name
+	}
+	return ""
+}
+
+func exprText(fset *token.FileSet, e ast.Expr) string {
+	if e == nil {
+		return ""
+	}
+	return renderExpr(fset, e)
+}
+
+// resolveDestination turns the second argument of a decode call into the type it
+// lands in. Pointer-of, composite-literal-of and a var or parameter name are all
+// read; a name that is not declared anywhere in the file's package scope, and a
+// name rebound to two different types, both come back unresolvable.
+func resolveDestination(dst ast.Expr, scope, pkgVars map[string]ast.Expr, fset *token.FileSet, conflicts map[string]bool) (string, string) {
+	if u, ok := dst.(*ast.UnaryExpr); ok && u.Op == token.AND {
+		dst = u.X
+	}
+	var typ ast.Expr
+	switch t := dst.(type) {
+	case *ast.CompositeLit:
+		typ = t.Type
+	case *ast.Ident:
+		if conflicts[t.Name] {
+			return "", "conflicting local declarations of " + t.Name
+		}
+		typ = scope[t.Name]
+		if typ == nil {
+			typ = pkgVars[t.Name]
+		}
+		if typ == nil {
+			return "", "no declaration found for " + t.Name
+		}
+	default:
+		return "", renderExpr(fset, dst)
+	}
+	return structNameOf(typ), renderExpr(fset, typ)
+}
+
+// classifyDecodes is run once every struct in the package is known: it decides
+// which decode destinations are enumerable (a same-package struct), and which are
+// a hole in this instrument (everything else, including map[string]any, which can
+// bind ANY key a page sends).
+func (pkg *boundaryPackage) classifyDecodes() {
+	pkg.inboundSeeds = map[string]bool{}
+	var holes []string
+	for _, d := range pkg.decodes {
+		typeText := d.TypeText
+		if typeText == "" {
+			typeText = "(unknown)"
+		} else {
+			typeText = strconv.Quote(typeText)
+		}
+		if d.TypeName == "" {
+			holes = append(holes, d.File+":"+strconv.Itoa(d.Line)+
+				": decodes into "+d.DstExpr+" (type "+typeText+"), which is not a same-package struct: "+
+				"a destination this instrument cannot enumerate keys for is not a clean boundary")
+			continue
+		}
+		if _, ok := pkg.structs[d.TypeName]; !ok {
+			holes = append(holes, d.File+":"+strconv.Itoa(d.Line)+
+				": decodes into "+strconv.Quote(d.TypeName)+", a type from another package or not a struct: "+
+				"its keys are not visible to this scan")
+			continue
+		}
+		pkg.inboundSeeds[d.TypeName] = true
+	}
+	if len(holes) > 0 {
+		sort.Strings(holes)
+		pkg.decodeProblem = "a JSON decode destination in " + strconv.Itoa(len(holes)) +
+			" place(s) cannot be enumerated: " + strings.Join(holes, "; ") +
+			". Judge it in a test that can see that type, or route the bytes through a same-package struct - do not let this file report the boundary clean"
+	}
+}
+
+func quoteOrEmpty(s string) string {
+	if s == "" {
+		return "(unknown)"
+	}
+	return strconv.Quote(s)
 }
 
 // parseBoundaryPackage reads a directory's struct types, string constants and
 // inbound route guard.
 func parseBoundaryPackage(dir string) (boundaryPackage, error) {
-	pkg := boundaryPackage{structs: map[string]structShape{}, consts: map[string]string{}, answered: map[string]bool{}}
+	pkg := boundaryPackage{
+		structs:  map[string]structShape{},
+		consts:   map[string]string{},
+		answered: map[string]bool{},
+		pkgVars:  map[string]ast.Expr{},
+	}
 	files, err := goSourceFiles(dir)
 	if err != nil {
 		return pkg, err
 	}
+	var parsed []parsedFile
 	for _, path := range files {
 		data, err := os.ReadFile(path)
 		if err != nil {
@@ -309,6 +604,10 @@ func parseBoundaryPackage(dir string) (boundaryPackage, error) {
 		rel := filepath.ToSlash(filepath.Base(path))
 
 		collectRouteLiterals(af, fset, rel, &pkg)
+		collectPackageVars(af, &pkg)
+		parsed = append(parsed, parsedFile{
+			af: af, fset: fset, rel: rel, importsJSON: importsEncodingJSON(af),
+		})
 
 		ast.Inspect(af, func(n ast.Node) bool {
 			switch decl := n.(type) {
@@ -395,6 +694,13 @@ func parseBoundaryPackage(dir string) (boundaryPackage, error) {
 			return true
 		})
 	}
+	// Second pass: a decode destination may be a package-level var declared in
+	// another file, and classifying it needs every struct in the directory, so
+	// neither half can run inside the loop above.
+	for _, pf := range parsed {
+		collectDecodeSites(pf, &pkg)
+	}
+	pkg.classifyDecodes()
 	return pkg, nil
 }
 
@@ -497,17 +803,18 @@ func joinUnresolved(items []unresolvedLabel) string {
 	return strings.Join(out, "")
 }
 
-// guardReadabilityProblem names why this tree's answered-set enumeration cannot
-// be trusted, or "" when it can. It is a function rather than a pile of t.Fatal
-// calls so the teeth plant in facet 4 can assert the *message* exists without
-// aborting its own subtest.
+// instrumentBlindnessProblem names why this tree's answered-set or inbound-set
+// cannot be trusted, or "" when both can. It is a function rather than a pile of
+// t.Fatal calls so the teeth plants in facet 4 can assert the *message* exists
+// without aborting their own subtest.
 //
-// The two ways the enumeration is narrower than the guard it reads are both here:
-// no guard at all, and a guard carrying case labels this scan cannot resolve
-// (F-1 in docs/evidence/s1/panel-l2-grant-nail-accept-r1.md: a route reaching
-// through a package-level var or a concatenation used to be dropped without a
-// word, and the file then reported the boundary as clean).
-func guardReadabilityProblem(dir string, pkg boundaryPackage) string {
+// The two families are the two ways an enumeration gets narrower than the thing
+// it reads: a case label that cannot be resolved (acceptance r1 F-1, where a
+// route reached through a package-level var or a concatenation was dropped
+// without a word), and a JSON decode whose destination cannot be named (F-4's
+// descendants - an inbound type this scan cannot list the keys of is an inbound
+// type it must not certify).
+func instrumentBlindnessProblem(dir string, pkg boundaryPackage) string {
 	if !pkg.guardSeen {
 		return "no inbound route guard (knownComposerMethod) under " + dir +
 			": the instrument can no longer tell which methods Go answers, so a clean report here would be silence, not safety"
@@ -523,28 +830,35 @@ func guardReadabilityProblem(dir string, pkg boundaryPackage) string {
 	if len(pkg.structs) == 0 {
 		return "no struct types under " + dir + " - a scan that parses nothing reports nothing"
 	}
+	if len(pkg.decodes) == 0 {
+		return "no JSON decode call under " + dir + ": the inbound-envelope scan has no destination to start from, so it judges nothing and reports that as a clean boundary"
+	}
+	if pkg.decodeProblem != "" {
+		return pkg.decodeProblem + " (under " + dir + ")"
+	}
 	return ""
 }
 
-// requireReadableGuard turns guardReadabilityProblem into an abort.
-func requireReadableGuard(t *testing.T, dir string, pkg boundaryPackage) {
+// requireReadableInstrument turns instrumentBlindnessProblem into an abort.
+func requireReadableInstrument(t *testing.T, dir string, pkg boundaryPackage) {
 	t.Helper()
-	if problem := guardReadabilityProblem(dir, pkg); problem != "" {
+	if problem := instrumentBlindnessProblem(dir, pkg); problem != "" {
 		t.Fatalf("%s", problem)
 	}
 }
 
 // inboundEnvelopes returns the struct types this package treats as an INBOUND
-// envelope, found by structure and not by a name typed in here: a type that
-// binds a "method" key is a request the route lives on. Types nested inside one
-// are pulled in too, because that is where a smuggled verdict would be parked.
+// envelope, found by structure and not by a name typed in here. The seed is
+// "a type some JSON decode in this package lands in", which replaced the older
+// "a struct that binds a method key" - a route field renamed to "cmd" walks past
+// the second criterion and straight into the ban (F-4 in the acceptance, plant G
+// in facet 4). Types nested or embedded inside a destination are pulled in too,
+// because that is where a smuggled verdict gets parked.
 func inboundEnvelopes(pkg boundaryPackage) map[string]bool {
 	inbound := map[string]bool{}
-	for name, sh := range pkg.structs {
-		for _, f := range sh.fields {
-			if strings.EqualFold(f.JSONKey, "method") {
-				inbound[name] = true
-			}
+	for name := range pkg.inboundSeeds {
+		if _, ok := pkg.structs[name]; ok {
+			inbound[name] = true
 		}
 	}
 	for changed := true; changed; {
@@ -703,7 +1017,7 @@ func scanGrantBoundary(t *testing.T, dir string) []boundaryFinding {
 	if err != nil {
 		t.Fatalf("parse %s: %v", dir, err)
 	}
-	requireReadableGuard(t, dir, pkg)
+	requireReadableInstrument(t, dir, pkg)
 
 	var findings []boundaryFinding
 	for _, route := range sortedSet(pkg.answered) {
@@ -717,7 +1031,7 @@ func scanGrantBoundary(t *testing.T, dir string) []boundaryFinding {
 
 	inbound := inboundEnvelopes(pkg)
 	if len(inbound) == 0 {
-		t.Fatalf("no inbound envelope type (a struct binding a \"method\" key) under %s: the instrument claims to check what a panel request can carry but cannot find the request type", dir)
+		t.Fatalf("no inbound envelope type (a JSON decode destination, or anything nested in one) under %s: the instrument claims to check what a panel request can carry but cannot find the request type", dir)
 	}
 	for name := range inbound {
 		sh := pkg.structs[name]
@@ -770,7 +1084,7 @@ func TestAnsweredPanelRoutesCarryNoApprovalDecision(t *testing.T) {
 	if err != nil {
 		t.Fatalf("parse %s: %v", dir, err)
 	}
-	requireReadableGuard(t, dir, pkg)
+	requireReadableInstrument(t, dir, pkg)
 
 	answered := sortedSet(pkg.answered)
 	for _, name := range answered {
@@ -1118,7 +1432,7 @@ func TestPlantedGrantWiringGoesRedInASnapshot(t *testing.T) {
 		if got := len(sortedSet(pkg.answered)); got != 4 {
 			t.Errorf("the plant must still resolve the 4 declared routes so this run cannot be passing by having stopped reading the guard, got %d", got)
 		}
-		problem := guardReadabilityProblem(dir, pkg)
+		problem := instrumentBlindnessProblem(dir, pkg)
 		if problem == "" {
 			t.Fatal("an unreadable case label produced no problem: facet 1 would report this boundary clean")
 		}
@@ -1157,7 +1471,7 @@ func TestPlantedGrantWiringGoesRedInASnapshot(t *testing.T) {
 		if err != nil {
 			t.Fatalf("parse %s: %v", dir, err)
 		}
-		requireReadableGuard(t, dir, pkg)
+		requireReadableInstrument(t, dir, pkg)
 		pool := routeNamePool(pkg)
 		sites, ok := pool["panel.review.allow"]
 		if !ok || len(sites) == 0 {
@@ -1174,6 +1488,51 @@ func TestPlantedGrantWiringGoesRedInASnapshot(t *testing.T) {
 		}
 		t.Logf("pool sees %q at %v while pkg.answered does not; the running guard still refuses it, which is what makes answeredElsewhere the load-bearing half",
 			"panel.review.allow", sites)
+	})
+
+	// Plant G: the F-4 shape from acceptance r1. An inbound envelope that carries
+	// its route on a "cmd" key and its verdict on "outcome", with its own real
+	// json.Unmarshal. The old seed criterion - "a struct that binds a method key"
+	// - walked right past it, because the whole point of the shape is that it does
+	// not bind "method". The new seed is the decode destination itself, which the
+	// shape cannot avoid by construction: no decode, nothing received.
+	const plantGHandler = "package panel\n\n" +
+		"import \"encoding/json\"\n\n" +
+		"// throwaway: an inbound envelope that renamed its route field.\n" +
+		"type grantViaCmd struct {\n" +
+		"\tCmd     string `json:\"cmd\"`\n" +
+		"\tOutcome string `json:\"outcome\"`\n" +
+		"}\n\n" +
+		"func handleGrantViaCmd(raw string) error {\n" +
+		"\tvar e grantViaCmd\n" +
+		"\treturn json.Unmarshal([]byte(raw), &e)\n" +
+		"}\n"
+
+	t.Run("G an inbound envelope with a renamed route key is still seeded from its decode", func(t *testing.T) {
+		dir := copyGoSources(t, src, files, string(bridgeReal), "l2-plant-g.go", plantGHandler)
+		pkg, err := parseBoundaryPackage(dir)
+		if err != nil {
+			t.Fatalf("parse %s: %v", dir, err)
+		}
+		requireReadableInstrument(t, dir, pkg)
+		if !pkg.inboundSeeds["grantViaCmd"] {
+			t.Fatalf("a type with its own json.Unmarshal did not become an inbound seed - the seed is still reading for a name, not for a decode. seeds=%v",
+				sortedSet(pkg.inboundSeeds))
+		}
+		oldCriterionSawIt := false
+		for _, f := range pkg.structs["grantViaCmd"].fields {
+			if strings.EqualFold(f.JSONKey, "method") {
+				oldCriterionSawIt = true
+			}
+		}
+		if oldCriterionSawIt {
+			t.Error("plant G binds a method key, so it no longer separates the two seed criteria and cannot show what it claims to")
+		}
+		hits := scanGrantBoundary(t, dir)
+		if !findingsName(hits, "l2-plant-g.go", `"outcome"`) {
+			t.Errorf("plant G is the F-4 shape and produced no finding - the renamed route key is still out of range:%s", joinFindings(hits))
+		}
+		t.Logf("seeded from its own decode and red as required:%s", joinFindings(hits))
 	})
 
 	t.Run("C a wired grant door goes red on both halves", func(t *testing.T) {
