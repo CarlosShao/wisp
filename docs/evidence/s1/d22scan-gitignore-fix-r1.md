@@ -530,3 +530,29 @@ ban #8 design/=32 frontend/=40 internal/=406 cmd/=39`，rc=0，
 打印 `skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/], decided by frontend/.gitignore (2 path(s))` 且
 **不打印** NOT APPLIED ⇒ 工作树问得到 index（该沉默时沉默），A207 的 `frontend/=40` 两枚合流**未退**；
 `design/=32` 是 §7 那枚已定性残留（100% 未追踪且未被忽略），本批吞不到也不该吞。
+
+---
+
+## 15. 收工程最后一发（时刻 09:2x +08，锚 `ca06fcd`＝本程第二枚 commit）
+
+HEAD 在本程干活期间走了四次（`ee5a25e` → `d8390aa` → 我的 `ca84b75` → 别家的 `333dfe3`/`dcb95ae` → 我的 `ca06fcd`），
+所以收工前再量一发，给下一位一个"这枚修落在哪棵树上仍成立"的锚：
+
+```
+$ git ls-files -i -c --exclude-standard                 # 真工作树，只读
+lines=0                              <- 今天真仓里仍没有一枚"受追踪且模式命中"的路径（与 accept §1.2 同值）
+$ sh scripts/d22scan.sh
+rc=0
+runtests.sh: OK - packages=[./...] top-level: PASS=28 FAIL=0 SKIP=0, === RUN=68, '[no tests to run]'=0
+d22scan: skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/], decided by frontend/.gitignore (2 path(s))
+bans #1-5 internal/=203 cmd/=22 / ban #6 frontend/=40 / ban #7 internal/tools/=18 /
+ban #8 design/=32 frontend/=40 internal/=406 cmd/=39
+（没有 NOT APPLIED 行——工作树问得到 index；也没有 "TRACKED and matching an ignore rule" 行——那枚名单是空的）
+```
+
+⇒ 本批**没有**给真仓引入任何新的红或新的分母移动；那两枚新诊断行在"什么都不该说"的树上保持沉默，
+在"该说"的树上（§2/§4/§14）逐枚出声。`ban #8 design/=32` 与 A216 那一格（30 枚入库、36 枚截图未入库）
+仍在动，**归前端会话与编排者**，本批一字未碰。
+
+**本程到此收工**：两枚 commit（`ca84b75` 代码＋取证、`ca06fcd` 追加 §14/§15），无第三枚代码改动，未 push。
+裁决请由**非实现者**做（`AGENTS.md` §0.3），复现装置在 `D:\tmp\d22scan-index-fix-r1\`（只建不删）。
