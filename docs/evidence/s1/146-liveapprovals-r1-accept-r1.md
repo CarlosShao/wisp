@@ -25,6 +25,26 @@
 
 本程放进副本的探针件（`zz_acceptor_*_test.go`／`qq_*_test.go`）**不进仓**：裁决者不实现（D22）。
 
+**变异有没有漏还原——整树复验**（`snap3` 是本程唯一没动过一行代码的副本，拿它当尺子逐文件比）：
+
+```
+cd D:/tmp/wisp-146acc1
+diff -rq snap6 snap3   → 只报两行：snap6 多 zz_acceptor_bench_test.go、snap3 多 zz_acceptor_depth_test.go
+diff -rq snap6 snap2   → 只报本程那三枚探针件（含改名留档的 zz_acceptor_ninth_test.go.M-a-only）
+```
+
+⇒ **仓里那两枚被验文件（`pending_read.go`／`ticket146_liveapprovals_backing_test.go`）与
+`internal/tools/gate.go` 在全部四棵动过的副本里都与锚点逐字节一致**，没有一枚变异漏在家里。
+
+另两发与本票有关的零字节／零登记复算（本程自量，不抄实现件）：
+
+```
+grep -n "DEFERRED" snap/internal/agent/approval/pending_read.go …ticket146_…_test.go   → 0 命中
+   ⇒ 本票没往 SPEC-12 §5 那张登记表里新添任何东西，1:1 双向那一条不会被这一票打破
+grep -oE "[─-⟿⌀-➿]" snap/internal/agent/approval/pending_read.go                      → 空集
+   ＋ `sh scripts/d22scan.sh` rc=0（§10）⇒ 禁符那一门既没被注释豁免绕过、也没被字符串带过去
+```
+
 ---
 
 ## 1. 字段普查独立复算（**8 枚成立；未发现第 9 枚；票面 5 枚是漏计**）
