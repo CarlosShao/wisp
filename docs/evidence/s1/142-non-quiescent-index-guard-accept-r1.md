@@ -300,3 +300,64 @@ S-5 reversed check: FAIL redlines=2
 **AC#2 成立**：方向只有一处、落点是既有的 `ok=false` 机制、四禁未碰、反方向有专断言挡着且我量到它红。
 "别的形状"我按四支分开写了——**两支该补的是注释和一枚小注入腿，一支与本票无关**，
 没有一支值得我为它硬开一道今天不响的 AC（票面 §AC#1 的 ⚠ 就是禁这件事）。
+
+---
+
+## 5. 它自报的那条副作用（"自陈会说谎"）：**独立复现成立，是一枚先于本票的缺陷**
+
+### 5.1 我自己复现的两发（不复用它的读数）
+
+**第一发（白盒）**：`mut-accept/M-A-no-guard.log`，摘掉守卫那 6 行、其余一字不动，用例 `:1792` 把当场的
+`note()` 原文打出来：
+
+```
+d22scan: skipped as git-ignored: 0 file(s) under 1 ignored director(ies) [frontend/dist/assets/], decided by frontend/.gitignore (1 path(s))
+d22scan: 1 path(s) git reports as TRACKED and matching an ignore rule (git ls-files -i -c --exclude-standard) - a tracked path is part of the delivery, so none of them was skipped: frontend/dist/assets/shipped.tsx
+```
+
+**第二发（端到端，更硬）**：§1.3 那枚 PATH-shim 探针打在 `S-4`（＝生产装配回到 `1b98c7b` 的内联形状）上，
+`note()` **同一句假话**照样出现，而且这一次我手里有独立证据说明它是假的：
+`examined["panel-approval"] = 3`、`findings = []` —— 也就是说 `shipped.tsx` **一个字节都没被读过**，
+它的父目录 `frontend/dist/assets/` 在第一行里刚被点名剪掉。
+⇒ 与它 §3.2 那段引文逐字同形，**这一发我认**。
+
+### 5.2 归因：先于本票，且本票没有把它改回无条件话
+
+```
+$ git show 1b98c7b:tools/d22scan/gitignore.go | grep -n "none of them was skipped"
+459:			"- a tracked path is part of the delivery, so none of them was skipped: %s",
+$ git diff 1b98c7b..cd87354 -- tools/d22scan/gitignore.go | grep -c "none of them was skipped"
+0
+```
+
+⇒ 那句话说的是"**这一枚清单里**的路径没被 skip() 剔掉"，但在撕裂索引上它被读成"这些文件被看过了"，
+而目录已经被剪。它是 `A214/F1` 那一批（`ca84b75` 系）立第三行自陈时带来的，**不是本票造的**，
+本票也没动那一行一个字。
+
+### 5.3 本票到底把它怎么样了：**遮住了一半，但遮住的方式是一条不变式，不是一条断言**
+
+我把"守卫开着 ⇒ 第三行不可能是假话"这条推导走完（并且只用文件里的事实）：
+`pruned` 只在 `skip()` 里、且只有 `holds(rel,dir)==false` 时才写入（`gitignore.go:483-500`）⇒ 一枚目录被剪，
+意味着它不是任何 tracked 路径的祖先；而守卫保证 `ignoreSet ⊆ tracked`（`:317` 那 6 行，不然直接 `ok=false`）⇒
+**第三行点名的路径不可能坐在被剪掉的目录下**。守卫关着的两行第一行（`ok=false`）不输出剪枝与第三行的
+撕裂组合同时无效。⇒ 结论：这一支**今天结构上不可达**。
+
+但要说清三件事，免得下一位把它当"已经钉住"：
+
+1. 全仓**没有任何断言**写"第三行点名的路径必须落在未被剪枝的目录里"。`ignoreSet` 的引用只有三处
+   （`gitignore.go:237/328/550/553`），测试侧命中的是 `scan_test.go:1525` 那句"note 必须点名这一枚路径"——
+   它证明这行**会说话**，不证明说出来的**是真话**。
+2. 遮住的只有"窄集冒到全量之外"这一支。§4.2 那两支（两读顺序掉包、吞掉某枚读失败）**不在这枚守卫的射程里**；
+   我逐支推过：吞掉窄读只让第三行消失（不会说谎），两读顺序掉包时全量是新的、`dirs` 反而更全 ⇒ 也造不出这枚假话。
+   ⇒ 目前**没有**已知的活着的通路；这句是推导，不是量到的零（我没能造出任何一枚今天还能让它响的变异）。
+3. 它 §3.2 把这条主动交出来了（"改前那种状态下自陈会主动误导读者，这是本票比'措辞'走得远的一点"），
+   **没有把它吹成"我修了自陈诚实性"**；措辞与它实际做的相符。
+
+### 5.4 建议归口（**本程不动手修**）
+
+- 不新开票。这一条与 §9 的 **F-142-1**（"没有任何断言钉住 `runGitIndex → buildGitIndexState` 那一跳"）
+  是同一枚小腿的活：那腿（shim 注入或源码形状断言）一旦补上，顺手加**一行**断言
+  "第三行点名的每一枚路径，都出现在本次 `examined`/非 `pruned` 目录之下"就同时把这条也钉住。
+- 台账口径建议写成：**先于票 142 存在的自陈诚实性缺陷（`1b98c7b:459` 那一句），在"窄集溢到全量之外"这一支上
+  被票 142 的守卫顺带堵住（结构推导＋验收程两发复现），但无断言持有**；
+  归口 F-142-1 那枚小腿，不单开、不阻塞本票验收。
