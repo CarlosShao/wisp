@@ -661,9 +661,13 @@ func (b *Bridge) OpenTask(taskID string) {
 // host inventing its own id, a retry wrapper, a scheduled task carrying one id
 // across turns - nothing in this tree closes it, and no test will tell you so.
 // Today no production code dispatches on the bridge except loop.go, so being
-// such a caller means being the first one; the gate meant to ring when that
-// happens is docs/evidence/s1/154-host-id-never-closed-r1.md §2.3 (clauses
-// G1/G1b), and it is one `git grep` away, not a note in someone's head.
+// such a caller means being the first one; the gates meant to ring when that
+// happens are clauses of .scratch/wisp/probes/154/gate-clauses.sh - G1/G1b for
+// this bridge leg, and G5 for a C25 taint scope opened with no paired close in
+// the same file, i.e. the leg that never crosses this bridge at all (G5 is
+// ticket 158's addition; §2 of 158-gate-scope-blind-spot-r1.md is its write-up,
+// §2.3 of 154-host-id-never-closed-r1.md the write-up of G1-G4). Each is one
+// `git grep` away, not a note in someone's head.
 //
 // Being first is also an API decision, not just a missing defer: Loop has no
 // exported method that takes a caller-supplied task id, so a host cannot route
