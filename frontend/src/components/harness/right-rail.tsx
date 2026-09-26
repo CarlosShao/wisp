@@ -105,7 +105,7 @@ const TERMINAL_LINES: readonly { kind: "cmd" | "out" | "ok"; text: string }[] = 
   { kind: "cmd", text: "$ npm run typecheck" },
   { kind: "ok", text: "> tsc -b" },
   { kind: "cmd", text: "$ npm run build" },
-  { kind: "ok", text: "✓ built in 826ms" },
+  { kind: "ok", text: "OK built in 826ms" },
   { kind: "cmd", text: "$ wisp run --panel" },
   { kind: "out", text: "[panel] C17 桥接就绪，等待宿主推送快照…" },
   { kind: "out", text: "[ball] Direct2D 表面已挂载，20 态转移表加载完成" },
