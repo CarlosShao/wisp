@@ -736,7 +736,7 @@ func TestSLO149CorruptLegsWithoutADecoderErrorKeepTheirOwnEnd(t *testing.T) {
 //
 // Case 14's own load-bearing reading: with this case neutralised, putting the
 // borrowed value back reddens nothing at all (probes/152/mut-post/
-// g1-restored-borrowed-value-case14off.log reports === RUN=21, PASS=14, FAIL=0);
+// g1-restored-borrowed-value-case14off.log reports === RUN=20, PASS=13, FAIL=0);
 // with this case live the same mutation is red (g1-restored-borrowed-value.log).
 //
 // Correction of that triple, measured at this anchor instead of copied - ticket
@@ -750,12 +750,12 @@ func TestSLO149CorruptLegsWithoutADecoderErrorKeepTheirOwnEnd(t *testing.T) {
 // reading: it is this selector's UNMUTATED baseline, 21/14/0, pasted into the
 // sentence that promises the mutation's numbers (probes/152/mut-post/asis.log, and
 // 21/14/0 again at this anchor: probes/156/mut-156-r2/r2-asis-152-surface.log).
-// Who is misled, and by which sentence: the next person who re-runs case 14's
-// load-bearing claim reads "reports === RUN=21, PASS=14, FAIL=0" at
-// cmd/wisp/slo_report_144_windows_test.go:739, gets 20 and 13, and - because a
-// short === RUN count is exactly how a swallowed or renamed case announces itself
-// in this repo's roster diffs - hunts for a test that stopped running instead of a
-// comment that stopped being true. No assertion moved; only these two numbers do.
+// Who was misled, and by which sentence, until this commit: a reader re-running
+// case 14's claim read 21/14/0 at slo_report_144_windows_test.go:739, measured
+// 20/13, and - a short === RUN count being exactly how a swallowed or renamed
+// case announces itself in this repo's roster diffs - hunted a stopped test, not
+// a stale comment. Cause: this selector's UNMUTATED baseline pasted into the
+// mutation sentence. r4 re-measured 20/13/0 and made :739 true in place.
 //
 // Ticket 156 AC#4(iii), the ingest-or-downgrade choice, measured not assumed: the
 // path the sentence above names IS in git (git ls-files
