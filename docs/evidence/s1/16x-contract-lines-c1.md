@@ -770,4 +770,97 @@ $ grep -n "Status" .scratch/wisp/issues/50-tier1-manifest-plugins.md .scratch/wi
 
 ---
 
-（下节：§4.7 owner 那句"这六张里有没有要写 `frontend/**` 的"。）
+### 4.7 owner 当面那一句：**"这六张里有没有一张要写 `frontend/**`？"**
+
+**答：没有。六张里零张要求写 `frontend/**`。** 三把尺，逐枚判读，全部在下面。
+（⚠ 判据只取自**票面原文**与冻结件原文；本程**没有打开过 `frontend/**` 的任何一枚文件**，与前端那支会话**零往来**、零引用。）
+
+**尺一（派单 §4 指定的那条命令，原样跑）**：
+
+```
+$ grep -rnE 'frontend' .scratch/wisp/issues/160-*.md .scratch/wisp/issues/162-*.md .scratch/wisp/issues/163-*.md .scratch/wisp/issues/164-*.md .scratch/wisp/issues/165-*.md .scratch/wisp/issues/168-*.md
+（9 行命中，rc=0；逐枚见下表——**没有一行是"去写它"的指令**）
+$ 同上 | cut -d: -f1 | sort | uniq -c
+      2 .scratch/wisp/issues/160-scope-open-returns-a-handle-carrying-its-own-closer.md
+      1 .scratch/wisp/issues/162-add-the-patch-one-region-tool-instead-of-rewriting-whole-files.md
+      1 .scratch/wisp/issues/163-persistent-shell-session-that-still-looks-one-shot.md
+      2 .scratch/wisp/issues/164-background-jobs-cannot-be-read-fix-the-roster-then-add-the-output-leg.md
+      2 .scratch/wisp/issues/165-plan-first-then-act-a-brake-the-voice-entry-needs.md
+      1 .scratch/wisp/issues/168-built-in-browser-as-a-disable-able-plugin-two-rules-to-set-first.md
+```
+
+9 行命中**逐枚判读**（"命中≠要写"，所以每一枚都标它是哪一种）：
+
+| 票 | 命中处 | 逐字那半句 | 属于哪一种 |
+|---|---|---|---|
+| 160 | `:30` | `…名、`frontend/**`、`design/**` 零字节` | **禁改名单** |
+| 160 | `:52` | `（158 的 AC#5 因一枚 `frontend/**` 字形闭不上、已归口票 169，等它＝等一支写不到那儿的编队）` | **叙述别人的票为何闭不上**（不是本票的活） |
+| 162 | `:37` | `…`thresholds.go`、golden、`frontend/**`、`design/**` 零字节` | **禁改名单** |
+| 163 | `:29` | `**只许动 docs/PLAN.md 里 shell.exec 那一行…**＋ `internal/tools/**`／`internal/proc/**` 实现与测试＋证据件。`frontend/**`、`design/**`、… 零字节` | **禁改名单** |
+| 164 | `:18` | `…`allowlist.txt`、`frontend/**`、`design/**` 零字节` | **禁改名单** |
+| 164 | `:23` | `不做面板上"看得见后台任务"的界面（那是 `frontend/**`，owner 委托会话的写面）` | **"本票不解决"明文** |
+| 165 | `:29` | `…`allowlist.txt`、`frontend/**`、`design/**` 零字节` | **禁改名单** |
+| 165 | `:33` | `不做界面（谁显示方案、点哪儿算点头＝`frontend/**`，owner 委托会话的写面）` | **"本票不解决"明文** |
+| 168 | `:32` | `…`allowlist.txt`、`frontend/**`、`design/**` 零字节` | **禁改名单** |
+
+**尺二（词形：界面／面板那一族说法——这一把尺专门用来抓"没写 `frontend` 三个词但意思是要做界面"的格子）**：
+
+```
+$ grep -rnE "界面|面板|视图|屏幕上|窗口里" .scratch/wisp/issues/16{0,2,3,4,5,8}-*.md | cut -d: -f1,2
+162-…-rewriting-whole-files.md:41
+163-…-looks-one-shot.md:33
+164-…-the-output-leg.md:5
+164-…-the-output-leg.md:23
+165-…-voice-entry-needs.md:28
+165-…-voice-entry-needs.md:33
+168-…-two-rules-to-set-first.md:5
+168-…-two-rules-to-set-first.md:11
+168-…-two-rules-to-set-first.md:12
+168-…-two-rules-to-set-first.md:17
+168-…-two-rules-to-set-first.md:30
+168-…-two-rules-to-set-first.md:37
+$ 同上 | wc -l
+12
+```
+  ⇒ **枚数＝12，分布＝162(1)·163(1)·164(2)·165(2)·168(6)，`160` 命中 0**（这把尺对 160 零命中，是因为 160 的票面根本不谈界面——它那半句在尺一的 `:30` 里）。
+  **12 枚全部落在三类之内，没有第四类**：
+
+1. **"本票不解决"明文（5 枚，就是本节要的那句"不做界面"）**：
+   - **162 `:41`**：`不做"人逐块批准改动"那个界面（**三家都没有**，那是我们自己的设计，归口另说）`
+     ⚠ **这一枚里没有 `frontend/**` 三个词**（所以尺一会漏它）——尺二就是为它跑的。
+   - **163 `:33`**：`不做"给人用的集成终端"那个界面（那是面板那一侧，归口票 167 与 owner 委托的前端会话；**本票只做 Go 侧那条会话**）`
+   - **164 `:23`**／**165 `:33`**／**168 `:37`**（`不做"给人看的浏览器界面"（界面腿 owner 委托）`，同样**不含** `frontend` 字样）· 见尺一表
+2. **禁改名单（6 枚）**：即尺一那六枚 `零字节`（`:30`/`:37`/`:29`/`:18`/`:29`/`:32`）。
+3. **绝对禁令与设计叙述（另 6 枚，其中 164 `:5`、168 `:5` 是指向别票的关联行）**：
+   164 `:5` `票 145（面板快照字段来源，本票的"输出"是它的上游）`＝**说我们的输出是别人那格的上游**，不是要我们写那一格；
+   165 `:28`（`面板不许代答…本票只加"发起请求"的出口，不许加"给出允许"的出口`）·
+   168 `:5`（`**绝对禁令**：面板侧来源的 L2"允许"不算允许`）· 168 `:30`（AC#5 `面板边界零越界…只加"显示/导航"这一类，不加"决定"这一类`）·
+   168 `:11`、`:12`、`:17` 三枚**讲"面板本身就是 WebView2 引擎"的叙述**（B 路边际成本、受控第二视图、绕过 C17 的风险）——
+   **它们是"在宿主 Go 侧留一个受控视图"的设计陈述，不是"去写 `frontend/**`"的要求**。
+
+**尺三（反向尺：找有没有任何一格把"写界面"列为交付物——即 AC 框里的正向要求）**：
+
+```
+$ grep -rnE "^\- \[ \].*(界面|面板|视图|frontend)" .scratch/wisp/issues/16{0,2,3,4,5,8}-*.md | cut -d: -f1,2
+160-…:30     162-…:37     163-…:29     164-…:18
+165-…:28     165-…:29     168-…:30     168-…:32
+$ 同上 | wc -l
+8
+```
+  ⇒ AC 框里出现这些词的**共 8 枚，逐枚打开看全是负向格**：6 枚是 AC 的"契约轴零字节"名单，2 枚（165 `:28`、168 `:30`）是"面板不许代答/不许新增可给出允许的出口"。
+  **没有任何一枚 AC 框要求谁去写界面。**
+
+**⛔ 所以：这一轮没有要交给 zcode 的那半。** 派单 §4 第 3 条要求的那格——
+"若量到某一枚的某一格确实要求写 `frontend/**`，单独列出是哪一格、它在用户屏幕上会显示什么字"——
+**本程量到的是空集**，因此不列。**没有"半张票"可以拆出去。**
+
+**⚠ 但有一件必须让 owner 顺手知道的事（不是问题，是差价）**：这六枚里有 **5 枚各 parked 了一枚界面腿**（162 逐块批准界面／163 集成终端／164 看得见后台任务／165 谁显示方案与点哪儿算点头／168 给人看的浏览器界面）。
+**它们不在任何一张这六枚票的 AC 里，也不在任何一张的写面里** ⇒ 六枚全落地之后，**用户屏幕上不会出现任何新东西**；
+这六枚交的是：**一处成对机器（160）＋四枚新工具名（162/163/164/165）＋一条白名单排期判断（168）**。
+若他要那五枚界面腿，那是**另外五张票**（163 那半票面已具名归口票 167；其余四枚票面写的是"归口另说／owner 委托"，**尚无票号**）。
+
+**顺带一枚凭据（为什么"六枚全落地屏幕不变"这句话是有根的）**：今天真能跑 agent 的路径与面板那条腿的形状，
+`docs/reports/pending-and-issues.md:7641`（A308）已现量过：`⇒ **今天唯一真能跑 agent 的路径是命令行 `wisp run`**`——
+本程**未复算**这一条，只作归属引用（〔A308 读数，我未复算〕）。
+
+---
