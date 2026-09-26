@@ -539,3 +539,35 @@ $ git grep -n 'setCurrent' 5365cb22 -- internal/agent/loop.go
 | `l.setCurrent(root)` `loop.go:353`（字段 `Loop.current *observe.Root` 声明在 `:189`） | `git grep -nE '\.current\b' -- internal/agent/loop.go` ＝ **3 枚**：`:348` **注释**、`:523` **读**、`:987` **写**（在 `:985` 那枚 setter 的体内，setter 被 `:353`／`:354` 调用）；字段声明 `:189` 是第 4 枚提及 ⇒ **读点只有 1 枚**，原句"3 处读点、只列 `:348`／`:523`"两处与盘不符 | **不算**——那一半本程独立复算成立：`Compressor` 结构体只有 `b`／`sum`／`lg` 三枚字段、六枚方法签名（`:98/:106/:115/:128/:189/:197`）无一枚接 `*Loop`／`*observe.Root`，`compress.go` 全文 `current` 与 `observe.Root` 各 **0** 命中 ⇒ `Compressor` 那侧够不着 |
 
 ⇒ 这一笔**不动任何档位**：155 验收件 `:103` 那格的判词是"数与列不吻合…**结论仍成立**"，本程复算同一枚结论（够不着）与同一枚错（数与列），只是把"3 枚读点"再削成"1 枚读点"。
+
+### B.5 第 5 笔 —— `Result.TaskID` 那句"晚于压缩那一发"：**〔成立〕**（盘上确实打反）
+
+**验收程那一句**（`155-three-unjudged-cells-r1-accept-r1.md:104` §2 那张表的第四行）：本件 `:115` 说 `res := Result{TaskID: taskID…}` 那一枚"那是**出口**，且**晚于**压缩那一发"，而现量是 `:369` **早** `:396` **二十七行** ⇒ "**打发，而且打错**"。
+
+**本程当轮复算**（锚点＝`5365cb22`；全文＝`probes/157/10-items-4-to-7-code-facts.txt` 的 S2 段＋`probes/157/14-supplementary-rulers.txt` 的 Q2 段）：
+
+```
+$ git show 5365cb22:internal/agent/loop.go | grep -n 'res := Result{\|l\.comp\.Compress(\|func (l \*Loop) run('
+339:func (l *Loop) run(ctx context.Context, taskID, input string) Result {
+369:	res := Result{TaskID: taskID, Status: StatusCompleted}
+396:			nh, rep, err := l.comp.Compress(ctx, hist)
+508:	res := Result{TaskID: taskID, Status: StatusControl}        ← 另一条腿那一枚，不是本笔的对象
+
+$ printf '396-369 = %s\n' "$((396-369))"
+396-369 = 27                                ← 本程那发算术（原文在 probes/157/10-…txt S2 段）
+$ git show 5365cb22:internal/agent/loop.go | sed -n '340,396p' | grep -n '^func \|^}'
+（空）                                  ⇒ :369 与 :396 落在**同一枚函数体**内，中间没有函数边界
+$ git show 5365cb22:internal/agent/loop.go | sed -n '369p;396p' | cat -A
+^Ires := Result{TaskID: taskID, Status: StatusCompleted}$        ← 一层缩进：在 for 之前，函数体顶层
+^I^I^Inh, rep, err := l.comp.Compress(ctx, hist)$               ← 三层缩进：for（:376）之内
+```
+
+**我这一笔用的尺是什么**＝**行号顺序＋函数体边界＋缩进层级**三发一起：`grep -n` 定三枚行号、`sed -n '340,396p'｜grep -n '^func \|^}'` 问"这两行之间有没有函数边界"（没有⇒同一帧）、`cat -A` 看制表符数（一层 vs 三层⇒`:369` 在循环**之前**执行）。这三发都是只读盘上文本，没有一枚依赖谁的记忆。
+
+**对不上的一枚没有** ⇒ 落下面这枚**新版行**（§2 那张表本体一字未改）：
+
+| 副本（新版） | 现量（`5365cb22`） | 算不算"另一个持有者" |
+|---|---|---|
+| `res := Result{TaskID: taskID…}` `loop.go:369` | `Result.TaskID` 声明在 `:83`；构造点在 `:369`，压缩那一发在 `:396`——**同一枚 `run` 函数体、:369 在 `for`（`:376`）之前**，所以它是**早于**压缩 27 行被赋值的 | **"晚于压缩"那一半〔盘上不成立〕**（本程复算＝验收程同一读数）；"它是返回值的载体／出口"那一半对。**且这一处不是措辞小事**：正因为 `:369` 早于 `:396`，`res.TaskID` 在压缩那一刻**已经握着那枚 id**——它就是同帧第二枚可编得的持有者（155 验收件 `:91` 那发 `_ = res.TaskID` BUILD-OK），本票第 6、7 笔补的两枚与它同族 |
+
+⇒ 本程**没有**据此改 §2 收尾那句"精确读法"的档（那一读法的后半句"只有 `Loop.run` 那一枚参数"由 155 验收件 `:112` 判〔不成立〕，属**那张表**的事，工单 `:45` 明令本票不动已定档位）；本笔只把打反的那半句落回盘上方向。
