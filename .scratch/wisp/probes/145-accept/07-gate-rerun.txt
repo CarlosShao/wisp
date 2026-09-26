@@ -1,0 +1,25 @@
+# 前提⑤ 门禁复跑（全部在 blob 精确树 C:/Users/swq/.../wisp-145-accept/exact，被验版本 3dcff6a）
+
+## A. internal/panel —— 三个版本同一把尺
+  e24-panel: RUN=105 PASS=58 FAIL=1 SKIP=0
+  exact-panel-baseline: RUN=105 PASS=58 FAIL=1 SKIP=0
+  (e24-panel=改前版本 e24ae28；exact-panel-baseline=被验版本 3dcff6a)
+  名册两向 comm（e24ae28 vs 3dcff6a）＝空；本程 59 行 vs 实现程 roster-after-panel.txt 59 行 两向 comm＝空
+
+## B. cmd/wisp —— 第一发（本程造出来的仪器没跑到形，已作废）
+  RUN=133 PASS=71 FAIL=8 rc=1
+  8 枚红的红因全部同一句：dataroot_128_windows_test.go:50 / secret_argv_windows_test.go:271 之形 —— 'no native DLLs in ..\..\third_party\sherpa-onnx - run scripts/fetch-deps.ps1 first'
+  真因＝blob 精确树里没有 third_party/（未tracked、git 里没有），不是被验物红
+
+## C. cmd/wisp —— 第二发（把三枚 DLL 拷进树的 third_party/sherpa-onnx/ 后重跑，只建不删）
+  RUN=139 PASS=79 FAIL=0 SKIP=0 rc=0 ok 139.5s
+  名册 79 行 vs 实现程 roster-after-cmdwisp.txt 79 行：两向 comm 皆空（逐名相同；本程把 '(0.12s)' 时长后缀剥掉才可比，第一发没剥得到 79/79 全差——那也是我这一发里的尺事，已记进证据件）
+  ⇒ 实现程 §5.1 的四数在 3dcff6a 逐枚复现：panel rc=1/105/58/1、cmd/wisp rc=0/139/79/0
+
+## D. 三件仪器（同一枚树）
+  gofmt -l internal/panel/ cmd/wisp/  -> 空
+  go vet ./internal/panel/ ./cmd/wisp/ -> rc=0
+d22scan: examined 228 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/wisp-145-accept/exact
+d22scan: scope ban #8 design/           examined  30 text files
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=205, bans #1-5 cmd/=23, ban #6 frontend/=73, ban #7 internal/tools/=18, ban #8 design/=30, ban #8 frontend/=73, ban #8 internal/=413, ban #8 cmd/=44; ban #8 emoji coverage: design/ 30 text files; frontend/ 73 text files; internal/ 413 Go files, comments and _test.go included; cmd/ 44 Go files, comments and _test.go included
+  ⚠ ban #8 design/ 本程＝30、实现程＝39：现量工作树 design/ 文本件＝39、3dcff6a 提交版＝30 ⇒ 差的 9 枚是另一枚会话未提交的 design/**（派单规定 design/** 不算进任何宣称），实现程那发读的是工作树，不是错

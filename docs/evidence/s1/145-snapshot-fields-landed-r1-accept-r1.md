@@ -312,3 +312,79 @@ $ 145 的两枚单行重写：7263456 ＝ 10:23，4156ff5 ＝ 10:25
 ⇒ 所以判词要分两句：**它没有从自己的派单里读到这条规矩**（那份特批里只有一句"撤销后…按追加更正处理，不改写历史"，
 管的是撤销不是证据件），但**它此刻盘上已有 A278 这条**。⇒ 本程维持 4.2 的判（形不合、方向为收紧、不追究），
 只把"下一版派单要写死这条"从建议升为**具名待办**：**`093x` 那份特批的"共同纪律"段缺 `A278②` 一句**。
+
+---
+
+## 5. 前提⑤ 门禁自报复跑：四数**逐枚复现**、名册**两向逐名相同**；但那枚红的**红因**在两棵树里不是同一枚（本程量出来了）
+
+原始件＝`probes/145-accept/07-gate-rerun.txt`。全部在 §0.2 那枚 **blob 精确树**（被验版本 3dcff6a）里跑，
+只有 A/B/C 三发的 `cmd/wisp` 需要把 `third_party/sherpa-onnx/*.dll` 拷进树（未 tracked，见 5.2）。
+
+### 5.1 四数复算 ＋ 名册两向 `comm`
+
+| 包 | 版本 | 本程复跑 rc / `=== RUN` / PASS / FAIL / SKIP | 实现程自报 | 判 |
+|---|---|---|---|---|
+| `./internal/panel/` | 改前 `e24ae28`（本程另取一枚精确树跑） | 1 / **105** / 58 / 1 / 0 | 1 / 105 / 58 / 1 | ✅ 逐数相同 |
+| `./internal/panel/` | **被验版本 `3dcff6a`** | 1 / **105** / 58 / 1 / 0 | 改后 1 / 105 / 58 / 1 | ✅ |
+| `./cmd/wisp/` | `3dcff6a`（DLL 进树后） | **0 / 139 / 79 / 0 / 0**（139.5s） | 0 / 139 / 79 / 0 | ✅ |
+
+**名册不是"复跑一次比一次"，本程做了三层**：
+① 实现程**自己那两枚已提交的**改前/改后名册文件，本程直接两向 `comm`（不用跑就验了它那句"差集为空"）：
+`roster2-{panel,cmdwisp}-before.txt` vs `roster-after-{panel,cmdwisp}.txt` ⇒ **四个方向全空**；
+② 本程 `e24ae28` 名册（59 行）vs 本程 `3dcff6a` 名册（59 行）⇒ **两向皆空**；
+③ 本程 `3dcff6a` 名册 vs 实现程 `roster-after-*` ⇒ panel **59/59 逐名相同**、`cmd/wisp` **79/79 逐名相同**。
+⚠ 一处尺事（本程自己的）：第一发比对 79/79 **全差**，因为本程的名册带着 ` (12.34s)` 时长后缀而实现程的名册剥掉了 ⇒
+`sed -E 's/ \([0-9.]+s\)$//'` 归一后才可比。**不是它的读数问题，是"名册"这个词在两份件里口径不同**，登记以免下一位拿两份件直接 `comm` 得出"全差"。
+
+### 5.2 那一枚红的**红因**：派单要本程判"是不是它说的那一个"——**在它跑的树里是，在被验版本里不是**
+
+实现程看到的（它 §5.2，工作树那一发）：
+
+```
+tokens_fourway_test.go:441: read design/assets/tokens.css: open …\design\assets\tokens.css: The system cannot find the path specified.
+⇒ readRepoFile 是 t.Fatalf 形 ⇒ 第一枚文件读不到就终止，四方比对根本没跑
+```
+
+本程现量：`git status --porcelain` 里 `design/assets/tokens.css` **是另一枚会话的未提交删除**（工作树 ` D `，HEAD 里在）。
+⇒ 那句红因**对它跑的那棵树成立**。
+
+但在 **3dcff6a 的 blob 精确树里四枚文件全在**，那一枚用例**真的把四方比对跑完了**，红在内容：
+
+```
+tokens_fourway_test.go:446: parties: design/assets/tokens.css=135 dark decls, c21-native-tokens.md=78 colour rows,
+                                 internal/ball/tokens.go=40/38 palette fields, tokens.generated.css=48 dark decls
+tokens_fourway_test.go:461: frontend/src/styles/tokens.generated.css does not carry --panel-w = 640px that design/assets/tokens.css declares
+                            … （同形逐枚）
+tokens_fourway_test.go:532: c21-native-tokens.md:118-132: design/assets/tokens.css declares --orb-body-2/--tint-* 但 generated.css 不携带
+tokens_fourway_test.go:547: only 0 of 78 colour rows completed all four legs - the check is not doing its job
+```
+
+⇒ **两问两答**：
+- **"今天这枚红的红因是不是它说的那一个"**——在被验版本上**不是**：3dcff6a 的红因是**内容不齐**（0/78 行走完四腿），
+  它写的那枚"文件缺失⇒没跑"只在**脏工作树**成立。它的措辞是老实的（"今天这一发日志里它只暴露一枚红因"），**不算错**；
+  但它由此得出的"**不能据此说另一条不存在**"这句保留疑问，**本程把它答成了肯定的：另一条存在，而且是被验版本上唯一那条**。
+  ⇒ 记忆里那条"现有两枚红因（**放回文件也不会绿**）"**本程实测成立**（文件放回＝3dcff6a 精确树，仍红）。
+- **"有没有第二枚红被当噪声吞了"**——**没有**：本程在 3dcff6a 精确树里跑出的 `FAIL` 枚数＝1，逐名＝`TestC21DesignTokensFourWayAgree`，
+  与它自报同枚同数。**但本程自己造出来一枚假红**（§0.2：`git archive` 的 CRLF 让 `TestComposerRenderFixtureTellsTheTruth` 红），
+  以及**一枚"仪器没跑到"形**：`cmd/wisp` 第一发 rc=1／FAIL=8／RUN=133，八枚红因全是同一句
+  `no native DLLs in ..\..\third_party\sherpa-onnx`——真因＝**blob 精确树里没有未 tracked 的 `third_party/`**，
+  与本票无关，那一发**作废、不计入任何读数**（把三枚 DLL 拷进树后重跑＝上表那发 139/79/0）。
+  ⚠ 派单警戒的那条形态（"包级 rc=1 而零条 `--- FAIL`"）本程没撞上，撞上的是**近亲形**：rc=1、八条 `--- FAIL`、
+  红句里写着"请先跑 fetch-deps" ——**只看枚数会把环境缺件读成被验物红**，这一条本程写进 §5.3。
+
+### 5.3 三件仪器复算
+
+| 仪器 | 本程在 3dcff6a 精确树 | 实现程自报（工作树） | 判 |
+|---|---|---|---|
+| `gofmt -l internal/panel/ cmd/wisp/` | 空 | 空 | ✅ |
+| `go vet ./internal/panel/ ./cmd/wisp/` | rc=0、无输出 | 同 | ✅ |
+| `sh scripts/d22scan.sh` | **rc=0 clean**；分母 internal=205／cmd=23／ban#6 frontend=73／ban#7 internal/tools=18／**ban#8 design=30**／frontend=73／internal=413／cmd=44 | rc=0；同数，唯 **design=39** | ✅ 差的那 9 枚现量得解：工作树 `design/**` 文本件＝39、`3dcff6a` 提交版＝30 ⇒ **它读的是工作树**（含别家未提交的 design），**不是它的读数错**；本程按派单不把 design/** 算进任何宣称 |
+
+⚠ 本程这一发 d22scan 顶部有一行实现程没有的：`d22scan: gitignore rules NOT APPLIED - git cannot be consulted in …exact`
+⇒ 精确树里没有 `.git`，仪器**响亮地**拒绝按 gitignore 跳件（它自己那句"a scanner that cannot ask git … does not get to skip any"）。
+⇒ 复算这一格时**两种分母都合法**，实现程那句 `skipped as git-ignored: 1 file(s) under frontend/dist/assets/` 只有真仓里才会出现。
+
+⇒ **这一格判**：实现程 §5 的门禁自报**逐枚复现**（含它自己承认作废的那发 `rc=127` 之外的一切），
+名册差集**三层皆空**；**唯一要改的是红因的适用范围**——它那句"四路比较根本没跑"必须带"在脏工作树里"这个限定，
+**在 `3dcff6a` 上四路比较是跑完了的、红在 0/78**。owner 已明示这一面是已知常红 ⇒ **本程没为它变绿做任何事**
+（没动 `tokens_fourway_test.go`、没动 `design/**`、没换基准）。
