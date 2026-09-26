@@ -1,0 +1,37 @@
+########## 1424aa7  evidence(票 154 实现程 第 0-1 节):
+  本枚碰到的文件（全量）:
+    .scratch/wisp/probes/154/archive-eol-control.txt
+    .scratch/wisp/probes/154/gate-pre-cli-v.txt
+    .scratch/wisp/probes/154/gate-pre-tools-v.txt
+    .scratch/wisp/probes/154/names-pre-cli.txt
+    .scratch/wisp/probes/154/names-pre-tools.txt
+    docs/evidence/s1/154-host-id-never-closed-r1.md
+  冻结面命中 = 0  ✓
+########## 352d3d8  evidence(票 154 实现程 第 2 节 格
+  本枚碰到的文件（全量）:
+    .scratch/wisp/probes/154/gate-clauses-roster.txt
+    .scratch/wisp/probes/154/gate-clauses.sh
+    .scratch/wisp/probes/154/gate-positive-control-r2.txt
+    .scratch/wisp/probes/154/gate-positive-control.sh
+    .scratch/wisp/probes/154/gate-positive-control.txt
+    docs/evidence/s1/154-host-id-never-closed-r1.md
+  冻结面命中 = 0  ✓
+########## 76c89b2  docs(票 154 实现程 第 3 节 格 AC#
+  本枚碰到的文件（全量）:
+    .scratch/wisp/probes/154/bridge-comment-after.txt
+    .scratch/wisp/probes/154/gate-post-cli-v.txt
+    .scratch/wisp/probes/154/gate-post-tools-v.txt
+    .scratch/wisp/probes/154/names-post-cli.txt
+    .scratch/wisp/probes/154/names-post-tools.txt
+    docs/evidence/s1/154-host-id-never-closed-r1.md
+    internal/tools/bridge.go
+  冻结面命中 = 0  ✓
+########## 304199f  evidence(票 154 实现程 第 4 节 格
+  本枚碰到的文件（全量）:
+    .scratch/wisp/probes/154/census-pairs.sh
+    .scratch/wisp/probes/154/census-pairs.txt
+    docs/evidence/s1/154-host-id-never-closed-r1.md
+  冻结面命中 = 0  ✓
+
+########## 反向自核：本票写面允许的三处，各碰了几枚
+  internal/tools/bridge.go 的注释面 → 由 AC#5 那条『增删行全部以 // 开头』的机器核担保
