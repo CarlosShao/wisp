@@ -1,0 +1,114 @@
+
+===== 尺A-1  词形：自称'逐字/唯一来源/权威表/一一对应'的条款（定稿+specs+薄索引） =====
+docs/PLAN.md:351:> ⚠ **本节的「六件套」清单已被 D34 内置工具权威表取代。**
+docs/PLAN.md:353:> ① **工具集从未被冻结成一张权威表** —— 它散在 D14（六件套）、D23（自用期范围）、
+docs/PLAN.md:363:> → **D34 是唯一权威表**；本节保留作为「为什么 shell 默认禁用、为什么必须有目录白名单」的
+docs/PLAN.md:756:   禁从镜像站获取模型哈希（哈希与签名的唯一来源是仓库内 C29 签名清单）
+docs/PLAN.md:1539:| ~~REJECTED~~ → **已采纳（窄例外）** | **一次性提醒 `reminder.*`** | ⚠ **本条原为「应用内定时任务/调度器」整条 REJECTED，第四轮部分推翻**（16.5.4）。D12 的安全论证针对的是**无人值守执行工具**，而 `reminder` **只发 `notify`、不执行任何工具、不调用 LLM**，攻击面不存在 | **已进 D34 权威表，落 S4** | `notify` 工具（S1） | **局限必须明示**：进程没在跑就不会触发；不做 OS 级调度（那是 L2 且有卸载残留）；不做周期性；不做过期补发 |
+docs/PLAN.md:1668:    → **每条须成功，且风险级判定与 D34 表一致**（`fs.trash` 必须是 L1 不是 L2）
+docs/PLAN.md:1747:| **`docs/TOOLS.md`** | **第四轮新增**：D34 内置工具权威表（工具名/动作/RiskLevel/capability/落哪个切片）。**必须单独成文** —— 原文的工具集散在 D14/D23/D30 三处且互相矛盾（如"应用启动"在 `search` 下是 L0、在 `web.open` 语境是 L1） |
+docs/PLAN.md:1801:| 内置工具「六件套」 | **推翻** → **D34 权威表 30+ 工具**，补 `system.*`/`window.*`/`app.launch`/`file.open`/`screen.capture`/`doc.read`/`input.type`/`fs.trash`/`reminder.*`；capability 6→**11** 项 |
+docs/PLAN.md:2024:| 5 | ~~**`Conversation`（开麦多轮）默认关闭**~~ → ✅ **已定案（2026-09-18）** | **用户选定：「默认 `Warm` 闭麦」** | **定案内容**：① **默认走 `Warm`** —— 模型热、**麦克风关**、悬浮球微弱暖色呼吸；下一轮单击球或快捷键，**零加载**（首字 P50 ≤1.5s）② **`Conversation` 保留为显式开启项**（`[voice] conversation_mode = false` 为默认值），开启后 `Speaking` 结束直接回 `Listening`、**红色常亮环不得渐隐**、30s 无语音退回 `Warm`、**首次开启需 L2 级隐私确认并记日志** ③ 省电模式下 `Warm` 缩到 30s、`Conversation` 缩到 15s（D42#6）④ 两态都已进 §2 状态表与 D43 转移表（#26/#28/#29/#30/#31），**不是可选项，是必须实现的**。<br>**理由**：隐私默认取安全侧（与 D16 三件套一致），陪聊体验靠一个显式开关补 —— **默认值代表产品的立场，开关代表用户的自由** |
+docs/PLAN.md:2170:`docs/TOOLS.md`（D34 工具权威表）。**这两张表散在方案里 agent 一定会自行简化。**
+docs/PLAN.md:2514:## 16.5 D34 — 内置工具权威表（**取代 D14 的六件套；`docs/TOOLS.md` 的唯一来源**）
+docs/PLAN.md:2527:### 16.5.2 权威表
+docs/PLAN.md:3003:⚠ **排序不是风格问题，是成本问题**：prompt caching 要求前缀**逐字节稳定**。
+docs/PLAN.md:3163:| **D14** | 加作废声明，**六件套 → D34 权威表**；保留"shell 默认禁用 + 目录白名单"的论证 |
+docs/PLAN.md:3189:| D26 | 模型哈希从镜像取 | **C29**：哈希与签名的唯一来源是**仓库内已签名清单** |
+docs/PLAN.md:3476:| **SSE 流式输出** | 文字逐段出现；末尾一个 **1px × 14px 竖线光标**（`--accent`）；右下角 micro 字号实时 token 计数（`--fg-tertiary`） | 光标 opacity 1→0.2→1 呼吸，1s | ❌ 闪烁方块 ❌ 打字机音效 ❌ 逐字符动画（CPU 与可读性都差，**按 SSE 分块追加即可**） |
+docs/PLAN.md:3593:| **D34 工具权威表** | `chat.html` 的工具调用 chip 应覆盖表里的主要类别（fs / web / system / window / screen / input / clipboard / notify / shell / reminder），图标按 17.4 的"工具类别"分组 |
+docs/PLAN.md:3594:| **D43 状态机** | `ball.html` 的 20 态与 `states.html` 的错误态必须**与 D43 转移表一一对应**，不得少画或多画 |
+docs/specs/README.md:34:| [SPEC-07-tools-and-plugins.md](SPEC-07-tools-and-plugins.md) | 内置工具权威表、ToolProvider、插件 manifest schema、Tier2 goja 约束、CLI 包装插件 | S1, S3, S7 |
+docs/specs/SPEC-00-product-overview.md:24:- **称职**：30+ 内置工具（D34 权威表）+ Tier1 声明式插件 + Tier1 command 插件（D46，可包任意
+docs/specs/SPEC-00-product-overview.md:119:| ① 系统操作与文件治理 | `app.launch` `file.open` `fs.*`(含 `fs.trash`) `search.*` `system.*` `window.*` | S3 | 10 条真实指令逐条跑，风险级判定与 D34 表一致（SPEC-10 §7.1） |
+docs/specs/SPEC-02-data-storage.md:131:  schema v2 迁移 DDL（与 `internal/memory/schema.go` 的 `ddlV2` 逐字节一致；票 09 已落地）：
+docs/specs/SPEC-05-agent-core.md:106:- 排序是成本问题：前缀逐字节稳定才能命中 prompt caching；④ 与 BM25 段每轮都变，
+docs/specs/SPEC-07-tools-and-plugins.md:1:# SPEC-07 · 内置工具权威表与插件系统
+docs/specs/SPEC-07-tools-and-plugins.md:7:D14 六件套已被 D34 权威表取代（原表散在三处且互相矛盾；按「除 coding 外必须称职」标准严重缺项）。
+docs/specs/SPEC-07-tools-and-plugins.md:32:## 3. D34 内置工具权威表（唯一来源；落 `docs/TOOLS.md`）
+docs/specs/SPEC-08-ui-ball-panel.md:242:  与 tokens.css 一一对应，列出对照表供核对）。
+AGENTS.md:5:> **这份文件不是什么**：它**不是权威来源，不新造任何规矩**。下面每一条都逐字抄或具名指回下列文件之一：
+AGENTS.md:15:2. **改契约＝人工批准**：改 `C1–C32` 或 `D1–D47` = 人工批准（`SPEC-12 §4.1` 逐字）。
+AGENTS.md:66:## 2. 未定义即停：已知待定案项（逐字抄自 `SPEC-12 §4.2`）
+AGENTS.md:79:## 3. 每片完成后必须做的五件事（逐字抄自 `SPEC-12 §4.3`）
+AGENTS.md:112:> 每行**逐字抄自 `PLAN.md` 的决策标题**（脚本抽取，非本文作者改写）。要看内容请点最后一列的行号。
+AGENTS.md:152:| D34 | 内置工具权威表（取代 D14 的六件套；`docs/TOOLS.md` 的唯一来源） | `PLAN.md:2514` |
+尺A-1 命中行数=33
+
+===== 尺A-2  同一词形在 README/工单规矩里的命中 =====
+146:  （D31 本身成立，目标文件逐字完整或不存在）。本票把那条评论式钉住"仍在"的断言**翻成"已清"**，
+182:  `SPEC-12 §4.1` 逐字写的就是「改 C1–C32 或 D1–D47 = 人工批准」。⚠ 注意 `PLAN.md:3` 那行状态摘要**自己也还写着 D1–D46/C1–C31**
+rc(0=有命中,1=无命中)=0
+
+===== 尺B-1  D34 shell.exec 行（PLAN.md:2563）的原文串在语料里的字面命中 =====
+docs/PLAN.md:2029:| 10 | ~~**邮件 / 日历 / IM 明确 REJECTED**~~ → ✅ **已定案（2026-09-18）** | **用户选定：「插件路径，核心不内置」** | **定案内容**：① **核心永不内置**邮件/日历/IM —— 不引入 OAuth、不存第三方凭据、不做应用注册与审核，D17「零现金支出」与 D16 隐私边界都不必为此扩张 ② **能力走插件**：本机已有认证好的 `lark-cli`（飞书邮件/日历/IM/任务/多维表格），写成 **Tier-1 声明式插件**即可接入 ③ 这直接牵出**新决策 D46「Tier-1 外部命令插件（CLI 包装）」**（§16.5.6）—— 因为要包 CLI 就必须有受约束的子进程执行通道，而 **D14 把 `shell.exec` 默认禁用了，不能为接一个 CLI 就打开整个 shell**。D46 用「**固定可执行文件 + 哈希钉死 + argv 模板（不经 shell）+ 参数 schema + 声明式输出提取 + 环境白名单**」解决，风险级仍由 C19 中心推断（**发送类动作自动 L2**，插件作者无法自降）④ **D46 不只服务飞书**：同一条通道让 `git`/`gh`/`ffmpeg`/`docker`/`pandoc` 等任何本机 CLI 都能零 Go 代码接入，**是本方案能力面扩展的主路径，优先级高于写内置工具** ⑤ **`lark-cli` 包装插件作为 S7 的"真插件跑起来"验收用例**（不另造玩具插件）；**示例可进仓库，凭据/令牌绝不进仓库**。<br>⚠ §7 的 REJECTED 条目须据此改写为「**核心内置** REJECTED + **插件路径已采纳（D46）**」，不得只写 REJECTED（否则后续 agent 会以为整个能力面被否决） |
+docs/PLAN.md:2507:- **`shell.exec` 必须强制 argv 向量** → 参数类型是 `argv: string[]`，**不接受单一命令字符串**。
+docs/PLAN.md:2563:| `shell.exec` | 任意命令 | **L2**（白名单命中 → L1） | `shell` | S3 | **默认禁用**（D14 结论保留）；**argv 向量强制**（D33） |
+docs/PLAN.md:2640:> 而 D14 恰恰把 `shell.exec` 默认禁用了，且 D33 强制 argv 向量、拒绝命令字符串。**
+docs/PLAN.md:2662:- `shell.exec` = **通用任意命令**，默认禁用，开启后每次 L2，argv 向量强制。**保持不变。**
+docs/specs/SPEC-06-security-gatekeeping.md:139:- `shell.exec` 强制 argv 向量（`argv: string[]`，不接受命令字符串）；确需字符串 →
+docs/specs/SPEC-07-tools-and-plugins.md:71:| `shell.exec` | 任意命令 | L2（白名单命中 → L1） | shell | S3 | **默认禁用**；argv 向量强制 |
+
+===== 尺B-2  D34 task.* 行（PLAN.md:2561）的字面命中（含 specs） =====
+docs/PLAN.md:2561:| `task.list` / `task.cancel` | 查看/取消任务 | L0 / L1 | — | **S7** | **D31「被阻塞的东西必须可见」的落地工具**（原文只有 UI 要求，没给 Agent 侧的查询手段） |
+docs/PLAN.md:3109:| **S7** | 增：**D45-2 作用域会话授权** · **C24 `GojaHostAPI` 契约测试** · **端到端"真插件跑起来"判据**（原文只判"goja 按需加载/卸载 + 沙箱加固"，没有一个真插件跑通就算过 —— 这是典型的"看着完成实则空壳"）。**验收用例已定：`lark-cli` 包装插件（D46），不另造玩具插件** —— 须验：查日程（L0 直通）· 发消息（**C19/R8 自动判 L2**，插件声明 L0 无效）· **篡改 exe 一个字节 → `exe_hash` 校验失败拒绝执行** · argv 模板注入元字符 → 被拒 · 环境变量白名单生效（子进程看不到 API Key）· `task.list`/`task.cancel` · 显示器拓扑/DPI（D42#3）· **C19 的 R7 批量规模规则** |
+docs/specs/SPEC-06-security-gatekeeping.md:108:  `task.list`/`task.cancel` 工具供 Agent 侧查询（D34）。
+docs/specs/SPEC-07-tools-and-plugins.md:69:| `task.list` / `task.cancel` | 查看/取消任务 | L0 / L1 | — | **S7** | 「被阻塞的东西必须可见」的 Agent 侧手段 |
+
+===== 尺B-3  D43 计数断言（'20 态'／'40 条'／'42 条'） =====
+docs/PLAN.md:1297:## 二、悬浮球状态机（补全草案 6 态 → **20 态**）
+docs/PLAN.md:1302:> 故现为 **20 态**。**权威转移表见 D43**（本节只列态与视觉，不含完整转移，
+docs/PLAN.md:1362:| C12 | `BallState` | **20 态** + **完整转移表（D43，第四轮才真正写出）** + 每态超时 | §2 + D43（⚠ 原标「来源 D24」为误引） |
+docs/PLAN.md:1746:| **`docs/STATE_MACHINE.md`** | **第四轮新增**：D43 的 20 态 + 40 条转移表。**必须单独成文** —— C12 冻结的就是它，散在方案里 agent 会自行简化 |
+docs/PLAN.md:3051:20 态（§2）· 40 条转移。**未列出的转移一律非法**（未定义即停，D22 闸门③）。
+docs/PLAN.md:3145:| 6 | 状态机 **20 态太多，应合并** | **驳回** | **态数不是复杂度指标，转移数才是**（40 条转移，20 态，比例正常）。合并 `Warm`/`Settling` 会让「模型是否已卸载」这一 **SLO 关键事实失去可视化**，而 D31 已确立原则「被阻塞/被占用的东西必须在某个界面上可见」。合并还会让看门狗的按态查表（D32 修订③）无处可挂 |
+docs/PLAN.md:3168:| **§2** | 标题 15 态 → **20 态**（原表已 18 行，是算术错误）；补 `Warm`/`Conversation` 两行；修正 `Listening`/`Confirming`/`Speaking` 三行的退出目标 |
+docs/PLAN.md:3170:| **§3 C12** | 15 态 → 20 态；来源误引 D24 → **§2 + D43** |
+docs/PLAN.md:3297:        ├── ball.html            ← 悬浮球 20 态全览 + 交互演示
+docs/PLAN.md:3529:原型用 HTML/CSS/SVG **模拟视觉**，目的是定下 20 态的**颜色、透明度、动效节奏与角标形态**，
+docs/PLAN.md:3541:- 各态差异（对应 D43 的 20 态）：
+docs/PLAN.md:3594:| **D43 状态机** | `ball.html` 的 20 态与 `states.html` 的错误态必须**与 D43 转移表一一对应**，不得少画或多画 |
+docs/specs/README.md:35:| [SPEC-08-ui-ball-panel.md](SPEC-08-ui-ball-panel.md) | 悬浮球（Win32/D2D）、**20 态状态机权威转移表**、WebView 面板、React 技术栈、设计系统 | S1, S5 |
+docs/specs/SPEC-00-product-overview.md:29:- **可见**：悬浮球 20 态状态机（C12/D43）+ 按需 WebView 面板（命令/结果/配置/历史/取证/成本），
+docs/specs/SPEC-00-product-overview.md:141:| 态 / BallState | 20 态状态机（C12/D43），见 SPEC-08 §3 |
+docs/specs/SPEC-01-architecture.md:18:  ├ BallState 状态机（20 态，C12/D43） + 会话控制层（本地正则，D11）
+docs/specs/SPEC-01-architecture.md:49:│   ├── statemachine/                  # BallState 20 态 + D43 转移表 + 每态超时（只有转移，没有能力）
+docs/specs/SPEC-08-ui-ball-panel.md:9:  但 20 态的颜色/透明度/动效节奏必须可执行地定死。
+docs/specs/SPEC-08-ui-ball-panel.md:85:## 3. 状态机权威转移表（C12/D43——20 态 42 条转移；未列出的一律非法）
+docs/specs/SPEC-08-ui-ball-panel.md:234:- 结构性：20 态 × 40 转移表做**穷举转移测试**（非法转移必须被拒）；每态超时值表驱动测试。
+
+===== 尺B-4  AwaitingApproval 在语料（非 .scratch／非 evidence／非 reports）里的命中枚数 =====
+0d1764731973a998c5d6da5839070151fb9b04a9:AGENTS.md:1
+0d1764731973a998c5d6da5839070151fb9b04a9:docs/PLAN.md:10
+0d1764731973a998c5d6da5839070151fb9b04a9:docs/specs/SPEC-06-security-gatekeeping.md:1
+0d1764731973a998c5d6da5839070151fb9b04a9:docs/specs/SPEC-08-ui-ball-panel.md:5
+0d1764731973a998c5d6da5839070151fb9b04a9:docs/specs/SPEC-12-roadmap-governance.md:1
+
+===== 尺B-5  D46 那句'保持不变' =====
+docs/PLAN.md:2662:- `shell.exec` = **通用任意命令**，默认禁用，开启后每次 L2，argv 向量强制。**保持不变。**
+
+===== 尺B-6  D33 那句'argv: string\[\]' =====
+docs/PLAN.md:2507:- **`shell.exec` 必须强制 argv 向量** → 参数类型是 `argv: string[]`，**不接受单一命令字符串**。
+docs/specs/SPEC-06-security-gatekeeping.md:139:- `shell.exec` 强制 argv 向量（`argv: string[]`，不接受命令字符串）；确需字符串 →
+
+===== 尺B-7  生产注册表里 fs.* 工具名枚数（尺1＝Name() 实现） =====
+5
+
+===== 尺B-8  生产注册表里 fs.* 工具名枚数（尺2＝字符串字面量） =====
+6
+
+===== 尺B-9  OpenScope 的生产调用枚数（尺1＝字面量，尺2＝文件名去重） =====
+cmd/wisp/panel_assets.go
+internal/tools/bridge.go
+0d1764731973a998c5d6da5839070151fb9b04a9:cmd/wisp/panel_assets.go
+0d1764731973a998c5d6da5839070151fb9b04a9:internal/tools/bridge.go
+
+===== 尺C   design/ 与 frontend/ 对 D34 单元格字面的命中（只枚文件名，不读内容） =====
+0d1764731973a998c5d6da5839070151fb9b04a9:design/doubao/demo/screens/approval.js
+0d1764731973a998c5d6da5839070151fb9b04a9:design/doubao/demo/screens/config.js
+0d1764731973a998c5d6da5839070151fb9b04a9:design/doubao/demo/screens/palette.js
+0d1764731973a998c5d6da5839070151fb9b04a9:design/screens/approval.html
+0d1764731973a998c5d6da5839070151fb9b04a9:design/screens/security.html
+0d1764731973a998c5d6da5839070151fb9b04a9:frontend/src/components/l2-approval-card.tsx
+0d1764731973a998c5d6da5839070151fb9b04a9:frontend/src/fixtures/harness-app.ts
+0d1764731973a998c5d6da5839070151fb9b04a9:frontend/src/fixtures/harness.ts
