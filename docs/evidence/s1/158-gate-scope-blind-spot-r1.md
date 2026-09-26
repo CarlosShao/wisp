@@ -344,9 +344,18 @@ $ go test -count=1 ./internal/tools/  -> ok ... 12.796s   rc=0 （最终树全�
 - **AC#6 票面框↔本程格双向对账＝未交·归 r2。** 本程也没数过票面框的枚数变化（派单 §0 说的「现量 6 枚未勾／0 勾」我只复算到「无 `-done`」这一半）。
 - 票面框**由编排者按非实现者验收表定**，实现方不自勾 ⇒ 本程一枚都没勾。
 
-给 r2 的 `next=`（**本程最终树＝`7f37ea4`**；三枚 commit 依序
-`4dcb71b` AC#1 → `5bfdfc7` AC#2 → `7f37ea4` AC#3＋交件，全部 `git cat-file -t` ＝ commit；
-开工锚点 `8f9162f`）：
+给 r2 的 `next=`（**别信本件正文里任何一枚写死的 commit 号，包括这一句**——本程的更正 commit 会把
+"最终树"那一行自己刷过期，实发过两次。本程全部落库＝开工锚点 `8f9162f` 之后、下面这条命令列出的那些：
+
+```
+$ git log --format='%h %ad %s' --date=format:'%H:%M' 8f9162f..HEAD      # 只数本程的（编排者同期提交会混进来，看 subject 前缀「票 158 r1」）
+$ git rev-parse --short HEAD                                            # 现量即最终树
+```
+
+本程写面（`git diff --name-status 8f9162f..HEAD` 实测只这三类）：
+`internal/tools/bridge_scope_open_ticket158_test.go`（新用例）·
+`.scratch/wisp/probes/154/gate-clauses.sh`（加 `pair()`＋G5 三腿，74 加 2 删）·
+`docs/evidence/s1/158-gate-scope-blind-spot-r1.md`（本件）· `.scratch/wisp/probes/158/**`（只建不删）。）
 1. 分母一律现跑：`internal/tools` 在 `8f9162f` 未改时 **115/79/0/0**，本程加一枚用例后全绿版＝ **116/80/0/0**；
    `cmd/wisp` 派单写的 `144/84/0/0` **本程未复算**，r2 必须现跑再当分母。
 2. AC#5 跑 `cmd/wisp` 前先读 `scripts/wisp-cli-tests.sh:99-113` 的 PATH／dll 原文（本程没读、没跑）。
