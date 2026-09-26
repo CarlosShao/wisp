@@ -352,3 +352,165 @@ kill report bytes=NO FILE (failed closed)
 2. 没量"被杀的是**被测** subject（不带 `-self-sample`）"那一支——那一支归 `sampler`，不经过 `collectReportWithin`，
    本票地界外，本程**没有**顺手测。
 3. 没量 `wisp slo -settle` 那条腿；没跑真 CI（无 push 权限）。
+
+---
+
+## 第 4 格　AC#2：`exited()` 那一支该印什么——按 149 的三档答，答案是 **ⓒ：说不好 ⇒ 停手上报**
+
+**判据**（工单 AC#2 原文三档）：ⓐ 该点名（补断言）／ⓑ 设计上不该走到 `summary()`（改成不会静默的形状＋一发"仍走到即红"）／
+ⓒ 说不好 ⇒ 停手上报。工单同时写了："不许预填结论……如果量出来'那条路今天**产不出**红句'，那正是要的答案，按 ⓑ/ⓒ 处理并停手上报"。
+
+### 4.1 为什么 ⓐ 与 ⓑ 都不合本程量到的形
+
+- **ⓐ 不成立**（不是"错"，是**已被 149 收过、且治不到本程量到的那一发**）：149 按 ⓐ 补的就是 case 13，
+  而 case 13 钉的是"**那条支被走到之后**句子带不带得上最后一次读数"。本程第 1／2／3 格量到的是**走到之前**就断了：
+  生产接线上没有任何人收尸 ⇒ `s.exited()` 恒假 ⇒ 那一支一次都没被执行过。
+  再补一枚断言只能钉"手工接线造出来的可达"，那正是本票要收掉的东西。
+- **ⓑ 不合形**：ⓑ 的措辞是"设计上不该走到 `summary()`"，其判据是"改成不会静默的形状＋一发**仍走到即红**"。
+  本程量到的不是"走到了但静默"，是**整条支走不到**（第 1 格四发 unreaped 全印邻居那句、第 2 格 `waitReady` 同形、
+  第 3 格端到端同形）。照 ⓑ 硬改，造出来的是**一枚永远不会响的格**——工单明令不许。
+- **真正缺的那一味不在本票地界里**：缺的是 subject 生命周期上的**收尸点**。本程把候选列出来，一条都不自己动手：
+  ①在 `collectReportWithin` 的循环里补一次 `Wait`/轮询；②把 `exited()` 改成问 OS（`GetExitCodeProcess`，
+  本程探针用的就是这一形）；③给 subject 配一枚 reaper goroutine——第三形还要过 D22 裸 `go func` 的 owner/recover 与
+  D38 并发与线程模型。三形都改到 `slo_windows.go` 之外的接线（`startSubject`／`stop()`／`internal/proc` 的 Job），
+  而"到点红该由谁在几秒内定性成什么"是 D37 错误映射的形状问题——**方案没覆盖，按 D22 闸门③停手，不自行假设**。
+
+⇒ **本程 AC#2 那一半一字节生产码都没改**（第 5 格改的是 AC#3 那条退路，与这一支无关），也没有为它开"要它响"的格。
+
+### 4.2 承重两问——两句都答，尺是本程自己的（`probes/152/my152.py`，原始读数在 `mut-anchor/` 与 `mut-shipped/`）
+
+| 变异 | 跑在哪版字节 | RUN | 顶层 PASS | 顶层 FAIL | 红名 |
+|---|---|---|---|---|---|
+| `e1-exited-drop-summary`（`last.summary()` 换成写死的 `"nothing read"`） | 锚点 5365cb2 | 20 | 12 | **1** | `TestSLO149ExitedGiveUpSentenceCarriesTheLastReading` |
+| `e2-exited-drop-summary-case13off`（同一发＋case 13 摘掉） | 锚点 | **19** | 12 | **0** | —（逃逸） |
+| `e3-case13-not-a-test-only`（只摘 case 13，码不动） | 锚点 | 19 | 12 | 0 | — |
+| `h1-exited-arm-deleted`（**整条 `if s.exited()` 支删掉**） | 交付字节 | 21 | 13 | **1**（case 13 跑满 60.05s） | 同上 |
+| `h2-exited-arm-deleted-case13off`（删支＋摘 case 13） | 交付字节 | **20** | 13 | **0** | —（逃逸） |
+
+`h1` 的红句原文（`probes/152/mut-shipped/h1-exited-arm-deleted.log`）：
+
+```
+slo_report_144_windows_test.go:837: exited give-up "wisp slo: subject 63728 never wrote a complete report within 30s (last read: 8 bytes read, document still open at offset 8: the tail had not arrived)" does not name the exit code
+slo_report_144_windows_test.go:840: an exited subject was reported as a spent budget, not as a dead child: "wisp slo: subject 63728 never wrote a complete report within 30s (last read: 8 bytes read, document still open at offset 8: the tail had not arrived)"
+slo_report_144_windows_test.go:843: exited subject was read 18485 times, want exactly 1 (the loop sees ProcessState and gives up on the spot)
+```
+
+- **问一："摘掉任意一味，是否存在一发变异从此打不红？"——存在，而且比 149 报的那发更凶。**
+  ① 摘掉 case 13 ⇒ `e1`（摘 `last.summary()` 那半）从此 0 红；
+  ② 摘掉 case 13 ⇒ 连**把整条 exited 支删掉**都 0 红（`h2`：FAIL 1→0、RUN 21→20）；
+  ⇒ 全仓对那条支的覆盖**只有 case 13 一枚持有者**，而它靠的是"测试替循环把尸收了"这一手生产里不存在的接线。
+  把它摘掉等价于"那条支不存在"——**没有任何读数会知道**。这一味因此是**承重的**（不是装饰），
+  但它承重的那条路今天不通：`h1` 印出来的句子与第 3 格端到端那句**同形**
+  （`never wrote a complete report within …（last read: …）`）——
+  **今天的生产输出，就等于"那条支被删掉"那一发的输出。**
+- **问二："摘掉它有没有任何外部可见读数变过？"——有。**
+  摘掉 case 13：`=== RUN` 20→19（交付字节 21→20）、顶层 PASS 枚数动、名册少一枚；
+  摘掉 `last.summary()` 那半：红的**枚数**与**原文**都动（`e1`/`h1` 三行红句在案）。
+  ⇒ 与本票第 5 格那条退路**不同类**：那条是"摘了零读数变化"（装饰腿），这一味是"摘了必响"（承重腿）——
+  只是它响的前提（走到那条支）在生产接线上今天不发生。
+
+**放水两问自答**：① 本程没有为了让哪一格"通过"改过判据：`e*`/`h*` 是**造变异去量它**，不是去放宽断言；
+② 尺是本程自己写的（`my152.py`），overlay 落盘后回读证明替换进了编译字节，且全程不带 `-cover*`（坑②）。
+
+**第 4 格判定**：**ⓑ/ⓒ 停手上报（取 ⓒ 那一支：三档都没覆盖"支不可达"这一形）**；
+承重两问**均已答**，凭据五发变异读数。**本程交付的是这次取证与"该由谁在哪收尸"这句待定案，不是一个修法。**
+
+**本程没测什么（本格）**：
+1. **没量"补了收尸点之后"的行为**——本程没实现任何候选修法，所以"改了就会印 exited 句"只是第 1 格
+   第 4／5 那两发 `REAPED` 读数的**外推**（那两发是真的，但外推是本程说的，不是量到的）。
+2. **没量 `waitReady` 之外还有没有第三处**同样在 `Wait` 之前问 `exited()`：本程的名册只覆盖
+   `cmd/wisp/slo_windows.go` 一枚文件（`exited()` 的调用者见 §1.5），
+   `internal/proc` 里若有同形调用**未被本程点名**。
+3. `h1` 那发的 18485 次真读与 60.05s 是**本机单次读数**，能引的是"烧尽预算＋反复重读"这个量级。
+
+---
+
+## 第 5 格　AC#3：那条退路选了"明说自己不知道"那一支——两问都有读数，"在未修码上响不响"＝**响**
+
+**判据**（工单 AC#3）：删掉，或者换成"会明说自己不知道"的形状，两选一、写清选了哪个为什么；
+加注释／说成"纵深防御"／"留着反正不害"三件不算收；不许为它开"要它响"的格，但判据要能答"这一发在未修码上响不响"。
+
+### 5.1 现量：那条腿"摘了零读数变化"，本程自己复算（不复用 149 的数）
+
+尺＝`probes/152/my152.py`（同文件多枚替换**串联**；overlay 落盘后**回读**断言"新文本在／旧文本不在"，
+否则 FATAL 不出数；命令行按 shlex 引号落盘——裸 `|` 的 `-run` 粘回去会变成管道，那不是"命令原文"）。
+被验树＝`git archive 5365cb2` 快照＋dll 三枚；选择＝`TestSLO144|TestSLO147|TestSLO149`；全程零 `-cover*`（坑②）。
+
+| 发 | 改了什么 | RUN | 顶层 PASS | FAIL | SKIP | 与 asis 比 |
+|---|---|---|---|---|---|---|
+| `asis` | 无 overlay | 20 | 13 | 0 | 0 | — |
+| `f1-fallback-to-zero` | 锚点那行 `return inputOffset` → `return 0` | 20 | 13 | 0 | 0 | **四数逐枚相同 ⇒ 零枚外部读数变化** |
+| `f2-fallback-to-minus1` | 同一行 → `return -1` | 20 | 13 | 0 | 0 | **同样零变化** |
+
+⇒ 149 第 5 格那枚"装饰腿"读数在本锚点**复算成立**。`f2` 还额外量到一件事：
+**只把值换成 -1、句子不认**，外部读数仍然一动不动——所以本票要收的不是那枚数，是**那句承诺**
+（`g3` 的红句印的正是 `-1` 冒充位置的样子）。
+
+### 5.2 选了哪一支，为什么
+
+**选"换成会明说自己不知道"，不选"删掉"**：字面删不掉——149 验收件 §5.1 量到"函数还有返回值，
+删掉默认臂 Go 直接编不过"；本程按"别家结论当未验证断言"的规矩自己撞了一遍（把 `return offsetUnknown` 摘掉＝
+`missing return`）。所以**能删的只有那句承诺，不是那行代码**。落地形状（`cmd/wisp/slo_windows.go`，commit `10e3585`）：
+
+- `contradictionOffset(err, inputOffset)` → **`contradictionOffset(err) int64`**：两家错误都不叫位置那一臂交回
+  `offsetUnknown`（新具名常量，值 -1），调用点**不再把 `dec.InputOffset()` 递进去**——
+  那枚数正是本函数存在的全部理由要说谎的数（149：18 发 corrupt 里 8 发印 0）。
+- 新增 `contradictSubjectReportErr(size, offset, err)`：`offset >= 0` 那臂的字符串与改前**逐字节相同**
+  （case 11／2／5／12 都靠它，改一个字符就会红——这就是"命名臂没被动过"的负向凭据：交付字节上整条选择
+  21 枚 RUN／14 枚顶层 PASS／0 红，见 `probes/152/fixed-tree-selection.log`）；
+  `offset < 0` 那臂印 `at an offset the decoder did not name`。
+- 新增 case 14 `TestSLO152CorruptLegWithNoNamedPositionRefusesToBorrowOne`：
+  两枚"叫得出位置"的臂用的是**真解码器错误**（`readSubjectReport` 造、`errors.As` 从 `%w` 包装里取回，不是手搓夹具），
+  只有"叫不出"那一臂 handed 一枚非 JSON 错误——那正是这条臂过去区分不了的东西。
+
+### 5.3 承重两问＋"这一发在未修码上响不响"
+
+| 发 | 改了什么 | RUN | PASS | FAIL | 红名／红句 |
+|---|---|---|---|---|---|
+| `asis`（交付字节） | 无 overlay | 21 | 14 | 0 | — |
+| `g1-restored-borrowed-value` | 把借来的值放回去（`return offsetUnknown` → `return 0`）＝未修码的行为 | 21 | 13 | **1** | case 14 |
+| `g1-restored-borrowed-value-case14off` | 同一发＋摘掉 case 14 | **20** | 13 | **0** | —（逃逸） |
+| `g2-case14-not-a-test-only` | 只摘 case 14，码不动 | **20** | 13 | 0 | — |
+| `g3-renderer-always-prints-position` | 句子那一臂不认 `offset < 0` | 21 | 13 | **1** | case 14 |
+| `g4-renderer-never-prints-position` | 句子那一臂永远不印位置 | 21 | 12 | **2** | case 11 **＋** case 14 |
+
+`g1` 的红句原文（`probes/152/mut-shipped/g1-restored-borrowed-value.log`）：
+
+```
+slo_report_144_windows_test.go:748: contradictionOffset for an error that names no position is 0, want -1 (offsetUnknown); any other number is a byte position this error never named - that is the value ticket 149 killed
+```
+
+`g3` 的红句原文（＝"只改值、不改句子"会印出来的样子）：
+
+```
+slo_report_144_windows_test.go:754: no-position corrupt sentence "39 bytes contradict a subject report at offset -1: invalid character: the runner wrote something that is not a json error type" is not the admission shape
+```
+
+⚠ **一把不够用的尺要点名**：把交付版用例**原文**叠到锚点的 `slo_windows.go` 上跑，是**编译期就断**的——
+`probes/152/n1-newtest-on-anchor-code.log` 原文四行：`not enough arguments in call to contradictionOffset`、
+`undefined: offsetUnknown`（两处）、`undefined: contradictSubjectReportErr`，`=== RUN` 枚数 **0**。
+⇒ "在未修码上响不响"这一问，本程**不以**那发为凭据（编不过是构建状态，不是读数），
+凭据落在 `g1`：它在交付字节上把未修码的行为**逐字放回去**，case 14 当场红，红句里带的就是那枚被借的数。
+
+- **问一："摘掉任意一味，是否存在一发变异从此打不红？"——存在。** 摘掉 case 14 ⇒ `g1` 从 1 红变 **0 红**
+  （`g1-restored-borrowed-value-case14off.log`），同一发里 `g3` 也没人接
+  ⇒ **case 14 是"没有位置就不许印位置"这条承诺的唯一持有者。**
+  ⚠ 诚实的一半：`g4`（命名臂被消音）由 **case 11 与 case 14 各抓**，那一臂**不是** case 14 独占的覆盖面。
+- **问二："摘掉它有没有任何外部可见读数变过？"——有。** `RUN` 21→20、顶层 `PASS` 14→13
+  （`g2-case14-not-a-test-only.log`），名册差集少 `TestSLO152CorruptLegWithNoNamedPositionRefusesToBorrowOne` 一枚
+  ⇒ 与本票第 4 格那枚承重的 exited 腿同形、与它自己开局那条退路"摘了零读数变化"的装饰形状**相反**。
+
+**放水两问自答**：① 本程**没有**为这条腿开"要它响"的格——它响的是"把借来的值放回去"这一发，
+判据方向是"不许印自己没有的位置"，与 147／149 已钉的三档同向，没有任何断言被放宽、没有阈值被动；
+② 新增的 helper（`contradictSubjectReportErr`）在本票地界内，只被生产调用点与本票 case 14 用，
+**没有替换掉任何一件被测物**：`readSubjectReport` 仍是真解码器、真 `%w` 包装、真句子。
+
+**第 5 格判定**：**成立**（AC#3 选了第二支并有可复算凭据；两问都答；"未修码上响不响"＝响，凭据 `g1`）。
+
+**本程没测什么（本格）**：
+1. **没有量到那条臂在真实文档上被走到**——本票全部读数的共同前提仍是"今天走不到"。
+   本程**没有**证明它不可达（那要枚举 `encoding/json` 的错误全集，含未来版本）。
+   ⇒ 谁先被骗：把"明说自己不知道"读成"这一发已经有人见证过"的人——见证的是接缝，不是世界。
+2. 没做 `offsetUnknown` 与 `note` 两腿的语义合并验证（都写 -1，同族不同来源）：本程只在注释里写清，
+   没造一发"把 -1 换成正数会怎样"的读数。
+3. 没验 case 14 那三枚真错误在**别的 Go 版本**上仍归 Syntax／UnmarshalType 两家（与 149 第 4 格同一条洞）。
