@@ -34,9 +34,11 @@ import { SettingsModal } from "@/components/harness/settings-modal";
 import { ToastStack, RB_TOASTS } from "@/components/harness/toast";
 import { WorkspacePicker, RB_WORKSPACES } from "@/components/harness/workspace-picker";
 import {
+  AUTOMATIONS,
   GREETING,
   EMPTY_HINT,
   HISTORY_GROUPS,
+  PROJECT,
   QUICK_COMMANDS,
   RECENT_TASKS,
   SESSIONS,
@@ -99,11 +101,13 @@ export function AppHarness() {
     <div className="flex h-screen w-full overflow-hidden bg-page text-ink">
       <HarnessSidebar
         activeSessionId={sessionId}
+        automations={AUTOMATIONS}
         groups={HISTORY_GROUPS}
         onNewTask={newTask}
         onOpenSettings={() => setSettingsOpen(true)}
         onSelectSession={(id) => setSessionId(id)}
         onToggleTheme={toggleTheme}
+        project={PROJECT}
         searchValue={search}
         onSearchChange={setSearch}
         theme={dark ? "dark" : "light"}

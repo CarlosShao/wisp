@@ -7,6 +7,19 @@
    a new-task entry, a session history list, a workspace picker, and the
    conversation view around them.
 
+   Second form ruling (2026-09-26, Qoder/ZCode screenshots): the sidebar body
+   becomes Qoder's three sections - 自动化 (status-dot rows with a right-edge
+   gear slot) / 工作区 (project row + nested session children with leading
+   status icons: red CircleAlert = failed, accent dot = streaming, none =
+   done) / 最近任务 (the previous history groups, anatomy unchanged) - and
+   the session view gains the ZCode/Qoder conversation furniture: a changes
+   summary capsule (已整理 N 个文件 +a -r) expanding to a file list card,
+   an elapsed row (已工作 …) expanding to a behaviour empty state, and a
+   permission/mode pill row above the composer. The vocabulary lives below:
+   HarnessAutomation / HarnessProject / HarnessProjectChild for the sidebar;
+   HarnessChanges / HarnessChangeFile and the session's
+   changes/elapsed/permissionLabel/modeLabel fields for the main view.
+
    Same two honesty rules as src/fixtures/harness.ts, kept intact here:
      1. Every row is a shape the harness components really declare (the
         interfaces below are the contract the components import). Nothing here
@@ -71,6 +84,25 @@ export interface HarnessAssistantMessage {
 
 export type HarnessMessage = HarnessUserMessage | HarnessAssistantMessage;
 
+/** 更改摘要条的一行文件（ZCode「Organized N files」卡里的一行）。 */
+export interface HarnessChangeFile {
+  /** 文件名（mono 渲染）。 */
+  name: string;
+  /** 动作徽标文本，如 已移动 / 已新建 / 已删除。 */
+  action: string;
+  /** 可选展开详情（如 from → to 路径）；缺省该行无展开箭头。 */
+  detail?: string;
+}
+
+/** 会话的更改摘要：胶囊汇总（已整理 N 个文件 +a -r）+ 可展开的文件清单卡。
+    files 可以短于 count（清单卡默认只列前几行，「显示更多」放开）。 */
+export interface HarnessChanges {
+  count: number;
+  additions: number;
+  removals: number;
+  files: HarnessChangeFile[];
+}
+
 /** One conversation, as the sidebar row and the session view both read it. */
 export interface HarnessSession {
   id: string;
@@ -82,6 +114,14 @@ export interface HarnessSession {
   workspace: string;
   /** EntityChip 必填的圆点色：token 引用（"var(--accent)" 形），不得是字面量。 */
   workspaceColor: string;
+  /** 更改摘要条（可选）：会话头下第一件；缺省不渲染。 */
+  changes?: HarnessChanges;
+  /** 耗时行文本（可选），如 "已工作 2 分 41 秒"；点击展开行为演示空态。 */
+  elapsed?: string;
+  /** composer 上方权限档 pill 的 label（可选，橙字 + chevron）。 */
+  permissionLabel?: string;
+  /** composer 上方模式 label（可选，中性描边 pill）。 */
+  modeLabel?: string;
   messages: HarnessMessage[];
 }
 
@@ -102,6 +142,31 @@ export interface HarnessSidebarGroup {
   /** 分组小标题：今天 / 近 7 天 / 更早。 */
   label: string;
   rows: HarnessSidebarRow[];
+}
+
+/** 自动化段的一行：状态圆点 + 名称 + 右缘齿轮位（Qoder 左栏形态）。 */
+export interface HarnessAutomation {
+  id: string;
+  name: string;
+  /** "running" = 蓝点（运行中）；"idle" = 灰点（空闲）。 */
+  state: "running" | "idle";
+}
+
+/** 工作区段嵌套会话行的状态词汇：红圈叹号 = failed（已拒绝）、蓝点 =
+    streaming（进行中）、无图标 = done（已完成）。 */
+export type HarnessProjectChildStatus = "done" | "failed" | "streaming";
+
+/** 工作区段的一行嵌套会话。id 是会话 id：点击经 onSelectSession 打开。 */
+export interface HarnessProjectChild {
+  id: string;
+  title: string;
+  status: HarnessProjectChildStatus;
+}
+
+/** 工作区段：项目行（Folder 图标 + 名，可折叠）+ 其嵌套会话行。 */
+export interface HarnessProject {
+  name: string;
+  children: readonly HarnessProjectChild[];
 }
 
 /** One bottom usage pill: label outside, value in a ValuePill. */
@@ -135,13 +200,26 @@ export type HarnessTheme = "light" | "dark";
    here so the assembler has ONE page to read.
    --------------------------------------------------------------------------- */
 
-/** src/components/harness/sidebar.tsx 的完整 props 契约。 */
+/** 顶部 monogram 行的工作区信息（原先是 sidebar.tsx 的本地接口，2026-09-26
+    契约并入本文件 - 组件从这份 import，不再各写一份）。 */
+export interface HarnessWorkspaceInfo {
+  /** 短名（monogram 与标题行）。 */
+  name: string;
+  /** 完整路径（title 提示行）。 */
+  path: string;
+}
+
+/** src/components/harness/sidebar.tsx 的完整 props 契约 - 组件从本文件 import
+    （与 main.tsx 同法）。2026-09-26 追加 Qoder 三段式的 automations/project。 */
 export interface HarnessSidebarProps {
-  /** 会话历史，已分组（今天 / 近 7 天 / 更早）、已摊平行（toSidebarRow）。 */
-  groups: HarnessSidebarGroup[];
-  /** 高亮行（bg-hover + 左缘 2px accent 竖条）；null 无高亮。 */
+  /** 顶部 monogram 行的工作区信息。 */
+  workspace: HarnessWorkspaceInfo;
+  /** 会话历史，已分组（今天 / 近 7 天 / 更早）、已摊平行（toSidebarRow）；
+      渲染在「最近任务」段下，解剖不变。 */
+  groups: readonly HarnessSidebarGroup[];
+  /** 高亮行（bg-hover 滑翔块 + 字重）；null 无高亮。 */
   activeSessionId: string | null;
-  /** 点击历史行。 */
+  /** 点击历史行 / 工作区段嵌套会话行。 */
   onSelectSession: (id: string) => void;
   /** 「新建任务」主按钮（bg-accent 实底）。 */
   onNewTask: () => void;
@@ -151,13 +229,19 @@ export interface HarnessSidebarProps {
   /** 搜索框 placeholder，缺省「搜索会话…」。 */
   searchPlaceholder?: string;
   /** 底部用量小计：每项渲染 "{label} <ValuePill>{value}</ValuePill>"。 */
-  usage: HarnessUsagePill[];
+  usage: readonly HarnessUsagePill[];
   /** 设置入口行（Settings 图标 + 文字）。 */
   onOpenSettings: () => void;
   /** 当前主题；暗色时主题行显示 Sun「浅色」。 */
   theme: HarnessTheme;
   /** 主题切换回调。 */
   onToggleTheme: () => void;
+  /** Qoder 自动化段：状态圆点行（蓝点=运行中 / 灰点=空闲）+ 右缘齿轮位。 */
+  automations: readonly HarnessAutomation[];
+  /** 自动化行齿轮位点击（可选；缺省齿轮仅展示、hover 显现）。 */
+  onOpenAutomation?: (id: string) => void;
+  /** Qoder 工作区段：项目行（Folder 图标 + 名，可折叠）+ 嵌套会话行。 */
+  project: HarnessProject;
   /** 追加到根 aside 的类。 */
   className?: string;
 }
@@ -207,7 +291,8 @@ export const GREETING = "早上好，今天要做什么？";
 
 export const EMPTY_HINT = "还没有会话记录。点「新建任务」发起第一条指令，历史会话会按时间归组出现在左侧。";
 
-/** 会话一：今天，已完成 - 用户消息 + 三枚工具 chip（两 done 一 denied）+ 完成回复 + 成本行。 */
+/** 会话一：今天，已完成 - 用户消息 + 三枚工具 chip（两 done 一 denied）+
+    完成回复 + 成本行；带更改摘要条（9 个文件 +9 -0，owner 截图原值）与耗时行。 */
 const SESSION_ARCHIVE: HarnessSession = {
   id: "sess-archive",
   title: "归档桌面截图",
@@ -215,6 +300,25 @@ const SESSION_ARCHIVE: HarnessSession = {
   time: "09:41",
   workspace: "Desktop",
   workspaceColor: "var(--green)",
+  changes: {
+    count: 9,
+    additions: 9,
+    removals: 0,
+    files: [
+      { name: "shot-01.png", action: "已移动", detail: "Desktop\\shot-01.png → Desktop\\截图\\2026-09\\shot-01.png" },
+      { name: "shot-02.png", action: "已移动", detail: "Desktop\\shot-02.png → Desktop\\截图\\2026-09\\shot-02.png" },
+      { name: "shot-03.png", action: "已移动", detail: "Desktop\\shot-03.png → Desktop\\截图\\2026-09\\shot-03.png" },
+      { name: "shot-04.png", action: "已移动" },
+      { name: "shot-05.png", action: "已移动" },
+      { name: "shot-06.png", action: "已移动" },
+      { name: "shot-07.png", action: "已移动" },
+      { name: "shot-08.png", action: "已移动" },
+      { name: "shot-09.png", action: "已移动" },
+    ],
+  },
+  elapsed: "已工作 2 分 41 秒",
+  permissionLabel: "标准门控",
+  modeLabel: "干活模式",
   messages: [
     { role: "user", id: "m-a1", text: "把桌面上的截图按日期归档，重名的不动。" },
     {
@@ -255,6 +359,8 @@ const SESSION_MINUTES: HarnessSession = {
   time: "10:18",
   workspace: "artifacts",
   workspaceColor: "var(--accent)",
+  permissionLabel: "标准门控",
+  modeLabel: "干活模式",
   messages: [
     { role: "user", id: "m-b1", text: "把会议纪要里的待办抽出来，按人分好。" },
     {
@@ -287,7 +393,8 @@ const SESSION_MINUTES: HarnessSession = {
   ],
 };
 
-/** 会话三：昨天，已拒绝 - denied 工具 + 门控解释。 */
+/** 会话三：昨天，已拒绝 - denied 工具 + 门控解释；带更改摘要条（+0 -2，
+    owner 点名让 failed 会话也演示这条形态）。 */
 const SESSION_CLEANUP: HarnessSession = {
   id: "sess-cleanup",
   title: "磁盘清理脚本",
@@ -295,6 +402,17 @@ const SESSION_CLEANUP: HarnessSession = {
   time: "昨天 16:05",
   workspace: "Temp",
   workspaceColor: "var(--red)",
+  changes: {
+    count: 2,
+    additions: 0,
+    removals: 2,
+    files: [
+      { name: "setup-verbose.log", action: "已删除", detail: "C:\\Users\\swq\\AppData\\Local\\Temp\\setup-verbose.log" },
+      { name: "shader-cache.bin", action: "已删除" },
+    ],
+  },
+  permissionLabel: "逐条批准",
+  modeLabel: "干活模式",
   messages: [
     { role: "user", id: "m-c1", text: "运行 clean.ps1 清理 C:\\Windows\\Temp。" },
     {
@@ -321,6 +439,8 @@ const SESSION_WEEKLY: HarnessSession = {
   time: "09-18",
   workspace: "reports",
   workspaceColor: "var(--orange)",
+  permissionLabel: "标准门控",
+  modeLabel: "干活模式",
   messages: [
     { role: "user", id: "m-d1", text: "把本周任务台账汇总成周报草稿。" },
     {
@@ -375,6 +495,30 @@ export const HISTORY_GROUPS: HarnessSidebarGroup[] = [
   { label: "近 7 天", rows: [toSidebarRow(SESSION_CLEANUP)] },
   { label: "更早", rows: [toSidebarRow(SESSION_WEEKLY)] },
 ];
+
+/* ---------------------------------------------------------------------------
+   Qoder 三段式的两段新数据（自动化 / 工作区）；「最近任务」段复用上面的
+   HISTORY_GROUPS，解剖不变。
+   --------------------------------------------------------------------------- */
+
+/** 侧栏自动化段两行（owner 截图：蓝点=运行中、灰点=空闲）。 */
+export const AUTOMATIONS: HarnessAutomation[] = [
+  { id: "auto-watchdog", name: "前端会话看门狗", state: "running" },
+  { id: "auto-model", name: "模型下载", state: "idle" },
+];
+
+/** 工作区段的嵌套会话四条（owner 截图状态词汇 done/failed/streaming）。
+    id 即 SESSIONS 的 id：点击直接打开对应会话；sess-cleanup 的会话状态是
+    denied（已拒绝），落到嵌套行的红圈叹号位上就是 failed。 */
+export const PROJECT_CHILDREN: HarnessProjectChild[] = [
+  { id: "sess-minutes", title: "会议纪要待办", status: "streaming" },
+  { id: "sess-cleanup", title: "磁盘清理脚本", status: "failed" },
+  { id: "sess-archive", title: "归档桌面截图", status: "done" },
+  { id: "sess-weekly", title: "周报生成", status: "done" },
+];
+
+/** 工作区段的项目行。 */
+export const PROJECT: HarnessProject = { name: "Wisp", children: PROJECT_CHILDREN };
 
 /** 新任务页的一排快捷指令 chips。 */
 export const QUICK_COMMANDS: HarnessQuickCommand[] = [

@@ -1,57 +1,77 @@
 /* ============================================================================
-   HarnessSidebar - the library's Sidebar Nav, adapted to props (owner
-   2026-09-26: "左边侧边栏人家也有对应的组件，你非要自己搞" - this replaces the
-   hand-rolled sidebar).
+   HarnessSidebar - the library's Sidebar Nav, adapted to props, body now in
+   Qoder's three-section form (owner 2026-09-26, second form ruling from the
+   Qoder screenshot: 分组段头 自动化 / 工作区 / 最近任务, muted small text).
    ----------------------------------------------------------------------------
    Derived from TurboKach/ai-native-react-components components/sidebar-nav.tsx
    (MIT, Copyright (c) 2026 Turbo, upstream commit 05dab2d2).
 
    Local changes, each load-bearing:
-     - props-driven: workspace / history groups / usage / callbacks all arrive
-       from the parent; upstream's hardcoded Creamery demo data is gone.
-     - the flat "Workspace/Objects" sections become our collapsible history
-       groups (今天 / 近 7 天 / 更早) - the demo README's "Collapsible ...
-       chat navigation" row, with rotating chevrons.
-     - items are session rows (label + time meta, no leading icon) and the
-       accent action is 新建任务; the settings/usage/theme block joins the
-       bottom under a hairline.
+     - props-driven: workspace / automations / project / history groups /
+       usage / callbacks all arrive from the parent; upstream's hardcoded
+       Creamery demo data is gone.
+     - PROPS CONTRACT lives in src/fixtures/harness-app.ts (HarnessSidebarProps
+       + HarnessWorkspaceInfo); this file imports it instead of re-declaring -
+       same one-contract-page rule main.tsx follows. HarnessWorkspaceInfo is
+       re-exported here so the old import path keeps working.
+     - Qoder three-section body (2026-09-26): below the preserved top anatomy,
+       the nav is three sections with muted small headers:
+         自动化   - status-dot rows (accent dot = running, ink-3 dot = idle)
+                    with a hover-revealed gear slot on the right edge;
+         工作区   - a project row (chevron + Folder icon + name, collapsible)
+                    over nested session children (indented, leading status
+                    icon: red CircleAlert = failed, accent dot = streaming,
+                    nothing = done);
+         最近任务 - the previous history groups (今天 / 近 7 天 / 更早),
+                    collapsible chevrons and session rows unchanged.
+     - the MEASURED gliding hover highlight (one bg-hover box easing between
+       rows, useLayoutEffect over hovered ?? active) now measures EVERY row
+       kind - automation rows, the project row, children, history rows - via
+       keyed refs ("auto:*" / "project" / "child:*" / plain session ids).
+     - what survives verbatim from the upstream anatomy: the workspace
+       monogram row, the quick-search field with the "/" kbd chip, the accent
+       action's plus-badge circle, the gliding highlight mechanics, the
+       count-badge pop-in curve, the hover-revealed affordance pattern, and
+       the bottom usage/settings/theme block under a hairline.
      - icons are lucide-react; upstream's inline SVG icon map is dropped.
      - TS6 strict interfaces; runtime statements otherwise kept.
 
-   What survives verbatim: the workspace monogram row, the quick-search field
-   with the "/" kbd chip, the accent action's plus-badge circle, the MEASURED
-   gliding hover highlight (one bg-hover box that eases between rows, driven
-   by useLayoutEffect over hovered ?? active), the count-badge pop-in curve
-   for badges, and the hover-revealed plus affordance pattern.
+   Colours: token utilities only, zero literals; no emoji.
    ============================================================================ */
 
 import { useLayoutEffect, useRef, useState } from "react";
-import { ChevronDown, Moon, Plus, Search, Settings, Sun } from "lucide-react";
+import { ChevronDown, CircleAlert, Folder, Moon, Plus, Search, Settings, Sun } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { ValuePill } from "@/components/ai-native/value-pill";
-import type { HarnessSidebarGroup, HarnessUsagePill } from "@/fixtures/harness-app";
+import type {
+  HarnessProjectChildStatus,
+  HarnessSidebarProps,
+  HarnessWorkspaceInfo,
+} from "@/fixtures/harness-app";
 
-export interface HarnessWorkspaceInfo {
-  /** 短名（monogram 与标题行）。 */
-  name: string;
-  /** 完整路径（副标题行）。 */
-  path: string;
+export type { HarnessWorkspaceInfo };
+
+/** 工作区段嵌套会话行的行首状态图标：红圈叹号=failed（已拒绝）、蓝点=
+    streaming（进行中）、无=done（已完成，占位空槽保持对齐）。 */
+function ChildStatusIcon({ status }: { status: HarnessProjectChildStatus }) {
+  return (
+    <span className="flex w-3.5 shrink-0 justify-center">
+      {status === "failed" ? (
+        <CircleAlert aria-hidden="true" className="shrink-0 text-red" size={12} strokeWidth={2} />
+      ) : status === "streaming" ? (
+        <span aria-hidden="true" className="block size-1.5 rounded-full bg-accent" />
+      ) : null}
+    </span>
+  );
 }
 
-export interface HarnessSidebarProps {
-  workspace: HarnessWorkspaceInfo;
-  groups: readonly HarnessSidebarGroup[];
-  activeSessionId: string | null;
-  onSelectSession: (id: string) => void;
-  onNewTask: () => void;
-  searchValue: string;
-  onSearchChange: (value: string) => void;
-  searchPlaceholder?: string;
-  usage: readonly HarnessUsagePill[];
-  onOpenSettings: () => void;
-  theme: "light" | "dark";
-  onToggleTheme: () => void;
-  className?: string;
+/** 三段的分组段头：muted 小字（Qoder 形态），不折叠。 */
+function SectionHeader({ label }: { label: string }) {
+  return (
+    <div className="px-2 pb-1 pt-1.5 text-[10.5px] font-medium tracking-[0.08em] text-ink-3">
+      {label}
+    </div>
+  );
 }
 
 export function HarnessSidebar({
@@ -67,15 +87,24 @@ export function HarnessSidebar({
   onOpenSettings,
   theme,
   onToggleTheme,
+  automations,
+  onOpenAutomation,
+  project,
   className,
 }: HarnessSidebarProps) {
   const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(new Set());
+  const [projectOpen, setProjectOpen] = useState(true);
   const [hovered, setHovered] = useState<string | null>(null);
   const [box, setBox] = useState<{ top: number; height: number } | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
-  const itemRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const itemRefs = useRef<Record<string, HTMLButtonElement | HTMLDivElement | null>>({});
 
-  // 滑翔高亮：一枚 bg-hover 方块量测着落到 hovered ?? active 行（上游逐字）。
+  const setItemRef = (key: string) => (el: HTMLButtonElement | HTMLDivElement | null) => {
+    itemRefs.current[key] = el;
+  };
+
+  // 滑翔高亮：一枚 bg-hover 方块量测着落到 hovered ?? active 行（上游逐字，
+  // 键域扩到三段全部行种）。行被折叠隐藏时量测落空，方块淡出。
   useLayoutEffect(() => {
     const container = navRef.current;
     const target = itemRefs.current[hovered ?? activeSessionId ?? ""];
@@ -86,7 +115,7 @@ export function HarnessSidebar({
     const containerRect = container.getBoundingClientRect();
     const targetRect = target.getBoundingClientRect();
     setBox({ top: targetRect.top - containerRect.top, height: targetRect.height });
-  }, [hovered, activeSessionId, groups, collapsed]);
+  }, [hovered, activeSessionId, groups, collapsed, projectOpen, automations, project]);
 
   function toggleGroup(title: string) {
     setCollapsed((current) => {
@@ -151,7 +180,7 @@ export function HarnessSidebar({
           </span>
         </button>
 
-        {/* items：滑翔高亮 + 可折叠分组 + 会话行 */}
+        {/* 三段式主体：滑翔高亮覆盖全部行种 */}
         <div ref={navRef} className="relative flex flex-col gap-2" onMouseLeave={() => setHovered(null)}>
           <span
             aria-hidden="true"
@@ -164,60 +193,148 @@ export function HarnessSidebar({
                 "top 220ms cubic-bezier(0.23,1,0.32,1), height 220ms cubic-bezier(0.23,1,0.32,1), opacity 150ms ease",
             }}
           />
-          {groups.map((group) => {
-            const isCollapsed = collapsed.has(group.label);
-            return (
-              <div key={group.label}>
-                <button
-                  type="button"
-                  onClick={() => toggleGroup(group.label)}
-                  className="group flex w-full items-center gap-1 px-2 pb-1 pt-1 text-[10.5px] font-medium uppercase tracking-[0.08em] text-ink-3"
+
+          {/* ── 自动化段：状态圆点行 + 右缘齿轮位（hover 显现） ── */}
+          <div>
+            <SectionHeader label="自动化" />
+            <div className="flex flex-col gap-px">
+              {automations.map((automation) => (
+                <div
+                  key={automation.id}
+                  ref={setItemRef(`auto:${automation.id}`)}
+                  onMouseEnter={() => setHovered(`auto:${automation.id}`)}
+                  className="group relative z-10 flex w-full items-center gap-2 rounded-[7px] px-2 py-1.5"
                 >
-                  <ChevronDown
+                  <span
                     aria-hidden="true"
-                    className={cn("transition-transform duration-150", isCollapsed && "-rotate-90")}
-                    size={10}
-                    strokeWidth={2.2}
+                    className={cn(
+                      "size-1.5 shrink-0 rounded-full",
+                      automation.state === "running" ? "bg-accent" : "bg-ink-3",
+                    )}
                   />
-                  <span className="min-w-0 flex-1 text-left">{group.label}</span>
-                </button>
-                {!isCollapsed && (
-                  <div className="flex flex-col gap-px">
-                    {group.rows.map((row) => {
-                      const isActive = row.id === activeSessionId;
-                      return (
-                        <button
-                          key={row.id}
-                          ref={(el) => {
-                            itemRefs.current[row.id] = el;
-                          }}
-                          type="button"
-                          aria-current={isActive ? "page" : undefined}
-                          onMouseEnter={() => setHovered(row.id)}
-                          onFocus={() => setHovered(row.id)}
-                          onBlur={() => setHovered(null)}
-                          onClick={() => onSelectSession(row.id)}
-                          className={cn(
-                            "relative z-10 flex w-full items-center gap-2 rounded-[7px] px-2 py-1.5 text-left transition-[color,transform] duration-150 active:scale-[0.96]",
-                            isActive ? "font-medium text-ink" : "text-ink-2",
-                          )}
-                        >
-                          <span className="min-w-0 flex-1 truncate text-[13px]">{row.title}</span>
-                          {row.badge ? (
-                            <span className="shrink-0 text-[10.5px] text-ink-3">{row.badge.label}</span>
-                          ) : null}
-                          <span className="shrink-0 text-[10.5px] tabular-nums text-ink-3">{row.time}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <span className="min-w-0 flex-1 truncate text-[13px] text-ink-2">
+                    {automation.name}
+                  </span>
+                  <button
+                    type="button"
+                    aria-label={`打开 ${automation.name} 设置`}
+                    className="flex size-5 shrink-0 items-center justify-center rounded-chip text-ink-3 opacity-0 transition-[opacity,background-color,color] duration-150 hover:bg-hover hover:text-ink focus-visible:opacity-100 group-hover:opacity-100"
+                    onClick={() => onOpenAutomation?.(automation.id)}
+                  >
+                    <Settings aria-hidden="true" size={12} strokeWidth={1.8} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── 工作区段：项目行（可折叠）+ 嵌套会话行（缩进 + 行首状态图标） ── */}
+          <div>
+            <SectionHeader label="工作区" />
+            <button
+              ref={setItemRef("project")}
+              type="button"
+              aria-expanded={projectOpen}
+              onMouseEnter={() => setHovered("project")}
+              onClick={() => setProjectOpen((current) => !current)}
+              className="relative z-10 flex w-full items-center gap-1.5 rounded-[7px] px-2 py-1.5 text-left transition-[color,transform] duration-150 active:scale-[0.96]"
+            >
+              <ChevronDown
+                aria-hidden="true"
+                className={cn(
+                  "shrink-0 text-ink-3 transition-transform duration-150",
+                  !projectOpen && "-rotate-90",
                 )}
+                size={10}
+                strokeWidth={2.2}
+              />
+              <Folder aria-hidden="true" className="shrink-0 text-ink-2" size={13} strokeWidth={1.8} />
+              <span className="min-w-0 flex-1 truncate text-[13px] text-ink-2">{project.name}</span>
+            </button>
+            {projectOpen && (
+              <div className="flex flex-col gap-px">
+                {project.children.map((child) => {
+                  const isActive = child.id === activeSessionId;
+                  return (
+                    <button
+                      key={child.id}
+                      ref={setItemRef(`child:${child.id}`)}
+                      type="button"
+                      aria-current={isActive ? "page" : undefined}
+                      onMouseEnter={() => setHovered(`child:${child.id}`)}
+                      onFocus={() => setHovered(`child:${child.id}`)}
+                      onBlur={() => setHovered(null)}
+                      onClick={() => onSelectSession(child.id)}
+                      className={cn(
+                        "relative z-10 flex w-full items-center gap-2 rounded-[7px] py-1.5 pl-6 pr-2 text-left transition-[color,transform] duration-150 active:scale-[0.96]",
+                        isActive ? "font-medium text-ink" : "text-ink-2",
+                      )}
+                    >
+                      <ChildStatusIcon status={child.status} />
+                      <span className="min-w-0 flex-1 truncate text-[13px]">{child.title}</span>
+                    </button>
+                  );
+                })}
               </div>
-            );
-          })}
-          {groups.every((g) => g.rows.length === 0) && (
-            <div className="px-2 py-3 text-[12px] text-ink-3">没有匹配的会话</div>
-          )}
+            )}
+          </div>
+
+          {/* ── 最近任务段：现会话历史（分组折叠 / 会话行 / 滑翔解剖不变） ── */}
+          <div>
+            <SectionHeader label="最近任务" />
+            {groups.map((group) => {
+              const isCollapsed = collapsed.has(group.label);
+              return (
+                <div key={group.label}>
+                  <button
+                    type="button"
+                    onClick={() => toggleGroup(group.label)}
+                    className="group flex w-full items-center gap-1 px-2 pb-1 pt-1 text-[10.5px] font-medium uppercase tracking-[0.08em] text-ink-3"
+                  >
+                    <ChevronDown
+                      aria-hidden="true"
+                      className={cn("transition-transform duration-150", isCollapsed && "-rotate-90")}
+                      size={10}
+                      strokeWidth={2.2}
+                    />
+                    <span className="min-w-0 flex-1 text-left">{group.label}</span>
+                  </button>
+                  {!isCollapsed && (
+                    <div className="flex flex-col gap-px">
+                      {group.rows.map((row) => {
+                        const isActive = row.id === activeSessionId;
+                        return (
+                          <button
+                            key={row.id}
+                            ref={setItemRef(row.id)}
+                            type="button"
+                            aria-current={isActive ? "page" : undefined}
+                            onMouseEnter={() => setHovered(row.id)}
+                            onFocus={() => setHovered(row.id)}
+                            onBlur={() => setHovered(null)}
+                            onClick={() => onSelectSession(row.id)}
+                            className={cn(
+                              "relative z-10 flex w-full items-center gap-2 rounded-[7px] px-2 py-1.5 text-left transition-[color,transform] duration-150 active:scale-[0.96]",
+                              isActive ? "font-medium text-ink" : "text-ink-2",
+                            )}
+                          >
+                            <span className="min-w-0 flex-1 truncate text-[13px]">{row.title}</span>
+                            {row.badge ? (
+                              <span className="shrink-0 text-[10.5px] text-ink-3">{row.badge.label}</span>
+                            ) : null}
+                            <span className="shrink-0 text-[10.5px] tabular-nums text-ink-3">{row.time}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+            {groups.every((g) => g.rows.length === 0) && (
+              <div className="px-2 py-3 text-[12px] text-ink-3">没有匹配的会话</div>
+            )}
+          </div>
         </div>
       </div>
 
