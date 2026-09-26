@@ -388,7 +388,8 @@ function ChangesBar({ changes }: { changes: HarnessChanges }) {
 
   return (
     <div style={{ animation: "fade-up 300ms var(--ease-out-strong) both" }}>
-      {/* 胶囊：汇总行 */}
+      {/* 胶囊：汇总行 + 审阅钮（ZCode 的 已编辑 5 个文件…审阅 形态） */}
+      <div className="flex items-center gap-2">
       <button
         type="button"
         aria-expanded={open}
@@ -406,6 +407,14 @@ function ChangesBar({ changes }: { changes: HarnessChanges }) {
           className={cn("text-ink-3 transition-transform duration-150", open && "rotate-180")}
         />
       </button>
+      <button
+        type="button"
+        className="shrink-0 rounded-control border border-line bg-surface px-2.5 py-1.5 text-[11.5px]
+          font-medium text-ink-2 transition-colors duration-150 hover:bg-hover hover:text-ink"
+      >
+        审阅
+      </button>
+      </div>
 
       {/* 文件清单卡 */}
       {open && (
@@ -540,6 +549,31 @@ function AssistantBlock({ msg }: { msg: HarnessAssistantMessage }) {
           streaming={motionOff() ? false : Boolean(msg.streaming)}
           text={msg.text}
         />
+      ) : null}
+      {msg.backgroundTools && msg.backgroundTools.length > 0 ? (
+        <div className="flex flex-col gap-1">
+          {msg.backgroundTools.map((n, i) => (
+            <div className="flex items-center gap-2 text-[11.5px] text-ink-3" key={i}>
+              <span className="flex size-4 items-center justify-center rounded-[4px] border border-line text-[9px] tabular-nums">{i + 1}</span>
+              执行工具 {n} 次
+            </div>
+          ))}
+        </div>
+      ) : null}
+      {msg.subagents && msg.subagents.length > 0 ? (
+        <div className="flex flex-col gap-1">
+          {msg.subagents.map((s) => (
+            <div className="flex items-center gap-2 text-[11.5px]" key={s.id}>
+              <span
+                aria-hidden="true"
+                className="size-4 shrink-0 rounded-full"
+                style={{ background: "conic-gradient(var(--accent), var(--green), var(--orange), var(--accent))" }}
+              />
+              <span className="min-w-0 flex-1 truncate text-ink-2">{s.name}</span>
+              <span className="shrink-0 tabular-nums text-ink-3">{s.duration}</span>
+            </div>
+          ))}
+        </div>
       ) : null}
       {msg.costLine ? (
         <p className="font-mono text-[11px] tabular-nums text-ink-3">{msg.costLine}</p>

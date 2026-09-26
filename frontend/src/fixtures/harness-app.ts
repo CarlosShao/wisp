@@ -79,12 +79,22 @@ export interface HarnessAssistantMessage {
   /** 正文内联来源 chip（可选）。 */
   sources?: StreamingSource[];
   /** 成本行（可选）：C23 口径的 mono tabular 纯文本，如 "tokens 3,420 · ¥0.08"。 */
+  /** 后台任务结果行（ZCode 会话流的 执行工具 N 次 形态）。 */
+  backgroundTools?: number[];
+  /** 子智能体内联行（渐变头像 + 名 + 时长）。 */
+  subagents?: HarnessSubagentRow[];
   costLine?: string;
 }
 
 export type HarnessMessage = HarnessUserMessage | HarnessAssistantMessage;
 
 /** 更改摘要条的一行文件（ZCode「Organized N files」卡里的一行）。 */
+export interface HarnessSubagentRow {
+  id: string;
+  name: string;
+  duration: string;
+}
+
 export interface HarnessChangeFile {
   /** 文件名（mono 渲染）。 */
   name: string;
@@ -346,6 +356,10 @@ const SESSION_ARCHIVE: HarnessSession = {
       ],
       text: "已归档 9 张截图到 Desktop\\截图\\2026-09；3 张疑似重复未直接删除，已移到「待确认」，等你逐条批准。",
       sources: [{ label: "Desktop\\截图" }],
+      backgroundTools: [10, 8],
+      subagents: [
+        { id: "sa-1", name: "general-purpose · 归档重检", duration: "795.1s" },
+      ],
       costLine: "tokens 3,420 · ¥0.08 · 6.8s",
     },
   ],
