@@ -47,12 +47,15 @@
    ============================================================================ */
 
 import {
+  Check,
   Command,
   FileDown,
   LoaderCircle,
   Settings,
   SquarePlus,
+  X,
 } from "lucide-react";
+import { useState } from "react";
 import { L2ApprovalCard } from "@/components/l2-approval-card";
 import { StatusPill } from "@/components/ai-native/status-pill";
 import { ValuePill } from "@/components/ai-native/value-pill";
@@ -79,6 +82,21 @@ export interface RightRailTaskRow {
   progress: number;
 }
 
+/** One run row of the 任务运行 directory (owner 2026-09-26: right rail should
+    mirror real harness tools - ZCode's 子智能体目录 shape: status groups,
+    durations, failure lines, expandable rows). */
+export interface RightRailRunRow {
+  id: string;
+  name: string;
+  status: "running" | "done" | "failed";
+  /** Wall-clock label like "2 分" / "38 分" - display copy, not a countdown. */
+  duration?: string;
+  /** Expanded detail line (a run's outcome summary). */
+  summary?: string;
+  /** Failed runs carry the reason in red. */
+  error?: string;
+}
+
 /** The 今日用量 numbers. Strings stay verbatim (they are display copy). */
 export interface RightRailUsage {
   /** Token count of today, e.g. "12,480". */
@@ -95,7 +113,10 @@ export interface RightRailProps {
   onViewAllApprovals?: () => void;
   approvalCard?: ApprovalCardView;
   onApprovalIntent?: (correlationId: string, outcome: ApprovalOutcome) => void;
-  tasks: readonly RightRailTaskRow[];
+  /** Deprecated demo field kept for the assembler's old wiring; the 任务运行
+      directory below is runs-driven. */
+  tasks?: readonly RightRailTaskRow[];
+  runs: readonly RightRailRunRow[];
   usage: RightRailUsage;
   onNewTask?: () => void;
   onOpenPalette?: () => void;
@@ -172,7 +193,7 @@ export function RightRail({
   onViewAllApprovals,
   approvalCard,
   onApprovalIntent,
-  tasks,
+  runs,
   usage,
   onNewTask,
   onOpenPalette,
@@ -183,6 +204,10 @@ export function RightRail({
   const overBudget = usage.budgetPct >= 100;
   const nearBudget = usage.budgetPct >= 80;
   const fillCls = overBudget ? "bg-red" : nearBudget ? "bg-warn" : "bg-accent";
+  // 任务运行目录：点行展开详情（ZCode 子智能体目录的形态）。
+  const [expandedRun, setExpandedRun] = useState<string | null>(null);
+  const runningRuns = runs.filter((r) => r.status === "running");
+  const finishedRuns = runs.filter((r) => r.status !== "running");
 
   return (
     <aside
@@ -236,34 +261,83 @@ export function RightRail({
         )}
       </section>
 
-      {/* 进行中任务 ---------------------------------------------------------- */}
-      <section className="flex flex-col gap-2 border-b border-line px-4 py-4" aria-label="进行中任务">
+      {/* 任务运行 ------------------------------------------------------------
+          形态对照真实 harness（ZCode 子智能体目录）：运行中/已结束两组、状态
+          图标、时长右对齐、失败行红字原因、点行展开详情。 */}
+      <section className="flex flex-col gap-2 border-b border-line px-4 py-4" aria-label="任务运行">
         <RailSectionHead
-          title="进行中任务"
+          title="任务运行"
           trailing={
-            tasks.length > 0 ? (
-              <span className="text-[11px] tabular-nums text-ink-3">{tasks.length}</span>
-            ) : undefined
+            <span className="text-[11px] tabular-nums text-ink-3">
+              运行中 {runningRuns.length} · 已结束 {finishedRuns.length}
+            </span>
           }
         />
-        {tasks.length === 0 ? (
-          <p className="text-[11.5px] text-ink-3">没有进行中的任务</p>
+        {runs.length === 0 ? (
+          <p className="text-[11.5px] text-ink-3">没有任务运行记录</p>
         ) : (
-          tasks.map((task) => (
-            <div className="flex items-center gap-2" key={task.id}>
-              <LoaderCircle
-                aria-hidden="true"
-                className="size-3.5 shrink-0 text-accent-ink"
-                style={{ animation: "spin 1.1s linear infinite" }}
-              />
-              <span className="min-w-0 flex-1 truncate font-mono text-[11.5px] text-ink" title={task.name}>
-                {task.name}
-              </span>
-              <span className="shrink-0 text-[11px] tabular-nums text-ink-3">
-                {Math.round(task.progress * 100)}%
-              </span>
-            </div>
-          ))
+          <div className="flex flex-col gap-1">
+            {runningRuns.map((run) => (
+              <button
+                className="flex w-full items-center gap-2 rounded-control px-1.5 py-1.5 text-left transition-colors duration-100 hover:bg-hover"
+                key={run.id}
+                onClick={() => setExpandedRun((current) => (current === run.id ? null : run.id))}
+                type="button"
+              >
+                <LoaderCircle
+                  aria-hidden="true"
+                  className="size-3.5 shrink-0 text-accent-ink"
+                  style={{ animation: "spin 1.1s linear infinite" }}
+                />
+                <span className="min-w-0 flex-1 truncate font-mono text-[11.5px] text-ink" title={run.name}>
+                  {run.name}
+                </span>
+                <span className="shrink-0 text-[10.5px] tabular-nums text-ink-3">{run.duration}</span>
+              </button>
+            ))}
+            {finishedRuns.map((run) => {
+              const failed = run.status === "failed";
+              const expanded = expandedRun === run.id;
+              return (
+                <button
+                  className="flex w-full flex-col items-stretch gap-0.5 rounded-control px-1.5 py-1.5 text-left transition-colors duration-100 hover:bg-hover"
+                  key={run.id}
+                  onClick={() => setExpandedRun((current) => (current === run.id ? null : run.id))}
+                  type="button"
+                >
+                  <span className="flex items-center gap-2">
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        "flex size-3.5 shrink-0 items-center justify-center rounded-full",
+                        failed ? "bg-red-tint text-red" : "bg-green-tint text-green",
+                      )}
+                    >
+                      {failed ? <X size={9} strokeWidth={3} /> : <Check size={9} strokeWidth={3} />}
+                    </span>
+                    <span
+                      className={cn(
+                        "min-w-0 flex-1 truncate font-mono text-[11.5px]",
+                        failed ? "text-red" : "text-ink",
+                      )}
+                      title={run.name}
+                    >
+                      {run.name}
+                    </span>
+                    <span className="shrink-0 text-[10.5px] tabular-nums text-ink-3">{run.duration}</span>
+                  </span>
+                  {failed && run.error ? (
+                    <span className="truncate pl-5.5 text-[10.5px] leading-relaxed text-red" title={run.error}>
+                      {run.error}
+                    </span>
+                  ) : null}
+                  {expanded && run.summary ? (
+                    <span className="pl-5.5 text-[10.5px] leading-relaxed text-ink-3">{run.summary}</span>
+                  ) : null}
+                </button>
+              );
+            })}
+          </div>
         )}
       </section>
 
@@ -342,6 +416,26 @@ export const RB_RIGHT_RAIL: RightRailProps = {
   tasks: [
     { id: "rb-task-1", name: "归档桌面截图", progress: 0.66 },
     { id: "rb-task-2", name: "下载模型文件", progress: 0.25 },
+  ],
+  runs: [
+    { id: "rb-run-1", name: "归档桌面截图", status: "running" as const, duration: "2 分" },
+    { id: "rb-run-2", name: "下载模型文件", status: "running" as const, duration: "1 分" },
+    {
+      id: "rb-run-3",
+      name: "会议纪要待办",
+      status: "done" as const,
+      duration: "5 分",
+      summary: "抽出待办 3 项，已按人汇总写入台账",
+    },
+    { id: "rb-run-4", name: "周报生成", status: "done" as const, duration: "12 分", summary: "周报已落 Desktop\\周报" },
+    {
+      id: "rb-run-5",
+      name: "磁盘清理脚本",
+      status: "failed" as const,
+      duration: "3 分",
+      error: "R6 命中：argv 含管道与重定向，需逐条确认",
+      summary: "已改为移入「待确认」目录",
+    },
   ],
   usage: { tokens: "12,480", spend: "¥0.31", budgetPct: 117 },
 };

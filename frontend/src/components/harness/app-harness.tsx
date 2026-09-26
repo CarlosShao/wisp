@@ -108,6 +108,7 @@ export function AppHarness() {
         onSearchChange={setSearch}
         theme={dark ? "dark" : "light"}
         usage={WEEK_USAGE}
+        workspace={{ name: "Wisp", path: WORKSPACE_NOW }}
       />
 
       <div className="flex min-w-0 flex-1 flex-col">
@@ -178,7 +179,7 @@ export function AppHarness() {
               onViewAllApprovals={() => undefined}
               pendingCount={SHOWCASE_APPROVALS.length}
               queueRows={queueRows}
-              tasks={RB_RIGHT_RAIL.tasks}
+              runs={RB_RIGHT_RAIL.runs}
               usage={RB_RIGHT_RAIL.usage}
             />
           )}
