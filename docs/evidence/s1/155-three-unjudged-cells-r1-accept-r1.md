@@ -69,3 +69,49 @@
 1. 它 §1 末段写改前那条痕是"**九枚键**的字面量参数…，**第八枚就是最后一枚**"——同一句里自相矛盾。现量：键值对 **8 枚**（`tokens_before … history_changed`），
    那条 `Info` 里被引号包住的 token 共 **9 枚**（第 9 枚是消息串 `"agent: history compressed"`）。**句子想说的是"没有 task 位"，那部分是对的**（本程 §3 的 ext-A 第一行读数互指）。
 2. 它 §1 表里"改前那版全文 `ctx` 只有 5 处（`:39/:128/:152/:197/:201`）"——本程逐字复到，**5 枚全等**。
+
+---
+
+## 2. 格②（票面 AC#1② ／ 153 的 AC#2 问②）复判：唯一持有者是谁？四句"不算"逐句判
+
+**它的答复**：唯一持有者＝`Loop.run` 的参数 `taskID`（它写 `loop.go:339`）；组合根不是。同帧另有四枚副本，它逐枚给了一句"为什么不算另一个持有者"。
+
+**先钉它引用的行号（按它的锚点取，派单坑①）**——`git show 5365cb22:internal/agent/loop.go` 现读：
+`:239 comp: NewCompressor(b, opt.Summarizer, WithLogger(opt.Logger))`、`:321 func (l *Loop) RunAsync(`、`:322 id := newTaskID()`、
+`:332 func (l *Loop) Run(`、`:333 return l.run(ctx, newTaskID(), input)`、`:339 func (l *Loop) run(ctx context.Context, taskID, input string) Result`、
+`:396 nh, rep, err := l.comp.Compress(ctx, hist)`。⇒ **它表里那七枚行号逐枚复到，无一枚错号**（在 HEAD 上会漂，在它自己的锚点上对）。
+
+**本程换的尺＝同一发编译器探针的第二半**（`probes/155-accept/20-compiler-ruler.py`，插在 `:396` 那一发之前）：
+
+| 那一发 | 改前 `5365cb22` | 改后 `6de3d1c5`（插点 `:399`） |
+|---|---|---|
+| `_ = taskID` | **BUILD-OK** ⇒ 参数在压缩那一刻的作用域里 | **BUILD-OK** |
+| `_ = l.taskID` | `l.taskID undefined (type *Loop has no field or method taskID)` | 同一枚错 |
+| `_ = root.ID` | **BUILD-OK** | **BUILD-OK** |
+| `_ = res.TaskID` | **BUILD-OK** | **BUILD-OK** |
+| `_ = j.taskID` | **BUILD-OK** | **BUILD-OK** |
+
+**组合根那一半（它说"那一发不带 id、cmd 侧全是事后读"）**：本程不复算它的 grep，换一枚它没用的尺——
+`git grep -n 'RunAsync' 5365cb22 -- cmd` **两跑皆 rc=1、0 命中**（全仓非测试命中只有 `loop.go:320` 注释与 `:321` 定义本身）。
+⇒ 宿主在锚点那版**根本不经过异步那条腿**，所以 `RunningTask.ID` 今天在生产上没有活体；这一发把它的"同步腿根本不经过它"从**断言**升成**读数**。判定：**〔成立〕**，且比它自己给的更硬。
+
+**四句"不算"逐句判（派单要的就是这一列）**：
+
+| 副本 | 它给的理由 | 本程的尺 | 判 |
+|---|---|---|---|
+| `Root.ID`（`loop.go:345`） | "`NewRootFrom` 内部只 `context.WithCancel`，没有 `WithValue` ⇒ id 没进 ctx" | `git grep -n 'WithValue' 5365cb22 -- internal/observe` **两跑 rc=1、0 命中**；`Root struct{ID;Ctx;Cancel;…}` 现读；§1 那发 `_ = traceTaskID(ctx)` 在改前编不过 | **不是打发**：理由独立复到。但"不算另一个持有者"只在"**能从 `Compress` 里摸到**"这个口径下成立——它确实是同一帧的第二枚持有者（本程 `_ = root.ID` 在 `:396` 之前编得过） |
+| `l.current`（`loop.go:353`） | "只有 3 处**读点**：`:348` 注释、`:523`" | `git grep -nE '\.current\b' 5365cb22 -- internal/agent/loop.go` ＝ **3 枚**：`:348` 注释、`:523` 读、`:987` **写**；字段声明 `:189 current *observe.Root` 是第 4 枚提及 | **数与列不吻合**：宣称"3 处读点"却只列 2 枚，且那 3 枚里含一枚写点。**结论仍成立**——`Compressor` 三枚字段（`b/sum/lg`）、六枚方法签名无一枚接 `Loop`/`Root`（现读），够不着 |
+| `Result.TaskID`（`loop.go:369`） | "那是**出口**，且**晚于压缩那一发**" | `:369` vs `:396`：同一枚函数体、同一条 `for` 之前 ⇒ **早 27 行** | **打发，而且打错**：赋值时刻早于压缩。"出口"那半句对（它是返回值的载体），"**晚于压缩**"那半句盘上不成立 |
+| `RunningTask.ID`（`loop.go:323`） | "它在 `reg.Spawn` 的闭包外，同步腿根本不经过它" | 上面那发 `RunAsync @cmd` ＝ 0 命中两跑 | **不是打发，但它没给凭据**：结论对，理由本程替它钉成了读数 |
+
+**它漏报的两枚同帧持有者**（要登记的就是这一笔）：
+① 日志那一发 `j := newTaskJournal(l.opt.Journal, taskID, taskID)`（`loop.go:356`；`taskJournal` 有字段 `taskID`，`journal.go:52/:61` 现读）——本程 `_ = j.taskID` 编译**过**；
+② 宿主审批回调 `l.opt.AdmitTask(taskID)`（`loop.go:362`；`Options.AdmitTask func(taskID string) (revoke func())` 现读，`cmd/wisp/run.go:558 AdmitTask: rt.gate.AdmitTextTask`）——id 在这一刻**已经出了包**。
+
+⇒ **对它 §2 收尾那句"精确读法"的判定**：前半句"**造 id 的通道唯一**（包私有 `newTaskID`、全仓 4 枚命中、`cmd` 侧 0）"**〔成立〕**；
+后半句"**压缩发生那一刻手里有 id 的只有 `Loop.run` 那一枚参数**"**〔不成立〕**——同一刻至少 `root.ID`／`l.current.ID`／`j.taskID`／`res.TaskID` 四枚编得过，外加一份已递给 gate 的拷贝。
+它自己 §2 表里那句"**没有任何一枚住在 `Compressor` 够得着的地方**"才是站得住的落点，本程逐枚复到、判**成立**。
+
+**本格档位**：**问② 的答复〔成立〕**（持有者是 `Loop.run` 的参数、组合根不是，两半都有独立读数）；
+**"唯一持有者"这个措辞〔说过头〕**，应收窄成"唯一**在压缩那一发够得着**的持有者"。这一处**不改 AC#2 的定档**——问②要的是"id 从哪来、要不要动契约面"，那两问本程都复到同一答案（不动契约面：`Compress` 签名与 `Result`/`RunningTask`/`Root` 三枚结构体一字未变即把归因闭上，§1 的编译器尺就是这条的反证）；
+但措辞必须登记，因为"唯一"两个字一旦被人照抄，下一个读者会以为这帧里只有一份 id，从而在 Warm-window hook 落地时（`DEFERRED(D28-1)`，`loop.go:395` 注释现读）**漏掉另四份拷贝里任何一份该不该带标**这个问题。
