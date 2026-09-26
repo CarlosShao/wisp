@@ -1,0 +1,50 @@
+### Q1 (all reads pinned to anchor 86b0161, before this ticket's fix)
+-- WithValue in non-test code at the anchor:
+86b0161:internal/tools/cancel.go:45:	return context.WithValue(ctx, cancelKey{}, h)
+-- ctx->root/task lookup helpers:
+(none, rc=1)
+
+### Q2: who holds the taskID (anchor)
+86b0161:internal/agent/loop.go:169:	AdmitTask func(taskID string) (revoke func())
+86b0161:internal/agent/loop.go:339:func (l *Loop) run(ctx context.Context, taskID, input string) Result {
+86b0161:internal/agent/loop.go:342:		return l.runControl(taskID, verb, input)
+86b0161:internal/agent/loop.go:345:	root := observe.NewRootFrom(ctx, taskID)
+86b0161:internal/agent/loop.go:356:	j := newTaskJournal(l.opt.Journal, taskID, taskID) // C18: correlation == task id
+86b0161:internal/agent/loop.go:362:		if r := l.opt.AdmitTask(taskID); r != nil {
+86b0161:internal/agent/loop.go:369:	res := Result{TaskID: taskID, Status: StatusCompleted}
+86b0161:internal/agent/loop.go:373:		l.log().Warn("agent: task_log open failed", "err", err, "task", taskID)
+86b0161:internal/agent/loop.go:411:		turn, streamErr := l.stream(ctx, taskID, req)
+86b0161:internal/agent/loop.go:418:			l.failOpenCalls(ctx, j, taskID, turn, OutcomeCancelled, string(observe.ClassCancelled), &res)
+86b0161:internal/agent/loop.go:425:			l.failOpenCalls(ctx, j, taskID, turn, OutcomeError, string(turn.Err.Class), &res)
+86b0161:internal/agent/loop.go:444:			n := l.failToolCallsFromTruncatedMessage(ctx, j, taskID, turn, &res)
+86b0161:internal/agent/loop.go:452:			l.publish(Event{Kind: EvError, TaskID: taskID, Text: msg, Stop: turn.Stop})
+86b0161:internal/agent/loop.go:471:				Kind: EvReminder, TaskID: taskID, Text: rem.Text,
+86b0161:internal/agent/loop.go:476:					Kind: EvStuck, TaskID: taskID,
+86b0161:internal/agent/loop.go:488:		l.executeCalls(ctx, root, j, taskID, guard, turn, &res)
+86b0161:internal/agent/loop.go:501:func (l *Loop) runControl(taskID string, verb ControlVerb, utterance string) Result {
+86b0161:internal/agent/loop.go:502:	l.publish(Event{Kind: EvControl, TaskID: taskID, Verb: verb, Text: utterance})
+86b0161:internal/agent/loop.go:508:	res := Result{TaskID: taskID, Status: StatusControl}
+86b0161:internal/agent/loop.go:536:func (l *Loop) stream(ctx context.Context, taskID string, req *llm.Request) (llm.TurnResult, error) {
+86b0161:internal/agent/loop.go:542:			l.publish(Event{Kind: EvTextDelta, TaskID: taskID, Text: ev.Text})
+86b0161:internal/agent/loop.go:544:			l.publish(Event{Kind: EvReasoningDelta, TaskID: taskID, Text: ev.Text})
+86b0161:internal/agent/loop.go:584:	taskID string, guard *Guard, turn llm.TurnResult, res *Result,
+86b0161:internal/agent/loop.go:644:			TaskID: taskID, CorrelationID: taskID, CallID: p.call.ID,
+86b0161:internal/agent/loop.go:647:		h := l.reg.Spawn("tool-exec-"+taskID, "agent", root, func(c context.Context) {
+86b0161:internal/agent/loop.go:714:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID,
+86b0161:internal/agent/loop.go:817:	taskID string, turn llm.TurnResult, res *Result,
+86b0161:internal/agent/loop.go:837:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID, ToolName: c.Name,
+86b0161:internal/agent/loop.go:847:func (l *Loop) failOpenCalls(ctx context.Context, j *taskJournal, taskID string,
+86b0161:internal/agent/loop.go:872:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID, ToolName: c.Name,
+-- taskID outside internal/agent (non-test):
+86b0161:cmd/wisp/panel_assets.go:218:// (risk.NewProvenance(...).Detector(taskID), see internal/tools/bridge.go's
+86b0161:cmd/wisp/panel_pump.go:51:// tree records one for a live call - tools.Decision has TaskID/CallID/Provider
+86b0161:cmd/wisp/run.go:476:	const taskID = "host:mode-switch"
+86b0161:cmd/wisp/run.go:477:	revoke := rt.gate.AdmitTextTask(taskID)
+86b0161:cmd/wisp/run.go:480:		TaskID: taskID,
+86b0161:cmd/wisp/run.go:587:			ID: res.TaskID, State: state, QueryText: task,
+86b0161:cmd/wisp/run.go:598:		if err := rt.store.FinishTaskLog(c, res.TaskID, state, summary,
+86b0161:cmd/wisp/run.go:608:		res.TaskID, res.Status, res.Rounds, res.ToolCalls, costLine(res))
+86b0161:cmd/wisp/run.go:729:			c.stream.Append(e.TaskID, e.Text)
+86b0161:cmd/wisp/run.go:756:			c.stream.Close(e.TaskID)
+-- does cmd/wisp ever pass an id INTO the loop?
+86b0161:cmd/wisp/run.go:576:	res := loop.Run(ctx, task)

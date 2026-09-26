@@ -1,0 +1,34 @@
+### Q3: is the trace's field set a frozen contract?
+-- PLAN.md mentions of the record / of compression log fields:
+(zero hits, rc=1)
+-- C12 row verbatim:
+86b0161:docs/PLAN.md:1362:| C12 | `BallState` | **20 态** + **完整转移表（D43，第四轮才真正写出）** + 每态超时 | §2 + D43（⚠ 原标「来源 D24」为误引） |
+-- C39 exists as a contract? (contracts run C1-C32)
+(no C39 row, rc=1)
+-- D39 subject line + what it deepens:
+86b0161:docs/PLAN.md:2926:### D39 — 契约深化（把"只有名字的契约"变成规格）
+### D39 — 契约深化（把"只有名字的契约"变成规格）
+
+审查指出五条契约被冻结了但**没有内容**，其中 C6 是**被实现次数最多的类型**，
+而 C11 被形容为"一个氛围而不是规格"。**冻结一个没有内容的契约，等于给 agent 一张空白授权书。**
+
+**C6 `StreamEvent` — 归一化事件全集**（原文零变体，而它承载 D21 依赖的 `stopReason=="length"`）：
+
+**C24–C31** 的规格已在 §3 契约表与 D33/D32/B4 中给出，此处不重复。
+
+**§14.3 系统提示词 — 补分段预算与缓存前缀排序约束**（原文只给了总预算 2000 token）：
+-- docs/contracts/ in the tree?
+0
+-- SPEC-05 4.3 verbatim (the compression spec):
+### 4.3 会话历史压缩（D15④）
+
+- 历史 >12000 token → 对最老轮次摘要压缩，保留最近 3 轮原文；仍超 → 继续压最老直到达标。
+- 压缩在**响应路径外**（Warm 窗口内）做；**不得丢弃 tool_call 的 id 与结果引用**
+  （否则截断失败判定与 C25 溯源断链）。
+
+## 5. 会话与保活（B4/C31）
+
+- 会话定义：唤起 → 用户显式结束，或空闲 90s（`[session] warm_timeout_sec`）。
+- `Warm` 态：VAD/ASR/TTS/标点模型保持加载、**麦克风关闭**、面板可隐藏保活
+  （`[panel] keep_alive_in_session`）；单击球/快捷键 → `Listening` **零模型加载**。
+- `Conversation`（显式开启，默认 false）：麦克风持续开启、红色常亮环；30s 无语音 → `Warm`；

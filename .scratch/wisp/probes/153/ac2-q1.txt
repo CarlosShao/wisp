@@ -1,0 +1,23 @@
+### Q1: signature + receiver + construction (anchor 86b0161, pre-fix)
+70:type Compressor struct {
+128:func (c *Compressor) Compress(ctx context.Context, hist []llm.Message) ([]llm.Message, CompressionReport, error) {
+type Compressor struct {
+	b   Budgets
+	sum Summarizer
+	lg  *slog.Logger
+}
+--- loop.go: where the Compressor is built vs where taskID exists
+239:		comp:     NewCompressor(b, opt.Summarizer, WithLogger(opt.Logger)),
+322:	id := newTaskID()
+333:	return l.run(ctx, newTaskID(), input)
+339:func (l *Loop) run(ctx context.Context, taskID, input string) Result {
+1104:func newTaskID() string {
+--- does any ctx carry the id? (observe.NewRootFrom body)
+func NewRootFrom(parent context.Context, id string) *Root {
+	ctx, cancel := context.WithCancel(parent)
+	return &Root{ID: id, Ctx: ctx, Cancel: cancel}
+}
+--- context.WithValue anywhere outside tools/cancel.go?
+internal/agent/compress.go:156:	return context.WithValue(ctx, traceTaskKey{}, taskID)
+internal/tools/cancel.go:45:	return context.WithValue(ctx, cancelKey{}, h)
+--- any ctx->root/task lookup?

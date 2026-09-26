@@ -1,0 +1,65 @@
+
+// ---------------------------------------------------------------------------
+// ticket 153 AC#1: the shape the four nails above do not cover - the history IS
+// over the threshold and the pass still cannot fold a single round.
+//
+// TestCompressionTraceSilentWhenNothingFolded treats "did not fold" as if it
+// only ever meant "did not clear the threshold": it hard-fails its own setup
+// the moment Need() is true (see the t.Fatalf above), so the over-threshold
+// no-fold shape exists in none of the four nails. That hole is why the guard
+// shape the 139 acceptance mutation M5 replaced `if rep.Ran` with
+// (`if c.Need(hist)`, "print whenever the threshold was crossed") kept all four
+// green and the whole package green.
+//
+// The shape is also what the real `wisp run` leg has today: one task is one
+// user message, groupRounds opens a round only at a user role, and D15(4)'s
+// floor keeps the last KeepRawRounds rounds verbatim, so a single-round history
+// has nothing to fold however large it grows. The 139 acceptance measured
+// exactly that pair on one disk at one threshold: the ordinary tool-loop shape
+// (~41 706 tokens over 3 072) left 0 records, the degenerate multi-ladder shape
+// left 1 - the only variable being whether a 4th user round existed
+// (139 acceptance r1 s7.2 / s8, which is also the section that retracted its
+// own s1).
+//
+// This case is the fang, and it cannot collapse into the nail above: the setup
+// asserts Need() is TRUE.
+
+func TestCompressionTraceSilentWhenNothingFoldableOverThreshold(t *testing.T) {
+	recs := newTraceCapture()
+	recs.assertRulerLive(t)
+
+	b := BudgetsFor(4096) // threshold read back out of the budget, never written
+	th := b.HistoryCompressTokens
+	c := NewCompressor(b, nil, WithLogger(recs.logger()))
+
+	// One raw round, deliberately fat enough to clear the derived threshold.
+	hist := buildRoundHistory(1, 2000)
+	if got := len(rawRoundIndexes(groupRounds(hist))); got != 1 {
+		t.Fatalf("setup: %d raw rounds, want exactly 1 - with more than KeepRawRounds the fold would be possible and this would no longer be the shape under test", got)
+	}
+	if !c.Need(hist) {
+		t.Fatalf("setup: %d tokens does NOT clear the derived threshold %d - this case would silently collapse into TestCompressionTraceSilentWhenNothingFolded",
+			c.TotalTokens(hist), th)
+	}
+
+	out, rep, err := c.Compress(context.Background(), hist)
+	if err != nil {
+		t.Fatalf("Compress: %v", err)
+	}
+	if rep.Ran {
+		t.Fatal("setup: the pass folded, so this is not the over-threshold/nothing-foldable shape")
+	}
+	if len(out) != len(hist) || c.TotalTokens(out) != c.TotalTokens(hist) {
+		t.Fatalf("a pass that folded nothing changed the history: %d msgs / %d tokens -> %d msgs / %d tokens",
+			len(hist), c.TotalTokens(hist), len(out), c.TotalTokens(out))
+	}
+
+	hits := recs.with(traceMsg)
+	for _, h := range hits {
+		t.Errorf("over-threshold pass that folded nothing left a trace: %s", h.flat())
+	}
+	if len(hits) != 0 {
+		t.Fatalf("%q records = %d, want none: a record reading \"compressed\" while nothing folded is a false positive, and %d raw round(s) against the KeepRawRounds floor of %d is exactly the case where no fold can happen (all records: %v)",
+			traceMsg, len(hits), len(rawRoundIndexes(groupRounds(hist))), b.KeepRawRounds, flattenRecordMsgs(recs.all()))
+	}
+}
