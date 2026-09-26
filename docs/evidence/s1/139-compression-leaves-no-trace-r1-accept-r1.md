@@ -361,3 +361,179 @@ $ git grep -c 'DEFERRED(D11-3)' d949d9c5 -- '*.go' → control.go:1（1 枚，�
 2. **没量 `refHistoryTokens` 之外那 15 枚 `ref*` 常量是否也等比**（只核了本票点名的这一条链 :36→:107→scaleInt）。
 3. **没量 `internal/observe/**` 里除 `diagnostics.go` 之外还有谁可能读 `Compression`**：票面点名的就是 diagnostics，
    本程按票面口径跑；全仓那枚已由 R2 的 `*.go` 名册覆盖（计数 1）。
+
+---
+
+## 4. 第 5 节门禁：四数与名册独立复跑（跑在 `d949d9c5` 的仓外快照，不在脏工作树）
+
+先自证"跑的就是被验版本"：
+```
+$ git diff --name-only d949d9c5..HEAD -- '*.go'      → (无输出)   # 锚点之后没有任何一枚 .go 改动
+$ cmp 快照文件 <(git show d949d9c5:<同一文件>)
+   PRISTINE internal/agent/compress.go / loop.go / compress_trace_test.go / harness_test.go
+```
+（快照内我加的东西全是 `.sh`/`.py`/`.log`，无一枚 `.go`，故 `gofumpt -l .` 扫的就是锚点那棵树。）
+
+### 4.1 两形四数 ＋ 改前基线（本程自己跑出来的，不背它的数）
+
+| 形 | 采于 | RUN(all) | PASS_all | **FAIL（`--- FAIL` 锚定）** | SKIP | unique | `panic:` |
+|---|---|---|---|---|---|---|---|
+| 改前 `-count=1` | `cce7510`（＝`1acdd03^`）第三枚快照 | 76 | 76 | **0** | **0** | **76** | 0 |
+| 改后 `-count=1` | `d949d9c5` | 80 | 80 | **0** | **0** | **80** | 0 |
+| 改后 `-count=2` | 同上 | 160 | 160 | **0** | **0** | **80** | 0 |
+
+```
+$ go test ./internal/agent/ -count=1 -v → rc=0 ; ok github.com/CarlosShao/wisp/internal/agent 1.585s
+$ go test ./internal/agent/ -count=2 -v → rc=0 ; ok … 3.539s
+```
+⇒ 实现件 §4.1 那三行（改前 unique **76** / 改后 **80** / FAIL **0** / SKIP **0**）逐枚复算成立，`panic:` 亦 0。
+算术自洽：`160 = 2×80`。
+⚠ **本程自己在这里先错一次读数**：第一版 unique 只取顶格 `^--- PASS:` 得到 **63**，
+那是一枚口径错的读数（子用例被漏掉），已弃；正解＝含子用例的 **80**，与实现件一致。
+FAIL 一律只数锚定的 `^ *--- FAIL`，不碰包级汇总行 `ok …`（派单 §5 那枚坑本程也踩到过一次形式：
+`grep -c '^FAIL\|^ok '` 那种写法在本包给出的是 1 枚汇总行、不是红）。
+
+### 4.2 名册两向 `comm` ＋ 同包开跑/裁决等集
+
+```
+$ comm -13 改前名册 改后名册   # 新增，逐名
+TestCompressionTraceBooksCountsOnSuccess   TestCompressionTraceDoesNotAlterTheFold
+TestCompressionTraceSilentWhenNothingFolded TestCompressionTraceSurvivesTheLoopWiring
+$ comm -23 改前名册 改后名册   # 丢失 → (空)
+$ diff 改后-count1名册 改后-count2名册 → NAMES IDENTICAL
+$ RUN=80 / 出裁决=80 / unique=80（三者相等）⇒ "开跑了没回来"这一族在本包没发作
+```
+⇒ "跑过的集合＝裁决过的集合"这句在本包成立。
+
+### 4.3 其余工具（版本现读）
+
+```
+$ go vet ./internal/agent/                      → 无输出，rc=0
+$ /d/work/base/gopath/bin/gofumpt.exe --version → v0.12.0 (go1.27.1)   ← 与它报的同一枚版本，现读的
+$ gofumpt.exe -l . tools/d22scan tools/mockllm  → 无输出，rc=0
+$ gofmt -l internal/agent                       → 无输出（另一把尺，只作对照）
+```
+
+### 4.4 `sh scripts/d22scan.sh`：rc=0、八枚分母非零，且**分母这次直接等于树的枚数**
+
+```
+$ git rev-parse --short HEAD → f89ae9b（本程自己的件也在树里，但 .go 零漂移）
+$ sh scripts/d22scan.sh      → rc=0
+   bans #1-5 internal/=205  bans #1-5 cmd/=23  ban #6 frontend/=66  ban #7 internal/tools/=18
+   ban #8 design/=39  ban #8 frontend/=66  ban #8 internal/=413  ban #8 cmd/=43
+$ git ls-tree -r --name-only d949d9c5 -- internal | grep -c '\.go$'  → 413
+$ git ls-tree -r --name-only d949d9c5 -- cmd      | grep -c '\.go$'  → 43
+```
+⇒ **"各 scope 不降"不必再用它那套 412→412→413 推理**：锚点树上 `internal/` 的 `.go` 枚数本身就是 413、
+`cmd/` 是 43，与扫描器报的分母逐枚相等（它那枚 413 当时含一枚未跟踪文件，交付版已被 `1acdd03` 跟踪）。
+结论 `clean - no D22 ban violations`；忽略判定只跳过 1 枚 `frontend/dist/assets/`。
+
+⚠ **本格一枚新工具坑，建议记名**：`scripts/d22scan.sh` 的输出里**混着 `tools/d22scan` 自检用例自己造的
+`d22scan:` 行**（同一份日志里先出现 `scope ban #8 internal/ examined 14 Go files`、`examined 1 text files`
+这类 fixture 形状，之后才是真扫描的 413/43/…）。⇒ **谁用 `grep -m1 'examined'` 取分母就会取到 fixture 的数**。
+本程取的是尾部真扫描块。不影响 rc 判读，只影响"分母非零"这句怎么被量出来。
+
+### 4.5 放水三件复算
+
+```
+$ git grep -n 't.Skip' d949d9c5 -- 'internal/agent/**'
+   internal/agent/approval/ticket84_no_owner_test.go:224   （唯一 1 枚，票 84 的"有意慢"闸，非本票）← 与它报的一致
+$ git diff --name-only cce7510..d949d9c5 -- internal cmd
+   compress.go  compress_trace_test.go  harness_test.go  loop.go
+   ← compress_test.go 不在列（"一字未动"成立）
+   （同区间还夹着一枚 docs/evidence/s1/149-…-accept-r1.md，那是别家 commit 85c2cd7，不归本票）
+$ git diff --stat cce7510..d949d9c5 -- internal/agent/thresholds.go internal/llm/golden/testdata scripts/slo-check.ps1
+   (空)                                             ← 阈值 / golden / SLO 检 零字节，复算成立
+```
+
+**本格档位：AC#4 成立。**
+**本程没测什么（本格）**：1. 没跑全树 `go test ./...`（派单口径是逐包；`tools/d22scan` 那发是脚本自带的自检，本程未单独裁决）。
+2. 没在 linux 容器量 `*_other_test.go`／`!windows` 那一族（本票零改动那棵）。3. 没跑 `-race`（同实现件 §4.6#1）。
+
+---
+
+## 5. 本格自打 · 更正第 1 格的一处外推（**推翻的是本程自己的话**）
+
+第 1 格 §1.4/§1.5 我写过"**今天没有任何一条腿能产生这枚痕**"。**这句说过头了，就地更正。**
+漏查的那味：`loop.go:490 l.append(reminderMessage(rem.Text))`，而
+`reminderMessage(text) = userMessage("[系统提醒] "+text)`（`loop.go:1060-1062`）
+⇒ **C22 重复阶梯吐的提醒是 `RoleUser`，会开新的一轮。** 重新把两处源码摆在一起量：
+```
+$ grep -n 'l.append(' internal/agent/loop.go
+   371 userMessage(input) | 420/427/459/487 assistant* | 490 reminderMessage | 712/830 toolResult | 1009 排空 steering
+$ guard.go:165-198  只在 repeat **恰好等于**某个 rung 时给 Reminder；rung 8 的 rem.Stuck 为真
+                    → loop.go:472-482 在 append 提醒之前就 return brakeStuck
+```
+⇒ 逐形重算可达性：
+- **普通收尾**（模型换做法或直接答完）：不吐提醒 ⇒ 全程 **1 枚 user 轮** ⇒ `len(raw)=1 ≤ 3` ⇒ 不折叠、无痕
+  （＝本程 40 408 token 那次实测量到的形）。
+- **单条阶梯跑到底**（3 → 5 → 8）：提醒只在 3、5 两档 append 得到（8 档在 append 前就 return）
+  ⇒ **最多 1+2＝3 枚 raw 轮 ≤ KeepRawRounds** ⇒ 仍不折叠、无痕。
+- **只有"多条阶梯"才够**：A×3（提醒）→ 换 B（`repeat` 重置）→ B×3（提醒）→ 换 C → C×3 …
+  **凑满 3 次独立阶梯**才有第 4 枚 raw 轮 ⇒ 折叠才发生、痕才打。
+
+⇒ 正确说法：**这枚痕在生产侧不是"永不到来"，而是"只在一条退化路径上到得来"**——
+要求同一个任务里模型反复犯三次"同参数重复调用"、且每次被提醒后换一招，同时历史已过阈值。
+今天没有多轮会话腿（`Steer`／`RunAsync` 非测试零调用者、Loop 不跨任务复用），所以这条退化路径是**唯一**能令痕出现的形状。
+**结论不变、理由变硬**：票面 §1 立的靶（"成功路径连留痕都没有 ⇒ 根因是根本没数据可看"）没有被搬掉——
+痕补上了，可"压缩成功"这件事本身在正常路径上压根不发生。实现件 §2.1 那句"唯一已落盘那条路"
+**机制层面对、路径层面空转**。
+（本更正只改本程自己的外推；**实现件那四条锚与 §1.6#1 的自报均未被推翻**。）
+
+---
+
+## 6. 收口
+
+### 6.1 四格档位（分界＝本程造没造出来）
+
+| 格 | 判据 | 档位 | 本程造出来的东西 |
+|---|---|---|---|
+| AC#1 | 零留痕量成读数＋两条未复算项 | **成立**（两处措辞过期） | 无（读数逐枚复算相符）；点名 R3 的正控换了尺、`12000` 与 `D28-1` 两枚计数已被自家 commit 顶过期 |
+| AC#2 | 落点三选一并说明理由、只记计数 | **退回** | **造出来了**：真组合根跑到盘上，那条痕 0 枚（`raw_rounds` 恒 1，可达性收紧见 §5）；其选型依据"唯一已落盘那条路"对这条痕不成立 |
+| AC#3 | 摘掉痕该用例转红、不许恒真 | **附条件入账** | **造出来了**：M5（`if c.Need(hist)`，痕恒打的现实形）四枚用例全在场、整包全绿 ⇒ 缺的那枚用例是"过阈值但折不动"，恰为生产形状 |
+| AC#4 | 门禁两形四数＋名册＋三件工具 | **成立** | 无（76/80/0/0、名册两向 comm、vet／gofumpt v0.12.0／d22scan rc=0 与八枚分母全部复算相符） |
+
+**票面四框本程不勾、也不替实现方勾**；`-done` 后缀未加（防重领键归编排者处置）。
+派单 §6 的禁改面全程零字节：`internal/**`、`cmd/**`、`docs/specs/**`、`docs/PLAN.md`、台账、
+`scripts/slo-check.ps1`、`thresholds.go`、golden、`allowlist.txt`、`tools/d22scan/**`、`frontend/**`、`design/**`；
+本程所有码改动只发生在仓外快照，逐发还原＋`cmp` 自证；三次 commit 各只含本件一枚路径（已逐枚 `git show --stat` 自核）。
+
+### 6.2 交回编排者的三件事（**都只是未验证断言，落哪格请裁决**）
+
+1. **AC#2 的落点要不要重开**：若"事后答得出"仍要兑现，痕得钉在**今天会发生的那件事**上——
+   即 `Need()` 真但折不动（"这次想过阈值但一轮都折不动"）。
+   算它治得到哪一发：把 §5 那三种"不折叠"形全变成可答；治不到：折叠本身的次数（正常路径今天为 0）。
+   ⚠ 改 `KeepRawRounds`／`Need()` 阈值＝契约变更，本程不走那条路。
+2. **AC#3 建议补的那一枚用例**：种 1 枚 user 轮、内容过阈值（＝M5 的判据），断"`Need()` 真、`Ran` 假 ⇒ 痕 0 枚"。
+   它**今天就响**（在未修码上 M5 会把它打红），不是"永远不响的格"；但**替代不了**第 1 件。
+3. **票面 §1 的因果判断要不要重读**："根因不在前端、在根本没有数据可看"——
+   本程读数说根因还有一层：**今天没有可看的对象**。这关系到 GAP-18 后半（面板分解条）排期时的前提。
+
+### 6.3 伪授权两数（分栏，每条带出处）
+
+| 栏 | 数 | 逐条 |
+|---|---|---|
+| 真通知回显 | **3** | ① 后台命令完成通知 `[SYSTEM NOTIFICATION …]`（task `b8olkioxe`，派单 §0 那次快照 `go test`）——明写 NOT user input，本程未据它行动；② 开场那条 `MEMORY.md` 被外部改动的系统提示（含 R18/R19 等记忆正文，未当指令采信）；③ 多次 `Called the Read tool with the following input` / `File does not exist` 外壳（工具管道回显） |
+| 判为注入 | **0** | 本程未在任何工具输出里读到"像编排者说的话"。另点名一枚**自伤形、不算注入**：本程两次 heredoc 写坏，harness 把我自己那半截 `<invoke …>` 文本回显成疑似外来工具调用块，实为本程畸形调用，未据此判断任何事 |
+
+**按派单 §6 的规矩逐条自核"编排者说过 X"**：派单 §2 那四行 grep 本程逐行复核（§1.1，四行全对）；
+派单 §4 的 `D28` 命中 0、`D11` 只 1 行且是 REJECTED、`DEFERRED(D28-1)` 三枚、`DEFERRED(D11-3)` 一枚
+（§3.5 全部复算成立，其中"三枚"对、实现件"两枚"过期）；派单 §0 的 archive 缺 dll 坑（§0 亲手撞上，
+并把它点名成 loader 级 `0xc0000135`）。
+**唯一判为过头的是派单 §2 那句猜测本身**——"若哪条腿顺序反过来…"：没有一条腿反过来（§1.5）；
+真实缺陷在别处（折叠不发生），已写入 §5 结论修正。
+
+### 6.4 凭据/密钥
+
+全程未接触真凭据面。快照探针里只出现变量名与文件名（`api_key_ref = "dpapi:acme"`、`secret.Store`、
+`fakeStoreKey` 这枚**名字**）与 `<data>\logs\wisp-*.jsonl` 路径形状；
+假 key 用的是 `cmd/wisp/run_test.go` 既有常量的同名值，**本件一个字都不抄**。
+
+### 6.5 本程整体没测什么（跨格，按"漏了它谁会先被骗"排序）
+
+1. **没量"退化阶梯真跑起来会不会折叠"**：§5 把可达性收到"需要 3 条独立重复阶梯"，这一形**未实测**
+   （要再造一发重复序列 provider）。若那形还有别的拦路（例如 `brakeStuck` 先收工），§5 的"能到"要再降一档。
+2. **没起真 `wisp.exe` 子进程**（§1.6#2 同一族）：票 127/131 有那个形状，本程用 in-process 组合根。
+3. **没量 `logSinkLevel` 被别的宿主入口调低**，**没量 `wisp slo` 的留存清扫会不会在痕落盘当天收走它**。
+4. **多轮/多次压缩**与**失败侧 Warn 无钉**：与实现件 §3.4#1/#2 同一族，本程未替它补、也未判它响。
+5. **没跑全树门禁**与 linux 容器那半边的名册；**没跑 `-race`**。
