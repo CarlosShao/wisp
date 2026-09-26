@@ -1,0 +1,29 @@
+ANCHOR=829abe51c11d1b9cd4ebb9b14aa29193a51dd3f9
+
+### G1 生产码里构造 agent.ToolRequest（排除 internal/agent/ 自身）
+--- 本仓（真读，应为空）---
+rc=1 (1＝零命中)
+--- 合成树（正控，应非空）---
+cmd/wisp/host_probe.go:8:	_, _ = b.Execute(ctx, agent.ToolRequest{TaskID: id, CallID: "c1"})
+
+### G2 OpenTask/CloseTask 的生产调用者名册（排除 bridge.go 自身）
+--- 本仓（真读，今日只有 run.go:563 那一发 CloseTask＋它的注释）---
+829abe51c11d1b9cd4ebb9b14aa29193a51dd3f9:cmd/wisp/run.go:546:// WHY THIS HOOK OWNS THE CLOSE. CloseTask's own comment says the composition
+829abe51c11d1b9cd4ebb9b14aa29193a51dd3f9:cmd/wisp/run.go:563:		rt.bridge.CloseTask(taskID)
+--- 合成树（正控：第二枚所有者出现时应变两行）---
+cmd/wisp/close_owner_probe.go:5:func secondOwner(b interface{ CloseTask(string) }, id string) {
+cmd/wisp/close_owner_probe.go:6:	b.CloseTask(id)
+
+### G3 Q-56 那一支落地（Loop 上出现收 task id 的导出方法）
+--- 本仓（真读，应为空）---
+rc=1 (1＝零命中)
+--- 合成树（正控，应非空）---
+internal/agent/loop_with_taskid_probe.go:5:func (l *Loop) RunWithTaskID(ctx context.Context, taskID, input string) Result {
+
+### 今日名册基准（三枚子句在本仓的完整输出，下一程按此对拍）
+-- G1 --
+(无输出＝零命中)
+-- G1 摘掉 !_test 之后（证明模式本身吃得住这个形状）--
+14
+-- 今日 production ToolRequest 构造点（含 internal/agent）--
+829abe51c11d1b9cd4ebb9b14aa29193a51dd3f9:internal/agent/loop.go:646:		req := ToolRequest{

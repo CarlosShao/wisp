@@ -101,3 +101,87 @@ $ comm -13 mine-tools.txt theirs-tools-sorted.txt  →  空
 ```
 
 ⇒ **改前基线成立**：两包 rc=0、FAIL/SKIP/panic 全 0；本票"改后"要复的就是这四数＋名册两向 `comm`（改后读数见第 3.2 节，随注释改动一起交）。
+
+---
+
+## 第 2 节 格 AC#1 — 触发门：先正面回答"这条判不判得出"
+
+票面给的候选形状（逐字）：**"全仓任何非测试代码里出现『构造 `tools.Request` 且 `TaskID` 非空』或『直接调 `Bridge.Execute`』，而其调用者不在 `Loop.run` 那条边界内"**，
+并附一句"先判这条判不判得出"。本程按三小节答：先把形状里**点错的名字**改对（不改就永远零命中，那是假门的一种），再答判得出/判不出各是哪半，最后给出本程真正采用的门（第 2.3 节）。
+
+### 2.1 形状里的两处符号，现量
+
+```
+$ git grep -nw "tools.Request" HEAD -- '*.go' ':!.scratch'      →  0 命中（尺：整词、大小写敏感、排除 .scratch）
+$ grep -n "type ToolRequest struct" internal/agent/tools.go     →  :54
+$ sed -n '54,64p' internal/agent/tools.go                       →  ToolRequest{ TaskID, CorrelationID, CallID, Name, Args, Timeout }（TaskID 是**导出字段**，没有 setter）
+$ git grep -nE "\.Execute\(" HEAD -- 'internal/**/*.go' 'cmd/**/*.go' ':!*_test.go'
+HEAD:internal/agent/loop.go:730:		return l.opt.Tools.Execute(ctx, req)
+HEAD:internal/agent/loop.go:734:	out, err := l.opt.Tools.Execute(tctx, req)
+HEAD:internal/tools/bridge.go:463:	res, err := entry.Tool.Execute(ectx, req.Args, onUpdate)
+```
+
+⇒ ①**没有 `tools.Request` 这个类型**：桥收的是 `agent.ToolRequest`（`Bridge.Execute` 的签名＝`internal/tools/bridge.go:243`）。照票面原话写的检子句会**结构上永远零命中**——那正是票面禁止的假门形状，所以本程的门改用真名。
+⇒ ②"直接调 `Bridge.Execute`"这一支也不能按字面写：生产里对桥的调用只有 `loop.go` 那两行，且它们调的是**接口** `ToolExecutor.Execute`（`internal/agent/tools.go:91`），
+`bridge.go:463` 那一发调的是 `Tool.Execute`（C4 单个工具，不是桥）。**按符号名 grep 会同时漏掉与误报**，故本程把子句落在"谁构造派发"上（理由见 2.2 末）。
+
+### 2.2 判得出／判不出，各是哪半
+
+| 半条 | 判得出否 | 依据 |
+|---|---|---|
+| "**谁在生产码里构造了过桥的派发**" | **判得出**（一条命令、rc 可判） | `ToolRequest.TaskID` 是导出字段、没有 setter、也没有第二个构造函数 ⇒ 要带着身份过桥，**必须**在某个文件里出现 `ToolRequest{` 这个字面量。它是唯一的语法位置，所以"名册里有没有这一行"＝"这一形存不存在"，不需要数据流。 |
+| "…且 **`TaskID` 非空**" | **判不出** | 空不空是值域问题：`TaskID: m["id"]`、`TaskID: strings.TrimSpace(x)` 这类写法 grep 给不出答案；要答它得跑数据流（本仓没有这类仪器，见下）。 |
+| "…而其**调用者不在 `Loop.run` 那条边界内**" | **判不出**（按函数体语法判得出，按"边界"判不出） | 行/函数级是语法事实，可以定位；但"这个函数是不是只在 `Loop.run` 之下被调到"是**跨函数可达性**，要 call graph。本仓现量：`grep -n "golang.org/x/tools" go.mod` ⇒ **0 命中**（仅 `go.sum:37` 有 v0.48.0 的条目＝不是本模块的 require），`tools/d22scan/main.go:98-99` 只 import `go/ast`＋`go/parser`（单文件解析，没有类型信息、没有 callgraph）。⇒ 上这枚仪器要**新增依赖＋改 `tools/d22scan/**`**，两者都在本票零字节面里，**本程不上**。 |
+| "**最接近的近似命令**是什么" | 就是第 2.3 节那五枚子句 | 近似性在两处，都写死在门本体上：**(a)** 它按**文件/目录**排 `internal/agent/*`（不是按"边界"排）⇒ 若有人在 `internal/agent/` 里新增一枚宿主派发，本门**不响**（漏报方向）；**(b)** 它不看值域 ⇒ 若新构造点其实填的是空串，本门**响**而无害（误报方向）。⇒ 所以门的输出是**一枚要人读两行的名册**，不是一句 pass/fail；本程不把它伪装成后者。 |
+
+### 2.3 本程采用的门＝五枚子句，一条命令一次跑完
+
+生成器＝`.scratch/wisp/probes/154/gate-clauses.sh`（`bash .scratch/wisp/probes/154/gate-clauses.sh <锚点>` 即可复算）；
+今日逐字输出＝`.scratch/wisp/probes/154/gate-clauses-roster.txt`（锚点 `1424aa7`，本件第 1 节那枚 commit）。
+
+| 子句 | 命令（`git grep -nE` 一把尺，全部排除 `_test.go`） | 今日读数（锚点 `1424aa7`） | 响了说明什么 |
+|---|---|---|---|
+| **G1** | `'ToolRequest\{' -- internal cmd ':!*_test.go' ':!internal/agent/*'` | **空（rc=1）** | 有生产代码在自己的函数里造派发＝**宿主自带 task id 那一形出现了**。本票 AC#1②那串事必须当时做。 |
+| **G1b** | `'\.Execute\(' -- internal cmd ':!*_test.go' ':!internal/agent/loop.go' ':!internal/tools/bridge.go'` | **空（rc=1）** | 有人绕过 `ToolExecutor` 接口的既有两枚调用点，直接对桥/对派发动手。与 G1 任一枚响即同判。 |
+| **G2** | `-w 'OpenTask\|CloseTask' -- internal cmd ':!*_test.go' ':!internal/tools/bridge.go'` | **2 行**：`cmd/wisp/run.go:546`（注释）＋ `:563`（唯一生产调用） | **关那侧的所有者从 1 枚变多枚**，或**开那侧多出一枚生产调用者**。名册是"1 枚调用者"这一事实本身；它变长＝本票记的那一形已被人接上了（该回头核它接得对不对、并发读数补没补）。 |
+| **G3** | `'^func \(l \*Loop\) [A-Z][A-Za-z0-9]*\(.*taskID' -- internal/agent` | **空（rc=1）** | **`Q-56` 那一支被落地了**（`Loop` 上出现收外部 task id 的导出方法）。这一枚响＝G1 那一形从"没有入口"变成"有入口"，关闭的所有者必须同批改。 |
+| **G4** | `'PassThroughUnclassifiedRisk:' -- '*.go' ':!*_test.go'` | **空（rc=1）** | 生产组合根打开了 L0 直通 ⇒ **环路那一形端到端可见**（第 4 节"第二道门"的那把锁被摘）。这一枚不影响"宿主 id"，但它一响，"151 已把环路那一形接完"这句话才第一次有端到端读数。 |
+
+**每枚子句都过了正控**（不是"看起来有牙"，是同一把尺打在仓库外的合成树上真响）：
+脚本＝`.scratch/wisp/probes/154/gate-positive-control.sh`，第一发读数＝`gate-positive-control.txt`（**G3 那发是空的**，原因写在下），
+修好后的第二发＝`gate-positive-control-r2.txt`：
+
+```
+G1  合成树 cmd/wisp/host_probe.go:8  →  1 命中（本仓 0）   ← 非恒真、非装饰
+G1b 与 G1 同一枚文件即响（该行的 `b.Execute(` 也被 G1b 吃到）
+G2  合成树多出一枚所有者 close_owner_probe.go → 2 命中（本仓就是这 2 行的形状）
+G3  合成树 internal/agent/loop_with_taskid_probe.go:5 RunWithTaskID → 命中（本仓 0）
+G4  本仓排掉 _test 即空、摘掉排除立刻 2 命中（harness_test.go:116 true ＋ loop_approval_test.go:128 false）
+```
+
+⚠ **本程自己撞的一枚，记下来给下一程**：G3 的正控第一发是**空**的，看着像"这枚子句结构上产不出读数＝装饰"。
+反查原因＝本程把探针文件放到了 `internal/` 而 pathspec 是 `internal/agent`（`git grep` 的 pathspec 是**目录前缀**，`internal/agent` 不吃 `internal/x.go`）。
+`git mv` 进 `internal/agent/` 后同一把尺命中。**教训：正控为空时先怀疑自己的探针放错地方，再怀疑检装饰。**
+
+### 2.4 两问自查（恒真检／装饰）
+
+1. **有没有哪一枚今天必然响？** 没有。G1/G1b/G3/G4 今日全空、G2 今日就是那 2 行。
+2. **有没有哪一枚结构上产不出自己想量的读数？** 没有——五枚都有第 2.3 节最后一列的正控；且 G1 的**负一负**在本仓就是现成的：
+   同一把尺只摘掉"排除测试"那一条 ⇒ 今日 **14 枚 `ToolRequest{` 命中在 `_test.go` 里**（`gate-clauses-roster.txt` 末段），
+   也就是说这个模式**天天在吃得住本票那一形**，只是它今天吃到的全是测试。
+3. **本程没有为此新增任何断言**（零生产码＋写面只有注释）。把"今日名册为空"写成 `t.Fatalf` 就是一枚恒真检——它今天绿、明天形状真出现时也不会红（那时它红的是"名册非空"这个**事实**，不是"你没接上关闭"这个**义务**），所以那种断言既买不到防回归、又会诱使下一位把"名册空"当成"没问题"。**明确不做。**
+
+⇒ AC#1① 的判据交付＝第 2.3 节那张表；AC#1③（"今天不可达"写在门本体上）落在 `internal/tools/bridge.go` 的注释里，**原文整段见第 3.1 节**。
+⇒ AC#1②（触发时必须做的事）也写进同一处注释，三条：为那一形接上关闭的所有者（或把 `Q-56` 拍板的那一支落地）、**同时**补第 2.5 节那形并发读数、把本门的新名册回贴到本件（只追加）。
+
+### 2.5 "并发那一形零读数"——本程现量三条，以及它今天为什么不可达
+
+| 量 | 命令 | 读数 |
+|---|---|---|
+| 一个进程里跑几枚环路任务 | `git grep -nE "agent\.New\(|loop\.Run\(" -- cmd internal ':!*_test.go'` | `cmd/wisp/run.go:573` ＋ `:604` **各一枚** ⇒ 一进程一枚环路任务（`runTextTask` 一次一条 `task`）。另两枚 `.Run(` 命中是 `bridge.Run`（`cmd/wisp/models.go:311`、`cmd/balldebug/main.go:252`），**不是** `agent.Loop`，本程逐个点开看过。 |
+| D38d 的 4 路并发是不是"两枚任务" | `sed -n '604,654p' internal/agent/loop.go` | `sem := make(chan struct{}, guard.Concurrency())` 限的是**同一回合内的多发调用**，而它们共用**同一枚 `req`（同一枚 `TaskID`）**（`loop.go:646-649`）⇒ 不构成"两枚 scope 同时开着"，撞不到 `unbound-scope` 那条 fail-close。 |
+| 有谁在测试里让两枚 scope 同时开着过 | `git grep -n "unbound-scope" -- '*.go' ':!internal/risk/provenance.go'` | 三处：`cmd/wisp/task_scope_close_151_test.go:14`（注释）＋ `:108`（断言），那是**串行**那一发（先关 A、再开 B）；第三处 `.scratch/wisp/probes/151/ac1-probe-source.go:105` 是上一程留在 `.scratch` 的探针文本，**不参与编译**（`git ls-files -- 'internal/**/*.go' 'cmd/**/*.go'` 不含它）。全仓**没有**一枚用例让两枚 scope 同时开着。 |
+
+⇒ 判据本体（`internal/risk/provenance.go:438-457` 的 `scopeMarks`，本程**只读**）：`unbound-scope` 只在"被检的那枚 scope 尚未注册、而**别的 scope 手里有污点**"时响。
+⇒ 所以并发那一形今天**双不可达**：既要等宿主自带 id（G1/G3），也要等**同时跑两枚任务的宿主**（今天连 `agent.Loop` 的第二枚生产持有者都没有）。
+⇒ 本票因此**不许为它硬开一道"要它响"的格**（票面 §现量形状第 5 条），本程照做：只在门上留了 G4，并在注释里写明"并发读数＝零，等 G1/G3/G4 任一响时一起补"。
