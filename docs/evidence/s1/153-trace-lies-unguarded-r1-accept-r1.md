@@ -382,3 +382,84 @@ $ traceTaskID 的读者：除 :237 那一处之外零读者（全量 git grep �
 
 **本格档位：成立，附两笔待补**（①件内缺那笔隐私账；②日志↔DB 键名差异无人写）。
 两笔都不动判据、不动码；且本程**没有**造出"这枚键泄漏到它不该去的地方"的活证据——§5.2 那把尺就是为这一条造的，造不出。
+
+---
+
+## 6. 攻击点⑥ —— 门禁与名册独立复跑（一律逐包，从不 `go test ./...`；版本现读）
+
+### 6.1 四数之外比名册差集（派单点名的这条，本程照做）
+
+| 形 | 采于（仓外快照，`git archive`） | RUN(all) | PASS 顶／子 | FAIL | SKIP | panic | 名册枚数 |
+|---|---|---|---|---|---|---|---|
+| 改前 `-count=1` | `86b0161` | 80 | 63／17 | **0** | **0** | 0 | 80 |
+| 改后 `-count=1` | `6de3d1c` | 83 | 66／17 | **0** | **0** | 0 | 83 |
+| 改后 `-count=2` | 同上 | 166 | 132／34 | **0** | **0** | 0 | 83 |
+
+```
+$ comm -13 改前名册 改后名册    # 新增，逐名
+TestCompressionTraceCarriesTheOwningTaskID
+TestCompressionTraceNeverInventsATaskID
+TestCompressionTraceSilentWhenNothingFoldableOverThreshold
+$ comm -23 改前名册 改后名册    →（空）
+$ diff -q 改后-count1名册 改后-count2名册  →（空 ⇒ 两形名册全等，166＝2×83 算术自洽）
+$ git grep -n "t.Skip" 6de3d1c -- internal/agent
+internal/agent/approval/ticket84_no_owner_test.go:224        ← 唯一一枚，票 84 的"有意慢"闸，非本票
+```
+
+⇒ 实现件 §6.1 那三个数（80→83、新增恰三枚、丢失为空、两形名册全等）**逐条复现**，
+"摘一枚证人"（§3 的 A2/A5/A7 三发 82／82／81）也都落在同一把尺上——**没有"一条 panic 吞掉整包读数"的形状**。
+
+### 6.2 三件工具（版本本程现读，不背数）
+
+```
+$ go version        → go version go1.27.1 windows/amd64
+$ gofumpt --version → v0.12.0 (go1.27.1)   （/d/work/base/gopath/bin/gofumpt.exe）
+$ go vet ./internal/agent/  → 无输出 rc=0
+$ gofmt -l internal/agent   → 无输出
+$ gofumpt -l internal/agent → 无输出
+$ go test ./internal/agent/ -count=1 -race → ok github.com/CarlosShao/wisp/internal/agent 3.894s
+```
+
+⚠ **一处读数本程复现不出来，且它是 CI 同形的那一行**（实现件 §6.2 第三条工具块里）：
+
+```
+$ gofumpt -l . tools/d22scan tools/mockllm          # 在 .scratch 之上的仓根形状＝CI ci.yml:114 那一步
+.scratch/wisp/probes/152/zz152probe_windows_test.go     ← 1 枚命中，它写的是"无输出"
+```
+
+本程核对过这枚文件不是刚出现的：它由 `eb4755a`（票 152 的程，**09:36**）落进 `6de3d1c` 的祖先链，
+而它这格读数取于 09:50–09:57；同一枚文件直到 `5429c0d`（票 152 自己"探针源过 gofumpt"，09:57，**与 `6de3d1c` 同一分钟**）才转干净
+（逐版重量：`eb4755a` 版被点名／`6de3d1c` 版被点名／`5429c0d` 起不被点名）。
+⇒ 两种解释本程都摆出来：**(i)** 它那一行跑在别的 cwd 下（`gofumpt -l .` 从 `internal/` 或快照里跑都不含 `.scratch`）；
+**(ii)** 它取数那一刻票 152 已把**工作树**修好而尚未提交（同分钟竞争，无法从历史上排除）。
+但**按可核对象——`6de3d1c` 那棵树——读出来是 1 枚命中**，所以这一行作为"无输出"的读数不可复现，需要更正口径。
+不是判据失灵，也不是它伸手了别家地界：`gofumpt -l internal/agent`（真正属于它地界的那两条）本程复跑仍为空。
+最小闭合＝把那一行改成"仓根整树 1 枚命中，属票 152 的探针，非本程地界"，或直接注明该条跑在只含 `internal/agent` 的目录。
+（同族提醒：本程自己的两枚探针源在落盘前先跑过同一把尺，空 ⇒ 不当那个把 CI 格式步点红的来源。）
+
+### 6.3 `sh scripts/d22scan.sh`：rc=0，八枚分母非零，且"别用 `grep -m1 examined`"那条坑本程复算成立
+
+```
+$ sh scripts/d22scan.sh ; echo $?            → 0        （末行 "d22scan: clean - no D22 ban violations"）
+$ grep -c examined 本程这份日志              → 69       （与实现件同一枚数）
+$ grep -m1 examined                          → 第 106 行：scan_test.go:1002: ban #6 examined 7 and fired in all 7 extension classes
+                                                ↑ 这就是那把坏尺：取到的是自检 fixture 的 7，不是任何分母
+真扫描块＝本程日志的 228–236 行（九行，与实现件说的行号相同）：
+   228  examined 228 production Go files under internal/ and cmd/
+   229-230  bans #1-5 internal/=205 · cmd/=23      231  ban #6 frontend/=73
+   232  ban #7 internal/tools/=18                  233-236 ban #8 design/=39 · frontend/=73 · internal/=413 · cmd/=44
+```
+
+分母直接和树自身对齐（本程重量，不引用它的数）：
+
+```
+$ git ls-tree -r --name-only 6de3d1c -- internal | grep -c '\.go$' → 413  = ban #8 internal/ ✓
+$ git ls-tree -r --name-only 6de3d1c -- cmd      | grep -c '\.go$' →  44  = ban #8 cmd/      ✓
+$ git ls-tree -r --name-only b23c7f7 -- cmd      | grep -c '\.go$' →  43                    ← 它当年读到的就是这个 43
+```
+
+⇒ 它那句"`cmd/` 差 1 枚不是我造的、因为扫描跑在工作树上、当时 `cmd/wisp/task_scope_close_151_test.go` 还是票 151 的未跟踪文件"
+**被本程独立证实**：那枚文件正是 `5d46f24`（subject 就叫 `placeholder`）带进树的，`6de3d1c` 起 `cmd/` 就是 44。
+`frontend/` 从它读到的 67 涨到本程的 73 同理（前端会话在写），**别家的树在动不算进本票任何宣称**——这句它写对了。
+
+**本格档位：成立（附一条更正）**——待补那一条就是 §6.2 里那行 `gofumpt -l .` 的口径。
