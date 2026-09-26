@@ -1,0 +1,20 @@
+=== docs/evidence/s1/156-exited-asks-os-r1.md
+  anchor_lines=674 head_lines=674 worktree_lines=674
+  anchor_vs_head_bytes=553fbcd6 / 553fbcd6 / worktree=553fbcd6
+  diff_anchor_vs_worktree_lines=0
+=== docs/evidence/s1/156-r4-gates-and-cleanup-r1.md
+  anchor_lines=449 head_lines=449 worktree_lines=449
+  anchor_vs_head_bytes=7085cf2d / 7085cf2d / worktree=7085cf2d
+  diff_anchor_vs_worktree_lines=0
+=== .scratch/wisp/issues/156-q-57-landed-as-option-b-exited-asks-the-os-instead-of-our-own-record-and-the-152-leftover-comment-actions.md
+  anchor_lines=88 head_lines=94 worktree_lines=94
+  anchor_vs_head_bytes=c30b27a5 / f680c346 / worktree=f680c346
+  diff_anchor_vs_worktree_lines=6
+=== docs/evidence/s1/152-subject-death-never-measured-r1-accept-r1.md
+  anchor_lines=709 head_lines=709 worktree_lines=709
+  anchor_vs_head_bytes=ee39d32a / ee39d32a / worktree=16f45130
+  diff_anchor_vs_worktree_lines=6
+=== AGENTS.md
+  anchor_lines=165 head_lines=165 worktree_lines=165
+  anchor_vs_head_bytes=008fc391 / 008fc391 / worktree=008fc391
+  diff_anchor_vs_worktree_lines=0

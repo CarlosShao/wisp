@@ -1,0 +1,112 @@
+diff --git a/cmd/wisp/slo_windows.go b/cmd/wisp/slo_windows.go
+index 86325850..d1f1b881 100644
+--- a/cmd/wisp/slo_windows.go
++++ b/cmd/wisp/slo_windows.go
+@@ -17,6 +17,8 @@ import (
+ 	"strings"
+ 	"time"
+ 
++	"golang.org/x/sys/windows"
++
+ 	"github.com/CarlosShao/wisp/internal/buildinfo"
+ 	"github.com/CarlosShao/wisp/internal/observe"
+ 	"github.com/CarlosShao/wisp/internal/proc"
+@@ -829,15 +831,94 @@ func (s *sloSubject) collectReportWithin(budget, poll time.Duration) (*sloRun, e
+ 	}
+ }
+ 
++// exitCodeUnknown is what exitCode() answers for a subject this process cannot
++// show a code for - the value both give-up sentences have always printed while
++// exited() says "not gone".
++const exitCodeUnknown = -1
++
++// exited answers one question: is this subject gone. Since ticket 156 the
++// authority for that answer is the OS, not our own bookkeeping (Q-57's ruling 乙,
++// owner-approved 2026-09-26 12:3x).
++//
++// What it used to read - `s.cmd != nil && s.cmd.ProcessState != nil &&
++// s.cmd.ProcessState.Exited()` - does not ask that question. ProcessState is
++// filled only by (*exec.Cmd).Wait, and in this type the only Wait in the file
++// sits inside stop() (re-measured at this anchor: one hit for `cmd.Wait()`, at
++// :855), which runOutOfTree defers past the report loop. So the old shape asked
++// "have WE happened to reap it" from a place where the answer is structurally
++// always "no": ticket 152 measured the consequence (the loop prints the budget
++// sentence over a corpse) and this ticket's probe measured the window - the
++// kernel knew the child was dead 44ms after spawn and the old predicate still
++// answered "alive" 2209ms and 186 real readings later
++// (.scratch/wisp/probes/156/probe-pre/probe-156.log).
+ func (s *sloSubject) exited() bool {
+-	return s.cmd != nil && s.cmd.ProcessState != nil && s.cmd.ProcessState.Exited()
++	gone, _ := s.exitStatus()
++	return gone
+ }
+ 
+ func (s *sloSubject) exitCode() int {
+-	if !s.exited() {
+-		return -1
++	_, code := s.exitStatus()
++	return code
++}
++
++// exitStatus returns (gone, exit code); code is exitCodeUnknown whenever gone is
++// false, which is what keeps the three exited() call sites from having to agree
++// on a sentinel of their own.
++func (s *sloSubject) exitStatus() (gone bool, code int) {
++	if s == nil || s.cmd == nil || s.cmd.Process == nil {
++		return false, exitCodeUnknown
++	}
++	// (a) OUR record - but only once it exists. A filled ProcessState means a
++	// cmd.Wait() has already run, and that call also CLOSED the handle arm (b)
++	// needs (os/exec: WithHandle "cannot be used after Process.Release or
++	// Process.Wait"), while the pid becomes free for the kernel to hand to
++	// somebody else. Past a reaping our own record is not the lazy answer, it is
++	// the only safe one - and it is the branch ticket 149's case 13 (a child
++	// reaped before the loop) has always travelled.
++	if ps := s.cmd.ProcessState; ps != nil {
++		return ps.Exited(), ps.ExitCode()
++	}
++	// (b) the OS, for the window this type actually lives in.
++	return s.queryProcess()
++}
++
++// queryProcess asks the kernel through the handle the exec package already owns.
++//
++// The oracle is the handle's WAIT STATE, not its exit code: a process handle is
++// signaled exactly when the process terminates and stays signaled while any
++// handle refers to it, so WAIT_OBJECT_0 means dead and WAIT_TIMEOUT means alive,
++// with no clock touched at all (this is the same call (*os.Process).wait() makes
++// internally, with the infinite wait replaced by a zero one). Reading
++// GetExitCodeProcess alone would have been the one-line edit and is the one this
++// file deliberately does not make: its answer while a process runs is
++// STILL_ACTIVE (259), which is also a legitimate exit code, so a subject that
++// exits 259 would be read as still alive. Terminating first and reading the code
++// second costs one extra syscall per decided answer and keeps the two questions
++// apart - which is also why this predicate can report code 259 truthfully.
++//
++// Anything undecided - WAIT_FAILED, a failed GetExitCodeProcess, a handle
++// os/exec will not lend - answers "not gone", exactly what this predicate answered
++// before the ticket. The fallback is the old behaviour, not a new verdict
++// invented here: the loop keeps polling and gives up on its budget sentence, which
++// names the budget it spent.
++func (s *sloSubject) queryProcess() (gone bool, code int) {
++	var (
++		decided bool
++		osCode  uint32
++	)
++	err := s.cmd.Process.WithHandle(func(h uintptr) {
++		if waited, _ := windows.WaitForSingleObject(windows.Handle(h), 0); waited != windows.WAIT_OBJECT_0 {
++			return // WAIT_TIMEOUT: alive. WAIT_FAILED: not judged here.
++		}
++		if cerr := windows.GetExitCodeProcess(windows.Handle(h), &osCode); cerr != nil {
++			return
++		}
++		decided = true
++	})
++	if err != nil || !decided {
++		return false, exitCodeUnknown
+ 	}
+-	return s.cmd.ProcessState.ExitCode()
++	return true, int(osCode)
+ }
+ 
+ // stop guarantees the subject this run created is gone, then reaps it. A
