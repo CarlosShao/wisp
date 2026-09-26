@@ -272,8 +272,10 @@ func TestSLO156WaitReadyNamesTheDeadSubjectToo(t *testing.T) {
 	slo156OsDead(t, uint32(cmd.Process.Pid))
 
 	dir := t.TempDir()
-	s := &sloSubject{cmd: cmd, pid: uint32(cmd.Process.Pid), dir: dir,
-		readyPath: filepath.Join(dir, "ready")}
+	s := &sloSubject{
+		cmd: cmd, pid: uint32(cmd.Process.Pid), dir: dir,
+		readyPath: filepath.Join(dir, "ready"),
+	}
 	err := s.waitReady()
 	if err == nil {
 		t.Fatal("a subject that died before its readiness marker passed waitReady")
