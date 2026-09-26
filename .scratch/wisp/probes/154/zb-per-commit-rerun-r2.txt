@@ -1,0 +1,42 @@
+# 票 154 续程 r2 复跑前一程脚本 zero-byte-per-commit.sh 的当轮输出（不只引用代提那份）
+# 生成时刻 2026-09-26T12:51:24+08:00　锚点 edd072535913ef54bcce232d4c1fc22fb1a9aec9　命令原文： bash .scratch/wisp/probes/154/zero-byte-per-commit.sh 1424aa7 352d3d8 76c89b2 304199f　(脚本本身只读 git 历史，与锚点无关，锚点行只为对账)
+# 第一发 2026-09-26T12:51:24+08:00 在同一条命令上跑过一遍，两发输出逐字节相同（对拍在末段）
+########## 1424aa7  evidence(票 154 实现程 第 0-1 节):
+  本枚碰到的文件（全量）:
+    .scratch/wisp/probes/154/archive-eol-control.txt
+    .scratch/wisp/probes/154/gate-pre-cli-v.txt
+    .scratch/wisp/probes/154/gate-pre-tools-v.txt
+    .scratch/wisp/probes/154/names-pre-cli.txt
+    .scratch/wisp/probes/154/names-pre-tools.txt
+    docs/evidence/s1/154-host-id-never-closed-r1.md
+  冻结面命中 = 0  ✓
+########## 352d3d8  evidence(票 154 实现程 第 2 节 格
+  本枚碰到的文件（全量）:
+    .scratch/wisp/probes/154/gate-clauses-roster.txt
+    .scratch/wisp/probes/154/gate-clauses.sh
+    .scratch/wisp/probes/154/gate-positive-control-r2.txt
+    .scratch/wisp/probes/154/gate-positive-control.sh
+    .scratch/wisp/probes/154/gate-positive-control.txt
+    docs/evidence/s1/154-host-id-never-closed-r1.md
+  冻结面命中 = 0  ✓
+########## 76c89b2  docs(票 154 实现程 第 3 节 格 AC#
+  本枚碰到的文件（全量）:
+    .scratch/wisp/probes/154/bridge-comment-after.txt
+    .scratch/wisp/probes/154/gate-post-cli-v.txt
+    .scratch/wisp/probes/154/gate-post-tools-v.txt
+    .scratch/wisp/probes/154/names-post-cli.txt
+    .scratch/wisp/probes/154/names-post-tools.txt
+    docs/evidence/s1/154-host-id-never-closed-r1.md
+    internal/tools/bridge.go
+  冻结面命中 = 0  ✓
+########## 304199f  evidence(票 154 实现程 第 4 节 格
+  本枚碰到的文件（全量）:
+    .scratch/wisp/probes/154/census-pairs.sh
+    .scratch/wisp/probes/154/census-pairs.txt
+    docs/evidence/s1/154-host-id-never-closed-r1.md
+  冻结面命中 = 0  ✓
+
+########## 反向自核：本票写面允许的三处，各碰了几枚
+  internal/tools/bridge.go 的注释面 → 由 AC#5 那条『增删行全部以 // 开头』的机器核担保
+########## 对拍 A：本轮 vs 已入库那份（e9a1db0 代提的 zero-byte-per-commit.txt）
+diff rc=0 (0＝逐字节相同)

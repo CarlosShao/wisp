@@ -361,3 +361,160 @@ $ sh scripts/d22scan.sh                           →  clean（rc=0）；分母�
 2. **`defer` 挂在不可达边上的完整清单**。本程只撞到了第 4.1 表第 4/5 对（DisposalScope 那族）。
    完整盘法需要"哪些边今天不可达"的全仓可达性判定，同一枚缺仪器。⇒ 这一类**未盘**。
 3. **`internal/plugin/**` 与 `internal/speech/**` 等本票 pathspec 之外的包**：本程尺只放了 `internal`＋`cmd`（这俩已含 plugin/speech 的全部 `.go`），但**`tools/**` 与 `cmd/*` 里非 `wisp` 的宿主（`balldebug`/`llmrecord`/`modelcheck`）本程只按上面逐枚点名，没有做穷举**。⇒ 这三处**未穷举**。
+
+---
+
+## 第 5 节 格 AC#4（**续程 r2 补写**）— 契约轴零字节：把"普查"写成逐支账
+
+> 本节作者＝票 154 的**续程**（派单＝`.scratch/wisp/dispatches/2026-09-26-124x-impl-154-r2-two-cells.md`，53 行，现读在盘）。
+> r1 那程把 AC#4 的**读数**跑完但没来得及 commit，三枚读数由编排者 12:3x 代提（`e9a1db0`）；**代提只到落盘为止，判语在本节**。
+> 本文件前 363 行（§0–§4）本节一字未改（`git diff --numstat` 的核法见 §5.8 末段）。
+
+### 5.0 锚点，以及对派单／编排者每一条前提的反查
+
+共享树在本节写作期间自己往前走了 **6 枚 commit**（155 验收程两枚、台账两枚、另两枚）。本节的每一发读数都写清它自己在哪枚锚点上量的：
+
+| 读数 | 锚点（`git rev-parse --short HEAD` 当轮现取） |
+|---|---|
+| 本程进场第一读 | `9835d81` |
+| AC#4 逐支尺 R1 | `9835d81` |
+| AC#4 逐支尺 R2（五枚输入那一发） | `edd0725` |
+| AC#4 逐支尺 R3 ＋ 门复跑两发 ＋ §6 的变异与正控 | `be603fd` |
+| 本节 commit 前的最后一读 | 见 §5.8（当轮记） |
+
+**逐条反查（派单里凡"前程说 X"都是自述，本节按盘上判）**：
+
+| 断言 | 反查命令（当轮跑的） | 读数 | 判定 |
+|---|---|---|---|
+| 前程末枚＝`304199f`＝第 4 节／AC#3 | `git log -1 --format="%h %ad %s" 304199f` | `304199f3 12:15:18 evidence(票 154 实现程 第 4 节 格 AC#3)…` | **成立** |
+| 三枚读数由 `e9a1db0` 入库 | `git show --stat --format="%h %ad %s" e9a1db0` | 3 files changed, 85 insertions(+)：`zero-byte-per-commit.sh`／`zero-byte-per-commit.txt`／`g3-open-side-via-loop.txt` | **成立** |
+| `e9a1db0` 含前程全部四节 | `git merge-base --is-ancestor 304199f e9a1db0`；`git show e9a1db0:docs/evidence/s1/154-….md \| wc -l`；同件 `\| grep -c '^## '` | rc=0；**363**；**5** | **成立**（＝派单说的"363 行／5 个 `## ` 节"逐字复到） |
+| AC#1／AC#2／AC#3／AC#5 已裁完并 commit | §5.1 名册逐枚对上本文件的第 1／2／3／4 节；四枚 subject 逐枚 `git log -1` 现读 | 第 1 节＝AC#5 改前、第 2 节＝AC#1、第 3 节＝AC#2＋AC#1③＋AC#5 改后、第 4 节＝AC#3 | **成立**（就"已写、已入库"而言；**成不成立由非实现者验收表判，本节不重跑、不改写**） |
+| 编排者"我这边 12:4x 是 `245d5f4`" | `git cat-file -t 245d5f4` → `fatal: Not a valid object name`（rc=128）；`git cat-file --batch-all-objects --batch-check \| grep -c '^245d5f4'` → **0** | 本仓**不存在**任何以 `245d5f4` 为前缀的对象 | **〔不成立〕**＋当轮读数。派单同时明写"以你现量为准"，故本节一律按上表锚点走，**不据那枚 sha 判任何事**；登记给编排者（这不是注入，是一枚读不出来的数） |
+| 另两枚程在飞（155 验收／156 实现） | `git log --oneline 9835d81..HEAD`；`git rev-parse <c>:cmd/wisp/slo_windows.go` 六点位 | 155 那两枚已入库（`67cc43f`／`edd0725`）；`cmd/wisp/slo_windows.go` 的 blob 从 `1424aa7^` 到 HEAD **全程同一枚 hash** ⇒ 156 那程**本节写作时还没提交过它** | **成立**（且给出时间边界） |
+
+### 5.1 名册现算（不抄前程表，也不抄任何人的枚数）
+
+```
+$ git log --pretty=tformat: --name-only 1424aa7 352d3d8 76c89b2 304199f | sed '/^$/d' | sort -u | wc -l
+1728      ← 派单那条命令**照字面**跑出来的数：不带 --no-walk，git 会沿这四枚的父链把全部祖先一起算进来。
+            这 1728 枚里冻结面命中**非零**（别人的 commit），所以它既不是本票的名册、也不能拿来判零字节。
+$ git log --no-walk=unsorted --pretty=tformat: --name-only 1424aa7 352d3d8 76c89b2 304199f | sed '/^$/d' | sort -u | wc -l
+19        ← 四枚 commit 真正碰过的文件（去重）
+$ 逐枚条目合计 = 22（19 枚去重 ⇒ 本文件那枚证据件被 4 枚 commit 各碰一次，另 3 次是重复计数）
+```
+
+名册（19 枚，全部当轮现算；`17` 枚 `.scratch/wisp/probes/154/**` ＋ `1` 枚本证据件 ＋ `1` 枚 `internal/tools/bridge.go`）：
+逐枚的 `N1 = --name-only` 与 `N2 = --name-status --no-renames` 两把尺并核（改名折叠 vs 改名拆两侧）：
+
+| commit | N1 | N2 | N1≡N2 |
+|---|---|---|---|
+| `1424aa7` | 6 | 6 | YES |
+| `352d3d8` | 6 | 6 | YES |
+| `76c89b2` | 7 | 7 | YES |
+| `304199f` | 3 | 3 | YES |
+
+⇒ 今天没有"改名把冻结面文件挪到面外"那一形（若有，N1 会小于 N2）。名册全文与这两把尺的原始输出＝`probes/154/ac4-per-face.txt`（R2 段 §1）。
+
+### 5.2 支数＝13（本节作者自己从票面数的，命令与枚举都贴出来）
+
+```
+$ T=.scratch/wisp/issues/154-the-close-only-covers-…-trigger-gate.md
+$ sed -n '/AC#4 契约轴零字节/,/^- \[ \] \*\*AC#5/p' $T | tr '、' '\n' | sed '/^[[:space:]]*$/d' | nl | head -13
+     1  - [ ] **AC#4 契约轴零字节**：`docs/PLAN.md`      8  `thresholds.go`
+     2  `docs/specs/**`                                9  任何 golden
+     3  `internal/risk/**`                            10  `allowlist.txt`
+     4  `internal/panel/**`                           11  `scripts/slo-check.ps1`
+     5  `internal/agent/**`                           12  `tools/d22scan/**`
+     6  `internal/agent/approval/**`                  13  `cmd/wisp/slo_windows.go`
+     7  `internal/observe/**`
+（第 14 项起是票面那两条 ⚠ 限定语，不是禁改面：①`frontend/**`／`design/**` 不碰不还原、**不算进任何零命中宣称**；②本票不改 `Loop`／`Bridge` 签名）
+```
+
+⇒ **票面 AC#4 点名 13 支**。派单点的两枚"最容易漏"——`internal/agent/**`（第 5 支）与 `cmd/wisp/slo_windows.go`（第 13 支）——本节都单列成行，理由与派单一致：一支是被第 6 支包含的父树、一支是整棵冻结树里唯一的单文件。
+
+### 5.3 逐支账（13 支 × 4 枚 commit；生成器＝`probes/154/ac4-per-face.sh`，原始输出三份＝`probes/154/ac4-per-face.txt`）
+
+尺面（每格都得对这句话负责）：**名册**＝单枚 commit 的 diff 路径（按 commit 量，不按区间量）；**匹配**＝`grep -E`、大小写敏感、路径前缀锚定、**不**整词、**含 `_test.go`**（本尺盘文件不盘符号）；**分母**＝`git ls-files` 在 HEAD 上命中该支的 tracked 件枚数；**每一发都跑两遍取数并记 `grep` 的 rc**（`0/1` ＝ 命中 0 枚、rc=1＝真零命中；`128` 会另写，见 §6.3 那一发）。
+
+| # | 支（票面逐字） | HEAD 上分母/rc | `1424aa7` | `352d3d8` | `76c89b2` | `304199f` | 正控（同一把尺打在册路径上） |
+|---|---|---|---|---|---|---|---|
+| 1 | `docs/PLAN.md` | 1/0 | 0/1 | 0/1 | 0/1 | 0/1 | 正控=1（`docs/PLAN.md`） |
+| 2 | `docs/specs/**` | 14/0 | 0/1 | 0/1 | 0/1 | 0/1 | 正控=1（`docs/specs/README.md`） |
+| 3 | `internal/risk/**` | 37/0 | 0/1 | 0/1 | 0/1 | 0/1 | 正控=1（`internal/risk/assessor.go`） |
+| 4 | `internal/panel/**` | 20/0 | 0/1 | 0/1 | 0/1 | 0/1 | 正控=1（`internal/panel/approval.go`） |
+| 5 | `internal/agent/**` | 58/0 | 0/1 | 0/1 | 0/1 | 0/1 | 正控=1（`internal/agent/approval/approval.go`） |
+| 6 | `internal/agent/approval/**` | 18/0 | 0/1 | 0/1 | 0/1 | 0/1 | 正控=1（同上，被第 5 支包含的那棵子树） |
+| 7 | `internal/observe/**` | 25/0 | 0/1 | 0/1 | 0/1 | 0/1 | 正控=1（`internal/observe/clock.go`） |
+| 8 | `thresholds.go` | 1/0 | 0/1 | 0/1 | 0/1 | 0/1 | 正控=1（`internal/observe/thresholds.go`） |
+| 9a | 任何 golden（**窄**：`*/testdata/golden/*`） | 52/0 | 0/1 | 0/1 | 0/1 | 0/1 | 正控=1（`internal/agent/testdata/golden/budget-loop.sse`） |
+| 9b | 任何 golden（**宽**：路径含 `golden`，大小写敏感；大小写不敏感同枚 58） | 58/0 | 0/1 | 0/1 | 0/1 | 0/1 | 正控=1（`internal/agent/loop_golden_test.go`） |
+| 10 | `allowlist.txt` | 1/0 | 0/1 | 0/1 | 0/1 | 0/1 | 正控=1（`tools/d22scan/allowlist.txt`） |
+| 11 | `scripts/slo-check.ps1` | 1/0 | 0/1 | 0/1 | 0/1 | 0/1 | 正控=1（同名件） |
+| 12 | `tools/d22scan/**` | 6/0 | 0/1 | 0/1 | 0/1 | 0/1 | 正控=1（`tools/d22scan/allowlist.txt`） |
+| 13 | `cmd/wisp/slo_windows.go` | 1/0 | 0/1 | 0/1 | 0/1 | 0/1 | 正控=1（同名件） |
+
+13 支全部**逐支 0 命中**、分母全非零（＝尺不是空的）、正控全打得住（＝尺不是死的）。同一把尺对**重复输入**的自反性（R2 那一发把 `304199f` 送进去两遍）：§2 的 14 行末两列逐行相同、§2b 的 4 行相同（`probes/154/ac4-per-face.txt` 末段那发 awk，其第一版尺放错、已在同处更正）。
+
+票面**未点名**、由 r1 脚本自带正则加严的四支一并答（同一把尺，读数同样 0）：`internal/speech/**`（分母 1＝`doc.go`）· `internal/secret/**`（15）· `.gitattributes`（1）· `go.sum`（1）。
+
+### 5.4 r1 那把尺（`zero-byte-per-commit.sh`）的四处不足——写下来不是挑刺，是因为"逐支"这一格它给不出来
+
+1. **只给总数、不给逐支**：它每枚 commit 印一行"冻结面命中 = 0"。总数为 0 时逐支当然也为 0，但**漏答一支**（比如把 `internal/agent/**` 整支从正则里删掉）在这一版输出里看不出来。本节把 13 支摊成 13 行。
+2. **名册尺只有一把**：`git show --name-only` 默认开改名探测 ⇒ "把冻结面文件改名到面外"那一形只会露出新名。本节两把尺并核（§5.1 表，今日四枚皆 `N1≡N2`）。
+3. **`tools/d22scan/**` 被写成 `allowlist\.txt|.*\.go`** ⇒ 该目录 6 枚 tracked 件里的 `go.mod` 与 `runtests.sh` **不在尺上**（现量：`git ls-files -- tools/d22scan`＝6 枚，本节尺按 `^tools/d22scan/` 整目录）。
+4. **"任何 golden" 被写成 `.*/testdata/golden/.*`** ⇒ 漏掉 `internal/llm/golden/`（3 枚 `.go`）与两枚 `*_golden_test.go`；本节宽窄两把都跑（9a/9b，分母 52 vs 58）。
+   另记一句账：它头里写"＝派单 AC#4 ∪ 票面 AC#4"，但它的正则实为 **18 项**，而"票面 13 支 ∪ 旧派单 14 支（多出 `frontend/**`·`design/**`）"＝**15 支**；多出的是上表那四支加严。**加严不是错**，但别把 18 读成"票面要求 18 支"。
+
+### 5.5 复跑 r1 的脚本（当轮输出，不只引用代提那份）
+
+```
+$ bash .scratch/wisp/probes/154/zero-byte-per-commit.sh 1424aa7 352d3d8 76c89b2 304199f
+（全文＝probes/154/zb-per-commit-rerun-r2.txt：四枚各自"冻结面命中 = 0 ✓"，名册逐枚列出）
+$ diff <本轮输出> .scratch/wisp/probes/154/zero-byte-per-commit.txt   →  diff rc=0（逐字节相同）
+```
+两发（`9835d81` 与 `edd0725` 两枚锚点各一发）也与入库那份逐字节相同 ⇒ 该脚本只读 git 历史，**与锚点无关**；这与 §5.7 那把区间尺的行为正好相反。
+
+### 5.6 第二口径：面级 tree／blob hash 逐枚相等（字节级，不看文件名）
+
+命令＝对每个面取 `git rev-parse <点位>:<面>`（目录取 tree hash、单件取 blob hash），点位＝`1424aa7^`（四枚之前的 base）、四枚 commit、`HEAD`。原始表＝`probes/154/ac4-per-face.txt` §3。
+
+```
+面（11 棵目录 ＋ 6 枚单件）      六点位 hash 全等?
+docs/specs · internal/risk · internal/panel · internal/agent · internal/agent/approval ·
+internal/observe · tools/d22scan · internal/llm/testdata/golden · internal/agent/testdata/golden ·
+tools/mockllm/testdata/golden · internal/llm/golden ·
+docs/PLAN.md · internal/observe/thresholds.go · tools/d22scan/allowlist.txt · scripts/slo-check.ps1 ·
+cmd/wisp/slo_windows.go · .gitattributes            →  17/17 枚"全等=YES"
+```
+⇒ 这一口径比 §5.3 更强也更弱：**强**在它连"同名字节被换掉而文件名不变"都瞒不过；**弱**在它把区间里别人的 commit 一起算了进来（今天恰好全等，所以两口径互证不冲突；一旦别家程动了某支，它会把别人的账算到本票头上——见 §5.7）。
+
+### 5.7 为什么零字节只能按 commit 量（本节现量，不是转抄派单那条规矩）
+
+```
+$ git diff --name-only 1424aa7^..HEAD | wc -l      →  R1（锚点 9835d81）＝43 枚 ／ R3（锚点 be603fd）＝60 枚
+      ← 同一条命令、同一对端点，十分钟里差 17 枚：共享树被别人推进了 6 枚 commit。
+$ git diff --name-status 1424aa7^..HEAD | grep -E '(frontend|design)/'
+    M	frontend/src/main.tsx        ← 归属现量：git log --oneline 1424aa7^..HEAD -- frontend → 902c3857（**owner 的前端会话**，不是本票）
+```
+⇒ 区间尺今天在本票点名的 13 支上读到 0，但那 0 **不是本票的功劳**：它同时把别人 6 枚 commit 一起判了。r1 派单记的是"区间尺读到 2 枚 frontend 命中、commit 尺 0 ⇒ 假报违规"，本节现量是 **1 枚**（锚点不同、数不同）——**这正是"枚数一律现量"的意思**。判据本体＝§5.3（按 commit）＋§5.6（字节级互证）。
+
+### 5.8 本节自己这一格的写面自查（含共享 index 那一发实量）
+
+- **写面只有两枚**：本文件（追加）＋ `.scratch/wisp/probes/154/**`（只建不删）。本节新增的台件：`ac4-per-face.sh` · `ac4-per-face.txt` · `zb-per-commit-rerun-r2.txt`。
+- **commit 前 `git diff --cached --name-only` 两发现量**：12:5x 第一发读到一枚**别人的路径** `docs/evidence/s1/155-three-unjudged-cells-r1-accept-r1.md`（155 验收程 stage 了它）；下一发同一条命令为空（那枚已被它自己以 `edd0725` 收走）。本程**没有** `git add` 它、**没有**替它 commit；提交走显式 pathspec，commit 后 `git show --name-only` 逐枚名册核过＝只有本程路径（在 §6 的 commit 表里连号一起交）。
+- **`frontend/**`／`design/**` 不算进任何零命中宣称**：票面 ⚠ 明写。现读工作树里 `design/**` 是 owner 的未提交删除、`frontend/**` 有前端会话的未提交活——本程**不碰、不还原、不 commit**，§5.3 的 13 支里没有它们（r1 脚本的正则里反而有）。
+- 同规格的别家半件：`.scratch/wisp/probes/152/my152.py`（` M`）· `docs/evidence/s1/152-…-accept-r1.md`（未提交自校）——同上，不碰，也**不进**本节任何宣称。
+- 本节改本文件的方式＝**末尾追加**：commit 前 `git status --porcelain -- docs/evidence/s1/154-…-r1.md` 只应出现 ` M`，且 `git diff --numstat` 给的是 `+N / -0`（＝前 363 行一字未动）；这一发的读数由 §6 那枚 commit 一并带出（本节写作时它还没入库）。
+
+### 5.9 本节没测什么（AC#4 射程内，按"漏了它谁会先被骗"排序）
+
+1. **没盘未跟踪件与 `.gitignore` 后面的东西**：尺是 `git ls-files`／`git show` 的名册，未跟踪文件结构上不在任何一枚 commit 里。若有人把冻结面文件变成未跟踪再改，本节两口径都不响。
+2. **§5.6 的字节口径只到"面级点位"17 枚**，没有对 9b 那把宽尺的 58 枚 golden 单件逐一取 hash——那 58 枚的零命中只由 §5.3 的名册口径担保。
+3. **没重跑 §1/§3.4 的门禁**（那是 AC#5 的格，已裁）⇒ 本节不声称"改后仍全绿"，只声称"禁改面逐支 0 字节"。
+4. **没盘 `internal/tools/**` 自身**：它不在票面 13 支里（本票写面就是它的注释面），它由 §3.3 那条"增删行全部以 `//` 开头"的机器核担保，本节复核了一把新尺（见 §6.2 的 `diff` 两发），但**没有**把 `internal/tools/**` 当成禁改面来判。
+
+### 5.10 AC#4 判语
+
+**成立（本节作者＝续程；勾不勾由编排者按非实现者验收表定，本程不自勾）。** 交付的是：13 支逐支账（§5.3，每支带分母／两发计数／rc／正控）＋ 名册现算 19 枚（§5.1，含"派单命令照字面跑＝1728"那一发反例）＋ 字节口径互证（§5.6）＋ 区间口径为什么不可用（§5.7）＋ r1 那把尺的四处不足（§5.4）。
+**边界两句**：本节量的是 r1 的四枚 commit；本程自己那两枚的逐支读数在 §6 收口（同一条尺、输入多一枚 sha）。
