@@ -83,3 +83,28 @@ harness 有点四不像，起码要有主流 harness 的样子」。
    l2-ball-ring/bg-stop/档位字符串族/1.0 MB 格式化等）、panel.ts 契约、panel-views、
    App 安全设计（L2 卡全局渲染）、六把尺、git 纪律。
 6. 转向口令：「撤 beautiful-ui 转向」⇒ 回 demo 路线（token 第三代 + 第一批提交）。
+
+## §4 react-bits 动画缺口审计（2026-09-26，代理 D 产出）
+
+owner 规矩「动画用 react-bits，但 beautiful-ui 没有的才用」。审计结论：**本轮零 vendored**——
+5 枚点名候选全部有依赖：FadeContent→gsap，CountUp/AnimatedList/BlurText/ShinyText→motion/react。
+gsap 与 motion 都是「未经 owner 批准不得新增」的 npm 依赖 ⇒ 全部判不可用；ShinyText 另有
+props 默认 #b5b5b5/#ffffff 字面量，即使依赖解决也过不了零字面量尺。
+
+R19（票 77:235-249 留5/缓4/砍2）逐枚：
+- 已覆盖 7：Thinking Dots（pixel-on 点阵+shimmer）、Staggered Text（stream-in/reveal-text）、
+  Animated List（task-rows 80ms fade-up stagger）、Screen Transition（.screen-enter）、
+  Sidebar Glide（.nav-glide）、Tooltip（.nav-rail-label+.kbd）、eq-bounce（已收编待票 35 挂载）。
+- 缺但现状够用：Blur Highlight（tool-chips 展开即聚焦；要字面版是 3 行 CSS，无需库）。
+- 缺被依赖挡：Count-up（react-bits CountUp 只吃 number，SHOWCASE_COST 三值是字符串，
+  money/budget 不适配；tokens 一枚可 to=12480——等依赖决定）。
+- 缓 4（性能门后）：Glass Flow/Aura Blob/Neural Float/Fog Sphere——react-bits 近亲全依赖
+  ogl/three，同须 owner 批；R19 原文的三条性能用例（同屏至多1/隐藏即销毁/CPU 回落）先有才做。
+- 砍 2 维持：Glass Cursor 不复活；Agentic Ball 不替代 Direct2D 球（ball-screen 已是 D43 状态表）。
+- Preloader：极简转向已弃，不实现。
+
+**范围外发现（待人拍板）**：react-bits 的 Magnet（按钮微磁吸）是全库唯一零依赖、
+零字面量的组件——今天就能照抄。不在 R19 清单，要不要抬由 owner 一句话。
+
+给 owner 的问题：①要不要为 react-bits 引入 motion 或 gsap（引入后 CountUp/BlurText 等
+5 枚可落，但 bundle 与 D32 CPU 预算要先评）？②Magnet 抬不抬？③背景层四枚继续缓？
