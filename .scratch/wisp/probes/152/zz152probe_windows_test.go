@@ -205,8 +205,10 @@ func TestP152SubjectDeathProbe(t *testing.T) {
 					return os.ReadFile(p)
 				}
 			case "scripted":
-				scripted = &scriptedReader{t: t, repeatLast: true,
-					got: []func() ([]byte, error){scriptBytes(doc[:half])}}
+				scripted = &scriptedReader{
+					t: t, repeatLast: true,
+					got: []func() ([]byte, error){scriptBytes(doc[:half])},
+				}
 				s.readReportFile = scripted.read
 			}
 

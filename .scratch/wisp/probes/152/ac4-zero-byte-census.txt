@@ -1,0 +1,39 @@
+# AC#4 契约轴现量（本票四枚 commit 的文件名册并集 = 36 枚路径，见上）
+# date: 2026-09-26 09:52 +0800  anchor at read: 6550dc4
+
+$ grep -E '^(internal/|docs/PLAN.md|docs/specs/|tools/d22scan/|.*thresholds.go|.*golden.*|.*allowlist.txt|scripts/slo-check.ps1|frontend/|design/)' /d/work/tmp/wisp152/ticket152-paths.txt | wc -l
+0
+
+# 逐枚 commit 的名册（各枚只含自己的路径）
+-- eb4755a: 17 枚路径
+-- 4cc85bbd: 1 枚路径
+-- 10e3585: 2 枚路径
+-- 6550dc4: 16 枚路径
+
+# 预算常量命中（改前后 diff）
+(空 = 预算常量零命中)
+
+# thresholds / golden / d22scan / slo-check 在本票 diff 里的字节数
+(空 = 零字节)
+
+# 本票 diff 覆盖到的路径名册（numstat 全量）
+36
+
+# 更正本程自己第一版的一把坏尺（点名，不藏）
+# 上面那条 "git diff --numstat … | grep -v '^0'" 是**坏的**：numstat 的行形是
+# "增 删 路径"，grep -v '^0' 会把"增=0 但删≠0"的行也一起吞掉——那正是禁改面被
+# 删字节时该响的形状。本程当时据此印了"（空 = 零字节）"，属于"grep 没吐东西"与
+# "grep 根本没跑"同形那一类（票 149 验收件 §N-1 第 7 行的又一枚实例，这次是本程自己造的）。
+# 不加过滤器重跑，两条尺都是真的 0：
+$ git diff --numstat 86b0161..HEAD -- internal/observe/thresholds.go internal/risk internal/panel \
+      internal/agent/approval tools/d22scan scripts/slo-check.ps1 docs/PLAN.md docs/specs | grep -c .
+0
+# ⚠ 这一条尺的量程是"区间"，区间里夹着别家的 commit（153 的 internal/agent/**、前端会话的 frontend/**），
+#    它为零只说明"这个区间里没人动过禁改面"，不专门构成本票的凭据。
+# 本票的凭据是上面那条按"本票四枚 commit 的文件名册并集（36 枚）"算交集的那把尺：
+$ grep -cE '^(internal/|docs/PLAN\.md|docs/specs/|tools/d22scan/|.*thresholds\.go$|.*golden.*|.*allowlist\.txt$|scripts/slo-check\.ps1$|frontend/|design/)' /d/work/tmp/wisp152/ticket152-paths.txt
+0
+$ git diff --numstat eb4755a~1..HEAD -- .scratch/wisp/probes/152 cmd/wisp/slo_windows.go \
+      cmd/wisp/slo_report_144_windows_test.go docs/evidence/s1/152-subject-death-never-measured-r1.md \
+      | grep -cE 'internal/|tools/d22scan|thresholds|golden|allowlist|slo-check|docs/PLAN|docs/specs|frontend/|design/'
+0
