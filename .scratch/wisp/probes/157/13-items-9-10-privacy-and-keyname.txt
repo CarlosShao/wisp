@@ -1,0 +1,136 @@
+### P0. 尺的锚定：两枚文件此刻的行数与工作树脏否
+   589 docs/evidence/s1/153-trace-lies-unguarded-r1.md
+   939 docs/evidence/s1/153-trace-lies-unguarded-r1-accept-r1.md
+  1528 total
+$ git status --porcelain -- docs/evidence/s1/153-trace-lies-unguarded-r1.md
+rc=0（空＝与 HEAD 同版）
+
+### P1. 第 9 笔：'件内缺那笔隐私账'——153 证据件里那六个词的全部命中
+隐私           命中 = 0
+privacy          命中 = 0
+keep_transcript  命中 = 0
+私有数据     命中 = 0
+Q-31             命中 = 0
+SealDir          命中 = 0
+--- 对照：同一把尺打在 153 验收件上（证明这些词是验收程先量到的）---
+隐私           验收件命中 = 7
+privacy          验收件命中 = 3
+keep_transcript  验收件命中 = 6
+Q-31             验收件命中 = 2
+SealDir          验收件命中 = 4
+
+### P2. 第 9 笔的地基（本程自己现量，不抄验收件）
+--- (i) 改前锚点 86b0161 上已经带 "task" 键的非测试行（验收件说三处）---
+$ git show 86b0161:internal/agent/loop.go | grep -n '"task"'
+373:		l.log().Warn("agent: task_log open failed", "err", err, "task", taskID)
+741:		l.log().Warn("agent: tool timeout", "tool", req.Name, "task", req.TaskID,
+933:		l.log().Warn("agent: task_log finish failed", "err", err, "task", res.TaskID)
+--- (ii) 交付锚点 6de3d1c 上非测试侧带 "task" 的行数（验收件说 7）---
+6de3d1c5:internal/agent/compress.go:4
+6de3d1c5:internal/agent/loop.go:3
+$ git grep -n '"task"' 6de3d1c5 -- internal/agent ':!*_test.go' | wc -l
+7
+6de3d1c5:internal/agent/compress.go:49:// kept_raw_rounds, history_changed, and "task" - the owning task id, present
+6de3d1c5:internal/agent/compress.go:139:// gets a record with no "task" key at all. Absence is the designed outcome -
+6de3d1c5:internal/agent/compress.go:232:		// Ticket 153 AC#2: whose pass this was. The key is "task", the name the
+6de3d1c5:internal/agent/compress.go:238:			attrs = append(attrs, "task", task)
+6de3d1c5:internal/agent/loop.go:373:		l.log().Warn("agent: task_log open failed", "err", err, "task", taskID)
+6de3d1c5:internal/agent/loop.go:744:		l.log().Warn("agent: tool timeout", "tool", req.Name, "task", req.TaskID,
+6de3d1c5:internal/agent/loop.go:936:		l.log().Warn("agent: task_log finish failed", "err", err, "task", res.TaskID)
+--- (iii) compress.go 里那句注释（交付版行号现取）---
+6de3d1c5:internal/agent/compress.go:235:		// one grep joins the line to the task. It is a correlation id, not
+			"history_changed", rep.TokensAfter != rep.TokensBefore || len(out) != len(hist),
+		}
+		// Ticket 153 AC#2: whose pass this was. The key is "task", the name the
+		// loop already uses for the same value (loop.go's task_log Warns), and
+		// the value is the id the Result and every Event of that run carry, so
+		// one grep joins the line to the task. It is a correlation id, not
+		// history content, so [privacy] keep_transcript does not reach it.
+		if task := traceTaskID(ctx); task != "" {
+			attrs = append(attrs, "task", task)
+		}
+		c.log().Info("agent: history compressed", attrs...)
+--- (iv) keep_transcript 是不是硬编码 false、写 true 会不会报错 ---
+6de3d1c5:internal/config/schema.go:500:// PrivacySection is [privacy]. keep_transcript/keep_audio are HARD-CODED
+6de3d1c5:internal/config/schema.go:510:	// KeepTranscript is hard-coded false; true in the file = load error.
+6de3d1c5:internal/config/schema.go:511:	KeepTranscript bool `toml:"keep_transcript" default:"false"`
+6de3d1c5:internal/config/validate.go:79:// validatePrivacy enforces the hard-coded read-only keep_transcript /
+6de3d1c5:internal/config/validate.go:82:	if c.Privacy.KeepTranscript {
+6de3d1c5:internal/config/validate.go:84:			"config.toml: privacy.keep_transcript is hard-coded false (read-only); writing true is rejected")
+6de3d1c5:internal/config/validate_test.go:136:		{"privacy.keep_transcript=true", "privacy.keep_transcript", func(c *Config) { c.Privacy.KeepTranscript = true }},
+
+// validatePrivacy enforces the hard-coded read-only keep_transcript /
+// keep_audio (D16: no code path may implement keep_audio=true, SPEC-03 sec 7).
+func validatePrivacy(c *Config) error {
+	if c.Privacy.KeepTranscript {
+		return observe.New(observe.ClassConfig,
+			"config.toml: privacy.keep_transcript is hard-coded false (read-only); writing true is rejected")
+	}
+	if c.Privacy.KeepAudio {
+		return observe.New(observe.ClassConfig,
+			"config.toml: privacy.keep_audio is hard-coded false (read-only); writing true is rejected")
+	}
+	return nil
+--- (v) winsec.SealDir 在 6de3d1c 非测试代码里的调用者枚数 ---
+$ git grep -n 'SealDir' 6de3d1c5 -- '*.go' ':!*_test.go'
+6de3d1c5:internal/winsec/winsec.go:174:// reaching os.Mkdir or SealDir here can have skipped C26: the only mint for that
+6de3d1c5:internal/winsec/winsec.go:190:			// and if cur is the requested path the SealDir below repairs it.
+6de3d1c5:internal/winsec/winsec.go:220:// SealDir narrows a directory to the current user, with new children inheriting
+6de3d1c5:internal/winsec/winsec.go:222:func SealDir(path string) error {
+6de3d1c5:internal/winsec/winsec_windows.go:52:// actually happens is that the next SealDir/SealFile wipes the out-of-band
+6de3d1c5:internal/winsec/winsec_windows.go:313:		// ResolvePath (winsec.go's SealFile/SealDir/PrivateDirAll resolve before
+非测试调用者（去掉定义与注释那一枚文件本身）：
+6de3d1c5:internal/winsec/winsec.go
+6de3d1c5:internal/winsec/winsec_windows.go
+
+### P3. 第 10 笔：日志侧 task vs DB 侧 task_id
+--- (i) 规格那两枚出处 ---
+$ sed -n '74p' docs/specs/SPEC-02*.md
+  task_id        TEXT NOT NULL REFERENCES task_log(id),
+$ sed -n '2697p' docs/PLAN.md
+| `tool_call` | `id` PK, `task_id` FK, `seq`, `tool`, `args_json`, **`risk_level`**, **`decision`**, `decided_at`, `started_at`, `ended_at`, `outcome`, `error_class`, **`correlation_id`**, `grant_id` | `task_id,seq` · `correlation_id` | **30 天** | **取证记录**：每次工具调用与审批决策。owner 是隐私敏感用户 —— **"它到底对我的机器做了什么"必须可查**，这是信任的前提。`grant_id` 关联 D45 的会话授权 |
+--- (ii) DB 侧列名在交付码里的形状 ---
+6de3d1c5:internal/memory/concurrent_test.go:77:						`INSERT INTO tool_call(task_id, seq, tool, args_json, risk_level, correlation_id)
+6de3d1c5:internal/memory/concurrent_test.go:204:				`INSERT INTO tool_call(task_id, seq, tool, args_json, risk_level, correlation_id)
+6de3d1c5:internal/memory/dao_toolcall.go:24:			`INSERT INTO tool_call(task_id, seq, tool, args_json, risk_level, decision, decided_at,
+6de3d1c5:internal/memory/dao_toolcall.go:112:	rows, err := s.reader.QueryContext(ctx, toolCallSelect+` WHERE task_id=? ORDER BY seq`, taskID)
+6de3d1c5:internal/memory/dao_toolcall.go:159:const toolCallSelect = `SELECT id, task_id, seq, tool, args_json, risk_level, decision, decided_at,
+6de3d1c5:internal/memory/models.go:162:		return fmt.Errorf("memory: tool_call.task_id is required")
+6de3d1c5:internal/memory/retention_test.go:37:			`INSERT INTO tool_call(task_id, seq, tool, args_json, risk_level, correlation_id, started_at)
+6de3d1c5:internal/memory/retention_test.go:57:			`INSERT INTO tool_call(task_id, seq, tool, args_json, risk_level, correlation_id, started_at, ended_at)
+6de3d1c5:internal/memory/schema.go:71:  task_id        TEXT NOT NULL REFERENCES task_log(id),
+6de3d1c5:internal/memory/schema.go:85:CREATE INDEX idx_tool_call_task ON tool_call(task_id, seq);
+6de3d1c5:internal/memory/schema_test.go:100:			{"task_id", "TEXT", true, false},
+--- (iii) 日志侧键名 "task" 的行（上面 P2(ii) 那 7 枚）：两面键名对照 ---
+DB 列＝task_id / 日志键＝task
+$ git grep -c 'task_id' 6de3d1c5 -- internal
+6de3d1c5:internal/memory/concurrent_test.go:2
+6de3d1c5:internal/memory/dao_toolcall.go:3
+6de3d1c5:internal/memory/models.go:1
+6de3d1c5:internal/memory/retention_test.go:2
+6de3d1c5:internal/memory/schema.go:2
+6de3d1c5:internal/memory/schema_test.go:1
+--- (iv) 153 证据件里 task_id / 键名 有没有被写过 ---
+153 证据件 task_id 命中 = 0
+153 证据件 "task" 键那一枚键名讨论命中 = 3
+153 验收件 task_id 命中 = 3
+
+### P4. 这两笔落在 153 票面/验收件的确切出处行号
+416:**本格档位：成立，附两笔待补**（①件内缺那笔隐私账；②日志↔DB 键名差异无人写）。
+**本格档位：成立，附两笔待补**（①件内缺那笔隐私账；②日志↔DB 键名差异无人写）。
+416:**本格档位：成立，附两笔待补**（①件内缺那笔隐私账；②日志↔DB 键名差异无人写）。
+831:| (a) 交付物本身 | §5.1／§5.2／§5.5、§3.2 的 `A4`／`A6` | `[前]` 到盘两行读数（未打标那行**整枚 `task` 键不存在**）、`traceTaskID` 一处读者、`withTraceTask` 唯一非测试点 `loop.go:399`、摘 `A4`/`A6` 即红 | **附条件**——两笔待补（`[前]` §5.3：件内缺那笔隐私账；§5.3 第 3 笔：日志侧 `task` 与 DB 侧 `task_id` 不同名无人写）。最小闭合＝证据件补那两行，不动码不动判据 |
+887:| 2 | 件内缺那笔隐私账（`:406–:411`）＋ 日志 `task` ↔ DB `task_id` 不同名无人写（`:412–:414`） | AC#2 (a) | 加两行，不动码 |
+### B9/B10 补尺：spec 侧有没有写过日志↔DB 那枚键名对价
+$ grep -rn 'task_id' docs/specs/ | grep -c '日志'
+0
+--- spec 里 task_id 的全部出现处（前 12 枚）---
+docs/specs/SPEC-02-data-storage.md:74:  task_id        TEXT NOT NULL REFERENCES task_log(id),
+docs/specs/SPEC-02-data-storage.md:88:CREATE INDEX idx_tool_call_task ON tool_call(task_id, seq);
+--- 本件里 "task" 键名惯例那两行的原文 ---
+373:	l.log().Warn("agent: task_log open failed", "err", err, "task", taskID)   ← 键名 "task" 的既有惯例
+（键名沿用 `loop.go` 已经在用的 `"task"`，值沿用 `newTaskID()` 造的那枚、与 `Result.TaskID`／
+--- 153 验收件 §5.3 三笔的行界（工单第 9 笔写的是'第 3 笔'）---
+398:1. **不是新增暴露类。** 锚点 `86b0161` 上**已经有三处**把同一枚 id 用同一个键名写进同一枚文件：
+403:2. **它算过的那笔账只写在码里、没写在件里。** `compress.go:236` 那句
+412:3. **命名一致性（本程自己加的一发）**：`SPEC-02:74`／`PLAN.md:2697` 里那枚叫 **`task_id`**（DB 列，`REFERENCES task_log(id)`），

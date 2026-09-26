@@ -587,3 +587,39 @@ git log --since='08:30' --until='10:30' -- frontend docs/reports/frontend-sessio
 ⇒ **候选真身＝`86b0161`**——**〔未证〕**，理由只有"同一区间、同一作者、名册里恰好缺一枚、而它是窗口内第一枚前端提交"；
 **我不据它改名册**（按"不回填、只追加"的规矩，也按"猜出来的号比空号更坏"这条本仓既有条）。下一位若要用这一行，**自己现跑上面那三条**。
 ⇒ **这格不影响任何 AC 的档位**（名册是"本程未越界"的反扫凭据，不是判据；少一枚不可核的号不改变"零越界"的结论）。
+
+---
+
+## 附录 B（票 157 代记，只追加）
+
+- 来路＝工单 `.scratch/wisp/issues/157-record-level-cleanup-ten-table-vs-disk-mismatches-left-by-tickets-155-and-153.md` 第 **9、10** 笔（＝本票 AC#2 里 `(a)` 那枚〔附条件〕欠的两件待补）＋派单 `.scratch/wisp/dispatches/2026-09-26-131x-impl-157-record-level.md`。同一票的第 1–8 笔落在 `155-three-unjudged-cells-r1.md` 末尾的**同名一节**。
+- 本程身份＝**实现程·代记**：**零代码、零翻勾、零 `-done`、零新读数**。本件 §0–§7 与 **附录 A** 一字未改（进场现量 `wc -l`＝**589**）。两笔逐笔**先复算再补**，原始读数＝`.scratch/wisp/probes/157/13-items-9-10-privacy-and-keyname.txt`（＋`14-supplementary-rulers.txt` 末段 B9/B10 补尺）。
+- ⚠ **补完这两件不等于本票 AC#2 能翻勾**：工单 `:31` 明写"翻勾由编排者按两张表合起来定，实现方不自勾"；本节里没有任何一枚档字是本程自立的。
+- ⚠ 出处的一枚更正：工单 `:21` 把第 9 笔的出处写成"153 验收件 §5.3 **第 3 笔**"，本程逐行取版现量 §5.3 三笔的行界＝**第 1 笔 `:398`**（不是新增暴露类）／**第 2 笔 `:403–:411`**（件内缺那笔隐私账）／**第 3 笔 `:412–:414`**（日志 `task` ↔ DB `task_id` 不同名）。⇒ 隐私账那笔是**第 2 笔**；153 验收件 §12 `:831` 与 §12.4 `:887` 两处的引用行号（`:406–:411`＋`:412–:414`）是对的，本附录按它们写。
+
+### B.9 第 9 笔 —— 本件缺那笔隐私账：**〔成立〕**
+
+**验收程那一句**（`153-trace-lies-unguarded-r1-accept-r1.md:403`–`:411` ＋ `:416` 档位行第 ① 件）："`compress.go:236` 那句 'It is a correlation id, not history content, so `[privacy] keep_transcript` does not reach it' —— 本程复算它**成立**…**但本程在整份交付版证据件里搜 隐私／privacy／keep_transcript／私有数据／Q-31／SealDir：0 命中**……证据件里该有一行'落在票 132 的未闭合面上'；现在没有，读者会以为注释里那句 'keep_transcript 不到它' ＝ 隐私已审。"
+
+**本程当轮复算**（全文＝`probes/157/13-…txt` 的 P1/P2 段）：
+
+```
+$ for w in 隐私 privacy keep_transcript 私有数据 Q-31 SealDir; do grep -c -- "$w" 本件; done
+0 ／ 0 ／ 0 ／ 0 ／ 0 ／ 0          ← 六枚全 0（同一把尺打在 153 验收件上＝7／3／6／—／2／4，尺是活的）
+$ git show 86b0161:internal/agent/loop.go | grep -n '"task"'
+:373 task_log open failed   ／  :741 agent: tool timeout   ／  :933 task_log finish failed   ← 三枚既有
+$ git grep -n '"task"' 6de3d1c5 -- internal/agent ':!*_test.go' | wc -l → 7
+$ git show 6de3d1c5:internal/agent/compress.go | sed -n '232,236p'   ← 那句注释逐字在场（:236 是"does not reach it"那行）
+$ git grep -n 'KeepTranscript' 6de3d1c5 -- internal/config
+schema.go:511 KeepTranscript bool `toml:"keep_transcript" default:"false"`
+validate.go:82-84 if c.Privacy.KeepTranscript { return observe.New(observe.ClassConfig, "…hard-coded false (read-only); writing true is rejected") }
+validate_test.go:136 {"privacy.keep_transcript=true", …}      ← 写 true 报错这件事有钉
+$ git grep -n 'SealDir' 6de3d1c5 -- '*.go' ':!*_test.go' → 6 枚命中，全在 internal/winsec/{winsec.go:174,190,220,222 与 winsec_windows.go:52,313}
+                                                  ⇒ 定义 1 枚＋注释 5 枚：**非测试调用者 0 枚**
+```
+
+**我这一笔用的尺是什么**＝**两把**：① "缺不缺这一行"用**六词行级计数**打在**本件**上（并同一把尺打验收件做正控，证明 0 不是死尺）；② "那一行该写什么内容"用**锚点取版的码级现量**（`git show <锚>:<路径>`／`git grep … <锚>`，全部打在 `86b0161`／`6de3d1c5` 上，不读工作树），**没有一条是从验收件转抄的**。`SealDir` 那一枚本程额外做了"调用者 vs 定义者"的分拣（6 枚命中全在 winsec 自己两枚文件里），因为"零调用者"这件事光看枚数会读反。
+
+**对不上的一枚没有** ⇒ 按最小闭合补那一行（本件正文一字未改，新文挂这里；这是**记账级**文字，不动判据、不动码）：
+
+> **隐私账（本件当时没算，票 157 第 9 笔代记）**：本票交的那枚 `task` 键把一枚可归因 id 写进宿主日志文件。**它不是新增暴露类**——同一枚键名、同一枚值在改前锚点 `86b0161` 就有三枚非测试行在用（`loop.go:373`／`:741`／`:933`），到 `6de3d1c` 非测试侧带 `"task"` 的行数是 **7**；本票做的是"让成功边那一行也进"，不是"让 id 第一次进日志"。**但它落在票 132 那格未闭合的面上**：`Q-31`（日志算私有数据要上锁）要求的那把锁 `winsec.SealDir` 在 `6de3d1c5` 的非测试代码里**零调用者**。交付版 `compress.go:236` 那句"`[privacy] keep_transcript` does not reach it"复算**成立**（硬编码 false＋写 true 报错，`schema.go:511`／`validate.go:82-84`／`validate_test.go:136`），**可它只到"转写不落盘"那一层，不等于"文件已上锁"**——本件正文里没有这一区分，读者会把它读成隐私已审。
