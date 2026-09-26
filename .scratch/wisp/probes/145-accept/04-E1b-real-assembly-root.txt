@@ -1,0 +1,16 @@
+# 派单前提② E1b 复现：blob 精确树 ＋ 只加 composer.go 九枚键（pump.go / run.go / panel.ts 全不动）
+# 本程不自造 PumpSources，改跑真装配根：newRunFixture -> runTextTask -> rt.publishPanelSnapshot -> lastPanelSnapshot 的 *出口字节*
+# 测试源：tree-mut1/cmd/wisp/zz145accept_e1b_test.go（已随本探针名册入仓，见 04b- 同名 .go）
+# 命令：PATH=<repo>/third_party/sherpa-onnx:$PATH go test -count=1 -v -run TestAccept145WhatTheRealAssemblyRoot ./cmd/wisp/
+    zz145accept_e1b_test.go:45: wire["pending"] = []
+    zz145accept_e1b_test.go:45: wire["results"] = [{"correlationId":"18207b6c-27f9-4085-9fea-55f5fc2f43b3","text":"echo: ## scene\n当前时间：2026-09-26 02:46 +00:00","done":true}]
+    zz145accept_e1b_test.go:45: wire["composer"] = {"mode":{"current":"ask_every_step","names":["ask_every_step","ask_high_risk","auto_approve"],"l2ConfirmNames":["auto_approve"]},"workspace":{"set":false,"spelling":"","canonical":"","reparse":false,"rewritten":false,"reason":"未选择工作区：本轮按 [fs] allowed_dirs 授权的目录判定"},"attachments":[],"acceptedAttachmentMimes":["image/png","image/jpeg","image/gif","image/webp","video/mp4","video/quicktime"],"maxAttachmentBytes":67108864,"attachmentError":""}
+    zz145accept_e1b_test.go:45: wire["generatedAt"] = "2026-09-26T02:46:39Z"
+    zz145accept_e1b_test.go:45: wire["run"] = {"reasoning":"","status":"","usage":{"input":0,"output":0,"cachedRead":0}}
+    zz145accept_e1b_test.go:45: wire["tools"] = null
+    zz145accept_e1b_test.go:45: wire["approval"] = {"depth":0,"windowMs":0,"vetoChannels":null}
+    zz145accept_e1b_test.go:45: wire["cost"] = {"tokensIn":0,"tokensOut":0,"cachedTokens":0,"micros":0,"currency":""}
+    zz145accept_e1b_test.go:45: wire["failures"] = null
+    zz145accept_e1b_test.go:56: LIVE in the same packet: pending=0 results=1 mode=ask_every_step workspace.set=false
+--- PASS: TestAccept145WhatTheRealAssemblyRootSendsForTheNewKeys (1.65s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.715s

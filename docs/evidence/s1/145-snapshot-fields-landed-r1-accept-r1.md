@@ -115,3 +115,61 @@ $ cp -r exact tree-mut2 && python <插一枚键> && go test -count=1 -v ./intern
 `approval_test.go:105`"——那两行是**函数注释/用例起点**（现量 `approval_test.go:105` ＝ `func TestApprovalCardViewJSONKeysMatchFrontendTypes`、
 `composer_test.go:48` ＝ `func TestComposerContractTypesMatchFrontend`），而**响的行**是 `:129`／`:74`。
 两读不矛盾（一枚指"尺在哪"，一枚指"哪一句红"），但**注释里那两行号是"定义处"不是"断言处"**，下一位照注释去 `:48` 找断言会扑空。属**措辞精度**，不属读数错。
+
+---
+
+## 2. 前提② E1b（派单称"最硬的一发"）：**成立——但本程把它从"手搓 PumpSources"换成真装配根，并量出一处它没写的边界**
+
+### 2.1 先复量派单给的那几枚锚点（行号是"它的锚点"下的，本程现读）
+
+```
+$ grep -n "NewSnapshotPump(panel.PumpSources{" cmd/wisp/run.go        → 421（字面量 421-427，读口 Verdicts/Mode/Workspace/Results/Out）
+$ grep -n "func (c consoleSink) Publish" cmd/wisp/run.go              → 751（事件汇 751-785 确为那一整枚 switch）
+$ grep -rn --include=*.go "NewSnapshotPump(" .  | grep -v _test.go
+      ./cmd/wisp/run.go:421                       ← 唯一生产调用者
+      ./internal/panel/pump.go:145                ← 定义本身
+      ./.scratch/wisp/probes/151/run.head.go:421  ← ⚠ 票 151 的**探针副本**，不是码
+      ./.scratch/wisp/probes/151/run.mut-noclose.go:421
+$ git diff --numstat e24ae28 3dcff6a -- cmd/wisp/run.go                → 空（实现程下的行号在本被验版本仍逐枚有效）
+```
+
+⇒ 锚点四枚全部成立，且要补一句口径：**"全树唯一生产调用者"只有在把 `.scratch/wisp/probes/**` 剔掉时才成立**
+（票 151 在探针目录里存了两枚 `run.go` 的副本，同一行号）。实现程那句"唯一一枚＝此处"结论对、**尺不够精确**。
+
+### 2.2 复现：本程**不**手搓 `PumpSources`，改跑真装配根
+
+派单/实现程那一发（§2.4）用的是自造的五枚读口字面量（实现程自己在 §7.3#2 承认了）。本程换成
+`newRunFixture → runTextTask（= `wisp run` 那一支组合根）→ rt.publishPanelSnapshot() → rt.lastPanelSnapshot()` 的
+**出口字节**（不是 Go struct）。测试源＝`probes/145-accept/04b-E1b-probe-test.go.txt`，读数＝`04-E1b-real-assembly-root.txt`。
+
+```
+$ cp -r exact tree-mut1 && git apply --include=internal/panel/composer.go <closure.patch>   # 只加九枚键
+$ PATH="<repo>/third_party/sherpa-onnx:$PATH" go test -count=1 -v -run TestAccept145WhatTheRealAssemblyRoot ./cmd/wisp/
+    wire["results"]     = [{"correlationId":"18207b6c-…","text":"echo: ## scene\n当前时间：…","done":true}]   ← 活
+    wire["composer"]    = {"mode":{"current":"ask_every_step",…},"workspace":{…,"reason":"未选择工作区：…"},…}  ← 活
+    wire["generatedAt"] = "2026-09-26T02:46:39Z"
+    wire["run"]         = {"reasoning":"","status":"","usage":{"input":0,"output":0,"cachedRead":0}}
+    wire["tools"]       = null
+    wire["approval"]    = {"depth":0,"windowMs":0,"vetoChannels":null}
+    wire["cost"]        = {"tokensIn":0,"tokensOut":0,"cachedTokens":0,"micros":0,"currency":""}
+    wire["failures"]    = null
+    LIVE in the same packet: pending=0 results=1 mode=ask_every_step workspace.set=false
+--- PASS   rc=0   （断言方向＝断言"没填"，见放水两问）
+```
+
+⇒ **五枚新段全部以零值／null 出门，而同一个包里 `results`／`composer` 带真值**（`pending=0` 见 2.3）。
+⇒ 派单前提②那句"`run.go:421-427` 不动 ⇒ 新增 section 跑出进程的是那串常量"**成立**，
+且它现在是**真装配根读数**，不再是"同形状手搓"。`{"depth":0,"windowMs":0,"vetoChannels":null}` 与派单引的一字不差。
+
+### 2.3 两处本程要给它划清楚的边界（不是推翻，是别让下一位读过头）
+
+- **"pending 也是活的"这一支本程没复现**，因为本程这一发跑的是普通文本任务、队列里没有卡。
+  实现程 §2.4 那个 `pending len=1` 来自**它自己喂给手搓读口的**一条 `NativeVerdict`——**那不是"生产在填"，是"探针在填"**。
+  ⇒ 结论不受影响（对比项换成 `results`/`composer` 更硬：那两枚是这条真任务真填的），
+  但**"同一个包里 pending/results 是活的"这句在实现件里是手搓读数**，本程把它降级为"半读数半构造"。
+- **"提前 ship 给面板"这一支不成立，而实现程自己没这么写**：这串常量今天**到不了页**——
+  泵出口是 `rt.bookPanelSnapshot`（写台账摘要＋在内存里留一份字节），树里没有 Go→页通道（`panel_pump.go:13-21` 自证、实现件 N1 同判）。
+  ⇒ 所以 E1b 证明的是**"有键无填＝契约里进五枚常量"**（形状＝普查 §2.0(2) 的第四态"无生产者"的镜像），
+  **不是**"用户会看到一堆 0"。本票的判词应写成前者；后者目前不会发生。实现件 §2.4 的原句
+  "加出来的正是本票自己要防的那形"——**那形＝装饰／契约污染**，它没写"用户看得见"，所以**这句不算错**，
+  但派单正文第 15 行把它转述成"把本票要防的常量**提前 ship 出去**"，**"ship 出去"三字过头**，本程按 2.3 校正。

@@ -1,0 +1,75 @@
+package main
+
+// ACCEPTANCE PROBE (ticket 145 adversarial accept, out-of-repo copy only).
+//
+// Question: with ticket 145's nine candidate keys added to panel.Snapshot and
+// the production assembly root (cmd/wisp/run.go:421-427) left exactly as the
+// audited version has it, what do the new sections carry when they leave a real
+// run? This drives runTextTask through the same composition root `wisp run`
+// uses, then publishes off the live runtime and reads the booked BYTES (the exit
+// function's output, not a hand-built struct).
+
+import (
+	"encoding/json"
+	"strings"
+	"testing"
+)
+
+func TestAccept145WhatTheRealAssemblyRootSendsForTheNewKeys(t *testing.T) {
+	f := newRunFixture(t, "openai-chat")
+	var rt *agentRuntime
+	f.rtHook = func(live *agentRuntime) { rt = live }
+	if code := f.run("总结一下 这份笔记"); code != 0 {
+		t.Fatalf("exit %d\nstderr:\n%s", code, f.err.String())
+	}
+	if rt == nil {
+		t.Fatal("the hook never saw the assembled runtime")
+	}
+	rt.publishPanelSnapshot()
+	snap, data, ok := rt.lastPanelSnapshot()
+	if !ok || len(data) == 0 {
+		t.Fatal("no packet was booked by the live pump")
+	}
+
+	var wire map[string]json.RawMessage
+	if err := json.Unmarshal(data, &wire); err != nil {
+		t.Fatalf("exit bytes do not parse: %v", err)
+	}
+	for _, k := range []string{"pending", "results", "composer", "generatedAt",
+		"run", "tools", "approval", "cost", "failures"} {
+		v, present := wire[k]
+		if !present {
+			t.Errorf("key %q never left the process at all", k)
+			continue
+		}
+		t.Logf("wire[%q] = %s", k, strings.TrimSpace(string(v)))
+	}
+
+	// The two sections the audited assembly root DOES fill, in this same packet.
+	if len(snap.Pending)+len(snap.Results) == 0 {
+		t.Fatalf("live sections empty too - this run proves nothing about contrast; pending=%d results=%d",
+			len(snap.Pending), len(snap.Results))
+	}
+	if snap.Composer.Mode.Current == "" || snap.Composer.Mode.Current == "unknown" {
+		t.Errorf("composer.mode = %q, want the mode this run actually ran under", snap.Composer.Mode.Current)
+	}
+	t.Logf("LIVE in the same packet: pending=%d results=%d mode=%s workspace.set=%v",
+		len(snap.Pending), len(snap.Results), snap.Composer.Mode.Current, snap.Composer.Workspace.Set)
+
+	// Every candidate section that arrived must be the zero value of its type.
+	if s := string(wire["run"]); !strings.Contains(s, `"input":0`) || !strings.Contains(s, `"status":""`) {
+		t.Errorf("run section = %s, want the unfilled zero shape", s)
+	}
+	if s := strings.TrimSpace(string(wire["tools"])); s != "null" {
+		t.Errorf("tools = %s, want null (no reader at the assembly root)", s)
+	}
+	if s := strings.TrimSpace(string(wire["approval"])); s != `{"depth":0,"windowMs":0,"vetoChannels":null}` {
+		t.Errorf("approval = %s, want the three-zero shape", s)
+	}
+	if s := string(wire["cost"]); !strings.Contains(s, `"micros":0`) || !strings.Contains(s, `"currency":""`) {
+		t.Errorf("cost = %s, want the unfilled zero shape", s)
+	}
+	if s := strings.TrimSpace(string(wire["failures"])); s != "null" {
+		t.Errorf("failures = %s, want null", s)
+	}
+}
