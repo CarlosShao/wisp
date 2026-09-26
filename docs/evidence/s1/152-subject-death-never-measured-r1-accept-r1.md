@@ -109,3 +109,77 @@ ok  	github.com/CarlosShao/wisp/cmd/wisp	0.071s	coverage: 1.8% of statements   r
 
 **本程没测什么（本格）**：没核 `10e3585^` 之前那一段区间里 `slo_windows.go` 的历史（144/147/149 的账）；
 没比对快照里那 3 枚 dll 与 CI runner 用的是不是同一批字节（同实现件 §0.1 的登记）。
+
+---
+
+## 第 1 格　AC#1 与被换掉的那枚根因：本程用自己的尺重走到"哪一句印出来"
+
+### 1.1 本程的判据（跑之前写死）
+
+派单第 1 条要求"自己复走到'摘掉 `s.exited()` 后 `--- FAIL: 0 枚`'那一步"。本程把它拆成三条**可失败**的读数，
+全部经本程自己的探针（`probes/152/accept-r1/zz152acc1_windows_test.go`，仓外 overlay 注入，
+`ls cmd/wisp/zz152acc1_windows_test.go` → 不存在，`git status --porcelain cmd/wisp` 干净）：
+
+1. 真子进程（`exec.Command(os.Args[0], …)`、真 pid、真退出码 7）、真落在盘上的真文件（子进程自己 `os.WriteFile`）、
+   真 `os.ReadFile`（`readReportFile` 留 nil＝生产接线）——**四真一条不退**，与实现件 §1.1 同一条纪律；
+2. 外部证人：`windows.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION)` ＋ `GetExitCodeProcess`，
+   **先等 OS 说终止、再开循环**（排除"死得不够快"）；
+3. 断言方向取**否证式**：探针 A 在"`exited()` 那一支今天真走到了／句子换了邻居"时红，探针 B 在"收尸之后仍不印 exited 句"时红。
+
+### 1.2 读数（`logs/post__probe-post.log`，RUN=3 全绿；同一发也在 `asisp-probe-only` 重跑过一遍）
+
+```
+ACC|setup|pid=57884 file_bytes=836 os_says=terminated exit_code=7 cmd.ProcessState==nil?true
+ACC|A|exited_before=false exitCode_before=-1 elapsed=2.0040809s
+ACC|A|sentence=wisp slo: subject 57884 never wrote a complete report within 2s (last read: 836 bytes read, document still open at offset 836: the tail had not arrived)
+ACC|A|after_loop|exited=false exitCode=-1
+ACC|A|last_reading|state=unwritten offset=836 bytes=836 summary="836 bytes read, document still open at offset 836: the tail had not arrived"
+ACC|B|after_reap|exited=true exitCode=7
+ACC|B|elapsed=565.2µs sentence=wisp slo: subject 61588 exited (code 7) without writing its report (836 bytes read, document still open at offset 836: the tail had not arrived)
+ACC|C|zero_value_summary="0 bytes read, document still open at offset 0: the tail had not arrived"
+ACC|C|inside_collectReportWithin|last_assign_at=883 exited_check_at=1126
+```
+
+⇒ **OS 说它死了（code 7）、`cmd.ProcessState` 仍是 nil、`s.exited()` 假、循环烧满整段预算、印的是邻居那句**：
+被验版本在真子进程上复现，**根因换轨那一判＝成立**。翻转它的唯一变量是本程自己补的那一发 `cmd.Wait()`（B：0s 内当场红）。
+
+### 1.3 机制名册（本程现跑，按 97cfc6e 行号）
+
+```
+$ grep -n '\.Wait()\|\.Run()\|StartInJob\|ProcessState' cmd/wisp/slo_windows.go
+498:	p, err := rt.Job.StartInJob(cmd)
+833:	return s.cmd != nil && s.cmd.ProcessState != nil && s.cmd.ProcessState.Exited()
+840:	return s.cmd.ProcessState.ExitCode()
+855:		_ = s.cmd.Wait()            <- 全文件唯一一处 Wait，在 stop() 里面
+$ grep -c "go func" cmd/wisp/slo_windows.go            -> 0    （没有哪条 goroutine 会去收尸）
+$ grep -n "defer subject.stop()\|defer instrumented.stop()\|collectReport()" cmd/wisp/slo_windows.go
+371:	defer subject.stop()
+380:	defer instrumented.stop()
+392:	observer, err := instrumented.collectReport()   <- 收尸是 defer，判死在它里面
+$ grep -n "s.exited()" cmd/wisp/slo_windows.go -> 520 / 820 / 837 / 851
+```
+
+⇒ 实现件 §1.5 那张名册**逐行对得上**（它引的 794/801/816 是本程 833/840/855 加上 `10e3585` 自己插入的 41 行）；
+⇒ `s.exited()` 的**两处用法**都在任何 `Wait` 之前（`:520` 属 `waitReady`、`:820` 属本循环），
+本程只把 `:820` 量成了读数，**`:520` 那一支本程没重跑**（实现件 §2 有它的一发 60s 读数，档位〔日志＋归档，抽验〕，
+本程按静态名册判它同因、不判它已复算）。
+
+### 1.4 AC#1 本身
+
+工单 AC#1 要的是"量成一次读数，而不是再造一个假对象"，并明写"不许预填结论：量出来那条路今天产不出红句，
+那正是要的答案"。本程复算：实现件 §1.3 的七格矩阵里，与本程同形的第 1、4 两格（unreaped→timeout 腿、REAPED→exited 腿）
+**本程独立走到了**；它 §3 那发端到端（真 `wisp slo`、真 `TerminateProcess`、操作员 stderr 原文、rc=2 不降级）
+本程**没有复跑**（理由见§9 第 3 条）。⇒ **AC#1 成立**，且它落在工单预填的"ⓑ/ⓒ 停手上报"那一支上是对的。
+
+### 1.5 两句要更正的措辞——一句是派单的、一句是台账的（**都不是交付表里的**）
+
+| 出处 | 那句话 | 本程现量 |
+|---|---|---|
+| 派单第 1 条（＝台账 `A275②`）："实现件断言……`saw[1]` 是**空信封**、`last` 被赋成一条都没见过的空报告、**`last` 是 nil**、那一支今天根本不进 ⇒ **摘掉 `s.exited()` 也零枚红**" | ① 被验的表里**零次**出现"空信封／`saw[1]`／`last` 是 nil"（`grep -c` 命中 0，见 §0 现跑）；② `subjectReportRead` 是**值类型**、`last = obs` 在两处 give-up **之前**无条件执行（`last_assign_at=883 < exited_check_at=1126`）⇒ 没有"nil"这个状态可谈；③ 真要谈零值，它印出来的是 `0 bytes read, document still open at offset 0`（本程量到的），那是**指错位置的数**、不是空信封；④ **"摘掉 `s.exited()` 零枚红"直接被本程否掉**：`x1-exited-arm-deleted`＝RUN 21／PASS 13／**FAIL 1**，红名 `TestSLO149ExitedGiveUpSentenceCarriesTheLastReading` | **不成立**。成立的是它的**条件式**：摘掉整条支**并且**摘掉 case 13 ⇒ 0 枚红（`x2`＝RUN 20／PASS 13／**FAIL 0**）——这句话在交付表 §4.2 问一 ② 里就是这么写的，**表是对的、台账与派单把它抄歪了** |
+| 任务书/派单第 2 条："为此新增了 `report.PendingExit` 字段和一条新红句" | `git grep -n "PendingExit" 97cfc6e` 全仓命中 **2 处，都在文档里**（这枚派单本身、台账 `A275`）；`*.go` 里 **0 处**，工作树里也 0 处。被验的码改动只新增了一枚**常量** `offsetUnknown` 与一枚函数 `contradictSubjectReportErr`（见第 2 格） | **不成立**：那三枚"工作树里读到的改动"没有进过任何一枚 commit（`A275①` 是 09:5x 按当时脏树逐行读的，`A276①` 之后它复活改成了 AC#3 那一版）。⇒ **本程按 97cfc6e 的真改动裁，不按这句裁** |
+
+**第 1 格判定：AC#1 成立、根因换轨成立（本程复现）；台账 `A275②` 与派单第 1／2 条那两版措辞退回更正。**
+
+**本程没测什么（本格）**：`waitReady`（`:520`）那一支本程没跑真读数；端到端（真 CLI＋真杀）本程没复跑；
+`startSubject` 指派失败那一支（`internal/proc/jobscope_windows.go:117-119`，唯一可能出现在 `collectReport` 之前的收尸点）
+本程与实现件**都没构造过**——两程一致挂着，没人在这里宣称测过。
