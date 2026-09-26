@@ -1,0 +1,40 @@
+### 收口复测（§7.1 那两枚枚数写错了，这里现量并指向更正）
+本程名下 commit 枚数: 4
+c10f0c4 12:13 evidence(155 收口三节): §3.4-3.5 本格�
+9136820 12:06 evidence(155 格③=AC#3 句② 裁完): 到�
+a52ded8 12:01 evidence(155 格②=AC#2 问② 裁完): 唯�
+829abe5 12:00 evidence(155 格①=AC#2 问① 裁完): 改�
+
+四枚 commit 的 name-only 并集去重枚数: 11
+.scratch/wisp/probes/155/00-anchor-reverse-check.txt
+.scratch/wisp/probes/155/01-ac2-q1-before.txt
+.scratch/wisp/probes/155/02-ac2-q2-holder.txt
+.scratch/wisp/probes/155/10-snapshot-sync.txt
+.scratch/wisp/probes/155/11-ext-matrix.txt
+.scratch/wisp/probes/155/12-instrument-listing.txt
+.scratch/wisp/probes/155/13-ruler-caliber-diff.txt
+.scratch/wisp/probes/155/14-line-number-recheck-for-voided-block.txt
+.scratch/wisp/probes/155/20-delivery-shape.txt
+.scratch/wisp/probes/155/sync_blob_tree.py
+docs/evidence/s1/155-three-unjudged-cells-r1.md
+
+禁改面管道支数（本程实列）: 15  支，逐支命中:
+  ^internal/risk/                  0
+  ^internal/panel/                 0
+  ^internal/agent/approval/        0
+  ^internal/observe/               0
+  ^internal/                       0
+  thresholds\.go                   0
+  golden                           0
+  allowlist\.txt                   0
+  ^scripts/slo-check\.ps1          0
+  ^tools/d22scan/                  0
+  ^docs/PLAN\.md                   0
+  ^docs/specs/                     0
+  ^cmd/wisp/slo_windows\.go        0
+  ^frontend/                       0
+  ^design/                         0
+正控（同一批尺，b23c7f7）^internal/agent/ = 3 枚
+
+155 票面未勾框枚数: 4   -done 枚数(153/155): 0
+收口时刻: 2026-09-26 12:14 +0800  HEAD: c10f0c4 evidence(155 收口三节): §3.
