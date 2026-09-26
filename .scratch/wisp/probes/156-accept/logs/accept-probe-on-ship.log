@@ -1,0 +1,43 @@
+$ go test -count=1 -overlay 'C:\Users\swq\AppData\Local\Temp\wisp156-ruler\accept-probe-on-ship\overlay.json' -v -run '^TestP156SubjectDeathProbe$' ./cmd/wisp/
+$ tree=D:/work/workspace/projects plans/Wisp  overlaid=['D:/work/workspace/projects plans/Wisp/cmd/wisp/zz156probe_windows_test.go']
+time=2026-09-26T17:03:56.926+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestP156SubjectDeathProbe
+P156|fixture|bytes=doc=1978 child_writes=989 child_exit=7 budget=2s poll=10ms
+=== RUN   TestP156SubjectDeathProbe/prefix-unreaped
+P156|prefix-unreaped|witness=os_knows_dead_ms_since_spawn=48 polls=23 code=7 (GetExitCodeProcess: terminated)
+P156|prefix-unreaped|record=ProcessState_nil=true exited=false exit_code=-1
+P156|prefix-unreaped|agree=os_dead_to_code_dead_ms=7 asks=6
+P156|prefix-unreaped|loop=elapsed_ms=0 reads=1 budget=2s verdict_kind=DEAD-CHILD sentence (the one that names the cause)
+P156|prefix-unreaped|sentence=wisp slo: subject 23104 exited (code 7) without writing its report (989 bytes read, document still open at offset 989: the tail had not arrived)
+P156|prefix-unreaped|record_after_loop=exited=true exit_code=7 ProcessState_nil=true
+P156|prefix-unreaped|window=os_knew_at_ms=48_code_still_said_alive_after_loop_ms=7
+=== RUN   TestP156SubjectDeathProbe/nofile-unreaped
+P156|nofile-unreaped|witness=os_knows_dead_ms_since_spawn=36 polls=18 code=7 (GetExitCodeProcess: terminated)
+P156|nofile-unreaped|record=ProcessState_nil=true exited=false exit_code=-1
+P156|nofile-unreaped|agree=os_dead_to_code_dead_ms=6 asks=5
+P156|nofile-unreaped|loop=elapsed_ms=0 reads=1 budget=2s verdict_kind=DEAD-CHILD sentence (the one that names the cause)
+P156|nofile-unreaped|sentence=wisp slo: subject 64572 exited (code 7) without writing its report (0 bytes read, no report file yet)
+P156|nofile-unreaped|record_after_loop=exited=true exit_code=7 ProcessState_nil=true
+P156|nofile-unreaped|window=os_knew_at_ms=36_code_still_said_alive_after_loop_ms=6
+=== RUN   TestP156SubjectDeathProbe/prefix-REAPED-case13shape
+P156|prefix-REAPED-case13shape|witness=os_knows_dead_ms_since_spawn=33 polls=18 code=7 (GetExitCodeProcess: terminated)
+P156|prefix-REAPED-case13shape|wait_before_loop=exit status 7
+P156|prefix-REAPED-case13shape|record=ProcessState_nil=false exited=true exit_code=7
+P156|prefix-REAPED-case13shape|agree=os_dead_to_code_dead_ms=4 asks=1
+P156|prefix-REAPED-case13shape|loop=elapsed_ms=0 reads=1 budget=2s verdict_kind=DEAD-CHILD sentence (the one that names the cause)
+P156|prefix-REAPED-case13shape|sentence=wisp slo: subject 19544 exited (code 7) without writing its report (989 bytes read, document still open at offset 989: the tail had not arrived)
+P156|prefix-REAPED-case13shape|record_after_loop=exited=true exit_code=7 ProcessState_nil=false
+P156|prefix-REAPED-case13shape|window=os_knew_at_ms=33_code_still_said_alive_after_loop_ms=4
+=== RUN   TestP156SubjectDeathProbe/live-child
+P156|live-child|witness=alive=true code=259 polls=1 (child deliberately still running)
+P156|live-child|record=ProcessState_nil=true exited=false exit_code=-1
+P156|live-child|loop=elapsed_ms=2005 reads=188 budget=2s verdict_kind=BUDGET sentence (the neighbour: names a spent budget, not a corpse)
+P156|live-child|sentence=wisp slo: subject 12572 never wrote a complete report within 2s (last read: 0 bytes read, no report file yet)
+P156|live-child|record_after_loop=exited=false exit_code=-1 ProcessState_nil=true
+--- PASS: TestP156SubjectDeathProbe (60.19s)
+    --- PASS: TestP156SubjectDeathProbe/prefix-unreaped (0.06s)
+    --- PASS: TestP156SubjectDeathProbe/nofile-unreaped (0.04s)
+    --- PASS: TestP156SubjectDeathProbe/prefix-REAPED-case13shape (0.04s)
+    --- PASS: TestP156SubjectDeathProbe/live-child (60.05s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	60.260s

@@ -198,3 +198,79 @@ $ git show 9835d81:cmd/wisp/slo_windows.go | sed -n '832,841p'
 2. **没量真 `wisp slo` 端到端**（真 Job Object 里打死真 subject 后操作员看到的原文）。
 3. **本格的窗口数来自探针自挑的 `2s/10ms` 预算**，不是生产的 `30s/20ms`；生产常量那一形在第 5 格的 `m1` 发里量到
    （本程现跑 **`dead subject was read 1470 times, want exactly 1`／30.05s**，见 5.3）。本格不做外推宣称。
+
+---
+
+## 第 2 格　AC#2 —— 落地乙：`exited()` 从此问 OS ＋ 三件硬约束 ＋ 两向举证
+
+**票面判据（`:36-41`）**：`exited()`（或等价的口径）改为**问 OS**；①不许动预算常量 ②不许新增 go.mod 依赖
+③不许用墙钟时间差实现超时、不许裸 `go func(`（要 goroutine 得带 owner/recover）、选丙那一形要先回来批；
+并且**举证"这一发在改前不响、改后会响"**。
+
+### 2.1 落地的形状（本程自己读 `7ca1130`，不引 r2 的行号）
+
+`exited()`（`:854-857`）与 `exitCode()`（`:859-862`）现在都是 `exitStatus()`（`:867-883`）的薄壳；
+`exitStatus()` 两支：**(a)** `:878-880` 我们的记录（只在 `ProcessState != nil` 时才问，注释 `:871-877` 写明理由——
+`Wait()` 之后 os/exec 不再出借句柄、pid 还可能被发给别人，所以收过尸之后"我们的记录"不是偷懒而是唯一安全的一支），
+**(b)** `:881-882` → `queryProcess()`（`:904-922`）：`Process.WithHandle` → `WaitForSingleObject(h,0)` 判**等态**、
+`GetExitCodeProcess` 读**码**，两问拆开；任何未决（`WAIT_FAILED`、`GetExitCodeProcess` 失败、句柄借不到）一律答"没死"。
+
+本程核过这不是"顺手 `GetExitCodeProcess` 一发完事"那一形（派单 `:20` 警告的正是它）：
+`queryProcess` **先等态后码**，所以一个以 259 退出的 subject 能被如实报 259 而不是被读成活着——
+这一条本程**没有**量到发生过（见 2.5 第 2 条），但**反向的一发本程量到了**：探针 `live-child` 那发
+`witness=alive=true code=259`，发货字节上 `exited()=false`、烧满预算、印 BUDGET〔自跑，1.3〕
+⇒ **等态门没有把活孩子认成死的**。
+
+### 2.2 三件硬约束——本程自己的尺，逐枚带正控
+
+| 约束 | 本程的尺 | 读数 | 判 |
+|---|---|---|---|
+| ① 预算常量一字不许动 | `git diff 9835d81 7ca1130 -- cmd/wisp/slo_windows.go \| grep -cE '^[-+].*(subjectReportBudget\|subjectGrace\|subjectReadyBudget\|subjectPollInterval)'` | **0**（rc=1＝零命中）；const 区 `sed` 双向 `diff` **空** | **成立**〔自跑，见 0.2〕 |
+| ② 不许新增 go.mod 依赖 | `git rev-parse 9835d81:go.mod 7ca1130:go.mod` ＋ `git diff-tree` 逐枚 10 枚 | 同一枚 blob `6ccb3fd1…`；10 枚全 `[]`；正控 `5eb0f6b`→`go.mod` 会响 | **成立**〔自跑，见 0.3〕 |
+| ③-a 不许墙钟超时（ban #5） | `grep -acE 'time\.Now\|time\.Since' <(git diff … \| grep '^+')`＝**0**；`sed -n '904,922p' \| grep -ac 'time\.'`＝**0**；`observe.NewTimeout` 锚点 **2** 枚＝改前 **2** 枚（一枚没少） | **成立**〔自跑〕 |
+| ③-b 不许裸 `go func(`（ban #1）／不许 reaper（丙未批） | `grep -ac 'go func'` 锚点 `slo_windows.go`＝**0**＝改前 **0**；新测试文件 `grep -cn 'go func'`＝**0**（rc=1）；`grep -acE 'reaper\|watchdog'`＝**0** | **成立**〔自跑〕 |
+| ④（票面 `:65`）`stop()` 的 `Kill→Wait→RemoveAll` 不许动 | `git diff … \| grep -aE '^[-+]' \| grep -avE '^(\+\+\+\|---)' \| grep -aiE 'stop\|Kill\|RemoveAll\|Wait\(\)'` 命中 **3** 行，其中**非注释行＝0**（再 pipe `grep -avE '^[+-][[:space:]]*//'` 零命中，rc=1）；`cmd.Wait()` 全文件仍**唯一一枚**（`:936`） | **成立**〔自跑，见 0.1〕 |
+
+`AGENTS.md §1.2` 那条"`filepath.Clean\|Abs` 只能在 `risk.PathResolver` 之外不出现"本程也顺手扫了新测试文件：
+`grep -nE 'filepath\.(Clean\|Abs)'` ＝ **0 命中**〔自跑〕。
+
+### 2.3 举证"改前不响、改后会响"——两向都是本程自己跑的
+
+| 同一发、同一 cell、只换那一味 | **摘掉 (b)（=m1，行为等价于改前谓词，等价性论证见 1.1）** | **发货字节（`7ca1130`）** |
+|---|---|---|
+| `prefix-unreaped` | `exited()` 130 次全 false、`reads=187`、`elapsed=2009ms`、印 **BUDGET** | `exited()` 第 6 次亮（`agree=7ms`）、**`reads=1`**、`elapsed=0ms`、印 **DEAD-CHILD `exited (code 7) without writing its report`** |
+| `nofile-unreaped` | 114 次全 false、`reads=190`、BUDGET | `reads=1`、DEAD-CHILD |
+| `live-child`（阴性对照） | BUDGET、`reads=192` | BUDGET、`reads=188` —— **一字未变** |
+| `prefix-REAPED-case13shape` | DEAD-CHILD、`reads=1` | DEAD-CHILD、`reads=1` —— **(a) 支没被摘到** |
+
+〔全部 自跑，`logs/accept-probe-on-m1.log` 与 `logs/accept-probe-on-ship.log`〕
+**用发货用例而不是探针**的第二向在第 5 格：`m1` 之下 case 17 量到 **`read 1470 times, want exactly 1`／30.05s**（生产常量），
+同一 cell 零变异那一发 6/6 全绿〔自跑，`logs/accept-teeth-m1-jia.log`／`accept-teeth-asis-jia.log`〕。
+
+反向也核了：**本票的改动面里没有一处以"让它响"为目的地动过既有断言**——
+`slo_report_144_windows_test.go` 在整票上 `67 加／1 删`，而**非注释的改动行＝0**
+（`git diff … \| grep -aE '^[+-]' \| grep -avE '^(\+\+\+\|---)' \| grep -avE '^[+-]//'` 零命中，rc=1）〔自跑〕；
+整票生产码面**只有 `cmd/wisp/slo_windows.go` 一枚文件**，`internal/` 零枚〔自跑〕。
+
+### 2.4 放水两问自答（本格）
+
+① **断言方向动没动**——没动：本程零判据、零阈值、零 golden 改动（第 0 格那把 `git diff-tree` 尺在 10 枚 commit 上
+对 `thresholds.go`／golden／`allowlist.txt`／`slo-check.ps1`／`tools/d22scan` 全 0 命中，见第 6 格）；
+② **helper 是不是原有的那枚**——本程这一格用的两把尺全是**已入库的**：`probes/156/my156.py`（变异字面与 `run`）＋
+`probes/156/zz156probe_windows_test.go`（探针），本程只加命名与打印；**没有新造变异、没有新造判据**。
+
+**第 2 格判定**：**〔成立〕**。乙落地且经本程自己两向举证；四件（票面三件硬约束＋`stop()` 语义）各有本程的零命中读数；
+**owner 批的是乙，本程量到的就是乙**（没有换丙：全文件 `go func`＝0、无 reaper）。
+
+### 2.5 本格**没测什么**（三条缺口是本程自己核过"确实没钉"，不是转述）
+
+1. **`sloSubject.stop()` 今天零枚用例**——本程自己数：`grep -rc '\.stop()' cmd/wisp/*_test.go` 非零的只有
+   `resident_sink_nail_127_windows_test.go`（6 枚，是 `leg.stop()`，另一类型）与 `leg_dispatch_gate_133_test.go`（1 枚），
+   `slo_exit_os_156_windows_test.go`／`slo_report_144_windows_test.go` **各 0 枚** ⇒
+   r1 §2.2 末段那条**口径后果**（`stop()` 里 `!s.exited()` 现在会跳过对已死未收尸 subject 的 `Kill()`）**没有用例钉**。
+   **这一条不改判 AC#2**（票面 `:65` 只要求"不许动收尾语义"，本程证实未动），但它是一笔**真实的未钉后果**，登记在第 8 格。
+2. **subject 以 259 退出**那一形零枚用例（新测试文件里 `259` 只出现在 `slo156StillActive` 这枚**见证侧**常量，
+   `:65-68`／`:374`）⇒ "先等态后码所以能如实报 259"仍是**接口性质**的论证，本程没把它升成读数。
+3. **`WAIT_FAILED` 兜底支没有用例走到**（`:899-903` 注释写明兜底＝改前行为）⇒ 本程同意 r1 "硬造＝放水"的判断，
+   **不为此开一格永不响的判据**；本程的读数侧证据是 `live-child` 那发两版逐字同形。
+
