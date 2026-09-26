@@ -170,17 +170,10 @@ export function AppHarness() {
           />
           {railOpen && (
             <RightRail
-              approvalCard={SHOWCASE_APPROVALS[0]}
-              onApprovalIntent={() => undefined}
-              onExportLogs={() => undefined}
-              onNewTask={newTask}
-              onOpenPalette={() => setPaletteOpen(true)}
-              onOpenSettings={() => setSettingsOpen(true)}
               onViewAllApprovals={() => undefined}
               pendingCount={SHOWCASE_APPROVALS.length}
               queueRows={queueRows}
               runs={RB_RIGHT_RAIL.runs}
-              usage={RB_RIGHT_RAIL.usage}
             />
           )}
         </div>
