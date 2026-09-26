@@ -423,3 +423,285 @@ Bash 跑测试／git 全部放行）。因此也不存在「取数前被拒所�
 （I-1 那次是 PowerShell；`pair()` 的两行中文提示里各一次，`bash -n` 前用 `grep -nE 'echo "[^"]*"[^"]*"'` 扫出来才改净）。
 派单 §6 末「含反引号的中文走 Write/Edit，别塞 heredoc 或双引号串」说的是同一类事，本程在单引号／herestring 上又把它扩大了一次认知。
 
+---
+---
+
+# r2 追加节 · 票 158 r2 —— AC#4 零字节名册／AC#5 两包门禁／AC#6 双向对账 ＋ 一枚经批准的注释面扩权
+
+- 程：**r2**。派单＝`.scratch/wisp/dispatches/2026-09-26-194x-impl-158-r2-redispatch-after-cancel.md`（19:4x 重派那一程）。
+- **上面 r1 的第 0–7 节一字未改**（本件是续写不是改写；AC#1／AC#2／AC#3 三格 r1 已交并经编排者独立复算，本程不重做）。
+- 本程只做三格：**§C(AC#4)／§D(AC#5)／§E(AC#6)** ＋ **§B 那一处经编排者批准的注释面扩权**。
+- 上面 r1 §4 那节写的「AC#4／AC#5／AC#6＝未交·归 r2」现在由本程接手；那一节原文不抹。
+
+## A. step-0 锚点（派单 §0 那四件的**原文输出**，本程一切行号／枚数以它为准）
+
+```
+$ date "+%Y-%m-%d %H:%M %z"
+2026-09-26 19:37 +0800
+
+$ git rev-parse --short HEAD
+bb08d1f
+
+$ git status --porcelain                     # 全树
+ M .scratch/wisp/probes/152/my152.py
+ D design/assets/base.css
+ D design/assets/icons.js
+ D design/assets/theme.js
+ D design/assets/tokens.css
+ M design/doubao/README.md
+ M design/doubao/demo/app.js
+ M design/doubao/demo/index.html
+ M design/doubao/demo/styles.css
+ D design/index.html
+ D design/screens/approval.html
+ D design/screens/ball.html
+ D design/screens/chat.html
+ D design/screens/config.html
+ D design/screens/cost.html
+ D design/screens/firstrun.html
+ D design/screens/palette.html
+ D design/screens/privacy.html
+ D design/screens/security.html
+ D design/screens/states.html
+ D design/screens/tasks.html
+ M docs/evidence/s1/152-subject-death-never-measured-r1-accept-r1.md
+?? .scratch/wisp/probes/139/accept-r1/
+?? .scratch/wisp/probes/152/overlay-probe1-on-samppost.json
+?? .scratch/wisp/probes/156/__pycache__/
+?? .scratch/wisp/probes/156/mut-156-r2/asis.log
+?? .scratch/wisp/probes/156/zero156-r4-head.sh
+?? .scratch/wisp/probes/156/zero156-r4-work/
+?? .scratch/wisp/probes/158/r2/
+?? .zcodeignore
+?? design/doubao/01-ball-states.jpg
+?? design/doubao/demo/lib/
+?? design/doubao/demo/rb-files.js
+?? design/doubao/demo/rb-plugins.js
+?? design/doubao/demo/rb-review.js
+?? design/doubao/demo/rb-terminal.js
+?? design/doubao/demo/rightbar.js
+?? design/doubao/demo/screens/home.js
+?? design/doubao/demo/screenshots/
+?? design/doubao/demo/sidebar.js
+?? design/old/
+
+$ git log --oneline -3
+bb08d1f 派单 19:4x: 票 158 r2 重派（前一程 18:33 被取消、零枚 commit）
+bf046d1 ledger(A304)＋票158进度＋停车点＋158-r2 派单: r1 三格复算通过；一次由我发起的局部扩权
+6f127f1 票 158 r1 交件：next= 里别再写死 commit 号，改成 8f9162f..HEAD 现量
+```
+
+工具版本现量（本程自己跑，不抄 r1 的）：`go version go1.27.1 windows/amd64` ·
+`$(go env GOPATH)/bin/gofumpt.exe --version` ＝ **`v0.12.0 (go1.27.1)`**。
+
+### A.1 与派单两条前提不符的地方（如实登记，没有一条让我改判据）
+
+1. **派单 §0 说前一程「没有留下半成品」——不完全成立。** 现量：`git status --porcelain` 里那一枚
+   `?? .scratch/wisp/probes/158/r2/` **确实存在**（11 枚文件，时间戳 18:29–18:32＝被取消那一程），
+   里面是改前的门禁读数（`roster-before-*`／`gate-before-*`／`gofumpt-before.txt`／`vet-before.txt`）。
+   **零枚 commit 那半句成立**（`git log` 里 18:33–19:35 之间没有任何提交）。
+   ⇒ 处置：那些读数**全部不用**（锚点不是我的，且按临时件只建不删的规矩我不碰它们）；
+   本程自己的读数一律落在**新建的** `.scratch/wisp/probes/158/r2b/`。派单那句「你从头做」我照做了。
+2. **本程跑到一半树上又落了别人的提交**（派单 §1 预告的那一种）。现量序列：
+   `bb08d1f`(19:36 我的 step-0) → `192ad56a`(19:40:36，编排者 ledger A305) → `ef34118f`(19:47:41，**本程那一枚注释 commit**) → `714f1698`(19:48:46，编排者 ledger A306＋停车点)。
+   ⇒ 按派单 §1 的规矩**把改后那一跑重跑到新 tip**：§D 里 `cmd/wisp` 那一跑、`gofumpt`／`vet`／门禁脚本／`d22scan.sh` 全部在 **tip `714f169`** 上跑。
+   ⇒ 并且机器核过这两枚编排者提交**与本程读数无关**：`git diff --name-only bb08d1f 192ad56 -- '*.go'` ＝ **空**（改前两跑的 Go 输入未变），
+   `git diff --name-only 192ad56 714f169 -- ':!docs'` ＝ 只有 `internal/tools/bridge.go`（那是**我自己**那一枚）。
+
+---
+
+## B. 那一处注释面扩权（唯一一处，写面没有更宽）
+
+| 项 | 内容 |
+|---|---|
+| 批准人 | **编排者**（不是我推断的、不是我从相邻授权外推的） |
+| 批准出处 | `.scratch/wisp/dispatches/2026-09-26-194x-impl-158-r2-redispatch-after-cancel.md` §4；同一射程由编排者登记在票面 `Progress log [2026-09-26 18:2x]` 那一长条里 |
+| 批准时刻 | 派单落盘＝2026-09-26 19:35（`ls` 现量的 mtime）；本程读到＝19:37 之后第一次读派单 |
+| 批准的确切射程 | `internal/tools/bridge.go` 里**那一枚指针注释**（原 `:663-666` 那四行中的一句）**的措辞与所指路径**，一字一字算；不许动行为码／断言／阈值／golden；除这一处写面不变宽 |
+| 「这不在票面原写面内」 | **明写：不在。** 票面 `:8` 的「地界」只给到 `internal/tools/**` 的**测试面**，这一枚注释在生产文件里 ⇒ 按原写面本程碰不到它 |
+| 用的射程 | **用掉了，且只用这一处**（下方 commit `ef34118f`）。本程没有量到需要第二处 ⇒ 没有停手事件 |
+| 提交形状 | 单独一枚 commit，标题含「注释面·编排者批准扩权」；`git commit -q -F <消息件> -- internal/tools/bridge.go`（显式 pathspec，消息件走 Write 工具，不经 shell 字符串） |
+
+**改了什么**（`git diff --numstat`＝`7 3 internal/tools/bridge.go`，全仓唯一 dirty 的 `.go` 就是它）：
+删掉那三行、换成七行。删的三行里过期的是两处——
+① 只点 `clauses G1/G1b`，而 G5（r1 新增、射程正是**不过桥**那一族）没被点名；
+② 落点写成 `docs/evidence/s1/154-host-id-never-closed-r1.md §2.3`，那一节装的是 **G1–G4 的文字**，
+一条命令能跑的生成器其实是 `.scratch/wisp/probes/154/gate-clauses.sh`（G5 连那份文字都不在 §2.3 里）。
+新句把两族各自管哪一条腿写清、并把**生成器路径**与**两份写-up**同时给出。
+
+改后原文（现量 `sed -n '663,669p' internal/tools/bridge.go`）：
+
+```
+// Today no production code dispatches on the bridge except loop.go, so being
+// such a caller means being the first one; the gates meant to ring when that
+// happens are clauses of .scratch/wisp/probes/154/gate-clauses.sh - G1/G1b for
+// this bridge leg, and G5 for a C25 taint scope opened with no paired close in
+// the same file, i.e. the leg that never crosses this bridge at all (G5 is
+// ticket 158's addition; §2 of 158-gate-scope-blind-spot-r1.md is its write-up,
+// §2.3 of 154-host-id-never-closed-r1.md the write-up of G1-G4). Each is one
+// `git grep` away, not a note in someone's head.
+```
+
+三件自证（票面 `:82` 要求的那三件，本程现量）：
+
+```
+$ git diff -U0 -- internal/tools/bridge.go | grep -E '^[+-][^+-]' | grep -cvE '^[+-][[:space:]]*//'
+0                       # 非 // 开头的改动行＝0 枚（删 3 加 7 全是注释）
+$ git diff --numstat -- internal/tools/bridge.go
+7	3	internal/tools/bridge.go        # 删除列只落在这一枚文件
+$ git status --porcelain -- '*.go'            # 改后、提交前
+ M internal/tools/bridge.go                   # 全仓唯一脏的 .go
+$ $(go env GOPATH)/bin/gofumpt.exe -l internal/tools/ cmd/wisp/    ; echo rc=$?
+rc=0                                          # 空输出
+$ go vet ./internal/tools/ ./cmd/wisp/        ; echo rc=$?
+rc=0                                          # 空输出
+```
+
+**这一处改动对门本体的影响＝零枚读数**（这条不是推理，是现量，但它有一个**仪器坑**必须写下来）：
+`gate-clauses.sh` 的锚点默认取 **`git rev-parse HEAD`**（脚本 `:10`），⇒ 注释还没提交时那把尺**看不见它**。
+本程先在未提交状态下比了一次「改前／改后」，两遍只差时间戳一行——那是**假等价**。
+提交后重跑（锚点 `ef34118f`）才量到真形状：判语一字未变（`UNPAIRED cmd/wisp/panel_assets.go (开方调用点=1)`／未成对＝1，
+正控 0，负一负 5），名册里唯一变的是**行号** `internal/tools/bridge.go:691 → :695`（注释净加 4 行，把 `CloseScope` 那行推下去）。
+复算尺＝`bash .scratch/wisp/probes/154/gate-clauses.sh` 两份读数原文
+＝`.scratch/wisp/probes/158/r2b/gate-before-bb08d1f.txt` 与 `…/gate-after-comment-committed.txt`。
+
+---
+
+## D. 格 AC#5 —— 两包门禁：改前／改后四数 ＋ 名册两向 ＋ 三道工具
+
+**档位：五子里四子已交、一子未裁（`sh scripts/d22scan.sh` 那一道，见 §D.5——它响在一枚**别人已提交**的前端码上，不在本程写面内）。**
+
+### D.1 四数（逐包单跑；`internal/tools` 直接 `go test -v`，`cmd/wisp` 走 CI 同形入口）
+
+尺＝仓内那把现成的（`tools/d22scan/runtests.sh:85-88`）：`^=== RUN`／`^--- PASS`／`^--- FAIL`／`^--- SKIP`，**顶层**口径。
+
+| 跑 | 命令原文 | `=== RUN` | `--- PASS` | `--- FAIL` | `--- SKIP` | rc |
+|---|---|---|---|---|---|---|
+| 改前 · tools | `go test -count=1 -v ./internal/tools/` | **116** | **80** | **0** | **0** | 0（`ok … 13.937s`） |
+| 改前 · cli | `bash scripts/wisp-cli-tests.sh` | **144** | **84** | **0** | **0** | 0 |
+| 改后 · tools | `go test -count=1 -v ./internal/tools/`（tip `714f169`） | **116** | **80** | **0** | **0** | 0（`ok … 17.600s`） |
+| 改后 · cli | `bash scripts/wisp-cli-tests.sh`（tip `714f169`） | **144** | **84** | **0** | **0** | 0 |
+| 改后 · tools（仓内严格尺再跑一遍） | `sh tools/d22scan/runtests.sh ./internal/tools/ -count=1` | 116 | 80 | 0 | 0 | 0（`runtests.sh: OK`） |
+
+改后 cli 那一跑打印的两行汇总（原文，含那枚 `-skip`）：
+
+```
+runtests.sh: OK - packages=[./cmd/wisp/ -count=1 -skip ^(TestDefaultDeadlineWallClockMeasurement|TestSubprocessCrashWriter|TestHelperProcess|TestLiveWasapiSmoke|TestRealDownloadVadThroughPipeline|TestRealDownloadPuncArchiveThroughPipeline|TestSyncRegistryProbeLive)$] top-level: PASS=84 FAIL=0 SKIP=0, === RUN=144, '[no tests to run]'=0
+portable-tests.sh: four numbers (all from -v output): === RUN=144  --- PASS=84  --- FAIL=0  --- SKIP=0
+```
+
+**分母为什么可以当分母用**：`internal/tools` 的 116/80 与 r1 §1.4 同值（那一格加了一枚用例后就是这个数）；
+`cmd/wisp` 的 144/84 与票面 `Progress log [17:5x]` 那一条说的今天现量同值。两包的改前＝改后**逐枚同名册**，见 §D.2。
+
+### D.2 名册两向 `comm` ＋ 差集逐枚归属
+
+名册尺＝`^[[:space:]]*--- (PASS|FAIL|SKIP):` **全名（含子测试）**，去掉时长后 `LC_ALL=C sort`（与 r1 §1.2 同形）。
+**并且这一发我差点读假，所以三条尺一起上**：`comm` 两向 **＋** `cmp -s`（字节级）＋ `md5sum`。
+
+```
+$ for pkg in tools cli; do cmp -s roster-$pkg-before.txt roster-$pkg-after.txt && echo "$pkg IDENTICAL"; LC_ALL=C comm -23 …; LC_ALL=C comm -13 …; done
+tools: cmp => IDENTICAL   comm -23 => 空   comm -13 => 空   md5 两遍同值 31e18e28f1f03bd5ba387edf99c3ae17（各 116 行）
+cli  : cmp => IDENTICAL   comm -23 => 空   comm -13 => 空   md5 两遍同值 c77310b70b17def6102f661ad543ca34（各 144 行）
+```
+
+⇒ **差集两向都是零枚**，归属因此是空的：本程唯一的非测试文件改动是 §B 那一处注释面，
+它不改变任何一条读数的名字、状态或存在性。**这一格没有需要归名的差集，也没有需要解释的新红。**
+
+（反面教材，本程自己撞的：第一次跑这个对比时我在 `LC_ALL=C sort` 之后**没带 `LC_ALL=C` 去跑 `comm`**，
+MSYS 的 collation 与 C 排序不一致时 `comm` 会**安静地报「两向都空」**。同一形状在我量变异那一发上先露馅——
+它把「一枚 PASS 翻成 FAIL」报成了零区别。三条尺一起上之后才敢说这是真等价。见 §G.2 的 I-2。）
+
+**变异下的名册差集（用来证明上面那把尺吃得住这个形状，不是永远报空）**：
+`.scratch/wisp/probes/158/r2b/roster-tools-before.txt` vs `…/roster-tools-mut.txt`（§E.1 那一发）——
+
+```
+只在改前（绿时）有：--- PASS: TestSensitiveReadAcrossTheBridgeOpensItsTaskScope
+只在变异后有：      --- FAIL: TestSensitiveReadAcrossTheBridgeOpensItsTaskScope
+```
+⇒ 同一条尺在真有一枚变脸时**点得出那一枚**，所以 §D.2 上面那个「两向皆空」不是尺瞎。
+
+### D.3 `cmd/wisp` 的枚数账（把票面 `:42` 那一行判为**过期**，追加说明、不改写那一格）
+
+票面 AC#5 第③条那句「`cmd/wisp` 声明 82 枚而本机只跑到 79（差的三枚在 `secret_dataroot_119b_test.go` 的 `//go:build !windows` 之下）」——
+**那两个数（82／79）在本锚点已过期**，本程现量：
+
+| 现量 | 命令 | 读数 |
+|---|---|---|
+| 源码里**声明**的顶层用例 | `grep -rn '^func Test' cmd/wisp/*_test.go \| sed 's/.*func \(Test[A-Za-z0-9_]*\).*/\1/' \| LC_ALL=C sort` | **87** 枚 |
+| Windows 上**编译进去**的顶层用例 | `go test -list '.*' ./cmd/wisp/`（dll 已注入）`grep -c '^Test'` | **84** 枚 |
+| CI 同形那一跑**真跑到**的顶层用例 | `^--- (PASS\|FAIL\|SKIP)` 计数 | **84** 枚 |
+| 声明−编译 的差集（两向 `comm`） | `comm -23 declared-cli-all-src.txt list-…` | **3 枚**，全部在 `cmd/wisp/secret_dataroot_119b_test.go`，该文件 `:1` ＝ `//go:build !windows`（`TestAC1POSIXSecretRouteSymlinkedHomeBecomesSealable119`／`TestAC1POSIXSecretRouteSymlinkedXDGConfigHomeBecomesSealable119`／`TestAC3POSIXSecretRouteLinkInsideItsDataRootStillRefused119`）；反向差集（跑了但源码没声明）**空** |
+| 那枚 `-skip` 在本包里挡住了几枚？ | 逐枚 `go test -list '^<名>$' ./cmd/wisp/` ＋ `grep -rl "func <名>(" cmd/wisp/` | **0 枚**：七枚名字在 `cmd/wisp` 源码里全部不存在（它们各自由 `portable-tests.sh` 的 ledger 在**自己的包**里作保，`internal/agent/approval`／`internal/memory`／`internal/proc`／`internal/audio`／`internal/models`／`internal/risk`），ledger 那枚 staleness 检（`scripts/portable-tests.sh:380-383`）按**行所命名的那个包**去 `go test -list` 验，不按当前 scope |
+
+⇒ **那句的道理成立且本程复算到了**（结构性跑不到＝build tag 那三枚，别把「本机全绿」说成「全仓无影响」）；
+**那句的数过期了**（今天 87／84／84，差仍是同一枚文件那 3 枚）。票面原句按派单 §2.3 一字不改，这一小段就是追加说明。
+
+### D.4 「根本没跑到」的判据（派单 §2.1 那枚坑，本程自己量了一次正控与一发负控）
+
+```
+$ case "$PATH" in *sherpa-onnx*) echo YES;; *) echo NO;; esac
+NO                                            # 这一跑的 PATH 里没有 dll 目录
+$ go test -count=1 -v ./cmd/wisp/             # 不做 dll 注入
+exit status 0xc0000135
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.090s
+FAIL                                          -> ^=== RUN 计数 = 0        rc=1
+$ bash scripts/wisp-cli-tests.sh             # CI 同形（脚本自己 export PATH="$dll_dir:$PATH"）
+^=== RUN 计数 = 144                            rc=0
+```
+⇒ 本程判「跑到了」只认 **`=== RUN` 枚数≠0** 这一件事，且两发都在本件里（原文＝`…/r2b/cli-negative-control-nodll.log` 与 `…/r2b/cli-after.log`）。
+`0xc0000135` 本程不当结论用。dll 在位现量：`ls third_party/sherpa-onnx/` ＝ `onnxruntime.dll`、`sherpa-onnx-c-api.dll`、`sherpa-onnx-cxx-api.dll`
+（三枚，与 `deps.toml` 的 `[sherpa-onnx.dll.*]` 一致；脚本自己那行 `dll_dir=… (pinned: …)` 也在 `cli-after.log` 里，路径形＝shell 自己的 `/d/work/…`，正是脚本注释说的那个不能写成 `D:/…` 的坑）。
+
+### D.5 三道工具
+
+| 工具 | 命令原文 | 改前 | 改后（tip `714f169`） | 判定 |
+|---|---|---|---|---|
+| gofumpt | `$(go env GOPATH)/bin/gofumpt.exe --version`；`… -l . tools/d22scan tools/mockllm`；`… -l internal/tools/ cmd/wisp/` | 版本 `v0.12.0 (go1.27.1)`；全仓 **0 行** rc=0；窄 **0 行** rc=0 | 全仓 **0 行** rc=0；窄 **0 行** rc=0 | **绿**（版本自己 `--version` 现读并贴了） |
+| go vet | `go vet ./internal/tools/ ./cmd/wisp/` | 空输出 rc=0 | 空输出 rc=0（字节数 0） | **绿** |
+| D22 门 | `sh scripts/d22scan.sh` | **rc=1**（正控步红：`runtests.sh: go test exited 1 - packages=[./...] top-level: PASS=28 FAIL=2 SKIP=0, === RUN=70`） | **rc=1**（同一枚红，两枚同名用例） | **未裁·受阻**，见下面整段 |
+
+**`sh scripts/d22scan.sh` 这一子项：本程判「未裁」，不是「过」也不是「不过」。** 现量链条：
+
+1. 红的两枚用例＝`TestScannerSelfScanOfRealRepoIsGreen`、`TestRealRepoLedgerIsHonest`，**都读运行时的工作树**。
+   两枚的失败体里是**同一条** finding：
+   ```
+   scan_test.go:269: repo HEAD violates: frontend/src/components/harness/right-rail.tsx:108: [emoji] ban #8 glyph in scope frontend/ is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)
+   ```
+2. 脚本 `set -eu` ⇒ 第 1 步（正控）红就退出，**第 2 步真扫没跑到**。本程因此把第 2 步单独跑了一遍拿读数：
+   `cd tools/d22scan && go run . -root <仓根>` ⇒ **rc=1，1 finding，同一条**。
+3. **这条 finding 不是本程造成的，也不是脏树造成的**：
+   ① 那枚文件在 `git status --porcelain` 里**干净**（⇒ 第 108 行是 `HEAD` 里的内容），
+   ② `git cat-file blob HEAD:frontend/src/components/harness/right-rail.tsx \| sed -n '108p' \| cat -A`
+   ＝ `{ kind: "ok", text: "M-bM-^\M-^S built in 826ms" }`——`M-bM-^\M-^S`＝**U+2713**，在**字符串字面量**里（正是 AGENTS.md §1.2 那句「`✓`(U+2713) 不行」的形状），
+   ③ 本程另外做了一件**独立口径**：`git archive HEAD \| tar -x -C $TMPDIR/…`（在**仓外**）再拿同一把尺扫那棵快照 ⇒ **同样 rc=1、同一条 finding**（`…/r2b/d22scan-headsnapshot.txt`）。
+   ④ 来路：`git log -1 -- frontend/src/components/harness/right-rail.tsx` ＝ `5e23d99`（09-26 **17:46**，前端那一程的第 N 枚提交，早于本程 step-0 的 `bb08d1f` 19:36）。
+4. ⇒ 本程**不许**修它：`frontend/**` 既在票面 AC#4 的冻结名单里、又「此刻正被别的会话写着」（派单 §3 明令不碰不还原不 commit），
+   `tools/d22scan/**` 与 `allowlist.txt` 也全冻结；把它「豁免」掉正是票面禁的形状。**没有放宽任何断言、没有 `t.Skip`、没有改阈值。**
+
+**同一把尺的另一半（`examined N` 非零）本程量到了，而且顺手把「别的会话的脏树」这件事量成了数**：
+
+| scope | 工作树（含他人未提交改动） | `HEAD` 快照（仓外，纯净） |
+|---|---|---|
+| bans #1-5 `internal/` | 205 | 205 |
+| bans #1-5 `cmd/` | 23 | 23 |
+| ban #6 `frontend/` | 85 | 85 |
+| ban #7 `internal/tools/` | 18 | 18 |
+| ban #8 `design/` | **39** | **30** |
+| ban #8 `frontend/` | 85 | 85 |
+| ban #8 `internal/`（含注释与 `_test.go`） | 414 | 414 |
+| ban #8 `cmd/` | 45 | 45 |
+
+⇒ **八枚作用域 `examined N` 全部非零**（这一子项绿，且它才是「不是空仪器」的那半判据）；
+唯一被他人未提交工作污染的是 `design/`（＋9，`git status --porcelain -- design` 现量 31 枚已跟踪改动 ＋ 61 枚未跟踪文件）。
+**本程任何「零命中」宣称的口径**：`design/**` 与 `frontend/**` 一律**排除**在宣称之外（派单 §3），
+本件里两族的数字只作为「仪器非空」的证据出现，不作为「谁也没写」的证据。
+（快照那一跑额外打印了 `gitignore rules NOT APPLIED … not a git repository` ⇒ 快照口径的分母是**上界**，
+它只会多扫不会少扫，所以「finding 相同」这一判语成立；这一句写在 `…/r2b/d22scan-headsnapshot.txt` 第 1 行。）
+
+### D.6 AC#5 的**最小闭合集合**（只欠 §D.5 那一子项）
+
+1. `frontend/**` 那一程（或任何拿到该写面的人）把 `right-rail.tsx:108` 字符串里的 U+2713 换成非禁字形（这是 D23／D29 的零 emoji 规矩，**不是阈值**）；
+2. 然后重跑 `sh scripts/d22scan.sh`，要求 **rc=0** 且八枚作用域 `examined N` 仍全部非零（本件 §D.5 那张表就是改前基线）；
+3. 若 owner 决定**不**改码而要走豁免，那必须给一条**可机读判据**并落在 `tools/d22scan/**`（本票与本程都写不到那儿）——那一支归 owner，不归 r2。
+4. 这一子项闭合**不依赖**本程任何未交的东西：本程那两包的读数已经全绿，两件事没有耦合。
+

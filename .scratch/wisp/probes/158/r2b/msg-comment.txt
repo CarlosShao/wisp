@@ -1,0 +1,23 @@
+票 158 r2 · 注释面·编排者批准扩权：bridge.go 的门指路句补上 G5 与可跑的生成器路径
+
+改动范围＝internal/tools/bridge.go 里那一条"the gate meant to ring when that
+happens is …"指针注释的**措辞与所指路径**，一共 3 行删、7 行加，改动行 100% 以
+// 开头（git diff -U0 现量：非 // 开头的改动行 0 枚）。生产行为字节零枚、断言零枚、
+阈值与 golden 零枚。
+
+为什么这一处不在票面原写面内：票 158 地界（:8）只给到 internal/tools 的**测试面**，
+这条注释在生产文件里 ⇒ 原写面碰不到它。批准人＝编排者；批准时刻＝2026-09-26 19:4x
+（派单 .scratch/wisp/dispatches/2026-09-26-194x-impl-158-r2-redispatch-after-cancel.md §4）；
+批准的确切射程＝该注释的措辞与所指路径，一字一字算，不许动行为码／断言／阈值／golden，
+且除这一处之外写面没有变宽。同一射程在票面 Progress log [18:2x] 那一条里由编排者登记过
+（"地界原句 :8 一字不动"）。
+
+为什么要改：原句只点 clauses G1/G1b，而 G5（票 158 r1 新增，射程＝不过桥的那条腿——
+C25 污点 scope 开了却没在同一文件合）今天就在响。被误导的正是票面点名的"最先被骗的那位"
+（接面板／球那一腿的程）。原句另把落点写成 154 证据件的 §2.3；那一节写的是 G1-G4 的
+文字，真正一条命令能跑的生成器是 .scratch/wisp/probes/154/gate-clauses.sh ⇒ 新句两个
+指路都给出。
+
+自证三件（改后立即跑，命令与输出全文见 docs/evidence/s1/158-gate-scope-blind-spot-r1.md 的 r2 节）：
+gofumpt -l internal/tools/ cmd/wisp/ = 空；go vet ./internal/tools/ ./cmd/wisp/ = rc 0 空输出；
+git diff --numstat 删除列只落在这一枚文件。
