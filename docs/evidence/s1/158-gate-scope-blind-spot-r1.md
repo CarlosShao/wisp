@@ -169,3 +169,107 @@ $ git status --porcelain -- internal/tools cmd/wisp
 - `gofumpt -l internal/tools/bridge_scope_open_ticket158_test.go` ＝ 空输出、rc=0。
 - `go vet ./internal/tools/` ＝ 空输出、rc=0。
 - `-overlay` 与 `-cover*` **没有**同用过（本程所有 `go test` 命令行可查，无 `-cover`）。
+
+---
+
+## 2. AC#2 —— 给门本体加一枚 G5，射程＝`OpenScope`↔`CloseScope` 成对普查
+
+**档位：已交（甲／乙／丙三发齐）。** 改动文件＝`.scratch/wisp/probes/154/gate-clauses.sh`（票 158 写面）。
+未接进 CI（`tools/d22scan/**` 一字未动，`git status -- tools/d22scan` ＝ 空）。
+
+### 2.1 为什么单加一把 `run()` 表达不出来
+
+G1–G4 的判据形状是「一条 `git grep` ＋ 名册非空即响」。成对这件事**一条 grep 表达不出**：
+`internal/tools/bridge.go` 同文件里 `:642 prov.OpenScope` 与 `:691 prov.CloseScope` 都在，
+非空判据会把这枚**已经成对**的样本也读成响。所以 G5 用新函数 `pair()`：
+**一把 `git grep -nEw '开|合'` 出名册 ＋ 按文件求差集**，锚点／pathspec 形状／逐行可 diff 的名册本体
+都与 `run()` 同形；判响的读数从「名册非空」换成「未成对枚数」。
+
+`internal/risk/*` 排出射程的理由写在脚本注释里（定义本体在那儿，票 158 地界只盘调用者）；
+§2.4 现量 1 另给了这条排除**其实不承重**的读数。
+
+### 2.2 发（甲）它在**未修码**上响不响 —— **响**
+
+```
+$ bash .scratch/wisp/probes/154/gate-clauses.sh          # 锚点 4dcb71b（本程 AC#1 落库后）
+## G5 OpenScope↔CloseScope 成对普查：生产码里开了 C25 scope 却没在同一文件关过的名册（排 internal/risk 的定义本体、排 *_test.go）
+$ git grep -nEw 'OpenScope|CloseScope' 4dcb71b... -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/*
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+4dcb71b...:cmd/wisp/panel_assets.go:232:	prov.OpenScope(taintSourceScopeID)
+4dcb71b...:internal/tools/bridge.go:642:		b.prov.OpenScope(taskID)
+4dcb71b...:internal/tools/bridge.go:691:		b.prov.CloseScope(taskID)
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   UNPAIRED cmd/wisp/panel_assets.go (开方调用点=1)
+# 未成对枚数＝1   （0＝这把尺没响／>0＝逐枚点名如上）
+```
+
+⇒ 票面 P1 那枚活样板（`cmd/wisp/panel_assets.go:232`）**被点名**，正是 AC#2(甲) 要的那一发。
+全文读数＝`.scratch/wisp/probes/158/gate-with-G5-final.txt`。
+
+同时记一句**这一发买的是哪一档**：它在未修码上今天就响 ⇒ 它现在买的是**防忘记**
+（把「门射程比危害面窄一格」这件已经存在的事变成每次跑门都会打印的一行），
+等 `panel_assets.go` 真拿到收尾之后，同一把尺自动换成**防回归**（名册里再出现一枚只开不合的生产文件就响）。
+两档不是二选一，这一枚先发就落在前一档。
+
+### 2.3 发（乙）正控 —— 同一把尺打在已知「开又合」的样本上**必须不响**
+
+样本＝`internal/tools/bridge.go`（同文件成对）。这一腿**必须自己也是能出读数的**，
+否则就是一枚装饰腿（票 154 的 AC#3 就是用「零区别」否掉装饰腿的）——所以判据写成
+「名册非空 **且** 未成对＝0」两条同时成立：
+
+```
+## G5-正控 同尺＝主尺射程，只多排掉主尺今天点名的那一枚 panel_assets.go ⇒ 剩下的开方全是 balanced 样本
+$ git grep -nEw 'OpenScope|CloseScope' 4dcb71b... -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/* :!cmd/wisp/panel_assets.go
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+4dcb71b...:internal/tools/bridge.go:642:		b.prov.OpenScope(taskID)
+4dcb71b...:internal/tools/bridge.go:691:		b.prov.CloseScope(taskID)
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   （空）
+# 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=0   （本枚子句的响＝未成对枚数；0＝不响）
+```
+
+⇒ 名册非空（`git grep rc=0`，两行读数都在）、未成对＝0 ⇒ 尺**看得见这枚样本、并且判定它没问题**。
+那行 `git grep rc=` 就是拿来区分「看见了且成对」与「根本没看见」的，恒真形状在这里被堵掉。
+
+### 2.4 发（丙）假阳性自拆
+
+**主尺今天新点名的族＝1 枚**：`cmd/wisp/panel_assets.go`。逐枚判读：同文件既无 `CloseTask` 也无 `Defer`
+（`git grep -nEw 'CloseTask|Defer' 4dcb71b -- cmd/wisp/panel_assets.go` ⇒ **rc=1，零命中**），
+⇒ 判**真漏**，不是「把收尾委托给桥」的委托形状。**无误判需登记。**
+
+**装饰腿／恒真／口径三处假阳性，全是本程自己撞出来再修掉的，原样登记：**
+
+| # | 形状 | 实发的坏读数（修之前） | 处置 |
+|---|---|---|---|
+| FP-1 | **纯注释里的动词也算调用点**。成对判据第一版不剔注释。 | 正控腿点名了 `internal/tools/bridge_scope_open_ticket158_test.go`——那只是本程新测试 §1 里解释 `Mark` 机理的一句注释「从没 OpenScope 的 scope 被 Mark 之后……」 | `pair()` 里加一行 `grep -vE ':[0-9]+:[[:space:]]*(//\|/\*\|\*)'`：**成对判据只吃调用点**；逐行名册本体**照旧带注释**，diff 口径不变 |
+| FP-2 | **正控自己是一枚装饰腿**。第一版图省事把 pathspec 写成 `internal/tools/**/*.go`。 | 实测 `git grep -lEw OpenScope 4dcb71b -- internal/tools/**/*.go` ⇒ **rc=1、零命中**；正控名册空、未成对 0，看着像"通过"，其实一把尺都没落下去 | 正控腿改成**与主尺同形再逐条排除**（只多排 `panel_assets.go`），并在输出里同时印 `git grep rc=` 与「未成对枚数」两把尺，见 §2.3 |
+| FP-3 | **每文件计数在说谎**。第一版把 `git grep -l` 的输出（`<锚>:<路径>`）直接当 pathspec 回喂给 `git grep -c`。 | 读数印成 `UNPAIRED ...panel_assets.go (open=0 close=0)`——点名了却报 0 枚开方，自相矛盾 | 改成从**同一条** `git grep -nEw '开\|合'` 的名册里用 `cut -d: -f2` 取干净路径再计数；计数现在报 `开方调用点=1` |
+
+**结构性残余（今天零例，给出可复算条件）**：`pair()` 剔注释、**不剔字符串字面量**。
+所以「一枚开方动词只出现在字符串里、同文件没有合方动词」的生产文件会假响。
+本程实测过这一族的真实存在形状——`internal/risk/provenance.go:477`／`:578` 就是把 `OpenScope`
+写进错误串的行（`Origin: "scope is not open (OpenScope missing or already closed)"`）；
+今天主尺名册里唯一的开方是 `panel_assets.go:232` 那发真调用，**零例假响**。
+复算尺＝`bash .scratch/wisp/probes/158/g5-fp-audit.sh`（三发现量全在里面，只读）。
+
+**顺带量到的一条口径事实**（丙档第二问，写在 §2.1 那条排除的旁边）：把 `internal/risk/*` 放回射程，
+`provenance.go` **不会**被点名（它同文件里 `:339` 与 `:350` 两枚定义都有）⇒
+「排掉 internal/risk」对**判语**不承重，它买的是**名册稳定**（那一文件的注释一改，逐行名册就变长、
+按名册 diff 的老读法就会误响）。这条写在 `g5-false-positive-audit.txt` 现量 1。
+
+### 2.5 门本体改动的回归自查
+
+G5 不许动 G1–G4 的任何读数。同一锚点改前／改后各跑一次，逐行比：
+
+```
+$ bash .scratch/wisp/probes/154/gate-clauses.sh > probes/158/gate-G1G4-before-G5.txt   # 改前
+$ bash .scratch/wisp/probes/154/gate-clauses.sh > probes/158/gate-with-G5-final.txt    # 改后
+$ diff <(awk '/^## G1 /{p=1} /^## G5 /{p=0} p' 改后) probes/158/gate-G1G4-before-G5.txt 段 -> G1-G4 diff rc=0 (一字未动)
+$ diff <(awk '/^## 附：G1 的负一负/{p=1} p' 改前) <(awk '/^## 附：G1 的负一负/{p=1} p' 改后) -> rc=0 (尾部两附一字未动)
+$ bash -n .scratch/wisp/probes/154/gate-clauses.sh -> rc=0
+```
+
+⇒ 新增只有 G5 三腿，既有五枚子句与两段附录的读数一字未变。
+（注：`pair()` 为求差集用了一次 bash herestring，临时件走 `$TMPDIR`、不落仓；已把这一点如实写进脚本头那行「不写仓里任何东西」旁边。）

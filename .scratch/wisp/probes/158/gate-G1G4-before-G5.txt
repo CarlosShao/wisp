@@ -1,0 +1,34 @@
+# 票 154 AC#1 触发门 —— 锚点 4dcb71b598922e1f1530422293660ccf4a2f087e
+# 生成时刻 2026-09-26T18:06:20+08:00
+# 下一程复算＝同一条命令再跑一次，逐行 diff 名册；名册变长＝门响。
+
+## G1 生产码里构造 ToolRequest（排 internal/agent/ 自身）
+$ git grep -nE  'ToolRequest\{' 4dcb71b598922e1f1530422293660ccf4a2f087e -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/agent/*
+# rc=1   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G1b 生产码里任意 .Execute( 调用点（排 loop.go 与 bridge.go 自身）
+$ git grep -nE  '\.Execute\(' 4dcb71b598922e1f1530422293660ccf4a2f087e -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/agent/loop.go :!internal/tools/bridge.go
+# rc=1   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G2 OpenTask/CloseTask 的生产出现点（排 bridge.go 自身；今日应只剩 cmd/wisp/run.go 那一发＋它上面的注释）
+$ git grep -nE -w 'OpenTask|CloseTask' 4dcb71b598922e1f1530422293660ccf4a2f087e -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/tools/bridge.go
+4dcb71b598922e1f1530422293660ccf4a2f087e:cmd/wisp/run.go:546:// WHY THIS HOOK OWNS THE CLOSE. CloseTask's own comment says the composition
+4dcb71b598922e1f1530422293660ccf4a2f087e:cmd/wisp/run.go:563:		rt.bridge.CloseTask(taskID)
+# rc=0   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G3 Q-56 那一支落地：Loop 上出现收 taskID 的导出方法
+$ git grep -nE  '^func \(l \*Loop\) [A-Z][A-Za-z0-9]*\(.*taskID' 4dcb71b598922e1f1530422293660ccf4a2f087e -- internal/agent
+# rc=1   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G4 生产组合根打开 L0 直通（PassThroughUnclassifiedRisk 的字面赋值）
+$ git grep -nE  'PassThroughUnclassifiedRisk:' 4dcb71b598922e1f1530422293660ccf4a2f087e -- *.go :!*_test.go
+# rc=1   （1＝零命中／0＝非空＝该枚子句已响）
+
+## 附：G1 的负一负（同尺摘掉排测试那一条 ⇒ 今日即非空，证明模式吃得住这个形状，不是结构上产不出读数的装饰）
+$ git grep -cE 'ToolRequest\{' 4dcb71b598922e1f1530422293660ccf4a2f087e -- internal cmd 里 *_test.go 的枚数
+15
+
+## 附：今日 production .Execute( 全名册（不过滤）＝G1b 的排除项本体
+4dcb71b598922e1f1530422293660ccf4a2f087e:internal/agent/loop.go:730:		return l.opt.Tools.Execute(ctx, req)
+4dcb71b598922e1f1530422293660ccf4a2f087e:internal/agent/loop.go:734:	out, err := l.opt.Tools.Execute(tctx, req)
+4dcb71b598922e1f1530422293660ccf4a2f087e:internal/tools/bridge.go:463:	res, err := entry.Tool.Execute(ectx, req.Args, onUpdate)

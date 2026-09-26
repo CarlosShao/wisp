@@ -1,0 +1,29 @@
+# G5 假阳性自拆 —— 锚点 4dcb71b598922e1f1530422293660ccf4a2f087e / 生成 2026-09-26T18:14:18+08:00
+
+## 现量 1：把 internal/risk/* 放回成对射程（只排 *_test.go），provenance.go 会不会被点名？
+4dcb71b598922e1f1530422293660ccf4a2f087e:cmd/wisp/panel_assets.go:232:	prov.OpenScope(taintSourceScopeID)
+4dcb71b598922e1f1530422293660ccf4a2f087e:internal/risk/provenance.go:339:func (p *Provenance) OpenScope(scopeID string) {
+4dcb71b598922e1f1530422293660ccf4a2f087e:internal/risk/provenance.go:350:func (p *Provenance) CloseScope(scopeID string) {
+4dcb71b598922e1f1530422293660ccf4a2f087e:internal/risk/provenance.go:387:		logf("risk/C25: scope %q not open (CloseScope raced or composition gap); taint stored — it cannot leak into other scopes", scopeID)
+4dcb71b598922e1f1530422293660ccf4a2f087e:internal/risk/provenance.go:453:			logf("risk/C25: Inspect/CheckText on unregistered scope %q while other scopes hold taints: fail-closed R4 (ensure OpenScope at task start)", scopeID)
+4dcb71b598922e1f1530422293660ccf4a2f087e:internal/risk/provenance.go:477:			Origin: "scope is not open (OpenScope missing or already closed)",
+4dcb71b598922e1f1530422293660ccf4a2f087e:internal/risk/provenance.go:578:			Origin: "scope is not open (OpenScope missing or already closed)",
+4dcb71b598922e1f1530422293660ccf4a2f087e:internal/tools/bridge.go:642:		b.prov.OpenScope(taskID)
+4dcb71b598922e1f1530422293660ccf4a2f087e:internal/tools/bridge.go:691:		b.prov.CloseScope(taskID)
+-- 开方名册: cmd/wisp/panel_assets.go internal/risk/provenance.go internal/tools/bridge.go
+-- 合方名册: internal/risk/provenance.go internal/tools/bridge.go
+-- 未成对（放回 risk 之后）:
+   UNPAIRED cmd/wisp/panel_assets.go
+-- 结论：provenance.go 不被点名（同文件里两枚都有：:339 与 :350 的定义本体）。
+-- ⇒ 主尺排掉 internal/risk/* 对【判语】不是承重的；它买的是【名册稳定】——
+--   provenance.go 的注释一改，逐行名册就会变长、按名册 diff 的读法就会误响。
+
+## 现量 2：今天被点名的那一枚是「真漏」还是「委托关闭」？
+-- rc=1（1＝同文件既无 CloseTask 也无 Defer ⇒ 真漏，不是委托）
+
+## 现量 3：字符串字面量这一族（结构性残余，今天零例）
+4dcb71b598922e1f1530422293660ccf4a2f087e:internal/risk/provenance.go:477:			Origin: "scope is not open (OpenScope missing or already closed)",
+4dcb71b598922e1f1530422293660ccf4a2f087e:internal/risk/provenance.go:578:			Origin: "scope is not open (OpenScope missing or already closed)",
+-- 上面两行把 OpenScope 写进了【错误串】而不是注释，pair() 只剔注释、不剔字符串，
+-- 所以「一枚只在字符串字面量里出现开方动词、同文件没有合方动词」的生产文件会假响。
+-- 今天实测：主尺名册里唯一的开方是 cmd/wisp/panel_assets.go:232 那发真调用，零例假响。
