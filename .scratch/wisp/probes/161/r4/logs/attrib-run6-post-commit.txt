@@ -1,0 +1,18 @@
+== (A) tracked tree: git ls-files -z '*.go' | xargs -0 D:\work\base\gopath/bin/gofumpt.exe -l   (tracked .go files handed to it: 531)
+== (B) working tree: D:\work\base\gopath/bin/gofumpt.exe -l . tools/d22scan tools/mockllm
+   ticket-161	.scratch/wisp/probes/161/r1/runs/b8-probe-bands/internal/a/p_b8.go (ignored, parse_err=0)
+   ticket-161	.scratch/wisp/probes/161/r1/runs/unp-bad/internal/a/p_unp.go (ignored, parse_err=1)
+   ticket-161	.scratch/wisp/probes/161/r1/runs/unp-bad/internal/a/p_unp.go (ignored, parse_err=1)
+   ticket-161	.scratch/wisp/probes/161/r1/runs/unp-hides-bans/internal/a/p_unp.go (ignored, parse_err=1)
+   ticket-161	.scratch/wisp/probes/161/r1/runs/unp-hides-bans/internal/a/p_unp.go (ignored, parse_err=1)
+   ticket-161	.scratch/wisp/probes/161/r3/pre-format/guard.no1.go (ignored, parse_err=0)
+   ticket-161	.scratch/wisp/probes/161/r3/pre-format/guard.no2.go (ignored, parse_err=0)
+   ticket-161	.scratch/wisp/probes/161/r3/pre-format/guard.no3.go (ignored, parse_err=0)
+   UNATTRIBUTABLE	.scratch/wisp/probes/999/bad-sample.go (path claims ticket 999 but .scratch/wisp/issues/999-*.md does not exist, class=untracked, parse_err=0) <== REAL INJURY
+
+attrib.sh: gofumpt v0.12.0 (go1.27.1)
+attrib.sh: (A) tracked-tree  lines=0 files=0  rule: MUST be empty
+attrib.sh: (B) working-tree  lines=9 files=7  tracked=0 attributed_tickets=[161] unattributable=1
+attrib.sh: (B) gofumpt's own exit status was 2 - note: rc=2 from gofumpt means 'a file would not parse', not 'these files need formatting'; per-line parse_err flags above are the reading.
+attrib.sh: attribution rule = .scratch/wisp/probes/<NN>/** AND a real .scratch/wisp/issues/<NN>-*.md
+attrib.sh: RED - tracked-dirty=0 unattributable=1 forms-disagree=0 (see the lines above for which)

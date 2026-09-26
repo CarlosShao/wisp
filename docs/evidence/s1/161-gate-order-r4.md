@@ -240,6 +240,19 @@ d22scan: clean - no D22 ban violations; ...                    rc=0   （999 那
 `gofumpt -l` 两形：见 §1.3（甲空 rc=0；乙 8 行全归得出）与 §1.4（负控 rc=1）。
 `--version`：`v0.12.0 (go1.27.1)`（`attrib.sh` 每次自己现跑并打这一行）。
 
+**提交之后再跑最后一遍**（AC#7② 的那条顺序规矩：三把尺在台件全部入库之后跑最后一次）——
+本程新提交的两枚 `removed/*.go` 是已跟踪 .go，所以它们**进了（甲）的分母**：
+
+```
+$ git rev-parse --short HEAD ; sh .scratch/wisp/probes/161/r4/attrib.sh
+77e9ed2
+attrib.sh: (A) tracked-tree  lines=0 files=0  rule: MUST be empty        # 仍空 = CI 不会因我的台件变红
+attrib.sh: (B) working-tree  lines=9 files=7  tracked=0 attributed_tickets=[161] unattributable=1
+（rc=1，唯一归不出的那行还是 §1.4 的 999 负控）   # 全文 logs/attrib-run6-post-commit.txt
+$ git show --name-only --format= 77e9ed2 | grep -v -E '^\.scratch/wisp/probes/161/r4|161-gate-order-r4\.md|161-gates-need'
+（空）   # 30 枚文件里没有别人的路径
+```
+
 ---
 
 ## 4. 本程写面 / 没写面
