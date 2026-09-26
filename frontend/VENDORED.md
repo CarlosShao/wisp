@@ -6,10 +6,12 @@ or registry URL, and what this repo changed. Each such file also carries the sam
 facts in its own header so `git grep` on any file answers the provenance question
 without opening this one.
 
-Delivery model: all three sources below are copy-paste libraries (Q-20). **None of
+Delivery model: the sources below are copy-paste libraries (Q-20). **None of
 them is an npm dependency.** `package.json` names only real runtime/build packages
-(react, react-dom, tailwindcss, lucide-react, clsx, tailwind-merge,
-class-variance-authority, radix-ui, vite, typescript, oxlint).
+(react, react-dom, motion, tailwindcss, lucide-react, clsx, tailwind-merge,
+class-variance-authority, radix-ui, vite, typescript, oxlint) - `motion` 13.4.4
+(added 2026-09-26) is the runtime the React Bits copies import through
+`motion/react`; the copies themselves are still vendored files, not packages.
 
 ## How a file here got here
 
@@ -76,26 +78,46 @@ is aliased onto C21 in `src/styles/theme.css`, and its `rounded-md`/`rounded-xl`
 utilities are re-pointed at C21's `--r-*` scale, so even a radius written by
 upstream resolves to a Wisp token.
 
-## React Bits - **phase two, zero code in this tree**
+## React Bits - `DavidHDev/react-bits` (MIT + Commons Clause)
 
 | Item | Value |
 |---|---|
 | Repository | `DavidHDev/react-bits` (reactbits.dev; 48,058 stars, created 2024-08-06, not a fork) - measured 2026-09-25 with `gh api repos/DavidHDev/react-bits`. **This row used to name `dillionverma/react-bits`, which is not a repository**: that exact API call returns 404 and the user has no react-bits project in its repo list. Nothing in `docs/` carried the wrong name - PLAN.md never names an upstream owner for React Bits - so the fix stays here. |
 | License | **MIT + Commons Clause** - not a plain MIT |
 | Licence text as measured | upstream `LICENSE.md`, blob sha `6425315416e94469f28d0223a09f7285b2f785ab`, 1303 bytes; header line "MIT + Commons Clause License Condition v1.0"; copyright line "Copyright (c) 2026 David Haz". Three sentences bind Wisp - the grant, the restriction and the notice condition - and they are quoted verbatim in `docs/reports/frontend-session-log.md` §53.1 rather than paraphrased here. |
-| Availability of the 11, measured 2026-09-25 | Only `AnimatedList` has source in the upstream tree (`src/content/Components/AnimatedList/`). The other ten names are absent from `src/content/**` **and** from the jsrepo registry `public/r/registry.json` (832 items, matched on name, title and description); each appears in the repo only as a preview image under `public/assets/pro/components/`. So for those ten, phase two's first question is "is there an item to take, and is it the Pro tier", not "does the Commons Clause allow it". Per-component rows: log §53.2. |
-| Status in this repo | **not vendored, one line of it is in the tree.** R19: the owner picked 12 animated components for a later phase and ordered phase one to ship on Beautiful UI alone |
-| Gate before it may enter | **owner re-review of the Commons Clause terms is required before any React Bits code is vendored** (the clause restricts selling/Redistribution of the components themselves, which is a product-shape question, not a code question) |
+| Availability of the 11, measured 2026-09-25 | Only `AnimatedList` has source in the upstream tree (`src/content/Components/AnimatedList/`). The other ten names are absent from `src/content/**` **and** from the jsrepo registry `public/r/registry.json` (832 items, matched on name, title and description); each appears in the repo only as a preview image under `public/assets/pro/components/`. So for those ten, phase two's first question is "is there an item to take, and is it the Pro tier", not "does the Commons Clause allow it". Per-component rows: log §53.2. **CORRECTED 2026-09-26, do not cite the sentence above against the local clone**: the clone this repo actually vendors from (commit `54807080`, taken 2026-09-25) carries jsx sources for the five picked names under `src/content/**` - `Components/AnimatedList/`, `Animations/Magnet/`, `TextAnimations/BlurText/`, `TextAnimations/CountUp/`, `TextAnimations/ShinyText/` (CountUp lives under TextAnimations/, not Components/). The 2026-09-25 row stands as what the GitHub tree and registry showed that day; the clone is the authoritative take-source. |
+| Status in this repo | **vendored 2026-09-26 - five components, table below.** The phase-one scope ("Beautiful UI alone", R19) was superseded for these five by the owner's 2026-09-26 ruling ("装动画库 motion；react-bits 组件可以落了", session log §5). Phase two remains open for the rest of the picked twelve. |
+| Gate before it may enter | ~~owner re-review of the Commons Clause terms is required before any React Bits code is vendored~~ **cleared 2026-09-26** by the owner ruling above (the clause restricts selling/Redistribution of the components themselves, which is a product-shape question, not a code question; Wisp is self-use per D23) |
 | Phase-two constraints already agreed | at most one full-screen WebGL ambience layer on screen at a time (`Glass Flow` / `Aura Blob` / `Neural Float` / `Fog Sphere` are mutually exclusive), and it must be destroyed when the panel hides, not merely paused - WebView2 CPU counts against the D32 budget. `Agentic Ball` may only ever be a secondary indicator inside the panel; the desktop ball stays Win32/Direct2D (ticket 77's first hard constraint) |
 
-Verification that the exclusion holds, runnable at any time:
+### Vendored 2026-09-26 - five components (owner ruling, session log §5)
+
+Upstream commit vendored: `5480708039d5fba65741802f3811097ab81e3db5` (local clone, jsx variants - the clone ships no ts variants, so every JSX→TSX typing below is this repo's work; the app tsconfig runs TS 6 strict, which forces it).
+License text: upstream `LICENSE.md` - "MIT + Commons Clause License Condition v1.0", "Copyright (c) 2026 David Haz".
+All five except Magnet import `motion/react`; the `motion` package (13.4.4) is the one npm dependency this batch adds.
+Every mount checks `html[data-motion="off"]` (theme.css) **before** rendering and falls back to the static end state - the vendored files never read the switch themselves.
+
+| File here | Upstream source | Component | Changes | Mounted? |
+|---|---|---|---|---|
+| `src/components/react-bits/count-up.tsx` | `src/content/TextAnimations/CountUp/CountUp.jsx` | CountUp | header; JSX→TSX: props interface, typed span ref and decimals helper - runtime statements verbatim | **yes** - Showcase 09 成本三数. CountUp has no decimals/prefix/suffix props: decimals derive from `to` (0.31 formats as two places), and the ¥ / % signs ride as static text beside the span at the mount. `html[data-motion="off"]` renders the fixture string instead |
+| `src/components/react-bits/blur-text.tsx` | `src/content/TextAnimations/BlurText/BlurText.jsx` | BlurText | header; JSX→TSX: props interface, typed p ref, `Transition` on the per-span transition, `Record` widening inside buildKeyframes (motion's Target has no index signature) | **yes** - Showcase page-header title, one-shot entrance with `animateBy="characters"` (a Chinese title has no spaces for words mode) and `delay={60}`. `html[data-motion="off"]` keeps the static span |
+| `src/components/react-bits/magnet.tsx` | `src/content/Animations/Magnet/Magnet.jsx` | Magnet | header; JSX→TSX: props interface over `HTMLAttributes<HTMLDivElement>`, typed div ref and MouseEvent param - runtime statements verbatim | **yes** - Showcase 10 磁吸按钮 demo card carrying the 下一步/完成 vocabulary (`padding={60}`). The real first-run action buttons live inside `firstrun-screen.tsx`, which that round's named-file scope did not open - wrap them there when approved. `html[data-motion="off"]` leaves the bare button |
+| `src/components/react-bits/shiny-text.tsx` + `shiny-text.css` | `src/content/TextAnimations/ShinyText/ShinyText.jsx` + `ShinyText.css` | ShinyText | header; JSX→TSX: props interface, typed three refs; **`color`/`shineColor` upstream defaults deleted, both props required** (the zero-literal gate - callers must name both, always as `var()` tokens); stylesheet import re-pointed to the copy's filename, the css copy itself is upstream verbatim (one display rule, zero literals) | NOT mounted - the one label it would replace (the 在装模型 download status) already renders through beautiful-ui's Shimmer in `src/components/firstrun-screen.tsx`; owner rule "beautiful-ui 有的不重复" |
+| `src/components/react-bits/animated-list.tsx` | `src/content/Components/AnimatedList/AnimatedList.jsx` | AnimatedList | header; JSX→TSX: two props interfaces plus four compiler-forced runtime-neutral spots (listed in the file header); **the stylesheet did not enter**: upstream `AnimatedList.css` carries seven colour literals, failed the zero-literal gate, was not copied, and its import was removed - rebuild the skin over C21 tokens before any future mount | NOT mounted - Showcase 01's Follow-ups rows already stagger through beautiful-ui's fade-up (`src/components/ai-native/streaming-text.tsx`); owner rule "beautiful-ui 有的不重复". Upstream's 15 demo-string prop default rides along verbatim; nothing imports the file, so it never reaches a bundle |
+
+Verification that the ledger covers every trace, runnable at any time:
 
 ```
 git grep -in "react-bits\|reactbits" -- frontend/ | grep -v VENDORED.md
 ```
 
-Expected: no hits. This row exists so React Bits cannot disappear from the books
-merely because phase one does not use it.
+Expected: the six files under `src/components/react-bits/` (the five components
+plus ShinyText's stylesheet - every header names the source repo) plus
+`src/components/showcase.tsx`, which hits only through its `@/components/react-bits/*`
+import paths. Before 2026-09-26 the expected result was "no hits" - the vendoring
+of the five components above changed that on purpose, and the grep now proves no
+file *outside* those two carries a react-bits trace. Either way React Bits cannot
+disappear from the books.
 
 ## Not vendored, and why it is named here anyway
 

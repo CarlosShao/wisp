@@ -40,6 +40,9 @@ import { ToolChips } from "@/components/ai-native/tool-chips";
 import { ValuePill } from "@/components/ai-native/value-pill";
 import { ApprovalScreen } from "@/components/approval-screen";
 import { BallScreen } from "@/components/ball-screen";
+import BlurText from "@/components/react-bits/blur-text";
+import CountUp from "@/components/react-bits/count-up";
+import Magnet from "@/components/react-bits/magnet";
 import { ConfigScreen } from "@/components/config-screen";
 import { L2ApprovalCard } from "@/components/l2-approval-card";
 import { PaletteScreen } from "@/components/palette-screen";
@@ -124,6 +127,32 @@ const TIER_COLORS: Record<string, string> = {
 
 const TIER_OPTIONS = ["L0 只读", "L1 可逆写", "L2 不可逆"] as const;
 
+/* JS-driven animation switch. html[data-motion="off"] (theme.css) silences
+   CSS animation, but motion/react springs and WAAPI do not read that
+   attribute, so every JS-animated mount checks it right here before rendering
+   and falls back to the static end state. The vendored implementations never
+   read the switch themselves. */
+function motionOff(): boolean {
+  return document.documentElement.dataset.motion === "off";
+}
+
+/* Section 09's cost figure: the fixture string when motion is off, a CountUp
+   roll-up otherwise. SHOWCASE_COST carries strings only, so the animated
+   numerals below mirror those strings by hand - keep the two in step. */
+function CostStat({ fallback, children }: { fallback: string; children: ReactNode }) {
+  return (
+    <p className="mt-1.5 font-mono text-[17px] font-semibold tabular-nums text-ink">
+      {motionOff() ? fallback : children}
+    </p>
+  );
+}
+
+/* Section 10's action button inside a Magnet. When motion is off the button
+   renders bare - same vocabulary, no pull toward the cursor. */
+function Magnetic({ children }: { children: ReactNode }) {
+  return motionOff() ? children : <Magnet padding={60}>{children}</Magnet>;
+}
+
 export function Showcase() {
   // The walkthrough's own view preferences. All of them die with the page;
   // nothing here is persisted and nothing reaches the bridge.
@@ -150,7 +179,16 @@ export function Showcase() {
         <div className="mx-auto flex h-14 w-full max-w-[960px] items-center justify-between gap-3 px-8">
           <div className="flex min-w-0 items-center gap-2.5">
             <span aria-hidden="true" className="size-3.5 shrink-0 rounded-full bg-accent" />
-            <span className="truncate text-[13px] font-medium text-ink">一缕 · 面板组件总览</span>
+            {motionOff() ? (
+              <span className="truncate text-[13px] font-medium text-ink">一缕 · 面板组件总览</span>
+            ) : (
+              <BlurText
+                animateBy="characters"
+                className="text-[13px] font-medium text-ink"
+                delay={60}
+                text="一缕 · 面板组件总览"
+              />
+            )}
             <span className="hidden truncate text-[11.5px] text-ink-3 sm:inline">
               十个章节，组件吃假数据
             </span>
@@ -372,21 +410,23 @@ export function Showcase() {
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                 <div className="rounded-control border border-line p-3">
                   <ValuePill>今日 tokens</ValuePill>
-                  <p className="mt-1.5 font-mono text-[17px] font-semibold tabular-nums text-ink">
-                    {SHOWCASE_COST.tokens}
-                  </p>
+                  <CostStat fallback={SHOWCASE_COST.tokens}>
+                    <CountUp separator="," to={12480} />
+                  </CostStat>
                 </div>
                 <div className="rounded-control border border-line p-3">
                   <ValuePill>今日花费</ValuePill>
-                  <p className="mt-1.5 font-mono text-[17px] font-semibold tabular-nums text-ink">
-                    {SHOWCASE_COST.money}
-                  </p>
+                  <CostStat fallback={SHOWCASE_COST.money}>
+                    {"¥"}
+                    <CountUp to={0.31} />
+                  </CostStat>
                 </div>
                 <div className="rounded-control border border-line p-3">
                   <ValuePill tone="red">月预算占用</ValuePill>
-                  <p className="mt-1.5 font-mono text-[17px] font-semibold tabular-nums text-ink">
-                    {SHOWCASE_COST.budget}
-                  </p>
+                  <CostStat fallback={SHOWCASE_COST.budget}>
+                    <CountUp to={117} />
+                    {"%"}
+                  </CostStat>
                 </div>
               </div>
             </DemoCard>
@@ -415,6 +455,23 @@ export function Showcase() {
             </DemoCard>
             <DemoCard title="第 3 步 凭据录入 · 掩码与 DPAPI">
               <FirstrunScreen {...SHOWCASE_FIRSTRUN} currentStep={2} />
+            </DemoCard>
+            <DemoCard title="磁吸按钮 · 下一步 / 完成">
+              <div className="flex items-center justify-end gap-4">
+                <Magnetic>
+                  <Button size="xs" variant="primary">
+                    下一步
+                  </Button>
+                </Magnetic>
+                <Magnetic>
+                  <Button size="xs" variant="primary">
+                    完成
+                  </Button>
+                </Magnetic>
+              </div>
+              <p className="mt-2 text-[11px] leading-[1.6] text-ink-3">
+                指针进入按钮周围 60px，按钮被吸向指针；离开后回弹原位。同一枚按钮在关闭动效时是普通按钮。
+              </p>
             </DemoCard>
           </Section>
         </div>
