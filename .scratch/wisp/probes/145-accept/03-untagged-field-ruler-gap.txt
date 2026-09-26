@@ -1,0 +1,10 @@
+# 前提⑥③ 复现：Snapshot 加一枚 *无 json tag* 的导出字段 LeakProbe string
+RUN=105 PASS=56 FAIL=3
+--- FAIL: TestThePumpBuildsThePacketFromWhatTheHostHolds (0.00s)
+--- FAIL: TestPublishHandsTheBytesToTheAttachedExit (0.00s)
+--- FAIL: TestC21DesignTokensFourWayAgree (0.01s)
+--- 两把契约尺的 Go->TS 方向命中数（应为空＝尺看不见）---
+0
+--- 键集钉抓到了什么 ---
+    pump_test.go:124: snapshot JSON keys = [pending results composer generatedAt LeakProbe], want exactly the four PanelSnapshot declares
+    pump_test.go:276: exit bytes carry keys [pending results composer generatedAt LeakProbe], want the four PanelSnapshot declares

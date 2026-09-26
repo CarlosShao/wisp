@@ -388,3 +388,73 @@ tokens_fourway_test.go:547: only 0 of 78 colour rows completed all four legs - t
 名册差集**三层皆空**；**唯一要改的是红因的适用范围**——它那句"四路比较根本没跑"必须带"在脏工作树里"这个限定，
 **在 `3dcff6a` 上四路比较是跑完了的、红在 0/78**。owner 已明示这一面是已知常红 ⇒ **本程没为它变绿做任何事**
 （没动 `tokens_fourway_test.go`、没动 `design/**`、没换基准）。
+
+---
+
+## 6. 前提⑥ 它报回来的三件新发现——逐件判真伪（每件都现量，尺写在前面）
+
+### 6.1 ① "`A273②` 的'不碰 151 的 `run.go`'对泵成立、对 AC#2 的填充不成立（4/5 候选段需要 `run.go` 一枚读数行）"
+
+**判：结论成立，两处措辞要改。**
+
+- **引用位置错了一格（具名可复核）**：那句原文在 **`A273③`**（台账 6768 行：
+  "⇒ **互斥按文件级判、四组两两不重叠**（我派前现量了构造点…，**不碰 151 的 `run.go`**）"），
+  `A273②` 讲的是 owner 那三句话。**本程的派单正文也抄成了 `A273②`** ⇒ 这条是**两边一起错一个标号**，
+  内容没逃（句子在、约束在）。⇒ 更正＝"引 `A273③`"。**且这枚约束不靠台账**：`093x` 特批正文自己写着"本程不许碰 `run.go`"（§3.1 锁 D）。
+- **"4/5"应为"5/5（按已证成的形状）"**：本程查了它那枚"只有 `approval.*` 可旁通"的支路——
+  它说"本程在仓外副本真做通了"并指 §2.4，**但 §2.4 是 E1b 那发手搓 `PumpSources`、量到的是 `approval` 出门为 `{"depth":0,"windowMs":0,"vetoChannels":null}`**，
+  **不是把 approval 旁通填起来的读数**；它唯一真填出值的 E3 用的正是 `run.go` 里那行 `Approval: rt.liveGateState,`。
+  本程自己查了旁通到底可不可行：`PumpSources` 全字段＝Verdicts/Mode/Workspace/Results/AttachmentMax/Now/Out（现量），
+  `NativeVerdict` 全字段＝CorrelationID/Tool/Args/CallChain/Level/RulesHit/Reason/SessionOverrideBlocked（`pump.go:64-78`），
+  **没有一处容得下 gate 窗口或通道名册**；`p.src` 是 `panel` 包私有字段，`cmd/wisp` 也改不动。
+  ⇒ 旁通只剩一枚形状：**给 `NativeVerdict` 加一枚"其实是 gate 状态"的字段**（两枚放开文件内可做），
+  代价＝把门的状态伪装成裁决携带。**能想，未做，未证**。⇒ 判该句**"未证"**，落地集＝空**不依赖它**（B/C 两把锁对任何键都响，§1）。
+- **"对泵成立"这一半本程复量成立**：泵（`pump.go`／`panel_pump.go`）今天确实在跑、确实不需要 `run.go` 动一行——
+  台账同一行给的三个构造点（`composer.go:79`／`pump.go:203`／`panel_pump.go:225`）**在 3dcff6a 已全部漂移**
+  （现量 `type Snapshot struct` 在 **`:57`**、`NewSnapshot` 在 `:76`、`return Snapshot{` 在 **`:92`**；
+  漂移原因＝`eb38c97` 自己在那三行上面加了 13 行注释）。
+  ⇒ **一条给下一位的实操**：`composer.go:44-49` 这组行号（工单票面、普查件、实现件 §0.3 尺表**三处都在用**）
+  **在被验版本上已不指向 `Snapshot`**；引它之前先 `grep -n "type Snapshot struct"`。实现件 §1 P1 那句"✅ 成立"
+  是**在它自己加注释之前的那枚树上量的**——不是造假，但是**版本没带**。
+
+### 6.2 ② "`remainingMs` 应从甲组挪乙组：`approval.EventTick` 声明与发射都是零"
+
+**判：成立（本程独立复量，并把"零"用的尺写清）。**
+
+```
+尺＝grep -rnw --include=*.go EventTick <全树>  再剔 ^./\.scratch   （大小写敏感、整词、含测试文件）
+  ./internal/agent/approval/ui.go:64:  EventTick EventKind = "tick"   ← 声明，一枚
+  ./internal/panel/pump.go:41:         // … approval.EventTick is declared and   ← 注释，不是码
+⇒ 生产/测试**发射者 0 枚**（不是"不存在这个符号"，是"没有一处构造它"）
+Remaining 消费者全数（尺＝grep -rnw --include=*.go Remaining internal cmd，剔 _test）：
+  gate.go:274 / :387  Kind: EventWarning, Remaining: g.window          ← 静态窗口长
+  gate.go:512         Remaining: g.q.WarningLead()                     ← 静态提前量
+  ui.go:74            Remaining time.Duration                          ← 字段本身
+倒计时本体＝gate.go:257 `deadline := g.clock.After(g.window)`；approval 包内 `time.Until(`/`Until(` **零命中** ⇒ 无"还剩多少"的读口
+```
+⇒ **三处发射带的都是静态长度、没有一枚是"还剩多久"** ⇒ 它的判"活倒计时今天没人算"成立；
+⇒ `remainingMs` 若落＝**填一个永远等于 `windowMs` 的数**，正是 AC#1 判据①／本票"宁缺毋造"要拦的那一形。⚠ 别用墙钟差补（`AGENTS §1.2` 禁形）。
+
+### 6.3 ③ 仪器缺口："未打 `json:` tag 的导出字段能同时躲过两把契约尺，而 `encoding/json` 照发"
+
+**判：成立（本程自造一发复现，且它的兜底只有一枚）。** 原始件＝`probes/145-accept/03-untagged-field-ruler-gap.txt`。
+
+```
+$ cp -r exact tree-mut3 && 给 Snapshot 加一枚 `LeakProbe string`（**不带 tag**）
+$ go test -count=1 -v ./internal/panel/   → RUN=105 PASS=56 FAIL=3
+  TestComposerContractTypesMatchFrontend            --- PASS   ← 尺看不见
+  TestApprovalCardViewJSONKeysMatchFrontendTypes    --- PASS   ← 尺看不见
+  TestThePumpBuildsThePacketFromWhatTheHostHolds    --- FAIL   pump_test.go:124: … generatedAt LeakProbe], want exactly the four
+  TestPublishHandsTheBytesToTheAttachedExit         --- FAIL   pump_test.go:276: exit bytes carry keys [… LeakProbe]
+⇒ 唯一兜底＝票 35 那两枚**字节级**键集钉；两把双向对账尺（读 jsonKeysOf）对此**全绿**。
+⇒ 它自陈"没有为此新增断言"＝**真**（`eb38c97` 27 行 `+`／0 行 `-`，纯注释；本程 §7.4 反扫过名册）。
+```
+
+### 6.4 顺带把 AC#3 那两发也独立打了一遍（派单没要求，但它是本票判词的一半）
+
+```
+$ grep -rn "panel\.view" --include=*.go . | grep -v '^./\.scratch'      → 空（尺＝全仓、大小写敏感、含测试）
+$ sed -n '/func knownComposerMethod/,/^}/p' internal/panel/bridge.go    → case 四枚：ModeRequest/WorkspaceRequest/AttachmentAdd/MessageSend，无第五枚
+```
+⇒ 实现程"ⓐ 落进来就是一枚无校验自由字符串"、"ⓑ 不在名单上、要它就得动 `C17` 白名单（`AGENTS §2` 停手项）"**两句均成立**；
+⇒ 它"ⓑ 零动作、停手上报"**这个处置本程认可**（不是本程替它批 ⓑ，是 ⓑ 确实不在任何已批射程里）。
