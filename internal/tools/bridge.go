@@ -640,20 +640,33 @@ func (b *Bridge) OpenTask(taskID string) {
 }
 
 // CloseTask closes one task's taint scope. The composition root defers this on
-// the task's DisposalScope (tickets 12/28). A task that never closes leaks only
-// its own indexed sources, which is the fail-closed direction: dropping marks
-// would open R4.
+// the task's own boundary: cmd/wisp wires it into agent.Options.AdmitTask's
+// revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+// task that ends takes its taint with it (ticket 151). A caller that dispatches
+// on the bridge outside that boundary - a host-internal call with its own task
+// id - still has no owner here, and stays fail-closed: a task that never closes
+// leaks only its own indexed sources, which is the fail-closed direction, since
+// dropping marks would open R4.
+//
+// The audit line runs on EVERY call, closed scope or not, because "who took
+// this task's taint off the table, and was there anything on it" is exactly the
+// question the C25 ledger owes a long-running host. A scope that was never
+// opened (a task that read no sensitive source) closes as dropped=0.
 func (b *Bridge) CloseTask(taskID string) {
 	if b.prov == nil || taskID == "" {
 		return
 	}
+	dropped := len(b.prov.ScopeTaints(taskID))
 	b.mu.Lock()
 	open := b.scopes[taskID]
 	delete(b.scopes, taskID)
+	left := len(b.scopes)
 	b.mu.Unlock()
 	if open {
 		b.prov.CloseScope(taskID)
 	}
+	b.log("tools: C25 scope closed task=%s was_open=%v dropped=%d open_scopes=%d",
+		taskID, open, dropped, left)
 }
 
 // assessorFor returns the assessor whose R4 input is bound to this task's

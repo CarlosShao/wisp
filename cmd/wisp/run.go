@@ -538,6 +538,32 @@ func (rt *agentRuntime) auditf(format string, args ...any) {
 	rt.spec.sink.logger().Info("audit: " + line)
 }
 
+// admitTask is this composition root's per-task boundary: it registers the
+// TEXT-loop task with the D47 gate and hands back the revocation the loop
+// defers (internal/agent/loop.go:366). The revocation now also closes the
+// task's C25 taint scope on the bridge (ticket 151).
+//
+// WHY THIS HOOK OWNS THE CLOSE. CloseTask's own comment says the composition
+// root defers it "on the task's ..." boundary, and this is the only boundary
+// this root has that (a) is handed the loop's task id - the loop generates it
+// inside Run, so nothing above this point knows it - and (b) already runs on a
+// defer, so it covers the brake/cancel/error exits too. The alternative
+// readings were rejected: closing after loop.Run returns would skip every
+// panic exit, and a task-lifecycle event does not exist in this tree yet.
+//
+// What this does NOT close: a task id a host-internal caller invents when it
+// dispatches on the bridge directly (no admission, no boundary). That shape is
+// recorded as an open end, not silently folded into this line.
+func (rt *agentRuntime) admitTask(taskID string) func() {
+	revoke := rt.gate.AdmitTextTask(taskID)
+	return func() {
+		if revoke != nil {
+			revoke()
+		}
+		rt.bridge.CloseTask(taskID)
+	}
+}
+
 // execute runs one task through the loop and presents the result.
 func (rt *agentRuntime) execute(task string) int {
 	cfg := rt.cfg
@@ -555,7 +581,9 @@ func (rt *agentRuntime) execute(task string) int {
 		Journal: nil,
 		// D47: only a task the TEXT loop registered may reach a gate, and the
 		// loop owns its task id, so registration travels through this hook.
-		AdmitTask: rt.gate.AdmitTextTask,
+		// The same hook is this task's only per-task boundary in this
+		// composition root, so it also owns the C25 teardown (admitTask).
+		AdmitTask: rt.admitTask,
 		Registry:  observe.NewRegistry(),
 		Config: agent.Config{
 			Model:         info.Model,
