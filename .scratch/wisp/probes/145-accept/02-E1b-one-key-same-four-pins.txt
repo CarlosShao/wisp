@@ -1,0 +1,14 @@
+# E1 变体（本程自造，非实现程所有）：只加 1 枚键 cost / 2 字段
+RUN=105 PASS=54 FAIL=5
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+--- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+--- FAIL: TestThePumpBuildsThePacketFromWhatTheHostHolds (0.00s)
+--- FAIL: TestPublishHandsTheBytesToTheAttachedExit (0.00s)
+--- FAIL: TestC21DesignTokensFourWayAgree (0.01s)
+    approval_test.go:129: Go Snapshot emits [cost] that interface PanelSnapshot does not declare
+    composer_test.go:74: Go Snapshot emits [cost] that interface PanelSnapshot does not declare
+    pump_test.go:124: snapshot JSON keys = [cost pending results composer generatedAt], want exactly the four PanelSnapshot declares
+    pump_test.go:276: exit bytes carry keys [pending results composer generatedAt cost], want the four PanelSnapshot declares
+
+# 命名澄清（追加）：本文件是 **E1 的单键变体**（本程自造），不是派单前提② 那枚 E1b；
+# 派单前提②（装配根不动 ⇒ 新段出门为常量）的读数在 04-E1b-real-assembly-root.txt。

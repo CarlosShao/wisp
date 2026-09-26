@@ -75,3 +75,43 @@ $ git status --porcelain | head           # 10:4x，进场第一发
 且**不含** `frontend/**`、`design/**`、`frontend/src/lib/panel.ts` 的工作树状态（派单硬约束）。
 `docs/reports/**`／`PLAN.md`／`specs/**`／`internal/**`／`cmd/**`／`thresholds.go`／golden／`allowlist.txt`
 ／`tools/d22scan/**` —— 本程**零写**（下面每一枚 commit 的 `git diff --cached --name-only` 名册逐枚贴出）。
+
+---
+
+## 1. 前提① E1——"加那 9 枚键、`panel.ts` 一字不动 ⇒ 响的是四枚用例"：**成立，且本程把它钉成"与枚数无关"**
+
+**尺**：blob 精确树（§0.2 那一支）＋**只**加 `composer.go` 的九枚键（`pump.go`／`run.go`／`panel.ts` 全不动）。
+读数＝`go test -count=1 -v ./internal/panel/` 的 `--- FAIL` 名册，不是推理。原始件：`probes/145-accept/01-E1-four-pins.txt`、`02-E1b-one-key-same-four-pins.txt`。
+
+```
+$ cp -r exact tree-mut1 && cd tree-mut1
+$ git apply -p1 --include=internal/panel/composer.go <repo>/.scratch/wisp/probes/145/patch/145-snapshot-fields-closure.patch
+$ go test -count=1 -v ./internal/panel/     # RUN=105 PASS=54 FAIL=5
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes        approval_test.go:129: Go Snapshot emits [run tools approval cost failures] that interface PanelSnapshot does not declare
+--- FAIL: TestComposerContractTypesMatchFrontend               composer_test.go:74:  Go Snapshot emits [run tools approval cost failures] that interface PanelSnapshot does not declare
+--- FAIL: TestThePumpBuildsThePacketFromWhatTheHostHolds       pump_test.go:124:     snapshot JSON keys = [...run cost ... tools approval failures], want exactly the four PanelSnapshot declares
+--- FAIL: TestPublishHandsTheBytesToTheAttachedExit            pump_test.go:276:     exit bytes carry keys [...], want the four PanelSnapshot declares
+--- FAIL: TestC21DesignTokensFourWayAgree                                              （基线既有红，与键无关，§5 单判）
+```
+
+⇒ **四枚，逐名逐行号与派单给的那四个锚点一字不差**（`approval_test.go:129`／`composer_test.go:74`／`pump_test.go:124`／`:276`
+——行号本程在 3dcff6a 现读到 `t.Errorf` 就在那四行上，不是从日志抄的）。
+实现程把普查 §4.4 的"一枚"更正为"四枚"——**本程独立复算，更正成立**。
+
+**本程自己加的一发（实现程没有）**：只加**一枚**键（`Cost CostProbe \`json:"cost"\``，两字段）⇒
+
+```
+$ cp -r exact tree-mut2 && python <插一枚键> && go test -count=1 -v ./internal/panel/   # RUN=105 PASS=54 FAIL=5
+    approval_test.go:129: Go Snapshot emits [cost] that interface PanelSnapshot does not declare
+    composer_test.go:74:  Go Snapshot emits [cost] that interface PanelSnapshot does not declare
+    pump_test.go:124:     snapshot JSON keys = [cost pending results composer generatedAt], want exactly the four ...
+    pump_test.go:276:     exit bytes carry keys [pending results composer generatedAt cost], want the four ...
+```
+
+⇒ **同一批四枚钉，一枚键就全响**。这条把实现程注释里那句"加一枚键要付四枚钉"**从声称升成读数**，
+也顺手否掉一种误读：**"少加几枚键就少响几枚"不成立**——爆炸半径与枚数无关，与"有没有第五枚键"有关。
+
+⚠ **一条本程不替它圆的**：`composer.go` 的头注释（`eb38c97` 落的）写的是"两把双向对账尺在 `composer_test.go:48` 与
+`approval_test.go:105`"——那两行是**函数注释/用例起点**（现量 `approval_test.go:105` ＝ `func TestApprovalCardViewJSONKeysMatchFrontendTypes`、
+`composer_test.go:48` ＝ `func TestComposerContractTypesMatchFrontend`），而**响的行**是 `:129`／`:74`。
+两读不矛盾（一枚指"尺在哪"，一枚指"哪一句红"），但**注释里那两行号是"定义处"不是"断言处"**，下一位照注释去 `:48` 找断言会扑空。属**措辞精度**，不属读数错。

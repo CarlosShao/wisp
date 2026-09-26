@@ -1,0 +1,19 @@
+# E1 复现：blob 精确树 3dcff6a ＋ 只加 composer.go 那 9 枚键（panel.ts 一字不动）
+命令：
+  cp -r exact tree-mut1 && cd tree-mut1
+  git apply -p1 --include=internal/panel/composer.go <repo>/.scratch/wisp/probes/145/patch/145-snapshot-fields-closure.patch
+  go test -count=1 -v ./internal/panel/
+（同一发之前先做了全补丁 git apply --check：8 枚文件全 clean，composer.go 偏移 13 行、pump.go 偏移 14 行 ⇒ 补丁在 3dcff6a 仍可用，实现程只声明了 e24ae28）
+
+RUN=105 PASS=54 FAIL=5
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+--- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+--- FAIL: TestThePumpBuildsThePacketFromWhatTheHostHolds (0.00s)
+--- FAIL: TestPublishHandsTheBytesToTheAttachedExit (0.00s)
+--- FAIL: TestC21DesignTokensFourWayAgree (0.01s)
+
+--- 四枚红句原文 ---
+    approval_test.go:129: Go Snapshot emits [run tools approval cost failures] that interface PanelSnapshot does not declare
+    composer_test.go:74: Go Snapshot emits [run tools approval cost failures] that interface PanelSnapshot does not declare
+    pump_test.go:124: snapshot JSON keys = [pending composer run cost results generatedAt tools approval failures], want exactly the four PanelSnapshot declares
+    pump_test.go:276: exit bytes carry keys [cost failures pending results composer generatedAt run tools approval], want the four PanelSnapshot declares
