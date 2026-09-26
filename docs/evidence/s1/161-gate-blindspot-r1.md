@@ -541,11 +541,51 @@ $ git diff --name-only fbe12c7..HEAD | grep -E 'docs/PLAN\.md|^docs/specs/|^inte
 `docs/reports/**`）一枚未碰。最后一枚提交之后会重跑这一发并把结果补在下面（名册是
 **每次提交后现取**的，不是一次性结论）。
 
-**终判（本程最后一次提交之后现跑，逐字）**：
+**终判（本程两枚提交之后现跑，逐字；22:0x）**：
 
 ```
-<<<FINAL-AC5>>>
+$ git log --format='%h %ad %s' --date=format:'%H:%M' fbe12c7..HEAD
+e8092351 21:59 evidence(票161 r1 §3-§9): AC#1 逐枚读数 27 发＋六枚盲区登记——…
+16364e63 21:53 evidence(票161 r1 §0-§2): 门禁盲区普查台件＋读数基线——…
+
+$ git diff --name-only fbe12c7..HEAD | wc -l
+45                                    # logs/final-ac5-roster.txt
+$ 上面那份名册里，落在契约轴/特别名单任何一枚之内的：
+(none: 契约轴零字节)
+$ git diff --name-only fbe12c7..HEAD | grep -v -e '^\.scratch/wisp/probes/161/r1/' -e '^docs/evidence/s1/161-gate-blindspot-r1\.md$'
+(none)                                # 45 行全在我两处写面内
+$ git diff --stat fbe12c7..HEAD -- tools/d22scan .github frontend design internal cmd docs/PLAN.md docs/specs docs/reports
+(空)                                  # 契约轴与特别名单：一个字节都没有
 ```
+
+**两向名册差集的最终一次（第三本日志，两枚提交都提完之后再跑一次整包）**：
+
+```
+$ sh tools/d22scan/runtests.sh -C tools/d22scan ./...      rc=0
+PASS=30 FAIL=0 SKIP=0  === RUN=70                          # logs/final-runtests.log
+pre 30 枚顶层名 vs final 30 枚：comm -23 = 空、comm -13 = 空（logs/pre-|final-passnames.txt）
+```
+
+⇒ 门禁口径落地：**三本日志（pre / post / final）四数完全相同、名册两向差集皆空、零枚红**。
+派单 §4 那两枚"已知红"在本锚上不存在（来路 §1.1），所以"除那两枚之外零枚新增红"这一句
+今天的实值就是"**零枚红**"——**只可能更严，不可能更松**，判据文字我一个字没动。
+
+### 5.7 一件必须让编排者知道的 Git 现场处置（票面追加**没有**进任何提交）
+
+票面 161 的 Progress log 追加**已经落盘**（`.scratch/wisp/issues/161-…md`，sha256
+`1daa1542…` 记在 `logs/ticket-file-sha-before.txt`），**但没提交**。原因不是我忘了：
+
+- 那枚文件在我进场时就是 ` M`——里面是**编排者 21:2x 的 53 行未提交在途编辑**
+  （AC#6、CI 写面边界、"九条→`// Bans` 现读"那三段更正）。
+- 我 `git add` 该文件后 `git diff --cached` 一看就是：`53 5` 的 numstat 里绝大部分**不是我的行**。
+  用**文件级 pathspec** 提交它，仍然会把它们并入我的提交＝`5afa666`/`15ff2be` 记过的那枚形状
+  （只是从"目录级"缩到"文件级"，缩掉的那一段这次救不了我）。
+- 处置：本程只提交证据件（`git commit -q -F - -- docs/evidence/s1/…`），
+  再用 `git restore --staged -- <票面>` 把索引**退回我进场时的样子**
+  （前后 `sha256sum` 同串 ⇒ 内容零丢失；`git diff --cached` 回到 0 枚；`git status` 回到 ` M`）。
+  派单禁的六枚动词一枚没用（`restore --staged` 只动索引、不动工作树、不改历史，理由写在上面）。
+- ⇒ **请编排者**：要么你先提交自己那 53 行、我下一程再提我的追加；要么你直接把我落盘的那一段
+  连同你的改动一起提。**不要由我在共享树里替你猜。**
 
 ---
 

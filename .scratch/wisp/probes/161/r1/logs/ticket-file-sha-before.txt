@@ -1,0 +1,1 @@
+1daa1542dcf8adca82a4694917474e0507d38d71cd56b69be3400e71a889835a *.scratch/wisp/issues/161-gates-need-their-own-gates-self-tests-in-ci-plus-is-the-approval-door-ever-rung.md
