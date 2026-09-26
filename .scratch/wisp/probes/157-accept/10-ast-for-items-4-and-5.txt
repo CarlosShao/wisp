@@ -1,0 +1,68 @@
+### S45. 第 4/5 笔换尺：go/ast 语法判据（不是 grep/sed 文本尺）
+取版尺＝git cat-file blob 5365cb22:<路径> 落 D:/tmp/157accept/{loopblob.txt}
+$ git cat-file blob 5365cb22:internal/agent/loop.go | wc -l -c
+   1117   38148
+rc=0
+---
+$ git rev-parse 5365cb22:internal/agent/loop.go
+e685a6efd595acb5ca1d7f051e139985bf6b9a47
+rc=0
+---
+--- 分析器本体在 D:/tmp/157accept/astfacts2.go（零依赖，go/parser＋go/token）---
+$ go run astfacts2.go loopblob.txt current Loop run
+[1] COMMENT node line  348 off  11307 | // D11(1) control layer abort a running task by cancelling l.current (the
+[1] COMMENT node line  579 off  19498 | // ticket 21), then D38d-capped concurrent execution with the C22 per-tool
+    comment nodes containing "current" (any form): 2
+
+[2] CODE selector uses of *.<current> in loopblob.txt (role from AssignStmt.Lhs slot)
+   #1 line  523 off  17861  receiver=l    in=l.defaultControl       role=READ
+   #2 line  987 off  34873  receiver=l    in=l.setCurrent           role=WRITE
+    TOTAL=2 READ=1 WRITE=1
+
+[3] Loop.current = struct FIELD decl, line 189 off 6484 (a declaration, not a use)
+
+[4] func (Loop).run -- ordering by BYTE OFFSET (line numbers not used as the ruler)
+   res := Result{TaskID:...}  line  369 off  12193 astDepth 3
+   first for{}                line  376 off  12407 astDepth 3
+   first .Compress( call      line  396 off  13350 astDepth 8
+   => Result.TaskID construction is EARLIER than the Compress call by 1157 bytes
+   => Compress call vs loop head: compressDepth=8 loopDepth=3 compressOff=13350 loopOff=12407
+rc=0
+### S6. 本程补的两发定向确认（AST 报了归属，这里把原文钉上）
+$ git cat-file blob 5365cb22:internal/agent/loop.go | sed -n "515,524p"（:523 那枚唯一读点的归属函数）
+^I^Ih = l.defaultControl
+^I}
+^Iout := h(verb, utterance)
+^Ires := Result{TaskID: taskID, Status: StatusControl}
+^Iswitch {
+^Icase out.Text != "":
+^I^Ires.Message = out.Text
+^Icase !out.Handled:
+^I^Ires.Message = "M-fM-^TM-6M-eM-^HM-0M-fM-^NM-'M-eM-^HM-6M-fM-^LM-^GM-dM-;M-$ " + string(verb) + "M-oM-<M-^LM-dM-=M-^F
+^I}
+^Ireturn res
+}
+
+// defaultControl covers what the loop itself can do: cancel/stop its running
+// task. repeat/louder/confirm belong to the host (TTS, approval queue) and
+// report unhandled unless a ControlHandler is wired.
+func (l *Loop) defaultControl(verb ControlVerb, _ string) ControlOutcome {
+^Il.mu.Lock()
+^Iroot := l.current
+^Il.mu.Unlock()
+$ 往上找它所属的 func 行
+521: func (l *Loop) defaultControl(verb ControlVerb, _ string) ControlOutcome {
+$ setCurrent 本体（写点 :987 的归属）
+func (l *Loop) setCurrent(r *observe.Root) {
+	l.mu.Lock()
+	l.current = r
+	l.mu.Unlock()
+$ run 的出口那几发（"晚于压缩"里"出口"那一半）
+342: 		return l.runControl(taskID, verb, input)
+378: 			return l.finish(ctx, root, j, guard, cost, &res, StatusCancelled, "任务已取消")
+382: 			return l.brakeStuck(ctx, root, j, guard, cost, &res, BrakeToken,
+387: 			return l.brakeStuck(ctx, root, j, guard, cost, &res, BrakeRounds,
+407: 			return l.failWith(ctx, root, j, guard, cost, &res,
+422: 			return l.finish(ctx, root, j, guard, cost, &res, StatusCancelled, "任务已取消")
+429: 			return l.failWith(ctx, root, j, guard, cost, &res, turn.Err)
+436: 				return l.brakeStuck(ctx, root, j, guard, cost, &res, BrakeToken,

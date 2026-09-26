@@ -1,0 +1,71 @@
+### V. 票面 5 枚框 ↔ 盘上形状（本程自己那把尺）
+### V1. 157 名下 commit 名册（锚定 grep ＋ no-walk 并集）
+$ git log --pretty=%h --grep='157 第' | wc -l
+10
+rc=0
+---
+  .scratch/wisp/probes/157/10-items-4-to-7-code-facts.sh
+  .scratch/wisp/probes/157/10-items-4-to-7-code-facts.txt
+  .scratch/wisp/probes/157/10-items4to7.txt
+  .scratch/wisp/probes/157/11-items-1-2-3-8-table-and-range.sh
+  .scratch/wisp/probes/157/11-items-1-2-3-8-table-and-range.txt
+  .scratch/wisp/probes/157/12-dep-closure-6de3d1c5.txt
+  .scratch/wisp/probes/157/12-dep-closure-from-git-objects.py
+  .scratch/wisp/probes/157/13-items-9-10-privacy-and-keyname.sh
+  .scratch/wisp/probes/157/13-items-9-10-privacy-and-keyname.txt
+  .scratch/wisp/probes/157/14-supplementary-rulers.sh
+  .scratch/wisp/probes/157/14-supplementary-rulers.txt
+  .scratch/wisp/probes/157/15-item2-lettersource-rulers.sh
+  .scratch/wisp/probes/157/15-item2-lettersource-rulers.txt
+  docs/evidence/s1/153-trace-lies-unguarded-r1.md
+  docs/evidence/s1/155-three-unjudged-cells-r1.md
+  并集枚数：15
+### V2. 禁改面命中数（同一份名册上按前缀尺）
+  前缀尺命中＝0
+sed: -e expression #1, char 15: unknown option to `s'
+### V3. 票面框的勾与 -done
+  已勾框枚数＝0
+  未勾框枚数＝5
+  -done 枚数＝0
+### V4. 两节附录的标题与枚数（锚定 grep '^## 附录'）
+  155件 389:## 附录 B（票 157 代记，只追加）
+  155件 398:### B.1 第 1 笔 —— §4 那张推进表缺"该枚 AC 全档"�
+  155件 444:### B.2 第 2 笔 —— "票面拆出的 6 件"那句指错文档
+  155件 487:### B.3 第 3 笔 —— §4 的 AC#3 行给了指针、没给句�
+  155件 515:### B.4 第 4 笔 —— `l.current` 那句"只有 3 处读点"：
+  155件 543:### B.5 第 5 笔 —— `Result.TaskID` 那句"晚于压缩那一
+  155件 575:### B.6 第 6 笔 —— 同帧持有者漏报 `j.taskID`（journa
+  155件 607:### B.7 第 7 笔 —— 同帧持有者漏报 `l.opt.AdmitTask(ta
+  155件 642:### B.8 第 8 笔 —— AC#4 的射程声明只证了"树＝`6de3
+  153件 573:## 附录 A（09-26 11:2x，**编排者代记**；本件正文 §0
+  153件 593:## 附录 B（票 157 代记，只追加）
+  153件 600:### B.9 第 9 笔 —— 本件缺那笔隐私账：**〔成立〕
+  153件 627:### B.10 第 10 笔 —— 日志侧 `task` ↔ DB 侧 `task_id` �
+### V5. 件数与'枚'的口径（自报 40 枚那一笔）
+  盘上文件枚数＝15
+  入库枚数（ec81582）＝13
+  读数件里 '$ ' 命令行总数＝39
+  读数件里 '### ' 小节总数＝44
+  两枚交付件里出现 '40 枚' 的枚数＝0
+0 
+### V6. 交付件里有没有 AC#5 那枚双向对账块（锚定 grep）
+  155 件附录里 '对账|双向' 命中＝0
+  153 件附录里 '对账|双向' 命中＝0
+### V7. 每笔带没带当轮命令（'$ ' 行枚数，按 B.n 小节切）
+  ### B.1 第 1 笔 —— §4 那张推进表缺"该枚 AC 全档"那一列：**〔成立〕** $-命令行＝5
+  ### B.2 第 2 笔 —— "票面拆出的 6 件"那句指错文档：**〔不成立〕**（本程复算打不中，按规矩**不补**那一行，停手报回） $-命令行＝7
+  ### B.3 第 3 笔 —— §4 的 AC#3 行给了指针、没给句① 的档：**〔成立〕** $-命令行＝3
+  ### B.4 第 4 笔 —— `l.current` 那句"只有 3 处读点"：**〔成立〕**（本程复算还把它再收窄一枚） $-命令行＝3
+  ### B.5 第 5 笔 —— `Result.TaskID` 那句"晚于压缩那一发"：**〔成立〕**（盘上确实打反） $-命令行＝4
+  ### B.6 第 6 笔 —— 同帧持有者漏报 `j.taskID`（journal 那一枚）：**〔成立〕** $-命令行＝6
+  ### B.7 第 7 笔 —— 同帧持有者漏报 `l.opt.AdmitTask(taskID)`（那一刻 id 已出包）：**〔成立〕** $-命令行＝6
+  ### B.8 第 8 笔 —— AC#4 的射程声明只证了"树＝`6de3d1c5`"、没证"＝交付那一版"：**〔成立〕**（本程换一把与验收程不同的尺重算闭包） $-命令行＝6
+  ### B.9 第 9 笔 —— 本件缺那笔隐私账：**〔成立〕**             $-命令行＝6
+  ### B.10 第 10 笔 —— 日志侧 `task` ↔ DB 侧 `task_id` 无人写：**〔成立〕** $-命令行＝8
+### V2b. 上一发那枚 sed 报错了（'s/.../g' 定界符撞了路径里的斜杠）——本程就地补尺，不抹原行
+$ for c in $(git log --pretty=%h --grep="157 第"); do git show --name-only --pretty= $c; done | sort -u | grep -E "thresholds.go|golden|allowlist.txt|slo-check|d22scan|PLAN.md|specs/" | wc -l
+0
+rc=0
+$ 同一份名册上按"三枚合法写面"反查（两枚证据件＋probes/157）
+0
+rc=1（0＝名册里除两枚证据件与 probes/157 之外一枚不剩）
