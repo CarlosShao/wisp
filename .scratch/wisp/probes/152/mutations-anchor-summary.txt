@@ -1,0 +1,9 @@
+# ticket 152 mutation ruler, anchor tree = snap-pre (git archive 5365cb2, cmd/wisp md5-checked)
+# selection: TestSLO144|TestSLO147|TestSLO149 ; no -cover flag anywhere (pitfall 2)
+# date: 2026-09-26 09:38 +0800
+asis                           rc=0 RUN=20 PASS=13 FAIL=0 SKIP=0 reds=-
+f1-fallback-to-zero            rc=0 RUN=20 PASS=13 FAIL=0 SKIP=0 reds=-
+f2-fallback-to-minus1          rc=0 RUN=20 PASS=13 FAIL=0 SKIP=0 reds=-
+e1-exited-drop-summary         rc=1 RUN=20 PASS=12 FAIL=1 SKIP=0 reds=TestSLO149ExitedGiveUpSentenceCarriesTheLastReading
+e2-exited-drop-summary-case13off rc=0 RUN=19 PASS=12 FAIL=0 SKIP=0 reds=-
+e3-case13-not-a-test-only      rc=0 RUN=19 PASS=12 FAIL=0 SKIP=0 reds=-
