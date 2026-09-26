@@ -1,0 +1,374 @@
+# 票 154 AC#3 同族普查 —— 锚点 352d3d8 / 生成 2026-09-26T12:10:45+08:00
+# 尺：git grep -nE（大小写敏感、不整词、pathspec=internal+cmd、排除 _test.go；每对另给的排除项写在标题里）
+
+########## 1 Bridge.OpenTask / Bridge.CloseTask（本票主题）
+--- 开那侧（生产码）---
+(零命中)
+--- 关那侧（生产码）---
+352d3d8:cmd/wisp/run.go:546:// WHY THIS HOOK OWNS THE CLOSE. CloseTask's own comment says the composition
+352d3d8:cmd/wisp/run.go:563:		rt.bridge.CloseTask(taskID)
+
+########## 2 Provenance.OpenScope / CloseScope（internal/risk 冻结面，本程只读）
+--- 开那侧（生产码）---
+352d3d8:cmd/wisp/panel_assets.go:232:	prov.OpenScope(taintSourceScopeID)
+352d3d8:internal/risk/provenance.go:339:func (p *Provenance) OpenScope(scopeID string) {
+352d3d8:internal/tools/bridge.go:638:		b.prov.OpenScope(taskID)
+--- 关那侧（生产码）---
+352d3d8:internal/risk/provenance.go:350:func (p *Provenance) CloseScope(scopeID string) {
+352d3d8:internal/tools/bridge.go:666:		b.prov.CloseScope(taskID)
+
+########## 3 Gate.AdmitTextTask 的 revoke（关那侧是闭包，方法名 grep 抓不到）
+--- 开那侧（生产码）---
+352d3d8:cmd/wisp/run.go:477:	revoke := rt.gate.AdmitTextTask(taskID)
+352d3d8:cmd/wisp/run.go:558:	revoke := rt.gate.AdmitTextTask(taskID)
+352d3d8:internal/agent/approval/doc.go:29://   - call Gate.AdmitTextTask(taskID) once per TEXT-loop task and defer its
+352d3d8:internal/agent/approval/gate.go:148:// AdmitTextTask registers one TEXT-loop task (Path T, or a Path C conversation
+352d3d8:internal/agent/approval/gate.go:154:// value that calls AdmitTextTask, and nothing that does not hold it can get a
+352d3d8:internal/agent/approval/gate.go:160:func (g *Gate) AdmitTextTask(taskID string) (revoke func()) {
+352d3d8:internal/agent/approval/gate.go:204:			"实时语音（Path C）不具备工具权限；该任务未经文本循环登记（AdmitTextTask），已 fail-closed 拒绝")
+352d3d8:internal/agent/loop.go:166:	// approval.Gate.AdmitTextTask here). Nil means the host has no approval
+--- 关那侧（生产码）---
+352d3d8:cmd/wisp/run.go:478:	defer revoke()
+352d3d8:cmd/wisp/run.go:561:			revoke()
+352d3d8:internal/agent/approval/approval.go:309:func (s *grantStore) revoke() {
+352d3d8:internal/agent/approval/queue.go:288:	it.grants.revoke()
+352d3d8:internal/agent/approval/queue.go:374:		it.grants.revoke()
+352d3d8:internal/agent/loop.go:366:	defer revokeAdmission()
+
+########## 4 plugin.DisposalScope：NewDisposalScope/Defer vs Dispose
+--- 开那侧（生产码）---
+352d3d8:internal/agent/approval/batch.go:68:			if view.Deferred > 0 {
+352d3d8:internal/agent/approval/batch.go:69:				return fmt.Sprintf("（另有 %d 项可展开查看）", view.Deferred)
+352d3d8:internal/observe/diagnostics.go:182:	if len(o.Deferred) == 0 {
+352d3d8:internal/observe/diagnostics.go:189:		deferred = o.Deferred
+352d3d8:internal/plugin/disposal.go:128:// not usable; use NewDisposalScope.
+352d3d8:internal/plugin/disposal.go:152:// NewDisposalScope creates a scope derived from parent (nil = detached). The
+352d3d8:internal/plugin/disposal.go:155:func NewDisposalScope(name string, parent context.Context, opts ...Option) *DisposalScope {
+352d3d8:internal/plugin/disposal.go:187:	return s.DeferNamed("", fn)
+352d3d8:internal/risk/provenance.go:348:// disposalScope.Defer(p.CloseScope) — disposal MUST not leak taints past the
+--- 关那侧（生产码）---
+(零命中)
+
+########## 5 Store.StartRetentionJob（需要一枚 DisposalScope）
+--- 开那侧（生产码）---
+352d3d8:internal/memory/retention.go:95:// StartRetentionJob launches the retention-job goroutine inside the given
+352d3d8:internal/memory/retention.go:98:func (s *Store) StartRetentionJob(scope *plugin.DisposalScope, cfg RetentionConfig) {
+352d3d8:internal/memory/retention.go:100:		panic("memory: StartRetentionJob requires a DisposalScope")
+352d3d8:internal/memory/retention.go:234:// command); production scheduling goes through StartRetentionJob.
+--- 关那侧（生产码）---
+352d3d8:internal/memory/retention.go:95:// StartRetentionJob launches the retention-job goroutine inside the given
+352d3d8:internal/memory/retention.go:98:func (s *Store) StartRetentionJob(scope *plugin.DisposalScope, cfg RetentionConfig) {
+352d3d8:internal/memory/retention.go:100:		panic("memory: StartRetentionJob requires a DisposalScope")
+352d3d8:internal/memory/retention.go:234:// command); production scheduling goes through StartRetentionJob.
+
+########## 6 tools.Registry.Register / Registry.RegisterProvider，有无 Unregister
+--- 开那侧（生产码）---
+352d3d8:cmd/wisp/run.go:345:		if err := reg.Register(e); err != nil {
+352d3d8:internal/tools/registry.go:160:// RegisterProvider attaches a C4 slot's provider. The three unlanded slots
+352d3d8:internal/tools/registry.go:163:func (r *Registry) RegisterProvider(p Provider) error {
+--- 关那侧（生产码）---
+352d3d8:internal/audio/mmdevice_windows.go:148:		// UnregisterEndpointNotificationCallback (slot 7).
+352d3d8:internal/ball/hotkey_windows.go:369:// hotkeyUnregisterer is the Win32 UnregisterHotKey for a fixed window.
+352d3d8:internal/ball/hotkey_windows.go:370:func hotkeyUnregisterer(hwnd windows.HWND) unregisterFn {
+352d3d8:internal/ball/hotkey_windows.go:371:	return func(id uint32) { pUnregisterHotKey.Call(uintptr(hwnd), uintptr(id)) }
+352d3d8:internal/ball/hotkey_windows.go:423:// Unregistering an id we do not hold is a no-op Win32 refuses silently.
+352d3d8:internal/ball/hotkey_windows.go:425:	unregisterAllWith(hotkeyUnregisterer(hwnd))
+352d3d8:internal/ball/hotkey_windows.go:437:	pUnregisterHotKey.Call(uintptr(hwnd), hkCancel)
+352d3d8:internal/ball/hotkey_windows.go:454:	pUnregisterHotKey.Call(uintptr(hwnd), hkCancel)
+352d3d8:internal/ball/win32_windows.go:43:	pUnregisterHotKey              = modUser32.NewProc("UnregisterHotKey")
+352d3d8:internal/llm/provider.go:213:// NewProvider builds the provider for ep.Protocol. Unregistered protocols
+
+########## 7 RiskAssessor.RegisterSubAssessor（只有注册、没有反注册）
+--- 开那侧（生产码）---
+352d3d8:internal/risk/assessor.go:212:// RegisterSubAssessor attaches a pluggable judge (guardian scoring later). Its
+352d3d8:internal/risk/assessor.go:214:func (a *RiskAssessor) RegisterSubAssessor(s SubAssessor) {
+--- 关那侧（生产码）---
+(零命中)
+
+########## 8 proc.JobScope：StartInJob vs Close
+--- 开那侧（生产码）---
+352d3d8:cmd/wisp/slo_windows.go:495:	// StartInJob starts AND assigns (and kills the child itself if the
+352d3d8:cmd/wisp/slo_windows.go:498:	p, err := rt.Job.StartInJob(cmd)
+352d3d8:internal/proc/jobscope_windows.go:107:// StartInJob starts cmd and immediately assigns it to the Job. If the
+352d3d8:internal/proc/jobscope_windows.go:110:func (j *JobScope) StartInJob(cmd *exec.Cmd) (*os.Process, error) {
+352d3d8:internal/proc/jobscope_windows.go:112:		return nil, fmt.Errorf("proc: StartInJob: nil cmd")
+352d3d8:internal/proc/jobscope_windows.go:115:		return nil, fmt.Errorf("proc: StartInJob: %w", err)
+--- 关那侧（生产码）---
+352d3d8:internal/proc/boot_windows.go:97:			_ = job.Close()
+352d3d8:internal/proc/boot_windows.go:109:		_ = job.Close()
+352d3d8:internal/proc/boot_windows.go:147:		hooks.CloseJob = func(context.Context) error { return rt.Job.Close() }
+352d3d8:internal/proc/shutdown.go:45:	StepCloseJob
+352d3d8:internal/proc/shutdown.go:88:	CloseJob              func(ctx context.Context) error // step 9 (proc.JobScope.Close)
+352d3d8:internal/proc/shutdown.go:183:	run(StepCloseJob, hooks.CloseJob, 0)
+
+########## 9 proc.SingleInstance：Acquire 与 Release
+--- 开那侧（生产码）---
+352d3d8:internal/proc/boot_windows.go:95:		si, err := AcquireSingleInstance(rt.Layout.MutexName, rt.Layout.ActivateEventName)
+352d3d8:internal/proc/singleinstance_windows.go:19:// ErrAlreadyRunning is returned by AcquireSingleInstance when another Wisp
+352d3d8:internal/proc/singleinstance_windows.go:24:// instance. Create with AcquireSingleInstance.
+352d3d8:internal/proc/singleinstance_windows.go:35:// AcquireSingleInstance creates and owns the named mutex, and creates the
+352d3d8:internal/proc/singleinstance_windows.go:40:func AcquireSingleInstance(mutexName, eventName string) (*SingleInstance, error) {
+--- 关那侧（生产码）---
+352d3d8:internal/proc/boot_windows.go:151:		_ = rt.Instance.Release()
+
+########## 10 audio：麦克风腿的 Start/Stop 成对（整条腿今天接没接宿主）
+--- 开那侧（生产码）---
+352d3d8:internal/audio/gate.go:83:// NewHalfDuplexGate wraps inner with the duplex policy of path.
+352d3d8:internal/audio/gate.go:84:func NewHalfDuplexGate(inner AudioSource, path Path, opts ...GateOption) *HalfDuplexGate {
+352d3d8:internal/audio/wasapi_other.go:18:func NewWASAPIMicrophone() *WASAPIMicrophone { return &WASAPIMicrophone{} }
+352d3d8:internal/audio/wasapimic_windows.go:58:	return &WASAPIMicrophone{
+352d3d8:internal/audio/wavinjector.go:44:// NewWavInjector parses a RIFF/WAVE file (PCM16 or IEEE float32, any channel
+352d3d8:internal/audio/wavinjector.go:48:func NewWavInjector(path string, opts ...InjectorOption) (*WavInjector, error) {
+--- 关那侧（生产码）---
+352d3d8:cmd/balldebug/main.go:406:	defer tk.Stop()
+352d3d8:internal/audio/gate.go:125:	return g.inner.Stop()
+352d3d8:internal/audio/gate.go:256:	if err := g.inner.Stop(); err != nil {
+352d3d8:internal/ball/hotkey_reload.go:131:	defer t.Stop()
+352d3d8:internal/llm/adaptertest/mockllm.go:107:	defer timer.Stop()
+352d3d8:internal/llm/retry.go:110:	defer t.Stop()
+352d3d8:internal/memory/retention.go:116:	defer timer.Stop()
+352d3d8:internal/observe/logging.go:292:	defer t.Stop()
+352d3d8:internal/observe/sampler.go:277:	defer t.Stop()
+352d3d8:internal/observe/sampler.go:494:	defer t.Stop()
+352d3d8:internal/statemachine/machine.go:207:		m.timer.Stop()
+
+########## 11 panel.StreamLog：Append 隐式开 key vs Close(key)
+--- 开那侧（生产码）---
+352d3d8:cmd/wisp/run.go:757:			c.stream.Append(e.TaskID, e.Text)
+352d3d8:internal/config/defaults.go:126:			out = reflect.Append(out, ev)
+--- 关那侧（生产码）---
+352d3d8:cmd/wisp/run.go:784:			c.stream.Close(e.TaskID)
+352d3d8:internal/audio/wasapimic_windows.go:183:	defer func() { _ = stream.Close() }() // closure: closes whatever stream is CURRENT (swap-safe)
+352d3d8:internal/audio/wasapimic_windows.go:202:			_ = stream.Close()
+352d3d8:internal/panel/pump.go:310:func (s *StreamLog) Close(key string) {
+
+########## 12 memory.Store：InsertGrant vs RevokeGrant/DeleteGrant
+--- 开那侧（生产码）---
+352d3d8:internal/memory/dao_misc.go:17:func (s *Store) InsertGrant(ctx context.Context, g ApprovalGrant) (int64, error) {
+--- 关那侧（生产码）---
+352d3d8:internal/memory/dao_misc.go:49:func (s *Store) RevokeGrant(ctx context.Context, id int64) error {
+352d3d8:internal/memory/dao_misc.go:102:func (s *Store) DeleteGrant(ctx context.Context, id int64) error {
+
+########## 13 ball：RegisteredHotkeys 注册 vs UnregisterHotKey（Win32）
+--- 开那侧（生产码）---
+352d3d8:internal/ball/ball_windows.go:834:// RegisteredHotkeys returns the id -> accelerator set Win32 actually holds
+352d3d8:internal/ball/ball_windows.go:837:func (b *Ball) RegisteredHotkeys() map[uint32]Accelerator {
+352d3d8:internal/ball/hotkey_windows.go:223:	// HotkeyLive: RegisterHotKey succeeded, the binding is ours and presses
+352d3d8:internal/ball/hotkey_windows.go:256:// Attempted reports whether a RegisterHotKey call was made for this binding.
+352d3d8:internal/ball/hotkey_windows.go:351:// hotkeyRegisterer is the Win32 RegisterHotKey for a fixed window.
+352d3d8:internal/ball/hotkey_windows.go:354:		r, _, err := pRegisterHotKey.Call(uintptr(hwnd), uintptr(id),
+352d3d8:internal/ball/hotkey_windows.go:362:		return syscall.EINVAL // RegisterHotKey returned FALSE with no error info
+352d3d8:internal/ball/win32_windows.go:42:	pRegisterHotKey                = modUser32.NewProc("RegisterHotKey")
+--- 关那侧（生产码）---
+352d3d8:cmd/balldebug/diff_windows.go:224:	defer f.Close()
+352d3d8:cmd/balldebug/main.go:234:			b.Close()
+352d3d8:cmd/balldebug/main.go:266:			b.Close()
+352d3d8:cmd/balldebug/main.go:358:	b.Close()
+352d3d8:cmd/balldebug/main.go:638:		b.ReleaseEscAfterSession()
+352d3d8:cmd/balldebug/shot_windows.go:119:		f.Close()
+352d3d8:cmd/llmrecord/main.go:102:	defer resp.Body.Close()
+352d3d8:cmd/wisp/logsink.go:113:	_ = s.pipeline.Close()
+352d3d8:cmd/wisp/models.go:304:	defer machine.Close()
+352d3d8:cmd/wisp/providers.go:185:	defer func() { _ = store.Close() }()
+352d3d8:cmd/wisp/run.go:517:		_ = rt.store.Close()
+352d3d8:cmd/wisp/slo_windows.go:304:			_ = pipeline.Close()
+352d3d8:cmd/wisp/slo_windows.go:313:			_ = pipeline.Close()
+352d3d8:cmd/wisp/slo_windows.go:327:	_ = pipeline.Close()
+352d3d8:internal/audio/wasapi_windows.go:238:		_ = s.Close() // release the half-initialized client (idempotent)
+352d3d8:internal/audio/wasapimic_windows.go:183:	defer func() { _ = stream.Close() }() // closure: closes whatever stream is CURRENT (swap-safe)
+352d3d8:internal/audio/wasapimic_windows.go:202:			_ = stream.Close()
+352d3d8:internal/audio/wasapimic_windows.go:250:	_ = (*stream).Close()
+352d3d8:internal/ball/ball_windows.go:866:// ReleaseEscAfterSession hands Esc back to the configured cancel binding
+352d3d8:internal/ball/ball_windows.go:868:func (b *Ball) ReleaseEscAfterSession() {
+352d3d8:internal/ball/hotkey_windows.go:369:// hotkeyUnregisterer is the Win32 UnregisterHotKey for a fixed window.
+352d3d8:internal/ball/hotkey_windows.go:371:	return func(id uint32) { pUnregisterHotKey.Call(uintptr(hwnd), uintptr(id)) }
+352d3d8:internal/ball/hotkey_windows.go:437:	pUnregisterHotKey.Call(uintptr(hwnd), hkCancel)
+352d3d8:internal/ball/hotkey_windows.go:454:	pUnregisterHotKey.Call(uintptr(hwnd), hkCancel)
+352d3d8:internal/ball/win32_windows.go:43:	pUnregisterHotKey              = modUser32.NewProc("UnregisterHotKey")
+352d3d8:internal/config/parse.go:216:		_ = tmp.Close()
+352d3d8:internal/config/parse.go:220:		tmp.Close()
+352d3d8:internal/config/parse.go:223:	if err := tmp.Close(); err != nil {
+352d3d8:internal/llm/adaptertest/mockllm.go:146:	defer resp.Body.Close()
+352d3d8:internal/llm/adaptertest/mockllm.go:158:	defer resp.Body.Close()
+352d3d8:internal/llm/adaptertest/mockllm.go:383:	defer resp.Body.Close()
+352d3d8:internal/llm/anthropic/adapter.go:170:		defer resp.Body.Close()
+352d3d8:internal/llm/anthropic/adapter.go:181:	defer resp.Body.Close()
+352d3d8:internal/llm/discover.go:70:	defer resp.Body.Close()
+352d3d8:internal/llm/openaichat/adapter.go:104:		defer resp.Body.Close()
+352d3d8:internal/llm/openaichat/adapter.go:115:	defer resp.Body.Close()
+352d3d8:internal/llm/openairesponses/adapter.go:139:		defer resp.Body.Close()
+352d3d8:internal/llm/openairesponses/adapter.go:150:	defer resp.Body.Close()
+352d3d8:internal/llm/systemproxy_windows.go:58:	defer k.Close()
+352d3d8:internal/memory/dao_memory.go:76:	defer rows.Close()
+352d3d8:internal/memory/dao_memory.go:136:	defer rows.Close()
+352d3d8:internal/memory/dao_misc.go:85:	defer rows.Close()
+352d3d8:internal/memory/dao_misc.go:97:	defer rows.Close()
+352d3d8:internal/memory/dao_misc.go:175:	defer rows.Close()
+352d3d8:internal/memory/dao_misc.go:250:	defer rows.Close()
+352d3d8:internal/memory/dao_profile.go:115:	defer rows.Close()
+352d3d8:internal/memory/dao_providerhealth.go:182:	defer rows.Close()
+352d3d8:internal/memory/dao_tasklog.go:101:	defer rows.Close()
+352d3d8:internal/memory/dao_toolcall.go:116:	defer rows.Close()
+352d3d8:internal/memory/dao_toolcall.go:127:	defer rows.Close()
+352d3d8:internal/memory/open.go:208:		_ = s.reader.Close()
+352d3d8:internal/memory/open.go:219:		_ = s.Close()
+352d3d8:internal/memory/open.go:266:			_ = s.reader.Close()
+352d3d8:internal/memory/open.go:269:			_ = s.writer.Close()
+352d3d8:internal/memory/open.go:300:		_ = boot.Close()
+352d3d8:internal/memory/open.go:304:		_ = boot.Close()
+352d3d8:internal/memory/open.go:308:		_ = boot.Close()
+352d3d8:internal/memory/open.go:317:		_ = boot.Close()
+352d3d8:internal/memory/open.go:325:		if err := boot.Close(); err != nil {
+352d3d8:internal/memory/open.go:336:			_ = boot.Close()
+352d3d8:internal/memory/open.go:342:	_ = boot.Close()
+352d3d8:internal/memory/open.go:532:	defer in.Close()
+352d3d8:internal/memory/open.go:538:		out.Close()
+352d3d8:internal/memory/open.go:541:	return out.Close()
+352d3d8:internal/models/archive.go:25:	defer f.Close()
+352d3d8:internal/models/archive.go:86:			out.Close()
+352d3d8:internal/models/archive.go:89:		if err := out.Close(); err != nil {
+352d3d8:internal/models/downloader.go:397:	defer resp.Body.Close()
+352d3d8:internal/models/downloader.go:428:	defer f.Close()
+352d3d8:internal/models/downloader.go:490:	defer f.Close()
+352d3d8:internal/models/downloader.go:683:	defer f.Close()
+352d3d8:internal/models/downloader.go:725:	defer in.Close()
+352d3d8:internal/models/downloader.go:730:	defer out.Close()
+352d3d8:internal/observe/diagnostics.go:81:			f.Close()
+352d3d8:internal/observe/diagnostics.go:202:	if err := zw.Close(); err != nil {
+352d3d8:internal/observe/diagnostics.go:208:	if err := f.Close(); err != nil {
+352d3d8:internal/observe/logging.go:82:			_ = w.Close()
+352d3d8:internal/observe/logging.go:118:	return p.writer.Close()
+352d3d8:internal/observe/logging.go:260:	cerr := w.file.Close()
+352d3d8:internal/panel/attachments.go:225:	defer func() { _ = rc.Close() }()
+352d3d8:internal/proc/boot_windows.go:97:			_ = job.Close()
+352d3d8:internal/proc/boot_windows.go:109:		_ = job.Close()
+352d3d8:internal/proc/boot_windows.go:147:		hooks.CloseJob = func(context.Context) error { return rt.Job.Close() }
+352d3d8:internal/risk/syncdirs_windows.go:43:		k.Close()
+352d3d8:internal/risk/syncdirs_windows.go:65:	defer k.Close()
+352d3d8:internal/tools/fs.go:148:	defer f.Close() //nolint:errcheck // read-only handle, Close's error is not actionable
+352d3d8:internal/tools/fs.go:212:	defer dir.Close() //nolint:errcheck // read-only handle
+352d3d8:internal/tools/fs_write.go:301:		_ = tmp.Close()
+352d3d8:internal/tools/fs_write.go:321:	if err := tmp.Close(); err != nil {
+352d3d8:internal/tools/fs_write.go:506:	defer src.Close() //nolint:errcheck // read-only handle
+352d3d8:internal/tools/fs_write.go:519:	_ = tmp.Close()
+352d3d8:internal/winsec/winsec.go:118:		_ = f.Close()
+352d3d8:internal/winsec/winsec.go:123:		_ = f.Close()
+352d3d8:internal/winsec/winsec.go:127:	if err := f.Close(); err != nil {
+
+########## 14 observe.LogPipeline.Close / rollingWriter.Close
+--- 开那侧（生产码）---
+(零命中)
+--- 关那侧（生产码）---
+352d3d8:cmd/balldebug/diff_windows.go:224:	defer f.Close()
+352d3d8:cmd/balldebug/main.go:234:			b.Close()
+352d3d8:cmd/balldebug/main.go:266:			b.Close()
+352d3d8:cmd/balldebug/main.go:358:	b.Close()
+352d3d8:cmd/balldebug/shot_windows.go:119:		f.Close()
+352d3d8:cmd/llmrecord/main.go:102:	defer resp.Body.Close()
+352d3d8:cmd/wisp/logsink.go:113:	_ = s.pipeline.Close()
+352d3d8:cmd/wisp/models.go:304:	defer machine.Close()
+352d3d8:cmd/wisp/providers.go:185:	defer func() { _ = store.Close() }()
+352d3d8:cmd/wisp/run.go:517:		_ = rt.store.Close()
+352d3d8:cmd/wisp/slo_windows.go:304:			_ = pipeline.Close()
+352d3d8:cmd/wisp/slo_windows.go:313:			_ = pipeline.Close()
+352d3d8:cmd/wisp/slo_windows.go:327:	_ = pipeline.Close()
+352d3d8:internal/audio/wasapi_windows.go:238:		_ = s.Close() // release the half-initialized client (idempotent)
+352d3d8:internal/audio/wasapimic_windows.go:183:	defer func() { _ = stream.Close() }() // closure: closes whatever stream is CURRENT (swap-safe)
+352d3d8:internal/audio/wasapimic_windows.go:202:			_ = stream.Close()
+352d3d8:internal/audio/wasapimic_windows.go:250:	_ = (*stream).Close()
+352d3d8:internal/config/parse.go:216:		_ = tmp.Close()
+352d3d8:internal/config/parse.go:220:		tmp.Close()
+352d3d8:internal/config/parse.go:223:	if err := tmp.Close(); err != nil {
+352d3d8:internal/llm/adaptertest/mockllm.go:146:	defer resp.Body.Close()
+352d3d8:internal/llm/adaptertest/mockllm.go:158:	defer resp.Body.Close()
+352d3d8:internal/llm/adaptertest/mockllm.go:383:	defer resp.Body.Close()
+352d3d8:internal/llm/anthropic/adapter.go:170:		defer resp.Body.Close()
+352d3d8:internal/llm/anthropic/adapter.go:181:	defer resp.Body.Close()
+352d3d8:internal/llm/discover.go:70:	defer resp.Body.Close()
+352d3d8:internal/llm/openaichat/adapter.go:104:		defer resp.Body.Close()
+352d3d8:internal/llm/openaichat/adapter.go:115:	defer resp.Body.Close()
+352d3d8:internal/llm/openairesponses/adapter.go:139:		defer resp.Body.Close()
+352d3d8:internal/llm/openairesponses/adapter.go:150:	defer resp.Body.Close()
+352d3d8:internal/llm/systemproxy_windows.go:58:	defer k.Close()
+352d3d8:internal/memory/dao_memory.go:76:	defer rows.Close()
+352d3d8:internal/memory/dao_memory.go:136:	defer rows.Close()
+352d3d8:internal/memory/dao_misc.go:85:	defer rows.Close()
+352d3d8:internal/memory/dao_misc.go:97:	defer rows.Close()
+352d3d8:internal/memory/dao_misc.go:175:	defer rows.Close()
+352d3d8:internal/memory/dao_misc.go:250:	defer rows.Close()
+352d3d8:internal/memory/dao_profile.go:115:	defer rows.Close()
+352d3d8:internal/memory/dao_providerhealth.go:182:	defer rows.Close()
+352d3d8:internal/memory/dao_tasklog.go:101:	defer rows.Close()
+352d3d8:internal/memory/dao_toolcall.go:116:	defer rows.Close()
+352d3d8:internal/memory/dao_toolcall.go:127:	defer rows.Close()
+352d3d8:internal/memory/open.go:208:		_ = s.reader.Close()
+352d3d8:internal/memory/open.go:219:		_ = s.Close()
+352d3d8:internal/memory/open.go:266:			_ = s.reader.Close()
+352d3d8:internal/memory/open.go:269:			_ = s.writer.Close()
+352d3d8:internal/memory/open.go:300:		_ = boot.Close()
+352d3d8:internal/memory/open.go:304:		_ = boot.Close()
+352d3d8:internal/memory/open.go:308:		_ = boot.Close()
+352d3d8:internal/memory/open.go:317:		_ = boot.Close()
+352d3d8:internal/memory/open.go:325:		if err := boot.Close(); err != nil {
+352d3d8:internal/memory/open.go:336:			_ = boot.Close()
+352d3d8:internal/memory/open.go:342:	_ = boot.Close()
+352d3d8:internal/memory/open.go:532:	defer in.Close()
+352d3d8:internal/memory/open.go:538:		out.Close()
+352d3d8:internal/memory/open.go:541:	return out.Close()
+352d3d8:internal/models/archive.go:25:	defer f.Close()
+352d3d8:internal/models/archive.go:86:			out.Close()
+352d3d8:internal/models/archive.go:89:		if err := out.Close(); err != nil {
+352d3d8:internal/models/downloader.go:397:	defer resp.Body.Close()
+352d3d8:internal/models/downloader.go:428:	defer f.Close()
+352d3d8:internal/models/downloader.go:490:	defer f.Close()
+352d3d8:internal/models/downloader.go:683:	defer f.Close()
+352d3d8:internal/models/downloader.go:725:	defer in.Close()
+352d3d8:internal/models/downloader.go:730:	defer out.Close()
+352d3d8:internal/observe/diagnostics.go:81:			f.Close()
+352d3d8:internal/observe/diagnostics.go:202:	if err := zw.Close(); err != nil {
+352d3d8:internal/observe/diagnostics.go:208:	if err := f.Close(); err != nil {
+352d3d8:internal/observe/logging.go:82:			_ = w.Close()
+352d3d8:internal/observe/logging.go:118:	return p.writer.Close()
+352d3d8:internal/observe/logging.go:260:	cerr := w.file.Close()
+352d3d8:internal/panel/attachments.go:225:	defer func() { _ = rc.Close() }()
+352d3d8:internal/proc/boot_windows.go:97:			_ = job.Close()
+352d3d8:internal/proc/boot_windows.go:109:		_ = job.Close()
+352d3d8:internal/proc/boot_windows.go:147:		hooks.CloseJob = func(context.Context) error { return rt.Job.Close() }
+352d3d8:internal/risk/syncdirs_windows.go:43:		k.Close()
+352d3d8:internal/risk/syncdirs_windows.go:65:	defer k.Close()
+352d3d8:internal/tools/fs.go:148:	defer f.Close() //nolint:errcheck // read-only handle, Close's error is not actionable
+352d3d8:internal/tools/fs.go:212:	defer dir.Close() //nolint:errcheck // read-only handle
+352d3d8:internal/tools/fs_write.go:301:		_ = tmp.Close()
+352d3d8:internal/tools/fs_write.go:321:	if err := tmp.Close(); err != nil {
+352d3d8:internal/tools/fs_write.go:506:	defer src.Close() //nolint:errcheck // read-only handle
+352d3d8:internal/tools/fs_write.go:519:	_ = tmp.Close()
+352d3d8:internal/winsec/winsec.go:118:		_ = f.Close()
+352d3d8:internal/winsec/winsec.go:123:		_ = f.Close()
+352d3d8:internal/winsec/winsec.go:127:	if err := f.Close(); err != nil {
+
+########## 15 可见性那一族（被上游码挡住）
+--- fs.read 的声明档 ---
+352d3d8:internal/tools/fs.go:294:func FSReadDecl() Decl {
+352d3d8:internal/tools/fs.go-295-	return Decl{
+352d3d8:internal/tools/fs.go-296-		Capabilities: []Capability{CapFSRead},
+352d3d8:internal/tools/fs.go-297-		Needs:        []Capability{CapFSRead},
+352d3d8:internal/tools/fs.go-298-		Declared:     risk.L0,
+--- loop 那侧的 default 分支（L0/未分级走哪条）---
+352d3d8:internal/agent/loop.go:125:	// PassThroughUnclassifiedRisk routes calls whose provider reports no risk
+352d3d8:internal/agent/loop.go:128:	PassThroughUnclassifiedRisk bool
+352d3d8:internal/agent/loop.go:621:		default:
+352d3d8:internal/agent/loop.go:689:		default:
+352d3d8:internal/agent/loop.go:767://   - an unclassified call still obeys PassThroughUnclassifiedRisk, which is a
+352d3d8:internal/agent/loop.go:776:	case RiskL1, RiskL2:
+352d3d8:internal/agent/loop.go:782:	default:
+352d3d8:internal/agent/loop.go:783:		if !l.opt.Config.PassThroughUnclassifiedRisk {
+352d3d8:internal/agent/loop.go:980:	default:
+--- 生产组合根的 agent.Config 字面量里有没有 PassThroughUnclassifiedRisk ---
+(零命中)
+--- 测试那侧谁打开了它 ---
+352d3d8:internal/agent/harness_test.go:116:		PassThroughUnclassifiedRisk: true,
+352d3d8:internal/tools/loop_approval_test.go:128:			PassThroughUnclassifiedRisk: false,
+--- 能 Mark 的工具名交集（注册名 ∩ sensitiveSourceTools）---
+注册名：fs.delete fs.move fs.read fs.trash fs.write 
+sensitive：asr.transcript clipboard.read doc.read fs.read screen.capture search.content system.get unbound-scope unscanned-nesting web.fetch 
+交集：fs.read 

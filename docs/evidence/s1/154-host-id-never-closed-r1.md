@@ -303,3 +303,61 @@ $ sh scripts/d22scan.sh                           →  clean（rc=0）；分母�
 "有没有任何外部可见读数变过"＝**没有**，三条独立证据：四数逐字同、两包名册两向 `comm` 皆空、`go vet`/`gofumpt -l`/`d22scan` 三项与改前同（且 `CloseTask` 那行审计日志的格式串在 `:693` 未动，`tools: C25 scope closed task=… was_open=… dropped=… open_scopes=…`）。
 
 ⇒ **AC#5 这一格：成立**（两包各两跑、四数、名册两向、另加 vet/gofumpt/d22scan）。
+
+---
+
+## 第 4 节 格 AC#3 — 同族普查（"只开不合／注册即泄漏／defer 挂在今天不可达的边上"＋"被上游码挡住的可见性"）
+
+生成器＝`.scratch/wisp/probes/154/census-pairs.sh`，15 对逐字原始输出＝`.scratch/wisp/probes/154/census-pairs.txt`（锚点 `352d3d8`）。
+尺统一＝`git grep -nE`（大小写敏感、**不**整词、pathspec＝`internal`＋`cmd`、排除 `_test.go`），每对另给的排除项写在 `census-pairs.txt` 的标题行里。
+"生产调用者"一律数**出现点行数**（定义行与注释行在下表逐枚标明，不混进计数）。
+
+### 4.1 成对 API 那一族
+
+| # | 成对 API | 开那侧（生产出现点） | 关那侧（生产出现点） | 一句判读 |
+|---|---|---|---|---|
+| 1 | `Bridge.OpenTask` ↔ `Bridge.CloseTask` | **1**：`internal/tools/bridge.go:559`（长在 `mark()` 里，每次调用） | **1**：`cmd/wisp/run.go:563`（长在 `admitTask` 的 revoke 里，每枚任务） | 本票主题。两侧都只有 1 枚，但**枚数相同不等于对称**：开按 call、合按 task，且合只覆盖环路自造的 id。 |
+| 2 | `risk.Provenance.OpenScope` ↔ `CloseScope`（冻结面，本程只读） | **2**：`bridge.go:638` ＋ **`cmd/wisp/panel_assets.go:232`** | **1**：`bridge.go:666`（在 `CloseTask` 内） | **同族第二枚真"只开不合"**：`panel-assets -l2` 那枚诊断腿开了一枚 `taintSourceScopeID`（`panel_assets.go:166` 常量），全仓没有任何 `CloseScope` 指向它。后果有界（进程一次性退出＋失败方向是 fail-closed），但它证明"只开不合"不是孤例。 |
+| 3 | `Gate.AdmitTextTask(taskID) → revoke func()` | **2**：`run.go:477`（`host:mode-switch` 那枚宿主自造 id）＋ `run.go:558`（环路那枚） | **2**：`run.go:478 defer revoke()` ＋ `run.go:561 revoke()` | 两枚都有 owner。⚠ 形状上给下一位的一条：**关那侧是闭包，按方法名 grep（`Close*(`/`Revoke(`）永远抓不到它**——本票的门因此不吃"关"的名字，只吃"开"的构造点。另：`host:mode-switch` 今天**不开** scope（它不经过桥，只 `gate.PendingApproval`），所以它不属"宿主自带 id 没人关"那一形，本票不把它算进去。 |
+| 4 | `plugin.DisposalScope`（C11）`NewDisposalScope`/`Defer` ↔ `Dispose` | **0**（只有 `internal/plugin/disposal.go:155` 定义＋两处注释） | **0**（`.Dispose(` 生产零命中） | **整对 API 今天没有生产使用者**。连带效应最要紧：`internal/risk/provenance.go:56` 与 `:348` 那两句义务写的是"OpenScope at task start and **Defer(CloseScope) on the task's DisposalScope**"——那是一条**挂在今天不可达的边上的 defer**；票 151 之所以只能把 close 长在 `AdmitTask` 的 revoke 上（`run.go:546-552` 自己写了拒绝理由），根因就是这里。 |
+| 5 | `memory.Store.StartRetentionJob(scope, cfg)` | **0**（定义 `retention.go:98` ＋两处注释） | 同左（它自己就是开侧） | 收 `*plugin.DisposalScope` 且 nil 就 panic（`:99-101`）的那道门，今天没有生产读者——与第 4 对同因。 |
+| 6 | `tools.Registry.Register` / `RegisterProvider` ↔ **无 Unregister** | `Register`：**1**（`run.go:345`，启动期在循环里注册 `BuiltinFSEntries`）；`RegisterProvider`：**0**（定义 `registry.go:163`，注释写着"three unlanded slots"） | **不存在**：`git grep -iwE "unregister" -- internal cmd ':!*_test.go'` 只剩 ball 的 Win32 命名与 audio 的一行注释（见第 13 对），Go 侧没有 `Registry.Unregister` | "注册即泄漏"在这一族**成立但有界**：注册表随进程寿命、启动期一次填。本程判＝不必修，但**下一位若加运行期热插拔（票 104 `-plugins-load` 那条腿）就必须回头要一枚 Unregister**。 |
+| 7 | `risk.RiskAssessor.RegisterSubAssessor` | **0**（定义 `assessor.go:214`＋注释） | **0**（`UnregisterSubAssessor` 全仓零命中） | 两侧都无使用者＝死代码形，不是泄漏形。登记，不扩大。 |
+| 8 | `proc.JobScope.StartInJob` ↔ `Close` | **1**：`cmd/wisp/slo_windows.go:498` | **3**：`internal/proc/boot_windows.go:97`、`:109`、`:147`（`hooks.CloseJob`） | 有 owner，且关闭那侧比开侧多（两条退出＋一条挂到 shutdown hook）。 |
+| 9 | `proc.AcquireSingleInstance` ↔ `(*SingleInstance).Release` | **1**：`boot_windows.go:95` | **1**：`boot_windows.go:151` | 有 owner。 |
+| 10 | `audio`：`NewHalfDuplexGate` / `WASAPIMicrophone{}` / `NewWavInjector` ↔ `Stop()` | **0**：三者在 `internal`＋`cmd` 的生产码里都只出现在自身定义与包文档（`internal/audio/gate.go:84`、`wavinjector.go:48`） | 只有包内互调（`gate.go:125`、`:256`） | **整条麦克风腿今天不接任何宿主** ⇒ 这一族的成对 API 两侧都是零读数。与本票"宿主 id 那一形零读数"同形：**不能因为绿测试多就说它接过了**。 |
+| 11 | `panel.StreamLog.Append(key,…)`（隐式开一枚 key） ↔ `Close(key)` | **1**：`cmd/wisp/run.go:757`（`c.stream.Append(e.TaskID, e.Text)`） | **1**：`cmd/wisp/run.go:784`，但它**只长在 `agent.EvDone` 那一个 case 上** | 同族实例（"关只挂一条出口"）：以 `EvError`／`EvStuck`／取消收尾的任务，其 key 永远不被 Close ⇒ 面板那段结果一直"在流"。有界＝`const DefaultStreamKeys = 32`（`internal/panel/pump.go:279`）＋ `mergeOverflowLocked`（`:344`），所以它**不是内存泄漏，是可见状态残留**。本程登记，**不在本票修**（要修得动 `internal/panel/**`＋`cmd/wisp/run.go`，都在写面外）。 |
+| 12 | `memory.Store.InsertGrant` ↔ `RevokeGrant` / `DeleteGrant` | **0**：只有定义 `dao_misc.go:17` | **0**：只有定义 `:49`／`:102` | D45 授权表的写入与撤销今天都没有生产调用者 ⇒ 两侧都零，不判。 |
+| 13 | ball 热键：`RegisterHotKey` ↔ `unregisterAll` | 注册在 `internal/ball/hotkey_windows.go:351-362`（＋ `RegisteredHotkeys()` 的读数口 `ball_windows.go:837`） | **2**：`ball_windows.go:804`、`:913`（后者在 `Ball.Close`（`:904`）内） | 关那侧**存在**（本程第一发以为"没有 UnregisterHotKey"是尺太窄：`git grep -iw Unregister` 整词尺抓不到 Win32 的 `pUnregisterHotKey`）。但 `Ball.Close` 本身今日生产调用者只在 `cmd/balldebug`（`main.go:234/266/358`）⇒ 常驻那条腿今天不销毁球。登记，不判。 |
+| 14 | `observe.LogPipeline` ↔ `Close` | **1**：`cmd/wisp/logsink.go:149`（`observe.InitLog(observe.LogConfig{…})`，字段声明在 `:94`） | **4**：`logsink.go:113` ＋ `slo_windows.go:304/313/327` | 有 owner（三条退出各关一次）。 |
+
+**普查里本程自己弄错又改回来的一枚**（写给下一位，别当"这族盘得很顺"）：第 13 对本程第一发用 `git grep -iw "unregister"` 得到"全仓零命中"，据此差点写成"球的热键注册即泄漏"。
+反查＝**整词尺吃不到** Win32 过程指针名（`pUnregisterHotKey`／`hotkeyUnregisterer`／`unregisterAll` 都不是整词 `unregister`），换成 `git grep -inE "unregister" -- internal cmd ':!*_test.go'` 后命中 **21 行**（尺：不区分大小写、子串、只看生产码；本程现读）。
+⇒ 教训与本票的门同形：**"零命中"必须先说自己是哪把尺**（票面 10:3x 那条 `>` 讲的正是这个）。
+
+### 4.2 族二：被上游码挡住的可见性（票面 11:4x ① 要求一起盘的那半）
+
+这一族盘的不是"有没有人关"，而是**"端到端看不见某一形"有几个独立原因**。本程现量到**三枚**，比票面引的那两处多一枚：
+
+| 锁 | 现量 | 读数 |
+|---|---|---|
+| **L-1 声明档** | `grep -n -A 4 "func FSReadDecl" internal/tools/fs.go` | `Declared: risk.L0`（fs.go:298；`fs.list` 同：`:311`） |
+| **L-2 环路分支** | `git grep -nE "case RiskL1, RiskL2:|default:|PassThroughUnclassifiedRisk" HEAD -- internal/agent/loop.go` | `decideRisk`（`loop.go:773`）只把 **L1/L2** 放行给宿主审批（`case RiskL1, RiskL2:`＝`:776`）；其余（含 L0）全落 `default:`＝`:782`，那里 `if !l.opt.Config.PassThroughUnclassifiedRisk` → `DecisionReject`＝`:783-785`，`p.skip=true` 后 `:636-639` 直接不派发 |
+| **L-3 组合根从不打开它** | `git grep -n "PassThroughUnclassifiedRisk" HEAD -- cmd/wisp/run.go` | **零命中**（Config 字面量在 `run.go:588-595`，本程逐行读过：`Model/ContextWindow/ArtifactsDir/PerToolTimeout/SteeringEnabled`，没有这一项） |
+| **L-4 只有 `fs.read` 能被 Mark** | `census-pairs.txt` 第 15 对的交集：注册名 `{fs.delete fs.move fs.read fs.trash fs.write}` ∩ `sensitiveSourceTools{fs.read search.content clipboard.read system.get web.fetch doc.read screen.capture asr.transcript}`（⚠ 脚本那行 `Src[A-Za-z]+ += "` 还会把两枚 **fail-closed 标记** `SrcUnboundScope`/`SrcUnscannedNesting` 一起捞出来，所以台件印出的清单比上表多这两枚；交集不受影响） | **交集＝`fs.read` 一枚** ⇒ `mark()`（`bridge.go:552` 的 `risk.IsSensitiveSource`）今天只可能为它响 |
+| **L-5（反向）测试开着、生产关着** | `git grep -n "PassThroughUnclassifiedRisk:" HEAD -- '*.go'` | 命中两枚，**都在 `_test.go`**：`internal/agent/harness_test.go:116 = true`、`internal/tools/loop_approval_test.go:128 = false` ⇒ 环路那批绿测试走的是**生产没有的那道门**（L-3 开着） |
+
+⇒ 合起来的判读（这句是本票真正要留给下一位的）：**票 151 接上的那一形（环路 id 的 close），今天在生产上没有任何 open 可关**——L-1＋L-2＋L-3 三环把 `fs.read` 挡在桥外，L-4 又说明即使接上、今天也只有这一枚工具会打污点。
+⇒ 具体后果分两型，别混：**T1 型**（`TestCompositionRootClosesTheLoopTasksTaintScope`）在 mockllm 那一形上绿，但它绿的是"关闭那发确实带着本轮 id 出现了"（`CloseTask` 的审计行**每次调用都写**，`bridge.go:676-679` 自己写着 `dropped=0` 也照写）——**不等于生产上真有一枚 scope 被关掉过**；
+**T2 型**（`TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit`）今天全仓**唯一**能让 `OpenTask` 真响起来的调用形，恰恰是"宿主自带 id 直接 `bridge.Execute`"（`cmd/wisp/task_scope_close_151_test.go:84/:92`），也就是本票说"没人关"的那一形。
+⇒ 〔未取证，本程只登记〕"环路上线之后 `fs.read` 走不走 L0 直通／改不改声明档"是 **L-1～L-3 的联合决定**，不在本票写面内，也不属 `Q-56` 那三支出路；本程**不判该走哪条**。
+
+### 4.3 盘不到的那半（票面"不许写成'应当没有'"）
+
+上面 14＋5 行只覆盖**名字里带开/合语义**与**注册语义**的成对 API。以下三类本程**盘不到**，写清命令与原因，不外推：
+
+1. **"关"不叫任何 lifecycle 名字的隐式配对**（例：`map[key]=true` 开了、靠别处 `delete` 合）。
+   本程命令＝`git grep -nE "^\s*b?\.?[a-zA-Z]*\[taskID\] = " -- internal cmd ':!*_test.go'` 之类只能撞运气；**没有**跨函数数据流仪器（第 2.2 节末：本模块 require 里没有 `golang.org/x/tools`）。⇒ 这一类**未盘**。
+2. **`defer` 挂在不可达边上的完整清单**。本程只撞到了第 4.1 表第 4/5 对（DisposalScope 那族）。
+   完整盘法需要"哪些边今天不可达"的全仓可达性判定，同一枚缺仪器。⇒ 这一类**未盘**。
+3. **`internal/plugin/**` 与 `internal/speech/**` 等本票 pathspec 之外的包**：本程尺只放了 `internal`＋`cmd`（这俩已含 plugin/speech 的全部 `.go`），但**`tools/**` 与 `cmd/*` 里非 `wisp` 的宿主（`balldebug`/`llmrecord`/`modelcheck`）本程只按上面逐枚点名，没有做穷举**。⇒ 这三处**未穷举**。
