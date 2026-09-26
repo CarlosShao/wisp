@@ -1,0 +1,23 @@
+$ go test -count=1 -overlay 'C:\Users\swq\AppData\Local\Temp\wisp156-ruler\accept-mut-m1-off-case17\overlay.json' -v -run 'TestSLO149Exited|TestSLO156' ./cmd/wisp/
+$ tree=D:/work/workspace/projects plans/Wisp  overlaid=['D:/work/workspace/projects plans/Wisp/cmd/wisp/slo_exit_os_156_windows_test.go', 'D:/work/workspace/projects plans/Wisp/cmd/wisp/slo_windows.go']
+time=2026-09-26T17:23:15.681+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSLO156FixtureChildrenDoWhatTheirNamesSay
+--- PASS: TestSLO156FixtureChildrenDoWhatTheirNamesSay (0.05s)
+=== RUN   TestSLO156ExitedAsksTheOSForAChildNobodyReaped
+    slo_exit_os_156_windows_test.go:159: exited() is false for a subject the OS reports terminated with code 7 (process object signaled, exit code read back) while ProcessState is still nil: that is the shape Q-57 ruled on, and it is why the loop prints the budget sentence over a corpse
+    slo_exit_os_156_windows_test.go:162: exitCode() is -1, want 7 (the code the OS reports): the give-up sentence prints this number
+    slo_exit_os_156_windows_test.go:170: the second ask of exited() answered false for a child the OS reports dead
+--- FAIL: TestSLO156ExitedAsksTheOSForAChildNobodyReaped (0.03s)
+=== RUN   TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees
+    slo_exit_os_156_windows_test.go:202: exited() is false after the OS reported our own Kill with code 1 (process object signaled, exit code read back), ProcessState nil=true
+    slo_exit_os_156_windows_test.go:206: Wait on a killed child reports the kill as an error (exit status 1); that is the fixture, not a failure
+--- FAIL: TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees (0.01s)
+=== RUN   TestSLO156WaitReadyNamesTheDeadSubjectToo
+    slo_exit_os_156_windows_test.go:285: waitReady give-up "wisp slo: subject 44724 never reported ready within 1m0s" does not name the dead subject and its code
+    slo_exit_os_156_windows_test.go:288: a dead subject was reported as a spent readiness budget: "wisp slo: subject 44724 never reported ready within 1m0s"
+--- FAIL: TestSLO156WaitReadyNamesTheDeadSubjectToo (60.04s)
+=== RUN   TestSLO149ExitedGiveUpSentenceCarriesTheLastReading
+--- PASS: TestSLO149ExitedGiveUpSentenceCarriesTheLastReading (0.04s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	60.263s
+FAIL
