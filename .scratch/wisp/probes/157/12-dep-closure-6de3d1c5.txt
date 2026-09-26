@@ -1,0 +1,56 @@
+### R-dep（非测试） 锚点 6de3d1c5：8 枚包
+    internal/config
+    internal/llm
+    internal/memory
+    internal/observe
+    internal/plugin
+    internal/risk
+    internal/secret
+    internal/winsec
+  internal/tools 在闭包里？ NO
+
+### R-testdep（含 _test.go） 锚点 6de3d1c5：16 枚包
+    internal/buildinfo
+    internal/config
+    internal/llm
+    internal/llm/adaptertest
+    internal/llm/anthropic
+    internal/llm/golden
+    internal/llm/openaichat
+    internal/llm/openairesponses
+    internal/memory
+    internal/observe
+    internal/plugin
+    internal/proc
+    internal/risk
+    internal/secret
+    internal/statemachine
+    internal/winsec
+  internal/tools 在闭包里？ NO
+
+### 直接依赖（只第一层，internal/agent 目录本体，非测试）
+['internal/config', 'internal/llm', 'internal/memory', 'internal/observe', 'internal/winsec']
+### 直接依赖（internal/agent 目录本体，含 _test.go）
+['internal/config', 'internal/llm', 'internal/llm/golden', 'internal/llm/openaichat', 'internal/memory', 'internal/observe', 'internal/proc', 'internal/winsec']
+### internal/agent/approval 是不是 internal/agent 的依赖（非测试第一层）
+approval in deps: False
+### B8 补尺：一枚会让闭包算反的陷阱（本程自己撞的）
+$ git ls-tree -r --name-only 6de3d1c5:internal/agent | grep -c '^approval/'
+18
+$ git ls-tree --name-only 6de3d1c5:internal/agent | grep -c '\.go$'（本级 .go 枚数）
+28
+$ git grep -l 'wisp/internal/agent/approval' 6de3d1c5 -- internal/agent
+6de3d1c5:internal/agent/approval/batch_test.go
+6de3d1c5:internal/agent/approval/fakes_test.go
+6de3d1c5:internal/agent/approval/queue_test.go
+6de3d1c5:internal/agent/approval/ticket84_no_owner_test.go
+6de3d1c5:internal/agent/approval/ticket87_veto_l2_test.go
+6de3d1c5:internal/agent/approval/ticket97_alias_direction_test.go
+6de3d1c5:internal/agent/approval/window_test.go
+$ git grep -l 'wisp/internal/agent/approval' 6de3d1c5 -- cmd internal | head -6
+6de3d1c5:cmd/wisp/run.go
+6de3d1c5:internal/agent/approval/batch_test.go
+6de3d1c5:internal/agent/approval/fakes_test.go
+6de3d1c5:internal/agent/approval/queue_test.go
+6de3d1c5:internal/agent/approval/ticket84_no_owner_test.go
+6de3d1c5:internal/agent/approval/ticket87_veto_l2_test.go

@@ -638,3 +638,41 @@ $ grep -n 'AdmitTextTask' 同上 → 只有 :131 那一枚，讲的是 run.go:47
 | `l.opt.AdmitTask(taskID)` `loop.go:362` | 签名 `Options.AdmitTask func(taskID string) (revoke func())`（`:169`）；宿主把 `approval.Gate.AdmitTextTask`（定义在 `internal/agent/approval/gate.go:160`）接进这枚字段（`cmd/wisp/run.go:558`）；`:362` **早于** `:396` ⇒ 压缩那一刻这枚 id **已经被包外接过一次**（`approval.Gate.AdmitTextTask` 的入参；本程只证"递出去了"这一发，**没**证 gate 里存成什么形状、存多久——那属票 150/151 那族的账） | **不算"另一个栈帧持有者"，算"第一枚包外持有者"**——这一句是本程据现量写的**归类**，不是档位：本票不动 155 验收件 `:112` 那枚措辞判定。⚠ 它与第 6 笔那枚 `j.taskID` 一起说明一件事：**"id 只在 `Loop.run` 里诞生"是对的，"压缩那一刻只有那一枚参数握着它"不是**（前半句本程复算成立：`newTaskID` 包私有、`cmd` 侧 0 命中） |
 
 ⇒ 补两枚的**后果**写清楚，免得下一位只当名册长了两行：这两枚都在 `DEFERRED(D28-1)` 那枚 Warm-window hook 的射程里（`loop.go:395` 注释现读，155 验收件 `:117` 就是按这个理由要求登记措辞的）——**hook 落地那天要问的是"这六枚各该不该带标"，而不是"那一枚参数带没带"**。
+
+### B.8 第 8 笔 —— AC#4 的射程声明只证了"树＝`6de3d1c5`"、没证"＝交付那一版"：**〔成立〕**（本程换一把与验收程不同的尺重算闭包）
+
+**验收程那一句**（`155-three-unjudged-cells-r1-accept-r1.md:243`–`:244`，§6 第三层末）：本件"没指错版本，**但它也没证过这一层**：§3.3 那行只证了'树＝`6de3d1c5`'（第一层），'`6de3d1c5`＝交付那一版'这一半本程补上（第三层）"；⇒ 工单 `:20` 第 8 笔要求把那一半落回本件。
+
+**本程当轮复算**（三批发言全文＝`probes/157/11-items-1-2-3-8-table-and-range.txt` 的 T5/T6 段、`probes/157/12-dep-closure-6de3d1c5.txt`、`probes/157/14-supplementary-rulers.txt` 的 Q3 段与 B8 补尺 1/2 段）：
+
+```
+(i) 本件那八处 6de3d1c5 的说法有没有一处写了"＝交付那一版"
+$ grep -c '6de3d1c5' docs/evidence/s1/155-three-unjudged-cells-r1.md → 9（含本附录那一枚）
+   取版纯度那一族的五枚＝:45 ／ :176 ／ :203 ／ :238 ／ :327，逐枚都在证"blob 对拍、mismatched 0、
+   三枚文件 hash-object 与 6de3d1c5 的 blob 逐字相同"——**没有一枚**把它跟 b23c7f7 对齐过
+$ grep -c '闭包' 本件 → 1，而且那一枚在 :116 讲的是 "reg.Spawn 的**闭包**外"（Go 的 closure），不是依赖闭包
+                            ⇒ 本件通篇没做过依赖闭包这件事，验收程那一半确实是它补的
+
+(ii) 版本等价那一半，本程自己现量（锚点：b23c7f7＝交付那枚生产改动，6de3d1c5＝快照来源，bb3a7a1＝155 收口）
+compress.go            b23c7f7 4fcd9a32a500 ／ 6de3d1c5 4fcd9a32a500 ／ bb3a7a1 4fcd9a32a500
+loop.go                b23c7f7 3ea1fb8df38a ／ 6de3d1c5 3ea1fb8df38a ／ bb3a7a1 3ea1fb8df38a
+compress_trace_test.go b23c7f7 2357dca86f67 ／ 6de3d1c5 2357dca86f67 ／ bb3a7a1 2357dca86f67   ← 三向同 blob
+$ git diff --name-only b23c7f7 6de3d1c5 -- internal/agent | wc -l → 0（整目录没动）
+$ git diff --name-only b23c7f7 6de3d1c5 -- internal/            → 只有一枚：internal/tools/bridge.go
+$ git merge-base --is-ancestor b23c7f7 6de3d1c5                 → YES（后代，不是无关版本）
+
+(iii) 依赖闭包：本程不跑 go、不读工作树，从 git 对象 BFS 自算（probes/157/12-dep-closure-from-git-objects.py）
+R-dep（非测试）      = 8 包：config llm memory observe plugin risk secret winsec        → internal/tools 不在
+R-testdep（含 _test.go）= 16 包：再加 buildinfo llm/adaptertest llm/anthropic llm/golden
+                        llm/openaichat llm/openairesponses proc statemachine            → internal/tools 不在
+$ 16 包逐包 git diff --name-only b23c7f7 6de3d1c5 -- <pkg> | wc -l → 逐包 0（唯 internal/tools＝1，闭包外）
+```
+
+**我这一笔用的尺是什么**＝**一把与验收程不同形的闭包尺**：它用 `go list -deps`／`go list -test -deps`（`GOPROXY=off` 现取）＋逐包 `git diff`；本程用**脚本从 `git ls-tree`＋`git show` 逐包 BFS 解 import**（零 `go` 命令、零工作树）。两把尺**独立同结论**（tools 不在闭包），但**枚数不同**：它列 11 枚、本程 16 枚（差 6 枚＝`buildinfo`／`llm/adaptertest`／`llm/anthropic`／`llm/openairesponses`／`proc`／`statemachine`）⇒ 本程那一份是**更宽**的闭包，结论仍同一句，所以这一笔不是"复述验收程"，是"换尺复算到"。
+
+⚠ **本程自己撞出来的一枚陷阱（拿错尺会算出反结论，必须登记）**：`git ls-tree **-r** --name-only 6de3d1c5:internal/agent` 会把 `internal/agent/approval/**` 那 18 枚 `.go` 一起当成"agent 的文件"，而 **approval 的非测试代码确实 import `internal/tools`**（`batch.go`／`gate.go`／`pending_read.go`／`queue.go`／`report.go`）⇒ 那把尺第一层就数出 `internal/tools` **14 次命中**（`probes/157/11-…txt` T6 段原样留着），足以让人写下"闭包里有 tools、所以 `bridge.go` 那枚差异在射程内"——**与真相相反**。第一层必须按包目录**本级**取（`git ls-tree` 不带 `-r`）；`git grep -l 'wisp/internal/agent/approval' 6de3d1c5 -- internal/agent` 只回 approval 自己的测试文件，包外读者是 `cmd/wisp/run.go` ⇒ **package `agent` 从不 import `approval`**。
+
+**对不上的一枚没有** ⇒ 落这枚**新版射程句**（本件 §0 末／§3.3／§7.3 那几处旧文一字未改，读的时候按下面这句加读）：
+
+> 本程那棵快照＝**`b23c7f7` 的交付码，取自其后代 `6de3d1c5`**（`merge-base --is-ancestor` ＝ YES）：三枚被测文件在 `b23c7f7`／`6de3d1c5`／`bb3a7a1` 三向同 blob；`internal/agent` 整目录在该区间 **0 枚**改动；其测试依赖闭包（本程 BFS 自算 **16** 包）**逐包 0 改动**；该区间 `internal/**` 唯一动过的那枚 `internal/tools/bridge.go` **在闭包外**。
+> ⇒ 射程只到"`internal/agent` 与其 test 闭包"，**不到 `cmd/wisp`**：下一位若拿同一棵快照去跑宿主，会踩到 `bridge.go` 那 16 进 3 删（票 151 的 `CloseTask` 日志）——155 那两程与本程**都没跑过 `cmd/wisp`**（本件 §5 第 1 条）。

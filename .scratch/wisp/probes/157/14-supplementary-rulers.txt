@@ -114,3 +114,15 @@ $ git show 5365cb22:internal/agent/loop.go | sed -n '161,169p'
 	// layer, which is also what keeps decideRisk refusing declared L1/L2
 	// calls: an ungated host must never execute a write.
 	AdmitTask func(taskID string) (revoke func())
+### B8 补尺 2：155 件里 6de3d1c5 的全部出现处（射程声明缺在哪一处）
+$ grep -n '6de3d1c5' docs/evidence/s1/155-three-unjudged-cells-r1.md
+20:| 到盘复算锚点 `6de3d1c5`（验收件 §12.3 第 3 条） | commit | `evidence(153 AC#5 第
+45:**取版自证（AC#4 第①条）**：快照＝`git ls-tree -r 6de3d1c5` 逐 blob `git cat-file 
+176:| 还原 | 每发之前 `mut153.py restore` ＋ 收口逐枚 `cmp` | `RESTORED IDENTICAL compres
+203:快照＝`D:/tmp/wisp155/snap`（**blob 精确树**，`6de3d1c5`，1452 枚全数对拍、`misma
+238:| 还原自证 | 每发之前 `restore`、收口逐枚 `cmp` | `RESTORED IDENTICAL compress.go /
+247:| 2 | **仪器来源的锚号我引错过一次**：本程用 `git show 6de3d1c5:.scratch/wisp/p
+326:- 临时件**只建不删**，且**全在仓库外**：`D:/tmp/wisp155/{snap,pristine,out,sha-li
+327:- 快照纯度自证在 §0 末（`mismatched: 0` ＋ 三枚被测文件 `git hash-object` 与 `
+394:- 取数纪律＝一律打在 **git 对象**上（`git show <锚>:<路径>`／`git grep … <锚
+枚数 = 9
