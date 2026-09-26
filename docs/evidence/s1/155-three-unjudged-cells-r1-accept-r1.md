@@ -209,3 +209,43 @@
 
 **本格档位：〔成立〕**——契约轴零字节这件事，本程用完整名册（13 枚）重扫 16 支禁改面，逐支 0、正控能命中 3 枚、名册不越界。
 它那三枚改口的数**没有一处把"0 命中"撑成假话**（每改一次口都是"重跑仍全 0"，本程独立重跑证实），但**枚数宣称四次偏小**这件事要记：它不是造假，是**写它之后就过期**——而 AC#3 的判据输入恰好就是那枚名册，所以"每次收口重算"这件事必须是**规矩**，不能是**自报**。
+---
+
+## 6. AC#4（活树自证）复判：那棵 blob 精确快照树，等不等于它读数所依据的那一版
+
+**它的宣称**：快照＝`git ls-tree -r 6de3d1c5` 逐 blob `git cat-file --batch` 落盘，`written: 1452 mismatched: 0`；三枚被测文件另用 `git hash-object` 与 `6de3d1c5` 的 blob 逐字对拍；全程未用 `git archive`；开测前先跑正控。
+派单要点名判的是**另一件事**：`6de3d1c5` 这枚号**真在**（§0 已复核），但它**指没指到读数那一版**。
+
+**第一层：树＝那枚号（本程另写一炉取版器复算，不用它的脚本）**
+`probes/155-accept/11-mksnap.py`（自己实现：`ls-tree` 出 sha 清单落文件 → `cat-file --batch` 走**文件重定向** stdin → 逐枚本地重算 `blob <len>\0`＋数据的 sha1 对拍）：
+`anchor=6de3d1c5 blobs=1452 / written=1452 mismatched=0` ⇒ **它那枚数被第二把实现复到**。
+同一把尺另取一枚锚点做对照：`anchor=5365cb22 blobs=1344 / written=1344 mismatched=0` ——**这不是一个背下来的数**（两棵树的枚数不同、都各自对拍通过）。
+
+**第二层：它那棵快照（盘上仍在）此刻还纯不纯**
+`mksnap.py verify /d/tmp/wisp155/snap manifest-6de3d1c5.json` ⇒ `files=1452 drift=0 missing=0 extra_in_tree=4`；
+`mksnap.py cmp` 两棵目录树 ⇒ `shared=1452 byte-differ=0 onlyA=0 onlyB=4`。
+那 4 枚多出来的**全是 `internal/agent/` 下的 `_test.go`**：`probe153_line_test.go`(`9b7d5afc…`)／`probe153_loopleg_test.go`(`40f734ab…`)／`zzaccept153_ondisk_test.go`(`04cb8d41…`)／`zzprobe155_ext_ondisk_test.go`(`f50cfa30…`)——
+`git hash-object` 四枚与它 §12 名册**逐枚全等**，前三枚又与**锚点原件**（`ac7fb00`／`777d6cc`）全等。
+⇒ **它交件时那棵树没有一枚变异落地、没多一枚非测试文件、没少一枚文件**（这条是它 §3.3"还原自证"想说的东西，本程独立钉住）。
+
+**第三层（派单那一问的正身）：`6de3d1c5` 等不等于读数所依据的那版**
+
+| 那一发 | 本程现量 |
+|---|---|
+| 三枚被测文件在两枚锚点上的 blob | `compress 4fcd9a32a500`／`loop 3ea1fb8df38a`／`compress_trace_test 2357dca86f67`——**`b23c7f7`、`6de3d1c5`、`bb3a7a1` 三枚锚点上逐字相同** |
+| `b23c7f7..6de3d1c5` 在 `internal/agent` 上动了什么 | `git diff --name-only … -- internal/agent` ⇒ **0 枚**（整目录没动） |
+| `internal/agent` 的**依赖闭包**（`go list -deps` 与 `go list -test -deps`，`GOPROXY=off` 现取） | `winsec/secret/observe/risk/config/llm(+golden/openaichat)/plugin/memory/agent`；**闭包里没有 `internal/tools`**（`grep -c` ＝ 0，两向都是 0） |
+| 闭包里每一包在该区间的改动枚数 | 逐包 `git diff --name-only b23c7f7 6de3d1c5 -- <pkg>` ⇒ **全部 0** |
+| 该区间在 `internal/**` 上唯一动过的一枚 | `internal/tools/bridge.go`（16 进 3 删，其中 4 行非注释＝票 151 的 `CloseTask` 日志）——**闭包外** |
+| 祖先关系 | `merge-base --is-ancestor b23c7f7 6de3d1c5` ＝ **YES** |
+
+⇒ **判〔成立〕**：那棵树**就是**它读数所依据的那一版——不是"号能解析"这种弱判据，而是"**`internal/agent` 整目录与其测试二进制的依赖闭包在两枚锚点之间逐包 0 改动、三枚被测文件同 blob**"。
+它没指错版本，**但它也没证过这一层**：§3.3 那行只证了"树＝`6de3d1c5`"（第一层），"`6de3d1c5`＝交付那一版"这一半本程补上（第三层）。
+⇒ 正确的口径写法应该是"`b23c7f7` 的交付码，取自其后代 `6de3d1c5`，闭包内逐字节同版"——它写成"快照＝`6de3d1c5`（blob 精确树）"少了后半句。这不是读数错，是**射程声明不够**（下一位若拿同一棵快照去跑 `cmd/wisp`，就会踩到那枚 `bridge.go` 差异）。
+
+**派单坑#4 的两条本程自己复现**：
+① **`git archive｜tar -x` 在本仓确实不是纯净树**——现量：`.scratch/wisp/probes/139/ac1-readers.log` **blob 1643 字节 vs archive 落盘 1679 字节**（`.gitattributes:1 = * text=auto`、`core.autocrlf=true`、`.log` 无 `eol=lf` 规则；同一枚文件**工作树里是 1643**，脏的是 archive 这条路，不是工作树）。凭据＝`probes/155-accept/13-archive-pitfall-demo.txt`。
+② `third_party/**` tracked＝**0**（`git ls-files third_party \| wc -l`）⇒ blob 树里没有那三枚 dll；本程与它一样**一行 `cmd/wisp` 都没跑**，所以这条对本程**不构成"仪器没跑到"的第三种形状**（它 §3.3 已经自己把这条挡在门外了，本程复核一致）。
+③ `-overlay`／`-cover*`：本程**两把都没用**（文件物理落盘）；`-race` **一行没跑**——所以本程**没有**任何一格的答案建在那枚可能 `0xc0000374` 的跑上；判红绿一律只认 `--- FAIL:` 行，判"跑到没"只认 `=== RUN` 枚数（见 §3 那两列）。
+
+**本格档位：〔成立〕，附一条射程声明要补**。

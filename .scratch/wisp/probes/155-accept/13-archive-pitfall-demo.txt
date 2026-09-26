@@ -1,0 +1,14 @@
+### A. 派单坑#4'不许用 git archive'本身是不是真的（现量一发）
+取文件: .scratch/wisp/probes/139/ac1-readers.log
+blob 字节=1643  archive 落盘字节=1679
+cmp: 与工作树不同
+
+### B. 多取几枚，看 CRLF 改写比例
+样本=8 枚，其中 blob 与工作树字节数不等=0 枚（autocrlf=true）
+
+### C. third_party 在本仓 tracked 枚数
+0
+
+### D. 本程两棵快照的取版方式（未用 archive）
+0
+mksnap.py 里没有 archive 字样
