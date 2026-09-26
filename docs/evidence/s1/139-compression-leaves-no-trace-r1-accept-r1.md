@@ -609,3 +609,25 @@ AC#4 的四数与名册全部复算相符。它的**两处真短板是实现件�
 本程另外新报两枚：**M5（`if c.Need(hist)` 那形痕恒打今天无人挡）**，
 以及 **§3.3 那枚"R3 的正控换了尺"**；另有两处实现件措辞已被它自家 commit 顶过期（`12000` 计数、`D28-1` 计数）。
 票面四框仍未勾。
+
+---
+
+## 8. 补一行读数：两形对照合并成**一次**跑（结掉 §7.4 第 4 项）
+
+§7 与 §1 那两发原本是两次独立跑。同一枚测试二进制、同一次 `go test` 里再跑一遍：
+```
+$ PATH="/tmp/wisp139-snap-2/third_party:$PATH" go test ./cmd/wisp/ -run 'TestAccept139' -v -count=1
+=== RUN   TestAccept139CompressionTraceReachesJSONLFile          # 每轮参数都不同（普通工具循环）
+    exit=0 requests=11 | provider saw 23 messages (~41706 tokens) | sink records = 20
+    THE TRACE NEVER REACHED THE FILE: "agent: history compressed" records = 0
+--- FAIL: TestAccept139CompressionTraceReachesJSONLFile (0.34s)
+=== RUN   TestAccept139bThreeLaddersFoldOnTheRealLeg             # 三条独立重复阶梯
+    exit=0 requests=10 | sink records=19
+    LANDED: {"compressed_msgs":7,"history_changed":true,"kept_raw_rounds":3,…,"threshold":3072,
+             "tokens_after":24562,"tokens_before":36498}
+--- PASS: TestAccept139bThreeLaddersFoldOnTheRealLeg (0.15s)
+```
+⇒ 同一发里的对照：**同一条腿、同一个盘、同一个阈值 3072、历史同样过阈值（41 706 / 与折叠前 36 498 token），
+唯一变量是"有没有 4 枚 user 轮"** → 痕从 0 枚变 1 枚。§7.3 的改判据此不再依赖"两次跑之间有没有别的东西变了"。
+⚠ 本格仍未测"同一发里会不会打多条"（§7.4 第 2 项原样保留）；那枚 `LANDED` 是 1 条，
+但 `tokens_after=24562` 仍高于阈值，下一轮若再凑出第 4 枚 raw 轮就会再打一条——**多条是不是常态，未量**。
