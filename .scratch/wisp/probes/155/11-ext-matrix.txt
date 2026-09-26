@@ -1,0 +1,155 @@
+# 票 155 AC#1 ③ — ext-A／ext-B／ext-C 外部枚数复算（到盘 JSONL 那一把尺）
+# 快照＝D:/tmp/wisp155/snap（blob 精确树，6de3d1c5，1452 枚全部对拍通过，见 10-snapshot-sync.txt）
+# 变异驱动＝.scratch/wisp/probes/153/mut153.py 的 drop-attr／unloop（原样拷进快照根，一字未改）
+# 正控＝ext 之前先跑：无变异 7 RUN／0 FAIL；已知会红那一发＝drop-attr 使 TestCompressionTrace* 两枚红
+# 本程未跑 cmd/wisp ⇒ third_party 那三枚 dll 没拷（这条在证据件 §3/§5 里写明）
+
+################ ext-A（前一回） ################
+###### ext-A（交付码，无变异） ######
+--- 155 三腿到盘探针 ---
+    zzprobe155_ext_ondisk_test.go:86: PROBE-155 DISK: {"time":"2026-09-26T11:57:29.9941174+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true}
+    zzprobe155_ext_ondisk_test.go:86: PROBE-155 DISK: {"time":"2026-09-26T11:57:29.9941174+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true,"task":"8d4d76cb-e1a0-4295-89a7-27a4ea665417"}
+    zzprobe155_ext_ondisk_test.go:86: PROBE-155 DISK: {"time":"2026-09-26T11:57:29.9990947+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":826,"tokens_after":532,"threshold":384,"msgs_before":13,"msgs_after":8,"compressed_msgs":6,"kept_raw_rounds":3,"history_changed":true,"task":"0bb07666-19bb-4ea2-bf39-d5f0e468effa"}
+    zzprobe155_ext_ondisk_test.go:88: PROBE-155 COUNT trace_lines=3 with_task=2 leg2_id=8d4d76cb-e1a0-4295-89a7-27a4ea665417 leg3_ResultTaskID=0bb07666-19bb-4ea2-bf39-d5f0e468effa
+--- PASS: TestProbe155ExtOnDisk (0.01s)
+ok  	github.com/CarlosShao/wisp/internal/agent	0.066s
+--- 复用的 accept-r1 到盘探针（两腿，未改一字）---
+    zzaccept153_ondisk_test.go:60: PROBE-153 DISK: {"time":"2026-09-26T11:57:31.9956436+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true}
+    zzaccept153_ondisk_test.go:60: PROBE-153 DISK: {"time":"2026-09-26T11:57:31.9961975+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true,"task":"e06b2f63-bad6-4295-8561-5e5f0a92d605"}
+--- PASS: TestAccept153TraceOnDiskThroughRedactor (0.01s)
+ok  	github.com/CarlosShao/wisp/internal/agent	0.059s
+--- 实现件那两枚 ext 探针（进程默认 logger，stderr）---
+time=2026-09-26T11:57:34.397+08:00 level=INFO msg="agent: history compressed" tokens_before=1236 tokens_after=780 threshold=384 msgs_before=18 msgs_after=10 compressed_msgs=9 kept_raw_rounds=3 history_changed=true
+    probe153_line_test.go:22: PROBE-A above: untagged call (no task in ctx)
+time=2026-09-26T11:57:34.397+08:00 level=INFO msg="agent: history compressed" tokens_before=1236 tokens_after=780 threshold=384 msgs_before=18 msgs_after=10 compressed_msgs=9 kept_raw_rounds=3 history_changed=true task=714329b2-f451-4ae7-b9c6-eca7bf3022ea
+    probe153_line_test.go:28: PROBE-B above: tagged call (id from newTaskID)
+--- PASS: TestProbe153PrintsTheRealLine (0.00s)
+time=2026-09-26T11:57:34.404+08:00 level=INFO msg="agent: history compressed" tokens_before=826 tokens_after=532 threshold=384 msgs_before=13 msgs_after=8 compressed_msgs=6 kept_raw_rounds=3 history_changed=true task=ea3464d4-cb31-4419-9c1b-d4fbae839ea6
+    probe153_loopleg_test.go:27: PROBE-LOOPLEG this run's Result.TaskID = "ea3464d4-cb31-4419-9c1b-d4fbae839ea6" (the line above must carry exactly this id)
+--- PASS: TestProbe153LoopLegLineOnDefaultLogger (0.01s)
+ok  	github.com/CarlosShao/wisp/internal/agent	0.077s
+
+################ ext-B（前一回） ################
+###### ext-B（摘 N3＝mut153 drop-attr） ######
+--- 155 三腿到盘探针 ---
+    zzprobe155_ext_ondisk_test.go:86: PROBE-155 DISK: {"time":"2026-09-26T11:57:45.53425+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true}
+    zzprobe155_ext_ondisk_test.go:86: PROBE-155 DISK: {"time":"2026-09-26T11:57:45.5347887+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true}
+    zzprobe155_ext_ondisk_test.go:86: PROBE-155 DISK: {"time":"2026-09-26T11:57:45.5403914+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":826,"tokens_after":532,"threshold":384,"msgs_before":13,"msgs_after":8,"compressed_msgs":6,"kept_raw_rounds":3,"history_changed":true}
+    zzprobe155_ext_ondisk_test.go:88: PROBE-155 COUNT trace_lines=3 with_task=0 leg2_id=5db99497-b5c5-40e9-82b7-87af42e600cf leg3_ResultTaskID=d0fa3794-8dbf-4d6c-8b59-7351c4c25386
+--- PASS: TestProbe155ExtOnDisk (0.02s)
+ok  	github.com/CarlosShao/wisp/internal/agent	0.104s
+--- 复用的 accept-r1 到盘探针（两腿）---
+    zzaccept153_ondisk_test.go:60: PROBE-153 DISK: {"time":"2026-09-26T11:57:48.0118809+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true}
+    zzaccept153_ondisk_test.go:60: PROBE-153 DISK: {"time":"2026-09-26T11:57:48.0118809+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true}
+--- FAIL: TestAccept153TraceOnDiskThroughRedactor (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent	0.068s
+FAIL
+--- 实现件那两枚 ext 探针（stderr）---
+time=2026-09-26T11:57:50.227+08:00 level=INFO msg="agent: history compressed" tokens_before=1236 tokens_after=780 threshold=384 msgs_before=18 msgs_after=10 compressed_msgs=9 kept_raw_rounds=3 history_changed=true
+    probe153_line_test.go:22: PROBE-A above: untagged call (no task in ctx)
+time=2026-09-26T11:57:50.227+08:00 level=INFO msg="agent: history compressed" tokens_before=1236 tokens_after=780 threshold=384 msgs_before=18 msgs_after=10 compressed_msgs=9 kept_raw_rounds=3 history_changed=true
+    probe153_line_test.go:28: PROBE-B above: tagged call (id from newTaskID)
+--- PASS: TestProbe153PrintsTheRealLine (0.00s)
+time=2026-09-26T11:57:50.235+08:00 level=INFO msg="agent: history compressed" tokens_before=826 tokens_after=532 threshold=384 msgs_before=13 msgs_after=8 compressed_msgs=6 kept_raw_rounds=3 history_changed=true
+    probe153_loopleg_test.go:27: PROBE-LOOPLEG this run's Result.TaskID = "ad9fd1c8-895f-4baf-8d8b-80e3ce10766c" (the line above must carry exactly this id)
+--- PASS: TestProbe153LoopLegLineOnDefaultLogger (0.01s)
+ok  	github.com/CarlosShao/wisp/internal/agent	0.073s
+
+################ ext-C（前一回） ################
+###### ext-C（摘 N2＝mut153 unloop） ######
+--- 155 三腿到盘探针 ---
+    zzprobe155_ext_ondisk_test.go:86: PROBE-155 DISK: {"time":"2026-09-26T11:58:03.3380916+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true}
+    zzprobe155_ext_ondisk_test.go:86: PROBE-155 DISK: {"time":"2026-09-26T11:58:03.3380916+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true,"task":"df9fcc4b-224c-4b6d-8b83-881ae68d953e"}
+    zzprobe155_ext_ondisk_test.go:86: PROBE-155 DISK: {"time":"2026-09-26T11:58:03.343017+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":826,"tokens_after":532,"threshold":384,"msgs_before":13,"msgs_after":8,"compressed_msgs":6,"kept_raw_rounds":3,"history_changed":true}
+    zzprobe155_ext_ondisk_test.go:88: PROBE-155 COUNT trace_lines=3 with_task=1 leg2_id=df9fcc4b-224c-4b6d-8b83-881ae68d953e leg3_ResultTaskID=75a4d071-9d43-4850-a395-98551beb7a14
+--- PASS: TestProbe155ExtOnDisk (0.01s)
+ok  	github.com/CarlosShao/wisp/internal/agent	0.069s
+--- 复用的 accept-r1 到盘探针（两腿）---
+    zzaccept153_ondisk_test.go:60: PROBE-153 DISK: {"time":"2026-09-26T11:58:05.5942295+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true}
+    zzaccept153_ondisk_test.go:60: PROBE-153 DISK: {"time":"2026-09-26T11:58:05.5942295+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true,"task":"7babb641-c2da-451c-8384-fc5a70927a53"}
+--- PASS: TestAccept153TraceOnDiskThroughRedactor (0.01s)
+ok  	github.com/CarlosShao/wisp/internal/agent	0.065s
+--- 实现件那两枚 ext 探针（stderr）---
+time=2026-09-26T11:58:07.680+08:00 level=INFO msg="agent: history compressed" tokens_before=1236 tokens_after=780 threshold=384 msgs_before=18 msgs_after=10 compressed_msgs=9 kept_raw_rounds=3 history_changed=true
+    probe153_line_test.go:22: PROBE-A above: untagged call (no task in ctx)
+time=2026-09-26T11:58:07.680+08:00 level=INFO msg="agent: history compressed" tokens_before=1236 tokens_after=780 threshold=384 msgs_before=18 msgs_after=10 compressed_msgs=9 kept_raw_rounds=3 history_changed=true task=f5092575-b784-4307-bb61-a2c3ffcf868b
+    probe153_line_test.go:28: PROBE-B above: tagged call (id from newTaskID)
+--- PASS: TestProbe153PrintsTheRealLine (0.00s)
+time=2026-09-26T11:58:07.686+08:00 level=INFO msg="agent: history compressed" tokens_before=826 tokens_after=532 threshold=384 msgs_before=13 msgs_after=8 compressed_msgs=6 kept_raw_rounds=3 history_changed=true
+    probe153_loopleg_test.go:27: PROBE-LOOPLEG this run's Result.TaskID = "b0dd0327-00c9-42b0-8869-788a867ef21c" (the line above must carry exactly this id)
+--- PASS: TestProbe153LoopLegLineOnDefaultLogger (0.01s)
+ok  	github.com/CarlosShao/wisp/internal/agent	0.061s
+--- 顺带：摘 N2 后交付用例侧红不红（AC#3 句①的 X3 那一发，本程自跑）---
+7
+--- FAIL: TestCompressionTraceCarriesTheOwningTaskID (0.01s)
+
+################ ext-B（本回收口再跑一遍，两回互校） ################
+--- 155 三腿到盘探针 ---
+    zzprobe155_ext_ondisk_test.go:86: PROBE-155 DISK: {"time":"2026-09-26T12:02:10.7834365+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true}
+    zzprobe155_ext_ondisk_test.go:86: PROBE-155 DISK: {"time":"2026-09-26T12:02:10.7834365+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true}
+    zzprobe155_ext_ondisk_test.go:86: PROBE-155 DISK: {"time":"2026-09-26T12:02:10.7887885+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":826,"tokens_after":532,"threshold":384,"msgs_before":13,"msgs_after":8,"compressed_msgs":6,"kept_raw_rounds":3,"history_changed":true}
+    zzprobe155_ext_ondisk_test.go:88: PROBE-155 COUNT trace_lines=3 with_task=0 leg2_id=f9119079-8b82-4bcc-bc18-3d5e656204a4 leg3_ResultTaskID=cc7594dc-2b9f-440a-bcd8-b8abd42ca643
+--- PASS: TestProbe155ExtOnDisk (0.01s)
+--- 复用的 accept-r1 两腿到盘探针（原文未改一字）---
+    zzaccept153_ondisk_test.go:60: PROBE-153 DISK: {"time":"2026-09-26T12:02:12.2524296+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true}
+    zzaccept153_ondisk_test.go:60: PROBE-153 DISK: {"time":"2026-09-26T12:02:12.2529689+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true}
+    zzaccept153_ondisk_test.go:70: tagged record lost its task on disk: want "a465ea9d-a088-4a25-b3d2-9f7432c1a070" in {"time":"2026-09-26T12:02:12.2529689+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true}
+--- FAIL: TestAccept153TraceOnDiskThroughRedactor (0.01s)
+--- 实现件那两枚 ext 探针（进程默认 logger，stderr）---
+time=2026-09-26T12:02:13.700+08:00 level=INFO msg="agent: history compressed" tokens_before=1236 tokens_after=780 threshold=384 msgs_before=18 msgs_after=10 compressed_msgs=9 kept_raw_rounds=3 history_changed=true
+    probe153_line_test.go:22: PROBE-A above: untagged call (no task in ctx)
+time=2026-09-26T12:02:13.700+08:00 level=INFO msg="agent: history compressed" tokens_before=1236 tokens_after=780 threshold=384 msgs_before=18 msgs_after=10 compressed_msgs=9 kept_raw_rounds=3 history_changed=true
+    probe153_line_test.go:28: PROBE-B above: tagged call (id from newTaskID)
+--- PASS: TestProbe153PrintsTheRealLine (0.00s)
+time=2026-09-26T12:02:13.705+08:00 level=INFO msg="agent: history compressed" tokens_before=826 tokens_after=532 threshold=384 msgs_before=13 msgs_after=8 compressed_msgs=6 kept_raw_rounds=3 history_changed=true
+    probe153_loopleg_test.go:27: PROBE-LOOPLEG this run's Result.TaskID = "73255b03-1750-42af-ab1a-b1794021c431" (the line above must carry exactly this id)
+--- PASS: TestProbe153LoopLegLineOnDefaultLogger (0.01s)
+--- 句①那一发本程自跑（交付用例侧红不红）---
+7
+--- FAIL: TestCompressionTraceCarriesTheOwningTaskID (0.00s)
+--- FAIL: TestCompressionTraceNeverInventsATaskID (0.00s)
+
+################ ext-C（本回收口再跑一遍，两回互校） ################
+###### ext-C（摘 N2：mut153 unloop） ######
+--- 155 三腿到盘探针 ---
+    zzprobe155_ext_ondisk_test.go:86: PROBE-155 DISK: {"time":"2026-09-26T12:02:32.9102112+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true}
+    zzprobe155_ext_ondisk_test.go:86: PROBE-155 DISK: {"time":"2026-09-26T12:02:32.9107427+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true,"task":"7f121c00-dac2-4093-b509-f58fdb46e7b1"}
+    zzprobe155_ext_ondisk_test.go:86: PROBE-155 DISK: {"time":"2026-09-26T12:02:32.9146825+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":826,"tokens_after":532,"threshold":384,"msgs_before":13,"msgs_after":8,"compressed_msgs":6,"kept_raw_rounds":3,"history_changed":true}
+    zzprobe155_ext_ondisk_test.go:88: PROBE-155 COUNT trace_lines=3 with_task=1 leg2_id=7f121c00-dac2-4093-b509-f58fdb46e7b1 leg3_ResultTaskID=305301cc-1247-4e04-ac11-ec354175a60d
+--- PASS: TestProbe155ExtOnDisk (0.01s)
+--- 复用的 accept-r1 两腿到盘探针（未改一字：它看不见这一发）---
+    zzaccept153_ondisk_test.go:60: PROBE-153 DISK: {"time":"2026-09-26T12:02:34.4595195+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true}
+    zzaccept153_ondisk_test.go:60: PROBE-153 DISK: {"time":"2026-09-26T12:02:34.4600757+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true,"task":"ed57ab98-9001-41c7-9780-b511d4fd6cc3"}
+--- PASS: TestAccept153TraceOnDiskThroughRedactor (0.01s)
+--- 实现件那两枚 ext 探针（stderr）---
+time=2026-09-26T12:02:36.038+08:00 level=INFO msg="agent: history compressed" tokens_before=1236 tokens_after=780 threshold=384 msgs_before=18 msgs_after=10 compressed_msgs=9 kept_raw_rounds=3 history_changed=true
+time=2026-09-26T12:02:36.038+08:00 level=INFO msg="agent: history compressed" tokens_before=1236 tokens_after=780 threshold=384 msgs_before=18 msgs_after=10 compressed_msgs=9 kept_raw_rounds=3 history_changed=true task=960e2985-3c5d-4772-b15c-2cc5f0e02b34
+--- PASS: TestProbe153PrintsTheRealLine (0.00s)
+time=2026-09-26T12:02:36.044+08:00 level=INFO msg="agent: history compressed" tokens_before=826 tokens_after=532 threshold=384 msgs_before=13 msgs_after=8 compressed_msgs=6 kept_raw_rounds=3 history_changed=true
+    probe153_loopleg_test.go:27: PROBE-LOOPLEG this run's Result.TaskID = "fde9aefb-4c7b-4361-9ff0-17aa35677434" (the line above must carry exactly this id)
+--- PASS: TestProbe153LoopLegLineOnDefaultLogger (0.01s)
+--- 交付用例侧（句①的 X3 那一发，本程自跑）---
+7
+--- FAIL: TestCompressionTraceCarriesTheOwningTaskID (0.00s)
+
+################ ext-D（本回收口再跑一遍，两回互校） ################
+###### ext-D（摘 N1＝AC#1 那枚判据用例，本程自加的一发） ######
+    zzprobe155_ext_ondisk_test.go:88: PROBE-155 COUNT trace_lines=3 with_task=2 leg2_id=e70d84f0-f308-4d38-818b-aa188946ee23 leg3_ResultTaskID=0b3b8caa-6c95-4b32-9a64-abf3d5076bc6
+--- PASS: TestProbe155ExtOnDisk (0.01s)
+-- 同发下句①那一形：摘掉证人再施 M5 会不会全绿（实现件 X2 那一发的本程版）--
+LANDED (internal/agent/compress.go): guard `if rep.Ran` -> `if c.Need(hist)`
+6
+ok  	github.com/CarlosShao/wisp/internal/agent	0.056s
+
+################ 收口还原自证 ################
+restored 3 files from pristine
+RESTORED IDENTICAL compress.go
+RESTORED IDENTICAL loop.go
+RESTORED IDENTICAL compress_trace_test.go
+$ git hash-object（应等于 6de3d1c5 的 blob 号）
+4fcd9a32a50001e0428f5b1b11affa6b066afb41
+3ea1fb8df38adfc56dc5f7510de07b4214fb547c
+2357dca86f679431a0a47b8a91528f8e2f7e6cf6
+$ go version
+go version go1.27.1 windows/amd64

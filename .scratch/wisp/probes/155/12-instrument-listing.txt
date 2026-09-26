@@ -1,0 +1,107 @@
+# 票 155 仪器名册与逐枚 sha1（仓外快照 D:/tmp/wisp155/snap/internal/agent/）
+# 反查：前三枚＝逐字复用前一程/实现件的探针（本程未改一字，sha1 与工作树原件相同）；第四枚＝本程新增的三腿到盘探针
+
+probe153_line_test.go                  9b7d5afc1e6a4b54aff8f95abb0ea1679735de33
+probe153_loopleg_test.go               40f734abd2814d34f3f7ce8754e081df2f042dbc
+zzaccept153_ondisk_test.go             04cb8d41b97b3772231a103c3568efc778220635
+zzprobe155_ext_ondisk_test.go          f50cfa30bc6ff996499ac87e75e41d2310371a1a
+
+# 原件对照（工作树里的 .scratch/wisp/probes/ 那几枚）
+.scratch/wisp/probes/153/probe153_line_test.go             9b7d5afc1e6a4b54aff8f95abb0ea1679735de33
+.scratch/wisp/probes/153/probe153_loopleg_test.go          40f734abd2814d34f3f7ce8754e081df2f042dbc
+.scratch/wisp/probes/153/accept-r1/zzaccept153_ondisk_test.go 04cb8d41b97b3772231a103c3568efc778220635
+
+# 本程新增那枚探针全文
+package agent
+
+// TICKET 155 PROBE (NOT a deliverable: it exists only in the out-of-repo
+// snapshot D:/tmp/wisp155/snap). It is the accept-r1 to-disk probe
+// (zzaccept153_ondisk_test.go) with the third leg the impl's ext table has and
+// that probe does not: a real Loop.Run pass. Without that leg the `unloop`
+// mutation (loop.go stops tagging) is structurally invisible on disk, because
+// the original probe tags its own ctx directly.
+//
+// Reading: after three compression passes (untagged / tagged / real Loop.Run),
+// count the records the JSONL pipeline actually persisted, and how many of them
+// carry a task key. That is the 到盘 counterpart of the impl's ext-A/ext-B/ext-C
+// (153 evidence 4.2), whose "task=" counts were read off the test binary's
+// stderr rather than off a file.
+
+import (
+	"context"
+	"log/slog"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+
+	"github.com/CarlosShao/wisp/internal/observe"
+)
+
+func TestProbe155ExtOnDisk(t *testing.T) {
+	dir := t.TempDir()
+	p, err := observe.InitLogWithRegistry(observe.LogConfig{Dir: dir}, observe.NewRegistry())
+	if err != nil {
+		t.Fatalf("observe init: %v", err)
+	}
+	prev := slog.Default()
+	_ = prev // no InstallAsDefault: both legs get the pipeline handler explicitly, so no global state is moved
+	defer func() { _ = p.Close() }()
+
+	c := NewCompressor(BudgetsFor(4096), nil, WithLogger(slog.New(p.Handler())))
+	hist := buildRoundHistory(6, 400)
+
+	// leg 1: untagged direct call (the shape ext-A's first line is).
+	if _, rep, err := c.Compress(context.Background(), hist); err != nil || !rep.Ran {
+		t.Fatalf("leg1 untagged Compress: err=%v ran=%v", err, rep.Ran)
+	}
+	// leg 2: tagged direct call.
+	tagID := newTaskID()
+	if _, rep, err := c.Compress(withTraceTask(context.Background(), tagID), hist); err != nil || !rep.Ran {
+		t.Fatalf("leg2 tagged Compress: err=%v ran=%v", err, rep.Ran)
+	}
+	// leg 3: the production leg - a real Loop.Run whose own minter supplies the id.
+	h := newHarness(t, "text-reply",
+		withConfig(func(cc *Config) { cc.ContextWindow = 4096 }),
+		withLogger(slog.New(p.Handler())))
+	for _, m := range buildRoundHistory(4, 400) {
+		h.loop.append(m)
+	}
+	res := h.run("收个尾")
+	if res.Status != StatusCompleted {
+		t.Fatalf("leg3 status = %s (%s)", res.Status, res.Message)
+	}
+	if !res.Compression.Ran {
+		t.Fatalf("leg3 loop run did not fold (Compression.Ran=false) -> the ext table's third line would be a phantom")
+	}
+
+	if err := p.FlushNow(); err != nil {
+		t.Fatalf("flush: %v", err)
+	}
+
+	var lines []string
+	files, _ := os.ReadDir(dir)
+	for _, f := range files {
+		b, rerr := os.ReadFile(filepath.Join(dir, f.Name()))
+		if rerr != nil {
+			t.Fatalf("read %s: %v", f.Name(), rerr)
+		}
+		for _, l := range strings.Split(string(b), "\n") {
+			if strings.Contains(l, "history compressed") {
+				lines = append(lines, l)
+			}
+		}
+	}
+	withTask := 0
+	for _, l := range lines {
+		if strings.Contains(l, `"task":"`) {
+			withTask++
+		}
+		t.Logf("PROBE-155 DISK: %s", l)
+	}
+	t.Logf("PROBE-155 COUNT trace_lines=%d with_task=%d leg2_id=%s leg3_ResultTaskID=%s",
+		len(lines), withTask, tagID, res.TaskID)
+	if len(lines) != 3 {
+		t.Errorf("PROBE-155 trace records = %d, want 3 (%v)", len(lines), lines)
+	}
+}
