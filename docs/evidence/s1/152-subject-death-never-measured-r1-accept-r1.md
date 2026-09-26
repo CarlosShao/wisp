@@ -89,7 +89,7 @@ ok  	github.com/CarlosShao/wisp/cmd/wisp	0.071s	coverage: 1.8% of statements   r
 
 ⇒ **A 红 B 绿**＝本程的 overlay 真的进了编译字节；**C 绿**＝坑②本程自己复现（那枚语法错误的句子在带 `-cover`
 时**整个消失**，overlay 被静默丢掉）。
-⇒ 本程经这把尺跑出 **21 枚格、24 次运行**，命令里**零枚 `-cover*`**（尺里是一条硬 assert：`assert not any("cover" in c for c in cmd)`，
+⇒ 本程经这把尺跑出 **20 枚格、24 次运行**，命令里**零枚 `-cover*`**（尺里是一条硬 assert：`assert not any("cover" in c for c in cmd)`，
 见 `probes/152/accept-r1/acc152ruler.py`）；每发的命令行原文＋overlay json 内容都落在那一发日志的头三行。
 
 ### 0.5 本程的仪器自纠（不藏）
@@ -211,7 +211,7 @@ $ git show --name-only 97cfc6e --format=''  -> 只有 docs/evidence/s1/…（第
 | 签名与调用点 | `func contradictionOffset(err error, inputOffset int64) int64 {` 与 `obs.offset = contradictionOffset(err, dec.InputOffset())` | 否 | 同步收窄，全仓无第二个调用者（本程 `grep -n contradictionOffset cmd/wisp/*.go` 只命中该调用点＋case 14） |
 | **唯一行为变化** | `return inputOffset` → `return offsetUnknown` | 不是断言，是被测行为 | 见 §2.3 与第 3 格。**没有任何既有断言检查过这条臂**——本程自己在改前字节上复算：`p1`（整臂换成 0）与 `p2`（换成 -1）都是 RUN 20／PASS 13／**FAIL 0**，与 `asis-pre` 四数逐枚相同 ⇒ 它说"装饰腿"是**量出来的**，不是嘴上说的 |
 | 句子搬家 | `obs.err = fmt.Errorf("%d bytes contradict a subject report at offset %d: %w", obs.bytes, obs.offset, err)` → `contradictSubjectReportErr(obs.bytes, obs.offset, err)` | 否 | 本程逐字节比：那枚格式串字面量在改前出现 1 次、改后出现 1 次、**完全相同**，只有实参名从 `obs.bytes, obs.offset` 换成 `size, offset` ⇒ 命名臂零变化（case 11 现绿为第二证） |
-| **删了没补回的一行** | `// Case 13 - AC#3's ruling is ⓐ: the s.exited() branch SHOULD name where the last` | 注释 | **缺陷登记（本程新增，实现件没报）**：case 13 的注释现在从句中开始（首行变成 `// reading stopped, for the reason…`），而**被删那半句是票 149 那一格裁定（ⓐ）的记录**。它不是放宽断言（票 152 的 AC#2 改判 ⓒ 之后，"ⓐ"这句话本来就过期了），但**别人票面的裁定出处被本票顺手抹了**。归口见 §8.2 |
+| **删了没补回的一行** | `// Case 13 - AC#3's ruling is ⓐ: … where the last` | 注释 | **缺陷登记（本程新增，实现件没报）**：case 13 的注释现在从句中开始（首行变成 `// reading stopped, for the reason…`），而被删那半句是**票 149 那一格裁定（ⓐ）的记录**——不是放宽断言（152 的 AC#2 已改判 ⓒ，"ⓐ"那句本来也过期了），但**别人票面的裁定出处被本票顺手抹了**；归口 §8.3 第 1 条 |
 
 ⇒ 测试文件的删除行**只有那一行注释**；`grep -E '^-' … | grep -E 't\.(Errorf|Fatalf|Skip)'` 只命中生产里那枚 `fmt.Errorf` 搬家行。
 **零枚既有断言被删、零枚被放宽、零枚 `t.Skip`、阈值与预算常量零字节**（`git diff 10e3585^ 97cfc6e -- cmd/wisp/slo_windows.go` 里
@@ -287,7 +287,7 @@ AC#3 的票面文本就是"两选一（删掉／换成会明说自己不知道�
 
 ---
 
-## 第 4 格　承重两问——本程的 21 枚格矩阵，与它对表；并给它问二那一句**更严的答**
+## 第 4 格　承重两问——本程的 20 枚格矩阵，与它对表；并给它问二那一句**更严的答**
 
 本程的尺与它不同源（`acc152ruler.py`，本程自写；每发落盘后**回读**断言"新文本在／旧文本不在"，否则 FATAL 不出数；
 命令原文＋overlay 内容印在每发日志头三行；全程零 `-cover`）。被验树＝两份仓外快照，§0.2 已 md5 对表。
@@ -370,7 +370,7 @@ $ 本程同发独立复算 y2-…-case14off（另一台基线、另一把尺）-
 不改码、不改判据、不动用例。
 ⇒ 本格因此给这一票记两枚**同源同枚 commit（`10e3585`）的注释缺陷**：§2.2 末类那枚被删掉的 case 13 裁定行、与此处这枚写错的读数。
 
-**第 4 格判定：承重两问＝成立（本程 21 枚格全复现，另补 2 枚它没做的操作员口径对照）；它问二那格记一处口径更正；同一枚交付物里另记一处随码注释读数错（§4.4）。**
+**第 4 格判定：承重两问＝成立（本程 20 枚格全复现，另补 2 枚它没做的操作员口径对照）；它问二那格记一处口径更正；同一枚交付物里另记一处随码注释读数错（§4.4）。**
 
 **本格抬头：第 4 格正文（§4.2 承重两问）由实现程写（盘上 mtime 10:01）、由编排者提交（`97cfc6e`，`162 加／0 删`）；
 第 5 格正文同上。** 本程对这两格内容的裁定**不因代提而加重或减轻**——本程全部读数都是自己的尺重跑的，
@@ -424,8 +424,8 @@ dll 目录以 MSYS 形交给 PATH（CI 同形＝`scripts/wisp-cli-tests.sh` 那�
 - **坑①（`0xc0000135` 与"根本没跑到"）**：本程**先踩后修**——尺的第一版把 dll 目录用 `:` 拼进 Windows 原生 PATH，
   那发 `rc=1` 且 `=== RUN=0`（日志 `post__probe-post.log` 第 1 次运行：`exit status 0xc0000135`），
   本程按**同一把尺的读数**判它"根本没跑到"而不是"跑到且红"，改成 `;` ＋反斜杠形后同一发跑到 RUN=24。
-  ⇒ 本程此后每一发都带 `DID_NOT_RUN=(RUN==0)` 这一列（`summary.txt` 现量 24 次运行、21 枚格、21 次带该列；
-   不带的 3 次是本程修尺之前的空跑，§0.5 点过名）；
+  ⇒ 本程此后每一发都带 `DID_NOT_RUN=(RUN==0)` 这一列（`summary.txt` 现量 24 次运行、20 枚格、22 次带该列；
+   不带的 2 次是本程修尺之前的空跑，§0.5 点过名）；
   两发编译断的（`y5`、`n1`）**正是靠这一列**被写成"没跑到"而不是"0 枚红"。
 - **坑②（`d22scan.sh` 日志里混着自检造的 `examined 14/1`）**：本程**没有用 `grep -m1`**——
   真扫描块在文件尾部，现量分母是 `bans #1-5 internal/=205 cmd/=23`、`ban #6 frontend/=67`、`ban #7 internal/tools/=18`、
@@ -616,7 +616,7 @@ diff 里那四枚名字的 `+/-` 命中数＝**0**。
 | 10 | **本程自己第一版把 #8 的不符安在了它的表上**（"它这一行 RUN 报错了"） | 本件 `c06a962` 里那行 | 现量它的表＝20/13/0（对），错在**码里的注释**；本程改正后另立 §4.4 | 本程自纠（原句可在 `c06a962` 里查到，不抹） |
 | 11 | **本程自己一度以为 §4.4 那批修改"已经入库"** | 本程一条 `git show --numstat HEAD` 的读数（HEAD 那时是**别人**的 commit） | 随后 `git diff --numstat HEAD -- <本件>` 现量＝25 加／5 删未提交 ⇒ 老老实实补一枚 commit | 本程自纠：比 HEAD 的 numstat 之前先确认 HEAD 是谁的 |
 | 12 | **本程仪器两发假红**（`file_bytes=0` 与 `last = obs` 比错对象） | §0.5 | 见那两行原文 | 本程自纠，两发红都**保留在日志里** |
-| 13 | **本程把"发了多少枚"写成 19** | 本件 `635ff3d`/`c06a962` 两处 | `summary.txt` 现跑计数＝24 次运行、21 枚格 | 本程自纠（分组手数漏尾项那一族，改在本格一并落） |
+| 13 | **本程两次把"发了多少枚"写错**（先写 19、改成 21、再量成 20） | 本件 `635ff3d`／`c06a962`／`19fee69` 三处 | `summary.txt` 现跑：24 次运行、20 枚格（把 `post:` 与 `post__` 同一格归一）、22 次带 `DID_NOT_RUN` | 本程自纠——**同一枚数连着错两次，正是"没现跑就报数"那一族**；本行是第三次改，落笔前已跑完计数 |
 | 14 | **本程在§0 总表里先把第 3 格预判成"附条件入账"** | 本件 `635ff3d` 那版总表 | 量完 AC#3 四判据（`y5`/`y1`/`y6`/`y4`/`p1`/`p2`）后改判"成立"，残余移入"没测什么" | 本程自纠，改判在 `76aeb6c` 那枚 commit 里落地 |
 
 ## 第 10 格　本程没测什么（整票一份，按"漏了它谁会先被骗"排序）
@@ -629,7 +629,7 @@ diff 里那四枚名字的 `+/-` 命中数＝**0**。
    case 14 的 14b 那三枚真错误**没换 Go 版本重验**（`encoding/json` 的错误分类在别的版本上可能挪家）。
    ⇒ 谁先被骗：以为"承认没有位置"这条句子在生产里出现过的人——它今天一次没出现过。
 4. **没跑 CI、没跑 `wisp slo` 那两个 D32 数、没跑 linux 容器半边**（本程无推送权；`*_other_test.go`／`!windows` 那批只能在容器量）。
-5. **没核 `5429c0d`（"矩阵在交付字节上重跑一遍"）那批发的是不是本程同一形状**——本程只交自己的 21 枚格，没去对它的 `fixed-tree-selection.log`/`pass2` 与我的哪发同形。
+5. **没核 `5429c0d`（"矩阵在交付字节上重跑一遍"）那批发的是不是本程同一形状**——本程只交自己的 20 枚格，没去对它的 `fixed-tree-selection.log`/`pass2` 与我的哪发同形。
 6. **没动、也没审**此刻盘上那两枚未入库增量（`.scratch/wisp/probes/152/mut-shipped/`、`my152.py` ＋12/0）会不会被下一枚不带 pathspec 的 commit 卷走——
    本程只登记这个风险（它正是 `A275` 里那三枚"从未入库的改动"的同一族形状）。
 7. **重读次数与耗时类读数不做跨机宣称**（本程 x1 那发 19418 次对实现件 18485 次，同一枚变异、不同机器）。
@@ -676,6 +676,9 @@ diff 里那四枚名字的 `+/-` 命中数＝**0**。
   但"暂存清单里出现过别人的路径"这件事按纪律**在这里点名报回**，不当作"没事"略过。
 - **零 push**；禁 `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`/`rm` —— 唯一一次 `rm` 是§0.5 那枚本程自己造出的仓外空壳（已自报）。
 - 仓外临时件（`D:\work\tmp\wisp152-accept-r1\`：两份快照＋`mut/`＋`ovl/`＋`logs/`＋`probe/`＋尺）**全部只建不删**，本件引它们的路径按"仓外"标。
+- **§0.3/§8.3 那两枚"仍未入库"判语的 as-of**：`10:5x` 现跑 `git diff --numstat HEAD -- .scratch/wisp/probes/152/my152.py`＝`12 0`、
+  `git ls-tree -r --name-only HEAD -- .scratch/wisp/probes/152/mut-shipped`＝**空**。
+  ⇒ 若下一位把它们提交，§8.3 第 3 条自动减一项，**其余判语不受影响**（把 as-of 钉进正文，防"归因腐坏"那一族）。
 - 票面 AC 框：**本程一个都不勾，也不替实现方勾**。
 
 ### 最终档（三档制，逐格）
@@ -700,7 +703,7 @@ diff 里那四枚名字的 `+/-` 命中数＝**0**。
 |---|---|---|
 | §0.4 overlay 生效性 | `posctl-overlay-broken.log`／`posctl-no-overlay.log`／`posctl-overlay-plus-cover.log`＋`posctl-broken.json` | 三发同命令、只差映射与 `-cover` |
 | 第 1 格真子进程探针 | `zz152acc1_windows_test.go`＋`post__probe-post.log`＋`post__asisp-probe-only.log` | `ACC|setup/A/B/C` 那些行；探针文件**不在仓里**，靠 overlay 注入 |
-| 第 4 格 21 枚格矩阵 | `summary.txt`（每发一行 JSON：RUN/PASS/FAIL/SKIP/红名/DID_NOT_RUN）＋各 `post__*.log`／`pre__*.log` | 尺＝`acc152ruler.py`（内含"零 `-cover`"硬 assert 与回读校验） |
+| 第 4 格 20 枚格矩阵 | `summary.txt`（每发一行 JSON：RUN/PASS/FAIL/SKIP/红名/DID_NOT_RUN）＋各 `post__*.log`／`pre__*.log` | 尺＝`acc152ruler.py`（内含"零 `-cover`"硬 assert 与回读校验） |
 | 第 5 格门禁两形 | `gate-post.log`／`gate-pre.log`＋`run-gate.sh` | 顶层枚数要**排除带 `/` 的子用例行**，否则 79 会被数成 139 |
 | 第 7 格禁改轴 | `ac4-range-census.txt` | 逐枚 commit ＋ 区间两口径，末段是同一把尺的正控 |
 | §5.4 d22scan 双块 | `d22scan-snapshot.log` | 前半 14/1 是自检夹具，尾部分母 205/23/67/18/30/67/413/44 |
