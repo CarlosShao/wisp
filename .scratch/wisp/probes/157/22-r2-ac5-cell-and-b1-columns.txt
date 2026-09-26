@@ -1,0 +1,293 @@
+### W0. 时刻（date 现取）
+2026-09-26 14:02:29 +0800
+
+### W1. 名册尺（--no-walk 必带）：本票 r1 实现程名下枚数
+$ R=$(git log --pretty=%h --grep="evidence(157" | grep -v ^89a35e9$)   # 去掉验收程那一枚（它的主题也以 evidence(157 开头）
+  锚定 grep 枚数＝13
+$ git log --no-walk --pretty="%h %ad" --date=format:%H:%M $R
+  b60c6b79 13:44 evidence(157 B.12 两处命令文本改�
+  c97d7064 13:42 evidence(157 终检枚数指针 21-…txt
+  ef1c474f 13:41 evidence(157 收口 B.11-B.14): 交件形
+  ec815820 13:34 evidence(157 第 10 笔 落 153 证据件
+  7f79638e 13:33 evidence(157 第 9 笔 落 153 证据件 
+  b5b52943 13:32 evidence(157 第 8 笔 补 B.8): AC#4 射
+  564ccce0 13:29 evidence(157 第 7 笔 补 B.7): 同帧�
+  3f77a223 13:28 evidence(157 第 6 笔 补 B.6): 同帧�
+  7a56af50 13:26 evidence(157 第 5 笔 补 B.5): Result.T
+  36d91b90 13:25 evidence(157 第 4 笔 补 B.4): l.curren
+  68aaec70 13:24 evidence(157 第 3 笔 补 B.3): AC#3 那
+  5fc3c3c3 13:23 evidence(157 第 2 笔 判〔不成立〕
+  0c539c36 13:21 evidence(157 第 1 笔 落 155 证据件 
+  --no-walk 名册（枚枚 git show --name-only 并集）＝19 枚路径
+  不带 --no-walk 的同一条尺（坑①，本程亲复）＝
+1835
+
+### W2. AC#5 那格到底交没交：锚点版逐枚数（'对账' / '双向' / 小节标题）
+--- ec81582（13:34）---
+  行数=678  对账=0  双向=0
+  ### B.1x 小节=8
+--- ef1c474（13:41）---
+  行数=761  对账=2  双向=2
+  ### B.1x 小节=12
+  680:### B.11 交件形状（本程的写面自证；凭据＝`probes/157/20-delivery-shape-and-forbidden-faces.txt` V1–V7 段）
+  694:### B.12 票面 5 枚框 ↔ 本程的格：双向对账（工单 `:39` 要求的那一节）
+  722:### B.13 本程没复算哪几笔、为什么（本票零读数义务 ⇒ 这一节写的是"没复算"，不是"没测"）
+  734:### B.14 伪授权两栏（两栏**分开**记；每条出处＝工具名＋命令前 40 字；凭据值零抄录）
+--- b60c6b7（13:44）---
+  行数=763  对账=2  双向=2
+  ### B.1x 小节=12
+  680:### B.11 交件形状（本程的写面自证；凭据＝`probes/157/20-delivery-shape-and-forbidden-faces.txt` V1–V7 段）
+  696:### B.12 票面 5 枚框 ↔ 本程的格：双向对账（工单 `:39` 要求的那一节）
+  724:### B.13 本程没复算哪几笔、为什么（本票零读数义务 ⇒ 这一节写的是"没复算"，不是"没测"）
+  736:### B.14 伪授权两栏（两栏**分开**记；每条出处＝工具名＋命令前 40 字；凭据值零抄录）
+--- HEAD（14:01）---
+  行数=763  对账=2  双向=2
+  ### B.1x 小节=12
+  680:### B.11 交件形状（本程的写面自证；凭据＝`probes/157/20-delivery-shape-and-forbidden-faces.txt` V1–V7 段）
+  696:### B.12 票面 5 枚框 ↔ 本程的格：双向对账（工单 `:39` 要求的那一节）
+  724:### B.13 本程没复算哪几笔、为什么（本票零读数义务 ⇒ 这一节写的是"没复算"，不是"没测"）
+  736:### B.14 伪授权两栏（两栏**分开**记；每条出处＝工具名＋命令前 40 字；凭据值零抄录）
+
+### W3. 验收程那发 '0/0' 读的是哪一版（它 run.sh 的 V6 命令原文）
+$ grep -n "对账" probes/157-accept/run.sh
+  136:  echo "### V6. 交付件里有没有 AC#5 那枚双向对账块（锚定 grep）"
+  137:  echo "  155 件附录里 '对账|双向' 命中＝$(git cat-file blob ec81582:docs/evidence/s1/155-three-unjudged-cells-r1.md | sed -n '389,760p' | grep -c '对账\|双向')"
+  138:  echo "  153 件附录里 '对账|双向' 命中＝$(git cat-file blob ec81582:docs/evidence/s1/153-trace-lies-unguarded-r1.md | sed -n '593,700p' | grep -c '对账\|双向')"
+  本程按它那一版（ec81582）复跑同一把尺＝
+0
+  同一把尺打在 B.12 落盘那一枚（ef1c474）＝
+2
+  B.12 落盘时刻与验收程锚点差＝
+ef1c474f 13:41:25  evidence(157 收口 B.11-B.14): 交件形
+ec815820 13:34:39  evidence(157 第 10 笔 落 153 证据件
+89a35e9e 13:45:16  evidence(157 验收 抽第1/4/5/8笔换�
+
+### W4. 验收件 §3.1 的档（本程只具名转记、不自立档）
+$ grep -n "^| \*\*AC#" 157-…-accept-r1.md
+  166:| **AC#1** 第 1–8 笔各补一行，全部落在 155 件末尾新一节 `## 附录 B（票 157 代记，只追加）`，每笔带**它自己的**当轮复算命令与输出；对不上⇒判〔不成立〕＋读数并停手报回 | 锚定 grep：`bb3a7a1` 版末行 385 → `ec81582` 版 `…
+  167:| **AC#2** 第 9–10 笔落在 153 件末尾同一形状（并明写"补完不等于 153 能翻勾"） | `153-…-r1.md`@`ec81582`：`:593` 挂 `## 附录 B（票 157 代记，只追加）`、`:600` `### B.9`、`:627` `### B.10…
+  168:| **AC#3** 一枚框都不勾、`-done` 一枚都不加 | `grep -c '^- \[x\]'`＝**0**／`'^- \[ \]'`＝**5**；`ls issues｜grep -c '157.*-done'`＝**0**（探针 V3 段） | **成立** |
+  169:| **AC#4** 契约轴零字节（`internal/**`、`cmd/**`、`PLAN`、`specs`、阈值/golden/`allowlist`/`slo-check`/`d22scan`、`frontend`、`design`、台账、`HANDOVER`） | 本程那把尺＝**逐…
+  170:| **AC#5** 票面框 ↔ 你的格 双向对账，没判的明写"未裁"＋最小闭合集合 | 锚定 grep 两枚附录：`对账\|双向` 命中＝**0／0**（V6 段）；两节附录的抬头那几枚弹头里也没有反向那一节（只登记了身份／来路／纪律） | **不成立（未交）**——见 §4 最小闭合 |…
+
+### W5. 157 票面：框数与勾数（锚定计数，现量）
+  票面未勾=5  已勾=0  AC 行=5
+  票面最后一次改动=4e20e21 13:06
+  157 名下 -done 文件＝0
+
+### W6. B.1 三行：两把尺并排（它尺＝index 取第一个 '| **'；本尺＝按 '|' 切格取**最后一格非空**）
+$ git cat-file blob b319bab:<153 验收件> 逐行；本尺＝awk -F"|" 从 NF 往回找第一枚非空格
+  本尺＝最后一格非空格；它尺＝substr(index($0,"| **"))（r1 那一把）：
+  :831 它尺=**附条件**——两笔待补（`[前]` §5 本尺最后一格=**附条件**——两笔待补（`[前]` §5.3：件内缺那笔隐私账；§5.3 第 3 笔：日志侧 `task` 与 DB 侧 `task_id` 不同名无人写）。最小闭合＝证据件补那两行，不动码不动判据 前一程那一格=§5.1／§5.2／§5.5、§3.2 的 `A4`／`A6`
+  :832 它尺=**无** | `[前]` 全件 `接收者` 本尺最后一格=**未裁**（本程不补档） 前一程那一格=**无**
+  :833 它尺=**无**（半格相邻） | `[前]` `持 本尺最后一格=**未裁**（本程不补档） 前一程那一格=**无**（半格相邻）
+  :834 它尺=**成立** |             本尺最后一格=**成立**             前一程那一格=§4.1／§4.2
+  :835 它尺=**成立** |             本尺最后一格=**成立**             前一程那一格=§5.1
+  :836 它尺=**成立**（账归编排者，见 §12.4 末 本尺最后一格=**成立**（账归编排者，见 §12.4 末条） 前一程那一格=§4.2／§4.3
+  :842 它尺=**成立** |             本尺最后一格=**成立**             前一程那一格=§3.2（`A1↔A2`／`A4↔A5`／`A6↔A7` 三对）
+  :843 它尺=**无** | `[前]` §8 第 3 条 本尺最后一格=**未裁**（本程不补档） 前一程那一格=**无**
+  两把尺同/不同逐枚判（同＝它尺读数**以**最后一格开头；不同＝它尺吃到了邻格）：
+  :831 同
+  :832 不同（它尺读到邻格：**无**|`[前]｜真档：**未裁**（本程不补档））
+  :833 不同（它尺读到邻格：**无**（半�｜真档：**未裁**（本程不补档））
+  :834 同
+  :835 同
+  :836 同
+  :842 同
+  :843 不同（它尺读到邻格：**无**|`[前]｜真档：**未裁**（本程不补档））
+  同=5 不同=3 不同那几枚= :832 :833 :843
+  盘上那一行最后一格逐字（三枚）：
+  :832 => **未裁**（本程不补档）
+  :833 => **未裁**（本程不补档）
+  :843 => **未裁**（本程不补档）
+  同一把尺打在工单点名的 :834/:835/:836（应仍是档）：
+  :834 => **成立**
+  :835 => **成立**
+  :836 => **成立**（账归编排者，见 §12.4 末条）
+
+### W7. 本件 B.1 表 HEAD 版那三行的字面（旧行不抹，只取原文）
+  433:| (b) 问① | **未裁**（前一程没造出这一枚） | `:832` | 读数由票 155 §1 格① 造出；档位由 155 验收件 `:57` 判〔成立〕 |
+  434:| (c) 问② | **未裁**（半格相邻） | `:833` | 读数由票 155 §2 格② 造出；155 验收件 `:115` 判〔成立〕附"唯一"措辞收窄 |
+  439:| AC#3 句② | **未裁**（前一程 §8 第 3 条自报没复算） | `:843` | 读数由票 155 §3 格③ 造出；155 验收件 `:158` 判〔成立〕 |
+
+### W8. 11-…sh:71 那发挂了 '| head -20' 的位置与不挂 head 的完整名册
+$ sed -n "71p" probes/157/11-…sh
+  git diff --name-only b23c7f7 6de3d1c5 | grep -v '^docs/' | head -20
+$ git diff --name-only b23c7f7 6de3d1c5 | grep -v "^docs/" | wc -l
+109
+$ 同上 | head -20 | wc -l（＝那发实际显示的枚数）
+20
+$ 被截掉的那几枚（diff -12 之后）：
+.scratch/wisp/probes/151/overlay-ac1.json
+.scratch/wisp/probes/151/overlay-mut-noclose.json
+.scratch/wisp/probes/151/overlay-pre.json
+.scratch/wisp/probes/151/ran-pre-tools.txt
+.scratch/wisp/probes/151/run.head.go
+.scratch/wisp/probes/151/run.mut-noclose.go
+.scratch/wisp/probes/152/e2e-observer-stderr.txt
+.scratch/wisp/probes/152/e2e-subject-kill-real-cli.log
+.scratch/wisp/probes/152/e2e-subject-kill.sh
+.scratch/wisp/probes/152/e2e-subject-kill2.sh
+.scratch/wisp/probes/152/e2e-subject-kill3.sh
+.scratch/wisp/probes/152/e2e-v1-broken-instrument.log
+.scratch/wisp/probes/152/e2e-v1-second-run-broken-pid.log
+.scratch/wisp/probes/152/e2e3-anchor-built-kill.log
+.scratch/wisp/probes/152/e2e3-observer-stderr.txt
+.scratch/wisp/probes/152/fixed-tree-selection.log
+.scratch/wisp/probes/152/gate-pre-ci.log
+.scratch/wisp/probes/152/gate-pre-snapshot.log
+.scratch/wisp/probes/152/mut-anchor/asis.log
+.scratch/wisp/probes/152/mut-anchor/e1-exited-drop-summary.log
+.scratch/wisp/probes/152/mut-anchor/e2-exited-drop-summary-case13off.log
+.scratch/wisp/probes/152/mut-anchor/e3-case13-not-a-test-only.log
+.scratch/wisp/probes/152/mut-anchor/f1-fallback-to-zero.log
+.scratch/wisp/probes/152/mut-anchor/f2-fallback-to-minus1.log
+.scratch/wisp/probes/152/mut-post/asis.log
+.scratch/wisp/probes/152/mut-post/g1-restored-borrowed-value-case14off.log
+.scratch/wisp/probes/152/mut-post/g1-restored-borrowed-value.log
+.scratch/wisp/probes/152/mut-post/g2-case14-not-a-test-only.log
+.scratch/wisp/probes/152/mut-post/g3-renderer-always-prints-position.log
+.scratch/wisp/probes/152/mut-post/g4-renderer-never-prints-position.log
+.scratch/wisp/probes/152/mutations-anchor-summary.txt
+.scratch/wisp/probes/152/my152.py
+.scratch/wisp/probes/152/overlay-mine-onto-samppre.json
+.scratch/wisp/probes/152/overlay-probe.json
+.scratch/wisp/probes/152/overlay-probe2-samppre.json
+.scratch/wisp/probes/152/probe-exited-reachability.log
+.scratch/wisp/probes/152/probe-waitready-unreaped.log
+.scratch/wisp/probes/152/zz152bprobe_windows_test.go
+.scratch/wisp/probes/152/zz152probe_windows_test.go
+.scratch/wisp/probes/153/ac1_snippet.txt
+.scratch/wisp/probes/153/ac2-q1.txt
+.scratch/wisp/probes/153/ac2-q2.txt
+.scratch/wisp/probes/153/ac2-q3.txt
+.scratch/wisp/probes/153/ac4-final.txt
+.scratch/wisp/probes/153/ac4-zero-byte.txt
+.scratch/wisp/probes/153/ac5-extra.txt
+.scratch/wisp/probes/153/logs/ac3-X0-delivered.txt
+.scratch/wisp/probes/153/logs/ac3-X1-m5.txt
+.scratch/wisp/probes/153/logs/ac3-X2-m5-noAC1.txt
+.scratch/wisp/probes/153/logs/ac3-X3-unloop.txt
+.scratch/wisp/probes/153/logs/ac3-X4-unloop-no-taskid-test.txt
+.scratch/wisp/probes/153/logs/ac3-X5-drop-attr.txt
+.scratch/wisp/probes/153/logs/ac3-X6-always-attr.txt
+.scratch/wisp/probes/153/logs/ac3-X7-fake-id.txt
+.scratch/wisp/probes/153/logs/ac3-X8-dropattr-no-ac2-tests.txt
+.scratch/wisp/probes/153/logs/ac5-d22scan-rc.txt
+.scratch/wisp/probes/153/logs/ac5-d22scan-rc2.txt
+.scratch/wisp/probes/153/logs/ac5-d22scan.txt
+.scratch/wisp/probes/153/logs/ac5-post-count1.txt
+.scratch/wisp/probes/153/logs/ac5-post-count2.txt
+.scratch/wisp/probes/153/logs/ac5-post-race.txt
+.scratch/wisp/probes/153/logs/ac5-pre-count1.txt
+.scratch/wisp/probes/153/logs/ac5-roster-post.txt
+.scratch/wisp/probes/153/logs/ac5-roster-post2.txt
+.scratch/wisp/probes/153/logs/ac5-roster-pre.txt
+.scratch/wisp/probes/153/logs/baseline-head-count1.txt
+.scratch/wisp/probes/153/logs/ext-A-delivered.txt
+.scratch/wisp/probes/153/logs/ext-B-drop-attr.txt
+.scratch/wisp/probes/153/logs/ext-C-unloop.txt
+.scratch/wisp/probes/153/logs/f1-delivered-unmutated.txt
+.scratch/wisp/probes/153/logs/f2-delivered-m5.txt
+.scratch/wisp/probes/153/logs/f3-restored.txt
+.scratch/wisp/probes/153/logs/r0-anchor-baseline.txt
+.scratch/wisp/probes/153/logs/r1-m5-4nails.txt
+.scratch/wisp/probes/153/logs/r2-m5-plus-ac1.txt
+.scratch/wisp/probes/153/logs/r3-unmutated-plus-ac1.txt
+.scratch/wisp/probes/153/m5.py
+.scratch/wisp/probes/153/mut153.py
+.scratch/wisp/probes/153/probe153_line_test.go
+.scratch/wisp/probes/153/probe153_loopleg_test.go
+.scratch/wisp/probes/153/run-ac1-readings-final.sh
+.scratch/wisp/probes/153/run-ac1-readings.sh
+.scratch/wisp/probes/153/run-ac3-matrix.sh
+.scratch/wisp/probes/153/run-ac5-gate.sh
+cmd/wisp/run.go
+cmd/wisp/slo_report_144_windows_test.go
+cmd/wisp/slo_windows.go
+cmd/wisp/task_scope_close_151_test.go
+internal/tools/bridge.go
+$ 完整名册里非 .scratch 的枚数＝
+5
+cmd/wisp/run.go
+cmd/wisp/slo_report_144_windows_test.go
+cmd/wisp/slo_windows.go
+cmd/wisp/task_scope_close_151_test.go
+internal/tools/bridge.go
+
+### W9. 只追加自证：本程进场基版（HEAD＝26bb094）起 155 件前 385 行
+  cmp 静默＝§0–§11 一字未改
+  153 件前 589 行：静默
+  本件 '## 附录 B（票 157 代记' 枚数=1
+
+### W10. probes/157 枚数（本程新增前后）
+19
+  10-items-4-to-7-code-facts.sh
+  10-items-4-to-7-code-facts.txt
+  10-items4to7.txt
+  11-items-1-2-3-8-table-and-range.sh
+  11-items-1-2-3-8-table-and-range.txt
+  12-dep-closure-6de3d1c5.txt
+  12-dep-closure-from-git-objects.py
+  13-items-9-10-privacy-and-keyname.sh
+  13-items-9-10-privacy-and-keyname.txt
+  14-supplementary-rulers.sh
+  14-supplementary-rulers.txt
+  15-item2-lettersource-rulers.sh
+  15-item2-lettersource-rulers.txt
+  20-delivery-shape-and-forbidden-faces.sh
+  20-delivery-shape-and-forbidden-faces.txt
+  21-final-self-check.sh
+  21-final-self-check.txt
+  22-r2-ac5-cell-and-b1-columns.sh
+  22-r2-ac5-cell-and-b1-columns.txt
+
+### W11. B.1 表八行逐枚对：写上去的档 vs 盘上最后一格（档字对不对／括号对不对分开数）
+  (a) 交付物本身 出处153 验收件 §12 `:831` 本程写=**附条件**——两笔待补          盘上真档=**附条件**——两笔待补（`[前]` §5.3：件内缺那笔隐私账；§5.3 第 3 笔：日志侧 `task` 与 DB 侧 `task_id` 不同名无人写）。最小闭合＝证据件补那两行，不动码不动判据 档同 括号不同（本程括号=｜盘上括号=（`[前]` §5.3：件内缺那笔隐私账；§5.3 第 3 笔：日志侧 `task` 与 DB 侧 `task_id` 不同名无人写））
+  (b) 问①     出处`:832`   本程写=**未裁**（前一程没造出这一枚） 盘上真档=**未裁**（本程不补档） 档同 括号不同（本程括号=（前一程没造出这一枚）｜盘上括号=（本程不补档））
+  (c) 问②     出处`:833`   本程写=**未裁**（半格相邻）             盘上真档=**未裁**（本程不补档） 档同 括号不同（本程括号=（半格相邻）｜盘上括号=（本程不补档））
+  (d) 问③     出处`:834`   本程写=**成立**                               盘上真档=**成立**             档同 括号同（本程括号=｜盘上括号=）
+  (e) 不许造假 ID 出处`:835`   本程写=**成立**                               盘上真档=**成立**             档同 括号同（本程括号=｜盘上括号=）
+  (f) 要动契约面就停手 出处`:836`   本程写=**成立**（账归编排者）          盘上真档=**成立**（账归编排者，见 §12.4 末条） 档同 括号不同（本程括号=（账归编排者）｜盘上括号=（账归编排者，见 §12.4 末条））
+  AC#3 句①    出处`:842`   本程写=**成立**                               盘上真档=**成立**             档同 括号同（本程括号=｜盘上括号=）
+  AC#3 句②    出处`:843`   本程写=**未裁**（前一程 §8 第 3 条自报没复算） 盘上真档=**未裁**（本程不补档） 档同 括号不同（本程括号=（前一程 §8 第 3 条自报没复算）｜盘上括号=（本程不补档））
+
+### W12. 只读别人的写面：验收件 §3.2 反向那六枚 + 它 V6 命令钉的锚点
+  176:| 1 | **第 2 笔（`B.2` 判〔不成立〕）那枚归属之争**：它说"票面确实拆了六件、字母也在票面上"，155 验收程说"票面没拆过 6 件" | 派单只让本程抽第 **1/4/5/8** 笔；这一枚是…
+  177:| 2 | **第 3／6／7／9／10 笔的档位**（`B.3`／`B.6`／`B.7`／`B.9`／`B.10`） | 不在本程抽判射程；本程只**看见了它们各自的 `$` 命令行枚数**（3/6/6/6/8…
+  178:| 3 | **票面 AC#5 那一枚框本身**（`成立（未交）`那一档要不要挂回工单） | 票面是编排者写面 | 最小闭合＝**157 自己往任一节的末尾补一枚"票面 5 枚框 ↔ 本程的格"双向表**（形状照…
+  179:| 4 | **AC#1 那句"各补一行"要不要为 §1.1 那三行括号再开一张记录级票** | 本程只判形状，不替它决定票的颗粒度 | 编排者两选一：①就地追加一枚 `B.1b`（只改出处列括号）；②记进台账由…
+  180:| 5 | **`probes/157/**` 那"40 枚"的口径** | 派单转述"它自报 40 枚"，本程在**盘上找不到这枚数**（两枚交付件里 `40 枚` 命中＝**0**） | 盘上现量三枚口径由编…
+  181:| 6 | **派单对被验物的两处描述** | 不是本程射程，但会坑下一位，登记：派单 `:4` 说 155 件那节是 `## 附录 A`、153 件是 `## 附录 B`；**盘上两枚都是 `## 附录 B`*…
+
+
+### W13. 编排者给本程的三件裁定，逐件现量（只反查号不够，事也要量）
+$ git cat-file -t bb3a7a1:.scratch/wisp/probes/155/00-anchor-reverse-check.txt
+  blob
+  那枚凭据自己的 date 读数＝
+    $ date
+    2026-09-26 11:42 +0800
+$ git show b319bab:<153 票面> | sed -n "25,29p"（第 2 笔：六件到底在不在票面）
+  - [ ] **AC#2 痕带 taskID——但先判它从哪来，拿不到就停手上报**。三问逐问答：
+        ① `Compress` 现在能拿到 taskID 吗（函数签名／接收者上有没有）？② 拿不到的话，唯一持有者是谁（组合根？`Loop`？）；
+        ③ 把 taskID 送进那条 Info 要不要改**契约面**（`C12` 状态机、`C39` 契约深化里那条痕的字段表）？
+        ⚠ **不许造一个假 ID**（填 `""`／`"unknown"`／拿 goroutine id 凑）来让 AC#2 变绿：那是把"归因不了"洗成"归因成功"。
+        ⚠ 若三问的答案是"要动契约面" ⇒ **D22 闸门③ 停手上报**，不要自己放宽字段口径。
+  票面里数得出的枚数：三问①②③= 4 枚 / ⚑ 弹头= 2 枚 / 该条款自身＝1 枚交付物 ⇒ 合计 6
+  票面 :81 那一行（字母／"拆 6 件事"在不在票面）＝
+    | AC#2 痕带 taskID（票面拆 6 件事） | **[ ] 不勾** | 只裁了 (a)(d)(e)(f) | **两问无人裁**：问①"`Compress` 改之前拿不拿得到 taskID（签名／接收者）"、问②"唯一持有者是不是 `Loop.run`" ⇒ 见下面"最小闭合" |
+$ 台账里 A293② 当前状态（编排者是否已自裁；本程不写台账）
+  7284:## A293（09-26 13:2x）：票 157 十笔**全部复算成立**、16 枚 commit 名册干净；它顺手抓到 **155 那张表自己跟自己矛盾**（§7.1 宣称做过…
+  7319:## A294（09-26 13:4x）：票 157 交件＝**9 笔补、第 2 笔判〔不成立〕并停手报回**；它的非实现者验收程把我 A293 那笔「矛盾」当场打掉，并证明「锚点反…
+  7328:「自相矛盾」盘上不存在（`A293②` 已作废）；且**反查是实现程 11:42 自做自入库**（`00-anchor-reverse-check.txt` 在 `bb3a7a1` …
+  台账 A293② 作废那一行的行号＝
+  7290:
+  7309:
+
+### W14. 验收件自己两把尺钉的不是同一版（§0 的行数读数 vs V6 钉的 blob）
+    ec81582（13:34:39）=> 155 件 678 行 / 对账 0 枚
+    ef1c474（13:41:25）=> 155 件 761 行 / 对账 2 枚
+    c97d706（13:42:37）=> 155 件 763 行 / 对账 2 枚
+    b60c6b7（13:44:05）=> 155 件 763 行 / 对账 2 枚
+  它 V6 那把尺钉的是 ec81582（678 行、对账 0），它验收件 §0 那张漂移表报的"收口"行数是 760＋（＝ef1c474 及以后的形状）。
+### END
