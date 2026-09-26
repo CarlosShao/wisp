@@ -1,0 +1,74 @@
+### Q1. 第 4 笔的地基：Compressor 到底够不够得着 l.current
+--- Compressor 结构体原文（5365cb22）---
+type Compressor struct {
+	b   Budgets
+	sum Summarizer
+	lg  *slog.Logger
+}
+--- Compressor 的全部方法签名（有没有一枚接 *Loop / *observe.Root）---
+98:func (c *Compressor) log() *slog.Logger {
+106:func (c *Compressor) TotalTokens(hist []llm.Message) int {
+115:func (c *Compressor) Need(hist []llm.Message) bool {
+128:func (c *Compressor) Compress(ctx context.Context, hist []llm.Message) ([]llm.Message, CompressionReport, error) {
+189:func (c *Compressor) totalOf(rounds []round) int {
+197:func (c *Compressor) summarize(ctx context.Context, msgs []llm.Message) (string, error) {
+--- compress.go 全文里 current / observe.Root 的命中枚数 ---
+compress.go 内 current 命中 = 0
+compress.go 内 observe\.Root 命中 = 0
+
+### Q2. 第 5 笔的地基：:369 与 :396 之间有没有函数边界
+--- $A 版 loop.go :340..:396 里的 ^func / ^} 行（相对行号）---
+(无：两枚行号在同一枚函数体内)
+--- :369 那一行的缩进层级（制表符数）vs :396 ---
+^Ires := Result{TaskID: taskID, Status: StatusCompleted}$
+^I^I^Inh, rep, err := l.comp.Compress(ctx, hist)$
+--- 从 :339 起，for 循环从哪一枚行号开始（res 在循环之前）---
+31:	res := Result{TaskID: taskID, Status: StatusCompleted}
+38:	for {
+
+### Q3. 第 8 笔的补尺：闭包逐包在 b23c7f7..6de3d1c5 的改动枚数（本程那 16 枚 test-dep 全列）
+internal/buildinfo             0
+internal/config                0
+internal/llm                   0
+internal/llm/adaptertest       0
+internal/llm/anthropic         0
+internal/llm/golden            0
+internal/llm/openaichat        0
+internal/llm/openairesponses   0
+internal/memory                0
+internal/observe               0
+internal/plugin                0
+internal/proc                  0
+internal/risk                  0
+internal/secret                0
+internal/statemachine          0
+internal/winsec                0
+internal/tools                 1
+
+### Q4. 锚定 grep：几枚'表与盘'的形状尺
+$ grep -c '闭包' docs/evidence/s1/155-three-unjudged-cells-r1.md
+1
+$ grep -c '同帧持有者\|持有者' docs/evidence/s1/155-three-unjudged-cells-r1.md
+7
+--- 155 证据件里 AdmitTask / j.taskID / journal 的全部命中（第 6/7 笔是否真漏报）---
+155 内 AdmitTask 命中 = 0
+155 内 j.taskID 命中 = 0
+155 内 journal 命中 = 0
+155 内 newTaskJournal 命中 = 0
+--- 155 §2 那张'副本'表的四枚名册（第 4 笔宣称的四枚）---
+| 副本 | 现量 | 算不算"另一个持有�
+|---|---|---|
+| `root := observe.NewRootFrom(ctx, taskID)` `
+| `l.setCurrent(root)` `loop.go:353`（`Loop.c
+| `res := Result{TaskID: taskID…}` `loop.go:
+| `RunningTask{ID: id}` `loop.go:323`（异步
+
+--- 155 证据件里 '3 处读点' 与 '晚于压缩' 的原句行号 ---
+114:| `l.setCurrent(root)` `loop.go:353`（`Loop.current *observe.Root`） | `l.current` 只有 3 处读点：`:348` 注释、`:523` | **不算**：它在 `Compressor` 那侧不可达（不同种类、无引用） |
+115:| `res := Result{TaskID: taskID…}` `loop.go:369` | `Result.TaskID` 声明在 `loop.go:83` | **不算**：那是**出口**，且晚于压缩那一发 |
+130:- `run.go:576` 原文（`sed -n '570,590p'`）：`res := loop.Run(ctx, task)`——`ctx` 是 `context.WithTimeout(context.Background(), …)` 造的，**没有任何任务身份**；组合根第一次拿到 id 是 `:587` 读 `res.TaskID`，**晚于整次环路**，因此**晚于压缩**。
+--- 155 §3.3 那两枚'还原自证'行（第 8 笔射程声明所在）---
+176:| 还原 | 每发之前 `mut153.py restore` ＋ 收口逐枚 `cmp` | `RESTORED IDENTICAL compress.go / loop.go / compress_trace_test.go`；收口再 `git hash-object` 三枚＝`4fcd9a32a500…`／`3ea1fb8df38a…`／`2357dca86f67…` ＝ **`6de3d1c5` 的 blob 号逐字相同** |
+177:| 树是纯的 | 快照取版＝blob 级（§0 末），`mismatched: 0` | 全程**未用** `git archive`；`third_party/**` 那三枚 dll **没拷**——因为本程**一行 `cmd/wisp` 都没跑**（`internal/agent` 包不需要它们），这条在 §5"没测"里另记一笔，不当"跑过了" |
+238:| 还原自证 | 每发之前 `restore`、收口逐枚 `cmp` | `RESTORED IDENTICAL compress.go / loop.go / compress_trace_test.go`；再 `git hash-object` 三枚＝`4fcd9a32a500…`／`3ea1fb8df38a…`／`2357dca86f67…`＝**与 `6de3d1c5` 的 blob 号逐字相同** |
+327:- 快照纯度自证在 §0 末（`mismatched: 0` ＋ 三枚被测文件 `git hash-object` 与 `6de3d1c5` 的 blob 号逐字相同）。

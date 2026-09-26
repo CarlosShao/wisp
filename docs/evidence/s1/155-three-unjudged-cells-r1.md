@@ -511,3 +511,31 @@ $ awk 'NR>=842 && NR<=843 {printf "%s 行尾=%s\n", NR, substr($0, index($0,"| *
 > **AC#3 那枚框的句①，档＝前一程所判〔成立〕**（153 验收件 §12 `:842`；凭据＝前一程 §3.2 那三对"摘证人即逃逸回来"各自跑到 ＋ 续程在盘上抽出的三发 FAIL 计数确为 0、RUN 82／82／81）。本件 §3.3 正控②与 §3.4 的 `ext-D`＋`m5` 各**复到一次同一形**——那是同一枚档的第二、第三次读数，**不是又一枚档**。句② 那一行在 **B.1** 的表末（前一程 `:843` 判"未裁"→ 读数由票 155 §3 格③ 造出 → 155 验收件 `:158` 判〔成立〕）。
 
 ⚠ **一处必读的边界**（本程现量，防这一行被读满）：**155 验收件自己把"句① 的 X1–X8 全变异矩阵"列进它没判的那一节**（`:270`，§7.2 第 2 行，原话"句①前一程已裁；本程只在 ext-D 那一棵树上复到 `drop-test＋m5` 一发"，最小闭合写的是"若要复算需另一格预算"）⇒ 本行只把**档**落到 §4 读者手边，**不得**被读成"句① 的全矩阵已由 155 那两程重跑过"。
+
+### B.4 第 4 笔 —— `l.current` 那句"只有 3 处读点"：**〔成立〕**（本程复算还把它再收窄一枚）
+
+**验收程那一句**（`155-three-unjudged-cells-r1-accept-r1.md:103` §2 那张表的第三行）：本件 `:114` 写"`l.current` 只有 3 处**读点**：`:348` 注释、`:523`"，而现量是**宣称 3 枚、只列 2 枚，且那 3 枚里含一枚写点**。
+
+**本程当轮复算**（锚点＝`5365cb22`；命令与读数全文＝`probes/157/10-items-4-to-7-code-facts.txt` 的 S1 段＋`probes/157/14-supplementary-rulers.txt` 的 Q1 段）：
+
+```
+$ git grep -nE '\.current\b' 5365cb22 -- internal/agent/loop.go        rc=0，三枚
+5365cb22:internal/agent/loop.go:348:   // D11(1) control layer abort a running task by cancelling l.current (the   ← 注释
+5365cb22:internal/agent/loop.go:523:   root := l.current                                                        ← 读点
+5365cb22:internal/agent/loop.go:987:   l.current = r                                                            ← 写点
+
+$ git show 5365cb22:internal/agent/loop.go | grep -n 'current \*observe.Root'
+189: current *observe.Root                                      ← 第 4 枚提及（前面没有点，那把尺扫不到）
+$ git grep -n 'setCurrent' 5365cb22 -- internal/agent/loop.go
+353: l.setCurrent(root) ／ 354: defer l.setCurrent(nil) ／ 985: func (l *Loop) setCurrent(r *observe.Root)
+```
+
+**我这一笔用的尺是什么**＝**枚数＋逐枚定性**：先用 `git grep -nE` 把那三枚取全，再逐枚 `git show <锚>:<路径>｜sed -n '<n>p'` 看那一行到底是注释、读还是写（`cat -A` 未用，但 `:987` 那行的 `l.current = r` 形状本身就带赋值号）；setter 名册另用 `grep -n 'setCurrent'`。**没**重跑 155 验收件那把编译器尺（本票零仪器义务）。
+
+**对不上的一枚没有，而且本程量到比验收件更窄的一层**：那三枚里**只有 1 枚是读点**（`:523`）——`:348` 是注释、`:987` 是写点，所以"3 处读点"这个说法在**词**上和**数**上都与盘不符，原句还只列了其中 2 枚。⇒ 落下面这枚**新版行**（§2 那张表本体一字未改，旧文留在原地）：
+
+| 副本（新版） | 现量（`5365cb22`） | 算不算"另一个持有者" |
+|---|---|---|
+| `l.setCurrent(root)` `loop.go:353`（字段 `Loop.current *observe.Root` 声明在 `:189`） | `git grep -nE '\.current\b' -- internal/agent/loop.go` ＝ **3 枚**：`:348` **注释**、`:523` **读**、`:987` **写**（在 `:985` 那枚 setter 的体内，setter 被 `:353`／`:354` 调用）；字段声明 `:189` 是第 4 枚提及 ⇒ **读点只有 1 枚**，原句"3 处读点、只列 `:348`／`:523`"两处与盘不符 | **不算**——那一半本程独立复算成立：`Compressor` 结构体只有 `b`／`sum`／`lg` 三枚字段、六枚方法签名（`:98/:106/:115/:128/:189/:197`）无一枚接 `*Loop`／`*observe.Root`，`compress.go` 全文 `current` 与 `observe.Root` 各 **0** 命中 ⇒ `Compressor` 那侧够不着 |
+
+⇒ 这一笔**不动任何档位**：155 验收件 `:103` 那格的判词是"数与列不吻合…**结论仍成立**"，本程复算同一枚结论（够不着）与同一枚错（数与列），只是把"3 枚读点"再削成"1 枚读点"。
