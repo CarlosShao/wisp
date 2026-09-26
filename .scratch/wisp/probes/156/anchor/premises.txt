@@ -1,0 +1,18 @@
+$ git rev-parse HEAD
+79551d1b0bd4554b3fe08f20e370f78478d9c065
+
+$ git show 9835d81:cmd/wisp/slo_windows.go | grep -n 'exited()\|cmd.Wait()\|ProcessState'
+520:		if s.exited() {
+820:		if s.exited() {
+832:func (s *sloSubject) exited() bool {
+833:	return s.cmd != nil && s.cmd.ProcessState != nil && s.cmd.ProcessState.Exited()
+837:	if !s.exited() {
+840:	return s.cmd.ProcessState.ExitCode()
+851:	if s.cmd != nil && s.cmd.Process != nil && !s.exited() {
+855:		_ = s.cmd.Wait()
+
+$ git diff --stat 9835d81 HEAD -- cmd/wisp/ (empty = my write face unchanged since the dispatch commit)
+(rc=0)
+
+$ git status --porcelain -- cmd/wisp/ (before my edits)
+(above empty at 12:4x = clean)

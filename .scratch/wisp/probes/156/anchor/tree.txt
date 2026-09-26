@@ -1,0 +1,38 @@
+$ git rev-parse --short HEAD  (at 13:0x, siblings have landed since the dispatch commit)
+4e20e21
+
+$ git log --oneline 9835d81..HEAD
+4e20e21a docs(票 155 结＝四框全勾、票 153 推进一格；台账 A291；注入 §15/§16 两处追加；新票 157；派单 README 加一条尺): 我那句名册尺漏了 --no-walk，1730 枚 vs 13 枚——验收程把我的取数指令判坏了
+79551d1b evidence(票 154 续程 第 5 节 格 AC#4): 把"冻结面普查"写成逐支账——13 支(我自己从票面数的，枚数命令随附)×4 枚 commit 逐支 0，每支带分母/两发计数/grep rc/正控；名册现算 19 枚(派单那条命令照字面跑＝1728＝把四枚的祖先一起算了，那一发原样记下来)；两把名册尺 N1≡N2 今日四枚皆成立；字节口径 17 枚面级点位六点位全等；区间口径今天读到 43→60 枚随锚点腐坏、唯一那枚 frontend 命中归属 owner 的 902c3857(不是本票)；r1 那把尺四处不足逐条写(只给总数/单把名册尺/tools/d22scan 的 go.mod+runtests.sh 不在尺/“任何 golden”漏 internal/llm/golden 那 3 枚)；编排者那枚锚点 245d5f4 判〔不成立〕——git cat-file 与 --batch-all-objects 两发都读不出该对象
+3274e4d4 evidence(155 验收 §11.2 枚数递归打住): 本程 commit 从 7 变 8 不再追加第九枚——落一条规矩："本程 commit 枚数"只在最后一枚之后量一次、写法换成可反查的 sha 而不是绝对数，这一列才不会写完即腐坏
+3d5f164a evidence(155 验收 §11.1 自校一处歧义): "第 4 枚枚数错"在 §1 与 §5 指的是两枚不同的数——族册逐枚列全(六枚：名册 7/11/12、禁改面 13 支、正控 12 行、commit 7 枚)，其中本程抓到两枚(名册并集真为 13、正控逐字复到 11)、它自报四枚；落一句规矩："每收一次口就会变大"不能只当免责声明，得由另一个人重算
+b64daae6 evidence(155 验收 §7-§11 收口): 票面四枚框双向对账(AC#1/#3/#4 成立、AC#2 票面成立而强尺不成立，未裁七件各带最小闭合集合与"今天从盘上答不了"那一件)；没测十条按谁先被骗排序(第一条：宿主默认 logger 是 tee，两把尺同源)；放水两问自答(断言只往严加一枚"零命中降级成没跑到"、helper 全是交付里原有那几枚)并自报本程那枚少 re.M 的计数错；伪授权两栏=真回显 5 类/注入 0 条，另登记一条判据要补：issues/156 今天真存在，存在性反查这一腿变松，须路径+越权+时刻三腿同用
+be603fdb evidence(155 验收 §6 AC#4 活树自证复判): 三层分开钉——①本程自写取版器复到 1452/1452 mismatched=0(另取 5365cb22 得 1344，证明那枚数不是背的)；②它盘上那棵快照此刻 1452 枚 drift=0 missing=0、多的 4 枚全是 _test.go 且 git hash-object 与名册与锚点原件三向全等；③派单那一问的正身：internal/agent 整目录在 b23c7f7..6de3d1c5 区间 0 改动、go list -test -deps 闭包逐包 0、闭包外只有 bridge.go(151 的日志)——号指对了版本，但它只证了"树=6de3d1c5"、"等于交付那一版"这一半是本程补的，射程声明要补一句；坑#4 两条复现(archive blob1643 vs 落盘1679、third_party tracked=0)，-race 一行没跑
+be67397a evidence(155 验收 §5 AC#3 契约轴复判): 名册现算——155 名下 commit 10 枚(同区间 3 枚是 154 的，逐枚筛)、名册并集 13 枚(它收口数成 12，第 4 枚同族过期数)、13 枚全在声明写面内(grep -v rc=1)、16 支禁改面逐支两跑全 0、正控 b23c7f7 命中 3 枚复到、证据件那一支只有它自己；另撞出一枚会假报违规的坑回给派单：多 rev 不带 --no-walk 会吞整仓历史(现量 1730 枚)，加 --no-walk 才与逐枚 git show 并集 IDENTICAL
+c1d22cfb evidence(155 验收 §4 推进表复判): 两把尺分开答——票面 AC#2 字面成立(三行逐枚点名+还差谁)；派单那把强尺不成立，缺三样且各带现量出处：AC#2 是六件框它只推到两件(153 验收件 §12:827/:831-836 才有全档)、"票面拆出的 6 件"这枚指针指错文档(票面只写三问+两条警告)、AC#3 行给了指针没给档位；最小闭合三条都是加一列/改一句的量级；另钉住它确实一枚框没勾(两枚票面最后一次改动都是编排者的 b319bab)
+49f792fe evidence(155 验收 §3 格③ 复判): 另起一炉——本程自己的 6de3d1c5 快照 + 键级尺(encoding/json 解析每枚落盘记录、并比对 leg3 的值等不等于那次运行的 Result.TaskID)，ext-A/B/C/D 读数 3/2、3/0、3/1、3/2 逐枚复到它，正控 7/0 与 drop-attr 恰两枚红名复到，153 那枚两腿探针在 ext-C 下 PASS/ext-B 下 FAIL 独立复到"结构上看不见 unloop"；派单那一问答"哪句都没推翻"(153 自己先声明未造读数)，判补档不是纠正也不是多余；"更强的尺"收窄一档：宿主默认 logger 是 tee(logsink.go:153 现读)，文件腿确实比 stderr 腿硬、但两腿同源不是两枚独立通道
+edd07253 evidence(155 验收 §2 格② 复判): 问②答复成立——参数是持有者、组合根不是(RunAsync@cmd 两跑 0 命中把它那句断言升成读数)；四句"不算"逐句判：Root.ID/RunningTask.ID 不是打发、l.current 数与列不吻合(宣称 3 读点列了 2、其中一枚是写点)、Result.TaskID 那句"晚于压缩"盘上打错(:369 早 :396 二十七十行)；另钉出它漏报的两枚同帧持有者 journal 与 AdmitTask，故"唯一"措辞判说过头、不改 AC#2 档位
+67cc43f8 evidence(155 验收 §0+§1 格① 复判): 换编译器当尺——三条通道在 5365cb22 逐条编不过、同一发在改后版只有 traceTaskID 编得过(正控两向)，故"改前拿不到"是量出来的；它宣称的 12 行正控逐字复到是 11 行(第四枚按枚数腐坏的数，正控本身仍成立)；派单四枚前提逐条现量：①②④成立、③本程 5+5 连跑未复现抖动
+adff3bd6 docs(台账 A290＋注入世代第 18 代 §16): 三枚"任务通知"自带假号与未来时刻、宣布在飞的程已死并交付一张不存在的表——四条反扫全部不服从
+
+$ git diff --stat 9835d81 HEAD -- cmd/wisp/
+(empty above => nobody else touched cmd/wisp between my dispatch anchor and now)
+
+$ git show 9835d81:cmd/wisp/slo_windows.go | md5sum
+19e9d1d0304eb72575c30d19bcb72bc1 *-
+$ git show HEAD:cmd/wisp/slo_windows.go | md5sum
+19e9d1d0304eb72575c30d19bcb72bc1 *-
+$ git show 9835d81:cmd/wisp/slo_report_144_windows_test.go | md5sum
+726b4fbb8c2f3ec18df26a76335ed3a2 *-
+$ git show HEAD:cmd/wisp/slo_report_144_windows_test.go | md5sum
+726b4fbb8c2f3ec18df26a76335ed3a2 *-
+
+$ go version
+go version go1.27.1 windows/amd64
+$ ls third_party/sherpa-onnx/*.dll
+third_party/sherpa-onnx/onnxruntime.dll
+third_party/sherpa-onnx/sherpa-onnx-c-api.dll
+third_party/sherpa-onnx/sherpa-onnx-cxx-api.dll
+$ git status --porcelain -- cmd/wisp/  (what THIS程 has modified at 13:0x)
+ M cmd/wisp/slo_windows.go
+?? cmd/wisp/slo_exit_os_156_windows_test.go
