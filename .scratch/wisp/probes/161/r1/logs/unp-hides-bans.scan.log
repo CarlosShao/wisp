@@ -1,0 +1,15 @@
+# cell: unp-hides-bans
+# command: (cd "/d/work/workspace/projects plans/Wisp/tools/d22scan" && /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/161/r1/bin/d22scan-probe161.exe -root "/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/161/r1/runs/unp-hides-bans")
+d22scan: gitignore rules NOT APPLIED - D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/161/r1/runs/unp-hides-bans is the subdirectory ".scratch/wisp/probes/161/r1/runs/unp-hides-bans/" of a git repository, not its top, so that index is not this tree's index; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+d22scan: examined 12 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/161/r1/runs/unp-hides-bans
+d22scan: scope bans #1-5 internal/      examined  11 production Go files
+d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+d22scan: scope ban #6 frontend/         examined   1 text files
+d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+d22scan: scope ban #8 design/           examined   1 text files
+d22scan: scope ban #8 frontend/         examined   1 text files
+d22scan: scope ban #8 internal/         examined  11 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+internal/a/p_unp.go:1: [unparseable] D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\161\r1\runs\unp-hides-bans\internal\a\p_unp.go:15:14: expected ')', found '{' (and 1 more errors)
+d22scan: 1 finding(s); D22 bans are not negotiable (see PLAN.md D22, tools/d22scan/allowlist.txt)
+# rc=1

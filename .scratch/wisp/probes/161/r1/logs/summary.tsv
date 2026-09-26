@@ -1,0 +1,28 @@
+cell	expected_ban	expectation	rc	ring_count	rig_said_ban	finding_lines
+skeleton-clean	-	silent	0	0	no	
+b1-closure-bad	bare-goroutine	ring	1	1	yes	internal/a/p_b1.go:6: [bare-goroutine] bare `go func(` is banned (D22/D38b): use observe.Registry.Spawn (named, owner, recover boundary)~
+b1-named-bad	bare-goroutine	ring	1	1	yes	internal/a/p_b1.go:7: [bare-goroutine] bare `go probeReader(...)` is banned (D22/D38b, R16: named calls count too): use observe.Registry.Spawn (named, owner, recover boundary)~
+b1-clean	bare-goroutine	silent	0	0	no	
+b1-probe-testfile	bare-goroutine	unknown	0	0	no	
+b2-bad	pathresolver-bypass	ring	1	2	yes	internal/a/p_b2.go:7: [pathresolver-bypass] filepath.Clean outside the C26 PathResolver is banned (D22); see tools/d22scan/allowlist.txt for the sanctioned exceptions~internal/a/p_b2.go:9: [pathresolver-bypass] filepath.Abs outside the C26 PathResolver is banned (D22); see tools/d22scan/allowlist.txt for the sanctioned exceptions~
+b2-clean	pathresolver-bypass	silent	0	0	no	
+b2-probe-alias	pathresolver-bypass	unknown	0	0	no	
+b3-bad	plaintext-key	ring	1	2	yes	internal/a/p_b3.go:6: [plaintext-key] identifier probeAPIKey holds a plaintext key literal (D22/C28: SecretStore refs only)~internal/a/p_b3.go:9: [plaintext-key] identifier probeSecret assigned a plaintext key literal (D22/C28: SecretStore refs only)~
+b3-clean	plaintext-key	silent	0	0	no	
+b3-probe-structlit	plaintext-key	unknown	0	0	no	
+b4-sub-bad	wallclock-timeout	ring	1	1	yes	internal/a/p_b4.go:6: [wallclock-timeout] wall-clock delta (Sub(time.Now())) in what must be monotonic logic (D42#9/D22)~
+b4-unix-bad	wallclock-timeout	ring	1	1	yes	internal/a/p_b4.go:7: [wallclock-timeout] unix timestamp on a timeout/deadline line - monotonic clock required (D42#9/D22)~
+b4-clean	wallclock-timeout	silent	0	0	no	
+b5-bad	mirror-hash	ring	1	2	yes	internal/a/p_b5.go:6: [mirror-hash] hash material mentioned together with a mirror (C29/F3: hashes come from the signed manifest only)~internal/a/p_b5.go:7: [mirror-hash] hash material mentioned together with a mirror (C29/F3: hashes come from the signed manifest only)~
+b5-clean	mirror-hash	silent	0	0	no	
+b6-bad	panel-approval	ring	1	1	yes	frontend/p_b6.ts:3: [panel-approval] `approval.decide` in frontend/ is banned (D33/F2: allow decisions are native-side only)~
+b6-clean	panel-approval	silent	0	0	no	
+b6-probe-comment	panel-approval	unknown	1	1	yes	frontend/p_b6.ts:5: [panel-approval] `approval.decide` in frontend/ is banned (D33/F2: allow decisions are native-side only)~
+b7-bad	internal-artifact-tool	ring	1	3	yes	internal/tools/p_b7.go:4: [internal-artifact-tool] host-internal artifact write looks implemented as a gated tool name (D34 note 2/D22)~internal/tools/p_b7.go:5: [internal-artifact-tool] host-internal artifact write looks implemented as a gated tool name (D34 note 2/D22)~internal/tools/p_b7.go:7: [internal-artifact-tool] host-internal artifact write looks implemented as a gated tool name (D34 note 2/D22)~
+b7-clean	internal-artifact-tool	silent	0	0	no	
+b8-scope-bad	emoji	ring	1	4	yes	design/p_b8.html:3: [emoji] ban #8 glyph in scope design/ is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)~frontend/p_b8.ts:1: [emoji] ban #8 glyph in scope frontend/ is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)~internal/a/p_b8.go:5: [emoji] ban #8 glyph in scope internal/ is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)~cmd/probe/p_b8.go:3: [emoji] ban #8 glyph in scope cmd/ is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)~
+b8-comment-clean	emoji	silent	0	0	no	
+b8-probe-bands	emoji	unknown	1	2	yes	internal/a/p_b8.go:11: [emoji] ban #8 glyph in scope internal/ is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)~internal/a/p_b8.go:12: [emoji] ban #8 glyph in scope internal/ is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)~
+unp-bad	unparseable	ring	1	2	yes	internal/a/p_unp.go:1: [unparseable] D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\161\r1\runs\unp-bad\internal\a\p_unp.go:5:14: expected ')', found '{' (and 1 more errors)~internal/a/p_unp.go:3: [emoji] ban #8 glyph in scope internal/ is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)~
+unp-hides-bans	bare-goroutine	unknown	1	1	no	internal/a/p_unp.go:1: [unparseable] D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\161\r1\runs\unp-hides-bans\internal\a\p_unp.go:15:14: expected ')', found '{' (and 1 more errors)~
+al-overbroad	pathresolver-bypass	silent	1	1	no	internal/a/p_al.go:11: [bare-goroutine] bare `go func(` is banned (D22/D38b): use observe.Registry.Spawn (named, owner, recover boundary)~

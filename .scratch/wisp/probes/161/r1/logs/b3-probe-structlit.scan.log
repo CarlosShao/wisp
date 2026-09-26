@@ -1,0 +1,14 @@
+# cell: b3-probe-structlit
+# command: (cd "/d/work/workspace/projects plans/Wisp/tools/d22scan" && /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/161/r1/bin/d22scan-probe161.exe -root "/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/161/r1/runs/b3-probe-structlit")
+d22scan: gitignore rules NOT APPLIED - D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/161/r1/runs/b3-probe-structlit is the subdirectory ".scratch/wisp/probes/161/r1/runs/b3-probe-structlit/" of a git repository, not its top, so that index is not this tree's index; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+d22scan: examined 12 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/161/r1/runs/b3-probe-structlit
+d22scan: scope bans #1-5 internal/      examined  11 production Go files
+d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+d22scan: scope ban #6 frontend/         examined   1 text files
+d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+d22scan: scope ban #8 design/           examined   1 text files
+d22scan: scope ban #8 frontend/         examined   1 text files
+d22scan: scope ban #8 internal/         examined  11 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=11, bans #1-5 cmd/=1, ban #6 frontend/=1, ban #7 internal/tools/=1, ban #8 design/=1, ban #8 frontend/=1, ban #8 internal/=11, ban #8 cmd/=1; ban #8 emoji coverage: design/ 1 text files; frontend/ 1 text files; internal/ 11 Go files, comments and _test.go included; cmd/ 1 Go files, comments and _test.go included
+# rc=0

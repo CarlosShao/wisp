@@ -1,0 +1,12 @@
+# Ticket 161 r1 probe bench: what stays OUT of the repository.
+#
+# runs/  - generated fixture roots. Byte-reproducible from the committed
+#          bench.sh (`sh bench.sh all`), and they deliberately contain
+#          unparseable .go files: committed, those would turn CI's
+#          `gofmt (gofumpt)` step red for a sample that is supposed to be
+#          measured, not linted. So they are generated and ignored.
+# bin/   - the scanner binary this bench builds out of tools/d22scan to run 27
+#          cells fast (`*.exe` is already ignored at the root; named here so the
+#          rule does not depend on the extension).
+runs/
+bin/
