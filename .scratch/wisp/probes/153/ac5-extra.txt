@@ -1,0 +1,20 @@
+### 12000 名册（139 验收 §3.4 那枚过期陷阱的现量，锚点 vs 交付）
+-- 全仓 *_test.go 里的 12000 枚数
+   anchor 86b0161: 86b0161:internal/agent/compress_test.go:8 86b0161:internal/agent/compress_trace_test.go:1 
+   delivered b23c7f7: b23c7f7:internal/agent/compress_test.go:8 b23c7f7:internal/agent/compress_trace_test.go:1 
+-- compress_trace_test.go 单枚文件：anchor=1 delivered=1
+
+### d22scan examined 行数与真扫描块位置
+   total examined lines: 69
+228:d22scan: examined 228 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
+229:d22scan: scope bans #1-5 internal/      examined 205 production Go files
+230:d22scan: scope bans #1-5 cmd/           examined  23 production Go files
+231:d22scan: scope ban #6 frontend/         examined  67 text files
+232:d22scan: scope ban #7 internal/tools/   examined  18 production Go files
+233:d22scan: scope ban #8 design/           examined  39 text files
+234:d22scan: scope ban #8 frontend/         examined  67 text files
+235:d22scan: scope ban #8 internal/         examined 413 Go files, comments and _test.go included
+236:d22scan: scope ban #8 cmd/              examined  44 Go files, comments and _test.go included
+
+### tree .go counts at b23c7f7
+   internal=413 cmd=43
