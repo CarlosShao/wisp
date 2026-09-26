@@ -1,0 +1,4 @@
+head=b8ebe7d
+r4-asis-152-surface RUN=21 PASS=14 FAIL=0 SKIP=0 red=-
+r4-152g1-case14off RUN=20 PASS=13 FAIL=0 SKIP=0 red=-
+r4-152g1-case14live RUN=21 PASS=13 FAIL=1 SKIP=0 red=TestSLO152CorruptLegWithNoNamedPositionRefusesToBorrowOne
