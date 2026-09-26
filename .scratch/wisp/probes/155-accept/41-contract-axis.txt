@@ -74,3 +74,32 @@ internal/agent/loop.go
 -- 153 票面最后一次改动 / 155 票面最后一次改动 --
 b319bab 09-26 11:25 docs(票 151 结＝附条件成立、票 153 结＝部分结
 b319bab 09-26 11:25 docs(票 151 结＝附条件成立、票 153 结＝部分结
+
+### 7) 派单第 26 行那把尺照字面跑 vs 加 --no-walk
+(revs=fe13c119 c10f0c43 bb3a7a1e a52ded8a 91368201 829abe51 5f6646a7 4c43b68f 33c63066 2a303c51 )
+-- naive: git log A B C --name-only | sort -u 枚数 --
+1730
+-- 同一批 revs 加 --no-walk --
+枚数=13
+.scratch/wisp/probes/155/00-anchor-reverse-check.txt
+.scratch/wisp/probes/155/01-ac2-q1-before.txt
+.scratch/wisp/probes/155/02-ac2-q2-holder.txt
+.scratch/wisp/probes/155/10-snapshot-sync.txt
+.scratch/wisp/probes/155/11-ext-matrix.txt
+.scratch/wisp/probes/155/12-instrument-listing.txt
+.scratch/wisp/probes/155/13-ruler-caliber-diff.txt
+.scratch/wisp/probes/155/14-line-number-recheck-for-voided-block.txt
+.scratch/wisp/probes/155/20-delivery-shape.txt
+.scratch/wisp/probes/155/21-roster-and-counts.txt
+.scratch/wisp/probes/155/22-closing-shape.txt
+.scratch/wisp/probes/155/sync_blob_tree.py
+docs/evidence/s1/155-three-unjudged-cells-r1.md
+-- 与逐枚 git show 并集是否同一枚集 --
+IDENTICAL
+
+### 8) 名册里 docs/evidence/ 只有它自己那一枚？
+docs/evidence/s1/155-three-unjudged-cells-r1.md
+rc=0
+
+### 9) 十枚 commit 里有没有任何一枚碰过工作树里别人正在写的路径
+rc=1（1＝没有）
