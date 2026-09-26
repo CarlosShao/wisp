@@ -331,3 +331,84 @@ $ git status --porcelain -- .scratch/wisp/issues/            ->  空（票 151�
 两枚都是 `532fd25`（10:29，"票 154 按现量重写"那一枚 commit）**同一枚 commit 里新增**的。
 派单点名的是第二枚。第一枚若是被重写取代的旧面，它现在仍躺在工单池里＝**一枚可被重领的号**（`issues/README` 的防重领键是 `-done` 后缀，救不了同号双枚）。
 本程不判它谁对，只把这个形状钉在这里。
+
+## 第 7 节 格 AC#5 — 门禁六数＋名册两向 `comm`（派单攻击点⑥）
+
+**先更正本件第 1 节那两行的格号映射（旧文留在原地，新版贴这里）**：
+
+| 票面那一格 | 本件那一节（最终） |
+|---|---|
+| AC#1 | 第 2 节 |
+| AC#2 | 第 3 节 |
+| AC#3 | 第 4 节 |
+| AC#4 | 第 5 节 |
+| 三句残余（攻击点⑦） | 第 6 节 |
+| AC#5 | **第 7 节（本节）** |
+| 攻击点①②③④⑤⑥⑦ | 依次＝第 2 / 1 / 3 / 3 / 3 / 7 / 6 节（③④⑤全在第 3 节的三发变异里） |
+| 档位总判 | 第 9 节（放水两问＝第 8 节，本程没测什么＝第 10 节，伪授权两栏＝第 11 节） |
+
+### 7.1 六数：本程**逐包单跑**复算（改前用的是真·未修码树，不是 `-overlay` 回映射）
+
+四把尺先钉死（全部只认行首，避开它 §AC#5 点名的"汇总行造出假命中"）：
+`^=== RUN` ＝ RUN；`^--- PASS|FAIL|SKIP` ＝ 顶格裁决；`^[[:space:]]*--- PASS|FAIL|SKIP` ＝ 全量裁决；`^panic:` ＝ panic。
+`-count=1` 时全量裁决＝RUN 枚数（开跑与出裁决等集，本程三跑皆如此）。
+
+| 包 | 形 | 它的 RUN/顶格/FAIL/SKIP | 本程现读 | 台件 |
+|---|---|---|---|---|
+| `internal/tools` | 改前 `-count=1` | 115 / 79 / 0 / 0 | **115 / 79 / 0 / 0**，panic 0，全量 115 | `probes/151-accept/gate-pre-tools-v-rerun.txt`（`5d46f24^` 的 `bridge.head.go`） |
+| `internal/tools` | 改后 `-count=1` | 115 / 79 / 0 / 0 | **115 / 79 / 0 / 0**，panic 0，全量 115 | `gate-base-tools-v.txt` |
+| `internal/tools` | 改后 `-count=2` | 230 / 158 / 0 / 0 | **230 / 158 / 0 / 0**，panic 0，全量 230 | `gate-post-tools-count2-rerun3.txt`（第一发 260/166 是本程自己污染的树，见 7.4） |
+| `cmd/wisp` | 改前 `-count=1` | 136 / 76 / 0 / 0 | **136 / 76 / 0 / 0**，panic 0，全量 136 | `gate-pre-cli-v.txt`（未修码树＋本票新用例摘成 `package main`） |
+| `cmd/wisp` | 改后 `-count=1` | 138 / 78 / 0 / 0 | **138 / 78 / 0 / 0**，panic 0，全量 138 | `gate-base-cli-v2.txt` |
+| `cmd/wisp` | 改后 `-count=2` | 276 / 156 / 0 / 0 | **本节 commit 时那发还在跑**（编队里另有三枚验收程在抢 CPU）；落定后按"只追加"新开一节贴数，不回头改这张表 | `gate-post-cli-count2-rerun.txt` |
+
+⇒ **它自报的六数一枚不差**，而且本程的"改前"两跑**没走 `-overlay`**（派单点名的那枚"`-overlay` 与 `-cover*` 同用被静默忽略"的坑本程结构上碰不到，因为本程全程没开 `-cover`）。
+它 §6 那句"改前怎么量的"本程判：做法合法、读数可复算。
+
+### 7.2 名册两向 `comm`
+
+```
+cmd/wisp 顶格名册（尺＝^[[:space:]]*--- (PASS|FAIL|SKIP) 取第一列，改前/改后各一次）：
+  comm -13 (新增) = TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit
+                    TestCompositionRootClosesTheLoopTasksTaintScope
+  comm -23 (丢失) = 空
+名册对拍（本程 vs 实现程，同一把尺）：
+  改后 138 枚全量名册  comm -3 my-post-cli-all.txt theirs-post-cli-all.txt = 空
+  改前 136 枚全量名册  comm -3 my-pre-cli-all.txt  theirs-pre-cli-all.txt  = 空
+internal/tools 顶格名册：本程 79 枚 ＝ 它 names-post-tools.txt 79 枚，comm -3 = 空；
+  它自己的 names-pre-tools.txt ↔ names-post-tools.txt 两向 comm 也 = 空 ⇒ 本票在 internal/tools 没新增用例（与它 §6 第二道自核一致）
+```
+
+⇒ 名册这一条**完全对得上**，包括"两向皆空、只多那两枚"。
+
+### 7.3 其余三道工具（版本现读，不背它的数）
+
+```
+$ go vet ./internal/tools/ ./cmd/wisp/         ->  无输出，rc=0                     （probes/151-accept/tools-govet.txt）
+$ gofumpt --version                            ->  v0.12.0 (go1.27.1)              （与它 §6 同一枚版本，本程自己现读）
+$ gofumpt -l internal/tools cmd/wisp           ->  空                              （tools-gofumpt-l.txt；gofmt 那把尺没用）
+$ sh scripts/d22scan.sh                        ->  rc=0，clean                     （tools-d22scan.txt）
+     bans#1-5 internal/=205 cmd/=23 · ban#6 frontend/=67 · ban#7 internal/tools/=18
+     ban#8 design/=30 frontend/=67 internal/=413 cmd/=44        ← 各作用域分母全非零（AC#5 那半条成立）
+```
+
+⚠ 与它 §6 唯一不同的一枚：`ban#8 design/` 它记 **39**、本程记 **30**。差在哪本程量出来了：
+本程扫的是 `git archive` 那枚**纯净树**，它扫的是**共享工作树**——此刻工作树里 `design/**` 正被前端会话未提交地改
+（`git status` 现读：` D design/screens/*.html` 一堆、`?? design/old/`、`?? design/doubao/demo/**`）。
+⇒ **这不是它报错了，是同一把尺扫在两枚不同的树上**；它日志里那句 `cmd/ 的 ban#8 分母比 139 那件记的 43 多 1＝本票新增的那枚 _test.go`
+本程独立复到＝**44** ✓。另外本程这跑还多一行它没有的回显：
+`d22scan: gitignore rules NOT APPLIED - git cannot be consulted in D:/tmp/wisp151accept-base`（A207 那枚机依赖分母的已知方向，
+它自己在 §6 也点了"取数一律取尾部正式行"那枚坑）。
+
+### 7.4 本程自己撞的两枚仪器坑（写下来给下一程，不算它的账）
+
+1. **纯净树没有 `third_party/`** ⇒ 8 枚"要起真子进程"的用例红（第 0 节）。补 dll 目录后同一枚树 138/78/0。
+2. **`-count=2` 那一跑本程第一发读到 260/166**，比它的 230/158 多 30 枚 RUN／8 枚顶格——
+   差值正好＝本程为复跑 AC#1 而复制进 `internal/tools/` 的那枚探针（4 枚顶格＋11 枚子用例＝15 枚/趟 × 2 趟）。
+   换一枚重新 `git archive` 的干净树重跑＝**230/158**，与它逐字一致。
+   ⇒ 教训与本票同形：**自己的读数先怀疑自己的树**，再怀疑对方。
+
+⇒ **AC#5 这一格：成立。** 六数里五数逐字复到（第六枚在 commit 这发之前还在跑，落定后另开一节追加，不回头改表）；
+两包名册两向 `comm` 与本程和它的名册对拍全空；`go vet` rc=0、`gofumpt -l` 空（版本 v0.12.0 (go1.27.1) 现读）、
+`sh scripts/d22scan.sh` rc=0 且各作用域分母非零。它 §AC#5 点名的三把尺（只认 `--- FAIL`、不裸 `grep -c '--- FAIL'`、
+一枚 panic 会吞同包其余读数）本程按同一方向用了：`^panic:` 六跑皆 **0** ⇒ 没有"开跑了没回来"的用例。
