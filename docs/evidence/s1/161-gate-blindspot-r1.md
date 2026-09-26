@@ -255,3 +255,362 @@ CI 不跑它，`runtests.sh` 不跑它。它买的是"这一次的数字"，**�
 ⇒ 它们是**下一程的输入**，档位只能记〔我推断，未跑〕。
 
 ---
+
+## 3. AC#1 逐枚读数表（27 发；每发都有样本路径 / 命令 / rc / finding 原文 / 判定）
+
+**命令原文（27 发同一形制，逐枚的完整一行印在 `logs/<cell>.scan.log` 第 2 行）**：
+
+```
+(cd "D:/work/workspace/projects plans/Wisp/tools/d22scan" && \
+  .scratch/wisp/probes/161/r1/bin/d22scan-probe161.exe \
+  -root "D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/161/r1/runs/<cell>")
+```
+
+- 该二进制是 `sh bench.sh tool` 现场从 `tools/d22scan` **读源码编出来的**（`go build -o`），
+  本程没有写过它任何一个输入字节。新鲜度交叉核对见 §5.5。
+- 每一发的输出第一行都是
+  `d22scan: gitignore rules NOT APPLIED - ... is the subdirectory ".scratch/..." of a git repository, not its top`
+  ⇒ 假根**不是一把 git 顶层索引**，matcher 因此**一条规则都不适用**（`gitignore.go:261-273`）。
+  这对本程是**有利方向**：样本里不可能有文件被 ignore 悄悄跳过。
+- 机器表 = `.scratch/wisp/probes/161/r1/logs/summary.tsv`（28 行含表头，逐字入档）。
+- 判定用语：**响** = 该枚禁令的 `[tag]` 出现在 finding 里；**不响** = 同一 tag 一枚没有。
+
+| # | cell | 禁令 | 样本文件（相对假根） | rc | finding 枚数 | 判定 |
+|---|---|---|---|---|---|---|
+| 1 | `skeleton-clean` | —（对照） | 整套骨架 16 枚文件 | 0 | 0 | 骨架本身不响 ⇒ 其余"不响"可归因 |
+| 2 | `b1-closure-bad` | #1 | `internal/a/p_b1.go` | 1 | 1 | **响** |
+| 3 | `b1-named-bad` | #1（具名调用，R16#1 那一切） | `internal/a/p_b1.go` | 1 | 1 | **响** |
+| 4 | `b1-clean` | #1 | `internal/a/p_b1.go`（同词只在注释里） | 0 | 0 | **不响** ⇒ 尺不是恒响 |
+| 5 | `b1-probe-testfile` | #1 | `internal/a/p_b1_test.go` | 0 | 0 | 探针：**不响** ⇒ B3 |
+| 6 | `b2-bad` | #2 | `internal/a/p_b2.go`（`filepath.Clean`+`Abs`） | 1 | 2 | **响**（两臂都活） |
+| 7 | `b2-clean` | #2 | 同路径（Join/Base/Dir/Rel＋他接收者的 `Clean()`） | 0 | 0 | **不响** |
+| 8 | `b2-probe-alias` | #2 | 同路径（`import fp "path/filepath"` → `fp.Clean`） | 0 | 0 | 探针：**不响** ⇒ B1 |
+| 9 | `b3-bad` | #3 | `internal/a/p_b3.go`（const 臂＋assign 臂） | 1 | 2 | **响**（两臂都活） |
+| 10 | `b3-clean` | #3 | 同路径（名字闸全过，值靠形状/前缀挡下） | 0 | 0 | **不响** |
+| 11 | `b3-probe-structlit` | #3 | `internal/a/p_b3s.go`（结构体字面量字段） | 0 | 0 | 探针：**不响** ⇒ B2 |
+| 12 | `b4-sub-bad` | #4 | `internal/a/p_b4.go`（`deadline.Sub(time.Now())`） | 1 | 1 | **响** |
+| 13 | `b4-unix-bad` | #4（第二臂） | 同路径（`timeoutUnix := time.Now().Unix()+30`） | 1 | 1 | **响** |
+| 14 | `b4-clean` | #4 | 同路径（`time.Until`/`time.Since`/`b.Sub(a)`） | 0 | 0 | **不响** |
+| 15 | `b5-bad` | #5 | `internal/a/p_b5.go` | 1 | 2 | **响**（`:6` 声明行＋`:7` 纯引用行，见 A2） |
+| 16 | `b5-clean` | #5 | 同路径（hash 词与 mirror 词分行） | 0 | 0 | **不响** |
+| 17 | `b6-bad` | #6 | `frontend/p_b6.ts` | 1 | 1 | **响** |
+| 18 | `b6-clean` | #6 | 同路径（`approval.request`） | 0 | 0 | **不响** |
+| 19 | `b6-probe-comment` | #6 | 同路径（`approval.decide` **只出现在注释里**） | 1 | 1 | 探针：**响** ⇒ A1 |
+| 20 | `b7-bad` | #7 | `internal/tools/p_b7.go` | 1 | 3 | **响**（`:5` 点号名＋`:7` 裸词；`:4` 见 A1） |
+| 21 | `b7-clean`（第二版） | #7 | 同路径（近邻拼写两枚） | 0 | 0 | **不响** |
+| 21b | `b7-clean` 第一版 | #7 | 同上，但注释里带了一对引号词 | 1 | 1 | **响在注释** ⇒ A1，日志另存 `logs/b7-clean.first-run-rang-on-comment.log` |
+| 22 | `b8-scope-bad` | #8 | 四枚作用域各一发：`design/p_b8.html`、`frontend/p_b8.ts`、`internal/a/p_b8.go`、`cmd/probe/p_b8.go` | 1 | 4 | **响，四枚 scope 全活** |
+| 23 | `b8-comment-clean` | #8 | 同四路径的"字形只进注释"版 | 0 | 0 | **不响**（Q-46(c) 豁免成立） |
+| 24 | `b8-probe-bands` | #8 | `internal/a/p_b8.go` 四枚字形各一：`→`/`①`/`✓`/`≤` | 1 | 2 | **只 `✓`+`≤` 响** ⇒ B4 |
+| 25 | `unp-bad` | `unparseable` | `internal/a/p_unp.go` | 1 | 2 | **响**（`unparseable`＋同文件那枚 #8 字形仍响） |
+| 26 | `unp-hides-bans` | #1–#5 | 同路径（不解析的文件里再塞 `go func(){}`＋`filepath.Clean`） | 1 | 1 | **只响 `unparseable`** ⇒ B5 |
+| 27 | `al-overbroad` | #2/#1 | `internal/a/p_al.go`＋本 cell 自带的假 allowlist | 1 | 1 | `bare-goroutine` 响、**同文件 `pathresolver-bypass` 被前缀压掉且零打印** ⇒ B6 |
+
+### 3.1 finding 原文（逐字，从 `logs/*.scan.log` 抄）
+
+```
+b1-closure-bad  : internal/a/p_b1.go:6: [bare-goroutine] bare `go func(` is banned (D22/D38b): use observe.Registry.Spawn (named, owner, recover boundary)
+b1-named-bad    : internal/a/p_b1.go:7: [bare-goroutine] bare `go probeReader(...)` is banned (D22/D38b, R16: named calls count too): use observe.Registry.Spawn (named, owner, recover boundary)
+b2-bad          : internal/a/p_b2.go:7: [pathresolver-bypass] filepath.Clean outside the C26 PathResolver is banned (D22); see tools/d22scan/allowlist.txt for the sanctioned exceptions
+b2-bad          : internal/a/p_b2.go:9: [pathresolver-bypass] filepath.Abs outside the C26 PathResolver is banned (D22); see tools/d22scan/allowlist.txt for the sanctioned exceptions
+b3-bad          : internal/a/p_b3.go:6: [plaintext-key] identifier probeAPIKey holds a plaintext key literal (D22/C28: SecretStore refs only)
+b3-bad          : internal/a/p_b3.go:9: [plaintext-key] identifier probeSecret assigned a plaintext key literal (D22/C28: SecretStore refs only)
+b4-sub-bad      : internal/a/p_b4.go:6: [wallclock-timeout] wall-clock delta (Sub(time.Now())) in what must be monotonic logic (D42#9/D22)
+b4-unix-bad     : internal/a/p_b4.go:7: [wallclock-timeout] unix timestamp on a timeout/deadline line - monotonic clock required (D42#9/D22)
+b5-bad          : internal/a/p_b5.go:6: [mirror-hash] hash material mentioned together with a mirror (C29/F3: hashes come from the signed manifest only)
+b5-bad          : internal/a/p_b5.go:7: [mirror-hash] hash material mentioned together with a mirror (C29/F3: hashes come from the signed manifest only)
+b6-bad          : frontend/p_b6.ts:3: [panel-approval] `approval.decide` in frontend/ is banned (D33/F2: allow decisions are native-side only)
+b6-probe-comment: frontend/p_b6.ts:5: [panel-approval] `approval.decide` in frontend/ is banned (D33/F2: allow decisions are native-side only)
+b7-bad          : internal/tools/p_b7.go:4: [internal-artifact-tool] host-internal artifact write looks implemented as a gated tool name (D34 note 2/D22)
+b7-bad          : internal/tools/p_b7.go:5: [internal-artifact-tool] host-internal artifact write looks implemented as a gated tool name (D34 note 2/D22)
+b7-bad          : internal/tools/p_b7.go:7: [internal-artifact-tool] host-internal artifact write looks implemented as a gated tool name (D34 note 2/D22)
+b7-clean 第一版 : internal/tools/p_b7.go:4: [internal-artifact-tool] host-internal artifact write looks implemented as a gated tool name (D34 note 2/D22)
+b8-scope-bad    : design/p_b8.html:3: [emoji] ban #8 glyph in scope design/ is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)
+b8-scope-bad    : frontend/p_b8.ts:1: [emoji] ban #8 glyph in scope frontend/ is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)
+b8-scope-bad    : internal/a/p_b8.go:5: [emoji] ban #8 glyph in scope internal/ is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)
+b8-scope-bad    : cmd/probe/p_b8.go:3: [emoji] ban #8 glyph in scope cmd/ is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)
+b8-probe-bands  : internal/a/p_b8.go:11: [emoji] ... 同一句话（该行字形是 U+2713）
+b8-probe-bands  : internal/a/p_b8.go:12: [emoji] ... 同一句话（该行字形是 U+2264）
+unp-bad         : internal/a/p_unp.go:1: [unparseable] D:\work\...\runs\unp-bad\internal\a\p_unp.go:5:14: expected ')', found '{' (and 1 more errors)
+unp-bad         : internal/a/p_unp.go:3: [emoji] ban #8 glyph in scope internal/ is banned (D23): ...
+unp-hides-bans  : internal/a/p_unp.go:1: [unparseable] D:\work\...\runs\unp-hides-bans\internal\a\p_unp.go:15:14: expected ')', found '{' (and 1 more errors)
+al-overbroad    : internal/a/p_al.go:11: [bare-goroutine] bare `go func(` is banned (D22/D38b): use observe.Registry.Spawn (named, owner, recover boundary)
+```
+
+**结论行（本格真正的答话）**：**`// Bans` 名单上 8 枚编号禁令，今天 8 枚都点得得到**，
+每一枚都同时给出"违规响＋干净不响"这一对；`unparseable` 那枚发现类型也响。
+**没有一枚禁令是死的。** 门今天不瞎——但它今天**瞎在六个更窄的地方**，逐条在 §4。
+
+---
+
+## 4. 盲区清单与各自的"会响条件"
+
+`今天量到的＝静默` 全部是 §3 表里的现跑读数；`会响条件` 是**下一程可直接抄成 cell 的判据**，
+档位＝〔我推断，未跑〕（本程明令不装自检，所以这些条件我一个都没兑现）。
+
+**B1 — ban #2 对别名导入让步（`b2-probe-alias`：rc=0，零 finding）**
+- 形状：`import fp "path/filepath"` + `fp.Clean(p)`。matcher 判的是
+  `sel.X.(*ast.Ident).Name == "filepath"`（`main.go:715`），即**接收者的局部名字**，不是**包身份**。
+- 与禁令文字的关系：文字是"`filepath.Clean` / `filepath.Abs` 在 allowlist 之外"——
+  换别名以后**决策仍然在 C26 PathResolver 之外** ⇒ 这是**门的射程比它自己的文字窄**。
+- 会响条件：假根 `internal/a/p_b2.go` 含 `fp "path/filepath"` 且出现 `fp.Clean(` ⇒ 必须
+  `[pathresolver-bypass]` 响。修法两选一（**都属下一程/契约面，本程不选**）：
+  按 import 的**路径**解析包身份，或把"局部名 ≠ filepath 的 Clean/Abs"另立一枚新禁令。
+- 这一枚登记买什么：**防回归**——真树今天有没有别名用法我**没量**（§2 N1）；
+  先把"门比自己的文字窄"钉住，别让下一位以为文字即射程。
+
+**B2 — ban #3 只看"声明/赋值"两种左值（`b3-probe-structlit`：rc=0）**
+- 形状：`probeCfg{APIKey: "<合成串>"}`（合成字面量的字段）。AST 只走 `ValueSpec` 与
+  左值为 `Ident` 的 `AssignStmt`（`main.go:723-755`），`*ast.CompositeLit` 里那枚
+  `KeyValueExpr` 的 `BasicLit` 没人看。
+- 同族没量的：map 字面量、函数实参位、结构体指针字段。
+- 会响条件：假根 `internal/a/p_b3s.go` 含 `type T struct{ APIKey string }` +
+  `var v = T{APIKey: "<16+ 字符、含数字、无空白>"}` ⇒ 必须 `[plaintext-key]` 响。
+- 买什么：**防忘记**（这是 C28 的语义洞、不是拼写洞；补它要动 ban #3 的实现射程 ⇒ 下一程）。
+
+**B3 — bans #1–#5 对 `_test.go` 整体不看（`b1-probe-testfile`：rc=0）**
+- 这是**声明过的作用域**（`main.go` 文档注释："production scope internal/ + cmd/
+  (non-test, non-testdata)"），不是 bug。但它与 AGENTS.md 禁止清单的文字（"裸 `go func(`
+  而无 owner/recover"）**没有 test 豁免**。
+- 我顺手查了有没有别的仪器补这一格：**没有**。同族的 `internal/observe/nobarego_test.go`
+  自己也 `strings.HasSuffix(path, "_test.go")` 就跳过（该文件 39 行）
+  ⇒ 测试文件里的裸 goroutine **今天零枚仪器**。
+- 会响条件：假根 `internal/a/p_b1_test.go` 含 `go func() {}()` ⇒ 要么 d22scan 响（改射程＝契约级），
+  要么新增一枚管 test 的尺。**这一条属"未定义即停"**：该不该管是 owner 的话，不是本程的。
+- 买什么：**防忘记**（把"文字说不得、仪器没看着"这一对记在同一处）。
+
+**B4 — ban #8 的两段波段空隙（`b8-probe-bands`：四发里两发不响）**
+- 实测量到的：字符串里的 `✓`(U+2713) 与 `≤`(U+2264) **响**；`→`(U+2192) 与 `①`(U+2460) **不响**。
+- 与 `main.go:156-164` 的自陈**一致**（`2190–21FF`、`2460–24FF` 是刻意留的空隙，由
+  `TestBan8MathBandAndRemainingGaps` 正反钉住），也**证实 AGENTS.md §1.2 那句"实际后果"**。
+- 所以这一枚**不是新洞**，是"已知洞＋我第一次拿真样本量到它"。会响条件（反向）：
+  假根字符串里放 `→` ⇒ 今天**必须不响**；一旦有人把箭头段并进去，这一发就该翻响并且
+  **该被名册看见**（那是 `Q-46`/票 141 的契约面，本程一字节不碰）。
+- 买什么：**防回归**（钉住"今天不响"这个事实，波段哪天被放宽时才发现多出的一响）。
+
+**B5 — 一枚不解析的文件对 #1–#5 完全隐形（`unp-hides-bans`：rc=1，只响 `unparseable`）**
+- `scanGoFile` 在 `parser.ParseFile` 失败处 `s.add("unparseable", …); return nil`
+  （`main.go:684-689`）⇒ 该文件的 #1/#2/#3（AST）**和同一个函数后半段那两枚逐行禁令
+  #4/#5 全部跳过**。实测：文件里同时塞了 `go func(){}` 与 `filepath.Clean(`，零枚响。
+- 危害形状：**修好语法再跑一次**才可能露出裸 goroutine；而今天这一跑给人的话是
+  "1 finding: unparseable"，一个字的"这枚文件我五道禁令都没看"都没有。
+- 会响条件：假根里一枚**故意不解析、内含 #1 形状**的文件 ⇒ 输出必须**同时**含
+  `[unparseable]` 与 `[bare-goroutine]`（做法：解析失败时退回逐行正则那一族，或明打印
+  "bans #1-5 skipped for this file"）。
+- 买什么：**防回归**（这就是"门还在、还在报通过，但它已经看不见东西"的**原生形状**，
+  票 161 立票要防的正是它）。
+
+**B6 — allowlist 抑制零枚计数、零枚打印（`al-overbroad`：同文件 `filepath.Clean` 静默消失）**
+- 假 allowlist 一行 `pathresolver-bypass<TAB>internal/<TAB>…` ⇒ **整个 internal/ 的 #2 从此不响**，
+  而 `bare-goroutine` 照常响（抑制是**按枚**的，这点与文字一致）。
+- 更要紧：`verdict()` 的 8 行自报告里**没有任何"本次抑制 N 条"**
+  （见 `logs/al-overbroad.scan.log` 全文）⇒ "allowlist 被写宽"这件事对人不可见。
+  真仓今天 **5 条**（`grep -vc '^#\|^$' tools/d22scan/allowlist.txt` = 5），两条是整文件前缀。
+- 会响条件：假根 allowlist 含一条**目录前缀**且样本里该目录下有该枚违规 ⇒
+  输出必须打印 `suppressed=N (by entry …)`，或让"条目零命中"本身成为一枚红。
+- 买什么：**防忘记**（`allowlist.txt` 在 AC#5 冻结名单里，动它＝人工批准；先把"它无声"记下来）。
+
+### 4.1 三枚"不是盲区、是脾气"的读数（同批 cell 顺手量到的，别当新洞报）
+
+- **A1 注释策略在一把门里有三套**：`b6-probe-comment`（`frontend/**` 的注释里写了
+  `approval.decide` ⇒ **响**）与 `b7-clean` 第一版（`internal/tools/**` 注释里带了一对引号词
+  ⇒ **响**，见 `logs/b7-clean.first-run-rang-on-comment.log`）。
+  同一工具里：#8 走 AST/词法注释分类器（豁免），#4/#5 走"整行以 `//` 开头就跳过"，
+  #6/#7 走 `walkText`**完全不剥注释**。⇒ 实际后果：**给面板写一句解释 `approval.decide`
+  的注释，今天就能把 CI 弄红**；这也解释了票 169 为什么一枚装饰字符就同时摘掉几道门。
+  （没量到的一侧：#5 的整行注释豁免我只在**码里**看见（`main.go:761`），样本里两个词没同现在
+  同一行 ⇒ 那条属读码、不属读数，档位〔未取样〕。）
+- **A2 ban #5 的精度＝同行字面共现**：`b5-bad` 第 2 枚响在 `return mirrorSHA256`——
+  一行**纯引用**，没有任何"从镜像取哈希"的数据流。⇒ 这条尺看名字同现、不看流向：
+  误报面由此来，反过来它也**不会**抓到拼写不同的真取哈希代码。
+- **A3 ban #8 的 `frontend/` 是 everyFile**：二进制也按字节搜（`walkEmoji` 的 everyFile 分支自陈）。
+  本程**没取样**二进制（§2 N3 已列）。
+
+---
+
+## 5. 门禁：四数 + 名册两向 `comm` 差集（全部我本轮现跑，锚 `fbe12c7`）
+
+### 5.1 仪器版本（先现跑再贴）
+
+```
+$ go version
+go version go1.27.1 windows/amd64
+$ /d/work/base/gopath/bin/gofumpt.exe --version
+v0.12.0 (go1.27.1)
+```
+
+⚠ `gofumpt` 不在本 shell 的 PATH 上（`which gofumpt` rc=1、裸 `gofumpt --version` rc=127），
+只在 `go env GOPATH`/bin 里有 `gofumpt.exe` ⇒ 以下均用全路径。环境事实，不是判据。
+
+### 5.2 `tools/d22scan` 那一包：改前 / 改后四数 + 名册
+
+| 读数 | pre（step-0 之后、写任何东西之前） | post（27 发跑完、§0–§2 提交之后） |
+|---|---|---|
+| 命令 | `sh tools/d22scan/runtests.sh -C tools/d22scan ./...` | 同 |
+| rc | 0 | 0 |
+| 四数 | `PASS=30 FAIL=0 SKIP=0`、`=== RUN=70` | `PASS=30 FAIL=0 SKIP=0`、`=== RUN=70` |
+| FAIL 名册 | 空 | 空 |
+| 日志 | `logs/pre-baseline-runtests.log`（225 行） | `logs/post-baseline-runtests.log`（225 行） |
+
+名册两向差集（`grep '^--- PASS'` 取顶层名 → `sort -u` → `comm -23` / `comm -13`）：
+
+```
+pre-only :  (空)
+post-only:  (空)
+counts: pre=30 post=30        # logs/pre-passnames.txt, logs/post-passnames.txt
+```
+
+**§4 点名的那两枚今天什么样**：两本日志里都在、且**都是 PASS**——
+`post-baseline-runtests.log:23  --- PASS: TestScannerSelfScanOfRealRepoIsGreen (0.80s)`、
+`:138 --- PASS: TestRealRepoLedgerIsHonest (0.85s)`。
+⇒ 我的门禁口径落地为：**"除（现已不存在的）那两枚之外零枚新增红" ＝ 零枚红；名册差集两向皆空**。
+判据文字、断言、`frontend/**` **一概没动**（三件禁事一件都没做）。
+
+### 5.3 `go vet`
+
+```
+$ go vet ./tools/d22scan/                      # 派单 §6 原文
+main module (github.com/CarlosShao/wisp) does not contain package .../tools/d22scan   rc=1
+$ cd tools/d22scan && go vet ./                # 与 ci.yml:124-126 同形制
+rc=0                                           # logs/pre-baseline-govet.log / -inmodule.log
+```
+
+⇒ 派单 §6 那条**原文不可跑**（跨模块），修正后的形状 rc=0。本程一枚 Go 源码都没写，
+这一发的作用是"证明没写坏、而不是没跑"。
+
+### 5.4 `sh scripts/d22scan.sh`（全仓那一腿）
+
+```
+$ sh scripts/d22scan.sh          rc=0                       # pre 与 post 各一次
+finding 枚数 = 0                # grep -cE '^[A-Za-z0-9_./-]+:[0-9]+: \[' = 0
+```
+
+自报告（`logs/post-d22scan-sh.log` 末尾，逐字）：
+
+```
+d22scan: examined 228 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
+d22scan: scope bans #1-5 internal/      examined 205 production Go files
+d22scan: scope bans #1-5 cmd/           examined  23 production Go files
+d22scan: scope ban #6 frontend/         examined  85 text files
+d22scan: scope ban #7 internal/tools/   examined  18 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined  85 text files
+d22scan: scope ban #8 internal/         examined 414 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined  45 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; ...
+```
+
+⇒ 派单 §4 的"rc=1／1 枚 finding"在锚上**不成立**（来路见 §1.1）。
+另记两处（不改任何东西，只记档）：
+① `main.go:36` 的注释写 ban #6 的 `frontend/` 是 **40** 枚，现跑是 **85**；
+② `set -eu` 让 `runtests.sh` 一挂就**根本不跑**第 2 步的全仓扫描 ⇒
+"脚本 rc"与"门看没看见"不是一回事（同族形状已登记在票面 **AC#6①**，归下一程）。
+
+### 5.5 台件自身的两件小事（新鲜度与格式）
+
+- **二进制不是过期货**：同一 cell 两条路各跑一次，finding 逐字相同
+  （`logs/b8-scope-bad.scan.log` 那 4 行 vs `logs/gorun-b8-scope-bad.log`，
+  后者是 `go run . -root <假根>`；两本唯一差别是 `go run` 自己加的 `exit status 1`）。
+- `gofumpt -l . tools/d22scan tools/mockllm`（派单 §6 要求"必须空"）：
+
+```
+pre :  rc=0，3 行 —— .scratch/wisp/probes/158/accept-r1/mut/guard.no{1,2,3}.go（**不是我产物**，
+        git ls-files 证明是入库件；盘上是 LF，故非 CRLF 假象）
+post:  rc=2，8 行 —— 上面 3 行 ＋ 我生成的 runs/ 里 5 行（两枚故意不可解析的 .go ＋一枚对齐差异）
+```
+
+  处置：(a) `runs/`、`bin/` 已被 `.scratch/wisp/probes/161/r1/.gitignore` 挡在库外 ⇒
+  提交里没有它们，CI 的检出不会因为我多一行；
+  (b) 那 3 行**本程一格未动**（不是我写面，且 `guard.no*.go` 是票 158 的变异台件，
+  "修它"＝踩别人的实验）。
+  ⇒ 按 §9 报回：**"gofumpt 必须空"这一条在我的锚上本来就不成立**。
+  ⚠ CI 用 `gofumpt@latest`、我本机 v0.12.0，两边会不会同判**我没跑过 CI**（档位〔仅本机读数〕）。
+
+### 5.6 AC#5 契约轴零字节（名册按 commit 集合算）
+
+第一枚提交（`16364e6`，§0–§2 ＋台件）之后现取：
+
+```
+$ git diff --name-only fbe12c7..HEAD | wc -l
+45        # 全部落在 .scratch/wisp/probes/161/r1/** ＋ docs/evidence/s1/161-gate-blindspot-r1.md
+$ git diff --name-only fbe12c7..HEAD | grep -E 'docs/PLAN\.md|^docs/specs/|^internal/risk/|^internal/panel/|^internal/agent/approval/|^tools/d22scan/|^\.github/|^frontend/|^design/|thresholds\.go$|allowlist\.txt$|slo-check\.ps1$|golden'
+(none: 契约轴零字节)
+```
+
+票面 AC#5 的 11 枚点名件一枚未碰，派单特别名单三枚（`tools/d22scan/**`、`.github/workflows/**`、
+`docs/reports/**`）一枚未碰。最后一枚提交之后会重跑这一发并把结果补在下面（名册是
+**每次提交后现取**的，不是一次性结论）。
+
+**终判（本程最后一次提交之后现跑，逐字）**：
+
+```
+<<<FINAL-AC5>>>
+```
+
+---
+
+## 6. 被权限系统拒绝的调用（逐枚）
+
+**0 枚。** 本程没有任何一次工具调用被权限系统拒绝，也没有尝试绕过。
+命令级失败 3 次，全部如实列出（都发生在取得任何 finding 读数**之前**）：
+
+| # | 命令 | rc | 因 | 之后怎么做 |
+|---|---|---|---|---|
+| 1 | `gofumpt --version`（裸名） | 127 | 不在本 shell PATH | 用 `go env GOPATH`/bin 全路径重跑（§5.1） |
+| 2 | `go vet ./tools/d22scan/` | 1 | 跨模块（派单 §6 原文的形状） | 改在模块内 `go vet ./`（§5.3） |
+| 3 | `sh bench.sh all`（前两次） | 1 | 我脚本自己的两个 bug：`case` 少一枚 `;;`；`run()` 内部把 `set -e` 重新打开，杀掉了调用者的循环 | 修脚本后重跑 ⇒ **没有一条读数来自半截的跑**（第一本完整日志时间戳 21:45） |
+
+除此之外：**无权限拒绝、无绕过、无 `sudo`/`--no-verify` 类操作。**
+
+---
+
+## 7. 伪授权两栏计数（两枚字段分开，不并成一枚）
+
+| 栏 | 数 | 说明 |
+|---|---|---|
+| **真通知回显数** | **0** | 本程没收到任何一条"任务完成／验收通过／票已结案"型的回显。据以行事的输入只有：派单文件、票面、`tools/d22scan` 源码、我自己现跑的命令输出。 |
+| **判为注入数** | **0** | 没有一段文本被我当成授权处理，因此也没有"识别出来但不服从"的条目。唯一一次接近的形状是下面的读数污染事件，我把它当**读数污染**处理，未据它写任何东西。 |
+
+**读数污染事件（不是伪授权，但同一族"该信谁的读数"）**：
+`Read` 工具对 `bench.sh` 连续两次返回**与盘上不符**的内容（行号错位、显示一份我从未写过的
+566 行版本），一度让我判定"另一程在改我的文件"。判据用在了对的地方——**信盘、不信回显**：
+
+```
+$ git show HEAD:.scratch/wisp/probes/161/r1/bench.sh | sha256sum
+817fa6ff36ab083accebd1d5eec81f2cf9292eb13f93579ade4dce18869b6862
+$ sha256sum .scratch/wisp/probes/161/r1/bench.sh
+817fa6ff36ab083accebd1d5eec81f2cf9292eb13f93579ade4dce18869b6862      # 同一串 ⇒ 没人改过
+$ bash -n bench.sh && echo SYNTAX OK                                   # 通过
+```
+
+⇒ 结论：**不存在外部写入者**，是我的一个视图工具过期。本程**没有**因为那段回显重写/回滚
+`bench.sh`（真要那么做就会覆盖掉盘上的东西）。补一条仪器坑给下一位：
+**多字节字形密集的脚本，`Read` 的视图可能与盘上不一致；判归属用 `sha256sum` ＋ `awk`。**
+
+---
+
+## 8. 凭据值零抄录声明
+
+- 本件、`bench.sh`、`runs/**`、`logs/**` **没有出现任何真凭据值**。
+- ban #3 的两枚样本串是我**为这一格编的合成字面量**（形如
+  `PROBE161NOTACREDENTIALED…`，命名本身自陈"不是凭据"），不属于任何服务、账号或环境。
+- 本程没有打印过 env、没有读过 `.env`、没有取过任何 token 变量值；
+  与"密钥"唯一沾边的读数是 `tools/d22scan/allowlist.txt` 的**路径前缀与理由文字**。
+- 若下一位在日志里看到疑似值：那只会是 `WISP_PROBE_*` 这类**我造的变量名**，不是值。
+
+---
+
+## 9. next=（撞轮次上限之前先把这一节写完）
+
+给票 161 **下一程（AC#2：把自检装上）**的话，本程一格都不代做：
+
+1. §3 那 27 枚 cell 就是 `--self-test` 的成对样本现成清单——照 `bench.sh` 里
+   `expect_of()` 那 28 行抄成表即可（cell, ban, ring|silent），一行不落地两向都过。
+2. §4 的 **B1/B2/B5/B6** 各带一发"会响条件"，先当**失败预演**用；
+   装成"允许失败但会打印"的那条腿是错的形状（要么响，要么明写不覆盖）。
+   **B3 属"未定义即停"**：`_test.go` 该不该进 ban #1–#5 的射程，是 owner 的一句话。
+3. §2 N2：`allowlist.txt` 的抑制今天**零打印**——那是"门自己瞎了还印 clean"最短的一条路。
+4. §5.5 那 3 行 `gofumpt` 脏件不是我产物、但在库内；归谁收请编排者定（本程未动）。
+5. 本程所有读数的锚是 **`fbe12c7`**。**任何"改前基线"请重新现量**，不要抄 §5.2 的四数——
+   编排者 21:23 那一次就已经被 21:26 的提交作废过一次，形状与票 158 的教训一模一样。
+
