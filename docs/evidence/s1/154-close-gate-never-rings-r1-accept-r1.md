@@ -203,3 +203,68 @@ $ 入口现读＝cmd/wisp/main.go:103  case "panel-assets":（生产命令面，
 
 **成立。** 三段都不是打发：每句能指回一件盘上事实（§2.3 那栏的右边全是本程现量，行号按两枚锚点各取一次）；"不许预引未产出读数"这一条**通过**（注释零枚读数型句子，两处指针在写它的那一刻已入库）；票面那句判据（只读注释的人能否自答"我这腿要不要自己关"）**能答**，因为自测问句与"no test will tell you so"都在。
 带两枚缺陷：**D-6**（"还没 owner 的腿"清单缺今天唯一那枚实例）与 **D-7**（"没有一枚用例让两枚 scope 同时开着"的措辞比它的判据宽）。
+
+---
+
+## 第 3 节 格 AC#3 — 同族普查：换尺（AST）重扫 ＋ 判它有没有漏族
+
+派单要本程"换尺重扫（它用 `git grep`；你换 `--name-only`×逐枚、或 AST／`go list` 级）＋判它有没有漏族：注册/注销、加/解监听、`Open`/`Close`、`Acquire`/`Release`、`Defer(` 挂在今天不可达的边上"。
+
+### 3.1 本程的尺与它的射程（先把尺写死，免得"零命中"没主语）
+
+```
+取版＝git ls-tree -r --name-only 5766be9 -- internal cmd → 457 枚 .go
+     ＋ git cat-file --batch（stdin 走文件、不走管道，按派单的坑②办）→ 457 枚 blob 全部落 D:/tmp/wisp-154-accept/tree/
+尺＝go/parser 单文件语法树（stdlib、离线）：枚举 ①名字落在 lifecycle 动词表里的声明（含接收者类型）
+    ②所有 selector 调用 x.Foo() 的 (Foo, 接收者表达式文本, 所在函数, 生产/测试, 文件:行)
+读数＝声明 122 枚／调用点 2108 枚／**parse-error 0 枚**（台件 probes/154-accept/ac3-ast-roster-5766be9.txt，2260 行）
+第二棵＝tools/**（他们 §4.3 明写"未穷举"的那支）：15 枚 .go，同一把尺，parse-error 0
+        （台件 D:/tmp/wisp-154-accept/ast-roster-tools.txt，读数转记在 §3.4 第 6 条）
+```
+
+⚠ **本尺的三处结构性吃不到，先于任何结论写出来**：①只认 `x.Foo()` 形状 ⇒ **裸标识符调用**（`unregisterAll(...)`、`closeJob(...)`）不在名册里；②**接收者只到表达式文本，不到静态类型** ⇒ 配对表是"按方法名"配的，一枚 `Close` 会被算给所有叫 Close 的东西（`llm.Usage.Add` 那种累加器因此会被误点名为"只开不合"）；③动词表**没含 `Notify`** ⇒ `signal.Notify` 这一族本尺整个漏掉，是 §3.4 第 3 条用派单点名的族名去手查才捞回来的。
+⇒ 第③条与本票 §4.1 末段 r1 自己那枚"整词尺吃不到 `pUnregisterHotKey`"是**同一类错的两种形**：本程不据此说他们的尺差，只说**两把尺在这里同盲**（`unregisterAll` 我的 AST 也看不见），所以他们的第 13 对本程**无法用 AST 尺复核**，只能用他们的 grep 尺换个旗重跑（下 §3.3 第 13 行）。
+
+### 3.2 与他们的表交叉核对：两把尺都覆盖的行，读数相不相同
+
+| 他们的行 | 他们的数（grep 尺） | 本程的数（AST 尺） | 判定 |
+|---|---|---|---|
+| 1 `OpenTask`↔`CloseTask` | 开 1（`bridge.go:559`）／合 1（`run.go:563`） | 开 1（`C OpenTask on=b in=mark PROD internal\tools\bridge.go:559`）／合 1（`C CloseTask on=rt.bridge in=admitTask PROD cmd\wisp\run.go:563`） | **同**，且 AST 还给出他们没写的"所在函数名"（`mark`／`admitTask`）⇒ "开按 call、合按 task"那句有第二把尺撑着 |
+| 2 `OpenScope`↔`CloseScope` | 开 2／合 1 | 开 2（`bridge.go:642`、`panel_assets.go:232`）／合 1（`bridge.go:691`） | **同**（本程另在 §1.5 指出门不吃这一对） |
+| 6 `Registry.Register` | 1（`run.go:345`）／`RegisterProvider` 0 | `C Register on=reg in=assembleRuntime PROD cmd\wisp\run.go:345` ＝ 1 | **同** |
+| 8 `StartInJob`↔`Close` | 开 1／合 3 | 开 1（`slo_windows.go:498`） | **同**（合那侧本尺按名字吃到 88 枚，不可用＝§3.1 第②条） |
+| 4/5 `DisposalScope` | `NewDisposalScope`/`Defer` 生产 0 | 本尺点名 `DeferNamed` 有 1 枚 PROD ⇒ 点开＝`disposal.go:187`，是 `Defer`→`DeferNamed` 的**包内委托**；`NewDisposalScope` 生产调用 **0 枚**（只有 `retention_test.go:193`、`disposal_test.go:17/168`、`provenance_test.go:307` 三处测试） | **他们的行成立**；本尺那一枚是**假阳性**，本程自己拆掉（放水两问之②的答案在这里） |
+
+⇒ 结论：**他们表里本程能复核的行，两把尺数一致**（5/5 行）；本程没有一行是拿他们的数抄的。
+
+### 3.3 本尺新点名、而他们的 14 对里没有的族（逐枚判读，含"这不是缺口"的）
+
+| # | 族（AST 尺点名） | 开那侧生产出现点 | 合那侧生产出现点 | 判读 |
+|---|---|---|---|---|
+| N1 | `memory.Open` ↔ `(*Store).Close` | **2**：`cmd/wisp/run.go:313`、`cmd/wisp/providers.go:180` | **2**：`run.go:517`（`_ = rt.store.Close()`）、`providers.go:185`（`defer … store.Close()`） | **对称、不是缺口**；但⚠ `run.go` 的开与合**不在同一枚函数**（开在 `assembleRuntime`、合在 `execute`）⇒ 本程"同函数窗口"那把小尺**第一发把它读成 0 枚 Close＝假缺口**（见 §3.5 的自抓 bug）。真读数以这两枚点名为准。他们表里缺这一行＝完整性问题，不是漏判 |
+| N2 | `Store.StartTaskLog` ↔ `FinishTaskLog` | **2**：`cmd/wisp/run.go:619`、`internal/agent/journal.go:129` | **4**（`FinishTaskLog`，尺＝`git grep -c 'FinishTaskLog('` 生产侧） | **有 owner、不必修**（任务行的开合都有人）；他们表里缺这一行。本程没去数"每条出口都调了 Finish 吗"（那是状态机那一票的账，§3.6） |
+| N3 | `signal.Notify` ↔ `signal.Stop` | **3**：`cmd/balldebug/main.go:293`（`*hold` 分支）、`:306`（`*stay` 分支）、`:564`（`waitForExit`） | **1**：`cmd/balldebug/main.go:571` | **真不对称**（3 开/1 合），但两枚未关的都紧接进程退出 ⇒ 后果与他们的 pair 6/13 同形（注册表随进程寿命、调试宿主、非产品路径）。登记、不判"必修"；**这一族他们的表里没有**，而它正是派单点名的"加/解监听" |
+| N4 | `llm.RegisterProtocol`（`anthropic/openaichat/openairesponses` 三枚 adapter 的 `init()`） | **3**（`adapter.go:100/:38/:75`） | **0**（`Unregister*` 全树 AST 零枚） | 与 pair 6 同判：**启动期一次填、进程寿命**，不必修；但它是**注册即无注销**的第四枚实例，他们表里没这一行 |
+| N5 | `llm.BucketLimiter.Acquire` ↔（无 Release） | **1**：`internal/llm/ratelimit.go:223`（`Stream` 内） | **不存在该名字** | **不是缺口**：令牌桶没有"归还"语义；本尺按名字点了名，判读归"不成族"。写出来是因为它长得像 `Acquire/Release` |
+| N6 | `audio`：`wasapiOpener.Open` ↔ `deviceStream` | `m.opener.Open` **1**（`wasapimic_windows.go:263`）＋ 全树生产 `Open` 共 16 枚 | 合那侧**不叫 Close**（interface 那侧是 `Stop`/release 闭包） | 本尺的**形状盲**（§3.1 第②条）：按名字配不上 ⇒ 不构成对 pair 10 的反驳。他们的第 10 对（构造函数零生产持有者）本程无法用 AST 尺独立复核，只能记"两把尺各判各的" |
+| N7 | `llm.Usage.Add` / `*Guard.AddUsage` / `*Cost.AddCost` | Add 系生产 **48** 枚（其中 `Usage.Add` 40） | 0 | **假阳性**（累加器不是资源）。列出来是为了让下一位不要把本尺的输出当判据 |
+
+### 3.4 派单点名的五族，逐族答一句（盘得到的写数，盘不到的写命令）
+
+1. **注册/注销**：`Register` 生产 4 枚（N4 的 3 ＋ `run.go:345`）／`Unregister` 生产 **0 枚**（AST 名册里 selector 名以 `Unregister` 开头的枚数＝0）；ball 的 `unregisterAll` 属裸标识符调用、**两把尺都看不见** ⇒ 这一子句**盘不到**，命令＝`git grep -inE "unregister" 5766be9 -- internal cmd ':!*_test.go'`（21 行，r1 的尺）。判读：注册那侧今天全是启动期，注销不存在＝有界。
+2. **加/解监听**：`signal.Notify` 3/1（N3）；`slog`/事件总线侧本程只盘到 `internal/observe` 的订阅不是配对外形 ⇒ 命令＝`git grep -nE "\.Subscribe[A-Za-z]*\(|AddListener|RemoveListener" 5766be9 -- internal cmd`（**零命中，尺已记 rc**）。**没有"应当没有"这句话**。
+3. **`Open`/`Close`**：生产 `Open` 16 枚逐枚点名（本程窗口尺 15 枚同函数有 Close、1 枚跨函数有 Close＝N1、1 枚是 deviceStream 形状＝N6）⇒ **本族本程没有新缺口**，但结论的来源是本程那把有 bug 的小尺＋人工点开，不是名册本身。
+4. **`Acquire`/`Release`**：`proc.AcquireSingleInstance`↔`Release` 1/1（与 pair 9 同）；新增 N5（不成族）。
+5. **`Defer(` 挂在今天不可达的边上**：他们的 pair 4/5 是本票最有价值的一行（`provenance.go:56/:348` 那句义务写在 `DisposalScope` 上、而 `NewDisposalScope` 生产零使用者）。本程 AST 复核＝**成立**（`Defer` 系生产仅包内委托 1 枚、`Dispose` 生产 0 枚），且**没有新发现第四枚**。
+
+### 3.5 本程自己弄错又改回来的一枚（不写这句，§3.3 的 N1 就是假缺口）
+
+本程给"同函数体内有没有 `.Close(`"那把小尺的第一发读数，把 **两枚** 站点报成 0：`cmd/wisp/run.go:313`（真因：Close 在别的函数）与 **`internal/tools/fs_write.go:502`**（假因：**函数签名跨两行时，窗口在 `{` 出现之前就 `depth<=0` 返回了**）。
+现读更正＝`fs_write.go:506` 明写 `defer src.Close() //nolint:errcheck // read-only handle` ⇒ **不是缺口**，是本程尺的 bug。修法是"只在见到第一个 `{` 之后才开始判 `depth<=0`"，修完重跑 16 枚站点的读数见 §3.3 的 N1（`providers.go:180` 也从 0 变 1）。
+⇒ 与本票 §4.1 末段 r1 那枚（整词尺吃不到 Win32 名）**同形不同人**：本程把它写进证据件，是因为**下一位拿本程的尺复算时会被同一枚坑咬**。
+
+### 3.6 AC#3 判语
+
+**成立。** 判据本体（票面："逐枚答'它的关那侧有几枚生产调用者'，并给命令"）他们给了：14 对 × 逐枚生产枚数 ＋ 5 道可见性锁 × 现量命令，且**"盘不到"那三处写的是命令与原因、不是"应当没有"**（§4.3 原文三条）。本程换尺复核了能复核的 5 行，**逐行同数**；新点名 7 族，其中 **N3（`signal.Notify` 3 开/1 合）与 N4（`llm.RegisterProtocol` 3 开/0 合）是他们表里确实没有的两行**，N1/N2 是完整性缺行（两侧都有 owner），N5/N6/N7 是本程尺的假阳性或形状盲，全部具名拆掉。
+⇒ **没有一枚足以把本格判成不成立**：漏的都是"启动期一次填、随进程寿命"那一类有界形，与本票已登记的 pair 6/13 同判；真正需要下一位做的是把 N1–N4 补成表里的 4 行（本程不代他们写票面）。
+⇒ 本程**补上了他们 §4.3 第 3 条自己承认没穷举的两处**：`cmd/**` 四枚宿主（AST 全量，本程树覆盖）＋ `tools/**` 15 枚 `.go`（第二棵尺，读数＝mockllm 的 `listen` 拿到的 `ln` 生产侧无 `Close`，但它 `Serve(ln)` 阻塞到进程退出＝有界；`d22scan`/`signmodels` 无配对 API）。⇒ 那一条现在可以写成"盘到了、命令是这些"，不再是"未穷举"。

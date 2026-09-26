@@ -1,0 +1,49 @@
+### AC#3 换尺读数转记（AST 尺＝probes/154-accept/ac3-ast-roster-5766be9.txt，工具源码在 D:/tmp/wisp-154-accept/astscan.go）
+
+[1] 交叉核对（两把尺同数的行）
+C CloseTask                  on=rt.bridge                in=admitTask                      PROD cmd\wisp\run.go:563
+C OpenTask                   on=b                        in=mark                           PROD internal\tools\bridge.go:559
+C Register                   on=reg                      in=assembleRuntime                PROD cmd\wisp\run.go:345
+
+[2] 新点名族的生产出现点（AST）
+N1 memory.Open/Store.Close:
+5766be9:cmd/wisp/providers.go:180:	store, err := memory.Open(io_.dataDir)
+5766be9:cmd/wisp/providers.go:185:	defer func() { _ = store.Close() }()
+5766be9:cmd/wisp/run.go:313:	mem, err := memory.Open(s.dataDir)
+5766be9:cmd/wisp/run.go:517:		_ = rt.store.Close()
+5766be9:internal/memory/open.go:253:func (s *Store) Close() error {
+N2 StartTaskLog/FinishTaskLog 生产枚数:
+  StartTaskLog   4
+  FinishTaskLog  4
+N3 signal.Notify/Stop:
+5766be9:cmd/balldebug/main.go:293:			signal.Notify(sig, os.Interrupt)
+5766be9:cmd/balldebug/main.go:306:		signal.Notify(sig, os.Interrupt)
+5766be9:cmd/balldebug/main.go:564:	signal.Notify(sig, os.Interrupt)
+5766be9:cmd/balldebug/main.go:571:	signal.Stop(sig)
+N4 RegisterProtocol:
+5766be9:internal/llm/anthropic/adapter.go:100:	llm.RegisterProtocol(Protocol, func(ep llm.EndpointOptions) (llm.LlmProvider, error) {
+5766be9:internal/llm/openaichat/adapter.go:38:	llm.RegisterProtocol("openai-chat", func(ep llm.EndpointOptions) (llm.LlmProvider, error) {
+5766be9:internal/llm/openairesponses/adapter.go:75:	llm.RegisterProtocol(Protocol, func(ep llm.EndpointOptions) (llm.LlmProvider, error) {
+5766be9:internal/llm/provider.go:192:func RegisterProtocol(protocol string, f ProviderFactory) {
+N5 BucketLimiter.Acquire:
+5766be9:internal/llm/ratelimit.go:223:	if err := p.limiter.Acquire(ctx, reserved); err != nil {
+
+[3] 派单点名的族，零命中也要记 rc（两发一致）
+-- Subscribe/AddListener/RemoveListener --
+   rc=1（真零命中）
+-- unregister 尺复算 r1 的 21 行 --
+21
+
+[4] 本程自抓的尺 bug：同函数窗口在多行签名上提前返回
+  修前读数：fs_write.go:502 .Close(=0（假缺口）／providers.go:180 .Close(=0
+  修后读数：fs_write.go:502 .Close(=1（真身＝defer src.Close() //nolint:errcheck 在 :506）
+	src, err := os.Open(from)
+	defer src.Close() //nolint:errcheck // read-only handle
+  run.go:313 修后仍 0 ⇒ 真因是 Close 在别的函数（run.go:517），不是缺 Close
+	mem, err := memory.Open(s.dataDir)
+		_ = rt.store.Close()
+
+[5] tools/**（他们 §4.3 第 3 条自陈未穷举，本程穷举）
+  15 枚 .go／parse-error 0；mockllm 的 listener 生产侧无 Close：
+	ln, err := listen(*addr)
+	if err := (&http.Server{Handler: mux}).Serve(ln); err != nil && err != http.ErrServerClosed {
