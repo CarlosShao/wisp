@@ -567,3 +567,23 @@ $ git ls-tree -r --name-only b23c7f7 -- cmd      | grep -c '\.go$'  →  43  ≠
 `internal/agent/compress.go`、`internal/agent/loop.go`、`internal/agent/compress_trace_test.go`、
 `docs/evidence/s1/153-trace-lies-unguarded-r1.md`、`.scratch/wisp/probes/153/**`（只建不删）。
 零 push。
+
+---
+
+## 附录 A（09-26 11:2x，**编排者代记**；本件正文 §0–§7 一字未改）
+
+来路＝非实现者验收件 §1.5 与续程 §12.4 第 4 行点名的那笔：**本件 §5 的别家名册里有一枚不存在的 commit 号 `8883b3f`**。
+**本轮我自己现量的四条**（不是转述）：
+
+```
+git cat-file -t 8883b3f          → fatal: Not a valid object name '8883b3f'      ← 不解析
+git rev-parse --disambiguate=8883b3f →（空）                                      ← 连以此为前缀的对象都没有
+git log --since='08:30' --until='10:30' -- frontend docs/reports/frontend-session-log.md
+                                 → 86b0161(08:59) · cdf2471(09:24) · ad9b29f(09:30) · 5c28b3b(10:14)   ← 该窗口真前端提交＝4 枚
+```
+
+⇒ **本件 §5 那行名册的正确读法**："前端会话"那一组只有 **`cdf2471`／`ad9b29f` 两枚可核**（`86b0161` 在窗口起点、`5c28b3b` 在本程收口之后），
+**`8883b3f` 是一枚不可核的号** ⇒ 本件自报"18 枚名册、17 枚可核"这个**分数本身仍然成立**，但**别把 `8883b3f` 当第五枚前端提交去查**。
+⇒ **候选真身＝`86b0161`**——**〔未证〕**，理由只有"同一区间、同一作者、名册里恰好缺一枚、而它是窗口内第一枚前端提交"；
+**我不据它改名册**（按"不回填、只追加"的规矩，也按"猜出来的号比空号更坏"这条本仓既有条）。下一位若要用这一行，**自己现跑上面那三条**。
+⇒ **这格不影响任何 AC 的档位**（名册是"本程未越界"的反扫凭据，不是判据；少一枚不可核的号不改变"零越界"的结论）。
