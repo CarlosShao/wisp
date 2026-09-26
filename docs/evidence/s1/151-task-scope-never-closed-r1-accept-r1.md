@@ -281,3 +281,25 @@ $ git diff 5d46f24^ 5d46f24 -- internal/tools/bridge.go | grep -c '^-'          
    `ScopeTaints` → `delete(b.scopes, taskID)` → 条件 `CloseScope` → `b.log` ⇒ 没夹带。
 
 ⇒ **AC#3 这一格：成立，无条件。**
+
+## 第 5 节 格 AC#4 — 契约轴（零字节）
+
+**尺（本程自己那把，不抄它 §5 的名册）**：把三枚 commit 的 `git show --name-only` 取并集，逐枚过一遍票面 AC#4 那张名单。
+
+```
+$ for c in 45c920e 5d46f24 4e16976; do git show --name-only --format='' $c | grep -v '^$'; done | sort -u
+    合计 27 枚：.scratch/wisp/probes/151/=23、cmd/wisp/=2、internal/tools/bridge.go=1、docs/evidence/s1/151-…-r1.md=1
+$ while read -r f; do case "$f" in internal/risk/*|internal/panel/*|internal/agent/approval/*|internal/agent/*|\
+      tools/d22scan/*|*thresholds.go|*golden*|*allowlist.txt|scripts/slo-check.ps1|docs/PLAN.md|docs/specs/*|\
+      frontend/*|design/*|cmd/wisp/slo_windows.go|cmd/wisp/slo_report_144_windows_test.go) echo "HIT $f";; esac; done
+    ->  零命中
+```
+
+⇒ 票面 AC#4 点名的 14 类路径**一枚都没被碰到**；派单另给的 `internal/agent/**`（票 153 的地界）也在本程的名单里，同样零命中。
+本程还额外把 `*golden*` 与 `*thresholds.go` 用**子串**尺过了一遍（不是只过目录名），仍零命中。
+⇒ **AC#4 成立，无条件。**
+
+⚠ **给下一程留一条尺的教训（本程自己撞的）**：`git diff --name-only 5d46f24^ 4e16976` 看着更省事，但它两头都不准——
+现读＝**5 枚**：本票那 4 枚（3 枚码＋本票证据件）**之外还多算进一枚别人的** `docs/evidence/s1/153-trace-lies-unguarded-r1.md`
+（票 153 的证据件落在同一区间），同时**少算 23 枚 probes**（`45c920e` 在 `5d46f24^` 之前，区间 diff 当然看不见它）。
+⇒ 判"谁改了哪些文件"只能按**逐枚 `git show --name-only` 取并集**，不能按区间 diff。实现件 §5 用的正是前一把尺，没抄错。
