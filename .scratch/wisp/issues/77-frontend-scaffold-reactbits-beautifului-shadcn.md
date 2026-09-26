@@ -349,3 +349,38 @@ C21、D23/§17 零 emoji 图标、D29 人工视觉签收、ban #6 / ban #8
   `go test ./cmd/wisp/` 本机加载期 rc=1（`0xc0000135`）照旧登记不追。
   `next=` 本票范围内**已无可推的框**：AC#1/AC#3 等票 33/35 的 host+pump，AC#4 等 ban #8 作用域那一行，AC#6 等 push。
   若编排者要我在这些之前再加一层证据，最有价值的是**真浏览器里的 DOM 断言**（需要新测试工具链，一期未定，等裁）。
+
+  ---------------------------------------------------------------------------
+  **2026-09-25/26 进度追记（owner 把前端当面交回 ZCode 直管；本段只追加，不改
+  上面任何状态行与勾框）** —— `agent-zcode-frontend`（owner 2026-09-25「前端这
+  块完全交给你重构了」、09-26 连续四轮现场指令：demo 推翻、beautiful-ui 收编、
+  harness 应用全观、右栏三标签）
+
+  **commit 链（全部未推送，推归编排者）**：`ab7afca`（token 第三代+demo 重构第一
+  批）→ `62431e9`（composer 钉底）→ `f22af4e`（滑翔条对齐）→ `424ac84`（beautiful-ui
+  主题收编第四代 + 全组件 props 化 + showcase）→ `dc5c504`（PromptBar vendored）→
+  `86b0161`（首启引导）→ `8ec6520`（harness 应用全观）→ `0c56b0c`/`eee7bd9`/`9225f33`/
+  `0f18652`（文档与审计）→ `0c56b0c…a2a3b3c`（右栏标签容器 + ZCode 交互补全）→
+  `5e23d99`（右栏三标签定案：审查/终端/浏览器）。
+  流水账：`docs/reports/frontend-session-log-zcode.md` §1–§7。
+
+  **AC 对照（只记现状，不勾框——勾选与裁决表按规矩走非实现者验收）**：
+  - **AC#2（已勾，需复核）**：本程把 token 表换成第四代（beautiful-ui 主题收编，
+    demo 不再是样式来源），`TestC21DesignTokensFourWayAgree` 在三代时已红、四代
+    仍红（红因=Go 侧 tokens.go 与 c21-native-tokens.md 未同步，交接文档 §4 在案）。
+    该勾要不要保留、还是按四代重验，归非实现者裁；本程未动勾框。
+  - **AC#4（PARTIAL→可复核）**：ban #6/#8 的射程前置（票 88/96，均 done）今日已
+    能打出数：`sh scripts/d22scan.sh` rc=0、`TestFrontendHasNoEmoji` 绿、
+    `TestTheRendererHoldsExactlyOneDoorToTheHost` 绿。台账证据行由非实现者出。
+  - **AC#1（blocked→票 33）**：真机拉起欠 WebView2 宿主；harness/浏览器验证都是
+    替身，不算这格。
+  - **AC#3（blocked→票 145 乙段）**：L2 卡渲染真数据——卡片组件已按
+    `fixtures/l2-card-fs-delete.json`（票 143 的真 R4 产物）渲染并通过 render-l2
+    尺，但"真数据"这格仍等 145 的快照字段。
+  - **AC#6（blocked→编排者 push）**：CI 步已进 ci.yml，无 run id 不勾（上程口径
+    不变）。
+  - **票面外的 owner 直派活**（登记在本票名下待编排者归口）：harness 应用全观
+    （左栏 Sidebar Nav 解剖/三段式、会话更改卡/耗时行/composer pill 行、右栏
+    审查/终端/浏览器三面板、任务监控弹窗、动画开关机器、react-bits 五枚
+    vendored）、`docs/reports/frontend-session-log-zcode.md` 流水账。
+  - **伪授权**：无新命中。

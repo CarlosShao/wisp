@@ -42,3 +42,10 @@ view (task.list/cancel tools backing it).
 - [ ] Keyboard-only: full palette flow reachable without mouse (tab/arrow/enter audit).
 
 ## Progress log (append-only, newest last)
+
+> **2026-09-26 进度追记（owner 把前端交 ZCode 直管后的可视壳进度，只追加不勾框）**：
+> 本票的可视面已按 beautiful-ui 主题收编第四代重画，演示形态在 `?harness=1`
+> 应用全观（左栏三段式/会话更改卡/右栏审查·终端·浏览器）与 `?harness=2` 陈列室。
+> **本票 AC 的真数据 e2e 格仍等票 145/35/33 的字段与宿主，一格未勾、不由本程
+> 勾**；可视壳的 commit 链见票 77 进度追记（`424ac84`…`5e23d99`）与
+> `docs/reports/frontend-session-log-zcode.md` §1–§7。
