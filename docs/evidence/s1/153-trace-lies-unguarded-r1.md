@@ -269,3 +269,74 @@ $ go test ./internal/agent/ -count=1 -v -run TestProbe153      # logs/ext-A-deli
 
 **本格改了哪些文件**：`internal/agent/compress.go`、`internal/agent/loop.go`、
 `internal/agent/compress_trace_test.go`（commit `b23c7f7`）。
+
+---
+
+## 4. AC#3 — 承重两句：先把"本票新增的每一味"列出来，再逐味摘
+
+**新增的味**（三味，逐枚有名）：
+
+| 味 | 位置 | 是什么 |
+|---|---|---|
+| N1 | `compress_trace_test.go:426` | AC#1 那一发用例（过阈值×折不动⇒痕 0 枚） |
+| N2 | `loop.go:399` | 调用点上的 `withTraceTask(ctx, taskID)`（loop 把 id 交出去） |
+| N3 | `compress.go:237-239` | 那条 `Info` 上"有才追加、没有就不写"的 `"task"` 属性 |
+| （用例侧） | `:478` / `:534` | `CarriesTheOwningTaskID`（读 N2＋N3 的合成结果）／`NeverInventsATaskID`（读 N3 的"不许占位"与"不许存在共享对象上"） |
+
+矩阵全部跑在**交付 commit `b23c7f7` 的仓外快照**上（不是脏工作树），每发：`restore` → 施味/施变异
+（落地必打印，见 `mut153.py`）→ `go build` → `go test ./internal/agent/ -count=1 -v` → 红名取自
+`^ *--- FAIL` 行。
+
+### 4.1 句① 「摘掉本票新增的任意一味，是否存在一发变异从此打不红？」——**三味各自：是**
+
+| 发 | 施了什么 | RUN / FAIL | 红名（去掉 `TestCompressionTrace` 前缀） |
+|---|---|---|---|
+| **X0** | 交付码，无变异 | 83 / **0** | — |
+| **X1** | 只施 M5（守卫→`if c.Need(hist)`） | 83 / **1** | `SilentWhenNothingFoldableOverThreshold` ← 本票的牙，同一枚变异从"四枚全绿"变成"这一发红" |
+| **X2** | **摘 N1** ＋ 施 M5 | 82 / **0** | **NONE ⇒ 逃逸回来**：N1 是 M5 的唯一证人 |
+| **X3** | **摘 N2**（loop 不再打标） | 83 / **1** | `CarriesTheOwningTaskID` |
+| **X4** | **摘 N2 ＋ 摘 `CarriesTheOwningTaskID`** | 82 / **0** | **NONE ⇒ N2 的唯一证人就是那一发**（`NeverInventsATaskID` 自己造 ctx，看不见 loop） |
+| **X5** | **摘 N3**（痕不再写属性） | 83 / **2** | `CarriesTheOwningTaskID` ＋ `NeverInventsATaskID` |
+| **X8** | **摘 N3 ＋ 摘掉那两枚用例** | 81 / **0** | **NONE ⇒ N3 的证人恰是这两发** |
+| X6 | 变异：属性**无条件**写（不判空） | 83 / **1** | `NeverInventsATaskID`（未打标的痕会带 `task=""` ——正是"把归因不了洗成归因成功"那一形） |
+| X7 | 变异：`traceTaskID` 恒返一枚常量 uuid | 83 / **2** | 两发都红 ⇒ "拿一枚像真的一样的假 ID 凑"当场红，不需要人去读码 |
+
+⇒ **没有一味是装饰**：N1 摘掉 ⇒ X1 那发从此打不红（回到 139 验收 §2.2 的原状）；N2 摘掉 ⇒ X4 全绿；
+N3 摘掉 ⇒ X8 全绿。**同时也没有一味是"独占证人却没人证"**：三味各自至少被一发红咬住（X1 / X3 / X5），
+且 X6、X7 两发是票面点名的两种假法（占位值、真形状假 id），它们各自也有专属证人。
+
+⚠ 与本仓旧坑对齐的口径：红名一律只数锚定的 `--- FAIL` 行、`-count=1`、**跑整包**（不只那七枚），
+所以"别枚用例顺手也抓到了"这一支被排掉了；X2/X4/X8 三发正是把"证人"与"被证的东西"一起摘掉才绿的，
+这也就是"摘掉任意一味是否有一发从此打不红"的**是**字的读法。
+
+### 4.2 句② 「摘掉它，有没有任何外部可见读数变过？」——**两句都答，且答案不是一样的**
+
+外部可见读数＝走**进程默认 logger**（`slog.Default()`，也就是宿主 JSONL 的那条链）打出来的那一行，
+不是测试内的 in-memory capture（探针 `probe153_line_test.go`／`probe153_loopleg_test.go`，只存在于快照）：
+
+| 发 | 痕行数 | 带 `task=` 的行数 | 判 |
+|---|---|---|---|
+| **ext-A** 交付码 | 3 | **2**（直接打标那一发＋真 `Loop.Run` 那一发；后者 `task=23ac7a42-…` 与同次 `Result.TaskID` 逐字符相等） | 基线 |
+| **ext-B** 摘 N3 | 3 | **0** | **变过**：盘上那一行少一枚键，肉眼可辨 |
+| **ext-C** 摘 N2 | 3 | **1**（只剩直接打标那一发；**Loop 腿那一发不再带归因**，`Result.TaskID=16889253-…` 在场而痕里没有） | **变过**：生产腿的归因消失 |
+
+⇒ N2／N3 两句都答"是，外部读数会变"。**N1 那句的答案是"不会"**：它是判据、不是输出面——
+`compress_trace_test.go` 是 `_test.go`，不进任何交付二进制，摘掉它本程没有读到任何外部读数会差
+（本程未为它造外部读数，可造的那一侧只是"少一枚证人"）。**它的承重只能由变异矩阵那一侧兑现**
+（X1 与 X2 之差就是它）。票面 §AC#3 那句"别把'我加了用例所以更严'当结论"本程照抄；
+但反过来"加了用例而外部读数不变"也不构成本票的退件理由——两句本程各自给了答案，没有拿一句抵另一句。
+
+### 4.3 本格自证：还原与"跑的就是交付码"
+
+```
+== matrix runs on commit b23c7f7; md5 of the three files under test: (logs 头部有逐枚打印)
+RESTORED IDENTICAL internal/agent/compress.go
+RESTORED IDENTICAL internal/agent/loop.go
+RESTORED IDENTICAL internal/agent/compress_trace_test.go
+```
+
+每发之间都 `restore`（`mut153.py restore`，从 `pristine-3/` 逐枚 `shutil.copyfile`），
+收口再与 `git show b23c7f7:<同一文件>` 逐名 `cmp`。矩阵里 X0 的 83 RUN 与 §6 门禁 POST 的 83 RUN 相等，
+说明快照那棵树与本程交付的那棵树在本包同一枚形状。
+
+**本格改了哪些文件**：无（只读＋仓外快照）。
