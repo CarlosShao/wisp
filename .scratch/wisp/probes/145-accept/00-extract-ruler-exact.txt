@@ -1,0 +1,6 @@
+# blob-exact tree (git ls-tree -r -z + git cat-file --batch, 1514 files) internal/panel baseline at 3dcff6a
+RUN=105 PASS=58 FAIL=1 SKIP=0
+--- FAIL: TestC21DesignTokensFourWayAgree (0.01s)
+FAIL	github.com/CarlosShao/wisp/internal/panel	1.949s
+FAIL
+rc=1

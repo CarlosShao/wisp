@@ -1,0 +1,16 @@
+# archive tree (git archive 3dcff6a | tar -x) internal/panel baseline — 本程判为取版尺假红，作废
+--- FAIL: TestComposerRenderFixtureTellsTheTruth (0.00s)
+--- FAIL: TestC21DesignTokensFourWayAgree (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	1.419s
+FAIL
+rc=1
+RUN=105 PASS=57 FAIL=2
+
+--- body of the archive-only red ---
+156:=== RUN   TestComposerRenderFixtureTellsTheTruth
+157-    composer_test.go:699: the render fixture has no block for "no host attached" - the harness and this test disagree about which states are evidenced
+158-    composer_test.go:699: the render fixture has no block for "workspace chosen, video stored" - the harness and this test disagree about which states are evidenced
+159-    composer_test.go:699: the render fixture has no block for "unsupported attachment told to the user" - the harness and this test disagree about which states are evidenced
+160-    composer_test.go:728: render fixture verified across 0 painted states
+161---- FAIL: TestComposerRenderFixtureTellsTheTruth (0.00s)
