@@ -1,0 +1,31 @@
+time=2026-09-26T09:29:30.292+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestCompositionRootClosesTheLoopTasksTaintScope
+time=2026-09-26T09:29:32.146+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/26 09:29:32 mockllm: serving on http://127.0.0.1:61591 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-26T09:29:32.222+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestCompositionRootClosesTheLoopTasksTaintScope2671390698\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-09-26T09:29:32.274+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestCompositionRootClosesTheLoopTasksTaintScope2671390698\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-26T09:29:32.284+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-26T01:29:32Z duration_ms=9
+time=2026-09-26T09:29:32.294+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestCompositionRootClosesTheLoopTasksTaintScope2671390698\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-26T09:29:32.302+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-26T01:29:32Z duration_ms=7
+time=2026-09-26T09:29:32.307+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-26T09:29:32.310+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    task_scope_close_151_test.go:62: 任务结束时没有关闭它自己的 C25 污点 scope：stderr 里找不到以 "[audit] tools: C25 scope closed task=8b4bf8cd-40d2-4453-b90e-6260f6a9c762 " 开头的审计行
+        stderr:
+        [audit] perm: MODE-READ origin=startup mode=ask_every_step source="C:\\Users\\swq\\AppData\\Local\\Temp\\TestCompositionRootClosesTheLoopTasksTaintScope2671390698\\002\\config.toml"
+--- FAIL: TestCompositionRootClosesTheLoopTasksTaintScope (2.12s)
+=== RUN   TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit
+time=2026-09-26T09:29:34.250+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/26 09:29:34 mockllm: serving on http://127.0.0.1:61594 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-26T09:29:34.285+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit2607424631\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-26T09:29:34.314+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit2607424631\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-26T09:29:34.323+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-26T01:29:34Z duration_ms=7
+time=2026-09-26T09:29:34.333+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit2607424631\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-26T09:29:34.340+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-26T01:29:34Z duration_ms=6
+time=2026-09-26T09:29:34.344+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-26T09:29:34.347+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    task_scope_close_151_test.go:109: 上一轮结束后它的污点 scope 还挂在表上，于是这一枚新任务的干净调用被 C25 的 unbound fail-closed 顶到 L2：第二发 judged L2, want L0；text="实时语音（Path C）不具备工具权限；该任务未经文本循环登记（AdmitTextTask），已 fail-closed 拒绝"
+    task_scope_close_151_test.go:113: 第二轮没有读到文件内容，text="实时语音（Path C）不具备工具权限；该任务未经文本循环登记（AdmitTextTask），已 fail-closed 拒绝"
+--- FAIL: TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit (1.98s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	4.170s
+FAIL

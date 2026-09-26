@@ -1,0 +1,59 @@
+time=2026-09-26T09:20:26.807+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestProbe151BleedIntoNextTaskVerdict
+=== RUN   TestProbe151BleedIntoNextTaskVerdict/no-close_today
+    probe151_scope_test.go:84: round1 task-1 fs.read level=L0 scopes=1 marks(task-1)=1
+    probe151_scope_test.go:85: RESULT no-close: task-2 level=L2 rules=[R4] approvals=1 windows=0 reason="R4: 包含来自 unbound-scope scope is not open (OpenScope missing or already closed) 的内容" scopes_left=1 marks_left=1
+=== RUN   TestProbe151BleedIntoNextTaskVerdict/close-first_control
+    probe151_scope_test.go:89: round1 task-1 fs.read level=L0 scopes=1 marks(task-1)=1
+    probe151_scope_test.go:89: after CloseTask(task-1): scopes=0 marks(task-1)=0
+    probe151_scope_test.go:90: RESULT control: task-2 level=L0 rules=[] approvals=0 windows=0 reason="" scopes_left=1 marks_left=1
+--- PASS: TestProbe151BleedIntoNextTaskVerdict (0.13s)
+    --- PASS: TestProbe151BleedIntoNextTaskVerdict/no-close_today (0.02s)
+    --- PASS: TestProbe151BleedIntoNextTaskVerdict/close-first_control (0.02s)
+=== RUN   TestProbe151ContentVsUnboundHit
+=== RUN   TestProbe151ContentVsUnboundHit/same-task-inherit
+    probe151_scope_test.go:141: RESULT same-task exfil: level=L2 rules=[R4] reason="R4: 包含来自 fs.read C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe151ContentVsUnboundHit3284193189\\001\\id.txt 的内容"
+=== RUN   TestProbe151ContentVsUnboundHit/cross-task-new-id
+    probe151_scope_test.go:152: RESULT cross-task exfil (params carry task-1's secret): level=L2 rules=[R4] reason="R4: 包含来自 unbound-scope scope is not open (OpenScope missing or already closed) 的内容"
+=== RUN   TestProbe151ContentVsUnboundHit/cross-task-after-close
+    probe151_scope_test.go:167: RESULT cross-task exfil AFTER CloseTask(task-1): out.level=L0 approvals=0 last=[] ""
+--- PASS: TestProbe151ContentVsUnboundHit (0.04s)
+    --- PASS: TestProbe151ContentVsUnboundHit/same-task-inherit (0.01s)
+    --- PASS: TestProbe151ContentVsUnboundHit/cross-task-new-id (0.01s)
+    --- PASS: TestProbe151ContentVsUnboundHit/cross-task-after-close (0.01s)
+=== RUN   TestProbe151SecondTaskRefused
+=== RUN   TestProbe151SecondTaskRefused/rounds=2
+    probe151_scope_test.go:201: RESULT no-close reject-gate: rounds=2 executed=1 refused=1 scopes=1 marks=1 L2cards=1
+=== RUN   TestProbe151SecondTaskRefused/rounds=8
+    probe151_scope_test.go:201: RESULT no-close reject-gate: rounds=8 executed=1 refused=7 scopes=1 marks=1 L2cards=7
+--- PASS: TestProbe151SecondTaskRefused (0.13s)
+    --- PASS: TestProbe151SecondTaskRefused/rounds=2 (0.03s)
+    --- PASS: TestProbe151SecondTaskRefused/rounds=8 (0.10s)
+=== RUN   TestProbe151ScopeTableGrowth
+=== RUN   TestProbe151ScopeTableGrowth/no-close/rounds=2
+    probe151_scope_test.go:253: after 2 rounds: scopes=2 marks=2 L2cards=1
+    probe151_scope_test.go:261: RESULT no-close rounds=2: executed=2 refused=0 scopes=2 marks=2 L2cards=1 heap=709352->567392 delta=-141960 (-70980 B/round)
+    probe151_scope_test.go:270: one more clean round: scopes 2 -> 3, L2cards 1 -> 2
+    probe151_scope_test.go:279: after CloseTask on all 3 ids: scopes=0 marks=0 heap=491848 (baseline was 709352)
+=== RUN   TestProbe151ScopeTableGrowth/no-close/rounds=64
+    probe151_scope_test.go:253: after 2 rounds: scopes=2 marks=2 L2cards=1
+    probe151_scope_test.go:261: RESULT no-close rounds=64: executed=64 refused=0 scopes=64 marks=64 L2cards=63 heap=591464->3001216 delta=2409752 (37652 B/round)
+    probe151_scope_test.go:270: one more clean round: scopes 64 -> 65, L2cards 63 -> 64
+    probe151_scope_test.go:279: after CloseTask on all 65 ids: scopes=0 marks=0 heap=578592 (baseline was 591464)
+=== RUN   TestProbe151ScopeTableGrowth/close-each-round/rounds=2
+    probe151_scope_test.go:253: after 2 rounds: scopes=0 marks=0 L2cards=0
+    probe151_scope_test.go:261: RESULT close-each-round rounds=2: executed=2 refused=0 scopes=0 marks=0 L2cards=0 heap=590600->490256 delta=-100344 (-50172 B/round)
+    probe151_scope_test.go:270: one more clean round: scopes 0 -> 1, L2cards -1 -> 0
+    probe151_scope_test.go:279: after CloseTask on all 3 ids: scopes=0 marks=0 heap=490096 (baseline was 590600)
+=== RUN   TestProbe151ScopeTableGrowth/close-each-round/rounds=64
+    probe151_scope_test.go:253: after 2 rounds: scopes=0 marks=0 L2cards=0
+    probe151_scope_test.go:261: RESULT close-each-round rounds=64: executed=64 refused=0 scopes=0 marks=0 L2cards=0 heap=592024->496784 delta=-95240 (-1488 B/round)
+    probe151_scope_test.go:270: one more clean round: scopes 0 -> 1, L2cards -1 -> 0
+    probe151_scope_test.go:279: after CloseTask on all 65 ids: scopes=0 marks=0 heap=496928 (baseline was 592024)
+--- PASS: TestProbe151ScopeTableGrowth (1.27s)
+    --- PASS: TestProbe151ScopeTableGrowth/no-close/rounds=2 (0.05s)
+    --- PASS: TestProbe151ScopeTableGrowth/no-close/rounds=64 (0.62s)
+    --- PASS: TestProbe151ScopeTableGrowth/close-each-round/rounds=2 (0.03s)
+    --- PASS: TestProbe151ScopeTableGrowth/close-each-round/rounds=64 (0.56s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	1.797s

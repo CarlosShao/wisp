@@ -1,0 +1,70 @@
+票 151 原始读数的采法（逐条命令原文 + 采于哪枚锚 + rc）。全部现跑于 2026-09-26 09:1x-09:3x +08。
+锚点：开工现读 `git rev-parse --short HEAD` = 86b0161（与派单共同锚点同一枚）。
+采读期间落地的别人的提交：ad9b29f / cdf2471（前端设置屏动画开关）、b23c7f7（票 153 AC#2）、
+eb4755a（票 152 probes）、4cc85bb（票 152 证据前 3 格）、ac7fb00（票 153 证据第 1 格）。
+本程开工现读锚＝86b0161。读数采在**共享工作树**上（09:1x-09:3x），期间别人的提交落了 5 枚，
+所以每一发读数用的是"当时那一枚树＋本程自己的改动"：AC#1 探针（09:18）与改前门禁（09:1x）
+采在 86b0161 之上；两包改后门禁与 -count=2（09:2x-09:3x）采在 b23c7f7/4cc85bb 之后的树上。
+别人这些提交都在别的文件（cmd/wisp/slo_windows.go 一族、internal/agent/**、design/**、frontend/**），
+与本程的三枚文件不相交；`go build ./...` rc=0 与两包零红就是在最终树上复跑的。工作树里另有 design/**、frontend 相关的未提交改动与 .zcodeignore，
+**属于别人的会话，本程一字未碰、未还原，也没把它们算进任何"零命中"宣称。**
+
+共享 index 事件（按派单 §git 纪律现量到的，不是注入也不是授权）：
+  $ git diff --cached --name-only
+  → 2026-09-26 09:3x 现读到 18 条 .scratch/wisp/probes/152/**（票 152 那程 add 了没 commit）
+  ⇒ 本程当时**没有 commit**，等到对方把这 18 条走成一枚 commit（eb4755a）之后
+     再复核 `git diff --cached --name-only` ＝ 空，才做本票的三枚 commit。
+
+--- 0. 票面四条"现量的形状"重跑（在 86b0161 这枚锚上重跑，不抄票面）-------------
+
+$ git grep -n 'CloseTask' 86b0161 -- '*.go'
+  86b0161:internal/tools/bridge.go:642:// CloseTask closes one task's taint scope. The composition root defers this on
+  86b0161:internal/tools/bridge.go:646:func (b *Bridge) close...            -> 2 命中，都是它自己
+$ git grep -c 'CloseTask' 86b0161 -- '*_test.go' | wc -l     -> 0     测试里也没有
+$ git grep -n 'OpenTask' 86b0161 -- internal cmd | grep -v _test
+  bridge.go:559 b.OpenTask(dec.TaskID) / :626 注释 / :629 声明   -> 派发热路径唯一调用者
+$ grep -rl "CloseTask" .scratch/wisp/issues/ | grep -v '^\.scratch/wisp/issues/151-' | wc -l -> 0
+
+$ grep -rn "agent.New(" --include='*.go' cmd internal | grep -v _test   -> 只有 cmd/wisp/run.go:573
+$ grep -rn "loop.Run(" --include='*.go' cmd internal | grep -v _test    -> 只有 cmd/wisp/run.go:604
+  ⇒ 今天这一枚组合根一个进程只跑一枚环路任务（resident 腿的事件腿是空环，resident_windows.go 自陈）
+
+--- 1. AC#1 探针（渗 / 长 / 同名复用）-------------------------------------------
+
+$ go test -count=1 -overlay="C:/Users/swq/AppData/Local/Temp/wisp151-probe/overlay.json" \
+      -run 'TestProbe151' -v ./internal/tools/                     rc=0（4 枚用例全 PASS）
+   输出全文 = ac1-probe-tools.txt；探针源码 = ac1-probe-source.go；
+   overlay 映射 = overlay-ac1.json（探针**经 -overlay 注入**，物理文件在仓库外，不进包）
+
+--- 2. AC#2 承重变异（只摘 admitTask 里那一发 CloseTask）------------------------
+
+$ go test -count=1 -overlay=".../overlay-mut.json" \
+      -run 'TestCompositionRootClosesTheLoopTasksTaintScope|TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit' \
+      -v ./cmd/wisp/                                               rc=1（两枚全红，红句见文件）
+   变异树 = run.mut-noclose.go（与 HEAD 的 run.go 只差被摘掉的那一行，映射见 overlay-mut-noclose.json）
+   ⚠ cmd/wisp 的测试二进制在 windows 上要先在 PATH 里放 third_party/sherpa-onnx（脚本
+     scripts/wisp-cli-tests.sh 教的形：用 shell 自己的路径形，**不是** `pwd -W` 的盘符形），
+     否则整包 0 条 `=== RUN` 直接 `exit status 0xc0000135`（本程第一发就撞上了）。
+   ⚠ 变异与门禁分两跑，且 -overlay 全程不与 -cover* 同用（派单点名的仪器坑）。
+
+--- 3. AC#5 门禁（逐包单跑）-----------------------------------------------------
+
+$ go test -count=1 ./internal/tools/                               rc=0  -> gate-pre-tools.txt
+$ go test -count=1 -v ./internal/tools/                            rc=0  -> gate-pre-tools-v.txt / gate-post-tools-v.txt
+$ go test -count=2 -v ./internal/tools/                            rc=0  -> gate-post-tools-count2.txt
+$ go test -count=1 -v ./cmd/wisp/            （改前＝overlay 回 HEAD 码 + 摘掉本票新用例）
+                                                                 rc=0  -> gate-pre-cmdwisp-v.txt
+$ go test -count=1 -v ./cmd/wisp/                                rc=0  -> gate-post-cmdwisp-v.txt
+$ go test -count=2 -v ./cmd/wisp/                                rc=0  -> gate-post-cmdwisp-count2.txt
+   改前的 overlay = overlay-pre.json（run.go/bridge.go 映射到 run.head.go / bridge.head.go，
+   新增用例映射到 null；.scratch 以点开头，go 工具链整个目录都不看，所以这些 .go 不参与 ./...）
+$ go vet ./internal/tools/ ./cmd/wisp/                             无输出，rc=0
+$ go build ./...                                                   无输出，rc=0
+$ D:/work/base/gopath/bin/gofumpt.exe --version  ->  v0.12.0 (go1.27.1)   （版本现读，不背别人的）
+$ gofumpt.exe -l internal/tools cmd/wisp       ->  空，rc=0
+$ sh scripts/d22scan.sh                                            rc=0  -> d22scan-post.txt
+
+名册两向 comm（同一条 sed 尺，改前改后各生成一次）：
+  internal/tools: 79 -> 79，`comm -13` 空、`comm -23` 空（names-pre-tools.txt / names-post-tools.txt）
+  cmd/wisp      : 76 -> 78，`comm -13`（只新增）= 本票那两枚，`comm -23`（丢失）空
+                  （names-cli-pre.txt / names-cli-post.txt）
