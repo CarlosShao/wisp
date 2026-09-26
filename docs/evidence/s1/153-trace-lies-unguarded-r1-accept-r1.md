@@ -119,3 +119,51 @@ $ head -342 bec1727.md > q1 ; head -342 6de3d1c.md > q2 ; cmp q1 q2
 
 **本格档位：成立（附一条措辞级待补）。** 理由：作者事后改写自己的证据这件事**确实发生过**（`9a8766e` 的 §5 被整体替换），
 但本程把可核的两版并排走完，**没找到一处判据或读数变弱**，且 §§0–4 是逐字节还原——"抽掉可信度地基"这一后果今天没有落地。
+
+---
+
+## 2. 攻击点② —— `DEFERRED(D-xx)` 计数：实现程"commit 前抓到"那句，现量成立（但派单那条判据要连口径一起读）
+
+### 2.1 交付版三枚文件里 `DEFERRED(` 的枚数与位置
+
+```
+$ git show 6de3d1c:internal/agent/compress.go | grep -n 'DEFERRED('
+27:// DEFERRED(D28-1): move the call into the Warm window hook; keep this
+53:// Warm-window hook DEFERRED(D28-1) installs will get it for free); it pairs
+$ git show 6de3d1c:internal/agent/loop.go | grep -n 'DEFERRED('
+394:                    // DEFERRED(D28-1): the Warm-window hook owns this call; the
+$ git show 6de3d1c:internal/agent/compress_trace_test.go | grep -c 'DEFERRED('
+0
+```
+
+同一把尺打在锚点 `86b0161`：`compress.go` 27 与 **49**、`loop.go` 394、`_test.go` 0。
+⇒ 交付版没有多出一枚标记：第二枚只是**从 :49 挪到 :53**（它上面新加了四行注释）。本程第一发把 `git grep -n` 的行号一起
+喂进了 `comm`，于是"挪位置"被读成"新增一枚"——那是**本程自己的尺坏了**，不是它的件坏了；改用"只取内容"重量即归零（见 §9）。
+
+### 2.2 全仓两枚计数（口径写死，否则下一位会误判）
+
+| 尺 | `86b0161` | `b23c7f7`（它的码） | `6de3d1c`（交付版） |
+|---|---|---|---|
+| `git grep -oh 'DEFERRED(D28-1)' … -- '*.go'` | **3** | **3** | **3** |
+| `git grep -oh 'DEFERRED(D11-3)' … -- '*.go'` | **1** | **1** | **1** |
+| 同一条尺**不带 `-- '*.go'`**（含 `*.md`／`probes/**`） | 39 | 39 | **40** ← 会假报漂移 |
+
+⇒ 那句"计数仍是 3／1"**只在代码标记这个口径上成立**，而 `AGENTS.md §1.1` 的硬规矩写的正是"**代码标记**与 `SPEC-12 §5` 1:1"，
+所以本程判它**对**；但差值那一枚本程具名到了行：`40` 比 `39` 多的那一枚＝**它自己证据件 §5 里那句"第一版真的写了字面量 `DEFERRED(D28-1)`"**
+（`git show b23c7f7:…md | grep -c` = 0 → `git show 6de3d1c:…md | grep -c` = 1）。
+**判**：这是一枚**文档里的提及**，不是代码标记，不顶任何 1:1 的账；但它是"下一位拿无路径过滤的尺去数就得出漂移"的形状，
+本程按派单要求的"具名＋给可复算尺"记在这里，不当违规。
+
+### 2.3 那两枚标记在 `SPEC-12 §5` 登记表里到底有没有行（本程顺手核，因为派单点名"1:1 是硬规矩"）
+
+```
+$ git grep -n "D28-1\|D11-3" 6de3d1c -- docs/specs/SPEC-12-roadmap-governance.md
+（无输出，rc=1）        ← 登记表里两枚都没有行
+$ ls .scratch/wisp/issues | grep '^150-'
+150-four-deferred-markers-have-no-row-in-the-spec-12-registry-so-the-1-to-1-rule-is-violated-today-and-no-instrument-scans-it.md
+```
+
+⇒ 1:1 **今天确实不符**，但那不是我票的事：票 150 的标题就是"四枚 DEFERRED 标记在 SPEC-12 登记表里没有行、且没有仪器在扫"。
+**本程判**：票 153 既没新增标记也没让这件事变坏，**本格成立**；顺带回派单那句"这条不是挑刺"——它确实不是，只是**归票 150**。
+
+**本格档位：成立。**
