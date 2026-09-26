@@ -1,0 +1,51 @@
+=== I2. internal/agent 顶层包文件清单（不含子包） ===
+approval
+budgets.go
+compress.go
+compress_test.go
+compress_trace_test.go
+control.go
+control_test.go
+cost.go
+doc.go
+forensics_test.go
+guard.go
+guard_test.go
+harness_test.go
+inject.go
+journal.go
+loop.go
+loop_golden_test.go
+prompt.go
+prompt_test.go
+scheduler
+sink.go
+spill.go
+spill_acl_windows_test.go
+spill_name_injectivity_test.go
+spill_path_invariant_test.go
+spill_test.go
+tempdir_resolved_124_test.go
+testdata
+testtools_test.go
+tools.go
+truncation_test.go
+
+=== 顶层包 import 的本仓包 ===
+internal/config
+internal/llm
+internal/llm/golden
+internal/llm/openaichat
+internal/memory
+internal/observe
+internal/proc
+internal/winsec
+
+=== 顶层生产文件（非 _test）的 import ===
+internal/config
+internal/llm
+internal/memory
+internal/observe
+internal/winsec
+
+=== L. 用 go list 现取闭包（在快照里跑，稍后） ===

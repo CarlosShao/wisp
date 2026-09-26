@@ -1,0 +1,102 @@
+### 155 对抗验收程 · ext 矩阵（我自己的快照 + 我自己的尺）
+go version = go version go1.27.1 windows/amd64
+probe copied into snapshot: 30-zzaccept155-parsed-ondisk_test.go
+probe copied into snapshot: zzaccept153_ondisk_test.go
+
+================ 正控①：未变异，这棵树活着 ================
+$ python mut153.py restore D:/tmp/wisp155accept/snap6de D:/tmp/wisp155accept/pristine
+   restored 3 files from D:\tmp\wisp155accept\pristine
+--- delivered TestCompressionTrace* : RUN=7 FAIL=0 
+    ok  	github.com/CarlosShao/wisp/internal/agent	0.171s
+
+================ 正控②：已知会红（drop-attr） ================
+$ python mut153.py drop-attr D:/tmp/wisp155accept/snap6de D:/tmp/wisp155accept/pristine
+   LANDED (internal/agent/compress.go): task attribute append removed
+--- delivered TestCompressionTrace* : RUN=7 FAIL=2 ['--- FAIL: TestCompressionTraceCarriesTheOwningTaskID', '--- FAIL: TestCompressionTraceNeverInventsATaskID']
+    --- FAIL: TestCompressionTraceCarriesTheOwningTaskID (0.01s)
+    --- FAIL: TestCompressionTraceNeverInventsATaskID (0.00s)
+    FAIL
+    FAIL	github.com/CarlosShao/wisp/internal/agent	0.191s
+    FAIL
+
+================ ext-B（摘 N3＝drop-attr），本程的尺 ================
+--- ext-B parsed on-disk : RUN=1 FAIL=0 
+    30-zzaccept155-parsed-ondisk_test.go:100: PROBE-155-ACCEPT RECORD 0 taskkey=false taskval=<nil> keys=11
+    30-zzaccept155-parsed-ondisk_test.go:100: PROBE-155-ACCEPT RECORD 1 taskkey=false taskval=<nil> keys=11
+    30-zzaccept155-parsed-ondisk_test.go:100: PROBE-155-ACCEPT RECORD 2 taskkey=false taskval=<nil> keys=11
+    30-zzaccept155-parsed-ondisk_test.go:108: PROBE-155-ACCEPT COUNT records=3 taskkey_present=0 leg2_id=21674327-2106-4468-a1e7-4cf733534718 leg3_taskid=59aa5b54-5f98-453f-b459-40a52f24cdda leg3_match=false
+    ok  	github.com/CarlosShao/wisp/internal/agent	0.099s
+
+================ ext-A（交付码基线），本程的尺 ================
+$ python mut153.py restore D:/tmp/wisp155accept/snap6de D:/tmp/wisp155accept/pristine
+   restored 3 files from D:\tmp\wisp155accept\pristine
+--- ext-A parsed on-disk : RUN=1 FAIL=0 
+    30-zzaccept155-parsed-ondisk_test.go:100: PROBE-155-ACCEPT RECORD 0 taskkey=false taskval=<nil> keys=11
+    30-zzaccept155-parsed-ondisk_test.go:100: PROBE-155-ACCEPT RECORD 1 taskkey=true taskval="f205a1ae-c75b-460d-bee2-6dcecac3fffd" keys=12
+    30-zzaccept155-parsed-ondisk_test.go:100: PROBE-155-ACCEPT RECORD 2 taskkey=true taskval="118e0523-d295-4e22-89f5-48dc5c439c25" keys=12
+    30-zzaccept155-parsed-ondisk_test.go:108: PROBE-155-ACCEPT COUNT records=3 taskkey_present=2 leg2_id=f205a1ae-c75b-460d-bee2-6dcecac3fffd leg3_taskid=118e0523-d295-4e22-89f5-48dc5c439c25 leg3_match=true
+    ok  	github.com/CarlosShao/wisp/internal/agent	0.120s
+
+================ ext-C（摘 N2＝unloop），本程的尺 + 153 两腿探针 ================
+$ python mut153.py unloop D:/tmp/wisp155accept/snap6de D:/tmp/wisp155accept/pristine
+   LANDED (internal/agent/loop.go): loop stopped tagging the ctx
+--- ext-C parsed on-disk : RUN=1 FAIL=0 
+    30-zzaccept155-parsed-ondisk_test.go:100: PROBE-155-ACCEPT RECORD 0 taskkey=false taskval=<nil> keys=11
+    30-zzaccept155-parsed-ondisk_test.go:100: PROBE-155-ACCEPT RECORD 1 taskkey=true taskval="176b4619-33ab-4565-8056-d3d16a29f9a1" keys=12
+    30-zzaccept155-parsed-ondisk_test.go:100: PROBE-155-ACCEPT RECORD 2 taskkey=false taskval=<nil> keys=11
+    30-zzaccept155-parsed-ondisk_test.go:108: PROBE-155-ACCEPT COUNT records=3 taskkey_present=1 leg2_id=176b4619-33ab-4565-8056-d3d16a29f9a1 leg3_taskid=f461ec53-f824-4912-848f-8d57cc1b11be leg3_match=false
+    ok  	github.com/CarlosShao/wisp/internal/agent	0.201s
+--- ext-C 153 两腿到盘探针（宣称：结构上看不见这一发） : RUN=1 FAIL=0 
+    zzaccept153_ondisk_test.go:60: PROBE-153 DISK: {"time":"2026-09-26T12:44:17.9596579+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true}
+    zzaccept153_ondisk_test.go:60: PROBE-153 DISK: {"time":"2026-09-26T12:44:17.9603593+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true,"task":"c0fe70a6-a0a6-4297-bd9b-2e42d8925efb"}
+    ok  	github.com/CarlosShao/wisp/internal/agent	0.129s
+
+================ ext-B 复跑第二回（两回互校）+ 153 两腿探针应红 ================
+$ python mut153.py restore D:/tmp/wisp155accept/snap6de D:/tmp/wisp155accept/pristine
+   restored 3 files from D:\tmp\wisp155accept\pristine
+$ python mut153.py drop-attr D:/tmp/wisp155accept/snap6de D:/tmp/wisp155accept/pristine
+   LANDED (internal/agent/compress.go): task attribute append removed
+--- ext-B parsed on-disk 第二回 : RUN=1 FAIL=0 
+    30-zzaccept155-parsed-ondisk_test.go:100: PROBE-155-ACCEPT RECORD 0 taskkey=false taskval=<nil> keys=11
+    30-zzaccept155-parsed-ondisk_test.go:100: PROBE-155-ACCEPT RECORD 1 taskkey=false taskval=<nil> keys=11
+    30-zzaccept155-parsed-ondisk_test.go:100: PROBE-155-ACCEPT RECORD 2 taskkey=false taskval=<nil> keys=11
+    30-zzaccept155-parsed-ondisk_test.go:108: PROBE-155-ACCEPT COUNT records=3 taskkey_present=0 leg2_id=d728e07e-a878-4200-b0f6-02566c34a754 leg3_taskid=8609d567-52f3-4934-aad1-13186e90e0e5 leg3_match=false
+    ok  	github.com/CarlosShao/wisp/internal/agent	0.241s
+--- ext-B 153 两腿到盘探针（应红） : RUN=1 FAIL=1 ['--- FAIL: TestAccept153TraceOnDiskThroughRedactor']
+    zzaccept153_ondisk_test.go:60: PROBE-153 DISK: {"time":"2026-09-26T12:44:26.2035571+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true}
+    zzaccept153_ondisk_test.go:60: PROBE-153 DISK: {"time":"2026-09-26T12:44:26.204353+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true}
+    zzaccept153_ondisk_test.go:70: tagged record lost its task on disk: want "57b12d60-4552-43e2-9409-c3449528ec89" in {"time":"2026-09-26T12:44:26.204353+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true}
+    --- FAIL: TestAccept153TraceOnDiskThroughRedactor (0.01s)
+    FAIL
+    FAIL	github.com/CarlosShao/wisp/internal/agent	0.271s
+    FAIL
+
+================ ext-D（摘 N1＝AC#1 那枚判据用例），本程的尺 ================
+$ python mut153.py restore D:/tmp/wisp155accept/snap6de D:/tmp/wisp155accept/pristine
+   restored 3 files from D:\tmp\wisp155accept\pristine
+$ python mut153.py drop-test:TestCompressionTraceSilentWhenNothingFoldableOverThreshold D:/tmp/wisp155accept/snap6de D:/tmp/wisp155accept/pristine
+   LANDED (internal/agent/compress_trace_test.go): removed TestCompressionTraceSilentWhenNothingFoldableOverThreshold (lines 426-464)
+--- ext-D parsed on-disk : RUN=1 FAIL=0 
+    30-zzaccept155-parsed-ondisk_test.go:100: PROBE-155-ACCEPT RECORD 0 taskkey=false taskval=<nil> keys=11
+    30-zzaccept155-parsed-ondisk_test.go:100: PROBE-155-ACCEPT RECORD 1 taskkey=true taskval="a44a365e-c73b-4f26-93f7-9d69225e9992" keys=12
+    30-zzaccept155-parsed-ondisk_test.go:100: PROBE-155-ACCEPT RECORD 2 taskkey=true taskval="82faf720-39a1-4d97-b00a-7a7cf10db282" keys=12
+    30-zzaccept155-parsed-ondisk_test.go:108: PROBE-155-ACCEPT COUNT records=3 taskkey_present=2 leg2_id=a44a365e-c73b-4f26-93f7-9d69225e9992 leg3_taskid=82faf720-39a1-4d97-b00a-7a7cf10db282 leg3_match=true
+    ok  	github.com/CarlosShao/wisp/internal/agent	0.125s
+
+---- ext-D 同一棵树上再施 M5（句①那一形：摘证人⇒逃逸回来） ----
+$ python mut153.py m5 D:/tmp/wisp155accept/snap6de D:/tmp/wisp155accept/pristine
+   LANDED (internal/agent/compress.go): guard `if rep.Ran` -> `if c.Need(hist)`
+--- ext-D + m5 delivered suite : RUN=6 FAIL=0 
+    ok  	github.com/CarlosShao/wisp/internal/agent	0.086s
+
+================ 收口：还原自证 ================
+$ python mut153.py restore D:/tmp/wisp155accept/snap6de D:/tmp/wisp155accept/pristine
+   restored 3 files from D:\tmp\wisp155accept\pristine
+$ git hash-object 三枚被测文件（应等于 6de3d1c5/b23c7f7 的 blob 号）
+   4fcd9a32a50001e0428f5b1b11affa6b066afb41
+   3ea1fb8df38adfc56dc5f7510de07b4214fb547c
+   2357dca86f679431a0a47b8a91528f8e2f7e6cf6
+   RESTORED-IDENTICAL compress.go                True
+   RESTORED-IDENTICAL loop.go                    True
+   RESTORED-IDENTICAL compress_trace_test.go     True
+   快照里本程新增的 _test.go 枚数： ['30-zzaccept155-parsed-ondisk_test.go', 'zzaccept153_ondisk_test.go']

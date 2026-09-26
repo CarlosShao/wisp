@@ -1,0 +1,59 @@
+# 票 155 对抗验收程 · 快照树自证（AC#4 的复算）
+# 本程自己的取版器 mksnap.py（与实现程 sync_blob_tree.py 不同实现），锚点 6de3d1c5 与 5365cb22
+
+##### 1) 本程独立取版：逐 blob 重算 sha1 对拍 #####
+$ python mksnap.py make <repo> 6de3d1c5 D:/tmp/wisp155accept/snap6de
+anchor=6de3d1c5 blobs=1452 / written=1452 mismatched=0
+$ python mksnap.py make <repo> 5365cb22 D:/tmp/wisp155accept/snap5365
+anchor=5365cb22 blobs=1344 / written=1344 mismatched=0
+
+##### 2) 它的快照（盘上仍在）对我的 manifest：逐枚 cmp #####
+$ python mksnap.py verify D:/tmp/wisp155/snap manifest-6de3d1c5.json
+manifest files=1452 drift=0 missing=0 extra_in_tree=4
+  EXTRA internal/agent/probe153_line_test.go
+  EXTRA internal/agent/probe153_loopleg_test.go
+  EXTRA internal/agent/zzaccept153_ondisk_test.go
+  EXTRA internal/agent/zzprobe155_ext_ondisk_test.go
+
+##### 3) 两棵目录树逐字节对拍 #####
+$ python mksnap.py cmp snap6de /d/tmp/wisp155/snap
+shared=1452 byte-differ=0 onlyA=0 onlyB=4（那 4 枚见上）
+
+##### 4) 6de3d1c5 是不是读数所依据的那一版（闭包级） #####
+=== S. 闭包逐包在 b23c7f7..6de3d1c5 的改动枚数（0＝同版） ===
+internal/winsec          0
+internal/secret          0
+internal/observe         0
+internal/risk            0
+internal/config          0
+internal/llm             0
+internal/plugin          0
+internal/memory          0
+internal/agent           0
+
+=== T. 闭包外唯一动过的 internal 文件（点名） ===
+internal/tools/bridge.go
+
+=== U. 三枚被测文件在四枚锚点的 blob ===
+5365cb22   compress=75758f64aa43 loop=e685a6efd595 trace_test=9a155dfc276a
+b23c7f7    compress=4fcd9a32a500 loop=3ea1fb8df38a trace_test=2357dca86f67
+6de3d1c5   compress=4fcd9a32a500 loop=3ea1fb8df38a trace_test=2357dca86f67
+bb3a7a1    compress=4fcd9a32a500 loop=3ea1fb8df38a trace_test=2357dca86f67
+
+##### 5) internal/agent 的依赖闭包（go list 现取，GOPROXY=off） #####
+github.com/CarlosShao/wisp/internal/winsec github.com/CarlosShao/wisp/internal/secret github.com/CarlosShao/wisp/internal/observe github.com/CarlosShao/wisp/internal/risk github.com/CarlosShao/wisp/internal/config github.com/CarlosShao/wisp/internal/llm github.com/CarlosShao/wisp/internal/plugin github.com/CarlosShao/wisp/internal/memory github.com/CarlosShao/wisp/internal/agent 
+闭包里 internal/tools 枚数=0
+0
+（上面那枚 0＝测试二进制闭包也没有 internal/tools）
+
+##### 6) 四枚锚点上三枚被测文件的 blob #####
+5365cb22   compress=75758f64aa43 loop=e685a6efd595 trace_test=9a155dfc276a
+b23c7f7    compress=4fcd9a32a500 loop=3ea1fb8df38a trace_test=2357dca86f67
+6de3d1c5   compress=4fcd9a32a500 loop=3ea1fb8df38a trace_test=2357dca86f67
+bb3a7a1    compress=4fcd9a32a500 loop=3ea1fb8df38a trace_test=2357dca86f67
+
+##### 7) 它的探针文件 sha1（对 §12 名册宣称 f50cfa30… 的复算） #####
+dd6132536da17a7791ee128c200a060867aebec8 */d/tmp/wisp155/snap/internal/agent/zzprobe155_ext_ondisk_test.go
+ab468ba81c987837a304f82a7e926a5afd397bce */d/tmp/wisp155/snap/internal/agent/zzaccept153_ondisk_test.go
+3be3741802318926931a8dcc603613b6e686cb31 */d/tmp/wisp155/snap/internal/agent/probe153_line_test.go
+4a69d169eb9f00f6205c3c2290db65c088acd258 */d/tmp/wisp155/snap/internal/agent/probe153_loopleg_test.go

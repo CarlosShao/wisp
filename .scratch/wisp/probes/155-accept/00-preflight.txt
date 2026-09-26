@@ -1,0 +1,137 @@
+### 本发时刻
+2026-09-26 12:33 +0800
+### 被验锚点 / 当前 HEAD（共享树在动）
+bb3a7a1e
+e9a1db0
+e9a1db0 09-26 12:32 evidence(代 154 程提交三枚未入库读数): 它撞在 150 轮上限前把 AC#4 的"逐枚 comm
+
+=== A. 派单/证据件点名的每一枚锚号：cat-file -t + 一行标题 ===
+bb3a7a1    commit   bb3a7a1e|09-26 12:20|evidence(155 §11.1 仪器形状): 上一条自�
+829abe5    commit   829abe51|09-26 12:00|evidence(155 格①=AC#2 问① 裁完): 改前 C
+a52ded8    commit   a52ded8a|09-26 12:01|evidence(155 格②=AC#2 问② 裁完): 唯一�
+9136820    commit   91368201|09-26 12:06|evidence(155 格③=AC#3 句② 裁完): 到盘�
+c10f0c4    commit   c10f0c43|09-26 12:13|evidence(155 收口三节): §3.4-3.5 本格自�
+5f6646a    commit   5f6646a7|09-26 12:15|evidence(155 收口自报): §7 两枚枚数写�
+4c43b68    commit   4c43b68f|09-26 12:16|evidence(155 读数件追加): ext-A 收口第二
+33c6306    commit   33c63066|09-26 12:18|evidence(155 §10 指针更正): 三处交叉引�
+2a303c5    commit   2a303c51|09-26 12:19|evidence(155 §11 钉死 §3 两块谁作废): pr
+fe13c11    commit   fe13c119|09-26 12:17|evidence(155 §9 收口一行): 七格 commit 名
+ff550f3    commit   ff550f38|09-26 09:24|test(153 AC#1): 补上"过阈值但一轮都折�
+5365cb22   commit   5365cb22|09-26 09:10|docs(派单存档): 票 152／153／151 三枚写
+86b0161    commit   86b01613|09-26 08:59|feat(frontend 10 首启引导): FirstrunScreen pr
+b23c7f7    commit   b23c7f77|09-26 09:30|feat(153 AC#2): 那条痕带上它所属的 taskI
+6de3d1c5   commit   6de3d1c5|09-26 09:57|evidence(153 AC#5 第 5 格＋收口，并更正 
+777d6cc    commit   777d6cce|09-26 10:26|evidence(153 验收 第 0-1 格): 取版纪律＋
+ac7fb00    commit   ac7fb008|09-26 09:40|evidence(153 AC#1 第 1 格): 锚点现量＋派�
+b319bab    commit   b319bab5|09-26 11:25|docs(票 151 结＝附条件成立、票 153 结�
+-- ff550f3^ 展开 --
+5365cb22
+-- 6de3d1c5 是否已进主线 --
+YES
+-- b23c7f7 是否 6de3d1c5 的祖先 --
+YES
+
+=== B. 派单前提 P1：行号天然带版本（它写 run.go:576） ===
+5365cb22  576:	res := loop.Run(ctx, task)
+bb3a7a1   604:	res := loop.Run(ctx, task)
+HEAD      604:	res := loop.Run(ctx, task)
+-- 同一发在 HEAD 的 run.go 总行数（漂移幅度） --
+834
+862
+
+=== C. 派单前提 P2：6de3d1c5 存在，但它指的是哪一版（internal/agent 三枚被测文件） ===
+internal/agent/compress.go             b23c7f7=4fcd9a32a500  6de3d1c5=4fcd9a32a500  SAME
+internal/agent/loop.go                 b23c7f7=3ea1fb8df38a  6de3d1c5=3ea1fb8df38a  SAME
+internal/agent/compress_trace_test.go  b23c7f7=2357dca86f67  6de3d1c5=2357dca86f67  SAME
+-- b23c7f7..6de3d1c5 在 internal/ cmd/ go.mod 上到底动了什么 --
+cmd/wisp/run.go
+cmd/wisp/slo_report_144_windows_test.go
+cmd/wisp/slo_windows.go
+cmd/wisp/task_scope_close_151_test.go
+internal/tools/bridge.go
+rc=0（空＝没动）
+-- 同一区间动了哪些面（全量，前 20 行） --
+.scratch/wisp/dispatches/2026-09-26-093x-thaw-panel-for-145.md
+.scratch/wisp/dispatches/2026-09-26-095x-accept-151.md
+.scratch/wisp/dispatches/2026-09-26-095x-accept-152.md
+.scratch/wisp/probes/151/ac1-probe-source.go
+.scratch/wisp/probes/151/ac1-probe-tools.txt
+.scratch/wisp/probes/151/ac2-mutation-noclose.txt
+.scratch/wisp/probes/151/bridge.head.go
+.scratch/wisp/probes/151/commands.txt
+.scratch/wisp/probes/151/d22scan-post.txt
+.scratch/wisp/probes/151/gate-post-cmdwisp-count2.txt
+.scratch/wisp/probes/151/gate-post-cmdwisp-v.txt
+.scratch/wisp/probes/151/gate-post-tools-count2.txt
+.scratch/wisp/probes/151/gate-post-tools-v.txt
+.scratch/wisp/probes/151/gate-pre-cmdwisp-v.txt
+.scratch/wisp/probes/151/gate-pre-tools-v.txt
+.scratch/wisp/probes/151/gate-pre-tools.txt
+.scratch/wisp/probes/151/names-cli-post.txt
+.scratch/wisp/probes/151/names-cli-pre.txt
+.scratch/wisp/probes/151/names-post-tools.txt
+.scratch/wisp/probes/151/names-pre-tools.txt
+-- 枚数 --
+114
+
+=== D. 派单前提 P4：155 §6.2 两条注入点名的路径盘上反查 ===
+ABSENT  .scratch/wisp/dispatches/2026-09-26-122x-accept-156.md
+ABSENT  .scratch/wisp/tasks/bca7d7c.output
+ABSENT  .scratch/wisp/issues/155-three-unjudged-cells-r1-continued.md
+-- .scratch/wisp 下有没有 tasks/ 或任何 156 件 --
+dispatches
+issues
+probes
+voided
+.scratch/wisp/issues/156-q-57-landed-as-option-b-exited-asks-the-os-instead-of-our-own-record-and-the-152-leftover-comment-actions.md
+find rc=0
+-- dispatches 最新 5 枚 --
+2026-09-26-115x-impl-154.md
+2026-09-26-115x-impl-155.md
+2026-09-26-123x-accept-155-r1.md
+2026-09-26-124x-impl-154-r2-two-cells.md
+README.md
+
+=== E. 工作树脏在哪（不是被验版本，逐枚登记，一律不碰不还原） ===
+ M .scratch/wisp/probes/152/my152.py
+ D design/assets/base.css
+ D design/assets/icons.js
+ D design/assets/theme.js
+ D design/assets/tokens.css
+ M design/doubao/README.md
+ M design/doubao/demo/app.js
+ M design/doubao/demo/index.html
+ M design/doubao/demo/styles.css
+ D design/index.html
+ D design/screens/approval.html
+ D design/screens/ball.html
+ D design/screens/chat.html
+ D design/screens/config.html
+ D design/screens/cost.html
+ D design/screens/firstrun.html
+ D design/screens/palette.html
+ D design/screens/privacy.html
+ D design/screens/security.html
+ D design/screens/states.html
+ D design/screens/tasks.html
+ M docs/evidence/s1/152-subject-death-never-measured-r1-accept-r1.md
+?? .scratch/wisp/dispatches/2026-09-26-124x-impl-154-r2-two-cells.md
+?? .scratch/wisp/issues/156-q-57-landed-as-option-b-exited-asks-the-os-instead-of-our-own-record-and-the-152-leftover-comment-actions.md
+?? .scratch/wisp/probes/139/accept-r1/
+?? .scratch/wisp/probes/152/mut-shipped/
+?? .scratch/wisp/probes/152/overlay-probe1-on-samppost.json
+?? .scratch/wisp/probes/155-accept/
+?? .zcodeignore
+?? design/doubao/01-ball-states.jpg
+?? design/doubao/demo/lib/
+?? design/doubao/demo/rb-files.js
+?? design/doubao/demo/rb-plugins.js
+?? design/doubao/demo/rb-review.js
+?? design/doubao/demo/rb-terminal.js
+?? design/doubao/demo/rightbar.js
+?? design/doubao/demo/screens/home.js
+?? design/doubao/demo/screenshots/
+?? design/doubao/demo/sidebar.js
+?? design/old/
+-- 枚数 --
+40

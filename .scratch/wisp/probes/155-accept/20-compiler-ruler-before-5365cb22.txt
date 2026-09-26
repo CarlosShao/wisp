@@ -1,0 +1,44 @@
+### 编译器那把尺 · 改前锚点 5365cb22（快照 D:/tmp/wisp155accept/snap5365）
+go version = go version go1.27.1 windows/amd64
+
+--- C-env  插在第 129 行：_ = ctx BUILD-OK（这一发在码里存在）
+    rc=0
+
+--- C-b  插在第 129 行：_ = c.b BUILD-OK（这一发在码里存在）
+    rc=0
+
+--- C-f1  插在第 129 行：_ = taskID BUILD-FAIL（编译器判它不存在）
+    rc=1
+    # github.com/CarlosShao/wisp/internal/agent
+    internal\agent\compress.go:129:6: undefined: taskID
+
+--- C-f2  插在第 129 行：_ = c.taskID BUILD-FAIL（编译器判它不存在）
+    rc=1
+    # github.com/CarlosShao/wisp/internal/agent
+    internal\agent\compress.go:129:8: c.taskID undefined (type *Compressor has no field or method taskID)
+
+--- C-f3  插在第 129 行：_ = traceTaskID(ctx) BUILD-FAIL（编译器判它不存在）
+    rc=1
+    # github.com/CarlosShao/wisp/internal/agent
+    internal\agent\compress.go:129:6: undefined: traceTaskID
+
+--- L-f1  插在第 396 行：_ = taskID BUILD-OK（这一发在码里存在）
+    rc=0
+
+--- L-f2  插在第 396 行：_ = l.taskID BUILD-FAIL（编译器判它不存在）
+    rc=1
+    # github.com/CarlosShao/wisp/internal/agent
+    internal\agent\loop.go:396:9: l.taskID undefined (type *Loop has no field or method taskID)
+
+--- L-f3  插在第 396 行：_ = root.ID BUILD-OK（这一发在码里存在）
+    rc=0
+
+--- L-f4  插在第 396 行：_ = res.TaskID BUILD-OK（这一发在码里存在）
+    rc=0
+
+--- L-f5  插在第 396 行：_ = j.taskID BUILD-OK（这一发在码里存在）
+    rc=0
+
+--- 还原自证 ---
+    compress restored-identical=True
+    loop restored-identical=True

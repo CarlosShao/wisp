@@ -1,0 +1,47 @@
+# 票 155 对抗验收程 · 逐枚 commit 的名册与 154 交错登记（格 AC#3 的输入）
+
+=== Y. 155 的 commit 名册（现算，不抄它表） ===
+枚数=9
+fe13c119 c10f0c43 bb3a7a1e a52ded8a 91368201 829abe51 5f6646a7 33c63066 2a303c51 
+名册去重枚数=1730
+.gitattributes
+.github/workflows/ci.yml
+.github/workflows/slo-fresh.yml
+.gitignore
+.scratch/wisp/dispatches/2026-09-26-091x-r152-r153-r151.md
+.scratch/wisp/dispatches/2026-09-26-093x-thaw-panel-for-145.md
+.scratch/wisp/dispatches/2026-09-26-0958x-accept-153.md
+.scratch/wisp/dispatches/2026-09-26-095x-accept-151.md
+.scratch/wisp/dispatches/2026-09-26-095x-accept-152.md
+.scratch/wisp/dispatches/2026-09-26-103x-accept-145.md
+.scratch/wisp/dispatches/2026-09-26-103x-accept-151-r2.md
+.scratch/wisp/dispatches/2026-09-26-105x-accept-153-r2.md
+.scratch/wisp/dispatches/2026-09-26-115x-impl-154.md
+.scratch/wisp/dispatches/2026-09-26-115x-impl-155.md
+.scratch/wisp/dispatches/README.md
+.scratch/wisp/issues/01-build-chain-done.md
+.scratch/wisp/issues/01-build-chain.md
+.scratch/wisp/issues/02-s0-spike-done.md
+.scratch/wisp/issues/02-s0-spike.md
+.scratch/wisp/issues/03-skeleton-runtime-rules-done.md
+.scratch/wisp/issues/03-skeleton-runtime-rules.md
+.scratch/wisp/issues/04-sqlite-core-done.md
+.scratch/wisp/issues/04-sqlite-core.md
+.scratch/wisp/issues/05-config-model-done.md
+.scratch/wisp/issues/05-config-model.md
+.scratch/wisp/issues/06-secretstore-envs-done.md
+.scratch/wisp/issues/06-secretstore-envs.md
+.scratch/wisp/issues/07-ball-state-machine-core-done.md
+.scratch/wisp/issues/07-ball-state-machine-core.md
+.scratch/wisp/issues/08-observability-slo-done.md
+.scratch/wisp/issues/08-observability-slo.md
+.scratch/wisp/issues/09-llm-provider-openai-mockllm-done.md
+.scratch/wisp/issues/09-llm-provider-openai-mockllm.md
+.scratch/wisp/issues/10-agent-loop-core-done.md
+.scratch/wisp/issues/10-agent-loop-core.md
+.scratch/wisp/issues/100-appcontainer-landing-ticket-gated-by-trigger.md
+.scratch/wisp/issues/101-perm-store-has-no-production-importer-done.md
+.scratch/wisp/issues/101-perm-store-has-no-production-importer.md
+.scratch/wisp/issues/102-c26-expansion-rewrites-onto-another-tree-done.md
+.scratch/wisp/issues/102-c26-expansion-rewrites-onto-another-tree.md
+.scratch/wisp/issues/103-seal-seam-is-unguarded-and-removeunlinked-follows-jun

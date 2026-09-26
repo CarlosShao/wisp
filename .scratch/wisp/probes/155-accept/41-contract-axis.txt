@@ -1,0 +1,76 @@
+### 1) 本程一枚尺的坑：git log A B C（不带 --not/区间）会把整条历史吞进来
+-- 只按证据件路径筛出的 commit（bb3a7a1e 2a303c51 33c63066 fe13c119 5f6646a7 c10f0c43 91368201 a52ded8a 829abe51 ）再 naive 展开，名册枚数：
+1730
+   ⇒ 上面那枚数明显大于一切合理名册＝区间没界住（本程记成一枚仪器坑，不用它当读数）
+
+### 2) 逐枚 commit 判定它属不属于 155（尺＝只碰这两枚写面路径之一）
+155   fe13c119 12:17:29 evidence(155 §9 收口一行): 七格 com
+155   c10f0c43 12:13:40 evidence(155 收口三节): §3.4-3.5 本�
+155   bb3a7a1e 12:20:01 evidence(155 §11.1 仪器形状): 上一�
+155   a52ded8a 12:01:52 evidence(155 格②=AC#2 问② 裁完): �
+155   91368201 12:06:20 evidence(155 格③=AC#3 句② 裁完): �
+155   829abe51 12:00:19 evidence(155 格①=AC#2 问① 裁完): �
+非155 76c89b26 12:08:33 docs(票 154 实现程 第 3 节 格 AC#2�
+155   5f6646a7 12:15:52 evidence(155 收口自报): §7 两枚枚�
+155   4c43b68f 12:16:34 evidence(155 读数件追加): ext-A 收�
+非155 352d3d8d 12:03:58 evidence(票 154 实现程 第 2 节 格 A
+155   33c63066 12:18:21 evidence(155 §10 指针更正): 三处交
+非155 304199f3 12:15:18 evidence(票 154 实现程 第 4 节 格 A
+155   2a303c51 12:19:26 evidence(155 §11 钉死 §3 两块谁作�
+-- 属于 155 的枚数 --
+10
+
+### 3) 名册并集（逐枚 git show 相加再 sort -u，不用 git log 的多 rev 形式）
+并集枚数=13
+.scratch/wisp/probes/155/00-anchor-reverse-check.txt
+.scratch/wisp/probes/155/01-ac2-q1-before.txt
+.scratch/wisp/probes/155/02-ac2-q2-holder.txt
+.scratch/wisp/probes/155/10-snapshot-sync.txt
+.scratch/wisp/probes/155/11-ext-matrix.txt
+.scratch/wisp/probes/155/12-instrument-listing.txt
+.scratch/wisp/probes/155/13-ruler-caliber-diff.txt
+.scratch/wisp/probes/155/14-line-number-recheck-for-voided-block.txt
+.scratch/wisp/probes/155/20-delivery-shape.txt
+.scratch/wisp/probes/155/21-roster-and-counts.txt
+.scratch/wisp/probes/155/22-closing-shape.txt
+.scratch/wisp/probes/155/sync_blob_tree.py
+docs/evidence/s1/155-three-unjudged-cells-r1.md
+-- 名册里有没有落在两枚写面之外的路径（应只有它自己的两枚） --
+rc=1（1＝没有越界路径）
+
+### 4) 逐支禁改面扫（尺＝名册 grep -E 行首锚定；每支两跑记 rc）
+^docs/PLAN\.md                   命中=0 (rc两跑=1/1)
+^docs/specs/                     命中=0 (rc两跑=1/1)
+^internal/risk/                  命中=0 (rc两跑=1/1)
+^internal/panel/                 命中=0 (rc两跑=1/1)
+^internal/agent/approval/        命中=0 (rc两跑=1/1)
+^internal/observe/               命中=0 (rc两跑=1/1)
+thresholds\.go                   命中=0 (rc两跑=1/1)
+golden                           命中=0 (rc两跑=1/1)
+allowlist\.txt                   命中=0 (rc两跑=1/1)
+^scripts/slo-check\.ps1          命中=0 (rc两跑=1/1)
+^tools/d22scan/                  命中=0 (rc两跑=1/1)
+^frontend/                       命中=0 (rc两跑=1/1)
+^design/                         命中=0 (rc两跑=1/1)
+^internal/                       命中=0 (rc两跑=1/1)
+^cmd/                            命中=0 (rc两跑=1/1)
+^third_party/                    命中=0 (rc两跑=1/1)
+注：'golden' 那支在本程名册里也 0——它没碰任何 fixture；正控在下一节。
+
+### 5) 正控：同一批尺打在 b23c7f7（153 的生产改动）上，必须命中
+^internal/               命中=3
+^internal/agent/         命中=3
+^docs/PLAN\.md           命中=0
+^frontend/               命中=0
+-- b23c7f7 全名册 --
+internal/agent/compress.go
+internal/agent/compress_trace_test.go
+internal/agent/loop.go
+
+### 6) 票面与 -done：本程与被验程都没动（现读）
+.scratch/wisp/issues/153-the-compression-trace-has-two-unguarded-ways-to-lie-swapping-the-ran-guard-for-need-keeps-all-four-nails-green-and-the-trace-carries-no-taskid.md 未勾框=2 已勾框=3
+.scratch/wisp/issues/155-ticket-153-leaves-three-cells-unjudged-because-my-attack-point-grid-and-the-ticket-ac-grid-are-not-the-same-coordinate-system.md 未勾框=4 已勾框=0
+-done 枚数(153/155)=0
+-- 153 票面最后一次改动 / 155 票面最后一次改动 --
+b319bab 09-26 11:25 docs(票 151 结＝附条件成立、票 153 结＝部分结
+b319bab 09-26 11:25 docs(票 151 结＝附条件成立、票 153 结＝部分结
