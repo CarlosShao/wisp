@@ -549,7 +549,8 @@ e8092351 21:59 evidence(票161 r1 §3-§9): AC#1 逐枚读数 27 发＋六枚盲
 16364e63 21:53 evidence(票161 r1 §0-§2): 门禁盲区普查台件＋读数基线——…
 
 $ git diff --name-only fbe12c7..HEAD | wc -l
-45                                    # logs/final-ac5-roster.txt
+49                                    # logs/final-ac5-roster.txt（三枚提交之后）
+
 $ 上面那份名册里，落在契约轴/特别名单任何一枚之内的：
 (none: 契约轴零字节)
 $ git diff --name-only fbe12c7..HEAD | grep -v -e '^\.scratch/wisp/probes/161/r1/' -e '^docs/evidence/s1/161-gate-blindspot-r1\.md$'
@@ -569,6 +570,14 @@ pre 30 枚顶层名 vs final 30 枚：comm -23 = 空、comm -13 = 空（logs/pre
 ⇒ 门禁口径落地：**三本日志（pre / post / final）四数完全相同、名册两向差集皆空、零枚红**。
 派单 §4 那两枚"已知红"在本锚上不存在（来路 §1.1），所以"除那两枚之外零枚新增红"这一句
 今天的实值就是"**零枚红**"——**只可能更严，不可能更松**，判据文字我一个字没动。
+
+⚠ **一句自指，免得下一位以为 45/49 谁抄错了**：上面那个 **49** 是第 3 枚提交之后取的数，
+而**写着这个数的这一行本身属第 4 枚提交**——名册只多这一枚文件、且仍落在同两处写面内。
+复算式（跑一次就得到一个更新的数，且永远比本行落后一枚提交）：
+`git diff --name-only fbe12c7..HEAD | grep -v -e '^\.scratch/wisp/probes/161/r1/' -e '^docs/evidence/s1/161-gate-blindspot-r1\.md$'`
+⇒ 输出为空即"仍在我写面内"。第三遍全仓扫描也重跑过：
+`sh scripts/d22scan.sh` **rc=0／0 枚 finding**（`logs/final-d22scan-sh.log`）。
+
 
 ### 5.7 一件必须让编排者知道的 Git 现场处置（票面追加**没有**进任何提交）
 

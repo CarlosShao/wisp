@@ -27,6 +27,9 @@
 .scratch/wisp/probes/161/r1/logs/b8-probe-bands.scan.log
 .scratch/wisp/probes/161/r1/logs/b8-scope-bad.scan.log
 .scratch/wisp/probes/161/r1/logs/bench-all.log
+.scratch/wisp/probes/161/r1/logs/final-ac5-roster.txt
+.scratch/wisp/probes/161/r1/logs/final-passnames.txt
+.scratch/wisp/probes/161/r1/logs/final-runtests.log
 .scratch/wisp/probes/161/r1/logs/gorun-b8-scope-bad.log
 .scratch/wisp/probes/161/r1/logs/post-baseline-runtests.log
 .scratch/wisp/probes/161/r1/logs/post-d22scan-sh.log
@@ -40,6 +43,7 @@
 .scratch/wisp/probes/161/r1/logs/pre-passnames.txt
 .scratch/wisp/probes/161/r1/logs/skeleton-clean.scan.log
 .scratch/wisp/probes/161/r1/logs/summary.tsv
+.scratch/wisp/probes/161/r1/logs/ticket-file-sha-before.txt
 .scratch/wisp/probes/161/r1/logs/unp-bad.scan.log
 .scratch/wisp/probes/161/r1/logs/unp-hides-bans.scan.log
 docs/evidence/s1/161-gate-blindspot-r1.md
