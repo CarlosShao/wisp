@@ -1,0 +1,28 @@
+$ go test -count=1 -v -overlay 'D:/work/tmp/wisp152-accept-r1/ovl\pre--n1-newtest-on-pre-code.json' -run 'TestSLO144|TestSLO147|TestSLO149|TestSLO152|TestAcc152Probe' ./cmd/wisp/
+cwd=D:/work/tmp/wisp152-accept-r1/snap-pre
+overlay_files=1
+overlay={"Replace": {"D:/work/tmp/wisp152-accept-r1/snap-pre/cmd/wisp/slo_report_144_windows_test.go": "D:/work/tmp/wisp152-accept-r1/snap-post/cmd/wisp/slo_report_144_windows_test.go"}}
+# github.com/CarlosShao/wisp/cmd/wisp [github.com/CarlosShao/wisp/cmd/wisp.test]
+..\snap-post\cmd\wisp\slo_report_144_windows_test.go:747:32: not enough arguments in call to contradictionOffset
+	have (error)
+	want (error, int64)
+..\snap-post\cmd\wisp\slo_report_144_windows_test.go:747:56: undefined: offsetUnknown
+..\snap-post\cmd\wisp\slo_report_144_windows_test.go:750:9: undefined: offsetUnknown
+..\snap-post\cmd\wisp\slo_report_144_windows_test.go:752:13: undefined: contradictSubjectReportErr
+..\snap-post\cmd\wisp\slo_report_144_windows_test.go:752:44: undefined: offsetUnknown
+..\snap-post\cmd\wisp\slo_report_144_windows_test.go:759:70: undefined: offsetUnknown
+..\snap-post\cmd\wisp\slo_report_144_windows_test.go:783:27: not enough arguments in call to contradictionOffset
+	have (*"encoding/json".SyntaxError)
+	want (error, int64)
+..\snap-post\cmd\wisp\slo_report_144_windows_test.go:784:107: not enough arguments in call to contradictionOffset
+	have (*"encoding/json".SyntaxError)
+	want (error, int64)
+..\snap-post\cmd\wisp\slo_report_144_windows_test.go:787:27: not enough arguments in call to contradictionOffset
+	have (*"encoding/json".UnmarshalTypeError)
+	want (error, int64)
+..\snap-post\cmd\wisp\slo_report_144_windows_test.go:788:114: not enough arguments in call to contradictionOffset
+	have (*"encoding/json".UnmarshalTypeError)
+	want (error, int64)
+..\snap-post\cmd\wisp\slo_report_144_windows_test.go:788:114: too many errors
+FAIL	github.com/CarlosShao/wisp/cmd/wisp [build failed]
+FAIL

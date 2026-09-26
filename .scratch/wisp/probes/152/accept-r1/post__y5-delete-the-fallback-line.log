@@ -1,0 +1,8 @@
+$ go test -count=1 -v -overlay 'D:/work/tmp/wisp152-accept-r1/ovl\post--y5-delete-the-fallback-line.json' -run 'TestSLO144|TestSLO147|TestSLO149|TestSLO152|TestAcc152Probe' ./cmd/wisp/
+cwd=D:/work/tmp/wisp152-accept-r1/snap-post
+overlay_files=1
+overlay={"Replace": {"D:/work/tmp/wisp152-accept-r1/snap-post/cmd/wisp/slo_windows.go": "D:/work/tmp/wisp152-accept-r1/mut/post--y5-delete-the-fallback-line/cmd/wisp/slo_windows.go"}}
+# github.com/CarlosShao/wisp/cmd/wisp [github.com/CarlosShao/wisp/cmd/wisp.test]
+..\mut\post--y5-delete-the-fallback-line\cmd\wisp\slo_windows.go:684:1: missing return
+FAIL	github.com/CarlosShao/wisp/cmd/wisp [build failed]
+FAIL

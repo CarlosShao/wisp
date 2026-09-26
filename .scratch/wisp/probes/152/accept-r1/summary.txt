@@ -1,0 +1,21 @@
+{"cell": "post:probe-post", "rc": 1, "RUN": 0, "PASS": 0, "FAIL": 0, "SKIP": 0, "red": []}
+{"cell": "post__probe-post", "rc": 1, "RUN": 0, "PASS": 0, "FAIL": 0, "SKIP": 0, "red": []}
+{"cell": "post__probe-post", "rc": 1, "RUN": 24, "DID_NOT_RUN": false, "PASS": 16, "FAIL": 1, "SKIP": 0, "red": ["TestAcc152ProbeLastIsAValueNotANilEnvelope"]}
+{"cell": "post__probe-post", "rc": 1, "RUN": 24, "DID_NOT_RUN": false, "PASS": 16, "FAIL": 1, "SKIP": 0, "red": ["TestAcc152ProbeUnreapedTakesTheTimeoutLeg"]}
+{"cell": "post__asis-post", "rc": 0, "RUN": 21, "DID_NOT_RUN": false, "PASS": 14, "FAIL": 0, "SKIP": 0, "red": []}
+{"cell": "post__x1-exited-arm-deleted", "rc": 1, "RUN": 21, "DID_NOT_RUN": false, "PASS": 13, "FAIL": 1, "SKIP": 0, "red": ["TestSLO149ExitedGiveUpSentenceCarriesTheLastReading"]}
+{"cell": "post__x2-exited-arm-deleted-case13off", "rc": 0, "RUN": 20, "DID_NOT_RUN": false, "PASS": 13, "FAIL": 0, "SKIP": 0, "red": []}
+{"cell": "post__x3-case13-off", "rc": 0, "RUN": 20, "DID_NOT_RUN": false, "PASS": 13, "FAIL": 0, "SKIP": 0, "red": []}
+{"cell": "post__probe-post", "rc": 0, "RUN": 24, "DID_NOT_RUN": false, "PASS": 17, "FAIL": 0, "SKIP": 0, "red": []}
+{"cell": "post__z1-exited-loses-last-summary", "rc": 1, "RUN": 21, "DID_NOT_RUN": false, "PASS": 13, "FAIL": 1, "SKIP": 0, "red": ["TestSLO149ExitedGiveUpSentenceCarriesTheLastReading"]}
+{"cell": "post__z2-exited-loses-summary-case13off", "rc": 0, "RUN": 20, "DID_NOT_RUN": false, "PASS": 13, "FAIL": 0, "SKIP": 0, "red": []}
+{"cell": "post__y1-fallback-returns-0", "rc": 1, "RUN": 21, "DID_NOT_RUN": false, "PASS": 13, "FAIL": 1, "SKIP": 0, "red": ["TestSLO152CorruptLegWithNoNamedPositionRefusesToBorrowOne"]}
+{"cell": "post__y2-fallback-0-case14off", "rc": 0, "RUN": 20, "DID_NOT_RUN": false, "PASS": 13, "FAIL": 0, "SKIP": 0, "red": []}
+{"cell": "post__y3-case14-off", "rc": 0, "RUN": 20, "DID_NOT_RUN": false, "PASS": 13, "FAIL": 0, "SKIP": 0, "red": []}
+{"cell": "pre__asis-pre", "rc": 0, "RUN": 20, "DID_NOT_RUN": false, "PASS": 13, "FAIL": 0, "SKIP": 0, "red": []}
+{"cell": "pre__p1-pre-fallback-was-a-constant", "rc": 0, "RUN": 20, "DID_NOT_RUN": false, "PASS": 13, "FAIL": 0, "SKIP": 0, "red": []}
+{"cell": "pre__p2-pre-fallback-was-minus-one", "rc": 0, "RUN": 20, "DID_NOT_RUN": false, "PASS": 13, "FAIL": 0, "SKIP": 0, "red": []}
+{"cell": "pre__n1-newtest-on-pre-code", "rc": 1, "RUN": 0, "DID_NOT_RUN": true, "PASS": 0, "FAIL": 0, "SKIP": 0, "red": []}
+{"cell": "post__y4-renderer-drops-the-naming-arm", "rc": 1, "RUN": 21, "DID_NOT_RUN": false, "PASS": 13, "FAIL": 1, "SKIP": 0, "red": ["TestSLO152CorruptLegWithNoNamedPositionRefusesToBorrowOne"]}
+{"cell": "post__y5-delete-the-fallback-line", "rc": 1, "RUN": 0, "DID_NOT_RUN": true, "PASS": 0, "FAIL": 0, "SKIP": 0, "red": []}
+{"cell": "post__y6-fallback-returns-1", "rc": 1, "RUN": 21, "DID_NOT_RUN": false, "PASS": 13, "FAIL": 1, "SKIP": 0, "red": ["TestSLO152CorruptLegWithNoNamedPositionRefusesToBorrowOne"]}

@@ -1,0 +1,4 @@
+# github.com/CarlosShao/wisp/cmd/wisp [github.com/CarlosShao/wisp/cmd/wisp.test]
+..\ovl\broken-slo-windows.go:3:1: syntax error: non-declaration statement outside function body
+FAIL	github.com/CarlosShao/wisp/cmd/wisp [build failed]
+FAIL
