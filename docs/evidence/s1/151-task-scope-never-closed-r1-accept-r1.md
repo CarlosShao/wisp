@@ -140,3 +140,101 @@ $ git show 4e16976:.scratch/wisp/issues/151-*.md | grep -c '^- \['      ->  6
 金样本能让环路发起 `fs.read`，但环路自己的风险政策不给它到桥。要造出那一发得动 `internal/agent/**` 或
 `cmd/wisp/run.go` 的 Config 字面量——**那是别人的地界（票 153／组合根），本程没那个写面，也没自作**。
 所以"实现件的 T1 钉的是 `dropped=0` 那一形"这句话**本程跟着成立**（它 §8#5 自陈的那一半没被本程推翻）。
+
+## 第 3 节 格 AC#2 — 会响的检（派单攻击点③④⑤落这一格）
+
+### 3.1 那三枚 commit 与它自陈的形状（攻击点④）
+
+```
+$ git cat-file -t 45c920e / 5d46f24 / 4e16976   ->  commit / commit / commit
+$ git show --name-only --format='%h %s' 45c920e  ->  23 枚，全在 .scratch/wisp/probes/151/  下，别枚＝0
+$ git show --name-only --format='%h %s' 5d46f24  ->  恰 3 枚：cmd/wisp/run.go、cmd/wisp/task_scope_close_151_test.go、internal/tools/bridge.go
+$ git show --name-only --format='%h %s' 4e16976  ->  恰 1 枚：docs/evidence/s1/151-task-scope-never-closed-r1.md
+$ git show -s --format='%s' 5d46f24              ->  placeholder
+```
+
+⇒ 攻击点④那一问的前半**对得上**：名册恰那三枚、无夹带；message 确实是 `placeholder`，实现件 §10 自打一枪登记过，
+本程跟着核过"内容正确、消息坏"这一句为真。**这枚不是验收表能替他补的**（补记＝改历史，AGENTS §1.4 禁 `--amend`/`reset`），
+只能由编排者以追加的方式处理 ⇒ 记进第 7 节的"要编排者动手"那一栏，不算它的实现缺陷。
+
+### 3.2 摘一味（攻击点③）：两味**都有牙**，本程各造一枚
+
+尺：变异全在仓库外的 `4e16976` 纯净树上做，逐枚先 `diff` 证明"其余一字不动"，再 `go test -count=1 -v -run '<两枚新用例>' ./cmd/wisp/`。
+
+**味 1＝`run.go` 里那一行 `rt.bridge.CloseTask(taskID)`**（`probes/151-accept/mutA-drop-closetask-call.txt`）
+
+```
+$ diff run.shipped.go cmd/wisp/run.go
+563d562
+<               rt.bridge.CloseTask(taskID)        ← 只少这一行，别的一字未动
+$ go test … -run 'TestCompositionRoot…|TestAdmitTask…' ./cmd/wisp/     rc=1
+    task_scope_close_151_test.go:62: 任务结束时没有关闭它自己的 C25 污点 scope：stderr 里找不到以
+      "[audit] tools: C25 scope closed task=51a044eb-… " 开头的审计行
+--- FAIL: TestCompositionRootClosesTheLoopTasksTaintScope (1.67s)
+    task_scope_close_151_test.go:109: … 第二发 judged L2, want L0；text="实时语音（Path C）…未经文本循环登记（AdmitTextTask），已 fail-closed 拒绝"
+    task_scope_close_151_test.go:113: 第二轮没有读到文件内容，text="…"
+--- FAIL: TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit (1.97s)
+```
+
+⇒ **两枚全红，红因不同**（一枚丢审计行、一枚丢裁决），行号 `:62/:109/:113` 与实现件 §3 引的那三句**逐字对得上**（只有 uuid 是本程现读的）。
+"哪条用例变得不响？"＝没有一条不响。⇒ 这一味**不是装饰**。
+
+**味 2＝`CloseTask` 里那行 `b.log(...)` 审计**（本程量到一件实现件没说的事：**这一味摘不干净**）
+
+```
+B1 只删那两行 b.log(...)：
+$ go test … ./cmd/wisp/
+# github.com/CarlosShao/wisp/internal/tools
+internal\tools\bridge.go:659:2: declared and not used: dropped
+internal\tools\bridge.go:663:2: declared and not used: left
+FAIL    github.com/CarlosShao/wisp/cmd/wisp [build failed]        （probes/151-accept/mutB1-drop-audit-log-compile.txt）
+```
+
+⇒ 那枚审计行是 `dropped`/`left` 两枚局部量的**唯一消费者**，按"其余一字不动"的字面去摘会得到**编译失败**，
+不是一枚可判的读数（编译失败既不能算红也不能算绿＝仪器没跑到）。所以本程补一发**行为中立的 B2**
+（删掉 `b.log` ＋ 补 `_, _ = dropped, left` 让编译过去，除这两处外一字不动）：
+
+```
+B2：probes/151-accept/mutB2-drop-audit-log-behavior-neutral.txt
+--- FAIL: TestCompositionRootClosesTheLoopTasksTaintScope (2.01s)     ← 只这一枚红
+--- PASS: TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit (1.73s)      ← 另一枚仍绿
+```
+
+⇒ **审计行有牙，且牙口正好只长在 T1 上**——这正是实现件 §4 末段那句"摘掉它 `TestCompositionRootCloses...` 直接红"
+与 §3 那张"一枚丢审计行、一枚丢裁决"的分工。**两味分开钉两半，本程跟着成立。**
+（但"摘一味"这一动作在味 2 上必须付一发额外改动才成立 ⇒ 实现件 §4 那句话该补一句"这枚审计行与两枚局部量绑死，
+不是可独立删除的一行"，本程把它列进"要更正措辞"那一栏，不改判定。）
+
+### 3.3 恒真这一问（攻击点⑤）：它那句推理**只对两枚里的一枚成立**
+
+实现件 §3 原文："这两枚在'没有本票改动'的码上**结构上跑不起来**（`rt.admitTask` 这枚方法就是本票引入的，
+未修码上连编译都过不去）。所以本件不用'未修码'当红绿尺，用的是**变异尺**。"
+
+- `rt.admitTask` 确是本票新引入（本程尺：`git show 5d46f24 -- cmd/wisp/run.go` 里那一枚 `+func (rt *agentRuntime) admitTask`；
+  `grep -c admitTask` 在 `5d46f24^` 的三枚相关文件上＝**0**）⇒ **T2 那一半成立**（它函数体里直接调 `rt.admitTask`）。
+- **T1 那一半不成立**：`TestCompositionRootClosesTheLoopTasksTaintScope` 函数体只用到 `newRunFixture` / `f.run` / `f.taskID()` /
+  `strings.Contains`，这四件在 `5d46f24^` 上**全都有**（本程尺：`git show 5d46f24^:cmd/wisp/run_test.go | grep -n 'func (f \*runFixture) taskID\|taskIDRe\|rtHook'`
+  ⇒ `:56 :67 :123 :134` 四行命中）。本程真去跑了：把 `probes/151/run.head.go`＋`bridge.head.go`（先 `sha256sum` 现核＝`5d46f24^` 逐字节相同）
+  铺进树，把那枚测试文件裁成 **T1-only**（T2 连同它独有的 `context`/`time` 两枚 import 一起摘，否则编译单元假死），
+
+```
+$ go test -count=1 -v -run 'TestCompositionRootClosesTheLoopTasksTaintScope' ./cmd/wisp/      rc=1
+    task_scope_close_151_test.go:17: 任务结束时没有关闭它自己的 C25 污点 scope：stderr 里找不到以
+      "[audit] tools: C25 scope closed task=d51b8723-… " 开头的审计行
+--- FAIL: TestCompositionRootClosesTheLoopTasksTaintScope (1.80s)
+```
+
+⇒ **T1 在未修码上编得过、且直接红**（`probes/151-accept/mutC-t1-on-prefix-code.txt`）。
+票面 AC#2 点名要的那一发"这一发在**未修码**上响不响"，对 T1 本可以**拿未修码当尺直接答**，
+实现件却用"两枚都跑不起来"把它整体推给了变异尺＋§2.1 的等价读数。
+**这不改变判定**：变异尺本程复到了、T1 的未修码直读也确实是红的，钉的牙比它自陈的更硬。
+但**它这句话是一句会被下一程当尺用的过度陈述**（例如"票 154 那两枚用例也不用拿未修码量了"），
+⇒ 列进"要更正措辞"那一栏，与本程总判的档位挂勾（第 7 节）。
+⚠ 同一枚 §6 里它把改前那一跑做成 `overlay-pre.json`（两枚用例**都**摘掉）是**另一件事、做法没错**：
+那一跑要的是"改前 rc=0"，留着 T1 就会红。本程这句只针对 §3 那句推理的射程，不针对它 §6 的改前尺。
+
+### 3.4 顺带一条同义反复检查（它没写、本程自己加的）
+
+T2 是**测试自己手动**调 `rt.admitTask("host-151-taint")()` 走那一发边界，不是让环路自己 defer。
+这种形状最容易长成"把被测函数写进断言里"的假绿 ⇒ 本程的判据照旧是摘一味：
+味 1 拿下后 T2 仍红（judged L2）⇒ 它钉的是**效果**，不是自己调自己。这一条**过**。
