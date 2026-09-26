@@ -72,3 +72,26 @@ $ grep -c '同帧持有者\|持有者' docs/evidence/s1/155-three-unjudged-cells
 177:| 树是纯的 | 快照取版＝blob 级（§0 末），`mismatched: 0` | 全程**未用** `git archive`；`third_party/**` 那三枚 dll **没拷**——因为本程**一行 `cmd/wisp` 都没跑**（`internal/agent` 包不需要它们），这条在 §5"没测"里另记一笔，不当"跑过了" |
 238:| 还原自证 | 每发之前 `restore`、收口逐枚 `cmp` | `RESTORED IDENTICAL compress.go / loop.go / compress_trace_test.go`；再 `git hash-object` 三枚＝`4fcd9a32a500…`／`3ea1fb8df38a…`／`2357dca86f67…`＝**与 `6de3d1c5` 的 blob 号逐字相同** |
 327:- 快照纯度自证在 §0 末（`mismatched: 0` ＋ 三枚被测文件 `git hash-object` 与 `6de3d1c5` 的 blob 号逐字相同）。
+### B6/B7 补尺（本程现跑）
+$ git grep -n 'func .*FinishTaskLog' 5365cb22 -- internal
+5365cb22:internal/memory/dao_tasklog.go:49:func (s *Store) FinishTaskLog(ctx context.Context, id, state, summary string, tokensIn, tokensOut, costMicro int64, errorClass string) error {
+$ git grep -n 'taskID\|TaskID' 5365cb22 -- internal/memory/dao_tasklog.go | head
+5365cb22:internal/memory/dao_test.go:312:		TaskID: "task-a", Seq: 1, Tool: "fs.read",
+5365cb22:internal/memory/dao_toolcall.go:27:			tc.TaskID, tc.Seq, tc.Tool, tc.ArgsJSON, tc.RiskLevel,
+5365cb22:internal/memory/dao_toolcall.go:111:func (s *Store) ListToolCallsByTask(ctx context.Context, taskID string) ([]ToolCall, error) {
+5365cb22:internal/memory/dao_toolcall.go:112:	rows, err := s.reader.QueryContext(ctx, toolCallSelect+` WHERE task_id=? ORDER BY seq`, taskID)
+5365cb22:internal/memory/dao_toolcall.go:166:	if err := scan(&tc.ID, &tc.TaskID, &tc.Seq, &tc.Tool, &tc.ArgsJSON, &tc.RiskLevel,
+5365cb22:internal/memory/models.go:76:	TaskID        string
+5365cb22:internal/memory/models.go:161:	if tc.TaskID == "" {
+5365cb22:internal/memory/privacy_test.go:38:		TaskID: "task-p1", Seq: 1, Tool: "app.launch", ArgsJSON: "{}",
+$ grep -n 'AdmitTextTask' docs/evidence/s1/155-three-unjudged-cells-r1.md
+131:- `:476` 那一枚 `const taskID = "host:mode-switch"` 本程**特别点名**，因为它是一枚长得像答案的东西：它是宿主为一次
+$ git grep -n 'AdmitTextTask' 5365cb22 -- internal cmd | head -8
+5365cb22:cmd/wisp/panel_pump_test.go:153:		revoke := rt.gate.AdmitTextTask("pump-task")
+5365cb22:cmd/wisp/run.go:477:	revoke := rt.gate.AdmitTextTask(taskID)
+5365cb22:cmd/wisp/run.go:558:		AdmitTask: rt.gate.AdmitTextTask,
+5365cb22:cmd/wisp/run_mode101_test.go:191:	revoke := rt.gate.AdmitTextTask(task)
+5365cb22:cmd/wisp/run_test.go:356:		revoke := rt.gate.AdmitTextTask("gate-task")
+5365cb22:cmd/wisp/run_test.go:375:		t.Error("a task that never went through AdmitTextTask must be refused (D47)")
+5365cb22:internal/agent/approval/batch_test.go:47:	g.AdmitTextTask(testTask)
+5365cb22:internal/agent/approval/batch_test.go:92:	g.AdmitTextTask(testTask)

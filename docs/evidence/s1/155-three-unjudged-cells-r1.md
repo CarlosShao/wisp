@@ -571,3 +571,35 @@ $ git show 5365cb22:internal/agent/loop.go | sed -n '369p;396p' | cat -A
 | `res := Result{TaskID: taskID…}` `loop.go:369` | `Result.TaskID` 声明在 `:83`；构造点在 `:369`，压缩那一发在 `:396`——**同一枚 `run` 函数体、:369 在 `for`（`:376`）之前**，所以它是**早于**压缩 27 行被赋值的 | **"晚于压缩"那一半〔盘上不成立〕**（本程复算＝验收程同一读数）；"它是返回值的载体／出口"那一半对。**且这一处不是措辞小事**：正因为 `:369` 早于 `:396`，`res.TaskID` 在压缩那一刻**已经握着那枚 id**——它就是同帧第二枚可编得的持有者（155 验收件 `:91` 那发 `_ = res.TaskID` BUILD-OK），本票第 6、7 笔补的两枚与它同族 |
 
 ⇒ 本程**没有**据此改 §2 收尾那句"精确读法"的档（那一读法的后半句"只有 `Loop.run` 那一枚参数"由 155 验收件 `:112` 判〔不成立〕，属**那张表**的事，工单 `:45` 明令本票不动已定档位）；本笔只把打反的那半句落回盘上方向。
+
+### B.6 第 6 笔 —— 同帧持有者漏报 `j.taskID`（journal 那一枚）：**〔成立〕**
+
+**验收程那一句**（`155-three-unjudged-cells-r1-accept-r1.md:108`）：本件 §2 那张"副本"表**漏报**了日志那一发 `j := newTaskJournal(l.opt.Journal, taskID, taskID)`（`loop.go:356`），"本程 `_ = j.taskID` 编译**过**"。
+
+**本程当轮复算**（锚点＝`5365cb22`；全文＝`probes/157/10-items-4-to-7-code-facts.txt` 的 S3 段＋`probes/157/14-supplementary-rulers.txt` 的 Q4 段与末段补尺）：
+
+```
+$ git grep -n 'newTaskJournal' 5365cb22 -- internal/agent
+5365cb22:internal/agent/journal.go:59:func newTaskJournal(j Journal, taskID, corrID string) *taskJournal {
+5365cb22:internal/agent/loop.go:356:   j := newTaskJournal(l.opt.Journal, taskID, taskID) // C18: correlation == task id
+
+$ git show 5365cb22:internal/agent/journal.go | sed -n '1p;/^type taskJournal struct/,/^}/p'
+package agent                                   ← 与 loop.go **同一枚包** ⇒ 字段可直接访问
+type taskJournal struct { mu sync.Mutex; j Journal; taskID string; corrID string; seq int64; rows map[string]int64 }
+$ git grep -nE 'taskID' 5365cb22 -- internal/agent/journal.go   → :52 字段 ／ :59 :61 :63 构造 ／ :76 :130 :144 使用
+
+$ git grep -n 'func .*FinishTaskLog' 5365cb22 -- internal
+5365cb22:internal/memory/dao_tasklog.go:49:func (s *Store) FinishTaskLog(ctx context.Context, id, state, …) error
+       ← journal.go:144 把 t.taskID 递给**另一枚包**的实现者 ⇒ 这枚副本不止在栈里
+
+$ grep -c 'journal' docs/evidence/s1/155-three-unjudged-cells-r1.md   → 0
+$ grep -c 'newTaskJournal' 同上 → 0 ／ $ grep -c 'j\.taskID' 同上 → 0   ← 漏报坐实（本件通篇没出现过这枚名字）
+```
+
+**我这一笔用的尺是什么**＝**盘上读码三腿**，不是编译器：① 同包（`journal.go:1 package agent`）⇒ 字段访问合法；② 字段在场（`:52 taskID string`，构造 `:61`／`:63` 逐枚赋同一枚入参）；③ 作用域（`j` 于 `:356` 在函数体顶层绑定，`:396` 那次压缩之前没出作用域）。三腿都成立 ⇒ 155 验收件那发 `_ = j.taskID`（`:92` BUILD-OK）**本程不重跑**也敢收下这个方向；本票零仪器义务，编译器那一发归它、不抵本程这三腿。
+
+**对不上的一枚没有** ⇒ 给 §2 那张"副本"表补**第五枚行**（旧四行一字未改，本行挂在附录）：
+
+| 副本（本程补的第五枚） | 现量（`5365cb22`） | 算不算"另一个持有者" |
+|---|---|---|
+| `j := newTaskJournal(l.opt.Journal, taskID, taskID)` `loop.go:356` | `taskJournal` 有字段 `taskID`（`journal.go:52`），构造时 `:61`／`:63` 逐枚赋值；与 `loop.go` **同包**、`j` 在 `:396` 之前全程在作用域 ⇒ 压缩那一刻 `j.taskID` 就在手里。它还把这枚 id 递给包外：`:76 TaskID: t.taskID`、`:130 ID: t.taskID`、`:144 FinishTaskLog(ctx, t.taskID, …)`，实现者＝`internal/memory/dao_tasklog.go:49 (*Store)` | **"算"这一半本程不判**（那是 155 验收件 `:112` 已判〔不成立〕的那枚措辞，工单 `:45` 不许本票动档）。本行只补**名册**：本件 §2 ④ 那句"同一枚 id 在 `l.run` 体内还**另落了三处**"（`:109`）与它下面那张**四行**表本身就差一枚，§4 推进表又叫它"同帧四枚副本"（`:262`）——两处都漏了 `j.taskID`。连本行一起，名册至少**六枚**：`root.ID`／`l.current.ID`／`res.TaskID`／`RunningTask.ID`（这枚今天**无活体**，155 验收件 `:95` 现量 `RunAsync @cmd` 两跑 0 命中）／`j.taskID`／递给 gate 的那份＝第 7 笔 |
