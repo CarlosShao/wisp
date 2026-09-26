@@ -1,0 +1,39 @@
+### Y-A  pure-append proof: the first 239 lines must be byte-identical to the base version
+  $ git cat-file blob 4720e53:docs/evidence/s1/157-ac5-recheck-r1.md | wc -l  => 239
+  $ wc -l docs/evidence/s1/157-ac5-recheck-r1.md (now)                     => 270
+  cmp(前 239 行, 两版) => SILENT (逐字节相同 = 纯追加)
+  $ git diff --numstat 4720e53 -- docs/evidence/s1/157-ac5-recheck-r1.md      => 31 0 docs/evidence/s1/157-ac5-recheck-r1.md
+  $ git diff --numstat (whole worktree, must be only my two families):
+warning: in the working copy of '.scratch/wisp/probes/152/my152.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'design/doubao/demo/index.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/components/harness/main.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/components/harness/sidebar.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/src/fixtures/harness-app.ts', LF will be replaced by CRLF the next time Git touches it
+     12	0	.scratch/wisp/probes/152/my152.py
+     0	518	design/assets/base.css
+     0	180	design/assets/icons.js
+     0	80	design/assets/theme.js
+     0	287	design/assets/tokens.css
+     47	3	design/doubao/README.md
+     124	11	design/doubao/demo/app.js
+     22	2	design/doubao/demo/index.html
+     271	1	design/doubao/demo/styles.css
+     0	668	design/index.html
+     0	1176	design/screens/approval.html
+     0	578	design/screens/ball.html
+     0	663	design/screens/chat.html
+     0	216	design/screens/config.html
+     0	191	design/screens/cost.html
+     0	158	design/screens/firstrun.html
+     0	292	design/screens/palette.html
+     0	198	design/screens/privacy.html
+     0	213	design/screens/security.html
+     0	225	design/screens/states.html
+     0	253	design/screens/tasks.html
+     3	3	docs/evidence/s1/152-subject-death-never-measured-r1-accept-r1.md
+     31	0	docs/evidence/s1/157-ac5-recheck-r1.md
+     238	10	frontend/src/components/harness/main.tsx
+     208	90	frontend/src/components/harness/sidebar.tsx
+     152	8	frontend/src/fixtures/harness-app.ts
+### Y-B  index right before this commit
+  $ git diff --cached --name-only (before add) =>

@@ -1,0 +1,112 @@
+### X-K1  my commit roster and the paths each one touched
+   count by my own subject prefix = 1
+  commit 4720e53 15:00:00 evidence(157 AC#5 那一格重判 〔成立〕): �
+     .scratch/wisp/probes/157-ac5/01-anchor-versions-and-v6-control.sh
+     .scratch/wisp/probes/157-ac5/01-anchor-versions-and-v6-control.txt
+     .scratch/wisp/probes/157-ac5/02-section-anchored-bidirectional-rulers.sh
+     .scratch/wisp/probes/157-ac5/02-section-anchored-bidirectional-rulers.txt
+     .scratch/wisp/probes/157-ac5/03-dereference-and-roster-completeness.sh
+     .scratch/wisp/probes/157-ac5/03-dereference-and-roster-completeness.txt
+     .scratch/wisp/probes/157-ac5/04-injection-and-discipline-selfcheck.txt
+     .scratch/wisp/probes/157-ac5/04-injection-credentials-and-write-face.sh
+     .scratch/wisp/probes/157-ac5/04-injection-credentials-and-write-face.txt
+     .scratch/wisp/probes/157-ac5/05-anchor-stability-and-fields.sh
+     .scratch/wisp/probes/157-ac5/05-anchor-stability-and-fields.txt
+     .scratch/wisp/probes/157-ac5/06-fixed-column-ruler-supersession.sh
+     .scratch/wisp/probes/157-ac5/06-fixed-column-ruler-supersession.txt
+     .scratch/wisp/probes/157-ac5/07-grade-transcription-fidelity.sh
+     .scratch/wisp/probes/157-ac5/07-grade-transcription-fidelity.txt
+     docs/evidence/s1/157-ac5-recheck-r1.md
+   out-of-boundary check (roster minus my two families):
+   foreign paths in my roster = 0 (grep rc=1 means zero)
+### X-K2  forbidden faces, each measured with the same roster ruler (and a positive control that it is alive)
+   POSITIVE CONTROL: the same name-only ruler on b23c7f7 counts ^internal/ = 3 paths
+   (a different object, do not cross-copy: git ls-tree -r --name-only b23c7f7 -- internal/ = 465 paths)
+   forbidden ^internal/                                         hits in my roster = 0
+   forbidden ^cmd/                                              hits in my roster = 0
+   forbidden ^docs/PLAN\.md$                                    hits in my roster = 0
+   forbidden ^docs/specs/                                       hits in my roster = 0
+   forbidden ^docs/reports/pending-and-issues\.md$              hits in my roster = 0
+   forbidden ^docs/reports/HANDOVER\.md$                        hits in my roster = 0
+   forbidden ^docs/reports/injection-timeline\.md$              hits in my roster = 0
+   forbidden ^frontend/                                         hits in my roster = 0
+   forbidden ^design/                                           hits in my roster = 0
+   forbidden ^tools/d22scan/                                    hits in my roster = 0
+   forbidden ^scripts/                                          hits in my roster = 0
+   forbidden thresholds\.go                                     hits in my roster = 0
+   forbidden golden                                             hits in my roster = 0
+   forbidden allowlist\.txt                                     hits in my roster = 0
+   forbidden slo-check                                          hits in my roster = 0
+   forbidden ^\.scratch/wisp/issues/                            hits in my roster = 0
+   forbidden ^docs/evidence/s1/152-                             hits in my roster = 0
+   forbidden ^docs/evidence/s1/153-                             hits in my roster = 0
+   forbidden ^docs/evidence/s1/154-                             hits in my roster = 0
+   forbidden ^docs/evidence/s1/155-                             hits in my roster = 0
+   forbidden ^docs/evidence/s1/156-                             hits in my roster = 0
+   forbidden ^docs/evidence/s1/157-record-level                 hits in my roster = 0
+### X-K3  append-only / zero-touch proof against my entry anchor
+   155-three-unjudged-cells-r1.md                             vs 4f6c14c => IDENTICAL
+   153-trace-lies-unguarded-r1.md                             vs 4f6c14c => IDENTICAL
+   157-record-level-cleanup-r1-accept-r1.md                   vs 4f6c14c => IDENTICAL
+   157-record-level-cleanup-ten-table-vs-disk-mismatches-left-by-tickets-155-and-153.md vs 4f6c14c => IDENTICAL
+fatal: unable to stream f166058bfb0991bb92a1abcd7b9454754d97bff0 to stdout
+   pending-and-issues.md                                      vs 4f6c14c => CHANGED
+   HANDOVER.md                                                vs 4f6c14c => CHANGED
+   injection-timeline.md                                      vs 4f6c14c => CHANGED
+   and the appendix B headings of the two delivered subjects still count the same:
+   155件 ^### B\. = 13 | 153件 ^### B\. = 2 | ^## 附录 B in each = 1/1
+### X-K4  ticket faces: ticks, boxes, -done
+   155-ticket-153-leaves-three-cells-unjudged-because-my-atta     unchecked=0 checked=4 last-change=4e20e21a 13:06:29
+   153-the-compression-trace-has-two-unguarded-ways-to-lie-sw     unchecked=0 checked=5 last-change=d12444cc 15:00:44
+   157-record-level-cleanup-ten-table-vs-disk-mismatches-left     unchecked=5 checked=0 last-change=4e20e21a 13:06:29
+   -done files matching 157: 0
+### X-K5  unpushed proof and the shared-index condition
+   ahead of upstream = 226 | my commits inside @{u}..HEAD = 1
+   $ git diff --cached --name-only  (must list nothing but my own, or nothing at all):
+   $ git status --porcelain -- docs/reports/
+### X-K6  my own deliverable shape
+   lines=239  sections:
+     1:# 票 157 · **AC#5 那一格的重判**（非实现者·第三程 r1；派单＝`.scrat
+     12:## 0. 进场即测：那把原尺到底是哪一发（不读脏树）
+     24:## 1. 判据逐件对到行（只 AC#5 这一格，四支）
+     28:### 1.1 ① "双向对账"＝正向与反向**两个方向都在**
+     59:### 1.2 ② "没判的明写'未裁'"＝枚数与名册都现量
+     70:### 1.3 ③ "＋最小闭合集合"＝每枚"未裁"旁边有没有真的写"谁、用�
+     89:### 1.4 ④ 判据文本自己写"4 枚框"，票面现量 5 枚 ⇒ 这是**判据文�
+     104:## 2. 现量命令原文＋输出（**同一把尺打在两枚版本上**各跑一次�
+     147:## 3. "当时正确"与"尺坏"是两句，本程分开写（派单 `:60` 明令不许
+     149:### 3.1 当时正确（就 `ec81582` 那一版而言）
+     152:### 3.2 缺陷 A（结构性的，会随版本腐坏）：行窗尺本身
+     155:### 3.3 缺陷 B（这一格真正的那一刀）：反向结论的锚点 ≠ 自己�
+     158:### 3.4 同一族的**第二例**（派单 `:56` 要本程"撞到就具名"）
+     170:## 4. AC#5 判语（只这一格）
+     194:## 5. 本程没判什么（按"漏了它谁会先被骗"排序）
+     207:### 5.2 本程自己踩到／必须具名的读数差异（八枚，写死给下一位
+     219:## 6. 伪授权两栏（两栏**分开**计数；每条出处＝工具名＋命令前 
+   banned emoji bands in MY OWN file (the repo's instrument band, strings not comments):
+     U+1F000-1FAFF  hits=0
+n/a
+     U+2200-22FF    hits=7
+     U+2600-27BF    hits=2
+     U+2B00-2BFF    hits=0
+n/a
+     U+FE0F         hits=0
+n/a
+   my probe roster:
+     01-anchor-versions-and-v6-control.sh
+     01-anchor-versions-and-v6-control.txt
+     02-section-anchored-bidirectional-rulers.sh
+     02-section-anchored-bidirectional-rulers.txt
+     03-dereference-and-roster-completeness.sh
+     03-dereference-and-roster-completeness.txt
+     04-injection-and-discipline-selfcheck.txt
+     04-injection-credentials-and-write-face.sh
+     04-injection-credentials-and-write-face.txt
+     05-anchor-stability-and-fields.sh
+     05-anchor-stability-and-fields.txt
+     06-fixed-column-ruler-supersession.sh
+     06-fixed-column-ruler-supersession.txt
+     07-grade-transcription-fidelity.sh
+     07-grade-transcription-fidelity.txt
+     08-delivery-shape-and-write-face.sh
+     08-delivery-shape-and-write-face.txt
