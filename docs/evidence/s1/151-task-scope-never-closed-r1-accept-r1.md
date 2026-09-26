@@ -412,3 +412,58 @@ $ sh scripts/d22scan.sh                        ->  rc=0，clean                 
 两包名册两向 `comm` 与本程和它的名册对拍全空；`go vet` rc=0、`gofumpt -l` 空（版本 v0.12.0 (go1.27.1) 现读）、
 `sh scripts/d22scan.sh` rc=0 且各作用域分母非零。它 §AC#5 点名的三把尺（只认 `--- FAIL`、不裸 `grep -c '--- FAIL'`、
 一枚 panic 会吞同包其余读数）本程按同一方向用了：`^panic:` 六跑皆 **0** ⇒ 没有"开跑了没回来"的用例。
+
+## 第 8 节 放水两问自答（本程自己那一遍 ＋ 对实现件 §7 那两问的复核）
+
+**本程自己**：
+1. **断言方向动没动**＝没动。本程对盘上唯一写面是这份表 ＋ `.scratch/wisp/probes/151-accept/**`；
+   所有变异都打在仓库外的三枚树上（`D:/tmp/wisp151accept{,-base,-pre,-clean,-count2}`），
+   `internal/**`、`cmd/**`、两枚新用例、`thresholds.go`、golden、`allowlist.txt`、`scripts/*` 一字未改
+   （现读尺＝`git status --porcelain`，见第 11 节那发）。本程也**没为了变绿放宽任何断言**——
+   本程自己造的两枚发（E2E 与其对照）第一枚**是红的**并且本程让它红着交上来。
+2. **helper 是不是原有的**＝分两半，都答清楚。
+   AC#1 那发复跑＝**原样复制实现件那枚探针**（它自己 §2 答过"复用 `fsBridgeWith`/`writeUnder`/`argsFor`/`gateSpy`"），
+   本程没有为它加一行；E2E 与对照那两发**没用 `newRunFixture`**（那枚夹具把 `text_chain` 写死成 `acme/m1`，
+   换不了金样本模型名），本程照它的形状自己拼了 `config.toml`＋`secret.NewStore`＋`runTextTask(runSpec{…})`，
+   用的常量/正则仍是包内原有的 `configFileName`/`fakeStoreKey`/`任务 (\S+) 结束`。
+   ⇒ 这是**新造了一枚输入构造器，不是新造了一把判定尺**：判"到没到桥"用的是桥自己那行 `[audit] tools:` 审计、
+   判"环路派发了什么"用的是控制台那行 `[工具 X -> outcome]`、判"真执行了"用的是 `os.ReadFile` 看文件落没落盘——三枚都是既有可观测面。
+
+**复核实现件 §7 那两问**（本程换尺重跑）：
+1. 它说"没动任何一条既有断言、只新增两枚用例"——本程尺：`git diff 5d46f24^ 5d46f24` 全文读，
+   `+` 里没有一枚既有 `t.Error/t.Fatal` 被改向，两枚新用例文件是**新文件**；`internal/tools` 里既有用例一字未动 ✓。
+   它 §7 特别说破的那处"看起来像放水"（修完之后**少**了一种 L2＝`unbound-scope`）本程**独立复到**：
+   第 2.2 节那发复跑里 `same-task-inherit` 腿仍命中 `R4: 包含来自 fs.read <路径>`、
+   `cross-task-after-close` 腿仍 `L0` 零卡 ⇒ 关掉的是误报、不是真命中。这一句它写对了。
+2. 它说"新用例只新增 `req151`/`write151` 两枚输入构造器，装配件全是原有的"——本程现读
+   `cmd/wisp/task_scope_close_151_test.go:33/45` 恰这两枚；它 AC#1 探针复用的那批 helper
+   **在 `5d46f24^` 上就存在**（`git grep` 尺：`helpers_test.go:32 fsBridgeWith`、`:99 writeUnder`、
+   `bridge_test.go:71 gateSpy`＋其 `PendingWindow/PendingApproval`）⇒ **没有"用 mock 代替真的"这一形**。
+
+## 第 9 节 追加读数（第 7 节那张表欠的那一枚）＋ 档位总判
+
+```
+$ go test -count=2 -v ./cmd/wisp/     （干净的 git archive 树，rc=0）
+  RUN=276  顶格 PASS=156  FAIL=0  SKIP=0  panic=0  全量裁决=276
+  台件：probes/151-accept/gate-post-cli-count2-rerun.txt（本节把它重成一枚完整的台件——第 7 节 commit 时那发还没写完）
+```
+
+⇒ **第 7 节那张表的第六枚也逐字复到**（它自报 276 / 156 / 0 / 0）。**六数全中。**
+
+### 档位总判：**附条件成立**
+
+分界按派单写的那句走——**这程造没造出来**：本程造出来了（三发变异、一发端到端金样本、一发对照、六枚门禁数、两包名册对拍，
+全在 `4e16976` 那枚纯净树上现做，见各节台件）。所以不判"退回"：
+没有任何一味是装饰（第 3 节）、没有假绿（第 8 节）、没有越界写（第 5 节）、没有把没量的当已量（它 §2.3/§8 反而处处收着说）。
+
+但也**不判"成立、无条件"**，因为它的**记录文本里有三句会被下一程当尺用**、而本程现量它们不准：
+
+| 条件 | 落在哪一句 | 本程的证据 | 谁能动 |
+|---|---|---|---|
+| **C1** 把"生产可达"读成"今天 `wisp run` 控制台腿天天吃到这一发"要收窄 | 实现件 §2.1 那张代价表第一行的括注"（今天的 `wisp run` 控制台腿、`NoGate`）" | 第 2.3 节两发：金样本发出 `fs.read` → `was_open=false dropped=0`（没到桥）；同腿换 L1 声明的 `fs.write` → success 且落盘 | 本程无写面 ⇒ 交编排者记台账（实现件只读） |
+| **C2** "两枚新用例在未修码上结构上跑不起来"只对 T2 成立 | 实现件 §3 末段第一句 | 第 3.3 节：T1-only 铺 `5d46f24^` 两枚 head → 编得过、且 `--- FAIL` | 同上 |
+| **C3** 残余清单少一条"第二道门" | 实现件 §8 第 5 条（只归给 mockllm 的 `tool_choice`） | 第 2.3 节三处原文：`fs.go:298`＋`loop.go:776-789`＋`run.go:588-595` 从不设 `PassThroughUnclassifiedRisk` | 交编排者定去向（并进票 154 的面、或另立一枚）；**本程不动票 151/154 面** |
+| **C4** `5d46f24` 的 commit message＝`placeholder` | 实现件 §10 自打一枪那条 | 本程 `git show -s --format='%s' 5d46f24` 现读＝`placeholder`；名册恰三枚、内容对 | 只能由编排者按"追加、不改写"补记（本程禁 `--amend`/`reset`，未动） |
+
+**票面那 5 枚框**：本程按上表 5 格判"都可勾"（AC#1 的勾**带着 C1**、AC#2 的勾**带着 C2**）；
+"6 枚"那一句是实现件的尺错（第 1 节），不影响任何一格有人裁过。
