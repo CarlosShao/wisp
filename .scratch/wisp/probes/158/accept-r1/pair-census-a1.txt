@@ -1,0 +1,68 @@
+# anchor c7f638c (c7f638c5 20:23:53 票 158 r2 · 交件后自纠两处（追加，§A–§H 已入库那一行一字未改：git diff numstat deleted=0）)
+
+## 0. token discovery: which open/close-ish verbs exist in the taint-scope area
+     31 OpenScope
+     15 Close
+     11 CloseScope
+      9 Open
+      7 OpenTask
+      6 CloseTask
+      5 DisposalScope
+      3 Defer
+      2 OpenProcess
+      2 OpenKey
+      2 CloseHandle
+      1 Release
+      1 OpenFile
+      1 EndpointOptions
+      1 Closed
+
+## P-1 G5 的既有射程（OpenScope<->CloseScope），本轮同尺复算
+$ git grep -nEw 'OpenScope|CloseScope' c7f638c -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/*   (roster lines: 3, call lines: 3)
+# open call sites per file:
+#   O cmd/wisp/panel_assets.go                                   1
+#   O internal/tools/bridge.go                                   1
+# close call sites per file:
+#   C internal/tools/bridge.go                                   1
+# UNPAIRED (opened in a file that never closes it):
+#   cmd/wisp/panel_assets.go
+# 未成对枚数＝1
+
+## P-2 票面 §5-5 第一族：OpenTask<->CloseTask（桥的 scope 账）
+$ git grep -nEw 'OpenTask|CloseTask' c7f638c -- internal/**/*.go cmd/**/*.go :!*_test.go   (roster lines: 8, call lines: 4)
+# open call sites per file:
+#   O internal/tools/bridge.go                                   2
+# close call sites per file:
+#   C cmd/wisp/run.go                                            1
+#   C internal/tools/bridge.go                                   1
+# UNPAIRED (opened in a file that never closes it):
+#   (none)
+# 未成对枚数＝0
+
+## P-3 票面 §5-5 第二族：Defer<->DisposalScope（收尾委托那一族，排定义本体包）
+$ git grep -nEw 'Defer|DisposalScope' c7f638c -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/*   (roster lines: 39, call lines: 22)
+# open call sites per file:
+#   O internal/plugin/disposal.go                                2
+# close call sites per file:
+#   C internal/memory/retention.go                               2
+#   C internal/observe/goroutine.go                              1
+#   C internal/plugin/disposal.go                                17
+#   C internal/proc/shutdown.go                                  1
+# UNPAIRED (opened in a file that never closes it):
+#   (none)
+# 未成对枚数＝0
+
+## P-4 反向：DisposalScope<->Defer（把上一族的开合方向倒过来再量一遍）
+$ git grep -nEw 'DisposalScope|Defer' c7f638c -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/*   (roster lines: 39, call lines: 22)
+# open call sites per file:
+#   O internal/memory/retention.go                               2
+#   O internal/observe/goroutine.go                              1
+#   O internal/plugin/disposal.go                                17
+#   O internal/proc/shutdown.go                                  1
+# close call sites per file:
+#   C internal/plugin/disposal.go                                2
+# UNPAIRED (opened in a file that never closes it):
+#   internal/memory/retention.go
+#   internal/observe/goroutine.go
+#   internal/proc/shutdown.go
+# 未成对枚数＝3

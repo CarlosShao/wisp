@@ -1,0 +1,124 @@
+# 票 154 AC#1 触发门 —— 锚点 c7f638c
+# 生成时刻 2026-09-26T20:29:50+08:00
+# 下一程复算＝同一条命令再跑一次，逐行 diff 名册；名册变长＝门响。
+
+## G1 生产码里构造 ToolRequest（排 internal/agent/ 自身）
+$ git grep -nE  'ToolRequest\{' c7f638c -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/agent/*
+# rc=1   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G1b 生产码里任意 .Execute( 调用点（排 loop.go 与 bridge.go 自身）
+$ git grep -nE  '\.Execute\(' c7f638c -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/agent/loop.go :!internal/tools/bridge.go
+# rc=1   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G2 OpenTask/CloseTask 的生产出现点（排 bridge.go 自身；今日应只剩 cmd/wisp/run.go 那一发＋它上面的注释）
+$ git grep -nE -w 'OpenTask|CloseTask' c7f638c -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/tools/bridge.go
+c7f638c:cmd/wisp/run.go:546:// WHY THIS HOOK OWNS THE CLOSE. CloseTask's own comment says the composition
+c7f638c:cmd/wisp/run.go:563:		rt.bridge.CloseTask(taskID)
+# rc=0   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G3 Q-56 那一支落地：Loop 上出现收 taskID 的导出方法
+$ git grep -nE  '^func \(l \*Loop\) [A-Z][A-Za-z0-9]*\(.*taskID' c7f638c -- internal/agent
+# rc=1   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G4 生产组合根打开 L0 直通（PassThroughUnclassifiedRisk 的字面赋值）
+$ git grep -nE  'PassThroughUnclassifiedRisk:' c7f638c -- *.go :!*_test.go
+# rc=1   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G5 OpenScope↔CloseScope 成对普查：生产码里开了 C25 scope 却没在同一文件关过的名册（排 internal/risk 的定义本体、排 *_test.go）
+$ git grep -nEw 'OpenScope|CloseScope' c7f638c -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/*
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+c7f638c:cmd/wisp/panel_assets.go:232:	prov.OpenScope(taintSourceScopeID)
+c7f638c:internal/tools/bridge.go:642:		b.prov.OpenScope(taskID)
+c7f638c:internal/tools/bridge.go:695:		b.prov.CloseScope(taskID)
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   UNPAIRED cmd/wisp/panel_assets.go (开方调用点=1)
+# 未成对枚数＝1   （0＝这把尺没响／>0＝逐枚点名如上）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=1   （本枚子句的响＝未成对枚数；0＝不响）
+
+## G5 正控（形状照 G1–G4 的「正控先跑」：同一把尺打在已知「开又合」的样本上，必须不响）
+# 样本＝internal/tools/bridge.go（:642 prov.OpenScope 与 :691 prov.CloseScope 同文件成对）
+# 写法上的两条自纠（都是本程实测撞出来的，不是设想的）：
+#   (1) pathspec 必须与主尺同形再逐条排除。第一版图省事写成 'internal/tools/**/*.go'，
+#       实测 git grep rc=1、名册空、未成对 0——那是一枚**根本产不出读数的装饰腿**，
+#       它「不响」不能算正控（票 154 的 AC#3 就是拿「零区别」否掉装饰腿的）。
+#       本机现量：git grep -lEw OpenScope <锚> -- internal/tools/**/*.go => rc=1 零命中；
+#                          同尺 -- internal/tools/*.go  => rc=0 命中 bridge.go。
+#   (2) 必须排 *_test.go。第一版没排，正控自己被本程新测试里那句解释 Mark 机理的**注释**
+#       点中——那是假阳性。成对判据从此只吃调用点（见 pair() 里剔注释那一行）。
+
+## G5-正控 同尺＝主尺射程，只多排掉主尺今天点名的那一枚 panel_assets.go ⇒ 剩下的开方全是 balanced 样本
+$ git grep -nEw 'OpenScope|CloseScope' c7f638c -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/* :!cmd/wisp/panel_assets.go
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+c7f638c:internal/tools/bridge.go:642:		b.prov.OpenScope(taskID)
+c7f638c:internal/tools/bridge.go:695:		b.prov.CloseScope(taskID)
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   （空）
+# 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=0   （本枚子句的响＝未成对枚数；0＝不响）
+
+## G5 负一负（同尺摘掉「排测试＋排定义」那两条 ⇒ 今日应非空，证明这把尺吃得住这个形状、不是结构上产不出读数的装饰）
+
+## G5-负一负 同尺不过滤任何文件
+$ git grep -nEw 'OpenScope|CloseScope' c7f638c -- internal/**/*.go cmd/**/*.go
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+c7f638c:cmd/wisp/panel_assets.go:232:	prov.OpenScope(taintSourceScopeID)
+c7f638c:internal/risk/provenance.go:56:// 21, 22, 26) must (1) OpenScope at task start and Defer(CloseScope) on the
+c7f638c:internal/risk/provenance.go:337:// OpenScope registers a task/session scope (composition root calls this at
+c7f638c:internal/risk/provenance.go:339:func (p *Provenance) OpenScope(scopeID string) {
+c7f638c:internal/risk/provenance.go:347:// CloseScope drops every taint bound to a scope (wire via
+c7f638c:internal/risk/provenance.go:348:// disposalScope.Defer(p.CloseScope) — disposal MUST not leak taints past the
+c7f638c:internal/risk/provenance.go:350:func (p *Provenance) CloseScope(scopeID string) {
+c7f638c:internal/risk/provenance.go:387:		logf("risk/C25: scope %q not open (CloseScope raced or composition gap); taint stored — it cannot leak into other scopes", scopeID)
+c7f638c:internal/risk/provenance.go:438:// OpenScope, or Inspect after CloseScope) while the engine holds taints in
+c7f638c:internal/risk/provenance.go:453:			logf("risk/C25: Inspect/CheckText on unregistered scope %q while other scopes hold taints: fail-closed R4 (ensure OpenScope at task start)", scopeID)
+c7f638c:internal/risk/provenance.go:477:			Origin: "scope is not open (OpenScope missing or already closed)",
+c7f638c:internal/risk/provenance.go:578:			Origin: "scope is not open (OpenScope missing or already closed)",
+c7f638c:internal/risk/provenance_syncdirs_other_test.go:55:	p.OpenScope("task-1")
+c7f638c:internal/risk/provenance_test.go:23:	p.OpenScope("task-1")
+c7f638c:internal/risk/provenance_test.go:297:	p.OpenScope("task-2")
+c7f638c:internal/risk/provenance_test.go:309:	p.OpenScope("session-1")
+c7f638c:internal/risk/provenance_test.go:310:	scope.Defer(func() { p.CloseScope("session-1") })
+c7f638c:internal/risk/provenance_test.go:322:	p.OpenScope("session-2")
+c7f638c:internal/risk/provenance_test.go:340:	p.OpenScope("task-1")
+c7f638c:internal/risk/provenance_test.go:358:	p.CloseScope("task-1")
+c7f638c:internal/risk/provenance_test.go:359:	p.OpenScope("task-2")
+c7f638c:internal/risk/provenance_test.go:364:	p.CloseScope("task-2") // disposes the taints -> engine empty again
+c7f638c:internal/risk/provenance_test.go:454:	p.OpenScope("task-1")
+c7f638c:internal/risk/provenance_test.go:722:	p2.OpenScope("s")
+c7f638c:internal/risk/provenance_test.go:780:	p.OpenScope("s")
+c7f638c:internal/risk/provenance_test.go:792:	p.OpenScope("s")
+c7f638c:internal/risk/provenance_test.go:798:	p2.OpenScope("s")
+c7f638c:internal/risk/provenance_test.go:812:	p.OpenScope("s")
+c7f638c:internal/risk/syncdirs_redteam_windows_test.go:89:	p.OpenScope("task-1")
+c7f638c:internal/risk/syncdirs_redteam_windows_test.go:154:	p.OpenScope("task-1")
+c7f638c:internal/risk/syncdirs_redteam_windows_test.go:222:	p.OpenScope("task-1")
+c7f638c:internal/risk/syncdirs_test.go:378:	e.p.OpenScope("task-1")
+c7f638c:internal/risk/syncdirs_test.go:459:	e.p.OpenScope("task-1")
+c7f638c:internal/risk/syncdirs_windows_test.go:95:	p.OpenScope("task-1")
+c7f638c:internal/risk/taintmatch_test.go:176:	p.OpenScope("s")
+c7f638c:internal/risk/taintmatch_test.go:181:		p.CloseScope("s")
+c7f638c:internal/risk/taintmatch_test.go:182:		p.OpenScope("s")
+c7f638c:internal/risk/taintmatch_test.go:190:	p.OpenScope("s")
+c7f638c:internal/tools/bridge.go:642:		b.prov.OpenScope(taskID)
+c7f638c:internal/tools/bridge.go:695:		b.prov.CloseScope(taskID)
+c7f638c:internal/tools/bridge_scope_open_ticket158_test.go:20:// 从没 OpenScope 的 scope 被 Mark 之后同样会在表上出现并带着污点（provenance.go:394，
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   UNPAIRED cmd/wisp/panel_assets.go (开方调用点=1)
+#   UNPAIRED internal/risk/provenance_syncdirs_other_test.go (开方调用点=1)
+#   UNPAIRED internal/risk/syncdirs_redteam_windows_test.go (开方调用点=3)
+#   UNPAIRED internal/risk/syncdirs_test.go (开方调用点=2)
+#   UNPAIRED internal/risk/syncdirs_windows_test.go (开方调用点=1)
+# 未成对枚数＝5   （0＝这把尺没响／>0＝逐枚点名如上）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=5   （本枚子句的响＝未成对枚数；0＝不响）
+
+## 附：G1 的负一负（同尺摘掉排测试那一条 ⇒ 今日即非空，证明模式吃得住这个形状，不是结构上产不出读数的装饰）
+$ git grep -cE 'ToolRequest\{' c7f638c -- internal cmd 里 *_test.go 的枚数
+15
+
+## 附：今日 production .Execute( 全名册（不过滤）＝G1b 的排除项本体
+c7f638c:internal/agent/loop.go:730:		return l.opt.Tools.Execute(ctx, req)
+c7f638c:internal/agent/loop.go:734:	out, err := l.opt.Tools.Execute(tctx, req)
+c7f638c:internal/tools/bridge.go:463:	res, err := entry.Tool.Execute(ectx, req.Args, onUpdate)

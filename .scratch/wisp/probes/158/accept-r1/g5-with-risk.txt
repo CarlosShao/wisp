@@ -1,0 +1,3 @@
+  UNPAIRED cmd/wisp/panel_assets.go
+  open files: cmd/wisp/panel_assets.go internal/risk/provenance.go internal/tools/bridge.go 
+  unpaired count: 1

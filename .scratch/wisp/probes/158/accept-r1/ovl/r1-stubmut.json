@@ -1,0 +1,6 @@
+{
+  "Replace": {
+    "D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go": "D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go",
+    "D:/work/workspace/projects plans/Wisp/internal/tools/bridge_scope_open_ticket158_test.go": "D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/158/accept-r1/mut/guard.stub.go"
+  }
+}
