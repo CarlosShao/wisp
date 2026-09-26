@@ -1,0 +1,3 @@
+gitignore.go:13:1: ineffectual compiler directive due to extraneous space: "// go:embed needs the directory to exist in a clean checkout (ticket 77 AC#1)." (SA9009)
+main.go:127:2: field failAddOn is unused (U1000)
+main.go:143:2: var secretNameRe is unused (U1000)

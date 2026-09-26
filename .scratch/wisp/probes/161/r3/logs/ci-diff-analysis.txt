@@ -1,0 +1,7 @@
+HEAD lint steps: 9  current lint steps: 10
+added steps: ['D22 scanner self-test (ticket 161 AC#2 - every ban, both directions)']
+triggers equal: True
+concurrency equal: True
+jobs key set equal: True
+slo-full step bodies equal: True
+non-lint jobs all equal: True

@@ -1314,7 +1314,19 @@ func scopeSummary(scopes []scanScope, s *scanner) string {
 
 func main() {
 	root := flag.String("root", ".", "repository root to scan")
+	selfTest := flag.Bool("self-test", false, "run this tool's own bidirectional self-test (ticket 161 AC#2) and exit: "+
+		"0 every ban ranged on its bad sample and stayed silent on its clean one, 1 a direction failed, "+
+		"2 the self-test's own roster is hollow (a ban with no sample, a sample with no ban, a walk that read nothing)")
+	selfTestSrc := flag.String("self-test-roster", selfBansSourceFlag,
+		"source file -self-test reads the ban roster from (the `// Bans` block and every finding-emission site)")
 	flag.Parse()
+	// The self-test first, because it is a claim about this binary, not about a
+	// tree: it builds its own throwaway fixtures and never touches -root, so the
+	// two modes cannot be confused for one another (and a broken -root spelling
+	// cannot make the self-test "pass" by scanning nothing).
+	if *selfTest {
+		os.Exit(runSelfTest(os.Stdout, os.Stderr, *selfTestSrc))
+	}
 	abs, err := filepath.Abs(*root)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "d22scan:", err)

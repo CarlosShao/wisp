@@ -1,0 +1,2 @@
+d22scan -self-test: FATAL ban #1 appears twice in main.go's roster block
+exit status 2

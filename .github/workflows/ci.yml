@@ -80,6 +80,31 @@ jobs:
         # process exit codes 1 and 2 on seeded violations.
         run: bash tools/d22scan/runtests.sh -C tools/d22scan ./...
 
+      - name: "D22 scanner self-test (ticket 161 AC#2 - every ban, both directions)"
+        # The step above proves the scanner's tests run; this one proves the SCANNER
+        # still sees what it claims to see. tools/d22scan -self-test builds a
+        # throwaway fixture repository per sample and runs the production walks over
+        # it, requiring for every ban id this tool can report (the list is read out
+        # of main.go itself, never copied here) one sample that MUST ring and one
+        # that MUST stay silent - and refusing to print a verdict at all if a ban has
+        # no pair, because a deleted sample would otherwise look like a passing test.
+        #
+        # WHY A SEPARATE STEP AT ALL, when the step above already executes the same
+        # table through TestSelfTestEntryPassesEveryCase: two independent ways to be
+        # run means deleting one is a reading, not a silence (ticket 161 AC#4). The
+        # process exit code is also what CI consumes, and a CI step whose command is
+        # `go run` cannot pass by importing a helper main() no longer calls.
+        #
+        # It sits directly under the positive control and above the scan, which is
+        # the highest position in this job that is not already taken: the two steps
+        # below it can be skipped by an earlier red (that disease is ticket 71/85/111
+        # territory and ticket 161 AC#6 owns the aggregate-rc half of it), so the
+        # nearer this sits to the top, the less often its verdict is the one that
+        # goes missing. Added step only: no existing step was moved, edited, given
+        # an `if:`, or made continue-on-error (D22 run-away mode 6).
+        run: go run . -self-test
+        working-directory: tools/d22scan
+
       - name: D22 seven-ban + emoji scan (tools/d22scan)
         # Wrapper is the supported entry point (ticket 67 AC#2): it derives the
         # repo root from its own location, runs the seeded-violation positive

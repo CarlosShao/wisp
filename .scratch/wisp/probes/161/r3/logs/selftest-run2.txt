@@ -1,0 +1,6 @@
+d22scan -self-test: FATAL the table does not cover the tool (4 hole(s)); an unrun self-test is not a green self-test
+d22scan -self-test:   HOLE ban #6 panel-approval is documented in the `// Bans` block but no s.add() can emit it - the walk was removed, or the tag was renamed in only one of the two places
+d22scan -self-test:   HOLE ban #7 internal-artifact-tool is documented in the `// Bans` block but no s.add() can emit it - the walk was removed, or the tag was renamed in only one of the two places
+d22scan -self-test:   HOLE a self-test case names tag "panel-approval", which no s.add() in this tool can emit - the sample is testing a ban that does not exist
+d22scan -self-test:   HOLE a self-test case names tag "internal-artifact-tool", which no s.add() in this tool can emit - the sample is testing a ban that does not exist
+exit status 2
