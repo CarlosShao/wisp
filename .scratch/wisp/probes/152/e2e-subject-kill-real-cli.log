@@ -1,0 +1,27 @@
+# anchor=cdf2471 date=2026-09-26 09:26 +0800
+# exe=/d/work/tmp/wisp152/scratch/wisp.exe (built by v1 step 1, rc=0)
+
+## step 1: start the real observer (window 6s, then it enters collectReport)
+observer shell pid=39577 at 09:26:52
+
+## step 2: enumerate wisp.exe children until the -self-sample one is seen
+--- attempt 1 sees: ---
+4056 D:\work\tmp\wisp152\scratch\wisp.exe slo -state Sleeping -seconds 6 -settle-ms 0 -interval-ms 250 -out D:/work/tmp/wisp152/scratch/e2e2/kill-report.json
+63800 D:\work\tmp\wisp152\scratch\wisp.exe slo -subject -state Sleeping -seconds 6 -interval-ms 250 -settle-ms 0 -ready-file C:\Users\swq\AppData\Local\Temp\wisp-slo-subject-406588375\ready -out C:\Users\swq\AppData\Local\Temp\wisp-slo-subject-406588375\subject-report.json
+41000 D:\work\tmp\wisp152\scratch\wisp.exe slo -subject -state Sleeping -seconds 6 -interval-ms 250 -settle-ms 0 -ready-file C:\Users\swq\AppData\Local\Temp\wisp-slo-subject-3126614692\ready -out C:\Users\swq\AppData\Local\Temp\wisp-slo-subject-3126614692\subject-report.json -self-sample
+victim pid=41000
+
+## step 3: kill it for real (TerminateProcess via Stop-Process)
+victim command line: 41000 D:\work\tmp\wisp152\scratch\wisp.exe slo -subject -state Sleeping -seconds 6 -interval-ms 250 -settle-ms 0 -ready-file C:\Users\swq\AppData\Local\Temp\wisp-slo-subject-3126614692\ready -out C:\Users\swq\AppData\Local\Temp\wisp-slo-subject-3126614692\subject-report.json -self-sample
+Stop-Process rc=0
+victim GONE (no process object)
+
+## step 4: wait for the observer to give up and print its verdict
+observer rc=2 elapsed_since_kill=35s
+--- observer stderr verbatim (what a human running `wisp slo` sees) ---
+stderr bytes=336
+time=2026-09-26T09:26:52.759+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+wisp slo: in-tree record unavailable (fail-closed, no silent downgrade to the tree basis): wisp slo: subject 41000 never wrote a complete report within 33s (last read: 0 bytes read, no report file yet)
+--- out file ---
+kill report bytes=NO FILE (the run failed closed)
+# end 2026-09-26 09:27 +0800

@@ -1,0 +1,87 @@
+# anchor=5365cb2  date=2026-09-26 09:22 +0800
+# cmd: go test -count=1 -overlay D:/work/tmp/wisp152/scratch/probe/overlay-probe.json -v -run TestP152SubjectDeathProbe ./cmd/wisp/
+# PATH dll form: /d/work/... (MSYS, per pitfall 1)
+time=2026-09-26T09:22:24.195+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestP152SubjectDeathProbe
+P152|fixture|bytes=1978 child_writes=989 child_exit=7
+=== RUN   TestP152SubjectDeathProbe/prod-prefix-unreaped
+P152|prod-prefix-unreaped|os_says=alive=false code=7 (GetExitCodeProcess: terminated)
+P152|prod-prefix-unreaped|exited_before_loop=false
+P152|prod-prefix-unreaped|exitcode_before_loop=-1
+P152|prod-prefix-unreaped|sentence=wisp slo: subject 2572 never wrote a complete report within 4s (last read: 989 bytes read, document still open at offset 989: the tail had not arrived)
+P152|prod-prefix-unreaped|elapsed=4.02s budget=4s
+P152|prod-prefix-unreaped|reads=counting_seam=0 scripted_seam=n/a
+P152|prod-prefix-unreaped|exited_after_loop=false
+P152|prod-prefix-unreaped|exited_after_wait=true code=7
+P152|prod-prefix-unreaped|file_on_disk=bytes=989 read_err=<nil> classified=unwritten (989 bytes read, document still open at offset 989: the tail had not arrived)
+=== RUN   TestP152SubjectDeathProbe/prod-nofile-unreaped
+P152|prod-nofile-unreaped|os_says=alive=false code=7 (GetExitCodeProcess: terminated)
+P152|prod-nofile-unreaped|exited_before_loop=false
+P152|prod-nofile-unreaped|exitcode_before_loop=-1
+P152|prod-nofile-unreaped|sentence=wisp slo: subject 3056 never wrote a complete report within 4s (last read: 0 bytes read, no report file yet)
+P152|prod-nofile-unreaped|elapsed=4.02s budget=4s
+P152|prod-nofile-unreaped|reads=counting_seam=0 scripted_seam=n/a
+P152|prod-nofile-unreaped|exited_after_loop=false
+P152|prod-nofile-unreaped|exited_after_wait=true code=7
+P152|prod-nofile-unreaped|file_on_disk=bytes=0 read_err=open C:\Users\swq\AppData\Local\Temp\TestP152SubjectDeathProbeprod-nofile-unreaped968817945\001\subject-report.json: The system cannot find the file specified. classified=unwritten (0 bytes read, document still open at offset 0: the tail had not arrived)
+=== RUN   TestP152SubjectDeathProbe/prod-prefix-unreaped-count
+P152|prod-prefix-unreaped-count|os_says=alive=false code=7 (GetExitCodeProcess: terminated)
+P152|prod-prefix-unreaped-count|exited_before_loop=false
+P152|prod-prefix-unreaped-count|exitcode_before_loop=-1
+P152|prod-prefix-unreaped-count|sentence=wisp slo: subject 11896 never wrote a complete report within 4s (last read: 989 bytes read, document still open at offset 989: the tail had not arrived)
+P152|prod-prefix-unreaped-count|elapsed=4.02s budget=4s
+P152|prod-prefix-unreaped-count|reads=counting_seam=186 scripted_seam=n/a
+P152|prod-prefix-unreaped-count|exited_after_loop=false
+P152|prod-prefix-unreaped-count|exited_after_wait=true code=7
+P152|prod-prefix-unreaped-count|file_on_disk=bytes=989 read_err=<nil> classified=unwritten (989 bytes read, document still open at offset 989: the tail had not arrived)
+=== RUN   TestP152SubjectDeathProbe/prod-prefix-REAPED
+P152|prod-prefix-REAPED|wait_before_loop=exit status 7
+P152|prod-prefix-REAPED|exited_before_loop=true
+P152|prod-prefix-REAPED|exitcode_before_loop=7
+P152|prod-prefix-REAPED|sentence=wisp slo: subject 64584 exited (code 7) without writing its report (989 bytes read, document still open at offset 989: the tail had not arrived)
+P152|prod-prefix-REAPED|elapsed=0s budget=4s
+P152|prod-prefix-REAPED|reads=counting_seam=0 scripted_seam=n/a
+P152|prod-prefix-REAPED|exited_after_loop=true
+P152|prod-prefix-REAPED|exited_after_wait=true code=7
+P152|prod-prefix-REAPED|file_on_disk=bytes=989 read_err=<nil> classified=unwritten (989 bytes read, document still open at offset 989: the tail had not arrived)
+=== RUN   TestP152SubjectDeathProbe/prod-nofile-REAPED
+P152|prod-nofile-REAPED|wait_before_loop=exit status 7
+P152|prod-nofile-REAPED|exited_before_loop=true
+P152|prod-nofile-REAPED|exitcode_before_loop=7
+P152|prod-nofile-REAPED|sentence=wisp slo: subject 25924 exited (code 7) without writing its report (0 bytes read, no report file yet)
+P152|prod-nofile-REAPED|elapsed=0s budget=4s
+P152|prod-nofile-REAPED|reads=counting_seam=0 scripted_seam=n/a
+P152|prod-nofile-REAPED|exited_after_loop=true
+P152|prod-nofile-REAPED|exited_after_wait=true code=7
+P152|prod-nofile-REAPED|file_on_disk=bytes=0 read_err=open C:\Users\swq\AppData\Local\Temp\TestP152SubjectDeathProbeprod-nofile-REAPED3243290850\001\subject-report.json: The system cannot find the file specified. classified=unwritten (0 bytes read, document still open at offset 0: the tail had not arrived)
+=== RUN   TestP152SubjectDeathProbe/case13-shape-scripted-REAPED
+P152|case13-shape-scripted-REAPED|wait_before_loop=exit status 7
+P152|case13-shape-scripted-REAPED|exited_before_loop=true
+P152|case13-shape-scripted-REAPED|exitcode_before_loop=7
+P152|case13-shape-scripted-REAPED|sentence=wisp slo: subject 51300 exited (code 7) without writing its report (989 bytes read, document still open at offset 989: the tail had not arrived)
+P152|case13-shape-scripted-REAPED|elapsed=0s budget=4s
+P152|case13-shape-scripted-REAPED|reads=counting_seam=0 scripted_seam=1
+P152|case13-shape-scripted-REAPED|exited_after_loop=true
+P152|case13-shape-scripted-REAPED|exited_after_wait=true code=7
+P152|case13-shape-scripted-REAPED|file_on_disk=bytes=989 read_err=<nil> classified=unwritten (989 bytes read, document still open at offset 989: the tail had not arrived)
+=== RUN   TestP152SubjectDeathProbe/unreaped-scripted
+P152|unreaped-scripted|os_says=alive=false code=7 (GetExitCodeProcess: terminated)
+P152|unreaped-scripted|exited_before_loop=false
+P152|unreaped-scripted|exitcode_before_loop=-1
+P152|unreaped-scripted|sentence=wisp slo: subject 30308 never wrote a complete report within 4s (last read: 989 bytes read, document still open at offset 989: the tail had not arrived)
+P152|unreaped-scripted|elapsed=4s budget=4s
+P152|unreaped-scripted|reads=counting_seam=0 scripted_seam=189
+P152|unreaped-scripted|exited_after_loop=false
+P152|unreaped-scripted|exited_after_wait=true code=7
+P152|unreaped-scripted|file_on_disk=bytes=989 read_err=<nil> classified=unwritten (989 bytes read, document still open at offset 989: the tail had not arrived)
+--- PASS: TestP152SubjectDeathProbe (16.64s)
+    --- PASS: TestP152SubjectDeathProbe/prod-prefix-unreaped (4.08s)
+    --- PASS: TestP152SubjectDeathProbe/prod-nofile-unreaped (4.07s)
+    --- PASS: TestP152SubjectDeathProbe/prod-prefix-unreaped-count (4.08s)
+    --- PASS: TestP152SubjectDeathProbe/prod-prefix-REAPED (0.11s)
+    --- PASS: TestP152SubjectDeathProbe/prod-nofile-REAPED (0.08s)
+    --- PASS: TestP152SubjectDeathProbe/case13-shape-scripted-REAPED (0.15s)
+    --- PASS: TestP152SubjectDeathProbe/unreaped-scripted (4.08s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	16.694s
+rc=0

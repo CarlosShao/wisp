@@ -1,0 +1,51 @@
+# anchor=cdf2471 date=2026-09-26 09:26 +0800
+# cwd=/d/work/workspace/projects plans/Wisp  exe=/d/work/tmp/wisp152/scratch/wisp.exe
+## step 1: build the real CLI outside the repo
+$ go build -o /d/work/tmp/wisp152/scratch/wisp.exe ./cmd/wisp
+build rc=0
+-rwxr-xr-x 1 swq 197609 28890559 Sep 26 09:26 /d/work/tmp/wisp152/scratch/wisp.exe
+
+## step 2: BASELINE - a healthy real run, same flags, no kill (control)
+$ /d/work/tmp/wisp152/scratch/wisp.exe slo -state Sleeping -seconds 3 -settle-ms 0 -interval-ms 250 -out $out
+baseline rc=0 elapsed=7s
+baseline stderr: 134 bytes
+baseline report bytes=16660
+
+## step 3: KILL the instrumented (-self-sample) subject child mid-run
+# the observer enters collectReport at ~t+3s; the subject would write its
+# report at ~t+6s (sampling 3s + subjectGrace 3s). Kill at ~t+4.5s, so the
+# observer waits on a corpse.
+$ Get-CimInstance Win32_Process -Filter "Name='wisp.exe'" | where CommandLine -match '-self-sample'
+--- every wisp.exe process the OS reports ---
+47800\|D:\work\tmp\wisp152\scratch\wisp.exe slo -state Sleeping -seconds 3 -settle-ms 0 -interval-ms 250 -out D:/work/tmp/wisp152/scratch/e2e/kill-report.json
+16004\|D:\work\tmp\wisp152\scratch\wisp.exe slo -subject -state Sleeping -seconds 3 -interval-ms 250 -settle-ms 0 -ready-file C:\Users\swq\AppData\Local\Temp\wisp-slo-subject-2699679461\ready -out C:\Users\swq\AppData\Local\Temp\wisp-slo-subject-2699679461\subject-report.json
+62424\|D:\work\tmp\wisp152\scratch\wisp.exe slo -subject -state Sleeping -seconds 3 -interval-ms 250 -settle-ms 0 -ready-file C:\Users\swq\AppData\Local\Temp\wisp-slo-subject-1381084089\ready -out C:\Users\swq\AppData\Local\Temp\wisp-slo-subject-1381084089\subject-report.json -self-sample
+victim pid=62424\
+$ Stop-Process -Id 62424\ -Force   (a real TerminateProcess on a real subject)
+Stop-Process : Cannot bind parameter 'Id'. Cannot convert value "62424\" to type "System.Int32". Error: "Input string w
+as not in a correct format."
+At line:1 char:18
++ Stop-Process -Id 62424\ -Force
++                  ~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Stop-Process], ParameterBindingException
+    + FullyQualifiedErrorId : CannotConvertArgumentNoMessage,Microsoft.PowerShell.Commands.StopProcessCommand
+ 
+stop rc=1
+$ GetExitCodeProcess-equivalent check that pid 62424\ is gone:
+Get-Process : Cannot bind parameter 'Id'. Cannot convert value "62424\" to type "System.Int32". Error: "Input string wa
+s not in a correct format."
+At line:1 char:21
++ if (Get-Process -Id 62424\ -ErrorAction SilentlyContinue) { 'STILL RU ...
++                     ~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Get-Process], ParameterBindingException
+    + FullyQualifiedErrorId : CannotConvertArgumentNoMessage,Microsoft.PowerShell.Commands.GetProcessCommand
+ 
+observer rc=0 elapsed=9s
+--- the kill run's out file ---
+kill report bytes=17095
+--- observer stderr verbatim (what a human running `wisp slo` actually sees) ---
+stderr bytes=134
+time=2026-09-26T09:26:40.093+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- baseline stderr for comparison ---
+time=2026-09-26T09:26:30.547+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+# end 2026-09-26 09:26 +0800

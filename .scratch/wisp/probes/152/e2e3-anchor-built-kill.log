@@ -1,0 +1,33 @@
+# date=2026-09-26 09:33 +0800
+## step 0: prove the bytes the exe is built from
+$ git -C /d/work/tmp/wisp152/snap-pre rev-parse HEAD   (a git-archive snapshot has no .git)
+cmd/wisp/slo_windows.go anchor=0403d5196f4bc0c20993dca7ceeea2b8 snap=0403d5196f4bc0c20993dca7ceeea2b8 same=YES
+cmd/wisp/slo_report_144_windows_test.go anchor=4d07365e12e9e156771020f3b638dcfa snap=4d07365e12e9e156771020f3b638dcfa same=YES
+cmd/wisp/run.go anchor=862af1373b868e7fa51f276363de015f snap=862af1373b868e7fa51f276363de015f same=YES
+
+## step 1: build the anchor CLI
+$ (cd /d/work/tmp/wisp152/snap-pre && go build -o /d/work/tmp/wisp152/scratch/wisp-anchor.exe ./cmd/wisp)
+build rc=0 exe=/d/work/tmp/wisp152/scratch/wisp-anchor.exe size=28482471
+
+## step 2: start the real observer (window 6s), then find its -self-sample child
+observer shell pid=40155 at 09:33:28
+--- attempt 1 sees: ---
+56208 D:\work\tmp\wisp152\scratch\wisp-anchor.exe slo -state Sleeping -seconds 6 -settle-ms 0 -interval-ms 250 -out D:/work/tmp/wisp152/scratch/e2e3/kill-report.json
+12736 D:\work\tmp\wisp152\scratch\wisp-anchor.exe slo -subject -state Sleeping -seconds 6 -interval-ms 250 -settle-ms 0 -ready-file C:\Users\swq\AppData\Local\Temp\wisp-slo-subject-2583625739\ready -out C:\Users\swq\AppData\Local\Temp\wisp-slo-subject-2583625739\subject-report.json
+28528 D:\work\tmp\wisp152\scratch\wisp-anchor.exe slo -subject -state Sleeping -seconds 6 -interval-ms 250 -settle-ms 0 -ready-file C:\Users\swq\AppData\Local\Temp\wisp-slo-subject-571289499\ready -out C:\Users\swq\AppData\Local\Temp\wisp-slo-subject-571289499\subject-report.json -self-sample
+victim pid=28528
+
+## step 3: kill it for real
+victim command line: 28528 D:\work\tmp\wisp152\scratch\wisp-anchor.exe slo -subject -state Sleeping -seconds 6 -interval-ms 250 -settle-ms 0 -ready-file C:\Users\swq\AppData\Local\Temp\wisp-slo-subject-571289499\ready -out C:\Users\swq\AppData\Local\Temp\wisp-slo-subject-571289499\subject-report.json -self-sample
+Stop-Process rc=0
+victim GONE (no process object)
+victim subject report file at kill time: ls: cannot access 'C:\Users\swq\AppData\Local\Temp\wisp-slo-subject-571289499\subject-report.json': No such file or directory
+
+## step 4: the observer's verdict
+observer rc=2 elapsed_since_kill=36s
+--- observer stderr verbatim ---
+stderr bytes=336
+time=2026-09-26T09:33:28.785+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+wisp slo: in-tree record unavailable (fail-closed, no silent downgrade to the tree basis): wisp slo: subject 28528 never wrote a complete report within 33s (last read: 0 bytes read, no report file yet)
+kill report bytes=NO FILE (failed closed)
+# end 2026-09-26 09:34 +0800

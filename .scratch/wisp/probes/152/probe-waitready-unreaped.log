@@ -1,0 +1,14 @@
+# snapshot 5365cb2 + overlay(probe1+probe2 from /d/work/tmp/wisp152/scratch/probe)
+# cmd: go test -count=1 -overlay D:/work/tmp/wisp152/scratch/probe/overlay-probe2-samppre.json -v -run TestP152BWaitReadyProbe ./cmd/wisp/
+# date: 2026-09-26 09:31 +0800
+time=2026-09-26T09:31:58.456+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestP152BWaitReadyProbe
+P152B|child|os_alive=false os_code=7 how=GetExitCodeProcess: terminated pid=48704
+P152B|predicate|exited_before_waitReady=false exitCode=-1 ready_file_exists=false
+P152B|waitReady|elapsed=1m0.02s err=wisp slo: subject 48704 never reported ready within 1m0s
+P152B|after|exited=false exitCode=-1
+P152B|after_reap|exited=true exitCode=7
+--- PASS: TestP152BWaitReadyProbe (60.08s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	60.192s
+rc=0

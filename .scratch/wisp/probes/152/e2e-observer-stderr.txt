@@ -1,0 +1,2 @@
+time=2026-09-26T09:26:52.759+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+wisp slo: in-tree record unavailable (fail-closed, no silent downgrade to the tree basis): wisp slo: subject 41000 never wrote a complete report within 33s (last read: 0 bytes read, no report file yet)
