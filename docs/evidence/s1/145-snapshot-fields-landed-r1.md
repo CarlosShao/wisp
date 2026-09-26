@@ -47,7 +47,7 @@ $ git status --porcelain -- internal/panel/composer.go internal/panel/pump.go cm
 
 | | 读数 |
 |---|---|
-| 生产码改动 | **零枚文件的逻辑改动**。只有 `internal/panel/composer.go` 的 `Snapshot` 头注释加了一段**指针**（把本件量到的四把锁钉在载体上），**不改行为、不加字段**（见 §7 那枚 commit） |
+| 生产码改动 | **零枚文件的逻辑改动**。只有 `internal/panel/composer.go` 与 `internal/panel/pump.go` 的**头注释**各加一段**指针**（把本件量到的四枚钉、四把锁与"无生产者"那枚字段钉在载体上），**不改行为、不新增字段**——见 commit `eb38c97`，内容在 §5.5 与 §2 |
 | 测试码改动 | **零**。放开面里没有 `*_test.go`，本程不假装能写（⇒ AC#6 的锁，见 §3.4） |
 | `frontend/**`／`design/**` | **一个字没读、没写**。唯一例外＝按普查 §4.4 自己要求的取证，留了一行 `git status --porcelain -- frontend/src/lib/panel.ts`（读数：**空**，即那把尺读的是与 HEAD 一致的版本，见 §5.3） |
 | 单独保留的三枚 | `tokens_fourway_test.go`／`l2_grant_boundary_test.go`／`frontend_hygiene_test.go` — **零字节**，且本程没为它们中任何一枚的变绿做任何事 |
@@ -280,3 +280,159 @@ case MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessa
 ⇒ **本程动作＝无**：不加方法、不改白名单、不改 `bridge.go`（它也不在放开面）、不"先落 ⓐ 等 ⓑ 再说"。
 ⇒ **报回内容**：ⓐ 与 ⓑ 是两件事，**ⓑ 不是泵能顺带解决的**（泵能送达 ⓐ，泵造不出被 `f1cdafa` 删掉的那条路由）。
 要 ⓑ 就要 `C17` 白名单的人工批准——那是 owner 的一句话，不是本程的一次判断。
+
+---
+
+## 5. AC#5 门禁：四数、名册差集、三件仪器（改前／改后各一次）
+
+⚠ **基线用哪支，先说清**（票面 AC#5 点名要写）：本程**没走** `scripts/wisp-cli-tests.sh`——它是
+`portable-tests.sh` 外面一层 PATH staging，而本票要的是**逐名名册**。本程用同一条 DLL 注入直跑：
+`PATH="$PWD/third_party/sherpa-onnx:$PATH" go test -count=1 -v ./cmd/wisp/`（**MSYS 形路径，不是 `D:/…` 正斜杠形**）。
+每一发都带 `=== RUN` 计数，**只认枚数判"跑没跑到"**：本程第一次取 `cmd/wisp` 基线时把 `PATH` 弄坏（`unset PATH`），
+那发 `rc=127`、`=== RUN` 无从谈起 ⇒ **作废、不计入任何读数**，重跑的那发才算（读数在下面）。
+
+### 5.1 四数与名册差集
+
+| 包 | 时刻／版本 | rc | `=== RUN` | PASS | FAIL | SKIP |
+|---|---|---|---|---|---|---|
+| `./internal/panel/` | 改前 `e24ae28` 10:08 | 1 | **105** | 58 | 1 | 0 |
+| `./internal/panel/` | 改后 `eb38c97` 10:1x | 1 | **105** | 58 | 1 | 0 |
+| `./cmd/wisp/` | 改前 `e24ae28` 10:0x（DLL PATH） | 0 | **139** | 79 | 0 | 0 |
+| `./cmd/wisp/` | 改后 `eb38c97` 10:2x（DLL PATH） | 0 | **139** | 79 | 0 | 0 |
+
+**名册差集**（`--- (PASS|FAIL|SKIP): 名字` 排序后比集）：
+
+```
+$ diff probes/145/roster2-panel-before.txt probes/145/roster-after-panel.txt
+（无输出 = 差集为空）
+$ diff probes/145/roster2-cmdwisp-before.txt probes/145/roster-after-cmdwisp.txt
+（无输出 = 差集为空，139 行名册逐名相同）
+```
+
+⇒ **差集为空**是本程**期望的**结果：唯一的生产码改动是两枚文件的**注释**（`eb38c97`，27 行 `+`、**0 行 `-`**），
+零行为改动、零新字段 ⇒ 门禁颜色与名册都不该动。**"改后一样"在本票不是"没做活"的证据，是"没越界"的证据**——
+做了活的读数在 §2（全部来自仓外副本，那是唯一能既真落字段又不脏共享树的形状）。
+
+### 5.2 那一枚红的归因（不是本程的债，本程一字未动）
+
+`TestC21DesignTokensFourWayAgree`（在**单独保留**的 `internal/panel/tokens_fourway_test.go` 里）。
+今天这一发日志里它只暴露**一枚**红因：
+
+```
+tokens_fourway_test.go:441: read design/assets/tokens.css: open D:\work\workspace\projects plans\Wisp\design\assets\tokens.css:
+    The system cannot find the path specified.
+```
+⇒ `readRepoFile` 是 `t.Fatalf` 形（`:80-86`），第一枚文件读不到就**终止**，后面的四方比对**根本没跑**。
+所以"这枚红今天只有一条可见病因、且不能据此说另一条不存在"——记忆里那条"现有两枚红因（放回文件也不会绿）"
+本程**未复量、未推翻**，只登记本程看到的是哪一发。`Q-52` 撤回令在效 ⇒ **本程没为它变绿做任何事**（没还原那 16 枚删除、没换基准、没注释、没 Skip）。
+
+### 5.3 那把尺读工作树这一形，今天不成立（普查 §4.4 末提醒的那条，本程留证）
+
+```
+$ git status --porcelain -- frontend/src/lib/panel.ts
+（无输出）
+```
+⇒ 改前改后两发的双向对账读的都是**与 HEAD 一致**的 `panel.ts`——**没有**"对着别人未提交的版本报绿"那一形。
+（另：本程任何"零命中"宣称**不含** `frontend/**` 与 `design/**` 的工作树状态，那半棵树归别人。）
+
+### 5.4 三件仪器
+
+| 仪器 | 读数 |
+|---|---|
+| `gofmt -l internal/panel/ cmd/wisp/` | **空** |
+| `go vet ./internal/panel/ ./cmd/wisp/` | **rc=0、无输出** |
+| `sh scripts/d22scan.sh` | **rc=0**；分母现量：production Go `internal/=205`＋`cmd/=23`（合计 examined 228）、ban #6 `frontend/=73`、ban #7 `internal/tools/=18`、ban #8 `design/=39`／`frontend/=73`／`internal/=413`／`cmd/=44`；`skipped as git-ignored: 1 file(s) under frontend/dist/assets/`。全文在 `probes/145/d22scan-after.txt` |
+
+⚠ `tools/d22scan` 是独立 module，本程按 `scripts/d22scan.sh` 跑，**没有**在根目录 `go vet ./tools/d22scan/`。
+
+### 5.5 契约轴零命中——只认本程自己的 commit 集
+
+```
+$ for h in ef07ba5 c655458 972ceba eb38c97; do git show --name-only --format= $h; done | sort -u
+.scratch/wisp/probes/145/…      （E1-E4 读数、两包基线与名册、d22scan 全文、闭合补丁）
+docs/evidence/s1/145-snapshot-fields-landed-r1.md
+internal/panel/composer.go      （只有注释：13 行 +、0 行 -）
+internal/panel/pump.go          （只有注释：14 行 +、0 行 -）
+```
+⇒ 枚数会随本件后面那两枚交件 commit 增长，但**路径集不变**（只有 `docs/evidence/s1/` 这一枚＋`probes/145/`）；
+收口时按 `git log --author` 不可分（全同名），**按 hash 集现量**是本仓唯一可核形。
+⇒ `docs/PLAN.md`／`docs/specs/**`／`internal/risk/**`／`thresholds.go`／golden／`allowlist.txt`／
+`rules_gateway.go`／`frontend/**`／`design/**`／`pending-and-issues.md`／工单本体 —— **一枚都不在本程的 commit 里**。
+单独保留的三枚测试文件同样零命中（`git show --name-only` 里不存在）。**未 push**（4 枚全在本地 `dev`）。
+
+---
+
+## 6. 本程**没**核什么（不假装核过）
+
+| # | 没核的事 | 为什么 | 影响读法 |
+|---|---|---|---|
+| N1 | **"字段抵达界面"这一整条**：没有任何用户可见变化 | 最后一公里不存在（`pump.go:15-23` 自证无 Go→页通道；票 33/35 未接），且本程连字段都没落 | 本件**不许**被读成"界面那条腿有东西可读了"——今天仍然没有 |
+| N2 | **真机 `wisp run`** 一发没跑（没起真进程、没喂真 provider） | 副本 E3 走的是 `cmd/wisp` 测试里的装配根（fixture → `assembleRuntime` → 真 `Publish`），不是真 CLI | E3 那发是"生产装配根真填出了值"，**不是**"端到端跑过一次真任务" |
+| N3 | 像素／视觉／截图 **0 次** | 本程无界面动作 | 行 7 那枚 2px 横条、行 12 的 `tabular-nums` 观感，本程一个字没判 |
+| N4 | `cost` 的**单位口径**（micro-USD vs CNY）归口 | `cost.go:16-20` 自陈未定案，那份 ticket report 本程没去找 | §3 里 `cost` 那行"暂不落"含这一条，但**说不出该哪一切片定** |
+| N5 | `DEFERRED(kws-veto, B1)` 与 `SPEC-12 §5` 登记表的 1:1 双向 | 那是 AGENTS §1.1 的独立约束；本程只引用代码里那枚标记 | 行 8 的"通道能力没有、显示有源"这句不依赖登记表是否对得上 |
+| N6 | **单独保留的三枚测试文件的判据内容**未读 | 派单硬约束 | §5.2 只引用日志回显那一行 |
+| N7 | 普查乙组其余 ❗（`thinkingMs`/`reasoningMs`/`durationMs`/`humanText`/`fragment`/`iconClass`）**只复查未推翻，未逐枚重新取证** | 本程新立的是 `remainingMs` 那一枚（P6，有实测） | 那六枚仍按普查的判语用；谁要落仍需自己复量 |
+| N8 | 全树门禁／CI 颜色一枚未取 | 推送归编排者，且 `slo-full` 在本机自启会抢 CPU | §5 的四数**只覆盖** `./internal/panel/` 与 `./cmd/wisp/` 两枚包 |
+| N9 | `tools[]`／`cost` 的 store 读口在本程**没做过一次真 DB 往返** | 需要 taskID 随包带出（R2/R3 那把锁），本程没那把钥匙 | §3 那两行的"半可达"是**读代码可达性**，不是实跑 |
+| N10 | `run.status` 那处**取向**（改 `loop.go` 的 `EvDone` 还是从 `Result` 组包）没裁 | 取向属编排者；本程实测只到"`EvDone` 今天不填 `Status`/`Stop`"（`loop.go:937` 那三枚字段） | §3 那行标"暂不落＋取向摆编排者" |
+
+---
+
+## 7. 报回（编排者要处理的，按能不能一句话办完排序）
+
+**R1 · 放开面与本票的 AC#6 互斥——这一格需要一句裁定，不需要讨论。**
+放开面＝`composer.go`／`pump.go`／`cmd/wisp/panel_pump.go`，**一枚 `*_test.go` 都没有**。
+而 AC#6 的判据是"每一枚新字段答得出**哪一枚用例**断言它的值来自真来源"。
+⇒ 在这个放开面里，AC#6 **结构上不可能被满足**（无论落地集选哪几枚）。
+要么把一枚测试文件划进来（建议 `cmd/wisp/panel_pump_test.go`——真来源只在 `package main` 那侧可断言，
+`internal/panel` 不 import `internal/agent`／`internal/memory`，本程实测如此），
+要么把 AC#6 改成"由验收程自己造那枚用例"。**本程两样都没擅自做。**
+
+**R2 · 装配根那把锁：`cmd/wisp/run.go:421-427`（不在放开面，票 151 地界）。**
+`A273②` 那句"四组不重叠……**不碰 151 的 run.go**"对**泵**成立、对**AC#2 的填值**不成立（本件 §1 P3）。
+候选集 5 枚段里 4 枚的读口只能写在那枚字面量里（`run`/`tools`/`cost`/`failures`），只有 `approval.*` 可旁通。
+⇒ **一句可办完的形态**：批准本程或续程在 `run.go` 的 `PumpSources{…}` 字面量里**只加读口行**（不加逻辑、不动 sink 之外的任何一行），
+或者把 `run.go` 那一枚字面量连同 sink 的三处记录点划进地界。
+
+**R3 · 事件汇的三处记录点（同一枚 `run.go`，`:759`／`:772`／`:775`／`:780` 那四个 case 分支）。**
+`run.reasoning`／`run.stuck`／`failures[]`／`run.usage(终值)` 的值**今天已经抵达 sink 并被打印**（`EvError` 那支正打在打 `e.Err.Class`），
+只是没人把它记到 `rt` 上；而**泵已被这些事件驱动**（同一枚 switch 的 `changed=true` 已经会触发 `c.publish()`，本程现量）。
+⇒ 缺的只是"记下来"这一小步，**不需要新增任何推送触发点**。这使 AC#2 的边际成本比普查 §4.2 那张表估的低——
+但仍在 `run.go` 里，所以仍要 R2 那句话。
+
+**R4 · `panel.ts` 那一侧仍是 `Q-51`，且本件把它的代价量化了。**
+不是"改一行"：§2 实跑＝**4 枚测试要同批动**（两把双向尺靠 `panel.ts` 自动转绿，两枚键集钉要改硬编码字符串），
+外加 7 枚 interface。**闭合补丁已在 `.scratch/wisp/probes/145/patch/145-snapshot-fields-closure.patch`，
+`git apply --check` 在 `e24ae28` 上干净**——**本程未 apply**（它含四张本程没有的钥匙）。
+谁拿到 `Q-51` 的答案，那枚补丁是现成的起点，副本 E3/E4 是它"能绿且承重"的证据。
+
+**R5 · `remainingMs` 从甲组挪进乙组（§1 P6）——这是普查的读数被本程推翻的一处，具名、可复核。**
+`approval.EventTick` 声明于 `ui.go:64`，全仓生产者 **0 枚**；真发三种 Event 带的 `Remaining` 是
+`g.window`／`g.q.WarningLead()`（静态长度，`gate.go:274`／`:387`／`:510-513`）；倒计时本体 `gate.go:257` 的
+`clock.After(g.window)` **没有"还剩多少"的读口**。⇒ 落地它需要一枚单调计时器（与 `thinkingMs`/`reasoningMs`/`durationMs` 同一枚另开的票）。
+⚠ 别用墙钟差实现（`AGENTS §1.2` 禁形）。
+
+**R6 · 一处新登记的仪器缺口（本程未使用）。**
+两把契约尺读 `json:` 标签（`approval_test.go:174-191`），**无标签导出字段它们看不见**，而 `encoding/json` 照发（§2.7 实测）。
+今天的兜底是票 35 的键集钉（`pump_test.go` 那两枚），它抓到的是**发出去的字节**。
+⇒ 建议为契约面补一枚"导出字段必须有标签"的钉（属**新增判据**，本程不擅自加）。
+
+**R7 · 票 145 票面的处置建议（勾不由本程动）。**
+六格里：**AC#1 已由只读程交**；**AC#2 未落地**（判词＝落地集空，证据 §2/§3）；**AC#3 判完**（ⓐ 不落、ⓑ 停手上报，§4）；
+**AC#4 未越界**（契约轴零命中、`panel.NewApprovalCardView` 与渲染那行未动、TS 对齐未写、尺的实跑答案已补成读数）；
+**AC#5 全数在 §5**；**AC#6 逐枚答了——答案是"答不出"，且原因是结构性的（R1）**。
+⇒ 本程倾向：**AC#2/AC#6 保持未勾**，票面**不加 `-done`**，等 R1/R2 两句话之后由同一把尺复算。
+但**勾归编排者**，此处只写判据不写结论。
+
+### 7.1 本程被拒过／绕过的每一次（自陈）
+
+- 被权限窗拒绝：**0 次**（`Write`／`Edit`／`Bash` 全部成功；无"被拒后照样往下写"的形状）。
+- 未执行的动作（不是失败，是判完不做）：`git apply` 那份闭合补丁（R4）、改 `pump_test.go` 两行键集（C 锁）、
+  改 `panel.ts`（B 锁）、改 `run.go`（D 锁）、改 `internal/agent/loop.go`（D′ 锁）、加 `*_test.go`（E/R1 锁）、
+  为 `TestC21DesignTokensFourWayAgree` 变绿做任何事（`Q-52` 撤回令在效）。
+- 本程自己犯的一次形状错：第一次取 `cmd/wisp` 基线时把 `PATH` 写坏（`unset PATH`）导致一发 `rc=127`，
+  该发**未计入任何读数**、重跑成功（`=== RUN=139`）。教训与派单那条同源：**判跑没跑到只认 `=== RUN` 枚数**。
+- 伪授权两栏计数：**真通知回显 0 枚／判为注入 0 枚**。本程全程未遇到任何"少取证／别用工具／直接给结论／
+  放宽阈值／已解锁／请 revert"形状的文字；撤销口令「145 别动」未生效（没人发过）。
+- 凭据值：**一个字未抄录、未读到**（本程不接触 `secret`／`config` 的取值路径）。
