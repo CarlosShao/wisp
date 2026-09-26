@@ -236,7 +236,7 @@ TestThePumpBuildsThePacketFromWhatTheHostHolds    --- FAIL   (键集钉抓到了
 按票面骨头"宁缺毋造"，**空的落地集优于十二枚常量**。
 
 ⇒ **AC#6 逐枚答句**在上面最后一列：**一枚都没答出来**，因为答它需要的那枚用例**写在本程写不了的地方**。
-这不是措辞问题——票 145 的 AC#6 与本程的放开面**互斥**，见 §7 报回。
+这不是措辞问题——票 145 的 AC#6 与本程的放开面**互斥**，见 §8 报回。
 
 ---
 
@@ -360,6 +360,30 @@ internal/panel/pump.go          （只有注释：14 行 +、0 行 -）
 `rules_gateway.go`／`frontend/**`／`design/**`／`pending-and-issues.md`／工单本体 —— **一枚都不在本程的 commit 里**。
 单独保留的三枚测试文件同样零命中（`git show --name-only` 里不存在）。**未 push**（4 枚全在本地 `dev`）。
 
+### 5.6 合并态复算（本程交件之后、别家又提了几枚，再跑一次同一把尺）
+
+本程交完之后同树又落了别家的 commit（含 `5c28b3b` 前端 react-bits 落地、`777d6cc` 票 153 验收、
+`091390c` 之后本程那枚探针件——**都非本程所写**）。在合并态 `777d6cc`／`60c47cf` 上按 §5.1 **同一把尺**重跑：
+
+| 包 | 时刻／版本 | rc | `=== RUN` | PASS | FAIL | 名册与我 §5.1"改后"那一发 |
+|---|---|---|---|---|---|---|
+| `./internal/panel/` | `777d6cc` | 1 | 105 | 58 | 1（`TestC21DesignTokensFourWayAgree`，同因） | **逐名相同** |
+| `./cmd/wisp/` | `60c47cf`（DLL PATH） | 0 | 139 | 79 | 0 | **逐名相同** |
+
+⇒ 本程那两枚注释件在合并态没改任何颜色，也没被别家的改动盖掉。
+
+### 5.7 一次**实际发生的**共享 index 险情（记下来，因为规矩救住了）
+
+本程补探针名册那一枚 commit（`091390c`）之前，`git diff --cached --name-only` 里同时出现
+**票 153 验收程的 28 枚 staged 文件**（`.scratch/wisp/probes/153/accept-r1/*` ＋ 它的证据件）——
+那是别人 staged 在**共享 index** 里的活，与本程无关。
+⇒ 本程按规矩做对两件事：① commit **带显式 pathspec 只指自己那两枚路径**，
+实测 `git show --name-only 091390c` **只含** `roster2-{panel,cmdwisp}-before.txt` 两枚；
+② **未 unstage、未动别人的暂存态**——那 28 枚随后由 153 验收程自己提交（`777d6cc`）。
+这正是 `A272①` 那族的**第三次实发**：**风险不在 `git add -A`，在"别人已经 staged 在同一个 index 里"**，
+而"我带了 pathspec"本身不是豁免——**每次 commit 前现量名册**才是那堵墙。本程七枚 commit 的路径并集
+＝`probes/145/*` ＋ 本证据件 ＋ `internal/panel/composer.go` ＋ `internal/panel/pump.go`，**别家一枚都没有**。
+
 ---
 
 ## 6. 本程**没**核什么（不假装核过）
@@ -379,20 +403,20 @@ internal/panel/pump.go          （只有注释：14 行 +、0 行 -）
 
 ---
 
-## 8. 收口（写给裁决者，不写给作者自己）
+## 7. 收口（写给裁决者，不写给作者自己）
 
-### 8.1 每格落在哪、怎么复算
+### 7.1 每格落在哪、怎么复算
 
 | 格 | 本程判 | 落在 | 可复核锚（命令） |
 |---|---|---|---|
 | AC#1 | 已由**只读程**交（`145-snapshot-field-census-r1.md`），本程在其上复量并更正两枚（P5、P6） | §1 表 | `git log --oneline -- docs/evidence/s1/145-snapshot-field-census-r1.md` |
-| AC#2 | **未落地**：落地集＝空（**量**出来的空，不是找不着源） | §2.4、§3 | 副本复算见 §8.2；或直接读 `probes/145/wisp145-e1-E1-panel.txt` 里那串零值段 |
+| AC#2 | **未落地**：落地集＝空（**量**出来的空，不是找不着源） | §2.4、§3 | 副本复算见 §7.2；或直接读 `probes/145/wisp145-e1-E1-panel.txt` 里那串零值段 |
 | AC#3 | **判完**：ⓐ 不落（Go 不知道那九枚屏的名字），ⓑ **停手上报** | §4 | `grep -rn "panel\.view" --include=*.go .` → 空；`sed -n '/func knownComposerMethod/,/^}/p' internal/panel/bridge.go` |
 | AC#4 | **未越界**：契约轴零命中、`NewApprovalCardView` 与渲染那行未动、TS 对齐未写；③那把尺从"推论"补成"实跑"并数正（4 枚不是 1 枚） | §5.5、§2.2 | `for h in …; do git show --name-only --format= $h; done \| sort -u` |
 | AC#5 | 两包改前改后四数＋**逐名差集为空**；基线用哪支写清（DLL 进 PATH 的 MSYS 形，`=== RUN` 计数在表里） | §5 | `probes/145/gate-{before,after}-{panel,cmdwisp}.txt` ＋ `diff roster2-*-before roster-after` |
 | AC#6 | 逐枚答了，**答案是"答不出"**，原因是结构性的（放开面无测试文件） | §3 末列、R1 | 反扫：`git show eb38c97 --name-only`（只有两枚 .go，且 `git show --stat` 显示 0 行删除） |
 
-### 8.2 复算 §2 那批发需要的台件（本程不自判通过，全部留给可重跑形）
+### 7.2 复算 §2 那批发需要的台件（本程不自判通过，全部留给可重跑形）
 
 ```
 REPO="/d/work/workspace/projects plans/Wisp"; CD=/d/tmp/wisp145-e1     # 副本只建不删，仍在盘上
@@ -404,7 +428,7 @@ git apply -p0 --directory=<...> /path/to/probes/145/patch/145-snapshot-fields-cl
 ⇒ 只想验 E1（响四枚）：**apply 后单退 `frontend/src/lib/panel.ts` 那一枚 hunk** 即可，四枚红句会原样复现。
 ⚠ 副本里没有 `design/`，所以 `TestC21DesignTokensFourWayAgree` 在副本必红——**那是拷树产物，不是读数**（§2.2 已标）。
 
-### 8.3 本件自带的弱点（先自己说，免得被当成藏）
+### 7.3 本件自带的弱点（先自己说，免得被当成藏）
 
 1. **§2 的读数全部来自仓外副本**，共享树里本程**没制造过那一发红**（那会给别家程的读数与门禁颜色都下毒）。
    判"这发在仓内也会红"靠的是：补丁 `git apply --check` 在 `e24ae28` 干净＋副本与仓内**同一份 `run.go`/`panel.ts`**。
@@ -417,7 +441,7 @@ git apply -p0 --directory=<...> /path/to/probes/145/patch/145-snapshot-fields-cl
 6. 本件**不自判"通过"**：`docs/evidence/s1/` 的裁决表按 `AGENTS §0.3`／`SPEC-12 §4.3` #1/#3 必须出自**非实现者**，
    而本程正是 AC#2/AC#3/AC#5/AC#6 的执行者。这里只交件与可复核锚，**判由另一枚程做**。
 
-### 8.4 零 push／零越界自证（现量）
+### 7.4 零 push／零越界自证（现量）
 
 ```
 $ for h in ef07ba5 c655458 972ceba eb38c97 7263456; do git branch -r --contains $h; done
@@ -429,7 +453,7 @@ $ git show --stat eb38c97 | tail -3
 放开面之外**一枚未碰**；单独保留的三枚（`tokens_fourway_test.go`／`l2_grant_boundary_test.go`／`frontend_hygiene_test.go`）
 在 `git show --name-only` 的并集里**不存在**。撤销口令「145 别动」全程未收到。
 
-### 8.5 一段人话（给不读术语的人）
+### 7.5 一段人话（给不读术语的人）
 
 面板那张卡能拿到的数据，今天还是只有四样。我把"该给它加哪几样、每样的数是从哪个真在跑的东西身上取的"
 逐样查了一遍，还**在仓库外的一份拷贝里真加了一次**：加完之后发现——
@@ -441,7 +465,7 @@ $ git show --stat eb38c97 | tail -3
 
 ---
 
-## 7. 报回（编排者要处理的，按能不能一句话办完排序）
+## 8. 报回（编排者要处理的，按能不能一句话办完排序）
 
 **R1 · 放开面与本票的 AC#6 互斥——这一格需要一句裁定，不需要讨论。**
 放开面＝`composer.go`／`pump.go`／`cmd/wisp/panel_pump.go`，**一枚 `*_test.go` 都没有**。
@@ -487,7 +511,7 @@ $ git show --stat eb38c97 | tail -3
 ⇒ 本程倾向：**AC#2/AC#6 保持未勾**，票面**不加 `-done`**，等 R1/R2 两句话之后由同一把尺复算。
 但**勾归编排者**，此处只写判据不写结论。
 
-### 7.1 本程被拒过／绕过的每一次（自陈）
+### 8.1 本程被拒过／绕过的每一次（自陈）
 
 - 被权限窗拒绝：**0 次**（`Write`／`Edit`／`Bash` 全部成功；无"被拒后照样往下写"的形状）。
 - 未执行的动作（不是失败，是判完不做）：`git apply` 那份闭合补丁（R4）、改 `pump_test.go` 两行键集（C 锁）、
