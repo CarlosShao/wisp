@@ -1,0 +1,6 @@
+ACCEPT156|MODE|teeth
+accept-teeth-asis-jia              rc=0   RUN=6    PASS=6    FAIL=0    SKIP=0   LOADED=YES
+accept-teeth-m1-jia                rc=1   RUN=6    PASS=2    FAIL=4    SKIP=0   LOADED=YES red=TestSLO156ExitedAsksTheOSForAChildNobodyReaped,TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees,TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn,TestSLO156WaitReadyNamesTheDeadSubjectToo
+accept-teeth-m1-plus-newcases-off-yi rc=0   RUN=22   PASS=15   FAIL=0    SKIP=0   LOADED=YES
+accept-teeth-asis-old-surface-bing-asis rc=0   RUN=21   PASS=14   FAIL=0    SKIP=0   LOADED=YES
+accept-teeth-m1-old-surface-bing   rc=0   RUN=21   PASS=14   FAIL=0    SKIP=0   LOADED=YES
