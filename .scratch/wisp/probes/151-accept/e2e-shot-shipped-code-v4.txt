@@ -1,0 +1,28 @@
+time=2026-09-26T10:54:04.523+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAccept151E2ELoopTaskClosesATaintedScope
+time=2026-09-26T10:54:05.578+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/26 10:54:05 mockllm: serving on http://127.0.0.1:59830 (golden dir D:\tmp\wisp151accept\internal\llm\testdata\golden)
+time=2026-09-26T10:54:05.614+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestAccept151E2ELoopTaskClosesATaintedScope1172432225\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-09-26T10:54:05.644+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAccept151E2ELoopTaskClosesATaintedScope1172432225\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-26T10:54:05.651+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-26T02:54:05Z duration_ms=7
+time=2026-09-26T10:54:05.660+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAccept151E2ELoopTaskClosesATaintedScope1172432225\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-26T10:54:05.679+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-26T02:54:05Z duration_ms=19
+time=2026-09-26T10:54:05.683+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-26T10:54:05.685+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    accept151_e2e_test.go:158: exit=0
+        --- stdout ---
+        [工具 fs.read -> error]
+        已经读到那份档案摘录了。
+        wisp run: 任务 08281a77-b203-4203-a269-6eef7515d063 结束（completed，2 轮，1 次工具调用，成本 0 CNY（未计价））
+        wisp run: 回复已完成
+        
+        --- stderr ---
+        [audit] perm: MODE-READ origin=startup mode=ask_every_step source="C:\\Users\\swq\\AppData\\Local\\Temp\\TestAccept151E2ELoopTaskClosesATaintedScope1172432225\\002\\config.toml"
+        [audit] tools: C25 scope closed task=08281a77-b203-4203-a269-6eef7515d063 was_open=false dropped=0 open_scopes=0
+time=2026-09-26T10:54:05.724+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    accept151_e2e_test.go:164: tool_call rows: 
+    accept151_e2e_test.go:188: 端到端这一轮没有在任务边界上关掉一枚带污点的 scope：stderr 里找不到 "[audit] tools: C25 scope closed task=08281a77-b203-4203-a269-6eef7515d063 was_open=true dropped=1 open_scopes=0"；实际看到的关闭审计行=["[audit] tools: C25 scope closed task=08281a77-b203-4203-a269-6eef7515d063 was_open=false dropped=0 open_scopes=0"]
+--- FAIL: TestAccept151E2ELoopTaskClosesATaintedScope (1.22s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	1.283s
+FAIL

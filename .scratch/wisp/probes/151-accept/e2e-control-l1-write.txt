@@ -1,0 +1,43 @@
+time=2026-09-26T10:58:29.602+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAccept151ControlL1DeclaredCallReachesTheBridge
+time=2026-09-26T10:58:31.679+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/26 10:58:31 mockllm: serving on http://127.0.0.1:55541 (golden dir D:\tmp\wisp151accept\internal\llm\testdata\golden)
+time=2026-09-26T10:58:31.775+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestAccept151ControlL1DeclaredCallReachesTheBridge50218280\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-09-26T10:58:31.847+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAccept151ControlL1DeclaredCallReachesTheBridge50218280\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-26T10:58:31.859+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-26T02:58:31Z duration_ms=11
+time=2026-09-26T10:58:31.872+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAccept151ControlL1DeclaredCallReachesTheBridge50218280\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-26T10:58:31.881+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-26T02:58:31Z duration_ms=9
+time=2026-09-26T10:58:31.887+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-26T10:58:31.892+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    accept151_control_test.go:118: exit=0
+        --- stdout ---
+        
+        [确认 L1 fs.write] R1: 工具声明为下界（L1）
+          规则 R1
+          取消方式：单击悬浮球：悬浮球取消不可用（未加载）
+          取消方式：按 Esc 键：Esc 取消不可用（未加载）
+          取消方式：面板拒绝：面板取消不可用（票 37 未接入）（未加载）
+          取消方式：说取消词：语音取消不可用（未加载）
+          影响路径：C:\Users\swq\AppData\Local\Temp\TestAccept151ControlL1DeclaredCallReachesTheBridge50218280\002\out.txt
+          窗口 2.0s
+        [started] 确认窗口结束，未收到否决，开始执行
+        [工具 fs.write -> success]
+        写好了。
+        wisp run: 任务 b27e0404-5b77-49a7-a42f-dc58e6b844d6 结束（completed，2 轮，1 次工具调用，成本 0 CNY（未计价））
+        wisp run: 回复已完成
+        
+        --- stderr ---
+        [audit] perm: MODE-READ origin=startup mode=ask_every_step source="C:\\Users\\swq\\AppData\\Local\\Temp\\TestAccept151ControlL1DeclaredCallReachesTheBridge50218280\\002\\config.toml"
+        [audit] wisp run: 风险判定 tool=fs.write level=L1 rules=[R1] reason="R1: 工具声明为下界（L1）"
+        [audit] tools: d31 report corr=b27e0404-5b77-49a7-a42f-dc58e6b844d6 tool=fs.write applied=4 执行已开始，以下步骤已生效，未自动回退（本次未收到否决记录）
+        - 已执行：在 C:\Users\swq\AppData\Local\Temp\TestAccept151ControlL1DeclaredCallReachesTheBridge50218280\002 创建临时文件 .wisp-tmp-8c344546-5172-1513424510
+        - 已执行：向临时文件写入 19 字节
+        - 已执行：临时文件已落盘并关闭
+        - 已执行：原子重命名 .wisp-tmp-8c344546-5172-1513424510 → C:\Users\swq\AppData\Local\Temp\TestAccept151ControlL1DeclaredCallReachesTheBridge50218280\002\out.txt（目标此刻起为新内容）
+        [audit] tools: call kind=success task=b27e0404-5b77-49a7-a42f-dc58e6b844d6 corr=b27e0404-5b77-49a7-a42f-dc58e6b844d6 tool=fs.write risk=L1 decision=allow outcome=success rules_hit=[R1] in_allowlist_scope=true reason="R1: 工具声明为下界（L1）"
+        [audit] tools: PATH-ACCOUNT task=b27e0404-5b77-49a7-a42f-dc58e6b844d6 tool=fs.write roots=1 rewritten=[] unusable=[]
+        [audit] tools: C25 scope closed task=b27e0404-5b77-49a7-a42f-dc58e6b844d6 was_open=false dropped=0 open_scopes=0
+    accept151_control_test.go:129: control reading: tool_lines=[[工具 fs.write -> success]] file_written=19 err=<nil> close_lines=["[audit] tools: C25 scope closed task=b27e0404-5b77-49a7-a42f-dc58e6b844d6 was_open=false dropped=0 open_scopes=0"]
+--- PASS: TestAccept151ControlL1DeclaredCallReachesTheBridge (4.38s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	4.490s

@@ -54,3 +54,89 @@ $ git show 4e16976:.scratch/wisp/issues/151-*.md | grep -c '^- \['      ->  6
 | （票面另四条"现量的形状"＝AC 之前的第 1 节，不是 AC 框） | §1 | 第 2 节开头 | 四条本程都重走过，一条尺写清了 |
 
 派单那七条攻击点落在哪：① →第 2 节；② →本节；③④⑤ →第 3 节；⑥ →第 5 节；⑦ →第 6 节。总判＝第 7 节。
+
+## 第 2 节 格 AC#1 —「不关」今天到底改变了什么（派单攻击点①落这一格）
+
+### 2.1 票面那四条"现量的形状"，本程在 `4e16976` 上重跑（尺写清楚）
+
+| 那一条 | 本程用的尺（大小写敏感／整词／范围） | 现读 |
+|---|---|---|
+| `CloseTask` 调用者 | `grep -rn "CloseTask" --include='*.go' cmd internal`（大小写敏感、子串，范围＝**纯净树 `4e16976`**） | 6 行命中，其中**调用点只有 1 枚**＝`cmd/wisp/run.go:563`；其余是 `run.go:546` 注释、`task_scope_close_151_test.go:7,16` 注释、`bridge.go:642` 注释、`bridge.go:655` 声明 ⇒ **修法接上线之后**确实长在组合根上 |
+| 未修码上的同一问 | `git grep -n 'CloseTask' 5d46f24^ -- '*.go'` | 只有注释＋声明两枚，**调用者 0 枚**，测试里也 0 枚 ⇒ 票面那条"连测试都没有"在开票那一刻成立 |
+| `OpenTask` 唯一非测试调用者 | `grep -rn "OpenTask" --include='*.go' cmd internal \| grep -v _test` | `bridge.go:559`（`mark` 里，实参 `dec.TaskID`）＋声明＋注释 ⇒ 与实现件 §1 第 2 条同一枚位置（**行号按 `4e16976` 取，不是按它们的 `86b0161`**） |
+| 一个进程几枚环路任务 | `grep -rn "agent.New(" / "loop.Run(" --include='*.go' cmd internal \| grep -v _test` | 各 1 枚（`cmd/wisp/run.go`），与实现件 §1 补的那条一致 |
+
+⇒ 这四条**全部对得上**，实现件 §1 没有过量、也没有少量。
+
+### 2.2 它的 AC#1 读数：本程**独立重跑**了那枚探针
+
+尺：把 `probes/151/ac1-probe-source.go` 原样复制进纯净树的 `internal/tools/`（仓库外那枚树，包名就是 `tools`，
+与它们用 `-overlay` 注入是同一枚编译单元），`go test -count=1 -v -run 'TestProbe151' ./internal/tools/`。
+原始读数＝`probes/151-accept/ac1-probe-rerun.txt`，rc=0（PASS 的是"量到了"）。逐枚对数：
+
+| 腿 | 实现件 §2 记的 | 本程现量 | 对得上？ |
+|---|---|---|---|
+| `no-close_today` 第二发裁决 | `L2 rules=[R4] approvals=1`，reason＝`R4: 包含来自 unbound-scope …` | **逐字相同**（`scopes_left=1 marks_left=1`） | 是 |
+| `close-first_control` | `L0 rules=[] approvals=0 reason=""`，关闭即时 `scopes 1->0 marks 1->0` | **逐字相同** | 是 |
+| 内容级三腿（同 id 复用／换新 id／换 id 且已关） | 命中 `fs.read <路径>`／命中 `unbound-scope`／`L0` 零卡 | **逐字相同**（本程的命中路径是这台机器的临时目录，形状一致） | 是 |
+| 无审批通道那一形（rounds=8） | `executed=1 refused=7 L2cards=7` | **`executed=1 refused=1`（rounds=2）／`executed=1 refused=7 L2cards=7`（rounds=8）** | 是 |
+| 一路点允许那一形（rounds=64） | `executed=64 refused=0 L2cards=63`、scopes 64、marks 64 | **相同**，heap `594,656 -> 3,015,152`＝`delta=2,420,496`＝**37,820 B/轮** | 是（斜率与它的 37,652 差 0.45％，同一次跑内 host 噪声） |
+| 再多一枚什么都不读的干净任务 | `64 -> 65` | **`scopes 64 -> 65`、`L2cards 63 -> 64`** | 是 |
+| 逐一 `CloseTask` 之后 | 表归零、堆回到基线附近 | **`scopes=0 marks=0 heap=587,008`（基线 594,656）** | 是 |
+| 小 N 的堆读数不可用（它自己认的坑） | rounds=2 两腿 delta 为负 | **本程也是负的**（-183,960 / -100,056） | 是（坑是真的，不是它推的） |
+
+⇒ **AC#1 的量法与量到的东西成立**："渗"＝会（且是变严不是漏内容，这个方向它也钉了）；"长"＝会、无上限、可归零；
+内容级渗＝不会。票面 AC#2 给的作废前提（"既不渗也不长"）**不成立**这一判语，本程跟着成立。
+
+### 2.3 派单攻击点①那一问：这条链到底是"生产可达"还是"真桥可达、CLI 那一轮不可达"
+
+**本程自己造了那一发，并把它造到哪儿为止量了下来。** 台件＝`probes/151-accept/accept151_e2e_test.go`
+（原始输出 `e2e-shot-shipped-code-v3.txt`、`…-v5.txt`）与对照件 `accept151_control_test.go`（`e2e-control-l1-write.txt`）。
+
+造法（不动仓内任何一枚文件，全部在仓库外那枚纯净树里）：mockllm 除"确定性合成"之外还有**金样本回放腿**
+（`tools/mockllm/main.go:19-21`：model 写作 `golden/<name>` 就逐段回放 `internal/llm/testdata/golden/<name>.sse`，
+`server.go:145 nextGolden` 一次请求吃一段）。⇒ 实现件 §8 第 5 条那句"mockllm 只在 `tool_choice` 非空时才吐
+`tool_calls`"只描述了**合成腿**（`tools/mockllm/chat.go:172` 那一行确实是它的尺），**金样本腿不看 tool_choice**。
+于是本程现写一篇两段的金样本（第 1 段＝模型发起一发 `fs.read`，参数是本轮 allowlist 内那份身份证号文件；
+第 2 段＝纯文本答复），config.toml 把 `text_chain` 指到 `acme/golden/…`，真跑 `runTextTask`：
+
+```
+现读（本程，4e16976 树）：exit=0
+  stdout: [工具 fs.read -> error] … 任务 08281a77-… 结束（completed，2 轮，1 次工具调用 …）
+  stderr: [audit] tools: C25 scope closed task=08281a77-… was_open=false dropped=0 open_scopes=0
+```
+
+⇒ **模型确实发起了那一发（2 轮 1 次工具调用），但它到不了桥**：`was_open=false dropped=0`
+说明这一轮的 scope 根本没被开过（`mark` 没跑到）。**为什么到不了，本程做了对照**（同一枚腿、同一套金样本机制，
+只把工具换成声明档位 L1 的 `fs.write`）：
+
+```
+对照现读：exit=0
+  stdout: [工具 fs.write -> success]        且 out.txt 真落盘（19 字节）
+  stderr: [audit] tools: C25 scope closed task=b27e0404-… was_open=false dropped=0 open_scopes=0
+```
+
+⇒ 档位之外别无变量，所以卡住 `fs.read` 的就是**声明档位**，三处原文（全在 `4e16976` 上现读）：
+`internal/tools/fs.go:298` `FSReadDecl → Declared: risk.L0`；
+`internal/tools/bridge.go:224` `ToolInfo.RiskLevel = levelString(e.Decl.Declared)`；
+`internal/agent/loop.go:776-789` `decideRisk` 只让 L1/L2 过，default 分支在
+`Config.PassThroughUnclassifiedRisk == false` 时**直接拒绝**，而 `cmd/wisp/run.go:588-595` 的
+`agent.Config{…}` 字面量里**没有这一枚键**（本程尺：`grep -rn "PassThroughUnclassifiedRisk" --include='*.go' internal cmd | grep -v _test`
+⇒ 只有 `loop.go:125/128/767/783`、`agent/tools.go:23`、`tools/gate.go:133` 五处，**组合根一处都没有**）。
+
+**裁决（两问分开答，档位不同）**：
+1. **"这一类缺陷在生产上可达"＝成立**，但要按 `bridge.go:559` 那一发的字面读：**任何在桥上派发的宿主**（面板／内部调用方／已装配好的 `rt.bridge`，
+   `cmd/wisp/run_test.go` 的 `TestHostDispatchThroughTheAssembledBridge` 就是这一形的现成形状）一发敏感读就挂一枚 scope，
+   且今天没人关。实现件 §2.1 那张"两形代价"表里的每一枚数本程都独立复到了（§2.2），所以"渗/长"不是推的。
+2. **"今天的 `wisp run` 控制台腿会天天吃到这一发"＝不成立**，且原因**比它自陈的那一枚更深一层**：
+   它 §8 第 5 条只归给 mockllm 的 `tool_choice` 门；本程现量到**第二道门是码给的**——
+   环路在 L0/未分级这一档就把它拒了，所以**换真 provider 也到不了桥**。
+   ⇒ 实现件 §2.1 那句"（今天的 `wisp run` 控制台腿、`NoGate`）"是把**桥的配置形**（NoGate）写成了**这条腿的实际后果**；
+   按本程的读数，这条腿今天连"第一枚任务读完敏感内容"都发生不了。
+   **这是登记不准，不是假绿**：它反而把自己的后果面**说大了**一格，方向与放水相反，但下一程若照它这句去验收"控制台腿已修"，会被它骗。
+   ⇒ 本程把这一条作为**对本票结论的更正值**记进总判的附条件里（第 7 节），并点名它 §8#5 那句"本程没测什么"应当补的正是这第二道门。
+
+⚠ 本程**没有**造出"端到端一轮里关掉一枚带污点的 scope"那一发（`dropped>=1` 那一形）。上表两枚读数就是本程造到为止的位置：
+金样本能让环路发起 `fs.read`，但环路自己的风险政策不给它到桥。要造出那一发得动 `internal/agent/**` 或
+`cmd/wisp/run.go` 的 Config 字面量——**那是别人的地界（票 153／组合根），本程没那个写面，也没自作**。
+所以"实现件的 T1 钉的是 `dropped=0` 那一形"这句话**本程跟着成立**（它 §8#5 自陈的那一半没被本程推翻）。

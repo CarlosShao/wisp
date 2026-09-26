@@ -1,0 +1,29 @@
+time=2026-09-26T10:43:35.392+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestCompositionRootClosesTheLoopTasksTaintScope
+time=2026-09-26T10:43:37.193+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/26 10:43:37 mockllm: serving on http://127.0.0.1:54838 (golden dir D:\tmp\wisp151accept\internal\llm\testdata\golden)
+time=2026-09-26T10:43:37.263+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestCompositionRootClosesTheLoopTasksTaintScope1143152678\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-09-26T10:43:37.311+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestCompositionRootClosesTheLoopTasksTaintScope1143152678\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-26T10:43:37.330+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-26T02:43:37Z duration_ms=18
+time=2026-09-26T10:43:37.346+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestCompositionRootClosesTheLoopTasksTaintScope1143152678\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-26T10:43:37.353+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-26T02:43:37Z duration_ms=7
+time=2026-09-26T10:43:37.360+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-26T10:43:37.366+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    task_scope_close_151_test.go:62: 任务结束时没有关闭它自己的 C25 污点 scope：stderr 里找不到以 "[audit] tools: C25 scope closed task=5776ac9c-e101-4cc2-af1d-195ad1e63bd3 " 开头的审计行
+        stderr:
+        [audit] perm: MODE-READ origin=startup mode=ask_every_step source="C:\\Users\\swq\\AppData\\Local\\Temp\\TestCompositionRootClosesTheLoopTasksTaintScope1143152678\\002\\config.toml"
+--- FAIL: TestCompositionRootClosesTheLoopTasksTaintScope (2.01s)
+=== RUN   TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit
+time=2026-09-26T10:43:38.932+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/26 10:43:38 mockllm: serving on http://127.0.0.1:54841 (golden dir D:\tmp\wisp151accept\internal\llm\testdata\golden)
+time=2026-09-26T10:43:38.973+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit2089178910\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-26T10:43:39.021+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit2089178910\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-26T10:43:39.034+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-26T02:43:39Z duration_ms=12
+time=2026-09-26T10:43:39.046+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit2089178910\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-26T10:43:39.055+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-26T02:43:39Z duration_ms=9
+time=2026-09-26T10:43:39.061+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-26T10:43:39.066+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit (1.73s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	3.843s
+FAIL

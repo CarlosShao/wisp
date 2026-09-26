@@ -1,0 +1,5 @@
+# github.com/CarlosShao/wisp/internal/tools
+internal\tools\bridge.go:659:2: declared and not used: dropped
+internal\tools\bridge.go:663:2: declared and not used: left
+FAIL	github.com/CarlosShao/wisp/cmd/wisp [build failed]
+FAIL
