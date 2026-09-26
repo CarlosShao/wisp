@@ -375,7 +375,69 @@ internal/panel/pump.go          （只有注释：14 行 +、0 行 -）
 | N7 | 普查乙组其余 ❗（`thinkingMs`/`reasoningMs`/`durationMs`/`humanText`/`fragment`/`iconClass`）**只复查未推翻，未逐枚重新取证** | 本程新立的是 `remainingMs` 那一枚（P6，有实测） | 那六枚仍按普查的判语用；谁要落仍需自己复量 |
 | N8 | 全树门禁／CI 颜色一枚未取 | 推送归编排者，且 `slo-full` 在本机自启会抢 CPU | §5 的四数**只覆盖** `./internal/panel/` 与 `./cmd/wisp/` 两枚包 |
 | N9 | `tools[]`／`cost` 的 store 读口在本程**没做过一次真 DB 往返** | 需要 taskID 随包带出（R2/R3 那把锁），本程没那把钥匙 | §3 那两行的"半可达"是**读代码可达性**，不是实跑 |
-| N10 | `run.status` 那处**取向**（改 `loop.go` 的 `EvDone` 还是从 `Result` 组包）没裁 | 取向属编排者；本程实测只到"`EvDone` 今天不填 `Status`/`Stop`"（`loop.go:937` 那三枚字段） | §3 那行标"暂不落＋取向摆编排者" |
+| N10 | `run.status` 那处**取向**（改 `loop.go` 的 `EvDone` 还是从 `Result` 组包）没裁 | 取向属编排者；本程实测只到"`EvDone` 今天不填 `Status`/`Stop`"（`loop.go` 那枚 publish 只带 `Kind/TaskID/Text/TokensIn/TokensOut`） | §3 那行标"暂不落＋取向摆编排者" |
+
+---
+
+## 8. 收口（写给裁决者，不写给作者自己）
+
+### 8.1 每格落在哪、怎么复算
+
+| 格 | 本程判 | 落在 | 可复核锚（命令） |
+|---|---|---|---|
+| AC#1 | 已由**只读程**交（`145-snapshot-field-census-r1.md`），本程在其上复量并更正两枚（P5、P6） | §1 表 | `git log --oneline -- docs/evidence/s1/145-snapshot-field-census-r1.md` |
+| AC#2 | **未落地**：落地集＝空（**量**出来的空，不是找不着源） | §2.4、§3 | 副本复算见 §8.2；或直接读 `probes/145/wisp145-e1-E1-panel.txt` 里那串零值段 |
+| AC#3 | **判完**：ⓐ 不落（Go 不知道那九枚屏的名字），ⓑ **停手上报** | §4 | `grep -rn "panel\.view" --include=*.go .` → 空；`sed -n '/func knownComposerMethod/,/^}/p' internal/panel/bridge.go` |
+| AC#4 | **未越界**：契约轴零命中、`NewApprovalCardView` 与渲染那行未动、TS 对齐未写；③那把尺从"推论"补成"实跑"并数正（4 枚不是 1 枚） | §5.5、§2.2 | `for h in …; do git show --name-only --format= $h; done \| sort -u` |
+| AC#5 | 两包改前改后四数＋**逐名差集为空**；基线用哪支写清（DLL 进 PATH 的 MSYS 形，`=== RUN` 计数在表里） | §5 | `probes/145/gate-{before,after}-{panel,cmdwisp}.txt` ＋ `diff roster2-*-before roster-after` |
+| AC#6 | 逐枚答了，**答案是"答不出"**，原因是结构性的（放开面无测试文件） | §3 末列、R1 | 反扫：`git show eb38c97 --name-only`（只有两枚 .go，且 `git show --stat` 显示 0 行删除） |
+
+### 8.2 复算 §2 那批发需要的台件（本程不自判通过，全部留给可重跑形）
+
+```
+REPO="/d/work/workspace/projects plans/Wisp"; CD=/d/tmp/wisp145-e1     # 副本只建不删，仍在盘上
+tar --exclude=./.git --exclude=./frontend/node_modules --exclude=./.scratch \
+    --exclude=./design --exclude=./third_party -cf - -C "$REPO" . | (cd /d/tmp/<新目录> && tar -xf -)
+cd /d/tmp/<新目录> && go test -count=1 -v ./internal/panel/            # 副本基线：两把尺"4 JSON keys"
+git apply -p0 --directory=<...> /path/to/probes/145/patch/145-snapshot-fields-closure.patch   # 全闭合
+```
+⇒ 只想验 E1（响四枚）：**apply 后单退 `frontend/src/lib/panel.ts` 那一枚 hunk** 即可，四枚红句会原样复现。
+⚠ 副本里没有 `design/`，所以 `TestC21DesignTokensFourWayAgree` 在副本必红——**那是拷树产物，不是读数**（§2.2 已标）。
+
+### 8.3 本件自带的弱点（先自己说，免得被当成藏）
+
+1. **§2 的读数全部来自仓外副本**，共享树里本程**没制造过那一发红**（那会给别家程的读数与门禁颜色都下毒）。
+   判"这发在仓内也会红"靠的是：补丁 `git apply --check` 在 `e24ae28` 干净＋副本与仓内**同一份 `run.go`/`panel.ts`**。
+2. **§2.4 那发**用的是手搓的 `PumpSources`，读口清单与 `run.go:421-427` **逐枚同形**（Verdicts/Mode/Workspace/Results/Now），
+   严格说是"与生产装配根同形状"。**更硬的那发在 §2.5**：那一发跑的是 `cmd/wisp` 里的**真**装配根。
+3. §3 里 `tools[]`／`cost` 两行的"半可达"是**读代码可达性**，没有真 DB 往返（N9）。
+4. `run.usage(实时)`／`run.status` 两行的上游判语部分沿用普查（本程只自量了 `loop.go:543-546` 的 switch 与 `EvDone` 那三枚字段）。
+5. 探针文件名有历史包袱：`baseline-*` 是 09:4x 在 `720cae6` 上取的第一发，`gate-before-*` 才是 `e24ae28` 的**权威基线**；
+   `wisp145-e1-*` / `wisp145-E3*` 前缀是拷贝现场留下的，未改名（**只建不删**，改名＝删除＋新建）。
+6. 本件**不自判"通过"**：`docs/evidence/s1/` 的裁决表按 `AGENTS §0.3`／`SPEC-12 §4.3` #1/#3 必须出自**非实现者**，
+   而本程正是 AC#2/AC#3/AC#5/AC#6 的执行者。这里只交件与可复核锚，**判由另一枚程做**。
+
+### 8.4 零 push／零越界自证（现量）
+
+```
+$ for h in ef07ba5 c655458 972ceba eb38c97 7263456; do git branch -r --contains $h; done
+（五枚全空 = 全部只在本地 dev；本节落下去是第六枚，路径集仍只有 docs/evidence/s1/ 那一枚＋probes/145/）
+$ git show --stat eb38c97 | tail -3
+ internal/panel/composer.go | 13 +++++++++++++
+ internal/panel/pump.go     | 14 ++++++++++++++     ← 27 行 +、0 行 -，纯注释
+```
+放开面之外**一枚未碰**；单独保留的三枚（`tokens_fourway_test.go`／`l2_grant_boundary_test.go`／`frontend_hygiene_test.go`）
+在 `git show --name-only` 的并集里**不存在**。撤销口令「145 别动」全程未收到。
+
+### 8.5 一段人话（给不读术语的人）
+
+面板那张卡能拿到的数据，今天还是只有四样。我把"该给它加哪几样、每样的数是从哪个真在跑的东西身上取的"
+逐样查了一遍，还**在仓库外的一份拷贝里真加了一次**：加完之后发现——
+**只要不动那三把别人手里的钥匙，加出来的每一样都是 0 或空**（我留了打印出来的证据）。
+所以这一趟**没有往共享仓库里加任何字段**，加进去的是"下一次谁要来加，得同时动哪几处、动错了会怎么被发现"。
+唯一一条**新**发现：那个"还剩几秒"的数字，后台**今天真的没有**——不是没送过来，是**根本没人在算**，
+所以它不能上这班车（上了就是一个假倒计时，正是这张票要防的那种东西）。
+另外顺手捉到一处**门没看住的形状**（字段不写标签时那两把对账尺会看不见），只登记、没使用。
 
 ---
 
