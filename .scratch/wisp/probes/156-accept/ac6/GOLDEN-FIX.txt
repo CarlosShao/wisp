@@ -1,0 +1,42 @@
+== how many files each golden pathspec selects at the anchor (firing check)
+fatal: :(glob)**/testdata/golden/**: pathspec magic not supported by this command: 'glob'
+:(glob)**/testdata/golden/** -> 0 files
+fatal: :(glob)**/golden/**: pathspec magic not supported by this command: 'glob'
+:(glob)**/golden/** -> 0 files
+fatal: :(glob)***.golden**: pathspec magic not supported by this command: 'glob'
+:(glob)***.golden** -> 0 files
+
+== golden arms per implementation commit (10, path-picked)
+cc58445 golden_hits=0
+0e95353 golden_hits=0
+2ce77e1 golden_hits=0
+2262c2b golden_hits=0
+3fbb1ce golden_hits=0
+1137781 golden_hits=0
+1d53526 golden_hits=0
+a4ec1f4 golden_hits=0
+d661e8c golden_hits=0
+7ca1130 golden_hits=0
+
+== POSITIVE CONTROL for the golden arm: a commit that really moved a golden
+picked cbbbdf8503cb1339e9bc9c86cf433d882bad853b docs(agent): correct the spill fixture's scenario 
+   :(glob)**/testdata/golden/** hits=1
+   :(glob)**/golden/** hits=1
+   :(glob)***.golden** hits=0
+
+== thresholds.go / slo-check.ps1 / allowlist / d22scan at anchor (存量, firing check)
+internal/observe/thresholds.go -> 1
+scripts/slo-check.ps1 -> 1
+tools/d22scan/allowlist.txt -> 1
+tools/d22scan -> 6
+docs/PLAN.md -> 1
+docs/specs -> 14
+internal/risk -> 37
+internal/panel -> 20
+internal/agent/approval -> 18
+internal/observe -> 25
+frontend -> 85
+design -> 30
+
+== whole-era (9835d81..7ca1130) hits on the contract axis, EVERY impl commit already 0 above
+  (range diff is NOT the AC#6 ruler - ticket face demands per-commit; this is a cross-check only)

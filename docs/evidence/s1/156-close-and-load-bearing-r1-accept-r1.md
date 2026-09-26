@@ -374,93 +374,6 @@ $ 本票新写的 slo156* 只有五枚：Spawn／Witness／OsDead／OsAlive／Pl
 
 ---
 
-## 第 5 格　AC#5 —— 承重那一格**按操作定义攻**（不是"读一遍说成立"）
-
-**定义（派单 §3 逐字）**：**摘掉任意一味，是否存在一发变异从此打不红？** 反面：**别要求"同一发变异里新加那支先响"**
-（它挂在 `else if` 上、前提正是被抹掉的东西）。再问一句：**摘掉它有没有任何外部可见读数变过？**
-**票面 `:48` 另加一条**：`摘一味导致编不过`**不算有牙**——要重做一发改得过、行为不变的对照。
-
-本味＝`cmd/wisp/slo_windows.go` @ `7ca1130` 的 **`:881-882`**（`// (b) the OS…` ＋ `return s.queryProcess()`），
-位置与内容本程自己在第 0 格钉过（**不是**照 r2 的行号去找）。摘法＝`my156.py` 的 `OS_ARM_REMOVED`
-把两行换成 `// MUTATION m1…` ＋ `return false, exitCodeUnknown`：**(a) 一字未动、签名一字未动、编得过**
-——本程下面每一发都真的编译并跑出了 `=== RUN`，这一条不是声称而是读数〔自跑〕。
-
-### 5.1 问①——**三形本程全部自己重跑**（派单点名"至少两形，尤其丙"），答案是**分层的**
-
-| 形 | 本程的发（`logs/`） | 选择器 | 本程四数 | 判 |
-|---|---|---|---|---|
-| **甲 单摘这一味** | `accept-teeth-m1-jia` | `TestSLO149Exited\|TestSLO156` | RUN=6 PASS=2 **FAIL=4** SKIP=0 | **有牙**：红的正是 15/16/17/18；仍绿的两枚＝case 19（夹具）＋**票 149 的 case 13**（它走 (a)，m1 拿它无可奈何——这正是 m1 只摘了 (b) 的证据） |
-| **乙 摘这一味＋本票四枚持有者逐枚改名** | `accept-teeth-m1-plus-newcases-off-yi` | 全 SLO 五族 | RUN=22 PASS=15 **FAIL=0** SKIP=0 | **存在打不红的那一发**，形状＝"摘一味 **并且** 把持有它的四枚用例一起摘掉" |
-| **丙 摘这一味，只问本票之前的旧名册** | `accept-teeth-m1-old-surface-bing` | `TestSLO144\|147\|149\|152` | RUN=21 PASS=14 **FAIL=0** SKIP=0 | 与**同选择器零变异基线** `accept-teeth-asis-old-surface-bing-asis`＝21/14/0 **四个数一字不差**，且**名册两向 `comm` 双向皆空**（21↔21，见 3.3 末与 `logs/roster/`）⇒ 改前那份测试面对这一味**零持有**。**这才是"打不红"的严格形**，也正是 AC#3 必须新增用例的理由 |
-
-⇒ **本格按定义的答案：问①"是"——存在打不红的那一发**（乙、丙两形），
-但**不是**"摘了没人能觉"那一形：两发都要靠**摘掉用例本身**才成立，而单摘一味（甲）红四枚。
-本程**没有**把乙/丙读成"这一味没牙"，也**没有**只报甲。〔全部自跑；与 r2 §5.1 的 6/2/4、22/15/0、21/14/0 **同数**，
-那是〔日志＋归档，本程抽验〕的对照，不是本程的凭据〕
-
-### 5.2 问②——**变了，两个口径都变**，且变的正是操作员看到的那一句
-
-**操作员口径**（本票的靶；本程自己两发探针，同一 cell 只换那一味）：
-
-| cell | 零变异（`accept-probe-on-ship`） | 摘掉这一味（`accept-probe-on-m1`） |
-|---|---|---|
-| `prefix-unreaped` | `sentence=… **exited (code 7) without writing its report** (989 bytes read…)`、`loop=elapsed_ms=0 **reads=1** DEAD-CHILD`、`window=48/7`、`agree=7ms asks=6` | `sentence=… **never wrote a complete report within 2s** (last read: 989 bytes read…)`、`loop=elapsed_ms=2009 **reads=187** BUDGET`、`window=38/**2211**`、`agree=**-1** asks=130` |
-| `nofile-unreaped` | DEAD-CHILD、`reads=1`、`window=36/6` | BUDGET、`reads=190`、`window=35/2210`、`agree=-1 asks=114` |
-| `live-child`（阴性对照） | BUDGET、`reads=188` | **仍是 BUDGET**、`reads=192` |
-| `prefix-REAPED-case13shape` | DEAD-CHILD、`reads=1` | **一字未变**：DEAD-CHILD、`reads=1` |
-
-⇒ 问②**有**：**指错病因 → 指对病因**，两发之间被改的只有"有没有人去问 OS"这一件事；
-**反向对照两发逐字同形**（`live-child` 与 `case13shape`）⇒ 这一味不是"什么都变"的那种改法。〔自跑〕
-
-**名册口径**：`TestSLO156` 五族那面对照见 5.1 甲；本程另有一发**用发货用例**的外部可见变化——
-`accept-teeth-m1-jia` 里 case 17 的红句原文（生产常量 30s）：
-
-```
---- FAIL: TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn (30.05s)
-    slo_exit_os_156_windows_test.go:257: dead subject was read 1470 times, want exactly 1 (the loop asks the OS and gives up on the spot)
---- FAIL: TestSLO156WaitReadyNamesTheDeadSubjectToo (60.05s)
-    slo_exit_os_156_windows_test.go:285: waitReady give-up "wisp slo: subject 63508 never reported ready within 1m0s" does not name the dead subject and its code
-```
-
-（1470 次／30.05s 与 r1 的 1469／30.07、r2 的 1467／30.04 是本机差，本程不做跨机宣称。）〔自跑〕
-
-### 5.3 单点回退进攻（本仓固定动作）：**只撤 1 处，问"哪条用例变得不响"**
-
-本程不撤全部，逐味撤（同一把尺、同一选择器、八发全自跑，全表在 3.3）：
-**撤 (b)** ⇒ 15/16/17/18 四枚红（甲）；**撤等态判定**（m2）⇒ 同样四枚；**撤"别把活的认成死的"**（m3）⇒ **只 16 一枚**；
-**撤 (a)**（m4）⇒ 16 ＋ **票 149 的 case 13**；**撤码那读**（m5）⇒ 15/17/18；
-**撤 (b) 再撤一枚持有者**（m1＋off15／m1＋off17）⇒ **其余三枚仍红**；
-**撤 (a) 再撤 case 13**（m4＋off13）⇒ **只剩 16 一枚红**。
-
-⇒ 答得出"哪条变得不响"：**没有任何一处改动撤掉之后全包静默**；同时**没有任何一枚持有者是装饰**——
-撤掉其中一枚，其余仍响（红数 3／3／1），要**四枚一起撤**才静默（乙）。这一条正是"承重"的可复算形。〔自跑〕
-
-### 5.4 恒真判据这一类新假绿——本程主动排掉两枚
-
-1. **"复跑必须红"型判据本程一枚没开**：丙那一形今天**就是**不响（21/14/0 与基线一字不差），
-   本程把它写成**读数**而不是判据（若写成"摘一味必须红"就成了永不响的装饰格）。
-2. **本程证过的"会响的正控"都在**：`asis` 6/6/0（绿侧）与六发变异 4/4/2/3/3/1（红侧）同尺同树，
-   外加 `LOADED=YES`（每发 `=== RUN`≥5，**零枚 `LOADED=NO`**、零枚 `0xc0000135`）〔自跑〕。
-
-**放水两问自答（本格）**：① 断言方向——本程零判据改动；本程甚至**没有**新造任何一枚变异（六发全部 import r1 的 `my156.py`），
-所以不存在"造一发打不红的变异来充数"这扇门；② helper——本程用 r1 的尺（`spec`/`case_off`/`run`/`apply_overlay`）
-与 r1 的探针（`zz156probe_windows_test.go`），只加 cell 命名与四数/名册打印。
-
-**第 5 格判定**：**〔成立〕**——两问都**量**不**辩**：问①按定义答"是，且只在使用者撤掉持有者时才成立"（甲乙丙三形本程全部自跑），
-问②答"变了"（操作员那句逐字变、名册那面 4 枚换色，两向反向对照同形）。
-**"摘一味编不过"那一形在本票不存在**（六发变异全部编得过并跑出 RUN）。
-
-**本程没测什么（本格）**：
-1. **没量 (a) 支内部**（`ps.Exited()` 与 `ps.ExitCode()` 的分配）——m4 摘的是整支三行，本程没造"只摘其中一行"的发；
-2. **没造"只红 case 17 一枚"或"只红 case 15 一枚"的那一发变异**（5.3 的对称缺口，见 3.5 第 1 条）；
-3. **没跑 `-race`** ⇒ 新增每轮询 1–3 枚内核调用与 `stop()` 的竞态关系**无判据**（既不红也不绿）；
-4. **没量真 `wisp slo` 那条命令端到端**（5.2 那一格是**探针**打在 `collectReportWithin` 生产接缝上打印的句子，
-   预算是探针自挑的 `2s/10ms`；生产常量那发是 case 17，走测试接线不是那条命令）——
-   这笔欠账票面 `:67` 自己登记过（`wisp slo` 全仓 100% 不被 `go test` 执行），本程**确认它仍在**。
-
-
----
-
 ## 第 4 格　AC#4 —— 票 152 §8.3 那三枚**注释级**动作（①②③逐枚裁 ＋ "分开 commit"这一条）
 
 **票面判据（`:45-46`）**：把"现量第 4 条"那三枚动作做掉；它们**不影响 AC#2 成立与否**，
@@ -565,3 +478,189 @@ $ grep -a -c 'RUN=21, PASS=14, FAIL=0'   = 1 枚，位置＝:749，且它的上�
 **C2** `:742`–`:752` 三处时态过期——**最小闭合集合：一张记录级收口票，用追加更正（不改正文）闭，见 4.5 与第 8 格**。
 
 
+
+## 第 5 格　AC#5 —— 承重那一格**按操作定义攻**（不是"读一遍说成立"）
+
+**定义（派单 §3 逐字）**：**摘掉任意一味，是否存在一发变异从此打不红？** 反面：**别要求"同一发变异里新加那支先响"**
+（它挂在 `else if` 上、前提正是被抹掉的东西）。再问一句：**摘掉它有没有任何外部可见读数变过？**
+**票面 `:48` 另加一条**：`摘一味导致编不过`**不算有牙**——要重做一发改得过、行为不变的对照。
+
+本味＝`cmd/wisp/slo_windows.go` @ `7ca1130` 的 **`:881-882`**（`// (b) the OS…` ＋ `return s.queryProcess()`），
+位置与内容本程自己在第 0 格钉过（**不是**照 r2 的行号去找）。摘法＝`my156.py` 的 `OS_ARM_REMOVED`
+把两行换成 `// MUTATION m1…` ＋ `return false, exitCodeUnknown`：**(a) 一字未动、签名一字未动、编得过**
+——本程下面每一发都真的编译并跑出了 `=== RUN`，这一条不是声称而是读数〔自跑〕。
+
+### 5.1 问①——**三形本程全部自己重跑**（派单点名"至少两形，尤其丙"），答案是**分层的**
+
+| 形 | 本程的发（`logs/`） | 选择器 | 本程四数 | 判 |
+|---|---|---|---|---|
+| **甲 单摘这一味** | `accept-teeth-m1-jia` | `TestSLO149Exited\|TestSLO156` | RUN=6 PASS=2 **FAIL=4** SKIP=0 | **有牙**：红的正是 15/16/17/18；仍绿的两枚＝case 19（夹具）＋**票 149 的 case 13**（它走 (a)，m1 拿它无可奈何——这正是 m1 只摘了 (b) 的证据） |
+| **乙 摘这一味＋本票四枚持有者逐枚改名** | `accept-teeth-m1-plus-newcases-off-yi` | 全 SLO 五族 | RUN=22 PASS=15 **FAIL=0** SKIP=0 | **存在打不红的那一发**，形状＝"摘一味 **并且** 把持有它的四枚用例一起摘掉" |
+| **丙 摘这一味，只问本票之前的旧名册** | `accept-teeth-m1-old-surface-bing` | `TestSLO144\|147\|149\|152` | RUN=21 PASS=14 **FAIL=0** SKIP=0 | 与**同选择器零变异基线** `accept-teeth-asis-old-surface-bing-asis`＝21/14/0 **四个数一字不差**，且**名册两向 `comm` 双向皆空**（21↔21，见 3.3 末与 `logs/roster/`）⇒ 改前那份测试面对这一味**零持有**。**这才是"打不红"的严格形**，也正是 AC#3 必须新增用例的理由 |
+
+⇒ **本格按定义的答案：问①"是"——存在打不红的那一发**（乙、丙两形），
+但**不是**"摘了没人能觉"那一形：两发都要靠**摘掉用例本身**才成立，而单摘一味（甲）红四枚。
+本程**没有**把乙/丙读成"这一味没牙"，也**没有**只报甲。〔全部自跑；与 r2 §5.1 的 6/2/4、22/15/0、21/14/0 **同数**，
+那是〔日志＋归档，本程抽验〕的对照，不是本程的凭据〕
+
+### 5.2 问②——**变了，两个口径都变**，且变的正是操作员看到的那一句
+
+**操作员口径**（本票的靶；本程自己两发探针，同一 cell 只换那一味）：
+
+| cell | 零变异（`accept-probe-on-ship`） | 摘掉这一味（`accept-probe-on-m1`） |
+|---|---|---|
+| `prefix-unreaped` | `sentence=… **exited (code 7) without writing its report** (989 bytes read…)`、`loop=elapsed_ms=0 **reads=1** DEAD-CHILD`、`window=48/7`、`agree=7ms asks=6` | `sentence=… **never wrote a complete report within 2s** (last read: 989 bytes read…)`、`loop=elapsed_ms=2009 **reads=187** BUDGET`、`window=38/**2211**`、`agree=**-1** asks=130` |
+| `nofile-unreaped` | DEAD-CHILD、`reads=1`、`window=36/6` | BUDGET、`reads=190`、`window=35/2210`、`agree=-1 asks=114` |
+| `live-child`（阴性对照） | BUDGET、`reads=188` | **仍是 BUDGET**、`reads=192` |
+| `prefix-REAPED-case13shape` | DEAD-CHILD、`reads=1` | **一字未变**：DEAD-CHILD、`reads=1` |
+
+⇒ 问②**有**：**指错病因 → 指对病因**，两发之间被改的只有"有没有人去问 OS"这一件事；
+**反向对照两发逐字同形**（`live-child` 与 `case13shape`）⇒ 这一味不是"什么都变"的那种改法。〔自跑〕
+
+**名册口径**：`TestSLO156` 五族那面对照见 5.1 甲；本程另有一发**用发货用例**的外部可见变化——
+`accept-teeth-m1-jia` 里 case 17 的红句原文（生产常量 30s）：
+
+```
+--- FAIL: TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn (30.05s)
+    slo_exit_os_156_windows_test.go:257: dead subject was read 1470 times, want exactly 1 (the loop asks the OS and gives up on the spot)
+--- FAIL: TestSLO156WaitReadyNamesTheDeadSubjectToo (60.05s)
+    slo_exit_os_156_windows_test.go:285: waitReady give-up "wisp slo: subject 63508 never reported ready within 1m0s" does not name the dead subject and its code
+```
+
+（1470 次／30.05s 与 r1 的 1469／30.07、r2 的 1467／30.04 是本机差，本程不做跨机宣称。）〔自跑〕
+
+### 5.3 单点回退进攻（本仓固定动作）：**只撤 1 处，问"哪条用例变得不响"**
+
+本程不撤全部，逐味撤（同一把尺、同一选择器、八发全自跑，全表在 3.3）：
+**撤 (b)** ⇒ 15/16/17/18 四枚红（甲）；**撤等态判定**（m2）⇒ 同样四枚；**撤"别把活的认成死的"**（m3）⇒ **只 16 一枚**；
+**撤 (a)**（m4）⇒ 16 ＋ **票 149 的 case 13**；**撤码那读**（m5）⇒ 15/17/18；
+**撤 (b) 再撤一枚持有者**（m1＋off15／m1＋off17）⇒ **其余三枚仍红**；
+**撤 (a) 再撤 case 13**（m4＋off13）⇒ **只剩 16 一枚红**。
+
+⇒ 答得出"哪条变得不响"：**没有任何一处改动撤掉之后全包静默**；同时**没有任何一枚持有者是装饰**——
+撤掉其中一枚，其余仍响（红数 3／3／1），要**四枚一起撤**才静默（乙）。这一条正是"承重"的可复算形。〔自跑〕
+
+### 5.4 恒真判据这一类新假绿——本程主动排掉两枚
+
+1. **"复跑必须红"型判据本程一枚没开**：丙那一形今天**就是**不响（21/14/0 与基线一字不差），
+   本程把它写成**读数**而不是判据（若写成"摘一味必须红"就成了永不响的装饰格）。
+2. **本程证过的"会响的正控"都在**：`asis` 6/6/0（绿侧）与六发变异 4/4/2/3/3/1（红侧）同尺同树，
+   外加 `LOADED=YES`（每发 `=== RUN`≥5，**零枚 `LOADED=NO`**、零枚 `0xc0000135`）〔自跑〕。
+
+**放水两问自答（本格）**：① 断言方向——本程零判据改动；本程甚至**没有**新造任何一枚变异（六发全部 import r1 的 `my156.py`），
+所以不存在"造一发打不红的变异来充数"这扇门；② helper——本程用 r1 的尺（`spec`/`case_off`/`run`/`apply_overlay`）
+与 r1 的探针（`zz156probe_windows_test.go`），只加 cell 命名与四数/名册打印。
+
+**第 5 格判定**：**〔成立〕**——两问都**量**不**辩**：问①按定义答"是，且只在使用者撤掉持有者时才成立"（甲乙丙三形本程全部自跑），
+问②答"变了"（操作员那句逐字变、名册那面 4 枚换色，两向反向对照同形）。
+**"摘一味编不过"那一形在本票不存在**（六发变异全部编得过并跑出 RUN）。
+
+**本程没测什么（本格）**：
+1. **没量 (a) 支内部**（`ps.Exited()` 与 `ps.ExitCode()` 的分配）——m4 摘的是整支三行，本程没造"只摘其中一行"的发；
+2. **没造"只红 case 17 一枚"或"只红 case 15 一枚"的那一发变异**（5.3 的对称缺口，见 3.5 第 1 条）；
+3. **没跑 `-race`** ⇒ 新增每轮询 1–3 枚内核调用与 `stop()` 的竞态关系**无判据**（既不红也不绿）；
+4. **没量真 `wisp slo` 那条命令端到端**（5.2 那一格是**探针**打在 `collectReportWithin` 生产接缝上打印的句子，
+   预算是探针自挑的 `2s/10ms`；生产常量那发是 case 17，走测试接线不是那条命令）——
+   这笔欠账票面 `:67` 自己登记过（`wisp slo` 全仓 100% 不被 `go test` 执行），本程**确认它仍在**。
+
+---
+
+## 第 6 格　AC#6 —— 契约轴零字节（**逐枚 commit 现量**，区间 diff 不当尺）
+
+**票面判据（`:49-52`）**：`docs/PLAN.md`、`docs/specs/**`、`internal/risk/**`、`internal/panel/**`、
+`internal/agent/approval/**`、`internal/observe/**`、`thresholds.go`、任何 golden、`allowlist.txt`、
+`scripts/slo-check.ps1`、`tools/d22scan/**`、`frontend/**`、`design/**`、台账、停车点＝**编排者写面**；
+⚠ 名册**逐枚 commit 现量**（别拿区间 diff 当尺）；`frontend/**`／`design/**` 有别的会话在未提交地写：**不碰、不还原、
+不算进任何零命中宣称**。
+
+### 6.1 本程的"本票实现 commit"名册是**按路径挑的**，得 **10 枚**（r4 报 8 枚）
+
+```
+$ git rev-list --count 9835d81..7ca1130                 88        （r4 在 d661e8c 上当轮量到 87＝版本漂，不是谁数错）
+$ 逐枚 git diff-tree … -- cmd/wisp | docs/evidence/s1/156-* | .scratch/wisp/probes/156
+cc58445 r1  0e95353 r1†  2ce77e1 r2  2262c2b r2  3fbb1ce r3  1137781 r3†  1d53526 r4  a4ec1f4 r4  d661e8c r4  7ca1130 r4
+```
+
+⇒ **比 r4 多的两枚（`d661e8c`／`7ca1130`）就是 r4 自己最后那两枚**——它数的时候它们还没落地，**结构性数不到**，
+不是漏计缺陷。†＝编排者代提（`0e95353` 代提 r1 停在轮次上限的码、`1137781` 代提 r3 的"改前"门禁台件）。
+**"代提"不加重也不减轻**：本程对这 10 枚**逐枚**重打同一把尺，`1137781` 在内（见 6.3 与第 7 格）。〔自跑〕
+
+### 6.2 十枚 × 射程：全 0，且**每一枚的删除列都不落在射程上**
+
+`ac6-census.sh`（16 支 pathspec＝票面 15 支，`thresholds.go` 与 `internal/observe/**` 分列、
+"任何 golden"拆成 `**/testdata/golden/**`＋`**/golden/**`）原文 `ac6/CENSUS-OUT.txt`＋`ac6/GOLDEN-FIX.txt`：
+
+```
+cc58445  A1..A16 全 0  TOTALHITS=0 deletedlines=0      0e95353  全 0  TOTALHITS=0 deletedlines=4
+2ce77e1  全 0  TOTALHITS=0 deletedlines=0              2262c2b  全 0  TOTALHITS=0 deletedlines=0
+3fbb1ce  全 0  TOTALHITS=0 deletedlines=2              1137781  全 0  TOTALHITS=0 deletedlines=0
+1d53526  全 0  TOTALHITS=0 deletedlines=7              a4ec1f4  全 0  TOTALHITS=0 deletedlines=0
+d661e8c  全 0  TOTALHITS=0 deletedlines=0              7ca1130  全 0  TOTALHITS=0 deletedlines=0
+golden 那两支单独重打（6.4 那枚死 pathspec 修好之后）：10 枚全 golden_hits=0
+go.mod／go.sum 逐枚：10 枚全 []
+```
+
+删除列非零的三枚（`0e95353`=4、`3fbb1ce`=2、`1d53526`=7）本程逐枚看了文件清单：
+全部落在 `cmd/wisp/**` 与 `docs/evidence/s1/156-*` ⇒ **一枚都不在射程**〔自跑〕。
+
+### 6.3 让"零"值钱：五枚正控全响（按**路径**挑，不按 message 挑）
+
+```
+1218192  internal/risk hits=2                     ← 冻结码会响
+191f0d6  docs/specs hits=2 ＋ 台账 1 ＋ 停车点 1
+5866c6f  docs/PLAN.md hits=1 ＋ docs/specs hits=1
+5eb0f6b  go.mod hits=1                            ← 依赖那支会响
+cbbbdf8  **/testdata/golden/** hits=1 ＋ **/golden/** hits=1     ← golden 那支会响
+负控：本程自己的 commit 也打一遍 → 16 支全 0（它只动证据件）
+```
+
+⇒ 本表所有"0 命中"都是**这把尺打得响**之下的 0〔自跑〕。
+
+### 6.4 本程在这格犯的**两枚**仪器错（都往"假零"方向，都就地纠正）
+
+1. **死 pathspec**：本程第一版把"任何 golden"写成裸 `testdata/golden` ⇒ 作为 git **前缀**只匹配**顶层**
+   `testdata/golden/`（本仓没有），**只能读出 0**。改成 `:(glob)**/testdata/golden/**` 后，
+   正控 `cbbbdf8` 打得响（hits=1），10 枚实现 commit 仍 0。**没修之前那个 0 是假的**，本程把它写出来而不是抹掉。
+2. **`git ls-tree` 不支持 pathspec magic**：`git ls-tree -r 7ca1130 -- ':(glob)**/golden/**'`
+   ⇒ `fatal: pathspec magic not supported by this command`，而**同一支 magic 在 `git diff-tree` 上工作正常**。
+   本程那条"存量 firing check"因此整批发 0——那是**尺不响**，不是**没有货**：
+   锚点存量本程改用朴素前缀重量：`docs/PLAN.md`=1、`docs/specs`=14、`internal/risk`=37、`internal/panel`=20、
+   `internal/agent/approval`=18、`internal/observe`=25、`thresholds.go`=1、`allowlist.txt`=1、
+   `scripts/slo-check.ps1`=1、`tools/d22scan`=6、`frontend`=85、`design`=30。〔自跑，`ac6/GOLDEN-FIX.txt`〕
+
+### 6.5 时代那面（本程不算进任何宣称，但把归属量出来）
+
+```
+$ 区间交叉核（不是 AC#6 的尺，只是对照）：git diff --name-only 9835d81 7ca1130 -- <冻结 11 支＋golden glob＋go.mod go.sum>
+   → **零行**（整个时代 88 枚里，冻结码那面一枚都没被碰过）
+$ 逐枚（88 枚 × frontend/design/台账/停车点）→ 20 枚有命中：fe=[1-9] 4 枚、design 0 枚、台账/停车点 16 枚
+$ 这 20 枚里，本票 10 枚实现 commit 命中＝**0**
+```
+
+⇒ **`design/**` 在 commit 层 0 命中**只说已入库部分；派单点名的 **25 枚未提交 `design/**` 增量**在名册上结构性看不见，
+本程**没碰、没还原、没提交**，也**没算进任何零命中宣称**。`a2a3b3c`／`0f18652`／`0c56b0c`／`7609913` 那四枚前端写面＝**另一会话**。〔自跑，`ac6/era-attr.txt`〕
+
+### 6.6 一枚本程多做的（票面没要求，但 AC#2/AGENTS §1.2 的禁形要用它）
+
+`bash scripts/d22scan.sh` rc=0：**clean - no D22 ban violations**，且它**报了射程**（`bans #1-5 cmd/=23`、
+`ban #8 cmd/ 45 Go files 含注释与 _test.go`、`internal/=205/413`），正控套件 `TestBuiltBinaryGoesRedEndToEnd` 六枚全 PASS
+⇒ "clean"不是"尺瞎了"。**档位与边界要写清**：这一发扫的是**当前工作树**（含别人未提交的 `design/**`、`frontend/**`），
+**不是 `7ca1130` 那棵树** ⇒ 它证"今天盘上没有违禁形状"，**不证**"锚点树没有"；本程**没有**为它造锚点快照
+（派单禁 `git archive | tar`，而本程没有别的合规取树法在射程内）。〔自跑，`d22scan.txt`〕
+
+**放水两问自答（本格）**：① 断言方向——本程一枚判据没动，且这格连测试都没跑（纯 git 尺＋一发只读扫描）；
+② helper——尺是本程自己写的 `ac6-census.sh`/`golden-fix.sh`（承 r1/r4 的逐枚原则），
+**没有** import r4 的 `zero156-r4.sh`，所以 6.2 那张表**不是**它的读数的复述。
+
+**第 6 格判定**：**〔成立〕**。票面 15 支射程在**本票全部 10 枚实现 commit**（含编排者代提那两枚）上逐枚 0 命中；
+三枚非零删除列全部落在 `cmd/wisp/**` 与证据件上；`go.mod`／`go.sum` 逐枚 0；
+五枚按路径挑的正控全响；两枚本程自己的"假零"尺已就地钉死并写进本表。
+
+**本程没测什么（本格）**：
+1. **没验 `design/**` 那 25 枚未提交增量的内容**（派单明令不碰）；
+2. **没在 `7ca1130` 的快照树上跑 d22scan**（见 6.6 的边界）；
+3. **没核 `mut-shipped/` 那 9 枚日志的内容**（AC#4③ 已闭，本程只核了"9 枚 tracked"这一条形，第 4 格 4.3）。
+
+
+
+---

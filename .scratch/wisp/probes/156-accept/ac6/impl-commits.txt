@@ -1,0 +1,10 @@
+cc58445736395dd1effb5e181a2dc2b0ef93d358 evidence(156 第0+1格): AC#1 那一发本程自己复现成 implfiles=11
+0e953533ed8c29184aaf2f27de851239e3b32788 wip(156 checkpoint·编排者代提停在轮次上限的程) implfiles=25
+2ce77e1816279634a3346be4427c52fcabf25331 evidence+注释(156 AC#4 三枚注释级动作·r2 程): 票 implfiles=7
+2262c2b60c982b37795ef41b531f2be63752dcb9 evidence(156 AC#5 承重两问·r2 程): 一味＝slo_window implfiles=39
+3fbb1ced17f18ec85612c56b03875b7978285e08 style(156 AC#7 r3): gofumpt 修形 slo_exit_os_156_windows_t implfiles=1
+11377815358c61db825e2cb068bbc0b81089f684 evidence(156 AC#7 r3,编排者代提): 把那枚被掐断的 implfiles=13
+1d53526cfc69edc3d85de3bed719cc513d393495 test(156 AC#4②, r4): 把 case 14 注释里那三个数改� implfiles=1
+a4ec1f458e79e56d5a9c1f117d35a213804095cc evidence(156 AC#4②+AC#7, r4): r4 的交件件——AC#4 � implfiles=26
+d661e8cfbb76db275957bfe9bdbf2558d1f0a4c0 evidence(156 AC#6, r4): 契约轴零字节——逐枚 commi implfiles=4
+7ca11301061c445d3c5700ff1c8dea71f44367a1 evidence(156 r4 交件报告): 总判＋逐格档位（每� implfiles=1
