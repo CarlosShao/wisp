@@ -1,0 +1,55 @@
+# 票 154 派单坑①（取版别用 git archive | tar -x）—— 本程现量，锚点 bcf7601b32d07e1155b1c12972046b930d9a71bc
+
+## 1) .gitattributes 原文
+* text=auto
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.go text eol=lf
+*.md text eol=lf
+# Shell entry points (scripts/d22scan.sh) run under sh on both the ubuntu CI
+# runner and local Git Bash; CRLF would break the shebang and `set -eu`.
+*.sh text eol=lf
+*.png binary
+*.jpg binary
+*.ico binary
+*.onnx binary
+*.sse text eol=lf
+models/manifest.json -text
+models/manifest.json.minisig -text
+*.tar.bz2 binary
+docker/model-mirror/fixtures/** binary
+
+## 2) 尺＝git ls-files --eol 的 (i/,w/) 两列
+   1393 i/lf w/lf
+    111 i/-text w/-text
+     89 i/lf w/crlf
+     16 i/lf w/
+     11 i/lf w/mixed
+      6 i/none w/none
+## 3) blob≠checkout 的件（i/lf w/crlf）＝89 枚，其中 attr 分布：
+      9 attr/text
+     80 attr/text=auto
+## 4) 那 89 枚里 attr/text=auto（无 eol 钉）的按扩展名：
+     53 log
+     20 txt
+      2 tsx
+      1 ts
+      1 toml
+      1 json
+      1 js
+      1 css
+## 5) 正控样本（未修改件，blob 字节 vs 工作树字节）
+.scratch/wisp/probes/149/combos2/x-p1-d11a-d11b.log blob=3391 worktree=3436
+.scratch/wisp/probes/149/combos2/x-p1-d11a.log blob=3567 worktree=3614
+.scratch/wisp/probes/149/combos2/x-p1-d11b.log blob=3608 worktree=3655
+.scratch/wisp/probes/149/combos2/x-p1-d11e.log blob=3234 worktree=3277
+.scratch/wisp/probes/149/combos2/x-p10-d12.log blob=3763 worktree=3810
+.scratch/wisp/probes/149/combos2/x-p12-d11c.log blob=4460 worktree=4511
+.scratch/wisp/probes/149/combos2/x-p12-d11d.log blob=4266 worktree=4316
+.scratch/wisp/probes/149/combos2/x-p2-d11a-d11b.log blob=3391 worktree=3436
+.scratch/wisp/probes/149/combos2/x-p3-d11a-d11b.log blob=3391 worktree=3436
+.scratch/wisp/probes/149/combos2/x-p7-d13a.log blob=3988 worktree=4037
+.scratch/wisp/probes/149/combos2/x-p7-d13b.log blob=3254 worktree=3297
+.scratch/wisp/probes/149/logs-verify/p1-corrupt-fill-to-zero.log blob=3622 worktree=3669
+## 6) 反向对照：*.go / *.md 有 eol=lf ⇒ archive|tar -x 对这些件是等字节的
+injection-timeline.md blob=46117 archive 解出=46117（本程真跑：git archive <A> <path> | tar -x 到 /d/tmp/wisp154-archive，cmp 判 SAME）
