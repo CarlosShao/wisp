@@ -513,3 +513,41 @@ $ 152 那一侧：slo subject 由 rt.Job.StartInJob(cmd) 起（slo_windows.go:49
   "`report.PendingExit`＋新红句"（`*.go` 零命中）。本程按§1.5／§6.1 各自否证了，**没有照它写**。
 
 **第 6 格判定：138 边界＝它对（本程用探针钉住"不共用"）；148 顶腐＝不成立（编号记错对象）；两句的引用来源＝作废（不在交付物里）。**
+
+---
+
+## 第 7 格　放水三问＋禁改轴
+
+### 7.1 三问逐答（本程现跑，命令与读数一并入库）
+
+| 问 | 本程量的那把尺 | 读数 |
+|---|---|---|
+| **断言方向动没动？** | `git show 10e3585` 的全部删除行逐枚点名（§2.2，18 行四类）＋`git diff 10e3585^ 97cfc6e -- cmd/wisp \| grep -E '^-' \| grep -E 't\.(Errorf\|Fatalf\|Skip)'` | 命中的**唯一一条**是生产里那枚 `obs.err = fmt.Errorf(...)` 搬家；测试文件里**删除行只有 1 条、且是注释**（case 13 那行 `ⓐ` 裁定头，§2.2 末类）⇒ **零枚既有断言被删、被改向、被放宽** |
+| **helper 是不是原有的？** | case 14 用到的每一枚 helper 在 `10e3585^` 与 `97cfc6e` 各数一遍 | `slo144Report`／`slo149Poke`／`slo149ContradictionOf`／`scriptedReader`／`scriptMissing` **pre=1 post=1**（五枚全是 144/147/149 留下的原物）⇒ 没有为过关新造替身 |
+| **有没有 `t.Skip` 或放宽阈值换绿？** | 全 diff 扫 `t.Skip\|thresholds\|= *[0-9]+ \* time.Second` | **0 命中**；两形门禁 `--- SKIP` 枚数＝**0**（§5.1）⇒ "变绿"不是因为被跳过 |
+
+新增那枚 helper 的产权本程也核了（防止"只被测试用的生产名字"那一形）：
+`contradictSubjectReportErr` 在 `97cfc6e` 的调用者＝**生产 1 处（`slo_windows.go:744`）＋本票用例 1 处（`:752`）**，
+`contradictionOffset`＝生产 1 处（`:743`）＋用例 4 处。⇒ 它坐在真接线上，不是测试专属的壳。
+（"坐在真接线上"与"今天有文档能走到那一臂"是两件事，后者仍未证——§3.2 末行、第 3 格残余。）
+
+### 7.2 禁改轴（AC#4）——逐枚 commit 认领＋区间双检，两条命令各自否证
+
+```
+$ for c in eb4755a 4cc85bb 10e3585 6550dc4 5429c0d 97cfc6e; do git show --name-only --format='' $c; done | sort -u
+  -> 只出现四类路径：.scratch/wisp/probes/152/** · cmd/wisp/slo_windows.go ·
+     cmd/wisp/slo_report_144_windows_test.go · docs/evidence/s1/152-…（原文：probes/152/accept-r1/ac4-range-census.txt）
+$ git diff --name-only 10e3585^ 97cfc6e -- internal/risk internal/panel internal/agent/approval \
+      tools/d22scan thresholds.go scripts/slo-check.ps1 docs/PLAN.md docs/specs frontend design      -> 空
+$ git diff --name-only 10e3585^ 97cfc6e -- '*golden*'                                                -> 空
+```
+
+⇒ **AC#4 成立**：票面点名的 12 枚禁改轴，逐枚 commit 零命中、整段区间也零命中（两种口径都对得上，不留归因缝）。
+⇒ 预算常量四枚现值两侧同值：`subjectGrace=3s`、`subjectReadyBudget=60s`、`subjectReportBudget=30s`、`subjectPollInterval=20ms`，
+diff 里那四枚名字的 `+/-` 命中数＝**0**。
+⇒ **同一把尺打了正控**（防"恒不匹配的尺报 0 命中"那一族）：同一条 grep 在两侧现值里**确实量到了**只有新版有的
+`const offsetUnknown = -1`（post 侧命中 `:575`、pre 侧无）⇒ 这把尺不是坏的。
+⇒ `frontend/**`／`design/**` 那两枚"不碰也不把其状态算进宣称"的例外：本程**没有**把它们此刻的脏工作树状态写进任何零命中判断——
+上面那条命令扫的是 **commit 区间**，与工作树无关（工作树此刻仍有 16 枚 `design/**` 未提交删除，别家的，本程不动不判）。
+
+**第 7 格判定：成立（三问全过、禁改轴两口径双检、尺本身打了正控）。**
