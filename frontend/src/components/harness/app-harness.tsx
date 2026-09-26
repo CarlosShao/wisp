@@ -29,7 +29,7 @@ import { PaletteScreen } from "@/components/palette-screen";
 import { FirstrunOverlay, RB_FIRSTRUN } from "@/components/harness/firstrun-overlay";
 import { HarnessMain } from "@/components/harness/main";
 import { HarnessSidebar } from "@/components/harness/sidebar";
-import { RightRail, RB_RIGHT_RAIL } from "@/components/harness/right-rail";
+import { RightRail } from "@/components/harness/right-rail";
 import { SettingsModal } from "@/components/harness/settings-modal";
 import { ToastStack, RB_TOASTS } from "@/components/harness/toast";
 import { MonitorPopover, RB_MONITOR } from "@/components/harness/monitor-popover";
@@ -46,7 +46,7 @@ import {
   WEEK_USAGE,
   WORKSPACE_NOW,
 } from "@/fixtures/harness-app";
-import { SHOWCASE_APPROVALS, SHOWCASE_PALETTE_GROUPS } from "@/fixtures/harness";
+import { SHOWCASE_PALETTE_GROUPS } from "@/fixtures/harness";
 import { cn } from "@/lib/cn";
 
 export function AppHarness() {
@@ -89,11 +89,6 @@ export function AppHarness() {
   }, [paletteOpen, pickerOpen, settingsOpen]);
 
   const activeSession = sessionId ? (SESSIONS.find((s) => s.id === sessionId) ?? null) : null;
-  const queueRows = SHOWCASE_APPROVALS.map((a) => ({
-    level: a.level,
-    tool: a.tool,
-    correlationId: a.correlationId,
-  }));
 
   function newTask() {
     setSessionId(null);
@@ -195,12 +190,7 @@ export function AppHarness() {
             workspace={WORKSPACE_NOW}
           />
           {railOpen && (
-            <RightRail
-              onViewAllApprovals={() => undefined}
-              pendingCount={SHOWCASE_APPROVALS.length}
-              queueRows={queueRows}
-              runs={RB_RIGHT_RAIL.runs}
-            />
+            <RightRail />
           )}
         </div>
       </div>
