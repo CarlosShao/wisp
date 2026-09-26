@@ -1,0 +1,833 @@
+{
+ "dispatchers": [
+  {
+   "file": "internal/statemachine/machine.go",
+   "line": 108,
+   "kind": "declared-in",
+   "text": "statemachine.Machine.Dispatch"
+  }
+ ],
+ "enum_decls": [
+  {
+   "file": "internal/risk/assessor.go",
+   "line": 44,
+   "kind": "enum-decl:Level",
+   "text": "L0"
+  },
+  {
+   "file": "internal/risk/assessor.go",
+   "line": 46,
+   "kind": "enum-decl:",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/assessor.go",
+   "line": 48,
+   "kind": "enum-decl:",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor.go",
+   "line": 50,
+   "kind": "enum-decl:",
+   "text": "Deny"
+  },
+  {
+   "file": "internal/statemachine/events.go",
+   "line": 35,
+   "kind": "enum-decl:Event",
+   "text": "EvApprovalNeeded"
+  },
+  {
+   "file": "internal/statemachine/events.go",
+   "line": 40,
+   "kind": "enum-decl:Event",
+   "text": "EvApprovalGranted"
+  },
+  {
+   "file": "internal/statemachine/events.go",
+   "line": 41,
+   "kind": "enum-decl:Event",
+   "text": "EvApprovalDenied"
+  },
+  {
+   "file": "internal/statemachine/events.go",
+   "line": 42,
+   "kind": "enum-decl:Event",
+   "text": "EvApprovalTimeout"
+  },
+  {
+   "file": "internal/statemachine/states.go",
+   "line": 21,
+   "kind": "enum-decl:State",
+   "text": "StateConfirming"
+  },
+  {
+   "file": "internal/statemachine/states.go",
+   "line": 22,
+   "kind": "enum-decl:State",
+   "text": "StateAwaitingApproval"
+  }
+ ],
+ "func_count": 4118,
+ "iface_sigs": {
+  "agent.Journal": [
+   "StartTaskLog",
+   "FinishTaskLog",
+   "InsertToolCall",
+   "DecideToolCall",
+   "FinishToolCall"
+  ],
+  "agent.Sink": [
+   "Publish"
+  ],
+  "agent.Summarizer": [
+   "SummarizeHistory"
+  ],
+  "agent.ToolProvider": [
+   "Tools",
+   "Execute"
+  ],
+  "approval.Bus": [
+   "Vetoed",
+   "Started",
+   "Report",
+   "Complete"
+  ],
+  "approval.Clock": [
+   "Now",
+   "After"
+  ],
+  "approval.NativeAPI": [
+   "Allow",
+   "Reject"
+  ],
+  "approval.PanelAPI": [
+   "Reject",
+   "Head",
+   "View"
+  ],
+  "approval.UI": [
+   "Prompt",
+   "Update"
+  ],
+  "audio.AudioSource": [
+   "Start",
+   "Stop"
+  ],
+  "audio.DeviceWatcher": [
+   "DefaultCaptureDevice",
+   "DefaultRenderDevice",
+   "OnDefaultCaptureChanged",
+   "Close"
+  ],
+  "audio.Stater": [
+   "Stats"
+  ],
+  "audio.deviceStream": [
+   "Descriptor",
+   "Rate",
+   "WaitEvent",
+   "Drain",
+   "Close"
+  ],
+  "audio.streamOpener": [
+   "Open"
+  ],
+  "ball.HotkeyBinder": [
+   "RebindHotkeys"
+  ],
+  "config.SecretResolver": [
+   "Resolve"
+  ],
+  "llm.Content": [
+   "contentPart"
+  ],
+  "llm.HealthSink": [
+   "RecordProbe"
+  ],
+  "llm.KeyResolver": [
+   "Resolve"
+  ],
+  "llm.LlmProvider": [
+   "Stream",
+   "Info"
+  ],
+  "llm.RateLimiter": [
+   "Acquire"
+  ],
+  "memory.scanner": [
+   "Scan"
+  ],
+  "memory.txExec": [
+   "ExecContext"
+  ],
+  "observe.TreeReader": [
+   "ReadTree"
+  ],
+  "panel.ArtifactSink": [
+   "PutArtifact",
+   "ArtifactsDir"
+  ],
+  "panel.ModeWriter": [
+   "PermissionMode",
+   "Set"
+  ],
+  "panel.PathScope": [
+   "WorkspaceRoot",
+   "ResolveWorkspace",
+   "SetWorkspaceRoot"
+  ],
+  "perm.ConfigManager": [
+   "Config",
+   "SetPermissionMode"
+  ],
+  "plugin.MemoryReleaser": [
+   "FreeOSMemory"
+  ],
+  "plugin.SLORecorder": [
+   "RecordScopeMemory"
+  ],
+  "risk.PathCanonicalizer": [
+   "Canonicalize",
+   "InAllowlist"
+  ],
+  "risk.SensitiveClassifier": [
+   "Classify"
+  ],
+  "risk.SubAssessor": [
+   "Assess"
+  ],
+  "risk.TaintDetector": [
+   "TaintHit"
+  ],
+  "risk.registryValueSource": [
+   "subKeys",
+   "string"
+  ],
+  "tools.CancelBus": [
+   "Vetoed",
+   "Started",
+   "Report",
+   "Complete"
+  ],
+  "tools.Gate": [
+   "PendingWindow",
+   "PendingApproval"
+  ],
+  "tools.ModeSource": [
+   "PermissionMode"
+  ],
+  "tools.Provider": [
+   "Kind",
+   "List",
+   "Lookup"
+  ],
+  "tools.Tool": [
+   "Name",
+   "Description",
+   "Parameters",
+   "Execute"
+  ],
+  "winsec.C26Resolver": [
+   "Resolve"
+  ],
+  "winsec.RewriteAccounted": [
+   "ResolveAccounted"
+  ]
+ },
+ "reach": {
+  "AdmitTextTask": null,
+  "DecideFromPanel": null,
+  "Dispatch": [
+   "statemachine.Machine.Dispatch"
+  ],
+  "PendingApproval": [
+   "approval.Gate.PendingApproval",
+   "tools.GateFuncs.PendingApproval",
+   "tools.NoGate.PendingApproval"
+  ],
+  "PendingWindow": [
+   "approval.Gate.PendingWindow",
+   "tools.GateFuncs.PendingWindow",
+   "tools.NoGate.PendingWindow"
+  ],
+  "Prompt": [
+   "approval.UIFuncs.Prompt",
+   "main.consoleApprovalUI.Prompt"
+  ],
+  "_reachable_total": [
+   "1188"
+  ],
+  "_seeds": [
+   "main.assembleRuntime",
+   "main.main"
+  ],
+  "push": [
+   "approval.Queue.push",
+   "audio.meter.push"
+  ]
+ },
+ "use_sites": {
+  "AdmitTextTask": [
+   {
+    "file": "cmd/wisp/panel_pump_test.go",
+    "line": 153,
+    "kind": "use-in-test",
+    "text": "rt.gate.AdmitTextTask"
+   },
+   {
+    "file": "cmd/wisp/run.go",
+    "line": 477,
+    "kind": "use-in-cmd",
+    "text": "rt.gate.AdmitTextTask"
+   },
+   {
+    "file": "cmd/wisp/run.go",
+    "line": 558,
+    "kind": "use-in-cmd",
+    "text": "rt.gate.AdmitTextTask"
+   },
+   {
+    "file": "cmd/wisp/run_mode101_test.go",
+    "line": 191,
+    "kind": "use-in-test",
+    "text": "rt.gate.AdmitTextTask"
+   },
+   {
+    "file": "cmd/wisp/run_test.go",
+    "line": 356,
+    "kind": "use-in-test",
+    "text": "rt.gate.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/batch_test.go",
+    "line": 47,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/batch_test.go",
+    "line": 92,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/batch_test.go",
+    "line": 125,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/batch_test.go",
+    "line": 145,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 25,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 92,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 153,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 194,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 272,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 323,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 336,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/ticket84_no_owner_test.go",
+    "line": 63,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/ticket84_no_owner_test.go",
+    "line": 185,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/ticket84_no_owner_test.go",
+    "line": 231,
+    "kind": "use-in-test",
+    "text": "noUI.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/ticket84_no_owner_test.go",
+    "line": 248,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/ticket87_veto_l2_test.go",
+    "line": 53,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/ticket87_veto_l2_test.go",
+    "line": 136,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/ticket87_veto_l2_test.go",
+    "line": 164,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/ticket97_alias_direction_test.go",
+    "line": 36,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/ticket97_alias_direction_test.go",
+    "line": 56,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 23,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 60,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 88,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 147,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 167,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 210,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 267,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/tools/loop_approval_test.go",
+    "line": 134,
+    "kind": "use-in-test",
+    "text": "gate.AdmitTextTask"
+   },
+   {
+    "file": "internal/tools/wiring_test.go",
+    "line": 100,
+    "kind": "use-in-test",
+    "text": "g.AdmitTextTask"
+   }
+  ],
+  "DecideFromPanel": [
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 118,
+    "kind": "use-in-test",
+    "text": "g.DecideFromPanel"
+   },
+   {
+    "file": "internal/agent/approval/ticket84_no_owner_test.go",
+    "line": 144,
+    "kind": "use-in-test",
+    "text": "g.DecideFromPanel"
+   },
+   {
+    "file": "internal/agent/approval/ticket97_alias_direction_test.go",
+    "line": 97,
+    "kind": "use-in-test",
+    "text": "g.DecideFromPanel"
+   },
+   {
+    "file": "internal/agent/approval/ticket97_alias_direction_test.go",
+    "line": 170,
+    "kind": "use-in-test",
+    "text": "g.DecideFromPanel"
+   }
+  ],
+  "Dispatch": [
+   {
+    "file": "cmd/balldebug/main.go",
+    "line": 618,
+    "kind": "use-in-cmd",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/ball/hotkey_live_test.go",
+    "line": 238,
+    "kind": "use-in-test",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/ball/hotkey_live_test.go",
+    "line": 254,
+    "kind": "use-in-test",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/ball/hotkey_live_test.go",
+    "line": 272,
+    "kind": "use-in-test",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 66,
+    "kind": "use-in-test",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 154,
+    "kind": "use-in-test",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 167,
+    "kind": "use-in-test",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 189,
+    "kind": "use-in-test",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 214,
+    "kind": "use-in-test",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 239,
+    "kind": "use-in-test",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/statemachine/machine.go",
+    "line": 202,
+    "kind": "use-in-internal",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/statemachine/machine_test.go",
+    "line": 77,
+    "kind": "use-in-test",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/statemachine/machine_test.go",
+    "line": 87,
+    "kind": "use-in-test",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/statemachine/machine_test.go",
+    "line": 128,
+    "kind": "use-in-test",
+    "text": "m2.Dispatch"
+   },
+   {
+    "file": "internal/statemachine/machine_test.go",
+    "line": 163,
+    "kind": "use-in-test",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/statemachine/machine_test.go",
+    "line": 188,
+    "kind": "use-in-test",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 299,
+    "kind": "use-in-test",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 362,
+    "kind": "use-in-test",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 405,
+    "kind": "use-in-test",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 411,
+    "kind": "use-in-test",
+    "text": "m.Dispatch"
+   }
+  ],
+  "PendingApproval": [
+   {
+    "file": "cmd/wisp/run.go",
+    "line": 479,
+    "kind": "use-in-cmd",
+    "text": "rt.gate.PendingApproval"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 219,
+    "kind": "use-in-test",
+    "text": "g.PendingApproval"
+   },
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 236,
+    "kind": "use-in-internal",
+    "text": "g.PendingApproval"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 324,
+    "kind": "use-in-test",
+    "text": "g.PendingApproval"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 340,
+    "kind": "use-in-test",
+    "text": "g.PendingApproval"
+   },
+   {
+    "file": "internal/agent/approval/ticket84_no_owner_test.go",
+    "line": 270,
+    "kind": "use-in-test",
+    "text": "g.PendingApproval"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 187,
+    "kind": "use-in-test",
+    "text": "g.PendingApproval"
+   },
+   {
+    "file": "internal/tools/bridge.go",
+    "line": 395,
+    "kind": "use-in-internal",
+    "text": "b.gate.PendingApproval"
+   }
+  ],
+  "PendingWindow": [
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 209,
+    "kind": "use-in-test",
+    "text": "g.PendingWindow"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 169,
+    "kind": "use-in-test",
+    "text": "g.PendingWindow"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 186,
+    "kind": "use-in-test",
+    "text": "g.PendingWindow"
+   },
+   {
+    "file": "internal/tools/bridge.go",
+    "line": 380,
+    "kind": "use-in-internal",
+    "text": "b.gate.PendingWindow"
+   }
+  ],
+  "Prompt": [
+   {
+    "file": "cmd/wisp/run.go",
+    "line": 818,
+    "kind": "use-in-cmd",
+    "text": "approval.Prompt"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 110,
+    "kind": "use-in-test",
+    "text": "approval.Prompt"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 119,
+    "kind": "use-in-test",
+    "text": "approval.Prompt"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 135,
+    "kind": "use-in-test",
+    "text": "approval.Prompt"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 142,
+    "kind": "use-in-test",
+    "text": "approval.Prompt"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 146,
+    "kind": "use-in-test",
+    "text": "approval.Prompt"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 149,
+    "kind": "use-in-test",
+    "text": "approval.Prompt"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 339,
+    "kind": "use-in-test",
+    "text": "approval.Prompt"
+   },
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 260,
+    "kind": "use-in-internal",
+    "text": "g.ui.Prompt"
+   },
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 486,
+    "kind": "use-in-internal",
+    "text": "g.ui.Prompt"
+   },
+   {
+    "file": "internal/agent/approval/ticket87_veto_l2_test.go",
+    "line": 165,
+    "kind": "use-in-test",
+    "text": "approval.Prompt"
+   },
+   {
+    "file": "internal/agent/approval/ticket87_veto_l2_test.go",
+    "line": 236,
+    "kind": "use-in-test",
+    "text": "approval.Prompt"
+   },
+   {
+    "file": "internal/tools/wiring_test.go",
+    "line": 44,
+    "kind": "use-in-test",
+    "text": "approval.Prompt"
+   },
+   {
+    "file": "internal/tools/wiring_test.go",
+    "line": 62,
+    "kind": "use-in-test",
+    "text": "approval.Prompt"
+   },
+   {
+    "file": "internal/tools/wiring_test.go",
+    "line": 65,
+    "kind": "use-in-test",
+    "text": "approval.Prompt"
+   },
+   {
+    "file": "internal/tools/wiring_test.go",
+    "line": 156,
+    "kind": "use-in-test",
+    "text": "approval.Prompt"
+   },
+   {
+    "file": "internal/tools/wiring_test.go",
+    "line": 262,
+    "kind": "use-in-test",
+    "text": "approval.Prompt"
+   }
+  ],
+  "push": [
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 457,
+    "kind": "use-in-internal",
+    "text": "g.q.push"
+   },
+   {
+    "file": "internal/agent/approval/pending_read_test.go",
+    "line": 47,
+    "kind": "use-in-test",
+    "text": "q.push"
+   },
+   {
+    "file": "internal/audio/wasapimic_windows.go",
+    "line": 231,
+    "kind": "use-in-internal",
+    "text": "m.meter.push"
+   },
+   {
+    "file": "internal/audio/wavinjector.go",
+    "line": 129,
+    "kind": "use-in-internal",
+    "text": "w.meter.push"
+   }
+  ]
+ }
+}

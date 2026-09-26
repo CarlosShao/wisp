@@ -1,0 +1,61 @@
+=== 1. enum members DECLARED (definition side, from go/parser) ===
+   L0                           enum-decl:Level    internal/risk/assessor.go:44
+   L1                           enum-decl:         internal/risk/assessor.go:46
+   L2                           enum-decl:         internal/risk/assessor.go:48
+   Deny                         enum-decl:         internal/risk/assessor.go:50
+   EvApprovalNeeded             enum-decl:Event    internal/statemachine/events.go:35
+   EvApprovalGranted            enum-decl:Event    internal/statemachine/events.go:40
+   EvApprovalDenied             enum-decl:Event    internal/statemachine/events.go:41
+   EvApprovalTimeout            enum-decl:Event    internal/statemachine/events.go:42
+   StateConfirming              enum-decl:State    internal/statemachine/states.go:21
+   StateAwaitingApproval        enum-decl:State    internal/statemachine/states.go:22
+
+=== 2. interface method sets carrying an ask verb ===
+   approval.UI      ['Prompt', 'Update']
+   tools.Gate       ['PendingApproval', 'PendingWindow']
+
+=== 3. selector USE sites of the wanted family, bucketed ===
+   AdmitTextTask      total=34   use-in-cmd=2  use-in-internal=0  use-in-panel=0  use-in-test=32
+   DecideFromPanel    total=4    use-in-cmd=0  use-in-internal=0  use-in-panel=0  use-in-test=4
+   Dispatch           total=20   use-in-cmd=1  use-in-internal=1  use-in-panel=0  use-in-test=18
+   PendingApproval    total=8    use-in-cmd=1  use-in-internal=2  use-in-panel=0  use-in-test=5
+   PendingWindow      total=4    use-in-cmd=0  use-in-internal=1  use-in-panel=0  use-in-test=3
+   Prompt             total=17   use-in-cmd=1  use-in-internal=2  use-in-panel=0  use-in-test=14
+   push               total=4    use-in-cmd=0  use-in-internal=3  use-in-panel=0  use-in-test=1
+
+=== 3b. non-test use sites, spelled out ===
+   -- AdmitTextTask : 2
+      cmd/wisp/run.go:477 [use-in-cmd] rt.gate.AdmitTextTask
+      cmd/wisp/run.go:558 [use-in-cmd] rt.gate.AdmitTextTask
+   -- DecideFromPanel : 0
+   -- Dispatch : 2
+      cmd/balldebug/main.go:618 [use-in-cmd] m.Dispatch
+      internal/statemachine/machine.go:202 [use-in-internal] m.Dispatch
+   -- PendingApproval : 3
+      cmd/wisp/run.go:479 [use-in-cmd] rt.gate.PendingApproval
+      internal/agent/approval/gate.go:236 [use-in-internal] g.PendingApproval
+      internal/tools/bridge.go:395 [use-in-internal] b.gate.PendingApproval
+   -- PendingWindow : 1
+      internal/tools/bridge.go:380 [use-in-internal] b.gate.PendingWindow
+   -- Prompt : 3
+      cmd/wisp/run.go:818 [use-in-cmd] approval.Prompt
+      internal/agent/approval/gate.go:260 [use-in-internal] g.ui.Prompt
+      internal/agent/approval/gate.go:486 [use-in-internal] g.ui.Prompt
+   -- push : 3
+      internal/agent/approval/gate.go:457 [use-in-internal] g.q.push
+      internal/audio/wasapimic_windows.go:231 [use-in-internal] m.meter.push
+      internal/audio/wavinjector.go:129 [use-in-internal] w.meter.push
+
+=== 4. call-graph reachability from production seeds ===
+   seeds: main.assembleRuntime, main.main
+   production nodes reachable from seeds: ['1188']
+   AdmitTextTask      reachable=0  []
+   DecideFromPanel    reachable=0  []
+   Dispatch           reachable=1  ['statemachine.Machine.Dispatch']
+   PendingApproval    reachable=3  ['approval.Gate.PendingApproval', 'tools.GateFuncs.PendingApproval', 'tools.NoGate.PendingApproval']
+   PendingWindow      reachable=3  ['approval.Gate.PendingWindow', 'tools.GateFuncs.PendingWindow', 'tools.NoGate.PendingWindow']
+   Prompt             reachable=2  ['approval.UIFuncs.Prompt', 'main.consoleApprovalUI.Prompt']
+   push               reachable=2  ['approval.Queue.push', 'audio.meter.push']
+
+=== 5. statemachine.Machine.Dispatch declaration sites ===
+   internal/statemachine/machine.go:108 statemachine.Machine.Dispatch

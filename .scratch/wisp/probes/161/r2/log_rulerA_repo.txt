@@ -1,0 +1,80 @@
+ruler A | root=. ext=.go files_scanned=462 family=12
+
+== risk.L1                total=42   prod=9    test=33    def=risk.Level value: ask via L1 window
+     go-prod-cmd/other                        1
+     go-prod-internal/case                    3
+     go-prod-internal/other                   5
+     go-test/other                            33
+
+== risk.L2                total=50   prod=8    test=42    def=risk.Level value: ask via L2 card
+     go-prod-cmd/other                        1
+     go-prod-internal/case                    3
+     go-prod-internal/other                   4
+     go-test/other                            40
+     go-test/return                           2
+
+== PendingWindow          total=11   prod=5    test=6     def=tools.Gate method: opens the L1 ask
+     go-prod-internal/call                    2
+     go-prod-internal/decl                    3
+     go-test/call                             2
+     go-test/decl                             3
+     go-test/other                            1
+
+== PendingApproval        total=15   prod=7    test=8     def=tools.Gate method: opens the L2 ask
+     go-prod-cmd/call                         1
+     go-prod-internal/call                    3
+     go-prod-internal/decl                    3
+     go-test/call                             4
+     go-test/decl                             3
+     go-test/other                            1
+
+== Prompt                 total=28   prod=9    test=19    def=approval.UI method: puts the question on screen
+     go-prod-cmd/decl                         1
+     go-prod-internal/call                    3
+     go-prod-internal/decl                    3
+     go-prod-internal/other                   1
+     go-prod-internal/return                  1
+     go-test/decl                             8
+     go-test/other                            7
+     go-test/return                           4
+
+== push                   total=6    prod=5    test=1     def=approval.Queue.push: creates a pending item
+     go-prod-internal/call                    3
+     go-prod-internal/decl                    2
+     go-test/call                             1
+
+== EvApprovalNeeded       total=9    prod=3    test=6     def=statemachine event: the ball's ask doorbell
+     go-prod-internal/other                   3
+     go-test/other                            6
+
+== StateAwaitingApproval  total=29   prod=13   test=16    def=statemachine state: shown while asking
+     go-prod-cmd/other                        2
+     go-prod-internal/case                    1
+     go-prod-internal/other                   10
+     go-test/other                            16
+
+== StateConfirming        total=34   prod=16   test=18    def=statemachine state: shown while asking (L1)
+     go-prod-cmd/case                         1
+     go-prod-cmd/other                        5
+     go-prod-internal/assign                  1
+     go-prod-internal/case                    3
+     go-prod-internal/other                   6
+     go-test/other                            18
+
+== DecideFromNative       total=6    prod=1    test=5     def=answer router (NOT an ask) - brief's candidate
+     go-prod-internal/decl                    1
+     go-test/call                             2
+     go-test/return                           3
+
+== DecideFromPanel        total=5    prod=1    test=4     def=answer router (NOT an ask) - brief's candidate
+     go-prod-internal/decl                    1
+     go-test/call                             2
+     go-test/return                           2
+
+== AdmitTextTask          total=35   prod=3    test=32    def=D47 registration (NOT an ask) - brief's candidate
+     go-prod-cmd/call                         2
+     go-prod-internal/decl                    1
+     go-test/call                             31
+     go-test/other                            1
+
+wrote ruler_a_emit.json

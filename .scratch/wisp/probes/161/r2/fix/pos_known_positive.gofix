@@ -1,0 +1,58 @@
+// POSITIVE CONTROL. Every construct below is a shape copied from a real
+// ask-related site in this repo (file:line noted per shape). All three rulers
+// MUST report non-zero against this file; if they report 0 the ruler is broken
+// and no "zero" reading of the real tree may be trusted.
+package fixpos
+
+import "x/risk"
+
+type Gate struct{ ui UI }
+
+// shape of internal/agent/approval/gate.go:260 and :486
+func (g *Gate) PendingApproval(ctx C, d Decision) (Answer, string) {
+	if err := g.ui.Prompt(ctx, p); err != nil {
+		return AnswerReject, "x"
+	}
+	// shape of internal/tools/bridge.go:395 and :380
+	a, why := b.gate.PendingApproval(ctx, *dec)
+	_, _ = a, why
+	// shape of internal/statemachine/table.go:118/:123 + events.go:35
+	to := StateAwaitingApproval
+	ev := EvApprovalNeeded
+	_, _ = to, ev
+	switch sil.Level {
+	case risk.L1:
+		return g.PendingWindow(ctx, d)
+	case risk.L2:
+		return g.PendingApproval(ctx, d)
+	}
+	return g.ui.Prompt(ctx, p), ""
+}
+
+func (g *Gate) PendingWindow(ctx C, d Decision) (Answer, string) { return "", "" }
+
+// --- A-layer producer shapes: a verdict that LEAVES the function. ----------
+// shape of internal/risk/rules_irreversible.go:45 and rules_scale.go:23
+func judgeIrreversible(in Input) (Level, string) {
+	return L2, "R8: 不可逆操作"
+}
+
+// shape of internal/risk/rules_gateway.go composite contributions
+func judgeGateway(in Input) Contribution {
+	return Contribution{level: L2, rule: "R5"}
+}
+
+// shape of internal/risk/rules_shell.go allowlisted argv -> L1
+func judgeShell(in Input) (Level, string) {
+	lv := L1
+	return lv, "R6: 白名单内干净 argv"
+}
+
+// shape of internal/tools/bridge.go:395 -- the routing decision that asks
+func route(sil Silenced) {
+	switch sil.Level {
+	case risk.L2:
+		a, why := b.gate.PendingApproval(ctx, *dec)
+		_, _ = a, why
+	}
+}

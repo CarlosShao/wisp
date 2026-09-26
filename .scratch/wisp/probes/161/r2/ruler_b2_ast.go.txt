@@ -1,0 +1,399 @@
+// 161-r2 RULER B (v2) -- AST-grade census of "ask the human", independent
+// shape from ruler A.  v1 (ruler_b_ast.go.txt) is KEPT because v1 was wrong in
+// two ways that only showed up when its readings disagreed with ruler A; the
+// diff between the two versions is part of the evidence.
+//
+// Why this shape is independent of ruler A:
+//   * go/parser -- the compiler's own tokeniser -- draws the comment/string
+//     boundary, not my hand-rolled stripper;
+//   * the verdict family is enumerated from the DEFINITION side (const blocks,
+//     interface method sets), not from a name list typed by hand;
+//   * it then asks a DIFFERENT question: function-level call-graph
+//     reachability from production entry points.
+//
+// v2 fixes over v1:
+//   * node keys include the file's DIRECTORY. v1 keyed on package name, so
+//     cmd/wisp/main.go:main and cmd/balldebug/main.go:main collapsed into one
+//     node; v1's "Dispatch reachable from seeds" was a balldebug artefact.
+//   * enum members are traced as VALUES, and every call records its arguments,
+//     which is what turns "how many times does the word appear" into "is the
+//     doorbell ever rung".
+//
+// v2a adds the ANSWER-side names above, so "can anyone answer at all"
+// gets measured with the same ruler that measures "can anyone ask".
+//
+// It writes nothing. Run from OUTSIDE the repo (an in-tree .go file would trip
+// the repo-wide gofumpt gate -- that is ticket 161 AC#7's own finding).
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"os"
+	"path/filepath"
+	"sort"
+	"strings"
+)
+
+var skip = map[string]bool{".git": true, ".scratch": true, "node_modules": true,
+	"third_party": true, "build": true, "tmp-none": true, "models": true,
+	"vendor": true, ".gocache": true, "dist": true}
+
+// Methods whose call opens a question in front of a human.
+var askMethods = map[string]string{
+	"PendingWindow":   "tools.Gate / approval.Gate: opens the L1 ask",
+	"PendingApproval": "tools.Gate / approval.Gate: opens the L2 ask",
+	"Prompt":          "approval.UI: puts the question on screen",
+	"push":            "approval.Queue.push: creates the pending item",
+	"AdmitTextTask":   "approval.Gate.AdmitTextTask: D47 registration (control)",
+	"DecideFromPanel": "answer router (control, NOT an ask)",
+	"DecideFromNative": "answer router (control, NOT an ask)",
+	"Native":            "approval.Gate.Native: hands out the allow surface",
+	"Panel":             "approval.Gate.Panel: hands out the reject-only surface",
+	"Veto":              "approval.Gate.Veto: the user's cancel entry",
+	"SetLoaded":         "ChannelRegistry.SetLoaded: a channel becomes real",
+	"LiveApprovals":     "Queue.LiveApprovals: the panel's read of the queue",
+	"Replay":            "approval.Gate.Replay: C18 one-click re-ask",
+	"Dispatch":        "statemachine.Machine.Dispatch: rings the state doorbell",
+}
+
+// Enum members whose VALUE means "a human owes an answer".
+var askValues = map[string]string{
+	"L1":                  "risk.Level: must ask (L1 window)",
+	"L2":                  "risk.Level: must ask (L2 card)",
+	"EvApprovalNeeded":    "statemachine.Event: the ask transition's trigger",
+	"StateAwaitingApproval": "statemachine.State: parked on a human",
+	"StateConfirming":     "statemachine.State: parked on a human (L1)",
+}
+
+type site struct {
+	File string `json:"file"`
+	Line int    `json:"line"`
+	Kind string `json:"kind"`
+	Pkg  string `json:"pkg"`
+	Fn   string `json:"fn"`
+	Text string `json:"text"`
+}
+
+type callRef struct {
+	callee    string
+	method    string
+	argIdents []string
+	argSel    []string
+}
+
+type funcNode struct {
+	dir, pkg, recv, name, file string
+	calls                      []callRef
+	line                       int
+	prod                       bool
+}
+
+var (
+	fsetGlobal   = token.NewFileSet()
+	repoRoot     string
+	enumDecls    []site
+	ifaceDecls   []site
+	methodsOf    = map[string][]string{}
+	nodes        = map[string]*funcNode{}
+	valueUses    = map[string][]site{}
+	methodUses   = map[string][]site{}
+	dispatchProd []site
+	unparsed     []site
+)
+
+func main() {
+	repoRoot = os.Args[1]
+	var files []string
+	filepath.Walk(repoRoot, func(p string, info os.FileInfo, err error) error {
+		if err != nil {
+			return nil
+		}
+		if info.IsDir() {
+			if skip[info.Name()] {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if strings.HasSuffix(p, ".go") {
+			files = append(files, p)
+		}
+		return nil
+	})
+
+	for _, p := range files {
+		f, perr := parser.ParseFile(fsetGlobal, p, nil, parser.ParseComments)
+		if perr != nil {
+			// v2b: NEVER skip silently. A ruler that zeroes an unparseable file
+			// is reporting "absent" where it should report "unreadable".
+			unparsed = append(unparsed, site{relOf(p), 0, "PARSE-ERROR", "", "", perr.Error()})
+			continue
+		}
+		rel := relOf(p)
+		dir := pathDir(rel)
+		pkg := f.Name.Name
+		test := strings.HasSuffix(rel, "_test.go")
+
+		ast.Inspect(f, func(n ast.Node) bool {
+			vs, ok := n.(*ast.ValueSpec)
+			if !ok {
+				return true
+			}
+			for _, nm := range vs.Names {
+				if _, want := askValues[nm.Name]; want {
+					enumDecls = append(enumDecls, site{rel,
+						fsetGlobal.Position(nm.Pos()).Line, "enum-decl", pkg, "", nm.Name})
+				}
+			}
+			return true
+		})
+		ast.Inspect(f, func(n ast.Node) bool {
+			ts, ok := n.(*ast.TypeSpec)
+			if !ok {
+				return true
+			}
+			it, ok := ts.Type.(*ast.InterfaceType)
+			if !ok {
+				return true
+			}
+			var names []string
+			for _, m := range it.Methods.List {
+				for _, nm := range m.Names {
+					names = append(names, nm.Name)
+					if _, want := askMethods[nm.Name]; want {
+						ifaceDecls = append(ifaceDecls, site{rel,
+							fsetGlobal.Position(nm.Pos()).Line,
+							"interface-method-decl", pkg + "." + ts.Name.Name, "", nm.Name})
+					}
+				}
+			}
+			if len(names) > 0 {
+				methodsOf[pkg+"."+ts.Name.Name] = names
+			}
+			return true
+		})
+
+		ast.Inspect(f, func(n ast.Node) bool {
+			fd, ok := n.(*ast.FuncDecl)
+			if !ok {
+				return true
+			}
+			fn := &funcNode{dir: dir, pkg: pkg, name: fd.Name.Name, file: rel,
+				prod: !test, line: fsetGlobal.Position(fd.Pos()).Line}
+			if fd.Recv != nil && len(fd.Recv.List) > 0 {
+				fn.recv = strings.TrimPrefix(render(fd.Recv.List[0].Type), "*")
+			}
+			key := fn.dir + "/" + fn.pkg + "." + fn.recv + "." + fn.name
+			cur := fn.name
+			ast.Inspect(fd, func(n2 ast.Node) bool {
+				if ce, ok := n2.(*ast.CallExpr); ok {
+					switch fu := ce.Fun.(type) {
+					case *ast.SelectorExpr:
+						ref := callRef{callee: render(fu.X), method: fu.Sel.Name}
+						for _, a := range ce.Args {
+							if ie, ok := a.(*ast.Ident); ok {
+								ref.argIdents = append(ref.argIdents, ie.Name)
+							}
+							if se, ok := a.(*ast.SelectorExpr); ok {
+								ref.argSel = append(ref.argSel, render(se))
+							}
+						}
+						fn.calls = append(fn.calls, ref)
+						if _, want := askMethods[fu.Sel.Name]; want {
+							methodUses[fu.Sel.Name] = append(methodUses[fu.Sel.Name], site{rel,
+								fsetGlobal.Position(fu.Sel.Pos()).Line,
+								"CALL/" + useBucket(rel), pkg, cur, render(fu)})
+						}
+						if fu.Sel.Name == "Dispatch" && !test {
+							dispatchProd = append(dispatchProd, site{rel,
+								fsetGlobal.Position(fu.Pos()).Line,
+								"dispatch-call", pkg, cur, argList(ce)})
+						}
+					case *ast.Ident:
+						fn.calls = append(fn.calls, callRef{method: fu.Name})
+					}
+					return true
+				}
+				switch x := n2.(type) {
+				case *ast.Ident:
+					if _, want := askValues[x.Name]; want {
+						valueUses[x.Name] = append(valueUses[x.Name], site{rel,
+							fsetGlobal.Position(x.Pos()).Line,
+							"bare/" + useBucket(rel), pkg, cur, x.Name})
+					}
+				case *ast.SelectorExpr:
+					if _, want := askValues[x.Sel.Name]; want {
+						valueUses[x.Sel.Name] = append(valueUses[x.Sel.Name], site{rel,
+							fsetGlobal.Position(x.Pos()).Line,
+							"qualified/" + useBucket(rel), pkg, cur, render(x)})
+					}
+				}
+				return true
+			})
+			nodes[key] = fn
+			return true
+		})
+	}
+
+	out := map[string]any{
+		"go_files": len(files), "func_nodes": len(nodes),
+		"enum_decls": enumDecls, "interface_method_decls": ifaceDecls,
+		"method_uses": countBuckets(methodUses), "method_uses_detail": methodUses,
+		"value_uses": countBuckets(valueUses), "value_uses_detail": valueUses,
+		"dispatch_calls_production": dispatchProd,
+		"parse_errors": unparsed, "parse_error_count": len(unparsed),
+		"reach":                     reachability(),
+	}
+	b, _ := json.MarshalIndent(out, "", " ")
+	os.Stdout.Write(b)
+	fmt.Println()
+}
+
+func argList(ce *ast.CallExpr) string {
+	var s []string
+	for _, a := range ce.Args {
+		s = append(s, render(a))
+	}
+	return "(" + strings.Join(s, ", ") + ")"
+}
+
+func useBucket(rel string) string {
+	switch {
+	case strings.HasSuffix(rel, "_test.go"):
+		return "TEST"
+	case strings.HasPrefix(rel, "cmd/balldebug/"):
+		return "CMD-DEBUGGUI"
+	case strings.HasPrefix(rel, "cmd/"):
+		return "CMD"
+	case strings.HasPrefix(rel, "internal/panel/"):
+		return "PANEL"
+	case strings.HasPrefix(rel, "internal/"), strings.HasPrefix(rel, "tools/"):
+		return "INTERNAL"
+	}
+	return "OTHER"
+}
+
+func countBuckets(m map[string][]site) map[string]map[string]int {
+	out := map[string]map[string]int{}
+	for k, rows := range m {
+		c := map[string]int{}
+		for _, r := range rows {
+			c[r.Kind]++
+		}
+		out[k] = c
+	}
+	return out
+}
+
+func relOf(p string) string {
+	r, _ := filepath.Rel(repoRoot, p)
+	return filepath.ToSlash(r)
+}
+
+func pathDir(rel string) string { return strings.TrimSuffix(rel, "/"+filepath.Base(rel)) }
+
+func render(e ast.Expr) string {
+	switch x := e.(type) {
+	case *ast.Ident:
+		return x.Name
+	case *ast.SelectorExpr:
+		return render(x.X) + "." + x.Sel.Name
+	case *ast.StarExpr:
+		return "*" + render(x.X)
+	case *ast.ArrayType:
+		return "[]" + render(x.Elt)
+	case *ast.IndexExpr:
+		return render(x.X)
+	case *ast.BasicLit:
+		return x.Value
+	case *ast.CallExpr:
+		return render(x.Fun) + "(...)"
+	case *ast.CompositeLit:
+		return "{}"
+	}
+	return "?"
+}
+
+// reachability: BFS over production (non-_test.go) function nodes from real
+// entry points. Interface dispatch expands "x.M" to EVERY production method
+// named M, so the graph OVER-approximates. Polarity: unreachable is a strong
+// statement; reachable only means "possible".
+func reachability() map[string][]string {
+	byMethod := map[string][]string{}
+	byLocal := map[string][]string{}
+	for k, f := range nodes {
+		if !f.prod {
+			continue
+		}
+		byMethod[f.name] = append(byMethod[f.name], k)
+		byLocal[f.dir+"/"+f.pkg+"."+f.name] = append(byLocal[f.dir+"/"+f.pkg+"."+f.name], k)
+	}
+	pick := func(dir, name string) []string {
+		var v []string
+		for k, f := range nodes {
+			if f.prod && f.dir == dir && f.name == name {
+				v = append(v, k)
+			}
+		}
+		sort.Strings(v)
+		return v
+	}
+	seeds := append(pick("cmd/wisp", "main"), pick("cmd/wisp", "assembleRuntime")...)
+	seeds = append(seeds, pick("cmd/wisp", "runMain")...)
+	gui := pick("cmd/balldebug", "main")
+
+	bfs := func(start []string) map[string]bool {
+		seen := map[string]bool{}
+		q := append([]string{}, start...)
+		for len(q) > 0 {
+			c := q[0]
+			q = q[1:]
+			if seen[c] {
+				continue
+			}
+			seen[c] = true
+			f := nodes[c]
+			if f == nil {
+				continue
+			}
+			var next []string
+			for _, call := range f.calls {
+				next = append(next, byMethod[call.method]...)
+				next = append(next, byLocal[f.dir+"/"+f.pkg+"."+call.method]...)
+			}
+			for _, k := range next {
+				if !seen[k] {
+					q = append(q, k)
+				}
+			}
+		}
+		return seen
+	}
+
+	cliside := bfs(seeds)
+	guicide := bfs(gui)
+	res := map[string][]string{}
+	for target := range askMethods {
+		var hit []string
+		for k := range cliside {
+			if strings.HasSuffix(k, "."+target) {
+				hit = append(hit, "cli:"+k)
+			}
+		}
+		for k := range guicide {
+			if strings.HasSuffix(k, "."+target) {
+				hit = append(hit, "gui:"+k)
+			}
+		}
+		sort.Strings(hit)
+		res[target] = hit
+	}
+	res["_seeds_cli"] = seeds
+	res["_seeds_gui"] = gui
+	res["_cli_reachable_nodes"] = []string{fmt.Sprint(len(cliside))}
+	res["_gui_reachable_nodes"] = []string{fmt.Sprint(len(guicide))}
+	return res
+}

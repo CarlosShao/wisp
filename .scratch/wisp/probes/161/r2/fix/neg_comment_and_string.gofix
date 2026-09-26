@@ -1,0 +1,27 @@
+// NEGATIVE / TRAP CONTROL — valid Go on purpose (the first revision of this
+// file was NOT valid Go, which silently voided every parser-based "zero" read
+// against it; see evidence file §4 and the parse_errors field ruler B now emits).
+//
+// Every token listed here lives ONLY inside a // comment, a block comment, or a
+// string literal — exactly the shapes a plain word grep counts as a hit and the
+// "production initiators" question must not count:
+//
+//	PendingApproval  PendingWindow  ui.Prompt  EvApprovalNeeded
+//	StateAwaitingApproval  risk.L2  Queue.push  Ask  Decide  Admit
+package fixtrap
+
+var blockComment = "and inside a raw string too:" + `
+	PendingWindow, Prompt, EvApprovalNeeded, StateAwaitingApproval, risk.L2
+`
+
+var notes = []string{
+	"PendingApproval is the L2 route",
+	"the gate calls ui.Prompt exactly twice",
+	"StateAwaitingApproval means the ball is waiting on a human",
+	"EvApprovalNeeded rings the transition",
+	"risk.L2 is the strong-confirm level",
+}
+
+func trap() string { return "PendingWindow" + " risk.L2 " + "Ask" }
+
+func trap2() string { return "Queue.push" }

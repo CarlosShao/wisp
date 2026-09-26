@@ -1,0 +1,13 @@
+ruler A | root=.scratch/wisp/probes/161/r2/fix_neg ext=.gofix files_scanned=1 family=12
+== risk.L1                total=0    prod=0    test=0     def=risk.Level value: ask via L1 window
+== risk.L2                total=1    prod=0    test=0     def=risk.Level value: ask via L2 card
+== PendingWindow          total=1    prod=0    test=0     def=tools.Gate method: opens the L1 ask
+== PendingApproval        total=1    prod=0    test=0     def=tools.Gate method: opens the L2 ask
+== Prompt                 total=1    prod=0    test=0     def=approval.UI method: puts the question on screen
+== push                   total=0    prod=0    test=0     def=approval.Queue.push: creates a pending item
+== EvApprovalNeeded       total=1    prod=0    test=0     def=statemachine event: the ball's ask doorbell
+== StateAwaitingApproval  total=1    prod=0    test=0     def=statemachine state: shown while asking
+== StateConfirming        total=0    prod=0    test=0     def=statemachine state: shown while asking (L1)
+== DecideFromNative       total=0    prod=0    test=0     def=answer router (NOT an ask) - brief's candidate
+== DecideFromPanel        total=0    prod=0    test=0     def=answer router (NOT an ask) - brief's candidate
+== AdmitTextTask          total=0    prod=0    test=0     def=D47 registration (NOT an ask) - brief's candidate

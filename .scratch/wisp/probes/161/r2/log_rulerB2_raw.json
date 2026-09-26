@@ -1,0 +1,3763 @@
+{
+ "dispatch_calls_production": [
+  {
+   "file": "cmd/balldebug/main.go",
+   "line": 618,
+   "kind": "dispatch-call",
+   "pkg": "main",
+   "fn": "dispatch",
+   "text": "(ev, f)"
+  },
+  {
+   "file": "internal/statemachine/machine.go",
+   "line": 202,
+   "kind": "dispatch-call",
+   "pkg": "statemachine",
+   "fn": "onTimeout",
+   "text": "(ev, nil)"
+  }
+ ],
+ "enum_decls": [
+  {
+   "file": "internal/risk/assessor.go",
+   "line": 46,
+   "kind": "enum-decl",
+   "pkg": "risk",
+   "fn": "",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/assessor.go",
+   "line": 48,
+   "kind": "enum-decl",
+   "pkg": "risk",
+   "fn": "",
+   "text": "L2"
+  },
+  {
+   "file": "internal/statemachine/events.go",
+   "line": 35,
+   "kind": "enum-decl",
+   "pkg": "statemachine",
+   "fn": "",
+   "text": "EvApprovalNeeded"
+  },
+  {
+   "file": "internal/statemachine/states.go",
+   "line": 21,
+   "kind": "enum-decl",
+   "pkg": "statemachine",
+   "fn": "",
+   "text": "StateConfirming"
+  },
+  {
+   "file": "internal/statemachine/states.go",
+   "line": 22,
+   "kind": "enum-decl",
+   "pkg": "statemachine",
+   "fn": "",
+   "text": "StateAwaitingApproval"
+  }
+ ],
+ "func_nodes": 4136,
+ "go_files": 462,
+ "interface_method_decls": [
+  {
+   "file": "internal/agent/approval/ui.go",
+   "line": 85,
+   "kind": "interface-method-decl",
+   "pkg": "approval.UI",
+   "fn": "",
+   "text": "Prompt"
+  },
+  {
+   "file": "internal/tools/gate.go",
+   "line": 102,
+   "kind": "interface-method-decl",
+   "pkg": "tools.Gate",
+   "fn": "",
+   "text": "PendingWindow"
+  },
+  {
+   "file": "internal/tools/gate.go",
+   "line": 105,
+   "kind": "interface-method-decl",
+   "pkg": "tools.Gate",
+   "fn": "",
+   "text": "PendingApproval"
+  }
+ ],
+ "method_uses": {
+  "AdmitTextTask": {
+   "CALL/CMD": 2,
+   "CALL/TEST": 31
+  },
+  "DecideFromPanel": {
+   "CALL/TEST": 4
+  },
+  "Dispatch": {
+   "CALL/CMD-DEBUGGUI": 1,
+   "CALL/INTERNAL": 1,
+   "CALL/TEST": 18
+  },
+  "PendingApproval": {
+   "CALL/CMD": 1,
+   "CALL/INTERNAL": 2,
+   "CALL/TEST": 4
+  },
+  "PendingWindow": {
+   "CALL/INTERNAL": 1,
+   "CALL/TEST": 2
+  },
+  "Prompt": {
+   "CALL/INTERNAL": 2
+  },
+  "push": {
+   "CALL/INTERNAL": 3,
+   "CALL/TEST": 1
+  }
+ },
+ "method_uses_detail": {
+  "AdmitTextTask": [
+   {
+    "file": "cmd/wisp/panel_pump_test.go",
+    "line": 153,
+    "kind": "CALL/TEST",
+    "pkg": "main",
+    "fn": "TestRunBooksWithASnapshotOfItsLiveQueue",
+    "text": "rt.gate.AdmitTextTask"
+   },
+   {
+    "file": "cmd/wisp/run.go",
+    "line": 477,
+    "kind": "CALL/CMD",
+    "pkg": "main",
+    "fn": "confirmModeSwitch",
+    "text": "rt.gate.AdmitTextTask"
+   },
+   {
+    "file": "cmd/wisp/run.go",
+    "line": 558,
+    "kind": "CALL/CMD",
+    "pkg": "main",
+    "fn": "admitTask",
+    "text": "rt.gate.AdmitTextTask"
+   },
+   {
+    "file": "cmd/wisp/run_mode101_test.go",
+    "line": 191,
+    "kind": "CALL/TEST",
+    "pkg": "main",
+    "fn": "t101call",
+    "text": "rt.gate.AdmitTextTask"
+   },
+   {
+    "file": "cmd/wisp/run_test.go",
+    "line": 356,
+    "kind": "CALL/TEST",
+    "pkg": "main",
+    "fn": "TestComposedGateBlocksAWriteForTwoSeconds",
+    "text": "rt.gate.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/batch_test.go",
+    "line": 47,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestBatchAggregatesHomogeneousL1Ops",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/batch_test.go",
+    "line": 92,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestR7SizedBatchEscalatesToL2Unaggregated",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/batch_test.go",
+    "line": 125,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestR7SizedBatchThatNobodyAnsweredIsRejectedNotRun",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/batch_test.go",
+    "line": 145,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestTenOpsInOneToolCallGetOneConfirm",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 25,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestL2NativeAllowExecutesThroughTheBridge",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 92,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestPanelSourcedAllowIsRejectedOnEveryForgeableAxis",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 153,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestGrantIsSingleUseAndBoundToItsItem",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 194,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestL2QueueAutoRejectsAt300sKeepsTaskAliveAndWarnsAt270s",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 272,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestReplayRedisplaysUnderAFreshGrant",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 323,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestHostUnreachableAndFullQueueFailClosed",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 336,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestHostUnreachableAndFullQueueFailClosed",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/ticket84_no_owner_test.go",
+    "line": 63,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestAnUnansweredL2CardResolvesToRejectAtTheQueueDeadline",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/ticket84_no_owner_test.go",
+    "line": 185,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestAnUnreachablePromptSurfaceIsRefusedImmediatelyNotWaitedOut",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/ticket84_no_owner_test.go",
+    "line": 231,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestDefaultDeadlineWallClockMeasurement",
+    "text": "noUI.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/ticket84_no_owner_test.go",
+    "line": 248,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestDefaultDeadlineWallClockMeasurement",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/ticket87_veto_l2_test.go",
+    "line": 53,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "ticket87Gate",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/ticket87_veto_l2_test.go",
+    "line": 136,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestAVetoNamedByTheHostsOwnKeyStillRefusesThatCard",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/ticket87_veto_l2_test.go",
+    "line": 164,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestAnAmbiguousVetoNameIsNotGuessedOnTheRefusalSide",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/ticket97_alias_direction_test.go",
+    "line": 36,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "ticket97Gate",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/ticket97_alias_direction_test.go",
+    "line": 56,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "aliasCardOn",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 23,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestL1WindowTimeoutMeansExecute",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 60,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestL1WindowVetoedByEachLoadedChannel",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 88,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestL1WindowUnavailableVoiceChannelIsAnnounced",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 147,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestL1WindowVetoOnForeignCorrelationCannotCancel",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 167,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestL1WindowUnreachableUIFailsClosed",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 210,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestVetoAfterStartYieldsAppliedStepsReport",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 267,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestVetoTravelsBackToTheLoopAsAFailure",
+    "text": "g.AdmitTextTask"
+   },
+   {
+    "file": "internal/tools/wiring_test.go",
+    "line": 100,
+    "kind": "CALL/TEST",
+    "pkg": "tools_test",
+    "fn": "compose",
+    "text": "g.AdmitTextTask"
+   }
+  ],
+  "DecideFromPanel": [
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 118,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestPanelSourcedAllowIsRejectedOnEveryForgeableAxis",
+    "text": "g.DecideFromPanel"
+   },
+   {
+    "file": "internal/agent/approval/ticket84_no_owner_test.go",
+    "line": 144,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestEveryAnswerRouteForAnUnknownCorrelationFailsFast",
+    "text": "g.DecideFromPanel"
+   },
+   {
+    "file": "internal/agent/approval/ticket97_alias_direction_test.go",
+    "line": 97,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestAnAliasCanNeverBuyAnAllow",
+    "text": "g.DecideFromPanel"
+   },
+   {
+    "file": "internal/agent/approval/ticket97_alias_direction_test.go",
+    "line": 170,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestEveryRefusalRouteOnAnUnknownEntryStillRefuses",
+    "text": "g.DecideFromPanel"
+   }
+  ],
+  "Dispatch": [
+   {
+    "file": "cmd/balldebug/main.go",
+    "line": 618,
+    "kind": "CALL/CMD-DEBUGGUI",
+    "pkg": "main",
+    "fn": "dispatch",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/ball/hotkey_live_test.go",
+    "line": 238,
+    "kind": "CALL/TEST",
+    "pkg": "ball",
+    "fn": "TestLiveMuteHotkeyEndToEnd",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/ball/hotkey_live_test.go",
+    "line": 254,
+    "kind": "CALL/TEST",
+    "pkg": "ball",
+    "fn": "TestLiveMuteHotkeyEndToEnd",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/ball/hotkey_live_test.go",
+    "line": 272,
+    "kind": "CALL/TEST",
+    "pkg": "ball",
+    "fn": "TestLiveMuteHotkeyEndToEnd",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 66,
+    "kind": "CALL/TEST",
+    "pkg": "ball",
+    "fn": "TestLiveClickSummonsAndDragDoesNot",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 154,
+    "kind": "CALL/TEST",
+    "pkg": "ball",
+    "fn": "TestLiveConfirmingCancelAndEscReturned",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 167,
+    "kind": "CALL/TEST",
+    "pkg": "ball",
+    "fn": "TestLiveConfirmingCancelAndEscReturned",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 189,
+    "kind": "CALL/TEST",
+    "pkg": "ball",
+    "fn": "TestLiveConfirmingCancelAndEscReturned",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 214,
+    "kind": "CALL/TEST",
+    "pkg": "ball",
+    "fn": "TestLiveConfirmingCancelAndEscReturned",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 239,
+    "kind": "CALL/TEST",
+    "pkg": "ball",
+    "fn": "TestLiveConfirmingCancelAndEscReturned",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/statemachine/machine.go",
+    "line": 202,
+    "kind": "CALL/INTERNAL",
+    "pkg": "statemachine",
+    "fn": "onTimeout",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/statemachine/machine_test.go",
+    "line": 77,
+    "kind": "CALL/TEST",
+    "pkg": "statemachine",
+    "fn": "TestSleepingHasZeroTimers",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/statemachine/machine_test.go",
+    "line": 87,
+    "kind": "CALL/TEST",
+    "pkg": "statemachine",
+    "fn": "TestSleepingHasZeroTimers",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/statemachine/machine_test.go",
+    "line": 128,
+    "kind": "CALL/TEST",
+    "pkg": "statemachine",
+    "fn": "TestTimersArmAndFire",
+    "text": "m2.Dispatch"
+   },
+   {
+    "file": "internal/statemachine/machine_test.go",
+    "line": 163,
+    "kind": "CALL/TEST",
+    "pkg": "statemachine",
+    "fn": "TestListeningPhaseTimeoutSelection",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/statemachine/machine_test.go",
+    "line": 188,
+    "kind": "CALL/TEST",
+    "pkg": "statemachine",
+    "fn": "TestSinkNoopDefault",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 299,
+    "kind": "CALL/TEST",
+    "pkg": "statemachine",
+    "fn": "TestEveryLegalRowFires",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 362,
+    "kind": "CALL/TEST",
+    "pkg": "statemachine",
+    "fn": "TestIllegalTransitionsRejected",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 405,
+    "kind": "CALL/TEST",
+    "pkg": "statemachine",
+    "fn": "TestWildcardNeverShadowsSpecificRow",
+    "text": "m.Dispatch"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 411,
+    "kind": "CALL/TEST",
+    "pkg": "statemachine",
+    "fn": "TestWildcardNeverShadowsSpecificRow",
+    "text": "m.Dispatch"
+   }
+  ],
+  "PendingApproval": [
+   {
+    "file": "cmd/wisp/run.go",
+    "line": 479,
+    "kind": "CALL/CMD",
+    "pkg": "main",
+    "fn": "confirmModeSwitch",
+    "text": "rt.gate.PendingApproval"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 219,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "runApproval",
+    "text": "g.PendingApproval"
+   },
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 236,
+    "kind": "CALL/INTERNAL",
+    "pkg": "approval",
+    "fn": "PendingWindow",
+    "text": "g.PendingApproval"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 324,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestHostUnreachableAndFullQueueFailClosed",
+    "text": "g.PendingApproval"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 340,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestHostUnreachableAndFullQueueFailClosed",
+    "text": "g.PendingApproval"
+   },
+   {
+    "file": "internal/agent/approval/ticket84_no_owner_test.go",
+    "line": 270,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "callApprovalTimed",
+    "text": "g.PendingApproval"
+   },
+   {
+    "file": "internal/tools/bridge.go",
+    "line": 395,
+    "kind": "CALL/INTERNAL",
+    "pkg": "tools",
+    "fn": "route",
+    "text": "b.gate.PendingApproval"
+   }
+  ],
+  "PendingWindow": [
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 209,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "runWindow",
+    "text": "g.PendingWindow"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 169,
+    "kind": "CALL/TEST",
+    "pkg": "approval_test",
+    "fn": "TestL1WindowUnreachableUIFailsClosed",
+    "text": "g.PendingWindow"
+   },
+   {
+    "file": "internal/tools/bridge.go",
+    "line": 380,
+    "kind": "CALL/INTERNAL",
+    "pkg": "tools",
+    "fn": "route",
+    "text": "b.gate.PendingWindow"
+   }
+  ],
+  "Prompt": [
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 260,
+    "kind": "CALL/INTERNAL",
+    "pkg": "approval",
+    "fn": "PendingWindow",
+    "text": "g.ui.Prompt"
+   },
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 486,
+    "kind": "CALL/INTERNAL",
+    "pkg": "approval",
+    "fn": "PendingApproval",
+    "text": "g.ui.Prompt"
+   }
+  ],
+  "push": [
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 457,
+    "kind": "CALL/INTERNAL",
+    "pkg": "approval",
+    "fn": "PendingApproval",
+    "text": "g.q.push"
+   },
+   {
+    "file": "internal/agent/approval/pending_read_test.go",
+    "line": 47,
+    "kind": "CALL/TEST",
+    "pkg": "approval",
+    "fn": "mustPush",
+    "text": "q.push"
+   },
+   {
+    "file": "internal/audio/wasapimic_windows.go",
+    "line": 231,
+    "kind": "CALL/INTERNAL",
+    "pkg": "audio",
+    "fn": "run",
+    "text": "m.meter.push"
+   },
+   {
+    "file": "internal/audio/wavinjector.go",
+    "line": 129,
+    "kind": "CALL/INTERNAL",
+    "pkg": "audio",
+    "fn": "pump",
+    "text": "w.meter.push"
+   }
+  ]
+ },
+ "reach": {
+  "AdmitTextTask": null,
+  "DecideFromPanel": null,
+  "Dispatch": [
+   "cli:internal/statemachine/statemachine.Machine.Dispatch",
+   "gui:internal/statemachine/statemachine.Machine.Dispatch"
+  ],
+  "PendingApproval": [
+   "cli:internal/agent/approval/approval.Gate.PendingApproval",
+   "cli:internal/tools/tools.GateFuncs.PendingApproval",
+   "cli:internal/tools/tools.NoGate.PendingApproval",
+   "gui:internal/agent/approval/approval.Gate.PendingApproval",
+   "gui:internal/tools/tools.GateFuncs.PendingApproval",
+   "gui:internal/tools/tools.NoGate.PendingApproval"
+  ],
+  "PendingWindow": [
+   "cli:internal/agent/approval/approval.Gate.PendingWindow",
+   "cli:internal/tools/tools.GateFuncs.PendingWindow",
+   "cli:internal/tools/tools.NoGate.PendingWindow",
+   "gui:internal/agent/approval/approval.Gate.PendingWindow",
+   "gui:internal/tools/tools.GateFuncs.PendingWindow",
+   "gui:internal/tools/tools.NoGate.PendingWindow"
+  ],
+  "Prompt": [
+   "cli:cmd/wisp/main.consoleApprovalUI.Prompt",
+   "cli:internal/agent/approval/approval.UIFuncs.Prompt",
+   "gui:cmd/wisp/main.consoleApprovalUI.Prompt",
+   "gui:internal/agent/approval/approval.UIFuncs.Prompt"
+  ],
+  "_cli_reachable_nodes": [
+   "1356"
+  ],
+  "_gui_reachable_nodes": [
+   "1215"
+  ],
+  "_seeds_cli": [
+   "cmd/wisp/main..main",
+   "cmd/wisp/main..assembleRuntime"
+  ],
+  "_seeds_gui": [
+   "cmd/balldebug/main..main"
+  ],
+  "push": [
+   "cli:internal/agent/approval/approval.Queue.push",
+   "cli:internal/audio/audio.meter.push",
+   "gui:internal/agent/approval/approval.Queue.push",
+   "gui:internal/audio/audio.meter.push"
+  ]
+ },
+ "value_uses": {
+  "EvApprovalNeeded": {
+   "bare/TEST": 4,
+   "qualified/TEST": 3
+  },
+  "L1": {
+   "bare/CMD": 1,
+   "bare/INTERNAL": 12,
+   "bare/TEST": 42,
+   "qualified/CMD": 1,
+   "qualified/INTERNAL": 8,
+   "qualified/TEST": 36
+  },
+  "L2": {
+   "bare/CMD": 1,
+   "bare/INTERNAL": 30,
+   "bare/TEST": 100,
+   "qualified/CMD": 1,
+   "qualified/INTERNAL": 7,
+   "qualified/TEST": 58
+  },
+  "StateAwaitingApproval": {
+   "bare/CMD-DEBUGGUI": 1,
+   "bare/INTERNAL": 3,
+   "bare/TEST": 7,
+   "qualified/CMD-DEBUGGUI": 1,
+   "qualified/INTERNAL": 1,
+   "qualified/TEST": 5
+  },
+  "StateConfirming": {
+   "bare/CMD-DEBUGGUI": 5,
+   "bare/INTERNAL": 6,
+   "bare/TEST": 14,
+   "qualified/CMD-DEBUGGUI": 5,
+   "qualified/INTERNAL": 4,
+   "qualified/TEST": 12
+  }
+ },
+ "value_uses_detail": {
+  "EvApprovalNeeded": [
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 186,
+    "kind": "qualified/TEST",
+    "pkg": "ball",
+    "fn": "TestLiveConfirmingCancelAndEscReturned",
+    "text": "statemachine.EvApprovalNeeded"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 186,
+    "kind": "bare/TEST",
+    "pkg": "ball",
+    "fn": "TestLiveConfirmingCancelAndEscReturned",
+    "text": "EvApprovalNeeded"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 214,
+    "kind": "qualified/TEST",
+    "pkg": "ball",
+    "fn": "TestLiveConfirmingCancelAndEscReturned",
+    "text": "statemachine.EvApprovalNeeded"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 214,
+    "kind": "bare/TEST",
+    "pkg": "ball",
+    "fn": "TestLiveConfirmingCancelAndEscReturned",
+    "text": "EvApprovalNeeded"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 239,
+    "kind": "qualified/TEST",
+    "pkg": "ball",
+    "fn": "TestLiveConfirmingCancelAndEscReturned",
+    "text": "statemachine.EvApprovalNeeded"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 239,
+    "kind": "bare/TEST",
+    "pkg": "ball",
+    "fn": "TestLiveConfirmingCancelAndEscReturned",
+    "text": "EvApprovalNeeded"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 341,
+    "kind": "bare/TEST",
+    "pkg": "statemachine",
+    "fn": "TestIllegalTransitionsRejected",
+    "text": "EvApprovalNeeded"
+   }
+  ],
+  "L1": [
+   {
+    "file": "cmd/wisp/panel_assets.go",
+    "line": 74,
+    "kind": "qualified/CMD",
+    "pkg": "main",
+    "fn": "cmdPanelAssets",
+    "text": "risk.L1"
+   },
+   {
+    "file": "cmd/wisp/panel_assets.go",
+    "line": 74,
+    "kind": "bare/CMD",
+    "pkg": "main",
+    "fn": "cmdPanelAssets",
+    "text": "L1"
+   },
+   {
+    "file": "internal/agent/approval/batch.go",
+    "line": 36,
+    "kind": "qualified/INTERNAL",
+    "pkg": "approval",
+    "fn": "Aggregate",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/agent/approval/batch.go",
+    "line": 36,
+    "kind": "bare/INTERNAL",
+    "pkg": "approval",
+    "fn": "Aggregate",
+    "text": "L1"
+   },
+   {
+    "file": "internal/agent/approval/batch_test.go",
+    "line": 147,
+    "kind": "qualified/TEST",
+    "pkg": "approval_test",
+    "fn": "TestTenOpsInOneToolCallGetOneConfirm",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/agent/approval/batch_test.go",
+    "line": 147,
+    "kind": "bare/TEST",
+    "pkg": "approval_test",
+    "fn": "TestTenOpsInOneToolCallGetOneConfirm",
+    "text": "L1"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 293,
+    "kind": "qualified/TEST",
+    "pkg": "approval_test",
+    "fn": "l1Decision",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 293,
+    "kind": "bare/TEST",
+    "pkg": "approval_test",
+    "fn": "l1Decision",
+    "text": "L1"
+   },
+   {
+    "file": "internal/agent/approval/pending_read_test.go",
+    "line": 114,
+    "kind": "qualified/TEST",
+    "pkg": "approval",
+    "fn": "TestLiveApprovalsReportsPendingRowsAndDoesNotConsumeThem",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/agent/approval/pending_read_test.go",
+    "line": 114,
+    "kind": "bare/TEST",
+    "pkg": "approval",
+    "fn": "TestLiveApprovalsReportsPendingRowsAndDoesNotConsumeThem",
+    "text": "L1"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 29,
+    "kind": "qualified/TEST",
+    "pkg": "approval_test",
+    "fn": "TestL2NativeAllowExecutesThroughTheBridge",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 29,
+    "kind": "bare/TEST",
+    "pkg": "approval_test",
+    "fn": "TestL2NativeAllowExecutesThroughTheBridge",
+    "text": "L1"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 200,
+    "kind": "qualified/TEST",
+    "pkg": "approval_test",
+    "fn": "TestL2QueueAutoRejectsAt300sKeepsTaskAliveAndWarnsAt270s",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 200,
+    "kind": "bare/TEST",
+    "pkg": "approval_test",
+    "fn": "TestL2QueueAutoRejectsAt300sKeepsTaskAliveAndWarnsAt270s",
+    "text": "L1"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 269,
+    "kind": "qualified/TEST",
+    "pkg": "approval_test",
+    "fn": "TestVetoTravelsBackToTheLoopAsAFailure",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 269,
+    "kind": "bare/TEST",
+    "pkg": "approval_test",
+    "fn": "TestVetoTravelsBackToTheLoopAsAFailure",
+    "text": "L1"
+   },
+   {
+    "file": "internal/panel/approval_test.go",
+    "line": 47,
+    "kind": "qualified/TEST",
+    "pkg": "panel",
+    "fn": "TestApprovalCardViewFromRealAssessor",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/panel/approval_test.go",
+    "line": 47,
+    "kind": "bare/TEST",
+    "pkg": "panel",
+    "fn": "TestApprovalCardViewFromRealAssessor",
+    "text": "L1"
+   },
+   {
+    "file": "internal/panel/approval_test.go",
+    "line": 145,
+    "kind": "qualified/TEST",
+    "pkg": "panel",
+    "fn": "TestPanelSnapshotSurvivesWebviewRestart",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/panel/approval_test.go",
+    "line": 145,
+    "kind": "bare/TEST",
+    "pkg": "panel",
+    "fn": "TestPanelSnapshotSurvivesWebviewRestart",
+    "text": "L1"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 274,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 274,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L1"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 275,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 275,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L1"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 342,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90TaintFlagAndDenyAreNeverSilenced",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 342,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90TaintFlagAndDenyAreNeverSilenced",
+    "text": "L1"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 342,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90TaintFlagAndDenyAreNeverSilenced",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 342,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90TaintFlagAndDenyAreNeverSilenced",
+    "text": "L1"
+   },
+   {
+    "file": "internal/perm/ticket90_persist_test.go",
+    "line": 114,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "askOnce",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/perm/ticket90_persist_test.go",
+    "line": 114,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "askOnce",
+    "text": "L1"
+   },
+   {
+    "file": "internal/risk/assessor.go",
+    "line": 58,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "String",
+    "text": "L1"
+   },
+   {
+    "file": "internal/risk/assessor_test.go",
+    "line": 57,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestFusionTakesMaxSeverity",
+    "text": "L1"
+   },
+   {
+    "file": "internal/risk/assessor_test.go",
+    "line": 58,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestFusionTakesMaxSeverity",
+    "text": "L1"
+   },
+   {
+    "file": "internal/risk/assessor_test.go",
+    "line": 123,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestDecisionGoldenSnapshots",
+    "text": "L1"
+   },
+   {
+    "file": "internal/risk/assessor_test.go",
+    "line": 124,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestDecisionGoldenSnapshots",
+    "text": "L1"
+   },
+   {
+    "file": "internal/risk/mode.go",
+    "line": 163,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "Screen",
+    "text": "L1"
+   },
+   {
+    "file": "internal/risk/mode.go",
+    "line": 174,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "Screen",
+    "text": "L1"
+   },
+   {
+    "file": "internal/risk/rules_shell.go",
+    "line": 44,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "ruleShell",
+    "text": "L1"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 197,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleShellR6",
+    "text": "L1"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 198,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleShellR6",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/bridge.go",
+    "line": 290,
+    "kind": "qualified/INTERNAL",
+    "pkg": "tools",
+    "fn": "Execute",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/bridge.go",
+    "line": 290,
+    "kind": "bare/INTERNAL",
+    "pkg": "tools",
+    "fn": "Execute",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/bridge.go",
+    "line": 379,
+    "kind": "qualified/INTERNAL",
+    "pkg": "tools",
+    "fn": "route",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/bridge.go",
+    "line": 379,
+    "kind": "bare/INTERNAL",
+    "pkg": "tools",
+    "fn": "route",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/bridge.go",
+    "line": 1025,
+    "kind": "qualified/INTERNAL",
+    "pkg": "tools",
+    "fn": "levelString",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/bridge.go",
+    "line": 1025,
+    "kind": "bare/INTERNAL",
+    "pkg": "tools",
+    "fn": "levelString",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 501,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 501,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 528,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 528,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 540,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 540,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 680,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestToolCallRowsAreComplete",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 680,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestToolCallRowsAreComplete",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/fs_test.go",
+    "line": 194,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestFSRegistrationIsTheD34Roster",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/fs_test.go",
+    "line": 194,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestFSRegistrationIsTheD34Roster",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/fs_test.go",
+    "line": 194,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestFSRegistrationIsTheD34Roster",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/fs_test.go",
+    "line": 194,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestFSRegistrationIsTheD34Roster",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/fs_test.go",
+    "line": 194,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestFSRegistrationIsTheD34Roster",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/fs_test.go",
+    "line": 194,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestFSRegistrationIsTheD34Roster",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/fs_write.go",
+    "line": 710,
+    "kind": "qualified/INTERNAL",
+    "pkg": "tools",
+    "fn": "FSWriteDecl",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/fs_write.go",
+    "line": 710,
+    "kind": "bare/INTERNAL",
+    "pkg": "tools",
+    "fn": "FSWriteDecl",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/fs_write.go",
+    "line": 725,
+    "kind": "qualified/INTERNAL",
+    "pkg": "tools",
+    "fn": "FSTrashDecl",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/fs_write.go",
+    "line": 725,
+    "kind": "bare/INTERNAL",
+    "pkg": "tools",
+    "fn": "FSTrashDecl",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/fs_write.go",
+    "line": 738,
+    "kind": "qualified/INTERNAL",
+    "pkg": "tools",
+    "fn": "FSMoveDecl",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/fs_write.go",
+    "line": 738,
+    "kind": "bare/INTERNAL",
+    "pkg": "tools",
+    "fn": "FSMoveDecl",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 205,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestD34WriteMatrix",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 205,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestD34WriteMatrix",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 222,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestD34WriteMatrix",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 222,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestD34WriteMatrix",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 229,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestD34WriteMatrix",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 229,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestD34WriteMatrix",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 310,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestCrossVolumeRuleIsR8",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 310,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestCrossVolumeRuleIsR8",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 319,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestCrossVolumeRuleIsR8",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 319,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestCrossVolumeRuleIsR8",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 320,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestCrossVolumeRuleIsR8",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 320,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestCrossVolumeRuleIsR8",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/gate.go",
+    "line": 61,
+    "kind": "qualified/INTERNAL",
+    "pkg": "tools",
+    "fn": "LevelString",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/gate.go",
+    "line": 61,
+    "kind": "bare/INTERNAL",
+    "pkg": "tools",
+    "fn": "LevelString",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/paths_workspace_test.go",
+    "line": 36,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "assessWrite",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/paths_workspace_test.go",
+    "line": 36,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "assessWrite",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/paths_workspace_test.go",
+    "line": 52,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestWorkspaceSwitchNarrowsWhatTheAssessorJudges",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/paths_workspace_test.go",
+    "line": 52,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestWorkspaceSwitchNarrowsWhatTheAssessorJudges",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/paths_workspace_test.go",
+    "line": 78,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestWorkspaceSwitchNarrowsWhatTheAssessorJudges",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/paths_workspace_test.go",
+    "line": 78,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestWorkspaceSwitchNarrowsWhatTheAssessorJudges",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/paths_workspace_test.go",
+    "line": 83,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestWorkspaceSwitchNarrowsWhatTheAssessorJudges",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/paths_workspace_test.go",
+    "line": 83,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestWorkspaceSwitchNarrowsWhatTheAssessorJudges",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/ticket90_test.go",
+    "line": 184,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestTicket90ModeReachesRoutingAsParameter",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/ticket90_test.go",
+    "line": 184,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestTicket90ModeReachesRoutingAsParameter",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/ticket90_test.go",
+    "line": 249,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestTicket90ModeReachesRoutingAsParameter",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/ticket90_test.go",
+    "line": 249,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestTicket90ModeReachesRoutingAsParameter",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/ticket90_test.go",
+    "line": 265,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestTicket90TwoBridgesDoNotShareOneMode",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/ticket90_test.go",
+    "line": 265,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestTicket90TwoBridgesDoNotShareOneMode",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/ticket90_test.go",
+    "line": 295,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestTicket90UnwiredModeSourceIsTheStrictestMode",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/ticket90_test.go",
+    "line": 295,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestTicket90UnwiredModeSourceIsTheStrictestMode",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/ticket90_test.go",
+    "line": 400,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestTicket90TierADenySurvivesEveryMode",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/ticket90_test.go",
+    "line": 400,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestTicket90TierADenySurvivesEveryMode",
+    "text": "L1"
+   },
+   {
+    "file": "internal/tools/ticket90_test.go",
+    "line": 468,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestTicket90ModeCarriesNoAllowAuthority",
+    "text": "risk.L1"
+   },
+   {
+    "file": "internal/tools/ticket90_test.go",
+    "line": 468,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestTicket90ModeCarriesNoAllowAuthority",
+    "text": "L1"
+   }
+  ],
+  "L2": [
+   {
+    "file": "cmd/wisp/run.go",
+    "line": 482,
+    "kind": "qualified/CMD",
+    "pkg": "main",
+    "fn": "confirmModeSwitch",
+    "text": "risk.L2"
+   },
+   {
+    "file": "cmd/wisp/run.go",
+    "line": 482,
+    "kind": "bare/CMD",
+    "pkg": "main",
+    "fn": "confirmModeSwitch",
+    "text": "L2"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 305,
+    "kind": "qualified/TEST",
+    "pkg": "approval_test",
+    "fn": "l2Decision",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 305,
+    "kind": "bare/TEST",
+    "pkg": "approval_test",
+    "fn": "l2Decision",
+    "text": "L2"
+   },
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 230,
+    "kind": "qualified/INTERNAL",
+    "pkg": "approval",
+    "fn": "PendingWindow",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 230,
+    "kind": "bare/INTERNAL",
+    "pkg": "approval",
+    "fn": "PendingWindow",
+    "text": "L2"
+   },
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 231,
+    "kind": "qualified/INTERNAL",
+    "pkg": "approval",
+    "fn": "PendingWindow",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 231,
+    "kind": "bare/INTERNAL",
+    "pkg": "approval",
+    "fn": "PendingWindow",
+    "text": "L2"
+   },
+   {
+    "file": "internal/agent/approval/pending_read_test.go",
+    "line": 113,
+    "kind": "qualified/TEST",
+    "pkg": "approval",
+    "fn": "TestLiveApprovalsReportsPendingRowsAndDoesNotConsumeThem",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/agent/approval/pending_read_test.go",
+    "line": 113,
+    "kind": "bare/TEST",
+    "pkg": "approval",
+    "fn": "TestLiveApprovalsReportsPendingRowsAndDoesNotConsumeThem",
+    "text": "L2"
+   },
+   {
+    "file": "internal/agent/approval/pending_read_test.go",
+    "line": 115,
+    "kind": "qualified/TEST",
+    "pkg": "approval",
+    "fn": "TestLiveApprovalsReportsPendingRowsAndDoesNotConsumeThem",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/agent/approval/pending_read_test.go",
+    "line": 115,
+    "kind": "bare/TEST",
+    "pkg": "approval",
+    "fn": "TestLiveApprovalsReportsPendingRowsAndDoesNotConsumeThem",
+    "text": "L2"
+   },
+   {
+    "file": "internal/agent/approval/pending_read_test.go",
+    "line": 192,
+    "kind": "qualified/TEST",
+    "pkg": "approval",
+    "fn": "TestLiveApprovalsSkipsRowsThatAreNotPending",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/agent/approval/pending_read_test.go",
+    "line": 192,
+    "kind": "bare/TEST",
+    "pkg": "approval",
+    "fn": "TestLiveApprovalsSkipsRowsThatAreNotPending",
+    "text": "L2"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 300,
+    "kind": "qualified/TEST",
+    "pkg": "approval_test",
+    "fn": "TestReplayRedisplaysUnderAFreshGrant",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 300,
+    "kind": "bare/TEST",
+    "pkg": "approval_test",
+    "fn": "TestReplayRedisplaysUnderAFreshGrant",
+    "text": "L2"
+   },
+   {
+    "file": "internal/agent/approval/ticket146_liveapprovals_backing_test.go",
+    "line": 75,
+    "kind": "qualified/TEST",
+    "pkg": "approval",
+    "fn": "sharedDecision",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/agent/approval/ticket146_liveapprovals_backing_test.go",
+    "line": 75,
+    "kind": "bare/TEST",
+    "pkg": "approval",
+    "fn": "sharedDecision",
+    "text": "L2"
+   },
+   {
+    "file": "internal/panel/approval_test.go",
+    "line": 93,
+    "kind": "qualified/TEST",
+    "pkg": "panel",
+    "fn": "TestApprovalCardViewMarksMissingReason",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/panel/approval_test.go",
+    "line": 93,
+    "kind": "bare/TEST",
+    "pkg": "panel",
+    "fn": "TestApprovalCardViewMarksMissingReason",
+    "text": "L2"
+   },
+   {
+    "file": "internal/panel/pump_test.go",
+    "line": 42,
+    "kind": "qualified/TEST",
+    "pkg": "panel",
+    "fn": "TestThePumpBuildsThePacketFromWhatTheHostHolds",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/panel/pump_test.go",
+    "line": 42,
+    "kind": "bare/TEST",
+    "pkg": "panel",
+    "fn": "TestThePumpBuildsThePacketFromWhatTheHostHolds",
+    "text": "L2"
+   },
+   {
+    "file": "internal/panel/pump_test.go",
+    "line": 226,
+    "kind": "qualified/TEST",
+    "pkg": "panel",
+    "fn": "TestPublishWithoutAnExitReportsInsteadOfPretending",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/panel/pump_test.go",
+    "line": 226,
+    "kind": "bare/TEST",
+    "pkg": "panel",
+    "fn": "TestPublishWithoutAnExitReportsInsteadOfPretending",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 261,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 261,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 277,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 277,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 277,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 277,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 277,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 277,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 278,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 278,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 278,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 278,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 278,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 278,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 279,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 279,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 279,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 279,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 279,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 279,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 280,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 280,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 280,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 280,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 280,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 280,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 281,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 281,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 281,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 281,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 281,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 281,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 282,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 282,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 282,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 282,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 282,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 282,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 283,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 283,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 283,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 283,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 283,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 283,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 284,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 284,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 284,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 284,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 285,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 285,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 285,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 285,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 304,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 304,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90ScreenTable",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 315,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90TaintFlagAndDenyAreNeverSilenced",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 315,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90TaintFlagAndDenyAreNeverSilenced",
+    "text": "L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 318,
+    "kind": "qualified/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90TaintFlagAndDenyAreNeverSilenced",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 318,
+    "kind": "bare/TEST",
+    "pkg": "perm",
+    "fn": "TestTicket90TaintFlagAndDenyAreNeverSilenced",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/assessor.go",
+    "line": 60,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "String",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/assessor.go",
+    "line": 281,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "runBuiltin",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/assessor.go",
+    "line": 295,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "runSubAssessor",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/assessor_test.go",
+    "line": 16,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestR9PanicInSubAssessorFailsClosed",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/assessor_test.go",
+    "line": 31,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestR9PanicInWiredDependencyFailsClosed",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/assessor_test.go",
+    "line": 43,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestFusionTakesMaxSeverity",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/assessor_test.go",
+    "line": 49,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestFusionTakesMaxSeverity",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/assessor_test.go",
+    "line": 52,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestFusionTakesMaxSeverity",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/assessor_test.go",
+    "line": 84,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestFusionR4BlocksSessionOverride",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/assessor_test.go",
+    "line": 130,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestDecisionGoldenSnapshots",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/assessor_test.go",
+    "line": 136,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestDecisionGoldenSnapshots",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/assessor_test.go",
+    "line": 148,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestDecisionGoldenSnapshots",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/assessor_test.go",
+    "line": 154,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestDecisionGoldenSnapshots",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/assessor_test.go",
+    "line": 160,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestDecisionGoldenSnapshots",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/assessor_test.go",
+    "line": 166,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestDecisionGoldenSnapshots",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/assessor_test.go",
+    "line": 172,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestDecisionGoldenSnapshots",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/mode.go",
+    "line": 163,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "Screen",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/mode.go",
+    "line": 180,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "Screen",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/mode.go",
+    "line": 186,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "Screen",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/provenance_test.go",
+    "line": 235,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestR4EndToEndViaAssessor",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_gateway.go",
+    "line": 14,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "ruleDeclared",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_gateway.go",
+    "line": 41,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "rulePathAllowlist",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_gateway.go",
+    "line": 48,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "rulePathAllowlist",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_gateway.go",
+    "line": 72,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "ruleSensitivePath",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_gateway.go",
+    "line": 85,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "ruleSensitivePath",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_gateway.go",
+    "line": 88,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "ruleSensitivePath",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_gateway.go",
+    "line": 111,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "ruleTaint",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_irreversible.go",
+    "line": 45,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "ruleIrreversible",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_network.go",
+    "line": 66,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "ruleNetwork",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_network.go",
+    "line": 70,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "ruleNetwork",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_network.go",
+    "line": 72,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "ruleNetwork",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_network.go",
+    "line": 75,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "ruleNetwork",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_network.go",
+    "line": 78,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "ruleNetwork",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_scale.go",
+    "line": 23,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "ruleBatchScale",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_shell.go",
+    "line": 27,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "ruleShell",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_shell.go",
+    "line": 37,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "ruleShell",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_shell.go",
+    "line": 50,
+    "kind": "bare/INTERNAL",
+    "pkg": "risk",
+    "fn": "ruleShell",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 58,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleDeclaredR1",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 59,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleDeclaredR1",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 69,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleDeclaredR1",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 78,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRulePathAllowlistR2",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 89,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRulePathAllowlistR2",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 122,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleSensitivePathR3",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 133,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleTaintR4",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 159,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleNetworkR5",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 160,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleNetworkR5",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 161,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleNetworkR5",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 162,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleNetworkR5",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 163,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleNetworkR5",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 164,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleNetworkR5",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 165,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleNetworkR5",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 195,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleShellR6",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 196,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleShellR6",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 199,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleShellR6",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 200,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleShellR6",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 223,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleBatchScaleR7",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 225,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleBatchScaleR7",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 226,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleBatchScaleR7",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 234,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleBatchScaleR7",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 248,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleIrreversibleR8",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 249,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleIrreversibleR8",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 251,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleIrreversibleR8",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 252,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleIrreversibleR8",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 253,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleIrreversibleR8",
+    "text": "L2"
+   },
+   {
+    "file": "internal/risk/rules_test.go",
+    "line": 260,
+    "kind": "bare/TEST",
+    "pkg": "risk",
+    "fn": "TestRuleIrreversibleR8",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/bridge.go",
+    "line": 394,
+    "kind": "qualified/INTERNAL",
+    "pkg": "tools",
+    "fn": "route",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/bridge.go",
+    "line": 394,
+    "kind": "bare/INTERNAL",
+    "pkg": "tools",
+    "fn": "route",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/bridge.go",
+    "line": 1027,
+    "kind": "qualified/INTERNAL",
+    "pkg": "tools",
+    "fn": "levelString",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/bridge.go",
+    "line": 1027,
+    "kind": "bare/INTERNAL",
+    "pkg": "tools",
+    "fn": "levelString",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/bridge_junction_windows_test.go",
+    "line": 242,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "assertJunctionRefused",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/bridge_junction_windows_test.go",
+    "line": 242,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "assertJunctionRefused",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/bridge_junction_windows_test.go",
+    "line": 456,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestJunctionInsideAnAllowedRootCannotReachAnAListFile",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/bridge_junction_windows_test.go",
+    "line": 456,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestJunctionInsideAnAllowedRootCannotReachAnAListFile",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/bridge_junction_windows_test.go",
+    "line": 552,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestShortNameSpellingGetsTheSameVerdictAsTheLongOne",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/bridge_junction_windows_test.go",
+    "line": 552,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestShortNameSpellingGetsTheSameVerdictAsTheLongOne",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/bridge_junction_windows_test.go",
+    "line": 576,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestShortNameSpellingGetsTheSameVerdictAsTheLongOne",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/bridge_junction_windows_test.go",
+    "line": 576,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestShortNameSpellingGetsTheSameVerdictAsTheLongOne",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 556,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 556,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 576,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 576,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 591,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 591,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 634,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestDeclaredRiskIsOnlyAFloor",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 634,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestDeclaredRiskIsOnlyAFloor",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/fs_test.go",
+    "line": 79,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestFSReadTaintFeedsR4",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/fs_test.go",
+    "line": 79,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestFSReadTaintFeedsR4",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/fs_test.go",
+    "line": 245,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestDeleteEnabledAddsFSDelete",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/fs_test.go",
+    "line": 245,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestDeleteEnabledAddsFSDelete",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/fs_write.go",
+    "line": 752,
+    "kind": "qualified/INTERNAL",
+    "pkg": "tools",
+    "fn": "FSDeleteDecl",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/fs_write.go",
+    "line": 752,
+    "kind": "bare/INTERNAL",
+    "pkg": "tools",
+    "fn": "FSDeleteDecl",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 193,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestD34WriteMatrix",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 193,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestD34WriteMatrix",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 198,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestD34WriteMatrix",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 198,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestD34WriteMatrix",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 210,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestD34WriteMatrix",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 210,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestD34WriteMatrix",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 217,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestD34WriteMatrix",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 217,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestD34WriteMatrix",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 234,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestD34WriteMatrix",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 234,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestD34WriteMatrix",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 241,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestD34WriteMatrix",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 241,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestD34WriteMatrix",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 246,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestD34WriteMatrix",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 246,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestD34WriteMatrix",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 313,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestCrossVolumeRuleIsR8",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 313,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestCrossVolumeRuleIsR8",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 345,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestOverwriteDetectionFollowsTheCanonicalPath",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 345,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestOverwriteDetectionFollowsTheCanonicalPath",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/gate.go",
+    "line": 63,
+    "kind": "qualified/INTERNAL",
+    "pkg": "tools",
+    "fn": "LevelString",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/gate.go",
+    "line": 63,
+    "kind": "bare/INTERNAL",
+    "pkg": "tools",
+    "fn": "LevelString",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/paths_workspace_test.go",
+    "line": 69,
+    "kind": "qualified/TEST",
+    "pkg": "tools",
+    "fn": "TestWorkspaceSwitchNarrowsWhatTheAssessorJudges",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/paths_workspace_test.go",
+    "line": 69,
+    "kind": "bare/TEST",
+    "pkg": "tools",
+    "fn": "TestWorkspaceSwitchNarrowsWhatTheAssessorJudges",
+    "text": "L2"
+   },
+   {
+    "file": "internal/tools/registry.go",
+    "line": 143,
+    "kind": "qualified/INTERNAL",
+    "pkg": "tools",
+    "fn": "validate",
+    "text": "risk.L2"
+   },
+   {
+    "file": "internal/tools/registry.go",
+    "line": 143,
+    "kind": "bare/INTERNAL",
+    "pkg": "tools",
+    "fn": "validate",
+    "text": "L2"
+   }
+  ],
+  "StateAwaitingApproval": [
+   {
+    "file": "cmd/balldebug/main.go",
+    "line": 318,
+    "kind": "qualified/CMD-DEBUGGUI",
+    "pkg": "main",
+    "fn": "main",
+    "text": "statemachine.StateAwaitingApproval"
+   },
+   {
+    "file": "cmd/balldebug/main.go",
+    "line": 318,
+    "kind": "bare/CMD-DEBUGGUI",
+    "pkg": "main",
+    "fn": "main",
+    "text": "StateAwaitingApproval"
+   },
+   {
+    "file": "internal/ball/liquid_test.go",
+    "line": 307,
+    "kind": "qualified/TEST",
+    "pkg": "ball",
+    "fn": "TestLiquidDrivenStateSet",
+    "text": "statemachine.StateAwaitingApproval"
+   },
+   {
+    "file": "internal/ball/liquid_test.go",
+    "line": 307,
+    "kind": "bare/TEST",
+    "pkg": "ball",
+    "fn": "TestLiquidDrivenStateSet",
+    "text": "StateAwaitingApproval"
+   },
+   {
+    "file": "internal/ball/live_windows_test.go",
+    "line": 91,
+    "kind": "qualified/TEST",
+    "pkg": "ball",
+    "fn": "TestBallLiveLifecycle",
+    "text": "statemachine.StateAwaitingApproval"
+   },
+   {
+    "file": "internal/ball/live_windows_test.go",
+    "line": 91,
+    "kind": "bare/TEST",
+    "pkg": "ball",
+    "fn": "TestBallLiveLifecycle",
+    "text": "StateAwaitingApproval"
+   },
+   {
+    "file": "internal/ball/statevisual.go",
+    "line": 181,
+    "kind": "qualified/INTERNAL",
+    "pkg": "ball",
+    "fn": "VisualFor",
+    "text": "statemachine.StateAwaitingApproval"
+   },
+   {
+    "file": "internal/ball/statevisual.go",
+    "line": 181,
+    "kind": "bare/INTERNAL",
+    "pkg": "ball",
+    "fn": "VisualFor",
+    "text": "StateAwaitingApproval"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 125,
+    "kind": "qualified/TEST",
+    "pkg": "ball",
+    "fn": "TestVisualForCoversAllTwentyStates",
+    "text": "statemachine.StateAwaitingApproval"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 125,
+    "kind": "bare/TEST",
+    "pkg": "ball",
+    "fn": "TestVisualForCoversAllTwentyStates",
+    "text": "StateAwaitingApproval"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 300,
+    "kind": "qualified/TEST",
+    "pkg": "ball",
+    "fn": "TestAnimatedWhitelist",
+    "text": "statemachine.StateAwaitingApproval"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 300,
+    "kind": "bare/TEST",
+    "pkg": "ball",
+    "fn": "TestAnimatedWhitelist",
+    "text": "StateAwaitingApproval"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 322,
+    "kind": "qualified/TEST",
+    "pkg": "ball",
+    "fn": "TestAnimationPolicyZeroTimerInSleeping",
+    "text": "statemachine.StateAwaitingApproval"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 322,
+    "kind": "bare/TEST",
+    "pkg": "ball",
+    "fn": "TestAnimationPolicyZeroTimerInSleeping",
+    "text": "StateAwaitingApproval"
+   },
+   {
+    "file": "internal/statemachine/machine_test.go",
+    "line": 24,
+    "kind": "bare/TEST",
+    "pkg": "statemachine",
+    "fn": "TestPerStateTimeoutsTableDriven",
+    "text": "StateAwaitingApproval"
+   },
+   {
+    "file": "internal/statemachine/states.go",
+    "line": 43,
+    "kind": "bare/INTERNAL",
+    "pkg": "statemachine",
+    "fn": "Valid",
+    "text": "StateAwaitingApproval"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 328,
+    "kind": "bare/TEST",
+    "pkg": "statemachine",
+    "fn": "TestIllegalTransitionsRejected",
+    "text": "StateAwaitingApproval"
+   },
+   {
+    "file": "internal/statemachine/timeouts.go",
+    "line": 51,
+    "kind": "bare/INTERNAL",
+    "pkg": "statemachine",
+    "fn": "DefaultTimeouts",
+    "text": "StateAwaitingApproval"
+   }
+  ],
+  "StateConfirming": [
+   {
+    "file": "cmd/balldebug/main.go",
+    "line": 325,
+    "kind": "qualified/CMD-DEBUGGUI",
+    "pkg": "main",
+    "fn": "main",
+    "text": "statemachine.StateConfirming"
+   },
+   {
+    "file": "cmd/balldebug/main.go",
+    "line": 325,
+    "kind": "bare/CMD-DEBUGGUI",
+    "pkg": "main",
+    "fn": "main",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "cmd/balldebug/main.go",
+    "line": 595,
+    "kind": "qualified/CMD-DEBUGGUI",
+    "pkg": "main",
+    "fn": "gesture",
+    "text": "statemachine.StateConfirming"
+   },
+   {
+    "file": "cmd/balldebug/main.go",
+    "line": 595,
+    "kind": "bare/CMD-DEBUGGUI",
+    "pkg": "main",
+    "fn": "gesture",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "cmd/balldebug/main.go",
+    "line": 605,
+    "kind": "qualified/CMD-DEBUGGUI",
+    "pkg": "main",
+    "fn": "gesture",
+    "text": "statemachine.StateConfirming"
+   },
+   {
+    "file": "cmd/balldebug/main.go",
+    "line": 605,
+    "kind": "bare/CMD-DEBUGGUI",
+    "pkg": "main",
+    "fn": "gesture",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "cmd/balldebug/main.go",
+    "line": 624,
+    "kind": "qualified/CMD-DEBUGGUI",
+    "pkg": "main",
+    "fn": "dispatch",
+    "text": "statemachine.StateConfirming"
+   },
+   {
+    "file": "cmd/balldebug/main.go",
+    "line": 624,
+    "kind": "bare/CMD-DEBUGGUI",
+    "pkg": "main",
+    "fn": "dispatch",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "cmd/balldebug/main.go",
+    "line": 634,
+    "kind": "qualified/CMD-DEBUGGUI",
+    "pkg": "main",
+    "fn": "syncMachineToBall",
+    "text": "statemachine.StateConfirming"
+   },
+   {
+    "file": "cmd/balldebug/main.go",
+    "line": 634,
+    "kind": "bare/CMD-DEBUGGUI",
+    "pkg": "main",
+    "fn": "syncMachineToBall",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "internal/ball/anim.go",
+    "line": 46,
+    "kind": "qualified/INTERNAL",
+    "pkg": "ball",
+    "fn": "AnimationPolicy",
+    "text": "statemachine.StateConfirming"
+   },
+   {
+    "file": "internal/ball/anim.go",
+    "line": 46,
+    "kind": "bare/INTERNAL",
+    "pkg": "ball",
+    "fn": "AnimationPolicy",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "internal/ball/ball_windows.go",
+    "line": 491,
+    "kind": "qualified/INTERNAL",
+    "pkg": "ball",
+    "fn": "animCycleMs",
+    "text": "statemachine.StateConfirming"
+   },
+   {
+    "file": "internal/ball/ball_windows.go",
+    "line": 491,
+    "kind": "bare/INTERNAL",
+    "pkg": "ball",
+    "fn": "animCycleMs",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 140,
+    "kind": "qualified/TEST",
+    "pkg": "ball",
+    "fn": "TestLiveConfirmingCancelAndEscReturned",
+    "text": "statemachine.StateConfirming"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 140,
+    "kind": "bare/TEST",
+    "pkg": "ball",
+    "fn": "TestLiveConfirmingCancelAndEscReturned",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 161,
+    "kind": "qualified/TEST",
+    "pkg": "ball",
+    "fn": "TestLiveConfirmingCancelAndEscReturned",
+    "text": "statemachine.StateConfirming"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 161,
+    "kind": "bare/TEST",
+    "pkg": "ball",
+    "fn": "TestLiveConfirmingCancelAndEscReturned",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 186,
+    "kind": "qualified/TEST",
+    "pkg": "ball",
+    "fn": "TestLiveConfirmingCancelAndEscReturned",
+    "text": "statemachine.StateConfirming"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 186,
+    "kind": "bare/TEST",
+    "pkg": "ball",
+    "fn": "TestLiveConfirmingCancelAndEscReturned",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 200,
+    "kind": "qualified/TEST",
+    "pkg": "ball",
+    "fn": "TestLiveConfirmingCancelAndEscReturned",
+    "text": "statemachine.StateConfirming"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 200,
+    "kind": "bare/TEST",
+    "pkg": "ball",
+    "fn": "TestLiveConfirmingCancelAndEscReturned",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "internal/ball/live_windows_test.go",
+    "line": 90,
+    "kind": "qualified/TEST",
+    "pkg": "ball",
+    "fn": "TestBallLiveLifecycle",
+    "text": "statemachine.StateConfirming"
+   },
+   {
+    "file": "internal/ball/live_windows_test.go",
+    "line": 90,
+    "kind": "bare/TEST",
+    "pkg": "ball",
+    "fn": "TestBallLiveLifecycle",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "internal/ball/live_windows_test.go",
+    "line": 111,
+    "kind": "qualified/TEST",
+    "pkg": "ball",
+    "fn": "TestBallLiveLifecycle",
+    "text": "statemachine.StateConfirming"
+   },
+   {
+    "file": "internal/ball/live_windows_test.go",
+    "line": 111,
+    "kind": "bare/TEST",
+    "pkg": "ball",
+    "fn": "TestBallLiveLifecycle",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "internal/ball/live_windows_test.go",
+    "line": 237,
+    "kind": "qualified/TEST",
+    "pkg": "ball",
+    "fn": "TestBallLiveIdleBorderTransition",
+    "text": "statemachine.StateConfirming"
+   },
+   {
+    "file": "internal/ball/live_windows_test.go",
+    "line": 237,
+    "kind": "bare/TEST",
+    "pkg": "ball",
+    "fn": "TestBallLiveIdleBorderTransition",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "internal/ball/statevisual.go",
+    "line": 177,
+    "kind": "qualified/INTERNAL",
+    "pkg": "ball",
+    "fn": "VisualFor",
+    "text": "statemachine.StateConfirming"
+   },
+   {
+    "file": "internal/ball/statevisual.go",
+    "line": 177,
+    "kind": "bare/INTERNAL",
+    "pkg": "ball",
+    "fn": "VisualFor",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "internal/ball/statevisual.go",
+    "line": 325,
+    "kind": "qualified/INTERNAL",
+    "pkg": "ball",
+    "fn": "Animated",
+    "text": "statemachine.StateConfirming"
+   },
+   {
+    "file": "internal/ball/statevisual.go",
+    "line": 325,
+    "kind": "bare/INTERNAL",
+    "pkg": "ball",
+    "fn": "Animated",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 124,
+    "kind": "qualified/TEST",
+    "pkg": "ball",
+    "fn": "TestVisualForCoversAllTwentyStates",
+    "text": "statemachine.StateConfirming"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 124,
+    "kind": "bare/TEST",
+    "pkg": "ball",
+    "fn": "TestVisualForCoversAllTwentyStates",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 163,
+    "kind": "qualified/TEST",
+    "pkg": "ball",
+    "fn": "TestVisualForCoversAllTwentyStates",
+    "text": "statemachine.StateConfirming"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 163,
+    "kind": "bare/TEST",
+    "pkg": "ball",
+    "fn": "TestVisualForCoversAllTwentyStates",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 290,
+    "kind": "qualified/TEST",
+    "pkg": "ball",
+    "fn": "TestAnimatedWhitelist",
+    "text": "statemachine.StateConfirming"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 290,
+    "kind": "bare/TEST",
+    "pkg": "ball",
+    "fn": "TestAnimatedWhitelist",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 321,
+    "kind": "qualified/TEST",
+    "pkg": "ball",
+    "fn": "TestAnimationPolicyZeroTimerInSleeping",
+    "text": "statemachine.StateConfirming"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 321,
+    "kind": "bare/TEST",
+    "pkg": "ball",
+    "fn": "TestAnimationPolicyZeroTimerInSleeping",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 341,
+    "kind": "qualified/TEST",
+    "pkg": "ball",
+    "fn": "TestAnimationPolicyZeroTimerInSleeping",
+    "text": "statemachine.StateConfirming"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 341,
+    "kind": "bare/TEST",
+    "pkg": "ball",
+    "fn": "TestAnimationPolicyZeroTimerInSleeping",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "internal/statemachine/machine_test.go",
+    "line": 21,
+    "kind": "bare/TEST",
+    "pkg": "statemachine",
+    "fn": "TestPerStateTimeoutsTableDriven",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "internal/statemachine/states.go",
+    "line": 43,
+    "kind": "bare/INTERNAL",
+    "pkg": "statemachine",
+    "fn": "Valid",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 328,
+    "kind": "bare/TEST",
+    "pkg": "statemachine",
+    "fn": "TestIllegalTransitionsRejected",
+    "text": "StateConfirming"
+   },
+   {
+    "file": "internal/statemachine/timeouts.go",
+    "line": 48,
+    "kind": "bare/INTERNAL",
+    "pkg": "statemachine",
+    "fn": "DefaultTimeouts",
+    "text": "StateConfirming"
+   }
+  ]
+ }
+}

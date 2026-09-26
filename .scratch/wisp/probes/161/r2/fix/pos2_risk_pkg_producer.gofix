@@ -1,0 +1,23 @@
+// POSITIVE CONTROL #2 — A-LAYER PRODUCER LEG. Declared `package risk` so the
+// ruler's same-package rule applies: this is where "return L2" must be counted
+// as a verdict that leaves the function. Shapes copied from
+// internal/risk/rules_irreversible.go:45, rules_scale.go:23,
+// rules_gateway.go contributions, rules_shell.go (allowlisted argv -> L1).
+package risk
+
+func judgeIrreversible(in Input) (Level, string) {
+	return L2, "R8: 不可逆操作"
+}
+
+func judgeScale(in Input) Contribution {
+	return Contribution{level: L2, rule: "R7"}
+}
+
+func judgeShell(in Input) (Level, string) {
+	lv := L1
+	return lv, "R6: 白名单内干净 argv"
+}
+
+func judgeTaint(in Input) {
+	add(L2, "R4: C25 污点命中") // call-argument position: ruler C's known blind spot
+}

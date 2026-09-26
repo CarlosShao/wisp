@@ -1,0 +1,318 @@
+// 161-r2 RULER B -- AST-grade, structurally different census of "ask the human".
+//
+// Why it is independent of ruler A (which is a hand-rolled line stripper):
+//   * it uses go/parser, i.e. the SAME tokeniser the compiler uses, so the
+//     comment/string boundary is not my code;
+//   * it enumerates from the DEFINITION side (const/iota blocks, interface
+//     method sets) rather than from a name list I typed by hand;
+//   * it then does a FUNCTION-LEVEL CALL GRAPH from the production entry points
+//     and reports reachability, which is a different question from "how many
+//     times does the token appear".
+//
+// It writes nothing. Usage: go run ruler_b.go <repo-root>
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"os"
+	"path/filepath"
+	"sort"
+	"strings"
+)
+
+var skip = map[string]bool{".git": true, ".scratch": true, "node_modules": true,
+	"third_party": true, "build": true, "tmp-none": true, "models": true,
+	"vendor": true, ".gocache": true, "dist": true}
+
+// The ask-verdict family. Filled from DEFINITIONS, not from my typing:
+// key = "pkg.Type.Member" as declared, value = where it was declared.
+type site struct {
+	File string `json:"file"`
+	Line int    `json:"line"`
+	Kind string `json:"kind"`
+	Text string `json:"text"`
+}
+
+type funcNode struct {
+	pkg   string
+	recv  string
+	name  string
+	calls []string // callee keys, best effort
+	line  int
+	file  string
+	prod  bool // not a _test.go
+}
+
+var (
+	enumDecls   []site            // const/type members of the ask family
+	methodsOf map[string][]string // "pkg.Type" -> method names
+	nodes     = map[string]*funcNode{}
+	byFilePkg = map[string]string{}
+	sites     = map[string][]site{} // family name -> use sites
+	wanted    = map[string]string{} // method/type names we trace calls of
+)
+
+func init() {
+	wanted = map[string]string{
+		"PendingWindow":   "tools.Gate / approval.Gate: opens the L1 ask",
+		"PendingApproval": "tools.Gate / approval.Gate: opens the L2 ask",
+		"Prompt":          "approval.UI: puts the question in front of eyes",
+		"push":            "approval.Queue.push: creates the pending item",
+		"Dispatch":        "statemachine.Machine.Dispatch: rings the state doorbell",
+		"AdmitTextTask":   "approval.Gate.AdmitTextTask: D47 registration",
+		"DecideFromPanel": "approval.Gate: answer router (control, not an ask)",
+	}
+	// enum member families, by declared type name
+	for _, t := range []string{"Level", "Event", "State"} {
+		for _, m := range []string{"L1", "L2", "EvApprovalNeeded", "EvApprovalGranted",
+			"EvApprovalDenied", "EvApprovalTimeout", "EvConfirmTimeout",
+			"StateAwaitingApproval", "StateConfirming"} {
+			_ = t
+			_ = m
+		}
+	}
+}
+
+func isTest(p string) bool { return strings.HasSuffix(p, "_test.go") }
+
+func main() {
+	root := os.Args[1]
+	methodsOf = map[string][]string{}
+	filepath.Walk(root, func(p string, info os.FileInfo, err error) error {
+		if err != nil || info.IsDir() {
+			if info != nil && info.IsDir() && skip[info.Name()] {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if !strings.HasSuffix(p, ".go") {
+			return nil
+		}
+		rel, _ := filepath.Rel(root, p)
+		rel = filepath.ToSlash(rel)
+		fset := token.NewFileSet()
+		f, perr := parser.ParseFile(fset, p, nil, parser.ParseComments)
+		if perr != nil {
+			return nil
+		}
+		pkg := f.Name.Name
+		byFilePkg[rel] = pkg
+		ast.Inspect(f, func(n ast.Node) bool {
+			switch x := n.(type) {
+			case *ast.ValueSpec:
+				// const member declarations: name (+optional type) = value
+				for i, nm := range x.Names {
+					tn := ""
+					if x.Type != nil {
+						tn = exprStr(x.Type)
+					} else if i < len(x.Values) {
+						tn = exprStr(x.Values[i])
+					}
+					key := pkg + "." + nm.Name
+					if wantEnum(key) {
+						enumDecls = append(enumDecls, site{rel,
+							fset.Position(x.Pos()).Line, "enum-decl:" + tn, nm.Name})
+					}
+				}
+			case *ast.InterfaceType:
+				// handled by method sets below via named types
+			case *ast.TypeSpec:
+				if it, ok := x.Type.(*ast.InterfaceType); ok {
+					k := pkg + "." + x.Name.Name
+					for _, m := range it.Methods.List {
+						for _, nm := range m.Names {
+							methodsOf[k] = append(methodsOf[k], nm.Name)
+						}
+					}
+				}
+			case *ast.FuncDecl:
+				fn := &funcNode{pkg: pkg, name: x.Name.Name,
+					line: fset.Position(x.Pos()).Line, file: rel,
+					prod: !isTest(rel)}
+				if x.Recv != nil {
+					fn.recv = recvStr(x.Recv)
+				}
+				key := nodeKey(fn)
+				ast.Inspect(x, func(n2 ast.Node) bool {
+					if ce, ok := n2.(*ast.CallExpr); ok {
+						fn.calls = append(fn.calls, calleeKey(ce, pkg, fn.recv))
+					}
+					if se, ok := n2.(*ast.SelectorExpr); ok {
+						k := se.Sel.Name
+						if _, want := wanted[k]; want {
+							sites[k] = append(sites[k], site{rel,
+								fset.Position(se.Pos()).Line,
+								classifyUse(fn), exprStr(se)})
+						}
+					}
+					return true
+				})
+				nodes[key] = fn
+			}
+			return true
+		})
+		return nil
+	})
+
+	out := map[string]any{
+		"enum_decls":  enumDecls,
+		"iface_sigs":  methodsOf,
+		"use_sites":   sites,
+		"func_count":  len(nodes),
+		"reach":       reachability(),
+		"dispatchers": dispatchSites(),
+	}
+	b, _ := json.MarshalIndent(out, "", " ")
+	os.Stdout.Write(b)
+	fmt.Println()
+}
+
+func wantEnum(key string) bool {
+	switch key {
+	case "risk.L1", "risk.L2", "risk.L0", "risk.Deny",
+		"statemachine.EvApprovalNeeded", "statemachine.EvApprovalGranted",
+		"statemachine.EvApprovalDenied", "statemachine.EvApprovalTimeout",
+		"statemachine.EvConfirmTimeout", "statemachine.StateAwaitingApproval",
+		"statemachine.StateConfirming":
+		return true
+	}
+	return false
+}
+
+func classifyUse(fn *funcNode) string {
+	if isTest(fn.file) {
+		return "use-in-test"
+	}
+	if strings.HasPrefix(fn.file, "cmd/") {
+		return "use-in-cmd"
+	}
+	if strings.HasPrefix(fn.file, "internal/panel/") {
+		return "use-in-panel"
+	}
+	return "use-in-internal"
+}
+
+func dispatchSites() []site {
+	var out []site
+	for k, fn := range nodes {
+		if fn.name != "Dispatch" && !strings.HasSuffix(k, ".Dispatch") {
+			continue
+		}
+		out = append(out, site{fn.file, fn.line, "declared-in", k})
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].File < out[j].File })
+	return out
+}
+
+func nodeKey(f *funcNode) string {
+	if f.recv != "" {
+		return f.pkg + "." + f.recv + "." + f.name
+	}
+	return f.pkg + "." + f.name
+}
+
+func calleeKey(ce *ast.CallExpr, pkg, recv string) string {
+	switch f := ce.Fun.(type) {
+	case *ast.SelectorExpr:
+		return exprStr(f.X) + "." + f.Sel.Name
+	case *ast.Ident:
+		return pkg + "." + f.Name
+	}
+	return "?"
+}
+
+func exprStr(e ast.Expr) string {
+	switch x := e.(type) {
+	case *ast.Ident:
+		return x.Name
+	case *ast.SelectorExpr:
+		return exprStr(x.X) + "." + x.Sel.Name
+	case *ast.StarExpr:
+		return "*" + exprStr(x.X)
+	case *ast.IndexExpr:
+		return exprStr(x.X)
+	case *ast.ArrayType:
+		return "[]" + exprStr(x.Elt)
+	case *ast.BasicLit:
+		return x.Value
+	}
+	return "?"
+}
+
+func recvStr(fl *ast.FieldList) string {
+	if len(fl.List) == 0 {
+		return ""
+	}
+	return strings.TrimPrefix(exprStr(fl.List[0].Type), "*")
+}
+
+// reachability: BFS over the function-level call graph from production entry
+// points, with an INTERFACE-DISPATCH rule: an unresolved callee "v.M" is
+// expanded to every declared method named M anywhere in production code. That
+// over-approximates (any possible dispatch counts as reachable) so a NEGATIVE
+// result is a strong statement and a positive one is only "possible".
+func reachability() map[string][]string {
+	byName := map[string][]string{}
+	for k, f := range nodes {
+		if f.prod {
+			byName[f.name] = append(byName[f.name], k)
+		}
+	}
+	seeds := []string{}
+	for k, f := range nodes {
+		if f.prod && (f.name == "main" || f.name == "runMain" ||
+			f.name == "assembleRuntime" || f.name == "residentMain" ||
+			f.name == "Confirm") {
+			seeds = append(seeds, k)
+		}
+	}
+	sort.Strings(seeds)
+	seen := map[string]bool{}
+	q := append([]string{}, seeds...)
+	for len(q) > 0 {
+		c := q[0]
+		q = q[1:]
+		if seen[c] {
+			continue
+		}
+		seen[c] = true
+		f := nodes[c]
+		if f == nil {
+			continue
+		}
+		for _, call := range f.calls {
+			name := call
+			if i := strings.LastIndex(call, "."); i >= 0 {
+				name = call[i+1:]
+			}
+			for _, k := range byName[name] {
+				if !seen[k] {
+					q = append(q, k)
+				}
+			}
+			if !seen[call] {
+				if _, ok := nodes[call]; ok {
+					q = append(q, call)
+				}
+			}
+		}
+	}
+	res := map[string][]string{}
+	for target := range wanted {
+		var hit []string
+		for k := range seen {
+			if strings.HasSuffix(k, "."+target) {
+				hit = append(hit, k)
+			}
+		}
+		sort.Strings(hit)
+		res[target] = hit
+	}
+	res["_seeds"] = seeds
+	res["_reachable_total"] = []string{fmt.Sprint(len(seen))}
+	return res
+}

@@ -1,0 +1,40 @@
+ruler A | root=.scratch/wisp/probes/161/r2/fix ext=.gofix files_scanned=2 family=12
+
+== risk.L1                total=1    prod=0    test=0     def=risk.Level value: ask via L1 window
+     other/case                               1
+
+== risk.L2                total=2    prod=0    test=0     def=risk.Level value: ask via L2 card
+     other/case                               1
+     other/other                              1
+
+== PendingWindow          total=3    prod=0    test=0     def=tools.Gate method: opens the L1 ask
+     other/decl                               1
+     other/other                              1
+     other/return                             1
+
+== PendingApproval        total=4    prod=0    test=0     def=tools.Gate method: opens the L2 ask
+     other/call                               1
+     other/decl                               1
+     other/other                              1
+     other/return                             1
+
+== Prompt                 total=3    prod=0    test=0     def=approval.UI method: puts the question on screen
+     other/call                               1
+     other/other                              1
+     other/return                             1
+
+== push                   total=0    prod=0    test=0     def=approval.Queue.push: creates a pending item
+
+== EvApprovalNeeded       total=2    prod=0    test=0     def=statemachine event: the ball's ask doorbell
+     other/other                              2
+
+== StateAwaitingApproval  total=2    prod=0    test=0     def=statemachine state: shown while asking
+     other/other                              2
+
+== StateConfirming        total=0    prod=0    test=0     def=statemachine state: shown while asking (L1)
+
+== DecideFromNative       total=0    prod=0    test=0     def=answer router (NOT an ask) - brief's candidate
+
+== DecideFromPanel        total=0    prod=0    test=0     def=answer router (NOT an ask) - brief's candidate
+
+== AdmitTextTask          total=0    prod=0    test=0     def=D47 registration (NOT an ask) - brief's candidate

@@ -1,0 +1,158 @@
+ruler A | root=. ext=.go files_scanned=462 family=12
+
+== risk.L1                total=42   prod=9    test=33    def=risk.Level value: ask via L1 window
+     go-prod-cmd/other                        1
+     go-prod-internal/case                    3
+     go-prod-internal/other                   5
+     go-test/other                            33
+     >> cmd/wisp/panel_assets.go:74 [other] Declared:     risk.L1,
+     >> internal/agent/approval/batch.go:36 [other] if d.Level != risk.L1 || len(d.Paths) < BatchMinOps || len(d.Paths) >= R7BatchFloor {
+     >> internal/tools/bridge.go:290 [other] if len(rawPaths) > 0 && verdict.Level >= risk.L1 {
+     >> internal/tools/bridge.go:379 [case] case risk.L1:
+     >> internal/tools/bridge.go:1025 [case] case risk.L1:
+     >> internal/tools/fs_write.go:710 [other] Declared:     risk.L1,
+     >> internal/tools/fs_write.go:725 [other] Declared:     risk.L1,
+     >> internal/tools/fs_write.go:738 [other] Declared:     risk.L1,
+     >> internal/tools/gate.go:61 [case] case risk.L1:
+
+== risk.L2                total=50   prod=8    test=42    def=risk.Level value: ask via L2 card
+     go-prod-cmd/other                        1
+     go-prod-internal/case                    3
+     go-prod-internal/other                   4
+     go-test/other                            40
+     go-test/return                           2
+     >> cmd/wisp/run.go:482 [other] Level:  risk.L2,
+     >> internal/agent/approval/gate.go:230 [other] if d.Level != risk.L2 {
+     >> internal/agent/approval/gate.go:231 [other] d.Level = risk.L2
+     >> internal/tools/bridge.go:394 [case] case risk.L2:
+     >> internal/tools/bridge.go:1027 [case] case risk.L2, risk.Deny:
+     >> internal/tools/fs_write.go:752 [other] Declared:     risk.L2,
+     >> internal/tools/gate.go:63 [case] case risk.L2, risk.Deny:
+     >> internal/tools/registry.go:143 [other] if e.Decl.Declared > risk.L2 {
+
+== PendingWindow          total=11   prod=5    test=6     def=tools.Gate method: opens the L1 ask
+     go-prod-internal/call                    2
+     go-prod-internal/decl                    3
+     go-test/call                             2
+     go-test/decl                             3
+     go-test/other                            1
+     >> internal/agent/approval/gate.go:218 [decl] func (g *Gate) PendingWindow(ctx context.Context, d tools.Decision) (tools.Answer, string) {
+     >> internal/tools/bridge.go:380 [call] a, why := b.gate.PendingWindow(ctx, *dec)
+     >> internal/tools/gate.go:102 [call] PendingWindow(ctx context.Context, d Decision) (Answer, string)
+     >> internal/tools/gate.go:116 [decl] func (g GateFuncs) PendingWindow(ctx context.Context, d Decision) (Answer, string) {
+     >> internal/tools/gate.go:138 [decl] func (NoGate) PendingWindow(context.Context, Decision) (Answer, string) {
+
+== PendingApproval        total=15   prod=7    test=8     def=tools.Gate method: opens the L2 ask
+     go-prod-cmd/call                         1
+     go-prod-internal/call                    3
+     go-prod-internal/decl                    3
+     go-test/call                             4
+     go-test/decl                             3
+     go-test/other                            1
+     >> cmd/wisp/run.go:479 [call] ans, why := rt.gate.PendingApproval(ctx, tools.Decision{
+     >> internal/agent/approval/gate.go:236 [call] a, why := g.PendingApproval(ctx, d)
+     >> internal/agent/approval/gate.go:452 [decl] func (g *Gate) PendingApproval(ctx context.Context, d tools.Decision) (tools.Answer, string) {
+     >> internal/tools/bridge.go:395 [call] a, why := b.gate.PendingApproval(ctx, *dec)
+     >> internal/tools/gate.go:105 [call] PendingApproval(ctx context.Context, d Decision) (Answer, string)
+     >> internal/tools/gate.go:124 [decl] func (g GateFuncs) PendingApproval(ctx context.Context, d Decision) (Answer, string) {
+     >> internal/tools/gate.go:143 [decl] func (NoGate) PendingApproval(context.Context, Decision) (Answer, string) {
+
+== Prompt                 total=28   prod=9    test=19    def=approval.UI method: puts the question on screen
+     go-prod-cmd/decl                         1
+     go-prod-internal/call                    3
+     go-prod-internal/decl                    3
+     go-prod-internal/other                   1
+     go-prod-internal/return                  1
+     go-test/decl                             8
+     go-test/other                            7
+     go-test/return                           4
+     >> cmd/wisp/run.go:818 [decl] func (u *consoleApprovalUI) Prompt(_ context.Context, p approval.Prompt) error {
+     >> internal/agent/approval/gate.go:260 [call] if err := g.ui.Prompt(ctx, p); err != nil {
+     >> internal/agent/approval/gate.go:486 [call] if err := g.ui.Prompt(ctx, p); err != nil {
+     >> internal/agent/approval/gate.go:547 [decl] func (g *Gate) promptFor(d tools.Decision, corr string, win, deadline time.Duration, bv *BatchView, grant string) Prompt
+     >> internal/agent/approval/gate.go:548 [return] return Prompt{
+     >> internal/agent/approval/ui.go:27 [decl] type Prompt struct {
+     >> internal/agent/approval/ui.go:85 [call] Prompt(ctx context.Context, p Prompt) error
+     >> internal/agent/approval/ui.go:92 [other] PromptFn func(context.Context, Prompt) error
+     >> internal/agent/approval/ui.go:97 [decl] func (u UIFuncs) Prompt(ctx context.Context, p Prompt) error {
+
+== push                   total=6    prod=5    test=1     def=approval.Queue.push: creates a pending item
+     go-prod-internal/call                    3
+     go-prod-internal/decl                    2
+     go-test/call                             1
+     >> internal/agent/approval/gate.go:457 [call] it, err := g.q.push(d)
+     >> internal/agent/approval/queue.go:141 [decl] func (q *Queue) push(d tools.Decision) (*qitem, error) {
+     >> internal/audio/audio.go:115 [decl] func (m *meter) push(buf chan<- []byte, frame []byte) bool {
+     >> internal/audio/wasapimic_windows.go:231 [call] m.meter.push(buf, encodeFrame(pending[:FrameSamples]))
+     >> internal/audio/wavinjector.go:129 [call] w.meter.push(buf, encodeFrame(w.samples[off:min(off+FrameSamples, len(w.samples))]))
+
+== EvApprovalNeeded       total=9    prod=3    test=6     def=statemachine event: the ball's ask doorbell
+     go-prod-internal/other                   3
+     go-test/other                            6
+     >> internal/statemachine/events.go:35 [other] EvApprovalNeeded  Event = "tools.approval-needed"   // #17
+     >> internal/statemachine/table.go:118 [other] D43: 17, From: StateActing, Event: EvApprovalNeeded, To: StateConfirming,
+     >> internal/statemachine/table.go:123 [other] D43: 17, From: StateActing, Event: EvApprovalNeeded, To: StateAwaitingApproval,
+
+== StateAwaitingApproval  total=29   prod=13   test=16    def=statemachine state: shown while asking
+     go-prod-cmd/other                        2
+     go-prod-internal/case                    1
+     go-prod-internal/other                   10
+     go-test/other                            16
+     >> cmd/balldebug/main.go:60 [other] statemachine.StateAwaitingApproval,
+     >> cmd/balldebug/main.go:318 [other] if s == statemachine.StateAwaitingApproval {
+     >> internal/ball/statevisual.go:181 [case] case statemachine.StateAwaitingApproval:
+     >> internal/statemachine/states.go:22 [other] StateAwaitingApproval State = "AwaitingApproval" // L2 queue
+     >> internal/statemachine/states.go:43 [other] StateWarm, StateConversation, StateConfirming, StateAwaitingApproval,
+     >> internal/statemachine/table.go:123 [other] D43: 17, From: StateActing, Event: EvApprovalNeeded, To: StateAwaitingApproval,
+     >> internal/statemachine/table.go:158 [other] D43: 23, From: StateAwaitingApproval, Event: EvApprovalGranted, To: StateActing,
+     >> internal/statemachine/table.go:163 [other] D43: 23, From: StateAwaitingApproval, Event: EvApprovalGranted, To: StateAwaitingApproval,
+     >> internal/statemachine/table.go:168 [other] D43: 24, From: StateAwaitingApproval, Event: EvApprovalDenied, To: StateActing,
+     >> internal/statemachine/table.go:172 [other] D43: 24, From: StateAwaitingApproval, Event: EvApprovalTimeout, To: StateActing,
+     >> internal/statemachine/table.go:176 [other] D43: 25, From: StateAwaitingApproval, Event: EvQueueDrained, To: StateSpeaking,
+     >> internal/statemachine/table.go:180 [other] D43: 25, From: StateAwaitingApproval, Event: EvQueueDrained, To: StateSettling,
+     >> internal/statemachine/timeouts.go:51 [other] {state: StateAwaitingApproval}:                    {300 * time.Second, EvApprovalTimeout},
+
+== StateConfirming        total=34   prod=16   test=18    def=statemachine state: shown while asking (L1)
+     go-prod-cmd/case                         1
+     go-prod-cmd/other                        5
+     go-prod-internal/assign                  1
+     go-prod-internal/case                    3
+     go-prod-internal/other                   6
+     go-test/other                            18
+     >> cmd/balldebug/main.go:59 [other] statemachine.StateConfirming,
+     >> cmd/balldebug/main.go:325 [other] if s == statemachine.StateConfirming {
+     >> cmd/balldebug/main.go:595 [case] case statemachine.StateListening, statemachine.StateConfirming:
+     >> cmd/balldebug/main.go:605 [other] if m.State() == statemachine.StateConfirming {
+     >> cmd/balldebug/main.go:624 [other] if to != statemachine.StateConfirming {
+     >> cmd/balldebug/main.go:634 [other] if s == statemachine.StateConfirming {
+     >> internal/ball/anim.go:46 [case] case statemachine.StateConfirming:
+     >> internal/ball/ball_windows.go:491 [case] case statemachine.StateConfirming:
+     >> internal/ball/statevisual.go:177 [case] case statemachine.StateConfirming:
+     >> internal/ball/statevisual.go:325 [assign] statemachine.StateConfirming:
+     >> internal/statemachine/states.go:21 [other] StateConfirming       State = "Confirming"       // L1 quick confirm
+     >> internal/statemachine/states.go:43 [other] StateWarm, StateConversation, StateConfirming, StateAwaitingApproval,
+     >> internal/statemachine/table.go:118 [other] D43: 17, From: StateActing, Event: EvApprovalNeeded, To: StateConfirming,
+     >> internal/statemachine/table.go:150 [other] D43: 21, From: StateConfirming, Event: EvConfirmExpired, To: StateActing,
+     >> internal/statemachine/table.go:154 [other] D43: 22, From: StateConfirming, Event: EvVeto, To: StateActing,
+     >> internal/statemachine/timeouts.go:48 [other] {state: StateConfirming}:                          {3 * time.Second, EvConfirmExpired},
+
+== DecideFromNative       total=6    prod=1    test=5     def=answer router (NOT an ask) - brief's candidate
+     go-prod-internal/decl                    1
+     go-test/call                             2
+     go-test/return                           3
+     >> internal/agent/approval/gate.go:610 [decl] func (g *Gate) DecideFromNative(ctx context.Context, r Request) error {
+
+== DecideFromPanel        total=5    prod=1    test=4     def=answer router (NOT an ask) - brief's candidate
+     go-prod-internal/decl                    1
+     go-test/call                             2
+     go-test/return                           2
+     >> internal/agent/approval/gate.go:622 [decl] func (g *Gate) DecideFromPanel(ctx context.Context, r Request) error {
+
+== AdmitTextTask          total=35   prod=3    test=32    def=D47 registration (NOT an ask) - brief's candidate
+     go-prod-cmd/call                         2
+     go-prod-internal/decl                    1
+     go-test/call                             31
+     go-test/other                            1
+     >> cmd/wisp/run.go:477 [call] revoke := rt.gate.AdmitTextTask(taskID)
+     >> cmd/wisp/run.go:558 [call] revoke := rt.gate.AdmitTextTask(taskID)
+     >> internal/agent/approval/gate.go:160 [decl] func (g *Gate) AdmitTextTask(taskID string) (revoke func()) {

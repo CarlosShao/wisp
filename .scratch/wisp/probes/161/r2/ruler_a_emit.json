@@ -1,0 +1,2058 @@
+{
+ "root": ".",
+ "hits": {
+  "StateConfirming": [
+   {
+    "file": "cmd/balldebug/main.go",
+    "line": 59,
+    "bucket": "go-prod-cmd",
+    "pos": "other",
+    "text": "statemachine.StateConfirming,"
+   },
+   {
+    "file": "cmd/balldebug/main.go",
+    "line": 325,
+    "bucket": "go-prod-cmd",
+    "pos": "other",
+    "text": "if s == statemachine.StateConfirming {"
+   },
+   {
+    "file": "cmd/balldebug/main.go",
+    "line": 595,
+    "bucket": "go-prod-cmd",
+    "pos": "case",
+    "text": "case statemachine.StateListening, statemachine.StateConfirming:"
+   },
+   {
+    "file": "cmd/balldebug/main.go",
+    "line": 605,
+    "bucket": "go-prod-cmd",
+    "pos": "other",
+    "text": "if m.State() == statemachine.StateConfirming {"
+   },
+   {
+    "file": "cmd/balldebug/main.go",
+    "line": 624,
+    "bucket": "go-prod-cmd",
+    "pos": "other",
+    "text": "if to != statemachine.StateConfirming {"
+   },
+   {
+    "file": "cmd/balldebug/main.go",
+    "line": 634,
+    "bucket": "go-prod-cmd",
+    "pos": "other",
+    "text": "if s == statemachine.StateConfirming {"
+   },
+   {
+    "file": "internal/ball/anim.go",
+    "line": 46,
+    "bucket": "go-prod-internal",
+    "pos": "case",
+    "text": "case statemachine.StateConfirming:"
+   },
+   {
+    "file": "internal/ball/ball_windows.go",
+    "line": 491,
+    "bucket": "go-prod-internal",
+    "pos": "case",
+    "text": "case statemachine.StateConfirming:"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 140,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "if m.State() == statemachine.StateConfirming {"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 161,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "if m.State() != statemachine.StateListening && m.State() != statemachine.StateConfirming {"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 186,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "{statemachine.EvApprovalNeeded, &statemachine.Facts{ApprovalLevel: 1}, statemachine.StateConfirming},"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 200,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "if got := readState(t, b); got != statemachine.StateConfirming {"
+   },
+   {
+    "file": "internal/ball/liquid_test.go",
+    "line": 124,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "statemachine.StateConversation, statemachine.StateConfirming,"
+   },
+   {
+    "file": "internal/ball/live_windows_test.go",
+    "line": 90,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "statemachine.StateConversation, statemachine.StateConfirming,"
+   },
+   {
+    "file": "internal/ball/live_windows_test.go",
+    "line": 111,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "b.SetState(statemachine.StateConfirming)"
+   },
+   {
+    "file": "internal/ball/live_windows_test.go",
+    "line": 237,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "statemachine.StateActing, statemachine.StateConfirming,"
+   },
+   {
+    "file": "internal/ball/statevisual.go",
+    "line": 177,
+    "bucket": "go-prod-internal",
+    "pos": "case",
+    "text": "case statemachine.StateConfirming:"
+   },
+   {
+    "file": "internal/ball/statevisual.go",
+    "line": 325,
+    "bucket": "go-prod-internal",
+    "pos": "assign",
+    "text": "statemachine.StateConfirming:"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 124,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "statemachine.StateConversation, statemachine.StateConfirming,"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 163,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "conf := VisualFor(p, 56, statemachine.StateConfirming, 0)"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 290,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "statemachine.StateSpeaking, statemachine.StateConfirming,"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 321,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "statemachine.StateConversation, statemachine.StateConfirming,"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 341,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "statemachine.StateThinking, statemachine.StateConfirming, statemachine.StateSpeaking,"
+   },
+   {
+    "file": "internal/statemachine/machine_test.go",
+    "line": 21,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "{StateConfirming, PhaseNone, 3 * time.Second, EvConfirmExpired},"
+   },
+   {
+    "file": "internal/statemachine/states.go",
+    "line": 21,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "StateConfirming       State = \"Confirming\"       // L1 quick confirm"
+   },
+   {
+    "file": "internal/statemachine/states.go",
+    "line": 43,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "StateWarm, StateConversation, StateConfirming, StateAwaitingApproval,"
+   },
+   {
+    "file": "internal/statemachine/table.go",
+    "line": 118,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "D43: 17, From: StateActing, Event: EvApprovalNeeded, To: StateConfirming,"
+   },
+   {
+    "file": "internal/statemachine/table.go",
+    "line": 150,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "D43: 21, From: StateConfirming, Event: EvConfirmExpired, To: StateActing,"
+   },
+   {
+    "file": "internal/statemachine/table.go",
+    "line": 154,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "D43: 22, From: StateConfirming, Event: EvVeto, To: StateActing,"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 130,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "facts: &Facts{ApprovalLevel: 1}, want: StateConfirming, effects: []string{\"confirm.countdown-start\"},"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 158,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "name: \"#21 confirm countdown expired\", from: StateConfirming, event: EvConfirmExpired,"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 162,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "name: \"#22 confirming veto\", from: StateConfirming, event: EvVeto, want: StateActing,"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 328,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "StateWarm, StateConversation, StateConfirming, StateAwaitingApproval,"
+   },
+   {
+    "file": "internal/statemachine/timeouts.go",
+    "line": 48,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "{state: StateConfirming}:                          {3 * time.Second, EvConfirmExpired},"
+   }
+  ],
+  "StateAwaitingApproval": [
+   {
+    "file": "cmd/balldebug/main.go",
+    "line": 60,
+    "bucket": "go-prod-cmd",
+    "pos": "other",
+    "text": "statemachine.StateAwaitingApproval,"
+   },
+   {
+    "file": "cmd/balldebug/main.go",
+    "line": 318,
+    "bucket": "go-prod-cmd",
+    "pos": "other",
+    "text": "if s == statemachine.StateAwaitingApproval {"
+   },
+   {
+    "file": "internal/ball/liquid_test.go",
+    "line": 125,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "statemachine.StateAwaitingApproval, statemachine.StateSettling,"
+   },
+   {
+    "file": "internal/ball/liquid_test.go",
+    "line": 307,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "statemachine.StateAwaitingApproval, statemachine.StateError,"
+   },
+   {
+    "file": "internal/ball/live_windows_test.go",
+    "line": 91,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "statemachine.StateAwaitingApproval, statemachine.StateSettling,"
+   },
+   {
+    "file": "internal/ball/statevisual.go",
+    "line": 181,
+    "bucket": "go-prod-internal",
+    "pos": "case",
+    "text": "case statemachine.StateAwaitingApproval:"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 125,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "statemachine.StateAwaitingApproval, statemachine.StateSettling,"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 300,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "statemachine.StateAwaitingApproval, statemachine.StateQueued,"
+   },
+   {
+    "file": "internal/ball/tokens_test.go",
+    "line": 322,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "statemachine.StateAwaitingApproval, statemachine.StateSettling,"
+   },
+   {
+    "file": "internal/statemachine/machine_test.go",
+    "line": 24,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "{StateAwaitingApproval, PhaseNone, 300 * time.Second, EvApprovalTimeout},"
+   },
+   {
+    "file": "internal/statemachine/states.go",
+    "line": 22,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "StateAwaitingApproval State = \"AwaitingApproval\" // L2 queue"
+   },
+   {
+    "file": "internal/statemachine/states.go",
+    "line": 43,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "StateWarm, StateConversation, StateConfirming, StateAwaitingApproval,"
+   },
+   {
+    "file": "internal/statemachine/table.go",
+    "line": 123,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "D43: 17, From: StateActing, Event: EvApprovalNeeded, To: StateAwaitingApproval,"
+   },
+   {
+    "file": "internal/statemachine/table.go",
+    "line": 158,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "D43: 23, From: StateAwaitingApproval, Event: EvApprovalGranted, To: StateActing,"
+   },
+   {
+    "file": "internal/statemachine/table.go",
+    "line": 163,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "D43: 23, From: StateAwaitingApproval, Event: EvApprovalGranted, To: StateAwaitingApproval,"
+   },
+   {
+    "file": "internal/statemachine/table.go",
+    "line": 168,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "D43: 24, From: StateAwaitingApproval, Event: EvApprovalDenied, To: StateActing,"
+   },
+   {
+    "file": "internal/statemachine/table.go",
+    "line": 172,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "D43: 24, From: StateAwaitingApproval, Event: EvApprovalTimeout, To: StateActing,"
+   },
+   {
+    "file": "internal/statemachine/table.go",
+    "line": 176,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "D43: 25, From: StateAwaitingApproval, Event: EvQueueDrained, To: StateSpeaking,"
+   },
+   {
+    "file": "internal/statemachine/table.go",
+    "line": 180,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "D43: 25, From: StateAwaitingApproval, Event: EvQueueDrained, To: StateSettling,"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 134,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "facts: &Facts{ApprovalLevel: 2}, want: StateAwaitingApproval, effects: []string{\"approval.enqueue-c18\"},"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 167,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "name: \"#23 approval granted, queue empties\", from: StateAwaitingApproval, event: EvApprovalGranted,"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 172,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "name: \"#23 approval granted, queue non-empty (stay)\", from: StateAwaitingApproval, event: EvApprovalGranted,"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 173,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "facts: &Facts{QueueDepthAfter: 2}, want: StateAwaitingApproval,"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 177,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "name: \"#24 approval denied\", from: StateAwaitingApproval, event: EvApprovalDenied, want: StateActing,"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 181,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "name: \"#24 approval timeout 300s\", from: StateAwaitingApproval, event: EvApprovalTimeout, want: StateActing,"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 185,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "name: \"#25 queue drained with announcement\", from: StateAwaitingApproval, event: EvQueueDrained,"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 189,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "name: \"#25 queue drained silent\", from: StateAwaitingApproval, event: EvQueueDrained,"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 328,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "StateWarm, StateConversation, StateConfirming, StateAwaitingApproval,"
+   },
+   {
+    "file": "internal/statemachine/timeouts.go",
+    "line": 51,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "{state: StateAwaitingApproval}:                    {300 * time.Second, EvApprovalTimeout},"
+   }
+  ],
+  "risk.L1": [
+   {
+    "file": "cmd/wisp/panel_assets.go",
+    "line": 74,
+    "bucket": "go-prod-cmd",
+    "pos": "other",
+    "text": "Declared:     risk.L1,"
+   },
+   {
+    "file": "internal/agent/approval/batch.go",
+    "line": 36,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "if d.Level != risk.L1 || len(d.Paths) < BatchMinOps || len(d.Paths) >= R7BatchFloor {"
+   },
+   {
+    "file": "internal/agent/approval/batch_test.go",
+    "line": 147,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "ft := newFakeTool(\"fs.write\", tools.CapFSWrite, risk.L1, \"paths\")"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 293,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "Level:         risk.L1,"
+   },
+   {
+    "file": "internal/agent/approval/pending_read_test.go",
+    "line": 114,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "dB := readSideDecision(\"corr-b\", \"shell.run\", risk.L1, []risk.RuleID{risk.R1}, false, risk.ModeAskHighRisk)"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 29,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "ft := newFakeTool(\"fs.write\", tools.CapFSWrite, risk.L1, \"paths\")"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 200,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "ft := newFakeTool(\"fs.write\", tools.CapFSWrite, risk.L1, \"paths\")"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 269,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "ft := newFakeTool(\"fs.write\", tools.CapFSWrite, risk.L1, \"paths\")"
+   },
+   {
+    "file": "internal/panel/approval_test.go",
+    "line": 47,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "Declared:     risk.L1,"
+   },
+   {
+    "file": "internal/panel/approval_test.go",
+    "line": 145,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "Facts:         risk.Facts{Declared: risk.L1, Paths: []string{`C:\\Users\\swq\\Desktop\\plan.md`}, Irreversible: []string{\"ov"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 274,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "risk.Decision{Level: risk.L1, RulesHit: []risk.RuleID{risk.R1}},"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 275,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "risk.L1, risk.L0, risk.L0, true, true,"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 342,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "if got := bad.Screen(risk.Decision{Level: risk.L1}); got.Level != risk.L1 || got.Silenced {"
+   },
+   {
+    "file": "internal/perm/ticket90_persist_test.go",
+    "line": 114,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "Declared:     risk.L1,"
+   },
+   {
+    "file": "internal/tools/bridge.go",
+    "line": 290,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "if len(rawPaths) > 0 && verdict.Level >= risk.L1 {"
+   },
+   {
+    "file": "internal/tools/bridge.go",
+    "line": 379,
+    "bucket": "go-prod-internal",
+    "pos": "case",
+    "text": "case risk.L1:"
+   },
+   {
+    "file": "internal/tools/bridge.go",
+    "line": 1025,
+    "bucket": "go-prod-internal",
+    "pos": "case",
+    "text": "case risk.L1:"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 501,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "entry(\"probe.rev\", risk.L1, []Capability{CapFSWrite}, []Capability{CapFSWrite}))"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 528,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "entry(\"probe.rev\", risk.L1, []Capability{CapFSWrite}, []Capability{CapFSWrite}))"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 540,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "entry(\"probe.rev\", risk.L1, []Capability{CapFSWrite}, []Capability{CapFSWrite}))"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 680,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "Declared: risk.L1, Provider: KindBuiltin,"
+   },
+   {
+    "file": "internal/tools/fs_test.go",
+    "line": 194,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "\"fs.write\": risk.L1, \"fs.trash\": risk.L1, \"fs.move\": risk.L1,"
+   },
+   {
+    "file": "internal/tools/fs_write.go",
+    "line": 710,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "Declared:     risk.L1,"
+   },
+   {
+    "file": "internal/tools/fs_write.go",
+    "line": 725,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "Declared:     risk.L1,"
+   },
+   {
+    "file": "internal/tools/fs_write.go",
+    "line": 738,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "Declared:     risk.L1,"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 205,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "want: risk.L1, route: \"window\", noRules: []risk.RuleID{risk.R8},"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 222,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "want: risk.L1, route: \"window\", noRules: []risk.RuleID{risk.R8},"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 229,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "want: risk.L1, route: \"window\", noRules: []risk.RuleID{risk.R8},"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 310,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "Declared:     risk.L1,"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 319,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "same := bareAssessor().Assess(\"fs.move\", map[string]any{}, risk.Facts{Declared: risk.L1})"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 320,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "if same.Level != risk.L1 || contains(same.RulesHit, risk.R8) {"
+   },
+   {
+    "file": "internal/tools/gate.go",
+    "line": 61,
+    "bucket": "go-prod-internal",
+    "pos": "case",
+    "text": "case risk.L1:"
+   },
+   {
+    "file": "internal/tools/paths_workspace_test.go",
+    "line": 36,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "Declared: risk.L1,"
+   },
+   {
+    "file": "internal/tools/paths_workspace_test.go",
+    "line": 52,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "if before.Level != risk.L1 {"
+   },
+   {
+    "file": "internal/tools/paths_workspace_test.go",
+    "line": 78,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "if inside.Level != risk.L1 {"
+   },
+   {
+    "file": "internal/tools/paths_workspace_test.go",
+    "line": 83,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "if back := assessWrite(t, canon, filepath.Join(wsB, \"note.txt\")); back.Level != risk.L1 {"
+   },
+   {
+    "file": "internal/tools/ticket90_test.go",
+    "line": 184,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "e, tool := t90Entry(\"t90.write\", risk.L1, nil, nil)"
+   },
+   {
+    "file": "internal/tools/ticket90_test.go",
+    "line": 249,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "if d.Level != risk.L1 {"
+   },
+   {
+    "file": "internal/tools/ticket90_test.go",
+    "line": 265,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "e, _ := t90Entry(\"t90.l1\", risk.L1, nil, nil)"
+   },
+   {
+    "file": "internal/tools/ticket90_test.go",
+    "line": 295,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "e, _ := t90Entry(\"t90.l1\", risk.L1, nil, nil)"
+   },
+   {
+    "file": "internal/tools/ticket90_test.go",
+    "line": 400,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "e, tool := t90Entry(\"t90.a\", risk.L1, []string{\"path\"}, nil)"
+   },
+   {
+    "file": "internal/tools/ticket90_test.go",
+    "line": 468,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "e, tool := t90Entry(\"t90.l1b\", risk.L1, nil, nil)"
+   }
+  ],
+  "AdmitTextTask": [
+   {
+    "file": "cmd/wisp/panel_pump_test.go",
+    "line": 153,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "revoke := rt.gate.AdmitTextTask(\"pump-task\")"
+   },
+   {
+    "file": "cmd/wisp/run.go",
+    "line": 477,
+    "bucket": "go-prod-cmd",
+    "pos": "call",
+    "text": "revoke := rt.gate.AdmitTextTask(taskID)"
+   },
+   {
+    "file": "cmd/wisp/run.go",
+    "line": 558,
+    "bucket": "go-prod-cmd",
+    "pos": "call",
+    "text": "revoke := rt.gate.AdmitTextTask(taskID)"
+   },
+   {
+    "file": "cmd/wisp/run_mode101_test.go",
+    "line": 191,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "revoke := rt.gate.AdmitTextTask(task)"
+   },
+   {
+    "file": "cmd/wisp/run_test.go",
+    "line": 356,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "revoke := rt.gate.AdmitTextTask(\"gate-task\")"
+   },
+   {
+    "file": "internal/agent/approval/batch_test.go",
+    "line": 47,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/agent/approval/batch_test.go",
+    "line": 92,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/agent/approval/batch_test.go",
+    "line": 125,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/agent/approval/batch_test.go",
+    "line": 145,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 160,
+    "bucket": "go-prod-internal",
+    "pos": "decl",
+    "text": "func (g *Gate) AdmitTextTask(taskID string) (revoke func()) {"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 25,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 92,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 153,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 194,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "revoke := g.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 272,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 323,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 336,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/agent/approval/ticket84_no_owner_test.go",
+    "line": 63,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/agent/approval/ticket84_no_owner_test.go",
+    "line": 185,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/agent/approval/ticket84_no_owner_test.go",
+    "line": 231,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "noUI.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/agent/approval/ticket84_no_owner_test.go",
+    "line": 248,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/agent/approval/ticket87_veto_l2_test.go",
+    "line": 53,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/agent/approval/ticket87_veto_l2_test.go",
+    "line": 136,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(\"task-87-host-key\")"
+   },
+   {
+    "file": "internal/agent/approval/ticket87_veto_l2_test.go",
+    "line": 164,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(sharedTask)"
+   },
+   {
+    "file": "internal/agent/approval/ticket97_alias_direction_test.go",
+    "line": 36,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/agent/approval/ticket97_alias_direction_test.go",
+    "line": 56,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(alias)"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 23,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 60,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 88,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 147,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 167,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 210,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 267,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "g.AdmitTextTask(testTask)"
+   },
+   {
+    "file": "internal/tools/loop_approval_test.go",
+    "line": 134,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "opt.AdmitTask = gate.AdmitTextTask"
+   },
+   {
+    "file": "internal/tools/wiring_test.go",
+    "line": 100,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "t.Cleanup(g.AdmitTextTask(\"task-wire-1\"))"
+   }
+  ],
+  "PendingApproval": [
+   {
+    "file": "cmd/wisp/run.go",
+    "line": 479,
+    "bucket": "go-prod-cmd",
+    "pos": "call",
+    "text": "ans, why := rt.gate.PendingApproval(ctx, tools.Decision{"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 219,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "a, why := g.PendingApproval(ctx, d)"
+   },
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 236,
+    "bucket": "go-prod-internal",
+    "pos": "call",
+    "text": "a, why := g.PendingApproval(ctx, d)"
+   },
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 452,
+    "bucket": "go-prod-internal",
+    "pos": "decl",
+    "text": "func (g *Gate) PendingApproval(ctx context.Context, d tools.Decision) (tools.Answer, string) {"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 324,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "a, why := g.PendingApproval(context.Background(), l2Decision(\"C:/data/a.txt\"))"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 340,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "a, why := g.PendingApproval(context.Background(), l2Decision(\"C:/data/b.txt\"))"
+   },
+   {
+    "file": "internal/agent/approval/ticket84_no_owner_test.go",
+    "line": 270,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "a, why := g.PendingApproval(context.Background(), d)"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 187,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "\"L2\": g.PendingApproval,"
+   },
+   {
+    "file": "internal/perm/ticket90_persist_test.go",
+    "line": 84,
+    "bucket": "go-test",
+    "pos": "decl",
+    "text": "func (g *t90gate) PendingApproval(context.Context, tools.Decision) (tools.Answer, string) {"
+   },
+   {
+    "file": "internal/tools/bridge.go",
+    "line": 395,
+    "bucket": "go-prod-internal",
+    "pos": "call",
+    "text": "a, why := b.gate.PendingApproval(ctx, *dec)"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 88,
+    "bucket": "go-test",
+    "pos": "decl",
+    "text": "func (g *gateSpy) PendingApproval(_ context.Context, d Decision) (Answer, string) {"
+   },
+   {
+    "file": "internal/tools/gate.go",
+    "line": 105,
+    "bucket": "go-prod-internal",
+    "pos": "call",
+    "text": "PendingApproval(ctx context.Context, d Decision) (Answer, string)"
+   },
+   {
+    "file": "internal/tools/gate.go",
+    "line": 124,
+    "bucket": "go-prod-internal",
+    "pos": "decl",
+    "text": "func (g GateFuncs) PendingApproval(ctx context.Context, d Decision) (Answer, string) {"
+   },
+   {
+    "file": "internal/tools/gate.go",
+    "line": 143,
+    "bucket": "go-prod-internal",
+    "pos": "decl",
+    "text": "func (NoGate) PendingApproval(context.Context, Decision) (Answer, string) {"
+   },
+   {
+    "file": "internal/tools/ticket90_test.go",
+    "line": 124,
+    "bucket": "go-test",
+    "pos": "decl",
+    "text": "func (g *t90Gate) PendingApproval(_ context.Context, d Decision) (Answer, string) {"
+   }
+  ],
+  "risk.L2": [
+   {
+    "file": "cmd/wisp/run.go",
+    "line": 482,
+    "bucket": "go-prod-cmd",
+    "pos": "other",
+    "text": "Level:  risk.L2,"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 305,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "d.Level = risk.L2"
+   },
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 230,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "if d.Level != risk.L2 {"
+   },
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 231,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "d.Level = risk.L2"
+   },
+   {
+    "file": "internal/agent/approval/pending_read_test.go",
+    "line": 113,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "dA := readSideDecision(\"corr-a\", \"fs.write\", risk.L2, []risk.RuleID{risk.R2, risk.R3}, true, risk.ModeAskEveryStep)"
+   },
+   {
+    "file": "internal/agent/approval/pending_read_test.go",
+    "line": 115,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "dC := readSideDecision(\"corr-c\", \"net.fetch\", risk.L2, []risk.RuleID{risk.R7}, true, risk.ModeAutoApprove)"
+   },
+   {
+    "file": "internal/agent/approval/pending_read_test.go",
+    "line": 192,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "dLive := readSideDecision(\"corr-live\", \"fs.write\", risk.L2, []risk.RuleID{risk.R2}, false, risk.ModeAskHighRisk)"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 300,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "Level: risk.L2, RulesHit: fresh.RulesHit, Reason: fresh.Reason, Paths: fresh.Paths,"
+   },
+   {
+    "file": "internal/agent/approval/ticket146_liveapprovals_backing_test.go",
+    "line": 75,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "Level:                  risk.L2,"
+   },
+   {
+    "file": "internal/panel/approval_test.go",
+    "line": 93,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "Level:    risk.L2,"
+   },
+   {
+    "file": "internal/panel/pump_test.go",
+    "line": 42,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "Level:                  risk.L2,"
+   },
+   {
+    "file": "internal/panel/pump_test.go",
+    "line": 226,
+    "bucket": "go-test",
+    "pos": "return",
+    "text": "return []NativeVerdict{{CorrelationID: \"c\", Tool: \"fs.write\", Level: risk.L2}}"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 261,
+    "bucket": "go-test",
+    "pos": "return",
+    "text": "return risk.Decision{Level: risk.L2, RulesHit: rules}"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 277,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "{\"R8 \u4e0d\u53ef\u9006\", l2(risk.R8), risk.L2, risk.L2, risk.L2, false, false},"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 278,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "{\"R1 declared L2\", l2(risk.R1), risk.L2, risk.L2, risk.L2, false, false},"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 279,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "{\"R2 \u5de5\u4f5c\u533a\u5916\", l2(risk.R2), risk.L2, risk.L2, risk.L2, false, false},"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 280,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "{\"R3 \u654f\u611f\u8def\u5f84\", l2(risk.R3), risk.L2, risk.L2, risk.L2, false, false},"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 281,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "{\"R4 \u6c61\u67d3\", l2(risk.R4), risk.L2, risk.L2, risk.L2, false, false},"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 282,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "{\"R5 \u5916\u7f51\", l2(risk.R5), risk.L2, risk.L2, risk.L2, false, false},"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 283,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "{\"R9 fail-closed\", l2(risk.R9), risk.L2, risk.L2, risk.L2, false, false},"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 284,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "{\"R6 shell \u5143\u5b57\u7b26\", l2(risk.R6), risk.L2, risk.L2, risk.L0, false, true},"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 285,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "{\"R7 \u6279\u91cf\u89c4\u6a21\", l2(risk.R7), risk.L2, risk.L2, risk.L0, false, true},"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 304,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "if c.m == risk.ModeAskHighRisk && tc.d.Level == risk.L2 && got.Kept == \"\" {"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 315,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "Level: risk.L2, RulesHit: []risk.RuleID{risk.R6}, SessionOverrideBlocked: true,"
+   },
+   {
+    "file": "internal/perm/store_test.go",
+    "line": 318,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "if got := m.Screen(tainted); got.Level != risk.L2 || got.Silenced {"
+   },
+   {
+    "file": "internal/tools/bridge.go",
+    "line": 394,
+    "bucket": "go-prod-internal",
+    "pos": "case",
+    "text": "case risk.L2:"
+   },
+   {
+    "file": "internal/tools/bridge.go",
+    "line": 1027,
+    "bucket": "go-prod-internal",
+    "pos": "case",
+    "text": "case risk.L2, risk.Deny:"
+   },
+   {
+    "file": "internal/tools/bridge_junction_windows_test.go",
+    "line": 242,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "if d := g.approvalDecision(); d.Level != risk.L2 {"
+   },
+   {
+    "file": "internal/tools/bridge_junction_windows_test.go",
+    "line": 456,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "if d.Level != risk.L2 || !contains(d.RulesHit, risk.R2) || !contains(d.RulesHit, risk.R3) {"
+   },
+   {
+    "file": "internal/tools/bridge_junction_windows_test.go",
+    "line": 552,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "if d.Level != risk.L2 || !contains(d.RulesHit, risk.R2) {"
+   },
+   {
+    "file": "internal/tools/bridge_junction_windows_test.go",
+    "line": 576,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "if d.Level != risk.L2 || len(d.Paths) != 1 ||"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 556,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "entry(\"probe.irrev\", risk.L2, []Capability{CapFSWrite}, []Capability{CapFSWrite}))"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 576,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "entry(\"probe.irrev\", risk.L2, []Capability{CapFSWrite}, []Capability{CapFSWrite}))"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 591,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "entry(\"probe.irrev\", risk.L2, []Capability{CapFSWrite}, []Capability{CapFSWrite}))"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 634,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "if d.Level != risk.L2 || !contains(d.RulesHit, risk.R2) {"
+   },
+   {
+    "file": "internal/tools/fs_test.go",
+    "line": 79,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "if d.Level != risk.L2 {"
+   },
+   {
+    "file": "internal/tools/fs_test.go",
+    "line": 245,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "if del.Declared != risk.L2 {"
+   },
+   {
+    "file": "internal/tools/fs_write.go",
+    "line": 752,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "Declared:     risk.L2,"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 193,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "want: risk.L2, rules: []risk.RuleID{risk.R2}, route: \"approval\","
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 198,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "want: risk.L2, rules: []risk.RuleID{risk.R2}, route: \"approval\","
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 210,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "want: risk.L2, rules: []risk.RuleID{risk.R8}, route: \"approval\","
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 217,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "want: risk.L2, rules: []risk.RuleID{risk.R2}, route: \"approval\","
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 234,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "want: risk.L2, rules: []risk.RuleID{risk.R8}, route: \"approval\","
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 241,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "want: risk.L2, rules: []risk.RuleID{risk.R8}, route: \"approval\","
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 246,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "want: risk.L2, rules: []risk.RuleID{risk.R8}, route: \"approval\","
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 313,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "if got.Level != risk.L2 {"
+   },
+   {
+    "file": "internal/tools/fs_write_test.go",
+    "line": 345,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "if dec.Level != risk.L2 || !contains(dec.RulesHit, risk.R8) {"
+   },
+   {
+    "file": "internal/tools/gate.go",
+    "line": 63,
+    "bucket": "go-prod-internal",
+    "pos": "case",
+    "text": "case risk.L2, risk.Deny:"
+   },
+   {
+    "file": "internal/tools/paths_workspace_test.go",
+    "line": 69,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "if after.Level != risk.L2 {"
+   },
+   {
+    "file": "internal/tools/registry.go",
+    "line": 143,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "if e.Decl.Declared > risk.L2 {"
+   }
+  ],
+  "Prompt": [
+   {
+    "file": "cmd/wisp/run.go",
+    "line": 818,
+    "bucket": "go-prod-cmd",
+    "pos": "decl",
+    "text": "func (u *consoleApprovalUI) Prompt(_ context.Context, p approval.Prompt) error {"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 102,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "prompts  []approval.Prompt"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 105,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "prompted chan approval.Prompt"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 110,
+    "bucket": "go-test",
+    "pos": "return",
+    "text": "return &fakeUI{prompted: make(chan approval.Prompt, 16)}"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 119,
+    "bucket": "go-test",
+    "pos": "decl",
+    "text": "func (u *fakeUI) Prompt(_ context.Context, p approval.Prompt) error {"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 135,
+    "bucket": "go-test",
+    "pos": "decl",
+    "text": "func (u *fakeUI) wait(t *testing.T) approval.Prompt {"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 142,
+    "bucket": "go-test",
+    "pos": "return",
+    "text": "return approval.Prompt{}"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 146,
+    "bucket": "go-test",
+    "pos": "decl",
+    "text": "func (u *fakeUI) all() []approval.Prompt {"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 149,
+    "bucket": "go-test",
+    "pos": "return",
+    "text": "return append([]approval.Prompt(nil), u.prompts...)"
+   },
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 339,
+    "bucket": "go-test",
+    "pos": "decl",
+    "text": "func channelText(p approval.Prompt, ch approval.Channel) (approval.ChannelStatus, bool) {"
+   },
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 260,
+    "bucket": "go-prod-internal",
+    "pos": "call",
+    "text": "if err := g.ui.Prompt(ctx, p); err != nil {"
+   },
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 486,
+    "bucket": "go-prod-internal",
+    "pos": "call",
+    "text": "if err := g.ui.Prompt(ctx, p); err != nil {"
+   },
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 547,
+    "bucket": "go-prod-internal",
+    "pos": "decl",
+    "text": "func (g *Gate) promptFor(d tools.Decision, corr string, win, deadline time.Duration, bv *BatchView, grant string) Prompt"
+   },
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 548,
+    "bucket": "go-prod-internal",
+    "pos": "return",
+    "text": "return Prompt{"
+   },
+   {
+    "file": "internal/agent/approval/ticket87_veto_l2_test.go",
+    "line": 165,
+    "bucket": "go-test",
+    "pos": "decl",
+    "text": "var cards []approval.Prompt"
+   },
+   {
+    "file": "internal/agent/approval/ticket87_veto_l2_test.go",
+    "line": 236,
+    "bucket": "go-test",
+    "pos": "decl",
+    "text": "func channelAdvertised(p approval.Prompt, ch approval.Channel) bool {"
+   },
+   {
+    "file": "internal/agent/approval/ticket97_alias_direction_test.go",
+    "line": 45,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "p     approval.Prompt"
+   },
+   {
+    "file": "internal/agent/approval/ui.go",
+    "line": 27,
+    "bucket": "go-prod-internal",
+    "pos": "decl",
+    "text": "type Prompt struct {"
+   },
+   {
+    "file": "internal/agent/approval/ui.go",
+    "line": 85,
+    "bucket": "go-prod-internal",
+    "pos": "call",
+    "text": "Prompt(ctx context.Context, p Prompt) error"
+   },
+   {
+    "file": "internal/agent/approval/ui.go",
+    "line": 92,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "PromptFn func(context.Context, Prompt) error"
+   },
+   {
+    "file": "internal/agent/approval/ui.go",
+    "line": 97,
+    "bucket": "go-prod-internal",
+    "pos": "decl",
+    "text": "func (u UIFuncs) Prompt(ctx context.Context, p Prompt) error {"
+   },
+   {
+    "file": "internal/tools/wiring_test.go",
+    "line": 38,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "prompts []approval.Prompt"
+   },
+   {
+    "file": "internal/tools/wiring_test.go",
+    "line": 41,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "onPrompt func(approval.Prompt)"
+   },
+   {
+    "file": "internal/tools/wiring_test.go",
+    "line": 44,
+    "bucket": "go-test",
+    "pos": "decl",
+    "text": "func (u *uiSpy) Prompt(_ context.Context, p approval.Prompt) error {"
+   },
+   {
+    "file": "internal/tools/wiring_test.go",
+    "line": 62,
+    "bucket": "go-test",
+    "pos": "decl",
+    "text": "func (u *uiSpy) cards() []approval.Prompt {"
+   },
+   {
+    "file": "internal/tools/wiring_test.go",
+    "line": 65,
+    "bucket": "go-test",
+    "pos": "return",
+    "text": "return append([]approval.Prompt(nil), u.prompts...)"
+   },
+   {
+    "file": "internal/tools/wiring_test.go",
+    "line": 156,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "ui.onPrompt = func(p approval.Prompt) {"
+   },
+   {
+    "file": "internal/tools/wiring_test.go",
+    "line": 262,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "ui.onPrompt = func(p approval.Prompt) {"
+   }
+  ],
+  "PendingWindow": [
+   {
+    "file": "internal/agent/approval/fakes_test.go",
+    "line": 209,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "a, why := g.PendingWindow(ctx, d)"
+   },
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 218,
+    "bucket": "go-prod-internal",
+    "pos": "decl",
+    "text": "func (g *Gate) PendingWindow(ctx context.Context, d tools.Decision) (tools.Answer, string) {"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 169,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "a, why := g.PendingWindow(context.Background(), l1Decision(\"C:/data/a.txt\"))"
+   },
+   {
+    "file": "internal/agent/approval/window_test.go",
+    "line": 186,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "\"L1\": g.PendingWindow,"
+   },
+   {
+    "file": "internal/perm/ticket90_persist_test.go",
+    "line": 77,
+    "bucket": "go-test",
+    "pos": "decl",
+    "text": "func (g *t90gate) PendingWindow(context.Context, tools.Decision) (tools.Answer, string) {"
+   },
+   {
+    "file": "internal/tools/bridge.go",
+    "line": 380,
+    "bucket": "go-prod-internal",
+    "pos": "call",
+    "text": "a, why := b.gate.PendingWindow(ctx, *dec)"
+   },
+   {
+    "file": "internal/tools/bridge_test.go",
+    "line": 81,
+    "bucket": "go-test",
+    "pos": "decl",
+    "text": "func (g *gateSpy) PendingWindow(_ context.Context, d Decision) (Answer, string) {"
+   },
+   {
+    "file": "internal/tools/gate.go",
+    "line": 102,
+    "bucket": "go-prod-internal",
+    "pos": "call",
+    "text": "PendingWindow(ctx context.Context, d Decision) (Answer, string)"
+   },
+   {
+    "file": "internal/tools/gate.go",
+    "line": 116,
+    "bucket": "go-prod-internal",
+    "pos": "decl",
+    "text": "func (g GateFuncs) PendingWindow(ctx context.Context, d Decision) (Answer, string) {"
+   },
+   {
+    "file": "internal/tools/gate.go",
+    "line": 138,
+    "bucket": "go-prod-internal",
+    "pos": "decl",
+    "text": "func (NoGate) PendingWindow(context.Context, Decision) (Answer, string) {"
+   },
+   {
+    "file": "internal/tools/ticket90_test.go",
+    "line": 113,
+    "bucket": "go-test",
+    "pos": "decl",
+    "text": "func (g *t90Gate) PendingWindow(_ context.Context, d Decision) (Answer, string) {"
+   }
+  ],
+  "push": [
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 457,
+    "bucket": "go-prod-internal",
+    "pos": "call",
+    "text": "it, err := g.q.push(d)"
+   },
+   {
+    "file": "internal/agent/approval/pending_read_test.go",
+    "line": 47,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "it, err := q.push(d)"
+   },
+   {
+    "file": "internal/agent/approval/queue.go",
+    "line": 141,
+    "bucket": "go-prod-internal",
+    "pos": "decl",
+    "text": "func (q *Queue) push(d tools.Decision) (*qitem, error) {"
+   },
+   {
+    "file": "internal/audio/audio.go",
+    "line": 115,
+    "bucket": "go-prod-internal",
+    "pos": "decl",
+    "text": "func (m *meter) push(buf chan<- []byte, frame []byte) bool {"
+   },
+   {
+    "file": "internal/audio/wasapimic_windows.go",
+    "line": 231,
+    "bucket": "go-prod-internal",
+    "pos": "call",
+    "text": "m.meter.push(buf, encodeFrame(pending[:FrameSamples]))"
+   },
+   {
+    "file": "internal/audio/wavinjector.go",
+    "line": 129,
+    "bucket": "go-prod-internal",
+    "pos": "call",
+    "text": "w.meter.push(buf, encodeFrame(w.samples[off:min(off+FrameSamples, len(w.samples))]))"
+   }
+  ],
+  "DecideFromNative": [
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 610,
+    "bucket": "go-prod-internal",
+    "pos": "decl",
+    "text": "func (g *Gate) DecideFromNative(ctx context.Context, r Request) error {"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 171,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "if err := g.DecideFromNative(context.Background(), approval.Request{"
+   },
+   {
+    "file": "internal/agent/approval/ticket84_no_owner_test.go",
+    "line": 138,
+    "bucket": "go-test",
+    "pos": "return",
+    "text": "return g.DecideFromNative(ctx, approval.Request{CorrelationID: \"corr-never-queued\", Reason: \"r\"})"
+   },
+   {
+    "file": "internal/agent/approval/ticket84_no_owner_test.go",
+    "line": 141,
+    "bucket": "go-test",
+    "pos": "return",
+    "text": "return g.DecideFromNative(ctx, approval.Request{CorrelationID: \"corr-never-queued\", Allow: true, Grant: \"grant_00\"})"
+   },
+   {
+    "file": "internal/agent/approval/ticket97_alias_direction_test.go",
+    "line": 92,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "if err := g.DecideFromNative(context.Background(), approval.Request{"
+   },
+   {
+    "file": "internal/agent/approval/ticket97_alias_direction_test.go",
+    "line": 165,
+    "bucket": "go-test",
+    "pos": "return",
+    "text": "return g.DecideFromNative(context.Background(), approval.Request{"
+   }
+  ],
+  "DecideFromPanel": [
+   {
+    "file": "internal/agent/approval/gate.go",
+    "line": 622,
+    "bucket": "go-prod-internal",
+    "pos": "decl",
+    "text": "func (g *Gate) DecideFromPanel(ctx context.Context, r Request) error {"
+   },
+   {
+    "file": "internal/agent/approval/queue_test.go",
+    "line": 118,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "err := g.DecideFromPanel(context.Background(), tc.req)"
+   },
+   {
+    "file": "internal/agent/approval/ticket84_no_owner_test.go",
+    "line": 144,
+    "bucket": "go-test",
+    "pos": "return",
+    "text": "return g.DecideFromPanel(ctx, approval.Request{CorrelationID: \"corr-never-queued\", Reason: \"r\"})"
+   },
+   {
+    "file": "internal/agent/approval/ticket97_alias_direction_test.go",
+    "line": 97,
+    "bucket": "go-test",
+    "pos": "call",
+    "text": "if err := g.DecideFromPanel(context.Background(), approval.Request{"
+   },
+   {
+    "file": "internal/agent/approval/ticket97_alias_direction_test.go",
+    "line": 170,
+    "bucket": "go-test",
+    "pos": "return",
+    "text": "return g.DecideFromPanel(context.Background(), approval.Request{"
+   }
+  ],
+  "EvApprovalNeeded": [
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 186,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "{statemachine.EvApprovalNeeded, &statemachine.Facts{ApprovalLevel: 1}, statemachine.StateConfirming},"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 214,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "if _, err := m.Dispatch(statemachine.EvApprovalNeeded, &statemachine.Facts{ApprovalLevel: 1}); err != nil {"
+   },
+   {
+    "file": "internal/ball/interaction_live_test.go",
+    "line": 239,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "if _, err := m.Dispatch(statemachine.EvApprovalNeeded, &statemachine.Facts{ApprovalLevel: 1}); err != nil {"
+   },
+   {
+    "file": "internal/statemachine/events.go",
+    "line": 35,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "EvApprovalNeeded  Event = \"tools.approval-needed\"   // #17"
+   },
+   {
+    "file": "internal/statemachine/table.go",
+    "line": 118,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "D43: 17, From: StateActing, Event: EvApprovalNeeded, To: StateConfirming,"
+   },
+   {
+    "file": "internal/statemachine/table.go",
+    "line": 123,
+    "bucket": "go-prod-internal",
+    "pos": "other",
+    "text": "D43: 17, From: StateActing, Event: EvApprovalNeeded, To: StateAwaitingApproval,"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 129,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "name: \"#17 L1 approval needed\", from: StateActing, event: EvApprovalNeeded,"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 133,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "name: \"#17 L2 approval needed\", from: StateActing, event: EvApprovalNeeded,"
+   },
+   {
+    "file": "internal/statemachine/table_test.go",
+    "line": 341,
+    "bucket": "go-test",
+    "pos": "other",
+    "text": "EvApprovalNeeded, EvToolsCompleted, EvRepeatThreshold, EvPathConflict,"
+   }
+  ]
+ },
+ "summary": {
+  "risk.L1": {
+   "total": 42,
+   "prod": 9,
+   "test": 33,
+   "by": {
+    "go-prod-cmd/other": 1,
+    "go-prod-internal/other": 5,
+    "go-test/other": 33,
+    "go-prod-internal/case": 3
+   }
+  },
+  "risk.L2": {
+   "total": 50,
+   "prod": 8,
+   "test": 42,
+   "by": {
+    "go-prod-cmd/other": 1,
+    "go-test/other": 40,
+    "go-prod-internal/other": 4,
+    "go-test/return": 2,
+    "go-prod-internal/case": 3
+   }
+  },
+  "PendingWindow": {
+   "total": 11,
+   "prod": 5,
+   "test": 6,
+   "by": {
+    "go-test/call": 2,
+    "go-prod-internal/decl": 3,
+    "go-test/other": 1,
+    "go-test/decl": 3,
+    "go-prod-internal/call": 2
+   }
+  },
+  "PendingApproval": {
+   "total": 15,
+   "prod": 7,
+   "test": 8,
+   "by": {
+    "go-prod-cmd/call": 1,
+    "go-test/call": 4,
+    "go-prod-internal/call": 3,
+    "go-prod-internal/decl": 3,
+    "go-test/other": 1,
+    "go-test/decl": 3
+   }
+  },
+  "Prompt": {
+   "total": 28,
+   "prod": 9,
+   "test": 19,
+   "by": {
+    "go-prod-cmd/decl": 1,
+    "go-test/other": 7,
+    "go-test/return": 4,
+    "go-test/decl": 8,
+    "go-prod-internal/call": 3,
+    "go-prod-internal/decl": 3,
+    "go-prod-internal/return": 1,
+    "go-prod-internal/other": 1
+   }
+  },
+  "push": {
+   "total": 6,
+   "prod": 5,
+   "test": 1,
+   "by": {
+    "go-prod-internal/call": 3,
+    "go-test/call": 1,
+    "go-prod-internal/decl": 2
+   }
+  },
+  "EvApprovalNeeded": {
+   "total": 9,
+   "prod": 3,
+   "test": 6,
+   "by": {
+    "go-test/other": 6,
+    "go-prod-internal/other": 3
+   }
+  },
+  "StateAwaitingApproval": {
+   "total": 29,
+   "prod": 13,
+   "test": 16,
+   "by": {
+    "go-prod-cmd/other": 2,
+    "go-test/other": 16,
+    "go-prod-internal/case": 1,
+    "go-prod-internal/other": 10
+   }
+  },
+  "StateConfirming": {
+   "total": 34,
+   "prod": 16,
+   "test": 18,
+   "by": {
+    "go-prod-cmd/other": 5,
+    "go-prod-cmd/case": 1,
+    "go-prod-internal/case": 3,
+    "go-test/other": 18,
+    "go-prod-internal/assign": 1,
+    "go-prod-internal/other": 6
+   }
+  },
+  "DecideFromNative": {
+   "total": 6,
+   "prod": 1,
+   "test": 5,
+   "by": {
+    "go-prod-internal/decl": 1,
+    "go-test/call": 2,
+    "go-test/return": 3
+   }
+  },
+  "DecideFromPanel": {
+   "total": 5,
+   "prod": 1,
+   "test": 4,
+   "by": {
+    "go-prod-internal/decl": 1,
+    "go-test/call": 2,
+    "go-test/return": 2
+   }
+  },
+  "AdmitTextTask": {
+   "total": 35,
+   "prod": 3,
+   "test": 32,
+   "by": {
+    "go-test/call": 31,
+    "go-prod-cmd/call": 2,
+    "go-prod-internal/decl": 1,
+    "go-test/other": 1
+   }
+  }
+ }
+}

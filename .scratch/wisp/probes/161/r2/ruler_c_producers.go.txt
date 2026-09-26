@@ -1,0 +1,244 @@
+// 161-r2 RULER C -- "who can PRODUCE the ask verdict", by statement position.
+//
+// Third shape. Ruler A is text-position after a hand-rolled comment/string
+// strip. Ruler B is name-and-call-graph. Ruler C asks a different question of
+// the AST: for each production file, in which STATEMENT does an ask verdict
+// become a value that leaves the function or is stored -- return / assignment
+// / struct-literal field / switch-case / call-argument / comparison? Only the
+// first three can *produce* a verdict that a caller sees; a switch-case only
+// *consumes* one. Counting all five and separating them is the point: a ruler
+// that lumps them reports "the word appears N times" and calls that a census.
+//
+// Writes nothing. go run ruler_c_producers.go <repo-root>
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"os"
+	"path/filepath"
+	"sort"
+	"strings"
+)
+
+var skip = map[string]bool{".git": true, ".scratch": true, "node_modules": true,
+	"third_party": true, "build": true, "tmp-none": true, "models": true,
+	"vendor": true, ".gocache": true, "dist": true}
+
+// qualified name -> what it means
+var askVerdicts = map[string]string{
+	"risk.L1":                  "ask via L1 pre-execution window",
+	"risk.L2":                  "ask via L2 approval card",
+	"statemachine.EvApprovalNeeded": "ring the ball's approval doorbell",
+	"statemachine.StateAwaitingApproval": "park the ball on a human",
+}
+
+// unqualified names, only counted when the enclosing package declares them
+var askVerdictIdents = map[string]string{
+	"L1": "risk", "L2": "risk", "EvApprovalNeeded": "statemachine",
+	"StateAwaitingApproval": "statemachine",
+}
+
+type row struct {
+	File     string `json:"file"`
+	Line     int    `json:"line"`
+	Bucket   string `json:"bucket"`
+	Pkg      string `json:"pkg"`
+	Fn       string `json:"fn"`
+	Position string `json:"position"`
+	Name     string `json:"name"`
+	Text     string `json:"text"`
+}
+
+var rows []row
+
+func main() {
+	root := os.Args[1]
+	var files []string
+	filepath.Walk(root, func(p string, info os.FileInfo, err error) error {
+		if err != nil {
+			return nil
+		}
+		if info.IsDir() {
+			if skip[info.Name()] {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if strings.HasSuffix(p, ".go") {
+			files = append(files, p)
+		}
+		return nil
+	})
+
+	for _, p := range files {
+		fset := token.NewFileSet()
+		f, perr := parser.ParseFile(fset, p, nil, parser.ParseComments)
+		if perr != nil {
+			continue
+		}
+		rel, _ := filepath.Rel(root, p)
+		rel = filepath.ToSlash(rel)
+		pkg := f.Name.Name
+
+		// walk every statement, remembering the innermost function name and
+		// the statement position class of each verdict expression
+		ast.Inspect(f, func(n ast.Node) bool {
+			switch x := n.(type) {
+			case *ast.FuncDecl:
+				r := &scope{name: x.Name.Name}
+				scanBody(fset, rel, pkg, r, x.Body)
+				return false
+			}
+			return true
+		})
+	}
+
+	counts := map[string]map[string]int{}
+	for _, r := range rows {
+		if counts[r.Name] == nil {
+			counts[r.Name] = map[string]int{}
+		}
+		counts[r.Name][r.Position+"/"+r.Bucket]++
+	}
+	out := map[string]any{"go_files": len(files), "total_rows": len(rows),
+		"by_name_position_bucket": counts, "rows": rows}
+	b, _ := json.MarshalIndent(out, "", " ")
+	os.Stdout.Write(b)
+	fmt.Println()
+}
+
+type scope struct{ name string }
+
+func scanBody(fset *token.FileSet, rel, pkg string, sc *scope, body *ast.BlockStmt) {
+	if body == nil {
+		return
+	}
+	for _, st := range body.List {
+		scanStmt(fset, rel, pkg, sc, st)
+	}
+}
+
+func scanStmt(fset *token.FileSet, rel, pkg string, sc *scope, st ast.Stmt) {
+	pos := "other-stmt"
+	var inner ast.Node
+	switch x := st.(type) {
+	case *ast.ReturnStmt:
+		pos, inner = "return(produces)", x
+	case *ast.AssignStmt:
+		pos, inner = "assign(produces)", x
+		for _, r := range x.Rhs {
+			scanExpr(fset, rel, pkg, sc, pos, r)
+		}
+		return
+	case *ast.ExprStmt:
+		pos, inner = "exprstmt", x
+	case *ast.CaseClause:
+		pos, inner = "case(consumes)", x
+	case *ast.IfStmt:
+		pos, inner = "if(comparison)", x
+	case *ast.BlockStmt:
+		scanBody(fset, rel, pkg, sc, x)
+		return
+	case *ast.ForStmt:
+		scanBody(fset, rel, pkg, sc, x.Body)
+		return
+	case *ast.SwitchStmt:
+		if x.Tag != nil {
+			scanExpr(fset, rel, pkg, sc, "switch-tag", x.Tag)
+		}
+		for _, c := range x.Body.List {
+			scanStmt(fset, rel, pkg, sc, c)
+		}
+		return
+	}
+	if inner != nil {
+		ast.Inspect(inner, func(n ast.Node) bool {
+			if s, ok := n.(ast.Stmt); ok && n != inner {
+				scanStmt(fset, rel, pkg, sc, s)
+				if bs, ok2 := n.(*ast.BlockStmt); ok2 {
+					scanBody(fset, rel, pkg, sc, bs)
+				}
+				return false
+			}
+			if e, ok := n.(ast.Expr); ok {
+				scanExpr(fset, rel, pkg, sc, pos, e)
+			}
+			return true
+		})
+	}
+}
+
+func scanExpr(fset *token.FileSet, rel, pkg string, sc *scope, position string, e ast.Expr) {
+	ast.Inspect(e, func(n ast.Node) bool {
+		switch x := n.(type) {
+		case *ast.SelectorExpr:
+			full := render(x.X) + "." + x.Sel.Name
+			if meaning, want := askVerdicts[full]; want {
+				emit(fset, x.Pos(), rel, pkg, sc, position, full, meaning, render(x))
+			} else if hostPkg, ok := askVerdictIdents[x.Sel.Name]; ok && render(x.X) == hostPkg {
+				emit(fset, x.Pos(), rel, pkg, sc, position, x.Sel.Name, "same-pkg", render(x))
+			}
+		case *ast.Ident:
+			if hostPkg, ok := askVerdictIdents[x.Name]; ok && pkg == hostPkg {
+				emit(fset, x.Pos(), rel, pkg, sc, position, x.Name, "same-pkg", x.Name)
+			}
+		case *ast.KeyValueExpr:
+			if v, ok := x.Value.(*ast.Ident); ok {
+				if hostPkg, want := askVerdictIdents[v.Name]; want {
+					emit(fset, x.Pos(), rel, pkg, sc, "struct-literal-field(produces)",
+						v.Name, hostPkg, render(x.Key)+"="+v.Name)
+				}
+			}
+		}
+		return true
+	})
+}
+
+func emit(fset *token.FileSet, posn token.Pos, rel, pkg string, sc *scope,
+	position, name, meaning, text string) {
+	rows = append(rows, row{File: rel, Line: fset.Position(posn).Line,
+		Bucket: bucket(rel), Pkg: pkg, Fn: sc.name,
+		Position: position, Name: name, Text: text})
+}
+
+func bucket(rel string) string {
+	switch {
+	case strings.HasSuffix(rel, "_test.go"):
+		return "TEST"
+	case strings.HasPrefix(rel, "cmd/balldebug/"):
+		return "CMD-DEBUGGUI"
+	case strings.HasPrefix(rel, "cmd/"):
+		return "CMD"
+	case strings.HasPrefix(rel, "internal/panel/"):
+		return "PANEL"
+	case strings.HasPrefix(rel, "internal/"):
+		return "INTERNAL"
+	case strings.HasPrefix(rel, "tools/"):
+		return "TOOLING"
+	}
+	return "OTHER"
+}
+
+func render(e ast.Expr) string {
+	switch x := e.(type) {
+	case *ast.Ident:
+		return x.Name
+	case *ast.SelectorExpr:
+		return render(x.X) + "." + x.Sel.Name
+	case *ast.StarExpr:
+		return "*" + render(x.X)
+	case *ast.BasicLit:
+		return x.Value
+	case *ast.CallExpr:
+		return render(x.Fun) + "(...)"
+	case *ast.IndexExpr:
+		return render(x.X)
+	}
+	return "?"
+}
+
+var _ = sort.Strings

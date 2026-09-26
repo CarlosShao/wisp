@@ -1,0 +1,4274 @@
+{
+ "by_name_position_bucket": {
+  "EvApprovalNeeded": {
+   "assign(produces)/TEST": 1
+  },
+  "L1": {
+   "assign(produces)/TEST": 5,
+   "case(consumes)/INTERNAL": 1,
+   "if(comparison)/INTERNAL": 5,
+   "if(comparison)/TEST": 3,
+   "return(produces)/INTERNAL": 8,
+   "struct-literal-field(produces)/INTERNAL": 6,
+   "struct-literal-field(produces)/TEST": 3
+  },
+  "L2": {
+   "assign(produces)/TEST": 28,
+   "case(consumes)/INTERNAL": 1,
+   "exprstmt/INTERNAL": 16,
+   "if(comparison)/INTERNAL": 3,
+   "if(comparison)/TEST": 43,
+   "return(produces)/INTERNAL": 52,
+   "struct-literal-field(produces)/INTERNAL": 38,
+   "struct-literal-field(produces)/TEST": 9
+  },
+  "StateAwaitingApproval": {
+   "assign(produces)/TEST": 2,
+   "case(consumes)/INTERNAL": 1,
+   "return(produces)/INTERNAL": 5,
+   "struct-literal-field(produces)/INTERNAL": 4
+  },
+  "risk.L1": {
+   "assign(produces)/CMD": 2,
+   "assign(produces)/TEST": 30,
+   "case(consumes)/INTERNAL": 3,
+   "exprstmt/TEST": 6,
+   "if(comparison)/INTERNAL": 7,
+   "if(comparison)/TEST": 12,
+   "return(produces)/INTERNAL": 9,
+   "return(produces)/TEST": 7
+  },
+  "risk.L2": {
+   "assign(produces)/CMD": 1,
+   "assign(produces)/INTERNAL": 4,
+   "assign(produces)/TEST": 48,
+   "case(consumes)/INTERNAL": 3,
+   "exprstmt/TEST": 8,
+   "if(comparison)/INTERNAL": 6,
+   "if(comparison)/TEST": 28,
+   "return(produces)/INTERNAL": 3,
+   "return(produces)/TEST": 3
+  },
+  "statemachine.EvApprovalNeeded": {
+   "assign(produces)/TEST": 3
+  },
+  "statemachine.StateAwaitingApproval": {
+   "assign(produces)/TEST": 3,
+   "case(consumes)/INTERNAL": 1
+  }
+ },
+ "go_files": 462,
+ "rows": [
+  {
+   "file": "cmd/wisp/panel_assets.go",
+   "line": 74,
+   "bucket": "CMD",
+   "pkg": "main",
+   "fn": "cmdPanelAssets",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "cmd/wisp/panel_assets.go",
+   "line": 74,
+   "bucket": "CMD",
+   "pkg": "main",
+   "fn": "cmdPanelAssets",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "cmd/wisp/run.go",
+   "line": 482,
+   "bucket": "CMD",
+   "pkg": "main",
+   "fn": "confirmModeSwitch",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/agent/approval/batch.go",
+   "line": 36,
+   "bucket": "INTERNAL",
+   "pkg": "approval",
+   "fn": "Aggregate",
+   "position": "if(comparison)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/agent/approval/batch.go",
+   "line": 36,
+   "bucket": "INTERNAL",
+   "pkg": "approval",
+   "fn": "Aggregate",
+   "position": "if(comparison)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/agent/approval/batch.go",
+   "line": 36,
+   "bucket": "INTERNAL",
+   "pkg": "approval",
+   "fn": "Aggregate",
+   "position": "if(comparison)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/agent/approval/batch.go",
+   "line": 36,
+   "bucket": "INTERNAL",
+   "pkg": "approval",
+   "fn": "Aggregate",
+   "position": "if(comparison)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/agent/approval/batch_test.go",
+   "line": 147,
+   "bucket": "TEST",
+   "pkg": "approval_test",
+   "fn": "TestTenOpsInOneToolCallGetOneConfirm",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/agent/approval/fakes_test.go",
+   "line": 293,
+   "bucket": "TEST",
+   "pkg": "approval_test",
+   "fn": "l1Decision",
+   "position": "return(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/agent/approval/fakes_test.go",
+   "line": 293,
+   "bucket": "TEST",
+   "pkg": "approval_test",
+   "fn": "l1Decision",
+   "position": "return(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/agent/approval/fakes_test.go",
+   "line": 293,
+   "bucket": "TEST",
+   "pkg": "approval_test",
+   "fn": "l1Decision",
+   "position": "return(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/agent/approval/fakes_test.go",
+   "line": 305,
+   "bucket": "TEST",
+   "pkg": "approval_test",
+   "fn": "l2Decision",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/agent/approval/gate.go",
+   "line": 230,
+   "bucket": "INTERNAL",
+   "pkg": "approval",
+   "fn": "PendingWindow",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/agent/approval/gate.go",
+   "line": 230,
+   "bucket": "INTERNAL",
+   "pkg": "approval",
+   "fn": "PendingWindow",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/agent/approval/gate.go",
+   "line": 231,
+   "bucket": "INTERNAL",
+   "pkg": "approval",
+   "fn": "PendingWindow",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/agent/approval/gate.go",
+   "line": 231,
+   "bucket": "INTERNAL",
+   "pkg": "approval",
+   "fn": "PendingWindow",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/agent/approval/gate.go",
+   "line": 230,
+   "bucket": "INTERNAL",
+   "pkg": "approval",
+   "fn": "PendingWindow",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/agent/approval/gate.go",
+   "line": 230,
+   "bucket": "INTERNAL",
+   "pkg": "approval",
+   "fn": "PendingWindow",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/agent/approval/gate.go",
+   "line": 231,
+   "bucket": "INTERNAL",
+   "pkg": "approval",
+   "fn": "PendingWindow",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/agent/approval/gate.go",
+   "line": 231,
+   "bucket": "INTERNAL",
+   "pkg": "approval",
+   "fn": "PendingWindow",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/agent/approval/pending_read_test.go",
+   "line": 113,
+   "bucket": "TEST",
+   "pkg": "approval",
+   "fn": "TestLiveApprovalsReportsPendingRowsAndDoesNotConsumeThem",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/agent/approval/pending_read_test.go",
+   "line": 114,
+   "bucket": "TEST",
+   "pkg": "approval",
+   "fn": "TestLiveApprovalsReportsPendingRowsAndDoesNotConsumeThem",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/agent/approval/pending_read_test.go",
+   "line": 115,
+   "bucket": "TEST",
+   "pkg": "approval",
+   "fn": "TestLiveApprovalsReportsPendingRowsAndDoesNotConsumeThem",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/agent/approval/pending_read_test.go",
+   "line": 192,
+   "bucket": "TEST",
+   "pkg": "approval",
+   "fn": "TestLiveApprovalsSkipsRowsThatAreNotPending",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/agent/approval/queue_test.go",
+   "line": 29,
+   "bucket": "TEST",
+   "pkg": "approval_test",
+   "fn": "TestL2NativeAllowExecutesThroughTheBridge",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/agent/approval/queue_test.go",
+   "line": 200,
+   "bucket": "TEST",
+   "pkg": "approval_test",
+   "fn": "TestL2QueueAutoRejectsAt300sKeepsTaskAliveAndWarnsAt270s",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/agent/approval/queue_test.go",
+   "line": 300,
+   "bucket": "TEST",
+   "pkg": "approval_test",
+   "fn": "TestReplayRedisplaysUnderAFreshGrant",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/agent/approval/ticket146_liveapprovals_backing_test.go",
+   "line": 75,
+   "bucket": "TEST",
+   "pkg": "approval",
+   "fn": "sharedDecision",
+   "position": "return(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/agent/approval/ticket146_liveapprovals_backing_test.go",
+   "line": 75,
+   "bucket": "TEST",
+   "pkg": "approval",
+   "fn": "sharedDecision",
+   "position": "return(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/agent/approval/ticket146_liveapprovals_backing_test.go",
+   "line": 75,
+   "bucket": "TEST",
+   "pkg": "approval",
+   "fn": "sharedDecision",
+   "position": "return(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/agent/approval/window_test.go",
+   "line": 269,
+   "bucket": "TEST",
+   "pkg": "approval_test",
+   "fn": "TestVetoTravelsBackToTheLoopAsAFailure",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/ball/interaction_live_test.go",
+   "line": 186,
+   "bucket": "TEST",
+   "pkg": "ball",
+   "fn": "TestLiveConfirmingCancelAndEscReturned",
+   "position": "assign(produces)",
+   "name": "statemachine.EvApprovalNeeded",
+   "text": "statemachine.EvApprovalNeeded"
+  },
+  {
+   "file": "internal/ball/interaction_live_test.go",
+   "line": 214,
+   "bucket": "TEST",
+   "pkg": "ball",
+   "fn": "TestLiveConfirmingCancelAndEscReturned",
+   "position": "assign(produces)",
+   "name": "statemachine.EvApprovalNeeded",
+   "text": "statemachine.EvApprovalNeeded"
+  },
+  {
+   "file": "internal/ball/interaction_live_test.go",
+   "line": 239,
+   "bucket": "TEST",
+   "pkg": "ball",
+   "fn": "TestLiveConfirmingCancelAndEscReturned",
+   "position": "assign(produces)",
+   "name": "statemachine.EvApprovalNeeded",
+   "text": "statemachine.EvApprovalNeeded"
+  },
+  {
+   "file": "internal/ball/statevisual.go",
+   "line": 181,
+   "bucket": "INTERNAL",
+   "pkg": "ball",
+   "fn": "VisualFor",
+   "position": "case(consumes)",
+   "name": "statemachine.StateAwaitingApproval",
+   "text": "statemachine.StateAwaitingApproval"
+  },
+  {
+   "file": "internal/ball/tokens_test.go",
+   "line": 125,
+   "bucket": "TEST",
+   "pkg": "ball",
+   "fn": "TestVisualForCoversAllTwentyStates",
+   "position": "assign(produces)",
+   "name": "statemachine.StateAwaitingApproval",
+   "text": "statemachine.StateAwaitingApproval"
+  },
+  {
+   "file": "internal/ball/tokens_test.go",
+   "line": 300,
+   "bucket": "TEST",
+   "pkg": "ball",
+   "fn": "TestAnimatedWhitelist",
+   "position": "assign(produces)",
+   "name": "statemachine.StateAwaitingApproval",
+   "text": "statemachine.StateAwaitingApproval"
+  },
+  {
+   "file": "internal/ball/tokens_test.go",
+   "line": 322,
+   "bucket": "TEST",
+   "pkg": "ball",
+   "fn": "TestAnimationPolicyZeroTimerInSleeping",
+   "position": "assign(produces)",
+   "name": "statemachine.StateAwaitingApproval",
+   "text": "statemachine.StateAwaitingApproval"
+  },
+  {
+   "file": "internal/panel/approval_test.go",
+   "line": 47,
+   "bucket": "TEST",
+   "pkg": "panel",
+   "fn": "TestApprovalCardViewFromRealAssessor",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/panel/approval_test.go",
+   "line": 93,
+   "bucket": "TEST",
+   "pkg": "panel",
+   "fn": "TestApprovalCardViewMarksMissingReason",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/panel/approval_test.go",
+   "line": 145,
+   "bucket": "TEST",
+   "pkg": "panel",
+   "fn": "TestPanelSnapshotSurvivesWebviewRestart",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/panel/pump_test.go",
+   "line": 42,
+   "bucket": "TEST",
+   "pkg": "panel",
+   "fn": "TestThePumpBuildsThePacketFromWhatTheHostHolds",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/panel/pump_test.go",
+   "line": 226,
+   "bucket": "TEST",
+   "pkg": "panel",
+   "fn": "TestPublishWithoutAnExitReportsInsteadOfPretending",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 261,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 274,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 275,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 277,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 277,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 277,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 278,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 278,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 278,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 279,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 279,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 279,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 280,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 280,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 280,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 281,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 281,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 281,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 282,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 282,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 282,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 283,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 283,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 283,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 284,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 284,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 285,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 285,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90ScreenTable",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 315,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90TaintFlagAndDenyAreNeverSilenced",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 342,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90TaintFlagAndDenyAreNeverSilenced",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 342,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90TaintFlagAndDenyAreNeverSilenced",
+   "position": "if(comparison)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 342,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90TaintFlagAndDenyAreNeverSilenced",
+   "position": "if(comparison)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/perm/store_test.go",
+   "line": 342,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "TestTicket90TaintFlagAndDenyAreNeverSilenced",
+   "position": "if(comparison)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/perm/ticket90_persist_test.go",
+   "line": 114,
+   "bucket": "TEST",
+   "pkg": "perm",
+   "fn": "askOnce",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/risk/assessor.go",
+   "line": 58,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "String",
+   "position": "case(consumes)",
+   "name": "L1",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/assessor.go",
+   "line": 60,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "String",
+   "position": "case(consumes)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 16,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestR9PanicInSubAssessorFailsClosed",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 16,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestR9PanicInSubAssessorFailsClosed",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 31,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestR9PanicInWiredDependencyFailsClosed",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 31,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestR9PanicInWiredDependencyFailsClosed",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 31,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestR9PanicInWiredDependencyFailsClosed",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 31,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestR9PanicInWiredDependencyFailsClosed",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 43,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestFusionTakesMaxSeverity",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 43,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestFusionTakesMaxSeverity",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 43,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestFusionTakesMaxSeverity",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 43,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestFusionTakesMaxSeverity",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 49,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestFusionTakesMaxSeverity",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "Declared=L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 49,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestFusionTakesMaxSeverity",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 52,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestFusionTakesMaxSeverity",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 52,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestFusionTakesMaxSeverity",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 52,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestFusionTakesMaxSeverity",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 57,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestFusionTakesMaxSeverity",
+   "position": "struct-literal-field(produces)",
+   "name": "L1",
+   "text": "Declared=L1"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 57,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestFusionTakesMaxSeverity",
+   "position": "assign(produces)",
+   "name": "L1",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 58,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestFusionTakesMaxSeverity",
+   "position": "if(comparison)",
+   "name": "L1",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 58,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestFusionTakesMaxSeverity",
+   "position": "if(comparison)",
+   "name": "L1",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 58,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestFusionTakesMaxSeverity",
+   "position": "if(comparison)",
+   "name": "L1",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 84,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestFusionR4BlocksSessionOverride",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 84,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestFusionR4BlocksSessionOverride",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 84,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestFusionR4BlocksSessionOverride",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 123,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestDecisionGoldenSnapshots",
+   "position": "struct-literal-field(produces)",
+   "name": "L1",
+   "text": "Declared=L1"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 123,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestDecisionGoldenSnapshots",
+   "position": "assign(produces)",
+   "name": "L1",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 124,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestDecisionGoldenSnapshots",
+   "position": "struct-literal-field(produces)",
+   "name": "L1",
+   "text": "Level=L1"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 124,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestDecisionGoldenSnapshots",
+   "position": "assign(produces)",
+   "name": "L1",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 130,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestDecisionGoldenSnapshots",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "Level=L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 130,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestDecisionGoldenSnapshots",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 136,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestDecisionGoldenSnapshots",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "Level=L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 136,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestDecisionGoldenSnapshots",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 148,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestDecisionGoldenSnapshots",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "Level=L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 148,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestDecisionGoldenSnapshots",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 154,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestDecisionGoldenSnapshots",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "Level=L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 154,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestDecisionGoldenSnapshots",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 160,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestDecisionGoldenSnapshots",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "Level=L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 160,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestDecisionGoldenSnapshots",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 166,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestDecisionGoldenSnapshots",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "Level=L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 166,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestDecisionGoldenSnapshots",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 172,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestDecisionGoldenSnapshots",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "Level=L2"
+  },
+  {
+   "file": "internal/risk/assessor_test.go",
+   "line": 172,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestDecisionGoldenSnapshots",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 163,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "if(comparison)",
+   "name": "L1",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 163,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 163,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "if(comparison)",
+   "name": "L1",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 163,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "if(comparison)",
+   "name": "L1",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 163,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 163,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 174,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "if(comparison)",
+   "name": "L1",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 174,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "if(comparison)",
+   "name": "L1",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 180,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "Level=L2"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 180,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 180,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "Level=L2"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 180,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 180,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 180,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "Level=L2"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 180,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 180,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "Level=L2"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 180,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 180,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 186,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "Level=L2"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 186,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 186,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "Level=L2"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 186,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 186,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 186,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "Level=L2"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 186,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 186,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "Level=L2"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 186,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/mode.go",
+   "line": 186,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "Screen",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/provenance_test.go",
+   "line": 235,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestR4EndToEndViaAssessor",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/provenance_test.go",
+   "line": 235,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestR4EndToEndViaAssessor",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_gateway.go",
+   "line": 14,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleDeclared",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_gateway.go",
+   "line": 14,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleDeclared",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_gateway.go",
+   "line": 14,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleDeclared",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_gateway.go",
+   "line": 14,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleDeclared",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_gateway.go",
+   "line": 14,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleDeclared",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_gateway.go",
+   "line": 14,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleDeclared",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_gateway.go",
+   "line": 14,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleDeclared",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_gateway.go",
+   "line": 14,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleDeclared",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_gateway.go",
+   "line": 14,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleDeclared",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_gateway.go",
+   "line": 14,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleDeclared",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_gateway.go",
+   "line": 14,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleDeclared",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_gateway.go",
+   "line": 14,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleDeclared",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_gateway.go",
+   "line": 14,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleDeclared",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_gateway.go",
+   "line": 14,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleDeclared",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_gateway.go",
+   "line": 111,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleTaint",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_gateway.go",
+   "line": 111,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleTaint",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_gateway.go",
+   "line": 111,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleTaint",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_gateway.go",
+   "line": 111,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleTaint",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_gateway.go",
+   "line": 111,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleTaint",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_gateway.go",
+   "line": 111,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleTaint",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_gateway.go",
+   "line": 111,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleTaint",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_irreversible.go",
+   "line": 45,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleIrreversible",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_irreversible.go",
+   "line": 45,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleIrreversible",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_irreversible.go",
+   "line": 45,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleIrreversible",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_irreversible.go",
+   "line": 45,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleIrreversible",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_irreversible.go",
+   "line": 45,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleIrreversible",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_irreversible.go",
+   "line": 45,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleIrreversible",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_irreversible.go",
+   "line": 45,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleIrreversible",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_network.go",
+   "line": 66,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleNetwork",
+   "position": "exprstmt",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_network.go",
+   "line": 66,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleNetwork",
+   "position": "exprstmt",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_network.go",
+   "line": 66,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleNetwork",
+   "position": "exprstmt",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_network.go",
+   "line": 66,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleNetwork",
+   "position": "exprstmt",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_network.go",
+   "line": 70,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleNetwork",
+   "position": "exprstmt",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_network.go",
+   "line": 70,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleNetwork",
+   "position": "exprstmt",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_network.go",
+   "line": 72,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleNetwork",
+   "position": "exprstmt",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_network.go",
+   "line": 72,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleNetwork",
+   "position": "exprstmt",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_network.go",
+   "line": 75,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleNetwork",
+   "position": "exprstmt",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_network.go",
+   "line": 75,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleNetwork",
+   "position": "exprstmt",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_network.go",
+   "line": 75,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleNetwork",
+   "position": "exprstmt",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_network.go",
+   "line": 75,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleNetwork",
+   "position": "exprstmt",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_network.go",
+   "line": 78,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleNetwork",
+   "position": "exprstmt",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_network.go",
+   "line": 78,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleNetwork",
+   "position": "exprstmt",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_network.go",
+   "line": 78,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleNetwork",
+   "position": "exprstmt",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_network.go",
+   "line": 78,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleNetwork",
+   "position": "exprstmt",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_scale.go",
+   "line": 23,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleBatchScale",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_scale.go",
+   "line": 23,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleBatchScale",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_scale.go",
+   "line": 23,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleBatchScale",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_scale.go",
+   "line": 23,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleBatchScale",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_scale.go",
+   "line": 23,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleBatchScale",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_scale.go",
+   "line": 23,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleBatchScale",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_scale.go",
+   "line": 23,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleBatchScale",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 27,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 27,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 27,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 27,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 27,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 27,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 27,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 27,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 27,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 27,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 27,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 27,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 27,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 27,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 37,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 37,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 37,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 37,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 37,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 37,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 37,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 37,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 37,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 37,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 37,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 37,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 37,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 37,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 44,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "struct-literal-field(produces)",
+   "name": "L1",
+   "text": "level=L1"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 44,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L1",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 44,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "struct-literal-field(produces)",
+   "name": "L1",
+   "text": "level=L1"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 44,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L1",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 44,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "struct-literal-field(produces)",
+   "name": "L1",
+   "text": "level=L1"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 44,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L1",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 44,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L1",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 44,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "struct-literal-field(produces)",
+   "name": "L1",
+   "text": "level=L1"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 44,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L1",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 44,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "struct-literal-field(produces)",
+   "name": "L1",
+   "text": "level=L1"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 44,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L1",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 44,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "struct-literal-field(produces)",
+   "name": "L1",
+   "text": "level=L1"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 44,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L1",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 44,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L1",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 50,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 50,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 50,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 50,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 50,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "level=L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 50,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_shell.go",
+   "line": 50,
+   "bucket": "INTERNAL",
+   "pkg": "risk",
+   "fn": "ruleShell",
+   "position": "return(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 58,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleDeclaredR1",
+   "position": "struct-literal-field(produces)",
+   "name": "L2",
+   "text": "Declared=L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 58,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleDeclaredR1",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 59,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleDeclaredR1",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 59,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleDeclaredR1",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 59,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleDeclaredR1",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 59,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleDeclaredR1",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 69,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleDeclaredR1",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 69,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleDeclaredR1",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 69,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleDeclaredR1",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 69,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleDeclaredR1",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 78,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRulePathAllowlistR2",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 78,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRulePathAllowlistR2",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 78,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRulePathAllowlistR2",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 78,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRulePathAllowlistR2",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 89,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRulePathAllowlistR2",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 89,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRulePathAllowlistR2",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 89,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRulePathAllowlistR2",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 89,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRulePathAllowlistR2",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 122,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleSensitivePathR3",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 122,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleSensitivePathR3",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 122,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleSensitivePathR3",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 122,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleSensitivePathR3",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 133,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleTaintR4",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 133,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleTaintR4",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 133,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleTaintR4",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 133,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleTaintR4",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 133,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleTaintR4",
+   "position": "if(comparison)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 159,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleNetworkR5",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 160,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleNetworkR5",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 161,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleNetworkR5",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 162,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleNetworkR5",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 163,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleNetworkR5",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 164,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleNetworkR5",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 165,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleNetworkR5",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 195,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleShellR6",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 196,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleShellR6",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 197,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleShellR6",
+   "position": "assign(produces)",
+   "name": "L1",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 198,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleShellR6",
+   "position": "assign(produces)",
+   "name": "L1",
+   "text": "L1"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 199,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleShellR6",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 200,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleShellR6",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 223,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleBatchScaleR7",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 225,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleBatchScaleR7",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 226,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleBatchScaleR7",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 248,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleIrreversibleR8",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 249,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleIrreversibleR8",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 251,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleIrreversibleR8",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 252,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleIrreversibleR8",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/risk/rules_test.go",
+   "line": 253,
+   "bucket": "TEST",
+   "pkg": "risk",
+   "fn": "TestRuleIrreversibleR8",
+   "position": "assign(produces)",
+   "name": "L2",
+   "text": "L2"
+  },
+  {
+   "file": "internal/statemachine/machine_test.go",
+   "line": 24,
+   "bucket": "TEST",
+   "pkg": "statemachine",
+   "fn": "TestPerStateTimeoutsTableDriven",
+   "position": "assign(produces)",
+   "name": "StateAwaitingApproval",
+   "text": "StateAwaitingApproval"
+  },
+  {
+   "file": "internal/statemachine/states.go",
+   "line": 43,
+   "bucket": "INTERNAL",
+   "pkg": "statemachine",
+   "fn": "Valid",
+   "position": "case(consumes)",
+   "name": "StateAwaitingApproval",
+   "text": "StateAwaitingApproval"
+  },
+  {
+   "file": "internal/statemachine/table_test.go",
+   "line": 328,
+   "bucket": "TEST",
+   "pkg": "statemachine",
+   "fn": "TestIllegalTransitionsRejected",
+   "position": "assign(produces)",
+   "name": "StateAwaitingApproval",
+   "text": "StateAwaitingApproval"
+  },
+  {
+   "file": "internal/statemachine/table_test.go",
+   "line": 341,
+   "bucket": "TEST",
+   "pkg": "statemachine",
+   "fn": "TestIllegalTransitionsRejected",
+   "position": "assign(produces)",
+   "name": "EvApprovalNeeded",
+   "text": "EvApprovalNeeded"
+  },
+  {
+   "file": "internal/statemachine/timeouts.go",
+   "line": 51,
+   "bucket": "INTERNAL",
+   "pkg": "statemachine",
+   "fn": "DefaultTimeouts",
+   "position": "struct-literal-field(produces)",
+   "name": "StateAwaitingApproval",
+   "text": "state=StateAwaitingApproval"
+  },
+  {
+   "file": "internal/statemachine/timeouts.go",
+   "line": 51,
+   "bucket": "INTERNAL",
+   "pkg": "statemachine",
+   "fn": "DefaultTimeouts",
+   "position": "return(produces)",
+   "name": "StateAwaitingApproval",
+   "text": "StateAwaitingApproval"
+  },
+  {
+   "file": "internal/statemachine/timeouts.go",
+   "line": 51,
+   "bucket": "INTERNAL",
+   "pkg": "statemachine",
+   "fn": "DefaultTimeouts",
+   "position": "struct-literal-field(produces)",
+   "name": "StateAwaitingApproval",
+   "text": "state=StateAwaitingApproval"
+  },
+  {
+   "file": "internal/statemachine/timeouts.go",
+   "line": 51,
+   "bucket": "INTERNAL",
+   "pkg": "statemachine",
+   "fn": "DefaultTimeouts",
+   "position": "return(produces)",
+   "name": "StateAwaitingApproval",
+   "text": "StateAwaitingApproval"
+  },
+  {
+   "file": "internal/statemachine/timeouts.go",
+   "line": 51,
+   "bucket": "INTERNAL",
+   "pkg": "statemachine",
+   "fn": "DefaultTimeouts",
+   "position": "struct-literal-field(produces)",
+   "name": "StateAwaitingApproval",
+   "text": "state=StateAwaitingApproval"
+  },
+  {
+   "file": "internal/statemachine/timeouts.go",
+   "line": 51,
+   "bucket": "INTERNAL",
+   "pkg": "statemachine",
+   "fn": "DefaultTimeouts",
+   "position": "return(produces)",
+   "name": "StateAwaitingApproval",
+   "text": "StateAwaitingApproval"
+  },
+  {
+   "file": "internal/statemachine/timeouts.go",
+   "line": 51,
+   "bucket": "INTERNAL",
+   "pkg": "statemachine",
+   "fn": "DefaultTimeouts",
+   "position": "struct-literal-field(produces)",
+   "name": "StateAwaitingApproval",
+   "text": "state=StateAwaitingApproval"
+  },
+  {
+   "file": "internal/statemachine/timeouts.go",
+   "line": 51,
+   "bucket": "INTERNAL",
+   "pkg": "statemachine",
+   "fn": "DefaultTimeouts",
+   "position": "return(produces)",
+   "name": "StateAwaitingApproval",
+   "text": "StateAwaitingApproval"
+  },
+  {
+   "file": "internal/statemachine/timeouts.go",
+   "line": 51,
+   "bucket": "INTERNAL",
+   "pkg": "statemachine",
+   "fn": "DefaultTimeouts",
+   "position": "return(produces)",
+   "name": "StateAwaitingApproval",
+   "text": "StateAwaitingApproval"
+  },
+  {
+   "file": "internal/tools/bridge.go",
+   "line": 290,
+   "bucket": "INTERNAL",
+   "pkg": "tools",
+   "fn": "Execute",
+   "position": "if(comparison)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/bridge.go",
+   "line": 290,
+   "bucket": "INTERNAL",
+   "pkg": "tools",
+   "fn": "Execute",
+   "position": "if(comparison)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/bridge.go",
+   "line": 290,
+   "bucket": "INTERNAL",
+   "pkg": "tools",
+   "fn": "Execute",
+   "position": "if(comparison)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/bridge.go",
+   "line": 379,
+   "bucket": "INTERNAL",
+   "pkg": "tools",
+   "fn": "route",
+   "position": "case(consumes)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/bridge.go",
+   "line": 394,
+   "bucket": "INTERNAL",
+   "pkg": "tools",
+   "fn": "route",
+   "position": "case(consumes)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge.go",
+   "line": 1025,
+   "bucket": "INTERNAL",
+   "pkg": "tools",
+   "fn": "levelString",
+   "position": "case(consumes)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/bridge.go",
+   "line": 1027,
+   "bucket": "INTERNAL",
+   "pkg": "tools",
+   "fn": "levelString",
+   "position": "case(consumes)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_junction_windows_test.go",
+   "line": 242,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "assertJunctionRefused",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_junction_windows_test.go",
+   "line": 242,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "assertJunctionRefused",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_junction_windows_test.go",
+   "line": 456,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestJunctionInsideAnAllowedRootCannotReachAnAListFile",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_junction_windows_test.go",
+   "line": 456,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestJunctionInsideAnAllowedRootCannotReachAnAListFile",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_junction_windows_test.go",
+   "line": 456,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestJunctionInsideAnAllowedRootCannotReachAnAListFile",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_junction_windows_test.go",
+   "line": 456,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestJunctionInsideAnAllowedRootCannotReachAnAListFile",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_junction_windows_test.go",
+   "line": 576,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestShortNameSpellingGetsTheSameVerdictAsTheLongOne",
+   "position": "exprstmt",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_junction_windows_test.go",
+   "line": 576,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestShortNameSpellingGetsTheSameVerdictAsTheLongOne",
+   "position": "exprstmt",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_junction_windows_test.go",
+   "line": 576,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestShortNameSpellingGetsTheSameVerdictAsTheLongOne",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_junction_windows_test.go",
+   "line": 576,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestShortNameSpellingGetsTheSameVerdictAsTheLongOne",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_junction_windows_test.go",
+   "line": 576,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestShortNameSpellingGetsTheSameVerdictAsTheLongOne",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_junction_windows_test.go",
+   "line": 576,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestShortNameSpellingGetsTheSameVerdictAsTheLongOne",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_junction_windows_test.go",
+   "line": 576,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestShortNameSpellingGetsTheSameVerdictAsTheLongOne",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_junction_windows_test.go",
+   "line": 576,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestShortNameSpellingGetsTheSameVerdictAsTheLongOne",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_junction_windows_test.go",
+   "line": 576,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestShortNameSpellingGetsTheSameVerdictAsTheLongOne",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_junction_windows_test.go",
+   "line": 576,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestShortNameSpellingGetsTheSameVerdictAsTheLongOne",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 501,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "exprstmt",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 501,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "exprstmt",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 501,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 501,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 528,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "exprstmt",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 528,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "exprstmt",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 528,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 528,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 540,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "exprstmt",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 540,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "exprstmt",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 540,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 540,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 556,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "exprstmt",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 556,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "exprstmt",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 556,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 556,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 576,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "exprstmt",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 576,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "exprstmt",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 576,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 576,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 591,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "exprstmt",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 591,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "exprstmt",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 591,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 591,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestRiskDecisionRoutesEachLevelToItsBranch",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 634,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestDeclaredRiskIsOnlyAFloor",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 634,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestDeclaredRiskIsOnlyAFloor",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 634,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestDeclaredRiskIsOnlyAFloor",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/bridge_test.go",
+   "line": 680,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestToolCallRowsAreComplete",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/fs_test.go",
+   "line": 79,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestFSReadTaintFeedsR4",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/fs_test.go",
+   "line": 79,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestFSReadTaintFeedsR4",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/fs_test.go",
+   "line": 194,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestFSRegistrationIsTheD34Roster",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/fs_test.go",
+   "line": 194,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestFSRegistrationIsTheD34Roster",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/fs_test.go",
+   "line": 194,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestFSRegistrationIsTheD34Roster",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/fs_test.go",
+   "line": 245,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestDeleteEnabledAddsFSDelete",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/fs_test.go",
+   "line": 245,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestDeleteEnabledAddsFSDelete",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/fs_write.go",
+   "line": 710,
+   "bucket": "INTERNAL",
+   "pkg": "tools",
+   "fn": "FSWriteDecl",
+   "position": "return(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/fs_write.go",
+   "line": 710,
+   "bucket": "INTERNAL",
+   "pkg": "tools",
+   "fn": "FSWriteDecl",
+   "position": "return(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/fs_write.go",
+   "line": 710,
+   "bucket": "INTERNAL",
+   "pkg": "tools",
+   "fn": "FSWriteDecl",
+   "position": "return(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/fs_write.go",
+   "line": 725,
+   "bucket": "INTERNAL",
+   "pkg": "tools",
+   "fn": "FSTrashDecl",
+   "position": "return(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/fs_write.go",
+   "line": 725,
+   "bucket": "INTERNAL",
+   "pkg": "tools",
+   "fn": "FSTrashDecl",
+   "position": "return(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/fs_write.go",
+   "line": 725,
+   "bucket": "INTERNAL",
+   "pkg": "tools",
+   "fn": "FSTrashDecl",
+   "position": "return(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/fs_write.go",
+   "line": 738,
+   "bucket": "INTERNAL",
+   "pkg": "tools",
+   "fn": "FSMoveDecl",
+   "position": "return(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/fs_write.go",
+   "line": 738,
+   "bucket": "INTERNAL",
+   "pkg": "tools",
+   "fn": "FSMoveDecl",
+   "position": "return(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/fs_write.go",
+   "line": 738,
+   "bucket": "INTERNAL",
+   "pkg": "tools",
+   "fn": "FSMoveDecl",
+   "position": "return(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/fs_write.go",
+   "line": 752,
+   "bucket": "INTERNAL",
+   "pkg": "tools",
+   "fn": "FSDeleteDecl",
+   "position": "return(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/fs_write.go",
+   "line": 752,
+   "bucket": "INTERNAL",
+   "pkg": "tools",
+   "fn": "FSDeleteDecl",
+   "position": "return(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/fs_write.go",
+   "line": 752,
+   "bucket": "INTERNAL",
+   "pkg": "tools",
+   "fn": "FSDeleteDecl",
+   "position": "return(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/fs_write_test.go",
+   "line": 193,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestD34WriteMatrix",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/fs_write_test.go",
+   "line": 198,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestD34WriteMatrix",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/fs_write_test.go",
+   "line": 205,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestD34WriteMatrix",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/fs_write_test.go",
+   "line": 210,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestD34WriteMatrix",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/fs_write_test.go",
+   "line": 217,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestD34WriteMatrix",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/fs_write_test.go",
+   "line": 222,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestD34WriteMatrix",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/fs_write_test.go",
+   "line": 229,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestD34WriteMatrix",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/fs_write_test.go",
+   "line": 234,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestD34WriteMatrix",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/fs_write_test.go",
+   "line": 241,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestD34WriteMatrix",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/fs_write_test.go",
+   "line": 246,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestD34WriteMatrix",
+   "position": "assign(produces)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/fs_write_test.go",
+   "line": 310,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestCrossVolumeRuleIsR8",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/fs_write_test.go",
+   "line": 313,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestCrossVolumeRuleIsR8",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/fs_write_test.go",
+   "line": 313,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestCrossVolumeRuleIsR8",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/fs_write_test.go",
+   "line": 319,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestCrossVolumeRuleIsR8",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/fs_write_test.go",
+   "line": 320,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestCrossVolumeRuleIsR8",
+   "position": "if(comparison)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/fs_write_test.go",
+   "line": 320,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestCrossVolumeRuleIsR8",
+   "position": "if(comparison)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/fs_write_test.go",
+   "line": 320,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestCrossVolumeRuleIsR8",
+   "position": "if(comparison)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/fs_write_test.go",
+   "line": 345,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestOverwriteDetectionFollowsTheCanonicalPath",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/fs_write_test.go",
+   "line": 345,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestOverwriteDetectionFollowsTheCanonicalPath",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/fs_write_test.go",
+   "line": 345,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestOverwriteDetectionFollowsTheCanonicalPath",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/gate.go",
+   "line": 61,
+   "bucket": "INTERNAL",
+   "pkg": "tools",
+   "fn": "LevelString",
+   "position": "case(consumes)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/gate.go",
+   "line": 63,
+   "bucket": "INTERNAL",
+   "pkg": "tools",
+   "fn": "LevelString",
+   "position": "case(consumes)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/paths_workspace_test.go",
+   "line": 36,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "assessWrite",
+   "position": "return(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/paths_workspace_test.go",
+   "line": 36,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "assessWrite",
+   "position": "return(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/paths_workspace_test.go",
+   "line": 36,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "assessWrite",
+   "position": "return(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/paths_workspace_test.go",
+   "line": 36,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "assessWrite",
+   "position": "return(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/paths_workspace_test.go",
+   "line": 52,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestWorkspaceSwitchNarrowsWhatTheAssessorJudges",
+   "position": "if(comparison)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/paths_workspace_test.go",
+   "line": 52,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestWorkspaceSwitchNarrowsWhatTheAssessorJudges",
+   "position": "if(comparison)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/paths_workspace_test.go",
+   "line": 69,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestWorkspaceSwitchNarrowsWhatTheAssessorJudges",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/paths_workspace_test.go",
+   "line": 69,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestWorkspaceSwitchNarrowsWhatTheAssessorJudges",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/paths_workspace_test.go",
+   "line": 78,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestWorkspaceSwitchNarrowsWhatTheAssessorJudges",
+   "position": "if(comparison)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/paths_workspace_test.go",
+   "line": 78,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestWorkspaceSwitchNarrowsWhatTheAssessorJudges",
+   "position": "if(comparison)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/paths_workspace_test.go",
+   "line": 83,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestWorkspaceSwitchNarrowsWhatTheAssessorJudges",
+   "position": "if(comparison)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/paths_workspace_test.go",
+   "line": 83,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestWorkspaceSwitchNarrowsWhatTheAssessorJudges",
+   "position": "if(comparison)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/registry.go",
+   "line": 143,
+   "bucket": "INTERNAL",
+   "pkg": "tools",
+   "fn": "validate",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/registry.go",
+   "line": 143,
+   "bucket": "INTERNAL",
+   "pkg": "tools",
+   "fn": "validate",
+   "position": "if(comparison)",
+   "name": "risk.L2",
+   "text": "risk.L2"
+  },
+  {
+   "file": "internal/tools/ticket90_test.go",
+   "line": 184,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestTicket90ModeReachesRoutingAsParameter",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/ticket90_test.go",
+   "line": 265,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestTicket90TwoBridgesDoNotShareOneMode",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/ticket90_test.go",
+   "line": 295,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestTicket90UnwiredModeSourceIsTheStrictestMode",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  },
+  {
+   "file": "internal/tools/ticket90_test.go",
+   "line": 468,
+   "bucket": "TEST",
+   "pkg": "tools",
+   "fn": "TestTicket90ModeCarriesNoAllowAuthority",
+   "position": "assign(produces)",
+   "name": "risk.L1",
+   "text": "risk.L1"
+  }
+ ],
+ "total_rows": 421
+}

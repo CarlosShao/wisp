@@ -1,0 +1,33 @@
+run dir: C:/Users/swq/AppData/Local/Temp/161r2/fixctl/run-20260926-223325   (previous run dirs are kept, not deleted)
+==========================================================================
+CONTROL POS  (ask-shapes, must RING)
+  fixture=fix/pos_known_positive.gofix  as=C:/Users/swq/AppData/Local/Temp/161r2/fixctl/run-20260926-223325\pos/pos_known_positive.go
+  ruler B : func_nodes=6 parse_errors=0
+            method_uses={"PendingApproval": {"CALL/OTHER": 3}, "PendingWindow": {"CALL/OTHER": 1}, "Prompt": {"CALL/OTHER": 2}}
+            value_uses ={"EvApprovalNeeded": {"bare/OTHER": 1}, "L1": {"bare/OTHER": 2, "qualified/OTHER": 1}, "L2": {"bare/OTHER": 4, "qualified/OTHER": 2}, "StateAwaitingApproval": {"bare/OTHER": 1}}
+            dispatch_calls_production=null
+  ruler C : total_rows=5 buckets={"L2": {"struct-literal-field(produces)/OTHER": 2}, "risk.L1": {"case(consumes)/OTHER": 1}, "risk.L2": {"case(consumes)/OTHER": 2}}
+  ruler A : name=total/prod  {"risk.L1": "1/0", "risk.L2": "2/0", "PendingWindow": "2/0", "PendingApproval": "4/0", "Prompt": "2/0", "push": "0/0", "EvApprovalNeeded": "1/0", "StateAwaitingApproval": "1/0", "StateConfirming": "0/0", "DecideFromNative": "0/0", "DecideFromPanel": "0/0", "AdmitTextTask": "0/0"}
+==========================================================================
+CONTROL POS2 (risk-pkg producers, must RING ruler C)
+  fixture=fix/pos2_risk_pkg_producer.gofix  as=C:/Users/swq/AppData/Local/Temp/161r2/fixctl/run-20260926-223325\pos2/pos2_risk_pkg_producer.go
+  ruler B : func_nodes=4 parse_errors=0
+            method_uses={}
+            value_uses ={"L1": {"bare/OTHER": 1}, "L2": {"bare/OTHER": 3}}
+            dispatch_calls_production=null
+  ruler C : total_rows=9 buckets={"L1": {"assign(produces)/OTHER": 1}, "L2": {"exprstmt/OTHER": 2, "return(produces)/OTHER": 4, "struct-literal-field(produces)/OTHER": 2}}
+  ruler A : name=total/prod  {"risk.L1": "0/0", "risk.L2": "0/0", "PendingWindow": "0/0", "PendingApproval": "0/0", "Prompt": "0/0", "push": "0/0", "EvApprovalNeeded": "0/0", "StateAwaitingApproval": "0/0", "StateConfirming": "0/0", "DecideFromNative": "0/0", "DecideFromPanel": "0/0", "AdmitTextTask": "0/0"}
+==========================================================================
+CONTROL NEG  (comments+strings only, must be ZERO)
+  fixture=fix/neg_comment_and_string.gofix  as=C:/Users/swq/AppData/Local/Temp/161r2/fixctl/run-20260926-223325\neg/neg_comment_and_string.go
+  ruler B : func_nodes=2 parse_errors=0
+            method_uses={}
+            value_uses ={}
+            dispatch_calls_production=null
+  ruler C : total_rows=0 buckets={}
+  ruler A : name=total/prod  {"risk.L1": "0/0", "risk.L2": "0/0", "PendingWindow": "0/0", "PendingApproval": "0/0", "Prompt": "0/0", "push": "0/0", "EvApprovalNeeded": "0/0", "StateAwaitingApproval": "0/0", "StateConfirming": "0/0", "DecideFromNative": "0/0", "DecideFromPanel": "0/0", "AdmitTextTask": "0/0"}
+==========================================================================
+PASS rule: POS and POS2 must each show >=1 non-zero from EVERY ruler that
+claims to measure that layer; NEG must show zero AND parse_errors=0.
+If NEG shows zero while parse_errors>0, the zero is VACUOUS -- fix the
+fixture, not the ruler.
