@@ -30,6 +30,20 @@ package panel
 // vocabulary in the repository (thinkingMs / reasoningMs / durationMs / humanText
 // / fragment / IconClass): a pump that fills a field with a constant to look
 // complete is the same failure this file exists to end.
+//
+// TICKET 145's landing pass re-measured both numbers in that paragraph and
+// neither one was wrong, only small. The pins are four: adding a key also
+// reddens approval_test.go:105 and the two byte-level key-set nails in
+// pump_test.go (:111-124, :270-276), which is the sharper of the two guards -
+// the reconciliations read json tags, so an untagged exported field passes
+// them while encoding/json still emits it (registered, not used). And the
+// no-source list is seven: approval.remainingMs joins it, because the L1
+// countdown has no producer either - approval.EventTick is declared and
+// emitted nowhere in the tree, the Remaining that is emitted carries the
+// static window length (gate.go:274, :387, :510-513), and the live countdown
+// is gate.go:257's clock.After, which exposes no "how much is left". What the
+// pump CAN fill from live objects is named in the evidence file with a
+// removal check behind each one: docs/evidence/s1/145-snapshot-fields-landed-r1.md.
 
 import (
 	"encoding/json"

@@ -41,6 +41,19 @@ import (
 // the pump). It is the whole truth: nothing on screen lives outside it. Moved
 // here from approval_test.go by ticket 92, because a view model that only a
 // test can build is a view model production never sends.
+//
+// The key set is the contract, and ticket 145 measured how many pins hold it:
+// FOUR, not one. Two two-way reconciliations against frontend/src/lib/panel.ts
+// (composer_test.go:48 and approval_test.go:105) plus two byte-level nails on
+// the published packet (pump_test.go:111-124 and :270-276, whose own comment
+// reads "the four keys are the contract"). Adding a fifth key therefore moves
+// panel.ts and those two byte nails in the same commit, and Q-51 - who may
+// write panel.ts - is still open. It also needs a reader handed over at the
+// pump's assembly root (cmd/wisp/run.go:421-427): measured there unchanged, a
+// new section leaves the running process as {"depth":0,"windowMs":0,
+// "vetoChannels":null} while pending and results in the same packet are live.
+// A key without that reader is the constant this file was moved here to stop.
+// Readings: docs/evidence/s1/145-snapshot-fields-landed-r1.md sections 2 and 3.
 type Snapshot struct {
 	Pending     []ApprovalCardView `json:"pending"`
 	Results     []ResultChunk      `json:"results"`
