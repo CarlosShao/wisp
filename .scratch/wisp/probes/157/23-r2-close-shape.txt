@@ -1,0 +1,97 @@
+### K0. 时刻 ＋ 进场基版 ＋ 本程名下 commit（两把锚定尺并排）
+2026-09-26 14:16:16 +0800
+  基版 67c0177 ＝commit｜HEAD＝35bcbff
+  ⚠ 尺坏一枚（本程自己踩的）：锚定 grep 的锚得锚到**本程自己的主题前缀**——
+     --grep='157 续程 r2' ＝ 5 枚（把编排者 67c0177 那枚派单存档也算进来了）
+     --grep='evidence(157 续程 r2' ＝ 4 枚（本程名下）
+  76f7cc91 14:15:46 evidence(157 续程 r2 第 4 件 本程自�
+  13d0bea9 14:12:43 evidence(157 续程 r2 第 3 件 本程自�
+  cc043558 14:08:43 evidence(157 续程 r2 第 2 件 B.15 末尾
+  1bd16d0f 14:04:35 evidence(157 续程 r2 第 1 件 B.1 三行�
+
+### K1. 名册（--no-walk ＋ 枚枚 --name-only 并集）
+$ git log --no-walk --pretty=tformat: --name-only <枚枚> | sort -u
+  .scratch/wisp/probes/157/22-r2-ac5-cell-and-b1-columns.sh
+  .scratch/wisp/probes/157/22-r2-ac5-cell-and-b1-columns.txt
+  docs/evidence/s1/155-three-unjudged-cells-r1.md
+  名册枚数＝3
+  越界（名册减掉声明的两族写面）＝
+    grep rc=1
+  坑①复现：同一把尺不带 --no-walk ＝
+1872
+
+### K2. 禁改面逐支（19 支＝B.11 那 16 支 ＋ 本程另加 3 支；尺＝同一枚名册）
+  ^docs/PLAN\.md                                 0 枚
+  ^docs/specs/                                   0 枚
+  ^internal/                                     0 枚
+  ^cmd/                                          0 枚
+  ^third_party/                                  0 枚
+  thresholds\.go                                 0 枚
+  golden                                         0 枚
+  allowlist\.txt                                 0 枚
+  ^scripts/slo-check\.ps1                        0 枚
+  ^tools/d22scan/                                0 枚
+  ^docs/reports/pending-and-issues\.md           0 枚
+  ^docs/reports/HANDOVER\.md                     0 枚
+  ^docs/reports/injection-timeline\.md           0 枚
+  ^\.scratch/wisp/issues/                        0 枚
+  ^docs/evidence/s1/152-                         0 枚
+  ^docs/evidence/s1/154-                         0 枚
+  ^docs/evidence/s1/156-                         0 枚
+  ^frontend/                                     0 枚
+  ^design/                                       0 枚
+  正控（同一把名册尺）：git show --name-only b23c7f7 上 ^internal/ 命中＝
+3
+  另一把尺（对象不同，别互抄）：git ls-tree -r b23c7f7 -- internal/ ＝
+465
+  别程在飞的四族（152/154/156 的活、cmd/wisp WIP、design/frontend）在本程名册命中＝
+0
+
+### K3. 只追加自证（旧行不抹）
+  本件 diff 基版..HEAD 的增删＝
+    78	0	docs/evidence/s1/155-three-unjudged-cells-r1.md
+  §0–§11（前 385 行）与 r1 基版 424ee363 比＝
+fatal: unable to stream bd0b3d1f1599ff19de87dca2d3f2398467d5e9f4 to stdout
+    静默（一字未改）
+  B.1 那一发＝纯插入：基版第 443 行起 == 本版第 445 行起同长度＝
+    静默（尾部 321 行逐字节相同；其后全是 B.15 的新增）
+  153 件与基版比＝
+    静默（本程一字未碰）
+  附录 B 标题枚数＝1／行数＝841
+  新增节标题：682:### B.11 交件形状（本程的写面自证；凭据＝`probes/157/20-delivery-shape-and-forbidden-faces.txt` V1–V7 段） 698:### B.12 票面 5 枚框 ↔ 本程的格：双向对账（工单 `:39` 要求的那一节） 726:### B.13 本程没复算哪几笔、为什么（本票零读数义务 ⇒ 这一节写的是"没复算"，不是"没测"） 738:### B.14 伪授权两栏（两栏**分开**记；每条出处＝工具名＋命令前 40 字；凭据值零抄录） 767:### B.15 票 157 续程 r2 —— 第一件事（AC#5 那一格）**判〔不成立〕：盘上已交**；本程只补它当时不可能有的那一半（只追加） 
+
+### K4. AC#5 那一格现在的形状（正向 5 行／反向 5 行／本程那一节 7 行）
+  本件 '对账'=10 '双向'=8
+  B.12 正向那表行数=5  B.12 反向行数=5
+  B.15 正向行数=5  B.15 反向行数=7
+
+### K5. 票面：三枚票本程一字未动（锚定到票路径的最后一次改动）
+  157-record-level-cleanup-ten-table-vs-disk-mismatches-left-by-tickets-155-and-153.md 最后改动＝4e20e21 13:06
+  155-ticket-153-leaves-three-cells-unjudged-because-my-attack-point-grid-and-the-ticket-ac-grid-are-not-the-same-coordinate-system-done.md 最后改动＝4e20e21 13:06
+  153-the-compression-trace-has-two-unguarded-ways-to-lie-swapping-the-ran-guard-for-need-keeps-all-four-nails-green-and-the-trace-carries-no-taskid.md 最后改动＝4e20e21 13:06
+  157 未勾=5 已勾=0
+  issues 里含 157 的 -done 文件＝0
+
+### K6. probes/157 枚数与名册（本程新增 22／23 两组）
+21
+  22-r2-ac5-cell-and-b1-columns.sh
+  22-r2-ac5-cell-and-b1-columns.txt
+  23-r2-close-shape.sh
+  23-r2-close-shape.txt
+
+### K7. push／remote／工作树边界（本程只 commit 不 push）
+  本机 remote（**早已存在，非本程所加**）＝
+    cnb	https://cnb.cool/CarlosShao/wisp (fetch)
+    cnb	https://cnb.cool/CarlosShao/wisp (push)
+    origin	https://github.com/CarlosShao/wisp.git (fetch)
+    origin	https://github.com/CarlosShao/wisp.git (push)
+  上游＝
+    cnb/dev
+  上游..HEAD 领先枚数（含别程与编排者的，不是本程一家的）＝
+    210
+  本程名下四枚是否已被推走（同一发尺）＝
+    4
+  未提交别程半件仍在原状（本程未 add／未还原）＝
+     M .scratch/wisp/probes/152/my152.py
+     M docs/evidence/s1/152-subject-death-never-measured-r1-accept-r1.md
+### END
