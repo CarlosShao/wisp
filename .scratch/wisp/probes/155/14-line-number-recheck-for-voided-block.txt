@@ -1,0 +1,16 @@
+### 给作废块（:138–:197）里那三枚未经本程现量的行号补上现量读数（锚点＝b23c7f7）
+$ git show b23c7f7:internal/agent/compress.go | grep -n 'type traceTaskKey\|^func withTraceTask\|^func traceTaskID\|if task := traceTaskID'
+148:type traceTaskKey struct{}
+152:func withTraceTask(ctx context.Context, taskID string) context.Context {
+160:func traceTaskID(ctx context.Context) string {
+237:		if task := traceTaskID(ctx); task != "" {
+
+$ git show b23c7f7:internal/agent/compress.go | sed -n '/attrs := \[\]any{/,/c.log().Info/p' | head -30  （属性表首尾行号）
+222:		attrs := []any{
+240:		c.log().Info("agent: history compressed", attrs...)
+
+$ git show b23c7f7:internal/agent/loop.go | grep -n 'withTraceTask'
+396:			// withTraceTask is what lets the record the compressor books say
+399:			nh, rep, err := l.comp.Compress(withTraceTask(ctx, taskID), hist)
+
+### 三腿探针 ext-A 那一发的第二回（补 'ext-A 只跑过一回' 那句）

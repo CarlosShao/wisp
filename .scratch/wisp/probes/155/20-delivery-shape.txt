@@ -1,0 +1,68 @@
+### A. 本程名下的 commit（尺＝只打本程两枚写面路径，不区间量）
+9136820|09-26 12:06|evidence(155 格③=AC#3 句② 裁完): 到盘复算 ext-A/B/C 外部枚数 2→0→1、痕总行数恒 3，与实现件 §4.2 逐枚同数但换了一把更强的尺（盘上 JSONL 的 "task":" 而非 stderr 的 task=）；自加 ext-D 摘 N1 量出"外部读数不变"；并量出复用那枚两腿到盘探针结构上看不见 unloop，故在仓外快照补第三腿（交付码零字节）；正控 7/0 与已知会红 2 枚红名逐字复到，收口 cmp＋hash-object 对拍
+a52ded8|09-26 12:01|evidence(155 格②=AC#2 问② 裁完): 唯一持有者=Loop.run 的参数 taskID(loop.go:339)、组合根被现量否掉(run.go:576 那一发不带 id、:476 是宿主伪任务名)；"唯一"说到的边界逐枚带行号(Root.ID/l.current/Result.TaskID/RunningTask.ID)；withTraceTask 改前 0 命中且同一把尺在 b23c7f7 命中 8 行
+829abe5|09-26 12:00|evidence(155 格①=AC#2 问① 裁完): 改前 Compress 三条通道逐条现量空（参数表/接收者/ctx），构造点在任何 id 诞生之前；正控=同一把尺打在 b23c7f7 命中 12 行；锚点 ff550f3^=5365cb22 与验收件的 86b0161 在三枚被测文件上同 blob；另登记一枚仪器死锁（管道喂 stdin）与一枚被吞命中的抖动
+
+### B. 逐枚 name-only（禁改面扫的输入）
+--- 9136820 ---
+.scratch/wisp/probes/155/11-ext-matrix.txt
+.scratch/wisp/probes/155/12-instrument-listing.txt
+docs/evidence/s1/155-three-unjudged-cells-r1.md
+--- a52ded8 ---
+.scratch/wisp/probes/155/02-ac2-q2-holder.txt
+docs/evidence/s1/155-three-unjudged-cells-r1.md
+--- 829abe5 ---
+.scratch/wisp/probes/155/00-anchor-reverse-check.txt
+.scratch/wisp/probes/155/01-ac2-q1-before.txt
+.scratch/wisp/probes/155/10-snapshot-sync.txt
+.scratch/wisp/probes/155/sync_blob_tree.py
+docs/evidence/s1/155-three-unjudged-cells-r1.md
+
+### C. 13 支禁改面逐支管道命中数（按 commit 名册尺）
+本程名册去重后枚数: 8
+.scratch/wisp/probes/155/00-anchor-reverse-check.txt
+.scratch/wisp/probes/155/01-ac2-q1-before.txt
+.scratch/wisp/probes/155/02-ac2-q2-holder.txt
+.scratch/wisp/probes/155/10-snapshot-sync.txt
+.scratch/wisp/probes/155/11-ext-matrix.txt
+.scratch/wisp/probes/155/12-instrument-listing.txt
+.scratch/wisp/probes/155/sync_blob_tree.py
+docs/evidence/s1/155-three-unjudged-cells-r1.md
+^internal/risk/                    0
+^internal/panel/                   0
+^internal/agent/approval/          0
+^internal/observe/                 0
+^internal/                         0
+thresholds\.go                     0
+golden                             0
+allowlist\.txt                     0
+^scripts/slo-check\.ps1            0
+^tools/d22scan/                    0
+^docs/PLAN\.md                     0
+^docs/specs/                       0
+^cmd/wisp/slo_windows\.go          0
+^frontend/                         0
+^design/                           0
+
+### D. 正控（同一批尺子打在一枚真动过生产码的 commit 上）
+$ git show --name-only --format='' b23c7f7
+internal/agent/compress.go
+internal/agent/compress_trace_test.go
+internal/agent/loop.go
+正控 ^internal/agent/            3
+
+### E. 票面未动自证
+153 票面未勾框枚数: 2
+155 票面未勾框枚数: 4
+-done 改名枚数(153/155): 0
+153 票面最后一次 commit: b319bab 09-26 11:25 docs(票 151 结＝附条件成立、票 153 结＝部分结案差三块；台账 A284/A285；注入世代第 16 代；新立票 155): 同一句"生产可达"今天被收窄两次，一次假的一次有九枚 commit
+
+### F. 未推自证 + 共享树现量
+## dev...cnb/dev [ahead 147]
+ M .scratch/wisp/probes/152/my152.py
+ahead 枚数: 147
+cnb/dev
+third_party tracked: 0
+
+收口时刻 2026-09-26 12:10 +0800
+HEAD 现读: 76c89b2 docs(票 154 实现程 第 3 节 格 AC#2＋AC#1③＋AC#5 改后): CloseTask 注释补三段(点名 151 只覆盖环路自造 id／给读者一句自测问句／写死"今天生产没有入口＋那是 Q-56 本文件不答")＋OpenTask 补一句指路；机器核=本次 bridge.go 改动 25 行全部以 // 开头(-0)、改后两包四数逐字同改前、两包名册两向 comm 皆空、vet/gofumpt/d22scan 三项与改前同

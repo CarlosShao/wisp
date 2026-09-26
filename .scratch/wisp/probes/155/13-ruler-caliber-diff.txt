@@ -1,0 +1,38 @@
+### 复算尺的口径差异（本程自报，免得被读成'逐字复到'）
+$ git show 6de3d1c5:docs/evidence/s1/153-trace-lies-unguarded-r1.md | grep -n 'slog.Default\|外部可见读数'
+312:### 4.2 句② 「摘掉它，有没有任何外部可见读数变过？」——**两句都答，且答案不是一样的**
+314:外部可见读数＝走**进程默认 logger**（`slog.Default()`，也就是宿主 JSONL 的那条链）打出来的那一行，
+490:1. **没把那枚痕复跑到盘**。§3.4／§4.2 的外部读数停在 `slog.Default()` 那一层（`go test -v` 的 stderr），
+
+$ git show 6de3d1c5:.scratch/wisp/probes/153/accept-r1/zzaccept153_ondisk_test.go | grep -n 'WithLogger\|InstallAsDefault\|newHarness\|withLogger'
+fatal: path '.scratch/wisp/probes/153/accept-r1/zzaccept153_ondisk_test.go' exists on disk, but not in '6de3d1c5'
+
+$ git show 6de3d1c5:.scratch/wisp/probes/153/probe153_loopleg_test.go | grep -n 'withLogger\|newHarness'
+12:// logger (harness withLogger(nil) -> Options.Logger nil -> slog.Default()) on
+17:	h := newHarness(t, "text-reply",
+19:		withLogger(nil)) // nil = the process default handler, i.e. the outside world
+
+### 两枚同名 mut153.py 的 drop-attr／unloop 锚串是否同一处（本程逐字比过）
+f098b6a9fd729fc34bf22b1fa07adc47 *-
+fatal: path '.scratch/wisp/probes/153/accept-r1/mut153.py' exists on disk, but not in '6de3d1c5'
+d41d8cd98f00b204e9800998ecf8427e *-
+### 仪器来源锚点（现量）
+777d6cc    commit
+   777d6cce 09-26 10:26 evidence(153 验收 第 0-1 格): 取版纪律＋攻击点①逐格原文并排
+ac7fb00    commit
+   ac7fb008 09-26 09:40 evidence(153 AC#1 第 1 格): 锚点现量＋派单两条未验证前提的现量结果＋那一发的改前红句与改后转绿
+
+### 工作树副本 vs 锚点副本逐字节（cmp）
+IDENTICAL .scratch/wisp/probes/153/accept-r1/zzaccept153_ondisk_test.go  ← 源自 777d6cc
+IDENTICAL .scratch/wisp/probes/153/accept-r1/mut153.py  ← 源自 777d6cc
+IDENTICAL .scratch/wisp/probes/153/mut153.py  ← 源自 ac7fb00
+IDENTICAL .scratch/wisp/probes/153/probe153_line_test.go  ← 源自 ac7fb00
+IDENTICAL .scratch/wisp/probes/153/probe153_loopleg_test.go  ← 源自 ac7fb00
+
+### 实现件那三发的口径原文（行号现读，证明本程换尺不是抄表）
+314:外部可见读数＝走**进程默认 logger**（`slog.Default()`，也就是宿主 JSONL 的那条链）打出来的那一行，
+490:1. **没把那枚痕复跑到盘**。§3.4／§4.2 的外部读数停在 `slog.Default()` 那一层（`go test -v` 的 stderr），
+
+### 两枚同名 mut153.py 的 md5（工作树）
+f098b6a9fd729fc34bf22b1fa07adc47 *.scratch/wisp/probes/153/mut153.py
+b9f1f7f89e6e6715b3009e2c00e3133d *.scratch/wisp/probes/153/accept-r1/mut153.py
