@@ -391,4 +391,194 @@ internal/tools/fs_write.go:29:	// the host-internal artifacts channel (SPEC-07 �
 
 ---
 
-（下节：§4.3 票 163。）
+### 4.3 票 163 — 常驻 shell 会话（对外仍像一次性）
+
+**① 票面现读**（`.scratch/wisp/issues/163-persistent-shell-session-that-still-looks-one-shot.md`，`Read` 全文，44 行）：
+- Status（`:3`）：`立而不派（要扩 shell.exec 的语义＝动 D34/D46 那条线，人工批准；且它和票 161 抢同一批审批判据）`
+- 硬约束（`:18`–`:21`）：不许墙钟差／不许裸 `go func(`／会话寿命必须绑任务作用域／"别照抄 Windows 那一半"清单
+- AC（`:25`–`:29`）：AC#1 未修码读数／AC#2 认退出码不靠时间／AC#3 会话绑任务（取消必收）／**AC#4 审批形状不许松，且 `:28` 逐字写着 `⚠ 不许动 internal/agent/approval/**，要动先回来报`**／AC#5 契约轴（`:29`）
+- AC#5（`:29`）逐字：**`只许动 docs/PLAN.md 里 shell.exec 那一行（需 owner 单独批准）＋ internal/tools/**／internal/proc/** 实现与测试＋证据件。frontend/**、design/**、thresholds.go、golden、allowlist.txt、tools/d22scan/** 零字节`**
+- 本票不解决（`:33`–`:35`）：`:33` 不做"给人用的集成终端"那个界面；`:35` **不引入 PTY 依赖**（要引依赖是另一次批准）
+
+**② 要动的具体行**：票面自己指的是 `docs/PLAN.md:2563`（`shell.exec` 那一行）。逐字现读：
+
+```
+$ awk 'NR==2563 {printf "%d\t%s\n", NR, $0}' .scratch/wisp/probes/16x/c1/PLAN.md.0d17647
+2563	| `shell.exec` | 任意命令 | **L2**（白名单命中 → L1） | `shell` | S3 | **默认禁用**（D14 结论保留）；**argv 向量强制**（D33） |
+```
+
+**但本程量到：动这一行是最贵的那条路。** 因为 `shell.exec` 这条线在定稿里被**三处**文字钉住，其中一处明确写着"不改"：
+
+```
+$ awk 'NR==2507 || NR==2640 || NR==2662 {printf "%d\t%s\n", NR, $0}' .scratch/wisp/probes/16x/c1/PLAN.md.0d17647
+2507	- **`shell.exec` 必须强制 argv 向量** → 参数类型是 `argv: string[]`，**不接受单一命令字符串**。
+2640	> 而 D14 恰恰把 `shell.exec` 默认禁用了，且 D33 强制 argv 向量、拒绝命令字符串。**
+2662	- `shell.exec` = **通用任意命令**，默认禁用，开启后每次 L2，argv 向量强制。**保持不变。**
+```
+- `:2507` 属 **D33 安全必修五项**（`PLAN.md:2357` 的标题逐字：`## 16.4 D33 — 安全必修五项（**实现前必须全部落地，不得推迟到「以后加固」**）`）；
+- `:2662` 属 **D46**，而且**它已经预告了今天这件事**：票 163 要动 `shell.exec` ＝ 直接撞一句写着"**保持不变**"的定稿文字。
+⇒ **走"扩 `shell.exec` 语义"这条路＝改写三枚已定稿的句子（其中两枚在 D33/D46），而不是加一行。**
+
+**③ 建议的替换文本**：**不改 `:2507`／`:2563`／`:2640`／`:2662` 任何一字**，改为**在 `:2563` 之后插一行新工具**（形状与 `fs.edit` 同策）：
+
+```
+| **`shell.session`** | **在一条活着的会话里跑下一条命令（工作目录与环境延续）** | **L2** | `shell` | S3 | 一次性外观、常驻内核；**会话寿命绑任务作用域**；超时＝真 deadline（ban #4）；每发命令仍按 R6 判；**不引 PTY**（引依赖另批） |
+```
+
+**④ 新增还是改写**：**新增**（推荐路，一行）／若走票面原路（扩 `shell.exec` 语义）＝**改写 3 枚既有句**（`:2507`、`:2563`、`:2662`）＋连带 `docs/specs/SPEC-06:139-140`。
+**这条差价就是本格要给 owner 看的东西。**
+
+**⑤ 同源拷贝有几份（两把尺）**：
+- **尺A（词形）**：`grep -n "内置工具权威表" ...` 同 §4.2 第 ⑤ 问 ⇒ 表格拷贝仍只有 **1 份**（`SPEC-07`），`shell.exec` 那行在拷贝里的落点＝**`SPEC-07:71`**（现读：`| `shell.exec` | 任意命令 | L2（白名单命中 → L1） | shell | S3 | **默认禁用**；argv 向量强制 |`）。
+- **尺B（内容串）**：`shell.exec`＋（默认禁用／argv 向量）的组合，本锚点全语料 **7 处**，逐枚判读不同性质的"拷贝"：
+
+```
+$ grep -rnE '`shell\.exec`.*(默认禁用|argv 向量)' docs/PLAN.md docs/specs AGENTS.md 2>/dev/null
+docs/PLAN.md:2029:| 10 | ~~**邮件 / 日历 / IM 明确 REJECTED**~~ → ✅ **已定案（2026-09-18）** | …而 **D14 把 `shell.exec` 默认禁用了，不能为接一个 CLI 就打开整个 shell**…（整行 1.7 KB，全行见 copy-census.log 尺B-1 段）
+docs/PLAN.md:2507:- **`shell.exec` 必须强制 argv 向量** → 参数类型是 `argv: string[]`，**不接受单一命令字符串**。
+docs/PLAN.md:2563:| `shell.exec` | 任意命令 | **L2**（白名单命中 → L1） | `shell` | S3 | **默认禁用**（D14 结论保留）；**argv 向量强制**（D33） |
+docs/PLAN.md:2640:> 而 D14 恰恰把 `shell.exec` 默认禁用了，且 D33 强制 argv 向量、拒绝命令字符串。**
+docs/PLAN.md:2662:- `shell.exec` = **通用任意命令**，默认禁用，开启后每次 L2，argv 向量强制。**保持不变。**
+docs/specs/SPEC-06-security-gatekeeping.md:139:- `shell.exec` 强制 argv 向量（`argv: string[]`，不接受命令字符串）；确需字符串 →
+docs/specs/SPEC-07-tools-and-plugins.md:71:| `shell.exec` | 任意命令 | L2（白名单命中 → L1） | shell | S3 | **默认禁用**；argv 向量强制 |
+
+$ 同上 | wc -l
+7
+```
+  （⚠ `:2029` 那一枚的**整行有 1.7 KB**，本块里我用 `…` 折了一次中段，**枚数与判定按整行读**；整行原文在 `.scratch/wisp/probes/16x/c1/copy-census.log` 尺B-1 段第 1 条。
+  ⚠ 这一支样式**漏掉了 `AGENTS.md`**（它不含 `shell.exec`＋默认禁用的组合，实测 0 命中），所以语料里写了 `AGENTS.md` 也只是把它当被扫件，不是当命中来源。）
+  分类（**别把 7 当成"7 份表格拷贝"**）：表格行拷贝 **1**（`SPEC-07:71`）＋本体 **1**（`:2563`）；
+  **规矩断言 4**（`:2507` D33／`:2662` D46／`SPEC-06:139-140`／`:2640` 引言）；**论证性复述 1**（`:2029` §15 第 10 项定案正文）。
+  ⚠ 另有 **1 处码侧注释**引用同一条规矩：`internal/config/unwired.go:70` 与 `:76` 两句 `lands: "it lands with the shell.exec tool (SPEC-06 sec 10…)"` —— 见下第 ⑥ 问，那才是这枚票真正的隐形第三写面。
+
+**⑥ 不动它能不能落地**：**不能**，且这枚有**两枚连带的硬事实**必须让 owner 知道：
+
+1. **`shell.exec` 本身今天也是名存实无**（与 164 同族，两把尺）：
+
+```
+$ git grep -n '"shell\.exec"' 0d17647 -- '*.go' ':!*_test.go' ':!.scratch'
+（零命中，rc=1）
+$ git grep -nE 'Name\(\) string[[:space:]]*\{ return "shell' 0d17647 -- '*.go' ':!.scratch'
+（零命中，rc=1）
+```
+   ⇒ 票面 `:3` 写的"扩 `shell.exec` 的语义"在**代码侧没有那个被扩的东西**：这不是"改一个已有工具"，是**同时新造两枚工具**（`shell.exec` 本体＋会话腿）。
+2. **仓里有一枚"诚实钥匙"登记簿会跟着变谎**（本程读码自取，票面未提）：
+
+```
+$ git show 0d17647:internal/config/unwired.go | awk 'NR>=57 && NR<=66 {printf "%d\t%s\n", NR, $0}'
+57	// unwiredKeys is the guard table. Deleting a row is part of landing the
+58	// capability it names: a load-time error must not outlive the consumer that
+59	// justifies it.
+60	var unwiredKeys = []unwiredKey{
+61		{
+62			path:    "risk.shell_enabled",
+63			missing: "no shell.exec tool is registered in internal/tools, so nothing reads this flag",
+64			lands:   "it lands with the shell.exec tool itself (SPEC-07 sec 3, S3, default-disabled per D14)",
+65			fires:   func(c *Config) bool { return c.Risk.ShellEnabled },
+66		},
+```
+   ⇒ `[risk] shell_enabled`／`allow_shell_string`／`shell_allowlist` 三枚键今天被**加载期响亮拒绝**（`validateUnwired`，`unwired.go:99-111`），
+   理由逐字就是"no shell.exec tool is registered"。**会话腿一旦落地，这三句 `missing` 里至少第一句变成假话**，
+   而 `internal/config/**` **既不在票面 `:29` 的允许写面里，也不在它的零字节名单里**（这一格是空白，不是遗漏 owner 就能看到）。
+   ⚠ 还有钉子在旁边：`TestEveryLockedSectionKeyIsAccountedFor`（`internal/config/unwired_test.go:311`）——
+   新增 🔒 `[risk]` 键不登记就红。⇒ **要么复用 `shell_enabled` 当会话的总开关（则 `unwired.go` 必须改），要么新增一键（则测试＋D36 的 🔒 语义一起跟上）**；两条路都不是"只动 `internal/tools`＋`internal/proc`"。
+3. **审批腿**：票面 `:28` 自己禁动 `internal/agent/approval/**`；会话的"每发命令各判一次"能不能在不碰它的情况下成立，本程**未量**（§2 第 2.5 格）。
+
+**⑦ 要 owner 点的那一句**：
+
+> **「批 D34 在 `shell.exec` 行（`PLAN.md:2563`）之后加一行 `shell.session`（L2、capability `shell`、S3、寿命绑任务、不引 PTY），同批镜像进 `SPEC-07:71` 之后；`shell.exec` 那一行与 D33 的 `:2507`、D46 的 `:2662`「保持不变」一字不动；并放开 `internal/config/unwired.go` 里那三行 `shell_*` 的 `missing` 文案（只改文案、不删守卫、不动阈值）。」**
+
+不这么批的代价：走票面原路（扩 `shell.exec` 语义）＝**改写三枚定稿句子**（其中一枚是 D33 安全必修项、一枚写着"保持不变"），
+本程按"改写比新增贵"的规矩判它**不推荐**；不批＝两条腿都停在纸面，且 `unwired.go:63` 那句"今天没人读它"会一直是对的。
+
+---
+
+### 4.4 票 164 — 后台任务读不到输出：先定名册，再补输出腿
+
+**① 票面现读**（`.scratch/wisp/issues/164-background-jobs-cannot-be-read-fix-the-roster-then-add-the-output-leg.md`，`Read` 全文，28 行）：
+- Status（`:3`）：`立而不派（D34 表里那两枚名存实无，先要一次名册更正＝人工批准，再谈实现）`
+- AC#1（`:14`）逐字：**`名册先行：现量 D34 里所有 task.* 名字 ↔ 生产注册表里的实现，列出差集；差集非空就不许进实现格，先出一份"要么补名、要么删名、要么标 DEFERRED 且五字段齐"的裁定表。⚠ 不许悄悄改名（Q-58 那两枚就是"名字与规矩打架、没人裁定"的前例）`**
+- AC#3（`:16`）：截断必须带**可找回的指针**，并指名按 `PLAN.md:431` 的既有规矩做（**本程核该行号＝对**，见下）
+- AC#5（`:18`）逐字：**`docs/specs/**、internal/risk/**、internal/panel/**、thresholds.go、golden、allowlist.txt、frontend/**、design/** 零字节；D34 那一行若要动＝owner 单独批准、原文落台账`**
+- 本票不解决（`:22`–`:23`）：`:23` `不做面板上"看得见后台任务"的界面（那是 frontend/**，owner 委托会话的写面）`
+- 前置（`:27`）：`AC#1 那份名册裁定先归我判（编排者），判完再派实现；票 163 之后`
+
+**② 要动的具体行**：`docs/PLAN.md:2561`（唯一权威落点），逐字：
+
+```
+$ awk 'NR>=2559 && NR<=2562 {printf "%d\t%s\n", NR, $0}' .scratch/wisp/probes/16x/c1/PLAN.md.0d17647
+2559	| **`reminder.set/list/cancel`** | 一次性提醒（**只发通知**） | L1 / L0 / L1 | `notify` | **S4** | ⭐ **对 D12 的部分推翻**，见 16.5.4 |
+2560	| `memory.save` / `memory.recall` | 显式记忆 | L1 / L0 | `memory` | S4 | D20 |
+2561	| `task.list` / `task.cancel` | 查看/取消任务 | L0 / L1 | — | **S7** | **D31「被阻塞的东西必须可见」的落地工具**（原文只有 UI 要求，没给 Agent 侧的查询手段） |
+2562	| `list_tools` | 元工具（D15 两级注入） | L0 | — | **S1** | — |
+```
+被 AC#3 点名的那枚既有规矩（**票面行号在本锚点成立**）：
+
+```
+$ awk 'NR==431 {printf "%d\t%s\n", NR, $0}' .scratch/wisp/probes/16x/c1/PLAN.md.0d17647
+431	| **③ 单个工具结果** | **> 4000 token**（约 6000 汉字 / 16KB 文本） | 全文落 `artifacts	ool-output-<id>.txt`；上下文里只留 **头 500 token + 尾 200 token + 总长度 + 文件路径**；模型可用 `fs.read` 按需再读（复用 D10 机制） |
+```
+（⚠ 那一行里 `` `artifacts	ool-output-<id>.txt` `` **不是我在转述时打错的**：本程按码点现量，`docs/PLAN.md:431` 的原文里就是一个 **U+0009 制表符**顶在 `artifacts` 与 `ool-output` 之间（写的人本意是 `artifacts\tool-output-<id>.txt`，反斜杠被吞成了一次转义）：
+
+```
+$ awk 'NR==431' docs/PLAN.md | python -c "import sys;s=sys.stdin.read().rstrip('\n');print([hex(ord(c)) for c in s[66:76]], s.count(chr(92)), s.count(chr(9)))"
+['0x66', '0x61', '0x63', '0x74', '0x73', '0x9', '0x6f', '0x6f', '0x6c', '0x2d'] 0 1
+                                                             ^^^^=U+0009 TAB   ^反斜杠枚数=0  ^制表符枚数=1
+```
+⇒ **定稿里被票 164 当判据引用的那枚路径字符串是坏的**。本程**未修**（冻结件、且改它＝人工批准），
+**只登记**：它同时是 `PLAN.md` 与 §10 验收读数的一个隐性坑（任何程序照字面读这行会拿到一个带 TAB 的路径）。
+工作树与该行的锚点版逐字节相同（`git diff --stat HEAD -- docs/PLAN.md` 空），所以这不是 checkout 改出来的。
+
+**③ 建议的替换文本**：**`:2561` 一字不动**（那是"改写"），改为在它**之后插一行**，另在 §7 登记表加一条 DEFERRED：
+
+```
+| **`task.output`** | **读一个后台任务吐了什么**（含"太长怎么续读"） | **L0** | — | **S7** | 164 的输出腿；截断按 `:431` 的既有规矩（头 500＋尾 200＋总长＋路径），**只截不指＝不合格** |
+```
+§7 登记表（`PLAN.md:1530` 那一族所在）新增一条（**照 `:1530` 的五字段排版**，五字段齐）：
+
+```
+| **DEFERRED** | **`task.list` / `task.cancel` 的实现（D34:2561 名存实无）** | 名册在册但生产注册表零实现（两把尺见 16x-c1 证据件 §4.4⑤）；先补名册裁定再谈实现 | 注册表里 `task.list`/`task.cancel` 各有一枚真实现并过契约测试 | 票 163（同一批命令执行面）＋票 164 AC#1 裁定表 | Agent 侧查不到"谁被阻塞"，D31 那条"必须可见"只剩 UI 半条腿 |
+```
+
+**④ 新增还是改写**：**两处都是新增**（表加一行＋登记表加一行）。
+本程**明确不建议**去改写 `:2561` 那句 备注（"D31『被阻塞的东西必须可见』的落地工具"）——它是那行的**理由**，不是状态声明；
+状态更正的正确落点就是 §7 登记表（票面 `:14` 自己给的第三选项"标 DEFERRED 且五字段齐"）。
+
+**⑤ 同源拷贝有几份（两把尺＋第三把）**：
+- **尺A（词形）**：同 §4.2⑤ 的 `内置工具权威表` 一查，表格拷贝 **1 份**（`SPEC-07`），本行落点 **`SPEC-07:69`**：
+  `$ awk 'NR==69' docs/specs/SPEC-07-tools-and-plugins.md` → `| `task.list` / `task.cancel` | 查看/取消任务 | L0 / L1 | — | **S7** | 「被阻塞的东西必须可见」的 Agent 侧手段 |`
+- **尺B（内容串 `task.list`）**：全语料 **4 处**（命令与原始输出在 `.scratch/wisp/probes/16x/c1/copy-census.log` 尺B-2 段）：
+  `docs/PLAN.md:2561`（本体）· `docs/PLAN.md:3109`（**D44 的 S7 验收清单里也点这俩名**）· `docs/specs/SPEC-06-security-gatekeeping.md:108` · `docs/specs/SPEC-07-tools-and-plugins.md:69`
+  ⇒ **改名或加注必须同批扫到这 4 处**，否则"名册"这件事会以另一种形式回来（`Q-58` 那一族的形状）。
+- **尺C（生产侧到底有没有，两把尺）**：
+
+```
+$ git grep -nE 'func \([a-zA-Z0-9_ *]+\) Name\(\) string[[:space:]]*\{ return "' 0d17647 -- '*.go' ':!*_test.go' ':!.scratch' | wc -l
+6
+$ git grep -n '"task\.' 0d17647 -- 'internal/' 'cmd/' ':!*_test.go' ':!.scratch'
+0d17647:internal/statemachine/table.go:253:		SideEffects: []string{"task.ctx-keep"},   ← 唯一命中，且不是工具名
+```
+  ⇒ 生产注册表**只有 6 枚 `fs.*`**（`fs.read/fs.list/fs.write/fs.trash/fs.move/fs.delete`），**`task.*` 一枚都没有** ⇒ 票面 `:4` 那句"`task.list`／`task.cancel` 作为工具在生产注册表里并不存在"**成立**。
+  ⚠ 本程第一次跑这把尺时用了**不带 `[[:space:]]*`** 的正则，得 **5**（漏了 `fs.go:188` 那枚被 gofumpt 对齐过的 `fsList`）；**两把尺都跑第二遍才对上 6**——记在这里，免得下一位拿 5 说事。
+- **另记（不是拷贝、但会被名册更正牵到的两处注释）**：`docs/reports/pending-and-issues.md:7642`（A308 里那句"名册级更正"已经写过了）· `.scratch/wisp/issues/README.md` 未列 `task.*`。
+  按 §2 第 2.11 格的排除理由，**不计进"要同批改的份数"**。
+
+**⑥ 不动 `D34` 能不能落地**：**AC#1（名册裁定）能**，**AC#3（输出腿）不能**。
+- 能的那半：裁定表是**编排者手里**的东西（票面 `:27` 就写了"先归我判"），零冻结面文字。
+- 不能的那半：**新工具必须有名字**；名字不在 D34 ⇒ 与 `Q-58` 同形（`cmd/wisp/run.go:330-340` 那段注释就是"两个冻结名打架、停在码里等 owner"的现物，本程现读在位）。
+- ⚠ **附带条件一枚（本程量到的票面自相矛盾）**：票面 `:18` 令 `docs/specs/**` 零字节，
+  而它要动的 `:2561` 有 **1 份 `SPEC-07:69` 逐行拷贝**＋**1 份 SPEC-06:108 内容引用** ⇒
+  **不改 `SPEC-07` 就交出一张已知会漂的表**；要改就违背自己的零字节 ⇒ 批语里必须一起放开（同 §4.2⑥）。
+- ⚠ 还有第二枚连带：`:3109` 那枚 **D44 的 S7 验收清单**也点了 `task.list`/`task.cancel`。它不是一张拷贝，它是**验收判据**；
+  名册若被改（删名/换名），**D44 那一行会跟着失去指代对象** ⇒ 本程把它列为"**必须同批核、不必同批改**"的那一类（现状：不改名 ⇒ 它不受影响）。
+
+**⑦ 要 owner 点的那一句**：
+
+> **「批两枚新增、零改写：D34 在 `:2561` 之后加一行 `task.output`（L0、S7，截断按 `:431`），§7 登记表加一条 `task.list`/`task.cancel` 的 DEFERRED（五字段齐）；`:2561` 原文一字不动；同批把 `SPEC-07:69` 之后镜像那一行；`docs/PLAN.md:3109` 的 S7 验收清单只核不改。」**
+
+不这么批的代价：把 `:2561` 直接**删掉**＝让 `PLAN.md:3109` 的验收清单指到一个不存在的名上（`SPEC-12 §3` 的"任一侧落空＝缺口回报"那一形）；
+**不动它**＝那两枚继续"名册在册、注册表零实现"，而票 164 的 AC#1 永远交不出差集为空的读数。
+
+---
+
+（下节：§4.5 票 165、§4.6 票 168。）
