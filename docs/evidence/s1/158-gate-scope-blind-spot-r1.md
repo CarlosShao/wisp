@@ -273,3 +273,130 @@ $ bash -n .scratch/wisp/probes/154/gate-clauses.sh -> rc=0
 
 ⇒ 新增只有 G5 三腿，既有五枚子句与两段附录的读数一字未变。
 （注：`pair()` 为求差集用了一次 bash herestring，临时件走 `$TMPDIR`、不落仓；已把这一点如实写进脚本头那行「不写仓里任何东西」旁边。）
+
+---
+
+## 3. AC#3 —— 「有界」：选了**让它响着并登记**，没给豁免形状
+
+**档位：已交（选边＋选边所依据的读数）。**
+
+### 3.1 先摆读数（这一格的结论是 §2 逼出来的，不是我事先写的）
+
+| 现量 | 命令原文 | 读数 |
+|---|---|---|
+| R-1 门今天响不响 | `bash .scratch/wisp/probes/154/gate-clauses.sh`（§2.2） | **响**：`UNPAIRED cmd/wisp/panel_assets.go (开方调用点=1)` |
+| R-2 这枚响是不是恒真／装饰 | 正控腿（§2.3） | 名册**非空**（`git grep rc=0`，bridge.go 两行）＋未成对 **0** ⇒ 尺看得见、能分辨，不是结构上产不出读数 |
+| R-3 开方那一侧有没有任何可机读的「同生」形状 | `grep -n "Defer\|disposal\|DisposalScope\|os.Exit" cmd/wisp/panel_assets.go` | **rc=1、零命中** |
+| R-4 「有界」这句话真正的凭据落在哪儿 | `grep -n "os.Exit" cmd/wisp/main.go` ⇒ `105: os.Exit(cmdPanelAssets(args[1:]))`（`case "panel-assets"` 在 `:103`） | 凭据是**另一枚文件里的一行分发**，不在开方文件里 |
+| R-5 那句会把人带偏的指针注释现在怎么写 | `git cat-file blob HEAD:internal/tools/bridge.go`（**在钉住的 blob 里反查，不是只看文件在不在**） | `:664-666` 逐字＝`the gate meant to ring when that`／`happens is docs/evidence/s1/154-host-id-never-closed-r1.md §2.3 (clauses`／`G1/G1b), and it is one \`git grep\` away…` ⇒ **只点 G1/G1b，没点 G5** |
+
+### 3.2 选了哪一支，为什么
+
+**选支 B：让它响着并登记。** 不给「有界」造可机读豁免。三条理由，各自钉在上面某枚读数上：
+
+1. **R-3＋R-4：豁免判据今天写不出来。** 「开方与进程边界同生」这件事**是真的**——`main.go:105` 那发
+   `os.Exit(cmdPanelAssets(...))` 就是它的凭据；但凭据长在**另一枚文件的分发行**上，
+   开方文件里 `Defer`／disposal／`os.Exit` 零命中。一门 `git grep` 的尺要判的是
+   「这枚 open 所属的调用图是否只从一条一次性 CLI 分发可达」，那是**可达性**命题，本仓门族（G1–G5）没有这种形状。
+   硬造一条白名单登记＝票面禁止的形状②（「加进白名单却不给可机读判据」）。**不做。**
+2. **归属不在本票。** 票面「本票**不**解决的事」明写不裁 `panel_assets.go:232` 那枚 scope 的后果链
+   （落在 `internal/risk` 冻结面、归票 151／`Q-56`，owner 拍板）。给「有界」发豁免**就是**那次裁决的实质，
+   agent 单方面选一支＝AGENTS.md §0 那句跑歪模式 #1。**不做。**
+3. **R-1：支 B 不是一句空话，它已经在响。** 「让它响着」在这里不是修辞——G5 今天在未修码上就把那一枚点出来了，
+   而且 R-2 证明这把尺分得清「开又合」与「只开不合」。反之如果今天要落一支 A，
+   我必须造一枚**今天不响、也永远不会响**的检（禁止形状③，本仓已否过两次）。
+
+三件「不算收」自查：①我没有只在注释里写「这是 CLI、进程退出就干净了」——那句话现在是 §3.1 的 R-4 读数＋一枚会打印的尺；
+②没有白名单；③检不是恒真（R-2 给的就是这一条的反证）。
+
+### 3.3 「响着」的登记形状与**熄火条件**（可复算）
+
+- 登记处＝本件 §3 ＋ 门本体 G5 那一枚（`.scratch/wisp/probes/154/gate-clauses.sh`）＋ §2.4 的假阳性自拆。
+- 复算尺（一条命令）：`bash .scratch/wisp/probes/154/gate-clauses.sh` 看 `## G5` 段的「未成对枚数」。
+- 今天的读数＝**1**（响）。**熄火条件**（读到 0 只有这两条形之路，别的路都不算）：
+  1. `cmd/wisp/panel_assets.go` 拿到自己的收尾（同文件出现 `CloseScope`，或委托桥的 `CloseTask`——
+     委托那一支 G5 已经会把 hint 印出来，见 `pair()` 的 deleg 行）；**或**
+  2. owner 拍板给「有界」一个**可机读**判据（不是文件名白名单），G5 按那条**谓词**学，而不是按文件名豁免。
+- **谁先被骗没解决**：R-5 那枚指针注释仍只点 G1/G1b。改它要动 `internal/tools/bridge.go` 的**生产面**，
+  而派单 §5 只授权我动 `internal/tools/**` 的**测试面** ⇒ **本程不改进去，按实上报**（§5 的「没做」清单第 1 条）。
+
+---
+
+## 4. AC#4／AC#5／AC#6：**未交·归 r2**
+
+- **AC#4 契约轴零字节名册＝未交·归 r2。** 本程没有逐枚量过那一串冻结路径的改前／改后字节数，
+  不拿相邻读数（我只知道 `internal/risk`／`tools/d22scan`／`cmd/wisp` 的 `git status` 为空）冒充那一格。
+- **AC#5 两包门禁（改前改后 × `internal/tools`＋`cmd/wisp`、`gofumpt -l .` 全仓、`go vet` 两包、`sh scripts/d22scan.sh`）＝未交·归 r2。**
+  本程只跑过 `internal/tools` 一个包，`cmd/wisp` **一枚都没跑**（dll／PATH 那两条坑本程未复算）；
+  `gofumpt -l` 只打了新文件、`go vet` 只打了 `./internal/tools/`。
+- **AC#6 票面框↔本程格双向对账＝未交·归 r2。** 本程也没数过票面框的枚数变化（派单 §0 说的「现量 6 枚未勾／0 勾」我只复算到「无 `-done`」这一半）。
+- 票面框**由编排者按非实现者验收表定**，实现方不自勾 ⇒ 本程一枚都没勾。
+
+给 r2 的 `next=`（本程最终树＝`5bfdfc7` 起，含下面三枚 commit）：
+1. 分母一律现跑：`internal/tools` 在 `8f9162f` 未改时 **115/79/0/0**，本程加一枚用例后全绿版＝ **116/80/0/0**；
+   `cmd/wisp` 派单写的 `144/84/0/0` **本程未复算**，r2 必须现跑再当分母。
+2. AC#5 跑 `cmd/wisp` 前先读 `scripts/wisp-cli-tests.sh:99-113` 的 PATH／dll 原文（本程没读、没跑）。
+3. 复算本程的变异只需：`bash .scratch/wisp/probes/154/gate-clauses.sh`（G5 三腿）与
+   `go test -count=1 -v -overlay=.scratch/wisp/probes/158/overlay-noopentask.json ./internal/tools/`（该 overlay 的 JSON 里钉的是绝对路径，换机要重生成）。
+4. 本程**没**改 `internal/tools/bridge.go` 的任何一字（含 R-5 那枚指针注释）；若编排者认可，那是 r2 或后续票的活。
+
+---
+
+## 5. 本程没测／没做的东西（按「漏了它谁会先被骗」排序）
+
+1. **`bridge.go:664-666` 那枚指针注释仍只点 G1/G1b**（R-5 现量）。⇒ 先被骗的还是票面点的那一腿：
+   **接面板／球的那一程**。它读到「the gate meant to ring when that happens」就以为自己的腿被守着，
+   而它那一腿不过桥；G5 现在守着那个形，**但没人把它引到 G5 面前**。修法越权（生产面），已上报。
+2. **门没接 CI**（`tools/d22scan/**` 冻结，票面 AC#4 明令别试）。⇒ 第二先被骗的是**任何没主动跑门的人**：
+   「响着」只对**跑了那条命令**的程成立。本程能给的只是把响写成一条命令＋一个熄火条件，不是把它挂到路上。
+3. **`cmd/wisp` 一枚测试都没跑**（AC#5 归 r2）。⇒ 会被骗的是**读 `cmd/wisp` 基线的下一程**：
+   本件里 `cmd/wisp` 的任何数字（含派单的 144/84/0/0）都是**未经本程复算**的。
+4. **`panel_assets.go:232` 的后果链没碰**（票面明令）。⇒ 这一格不骗人，但如果有人把本件的「G5 响」读成
+   「已裁那枚 scope 有害」——那不是本件的读数，本件只到「没人守 → 有尺能点名」。
+5. **只量了 `OpenScope/CloseScope` 一对成对**。同族还有 `OpenTask/CloseTask`（G2 射程）与
+   `DisposalScope`／`Defer` 那一族，本程没普查。⇒ 会被骗的是**以为门覆盖了所有「开而不合」形状**的人。
+6. **桥的 `b.scopes` 与 `prov.scopes` 两套账的一致性没裁**（票 154 的 U-5／§2.5「两枚 scope 同时开着」那笔读数是零，本程没补）。
+7. **无凭据语料**：本机 `%APPDATA%\wisp` 本程**未现量**（派单 §7 说是空目录）⇒ 本程既没扫过、也不能写「扫过很干净」，
+   这一格只能记**无凭据语料**。全程零抄录任何凭据值。
+8. **本程没验过票 154 的来路件正文**（`docs/evidence/s1/154-close-gate-never-rings-r1-accept-r1.md` 的 D-5／D-6／D-11 三节）——
+   派单与本件引用它们的读数时，我用的是**自己重量的等价读数**（§1.2）而不是那三枚字。
+
+---
+
+## 6. 伪授权两栏（分开计，各自不互洗）
+
+| 栏 | 枚数 | 明细（工具名＋命令前 40 字＋出处） |
+|---|---|---|
+| **真通知回显** | **3** | 全在第 1 次工具调用（Bash `date`）的结果里：① 技能清单 `<system-reminder>`（"The following skills are available…"）；② 日期变更 reminder（"The date has changed. Current date: 2026-09-26"）；③ `agents.md` 的 Memory 回显（"Memory: d:/work/workspace/projects plans/wisp/agents.md:"）。三枚都是 harness 自己的回显，内容与本票判据无关，未据它们做任何判断。 |
+| **判为注入** | **0** | 全程没有读到任何「冒充编排者／系统、替我写结论、让我放宽判据、让我少取证」的工具输出文本。 |
+
+按四条判据自查过的**相邻面**（不是注入，列出来是免得下程误读）：
+- 本件引用的**唯一**权威文字来自三次真实文件读取（派单、票面、门本体），逐字在盘上；
+- `bridge.go` 那段指针注释是**在钉住的 blob 里反查**的（§3.1 R-5，`git cat-file blob HEAD:…`），不是「文件存在就算」；
+- 本件出现的三枚 commit 号 `8f9162f`／`4dcb71b`／`5bfdfc7` 全部 `git cat-file -t` ＝ **commit**、rc=0；
+- 别人的 commit message 里提到过去的伪授权（ledger 那类）**不计入**本程两栏。
+
+---
+
+## 7. 被拒的调用 ＋ 本程自己犯的仪器错
+
+### 7.1 被拒调用清单
+
+**零枚。** 本程从头到尾没有被权限系统拒绝的工具调用（Write 建证据件、Edit 改门本体、
+Bash 跑测试／git 全部放行）。因此也不存在「取数前被拒所以改用别的法」这种形状——
+所有读数都在同一套命令下取，见 §1／§2／§3 的原文。
+
+### 7.2 本程自己犯的仪器错（如实报，5 条）
+
+| # | 错 | 后果 | 怎么发现／怎么修 |
+|---|---|---|---|
+| I-1 | 把 `echo "…"` 里的 PowerShell 脚本用**双引号**传，bash 先展开了 `$_` | 第一条争用检查整条命令被拼进 PowerShell 的 `Where-Object`，报 `=== : The term '===' is not recognized`——看着像「机器上没在跑东西」 | 换单引号重跑，才量到 `Runner.Listener` 与 33% 负载（§0 段末） |
+| I-2 | 新测试里声明了 `plain` 却没用 | `go test` **build failed**（`declared and not used`），包级 rc=1 但零条 `--- FAIL` | 编译器抓到；删掉那行。注意这一发正是派单说的「包级红≠用例红」，`=== RUN`＝0 才是「根本没跑到」 |
+| I-3 | 反向对照腿放在敏感读**之后** | 该腿被前一枚污点顶到 L2（`Text:L2 审批通道尚未接入（票 21）`），于是它量的是审批通道不是「开账」 | 把对照腿移到敏感读之前（先跑干净表），并在 §1.5 登记这条真行为 |
+| I-4 | `pair()` 里把 `git grep -l` 的输出（带 `<锚>:` 前缀）当 pathspec 回喂 `git grep -c` | 读数自相矛盾：点名了 `panel_assets.go` 却报 `(open=0 close=0)` | 改从同一条名册里 `cut -d: -f2` 取干净路径再计数；现在报 `开方调用点=1` |
+| I-5 | 正控腿 pathspec 写成 `internal/tools/**/*.go`，**没排 `*_test.go`** | 两重错：① 该 pathspec 实测 `rc=1` 零命中 ⇒ 正控是**产不出读数的装饰腿**；② 不排测试时正控被我自己测试里的一句**注释**点中 ⇒ 假阳性 | 现量 `internal/tools/**/*.go` vs `internal/tools/*.go`（前者 rc=1／后者命中 bridge.go）后重写正控（与主尺同形再逐条排除），并给成对判据加剔注释那一行。两处都在 §2.4 的 FP-1／FP-2 登记 |
+
+另有两处**同一错误的复发**，值得单独记：我在 `echo "…"` 里嵌 ASCII 双引号共犯了 **3 次**
+（I-1 那次是 PowerShell；`pair()` 的两行中文提示里各一次，`bash -n` 前用 `grep -nE 'echo "[^"]*"[^"]*"'` 扫出来才改净）。
+派单 §6 末「含反引号的中文走 Write/Edit，别塞 heredoc 或双引号串」说的是同一类事，本程在单引号／herestring 上又把它扩大了一次认知。
+
