@@ -1,0 +1,59 @@
+### V-A  self-test of the fixed ruler (must be 0 spurious SH insertions)
+   fixed form keeps the row readable: ok
+   gsub hits=1  Q count=1  (must be equal)
+   gsub hits on an escape-free row=0  (must be 0)
+### V-B  B.12 12.2 (5 rows) cell map, fixed ruler
+   row 1  | item= **十笔的档位**（哪几笔算"补对了"）  | why= 本程＝实现程；裁决者≠实现者（`AGENTS.md §0.3`）  | closure-bytes=127 | closure= 157 的非实现者验收程**抽 4 笔换尺重走**（其派单 `:9` 已点名第 **1、4、5、8** 笔；本程那几把尺＝行级锚定计数／行
+   row 2  | item= **第 2 笔〔不成立〕这一判本身**  | why= 本程只能报"复算打不中"，判"该不该撤掉最小闭合②"不在实现程权限内  | closure-bytes=137 | closure= 验收程按 `probes/157/15-item2-lettersource-rulers.txt` 那七发逐字重跑（票面 `:81`/`
+   row 3  | item= **153 的 AC#2 那枚框能否翻勾**  | why= 工单 `:31`："翻勾由我按两张表合起来定，实现方不自勾"  | closure-bytes=74 | closure= 编排者并排 153 验收件 `:831`(a)（两笔待补＝本件 B.9/B.10 已交）＋`:832`–`:836` 五件 ⇒ **不需仪
+   row 4  | item= **155 那四枚已定的勾是否因本程的记录要重看**  | why= 勾是编排者 13:06（`4e20e21`）落的；本程只补措辞与名册，未动判据  | closure-bytes=56 | closure= 编排者自决（B.2 那笔若被验收程判"本程错"，则 §4 那张表要连最小闭合②一起重做）⇒ **不需仪器** 
+   row 5  | item= **A293（`7cb9b19`）与 157 验收派单第 2 件那枚"155 自己跟自己矛盾"**  | why= 已被派给 157 验收程，本程不抢判；**但本程现量了三枚事实**：实现件 `grep | closure-bytes=103 | closure= 验收程按锚点现读两枚件的 §0 与 §7.1 全文再判该勾挂不挂 ⇒ **不需仪器**；⚠ 若它判"矛盾不存在"，请连 A293 那句"1
+### V-C  B.15 15.3 (7 rows) cell map, fixed ruler
+   row 1  | item= **AC#5 那枚框要不要从"不成立（未交）"改判**  | closure-bytes=76 | closure= 157 验收程把 V6 那把尺**重钉到 `ef1c474` 或它自己的收口版**再跑同一发（本程已重跑＝**2** 枚命中）⇒ **不需
+   row 2  | item= **`A293②` 那件"155 表自己跟自己矛盾"**  | closure-bytes=50 | closure= **本程零动作**（已由 `7236c92` 闭合）；本程不去"修"它、也不在本表重判它存不存在 
+   row 3  | item= **第 3／6／7／9／10 笔的档**  | closure-bytes=101 | closure= 任一枚换尺复算即可；⚠ 第 3 笔若要复算**必须扔掉 `index($0,"Q **")` 那把**——本程 W6 已数出它在 `:83
+   row 4  | item= **B.3 里同一把坏尺的第二处产物**：`:506` 那一行把 153 验收件 `:843` 的"行尾" | closure-bytes=55 | closure= 编排者两选一：①授权一次同样的就近判语；②记进下一张记录级票 ⇒ **不需仪器**；本程**未改**那一行 
+   row 5  | item= **157 验收件 §1.1 给的那句"最小修法"（把三行括号换成……）**  | closure-bytes=35 | closure= 若要落地成"改行"，需编排者批准破一次只追加；本程按只追加那一支做 
+   row 6  | item= **`probes/157/11-…sh:71` 那发 `Q head -20`**  | closure-bytes=355 | closure= **本程选"注明"这一支**：`11-…sh` 未改、`11-…txt` 未改，只把那**一发命令**摘掉 `head` 单跑，完整名册在
+   row 7  | item= **155 验收件 §1.2 多问的那一枚**（"`l.current` 唯一读点在 `defaultCo | closure-bytes=47 | closure= 它挂在验收件 §1.2 末句，最小闭合写的是"随 §1.1 那处一起补一句或由编排者另记" 
+### V-D  field presence per row with the FIXED ruler (who / which-ruler-or-action / cost / clock-duration)
+   B.12 12.2                  rows=5   who=5   action-or-ruler=4   cost=5   clock=0   cell-under-10-bytes=0
+   B.15 15.3                  rows=7   who=7   action-or-ruler=5   cost=3   clock=0   cell-under-10-bytes=0
+   ctl 155-accept 7.2         rows=7   who=2   action-or-ruler=2   cost=4   clock=1   cell-under-10-bytes=1
+   (the ctl line in probe 05 read who=2/7 with the BROKEN ruler; here is the same yardstick re-measured)
+### V-E  forward table: per-row grade cell, fixed ruler (the criterion 2 field '明写未裁')
+-- 12.1 (implementer self-proof, 5 rows):
+    **AC#1** 第 1–8 笔各补一行、全落本件末尾新一节、逐笔带当轮复算命令与输出；对不上⇒判〔不成立〕＋读数并停手报回  section-col= **B.1–B.8**  | self-evidence-bytes=226 | grade= **未裁**（见 12.2 第 1 行） 
+    **AC#2** 第 9–10 笔落 153 件末尾同一形状  section-col= 153 件的 **B.9／B.10**  | self-evidence-bytes=127 | grade= **未裁**；且本程**没碰 153 的 AC#2 那枚勾**（工
+    **AC#3** 一枚框都不勾、`-done` 一枚都不加  section-col= （纪律，不是格）  | self-evidence-bytes=145 | grade= **未裁**（本程只能自证"没动"） 
+    **AC#4** 契约轴零字节  section-col= （纪律，不是格）  | self-evidence-bytes=129 | grade= **未裁** 
+    **AC#5** 票面框 ↔ 本程格 双向对账，没判的明写"未裁"＋最小闭合集合  section-col= **本节**  | self-evidence-bytes=29 | grade= **未裁** 
+-- 15.1 (grades transcribed from the non-implementer, 5 rows):
+    **AC#1** 第 1–8 笔各补一行、逐笔带当轮复算命令与输出  section-col= 本件 **B.1–B.8**：`grep -cE '^### B\ | grade-from-acceptor= **成立**（形状；抽判 1/4/5/8 四笔站得 | state-after-r2= §1.1 那一处：本程已按派单在 B.1 表下**就近加一行读后判语**（`1
+    **AC#2** 第 9–10 笔落 153 件同一形状  section-col= **153 件 B.9／B.10**：`grep -cE '^## | grade-from-acceptor= **成立**（形状；这两笔不在它抽判射程）  | state-after-r2= 本程未碰 153 件（不在 r2 写面）；153 的 AC#2 那枚勾本程仍不
+    **AC#3** 一枚框都不勾、`-done` 一枚都不加  section-col= （纪律，不是格）  | grade-from-acceptor= **成立**  | state-after-r2= 本程同样零翻勾：现量 157 票面 `^- [ ]`＝**5**、`^- [x
+    **AC#4** 契约轴零字节  section-col= （纪律；形状自证在 **B.11**）  | grade-from-acceptor= **成立**  | state-after-r2= 本程 r2 名册只有两族路径（本件 ＋ `.scratch/wisp/prob
+    **AC#5** 票面框 ↔ 你的格 双向对账，没判的明写"未裁"＋最小闭合集合  section-col= 本件 **B.12**（12.1 正向 5 行＋12.2 反向 5 | grade-from-acceptor= **不成立（未交）**——那一发读的是 `ec81 | state-after-r2= ⚠ 本程判**派单这一件〔不成立〕**：B.12 已在 `ef1c474`（1
+### V-F  the 15.2 attribution table item column, fixed ruler (6 rows)
+   | 1 十笔的档位 | who-says= 157 验收程已抽判第 1/4/5/8 笔（`89a35e9`）；第 3/6/7/9/10 笔由它自己列在 §3.
+   | 2 第 2 笔〔不成立〕的归属之争 | who-says= **编排者 13:46 已裁**：票面自己就拆了六件 ⇒ r1 判〔不成立〕对、验收程建议那句改法落地反而是错更正
+   | 3 票面 AC#5 那枚框本身 | who-says= 票面＝编排者写面 
+   | 4 要不要为 B.1 那三行括号再开一张票 | who-says= 编排者两选一（就地 `B.1b` 或记台账）；派单已选第三支：**旧行不抹＋就近一行判语** 
+   | 5 `probes/157/**` 的"40 枚"口径 | who-says= 编排者 13:48 已按现量作废"40 枚"（台账 `:7290` 写"真值＝17 枚"） 
+   | 6 派单对被验物的两处描述（附录 A vs B 等） | who-says= 编排者已自裁（`7236c92`） 
+### V-G  does 15.1/15.2/15.3 carry the AC#3 and AC#4 discipline items into a reverse row? (union check)
+   AC#1 : 12.2=1 15.2=0 15.3=0 15.1-fwd=1 12.1-fwd=1
+   AC#2 : 12.2=1 15.2=0 15.3=0 15.1-fwd=1 12.1-fwd=2
+   AC#3 : 12.2=0 15.2=0 15.3=0 15.1-fwd=1 12.1-fwd=1
+   AC#4 : 12.2=0 15.2=0 15.3=0 15.1-fwd=1 12.1-fwd=1
+   AC#5 : 12.2=0 15.2=1 15.3=1 15.1-fwd=1 12.1-fwd=1
+   discipline content by keyword (not by AC number) in the reverse union:
+   翻勾  12.2=1 15.2=0 15.3=0
+   不勾  12.2=0 15.2=0 15.3=0
+   done    12.2=0 15.2=0 15.3=0
+   契约轴 12.2=0 15.2=0 15.3=0
+   禁改  12.2=0 15.2=0 15.3=0
+   零字节 12.2=0 15.2=0 15.3=0
+### V-H  anchor equality re-check (same fixed ruler on both anchors)
+   4f6c14c  12.1 rows=5 12.2 rows=5 15.1 rows=5 15.3 rows=7 | 12.2 未裁-cells=5
+   eee7bd9  12.1 rows=5 12.2 rows=5 15.1 rows=5 15.3 rows=7 | 12.2 未裁-cells=5

@@ -1,0 +1,1 @@
+bash: .scratch/wisp/probes/157-ac5/04-injection-and-discipline-selfcheck.sh: No such file or directory

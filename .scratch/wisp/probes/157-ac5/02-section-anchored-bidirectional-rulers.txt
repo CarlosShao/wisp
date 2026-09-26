@@ -1,0 +1,135 @@
+### R-B  row counts per version, both directions, section-anchored
+=== VERSION ec815820 (155 file: 678 lines) ===
+     B.12 forward rows (^| **AC#)   = 0
+     B.12 reverse rows (^| N |)     = 0
+       B.12 token 对账    = 0
+       B.12 token 双向    = 0
+       B.12 token 未裁    = 0
+       B.12 token 最小闭合 = 0
+     15.1 forward rows              = 0
+     15.2 attribution rows          = 0
+     15.3 reverse rows              = 0
+       B.15 token 对账    = 0
+       B.15 token 双向    = 0
+       B.15 token 未裁    = 0
+       B.15 token 最小闭合 = 0
+
+=== VERSION 89a35e9e (155 file: 763 lines) ===
+     B.12 forward rows (^| **AC#)   = 5
+     B.12 reverse rows (^| N |)     = 5
+       B.12 token 对账    = 1
+       B.12 token 双向    = 1
+       B.12 token 未裁    = 5
+       B.12 token 最小闭合 = 5
+     15.1 forward rows              = 0
+     15.2 attribution rows          = 0
+     15.3 reverse rows              = 0
+       B.15 token 对账    = 0
+       B.15 token 双向    = 0
+       B.15 token 未裁    = 0
+       B.15 token 最小闭合 = 0
+
+=== VERSION 4f6c14c (155 file: 841 lines) ===
+     B.12 forward rows (^| **AC#)   = 5
+     B.12 reverse rows (^| N |)     = 5
+       B.12 token 对账    = 1
+       B.12 token 双向    = 1
+       B.12 token 未裁    = 5
+       B.12 token 最小闭合 = 5
+     15.1 forward rows              = 5
+     15.2 attribution rows          = 6
+     15.3 reverse rows              = 7
+       B.15 token 对账    = 8
+       B.15 token 双向    = 6
+       B.15 token 未裁    = 2
+       B.15 token 最小闭合 = 4
+
+### R-C  dereference B.12 forward pointers at the anchor (semantic level)
+  **AC#1**       pointer= **B.1–B.8**                                 grade-col= **未裁**（见 12.2
+  **AC#2**       pointer= 153 件的 **B.9／B.10**                     grade-col= **未裁**；且本�
+  **AC#3**       pointer= （纪律，不是格）                      grade-col= **未裁**（本程�
+  **AC#4**       pointer= （纪律，不是格）                      grade-col= **未裁** 
+  **AC#5**       pointer= **本节**                                    grade-col= **未裁** 
+  -- does each pointed target exist at the anchor? (line-anchored ruler)
+     B.1-B.8 sections (AC#1)         = 8
+     B.9/B.10 in 153 file (AC#2)     = 2
+     153 file appendix-B heading     = 1
+     B.11 section (AC#4)             = 1
+     B.12 section (AC#5)             = 1
+     B.15 section (AC#5 second half) = 1
+### R-D  per-row closure-field presence (awk -F'|' taking the LAST non-empty cell)
+-- R-D0 POSITIVE CONTROL: same three greps over the 7 last-cells of 155-accept 7.2 --
+   ctl closure-bytes=139   who=1 ruler=1 cost=1
+   ctl closure-bytes=132   who=1 ruler=1 cost=1
+   ctl closure-bytes=138   who=0 ruler=0 cost=1
+   ctl closure-bytes=47    who=0 ruler=0 cost=1
+   ctl closure-bytes=14    who=0 ruler=0 cost=0
+   ctl closure-bytes=56    who=0 ruler=0 cost=0
+   ctl closure-bytes=40    who=0 ruler=0 cost=0
+-- B.12 12.2 rows:
+   row 1  closure-bytes=287   who=1 ruler=1 cost=1
+   row 2  closure-bytes=245   who=1 ruler=1 cost=1
+   row 3  closure-bytes=130   who=1 ruler=1 cost=1
+   row 4  closure-bytes=135   who=1 ruler=0 cost=1
+   row 5  closure-bytes=237   who=1 ruler=1 cost=1
+-- B.15 15.3 rows:
+   row 1  closure-bytes=156   who=1 ruler=1 cost=1
+   row 2  closure-bytes=112   who=1 ruler=0 cost=0
+   row 3  closure-bytes=188   who=1 ruler=1 cost=0
+   row 4  closure-bytes=141   who=1 ruler=0 cost=1
+   row 5  closure-bytes=97    who=1 ruler=1 cost=1
+   row 6  closure-bytes=547   who=1 ruler=1 cost=1
+   row 7  closure-bytes=111   who=1 ruler=0 cost=0
+### R-E  empty-shell scan
+  ### B.12  待补/以后再/回头补/以后加固 hits = 1
+  ### B.15  待补/以后再/回头补/以后加固 hits = 0
+  rows whose last content cell is 1..9 bytes (empty-shell candidates):
+   B12 weak: | 票面那枚框 | 本程交它的那一节 | 本程自证（锚定计数） | 档 |
+   B12 weak: | **AC#4** 契约轴零字节 | （纪律，不是格） | B.11 那整表：名册 15 枚、越界 0、16 支逐支 0、正控 3 枚；`
+   B12 weak: | **AC#5** 票面框 ↔ 本程格 双向对账，没判的明写"未裁"＋最小闭合集合 | **本节** | 正向 5 行（上表）＋反向 5 
+  POSITIVE CONTROL for the last-cell ruler (same checker on 155-accept 7.2, 7 rows):
+   ctl row  1  bytes=79 starts=编排者把 153 验收件 `:831`(a)／`:835
+   ctl row  2  bytes=58 starts=若要复算：`mut153.py` 的 8 发在本程快照里
+   ctl row  3  bytes=62 starts=需要 dll 落地（`D26` 模型分发那一族，owne
+   ctl row  4  bytes=15 starts=同一枚驱动两发即可；不需新仪器
+   ctl row  5  bytes=4 starts=不属本票
+   ctl row  6  bytes=28 starts=无需闭合，**但翻勾的人只读 `:138–:197`**
+   ctl row  7  bytes=14 starts=属"下一位现量"，不阻塞本票
+### R-F  shape yardstick the acceptor itself prescribed (155-accept 7.1/7.2) vs what landed
+  155-accept 7.1 forward rows   = 4
+  155-accept 7.2 reverse rows   = 7
+  155-accept 7.1 header cols    = 4
+  155-accept 7.2 header cols    = 4
+  B.12 12.1 forward rows        = 5
+  B.12 12.2 reverse rows        = 5
+  B.12 12.1 header cols         = 4
+  B.12 12.2 header cols         = 4
+  B.15 15.1 forward rows        = 5
+  B.15 15.3 reverse rows        = 7
+### R-G  the verdict under re-judgement, verbatim (157-accept 3.1 AC#5 row + 3.2 row 3)
+8:- **一句话总裁决**：抽到的四笔（第 1／4／5／8 笔）**结论全部站得住**，本程换了三把与它不同形的尺各自复到同一句；但**第 1 笔那枚"补上去的表"里有三行读错了列**（新的一笔
+170:| **AC#5** 票面框 ↔ 你的格 双向对账，没判的明写"未裁"＋最小闭合集合 | 锚定 grep 两枚附录：`对账\|双向` 命中＝**0／0**（V6 段）；两节附录的抬头那几枚弹头里也没有反向那一�
+178:| 3 | **票面 AC#5 那一枚框本身**（`成立（未交）`那一档要不要挂回工单） | 票面是编排者写面 | 最小闭合＝**157 自己往任一节的末尾补一枚"票面 5 枚框 ↔ 本程的格"双向表**（形�
+### R-H  appendix-wide and per-section 未裁 counts per version (section ruler)
+  ec815820  appendix-B 未裁=8    B.12 内=0    B.15 内=0
+  89a35e9e  appendix-B 未裁=13   B.12 内=5    B.15 内=0
+  4f6c14c   appendix-B 未裁=16   B.12 内=5    B.15 内=2
+### R-I  landing commit of each heading (pickaxe, path-scoped) + the roster of that commit
+  literal search string: '### B.12 '  (git log -S is literal by default, so do NOT backslash-escape the dot)
+    full pickaxe list (path-scoped, NOT truncated; first line = the commit that introduced it):
+    ef1c474f 13:41:25 evidence(157 收口 B.11-B.14): 交件形状＋票面框↔本程格双向
+    cc043558 14:08:43 evidence(157 续程 r2 第 2 件 B.15 末尾一节): AC#5 那一格本程�
+    same string via --pickaxe-regex (regex ruler, must agree on the first line):
+    ef1c474f 13:41:25
+  literal search string: '### B.15 '  (git log -S is literal by default, so do NOT backslash-escape the dot)
+    full pickaxe list (path-scoped, NOT truncated; first line = the commit that introduced it):
+    cc043558 14:08:43 evidence(157 续程 r2 第 2 件 B.15 末尾一节): AC#5 那一格本程�
+    same string via --pickaxe-regex (regex ruler, must agree on the first line):
+    cc043558 14:08:43
+  ef1c474 author-date=13:41:25
+    ef1c474 touched: .scratch/wisp/probes/157/20-delivery-shape-and-forbidden-faces.sh
+    ef1c474 touched: .scratch/wisp/probes/157/20-delivery-shape-and-forbidden-faces.txt
+    ef1c474 touched: docs/evidence/s1/155-three-unjudged-cells-r1.md
+    1bd16d0 touched: .scratch/wisp/probes/157/22-r2-ac5-cell-and-b1-columns.sh
+    1bd16d0 touched: .scratch/wisp/probes/157/22-r2-ac5-cell-and-b1-columns.txt
+    1bd16d0 touched: docs/evidence/s1/155-three-unjudged-cells-r1.md

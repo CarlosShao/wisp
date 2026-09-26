@@ -1,0 +1,50 @@
+### U-A  anchor stability: entry anchor 4f6c14c vs current HEAD df69bcd
+   4f6c14c:docs/evidence/s1/155-three-unjudged-cells-r1.md = 553a4e85f2c008f66913ccefff084104c9d63145
+   df69bcd:docs/evidence/s1/155-three-unjudged-cells-r1.md = 553a4e85f2c008f66913ccefff084104c9d63145
+   entry is ancestor of HEAD  = YES
+   commits added since entry  = 6
+   the SAME section-anchored ruler, both anchors:
+   4f6c14c  12.1fwd=5 12.2rev=5 15.1fwd=5 15.2attr=6 15.3rev=7
+   df69bcd  12.1fwd=5 12.2rev=5 15.1fwd=5 15.2attr=6 15.3rev=7
+### U-B  row counts at each version from the landing commit up to HEAD
+   ef1c474f  ef1c474f 12.1=5 12.2=5 15.1=0 15.3=0 15.2=0
+   c97d706   c97d7064 12.1=5 12.2=5 15.1=0 15.3=0 15.2=0
+   b60c6b7   b60c6b79 12.1=5 12.2=5 15.1=0 15.3=0 15.2=0
+   89a35e9e  89a35e9e 12.1=5 12.2=5 15.1=0 15.3=0 15.2=0
+   67c0177c  67c0177c 12.1=5 12.2=5 15.1=0 15.3=0 15.2=0
+   cc04355   cc043558 12.1=5 12.2=5 15.1=5 15.3=7 15.2=6
+   1bd16d0   1bd16d0f 12.1=5 12.2=5 15.1=0 15.3=0 15.2=0
+   76f7cc9   76f7cc91 12.1=5 12.2=5 15.1=5 15.3=7 15.2=6
+   35bcbff   35bcbff2 12.1=5 12.2=5 15.1=5 15.3=7 15.2=6
+   942dae0   942dae0c 12.1=5 12.2=5 15.1=5 15.3=7 15.2=6
+   4f6c14c   4f6c14c0 12.1=5 12.2=5 15.1=5 15.3=7 15.2=6
+   df69bcd   df69bcd8 12.1=5 12.2=5 15.1=5 15.3=7 15.2=6
+### U-C  dereference the 15.1 rows (semantic level)
+    **AC#1** 第 1–8 笔各补一行、逐笔带当轮复算命令与输出  pointer-col= 本件 **B.1–B.8**：`grep -cE '^### B\.[1-8] '`＝**8** 
+    **AC#2** 第 9–10 笔落 153 件同一形状  pointer-col= **153 件 B.9／B.10**：`grep -cE '^### B\.(9SH10) '`＝**2*
+    **AC#3** 一枚框都不勾、`-done` 一枚都不加  pointer-col= （纪律，不是格） 
+    **AC#4** 契约轴零字节  pointer-col= （纪律；形状自证在 **B.11**） 
+    **AC#5** 票面框 ↔ 你的格 双向对账，没判的明写"未裁"＋最小闭合集合  pointer-col= 本件 **B.12**（12.1 正向 5 行＋12.2 反向 5 行）；`对账`／`双向` 各 **2*
+   pointed sections exist: 155 B.1-B.8=8 | 153 B.9/B.10=2 | 155 B.11=1 | 155 B.12=1 | 155 B.15=1
+### U-D  the field the recheck ruler asks for: 谁 / 用什么尺 / 多久
+   B.12 12.2                    rows=5   who=5   ruler-or-action=4   cost=5   clock-duration=0
+   B.15 15.3                    rows=7   who=7   ruler-or-action=4   cost=3   clock-duration=0
+   155-accept 7.2 (yardstick)   rows=7   who=2   ruler-or-action=2   cost=4   clock-duration=1
+   ticket face AC#5 asks literally for: 最小闭合集合 (hits in the ticket=2); the word 分钟/小时 appears in its AC#5 line? 0
+### U-E  roster union / overlap
+   15.2 key:  1 十笔的档位                           -> who: 157 验收程已抽判第 1/4/5/8 笔（`89a35e9`）；第 3/6/7/9/
+   15.2 key:  2 第 2 笔〔不成立〕的归属之争                 -> who: **编排者 13:46 已裁**：票面自己就拆了六件 ⇒ r1 判〔不成立〕对、验收程
+   15.2 key:  3 票面 AC#5 那枚框本身                   -> who: 票面＝编排者写面 
+   15.2 key:  4 要不要为 B.1 那三行括号再开一张票             -> who: 编排者两选一（就地 `B.1b` 或记台账）；派单已选第三支：**旧行不抹＋就近一行判
+   15.2 key:  5 `probes/157/**` 的"40 枚"口径       -> who: 编排者 13:48 已按现量作废"40 枚"（台账 `:7290` 写"真值＝17 枚
+   15.2 key:  6 派单对被验物的两处描述（附录 A vs B 等）        -> who: 编排者已自裁（`7236c92`） 
+   are 12.2 rows 3 and 4 re-listed in 15.3 or 15.2?
+   token "153 的 AC#2": 12.2=1 15.2=0 15.3=0
+   token "四枚已定的勾": 12.2=1 15.2=0 15.3=0
+   token "翻勾": 12.2=1 15.2=0 15.3=0
+### U-F  AC#3 / AC#4 grades exist on the non-implementer side?
+   157-accept 3.1: | **AC#1** 第 1–8 笔各补一行，全部落在 155 件末尾新一节 `## 附录 B（票 157 �
+   157-accept 3.1: | **AC#2** 第 9–10 笔落在 153 件末尾同一形状（并明写"补完不等于 153 能翻勾"
+   157-accept 3.1: | **AC#3** 一枚框都不勾、`-done` 一枚都不加 | `grep -c '^- \[x\]'`＝**0**／`'^- \[ \]'
+   157-accept 3.1: | **AC#4** 契约轴零字节（`internal/**`、`cmd/**`、`PLAN`、`specs`、阈值/golden/`allowli
+   157-accept 3.1: | **AC#5** 票面框 ↔ 你的格 双向对账，没判的明写"未裁"＋最小闭合集合 | 锚

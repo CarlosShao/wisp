@@ -1,0 +1,91 @@
+### P0. entry anchor / clock / branch state
+  $ date => 2026-09-26 14:27:23 +0800
+  $ git rev-parse --short HEAD => 4f6c14c
+  $ git rev-parse HEAD         => 4f6c14c0c50b1738d11db0430d104a97c3754b96
+  $ git rev-parse --abbrev-ref HEAD => dev
+  $ git status -sb | head -1   => ## dev...cnb/dev [ahead 214]
+### P1. commit timeline of the five anchors named in the dispatch (commit author time)
+  \$ git log -1 --pretty=%ad --date=format:%H:%M:%S ec815820 => 2026-09-26 13:34:39
+  \$ git log -1 --pretty=%ad --date=format:%H:%M:%S ef1c474f => 2026-09-26 13:41:25
+  \$ git log -1 --pretty=%ad --date=format:%H:%M:%S 89a35e9e => 2026-09-26 13:45:16
+  \$ git log -1 --pretty=%ad --date=format:%H:%M:%S 67c0177c => 2026-09-26 13:49:32
+  \$ git log -1 --pretty=%ad --date=format:%H:%M:%S 5d286d5 => 2026-09-26 14:19:28
+  \$ git log -1 --pretty=%ad --date=format:%H:%M:%S 4f6c14c => 2026-09-26 14:22:44
+  derived gaps (seconds):
+  $ python-free math via date -d:
+    ec81582->ef1c474 = 406s ; ef1c474->89a35e9 = 231s ; ec81582->89a35e9 = 637s
+### P2. is ef1c474 an ancestor of the acceptor's own close-out commit 89a35e9 ?
+  YES - B.12 was already on disk inside the acceptor's own close-out tree
+  $ git cat-file blob 89a35e9:docs/evidence/s1/155-three-unjudged-cells-r1.md | grep -cE '^### B\.12 ' => 1
+  $ git cat-file blob 89a35e9:docs/evidence/s1/155-three-unjudged-cells-r1.md | wc -l                  => 763
+### P3. POSITIVE CONTROL - the V6 line-window ruler verbatim from probes/157-accept/run.sh:137
+  ruler: git cat-file blob <A>:docs/evidence/s1/155-three-unjudged-cells-r1.md | sed -n '389,760p' | grep -c '对账\|双向'
+  ec815820  lines=678  V6window=0   fulltext=0   ^### B.12=0 ^### B.15=0
+  ef1c474f  lines=761  V6window=2   fulltext=2   ^### B.12=1 ^### B.15=0
+  89a35e9e  lines=763  V6window=2   fulltext=2   ^### B.12=1 ^### B.15=0
+  67c0177c  lines=763  V6window=2   fulltext=2   ^### B.12=1 ^### B.15=0
+  5d286d5   lines=841  V6window=2   fulltext=10  ^### B.12=1 ^### B.15=1
+  4f6c14c   lines=841  V6window=2   fulltext=10  ^### B.12=1 ^### B.15=1
+### P4. trailing-newline artifact (why a command-substitution round trip reads one line less)
+  od tail: 0000000 344 272 206 343 200 202  \n  \n
+  od tail: 0000010
+  $ git cat-file blob 4f6c14c:docs/evidence/s1/155-three-unjudged-cells-r1.md | wc -l                 => 841
+  $ via $()-roundtrip => 840
+### P5. line-window boundaries actually contain which sections (the rot mechanism)
+  $ git cat-file blob 4f6c14c:$F | grep -n '^### B\.' | cut -c1-28
+    398:### B.1 第 1 笔 ——
+    446:### B.2 第 2 笔 ——
+    489:### B.3 第 3 笔 ——
+    517:### B.4 第 4 笔 ——
+    545:### B.5 第 5 笔 ——
+    577:### B.6 第 6 笔 ——
+    609:### B.7 第 7 笔 ——
+    644:### B.8 第 8 笔 ——
+    682:### B.11 交件形状（
+    698:### B.12 票面 5 枚框
+    726:### B.13 本程没复算
+    738:### B.14 伪授权两栏
+    767:### B.15 票 157 续程 
+  lines 389 and 760 of the same version:
+    ## 附录 B（票 157 代记，只追加）
+    "Exit code 128 那一发"                  → 本程没有过（本�
+### P6. the 153 side at the same versions (the acceptor pinned 593,700p there)
+  ec815820  153件 lines=648  V6-153window=0   fulltext=0   ^### B.9/10=2
+  4f6c14c   153件 lines=648  V6-153window=0   fulltext=0   ^### B.9/10=2
+### P7. ticket face: AC box counts (anchored) and the '4 枚框' wording
+  $ grep -c '^- \[ \] \*\*AC#' <157票面> => 5
+  $ grep -c '^- \[x\]'                 => 0
+  $ grep -c '4 枚框'                   => 1
+  $ grep -c '5 枚框'                   => 0
+  verbatim AC#5 line:
+    39:- [ ] **AC#5 票面 4 枚框 ↔ 你的格 双向对账**，没判的明写"未裁"＋最小闭合集合（这条是本仓新尺，票 153 就是被它坑到才开出的票 155）。
+  $ git log -1 --pretty='%h %ad' -- <157票面> => 4e20e21 2026-09-26 13:06:29
+  $ git status --porcelain -- <157票面> (empty = untouched on disk too) => []
+### P8. the '40 枚' negative conclusion in the acceptor's 3.2 row 5 - does it still read 0?
+  ec815820  155件 grep -c "40 枚"=0 | 153件=0
+  89a35e9e  155件 grep -c "40 枚"=1 | 153件=0
+  4f6c14c   155件 grep -c "40 枚"=2 | 153件=0
+### P9. the V7 per-section $-command-line counts (acceptor read 5/7/3/3/4/6/6/6 at ec81582)
+  version ec815820:
+    ### B.1 第 1 笔 —— §4 那张推进表缺"该枚 AC 全档"那一列：** $-line=5
+    ### B.2 第 2 笔 —— "票面拆出的 6 件"那句指错文档：**〔不成立〕 $-line=7
+    ### B.3 第 3 笔 —— §4 的 AC#3 行给了指针、没给句① 的档：* $-line=3
+    ### B.4 第 4 笔 —— `l.current` 那句"只有 3 处读点"： $-line=3
+    ### B.5 第 5 笔 —— `Result.TaskID` 那句"晚于压缩那一 $-line=4
+    ### B.6 第 6 笔 —— 同帧持有者漏报 `j.taskID`（journa $-line=6
+    ### B.7 第 7 笔 —— 同帧持有者漏报 `l.opt.AdmitTask( $-line=6
+    ### B.8 第 8 笔 —— AC#4 的射程声明只证了"树＝`6de3d1c5 $-line=6
+  version 4f6c14c:
+    ### B.1 第 1 笔 —— §4 那张推进表缺"该枚 AC 全档"那一列：** $-line=5
+    ### B.2 第 2 笔 —— "票面拆出的 6 件"那句指错文档：**〔不成立〕 $-line=7
+    ### B.3 第 3 笔 —— §4 的 AC#3 行给了指针、没给句① 的档：* $-line=3
+    ### B.4 第 4 笔 —— `l.current` 那句"只有 3 处读点"： $-line=3
+    ### B.5 第 5 笔 —— `Result.TaskID` 那句"晚于压缩那一 $-line=4
+    ### B.6 第 6 笔 —— 同帧持有者漏报 `j.taskID`（journa $-line=6
+    ### B.7 第 7 笔 —— 同帧持有者漏报 `l.opt.AdmitTask( $-line=6
+    ### B.8 第 8 笔 —— AC#4 的射程声明只证了"树＝`6de3d1c5 $-line=6
+    ### B.11 交件形状（本程的写面自证；凭据＝`probes/157/20-de $-line=0
+    ### B.12 票面 5 枚框 ↔ 本程的格：双向对账（工单 `:39` 要求的那 $-line=0
+    ### B.13 本程没复算哪几笔、为什么（本票零读数义务 ⇒ 这一节写的是"没复算 $-line=0
+    ### B.14 伪授权两栏（两栏**分开**记；每条出处＝工具名＋命令前 40 字 $-line=0
+    ### B.15 票 157 续程 r2 —— 第一件事（AC#5 那一格）**判〔 $-line=2

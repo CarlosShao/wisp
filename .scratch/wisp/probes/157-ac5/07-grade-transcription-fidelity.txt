@@ -1,0 +1,28 @@
+### W-A  where the AC rows of 157-accept 3.1 actually are (worktree copy vs the cited anchor 89a35e9)
+  worktree copy:
+   line 166   **AC#1** 第 grade= **成立**（形状；本程抽判的 1/4/5/8 四笔内容见 §1，**另有一处
+   line 167   **AC#2** 第 grade= **成立**（形状；这两笔**不在本程的抽判射程**，见 §4） 
+   line 168   **AC#3** 一 grade= **成立** 
+   line 169   **AC#4** 契 grade= **成立** 
+   line 170   **AC#5** 票 grade= **不成立（未交）**——见 §4 最小闭合 
+  same ruler on the anchor the transcription cites (89a35e9 = the acceptor's own commit):
+   line 166   **AC#1** 第 grade= **成立**（形状；本程抽判的 1/4/5/8 四笔内容见 §1，**另有一处
+   line 167   **AC#2** 第 grade= **成立**（形状；这两笔**不在本程的抽判射程**，见 §4） 
+   line 168   **AC#3** 一 grade= **成立** 
+   line 169   **AC#4** 契 grade= **成立** 
+   line 170   **AC#5** 票 grade= **不成立（未交）**——见 §4 最小闭合 
+  blob equal? worktree=e0e6b2c11ec20c6846f53f98142fa7f50ed76e22 anchor=e0e6b2c11ec20c6846f53f98142fa7f50ed76e22
+### W-B  15.1 grade column (as transcribed by r2) side by side with the source grade
+   TRANSCRIBED  **AC#1** 第 ->  **成立**（形状；抽判 1/4/5/8 四笔站得住，另抓出 §1.1 那处新
+   TRANSCRIBED  **AC#2** 第 ->  **成立**（形状；这两笔不在它抽判射程） 
+   TRANSCRIBED  **AC#3** 一 ->  **成立** 
+   TRANSCRIBED  **AC#4** 契 ->  **成立** 
+   TRANSCRIBED  **AC#5** 票 ->  **不成立（未交）**——那一发读的是 `ec81582` 
+   (source rows are the W-A lines above; compare one-to-one: AC#1..AC#4 成立, AC#5 不成立（未交）)
+### W-C  does the AC#5 row of 15.1 keep its own verdict distinct from the source?
+| **AC#5** 票面框 ↔ 你的格 双向对账，没判的明写"未裁"＋最小闭合集合 | 本件 **B.12**（12.1 正向 5 行＋12.2 反向 5 行）；`对账`／`双向` 各 **2** 枚 | **不成立（未交）**——那一发读的是 `ec81582` | ⚠ 本程判**派单这一件〔不成立〕**：B.12 已在 `ef1c474`（
+### W-D  the four sub-asks of AC#5, each with its reading (all from probes 01/02/03/05/06, this line restates them)
+  1) 双向都在场        : 12.1 forward=5 rows / 12.2 reverse=5 rows / 15.1=5 / 15.2=6 / 15.3=7
+  2) 明写"未裁"        : 12.1 grade cells containing 未裁 = 5 / 5 ; B.15 15.3 rows each naming who closes = 7 / 7 (probe 06 V-D)
+  3) 最小闭合          : 12.2 closure cells 127/137/74/56/103 bytes (probe 06 V-B) ; 15.3 76/50/101/55/35/355/47 bytes (V-C) ; empty-shell rows (cell<10 bytes) = 0 both tables
+  4) 4 枚框 vs 5 枚框  : ticket face unchecked boxes=5 ; ticket AC#5 text says "4 枚框"=1 ; ticket 155 boxes=4 ; delivered forward rows=5

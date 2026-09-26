@@ -1,0 +1,88 @@
+### S-A  cited 凭据 targets exist at the anchor (blob object type + cited marker present)
+  .scratch/wisp/probes/157/20-delivery-shape-and-forbidden-faces.txt git cat-file -t => blob  lines=138 V1=1 V2=1 V3=1 V4=1 V5=1 V6=1 V7=1
+  .scratch/wisp/probes/157/22-r2-ac5-cell-and-b1-columns.txt     git cat-file -t => blob  lines=293 W1=1 W2=1 W3=1 W5=1 W6=1 W8=1 W10=1 W11=1 W12=1 W13=1
+  .scratch/wisp/probes/157/23-r2-close-shape.txt                 git cat-file -t => blob  lines=97 K0=1 K1=1 K2=1 K3=1 K4=1 K5=1 K6=1 K7=1
+  .scratch/wisp/probes/157/15-item2-lettersource-rulers.txt      git cat-file -t => blob  lines=44
+  .scratch/wisp/probes/157/21-final-self-check.txt               git cat-file -t => blob  lines=75 W1=1 W2=1 W3=1 W5=1 W6=1
+### S-B  forward grade column, per row (12.1 = implementer self-proof, 15.1 = grades from the acceptor)
+-- 12.1 rows: does the last cell literally contain 未裁 ?
+    **AC#1** 第 1–8 笔各补一行、全落本件末尾新一节、逐笔带当轮复算命令与输出；对不上⇒判〔不成立〕＋读数并停手报回  -> 未裁?YES  col= **未裁**（见 12.2 第 1 行） 
+    **AC#2** 第 9–10 笔落 153 件末尾同一形状  -> 未裁?YES  col= **未裁**；且本程**没碰 153 的 AC#2
+    **AC#3** 一枚框都不勾、`-done` 一枚都不加  -> 未裁?YES  col= **未裁**（本程只能自证"没动"） 
+    **AC#4** 契约轴零字节  -> 未裁?YES  col= **未裁** 
+    **AC#5** 票面框 ↔ 本程格 双向对账，没判的明写"未裁"＋最小闭合集合  -> 未裁?YES  col= **未裁** 
+-- 15.1 rows: does the grade column carry a NON-implementer 档 ?
+    **AC#1** 第 1–8 笔各补一行、逐笔带当轮复算命令与输出  -> col3(验收程的档)= **成立**（形状；抽判 1/4/5/8 四笔站得住，另抓出 §1.1 那处新
+    **AC#2** 第 9–10 笔落 153 件同一形状  -> col3(验收程的档)= **成立**（形状；这两笔不在它抽判射程） 
+    **AC#3** 一枚框都不勾、`-done` 一枚都不加  -> col3(验收程的档)= **成立** 
+    **AC#4** 契约轴零字节  -> col3(验收程的档)= **成立** 
+    **AC#5** 票面框 ↔ 你的格 双向对账，没判的明写"未裁"＋最小闭合集合  -> col3(验收程的档)= **不成立（未交）**——那一发读的是 `ec81582` 
+-- POSITIVE CONTROL for S-B: 155-accept 7.1 grade column (must read 成立 for its 4 boxes)
+   ctl  **AC#1** 把三块各答一次，答案带命令原文＋输出；三枚锚点号先反查  ->  `00-preflight.txt`、`20/21-com
+   ctl  **AC#2** 交件里要有一行"三块各把 153 的哪一枚 AC 推到可定档"  ->  `10-ruler-caliber-and-counts.
+   ctl  **AC#3** 契约轴零字节（含"票 153/155 之外的任何证据件"）  ->  `41-contract-axis.txt`、`42-ro
+   ctl  **AC#4** 若要跑测试：先取一棵活树并自证（三枚坑）  ->  `11-snapshot-tree-verify.txt`
+### S-C  cross-pointer from the forward table into the reverse table
+  rows in 12.1 whose grade cell names "见 12.2" = 1
+  rows in 15.1 whose state cell names "15.3"    = 1
+### S-D  reverse roster printed in full (3 tables, NO truncation)
+-- 12.2 item column (5 rows):
+   | 1 |  **十笔的档位**（哪几笔算"补对了"） 
+   | 2 |  **第 2 笔〔不成立〕这一判本身** 
+   | 3 |  **153 的 AC#2 那枚框能否翻勾** 
+   | 4 |  **155 那四枚已定的勾是否因本程的记录要重看** 
+   | 5 |  **A293（`7cb9b19`）与 157 验收派单第 2 件那枚"155 自己跟自己矛盾"** 
+-- 15.2 attribution table (6 rows):
+   | 1 十笔的档位 |  157 验收程已抽判第 1/4/5/8 笔（`89a35e9`）；第 3/6/7/9/10 笔由它自己列在 §3.2 第 2 行＝**没判** 
+   | 2 第 2 笔〔不成立〕的归属之争 |  **编排者 13:46 已裁**：票面自己就拆了六件 ⇒ r1 判〔不成立〕对、验收程建议那句改法落地反而是错更正 ⇒ **不落** 
+   | 3 票面 AC#5 那枚框本身 |  票面＝编排者写面 
+   | 4 要不要为 B.1 那三行括号再开一张票 |  编排者两选一（就地 `B.1b` 或记台账）；派单已选第三支：**旧行不抹＋就近一行判语** 
+   | 5 `probes/157/**` 的"40 枚"口径 |  编排者 13:48 已按现量作废"40 枚"（台账 `:7290` 写"真值＝17 枚"） 
+   | 6 派单对被验物的两处描述（附录 A vs B 等） |  编排者已自裁（`7236c92`） 
+-- 15.3 item column (7 rows):
+   | 1 |  **AC#5 那枚框要不要从"不成立（未交）"改判** 
+   | 2 |  **`A293②` 那件"155 表自己跟自己矛盾"** 
+   | 3 |  **第 3／6／7／9／10 笔的档** 
+   | 4 |  **B.3 里同一把坏尺的第二处产物**：`:506` 那一行把 153 验收件 `:843` 的"行尾"取成了那枚 `**无**`（实为"前一程哪一格"那一格），还把它注成
+   | 5 |  **157 验收件 §1.1 给的那句"最小修法"（把三行括号换成……）** 
+   | 6 |  **`probes/157/11-…sh:71` 那发 `SH head -20`** 
+   | 7 |  **155 验收件 §1.2 多问的那一枚**（"`l.current` 唯一读点在 `defaultControl`、不在 `run` 体内"） 
+### S-E  coverage: is each ticket box named in the reverse union (12.2 + 15.3 + 15.2)?
+  AC#1 named in: 12.2=1 15.3=0 15.2=0
+  AC#2 named in: 12.2=1 15.3=0 15.2=0
+  AC#3 named in: 12.2=0 15.3=0 15.2=0
+  AC#4 named in: 12.2=0 15.3=0 15.2=0
+  AC#5 named in: 12.2=0 15.3=1 15.2=1
+  discipline contents (AC#3 不勾框 / -done, AC#4 契约轴/禁改面) anywhere in the appendix:
+  翻勾|勾 anywhere in 12.2=1  15.3=0 | -done in 12.1=1  15.1=1 | 禁改面|零字节|契约轴 in 12.1=1  15.1=1
+### S-F  the '4 枚框' text vs the disk count (three sources side by side)
+  ticket face 157 : grep -c "^- [ ] **AC#"   = 5
+  ticket face 157 : AC#5 line contains "4 枚框" = 1
+  impl dispatch D1 :58 "5 枚框" hits            = 1
+  r2 dispatch D3   "5 枚框" hits                = 1
+  B.12 heading itself says "5 枚框"             = 1
+  ticket 155's face box count (the source of the '4 枚框' wording in ticket 157 AC#5):
+  ticket 155: matches of ^155 in issues/ = 1 file(s) (only one, so no truncation risk)
+  ticket 155 file = 155-ticket-153-leaves-three-cells-unjudged-because-my-attack-point-grid-and-the-ticket-ac-grid-are-not-the-same-coordinate-system-done.md
+  ticket 155 anchored box count (any state) = 4 ; unchecked = 0  <= the origin of the "四枚框" wording
+### S-G  worktree vs anchor guard for every file this program reads (dirty tree is never an anchor)
+  155-three-unjudged-cells-r1.md                                         status=[] IDENTICAL
+  153-trace-lies-unguarded-r1.md                                         status=[] IDENTICAL
+  155-three-unjudged-cells-r1-accept-r1.md                               status=[] IDENTICAL
+  157-record-level-cleanup-r1-accept-r1.md                               status=[] IDENTICAL
+  2026-09-26-131x-impl-157-record-level.md                               status=[] IDENTICAL
+  2026-09-26-132x-accept-157-r1.md                                       status=[] IDENTICAL
+  2026-09-26-134x-impl-157-r2-one-cell.md                                status=[] IDENTICAL
+  157-record-level-cleanup-ten-table-vs-disk-mismatches-left-by-tickets-155-and-153.md status=[] IDENTICAL
+### S-H  AC#5 row of the acceptor verdict, verbatim in full (the text being re-judged)
+| **AC#5** 票面框 ↔ 你的格 双向对账，没判的明写"未裁"＋最小闭合集合 | 锚定 grep 两枚附录：`对账\|双向` 命中＝**0／0**（V6 段）；两节附录的抬头那几枚弹头里也没有反向那一节（只登记了身份／来路／纪律） | **不成立（未交）**——见 §4 最小闭合 |
+### S-I  the acceptor's prescribed closure, verbatim in full
+| 3 | **票面 AC#5 那一枚框本身**（`成立（未交）`那一档要不要挂回工单） | 票面是编排者写面 | 最小闭合＝**157 自己往任一节的末尾补一枚"票面 5 枚框 ↔ 本程的格"双向表**（形状照 155 验收件 §7.1/§7.2 两表，含"未裁"清单＋最小闭合）；**不需新仪器、不需重跑任何读数** |
+### S-J  does the delivered table satisfy that prescription line by line? (4 sub-asks)
+  prescription says: 形状照 155-accept 7.1/7.2 两表 -> 12.1 rows=5 cols=4 | 12.2 rows=5 cols=4
+  prescription says: 含"未裁"清单 -> 12.1 grade cells with 未裁 = 5 / 5
+  prescription says: ＋最小闭合 -> 12.2 rows with a closure cell >=40 bytes = 5 / 5
+  prescription: "157 自己往任一节的末尾补" -> the table lives at the END of the appendix? B.12 line no vs appendix-B start line no
+    389:## 附录 B（票 157 代记，只追加�
+    698:### B.12 票面 5 枚框 ↔ 本程的格�
+    767:### B.15 票 157 续程 r2 —— 第一�
