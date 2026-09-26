@@ -161,24 +161,51 @@ $ grep -c "C25-loop-wiring" docs/specs/SPEC-12-roadmap-governance.md  # 尺2：�
 
 **⑤ 同源拷贝有几份**（这一问在这枚上＝"这段注释所钉的成对规矩在别处还有几处自称同源"）：
 
-- **尺A（词形）**：`grep -rnE "逐字|照抄|verbatim|唯一来源|权威表" docs/PLAN.md docs/specs AGENTS.md` → 全语料 33 行命中（原始输出在 `.scratch/wisp/probes/16x/c1/copy-census.log` 尺A-1 段），
-  其中**没有一行**声称"逐字抄自 `provenance.go` 的头注释" ⇒ 词形这把尺给出：**0 份自称同源的拷贝**。
-- **尺B（内容串）**：`grep -rn "OpenScope at task start" docs/ internal/ cmd/` 与 `git grep -n "OpenScope" <锚> -- '*.go' ':!*_test.go' ':!.scratch'` →
-  文档侧 0 命中；**代码侧 2 枚生产调用点**（它们是**受这次签名改动影响的调用者**，不是"自称逐字抄"的拷贝）：
+- **尺A（词形）**：`grep -rnE "逐字|照抄|verbatim|唯一来源|权威表" docs/PLAN.md docs/specs AGENTS.md | wc -l` → **28** 行命中
+  （原始逐行输出在 `.scratch/wisp/probes/16x/c1/copy-census.log` 尺A-1 段，那次跑的是**更宽**的八支样式所以得 33；
+  两支的差别＝多出来的 `一一对应`／`与 D3x 表一致`／`与 D43 转移表` 三支）。
+  ⚠ **这把尺的已知缺陷（写下来免得下一位当它是精确计数）**：`逐字` 无词边界，会把 `逐字节稳定`（`PLAN.md:3003`、`SPEC-02:131`、`SPEC-05:106`）也算进来
+  ⇒ **它只能当"有没有人声称逐字拷贝"的上界用**；本格的结论（0 份）靠的是逐枚读那 28 行，不是那个数。
+  **28 行里没有任何一行声称"逐字抄自 `provenance.go` 的头注释"** ⇒ 文档侧的同源拷贝：**0 份**。
+- **尺B（内容串）**：
+
+```
+$ grep -rn "OpenScope at task start" docs/ internal/ cmd/ | grep -v docs/evidence
+internal/risk/provenance.go:56:// 21, 22, 26) must (1) OpenScope at task start and Defer(CloseScope) on the
+internal/risk/provenance.go:453:			logf("risk/C25: Inspect/CheckText on unregistered scope %q while other scopes hold taints: fail-closed R4 (ensure OpenScope at task start)", scopeID)
+```
+  ⇒ 那半句原文在**文档里 0 处**、在**码里 2 处且都在同一枚文件内**（`:453` 是同包的一句日志文案，不是拷贝）。
+- **尺B-补（被改那条标记的名字在别处被复述了几次）**：
+
+```
+$ git grep -n "C25-loop-wiring" 0d17647 -- ':!.scratch' ':!docs/evidence' ':!docs/reports'
+internal/risk/provenance.go:55:// DEFERRED(C25-loop-wiring): the agent loop / tool providers (tickets 10, 20,
+internal/tools/bridge.go:627:// DEFERRED(C25-loop-wiring) item (1). Idempotent; Execute opens lazily so a
+cmd/wisp/panel_assets.go:164:// DEFERRED(C25-loop-wiring) item 1); a CLI probe has no task, so it names one
+```
+  ⇒ **除本体之外还有 2 处注释在复述"第 (1) 条"**（`bridge.go:627`、`panel_assets.go:164`）。
+  它们**不是"逐字拷贝"，是"跟着这条标记说话的注释"**——把 `:56` 改成 LANDED 而不改它们，同一枚标记就会出现**三种状态**（本仓"名册与注释各说各话"那一族的形状）。
+  ⚠ 那 2 处**本来就落在本程第 ⑥ 问必须放开的两枚文件里** ⇒ 不缺批准，只缺"一起改"这一句。
+- **受签名改动直接影响的调用者（两把尺各数一次，都是 2 枚）**：
 
 ```
 $ git grep -l "OpenScope" 0d17647 -- '*.go' ':!*_test.go' ':!.scratch' | grep -v internal/risk/provenance.go
-0d17647...:cmd/wisp/panel_assets.go
-0d17647...:internal/tools/bridge.go
+0d17647:cmd/wisp/panel_assets.go
+0d17647:internal/tools/bridge.go
+$ git grep -n "prov.OpenScope" 0d17647 -- '*.go' ':!*_test.go' ':!.scratch'
+0d17647:cmd/wisp/panel_assets.go:232:	prov.OpenScope(taintSourceScopeID)
+0d17647:internal/tools/bridge.go:642:		b.prov.OpenScope(taskID)
 ```
-
   逐枚现读（本锚点）：
   - `internal/tools/bridge.go:633-644` `func (b *Bridge) OpenTask(...)`，其中 `:638-642` 就是票 160 进度段说的那两套并行记账：
     `open := b.scopes[taskID]` / `b.scopes[taskID] = true` 与 `:642 b.prov.OpenScope(taskID)` 分列两行（**本程读码自取，与票面 `:46-47` 同读**）；
-  - `cmd/wisp/panel_assets.go:232 prov.OpenScope(taintSourceScopeID)`，且 `:162-166` 的注释自陈它是**故意不关**的：
-    `a CLI probe has no task, so it names one / and closes nothing - the engine lives and dies inside this process.`（逐字）
+  - `cmd/wisp/panel_assets.go:232`，且 `:162-165` 的注释自陈它是**故意不关**的（逐字，跨两行折行）：
+    `a CLI probe has no task, so it names one` / `and closes nothing - the engine lives and dies inside this process.`
     ⇒ **这一枚不是遗漏，是与新形状直接冲突的一形**：句柄自带关闭动作之后，"开一个、不关、随进程死"要么显式写成"故意丢弃句柄"，要么被类型系统挡住。
-- ⚠ **两把尺都数过，才允许写这句**：`provenance.go` 头注释的**同源拷贝＝0 份**；**受影响的真实调用者＝2 枚**（这是两件不同的事，别并成一句）。
+- ⚠ **三把尺都数过，才允许写下面这句**：**文档侧同源拷贝＝0 份**；**同文件内复述＝1 处**（`:453`）；
+  **跨文件复述（会随这条标记变陈的注释）＝2 处**；**受签名改动影响的真实调用者＝2 枚**。
+  这**是三件不同的事**，别并成一句。另：`docs/evidence/s1/{154-host-id-never-closed-r1.md:336, 151-task-scope-never-closed-r1.md:200,299}` 也复述过（3 处），
+  但那是裁决史、不是契约拷贝（§2 第 2.11 格的排除理由），**不计进"要同批改的份数"**。
 
 **⑥ 不动它能不能落地**：**不能**，且**理由与文字无关**——
 签名从 `OpenScope(scopeID string)` 变成"交回句柄"，**编译器会当场要 2 枚调用者一起改**，
@@ -200,4 +227,168 @@ $ git grep -l "OpenScope" 0d17647 -- '*.go' ':!*_test.go' ':!.scratch' | grep -v
 
 ---
 
-（§4.2 起逐枚续写；§3 六行表在六枚全部落地后一次给出。）
+### 4.2 票 162 — 补"只改这一小块"那枚工具（`fs.edit`）
+
+**① 票面现读**（`.scratch/wisp/issues/162-add-the-patch-one-region-tool-instead-of-rewriting-whole-files.md`，`Read` 全文，52 行）：
+
+- Status（`:3`）：`立而不派（往内置工具表加东西＝改 D34＝人工批准；owner 已答"要的"，但那是批能力要，路径他还没选 ⇒ 见"我的推荐"）`
+- AC（`:32`–`:37`）：AC#1 未修码读数／AC#2 四枚拒绝各一枚用例／AC#3 换行 BOM 正反／AC#4 原子性／AC#5 风险档与门控／**AC#6 契约轴**
+- AC#5（`:36`）逐字：**`fs.edit 判定必须与 fs.write 同族（L1）`**，且**越界路径必须被 `PathResolver` 拒**；不许新增豁免、不许动 `allowlist.txt`
+- AC#6（`:37`）逐字：**`本票只许动 docs/PLAN.md 的 D34 那一行（需 owner 单独批准，且批准原文要落台账）＋ internal/tools/** 实现与测试＋自己证据件。docs/specs/**、internal/risk/**、thresholds.go、golden、frontend/**、design/** 零字节`**
+- 本票不解决（`:41`–`:43`）：不做"人逐块批准改动"那个界面（`:41`）／不做机器自审工具／不补 `fs.read` 分页
+- **owner 已答的那半**（`:51`）：`owner 已答"要的"＝批能力要；路径（核心/插件/内部不露）他未选`
+
+**② 要动的具体行（file:line ＋ 现在逐字写着什么）**：**两枚**，一枚是必动的权威表，一枚是被它牵着动的拷贝。
+
+```
+$ awk 'NR>=2529 && NR<=2535 {printf "%d\t%s\n", NR, $0}' .scratch/wisp/probes/16x/c1/PLAN.md.0d17647
+2529	| 工具 | 动作 | RiskLevel | capability | 落切片 | 备注 |
+2530	|---|---|---|---|---|---|
+2531	| `fs.read` | 读文本/二进制摘要 | **L0**（授权目录内）/ L2（越界） | `fs.read` | S3 | 经 C26；长输出走宿主内部 spill（**不门控**，见注②）；结果打 taint |
+2532	| `fs.list` | 列目录 | L0 / L2（越界） | `fs.read` | S3 | — |
+2533	| `fs.write` | **新建**文件 | **L1** | `fs.write` | S3 | **temp + 原子 rename**（D31 已定，因取消不原子） |
+2534	| `fs.write` | **覆盖已存在** | **L2** | `fs.write` | S3 | C19/R8 不可逆 |
+2535	| `fs.move` | 移动/重命名 | **L1** | `fs.write` | S3 | **跨盘 = 复制+删 → L2** |
+```
+
+⇒ **插入点＝`docs/PLAN.md:2534` 之后**（紧跟"覆盖已存在"那一行，同族相邻）。
+它**同时牵住**这三行，本程建议它们**一字不动**：
+
+```
+$ awk 'NR==2524 || NR==2525 || NR==2981 || NR==1176 {printf "%d\t%s\n", NR, $0}' .scratch/wisp/probes/16x/c1/PLAN.md.0d17647
+1176	- 工程要求：`fs.write` 必须走**临时文件 + 原子 rename**，否则取消会留损坏文件；
+2524	RiskLevel 列是 **C19 融合后的默认结论**；实际判定仍由 C19 的 R1–R9 规则集在调用时算出
+2525	（例如越界路径会把 L0 升到 L2）。
+2981	| R8 | 不可逆性：永久删除 / 覆盖已存在 / 关机重启 / 关闭窗口 / 发送类 | → **L2** |
+```
+
+**③ 建议的替换文本（逐字可贴，一行；照现有表格排版）**：
+
+```
+| **`fs.edit`** | **字面定位替换已存在文件里的一小段** | **L2** | `fs.write` | S3 | 定位＝字面子串且**必须唯一命中**；匹不上/多处命中＝硬错且**绝不落盘**；写走 temp＋原子 rename（`:1176` 同规）；**R8 覆盖已存在 → L2**，与 `fs.write` 覆盖行同级 |
+```
+
+⚠⚠ **本程在这里改了推荐，且必须让 owner 看见我改了什么**：票面 `:36` 现在写的是 **L1**，
+我给的是 **L2**。凭据三条（都是本程现量，不是推理）：
+
+```
+$ git show 0d17647:internal/risk/rules_irreversible.go | awk 'NR==10 || NR==25 {printf "%d\t%s\n", NR, $0}'
+10		"overwrite":    "覆盖已有内容",
+25			classes = append(classes, "overwrite")
+$ git show 0d17647:internal/tools/fs_write.go | awk 'NR==17 {printf "%d\t%s\n", NR, $0}'
+17	//	fs.write  new file L1 / overwrite L2 (R8)   D31 temp+atomic-rename writer
+$ awk 'NR==2534 {print}' .scratch/wisp/probes/16x/c1/PLAN.md.0d17647
+| `fs.write` | **覆盖已存在** | **L2** | `fs.write` | S3 | C19/R8 不可逆 |
+```
+⇒ 在**现有语义**下，一枚"替换已存在文件的旧内容"的调用，事实钩子必然带 `overwrite`，R8 必然判 **L2**；
+把 D34 那行写成 L1 ＝**表与判定器互相矛盾**，而 `R1–R9` 与 `D34` 都在禁改名单里（`README:180`）。
+⇒ 想真拿 L1，必须**先有可撤销那味**（写前把原件留一份、面板可撤销，类比 `fs.trash` 的 L1 论证 `PLAN.md:2536`）——
+**那是新机器，不是表格加一行**，且要另一次批准。〔这一句是推断，见 §2 第 2.4 格〕
+⇒ **验收面也跟着**，两处文字都要求"判定必须等于表"：
+
+```
+$ grep -n "与 D34 表一致" .scratch/wisp/probes/16x/c1/PLAN.md.0d17647 docs/specs/*.md
+.scratch/wisp/probes/16x/c1/PLAN.md.0d17647:1668:    → **每条须成功，且风险级判定与 D34 表一致**（`fs.trash` 必须是 L1 不是 L2）
+docs/specs/SPEC-00-product-overview.md:119:| ① 系统操作与文件治理 | … | S3 | 10 条真实指令逐条跑，风险级判定与 D34 表一致（SPEC-10 §7.1） |
+```
+⇒ 表里写 L1、判定器判 L2 ⇒ **场景①那 10 条的验收格自己打红**（这两行就是那格的判据原文）。
+
+**④ 新增还是改写**：**新增**（在 `:2534` 后插一行）。
+**不**改写 `:2533`/`:2534`/`:2524`/`:2981`/`:1176`/`SPEC-06:41` 任何一枚既有文字——
+这是这张表里**最便宜的一种改动**，也正好是票面 `:37` 已经写明"批准原文要落台账"的那一档。
+（对照：若走"把 `fs.write` 覆盖行的措辞改成能涵盖 edit"那条路＝**改写既有文字**，本程**不推荐**，见 §2 与 §3 的"改写"列。）
+
+**⑤ 同源拷贝有几份（两把尺都数过）**：
+
+- **尺A（词形，谁自称是 D34 的拷贝）**：
+
+```
+$ grep -n "内置工具权威表" docs/specs/SPEC-07-tools-and-plugins.md docs/PLAN.md AGENTS.md
+docs/specs/SPEC-07-tools-and-plugins.md:1:# SPEC-07 · 内置工具权威表与插件系统
+docs/specs/SPEC-07-tools-and-plugins.md:32:## 3. D34 内置工具权威表（唯一来源；落 `docs/TOOLS.md`）
+docs/PLAN.md:351:> ⚠ **本节的「六件套」清单已被 D34 内置工具权威表取代。**
+docs/PLAN.md:1747:| **`docs/TOOLS.md`** | **第四轮新增**：D34 内置工具权威表（工具名/动作/RiskLevel/capability/落哪个切片）。**必须单独成文** …
+docs/PLAN.md:2514:## 16.5 D34 — 内置工具权威表（**取代 D14 的六件套；`docs/TOOLS.md` 的唯一来源**）
+AGENTS.md:152:| D34 | 内置工具权威表（取代 D14 的六件套；`docs/TOOLS.md` 的唯一来源） | `PLAN.md:2514` |
+```
+  逐枚判读：`PLAN.md:2514` 是**本体**；`PLAN.md:351`（D14 的作废声明）与 `:1747`（交付物清单）是**指回它**；
+  `AGENTS.md:152` 是**薄索引一行**（只抄标题＋给行号，**不抄表格**）；
+  **真正"另抄一份表格"的＝1 枚文件＝`docs/specs/SPEC-07-tools-and-plugins.md`，那张表在它里面（标题在 `:32`，行体在 `:37-71`）**。
+- **尺B（内容，把被抄的具体内容串当尺）**：`fs.*` 那一族行在拷贝里的落点（**行号＝该文件绝对行号**）：
+
+```
+$ awk 'NR>=37 && NR<=71 && /\| `?fs\./ {printf "%d\t%s\n", NR, $0}' docs/specs/SPEC-07-tools-and-plugins.md
+39	| `fs.read` | 读文本/二进制摘要 | L0（授权内）/ L2（越界） | fs.read | S3 | 经 C26；长输出宿主内部 spill；结果打 taint |
+40	| `fs.list` | 列目录 | L0 / L2（越界） | fs.read | S3 | — |
+41	| `fs.write` | 新建文件 | L1 | fs.write | S3 | temp + 原子 rename（D31） |
+42	| `fs.write` | 覆盖已存在 | L2 | fs.write | S3 | C19/R8 |
+43	| `fs.move` | 移动/重命名 | L1 | fs.write | S3 | 跨盘 = 复制+删 → L2 |
+44	| `fs.trash` | 移入回收站 | **L1** | fs.write | S3 | ⭐ 可用性收益最大：场景①大部分操作 L2→L1，缓解 B2 |
+45	| `fs.delete` | 永久删除 | L2 | fs.write | S3 | **默认不注册**，`[fs] delete_enabled=true` 才有 |
+48	| `search.files` | 按名找文件 | L0 | fs.read | S3 | 白名单内 |
+49	| `search.content` | 全文检索 | L0 | fs.read | S3 | 结果打 taint |
+54	| `doc.read` | PDF/docx/pptx → 文本 | L0 | fs.read | S3 | xlsx 与 OCR DEFERRED |
+```
+  **两张表的枚数现在相等**（这把尺最容易漏，所以两条命令分开）：
+
+```
+$ awk 'NR>=2531 && NR<=2563' .scratch/wisp/probes/16x/c1/PLAN.md.0d17647 | grep -c "^| "
+33
+$ awk 'NR>=39 && NR<=71' docs/specs/SPEC-07-tools-and-plugins.md | grep -c "^| "
+33
+```
+⇒ **D34 表格的逐行同源拷贝＝1 份**（`SPEC-07:37-71`），它的 `fs.write` 覆盖行在 **`SPEC-07:42`** ⇒ 我的新行要**同批镜像到 `SPEC-07:42` 之后**。
+
+```
+$ awk 'NR>=2531 && NR<=2563' .scratch/wisp/probes/16x/c1/PLAN.md.0d17647 | grep -c "^| "
+33
+$ awk 'NR>=39 && NR<=71' docs/specs/SPEC-07-tools-and-plugins.md | grep -c "^| "
+33
+```
+⇒ **D34 表格的逐行同源拷贝＝1 份**（`SPEC-07:37-71`），它的 `fs.write` 覆盖行在 **`SPEC-07:42`** ⇒ 我的新行要**同批镜像到 `SPEC-07:42` 之后**。
+- ⚠ **第三枚会跟着变谎的地方**（词形尺抓不到、内容尺也抓不到，只有读码看得到）：
+
+```
+$ git show 0d17647:internal/tools/fs.go | awk 'NR>=318 && NR<=323 {printf "%d\t%s\n", NR, $0}'
+318	// BuiltinFSEntries returns the whole D34 fs family the configuration allows:
+319	// the L0 pair plus the write half (fs.write / fs.trash / fs.move), with
+320	// fs.delete present ONLY when [fs] delete_enabled is true (FSDeps.
+321	// DeleteEnabled). Callers that want the write half on its own use
+322	// BuiltinFSWriteEntries.
+323	func BuiltinFSEntries(d FSDeps) []Entry {
+```
+  ⇒ `fs.go:318` 那句 **"the whole D34 fs family"** 是一个**自称等于全表的断言**：
+  只往表里加 `fs.edit`、不往这里加，这行注释就从那一刻起变成假话（而票面 `:37` 恰好**允许**动 `internal/tools/**`，所以这条不缺批准、只缺提醒）。
+- ⚠ **没有机器尺在盯这张表的对齐**（两把尺，各自量的是不同形状的东西）：
+
+```
+$ git grep -l "docs/PLAN" 0d17647 -- '*.go' '*.sh' '*.yml' '*.ps1' ':!.scratch' ; echo rc=$?
+rc=1                       # 尺1（零命中）：没有任何码/脚本/CI 读 docs/PLAN.md
+$ git grep -n "SPEC-07" 0d17647 -- '*.go' '*.sh' '*.yml' '*.ps1' ':!.scratch' | grep -E "table|§3|roster|名册"
+cmd/wisp/run.go:331:	// shortcut). SPEC-07 §3's frozen S1 roster names the first two builtins
+internal/tools/bridge.go:100:// through (SPEC-01 §3 / SPEC-07 §2). It implements agent.ToolProvider, the
+internal/tools/doc.go:2:// funnels every capability through enforcement (SPEC-01 §3, SPEC-07 §2).
+internal/tools/fs_write.go:29:	// the host-internal artifacts channel (SPEC-07 §3), not a gated tool.
+```
+  尺2 的 4 枚命中**逐枚判读**：`bridge.go:100` 与 `doc.go:2` 指的是 SPEC-07 **§2**（接口面），与表格无关；
+  **真点名 §3 那张表的只有 2 枚**（`run.go:331` 与 `fs_write.go:29`），它们**不抄表格文字、只把那张表当权威引用** ⇒
+  词形尺（"自称逐字抄自"）给 **0**、内容尺（表格行）给 **1 份**（`SPEC-07:37-71`）、"拿它当权威"的注释给 **2 枚**。
+  ⚠ 三个数不是一回事，**别并成一句**；**但"没有机器比对"这件事两把尺都成立**（尺1 零命中＋尺2 四枚全是注释、无解析）。
+⇒ **表与码、`PLAN.md` 与 `SPEC-07` 三者之间的漂移是静默的**（本仓"改一把尺之前先数它有几份拷贝"那条教训在这里就长这样）。
+
+**⑥ 不动 `D34` 能不能落地**：**不能（附带条件：只能"先只写码、名册那行由 owner 一次批完"）**。最短理由三条：
+(1) 工具名必须由 C1 注册器过校验，`PLAN.md` 表里没有这个名字＝**实现比权威表多一枚**，正是 `Q-58` 那一族（`cmd/wisp/run.go:330-340` 那段注释就是"两个冻结名打架、没人裁定"停在码里的现物）；
+(2) 票面 `:36` 自己要求"判定必须与 `fs.write` 同族"，而同族结论在表里；
+(3) `docs/specs/**` 若不同批镜像（`SPEC-07:42` 之后），**SPEC-07 那张自称权威表的拷贝当场落后一行** —— 而票面 `:37` **明令 `docs/specs/**` 零字节** ⇒
+**本程量到票 162 的 AC#6 与它自己要动的东西冲突**：批语必须把 `SPEC-07` 那一枚镜像行**一起放开**，否则这枚票交出来的就是**一张已知会漂的表**。
+
+**⑦ 要 owner 点的那一句**：
+
+> **「批 `docs/PLAN.md` 的 D34 在 `fs.write` 覆盖行（`:2534`）之后插一行 `fs.edit`，**风险级按 R8 写 L2**（票面原写 L1，我改判，理由在证据件 §4.2③），同批把这一行镜像进 `docs/specs/SPEC-07-tools-and-plugins.md:42` 之后；除此之外 `docs/specs/**` 其余零字节，批准原文我落台账（现最大号 `A316`）。」**
+
+不按推荐来的代价：坚持 **L1** ⇒ 要么验收格自己打红（`PLAN.md:1668`），要么**回去改 R8／改判定器**（`R1–R9` 禁改名单＋`internal/risk/**` 冻结面，比加一行贵一个数量级）；
+不镜像 `SPEC-07` ⇒ 留一行静默漂移，下一枚读 `SPEC-07` 的程会照旧表实现。
+
+---
+
+（下节：§4.3 票 163。）
