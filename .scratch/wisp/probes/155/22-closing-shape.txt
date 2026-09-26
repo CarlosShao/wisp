@@ -1,0 +1,67 @@
+### §6.1 本程名册（尺＝只打本程两枚写面路径）
+4c43b68|12:16|evidence(155 读数件追加): ext-A 收口第二回（同一棵未变异树
+5f6646a|12:15|evidence(155 收口自报): §7 两枚枚数写错——名册 7 枚应为 1
+c10f0c4|12:13|evidence(155 收口三节): §3.4-3.5 本格自报三处（§3 那节落了�
+9136820|12:06|evidence(155 格③=AC#3 句② 裁完): 到盘复算 ext-A/B/C 外部枚数
+a52ded8|12:01|evidence(155 格②=AC#2 问② 裁完): 唯一持有者=Loop.run 的参数 
+829abe5|12:00|evidence(155 格①=AC#2 问① 裁完): 改前 Compress 三条通道逐条�
+
+### §6.2 逐枚 commit 的 name-only（禁改面扫的输入；按 commit 量、不区间量）
+--- 4c43b68 ---
+.scratch/wisp/probes/155/11-ext-matrix.txt
+--- 5f6646a ---
+.scratch/wisp/probes/155/21-roster-and-counts.txt
+docs/evidence/s1/155-three-unjudged-cells-r1.md
+--- c10f0c4 ---
+.scratch/wisp/probes/155/13-ruler-caliber-diff.txt
+.scratch/wisp/probes/155/14-line-number-recheck-for-voided-block.txt
+.scratch/wisp/probes/155/20-delivery-shape.txt
+docs/evidence/s1/155-three-unjudged-cells-r1.md
+--- 9136820 ---
+.scratch/wisp/probes/155/11-ext-matrix.txt
+.scratch/wisp/probes/155/12-instrument-listing.txt
+docs/evidence/s1/155-three-unjudged-cells-r1.md
+--- a52ded8 ---
+.scratch/wisp/probes/155/02-ac2-q2-holder.txt
+docs/evidence/s1/155-three-unjudged-cells-r1.md
+--- 829abe5 ---
+.scratch/wisp/probes/155/00-anchor-reverse-check.txt
+.scratch/wisp/probes/155/01-ac2-q1-before.txt
+.scratch/wisp/probes/155/10-snapshot-sync.txt
+.scratch/wisp/probes/155/sync_blob_tree.py
+docs/evidence/s1/155-three-unjudged-cells-r1.md
+
+### §6.3 15 支禁改面管道命中数（本程名册并集）
+12
+^internal/risk/                  0
+^internal/panel/                 0
+^internal/agent/approval/        0
+^internal/observe/               0
+^internal/                       0
+thresholds\.go                   0
+golden                           0
+allowlist\.txt                   0
+^scripts/slo-check\.ps1          0
+^tools/d22scan/                  0
+^docs/PLAN\.md                   0
+^docs/specs/                     0
+^cmd/wisp/slo_windows\.go        0
+^frontend/                       0
+^design/                         0
+
+### §6.4 正控（同一批尺打在一枚真动过生产码的 commit 上）
+internal/agent/compress.go
+internal/agent/compress_trace_test.go
+internal/agent/loop.go
+正控 ^internal/agent/ = 3 枚
+
+### §6.5 票面与 -done 未动（现量）
+153 未勾框: 2   155 未勾框: 4   153/155 的 -done: 0
+153 票面最后一次 commit: b319bab 09-26 11:25 docs(票 151 结＝附条件成立、票
+
+### §6.6 未推自证
+## dev...cnb/dev [ahead 151]
+third_party tracked 枚数: 0
+
+§6.7 收口时刻 2026-09-26 12:17 +0800
+HEAD 现读: 4c43b68 evidence(155 读数件追加): ext-A 收�
