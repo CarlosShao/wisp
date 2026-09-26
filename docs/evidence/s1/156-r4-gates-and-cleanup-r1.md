@@ -249,3 +249,95 @@ internaltools verdicts pre-only=0  post-only=0      （ 79 ↔  79）
   变异那一侧用 `-overlay`（§2.1），**从不与 `-cover*` 同用**（`my156.py` 会 FATAL）。
 - 取干净树：本程**没有**做 `git archive | tar -x`，也没有需要——两发都跑在工作树本身上，
   且 `meta.txt` 的 `status_cmd_wisp_internal=[]` 与每发前后的树哈希共同钉住"跑的就是这批字节"。
+
+### 3.4 门禁跑完之后 HEAD 又动了（归属写清，别让下一个程误读成"改后未覆盖"）
+
+本程 AC#7 那一发钉在 `1d53526`（＝本程 AC#4② 落地、`status_cmd_wisp_internal=[]`）。此后盘上多了一枚
+`a2a3b3c feat(frontend 右栏 ZCode 交互补全 + 会话流行)`——**另一会话的写面**，本程未碰。它能否影响本程这两发：
+
+```
+$ git show --name-only --format='' a2a3b3c          frontend/src/components/harness/main.tsx
+                                                    frontend/src/components/harness/right-rail.tsx
+                                                    frontend/src/fixtures/harness-app.ts   ← 只有 .ts/.tsx
+$ grep -rl 'frontend/' cmd/wisp/*.go internal/tools/*.go | wc -l   0      ← 两包的 Go 源码零引用 frontend
+$ grep -rn 'go:embed' cmd/wisp/*.go internal/tools/*.go               仅 1 行注释（panel_assets.go:19，
+                                                     说的是 internal/panel 的 embed bundle；a2a3b3c 未动 internal/panel）
+```
+
+⇒ **本程不重跑**：那枚 commit 结构上进不了这两包的读数（既不 `//go:embed` 也不被引用）。
+本程把"重跑一次以覆盖别人写面"当成 gold-plating 拒掉，并在此登记判据；若验收程要一发跑在
+`a2a3b3c` 之后的读数，那一发**不是本程的凭据**，请另派。
+
+---
+
+## 第 4 格　AC#6 契约轴零字节（**逐枚 commit 现量**，区间 diff 不当尺）
+
+尺＝本程新建 `.scratch/wisp/probes/156/zero156-r4.sh`（承 r1 已入库的 `zero156.sh` 的逐枚原则，
+补上派单 §4 点名的三枚坑），名册逐字抄票面 `:49`–`:51` 的 15 支。原文两份：
+`ac6-census-156-impl-commits.txt`（本票实现 commit）与 `ac6-census-156-era.txt`（整个票 156 时代 87 枚）。
+
+### 4.1 先让"零"值钱：正控与那三枚坑
+
+- **坑①＝假零**（`git ls-tree HEAD <目录>` 不带 `-r` 只列目录本身）——本程现量：
+  `internal/risk` 非递归＝**1**，递归＝**37**。⇒ 本件所有射程盘点一律 `git ls-tree -r`（`zero156-r4.sh selftest`）。
+  射程在 HEAD 上的存量：**1＝PLAN.md、14＝docs/specs、37＝internal/risk、20＝internal/panel、
+  18＝internal/agent/approval、25＝internal/observe、1＝slo-check.ps1、6＝tools/d22scan、85＝frontend、
+  30＝design、1＋1＝台账与停车点**，另 `thresholds.go`＝1、`golden`＝58、`allowlist.txt`＝1（合计 239，重叠未去）。
+- **正控**（否则"零命中"可能只是尺坏了）：把同一把尺打在**按路径挑出来的**（不是按 message 挑的）三枚历史 commit 上：
+
+```
+1218192  AC6-HIT AC6[03]=2   risk(票 141 具名解冻 ③)          ← internal/risk 打得响
+191f0d6  AC6-HIT AC6[02]=2 AC6[14]=1 AC6[15]=1  docs(Q-44…)   ← docs/specs 打得响
+5866c6f  AC6-HIT AC6[01]=1 AC6[02]=1            docs(Q-39..Q-43 执行) ← docs/PLAN.md 打得响
+```
+
+  ⇒ **冻结码那 11 支（01–11）本程的尺会响**，所以下面的 0 是量出来的，不是"尺没接上"。
+- **坑②＝改名只在一枚 commit 记 R，且要两名同列**：本程用 `--name-status -M` 并把 R 项的**旧名与新名都**送进名册
+  （现量 `033ff77f` 抽得出 `OLD:`＋`NEW:` 两行；合成控制 `docs/specs/old→new` 两名各命中 AC6[02]＝2）。
+  票 156 时代内**确有 3 枚 R**（都是 `.scratch/wisp/issues/NN-…md → …-done.md`，不在射程上）
+  ⇒ 这枚坑**上了膛但没击发**，本程不假装它改变了结果。
+- **坑③＝`--diff-filter=D` 空 ≠ 没有行内删除**：本程对**每一枚** commit 另打印 `--numstat` 的删除列
+  （见 §4.2 的 `deletedlines=` 栏），把"在不在射程"与"删了多少行"分成两栏读。
+
+### 4.2 本票实现 commit 的八枚：逐枚零命中
+
+按**碰过什么**认（不按 message 措辞认）：时代 87 枚里碰 `cmd/wisp/`、`docs/evidence/s1/156*`、
+`.scratch/wisp/probes/156/` 的恰好 8 枚＝四程各两枚。
+
+```
+commit     程   射程命中  files  deletedlines
+cc58445    r1    AC6-zero    11     0
+0e95353    r1†   AC6-zero    25     4
+2ce77e1    r2    AC6-zero     7     0
+2262c2b    r2    AC6-zero    39     0
+3fbb1ce    r3    AC6-zero     1     2
+1137781    r3†   AC6-zero    13     0
+1d53526    r4    AC6-zero     1     7     ← 本程唯一被批准的删除，落在 cmd/wisp/…_test.go，不在射程
+a4ec1f4    r4    AC6-zero    26     0
+=== 8 commits read one at a time; 0 of them touch the contract axis; 0 axis-path hits total ===
+†＝编排者代提该程的活（0e95353 代提 r1 停在轮次上限的码、1137781 代提 r3 的"改前"门禁台件）
+```
+
+⇒ **AC#6 的"零字节"在本票全部四程的 commit 上成立**，且删除列非零的三枚（4／2／7）都在
+`cmd/wisp/**` 与证据件上，**一枚都不在 15 支射程上**。
+另附一条本程多量的（票面没要求、但 AC#2 的前提要用）：
+**`go.mod`／`go.sum` 在时代 87 枚里 0 命中** ⇒ AC#2 的"不新增依赖"有独立凭据。
+
+### 4.3 时代 87 枚里那 21 枚射程命中，**逐枚归属**（本程不把它们算进任何宣称，也不假装它们不存在）
+
+命中只落在三支上：**AC6[12]＝`frontend/`、AC6[14]＝台账、AC6[15]＝停车点**；
+**冻结码 11 支（PLAN/specs/risk/panel/approval/observe/thresholds/golden/allowlist/slo-check/d22scan）
+与 `design/` 在整个时代 87 枚里 0 命中。**
+
+| 归属 | 枚数 | commit |
+|---|---|---|
+| 编排者写面（`docs(台账…)`／`ledger(...)`／`parking(...)`，即 AC#6 点名要我别碰的那两枚文件，**他有权写**） | 17 | `9835d81 adff3bd 4e20e21 c6e4d63 424ee36 7cb9b19 7236c92 7c93e81 91819770 df69bcd8 33e79e79 ab61923 e098927 f5d3b5c 3293192 b8ebe7d 88050b1` |
+| 另一会话的前端写面（票面 `:52` 明写"此刻有别的会话在未提交地写"） | 4 | `7609913 0c56b0c 0f18652 a2a3b3c` |
+| **本票四程** | **0** | — |
+
+⚠ **两处本程自己声明的边界**，别让下一位把上面读成全局：
+1. **`design/**` 的"0 命中"只是 commit 层**：派单 §5 点名的 `design/**` **25 枚未提交增量**（含 owner 自己挪走的
+   16 枚删除、`?? design/doubao/**`、`?? design/old/`）在 commit 名册上**结构性看不见**，本程**不碰、不还原、
+   不提交，也不算进零命中宣称**——"时代 87 枚里 design 0 命中"说的只是已入库部分。
+2. 本程 census 文件本身含**中文 subject 截断产生的坏字节**，第一发 `grep` 把整份输出当二进制、
+   21 枚命中只显出 12 枚（还打了一行 `Binary file … matches`）。⇒ 全部结论以 `grep -a` 重跑为准（本格数字即重跑值）。

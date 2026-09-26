@@ -1,0 +1,121 @@
+9835d81   1   AC6-HIT AC6[14]=1  files=4   deletedlines=0     | docs(台账 A289＋新票 156＋两枚派单存档): Q-57 已批
+            axisdocs/reports/pending-and-issues.md
+adff3bd   2   AC6-HIT AC6[14]=1  files=2   deletedlines=0     | docs(台账 A290＋注入世代第 18 代 §16): 三枚"任务�
+            axisdocs/reports/pending-and-issues.md
+67cc43f   3   AC6-zero               files=16  deletedlines=0     | evidence(155 验收 §0+§1 格① 复判): 换编译器当尺�
+edd0725   4   AC6-zero               files=1   deletedlines=0     | evidence(155 验收 §2 格② 复判): 问②答复成立——
+49f792f   5   AC6-zero               files=1   deletedlines=0     | evidence(155 验收 §3 格③ 复判): 另起一炉——本程
+c1d22cf   6   AC6-zero               files=1   deletedlines=0     | evidence(155 验收 §4 推进表复判): 两把尺分开答—�
+be67397   7   AC6-zero               files=2   deletedlines=0     | evidence(155 验收 §5 AC#3 契约轴复判): 名册现算—�
+be603fd   8   AC6-zero               files=2   deletedlines=0     | evidence(155 验收 §6 AC#4 活树自证复判): 三层分开�
+b64daae   9   AC6-zero               files=2   deletedlines=0     | evidence(155 验收 §7-§11 收口): 票面四枚框双向对�
+3d5f164   10  AC6-zero               files=1   deletedlines=0     | evidence(155 验收 §11.1 自校一处歧义): "第 4 枚枚数
+3274e4d   11  AC6-zero               files=1   deletedlines=0     | evidence(155 验收 §11.2 枚数递归打住): 本程 commit �
+79551d1   12  AC6-zero               files=4   deletedlines=0     | evidence(票 154 续程 第 5 节 格 AC#4): 把"冻结面普查
+4e20e21   13  AC6-HIT AC6[14]=1  files=8   deletedlines=6     | docs(票 155 结＝四框全勾、票 153 推进一格；台账 
+            axisdocs/reports/pending-and-issues.md
+f3d68b1   14  AC6-zero               files=1   deletedlines=0     | docs(派单存档 157 记录级收口程): 十条逐笔要求它
+cc58445   15  AC6-zero               files=11  deletedlines=0     | evidence(156 第0+1格): AC#1 那一发本程自己复现成两�
+c6e4d63   16  AC6-HIT AC6[14]=1  files=2   deletedlines=1     | docs(台账 A291④ 就地更正＋注入 §16 判据第 4 条):
+            axisdocs/reports/pending-and-issues.md
+5766be9   17  AC6-zero               files=9   deletedlines=0     | evidence(票 154 续程 第 6 节 格 AC#6 ＋ §6.10 自报违�
+424ee36   18  AC6-HIT AC6[14]=1  files=2   deletedlines=0     | docs(台账 A292＋派单存档 154 对抗验收): 154 六格交
+            axisdocs/reports/pending-and-issues.md
+0c539c3   19  AC6-zero               files=6   deletedlines=0     | evidence(157 第 1 笔 落 155 证据件 附录 B): 推进表缺
+0e95353   20  AC6-zero               files=25  deletedlines=4     | wip(156 checkpoint·编排者代提停在轮次上限的程): �
+5fc3c3c   21  AC6-zero               files=3   deletedlines=0     | evidence(157 第 2 笔 判〔不成立〕): "票面没拆过 6 �
+7cb9b19   22  AC6-HIT AC6[14]=1  files=2   deletedlines=0     | docs(台账 A293＋派单存档 157 验收): 157 十笔全复算
+            axisdocs/reports/pending-and-issues.md
+68aaec7   23  AC6-zero               files=2   deletedlines=0     | evidence(157 第 3 笔 补 B.3): AC#3 那行给了指针没给�
+36d91b9   24  AC6-zero               files=3   deletedlines=0     | evidence(157 第 4 笔 补 B.4): l.current 那句"3 处读点"�
+7a56af5   25  AC6-zero               files=1   deletedlines=0     | evidence(157 第 5 笔 补 B.5): Result.TaskID 那句"晚于压�
+3f77a22   26  AC6-zero               files=2   deletedlines=0     | evidence(157 第 6 笔 补 B.6): 同帧持有者漏报 j.taskID�
+564ccce   27  AC6-zero               files=2   deletedlines=0     | evidence(157 第 7 笔 补 B.7): 同帧持有者漏报 l.opt.Adm
+152b785   28  AC6-zero               files=8   deletedlines=0     | evidence(154 对抗验收 第1格 AC#1 触发门): 他们的门�
+b5b5294   29  AC6-zero               files=4   deletedlines=0     | evidence(157 第 8 笔 补 B.8): AC#4 射程声明少的那一�
+7f79638   30  AC6-zero               files=3   deletedlines=0     | evidence(157 第 9 笔 落 153 证据件 附录 B): 件内那笔
+ec81582   31  AC6-zero               files=1   deletedlines=0     | evidence(157 第 10 笔 落 153 证据件 附录 B): 日志侧 t
+ef1c474   32  AC6-zero               files=3   deletedlines=0     | evidence(157 收口 B.11-B.14): 交件形状＋票面框↔本�
+72500e5   33  AC6-zero               files=7   deletedlines=0     | evidence(154 对抗验收 第2格 AC#2 文案落点): 换尺＝�
+c97d706   34  AC6-zero               files=3   deletedlines=0     | evidence(157 终检枚数指针 21-…txt): B.11 末补一句"�
+b60c6b7   35  AC6-zero               files=1   deletedlines=2     | evidence(157 B.12 两处命令文本改字面 faithful): 表里�
+89a35e9   36  AC6-zero               files=8   deletedlines=0     | evidence(157 验收 抽第1/4/5/8笔换尺＋裁那件"自相矛
+8cddcba   37  AC6-zero               files=2   deletedlines=0     | evidence(154 对抗验收 第3格 AC#3 同族普查): 换尺＝g
+7236c92   38  AC6-HIT AC6[14]=1  files=2   deletedlines=1     | docs(台账 A294＋A293② 整笔作废＋派单两处更正): �
+            axisdocs/reports/pending-and-issues.md
+67c0177   39  AC6-zero               files=1   deletedlines=0     | docs(派单存档 157 续程 r2): 只补 AC#5 那张对账表＋
+0e5e762   40  AC6-zero               files=5   deletedlines=0     | evidence(154 对抗验收 第4格 AC#4 契约轴零字节): 名�
+1324fbf   41  AC6-zero               files=1   deletedlines=0     | evidence(154 代提落盘 r1 迟到段): 那 87 行不是残段�
+7c93e81   42  AC6-HIT AC6[14]=1  files=2   deletedlines=0     | docs(台账 A295＋票 154 进度日志): 154 的 r1 迟到段�
+            axisdocs/reports/pending-and-issues.md
+26bb094   43  AC6-zero               files=13  deletedlines=0     | evidence(154 对抗验收 第5格 AC#5 门禁): 两包都复跑�
+1bd16d0   44  AC6-zero               files=3   deletedlines=0     | evidence(157 续程 r2 第 1 件 B.1 三行读后判语): 验收
+cc04355   45  AC6-zero               files=1   deletedlines=0     | evidence(157 续程 r2 第 2 件 B.15 末尾一节): AC#5 那一
+9444c72   46  AC6-zero               files=1   deletedlines=0     | evidence(154 对抗验收 第6格 AC#6 承重·本格最难判):
+13d0bea   47  AC6-zero               files=1   deletedlines=4     | evidence(157 续程 r2 第 3 件 本程自己 B.15 两处坏读�
+fca7645   48  AC6-zero               files=10  deletedlines=0     | evidence(154 对抗验收 收尾：双向对账＋没测什么�
+76f7cc9   49  AC6-zero               files=1   deletedlines=3     | evidence(157 续程 r2 第 4 件 本程自己那枚尺坏＋正�
+35bcbff   50  AC6-zero               files=1   deletedlines=0     | evidence(154 对抗验收 §13 本程自报两处措辞): A1 §1
+d27d9d1   51  AC6-zero               files=2   deletedlines=0     | evidence(157 续程 r2 第 5 件 收口形状自证 23-…sh/.tx
+942dae0   52  AC6-zero               files=1   deletedlines=1     | evidence(157 续程 r2 第 6 件 本程 B.15 抬头那行自己�
+5d286d5   53  AC6-zero               files=1   deletedlines=0     | docs(154 被验件件首落 U-1): 节号撞车关系改成一张
+4f6c14c   54  AC6-zero               files=1   deletedlines=0     | docs(派单存档 157 AC#5 重判): 只派一格；把"AC#5 未�
+e6a50b8   55  AC6-zero               files=2   deletedlines=0     | docs(票 154 结案改名 done＋新立票 158·立而不派): �
+7609913   56  AC6-HIT AC6[12]=2  files=2   deletedlines=315   | feat(frontend 右栏标签化): owner 指认「组件塞右栏�
+            axisfrontend/src/components/harness/app-harness.tsx
+            axisfrontend/src/components/harness/right-rail.tsx
+dd78c618  57  AC6-zero               files=1   deletedlines=98    | fix(票 154 改名补第二拍): 上一枚 e6a50b8 带显式 pat
+91819770  58  AC6-HIT AC6[14]=1  files=2   deletedlines=0     | docs(台账 A296＋注入世代第 19 代): 票 154 六格成立
+            axisdocs/reports/pending-and-issues.md
+1a04f3d1  59  AC6-zero               files=1   deletedlines=0     | docs(派单存档 153 AC#2 部件(a) 内容级复核): 我只缺
+df69bcd8  60  AC6-HIT AC6[14]=1 AC6[15]=1  files=2   deletedlines=1     | docs(台账 A297＋HANDOVER 新停车点 4.0r): 我上一笔"153
+            axisdocs/reports/HANDOVER.md
+            axisdocs/reports/pending-and-issues.md
+33e79e79  61  AC6-HIT AC6[14]=1  files=1   deletedlines=0     | docs(台账 A297 追加一块): 153 (a) 复核程第一发死在
+            axisdocs/reports/pending-and-issues.md
+eee7bd90  62  AC6-zero               files=1   deletedlines=0     | docs(前端 log §7): owner 8 张截图拆形态规格——左�
+744bea43  63  AC6-zero               files=9   deletedlines=0     | docs(153 AC2 部件(a) 内容级复核 问一): B.9 那笔隐私
+c1135c8   64  AC6-zero               files=9   deletedlines=0     | docs(153 AC2 部件(a) 内容级复核 问二＋收口): B.10 �
+4720e53   65  AC6-zero               files=16  deletedlines=0     | evidence(157 AC#5 那一格重判 〔成立〕): 那整张双向
+d12444c   66  AC6-zero               files=2   deletedlines=2     | docs(票 153 结案改名 done): AC#2 的六件逐件都有非�
+ab61923   67  AC6-HIT AC6[14]=1 AC6[15]=1  files=2   deletedlines=0     | docs(台账 A298＋HANDOVER 4.0r 追加一块): 票 153 结案�
+            axisdocs/reports/HANDOVER.md
+            axisdocs/reports/pending-and-issues.md
+c4ff00a   68  AC6-zero               files=5   deletedlines=0     | evidence(157 AC#5 重判 追加 §7 交件形状＋§8 本程自
+033ff77   69  AC6-zero               files=2   deletedlines=6     | docs(票 157 结案改名 done): 五框全成立——AC#1-4 出
+0c56b0c   70  AC6-HIT AC6[12]=6  files=6   deletedlines=108   | feat(frontend §7 形态落地): 左栏 Qoder 三段式 + 会话
+            axisfrontend/src/components/harness/app-harness.tsx
+            axisfrontend/src/components/harness/main.tsx
+            axisfrontend/src/components/harness/monitor-popover.tsx
+            axisfrontend/src/components/harness/rail-empty-state.tsx
+            axisfrontend/src/components/harness/sidebar.tsx
+            axisfrontend/src/fixtures/harness-app.ts
+5092e86   71  AC6-zero               files=1   deletedlines=0     | docs(派单存档 156 续程 r2): 只派两格（AC#4 注释级�
+e098927   72  AC6-HIT AC6[14]=1 AC6[15]=1  files=3   deletedlines=0     | docs(台账 A299＋注入第 20 代 §18＋HANDOVER): 票 157 �
+            axisdocs/reports/HANDOVER.md
+            axisdocs/reports/pending-and-issues.md
+0f18652   73  AC6-HIT AC6[12]=2  files=2   deletedlines=1     | feat(frontend 任务监控弹窗): 顶栏「任务监控」钮 +
+            axisfrontend/src/components/harness/app-harness.tsx
+            axisfrontend/src/components/harness/monitor-popover.tsx
+2ce77e1   74  AC6-zero               files=7   deletedlines=0     | evidence+注释(156 AC#4 三枚注释级动作·r2 程): 票面 
+2262c2b   75  AC6-zero               files=39  deletedlines=0     | evidence(156 AC#5 承重两问·r2 程): 一味＝slo_windows.go
+7ad2d98   76  AC6-zero               files=9   deletedlines=0     | evidence(152,票156 AC#4③): 把 §4.2 指向的 9 枚变异原
+f5d3b5c   77  AC6-HIT AC6[14]=1  files=1   deletedlines=0     | ledger(A300): 156-r2 交件收妥；主账在我——派单那�
+            axisdocs/reports/pending-and-issues.md
+ad8f901   78  AC6-zero               files=1   deletedlines=0     | dispatch(156-r3): 门禁两包＋AC#4② 那枚被批准的单�
+3293192   79  AC6-HIT AC6[15]=1  files=2   deletedlines=0     | docs(156 票面进度＋停车点): AC#4③ 由编排者闭、r3
+            axisdocs/reports/HANDOVER.md
+3fbb1ce   80  AC6-zero               files=1   deletedlines=2     | style(156 AC#7 r3): gofumpt 修形 slo_exit_os_156_windows_test.
+1137781   81  AC6-zero               files=13  deletedlines=0     | evidence(156 AC#7 r3,编排者代提): 把那枚被掐断的程�
+1133977   82  AC6-zero               files=1   deletedlines=0     | dispatch(156-r4): 接手被掐断的 r3——AC#4② ＋ AC#7 �
+b8ebe7d   83  AC6-HIT AC6[14]=1  files=2   deletedlines=0     | ledger(A301)＋票156进度: r3 死于连接中断不是撞顶�
+            axisdocs/reports/pending-and-issues.md
+88050b1   84  AC6-HIT AC6[15]=1  files=1   deletedlines=0     | parking(16:3x): 更正上一段的时态——r3 不是"交完"�
+            axisdocs/reports/HANDOVER.md
+1d53526   85  AC6-zero               files=1   deletedlines=7     | test(156 AC#4②, r4): 把 case 14 注释里那三个数改成 r
+a2a3b3c   86  AC6-HIT AC6[12]=3  files=3   deletedlines=195   | feat(frontend 右栏 ZCode 交互补全 + 会话流行): 标签�
+            axisfrontend/src/components/harness/main.tsx
+            axisfrontend/src/components/harness/right-rail.tsx
+            axisfrontend/src/fixtures/harness-app.ts
+a4ec1f4   87  AC6-zero               files=26  deletedlines=0     | evidence(156 AC#4②+AC#7, r4): r4 的交件件——AC#4 三发
+=== AC#6 census: 87 commits read one at a time; 21 of them touch the contract axis; 33 axis-path hits total ===

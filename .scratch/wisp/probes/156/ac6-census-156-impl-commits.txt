@@ -1,0 +1,16 @@
+cc58445   1   AC6-zero               files=11  deletedlines=0     | evidence(156 第0+1格): AC#1 那一发本程自己复现成两�
+=== AC#6 census: 1 commits read one at a time; 0 of them touch the contract axis; 0 axis-path hits total ===
+0e95353   1   AC6-zero               files=25  deletedlines=4     | wip(156 checkpoint·编排者代提停在轮次上限的程): �
+=== AC#6 census: 1 commits read one at a time; 0 of them touch the contract axis; 0 axis-path hits total ===
+2ce77e1   1   AC6-zero               files=7   deletedlines=0     | evidence+注释(156 AC#4 三枚注释级动作·r2 程): 票面 
+=== AC#6 census: 1 commits read one at a time; 0 of them touch the contract axis; 0 axis-path hits total ===
+2262c2b   1   AC6-zero               files=39  deletedlines=0     | evidence(156 AC#5 承重两问·r2 程): 一味＝slo_windows.go
+=== AC#6 census: 1 commits read one at a time; 0 of them touch the contract axis; 0 axis-path hits total ===
+3fbb1ce   1   AC6-zero               files=1   deletedlines=2     | style(156 AC#7 r3): gofumpt 修形 slo_exit_os_156_windows_test.
+=== AC#6 census: 1 commits read one at a time; 0 of them touch the contract axis; 0 axis-path hits total ===
+1137781   1   AC6-zero               files=13  deletedlines=0     | evidence(156 AC#7 r3,编排者代提): 把那枚被掐断的程�
+=== AC#6 census: 1 commits read one at a time; 0 of them touch the contract axis; 0 axis-path hits total ===
+1d53526   1   AC6-zero               files=1   deletedlines=7     | test(156 AC#4②, r4): 把 case 14 注释里那三个数改成 r
+=== AC#6 census: 1 commits read one at a time; 0 of them touch the contract axis; 0 axis-path hits total ===
+a4ec1f4   1   AC6-zero               files=26  deletedlines=0     | evidence(156 AC#4②+AC#7, r4): r4 的交件件——AC#4 三发
+=== AC#6 census: 1 commits read one at a time; 0 of them touch the contract axis; 0 axis-path hits total ===
