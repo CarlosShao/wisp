@@ -1,0 +1,25 @@
+票 158 r2 · 交件后自纠两处（追加，§A–§H 已入库那一行一字未改：git diff numstat deleted=0）
+
+两处都是我"抄原文抄得不准"，都不动判语：
+
+I.1 §D.5 那枚 cat -A 输出我漏抄了三样（行首两枚空格、行尾逗号、cat -A 的行尾标记 $）。
+更正文里补了完整一条：
+  git cat-file blob HEAD:frontend/src/components/harness/right-rail.tsx | sed -n '108p' | cat -A
+  =>「  { kind: "ok", text: "M-bM-^\M-^S built in 826ms" },$」
+字形仍是 U+2713、仍在字符串字面量里、该文件在 git status 里仍干净、来路仍是 5e23d99（17:46）。
+这一处只修"抄得像不像"，不修"是不是"；那一子项仍是**未裁**。
+
+I.2 §D.2 里那行 for 循环是排版省略、不是命令原文。补上实际跑的四条并现场重放：
+  cmp -s 两遍名册 => rc=0；LC_ALL=C comm -23 => 0 行；LC_ALL=C comm -13 => 0 行；md5sum 两遍同值
+  （tools 31e18e28f1f03bd5ba387edf99c3ae17／cli c77310b70b17def6102f661ad543ca34）
+名册造尺原文一并写清：grep -E '^[[:space:]]*--- (PASS|FAIL|SKIP):' | sed 's/ (.*//; s/^[[:space:]]*//' | LC_ALL=C sort
+判语不变：两包改前改后名册零枚差。病根与 §D.2 那条反面教材同一枚（comm 必须与 sort 同一 collation，
+且旁边要有一把字节级尺）。
+
+I.3 §H 那句"本程 commit 枚数＝4"由这一节自己作废：本枚就是第五枚（自我更正，形状同本仓那次
+「交件两处过期自纠（追加，不改写已入库历史）」）。改成一条现量尺：
+  git log --format=… <你的 step-0 锚点>..HEAD --grep='^票 158 r2'
+  bash .scratch/wisp/probes/158/r2b/zero-byte-census.sh
+本程在 §C.5 之后自己复算过一次（读数落在 $TMPDIR，**没往仓里落第二份**）：枚数 3→4 时名册去重 40→48、
+多出的 8 枚全在 probes/158/r2b/ 之下、28 支冻结面仍全 0、§5 仍只剩 bridge.go。
+不许变的判语：冻结面全零、两包四数不变、那枚未裁还是未裁。

@@ -1021,3 +1021,57 @@ $ bash .scratch/wisp/probes/158/r2b/zero-byte-census.sh                         
 ② 票面 6 枚框的勾与 AC#1① 那一腿的重判要等**非实现者**验收程（§E.4-2 给了它可跑的形状）；
 ③ §B 那一处扩权请在验收表里**单列一行**，别并进 AC#2。
 
+---
+
+## I. 本程交件后的两处自纠（**追加**，上面 §A–§H 已入库的每一行一字未改）
+
+派单 §6「证据件里凡引原文就是要能逐字复算」这一条，本程自己交完后回量，抓到两处**我抄得不准**的地方。
+两处都**不动任何判语**（结论方向、枚数、归属全不变），但"原文"就要能逐字复算，所以单独补这一节，不偷偷改写已入库的那两行。
+
+### I.1 §D.5 第 3 步 ② 里那枚 `cat -A` 输出，我漏抄了三样东西
+
+本件那处写成了 `{ kind: "ok", text: "M-bM-^\M-^S built in 826ms" }`——**少了行首两枚空格、少了行尾那枚逗号、少了 `cat -A` 的行尾标记 `$`**。
+
+```
+$ git cat-file blob HEAD:frontend/src/components/harness/right-rail.tsx | sed -n '108p' | cat -A
+  { kind: "ok", text: "M-bM-^\M-^S built in 826ms" },$
+```
+
+⇒ 更正后的原文就是上面这一行（含行首 `··`、行尾 `,` 与 `$`）。
+**判语一字不改**：那枚字形仍是 `M-bM-^\M-^S`＝**U+2713**、仍在**字符串字面量**里、`right-rail.tsx` 在 `git status` 里仍干净（＝`HEAD` 的内容）、
+来路仍是 `5e23d99`（09-26 17:46）。这条自纠只修"抄得像不像"，不修"是不是"。
+
+### I.2 §D.2 里那行 `for pkg in tools cli; do …` 是**排版省略**，不是命令原文
+
+本程实际跑的是四条（不是循环），这里把原文补齐，并把它们各自的读数重放一遍确认仍可复算：
+
+```
+$ b=.scratch/wisp/probes/158/r2b/roster-tools-before.txt
+$ a=.scratch/wisp/probes/158/r2b/roster-tools-after.txt
+$ cmp -s $b $a ; echo "cmp rc=$?"                      -> cmp rc=0        （0＝字节级同一枚文件）
+$ LC_ALL=C comm -23 $b $a | wc -l                      -> 0
+$ LC_ALL=C comm -13 $b $a | wc -l                      -> 0
+$ md5sum $b $a
+31e18e28f1f03bd5ba387edf99c3ae17  …/roster-tools-before.txt
+31e18e28f1f03bd5ba387edf99c3ae17  …/roster-tools-after.txt
+```
+（`cmd/wisp` 那一包同形四条，md5 两遍都是 `c77310b70b17def6102f661ad543ca34`。）
+名册的**造尺**原文＝`grep -E '^[[:space:]]*--- (PASS|FAIL|SKIP):' <那一跑日志> | sed 's/ (.*//; s/^[[:space:]]*//' | LC_ALL=C sort > <名册>`。
+⇒ 判语同样一字不改：两包改前改后名册**都是零枚差**。
+**这一处的病根与 §D.2 里那条反面教材是同一枚**：比对必须 `LC_ALL=C` 一路到底（`sort` 与 `comm` 同一 collation），
+并且要有一把字节级的尺（`cmp`／`md5sum`）在旁边——本程就是因为变异那一发先被假空过一次，才知道这条不能省。
+
+### I.3 顺带把 §H 里那枚「本程 commit 枚数＝4」改成一条现量尺
+
+上面 §H 那行写「本程 commit 枚数＝4」，而**这一节的 commit 本身就是第五枚**（它是在自我更正，形状与本仓已发生过的那次「交件两处过期自纠（追加，不改写已入库历史）」同一种）。
+⇒ 请以这条现量为准，别信任何一枚写死的数（这一条正是 r1 在 §4 末教给本程的）：
+
+```
+$ git log --format='%h %ad %s' --date=format:'%H:%M:%S' <你的 step-0 锚点>..HEAD --grep='^票 158 r2'
+$ bash .scratch/wisp/probes/158/r2b/zero-byte-census.sh          # 名册会自己把新增的那枚算进去
+```
+预期仍成立（本程在 §C.5 之后自己复算过一次，读数落在 `$TMPDIR`、**没往仓里落第二份**）：
+枚数从 3 走到 4 时，名册去重从 **40 走到 48**（多出来的 8 枚全在 `probes/158/r2b/**` 之下）、
+28 支冻结面**仍全 0**、§5 那一发**仍只剩 `bridge.go`**。再加一枚＝同样的形状再走一遍。
+**唯一不许变的判语**：冻结面全零、两包四数不变、那枚未裁还是未裁。
+
