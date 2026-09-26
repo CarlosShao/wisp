@@ -1,0 +1,184 @@
+### T1. 第 1 笔：155 §4 推进表的列形状（有没有'该枚 AC 全档'那一列）
+--- §4 那节标题与表头逐行（带行号）---
+257:## 4. 三块 ↔ 票 153 哪一枚 AC：推进表（票 155 AC#2 要求的那一节）
+     1	## 4. 三块 ↔ 票 153 哪一枚 AC：推进表（票 155 AC#2 要求的那一节）
+     2	
+     3	| 本程那一格 | 本程的答案（一句话） | 推到 153 的哪一部件 | 本程之后**还差谁** |
+     4	|---|---|---|---|
+     5	| §1 格① | 改前 `Compress` **拿不到** taskID：参数表／接收者／ctx 三条通道逐条空，构造点在任何 id 诞生之前 | **AC#2 的 (b) 问①** | 只差**非实现者**验收。三问里 (b)(c) 由本票补上、(d) 前一程已裁 ⇒ AC#2 在"三问"这一层不再有空格；它 (a) 那两笔记账级待补仍挂在 153 名下（§12.4 第 2 枚），本票不代它合 |
+     6	| §2 格② | 唯一持有者＝**`Loop.run` 的参数 `taskID`**；**组合根不是**（那一发不带 id，且 `cmd` 侧全是事后读 `res.TaskID`） | **AC#2 的 (c) 问②** | 同上。本程特别把"唯一"的两端钉住：`Loop` **结构体**没有 id 字段（所以"持有者＝那个可复用对象"不成立）、同帧四枚副本（`Root.ID`／`l.current`／`Result.TaskID`／`RunningTask.ID`）逐枚给了"为什么不算另一个持有者" |
+     7	| §3 格③ | **变过**：到盘 `"task":"` 枚数 2→0→1（痕总行数恒 3）；摘 N1（判据用例）**不变**，这一味是量出来的不是推的 | **AC#3 的整枚句②** | 只差验收程复跑。句①前一程已裁、本程 §3.3 正控②与 ext-D＋`m5` 那一发又各自复到一次 ⇒ AC#3 两句**今天第一次**各自都有读数 |
+     8	
+     9	⇒ **本程一枚框都不勾、不自立档位**（票 155 AC#2 原文：勾由编排者按两份表合起来定）。
+    10	⇒ **本票没重开 153 已成立的那几格**：AC#1／AC#4／AC#5 与攻击点①②③⑤⑥里已裁的部分，本程一行未动；153 票面最后一次改动是 `b319bab`（11:25，编排者那次），**不是本程的 commit**（现量见 §7）。
+--- 锚定尺：'全档' 那一列在 155 证据件里的命中枚数 ---
+$ grep -c '全档' docs/evidence/s1/155-three-unjudged-cells-r1.md
+0
+--- 155 §4 表里 (a)(e)(f) 三枚字母各出现几回（锚定到行首竖线）---
+155 §4 内 (a)   命中 = 1
+155 §4 内 (e)   命中 = 0
+155 §4 内 (f)   命中 = 0
+155 §4 内 (b)   命中 = 2
+155 §4 内 (c)   命中 = 2
+155 §4 内 (d)   命中 = 1
+--- 档位词在 §4 那十行里的枚数（成立／附条件／未裁）---
+155 §4 内 成立 = 2
+155 §4 内 附条件 = 0
+155 §4 内 未裁 = 0
+
+### T2. 第 1 笔的地基：153 验收件 §12 那张 AC#2 六件表在盘上的真实行号与档位
+$ grep -n 'AC#2 痕带 taskID' docs/evidence/s1/153-trace-lies-unguarded-r1-accept-r1.md
+827:**AC#2 痕带 taskID**（票面把它拆成 6 件事：交付物 (a)／问① (b)／问② (c)／问③ (d)／不许造假 ID (e)／要动契约面就停手 (f)）
+--- 逐行看 :829-:836 的行首字母与行尾档位列 ---
+**AC#2 痕带 taskID**�
+
+| 支 | 前一程哪一�
+|---|---|---|---|
+| (a) 交付物本身 | 
+| (b) 问① `Compress` 
+| (c) 问② 唯一持�
+| (d) 问③ 要不要�
+| (e) 不许造假 ID | 
+| (f) 要动契约面就
+
+--- 六件各自的档位（只取'| **' 之后那一段）---
+:831  | **附条件**——两笔待补（`[前]` §5.3：件内缺那笔隐私账；§5.3
+:832  | **无** | `[前]` 全件 `接收者` 0 命中；它 §5.2 量的是
+:833  | **无**（半格相邻） | `[前]` `持有者`／`组合根` 各 **0*
+:834  | **成立** |
+:835  | **成立** |
+:836  | **成立**（账归编排者，见 §12.4 末条） |
+
+### T3. 第 2 笔：'票面拆出的 6 件'那一句在 155 证据件里的全部出现处
+$ grep -n '6 件' docs/evidence/s1/155-three-unjudged-cells-r1.md
+71:**这一块把 153 的哪一枚 AC 从"未裁"推到"可定档"**：**AC#2 的问①**（票面拆出的 6 件里那一件 `(b)`）。
+133:**这一块把 153 的哪一枚 AC 从"未裁"推到"可定档"**：**AC#2 的问②**（票面 6 件里那一件 `(c)`）。
+--- 153 验收件 §12 里'票面把它拆成 6 件事'的原句（第 :827 行）---
+**AC#2 痕带 taskID**（票面把它拆成 6 件事：交付物 (a)／问① (b)／问② (c)／问③ (d)／不许造假 ID (e)／要动契约面就停手 (f)）
+--- 153 票面 AC#2 那一条的原文枚数盘点（锚定尺）---
+$ grep -c '^- \[ \]' .scratch/wisp/issues/153-the-compression-trace-has-two-unguarded-ways-to-lie-swapping-the-ran-guard-for-need-keeps-all-four-nails-green-and-the-trace-carries-no-taskid.md
+1
+$ grep -n 'AC#2' .scratch/wisp/issues/153-the-compression-trace-has-two-unguarded-ways-to-lie-swapping-the-ran-guard-for-need-keeps-all-four-nails-green-and-the-trace-carries-no-taskid.md
+6:- 关联：票 139（痕的实现与四枚钉子，AC#2／AC#3 因本票两格未闭**至今不勾**）· 票 123（C18 超时那一族，同一枚 `internal/agent/**`）
+25:- [ ] **AC#2 痕带 taskID——但先判它从哪来，拿不到就停手上报**。三问逐问答：
+28:      ⚠ **不许造一个假 ID**（填 `""`／`"unknown"`／拿 goroutine id 凑）来让 AC#2 变绿：那是把"归因不了"洗成"归因成功"。
+49:- 不重开 139 的落点选择（验收程 §7.3 已把 AC#2 从"退回"改判为"附条件"，选型判对了）。
+65:  AC#1 治的是判据形状（少一形），AC#2 治的是字段（少一个归因键），验收程明说"第 2 件替代不了第 1 件"，交件时也不许互相抵账。
+81:| AC#2 痕带 taskID（票面拆 6 件事） | **[ ] 不勾** | 只裁了 (a)(d)(e)(f) | **两问无人裁**：问①"`Compress` 改之前拿不拿得到 taskID（签名／接收者）"、问②"唯一持有者是不是 `Loop.run`" ⇒ 见下面"最小闭合" |
+88:1. **AC#2 问①**：`git show ff550f3^:internal/agent/compress.go` 读 `Compress` 的签名与接收者，答"改之前它能不能拿到 taskID"。
+89:2. **AC#2 问②**：`git grep -n 'newTaskID\|withTraceTask' 5365cb22 -- internal/agent`，答"唯一持有者是谁"（前一程只量了**改后**的打标点，不可抵账）。
+101:  ⚠ 本票 **AC#2 仍不勾**：它的六件里 (b) 问①、(c) 问② 现由票 155 格①／格② **裁为成立**，(d)(e)(f) 前一程已判，
+--- AC#2 那一条跨几行、里面有几个编号件 ---
+:26       ① `Compress` 现在能拿到 taskID 吗（函数签名／接收者上有没有）？② 拿不到的话，唯一
+:27       ③ 把 taskID 送进那条 Info 要不要改**契约面**（`C12` 状态机、`C39` 契约深
+:28       ⚠ **不许造一个假 ID**（填 `""`／`"unknown"`／拿 goroutine id 凑）
+:29       ⚠ 若三问的答案是"要动契约面" ⇒ **D22 闸门③ 停手上报**，不要自己放宽字段口径。
+--- 票面有没有 (a)/(b)/(c)/(d)/(e)/(f) 这套字母（锚定到票面全文）---
+153 票面 (a)   命中 = 2
+153 票面 (b)   命中 = 1
+153 票面 (c)   命中 = 1
+153 票面 (d)   命中 = 2
+153 票面 (e)   命中 = 2
+153 票面 (f)   命中 = 2
+
+### T4. 第 3 笔：155 §4 的 AC#3 行 vs 153 验收件 §12.1 句① 的档
+--- 155 §4 表末行（AC#3 那一行）原文 ---
+| §3 格③ | **变过**：到盘 `"task":"` 枚数 2→0→1（痕总行数恒 3）；摘 N1（判据用例）**不变**，这一味是量出来的不是推的 | **AC#3 的整枚句②** | 只差验收程复跑。句①前一程已裁、本程 §3.3 正控②与 ext-D＋`m5` 那一发又各自复到一次 ⇒ AC#3 两句**今天第一次**各自都有读数 |
+--- 153 验收件 §12.1 AC#3 那两行 :842/:843 的档位段 ---
+:842 | 句①「摘任意一味 => | **成立** |
+:843 | 句②「摘掉它，有 => | **无** | `[前]` §8 第 3 条自报
+--- 句① 那一格前一程落在哪一节（验收件 :842 行首）---
+| 句①「摘任意一味，是否存在一发变异从此打不红」 | §3.2（`A1↔A2`／`A4↔A5`／`A6↔A7` 三�
+--- 155 证据件 §3.4/§4 里'句①'的全部出现处与是否带档字 ---
+192:⇒ 顺手把句①那一形在本程手上跑到（同发再施 M5）：`RUN` 从 7 掉到 **6**（证人就是被摘掉的那枚）、`ok github.com/CarlosShao/wisp/internal/agent` **全绿** ⇒ 这正是实现件 X2 的"摘证人⇒逃逸回来"，本程独立复现到同形。
+195:⇒ 句①（前一程 §3.2 已裁、本程 §3.3 正控②与 §3.4 各复到一次）＋ 句②（本节）合起来，**AC#3 那枚框两句才都有了读数**；本程不自勾，档位由编排者合两份表定。
+237:| 顺带复现句①那一形 | ext-D 同一棵树上再施 `m5`（守卫→`if c.Need(hist)`） | RUN 从 7 掉到 **6**（少的正是被摘掉的证人）、`ok github.com/CarlosShao/wisp/internal/agent 0.056s` **全绿** ⇒ 这就是"摘证人⇒逃逸回来"（实现件 X2 的本程版，独立跑到） |
+263:| §3 格③ | **变过**：到盘 `"task":"` 枚数 2→0→1（痕总行数恒 3）；摘 N1（判据用例）**不变**，这一味是量出来的不是推的 | **AC#3 的整枚句②** | 只差验收程复跑。句①前一程已裁、本程 §3.3 正控②与 ext-D＋`m5` 那一发又各自复到一次 ⇒ AC#3 两句**今天第一次**各自都有读数 |
+
+### T5. 第 8 笔：6de3d1c5 等不等于交付那一版（本程自己那把尺）
+--- 三枚被测文件在 b23c7f7 / 6de3d1c5 / bb3a7a1 三枚锚点上的 blob ---
+internal/agent/compress.go             b23c7f7   4fcd9a32a500
+internal/agent/compress.go             6de3d1c5  4fcd9a32a500
+internal/agent/compress.go             bb3a7a1   4fcd9a32a500
+internal/agent/loop.go                 b23c7f7   3ea1fb8df38a
+internal/agent/loop.go                 6de3d1c5  3ea1fb8df38a
+internal/agent/loop.go                 bb3a7a1   3ea1fb8df38a
+internal/agent/compress_trace_test.go  b23c7f7   2357dca86f67
+internal/agent/compress_trace_test.go  6de3d1c5  2357dca86f67
+internal/agent/compress_trace_test.go  bb3a7a1   2357dca86f67
+--- b23c7f7..6de3d1c5 在 internal/agent 上的改动枚数 ---
+$ git diff --name-only b23c7f7 6de3d1c5 -- internal/agent | wc -l
+0
+--- 同一区间 internal/** 上唯一动过的那枚 ---
+internal/tools/bridge.go
+--- 祖先关系 ---
+ANCESTOR=YES
+--- 区间在 docs/ 之外还动了什么（只列非 docs 路径，供射程句写全）---
+.scratch/wisp/dispatches/2026-09-26-093x-thaw-panel-for-145.md
+.scratch/wisp/dispatches/2026-09-26-095x-accept-151.md
+.scratch/wisp/dispatches/2026-09-26-095x-accept-152.md
+.scratch/wisp/probes/151/ac1-probe-source.go
+.scratch/wisp/probes/151/ac1-probe-tools.txt
+.scratch/wisp/probes/151/ac2-mutation-noclose.txt
+.scratch/wisp/probes/151/bridge.head.go
+.scratch/wisp/probes/151/commands.txt
+.scratch/wisp/probes/151/d22scan-post.txt
+.scratch/wisp/probes/151/gate-post-cmdwisp-count2.txt
+.scratch/wisp/probes/151/gate-post-cmdwisp-v.txt
+.scratch/wisp/probes/151/gate-post-tools-count2.txt
+.scratch/wisp/probes/151/gate-post-tools-v.txt
+.scratch/wisp/probes/151/gate-pre-cmdwisp-v.txt
+.scratch/wisp/probes/151/gate-pre-tools-v.txt
+.scratch/wisp/probes/151/gate-pre-tools.txt
+.scratch/wisp/probes/151/names-cli-post.txt
+.scratch/wisp/probes/151/names-cli-pre.txt
+.scratch/wisp/probes/151/names-post-tools.txt
+.scratch/wisp/probes/151/names-pre-tools.txt
+
+### T6. 第 8 笔的第二半：internal/agent 的依赖闭包里到底有没有 internal/tools
+--- 6de3d1c5 版 internal/agent 全部 go 文件里 import wisp/internal/* 的名字册（去重）---
+      4 internal/agent
+      7 internal/agent/approval
+      2 internal/config
+     14 internal/llm
+      1 internal/llm/golden
+      1 internal/llm/openaichat
+      7 internal/memory
+     13 internal/observe
+      2 internal/proc
+      9 internal/risk
+     14 internal/tools
+      1 internal/winsec
+--- 6de3d1c5 上引用 internal/tools 的文件名册（全仓，非测试）---
+.scratch/wisp/probes/151/run.head.go
+.scratch/wisp/probes/151/run.mut-noclose.go
+cmd/wisp/panel_pump.go
+cmd/wisp/run.go
+internal/agent/approval/batch.go
+internal/agent/approval/batch_test.go
+internal/agent/approval/fakes_test.go
+internal/agent/approval/gate.go
+internal/agent/approval/pending_read.go
+internal/agent/approval/pending_read_test.go
+internal/agent/approval/queue.go
+internal/agent/approval/queue_test.go
+internal/agent/approval/report.go
+internal/agent/approval/ticket146_liveapprovals_backing_test.go
+internal/agent/approval/ticket84_no_owner_test.go
+internal/agent/approval/ticket87_veto_l2_test.go
+internal/agent/approval/ticket97_alias_direction_test.go
+internal/agent/approval/window_test.go
+internal/perm/ticket90_persist_test.go
+internal/tools/loop_approval_test.go
+internal/tools/wiring_test.go
+--- 闭包里那几包各自在该区间的改动枚数 ---
+internal/observe   0
+internal/llm       0
+internal/memory    0
+internal/plugin    0
+internal/risk      0
+internal/config    0
+internal/secret    0
+internal/winsec    0
+internal/agent     0
+internal/tools     1

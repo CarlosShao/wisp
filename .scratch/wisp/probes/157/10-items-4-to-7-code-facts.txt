@@ -1,0 +1,143 @@
+### S1. 第 4 笔：l.current 的全部提及（宣称 3 处读点、只列 2 枚、其中一枚是写点）
+$ git grep -nE '\.current\b' 5365cb22 -- internal/agent/loop.go
+5365cb22:internal/agent/loop.go:348:	// D11(1) control layer abort a running task by cancelling l.current (the
+5365cb22:internal/agent/loop.go:523:	root := l.current
+5365cb22:internal/agent/loop.go:987:	l.current = r
+rc=0
+--- 逐枚看那一行的原文（判定它是注释／读／写）---
+:189  	current *observe.Root
+:348  	// D11(1) control layer abort a running task by cancelling l.current (the
+:353  	l.setCurrent(root)
+:523  	root := l.current
+:987  	l.current = r
+--- 字段声明那一枚（第 4 枚提及？）---
+$ git grep -n 'current \*observe.Root' 5365cb22 -- internal/agent/loop.go
+5365cb22:internal/agent/loop.go:189:	current *observe.Root
+rc=0
+--- setCurrent 的定义与全部调用点 ---
+5365cb22:internal/agent/loop.go:353:	l.setCurrent(root)
+5365cb22:internal/agent/loop.go:354:	defer l.setCurrent(nil)
+5365cb22:internal/agent/loop.go:985:func (l *Loop) setCurrent(r *observe.Root) {
+
+### S2. 第 5 笔：Result.TaskID 的赋值时刻 vs 压缩那一发（宣称'晚于压缩'）
+$ git show 5365cb22:internal/agent/loop.go | grep -n 'res := Result{\|l.comp.Compress(\|func (l \*Loop) run(' 
+339:func (l *Loop) run(ctx context.Context, taskID, input string) Result {
+369:	res := Result{TaskID: taskID, Status: StatusCompleted}
+396:			nh, rep, err := l.comp.Compress(ctx, hist)
+508:	res := Result{TaskID: taskID, Status: StatusControl}
+--- :369 与 :396 之间是否同一函数体、是否有 return/for 边界 ---
+func (l *Loop) run(ctx context.Context, taskID, input string) Result {
+	// (1) D11(1): control words never reach the provider.
+	if verb, ok := MatchControl(input); ok {
+	}
+	defer revokeAdmission()
+	guard := NewGuard(l.guard)
+	cost := Cost{Currency: l.opt.Config.Currency}
+	res := Result{TaskID: taskID, Status: StatusCompleted}
+
+	l.append(userMessage(input))
+	if err := j.startTask(ctx, input); err != nil {
+		hist := l.History()
+		if l.comp.Need(hist) {
+			// DEFERRED(D28-1): the Warm-window hook owns this call; the
+			// synchronous fallback here is what the S1 slice accepts.
+			nh, rep, err := l.comp.Compress(ctx, hist)
+			if err != nil {
+				l.log().Warn("agent: history compression failed", "err", err)
+			} else if rep.Ran {
+				l.replaceHistory(nh)
+--- 行号差 ---
+396-369 = 27
+$ git grep -n 'TaskID' 5365cb22 -- internal/agent/loop.go（全部 4 枚声明/赋值/读取点）
+5365cb22:internal/agent/loop.go:83:	TaskID string
+5365cb22:internal/agent/loop.go:322:	id := newTaskID()
+5365cb22:internal/agent/loop.go:333:	return l.run(ctx, newTaskID(), input)
+5365cb22:internal/agent/loop.go:369:	res := Result{TaskID: taskID, Status: StatusCompleted}
+5365cb22:internal/agent/loop.go:452:			l.publish(Event{Kind: EvError, TaskID: taskID, Text: msg, Stop: turn.Stop})
+5365cb22:internal/agent/loop.go:471:				Kind: EvReminder, TaskID: taskID, Text: rem.Text,
+5365cb22:internal/agent/loop.go:476:					Kind: EvStuck, TaskID: taskID,
+5365cb22:internal/agent/loop.go:502:	l.publish(Event{Kind: EvControl, TaskID: taskID, Verb: verb, Text: utterance})
+5365cb22:internal/agent/loop.go:508:	res := Result{TaskID: taskID, Status: StatusControl}
+5365cb22:internal/agent/loop.go:542:			l.publish(Event{Kind: EvTextDelta, TaskID: taskID, Text: ev.Text})
+5365cb22:internal/agent/loop.go:544:			l.publish(Event{Kind: EvReasoningDelta, TaskID: taskID, Text: ev.Text})
+5365cb22:internal/agent/loop.go:644:			TaskID: taskID, CorrelationID: taskID, CallID: p.call.ID,
+5365cb22:internal/agent/loop.go:714:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID,
+5365cb22:internal/agent/loop.go:741:		l.log().Warn("agent: tool timeout", "tool", req.Name, "task", req.TaskID,
+5365cb22:internal/agent/loop.go:837:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID, ToolName: c.Name,
+5365cb22:internal/agent/loop.go:872:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID, ToolName: c.Name,
+5365cb22:internal/agent/loop.go:884:		Kind: EvStuck, TaskID: res.TaskID, Text: msg,
+5365cb22:internal/agent/loop.go:895:	l.publish(Event{Kind: EvError, TaskID: res.TaskID, Text: err.Error(), Err: err})
+5365cb22:internal/agent/loop.go:933:		l.log().Warn("agent: task_log finish failed", "err", err, "task", res.TaskID)
+5365cb22:internal/agent/loop.go:936:		Kind: EvDone, TaskID: res.TaskID, Text: summary,
+5365cb22:internal/agent/loop.go:1102:// newTaskID returns a UUIDv4-shaped task id (the task_log.id column is
+5365cb22:internal/agent/loop.go:1104:func newTaskID() string {
+
+### S3. 第 6 笔：j.taskID 是同帧第二枚持有者（155 §2 表漏报）
+$ git grep -n 'newTaskJournal' 5365cb22 -- internal/agent
+5365cb22:internal/agent/journal.go:59:func newTaskJournal(j Journal, taskID, corrID string) *taskJournal {
+5365cb22:internal/agent/loop.go:356:	j := newTaskJournal(l.opt.Journal, taskID, taskID) // C18: correlation == task id
+--- :356 那一行原文 ---
+	j := newTaskJournal(l.opt.Journal, taskID, taskID) // C18: correlation == task id
+$ git grep -nE 'taskID' 5365cb22 -- internal/agent/journal.go
+5365cb22:internal/agent/journal.go:52:	taskID string
+5365cb22:internal/agent/journal.go:59:func newTaskJournal(j Journal, taskID, corrID string) *taskJournal {
+5365cb22:internal/agent/journal.go:61:		return &taskJournal{taskID: taskID, corrID: corrID, rows: map[string]int64{}}
+5365cb22:internal/agent/journal.go:63:	return &taskJournal{j: j, taskID: taskID, corrID: corrID, rows: map[string]int64{}}
+5365cb22:internal/agent/journal.go:76:		TaskID:        t.taskID,
+5365cb22:internal/agent/journal.go:130:		ID:        t.taskID,
+5365cb22:internal/agent/journal.go:144:	return j.FinishTaskLog(ctx, t.taskID, state, summary, tokensIn, tokensOut, costMicro, errorClass)
+--- taskJournal 结构体原文 + newTaskJournal 函数体 ---
+type taskJournal struct {
+	mu     sync.Mutex
+	j      Journal
+	taskID string
+	corrID string
+	seq    int64
+	// rows maps tool_call id -> DB row id for finish/update calls.
+	rows map[string]int64
+}
+func newTaskJournal(j Journal, taskID, corrID string) *taskJournal {
+	if j == nil {
+		return &taskJournal{taskID: taskID, corrID: corrID, rows: map[string]int64{}}
+	}
+	return &taskJournal{j: j, taskID: taskID, corrID: corrID, rows: map[string]int64{}}
+}
+--- journal.go 是不是同一枚 package（同包 ⇒ 字段可直接访问）---
+package agent
+
+import (
+
+### S4. 第 7 笔：l.opt.AdmitTask(taskID) 那一刻 id 已出包（155 §2 表漏报）
+$ git grep -n 'AdmitTask' 5365cb22 -- internal cmd
+5365cb22:cmd/wisp/run.go:21://	                -> agent.Loop(provider, bridge, AdmitTask=D47 hook)
+5365cb22:cmd/wisp/run.go:558:		AdmitTask: rt.gate.AdmitTextTask,
+5365cb22:internal/agent/loop.go:161:	// AdmitTask registers a task with the host's approval layer the moment the
+5365cb22:internal/agent/loop.go:169:	AdmitTask func(taskID string) (revoke func())
+5365cb22:internal/agent/loop.go:361:	if l.opt.AdmitTask != nil {
+5365cb22:internal/agent/loop.go:362:		if r := l.opt.AdmitTask(taskID); r != nil {
+5365cb22:internal/agent/loop.go:758://     tasks with an approval layer (Options.AdmitTask). Where a bridge and a
+5365cb22:internal/agent/loop.go:774:		if l.opt.AdmitTask == nil {
+5365cb22:internal/tools/loop_approval_test.go:134:		opt.AdmitTask = gate.AdmitTextTask
+--- loop.go:362 那一行原文 ---
+	revokeAdmission := func() {}
+	if l.opt.AdmitTask != nil {
+		if r := l.opt.AdmitTask(taskID); r != nil {
+			revokeAdmission = r
+		}
+--- Options.AdmitTask 的签名 ---
+5365cb22:internal/agent/loop.go:161:	// AdmitTask registers a task with the host's approval layer the moment the
+5365cb22:internal/agent/loop.go:169:	AdmitTask func(taskID string) (revoke func())
+5365cb22:internal/agent/loop.go:361:	if l.opt.AdmitTask != nil {
+5365cb22:internal/agent/loop.go:774:		if l.opt.AdmitTask == nil {
+
+### S5. 第 6/7 笔共同的地基：压缩那一发 :396 之前这几枚是否都已在同一作用域
+$ git show 5365cb22:internal/agent/loop.go | sed -n '339,400p' 的行号图（只取关键行）
+7:	root := observe.NewRootFrom(ctx, taskID)
+15:	l.setCurrent(root)
+16:	defer l.setCurrent(nil)
+18:	j := newTaskJournal(l.opt.Journal, taskID, taskID) // C18: correlation == task id
+23:	if l.opt.AdmitTask != nil {
+24:		if r := l.opt.AdmitTask(taskID); r != nil {
+31:	res := Result{TaskID: taskID, Status: StatusCompleted}
+38:	for {
+58:			nh, rep, err := l.comp.Compress(ctx, hist)
