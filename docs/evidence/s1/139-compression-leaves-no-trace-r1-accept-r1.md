@@ -178,3 +178,77 @@ Loop 不跨任务复用）。实现件 §3 那枚"端到端"用例之所以能�
 3. **没量子进程版的 resident 腿**（票 127/131 有，本程未复用其形状）。
 4. **`-race` 下这条链未量**（实现件 §4.6#1 同样未量）。
 5. **没量"痕重复打"的盘上形状**（本程只数到 0 枚，无法在同一发里判 1 枚 vs 3 枚）。
+
+---
+
+## 2. 第 4 节承重与恒真：四发变异独立重跑 ＋ 本程自造四发
+
+跑在**第二枚仓外快照** `/tmp/wisp139-snap-2`（`git archive d949d9c5`，与锚点逐枚 md5 相符：
+`compress.go 9c5015dd… / loop.go 70f8fb10… / compress_trace_test.go 7bf2fbf7…`）。
+驱动件 `mut.sh` / `drive.sh` / 逐发 patch `.py` 都在该快照内（快照非交付物，形状见 §0 落点规矩）。
+每发都：先证落地（`grep` 原文改动在场）→ `go build ./internal/agent/` rc=0 → 读数 → 还原 → `cmp` 自证。
+
+### 2.1 实现件自报的四发：**逐名复算全部成立**
+
+```
+[M0]  build rc=0 | whole-pkg-reds: NONE                                    （基线全绿）
+[M1b] build rc=0 | whole-pkg-reds: BooksCountsOnSuccess SurvivesTheLoopWiring
+[M2]  build rc=0 | whole-pkg-reds: SurvivesTheLoopWiring
+[M3]  build rc=0 | whole-pkg-reds: SilentWhenNothingFolded
+[M4]  build rc=0 | whole-pkg-reds: BooksCountsOnSuccess
+```
+（M1b ＝ 真删 `if rep.Ran { Info(…) }` 整块，比实现件的 `if false` 形状更狠：不留死码。）
+⇒ 实现件 §3 那张表的**红名逐枚对得上**，且 M2 只端到端那一枚红、M3 被反向那枚独立咬住，两句都真。
+名册口径按派单 §5：只数 `--- FAIL:` 行、`-count=1`、且这里跑的是**整包**（不只那四枚），
+所以"别枚用例顺手也抓到了"这一支被排掉了——见 2.2 的 M6b/M7，整包里真出现了别枚红。
+
+### 2.2 本程自造的四发（实现件没问过的问题）
+
+| 变异 | 形状 | 整包红名（`-count=1`） | 判 |
+|---|---|---|---|
+| **M5 痕恒打（现实形）** | `if rep.Ran {` → `if c.Need(hist) {` | **NONE** | **逃逸。见下** |
+| **M6b 痕顺手改写返回历史** | 记录打完 `out[len(out)-1] = …Text:"trace-altered"` | `TestCompressFoldsOldestKeepsLastThreePreservesIDs`、`TestCompressTriggerScalesWithWindow`、`BooksCountsOnSuccess` | 抓到，但**不是靠 T4**（另两枚既有用例也在管） |
+| **M7 只在挂了 logger 那侧改写正文** | `if c.lg != nil { out[last]=… }`（长度/part 数不变、字节变了） | `BooksCountsOnSuccess`（靠 `:219-220` 那两行拿 `c.TotalTokens(out)` 复量） | 抓到；**T4 不红** ⇒ T4 只比"条数＋每条 part 数"，**不比正文 bytes**，"不改折叠"这句在它里面是结构级的、不是字节级 |
+| **M9 只在挂了 logger 那侧改报告** | `if c.lg != nil { rep.CompressedMsgs = 0 }` | **只有 `DoesNotAlterTheFold`** | 抓到，且**唯一证人**就是 T4 |
+
+**M5 是本格的点名缺陷。** 派单 §4 问："若 `if true` 只让'没压缩也记账'那一枚红，那把'痕恒打'的写法挡得住吗？"
+⇒ 读数：**`if true` 挡得住（M3 被 T2 咬住），而现实里更可能写出来的那一形——"只要这次 `Need()` 过阈值就打痕"——今天零枚用例抓得到。**
+根因读得出来：T2 那枚反例种的是 `buildRoundHistory(2, 20)`，测试自己先断言
+`if c.Need(hist) { t.Fatalf("setup: …want a no-op pass") }`（`compress_trace_test.go:270-271`）——
+它把"没过阈值"当**唯一**的"没折叠"形状。于是**"过了阈值但折不动"这一形在四枚用例里不存在**，
+而它恰好就是第 1 格里量到的**生产形状**（`raw_rounds=1 ≤ KeepRawRounds=3` ⇒ `Need()` 真、`rep.Ran` 假）。
+⇒ 两格是同一个洞的两面：**今天真机上唯一会发生的压缩结局（"想过阈值、折不动"）既没人打痕、也没人测。**
+（M5 造出的痕还会带 `history_changed=false`、`compressed_msgs=0`，读的人把它当成"压了但没压动"，
+比"没有痕"更误导——这条是本程按 M5 语义推的读数级判断，未再单独造发验它。）
+
+### 2.3 「摘掉任意一味，是否存在一发变异从此打不红」——逐味答
+
+先给"每味各自被谁抓着"（`X+M` ＝ 同时摘掉用例 X 并施变异 M，整包 `-count=1`）：
+```
+[T4+M9]  reds: NONE     ← 摘掉 DoesNotAlterTheFold，M9 逃逸
+[T1+M4]  reds: NONE     ← 摘掉 BooksCountsOnSuccess，隐私探针那发（泄正文）逃逸
+[T2+M3]  reds: NONE     ← 摘掉 SilentWhenNothingFolded，恒真化（if true）逃逸
+[T3+M2]  reds: NONE     ← 摘掉 SurvivesTheLoopWiring，loop 那行接线断了也没人抓
+[M9-only] reds: DoesNotAlterTheFold   （T4 是唯一证人）
+```
+⇒ **四枚用例枚枚都有专属证人，摘掉任意一枚都真有一发变异从此打不红**：
+- 摘 **`loop.go:239` 那行接线** ＝ M2 → 只有 T3 红；**T3 一并摘掉才逃逸** ⇒ 那行承重。
+- 摘 **`compress.go` 那条 Info** ＝ M1b → T1、T3 都红 ⇒ 承重（实现件说"两发红"复算一致）。
+- 摘 **T1** → M4（把正文塞进痕）逃逸；摘 **T2** → M3 逃逸；摘 **T3** → M2 逃逸；摘 **T4** → M9 逃逸。
+⇒ 这一格实现件**站得住**，四枚用例没有一枚是装饰。
+**但**上面 M5 那一发说明：**"承重"是相对于"他们想到的那四形"而言的**；
+本程自造的一形（`if c.Need(hist)`）在四枚用例全在场的情况下整包全绿。⇒ 牙有，牙口够不够是另一件事。
+
+### 2.4 本格档位
+
+| 项 | 档位 |
+|---|---|
+| 实现件 §3 的 M1–M4 与逐名红句 | **成立**（本程独立复算，含"跑整包"这一更严口径） |
+| AC#3「反向判据：摘掉痕该用例必须转红」 | **成立**（M1b 两发红） |
+| AC#3 的"恒真判据＝本仓登记过的一类新假绿"这一支 | **附条件入账**：`if true` 形被 T2 挡住，**`if Need` 形今天无人挡**（M5 全绿） ⇒ 建议补的那一枚用例是"过阈值但折不动"（＝1 枚 user 轮、`Need()` 真、`Ran` 假）——**这只治 M5 与 §2.2 那一形，治不到第 1 格的"生产侧根本不出痕"**（那要落点选在调用方或改 `KeepRawRounds` 语义＝契约变更，本程不开那张面） |
+
+**本程没测什么（本格）**
+1. **没量 M5 造出的痕会不会被下游误读**（本格只证"逃逸"，未证"误导"到盘面/诊断的那一跳）。
+2. **没造"痕重复打"那一发**（把 Info 挪进 `for` 折叠循环里 ⇒ 一轮多条）：实现件 §3.4#1 自己说这条判据"排在功能断言之后"，本程未独立验它响不响。
+3. **没量 `t.Try/TestBench` 之类的名册外入口**：本程红名一律取自 `go test -count=1` 整包输出，未跑 `-count=2`（§5 那格统一跑）。
+4. **变异只施加在 `internal/agent`**：没量"改 `cmd/wisp` 侧"（如把 `Logger` 传成别的）会不会红——今天那里压根不传。
