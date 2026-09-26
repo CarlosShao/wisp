@@ -60,3 +60,20 @@
 **顺带一条给编排者自己（不在派单里，在我手里）**：凡是让下游"判 X 是否存在／是否为零"的话，**必须带上是哪把尺**（大小写敏感否、整词否、哪个目录、含不含测试文件）。
 今天实发两回：①我用大小写敏感整词 grep 得 0，就把"连测试都没有"写进了台账（其实 `cmd/wisp/run.go` 有 `runTextTask`、测试里有三枚 `TestRunTextTask…`）；②我把"别双派"引到一枚**不存在的 `A270`**（真账是 `A77③`／`A156`）。
 ⇒ **两回都发生在"我正在纠正别人的错"的那段文字里** ⇒ 更正稿要和原稿一样过一遍"这串引用我现量了吗"。
+
+## 追加（2026-09-26 11:0x，编排者自采）：**派单里"用 `git archive | tar -x` 取纯净树"这一句作废**（本仓它不纯净）
+
+**谁量出来的**：票 145 的非实现者验收程（它的表 §0.2／§8 条件 C6）——它按我这句派单指令取版，第一发读数因此**作废**，
+因为它造出了一枚**真红**（`internal/panel/composer_test.go:677` 那枚 `TestComposerRenderFixtureTellsTheTruth` 按字面 `" -->\n"` 切块，字节形状一变就红）。
+**我本轮自己复核到机制层**（不是转述）：
+- `.gitattributes:1` 写着 `* text=auto`，而 `git config core.autocrlf` ＝ `true`；
+- 显式 `eol=lf` 只覆盖 `*.go`／`*.md`／`*.sh`／`*.ps1`／`*.bat`／`*.sse`——**`.txt`／`.log`／`.tsx`／`.json`／`.css`／`.html` 全不在内**（本仓 tracked 枚数现量：go 503／md 421／**txt 172／log 155**／png 106／tsx 56／sse 52／json 42；`git ls-files | sed 's/.*\.//' | sort | uniq -c`）；
+- 实发一枚对照：`.scratch/wisp/probes/149/combos2/x-p1-d11a.log` **blob 3391 字节 vs 工作树 3436**（差的正是换行数）。
+⇒ **`git archive` 导出的是 blob（LF），checkout 得到的是 CRLF** ⇒ 两者**不是同一批字节**，而 `.go` 恰好不受影响 ⇒ **这个坑只在"测试读文本件当字节凭据"那一族里炸**，所以它很容易被当成"偶发"。
+⇒ **同族第二枚（同一个程量到、我复核过前提）**：`third_party/**` 在本仓 **tracked 枚数＝0**（`git ls-files third_party` 空），
+所以任何 blob 树／archive 树里**没有那三枚 dll** ⇒ `cmd/wisp` 会报 8 条 `no native DLLs in ..\..\third_party\sherpa-onnx`、看着像"被验物红了"。
+**只看枚数就会读错方向**：那一跑的正确读数不是 `FAIL=8`，是**"仪器没跑到"**（与 `0xc0000135`＋0 条 `=== RUN` 同族、第三种形状）。
+
+**从本行起派单里那句改成**：取被验版本一律用 **`git ls-tree -r <锚> ＋ git cat-file --batch` 逐 blob 落盘**（或真 checkout 到仓库外），
+并且**先跑一条已知会红的正控**证明你那棵树是活的；要跑 `cmd/wisp` 就先确认 dll 在不在你那棵树里，不在就**拷进去并写明你拷了**。
+（旧派单**不回填**——它们只回答"我当时说了什么"；这条改的是**往后**每一份。）
