@@ -1,0 +1,12 @@
+# 本程新盘：五枚子句不含 OpenScope/CloseScope 这一对（=他们普查 §4.1 第 2 行的第二枚真"只开不合"）
+# 尺＝与 gate-clauses.sh 同一把 git grep -nE（大小写敏感、子串、pathspec=internal+cmd、排 _test.go、排 internal/risk 自身）
+$ git grep -nE 'OpenScope\(|CloseScope\(|prov\.Mark\(' 5766be9 -- internal cmd ':!*_test.go' ':!internal/risk/*'
+5766be9:cmd/wisp/panel_assets.go:232:	prov.OpenScope(taintSourceScopeID)
+5766be9:cmd/wisp/panel_assets.go:234:		prov.Mark(taintSourceScopeID, s.tool, s.origin, s.content)
+5766be9:internal/tools/bridge.go:560:	if !b.prov.Mark(dec.TaskID, dec.Tool, origin, res.Text) {
+5766be9:internal/tools/bridge.go:642:		b.prov.OpenScope(taskID)
+5766be9:internal/tools/bridge.go:691:		b.prov.CloseScope(taskID)
+# rc=0（命中 5 行）
+$ 关那侧枚数（同一把尺只数 CloseScope）＝1（bridge.go:691，且它只被 CloseTask 调）
+$ 开那侧枚数＝2（bridge.go:642 由 OpenTask 调；panel_assets.go:232 全仓无人关）
+⇒ 建议的 G5 基线＝"开那侧 2 / 关那侧 1"；今日不响＝不响在"没人新增"，而不是"没有不对称"。

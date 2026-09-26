@@ -1,0 +1,28 @@
+# 本程（非实现者验收程）AC#1 的正控：G1 那句"构造点是唯一的语法位置"在 Go 里成立吗？
+# 合成树＝/d/tmp/wisp-154-accept/g1blind（临时件只建不删），五形全部 `go build ./...` 通过。
+# 判据不是"本仓今天有没有这种写法"，而是"那一形真出现时本门响不响"。
+$ cd /d/tmp/wisp-154-accept/g1blind && go build ./...   →  BUILD OK rc=0（Go 1.27.1）
+
+## 五形（都能带着宿主自造的 TaskID 走到 Execute）
+A  var req agent.ToolRequest; req.TaskID = "host-invented-id"; b.Execute(ctx, req)
+B  type dispatch = agent.ToolRequest   →  字面量文本是 `dispatch{`，不是 `ToolRequest{`
+C  req := agent.NewRequest()（字面量在别的包里）; req.TaskID = "…"
+D  req2 := seed; req2.TaskID = "…"（拷贝既有值再改 id）
+E  fn := (bridgeImpl{}).Execute; fn(req)（方法值／函数指针间接调）
+
+## 同一把尺打在这棵合成树上（他们 G1／G1b 的字面 pattern，引擎＝grep -rnE）
+$ grep -rnE 'ToolRequest\{' --include='*.go' .
+./agent/tools.go:17:func NewRequest() ToolRequest { return ToolRequest{} }
+./host/host.go:9:// 形 1：零值 + 字段赋值（无 ToolRequest{ 字面量）      ← 命中的是注释文本
+./main.go:12:	_ = host.LegitD(agent.ToolRequest{TaskID: "seed"})
+⇒ A／B／C／D／E 五枚**宿主函数本身**没有一枚被 G1 吃到（C 吃到的是 helper 所在文件、D 吃到的是 main.go）。
+
+$ grep -rnE '\.Execute\(' --include='*.go' .
+host/host.go:13 / :20 / :27 / :34                                  ← A/B/C/D 全响（因为写成 b.Execute(）
+⇒ **E 不在名册里**：`fn := (bridgeImpl{}).Execute` 后面没有 `(`，调用是 `fn(req)`。
+
+## 本仓现量（锚点 5766be9）：今天没有这种写法
+$ git grep -nE ':?= *[a-zA-Z0-9_.(){}]*\.Execute$' 5766be9 -- internal cmd ':!*_test.go'   →  rc=1（零命中）
+$ git grep -n "ToolRequest" 5766be9 -- internal cmd ':!*_test.go'   →  14 行／3 枚文件（loop.go 2·tools.go 6·bridge.go 6）
+    生产里唯一的字面构造点＝5766be9:internal/agent/loop.go:646 `req := ToolRequest{`
+    生产里唯一的 .Execute( 三行＝loop.go:730 / :734 / bridge.go:463（与 §2.1 一致）
