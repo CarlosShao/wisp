@@ -1,0 +1,2 @@
+d22scan -self-test: FATAL the table does not cover the tool (1 hole(s)); an unrun self-test is not a green self-test
+d22scan -self-test:   HOLE tag "mirror-hash" has only an expect-silent sample - a ban whose violating sample was deleted cannot be distinguished from a ban that was never implemented

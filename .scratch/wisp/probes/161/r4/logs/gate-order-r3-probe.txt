@@ -1,0 +1,31 @@
+gate-order.sh: repo root = /d/work/workspace/projects plans/Wisp/.scratch
+gate-order.sh: v0.12.0 (go1.27.1) (2026-09-26 23:45 +0800)
+
+== ruler 1/3: D:\work\base\gopath/bin/gofumpt.exe -l . tools/d22scan tools/mockllm
+   UNTRACKED wisp/probes/161/r1/runs/b8-probe-bands/internal/a/p_b8.go   (-)   <== not in a CI checkout
+   UNTRACKED wisp/probes/161/r1/runs/unp-bad/internal/a/p_unp.go   (-)   <== not in a CI checkout
+   UNTRACKED wisp/probes/161/r1/runs/unp-bad/internal/a/p_unp.go   (-)   <== not in a CI checkout
+   UNTRACKED wisp/probes/161/r1/runs/unp-hides-bans/internal/a/p_unp.go   (-)   <== not in a CI checkout
+   UNTRACKED wisp/probes/161/r1/runs/unp-hides-bans/internal/a/p_unp.go   (-)   <== not in a CI checkout
+   UNTRACKED wisp/probes/161/r3/pre-format/guard.no1.go   (-)   <== not in a CI checkout
+   UNTRACKED wisp/probes/161/r3/pre-format/guard.no2.go   (-)   <== not in a CI checkout
+   UNTRACKED wisp/probes/161/r3/pre-format/guard.no3.go   (-)   <== not in a CI checkout
+   UNTRACKED wisp/probes/999/bad-sample.go   (-)   <== not in a CI checkout
+   UNTRACKED GetFileAttributesEx tools/d22scan: The system cannot find the path specified.   (-)   <== not in a CI checkout
+   UNTRACKED GetFileAttributesEx tools/mockllm: The system cannot find the path specified.   (-)   <== not in a CI checkout
+   tracked=0 untracked=11 (gofumpt's own rc was NOT printed: a line dump is the reading, rc=2 here means 'a file would not parse', not 'files need formatting')
+
+== ruler 2/3: sh scripts/d22scan.sh
+   0 finding lines; script rc=127
+
+== ruler 3/3: go vet ./...  (root module) and go vet ./  (tools/d22scan)
+   root: found packages tools (ac1-probe-source.go) and main (run.head.go) in D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\151
+   root: found packages main (accept151_control_test.go) and tools (bridge.shipped.go) in D:\work\workspace\projects plans\Wisp\.scratch\wisp\probes\151-accept
+   root: wisp\probes\161\r2\ctl\pos\p.go:7:8: package x/risk is not in std (D:\work\base\go\src\x\risk)
+.scratch/wisp/probes/161/r3/gate-order.sh: line 153: cd: /d/work/workspace/projects plans/Wisp/.scratch/tools/d22scan: No such file or directory
+   note: the root-module form 'go vet ./tools/d22scan/' is NOT runnable (separate
+         go.mod; measured rc=1 'main module does not contain package'), so the
+         in-module form above is the one CI's step 8 uses.
+
+gate-order.sh: TRACKED offenders across the three rulers = 0
+gate-order.sh: clean on the committed set (UNTRACKED lines above, if any, are local bench bytes CI never sees)

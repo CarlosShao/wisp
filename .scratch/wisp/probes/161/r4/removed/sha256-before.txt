@@ -1,0 +1,1 @@
+7ea3f1d8f664ac61a0e3287b5fc2fc4c6a0bc94871a0fcc9005f57790d85daf5 *tools/d22scan/selftestsamples.go

@@ -1,0 +1,5 @@
+# 161-r4: the two d22scan binaries this program built in order to read AC#4's own
+# exit code (intact table vs table with one sample removed) are not committed.
+# Create-only rule: they are never deleted here, they just stay untracked.
+# Everything else in this directory is evidence and IS committed.
+*.exe

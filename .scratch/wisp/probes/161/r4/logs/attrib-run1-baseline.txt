@@ -1,0 +1,56 @@
+== (A) tracked tree: git ls-files '*.go' | xargs D:\work\base\gopath/bin/gofumpt.exe -l
+error: unknown switch `Z'
+usage: git ls-files [<options>] [<file>...]
+
+    -z                    separate paths with the NUL character
+    -t                    identify the file status with tags
+    -v                    use lowercase letters for 'assume unchanged' files
+    -f                    use lowercase letters for 'fsmonitor clean' files
+    -c, --[no-]cached     show cached files in the output (default)
+    -d, --[no-]deleted    show deleted files in the output
+    -m, --[no-]modified   show modified files in the output
+    -o, --[no-]others     show other files in the output
+    -i, --[no-]ignored    show ignored files in the output
+    -s, --[no-]stage      show staged contents' object name in the output
+    -k, --[no-]killed     show files on the filesystem that need to be removed
+    --[no-]directory      show 'other' directories' names only
+    --[no-]eol            show line endings of files
+    --[no-]empty-directory
+                          don't show empty directories
+    -u, --[no-]unmerged   show unmerged files in the output
+    --[no-]resolve-undo   show resolve-undo information
+    -x, --exclude <pattern>
+                          skip files matching pattern
+    -X, --exclude-from <file>
+                          read exclude patterns from <file>
+    --[no-]exclude-per-directory <file>
+                          read additional per-directory exclude patterns in <file>
+    --exclude-standard    add the standard git exclusions
+    --full-name           make the output relative to the project top directory
+    --[no-]recurse-submodules
+                          recurse through submodules
+    --[no-]error-unmatch  if any <file> is not in the index, treat this as an error
+    --[no-]with-tree <tree-ish>
+                          pretend that paths removed since <tree-ish> are still present
+    --[no-]abbrev[=<n>]   use <n> digits to display object names
+    --[no-]debug          show debugging data
+    --[no-]deduplicate    suppress duplicate entries
+    --[no-]sparse         show sparse directories in the presence of a sparse index
+    --format <format>     format to use for the output
+
+== (B) working tree: D:\work\base\gopath/bin/gofumpt.exe -l . tools/d22scan tools/mockllm
+   ticket-161	.scratch/wisp/probes/161/r1/runs/b8-probe-bands/internal/a/p_b8.go (ignored, parse_err=0)
+   ticket-161	.scratch/wisp/probes/161/r1/runs/unp-bad/internal/a/p_unp.go (ignored, parse_err=0)
+   ticket-161	.scratch/wisp/probes/161/r1/runs/unp-bad/internal/a/p_unp.go (ignored, parse_err=0)
+   ticket-161	.scratch/wisp/probes/161/r1/runs/unp-hides-bans/internal/a/p_unp.go (ignored, parse_err=0)
+   ticket-161	.scratch/wisp/probes/161/r1/runs/unp-hides-bans/internal/a/p_unp.go (ignored, parse_err=0)
+   ticket-161	.scratch/wisp/probes/161/r3/pre-format/guard.no1.go (ignored, parse_err=0)
+   ticket-161	.scratch/wisp/probes/161/r3/pre-format/guard.no2.go (ignored, parse_err=0)
+   ticket-161	.scratch/wisp/probes/161/r3/pre-format/guard.no3.go (ignored, parse_err=0)
+
+attrib.sh: gofumpt v0.12.0 (go1.27.1)
+attrib.sh: (A) tracked-tree  lines=0 files=0  rule: MUST be empty
+attrib.sh: (B) working-tree  lines=8 files=8  tracked=0 attributed_tickets=[161] unattributable=0
+attrib.sh: (B) gofumpt's own exit status was 2 - note: rc=2 from gofumpt means 'a file would not parse', not 'these files need formatting'; per-line parse_err flags above are the reading.
+attrib.sh: attribution rule = .scratch/wisp/probes/<NN>/** AND a real .scratch/wisp/issues/<NN>-*.md
+attrib.sh: GREEN - (A) empty and all 8 working-tree lines attributed to a named ticket
