@@ -333,3 +333,71 @@ cmd/wisp/slo_windows.go→**0e95353 命中 1**   ← 最要紧的一发
 **AC#4＝成立。** 判据（13 支 × 逐枚 commit、每支非零分母＋正控、宽窄两口径、两把名册尺）本程**全部换尺复核且同数**，并补了一枚他们没用的口径（§4.2 逐枚字节）。
 - **缺陷 D-8（小，措辞）**：票面 AC#4 的第 9 项 `任何 golden` 不带反引号，导致任何"数反引号"的复算尺都会得 12 而不是 13。本程的台件里连这枚错法都留了。这不是他们的错（他们从票面现数是 13 并给了枚举），但**下一位换尺复算时会被咬**，与票面 10:3x 那条"零命中要写明哪把尺"同形。
 - **本格一条不能说过头的话**：§4.2 的字节口径证的是**七枚 commit 各自点位上那 13 支没动**，**不等于**"整个区间里没人动过它们"——本程正控那一发（`0e95353` 命中第 13 支）恰恰证明**别家在这一天动过第 13 支**（`cmd/wisp/slo_windows.go`）。两句话都必须同时成立，只写前者会让人以为全仓安静，只写后者会把别家的账算到本票头上。
+
+---
+
+## 第 5 节 格 AC#5 — 门禁：**两包都复跑到四数**，其中 `cmd/wisp` 是把树拉回锚点跑的
+
+派单点名的坑②（`cmd/wisp` 要 dll ＋ PATH 用 shell 路径形）与本程进场时就写死的那条（工作树里 `cmd/wisp` 已不是 `5766be9`，那种跑只能记"没判据"）——本程两件事一起办了。
+
+### 5.1 `internal/tools`：原地跑＝跑锚点树（前提先钉住，再跑）
+
+```
+$ git status --porcelain -- internal cmd        →  空
+$ git diff --name-only 5766be9 -- internal      →  0 枚（工作树的 internal/** 逐字节＝锚点）
+$ git ls-files --others --exclude-standard -- internal cmd →  空（没有未跟踪 .go 混进编译）
+$ git diff --name-only 5766be9 -- internal/tools → 0 枚      ← 本包自己的复述
+$ 另：两包**都不读** design/** 或 frontend/**（尺＝git grep -nE '"(design|frontend)/' 5766be9 -- internal/tools cmd/wisp ⇒ **rc=1 真零命中**，台件 probes/154-accept/ac5-design-ref-scan.txt）
+  ⇒ owner 在工作树里未提交删掉的那 16 枚 design 件**结构上影响不到这两包的读数**
+```
+
+```
+$ export PATH="$PWD/third_party/sherpa-onnx:$PATH"     ← shell 路径形（派单坑②）
+$ go test -count=1 -v ./internal/tools/                →  rc=0  ok 14.501s
+   ^=== RUN = 115   ^--- PASS = 79   ^--- FAIL = 0   ^--- SKIP = 0   ^panic: = 0
+```
+⇒ **与 r1 §1（改前）与 §3.4（改后）那两行四数逐字相同**（115/79/0/0）。台件＝`probes/154-accept/ac5-accept-tools-v.txt`（整份 `-v` 原文）。
+
+**名册两向 `comm`**（本程 vs 他们在锚点上的 `names-post-tools.txt`，尺＝`^--- (PASS|FAIL|SKIP)` 取第 3 列、去子用例、`sort -u`）：
+
+```
+$ comm -23 本程 他们 →  空      $ comm -13 本程 他们 →  空      （两栏各 79 枚）
+```
+
+### 5.2 `cmd/wisp`：**取锚点树再跑**——用的尺是 `-overlay` 把三枚别家文件换掉／藏掉
+
+工作树里 `cmd/wisp` 的三枚差异（`slo_windows.go` `M`、`slo_report_144_windows_test.go` `M`、`slo_exit_os_156_windows_test.go` `A`）**已由编排者代提在 `0e95353`**，所以它们既不在 `git status` 里也不该进本程的读数。本程不还原工作树（禁件），改用 overlay：
+
+```
+$ git show 5766be9:cmd/wisp/slo_windows.go            > D:/tmp/…/anchor-cmd/slo_windows.go
+$ git show 5766be9:cmd/wisp/slo_report_144_windows_test.go > D:/tmp/…/anchor-cmd/…
+overlay＝{"Replace":{那两枚:锚点件, "cmd/wisp/slo_exit_os_156_windows_test.go":""}}   ← 空替换＝该件视为不存在
+$ go test -overlay=… -count=1 -list '.*' ./cmd/wisp/   →  79 枚（与锚点上的名册同数）
+$ grep -cE "TestSLO156" 名册 → 0                       ← **可证地**没混进 156 那五枚（声明名见台件）
+$ go test -overlay=… -count=1 -v ./cmd/wisp/           →  rc=0  ok 116.032s
+   ^=== RUN = 139   ^--- PASS = 79   ^--- FAIL = 0   ^--- SKIP = 0   ^panic: = 0
+$ comm -23 本程 他们(names-post-cli.txt) → 空          $ comm -13 → 空
+```
+⇒ **四数与名册两向都复到 r1 §3.4 那行**（139/79/0/0），且这一发是**在锚点树上**跑的——比 r1 那一发（他们跑的是"当时的工作树＝锚点"）多一条独立担保：本程进场时工作树已经不是锚点，本程把它拉回去了。台件＝`ac5-accept-cli-v-anchoroverlay.txt`（整份 `-v`）＋`ac5-cli-list-anchoroverlay.txt`＋五枚 overlay JSON。
+⚠ `-overlay` 全程**没与 `-cover*` 同用**（派单坑①），且"跑到没"只认 `^=== RUN` 的 139 枚，不是靠末行 `ok`。
+
+### 5.3 本程换的一把新尺：**声明名册 vs 跑到名册**（他们的 pre/post 差集结构上看不见这一层）
+
+r1/r2 的名册尺比的是"跑前 vs 跑后"，两栏**同样瞎**的地方没人查。本程从锚点树里把两包**声明了**的 `Test*` 数出来，与跑到的名册求差：
+
+```
+internal/tools：声明 79 ／跑到 79 ⇒ 差集空
+cmd/wisp      ：声明 82 ／跑到 79 ⇒ 差 3 枚
+  TestAC1POSIXSecretRouteSymlinkedHomeBecomesSealable119
+  TestAC1POSIXSecretRouteSymlinkedXDGConfigHomeBecomesSealable119
+  TestAC3POSIXSecretRouteLinkInsideItsDataRootStillRefused119
+  归属现读＝cmd/wisp/secret_dataroot_119b_test.go 头部第一行 **//go:build !windows**
+```
+⇒ 这枚 runner 上 `cmd/wisp` 的"79"里**结构上不含**这三枚 POSIX 路由用例（不是被 skip，`SKIP` 全程 0）。
+⇒ **判语不受影响**（本票只要求改前改后同数，且两包零红），但登记为**缺陷 D-10（读数解释层面）**：下一位若拿"cmd/wisp 79 枚全绿"去推"secret 路由那三枚也绿"就错了；这条与本票主题同形——**"跑到了不响"与"根本没编进来"在两把 pre/post 尺里长得一模一样**。本程是把声明名册单列出来才看见的。
+⚠ 另记一笔与本程写面无关但必须上报的事：本程在第 4 格 commit 前现读 `git diff --cached --name-only`，读到一枚**别人的路径** `docs/evidence/s1/154-host-id-never-closed-r1.md`（**`M ` 已入索引、相对 HEAD ＋87/−0**）——那是被验那枚文件被别的过程 stage 的追加。本程**没有** `git add` 它、**没有**替它 commit（本程每枚 commit 都带显式 pathspec，`git show --name-only` 逐枚核过＝只有本程两枚写面），也**没有**动它的索引项（共享树里撤别人的暂存会吞别人的活）。⇒ 交编排者：被验交付物在 `5766be9` 之后**又长了 87 行且已在索引里**，本程全部读数仍按 `git show 5766be9:` 取。
+
+### 5.4 AC#5 判语
+
+**成立。** 两包都复跑到四数（115/79/0/0 与 139/79/0/0），名册两向 `comm` 四发皆空；`cmd/wisp` 那一发是**先把树拉回锚点**再跑的，且用 `-list` 单独证过 156 的五枚没混进来。
+带一枚读数解释层面的缺陷 **D-10**（三枚 `//go:build !windows` 的用例不在这台的 79 里，pre/post 名册尺看不见这一层）。

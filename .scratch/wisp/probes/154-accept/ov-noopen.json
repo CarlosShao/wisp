@@ -1,0 +1,5 @@
+{
+ "Replace": {
+  "internal/tools/bridge.go": "D:\\tmp\\wisp-154-accept\\mut\\bridge-noopen.go"
+ }
+}

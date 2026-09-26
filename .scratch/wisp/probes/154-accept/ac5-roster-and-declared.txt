@@ -1,0 +1,13 @@
+### AC#5 名册两向 comm 与 声明/跑到 差集（本程@锚点）
+[tools] 本程枚数=79 他们=79
+  comm -23 枚数=0  comm -13 枚数=0
+[cli]   本程枚数=79 他们=79
+  comm -23 枚数=0  comm -13 枚数=0
+
+### 声明名册（锚点树，grep '^func Test'）vs 跑到名册
+  internal/tools 声明=79 跑到=79 差=0
+  cmd/wisp       声明=82 跑到=79 差=3
+    TestAC1POSIXSecretRouteSymlinkedHomeBecomesSealable119
+    TestAC1POSIXSecretRouteSymlinkedXDGConfigHomeBecomesSealable119
+    TestAC3POSIXSecretRouteLinkInsideItsDataRootStillRefused119
+  归属尺：head -1 cmd/wisp/secret_dataroot_119b_test.go ⇒ //go:build !windows

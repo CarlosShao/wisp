@@ -1,0 +1,8 @@
+{
+ "Replace": {
+  "cmd/wisp/slo_windows.go": "D:\\tmp\\wisp-154-accept\\anchor-cmd\\slo_windows.go",
+  "cmd/wisp/slo_report_144_windows_test.go": "D:\\tmp\\wisp-154-accept\\anchor-cmd\\slo_report_144_windows_test.go",
+  "cmd/wisp/slo_exit_os_156_windows_test.go": "",
+  "internal/tools/bridge.go": "D:\\tmp\\wisp-154-accept\\mut\\bridge-noopen.go"
+ }
+}

@@ -1,0 +1,5 @@
+{
+ "Replace": {
+  "internal/tools/capability.go": "D:\\tmp\\wisp-154-accept\\mut\\cap-renotify.go"
+ }
+}
