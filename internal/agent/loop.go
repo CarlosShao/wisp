@@ -393,7 +393,10 @@ func (l *Loop) run(ctx context.Context, taskID, input string) Result {
 		if l.comp.Need(hist) {
 			// DEFERRED(D28-1): the Warm-window hook owns this call; the
 			// synchronous fallback here is what the S1 slice accepts.
-			nh, rep, err := l.comp.Compress(ctx, hist)
+			// withTraceTask is what lets the record the compressor books say
+			// which task paid for it (ticket 153 AC#2): run() is the only place
+			// the id exists, and the compressor is shared across tasks.
+			nh, rep, err := l.comp.Compress(withTraceTask(ctx, taskID), hist)
 			if err != nil {
 				l.log().Warn("agent: history compression failed", "err", err)
 			} else if rep.Ran {

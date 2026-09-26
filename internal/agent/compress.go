@@ -44,6 +44,10 @@ type Summarizer interface {
 // Trace placement (ticket 139 AC#2): a pass that actually folded history is
 // booked as ONE slog.Info record ("agent: history compressed") emitted right
 // here, on the success edge, so it carries the counts and never the text.
+// Field set (ticket 153 AC#2 appends the last key): tokens_before,
+// tokens_after, threshold, msgs_before, msgs_after, compressed_msgs,
+// kept_raw_rounds, history_changed, and "task" - the owning task id, present
+// only when the caller handed this pass one (see withTraceTask below).
 // Three things follow from putting it in the compressor rather than at a call
 // site: the record exists even for a caller that forgets to log (the
 // Warm-window hook DEFERRED(D28-1) installs will get it for free); it pairs
@@ -116,6 +120,48 @@ func (c *Compressor) Need(hist []llm.Message) bool {
 	return c.TotalTokens(hist) > c.b.HistoryCompressTokens
 }
 
+// ---------------------------------------------------------------------------
+// trace attribution (ticket 153 AC#2)
+//
+// The record booked on the success edge cannot see a task id on its own: the
+// Compressor is built ONCE per Loop in agent.New (loop.go:239), the id is
+// minted later and only inside Loop.run (loop.go:322 / :333), and neither the
+// receiver nor Compress's parameter list carries it. Nor is it on the context
+// the pass already receives - observe.NewRootFrom derives a plain cancelable
+// child and keeps the id on the Root struct (goroutine.go:103-106), and there
+// is no context lookup for it anywhere in the package.
+//
+// withTraceTask is the smallest channel that closes that gap without moving the
+// record out of the compressor (139 AC#2's placement, which this ticket does
+// not reopen) and without adding mutable per-task state to a shared object.
+//
+// What it does NOT buy, stated plainly: a caller that does not tag its context
+// gets a record with no "task" key at all. Absence is the designed outcome -
+// the compressor never fills in "" or "unknown", because a placeholder reads as
+// attributed and turns "cannot attribute" into "attributed to nobody". Pinned by
+// TestCompressionTraceNeverInventsATaskID. Today the only non-test caller is
+// loop.go's synchronous fallback, which tags every call; the Warm-window hook
+// this call is supposed to move to (the D28-1 deferral flagged at the top of
+// this file) has to tag too.
+
+// traceTaskKey is the unexported context key the owning task id rides on.
+type traceTaskKey struct{}
+
+// withTraceTask tags ctx with the task a compression pass belongs to. An empty
+// (or whitespace-only) id is not a task, so it is dropped rather than carried.
+func withTraceTask(ctx context.Context, taskID string) context.Context {
+	if strings.TrimSpace(taskID) == "" {
+		return ctx
+	}
+	return context.WithValue(ctx, traceTaskKey{}, taskID)
+}
+
+// traceTaskID is the read side: "" when the caller tagged nothing.
+func traceTaskID(ctx context.Context) string {
+	s, _ := ctx.Value(traceTaskKey{}).(string)
+	return s
+}
+
 // round is one conversational round (a user turn plus what followed it).
 type round struct {
 	msgs      []llm.Message
@@ -173,7 +219,7 @@ func (c *Compressor) Compress(ctx context.Context, hist []llm.Message) ([]llm.Me
 		// actually returned instead of echoing rep.Ran, so it can contradict
 		// the fold flag and a reader is never told the history moved when the
 		// bytes coming back are the same size.
-		c.log().Info("agent: history compressed",
+		attrs := []any{
 			"tokens_before", rep.TokensBefore,
 			"tokens_after", rep.TokensAfter,
 			"threshold", c.b.HistoryCompressTokens,
@@ -181,7 +227,17 @@ func (c *Compressor) Compress(ctx context.Context, hist []llm.Message) ([]llm.Me
 			"msgs_after", len(out),
 			"compressed_msgs", rep.CompressedMsgs,
 			"kept_raw_rounds", rep.KeptRawRounds,
-			"history_changed", rep.TokensAfter != rep.TokensBefore || len(out) != len(hist))
+			"history_changed", rep.TokensAfter != rep.TokensBefore || len(out) != len(hist),
+		}
+		// Ticket 153 AC#2: whose pass this was. The key is "task", the name the
+		// loop already uses for the same value (loop.go's task_log Warns), and
+		// the value is the id the Result and every Event of that run carry, so
+		// one grep joins the line to the task. It is a correlation id, not
+		// history content, so [privacy] keep_transcript does not reach it.
+		if task := traceTaskID(ctx); task != "" {
+			attrs = append(attrs, "task", task)
+		}
+		c.log().Info("agent: history compressed", attrs...)
 	}
 	return out, rep, nil
 }
