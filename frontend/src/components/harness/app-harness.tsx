@@ -23,7 +23,7 @@
    ============================================================================ */
 
 import { useEffect, useState } from "react";
-import { Command, Moon, PanelRight, PanelRightClose, Sun } from "lucide-react";
+import { Activity, Command, Moon, PanelRight, PanelRightClose, Sun } from "lucide-react";
 import { EntityChip } from "@/components/ai-native/entity-chip";
 import { PaletteScreen } from "@/components/palette-screen";
 import { FirstrunOverlay, RB_FIRSTRUN } from "@/components/harness/firstrun-overlay";
@@ -32,6 +32,7 @@ import { HarnessSidebar } from "@/components/harness/sidebar";
 import { RightRail, RB_RIGHT_RAIL } from "@/components/harness/right-rail";
 import { SettingsModal } from "@/components/harness/settings-modal";
 import { ToastStack, RB_TOASTS } from "@/components/harness/toast";
+import { MonitorPopover, RB_MONITOR } from "@/components/harness/monitor-popover";
 import { WorkspacePicker, RB_WORKSPACES } from "@/components/harness/workspace-picker";
 import {
   AUTOMATIONS,
@@ -46,6 +47,7 @@ import {
   WORKSPACE_NOW,
 } from "@/fixtures/harness-app";
 import { SHOWCASE_APPROVALS, SHOWCASE_PALETTE_GROUPS } from "@/fixtures/harness";
+import { cn } from "@/lib/cn";
 
 export function AppHarness() {
   // view state: which main column mode, which session, which overlays.
@@ -58,6 +60,7 @@ export function AppHarness() {
   const [pickerQuery, setPickerQuery] = useState("");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [firstrunOpen, setFirstrunOpen] = useState(true);
+  const [monitorOpen, setMonitorOpen] = useState(false);
   const [dark, setDark] = useState(false);
 
   function toggleTheme() {
@@ -128,6 +131,25 @@ export function AppHarness() {
             <span className="truncate font-mono text-[11.5px] text-ink-2">{WORKSPACE_NOW}</span>
           </button>
           <div className="flex shrink-0 items-center gap-1.5">
+            <span className="relative">
+            <button
+              aria-expanded={monitorOpen}
+              className={cn(
+                "flex items-center gap-1.5 rounded-control px-2 py-1 text-[11.5px] transition-colors duration-150 hover:bg-hover",
+                monitorOpen ? "bg-hover text-ink" : "text-ink-2",
+              )}
+              onClick={() => setMonitorOpen((v) => !v)}
+              type="button"
+            >
+              <Activity aria-hidden="true" size={13} />
+              <span>任务监控</span>
+            </button>
+            {monitorOpen && (
+              <div className="absolute right-0 top-full z-50 mt-1.5">
+                <MonitorPopover {...RB_MONITOR} open />
+              </div>
+            )}
+            </span>
             <button
               className="flex items-center gap-1.5 rounded-control px-2 py-1 text-[11.5px] text-ink-2 transition-colors duration-150 hover:bg-hover hover:text-ink"
               onClick={() => setPaletteOpen(true)}

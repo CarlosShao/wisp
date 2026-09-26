@@ -110,3 +110,18 @@ export function MonitorPopover({ open, env, agents, onPin }: MonitorPopoverProps
     </div>
   );
 }
+
+/* 演示数据：环境信息取 Wisp 仓现状口径（demo 假数据）。 */
+export const RB_MONITOR: Pick<MonitorPopoverProps, "env" | "agents"> = {
+  env: [
+    { label: "工作区", value: "D:\work\workspace\projects plans\Wisp" },
+    { label: "分支", value: "dev" },
+    { label: "未提交", value: "+2,244 -1,233" },
+  ],
+  agents: [
+    { id: "a1", name: "前端会话看门狗", state: "running" },
+    { id: "a2", name: "票 145 快照字段", state: "running" },
+    { id: "a3", name: "票 153 门禁修复", state: "done" },
+    { id: "a4", name: "票 146 LiveApprovals", state: "done" },
+  ],
+};
