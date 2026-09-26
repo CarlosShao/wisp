@@ -233,3 +233,30 @@
     animation: none;
   }
 }
+
+/* --- the animation switch (owner 2026-09-26: 动画该装就装，但要有一个
+   关闭/降低动画的设置项，让用户自己在性能开销和轻量之间选) -------------------
+   Two tiers today: full (default) and off. html[data-motion="off"] is the same
+   0.01ms floor as prefers-reduced-motion - one selector, every keyframe in the
+   tree goes still, including the two PLAN-frozen loops (the caret breath and
+   the L2 ball ring): a user preference to stop motion outranks a visual spec
+   the same way prefers-reduced-motion does. The panel is stateless
+   (PLAN.md:1044), so the switch lives in memory only; ticket 145's snapshot
+   field is what makes it survive a WebView restart. */
+[data-motion="off"] *,
+[data-motion="off"] *::before,
+[data-motion="off"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+[data-motion="off"] .nav-glide {
+  transition: none;
+}
+[data-motion="off"] .screen-enter {
+  animation: none;
+}
+[data-motion="off"] .l2-ball-ring,
+[data-motion="off"] .stream-caret.is-streaming {
+  animation: none;
+}
