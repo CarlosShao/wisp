@@ -1,0 +1,6 @@
+time=2026-09-26T10:35:28.373+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAccept153EmptyAndBlankIdsLeaveNoKey
+    zzaccept153_blank_test.go:40: PROBE3-153: 4 blank-ish ids -> no task key at all; control id present as expected
+--- PASS: TestAccept153EmptyAndBlankIdsLeaveNoKey (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent	0.051s

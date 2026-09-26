@@ -226,3 +226,159 @@ A1-m5 读数（交付树＋M5，`-count=1`）：
 
 **本格档位：成立。** 新用例是真判据（它单独把 M5 打红），既不是装饰也不是恒红：
 `A0`（无变异）绿、`A1`（只变异）红、`A2`（变异＋摘证人）绿——三态齐全，"今天不响、修了才响"那一发本程也替它在未修树上复算过（`anchor-m5-count1`＝139 的逃逸原状）。
+
+---
+
+## 4. 攻击点④ —— "未碰契约面"那三问本程独立重走（＋派单自己那句"8 枚字段名各 0 命中"不成立）
+
+### 4.1 那把尺先证明它能命中，再谈"0"
+
+`docs/PLAN.md`＋`docs/specs/**` 这一范围内，本程先拿**一枚确实被冻结的字段名**打正控：
+
+```
+$ git grep -n "keep_transcript" 6de3d1c -- docs/PLAN.md docs/specs
+docs/PLAN.md:2735 | `[privacy]` | `redact_paths` … **`keep_transcript`/`keep_audio` 为硬编码 false…**
+docs/specs/SPEC-03-config-secrets-envs.md:37  （同一行形状的 section 表）        → 2 命中，尺活着
+```
+
+同一把尺打到那枚痕上：
+
+```
+$ git grep -n "history compressed\|compressed_msgs\|kept_raw_rounds\|history_changed" 6de3d1c -- docs/PLAN.md docs/specs
+（无输出）
+$ git grep -n "tokens_before" … → 0    tokens_after → 0    msgs_before → 0    msgs_after → 0
+$ git grep -n "threshold"       … → 6 枚命中行，不是 0；逐枚看全是别的东西：
+      PLAN.md:2728 `[voice] wake_word{… thresholds[] …}`   PLAN.md:2731 `loop_guard{repeat_thresholds:[3,5,8]}`
+      PLAN.md:2738 `[cost] … alert_threshold`              SPEC-03:30 / :33 / :40 同三处
+```
+
+⇒ **派单第 4 点那句"那 8 枚字段名与新增的 `task` 键各 0 命中"按字面不成立**：`threshold` 有两枚无关命中，
+而 `task` 是日常词（`docs/PLAN.md` 里成百枚），"0 命中"这句话对它毫无意义。
+**成立的是它那半句实质**：痕的那张字段表**在 PLAN/specs 里不存在**（七枚独有名 0 命中＋唯一同名的 `threshold` 是配置键）⇒
+"这张表是票 139 的实现选择、不是契约"这句话**入账**。本程把它重写成可核的形状：
+**"零命中"只对独有名成立，不对通用词成立**，任何下一位拿 `task`/`threshold` 去数都会读出假号。
+
+### 4.2 "没有 C39 这枚契约、契约是 C1–C32、`docs/contracts/` 是 0 个文件"——三句全部复算成立
+
+```
+$ git grep -n "^| C12" 6de3d1c -- docs/PLAN.md    → docs/PLAN.md:1362（正控：这张表就是 `^| C<N> ` 形状）
+$ git grep -n "^| C39" 6de3d1c -- docs/PLAN.md    → 无输出
+$ git grep -oh "C[0-9]\{1,2\} " 6de3d1c -- docs/PLAN.md | sort -u -V | tail -1   → C32
+$ git ls-tree -r --name-only 6de3d1c | grep -c "^docs/contracts/"                → 0
+```
+
+⇒ 它 §3.3 那半句（"票面问的 `C39` 这枚编号不存在"）**成立**，且它没拿"编号不存在"当免检：它同时答了 `D39` 里有没有这张表。
+
+### 4.3 那笔账归派单方：`D39` 被工单错写成 `C39`
+
+派单第 4 点末要求本程"回查我的工单／派单里有没有把 `D39` 错写成 `C39`"。**有，就在票 153 票面上**：
+
+```
+$ git grep -n "C39" 6de3d1c -- docs .scratch
+.scratch/wisp/issues/153-…-no-taskid.md:27: ③ 把 taskID 送进那条 Info 要不要改**契约面**（`C12` 状态机、**`C39` 契约深化**里那条痕的字段表）？
+.scratch/wisp/probes/153/ac2-q3.txt:6-7:      -- C39 exists as a contract? (contracts run C1-C32) / (no C39 row, rc=1)
+docs/evidence/s1/153-trace-lies-unguarded-r1.md:225: 它答这一枚的那一行
+```
+
+⇒ 全仓 `C39` 只有三处命中，**第一处就是工单那枚错号**，后两处是实现对它的回答。`D39` 才是"契约深化"那枚决策
+（`AGENTS.md §5` 与 `PLAN.md:2926` 同名）。**这笔账按派单说的归我（编排者／开票人），本程在此点亮它**：
+不是实现件的缺陷；实现件的处理也**不算蒙混**——它没有用"该编号不存在"把这一问打发掉，而是两读都答了（C39 不存在／D39 里没有这张表）。
+⚠ 但工单这一枚错号有实际代价：**"未定义即停"的判据是"要不要动契约面"，编号写错会让下一位在 `C` 表里找一个不存在的东西**，
+找不到时最容易滑成"那就当我没这问"。本程把它写进 §11 待办给编排者（改票面一行字，不改判据）。
+
+### 4.4 `C17` 白名单不受影响 ＋ 交付码没碰任何禁改面（本程自己那把尺）
+
+```
+$ git grep -c "compression\|compressed" 6de3d1c -- internal/panel docs/specs/SPEC-08-ui-ball-panel.md
+（无输出，rc=1）                        ⇒ 一条 Go 侧 slog 属性不过 C17 那条线（既不在白名单、也不需要进）
+$ git show --pretty=format: --name-only ff550f3 b23c7f7 | sed '/^$/d'
+internal/agent/compress_trace_test.go  internal/agent/compress.go  internal/agent/compress_trace_test.go  internal/agent/loop.go
+$ 同一条管道 | grep -E "^docs/PLAN.md|^docs/specs/|^internal/risk/|^internal/panel/|^internal/agent/approval/|^internal/observe/|thresholds\.go|golden|allowlist\.txt|^scripts/slo-check\.ps1|^tools/d22scan/|^frontend/|^design/"
+（零命中）  ；正控 grep -cE "^internal/agent/" = 4（同一根管子上）
+$ sed -n '/func (c \*Compressor) Need/,/^}/p' 两版 cmp → Need() IDENTICAL
+$ "if len(raw) <= c.b.KeepRawRounds"      anchor=1 delivered=1
+$ "for c.totalOf(rounds) > c.b.HistoryCompressTokens"  anchor=1 delivered=1
+$ git diff --numstat 86b0161 6de3d1c -- internal/agent/budgets.go → 0 行
+```
+
+⇒ 派单第 4 点那句"C17 白名单不受影响"**成立**；`Need()`／`KeepRawRounds`／阈值**一字节没动**（这条最要紧，
+因为"让常见路径也折叠"是这枚痕唯一的"把谎说圆"捷径，它没走）。`frontend/**`／`design/**` 零触碰、零宣称 ✓。
+
+**本格档位：成立。**
+
+---
+
+## 5. 攻击点⑤ —— `withTraceTask` 是一条新的隐式通道：两个方向本程各自取到读数
+
+### 5.1 方向②（先看硬的）：缺 ID 时那一行**到底**长什么样——到盘读数，本程补上了实现件自己没测的那一环
+
+实现件 §7 第 1 条自报"没把那枚痕复跑到盘、因此没验 `redactHandler` 会不会改写字段名"。本程把这一环补上：
+在仓外快照里加一枚**只存在于快照**的探针（`.scratch/wisp/probes/153/accept-r1/zzaccept153_ondisk_test.go`），
+走**真的宿主日志管链**（`observe.InitLogWithRegistry` → `redactHandler`（D33 硬编码、不可关）→ `slog.NewJSONHandler` → 滚动文件），
+再回读那个文件。读数原文（`probes/153/accept-r1/probe-ondisk.txt`）：
+
+```
+{"time":"…","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,
+ "threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true}
+{"time":"…","level":"INFO","msg":"agent: history compressed",…,"history_changed":true,"task":"70583f25-…"}
+```
+
+⇒ **未打标的那一行：`task` 这枚键整个不存在**——不是 `task=""`、不是 `task="unknown"`、没有任何兜底值，
+也没有被红删器改名（八枚既有键名逐字在场）。打标那一行：uuid **原样过 `redactHandler`**（键名与值都没被动过）。
+⇒ 派单要的"造不出反例就说造不出"：**本程造不出**。本程试了三条造法，全部不响：
+(a) 不打标 ⇒ 键不存在（上面第一行读数）；
+(b) 空串／`"   "`／`"\t"`／`" \t \n "` 四枚空白 id 逐枚喂进 `withTraceTask` ⇒ **四条痕里 `task` 一枚都没出现**，
+    同发里那枚真 id 照常在场（正控，防"尺瞎了"）——读数 `probes/153/accept-r1/probe-blank.txt`，探针源 `zzaccept153_blank_test.go`；
+(c) 指望红删器改写它 ⇒ `Redactor` 按**键名词根**命中的三类是 `key/token/secret/password/…`、`audio/pcm/…`、`body/content/…`，
+`task` 一枚都不沾；值侧的内嵌密钥形状（`sk-…`／`Bearer …`／`ghp_…`）uuid 也不匹配 ⇒ 规则层面就没有这条路。
+
+**两种假法本程自己造出来、当场红（这才是"没兜底"的证明，不是措辞）**：
+
+```
+A8 属性无条件追加（不判空）   → 83/1，红句：
+   compress_trace_test.go:552: untagged call produced a "task" attribute "" (string): absence is honest, an invented owner is not
+A9 traceTaskID 恒返一枚 uuid 常量 → 83/2（两枚任务用例都红）
+```
+
+⚠ 本程在 A9 之后**忘了先 restore 就跑了一次到盘探针**，于是白捡一发读数：那枚**假常量原样落在盘上**
+（`…"task":"00000000-0000-4000-8000-000000000153"…`，本程随后 restore 重跑，才有上面那两行干净读数）。
+⇒ 这一发把问题的边界钉死了：**盘上没有任何一道工序会拦假归因，拦它的只有那枚用例**。
+本程不因此判实现件什么（它挡的是"自己造"，不是"别人不许造"），但下一位若问"要不要在 sink 侧再加一道"，读数在这里。
+
+### 5.2 泄漏面：这枚键今天只被读一次、也只多到一个地方
+
+```
+$ git grep -n "ctx.Value(" 6de3d1c -- '*.go' ':!*_test.go'
+internal/agent/compress.go:161: s, _ := ctx.Value(traceTaskKey{}).(string)      ← 新增这一枚
+internal/tools/cancel.go:49:    h, ok := ctx.Value(cancelKey{}).(cancelHandle)   ← 既有，全仓就这两枚
+$ traceTaskID 的读者：除 :237 那一处之外零读者（全量 git grep 核过）；withTraceTask 唯一非测试点＝loop.go:399
+```
+
+⇒ 键是未导出类型、读侧一处；被打标的 ctx 会顺路进 `c.summarize(ctx, …)`（`compress.go:198`），
+但 Go 的 `context` 没有"枚举值"的 API，下游 provider 拿不到它 ⇒ **不存在"多一个出口"**。
+一句话结论：**这条隐式通道的到达面＝同一枚 `Info` 行，没有第二处。**
+
+### 5.3 方向①：taskID 进日志文件这件事，隐私面上到底算不算账——**算，但它没算在这件证据件里**
+
+三笔现量，逐笔给：
+
+1. **不是新增暴露类。** 锚点 `86b0161` 上**已经有三处**把同一枚 id 用同一个键名写进同一枚文件：
+   `loop.go:373 "agent: task_log open failed" … "task", taskID`、`loop.go:741 "agent: tool timeout" … "task", req.TaskID`、
+   `loop.go:933 "agent: task_log finish failed" … "res.TaskID"`；到 `6de3d1c` 非测试侧带 `"task"` 的行数是 **7**。
+   ⇒ 本票做的不是"让 id 第一次进日志"，是"让成功边那一行也进"。这一笔实现件用"键名沿用 `loop.go` 已经在用的 `"task"`"带过，
+   **方向对、没展开**。
+2. **它算过的那笔账只写在码里、没写在件里。** `compress.go:236` 那句
+   "It is a correlation id, not history content, so `[privacy] keep_transcript` does not reach it"
+   ——本程复算它**成立**（`keep_transcript` 硬编码 false、写 true 直接报错：`internal/config/validate.go:82-84`＋`validate_test.go:136`
+   ⇒ 没有任何配置面能把它变成"转写上盘"），但它就到此为止。⚠ **本程在整份交付版证据件里搜
+   `隐私`／`privacy`／`keep_transcript`／`私有数据`／`Q-31`／`SealDir`：0 命中**（`grep -c` 现量）。
+   派单写"本仓已定案日志属私有数据（Q-31）"，而**该定案要求的那把锁今天还没上**：
+   `winsec.SealDir` 在 `6de3d1c` 的非测试代码里**零调用者**（只有定义与注释），那正是票 132 挂着的一格。
+   ⇒ 本程判：**这笔账不是票 153 欠的，但票 153 是新落进这枚"未上锁文件"的第一枚可归因键**，
+   证据件里该有一行"落在票 132 的未闭合面上"；现在没有，读者会以为注释里那句"keep_transcript 不到它"＝隐私已审。
+3. **命名一致性（本程自己加的一发）**：`SPEC-02:74`／`PLAN.md:2697` 里那枚叫 **`task_id`**（DB 列，`REFERENCES task_log(id)`），
+   日志侧叫 **`task`**。⇒ 同一枚值两个面**故意不同名**，本票跟随日志侧是对的；
+   但"从日志 join 回 DB"的人要知道这次改名，实现件与 spec 都没写这一句（登记，不判退）。
+
+**本格档位：成立，附两笔待补**（①件内缺那笔隐私账；②日志↔DB 键名差异无人写）。
+两笔都不动判据、不动码；且本程**没有**造出"这枚键泄漏到它不该去的地方"的活证据——§5.2 那把尺就是为这一条造的，造不出。
