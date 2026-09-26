@@ -1,0 +1,6 @@
+$ go test -count=1 -overlay 'D:\work\tmp\wisp152\scratch\mut\i1-delete-the-fallback-arm\overlay.json' -v -run 'TestSLO144|TestSLO147|TestSLO149|TestSLO152' ./cmd/wisp/
+$ tree=D:/work/tmp/wisp152/snap-post  mutated_files=['D:/work/tmp/wisp152/snap-post/cmd/wisp/slo_windows.go']
+FAIL	github.com/CarlosShao/wisp/cmd/wisp [build failed]
+FAIL
+# github.com/CarlosShao/wisp/cmd/wisp [github.com/CarlosShao/wisp/cmd/wisp.test]
+..\scratch\mut\i1-delete-the-fallback-arm\slo_windows.go:684:1: missing return
