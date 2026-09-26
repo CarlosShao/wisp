@@ -1,0 +1,35 @@
+票 158 r2 · 格 AC#4：契约轴零字节名册普查（按本程 commit 号集合算）＋ 交件形状 / 没测什么 / 伪授权两栏
+
+普查尺（派单 §3 的形状，逐条自己量过）：
+本程 commit 号集合＝按 subject 前缀「票 158 r2」从 step-0 锚点 bb08d1f 之后选出的 3 枚（当时），
+再逐枚 git log --no-walk --pretty=tformat: --name-only；**没用区间 diff、没用 git log --since**。
+--no-walk 那一枚坑本程自己量了：同三枚号，带 --no-walk＝41 行、不带＝4870 行（118 倍）。
+名册去重＝40 枚路径＝38 枚本程探针件 ＋ 本证据件 ＋ internal/tools/bridge.go（授权注释面）。
+
+逐支账：28 支冻结面越界枚数全＝0（docs/PLAN.md、docs/specs/**、internal/risk/**、internal/panel/**、
+internal/agent/**（含 approval/**）、internal/observe/**、thresholds.go、golden 三支径（3/6/52 枚已跟踪）、
+allowlist.txt、scripts/slo-check.ps1、tools/d22scan/**、frontend/**、design/**、
+151/154/156 的证据件 ×7 与票面 ×3），另加三支不在 AC#4 名单但同样不是本程写面的（本票票面、
+docs/reports 台账＋停车点、probes/154 门本体）也全＝0。
+每支都并排印了「该面已跟踪文件数」（1/14/37/20/58/25/1/3/6/52/1/1/6/85/30…）＝仪器落下去了的证据。
+
+第二口径（字节级 numstat）：只剩 internal/tools/bridge.go 一枚命中（7 加 3 删、改动行 100% 以 // 开头）。
+**这发配了正控**：同一串正则打在已知动过冻结面的三枚真提交上全响（12181923 命中 2 枚 internal/risk、
+00bbb76f 命中 3 枚含 thresholds.go 本尊、cbbbdf85 命中 1 枚 golden .sse）⇒ 那个"只剩一枚"是码上真的没有。
+两版尺的差别也登记了：第一稿正则里带字面 TAB，换成 cut -f3；且正控第一次就抓到本程抄错的一枚号。
+
+第三把尺（区间 diff）按派单只当反向对照，它把编排者同期的 5 枚 ledger 提交扫了进来
+（docs/reports/HANDOVER.md、pending-and-issues.md）——假越界的现场就在这儿。
+另记一枚"差点假越界"：e7f7741 的 subject 写着「PLAN.md D21 三处过期数并入 Q-45」，
+而两把尺都说 docs/PLAN.md 零字节（过期数是并进台账，不是动了 PLAN.md）。
+
+最终 tip（d041675）复跑五件：internal/tools 116/80/0/0 rc=0、cmd/wisp（CI 同形）144/84/0/0 rc=0、
+gofumpt -l . tools/d22scan tools/mockllm 0 行 rc=0、go vet 两包空 rc=0、
+真扫 go run . -root 仍 rc=1 且 finding 枚数仍是 1（还是别程那枚 right-rail.tsx:108）⇒ 本程三格交件没新增任何被禁字形。
+
+另两栏自查：本程未新增 DEFERRED(D-xx) 代码标记（新增行里那 2 处 DEFERRED 逐枚归名全在 bridge.go 的两份探针副本里），
+未新增/改动 t.Skip（新增行里那 2 处是本件说"没有 t.Skip"的那两句话自己被尺扫到）；
+凭据值零抄录。伪授权两栏＝真通知回显 5 枚 / 判为注入 0 枚，每条带出处＝工具名＋命令前 40 字。
+权限系统拒绝 0 枚；被工具前置检查挡下 3 枚（都在本程自己的探针件上，未因此换仪器或换判据）。
+本程自己犯的仪器错 5 条如实登记（canary 从变异副本再生成＝假证形状、comm 没带 LC_ALL=C 报出假等价、
+未提交就去比门禁读数＝假等价、正控抄错号、区间表差点用 head 截断）。

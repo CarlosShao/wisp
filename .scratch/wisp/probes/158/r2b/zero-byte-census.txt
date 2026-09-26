@@ -1,0 +1,242 @@
+# AC#4 census - anchor for commit selection: bb08d1f (bb08d1f5 19:36:05 派单 19:4x: 票 158 r2 重派（前一程 18:33 被取消、零枚 commit）)
+# tip now: d041675 (20:09:19 ledger(A309): Cordis 交件——D21 那句"不依赖 cordis-rs"在真实上游里 0 命中；它那枚"开即自动登记关"正是票158那族病的解药形状)
+
+## 1. 本程 commit 号集合（按 subject 前缀选，不是按时间窗）
+$ git log --format='%H' bb08d1f..HEAD --grep='^票 158 r2'
+  ee41e63 20:03:49 票 158 r2 · 格 AC#6：票面框↔本程格 双向对账（按节锚；两向都数过；两处未裁明写＋最小闭合集合）
+  8225cdc 19:59:38 票 158 r2 · 格 AC#5：两包门禁改前改后四数＋名册两向零差＋三道工具（d22scan 那一子项判未裁）
+  ef34118 19:47:41 票 158 r2 · 注释面·编排者批准扩权：bridge.go 的门指路句补上 G5 与可跑的生成器路径
+# 枚数=3
+# 反向自证：同一区间里【不是】本程的提交（选规则没有多吞/漏吞）：
+  d0416758 20:09:19 ledger(A309): Cordis 交件——D21 那句"不依赖 cordis-rs"在真实上游里 0 命中；它那枚"开即自动登记关"正是票158那族病的解药形状
+  29532035 20:07:33 ledger(A308)＋新增 Q-58: W1 把我们自己的工具面底盘量出来了——声明 36/实现 6/注册 5+1/可达 5
+  e7f7741f 20:04:07 ledger(A307): Pi 那枚 edit 的机制逐条验到原文＋PLAN.md D21 三处过期数并入 Q-45＋调研封批
+  714f1698 19:48:46 ledger(A306)＋停车点: owner 两句话到账＋再派四路（含把我们自己的地基量进去那枚）
+  192ad56a 19:40:36 ledger(A305): 外部 harness 十路对标交完＋我撤回两条已讲出去的话
+# 每一枚的 --no-walk 自证（都是 commit，不是 tree/blob）：
+  commit ee41e6359a0619f8c688f2c93e3ae2ae987415da
+  commit 8225cdc705bd0d5cfd8d70cebaf9fb4c97012b1a
+  commit ef34118f63cf3a2a249fdf4e0a20b52a8ba5a3ca
+
+## 2. 名册尺（主尺）：git log --no-walk --pretty=tformat: --name-only <逐枚号>
+$ git log --no-walk --pretty=tformat: --name-only ee41e6359a0619f8c688f2c93e3ae2ae987415da
+8225cdc705bd0d5cfd8d70cebaf9fb4c97012b1a
+ef34118f63cf3a2a249fdf4e0a20b52a8ba5a3ca | sed '/^$/d' | LC_ALL=C sort | uniq -c
+      1 .scratch/wisp/probes/158/r2b/bridge.canary-r2.go
+      1 .scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go
+      1 .scratch/wisp/probes/158/r2b/cli-after.log
+      1 .scratch/wisp/probes/158/r2b/cli-before.log
+      1 .scratch/wisp/probes/158/r2b/cli-negative-control-nodll.log
+      1 .scratch/wisp/probes/158/r2b/d22scan-before.txt
+      1 .scratch/wisp/probes/158/r2b/d22scan-headsnapshot.txt
+      1 .scratch/wisp/probes/158/r2b/d22scan-script-after.txt
+      1 .scratch/wisp/probes/158/r2b/d22scan-worktree-after-comment.txt
+      1 .scratch/wisp/probes/158/r2b/declared-cli-all-src.txt
+      1 .scratch/wisp/probes/158/r2b/gate-after-comment-committed.txt
+      1 .scratch/wisp/probes/158/r2b/gate-after-comment.txt
+      1 .scratch/wisp/probes/158/r2b/gate-before-bb08d1f.txt
+      1 .scratch/wisp/probes/158/r2b/gofumpt-full-after.txt
+      1 .scratch/wisp/probes/158/r2b/gofumpt-full-before.err
+      1 .scratch/wisp/probes/158/r2b/gofumpt-full-before.txt
+      1 .scratch/wisp/probes/158/r2b/gofumpt-narrow-after.txt
+      1 .scratch/wisp/probes/158/r2b/gofumpt-narrow-before.txt
+      1 .scratch/wisp/probes/158/r2b/gofumpt-version.txt
+      1 .scratch/wisp/probes/158/r2b/list-cli-windows.txt
+      1 .scratch/wisp/probes/158/r2b/msg-ac5.txt
+      1 .scratch/wisp/probes/158/r2b/msg-ac6.txt
+      1 .scratch/wisp/probes/158/r2b/msg-comment.txt
+      1 .scratch/wisp/probes/158/r2b/overlay-canary-r2.json
+      1 .scratch/wisp/probes/158/r2b/overlay-noopentask-r2.json
+      1 .scratch/wisp/probes/158/r2b/reached-cli-toplevel-before.txt
+      1 .scratch/wisp/probes/158/r2b/roster-cli-after.txt
+      1 .scratch/wisp/probes/158/r2b/roster-cli-before.txt
+      1 .scratch/wisp/probes/158/r2b/roster-tools-after.txt
+      1 .scratch/wisp/probes/158/r2b/roster-tools-before.txt
+      1 .scratch/wisp/probes/158/r2b/roster-tools-mut.txt
+      1 .scratch/wisp/probes/158/r2b/snapshot-path.txt
+      1 .scratch/wisp/probes/158/r2b/tools-after.log
+      1 .scratch/wisp/probes/158/r2b/tools-before.log
+      1 .scratch/wisp/probes/158/r2b/tools-mut-r2.log
+      1 .scratch/wisp/probes/158/r2b/tools-runtests-after.txt
+      1 .scratch/wisp/probes/158/r2b/vet-after.txt
+      1 .scratch/wisp/probes/158/r2b/vet-before.txt
+      2 docs/evidence/s1/158-gate-scope-blind-spot-r1.md
+      1 internal/tools/bridge.go
+# 名册去重后枚数=40
+# 派单点名的那枚坑，本程自己量一遍（同三枚号，只差 --no-walk）：
+  带 --no-walk   = 41 行
+  不带 --no-walk = 4870 行
+
+## 3. 逐枚 name-status + numstat（谁碰了什么、动了几行）
+### ee41e63 票 158 r2 · 格 AC#6：票面框↔本程格 双向对账（按节锚；两向都数过；两处未裁明写＋最小闭合集合）
+A	.scratch/wisp/probes/158/r2b/msg-ac6.txt
+M	docs/evidence/s1/158-gate-scope-blind-spot-r1.md
+  -- numstat 合计: added=111 deleted=0
+### 8225cdc 票 158 r2 · 格 AC#5：两包门禁改前改后四数＋名册两向零差＋三道工具（d22scan 那一子项判未裁）
+A	.scratch/wisp/probes/158/r2b/bridge.canary-r2.go
+A	.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go
+A	.scratch/wisp/probes/158/r2b/cli-after.log
+A	.scratch/wisp/probes/158/r2b/cli-before.log
+A	.scratch/wisp/probes/158/r2b/cli-negative-control-nodll.log
+A	.scratch/wisp/probes/158/r2b/d22scan-before.txt
+A	.scratch/wisp/probes/158/r2b/d22scan-headsnapshot.txt
+A	.scratch/wisp/probes/158/r2b/d22scan-script-after.txt
+A	.scratch/wisp/probes/158/r2b/d22scan-worktree-after-comment.txt
+A	.scratch/wisp/probes/158/r2b/declared-cli-all-src.txt
+A	.scratch/wisp/probes/158/r2b/gate-after-comment-committed.txt
+A	.scratch/wisp/probes/158/r2b/gate-after-comment.txt
+A	.scratch/wisp/probes/158/r2b/gate-before-bb08d1f.txt
+A	.scratch/wisp/probes/158/r2b/gofumpt-full-after.txt
+A	.scratch/wisp/probes/158/r2b/gofumpt-full-before.err
+A	.scratch/wisp/probes/158/r2b/gofumpt-full-before.txt
+A	.scratch/wisp/probes/158/r2b/gofumpt-narrow-after.txt
+A	.scratch/wisp/probes/158/r2b/gofumpt-narrow-before.txt
+A	.scratch/wisp/probes/158/r2b/gofumpt-version.txt
+A	.scratch/wisp/probes/158/r2b/list-cli-windows.txt
+A	.scratch/wisp/probes/158/r2b/msg-ac5.txt
+A	.scratch/wisp/probes/158/r2b/msg-comment.txt
+A	.scratch/wisp/probes/158/r2b/overlay-canary-r2.json
+A	.scratch/wisp/probes/158/r2b/overlay-noopentask-r2.json
+A	.scratch/wisp/probes/158/r2b/reached-cli-toplevel-before.txt
+A	.scratch/wisp/probes/158/r2b/roster-cli-after.txt
+A	.scratch/wisp/probes/158/r2b/roster-cli-before.txt
+A	.scratch/wisp/probes/158/r2b/roster-tools-after.txt
+A	.scratch/wisp/probes/158/r2b/roster-tools-before.txt
+A	.scratch/wisp/probes/158/r2b/roster-tools-mut.txt
+A	.scratch/wisp/probes/158/r2b/snapshot-path.txt
+A	.scratch/wisp/probes/158/r2b/tools-after.log
+A	.scratch/wisp/probes/158/r2b/tools-before.log
+A	.scratch/wisp/probes/158/r2b/tools-mut-r2.log
+A	.scratch/wisp/probes/158/r2b/tools-runtests-after.txt
+A	.scratch/wisp/probes/158/r2b/vet-after.txt
+A	.scratch/wisp/probes/158/r2b/vet-before.txt
+M	docs/evidence/s1/158-gate-scope-blind-spot-r1.md
+  -- numstat 合计: added=6577 deleted=0
+### ef34118 票 158 r2 · 注释面·编排者批准扩权：bridge.go 的门指路句补上 G5 与可跑的生成器路径
+M	internal/tools/bridge.go
+  -- numstat 合计: added=7 deleted=3
+
+## 4. 逐支冻结面：本程 commit 号集合上再套一条 pathspec（命中即越界）
+  越界枚数=0   (该面已跟踪文件数=1   )  docs/PLAN.md
+  越界枚数=0   (该面已跟踪文件数=14  )  docs/specs/**
+  越界枚数=0   (该面已跟踪文件数=37  )  internal/risk/**
+  越界枚数=0   (该面已跟踪文件数=20  )  internal/panel/**
+  越界枚数=0   (该面已跟踪文件数=58  )  internal/agent/** (incl approval/**)
+  越界枚数=0   (该面已跟踪文件数=25  )  internal/observe/**
+  越界枚数=0   (该面已跟踪文件数=1   )  thresholds.go
+  越界枚数=0   (该面已跟踪文件数=3   )  golden: internal/llm/golden/**
+  越界枚数=0   (该面已跟踪文件数=6   )  golden: any tracked path with golden in it
+  越界枚数=0   (该面已跟踪文件数=52  )  golden: any testdata/golden/**
+  越界枚数=0   (该面已跟踪文件数=1   )  allowlist.txt
+  越界枚数=0   (该面已跟踪文件数=1   )  scripts/slo-check.ps1
+  越界枚数=0   (该面已跟踪文件数=6   )  tools/d22scan/**
+  越界枚数=0   (该面已跟踪文件数=85  )  frontend/**
+  越界枚数=0   (该面已跟踪文件数=30  )  design/**
+  越界枚数=0   (该面已跟踪文件数=1   )  evidence 151 r1
+  越界枚数=0   (该面已跟踪文件数=1   )  evidence 151 accept
+  越界枚数=0   (该面已跟踪文件数=1   )  evidence 154 host-id
+  越界枚数=0   (该面已跟踪文件数=1   )  evidence 154 accept
+  越界枚数=0   (该面已跟踪文件数=1   )  evidence 156 r1
+  越界枚数=0   (该面已跟踪文件数=1   )  evidence 156 accept
+  越界枚数=0   (该面已跟踪文件数=1   )  evidence 156 r4
+  越界枚数=0   (该面已跟踪文件数=1   )  ticket face 151
+  越界枚数=0   (该面已跟踪文件数=1   )  ticket face 154
+  越界枚数=0   (该面已跟踪文件数=1   )  ticket face 156
+  越界枚数=0   (该面已跟踪文件数=1   )  本票票面（编排者写面，非 AC#4 名单但同样应零枚）
+  越界枚数=0   (该面已跟踪文件数=15  )  台账/停车点（编排者写面）
+  越界枚数=0   (该面已跟踪文件数=31  )  门本体（r1 写面，本程应零枚）
+  越界枚数=1   (该面已跟踪文件数=1   )  WRITEFACE 本票证据件（应有命中）
+      HIT docs/evidence/s1/158-gate-scope-blind-spot-r1.md
+  越界枚数=38  (该面已跟踪文件数=54  )  WRITEFACE 本程探针件（应有命中）
+      HIT .scratch/wisp/probes/158/r2b/bridge.canary-r2.go
+      HIT .scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go
+      HIT .scratch/wisp/probes/158/r2b/cli-after.log
+      HIT .scratch/wisp/probes/158/r2b/cli-before.log
+      HIT .scratch/wisp/probes/158/r2b/cli-negative-control-nodll.log
+      HIT .scratch/wisp/probes/158/r2b/d22scan-before.txt
+      HIT .scratch/wisp/probes/158/r2b/d22scan-headsnapshot.txt
+      HIT .scratch/wisp/probes/158/r2b/d22scan-script-after.txt
+      HIT .scratch/wisp/probes/158/r2b/d22scan-worktree-after-comment.txt
+      HIT .scratch/wisp/probes/158/r2b/declared-cli-all-src.txt
+      HIT .scratch/wisp/probes/158/r2b/gate-after-comment-committed.txt
+      HIT .scratch/wisp/probes/158/r2b/gate-after-comment.txt
+      HIT .scratch/wisp/probes/158/r2b/gate-before-bb08d1f.txt
+      HIT .scratch/wisp/probes/158/r2b/gofumpt-full-after.txt
+      HIT .scratch/wisp/probes/158/r2b/gofumpt-full-before.err
+      HIT .scratch/wisp/probes/158/r2b/gofumpt-full-before.txt
+      HIT .scratch/wisp/probes/158/r2b/gofumpt-narrow-after.txt
+      HIT .scratch/wisp/probes/158/r2b/gofumpt-narrow-before.txt
+      HIT .scratch/wisp/probes/158/r2b/gofumpt-version.txt
+      HIT .scratch/wisp/probes/158/r2b/list-cli-windows.txt
+      HIT .scratch/wisp/probes/158/r2b/msg-ac5.txt
+      HIT .scratch/wisp/probes/158/r2b/msg-ac6.txt
+      HIT .scratch/wisp/probes/158/r2b/msg-comment.txt
+      HIT .scratch/wisp/probes/158/r2b/overlay-canary-r2.json
+      HIT .scratch/wisp/probes/158/r2b/overlay-noopentask-r2.json
+      HIT .scratch/wisp/probes/158/r2b/reached-cli-toplevel-before.txt
+      HIT .scratch/wisp/probes/158/r2b/roster-cli-after.txt
+      HIT .scratch/wisp/probes/158/r2b/roster-cli-before.txt
+      HIT .scratch/wisp/probes/158/r2b/roster-tools-after.txt
+      HIT .scratch/wisp/probes/158/r2b/roster-tools-before.txt
+      HIT .scratch/wisp/probes/158/r2b/roster-tools-mut.txt
+      HIT .scratch/wisp/probes/158/r2b/snapshot-path.txt
+      HIT .scratch/wisp/probes/158/r2b/tools-after.log
+      HIT .scratch/wisp/probes/158/r2b/tools-before.log
+      HIT .scratch/wisp/probes/158/r2b/tools-mut-r2.log
+      HIT .scratch/wisp/probes/158/r2b/tools-runtests-after.txt
+      HIT .scratch/wisp/probes/158/r2b/vet-after.txt
+      HIT .scratch/wisp/probes/158/r2b/vet-before.txt
+  越界枚数=1   (该面已跟踪文件数=1   )  WRITEFACE bridge.go（授权注释面，应有命中且只注释）
+      HIT internal/tools/bridge.go
+# 冻结面每一支都＝0 ⇒ AC#4 的逐支账；三支 WRITEFACE 有命中，那是本程写面本体
+
+## 5. 第二口径（字节级：把 numstat 的文件名列打上面那串正则）
+$ git log --no-walk --pretty=tformat: --numstat ee41e6359a0619f8c688f2c93e3ae2ae987415da
+8225cdc705bd0d5cfd8d70cebaf9fb4c97012b1a
+ef34118f63cf3a2a249fdf4e0a20b52a8ba5a3ca | cut -f3 | grep -E "^(docs/PLAN\.md|docs/specs/|internal/(risk|panel|agent|observe)/|internal/tools/bridge\.go$|tools/d22scan/|frontend/|design/|.*golden|.*allowlist\.txt$|scripts/slo-check\.ps1$|docs/evidence/s1/15[146]-|\.scratch/wisp/issues/15[146]-)"
+  HIT internal/tools/bridge.go
+  # 预期：只有 bridge.go 那一枚命中（授权面）。其余冻结面全零 ⇒ 与 §4 同判
+
+## 6. 工作树侧（本程还没 commit 的改动）
+ M docs/evidence/s1/158-gate-scope-blind-spot-r1.md
+?? .scratch/wisp/probes/158/r2/
+?? .scratch/wisp/probes/158/r2b/cli-finaltip.log
+?? .scratch/wisp/probes/158/r2b/d22scan-finaltip.txt
+?? .scratch/wisp/probes/158/r2b/gofumpt-full-finaltip.txt
+?? .scratch/wisp/probes/158/r2b/tools-finaltip.log
+?? .scratch/wisp/probes/158/r2b/vet-finaltip.txt
+?? .scratch/wisp/probes/158/r2b/zero-byte-census.sh
+?? .scratch/wisp/probes/158/r2b/zero-byte-census.txt
+  # 这里出现的都属本程写面；别人的脏文件不在列（口径见证据件 §C.4）
+
+## 7. 第三把尺：区间 diff（派单 §3 明令它【不能】当普查主尺，这里只当反向对照）
+$ git diff --name-only bb08d1f HEAD | grep -v '^\.scratch/wisp/probes/158/r2b/'
+  docs/evidence/s1/158-gate-scope-blind-spot-r1.md
+  docs/reports/HANDOVER.md
+  docs/reports/pending-and-issues.md
+  internal/tools/bridge.go
+  # 区间尺把【编排者同期提交】也扫进来了。下面逐枚归名（这些号都不在 §1 的本程集合里）：
+  --- d041675 ledger(A309): Cordis 交件——D21 那句"不依赖 cordis-rs"在真实上游里 0 命中；它那枚"开即自动登记关"正是票158那族病的解药形状
+docs/reports/pending-and-issues.md
+  --- 2953203 ledger(A308)＋新增 Q-58: W1 把我们自己的工具面底盘量出来了——声明 36/实现 6/注册 5+1/可达 5
+docs/reports/pending-and-issues.md
+  --- e7f7741 ledger(A307): Pi 那枚 edit 的机制逐条验到原文＋PLAN.md D21 三处过期数并入 Q-45＋调研封批
+docs/reports/pending-and-issues.md
+  --- 714f169 ledger(A306)＋停车点: owner 两句话到账＋再派四路（含把我们自己的地基量进去那枚）
+docs/reports/HANDOVER.md
+docs/reports/pending-and-issues.md
+  --- 192ad56 ledger(A305): 外部 harness 十路对标交完＋我撤回两条已讲出去的话
+docs/reports/pending-and-issues.md
+  # ⇒ 这就是普查必须按 commit 号集合算的理由：区间尺会把别人写成我的。
+
+## 8. §5 那把尺的正控（同一串正则，打在【已知动过冻结面】的三枚真提交上，必须响）
+  12181923 命中=2  risk(票 141 具名解冻 ③): 审批卡 R7 文案那枚 `�
+      FIRE internal/risk/assessor_test.go
+      FIRE internal/risk/rules_scale.go
+  00bbb76f 命中=3  slo(66): read the D32 CPU row out of the measured tree (AC#3
+      FIRE internal/observe/observer_cost_test.go
+      FIRE internal/observe/sampler.go
+      FIRE internal/observe/thresholds.go
+  cbbbdf85 命中=1  docs(agent): correct the spill fixture's scenario header (ti
+      FIRE internal/agent/testdata/golden/spill-tool.sse
+  # 三枚全命中 ⇒ §5 那个『只剩 bridge.go』是『码上真的没有』，不是尺没通电。

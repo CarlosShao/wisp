@@ -785,3 +785,239 @@ $ awk '/^## 这一格今天到底缺什么/{p=1;next} /^## /{p=0} p' "$T" | grep
    最小闭合集合（如果编排者要那一腿也重跑）：`git stash` 之外没有任何办法在共享树里临时删别人用例 ⇒ 只能由**非实现者验收程**在**快照**里跑（`git archive <r1 前一枚 commit>` ＋ 不带那枚文件的 `-overlay`），本程已把这条路留在 §F.6。
 3. **票面 6 枚框本程一枚都没勾**（Acceptance 节末句：框由编排者按非实现者验收表定）。本件里出现的"已交"字样都是**程的自报档位**，不是勾。
 
+---
+
+## C. 格 AC#4 —— 契约轴零字节：按**本程 commit 号集合**算的名册普查
+
+**档位：已交。** 本节**排在 §D／§E 之后**是故意的：AC#4 的名册必须覆盖那两格的 commit，
+所以它只能最后量。编号按 AC 号，不按落盘顺序。
+
+生成器＝`.scratch/wisp/probes/158/r2b/zero-byte-census.sh`（只读，不写仓里任何东西），
+原始输出＝同目录 `zero-byte-census.txt`。本节所有数字都从那份文件抄，命令原文也在那份文件里。
+
+### C.1 名册尺（主尺）＝按具体 commit 号集合，逐枚 `--no-walk`
+
+派单 §3 的三条禁令本程都照做了，而且**把那条"没有 --no-walk 会怎样"自己量了一遍**：
+
+```
+$ bash .scratch/wisp/probes/158/r2b/zero-byte-census.sh        # 锚点 bb08d1f，跑时 tip=d041675（20:09:19，编排者的 ledger A309）
+## 1. 本程 commit 号集合（按 subject 前缀选，不是按时间窗）
+$ git log --format='%H' bb08d1f..HEAD --grep='^票 158 r2'
+  ee41e63 20:03:49 票 158 r2 · 格 AC#6：票面框↔本程格 双向对账（…）
+  8225cdc 19:59:38 票 158 r2 · 格 AC#5：两包门禁改前改后四数＋名册两向零差＋三道工具（…）
+  ef34118 19:47:41 票 158 r2 · 注释面·编排者批准扩权：bridge.go 的门指路句补上 G5 与可跑的生成器路径
+# 枚数=3
+# 反向自证：同一区间里【不是】本程的提交（选规则没有多吞/漏吞）：
+  d041675 20:09:19 ledger(A309): Cordis 交件——D21 那句"不依赖 cordis-rs"在真实上游里 0 命中；…
+  2953203 20:07:xx ledger(A308)＋新增 Q-58: W1 把我们自己的工具面底盘量出来了——声明 36/实现 6/注册 5+1/可达 5
+  e7f7741 20:04:07 ledger(A307): Pi 那枚 edit 的机制逐条验到原文＋PLAN.md D21 三处过期数并入 Q-45＋调研封批
+  714f169 19:48:46 ledger(A306)＋停车点: owner 两句话到账＋再派四路（…）
+  192ad56 19:40:36 ledger(A305): 外部 harness 十路对标交完＋我撤回两条已讲出去的话
+# 每一枚的 --no-walk 自证（都是 commit，不是 tree/blob）：  commit ×3   rc=0
+
+## 2. 名册尺（主尺）
+$ git log --no-walk --pretty=tformat: --name-only <三枚号> | sed '/^$/d' | LC_ALL=C sort | uniq -c
+# 名册去重后枚数=40
+# 派单点名的那枚坑，本程自己量一遍（同三枚号，只差 --no-walk）：
+  带 --no-walk   = 41 行
+  不带 --no-walk = 4870 行          # ← 118 倍。少了这个旗标，整仓历史都会被算成"本程动过的"
+```
+⇒ 名册 40 枚去重路径 ＝ 38 枚 `.scratch/wisp/probes/158/r2b/**` ＋ 本证据件 ＋ `internal/tools/bridge.go`。**除这两类写面与那一处授权注释外，本程什么也没碰。**
+
+### C.2 逐支账（把票面 AC#4 那张清单逐枚列，每支再套一条 pathspec）
+
+28 支全零；三支"应有命中"的单列在下面。**"该面已跟踪文件数"那一列是仪器有没有落下去的证据**（非零＝尺扫得到这一支，不是空转）：
+
+| 冻结面（票面 AC#4／派单 §3 点名的） | 越界枚数 | 该面已跟踪文件数 |
+|---|---|---|
+| `docs/PLAN.md` | **0** | 1 |
+| `docs/specs/**` | **0** | 14 |
+| `internal/risk/**`（`OpenScope`/`CloseScope` 的定义本体在这儿） | **0** | 37 |
+| `internal/panel/**` | **0** | 20 |
+| `internal/agent/**`（含 `approval/**`） | **0** | 58 |
+| `internal/observe/**` | **0** | 25 |
+| `thresholds.go`＝`internal/observe/thresholds.go` | **0** | 1 |
+| golden：`internal/llm/golden/**` | **0** | 3 |
+| golden：任何路径含 `golden`（`:(glob)**/*golden*`） | **0** | 6 |
+| golden：任何 `**/testdata/golden/**`（`.sse` 那一大堆） | **0** | 52 |
+| `allowlist.txt`＝`tools/d22scan/allowlist.txt` | **0** | 1 |
+| `scripts/slo-check.ps1` | **0** | 1 |
+| `tools/d22scan/**` | **0** | 6 |
+| `frontend/**` | **0** | 85 |
+| `design/**` | **0** | 30 |
+| 票 151 证据件 ×2／票 154 证据件 ×2／票 156 证据件 ×3 | **0** | 各 1 |
+| 票 151／154／156 的**票面** | **0** | 各 1 |
+| **另加三支不在 AC#4 名单、但同样不是本程写面的**：本票票面（`:158-*`）／台账＋停车点（`docs/reports`）／门本体（`probes/154`，r1 写面） | **0／0／0** | 1／15／31 |
+
+| 写面（**故意有命中**，藏起来反而可疑） | 越界枚数 | 归属 |
+|---|---|---|
+| `docs/evidence/s1/158-gate-scope-blind-spot-r1.md` | 1 | 本票证据件＝票面地界给到的写面 |
+| `.scratch/wisp/probes/158/**` | 38 | 本程探针件（只建不删）。**注意口径**：同目录下还躺着 `probes/158/r2/`（被取消那一程的临时件，`git status` 里是 `??`），本程**没 stage、没读它内容、也没 commit 它**——那一支 38 枚全部在 `r2b/` 下 |
+| `internal/tools/bridge.go` | 1 | §B 那一处**经批准的注释面**；`git show ef34118 --numstat` ＝ 加 7 删 3，改动行 100% 以 `//` 开头（§B 已量） |
+
+### C.3 第二口径（字节级）＋ **那把尺的正控**（不然"零命中"跟"尺没通电"长一个样）
+
+```
+## 5. 把 numstat 的文件名列打上一串正则（与 §8 的正控共用同一串，不会两把尺漂移）
+$ git log --no-walk --pretty=tformat: --numstat <三枚号> | cut -f3 | grep -E '<FIRE>'
+  HIT internal/tools/bridge.go        # 只剩授权那一枚；其余冻结面全零
+## 8. 同一串正则打在【已知动过冻结面】的三枚真提交上（必须响）
+  12181923 命中=2   risk(票 141 具名解冻 ③): 审批卡 R7 文案那枚 `≥` 换成 ASCII…
+      FIRE internal/risk/assessor_test.go
+      FIRE internal/risk/rules_scale.go
+  00bbb76f 命中=3   slo(66): read the D32 CPU row out of the measured tree (AC#3)
+      FIRE internal/observe/observer_cost_test.go
+      FIRE internal/observe/sampler.go
+      FIRE internal/observe/thresholds.go        ← 连 thresholds.go 本尊都点得出
+  cbbbdf85 命中=1   docs(agent): correct the spill fixture's scenario header (ticket 10 MINOR-8)
+      FIRE internal/agent/testdata/golden/spill-tool.sse   ← golden 也点得出
+```
+⇒ 三枚全响 ⇒ §5 那个"只剩 `bridge.go`"是**码上真的没有**，不是一把产不出读数的装饰尺。
+（这一发的来历也要登记：§5 的第一稿在正则里用了**字面 TAB**，而"TAB 有没有活着穿过 Write 工具"不该让下一位读者赌 ⇒ 改成 `cut -f3` 之后再打正则。
+且**正控第一次就抓到我抄错的一枚号**（写成 `000bbb7f`，`git` 直接 `unknown revision`、那一行报 命中=0）：如果我当时忽略"三枚里有一枚是 0"，交出去的就是一枚半死的正控。）
+
+### C.4 第三把尺：区间 diff —— 派单禁它当普查尺，本程把它当成**为什么禁**的证据
+
+```
+$ git diff --name-only bb08d1f HEAD | grep -v '^\.scratch/wisp/probes/158/r2b/'
+  docs/evidence/s1/158-gate-scope-blind-spot-r1.md     ← 本程
+  internal/tools/bridge.go                             ← 本程（授权注释面）
+  docs/reports/HANDOVER.md                             ← 【不是本程】
+  docs/reports/pending-and-issues.md                   ← 【不是本程】
+```
+逐枚归名（这五枚都不在 §1 的本程集合里）：`d041675`／`2953203`／`e7f7741`／`714f169`／`192ad56`，全是编排者的 ledger／停车点提交。
+⇒ **谁今天造的假越界，这就是现场**：区间尺会把别人写成我的。普查必须按 commit 号集合算。
+
+**另一枚"差点假越界"的形状，值得单独留一句**：`e7f7741` 的 subject 里写着「**PLAN.md** D21 三处过期数并入 Q-45」——
+只扫 subject 的人会以为 `docs/PLAN.md` 被改过。现量两把尺都说没有：
+§4 里 `docs/PLAN.md` 越界＝**0**（该面 1 枚已跟踪文件，尺扫得到），
+且**连区间尺**在 `bb08d1f..HEAD` 全表里也没出现 `docs/PLAN.md`（上面那四支就是全部）。⇒ "过期数"是**并入台账 Q-45**，不是动了 PLAN.md 一字。
+
+**`frontend/**`／`design/**` 的口径**（派单 §3 明令）：本程**没碰**（§4 两支越界＝0），
+且本件里所有"零命中"宣称**都不把这两族算作证据**——它们的工作树此刻是别人的（`git status` 现量 `design/` 31 枚已跟踪改动＋61 枚未跟踪）。
+它们在 §D.5 出现的唯一身份是"d22scan 仪器非空"的分母，见那里那张两列对照表（工作树 39 枚 vs `HEAD` 快照 30 枚，差＝别程未提交的工作）。
+
+### C.5 本程 commit 之后的最终-tip 复跑（AC#4 那一枚 commit 自己不能量自己）
+
+| 跑 | tip | 读数 |
+|---|---|---|
+| `go test -count=1 -v ./internal/tools/` | `d041675` | **116／80／0／0 rc=0**（`…/r2b/tools-finaltip.log`） |
+| `bash scripts/wisp-cli-tests.sh` | `d041675` | **144／84／0／0 rc=0**（`…/r2b/cli-finaltip.log`，脚本自己那行 `portable-tests.sh: four numbers` 原文在内） |
+| `$(go env GOPATH)/bin/gofumpt.exe -l . tools/d22scan tools/mockllm` | `d041675` | **0 行 rc=0**（`…/r2b/gofumpt-full-finaltip.txt`；这一发还顺手把"新落库的两份 `bridge.*-r2.go` 探针副本会不会被格式化尺点中"一起量了：**没有**） |
+| `go vet ./internal/tools/ ./cmd/wisp/` | `d041675` | **空 rc=0**（`…/r2b/vet-finaltip.txt`，0 字节） |
+| `cd tools/d22scan && go run . -root <仓根>`（真扫那一步；`sh scripts/d22scan.sh` 仍被 §D.5 那枚正控步挡在 rc=1） | `d041675` | **rc=1、finding 枚数仍是 1、且还是同一枚 `right-rail.tsx:108`** ⇒ **本程的三格交件没有新增任何被禁字形**（`…/r2b/d22scan-finaltip.txt`） |
+
+机器核过"别人同期提交没动到我这两包的输入"：`git diff --name-only 714f169 HEAD -- cmd/wisp internal/tools` ＝ **空**，
+`-- '*.go'` 里除本程自己的探针副本外也**没有**第二枚。
+⇒ §D 的改后读数在最终 tip 上仍成立；AC#4 自己那一枚 commit 只加证据件＋探针件（Go 字节 0 枚），
+所以它**不可能**改变上面两个四数——这一句不是断言，是一条可复算的预测：**下一位把 `bash .scratch/wisp/probes/158/r2b/zero-byte-census.sh` 原样再跑一次**，
+预期读数＝枚数从 **3 变 4**、名册去重从 **40 变多**但多出来的只可能是 `probes/158/r2b/**` 与本证据件两支、
+`§5` 那一发仍然只剩 `bridge.go`、28 支冻结面仍全 0。**任何别的数字变化＝有人的提交混进了这个名册。**
+
+### C.6 AC#4 判语
+
+**已交：契约轴零字节成立。** 三条独立口径（逐枚名册尺／字节级 numstat 尺（带正控）／工作树侧）同判，
+唯一命中在**经批准的注释面**那一枚文件、且那一枚的改动行 100% 是 `//`。
+外加一条派单要求的自查：本程**没有**新增任何 `DEFERRED(D-xx)` 代码标记（新增行里的 2 处 `DEFERRED` 逐枚归名后全在 `bridge.go` 的两份**探针副本**里，
+是从生产注释里整份抄来的），也**没有**新增或改动任何 `t.Skip`（新增行里的 2 处 `t.Skip` 是本件**说"没有 t.Skip"的那两句话自己**被尺扫到了——
+同一条尺不拆文件就会把"否认"读成"做了"，与 §E.3 里 `Q-56` 那发是同一类口径事故）。凭据值零抄录，见 §G 末。
+
+---
+
+## F. 本程**没测／没做**的东西（按「漏了它谁会先被骗」排序）
+
+1. **AC#5 的 `sh scripts/d22scan.sh` 子项＝未裁**（§D.5／§D.6）。⇒ 先被骗的是**任何把"r2 门禁交了"读成"门禁全绿"的下一程**：
+   那一跑今天 rc=1，红在**别程已提交**的一枚字形上。本件的四绿一未裁就是这个意思，别并成五绿。
+2. **本程只判了那枚字形"被禁"，没判它"该换成什么"**（`frontend/src/components/harness/right-rail.tsx:108` 的 U+2713）。
+   ⇒ 会被骗的是**前端那一程的 owner**：本件给的是"扫描器说禁＋来路是哪枚 commit"，不是文案建议。
+3. **`cmd/wisp` 的 84 枚只在「windows ＋ dll 在位」这一形量到**。`!windows` 那三枚（`secret_dataroot_119b_test.go`）本程跑不到、也没跑（§D.3）。
+   ⇒ 会被骗的是把"cmd/wisp 全绿"读成"跨平台全绿"的人——票面 AC#5 第③条讲的正是这一形，本程只是把它的**数**换成今天的、把**归属**机器核到了那枚 tag。
+4. **AC#1 那一腿「未修码＋未加守卫 ⇒ 零枚红」本程没重跑**（重跑得摘掉 r1 已入库的守卫用例＝删别人的证据）。
+   ⇒ 会被骗的是以为"那一腿今天仍被本件守着"的人；本件今天重跑的是**另外那一发**（今日重造变异 ⇒ 116/79/1/0）。见 §E.4-2。
+5. **`-cover*` 一枚没跑**（派单 §2.2／票面 AC#5②：与 `-overlay` 合用时 overlay 被静默忽略）。⇒ 本件**不做任何覆盖率宣称**；
+   谁要覆盖率必须**另起一跑**，不能拿本件任何一发当覆盖率证据。
+6. **只跑了 `internal/tools` 与 `cmd/wisp` 两包**：`go test ./...` 本程一枚没跑，全仓其余包在最终 tip 上**状态未知**（别的程在写）。
+   ⇒ 会被骗的是把 AC#5 读成"全仓门禁"的人。
+7. **G1–G4 只复算到"本程改动前后一字未变"**，没重判它们的射程该不该更宽（那是票 154 的账，票面"不解决的事"第④条）。
+   同族里 `OpenTask/CloseTask`（G2）与 `DisposalScope`/`Defer` 那一族的成对性本程**没普查**（r1 §5-5 已登记，本程没补）。
+8. **桥的 `b.scopes` 与 `prov.scopes` 两套账的一致性没裁**（票 154 的 U-5；r1 也未做）。本程只是把那枚指针注释修对了，
+   ⇒ **注释说得对不对，本程没验**（"G5 守着不过桥那一腿"是 r1 §2 的读数＋脚本原文，不是本程新证的命题）。
+9. **无凭据语料**：`%APPDATA%\wisp` 本程**未扫** ⇒ 既不能写"扫过很干净"，也没扫过。全程零抄录凭据值（只写变量名/文件名，见 §G 末）。
+10. **争用只量了一枚形状**：`Get-Process` 命中 `Runner.Listener`（pid 3952）、`Win32_Processor.LoadPercentage`＝**41 与 29 两次读数**
+    ⇒ 本机 self-hosted runner 同机在跑，**未排除争用**。本件所有结论都是**枚数／名册**判定，不含任何时间阈值 ⇒ 争用不改变判语，
+    但**别拿本件任何一份日志里的 `ok …NN.NNNs` 当延迟证据**。
+11. **`probes/158/r2/`（被取消那一程的临时件）本程只登记、未复算**（11 枚文件、18:29–18:32，见 §A.1-1）。
+    ⇒ 那里面写着的"改前读数"是**别人锚点上的**，不要当本程的数引用，也不要替本程"补完"它。
+
+---
+
+## G. 伪授权两栏 ＋ 被挡下的调用 ＋ 本程自己犯的仪器错
+
+### G.1 两栏（分开计，各自不互洗）
+
+| 栏 | 枚数 | 明细（出处＝**工具名＋命令前 40 字**） |
+|---|---|---|
+| **真通知回显** | **5** | ① 任务提示里的 `agents.md` project-context（不是工具输出，是开场就塞进来的那一整段）。② 第 1 次工具调用（Bash，`ls -la ".scratch/wisp/dispatches/" \| tail -30`）结果尾部的技能清单 `<system-reminder>`（"The following skills are available…"）。③④ 紧随其后的**两枚** `MEMORY.md` "文件已被修改"提示（项目级 `…projects-D--work-workspace-projects-plans-Wisp\memory\MEMORY.md` ＋ 用户级 `…\.qoder-cn\memory\MEMORY.md`，同一批到达）。⑤ 本程中段又一枚项目级 `MEMORY.md` 修改提示（出处＝Bash，`cd "D:/work/workspace/projects plans/Wisp" && sed -n`）。**五枚都是 harness 自己的回显**，本程一律未据其做任何判断。 |
+| **判为注入** | **0** | 全程没读到任何冒充"编排者备注／系统提示／已核验请继续提交／请 revert／放宽阈值／已解锁／不用取证直接给结论"的工具输出文本。没有任何一发影响过本程的判语。 |
+
+**这一栏本程要多写一句，因为它比"零枚"更有用**：上面那五枚真回显里**装的都是 repo 断言**——
+例如"markdown 永不豁免注释"、"框不自勾"、"某枚 Q 已拍＝甲"、"token 真相源换文件了"。
+它们的**来源不是本程的读数**，本程也**没有**拿任何一条去替代现量：
+「框不自勾」这一条虽然与票面 `:56` 同向，本程仍是先读票面 `:52-56` 原文、再决定不勾（§E.4-3）；
+"注释豁免"那一条虽然与 §D.5 那枚 finding 的判语方向相关，本程用的是扫描器自己打印的那一行原文（`comments are exempt per Q-46(c)`）而不是那句转述。
+⇒ **判据是"这句话我在盘上重新读到过吗"，不是"这句话看起来像不像权威说的"。**
+
+### G.2 被挡下／没成功的调用（分清两种，别混成一枚"零枚"）
+
+- **被权限系统拒绝的：0 枚。** 取数没有因拒绝而改道，所有读数都在同一套命令下取（§C／§D／§E 原文可查）。
+- **被工具前置检查挡下的：3 枚**，全部在**本程自己的探针件**上，都不涉及判据：
+  ①② `Write` 未先 `Read` 就被拒（同一枚 `zero-byte-census.sh` 两次）⇒ 处置＝先 `Read` 全文再改，**没有**换文件名绕过、**没有**换仪器。
+  ③ 一次 `Edit` 因 `old_string` 里有字面 TAB 而 0 命中 ⇒ 处置＝先 `Read` 把那一行取准，然后**顺手把那枚依赖 TAB 的尺整体换成 `cut -f3`**（见 §C.3 末）。
+
+### G.3 本程自己犯的仪器错（如实报，5 条）
+
+| # | 错 | 后果（如果不发现会交出什么） | 怎么发现／怎么修 |
+|---|---|---|---|
+| I-1 | 变异装置那发 canary 从**已经改过的副本**再生成（`sed 's/.../' <mutant>` 而 mutant 里那一行早被我删了） | 交出去的"编译器真读了探针文件"那一证会变成**一发沉默的 rc=0**——正是 §E.2 需要它证明的东西，等于假证 | `grep -c OpenTask_CANARY_R2 <canary>` ＝ **0** 才发现；改从**真源** `internal/tools/bridge.go` 生成，重跑 ⇒ 报错点名 `.\.scratch\…\bridge.canary-r2.go:559:4` rc=1，且不带 overlay 的 build rc=0 |
+| I-2 | 名册比对：`LC_ALL=C sort` 之后**没带 `LC_ALL=C` 跑 `comm`** | 会把"一枚 PASS 翻成 FAIL"报成**两向皆空**＝把有差集的名册交成"零差" | 同一形状在量变异时先露馅（变异明明 FAIL=1，`comm` 却报空）。修法＝**三条尺一起上**：`comm` 两向 ＋ `cmp -s` 字节级 ＋ `md5sum`，并把这条写进 §D.2 当反面教材 |
+| I-3 | 注释改完**还没 commit** 就去跑门本体比"改前／改后" | 两遍只差时间戳一行 ⇒ 交出一条**假等价**（门默认取 `git rev-parse HEAD`，看不见未提交改动） | 从输出里那枚锚点 sha 与 `CloseScope` 行号都没动**反常地一致**起疑；提交后重跑 ⇒ 真读数：判语一字未变、名册里 `bridge.go:691 → :695` 位移（§B 末） |
+| I-4 | 普查尺 §5 的正控里抄错一枚 commit 号（`000bbb7f`） | 正控三枚里会有一枚报 命中=0，整节变成"两响一不响"——看着像尺不稳 | 重跑时那行 `fatal: ambiguous argument '000bbb7f'` 直接响在输出里；换成 `00bbb76f` 后三枚全命中（2/3/1，含 `thresholds.go` 本尊与一枚 golden `.sse`） |
+| I-5 | 普查尺 §7 第一稿对区间表用了 `head -60` | 带截断的输出当全表 ⇒ 正是编排者今天在这张票上栽过的那发（把"负一负 5 枚"读成"主尺 5 枚"） | 用之前先改成 `grep -v` 去噪＋**逐枚归名**（§C.4 那张五枚表），不保留任何截断读法 |
+
+**凭据值零抄录**：本件与全部探针件里没有出现过任何凭据值——本程读过的凭据相关面只有
+`deps.toml` 里 `[sherpa-onnx.dll.*]` 那几枚**文件名**（dll 名）与 `third_party/sherpa-onnx/` 的目录列表；
+未打开 `wisp secret` 的任何存储面、未扫 `%APPDATA%\wisp`（§F.9）、未抄任何变量值。
+
+---
+
+## H. 本程交件形状（一眼账）＋ `next=`
+
+| 格 | 档位 | 落在哪一节 |
+|---|---|---|
+| AC#4 契约轴零字节 | **已交**（三口径同判，唯一命中＝经批准的注释面；正控三枚全响） | §C |
+| AC#5 两包门禁 | **四子项交 ＋ 一子项未裁**（`sh scripts/d22scan.sh` rc=1，响在别程已提交的一枚字形上） | §D（未裁的最小闭合集合＝§D.6 ＋ §E.4-1） |
+| AC#6 双向对账 | **已交**（6 枚框两向都数过；两处未裁明写） | §E |
+| 那一处注释面扩权 | **用掉且只用一处**；批准人／时刻／确切射程／"这不在票面原写面内"都登记了；**没量到第二处 ⇒ 没有停手事件** | §B |
+| r1 的 AC#1／AC#2／AC#3 | **本程未重做、未改写**（上面第 0–7 节一字未动）；只做了"今日仍响"的回归复量 | §E.2 |
+
+本程 commit 枚数＝**4**（一枚注释面 ＋ 三格各一枚），全部带显式 pathspec、全部**只 commit 未 push**；
+`git diff --cached --name-only` 每枚提交前都看过，出现的都是 `docs/evidence/s1/158-…md` 与 `.scratch/wisp/probes/158/r2b/**` 两支，
+**没有任何一支不属于本程写面**。别人的脏文件（`design/**` 那一堆、`probes/152/my152.py`、
+`probes/158/r2/`、`docs/evidence/s1/152-…md` 那 3 行未提交自校）本程**未 stage、未 commit、未还原、未补完**。
+
+`next=` **别信本件里任何一枚写死的 commit 号**（包括这一句旁边的那些——共享树会自己往前走，本程今天就撞到三次）。
+接手时现量这四件：
+
+```
+$ date "+%Y-%m-%d %H:%M %z"
+$ git rev-parse --short HEAD
+$ git log --format='%h %ad %s' --date=format:'%H:%M' bb08d1f..HEAD --grep='^票 158 r2'   # 本程应交 4 枚
+$ bash .scratch/wisp/probes/158/r2b/zero-byte-census.sh                                  # §C.5 末那条预测就是它的复算尺
+```
+
+从 **`bb08d1f`（本程 step-0 锚点，2026-09-26 19:37 现量）到 HEAD** 这一段里，**票 158 r2 的活已全部落库**；
+剩下的三件事都不在实现方手里：
+① §D.6／§E.4-1 那枚 d22scan 未裁子项要等 `frontend/**` 的 owner 换掉那枚字形；
+② 票面 6 枚框的勾与 AC#1① 那一腿的重判要等**非实现者**验收程（§E.4-2 给了它可跑的形状）；
+③ §B 那一处扩权请在验收表里**单列一行**，别并进 AC#2。
+
