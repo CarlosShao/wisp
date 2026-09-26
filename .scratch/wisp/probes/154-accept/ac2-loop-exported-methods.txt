@@ -1,0 +1,32 @@
+### *Loop 的全部方法（尺一＝正则 ^func (l \*Loop) X( 枚举，锚点 5766be9）
+253:func (l *Loop) Budgets() Budgets { return l.b }
+256:func (l *Loop) History() []llm.Message {
+265:func (l *Loop) Reset() {
+275:func (l *Loop) Steer(text string) bool {
+321:func (l *Loop) RunAsync(ctx context.Context, input string) *RunningTask {
+332:func (l *Loop) Run(ctx context.Context, input string) Result {
+339:func (l *Loop) run(ctx context.Context, taskID, input string) Result {
+504:func (l *Loop) runControl(taskID string, verb ControlVerb, utterance string) Result {
+524:func (l *Loop) defaultControl(verb ControlVerb, _ string) ControlOutcome {
+539:func (l *Loop) stream(ctx context.Context, taskID string, req *llm.Request) (llm.TurnResult, error) {
+555:func (l *Loop) buildRequest(ctx context.Context) (*llm.Request, error) {
+586:func (l *Loop) executeCalls(ctx context.Context, root *observe.Root, j *taskJournal,
+726:func (l *Loop) dispatch(ctx context.Context, j *taskJournal, rowID int64,
+773:func (l *Loop) decideRisk(ctx context.Context, j *taskJournal, rowID int64, info ToolInfo) (ok, unbooked bool, why string) {
+794:func (l *Loop) localListTools(ctx context.Context) ToolOutcome {
+819:func (l *Loop) failToolCallsFromTruncatedMessage(ctx context.Context, j *taskJournal,
+850:func (l *Loop) failOpenCalls(ctx context.Context, j *taskJournal, taskID string,
+882:func (l *Loop) brakeStuck(ctx context.Context, root *observe.Root, j *taskJournal,
+893:func (l *Loop) failWith(ctx context.Context, root *observe.Root, j *taskJournal,
+904:func (l *Loop) finish(ctx context.Context, root *observe.Root, j *taskJournal,
+960:func (l *Loop) publishUsage(res *Result, cost Cost) {
+988:func (l *Loop) setCurrent(r *observe.Root) {
+994:func (l *Loop) append(m llm.Message) {
+1000:func (l *Loop) replaceHistory(hist []llm.Message) {
+1006:func (l *Loop) drainSteering() {
+1016:func (l *Loop) publish(e Event) {
+1022:func (l *Loop) log() *slog.Logger {
+
+### 尺二＝AST 名册里 recv=Loop/*Loop 的声明（本程自己的 astscan）
+
+### 判读：收 taskID 的导出方法枚数=0；未导出的 l.run(ctx, taskID, input) 在 loop.go:338

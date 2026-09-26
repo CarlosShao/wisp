@@ -1,0 +1,6 @@
+CloseTask
+Execute
+OpenTask
+Paths
+Registry
+Tools

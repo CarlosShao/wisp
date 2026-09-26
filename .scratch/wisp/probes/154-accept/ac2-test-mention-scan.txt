@@ -1,0 +1,44 @@
+### 尺＝git grep -nE 'OpenScope|CloseScope|OpenTask|CloseTask|open_scopes' <锚> -- '*_test.go'（整棵已入库树、不排目录）
+### 判读：没有一枚是'普查式'断言（没有任何用例断言'生产里每枚开出去的 scope 都有人关'）。
+### 命中 33 枚＝仓内 28（internal/risk 22·cmd/wisp 2·另 4 枚在 internal/agent 等，见下）＋ .scratch 探针文本 5（目录以点开头 ⇒ go tooling 结构性忽略，不进任何包）
+7	.scratch/wisp/probes/151-accept/accept151_control_test.go
+8	.scratch/wisp/probes/151-accept/accept151_control_test.go
+17	.scratch/wisp/probes/151-accept/accept151_e2e_test.go
+181	.scratch/wisp/probes/151-accept/accept151_e2e_test.go
+6	.scratch/wisp/probes/151-accept/accept151_e2e_test.go
+16	cmd/wisp/task_scope_close_151_test.go
+7	cmd/wisp/task_scope_close_151_test.go
+55	internal/risk/provenance_syncdirs_other_test.go
+23	internal/risk/provenance_test.go
+297	internal/risk/provenance_test.go
+309	internal/risk/provenance_test.go
+310	internal/risk/provenance_test.go
+322	internal/risk/provenance_test.go
+340	internal/risk/provenance_test.go
+358	internal/risk/provenance_test.go
+359	internal/risk/provenance_test.go
+364	internal/risk/provenance_test.go
+454	internal/risk/provenance_test.go
+722	internal/risk/provenance_test.go
+780	internal/risk/provenance_test.go
+792	internal/risk/provenance_test.go
+798	internal/risk/provenance_test.go
+812	internal/risk/provenance_test.go
+154	internal/risk/syncdirs_redteam_windows_test.go
+222	internal/risk/syncdirs_redteam_windows_test.go
+89	internal/risk/syncdirs_redteam_windows_test.go
+378	internal/risk/syncdirs_test.go
+459	internal/risk/syncdirs_test.go
+95	internal/risk/syncdirs_windows_test.go
+176	internal/risk/taintmatch_test.go
+181	internal/risk/taintmatch_test.go
+182	internal/risk/taintmatch_test.go
+190	internal/risk/taintmatch_test.go
+### 总数=33
+### 排 .scratch 的枚数=28
+### 附：*Loop 收 taskID 的方法（锚点现读）——导出 0 枚、未导出 4 枚（run:339 / runControl:504 / stream:539 / failOpenCalls:850）
+339:func (l *Loop) run(ctx context.Context, taskID, input string) Result {
+504:func (l *Loop) runControl(taskID string, verb ControlVerb, utterance string) Result {
+539:func (l *Loop) stream(ctx context.Context, taskID string, req *llm.Request) (llm.TurnResult, error) {
+850:func (l *Loop) failOpenCalls(ctx context.Context, j *taskJournal, taskID string,
+### ⚠ 顺带抓到一处别家行号漂移（不属本程写面，交编排者）：工单 :16 与台账 Q-56 都写 l.run 在 loop.go:338 ⇒ 锚点 5766be9 现读＝339（338 是 'core' 分隔注释）。被验的 154 证据件没引这枚号。

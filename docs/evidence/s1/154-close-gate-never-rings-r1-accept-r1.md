@@ -121,3 +121,85 @@ $ git grep -nE 'OpenScope\(|CloseScope\(|prov\.Mark\(' 5766be9 -- internal cmd '
 本程**没有**逼实现程造恒真检，**也没有**代它造：本程新增的只有"编译正控"（证明形状的语法可能性）与"未写子句的读数"（证明门不覆盖），两者都不落进任何断言面。
 
 ⚠ 一条**不能说过头**的话（免得本程自己犯本格要抓的错）：以上读数判的是**锚点 `5766be9` 的门本体**；`bridge.go` 注释里那句"the gate … is one `git grep` away"指的正是这套子句，它没有承诺"所有形都能被抓"，所以 D-1/D-5 **不与注释文案矛盾**，只与证据件 §2.2 那句"唯一的语法位置"矛盾。
+
+---
+
+## 第 2 节 格 AC#2 — 文案落点：逐句指回盘上事实 ＋ 每个引用当场解析
+
+派单要本程换的尺：**逐句判这三段是不是打发**，且**注释里不许预先引用尚未产出的读数**——"逐条 `ls`／`git cat-file` 它引的每个路径与号"。
+
+### 2.1 改动形状（换尺＝读 hunk 头，不读他们的 grep 过滤）
+
+r1 在 §3.3 用的尺是 `git diff -U0 | grep '^[+-]' | grep -v '^[+-]\s*//'`（文本过滤）。本程换成 **hunk 结构**（台件＝`probes/154-accept/ac2-bridge-comment.diff`）：
+
+```
+$ git diff -U0 --no-prefix 76c89b2^ 76c89b2 -- internal/tools/bridge.go
+@@ -628,0 +629,4 @@    ← OpenTask 注释：纯插入 4 行，0 删除
+@@ -650,0 +655,21 @@   ← CloseTask 注释：纯插入 21 行，0 删除
+$ git diff --numstat 76c89b2^ 76c89b2 -- internal/tools/bridge.go   →  25  0
+$ 非注释增删行枚数（grep -vE '^\+[[:space:]]*//'）                  →  0
+```
+
+⇒ 两枚 hunk 都是 `-,0`（**纯插入**）⇒ §3.1 那句"不抹原句、不改原句一字"**在结构上成立**，且插入点不落在任何原句中间（`-628,0` 落在原 OpenTask 注释末行之后、`-650,0` 落在原 8 行段末与 audit 段之间）——这条**只有 hunk 头能给**，他们的 grep 尺给不出"有没有把原句劈开"。
+本程另核 `git log --oneline 76c89b2..5766be9 -- internal/tools/bridge.go` ⇒ **空**（这一枚文件在 154 之后没人动过）⇒ §3.2 贴的行号（`626-632`／`646-679`）在**本程锚点**仍逐位对得上：`func (b *Bridge) OpenTask` ＝ `:633`、`func (b *Bridge) CloseTask` ＝ `:680`（现读）。
+
+### 2.2 注释里每一个引用，本程当场解析（两枚锚点各一次：写它的那枚 commit ＋ 被验锚点）
+
+| 注释里的引用 | 解析命令 | 读数（`76c89b2` ／ `5766be9`） | 判定 |
+|---|---|---|---|
+| `internal/agent/loop.go:366`（原句引，仍在原位） | `git show <锚>:… \| sed -n '366p'` | 两枚锚点都是 `defer revokeAdmission()` | **对** |
+| `Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321` | `sed -n '332p;321p'` | `:332 func (l *Loop) Run(` ／ `:321 func (l *Loop) RunAsync(` | **对，且顺序没写反**（票面 §现量第 4 条也是这个配对） |
+| `newTaskID` 未导出 | `git grep -n newTaskID` | 定义 `:1107`，生产调用只有 `:322`/`:333` 两枚（都在 `Loop` 内部） | **对** |
+| `docs/evidence/s1/154-host-id-never-closed-r1.md §2.3 (clauses G1/G1b)` | `git show 76c89b2:<该件> \| grep -nE '^### 2\.'` | §2.1–2.5 **全在**（`### 2.3 本程采用的门＝五枚子句` 在 `:137`） | **对：指针落点当时已在盘上** |
+| 同件 `§2.5` | 同上 | `### 2.5 "并发那一形零读数"` 在 `:177` | **对** |
+| `Q-56` | `git show <锚>:docs/reports/pending-and-issues.md \| grep -c Q-56` | `76c89b2`＝**9**、`5766be9`＝在 `:1095` 有整行登记 | **对**，且注释只引编号、**没替它选支**（ⓐ/ⓑ/ⓒ 一字未提） |
+| `.scratch/wisp/probes/154/gate-clauses.sh`（"one `git grep` away" 的落点） | `git cat-file -e 76c89b2:.scratch/…/gate-clauses.sh` | 存在（rc=0） | **对** |
+| `DEFERRED(C25-loop-wiring) item (1)`（原句） | `git grep -n` | `internal/risk/provenance.go:55` 真有这枚标记 | **对** |
+| `ticket 151` / `ticket 154` / `ticket 19` | `git cat-file -t 5d46f24`＝commit；`ls` 三枚票面 | 全在（19 的票面 `:62` 就是那枚 DEFERRED 的登记行） | **对** |
+
+⇒ **"不许预先引用尚未产出的读数"这一条：成立**——注释没有引用任何"以后才会有"的数（它不含任何读数型句子：没有"115/79"、没有"两跑皆红"、没有枚数），指向的两件（证据件小节、门脚本）在**写它的那枚 commit 上就已入库**。本程特意去数了注释全文里的数字：**只有行号与票号**（`366`/`332`/`321`/`151`/`154`/`56`/`2.3`/`2.5`），无一枚是"读数"。
+
+### 2.3 三段文案逐段判"是不是打发"（判据＝票面 AC#2 那句"只读注释的人能不能答出'我这条腿要不要自己关'"）
+
+| 段 | 承重的句子 | 指回的盘上事实（本程现量，不是他们自述） | 判 |
+|---|---|---|---|
+| A `OpenTask` 指路句 | "The open side is per CALL (mark above), the close side is per TASK and lives in another package, so nothing here keeps the two sides in step by construction" | 开＝`bridge.go:559` 在 `mark()` 里（每次调用）；合＝`cmd/wisp/run.go:563`（每枚任务）——本程用 **AST 名册**独立数过：`OpenTask` 生产调用者 **0 枚**（只被同文件的 `mark` 调）、`CloseTask` 生产调用者 **1 枚**（`run.go:563`） | **不是打发**：这一句给的是"为什么编译器帮不了你"，且两侧枚数就是它的证据 |
+| B1 `WHICH LEGS STILL HAVE NO OWNER HERE` | 自测问句 **"does the TaskID you dispatch with come from that boundary?"** ＋ 三枚举例（panel/ball host 自造 id、retry wrapper、scheduled task 跨轮带同一枚 id）＋ **"nothing in this tree closes it, and no test will tell you so"** | "没有别人关"＝G2 名册 2 行（注释＋唯一调用）本程复算逐字同；"**no test will tell you so**"＝本程把全仓 `_test.go` 里 `OpenScope/OpenTask/CloseTask/open_scopes` 的命中逐枚点开（**33 枚**＝仓内 28 ＋ `.scratch` 探针文本 5；后者目录以点开头，`go` 工具结构性忽略 ⇒ 不进任何包，台件＝`probes/154-accept/ac2-test-mention-scan.txt`）——**没有一枚是"普查式"断言**（`internal/risk/*_test.go` 那些是自己开自己关的用例；`cmd/wisp/task_scope_close_151_test.go` 两枚断言的是 revoke 那一形） | **不是打发**：读者拿这一句能自答"我这腿要不要自己关"＝**要**，且知道没有测试会提醒他 |
+| B2 `Being first is also an API decision` | "**Loop has no exported method that takes a caller-supplied task id**, so a host cannot route its id through the boundary that owns the close. That choice is `Q-56` and **this file does not answer it**." ＋ "closing your leg is only half of what ticket 154 owes - the reading for two tasks with scopes open at once is **still zero**, and it has to be measured in the same change (§2.5)" | 本程**不用他们的正则**证这一句：把 `*Loop` 的**全部**导出方法枚举出来（`probes/154-accept/ac2-loop-exported-methods.txt`）＝`Budgets`/`History`/`Reset`/`Steer`/`RunAsync`/`Run` 六枚，**无一枚收 taskID**；收 taskID 的 `l.run(ctx, taskID, input)` 未导出 ⇒ 句子成立。"并发读数仍为零"＝本程的 **AST 同函数序列扫描**独立复算（见 §2.4） | **不是打发**，且这一句是本票最值钱的一句：它把"缺的不只是 defer，而是一枚 API"写死在读者必经的位置，同时**没有**替 `Q-56` 选支 |
+
+### 2.4 本程替 AC#2 补的一发校验：'still zero' 那句到底零不零
+
+r1/r2 的 §2.5 用的是"数 `unbound-scope` 命中"这把尺。本程换尺＝**按函数体扫 `OpenScope`/`CloseScope`/`OpenTask`/`CloseTask` 的调用序列**（AST，457 枚 `.go` 全解析成功、0 枚 parse-error）：
+
+```
+同函数内 ≥2 枚开/合的全部用例：
+  internal\risk\provenance_test.go#TestDisposalScopeClearsTaints        open=2 close=1   （session-1 先 Dispose 才开 session-2 ⇒ 串行）
+  internal\risk\provenance_test.go#TestInspectUnknownScopeIsEmptyStore  open=2 close=2   （task-1 关后才开 task-2 ⇒ 串行）
+  internal\risk\provenance_test.go#TestFragmentThresholdStricterAllowed open=2 close=0   （两枚是 p 与 p2 两枚**引擎实例**，不是同树两枚 scope）
+  internal\risk\taintmatch_test.go#BenchmarkMarkFullSource              open=2 close=1   （同一枚 id "s"）
+⇒ "两枚任务同时各开一枚 scope 且都活着"这一形：全仓**零枚**用例 ⇒ 注释那句 "still zero" 成立。
+```
+⚠ 但本程要给 §2.5 那句"**全仓没有一枚用例让两枚 scope 同时开着**"记一枚措辞缺陷 **D-7**：`internal/risk/provenance_test.go:296` 的 `TestScopesNeverInherit` 一边 `OpenScope("task-2")`、一边让 `task-1` 手里有污点（`Mark("task-1", …)`，且 `provenance.go` 的 `Mark` 注释明写"Marking a closed/never-opened scope **still records the taint**"），而那枚用例自己的失败文案写的是 **"a second concurrent scope must never see task-1's taint"**。⇒ 按"注册过且非空的 scope 有两枚"读，§2.5 成立；按"引擎里同时存在两枚带状态的 scope"读，**有一枚用例就在做这件事、还自称 concurrent**。这一处不影响任何判语（它量的正是同一形），但下一位若拿"全仓没有并发读数"去推"并发无仪器"会被这句绊一下。
+
+### 2.5 本格抓到的一枚文案缺陷（D-6，实质）
+
+`CloseTask` 新段落的标题句是 **"WHICH LEGS STILL HAVE NO OWNER HERE"**，但列出的三枚全是**假设形**（host 自造 id／retry wrapper／scheduled task）。**今天真的在开着、且没人关的那一形不在名单上**：
+
+```
+$ git grep -nE 'OpenScope\(|CloseScope\(' 5766be9 -- cmd ':!*_test.go'
+5766be9:cmd/wisp/panel_assets.go:232:	prov.OpenScope(taintSourceScopeID)     ← cmd/ 下 CloseScope 枚数 = 0
+$ git show 5766be9:cmd/wisp/panel_assets.go \| sed -n '163,166p'
+  "…a CLI probe has no task, so it names one and **closes nothing** - the engine lives and dies inside this process."
+$ 入口现读＝cmd/wisp/main.go:103  case "panel-assets":（生产命令面，不是测试夹具）
+```
+
+⇒ 判读分两面写，免得本程说过头：
+- **不算谎**：注释里"legs"那三枚举例的限定语是"dispatch on the bridge"，而 `panel-assets` 那一枚**不过桥**（它直接调 `Provenance.OpenScope`），所以严格讲它不属注释正在答的那一形；且它的后果在它**自己的落点**（`panel_assets.go:163-166`）写得很老实、也有界（进程一次性退出、方向 fail-closed）。
+- **但确实是缺**：本票 AC#2 选 `CloseTask` 的理由是"那是会被读到的地方"，而票 154 自己的普查（§4.1 表第 2 行）把这一枚列为**"同族第二枚真只开不合"**。一份标题写着"哪些腿还没有 owner"的清单里**没有今天唯一的实际实例**，下一位容易读成"这一族还只是假设"。
+⇒ 记 **D-6**：建议补一句具名指路（"今日已存在一枚不过桥、直接开 Provenance scope 的诊断腿＝`cmd/wisp/panel_assets.go:232`，它有界且自带说明，但同族"）。**本程不改注释面**（写面只有两枚）。
+⇒ 与 §1.5 的 **D-5 同源**：门（G1/G1b）不吃不过桥那一形、文案（B1）也没点名它——**两件交付各自缺了同一枚形状**，这是本格最该被下一位读到的一条。
+
+### 2.6 AC#2 判语
+
+**成立。** 三段都不是打发：每句能指回一件盘上事实（§2.3 那栏的右边全是本程现量，行号按两枚锚点各取一次）；"不许预引未产出读数"这一条**通过**（注释零枚读数型句子，两处指针在写它的那一刻已入库）；票面那句判据（只读注释的人能否自答"我这腿要不要自己关"）**能答**，因为自测问句与"no test will tell you so"都在。
+带两枚缺陷：**D-6**（"还没 owner 的腿"清单缺今天唯一那枚实例）与 **D-7**（"没有一枚用例让两枚 scope 同时开着"的措辞比它的判据宽）。
