@@ -1,0 +1,20 @@
+time=2026-09-26T10:06:01.386+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSnapshotGateSectionComesFromTheLiveGate
+time=2026-09-26T10:06:02.809+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/26 10:06:02 mockllm: serving on http://127.0.0.1:54959 (golden dir D:\tmp\wisp145-e1\internal\llm\testdata\golden)
+time=2026-09-26T10:06:02.844+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestSnapshotGateSectionComesFromTheLiveGate2148927683\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-09-26T10:06:02.879+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestSnapshotGateSectionComesFromTheLiveGate2148927683\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-26T10:06:02.888+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-26T02:06:02Z duration_ms=8
+time=2026-09-26T10:06:02.895+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestSnapshotGateSectionComesFromTheLiveGate2148927683\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-26T10:06:02.902+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-26T02:06:02Z duration_ms=6
+time=2026-09-26T10:06:02.906+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-26T10:06:02.908+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    panel_pump_gate145_test.go:40: packet approval section = {"depth":0,"windowMs":0,"vetoChannels":null}
+    panel_pump_gate145_test.go:41: gate window=2000ms registry rows=[{name:ball text:单击悬浮球：悬浮球取消不可用 loaded:false} {name:esc text:按 Esc 键：Esc 取消不可用 loaded:false} {name:panel text:面板拒绝：面板取消不可用（票 37 未接入） loaded:false} {name:kws text:说取消词：语音取消不可用 loaded:false}]
+    panel_pump_gate145_test.go:50: windowMs = 0, want the gate's own 2000
+    panel_pump_gate145_test.go:53: windowMs = 0: the section arrived unfilled
+    panel_pump_gate145_test.go:56: packet carries 0 channel rows, registry reports 4
+--- FAIL: TestSnapshotGateSectionComesFromTheLiveGate (1.55s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	1.620s
+FAIL

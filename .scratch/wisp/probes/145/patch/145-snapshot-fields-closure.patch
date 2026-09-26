@@ -1,0 +1,403 @@
+diff --git a/internal/panel/composer.go b/internal/panel/composer.go
+index e444d5d..3c7410c 100644
+--- a/internal/panel/composer.go	
++++ b/internal/panel/composer.go
+@@ -46,6 +46,83 @@ type Snapshot struct {
+ 	Results     []ResultChunk      `json:"results"`
+ 	Composer    ComposerState      `json:"composer"`
+ 	GeneratedAt string             `json:"generatedAt"`
++	Run         RunState           `json:"run"`
++	Tools       []ToolCallView     `json:"tools"`
++	Approval    ApprovalState      `json:"approval"`
++	Cost        CostView           `json:"cost"`
++	Failures    []FailureView      `json:"failures"`
++}
++
++// RunState is the run section: what this run is doing, as the loop reported it.
++type RunState struct {
++	Reasoning string     `json:"reasoning"`
++	Status    string     `json:"status"`
++	Usage     UsageView  `json:"usage"`
++	Stuck     *StuckView `json:"stuck,omitempty"`
++}
++
++// UsageView is the token counter the streaming row shows.
++type UsageView struct {
++	Input      int `json:"input"`
++	Output     int `json:"output"`
++	CachedRead int `json:"cachedRead"`
++}
++
++// StuckView is C22's brake, as the guard stated it.
++type StuckView struct {
++	Tool   string `json:"tool"`
++	Repeat int    `json:"repeat"`
++	Level  int    `json:"level"`
++	Text   string `json:"text"`
++	Brake  string `json:"brake"`
++}
++
++// ToolCallView is one tool call row.
++type ToolCallView struct {
++	CallID        string `json:"callId"`
++	Name          string `json:"name"`
++	Status        string `json:"status"`
++	Level         string `json:"level"`
++	ArgSummary    string `json:"argSummary"`
++	ArgsJSON      string `json:"argsJson"`
++	ResultSummary string `json:"result"`
++	CorrelationID string `json:"correlationId"`
++}
++
++// ApprovalState is the gate section: queue depth and the L1 window. There is
++// deliberately no remainingMs: the countdown has no producer in this repository
++// (approval.EventTick is declared and emitted nowhere, and the Remaining that
++// is emitted carries the static window length), so a live "还剩几秒" would be a
++// constant dressed as a timer (ticket 145 AC#1 乙组, same family as thinkingMs).
++type ApprovalState struct {
++	Depth    int               `json:"depth"`
++	WindowMs int64             `json:"windowMs"`
++	Channels []VetoChannelView `json:"vetoChannels"`
++}
++
++// VetoChannelView is one cancel channel and whether it is live.
++type VetoChannelView struct {
++	Name   string `json:"name"`
++	Text   string `json:"text"`
++	Loaded bool   `json:"loaded"`
++}
++
++// CostView is C23's cost row. Micros and Currency travel together.
++type CostView struct {
++	TokensIn     int    `json:"tokensIn"`
++	TokensOut    int    `json:"tokensOut"`
++	CachedTokens int    `json:"cachedTokens"`
++	Micros       int64  `json:"micros"`
++	Currency     string `json:"currency"`
++}
++
++// FailureView is one D37 classified failure. HumanText is NOT here: the
++// class-to-copy table does not exist in this repository (ticket 145 AC#1 乙组).
++type FailureView struct {
++	ErrorClass string `json:"errorClass"`
++	Technical  string `json:"technical"`
++	Retryable  bool   `json:"retryable"`
++	Detail     string `json:"detail"`
+ }
+ 
+ // ResultChunk is one streamed assistant chunk.
+diff --git a/internal/panel/pump.go b/internal/panel/pump.go
+index b3144d8..da8a783 100644
+--- a/internal/panel/pump.go	
++++ b/internal/panel/pump.go
+@@ -100,6 +100,9 @@ type PumpSources struct {
+ 	Workspace func() WorkspaceView
+ 	// Results reads the streamed assistant text so far.
+ 	Results func() []ResultChunk
++	// Approval reads the gate section: how deep the queue is, how long the L1
++	// window is, and which veto channels can actually fire.
++	Approval func() ApprovalState
+ 	// AttachmentMax is the composer's per-attachment ceiling. Zero means
+ 	// MaxAttachmentBytes, the constant the broker itself defaults to
+ 	// (attachments.go:186), so the packet never advertises a ceiling that the
+@@ -175,11 +178,21 @@ func (p *SnapshotPump) Snapshot() Snapshot {
+ 		composer.Mode = ModeUnknownView()
+ 	}
+ 
++	// E3 closure measurement (ticket 145): the gate section is read from its own
++	// reader, and the depth is the card list this same pump just built.
++	approval := ApprovalState{Channels: []VetoChannelView{}}
++	if p.src.Approval != nil {
++		approval = p.src.Approval()
++	}
++	approval.Depth = len(cards)
++
+ 	now := time.Now
+ 	if p.src.Now != nil {
+ 		now = p.src.Now
+ 	}
+-	return NewSnapshot(cards, results, composer, now())
++	snap := NewSnapshot(cards, results, composer, now())
++	snap.Approval = approval
++	return snap
+ }
+ 
+ // Marshal is the exit function: the bytes the panel would be rendered from.
+diff --git a/internal/panel/pump_test.go b/internal/panel/pump_test.go
+index 220963d..f06ebdf 100644
+--- a/internal/panel/pump_test.go	
++++ b/internal/panel/pump_test.go
+@@ -120,7 +120,7 @@ func TestThePumpBuildsThePacketFromWhatTheHostHolds(t *testing.T) {
+ 	for k := range generic {
+ 		got = append(got, k)
+ 	}
+-	if strings.Join(sortedCopy(got), ",") != "composer,generatedAt,pending,results" {
++	if strings.Join(sortedCopy(got), ",") != "approval,composer,cost,failures,generatedAt,pending,results,run,tools" {
+ 		t.Errorf("snapshot JSON keys = %v, want exactly the four PanelSnapshot declares", got)
+ 	}
+ }
+@@ -272,7 +272,7 @@ func TestPublishHandsTheBytesToTheAttachedExit(t *testing.T) {
+ 	for k := range wire {
+ 		keys = append(keys, k)
+ 	}
+-	if strings.Join(sortedCopy(keys), ",") != "composer,generatedAt,pending,results" {
++	if strings.Join(sortedCopy(keys), ",") != "approval,composer,cost,failures,generatedAt,pending,results,run,tools" {
+ 		t.Errorf("exit bytes carry keys %v, want the four PanelSnapshot declares", keys)
+ 	}
+ 	var composer map[string]json.RawMessage
+diff --git a/cmd/wisp/panel_pump.go b/cmd/wisp/panel_pump.go
+index e751728..c18dfa7 100644
+--- a/cmd/wisp/panel_pump.go	
++++ b/cmd/wisp/panel_pump.go
+@@ -86,6 +86,23 @@ func (rt *agentRuntime) workspaceView() panel.WorkspaceView {
+ 	return panel.WorkspaceViewFromRoot(rt.paths.WorkspaceRoot())
+ }
+ 
++// liveGateState reports the gate section off the objects this process already
++// runs: the L1 window the gate was built with, and the channel registry's own
++// availability lines (B1's verbatim wording, copied not re-worded).
++func (rt *agentRuntime) liveGateState() panel.ApprovalState {
++	st := panel.ApprovalState{Channels: []panel.VetoChannelView{}}
++	if rt == nil || rt.gate == nil {
++		return st
++	}
++	st.WindowMs = rt.gate.Window().Milliseconds()
++	for _, c := range rt.gate.Channels().Statuses() {
++		st.Channels = append(st.Channels, panel.VetoChannelView{
++			Name: string(c.Channel), Text: c.Text, Loaded: c.Loaded,
++		})
++	}
++	return st
++}
++
+ // panelArgs shapes one live call's argument bytes into the argv-shaped list
+ // ApprovalCardView.args shows. Two real shapes exist: a call that carries an
+ // argv vector (what risk.Facts.ShellArgv is built from, and what
+diff --git a/cmd/wisp/run.go b/cmd/wisp/run.go
+index 688b56d..6728f09 100644
+--- a/cmd/wisp/run.go	
++++ b/cmd/wisp/run.go
+@@ -423,6 +423,7 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
+ 		Mode:      rt.modes.PermissionMode,
+ 		Workspace: rt.workspaceView,
+ 		Results:   rt.stream.Chunks,
++		Approval:  rt.liveGateState,
+ 		Out:       rt.bookPanelSnapshot,
+ 	})
+ 	rt.ui.publish = rt.publishPanelSnapshot
+diff --git a/frontend/src/lib/panel.ts b/frontend/src/lib/panel.ts
+index 5ea999d..3e10e2d 100644
+--- a/frontend/src/lib/panel.ts	
++++ b/frontend/src/lib/panel.ts
+@@ -125,6 +125,73 @@ export interface ResultChunkView {
+   done: boolean;
+ }
+ 
++/** The run section: what this run is doing, as the loop reported it. */
++export interface RunState {
++  reasoning: string;
++  status: string;
++  usage: UsageView;
++  stuck?: StuckView | null;
++}
++
++/** Live token counts (LLM_USAGE-reported, per stream). */
++export interface UsageView {
++  input: number;
++  output: number;
++  cachedRead: number;
++}
++
++/** C22's brake, as the guard stated it. */
++export interface StuckView {
++  tool: string;
++  repeat: number;
++  level: number;
++  text: string;
++  brake: string;
++}
++
++/** One tool call row (no durationMs: started_at has no writer - ticket 145). */
++export interface ToolCallView {
++  callId: string;
++  name: string;
++  status: string;
++  level: string;
++  argSummary: string;
++  argsJson: string;
++  result: string;
++  correlationId: string;
++}
++
++/** The gate section: queue depth and the L1 window (no remainingMs: no producer). */
++export interface ApprovalState {
++  depth: number;
++  windowMs: number;
++  vetoChannels: VetoChannelView[];
++}
++
++/** One veto channel and whether it can actually fire. */
++export interface VetoChannelView {
++  name: string;
++  text: string;
++  loaded: boolean;
++}
++
++/** C23's cost row. micros and currency travel together (unit open question). */
++export interface CostView {
++  tokensIn: number;
++  tokensOut: number;
++  cachedTokens: number;
++  micros: number;
++  currency: string;
++}
++
++/** One D37 classified failure. No humanText: the copy table does not exist. */
++export interface FailureView {
++  errorClass: string;
++  technical: string;
++  retryable: boolean;
++  detail: string;
++}
++
+ /** What the host pushes on every state change (ticket 35 owns the pump). */
+ export interface PanelSnapshot {
+   pending: ApprovalCardView[];
+@@ -134,6 +201,11 @@ export interface PanelSnapshot {
+   /** ISO-8601 stamp of when Go built the snapshot; display only, never used
+       to derive state - the panel keeps none. */
+   generatedAt: string;
++  run: RunState;
++  tools: ToolCallView[];
++  approval: ApprovalState;
++  cost: CostView;
++  failures: FailureView[];
+ }
+ 
+ /** Shape of the object WebView2 installs on the host page (C17). */
+diff --git a/cmd/wisp/panel_pump_gate145_test.go b/cmd/wisp/panel_pump_gate145_test.go
+new file mode 100644
+index 0000000..efa6df8
+--- /dev/null
++++ b/cmd/wisp/panel_pump_gate145_test.go
+@@ -0,0 +1,77 @@
++package main
++
++// MEASUREMENT ONLY - this file lives in an out-of-repo copy (D:\tmp\wisp145-e1)
++// and is ticket 145's AC#6 witness for the candidate gate section: it asks
++// whether the new approval.* values arrive from objects the run is actually
++// running, and it is the case that must go red when the fill is removed.
++
++import (
++	"encoding/json"
++	"testing"
++
++	"github.com/CarlosShao/wisp/internal/panel"
++)
++
++type chanRow struct {
++	name   string
++	text   string
++	loaded bool
++}
++
++func TestSnapshotGateSectionComesFromTheLiveGate(t *testing.T) {
++	f := newRunFixture(t, "openai-chat")
++	var (
++		live    panel.Snapshot
++		gateWin int64
++		rows    []chanRow
++	)
++	f.rtHook = func(rt *agentRuntime) {
++		gateWin = rt.gate.Window().Milliseconds()
++		for _, c := range rt.gate.Channels().Statuses() {
++			rows = append(rows, chanRow{string(c.Channel), c.Text, c.Loaded})
++		}
++		rt.publishPanelSnapshot()
++		live, _, _ = rt.lastPanelSnapshot()
++	}
++	if code := f.run("总结一下 这份笔记"); code != 0 {
++		t.Fatalf("exit %d\nstderr:\n%s", code, f.err.String())
++	}
++	b, _ := json.Marshal(live.Approval)
++	t.Logf("packet approval section = %s", b)
++	t.Logf("gate window=%dms registry rows=%+v", gateWin, rows)
++
++	if len(rows) != 4 {
++		t.Fatalf("the live registry reported %d channels, want the four allChannels names", len(rows))
++	}
++	if live.Approval.Depth != 0 {
++		t.Errorf("depth = %d, want the queue's real emptiness", live.Approval.Depth)
++	}
++	if live.Approval.WindowMs != gateWin {
++		t.Errorf("windowMs = %d, want the gate's own %d", live.Approval.WindowMs, gateWin)
++	}
++	if live.Approval.WindowMs == 0 {
++		t.Error("windowMs = 0: the section arrived unfilled")
++	}
++	if len(live.Approval.Channels) != len(rows) {
++		t.Fatalf("packet carries %d channel rows, registry reports %d",
++			len(live.Approval.Channels), len(rows))
++	}
++	for i, want := range rows {
++		got := live.Approval.Channels[i]
++		if got.Name != want.name || got.Text != want.text || got.Loaded != want.loaded {
++			t.Errorf("row %d = %+v, want %+v as the registry itself words it", i, got, want)
++		}
++	}
++	// B1's mandated line must survive the copy into the packet verbatim.
++	for _, c := range live.Approval.Channels {
++		if c.Name != "kws" {
++			continue
++		}
++		if c.Loaded {
++			t.Error("kws reported loaded: the packet would promise a voice cancel that cannot fire")
++		}
++		if c.Text != "说取消词：语音取消不可用" {
++			t.Errorf("kws text = %q, want B1's verbatim sentence", c.Text)
++		}
++	}
++}
+diff --git a/internal/panel/probe145_carrier_test.go b/internal/panel/probe145_carrier_test.go
+new file mode 100644
+index 0000000..6784e0e
+--- /dev/null
++++ b/internal/panel/probe145_carrier_test.go
+@@ -0,0 +1,37 @@
++package panel
++
++import (
++	"encoding/json"
++	"testing"
++	"time"
++
++	"github.com/CarlosShao/wisp/internal/risk"
++)
++
++// probe: assemble EXACTLY what cmd/wisp/run.go:421-427 assembles today (five
++// readers, none of them a new one) and report what the five new sections come
++// out as. This is the "无生产者" reading of ticket 145's candidate set.
++func TestProbe145WhatTheLiveAssemblyFills(t *testing.T) {
++	p := NewSnapshotPump(PumpSources{
++		Verdicts: func() []NativeVerdict {
++			return []NativeVerdict{{CorrelationID: "c1", Tool: "fs.write",
++				Args: []string{"a.txt"}, Level: risk.Level(2)}}
++		},
++		Mode:      func() risk.Mode { return risk.Mode(1) },
++		Workspace: func() WorkspaceView { return WorkspaceView{Set: true, Canonical: "D:/x"} },
++		Results:   func() []ResultChunk { return []ResultChunk{{CorrelationID: "t1", Text: "hi"}} },
++		Now:       func() time.Time { return time.Date(2026, 9, 26, 9, 0, 0, 0, time.UTC) },
++	})
++	snap := p.Snapshot()
++	b, err := json.Marshal(snap.Run)
++	t.Logf("run        = %s err=%v", b, err)
++	b, _ = json.Marshal(snap.Tools)
++	t.Logf("tools      = %s", b)
++	b, _ = json.Marshal(snap.Approval)
++	t.Logf("approval   = %s", b)
++	b, _ = json.Marshal(snap.Cost)
++	t.Logf("cost       = %s", b)
++	b, _ = json.Marshal(snap.Failures)
++	t.Logf("failures   = %s", b)
++	t.Logf("pending len=%d results len=%d (both live)", len(snap.Pending), len(snap.Results))
++}
