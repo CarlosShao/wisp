@@ -6907,6 +6907,12 @@ A40② 说最近三个 **push** run 是 `cancelled`。我又查了两步，**排
 | "`run.go:513` 实打实写着 `rt.bridge.OpenTask("")`" | `git log -S 'OpenTask("")' --all -- cmd/wisp/run.go` | **零枚 commit** 含过这行；`git grep -n OpenTask 86b0161 -- internal cmd \| grep -v _test` ⇒ 唯一非测试调用者是 **`bridge.go:559` 的 `mark`，实参 `dec.TaskID`（真 id）** |
 | "`unboundScopes()` 第一句 `if id != \"\"` 短路" | `grep -rn 'unboundScopes' --include='*.go' internal/ cmd/` ＋ 同扫 `.scratch/wisp/probes/151/` | **全仓零命中，生产码和探针文件里都没有这枚符号**（真实存在的是 `provenance.go:441-458` 的 `scopeMarks`，它做的是另一件事） |
 | "`RunTextTask` 路径确实通（`run.go:502-505`）／`WithInputProvider` 的 `TaskID`" | `grep -rn 'RunTextTask\|WithInputProvider' --include='*.go' internal cmd` | **两个符号全仓零命中**（连测试都没有） |
+  > **`>` 更正这一行我自己过量了（同一轮 10:3x，写完立刻反查发现的；原行不抹）**：区分大小写之后形状不一样——
+  > `RunTextTask` 作为**环路方法**确实不存在（`Loop` 只有 `Run`/`RunAsync`/`run`），但**这串字符在仓里是有的**：
+  > `cmd/wisp/run.go:137` 的 `func runTextTask(s runSpec) int`（CLI 自己那一腿），加 `cmd/wisp/run_test.go:154/:204/:420` 三枚 `TestRunTextTask…` 用例名。
+  > ⇒ 该行**成立的部分**是"ⓓ 那支不成立"：`runSpec` 里**没有 `TaskID` 字段**、`runTextTask` 收的是 `argv`、`Loop` 那一侧收不到外部 id ⇒ 宿主今天没有传 id 的口（这条我另在 `Q-56` ①②③ 里现量过）。
+  > ⇒ **不成立的部分**是我那句"连测试都没有"：那是一次**按大小写敏感的整词去 grep、却写成全称否定**。⇒ 规矩补一条：**"零命中"必须写明是哪把尺（大小写？整词？哪个目录？）**，否则我就是在用同一个毛病去纠正同一个毛病。
+  > （同一个措辞还出现在 `Q-56` 那一行的括号里——**那一处我不改**：按台账"只追加不删"的规矩，已提交的行只在就近补这块 `>`，由本块代它负责。）
 | "验收程 `66203d5`→`a272b07` 五格" | `git cat-file -t 66203d5`、`git cat-file -t a272b07` | **两枚都不是对象**（`fatal: Not a valid object name`）；只有锚点 `4e16976` 真存在 |
 | "验收件＝`151-task-scope-never-closed-r1-accept-r1.md`" | `ls docs/evidence/s1/ \| grep 151` | 盘上**只有实现件那一枚**，验收件**不存在** |
 | "该验收程已交件（`status: completed`）" | `task-ac2300145c9c69ae3.json` | **`status: running`、`result` 0 字节** ⇒ 它此刻还在跑，我那句"已交件"没有来源 |
