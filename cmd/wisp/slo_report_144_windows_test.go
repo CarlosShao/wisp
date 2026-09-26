@@ -738,6 +738,39 @@ func TestSLO149CorruptLegsWithoutADecoderErrorKeepTheirOwnEnd(t *testing.T) {
 // borrowed value back reddens nothing at all (probes/152/mut-post/
 // g1-restored-borrowed-value-case14off.log reports === RUN=21, PASS=14, FAIL=0);
 // with this case live the same mutation is red (g1-restored-borrowed-value.log).
+//
+// Correction of that triple, measured at this anchor instead of copied - ticket
+// 156's AC#4(ii) says "re-measure before you touch it". At head 0f18652, same
+// selector, on the bytes this file is in today: the shape described above
+// (borrowed value restored AND case 14 renamed away) is RUN=20 PASS=13 FAIL=0
+// SKIP=0 - probes/156/my156-r2.py cell r2-152g1-case14off, log
+// probes/156/mut-156-r2/r2-152g1-case14off.log - and with case 14 live the same
+// edit is RUN=21 PASS=13 FAIL=1 (cell r2-152g1-case14live). The tracked log this
+// block names says 20/13/0 as well. So "=== RUN=21, PASS=14, FAIL=0" is neither
+// reading: it is this selector's UNMUTATED baseline, 21/14/0, pasted into the
+// sentence that promises the mutation's numbers (probes/152/mut-post/asis.log, and
+// 21/14/0 again at this anchor: probes/156/mut-156-r2/r2-asis-152-surface.log).
+// Who is misled, and by which sentence: the next person who re-runs case 14's
+// load-bearing claim reads "reports === RUN=21, PASS=14, FAIL=0" at
+// cmd/wisp/slo_report_144_windows_test.go:739, gets 20 and 13, and - because a
+// short === RUN count is exactly how a swallowed or renamed case announces itself
+// in this repo's roster diffs - hunts for a test that stopped running instead of a
+// comment that stopped being true. No assertion moved; only these two numbers do.
+//
+// Ticket 156 AC#4(iii), the ingest-or-downgrade choice, measured not assumed: the
+// path the sentence above names IS in git (git ls-files
+// .scratch/wisp/probes/152/mut-post/ = 6 files, both g1 logs among them), while
+// the twin that ticket 152's own delivery table cites is not (git ls-files
+// .scratch/wisp/probes/152/mut-shipped/ = 0, git log --oneline -- that path = 0
+// commits, 9 files sitting there as "??"). This program ingests neither and
+// downgrades neither - both branches write into another ticket's artifacts, which
+// is outside what ticket 156's r2 dispatch lets it touch - and registers the open
+// choice in docs/evidence/s1/156-exited-asks-os-r1.md, AC#4 section.
+// Who is misled by the un-ingested copy: whoever follows "原始读数在 mut-anchor/
+// 与 mut-shipped/" at docs/evidence/s1/152-subject-death-never-measured-r1.md:380
+// from a checkout of HEAD rather than from this working tree, finds no such
+// directory, and reads ticket 152's load-bearing table as invented - when the same
+// shapes are tracked two doors away, at the path this case's own comment names.
 func TestSLO152CorruptLegWithNoNamedPositionRefusesToBorrowOne(t *testing.T) {
 	doc := slo144Report(t)
 
@@ -822,6 +855,28 @@ func TestSLO152CorruptLegWithNoNamedPositionRefusesToBorrowOne(t *testing.T) {
 // letter ticket 152's AC#2 drew: 152 took ⓒ and sent "who reaps a subject, and
 // where" upstairs as Q-57, which owner ruled on 2026-09-26 as ticket 156's option
 // 乙 (exited() asks the OS). Neither ruling moved one assertion in this case.
+//
+// Two pointers that restored header still does not carry, added by ticket 156
+// AC#4(i); this block states no ruling of its own:
+//   - "restored" here is a measurement, not a claim. The header line is
+//     byte-identical to the line ticket 152 deleted: git show 10e3585 --
+//     cmd/wisp/slo_report_144_windows_test.go | grep '^-//' yields 1 hit, and the
+//     md5 of that hit and of this file's line 835 are both
+//     a756e044366a5c957bef470027a86bc0. Nothing was rewritten while it was being
+//     put back.
+//   - the record of the deletion is docs/evidence/s1/152-subject-death-never-measured-r1-accept-r1.md,
+//     section 2.2, in the row that names the one deleted-and-not-restored line.
+//     The elided form of that path, "152-...-accept-r1.md" at line 851 above, is
+//     not a filename anyone can open, cat or grep.
+//
+// Who is misled, and which sentence does it: whoever adjudicates TICKET 156's AC#3
+// by grepping this file for "AC#3" to find its ruling. The sentence "// Case 13 -
+// AC#3's ruling is [the circled letter]: the s.exited() branch SHOULD name where
+// the last reading stopped" at cmd/wisp/slo_report_144_windows_test.go:835 puts no
+// ticket number in its first line, so a context-free grep hit reads as if 156's
+// AC#3 - which asked for a case that rings, and drew no letter at all - had a
+// ruling attached to it here. Lines 849-857 already say whose letter it is; this
+// block only says where to look when the first line is all the grep returned.
 func TestSLO149ExitedGiveUpSentenceCarriesTheLastReading(t *testing.T) {
 	dead := exec.Command("cmd.exe", "/c", "exit", "7")
 	_ = dead.Run() // a non-zero exit is the fixture, not a failure of this test

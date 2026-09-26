@@ -304,3 +304,144 @@ only-in-pre : 零枚
 
 
 ---
+
+## 第 4 格　AC#4：票 152 §8.3 那三枚注释级动作（**r2 程**，2026-09-26 15:3x，锚点现读 `0f18652`）
+
+> 本节及第 5 格由 **续程 r2** 写（派单：`.scratch/wisp/dispatches/2026-09-26-151x-impl-156-r2-two-cells.md`，`5092e86`）。
+> 上面第 0-3 格是 r1 程的已入库文字，本程**一字未改**（`git diff` 的删除列＝0，见 §4.5 那把尺）。
+
+### 4.0 先登记一处写面不一致（不是缺陷申报，是让下一位不必猜）
+
+派单 §"git 纪律与写面"把 AC#4 的写面写成 **`cmd/wisp/slo_windows.go` 的注释面**，而票面 `:45` 指到的"现量第 4 条"
+那三枚动作（工单 `:22-24`）逐枚点名的是**别的文件**：①② 在 `cmd/wisp/slo_report_144_windows_test.go`，③ 在
+`probes/152/mut-shipped/` 或票 152 实现件 `§4.2`。**按派单那一句，AC#4 三枚动作一枚都做不了。**
+本程取了票面那一支：`cmd/wisp/slo_report_144_windows_test.go` **不在冻结清单里**，r1 的派单与 r1 证据件第 0 格
+"地界"（本件 `:9-10`）本来就把这枚文件写进射程、且注明"**仅** AC#4 的三枚注释级动作"，本程照那一档做，
+一字代码未动、一断言未动。⚠ **这一处需要编排者认账**：要么承认派单写面那行漏了这枚文件（票面与 r1 地界都对，派单自己窄了），
+要么判本程越界——但**别按派单那行去判票面错**。
+
+### 4.1 动作①（补回 case 13 裁定头）：**"补回"由 r1 已交付并经本程核过字节，本程补的是"指路"那一半**
+
+现量（本程自己跑，不是抄 r1 的表）：
+
+```
+$ git show 10e3585 -- cmd/wisp/slo_report_144_windows_test.go | grep -c '^-//'      1
+$ git show 10e3585 -- ... | grep '^-//' | sed 's/^-//' | md5sum        a756e044366a5c957bef470027a86bc0
+$ sed -n '835p' cmd/wisp/slo_report_144_windows_test.go | md5sum        a756e044366a5c957bef470027a86bc0
+$ diff <(那一枚删除行) <(现在的 :835)                                     IDENTICAL
+```
+
+⇒ 票面 ① 要的"补回被删的裁定头"**成立且是逐字节的**（`0e95353` 交付），且它也已写明"ⓐ 是 149 的裁定、152 的 AC#2 走 ⓒ"
+（现 `:849-:857`）。本程**没有重做它**，只补了两枚指路（本件之外唯一另一处写面动作）：
+1. 那三行 `152-...-accept-r1.md §2.2`（现 `:851`）里的路径是**带省略号的、开不了也 grep 不到**：真名＝
+   `docs/evidence/s1/152-subject-death-never-measured-r1-accept-r1.md`，那一行在它自己的 **§2.2**（`### 2.2 删除行逐枚点名`，
+   本程按 HEAD blob 数过：`## 第 2 格`＝`:189`、`### 2.2`＝`:206`、那枚"删了没补回的一行"＝`:214`）。
+2. **谁会误判**：拿 `grep AC#3 cmd/wisp/slo_report_144_windows_test.go` 去查**票 156 的 AC#3** 有无裁定的人。
+   他把哪一句读错：`// Case 13 - AC#3's ruling is ⓐ: the s.exited() branch SHOULD name where the last`
+   ——出处 **`cmd/wisp/slo_report_144_windows_test.go:835`**，那一行**头一字不带票号**，脱离上下文的一次 grep 命中
+   会把 149 的 ⓐ 读成 156 的 AC#3 也 draw 了一枚字母（156 的 AC#3 要的是"会响的检"，今天一枚字母都没 draw）。
+   本程把这两枚补成 `:835` 之后的一段注释，并**现量了字节等式**，没新造任何裁定。
+
+### 4.2 动作②（`:737-740` 那三行注释里的读数）：**票面那个"改成 20/13/0"本程按自己的锚点重量＝成立，且错因比票面写的更具体**
+
+先按票面要求"先按你自己的锚点现量再改"。尺＝`.scratch/wisp/probes/156/my156-r2.py`
+（它**不重打变异字面**，全部 `spec`/`case_off` 都 import 自 r1 那把尺 `probes/156/my156.py`，
+所以 r2 的读数与 r1 的日志说的是同一发编辑；本程另加一枚"落地必打印"，见第 5 格 §5.2）。选择器＝
+`-run 'TestSLO144|TestSLO147|TestSLO149|TestSLO152'`（票 152 那一族的原选择器，**不含**本票新增的 5 枚）。
+
+| 发 | 谁量的 | `=== RUN` | `--- PASS` | `--- FAIL` | `--- SKIP` | 出处 |
+|---|---|---|---|---|---|---|
+| 借来的值放回去**＋**case 14 摘掉 | **本程现跑** | **20** | **13** | **0** | 0 | `probes/156/mut-156-r2/r2-152g1-case14off.log` |
+| 同一发、case 14 活着 | **本程现跑** | 21 | 13 | **1** | 0 | `.../r2-152g1-case14live.log`（红名 `TestSLO152CorruptLegWithNoNamedPositionRefusesToBorrowOne`） |
+| **不放任何变异**（同选择器、同字节） | **本程现跑** | **21** | **14** | **0** | 0 | `.../r2-asis-152-surface.log` |
+| 注释**点名引用**的那枚日志（`mut-post/`，`git ls-files`＝tracked） | r1 留的、本程现数 | 20 | 13 | 0 | 0 | `probes/152/mut-post/g1-restored-borrowed-value-case14off.log` |
+| 同一枚日志的未入库孪生（`mut-shipped/`） | r1 留的、本程现数 | 20 | 13 | 0 | 0 | `probes/152/mut-shipped/g1-restored-borrowed-value-case14off.log` |
+
+**判**：注释里那句 `reports === RUN=21, PASS=14, FAIL=0`（`cmd/wisp/slo_report_144_windows_test.go:739`）**是错的**，
+票面 ② 给的 `20/13/0` **对**。本程还量出错因，比"写歪了一个数"更具体：
+**21/14/0 恰好等于这个选择器在改前改后的"零变异"名册数**（第 3 行＝本程现跑，且票 152 自己那枚
+`mut-post/asis.log` 也是 21/14/0）⇒ 那三行注释把 **asis 的四个数**贴进了一句承诺"变异后的数"的话里；
+`21` 不是"从孪生日志抄错一位"，`14` 也不是——**它俩谁都不是那一发变异的读数**。
+（旁证：本程第一次跑错命令时**覆盖**了 `mut-156-r2/asis.log`——同名不同选择器一枚文件两头发——
+本程没有把它删掉，改成把每一发都换成带选择器的名字（`r2-asis-152-surface.log`）后重跑，两发的数一字未变；
+这条自报＝"别按名字猜"那一坑在本程又实发一次。）
+
+**这一枚的修法形状受限于派单的尺**：派单要 AC#4 每一枚 commit **删除列＝0**，而"改成"按字面必然是一删一增
+（票面 `:737-740` 与派单 `:18` 在这里直接冲突，冲突归 4.0 那一笔账）。本程取**纯追加**：
+在 `:739` 之后（同一段注释里、函数声明之前）加一段，**逐字说出上面那三行表、现跑的日志路径、以及错因**，
+并**逐字保留**被纠正的那句原文可 grep。⇒ 结果：`RUN=21, PASS=14, FAIL=0` 这串字符**仍在 `:739`**，
+但它下一段就写明它是什么的数。**残留缺陷（要编排者那一枚带删除的 commit 才闭得了）**：
+只读 `:739` 那一行的人若跳过后续注释，仍会拿到错的数。**本程不假装这一半也交了。**
+
+**谁会误判**：自己去复跑 case 14 那枚"承重"读数的人。他把哪一句读错：
+`g1-restored-borrowed-value-case14off.log reports === RUN=21, PASS=14, FAIL=0`，
+出处 **`cmd/wisp/slo_report_144_windows_test.go:739`**。他量到 20/13 ⇒
+在本仓 `=== RUN` 少一枚的读法就叫"有用例没跑到／被改名吞了"（正是名册两向 `comm` 要防的那件事），
+于是他去**找一个失踪的用例**，而不是去信一句过期注释。
+
+### 4.3 动作③（`mut-shipped/` 入库 or 把 §4.2 档位降级）：**两支都写在本程写面之外 ⇒ 本程一支都不执行，交读数＋点名残余**
+
+```
+$ git ls-files .scratch/wisp/probes/152/mut-post/    | wc -l   6      <- 含注释点名的那两枚 g1
+$ git ls-files .scratch/wisp/probes/152/mut-anchor/  | wc -l   6
+$ git ls-files .scratch/wisp/probes/152/mut-shipped/ | wc -l   0
+$ git log --oneline -- .scratch/wisp/probes/152/mut-shipped/ | wc -l   0
+$ ls .scratch/wisp/probes/152/mut-shipped/ | wc -l  9                  (asis + g1/g2/g3/g4 + h1/h2 + i1)
+$ grep -n '原始读数在' docs/evidence/s1/152-subject-death-never-measured-r1.md
+380:### 4.2 承重两问——两句都答，尺是本程自己的（`probes/152/my152.py`，原始读数在 `mut-anchor/` 与 `mut-shipped/`）
+```
+
+- 票面 ③ 的两支：**(甲)** 把 `mut-shipped/` 那 9 枚**入库**——纯新增（0 删），但目标路径是 `.scratch/wisp/probes/152/**`，
+  不在派单给本程的写面（"新建 `.scratch/wisp/probes/156/**`"）里，而且那是**已停笔别程**留下的件；
+  **(乙)** 把票 152 实现件 `§4.2` 那两行档位**降级**——那是**另一枚票的已入库证据件**，且按字面必带删除行。
+  ⇒ **两支都越界，本程都不执行**（`SPEC-12 §4.2` 未定义即停那一支的形）。本程**也没有**做一个"看着像入库"的替代动作：
+  把 9 枚日志**复制**进 `probes/156/` 再 commit 是**假交件**——被点名的那条路径依旧 0 枚 tracked，
+  而多出来的副本只会让下一位数成两份凭据。**这条判断本程写在这里，不写成已完成。**
+- 本程交的是读数与**归属**：`mut-post/`（tracked）**已经含**代码注释点名的两枚 g1 ⇒ 代码侧那条引用**在 HEAD 上可解析**，
+  这一半不缺；缺的是 `§4.2` 点名的 `mut-shipped/` 那一族（9 枚、0 tracked、0 commit）。
+- **谁会误判**：从**一枚 HEAD checkout**（而不是这台工作树）出发、按票 152 `§4.2` 那行去找原始读数的人。
+  他把哪一句读错：`原始读数在 `mut-anchor/` 与 `mut-shipped/``，
+  出处 **`docs/evidence/s1/152-subject-death-never-measured-r1.md:380`** —— 他会撞 `No such file or directory`，
+  然后有理由把票 152 那张承重表读成编的（实际同形读数就在两门之外的 `mut-post/`，tracked）。
+  本程把这一对（`mut-post`=6／`mut-shipped`=0）写进了 `slo_report_144_windows_test.go` 的注释面。
+- ⚠ **别把这条当"③已闭"**：③ 的"两选一 + 写清选了哪个"仍**未决**，选择权在编排者。
+
+### 4.4 放水两问自答（本格）
+
+① **断言方向动没动**：没动——本格只加注释行，零枚 `t.` 调用、零枚判据；四个数与名册由 §4.5 那发控量证明未变。
+② **helper 是不是原有的那枚**：本格不用 helper；尺是 r1 那把（`my156.py` 的 `spec`/`case_off`），r2 只加打印。
+**另自报一处本程自己的形状违例**：`git diff --numstat` 的**新增行全以 `//` 开头**这一条，
+本格只在 `cmd/wisp/slo_report_144_windows_test.go` 上成立；证据件本体是 markdown，追加行天然不以 `//` 开头
+（票 154 那把尺量的是码的注释面）。本程不为此把证据行伪装成注释。
+
+### 4.5 机器核（派单那把尺，原文可复算）
+
+```
+$ git diff --numstat -- cmd/wisp/slo_report_144_windows_test.go            55	0	...      (删除列＝0)
+$ git diff -U0 -- <同上> | grep '^+' | grep -v '^+++' | grep -vcE '^\+//'   0            (新增行 100% 以 // 开头)
+$ "$(go env GOPATH)/bin/gofumpt.exe" --version                              v0.12.0 (go1.27.1)   <- 现读，未抄旧票面
+$ "$(go env GOPATH)/bin/gofumpt.exe" -l cmd/wisp/
+  cmd/wisp/slo_exit_os_156_windows_test.go        <- 不是本程碰过的文件：r1 交付的 :272-279 那枚 struct literal 换行
+                                                     形状；本程没动它（改它＝带删除行、且不在 AC#4 三枚动作里），
+                                                     只登记。`grep -rln gofumpt scripts/ tools/` 本程现量＝0 命中
+                                                     ⇒ 今天的门禁不扫这条，但 AC#7 那程若加就得先处理它。
+$ go build ./cmd/wisp/                                                      rc=0
+$ # 行为控制发（注释改完之后，同一条命令、同一选择器）：
+$ python probes/156/my156-r2.py ... r2-asis-152-surface       RUN=21 PASS=14 FAIL=0 SKIP=0  rc=0
+$ python probes/156/my156-r2.py ... r2-asis-slo-all-after-ac4 RUN=26 PASS=19 FAIL=0 SKIP=0  rc=0
+  # 与注释改动前那一发 r2-asis-slo-all（RUN=26 PASS=19 FAIL=0 SKIP=0）一字不差
+  # TREE 行把每发钉在字节上：slo_windows.go=d2bc41ecfef06bd4（改前改后同一枚，本格一字未动它）、
+  # slo_exit_os_156_windows_test.go=9f1a709712b3bf1c（同样未动）、被本格加了 55 行注释的那枚文件
+  # 在控制发里=daf3455916f6bfd3（注释改完之后的字节；上面三发 g1/asis 全部跑在这一版上）
+```
+
+**第 4 格判定**：**① 成立（r1 交付＋本程字节核）／② 读数成立、修法只到"纯追加纠正"那一半，残留一行过期数字未闭／
+③ 未交（两支均越界，已点名归属）**。本格**不判自己 AC#4 通过**——三枚里 ② 有残留、③ 未动，票框由编排者定。
+
+**本程没测什么（本格）**：
+1. **没验"票 152 实现件 §4.2 那两行档位"到底该降还是该入库**（那是编排者的选择，本程只给读数）；
+2. **没跑 `mut-shipped/` 那 9 枚日志里除 g1 之外的任何一发**（h1/h2/i1/g2/g3/g4 全是 r1 或票 152 的凭据，本程一枚未复算）；
+3. **没验"注释里那两个数被改完之后，票 152 的验收程会不会反过来判它自己的 §9 第 8 行过期"**——
+   `152-…-accept-r1.md` 是本程不许动的半件（` M`），它对同一枚数的记法本程一字未读成凭据。
+
+---
