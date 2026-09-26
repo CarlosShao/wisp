@@ -29,6 +29,7 @@ import { CodeBlock } from "@/components/ai-native/code-block";
 import { ContextCards } from "@/components/ai-native/context-cards";
 import { DiffTable } from "@/components/ai-native/diff-table";
 import { EntityChip } from "@/components/ai-native/entity-chip";
+import { FirstrunScreen } from "@/components/firstrun-screen";
 import { LoadingState } from "@/components/ai-native/loading-state";
 import { SegmentedControl } from "@/components/ai-native/segmented-control";
 import { StreamingText } from "@/components/ai-native/streaming-text";
@@ -53,6 +54,7 @@ import {
   SHOWCASE_CONTEXT,
   SHOWCASE_COST,
   SHOWCASE_DIFF,
+  SHOWCASE_FIRSTRUN,
   SHOWCASE_PALETTE_GROUPS,
   SHOWCASE_PERMISSION_TIERS,
   SHOWCASE_PRIVACY_MEMORY,
@@ -82,6 +84,7 @@ const SECTIONS: readonly SectionMeta[] = [
   { id: "sec-security", num: "07", name: "安全", desc: "权限档三卡与授权记录：原生侧做决定，面板转述。" },
   { id: "sec-privacy", num: "08", name: "隐私", desc: "L1 画像 / L2 记忆两卡，外加保留期与本地保留开关。" },
   { id: "sec-cost", num: "09", name: "成本", desc: "成本三数与一周用量；数字口径是 C23 的 mono tabular 纯文字。" },
+  { id: "sec-firstrun", num: "10", name: "首启引导", desc: "三步进度轨、真实模型清单与目录授权：票 14/63 的观感定案。" },
 ];
 
 /** The framed demo card every section drops its components into. The chip in
@@ -149,7 +152,7 @@ export function Showcase() {
             <span aria-hidden="true" className="size-3.5 shrink-0 rounded-full bg-accent" />
             <span className="truncate text-[13px] font-medium text-ink">一缕 · 面板组件总览</span>
             <span className="hidden truncate text-[11.5px] text-ink-3 sm:inline">
-              九个章节，组件吃假数据
+              十个章节，组件吃假数据
             </span>
           </div>
           <Button onClick={toggleTheme} size="xs" variant="secondary">
@@ -399,6 +402,19 @@ export function Showcase() {
                   </div>
                 ))}
               </div>
+            </DemoCard>
+          </Section>
+
+          {/* 10 首启引导 */}
+          <Section meta={SECTIONS[9]}>
+            <DemoCard title="第 1 步 选择模型 · 进度环与 minisign 两态">
+              <FirstrunScreen {...SHOWCASE_FIRSTRUN} currentStep={0} />
+            </DemoCard>
+            <DemoCard title="第 2 步 目录授权 · 增与删">
+              <FirstrunScreen {...SHOWCASE_FIRSTRUN} currentStep={1} />
+            </DemoCard>
+            <DemoCard title="第 3 步 凭据录入 · 掩码与 DPAPI">
+              <FirstrunScreen {...SHOWCASE_FIRSTRUN} currentStep={2} />
             </DemoCard>
           </Section>
         </div>

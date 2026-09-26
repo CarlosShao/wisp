@@ -376,3 +376,33 @@ export const SHOWCASE_CODE = [
   { n: 3, segs: [{ t: "merge", c: "fn" as const }, { t: "(todos, " }, { t: "\"待办台账.json\"", c: "str" as const }, { t: ")" }] },
   { n: 4, segs: [{ t: "return", c: "kw" as const }, { t: " " }, { t: "dedup", c: "fn" as const }, { t: "(todos)" }] },
 ];
+
+/* ---------------------------------------------------------------------------
+   SHOWCASE · 首启引导（第 10 节）——showcase 假数据，生产路径不读此文件。
+   四枚模型清单（名字 / 大小 / minisign 两态）、三步轨与 DPAPI 行照抄 demo
+   firstrun 屏的内容数据（票 14/63 的观感定案）。
+   --------------------------------------------------------------------------- */
+
+export const SHOWCASE_FIRSTRUN = {
+  title: "欢迎使用一缕",
+  subtitle: "三步完成首次配置 · 每步均可跳过，稍后在设置里补",
+  steps: ["选择模型", "目录授权", "凭据录入"],
+  modelRows: [
+    { name: "asr-streaming-paraformer", desc: "流式识别 · int8", size: "245MB", minisign: "verifying" },
+    { name: "asr-offline-sensevoice", desc: "离线识别 · int8", size: "118MB", minisign: "verified" },
+    { name: "punc-ct-transformer", desc: "标点恢复 · int8", size: "88MB", minisign: "verified" },
+    { name: "kws-zipformer", desc: "唤醒词 · int8", size: "42MB", minisign: "verified" },
+  ],
+  progress: 0.68,
+  downloadStatus: "在装模型",
+  downloadNote: "哈希一律取自已验签的清单，不从镜像取；下载支持断点续传，可随时跳过，后台继续。",
+  dirs: ["C:\\Users\\swq\\Desktop", "D:\\work\\workspace"],
+  dirTitle: "授权目录",
+  dirNote: "一缕只能读写你授权的目录；工作区必须落在其中（C26 拒绝符号链接外指）。",
+  dirPlaceholder: "粘贴或输入目录绝对路径…",
+  dirAddLabel: "添加",
+  keyLabel: "LLM 凭据",
+  keyNote: "用于文本与工具调用；不填也能用离线语音，但对话能力不可用。",
+  keyMasked: "sk-************3f9a",
+  dpapiNote: "密钥由 Windows DPAPI 按用户加密落盘（SPEC-03）",
+} as const;
