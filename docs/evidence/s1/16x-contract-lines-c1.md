@@ -95,4 +95,109 @@ $ cmp .scratch/wisp/probes/16x/c1/bridge.go.0d17647 internal/tools/bridge.go
 
 ---
 
-（§3 六行表与 §4 各节在最后几条 commit 里逐枚补上；本文件写到哪一格，commit 记到哪一格。）
+## 4. 六枚各一节（派单 §3 那七问，逐枚）
+
+### 4.1 票 160 — `OpenScope` 改成自带关闭动作的句柄
+
+**这枚的批准粒度不是"改哪一行字"，是"开不开 `internal/risk/**` 这块地"**（派单 §3 第 6 问明令单独写清）。
+下面照七问走，但**第 2／3 问在这枚上是次要的**：文字改动只在 `provenance.go` 头注释那一处，
+真正贵的是**写面解冻**＋**这枚票自己的契约轴自相矛盾**（第 6 问）。
+
+**① 票面现读**（`.scratch/wisp/issues/160-scope-open-returns-a-handle-carrying-its-own-closer.md`，本程 `Read` 全文，53 行）：
+
+- Status（`:3`）：`立而不派（要动 internal/risk/**＝冻结面，且要兑现 DEFERRED(C25-loop-wiring) ⇒ 改契约＝人工批准，owner 点头之前不派）`
+- AC（`:26`–`:30`）：AC#1 未修码读数／AC#2 换形状（硬约束：不新增 goroutine、不用墙钟差、`RiskLevel` 判定语义一字节不许变）／AC#3 反向判据／AC#4 明写治不到什么／**AC#5 契约轴**
+- AC#5（`:30`）逐字：**`本票只许动 internal/risk/provenance.go 及其测试＋自己的证据件；docs/PLAN.md、docs/specs/**、thresholds.go、golden、allowlist.txt、tools/d22scan/**、frontend/**、design/** 零字节`**
+- 本票不解决（`:34`–`:37`）：不裁 `Q-56`／不做 `OpenTask/CloseTask` 同改造／不把门接进 CI／**只收 C25-loop-wiring 的第 (1) 条**
+- 前置条件（`:41`）：①owner 批准动 `internal/risk`（一句话即可，撤销口令写进票面进度）②票 158 结案 → **`:52` 已把②改判**为"票 158 五格成立＋AC#5 残余有票号"
+
+**② 要不要动冻结文本**：**要动 `docs/PLAN.md` 的哪一行？＝不动。**（票面 `:30` 自己钉死 `docs/PLAN.md`、`docs/specs/**` 零字节，本程核这一条与冻结面无冲突。）
+真正的冻结面是**包**，且**它的身份在仓规里写着**：
+
+- `.scratch/wisp/issues/README.md:180`（逐字）：`Never modify D1–D47 / C1–C32 / R1–R9 / D43 transition table (contract change = human approval).`
+- `.scratch/wisp/issues/README.md:141`（逐字）：`⚠ 本票要动 internal/risk/＝冻结区 ⇒ 改法先报编排者判；` ← **`internal/risk` 的"冻结区"身份在这里，不在 `docs/specs/**` 里**
+- `docs/specs/SPEC-12-roadmap-governance.md:38`（逐字）：`改 C1–C32 或 D1–D47 = 人工批准；同步更新 PLAN.md、docs/DECISIONS.md、受影响切片卡。`
+
+被这条批准放开的**具体文字**只有一处（它在冻结包内，是契约注释）：
+
+```
+$ git show 0d17647:internal/risk/provenance.go | awk 'NR>=55 && NR<=61 {printf "%d\t%s\n", NR, $0}'
+55	// DEFERRED(C25-loop-wiring): the agent loop / tool providers (tickets 10, 20,
+56	// 21, 22, 26) must (1) OpenScope at task start and Defer(CloseScope) on the
+57	// task's DisposalScope, (2) call Mark(...) on every SPEC-06 §5 sensitive
+58	// source output, (3) gate outgoing calls with Inspect(scope, tool, params)
+59	// (or CheckText for the TTS/HTTP-body channels), and (4) record the R4 source
+60	// name in the tool_call forensics row via the existing DAO — Hit.Fragment
+61	// itself must NEVER be persisted (it is sensitive content; native card only).
+```
+
+**③ 建议的替换文本**（只改 `:55-57` 那三行的第 (1) 条，第 (2)(3)(4) 条一字不动——票面 `:37` 就写了"只收第 (1) 条"）：
+
+```go
+// DEFERRED(C25-loop-wiring): the agent loop / tool providers (tickets 10, 20,
+// 21, 22, 26) must (1) LANDED as of ticket 160: opening a scope hands back a
+// handle that owns its own close, (2) call Mark(...) on every SPEC-06 §5 sensitive
+```
+
+（第三行续接原 `:57` 后半句 `source output, (3) gate outgoing calls ...`，即**整段只把 "(1) OpenScope at task start and Defer(CloseScope) on the task's DisposalScope," 换成上面那半句**，其余字节不动。）
+
+**④ 新增还是改写**：**改写既有文字**（一枚 `DEFERRED` 标记句 → 就地记"第 (1) 条已兑现"）。
+比 162/163/164 那三枚"加一行"贵，因为**这枚标记正对着双向交叉核对**：
+`PLAN.md:1546` 逐字 `**强制要求**：代码内每个 ` + '`// DEFERRED(D-xx): ... → docs/DEFERRED.md#锚点`' + ` 标记必须在本表有对应条目，**反向亦查**`，
+`docs/specs/SPEC-12-roadmap-governance.md:94` 逐字 `**双向交叉核对**：代码内每个 ` + '`// DEFERRED(D-xx): … → docs/DEFERRED.md#锚点`' + ` 必须在表有对应条目，`。
+⚠ 顺带一枚**本程量到的既存缝**（不是 160 造的，但 160 一动就会撞上）：
+
+```
+$ grep -c "loop-wiring" .scratch/wisp/probes/16x/c1/PLAN.md.0d17647   # 尺1：内容串
+0        （grep rc=1＝零命中）
+$ grep -c "C25-loop-wiring" docs/specs/SPEC-12-roadmap-governance.md  # 尺2：另一枚文件里的同一名字
+0        （grep rc=1＝零命中）
+```
+⇒ `DEFERRED(C25-loop-wiring)` 在 `PLAN.md` 与 `SPEC-12` 的登记表里**都没有条目**（两把尺都零命中）。
+它**严格说不在 `D-xx` 那族里**（`PLAN.md:1546` 的规矩字面只覆盖 `DEFERRED(D-xx)`），所以这不算违令；
+但 160 把它"就地记为已兑现"之后，表里**依然**没有这一条 ⇒ **登记表的 1:1 双向核对从此永远数不平它**。
+⚠ 本程**不**建议 160 顺手补这条（那要动 `PLAN.md` §7，正踩票面 `:30` 的零字节），只把它的**归属写清**：
+补条目＝另一次批准，或归 §7 登记表的既有 owner 待定项。
+
+**⑤ 同源拷贝有几份**（这一问在这枚上＝"这段注释所钉的成对规矩在别处还有几处自称同源"）：
+
+- **尺A（词形）**：`grep -rnE "逐字|照抄|verbatim|唯一来源|权威表" docs/PLAN.md docs/specs AGENTS.md` → 全语料 33 行命中（原始输出在 `.scratch/wisp/probes/16x/c1/copy-census.log` 尺A-1 段），
+  其中**没有一行**声称"逐字抄自 `provenance.go` 的头注释" ⇒ 词形这把尺给出：**0 份自称同源的拷贝**。
+- **尺B（内容串）**：`grep -rn "OpenScope at task start" docs/ internal/ cmd/` 与 `git grep -n "OpenScope" <锚> -- '*.go' ':!*_test.go' ':!.scratch'` →
+  文档侧 0 命中；**代码侧 2 枚生产调用点**（它们是**受这次签名改动影响的调用者**，不是"自称逐字抄"的拷贝）：
+
+```
+$ git grep -l "OpenScope" 0d17647 -- '*.go' ':!*_test.go' ':!.scratch' | grep -v internal/risk/provenance.go
+0d17647...:cmd/wisp/panel_assets.go
+0d17647...:internal/tools/bridge.go
+```
+
+  逐枚现读（本锚点）：
+  - `internal/tools/bridge.go:633-644` `func (b *Bridge) OpenTask(...)`，其中 `:638-642` 就是票 160 进度段说的那两套并行记账：
+    `open := b.scopes[taskID]` / `b.scopes[taskID] = true` 与 `:642 b.prov.OpenScope(taskID)` 分列两行（**本程读码自取，与票面 `:46-47` 同读**）；
+  - `cmd/wisp/panel_assets.go:232 prov.OpenScope(taintSourceScopeID)`，且 `:162-166` 的注释自陈它是**故意不关**的：
+    `a CLI probe has no task, so it names one / and closes nothing - the engine lives and dies inside this process.`（逐字）
+    ⇒ **这一枚不是遗漏，是与新形状直接冲突的一形**：句柄自带关闭动作之后，"开一个、不关、随进程死"要么显式写成"故意丢弃句柄"，要么被类型系统挡住。
+- ⚠ **两把尺都数过，才允许写这句**：`provenance.go` 头注释的**同源拷贝＝0 份**；**受影响的真实调用者＝2 枚**（这是两件不同的事，别并成一句）。
+
+**⑥ 不动它能不能落地**：**不能**，且**理由与文字无关**——
+签名从 `OpenScope(scopeID string)` 变成"交回句柄"，**编译器会当场要 2 枚调用者一起改**，
+而票面 `:30` 的契约轴**只许动 `provenance.go` 及其测试**。
+⇒ 这一格本程必须说白：**票 160 现在的 AC#5 是自相矛盾的**，实现程无论怎么走都会越界（或是"用 mock 代替真的"那类假绿）。
+**两种解法，我推荐乙**：
+甲＝owner 只批"开地"，编排者随后**改票面**把 AC#5 扩到那 2 枚调用者（票面归编排者，`.scratch/wisp/issues/README.md:198` 已写明"那张票面归我"）；
+乙＝**批语里一次划清射程**（照 09-26 `thaw-panel-for-145` 那份特批件的写法：owner 给一句话、编排者把射程写死到文件名），即下面第 ⑦ 问那句。
+⚠ 撤销口令照既有制度必须随批语一起给（`.scratch/wisp/dispatches/README.md` 每份记录固定五字段：程名·被派时刻·锚点 sha·授权范围（含"不含哪些"）·撤销口令）。
+
+**⑦ 要 owner 点的那一句（一句话，可直接回"照这个改"）**：
+
+> **「批我动 `internal/risk/provenance.go`（含其测试），并连带放开 `internal/tools/bridge.go`、`cmd/wisp/panel_assets.go` 这两枚唯一生产调用点为配合签名改动所必需的最小改动；`RiskLevel` 判定语义、`D43` 转移表、`docs/PLAN.md`、`docs/specs/**` 一字不动；撤销口令＝"160 别动"。」**
+
+推荐错了的代价（照 `thaw-panel-for-145` 的写法把"代价"随批语一起摆出来）：
+放开那 2 枚调用者＝同时打开 `internal/tools`（票 158/161 的地界）与 `cmd/wisp`（装配根）两片写面 ⇒
+**代价是同片写码程要串行**（票面 `:41` 前置条件③"编队空"这条仍在），最坏情况是这枚把 161 的尾巴顶到后面；
+**不放开**的代价＝这枚永远只能停在"普查尺事后数"，而票面 `:46-50` 已经量到"门装上了还是能从门旁边走过去"那一发。
+
+---
+
+（§4.2 起逐枚续写；§3 六行表在六枚全部落地后一次给出。）
