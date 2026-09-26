@@ -27,6 +27,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -711,7 +712,93 @@ func TestSLO149CorruptLegsWithoutADecoderErrorKeepTheirOwnEnd(t *testing.T) {
 	}
 }
 
-// Case 13 - AC#3's ruling is ⓐ: the s.exited() branch SHOULD name where the last
+// Case 14 - ticket 152 AC#3, the corrupt leg's fallback arm.
+//
+// What it replaced: `return inputOffset`, i.e. the position the decoder had
+// buffered up to. Ticket 149 measured that value lying (8 of its 18 corrupt
+// shapes printed 0 from it) and measured that replacing the arm wholesale with a
+// constant changed not one external reading - a decorative leg, not an
+// unmeasured one. Ticket 152 re-measured both of those against these bytes
+// (.scratch/wisp/probes/152/mut-anchor/f1-fallback-to-zero.log and
+// f2-fallback-to-minus1.log, both the same four numbers as asis.log), so the only
+// honest shapes left were "delete the promise" or "make the leg say it does not
+// know". This file chose the second, because Go needs a return on every path: the
+// arm now hands back offsetUnknown and contradictSubjectReportErr renders that as
+// words instead of a number.
+//
+// Why the assertion sits at this seam and not at a document: no shape reaches the
+// arm - that is the finding, not an obstacle this ticket is allowed to manufacture
+// around. So the two arms that DO name a position are taken from REAL decoder
+// errors, produced by the production classifier itself and pulled back out with
+// errors.As (the leg wraps with %w), and only the "names nothing" arm is handed an
+// error that is neither JSON type - which is exactly the thing the leg used to be
+// unable to distinguish from a real position.
+//
+// Case 14's own load-bearing reading: with this case neutralised, putting the
+// borrowed value back reddens nothing at all (probes/152/mut-post/
+// g1-restored-borrowed-value-case14off.log reports === RUN=21, PASS=14, FAIL=0);
+// with this case live the same mutation is red (g1-restored-borrowed-value.log).
+func TestSLO152CorruptLegWithNoNamedPositionRefusesToBorrowOne(t *testing.T) {
+	doc := slo144Report(t)
+
+	// 14a - an error that names no position gets no position, and the sentence
+	// says so in words. Nothing on this leg may print a byte number.
+	notAJsonsError := errors.New("invalid character: the runner wrote something that is not a json error type")
+	if got := contradictionOffset(notAJsonsError); got != offsetUnknown {
+		t.Errorf("contradictionOffset for an error that names no position is %d, want %d (offsetUnknown); "+
+			"any other number is a byte position this error never named - that is the value ticket 149 killed",
+			got, offsetUnknown)
+	}
+	unknown := contradictSubjectReportErr(39, offsetUnknown, notAJsonsError)
+	if re := regexp.MustCompile(`^([0-9]+) bytes contradict a subject report at an offset the decoder did not name: `); !re.MatchString(unknown.Error()) {
+		t.Errorf("no-position corrupt sentence %q is not the admission shape", unknown.Error())
+	}
+	if m := regexp.MustCompile(`offset [0-9]`).FindString(unknown.Error()); m != "" {
+		t.Errorf("the no-position corrupt sentence %q prints a byte position anyway (matched %q)", unknown.Error(), m)
+	}
+	if strings.Contains(unknown.Error(), "at offset "+strconv.FormatInt(offsetUnknown, 10)) {
+		t.Errorf("the admission leaked offsetUnknown as a position: %q", unknown.Error())
+	}
+
+	// 14b - and the two arms that DO name a position still name it, so 14a cannot
+	// be satisfied by a helper that answers "I do not know" to everything. Those
+	// two errors are the decoder's own, taken out of readSubjectReport's wrapped
+	// error rather than hand-built.
+	for _, tc := range []struct {
+		name string
+		body []byte
+	}{
+		{"real-syntax-error", []byte(`{"mode":"subject-in-tree",,"pass":true}`)},
+		{"real-unmarshaltype-error", []byte(`{"mode": 123}`)},
+		{"poke-in-the-fixture", slo149Poke(doc, 500, '@')},
+	} {
+		obs := readSubjectReport(tc.body)
+		if obs.state != reportCorrupt {
+			t.Fatalf("%s: state %s, want corrupt (%s)", tc.name, obs.state, obs.summary())
+		}
+		var syn *json.SyntaxError
+		var typ *json.UnmarshalTypeError
+		switch {
+		case errors.As(obs.err, &syn):
+			if contradictionOffset(syn) != syn.Offset {
+				t.Errorf("%s: contradictionOffset is %d, want the SyntaxError's own %d", tc.name, contradictionOffset(syn), syn.Offset)
+			}
+		case errors.As(obs.err, &typ):
+			if contradictionOffset(typ) != typ.Offset {
+				t.Errorf("%s: contradictionOffset is %d, want the UnmarshalTypeError's own %d", tc.name, contradictionOffset(typ), typ.Offset)
+			}
+		default:
+			t.Fatalf("%s: neither JSON error type came back, so this case's positive control is broken: %v", tc.name, obs.err)
+		}
+		if obs.offset < 0 {
+			t.Errorf("%s: a real decoder error was rendered as offsetUnknown (%d); the naming arm is asleep", tc.name, obs.offset)
+		}
+		if _, _, _, ok := slo149ContradictionOf(obs.summary()); !ok {
+			t.Errorf("%s: the naming arm no longer renders the contradiction shape case 11 parses: %q", tc.name, obs.summary())
+		}
+	}
+}
+
 // reading stopped, for the reason readSubjectReport's own doc comment gives - a
 // subject that died part-way through its write is exactly the shape that looks
 // like a prefix, and "exited (code 7) without writing its report" with no reading
