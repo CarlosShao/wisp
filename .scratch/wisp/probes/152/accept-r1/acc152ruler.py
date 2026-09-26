@@ -84,6 +84,11 @@ CELLS = {
     "p2-pre-fallback-was-minus-one": [(SLO, "\treturn inputOffset\n}", "\treturn -1\n}")],
     # --- the delivered test file dropped onto the pre-fix code (n1 shape) ----
     "n1-newtest-on-pre-code": [("@MAP@", TST, "post")],
+    # --- probe-only on a mutant: is any OPERATOR-VISIBLE sentence changed? ---
+    "x1p-arm-deleted-probe-only": [("@PROBE@",), (SLO, EXITED_ARM, "")],
+    "asisp-probe-only": [("@PROBE@",)],
+    # --- the naming arm silenced: is case 14 its only holder? (impl g4 shape) ---
+    "y7-renderer-never-numbers": [(SLO, "	if offset < 0 {", "	if true {")],
 }
 
 
@@ -180,7 +185,8 @@ def main():
         if err:
             print(json.dumps(dict(cell=key, fatal=err)))
             continue
-        print(json.dumps(go_test(snap_key, cell, ovl, n, SELECTION, key.replace(":", "__")), ensure_ascii=False))
+        sel = "TestAcc152Probe" if cell.endswith("probe-only") else SELECTION
+        print(json.dumps(go_test(snap_key, cell, ovl, n, sel, key.replace(":", "__")), ensure_ascii=False))
 
 
 if __name__ == "__main__":

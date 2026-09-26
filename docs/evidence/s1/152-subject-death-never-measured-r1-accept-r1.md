@@ -183,3 +183,61 @@ $ grep -n "s.exited()" cmd/wisp/slo_windows.go -> 520 / 820 / 837 / 851
 **本程没测什么（本格）**：`waitReady`（`:520`）那一支本程没跑真读数；端到端（真 CLI＋真杀）本程没复跑；
 `startSubject` 指派失败那一支（`internal/proc/jobscope_windows.go:117-119`，唯一可能出现在 `collectReport` 之前的收尸点）
 本程与实现件**都没构造过**——两程一致挂着，没人在这里宣称测过。
+
+---
+
+## 第 2 格　它动了代码——是不是给自己开的授权
+
+**先纠派单那句**（任务书第 2、3 条都按"新增了 `report.PendingExit` 字段＋新红句"来问）：**那两味在被验版本里不存在**（§1.5 表第 2 行）。
+本程因此把这一格改成问**真动的那一味**：`10e3585` 交付的改动面。
+
+### 2.1 被验版本的真实改动面（现量）
+
+```
+$ git show --numstat 10e3585        -> 88 1  cmd/wisp/slo_report_144_windows_test.go
+                                          56 17 cmd/wisp/slo_windows.go
+$ git show --name-only 97cfc6e --format=''  -> 只有 docs/evidence/s1/…（第 4-5 格，编排者代提）
+```
+
+新增符号只有四枚：常量 `offsetUnknown = -1`、函数 `contradictSubjectReportErr`、`contradictionOffset` 的**签名收窄**
+（两参→单参）、用例 `TestSLO152CorruptLegWithNoNamedPositionRefusesToBorrowOne`（case 14）。
+**没有新增字段、没有新增状态、没有动 `exited` 那条支的任何一个字**（与它 §4"AC#2 那一半一字节生产码都没改"一致）。
+
+### 2.2 删除行逐枚点名（全部 18 行，本程 `git show 10e3585 | grep -E '^-[^-]' | cat -A` 现跑，分四类）
+
+| 类 | 行 | 是不是断言 | 本程判 |
+|---|---|---|---|
+| 注释重排 | `subjectReportRead.offset` 语义段 8 行、`Only the -1 leg is never printed…` 2 行、`contradictionOffset` doc 3 行 | 否 | 无放宽；且新注释**没有把没测的说成测过**（它写"case 14 is what makes the new answer checkable at this seam"，seam 这个词是准的） |
+| 签名与调用点 | `func contradictionOffset(err error, inputOffset int64) int64 {` 与 `obs.offset = contradictionOffset(err, dec.InputOffset())` | 否 | 同步收窄，全仓无第二个调用者（本程 `grep -n contradictionOffset cmd/wisp/*.go` 只命中该调用点＋case 14） |
+| **唯一行为变化** | `return inputOffset` → `return offsetUnknown` | 不是断言，是被测行为 | 见 §2.3 与第 3 格。**没有任何既有断言检查过这条臂**——本程自己在改前字节上复算：`p1`（整臂换成 0）与 `p2`（换成 -1）都是 RUN 20／PASS 13／**FAIL 0**，与 `asis-pre` 四数逐枚相同 ⇒ 它说"装饰腿"是**量出来的**，不是嘴上说的 |
+| 句子搬家 | `obs.err = fmt.Errorf("%d bytes contradict a subject report at offset %d: %w", obs.bytes, obs.offset, err)` → `contradictSubjectReportErr(obs.bytes, obs.offset, err)` | 否 | 本程逐字节比：那枚格式串字面量在改前出现 1 次、改后出现 1 次、**完全相同**，只有实参名从 `obs.bytes, obs.offset` 换成 `size, offset` ⇒ 命名臂零变化（case 11 现绿为第二证） |
+| **删了没补回的一行** | `// Case 13 - AC#3's ruling is ⓐ: the s.exited() branch SHOULD name where the last` | 注释 | **缺陷登记（本程新增，实现件没报）**：case 13 的注释现在从句中开始（首行变成 `// reading stopped, for the reason…`），而**被删那半句是票 149 那一格裁定（ⓐ）的记录**。它不是放宽断言（票 152 的 AC#2 改判 ⓒ 之后，"ⓐ"这句话本来就过期了），但**别人票面的裁定出处被本票顺手抹了**。归口见 §8.2 |
+
+⇒ 测试文件的删除行**只有那一行注释**；`grep -E '^-' … | grep -E 't\.(Errorf|Fatalf|Skip)'` 只命中生产里那枚 `fmt.Errorf` 搬家行。
+**零枚既有断言被删、零枚被放宽、零枚 `t.Skip`、阈值与预算常量零字节**（`git diff 10e3585^ 97cfc6e -- cmd/wisp/slo_windows.go` 里
+`subjectReportBudget|subjectGrace|subjectPollInterval|subjectReadyBudget` 命中 **0**）。
+
+### 2.3 三问逐答（派单第 2 条原问的三个）
+
+1. **这条新句有没有偷偷放宽任何既有断言？** 没有（§2.2 逐枚）。被它改的那句 `at an offset the decoder did not name` 只长在一条
+   **今天没有任何文档能走到**的臂上（第 3 格条件），而走到过的两枚命名臂字符串逐字节未动。
+2. **"subject 没有写出一行报告"那个数是量到的还是造出来的？** 派单问的这句**不在被验版本里**——`exited (code %d) without writing its report (%s)`
+   是存量句子（`10e3585^:cmd/wisp/slo_windows.go:782` 就有；钉它的 case 13 出自 `b417d31`＝票 149，句里的 `last.summary()` 出自 `95885fb`＝票 144）。
+   本程把它的数**量成了读数**：探针 B 印出的是真 836 字节（`…(%s)` 里的 `836 bytes read, document still open at offset 836`），
+   那 836 枚字节是真子进程 `os.WriteFile` 落盘、由真 `os.ReadFile` 读回、`readSubjectReport` 真分类成 `unwritten` 的。⇒ **量到的**。
+   顺带把台账那句钉死：**这条支今天在生产接线上不响**，所以"量到的"是**它的形状**，不是**它的到达**——两程都没说过后者。
+3. **有没有为新增那一味造一发"今天不响的检"（恒真判据族）？** case 14 **不是恒真**，本程三发变异都能打红它：
+   `y1`（臂交回 0）／`y6`（臂交回 1）／`y4`（渲染器删掉承认臂、永远印数字）＝**各 1 枚红，红名都是 case 14**；
+   `y7`（渲染器永远不印数字＝命名臂被消音）＝ **2 枚红：case 11 与 case 14**（本程现量：`RUN 21/PASS 12/FAIL 2`）
+   ⇒ 与它 §5.3"诚实的一半：那一臂不是 case 14 独占的覆盖面"**同向、且本程自己走到了**。
+   但它**响的前提仍然是有人走到那条臂**：本程同样**没有**构造出任何一份真实文档把这枚检叫响过（§3.2）。
+
+### 2.4 授权面
+
+AC#3 的票面文本就是"两选一（删掉／换成会明说自己不知道的形状）"——**动码在授权射程内**，不是自开。
+真正越出票面的一点，本程登记在这里：`offsetUnknown` 把**票 147 钉过的 `-1` 语义**（"分类器根本没跑：没读到／没文件／文件读不开"）
+**加了一腿**（"解码器跑了但没点名"）。它自己在 §5"没测什么"第 2 条登记了"没做两腿的语义合并验证" ⇒
+**诚实、但确实是票面没点头的一小步扩张**。它没有渗进任何契约面（`internal/risk`／`panel`／`approval`／`d22scan`／`thresholds`／golden 零字节，见第 7 格），
+所以本程按"票内小扩张＋已登记"记，不按自开授权记。
+
+**第 2 格判定：成立（不是自开授权）。附带两笔要记的：case 13 注释被删那一行（§2.2 末类）、`-1` 语义加腿（§2.4）。**

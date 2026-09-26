@@ -1,0 +1,28 @@
+$ go test -count=1 -v -overlay 'D:/work/tmp/wisp152-accept-r1/ovl\post--x1p-arm-deleted-probe-only.json' -run TestAcc152Probe ./cmd/wisp/
+cwd=D:/work/tmp/wisp152-accept-r1/snap-post
+overlay_files=2
+overlay={"Replace": {"D:/work/tmp/wisp152-accept-r1/snap-post/cmd/wisp/zz152acc1_windows_test.go": "D:/work/tmp/wisp152-accept-r1/probe/zz152acc1_windows_test.go", "D:/work/tmp/wisp152-accept-r1/snap-post/cmd/wisp/slo_windows.go": "D:/work/tmp/wisp152-accept-r1/mut/post--x1p-arm-deleted-probe-only/cmd/wisp/slo_windows.go"}}
+time=2026-09-26T10:33:42.009+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAcc152ProbeUnreapedTakesTheTimeoutLeg
+    zz152acc1_windows_test.go:112: ACC|setup|pid=17192 file_bytes=836 os_says=terminated exit_code=7 cmd.ProcessState==nil?true
+    zz152acc1_windows_test.go:124: ACC|A|sawReported=false|exited_before=false exitCode_before=-1 elapsed=2.0009114s
+    zz152acc1_windows_test.go:125: ACC|A|sentence=wisp slo: subject 17192 never wrote a complete report within 2s (last read: 836 bytes read, document still open at offset 836: the tail had not arrived)
+    zz152acc1_windows_test.go:126: ACC|A|after_loop|exited=false exitCode=-1
+    zz152acc1_windows_test.go:149: ACC|A|last_reading|state=unwritten offset=836 bytes=836 summary="836 bytes read, document still open at offset 836: the tail had not arrived"
+--- PASS: TestAcc152ProbeUnreapedTakesTheTimeoutLeg (2.09s)
+=== RUN   TestAcc152ProbeReapedTakesTheExitedLeg
+    zz152acc1_windows_test.go:162: ACC|setup|pid=6420 file_bytes=836 os_says=terminated exit_code=7 cmd.ProcessState==nil?true
+    zz152acc1_windows_test.go:164: ACC|B|Wait returned exit status 7 (expected: exit status 7)
+    zz152acc1_windows_test.go:167: ACC|B|after_reap|exited=true exitCode=7
+    zz152acc1_windows_test.go:178: ACC|B|elapsed=2.0001696s sentence=wisp slo: subject 6420 never wrote a complete report within 2s (last read: 836 bytes read, document still open at offset 836: the tail had not arrived)
+    zz152acc1_windows_test.go:180: ACC|B|reaping did not produce the exited sentence: "wisp slo: subject 6420 never wrote a complete report within 2s (last read: 836 bytes read, document still open at offset 836: the tail had not arrived)"
+    zz152acc1_windows_test.go:183: ACC|B|the budget leg spoke where the exited leg should: "wisp slo: subject 6420 never wrote a complete report within 2s (last read: 836 bytes read, document still open at offset 836: the tail had not arrived)"
+    zz152acc1_windows_test.go:189: ACC|B|gave up on the spot expected, took 2.0001696s
+--- FAIL: TestAcc152ProbeReapedTakesTheExitedLeg (2.09s)
+=== RUN   TestAcc152ProbeLastIsAValueNotANilEnvelope
+    zz152acc1_windows_test.go:200: ACC|C|zero_value_summary="0 bytes read, document still open at offset 0: the tail had not arrived" state="unwritten" offset=0
+    zz152acc1_windows_test.go:225: ACC|C|inside_collectReportWithin|last_assign_at=883 exited_check_at=1126
+--- PASS: TestAcc152ProbeLastIsAValueNotANilEnvelope (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	4.323s
+FAIL
