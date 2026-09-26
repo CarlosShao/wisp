@@ -297,5 +297,16 @@ $ git show --name-only --format= 77e9ed2 | grep -v -E '^\.scratch/wisp/probes/16
 3. **`gate-order.sh` 的根算短一级**（§1.5）：它是 r3 已提交件，本程无权修。建议起一张小票（或并进 161 的下一程）
    把 `../../../..` 改成"向上找 `.git`＋校验 `go.mod`"，并给 ruler 2 的 `rc=127` 加硬退码——
    **它现在会在三把尺都没跑对的情况下打 clean 并退 0**，这比没有仪器更坏。
-4. **（甲）的 TRACKED-DIRTY 那一发从未实测红过**（§5' of my report / 本文件 §4）：要证它得把一枚已跟踪 `.go` 弄脏，
-   共享工作树里不该由实现程顺手做。可复算做法＝另开一个 worktree/`git archive` 检出，在里面弄脏一枚再跑 `attrib.sh`。
+4. **（甲）的 TRACKED-DIRTY 那一发从未实测红过**：本文件与交件报告的"没测什么"一节都记了这一条。
+   要证它得把一枚已跟踪 `.go` 弄脏，共享工作树里不该由实现程顺手做。
+   可复算做法＝另开一个 worktree/`git archive` 检出，在里面弄脏一枚再跑 `attrib.sh`，期望 `TRACKED-DIRTY` 行＋rc=1。
+5. **`attrib.sh` 今天只归因 gofumpt 那一把尺**（派单第一格写的输入＝"两把尺的原始输出"，即甲／乙两形），
+   而票面 AC#7②（`issues/161-…:41`）点的是**三把**：`gofumpt -l .`／`sh scripts/d22scan.sh`／`go vet`。
+   现状读数：`sh scripts/d22scan.sh` **rc=0、0 条 finding**（`logs/d22scan-sh-final.txt`）⇒ 那一腿今天**没有可归因的行**；
+   第三把尺本程**补跑了一遍并留了读数**（`ffbf463` 之后现量，全部 rc=0、输出 0 行）：
+   `cd tools/d22scan && go vet ./` rc=0、`cd tools/mockllm && go vet ./` rc=0、根模块 `go vet ./...` rc=0（`logs/go-vet-root.txt`，空文件）。
+   但这三发**只是"今天干净"的读数，不是归因**——vet 一旦报错，它的行形是 `path:line:col: message`，
+   而 `attrib.sh` 今天不看 vet 也不看 d22scan 的 finding（派单第一格给它的输入只有 gofumpt 那两形）。
+   ⇒ 最小闭合动作：把 finding／vet 行喂进同一套 `classify`/`ticket_of`/`ticket_known`，vet 仍限定在模块内
+   （`cd tools/d22scan && go vet ./`、`cd tools/mockllm && go vet ./`）；
+   否则就重演 r3 那枚脚本的形状——**三把尺没一把跑对，还照打 clean 退 0**。
