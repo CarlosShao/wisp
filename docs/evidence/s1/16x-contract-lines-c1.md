@@ -581,4 +581,193 @@ $ git grep -n '"task\.' 0d17647 -- 'internal/' 'cmd/' ':!*_test.go' ':!.scratch'
 
 ---
 
-（下节：§4.5 票 165、§4.6 票 168。）
+### 4.5 票 165 — "先出方案、你点头再动手"那一档
+
+**① 票面现读**（`.scratch/wisp/issues/165-plan-first-then-act-a-brake-the-voice-entry-needs.md`，`Read` 全文，39 行）：
+- Status（`:3`）：`立而不派（新增一档＝动 D31/D43/C12 那条状态与审批线，人工批准；且 owner 已定过"改状态机要谨慎"）`
+- 硬约束（`:19`–`:21`）：`:19` **`不许新造一套状态机。D43/C12 那张表是冻结的；本票优先复用现有的 AwaitingApproval 那一族，若量到"必须新增状态才成立"，停手上报`**
+- AC（`:25`–`:29`）：AC#1 未修码读数／**AC#2 复用形状（不新增状态；必须新增则本票退回转 `Q##`）**／AC#3 批准只批这一批（两发变异）／AC#4 面板不许代答／**AC#5 契约轴**
+- AC#5（`:29`）逐字：**`docs/PLAN.md、docs/specs/**、internal/risk/**、internal/panel/**、internal/agent/approval/**、thresholds.go、golden、allowlist.txt、frontend/**、design/** 零字节`**
+- 本票不解决（`:33`）：`不做界面（谁显示方案、点哪儿算点头＝frontend/**，owner 委托会话的写面）`
+
+**② 要动哪一行**：**本程把三条候选路各自的落点都量了一遍，结论是"这三条路的落点全在 `:29` 那句零字节名单里"**：
+
+| 候选路 | 必动的东西 | 逐字现读（本锚点） | 在 `:29` 的禁改名单里吗 |
+|---|---|---|---|
+| 甲：方案是一枚**工具**（走 C18 队列） | `D34` 加一行 | `docs/PLAN.md:2562` 就是那张表的元工具行，新行只能挨着它插 | **在**（`docs/PLAN.md`） |
+| 乙：方案是一枚**权限档**（第四档） | `internal/risk/mode.go` 的词表 | `65	modeVocabularyPattern = "ask_every_step\|ask_high_risk\|auto_approve"` | **在**（`internal/risk/**`） |
+| 丙：只改**审批层的放行范围**（批完方案就免问后续） | `internal/agent/approval/**` | `internal/agent/approval/batch.go:14` `// BatchMinOps is D45-1's "N >= 3 同质 L1 操作 -> 合并为一个确认".` ＋ `:15` `BatchMinOps = 3`（`:11-12` 逐字：`They are numbers from the contract, not tunables: changing one is a contract change.`） | **在**（`internal/agent/approval/**`） |
+
+⇒ **本票的"哪一行必须改"这一问，正确答案是先改票面**（它的 `:29` 把这枚票唯一可能的三条路全禁了）。
+
+**③ 建议的替换文本**（走甲路，代价与差别见第 ⑥ 问）：
+
+```
+| **`plan.present`** | **交回一份"我要干什么"的清单并停下等点** | **L2** | — | S3 | 复用 D43 #17/#23/#24/#25 那一族，**不新增状态**；**批准只批清单里那一批**（清单外的写仍各自弹卡）；**本票因此不减少确认次数**，它买的是"先看意图再看手" |
+```
+
+**④ 新增还是改写**：**新增**（表加一行）。
+⚠ **但票面自己许诺的收益是"改写"级的**——"一批改动只问一次"这句话若要做实，
+必动的就是 **D45 那三条不可逾越的限制**（`PLAN.md:2148`–`:2153`，现读第一条逐字 `**L2 永不进入任何持久授权**（含会话级）`），
+外加 `docs/specs/SPEC-06-security-gatekeeping.md:115-120` 那份 D45 拷贝，外加 §7 里那两枚 RESERVED 行（`PLAN.md:1532`、`:1533`）——
+**那全是改写已定稿的文字，且 D45 那两枚机制在语料里落在 22 行**（命令与逐枚见本节第 ⑤ 问）。
+
+**⑤ 同源拷贝有几份（两把尺）**：
+- **`plan.present` 这个名字**：**0 份**（它还不存在）。两把尺：
+
+```
+$ grep -niE "plan.?mode|计划模式|先方案|propose" .scratch/wisp/probes/16x/c1/PLAN.md.0d17647 | wc -l
+0        （尺1：内容串，定稿整篇零命中）
+$ grep -n "steering" .scratch/wisp/probes/16x/c1/PLAN.md.0d17647
+2731	| `[agent]` | `max_rounds`(50 兜底) … `steering_enabled` | `hot` |
+         （尺2：唯一那枚"看起来像刹车"的键，全篇只出现 1 次、且从未被定义过它做什么）
+```
+  ⚠ 第二把尺顺带量到一枚**既存空洞**：`[agent] steering_enabled` 在定稿里**只有名字、没有语义** ⇒ 任何程把它当"就是这一档"来实现＝自行假设（D22 闸门③／`AGENTS.md §2`）。
+- **`AwaitingApproval` 那一族**（甲路复用的东西）：**词形尺 5 枚文件、内容尺 18 处**，其中**表格拷贝 1 份**：
+  `$ git grep -c "AwaitingApproval" 0d17647 -- docs/PLAN.md 'docs/specs/*' AGENTS.md` → `AGENTS.md:1 · docs/PLAN.md:10 · SPEC-06:1 · SPEC-08:5 · SPEC-12:1`
+  转移表本体的拷贝＝`docs/specs/SPEC-08-ui-ball-panel.md:85-130`（它的 #23/#24/#25 在 `:111`/`:112`/`:113`，与 `PLAN.md:3077/3078/3079` 逐行对得上）。
+  ⚠ **本程在这枚票上量到一张"两张表已经不一致"的活证**（这一条与 165 直接相关，因为复用的就是它）：
+
+```
+$ awk 'NR==3051' .scratch/wisp/probes/16x/c1/PLAN.md.0d17647
+3051	20 态（§2）· 40 条转移。**未列出的转移一律非法**（未定义即停，D22 闸门③）。
+$ awk 'NR==85' docs/specs/SPEC-08-ui-ball-panel.md
+85	## 3. 状态机权威转移表（C12/D43——20 态 42 条转移；未列出的一律非法）
+$ git show 0d17647:internal/statemachine/doc.go | awk 'NR>=6 && NR<=7 {printf "%d\t%s\n", NR, $0}'
+6	//   - the authoritative D43 transition table (table.go: the 40 frozen rows
+7	//     plus SPEC-08 §3's appended #41/#42) and the per-state timeout table
+```
+  ⇒ 定稿说 **40**、`SPEC-08` 说 **42**（并把 #41/#42 插在 `:119-120`，顺序也乱了）、生产码的 `doc.go` 自己写明"40 frozen rows **plus** SPEC-08's appended #41/#42"。
+  第三把尺（枚数）：`$ awk 'NR>=3055 && NR<=3094' 定稿件 | grep -c "^| "` → **40 行**；`$ awk 'NR>=89 && NR<=130' SPEC-08 | grep -c "^| "` → **42 行**。
+  ⚠ **这不是本程造的**（D47 那批追加没回写定稿 §16.10 的那张表），但它正是"任何新转移该往第几号插"这个问题的现物 ⇒ **票 165 若要加任何一条转移，它会掉进这 40/42 缝里**。
+- **D45 那两机制在语料里的枚数**（丙路要改的东西，**按文件分**）：
+
+```
+$ grep -rc "批量聚合\|作用域会话授权" docs/PLAN.md docs/specs/*.md AGENTS.md | grep -v ":0$"
+docs/PLAN.md:15
+docs/specs/SPEC-01-architecture.md:1
+docs/specs/SPEC-02-data-storage.md:1
+docs/specs/SPEC-06-security-gatekeeping.md:3
+docs/specs/SPEC-10-testing-acceptance.md:1
+docs/specs/SPEC-12-roadmap-governance.md:1
+$ grep -rn "批量聚合\|作用域会话授权" docs/PLAN.md docs/specs/*.md AGENTS.md | wc -l
+22
+```
+  ⇒ 逐枚清单已在本程取数记录里（`PLAN.md` 的 15 枚行号：`1532 1590 1639 1795 2133 2135 2138 2140 2144 2698 2844 2985 3105 3109 3144`；`SPEC-06` 的 3 枚：`115 117 152`）；
+  **丙路若走，这 22 行里"哪几行是真要改"本程未逐枚判**（那要读每一行的语境，已越出普查射程，见 §2 第 2.2 格）。
+  ⚠ `AGENTS.md` 那把尺 **0 命中**（`grep -c` 直接给了 `AGENTS.md:0` 后被 `grep -v ":0$"` 滤掉，所以看起来像"漏了一枚文件"，不是漏）。
+
+**⑥ 不动它能不能落地**：**不能落地**（三档里的"不能"，且是最硬那种）——
+不是"要改一行才能落地"，是**票面 `:29` 自己把三条路全堵了**：
+甲堵在 `docs/PLAN.md`、乙堵在 `internal/risk/**`、丙堵在 `internal/agent/approval/**`。
+⇒ **必须先有一句批准（放开其中一条路的具体落点），这枚票才有可派形状。**
+附带两条本程量到的实话：
+1. **甲路不做 D45 改写 ⇒ 不减少确认次数**：`AGENTS.md` 禁的"面板侧给出允许"这条红线（`PLAN.md:2420` 逐字 `**`approval.decide` 的「允许」决策不接受来自面板的调用。**`）意味着卡片照弹、点还在那儿点；
+   ⇒ **票面 `:15` 那句"有了先方案这一档，一批改动只问一次"在甲路下不成立**（本程未实跑，见 §2 第 2.2 格）。
+2. **甲路复用的 `AwaitingApproval` 有一格行为至今未定义**，且它是 `AGENTS.md §2` 具名的"未定义即停"项：
+
+```
+$ awk 'NR==1530' .scratch/wisp/probes/16x/c1/PLAN.md.0d17647 | cut -c1-150
+1530	| **DEFERRED** | **`AwaitingApproval` 遇系统挂起的行为定案**（§16.11 第 10 条） | 本轮识别但未定案。倾向**作废并判拒绝**…| S7 切片卡明确定义，并写进 D43 转移表 | S7 | 挂起恢复后待批准请求的行为**未定义** → 按 D22 闸门③「未定义即停」处理 |
+```
+   同一条在 `PLAN.md:3228-3231` 与 `docs/specs/SPEC-06-security-gatekeeping.md:110-111` 各写了一次 ⇒ **"方案被批准"这一发如果正好赶上系统挂起，行为没有定义**。
+   ⚠ 这一条**不该由 165 顺带解决**（它自己 `:19` 就说了新造状态要停手），但 owner 批甲路时应知道：他批的那张卡挂在一枚已知未定义的行为上。
+
+**⑦ 要 owner 点的那一句（含本程的判语）**：
+
+> **「票 165 我按甲路批：放开两枚落点——`docs/PLAN.md` 的 D34 加一行 `plan.present`（L2、S3、复用 D43 现有 #17/#23/#24/#25，不新增状态）＋同批镜像 `SPEC-07 §3`；`internal/agent/approval/**` 与 `internal/risk/**` 仍然零字节。⇒ 明示代价：**这一档今天只买到"先看意图再看手"，不买到"一批只问一次"**；要后者必须另批 D45 的改写（语料 22 行落点，含 §7 两枚 RESERVED 行）。」**
+
+⚠ 三条本程要更正的票面读数（都带凭据，逐条）：
+1. `:15` 引 `PLAN.md:2118` 算的是"**≈33 分钟**"（`500 次阻止窗口 × 每次约 4s`），票面写成"半小时"——**同一笔账，措辞漂移**（凭据：`awk 'NR==2118' 定稿件`）。
+2. `:3` 的 Status 说"新增一档＝动 D31/D43/C12" —— **本程量到：走甲路可以完全不动 D43/C12**（复用现成四行）；"必须动状态机"这件事**不成立**，除非要走乙路（第四枚权限档，那才动 `internal/risk/mode.go:65` 的词表）。
+3. `:29` 里 `internal/panel/**` 被列零字节 —— **仓规其实明令它不冻结**：`.scratch/wisp/issues/README.md:44` 逐字 `**不冻结**（别扩大解释）：`internal/panel/` 与 `cmd/wisp/` 的 **Go 侧接线**`（`docs/reports/HANDOVER.md:545` 同句）。
+   ⇒ 这一条不是缺陷（票面自愿收窄射程是合法的），但**owner 批的时候别以为"解冻 panel"需要他开口**——需要他开口的是 `docs/PLAN.md` 那一行。
+
+---
+
+### 4.6 票 168 — 内置浏览器：两件必须先立
+
+**① 票面现读**（`.scratch/wisp/issues/168-built-in-browser-as-a-disable-able-plugin-two-rules-to-set-first.md`，`Read` 全文，44 行）：
+- Status（`:3`）：`立而不派（前置＝票 50（Tier-1 清单插件）＋票 51（Tier-2 goja）都没做完，插件地基不存在；且它要动 C17/C24 那两张未定案的白名单＝人工批准）`
+- 推荐（`:12`）：`A 做成可关的插件；B 只在宿主里留一个受控的第二视图，不许插件自己塞页面进来`
+- 两件必须先立（`:21`–`:22`）：逛到的内容必须打"外部内容"标记（与抓取同枚标记）／一次浏览的会话不得跨任务常驻
+- AC（`:26`–`:32`）：**AC#1 地基前置证明（票 50/51 未结案 ⇒ 不许开工，缺任何一枚停手上报）**／AC#2 注册位第二名当场失败／AC#3 两引擎同一接口／AC#4 外部内容标记正反两向／AC#5 面板边界零越界（`:30` 逐字含 `只加"显示/导航"这一类，不加"决定"这一类`）／AC#6 关掉要真关（对着 D32 那两个数）／**AC#7 契约轴（`:32`）**
+- AC#7（`:32`）逐字：**`docs/PLAN.md、docs/specs/**、internal/risk/**、internal/panel/**、internal/agent/approval/**、thresholds.go、golden、allowlist.txt、frontend/**、design/** 零字节`**
+- 本票不解决（`:36`–`:39`）：`web.search` 走哪条路不答／`:37` `不做"给人看的浏览器界面"（界面腿 owner 委托）`／不接 MCP／`:39` **不许把浏览器做成受门控的内置工具**
+
+**② 要动哪一行**：**这枚票的批准不是"改哪一行字"，是"两张尚未定案的白名单要不要现在就定稿"**（与 160 同型）。它自己的 AC#7 也把 `docs/specs/**` 禁死了，而那两张表**正好只在 specs 里**：
+
+```
+$ grep -n "方法白名单" docs/specs/*.md
+docs/specs/SPEC-08-ui-ball-panel.md:156:### 5.2 C17 PanelBridge 方法白名单【SPEC 提案，S5 定稿走契约批准】
+docs/specs/SPEC-08-ui-ball-panel.md:235:- C17：correlationId 路由测试（并发 10 个请求乱序回复）、方法白名单拒绝、resync 后前端状态与
+docs/specs/SPEC-06-security-gatekeeping.md:131:3. **服务端二次授权**：…；PanelBridge 方法白名单 +
+docs/specs/SPEC-12-roadmap-governance.md:48:- C24 GojaHostAPI 初始集与 C17 方法白名单定稿（S7/S5 切片卡批准）
+```
+⇒ **方法清单本体只在 `SPEC-08:161-174` 一处**（14 行方法表，`panel.resync` 起、事件推送止）；
+⇒ **C24 的初始入口集只在 `SPEC-07:117-120` 一处**，它自己那行就写着"【SPEC 提案，S7 定稿走契约批准】"：
+
+```
+$ awk 'NR>=115 && NR<=120 {printf "%d\t%s\n", NR, $0}' docs/specs/SPEC-07-tools-and-plugins.md
+115	- 所有能力经 host 注入（goja 无 `fetch`/定时器/IO）；**C24 `GojaHostAPI` 是 JS 侧唯一宿主入口
+116	  全集**，未列出的入口即契约违规（字符串扫描可验）。
+117	  【SPEC 提案，S7 定稿走契约批准】初始入口集：
+118	  `wisp.http.request`（cap: net）· `wisp.fs.read|write`（cap: fs.read|fs.write）·
+119	  `wisp.clipboard.read|write` · `wisp.notify.send` · `wisp.sysinfo.get` ·
+120	  `wisp.state.get|set`（插件自身 KV，无 capability——插件自己的数据）。
+```
+（这两处未定案的身份，`AGENTS.md §2` 未定义即停清单里点得名：`- ` + '`C24 GojaHostAPI`' + ` 初始集与 ` + '`C17`' + ` 方法白名单定稿（S7/S5 切片卡批准）`。）
+
+**③ 建议的替换文本**（**只在 owner 真要现在定 B 路时才贴**；本程的推荐是**现在不定、只做第一问那两枚标记**，见第 ⑥ 问）：
+- 若定 B 路：`docs/specs/SPEC-08:156` 那枚标题去掉未定案方括号 →
+  `### 5.2 C17 PanelBridge 方法白名单（2026-09-26 owner 定稿；浏览器视图那两枚另批）`，
+  并在方法表（`:174` 之前）**加两行**：
+
+```
+| `browser.view.open` | Go→前端推送 | —（只开一个受控第二视图；**不给出任何允许**） |
+| `browser.view.navigate` | Go→前端推送 | —（导航目标必须是任务内已批准的 URL；**永不扩"决定"这一类**） |
+```
+- 若只立"两件规矩"（本程推荐）：**零文字改动**，两枚标记都是**行为要求**，落点在实现里：
+  外部内容标记复用 `internal/risk/provenance.go` 那族源标记（`SrcWebFetch = "web.fetch"`，现读 `:79`），
+  会话归属复用票 160 的句柄形状（票面 `:22` 自己就是这么指的）。
+
+**④ 新增还是改写**：走 B 路＝**两处都是改写＋两处新增**（标题那句"提案/未定稿"是要被**改掉**的已定稿措辞，方法表加两行是新增）；
+走"只立两枚标记"路＝**零改写零新增**（不动冻结件）。⚠ **这个差价是本枚最该让 owner 看见的东西**：
+168 唯一"必须现在批"的那一格（第 ⑥ 问）其实**不需要改任何文字**，需要的是**排期判断**。
+
+**⑤ 同源拷贝有几份（两把尺）**：
+- **C17 方法清单**：**1 份**（就在 `SPEC-08:161-174`，它就是本体）。词形尺给出 6 处**只谈"要有白名单"而不列方法**的指涉：
+  `PLAN.md:2432`、`PLAN.md:2963`、`PLAN.md:3107`、`SPEC-06:131`、`SPEC-12:48`、`AGENTS.md:74`
+  ⇒ **改方法表不会牵连那 6 处**（它们不抄内容）。
+- **C24 初始入口集**：**1 份**（`SPEC-07:117-120` 本体，`grep -rn "wisp\.http\.request" docs/` → 仅此一处）；
+  指涉它的：`PLAN.md:1374`（C24 契约行，只说"全集/未列出即违规"，不列名字）· `PLAN.md:3109`（S7 验收）· `SPEC-12:48` · `AGENTS.md:74`。
+- ⚠ **别把上面这两组数并成"拷贝很多"**：**内容尺给 1＋1**，**词形尺给 6＋4 枚"只指名不抄内容"的引用**。
+
+**⑥ 不动它能不能落地**：**不能，且理由与冻结文字无关（本程两把尺现量）**：
+
+```
+$ ls .scratch/wisp/issues/ | grep -E "^0?5[01]-"
+50-tier1-manifest-plugins.md
+51-tier2-goja.md
+$ ls .scratch/wisp/issues/ | grep -cE '^(50|51)-.*-done$'
+0        （grep rc=1＝零命中）
+$ grep -n "Status" .scratch/wisp/issues/50-tier1-manifest-plugins.md .scratch/wisp/issues/51-tier2-goja.md
+.scratch/wisp/issues/50-tier1-manifest-plugins.md:3:**Status:** ready-for-agent
+.scratch/wisp/issues/51-tier2-goja.md:3:**Status:** ready-for-agent
+```
+⇒ 两枚都不带 `-done` 后缀（`AGENTS.md §1.5`：那后缀是防重领的唯一键），Status 也都不是 done ⇒ **票 168 的 AC#1（`:26`）判"不许开工"直接成立**。
+⇒ 它还排在票 160 之后（`:43` 前置条件写死"票 160 结案"），而 160 正是 §4.1 里那枚"要 owner 批开地"的票。
+⇒ **本程对 owner 的建议：168 这一枚不要现在批文字。** 它今天唯一能批的是"**先立那两枚规矩**"（票面 `:21-22`），
+而那两枚**不需要动任何冻结件**；方法白名单（C17/C24）定稿是 **S5/S7 切片卡**该做的事（`:48` 与 `AGENTS.md §2` 都是这么写的），
+现在为了一枚地基还没有的浏览器提前定稿，正是本仓 `Q-52` 那格"为还会变的东西签冻结契约"的形状。
+
+**⑦ 要 owner 点的那一句**：
+
+> **「票 168 我这轮只批那一半不需要动冻结件的：把票面 `:21-22` 那两件（逛到的内容必须打与抓取同一枚外部内容标记／一次浏览的会话不得跨任务常驻）钉成实现要求，`docs/specs/**` 与 `docs/PLAN.md` 一字不动；C17 方法白名单与 C24 初始集仍按 S5/S7 切片卡定稿，**不提前为浏览器开洞**；本票继续立而不派，等票 50／51 双双 `-done` ＋票 160 结案。」**
+
+不这么批的代价：若现在就定 C17/B 路那两枚方法名 ⇒ **在一枚依赖的插件地基（票 50/51）尚不存在、且界面腿归别人**的情况下把白名单钉死，
+将来 S5/S7 切片卡真要定稿时只能改写它；若连"两枚标记"都不批 ⇒ `:21` 那条正面漏口留在（dsh 那形"抓的打了标记、逛的什么都没打"，票面 `:4` 已把它记成反面教材）。
+
+---
+
+（下节：§4.7 owner 那句"这六张里有没有要写 `frontend/**` 的"。）
