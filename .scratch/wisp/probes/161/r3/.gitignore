@@ -1,0 +1,5 @@
+pre-format/*.go
+bin/
+*.exe
+logs/ci-head-baseline.yml
+tmp-*.md

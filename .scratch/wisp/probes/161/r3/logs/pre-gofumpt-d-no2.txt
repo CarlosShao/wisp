@@ -1,0 +1,9 @@
+diff .scratch/wisp/probes/158/accept-r1/mut/guard.no2.go.orig .scratch/wisp/probes/158/accept-r1/mut/guard.no2.go
+--- .scratch/wisp/probes/158/accept-r1/mut/guard.no2.go.orig
++++ .scratch/wisp/probes/158/accept-r1/mut/guard.no2.go
+@@ -113,5 +113,4 @@
+ 			"bridge.scopes 里没有 %q。这一味（mark 里的 b.OpenTask）是本包对 C25 开侧唯一的"+
+ 			"断言点，它一旦被改掉，敏感读的污点就没有主人了", taintedTask)
+ 	}
+-
+ }

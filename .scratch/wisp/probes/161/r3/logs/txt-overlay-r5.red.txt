@@ -1,0 +1,10 @@
+RUN=116
+PASS=79
+FAIL=1
+SKIP=0
+--- failing test names (sorted) ---
+--- FAIL: TestSensitiveReadAcrossTheBridgeOpensItsTaskScope
+--- red sentences (verbatim, block above each --- FAIL:) ---
+>>> --- FAIL: TestSensitiveReadAcrossTheBridgeOpensItsTaskScope (0.01s)
+    bridge_scope_open_ticket158_test.go:122: 收尾审计行没有承认这枚 scope 是开过的：找不到含 "task=task-158-taint was_open=true" 的行；C25 scope closed 全部读数=["tools: C25 scope closed task=task-158-taint was_open=false dropped=1 open_scopes=0"]
+        （was_open=false 就是开侧那一味丢了的形状：CloseTask 会照常打点、照常把 risk 层的污点留在表上）

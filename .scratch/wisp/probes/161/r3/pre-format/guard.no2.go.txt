@@ -113,4 +113,5 @@ func TestSensitiveReadAcrossTheBridgeOpensItsTaskScope(t *testing.T) {
 			"bridge.scopes 里没有 %q。这一味（mark 里的 b.OpenTask）是本包对 C25 开侧唯一的"+
 			"断言点，它一旦被改掉，敏感读的污点就没有主人了", taintedTask)
 	}
+
 }

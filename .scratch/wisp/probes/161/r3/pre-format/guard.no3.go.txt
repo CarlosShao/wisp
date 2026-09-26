@@ -82,19 +82,6 @@ func TestSensitiveReadAcrossTheBridgeOpensItsTaskScope(t *testing.T) {
 	sink := &logSink158{}
 	b.logf = sink.write
 
-	// 判据 3（反向对照，先在一颗干净的污点表上跑）：非敏感源不得开账。
-	// 这一发必须在敏感读**之前**：表上只要挂着别枚 task 的污点，一枚没开账的 task id
-	// 就会被 risk 层的 unbound-scope fail-closed 顶到 L2（实测量到，见证据件 §1.5），
-	// 那样这一腿量的就变成"审批通道"而不是"开账"了。
-	const plainTask = "task-158-plain"
-	out2, err2 := b.Execute(t.Context(), reqTask158(plainTask, "fs.list", argsFor(root)))
-	if err2 != nil || out2.IsError {
-		t.Fatalf("对照腿 fs.list 没有跑成：out=%+v err=%v", out2, err2)
-	}
-	if scopeOpened158(b, plainTask) {
-		t.Errorf("非敏感源 fs.list 也开了 scope，task=%q："+
-			"开账必须挂在敏感源上，不能挂在每一次 Execute 上", plainTask)
-	}
 
 	// 前置：这一发读必须真的跑成功，否则 mark() 根本不会被走到
 	// （Execute 里 !res.IsError 那道门），红就会是假红。
@@ -112,5 +99,25 @@ func TestSensitiveReadAcrossTheBridgeOpensItsTaskScope(t *testing.T) {
 		t.Errorf("一枚过了桥的敏感读没有打开它自己的 C25 污点 scope："+
 			"bridge.scopes 里没有 %q。这一味（mark 里的 b.OpenTask）是本包对 C25 开侧唯一的"+
 			"断言点，它一旦被改掉，敏感读的污点就没有主人了", taintedTask)
+	}
+
+	// 判据 2：收尾那一行报的是"确实开着、摘掉了 1 枚"。
+	b.CloseTask(taintedTask)
+	want := "task=" + taintedTask + " was_open=true"
+	got := sink.containing("C25 scope closed")
+	var hit []string
+	for _, l := range got {
+		if strings.Contains(l, want) {
+			hit = append(hit, l)
+		}
+	}
+	if len(hit) == 0 {
+		t.Fatalf("收尾审计行没有承认这枚 scope 是开过的：找不到含 %q 的行；"+
+			"C25 scope closed 全部读数=%q\n"+
+			"（was_open=false 就是开侧那一味丢了的形状：CloseTask 会照常打点、"+
+			"照常把 risk 层的污点留在表上）", want, got)
+	}
+	if !strings.Contains(strings.Join(hit, "\n"), "dropped=1") {
+		t.Errorf("收尾审计行没有带着 dropped=1（本轮只读了 1 枚敏感源），行=%q", hit)
 	}
 }

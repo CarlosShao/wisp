@@ -1,0 +1,12 @@
+RUN=116
+PASS=78
+FAIL=2
+SKIP=0
+--- failing test names (sorted) ---
+--- FAIL: TestAtomicWriteKillsMidWrite
+--- FAIL: TestFSListSummarizesADirectory
+--- red sentences (verbatim, block above each --- FAIL:) ---
+>>> --- FAIL: TestFSListSummarizesADirectory (0.01s)
+    fs_test.go:111: fs.list marked 1 tainted sources, want 0
+>>> --- FAIL: TestAtomicWriteKillsMidWrite (0.04s)
+    fs_write_test.go:445: read-back through the bridge failed: {Text:L2 审批未通过，已拒绝执行 IsError:true RiskLevel:L2 ErrorClass:user_rejected Truncated:false AppliedSteps:[]} err=<nil>

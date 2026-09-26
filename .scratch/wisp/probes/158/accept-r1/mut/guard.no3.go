@@ -82,7 +82,6 @@ func TestSensitiveReadAcrossTheBridgeOpensItsTaskScope(t *testing.T) {
 	sink := &logSink158{}
 	b.logf = sink.write
 
-
 	// 前置：这一发读必须真的跑成功，否则 mark() 根本不会被走到
 	// （Execute 里 !res.IsError 那道门），红就会是假红。
 	const taintedTask = "task-158-taint"

@@ -107,7 +107,6 @@ func TestSensitiveReadAcrossTheBridgeOpensItsTaskScope(t *testing.T) {
 		t.Fatalf("敏感读 judged %s, want L0（allowlist 内的 fs.read）", out.RiskLevel)
 	}
 
-
 	// 判据 2：收尾那一行报的是"确实开着、摘掉了 1 枚"。
 	b.CloseTask(taintedTask)
 	want := "task=" + taintedTask + " was_open=true"

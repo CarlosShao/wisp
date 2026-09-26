@@ -1,0 +1,9 @@
+RUN=116
+PASS=79
+FAIL=1
+SKIP=0
+--- failing test names (sorted) ---
+--- FAIL: TestSensitiveReadAcrossTheBridgeOpensItsTaskScope
+--- red sentences (verbatim, block above each --- FAIL:) ---
+>>> --- FAIL: TestSensitiveReadAcrossTheBridgeOpensItsTaskScope (TIME)
+    bridge_scope_open_ticket158_test.go:LINE: 一枚过了桥的敏感读没有打开它自己的 C25 污点 scope：bridge.scopes 里没有 "task-158-taint"。这一味（mark 里的 b.OpenTask）是本包对 C25 开侧唯一的断言点，它一旦被改掉，敏感读的污点就没有主人了
