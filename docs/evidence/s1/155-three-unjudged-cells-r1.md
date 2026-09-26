@@ -603,3 +603,38 @@ $ grep -c 'newTaskJournal' 同上 → 0 ／ $ grep -c 'j\.taskID' 同上 → 0  
 | 副本（本程补的第五枚） | 现量（`5365cb22`） | 算不算"另一个持有者" |
 |---|---|---|
 | `j := newTaskJournal(l.opt.Journal, taskID, taskID)` `loop.go:356` | `taskJournal` 有字段 `taskID`（`journal.go:52`），构造时 `:61`／`:63` 逐枚赋值；与 `loop.go` **同包**、`j` 在 `:396` 之前全程在作用域 ⇒ 压缩那一刻 `j.taskID` 就在手里。它还把这枚 id 递给包外：`:76 TaskID: t.taskID`、`:130 ID: t.taskID`、`:144 FinishTaskLog(ctx, t.taskID, …)`，实现者＝`internal/memory/dao_tasklog.go:49 (*Store)` | **"算"这一半本程不判**（那是 155 验收件 `:112` 已判〔不成立〕的那枚措辞，工单 `:45` 不许本票动档）。本行只补**名册**：本件 §2 ④ 那句"同一枚 id 在 `l.run` 体内还**另落了三处**"（`:109`）与它下面那张**四行**表本身就差一枚，§4 推进表又叫它"同帧四枚副本"（`:262`）——两处都漏了 `j.taskID`。连本行一起，名册至少**六枚**：`root.ID`／`l.current.ID`／`res.TaskID`／`RunningTask.ID`（这枚今天**无活体**，155 验收件 `:95` 现量 `RunAsync @cmd` 两跑 0 命中）／`j.taskID`／递给 gate 的那份＝第 7 笔 |
+
+### B.7 第 7 笔 —— 同帧持有者漏报 `l.opt.AdmitTask(taskID)`（那一刻 id 已出包）：**〔成立〕**
+
+**验收程那一句**（`155-three-unjudged-cells-r1-accept-r1.md:109`）：本件 §2 那张表还漏了第二枚——宿主审批回调 `l.opt.AdmitTask(taskID)`（`loop.go:362`），"`Options.AdmitTask func(taskID string) (revoke func())` 现读，`cmd/wisp/run.go:558 AdmitTask: rt.gate.AdmitTextTask`"⇒ **id 在这一刻已经出了包**。
+
+**本程当轮复算**（锚点＝`5365cb22`；全文＝`probes/157/10-items-4-to-7-code-facts.txt` 的 S4 段＋`probes/157/14-supplementary-rulers.txt` 末段 B7 补尺）：
+
+```
+$ git show 5365cb22:internal/agent/loop.go | sed -n '361,362p'
+	if l.opt.AdmitTask != nil {
+		if r := l.opt.AdmitTask(taskID); r != nil {        ← :362，早于 :396 那次压缩三十余行
+$ git grep -n 'AdmitTask' 5365cb22 -- internal cmd        （七枚命中，名册全文在探针里）
+5365cb22:internal/agent/loop.go:169:  AdmitTask func(taskID string) (revoke func())
+5365cb22:internal/agent/loop.go:361:/362: 回调本体 ／ :774: decideRisk 里那一处 nil 判
+5365cb22:cmd/wisp/run.go:558:         AdmitTask: rt.gate.AdmitTextTask,
+$ git grep -n 'func .*AdmitTextTask' 5365cb22 -- internal
+5365cb22:internal/agent/approval/gate.go:160:func (g *Gate) AdmitTextTask(taskID string) (revoke func()) {
+$ git show 5365cb22:internal/agent/loop.go | sed -n '161,165p'
+	// AdmitTask registers a task with the host's approval layer the moment the
+	// loop knows its own task id, … (cmd/wisp passes approval.Gate.AdmitTextTask here).
+
+$ grep -c 'AdmitTask' docs/evidence/s1/155-three-unjudged-cells-r1.md   → 0     ← 漏报坐实
+$ grep -n 'AdmitTextTask' 同上 → 只有 :131 那一枚，讲的是 run.go:476/477 那枚宿主自编的
+                                 "host:mode-switch" 伪任务名，不是 run() 手里那枚 id 的回调
+```
+
+**我这一笔用的尺是什么**＝**跨包名册的 `git grep`**（同一枚 id 从 `internal/agent` 递给 `internal/agent/approval` 与 `cmd/wisp` 的三枚落点逐枚点名）＋**行号顺序**（`:362` < `:396`）＋**本件自身的名册反查**（`grep -c 'AdmitTask'`＝0；那把尺是干净的，因为 `AdmitTextTask` 里不含 `AdmitTask` 这个子串，本程两向都数过）。没有一枚读数依赖编译器或快照。
+
+**对不上的一枚没有** ⇒ 给同一张表补**第六枚行**（旧行未改）：
+
+| 副本（本程补的第六枚） | 现量（`5365cb22`） | 算不算"另一个持有者" |
+|---|---|---|
+| `l.opt.AdmitTask(taskID)` `loop.go:362` | 签名 `Options.AdmitTask func(taskID string) (revoke func())`（`:169`）；宿主把 `approval.Gate.AdmitTextTask`（定义在 `internal/agent/approval/gate.go:160`）接进这枚字段（`cmd/wisp/run.go:558`）；`:362` **早于** `:396` ⇒ 压缩那一刻这枚 id **已经被包外接过一次**（`approval.Gate.AdmitTextTask` 的入参；本程只证"递出去了"这一发，**没**证 gate 里存成什么形状、存多久——那属票 150/151 那族的账） | **不算"另一个栈帧持有者"，算"第一枚包外持有者"**——这一句是本程据现量写的**归类**，不是档位：本票不动 155 验收件 `:112` 那枚措辞判定。⚠ 它与第 6 笔那枚 `j.taskID` 一起说明一件事：**"id 只在 `Loop.run` 里诞生"是对的，"压缩那一刻只有那一枚参数握着它"不是**（前半句本程复算成立：`newTaskID` 包私有、`cmd` 侧 0 命中） |
+
+⇒ 补两枚的**后果**写清楚，免得下一位只当名册长了两行：这两枚都在 `DEFERRED(D28-1)` 那枚 Warm-window hook 的射程里（`loop.go:395` 注释现读，155 验收件 `:117` 就是按这个理由要求登记措辞的）——**hook 落地那天要问的是"这六枚各该不该带标"，而不是"那一枚参数带没带"**。

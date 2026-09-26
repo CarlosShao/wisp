@@ -95,3 +95,22 @@ $ git grep -n 'AdmitTextTask' 5365cb22 -- internal cmd | head -8
 5365cb22:cmd/wisp/run_test.go:375:		t.Error("a task that never went through AdmitTextTask must be refused (D47)")
 5365cb22:internal/agent/approval/batch_test.go:47:	g.AdmitTextTask(testTask)
 5365cb22:internal/agent/approval/batch_test.go:92:	g.AdmitTextTask(testTask)
+### B7 补尺：AdmitTextTask 的定义与 run.go:477 那枚伪 id 的界线
+$ git grep -n 'func .*AdmitTextTask' 5365cb22 -- internal
+5365cb22:internal/agent/approval/gate.go:160:func (g *Gate) AdmitTextTask(taskID string) (revoke func()) {
+$ git show 5365cb22:cmd/wisp/run.go | sed -n '474,478p'
+		return fmt.Errorf("审批 gate 未装配，无法为切到 %s 签发 L2 卡片", sw.To)
+	}
+	const taskID = "host:mode-switch"
+	revoke := rt.gate.AdmitTextTask(taskID)
+	defer revoke()
+$ git show 5365cb22:internal/agent/loop.go | sed -n '161,169p'
+	// AdmitTask registers a task with the host's approval layer the moment the
+	// loop knows its own task id, and returns the revocation the loop runs
+	// when the task ends. D47 says only a task the TEXT loop registered may
+	// reach a gate at all, and the task id is minted inside run(), so this is
+	// the one place the registration can honestly happen (cmd/wisp passes
+	// approval.Gate.AdmitTextTask here). Nil means the host has no approval
+	// layer, which is also what keeps decideRisk refusing declared L1/L2
+	// calls: an ungated host must never execute a write.
+	AdmitTask func(taskID string) (revoke func())
