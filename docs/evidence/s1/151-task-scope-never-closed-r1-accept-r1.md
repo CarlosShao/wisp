@@ -238,3 +238,46 @@ $ go test -count=1 -v -run 'TestCompositionRootClosesTheLoopTasksTaintScope' ./c
 T2 是**测试自己手动**调 `rt.admitTask("host-151-taint")()` 走那一发边界，不是让环路自己 defer。
 这种形状最容易长成"把被测函数写进断言里"的假绿 ⇒ 本程的判据照旧是摘一味：
 味 1 拿下后 T2 仍红（judged L2）⇒ 它钉的是**效果**，不是自己调自己。这一条**过**。
+
+## 第 4 节 格 AC#3 —「谁拥有关闭」三选一（裁的是"组合根 defer"）
+
+票面这一格给了两条硬约束：**(a) 三选一先裁再写**；**(b) 不许顺手把 `OpenTask` 也改了来"让两头对称"**。两条本程都核了。
+
+### 4.1 它选①的那两条"现量理由"，本程各换一把尺复到
+
+| 它的理由 | 本程的尺（现读于 `4e16976`） | 读数 |
+|---|---|---|
+| (a) 这枚 hook 是组合根里唯一拿得到环路 task id 的边界 | `grep -n "newTaskID" internal/agent/loop.go` ＋ 全包 `grep -rn "newTaskID" --include='*.go' internal cmd \| grep -v _test` | 调用点只有 `:322`（`RunAsync`）与 `:333`（`Run`），声明在 `:1107`——**小写、包内可见**，包外拿不到 ⇒ 这一条不是"它推的"，是**符号可见性给的硬界** |
+| (b) 这条边界本来就 `defer`，所以 brake/cancel/error/panic 四条形都走它 | `sed -n '355,370p' internal/agent/loop.go` | `:361` `if l.opt.AdmitTask != nil {` → `:366` `defer revokeAdmission()`——**admit 之后立刻 defer**。非测试码里 `AdmitTask` 只有 `cmd/wisp/run.go:586` 一枚赋值（尺：`grep -rn "AdmitTask" --include='*.go' internal cmd \| grep -v _test` ⇒ `loop.go:161/169/361/362/761/777` ＋ `run.go:21/586` ＋ `bridge.go:643` 注释），且 `loop.go:777` 那一枚只是 **nil 检查**、不产生第二条 revoke 路 ⇒ "恰好一枚、长在 defer 上"成立。panic 那一形本程按 Go 语义读（defer 在 unwinding 里跑），**没有真造一发 panic 去量**（见第 8 节） |
+| ②"桥内部自管"被否的理由（`Execute` 返回≠任务结束） | `grep -n "sem := make(chan struct{}, guard.Concurrency())" internal/agent/loop.go` | `:604` 命中 ⇒ 同一轮的工具跑在并发闸上（D38d 多路），同一任务多轮 ⇒ 桥确实不知道"任务什么时候完"，②要成立得新造契约。**否得成立** |
+| ③"任务生命周期事件"被否的理由（今天没有这个面） | 本程 §2.1 那两枚 `agent.New(`/`loop.Run(` 唯一调用者读数 ＋ `run.go` 的 `onRuntime` 只被测试填 | 桥不在事件那条边上 ⇒ 选③要先造一条总线。**否得成立** |
+
+⇒ **"三选一先裁再写"：本程判它裁对了，且裁的依据是真读数不是偏好。**
+"零新生命周期、零新接口"这句本程跟着核过：`admitTask` 只是把已有的 `rt.gate.AdmitTextTask` 包一层、
+revoke 里多一发 `rt.bridge.CloseTask(taskID)`，`agent.Options` 的形状一字未动
+（尺＝`git diff 5d46f24^ 5d46f24 -- cmd/wisp/run.go` 全文逐行读过：唯一的行为改动就是 `AdmitTask: rt.admitTask` 那一行换掉 `rt.gate.AdmitTextTask`）。
+
+### 4.2 那句"不许顺手改 `OpenTask`"：逐字节核过，**没犯**
+
+```
+$ git diff 5d46f24^ 5d46f24 -- internal/tools/bridge.go | grep -E '^[+-]' | grep -n "OpenTask\|OpenScope"   ->  空
+$ git diff 5d46f24^ 5d46f24 -- internal/tools/bridge.go | grep -c '^+'                                     ->  17（含 `+++ b/…` 那一枚头 ⇒ 真实新增 16 行）
+$ git diff 5d46f24^ 5d46f24 -- internal/tools/bridge.go | grep -c '^-'                                     ->  4 （含 `--- a/…` 那一枚头 ⇒ 真实删 3 行，全在 CloseTask 的旧注释里）
+```
+
+⇒ diff 里那枚 `@@ … func (b *Bridge) OpenTask(taskID string) {` 是**上下文行、不是被改行**（本程专门把它挑出来看了）。
+`OpenTask` 函数体一字未动 ⇒ **射程没扩大，这一条过**。
+
+### 4.3 它"刻意不做"的那三件事，本程判哪几条真是射程外
+
+1. **不在任务开头 `OpenScope`**：它给的理由是"那会把 unbound 的 fail-closed 换成 fail-open，且正主在
+   `internal/risk/**` 那面零字节墙上（`DEFERRED(C25-loop-wiring)` 第 (1) 项）"。本程现量：
+   `CloseTask` 新用的那枚 `prov.ScopeTaints` **在 `5d46f24^` 上就存在**
+   （`git grep -n "func (p \*Provenance) ScopeTaints" 5d46f24^ -- internal/risk` ⇒ `internal/risk/provenance.go:412`）
+   ⇒ 它没有为了加一行审计去动 `internal/risk` 一字。这一条"留给编排者判"**判得对**，且**票 154 已收下**。
+2. **不给桥加"列出当前开着哪些 scope"的公开 API**：本程跟着成立——AC#1 那枚探针是经 `-overlay`／包内文件量的
+   （本程 §2.2 照同一形状复跑），不需要新面。
+3. **不在 `CloseTask` 里顺手删 `b.seqs`**：本程现读函数体（`bridge.go:655-670`）只有
+   `ScopeTaints` → `delete(b.scopes, taskID)` → 条件 `CloseScope` → `b.log` ⇒ 没夹带。
+
+⇒ **AC#3 这一格：成立，无条件。**
