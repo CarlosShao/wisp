@@ -290,7 +290,7 @@ $ 名册尺（^[[:space:]]*--- (PASS|FAIL|SKIP): 全名、去时长、LC_ALL=C s
 
 **② dll／PATH 那一坑（本程自己一正一负都打了）**：正控＝上面那一跑 `=== RUN`=144≠0；
 负控＝本程**故意**不注入 dll 直接 `go test -count=1 -v ./cmd/wisp/` ⇒ `RUN=0`（原文
-`probes/158/accept-r1/cli-negative-nodll.log`（字面两行＝`exit status 0xc0000135` 与 `FAIL`，`=== RUN` 计数＝**0**）
+`probes/158/accept-r1/cli-negative-nodll.log` 里两行字面＝`exit status 0xc0000135` 与 `FAIL`，`=== RUN` 计数＝**0**）。
 ⇒ "判根本没跑到只认 `=== RUN` 枚数＝0"这一条**独立成立**，被验件 §D.4 那两发不是修辞。
 
 **③④ gofumpt / vet**：读数在 §1.3。版本是**本程自己 `--version` 现读**的
