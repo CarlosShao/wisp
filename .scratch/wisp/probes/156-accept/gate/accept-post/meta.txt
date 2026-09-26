@@ -1,0 +1,21 @@
+tag=accept-r1
+requested_anchor=7ca1130
+worktree_head=c6ceddc9f9f9a443ff59b91b2271bed625df922e
+branch=dev
+start_iso=2026-09-26T17:14:08+08:00
+go_version=go version go1.27.1 windows/amd64
+pwd=/d/work/workspace/projects plans/Wisp
+dll_dir shell form: /d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx -> /d/work/workspace/projects plans/Wisp/third_party/sherpa-onnx
+status_cmd_wisp_internal=[]
+diff_against_anchor_7ca1130=[]
+tree_sha256 cmd/wisp/slo_windows.go=d1f1b881a006a569
+anchor_sha256 cmd/wisp/slo_windows.go=d1f1b881a006a569
+tree_sha256 cmd/wisp/slo_report_144_windows_test.go=4bd20e1ff2cb8b96
+anchor_sha256 cmd/wisp/slo_report_144_windows_test.go=4bd20e1ff2cb8b96
+tree_sha256 cmd/wisp/slo_exit_os_156_windows_test.go=cabd5c6d926f6ae8
+anchor_sha256 cmd/wisp/slo_exit_os_156_windows_test.go=cabd5c6d926f6ae8
+runner_listener_procs=1
+runner_worker_procs=0
+rc=0 pkg=./cmd/wisp/ log=/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/156-accept/gate/accept-post/cmdwisp.log
+rc=0 pkg=./internal/tools/ log=/d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/156-accept/gate/accept-post/internaltools.log
+end_iso=2026-09-26T17:15:51+08:00

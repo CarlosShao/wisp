@@ -661,6 +661,118 @@ $ 这 20 枚里，本票 10 枚实现 commit 命中＝**0**
 2. **没在 `7ca1130` 的快照树上跑 d22scan**（见 6.6 的边界）；
 3. **没核 `mut-shipped/` 那 9 枚日志的内容**（AC#4③ 已闭，本程只核了"9 枚 tracked"这一条形，第 4 格 4.3）。
 
+---
+
+## 第 7 格　AC#7 —— 门禁（逐包单跑）＋ 派单 §4② 那笔账的裁
+
+**票面判据（`:55-58`）**：`cmd/wisp` 与 `internal/tools` **改前改后各一次**，四数之外**名册两向 `comm`（差集逐枚归属）**；
+三枚仪器坑（dll/PATH 形状、`-overlay` 不与 `-cover*` 同用、`-race` 可能既不算红也不算绿）。
+本程做了两件：**把四发入库日志用自己的尺重数**＋**自己再跑一发**（第五发，跑在合并态 HEAD 上）。
+
+### 7.1 五发并排（前四发＝〔日志＋归档，本程抽验〕，第五发＝〔自跑〕）
+
+| 发 | 跑者／锚点 | `cmd/wisp` 四数 | `internal/tools` 四数 | `0xc0000135` | verdict |
+|---|---|---|---|---|---|
+| `gate-pre` | r1 @ 改前面 | 139／79／0／0 | 115／79／0／0 | 0 | ok 136.561s |
+| `gate-post` | r1 @ r1 之后 | **143／83**／0／0 | 115／79／0／0 | 0 | ok 105.606s |
+| `gate-r3-pre` | r3 @ `3293192`（编排者代提 `1137781`） | 144／84／0／0 | 115／79／0／0 | 0 | ok 84.960s |
+| `gate-r4-post` | r4 @ `1d53526` | 144／84／0／0 | 115／79／0／0 | 0 | ok 114.336s |
+| **`accept-post`（本程）** | 本程 @ 工作树字节＝`7ca1130`、HEAD＝`c6ceddc` | **144／84／0／0 rc=0** | **115／79／0／0 rc=0** | 0 | ok 79.560s／13.223s |
+
+本程那一发的钉法（不是"我相信工作树干净"）：`meta.txt` 里 `diff_against_anchor_7ca1130=[]`
+＋`tree_sha256 cmd/wisp/slo_windows.go=d1f1b881a006a569` **＝**`anchor_sha256 …=d1f1b881a006a569`〔自跑〕。
+
+### 7.2 名册两向 `comm`——四组差集本程全部自己重算
+
+```
+r1 那对（139/79 vs 143/83）：cmdwisp runs pre-only=0 post-only=4 ; verdicts pre-only=0 post-only=4
+   post-only 四枚逐枚点名＝TestSLO156ExitedAsks…／LiveSubjectStays…／ReportLoopNames…／WaitReadyNames…
+   internaltools runs+verdicts 两向全空（115↔115、79↔79）
+r3/r4 那对（144/84 vs 144/84）：四向全空（本程抽验，且本程从 .log 重抽的名册与入库 -runs/-verdicts 逐字节相同＝8 项 IDENTICAL-to-landed）
+本程 vs r4（合并态那一发）：cmdwisp runs 0/0（144↔144）、verdicts 0/0（84↔84）；internaltools 0/0、0/0
+整票那一向（本程补的尺，票面没要求但"改前改后"要的是这一对）：
+   gate-pre(139/79) vs 本程 accept-post(144/84)：pre-only=0，mine-only＝**恰好那五枚 TestSLO156**（含 case 19）
+```
+
+⇒ **整票净增五枚名字、零枚被吞／被改名**〔自跑＋抽验，`gate/RECOMPUTE-LANDED.txt`〕。
+`internal/tools` 五发一字未变，本程量到了**为什么**：整票 `git diff --name-only 9835d81 7ca1130 -- internal` ＝ **零枚文件**〔自跑，2.3 那把尺〕。
+
+### 7.3 三枚坑逐枚核（本程自己数，不抄坑单）
+
+1. **印出来的红**：本程 `accept-post/cmdwisp.log` 里 `^--- FAIL`＝**0**，而字符串 `FAIL`＝**4**。
+   本程逐行验那 4 行＝`[FAIL] sherpa-onnx C API`／`[FAIL] onnxruntime.dll version`／`[FAIL] data dir resolvable (dev)`
+   ＋汇总行 `wisp doctor: FAIL`，且**全在 `TestAC2RealProcessRefusesOnEveryLegWithoutAppData128` 内部、那枚用例 `--- PASS`**
+   （本程用行号回溯定位 enclosing `=== RUN`，不是引用别人的话）。
+   ⇒ 四发入库日志同样各是 **4／0**〔自跑，本程重数〕。**派单 §5 那句"3 枚 `[FAIL]` 标记＋1 行汇总＝4 行"本程证实。**
+2. **dll／PATH 形状**：本程走 shell 形 `/d/work/…/third_party/sherpa-onnx`（`meta.txt` 记 PATH 首项），
+   两包 `0xc0000135`＝**0** 且 `=== RUN` 非零 ⇒ **真加载真跑了**，不是"看着像没测到"〔自跑〕。
+3. **`-race`／`-cover`／`-overlay` 一枚没用**（本程脚本源码即证：`go test -count=1 -v` 一条）
+   ⇒ 本程这两发**既没有 overlay/cover 互相吞掉的读数，也没有 `rc=1 而零条 --- FAIL` 那种"既不算红也不算绿"**〔自跑〕。
+4. **射程没跑偏**：`TestC21DesignTokensFourWayAgree`／`internal/panel` 在本程两发日志里 **0／0 命中**〔自跑〕。
+   （但本程在**另一件事**上撞到了 `internal/panel`——见 7.5，那与门禁射程无关。）
+5. **争用**：开测前 `tasklist` 现量 Listener=1／Worker=0／在跑 go test=0（0.4），与本票前几程同形。
+
+**放水两问自答（本格）**：① 断言方向——本程没有为变绿动过任何判据；本程那一发**红了就是红了**，
+   事实是 `--- FAIL` 0 枚、`rc=0`、verdict `ok`；② helper——本程的脚本 `gate156-accept.sh` 是**照 r4 的形状自己重写的一份**
+   （同包列、同 flag、同锚定模式、同抽名法），**没有 import r4 的脚本**，所以 7.1 那张表不是他们读数的复述。
+
+**第 7 格判定**：**〔成立〕**。票面要的"改前改后各一次"在**两层**都齐：
+每程各自那一对（r1 139/79→143/83、r3/r4 144/84→144/84），**以及整票那一**对（139/79→144/84，本程自己合出来）；
+四数之外名册两向 `comm` 逐枚归属，差集要么是"恰好多出本票新增的名字"要么是空集，**没有一枚用例被吞或被改名**。
+
+### 7.4 本格顺手量到的一枚**证据件缺陷**（记档，本程不修——不是本程的写面）
+
+r1 证据件第 3 格（`7ca1130` 版 `:283`／`:285`）写着：
+
+```
+改后 cmd/wisp   RUN=144  PASS=84   FAIL=0  SKIP=0   rc=0  ok  (见第 7 格现量)
+only-in-post: 5 枚，全部 TestSLO156*（本票新增，逐枚点名见第 7 格）
+```
+
+本程重数它**自己那发** `gate-post/cmdwisp.log`：`RUN=143 PASS=83 FAIL=0 SKIP=0`，名册 post-only **＝4 枚**。
+`144／84／5 枚` 那组数**真实存在**，但它是 `gate-r3-pre`（跑在 `3293192`）那一发——
+本程把中间那一枚差集也点了名：`gate-post → gate-r3-pre` 只多 **`TestSLO156FixtureChildrenDoWhatTheirNamesSay`**
+（case 19 在 r1 跑完它那发门禁之后才加进去，r1 的 post 面结构数不到它）。
+另：那两行括号里指的"第 7 格"在**现在这份文件里是 r2 的第 7 格**（`第 6/7 格（r2 部分）`），
+r1 自己的 6/7 格没进这份件 ⇒ **指针悬空**。
+**档位**：记录级缺陷（数值真实、**归属指错了一发跑**）；**不改判 AC#7**，也**不扣 AC#3**（AC#3 的判据在 3.1/3.3 由本程独立量到）。
+最小闭合集合见第 8 格 C3。
+
+### 7.5 派单 §4② 那笔账——本程**同意结论、推翻理由**，并交出读数
+
+**编排者的裁定**＝本票不重跑合并态；**r4 的理由**＝"两包内 `frontend` 引用 0 命中、无 embed 路径"。
+**本程量到那一枚理由是假的**：
+
+```
+$ grep -rn "wisp/frontend" --include=*.go cmd/ internal/     →  internal/panel/assets.go:25  import "…/wisp/frontend"
+$ go list -deps ./cmd/wisp/  | grep -c CarlosShao/wisp/frontend →  1        （internal/tools 那发＝0）
+$ frontend/embed.go:19                                        →  //go:embed all:dist
+$ git ls-tree -r 7ca1130 -- frontend/dist                     →  frontend/dist/.gitkeep   只有 1 枚
+```
+
+⇒ **`cmd/wisp` 的测试二进制确实把 `frontend` 那个 Go 包（连带 `all:dist` 的字节）链进来了**，
+依赖只是**经 `internal/panel` 一跳**到达，所以"`cmd/wisp/*.go` 里搜不到 `frontend/` 字样"这把尺**天然量不到它**。
+**结论仍然成立，但成立在另一处事实上**（本程自己量）：`a2a3b3c` 那枚 commit 只碰 `frontend/src/**` 3 枚文件，
+而 embed 图案是 `all:dist`——时代 88 枚里碰 `frontend/embed.go` 或 `frontend/dist` 的 commit **0 枚**；
+四枚别家前端 commit（`7609913 0c56b0c 0f18652 a2a3b3c`）**每一枚的非 `frontend/src` 文件＝0**。
+
+**而且这一发本程已经替它跑过了**：本程那发门禁跑在 HEAD `c6ceddc` 上（`git merge-base --is-ancestor a2a3b3c c6ceddc` ＝ rc 0），
+`cmd/wisp`＋`internal/tools` 字节钉在 `7ca1130`，读数＝144／84／0／0 与 115／79／0／0，与 r4 那发**名册两向全空**。
+⇒ **本程判：AC#7 不需要为合并态再开一格；"要那枚读数得另派"这笔欠账已由本程这一发付掉，不必继承、也不必另派。**
+**同时登记一枚新的架构事实**（它比这一票更值钱，交给下一位引用"frontend 没被 embed"这句话的人）：
+**别拿"两包内搜不到 `frontend/` 字样"当"前端 commit 进不了 `cmd/wisp` 读数"的理由**——正确的尺是 `go list -deps`；
+`frontend/dist` 一旦被 build 出真字节并入库，或 `frontend/*.go` 被改，`cmd/wisp` 的读数**可以**随之变，
+而那种变化今天**没有任何一枚门禁盯得住**（`wisp slo`／panel bundle 一致性那面另说）。〔自跑〕
+
+**本程没测什么（本格）**：
+1. **没跑全仓 `go test ./...`**（票面射程只有两包，本程不自扩射程）；
+2. **没跑 `npm run build` 后那一发 `cmd/wisp`**（那要动 `frontend/**`，本程写面之外）——
+   7.5 登记的正是这一枚未证形：**dist 字节变了会怎样，本票无人量过**；
+3. **没跑 `-race`**（与 r1/r2/r4 同一笔未取证）；
+4. **没验 r3 那发"改前"的**树**可比性**——本程只证了名册抽取同源、四数对得上，
+   那发跑在 `3293192`，其时 `cmd/wisp` 字节已含 r1/r2 的改动（"改前"是 **r3/r4 那一段的改前**，不是整票的改前；整票那对本程合在 7.2）。
+
+
 
 
 ---

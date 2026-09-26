@@ -1,0 +1,45 @@
+gate-pre     cmdwisp        RUN=139  PASS=79   FAIL=0    SKIP=0    0xc0000135=0  printedFAILstr=4   ok github.com/CarlosShao/wisp/cmd/wisp 136.561s
+gate-pre     internaltools  RUN=115  PASS=79   FAIL=0    SKIP=0    0xc0000135=0  printedFAILstr=0   ok github.com/CarlosShao/wisp/internal/tools 14.767s
+gate-post    cmdwisp        RUN=143  PASS=83   FAIL=0    SKIP=0    0xc0000135=0  printedFAILstr=4   ok github.com/CarlosShao/wisp/cmd/wisp 105.606s
+gate-post    internaltools  RUN=115  PASS=79   FAIL=0    SKIP=0    0xc0000135=0  printedFAILstr=0   ok github.com/CarlosShao/wisp/internal/tools 15.107s
+gate-r3-pre  cmdwisp        RUN=144  PASS=84   FAIL=0    SKIP=0    0xc0000135=0  printedFAILstr=4   ok github.com/CarlosShao/wisp/cmd/wisp 84.960s
+gate-r3-pre  internaltools  RUN=115  PASS=79   FAIL=0    SKIP=0    0xc0000135=0  printedFAILstr=0   ok github.com/CarlosShao/wisp/internal/tools 13.279s
+gate-r4-post cmdwisp        RUN=144  PASS=84   FAIL=0    SKIP=0    0xc0000135=0  printedFAILstr=4   ok github.com/CarlosShao/wisp/cmd/wisp 114.336s
+gate-r4-post internaltools  RUN=115  PASS=79   FAIL=0    SKIP=0    0xc0000135=0  printedFAILstr=0   ok github.com/CarlosShao/wisp/internal/tools 15.130s
+
+== roster two-way comm: r1 pre vs r1 post
+cmdwisp runs pre-only=0 post-only=4 sizes=139/143
+cmdwisp verdicts pre-only=0 post-only=4 sizes=79/83
+internaltools runs pre-only=0 post-only=0 sizes=115/115
+internaltools verdicts pre-only=0 post-only=0 sizes=79/79
+-- names only-in-post (cmdwisp runs):
+   TestSLO156ExitedAsksTheOSForAChildNobodyReaped
+   TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees
+   TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn
+   TestSLO156WaitReadyNamesTheDeadSubjectToo
+
+== roster two-way comm: r3 pre vs r4 post
+cmdwisp runs pre-only=0 post-only=0 sizes=144/144
+cmdwisp verdicts pre-only=0 post-only=0 sizes=84/84
+internaltools runs pre-only=0 post-only=0 sizes=115/115
+internaltools verdicts pre-only=0 post-only=0 sizes=79/79
+
+== cross-check my extractions against the LANDED roster files (r3/r4 shipped -runs.txt)
+gate-r3-pre cmdwisp runs IDENTICAL-to-landed
+gate-r4-post cmdwisp runs IDENTICAL-to-landed
+gate-r3-pre cmdwisp verdicts IDENTICAL-to-landed
+gate-r4-post cmdwisp verdicts IDENTICAL-to-landed
+gate-r3-pre internaltools runs IDENTICAL-to-landed
+gate-r4-post internaltools runs IDENTICAL-to-landed
+gate-r3-pre internaltools verdicts IDENTICAL-to-landed
+gate-r4-post internaltools verdicts IDENTICAL-to-landed
+
+== the out-of-scope always-red case must NOT appear in any of these four logs
+  gate-pre/cmdwisp internal/panel refs=0 TestC21DesignTokens refs=0
+  gate-pre/internaltools internal/panel refs=0 TestC21DesignTokens refs=0
+  gate-post/cmdwisp internal/panel refs=0 TestC21DesignTokens refs=0
+  gate-post/internaltools internal/panel refs=0 TestC21DesignTokens refs=0
+  gate-r3-pre/cmdwisp internal/panel refs=0 TestC21DesignTokens refs=0
+  gate-r3-pre/internaltools internal/panel refs=0 TestC21DesignTokens refs=0
+  gate-r4-post/cmdwisp internal/panel refs=0 TestC21DesignTokens refs=0
+  gate-r4-post/internaltools internal/panel refs=0 TestC21DesignTokens refs=0
