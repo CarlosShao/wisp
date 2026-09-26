@@ -23,13 +23,33 @@ const harness = new URLSearchParams(location.search).get("harness");
 
 if (harness === "1" || harness === "2") {
   const note = document.createElement("div");
-  note.textContent = HARNESS_BANNER;
   note.setAttribute("role", "note");
   note.style.cssText = [
     "position:fixed", "left:0", "right:0", "top:0", "z-index:9999",
+    "display:flex", "align-items:center", "gap:8px",
     "padding:4px 10px", "font:500 11px/1.4 ui-monospace,monospace",
     "background:var(--warn-soft)", "color:var(--warn)", "border-bottom:1px solid var(--warn-line)",
   ].join(";");
+
+  const text = document.createElement("span");
+  text.textContent = HARNESS_BANNER;
+  text.style.cssText = "flex:1;";
+  note.append(text);
+
+  // owner 2026-09-26: 横幅一直压着顶栏，「首次加载一下，我点击关闭起码能关闭」。
+  // 关闭是纯 DOM 移除，不进 React 树、不落盘——刷新会重新出现（它仍然得在）。
+  const close = document.createElement("button");
+  close.type = "button";
+  close.textContent = "关闭";
+  close.setAttribute("aria-label", "关闭演示横幅");
+  close.style.cssText = [
+    "flex-shrink:0", "border:none", "cursor:pointer", "padding:0 6px",
+    "font:inherit", "border-radius:999px",
+    "background:transparent", "color:inherit",
+  ].join(";");
+  close.addEventListener("click", () => note.remove());
+  note.append(close);
+
   document.body.append(note);
 }
 
