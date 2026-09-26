@@ -90,3 +90,150 @@ $ git status --porcelain -- internal/panel/composer.go internal/panel/pump.go cm
 
 ⇒ **两条要报回的**：P3（`A273②` 那句"不碰 run.go"对 AC#2 不成立）与 P6（`remainingMs` 无生产者）。
 本件把它们写成读数与出处，**不据它们硬改，也不据它们扩权**。
+
+---
+
+## 2. "加字段谁会响"——AC#4③ 要的那一发，实跑（普查那发是推论，本程补成读数）
+
+**现场＝仓外副本 `D:\tmp\wisp145-e1`**（整树拷贝，剔 `.git`/`node_modules`/`.scratch`/`design`/`third_party`；
+副本里怎么改都碰不到共享树，副本**只建不删**）。候选落地集＝`run` / `tools` / `approval` / `cost` / `failures`
+五枚段、9 枚键、8 枚 view 类型（定义见 `.scratch/wisp/probes/145/patch/`）。
+
+原始读数：`probes/145/copy-E0-baseline-rulers.txt`、`wisp145-e1-E1-panel.txt`、`wisp145-e1-E2-panel.txt`、
+`wisp145-E3-cmdwisp.txt`、`wisp145-E3b-cmdwisp.txt`、`E4-removal-check.txt`。
+
+### 2.1 E0 副本基线（两把尺绿，逐键数＝4）
+
+```
+approval_test.go:134:  Snapshot <-> PanelSnapshot: 4 JSON keys reconciled
+composer_test.go:79:   Snapshot <-> PanelSnapshot: 4 JSON keys reconciled
+```
+
+### 2.2 E1 只加 Go 侧九枚键、`panel.ts` 不动 ⇒ **响四枚，不是一枚**
+
+`go test -count=1 -v ./internal/panel/` → `RUN=105`、`FAIL=4`＋1 枚副本产物红：
+
+| 用例 | 红句（原文） |
+|---|---|
+| `TestApprovalCardViewJSONKeysMatchFrontendTypes` | `approval_test.go:129: Go Snapshot emits [run tools approval cost failures] that interface PanelSnapshot does not declare` |
+| `TestComposerContractTypesMatchFrontend` | `composer_test.go:74:` 同一句 |
+| `TestThePumpBuildsThePacketFromWhatTheHostHolds` | `pump_test.go:124: snapshot JSON keys = [pending results run tools approval cost failures composer generatedAt], want exactly the four PanelSnapshot declares` |
+| `TestPublishHandsTheBytesToTheAttachedExit` | `pump_test.go:276: exit bytes carry keys […], want the four PanelSnapshot declares` |
+
+⚠ 第 3、4 枚是**票 35 的键集钉**（`pump_test.go:111-112` 原话："the four keys are the contract, so a fifth arriving here is
+a contract change dressed as a bug fix"）。普查 §4.4 只点了前两家 ⇒ **P5 的更正**：闭合的爆炸半径是 **4 枚测试＋1 枚前端文件**，
+且其中 `pump_test.go` 与两把尺**都不在本程放开面**。
+⚠ 同发里 `TestC21DesignTokensFourWayAgree` 也红，但**那是副本产物**（`read design/assets/tokens.css: open D:\tmp\wisp145-e1\design\…`
+——本程拷树时剔了 `design/`），**不计入读数**；仓内那一枚另有其既有红因（`Q-52` 撤回令，见 §5.2）。
+
+### 2.3 E2 把 `panel.ts` 逐键补上（九枚键＋7 枚 interface）⇒ 两把尺转绿，两枚键集钉仍红
+
+```
+composer_test.go:79:  Snapshot <-> PanelSnapshot: 9 JSON keys reconciled   --- PASS
+approval_test.go:134: Snapshot <-> PanelSnapshot: 9 JSON keys reconciled   --- PASS
+pump_test.go:124:     snapshot JSON keys = […9 枚…], want exactly the four  --- FAIL
+```
+⇒ 键集钉要改的是**两行硬编码字符串**（`pump_test.go:123`／`:275`）。**这是"改断言"，不是"放宽断言"**——
+它跟着契约走、方向与契约同批；但按字面它仍属"动别人的测试"，本程没在仓内做。
+
+### 2.4 E1b **只加键、不动装配根**——那九枚键今天会带什么出门（本件最硬的一发）
+
+副本里 `cmd/wisp/run.go:421-427` **原封不动**（就是仓内现状那五枚读口），把包构造出来看新段：
+
+```
+run      = {"reasoning":"","status":"","usage":{"input":0,"output":0,"cachedRead":0}}
+tools    = null
+approval = {"depth":0,"windowMs":0,"vetoChannels":null}
+cost     = {"tokensIn":0,"tokensOut":0,"cachedTokens":0,"micros":0,"currency":""}
+failures = null
+pending len=1 results len=1 (both live)
+```
+
+⇒ **五枚段零枚被填**，而同一发包里 `pending`/`results` 是活的。也就是说：**今天往 `Snapshot` 上加字段，
+加出来的正是本票自己要防的那形——一串永远为 0/空的常量**（普查 §2.0(2) 的第四态"无生产者"，只不过这次是"有键无填"）。
+这一发是 AC#6 的反证，**不需要任何推测**：跑的是生产装配根那一份读口清单。
+
+### 2.5 E3 全量闭合（副本内）：**能绿，且能真填**——但要用到四张本程没有的钥匙
+
+副本里同时动：`composer.go`（键）＋`pump.go`（`PumpSources.Approval` 读口＋装配）＋
+`cmd/wisp/panel_pump.go`（`liveGateState()` 读 `rt.gate.Window()`／`rt.gate.Channels().Statuses()`）＋
+`cmd/wisp/run.go`（字面量加一行 `Approval: rt.liveGateState,`）＋`frontend/src/lib/panel.ts`（逐键）＋
+`internal/panel/pump_test.go`（两行键集）＋**一枚新用例** `cmd/wisp/panel_pump_gate145_test.go`（AC#6 那问的答句）。
+跑生产装配根（`go test -run TestSnapshotGateSectionComesFromTheLiveGate ./cmd/wisp/`，`RUN=1`、rc=0）：
+
+```
+packet approval section = {"depth":0,"windowMs":2000,
+  "vetoChannels":[{"name":"ball","text":"单击悬浮球：悬浮球取消不可用","loaded":false},
+                  {"name":"esc","text":"按 Esc 键：Esc 取消不可用","loaded":false},
+                  {"name":"panel","text":"面板拒绝：面板取消不可用（票 37 未接入）","loaded":false},
+                  {"name":"kws","text":"说取消词：语音取消不可用","loaded":false}]}
+--- PASS
+```
+⇒ 值**来自这个进程真在跑的那两枚对象**（gate 的窗口、通道注册表的原句），B1 那句"语音取消不可用"逐字抵达；
+`./internal/panel/` 同发除 `design/` 副本产物外**全绿**。
+
+### 2.6 E4 承重判据（把 E3 那枚填值摘掉）
+
+副本里删 `pump.go` 那一行 `snap.Approval = approval`（其余一字不动）：
+
+```
+--- FAIL: TestSnapshotGateSectionComesFromTheLiveGate
+    windowMs = 0, want the gate's own 2000
+    windowMs = 0: the section arrived unfilled
+    packet carries 0 channel rows, registry reports 4
+```
+⇒ **摘掉填值那一行，断言就不响**——这一枚段的"承重"是量出来的，不是声称的。
+按同一把尺，其余四枚段（`run`/`tools`/`cost`/`failures`）今天**连承重都无从谈起**：没有读口、没有值、没有用例（§3）。
+
+### 2.7 顺手捉到一枚**仪器缺口**（登记，本程未使用）
+
+`jsonKeysOf`（`internal/panel/approval_test.go:174-191`）读的是 `json:` 标签：
+**没有标签的导出字段它看不见**，而 `encoding/json` 会按 Go 字段名把它发出去。实测（副本）：
+`Snapshot` 加一枚 `LeakProbe string`（不带标签）——
+
+```
+probe: encoding/json emits LeakProbe = true ; jsonKeysOf(Snapshot) = [pending results composer generatedAt run tools approval cost failures]
+TestComposerContractTypesMatchFrontend            --- PASS   ("9 JSON keys reconciled")
+TestApprovalCardViewJSONKeysMatchFrontendTypes    --- PASS
+TestThePumpBuildsThePacketFromWhatTheHostHolds    --- FAIL   (键集钉抓到了 LeakProbe)
+```
+
+⇒ 那两把"契约尺"**看不见无标签导出字段**，唯一的兜底是票 35 的字节级键集钉。
+本程**没有**用这条口子塞任何字段（用＝绕开契约尺，正是本仓定的假绿形），只登记：
+**将来谁给 `Snapshot` 加字段而忘了写标签，两把尺会照样绿**。归口＝编排者决定要不要为它补一枚钉（`AGENTS §1.1` 的"改断言"射程外，属新增判据）。
+
+---
+
+## 3. 逐字段判（AC#2 的落地集 ＋ AC#6 的反问）
+
+**口径**：一列"真源"只认两种读数（① 该包今天就能算出这个值；② 今天已有人在生产它）——普查 §0.4 原尺；
+本程自己实跑/现量的标 **[量]**，沿用普查未复量的标 **[普查]**。
+"锁"＝落地还缺谁：**B**=`frontend/src/lib/panel.ts`（Q-51 未答，本程禁写）· **C**=`pump_test.go` 两行键集＋两把尺（禁面）·
+**D**=`cmd/wisp/run.go` 装配根/事件汇（票 151 地界，特批未放开）· **D′**=`internal/agent/loop.go`（票 153 地界）·
+**E**=一枚 `*_test.go` 写 AC#6 的断言（**放开面里根本没有测试文件**）。
+
+| 字段（候选） | 真源 | 生产者可达？ | 锁 | **AC#6 答句**（哪枚用例断言它来自真源） | 判 |
+|---|---|---|---|---|---|
+| `approval.depth` | **[量]** 就是本泵刚建出来的 `pending` 卡片数 | ✅ `pump.go` 内派生 | B·C·E | 副本里能答（`depth` 与队列实测）；**但它是 `len(pending)` 的复述**，`App.tsx:75-76` 今天已经在自己算 | **不落**：装饰（同一枚事实的第二份拷贝），且缺 B/C/E |
+| `approval.windowMs` | **[量]** `gate.Window()`（实测 `2000ms`） | ✅ 已在跑；填它要 `run.go:426` 加一枚读口（或旁通 `Verdicts`） | B·C·D·E | 副本 E3 那枚用例＝答句；仓内**写不出**（E） | **暂不落**（唯一实质阻塞是 B/C/D/E，不是数据） |
+| `approval.vetoChannels` | **[量]** `ChannelRegistry.Statuses()`，四行含 B1 原句 | ✅ 同上 | B·C·D·E | 同上 | **暂不落** |
+| `approval.remainingMs` | ❗ **无源**（P6）：`EventTick` 零生产者，倒计时是 `gate.go:257 clock.After`，无"还剩多少"读口 | ✗ | — | 答不出：任何实现都只能填静态窗口长 | **禁入**（挪进乙组；另开票装单调计时器） |
+| `run.reasoning` | **[量]** `loop.go:545` 真转 `EvReasoningDelta`；`run.go:759-765` 收到并打印，**注释自己写着**"the reasoning field is ticket 145 row 3, which is a key the snapshot does not have" | ✅ 到得了 sink，sink 不留存 | B·C·D·E | 写得出用例，但要 D＋E | **暂不落** |
+| `run.usage`（终值） | **[量]** `EvDone` 已带 `TokensIn/TokensOut`（`loop.go:937` 实填） | ✅ 到得了 sink | B·C·D·E | 同 E3 形状 | **暂不落** |
+| `run.usage`（实时） | **[量]** `llm.EvUsage` 三适配器真发，但 `agent` 侧 `grep EvUsage` **0 命中**——`loop.go:543-546` 的 switch 只转 text/reasoning | ✗ 今日无转发 | D′ 先行 | 答不出（值根本不到 agent 面） | **禁入本票**（属 `internal/agent/**`，票 153 地界） |
+| `run.status`（取消/完成） | **[量]** `EvDone` 只填 `Kind/TaskID/Text/TokensIn/TokensOut`，**不填 `Status`/`Stop`**；`Result.Status` 只在同步返回里 | 半：sink 那侧要记 | B·C·D（＋取向：改 `loop.go:937` 还是从 `Result` 组包） | 答不出，取向未定 | **暂不落**，取向摆编排者（普查 §2.14 同判） |
+| `run.phase` | ❗ **[量]** `agent.Event` → `statemachine.State` 的映射表**在仓里不存在**（本程在 `internal/panel/`＋`cmd/wisp/` 剔测试 grep 状态名：零命中） | ✗ | — | 答不出：只能填常量或猜 | **禁入**（第四态"无生产者"，另开票） |
+| `tools[]`（除 `durationMs`/`iconClass`） | **[普查]** `memory.ToolCall` 的 name/outcome/riskLevel/argsJson/correlationId，读口 `Store.ListToolCallsByTask`（本程现量在 `dao_toolcall.go:111`）；taskID 今天只活在 `run.go` 的 sink（`e.TaskID`）与 `StreamLog` 的键里 | 半：`rt.store` 可达，**taskID 未随包带出** | B·C·D·E | 写得出用例，但要 D＋E | **暂不落** |
+| `cost`（`micros` 必与 `currency` 成对） | **[普查]** `agent.Cost`／`llm.Usage`／`Result.CostMicros/Currency`；历史读口 `task_log`（本程现量 `memory/models.go:65-68` 确有 `CostTokensIn/Out/Currency`） | 半，同 `tools[]` | B·C·D·E ＋ **单位口径未定案**（`cost.go:16-20` 自陈 micro-USD vs CNY） | 答不出：单位没定 | **暂不落**，且**绝不许面板自己加"￥"** |
+| `failures[]`（除 `humanText`） | **[量]** `EvError` 到 sink（`run.go:775-778` 打的正是 `e.Err.Class`/`e.Err.Detail`），sink 不留存 | ✗ 未记录 | B·C·D·E | 写得出用例，但要 D＋E | **暂不落** |
+| `view`（AC#3 ⓐ） | ❗ **[量]** Go 侧九枚屏 id 零命中（§1 P7）；消费端 `currentView()` 今天就位 | ✗ 值无源、名字无校验 | B·C·D·E ＋ 要先在 Go 立枚举＋双向尺 | 答不出 | **禁入**（详见 §4） |
+| `thinkingMs` / `reasoningMs` / `durationMs` / `humanText` / `fragment` / `iconClass` | ❗ 普查乙组六枚，本程**逐条复查未推翻任何一条**（`tool_call.started_at` 零写者、class→中文文案映射不存在、`risk.Hit` 包外零消费者、图标名册冻结…） | ✗ | — | 答不出 | **禁入**（宁缺毋造） |
+
+### 3.4 一句话总结这张表
+
+**没有一枚字段是"只差一个键"**：每一枚实质候选都同时卡在 **B（前端契约面）＋ C（三枚禁面测试）＋ D（票 151 的 `run.go`）＋ E（放开面里没有测试文件）** 上。
+⇒ **落地集＝空**，且这是**量出来的空**（E1b 那发证明"只加键"产出的就是装饰；E4 那发证明"能承重"的形今天需要四张钥匙）。
+按票面骨头"宁缺毋造"，**空的落地集优于十二枚常量**。
+
+⇒ **AC#6 逐枚答句**在上面最后一列：**一枚都没答出来**，因为答它需要的那枚用例**写在本程写不了的地方**。
+这不是措辞问题——票 145 的 AC#6 与本程的放开面**互斥**，见 §7 报回。
