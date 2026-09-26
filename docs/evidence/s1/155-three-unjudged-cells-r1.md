@@ -70,3 +70,65 @@ internal/agent/loop.go       （同上四枚） e685a6efd595
 
 **这一块把 153 的哪一枚 AC 从"未裁"推到"可定档"**：**AC#2 的问①**（票面拆出的 6 件里那一件 `(b)`）。
 问①的答案是"不能"，因此票面那条"若三问的答案是要动契约面 ⇒ 停手"**在问①这一支不触发**——通道三条全空、构造点位置不对，**"要动的是实现内部的一枚 ctx 键"这件事是被现量逼出来的，不是自选的**。
+
+---
+
+## 2. 格② AC#2 问② —— 唯一持有者是谁（组合根？`Loop`？）
+
+**答：`Loop.run` 那一枚参数 `taskID`（`internal/agent/loop.go:339`）。组合根不是。**
+票面给的两个候选里选**后者**，但"唯一"两个字有边界，本程把它说到哪儿为止写在下面第 4 条。凭据＝`probes/155/02-ac2-q2-holder.txt`（13 节，尺全打在 `5365cb22` 的 git 对象上）。
+
+**① 派单点名的那一发，原文照跑**
+
+```
+$ git grep -n 'newTaskID\|withTraceTask' 5365cb22 -- internal/agent
+5365cb22:internal/agent/loop.go:322:	id := newTaskID()
+5365cb22:internal/agent/loop.go:333:	return l.run(ctx, newTaskID(), input)
+5365cb22:internal/agent/loop.go:1102:// newTaskID returns a UUIDv4-shaped task id (the task_log.id column is
+5365cb22:internal/agent/loop.go:1104:func newTaskID() string {
+rc=0
+```
+
+⇒ `newTaskID` 四枚命中**全在同一枚文件**（定义 1＋生产调用 2＋注释 1）；`withTraceTask` **0 枚命中**——它当时还不存在（那是本票改出来的东西）。
+**这不是"尺钝了"的 0**：同一把尺打在改后版 `b23c7f7` 上命中 **8 行 / 3 枚文件**（`compress.go:4`、`compress_trace_test.go:2`、`loop.go:2`，探针第 1b 节）。
+
+**② id 出不了这枚包**：`git grep -n 'newTaskID' 5365cb22 -- . ':!.scratch/*' ':!docs/*'` ⇒ **仍然只有那 4 行**（排除工单正文与票 139 的快照副本之后，全仓生产码里没有任何包外调用点）。`newTaskID` 是小写开头＝包私有，组合根**结构上拿不到它**。
+
+**③ 压缩那一发就在持有者的作用域里**（这是问②真正在问的东西）
+
+```
+$ git show 5365cb22:internal/agent/loop.go | grep -n 'func (l \*Loop) run(\|l.comp.Compress('
+339:func (l *Loop) run(ctx context.Context, taskID, input string) Result {
+396:			nh, rep, err := l.comp.Compress(ctx, hist)
+```
+
+- 生产侧调用 `Compress` 的点**全仓唯一**：`git grep -n '\.Compress(' 5365cb22 -- internal cmd ':!*_test.go'` ⇒ **1 枚命中**（`loop.go:396`）；同一把尺不排测试时是 8 枚（`compress_test.go:4`＋`compress_trace_test.go:3`＋`loop.go:1`）⇒ 测试腿 7 枚、生产腿 1 枚，本程没把测试调用点算进"持有者"里。
+- `:396` 落在 `:339` 那一枚函数体里 ⇒ **参数 `taskID` 当场在作用域内**。这正是票 153 §地界 预留的那一支（"loop.go 只读，除非 taskID 必须由它传进来"）。
+- `Loop` **结构体自己没有 id 字段**（`type Loop struct` 原文 11 行：`opt/b/guard/asm/sp/comp/reg/provider/mu/history/steer/current`）⇒ "持有者＝`Loop` 这个对象"这种读法**不成立**；持有者是**这一次调用的栈帧**，不是那枚可被复用的对象。这条与格①"构造时刻也对不上"是同一件事的两面。
+
+**④ "唯一"说到哪儿为止（本程不肯把它说满的那半格）**：同一枚 id 在 `l.run` 体内还另落了三处，逐枚带行号（探针第 10–12 节）：
+
+| 副本 | 现量 | 算不算"另一个持有者" |
+|---|---|---|
+| `root := observe.NewRootFrom(ctx, taskID)` `loop.go:345` | `Root struct { ID string; Ctx; Cancel; … }`（`observe/goroutine.go:88-95`），id 只在**结构体字段**上 | **不算**：`NewRootFrom` 内部只 `context.WithCancel(parent)`，**没有 `WithValue`** ⇒ id 没进 ctx（格①第三条互指） |
+| `l.setCurrent(root)` `loop.go:353`（`Loop.current *observe.Root`） | `l.current` 只有 3 处读点：`:348` 注释、`:523` | **不算**：它在 `Compressor` 那侧不可达（不同种类、无引用） |
+| `res := Result{TaskID: taskID…}` `loop.go:369` | `Result.TaskID` 声明在 `loop.go:83` | **不算**：那是**出口**，且晚于压缩那一发 |
+| `RunningTask{ID: id}` `loop.go:323`（异步腿独有） | `type RunningTask struct { ID string; root; h; done; result }` | **不算**：它在 `reg.Spawn` 的闭包外，同步腿（`Run`）根本不经过它 |
+
+⇒ 精确读法：**"造 id 的通道唯一（包私有 `newTaskID`）、压缩发生那一刻手里有 id 的只有 `Loop.run` 那一枚参数"**；同帧内的四枚副本都在**这一次调用之内**，没有任何一枚住在 `Compressor` 够得着的地方。
+
+**⑤ 组合根被现量否掉**（票面那个问句的另一半）
+
+```
+$ git grep -n 'taskID\|TaskID' 5365cb22 -- cmd ':!*_test.go'
+cmd/wisp/run.go:476	const taskID = "host:mode-switch"     ← 宿主给 L2 卡片签发的伪任务名
+cmd/wisp/run.go:576	(下一发) res := loop.Run(ctx, task)   ← 进 Loop 那一发不带任何 id
+cmd/wisp/run.go:587/:598/:608	res.TaskID …                 ← 全是事后读
+cmd/wisp/run.go:729/:756	e.TaskID …                      ← 事件侧，事后
+```
+
+- `run.go:576` 原文（`sed -n '570,590p'`）：`res := loop.Run(ctx, task)`——`ctx` 是 `context.WithTimeout(context.Background(), …)` 造的，**没有任何任务身份**；组合根第一次拿到 id 是 `:587` 读 `res.TaskID`，**晚于整次环路**，因此**晚于压缩**。
+- `:476` 那一枚 `const taskID = "host:mode-switch"` 本程**特别点名**，因为它是一枚长得像答案的东西：它是宿主为一次权限模式切换**自己编的**字符串（同段 `rt.gate.AdmitTextTask(taskID)`／`tools.Decision{TaskID: taskID…}`），**不是** `newTaskID()` 造的那枚，也不在压缩那条路上。拿它抵"组合根持有 id"这一账，就是本仓那种"相近读数顶真问句"的形状。
+
+**这一块把 153 的哪一枚 AC 从"未裁"推到"可定档"**：**AC#2 的问②**（票面 6 件里那一件 `(c)`）。
+⇒ 问②裁"组合根**不是**持有者、`Loop.run` 的参数是"，所以"把 id 送进 `Compress`"**不要求扩任何契约面、也不要求改组合根**：唯一需要动的那一发本来就在票 153 §地界 允许动的两枚文件里（`loop.go` 那一发调用点）。它与格①合起来才等于票面那句"若三问的答案是要动契约面 ⇒ 停手"的**前两问**（第三问 (d) 前一程已裁）。

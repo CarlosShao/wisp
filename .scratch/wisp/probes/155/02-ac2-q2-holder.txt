@@ -1,0 +1,285 @@
+# 票 155 AC#1 ② — 唯一持有者是谁（组合根？Loop？）
+# 派单点名的那一发原文照跑；锚点 5365cb22 = ff550f3^（改前），blob 反查见 00 号文件
+=== 本发时刻 ===
+2026-09-26 11:53 +0800
+
+### 1. 派单点名的那一发（原文照跑）
+$ git grep -n 'newTaskID\|withTraceTask' 5365cb22 -- internal/agent
+5365cb22:internal/agent/loop.go:322:	id := newTaskID()
+5365cb22:internal/agent/loop.go:333:	return l.run(ctx, newTaskID(), input)
+5365cb22:internal/agent/loop.go:1102:// newTaskID returns a UUIDv4-shaped task id (the task_log.id column is
+5365cb22:internal/agent/loop.go:1104:func newTaskID() string {
+rc=0
+  ↑ 读法：newTaskID 4 枚命中全在 loop.go（定义 1 枚＋生产调用 2 枚＋注释 1 枚）；withTraceTask 0 枚命中
+
+### 1b. 正控：withTraceTask 这把尺在改后版 b23c7f7 上的命中数（非零＝尺是活的）
+b23c7f7:internal/agent/compress.go:4
+b23c7f7:internal/agent/compress_trace_test.go:2
+b23c7f7:internal/agent/loop.go:2
+
+### 2. newTaskID 是不是包外可得（全仓含测试，改前）
+$ git grep -n 'newTaskID' 5365cb22 -- . ':!*.scratch*'
+5365cb22:internal/agent/loop.go:322:	id := newTaskID()
+5365cb22:internal/agent/loop.go:333:	return l.run(ctx, newTaskID(), input)
+5365cb22:internal/agent/loop.go:1102:// newTaskID returns a UUIDv4-shaped task id (the task_log.id column is
+5365cb22:internal/agent/loop.go:1104:func newTaskID() string {
+
+### 3. 生产侧调用 Compress 的点（改前，全仓）
+$ git grep -n '\.Compress(' 5365cb22 -- internal cmd ':!*_test.go'
+5365cb22:internal/agent/loop.go:396:			nh, rep, err := l.comp.Compress(ctx, hist)
+
+### 3b. 同一把尺不排测试时的全部命中（数一枚测试调用点都没有赖）
+5365cb22:internal/agent/compress_test.go:4
+5365cb22:internal/agent/compress_trace_test.go:3
+5365cb22:internal/agent/loop.go:1
+
+### 4. 那一发调用所在函数的签名与它到调用点的行差（持有者=参数？）
+$ git show 5365cb22:internal/agent/loop.go | grep -n 'func (l \*Loop) run(\|l.comp.Compress('
+339:func (l *Loop) run(ctx context.Context, taskID, input string) Result {
+396:			nh, rep, err := l.comp.Compress(ctx, hist)
+
+$ git show 5365cb22:internal/agent/loop.go | sed -n '388,400p'  （调用点上下文：taskID 在不在作用域）
+				fmt.Sprintf("本次任务已达 %d 轮上限并停止：%s。", l.guard.MaxRounds, guard.Consumption()))
+		}
+		l.drainSteering()
+
+		hist := l.History()
+		if l.comp.Need(hist) {
+			// DEFERRED(D28-1): the Warm-window hook owns this call; the
+			// synchronous fallback here is what the S1 slice accepts.
+			nh, rep, err := l.comp.Compress(ctx, hist)
+			if err != nil {
+				l.log().Warn("agent: history compression failed", "err", err)
+			} else if rep.Ran {
+				l.replaceHistory(nh)
+
+### 5. Loop 结构体上有没有 id 字段（持有者=Loop 自身？）
+$ git show 5365cb22:internal/agent/loop.go | sed -n '/^type Loop struct/,/^}/p'
+type Loop struct {
+	opt      Options
+	b        Budgets
+	guard    GuardConfig
+	asm      *Assembler
+	sp       *Spiller
+	comp     *Compressor
+	reg      *observe.Registry
+	provider llm.LlmProvider
+
+	mu      sync.Mutex
+	history []llm.Message
+	steer   []llm.Message
+	current *observe.Root
+}
+
+### 6. 两枚 birth 点原文（RunAsync / Run）
+// RunAsync spawns the task on a roster-named goroutine and returns immediately.
+func (l *Loop) RunAsync(ctx context.Context, input string) *RunningTask {
+	id := newTaskID()
+	t := &RunningTask{ID: id, root: observe.NewRootFrom(ctx, id), done: make(chan struct{})}
+	t.h = l.reg.Spawn("agent-task-"+id, "agent", t.root, func(c context.Context) {
+		defer close(t.done)
+		t.result = l.run(c, id, input)
+	})
+	return t
+}
+
+// Run executes one task synchronously on the calling goroutine.
+func (l *Loop) Run(ctx context.Context, input string) Result {
+	return l.run(ctx, newTaskID(), input)
+}
+
+
+### 6b. RunningTask 结构体（异步那条腿 id 还落在哪）
+type RunningTask struct {
+	ID   string
+	root *observe.Root
+	h    *observe.Handle
+
+	done   chan struct{}
+	result Result
+}
+
+### 7. 组合根 cmd/wisp：压缩发生那一刻它手里有没有 id
+$ git grep -n 'taskID\|TaskID' 5365cb22 -- cmd ':!*_test.go'
+5365cb22:cmd/wisp/panel_assets.go:218:// (risk.NewProvenance(...).Detector(taskID), see internal/tools/bridge.go's
+5365cb22:cmd/wisp/panel_pump.go:51:// tree records one for a live call - tools.Decision has TaskID/CallID/Provider
+5365cb22:cmd/wisp/run.go:476:	const taskID = "host:mode-switch"
+5365cb22:cmd/wisp/run.go:477:	revoke := rt.gate.AdmitTextTask(taskID)
+5365cb22:cmd/wisp/run.go:480:		TaskID: taskID,
+5365cb22:cmd/wisp/run.go:587:			ID: res.TaskID, State: state, QueryText: task,
+5365cb22:cmd/wisp/run.go:598:		if err := rt.store.FinishTaskLog(c, res.TaskID, state, summary,
+5365cb22:cmd/wisp/run.go:608:		res.TaskID, res.Status, res.Rounds, res.ToolCalls, costLine(res))
+5365cb22:cmd/wisp/run.go:729:			c.stream.Append(e.TaskID, e.Text)
+5365cb22:cmd/wisp/run.go:756:			c.stream.Close(e.TaskID)
+
+$ git show 5365cb22:cmd/wisp/run.go | grep -n 'loop.Run(\|loop.RunAsync(\|NewLoop'
+547:	loop, err := agent.New(agent.Options{
+576:	res := loop.Run(ctx, task)
+
+$ git show 5365cb22:cmd/wisp/run.go | sed -n '570,590p'
+		fmt.Fprintf(rt.stderr, "wisp run: agent 环路装配失败：%v\n", err)
+		return 1
+	}
+	ctx, cancel := context.WithTimeout(context.Background(),
+		time.Duration(cfg.LLM.TimeoutMS)*time.Millisecond)
+	defer cancel()
+	res := loop.Run(ctx, task)
+
+	class := ""
+	if res.Err != nil {
+		class = string(res.Err.Class)
+	}
+	state := taskLogState(res.Status)
+	if rt.store != nil {
+		c, cancel2 := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel2()
+		tl := memory.TaskLog{
+			ID: res.TaskID, State: state, QueryText: task,
+			CostTokensIn: int64(res.Usage.InputTokens), CostTokensOut: int64(res.Usage.OutputTokens),
+			CostAmountMicro: res.CostMicros, Currency: res.Currency, ErrorClass: class,
+		}
+
+### 8. 组合根那一发 run.go:476 的 const taskID 是什么（防拿它当持有者）
+// own synthetic task id for the duration of the confirmation and revokes it on
+// the way out.
+func (rt *agentRuntime) confirmModeSwitch(ctx context.Context, sw perm.Switch) error {
+	if rt.gate == nil {
+		return fmt.Errorf("审批 gate 未装配，无法为切到 %s 签发 L2 卡片", sw.To)
+	}
+	const taskID = "host:mode-switch"
+	revoke := rt.gate.AdmitTextTask(taskID)
+	defer revoke()
+	ans, why := rt.gate.PendingApproval(ctx, tools.Decision{
+		TaskID: taskID,
+		Tool:   modeSwitchToolName,
+		Level:  risk.L2,
+
+### 9. newTaskID 本体（改前，行号现读）
+// newTaskID returns a UUIDv4-shaped task id (the task_log.id column is
+// documented as a UUID), built from crypto/rand so no new dependency appears.
+func newTaskID() string {
+	var b [16]byte
+	if _, err := rand.Read(b[:]); err != nil {
+		// Entropy source unavailable: fall back to a clock-derived unique id.
+		n := time.Now().UnixNano()
+		for i := range b {
+			b[i] = byte(n >> (8 * uint(i%8)))
+		}
+	}
+	b[6] = (b[6] & 0x0f) | 0x40
+	b[8] = (b[8] & 0x3f) | 0x80
+	h := hex.EncodeToString(b[:])
+	return h[0:8] + "-" + h[8:12] + "-" + h[12:16] + "-" + h[16:20] + "-" + h[20:]
+}
+### 10. 追加一发（防持有者只有一枚说满）：l.current 上带的 Root.ID 是不是同一枚 id
+$ git show 5365cb22:internal/agent/loop.go | grep -n 'current = \|current:\|l.current'
+348:	// D11(1) control layer abort a running task by cancelling l.current (the
+523:	root := l.current
+987:	l.current = r
+
+$ git grep -n 'type Root struct' 5365cb22 -- internal/observe
+5365cb22:internal/observe/goroutine.go:88:type Root struct {
+5365cb22:internal/observe/goroutine.go-89-	ID     string
+5365cb22:internal/observe/goroutine.go-90-	Ctx    context.Context
+5365cb22:internal/observe/goroutine.go-91-	Cancel context.CancelFunc
+5365cb22:internal/observe/goroutine.go-92-
+5365cb22:internal/observe/goroutine.go-93-	mu      sync.Mutex
+5365cb22:internal/observe/goroutine.go-94-	pending int
+5365cb22:internal/observe/goroutine.go-95-}
+5365cb22:internal/observe/goroutine.go-96-
+
+$ git show 5365cb22:internal/agent/loop.go | sed -n '336,360p'  （run 开头有没有为 SyncRun 造 Root）
+// ---------------------------------------------------------------------------
+// core
+
+func (l *Loop) run(ctx context.Context, taskID, input string) Result {
+	// (1) D11(1): control words never reach the provider.
+	if verb, ok := MatchControl(input); ok {
+		return l.runControl(taskID, verb, input)
+	}
+
+	root := observe.NewRootFrom(ctx, taskID)
+	defer root.Cancel()
+	// Operate under the root's own cancelable context: this is what lets the
+	// D11(1) control layer abort a running task by cancelling l.current (the
+	// default handler reaches the loop only through this root, not the caller's
+	// parent ctx). Cancellation set by the caller's parent propagates down here
+	// as well, so both paths are observed by the loop's ctx.Err() checks.
+	ctx = root.Ctx
+	l.setCurrent(root)
+	defer l.setCurrent(nil)
+
+	j := newTaskJournal(l.opt.Journal, taskID, taskID) // C18: correlation == task id
+	// D47: register the task with the host's approval layer before any tool
+	// call can reach a gate. The revocation runs when the task ends, so an
+	// admitted id cannot outlive the task that earned it.
+	revokeAdmission := func() {}
+	if l.opt.AdmitTask != nil {
+		if r := l.opt.AdmitTask(taskID); r != nil {
+
+### 11. Root.ID 与 taskID 同源那一行的行号（现读）
+323:	t := &RunningTask{ID: id, root: observe.NewRootFrom(ctx, id), done: make(chan struct{})}
+345:	root := observe.NewRootFrom(ctx, taskID)
+353:	l.setCurrent(root)
+354:	defer l.setCurrent(nil)
+
+### 12. internal/agent 里 TaskID 的全部持有形状（改前）
+5365cb22:internal/agent/approval/gate.go:219:	if err := g.admitCheck(d.TaskID); err != nil {
+5365cb22:internal/agent/approval/gate.go:220:		g.logf("approval: L1 refused by D47 guard task=%q tool=%s: %v", d.TaskID, d.Tool, err)
+5365cb22:internal/agent/approval/gate.go:247:	corr := orDefaultText(d.CorrelationID, d.TaskID)
+5365cb22:internal/agent/approval/gate.go:453:	if err := g.admitCheck(d.TaskID); err != nil {
+5365cb22:internal/agent/approval/gate.go:454:		g.logf("approval: L2 refused by D47 guard task=%q tool=%s: %v", d.TaskID, d.Tool, err)
+5365cb22:internal/agent/approval/gate.go:471:	incoming := orDefaultText(d.CorrelationID, d.TaskID)
+5365cb22:internal/agent/approval/gate.go:550:		TaskID:        d.TaskID,
+5365cb22:internal/agent/approval/gate.go:649:	d.TaskID = taskID
+5365cb22:internal/agent/approval/queue.go:39:	// cancels by orDefault(CorrelationID, TaskID)). Ticket 87: a card that is
+5365cb22:internal/agent/approval/queue.go:162:	it.bind = bindDigest(corr, d.TaskID, d.Tool, d.LevelString(), q.seq, d.Args)
+5365cb22:internal/agent/approval/queue.go:167:		corr, d.TaskID, d.Tool, len(q.pending))
+5365cb22:internal/agent/approval/queue.go:176:	for _, n := range []string{d.CorrelationID, d.TaskID} {
+5365cb22:internal/agent/approval/report.go:23:	TaskID        string
+5365cb22:internal/agent/approval/report.go:95:	corr := orDefaultText(d.CorrelationID, d.TaskID)
+5365cb22:internal/agent/approval/report.go:97:		Tool: d.Tool, CorrelationID: corr, TaskID: d.TaskID, Level: d.LevelString(),
+5365cb22:internal/agent/approval/ui.go:29:	TaskID        string
+5365cb22:internal/agent/journal.go:76:		TaskID:        t.taskID,
+5365cb22:internal/agent/loop.go:83:	TaskID string
+5365cb22:internal/agent/loop.go:322:	id := newTaskID()
+5365cb22:internal/agent/loop.go:333:	return l.run(ctx, newTaskID(), input)
+5365cb22:internal/agent/loop.go:369:	res := Result{TaskID: taskID, Status: StatusCompleted}
+5365cb22:internal/agent/loop.go:452:			l.publish(Event{Kind: EvError, TaskID: taskID, Text: msg, Stop: turn.Stop})
+5365cb22:internal/agent/loop.go:471:				Kind: EvReminder, TaskID: taskID, Text: rem.Text,
+5365cb22:internal/agent/loop.go:476:					Kind: EvStuck, TaskID: taskID,
+5365cb22:internal/agent/loop.go:502:	l.publish(Event{Kind: EvControl, TaskID: taskID, Verb: verb, Text: utterance})
+5365cb22:internal/agent/loop.go:508:	res := Result{TaskID: taskID, Status: StatusControl}
+5365cb22:internal/agent/loop.go:542:			l.publish(Event{Kind: EvTextDelta, TaskID: taskID, Text: ev.Text})
+5365cb22:internal/agent/loop.go:544:			l.publish(Event{Kind: EvReasoningDelta, TaskID: taskID, Text: ev.Text})
+5365cb22:internal/agent/loop.go:644:			TaskID: taskID, CorrelationID: taskID, CallID: p.call.ID,
+5365cb22:internal/agent/loop.go:714:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID,
+5365cb22:internal/agent/loop.go:741:		l.log().Warn("agent: tool timeout", "tool", req.Name, "task", req.TaskID,
+5365cb22:internal/agent/loop.go:837:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID, ToolName: c.Name,
+5365cb22:internal/agent/loop.go:872:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID, ToolName: c.Name,
+5365cb22:internal/agent/loop.go:884:		Kind: EvStuck, TaskID: res.TaskID, Text: msg,
+5365cb22:internal/agent/loop.go:895:	l.publish(Event{Kind: EvError, TaskID: res.TaskID, Text: err.Error(), Err: err})
+5365cb22:internal/agent/loop.go:933:		l.log().Warn("agent: task_log finish failed", "err", err, "task", res.TaskID)
+5365cb22:internal/agent/loop.go:936:		Kind: EvDone, TaskID: res.TaskID, Text: summary,
+5365cb22:internal/agent/loop.go:1102:// newTaskID returns a UUIDv4-shaped task id (the task_log.id column is
+5365cb22:internal/agent/loop.go:1104:func newTaskID() string {
+5365cb22:internal/agent/sink.go:46:	TaskID    string
+5365cb22:internal/agent/tools.go:55:	TaskID        string
+
+### 13. 改前 l.comp.Compress 那一发拿的 ctx 是哪一枚（root.Ctx 还是入参 ctx）
+
+	root := observe.NewRootFrom(ctx, taskID)
+	defer root.Cancel()
+	// Operate under the root's own cancelable context: this is what lets the
+	// D11(1) control layer abort a running task by cancelling l.current (the
+	// default handler reaches the loop only through this root, not the caller's
+	// parent ctx). Cancellation set by the caller's parent propagates down here
+	// as well, so both paths are observed by the loop's ctx.Err() checks.
+	ctx = root.Ctx
+		hist := l.History()
+		if l.comp.Need(hist) {
+			// DEFERRED(D28-1): the Warm-window hook owns this call; the
+			// synchronous fallback here is what the S1 slice accepts.
+			nh, rep, err := l.comp.Compress(ctx, hist)
+			if err != nil {
+				l.log().Warn("agent: history compression failed", "err", err)
