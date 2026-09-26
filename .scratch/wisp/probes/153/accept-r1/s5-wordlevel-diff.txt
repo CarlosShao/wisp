@@ -1,0 +1,65 @@
+bec1727: CRLF=0  LF=342  bare_CR=0
+9a8766e: CRLF=0  LF=830  bare_CR=0
+6de3d1c: CRLF=0  LF=569  bare_CR=0
+bec1727 lines=343 blank=78 nonblank=265
+9a8766e lines=831 blank=511 nonblank=320
+6de3d1c lines=570 blank=129 nonblank=441
+
+=== section 5 word-level diff: 9a8766e(<) vs 6de3d1c(>) ===
+[-OLD] 在本仓零信息——全编队共用 `git config user.name/email` 同一枚身份（`git
+[+NEW] 在本仓零信息——全编队共用同一枚 git 身份 （`git
+[-OLD] 152／151／前端／本程全印成同一个名字），所以"我这一枚区间里谁提交了什么"只能按
+[+NEW] 152／151／前端／编排者／本程全印成同一个名字）， 所以"这一格是谁交的"只能按
+[-OLD] 本程区间 `86b0161..HEAD` 里别家的 commit 逐枚有名（现量于 `HEAD=4e16976`；之后区间又长， 本程收口时另读到 `eed7c99`/`63e228f`＝编排者的台账与推送收账，同样不归本程）：`5365cb2`（编排者派单存档）、 `cdf2471`/`ad9b29f`（前端会话）、`eb4755a`/`4cc85bb`（票 152 的程）、`45c920e`/`5d46f24`/`4e16976` （票 151 的程——其中 `5d46f24` 的 subject 就叫 `placeholder`，动的是 `cmd/wisp/run.go` ＋ `cmd/wisp/task_scope_close_151_test.go` ＋ `internal/tools/bridge.go`，不是本程的）、 `720cae6`（编排者特批存档）。 本程到此共五枚 commit，逐枚名册（本节这枚证据件是第六枚，不列自己）（`git
+[+NEW] 本程到这一枚为止五枚 commit，逐枚名册（`git
+[-OLD] 表＋43
+[+NEW] 表 ＋ 43
+[-OLD] `docs/evidence/s1/153-…md`
+[+NEW] 本证据件
+[-OLD] /
+[+NEW] | AC#2 表 | 只有本证据件 | |
+[-OLD] AC#2 /
+[+NEW] 
+[-OLD] 只有那枚证据件
+[+NEW] 只有本证据件
+[-OLD] 点名的三枚，没多一枚。
+[+NEW] 点名的那三枚，没多一枚。 本程区间 `86b0161..HEAD` 里别家的 commit 逐枚有名（现量于 `HEAD=4e16976`；本程收口时区间又长了 `eed7c99`／`63e228f`＝编排者的台账与推送收账，同样不归本程）：`5365cb2`（派单存档）、 `cdf2471`／`ad9b29f`／`8883b3f`（前端会话）、`eb4755a`／`4cc85bb`／`10e3585`／`6550dc4`（票 152 的程）、 `45c920e`／`5d46f24`／`4e16976`（票 151 的程——其中 `5d46f24` 的 subject 就叫 `placeholder`， 动的是 `cmd/wisp/run.go` ＋ `cmd/wisp/task_scope_close_151_test.go` ＋ `internal/tools/bridge.go`， 不是本程的）、`720cae6`（编排者特批存档）。共享 index 下本程每次 commit 前都现量了 `git diff --cached --name-only`，五枚里没混进别家路径（一枚 `git add` 之后 index 名册见 §9）。
+[-OLD] "^docs/PLAN.md|^docs/specs/|^internal/risk/|^internal/panel/|^internal/agent/approval/| ^internal/observe/|thresholds\.go|golden|allowlist\.txt|^scripts/slo-check\.ps1| ^tools/d22scan/|^frontend/|^design/"
+[+NEW] "^docs/PLAN.md|^docs/specs/|^internal/risk/|^internal/panel/|^internal/agent/approval/|^internal/observe/|thresholds\.go|golden|allowlist\.txt|^scripts/slo-check\.ps1|^tools/d22scan/|^frontend/|^design/"
+[-OLD] …
+[+NEW] …同一条管道…
+[-OLD] 同一把尺、同一管道上的正控：尺活着
+[+NEW] 正控：尺活着，0 命中不是尺坏
+[-OLD] 取函数体逐字节 cmp（锚点
+[+NEW] 取函数体，锚点
+[-OLD] 交付）
+[+NEW] 交付逐字节 cmp
+[-OLD] 本票没有把"让常见路径也折叠"当捷径；AC#1
+[+NEW] 本票没有把"让常见路径也折叠"当捷径：AC#1
+[-OLD] 里那三条被删的行也只有：那条
+[+NEW] 里被删掉的行只有三条——那条
+[-OLD] 那一行（改写同表达式换行）、
+[+NEW] 那一行（同表达式换行）、
+[-OLD] 那一枚调用点（变成带标版）——`ac4-zero-byte.txt`
+[+NEW] 那一枚调用点（变成带标版）；`probes/153/ac4-zero-byte.txt`
+[-OLD] 86b0161:
+[+NEW] 86b0161 :
+[-OLD] b23c7f7:
+[+NEW] b23c7f7 :
+[-OLD] 自打一枚：本程 `compress.go`
+[+NEW] 自打一枚：`compress.go`
+[-OLD] 枚顶到
+[+NEW] 枚顶成
+[-OLD] 写完当场想到、改成"the
+[+NEW] 写完当场想到、改成转述（"the
+[-OLD] file"后才跑上面那两条计数—— 这条是靠"改之前先想到"没成的，不是靠读数捞回来的，记在这里以免读者以为本程有门兜着。
+[+NEW] file"）之后才跑上面那两条计数—— 这一条是"写之前想到"没成的，不是被读数捞回来的，记在这里，免得读者以为有门兜着。
+[-OLD] 枚"过期陷阱）：
+[+NEW] 枚"过期陷阱，本程先量再落笔）：
+[-OLD] 8 + 1 = 9 |
+[+NEW] 8+1=9
+[-OLD] 8 + 1 = 9
+[+NEW] 8+1=9
+[-OLD] 
+[+NEW] ---
+old_tokens=296 new_tokens=308

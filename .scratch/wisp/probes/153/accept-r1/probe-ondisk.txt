@@ -1,0 +1,7 @@
+time=2026-09-26T10:16:11.138+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAccept153TraceOnDiskThroughRedactor
+    zzaccept153_ondisk_test.go:60: PROBE-153 DISK: {"time":"2026-09-26T10:16:11.1467984+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true}
+    zzaccept153_ondisk_test.go:60: PROBE-153 DISK: {"time":"2026-09-26T10:16:11.1467984+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true,"task":"f2aa9a2a-80ce-4738-8f13-908a7249f6db"}
+--- PASS: TestAccept153TraceOnDiskThroughRedactor (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/agent	0.207s

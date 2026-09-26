@@ -1,0 +1,7 @@
+=== comm -13 anchor..delivered (ADDED) ===
+TestCompressionTraceCarriesTheOwningTaskID
+TestCompressionTraceNeverInventsATaskID
+TestCompressionTraceSilentWhenNothingFoldableOverThreshold
+=== comm -23 (LOST) ===
+=== diff count1 vs count2 names ===
+IDENTICAL
