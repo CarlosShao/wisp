@@ -1,0 +1,36 @@
+Ticket 156 - the FIRST mutation battery run's surviving readings, transcribed verbatim.
+
+Provenance (stated because the raw logs of this run are NOT in this directory):
+  command  : same as mut-156 second run - `python .scratch/wisp/probes/156/my156.py mut
+             "D:/work/workspace/projects plans/Wisp" .../probes/156/mut-156
+             --sel='TestSLO149Exited|TestSLO156' asis m1-... m5-... case15-off... m4-plus-case13-off`
+  when     : 2026-09-26 13:06-13:09, against cmd/wisp/slo_exit_os_156_windows_test.go
+             BEFORE the case-19 restructure (the role dispatch then lived inside case 15
+             and slo156Spawn re-entered `-test.run=^TestSLO156ExitedAsksTheOSForAChildNobodyReaped$`).
+  artifact : this is the RULER'S OWN STDOUT (my156.py's per-cell summary line), not a
+             `go test -v` log. The per-cell raw logs of this run were deleted at 13:1x
+             when this程 rotated `mut-156/` before the second battery - a breach of the
+             "临时件只建不删" rule, registered in the evidence file's §9 rather than
+             papered over. The numbers below are what survives; they are quoted from the
+             background task's captured stdout, which this程 did not touch.
+
+asis                               rc=0   RUN=5    PASS=5    FAIL=0    SKIP=0   LOADED=YES
+m1-os-arm-removed                  rc=1   RUN=5    PASS=1    FAIL=4    SKIP=0   LOADED=YES red=TestSLO156ExitedAsksTheOSForAChildNobodyReaped,TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees,TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn,TestSLO156WaitReadyNamesTheDeadSubjectToo
+m2-os-arm-never-dead               rc=1   RUN=5    PASS=1    FAIL=4    SKIP=0   LOADED=YES red=TestSLO156ExitedAsksTheOSForAChildNobodyReaped,TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees,TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn,TestSLO156WaitReadyNamesTheDeadSubjectToo
+m3-os-arm-always-dead              rc=1   RUN=5    PASS=4    FAIL=1    SKIP=0   LOADED=YES red=TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees
+m4-shortcircuit-deleted            rc=1   RUN=5    PASS=3    FAIL=2    SKIP=0   LOADED=YES red=TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees,TestSLO149ExitedGiveUpSentenceCarriesTheLastReading
+m5-code-read-dropped               rc=1   RUN=5    PASS=2    FAIL=3    SKIP=0   LOADED=YES red=TestSLO156ExitedAsksTheOSForAChildNobodyReaped,TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn,TestSLO156WaitReadyNamesTheDeadSubjectToo
+m1-plus-all-new-cases-off          rc=0   RUN=1    PASS=1    FAIL=0    SKIP=0   LOADED=YES
+case15-off                         rc=1   RUN=4    PASS=2    FAIL=2    SKIP=0   LOADED=YES red=TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn,TestSLO156WaitReadyNamesTheDeadSubjectToo
+case16-off                         rc=0   RUN=4    PASS=4    FAIL=0    SKIP=0   LOADED=YES
+case17-off                         rc=0   RUN=4    PASS=4    FAIL=0    SKIP=0   LOADED=YES
+case18-off                         rc=0   RUN=4    PASS=4    FAIL=0    SKIP=0   LOADED=YES
+m4-plus-case13-off                 rc=1   RUN=4    PASS=3    FAIL=1    SKIP=0   LOADED=YES red=TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees
+
+The reading this file exists for is `case15-off`: with the SHIPPED bytes untouched and only
+case 15's function name neutralised, cases 17 and 18 went red. That is not the code under
+test failing - renaming the graded cell also renamed the entry point the role children
+re-enter, so those children matched no test, exited 0 instead of 7, and the give-up
+sentences stopped naming "code 7". A fixture whose wires are one of the graded cases cannot
+be taken apart to test anything, which is why the second run's tree has case 19 and why no
+mutation cell in my156.py is allowed to rename it.

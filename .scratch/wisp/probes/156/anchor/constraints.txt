@@ -1,0 +1,33 @@
+$ git diff -- cmd/wisp/slo_windows.go | grep -nE '^[-+]' | grep -iE 'stop|Kill|RemoveAll|Wait\(\)'
+30:+// sits inside stop() (re-measured at this anchor: one hit for `cmd.Wait()`, at
+59:+	// cmd.Wait() has already run, and that call also CLOSED the handle arm (b)
+77:+// with no clock touched at all (this is the same call (*os.Process).wait() makes
+rc=0 (1 = stop() 与 Wait/Kill 一条 +/- 都没有)
+
+$ git diff -U0 -- cmd/wisp/slo_windows.go | grep -c '^-'
+5
+
+$ grep -n 'func (s \*sloSubject) stop' -A 12 cmd/wisp/slo_windows.go
+928:func (s *sloSubject) stop() {
+929-	if s == nil {
+930-		return
+931-	}
+932-	if s.cmd != nil && s.cmd.Process != nil && !s.exited() {
+933-		_ = s.cmd.Process.Kill()
+934-	}
+935-	if s.cmd != nil {
+936-		_ = s.cmd.Wait()
+937-	}
+938-	_ = os.RemoveAll(s.dir)
+939-}
+940-
+
+$ grep -n 'cmd.Wait()' cmd/wisp/slo_windows.go
+846:// sits inside stop() (re-measured at this anchor: one hit for `cmd.Wait()`, at
+872:	// cmd.Wait() has already run, and that call also CLOSED the handle arm (b)
+936:		_ = s.cmd.Wait()
+
+$ grep -n 's.exited()' cmd/wisp/slo_windows.go
+522:		if s.exited() {
+822:		if s.exited() {
+932:	if s.cmd != nil && s.cmd.Process != nil && !s.exited() {

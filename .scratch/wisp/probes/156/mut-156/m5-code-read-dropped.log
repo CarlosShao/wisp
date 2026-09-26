@@ -1,0 +1,22 @@
+$ go test -count=1 -overlay 'D:\tmp\wisp156\wisp156-ruler\m5-code-read-dropped\overlay.json' -v -run 'TestSLO149Exited|TestSLO156' ./cmd/wisp/
+$ tree=D:/work/workspace/projects plans/Wisp  overlaid=['D:/work/workspace/projects plans/Wisp/cmd/wisp/slo_windows.go']
+time=2026-09-26T13:19:13.420+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSLO156FixtureChildrenDoWhatTheirNamesSay
+--- PASS: TestSLO156FixtureChildrenDoWhatTheirNamesSay (0.07s)
+=== RUN   TestSLO156ExitedAsksTheOSForAChildNobodyReaped
+    slo_exit_os_156_windows_test.go:162: exitCode() is 1, want 7 (the code the OS reports): the give-up sentence prints this number
+--- FAIL: TestSLO156ExitedAsksTheOSForAChildNobodyReaped (0.05s)
+=== RUN   TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees
+    slo_exit_os_156_windows_test.go:206: Wait on a killed child reports the kill as an error (exit status 1); that is the fixture, not a failure
+--- PASS: TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees (0.01s)
+=== RUN   TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn
+    slo_exit_os_156_windows_test.go:248: give-up "wisp slo: subject 49120 exited (code 1) without writing its report (8 bytes read, document still open at offset 8: the tail had not arrived)" does not name the dead child and its code
+--- FAIL: TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn (0.06s)
+=== RUN   TestSLO156WaitReadyNamesTheDeadSubjectToo
+    slo_exit_os_156_windows_test.go:283: waitReady give-up "wisp slo: subject 44160 exited early (code 1) before reporting ready" does not name the dead subject and its code
+--- FAIL: TestSLO156WaitReadyNamesTheDeadSubjectToo (0.06s)
+=== RUN   TestSLO149ExitedGiveUpSentenceCarriesTheLastReading
+--- PASS: TestSLO149ExitedGiveUpSentenceCarriesTheLastReading (0.06s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.390s
+FAIL

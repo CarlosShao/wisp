@@ -1,0 +1,9 @@
+$ go test -count=1 -overlay 'D:\tmp\wisp156\wisp156-ruler\m1-plus-all-new-cases-off\overlay.json' -v -run 'TestSLO149Exited|TestSLO156' ./cmd/wisp/
+$ tree=D:/work/workspace/projects plans/Wisp  overlaid=['D:/work/workspace/projects plans/Wisp/cmd/wisp/slo_exit_os_156_windows_test.go', 'D:/work/workspace/projects plans/Wisp/cmd/wisp/slo_windows.go']
+time=2026-09-26T13:19:20.318+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSLO156FixtureChildrenDoWhatTheirNamesSay
+--- PASS: TestSLO156FixtureChildrenDoWhatTheirNamesSay (0.13s)
+=== RUN   TestSLO149ExitedGiveUpSentenceCarriesTheLastReading
+--- PASS: TestSLO149ExitedGiveUpSentenceCarriesTheLastReading (0.08s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.339s

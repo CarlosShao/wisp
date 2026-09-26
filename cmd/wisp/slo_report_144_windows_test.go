@@ -799,6 +799,7 @@ func TestSLO152CorruptLegWithNoNamedPositionRefusesToBorrowOne(t *testing.T) {
 	}
 }
 
+// Case 13 - AC#3's ruling is ⓐ: the s.exited() branch SHOULD name where the last
 // reading stopped, for the reason readSubjectReport's own doc comment gives - a
 // subject that died part-way through its write is exactly the shape that looks
 // like a prefix, and "exited (code 7) without writing its report" with no reading
@@ -811,6 +812,16 @@ func TestSLO152CorruptLegWithNoNamedPositionRefusesToBorrowOne(t *testing.T) {
 // reading rather than a hand-made ProcessState; the report file is still scripted,
 // because counting the reads is how "on the spot" is shown without a wall-clock
 // claim (same reason as case 5).
+//
+// Which ⓐ this is, and which one it is not (ticket 156 AC#4(i), restoring the
+// header ticket 152 deleted - 152's own acceptance run recorded the deletion at
+// docs/evidence/s1/152-...-accept-r1.md §2.2; the line is verbatim from
+// `git show 10e3585 -- cmd/wisp/slo_report_144_windows_test.go`, the one `^-//`
+// hit in that commit). The letter belongs to TICKET 149's AC#3, whose three options
+// were ⓐ name it / ⓑ by design never reached / ⓒ say so and stop. It is NOT the
+// letter ticket 152's AC#2 drew: 152 took ⓒ and sent "who reaps a subject, and
+// where" upstairs as Q-57, which owner ruled on 2026-09-26 as ticket 156's option
+// 乙 (exited() asks the OS). Neither ruling moved one assertion in this case.
 func TestSLO149ExitedGiveUpSentenceCarriesTheLastReading(t *testing.T) {
 	dead := exec.Command("cmd.exe", "/c", "exit", "7")
 	_ = dead.Run() // a non-zero exit is the fixture, not a failure of this test

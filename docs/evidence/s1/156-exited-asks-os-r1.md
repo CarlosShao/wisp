@@ -182,3 +182,125 @@ $ ls third_party/sherpa-onnx/*.dll          onnxruntime.dll  sherpa-onnx-c-api.d
    那正是本程把 (a) 支放在 (b) 支**之前**的理由（第 2 格注释），不是量出来的行为。
 
 ---
+
+## 第 2 格　AC#2：落地乙——`exited()` 从此问 OS；机制本程选，举证也在本程
+
+### 2.1 选了什么机制，为什么不是那枚一行编辑
+
+`cmd/wisp/slo_windows.go` 里 `exited()` 现在经由 `exitStatus() → queryProcess()` 问内核：
+
+```go
+err := s.cmd.Process.WithHandle(func(h uintptr) {
+    if waited, _ := windows.WaitForSingleObject(windows.Handle(h), 0); waited != windows.WAIT_OBJECT_0 {
+        return // WAIT_TIMEOUT: alive. WAIT_FAILED: not judged here.
+    }
+    if cerr := windows.GetExitCodeProcess(windows.Handle(h), &osCode); cerr != nil {
+        return
+    }
+    decided = true
+})
+```
+
+三件本程现量到的事决定了这个形状，不是抄来的：
+
+1. **句柄从哪来**：`os.Process.WithHandle` 递给回调的是 `exec.Cmd.Start` 那枚 **CreateProcess 原生句柄**
+   （`D:/work/base/go/src/os/exec_posix.go:80` 读的是 `p.handle`；Go 自己的 `(*Process).wait()` 在
+   `exec_windows.go:18` 就是拿它做 `WaitForSingleObject(INFINITE)` ＋ `GetExitCodeProcess`）。
+   ⇒ 本程没开新句柄、没引依赖、没造 reaper，等的是**内核早就算好的那个位**。
+2. **不能用 `GetExitCodeProcess` 单独判死活**（派单警告的那一枚"就用 GetExitCodeProcess"）：
+   它在进程还活着时答 `STILL_ACTIVE = 259`，而 259 同时是**合法退出码** ⇒ 一个以 259 退出的 subject 会被读成"还活着"。
+   本仓 subject 今天的退出码是 0/1/2（`cmdSLO` 的三个 return），**这一发本程没量到发生过**（记 §9 第 5 条），
+   但"等态先、码后"把两个问题拆开是**接口性质**上的便宜：多一枚 syscall、少一类歧义，且码为 259 时能如实报 259。
+3. **两扇门不等价，量出来的**：`slo_exit_os_156_windows_test.go` 初稿用
+   `OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION)` 的句柄做 `WaitForSingleObject`，四枚用例各撞
+   `WAIT_FAILED / Access is denied`（limited 权限不带 `SYNCHRONIZE`）⇒ **从 pid 新开的句柄与 exec 那枚不是同一只东西**；
+   而探针那侧（第 1 格）用"码门"看到 `terminated` 时，"等态门"还要晚约 6ms 才同意
+   （`probe-post/probe-156.log`：`witness=…44/50ms` 对 `agree=os_dead_to_code_dead_ms=6 asks=6`）。
+   ⇒ 修法取的是**保守那一门**："内核还没收完尾" 就说没死，最多多烧一轮 20ms 轮询，不会把活孩子认成死的。
+
+### 2.2 三件硬约束逐条现量（原文 `.scratch/wisp/probes/156/anchor/constraints.txt`）
+
+| 约束 | 尺 | 读数 |
+|---|---|---|
+| 不许动预算常量（`subjectReportBudget`／`subjectGrace`） | `git diff -- cmd/wisp/slo_windows.go \| grep -cE '^[-+].*(subjectReportBudget\|subjectGrace\|subjectReadyBudget)'` | **0**（`thresholds.go`、golden、`scripts/slo-check.ps1` 见第 6 格逐枚 commit 名册） |
+| 不许新增 go.mod 依赖 | `git status --porcelain go.mod go.sum` | **空**（零字节；用的是 `go.mod:11` 已有的 `golang.org/x/sys v0.48.0`，先例 `internal/proc/jobscope_windows.go` 等） |
+| 不许墙钟超时（ban #5）／不许裸 `go func(`（ban #1）／不许 reaper（owner 没批丙） | `git diff -- cmd/wisp/slo_windows.go \| grep -nE '^\+.*(go func\|time\.Now\|time\.Since\|time\.Until\|watchdog\|reaper)'` | **零命中（rc=1）**；`queryProcess` 一个 `time.` 都不出现，循环的预算仍是 `observe.NewTimeout` 那枚单调尺；**没有新增 goroutine** |
+| `stop()` 的收尾语义（`Kill`→`Wait`→`RemoveAll`）不许动 | `git diff \| grep '^[-+]' \| grep -iE 'stop\|Kill\|RemoveAll\|Wait\(\)'` 只命中本程新写的**注释行**；`grep -n 'cmd.Wait()'` 全文件仍 **1 枚**（`:936`，原 `:855`，位移＝上方插入行所致） | **代码一字未改** |
+
+⚠ 一条**必需要说的后果**（不是编辑、是口径变了带出来的）：`stop()` 里 `!s.exited()` 那枚守卫现在会
+**跳过对已死未收尸 subject 的 `Kill()`**（以前一定打一发 `Kill` 到已终止的进程上，返回一个被丢弃的错误）。
+`Kill→Wait→RemoveAll` 的顺序与幂等性都没变，本程没为此改 `stop()` 一字；
+但这一条**没有用例钉**（`sloSubject.stop()` 今天零枚测试，本程 grep 过：`cmd/wisp/*_test.go` 里的 `stop()` 全是
+`resident_sink_nail_127` 那枚 `leg.stop()`，不属同一类型）⇒ 记 §9 第 2 条，不假称已钉。
+
+### 2.3 举证"这一发在改前不响、改后会响"（承重按操作定义答在第 4 格）
+
+同一枚探针、同一棵树、同一个 cell，只换 `slo_windows.go` 那一版字节：
+
+| cell（生产形） | 改前（`probe-pre/`） | 改后（`probe-post/`） |
+|---|---|---|
+| `prefix-unreaped` | 记录 `exited=false`；再问 145 次全 false；循环 **186 次真读／2006ms**；印 **BUDGET** 句 | 记录 `exited` 在等态门亮后 6ms 内为 true（`agree=os_dead_to_code_dead_ms=6 asks=6`）；循环 **1 次读／elapsed=0ms**；印 **DEAD-CHILD** 句 `exited (code 7) without writing its report (…)` |
+| `nofile-unreaped` | 同上（191 次真读／2009ms，BUDGET） | **1 次读**、DEAD-CHILD，`record_after_loop=exited=true exit_code=7 ProcessState_nil=true` |
+| `live-child`（阴性对照） | 188 次真读／2000ms，BUDGET（正确） | **192 次真读／2007ms，BUDGET（一字未变）** ⇒ 修法没有把活孩子认成死的 |
+| `prefix-REAPED-case13shape` | 1 次读／DEAD-CHILD | 1 次读／DEAD-CHILD（(a) 支原样保留，票 149 的 case 13 不动） |
+
+第二向证据（**用发货的用例**而不是探针）在第 4 格：`m1-os-arm-removed` 这一发把 (b) 支摘掉、其余一字不改，
+四枚新用例全红、case 17 量到 **1469 次真读／30.07s**（同 cell 前一发 1468 次）并印回 BUDGET 句——
+**同一发在改后的字节上是 1 次读、DEAD-CHILD 句**。
+
+**放水两问自答**：① 断言方向：本程没有为了让任何一格通过而放宽任何断言；第 3 格四枚用例是**新增**的、只往严加；
+② helper：`queryProcess`/`exitStatus` 是本程新建的两枚方法，`exited()`/`exitCode()` 是**原有**那两枚的口径改写（签名不变、三枚调用者一字未动）；
+测试侧 `scriptedReader`／`scriptMissing`／`scriptBytes`／`slo144Report` 全是 `slo_report_144_windows_test.go` **原有**的 helper，本程一枚都没改。
+
+**第 2 格判定**：**成立**——乙落地，机制为本程所选并给出 §2.1 三条现量理由；三件硬约束各有零命中读数；
+"改前不响／改后会响"两向都有本程自己的读数（§2.3 两枚来源：探针对照 ＋ `m1` 变异）。
+
+**本程没测什么（本格）**：
+1. **没量 `wisp slo` 真命令端到端**（真 Job Object 里打死真 subject 后操作员看到的那一句原文）——见 §9 第 1 条，本票真正的欠账。
+2. **没量 subject 以 259 退出**那一形（§2.1 第 2 条的歧义是**接口性质**的论证，不是读数）。
+3. **没量 `stop()` 的 Kill 跳过**（§2.2 末段），也没量新增的每轮询 1–3 枚内核调用对观察者自身 CPU 的影响
+   （门禁射程里没有 `wisp slo`，票面已登记；本程没跑 SLO 门）。
+
+---
+
+## 第 3 格　AC#3：会响的检——四枚新用例钉"OS 说死 ⇒ 我们立刻算死"，既有断言一枚没弄松
+
+新建 `cmd/wisp/slo_exit_os_156_windows_test.go`（cases 15-19，5 枚）。每枚各自钉一件，**互不替代**（替代关系是量出来的，见第 4 格的单枚摘掉表）：
+
+| 用例 | 钉住什么 | 为什么只有它能钉 |
+|---|---|---|
+| 15 `ExitedAsksTheOSForAChildNobodyReaped` | **机制**：等态门一亮，`exited()` 第一次问就 true、`exitCode()` 就是 7；且**同一刻 `ProcessState == nil`**，问完再问一次还是 nil | "OS 说死⇒我们算死"这一形若被"顺手在 `exited()` 里 `Wait()` 一下"实现，前两条断言照样满足——是 `ProcessState==nil` 那一枚把它挡在门外（AC#3 要的正是钉这一形，不是钉这个答案） |
+| 16 `LiveSubjectStaysAliveUntilTheOSDisagrees` | **反方向**与两支的分界：16a 活着 ⇒ false／`exitCodeUnknown`；16b 我们亲手 `Kill` 且未收尸 ⇒ true（走 (b)）；16c `Wait()` 之后 ⇒ true 走 (a) | 只往"死"的方向加用例，`exited() := true` 就能满足全部（第 4 格 `m3` 量到只有 16 一枚红 ⇒ 这一枚是唯一的持有者） |
+| 17 `ReportLoopNamesTheDeadSubjectItWasWaitingOn` | **那一发本身**在生产接缝的闭环：`:822`（派单记作 `:820`，本票前提③那枚）那枚调用者对**已死未收尸**的孩子印 `exited (code 7) without writing its report`，且**读 1 次**、不许出现 BUDGET 句 | 票 149 的 case 13 已经钉过同一句的**文案**，但它靠 `dead.Run()` 先把尸收了——生产里不存在那一手（152 验收件第 1、2 格）。17 是唯一一枚"真 corpse ＋真循环"的接线 |
+| 18 `WaitReadyNamesTheDeadSubjectToo` | 第二枚出口 `:522`：subject 死在 ready 标记之前 ⇒ `exited early (code 7) before reporting ready`，不许印 `never reported ready within 1m0s` | 票 152 第 2 格量过这句"今天根本产不出"，此前全仓零枚持有者；这一枚是它的第一枚 |
+| 19 `FixtureChildrenDoWhatTheirNamesSay` | **夹具自己**：`exit` 角色真的以 7 死、死时 `ProcessState` 为 nil；`sleep` 角色真的活着且杀得掉 | 本程先踩后钉：第一版把角色分发塞在 case 15 里，于是"摘掉 case 15"这发变异把别的 cell 的**子进程**一起摘坏了，`case15-off` 在未改的码上报出 17/18 两枚假红（`mut-156-first-run-summaries.txt`） |
+
+**"不能把票 152 已钉住的既有断言弄松"——本程的尺与读数**：
+
+```
+$ # 逐包门禁，改前／改后各一次（原文 probes/156/gate-{pre,post}/cmdwisp.log）
+改前 cmd/wisp   RUN=139  PASS=79   FAIL=0  SKIP=0   rc=0  ok 136.561s
+改后 cmd/wisp   RUN=144  PASS=84   FAIL=0  SKIP=0   rc=0  ok  (见第 7 格现量)
+$ # 名册两向 comm（roster-{pre,post}-cmdwisp.txt，sort -u 后 comm -3）
+only-in-post: 5 枚，全部 TestSLO156*（本票新增，逐枚点名见第 7 格）
+only-in-pre : 零枚
+```
+
+- **既有断言的方向与枚数一枚没动**：`TestSLO149ExitedGiveUpSentenceCarriesTheLastReading`（case 13）
+  在改后仍 `--- PASS (0.04s)`，且它在 `m1`／`m4` 两发变异下的红／不红关系是**本程量出来的目标行为**（第 4 格）；
+- **没有 `t.Skip`**：`SKIP=0` 在改前改后都是 0；**没有改 golden／阈值**（第 6 格逐枚 commit 名册）；
+- **helper 全是原有的那几枚**：17 复用 `scriptedReader`＋`scriptBytes`，fixture 复用 `slo144Report`；本程新写的
+  `slo156Spawn`/`slo156Witness`/`slo156OsDead`/`slo156OsAlive` 只陈述夹具事实，**不含任何一条对生产代码的判定**。
+
+**放水两问自答**：① 断言方向动没动——没动，五枚全是新增，两向 `comm` 的 only-in-pre 为空集就是这一句的读数；
+② helper 是不是原有的那枚——判定用的 helper 全是原有那三枚；新增四枚是**取版器**，它们唯一的 `t.Fatalf` 出现在"夹具没照名字死／活"上（守卫，不评产品）。
+
+**第 3 格判定**：**成立**——四枚会响的检（15/17/18/19）加一枚双向界（16），每枚在第 4 格都有它**唯一持有**的那一发；
+既有断言一枚没松（case 13 改后仍绿、名册 only-in-pre 空）。
+
+**本程没测什么（本格）**：19 枚 code-path 之外的 `stop()`（§2.2 末段）；
+`exitStatus()` 在 `s == nil`／`s.cmd == nil` 那两条 return 上的行为（脚本化 subject 早于本票就在测 `cmd==nil` 那一支，`s==nil` 那一支本程没造用例）；
+`WAIT_FAILED` 那一条兜底支**没有任何用例走到**（本程构造不出让 exec 句柄 wait 失败的条件，硬造＝放水，见 §9 第 3 条）。
+
+
+---

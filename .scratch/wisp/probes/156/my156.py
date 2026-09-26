@@ -100,6 +100,10 @@ NEW_CASES = {
     "case16": "TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees",
     "case17": "TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn",
     "case18": "TestSLO156WaitReadyNamesTheDeadSubjectToo",
+    # case 19 (TestSLO156FixtureChildrenDoWhatTheirNamesSay) is deliberately NOT
+    # here: it is the entry point every role child re-enters, so renaming it would
+    # break the other cells' fixtures and report reds that are not about the code.
+    # That mistake is what case 19 exists to prevent (measured, in its own comment).
 }
 NEW_TEST_REL = "cmd/wisp/slo_exit_os_156_windows_test.go"
 OLD_TEST_REL = "cmd/wisp/slo_report_144_windows_test.go"

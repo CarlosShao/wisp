@@ -1,0 +1,28 @@
+$ go test -count=1 -overlay 'D:\tmp\wisp156\wisp156-ruler\m2-os-arm-never-dead\overlay.json' -v -run 'TestSLO149Exited|TestSLO156' ./cmd/wisp/
+$ tree=D:/work/workspace/projects plans/Wisp  overlaid=['D:/work/workspace/projects plans/Wisp/cmd/wisp/slo_windows.go']
+time=2026-09-26T13:16:26.644+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSLO156FixtureChildrenDoWhatTheirNamesSay
+--- PASS: TestSLO156FixtureChildrenDoWhatTheirNamesSay (0.18s)
+=== RUN   TestSLO156ExitedAsksTheOSForAChildNobodyReaped
+    slo_exit_os_156_windows_test.go:159: exited() is false for a subject the OS reports terminated with code 7 (process object signaled, exit code read back) while ProcessState is still nil: that is the shape Q-57 ruled on, and it is why the loop prints the budget sentence over a corpse
+    slo_exit_os_156_windows_test.go:162: exitCode() is -1, want 7 (the code the OS reports): the give-up sentence prints this number
+    slo_exit_os_156_windows_test.go:170: the second ask of exited() answered false for a child the OS reports dead
+--- FAIL: TestSLO156ExitedAsksTheOSForAChildNobodyReaped (0.04s)
+=== RUN   TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees
+    slo_exit_os_156_windows_test.go:202: exited() is false after the OS reported our own Kill with code 1 (process object signaled, exit code read back), ProcessState nil=true
+    slo_exit_os_156_windows_test.go:206: Wait on a killed child reports the kill as an error (exit status 1); that is the fixture, not a failure
+--- FAIL: TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees (0.01s)
+=== RUN   TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn
+    slo_exit_os_156_windows_test.go:247: give-up "wisp slo: subject 35160 never wrote a complete report within 30s (last read: 8 bytes read, document still open at offset 8: the tail had not arrived)" does not name the dead child and its code
+    slo_exit_os_156_windows_test.go:250: an unreaped dead subject was reported as a spent budget, not as a corpse - the exact misattribution Q-57 was raised for: "wisp slo: subject 35160 never wrote a complete report within 30s (last read: 8 bytes read, document still open at offset 8: the tail had not arrived)"
+    slo_exit_os_156_windows_test.go:256: dead subject was read 1468 times, want exactly 1 (the loop asks the OS and gives up on the spot)
+--- FAIL: TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn (30.16s)
+=== RUN   TestSLO156WaitReadyNamesTheDeadSubjectToo
+    slo_exit_os_156_windows_test.go:282: waitReady give-up "wisp slo: subject 62956 never reported ready within 1m0s" does not name the dead subject and its code
+    slo_exit_os_156_windows_test.go:285: a dead subject was reported as a spent readiness budget: "wisp slo: subject 62956 never reported ready within 1m0s"
+--- FAIL: TestSLO156WaitReadyNamesTheDeadSubjectToo (60.06s)
+=== RUN   TestSLO149ExitedGiveUpSentenceCarriesTheLastReading
+--- PASS: TestSLO149ExitedGiveUpSentenceCarriesTheLastReading (0.04s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	90.544s
+FAIL
