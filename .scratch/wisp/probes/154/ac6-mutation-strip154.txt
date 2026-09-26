@@ -1,0 +1,111 @@
+# 票 154 续程 r2 —— AC#6 第一问：摘掉本票写的那一味（bridge.go 的 25 行注释），有没有一发变异从此打不红
+# 锚点 be67397a5e4b3e23000ae6206a2b619a4ea83f63　生成时刻 2026-09-26T12:53:55+08:00
+
+## 1. 变异体怎么造的（改得过、行为不变的对照；本仓尺：摘一味导致编不过＝不算有牙）
+$ git show 76c89b2^:internal/tools/bridge.go > /d/tmp/wisp154-r2/mut/bridge-pre154.go
+$ git show HEAD:internal/tools/bridge.go        > /d/tmp/wisp154-r2/mut/bridge-head.go
+$ diff bridge-head.go bridge-pre154.go | grep -E "^[<>]" | grep -vE "^[<>][[:space:]]*//"   → 无输出（rc=1）
+$ diff bridge-head.go bridge-pre154.go | grep -cE "^[<>]"                                   → 25
+  ⇒ 摘掉的正是本票那 25 行，且两版之间**除注释以外零差别**；被摘的那一味在本票之后没被人再动过：
+  $ git log --oneline 76c89b2..be67397a5e4b3e23000ae6206a2b619a4ea83f63 -- internal/tools/bridge.go → 空（rc=0，零枚 commit 碰它）
+  overlay 件＝/d/tmp/wisp154-r2/mut/overlay-strip154.json：
+{"Replace": {"D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go": "D:/tmp/wisp154-r2/mut/bridge-pre154.go"}}
+
+## 2. 变异体上重跑两包门禁（-overlay 与 -cover* 不同用：本程全程没开 -cover）
+$ export PATH="$PWD/third_party/sherpa-onnx:$PATH"      # 不带它就是 0xc0000135＋0 条 === RUN＝没跑到
+$ go test -count=1 -v -overlay=D:/tmp/wisp154-r2/mut/overlay-strip154.json ./internal/tools/
+  RUN=115  顶格=79  全量裁决=115  FAIL=0  SKIP=0  panic=0
+  末行：ok  	github.com/CarlosShao/wisp/internal/tools	13.892s
+$ go test -count=1 -v -overlay=D:/tmp/wisp154-r2/mut/overlay-strip154.json ./cmd/wisp/
+  RUN=139  顶格=79  全量裁决=139  FAIL=0  SKIP=0  panic=0　（末两枚＝两向 comm 皆空 ⇒ 名册逐字相同）
+  末行：rc=0
+
+## 3. 名册两向 comm（尺同 154 实现程 r1 第 1 节：'^[[:space:]]*--- (PASS|FAIL|SKIP)' 取第一列、去掉含 / 的子用例、sort -u）
+$ comm -23 names-mut-cli.txt names-post-cli.txt → [空]
+$ comm -13 names-mut-cli.txt names-post-cli.txt → [空]
+   变异体名册枚数 = 79；r1 改后名册枚数 = 79
+$ comm -23 names-mut-tools.txt names-post-tools.txt → [空]
+$ comm -13 names-mut-tools.txt names-post-tools.txt → [空]
+   变异体名册枚数 = 79；r1 改后名册枚数 = 79
+
+## 4. 仪器正控（证明上面那两个 0 是读数，不是死尺）
+  同一套 overlay 通道、同一枚 PATH，只把 cmd/wisp/run.go:563 那枚 rt.bridge.CloseTask(taskID) 摘掉：
+  （摘的是票 151 那一味，不是本票的——本票没有"摘了会红"的那一味，这一发买的是"仪器会不会响"。）
+$ git show HEAD:cmd/wisp/run.go | grep -v "rt\.bridge\.CloseTask(taskID)" > /d/tmp/wisp154-r2/mut/run-noclose.go   → 只差 1 行（563d562）
+$ go test -count=1 -v -overlay=D:/tmp/wisp154-r2/mut/overlay-noop-close.json -run "TestCompositionRootClosesTheLoopTasksTaintScope|TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit" ./cmd/wisp/
+  RUN=2  FAIL=2  PASS=0  rc=1（未记进文件，命令当轮记的）
+  --- FAIL: TestCompositionRootClosesTheLoopTasksTaintScope (1.40s)
+  --- FAIL: TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit (1.52s)
+  FAIL
+  FAIL	github.com/CarlosShao/wisp/cmd/wisp	2.984s
+  FAIL
+      task_scope_close_151_test.go:62: 任务结束时没有关闭它自己的 C25 污点 scope：stderr 里找不到以 "[audit] tools: C25 scope close
+      task_scope_close_151_test.go:109: 上一轮结束后它的污点 scope 还挂在表上，于是这一枚新任务的干净调用被 C25 的 unboun
+      task_scope_close_151_test.go:113: 第二轮没有读到文件内容，text="实时语音（Path C）不具备工具权限；该任务未经文本�
+  ⇒ 一发"行为变了"的 mutation 在两枚用例上都红、红句点名行号 ⇒ 第 2 节那两个 0 不是"根本没跑到"（RUN 115/139 也钉着这一点）。
+# 上面第 4 节那一发的**第二跑**（当轮记 rc）：
+# 命令同第 4 节
+rc=0
+  --- FAIL: TestCompositionRootClosesTheLoopTasksTaintScope (3.70s)
+  --- FAIL: TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit (2.23s)
+  FAIL
+  FAIL	github.com/CarlosShao/wisp/cmd/wisp	6.065s
+  FAIL
+# 两跑逐字比（去掉计时行）：
+1c1
+< time=2026-09-26T12:49:48.048+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+---
+> time=2026-09-26T12:54:19.420+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+3,12c3,12
+< time=2026-09-26T12:49:49.337+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+< 2026/09/26 12:49:49 mockllm: serving on http://127.0.0.1:58253 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+< time=2026-09-26T12:49:49.368+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestCompositionRootClosesTheLoopTasksTaintScope113567876\002\logs min_level=info early_records=2 early_dropped=0
+< time=2026-09-26T12:49:49.393+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestCompositionRootClosesTheLoopTasksTaintScope113567876\002\backup\wisp.db.bak-0-1 from=0 to=1
+< time=2026-09-26T12:49:49.400+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-26T04:49:49Z duration_ms=6
+< time=2026-09-26T12:49:49.409+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestCompositionRootClosesTheLoopTasksTaintScope113567876\002\backup\wisp.db.bak-1-2 from=1 to=2
+< time=2026-09-26T12:49:49.415+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-26T04:49:49Z duration_ms=5
+< time=2026-09-26T12:49:49.418+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+< time=2026-09-26T12:49:49.422+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+<     task_scope_close_151_test.go:62: 任务结束时没有关闭它自己的 C25 污点 scope：stderr 里找不到以 "[audit] tools: C25 scope closed task=8732ba6f-7be8-417e-b7c4-9731d087effb " 开头的审计行
+---
+> time=2026-09-26T12:54:22.928+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+> 2026/09/26 12:54:22 mockllm: serving on http://127.0.0.1:58581 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+> time=2026-09-26T12:54:22.976+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestCompositionRootClosesTheLoopTasksTaintScope679016913\002\logs min_level=info early_records=2 early_dropped=0
+> time=2026-09-26T12:54:23.025+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestCompositionRootClosesTheLoopTasksTaintScope679016913\002\backup\wisp.db.bak-0-1 from=0 to=1
+> time=2026-09-26T12:54:23.035+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-26T04:54:23Z duration_ms=10
+> time=2026-09-26T12:54:23.052+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestCompositionRootClosesTheLoopTasksTaintScope679016913\002\backup\wisp.db.bak-1-2 from=1 to=2
+> time=2026-09-26T12:54:23.059+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-26T04:54:23Z duration_ms=7
+> time=2026-09-26T12:54:23.068+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+> time=2026-09-26T12:54:23.071+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+>     task_scope_close_151_test.go:62: 任务结束时没有关闭它自己的 C25 污点 scope：stderr 里找不到以 "[audit] tools: C25 scope closed task=f120e68c-e4cd-460b-a4a8-ead87305cfaa " 开头的审计行
+14c14
+<         [audit] perm: MODE-READ origin=startup mode=ask_every_step source="C:\\Users\\swq\\AppData\\Local\\Temp\\TestCompositionRootClosesTheLoopTasksTaintScope113567876\\002\\config.toml"
+---
+>         [audit] perm: MODE-READ origin=startup mode=ask_every_step source="C:\\Users\\swq\\AppData\\Local\\Temp\\TestCompositionRootClosesTheLoopTasksTaintScope679016913\\002\\config.toml"
+16,24c16,24
+< time=2026-09-26T12:49:50.855+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+< 2026/09/26 12:49:50 mockllm: serving on http://127.0.0.1:58258 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+< time=2026-09-26T12:49:50.883+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit1820223502\002\logs min_level=info early_records=0 early_dropped=0
+< time=2026-09-26T12:49:50.907+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit1820223502\002\backup\wisp.db.bak-0-1 from=0 to=1
+< time=2026-09-26T12:49:50.913+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-26T04:49:50Z duration_ms=5
+< time=2026-09-26T12:49:50.921+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit1820223502\002\backup\wisp.db.bak-1-2 from=1 to=2
+< time=2026-09-26T12:49:50.926+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-26T04:49:50Z duration_ms=5
+< time=2026-09-26T12:49:50.931+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+< time=2026-09-26T12:49:50.932+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+---
+> time=2026-09-26T12:54:25.210+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+> 2026/09/26 12:54:25 mockllm: serving on http://127.0.0.1:61953 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+> time=2026-09-26T12:54:25.248+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit4290858809\002\logs min_level=info early_records=0 early_dropped=0
+> time=2026-09-26T12:54:25.282+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit4290858809\002\backup\wisp.db.bak-0-1 from=0 to=1
+> time=2026-09-26T12:54:25.289+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-26T04:54:25Z duration_ms=7
+> time=2026-09-26T12:54:25.297+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit4290858809\002\backup\wisp.db.bak-1-2 from=1 to=2
+> time=2026-09-26T12:54:25.303+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-26T04:54:25Z duration_ms=5
+> time=2026-09-26T12:54:25.311+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+> time=2026-09-26T12:54:25.313+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+28c28
+< FAIL	github.com/CarlosShao/wisp/cmd/wisp	2.984s
+---
+> FAIL	github.com/CarlosShao/wisp/cmd/wisp	6.065s
+# 更正上面那发 diff 的读法（两跑唯一差别＝时间戳类行；判红绿只认 ^--- FAIL:）：
+# 第二跑：RUN=2  FAIL=2  PASS=0  rc=1
+# ⇒ 正控两跑一致：这一发 mutation 每次都被同一对用例抓住。

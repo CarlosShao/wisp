@@ -1,0 +1,42 @@
+# 票 154 续程 r2 —— 门（AC#1 §2.3 那五枚子句）有没有任何仪器/测试读得到
+# 锚点 be603fdb1d92aa766c230194dfe69910549203fb　时刻 2026-09-26T12:54:53+08:00
+
+## 第一发（记错尺面的一发，原样留着）：
+$ git grep -nE "gate-clauses|probes/154|154-host-id" -- *.go *.yml *.ps1 *.sh :!_scratch
+  fatal: Unimplemented pathspec magic '_' in ':!_scratch'
+  rc=0（**128＝git 报错，不是零命中**——只数命中行数就会把它写成全仓 0 命中，本仓那条坑今天又自己踩了一次）
+
+## 第二发（尺面写清）：同一把正则、pathspec 只放 *.go *.yml *.ps1 *.sh、不排除任何目录、跑两遍记 rc
+  --- 第 1 遍 ---
+.scratch/wisp/probes/154/census-pairs.sh:2:# 用法：bash .scratch/wisp/probes/154/census-pairs.sh [锚点]  > 读数文件
+.scratch/wisp/probes/154/gate-clauses.sh:2:# 用法：bash .scratch/wisp/probes/154/gate-clauses.sh [锚点]   > 读数文件
+.scratch/wisp/probes/154/zero-byte-per-commit.sh:2:# 用法：bash .scratch/wisp/probes/154/zero-byte-per-commit.sh <sha> [<sha> …]
+internal/tools/bridge.go:665:// happens is docs/evidence/s1/154-host-id-never-closed-r1.md §2.3 (clauses
+  rc=0
+  --- 第 2 遍 ---
+.scratch/wisp/probes/154/census-pairs.sh:2:# 用法：bash .scratch/wisp/probes/154/census-pairs.sh [锚点]  > 读数文件
+.scratch/wisp/probes/154/gate-clauses.sh:2:# 用法：bash .scratch/wisp/probes/154/gate-clauses.sh [锚点]   > 读数文件
+.scratch/wisp/probes/154/zero-byte-per-commit.sh:2:# 用法：bash .scratch/wisp/probes/154/zero-byte-per-commit.sh <sha> [<sha> …]
+internal/tools/bridge.go:665:// happens is docs/evidence/s1/154-host-id-never-closed-r1.md §2.3 (clauses
+  rc=0
+
+## 判读：命中的四行里，三行是 .scratch/wisp/probes/154/*.sh 自己的用法注释（不参与编译、CI 不跑），一行是 internal/tools/bridge.go:665 那条注释的指针。
+## 也就是说：**没有任何 *_test.go、没有 .github/workflows/*.yml、没有 scripts/* 读这五枚子句** ⇒ 摘掉门，零枚用例转红、零枚外部读数变化。
+
+## 附带一问（有没有仪器校验注释里的 docs/ 指针存在）：
+$ git grep -n "docs/evidence" -- scripts tools .github
+  .github/workflows/ci.yml:638:        # frontend/src/styles/tokens.generated.css from docs/evidence/s1 and
+  scripts/dev/ball-cycle.ps1:5:# docs/evidence/s1/ball-states/<NN>-<State>.png, then verifies the process
+  scripts/portable-tests.sh:320:    "TestDefaultDeadlineWallClockMeasurement|./internal/agent/approval/|any|opt-in|300s wall-clock measureme
+  scripts/slo-freshness.sh:92:# docs/evidence/s1/134-ac6-contended-no-conclusion.md section 3.4.
+  scripts/spike/common/mem.go:3:// deliverable (see docs/evidence/s0/02-spike-report.md).
+  scripts/spike/common/winshell.go:6:// in docs/evidence/s0/02-spike-report.md.
+  scripts/spike/run.ps1:3:# writing JSON evidence into docs/evidence/s0/data/.
+  tools/d22scan/main.go:519://     docs/evidence/s1/67-emoji-scope-internal-cmd.md rather than left unsaid.
+  tools/d22scan/main.go:909://     docs/evidence/s1/67-emoji-scope-internal-cmd.md (S7).
+  ⇒ 九行（八枚文件）命中逐枚点开都是散文引用（注释／登记表字符串），**没有一处是校验该路径存在的检** ⇒ 摘掉门会让 bridge.go:665 那行指针悬空，而全仓没一发会因此响。
+# （枚数自核：本节上面列出的正是那九行；第一次收口时把它写成"八处"，是按文件数忘了 tools/d22scan/main.go 占两行。已就地更正——这枚台件此刻还没入库，不算改已提交的账。）
+
+# 自核更正（本文件上面第一发那行 rc 记错了）：那条 rc 是从管道尾（sed）取的＝0，
+# 不带管道现量： $ git grep -nE gate-clauses -- '":!_scratch"' >/dev/null 2>&1; echo $? ⇒ 128
+# 当轮实测 rc=128（fatal 的那发应为 128）
