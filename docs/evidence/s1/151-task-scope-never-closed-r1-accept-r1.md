@@ -303,3 +303,31 @@ $ while read -r f; do case "$f" in internal/risk/*|internal/panel/*|internal/age
 现读＝**5 枚**：本票那 4 枚（3 枚码＋本票证据件）**之外还多算进一枚别人的** `docs/evidence/s1/153-trace-lies-unguarded-r1.md`
 （票 153 的证据件落在同一区间），同时**少算 23 枚 probes**（`45c920e` 在 `5d46f24^` 之前，区间 diff 当然看不见它）。
 ⇒ 判"谁改了哪些文件"只能按**逐枚 `git show --name-only` 取并集**，不能按区间 diff。实现件 §5 用的正是前一把尺，没抄错。
+
+## 第 6 节 三句"本程没测什么"残余登记准不准（派单攻击点⑦）
+
+判据只有一个是本程认的：**那三句作为"本票未修残余"的登记，是不是盘上量得出的事实。**
+（派单与编排者都写死了：不许把它没做的三件事算成本票的功劳，也不许因还有残余就判退回——那是票 154 的账。）
+
+| 它那一句（§8 第 1/2/3 条） | 本程现量 | 判 |
+|---|---|---|
+| **① 宿主自带 task id 那一形仍没人关** | `CloseTask` 全树唯一调用点＝`cmd/wisp/run.go:563`，它在 `admitTask` 的 revoke 里；`admitTask` 只被 `agent.Options.AdmitTask`（`run.go:586`）用，而 `Options.AdmitTask` 只在 `internal/agent/loop.go:361-362` 被调 ⇒ **不经环路的宿主 id 没有任何一处会关它**。它举的现成形状 `cmd/wisp/run_test.go:245 TestHostDispatchThroughTheAssembledBridge` 本程按 `4e16976` 现读到**同一行、同名** | **登记准**（本程未复量其后果，只复量了"没人关"这一半） |
+| **② 并发任务零读数（探针 64 轮是串行）** | 它那两枚探针（本程 §2.2 复跑件）每一轮都是"发一发 → 收一发"，没有并发腿；D38d 那枚并发闸在 `internal/agent/loop.go:604`（`sem := make(chan struct{}, guard.Concurrency())`），两枚同时在跑的任务在桥上没有引用计数（`b.scopes` 是 map，`OpenTask` 幂等、`CloseTask` 直接 delete） ⇒ "关了同时在跑的那枚"这一形今天确实**既没做也没量** | **登记准**（它这句是"没测"，不是"测了说没事"） |
+| **③ 内存只量到斜率、没量上界** | 本程复到的斜率＝**37,820 B/轮**（它记 37,652，同一枚探针、差 0.45％）；`internal/risk/provenance.go:172/174` 现读 `defaultMaxScopeSources = 64`、`defaultMaxSourceRunes = 262144` ⇒ 预算只管**单枚 scope 内**，**scope 枚数一枚都不设上限**这句是盘面事实；同一条任务生命周期的另一张表**有**界（`internal/agent/approval/gate.go:167/192` `maxAdmittedTasks = 256`） ⇒ "一张有界一张无界"这个形状差它也钉对了 | **登记准**（上界与整日常数它都没报，本程也没有；两侧都不许凭感觉报数这条，它守住了） |
+
+⚠ **本程要补的一句它没写的**（不是它的错、但它 §8 那一节既然自称"按谁会先被骗排序"就该有）：
+它的 §8 第 5 条把"端到端那一轮没有模型发起的 `fs.read`"整条归给 mockllm 的 `tool_choice` 门；
+本程第 2.3 节现量到**还有第二道门是码给的**（`fs.read` 声明 L0 ⇒ `loop.go:776-789` 在
+`PassThroughUnclassifiedRisk == false` 时直接拒，而 `run.go:588-595` 从不设这枚键；对照读数＝同腿换 L1 的 `fs.write` 真落盘）。
+⇒ 这一条不是"残余登记不准"，是**残余登记少了一条**；它和 ① 同源（都落在"谁来关/关不到谁"那面），
+本程把它交给编排者定去向（补上票 154 的面、或另立一枚），**本程不动那两枚票面**：现读
+
+```
+$ git status --porcelain -- .scratch/wisp/issues/            ->  空（票 151、票 154 两枚面本程一字未动、未加 -done）
+```
+
+⚠ 另一枚**只上报、不动手**的台账级观察（与本票判定无关）：`.scratch/wisp/issues/` 里现在**同时存在两枚票号 154**
+（`154-no-today-reachable-path-closes-taint-scopes-…` 与 `154-the-close-only-covers-the-loop-task-id-…`），
+两枚都是 `532fd25`（10:29，"票 154 按现量重写"那一枚 commit）**同一枚 commit 里新增**的。
+派单点名的是第二枚。第一枚若是被重写取代的旧面，它现在仍躺在工单池里＝**一枚可被重领的号**（`issues/README` 的防重领键是 `-done` 后缀，救不了同号双枚）。
+本程不判它谁对，只把这个形状钉在这里。
