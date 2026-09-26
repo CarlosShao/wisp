@@ -1,0 +1,123 @@
+# 续程 §12 对账尺与读数（第 2 版；初版 C 段把尺打在了探针件自身、且 cut -c 截断把一行 UTF-8 切坏，两处本程就地改正并留此一句）
+# 采于 2026-09-26 11:11:30 +0800 · HEAD=dc52917 · 被验版本=6de3d1c5
+# 尺对象：票面=.scratch/wisp/issues/153-the-compression-trace-has-two-unguarded-ways-to-lie-swapping-the-ran-guard-for-need-keeps-all-four-nails-green-and-the-trace-carries-no-taskid.md ；前一程件=docs/evidence/s1/153-trace-lies-unguarded-r1-accept-r1.md
+
+## A. 票面框枚数（尺：单文件、行首锚定 grep -c）
+未勾 ^- [ ] = 5
+已勾 ^- [x] = 0
+票面行数 = 67
+票面 AC 标题行 = 5
+
+## B. 前一程件里 AC# 的逐枚命中（尺：grep -c -o 于该文件）
+AC#1=3 AC#2=2 AC#3=5 AC#4=2 AC#5=1
+出处（grep -n AC#，全行不截断）：
+3:被验版本＝**`6de3d1c5`**（票 153 实现件最后一枚）。实现链条＝码 `ff550f3`（AC#1 新用例）＋`b23c7f7`（痕带 taskID）→ 证据件逐格 `ac7fb00`／`f58c513`／`bec1727`／`9a8766e`／`6de3d1c`。
+21:972ceba evidence(145 §4): AC#3 两角色一次定死 ...
+51:$ git show 9a8766e:… | grep -n '^## '       只到   691:## 5. AC#4 — 契约轴零字节            总行 830
+52:$ git show 6de3d1c:… | grep -n '^## '       346:## 5. AC#4 … / 420:## 6. AC#5 … / 488:## 7. 本程没测什么
+75:### 1.2 §§0–4（含 AC#1 红句与全部读数）在重写后**逐字节相同**
+99:| 8 | 表格拆分 | `\| f58c513 / bec1727 \| AC#2 / AC#3 表 \| 只有那枚证据件 \|` | 拆成两行，各自有名 | 同信息、可核粒度更细 |
+611:| 票面 AC#2 里那枚 `C39` | **是开票人的错号**，账按派单说的归编排者 | 全仓 `C39` 仅三处，第一处＝票面 `:27`（§4.3） |
+702:| `cmd/wisp/slo_report_144_windows_test.go` | 88／**1** | `10e3585c`（票 152 AC#3） | 地界外，具名移交票 152 验收程。本程只看了那唯一一枚删除线：`-// Case 13 - AC#3's ruling is ⓐ: …` ＝ **`//` 文档行**，不是断言、不是期望值 |
+713:| **H1** | `@@ -26,6 +26,12 @@` | 6 行，`sed -n '29,34p'` 现量**逐行都是 `//` 注释**（讲"票 153 AC#1 补的是前两枚钉子没覆盖的第三形"） | **中性**——无断言、无期望值；措辞是把射程写进文件头 |
+788:也不可能把 CI 的 `go vet ./...` 弄红。它们唯一的作用是**外部可见读数**（痕到 `slog.Default()` 那一发），而那一发本程**没复跑**、它属于 AC#3 句②，见 §12.3。
+
+## C. 判"哪枚 AC 没人裁"所用的那批尺（一律：单文件、子串匹配、grep -c 命中行数；CJK 无大小写可言；含全部章节）
+放水   = 4
+三问   = 1
+持有者 = 0
+组合根 = 0
+接收者 = 0
+承重   = 0
+外部可见 = 1
+ext-A    = 1
+ext-B    = 1
+ext-C    = 1
+未裁   = 0
+t.Skip   = 3
+名册   = 25
+档位   = 6
+攻击点 = 11
+三处需要具名的命中位置：
+19:7263456 evidence(145 §5-§7): 门禁改前改后四数＋两包名册差集为空、没核十条、报回七条
+93:| 2 | 同上 | 把 152／151／前端／本程全印成同一个名字 | 把 152／151／前端／**编排者**／本程全印成同一个名字 | **变强**（名册多一类） |
+95:| 4 | 名册枚数 | 本程到此共五枚 commit，逐枚名册**（本节这枚证据件是第六枚，不列自己）** | 本程到这一枚为止五枚 commit，逐枚名册 | **唯一一枚消失的措辞**，见 §1.4 |
+96:| 5 | 别家名册 | `5365cb2`、`cdf2471`/`ad9b29f`、`eb4755a`/`4cc85bb`、`45c920e`/`5d46f24`/`4e16976`、`720cae6` | 同上 **＋`8883b3f`（前端）＋`10e3585`/`6550dc4`（票 152）** | 结构变强（多三枚具名），**但 `8883b3f` 这枚号不存在** ⇒ 见 §1.5 |
+98:| 7 | 新增段 | （无） | 追加"共享 index 下本程每次 commit 前都现量了 `git diff --cached --name-only`，五枚里没混进别家路径（一枚 `git add` 之后 index 名册见 §9）" | **变强**（新增自证） |
+103:| 12 | 12000 名册 | "（139 验收 §3.4 那枚"本票贡献 0 枚"过期陷阱）" | 同句 **＋"本程先量再落笔"** | 这句是**向它自己偏**的一处（本程 §1.9 复算：anchor 9／delivered 9／单枚 1／1 全对，"先量"没有被冒用） |
+113:它的作用是把"名册只列五枚"这件事自我限定住；删掉之后，读者拿 §5 那句"本程到这一枚为止五枚 commit"去对
+123:### 1.5 ⚠ 追加一格（本程后面才量到，落在 §1.3 表第 5 行那一处）：**重写往名册里塞进一枚不存在的 commit 号**
+154:按本仓的规矩就是直接退回；这里它只出现在归因名册，判"待补"。**已并入 §11 待补项第 4 条。**
+211:不能拿它当红），四数之外还出 `panic` 数与名册；`-count=1`、**跑整包**（不只那几枚）。
+233:少摘一枚当场红（A1/A4/A6 就是另一半）；`panic` 全 0、两向名册差集见 §6.1，没有"一条红吞掉整包读数"的形状。
+265:## 4. 攻击点④ —— "未碰契约面"那三问本程独立重走（＋派单自己那句"8 枚字段名各 0 命中"不成立）
+445:## 6. 攻击点⑥ —— 门禁与名册独立复跑（一律逐包，从不 `go test ./...`；版本现读）
+447:### 6.1 四数之外比名册差集（派单点名的这条，本程照做）
+449:| 形 | 采于（仓外快照，`git archive`） | RUN(all) | PASS 顶／子 | FAIL | SKIP | panic | 名册枚数 |
+456:$ comm -13 改前名册 改后名册    # 新增，逐名
+460:$ comm -23 改前名册 改后名册    →（空）
+461:$ diff -q 改后-count1名册 改后-count2名册  →（空 ⇒ 两形名册全等，166＝2×83 算术自洽）
+466:⇒ 实现件 §6.1 那三个数（80→83、新增恰三枚、丢失为空、两形名册全等）**逐条复现**，
+570:3. **没复算实现件 ext-A／ext-B／ext-C 那三发外部枚数对照**（"摘 N3 ⇒ 带 `task=` 的行数 3→0"、"摘 N2 ⇒ 只剩 1"）。
+595:| §5 名册 | 重写后新增 `8883b3f`（前端会话） | `git cat-file -t 8883b3f` → **不存在**；全仓唯一出处＝这枚证据件；重写前 §5 引的 16 枚**全部可核** | 假号是**重写带进来的**；不指向任何读数 ⇒ 待补 4，不判退（§1.5） |
+609:| "门禁名册 80→83、新增恰三枚" | **成立** | 两向 `comm` 逐名复现（§6.1） |
+628:7. **git 纪律：本程违了派单那一条"名册里出现别人的路径就停手"**。第 6 格提交时 `git add` 之后，
+725:顶层函数名册两版对照（尺＝`grep -n '^func '`，含方法函数）：锚点 **18** 枚、交付版 **21** 枚，**差集恰为那三枚新用例**，
+739:| `SilentWhenNothingFoldableOverThreshold`（`:426`） | `:437` raw rounds 必须恰为 1（多一枚这形就不成立）；`:440` **`Need()` 必须为真**，否则 Fatalf 明说"this case would silently collapse into TestCompressionTraceSilentWhenNothingFolded"；`:449` `rep.Ran` 必须为假；`:451` 历史逐字节没动（枚数与 token 双判）；`:456-461` 痕必须 **0 枚**（`:458` Errorf 逐枚印出、`:461` Fatalf 带全枚名册）；`:428` 先 `assertRulerLive(t)`（捕到零枚即 Fatalf） |
+765:⇒ **新增的顶层测试侧函数＝0 枚**（11.1a 的名册差集已钉死：21−18＝3，全是 `Test*`）。
+787:所以它们既没进 `go test ./internal/agent/` 的名册（前一程 §6.1 那三枚新增名册里也没有它们：**那是前一程量的，它的 §9 已登记它推翻本派单的五条前提**），
+788:也不可能把 CI 的 `go vet ./...` 弄红。它们唯一的作用是**外部可见读数**（痕到 `slog.Default()` 那一发），而那一发本程**没复跑**、它属于 AC#3 句②，见 §12.3。
+
+## D. AC#4 那枚框：尺必须按 commit 取、不能按区间取（本程现量）
+-- 区间尺 git diff --name-only 5365cb22..6de3d1c5 -- <票面点名的 13 支路径>
+frontend/src/components/config-screen.tsx
+frontend/src/styles/theme.css
+区间尺命中枚数 = 2 ⇒ 拿区间当尺会假报 AC#4 违规（别家在动 frontend/design/docs）
+-- commit 尺（前一程 §4.4 那把，本程复述同一形状）：git show --pretty=format: --name-only ff550f3 b23c7f7
+internal/agent/compress.go
+internal/agent/compress_trace_test.go
+internal/agent/loop.go
+同一根管子上 13 支禁改面 grep -cE = 0（正控 grep -cE "^internal/agent/" = 4）
+
+## E. AC#1 两枚必需读数：本程在盘上具名抽验（读前一程日志文件，未重跑 go test）
+-- 改后转绿那一枚（delivered-count1.log.txt）
+--- PASS: TestCompressionTraceSilentWhenNothingFoldableOverThreshold (0.00s)
+ok  	github.com/CarlosShao/wisp/internal/agent	2.133s
+该文件里 TestCompressionTrace* 的 PASS 行枚数 = 7（四枚旧钉子＋三枚新用例 = 7）
+-- 改前红那一枚（A1-m5.log.txt）
+--- FAIL: TestCompressionTraceSilentWhenNothingFoldableOverThreshold (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent	1.959s
+FAIL
+-- 摘了证人就逃逸（前一程 A2/A5/A7）
+A2-m5-dropAC1test FAIL=0 RUN=82
+A5-dropN2-dropowntaskidtest FAIL=0 RUN=82
+A7-dropN3-dropbothtasktests FAIL=0 RUN=81
+-- 未修码上 M5 逃逸复现（anchor-m5-count1.log.txt）：FAIL 枚数／PASS 名册
+0
+--- PASS: TestCompressionTraceBooksCountsOnSuccess (0.00s)
+--- PASS: TestCompressionTraceSilentWhenNothingFolded (0.00s)
+--- PASS: TestCompressionTraceSurvivesTheLoopWiring (0.01s)
+--- PASS: TestCompressionTraceDoesNotAlterTheFold (0.00s)
+
+## C2. 上表 C 段自证为一处【尺打在哪个版本上】的坑（本程自己撞上，就地登记）
+C 段那批数字是打在【工作树版＝含本程 §11】上的；本程 §11 的标题里就带着『放水』『外部可见』『t.Skip』三枚词，于是 C 段把它们自己算了进去（放水=4、外部可见=1、t.Skip=3）。
+⇒ 判前一程『整件零命中』必须打在 §11 落盘之前那一版：d5a24983（=6247a68^，本程 §11 那枚 commit 的父）。同一批尺、同一文件，逐枚重量：
+放水    旧版=0  新版=4
+三问    旧版=1  新版=1
+持有者 旧版=0  新版=0
+组合根 旧版=0  新版=0
+接收者 旧版=0  新版=0
+承重    旧版=0  新版=0
+外部可见 旧版=0  新版=1
+ext-A     旧版=1  新版=1
+ext-B     旧版=1  新版=1
+ext-C     旧版=1  新版=1
+未裁    旧版=0  新版=0
+t.Skip    旧版=1  新版=3
+⇒ 前一程整件：放水 0、承重 0、外部可见 0、持有者 0、组合根 0、接收者 0、未裁 0；三问 1（在 §4 标题）；ext-A/B/C 各 1（全在 §8 第 3 条『没复算』那一行）。
+
+## B2. 同一批 AC# 尺打在 §11 落盘之前那一版（d5a24983）——§12.0 引的就是这一列
+AC#1=2 AC#2=2 AC#3=2 AC#4=2 AC#5=1 合计=9
+（B 段那列 3/2/5/2/1 是打在含本程 §11 的版本上的，两列不是同一把尺的同一对象。）
+采于 2026-09-26 11:15:52 +0800
