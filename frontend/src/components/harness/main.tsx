@@ -41,18 +41,22 @@
    ============================================================================ */
 
 import { useState } from "react";
-import { ChevronRight, FolderCog, Inbox, Paperclip, Plus, Send } from "lucide-react";
+import { ChevronRight, FolderCog, Inbox, Plus } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { Button } from "@/components/ai-native/button";
 import { EntityChip } from "@/components/ai-native/entity-chip";
+import { PromptBar } from "@/components/ai-native/prompt-bar";
 import { StreamingText } from "@/components/ai-native/streaming-text";
 import { Thinking } from "@/components/ai-native/thinking";
 import { ToolChips } from "@/components/ai-native/tool-chips";
-import type {
-  HarnessAssistantMessage,
-  HarnessMainProps,
-  HarnessRecentTask,
-  HarnessSession,
+import {
+  PROMPT_COMMANDS,
+  PROMPT_MODELS,
+  PROMPT_SOURCES,
+  type HarnessAssistantMessage,
+  type HarnessMainProps,
+  type HarnessRecentTask,
+  type HarnessSession,
 } from "@/fixtures/harness-app";
 
 /* RevealText 的逐段计时器不读 html[data-motion="off"]，挂载点在这里代读：
@@ -134,9 +138,8 @@ function NewTaskView({
   onPickTask?: (task: HarnessRecentTask) => void;
   className?: string;
 }) {
-  // 演示页允许本地 state：大输入框只是摆出可输入的样子，不发起任何请求。
-  const [draft, setDraft] = useState("");
-  const filled = draft.trim().length > 0;
+  // 演示页允许本地 state：模型选择是 PromptBar 的受控演示值，发送不发请求。
+  const [promptModel, setPromptModel] = useState(PROMPT_MODELS[0]?.key ?? "");
 
   return (
     <main
@@ -148,29 +151,18 @@ function NewTaskView({
       <div className="mx-auto flex w-full max-w-[680px] flex-1 flex-col justify-center gap-6 px-8 py-10">
         <h1 className="text-[22px] font-semibold tracking-wide text-ink">{greeting}</h1>
 
-        {/* 大输入框卡：rounded-card + 右下发送钮位装饰（演示页不发请求） */}
-        <div className="rounded-card border border-line bg-surface p-4 shadow-card">
-          <textarea
-            aria-label="新任务描述"
-            className="min-h-[72px] w-full resize-none bg-transparent text-[13.5px] leading-relaxed text-ink outline-none [overflow-wrap:anywhere] placeholder:text-ink-3"
-            onChange={(e) => setDraft(e.target.value)}
-            placeholder={newPlaceholder}
-            rows={3}
-            value={draft}
-          />
-          <div className="mt-2 flex items-center justify-end">
-            <span
-              aria-hidden="true"
-              className="flex size-8 items-center justify-center rounded-[8px] transition-colors duration-200"
-              style={{
-                background: filled ? "var(--ink)" : "var(--line-strong)",
-                color: filled ? "var(--surface)" : "var(--ink-2)",
-              }}
-            >
-              <Send className="size-4" strokeWidth={2.4} />
-            </span>
-          </div>
-        </div>
+        {/* 大输入框 = beautiful-ui 的 Prompt Bar（完整解剖：附加菜单 / @ 来源 /
+            / 命令 / 模型下拉 / 听写 / 发送）。演示页 onSend 只清空，不发请求。 */}
+        <PromptBar
+          autoFocus
+          commands={PROMPT_COMMANDS}
+          models={PROMPT_MODELS}
+          model={promptModel}
+          onModelChange={setPromptModel}
+          onSend={() => undefined}
+          placeholder={newPlaceholder}
+          sources={PROMPT_SOURCES}
+        />
 
         {/* 工作区选择条 */}
         <div className="flex items-center gap-1.5 text-[11.5px] text-ink-3">
@@ -247,9 +239,8 @@ function SessionView({
   composerPlaceholder: string;
   className?: string;
 }) {
-  // 演示页允许本地 state：composer 不发真请求，发送钮只清空草稿。
-  const [draft, setDraft] = useState("");
-  const canSend = draft.trim().length > 0;
+  // 演示页允许本地 state：模型选择为受控演示值。
+  const [promptModel, setPromptModel] = useState(PROMPT_MODELS[0]?.key ?? "");
 
   return (
     <main
@@ -285,50 +276,19 @@ function SessionView({
         </div>
       </div>
 
-      {/* composer 钉底（chat.tsx:152 外壳词汇：rounded-control / bg-field /
-          focus-within:border-line-strong / shadow-btn）。演示不发真请求。 */}
+      {/* composer 钉底：beautiful-ui 的 Prompt Bar（同新任务页，全解剖）。
+          演示不发真请求，onSend 只清空。 */}
       <div className="border-t border-line px-6 pb-4 pt-3">
         <div className="mx-auto w-full max-w-[720px]">
-          <div
-            className="flex cursor-text flex-col gap-1.5 rounded-control border border-line
-              bg-field p-2.5 shadow-btn transition-[border-color,box-shadow] duration-150
-              focus-within:border-line-strong"
-          >
-            <div className="flex items-end gap-1">
-              {/* 附件位装饰（aria-hidden，无路由不假装可点） */}
-              <span
-                aria-hidden="true"
-                className="flex size-7 shrink-0 items-center justify-center rounded-[8px] text-ink-3"
-              >
-                <Paperclip className="size-4" strokeWidth={2} />
-              </span>
-              <textarea
-                aria-label="给一缕的指令"
-                className="min-h-7 min-w-0 w-full resize-none bg-transparent px-1 py-[5px]
-                  text-[13px] leading-[18px] text-ink outline-none [overflow-wrap:anywhere]
-                  placeholder:text-ink-3"
-                onChange={(e) => setDraft(e.target.value)}
-                placeholder={composerPlaceholder}
-                rows={1}
-                value={draft}
-              />
-              <button
-                aria-label="发送（演示位，不发起请求）"
-                className="flex size-7 shrink-0 items-center justify-center rounded-[8px]
-                  transition-[background-color,color,transform] duration-200
-                  enabled:active:scale-[0.94] disabled:pointer-events-none disabled:opacity-50"
-                disabled={!canSend}
-                onClick={() => setDraft("")}
-                style={{
-                  background: canSend ? "var(--ink)" : "var(--line-strong)",
-                  color: canSend ? "var(--surface)" : "var(--ink-2)",
-                }}
-                type="button"
-              >
-                <Send aria-hidden="true" className="size-4" strokeWidth={2.4} />
-              </button>
-            </div>
-          </div>
+          <PromptBar
+            commands={PROMPT_COMMANDS}
+            models={PROMPT_MODELS}
+            model={promptModel}
+            onModelChange={setPromptModel}
+            onSend={() => undefined}
+            placeholder={composerPlaceholder}
+            sources={PROMPT_SOURCES}
+          />
           <p className="mt-1.5 text-[10.5px] text-ink-3">
             Enter 发送 · Shift+Enter 换行 · 演示页不发起真实请求
           </p>

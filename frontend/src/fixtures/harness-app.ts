@@ -395,3 +395,29 @@ export const WEEK_USAGE: HarnessUsagePill[] = [
   { label: "本周 tokens", value: "128.4k", tone: "neutral" },
   { label: "本周花费", value: "¥3.72", tone: "accent" },
 ];
+
+/* ---------------------------------------------------------------------------
+   PromptBar 演示数据（harness 主区两处输入框共用；生产 composer 走真快照，
+   不读这里）。来源/命令/模型名沿用 demo chat.js 与 C8 的口径。
+   --------------------------------------------------------------------------- */
+
+import type { PromptSource, PromptCommand, PromptModel } from "@/components/ai-native/prompt-bar";
+
+export const PROMPT_SOURCES: readonly PromptSource[] = [
+  { key: "files", name: "本地文件", desc: "从授权目录选取（C26）" },
+  { key: "desktop", name: "桌面截图", desc: "最近 20 张截图" },
+  { key: "clipboard", name: "剪贴板历史", desc: "最近 10 条" },
+  { key: "web", name: "网页搜索", desc: "实时联网信息（R4 带污染标记）" },
+];
+
+export const PROMPT_COMMANDS: readonly PromptCommand[] = [
+  { key: "organize", name: "/整理桌面", desc: "按月份归档桌面截图" },
+  { key: "weekly", name: "/生成周报", desc: "汇总本周任务与花费" },
+  { key: "summarize", name: "/总结会话", desc: "提炼当前会话要点" },
+  { key: "cost", name: "/查看成本", desc: "今日 tokens 与预算占用" },
+];
+
+export const PROMPT_MODELS: readonly PromptModel[] = [
+  { key: "deepseek-chat", name: "deepseek-chat", tag: "默认" },
+  { key: "deepseek-reasoner", name: "deepseek-reasoner", tag: "推理增强" },
+];
