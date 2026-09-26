@@ -167,3 +167,62 @@ $ ls .scratch/wisp/issues | grep '^150-'
 **本程判**：票 153 既没新增标记也没让这件事变坏，**本格成立**；顺带回派单那句"这条不是挑刺"——它确实不是，只是**归票 150**。
 
 **本格档位：成立。**
+
+---
+
+## 3. 攻击点③ —— "那枚新用例是不是唯一证人"：本程自己跑的 12 发（不背它的 X 表）
+
+### 3.1 先钉判据与尺
+
+尺＝`.scratch/wisp/probes/153/accept-r1/ruler153.py`：只认锚定的 `^--- FAIL` 行判红（`t.Logf` 也带 `file:line:` 前缀，
+不能拿它当红），四数之外还出 `panic` 数与名册；`-count=1`、**跑整包**（不只那几枚）。
+每发变异由 `mut153.py` 落地并**强制打印**：锚点字符串出现次数必须恰为 1（否则 `SystemExit`）、落地后新文本次数与文件字节差。
+每发之前 `restore` 并把三枚文件与 `pristine/`（＝`git show 6de3d1c:…`，md5 逐枚 MATCH）比字节 ⇒ `RESTORE OK (3/3 byte-identical to pristine)`。
+
+### 3.2 读数（本程亲跑；"它的 X"一列是从它 §4.1 表里抄来对照用的，不是本程的凭据）
+
+| 本程发 | 施了什么 | RUN / FAIL | 红名 | 它的 X | 判 |
+|---|---|---|---|---|---|
+| `delivered-count1` | 交付码，无变异 | 83 / **0** | — | X0 | 一致 |
+| `A1-m5` | 只施 M5（`if rep.Ran {`→`if c.Need(hist) {`，落在 `compress.go:216`） | 83 / **1** | `SilentWhenNothingFoldableOverThreshold` | X1 | **一致** |
+| `A2-m5-dropAC1test` | M5 ＋ 摘掉那枚新用例 | 82 / **0** | **NONE ⇒ 逃逸回来** | X2 | **一致** |
+| `A3-dropAC1test-only` | **只摘新用例、不改码**（派单的 ①） | 82 / **0** | NONE | — | **派单前提不成立**，见 §3.4 |
+| `A4-dropN2-looptag` | 摘 N2（`loop.go:399` 不再打标） | 83 / **1** | `CarriesTheOwningTaskID` | X3 | 一致 |
+| `A5-dropN2-dropowntaskidtest` | 摘 N2 ＋ 摘掉那枚证人用例 | 82 / **0** | NONE | X4 | 一致 |
+| `A6-dropN3-attrwrite` | 摘 N3（痕不再写 `task` 属性） | 83 / **2** | `CarriesTheOwningTaskID` ＋ `NeverInventsATaskID` | X5 | 一致 |
+| `A7-dropN3-dropbothtasktests` | 摘 N3 ＋ 摘掉那两枚证人用例 | 81 / **0** | NONE | X8 | 一致 |
+| `A8-m6-unconditional-attr` | 变异：属性**无条件**追加（不判空） | 83 / **1** | `NeverInventsATaskID` | X6 | 一致 |
+| `A9-m7-constant-fake-id` | 变异：`traceTaskID` 恒返一枚 uuid 常量 | 83 / **2** | 两枚任务用例都红 | X7 | 一致 |
+| `anchor-count1` | 锚点 `86b0161` 原树（四枚钉子、无新用例） | 80 / **0** | — | 它的 §6.1 改前 | 一致（80） |
+| `anchor-m5-count1` | **未修码**上只施 M5（139 那一发的复算） | 80 / **0** | 四枚钉子逐枚 PASS | 它的 R1 | **一致：逃逸复现** |
+
+⇒ 它 §4.1 那张九发表**本程独立重走出同一批数**，包括三处最容易糊的地方：X2／X4／X8 是"把证人和被证的东西一起摘掉"才绿，
+少摘一枚当场红（A1/A4/A6 就是另一半）；`panic` 全 0、两向名册差集见 §6.1，没有"一条红吞掉整包读数"的形状。
+
+### 3.3 改前红句原文——本程复跑打到同一枚行号
+
+```
+A1-m5 读数（交付树＋M5，`-count=1`）：
+    compress_trace_test.go:458: over-threshold pass that folded nothing left a trace: agent: history compressed kept_raw_rounds=1 history_changed=false tokens_before=1006 tokens_after=1006 threshold=384 msgs_before=3 msgs_after=3 compressed_msgs=0
+    compress_trace_test.go:461: "agent: history compressed" records = 1, want none: … 1 raw round(s) against the KeepRawRounds floor of 3 is exactly the case where no fold can happen (all records: [trace-capture-ruler-control agent: history compressed])
+--- FAIL: TestCompressionTraceSilentWhenNothingFoldableOverThreshold (0.00s)
+```
+
+与它 §2.2 贴的那两行：行号 `:458`／`:461` **相同**；红句里的**八枚 `键=值` 全相同**（`tokens_before=1006 tokens_after=1006 threshold=384 msgs_before=3 msgs_after=3 compressed_msgs=0 kept_raw_rounds=1 history_changed=false`）；
+**唯一不同是打印顺序**——它把两行按 `compressed_msgs` 在前抄出，本程读到的是 `kept_raw_rounds` 在前。
+原因本程读到源码层级：`traceCapture.Handle` 把属性收进 `map[string]any`（`compress_trace_test.go:64`／`:67`），
+而打印用的 `capturedRecord.flat()` 在 `:117-124` 里 `for k, v := range r.attr` ⇒ **map 遍历顺序，天生不稳定**。
+⇒ 判：红句**内容逐对可复算、行号可复算**，"原文照贴"这件事成立；但**顺序不是可复算量**，
+下一位若拿"逐字符相同"去对这两行会误判——本程把这条差异写死在这里（不构成退件，见 §9 结论修正）。
+
+### 3.4 派单前提①「只摘新用例、不改码 ⇒ 应红」**结构上产不出它想量的读数**
+
+本程照字面跑了 `A3`：`82 / 0`，**绿**。理由不是环境也不是判据变了，是这句话本身不可满足：
+交付树上的生产码守卫是**正的那枚**（`if rep.Ran`），摘掉一枚 `_test.go` 里的用例**不会造出红**——
+测试只能拒代码，不能因少一枚而多拒。⇒ 本程**不**按它字面判实现件红，并给出这句话唯一有意义的读法：
+**"摘证人"必须与"施变异"同发**，也就是 `A1↔A2`（同一枚 M5，有证人红／摘了证人从此不红）。
+这一对已由实现件与本程**各自独立**跑到，故"新用例是 M5 的唯一证人"这句话**入账**。
+（派单第 3 点另两句——②"只上 M5 不带新用例应绿"、③"新用例＋M5 应红"——本程复算**都成立**，见 `A2`／`A1`。）
+
+**本格档位：成立。** 新用例是真判据（它单独把 M5 打红），既不是装饰也不是恒红：
+`A0`（无变异）绿、`A1`（只变异）红、`A2`（变异＋摘证人）绿——三态齐全，"今天不响、修了才响"那一发本程也替它在未修树上复算过（`anchor-m5-count1`＝139 的逃逸原状）。
