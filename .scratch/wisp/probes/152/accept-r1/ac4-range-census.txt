@@ -1,0 +1,65 @@
+# 152 验收 r1 禁改轴名册（本程现跑，2026-09-26 10:5x +08）
+
+$ git rev-parse --short 10e3585^
+63e228fc
+
+$ git diff --name-only 10e3585^ 97cfc6e -- internal/risk internal/panel internal/agent/approval tools/d22scan thresholds.go scripts/slo-check.ps1 docs/PLAN.md docs/specs frontend design
+  (空输出=零字节)
+
+$ git diff --name-only 10e3585^ 97cfc6e -- '*golden*'
+  (空输出=零字节)
+
+$ for c in eb4755a 4cc85bb 10e3585 6550dc4 5429c0d 97cfc6e; do git show --name-only --format='' $c; done | sort -u
+  .scratch/wisp/probes/152/ac4-zero-byte-census.txt
+  .scratch/wisp/probes/152/e2e-observer-stderr.txt
+  .scratch/wisp/probes/152/e2e-subject-kill-real-cli.log
+  .scratch/wisp/probes/152/e2e-subject-kill.sh
+  .scratch/wisp/probes/152/e2e-subject-kill2.sh
+  .scratch/wisp/probes/152/e2e-subject-kill3.sh
+  .scratch/wisp/probes/152/e2e-v1-broken-instrument.log
+  .scratch/wisp/probes/152/e2e-v1-second-run-broken-pid.log
+  .scratch/wisp/probes/152/e2e3-anchor-built-kill.log
+  .scratch/wisp/probes/152/e2e3-observer-stderr.txt
+  .scratch/wisp/probes/152/fixed-tree-selection.log
+  .scratch/wisp/probes/152/gate-post-snapshot.log
+  .scratch/wisp/probes/152/gate-pre-ci.log
+  .scratch/wisp/probes/152/gate-pre-snapshot.log
+  .scratch/wisp/probes/152/mut-anchor/asis.log
+  .scratch/wisp/probes/152/mut-anchor/e1-exited-drop-summary.log
+  .scratch/wisp/probes/152/mut-anchor/e2-exited-drop-summary-case13off.log
+  .scratch/wisp/probes/152/mut-anchor/e3-case13-not-a-test-only.log
+  .scratch/wisp/probes/152/mut-anchor/f1-fallback-to-zero.log
+  .scratch/wisp/probes/152/mut-anchor/f2-fallback-to-minus1.log
+  .scratch/wisp/probes/152/mut-post/asis.log
+  .scratch/wisp/probes/152/mut-post/g1-restored-borrowed-value-case14off.log
+  .scratch/wisp/probes/152/mut-post/g1-restored-borrowed-value.log
+  .scratch/wisp/probes/152/mut-post/g2-case14-not-a-test-only.log
+  .scratch/wisp/probes/152/mut-post/g3-renderer-always-prints-position.log
+  .scratch/wisp/probes/152/mut-post/g4-renderer-never-prints-position.log
+  .scratch/wisp/probes/152/mutations-anchor-summary.txt
+  .scratch/wisp/probes/152/my152.py
+  .scratch/wisp/probes/152/overlay-mine-onto-samppre.json
+  .scratch/wisp/probes/152/overlay-probe.json
+  .scratch/wisp/probes/152/overlay-probe2-samppre.json
+  .scratch/wisp/probes/152/probe-exited-reachability-pass2.log
+  .scratch/wisp/probes/152/probe-exited-reachability.log
+  .scratch/wisp/probes/152/probe-waitready-unreaped.log
+  .scratch/wisp/probes/152/zz152bprobe_windows_test.go
+  .scratch/wisp/probes/152/zz152probe_windows_test.go
+  cmd/wisp/slo_report_144_windows_test.go
+  cmd/wisp/slo_windows.go
+  docs/evidence/s1/152-subject-death-never-measured-r1.md
+
+$ git diff 10e3585^ 97cfc6e -- cmd/wisp/slo_windows.go | grep -cE '^[-+].*(subjectReportBudget|subjectGrace|subjectPollInterval|subjectReadyBudget)'
+0
+
+$ 预算常量两侧现值（同一把尺打正控：先量已知会动的 offsetUnknown）
+77:	subjectGrace = 3 * time.Second
+83:	subjectReadyBudget  = 60 * time.Second
+84:	subjectReportBudget = 30 * time.Second
+85:	subjectPollInterval = 20 * time.Millisecond
+575:const offsetUnknown = -1
+77:	subjectGrace = 3 * time.Second
+83:	subjectReadyBudget  = 60 * time.Second
+84:	subjectReportBudget = 30 * time.Second
+85:	subjectPollInterval = 20 * time.Millisecond
