@@ -626,6 +626,10 @@ func safeFacts(ctx context.Context, hook func(context.Context, map[string]any, [
 // OpenTask opens the C25 taint scope for one task - ticket 19's
 // DEFERRED(C25-loop-wiring) item (1). Idempotent; Execute opens lazily so a
 // caller that forgot cannot get an untainted read.
+//
+// The open side is per CALL (mark above), the close side is per TASK and lives
+// in another package, so nothing here keeps the two sides in step by
+// construction: read CloseTask before adding a caller that opens a scope.
 func (b *Bridge) OpenTask(taskID string) {
 	if b.prov == nil || taskID == "" {
 		return
@@ -647,6 +651,27 @@ func (b *Bridge) OpenTask(taskID string) {
 // id - still has no owner here, and stays fail-closed: a task that never closes
 // leaks only its own indexed sources, which is the fail-closed direction, since
 // dropping marks would open R4.
+//
+// WHICH LEGS STILL HAVE NO OWNER HERE - ticket 154, read this before assuming
+// ticket 151 finished the job. 151 put the close on ONE boundary: cmd/wisp's
+// admitTask hook, which the TEXT loop defers. That covers only ids the loop
+// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+// So ask one question about your own leg: does the TaskID you dispatch with
+// come from that boundary? If it comes from anywhere else - a panel or ball
+// host inventing its own id, a retry wrapper, a scheduled task carrying one id
+// across turns - nothing in this tree closes it, and no test will tell you so.
+// Today no production code dispatches on the bridge except loop.go, so being
+// such a caller means being the first one; the gate meant to ring when that
+// happens is docs/evidence/s1/154-host-id-never-closed-r1.md §2.3 (clauses
+// G1/G1b), and it is one `git grep` away, not a note in someone's head.
+//
+// Being first is also an API decision, not just a missing defer: Loop has no
+// exported method that takes a caller-supplied task id, so a host cannot route
+// its id through the boundary that owns the close. That choice is Q-56 and this
+// file does not answer it. When the shape does become reachable, closing your
+// leg is only half of what ticket 154 owes - the reading for two tasks with
+// scopes open at once is still zero, and it has to be measured in the same
+// change (same evidence file, §2.5).
 //
 // The audit line runs on EVERY call, closed scope or not, because "who took
 // this task's taint off the table, and was there anything on it" is exactly the

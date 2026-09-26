@@ -185,3 +185,121 @@ G4  本仓排掉 _test 即空、摘掉排除立刻 2 命中（harness_test.go:11
 ⇒ 判据本体（`internal/risk/provenance.go:438-457` 的 `scopeMarks`，本程**只读**）：`unbound-scope` 只在"被检的那枚 scope 尚未注册、而**别的 scope 手里有污点**"时响。
 ⇒ 所以并发那一形今天**双不可达**：既要等宿主自带 id（G1/G3），也要等**同时跑两枚任务的宿主**（今天连 `agent.Loop` 的第二枚生产持有者都没有）。
 ⇒ 本票因此**不许为它硬开一道"要它响"的格**（票面 §现量形状第 5 条），本程照做：只在门上留了 G4，并在注释里写明"并发读数＝零，等 G1/G3/G4 任一响时一起补"。
+
+---
+
+## 第 3 节 格 AC#2（＋AC#1③ 的落点）— `Bridge.CloseTask` 注释改后原文整段
+
+### 3.1 先答票面那一问："已经有的那一句够不够"
+
+原判句（改前 `internal/tools/bridge.go:649-653`，现读仍在原位）：
+> "A caller that dispatches on the bridge outside that boundary - a host-internal call with its own task id - still has no owner here, and stays fail-closed…"
+
+本程判：**方向对，但不构成会被读到的防呆**，三条不足（每条都对应票面 AC#2 的判据"一个只读注释的人能不能答出'我这条腿要不要自己关'"）：
+
+1. **不点名票号**：读的人不知道"151 已经做过一次判断"，于是会把"still has no owner"读成"这是一句 TODO 风格的自谦"，而不是"这是一个**已登记、故意没接**的口"。
+2. **没给自测问句**：它描述的是"有一种调用方"，没有把判据交到读者手上——读者要的是"我怎么知道我是它"。本程补的就是那句
+   `does the TaskID you dispatch with come from that boundary?`（第 3.2 节 B 段第 4 行起）。
+3. **没写"今天这一形在生产上还没有入口"**：这半最要命。不写它，面板/球上线那天读这段注释的人会以为"接上就是了，加个 defer"；
+   实际上 `Loop` 没有收外部 task id 的导出方法（票面 §现量形状第 4 条），那是 `Q-56`，是**人工拍板项**。
+   本程把这两样都写进注释，并写明"本文件不回答 Q-56"。
+
+⇒ 所以 AC#2 的动作＝**在原地补两段**（不抹原句、不改原句一字），并给"门在哪"一个可点的落点（本件 §2.3）。
+
+### 3.2 改后注释原文（整段，含行号；机器可核＝`probes/154/bridge-comment-after.txt`）
+
+**A. `Bridge.OpenTask`（`internal/tools/bridge.go:626-632`）** —— 只补了"开合两侧不在同一作用域"这一句指路：
+
+```go
+626| // OpenTask opens the C25 taint scope for one task - ticket 19's
+627| // DEFERRED(C25-loop-wiring) item (1). Idempotent; Execute opens lazily so a
+628| // caller that forgot cannot get an untainted read.
+629| //
+630| // The open side is per CALL (mark above), the close side is per TASK and lives
+631| // in another package, so nothing here keeps the two sides in step by
+632| // construction: read CloseTask before adding a caller that opens a scope.
+633| func (b *Bridge) OpenTask(taskID string) {
+```
+
+**B. `Bridge.CloseTask`（`internal/tools/bridge.go:646-679`）** —— 前 8 行是**原句未动**，中段是本程新增，末尾"audit line"那 4 行也是原句未动：
+
+```go
+646| // CloseTask closes one task's taint scope. The composition root defers this on
+647| // the task's own boundary: cmd/wisp wires it into agent.Options.AdmitTask's
+648| // revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+649| // task that ends takes its taint with it (ticket 151). A caller that dispatches
+650| // on the bridge outside that boundary - a host-internal call with its own task
+651| // id - still has no owner here, and stays fail-closed: a task that never closes
+652| // leaks only its own indexed sources, which is the fail-closed direction, since
+653| // dropping marks would open R4.
+654| //
+655| // WHICH LEGS STILL HAVE NO OWNER HERE - ticket 154, read this before assuming
+656| // ticket 151 finished the job. 151 put the close on ONE boundary: cmd/wisp's
+657| // admitTask hook, which the TEXT loop defers. That covers only ids the loop
+658| // mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+659| // So ask one question about your own leg: does the TaskID you dispatch with
+660| // come from that boundary? If it comes from anywhere else - a panel or ball
+661| // host inventing its own id, a retry wrapper, a scheduled task carrying one id
+662| // across turns - nothing in this tree closes it, and no test will tell you so.
+663| // Today no production code dispatches on the bridge except loop.go, so being
+664| // such a caller means being the first one; the gate meant to ring when that
+665| // happens is docs/evidence/s1/154-host-id-never-closed-r1.md §2.3 (clauses
+666| // G1/G1b), and it is one `git grep` away, not a note in someone's head.
+667| //
+668| // Being first is also an API decision, not just a missing defer: Loop has no
+669| // exported method that takes a caller-supplied task id, so a host cannot route
+670| // its id through the boundary that owns the close. That choice is Q-56 and this
+671| // file does not answer it. When the shape does become reachable, closing your
+672| // leg is only half of what ticket 154 owes - the reading for two tasks with
+673| // scopes open at once is still zero, and it has to be measured in the same
+674| // change (same evidence file, §2.5).
+675| //
+676| // The audit line runs on EVERY call, closed scope or not, because "who took
+677| // this task's taint off the table, and was there anything on it" is exactly the
+678| // question the C25 ledger owes a long-running host. A scope that was never
+679| // opened (a task that read no sensitive source) closes as dropped=0.
+```
+
+注释里点到的三处**都先反查过**（票面"点名符号前先 grep"）：`internal/agent/loop.go:366` 现读＝`defer revokeAdmission()`（原引用没烂）；
+`Run` 在 `:332`、`Async` 在 `:321`、`newTaskID` 在 `:1107`（本程 `grep -n "^func (l \*Loop)"` 与 `grep -n "func newTaskID"` 现读）；
+`Q-56` 在 `docs/reports/pending-and-issues.md` 有登记条目（本程只引用编号，不替它选支）。
+
+### 3.3 写面机器核：这次改动**一行都不是码**
+
+```
+$ git diff -U0 -- internal/tools/bridge.go | grep -E "^[+-]" | grep -vE "^(\+\+\+|---)" | grep -vE '^[+-][[:space:]]*//'
+                                                    →  无输出（rc=1）  ← 增删行全部以 "//" 开头
+$ git diff --numstat -- internal/tools/bridge.go    →  25  0  internal/tools/bridge.go（+25 / -0）
+```
+
+⇒ **不改签名、不新增 API、不动任何语句**（票面"本票不解决的事"第 1 条）。
+
+### 3.4 格 AC#5（改后两跑）＋ 名册两向 ＋ 另外三道工具
+
+同尺同 PATH（`PATH="$PWD/third_party/sherpa-onnx:$PATH" go test -count=1 -v <包>`）：
+
+| 包 | 形 | RUN | 顶格 | FAIL | SKIP | panic | 全量 | 台件 |
+|---|---|---|---|---|---|---|---|---|
+| `internal/tools` | 改后 `-count=1` | **115** | **79** | **0** | **0** | 0 | 115 | `probes/154/gate-post-tools-v.txt` |
+| `cmd/wisp` | 改后 `-count=1` | **139** | **79** | **0** | **0** | 0 | 139 | `probes/154/gate-post-cli-v.txt`（`ok 91.747s`） |
+
+⇒ 四数与第 1 节那两行**逐字相同**（改前＝改后），`rc=0` 两包皆然。
+
+```
+$ comm -23 names-pre-cli.txt names-post-cli.txt   →  空
+$ comm -13 names-pre-cli.txt names-post-cli.txt   →  空
+$ comm -3  names-pre-tools.txt names-post-tools.txt  →  空
+（台件：probes/154/names-{pre,post}-{cli,tools}.txt；尺＝第 1 节那把，两栏皆 sort 过）
+$ go vet ./internal/tools/                        →  无输出，rc=0
+$ $(go env GOPATH)/bin/gofumpt --version          →  v0.12.0 (go1.27.1)   （现读，不背 151 那两程的数）
+$ $(go env GOPATH)/bin/gofumpt -l internal/tools cmd/wisp  →  空
+$ sh scripts/d22scan.sh                           →  clean（rc=0）；分母：bans#1-5 internal/=205 cmd/=23 · ban#6 frontend/=83 · ban#7 internal/tools/=18
+                                                     · ban#8 design/=39 frontend/=83 internal/=413 cmd/=44   ← 各作用域分母全非零
+```
+
+**承重第二问（派单点名那句：摘掉你新写的哪一味，哪条用例转红）**：
+本程新写的**只有注释**（§3.3 的机器核），Go 的注释不进 AST 输出、不进二进制 ⇒ **摘掉它，零枚用例转红**。
+这不是"检没牙"，是本票的性质：**本票买的是防忘记，不是防回归**（票面 AC#6 的明文允许）。
+"有没有任何外部可见读数变过"＝**没有**，三条独立证据：四数逐字同、两包名册两向 `comm` 皆空、`go vet`/`gofumpt -l`/`d22scan` 三项与改前同（且 `CloseTask` 那行审计日志的格式串在 `:693` 未动，`tools: C25 scope closed task=… was_open=… dropped=… open_scopes=…`）。
+
+⇒ **AC#5 这一格：成立**（两包各两跑、四数、名册两向、另加 vet/gofumpt/d22scan）。

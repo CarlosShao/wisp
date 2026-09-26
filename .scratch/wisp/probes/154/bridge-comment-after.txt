@@ -1,0 +1,66 @@
+626| // OpenTask opens the C25 taint scope for one task - ticket 19's
+627| // DEFERRED(C25-loop-wiring) item (1). Idempotent; Execute opens lazily so a
+628| // caller that forgot cannot get an untainted read.
+629| //
+630| // The open side is per CALL (mark above), the close side is per TASK and lives
+631| // in another package, so nothing here keeps the two sides in step by
+632| // construction: read CloseTask before adding a caller that opens a scope.
+633| func (b *Bridge) OpenTask(taskID string) {
+634| 	if b.prov == nil || taskID == "" {
+635| 		return
+636| 	}
+646| // CloseTask closes one task's taint scope. The composition root defers this on
+647| // the task's own boundary: cmd/wisp wires it into agent.Options.AdmitTask's
+648| // revoke, which the TEXT loop already defers (internal/agent/loop.go:366), so a
+649| // task that ends takes its taint with it (ticket 151). A caller that dispatches
+650| // on the bridge outside that boundary - a host-internal call with its own task
+651| // id - still has no owner here, and stays fail-closed: a task that never closes
+652| // leaks only its own indexed sources, which is the fail-closed direction, since
+653| // dropping marks would open R4.
+654| //
+655| // WHICH LEGS STILL HAVE NO OWNER HERE - ticket 154, read this before assuming
+656| // ticket 151 finished the job. 151 put the close on ONE boundary: cmd/wisp's
+657| // admitTask hook, which the TEXT loop defers. That covers only ids the loop
+658| // mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+659| // So ask one question about your own leg: does the TaskID you dispatch with
+660| // come from that boundary? If it comes from anywhere else - a panel or ball
+661| // host inventing its own id, a retry wrapper, a scheduled task carrying one id
+662| // across turns - nothing in this tree closes it, and no test will tell you so.
+663| // Today no production code dispatches on the bridge except loop.go, so being
+664| // such a caller means being the first one; the gate meant to ring when that
+665| // happens is docs/evidence/s1/154-host-id-never-closed-r1.md §2.3 (clauses
+666| // G1/G1b), and it is one `git grep` away, not a note in someone's head.
+667| //
+668| // Being first is also an API decision, not just a missing defer: Loop has no
+669| // exported method that takes a caller-supplied task id, so a host cannot route
+670| // its id through the boundary that owns the close. That choice is Q-56 and this
+671| // file does not answer it. When the shape does become reachable, closing your
+672| // leg is only half of what ticket 154 owes - the reading for two tasks with
+673| // scopes open at once is still zero, and it has to be measured in the same
+674| // change (same evidence file, §2.5).
+675| //
+676| // The audit line runs on EVERY call, closed scope or not, because "who took
+677| // this task's taint off the table, and was there anything on it" is exactly the
+678| // question the C25 ledger owes a long-running host. A scope that was never
+679| // opened (a task that read no sensitive source) closes as dropped=0.
+680| func (b *Bridge) CloseTask(taskID string) {
+681| 	if b.prov == nil || taskID == "" {
+682| 		return
+683| 	}
+684| 	dropped := len(b.prov.ScopeTaints(taskID))
+685| 	b.mu.Lock()
+686| 	open := b.scopes[taskID]
+687| 	delete(b.scopes, taskID)
+688| 	left := len(b.scopes)
+689| 	b.mu.Unlock()
+690| 	if open {
+691| 		b.prov.CloseScope(taskID)
+692| 	}
+693| 	b.log("tools: C25 scope closed task=%s was_open=%v dropped=%d open_scopes=%d",
+694| 		taskID, open, dropped, left)
+695| }
+696| 
+697| // assessorFor returns the assessor whose R4 input is bound to this task's
+698| // scope. The frozen C19 TaintDetector seam takes no tool name
+699| // (internal/risk/assessor.go:165-171), so the binding is per scope, hence per
+700| // task; the canonicalizer and classifier are shared and immutable.
