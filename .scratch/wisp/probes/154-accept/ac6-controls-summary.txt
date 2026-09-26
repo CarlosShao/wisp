@@ -1,0 +1,12 @@
+### AC#6 三枚正控/变异跑的读数摘要（四数尺＝^=== RUN / ^--- PASS / ^--- FAIL / ^--- SKIP / ^panic:）
+  ac6-mut-tools-strip154-v.txt       RUN=115  PASS=79   FAIL=0   SKIP=0   panic=0
+  ac6-mut-tools-noopen-v.txt         RUN=115  PASS=79   FAIL=0   SKIP=0   panic=0
+  ac6-mut-tools-capren-v.txt         RUN=115  PASS=78   FAIL=1   SKIP=0   panic=0
+  ac6-cli-strip154-v.txt             RUN=139  PASS=79   FAIL=0   SKIP=0   panic=0
+  ac6-cli-noopen-two-tests.txt       RUN=2    PASS=1    FAIL=1   SKIP=0   panic=0
+
+  变异体一（摘本票 25 行注释）自证：diff 锚点版与变异体 = 25 行，其中非注释 0 行；CloseTask 函数体两版 cmp rc=0
+  变异体二（摘 bridge.go:559 b.OpenTask(dec.TaskID)）自证：diff = 559d558 一行
+  变异体三（capability.go: CapNotify "notify"->"notifyx"）自证：diff = 28c28 一行
+  cmd/wisp 那两发都带 overlay：slo_windows.go/slo_report_144 换回 5766be9 的 blob ＋ slo_exit_os_156 空替换（藏掉）
+0

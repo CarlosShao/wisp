@@ -1,0 +1,42 @@
+### 本程写面自查（六枚 commit 名册并集）
+$ git log --no-walk=unsorted --pretty=tformat: --name-only 152b785 72500e5 8cddcba 0e5e762 26bb094 9444c72 | sed '/^$/d' | sort -u
+  .scratch/wisp/probes/154-accept/ac1-g1-blindspot-synthetic.txt
+  .scratch/wisp/probes/154-accept/ac1-gate-clauses-rerun-by-accept.txt
+  .scratch/wisp/probes/154-accept/ac1-openscope-clause-not-written.txt
+  .scratch/wisp/probes/154-accept/ac1-their-positive-control-rerun.txt
+  .scratch/wisp/probes/154-accept/ac2-bridge-comment.diff
+  .scratch/wisp/probes/154-accept/ac2-bridge-exported.txt
+  .scratch/wisp/probes/154-accept/ac2-loop-exported-methods.txt
+  .scratch/wisp/probes/154-accept/ac2-test-mention-scan.txt
+  .scratch/wisp/probes/154-accept/ac3-ast-roster-5766be9.txt
+  .scratch/wisp/probes/154-accept/ac3-census-crosscheck.txt
+  .scratch/wisp/probes/154-accept/ac3-test-files.txt
+  .scratch/wisp/probes/154-accept/ac4-counts-and-e-recheck.txt
+  .scratch/wisp/probes/154-accept/ac4-face-count.txt
+  .scratch/wisp/probes/154-accept/ac4-per-face-bytes-and-controls.txt
+  .scratch/wisp/probes/154-accept/ac4-roster-and-equality.txt
+  .scratch/wisp/probes/154-accept/ac5-156-declared-tests.txt
+  .scratch/wisp/probes/154-accept/ac5-accept-cli-v-anchoroverlay.txt
+  .scratch/wisp/probes/154-accept/ac5-accept-tools-v.txt
+  .scratch/wisp/probes/154-accept/ac5-cli-list-anchoroverlay.txt
+  .scratch/wisp/probes/154-accept/ac5-roster-and-declared.txt
+  .scratch/wisp/probes/154-accept/ac6-cli-noopen-two-tests.txt
+  .scratch/wisp/probes/154-accept/ac6-mut-tools-capren-v.txt
+  .scratch/wisp/probes/154-accept/norm-accept-roster.txt
+  .scratch/wisp/probes/154-accept/norm-r1-roster.txt
+  .scratch/wisp/probes/154-accept/norm-r2-roster.txt
+  .scratch/wisp/probes/154-accept/ov-capren.json
+  .scratch/wisp/probes/154-accept/ov-cli-noopen.json
+  .scratch/wisp/probes/154-accept/ov-noopen.json
+  .scratch/wisp/probes/154-accept/ov-strip154.json
+  .scratch/wisp/probes/154-accept/overlay-anchor-cli.json
+  docs/evidence/s1/154-close-gate-never-rings-r1-accept-r1.md
+  并集去重枚数=31
+  剥掉两枚写面后=0
+  ⚠ 本程曾把这两发串成同一条管道、读到 61（假数，stdin 没接上）；正确尺＝各数各的输入
+
+### 被验件在锚点之后的新变动（第 12 节更正块的读数）
+  1324fbf 13:59:03 编排者代提 r1 迟到段：93	0	docs/evidence/s1/154-host-id-never-closed-r1.md
+  前 695 行 cmp 复：rc=0 逐字同
+  重号节：367:## 第 5 节 格 AC#4（**续程 r2 补写**）— 契约轴零字节：把"普查"写成逐支账 524:## 第 6 节 格 AC#6（**续程 r2 补写**）— 承重那句按操作定义答 705:## 第 5 节 格 AC#4 — 契约轴零字节（**按 commit 量**，派单点名的坑） 724:## 第 6 节 格 AC#6 — 承重那句按操作定义答 
+  迟到段的新节：740:## 第 7 节 本程没测什么（按"漏了它谁会先被骗"排序） 758:## 第 8 节 伪授权两栏 ＋ 本程自校／偏差登记 762:### 8.1 真通知回显数：**3** 772:### 8.2 判为注入／整段弃用的读数：**4** 781:### 8.3 本程自校／偏差登记（我自己犯的，逐条写，不等谁来问） 

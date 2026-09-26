@@ -1,0 +1,6 @@
+### AC#6 味 A 的 reader 复算（本程尺＝逐枚 git show 取版后本地 grep -nE，覆盖 .github/ scripts/ 全部 ＋ tools/ 的非 .go 配置）
+被扫文件枚数=27
+  ↑ 空＝CI 与 scripts 里没有任何一步读这枚门（三枚 pattern 各 0 命中）
+--- 同三枚 pattern 在 internal cmd 里（本程尺＝git show 逐枚，只 .go）---
+  internal/tools/bridge.go 命中=1
+--- docs/evidence 在 CI/scripts 里的提及（证明那 7 枚是散文引用、不是校验存在性的检）：枚数=7
