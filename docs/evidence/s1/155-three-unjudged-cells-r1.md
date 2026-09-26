@@ -691,6 +691,8 @@ $ 16 包逐包 git diff --name-only b23c7f7 6de3d1c5 -- <pkg> | wc -l → 逐包
 | 别程留下的两枚半件 | `docs/evidence/s1/152-…-accept-r1.md`（3 行未提交自校）与 `.scratch/wisp/probes/152/my152.py`（` M`）：名册 **0 枚命中** ⇒ 本程未 commit、未还原、未补 ✓ |
 | 桩件登记 | `probes/157/10-items4to7.txt` 是本程把文件名打错时留下的 **1 行残桩**（`bash: …: No such file or directory`），**不是读数**；按"只建不删"留在名册里，读名册的人请当第 14 枚空气 |
 
+⇒ 上面这一整表的**量法**与收口后的最终读数都在 `probes/157/21-final-self-check.txt`（W1–W6，本程在最后一枚 commit 之前现跑）：**枚数与名册那一列本程刻意不写终值**——要哪一格，就自己跑那把尺（`--no-walk` 必带、grep 必锚定），别抄本节任何一枚数。
+
 ### B.12 票面 5 枚框 ↔ 本程的格：双向对账（工单 `:39` 要求的那一节）
 
 **先把尺摆正**（V3/V7 现量）：

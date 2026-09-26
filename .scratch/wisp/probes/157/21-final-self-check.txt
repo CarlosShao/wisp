@@ -1,0 +1,75 @@
+### W1. 本程 commit（主题锚定取号，枚数只在这里量）
+ef1c474 ec81582 7f79638 b5b5294 564ccce 3f77a22 7a56af5 36d91b9 68aaec7 5fc3c3c 0c539c3 
+枚数 = 11
+$ git log --no-walk --pretty=tformat: --name-only <上面那几枚> | sort -u
+.scratch/wisp/probes/157/10-items-4-to-7-code-facts.sh
+.scratch/wisp/probes/157/10-items-4-to-7-code-facts.txt
+.scratch/wisp/probes/157/10-items4to7.txt
+.scratch/wisp/probes/157/11-items-1-2-3-8-table-and-range.sh
+.scratch/wisp/probes/157/11-items-1-2-3-8-table-and-range.txt
+.scratch/wisp/probes/157/12-dep-closure-6de3d1c5.txt
+.scratch/wisp/probes/157/12-dep-closure-from-git-objects.py
+.scratch/wisp/probes/157/13-items-9-10-privacy-and-keyname.sh
+.scratch/wisp/probes/157/13-items-9-10-privacy-and-keyname.txt
+.scratch/wisp/probes/157/14-supplementary-rulers.sh
+.scratch/wisp/probes/157/14-supplementary-rulers.txt
+.scratch/wisp/probes/157/15-item2-lettersource-rulers.sh
+.scratch/wisp/probes/157/15-item2-lettersource-rulers.txt
+.scratch/wisp/probes/157/20-delivery-shape-and-forbidden-faces.sh
+.scratch/wisp/probes/157/20-delivery-shape-and-forbidden-faces.txt
+docs/evidence/s1/153-trace-lies-unguarded-r1.md
+docs/evidence/s1/155-three-unjudged-cells-r1.md
+名册去重枚数 = 17
+--- 越界自检（应 rc=1、零枚）---
+rc=1
+
+### W2. 禁改面逐支（尺＝最终名册）
+^docs/PLAN\.md                           命中 = 0
+^docs/specs/                             命中 = 0
+^internal/                               命中 = 0
+^cmd/                                    命中 = 0
+^third_party/                            命中 = 0
+thresholds\.go                           命中 = 0
+golden                                   命中 = 0
+allowlist\.txt                           命中 = 0
+^scripts/slo-check\.ps1                  命中 = 0
+^tools/d22scan/                          命中 = 0
+^docs/reports/                           命中 = 0
+^\.scratch/wisp/issues/                  命中 = 0
+^\.scratch/wisp/dispatches/              命中 = 0
+^docs/evidence/s1/(?!153|155)            命中 = 0
+--- 名册里 docs/evidence 那一支逐枚（应只 153/155 两枚）---
+docs/evidence/s1/153-trace-lies-unguarded-r1.md
+docs/evidence/s1/155-three-unjudged-cells-r1.md
+正控：同一把尺打 b23c7f7 的 internal/ = 3
+
+### W3. 零翻勾 / 零 -done 终检（三枚票面）
+153 未勾 = 1 ／ 已勾 = 4 ／ 文件名带 -done? NO
+   最后一次改动 = 4e20e21 13:06 docs(票 155 结＝四框全�
+155 未勾 = 0 ／ 已勾 = 4 ／ 文件名带 -done? YES
+   最后一次改动 = 4e20e21 13:06 docs(票 155 结＝四框全�
+157 未勾 = 5 ／ 已勾 = 0 ／ 文件名带 -done? NO
+   最后一次改动 = 4e20e21 13:06 docs(票 155 结＝四框全�
+--- 名册里 issues/ 一支的枚数（应 0＝本程一次没提交票面）---
+0
+
+### W4. 只追加终检：与基版逐字节 cmp（基版＝本程首枚的父）
+基版＝424ee363fb431fae0e8a4a2fd39325f42d2ea316
+docs/evidence/s1/155-three-unjudged-cells-r1.md 前 385 行 逐字节相同
+docs/evidence/s1/153-trace-lies-unguarded-r1.md 前 589 行 逐字节相同
+附录标题枚数 = docs/evidence/s1/155-three-unjudged-cells-r1.md:1 docs/evidence/s1/153-trace-lies-unguarded-r1.md:1 
+
+### W5. 十笔落点枚数（行首锚定尺）
+155 件 B.1-B.8 = 8
+155 件〔成立〕= 7
+155 件〔不成立〕= 1
+153 件 B.9-B.10 = 2
+两枚尺列枚数（155／153）= 8
+2
+
+### W6. 未推自证 + 别程文件未被本程碰（工作树此刻仍脏＝别家的活，本程不动）
+## dev...cnb/dev [ahead 192]
+ M .scratch/wisp/probes/152/my152.py
+ M docs/evidence/s1/152-subject-death-never-measured-r1-accept-r1.md
+（上面这四枚仍应是别家的未提交态：M／M／M／M —— 本程一枚未 commit、未还原）
+本程名册里出现这四枚任一枚？ 0
