@@ -274,6 +274,18 @@ $ bash -n .scratch/wisp/probes/154/gate-clauses.sh -> rc=0
 ⇒ 新增只有 G5 三腿，既有五枚子句与两段附录的读数一字未变。
 （注：`pair()` 为求差集用了一次 bash herestring，临时件走 `$TMPDIR`、不落仓；已把这一点如实写进脚本头那行「不写仓里任何东西」旁边。）
 
+### 2.6 三腿读数在**最终树**上复跑过一遍（免得 r2 以为只有 AC#1 落库那一次）
+
+```
+$ git rev-parse --short HEAD        -> 5bfdfc7      # AC#2 落库后
+$ bash .scratch/wisp/probes/154/gate-clauses.sh | grep -E '^## G5|UNPAIRED|未成对枚数'
+  G5 主尺   ：UNPAIRED cmd/wisp/panel_assets.go (开方调用点=1)  未成对枚数＝1   rc=1  （响）
+  G5-正控   ：未成对枚数＝0   rc=0                              （不响）
+  G5-负一负 ：UNPAIRED 5 枚（panel_assets + 4 枚 internal/risk 测试）
+$ go test -count=1 ./internal/tools/  -> ok ... 12.796s   rc=0 （最终树全绿，非 -v 快跑一次）
+```
+（AC#3 那一枚 commit 只动本证据件，不改 Go 码也不改门本体 ⇒ 上面两行读数对 `7f37ea4` 同样成立。）
+
 ---
 
 ## 3. AC#3 —— 「有界」：选了**让它响着并登记**，没给豁免形状
@@ -332,7 +344,9 @@ $ bash -n .scratch/wisp/probes/154/gate-clauses.sh -> rc=0
 - **AC#6 票面框↔本程格双向对账＝未交·归 r2。** 本程也没数过票面框的枚数变化（派单 §0 说的「现量 6 枚未勾／0 勾」我只复算到「无 `-done`」这一半）。
 - 票面框**由编排者按非实现者验收表定**，实现方不自勾 ⇒ 本程一枚都没勾。
 
-给 r2 的 `next=`（本程最终树＝`5bfdfc7` 起，含下面三枚 commit）：
+给 r2 的 `next=`（**本程最终树＝`7f37ea4`**；三枚 commit 依序
+`4dcb71b` AC#1 → `5bfdfc7` AC#2 → `7f37ea4` AC#3＋交件，全部 `git cat-file -t` ＝ commit；
+开工锚点 `8f9162f`）：
 1. 分母一律现跑：`internal/tools` 在 `8f9162f` 未改时 **115/79/0/0**，本程加一枚用例后全绿版＝ **116/80/0/0**；
    `cmd/wisp` 派单写的 `144/84/0/0` **本程未复算**，r2 必须现跑再当分母。
 2. AC#5 跑 `cmd/wisp` 前先读 `scripts/wisp-cli-tests.sh:99-113` 的 PATH／dll 原文（本程没读、没跑）。
