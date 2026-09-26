@@ -132,6 +132,15 @@ func TestAccept151ControlL1DeclaredCallReachesTheBridge(t *testing.T) {
 	if err != nil {
 		t.Errorf("控制读数没有成立：这条腿上的 fs.write 没有落盘（%v），所以它和 fs.read 一样没能到达桥；两形的差别不能只归给声明档位", err)
 	}
+	// Third independent observable: the bridge writes the authoritative tool_call
+	// row when a call really reaches it (cmd/wisp/run.go:578-581 leaves
+	// agent.Options.Journal nil precisely because the bridge owns that row).
+	rows := accept151Rows(t, dir, stdout)
+	t.Logf("control tool_call rows: %s", rows)
+	if strings.TrimSpace(rows) == "" {
+		t.Errorf("对照发的桥侧 tool_call 行是空的——那 fs.write 也没到桥，第 2.3 节的对照就不成立，得重判")
+	}
+
 	if !strings.Contains(stdout, "fs.write") {
 		t.Errorf("环路没有派发 fs.write，stdout=%q", stdout)
 	}

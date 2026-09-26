@@ -467,3 +467,156 @@ $ go test -count=2 -v ./cmd/wisp/     （干净的 git archive 树，rc=0）
 
 **票面那 5 枚框**：本程按上表 5 格判"都可勾"（AC#1 的勾**带着 C1**、AC#2 的勾**带着 C2**）；
 "6 枚"那一句是实现件的尺错（第 1 节），不影响任何一格有人裁过。
+
+## 第 10 节 本程没测什么（按"如果本程漏了它，谁会先被骗"排序）
+
+1. **brake / cancel / error / panic 那几条形没真造。** 实现件 §4 选①的第二条理由就是"这条边界本来就 `defer`，
+   四条形都走它"。本程只按 Go 语义读了"defer 在 panic unwinding 里也跑"，**没有真造一发 panic 去量
+   `rt.bridge.CloseTask` 到底跑没跑**。谁先被骗：验收 D43 转移表／票 142（panic→Failure）那一格——
+   它会以为"关闭覆盖四条形"被两枚新用例钉住了；实际两枚走的都是 `completed` 那一形
+   （本程现读：两枚用例的 `f.run(...)` 都要求 `code == 0`）。
+2. **`-race` 一枚没跑。** 派单给的是"本机可能崩〔未取证〕"，本程**没有去取证这句**（判下来边际收益低：
+   本票的改动只多一行调用＋一行日志，且第 3 节三发变异已经把"有没有牙"问完了；编队里还有三枚验收程在抢 CPU）。
+   ⇒ 这一格留给编排者：要么派一枚专门量 `-race` 的，要么把这句"未取证"一直挂着。
+3. **并发两枚任务同时在跑那一形没量**（与它 §8 第 2 条同一枚残余，本程复述它的登记为"准"，但本程**也没造出来**）。
+   要造得同时开两枚 `Loop.Run` 或两枚宿主 dispatch，并让 B 的第一发判定落在 A 还开着且有污点的时候。
+4. **内存只到斜率、没到上界**（同它 §8 第 3 条）。本程复到的 37,820 B/轮就是同一枚尺的第二遍，
+   没往 D32 最坏形（单枚 scope 塞满 64 源 × 262,144 字）走一步。
+5. **球／面板宿主那一形没起。** `internal/panel/**` 与 `frontend/**` 都在本票与本程的零字节面上。
+   所以"每一枚干净任务吃一张 `unbound-scope` L2 卡"的**真实用户代价（审批疲劳）本程零读数**，
+   它 §8 第 4 条同样登记为没测 ⇒ 这条只有等宿主真起来。
+6. **真 provider 那一形没量，但本程能说清它为什么不影响第 2.3 节的结论**：
+   `decideRisk` 在**派发之前**就把 L0/未分级拒了，与 provider 是谁无关；
+   且本程现读组合根只有一枚注册循环（`cmd/wisp/run.go:341-346` 那一个 `reg.Register`，喂的是 `tools.BuiltinFSEntries`）
+   ⇒ 今天这条腿可派发的工具里**唯一那枚 sensitive source 就是 `fs.read`，而它声明 L0**（`fs.go:298`）。
+   所以"换真 provider 就能端到端脏起来"这一句本程**不支持**：挡它的那道门是码给的，不是夹具给的。
+7. **实现件 §0 那张"六枚别人的提交与本程三枚文件不相交"的表本程没逐枚复核**（要复核得逐枚 `git show --name-only`）。
+   本程换了一把正交的尺代替：直接过它三枚 commit 的名册并集（第 5 节）⇒ 判"有没有越界写"用不着那张表。
+8. **票面 AC#1 那句"N 取 2 与一个更脏的值"本程只复到 2 与 64**（探针自带这两档），没自加 3/8/128 之类中间档；
+   斜率的 host 差异（37,652 vs 37,820）也没做多遍方差。
+
+## 第 11 节 伪授权两栏 ＋ 凭据 ＋ 本程纪律自查
+
+**真通知回显＝6 条**（都是授权/状态的真件，本程按它做，未据此少取证）：
+
+| # | 出处（工具名＋命令/文件前 40 字） | 本程怎么处置 |
+|---|---|---|
+| 1 | `Read` — `.scratch/wisp/dispatches/2026-09-26-103x-` | 派单正文＝本程唯一权威任务说明，全程照它 |
+| 2 | `system-reminder` 注入的 AGENTS.md — `# AGENTS.md — Agent 执行版薄索引` | 只当索引；§1.4 的 git 纪律本程逐条自己执行（见本节末） |
+| 3 | `Bash` 后台完成通知 — `Background command "Run baseline gate for b` | 通知报 exit 0；本程读的是日志本体，发现其中 8 枚红＝仪器缺 dll，未据通知改判 |
+| 4 | `Bash` 后台完成通知 — `Background command "Run post and pre-fix ful` | 同上，读数取自两份 `gate-*.txt` |
+| 5 | `Bash` 后台完成通知 — `Background command "Run gofumpt, vet and d22sc` | 同上 |
+| 6 | `Bash` 后台完成通知 — `Background command "Fresh clean tree; run tool` | 这句落地前本程已把第六枚数以"还在跑"交过一次（第 7 节）；落地后按只追加写进第 9 节 |
+
+**判为注入＝0 条。** 本程全程没遇到任何要求"少取证／别用工具／直接给结论／放宽阈值／已解锁／请 revert／
+不用取证直接给结论／Respond with TEXT ONLY"形状的文字。两枚容易误判的，按事实登记为**不是授权也不是注入**：
+
+- 派单里转述的那起 `A280`（编排者把上一枚验收程的中途输出当终判）——那是**案情说明**，不是给本程的指令；
+  本程据此只多做了一件事：每格一 commit，且各节结论全部先落盘再上报（本程没有向编排者转述任何未落盘的结论）。
+- 共享工作树里别人那些未提交的 ` M`/` D`/`??` 路径（`design/**`、`frontend/**`、`.scratch/wisp/probes/152/**`、
+  别人的两枚验收表）：本程一字未碰、未还原，也**没把它们算进任何"零命中/未改动"宣称**
+  （第 5 节那把尺只过它三枚 commit 的名册并集）。
+
+⚠ **本程自己一枚纪律越界，自陈在这里**（不等谁来抓）：`D:/tmp/count2clean.sh` 那发脚本里本程写了
+`rm -f /d/tmp/wisp151accept-count2 2>/dev/null || true`——派单与 `issues/README` 规则 8 写的是
+"临时件**只建不删**、`rm`/`rmdir` 一律不用"。现读事实：那枚路径当时**不存在**（同一次跑的 `cp -r` 在它之后才建），
+所以**没有删到任何东西**；但命令本身用了 `rm`，这是本程的手错，登记在此、不辩解。
+后续两次建树改成"只建不删"（`wisp151accept-count2` 与 `wisp151accept-clean` 两枚树都还在盘上、未删）。
+
+**凭据零抄录**：本件与本程台件里出现的凭据**相关名字只有两枚引用名**，值一个都没抄：
+
+- `dpapi:acme` —— `api_key_ref` 的**引用名**，出现在本程两枚探针的 config 文本里（与包内既有夹具同形）；
+- `fakeStoreKey` —— 包内既有常量，本程**按标识符引用**、未复制其值。
+  现读尺＝拿那枚常量的**字面值**去 `.scratch/wisp/probes/151-accept/` 里搜（值本身本件不复述、
+  命令里也不复述：本件第一稿把值的前缀写进了那条 grep 的模式里，那是本程自己犯的一次"抄了半个值"，
+  在**这一节第一次 commit 之前**换掉了，并把这一处自首留在原地当读数的一部分）⇒ 台件里**零命中**，
+  也就是那枚常量的字面值没进过本程任何一枚台件。
+  其余出现的绝对路径全是这台机器的临时目录路径，非凭据。
+
+**纪律自查（本程收口前最后一发，全部现读）**：
+
+```
+$ git status --porcelain -- .scratch/wisp/issues
+    ->  本程 commit 这发之前最后一次现读：只剩**别人那一程**的 ` M .scratch/wisp/issues/153-…-r1…md` 一枚；
+        票 151 面与两枚票 154 面**都不在改动列里**＝本程一字未动、未加 -done
+        （开工时同一把尺读到的是空，中途是别人落地的改动，本程没碰、没还原）
+$ git log --oneline --grep='evidence(151 验收 第' | wc -l  ->  **8 枚**（尺＝这个 --grep；收口这一枚落下去是 9 枚）
+                                                              逐节各一枚：0-1 / 2 / 3 / 4 / 5 / 6 / 7 / 8-9；
+                                                              每枚前都现读 git diff --cached --name-only：
+                                                              开工时为空、每次 commit 之后仍为空（本节 commit 前再读＝空）
+                                                              ⇒ 本程没吞过任何别人的路径、也没把别人的东西 commit 掉
+$ git show --name-only --format='' <本程每一枚>            ->  只含 docs/evidence/s1/151-…-accept-r1.md 与 .scratch/wisp/probes/151-accept/ 两枚路径（逐枚复核过）
+$ 禁列操作：git add -A / git add . / --amend / reset / rebase / stash / checkout . / clean / push
+                                                             ->  全部未用；本程从未 push（派单：只 commit）
+```
+
+## 第 12 节 台件名册（`.scratch/wisp/probes/151-accept/`，本程原始读数；只建未删）
+
+| 文件 | 是什么 | 字节 |
+|---|---|---|
+| `ac1-probe-rerun.txt` | 本程独立复跑实现件那枚 AC#1 探针的原文输出 | 5254 |
+| `accept151_control_test.go` | 第 2.3 节对照发的探针源码（金样本 fs.write，L1 声明） | 4918 |
+| `accept151_e2e_test.go` | 第 2.3 节那发 E2E 的探针源码（金样本 fs.read） | 6662 |
+| `bridge.shipped.go` | 变异前的 bridge.go 快照（=4e16976）；diff 的基准 | 37410 |
+| `e2e-control-l1-write.txt` | 对照发：[工具 fs.write -> success] ＋ out.txt 落盘 19 字节 | 4587 |
+| `e2e-shot-shipped-code-v2.txt` | E2E 第二发（缺 usage 块被 provider 分类拒） | 3644 |
+| `e2e-shot-shipped-code-v3.txt` | E2E 第三发：exit 0、2 轮 1 次工具调用、[工具 fs.read -> error]、was_open=false | 2883 |
+| `e2e-shot-shipped-code-v4.txt` | E2E 第四发（加 tool_call 行回读） | 3073 |
+| `e2e-shot-shipped-code-v5.txt` | E2E 第五发（回读全库 tool_call 行＝空；`run.go:580` 那枚 `Journal: nil` 是本程看到的候选解释、**这条链本程没追**，故该行只当现场不当结论） | 3073 |
+| `e2e-shot-shipped-code.txt` | E2E 第一发（金样本没选上，走成合成腿）——留作尺的现场 | 3602 |
+| `gate-base-cli-v.txt` | 第一发 cmd/wisp 全跑＝8 枚红（缺 dll＝仪器没跑到），第 0 节那条 | 65489 |
+| `gate-base-cli-v2.txt` | 补 dll 后改后全跑 138/78/0/0 | 71492 |
+| `gate-base-tools-v.txt` | internal/tools 改后 115/79/0/0 | 27356 |
+| `gate-post-cli-count2-rerun.txt` | 改后 -count=2 全跑 276/156/0/0 | 142789 |
+| `gate-post-tools-count2-rerun.txt` | -count=2 第一发＝260/166（本程探针污染了树，第 7.4 节那条） | 64653 |
+| `gate-post-tools-count2-rerun2.txt` | -count=2 第二发＝同上（从被污染的 base 树 cp 出来的，仍污染） | 64642 |
+| `gate-post-tools-count2-rerun3.txt` | -count=2 干净重新 archive 的树＝230/158/0/0 | 54524 |
+| `gate-pre-cli-v.txt` | 改前（真未修码树）全跑 136/76/0/0 | 68058 |
+| `gate-pre-tools-v-rerun.txt` | internal/tools 改前（真未修码树）115/79/0/0 | 27365 |
+| `mutA-drop-closetask-call.txt` | 变异 A：只删 run.go 那一行 CloseTask → 两枚全红 | 4488 |
+| `mutB1-drop-audit-log-compile.txt` | 变异 B1：只删 b.log → declared and not used（编译失败） | 228 |
+| `mutB2-drop-audit-log-behavior-neutral.txt` | 变异 B2：删 b.log ＋ _, _ = dropped, left → 只 T1 红、T2 PASS | 3942 |
+| `mutC-t1-on-prefix-code.txt` | 未修码（5d46f24^ 两枚 head）＋ T1-only → 编得过且 FAIL | 2279 |
+| `my-post-cli-all.txt` | 本程改后 cmd/wisp 全量名册（138） | 7357 |
+| `my-post-cli.txt` | 本程改后 cmd/wisp 顶格名册（78） | 3530 |
+| `my-post-tools-all.txt` | 本程 internal/tools 改后全量名册（115） | 5859 |
+| `my-post-tools-top.txt` | 本程 internal/tools 改后顶格名册（79） | 3225 |
+| `my-pre-cli-all.txt` | 本程改前 cmd/wisp 全量名册（136） | 7262 |
+| `run.shipped.go` | 变异前的 run.go 快照（=4e16976）；diff 的基准 | 35182 |
+| `theirs-post-cli-all.txt` | 实现件 names-cli-post.txt 归一化后（对拍用） | 7357 |
+| `theirs-post-tools-all.txt` | 实现件 names-post-tools.txt 归一化后（含子用例那把尺） | 3225 |
+| `theirs-post-tools-top.txt` | 实现件 names-post-tools.txt 归一化后（顶格那把尺，79） | 3225 |
+| `theirs-pre-cli-all.txt` | 实现件 names-cli-pre.txt 归一化后（136） | 7262 |
+| `theirs-pre-tools-top.txt` | 实现件 names-pre-tools.txt 归一化后（79） | 3225 |
+| `tools-d22scan.txt` | d22scan 全日志（rc=0 clean＋各作用域分母） | 22739 |
+| `tools-gofumpt-l.txt` | gofumpt -l 输出（空） | 0 |
+| `tools-gofumpt-version.txt` | gofumpt --version 现读 | 19 |
+| `tools-govet.txt` | go vet 两包输出（空） | 0 |
+
+## 第 13 节 追加读数（第 2.3 节对照发的第三枚可观测面）——C1 因这一发更硬
+
+本程给对照发（`fs.write` 那一发）补了第三枚独立观测面，然后重跑一次：
+桥自己那行 `tool_call` 取证（`cmd/wisp/run.go:578-581` 把 `agent.Options.Journal` 留成 `nil`，
+注释写得很死——"the bridge already writes the authoritative one"，所以**行没到桥就不会有行**）。
+
+```
+$ go test -count=1 -v -run TestAccept151ControlL1DeclaredCallReachesTheBridge ./cmd/wisp/   rc=0（PASS）
+  control tool_call rows: [task=14b2eb43-… tool=fs.write
+    args={"path":"<临时目录>/out.txt","content":"written-by-the-loop"}
+    level=L1 decision=allow outcome=success class=]
+  台件：probes/151-accept/e2e-control-l1-write-with-rows.txt
+```
+
+对照本程第 2.3 节那一发的同一枚读数尺：
+
+| 发 | 金样本里的工具 | 声明档位 | 控制台那行 | 桥的 `tool_call` 行 | `CloseTask` 审计 |
+|---|---|---|---|---|---|
+| E2E 发 | `fs.read`（`fs.go:298` → L0） | L0 | `[工具 fs.read -> error]` | **0 枚**（全库都空） | `was_open=false dropped=0` |
+| 对照发 | `fs.write`（L1 声明） | L1 | `[工具 fs.write -> success]` | **1 枚，`decision=allow outcome=success`** | `was_open=false dropped=0` |
+
+⇒ 三枚互不相干的可观测面（控制台 outcome、桥侧取证行、`[audit] tools:` 审计行）**同向**：
+L0 那一发死在环路、根本没进桥；L1 那一发进了桥、被记了行。
+⇒ **条件 C1 从"本程的推理"升级成"三面对拍的现量"**：`wisp run` 这条腿今天产生不了"带污点的环路 scope"，
+与 provider 是不是 mockllm 无关。第 9 节那张表的 C1 一行据此读，不再需要新读数。
+⚠ 同时钉一句边界：这两发都还是 `dropped=0`，所以**本程没有**造出"端到端关掉一枚带污点的 scope"那一发
+（第 2.3 节末段那条"本程没造出来"的登记**不撤销**，本节只是把"为什么造不出来"钉成了三面读数）。
