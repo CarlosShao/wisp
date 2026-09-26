@@ -173,3 +173,69 @@ $ PATH="<repo>/third_party/sherpa-onnx:$PATH" go test -count=1 -v -run TestAccep
   **不是**"用户会看到一堆 0"。本票的判词应写成前者；后者目前不会发生。实现件 §2.4 的原句
   "加出来的正是本票自己要防的那形"——**那形＝装饰／契约污染**，它没写"用户看得见"，所以**这句不算错**，
   但派单正文第 15 行把它转述成"把本票要防的常量**提前 ship 出去**"，**"ship 出去"三字过头**，本程按 2.3 校正。
+
+---
+
+## 3. 前提③：四把锁的归属 ＋ **AC#6 到底是不是结构上不可满足**（本程独立重走，含一发自造的钥匙探测）
+
+### 3.1 四把锁逐枚复量（出处＝`.scratch/wisp/dispatches/2026-09-26-093x-thaw-panel-for-145.md` 现读，不抄实现件）
+
+| 锁 | 派单说它是谁 | 本程现量 | 判 |
+|---|---|---|---|
+| **B** | `frontend/src/lib/panel.ts`，Q-51 未答、实现程禁写 | 特批正文里 `frontend/**` 那句是**"继续完全隔离：不读它的未提交改动、不写"**；两把双向对账尺读的正是这枚文件（`approval_test.go:107`、`composer_test.go:50` 现量 `os.ReadFile(filepath.Join(root,"frontend","src","lib","panel.ts"))`）——**尺的输入面＝禁写面**，这是结构不是态度 | ✅ 成立 |
+| **C** | 三枚被钉死的测试文件 | 响的四枚里两枚在 `pump_test.go`（§1），另一枚 `approval_test.go`／`composer_test.go`——**特批的放开清单只枚举了三枚文件**（`composer.go`／`pump.go`／`cmd/wisp/panel_pump.go`），其余按它自己那句"越界即作废"处理；另有三枚被**具名保留**（`tokens_fourway_test.go`／`l2_grant_boundary_test.go`／`frontend_hygiene_test.go`） | ✅ 成立 |
+| **D** | `cmd/wisp/run.go:421-427` ＋ sink `:751-785`＝票 151 的脸 | 两处行号在 3dcff6a **逐枚现量有效**（§2.1）；特批正文**自己写着**"本程不许碰 `run.go`"，台账 `A273③` 同句"**不碰 151 的 `run.go`**" | ✅ 成立（比实现件引的更强：不止台账划的，派单正文也写了） |
+| **E** | 放开面里没有 `*_test.go` ⇒ AC#6 无处落 | 见 3.2——本程**没有只信文档**，另造了一发探测"能不能在放开的非测试文件里塞一枚会跑的用例" | ✅ 成立，且是**硬**成立 |
+
+### 3.2 AC#6：三发独立凭据（原始件 `probes/145-accept/06-lockE-nontest-file-probe.txt`）
+
+**第一发（本程自造，是这一格真正的钥匙）**：Go 允不允许"用例写在非 `_test.go` 文件里"？
+如果允许，锁 E 就是措辞问题不是结构问题，本程就得推翻它。实测——往**放开面内的** `internal/panel/composer.go`
+末尾加一枚 `func TestProbe145AcceptInNonTestFile(t *testing.T) { t.Fatal(...) }` 并 `import "testing"`：
+
+```
+$ go test -count=1 -v -run TestProbe145AcceptInNonTestFile ./internal/panel/
+    testing: warning: no tests to run
+    ok  github.com/CarlosShao/wisp/internal/panel  [no tests to run]
+$ go vet ./internal/panel/                     → rc=0，**一声不响**
+$ go test -count=1 -v ./internal/panel/        → RUN=105（与基线同枚数），名册里该探针名出现 **0 次**
+```
+
+⇒ **非 `_test.go` 里的 `TestXxx` 编得进、vet 得绿、永远不跑**。⇒ 在那三枚放开文件里**造不出任何一枚会被执行的断言**，
+没有旁路。锁 E 成立，且**不是"它没找到写法"**。
+⚠ 顺手登记一枚**本程新增的仪器缺口**（与实现程那枚 json tag 缺口同族、方向更坏）：
+**"看着像用例、其实从不执行"这一形今天没有任何尺抓**——它比"忘了加 json tag"更危险，因为它给的是**绿＋一枚不跑的断言**，
+而 AC#6 的答句要的恰恰是"哪一枚用例"。归口＝编排者（新增判据，本程不擅自加钉）。
+
+**第二发（承重侧的对照，证明缺口是"地界"的不是"世界"的）**：把实现件那份闭合补丁**完整** apply 到 3dcff6a 的 blob 精确树
+（8 枚文件全 clean，`composer.go` 偏移 13、`pump.go` 偏移 14 ⇒ **它只声明了 `e24ae28` 干净，本程量到 3dcff6a 也干净**）：
+
+```
+./internal/panel/  RUN=106 PASS=59 FAIL=1   ← 唯一红＝基线那枚 C21；两把尺 "9 JSON keys reconciled" 转绿
+./cmd/wisp/ -run TestSnapshotGateSectionComesFromTheLiveGate   rc=0 --- PASS
+    packet approval section = {"depth":0,"windowMs":2000,"vetoChannels":[ …四行含 B1 原句"说取消词：语音取消不可用"… ]}
+```
+再按实现件的 E4 摘掉**唯一**那行填值（`pump.go` 的 `snap.Approval = approval`）：
+
+```
+    windowMs = 0, want the gate's own 2000
+    windowMs = 0: the section arrived unfilled
+    packet carries 0 channel rows, registry reports 4
+--- FAIL   rc=1
+```
+⇒ 实现件 §2.5/§2.6 那两发**本程逐字复现**（含那三句红句）。⇒ **AC#6 的缺口在于放开面，不在于可达性**：
+拿到 `panel.ts`＋`pump_test.go`＋`run.go` 一行读口＋一枚 `*_test.go` 这四把钥匙，AC#6 当场可答且承重。
+
+**第三发（实现件没写的一层，直接影响验收表怎么措辞）**：**空落地集下 AC#6 是"空真"，不是"不可满足"**。
+AC#6 的句式是"对**每一枚新字段**答一句"——落地集＝空 ⇒ 全称命题对空域自动为真。
+⇒ 所以准确判词是**两条**，不是一条：
+1. **AC#2 未落地**（判据成立，见 §1/§2），因而 **AC#6 今天没有回答对象**；
+2. **一旦 AC#2 落地任何一枚字段，AC#6 在这枚放开面内立即不可满足**（3.2 第一发）。
+⇒ 派单第 3 条那句禁令本程**采纳并给出替代措辞**：验收表里不许写"AC#6 待补"；
+应写成 **"AC#6：本放开面内无定义域；其可满足性与 AC#2 的落地集非空互为条件，解锁需 3.2 第二发那四把钥匙"**——
+既不是待办，也不是通过。
+
+### 3.3 一句总结这一格
+
+四把锁**枚枚成立**，其中锁 E 本程**加硬成"物理不可绕"**；而"能绿且承重"本程**自己造出来了**（第二发），
+所以 R1/R2 不是"做不到"的问题、是**给不给钥匙**的问题——**修法二选一归编排者，本程不选**。

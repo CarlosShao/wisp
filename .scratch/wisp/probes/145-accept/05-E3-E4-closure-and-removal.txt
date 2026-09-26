@@ -1,0 +1,17 @@
+# 前提③ 的承重判据复现：全闭合补丁在 3dcff6a 上 apply -> 能绿；摘掉填值那一行 -> 必红
+## apply（git apply -p1 -v，8 枚文件全 clean；composer.go 偏移 13、pump.go 偏移 14）
+## A. 合并全闭合：go test -count=1 -v ./internal/panel/
+RUN=106 PASS=59 FAIL=1  ← 唯一红＝基线既有的 TestC21DesignTokensFourWayAgree
+    approval_test.go:134: Snapshot <-> PanelSnapshot: 9 JSON keys reconciled
+    composer_test.go:79: Snapshot <-> PanelSnapshot: 9 JSON keys reconciled
+## B. 真装配根那一发（cmd/wisp，RUN=1，rc=0）
+    panel_pump_gate145_test.go:40: packet approval section = {"depth":0,"windowMs":2000,"vetoChannels":[{"name":"ball","text":"单击悬浮球：悬浮球取消不可用","loaded":false},{"name":"esc","text":"按 Esc 键：Esc 取消不可用","loaded":false},{"name":"panel","text":"面板拒绝：面板取消不可用（票 37 未接入）","loaded":false},{"name":"kws","text":"说取消词：语音取消不可用","loaded":false}]}
+--- PASS: TestSnapshotGateSectionComesFromTheLiveGate (1.92s)
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.000s
+rc=0
+## C. 承重判据 E4：只删 pump.go 的 snap.Approval = approval 一行
+    panel_pump_gate145_test.go:40: packet approval section = {"depth":0,"windowMs":0,"vetoChannels":null}
+    panel_pump_gate145_test.go:50: windowMs = 0, want the gate's own 2000
+    panel_pump_gate145_test.go:53: windowMs = 0: the section arrived unfilled
+    panel_pump_gate145_test.go:56: packet carries 0 channel rows, registry reports 4
+--- FAIL: TestSnapshotGateSectionComesFromTheLiveGate (1.89s)

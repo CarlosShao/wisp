@@ -1,0 +1,7 @@
+# 锁 E 的结构性判据（本程自造）：TestXxx 写在 *非* _test.go 里到底会不会跑
+命令：cp -r exact tree-mut6 && python<往 internal/panel/composer.go 末尾加 func TestProbe145AcceptInNonTestFile(t *testing.T){t.Fatal(...)} 并 import testing>
+  go test -count=1 -v -run TestProbe145AcceptInNonTestFile ./internal/panel/  ->  testing: warning: no tests to run / ok [no tests to run]
+  go vet ./internal/panel/                                                   ->  rc=0（不报警）
+  go test -count=1 -v ./internal/panel/（整包，无 -run）                     ->  RUN=105（基线 105，一枚没多）、名册里 0 次出现该探针名、包仍 FAIL=1＝基线那枚 C21
+⇒ 结论：非 _test.go 里的 TestXxx 编得进、vet 得绿、**永远不跑** ⇒ 放开面（三枚非测试文件）里造不出一枚会执行的用例。
+⇒ 顺带一枚**本程新登记的仪器缺口**（与实现程那枚 json tag 缺口同族）：'看着像用例、其实从不执行'这一形今天没有任何尺抓。
