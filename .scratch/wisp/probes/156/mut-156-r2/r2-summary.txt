@@ -1,0 +1,32 @@
+head=0f18652
+r2-152g1-case14off RUN=20 PASS=13 FAIL=0 SKIP=0 red=-
+r2-152g1-case14live RUN=21 PASS=13 FAIL=1 SKIP=0 red=TestSLO152CorruptLegWithNoNamedPositionRefusesToBorrowOne
+r2-asis-same-shape RUN=6 PASS=6 FAIL=0 SKIP=0 red=-
+head=0f18652
+r2-m1-old-surface-only RUN=21 PASS=14 FAIL=0 SKIP=0 red=-
+r2-asis-slo-all RUN=26 PASS=19 FAIL=0 SKIP=0 red=-
+r2-m1-plus-all-new-cases-off RUN=22 PASS=15 FAIL=0 SKIP=0 red=-
+r2-m1-same-shape RUN=6 PASS=2 FAIL=4 SKIP=0 red=TestSLO156ExitedAsksTheOSForAChildNobodyReaped,TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees,TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn,TestSLO156WaitReadyNamesTheDeadSubjectToo
+r2-m1-slo-all RUN=26 PASS=15 FAIL=4 SKIP=0 red=TestSLO156ExitedAsksTheOSForAChildNobodyReaped,TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees,TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn,TestSLO156WaitReadyNamesTheDeadSubjectToo
+r2-reinstall-asis-slo-all RUN=26 PASS=19 FAIL=0 SKIP=0 red=-
+head=0f18652
+r2-probe-on-shipped RUN=5 PASS=1 FAIL=0 SKIP=0 red=-
+r2-probe-on-m1 RUN=5 PASS=1 FAIL=0 SKIP=0 red=-
+head=0f18652
+r2-asis-152-surface RUN=21 PASS=14 FAIL=0 SKIP=0 red=-
+r2-asis-slo-all-after-ac4 RUN=26 PASS=19 FAIL=0 SKIP=0 red=-
+head=0f18652
+r2-152g1-case14off RUN=20 PASS=13 FAIL=0 SKIP=0 red=-
+r2-152g1-case14live RUN=21 PASS=13 FAIL=1 SKIP=0 red=TestSLO152CorruptLegWithNoNamedPositionRefusesToBorrowOne
+head=0f18652
+r2-asis-152-surface RUN=21 PASS=14 FAIL=0 SKIP=0 red=-
+r2-asis-slo-all-after-ac4 RUN=26 PASS=19 FAIL=0 SKIP=0 red=-
+head=2ce77e1
+r2-asis-same-shape-after-ac4 RUN=6 PASS=6 FAIL=0 SKIP=0 red=-
+r2-m1-old-surface-only-after-ac4 RUN=21 PASS=14 FAIL=0 SKIP=0 red=-
+r2-m1-plus-all-new-cases-off-after-ac4 RUN=22 PASS=15 FAIL=0 SKIP=0 red=-
+r2-probe-on-shipped-after-ac4 RUN=5 PASS=1 FAIL=0 SKIP=0 red=-
+r2-probe-on-m1-after-ac4 RUN=5 PASS=1 FAIL=0 SKIP=0 red=-
+head=2ce77e1
+r2-m1-same-shape-after-ac4 RUN=6 PASS=2 FAIL=4 SKIP=0 red=TestSLO156ExitedAsksTheOSForAChildNobodyReaped,TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees,TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn,TestSLO156WaitReadyNamesTheDeadSubjectToo
+r2-m1-slo-all-after-ac4 RUN=26 PASS=15 FAIL=4 SKIP=0 red=TestSLO156ExitedAsksTheOSForAChildNobodyReaped,TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees,TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn,TestSLO156WaitReadyNamesTheDeadSubjectToo

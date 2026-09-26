@@ -445,3 +445,230 @@ $ python probes/156/my156-r2.py ... r2-asis-slo-all-after-ac4 RUN=26 PASS=19 FAI
    `152-…-accept-r1.md` 是本程不许动的半件（` M`），它对同一枚数的记法本程一字未读成凭据。
 
 ---
+
+## 第 5 格　AC#5：承重两问（**r2 程**，锚点现读 `2ce77e1`＝本格 AC#4 那枚 commit；变异**本程自己跑**，红句**逐字贴**）
+
+### 5.0 本程答的是哪一味（带版本的可定位写法）
+
+`cmd/wisp/slo_windows.go` @ 树内 sha256 前缀 `d2bc41ecfef06bd4`（＝`git show HEAD:…| sha256sum` 同值，本程现核）：
+
+| 味 | 行 | 内容 |
+|---|---|---|
+| (a) 我们的记录（收过尸才算数） | `:878-880` | `if ps := s.cmd.ProcessState; ps != nil { return ps.Exited(), ps.ExitCode() }` |
+| **(b) 本票选定的一味＝问 OS** | **`:881-882`** | `// (b) the OS, for the window this type actually lives in.` ＋ `return s.queryProcess()` |
+| 它的实现 | `:904-922` | `queryProcess()`：`WithHandle` → `WaitForSingleObject(h,0)` → `GetExitCodeProcess` |
+
+**摘法**＝变异 `m1`（`probes/156/my156.py:OS_ARM_REMOVED`）把 `:881-882` 两行换成
+`// MUTATION m1: …` ＋ `return false, exitCodeUnknown` ⇒ **(a) 一字未动、函数签名一字未动、编得过**（不是"摘一味导致编不过"那一形）。
+
+### 5.1 问①"摘掉这一味，是否存在一发变异从此打不红？"——**三个方向都量了，答案是分层的**
+
+本程现跑（尺＝`probes/156/my156-r2.py`，全部 `spec`/`case_off` **import 自 r1 那把尺**，一枚字面都没重打）：
+
+| 方向 | 发 | 选择器 | 四数 | 判 |
+|---|---|---|---|---|
+| 甲：**单摘这一味** | `r2-m1-same-shape-after-ac4` | `TestSLO149Exited\|TestSLO156` | RUN=6 PASS=**2** **FAIL=4** SKIP=0 | **有牙**：四枚红（名与句见 §5.3）。仍绿的两枚＝`TestSLO156FixtureChildrenDoWhatTheirNamesSay`（夹具自检）＋`TestSLO149ExitedGiveUpSentenceCarriesTheLastReading`（**票 149 的 case 13**）⇒ case 13 **不是**这味的主人，它走 (a) 那条支，所以 m1 拿它无可奈何——这正是 m1"只摘 (b)"的证据 |
+| 乙：**同一味摘掉＋本票新增四枚持有者逐枚改名** | `r2-m1-plus-all-new-cases-off-after-ac4` | 全 SLO 五族 | RUN=22 PASS=15 **FAIL=0** SKIP=0 | **存在打不红的那一发**——形状＝"摘一味 **并且** 同时摘掉四枚新用例"。这与票 152 那枚"条件式"（`h1` 红／`h2` 逃逸）同形，本程把它从**断言**降级成了**读数** |
+| 丙：**这一味摘掉，只问本票之前的旧名册** | `r2-m1-old-surface-only-after-ac4` | `TestSLO144\|TestSLO147\|TestSLO149\|TestSLO152` | RUN=21 PASS=14 **FAIL=0** SKIP=0 | 与该选择器的**零变异**基线（`r2-asis-152-surface`＝21/14/0）**四个数一字不差，名册两向 `comm` 差集三向皆空**（§5.5）⇒ 改前那份测试面对这一味**零持有**。**这才是"打不红"的严格形**，也正是 AC#3 必须新增用例的理由（没有新用例，这味就是装饰腿） |
+
+⇒ **本格按操作定义的答案**：问①**是**——存在打不红的那一发（乙、丙两形），但**不是**"摘了没人能觉"那一形：
+单摘一味（甲）红四枚，而打不红的两发**都要靠摘掉用例本身**才成立。本程**没有**把乙/丙读成"这一味没牙"，
+也没有把它们藏起来只报甲。
+
+### 5.2 变异落地自证（派单第（甲）步：别只贴 diff）
+
+每一发在跑**之前**打印三行、跑**之后**再打一行（原文在 stdout 记录里，key 全部 `P156R2|`）：
+
+```
+P156R2|TREE|cell=r2-m1-same-shape-after-ac4|head=2ce77e1|slo_windows.go=d2bc41ecfef06bd4|slo_report_144_windows_test.go=daf3455916f6bfd3|slo_exit_os_156_windows_test.go=9f1a709712b3bf1c
+P156R2|LANDING|cell=…|overlay_json=D:\tmp\wisp156-r2\wisp156-ruler\r2-m1-same-shape-after-ac4\overlay.json
+P156R2|LANDING|cell=…|compiled_file=cmd/wisp/slo_windows.go|src_read_by_compiler=D:/tmp/wisp156-r2/wisp156-ruler/r2-m1-same-shape-after-ac4/slo_windows.go|entries=1|tmp_sha256=28b99b2b842a9344|new1=yes|old1=gone
+P156R2|RESULT|cell=…|rc=1|RUN=6|PASS=2|FAIL=4|SKIP=0|red=…|tree_dirty_after=clean|log=…r2-m1-same-shape-after-ac4.log
+```
+
+三层反假绿：
+1. **编译器真读的那份文件**的绝对路径与 sha256 打出来（`tmp_sha256=28b99b2b842a9344`），
+   且 `new1=yes`（变异自己的 `MUTATION m1` 文字在里面）／`old1=gone`（被换掉的 `return s.queryProcess()` 已不在里面）；
+   这两条 r1 那把尺是**内部 FATAL 守卫**，本程改成**打印**。
+2. **五发 m1 打的 `tmp_sha256` 是同一枚**（`28b99b2b842a9344`：`r2-m1-same-shape-after-ac4`、`r2-m1-slo-all-after-ac4`、
+   `r2-m1-old-surface-only-after-ac4`、`r2-m1-plus-all-new-cases-off-after-ac4`、`r2-probe-on-m1-after-ac4`），
+   而树字节全是 `d2bc41ecfef06bd4` ⇒ 五发说的是**同一 edits、同一底版**，不是五枚各自漂出来的东西。
+3. 行为层的反证：**红句本身只可能在变异字节上出现**——`never wrote a complete report within 30s` 打在
+   一只已死未收尸的 subject 上；同一 cell 在零变异那一发印的是 DEAD-CHILD 句（§5.4）。
+   外加每发 `tree_dirty_after=clean` ⇒ **改的是 overlay，工作树自始至终没被写过**（与 r1 同形，本程也没做快照搬运）。
+
+仪器纪律现量：`-overlay` 与 `-cover*` 合用 **0 次**（`my156.run` 里那条 FATAL 守卫在，本程一枚 `-cover` 都没传）；
+`-race` **0 次**；红绿只认锚定 `^--- FAIL:`；每发都数 `=== RUN`（本程自己跑的 **20 发全部 ≥5 条，无一枚 `LOADED=NO`**）。
+
+### 5.3 红名与红句原文（本程现跑，`r2-m1-same-shape-after-ac4.log`，逐字）
+
+```
+--- FAIL: TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn (30.04s)
+    slo_exit_os_156_windows_test.go:248: give-up "wisp slo: subject 11852 never wrote a complete report within 30s (last read: 8 bytes read, document still open at offset 8: the tail had not arrived)" does not name the dead child and its code
+    slo_exit_os_156_windows_test.go:251: an unreaped dead subject was reported as a spent budget, not as a corpse - the exact misattribution Q-57 was raised for: "wisp slo: subject 11852 never wrote a complete report within 30s (last read: 8 bytes read, document still open at offset 8: the tail had not arrived)"
+    slo_exit_os_156_windows_test.go:257: dead subject was read 1467 times, want exactly 1 (the loop asks the OS and gives up on the spot)
+--- FAIL: TestSLO156ExitedAsksTheOSForAChildNobodyReaped (0.16s)
+    slo_exit_os_156_windows_test.go:159: exited() is false for a subject the OS reports terminated with code 7 (process object signaled, exit code read back) while ProcessState is still nil: …
+    slo_exit_os_156_windows_test.go:162: exitCode() is -1, want 7 (the code the OS reports): the give-up sentence prints this number
+    slo_exit_os_156_windows_test.go:170: the second ask of exited() answered false for a child the OS reports dead
+--- FAIL: TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees (0.01s)
+--- FAIL: TestSLO156WaitReadyNamesTheDeadSubjectToo (60.09s)
+    slo_exit_os_156_windows_test.go:283: waitReady give-up "wisp slo: subject 50320 never reported ready within 1m0s" does not name the dead subject and its code
+```
+
+（1467 次／30.04s 与 r1 那发的 1469 次／30.07s 是**本机差**，本程不做跨机宣称。）
+
+### 5.4 复装回全绿（派单第（丙）步；"复装"在这一套路子里是什么意思，本程写明白）
+
+本程与 r1 一样**从不往树上写变异**（§5.2 第 3 层），所以"复装"＝**同一条命令、不带 `-overlay`、树字节 sha 一致**。
+本程量了两枚不同时刻的 asis 发，把 AC#4 那枚 commit 的两侧都钉住：
+
+| 发 | head | 四数 | 与 m1 那发的关系 |
+|---|---|---|---|
+| `r2-m1-slo-all-after-ac4`（变异） | 2ce77e1 | RUN=26 PASS=15 **FAIL=4** | 红名＝四枚新用例 |
+| `r2-reinstall-asis-slo-all`（AC#4 落库前，同命令、无 overlay） | 0f18652 | RUN=26 PASS=19 **FAIL=0** | 与下一行**名册两向 `comm` 差集为空** |
+| `r2-asis-slo-all-after-ac4`（AC#4 落库后，同一形状） | 2ce77e1 | RUN=26 PASS=19 **FAIL=0** | 19 枚名字与前两发逐字相同 |
+| `r2-asis-same-shape-after-ac4`（甲那一形的 asis 侧） | 2ce77e1 | RUN=6 PASS=6 **FAIL=0** | 与 r1 的 `asis.log` 同形同数 |
+
+⇒ **同一条命令、树字节 `d2bc41ecfef06bd4` 不变、去掉 overlay ⇒ 全绿**，这就是"复装必须回全绿"的读数。
+
+### 5.5 问②"摘掉它有没有任何外部可见读数变过？"——**变了，两口径都变**（与票 152 那一票恰好相反）
+
+**名册口径**（`r2-asis-slo-all-after-ac4` vs `r2-m1-slo-all-after-ac4`，两向 `comm`，四数之外必须比名册）：
+
+```
+[RUN]  26 对 26   only-in-asis=空   only-in-m1=空      <- 没有任何用例被吞、没有 panic 掩盖其余读数
+[PASS] 19 对 15   only-in-asis= TestSLO156ExitedAsksTheOSForAChildNobodyReaped,
+                                      TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees,
+                                      TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn,
+                                      TestSLO156WaitReadyNamesTheDeadSubjectToo      only-in-m1=空
+[FAIL]  0 对  4   only-in-asis=空                     only-in-m1=同样那 4 枚
+[SKIP]  0 对  0   两向皆空
+旧名册那一面（TestSLO144|147|149|152，21 枚名字）：asis 与 m1 两向 comm 三向皆空（§5.1 丙）
+```
+
+**操作员口径**（这才是本票的靶）——同一枚探针、同一棵树、同一 cell，只换那一味，`sentence=` 逐字不同：
+
+| cell | 零变异（`r2-probe-on-shipped-after-ac4.log`） | 摘掉这一味（`r2-probe-on-m1-after-ac4.log`） |
+|---|---|---|
+| `prefix-unreaped` | `sentence=wisp slo: subject 51052 **exited (code 7) without writing its report** (989 bytes read, document still open at offset 989…)`；`loop=elapsed_ms=0 **reads=1** verdict_kind=DEAD-CHILD`；`window=os_knew_at_ms=36_code_still_said_alive_after_loop_ms=4` | `sentence=wisp slo: subject 29912 **never wrote a complete report within 2s** (last read: 989 bytes read…)`；`loop=elapsed_ms=2002 **reads=188** verdict_kind=BUDGET`；`window=os_knew_at_ms=32_code_still_said_alive_after_loop_ms=**2202**`；`agree=os_dead_to_code_dead_ms=**-1** asks=126` |
+| `nofile-unreaped` | DEAD-CHILD、`reads=1`、window 5ms | BUDGET、`reads=190`、window 2203ms、`agree=-1 asks=125` |
+| `prefix-REAPED-case13shape` | DEAD-CHILD、`reads=1` | **一字未变**：DEAD-CHILD、`reads=1` ⇒ m1 确实只摘了 (b)，(a) 那条支照旧（与 §5.1 甲里 case 13 仍绿互为两向证据） |
+| `live-child`（阴性对照） | BUDGET、`reads=192` | **仍是 BUDGET**、`reads=190` ⇒ 这味没把活着的孩子认成死的 |
+
+⇒ 问②**有**：**外部可见读数变了，且变的正是操作员看到的那一句**（指错病因 → 指对病因），
+不是票 152 §9 第 7 行那种"名册变了、操作员一毫米没变"。**反向对照也在**：`live-child` 与
+`prefix-REAPED-case13shape` 两发两版逐字同形 ⇒ 这一味不是"什么都变"的那种改法。
+
+### 5.6 逐枚点名：**哪些是本程复跑、哪些仍是引用**（本仓为"把引用当复算"退回过程序）
+
+本程**复跑**（当轮、同形＝同 `spec` 同选择器）：
+
+| r1 那枚日志 | 本程复跑的发 | 对不对得上 |
+|---|---|---|
+| `mut-156/asis.log`（6/6/0） | `r2-asis-same-shape-after-ac4` | **对上**：6/6/0/0 |
+| `mut-156/m1-os-arm-removed.log`（6/2/4，四枚红名） | `r2-m1-same-shape-after-ac4` | **对上**：6/2/4/0、四枚红名逐字相同；reads 1467 对 1469＝本机差 |
+
+本程**复跑了同一发变异但换了选择器 ⇒ 不是那枚日志的复算**：
+`m1-plus-all-new-cases-off`（r1＝2/2/0，sel 两族）对 `r2-m1-plus-all-new-cases-off-after-ac4`（本程＝22/15/0，sel 五族）——
+**同一发编辑、不同射程**，共同读数只有 `FAIL=0` 那一格。本程把它记成"这一味的逃逸口被本程重量过"，**不记成"那枚日志被复算"**。
+
+**仍是引用、本程一枚未跑**（判 AC#5 不需要它们，需要它们的格子在别处）：
+`m2-os-arm-never-dead`（6/2/4）、`m3-os-arm-always-dead`（6/5/1，只红 case 16）、`m4-shortcircuit-deleted`（6/4/2，红 case 16＋**case 13**）、
+`m5-code-read-dropped`（6/3/3）、`case15-off`／`case16-off`／`case17-off`／`case18-off`（各 5/5/0）、`m4-plus-case13-off`（5/4/1）。
+⇒ 这 8 枚的档位一律**停在〔r1 日志＋本程只数了四数〕**：本程只**现数了这四数的字面**（`grep -c`），**没有**重跑任何一发 m2-m5／caseNN-off。
+
+⚠ **票面那个"别按名字猜"的坑，本程的处置**：`mut-156/` 里**没有** `case13-off.log`，只有 `m4-plus-case13-off.log`
+（合体发）。**本程没有补跑"只关 case 13"那一发**，因为问①的三个方向里没有任何一问需要它：
+"case 13 是不是这味的主人"本程是由 `r2-m1-same-shape-after-ac4` **直接**量到的（m1 之下 case 13 仍绿）。
+若下一位要判的是 **(a) 支的持有者**（那是 r1 §第 4 格与 m4 那一族的问题，不在本程射程），
+那一发才必须自己补跑，尺已备：`my156.py` 的 `case_off(OLD_TEST_REL, CASE13, "case13")`。
+
+**放水两问自答**：① 断言方向：本程零改动——判据、阈值、预算常量（`subjectReportBudget`／`subjectGrace`）、
+golden、`slo_exit_os_156_windows_test.go` 全未动（三枚文件的树 sha 在每发 `TREE` 行里，与前 8 格同一枚）；
+② helper：本程用的两把尺都是**已有的**（`my156.py` 出变异、`zz156probe_windows_test.go` 出探针读数），
+`my156-r2.py` **不含任何一枚变异字面**，只做打印与四数/名册。
+
+**第 5 格判定**：**①〔成立·带条件，且条件是本程量的〕**（单摘一味＝四枚红；打不红的两发分别是"同时摘四枚持有者"与"只问改前旧名册"）；
+**②〔成立〕**（名册口径四数＋名册差集变、操作员口径逐字变，另有两发反向对照未变）。
+本格**不自判 AC#5 通过**——按 `SPEC-12 §4.3` 那把尺，这格要非实现者程另判。
+
+**本程没测什么（本格）**：
+1. **没跑 m2/m3/m4/m5 与四枚 caseNN-off**（§5.6 点名，全是引用），因此**没有独立复核**"这一味内部每一枚 syscall 是否都有主人"
+   （那是 r1 §第 4 格的射程，r2 派单明令不重跑）；
+2. **没量 (a) 支的持有者**（m4 那一族）⇒ **本程也没替票 156 补 `case13-off` 那一发**；
+3. **没跑 `cmd/wisp` 全套门禁**（AC#7 射程，本程明令不跑）⇒ §5.5 那些名册数**只在 SLO 五族选择器内成立**，
+   不是整包读数，**别把它们当 AC#7 的四数用**；
+4. **没量真 `wisp slo` 端到端**（真 Job Object 里打死真 subject 后操作员看到的那一句）：§5.5 那一格是**探针**在
+   生产接缝上打印的句子，探针预算是本探针自挑的 `2s/10ms`（生产是 `30s/20ms`）；case 17 那发的 30.04s／1467 次
+   **是**生产常量，但它走的是测试接线不是那条命令；
+5. **`-race` 一枚没跑** ⇒ 新增每轮询 1-3 枚内核调用与 `stop()` 的竞态关系，本程**没有判据**（既不红也不绿）。
+
+---
+
+## 第 6 格（r2 部分）　本程**没测什么**＋**未交**（整程一份，按"漏了它谁会先被骗"排序）
+
+1. **AC#6 契约轴零字节名册＝本程未交**（派单明写留给下一程）。本程只**自证**没碰码：
+   `slo_windows.go`／`slo_exit_os_156_windows_test.go` 树 sha 在本程那 20 发的 `TREE` 行里恒为
+   `d2bc41ecfef06bd4`／`9f1a709712b3bf1c`，`git status --porcelain -- cmd/wisp internal` 每发之后 `clean`，
+   本程唯一改过的码文件＝`slo_report_144_windows_test.go`（55 增 0 删、纯注释）。
+   **这不等于 AC#6**：逐枚 commit 名册、`frontend/**`/`design/**` 的排除口径、`probes/152/my152.py` 与
+   `152-…-accept-r1.md` 两枚半件的"不算进任何零命中宣称"，本程**一枚都没做**。
+   ⇒ 谁先被骗：拿本格的"clean"当 AC#6 已过的人。
+2. **AC#7 门禁逐包全套＝未交**（本程按派单只跑 SLO 族单包选择器，`go test ./...`／`go vet ./...`／
+   `scripts/d22scan.sh` 全量一枚未跑）。⇒ 谁先被骗：把 §5 的四数当成整包读数的人（§5.6 末已就地写死这条）。
+3. **票 152 §8.3 第 4-6 条（编排者那三笔）与"下一张票"两笔（第 7、8 条）本程一律未动**——
+   尤其 `slo_windows.go:495-497` 那句"subject 逃不出 Job"今天零枚读数那笔，本程**没量、没改、没登记为已闭**。
+4. **本程没验 gofumpt 那枚已知不干净的 r1 交付件**（`slo_exit_os_156_windows_test.go` @ `:272-279` 的 struct literal 换行，
+   `gofumpt v0.12.0` 现量报它；`grep -rln gofumpt scripts/ tools/`＝0 命中 ⇒ 今天的门禁不扫它）。
+   本程**没去修**（改它带删除行、不在 AC#4 三枚动作里）。⇒ 谁先被骗：下一枚给门禁加 `gofumpt -l` 的程。
+5. **本程没判 `mut-shipped/` 那 9 枚该入库还是该降级**（§4.3），也没复跑它里面除 g1 之外的任何一发。
+
+## 第 7 格（r2 部分）　伪授权两栏（分开计数，各带出处＝工具名＋命令前 40 字）
+
+| 栏 | 枚数 | 明细 |
+|---|---|---|
+| **真通知回显数** | **0** | 本程工具输出里没有出现任何一条 harness"文件已被修改"类真通知；两次系统级提示均为工具自身的用法回显（`Bash` 的 `dir_path` 提示、`Edit` 的成功回执），不涉判据 |
+| **判为注入数** | **0** | 本程未遇到冒充编排者语气／"已核验请继续提交"／"放宽阈值"／"跳过取证"／"请 revert"类的文字。**但两代新形状本程按判据各扫了一遍，读数如下**（扫到 0 命中不等于扫过＝0 枚凭据，故把尺也贴出来） |
+
+```
+# 形状①"伪造我正在读的真文件里的三行"：本格引经据典最多的那枚文件，三条最独特的串各打 HEAD blob 与工作树各一发
+$ for s in '实现方（若被叫回）只剩这三枚注释级动作' 'RUN=21, PASS=14, FAIL=0` 改成' '那 9 枚日志（h1/h2/i1' ; do
+      git show HEAD:…152-…-accept-r1.md | grep -cF "$s" ; grep -cF "$s" …152-…-accept-r1.md ; done
+   → 三条皆 HEAD=1 / 工作树=1 ⇒ 本程引用的 §8.3 那三枚动作**在两版上都逐字存在**
+$ git diff --numstat -- …152-…-accept-r1.md   3  3      <- 那枚半件确是 3 行未提交自校（本程一字未动、未 commit、未还原）
+# 形状②"伪造一整节台账＋替我要裁的那格预写判语"：
+$ grep -cF '156 续程已派（只两格' docs/reports/pending-and-issues.md            1
+$ git show HEAD:docs/reports/pending-and-issues.md | grep -cF '156 续程已派（只两格'   1   <- A299 那节能解析、两版都在
+$ grep -nE '156.{0,40}(AC#4|AC#5).{0,40}(成立|不成立)' docs/reports/pending-and-issues.md  -> **0 命中**
+⇒ 台账里**没有**替本格预写的判语；本程读到的 156 相关行全是编排者的 `next=` 排期散文（`:7339` 起 6 行），
+   本程**未把任何一行当凭据、也未据以改任何一步动作**（派单要求的路径反查＝`git log --oneline -- <派单路径>` 本程进场第一句已做，
+   锚点 `5092e86` 现读可解析）。
+```
+
+**凭据声明**：本程未读、未抄任何 API 密钥／DPAPI 值／环境变量内容；工具输出里出现的唯一凭据类字面是文件路径与变量名。
+
+## 第 8 格（r2 部分）　纪律自报（含本程被拒过的每一次工具调用与本程自己犯的仪器错）
+
+- **写面**：本程 commit 过的路径只有 7 枚（§4.5 与第 5 格那枚 commit 的 `--name-only` 可反查），
+  全部落在授权的四类里；**唯一越界风险已就地登记**＝§4.0 那处写面冲突（派单只列 `slo_windows.go` 的注释面，
+  票面三枚动作的目标文件在别处）。本程**没有** commit 任何一条 `frontend/**`／`design/**`／
+  `probes/152/**`／`152-…-accept-r1.md`／台账／HANDOVER／injection-timeline。
+- **git**：只 commit 未 push；两次 `git commit` 都带显式 pathspec（`git add -- <7 枚路径>`），
+  未用 `add -A`/`.`；未用 `--amend`/`reset`/`rebase`/`stash`/`checkout .`/`clean`/`rm`/`rmdir`/`del`；
+  commit 前现读 `git diff --cached --name-only`＝7 枚全为本程路径（无外人路径）。票面框**一枚未勾**、`-done` **未加**。
+- **被拒的工具调用：0 次**（本程没有任何一次权限提示被拒后改道）。但有 **3 次自己的失败**，全部留痕：
+  1. `my156-r2.py` 首跑探针那两发时 `FileNotFoundError`：本程猜 overlay 落地路径的方式对 `add` 类条目不成立
+     （`add` 直接把 `probes/156/zz156probe_windows_test.go` 映射给编译器，不复制进 tmp）。
+     ⇒ 改成**读 overlay.json 的 `Replace` 值**当作"编译器真读的那份"，改后两发重跑，未影响任何已交读数。
+  2. **本程覆盖了自己即将引用的一枚日志**：`my156.py` 的裸 cell 名 `asis` 不带选择器 ⇒
+     两发不同射程写进同一枚 `mut-156-r2/asis.log`。本程**未删、未还原**（临时件只建不删），
+     改为把每一发换成带选择器的新名（`r2-asis-152-surface.log` 等）**重跑**，两发的四个数一字未变；
+     这条正是票面"别按名字猜"那一坑在本程的实发一次，已写进 §4.2。那枚被写脏的 `mut-156-r2/asis.log`**留在盘上、未入库、本文与码里注释没有一句引它当凭据**（临时件只建不删；
+     §4.2 那句已入库的文字本程**一字未回改**，这条补充只长在本格）。
+  3. 一次 `grep -vc` 命中数为 0 时 rc=1 断了 `&&` 链（形状核那一步只跑到第二条）⇒ 拆开发重跑，读数不变。
+- **本格尺子版本现读**：`gofumpt v0.12.0 (go1.27.1)`、`go version go1.27.1 windows/amd64`、
+  `git` 与 python 尺同 r1；**未从任何旧票面抄版本号**。
+- **本格不判任何一框**：票面 7 框由编排者按非实现者验收表定（`SPEC-12 §4.3` #1/#3）。
+
+---

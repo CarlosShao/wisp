@@ -72,6 +72,11 @@ CELLS = {
     "r2-asis-slo-all-after-ac4": ([], SEL_SLO_ALL),
     "r2-m1-slo-all-after-ac4": ([R.OS_ARM_REMOVED], SEL_SLO_ALL),
     "r2-m1-same-shape-after-ac4": ([R.OS_ARM_REMOVED], SEL_156_SHAPE),
+    "r2-asis-same-shape-after-ac4": ([], SEL_156_SHAPE),
+    "r2-m1-plus-all-new-cases-off-after-ac4": ([R.OS_ARM_REMOVED] + ALL_NEW_CASES_OFF, SEL_SLO_ALL),
+    "r2-m1-old-surface-only-after-ac4": ([R.OS_ARM_REMOVED], SEL_152_ONLY),
+    "r2-probe-on-shipped-after-ac4": ([R.PROBE_ADD], "^" + R.SELPROBE + "$"),
+    "r2-probe-on-m1-after-ac4": ([R.OS_ARM_REMOVED, R.PROBE_ADD], "^" + R.SELPROBE + "$"),
 }
 
 
