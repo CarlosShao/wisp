@@ -1,5 +1,13 @@
 # 138 — 取消一轮任务时，那一轮**自己拉起来的子进程没有归属**：`Cancel()` 只掐 context，全仓零枚 `TerminateJobObject`，唯一的 `JobScope` 是**整机一枚**
 
+**Status:** **`blocked`（09-26 00:5x 编排者按 138 验收程的第 4 节判；等 `Q-55` 那一次批准一起落）**
+              ⇒ **不走 `-done`、也不作废**：验收程判"正解是池内规则 5＝`blocked` ＋ `Q##`"，
+              并点名我票面 `:46` 那个 `ready-for-human` **在池子词表里不存在**（`README:9-15` 只有
+              `ready-for-agent`／`in-progress`／`blocked`／`review`／`done`）——那一处是**我写的票面缺陷**，
+              原句不抹、更正见文末 Progress log。
+              ⚠ 同时登记：我票面 `:12`（冻 `docs/specs/*.md`）与 `:44-46`（命令去 `SPEC-12 §5` 登记）**是同票互斥**。
+              ／ 上一状态 **`ready-for-agent`**（原文照抄在下一行，不覆盖它）
+
 **Status:** ready-for-agent（2026-09-24 10:0x 编排者建；来源＝owner 批准的 `Q-43` 前半，
               原始缺口＝`docs/reports/2026-09-23-gap-analysis-vs-oss-harnesses.md` **GAP-09**，
               裁决见 `docs/reports/2026-09-24-gap-analysis-audit-verdict.md` §2 表第 09 行。
@@ -35,7 +43,7 @@ GAP-09 的原话是：「取消只有 `RunningTask.Cancel()`→root ctx；JobSco
 
 ## 2. 结案判据
 
-- [ ] **AC#1**（把"无归属"从断言变成读数）**现算三件事并逐名给表**：
+- [x] **AC#1**（把"无归属"从断言变成读数）**现算三件事并逐名给表**：
       ① 那一枚 `JobScope` 的**创建点数**与**调用者**（生产码里几枚、测试里几枚；是不是整机共用一枚）；
       ② 仓内有没有 `AssignProcessToJobObject`（及等价形状）；有 ⇒ 谁被分配进去过；
       ③ **今天哪一条生产路径真的会 exec 出子进程**：逐枚列出候选（`fs.*` 之外还有哪些），
@@ -55,7 +63,7 @@ GAP-09 的原话是：「取消只有 `RunningTask.Cancel()`→root ctx；JobSco
 - [ ] **AC#3**（牙）**必须有一枚用例在"级联"被摘掉时转红**，且**逐名列出**它红在哪一行；
       先证变异落地（`grep -n` 到你改那一行的原文 ＋ `go build ./...` rc=0）再读数。
       ⚠ 不许用 `t.Skip` 或调高阈值换绿；不许改断言去迁就实现。
-- [ ] **AC#4**（门禁）`gofmt -l`／`gofumpt`（⚠ **宿主已装 v0.12.0，直接跑现成 binary，
+- [x] **AC#4**（门禁）`gofmt -l`／`gofumpt`（⚠ **宿主已装 v0.12.0，直接跑现成 binary，
       绝对不要执行 `go install mvdan.cc/gofumpt@latest`**——那会改写宿主工具）／
       `go vet` 宿主原生 rc=0 ／ `sh scripts/d22scan.sh` rc=0 且各 scope 不降 ／ `-count=2 -v` 两形四数
       ＋**名册差集**（四数之外还要比 `=== RUN` 与 `--- FAIL` 逐名名单，一条 panic 会吞掉同包其余读数）。
@@ -76,3 +84,16 @@ GAP-09 的原话是：「取消只有 `RunningTask.Cancel()`→root ctx；JobSco
   自己现量了 §0 那两枚锚（`loop.go:300`、`type JobScope` 唯一声明、`TerminateJobObject` 零命中）；
   **审计代理报的"全进程一枚／无调用者"那半截我没复算，已写进 AC#1 要求现算**。
   next＝排在今日队列之后（137 AC#3／AC#4、135 原六格、136 AC#10／AC#11、#40 全树终判据复算）。
+
+- [2026-09-26 00:5x +08] 编排者按 138 验收程（`docs/evidence/s1/138-cancel-kills-children-r1-accept-r1.md`，6 格／6 枚 commit、零代码改动）处置本票。
+  **`AC#1`／`AC#4` 我已翻勾；`AC#2`／`AC#3` 原句不动、也不勾**——它俩的"前件被判假⇒未触发"是真的（今天没有可走路径），
+  本票**既不作废也不 `-done`**，按验收程第 4 节改判 **`blocked` ＋ 等 `Q-55` 那一次批准一起落**。
+  > **更正一处、认错两处（原句不抹，逐条在下面追加）：**
+  > ① **`:46` 那句 `ready-for-human` 是我写的票面缺陷**：`README:9-15` 的状态词表里**根本没有这个值**
+  >    （只有 `ready-for-agent`/`in-progress`/`blocked`/`review`/`done`）。正确写法就是本行上面那个 `blocked`。
+  > ② **`:12`（冻 `docs/specs/*.md`）与 `:44-46`（命令去 `SPEC-12 §5` 登记）在同一次批准之前互斥**——
+  >    这是我自己开票时没量到的自相矛盾；验收程点名了，处置是"两行一起交给 `Q-55`"，不由实现方硬挑一边。
+  > ③ **`A267③` 我那格"它引用了我没说过的话"降级为未定性**：验收程现量 **票面整份零枚 `CI|workflow|runner|gh run` 字样**（比我说得强，排除"改写票面"那一支），
+  >    但**我的派单正文在盘上没有凭据**（`.scratch/wisp/dispatches/` 的规矩当时只归档"授予范围／解冻／例外"那类，普通实现派单不入盘）
+  >    ⇒ 所以"我派单里没这句"是**我对上下文的回忆、不是一件可核的物证**。甲／乙／丙／丁四支**一支都不能定罪**。
+  >    ⇒ 制度已改：**从本行起，每一枚派单正文落盘进 `dispatches/`**（见该目录 README 末段追加的那条），今后这类争议有物证可查。
