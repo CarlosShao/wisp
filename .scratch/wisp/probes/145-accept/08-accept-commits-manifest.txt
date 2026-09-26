@@ -1,0 +1,102 @@
+# 本程（145 对抗验收）全部 commit 的路径名册——由 git 现量生成，非手抄
+## ec2247a  10:43
+      msg: evidence(145 验收 §0): 锚点 3dcff6a 现读＋本程自己造出的一枚取版尺假红——`git archive` 在 * text=auto 下把 LF blob 落成 CRLF 树（1514 枚里 423 枚不字节等、.go 零受影响），archive 树多一枚 TestComposerRenderFixtureTellsTheTruth 红、逐 blob 精确树＝RUN105/PASS58/FAIL1 与实现程同数
+   
+   .scratch/wisp/probes/145-accept/00-extract-ruler-archive.txt
+   .scratch/wisp/probes/145-accept/00-extract-ruler-exact.txt
+   docs/evidence/s1/145-snapshot-fields-landed-r1-accept-r1.md
+## 69f50ca  10:47
+      msg: evidence(145 验收 §1): 前提① E1 成立——blob 精确树只加九枚键 ⇒ 四枚逐名逐行号复现（approval_test.go:129 / composer_test.go:74 / pump_test.go:124 / :276），并自造单键变体证明"爆炸半径与枚数无关、与第五枚键有关"；另记 composer.go 注释里那两行号是定义处不是断言处
+   
+   .scratch/wisp/probes/145-accept/01-E1-four-pins.txt
+   .scratch/wisp/probes/145-accept/02-E1b-one-key-same-four-pins.txt
+   docs/evidence/s1/145-snapshot-fields-landed-r1-accept-r1.md
+## 9ffb9f5  10:49
+      msg: evidence(145 验收 §2): 前提② E1b 成立并升级——本程不手搓 PumpSources，改跑真装配根（runTextTask→publishPanelSnapshot→出口字节），五枚新段全零值/null 出门而 results/composer 同包为活；同时划两处边界：pending 那一支是实现程手搓读数（本程未复现），"提前 ship 出去"三字过头（常量今天到不了页，只污染契约）
+   
+   .scratch/wisp/probes/145-accept/04-E1b-real-assembly-root.txt
+   .scratch/wisp/probes/145-accept/04b-E1b-probe-test.go.txt
+   docs/evidence/s1/145-snapshot-fields-landed-r1-accept-r1.md
+## 082e374  10:52
+      msg: evidence(145 验收 §3): 四把锁枚枚成立，锁 E 本程加硬成物理不可绕（自造一发：TestXxx 写在非 _test.go 里编得进、vet 得绿、永不跑 ⇒ 顺手登记一枚"绿＋不跑的断言"仪器缺口）；闭合补丁在 3dcff6a 也干净、E3/E4 逐字复现（能绿且承重）；AC#6 拆成两条——空集下是空真、非空集下立即不可满足，并给出替代"待补"的措辞
+   
+   .scratch/wisp/probes/145-accept/05-E3-E4-closure-and-removal.txt
+   .scratch/wisp/probes/145-accept/06-lockE-nontest-file-probe.txt
+   docs/evidence/s1/145-snapshot-fields-landed-r1-accept-r1.md
+## 6df6a3e  10:56
+      msg: evidence(145 验收 §4): 3dcff6a 的 10 处删除逐行配对＝10/10 只差节号、判"重排非重写"；commit message"删的全是标题行"被量成 8 标题＋1 表格＋1 正文；扩查全文删除史＝12 行（派单只点 10），另 2 处单行重写方向均为收紧（一处多认一枚文件、一处把 3 枚字段改对成 5 枚），并追加一枚时序：A278② 晚于 093x 派单
+   
+   docs/evidence/s1/145-snapshot-fields-landed-r1-accept-r1.md
+## dd88bb6  11:01
+      msg: evidence(145 验收 §5): 门禁四数在 3dcff6a 逐枚复现（panel 105/58/1 两版本同、cmd/wisp 139/79/0），名册三层两向 comm 全空；红因判出适用范围——脏工作树里是"文件缺失⇒没跑"、被验版本里四路比较跑完了且红在 0/78（"放回文件也不会绿"实测成立）；无被吞的第二枚红，但本程自造一枚 archive 假红＋一枚"缺 third_party DLL"的近亲仪器没跑到形（作废）
+   
+   .scratch/wisp/probes/145-accept/07-gate-rerun.txt
+   docs/evidence/s1/145-snapshot-fields-landed-r1-accept-r1.md
+## bc3e5c0  11:02
+      msg: evidence(145 验收 §6): 三件新发现逐件判——①结论成立但引错台账小标号（A273②→③，派单同错）且"4/5"应为"5/5＋approval 旁通未证"（NativeVerdict 八字段装不下 gate 状态、p.src 私有），另量到它引的 composer.go:44-49 在 3dcff6a 已漂到 :57/:92（它自己那枚注释造成的）；②remainingMs 成立，尺写明（EventTick 声明 1／发射 0，Remaining 三处皆静态）；③无 tag 字段躲过两把契约尺＝本程自造一发复现，兜底仅票 35 键集钉；顺带独立打完 AC#3 两发
+   
+   .scratch/wisp/probes/145-accept/03-untagged-field-ruler-gap.txt
+   docs/evidence/s1/145-snapshot-fields-landed-r1-accept-r1.md
+## 并集（去重）
+.scratch/wisp/probes/145-accept/00-extract-ruler-archive.txt
+.scratch/wisp/probes/145-accept/00-extract-ruler-exact.txt
+.scratch/wisp/probes/145-accept/01-E1-four-pins.txt
+.scratch/wisp/probes/145-accept/02-E1b-one-key-same-four-pins.txt
+.scratch/wisp/probes/145-accept/03-untagged-field-ruler-gap.txt
+.scratch/wisp/probes/145-accept/04-E1b-real-assembly-root.txt
+.scratch/wisp/probes/145-accept/04b-E1b-probe-test.go.txt
+.scratch/wisp/probes/145-accept/05-E3-E4-closure-and-removal.txt
+.scratch/wisp/probes/145-accept/06-lockE-nontest-file-probe.txt
+.scratch/wisp/probes/145-accept/07-gate-rerun.txt
+docs/evidence/s1/145-snapshot-fields-landed-r1-accept-r1.md
+## 是否含别人的路径（禁写面反扫）
+(空＝禁写面零命中)
+## 未 push 自证
+ec2247a remote-contains:[]
+69f50ca remote-contains:[]
+9ffb9f5 remote-contains:[]
+082e374 remote-contains:[]
+6df6a3e remote-contains:[]
+dd88bb6 remote-contains:[]
+bc3e5c0 remote-contains:[]
+
+## 附：被验那程（145 实现程）八枚 commit 的名册与未推状态（本程 §8 第 4 条的凭据，非本程自证）
+ef07ba5 remote:[]
+     .scratch/wisp/probes/145/E4-removal-check.txt
+     .scratch/wisp/probes/145/anchor-before-rerun.txt
+     .scratch/wisp/probes/145/baseline-cmdwisp-before.txt
+     .scratch/wisp/probes/145/baseline-panel-before.txt
+     .scratch/wisp/probes/145/copy-E0-baseline-rulers.txt
+     .scratch/wisp/probes/145/gate-before-cmdwisp.txt
+     .scratch/wisp/probes/145/gate-before-panel.txt
+     .scratch/wisp/probes/145/patch/145-snapshot-fields-closure.patch
+     .scratch/wisp/probes/145/roster-cmdwisp-before.txt
+     .scratch/wisp/probes/145/roster-panel-before.txt
+     .scratch/wisp/probes/145/wisp145-E3-cmdwisp.txt
+     .scratch/wisp/probes/145/wisp145-E3b-cmdwisp.txt
+     .scratch/wisp/probes/145/wisp145-e1-E1-panel.txt
+     .scratch/wisp/probes/145/wisp145-e1-E2-panel.txt
+     docs/evidence/s1/145-snapshot-fields-landed-r1.md
+c655458 remote:[]
+     docs/evidence/s1/145-snapshot-fields-landed-r1.md
+972ceba remote:[]
+     docs/evidence/s1/145-snapshot-fields-landed-r1.md
+eb38c97 remote:[]
+     internal/panel/composer.go
+     internal/panel/pump.go
+7263456 remote:[]
+     .scratch/wisp/probes/145/d22scan-after.txt
+     .scratch/wisp/probes/145/gate-after-cmdwisp.txt
+     .scratch/wisp/probes/145/gate-after-panel.txt
+     .scratch/wisp/probes/145/roster-after-cmdwisp.txt
+     .scratch/wisp/probes/145/roster-after-panel.txt
+     docs/evidence/s1/145-snapshot-fields-landed-r1.md
+091390c remote:[]
+     .scratch/wisp/probes/145/roster2-cmdwisp-before.txt
+     .scratch/wisp/probes/145/roster2-panel-before.txt
+4156ff5 remote:[]
+     docs/evidence/s1/145-snapshot-fields-landed-r1.md
+3dcff6a remote:[]
+     docs/evidence/s1/145-snapshot-fields-landed-r1.md
+⇒ 八枚全未推；路径并集＝.scratch/wisp/probes/145/** ＋ docs/evidence/s1/145-snapshot-fields-landed-r1.md ＋ internal/panel/{composer,pump}.go
+⇒ 与它 §5.5/§7.4 的自证一致；禁写面（frontend/design/PLAN/specs/risk/thresholds/golden/allowlist/d22scan/台账/工单）**一枚未出现**；三枚单独保留的测试文件未出现
