@@ -52,13 +52,15 @@ export function NavRail({
       aria-label="面板视图"
       className="relative flex w-[60px] min-w-[60px] shrink-0 flex-col items-center gap-0.5 border-r border-line bg-surface py-3"
     >
-      {/* 滑翔指示条：一枚 accent-tint 圆角块，280ms 滑到 active 行。偏移量是
-          行步距 × 序号——行距由本文件自己的布局常量决定（40px 行 + 2px 间距），
-          改布局就改这里，量测式读数反而会在 SSR 静态标记里拿到 0。 */}
+      {/* 滑翔指示条：一枚 accent-tint 圆角块，280ms 滑到 active 行。偏移量 =
+          容器顶距(py-3=12px) + 行距×序号；行距 = 40px 行 + 2px 间距 = 42px。
+          三个数都由本文件的布局类决定（py-3 / size-10 / gap-0.5），改布局就
+          同步改这两个常量——owner 2026-09-26 指出 glide 整体偏上一行距的 12px
+          就是漏加了容器顶距。 */}
       <div
         aria-hidden="true"
         className="nav-glide"
-        style={{ transform: `translateY(${PANEL_VIEWS.findIndex((v) => v.id === active) * 42}px)` }}
+        style={{ transform: `translateY(${12 + PANEL_VIEWS.findIndex((v) => v.id === active) * 42}px)` }}
       />
       {PANEL_VIEWS.map((v) => {
         const Icon = ICONS[v.icon as keyof typeof ICONS];
