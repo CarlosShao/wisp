@@ -1,0 +1,17 @@
+### 7'. 支数 13 的独立复核（改尺：只取 AC#4 主句＝从'AC#4 契约轴零字节'到第一个 ⚠；'任何 golden' 不在反引号里，单列）
+     1	- [ ] **AC#4 契约轴零字节**：`docs/PLAN.md`
+     2	`docs/specs/**`
+     3	`internal/risk/**`
+     4	`internal/panel/**`
+     5	`internal/agent/**`
+     6	`internal/agent/approval/**`
+     7	`internal/observe/**`
+     8	`thresholds.go`
+     9	任何 golden
+    10	`allowlist.txt`
+    11	`scripts/slo-check.ps1`
+    12	`tools/d22scan/**`
+    13	`cmd/wisp/slo_windows.go`
+    14	Binary file (standard input) matches
+  反引号枚数=12
+  '任何 golden'（无行内反引号、以顿号分隔）＝第 9 项 ⇒ 票面 AC#4 点名支数＝12＋1＝13，与 r2 §5.2 同数（本程的尺不同：他们 sed|tr '、'|\nl，本程 sed 到第一个 ⚠ 再 tr）

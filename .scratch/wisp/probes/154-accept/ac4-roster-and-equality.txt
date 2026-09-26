@@ -1,0 +1,64 @@
+### 0. 七枚 sha 类型现读
+  1424aa7   commit
+  352d3d8   commit
+  76c89b2   commit
+  304199f   commit
+  e9a1db0   commit
+  79551d1   commit
+  5766be9   commit
+
+### 1. 名册尺三把（本程自算，全带 --no-walk）
+-- 尺A git log --no-walk=unsorted --name-only -- 六枚(不含被验锚点) 去重枚数:
+25
+-- 尺B 同六枚但**不带 --no-walk**（本程自己复算 r2 的 1728 那一发）:
+1759
+-- 尺C git diff-tree -r --no-commit-id --name-only 逐枚:
+  1424aa7   entries=6
+  352d3d8   entries=6
+  76c89b2   entries=7
+  304199f   entries=3
+  e9a1db0   entries=3
+  79551d1   entries=4
+  5766be9   entries=9
+-- 尺D 改名两侧（--no-renames）逐枚 + N1≡N2 核:
+  1424aa7   N1=6 N2=6 N1≡N2:YES
+  352d3d8   N1=6 N2=6 N1≡N2:YES
+  76c89b2   N1=7 N2=7 N1≡N2:YES
+  304199f   N1=3 N2=3 N1≡N2:YES
+  e9a1db0   N1=3 N2=3 N1≡N2:YES
+  79551d1   N1=4 N2=4 N1≡N2:YES
+  5766be9   N1=9 N2=9 N1≡N2:YES
+
+### 2. 六枚并集里非 154 写面的枚数（判 0 或非 0）
+.scratch/wisp/probes/154/ac4-per-face-5sha-incl-r2.txt
+.scratch/wisp/probes/154/ac4-per-face.sh
+.scratch/wisp/probes/154/ac4-per-face.txt
+.scratch/wisp/probes/154/ac6-gate-reader-scan.txt
+.scratch/wisp/probes/154/ac6-mut-cli-noop-close-control-v-r2.txt
+.scratch/wisp/probes/154/ac6-mut-cli-noop-close-control-v.txt
+.scratch/wisp/probes/154/ac6-mut-cli-strip154-v.txt
+.scratch/wisp/probes/154/ac6-mut-tools-strip154-v.txt
+.scratch/wisp/probes/154/ac6-mutation-strip154.txt
+.scratch/wisp/probes/154/archive-eol-control.txt
+.scratch/wisp/probes/154/bridge-comment-after.txt
+.scratch/wisp/probes/154/census-pairs.sh
+.scratch/wisp/probes/154/census-pairs.txt
+.scratch/wisp/probes/154/g3-open-side-via-loop.txt
+.scratch/wisp/probes/154/gate-clauses-roster-r2.txt
+.scratch/wisp/probes/154/gate-clauses-roster.txt
+.scratch/wisp/probes/154/gate-clauses.sh
+.scratch/wisp/probes/154/gate-positive-control-r2.txt
+.scratch/wisp/probes/154/gate-positive-control.sh
+.scratch/wisp/probes/154/gate-positive-control.txt
+.scratch/wisp/probes/154/gate-post-cli-v.txt
+.scratch/wisp/probes/154/gate-post-tools-v.txt
+.scratch/wisp/probes/154/gate-pre-cli-v.txt
+.scratch/wisp/probes/154/gate-pre-tools-v.txt
+.scratch/wisp/probes/154/names-post-cli.txt
+.scratch/wisp/probes/154/names-post-tools.txt
+.scratch/wisp/probes/154/names-pre-cli.txt
+.scratch/wisp/probes/154/names-pre-tools.txt
+.scratch/wisp/probes/154/zb-per-commit-rerun-r2.txt
+.scratch/wisp/probes/154/zero-byte-per-commit.sh
+.scratch/wisp/probes/154/zero-byte-per-commit.txt
+  ↑ 空＝越界 0 枚

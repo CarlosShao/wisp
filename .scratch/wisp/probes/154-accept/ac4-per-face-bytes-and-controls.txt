@@ -1,0 +1,52 @@
+### 2'. 七枚并集里非 154 写面（正确前缀尺：^\.scratch/wisp/probes/154/ 或 证据件 或 bridge.go）
+  上面空＝越界 0 枚；并集总枚数=33（r2 说'六枚并集去重 22'，本程把被验锚点 5766be9 一起算＝33）
+
+### 3. 逐支 × 逐枚：**字节口径**（面级 tree/blob hash 在每个点位各自等不等，基线＝1424aa7^；区间口径留给 §3.5）
+  docs/PLAN.md                     base=39a9fa5b   39a9fa5b 39a9fa5b 39a9fa5b 39a9fa5b 39a9fa5b 39a9fa5b 39a9fa5b 逐枚全等=YES
+  docs/specs                       base=58ab4065   58ab4065 58ab4065 58ab4065 58ab4065 58ab4065 58ab4065 58ab4065 逐枚全等=YES
+  internal/risk                    base=344943ab   344943ab 344943ab 344943ab 344943ab 344943ab 344943ab 344943ab 逐枚全等=YES
+  internal/panel                   base=09782b0a   09782b0a 09782b0a 09782b0a 09782b0a 09782b0a 09782b0a 09782b0a 逐枚全等=YES
+  internal/agent                   base=edc03413   edc03413 edc03413 edc03413 edc03413 edc03413 edc03413 edc03413 逐枚全等=YES
+  internal/agent/approval          base=e4d826b9   e4d826b9 e4d826b9 e4d826b9 e4d826b9 e4d826b9 e4d826b9 e4d826b9 逐枚全等=YES
+  internal/observe                 base=93fb58c1   93fb58c1 93fb58c1 93fb58c1 93fb58c1 93fb58c1 93fb58c1 93fb58c1 逐枚全等=YES
+  internal/observe/thresholds.go   base=e2677b11   e2677b11 e2677b11 e2677b11 e2677b11 e2677b11 e2677b11 e2677b11 逐枚全等=YES
+  tools/d22scan/allowlist.txt      base=6b61fad5   6b61fad5 6b61fad5 6b61fad5 6b61fad5 6b61fad5 6b61fad5 6b61fad5 逐枚全等=YES
+  scripts/slo-check.ps1            base=6e2ba550   6e2ba550 6e2ba550 6e2ba550 6e2ba550 6e2ba550 6e2ba550 6e2ba550 逐枚全等=YES
+  tools/d22scan                    base=274930eb   274930eb 274930eb 274930eb 274930eb 274930eb 274930eb 274930eb 逐枚全等=YES
+  cmd/wisp/slo_windows.go          base=86325850   86325850 86325850 86325850 86325850 86325850 86325850 86325850 逐枚全等=YES
+  ⚠ golden 两支按目录逐枚：
+  internal/agent/testdata/golden   base=3dc827ec   3dc827ec 3dc827ec 3dc827ec 3dc827ec 3dc827ec 3dc827ec 3dc827ec 全等=YES
+  internal/llm/testdata/golden     base=efa272bc   efa272bc efa272bc efa272bc efa272bc efa272bc efa272bc efa272bc 全等=YES
+  tools/mockllm/testdata/golden    base=08c4fab8   08c4fab8 08c4fab8 08c4fab8 08c4fab8 08c4fab8 08c4fab8 08c4fab8 全等=YES
+  internal/llm/golden              base=3f3f2db6   3f3f2db6 3f3f2db6 3f3f2db6 3f3f2db6 3f3f2db6 3f3f2db6 3f3f2db6 全等=YES
+
+### 4. 每支的正控：从**真实历史**里找一枚碰过该支的 commit，用同一把尺打它（必须非零，否则尺是死的）
+  docs/PLAN.md                     正控commit=45623e40  该尺命中=1
+  docs/specs                       正控commit=191f0d68  该尺命中=2
+  internal/risk                    正控commit=12181923  该尺命中=2
+  internal/panel                   正控commit=eb38c973  该尺命中=2
+  internal/agent                   正控commit=b23c7f7   该尺命中=3
+  internal/agent/approval          正控commit=b6943788  该尺命中=1
+  internal/observe                 正控commit=333dfe32  该尺命中=1
+  internal/observe/thresholds.go   正控commit=00bbb76f  该尺命中=1
+  tools/d22scan/allowlist.txt      正控commit=38b37153  该尺命中=1
+  scripts/slo-check.ps1            正控commit=decb7b96  该尺命中=1
+  tools/d22scan                    正控commit=1ed231ef  该尺命中=1
+  cmd/wisp/slo_windows.go          正控commit=0e95353   该尺命中=1
+  golden 两支正控：
+    cbbbdf85 命中=1
+
+### 5. 每支的分母（HEAD→锚点 5766be9 现取，tracked 件枚数）
+  docs/PLAN.md                     1
+  docs/specs                       14
+  internal/risk                    37
+  internal/panel                   20
+  internal/agent                   58
+  internal/agent/approval          18
+  internal/observe                 25
+  internal/observe/thresholds.go   1
+  tools/d22scan/allowlist.txt      1
+  scripts/slo-check.ps1            1
+  tools/d22scan                    6
+  cmd/wisp/slo_windows.go          1
+  golden 窄（*/testdata/golden/*）=52  golden 宽（路径含 golden，大小写敏感）=58  宽·大小写不敏感=58

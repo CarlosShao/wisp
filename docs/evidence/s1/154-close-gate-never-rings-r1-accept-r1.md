@@ -268,3 +268,68 @@ $ 入口现读＝cmd/wisp/main.go:103  case "panel-assets":（生产命令面，
 **成立。** 判据本体（票面："逐枚答'它的关那侧有几枚生产调用者'，并给命令"）他们给了：14 对 × 逐枚生产枚数 ＋ 5 道可见性锁 × 现量命令，且**"盘不到"那三处写的是命令与原因、不是"应当没有"**（§4.3 原文三条）。本程换尺复核了能复核的 5 行，**逐行同数**；新点名 7 族，其中 **N3（`signal.Notify` 3 开/1 合）与 N4（`llm.RegisterProtocol` 3 开/0 合）是他们表里确实没有的两行**，N1/N2 是完整性缺行（两侧都有 owner），N5/N6/N7 是本程尺的假阳性或形状盲，全部具名拆掉。
 ⇒ **没有一枚足以把本格判成不成立**：漏的都是"启动期一次填、随进程寿命"那一类有界形，与本票已登记的 pair 6/13 同判；真正需要下一位做的是把 N1–N4 补成表里的 4 行（本程不代他们写票面）。
 ⇒ 本程**补上了他们 §4.3 第 3 条自己承认没穷举的两处**：`cmd/**` 四枚宿主（AST 全量，本程树覆盖）＋ `tools/**` 15 枚 `.go`（第二棵尺，读数＝mockllm 的 `listen` 拿到的 `ln` 生产侧无 `Close`，但它 `Serve(ln)` 阻塞到进程退出＝有界；`d22scan`/`signmodels` 无配对 API）。⇒ 那一条现在可以写成"盘到了、命令是这些"，不再是"未穷举"。
+
+---
+
+## 第 4 节 格 AC#4 — 契约轴零字节：名册自己现算 ＋ 把口径从"区间"换成"逐枚字节"
+
+派单要本程：名册自己现算（**必须带 `--no-walk`**）、逐支扫、**每支都要有非零分母＋一枚能命中的正控**、两把名册尺也对一次、宽窄两口径都跑。本程另加一枚他们没用过的口径（§4.2）。
+
+### 4.1 名册三把尺，全部现算（台件 `probes/154-accept/ac4-roster-and-equality.txt`）
+
+```
+$ git log --no-walk=unsorted --pretty=tformat: --name-only <六枚> | sed '/^$/d' | sort -u | wc -l   →  25
+$ git log --pretty=tformat: --name-only <同六枚，**不带 --no-walk**>                                 →  1759
+      ← 本程自己复算那一发反例：r2 四枚输入读到 1728、编排者读到 1730、本程六枚输入读到 1759。
+        三个数都是"对的"，因为**枚数是输入的函数**——这正是派单把 `--no-walk` 写成硬尺的原因。
+$ git diff-tree -r --no-commit-id --name-only <逐枚>   →  6 / 6 / 7 / 3 / 3 / 4 / 9（第三把名册尺）
+$ N1(--name-only) vs N2(--name-status --no-renames)   →  七枚各自 N1≡N2＝YES（含被验锚点 5766be9＝9/9）
+      ⇒ 本票名下没有"改名把冻结面挪到面外"那一形（若有，N1 会小于 N2）。这一发本程自己对了，没抄他们的表。
+```
+
+**并集对账**（把 r2 的两个枚数接上本程的，方向写清）：四枚去重＝**19**（复到 §5.1）、五枚＝**22**（复到 §6.8）、六枚＝**25**、**七枚（含被验锚点 `5766be9`）＝33**。
+⇒ `33 = 22 + 3`（`e9a1db0` 的三枚台件）`+ 8`（`5766be9` 新增台件；证据件那枚已在册）——r2 的 22 与本程的 33 是同一件事的两个输入集，**没有一处对不上**。
+**越界枚数＝0**：并集 33 条里剥掉 `^\.scratch/wisp/probes/154/`、`docs/evidence/s1/154-host-id-never-closed-r1.md`、`internal/tools/bridge.go` 三种前缀 ⇒ **输出为空**（台件同文件 §2'，本程特意把第一发的错尺也留着：前缀写成 `\.scratch/wisp/probes/154/` 配 `$` 会整列假外越，改对后才是 0）。
+
+### 4.2 本程换的口径：**逐枚点位的 tree/blob hash**（不是区间，也不是文件名）
+
+r2 的 §5.3 是"文件名 × commit"，§5.6 是"面级 hash × 区间端点（含 HEAD）"——后者他们自己承认会把别人的 commit 算进来。本程取中间那格：**对每一支面，在 `1424aa7^`（base）与票 154 名下全部七枚 commit 各自的树里取 hash，逐枚与 base 比**。
+
+```
+12 支（docs/PLAN.md·docs/specs·internal/risk·internal/panel·internal/agent·internal/agent/approval·
+      internal/observe·internal/observe/thresholds.go·tools/d22scan/allowlist.txt·scripts/slo-check.ps1·
+      tools/d22scan·cmd/wisp/slo_windows.go）× 7 枚点位 ⇒ 逐枚全等＝YES（12/12 支）
+golden 四棵目录（internal/agent/testdata/golden·internal/llm/testdata/golden·
+      tools/mockllm/testdata/golden·internal/llm/golden）× 7 枚点位 ⇒ 全等＝YES（4/4）
+```
+（台件＝`probes/154-accept/ac4-per-face-bytes-and-controls.txt` §3，每行带着 base hash 与七枚 hash 前 8 位）
+⇒ 这一口径比 §5.3 强在**同文件名被换内容也瞒不过**，比 §5.6 强在**只算本票自己的点位、区间里别家的 23 枚 commit 进不来**（他们 §5.7 现量的那枚"十分钟里 43→60"的漂移，本口径结构上不受）。
+
+### 4.3 每支的正控：不用合成树，用**真实历史**
+
+他们 §5.3 的正控是"把该支第一条 tracked 件喂回同一把 grep"（证的是尺活着）。本程换一发更能打的：**从历史里找一枚真碰过该支的 commit，用同一把尺打它，必须非零**——
+
+```
+docs/PLAN.md→45623e40 命中1   docs/specs→191f0d68 命中2   internal/risk→12181923 命中2
+internal/panel→eb38c973 命中2  internal/agent→b23c7f7 命中3  internal/agent/approval→b6943788 命中1
+internal/observe→333dfe32 命中1  thresholds.go→00bbb76f 命中1  allowlist.txt→38b37153 命中1
+scripts/slo-check.ps1→decb7b96 命中1  tools/d22scan→1ed231ef 命中1  golden→cbbbdf85 命中1
+cmd/wisp/slo_windows.go→**0e95353 命中 1**   ← 最要紧的一发
+```
+⇒ 13/13 支正控全打得住。其中第 13 支的正控 commit 是 **`0e95353`＝编排者 13:2x 代提的票 156 WIP**——同一把尺在票 154 的七枚上读到 **0**、在别家那一枚上读到 **1**，两件事一起把"尺没死"和"零命中不是本票的功劳也不是本票的过失"说清了（这恰是他们 §5.7 想要的那条形为，本程用一发真数据把它钉住）。
+
+### 4.4 支数与分母，本程自己数（两把尺都记）
+
+- **支数＝13**：本程的尺＝取票面 AC#4 主句（从 `AC#4 契约轴零字节` 到第一个 `⚠` 为止）数反引号项 ⇒ **12 枚反引号 ＋ `任何 golden`（它不在反引号里）＝13**，与 r2 §5.2 同数；台件 `probes/154-accept/ac4-face-count.txt` 里连本程**第一发读错的尺**一起留着（只数反引号会得 12，把 `⚠` 那两行也算进来会得 20——两种错法都写上了，免得下一位以为这枚 13 是天生清楚的）。
+- **分母**（`git ls-tree -r --name-only 5766be9` 逐支，本程锚点现取）：PLAN 1·specs 14·risk 37·panel 20·agent 58·approval 18·observe 25·thresholds 1·allowlist 1·slo-check 1·d22scan 6·slo_windows 1 ⇒ **13 支全非零**；golden 窄＝**52**、宽＝**58**、宽且大小写不敏感＝**58** ⇒ 与他们 9a/9b 两行逐字同数（本程复算）。
+- **面名完备性**（他们没查的一发）：`git ls-tree -r 5766be9 | grep -E '(thresholds\.go|allowlist\.txt)$'` ⇒ 全仓各只有 1 枚（`internal/observe/thresholds.go`、`tools/d22scan/allowlist.txt`）⇒ 票面那种"只写文件名"的窄名**在本仓不会漏第二枚同名件**。
+- **包含关系**（他们 §6.10 的 E3 更正）：`internal/agent`=58 ⊃ `internal/agent/approval`=18 ⇒ **E3 的更正方向本程复核＝对**（入库原文那句写反了）。
+- **E 系列另外三处本程复核**：E1 `git rev-list --count 9835d81..be603fd`＝**7**（更正值对）；E6 `1424aa7^..be603fd`＝**28** 枚、其中票 154 名下 **5** 枚（更正值对）；E5 `zero-byte-per-commit.sh:6` 那行 `FREEZE`：本程**两发都跑**——**顶层 alternation＝12 项**，把内层两组展开（`internal/(risk|panel|agent|observe|speech|secret)/`→6、`tools/d22scan/(allowlist.txt|.*\.go)`→2）＝**18 项** ⇒ 与 E5 写的"正则实为 18 项"**同数**。
+  ⚠ **但 E5 那句"15 支在它尺上只占 14 个条目"本程没复核到同一枚数**：按本程的深度尺，票面 13 支映到那 12 个顶层条目里时，`internal/agent/**` 与 `internal/agent/approval/**` 是被**同一个内层组**（`internal/(…|agent|…)/`）吃掉的，所以"13 支占几枚条目"取决于**先把哪一串当输入**（票面 13／旧派单 14／并集 15 三种口径给出三种数）。本程只钉得住"顶层 12、展开 18"这两枚数，**"14" 那一枚判＝未复核**（不翻转 §5.4 的任何结论，也别拿本程当它的复算者）。
+  ⚠ **本程在这一发上连错两种，都留档**：错法一＝按"`|` 总数＋1"数（17＋1＝18，**与正当尺撞数但方法不对**，它把内层 `internal/(risk|panel|…)` 的 5 枚管道也当顶层条目）；错法二＝第一次跑深度尺时忘了整条正则被 `^( … )` 包住、把最小深度当成 0，于是读出"顶层 1 项"（明显不成立，当场弃）。正当尺＝**顶层（深度 1）alternation 12 项，展开内层两组后 18 项**。⇒ 复算命令要用深度尺，别用管道计数。记为**缺陷 D-9（本程自己尺的缺陷，不是他们的）**。
+
+### 4.5 本格判语与两枚登记
+
+**AC#4＝成立。** 判据（13 支 × 逐枚 commit、每支非零分母＋正控、宽窄两口径、两把名册尺）本程**全部换尺复核且同数**，并补了一枚他们没用的口径（§4.2 逐枚字节）。
+- **缺陷 D-8（小，措辞）**：票面 AC#4 的第 9 项 `任何 golden` 不带反引号，导致任何"数反引号"的复算尺都会得 12 而不是 13。本程的台件里连这枚错法都留了。这不是他们的错（他们从票面现数是 13 并给了枚举），但**下一位换尺复算时会被咬**，与票面 10:3x 那条"零命中要写明哪把尺"同形。
+- **本格一条不能说过头的话**：§4.2 的字节口径证的是**七枚 commit 各自点位上那 13 支没动**，**不等于**"整个区间里没人动过它们"——本程正控那一发（`0e95353` 命中第 13 支）恰恰证明**别家在这一天动过第 13 支**（`cmd/wisp/slo_windows.go`）。两句话都必须同时成立，只写前者会让人以为全仓安静，只写后者会把别家的账算到本票头上。

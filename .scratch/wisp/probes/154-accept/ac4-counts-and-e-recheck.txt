@@ -1,0 +1,52 @@
+### 6. 枚数对账：r2 的 19/22 与本程的 33 是不是同一件事
+  四枚(1424aa7 352d3d8 76c89b2 304199f) 去重 = 19 （r2 §5.1 记 19）
+  五枚(+79551d1) 去重 = 22 （r2 §6.8 记 22）
+  六枚(+e9a1db0) 去重 = 25
+  七枚(+5766be9 被验锚点) 去重 = 33 ⇒ 33 = 22 + 3(e9a1db0) + 8(5766be9 新增台件，证据件那枚已在册)
+
+### 7. 支数 13 的独立复核（本程的尺＝数反引号里的项，不抄他们的 sed/tr 管线）
+     1	`docs/PLAN.md`
+     2	`docs/specs/**`
+     3	`internal/risk/**`
+     4	`internal/panel/**`
+     5	`internal/agent/**`
+     6	`internal/agent/approval/**`
+     7	`internal/observe/**`
+     8	`thresholds.go`
+     9	`allowlist.txt`
+    10	`scripts/slo-check.ps1`
+    11	`tools/d22scan/**`
+    12	`cmd/wisp/slo_windows.go`
+    13	`frontend/**`
+    14	`design/**`
+    15	`Loop`
+    16	`Bridge`
+    17	`Q-56`
+    18	`internal/tools`
+    19	`cmd/wisp`
+    20	`comm`
+  ↑ 枚数=20（票面 AC#4 那一行内；本程把 AC#5 那行的反引号排除在外）
+
+### 8. 面名的完备性：仓里还有别的 thresholds.go / allowlist.txt 吗（窄名吃不吃得着）
+internal/observe/thresholds.go
+tools/d22scan/allowlist.txt
+### 9. §6.10 那六处'现量更正'本程复核（E 系列）
+  E1 9835d81..be603fd 枚数 = 7（他们更正成 7）
+  E3 internal/agent=58 ⊃ internal/agent/approval=18 ⇒ 更正方向对（原文写反）
+  E6 1424aa7^..be603fd 共 28 枚；其中票 154 名下 5 枚（他们更正成 28/5）
+  E5 zero-byte-per-commit.sh 的 FREEZE 正则条目数 = 18（他们更正成 18）
+### 10. frontend/design：本程一律不算进任何零命中宣称（工作树里 design 有 owner 的未提交删除）
+ D design/assets/base.css
+ D design/assets/icons.js
+ D design/assets/theme.js
+ D design/assets/tokens.css
+  ↑ 别家的半件，本程不碰不还原，已从 §3 的字节口径里排除（票面 13 支不含它们）
+
+### 更正块（E5 复算的正当尺；本程在这一发上连错两次，全部留档）
+被数对象＝zero-byte-per-commit.sh:6 的 FREEZE 正则；「18 项」按 E5 的定义＝**展开后的条目数**。
+顶层（深度 1 的 |）alternation 枚数 = 12
+内层两组展开：internal/(risk|panel|agent|observe|speech|secret)/ → 6、tools/d22scan/(allowlist.txt|.*\.go) → 2
+⇒ 展开后条目 = 12 - 2 + 6 + 2 = 18
+本程错法一（管道总数+1）＝ 18  → 与 18 撞数，方法不对（把内层管道当顶层条目）
+本程错法二（第一次跑深度尺时忘了整条被 ^(...) 包住、把最小深度当成 0）→ 得 1 项，明显不成立，已弃
+=> E5「正则实为 18 项」复算＝**成立**（正当尺＝顶层 12 项、展开后 18 项）；复算命令要用顶层深度尺，别用管道计数。
