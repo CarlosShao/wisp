@@ -41,10 +41,29 @@
 import { useState } from "react";
 import { Chip } from "@/components/ai-native/chip";
 import { ProgressRing } from "@/components/ai-native/progress-ring";
+import { SegmentedControl } from "@/components/ai-native/segmented-control";
 import { cn } from "@/lib/cn";
 
 /** The knob the frost reads. Kept as one name so nothing else can drift. */
 const ALPHA_VAR = "--panel-alpha";
+
+/** The animation switch, owner 2026-09-26: 「动画该装就装…让用户自己选择是
+    多一点性能开销还是选择更轻量」. "off" is what theme.css's
+    [data-motion="off"] block listens for; removing the attribute is full
+    motion. Memory-only, exactly like the alpha knob. */
+const MOTION_ATTR = "data-motion";
+type MotionTier = "全开" | "关闭";
+
+/** SegmentedControl 的泛型实参：两档就是全部档位（「降低」档等真需求出现再说）。 */
+const MOTION_TIERS: readonly MotionTier[] = ["全开", "关闭"];
+
+function applyMotionTier(tier: MotionTier) {
+  if (tier === "关闭") {
+    document.documentElement.setAttribute(MOTION_ATTR, "off");
+  } else {
+    document.documentElement.removeAttribute(MOTION_ATTR);
+  }
+}
 
 /**
  * The default comes from the generated token table, not from a number typed
@@ -70,12 +89,15 @@ interface Row {
   desc: string;
   /** Why this row is not editable yet. Empty string = the panel owns it. */
   blocked: string;
+  /** Which live control this row draws when `blocked` is empty. */
+  control?: "alpha" | "motion";
 }
 
 /** The appearance rows, in the demo owner's original order. */
 const APPEARANCE_ROWS: readonly Row[] = [
   { group: "app", name: "theme", desc: "界面主题", blocked: "主题由原生宿主决定，面板只跟随" },
-  { group: "panel", name: "opacity", desc: "面板背景不透明度", blocked: "" },
+  { group: "panel", name: "opacity", desc: "面板背景不透明度", blocked: "", control: "alpha" },
+  { group: "panel", name: "animations", desc: "界面动画（关掉后全部静帧，性能最省）", blocked: "", control: "motion" },
   { group: "panel", name: "font_size", desc: "面板正文字号（px）", blocked: "快照里没有这个字段" },
   { group: "ball", name: "size", desc: "悬浮球直径（44-72）", blocked: "那颗球是原生绘制的（D29），页面改不到" },
   { group: "ball", name: "opacity_idle", desc: "空闲时悬浮球不透明度", blocked: "同上" },
@@ -100,17 +122,23 @@ function EffectBadge({ live }: { live: boolean }) {
 
 export function ConfigScreen() {
   const [alpha, setAlpha] = useState<number | null>(() => readPanelAlpha());
+  const [motion, setMotion] = useState<MotionTier>("全开");
 
   function moveAlpha(next: number) {
     document.documentElement.style.setProperty(ALPHA_VAR, `${next}%`);
     setAlpha(next);
   }
 
+  function moveMotion(next: MotionTier) {
+    applyMotionTier(next);
+    setMotion(next);
+  }
+
   return (
     <section aria-label="设置" className="flex min-w-0 flex-col gap-1">
       <h2 className="text-[15px] font-semibold text-ink">设置</h2>
       <p className="text-[12.5px] text-ink-2">
-        外观一节的七行键。能动的只有面板不透明度那一行，其余各行今天没有数据源，所以它们不显示数字。
+        外观一节的八行键。能动的只有面板不透明度和界面动画两行，其余各行今天没有数据源，所以它们不显示数字。
       </p>
 
       <div className="mt-1 flex flex-col">
@@ -133,7 +161,13 @@ export function ConfigScreen() {
                 <div className="mt-0.5 text-xs text-ink-2">{row.desc}</div>
               </div>
               <div className="flex shrink-0 items-center gap-2">
-                {live ? (
+                {live && row.control === "motion" ? (
+                  <SegmentedControl
+                    onChange={moveMotion}
+                    options={MOTION_TIERS}
+                    value={motion}
+                  />
+                ) : live && row.control === "alpha" ? (
                   alpha === null ? (
                     <span className="text-xs text-ink-3">
                       读不到 {ALPHA_VAR}
@@ -158,6 +192,8 @@ export function ConfigScreen() {
                       <span className="text-[11px] text-ink-3">%</span>
                     </>
                   )
+                ) : live ? (
+                  <span className="text-xs text-ink-3">此行缺控件定义</span>
                 ) : (
                   <span className="text-xs text-ink-3">{row.blocked}</span>
                 )}
@@ -169,8 +205,8 @@ export function ConfigScreen() {
       </div>
 
       <p className="mt-3 text-[11px] leading-[1.6] text-ink-3">
-        「即时」那一行改的是这个页面自己的一层样式：关掉面板就回到 token 表里的默认值。
-        要让它记住，缺的是 C17 快照上的一个字段和一条回写的方法，不是这里的代码。
+        「即时」那两行改的是这个页面自己的一层样式：关掉面板就回到 token 表里的默认值。
+        要让它们记住，缺的是 C17 快照上的一个字段和一条回写的方法，不是这里的代码。
       </p>
 
       <div className="mt-2 flex flex-col gap-1 text-[11px] leading-[1.6] text-ink-3">
