@@ -41,3 +41,5 @@ owner 批准扩 `shell.exec` 语义；票 161 结案（审批判据先有自检�
 ## Progress log (append-only, newest last)
 
 - [2026-09-26 20:5x] 编排者开票。来路＝对标"终端"那一路。**证据分档要写清，别混**：①"ConPTY 不在 Job 管控内"那句**我本轮现量过原文**（`grep` 命中 `subprocess-local/src/index.ts:245`，测试 `:803` 同句）；②埋标记取退出码那一形**我现量过**（`tool-bash-persistent/src/index.ts:66-69` 是随机量与起止标记）；③**`node-pty` 的 `kill` 会抛／SIGINT 靠塞 `\x03`／收尾用 `taskkill` 这三条＝程读数〔我未复算〕**，实现程**一律现量，别抄这里的行号**。
+
+- [2026-09-26 23:3x] 编排者代落：只读普查程 `16x-c1` 交回本票的**冻结文本射程**七问（全文见 `docs/evidence/s1/16x-contract-lines-c1.md`，§3 那张表里是 owner 一句可批的话）。普查程**反对照票面原路**（「扩 `shell.exec` 语义」＝要改写 3 枚既有句），改推**新增** `shell.session` 一行（`PLAN.md:2563` 之后）；⚠ 且 `shell.exec` 本体今天**名存实无** ⇒ 这一张实际是同时新造两枚；`internal/config/unwired.go:62-77` 那三行 missing 文案会跟着变谎，需一并放开（**只改文案、不删守卫、不动阈值**）。

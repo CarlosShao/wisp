@@ -36,3 +36,5 @@
 ## 派单前置条件
 
 owner 一句话（要不要这一档）；票 161 结案（先有"有没有人按门铃"那把尺，否则这一档也会变成建好没人喂的门）。
+
+- [2026-09-26 23:3x] 编排者代落：只读普查程 `16x-c1` 交回本票的**冻结文本射程**七问（全文见 `docs/evidence/s1/16x-contract-lines-c1.md`，§3 那张表里是 owner 一句可批的话）。**六枚里唯一一枚「票面把自己锁死」**：它可能的三条路（`docs/PLAN.md` 的 D34／`internal/risk/mode.go:65`／`internal/agent/approval/batch.go:15`）全在自己票面 `:29` 的零字节名单里 ⇒ 不动冻结面它一格也落不了。另附带量到：它复用的 `AwaitingApproval` 那一族有一格行为**至今未定义**（`PLAN.md:1530`，也是 `AGENTS.md §2` 的具名停手项）。
