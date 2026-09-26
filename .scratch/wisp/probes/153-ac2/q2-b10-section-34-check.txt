@@ -1,0 +1,47 @@
+# Q2 batch5 14:54:50
+
+## F1. full line :598 of HEAD subject file (the 1 task_id hit at 7f79638e)
+- ⚠ 出处的一枚更正：工单 `:21` 把第 9 笔的出处写成"153 验收件 §5.3 **第 3 笔**"，本程逐行取版现量 §5.3 三笔的行界＝**第 1 笔 `:398`**（不是新增暴露类）／**第 2 笔 `:403–:411`**（件内缺那笔隐私账）／**第 3 笔 `:412–:414`**（日志 `task` ↔ DB `task_id` 不同名）。⇒ 隐私账那笔是**第 2 笔**；153 验收件 §12 `:831` 与 §12.4 `:887` 两处的引用行号（`:406–:411`＋`:412–:414`）是对的，本附录按它们写。
+
+## F2. which section holds :231 ? body 219-246 of b319bab5
+219| ### 3.3 Q3 送进去要不要动契约面？——**不要**（五枚读数）
+220| 
+221| | 问的那一面 | 现量 | 结论 |
+222| |---|---|---|
+223| | 痕的字段表是否被 `PLAN.md` 或任何 spec 冻结 | `git grep -n "history compressed\|compressed_msgs\|kept_raw_rounds\|history_changed" 86b0161 -- docs/PLAN.md docs/specs` → **0 命�
+224| | `C12` 状态机 | `PLAN.md:1362` 原文：`C12 = BallState`、20 态＋D43 转移表＋每态超时 | 压缩痕不是态、不是转移，碰不到它 |
+225| | `C39` 契约深化里那条痕的字段表 | 契约面只有 **C1–C32**（`git grep -n "^| C39" docs/PLAN.md` → 无）；`D39` 深化的是 C6/C7/C11/C17/C19 与 §14.3 分段预算，末�
+226| | `docs/contracts/**` 里有没有这一项 | `git ls-tree -r --name-only 86b0161 \| grep -c "^docs/contracts/"` → **0** | 与 AGENTS.md §4 那句"截至锚点它们在仓里不存在"一致 |
+227| | 压缩那条 spec 本身 | `SPEC-05 §4.3` 原文两行：>12000 保 3 轮 / 压缩在响应路径外＋**不得丢弃 tool_call id 与结果引用** | 没有日志 schema，本改动两条都�
+228| | 会不会新增 Go→前端事件／面板方法（139 AC#2 的硬约束） | `SPEC-08 §5.2` 的 C17 白名单名册里无 compression 相关项；`git grep -c "compression\|compressed" 86b016
+229| 
+230| ⇒ **不触发 D22 闸门③**，本程不自立"停手"也不自立"放宽口径"：既没扩契约，也没自创归因口径
+231| （键名沿用 `loop.go` 已经在用的 `"task"`，值沿用 `newTaskID()` 造的那枚、与 `Result.TaskID`／
+232| journal／C18 correlation 同一枚，见 §3.4 的读数）。
+233| 
+234| ### 3.4 交的形状与它的读数
+235| 
+236| **形状**（`b23c7f7`，三枚文件）：
+237| - `compress.go:148-163` 新增 `traceTaskKey{}` ＋ `withTraceTask(ctx, taskID)`（空串＝不是任务，直接丢弃不打标）
+238|   ＋ `traceTaskID(ctx)`；
+239| - `compress.go:222-241` 那条 `Info` 的属性表由字面量改为 `attrs` 切片，**只在 `traceTaskID(ctx) != ""` 时**
+240|   追加 `"task", task`；八枚既有键与 `history_changed` 的表达式逐字节照旧（`git diff` 的 `-` 行里
+241|   只有那条 Info 的头尾与这一枚表达式换行，见 `ac4-zero-byte.txt`）；
+242| - `loop.go:399` 唯一非测试调用点带上 `withTraceTask(ctx, taskID)`；
+243| - 新用例两枚：`compress_trace_test.go:478 TestCompressionTraceCarriesTheOwningTaskID`、
+244|   `:534 TestCompressionTraceNeverInventsATaskID`。
+245| 
+246| **为什么是 ctx 而不是给 `Compress` 加参数**（被否的那条路，照实记）：加参数要动
+
+## F3. section 3.4 span and any mention of the key there (b319bab5 lines 234-262)
+4:237| - `compress.go:148-163` 新增 `traceTaskKey{}` ＋ `withTraceTask(ctx, taskID)`（空串＝不是任务，直接丢弃不打标）
+7:240|   追加 `"task", task`；八枚既有键与 `history_changed` 的表达式逐字节照旧（`git diff` 的 `-` 行里
+9:242| - `loop.go:399` 唯一非测试调用点带上 `withTraceTask(ctx, taskID)`；
+16:249| **代价也照实记**：ctx 通道可以被未来的调用方**忘记**——忘记的后果是那条痕**没有** `task` 键
+24:257| … msg="agent: history compressed" tokens_before=1236 … history_changed=true                      ← 未打标的调用：没有 task 键
+25:258| … msg="agent: history compressed" tokens_before=1236 … history_changed=true task=ab8a8e40-5df0-41c7-be96-1fa1188bd095
+26:259| … msg="agent: history compressed" tokens_before=826  … history_changed=true task=23ac7a42-ee92-4a89-8532-f18d23dad154
+
+## F4. PLAN.md: any line joining log-side key and DB column?
+1
+(if empty: PLAN.md 里 task_id 的每一次出现都不与 日志/键 同现)

@@ -1,0 +1,58 @@
+# Q2 batch4 14:54:18
+
+## E1. which line holds the 1 task_id hit at 7f79638e (B.9-only version)
+598:- ⚠ 出处的一枚更正：工单 `:21` 把第 9 笔的出处写成"153 验收件 §5.3 **第 3 笔**"，本程逐行取版现量 §5.3 三笔的行界＝**第 1 笔 `:398`**（不是新增暴露类）／**第 2 笔 `:403–:411`**�
+
+## E2. section headers around :204/:231/:492 in the pre-fix (b319bab5) subject file
+18:## 0. 锚点与工作树现量（开工第一发）
+53:## 1. 派单带进来的两条"未验证前提"——现量结果：一条成立、一条只成立一半
+55:### 1.1 前提①「M5 那形在未修码上今天就响」——**成立（两半都复跑过）**
+68:### 1.2 前提②「普通收尾形 0 枚、重复阶梯退化形 1 枚」——**前半本程亲量成立；后半�
+85:## 2. AC#1 — 补上"过阈值但折不动 ⇒ 痕 0 枚"那一枚用例（判据形状）
+87:### 2.1 判据与形状
+103:### 2.2 改前红句原文（**未修码上**，`86b0161` 的 compress.go + 交付版用例 + M5 已落地）
+125:### 2.3 改后转绿（同一发，未施任何变异；工作树交付态）
+144:### 2.4 本格自证：快照还原
+162:## 3. AC#2 — 痕带 taskID：三问逐问答完才动手（结论：不动契约面，故不停手）
+167:### 3.1 Q1 `Compress` 现在能拿到 taskID 吗？——**不能，三条通道逐条堵死**
+195:### 3.2 Q2 唯一持有者是谁？——**`Loop.run` 的那枚局部 `taskID`，不是组合根**
+219:### 3.3 Q3 送进去要不要动契约面？——**不要**（五枚读数）
+234:### 3.4 交的形状与它的读数
+462:### 6.3 `sh scripts/d22scan.sh`：rc=0，八枚分母非零
+488:## 7. 本程没测什么（按"漏了它谁会先被骗"排序）
+
+## E3. is :231 inside 3.4? show headers between 200 and 240
+### 3.2 Q2 唯一持有者是谁？——**`Loop.run` 的那枚局部 `taskID`，不是组合根**
+### 3.3 Q3 送进去要不要动契约面？——**不要**（五枚读数）
+### 3.4 交的形状与它的读数
+
+## E4. any passage anywhere already joining log-side task to db-side task_id (repo-wide, at b319bab5 and HEAD)
+--- b319bab5
+b319bab5:docs/PLAN.md
+b319bab5:docs/evidence/s1/153-trace-lies-unguarded-r1-accept-r1.md
+b319bab5:docs/specs/SPEC-02-data-storage.md
+--- HEAD
+HEAD:docs/PLAN.md
+HEAD:docs/evidence/s1/153-ac2-a-closure-r1.md
+HEAD:docs/evidence/s1/153-trace-lies-unguarded-r1-accept-r1.md
+HEAD:docs/evidence/s1/153-trace-lies-unguarded-r1.md
+HEAD:docs/evidence/s1/154-close-gate-never-rings-r1-accept-r1.md
+HEAD:docs/reports/pending-and-issues.md
+HEAD:docs/specs/SPEC-02-data-storage.md
+--- lines containing BOTH task_id and (日志 or logs) anywhere in docs at HEAD
+HEAD:docs/evidence/s1/153-ac2-a-closure-r1.md:42:| `153-…-accept-r1.md:831` 的 (a) 逐字档 | 现读 HEAD blob：`**附条件**——两笔待补（…件内缺那笔隐私账；…日志侧 task 
+HEAD:docs/evidence/s1/153-trace-lies-unguarded-r1-accept-r1.md:831:| (a) 交付物本身 | §5.1／§5.2／§5.5、§3.2 的 `A4`／`A6` | `[前]` 到盘两行读数（未打标那行**整枚 `task` �
+HEAD:docs/evidence/s1/153-trace-lies-unguarded-r1-accept-r1.md:887:| 2 | 件内缺那笔隐私账（`:406–:411`）＋ 日志 `task` ↔ DB `task_id` 不同名无人写（`:412–:414`） | AC#2 (a) 
+HEAD:docs/evidence/s1/153-trace-lies-unguarded-r1.md:598:- ⚠ 出处的一枚更正：工单 `:21` 把第 9 笔的出处写成"153 验收件 §5.3 **第 3 笔**"，本程逐行取版现量 §5.3 三�
+HEAD:docs/evidence/s1/153-trace-lies-unguarded-r1.md:627:### B.10 第 10 笔 —— 日志侧 `task` ↔ DB 侧 `task_id` 无人写：**〔成立〕**
+HEAD:docs/evidence/s1/153-trace-lies-unguarded-r1.md:629:**验收程那一句**（`153-trace-lies-unguarded-r1-accept-r1.md:412`–`:414` ＋ `:416` 档位行第 ② 件）："`SPEC-02:74`／`PLAN.md:
+HEAD:docs/evidence/s1/153-trace-lies-unguarded-r1.md:637:$ grep -rn 'task_id' docs/specs/ | grep -c '日志'      → 0        ← spec 全目录里没有一句把两面键名对上
+HEAD:docs/evidence/s1/153-trace-lies-unguarded-r1.md:648:> **键名两面账（代记第 10 笔）**：同一枚 id 在两个面**故意不同名**——日志侧键＝`task`（`compress.go:238`、`lo
+HEAD:docs/reports/pending-and-issues.md:7401:(a) 交付物本身＝**附条件**（两笔待补：件内缺那笔隐私账；日志侧 `task` 与 DB 侧 `task_id` 不同名无人写；最小闭合＝*
+
+## E5. B.10 own distinctive substrings: grep -c on HEAD blob vs worktree vs pre-fix (path exists != that passage is in)
+同一枚 id 在两个面                headblob=1 wt=1 b319=0
+故意不同名                          headblob=2 wt=2 b319=0
+第一次会在                          headblob=1 wt=1 b319=0
+要真去 `SPEC-02` 补那句对价说明是 headblob=1 wt=1 b319=0
+本件与 spec 都没写一句           headblob=1 wt=1 b319=0

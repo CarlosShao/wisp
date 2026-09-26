@@ -1,0 +1,50 @@
+# Q2 batch2 14:53:31
+
+## S3. task_id in docs/specs at anchors and worktree
+--- git grep -n 'task_id' b319bab5 -- docs/specs/
+b319bab5:docs/specs/SPEC-02-data-storage.md:74:  task_id        TEXT NOT NULL REFERENCES task_log(id),
+b319bab5:docs/specs/SPEC-02-data-storage.md:88:CREATE INDEX idx_tool_call_task ON tool_call(task_id, seq);
+--- git grep -n 'task_id' 6de3d1c5 -- docs/specs/
+6de3d1c5:docs/specs/SPEC-02-data-storage.md:74:  task_id        TEXT NOT NULL REFERENCES task_log(id),
+6de3d1c5:docs/specs/SPEC-02-data-storage.md:88:CREATE INDEX idx_tool_call_task ON tool_call(task_id, seq);
+--- git grep -n 'task_id' HEAD -- docs/specs/
+HEAD:docs/specs/SPEC-02-data-storage.md:74:  task_id        TEXT NOT NULL REFERENCES task_log(id),
+HEAD:docs/specs/SPEC-02-data-storage.md:88:CREATE INDEX idx_tool_call_task ON tool_call(task_id, seq);
+--- worktree grep -rn 'task_id' docs/specs/
+docs/specs/SPEC-02-data-storage.md:74:  task_id        TEXT NOT NULL REFERENCES task_log(id),
+docs/specs/SPEC-02-data-storage.md:88:CREATE INDEX idx_tool_call_task ON tool_call(task_id, seq);
+count wt: 2
+
+## S4. co-occurrence with 日志 in specs
+wt count: 0
+count with SPEC-02:74 and 日志 nearby?
+0
+
+## S5. git grep -c 'task_id' 6de3d1c5 -- internal
+6de3d1c5:internal/memory/concurrent_test.go:2
+6de3d1c5:internal/memory/dao_toolcall.go:3
+6de3d1c5:internal/memory/models.go:1
+6de3d1c5:internal/memory/retention_test.go:2
+6de3d1c5:internal/memory/schema.go:2
+6de3d1c5:internal/memory/schema_test.go:1
+
+## S5b. same ruler at HEAD -- internal
+HEAD:internal/memory/concurrent_test.go:2
+HEAD:internal/memory/dao_toolcall.go:3
+HEAD:internal/memory/models.go:1
+HEAD:internal/memory/retention_test.go:2
+HEAD:internal/memory/schema.go:2
+HEAD:internal/memory/schema_test.go:1
+
+## S9. code-side line numbers cited by B.10 补文, at 6de3d1c5
+6de3d1c5:internal/memory/dao_toolcall.go:24:			`INSERT INTO tool_call(task_id, seq, tool, args_json, risk_level, decision, decided_at,
+6de3d1c5:internal/memory/dao_toolcall.go:112:	rows, err := s.reader.QueryContext(ctx, toolCallSelect+` WHERE task_id=? ORDER BY seq`, taskID)
+6de3d1c5:internal/memory/dao_toolcall.go:159:const toolCallSelect = `SELECT id, task_id, seq, tool, args_json, risk_level, decision, decided_at,
+6de3d1c5:internal/memory/models.go:162:		return fmt.Errorf("memory: tool_call.task_id is required")
+6de3d1c5:internal/memory/schema.go:71:  task_id        TEXT NOT NULL REFERENCES task_log(id),
+6de3d1c5:internal/memory/schema.go:85:CREATE INDEX idx_tool_call_task ON tool_call(task_id, seq);
+
+## S9b. memory blobs identity 6de3d1c5 vs HEAD
+internal/memory/schema.go 6de3=290a810b498b6c4e7705a00955ea1cd65e27c6da head=290a810b498b6c4e7705a00955ea1cd65e27c6da wt=290a810b498b6c4e7705a00955ea1cd65e27c6da
+internal/memory/dao_toolcall.go 6de3=e53b7485201411c3f33a46d76908877489b2c982 head=e53b7485201411c3f33a46d76908877489b2c982 wt=e53b7485201411c3f33a46d76908877489b2c982
+internal/memory/models.go 6de3=21999f4dc452e6a4dce5e58e394cab1232218258 head=21999f4dc452e6a4dce5e58e394cab1232218258 wt=21999f4dc452e6a4dce5e58e394cab1232218258

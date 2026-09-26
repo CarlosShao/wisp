@@ -1,0 +1,129 @@
+# Q2 B.10 re-measure 14:53:09 anchor-now 744bea4
+
+## S1. SPEC-02:70-92 at three versions (worktree / ec815820 / b319bab5)
+--- b319bab5
+70| 
+71| -- 工具调用与审批取证（owner 隐私敏感：「它到底对我的机器做了什么」必须可查）
+72| CREATE TABLE tool_call (
+73|   id             INTEGER PRIMARY KEY AUTOINCREMENT,
+74|   task_id        TEXT NOT NULL REFERENCES task_log(id),
+75|   seq            INTEGER NOT NULL,
+76|   tool           TEXT NOT NULL,
+77|   args_json      TEXT NOT NULL,          -- 长字符串截断（§5.1 脱敏规则）
+78|   risk_level     TEXT NOT NULL,          -- 'L0'|'L1'|'L2'
+79|   decision       TEXT,                   -- 'allow'|'allow_session_grant'|'reject'|'timeout'|'batch_aggregated'
+80|   decided_at     INTEGER,
+81|   started_at     INTEGER,
+82|   ended_at       INTEGER,
+83|   outcome        TEXT,                   -- 'success'|'error'|'cancelled'|'truncated'
+84|   error_class    TEXT,
+85|   correlation_id TEXT NOT NULL,          -- C18 路由与取证
+86|   grant_id       INTEGER                 -- 关联 approval_grant（D45）
+87| );
+88| CREATE INDEX idx_tool_call_task ON tool_call(task_id, seq);
+89| CREATE INDEX idx_tool_call_corr ON tool_call(correlation_id);
+90| 
+91| -- D45 作用域会话授权
+92| CREATE TABLE approval_grant (
+--- ec815820
+70| 
+71| -- 工具调用与审批取证（owner 隐私敏感：「它到底对我的机器做了什么」必须可查）
+72| CREATE TABLE tool_call (
+73|   id             INTEGER PRIMARY KEY AUTOINCREMENT,
+74|   task_id        TEXT NOT NULL REFERENCES task_log(id),
+75|   seq            INTEGER NOT NULL,
+76|   tool           TEXT NOT NULL,
+77|   args_json      TEXT NOT NULL,          -- 长字符串截断（§5.1 脱敏规则）
+78|   risk_level     TEXT NOT NULL,          -- 'L0'|'L1'|'L2'
+79|   decision       TEXT,                   -- 'allow'|'allow_session_grant'|'reject'|'timeout'|'batch_aggregated'
+80|   decided_at     INTEGER,
+81|   started_at     INTEGER,
+82|   ended_at       INTEGER,
+83|   outcome        TEXT,                   -- 'success'|'error'|'cancelled'|'truncated'
+84|   error_class    TEXT,
+85|   correlation_id TEXT NOT NULL,          -- C18 路由与取证
+86|   grant_id       INTEGER                 -- 关联 approval_grant（D45）
+87| );
+88| CREATE INDEX idx_tool_call_task ON tool_call(task_id, seq);
+89| CREATE INDEX idx_tool_call_corr ON tool_call(correlation_id);
+90| 
+91| -- D45 作用域会话授权
+92| CREATE TABLE approval_grant (
+--- HEAD
+70| 
+71| -- 工具调用与审批取证（owner 隐私敏感：「它到底对我的机器做了什么」必须可查）
+72| CREATE TABLE tool_call (
+73|   id             INTEGER PRIMARY KEY AUTOINCREMENT,
+74|   task_id        TEXT NOT NULL REFERENCES task_log(id),
+75|   seq            INTEGER NOT NULL,
+76|   tool           TEXT NOT NULL,
+77|   args_json      TEXT NOT NULL,          -- 长字符串截断（§5.1 脱敏规则）
+78|   risk_level     TEXT NOT NULL,          -- 'L0'|'L1'|'L2'
+79|   decision       TEXT,                   -- 'allow'|'allow_session_grant'|'reject'|'timeout'|'batch_aggregated'
+80|   decided_at     INTEGER,
+81|   started_at     INTEGER,
+82|   ended_at       INTEGER,
+83|   outcome        TEXT,                   -- 'success'|'error'|'cancelled'|'truncated'
+84|   error_class    TEXT,
+85|   correlation_id TEXT NOT NULL,          -- C18 路由与取证
+86|   grant_id       INTEGER                 -- 关联 approval_grant（D45）
+87| );
+88| CREATE INDEX idx_tool_call_task ON tool_call(task_id, seq);
+89| CREATE INDEX idx_tool_call_corr ON tool_call(correlation_id);
+90| 
+91| -- D45 作用域会话授权
+92| CREATE TABLE approval_grant (
+--- worktree
+70| 
+71| -- 工具调用与审批取证（owner 隐私敏感：「它到底对我的机器做了什么」必须可查）
+72| CREATE TABLE tool_call (
+73|   id             INTEGER PRIMARY KEY AUTOINCREMENT,
+74|   task_id        TEXT NOT NULL REFERENCES task_log(id),
+75|   seq            INTEGER NOT NULL,
+76|   tool           TEXT NOT NULL,
+77|   args_json      TEXT NOT NULL,          -- 长字符串截断（§5.1 脱敏规则）
+78|   risk_level     TEXT NOT NULL,          -- 'L0'|'L1'|'L2'
+79|   decision       TEXT,                   -- 'allow'|'allow_session_grant'|'reject'|'timeout'|'batch_aggregated'
+80|   decided_at     INTEGER,
+81|   started_at     INTEGER,
+82|   ended_at       INTEGER,
+83|   outcome        TEXT,                   -- 'success'|'error'|'cancelled'|'truncated'
+84|   error_class    TEXT,
+85|   correlation_id TEXT NOT NULL,          -- C18 路由与取证
+86|   grant_id       INTEGER                 -- 关联 approval_grant（D45）
+87| );
+88| CREATE INDEX idx_tool_call_task ON tool_call(task_id, seq);
+89| CREATE INDEX idx_tool_call_corr ON tool_call(correlation_id);
+90| 
+91| -- D45 作用域会话授权
+92| CREATE TABLE approval_grant (
+
+## S1b. SPEC-02 blob identity
+wt=b512fd840768426c86b478d9302e2153fd454630 b319=b512fd840768426c86b478d9302e2153fd454630 ec81=b512fd840768426c86b478d9302e2153fd454630 head=b512fd840768426c86b478d9302e2153fd454630
+
+## S2. PLAN.md:2694-2700 at worktree / b319bab5 / HEAD
+--- b319bab5
+2694| | `profile` | `id` PK, **`slot` UNIQUE**, `content`, `source`, `updated_at` | `updated_at` | 常驻（用户可删） | **L1 用户画像**（D20）。`slot` 是**有限枚举**（如 `pref.language`/`pref.tone`/`habit.work_hours`/`fact.family`…），*
+2695| | `memory` | `id` PK, `kind`, `content`, `keywords`, `created_at`, `last_hit_at`, `hit_count` | `keywords`（FTS 或 LIKE）· `last_hit_at` | 常驻（用户可删） | **L2 显式记忆**（D20 关键词检索）。`last_hit_at`/`hit_count` 供淘汰�
+2696| | `task_log` | `id` PK(TEXT), `started_at`, `ended_at`, `state`, `query_text`, `summary_text`, `cost_tokens_in`, `cost_tokens_out`, `cost_amount`, `error_class` | `started_at` | **30 天** | **L3 任务日志**（D20）。`query_text` 须按 §14.4 脱�
+2697| | `tool_call` | `id` PK, `task_id` FK, `seq`, `tool`, `args_json`, **`risk_level`**, **`decision`**, `decided_at`, `started_at`, `ended_at`, `outcome`, `error_class`, **`correlation_id`**, `grant_id` | `task_id,seq` · `correlation_id` | **30 天** | **�
+2698| | `approval_grant` | `id` PK, `scope`, `tool`, `pattern`, `session_id`, `created_at`, `expires_at`, `revoked_at` | `session_id` | 会话结束即失效（行保留 30 天供审计） | **D45 作用域会话授权** |
+2699| | `cost_daily` | `day` PK, `tokens_in`, `tokens_out`, `amount`, `tasks` | — | **400 天** | C23 的日聚合（避免每次全表扫 `task_log`） |
+2700| | `plugin_state` | `id` PK, `version`, `enabled`, `capabilities_json`, `net_allowlist_json`, `installed_at`, **`hash`** | — | 永久 | §14.7 安装状态 + **完整性校验**（`hash` 不符 → 拒绝加载并告警，防插件文件被就地替换�
+--- HEAD
+2694| | `profile` | `id` PK, **`slot` UNIQUE**, `content`, `source`, `updated_at` | `updated_at` | 常驻（用户可删） | **L1 用户画像**（D20）。`slot` 是**有限枚举**（如 `pref.language`/`pref.tone`/`habit.work_hours`/`fact.family`…），*
+2695| | `memory` | `id` PK, `kind`, `content`, `keywords`, `created_at`, `last_hit_at`, `hit_count` | `keywords`（FTS 或 LIKE）· `last_hit_at` | 常驻（用户可删） | **L2 显式记忆**（D20 关键词检索）。`last_hit_at`/`hit_count` 供淘汰�
+2696| | `task_log` | `id` PK(TEXT), `started_at`, `ended_at`, `state`, `query_text`, `summary_text`, `cost_tokens_in`, `cost_tokens_out`, `cost_amount`, `error_class` | `started_at` | **30 天** | **L3 任务日志**（D20）。`query_text` 须按 §14.4 脱�
+2697| | `tool_call` | `id` PK, `task_id` FK, `seq`, `tool`, `args_json`, **`risk_level`**, **`decision`**, `decided_at`, `started_at`, `ended_at`, `outcome`, `error_class`, **`correlation_id`**, `grant_id` | `task_id,seq` · `correlation_id` | **30 天** | **�
+2698| | `approval_grant` | `id` PK, `scope`, `tool`, `pattern`, `session_id`, `created_at`, `expires_at`, `revoked_at` | `session_id` | 会话结束即失效（行保留 30 天供审计） | **D45 作用域会话授权** |
+2699| | `cost_daily` | `day` PK, `tokens_in`, `tokens_out`, `amount`, `tasks` | — | **400 天** | C23 的日聚合（避免每次全表扫 `task_log`） |
+2700| | `plugin_state` | `id` PK, `version`, `enabled`, `capabilities_json`, `net_allowlist_json`, `installed_at`, **`hash`** | — | 永久 | §14.7 安装状态 + **完整性校验**（`hash` 不符 → 拒绝加载并告警，防插件文件被就地替换�
+--- worktree
+2694| | `profile` | `id` PK, **`slot` UNIQUE**, `content`, `source`, `updated_at` | `updated_at` | 常驻（用户可删） | **L1 用户画像**（D20）。`slot` 是**有限枚举**（如 `pref.language`/`pref.tone`/`habit.work_hours`/`fact.family`…），*
+2695| | `memory` | `id` PK, `kind`, `content`, `keywords`, `created_at`, `last_hit_at`, `hit_count` | `keywords`（FTS 或 LIKE）· `last_hit_at` | 常驻（用户可删） | **L2 显式记忆**（D20 关键词检索）。`last_hit_at`/`hit_count` 供淘汰�
+2696| | `task_log` | `id` PK(TEXT), `started_at`, `ended_at`, `state`, `query_text`, `summary_text`, `cost_tokens_in`, `cost_tokens_out`, `cost_amount`, `error_class` | `started_at` | **30 天** | **L3 任务日志**（D20）。`query_text` 须按 §14.4 脱�
+2697| | `tool_call` | `id` PK, `task_id` FK, `seq`, `tool`, `args_json`, **`risk_level`**, **`decision`**, `decided_at`, `started_at`, `ended_at`, `outcome`, `error_class`, **`correlation_id`**, `grant_id` | `task_id,seq` · `correlation_id` | **30 天** | **�
+2698| | `approval_grant` | `id` PK, `scope`, `tool`, `pattern`, `session_id`, `created_at`, `expires_at`, `revoked_at` | `session_id` | 会话结束即失效（行保留 30 天供审计） | **D45 作用域会话授权** |
+2699| | `cost_daily` | `day` PK, `tokens_in`, `tokens_out`, `amount`, `tasks` | — | **400 天** | C23 的日聚合（避免每次全表扫 `task_log`） |
+2700| | `plugin_state` | `id` PK, `version`, `enabled`, `capabilities_json`, `net_allowlist_json`, `installed_at`, **`hash`** | — | 永久 | §14.7 安装状态 + **完整性校验**（`hash` 不符 → 拒绝加载并告警，防插件文件被就地替换�
+wt=39a9fa5beed35a6ac5c29782edc69c723d07f8ab b319=39a9fa5beed35a6ac5c29782edc69c723d07f8ab head=39a9fa5beed35a6ac5c29782edc69c723d07f8ab

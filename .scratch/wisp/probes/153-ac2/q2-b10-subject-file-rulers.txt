@@ -1,0 +1,35 @@
+# Q2 batch3 14:53:55
+
+## S7. grep -c 'task_id' on the 153 SUBJECT FILE at each version
+6de3d1c5   0
+b319bab5   0
+7f79638e   1
+ec815820   10
+HEAD       10
+worktree   10
+positive control 153 accept-r1 (b319bab5) = 3
+positive control 153 accept-r1 (HEAD) = 3
+accept-r1 lines at b319bab5 = 939 vs HEAD = 939
+
+## S7b. where are the 3 task_id hits in the accept file
+412:3. **命名一致性（本程自己加的一发）**：`SPEC-02:74`／`PLAN.md:2697` 里那枚叫 **`task_id`**（DB 列，`REFERENCES task_log(id)`），
+831:| (a) 交付物本身 | §5.1／§5.2／§5.5、§3.2 的 `A4`／`A6` | `[前]` 到盘两行读数（未打标那行**整枚 `task` 键不存在**）、`traceTaskID` 一处读者、`withTraceTask`
+887:| 2 | 件内缺那笔隐私账（`:406–:411`）＋ 日志 `task` ↔ DB `task_id` 不同名无人写（`:412–:414`） | AC#2 (a) | 加两行，不动码 |
+
+## S8. grep -n '键名' on the SUBJECT FILE at b319bab5 (the version B.10 measured) and at HEAD
+--- b319bab5
+204:373:	l.log().Warn("agent: task_log open failed", "err", err, "task", taskID)   ← 键名 "task" 的既有惯例
+231:（键名沿用 `loop.go` 已经在用的 `"task"`，值沿用 `newTaskID()` 造的那枚、与 `Result.TaskID`／
+492:   139 验收 §7.2 第 2 项验过"八枚键名原样在场"，**但它验的那版里还没有 `task` 这枚键**。
+count b319=3
+--- HEAD
+204:373:	l.log().Warn("agent: task_log open failed", "err", err, "task", taskID)   ← 键名 "task" 的既有惯例
+231:（键名沿用 `loop.go` 已经在用的 `"task"`，值沿用 `newTaskID()` 造的那枚、与 `Result.TaskID`／
+492:   139 验收 §7.2 第 2 项验过"八枚键名原样在场"，**但它验的那版里还没有 `task` 这枚键**。
+625:> **隐私账（本件当时没算，票 157 第 9 笔代记）**：本票交的那枚 `task` 键把一枚可归因 id 写进宿主日志文件。**它不是新增暴露类**——同一枚键名、同一枚值在改前锚点 
+637:$ grep -rn 'task_id' docs/specs/ | grep -c '日志'      → 0        ← spec 全目录里没有一句把两面键名对上
+639:$ git grep -n '"task"' 6de3d1c5 -- internal/agent ':!*_test.go' | wc -l → 7（日志侧键名，第 9 笔那发）
+641:$ grep -n '键名' 本件 → :204 ／ :231 ／ :492 三枚，逐枚都在说**日志侧**惯例（"键名沿用 `loop.go` 已经在用的 `"task"`"），无一枚提 DB 侧
+644:**我这一笔用的尺是什么**＝**两面键名各取一枚名册**：DB 侧从**规格两处**（`sed -n` 取行原文）＋**锚点取版的码侧 `git grep -c`** 数出列名在场；日志侧用第 9 笔那发 7 行名
+648:> **键名两面账（代记第 10 笔）**：同一枚 id 在两个面**故意不同名**——日志侧键＝`task`（`compress.go:238`、`loop.go:373/744/936`），DB 侧列＝`task_id`（`SPEC-02:74` 的 `task_id TEXT NOT 
+count HEAD=9

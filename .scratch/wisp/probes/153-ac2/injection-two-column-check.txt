@@ -1,0 +1,13 @@
+# distinctiveness check on pre-fix blob 14:57:26
+它不是新增暴露类                 b319bab5=0 HEADblob=1 worktree=1
+落在票 132 那格未闭合的面上   b319bab5=0 HEADblob=1 worktree=1
+读者会把它读成隐私已审        b319bab5=0 HEADblob=1 worktree=1
+同一枚 id 在两个面                b319bab5=0 HEADblob=1 worktree=1
+故意不同名                          b319bab5=0 HEADblob=2 worktree=2
+第一次会在                          b319bab5=0 HEADblob=1 worktree=1
+本件与 spec 都没写一句           b319bab5=0 HEADblob=1 worktree=1
+
+## acceptor-file strings at HEAD vs its own baseline (control that B.9/B.10 quote a real passage)
+它算过的那笔账只写在码里、没写在件里 acceptHEADblob=1 acceptwt=1
+命名一致性（本程自己加的一发）  acceptHEADblob=1 acceptwt=1
+本格档位：成立，附两笔待补        acceptHEADblob=1 acceptwt=1

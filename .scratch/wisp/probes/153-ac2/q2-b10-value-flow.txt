@@ -1,0 +1,105 @@
+# Q2 batch6 value flow 14:55:12
+
+## G1. does tool_call.task_id in DB carry the same run taskID that the log line carries? (6de3d1c5)
+6de3d1c5:internal/agent/journal.go:21:	InsertToolCall(ctx context.Context, tc memory.ToolCall) (int64, error)
+6de3d1c5:internal/agent/journal.go:75:	rowID, err := t.j.InsertToolCall(ctx, memory.ToolCall{
+
+## G2. memory: task_log insert + tool_call insert signatures
+6de3d1c5:internal/memory/dao_tasklog.go:33:			`INSERT INTO task_log(id, started_at, ended_at, state, query_text, summary_text,
+6de3d1c5:internal/memory/dao_toolcall.go:24:			`INSERT INTO tool_call(task_id, seq, tool, args_json, risk_level, decision, decided_at,
+
+## G3. loop.go 640-660 (where ToolRequest.TaskID is set)
+640| 		p, i := p, i
+641| 		if p.local {
+642| 			results[i] = l.localListTools(ctx)
+643| 			continue
+644| 		}
+645| 		timeout := guard.PerToolTimeout()
+646| 		req := ToolRequest{
+647| 			TaskID: taskID, CorrelationID: taskID, CallID: p.call.ID,
+648| 			Name: p.call.Name, Args: p.call.Args, Timeout: timeout,
+649| 		}
+650| 		h := l.reg.Spawn("tool-exec-"+taskID, "agent", root, func(c context.Context) {
+651| 			sem <- struct{}{}
+652| 			defer func() { <-sem }()
+653| 			results[i], execErr[i] = l.dispatch(c, j, p.rowID, req, timeout)
+654| 		})
+655| 		handles = append(handles, h)
+656| 	}
+657| 	for _, h := range handles {
+658| 		<-h.Done()
+659| 	}
+660| 	for _, h := range handles {
+
+## G4. models.go ToolCall struct field for TaskID
+76:	TaskID        string
+161:	if tc.TaskID == "" {
+## G5. journal.go 70-85 (ToolCall row field) at 6de3d1c5
+66| // startCall books a pending tool_call row (decision recorded separately once
+67| // the gate/pass-through resolves it).
+68| func (t *taskJournal) startCall(ctx context.Context, callID, tool string, args json.RawMessage, risk string) int64 {
+69| 	t.mu.Lock()
+70| 	defer t.mu.Unlock()
+71| 	if t.j == nil {
+72| 		return 0
+73| 	}
+74| 	t.seq++
+75| 	rowID, err := t.j.InsertToolCall(ctx, memory.ToolCall{
+76| 		TaskID:        t.taskID,
+77| 		Seq:           t.seq,
+78| 		Tool:          tool,
+79| 		ArgsJSON:      string(args),
+80| 		RiskLevel:     riskColumn(risk),
+81| 		CorrelationID: t.corrID,
+82| 	})
+83| 	if err != nil {
+84| 		return 0
+
+## G6. task_log id source
+52:	taskID string
+59:func newTaskJournal(j Journal, taskID, corrID string) *taskJournal {
+61:		return &taskJournal{taskID: taskID, corrID: corrID, rows: map[string]int64{}}
+63:	return &taskJournal{j: j, taskID: taskID, corrID: corrID, rows: map[string]int64{}}
+76:		TaskID:        t.taskID,
+130:		ID:        t.taskID,
+144:	return j.FinishTaskLog(ctx, t.taskID, state, summary, tokensIn, tokensOut, costMicro, errorClass)
+## G7. newTaskJournal call site (loop.go at 6de3d1c5)
+6de3d1c5:internal/agent/journal.go:59:func newTaskJournal(j Journal, taskID, corrID string) *taskJournal {
+6de3d1c5:internal/agent/loop.go:356:	j := newTaskJournal(l.opt.Journal, taskID, taskID) // C18: correlation == task id
+344| 
+345| 	root := observe.NewRootFrom(ctx, taskID)
+346| 	defer root.Cancel()
+347| 	// Operate under the root's own cancelable context: this is what lets the
+348| 	// D11(1) control layer abort a running task by cancelling l.current (the
+349| 	// default handler reaches the loop only through this root, not the caller's
+350| 	// parent ctx). Cancellation set by the caller's parent propagates down here
+351| 	// as well, so both paths are observed by the loop's ctx.Err() checks.
+352| 	ctx = root.Ctx
+353| 	l.setCurrent(root)
+354| 	defer l.setCurrent(nil)
+355| 
+356| 	j := newTaskJournal(l.opt.Journal, taskID, taskID) // C18: correlation == task id
+357| 	// D47: register the task with the host's approval layer before any tool
+358| 	// call can reach a gate. The revocation runs when the task ends, so an
+359| 	// admitted id cannot outlive the task that earned it.
+360| 	revokeAdmission := func() {}
+361| 	if l.opt.AdmitTask != nil {
+362| 		if r := l.opt.AdmitTask(taskID); r != nil {
+363| 			revokeAdmission = r
+364| 		}
+365| 	}
+366| 	defer revokeAdmission()
+367| 	guard := NewGuard(l.guard)
+368| 	cost := Cost{Currency: l.opt.Config.Currency}
+369| 	res := Result{TaskID: taskID, Status: StatusCompleted}
+370| 
+371| 	l.append(userMessage(input))
+372| 	if err := j.startTask(ctx, input); err != nil {
+## G8. why :741/:933 at 86b0161 become :744/:936 at 6de3d1c5 (diff of loop.go between the two anchors)
+@@ -393,7 +393,10 @@ func (l *Loop) run(ctx context.Context, taskID, input string) Result {
+-			nh, rep, err := l.comp.Compress(ctx, hist)
++			// withTraceTask is what lets the record the compressor books say
++			// which task paid for it (ticket 153 AC#2): run() is the only place
++			// the id exists, and the compressor is shared across tasks.
++			nh, rep, err := l.comp.Compress(withTraceTask(ctx, taskID), hist)
+blob: 86b0161=e685a6efd595acb5ca1d7f051e139985bf6b9a47 6de3d1c5=3ea1fb8df38adfc56dc5f7510de07b4214fb547c
