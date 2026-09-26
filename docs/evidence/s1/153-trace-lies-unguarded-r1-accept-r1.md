@@ -416,6 +416,30 @@ $ traceTaskID 的读者：除 :237 那一处之外零读者（全量 git grep �
 **本格档位：成立，附两笔待补**（①件内缺那笔隐私账；②日志↔DB 键名差异无人写）。
 两笔都不动判据、不动码；且本程**没有**造出"这枚键泄漏到它不该去的地方"的活证据——§5.2 那把尺就是为这一条造的，造不出。
 
+### 5.5 本程补的一条新读数：**这条隐式通道不只"会被忘记"，它还会"被继承"**
+
+实现件 §3.4 与 §7 第 5 条把 ctx 通道的代价写成一句："**ctx 通道可以被忘记**——未打标的调用，痕里就是没有 `task` 键"。
+这句话对，但它只说了方向的一半。本程量另一半（探针 `zzaccept153_inherit_test.go`，快照专用）：
+
+```
+$ go test ./internal/agent/ -count=1 -race -v -run TestAccept153
+PROBE4-153 INHERIT: fold on a ctx DERIVED from a tagged run still reports the parent task id "448bbe3d-…"
+PROBE3-153: 4 blank-ish ids -> no task key at all; control id present as expected
+PROBE2-153 CONCURRENCY: 24 goroutines / 1 shared compressor -> 24 records, 24 distinct ids, every id exactly once
+PROBE-153 DISK: …"history_changed":true}                    ← 未打标：无键
+PROBE-153 DISK: …"history_changed":true,"task":"2bdf762a-…"} ← 打标：键原样过红删器
+（四枚同一次 -race 跑里全 PASS，读数全文＝ `.scratch/wisp/probes/153/accept-r1/all-probes-race.txt`）
+```
+
+⇒ `context.WithCancel(带标 ctx)` 生出的**子 ctx 上发生的折叠，报的是父任务的 id**。今天**没有**任何调用点走这条形状
+（唯一非测试点 `loop.go:399` 把 `run()` 自己的 ctx 直接交进去，不派生），所以**本程造不出"张冠李戴"的活反例**；
+但"忘记"是**可见的缺失**（少一枚键，读者知道没归因），"继承"是**不可见的错配**（键在场、值指向另一件事）——
+前者被它写进注释与用例了，后者**既没写进注释、也没进判据**。
+尤其考虑到那枚 `DEFERRED(D28-1)` 的 Warm-window hook 落地时最自然的写法就是"从任务 ctx 派生一枚带取消的 ctx 再折"，
+那一刻 `task=` 会**自动在场**、看起来全对，而它归的是**派生链根部那次任务**，不一定是付钱的那次。
+**判**：本格仍成立（今天的形状里没有缺陷，实现件那句话今天也没说错）；本程把这一条记成**给它的那句提醒**，
+并挂在 §7 的触发点 A 上（hook 那天要重读的就是这两样：可达性＋继承性）。**不新开票、不改票面。**
+
 ---
 
 ## 6. 攻击点⑥ —— 门禁与名册独立复跑（一律逐包，从不 `go test ./...`；版本现读）

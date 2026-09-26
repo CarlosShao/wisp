@@ -1,0 +1,10 @@
+    zzaccept153_blank_test.go:40: PROBE3-153: 4 blank-ish ids -> no task key at all; control id present as expected
+--- PASS: TestAccept153EmptyAndBlankIdsLeaveNoKey (0.00s)
+    zzaccept153_concurrency_test.go:63: PROBE2-153 CONCURRENCY: 24 goroutines / 1 shared compressor -> 24 records, 24 distinct ids, every id exactly once
+--- PASS: TestAccept153AttributionUnderRealConcurrency (0.01s)
+    zzaccept153_inherit_test.go:29: PROBE4-153 INHERIT: fold on a ctx DERIVED from a tagged run still reports the parent task id "448bbe3d-aa34-4a9d-aa1a-987868ad9b0b"
+--- PASS: TestAccept153TagIsInheritedByDerivedContexts (0.00s)
+    zzaccept153_ondisk_test.go:60: PROBE-153 DISK: {"time":"2026-09-26T10:41:32.747071+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true}
+    zzaccept153_ondisk_test.go:60: PROBE-153 DISK: {"time":"2026-09-26T10:41:32.7484693+08:00","level":"INFO","msg":"agent: history compressed","tokens_before":1236,"tokens_after":780,"threshold":384,"msgs_before":18,"msgs_after":10,"compressed_msgs":9,"kept_raw_rounds":3,"history_changed":true,"task":"2bdf762a-d6d4-4fbe-ada5-66efbbcaf78c"}
+--- PASS: TestAccept153TraceOnDiskThroughRedactor (0.03s)
+ok  	github.com/CarlosShao/wisp/internal/agent	1.182s
