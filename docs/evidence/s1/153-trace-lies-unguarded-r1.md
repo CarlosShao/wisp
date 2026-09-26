@@ -623,3 +623,26 @@ $ git grep -n 'SealDir' 6de3d1c5 -- '*.go' ':!*_test.go' → 6 枚命中，全�
 **对不上的一枚没有** ⇒ 按最小闭合补那一行（本件正文一字未改，新文挂这里；这是**记账级**文字，不动判据、不动码）：
 
 > **隐私账（本件当时没算，票 157 第 9 笔代记）**：本票交的那枚 `task` 键把一枚可归因 id 写进宿主日志文件。**它不是新增暴露类**——同一枚键名、同一枚值在改前锚点 `86b0161` 就有三枚非测试行在用（`loop.go:373`／`:741`／`:933`），到 `6de3d1c` 非测试侧带 `"task"` 的行数是 **7**；本票做的是"让成功边那一行也进"，不是"让 id 第一次进日志"。**但它落在票 132 那格未闭合的面上**：`Q-31`（日志算私有数据要上锁）要求的那把锁 `winsec.SealDir` 在 `6de3d1c5` 的非测试代码里**零调用者**。交付版 `compress.go:236` 那句"`[privacy] keep_transcript` does not reach it"复算**成立**（硬编码 false＋写 true 报错，`schema.go:511`／`validate.go:82-84`／`validate_test.go:136`），**可它只到"转写不落盘"那一层，不等于"文件已上锁"**——本件正文里没有这一区分，读者会把它读成隐私已审。
+
+### B.10 第 10 笔 —— 日志侧 `task` ↔ DB 侧 `task_id` 无人写：**〔成立〕**
+
+**验收程那一句**（`153-trace-lies-unguarded-r1-accept-r1.md:412`–`:414` ＋ `:416` 档位行第 ② 件）："`SPEC-02:74`／`PLAN.md:2697` 里那枚叫 **`task_id`**（DB 列），日志侧叫 **`task`** ⇒ 同一枚值两个面**故意不同名**，本票跟随日志侧是对的；但'从日志 join 回 DB'的人要知道这次改名，**实现件与 spec 都没写这一句**（登记，不判退）。"
+
+**本程当轮复算**（全文＝`probes/157/13-…txt` 的 P3 段＋`14-supplementary-rulers.txt` 末段 B9/B10 补尺）：
+
+```
+$ sed -n '74p' docs/specs/SPEC-02-data-storage.md      → "  task_id        TEXT NOT NULL REFERENCES task_log(id),"
+$ sed -n '2697p' docs/PLAN.md                          → tool_call 那一行：`id` PK、`task_id` FK、…、`correlation_id`、`grant_id`
+$ grep -rn 'task_id' docs/specs/                       → 只有 SPEC-02:74 与 SPEC-02:88（那枚索引）两枚
+$ grep -rn 'task_id' docs/specs/ | grep -c '日志'      → 0        ← spec 全目录里没有一句把两面键名对上
+$ git grep -c 'task_id' 6de3d1c5 -- internal           → 只在 internal/memory：schema.go 2 ／ dao_toolcall.go 3 ／ models.go 1（＋测试）
+$ git grep -n '"task"' 6de3d1c5 -- internal/agent ':!*_test.go' | wc -l → 7（日志侧键名，第 9 笔那发）
+$ grep -c 'task_id' docs/evidence/s1/153-trace-lies-unguarded-r1.md → 0 ／ 同一把尺打 153 验收件 → 3（正控）
+$ grep -n '键名' 本件 → :204 ／ :231 ／ :492 三枚，逐枚都在说**日志侧**惯例（"键名沿用 `loop.go` 已经在用的 `"task"`"），无一枚提 DB 侧
+```
+
+**我这一笔用的尺是什么**＝**两面键名各取一枚名册**：DB 侧从**规格两处**（`sed -n` 取行原文）＋**锚点取版的码侧 `git grep -c`** 数出列名在场；日志侧用第 9 笔那发 7 行名册；"有没有人写过这枚对价"用**三枚 0 命中**（本件／spec 与"日志"同现／本件 `键名` 三枚逐枚看过去只讲日志侧），并给每枚 0 配了**同一把尺的正控读数**（验收件 3 枚、SPEC-02 2 枚）——0 与"死尺"分开。
+
+**对不上的一枚没有** ⇒ 补那一行（登记级：不动码、不动判据、不判退；本件正文一字未改）：
+
+> **键名两面账（代记第 10 笔）**：同一枚 id 在两个面**故意不同名**——日志侧键＝`task`（`compress.go:238`、`loop.go:373/744/936`），DB 侧列＝`task_id`（`SPEC-02:74` 的 `task_id TEXT NOT NULL REFERENCES task_log(id)`、`:88` 的 `idx_tool_call_task`、`PLAN.md:2697` 那行 `tool_call`，码侧同形 `internal/memory/schema.go:71/:85`、`dao_toolcall.go:24/:112/:159`、`models.go:162`）。本票跟随**日志侧**惯例是对的（§3.4 已写"键名沿用 `loop.go` 已经在用的 `task`"），**但改名这件事本件与 spec 都没写一句**：拿那条痕去 join `tool_call`／`task_log` 的人，第一次会在 `task` ≠ `task_id` 上撞一次。⇒ 要真去 `SPEC-02` 补那句对价说明是**另一格活**（spec 在禁改面里，本程未碰）。
