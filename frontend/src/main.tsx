@@ -1,27 +1,27 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "@/App";
+import { AppHarness } from "@/components/harness/app-harness";
 import { Showcase } from "@/components/showcase";
 import { HARNESS_BANNER } from "@/fixtures/harness";
 import "./styles/theme.css";
 
 /**
- * The host page is loaded two ways and only one of them carries data:
+ * The host page is loaded three ways and only one of them carries data:
  *   - inside Wisp, WebView2 serves the embedded dist and Go pushes snapshots
  *     through the C17 bridge - no query string, so this file renders <App />
  *     with its empty frame and every unfed screen says so out loud;
- *   - in a browser with ?harness=1, the bundle renders the showcase: the
- *     library-style component walkthrough (owner 2026-09-25: "起码要有主流
- *     harness 的样子") fed by the fixtures in src/fixtures/harness.ts. The
- *     showcase is a walkthrough page, NOT the panel - the panel itself has no
- *     fixture mode, because a fixture behind the real UI would be exactly the
- *     "假数据当真实字段" the P9 red line forbids.
- * The banner is added to the document, not to React's tree, so a render
- * harness that counts markup never sees it.
+ *   - ?harness=1 renders the whole-application walkthrough (owner 2026-09-26:
+ *     "用户刚进来的时候，不是都进入一个新任务的窗口吗" - sidebar, new-task
+ *     entry, sessions, right rail, overlays), fed by fixtures;
+ *   - ?harness=2 keeps the component showcase this replaced.
+ * All harness modes are demo data behind a banner; the product panel has no
+ * fixture mode, because a fixture behind the real UI would be exactly the
+ * "假数据当真实字段" the P9 red line forbids.
  */
-const harness = new URLSearchParams(location.search).get("harness") === "1";
+const harness = new URLSearchParams(location.search).get("harness");
 
-if (harness) {
+if (harness === "1" || harness === "2") {
   const note = document.createElement("div");
   note.textContent = HARNESS_BANNER;
   note.setAttribute("role", "note");
@@ -35,6 +35,7 @@ if (harness) {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    {harness ? <Showcase /> : <App />}
+    {harness === "1" ? <AppHarness /> : harness === "2" ? <Showcase /> : <App />}
   </StrictMode>,
 );
+
