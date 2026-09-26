@@ -1,0 +1,64 @@
+# 续程 §11.1 原始读数 · 采于 2026-09-26 11:03:45 +0800 · HEAD=3ad13d4 · 被验版本=6de3d1c5 · ff550f3^=5365cb22
+
+## A. 区间内测试文件面（尺：git diff --name-status / --numstat ff550f3^..6de3d1c5 -- *_test.go）
+A	.scratch/wisp/probes/152/zz152bprobe_windows_test.go
+A	.scratch/wisp/probes/152/zz152probe_windows_test.go
+A	.scratch/wisp/probes/153/probe153_line_test.go
+A	.scratch/wisp/probes/153/probe153_loopleg_test.go
+M	cmd/wisp/slo_report_144_windows_test.go
+A	cmd/wisp/task_scope_close_151_test.go
+M	internal/agent/compress_trace_test.go
+
+74	0	.scratch/wisp/probes/152/zz152bprobe_windows_test.go
+258	0	.scratch/wisp/probes/152/zz152probe_windows_test.go
+29	0	.scratch/wisp/probes/153/probe153_line_test.go
+28	0	.scratch/wisp/probes/153/probe153_loopleg_test.go
+88	1	cmd/wisp/slo_report_144_windows_test.go
+115	0	cmd/wisp/task_scope_close_151_test.go
+204	0	internal/agent/compress_trace_test.go
+
+## B. 每枚测试文件的归属 commit（尺：git log --format=%h.. -- <path>）
+-- internal/agent/compress_trace_test.go
+b23c7f77 feat(153 AC#2): 那条痕带上它所属的 taskID——三问逐问答完再动手，答案不是"要动契约面"
+ff550f38 test(153 AC#1): 补上"过阈值但一轮都折不动"那一枚判据——M5 那形在未修码上今天就能被它打红
+-- cmd/wisp/task_scope_close_151_test.go
+5d46f241 placeholder
+-- cmd/wisp/slo_report_144_windows_test.go
+10e3585c fix(152 AC#3): contradictionOffset 那条退路不再借位置——它明说自己没有位置可报
+
+## C. 本票那枚测试文件的 hunk 名册（尺：git diff -U3 | grep -c ^@@）
+@@ -26,6 +26,12 @@ import (
+@@ -391,3 +397,201 @@ func flattenRecordMsgs(rs []capturedRecord) []string {
+hunk 枚数=2  numstat=204	0	internal/agent/compress_trace_test.go
+
+## D. 逐字节证明：交付版剥掉两枚插入区 == 锚点前 393 行
+cmp rc=0 (无输出=逐字节相同)
+  393 /d/tmp/w153r2/a/deliv_minus_inserts
+  393 /d/tmp/w153r2/a/anchor_head393
+  786 total
+
+## E. 顶层函数名册差（尺：grep -n ^func）
+18
+21
+393:func flattenRecordMsgs(rs []capturedRecord) []string {
+426:func TestCompressionTraceSilentWhenNothingFoldableOverThreshold(t *testing.T) {
+478:func TestCompressionTraceCarriesTheOwningTaskID(t *testing.T) {
+534:func TestCompressionTraceNeverInventsATaskID(t *testing.T) {
+
+## F. 断言动词计数（尺：grep -c 于两个行区间）
+appended 394-597: Fatalf=17 Errorf=7 Fatal(=1 Skip=0
+pre-existing 1-393: Fatalf=20 Errorf=16 Fatal(=3 Skip=0
+t.Run 于交付版整文件=0 ; grep -ci skip 整文件=0
+
+## G. 守卫与键值现量
+if rep.Ran {  anchor=1 delivered=1  行号: 170:	if rep.Ran {
+216:	if rep.Ran {
+summarize() 两版函数体 cmp:
+cmp rc=0 行数=13
+NewCompressor(...,nil,...) 出现次数（尺：git grep -c 于单文件）:
+5365cb22:internal/agent/compress_trace_test.go:6
+6de3d1c5:internal/agent/compress_trace_test.go:8
+整包 t.Skip 名册（6de3d1c5）:
+6de3d1c5:internal/agent/approval/ticket84_no_owner_test.go:224:		t.Skip("有意慢：300s 墙钟计量，只在 WISP_84_MEASURE=1 时跑（票 84 AC#1；见 docs/evidence/s1/84-ac1-bounded-wait.md）")
+前一程 12 发日志里带缩进的 --- FAIL 命中文件数（尺：grep -lE "^ +--- FAIL"）:
+0

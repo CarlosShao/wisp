@@ -1,0 +1,130 @@
+# 续程 §11.2 原始读数 · 采于 2026-09-26 11:05:14 +0800 · HEAD=3ad13d4 · 锚点(=ff550f3^)=5365cb22 · 被验版本=6de3d1c5
+
+## A. 逐枚装配件"改前在场吗"（尺：git grep -n "func <名>" <sha> -- internal/agent，两版各跑一发）
+### func newTraceCapture
+  5365cb22 : internal/agent/compress_trace_test.go:54:func newTraceCapture() *traceCapture { return &traceCapture{} }|
+  6de3d1c5 : internal/agent/compress_trace_test.go:60:func newTraceCapture() *traceCapture { return &traceCapture{} }|
+### func (tc \*traceCapture) all
+  5365cb22 : internal/agent/compress_trace_test.go:75:func (tc *traceCapture) all() []capturedRecord {|
+  6de3d1c5 : internal/agent/compress_trace_test.go:81:func (tc *traceCapture) all() []capturedRecord {|
+### func (tc \*traceCapture) with
+  5365cb22 : internal/agent/compress_trace_test.go:84:func (tc *traceCapture) with(msg string) []capturedRecord {|
+  6de3d1c5 : internal/agent/compress_trace_test.go:90:func (tc *traceCapture) with(msg string) []capturedRecord {|
+### func (r capturedRecord) flat
+  5365cb22 : internal/agent/compress_trace_test.go:111:func (r capturedRecord) flat() string {|
+  6de3d1c5 : internal/agent/compress_trace_test.go:117:func (r capturedRecord) flat() string {|
+### func (tc \*traceCapture) assertRulerLive
+  5365cb22 : internal/agent/compress_trace_test.go:97:func (tc *traceCapture) assertRulerLive(t *testing.T) {|
+  6de3d1c5 : internal/agent/compress_trace_test.go:103:func (tc *traceCapture) assertRulerLive(t *testing.T) {|
+### func attrInt
+  5365cb22 : internal/agent/compress_trace_test.go:120:func attrInt(t *testing.T, r capturedRecord, key string) int64 {|
+  6de3d1c5 : internal/agent/compress_trace_test.go:126:func attrInt(t *testing.T, r capturedRecord, key string) int64 {|
+### func attrBool
+  5365cb22 : internal/agent/compress_trace_test.go:137:func attrBool(t *testing.T, r capturedRecord, key string) bool {|
+  6de3d1c5 : internal/agent/compress_trace_test.go:143:func attrBool(t *testing.T, r capturedRecord, key string) bool {|
+### func requireTraceAttrs
+  5365cb22 : internal/agent/compress_trace_test.go:152:func requireTraceAttrs(t *testing.T, r capturedRecord) {|
+  6de3d1c5 : internal/agent/compress_trace_test.go:158:func requireTraceAttrs(t *testing.T, r capturedRecord) {|
+### func flattenRecordMsgs
+  5365cb22 : internal/agent/compress_trace_test.go:387:func flattenRecordMsgs(rs []capturedRecord) []string {|
+  6de3d1c5 : internal/agent/compress_trace_test.go:393:func flattenRecordMsgs(rs []capturedRecord) []string {|
+### func newHarness
+  5365cb22 : internal/agent/harness_test.go:92:func newHarness(t *testing.T, fixture string, opts ...harnessOpt) *harness {|
+  6de3d1c5 : internal/agent/harness_test.go:92:func newHarness(t *testing.T, fixture string, opts ...harnessOpt) *harness {|
+### func withConfig
+  5365cb22 : internal/agent/harness_test.go:54:func withConfig(f func(*Config)) harnessOpt {|
+  6de3d1c5 : internal/agent/harness_test.go:54:func withConfig(f func(*Config)) harnessOpt {|
+### func withLogger
+  5365cb22 : internal/agent/harness_test.go:87:func withLogger(lg *slog.Logger) harnessOpt {|
+  6de3d1c5 : internal/agent/harness_test.go:87:func withLogger(lg *slog.Logger) harnessOpt {|
+### func WithLogger
+  5365cb22 : internal/agent/compress.go:83:func WithLogger(lg *slog.Logger) CompressorOpt {|
+  6de3d1c5 : internal/agent/compress.go:87:func WithLogger(lg *slog.Logger) CompressorOpt {|
+### func NewCompressor
+  5365cb22 : internal/agent/compress.go:88:func NewCompressor(b Budgets, sum Summarizer, opts ...CompressorOpt) *Compressor {|
+  6de3d1c5 : internal/agent/compress.go:92:func NewCompressor(b Budgets, sum Summarizer, opts ...CompressorOpt) *Compressor {|
+### func BudgetsFor
+  5365cb22 : internal/agent/budgets.go:85:func BudgetsFor(ctxWindow int) Budgets {|
+  6de3d1c5 : internal/agent/budgets.go:85:func BudgetsFor(ctxWindow int) Budgets {|
+### func buildRoundHistory
+  5365cb22 : internal/agent/compress_test.go:23:func buildRoundHistory(rounds, padBytes int) []llm.Message {|
+  6de3d1c5 : internal/agent/compress_test.go:23:func buildRoundHistory(rounds, padBytes int) []llm.Message {|
+### func groupRounds
+  5365cb22 : internal/agent/compress.go:291:func groupRounds(hist []llm.Message) []round {|
+  6de3d1c5 : internal/agent/compress.go:347:func groupRounds(hist []llm.Message) []round {|
+### func rawRoundIndexes
+  5365cb22 : internal/agent/compress.go:320:func rawRoundIndexes(rounds []round) []int {|
+  6de3d1c5 : internal/agent/compress.go:376:func rawRoundIndexes(rounds []round) []int {|
+### func newTaskID
+  5365cb22 : internal/agent/loop.go:1104:func newTaskID() string {|
+  6de3d1c5 : internal/agent/loop.go:1107:func newTaskID() string {|
+### func withTraceTask
+  5365cb22 : (0 命中)
+  6de3d1c5 : internal/agent/compress.go:152:func withTraceTask(ctx context.Context, taskID string) context.Context {|
+### func traceTaskID
+  5365cb22 : (0 命中)
+  6de3d1c5 : internal/agent/compress.go:160:func traceTaskID(ctx context.Context) string {|
+### type traceTaskKey
+  5365cb22 : (0 命中)
+  6de3d1c5 : internal/agent/compress.go:148:type traceTaskKey struct{}|
+
+## B. 没有第二把尺：三枚新用例读的尺与四枚钉子同一枚（尺：grep -n 于交付版）
+179:	recs.assertRulerLive(t)
+210:	hits := recs.with(traceMsg)
+256:	for _, r := range recs.with(traceMsg) {
+271:	recs.assertRulerLive(t)
+291:	if got := recs.with(traceMsg); len(got) != 0 {
+304:	recs.assertRulerLive(t)
+332:	hits := recs.with(traceMsg)
+428:	recs.assertRulerLive(t)
+456:	hits := recs.with(traceMsg)
+480:	recs.assertRulerLive(t)
+498:	hits := recs.with(traceMsg)
+536:	recs.assertRulerLive(t)
+547:	untagged := recs.with(traceMsg)
+568:	tagged := recs.with(traceMsg)[1:]
+585:	for _, r := range recs.with(traceMsg) {
+
+## C. nil Summarizer 是生产既有分支，不是 mock（尺：git show <sha>:… | sed -n /p 函数体）
+func (c *Compressor) summarize(ctx context.Context, msgs []llm.Message) (string, error) {
+	if c.sum == nil {
+		return structuralTrim(msgs), nil
+	}
+	s, err := c.sum.SummarizeHistory(ctx, msgs)
+	if err != nil {
+		return "", err
+	}
+	if strings.TrimSpace(s) == "" {
+		return structuralTrim(msgs), nil
+	}
+	return s, nil
+}
+两版函数体 cmp 结果见 11-1 文件 G 段（rc=0、13 行）
+
+## D. newHarness = C5 golden SSE 接缝上的真 Loop.Run（尺：git show 6de3d1c5:internal/agent/harness_test.go | grep -n）
+9:	"net/http/httptest"
+17:	"github.com/CarlosShao/wisp/internal/llm/golden"
+22:// goldenDir points at this package's golden fixtures: the same format and
+26:var goldenDir = func() string {
+31:	return filepath.Join(filepath.Dir(thisFile), "testdata", "golden")
+34:// harness is a Loop wired to a golden-backed C5 provider.
+37:	rep    *golden.Replayer
+38:	server *httptest.Server
+91:// newHarness loads a golden fixture and serves its responses sequentially.
+94:	rs, err := golden.LoadFile(filepath.Join(goldenDir, fixture+".sse"))
+96:		t.Fatalf("load golden %s: %v", fixture, err)
+98:	rep := golden.NewReplayer(rs)
+101:	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+159:// slice is written on the httptest handler goroutine, and a cancelled task can
+
+## E. 快照探针在树里编译不了（.scratch 以点开头 ⇒ 不在 ./... 图内）
+go list ./... | grep -c scratch = 0
+$ go vet ./.scratch/wisp/probes/153/ →
+# github.com/CarlosShao/wisp/.scratch/wisp/probes/153
+# [github.com/CarlosShao/wisp/.scratch/wisp/probes/153]
+vet.exe: .scratch\wisp\probes\153\probe153_line_test.go:15:7: undefined: BudgetsFor
+
+## F. 本票地界外的两枚测试文件一行事实
+cmd/wisp/task_scope_close_151_test.go 归属: 5d46f241 placeholder
+slo_report_144 的那一枚删除线: -// Case 13 - AC#3's ruling is ⓐ: the s.exited() branch SHOULD name where the last
+它在树里的 build 约束/包名: //go:build windows  package main 

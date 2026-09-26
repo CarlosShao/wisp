@@ -663,3 +663,134 @@ $ git ls-tree -r --name-only b23c7f7 -- cmd      | grep -c '\.go$' →  43      
 全程未接触凭据面。本件出现的只有**名字与形状**：函数／类型名 `traceTaskKey`／`withTraceTask`／`traceTaskID`／`newTaskID`／`redactHandler`／`SealDir`；
 本程四枚探针现造的 uuid 形状**任务号**一律截断成 `70583f25-…`／`2bdf762a-…`／`448bbe3d-…` 三枚前缀（它们是 `task_log.id` 那枚主键，D35 要求可查，不是凭据）；
 路径形状 `<data>\logs\wisp-*.jsonl`。**没有任何 Key、DPAPI 串、`.env` 内容出现在本程读数里**——本程连 `cmd/wisp` 里那几枚假凭据常量都没打开过。
+
+---
+
+## 11. 放水两问自答（**续程**亲量 · 派单 `2026-09-26-105x-accept-153-r2` 第一件）
+
+**本节作者＝续程**（§0–§10 的作者是前一程 `2026-09-26-0958x-accept-153`，它 10:4x 撞 150 轮上限死在半路）。
+续程开工第一步现读，派单那条"被验的不是 HEAD"照办：
+
+```
+$ date '+%Y-%m-%d %H:%M:%S %z'      2026-09-26 11:00:00 +0800
+$ git rev-parse --short HEAD        0fd9899      ← 开工那一刻；写本节时已前进为 47b8f88（别家在提）
+$ git cat-file -t 6de3d1c5          commit       ← 被验版本
+$ git status --porcelain=v1 | wc -l 40 → 38      ← 脏的全是别家，本程一次都没读脏树当被验版本
+```
+
+⇒ 本节与 §12 的**行号一律按 `6de3d1c5` 取**（`git show 6de3d1c5:<path>`），不拿 HEAD 比。
+前一程落在 `probes/153/accept-r1/**` 的读数本程**只引用、一枚不重跑**；引用处逐次带一句
+"那是前一程量的，它的 §9 已登记它推翻本派单的五条前提"。本程新落的读数一律进 `probes/153/accept-r2/`。
+
+### 11.0 先登记一枚编号撞车（本程不改 §0–§10 一字）
+
+派单把 §11 定成"放水两问"，而**盘上已有的 §0–§10 里有五处把 §11 当成"总裁决／待补项清单"在指**。尺＝`grep -n '§11'` 于本件（工作树版＝`HEAD` 版，`git diff --numstat` 对本文件空），五枚命中：
+`:8` "总裁决（详见 §11）"、`:118` "§11 待补项第 3 条"、`:154` "已并入 §11 待补项第 4 条"、`:320` "写进 §11 待办给编排者"、`:594` "更正口径即可（§11 待补 1）"。
+
+⇒ 事实是**那一节今天不存在**：前一程只交到 §10，编排者代提的是 §8／§9／§10。本程按派单只写 §11（放水）与 §12（对账），**不冒充总裁决那一节**；
+上面五处指向的待补项，本程在 **§12.5** 只做"逐枚具名归拢＋带盘上出处行号"这一件事，不替前一程定任何新档、不改它一句措辞。
+
+### 11.1 问① 断言方向动没动——逐处答"收紧还是放宽"
+
+**先把派单给的那把区间尺的边界说清**：`ff550f3^..6de3d1c5` 里 `ff550f3^ = 5365cb22`（本程现量 `git cat-file -t` ＝ commit、`git rev-parse --short` ＝ 5365cb22）。
+**这枚区间不是本票专用的**，它横穿别家三程。区间内所有测试文件的改动面（尺＝`git diff --name-status` 与 `--numstat` 于 `'ff550f3^'..6de3d1c5`，无 pathspec，再逐枚回查归属 commit＝`git log --format='%h %s' 'ff550f3^..6de3d1c5' -- <path>`）：
+
+| 测试文件 | numstat（增／删） | 谁带进区间的 | 本程判 |
+|---|---|---|---|
+| `internal/agent/compress_trace_test.go` | **204／0** | `ff550f3`＋`b23c7f7`（本票两枚码 commit） | **本票地界，逐 hunk 裁，见 11.1a／b** |
+| `cmd/wisp/task_scope_close_151_test.go` | 115／0 | `5d46f24`（subject 就叫 `placeholder`，票 151） | 地界外，**不裁档**。只报一枚形状事实：新增文件、删除列 0 ⇒ 它结构上碰不到本票那四枚钉子 |
+| `cmd/wisp/slo_report_144_windows_test.go` | 88／**1** | `10e3585c`（票 152 AC#3） | 地界外，具名移交票 152 验收程。本程只看了那唯一一枚删除线：`-// Case 13 - AC#3's ruling is ⓐ: …` ＝ **`//` 文档行**，不是断言、不是期望值 |
+| `.scratch/wisp/probes/152/zz152probe_windows_test.go` 与 `zz152bprobe_windows_test.go` | 258／0 与 74／0 | `eb4755a3`（票 152 探针归档） | 地界外，且不在编译图内（11.2 那条尺） |
+| `.scratch/wisp/probes/153/probe153_line_test.go` 与 `probe153_loopleg_test.go` | 29／0 与 28／0 | `ac7fb008`（本票实现程的**快照专用**探针副本） | 本票地界内但**不进判据**：它们只在仓外快照里被编译过，见 11.2 末段 |
+
+⇒ **本票地界内被改动的测试文件恰一枚**，而它的删除列是 **0**。这一条就把派单点名那一族（"为了让它绿而改期望值"）在**结构上**关掉了：
+改一枚既有期望值必然留下删除线或改动既有行，两样本程都没读到。
+
+#### 11.1a 逐 hunk（尺＝`git diff -U3 'ff550f3^'..6de3d1c5 -- internal/agent/compress_trace_test.go`，全文 `grep -c '^@@'` ＝ **2**）
+
+| hunk | 盘上位置 | 内容（本程逐行看过去） | 方向判 |
+|---|---|---|---|
+| **H1** | `@@ -26,6 +26,12 @@` | 6 行，`sed -n '29,34p'` 现量**逐行都是 `//` 注释**（讲"票 153 AC#1 补的是前两枚钉子没覆盖的第三形"） | **中性**——无断言、无期望值；措辞是把射程写进文件头 |
+| **H2** | `@@ -391,3 +397,201 @@` | 锚点末行 393 **之后**纯追加三枚 `Test*` 函数（`:426`／`:478`／`:534`） | **单向收紧**：净增 25 枚断言（17 枚 `t.Fatalf` ＋ 7 枚 `t.Errorf` ＋ 1 枚 `t.Fatal(`，尺＝对追加区 394–597 行逐枚 `grep -c`），既有的 39 枚断言一枚没动 |
+
+**逐字节证明"既有一枚未动"**（不是"读一遍觉得没少"）：
+
+```
+$ git show 5365cb22:internal/agent/compress_trace_test.go > a      # 393 行
+$ git show 6de3d1c5:internal/agent/compress_trace_test.go > d      # 597 行
+$ { sed -n '1,28p' d; sed -n '35,399p' d; } > x                    # 剥掉 H1 插入的 6 行 ⇒ x 前 393 行应等锚点
+$ head -393 a > y ; cmp x y                                        # 无输出，rc=0（x=393 行、y=393 行）
+```
+
+顶层函数名册两版对照（尺＝`grep -n '^func '`，含方法函数）：锚点 **18** 枚、交付版 **21** 枚，**差集恰为那三枚新用例**，
+其余 18 枚（含 `assertRulerLive`／`attrInt`／`requireTraceAttrs`／四枚钉子）行号只整体位移 6、函数体逐字节相同（上面的 `cmp`）。
+
+#### 11.1b "有没有为绿而改期望值"——连同它的前一半（生产侧有没有把值挪到用例够得着的地方）
+
+1. **期望值的来源没被写过数字**。文件头那句 "Every threshold below is read back out of Budgets; none is a written number" 在交付版 `:35–:36`，属**逐字节未动**那一段；
+   而 `git diff --numstat 86b0161 6de3d1c5 -- internal/agent/budgets.go` ＝ **0 行**、`Need()` 函数体两版 `cmp` 相同——**那是前一程 §4.4 量的，它的 §9 已登记它推翻本派单的五条前提**（本程不重跑）。
+   ⇒ "把阈值挪一挪让常见路径也折叠、于是痕又响了"这条唯一的"把谎说圆"捷径，本票一步都没走。
+2. **守卫那枚还是正的那枚**。本程现量：`if rep.Ran {` 在锚点 `compress.go:170`、交付版 `compress.go:216`，**两版各 1 枚命中**（尺＝`git show <sha>:… | grep -c 'if rep.Ran {'`，整词带花括号）。
+   M5 换掉的正是这一枚；交付版没换。生产 diff 里八对 `键, 值` 全是**上下文行**（不带 +/-），只有承载形状从 `Info(msg, …)` 变成 `attrs := []any{…}` ⇒ 值侧零改动。
+3. **三枚新用例自己带了防"恒绿"的 setup 闸**（这才是"这发不是装饰"的凭据，逐枚带盘上行号）：
+
+| 用例 | 防它自己塌成一发恒真的闸 |
+|---|---|
+| `SilentWhenNothingFoldableOverThreshold`（`:426`） | `:437` raw rounds 必须恰为 1（多一枚这形就不成立）；`:440` **`Need()` 必须为真**，否则 Fatalf 明说"this case would silently collapse into TestCompressionTraceSilentWhenNothingFolded"；`:449` `rep.Ran` 必须为假；`:451` 历史逐字节没动（枚数与 token 双判）；`:456-461` 痕必须 **0 枚**（`:458` Errorf 逐枚印出、`:461` Fatalf 带全枚名册）；`:428` 先 `assertRulerLive(t)`（捕到零枚即 Fatalf） |
+| `CarriesTheOwningTaskID`（`:478`） | `:480` `assertRulerLive`；`:495` 状态必须 Completed 否则 Fatalf（"attribution needs a pass that ran"）；`:500` 痕必须**恰 1 枚**；`:507` 键 `task` 必须在场、`:509` 必须是 string、`:514` 值必须 `== res.TaskID`；`:518`／`:521` 再把 `threshold`／`tokens_before` 钉成同一次 Run 的派生值与 Result 值；`:526` 还判它像不像 `newTaskID()` 造的那枚形状（36 字符／4 枚连字符） |
+| `NeverInventsATaskID`（`:534`） | `:542` 夹具必须真折得动（否则这发什么也没测）；`:552` 未打标调用**一旦出现 `task` 键即 Fatalf**；`:559` `newTaskID()` 两次相同即 Fatalf；`:585-595` 扫**所有**记录的**所有**字符串属性，命中 `""`／`unknown`／`none`／`nil`／`n/a`／`-` 即 Errorf |
+
+4. **一枚 `t.Errorf` 都不是放水**（本票地界）：`Errorf` 与 `Fatalf` 一样判红，只是不中断；且本包 0 枚 `t.Run` 子测试（现量 `grep -c 't\.Run('` 于交付版＝**0**），
+   所以实现程那把 `^ *--- FAIL` 尺与前一程那把"只认锚定 `^--- FAIL`"的尺（`probes/153/accept-r1/ruler153.py`）在本票读数上**等价**——本程另量一发佐证：`grep -lE '^ +--- FAIL'` 于前一程 12 份日志＝**0 枚文件**。
+5. **没有 `t.Skip` 洗绿的痕迹**：`git show 6de3d1c5:internal/agent/compress_trace_test.go | grep -ci skip` ＝ **0**（尺：单文件、大小写不敏感、整子串）；
+   `git grep -n "t.Skip" 6de3d1c5 -- internal/agent` ＝ 整包 1 枚命中，在 `approval/ticket84_no_owner_test.go:224`（票 84 的有意慢闸，非本票）——**这一枚前一程 §6.1 也量过、同结论，本程复述不是复跑**。
+
+**§11.1 答**：断言方向**单向收紧**（＋25 枚、0 枚既有断言被动、0 枚期望值被改、0 枚 Skip）；"为了让它绿而改期望值"本程**造不出证据**，
+且它不是"没找"——是删除列 0 ＋ `cmp` 逐字节这两把尺把它关死的。
+
+### 11.2 问② helper 是不是原有的那枚
+
+**逐枚答"改前这枚 helper 就存在吗"**。尺＝`git grep -n "func <名字>" 5365cb22 -- internal/agent` 与 `… 6de3d1c5 -- internal/agent`（`5365cb22` ＝ `ff550f3^`），交付版行号一并给出：
+
+| 三枚新用例用到的装配件 | 改前在场？ | 定义处（交付版 file:line） |
+|---|---|---|
+| `newTraceCapture` / `all` / `with` / `flat` / `assertRulerLive` / `attrInt` / `flattenRecordMsgs` | **在**（锚点 `:54/:75/:84/:111/:97/:120/:387`） | 同文件（锚点同号；交付版位移 6 行） |
+| `newHarness` / `withConfig` / `withLogger`（harnessOpt 那枚） | **在**（锚点 `harness_test.go:92/:54/:87`） | `internal/agent/harness_test.go:92/:54`（`withLogger` 同名两枚：harnessOpt 与 CompressorOpt） |
+| `WithLogger`（CompressorOpt） / `NewCompressor` / `BudgetsFor` | **在**（锚点 `compress.go:83/:88`、`budgets.go:85`） | `compress.go:92`、`budgets.go:85`（行号位移来自本票自己加的注释） |
+| `buildRoundHistory` | **在**（锚点 `compress_test.go:23`） | `compress_test.go:23` |
+| `groupRounds` / `rawRoundIndexes` | **在**（锚点 `compress.go:291/:320`） | `compress.go:347/:376` |
+| `newTaskID` | **在**（锚点 `loop.go:1104`） | `loop.go:1107` |
+| `withTraceTask` / `traceTaskID` / `traceTaskKey` | **不在**（锚点 0 命中，尺同上） | `compress.go:152/:160/:148`——**这三枚就是本票交付物本身**，不是为读数造的尺；它们的读者只有那条 `Info` 与三枚新用例 |
+
+⇒ **新增的顶层测试侧函数＝0 枚**（11.1a 的名册差集已钉死：21−18＝3，全是 `Test*`）。
+"为读数新造第二把尺"这一族：**没造**——新用例读的痕走的是与四枚钉子**同一枚** `traceCapture`、同一条 `recs.with(traceMsg)`、同一个哨兵 `assertRulerLive`。
+
+**没有用 mock 顶掉真件**，两枚"看着像 mock"的地方本程各自核过：
+
+1. `NewCompressor(b, nil, WithLogger(recs.logger()))`（`:426` 用例与 `:534` 用例）——**这不是把依赖 mock 掉**：
+   `nil` 走的是**生产既有分支** `func (c *Compressor) summarize`：`if c.sum == nil { return structuralTrim(msgs), nil }`，
+   本程把 `86b0161` 与 `6de3d1c5` 两版这枚函数体贴出来逐行比（尺＝`git show <sha>:… | sed -n '/func (c \*Compressor) summarize/,/^}/p'`）＝**13 行完全相同**、本票没改它一个字；
+   且这种写法**改前就在同一枚文件里用了 6 次**（尺＝`git grep -c "NewCompressor(.*, nil" 5365cb22 -- internal/agent/compress_trace_test.go` ＝ 6，交付版 ＝ 8，差值恰是本票新增那两枚用例）。
+   ⇒ 复用既有夹具，不是为读数新造的旁路。
+2. `newHarness(t, "text-reply", …)`（`:478` 用例）——**这是 AGENTS.md §1.3 允许的那一枚接缝**：`harness_test.go` 现量，
+   `golden.LoadFile(…/testdata/golden/<fixture>.sse)` → `golden.NewReplayer` → `httptest.NewServer`，注释原文写着 "harness is a Loop wired to a golden-backed C5 provider"。
+   ⇒ 真 `Loop.Run` ＋ 真 HTTP ＋ 录下来的 SSE 字节；被测的打标那条腿（`loop.go:399`）跑的是**生产接线**，不是替身。
+
+**那两枚快照探针（`probe153_line_test.go`／`probe153_loopleg_test.go`）算不算"第二把尺"？** 本程量了一发边界，结论是**不算、也不污染门禁**：
+
+```
+$ go list ./... | grep -c scratch      → 0        ← .scratch 以点开头，Go 的 ./... 模式根本不进它
+$ go vet ./.scratch/wisp/probes/153/   → vet.exe: …probe153_line_test.go:15:7: undefined: BudgetsFor
+```
+
+⇒ 这两枚 `package agent` 的副本**在树里从没能编译**（它们引用包内未导出符号）；只有被复制进仓外快照的 `internal/agent/` 时才编译得过。
+所以它们既没进 `go test ./internal/agent/` 的名册（前一程 §6.1 那三枚新增名册里也没有它们：**那是前一程量的，它的 §9 已登记它推翻本派单的五条前提**），
+也不可能把 CI 的 `go vet ./...` 弄红。它们唯一的作用是**外部可见读数**（痕到 `slog.Default()` 那一发），而那一发本程**没复跑**、它属于 AC#3 句②，见 §12.3。
+
+### 11.3 两问的一行版答句
+
+- **①**：本票地界内被改的测试文件恰一枚、删除列 0、hunk 恰两枚（一枚纯注释、一枚锚点末行之后的纯追加）；
+  既有 39 枚断言逐字节未动、`Need()`／`budgets.go`／`if rep.Ran` 三处本程现量零改动 ⇒ **方向＝单向收紧，"为绿改期望值"造不出证据**。
+- **②**：三枚新用例用的 17 件装配件**全部改前就在场**（逐枚 `git grep 5365cb22` 有名有行号），测试侧新增函数 0 枚；
+  `nil` Summarizer 是生产既有分支（函数体两版逐字节同）、`newHarness("text-reply")` 是 C5 golden SSE 接缝上的真 `Loop.Run`；
+  两枚快照探针在树里编译不了（`go list ./...` 0 枚 .scratch 包）⇒ **没有第二把尺、没有 mock 顶真件**。
