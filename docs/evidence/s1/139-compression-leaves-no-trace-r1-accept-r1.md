@@ -252,3 +252,112 @@ Loop 不跨任务复用）。实现件 §3 那枚"端到端"用例之所以能�
 2. **没造"痕重复打"那一发**（把 Info 挪进 `for` 折叠循环里 ⇒ 一轮多条）：实现件 §3.4#1 自己说这条判据"排在功能断言之后"，本程未独立验它响不响。
 3. **没量 `t.Try/TestBench` 之类的名册外入口**：本程红名一律取自 `go test -count=1` 整包输出，未跑 `-count=2`（§5 那格统一跑）。
 4. **变异只施加在 `internal/agent`**：没量"改 `cmd/wisp` 侧"（如把 `Logger` 传成别的）会不会红——今天那里压根不传。
+
+---
+
+## 3. 第 3 节：它那几把"零命中"的尺，逐枚验正控是否同一把尺
+
+口径先说死：**"同一把尺"＝同一个 pattern、同一组 flag、同一次进程内跑**，只换 pathspec；
+换成正则形状不同的另一种检（如拿字面量键名去给一条 `grep -i` 背书）本程**不算同尺正控**。
+本程全部在 `git grep <sha>` 形态下跑（按 sha 取树，不读脏工作树）。
+
+### 3.1 R1「`compress.go` 日志调用 0 枚」——**同尺正控复算成立，且实现件那个 0 是真 0**
+
+```
+$ git grep -cE 'Info\(|Warn\(|Debug\(|Error\(' cce7510 -- internal/agent/compress.go
+   (无输出，rc=1)                        ← 改前（1acdd03 的父）＝票面 §0 那枚 0，复算成立
+$ git grep -cE 'Info\(|Warn\(|Debug\(|Error\(' d949d9c5 -- internal/agent/compress.go   → 1
+$ git grep -cE 'Info\(|Warn\(|Debug\(|Error\(' d949d9c5 -- internal/agent/loop.go      → 14   ← 同尺正控，逐枚对上实现件的 14
+```
+
+### 3.2 R2「`Compression` 生产侧零读者」——**三枚读数逐名对上**
+
+```
+$ git grep -cE '\.Rounds\b'       d949d9c5 -- '*.go' ':!*_test.go' | awk sum → 3     （实现件：3）
+$ git grep -cE '\.Usage\b'        d949d9c5 -- '*.go' ':!*_test.go' | awk sum → 54    （实现件：54）
+$ git grep -cE '\.Compression\b'  d949d9c5 -- '*.go' ':!*_test.go' | awk sum → 1     （唯一命中＝loop.go:401 赋值，等号左边）
+```
+顺把 §1.2 那三处"逐名"验了（不是只给计数）：
+```
+$ git grep -n 'agent\.Result' d949d9c5 -- 'cmd/wisp/**' ':!*_test.go'
+   run.go:647 func notifyBody(res agent.Result)   run.go:658 func costLine(res agent.Result)
+$ git grep -n 'loop\.Run(' d949d9c5 -- 'cmd/wisp/**' ':!*_test.go'   → run.go:576
+$ git grep -ln 'agent\.Result' d949d9c5 -- '*.go' ':!*_test.go'      → 只有 cmd/wisp/run.go（全仓）
+```
+⇒ 实现件 §1.2 点名的"三处"复算成立，且 `agent.Result` 在非测试代码里**只出现在 run.go 一个文件**。
+
+### 3.3 R3「`internal/panel`＋`internal/tools`＋`diagnostics.go` 对 compression 0 命中」——**0 站得住，但它那发正控不是同一把尺**
+
+实现件 §1.5 写"所有'0'都先打了正控（[P1][P3][P5-control]）"，而 §1.2/§2.1 给这一枚 0 配的
+是 `diagnostics.go` 的字面量键名 `"id" "ticket" "summary" …` —— **那是另一种形状检，不是 `grep -i compression` 这把尺**。
+本程补上同尺正控（同 pattern、同 `-ni` flag，只换 pathspec）：
+```
+$ git grep -cni 'compression' d949d9c5 -- internal/agent
+   budgets.go:2  compress.go:11  compress_test.go:7  compress_trace_test.go:17  loop.go:5      （合计 42，尺活着）
+$ git grep -ni  'compression' d949d9c5 -- internal/panel internal/tools internal/observe/diagnostics.go
+   (无输出，rc=1)                                                            ← 同尺同 flag 的 0，真 0
+```
+另把它承重的那支撑（"没人整枚序列化 `Result`，所以字段级零读者＝整结构级也看不见"）也验了：
+```
+$ git grep -n '%+v\|%#v' d949d9c5 -- cmd/wisp internal/panel internal/tools ':!*_test.go'   → 无输出
+$ git grep -c '%+v\|%#v' d949d9c5 -- cmd/wisp internal/panel internal/tools（含 _test.go）    → 115
+```
+⇒ 尺在场 115 次、非测试侧 0 次，**"全落 `_test.go`"这句成立**。
+**本枚档位：读数成立；实现件 §1.5 那句"所有 0 都先打了正控"过 claim（R3 那发的正控换了尺）。**
+
+### 3.4 AC#1② 的缩放链与 `12000` 名册——**读数成立，但"本票贡献 0 枚"这句在交付版是假的**
+
+```
+$ git grep -n 'refHistoryTokens\|HistoryCompressTokens = s(' d949d9c5 -- internal/agent/budgets.go
+   :36  refHistoryTokens  = 12000 // D15(4) compression trigger
+   :107 b.HistoryCompressTokens = s(refHistoryTokens)            ← 等比缩放链复算成立
+$ git grep -n '12000' d949d9c5 -- 'internal/agent/*_test.go' | wc -l → 9   （实现件：8）
+$ git grep -c '12000' d949d9c5 -- 'internal/agent/*_test.go'
+   compress_test.go:8   compress_trace_test.go:1                  ← 多出的那 1 枚就在本票新增的文件里
+$ git grep -c '12000' cce7510 -- 'internal/agent/*_test.go' → compress_test.go:8   （改前确是 8）
+```
+读那枚新增命中的上下文（`compress_trace_test.go:29-30`）：它写在文件头注释里，
+原文是 **"(AC#1(2) forbids citing the 12000 reference value as an actual trigger)"** ——
+即它正是"引用禁令"本身。⇒ **AC#1② 的实质合规成立**（本程复核四枚用例的阈值一律从
+`BudgetsFor(...)`/`c.b.HistoryCompressTokens` 读，未写死 12000；第 1 格那次真跑里量到的
+`threshold=3072` 也来自 `BudgetsFor(32768)`，不是字面量）。
+但实现件 §1.3 那句"**本票新增用例对 `12000` 的贡献为 0 枚**"在 `d949d9c5` 上不成立：
+**本票确实新增了 1 枚 `12000` 文本出现**（在新增的测试文件里）。这句在它写 AC#1 那格的时刻为真、
+在交付版为假——是自家 `1acdd03` 造成的漂移（同 §3.5 那枚 `D28-1` 计数）。
+
+### 3.5 `D28-1` 名册与 §5 登记表（AC#1③）——登记缺格复算成立；代码标记枚数两家只有一个对
+
+```
+$ git show d949d9c5:docs/specs/SPEC-12-roadmap-governance.md | grep -c 'D28-1' → 0 (rc=1)
+$ git show d949d9c5:docs/specs/SPEC-12-roadmap-governance.md | grep -n 'D28'   → 无输出（整份文件 0 枚 D28）
+$ git show d949d9c5:docs/specs/SPEC-12-roadmap-governance.md | grep -n 'D11'
+   91:| REJECTED | 意图分类四级流水线 | D11 过度设计已废 | …            ← 只有 1 行、且正是 REJECTED 那行
+```
+⇒ 派单 §4 那两句（`D28` 命中 0、`D11` 只有 1 枚且是 REJECTED）**逐字成立**，
+实现件"§5 里根本没有 D28-1 那一格"亦成立（且比它写的更宽：整份 SPEC-12 都不提 D28）。
+代码侧标记数：
+```
+$ for c in cce7510 1acdd03 e22da5a d949d9c5; do git grep -c 'DEFERRED(D28-1)' $c -- '*.go'|awk sum; done
+   2 → 3 → 3 → 3
+$ git grep -n 'DEFERRED(D28-1)' d949d9c5 -- '*.go'
+   compress.go:27  compress.go:49  loop.go:394      ← 交付版是 3 枚
+$ git grep -c 'DEFERRED(D11-3)' d949d9c5 -- '*.go' → control.go:1（1 枚，与派单一致）
+```
+⇒ **实现件 §1.4 的"两枚"在 AC#1 那格时刻为真，在交付版为假**；第 3 枚是它自己 `1acdd03` 写
+`CompressionReport` 的文档注释时加进去的。**本程派单里那句"代码里却有 `DEFERRED(D28-1)` 三枚"经复核成立。**
+（按派单 §4 明令：本票不动 `docs/specs/**`、不为这族写今天不响的检；票 150／`Q-55` 归编排者。）
+
+### 3.6 本格档位与「本程没测什么」
+
+| 那把尺 | 档位 |
+|---|---|
+| R1（日志 0）、R2（读者 1、逐名三处、`%+v` 全在测试） | **成立**，读数与本程独立复算逐枚相符 |
+| R3（panel/tools/diagnostics 0） | **读数成立；正控配对不成立**（换尺），本程已补同尺正控 |
+| AC#1②（等比缩放、不拿 12000 当触发点） | **成立**；但"本票对 12000 贡献 0 枚"这句**过期**（实为 1 枚、在禁令注释里） |
+| AC#1③（那格不存在 ⇒ 未被覆盖） | **成立**（本程另核：整份 SPEC-12 零枚 D28） |
+
+1. **没验 §5 表体"47 行"那句**（实现件用它背书"0 是扫过表得到的"）：本程改用同尺正控那条路径否证了
+   "文件没读到"这一支，就没去复量那 47；若那句话错，影响面只有它自己的措辞。
+2. **没量 `refHistoryTokens` 之外那 15 枚 `ref*` 常量是否也等比**（只核了本票点名的这一条链 :36→:107→scaleInt）。
+3. **没量 `internal/observe/**` 里除 `diagnostics.go` 之外还有谁可能读 `Compression`**：票面点名的就是 diagnostics，
+   本程按票面口径跑；全仓那枚已由 R2 的 `*.go` 名册覆盖（计数 1）。
