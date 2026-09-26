@@ -1,0 +1,29 @@
+## log level: does an Info record reach the file sink at 6de3d1c5?
+6de3d1c5:cmd/wisp/logsink.go:82:const logSinkLevel = "info"
+6de3d1c5:cmd/wisp/logsink.go:149:	p, err := observe.InitLog(observe.LogConfig{Dir: dir, Level: logSinkLevel})
+6de3d1c5:cmd/wisp/logsink.go:160:		mirror: slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo}),
+6de3d1c5:internal/observe/logging.go:79:	level := slog.LevelInfo
+6de3d1c5:internal/observe/logging.go:90:			Level: level,
+6de3d1c5:internal/observe/logging.go:459:	// LevelInfo the stock default applied.
+6de3d1c5:internal/observe/logging.go:462:		mirror: slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo}),
+
+## c.log() in compress.go
+6de3d1c5:internal/agent/compress.go:102:func (c *Compressor) log() *slog.Logger {
+
+## default level in observe
+44:	// Level is debug|info|warn|error ("" = info).
+45:	Level string
+79:	level := slog.LevelInfo
+80:	if cfg.Level != "" {
+81:		if err := level.UnmarshalText([]byte(strings.ToLower(cfg.Level))); err != nil {
+90:			Level: level,
+128:func (h *redactHandler) Enabled(ctx context.Context, l slog.Level) bool {
+133:	out := slog.NewRecord(rec.Time, rec.Level, h.red.Message(rec.Message), rec.PC)
+459:	// LevelInfo the stock default applied.
+462:		mirror: slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelInfo}),
+499:		if !next.Enabled(ctx, r.Level) {
+512:		rec := slog.NewRecord(time.Now(), slog.LevelWarn, earlyLogOverflowMsg, 0)
+518:		if next.Enabled(ctx, rec.Level) {
+569:func (t earlyTee) Enabled(ctx context.Context, level slog.Level) bool {
+575:	if t.mirror.Enabled(ctx, r.Level) {
+618:	out := slog.NewRecord(r.Time, r.Level, r.Message, r.PC)

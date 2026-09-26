@@ -1,0 +1,57 @@
+# Q1 value identity + quoted-passage liveness 14:49:47
+
+## V1. traceTaskID / withTraceTask at 6de3d1c5
+6de3d1c5:internal/agent/compress.go:50:// only when the caller handed this pass one (see withTraceTask below).
+6de3d1c5:internal/agent/compress.go:134:// withTraceTask is the smallest channel that closes that gap without moving the
+6de3d1c5:internal/agent/compress.go:150:// withTraceTask tags ctx with the task a compression pass belongs to. An empty
+6de3d1c5:internal/agent/compress.go:152:func withTraceTask(ctx context.Context, taskID string) context.Context {
+6de3d1c5:internal/agent/compress.go:159:// traceTaskID is the read side: "" when the caller tagged nothing.
+6de3d1c5:internal/agent/compress.go:160:func traceTaskID(ctx context.Context) string {
+6de3d1c5:internal/agent/compress.go:237:		if task := traceTaskID(ctx); task != "" {
+6de3d1c5:internal/agent/loop.go:396:			// withTraceTask is what lets the record the compressor books say
+6de3d1c5:internal/agent/loop.go:399:			nh, rep, err := l.comp.Compress(withTraceTask(ctx, taskID), hist)
+
+## V2. loop.go:396-404 at 6de3d1c5 (the marking site)
+392| 		hist := l.History()
+393| 		if l.comp.Need(hist) {
+394| 			// DEFERRED(D28-1): the Warm-window hook owns this call; the
+395| 			// synchronous fallback here is what the S1 slice accepts.
+396| 			// withTraceTask is what lets the record the compressor books say
+397| 			// which task paid for it (ticket 153 AC#2): run() is the only place
+398| 			// the id exists, and the compressor is shared across tasks.
+399| 			nh, rep, err := l.comp.Compress(withTraceTask(ctx, taskID), hist)
+400| 			if err != nil {
+401| 				l.log().Warn("agent: history compression failed", "err", err)
+402| 			} else if rep.Ran {
+403| 				l.replaceHistory(nh)
+404| 				res.Compression = rep
+
+## V3. acceptor's distinctive substrings, grep -c on BOTH HEAD blob and worktree of 153 accept-r1
+does not reach it                          headblob=1 worktree=1
+它算过的那笔账只写在码里、没写在件里 headblob=1 worktree=1
+证据件里该有一行                   headblob=1 worktree=1
+本格档位：成立，附两笔待补    headblob=1 worktree=1
+不是新增暴露类                      headblob=1 worktree=1
+零调用者                               headblob=2 worktree=2
+
+## V4. B.9 own text: distinctive substrings, grep -c on HEAD blob + worktree of 153 subject file
+它不是新增暴露类               headblob=1 worktree=1
+落在票 132 那格未闭合的面上 headblob=1 worktree=1
+零调用者                           headblob=3 worktree=3
+可它只到"转写不落盘"那一层 headblob=1 worktree=1
+读者会把它读成隐私已审      headblob=1 worktree=1
+
+## V5. ^### B.9 / B.10 anchored counts, HEAD blob vs worktree vs the two adding commits
+^### B\.9      headblob=1 wt=1 b319bab5=0 7f79638e=1 ec815820=1
+^### B\.10     headblob=1 wt=1 b319bab5=0 7f79638e=0 ec815820=1
+
+## V6. name-status of the two 157 commits (which paths each touched)
+7f79638e evidence(157 第 9 笔 落 153 证据件 附录 B): 件内那笔隐私账本程复算成立后补上——六词尺在本件 0 命中（同一把尺打验收件 7/3/6/2/4＝尺是活的）、86b0161 三枚既有 "task" 行、6de3d1c 非测试 7 行、keep_transcript 硬编码 false 三枚钉在场、SealDir 非测试调用者 0 枚（6 枚命中全在 winsec 自己文件里，做过"调用者 vs 定义者"分拣）；另更正工单 :21 那枚出处：隐私账是 §5.3 第 2 笔（:403-:411）不是第 3 笔
+
+.scratch/wisp/probes/157/13-items-9-10-privacy-and-keyname.sh
+.scratch/wisp/probes/157/13-items-9-10-privacy-and-keyname.txt
+docs/evidence/s1/153-trace-lies-unguarded-r1.md
+--
+ec815820 evidence(157 第 10 笔 落 153 证据件 附录 B): 日志侧 task ↔ DB 侧 task_id 那枚改名账复算成立后补上——规格两处取行原文（SPEC-02:74/:88、PLAN.md:2697）、码侧锚点名册（memory/schema.go、dao_toolcall.go、models.go:162）、三枚 0 命中各配同尺正控（本件 task_id=0 而验收件=3；spec 与"日志"同现=0 而 SPEC-02 task_id=2；本件键名三枚全在讲日志侧）；spec 那句对价说明是另一格活、本程未碰
+
+docs/evidence/s1/153-trace-lies-unguarded-r1.md

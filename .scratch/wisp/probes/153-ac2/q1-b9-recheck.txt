@@ -1,0 +1,26 @@
+# Q1 re-measure, run at 2026-09-26 14:47:29, anchor eee7bd9
+
+## A1. six-word grep -c on PRE-FIX blob b319bab5 (153 subject file, 589 lines)
+589
+隐私           0
+privacy          0
+keep_transcript  0
+私有数据     0
+Q-31             0
+SealDir          0
+
+## A1b. positive control: same ruler on 153 accept-r1 (HEAD blob)
+隐私           7
+privacy          3
+keep_transcript  6
+私有数据     2
+Q-31             2
+SealDir          4
+
+## A2. same ruler on CURRENT (HEAD) 153 subject file
+隐私           5
+privacy          5
+keep_transcript  5
+私有数据     3
+Q-31             3
+SealDir          5

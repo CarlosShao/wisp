@@ -1,0 +1,59 @@
+# Q1 log-sealing route 14:49:20
+
+## logsink.go:20-60 at 6de3d1c5
+18| // command). Every test that proved these notices "are recorded" installed its
+19| // own sink, which is the shape this repository has now booked six times as
+20| // "capability finished, nobody listening" - and the most expensive of the six,
+21| // because it downgrades every earlier ticket's "loud failure" to "loud in a
+22| // test binary".
+23| //
+24| // Two invariants this file exists to keep, both stated as grep-able claims in
+25| // the ticket:
+26| //
+27| //  1. Ordering: install before anything that can log. On the `run` leg that
+28| //     means before assembleRuntime, whose FIRST statement
+29| //     (secret.NewStore -> winsec.PrivateDirAll) is already a sealing site; on
+30| //     the resident leg it means immediately after proc.Boot, which performs no
+31| //     sealing at all (internal/proc has zero winsec imports). A sink installed
+32| //     after the first event loses exactly the record it exists to keep.
+33| //     Ticket 130 closes the one gap this rule cannot reach by itself: a record
+34| //     made from another package's init() is older than any install this file can
+35| //     be placed before, because the main package's init() runs last. Those
+36| //     records are now carried by the buffer in internal/observe/logging.go and
+37| //     replayed by installLogSink ahead of the install record below.
+38| //  2. Landing spot: <the env's data root>\logs - the same spelling `wisp slo`
+39| //     already writes, and the tree ticket 95 put under private-data discipline
+40| //     (config.toml, the DPAPI blob dir, memory.db and the backups all land
+41| //     sealed inside it). Never a world-shared temp default: a security outlet
+42| //     that anyone on the machine can read is a leak path, not a listener.
+43| //
+44| // INTERIM (ticket 117 AC#3): whether a log file counts as private data is the
+45| // one question of ticket 95's that owner has not answered, so nothing here
+46| // seals or un-seals the log file - it neither adds nor removes that decision.
+47| // What this file does guarantee is *placement*: the sink is created only under
+48| // the resolved data dir of the running env, so the question owner has to answer
+49| // is about one directory, not about a temp file. See logSinkDir and its
+50| // invariant test.
+51| //
+52| // PLATFORM, written because ticket 117 over-claimed this file once (R-117-C,
+53| // corrected by ticket 127 AC#2): being untagged only means this file
+54| // participates in every build of package main - and package main has no Linux
+55| // build, because `GOOS=linux go vet ./cmd/wisp/` is rc=1 on the sherpa-onnx
+56| // import main.go carries. So nothing in this file has ever been *compiled* for
+57| // Linux, and no GOOS=linux reading of some other package can be quoted as if it
+58| // had: cmd/wisp is outside those dependency closures. What is true is weaker
+59| // than what was written - this file deliberately imports nothing
+60| // platform-specific, which is why it will still build for Linux on the day the
+
+## 132 ticket face status (worktree)
+1
+132-log-files-are-never-sealed-sealdirdir-has-zero-production-callers.md
+unchecked boxes on 132: 5
+checked boxes on 132: 0
+
+## ledger line 6871 verbatim (HEAD blob)
+6869| ⚠ **这条规矩要沉进模板**（下次写进每份多格派单）：**证据件只能追加、不能重写**；要换行尾或排版就**新开一节**贴新版，旧版留在原地——"每格一枚 commit"是为了防丢活，**不是为了给作者重写权**。
+6870| **③ 它还报了另一处自打并被我核收的形状**：第一版归因注释里写了 `DEFERRED(D28-1)`，会把那枚计数从 3 推到 4——**在 commit 前抓到**。⇒ 这条不是小事：`DEFERRED` 与 `SPEC-12 §5` 的 1:1 是硬规矩（票 150 正为它立着）。已要求复核程**现量交付版**的 `DEFERRED(` 枚数与位置，不采信"抓到"这句。
+6871| **④ 一枚我本轮新起的问题，先登记不定档**：给日志带上 taskID ⇒ **taskID 从此落进日志文件**，而本仓已定案"日志属私有数据、要上锁"（`Q-31`→票 132 那条路至今 `SealDir` 生产零调用者）。
+6872| ⇒ 我不预设这是漏洞也不预设它没事：**已把"这一跳算不算账"列进复核程的第 5 条**，等读数回来再决定是登记、开票，还是摆给 owner。
+6873| **⑤ R22 落地自证**：本轮我**没有**因为 153 交件就补派第四枚写码程（写码仍在跑 2 枚：152 复活、145），只新增一枚只读复核（153 验收，锚 `6de3d1c`）；也没提前推送、没在半批状态跑全量。

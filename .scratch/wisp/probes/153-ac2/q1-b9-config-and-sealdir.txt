@@ -1,0 +1,93 @@
+# Q1 config/SealDir re-measure 14:48:40
+
+## A6. git grep -n 'KeepTranscript' 6de3d1c5 -- internal/config
+6de3d1c5:internal/config/schema.go:510:	// KeepTranscript is hard-coded false; true in the file = load error.
+6de3d1c5:internal/config/schema.go:511:	KeepTranscript bool `toml:"keep_transcript" default:"false"`
+6de3d1c5:internal/config/validate.go:82:	if c.Privacy.KeepTranscript {
+6de3d1c5:internal/config/validate_test.go:136:		{"privacy.keep_transcript=true", "privacy.keep_transcript", func(c *Config) { c.Privacy.KeepTranscript = true }},
+
+## A6b. schema.go:509-513 / validate.go:78-90 / validate_test.go:132-140 at 6de3d1c5
+509| 	RetentionDays int `toml:"retention_days" default:"30"`
+510| 	// KeepTranscript is hard-coded false; true in the file = load error.
+511| 	KeepTranscript bool `toml:"keep_transcript" default:"false"`
+512| 	// KeepAudio is hard-coded false; true in the file = load error.
+513| 	KeepAudio bool `toml:"keep_audio" default:"false"`
+--
+78| 
+79| // validatePrivacy enforces the hard-coded read-only keep_transcript /
+80| // keep_audio (D16: no code path may implement keep_audio=true, SPEC-03 sec 7).
+81| func validatePrivacy(c *Config) error {
+82| 	if c.Privacy.KeepTranscript {
+83| 		return observe.New(observe.ClassConfig,
+84| 			"config.toml: privacy.keep_transcript is hard-coded false (read-only); writing true is rejected")
+85| 	}
+86| 	if c.Privacy.KeepAudio {
+87| 		return observe.New(observe.ClassConfig,
+88| 			"config.toml: privacy.keep_audio is hard-coded false (read-only); writing true is rejected")
+89| 	}
+90| 	return nil
+--
+132| 		path string
+133| 		mut  func(*Config)
+134| 	}{
+135| 		{"audio.half_duplex=false", "audio.half_duplex", func(c *Config) { c.Audio.HalfDuplex = false }},
+136| 		{"privacy.keep_transcript=true", "privacy.keep_transcript", func(c *Config) { c.Privacy.KeepTranscript = true }},
+137| 		{"privacy.keep_audio=true", "privacy.keep_audio", func(c *Config) { c.Privacy.KeepAudio = true }},
+138| 		{"models.verify_signature=false", "models.verify_signature", func(c *Config) { c.Models.VerifySignature = false }},
+139| 	}
+140| 	for _, tc := range cases {
+
+## A7. git grep -n 'SealDir' 6de3d1c5 -- '*.go' ':!*_test.go'
+6de3d1c5:internal/winsec/winsec.go:174:// reaching os.Mkdir or SealDir here can have skipped C26: the only mint for that
+6de3d1c5:internal/winsec/winsec.go:190:			// and if cur is the requested path the SealDir below repairs it.
+6de3d1c5:internal/winsec/winsec.go:220:// SealDir narrows a directory to the current user, with new children inheriting
+6de3d1c5:internal/winsec/winsec.go:222:func SealDir(path string) error {
+6de3d1c5:internal/winsec/winsec_windows.go:52:// actually happens is that the next SealDir/SealFile wipes the out-of-band
+6de3d1c5:internal/winsec/winsec_windows.go:313:		// ResolvePath (winsec.go's SealFile/SealDir/PrivateDirAll resolve before
+count: 6
+
+## A7b. SealDir across ALL go files incl tests (ruler liveness control)
+count incl tests: 37
+6de3d1c5:internal/winsec/acl_windows_test.go:383:// TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs is the coverage leg
+6de3d1c5:internal/winsec/acl_windows_test.go:398:func TestAC2SealDirNarrowsChildrenThatCarryTheirOwnExplicitACEs(t *testing.T) {
+6de3d1c5:internal/winsec/acl_windows_test.go:447:	if err := winsec.SealDir(root); err != nil {
+6de3d1c5:internal/winsec/acl_windows_test.go:448:		t.Fatalf("SealDir over a tree with explicitly widened children: %v", err)
+6de3d1c5:internal/winsec/inherited_narrow_notice_104_windows_test.go:225:		if err := SealDir(sub); err != nil {
+6de3d1c5:internal/winsec/inherited_narrow_notice_104_windows_test.go:228:		if err := SealDir(root); err != nil {
+6de3d1c5:internal/winsec/inherited_narrow_notice_104_windows_test.go:266:		if err := SealDir(root); err != nil {
+6de3d1c5:internal/winsec/inherited_narrow_notice_104_windows_test.go:267:			t.Fatalf("SealDir(parent): %v", err)
+6de3d1c5:internal/winsec/narrow_notice_windows_test.go:43:	if err := SealDir(root); err != nil {
+6de3d1c5:internal/winsec/narrow_notice_windows_test.go:68:	if err := SealDir(root); err != nil {
+6de3d1c5:internal/winsec/narrow_notice_windows_test.go:69:		t.Fatalf("SealDir over an explicitly widened tree: %v", err)
+6de3d1c5:internal/winsec/narrow_notice_windows_test.go:126:		if err := SealDir(root); err != nil {
+6de3d1c5:internal/winsec/narrow_notice_windows_test.go:127:			t.Fatalf("SealDir: %v", err)
+6de3d1c5:internal/winsec/notice_attribution_115_windows_test.go:300:	if err := SealDir(a.dirShort); err != nil { // the directory, typed short
+6de3d1c5:internal/winsec/placement_leaf_118_other_test.go:8:// named the object is TestAC1POSIXSealDirThroughASymlinkRefuses. That left the
+6de3d1c5:internal/winsec/placement_symlink_113_other_test.go:258:// TestAC1POSIXSealDirThroughASymlinkRefusesIsTheSameLegOnTheDirectoryEntry:
+6de3d1c5:internal/winsec/placement_symlink_113_other_test.go:259:// SealDir is the other exported way in, and on POSIX it chmods a directory
+6de3d1c5:internal/winsec/placement_symlink_113_other_test.go:261:func TestAC1POSIXSealDirThroughASymlinkRefuses(t *testing.T) {
+6de3d1c5:internal/winsec/placement_symlink_113_other_test.go:269:	assertRefused113(t, "SealDir", link, link, winsec.SealDir(link))
+6de3d1c5:internal/winsec/placement_symlink_113_other_test.go:351:// (PrivateDirAll, PrivateFile, SealDir) so the leg cannot be bolted onto
+6de3d1c5:internal/winsec/placement_symlink_113_other_test.go:382:	if err := winsec.SealDir(deep); err != nil {
+6de3d1c5:internal/winsec/placement_symlink_113_other_test.go:383:		t.Errorf("AC#3 RED: SealDir refused its own directory: %v", err)
+6de3d1c5:internal/winsec/placement_symlink_113_other_test.go:390:	if err := winsec.SealDir(deep); err != nil {
+6de3d1c5:internal/winsec/placement_symlink_113_other_test.go:391:		t.Errorf("AC#3 RED: SealDir refused a directory that merely has a link among its children: %v", err)
+6de3d1c5:internal/winsec/private_fail_test.go:75:		if err := SealDir(dir); !errors.Is(err, ErrNotSealable) {
+6de3d1c5:internal/winsec/private_fail_test.go:76:			t.Fatalf("SealDir: %v", err)
+6de3d1c5:internal/winsec/private_set_sid_windows_test.go:328:	if err := SealDir(root); err != nil {
+6de3d1c5:internal/winsec/reparse_windows_test.go:182:	if err := SealDir(root); err != nil {
+6de3d1c5:internal/winsec/reparse_windows_test.go:183:		t.Fatalf("SealDir over a subtree containing a symlink: %v", err)
+6de3d1c5:internal/winsec/reparse_windows_test.go:348:	if err := SealDir(root); err != nil {
+6de3d1c5:internal/winsec/reparse_windows_test.go:349:		t.Fatalf("SealDir over a subtree containing a link: %v", err)
+6de3d1c5:internal/winsec/winsec.go:174:// reaching os.Mkdir or SealDir here can have skipped C26: the only mint for that
+6de3d1c5:internal/winsec/winsec.go:190:			// and if cur is the requested path the SealDir below repairs it.
+6de3d1c5:internal/winsec/winsec.go:220:// SealDir narrows a directory to the current user, with new children inheriting
+6de3d1c5:internal/winsec/winsec.go:222:func SealDir(path string) error {
+6de3d1c5:internal/winsec/winsec_windows.go:52:// actually happens is that the next SealDir/SealFile wipes the out-of-band
+6de3d1c5:internal/winsec/winsec_windows.go:313:		// ResolvePath (winsec.go's SealFile/SealDir/PrivateDirAll resolve before
+
+## A7c. callers: any SealDir outside internal/winsec?
+count outside winsec: 0
+
+## A7d. SealDir at HEAD (current) non-test, to see if it changed since
+count: 6

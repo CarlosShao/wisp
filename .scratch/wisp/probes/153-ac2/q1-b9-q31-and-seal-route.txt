@@ -1,0 +1,60 @@
+# Q1 Q-31 / sealing-route re-measure 14:49:00
+
+## A9. Q-31 in ledger (worktree == HEAD? blob check below)
+0a2f81d5582dec1caf277f8ba24711927996932d
+0a2f81d5582dec1caf277f8ba24711927996932d
+grep -c 'Q-31' ledger: 13
+22:- **[H7] ⚠ 三条待你拍板、且都已「问过未答」**（2026-09-21 21:2x 登记，正文在下面的 Q 表 Q-31/Q-32/Q-33）：① **日志算不算私有数据**（**卡票 117 AC#3**，推荐＝封，代价已实测
+990:| **Q-31**（**2026-09-21 反复提出、owner 至今未答**）**日志文件算不算私有数据 ⇒ 要不要封？** | **建议封（算私有数据）**：代价已实测——封了之后**你自己用同账户 `tail`�
+1321:  ④ `Q-31/32/33` 与 `Q-25` 挂着等 owner。
+1348:  ② 票 85a 的 `lint` 新读数要等下一次 push 之后的 run；③ `Q-31/32/33/25` 挂着等 owner。
+1391:  ② 117 交件后派 121；③ `Q-31/32/33/25` 挂着等 owner。
+1419:  ③ 票 86 只在编队安静时；④ `Q-31/32/33/25` 挂着等 owner。
+1453:  ④ `Q-31/32/33/25` 挂着等 owner。
+1476:  ⇒ 已把三条"问过未答"的拍板项登记为 **`Q-31`（日志算不算私有数据，卡票 117 AC#3）/ `Q-32`（要不要专门查那串注入文本）/
+1483:  ③ 票 86 **只在编队安静时**；④ `Q-31/32/33` 继续挂着，等 owner。
+3265:- **A97③ AC#3 没有拿 `Q-31` 当停手理由**（这是我要的形状）：四发探法（`APPDATA` 未设 run 腿/GUI 腿、`WISP_ENV=test`）**都在解析出的数据根之内 ⇒ 造不出逃逸**；
+3446:  `Q-31` 日志算不算私有数据＝**算、要锁** ⇒ 新建**票 132**；
+3452:  ⚠ `Q-31/33/34/25` 四行原文里的"未答"字样**以本条为准**，那四行我**不回改**（台账 append-only）。
+6871:**④ 一枚我本轮新起的问题，先登记不定档**：给日志带上 taskID ⇒ **taskID 从此落进日志文件**，而本仓已定案"日志属私有数据、要上锁"（`Q-31`→票 132 那条路至今 `SealDir`
+
+## A9b. Q-31 in ticket faces / issues dir
+.scratch/wisp/issues/117-security-warnings-have-no-listener-in-production-done.md
+.scratch/wisp/issues/132-log-files-are-never-sealed-sealdirdir-has-zero-production-callers.md
+
+## A10. does anything outside internal/winsec call the sealing API at 6de3d1c5?
+--- PrivateDirAll non-winsec non-test:
+6de3d1c5:.scratch/wisp/probes/151/run.head.go:174:	// winsec.PrivateDirAll, which is already a sealing site, so a sink
+6de3d1c5:.scratch/wisp/probes/151/run.mut-noclose.go:174:	// winsec.PrivateDirAll, which is already a sealing site, so a sink
+6de3d1c5:cmd/wisp/doctor.go:238:// winsec.PrivateDirAll - with a refusal that reads like an attack.
+6de3d1c5:cmd/wisp/logsink.go:29://     (secret.NewStore -> winsec.PrivateDirAll) is already a sealing site; on
+6de3d1c5:cmd/wisp/run.go:174:	// winsec.PrivateDirAll, which is already a sealing site, so a sink
+6de3d1c5:internal/agent/spill.go:111:	if err := winsec.PrivateDirAll(s.dir, 0o700); err != nil {
+count: 9
+--- PrivateFile non-winsec non-test:
+6de3d1c5:internal/agent/spill.go:125:		if wErr := winsec.PrivateFile(tmp, []byte(capped), 0o600); wErr != nil {
+6de3d1c5:internal/agent/spill.go:254:	return winsec.PrivateFileExclusive(path, data)
+6de3d1c5:internal/config/migrate.go:89:	// other local accounts. winsec.PrivateFile seals the handle before the first
+6de3d1c5:internal/config/migrate.go:91:	// rewrites an existing backup rather than skipping it, PrivateFile is also
+6de3d1c5:internal/config/migrate.go:93:	if err := winsec.PrivateFile(backup, raw, 0o600); err != nil {
+6de3d1c5:internal/memory/artifacts.go:75:	if err := winsec.PrivateFileExclusive(filepath.Join(s.artifactsDir, name), data); err != nil {
+count: 5
+--- SealFile non-winsec non-test:
+6de3d1c5:internal/config/parse.go:215:	if err := winsec.SealFile(tmpName); err != nil {
+6de3d1c5:internal/secret/migrate.go:174:	} else if serr := winsec.SealFile(backupPath); serr != nil {
+count: 2
+--- SealDir non-winsec non-test:
+count: 0
+
+## A10b. where is the log file opened?
+6de3d1c5:internal/observe/diagnostics.go:17://   - the rolling logs (already redacted at write time by the non-disableable
+6de3d1c5:internal/observe/diagnostics.go:122:			if err := writeZipEntry(zw, "logs/"+name, []byte(clean)); err != nil {
+6de3d1c5:internal/observe/diagnostics.go:127:		addManifest("logs/", fmt.Sprintf("%d file(s) copied, %d skipped (missing/oversized)", copied, skipped))
+6de3d1c5:internal/observe/diagnostics.go:129:		addManifest("logs/", "not collected: log dir not provided")
+6de3d1c5:internal/observe/errors.go:12:// enum by contract: logs, StreamEvent.Error (C6) and the task_log.error_class
+6de3d1c5:internal/observe/errors.go:161:// text itself is deferred (D23 error-copy work, S6); UI and logs embed the key
+6de3d1c5:internal/observe/logging.go:20:// rollingWriter (size + daily rolls, 7-day retention) -> <data>\logs\.
+6de3d1c5:internal/observe/logging.go:42:	// Dir is the log directory (<data>\logs\, SPEC-02 §6).
+6de3d1c5:internal/observe/logging.go:95:	p.root = NewRootFrom(context.Background(), "observe-logs")
+6de3d1c5:internal/observe/logging.go:375:// SetPathResolver, and that function logs the conformance verdict - either
+6de3d1c5:internal/observe/logging.go:449:	// catches it, because Registry.Spawn logs through the default while holding

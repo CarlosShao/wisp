@@ -1,0 +1,81 @@
+# Q1 code-anchor re-measure 14:48:14 ; entry anchor df69bcd, current HEAD eee7bd9
+
+## A0. is 86b0161 really the pre-fix loop.go state?
+86b0161:loop.go blob  = e685a6efd595acb5ca1d7f051e139985bf6b9a47
+b23c7f77^:loop.go blob = e685a6efd595acb5ca1d7f051e139985bf6b9a47
+6de3d1c5:compress.go blob = 4fcd9a32a50001e0428f5b1b11affa6b066afb41
+b23c7f77:compress.go blob = 4fcd9a32a50001e0428f5b1b11affa6b066afb41
+HEAD~2:compress.go blob = 4fcd9a32a50001e0428f5b1b11affa6b066afb41
+is 86b0161 ancestor of b23c7f77? yes
+
+## A3. git show 86b0161:internal/agent/loop.go | grep -n '"task"'
+373:		l.log().Warn("agent: task_log open failed", "err", err, "task", taskID)
+741:		l.log().Warn("agent: tool timeout", "tool", req.Name, "task", req.TaskID,
+933:		l.log().Warn("agent: task_log finish failed", "err", err, "task", res.TaskID)
+count: 3
+
+## A3b. same grep at b23c7f77^ (true pre-fix parent of the code commit)
+373:		l.log().Warn("agent: task_log open failed", "err", err, "task", taskID)
+741:		l.log().Warn("agent: tool timeout", "tool", req.Name, "task", req.TaskID,
+933:		l.log().Warn("agent: task_log finish failed", "err", err, "task", res.TaskID)
+
+## A4. git grep -n '"task"' 6de3d1c5 -- internal/agent ':!*_test.go'
+6de3d1c5:internal/agent/compress.go:49:// kept_raw_rounds, history_changed, and "task" - the owning task id, present
+6de3d1c5:internal/agent/compress.go:139:// gets a record with no "task" key at all. Absence is the designed outcome -
+6de3d1c5:internal/agent/compress.go:232:		// Ticket 153 AC#2: whose pass this was. The key is "task", the name the
+6de3d1c5:internal/agent/compress.go:238:			attrs = append(attrs, "task", task)
+6de3d1c5:internal/agent/loop.go:373:		l.log().Warn("agent: task_log open failed", "err", err, "task", taskID)
+6de3d1c5:internal/agent/loop.go:744:		l.log().Warn("agent: tool timeout", "tool", req.Name, "task", req.TaskID,
+6de3d1c5:internal/agent/loop.go:936:		l.log().Warn("agent: task_log finish failed", "err", err, "task", res.TaskID)
+count: 7
+
+## A4b. same ruler at 86b0161 (pre-fix) non-test count
+86b0161:internal/agent/loop.go:373:		l.log().Warn("agent: task_log open failed", "err", err, "task", taskID)
+86b0161:internal/agent/loop.go:741:		l.log().Warn("agent: tool timeout", "tool", req.Name, "task", req.TaskID,
+86b0161:internal/agent/loop.go:933:		l.log().Warn("agent: task_log finish failed", "err", err, "task", res.TaskID)
+count: 3
+
+## A5. compress.go 226-246 at 6de3d1c5
+226| 			"msgs_before", len(hist),
+227| 			"msgs_after", len(out),
+228| 			"compressed_msgs", rep.CompressedMsgs,
+229| 			"kept_raw_rounds", rep.KeptRawRounds,
+230| 			"history_changed", rep.TokensAfter != rep.TokensBefore || len(out) != len(hist),
+231| 		}
+232| 		// Ticket 153 AC#2: whose pass this was. The key is "task", the name the
+233| 		// loop already uses for the same value (loop.go's task_log Warns), and
+234| 		// the value is the id the Result and every Event of that run carry, so
+235| 		// one grep joins the line to the task. It is a correlation id, not
+236| 		// history content, so [privacy] keep_transcript does not reach it.
+237| 		if task := traceTaskID(ctx); task != "" {
+238| 			attrs = append(attrs, "task", task)
+239| 		}
+240| 		c.log().Info("agent: history compressed", attrs...)
+241| 	}
+242| 	return out, rep, nil
+243| }
+244| 
+245| func (c *Compressor) totalOf(rounds []round) int {
+246| 	n := 0
+## A5b. compress.go 226-246 at 86b0161 (pre-fix)
+226| // argument size and result status survives; prose bodies are shortened.
+227| func structuralTrim(msgs []llm.Message) string {
+228| 	var b strings.Builder
+229| 	for _, m := range msgs {
+230| 		for _, p := range m.Content {
+231| 			switch c := p.(type) {
+232| 			case llm.TextPart:
+233| 				if t := strings.TrimSpace(c.Text); t != "" {
+234| 					fmt.Fprintf(&b, "%s: %s\n", m.Role, firstRunes(t, 80))
+235| 				}
+236| 			case llm.ToolUsePart:
+237| 				fmt.Fprintf(&b, "tool_call %s name=%s args=%d字节\n", c.ID, c.Name, len(c.Input))
+238| 			case llm.ToolResultPart:
+239| 				status := "ok"
+240| 				if c.IsError {
+241| 					status = "error"
+242| 				}
+243| 				fmt.Fprintf(&b, "tool_result %s %s (%d token)\n", c.ID, status, ApproxTokensOf(c.Content))
+244| 			case llm.ImagePart:
+245| 				fmt.Fprintf(&b, "image mime=%s (字节引用不入历史)\n", c.MimeType)
+246| 			}

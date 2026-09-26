@@ -1,0 +1,105 @@
+# enclosing funcs + taskID assignment at 6de3d1c5 loop.go 14:50:14
+## func boundaries (lines with '^func ')
+308:func (t *RunningTask) Wait() Result {
+318:func (t *RunningTask) Pending() int { return t.root.Pending() }
+321:func (l *Loop) RunAsync(ctx context.Context, input string) *RunningTask {
+332:func (l *Loop) Run(ctx context.Context, input string) Result {
+339:func (l *Loop) run(ctx context.Context, taskID, input string) Result {
+504:func (l *Loop) runControl(taskID string, verb ControlVerb, utterance string) Result {
+524:func (l *Loop) defaultControl(verb ControlVerb, _ string) ControlOutcome {
+539:func (l *Loop) stream(ctx context.Context, taskID string, req *llm.Request) (llm.TurnResult, error) {
+555:func (l *Loop) buildRequest(ctx context.Context) (*llm.Request, error) {
+586:func (l *Loop) executeCalls(ctx context.Context, root *observe.Root, j *taskJournal,
+723:func (p *toolPlan) reject() { p.rejected = true }
+726:func (l *Loop) dispatch(ctx context.Context, j *taskJournal, rowID int64,
+773:func (l *Loop) decideRisk(ctx context.Context, j *taskJournal, rowID int64, info ToolInfo) (ok, unbooked bool, why string) {
+794:func (l *Loop) localListTools(ctx context.Context) ToolOutcome {
+819:func (l *Loop) failToolCallsFromTruncatedMessage(ctx context.Context, j *taskJournal,
+850:func (l *Loop) failOpenCalls(ctx context.Context, j *taskJournal, taskID string,
+882:func (l *Loop) brakeStuck(ctx context.Context, root *observe.Root, j *taskJournal,
+893:func (l *Loop) failWith(ctx context.Context, root *observe.Root, j *taskJournal,
+904:func (l *Loop) finish(ctx context.Context, root *observe.Root, j *taskJournal,
+956:func terminalWriteCtx(ctx context.Context) (context.Context, context.CancelFunc) {
+
+## taskID assignments
+
+## req.TaskID / res.TaskID sources
+83:	TaskID string
+322:	id := newTaskID()
+333:	return l.run(ctx, newTaskID(), input)
+369:	res := Result{TaskID: taskID, Status: StatusCompleted}
+455:			l.publish(Event{Kind: EvError, TaskID: taskID, Text: msg, Stop: turn.Stop})
+474:				Kind: EvReminder, TaskID: taskID, Text: rem.Text,
+479:					Kind: EvStuck, TaskID: taskID,
+505:	l.publish(Event{Kind: EvControl, TaskID: taskID, Verb: verb, Text: utterance})
+511:	res := Result{TaskID: taskID, Status: StatusControl}
+545:			l.publish(Event{Kind: EvTextDelta, TaskID: taskID, Text: ev.Text})
+547:			l.publish(Event{Kind: EvReasoningDelta, TaskID: taskID, Text: ev.Text})
+647:			TaskID: taskID, CorrelationID: taskID, CallID: p.call.ID,
+717:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID,
+744:		l.log().Warn("agent: tool timeout", "tool", req.Name, "task", req.TaskID,
+840:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID, ToolName: c.Name,
+875:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID, ToolName: c.Name,
+887:		Kind: EvStuck, TaskID: res.TaskID, Text: msg,
+898:	l.publish(Event{Kind: EvError, TaskID: res.TaskID, Text: err.Error(), Err: err})
+936:		l.log().Warn("agent: task_log finish failed", "err", err, "task", res.TaskID)
+939:		Kind: EvDone, TaskID: res.TaskID, Text: summary,
+1105:// newTaskID returns a UUIDv4-shaped task id (the task_log.id column is
+1107:func newTaskID() string {
+## dispatch signature + timeout log (726-750) at 6de3d1c5
+726| func (l *Loop) dispatch(ctx context.Context, j *taskJournal, rowID int64,
+727| 	req ToolRequest, timeout time.Duration,
+728| ) (ToolOutcome, error) {
+729| 	if timeout <= 0 {
+730| 		return l.opt.Tools.Execute(ctx, req)
+731| 	}
+732| 	tctx, cancel := context.WithTimeout(ctx, timeout)
+733| 	defer cancel()
+734| 	out, err := l.opt.Tools.Execute(tctx, req)
+735| 	if errors.Is(tctx.Err(), context.DeadlineExceeded) {
+736| 		// Structured TOOL_TIMEOUT (C22): the row says timeout, the model is
+737| 		// told the call was aborted so it can shorten its request. The tool's
+738| 		// own error is dropped ON PURPOSE - a contract-honest host reports a
+739| 		// timed-out call as an error (tools.go:82-85), and returning it here
+740| 		// made executeCalls prefer it, so the model saw a bare "context
+741| 		// deadline exceeded" and the row was booked error_class="internal"
+742| 		// (a class the model cannot self-correct, D37) instead of "tool".
+743| 		// The outcome below expresses the failure completely.
+744| 		l.log().Warn("agent: tool timeout", "tool", req.Name, "task", req.TaskID,
+745| 			"timeout_ms", timeout.Milliseconds())
+746| 		return ToolOutcome{
+747| 			Text: fmt.Sprintf("工具 %s 超时（%dms），已协作式中止",
+748| 				req.Name, timeout.Milliseconds()), IsError: true,
+749| 			ErrorClass: string(observe.ClassTool),
+750| 		}, nil
+
+## finish signature (904-940)
+904| func (l *Loop) finish(ctx context.Context, root *observe.Root, j *taskJournal,
+905| 	guard *Guard, cost Cost, res *Result, status Status, msg string,
+906| ) Result {
+907| 	res.Status = status
+908| 	if msg != "" && res.Message == "" {
+909| 		res.Message = msg
+910| 	}
+911| 	res.Rounds = guard.Rounds()
+912| 	res.Usage = cost.Usage
+930| 	// wall-clock difference (D42#9).
+931| 	wctx, cancelWrite := terminalWriteCtx(ctx)
+932| 	defer cancelWrite()
+933| 	if err := j.finishTask(wctx, taskLogState(status), firstRunes(summary, 400),
+934| 		int64(cost.Usage.InputTokens), int64(cost.Usage.OutputTokens),
+935| 		cost.Micros, errClass); err != nil {
+936| 		l.log().Warn("agent: task_log finish failed", "err", err, "task", res.TaskID)
+937| 	}
+938| 	l.publish(Event{
+
+## where finish/dispatch are called from run()
+378:			return l.finish(ctx, root, j, guard, cost, &res, StatusCancelled, "任务已取消")
+425:			return l.finish(ctx, root, j, guard, cost, &res, StatusCancelled, "任务已取消")
+456:			return l.finish(ctx, root, j, guard, cost, &res, StatusTruncated, msg)
+466:			return l.finish(ctx, root, j, guard, cost, &res, StatusCompleted, "")
+491:		l.executeCalls(ctx, root, j, taskID, guard, turn, &res)
+497:			return l.finish(ctx, root, j, guard, cost, &res, StatusCancelled, "任务已取消")
+653:			results[i], execErr[i] = l.dispatch(c, j, p.rowID, req, timeout)
+890:	return l.finish(ctx, root, j, guard, cost, res, StatusStuck, msg)
+899:	return l.finish(ctx, root, j, guard, cost, res, StatusFailed, res.Message)
