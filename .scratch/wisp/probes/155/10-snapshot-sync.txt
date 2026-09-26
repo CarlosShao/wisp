@@ -1,0 +1,4 @@
+ls-tree blobs: 1452
+written: 1452   mismatched: 0
+SNAPSHOT 6de3d1c5 -> D:/tmp/wisp155/snap : EXACT
+rc=0

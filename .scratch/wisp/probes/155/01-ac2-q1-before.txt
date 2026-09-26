@@ -1,0 +1,92 @@
+# 票 155 AC#1 ① — 改之前 `Compress` 拿不拿得到 taskID（签名／接收者／ctx 三条通道）
+# 尺全部打在 git 对象上（不读脏工作树）。锚点反查见 00-anchor-reverse-check.txt：
+#   ff550f3^ = 5365cb22（同一枚 commit），其 internal/agent/compress.go blob = 75758f64aa43
+#   = 生产改动那枚 b23c7f7 的父（b23c7f7^，同 blob）= 验收件 §12.3 那枚 86b0161（同 blob）
+=== 本发时刻 ===
+2026-09-26 11:52 +0800
+
+### 1. 派单点名的那一发（原文照跑）
+$ git show ff550f3^:internal/agent/compress.go | grep -n 'func (c \*Compressor)\|^type Compressor struct'
+70:type Compressor struct {
+98:func (c *Compressor) log() *slog.Logger {
+106:func (c *Compressor) TotalTokens(hist []llm.Message) int {
+115:func (c *Compressor) Need(hist []llm.Message) bool {
+128:func (c *Compressor) Compress(ctx context.Context, hist []llm.Message) ([]llm.Message, CompressionReport, error) {
+189:func (c *Compressor) totalOf(rounds []round) int {
+197:func (c *Compressor) summarize(ctx context.Context, msgs []llm.Message) (string, error) {
+
+### 2. 接收者结构体原文（改前）
+$ git show ff550f3^:internal/agent/compress.go | sed -n '/^type Compressor struct/,/^}/p'
+type Compressor struct {
+	b   Budgets
+	sum Summarizer
+	lg  *slog.Logger
+}
+
+### 3. Compress 参数表原文（改前，仅函数头两行）
+128:func (c *Compressor) Compress(ctx context.Context, hist []llm.Message) ([]llm.Message, CompressionReport, error) {
+129-	rep := CompressionReport{TokensBefore: c.TotalTokens(hist)}
+130-	rounds := groupRounds(hist)
+
+### 4. 构造器签名：改前有没有任何一枚带 id 的变参/opt
+$ git show ff550f3^:internal/agent/compress.go | grep -n 'func NewCompressor\|func WithLogger\|type compressOpt\|Opts struct'
+83:func WithLogger(lg *slog.Logger) CompressorOpt {
+88:func NewCompressor(b Budgets, sum Summarizer, opts ...CompressorOpt) *Compressor {
+
+### 5. 改前那版全文里有没有任何"读 ctx 取值"的形状（三条通道之第三条）
+$ git show ff550f3^:internal/agent/compress.go | grep -n 'ctx'
+39:	SummarizeHistory(ctx context.Context, msgs []llm.Message) (string, error)
+128:func (c *Compressor) Compress(ctx context.Context, hist []llm.Message) ([]llm.Message, CompressionReport, error) {
+152:		summary, err := c.summarize(ctx, victims)
+197:func (c *Compressor) summarize(ctx context.Context, msgs []llm.Message) (string, error) {
+201:	s, err := c.sum.SummarizeHistory(ctx, msgs)
+
+### 6. 正控（同一把尺打在改后版 b23c7f7 上，证明这把尺能命中）
+$ git show b23c7f7:internal/agent/compress.go | grep -n 'withTraceTask\|traceTaskID\|traceTaskKey\|ctx.Value'
+50:// only when the caller handed this pass one (see withTraceTask below).
+134:// withTraceTask is the smallest channel that closes that gap without moving the
+147:// traceTaskKey is the unexported context key the owning task id rides on.
+148:type traceTaskKey struct{}
+150:// withTraceTask tags ctx with the task a compression pass belongs to. An empty
+152:func withTraceTask(ctx context.Context, taskID string) context.Context {
+156:	return context.WithValue(ctx, traceTaskKey{}, taskID)
+159:// traceTaskID is the read side: "" when the caller tagged nothing.
+160:func traceTaskID(ctx context.Context) string {
+161:	s, _ := ctx.Value(traceTaskKey{}).(string)
+237:		if task := traceTaskID(ctx); task != "" {
+
+### 7. 改前全仓 ctx 上有没有可读的任务通道
+$ git grep -n 'withTraceTask\|traceTaskID\|traceTaskKey' 5365cb22 -- .
+rc=1（1＝零命中；上面第 6 节同一把尺在 b23c7f7 命中，故这把尺不是死尺）
+
+$ git grep -n 'ctx.Value' 5365cb22 -- internal/agent
+rc=1
+
+$ git grep -n 'context.WithValue' 5365cb22 -- '*.go' ':!*_test.go'
+5365cb22:internal/tools/cancel.go:45:	return context.WithValue(ctx, cancelKey{}, h)
+rc=0（重跑 3/3 稳定；本程第一次单发跑这一行时输出被吞过一枚命中、判为仪器抖动，已在证据件登记）
+
+### 8. observe 那侧：id 进没进 ctx（改前）
+$ git show 5365cb22:internal/observe/goroutine.go | sed -n '/func NewRootFrom/,/^}/p'
+func NewRootFrom(parent context.Context, id string) *Root {
+	ctx, cancel := context.WithCancel(parent)
+	return &Root{ID: id, Ctx: ctx, Cancel: cancel}
+}
+
+### 9. 改前的 trace 那一行本身长什么样（有没有 task 位）
+	if rep.Ran {
+		// The one trace a successful pass leaves (AC#2): counts only, never the
+		// folded text. "history_changed" is recomputed from what this call
+		// actually returned instead of echoing rep.Ran, so it can contradict
+		// the fold flag and a reader is never told the history moved when the
+		// bytes coming back are the same size.
+		c.log().Info("agent: history compressed",
+			"tokens_before", rep.TokensBefore,
+			"tokens_after", rep.TokensAfter,
+			"threshold", c.b.HistoryCompressTokens,
+			"msgs_before", len(hist),
+			"msgs_after", len(out),
+			"compressed_msgs", rep.CompressedMsgs,
+			"kept_raw_rounds", rep.KeptRawRounds,
+			"history_changed", rep.TokensAfter != rep.TokensBefore || len(out) != len(hist))
+	}

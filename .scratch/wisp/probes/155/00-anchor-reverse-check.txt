@@ -1,0 +1,59 @@
+# 票 155 · 三枚锚点与仪器名的反查（本程第一发，先反查再用）
+# 现量时刻见文末 date；命令一律在仓库根 D:/work/workspace/projects plans/Wisp 跑，分支 dev
+$ date
+2026-09-26 11:42 +0800
+
+$ git rev-parse --abbrev-ref HEAD
+dev
+
+== A. 派单/票面点名的三枚锚点是否存在（cat-file -t）==
+ff550f3      type=commit  ff550f38 09-26 09:24 test(153 AC#1): 补上"过阈值但一轮都折不动"那一枚判据——M5 那形在未修码上今天就能被它打红
+5365cb22     type=commit  5365cb22 09-26 09:10 docs(派单存档): 票 152／153／151 三枚写码程派出，正文按 09-26 新规矩落盘
+86b0161      type=commit  86b01613 09-26 08:59 feat(frontend 10 首启引导): FirstrunScreen props 化 + showcase 第十节
+b23c7f7      type=commit  b23c7f77 09-26 09:30 feat(153 AC#2): 那条痕带上它所属的 taskID——三问逐问答完再动手，答案不是"要动契约面"
+6de3d1c5     type=commit  6de3d1c5 09-26 09:57 evidence(153 AC#5 第 5 格＋收口，并更正 9a8766e 的排版事故): 门禁两形四数与名册差集、d22scan 真扫描块、没测什么七条、伪授权两栏 本程交件形状收口（票面四框不自勾、-done 未加、零 push）
+ff550f3^     type=commit  5365cb22 09-26 09:10 docs(派单存档): 票 152／153／151 三枚写码程派出，正文按 09-26 新规矩落盘
+
+== B. ff550f3^ 到底是哪一枚 ==
+5365cb2284508bd9aa83fc3fa451d380232f7149
+
+== C. 生产改动那枚 commit（compress.go 的改动史）==
+b23c7f7 feat(153 AC#2): 那条痕带上它所属的 taskID——三问逐问答完再动手，答案不是"要动契约面"
+1acdd03 fix(139 AC#2+AC#3): 压缩成功那一跳留一条只记计数的痕
+d25f139 chore(agent): drop the unused prefixSummary computation (ticket 10 MINOR-7)
+ae23da6 feat(agent): ReAct loop core on the C5 seam + AC1 golden-driven loop tests (ticket 10)
+
+== D. 锚点等价性：compress.go / loop.go 的 blob 号逐枚对照 ==
+file                         anchor       blob(short12)
+internal/agent/compress.go   86b0161      75758f64aa43
+internal/agent/compress.go   5365cb22     75758f64aa43
+internal/agent/compress.go   ff550f3^     75758f64aa43
+internal/agent/compress.go   b23c7f7^     75758f64aa43
+internal/agent/compress.go   b23c7f7      4fcd9a32a500
+internal/agent/compress.go   6de3d1c5     4fcd9a32a500
+internal/agent/loop.go       86b0161      e685a6efd595
+internal/agent/loop.go       5365cb22     e685a6efd595
+internal/agent/loop.go       ff550f3^     e685a6efd595
+internal/agent/loop.go       b23c7f7^     e685a6efd595
+internal/agent/loop.go       b23c7f7      3ea1fb8df38a
+internal/agent/loop.go       6de3d1c5     3ea1fb8df38a
+
+== E. ff550f3 是 b23c7f7 的祖先吗 ==
+YES（ff550f3 在改前，故 ff550f3^ 也是改前）
+
+== F. 6de3d1c5 是 HEAD 的祖先吗（ext 复算那发要用的版本）==
+YES
+
+== G. 仪器名反查：派单点名的两枚 ==
+-rwxr-xr-x 1 swq 197609 5981 Sep 26 10:25 .scratch/wisp/probes/153/accept-r1/mut153.py
+-rw-r--r-- 1 swq 197609 4215 Sep 26 09:38 .scratch/wisp/probes/153/mut153.py
+-rw-r--r-- 1 swq 197609 2167 Sep 26 10:41 .scratch/wisp/probes/153/accept-r1/zzaccept153_ondisk_test.go
+-- 两枚 mut153.py 的 drop-attr / unloop 支是否在场 --
+9:  drop-attr       remove the `task` append block from the trace
+12:  unloop          loop.go stops tagging the ctx (withTraceTask(ctx, taskID) -> ctx)
+92:    if op == "drop-attr":
+106:    if op == "unloop":
+(accept-r1/mut153.py 用 A4/A6 那两枚动作名，逐枚：)
+86:    'A0-baseline-delivered': lambda: None,
+95:    'A4-dropN2-looptag': lambda: sub_once(SNAP + '/internal/agent/loop.go',
+103:    'A6-dropN3-attrwrite': lambda: sub_once(
