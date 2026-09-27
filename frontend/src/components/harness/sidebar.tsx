@@ -39,7 +39,7 @@
    Colours: token utilities only, zero literals; no emoji.
    ============================================================================ */
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, CircleAlert, Folder, Moon, Plus, Search, Settings, Sun, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { ValuePill } from "@/components/ai-native/value-pill";
@@ -113,25 +113,51 @@ export function HarnessSidebar({
   // changed no row on screen. Both lists are derived here - pure projection,
   // no state - and a group with no surviving row drops out entirely so the
   // headings cannot stack up over an empty column.
+  //
+  // useMemo is load-bearing, not an optimisation. The glide effect below lists
+  // these in its dependency array, and a projection built inline gets a fresh
+  // identity on every render: effect -> setBox(new object) -> render -> fresh
+  // array -> effect ... That loop only bites once a row is actually hoverable
+  // (with hovered null the effect returns early), which is exactly why a
+  // screenshot pass never sees it and the first mouse move does. Memoising
+  // keeps the identity pinned to the inputs, which is what the old prop-based
+  // dependency had for free.
   const q = searchValue.trim().toLowerCase();
-  const hit = (title: string) => !q || title.toLowerCase().includes(q);
-  const shownGroups = groups
-    .map((group) => ({ ...group, rows: group.rows.filter((row) => hit(row.title)) }))
-    .filter((group) => group.rows.length > 0);
-  const shownChildren = project.children.filter((child) => hit(child.title));
+  const shownGroups = useMemo(
+    () =>
+      groups
+        .map((group) => ({
+          ...group,
+          rows: group.rows.filter((row) => !q || row.title.toLowerCase().includes(q)),
+        }))
+        .filter((group) => group.rows.length > 0),
+    [groups, q],
+  );
+  const shownChildren = useMemo(
+    () => project.children.filter((child) => !q || child.title.toLowerCase().includes(q)),
+    [project.children, q],
+  );
 
   // 滑翔高亮：一枚 bg-hover 方块量测着落到 hovered ?? active 行（上游逐字，
   // 键域扩到三段全部行种）。行被折叠隐藏时量测落空，方块淡出。
+  //
+  // The equality guard is the second half of that lesson: a fresh {top,height}
+  // object is never equal to the old one, so an unguarded setBox re-renders
+  // even when the numbers did not move. Comparing here means the effect can be
+  // re-run by anything at all without being able to spin.
   useLayoutEffect(() => {
     const container = navRef.current;
     const target = itemRefs.current[hovered ?? activeSessionId ?? ""];
     if (!container || !target) {
-      setBox(null);
+      setBox((current) => (current === null ? current : null));
       return;
     }
     const containerRect = container.getBoundingClientRect();
     const targetRect = target.getBoundingClientRect();
-    setBox({ top: targetRect.top - containerRect.top, height: targetRect.height });
+    const next = { top: targetRect.top - containerRect.top, height: targetRect.height };
+    setBox((current) =>
+      current !== null && current.top === next.top && current.height === next.height ? current : next,
+    );
   }, [hovered, activeSessionId, shownGroups, collapsed, projectOpen, automations, shownChildren, project]);
 
   function toggleGroup(title: string) {
