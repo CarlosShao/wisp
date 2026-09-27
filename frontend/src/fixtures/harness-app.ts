@@ -83,7 +83,23 @@ export interface HarnessAssistantMessage {
   backgroundTools?: number[];
   /** 子智能体内联行（渐变头像 + 名 + 时长）。 */
   subagents?: HarnessSubagentRow[];
+  /**
+   * The agent asking for a tool it does not have. This is the only reason a
+   * context tab appears on its own - the rail stays shut until somebody opens
+   * it, and "somebody" can be the agent. Absent = the message needs no tool.
+   */
+  openTab?: HarnessOpenTab;
   costLine?: string;
+}
+
+/** One "let me open the browser for that" ask, drawn as a row the user clicks.
+    The key is the rail's own vocabulary, not a free string. */
+export interface HarnessOpenTab {
+  tab: "review" | "files" | "terminal" | "browser";
+  /** Why it wants it, one line, in the agent's voice. */
+  reason: string;
+  /** The button's own label; defaults to the tab's name. */
+  label?: string;
 }
 
 export type HarnessMessage = HarnessUserMessage | HarnessAssistantMessage;
@@ -287,6 +303,8 @@ export interface HarnessMainProps {
   onPickTask?: (task: HarnessRecentTask) => void;
   /** view="empty"：空态的「新建任务」按钮；缺省不渲染按钮。 */
   onNewTask?: () => void;
+  /** 助手消息里那行「我需要打开浏览器」被点了：把右栏顶出来并切到该标签。 */
+  onOpenTab?: (tab: "review" | "files" | "terminal" | "browser") => void;
   /** 追加到根 main 的类。 */
   className?: string;
 }
@@ -403,6 +421,11 @@ const SESSION_MINUTES: HarnessSession = {
       ],
       text: "会议纪要已经按议题拆成三段，待办抽出来了，一共 3 项，下面逐条列给你。",
       streaming: true,
+      openTab: {
+        tab: "browser",
+        reason: "待办台账已经写好了，要我打开浏览器看一眼渲染结果吗？",
+        label: "打开浏览器",
+      },
     },
   ],
 };

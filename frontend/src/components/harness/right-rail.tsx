@@ -21,29 +21,87 @@
              pretending to browse.
    ============================================================================ */
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Compass,
+  FileText,
+  Folder,
+  GitPullRequest,
   Plus,
   RotateCw,
+  SquareTerminal,
   X,
+  type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
-type RailTabKey = "review" | "terminal" | "browser";
+export type RailTabKey = "review" | "files" | "terminal" | "browser";
+
+/** An agent-side request to put a tab up. The nonce is what makes asking twice
+    for the same tab work; the mounter also flips the rail open, because a tab
+    nobody can see is not opened. */
+export interface RailOpenRequest {
+  tab: RailTabKey;
+  nonce: number;
+}
 
 interface RailTabDef {
   key: RailTabKey;
   label: string;
   closedAgo: string;
+  /** The launcher's one-line "what happens if I click this". The homepage is a
+      menu, not a label list - a card that says only 浏览器 tells you nothing
+      about what you are about to get. */
+  blurb: string;
+  /** The shortcut chip on the launcher card, or "" when there is none. */
+  keys?: string;
 }
 
 const TAB_DEFS: readonly RailTabDef[] = [
-  { key: "review", label: "审查", closedAgo: "刚刚" },
-  { key: "terminal", label: "终端", closedAgo: "3 小时" },
-  { key: "browser", label: "浏览器", closedAgo: "5 小时" },
+  { key: "review", label: "审查", closedAgo: "刚刚", blurb: "看这一轮改了哪些文件、每一处改动是什么" },
+  { key: "files", label: "工作区文件", closedAgo: "1 小时", blurb: "浏览会话工作区的文件", keys: "Ctrl P" },
+  { key: "terminal", label: "终端", closedAgo: "3 小时", blurb: "在会话工作区里跑命令", keys: "Ctrl `" },
+  { key: "browser", label: "浏览器", closedAgo: "5 小时", blurb: "浏览网页、看生成物预览", keys: "Ctrl T" },
+];
+
+const WORKSPACE_ROOT = "D:\\work\\workspace\\projects plans\\Wisp";
+
+/** The workspace tree, as the C26-authorised scope the agent may touch. Rows
+    that carry a lock are held by a running tool, which is why the note at the
+    bottom exists at all: without it a locked row reads as a permission error. */
+interface TreeRow {
+  name: string;
+  kind: "dir" | "file";
+  depth: number;
+  /** Held by a tool right now (C20 path lock). */
+  locked?: string;
+  /** Touched this session - same rule as the review pane's tile colour. */
+  changed?: boolean;
+}
+
+const TREE: readonly TreeRow[] = [
+  { name: "frontend", kind: "dir", depth: 0 },
+  { name: "src", kind: "dir", depth: 1 },
+  { name: "components", kind: "dir", depth: 2 },
+  { name: "harness", kind: "dir", depth: 3, changed: true },
+  { name: "right-rail.tsx", kind: "file", depth: 4, changed: true },
+  { name: "sidebar.tsx", kind: "file", depth: 4, changed: true },
+  { name: "palette-screen.tsx", kind: "file", depth: 4, changed: true },
+  { name: "ai-native", kind: "dir", depth: 3 },
+  { name: "prompt-bar.tsx", kind: "file", depth: 4, locked: "fs.write" },
+  { name: "styles", kind: "dir", depth: 2, changed: true },
+  { name: "theme.css", kind: "file", depth: 3, changed: true },
+  { name: "internal", kind: "dir", depth: 0 },
+  { name: "tools", kind: "dir", depth: 1 },
+  { name: "fs.go", kind: "file", depth: 2 },
+  { name: "fs_edit.go", kind: "file", depth: 2 },
+  { name: "docs", kind: "dir", depth: 0 },
+  { name: "specs", kind: "dir", depth: 1 },
+  { name: "tasks", kind: "dir", depth: 0 },
+  { name: "待办台账.json", kind: "file", depth: 1 },
 ];
 
 /** 审查文件行：类型色 tile（token 底色）+ 名 + 目录 + diff 统计 + 可展开。 */
@@ -120,13 +178,39 @@ const TERMINAL_LINES: readonly { kind: "cmd" | "out" | "ok"; text: string }[] = 
 
 const BROWSER_URL = "wisp.local/preview/生成页面";
 
-export function RightRail() {
+/**
+ * The rail opens EMPTY on purpose.
+ *
+ * It used to start with 审查 / 终端 / 浏览器 already open, which is the shape
+ * nobody else ships: a panel that is busy before you asked it to be tells you
+ * nothing about whether you opened it. The mainstream harnesses land on a
+ * LAUNCHER instead - a small home page of things you can open - and the tab
+ * strip only appears once something is actually open. So the default open set
+ * is empty, and the launcher below is what you see first. Opening the rail is
+ * also a separate decision again: app-harness keeps it collapsed until you
+ * click the toggle, or until the agent asks for a tab (openRequest).
+ */
+export function RightRail({ openRequest }: { openRequest?: RailOpenRequest }) {
   // ZCode 的标签容器模型：打开集合 + 激活 + 最近关闭栈 + 下拉。
-  const [openTabs, setOpenTabs] = useState<RailTabKey[]>(["review", "terminal", "browser"]);
-  const [activeTab, setActiveTab] = useState<RailTabKey | null>("review");
+  const [openTabs, setOpenTabs] = useState<RailTabKey[]>([]);
+  const [activeTab, setActiveTab] = useState<RailTabKey | null>(null);
   const [closedTabs, setClosedTabs] = useState<RailTabKey[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuQuery, setMenuQuery] = useState("");
+
+  // The agent asked for a tab. The nonce is what makes a repeated request for
+  // the SAME tab fire again after it was closed, which is the case that
+  // matters: "open the browser" twice should open it twice.
+  const handled = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    if (!openRequest || openRequest.nonce === handled.current) return;
+    handled.current = openRequest.nonce;
+    setOpenTabs((current) =>
+      current.includes(openRequest.tab) ? current : [...current, openRequest.tab],
+    );
+    setClosedTabs((current) => current.filter((k) => k !== openRequest.tab));
+    setActiveTab(openRequest.tab);
+  }, [openRequest]);
 
   function closeTab(key: RailTabKey) {
     setOpenTabs((current) => {
@@ -273,7 +357,7 @@ export function RightRail() {
         )}
       </div>
 
-      {/* ── 全关后的空状态（Qoder 大卡片组） ───────────────────────────── */}
+      {/* ── 启动页：一个都没有打开时的默认落点（不是标签栏） ──────────── */}
       {openTabs.length === 0 ? (
         <div
           className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-4 py-6"
@@ -287,14 +371,23 @@ export function RightRail() {
           <div className="flex w-full flex-col gap-2.5">
             {TAB_DEFS.map((def) => (
               <button
-                className="flex w-full items-center gap-3 rounded-card border border-line bg-surface p-4 text-left shadow-card transition-colors duration-150 hover:border-accent/40"
+                className="group flex w-full items-center gap-3 rounded-card border border-line bg-surface p-4 text-left shadow-card transition-colors duration-150 hover:border-accent/40"
                 key={def.key}
                 onClick={() => reopenTab(def.key)}
                 type="button"
               >
-                <span className="min-w-0 flex-1 truncate text-[12.5px] font-medium text-ink">
-                  {def.label}
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-control bg-field text-ink-2">
+                  <IconFor def={def} />
                 </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[12.5px] font-medium text-ink">
+                    {def.label}
+                  </span>
+                  <span className="mt-0.5 block truncate text-[11px] text-ink-3">{def.blurb}</span>
+                </span>
+                {def.keys ? (
+                  <kbd className="kbd shrink-0">{def.keys}</kbd>
+                ) : null}
               </button>
             ))}
           </div>
@@ -304,6 +397,9 @@ export function RightRail() {
           {/* ── 审查：作用域下拉 + 文件 diff 列表（ZCode 审查页形态） ────── */}
           {active === "review" && <ReviewPane />}
 
+          {/* ── 工作区文件：C26 授权范围内的树 + 路径锁说明 ─────────────── */}
+          {active === "files" && <FilesPane />}
+
           {/* ── 终端：tooltip 暗面 + 等宽回滚 + 块光标（只读演示） ───────── */}
           {active === "terminal" && <TerminalPane />}
 
@@ -312,6 +408,120 @@ export function RightRail() {
         </>
       )}
     </aside>
+  );
+}
+
+/** 启动页卡片上的图标，和标签页用的是同一套映射，避免两处各画一套。 */
+const RAIL_ICONS: Record<RailTabKey, LucideIcon> = {
+  review: GitPullRequest,
+  files: Folder,
+  terminal: SquareTerminal,
+  browser: Compass,
+};
+
+function IconFor({ def }: { def: RailTabDef }) {
+  const Icon = RAIL_ICONS[def.key];
+  return <Icon aria-hidden="true" size={15} strokeWidth={1.8} />;
+}
+
+/* ── 工作区文件面板 ──────────────────────────────────────────────────────── */
+
+function FilesPane() {
+  const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(new Set());
+  const [open, setOpen] = useState<string | null>(null);
+
+  // A directory hides its subtree when collapsed; a file is a leaf and only
+  // carries the "this is the row you are on" state.
+  const visible = TREE.filter((row, i) => {
+    if (row.kind !== "dir") return true;
+    for (let j = i - 1; j >= 0; j--) {
+      if (TREE[j].kind === "dir" && TREE[j].depth < row.depth) {
+        return !collapsed.has(TREE[j].name);
+      }
+    }
+    return true;
+  });
+
+  return (
+    <section aria-label="工作区文件" className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <div className="flex shrink-0 items-center gap-2 border-b border-line px-3 py-2">
+        <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-ink-2" title={WORKSPACE_ROOT}>
+          {WORKSPACE_ROOT}
+        </span>
+        <button
+          className="flex shrink-0 items-center gap-1 rounded-control px-1.5 py-1 text-[11.5px] text-ink-2 transition-colors duration-150 hover:bg-hover hover:text-ink"
+          title="刷新"
+          type="button"
+        >
+          <RotateCw aria-hidden="true" size={12} strokeWidth={2} />
+          刷新
+        </button>
+      </div>
+
+      <div className="min-h-0 flex-1 overflow-y-auto py-1">
+        {visible.map((row) => {
+          const isDir = row.kind === "dir";
+          const shut = isDir && collapsed.has(row.name);
+          return (
+            <button
+              aria-expanded={isDir ? !shut : undefined}
+              className={cn(
+                "flex w-full items-center gap-1.5 rounded-chip py-1 pr-2 text-left transition-colors duration-100 hover:bg-hover",
+                open === row.name ? "bg-hover" : "",
+              )}
+              key={`${row.depth}:${row.name}`}
+              onClick={() => {
+                setOpen(row.name);
+                if (isDir) {
+                  setCollapsed((current) => {
+                    const next = new Set(current);
+                    if (next.has(row.name)) next.delete(row.name);
+                    else next.add(row.name);
+                    return next;
+                  });
+                }
+              }}
+              style={{ paddingLeft: 8 + row.depth * 12 }}
+              type="button"
+            >
+              {isDir ? (
+                <ChevronRight
+                  aria-hidden="true"
+                  className={cn("shrink-0 text-ink-3 transition-transform duration-150", !shut && "rotate-90")}
+                  size={11}
+                  strokeWidth={2.2}
+                />
+              ) : (
+                <span aria-hidden="true" className="w-[11px] shrink-0" />
+              )}
+              {isDir ? (
+                <Folder aria-hidden="true" className="shrink-0 text-ink-3" size={12} strokeWidth={1.8} />
+              ) : (
+                <FileText aria-hidden="true" className="shrink-0 text-ink-3" size={12} strokeWidth={1.8} />
+              )}
+              <span
+                className={cn(
+                  "min-w-0 flex-1 truncate text-[12px]",
+                  row.changed ? "font-medium text-ink" : isDir ? "text-ink-2" : "text-ink-2",
+                )}
+              >
+                {row.name}
+              </span>
+              {row.locked ? (
+                <span className="shrink-0 text-[10px] text-warn">{row.locked} 正在写</span>
+              ) : row.changed ? (
+                <span aria-label="本轮已改动" className="size-1.5 shrink-0 rounded-full bg-green" />
+              ) : null}
+            </button>
+          );
+        })}
+      </div>
+
+      <p className="shrink-0 border-t border-line px-3 py-2 text-[10.5px] leading-[1.6] text-ink-3">
+        一缕只能读写你授权的目录；工作区必须落在其中（C26 拒绝符号链接外指）。
+        标着「正在写」的行被工具占着路径锁，这时点开只会拿到一句拒绝。
+      </p>
+    </section>
   );
 }
 

@@ -22,14 +22,14 @@
    none of it reaches the bridge. The product panel (App) stays stateless.
    ============================================================================ */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Activity, Command, Moon, PanelRight, PanelRightClose, Sun } from "lucide-react";
 import { EntityChip } from "@/components/ai-native/entity-chip";
 import { PaletteScreen } from "@/components/palette-screen";
 import { FirstrunOverlay, RB_FIRSTRUN } from "@/components/harness/firstrun-overlay";
 import { HarnessMain } from "@/components/harness/main";
 import { HarnessSidebar, SESSION_SEARCH_ID } from "@/components/harness/sidebar";
-import { RightRail } from "@/components/harness/right-rail";
+import { RightRail, type RailOpenRequest, type RailTabKey } from "@/components/harness/right-rail";
 import { SettingsModal } from "@/components/harness/settings-modal";
 import { ToastStack, RB_TOASTS } from "@/components/harness/toast";
 import { MonitorPopover, RB_MONITOR } from "@/components/harness/monitor-popover";
@@ -53,7 +53,14 @@ export function AppHarness() {
   // view state: which main column mode, which session, which overlays.
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [railOpen, setRailOpen] = useState(true);
+  // The context rail is COLLAPSED until something asks for it. It used to start
+  // open with three tabs already up, which is a shape nobody ships: a panel
+  // that is busy before you asked says nothing about whether you opened it. You
+  // open it with the header toggle and land on its launcher, or the agent asks
+  // for a tab and it comes up on its own.
+  const [railOpen, setRailOpen] = useState(false);
+  const [railRequest, setRailRequest] = useState<RailOpenRequest | null>(null);
+  const railNonce = useRef(0);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [paletteQuery, setPaletteQuery] = useState("");
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -107,6 +114,15 @@ export function AppHarness() {
   function newTask() {
     setSessionId(null);
     setFirstrunOpen(false);
+  }
+
+  // The agent asks for a tab. Opening the rail is implied: a tab the user
+  // cannot see is not an opened tab. The nonce is bumped every time so asking
+  // twice for the same tab still works.
+  function openRailTab(tab: RailTabKey) {
+    railNonce.current += 1;
+    setRailOpen(true);
+    setRailRequest({ tab, nonce: railNonce.current });
   }
 
   // Palette rows used to be buttons with no handler: the legend said Enter
@@ -224,6 +240,7 @@ export function AppHarness() {
             emptyHint={EMPTY_HINT}
             greeting={GREETING}
             onNewTask={newTask}
+            onOpenTab={openRailTab}
             onPickCommand={() => setPaletteOpen(true)}
             onPickTask={() => setSessionId(SESSIONS[0]?.id ?? null)}
             onPickWorkspace={() => setPickerOpen(true)}
@@ -233,9 +250,7 @@ export function AppHarness() {
             view={activeSession ? "session" : "new"}
             workspace={WORKSPACE_NOW}
           />
-          {railOpen && (
-            <RightRail />
-          )}
+          {railOpen && <RightRail openRequest={railRequest ?? undefined} />}
         </div>
       </div>
 
