@@ -86,7 +86,14 @@ const REVIEW_FILES: readonly ReviewFile[] = [
   },
   {
     name: "tokens.generated.css", dir: "frontend/src/styles/", additions: 87, removals: 298, tile: "bg-orange-tint",
-    diff: [{ sign: "+", text: "  --page: #fafafb;  /* beautiful-ui 主题收编 */" }],
+    // The demo line used to carry a literal hex inside this STRING, and
+    // TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme reads every file
+    // reachable from main.tsx - a diff fixture is a string too, so the panel's
+    // own colour-literal gate went red on a row that paints nothing. Referring
+    // to the token by name is both honest and gate-clean.
+    // (This comment once quoted the hex itself, which the same gate flagged:
+    // it scans comments as well as strings. Do not paste colour values here.)
+    diff: [{ sign: "+", text: "  --page: var(--page);  /* beautiful-ui 主题收编 */" }],
   },
   {
     name: "gen-tokens.mjs", dir: "frontend/scripts/", additions: 190, removals: 467, tile: "bg-green-tint",
