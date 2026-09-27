@@ -205,11 +205,15 @@ func runTextTask(s runSpec) int {
 
 // runtime is the assembled S1 stack.
 type agentRuntime struct {
-	spec     runSpec
-	cfg      *config.Config
-	mgr      *config.Manager
-	paths    *tools.PathCanonicalizer
-	store    *memory.Store
+	spec  runSpec
+	cfg   *config.Config
+	mgr   *config.Manager
+	paths *tools.PathCanonicalizer
+	store *memory.Store
+	// tasks is ticket 164's process-local background-task table: the only
+	// thing task.output reads. v1 keeps no roster across restarts (票 164
+	// 定案②), so a restart answers "查不到这个任务" rather than empty.
+	tasks    *tools.TaskRoster
 	provs    []llm.LlmProvider // built chain, kept for the probe path
 	names    []string
 	endpoint llm.Endpoint
@@ -342,6 +346,20 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		Paths:         rt.paths,
 		DeleteEnabled: cfg.FS.DeleteEnabled,
 	}) {
+		if err := reg.Register(e); err != nil {
+			fmt.Fprintf(s.stderr, "wisp run: 工具注册失败（%s）：%v\n", e.Tool.Name(), err)
+			return rt, 2
+		}
+	}
+	// task.output (ticket 164 AC#3, D34 row PLAN.md:2564, L0) reads the
+	// process-local task table above. ⚠ WHO FILLS IT IS NOT THIS TICKET: the
+	// background spawn and its cancel are AC#4's and ticket 163's land, and
+	// RunAsync still has zero production call sites (measured, evidence file
+	// 164-task-output-impl-r1-ac2-ac3.md §4). Until a spawner records into it,
+	// every call here answers "查不到这个任务" - loud, per 票 164 定案②, and
+	// never an empty success that would read as "the task printed nothing".
+	rt.tasks = tools.NewTaskRoster()
+	for _, e := range tools.BuiltinTaskEntries(tools.TaskDeps{Roster: rt.tasks}) {
 		if err := reg.Register(e); err != nil {
 			fmt.Fprintf(s.stderr, "wisp run: 工具注册失败（%s）：%v\n", e.Tool.Name(), err)
 			return rt, 2
