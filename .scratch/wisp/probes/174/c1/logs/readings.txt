@@ -1,0 +1,153 @@
+[dir1/operator-rejects] spill path = C:\Users\swq\AppData\Local\Temp\TestDir1DefaultAllowlist1775399360\001\artifacts\tool-output-call-1.txt
+[dir1/operator-rejects] gate L2 asks = 1
+[dir1/operator-rejects] decision: tool=fs.read level=L2 rules=[R2] column= reason="R2: 目标路径在授权目录之外: C:\\Users\\swq\\AppData\\Local\\Temp\\TestDir1DefaultAllowlist1775399360\\001\\artifacts\\tool-output-call-1.txt"
+[dir1/operator-rejects] outcome: isError=true riskLevel=L2 class=user_rejected text="L2 审批未通过，已拒绝执行"
+[dir1/card-times-out] spill path = C:\Users\swq\AppData\Local\Temp\TestDir1DefaultAllowlist1775399360\001\artifacts\tool-output-call-1.txt
+[dir1/card-times-out] gate L2 asks = 1
+[dir1/card-times-out] decision: tool=fs.read level=L2 rules=[R2] column= reason="R2: 目标路径在授权目录之外: C:\\Users\\swq\\AppData\\Local\\Temp\\TestDir1DefaultAllowlist1775399360\\001\\artifacts\\tool-output-call-1.txt"
+[dir1/card-times-out] outcome: isError=true riskLevel=L2 class=user_rejected text="审批超时未确认，已自动拒绝"
+[dir2] L2 asks = 0 isError=false riskLevel=L0
+[dir2] readback first 80 bytes = "W174C1-HEAD-MARK\nline 0000: padding padding padding padding\nline 0001: padding p"
+[dir2] readback total bytes = 51633 (artifact body 51633)
+[fake/t-ghost] isError=false level=L0
+[fake/t-ghost] full text (3011 bytes) follows:
+W174C1-HEAD-MARK
+line 0000: padding padding padding padding
+line 0001: padding padding padding padding
+line 0002: padding padding padding padding
+line 0003: padding padding padding padding
+line 0004: padding padding padding padding
+line 0005: padding padding padding padding
+line 0006: padding padding padding padding
+line 0007: padding padding padding padding
+line 0008: padding padding padding padding
+line 0009: padding padding padding padding
+line 0010: padding padding padding padding
+line 0011: padding padding padding padding
+line 0012: padding padding padding padding
+line 0013: padding padding padding padding
+line 0014: padding padding padding padding
+line 0015: padding padding padding padding
+line 0016: padding padding padding padding
+line 0017: padding padding padding padding
+line 0018: padding padding padding padding
+line 0019: padding padding padding padding
+line 0020: padding padding padding padding
+line 0021: padding padding padding padding
+line 0022: padding padding padding padding
+line 0023: padding padding padding padding
+line 0024: padding padding padding padding
+line 0025: padding padding padding padding
+line 0026: padding padding padding padding
+line 0027: padding padding padding padding
+line 0028: padding padding padding padding
+line 0029: padding padding padding padding
+line 0030: padding padding padding padding
+line 0031: padding padding padding padding
+line 0032: padding padding padding padding
+line 0033: padding padding padding padding
+line 0034: padding padding padding padding
+line 0035: padding padding padding padding
+line 0036: padding padding padding padding
+line 0037: padding padding padding padding
+line 0038: padding padding padding padding
+line 0039: padding padding padding padding
+line 0040: padding padding padding padding
+line 0041: padding padding padding padding
+line 0042: padding padding padding padding
+line 0043: padding padding padding padding
+line 0044: padding padding padding padding
+line 0045: padding padding padding padding
+line 
+[…输出已落文件：省略 48833 字符，总长 51633 字节 / 约 12908 token，全文见 C:\Users\swq\AppData\Local\Temp\TestFakePointerBranch2775368569\001\artifacts\tool-output-does-not-exist.txt…]
+g padding
+line 1182: padding padding padding padding
+line 1183: padding padding padding padding
+line 1184: padding padding padding padding
+line 1185: padding padding padding padding
+line 1186: padding padding padding padding
+line 1187: padding padding padding padding
+line 1188: padding padding padding padding
+line 1189: padding padding padding padding
+line 1190: padding padding padding padding
+line 1191: padding padding padding padding
+line 1192: padding padding padding padding
+line 1193: padding padding padding padding
+line 1194: padding padding padding padding
+line 1195: padding padding padding padding
+line 1196: padding padding padding padding
+line 1197: padding padding padding padding
+line 1198: padding padding padding padding
+line 1199: padding padding padding padding
+W174C1-TAIL-MARK
+[fake/t-dir] isError=false level=L0
+[fake/t-dir] full text (2980 bytes) follows:
+W174C1-HEAD-MARK
+line 0000: padding padding padding padding
+line 0001: padding padding padding padding
+line 0002: padding padding padding padding
+line 0003: padding padding padding padding
+line 0004: padding padding padding padding
+line 0005: padding padding padding padding
+line 0006: padding padding padding padding
+line 0007: padding padding padding padding
+line 0008: padding padding padding padding
+line 0009: padding padding padding padding
+line 0010: padding padding padding padding
+line 0011: padding padding padding padding
+line 0012: padding padding padding padding
+line 0013: padding padding padding padding
+line 0014: padding padding padding padding
+line 0015: padding padding padding padding
+line 0016: padding padding padding padding
+line 0017: padding padding padding padding
+line 0018: padding padding padding padding
+line 0019: padding padding padding padding
+line 0020: padding padding padding padding
+line 0021: padding padding padding padding
+line 0022: padding padding padding padding
+line 0023: padding padding padding padding
+line 0024: padding padding padding padding
+line 0025: padding padding padding padding
+line 0026: padding padding padding padding
+line 0027: padding padding padding padding
+line 0028: padding padding padding padding
+line 0029: padding padding padding padding
+line 0030: padding padding padding padding
+line 0031: padding padding padding padding
+line 0032: padding padding padding padding
+line 0033: padding padding padding padding
+line 0034: padding padding padding padding
+line 0035: padding padding padding padding
+line 0036: padding padding padding padding
+line 0037: padding padding padding padding
+line 0038: padding padding padding padding
+line 0039: padding padding padding padding
+line 0040: padding padding padding padding
+line 0041: padding padding padding padding
+line 0042: padding padding padding padding
+line 0043: padding padding padding padding
+line 0044: padding padding padding padding
+line 0045: padding padding padding padding
+line 
+[…输出已落文件：省略 48833 字符，总长 51633 字节 / 约 12908 token，全文见 C:\Users\swq\AppData\Local\Temp\TestFakePointerBranch2775368569\001\artifacts…]
+g padding
+line 1182: padding padding padding padding
+line 1183: padding padding padding padding
+line 1184: padding padding padding padding
+line 1185: padding padding padding padding
+line 1186: padding padding padding padding
+line 1187: padding padding padding padding
+line 1188: padding padding padding padding
+line 1189: padding padding padding padding
+line 1190: padding padding padding padding
+line 1191: padding padding padding padding
+line 1192: padding padding padding padding
+line 1193: padding padding padding padding
+line 1194: padding padding padding padding
+line 1195: padding padding padding padding
+line 1196: padding padding padding padding
+line 1197: padding padding padding padding
+line 1198: padding padding padding padding
+line 1199: padding padding padding padding
+W174C1-TAIL-MARK
