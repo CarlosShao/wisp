@@ -2,3 +2,33 @@
     台件写面只有 probes/171/r2/**；样本落 $TMPDIR 合成树（不在仓内、无 worktree、无 checkout、只建不删）。
 
 .scratch/wisp/probes/171/r2/r2-run-legs-and-subtraction.sh
+fd8201e7 162-r4 收尾：票面 162 追加 17:4x 进度一节（零勾）＋证据件 §11.1 贴四枚提交的原样输出
+    
+    票面＝只追加，删除列 0；编排者 17:2x 那一节的原文逐字未变（复算：与 HEAD 版该行
+    diff 结果＝IDENTICAL，命令见证据件 §11.1 与本程报告）。
+    ⚠ 自报形状缺陷归我：17:4x 那一枚 bullet 被插在 17:2x **之前**，违"newest last"；
+    没挪是因为挪一次会产生一对 -/+，让编排者那一节在 diff 里看起来被动过——
+    宁可留顺序错、不留删改痕迹，移不移归编排者。
+    证据件新增 §11.1：逐枚贴 git log --oneline -1 与 show --name-only 的原样输出
+    （7a41af51／27f0cb8a／9c00bb33／b542bc1c），父链 7a41af51 parent=4cee47f2。
+    写面到此为止：internal/tools/** 两枚新测试＋本证据件＋票面 Progress log。
+
+.scratch/wisp/issues/162-add-the-patch-one-region-tool-instead-of-rewriting-whole-files.md
+docs/evidence/s1/162-risk-tier-and-contract-axis-r4.md
+
+=== 件③ commit 的原样输出（本程自己的那枚，不是 HEAD：共享工作树里 162-r4 之后落了一枚）===
+290aa63e 票 171（171-r2 写码位·件③）AC#7＋AC#8①②落进尺本体（probes/**，生产码零字节）：  AC#7 run() 那一族腿带上枚数——G1/G1b/G2/G3/G4 各登记 want_n（run 腿的枚数＝命中行数，    锚 f1b99a70 现量 0/0/2/0/0），记账并入 pair 腿那同一枚 book_count（改前只管 run 腿的 book()    整枚删掉，不留第二个判法）；两向读数：合成树里同一条 G2 腿 2 枚->3 枚 ⇒ 改前聚合退码 6->6（洞复现）、    改后 6->7，红句 `# BAD  腿=G2 声明=ring 基线=2枚 实测=3枚 因=新增命中（票 171 AC#7：实测 > 基线）`。  AC#8① 腿数断言：腿的名册只写在 LEGS_EXPECT 一处（14 枚的数从它现算，不在第二处抄号），    want() 核腿号在不在册／重不重复（rc=3），聚合段核【在册的每一腿都记过账】＋反向【只声明没跑腿】；    两向读数：从尺的副本整条摘掉 G6 ⇒ 改前 rc=0（腿数打印 13 然后安静）、改后 rc=1。  AC#8② SHR 不计进退码（真树两把尺都 rc=0），但单列一张【基线过期】表；两向：want_n 8 抬 9、实测 8 ⇒    改表单列 0 枚 / 改后 1 枚（`# STALE 腿=G5neg ... 差=1枚`），核它的新格下一件交付。 顺带一字（票面 AC#8 的 `>`）：注释里"非测试生产码 40 枚文件里有 Close()"现量改 42。 真树改后基线：sh gate-clauses.sh => rc=0、腿数＝14 声明与实测不符＝0、14 腿逐枚 ok（logs/gate-post-fix.txt）。
+.scratch/wisp/probes/154/gate-clauses.sh
+.scratch/wisp/probes/171/r2/logs/commit-attest.txt
+.scratch/wisp/probes/171/r2/logs/flip-pre-fix.txt
+.scratch/wisp/probes/171/r2/logs/gate-post-fix.txt
+.scratch/wisp/probes/171/r2/logs/harness-post-fix.txt
+.scratch/wisp/probes/171/r2/logs/harness-pre-fix.txt
+.scratch/wisp/probes/171/r2/logs/part1-state1-fixed.txt
+.scratch/wisp/probes/171/r2/logs/part1-state1-pristine.txt
+.scratch/wisp/probes/171/r2/logs/part1-state2-fixed.txt
+.scratch/wisp/probes/171/r2/logs/part1-state2-pristine.txt
+.scratch/wisp/probes/171/r2/logs/part2-nog6-fixed.txt
+.scratch/wisp/probes/171/r2/logs/part2-nog6-pristine.txt
+.scratch/wisp/probes/171/r2/logs/part3-stale-fixed.txt
+.scratch/wisp/probes/171/r2/logs/part3-stale-pristine.txt

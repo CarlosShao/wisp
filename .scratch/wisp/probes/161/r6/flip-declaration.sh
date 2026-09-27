@@ -148,6 +148,35 @@ flip "G7pos quiet->ring (new AC#6 positive control; 0 unpaired today)" nonzero \
 flip "G1 quiet->ring AND G4 quiet->ring together (expect rc to be 2, not 1)" 2 \
     's/^want G1 quiet$/want G1 ring/' 's/^want G4 quiet$/want G4 ring/'
 
+# ---- NEW CELL, added by 171-r2 (ticket 171 AC#8-2). The nine cells above are untouched. ----
+# SHR (measured BELOW the registered want_n) is allowed to stay out of the exit code - a reading
+# that got better is not a broken promise (that is the constant-red shape A320/A321 retired).
+# But it may no longer be only an inline note in the aggregate list, which is human-eyes-only:
+# the gate must print a standalone 基线过期 table, and this door must check the table exists.
+# Pre-fix reading (same anchor, this very sed): rc=0 and 0 table rows - see the evidence file §4.
+printf '== (stale) raise one baseline above its own measurement: rc must stay 0 AND a table must appear\n'
+seq=$((seq + 1))
+stale="$work/gate-$seq-stale.sh"
+sed 's/^want_n 8$/want_n 9/' "$pristine" >"$stale"
+if cmp -s "$pristine" "$stale"; then
+    printf '  FAIL  want_n 8 -> 9 changed not one byte - G5neg has no such baseline line any more, so this cell cannot answer\n'
+    fail=1
+else
+    printf '   the baseline line this run differs by:\n'
+    diff "$pristine" "$stale" | grep -E '^[<>] want_n ' | sed -e 's/^/   /'
+    got=$(run_gate "$stale" "$logdir/flip-$seq.txt")
+    expect "G5neg 基线 8->9（实测 8）still exits 0 (变好了不算言行不一)" "$got" zero
+    if grep -q '^## 基线过期' "$logdir/flip-$seq.txt" &&
+        grep -q '^# STALE 腿=G5neg ' "$logdir/flip-$seq.txt" &&
+        grep -q '^# 基线过期枚数＝1' "$logdir/flip-$seq.txt"; then
+        printf '  ok    the stale baseline is its own readable table row: %s\n' \
+            "$(grep -m1 '^# STALE ' "$logdir/flip-$seq.txt")"
+    else
+        printf '  FAIL  no standalone 基线过期 table naming G5neg - SHR is still human-eyes-only\n'
+        fail=1
+    fi
+fi
+
 # ---- restore ------------------------------------------------------------------
 printf '== (restore) pristine bytes again, same anchor\n'
 rest_rc=$(run_gate "$pristine" "$logdir/flip-restored.txt")

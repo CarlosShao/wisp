@@ -1,0 +1,61 @@
+flip-declaration.sh: anchor fd8201e7c6e18a0358d9949008e8f76eae2b2542 (the gate reads the COMMITTED tree at this anchor, never the working tree)
+== (0) baseline: committed declarations, untouched
+  ok    14 legs each say what it does -> rc=0 (want zero)
+   legs booked: 腿数＝14   mismatched: 声明与实测不符＝0
+== flip 1: G2 ring->quiet (run-shaped; its roster is non-empty today)
+   the declaration lines this run differs by:
+   < want G2 ring
+   > want G2 quiet
+  ok    G2 ring->quiet (run-shaped; its roster is non-empty today) -> rc=1 (want nonzero)
+   which legs the aggregate called out (rc=1):
+   # BAD  腿=G2 声明=quiet 基线=2枚 实测=2枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+== flip 2: G5neg ring->quiet (pair-shaped; 5 unpaired by design today)
+   the declaration lines this run differs by:
+   < want G5neg ring
+   > want G5neg quiet
+  ok    G5neg ring->quiet (pair-shaped; 5 unpaired by design today) -> rc=1 (want nonzero)
+   which legs the aggregate called out (rc=1):
+   # BAD  腿=G5neg 声明=quiet 基线=8枚 实测=8枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+== flip 3: G7 ring->quiet (new AC#6 leg; 3 unpaired today, reverse direction only)
+   the declaration lines this run differs by:
+   < want G7 ring rev
+   > want G7 quiet rev
+  ok    G7 ring->quiet (new AC#6 leg; 3 unpaired today, reverse direction only) -> rc=1 (want nonzero)
+   which legs the aggregate called out (rc=1):
+   # BAD  腿=G7 声明=quiet 基线=3枚 实测=3枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+== flip 4: G1 quiet->ring (run-shaped; zero hits today)
+   the declaration lines this run differs by:
+   < want G1 quiet
+   > want G1 ring
+  ok    G1 quiet->ring (run-shaped; zero hits today) -> rc=1 (want nonzero)
+   which legs the aggregate called out (rc=1):
+   # BAD  腿=G1 声明=ring 基线=0枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+== flip 5: G7pos quiet->ring (new AC#6 positive control; 0 unpaired today)
+   the declaration lines this run differs by:
+   < want G7pos quiet rev
+   > want G7pos ring rev
+  ok    G7pos quiet->ring (new AC#6 positive control; 0 unpaired today) -> rc=1 (want nonzero)
+   which legs the aggregate called out (rc=1):
+   # BAD  腿=G7pos 声明=ring 基线=0枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+== flip 6: G1 quiet->ring AND G4 quiet->ring together (expect rc to be 2, not 1)
+   the declaration lines this run differs by:
+   < want G1 quiet
+   > want G1 ring
+   < want G4 quiet
+   > want G4 ring
+  ok    G1 quiet->ring AND G4 quiet->ring together (expect rc to be 2, not 1) -> rc=2 (want 2)
+   which legs the aggregate called out (rc=2):
+   # BAD  腿=G1 声明=ring 基线=0枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+   # BAD  腿=G4 声明=ring 基线=0枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+== (stale) raise one baseline above its own measurement: rc must stay 0 AND a table must appear
+   the baseline line this run differs by:
+   < want_n 8
+   > want_n 9
+  ok    G5neg 基线 8->9（实测 8）still exits 0 (变好了不算言行不一) -> rc=0 (want zero)
+  ok    the stale baseline is its own readable table row: # STALE 腿=G5neg 声明=ring 基线=9枚 实测=8枚 差=1枚 处置=把 want_n 核下来；样本一枚没变好而是被摘掉的，先回答谁摘的
+== (restore) pristine bytes again, same anchor
+  ok    nothing flipped any more -> rc=0 (want zero)
+  ok    restore matches the baseline (rc=0)
+
+flip-declaration.sh: GREEN - the aggregate exit code tracks the declarations in both directions and returns to 0 (baseline rc=0, 14 legs booked).
+flip-declaration.sh: this is provably NOT "any leg rings => non-zero": the baseline books 7 ringing legs (G2 G5 G5neg G6 G6neg G7 G7neg) and 7 silent ones (G1 G1b G3 G4 G5pos G6pos G7pos) and still exits 0.

@@ -1,0 +1,15 @@
+# ok   腿=G1 声明=quiet 实测=quiet
+# ok   腿=G1b 声明=quiet 实测=quiet
+# ok   腿=G2 声明=ring 实测=ring
+# ok   腿=G3 声明=quiet 实测=quiet
+# ok   腿=G4 声明=quiet 实测=quiet
+# ok   腿=G5 声明=ring 基线=1枚 实测=1枚
+# ok   腿=G5pos 声明=quiet 基线=0枚 实测=0枚
+# ok   腿=G5neg 声明=ring 基线=8枚 实测=8枚
+# ok   腿=G6 声明=ring 基线=1枚 实测=1枚
+# ok   腿=G6pos 声明=quiet 基线=0枚 实测=0枚
+# ok   腿=G6neg 声明=ring 基线=1枚 实测=1枚
+# ok   腿=G7 声明=ring 基线=3枚 实测=3枚
+# ok   腿=G7pos 声明=quiet 基线=0枚 实测=0枚
+# ok   腿=G7neg 声明=ring 基线=4枚 实测=4枚
+# 腿数＝14 声明与实测不符＝0
