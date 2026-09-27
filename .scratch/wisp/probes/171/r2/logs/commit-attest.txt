@@ -48,3 +48,8 @@ docs/evidence/s1/162-risk-tier-and-contract-axis-r4.md
 .scratch/wisp/probes/171/r2/logs/runtests-roster.txt
 .scratch/wisp/probes/171/r2/logs/runtests.txt
 .scratch/wisp/probes/171/r2/r2-roster-diff.sh
+
+=== 件⑤ commit 原样输出 ===
+12ad498b 票 171（171-r2 写码位·件⑤）证据件落盘：docs/evidence/s1/171-run-legs-and-subtraction-r2.md（十三节，按派单 §6 的顺序） step-0 五件／本程没测什么／AC#7 两向读数（合成树同一条 G2 腿 2 枚->3 枚：改前 6->6、改后 6->7）＋十四腿改前改后全表／ AC#8 三处（整腿摘除 0->1、SHR 仍 rc=0 但单列一张『基线过期』表、与 AC#7 同程）＋flip 十格全量 rc=0／ 单独一节"我有没有减射程"（两把尺同一枚锚，十四腿名册两向 comm 全空、合计 151 行对 151 行、射程行增删 0 枚）／ 40->42 现量（两枚锚同数）／门禁四数（d22scan rc=0、runtests PASS=34 FAIL=0 SKIP=0 RUN=76、gofumpt v0.12.0）／ 权限拒绝 0 次（一次 Edit 未匹配＝非权限，发生在取数之后）／删除命令 0 次／伪授权两栏 0／凭据零抄录／next= 五条。 自报两处缺陷：r2-roster-diff.sh 第一版是恒真比较（六枚对照腿段名取错，已改）、覆掉后没留原件； flip 文件头那句 "6 of 14 legs ringing" 与现量 7 响/7 静不符＝过期文字，本程未动、入账归编排者。
+.scratch/wisp/probes/171/r2/logs/commit-attest.txt
+docs/evidence/s1/171-run-legs-and-subtraction-r2.md
