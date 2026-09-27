@@ -15,6 +15,7 @@ import (
 // The D34 write half of the fs family:
 //
 //	fs.write  new file L1 / overwrite L2 (R8)   D31 temp+atomic-rename writer
+//	fs.edit   L2 (D34, ticket 162)              literal locate-and-replace, fs.write's writer
 //	fs.trash  L1                                the real Shell recycle-bin API
 //	fs.move   L1 / cross-volume L2, overwrite L2 (R8)
 //	fs.delete NOT REGISTERED unless [fs] delete_enabled=true, then L2 (R8)
@@ -763,9 +764,15 @@ func FSDeleteDecl(FSDeps) Decl {
 // fs.delete's ABSENCE when the flag is off is the enforcement: a tool the model
 // cannot see cannot be called, which is a stronger guarantee than a call that
 // would be refused. D34 asks for exactly that.
+//
+// fs.edit is here because it is the same family: same C26 path judgment, same
+// C3 capability, same D31 staged writer. It is registered unconditionally - the
+// tool refuses a missing target instead of creating one, so there is no setting
+// that could make it unsafe to show.
 func BuiltinFSWriteEntries(d FSDeps) []Entry {
 	out := []Entry{
 		{Tool: fsWrite{d: d}, Decl: FSWriteDecl(d)},
+		{Tool: fsEdit{d: d}, Decl: FSEditDecl(d)},
 		{Tool: fsTrash{d: d}, Decl: FSTrashDecl(d)},
 		{Tool: fsMove{d: d}, Decl: FSMoveDecl(d)},
 	}

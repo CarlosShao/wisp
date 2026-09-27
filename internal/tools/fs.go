@@ -316,8 +316,8 @@ func FSListDecl() Decl {
 }
 
 // BuiltinFSEntries returns the whole D34 fs family the configuration allows:
-// the L0 pair plus the write half (fs.write / fs.trash / fs.move), with
-// fs.delete present ONLY when [fs] delete_enabled is true (FSDeps.
+// the L0 pair plus the write half (fs.write / fs.edit / fs.trash / fs.move),
+// with fs.delete present ONLY when [fs] delete_enabled is true (FSDeps.
 // DeleteEnabled). Callers that want the write half on its own use
 // BuiltinFSWriteEntries.
 func BuiltinFSEntries(d FSDeps) []Entry {

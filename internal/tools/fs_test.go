@@ -178,7 +178,8 @@ func TestSensitiveFileIsDeniedNotEscalated(t *testing.T) {
 }
 
 // TestFSRegistrationIsTheD34Roster pins the whole family's registration shape:
-// the L0 pair plus the L1 write trio, and NO fs.delete unless
+// the L0 pair plus the write half (fs.write L1, fs.edit L2 per ticket 162,
+// fs.trash/fs.move L1), and NO fs.delete unless
 // [fs] delete_enabled was set. Segment 1 pinned this at two entries; the third
 // and later entries are what segment 2 was, so the pin moved with the work
 // rather than being deleted (an absent fs.write here would still mean the
@@ -186,19 +187,20 @@ func TestSensitiveFileIsDeniedNotEscalated(t *testing.T) {
 func TestFSRegistrationIsTheD34Roster(t *testing.T) {
 	paths := NewPathCanonicalizer(nil, nil)
 	entries := BuiltinFSEntries(FSDeps{Paths: paths})
-	if len(entries) != 5 {
-		t.Fatalf("the default fs roster has %d tools, want 5 (read/list/write/trash/move)", len(entries))
+	if len(entries) != 6 {
+		t.Fatalf("the default fs roster has %d tools, want 6 (read/list/write/edit/trash/move)", len(entries))
 	}
 	want := map[string]risk.Level{
 		"fs.read": risk.L0, "fs.list": risk.L0,
-		"fs.write": risk.L1, "fs.trash": risk.L1, "fs.move": risk.L1,
+		"fs.write": risk.L1, "fs.edit": risk.L2, "fs.trash": risk.L1, "fs.move": risk.L1,
 	}
 	// Needs is not decoration: Bridge.checkCaps derives the C3 requirement set
 	// from it, so an under-declared Needs makes the authz check pass for a
 	// capability the tool actually exercises.
 	wantNeeds := map[string][]Capability{
 		"fs.read": {CapFSRead}, "fs.list": {CapFSRead},
-		"fs.write": {CapFSWrite}, "fs.trash": {CapFSWrite}, "fs.move": {CapFSWrite},
+		"fs.write": {CapFSWrite}, "fs.edit": {CapFSWrite},
+		"fs.trash": {CapFSWrite}, "fs.move": {CapFSWrite},
 	}
 	for _, e := range entries {
 		n := e.Tool.Name()
@@ -230,8 +232,8 @@ func TestFSRegistrationIsTheD34Roster(t *testing.T) {
 func TestDeleteEnabledAddsFSDelete(t *testing.T) {
 	paths := NewPathCanonicalizer(nil, nil)
 	entries := BuiltinFSEntries(FSDeps{Paths: paths, DeleteEnabled: true})
-	if len(entries) != 6 {
-		t.Fatalf("with delete_enabled the roster has %d tools, want 6", len(entries))
+	if len(entries) != 7 {
+		t.Fatalf("with delete_enabled the roster has %d tools, want 7", len(entries))
 	}
 	var del *Decl
 	for i, e := range entries {
@@ -258,15 +260,16 @@ func TestToolsDirectoryShape(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(dir) != 5 {
+	if len(dir) != 6 {
 		t.Fatalf("directory has %d entries: %+v", len(dir), dir)
 	}
 	// The directory carries the DECLARED level (the R1 floor), never a verdict:
 	// the write trio shows L1 while an overwrite of the same path will be
-	// judged L2 by R8 inside Execute.
+	// judged L2 by R8 inside Execute. fs.edit shows L2 because overwriting an
+	// existing file is the only thing it can do (ticket 162, D34).
 	declared := map[string]string{
 		"fs.read": "L0", "fs.list": "L0",
-		"fs.write": "L1", "fs.trash": "L1", "fs.move": "L1",
+		"fs.write": "L1", "fs.edit": "L2", "fs.trash": "L1", "fs.move": "L1",
 	}
 	for _, ti := range dir {
 		if !ti.Resident {

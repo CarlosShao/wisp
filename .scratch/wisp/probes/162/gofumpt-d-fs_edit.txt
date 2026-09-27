@@ -1,0 +1,23 @@
+diff internal/tools/fs_edit.go.orig internal/tools/fs_edit.go
+--- internal/tools/fs_edit.go.orig
++++ internal/tools/fs_edit.go
+@@ -45,8 +45,8 @@
+ // malformed call. Both refuse; only the wording differs, and the wording is the
+ // remedial action the model reads.
+ type fsEditArgs struct {
+-	Path  string      `json:"path"`
+-	Edits []fsEditOp  `json:"edits"`
++	Path  string     `json:"path"`
++	Edits []fsEditOp `json:"edits"`
+ }
+ 
+ type fsEditOp struct {
+@@ -125,7 +125,7 @@
+ 			"请确认路径可读，或改用 fs.read 先看一眼"), nil
+ 	}
+ 	if !exists {
+-		return refusal("目标文件不存在，没有可定位的内容：" + target,
++		return refusal("目标文件不存在，没有可定位的内容："+target,
+ 			"新建文件请用 fs.write；本工具只改已存在的文件"), nil
+ 	}
+ 

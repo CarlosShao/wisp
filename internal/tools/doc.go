@@ -10,8 +10,9 @@
 //     dispatch is this code - there is no second path to forget to secure.
 //   - the C1 Tool contract (tool.go) and the C4 registry (registry.go)
 //   - the fs family, per D34: fs.read/fs.list (L0 pair, ticket 20 segment 1)
-//     and fs.write/fs.trash/fs.move (segment 2) are here, with fs.delete
-//     registered ONLY when [fs] delete_enabled=true. web/system/doc/search
+//     and fs.write/fs.edit/fs.trash/fs.move (segment 2, plus ticket 162's
+//     fs.edit) are here, with fs.delete registered ONLY when [fs]
+//     delete_enabled=true. web/system/doc/search
 //     tools are 22-24. The write half brings the D31 temp+atomic-rename
 //     writer, the applied-steps ledger (Result.AppliedSteps + CancelBus) and
 //     the real Shell recycle-bin call behind fs.trash.
