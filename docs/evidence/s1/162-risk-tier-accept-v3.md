@@ -128,6 +128,18 @@ gofumpt v0.12.0 (go1.27.1) -l(已跟踪 .go)                   → 甲形 0 行�
 
 SKIP=0 ⇒ Windows 清扫枚 `TestFSEditWriteReclaimsADeadWritersOrphan` 本机**真跑且过**，非靠整包绿充数。原始读数落 `$TMPDIR` 丢弃树 `logs/`（`tools-v3.txt`·`d22scan.txt`·`runtests.txt`·`gofumpt.txt`·`logs_m1_tier.txt`；本程零删除命令，件只建不删）。
 
+## 9. 本程自身越界核查（`git -c core.quotePath=false show --name-only` 逐枚）
+
+本程三枚提交，逐枚 `show --name-only HEAD`（原样贴在各次提交的取数里）写面**只两路**：
+
+| commit | 动到 |
+|---|---|
+| `7a0d7e4f` | `docs/evidence/s1/162-risk-tier-accept-v3.md`（本表） |
+| `6aef4164` | `docs/evidence/s1/162-risk-tier-accept-v3.md` |
+| `416cd523` | `.scratch/wisp/probes/162/v3/m1-tier-floor-overlay.sh` |
+
+⚠ `git diff --name-only 7a0d7e4f~1 416cd523`（**跨程范围**）会多显 `171-three-ruler-holes…` 票面、`probes/171/r2/logs/*`、`docs/evidence/s1/171-…-r2.md`——**那些是同树另一程 `171-r2` 在我三枚之间落地的交错提交**（tip 因其在飞而前移，派单 step-0 已预告），非本程所写、本程未动未提未评。判据＝**只看本程三枚各自的 `show --name-only`**，不只看范围端点。`git status --porcelain -- docs/evidence/s1/162-risk-tier-accept-v3.md .scratch/wisp/probes/162/v3/` 现量＝**空**（本程两路全提交）。盘上 `internal/tools/fs_edit.go` 与锚点 `fd8201e7` blob **逐字相同**（overlay 变异只在 `$TMPDIR`，未回写）。
+
 ## 10. 被拒／没成功的调用（发生在取数前/后）
 
 - 被权限系统拒绝：**0 次**。
