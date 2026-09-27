@@ -1,0 +1,10 @@
+### [PRE] ac1 gofmt -l ###
+GetFileAttributesEx ../ac1: The system cannot find the file specified.
+GetFileAttributesEx ../ac1-closebyid: The system cannot find the file specified.
+### [PRE] ac1 go vet ###
+rc_vet=0
+### [PRE] ac1-closebyid go vet ###
+rc_vet3=0
+### [PRE] LEG3 go run (foreign by-id close) ###
+foreign-by-id-close taintsBefore=1 taintsAfter=0 inspectHitAfter=false
+rc_run3=0

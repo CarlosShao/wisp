@@ -1,0 +1,6 @@
+A-after-open  scopes=1 taints=[]
+A-after-dispose scopes=0
+A-no-dispose-owner scopes=1
+B-discarded scopes=1
+B-no-identity mis-closed scopes=0 (0 = victim silently lost its scope)
+B-with-identity own-close scopes=0
