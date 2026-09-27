@@ -1,0 +1,132 @@
+# 票 154 AC#1 触发门 —— 锚点 3df749607a0da1e70579f5c3abb71003350a45d2
+# 生成时刻 2026-09-27T16:56:09+08:00
+# 下一程复算＝同一条命令再跑一次，逐行 diff 名册；名册变长＝门响。
+
+## G1 生产码里构造 ToolRequest（排 internal/agent/ 自身）
+$ git grep -nE  'ToolRequest\{' 3df749607a0da1e70579f5c3abb71003350a45d2 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/agent/*
+# rc=1   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G1b 生产码里任意 .Execute( 调用点（排 loop.go 与 bridge.go 自身）
+$ git grep -nE  '\.Execute\(' 3df749607a0da1e70579f5c3abb71003350a45d2 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/agent/loop.go :!internal/tools/bridge.go
+# rc=1   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G2 OpenTask/CloseTask 的生产出现点（排 bridge.go 自身；今日应只剩 cmd/wisp/run.go 那一发＋它上面的注释）
+$ git grep -nE -w 'OpenTask|CloseTask' 3df749607a0da1e70579f5c3abb71003350a45d2 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/tools/bridge.go
+3df749607a0da1e70579f5c3abb71003350a45d2:cmd/wisp/run.go:546:// WHY THIS HOOK OWNS THE CLOSE. CloseTask's own comment says the composition
+3df749607a0da1e70579f5c3abb71003350a45d2:cmd/wisp/run.go:563:		rt.bridge.CloseTask(taskID)
+# rc=0   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G3 Q-56 那一支落地：Loop 上出现收 taskID 的导出方法
+$ git grep -nE  '^func \(l \*Loop\) [A-Z][A-Za-z0-9]*\(.*taskID' 3df749607a0da1e70579f5c3abb71003350a45d2 -- internal/agent
+# rc=1   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G4 生产组合根打开 L0 直通（PassThroughUnclassifiedRisk 的字面赋值）
+$ git grep -nE  'PassThroughUnclassifiedRisk:' 3df749607a0da1e70579f5c3abb71003350a45d2 -- *.go :!*_test.go
+# rc=1   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G5 OpenScope↔CloseScope 成对普查：生产码里开了 C25 scope 却没在同一文件关过的名册（排 internal/risk 的定义本体、排 *_test.go）
+$ git grep -nEw 'OpenScope|CloseScope|Close\(\)' 3df749607a0da1e70579f5c3abb71003350a45d2 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/*
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+3df749607a0da1e70579f5c3abb71003350a45d2:cmd/balldebug/diff_windows.go:224:	defer f.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:cmd/balldebug/main.go:234:			b.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:cmd/balldebug/main.go:266:			b.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:cmd/balldebug/main.go:358:	b.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:cmd/balldebug/shot_windows.go:119:		f.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:cmd/llmrecord/main.go:102:	defer resp.Body.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:cmd/wisp/logsink.go:113:	_ = s.pipeline.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:cmd/wisp/models.go:304:	defer machine.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:cmd/wisp/panel_assets.go:168:// has to admit: OpenScope now hands back the *Scope that owns the close, and
+3df749607a0da1e70579f5c3abb71003350a45d2:cmd/wisp/panel_assets.go:240:	// Discarded on purpose, and named so: the handle OpenScope hands back is
+3df749607a0da1e70579f5c3abb71003350a45d2:cmd/wisp/panel_assets.go:243:	_ = prov.OpenScope(taintSourceScopeID)
+3df749607a0da1e70579f5c3abb71003350a45d2:cmd/wisp/providers.go:185:	defer func() { _ = store.Close() }()
+3df749607a0da1e70579f5c3abb71003350a45d2:cmd/wisp/run.go:517:		_ = rt.store.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:cmd/wisp/slo_windows.go:306:			_ = pipeline.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:cmd/wisp/slo_windows.go:315:			_ = pipeline.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:cmd/wisp/slo_windows.go:329:	_ = pipeline.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/audio/device.go:39:	Close() error
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/audio/device.go:65:	Close() error
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/audio/mmdevice_windows.go:136:func (w *mmDeviceWatcher) Close() error {
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/audio/wasapi_windows.go:238:		_ = s.Close() // release the half-initialized client (idempotent)
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/audio/wasapi_windows.go:408:func (s *wasapiStream) Close() error {
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/audio/wasapimic_windows.go:183:	defer func() { _ = stream.Close() }() // closure: closes whatever stream is CURRENT (swap-safe)
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/audio/wasapimic_windows.go:202:			_ = stream.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/audio/wasapimic_windows.go:250:	_ = (*stream).Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/ball/ball_windows.go:904:func (b *Ball) Close() {
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/config/parse.go:216:		_ = tmp.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/config/parse.go:220:		tmp.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/config/parse.go:223:	if err := tmp.Close(); err != nil {
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/llm/discover.go:70:	defer resp.Body.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/llm/systemproxy_windows.go:58:	defer k.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/dao_memory.go:76:	defer rows.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/dao_memory.go:136:	defer rows.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/dao_misc.go:85:	defer rows.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/dao_misc.go:97:	defer rows.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/dao_misc.go:175:	defer rows.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/dao_misc.go:250:	defer rows.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/dao_profile.go:115:	defer rows.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/dao_providerhealth.go:182:	defer rows.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/dao_tasklog.go:101:	defer rows.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/dao_toolcall.go:116:	defer rows.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/dao_toolcall.go:127:	defer rows.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/open.go:208:		_ = s.reader.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/open.go:219:		_ = s.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/open.go:253:func (s *Store) Close() error {
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/open.go:266:			_ = s.reader.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/open.go:269:			_ = s.writer.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/open.go:300:		_ = boot.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/open.go:304:		_ = boot.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/open.go:308:		_ = boot.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/open.go:317:		_ = boot.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/open.go:325:		if err := boot.Close(); err != nil {
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/open.go:336:			_ = boot.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/open.go:342:	_ = boot.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/open.go:532:	defer in.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/open.go:538:		out.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/memory/open.go:541:	return out.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/models/archive.go:25:	defer f.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/models/archive.go:86:			out.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/models/archive.go:89:		if err := out.Close(); err != nil {
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/models/downloader.go:397:	defer resp.Body.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/models/downloader.go:428:	defer f.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/models/downloader.go:490:	defer f.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/models/downloader.go:683:	defer f.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/models/downloader.go:725:	defer in.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/models/downloader.go:730:	defer out.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/observe/diagnostics.go:81:			f.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/observe/diagnostics.go:202:	if err := zw.Close(); err != nil {
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/observe/diagnostics.go:208:	if err := f.Close(); err != nil {
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/observe/logging.go:82:			_ = w.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/observe/logging.go:115:func (p *LogPipeline) Close() error {
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/observe/logging.go:118:	return p.writer.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/observe/logging.go:260:	cerr := w.file.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/observe/logging.go:281:func (w *rollingWriter) Close() error {
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/panel/attachments.go:225:	defer func() { _ = rc.Close() }()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/proc/boot_windows.go:97:			_ = job.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/proc/boot_windows.go:109:		_ = job.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/proc/boot_windows.go:147:		hooks.CloseJob = func(context.Context) error { return rt.Job.Close() }
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/proc/jobscope_windows.go:170:func (j *JobScope) Close() error {
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/statemachine/machine.go:169:func (m *Machine) Close() {
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/tools/bridge.go:628:// risk.OpenScope now hands back the *Scope that owns the close, and the bridge
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/tools/bridge.go:648:	b.scopes[taskID] = b.prov.OpenScope(taskID)
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/tools/bridge.go:706:		closeErr = scope.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/tools/fs.go:150:	defer f.Close() //nolint:errcheck // read-only handle, Close's error is not actionable
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/tools/fs.go:214:	defer dir.Close() //nolint:errcheck // read-only handle
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/tools/fs_write.go:302:		_ = tmp.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/tools/fs_write.go:322:	if err := tmp.Close(); err != nil {
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/tools/fs_write.go:507:	defer src.Close() //nolint:errcheck // read-only handle
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/tools/fs_write.go:520:	_ = tmp.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/winsec/winsec.go:118:		_ = f.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/winsec/winsec.go:123:		_ = f.Close()
+3df749607a0da1e70579f5c3abb71003350a45d2:internal/winsec/winsec.go:127:	if err := f.Close(); err != nil {
+# 开方丢了句柄的文件（handle 味：合方写什么都不算关）：
+#   DISCARD-HANDLE cmd/wisp/panel_assets.go
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   UNPAIRED cmd/wisp/panel_assets.go (开方调用点=1)
+#     note 丢句柄那一味点的名：开方没接住返回值，这一族的收尾结构上不可能
+# 合方只由泛用 Close() 命中的开方文件（这一味＝人来判那只 Close() 是不是这族句柄）：
+#   CLOSE-BY-GENERIC-CLOSE internal/tools/bridge.go
+# 未成对枚数＝1   （0＝这把尺没响／>0＝逐枚点名如上）
+# 基线枚数＝（没登记）   （票 171 AC#2：响＝实测 > 基线；want_n 登记的那一发就是这一行的右边）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=1   （本枚子句的响＝未成对枚数；0＝不响）
+想死在起跑线上：pair 腿 G5 没登记 want_n 基线——枚数不进判据＝票 171 AC#2 那枚洞还开着

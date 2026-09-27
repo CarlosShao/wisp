@@ -1,0 +1,15 @@
+G1	$ git grep -nE  'ToolRequest\{' 3df749607a0da1e70579f5c3abb71003350a45d2 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/agent/*
+G1b	$ git grep -nE  '\.Execute\(' 3df749607a0da1e70579f5c3abb71003350a45d2 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/agent/loop.go :!internal/tools/bridge.go
+G2	$ git grep -nE -w 'OpenTask|CloseTask' 3df749607a0da1e70579f5c3abb71003350a45d2 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/tools/bridge.go
+G3	$ git grep -nE  '^func \(l \*Loop\) [A-Z][A-Za-z0-9]*\(.*taskID' 3df749607a0da1e70579f5c3abb71003350a45d2 -- internal/agent
+G4	$ git grep -nE  'PassThroughUnclassifiedRisk:' 3df749607a0da1e70579f5c3abb71003350a45d2 -- *.go :!*_test.go
+G5	$ git grep -nEw 'OpenScope|CloseScope' 3df749607a0da1e70579f5c3abb71003350a45d2 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/*
+G5-正控	$ git grep -nEw 'OpenScope|CloseScope' 3df749607a0da1e70579f5c3abb71003350a45d2 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/* :!cmd/wisp/panel_assets.go
+G5-负一负	$ git grep -nEw 'OpenScope|CloseScope' 3df749607a0da1e70579f5c3abb71003350a45d2 -- internal/**/*.go cmd/**/*.go
+G6	$ git grep -nEw 'OpenTask|CloseTask' 3df749607a0da1e70579f5c3abb71003350a45d2 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/tools/bridge.go
+G6-正控	$ git grep -nEw 'OpenTask|CloseTask' 3df749607a0da1e70579f5c3abb71003350a45d2 -- internal/tools/bridge.go :!*_test.go
+G6-负一负	$ git grep -nEw 'OpenTask|CloseTask' 3df749607a0da1e70579f5c3abb71003350a45d2 -- internal/**/*.go cmd/**/*.go
+G7	$ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' 3df749607a0da1e70579f5c3abb71003350a45d2 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/plugin/disposal.go
+G7-正控	$ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' 3df749607a0da1e70579f5c3abb71003350a45d2 -- internal/plugin/disposal.go :!*_test.go
+G7-负一负	$ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' 3df749607a0da1e70579f5c3abb71003350a45d2 -- internal/**/*.go cmd/**/*.go
+附：G1	$ git grep -cE 'ToolRequest\{' 3df749607a0da1e70579f5c3abb71003350a45d2 -- internal cmd 里 *_test.go 的枚数

@@ -1,0 +1,4 @@
+UNPAIRED-REV:internal/memory/retention.go
+UNPAIRED-REV:internal/memory/retention_test.go
+UNPAIRED-REV:internal/observe/goroutine.go
+UNPAIRED-REV:internal/proc/shutdown.go

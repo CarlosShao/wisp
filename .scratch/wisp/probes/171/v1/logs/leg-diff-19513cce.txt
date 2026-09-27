@@ -1,0 +1,45 @@
+###### ① 命令行（射程本体）逐腿对照：old vs new（同一锚 19513ccefa45d51206871f00b3efa6ab19dd620a）
+-- G5 [SAME-pathspec]
+   old-cmd: $ git grep -nEw 'OpenScope|CloseScope' 19513ccefa45d51206871f00b3efa6ab19dd620a -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/*|
+   new-cmd: $ git grep -nEw 'OpenScope|CloseScope|Close\(\)' 19513ccefa45d51206871f00b3efa6ab19dd620a -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/*|
+-- G5-正控 [SAME-pathspec]
+   old-cmd: $ git grep -nEw 'OpenScope|CloseScope' 19513ccefa45d51206871f00b3efa6ab19dd620a -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/* :!cmd/wisp/panel_assets.go|
+   new-cmd: $ git grep -nEw 'OpenScope|CloseScope|Close\(\)' 19513ccefa45d51206871f00b3efa6ab19dd620a -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/* :!cmd/wisp/panel_assets.go|
+-- G5-负一负 [SAME-pathspec]
+   old-cmd: $ git grep -nEw 'OpenScope|CloseScope' 19513ccefa45d51206871f00b3efa6ab19dd620a -- internal/**/*.go cmd/**/*.go|
+   new-cmd: $ git grep -nEw 'OpenScope|CloseScope|Close\(\)' 19513ccefa45d51206871f00b3efa6ab19dd620a -- internal/**/*.go cmd/**/*.go|
+-- G6 [SAME-pathspec]
+   old-cmd: $ git grep -nEw 'OpenTask|CloseTask' 19513ccefa45d51206871f00b3efa6ab19dd620a -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/tools/bridge.go|
+   new-cmd: $ git grep -nEw 'OpenTask|CloseTask' 19513ccefa45d51206871f00b3efa6ab19dd620a -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/tools/bridge.go|
+-- G6-正控 [SAME-pathspec]
+   old-cmd: $ git grep -nEw 'OpenTask|CloseTask' 19513ccefa45d51206871f00b3efa6ab19dd620a -- internal/tools/bridge.go :!*_test.go|
+   new-cmd: $ git grep -nEw 'OpenTask|CloseTask' 19513ccefa45d51206871f00b3efa6ab19dd620a -- internal/tools/bridge.go :!*_test.go|
+-- G6-负一负 [SAME-pathspec]
+   old-cmd: $ git grep -nEw 'OpenTask|CloseTask' 19513ccefa45d51206871f00b3efa6ab19dd620a -- internal/**/*.go cmd/**/*.go|
+   new-cmd: $ git grep -nEw 'OpenTask|CloseTask' 19513ccefa45d51206871f00b3efa6ab19dd620a -- internal/**/*.go cmd/**/*.go|
+-- G7 [SAME-pathspec]
+   old-cmd: $ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' 19513ccefa45d51206871f00b3efa6ab19dd620a -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/plugin/disposal.go|
+   new-cmd: $ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' 19513ccefa45d51206871f00b3efa6ab19dd620a -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/plugin/disposal.go|
+-- G7-正控 [SAME-pathspec]
+   old-cmd: $ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' 19513ccefa45d51206871f00b3efa6ab19dd620a -- internal/plugin/disposal.go :!*_test.go|
+   new-cmd: $ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' 19513ccefa45d51206871f00b3efa6ab19dd620a -- internal/plugin/disposal.go :!*_test.go|
+-- G7-负一负 [SAME-pathspec]
+   old-cmd: $ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' 19513ccefa45d51206871f00b3efa6ab19dd620a -- internal/**/*.go cmd/**/*.go|
+   new-cmd: $ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' 19513ccefa45d51206871f00b3efa6ab19dd620a -- internal/**/*.go cmd/**/*.go|
+
+###### ② 逐腿 UNPAIRED 名册差集（comm -23＝退场／comm -13＝新增）
+-- G5 改前2枚 改后1枚 退场=[UNPAIRED:internal/tools/bridge.go ] 新增=[]
+-- G5-正控 改前1枚 改后0枚 退场=[UNPAIRED:internal/tools/bridge.go ] 新增=[]
+-- G5-负一负 改前9枚 改后8枚 退场=[UNPAIRED:internal/tools/bridge.go ] 新增=[]
+-- G6 改前1枚 改后1枚 退场=[] 新增=[]
+-- G6-正控 改前0枚 改后0枚 退场=[] 新增=[]
+-- G6-负一负 改前1枚 改后1枚 退场=[] 新增=[]
+-- G7 改前3枚 改后3枚 退场=[] 新增=[]
+-- G7-正控 改前0枚 改后0枚 退场=[] 新增=[]
+-- G7-负一负 改前4枚 改后4枚 退场=[] 新增=[]
+
+###### ③ 全门合计（九腿并集）退场/新增
+退场(只在改前)：
+UNPAIRED:internal/tools/bridge.go
+新增(只在改后)：
+改前枚数合计=21 改后枚数合计=18
