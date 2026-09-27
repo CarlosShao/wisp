@@ -153,6 +153,56 @@ tones and their dot colours) resolves through `src/styles/theme.css`'s
 library-vocabulary alias block; nothing was missing at mount time and no alias had
 to be added for it.
 
+### Vendored 2026-09-27 - the primitives, brought in by script
+
+`npm run vendor:beautifului -- <checkout-of-beautiful-ui>` -
+`scripts/vendor-beautifului.mjs`. The owner named this library the BASE one
+(react-bits is only for motion it has no piece for; shadcn is the last resort),
+and nine of its twenty-two primitives were sitting in the local clone unused while
+hand-written stand-ins existed for several of them.
+
+Why a script and not nine hand copies: a hand copy is what this ledger exists to
+prevent. The script applies the mechanical pass (header, `use client` removal,
+import re-pointing, default-to-named, LF, D23 glyph ASCII-izing), applies the
+gate-forced token substitutions as literal `subs` so a re-run REPRODUCES them, and
+**fails loudly** if a substitution stops matching - a silent no-op there is how a
+gate fix gets quietly reverted. Two dests are marked `adapted` and skipped without
+`--force` (GlideMenu, FilterTable): both had their markup hand-wrapped so their
+rows take the panel's one hover treatment.
+
+| File here | Component | Mounted? |
+|---|---|---|
+| `glide-menu.tsx` | GlideMenu (hover layer) | **yes** - sidebar (both blocks), command palette, right rail (launcher cards / review rows / scope menu / file tree), task monitor popover, workspace picker, approval queue, task list |
+| `search-list.tsx` | SearchList | no - it owns its query, the sidebar's field is page-controlled |
+| `filter-table.tsx` | FilterTable | no - its columns are not the task screen's columns |
+| `fine-tune-card.tsx` | FineTuneCard | no - it is a scrub-to-change inspector; the settings rows are read-mostly |
+| `chat-composer.tsx` | ChatComposer | no - it is a scripted demo chat; the real one is the session view |
+| `recommendation-card.tsx` | RecommendationCard | no - wants a "pick one and decide" surface we do not have |
+| `agent-screen.tsx` | AgentScreen | no - it wants a live screen capture, which the panel has no source for |
+| `flowchart.tsx` | Flowchart | no - it draws a task graph, and nothing produces one yet |
+| `insight-cards.tsx` | InsightCards | no - the cost/context meters are its place, and those wait on ticket 167 |
+| `records-table.tsx` | RecordsTable | no - the history view is its place, and that is ticket 166 |
+
+**Not vendored, and why** - two primitives import a SECOND icon library, which is
+a decision rather than a transformation:
+
+- `SidebarNav` pulls 13 icons from `@central-icons-react/...`
+- `SelectionActions` pulls from `iconoir-react`, and one of them is an icon
+  literally named `EmojiSatisfied`
+
+This tree draws with lucide (D29 picked it; the zero-emoji rule is satisfied by
+stroke icons). Vendoring either would mean adding a second icon set for a handful
+of glyphs, or mapping each one by hand. Both are in the local clone and can be
+vendored the moment that mapping is agreed.
+
+**Cost, measured rather than assumed**: the nine pieces add **0 bytes to the
+bundle** - nothing imports them yet, verified by grepping the built JS for their
+demo strings (`Restock mango sorbet`, `Forecast summer demand`, `Snow Cone`,
+`Liveline`: all absent). `liveline`, the npm package InsightCards needs, is 310 KB
+on disk and likewise absent from the bundle. A vendored-but-unmounted piece costs
+source, not runtime; the number changes the moment one is mounted, which is why it
+is written down here rather than left to be discovered.
+
 ## Gate notes for this tree (AC#4)
 
 - **ban #6 (the panel-side approval-decision identifier, `frontend/`)** - the very
