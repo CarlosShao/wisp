@@ -194,7 +194,7 @@ func TestFSEditStillLandsAnOldStartingAtByteZeroWithoutABOM(t *testing.T) {
 // swallow, so the BOM check's only reachable input stays "old covers EF BB BF".
 func TestFSEditCannotBeFedAPartialBOMThroughJSON(t *testing.T) {
 	root := sealableTempDir124(t)
-	original := utf8BOM + "alpha\n" // 7 bytes; byte index 2 is the BOM's last byte
+	original := utf8BOM + "alpha\n" // 9 bytes; byte index 2 is the BOM's last byte
 	target := filepath.Join(root, "bom-partial.txt")
 	if err := os.WriteFile(target, []byte(original), 0o600); err != nil {
 		t.Fatal(err)
