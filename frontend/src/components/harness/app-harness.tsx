@@ -109,6 +109,32 @@ export function AppHarness() {
     setFirstrunOpen(false);
   }
 
+  // Palette rows used to be buttons with no handler: the legend said Enter
+  // runs a command and nothing ran. Three of the fixture's rows name something
+  // this page can actually do, and those are wired. The rest (fs.delete on the
+  // recycle bin, re-reading config.toml, browsing a file) belong to the native
+  // side and stay inert here - the banner already says the values are demo
+  // data, and a row that visibly does nothing is better than one that fakes a
+  // result. Dropping to a comment rather than a stub keeps that honest.
+  function runPaletteCommand(item: { label: string }) {
+    switch (item.label) {
+      case "打开设置":
+        setSettingsOpen(true);
+        break;
+      case "切换明暗主题":
+        toggleTheme();
+        break;
+      case "查看最近任务":
+        setSessionId(SESSIONS[0]?.id ?? null);
+        break;
+      default:
+        // 打开审批中心 has no destination in this page yet: the approval centre
+        // is a product-panel view, and the harness has no equivalent route.
+        return;
+    }
+    setPaletteOpen(false);
+  }
+
   return (
     // h-full, not h-screen: main.tsx makes the document a flex column for this
     // page (?harness=1) so the demo banner can be a real row, and #root has
@@ -216,16 +242,19 @@ export function AppHarness() {
       {/* 浮层族：命令面板 / 工作区选择 / 设置 / 首启 / Toast */}
       {paletteOpen && (
         <div
+          aria-label="命令面板"
+          aria-modal="true"
           className="fixed inset-0 z-40 flex items-start justify-center bg-black/35 pt-[12vh]"
           onClick={(e) => {
             if (e.target === e.currentTarget) setPaletteOpen(false);
           }}
-          role="presentation"
+          role="dialog"
         >
           <div className="w-[560px] overflow-hidden rounded-card border border-line bg-surface shadow-overlay" style={{ animation: "fade-up 200ms var(--ease-out-strong) both" }}>
             <PaletteScreen
               groups={SHOWCASE_PALETTE_GROUPS}
               onQueryChange={setPaletteQuery}
+              onSelect={runPaletteCommand}
               query={paletteQuery}
             />
           </div>
