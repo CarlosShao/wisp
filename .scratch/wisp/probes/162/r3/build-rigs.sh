@@ -56,3 +56,35 @@ go test -count=1 -overlay="$V/overlay-m3.json" -v -run 'TestFSEdit' ./internal/t
 echo "  m3 rc=$? (expected NONZERO: the reverse ruler must be red under forced CRLF)"
 grep -E "(^|[[:space:]])--- FAIL" "$V/logs/m3-on-r3.log" | sed 's/^/  M3-RED    /'
 echo "== rigs built =="
+
+# ---------------------------------------------------------------- AC#4b ruler
+# M-4, re-derived HERE (162-v1's own mut/m4 is read-only evidence): take the one
+# staging call out of fs.edit and write the target directly with production's own
+# chunked writer, same WriteChunk, same kill seam. That is the falsification of
+# the byte-level assertion in the real-taskkill case - if the rig is a no-op the
+# ruler is decorative.
+echo "== M-4 on top of r3: temp+rename removed from fs.edit (AC#4b ruler) =="
+mkdir -p "$V/mut/m4"; cp internal/tools/fs_edit.go "$V/mut/m4/fs_edit.go"
+sub "$V/mut/m4/fs_edit.go" '	res := t.d.stageAndRename(ctx, target, strings.NewReader(updated), onUpdate)
+	res.Origin = target' '	se := t.d.ledger()
+	f, oerr := os.OpenFile(target, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600) // MUT-R3-M4 no staging file, direct write (same kill seam)
+	if oerr != nil {
+		return Result{Text: "打开目标失败：" + oerr.Error(), IsError: true, Origin: target}, nil
+	}
+	nw, werr := se.writeAll(ctx, f, strings.NewReader(updated), onUpdate, limit)
+	_ = f.Close()
+	res := Result{Origin: target, AppliedSteps: se.snapshot()}
+	if werr != nil {
+		res.Text = "写入未完成：" + werr.Error()
+		res.IsError = true
+	} else {
+		res.Text = fmt.Sprintf("fs.edit 已改写 %s：%d 枚编辑全部生效，%d 字节 / %d 行 → %d 字节 / %d 行（直接写，无临时文件）",
+			target, len(matches), len(content), countNL(content), nw, countNL(updated))
+	}' || exit 1
+proof "$V/mut/m4/fs_edit.go" 'MUT-R3-M4 no staging file' 't.d.stageAndRename' || exit 1
+ovl m4 "internal/tools/fs_edit.go" "$V/mut/m4/fs_edit.go"
+go test -count=1 -overlay="$V/overlay-m4.json" -v -run '^TestFSEditRealTaskkill' ./internal/tools/ > "$V/logs/m4-on-r3-ac4b.log" 2>&1
+echo "  m4 rc=$? (expected NONZERO: the target must stop being the original bytes)"
+grep -E "(^|[[:space:]])--- FAIL" "$V/logs/m4-on-r3-ac4b.log" | sed 's/^/  M4-RED    /'
+grep -E 'violated' "$V/logs/m4-on-r3-ac4b.log" | sed 's/^/  M4-CAUSE  /'
+echo "== all rigs built =="

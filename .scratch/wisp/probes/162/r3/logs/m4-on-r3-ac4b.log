@@ -1,0 +1,10 @@
+time=2026-09-27T16:36:25.413+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestFSEditRealTaskkillLeavesTheTargetWholeAndNamesTheStagingResidue
+    fs_edit_ac4b_kill_windows_test.go:200: AC#4b 子进程输出（应只有 taskkill 的强制终止，没有任何 Go 清理）："time=2026-09-27T16:36:25.463+08:00 level=INFO msg=\"winsec: sealing path resolver installed\" resolver=risk.c26Pipeline probes_passed=2\n"
+    fs_edit_ac4b_kill_windows_test.go:210: AC#4b(a) violated：硬杀之后目标不是原文。got 4 字节 41 4c 50 48
+        want 31 字节 61 6c 70 68 61 0a 62 72 61 76 6f 0a 63 68 61 72 6c 69 65 0a 64 65 6c 74 61 0a 65 63 68 6f 0a
+        （既不是原文也不是全量新内容＝半个新内容＝损坏）
+--- FAIL: TestFSEditRealTaskkillLeavesTheTargetWholeAndNamesTheStagingResidue (0.49s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.552s
+FAIL
