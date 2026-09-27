@@ -5,6 +5,15 @@
 #     响的腿本身不计进退码（G2、G5-负一负 今天按设计就该响）。
 #   ② 两族成对普查各成一腿：G6（OpenTask↔CloseTask）与 G7（Defer↔DisposalScope），
 #     形状照 G5＝主尺＋正控＋负一负三发都在；这两族另开反向（方向倒过来也算，见 want 的第三味 rev）。
+# 票 171 r1 追加（09-27，**只加声明、加味、加形状；一枚腿没删、一条 pathspec 射程没减**）：
+#   ① AC#2＝枚数进判据：新增 want_n <基线枚数>，pair 腿的响由「空／非空」变成「实测枚数 vs 基线枚数」；
+#     实测 > 基线 才 BAD（新增的未成对躲不进「非空」里了），实测 < 基线 打 SHR（变好了不恒红，但声明过期可见）。
+#     pair() 没拿到 want_n 就直接死（rc=4）——不让下一程新加一枚腿又把 AC#2 那枚洞开回去。
+#   ② AC#6＝合方词根认句柄那一形：G5 三腿的合方从写死的 'CloseScope' 换成 'CloseScope|Close\(\)'
+#     （票 160 之后 risk.OpenScope 交回 *Scope 句柄，收尾是句柄自带的 .Close()，见 bridge.go:706），
+#     并新增 pair() 的第四味 handle＝「开方把句柄丢了（`_ =` 或裸调用）⇒ 这一族在这枚文件里结构上关不掉，
+#     合方写什么都不算关」。G6／G7 明写 '-'：它们的开方（OpenTask 无返回值、Defer 返回 bool）不交句柄。
+#   两格撞同一枚 pair helper ⇒ 同一程做完（票面 171 AC#6 末行「别拆两程各改一次同一个函数」）。
 # 用法：bash .scratch/wisp/probes/154/gate-clauses.sh [锚点]   > 读数文件
 # 规矩：只做 grep／不写仓里任何东西；名册变了即门响。
 #   （G5 的 pair() 为求差集用了一次 bash herestring，临时件走 $TMPDIR、不落仓；
@@ -20,12 +29,16 @@ NT=':_test.go'
 # 形状（判据本体＝票面 AC#6 下面 09-27 09:1x 那个 > 块）：
 #   want <腿号> <ring|quiet> [rev]  —— 开跑前登记这一腿今天该不该响；rev＝成对普查两向都算。
 #   ring＝该响（run()：名册非空／pair()：未成对≥1 枚）／quiet＝不该响（零命中／0 枚）。
+# 票 171 AC#2 加味：
+#   want_n <枚数>                   —— 紧跟 want、只给 pair 腿登记【基线枚数】；这一腿的响从此是
+#                                     「实测枚数 > 基线」，不再是「实测非空」。run 腿用不上（它没有枚数）。
 # ⚠ 这一枚**不是**「任何一腿响⇒脚本非 0」：本文件里 G2、G5-负一负、G6、G6-负一负、G7、G7-负一负
 #   今天按设计就该响（G5 主尺那 1 枚是票 158 登记在册的活形状），把它们计进退码＝把票 161 AC#7
 #   刚收掉的恒红形状从另一扇门放回来（同一枚错，台账 A320／A321）。
 LEG='(还没 want)'
 EXPECT='quiet'
 REV=0
+COUNT=''
 AGG=''
 AGG_BAD=0
 LEG_COUNT=0
@@ -34,11 +47,30 @@ want() { # $1 腿号 $2 ring|quiet [$3 rev]
 	LEG="$1"
 	EXPECT="$2"
 	REV=0
+	COUNT=''
 	if [ "${3:-}" = "rev" ]; then REV=1; fi
 	if [ "$EXPECT" != ring ] && [ "$EXPECT" != quiet ]; then
 		echo "想死在起跑线上：腿 $LEG 的声明 '$EXPECT' 不是 ring／quiet 之一——声明打错＝聚合是枚哑弹" >&2
 		exit 3
 	fi
+}
+
+# want_n（票 171 AC#2）：pair 腿的基线枚数。放在 want 之后、pair 之前＝「开跑前先登记」这条没破。
+# 不校「quiet 却登记了 N>0」那种自相矛盾的声明——book_count 里【空/非空】那一味先它一步响，
+# 而且 flip-declaration.sh 正是靠改 want 那一行来验「声明还连着退码」，起跑线上把脚本打死会把
+# 它要证的那件事（聚合累计声明与实测不符）换成另一件事（脚本崩在登记处）。
+want_n() { # $1 基线枚数
+	if [ "$LEG" = '(还没 want)' ]; then
+		echo "想死在起跑线上：want_n 排在任何 want 之前——基线没有腿可登记" >&2
+		exit 3
+	fi
+	case "${1:-}" in
+	'' | *[!0-9]*)
+		echo "想死在起跑线上：腿 $LEG 的基线枚数 '${1:-}' 不是数字——枚数打成散文＝聚合是枚哑弹" >&2
+		exit 3
+		;;
+	esac
+	COUNT="$1"
 }
 
 book() { # $1 这一腿的实测（ring|quiet|git-grep-rc-N）；与 want 的声明比对，只把【不符】计进退码
@@ -54,14 +86,75 @@ book() { # $1 这一腿的实测（ring|quiet|git-grep-rc-N）；与 want 的声
 "
 }
 
-diffsets() { # $1 开方 pattern $2 合方 pattern $3 名册的调用行（已剔注释）
+# book_count（票 171 AC#2）：pair 腿的记账。$1＝实测未成对枚数（两向之和），$2＝那一发 git grep 的 rc。
+# 两味**并集**，一枚腿最多计一进退码（不重复计）：
+#   ① 票 161 AC#6① 那一味（空／非空 vs want 的 ring／quiet）——一字不改地继续校，
+#      否则 .scratch/wisp/probes/161/r6/flip-declaration.sh 那发「翻声明退码跟着变」会被我换成另一件事；
+#   ② 票 171 AC#2 那一味（实测枚数 vs want_n 基线）——同一条腿里新增的第二枚从此躲不进「非空」。
+# 实测 < 基线 打 SHR 不计退码：改好了不算言行不一（要算的话这把门就为好消息响，
+# 下一程就去放宽它——那正是票 161 AC#7／台账 A320、A321 收掉的恒红形状）。
+book_count() {
+	local n="$1" rrc="$2" verdict meas bin='quiet' why=''
+	if [ -z "$COUNT" ]; then
+		echo "想死在起跑线上：pair 腿 $LEG 没登记 want_n 基线——枚数不进判据＝票 171 AC#2 那枚洞还开着" >&2
+		exit 4
+	fi
+	meas="${n}枚"
+	[ "$n" -gt 0 ] && bin='ring'
+	if [ "$rrc" -gt 1 ]; then
+		# 尺自己坏了（git grep 出错，不是零命中）：这一腿的 0 枚没有资格说「都关好了」。
+		verdict='BAD '
+		meas="git-grep-rc-$rrc"
+	elif [ "$bin" != "$EXPECT" ]; then
+		# ① 票 161 AC#6① 那一味：响不响＝名册空不空，逐字照改前的判法（flip-declaration 连的是这一味）。
+		verdict='BAD '
+		why=' 因=空/非空那一味与声明不符（票 161 AC#6①）'
+	elif [ "$n" -gt "$COUNT" ]; then
+		verdict='BAD '
+		why=' 因=新增未成对（票 171 AC#2：实测 > 基线）'
+	elif [ "$n" -lt "$COUNT" ]; then
+		# 变好＝不算言行不一，但基线于是过期了，逐行打出来给下一程核。这一味**不**计进退码。
+		verdict='SHR '
+		why=' 注=读数变好了，基线过期，下一程把 want_n 核下来'
+	else
+		verdict='ok  '
+	fi
+	[ "$verdict" = 'BAD ' ] && AGG_BAD=$((AGG_BAD + 1))
+	LEG_COUNT=$((LEG_COUNT + 1))
+	AGG="$AGG# $verdict 腿=$LEG 声明=$EXPECT 基线=${COUNT}枚 实测=$meas$why
+"
+}
+
+
+# discarded_files（票 171 AC#6 的 handle 味）：开方那一行没把返回的句柄接下来。
+# 两种拼写：(1) 开方之前整行一个赋值号都没有＝裸调用，返回值落地即弃；
+#           (2) 赋值给 `_`＝显式丢（今天生产码里那一枚在册活形状 cmd/wisp/panel_assets.go 就是这一形）。
+# 句柄被丢＝这一族的收尾在这枚文件里【结构上不可能发生】，所以合方写什么都不该认它关过。
+# 先剔定义行：`func (p *Provenance) OpenScope(...)` 那一行天生没有赋值号，把它当调用点
+# 就是拿声明说成读数（G5-负一负那枚射程连 internal/risk 的定义本体一起吃，171-r1 合成树的
+# 样本也这么写——两处都会踩；本程实测踩过一次，读数见证据件 §3 的改前读数那一格）。
+# 只这一处实现：pair() 用它求名册、也用它打批注（同源拷贝逐枚有归属那起事故的教训）。
+discarded_files() { # $1 开方 pattern $2 调用行 -> 丢句柄的文件清单
+	printf '%s\n' "$2" | grep -Ew "$1" |
+		grep -vE ':[0-9]+:[[:space:]]*func[[:space:]]' |
+		grep -E "(^[^=]*)$1|(^|[[:space:];{(])_[[:space:]]*=[^;]*$1" |
+		cut -d: -f2 | sort -u || true
+}
+
+diffsets() { # $1 开方 pattern $2 合方 pattern $3 名册的调用行（已剔注释）[$4 强制点名的文件清单]
 	# 求差集那一段独立成枚函数，理由有两条：pair() 的每一腿吃它；票 161 AC#6②（乙）那发
 	# 「文本喂入」样本也吃同一份代码——证算术的尺与产生读数的尺于是不会是两把。
 	# stdout＝「$1 出现过、同一文件里 $2 一次都没出现过」的文件清单（换行分隔，无尾随换行）。
-	local o c f out=''
+	# $4（票 171 AC#6）＝就算 $2 出现过也**照样点名**的文件（丢句柄那一族用）；不传＝行为逐字同改前。
+	local o c f out='' force="${4:-}"
 	o="$(printf '%s\n' "$3" | grep -Ew "$1" | cut -d: -f2 | sort -u || true)"
 	c="$(printf '%s\n' "$3" | grep -Ew "$2" | cut -d: -f2 | sort -u || true)"
 	for f in $o; do
+		if [ -n "$force" ] && printf '%s\n' "$force" | grep -qxF "$f"; then
+			out="$out$f
+"
+			continue
+		fi
 		printf '%s\n' "$c" | grep -qxF "$f" || out="$out$f
 "
 	done
@@ -88,16 +181,18 @@ run() { # $1 标题 $2 pattern $3 额外 git-grep 旗标 $4.. pathspecs
 	book "$meas"
 }
 
-pair() { # 成对普查（票 158 G5 用）：$1 标题 $2 开方 pattern $3 合方 pattern $4.. pathspecs
+pair() { # 成对普查：$1 标题 $2 开方 pattern $3 合方 pattern $4 handle|- $5.. pathspecs
 	# 与 run() 的区别：run() 的响不响看名册非空，pair() 的响不响看「开了却没在同一文件关过」。
 	# 一条 git grep 表达不出成对，所以这一枚是【一把尺 ＋ 两次求差集】；
 	# 锚点、pathspec 与逐行可 diff 的名册本体都照 run() 的形状。
-	local title="$1" open="$2" close="$3"; shift 3
+	# $4（票 171 AC#6）＝handle 时开方丢句柄的文件强制点名；'-' ＝不启用（G6/G7 的开方不交句柄）。
+	# 响的粒度（票 171 AC#2）＝want_n 登记的基线枚数，不再是非空——见 book_count()。
+	local title="$1" open="$2" close="$3" mode="$4"; shift 4
 	echo
 	echo "## $title"
 	echo "\$ git grep -nEw '$open|$close' $A -- $*"
 	# shellcheck disable=SC2068
-	local roster rrc calls unpaired="" runpaired="" n rn f oc deleg rncalls meas
+	local roster rrc calls unpaired="" runpaired="" n rn f oc deleg rncalls meas disc='' generic='' gk
 	roster="$(git grep -nEw "$open|$close" "$A" -- $@ 2>/dev/null)"; rrc=$?
 	echo "# 逐行读数（名册本体，供下一程 diff；这一份含注释行）："
 	if [ -n "$roster" ]; then printf '%s\n' "$roster"; else echo "#   （空）"; fi
@@ -105,8 +200,18 @@ pair() { # 成对普查（票 158 G5 用）：$1 标题 $2 开方 pattern $3 合
 	# 不剔的下场是本程实测到的——它点到了票 158 r1 自己测试文件里那句解释 Mark 机理的注释，
 	# 一把会因为散文而响的尺不叫读数（详证据件 §2.4）。名册本体照旧带注释，diff 不受影响。
 	calls="$(printf '%s\n' "$roster" | grep -vE ':[0-9]+:[[:space:]]*(//|/\*|\*)' || true)"
+	# 票 171 AC#6：handle 味＝先求「开方把句柄丢了」的文件清单，交给 diffsets 当强制点名那一味。
+	if [ "$mode" = handle ]; then
+		disc="$(discarded_files "$open" "$calls")"
+		if [ -n "$disc" ]; then
+			echo "# 开方丢了句柄的文件（$mode 味：合方写什么都不算关）："
+			printf '%s\n' "$disc" | sed 's|^|#   DISCARD-HANDLE |'
+		fi
+		# 泛用 Close() 命中的文件：合方认两形之后，这一味要单独说得出来，别混进「关好了」。
+		generic="$(printf '%s\n' "$calls" | grep -Ew 'Close\(\)' | cut -d: -f2 | sort -u || true)"
+	fi
 	# 票 161 AC#6②：求差集那段交给 diffsets()（下面（乙）文本喂入那发样本吃的是同一份算术）。
-	unpaired="$(diffsets "$open" "$close" "$calls")"
+	unpaired="$(diffsets "$open" "$close" "$calls" "$disc")"
 	n="$(printf '%s' "$unpaired" | grep -c . || true)"
 	echo "# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）："
 	if [ -n "$unpaired" ]; then
@@ -116,9 +221,25 @@ pair() { # 成对普查（票 158 G5 用）：$1 标题 $2 开方 pattern $3 合
 			# 委托关闭的形状：同一文件里出现另一族的收尾动词 ⇒ 人来判「真漏」还是「委托」
 			deleg="$(git grep -lEw 'CloseTask|Defer' "$A" -- "$f" 2>/dev/null || true)"
 			echo "#   UNPAIRED $f (开方调用点=${oc:-0})${deleg:+  # 同文件另见收尾动词，判「真漏／委托」}"
+			if [ "$mode" = handle ] && printf '%s\n' "$disc" | grep -qxF "$f"; then
+				echo "#     note 丢句柄那一味点的名：开方没接住返回值，这一族的收尾结构上不可能"
+			fi
 		done <<< "$unpaired"
 	else
 		echo "#   （空）"
+	fi
+	# 票 171 AC#6：合方认下句柄那一形之后，「这一文件的关是谁关的」必须说出来给人判——
+	# 泛用 Close() 是本仓到处都是的动词（现量：非测试生产码 40 枚文件里有 Close()），
+	# 一把只按文件求差集的尺分辨不出那只 Close() 是不是这族的句柄，所以它别想安静地混过去。
+	if [ "$mode" = handle ] && [ -n "$generic" ]; then
+		gk="$(printf '%s\n' "$calls" | grep -Ew "$open" | cut -d: -f2 | sort -u |
+			while IFS= read -r f; do [ -z "$f" ] && continue
+				printf '%s\n' "$generic" | grep -qxF "$f" && printf '%s\n' "$f"
+			done | sort -u)"
+		if [ -n "$gk" ]; then
+			echo "# 合方只由泛用 Close() 命中的开方文件（这一味＝人来判那只 Close() 是不是这族句柄）："
+			printf '%s\n' "$gk" | sed 's|^|#   CLOSE-BY-GENERIC-CLOSE |'
+		fi
 	fi
 	if [ "$REV" = 1 ]; then
 		# 票 161 AC#6②「方向倒过来也算」：合方出现过、同一文件里开方一次都没有，也算一枚未成对。
@@ -142,13 +263,12 @@ pair() { # 成对普查（票 158 G5 用）：$1 标题 $2 开方 pattern $3 合
 		n=$((n + rn))
 	fi
 	echo "# 未成对枚数＝$n   （0＝这把尺没响／>0＝逐枚点名如上）"
+	echo "# 基线枚数＝${COUNT:-（没登记）}   （票 171 AC#2：响＝实测 > 基线；want_n 登记的那一发就是这一行的右边）"
 	echo "# git grep rc=$rrc（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）"
 	echo "# rc=$n   （本枚子句的响＝未成对枚数；0＝不响）"
-	# 票 161 AC#6①：pair() 这一形的响＝未成对枚数≥1（两向之和，若这一腿开了 rev）。
-	meas='quiet'
-	[ "$n" -gt 0 ] && meas='ring'
-	if [ "$rrc" -gt 1 ]; then meas="git-grep-rc-$rrc"; fi
-	book "$meas"
+	# 票 161 AC#6①＋票 171 AC#2：pair 腿的实测交给 book_count——它拿 want_n 的基线比枚数，
+	# 没登记基线就直接死（rc=4），所以这一形不可能被下一程新加的腿悄悄退回「空／非空」。
+	book_count "$n" "$rrc"
 }
 
 # ---- 票 161 AC#6②（乙）文本喂入模式：只证「求差集那段算术」不撒谎 -------------------
@@ -196,18 +316,26 @@ run "G4 生产组合根打开 L0 直通（PassThroughUnclassifiedRisk 的字面�
 # G5（票 158 AC#2 新增）射程＝OpenScope↔CloseScope 的成对普查。
 # G1–G4 盯的是「宿主派发工具却没关环路那一枚 id」那一族（过桥那条腿），
 # 而「不过桥、直接对 risk 层开一枚 scope」这一形今天有活样板：
-#   cmd/wisp/panel_assets.go:232  prov.OpenScope(taintSourceScopeID)   且 cmd/wisp 下 CloseScope 零枚。
+#   cmd/wisp/panel_assets.go:243  _ = prov.OpenScope(taintSourceScopeID)   且该文件里 Close()/CloseScope 零枚。
 # 排掉 internal/risk/* 的理由：OpenScope/CloseScope 的**定义**在那儿（票 158 地界明令只盘调用者），
 # 把定义算成调用点会让名册每改一行注释就响一次，那是噪音不是读数。
-# G5 主尺今天【该响】，且响 1 枚：cmd/wisp/panel_assets.go:232 开了 C25 scope 却没在同一文件关。
+# G5 主尺今天【该响】，且响 1 枚：cmd/wisp/panel_assets.go:243 开了 C25 scope 却没在同一文件关。
 # 这一枚是票 158 登记在册的活形状、不是本票的靶子（票面 AC#6 那条红线），本程一字节生产码都没动。
+# 票 171 AC#6 改的两味（射程一条没减）：合方 'CloseScope' → 'CloseScope|Close\(\)'，
+#   因为票 160 之后 CloseScope 这个词根在生产码里【已经一枚都不剩】（现量：git grep -n CloseScope <锚>
+#   -- internal cmd 排测试 ⇒ rc=1 零命中；唯一的收尾是 internal/tools/bridge.go:706 的 scope.Close()），
+#   只写 CloseScope 的尺于是把「用句柄正常关掉」的文件一律读成漏；另一味＝handle（丢句柄强制点名）。
 want G5 ring
+want_n 1
 pair "G5 OpenScope↔CloseScope 成对普查：生产码里开了 C25 scope 却没在同一文件关过的名册（排 internal/risk 的定义本体、排 *_test.go）" \
-	'OpenScope' 'CloseScope' "$GO" "$GO2" ':!*_test.go' ':!internal/risk/*'
+	'OpenScope' 'CloseScope|Close\(\)' handle "$GO" "$GO2" ':!*_test.go' ':!internal/risk/*'
 
 echo
 echo "## G5 正控（形状照 G1–G4 的「正控先跑」：同一把尺打在已知「开又合」的样本上，必须不响）"
-echo "# 样本＝internal/tools/bridge.go（:642 prov.OpenScope 与 :691 prov.CloseScope 同文件成对）"
+echo "# 样本＝internal/tools/bridge.go（:648 b.scopes[taskID] = b.prov.OpenScope(taskID) 与"
+echo "#   :706 closeErr = scope.Close() 同文件成对——票 160 之后收尾是句柄自带的那枚 Close，"
+echo "#   行号＝09-27 本程在锚上现量（git grep -nE 'OpenScope|scope\\.Close\\(\\)' <锚> -- internal/tools/bridge.go），"
+echo "#   改前那句注释写的 :642/:691 已经因为这次落地位移过，出处＝票 171 票面 AC#6 与台账 A329）"
 echo "# 写法上的两条自纠（都是本程实测撞出来的，不是设想的）："
 echo "#   (1) pathspec 必须与主尺同形再逐条排除。第一版图省事写成 'internal/tools/**/*.go'，"
 echo "#       实测 git grep rc=1、名册空、未成对 0——那是一枚**根本产不出读数的装饰腿**，"
@@ -217,15 +345,20 @@ echo "#                          同尺 -- internal/tools/*.go  => rc=0 命中 b
 echo "#   (2) 必须排 *_test.go。第一版没排，正控自己被本程新测试里那句解释 Mark 机理的**注释**"
 echo "#       点中——那是假阳性。成对判据从此只吃调用点（见 pair() 里剔注释那一行）。"
 want G5pos quiet
+want_n 0
 pair "G5-正控 同尺＝主尺射程，只多排掉主尺今天点名的那一枚 panel_assets.go ⇒ 剩下的开方全是 balanced 样本" \
-	'OpenScope' 'CloseScope' "$GO" "$GO2" ':!*_test.go' ':!internal/risk/*' ':!cmd/wisp/panel_assets.go'
+	'OpenScope' 'CloseScope|Close\(\)' handle "$GO" "$GO2" ':!*_test.go' ':!internal/risk/*' ':!cmd/wisp/panel_assets.go'
 
 echo
 echo "## G5 负一负（同尺摘掉「排测试＋排定义」那两条 ⇒ 今日应非空，证明这把尺吃得住这个形状、不是结构上产不出读数的装饰）"
-# G5-负一负【按设计就该响】（今天 5 枚）：这一腿的作用就是证明这把尺吃得住这个形状。
+# G5-负一负【按设计就该响】：这一腿的作用就是证明这把尺吃得住这个形状。
+# 枚数＝本程现量：改前 9 枚 → 改后 8 枚，退场的只有 internal/tools/bridge.go 那一枚
+#   （它在 :648 接住句柄、在 :706 用句柄关掉——认得句柄那一形之后这一枚按设计该退场）；
+#   其余 8 枚逐枚还在被点名，命令与两读见 docs/evidence/s1/171-pair-legs-r1.md §4。
 want G5neg ring
+want_n 8
 pair "G5-负一负 同尺不过滤任何文件" \
-	'OpenScope' 'CloseScope' "$GO" "$GO2"
+	'OpenScope' 'CloseScope|Close\(\)' handle "$GO" "$GO2"
 
 echo
 echo "## 附：G1 的负一负（同尺摘掉排测试那一条 ⇒ 今日即非空，证明模式吃得住这个形状，不是结构上产不出读数的装饰）"
@@ -242,6 +375,10 @@ git grep -nE '\.Execute\(' "$A" -- "$GO" "$GO2" ':!*_test.go'
 # 形状照 G5＝主尺＋正控＋负一负三发都在；want 的第三味 rev＝「方向倒过来也算」。
 # 下面注释里那几处行号（bridge.go:559／:633／:684、disposal.go:129／:186／:191／:253、
 # run.go:563）是本程 git grep 现量的，命令与全份读数见 docs/evidence/s1/161-gate-aggregate-r6.md。
+# ⚠ 票 171 r1 现量补一句：那几处行号里 bridge.go 的三枚已经被票 160 的落地挪过——
+#   本程在锚上重量＝OpenTask 的调用点 :648、定义本体 :639（OpenTask）与 :689（CloseTask）、
+#   收尾 :706。命令：git grep -nE 'func \(b \*Bridge\) (Open|Close)Task|OpenScope|scope\.Close\(\)' <锚> -- internal/tools/bridge.go
+#   （台账 A329 那两行说的就是这种位移；这里不改 161 写下的字，只把现量并排放在旁边。）
 # =====================================================================================
 
 echo
@@ -254,8 +391,9 @@ echo "#   正向那 0 枚**不是**「都关好了」：开方唯一的生产调
 echo "#   正好落在被排掉的定义本体文件里，这条射程的结构就没有开方可数——所以这一腿的响只由反向撑着，"
 echo "#   「新造一发开了却没关的它必须响」那件事交给（甲）合成树那发主证，不靠这条射程的空 0。"
 want G6 ring rev
+want_n 1
 pair "G6 主尺 OpenTask↔CloseTask 成对普查（排 *_test.go、排定义本体 internal/tools/bridge.go；两向都算）" \
-	'OpenTask' 'CloseTask' "$GO" "$GO2" ':!*_test.go' ':!internal/tools/bridge.go'
+	'OpenTask' 'CloseTask' - "$GO" "$GO2" ':!*_test.go' ':!internal/tools/bridge.go'
 
 echo
 echo "## G6 正控（同一把尺打在已知「开了又关」的样本上，两向都必须不响）"
@@ -263,8 +401,9 @@ echo "# 样本＝internal/tools/bridge.go 自己：:559 的 b.OpenTask 与 :684 
 echo "# 这条射程是真吃得住的（本程现量 git grep rc=0、剔注释后 3 行调用点），不是「射程里根本没这东西」"
 echo "#   那种空 0——那种 0 不算正控（票 154 AC#3 就是拿「零区别」否掉装饰腿的，G5 的自纠 (1) 同一条）。"
 want G6pos quiet rev
+want_n 0
 pair "G6-正控 同尺只放已知「开又合」的那一枚 internal/tools/bridge.go ⇒ 两向都必须 0 枚" \
-	'OpenTask' 'CloseTask' 'internal/tools/bridge.go' ':!*_test.go'
+	'OpenTask' 'CloseTask' - 'internal/tools/bridge.go' ':!*_test.go'
 
 echo
 echo "## G6 负一负（同尺摘掉「排测试＋排定义」两条 ⇒ 今日应非空，证明这把尺吃得住这个形状）"
@@ -272,8 +411,9 @@ echo "# 今日真实枚数：正向 0 枚／反向 1 枚＝cmd/wisp/run.go。测
 echo "#   （internal/tools/bridge_scope_open_ticket158_test.go），所以摘掉过滤也点不出正向未成对——"
 echo "#   本程不把它谎称成点得出；正向那一向的证＝（甲）合成树。"
 want G6neg ring rev
+want_n 1
 pair "G6-负一负 同尺不过滤任何文件" \
-	'OpenTask' 'CloseTask' "$GO" "$GO2"
+	'OpenTask' 'CloseTask' - "$GO" "$GO2"
 
 echo
 echo "## G7 主尺（票 161 AC#6②第二族）Defer↔DisposalScope：挂了收尾却没绑到声明的 scope／反向＝拿着 scope 却没挂收尾"
@@ -290,24 +430,27 @@ echo "#   反向 3 枚＝internal/memory/retention.go、internal/observe/gorouti
 echo "#   反向这 3 枚里 retention.go:98 是真拿 scope 的签名，另两枚各有一味是「代码行尾随注释」被算进"
 echo "#   调用行的已知粗糙处（pair() 只剔以 // 开头的整行）——逐枚人来判真漏／委托，本程不替它判。"
 want G7 ring rev
+want_n 3
 pair "G7 主尺 Defer↔DisposalScope 成对普查（排 *_test.go、排定义本体 internal/plugin/disposal.go；两向都算）" \
-	'Defer(Named)?' '(New)?DisposalScope' "$GO" "$GO2" ':!*_test.go' ':!internal/plugin/disposal.go'
+	'Defer(Named)?' '(New)?DisposalScope' - "$GO" "$GO2" ':!*_test.go' ':!internal/plugin/disposal.go'
 
 echo
 echo "## G7 正控（同一把尺打在已知「收尾与 scope 同文件」的样本上，两向都必须不响）"
 echo "# 样本＝internal/plugin/disposal.go 自己：Defer／DeferNamed 与 DisposalScope 同文件 ⇒ 两向 0 枚，"
 echo "#   且名册非空（本程现量 git grep rc=0），不是「射程里没这东西」那种空 0。"
 want G7pos quiet rev
+want_n 0
 pair "G7-正控 同尺只放定义本体 internal/plugin/disposal.go 这一枚已知「两向都有」的样本" \
-	'Defer(Named)?' '(New)?DisposalScope' 'internal/plugin/disposal.go' ':!*_test.go'
+	'Defer(Named)?' '(New)?DisposalScope' - 'internal/plugin/disposal.go' ':!*_test.go'
 
 echo
 echo "## G7 负一负（同尺不过滤任何文件 ⇒ 今日应非空，证明这把尺吃得住这个形状）"
 echo "# 今日真实枚数：正向 1 枚＝internal/risk/provenance_test.go（出现 Defer 却没在同一文件出现"
 echo "#   DisposalScope 这个词）／反向 3 枚＝主尺那三枚 ⇒ 合计 4 枚。"
 want G7neg ring rev
+want_n 4
 pair "G7-负一负 同尺不过滤任何文件" \
-	'Defer(Named)?' '(New)?DisposalScope' "$GO" "$GO2"
+	'Defer(Named)?' '(New)?DisposalScope' - "$GO" "$GO2"
 
 # =====================================================================================
 # 票 161 AC#6① —— 聚合退码。放在文件最后一格，是因为前面每一腿都得保持「逐行可 diff」原样。
@@ -319,7 +462,10 @@ echo "## 聚合退码（票 161 AC#6①）：只累计【声明与实测不符�
 echo "# 判据**不是**「任何一腿响⇒脚本非 0」——见文件头 want 那一段与本票票面 09-27 09:1x 的 > 块："
 echo "#   G2／G5-负一负／G6／G6-负一负／G7／G7-负一负 今天按设计就该响，把它们计进退码"
 echo "#   ＝把票 161 AC#7 刚收掉的恒红形状从另一扇门放回来（同一枚错，台账 A320／A321）。"
-echo "# 每腿判定（ok＝说到做到／BAD＝言行不一；这一份同样逐行可 diff）："
+echo "# 每腿判定（ok＝说到做到／BAD＝言行不一／SHR＝读数比基线好＝基线过期但不算言行不一；这一份同样逐行可 diff）："
+echo "# 票 171 AC#2：pair 腿多两列——基线＝want_n 登记的枚数、实测＝这一腿自己数出来的枚数。"
+echo "#   退码累计的是【声明与实测不符】，而 pair 腿的「不符」现在有两味：空/非空（票 161 AC#6①）与"
+echo "#   实测>基线（票 171 AC#2）。run 腿没有枚数，行形状逐字照改前。"
 if [ -n "$AGG" ]; then printf '%s' "$AGG"; fi
 echo "# 腿数＝$LEG_COUNT 声明与实测不符＝$AGG_BAD"
 echo "# 聚合退码＝$AGG_BAD   （0＝每一腿的响与不响都和自己登记的声明一致；>0＝有腿言行不一）"

@@ -1,0 +1,60 @@
+flip-declaration.sh: anchor 19513ccefa45d51206871f00b3efa6ab19dd620a (the gate reads the COMMITTED tree at this anchor, never the working tree)
+== (0) baseline: committed declarations, untouched
+  FAIL  14 legs each say what it does -> rc=1 (want zero)
+   legs booked: 腿数＝14   mismatched: 声明与实测不符＝1
+== flip 1: G2 ring->quiet (run-shaped; its roster is non-empty today)
+   the declaration lines this run differs by:
+   < want G2 ring
+   > want G2 quiet
+  ok    G2 ring->quiet (run-shaped; its roster is non-empty today) -> rc=2 (want nonzero)
+   which legs the aggregate called out (rc=2):
+   # BAD  腿=G2 声明=quiet 实测=ring
+   # BAD  腿=G5pos 声明=quiet 实测=ring
+== flip 2: G5neg ring->quiet (pair-shaped; 5 unpaired by design today)
+   the declaration lines this run differs by:
+   < want G5neg ring
+   > want G5neg quiet
+  ok    G5neg ring->quiet (pair-shaped; 5 unpaired by design today) -> rc=2 (want nonzero)
+   which legs the aggregate called out (rc=2):
+   # BAD  腿=G5pos 声明=quiet 实测=ring
+   # BAD  腿=G5neg 声明=quiet 实测=ring
+== flip 3: G7 ring->quiet (new AC#6 leg; 3 unpaired today, reverse direction only)
+   the declaration lines this run differs by:
+   < want G7 ring rev
+   > want G7 quiet rev
+  ok    G7 ring->quiet (new AC#6 leg; 3 unpaired today, reverse direction only) -> rc=2 (want nonzero)
+   which legs the aggregate called out (rc=2):
+   # BAD  腿=G5pos 声明=quiet 实测=ring
+   # BAD  腿=G7 声明=quiet 实测=ring
+== flip 4: G1 quiet->ring (run-shaped; zero hits today)
+   the declaration lines this run differs by:
+   < want G1 quiet
+   > want G1 ring
+  ok    G1 quiet->ring (run-shaped; zero hits today) -> rc=2 (want nonzero)
+   which legs the aggregate called out (rc=2):
+   # BAD  腿=G1 声明=ring 实测=quiet
+   # BAD  腿=G5pos 声明=quiet 实测=ring
+== flip 5: G7pos quiet->ring (new AC#6 positive control; 0 unpaired today)
+   the declaration lines this run differs by:
+   < want G7pos quiet rev
+   > want G7pos ring rev
+  ok    G7pos quiet->ring (new AC#6 positive control; 0 unpaired today) -> rc=2 (want nonzero)
+   which legs the aggregate called out (rc=2):
+   # BAD  腿=G5pos 声明=quiet 实测=ring
+   # BAD  腿=G7pos 声明=ring 实测=quiet
+== flip 6: G1 quiet->ring AND G4 quiet->ring together (expect rc to be 2, not 1)
+   the declaration lines this run differs by:
+   < want G1 quiet
+   > want G1 ring
+   < want G4 quiet
+   > want G4 ring
+  FAIL  G1 quiet->ring AND G4 quiet->ring together (expect rc to be 2, not 1) -> rc=3 (want 2)
+   which legs the aggregate called out (rc=3):
+   # BAD  腿=G1 声明=ring 实测=quiet
+   # BAD  腿=G4 声明=ring 实测=quiet
+   # BAD  腿=G5pos 声明=quiet 实测=ring
+== (restore) pristine bytes again, same anchor
+  FAIL  nothing flipped any more -> rc=1 (want zero)
+  ok    restore matches the baseline (rc=1)
+
+flip-declaration.sh: RED - at least one assertion above failed. A declaration that stopped matching today is a finding for the next slice, not a knob to turn.

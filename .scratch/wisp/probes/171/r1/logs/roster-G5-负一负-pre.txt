@@ -1,0 +1,9 @@
+#   UNPAIRED cmd/wisp/panel_assets.go 
+#   UNPAIRED internal/risk/provenance.go 
+#   UNPAIRED internal/risk/provenance_syncdirs_other_test.go 
+#   UNPAIRED internal/risk/provenance_test.go 
+#   UNPAIRED internal/risk/syncdirs_redteam_windows_test.go 
+#   UNPAIRED internal/risk/syncdirs_test.go 
+#   UNPAIRED internal/risk/syncdirs_windows_test.go 
+#   UNPAIRED internal/risk/taintmatch_test.go 
+#   UNPAIRED internal/tools/bridge.go 

@@ -1,0 +1,60 @@
+# 写面自证（禁改名单零字节）：2026-09-27T16:20:05+08:00  锚 19513ccefa45d51206871f00b3efa6ab19dd620a
+$ git status --porcelain -- internal cmd tools .github frontend design docs/PLAN.md docs/specs docs/reports .scratch/wisp/probes/160 .scratch/wisp/probes/161 .scratch/wisp/probes/162
+ M .scratch/wisp/probes/161/r6/logs/flip-1.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-2.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-3.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-4.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-5.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-6.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-baseline.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-restored.txt
+ D design/assets/base.css
+ D design/assets/icons.js
+ D design/assets/theme.js
+ D design/assets/tokens.css
+ M design/doubao/README.md
+ M design/doubao/demo/app.js
+ M design/doubao/demo/index.html
+ M design/doubao/demo/styles.css
+ D design/index.html
+ D design/screens/approval.html
+ D design/screens/ball.html
+ D design/screens/chat.html
+ D design/screens/config.html
+ D design/screens/cost.html
+ D design/screens/firstrun.html
+ D design/screens/palette.html
+ D design/screens/privacy.html
+ D design/screens/security.html
+ D design/screens/states.html
+ D design/screens/tasks.html
+?? .scratch/wisp/probes/161/r2/__pycache__/
+?? .scratch/wisp/probes/161/r2/ctl/
+?? .scratch/wisp/probes/161/r5/negative-control/
+?? .scratch/wisp/probes/162/r3/
+?? .scratch/wisp/probes/162/v1-baseline-gotest.txt
+?? design/doubao/01-ball-states.jpg
+?? design/doubao/demo/lib/
+?? design/doubao/demo/rb-files.js
+?? design/doubao/demo/rb-plugins.js
+?? design/doubao/demo/rb-review.js
+?? design/doubao/demo/rb-terminal.js
+?? design/doubao/demo/rightbar.js
+?? design/doubao/demo/screens/home.js
+?? design/doubao/demo/screenshots/
+?? design/doubao/demo/sidebar.js
+?? design/old/
+#（以上若只有 probes/161 的既有未跟踪件＝本程没动过任何一枚；本程实际写了：）
+$ git status --porcelain -- .scratch/wisp/probes/154/ .scratch/wisp/probes/171/ docs/evidence/s1/
+ M .scratch/wisp/probes/154/gate-clauses.sh
+ M docs/evidence/s1/152-subject-death-never-measured-r1-accept-r1.md
+?? .scratch/wisp/probes/171/r1/
+?? docs/evidence/s1/162-fs-edit-r3.md
+?? docs/evidence/s1/171-pair-legs-r1.md
+# 泛用 Close() 的枚数（正确 pathspec 形状，与尺同形）
+$ git grep -lEw 'Close\(\)' 19513ccefa45d51206871f00b3efa6ab19dd620a -- 'internal/**/*.go' 'cmd/**/*.go' ':!*_test.go' | wc -l
+42
+$ git grep -n CloseScope 19513ccefa45d51206871f00b3efa6ab19dd620a -- internal cmd ':(exclude)*_test.go' => 
+19513ccefa45d51206871f00b3efa6ab19dd620a:internal/risk/provenance.go:361:// functions — OpenScope(id) and CloseScope(id) — so any caller anywhere could
+19513ccefa45d51206871f00b3efa6ab19dd620a:internal/risk/provenance.go:562:// by-id CloseScope gone, the only way to reach "not registered" is a handle
+# rc=0 （1＝生产码零命中）

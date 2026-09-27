@@ -1,0 +1,62 @@
+r1-pair-shapes.sh: pre-fix gate = git show 19513ccefa45d51206871f00b3efa6ab19dd620a:.scratch/wisp/probes/154/gate-clauses.sh  (written to /tmp/wisp-171-r1.1ynhvl/gate-pristine.sh)
+r1-pair-shapes.sh: fixed gate   = /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/154/gate-clauses.sh (working copy, uncommitted at the time of writing)
+r1-pair-shapes.sh: synthetic tree (deliberately OUTSIDE /d/work/workspace/projects plans/Wisp) at /tmp/wisp-171-r1-tree.AtZA2a
+
+===== PART 1 (AC#6): does the合方 side recognise the handle shape? =====
+warning: in the working copy of 'internal/fake171/a_paired.go', LF will be replaced by CRLF the next time Git touches it
+-- state 'A: opened via handle, handle closed in the same file (balanced)' committed at 4834943 (synthetic tree, outside /d/work/workspace/projects plans/Wisp)
+  ok    generated samples are gofumpt-clean (v0.12.0 (go1.27.1))
+   pristine G5 names: [#   UNPAIRED internal/fake171/a_paired.go  ] rc=1
+   fixed    G5 names: [] rc=0
+  ok    pristine ruler names a file that DOES close the scope (this is the false red AC#6 is about)
+  ok    fixed ruler goes quiet on the balanced handle file WITHOUT any pathspec being dropped
+  ok    fixed ruler prints who closed it (CLOSE-BY-GENERIC-CLOSE) so the coarseness is reviewable
+   aggregate rc on state A: pristine=6 fixed=7
+warning: in the working copy of 'internal/fake171/b_leak.go', LF will be replaced by CRLF the next time Git touches it
+-- state 'B: handle-shaped OPEN, never closed (the leak AC#6 says must not become invisible)' committed at bd20963 (synthetic tree, outside /d/work/workspace/projects plans/Wisp)
+   pristine G5 names: [#   UNPAIRED internal/fake171/b_leak.go  ] rc=1
+   fixed    G5 names: [#   UNPAIRED internal/fake171/b_leak.go  ] rc=1
+  ok    fixed ruler NAMES the handle-shaped open-without-close (AC#6 cell 3, '修完之后必须点名它')
+   --     NOTE: the pristine ruler names it TOO (its合方 root is absent here).
+   --     The ticket's wording '未修码上主尺点不到它' therefore does NOT hold for this
+   --     sample; see the evidence file section 3 for why (widening a合方 root can only
+   --     ever reduce naming, never add it). State C is the sample where the direction holds.
+   aggregate rc on state B: pristine=6 fixed=6
+warning: in the working copy of 'internal/fake171/c_discarded.go', LF will be replaced by CRLF the next time Git touches it
+-- state 'C: discarded handle (_ =) plus a by-id CloseScope of another id (invisible to the old word roots)' committed at c398035 (synthetic tree, outside /d/work/workspace/projects plans/Wisp)
+   pristine G5 names: [] rc=0
+   fixed    G5 names: [#   UNPAIRED internal/fake171/c_discarded.go  ] rc=1
+  ok    pristine ruler is SILENT on state C (open root + close root both present in one file)
+  ok    fixed ruler NAMES state C: a discarded handle cannot be closed by anything in the file (AC#6 cell 3's direction, both ways read)
+       #   DISCARD-HANDLE internal/fake171/c_discarded.go
+       #     note 丢句柄那一味点的名：开方没接住返回值，这一族的收尾结构上不可能
+   aggregate rc on state C: pristine=7 fixed=6
+
+===== PART 2 (AC#2): 同一条腿内未成对从 1 枚变 2 枚 =====
+warning: in the working copy of 'internal/fake171/leak1.go', LF will be replaced by CRLF the next time Git touches it
+-- state 'phase1: exactly ONE unpaired file in the leg' committed at edf85ed (synthetic tree, outside /d/work/workspace/projects plans/Wisp)
+   phase1: G5 measures pristine=1枚 fixed=1枚 | aggregate rc pristine=6 fixed=6
+warning: in the working copy of 'internal/fake171/leak1.go', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'internal/fake171/leak2.go', LF will be replaced by CRLF the next time Git touches it
+-- state 'phase2: TWO unpaired files in the SAME leg (1 枚 -> 2 枚)' committed at e4cf5af (synthetic tree, outside /d/work/workspace/projects plans/Wisp)
+  ok    generated samples are gofumpt-clean (v0.12.0 (go1.27.1))
+   phase2: G5 measures pristine=2枚 fixed=2枚 | aggregate rc pristine=6 fixed=7
+   which legs the FIXED aggregate calls out in phase2:
+       # BAD  腿=G2 声明=ring 实测=quiet
+       # BAD  腿=G5 声明=ring 基线=1枚 实测=2枚 因=新增未成对（票 171 AC#2：实测 > 基线）
+       # BAD  腿=G5pos 声明=quiet 基线=0枚 实测=2枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+       # SHR  腿=G5neg 声明=ring 基线=8枚 实测=2枚 注=读数变好了，基线过期，下一程把 want_n 核下来
+       # BAD  腿=G6 声明=ring 基线=1枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+       # BAD  腿=G6neg 声明=ring 基线=1枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+       # BAD  腿=G7 声明=ring 基线=3枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+       # BAD  腿=G7neg 声明=ring 基线=4枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+  ok    pristine ruler does see 1 枚 then 2 枚 - the reading is there, only the verdict hides it
+  ok    UNMODIFIED CODE: 1 枚 -> 2 枚 moves the aggregate exit code NOT AT ALL (rc=6 both) - that is ticket 171's hole 3, reproduced
+  ok    fixed ruler measures 1 枚 then 2 枚 on the same leg
+  ok    FIXED CODE: the same jump moves the aggregate exit code (6 -> 7) - the new second file cannot hide in 'non-empty' any more
+  ok    the leg prints its own baseline next to its measurement (声明与实测同一行可 diff)
+
+r1-pair-shapes.sh: logs kept (created, never deleted): /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/171/r1/logs/part1-*.txt /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/171/r1/logs/part2-*.txt
+r1-pair-shapes.sh: pristine gate copy: /tmp/wisp-171-r1.1ynhvl/gate-pristine.sh
+r1-pair-shapes.sh: synthetic tree left in place at /tmp/wisp-171-r1-tree.AtZA2a; this repo's working tree was never written by this run
+r1-pair-shapes.sh: GREEN - AC#6's合方 side reads the handle shape (and names a leak the old roots could not), AC#2's exit code tracks 枚数 where the old one could not.
