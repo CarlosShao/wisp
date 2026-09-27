@@ -70,6 +70,7 @@ RiskLevel 列是 C19 融合后的**默认结论**；实际判定在调用时算�
 | `task.list` / `task.cancel` | 查看/取消任务 | L0 / L1 | — | **S7** | 「被阻塞的东西必须可见」的 Agent 侧手段 |
 | `list_tools` | 元工具 | L0 | — | **S1** | D15②兜底 |
 | `shell.exec` | 任意命令 | L2（白名单命中 → L1） | shell | S3 | **默认禁用**；argv 向量强制 |
+| **`shell.session`** | 在一条活着的会话里跑下一条命令 | **L2** | shell | S3 | 票 163 新增，镜像 `PLAN.md` D34；一次性外观、常驻内核；会话绑任务作用域；每发命令仍按 R6 判；**不引 PTY** |
 
 ## 4. 插件 manifest schema（C14/C16，TOML）
 
