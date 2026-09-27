@@ -52,3 +52,26 @@
 | 事后观察口 | 本程样本里 `ScopeTaints(已知 id)=1`／`ScopeTaints(猜的 id)=0`（同一行输出） | 无导出"列出开着哪些 scope"的口（`git grep -n "^func (p \*Provenance)"` 复核：按-scope 出口只有 `ScopeTaints`/`scopeMarks`，前者要 id、后者非导出） | 一致（三态塌成 0） |
 
 **判据本体核对**（票面 `:26`：编译器不拦✓／门不响（只点文件名，且不吃台件目录）✓／只有普查尺点名✓／事后查不出✓）。四把尺本程全部现量、未借它的数据。
+
+### 3.2 AC#2 —— 判语：**成立**
+
+**(i)／(i′) 认身份两枚用例＋(ii) 幂等分格——本程读码核了三件事**（`internal/risk/provenance.go:383-466`、`provenance_test.go:906-997`）：
+
+- **分格没有**：`Close()` 四味各一条出口、各一枚 sentinel——`s==nil||s.p==nil`→`ErrScopeNotOpen`（`:426-428`）、`s.closed`→`ErrScopeAlreadyClosed`（`:432-434`）、`reg==nil`→`ErrScopeNotOpen`（`:437-439`）、`reg.owner!=s`→`ErrScopeNotOwner`（`:440-441`）；测试面用 `errors.Is` **逐枚钉**（`:912`／`:940` NotOwner、`:966`／`:972` AlreadyClosed、`:978` NotOpen），**没有一格靠 `err != nil` 混打**。⇒ 不是"一条 err!=nil 吃四味"。
+  ⚠ 一枚**观察**（不阻断判语）：`reg==nil` 且句柄未 spent 那一格（stale 句柄碰上 fresh 关完又没了登记）今天**没有专测**——唯一被钉到的 `ErrScopeNotOpen` 是 nil-receiver 形。可达序列存在（`stale→fresh→fresh.Close()` 后 `stale.Close()`＝NotOpen）；本程判定该缺口属 AC#4"明写治不到什么"的射程（未派），记进 §12 next。
+- **(iii) 旧口子的档位**：本程**自造**外人按 id 关的样本（`probes/160/v1/ac1b`，与 r1 那枚同谓词、不同文件）打在改后工作树：`go vet ./...` → `vet.exe: .\closebyid.go:18:54: p.CloseScope undefined (type *risk.Provenance has no field or method CloseScope)` rc=1；`git grep CloseScope -- internal cmd` 非注释命中＝0（只剩 `provenance.go:361/:562` 两处**讲历史的注释**与两枚测试注释）⇒ 导出面**整枚消失**属实。
+  它买到的是**"写不出来"**（编译器读数，可信）——但只覆盖**外人关**这一形；**忘关**那一形本程实测改前改后**同一份样本照样编译、照样漏**（§3.1 LEG 1 两档同读数）。票面 `:12` 那句在 `:33` 被降格成"关不掉别人的、别人的也关不了你的；忘关由门响亮地点名"——**逐字对 `provenance.go:366-372` 的新注释块**：写的正是这个降格、还自带"measured rather than claimed"指回台件。承诺文字与读数**一致**，无oversell。
+- **生产三枚调用点改口属实**：`bridge.go:648` 开腿把句柄**存进桥账本**（`:143` `map[string]*risk.Scope`）、`:706` 关腿 `scope.Close()`＋错误并进审计行 `:708`（追加 `close_err=%v`）；`panel_assets.go:243` `_ = prov.OpenScope(...)` **写明故意的丢弃**。`git grep "risk\.Scope\b"` 排包内 ⇒ **只有 `bridge.go:143/:186` 两枚＋一枚测试注释**，无第四枚地界。
+- **DEFERRED 枚数尺**：`git grep -c "DEFERRED(C25-loop-wiring)" -- internal cmd tools` ⇒ 三文件各 1、**恰 3 枚**（枚数未变；行号 55→58 的位移与台账 `:7660` 过期两笔，编排者已在台账 09-27 11:5x 补账条目里自落——本程复核**该补账在盘**）。
+
+## 4. 恒真检查那一发（两向读数都贴）
+
+问：AC#2 那两枚新用例（实为四枚：`TestScopeCloseRefusesAnotherOwnersRegistration`／`TestScopeCloseRefusedOnEmptyRegistrationIsStillVisible`／`TestScopeCloseIsIdempotent`／`TestScopeIDGrantsNoPower`）在**改前**码上响不响？
+
+| 向 | 命令 | 读数 |
+|---|---|---|
+| 新测试 × 旧实现（只映回 `provenance.go`） | `go test -count=1 -overlay="$V1/prebase/overlay-pre-provonly.json" -run 'TestScopeClose|TestScopeID' ./internal/risk/` | **build failed**：`provenance_test.go:908:11: p.OpenScope("task-victim") (no value) used as value`、`:912:43/:940:43: undefined: ErrScopeNotOwner`、`:341:33: undefined: Scope` 等 ⇒ **旧码上根本站不起来，谈不上响** |
+| 全 pre-base 六文件映回 `34c0b4e4` | `go test -count=1 -overlay="$V1/prebase/overlay-pre-full.json" -run 'TestScopeClose|TestScopeID' -v ./internal/risk/` | `testing: warning: no tests to run`／`ok … [no tests to run]` ⇒ **改前这四枚不存在**，旧全量 100 枚（99 PASS＋1 SKIP）对着旧码全绿（`out/roster-pre.txt`） |
+| **真检的反证（比"改前不响"更硬的一向）** | 三枚自有变异打改后码（§5） | m2 摘认身份 ⇒ **恰好两枚认身份用例红**、其余 101＋SKIP 照旧；m1 摘幂等分格 ⇒ **恰好幂等用例红**；m3 摘 nil 守卫 ⇒ 该用例 panic 红。**每一味摘掉都有且只有点名它的用例红** ⇒ 这四枚不是恒真，是**承重探针**。 |
+
+⇒ 本仓否过四次的形状（用例在坏码上从不响）这一发**没有蒙过去**：两向＋变异反证三路全在案。
