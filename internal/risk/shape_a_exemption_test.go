@@ -181,12 +181,16 @@ func TestShapeAFExclusionDiesWithScopeClose(t *testing.T) {
 	if n := len(p.ScopeTaints("task-9")); n != 0 {
 		t.Fatalf("Close must drop marks AND their exemptions together, %d taints left", n)
 	}
-	p.OpenScope("task-9")
+	sc2 := p.OpenScope("task-9")
 	if !p.MarkWithHostPath("task-9", SrcWebFetch, "https://evil.example/x", shapeAStub, "") {
 		t.Fatal("re-mark must be recorded")
 	}
 	if _, ok := p.Inspect("task-9", "notify", map[string]any{"text": shapeAPath}); !ok {
+		sc2.Close()
 		t.Fatal("F: exemption survived the close/reopen (global span store) — P must hit again once no declaration covers it")
+	}
+	if err := sc2.Close(); err != nil {
+		t.Fatalf("reopen close: %v", err)
 	}
 }
 
