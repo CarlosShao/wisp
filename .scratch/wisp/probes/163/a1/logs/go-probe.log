@@ -1,0 +1,12 @@
+# 163/a1 go-probe 现量（go run，真包真进程，无镜像/假进程）
+## 注册表实名册: fs.edit(L2) fs.list(L0) fs.move(L1) fs.read(L0) fs.trash(L1) fs.write(L1) task.output(L0)
+## Lookup("shell.exec") => registered=false
+## Lookup("shell.session") => registered=false
+## Lookup("task.output") => registered=true
+## IsSensitiveSource(shell.exec)=false IsSensitiveSource(shell.session)=false IsSensitiveSource(fs.read)=true (mark 侧名闸, bridge.go:552 用它)
+## 发1(进程A) cmd.exe /c 'cd /d C:\Windows & cd' => "C:\\Windows" rc=0
+## 发2(进程B,全新) cmd.exe /c 'cd' => "D:\\work\\workspace\\projects plans\\Wisp" rc=0
+## 读数: 发2 ≠发1的目录 ⇒ 两次生发之间没有任何存活载体（cwd 每发只能靠 exec.Cmd.Dir 单发指定）
+## exit 7: errors.As(*exec.ExitError) 命中, ExitCode()=7 —— Wait 状态【取回的字段】
+## 真值=0 的进程打印了 "exit 1"：若『从输出文本里猜』会把 1 读成 1；字段取回 rc=0 err=true
+# 台件结束

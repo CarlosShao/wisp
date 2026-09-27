@@ -1,0 +1,15 @@
+# 台件 cd-pwd.sh 读数
+2026-09-27T21:23:03+08:00
+# 生发器＝cmd.exe（Windows 上 shell.exec 未来会生发的那一枚真 shell；非镜像、非假进程）
+
+## 发 1: cmd.exe /c "cd /d C:\Windows & cd"
+C:\Windows
+# rc=0
+
+## 发 2（另起一发全新进程，只问当前目录）: cmd.exe /c "cd"
+D:\work\workspace\projects plans\Wisp
+# rc=0
+
+## 读数判语：发 2 打印的目录若不是 C:\Windows，则两步之间没有任何状态存活。
+# 另外：exit 码取回验证 cmd.exe /c exit 7
+# rc=7（这是操作系统 Wait 状态取回的字段，不是从输出文本里猜的）
