@@ -143,6 +143,34 @@ jobs:
             exit 1
           fi
 
+      # ADDED STEP ONLY (ticket 161 AC#7 form (A), decided by the orchestrator's
+      # 00:0x ruling "裁二"): no existing step was moved, edited, deleted, given an
+      # `if:`, or made continue-on-error. It sits directly BELOW the gofmt step
+      # rather than above it on purpose - "who goes red first" is a causal claim this
+      # file already makes twice (see the ordering notes on the two D22 steps), so
+      # the new leg takes the next free slot instead of overtaking anybody.
+      - name: "gofmt (gofumpt) - the tracked set is the denominator (ticket 161 AC#7 form A)"
+        # STATED PLAINLY, because the honest version of this step's value is small:
+        # it adds NO REACH TODAY. On a checkout every file is tracked, so the step
+        # above and this one read the same bytes and must agree - if that ever stops
+        # being true, the disagreement is the finding. What this step buys is that
+        # the sentence "the denominator of the formatting gate is the TRACKED set,
+        # not the working tree" stops living in human memory. That sentence is what
+        # ticket 161 AC#7 was decided on after `gofumpt -l . tools/... must be EMPTY`
+        # was found to be structurally unsatisfiable on a bench tree (gofumpt walks
+        # .scratch/**, which by definition holds deliberately-broken samples), and a
+        # criterion that only people remember is a criterion that silently changes
+        # when the next program formats "the whole tree".
+        #
+        # It is not a second copy of the check - it calls the same instrument that
+        # measures the working tree on the bench, so the two readings cannot drift
+        # apart, and it reuses that instrument's hollow guard instead of writing a
+        # new one: handed ZERO tracked .go files the script exits 2, which CI reads
+        # as red, never as green (the vacuous-empty mistake this file's own ancestor
+        # made once with `git ls-files -Z`). A step that could pass by matching
+        # nothing is the shape ticket 161 exists to refuse.
+        run: sh .scratch/wisp/probes/161/r5/attrib.sh --tracked-only
+
       - name: go vet (module)
         run: go vet ./...
 
