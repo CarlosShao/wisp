@@ -1,0 +1,7 @@
+time=2026-09-27T16:03:08.137+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestV1AC4TargetIsNeverHalfWritten
+    probe162v1_ac13_test.go:222: V1-AC#4 不变式读数：杀点边界序列=["create-temp" "write:8" "write:16"] IsError=true 目标 26 字节（原文 26／全量 52）内容="alpha\nbravo\ncharlie\ndelta\n"
+    probe162v1_ac13_test.go:231: V1-AC#4 不变式成立：目标要么是原文要么是完整新内容（本次=26 字节）
+--- PASS: TestV1AC4TargetIsNeverHalfWritten (0.02s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.077s

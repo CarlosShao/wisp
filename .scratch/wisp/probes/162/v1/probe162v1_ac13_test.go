@@ -7,6 +7,7 @@ package tools
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -183,9 +184,52 @@ func TestV1AC1WholeFileRewriteDropsMiddleBlockUnreported(t *testing.T) {
 		"事后 fs.read 五处读数全为安静 ⇒ 票面 :32 的前提由验收位自己复算成立", beforeBytes-len(after))
 }
 
-// ---------------------------------------------------------------------------
-// AC#3, my OWN three shots + my OWN re-measure of the two "silent today" shapes
-// ---------------------------------------------------------------------------
+// TestV1AC4TargetIsNeverHalfWritten is the acceptance cell for AC#4's load bit,
+// written as an INVARIANT instead of as a ledger probe: after a mid-write stop
+// the target must hold EITHER the pre-edit bytes OR the complete new bytes -
+// never a prefix of either. Run twice: unmutated (staged writer) it must pass;
+// under MUT-4 (temp+rename removed from fs.edit's own write path) it must go
+// red on the BYTE READING, which is the assertion their kill case never reaches
+// because its boundary probe fires first.
+func TestV1AC4TargetIsNeverHalfWritten(t *testing.T) {
+	const original = "alpha\nbravo\ncharlie\ndelta\n"                           // 26 bytes
+	const intended = "ALPHA-LONGER\nbravo\nCHARLIE-LONGER-THAN-BEFORE\ndelta\n" // 53 bytes
+	var boundaries []string
+	root := sealableTempDir124(t)
+	target := filepath.Join(root, "inv.txt")
+	if err := os.WriteFile(target, []byte(original), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	b, _ := fsEditBridgeDeps(t, mustCanonical(t, root), func(d *FSDeps) {
+		d.WriteChunk = 8
+		d.Hooks = Hooks{
+			AtStep: func(step string) { boundaries = append(boundaries, step) },
+			Kill: func(step string) error {
+				if step == "write:16" {
+					return errors.New("验收位模拟：进程在此刻被杀")
+				}
+				return nil
+			},
+		}
+	})
+	out, err := b.Execute(t.Context(), req("fs.edit", editArgs(t, target,
+		map[string]any{"old": "alpha", "new": "ALPHA-LONGER"},
+		map[string]any{"old": "charlie", "new": "CHARLIE-LONGER-THAN-BEFORE"})))
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := readString(t, target)
+	t.Logf("V1-AC#4 不变式读数：杀点边界序列=%q IsError=%v 目标 %d 字节（原文 %d／全量 %d）内容=%q",
+		boundaries, out.IsError, len(got), len(original), len(intended), got)
+	if !out.IsError {
+		t.Fatalf("the killed call must report a failure: %+v", out)
+	}
+	if got != original && got != intended {
+		t.Fatalf("AC#4 invariant broken: the target holds a PREFIX (%d of %d bytes) - a half-written file, "+
+			"neither the old content nor the new one: %q", len(got), len(intended), got)
+	}
+	t.Logf("V1-AC#4 不变式成立：目标要么是原文要么是完整新内容（本次=%d 字节）", len(got))
+}
 
 func v1Endings(s string) (int, int, int) {
 	crlf := strings.Count(s, "\r\n")

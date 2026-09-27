@@ -236,4 +236,56 @@ M-3＝**只**把 `fs_edit.go` 落盘前的 `updated` 强制成 CRLF（`strings.R
 它只在"LF 文件那侧"被 M-3 抓到。**这一格本程判成立但把这一笔点名给 r3**：
 将来若真做行尾归一，缺的是"纯 CRLF 文件被强改成别的形状"那一枚反向尺（M-3 就是它的模板）。
 
+## 5. 第④格＝AC#4〔**成立**，且判据只覆盖"优雅取消"这一支〕
+
+**判据出处现量**：`PLAN.md:1176`（本程 `grep -n "临时文件" docs/PLAN.md` 现量，见 §0）＝
+"工程要求：`fs.write` 必须走**临时文件 + 原子 rename**，否则取消会留损坏文件"。
+
+### 5a 实现者那两枚的正读数（本轮现跑的名册输出，`logs/gate-gotest.json`）
+
+```
+AC#4(a)(b)：改前 26 字节 → 杀点 write:16（边界在下一块落笔前触发，暂存件里此刻 8 字节）→ 目标仍是 26 字节原字节；
+           目录内 .wisp-tmp-* 残件 0 枚，台账五步逐字点名 "创建临时文件 .wisp-tmp-…"
+           与 "删除临时文件 …（目标从头到尾未被改动）"
+AC#4(c) 反面实验：同一批字节、同一道 write:16 杀点，摘掉 temp+rename 之后目标从 26 字节变成 8 字节（"ALPHA-LO"），
+                 既不是原文也不是要落的内容；事后 fs.read IsError=false ErrorClass="" Truncated=false
+```
+
+⇒ 与本程复算一致（下面 5b 是同形状的**独立**读数，且**更强**）。
+
+### 5b 本程自己的不变式台件（不是台账探针）：`TestV1AC4TargetIsNeverHalfWritten`
+
+派单点名的"承重那一问"是**摘掉那一味之后是否存在一发损坏从此看不见**。实现者的答法是把"没有 temp 的写通路"
+**另造一发**（他们的 §4c，直写目标）；本程不满足于此——**直接把生产码 `fs.edit` 的那一味摘掉**（M-4＝
+把 `fs_edit.go` 唯一的落盘调用 `stageAndRename` 换成 `os.OpenFile(...O_TRUNC)`＋生产自己的 `writeAll`，
+**同一个 `WriteChunk:8`、同一道 `write:16` 杀点，唯一变量＝缺 temp＋rename**），再问同一句话：
+
+```
+未变异（logs/ac4-mine.txt）：  rc=0
+  杀点边界序列=["create-temp" "write:8" "write:16"] IsError=true 目标 26 字节（原文 26／全量 52）
+  ⇒ 不变式成立：目标要么是原文要么是完整新内容
+M-4（logs/ac4-m4.txt）：       rc=1
+  --- FAIL: TestFSEditKilledMidWriteLeavesTheTargetByteIdentical
+        fs_edit_ac34_test.go:458: expected the write to reach the staging boundaries, got ["write:8" "write:16"]
+  --- FAIL: TestV1AC4TargetIsNeverHalfWritten
+        杀点边界序列=["write:8" "write:16"] IsError=true 目标 8 字节（原文 26／全量 52）内容="ALPHA-LO"
+        ⇒ AC#4 invariant broken: the target holds a PREFIX (8 of 52 bytes) - a half-written file
+```
+
+⇒ **答"存在"**，而且是**在产品通路上量出来的**，不是构造对照：摘掉那一味，同一道杀点让目标停在
+**新内容的 8 字节前缀**上——既不是原文也不是新内容，**这就是"损坏"**；
+"从此看不见"那一半由 §5a 那条 `fs.read IsError=false Truncated=false` 钉住（本程在同一遍门禁里复跑到了同一行读数）。
+⇒ **恒真那一问：响。** 且本程把红因**归到位**：实现者那枚先红在**台账/边界探针**（`:458`），
+其下的**字节等值断言（`:471`）在本程 M-4 下没有单独被读到**（被前一枚 Fatalf 挡住）；
+本程自造的那枚直接红在字节上 ⇒ **两枚合起来才说清"是哪一味在承重"**。这一笔登记为改进、**不是退回**。
+
+### 5c 本格射程的另一半（必须写在判语旁边，别让读者以为整族闭了）
+
+- 本程与实现者用的都是 **`Hooks.Kill`**——它**返回 error，会跑 Go 的清理**（`discard()` 删暂存件、
+  台账点名"删除临时文件"）。**真实进程被 `taskkill` 那一形不跑任何清理**，
+  `fs.edit` 今天**没有**那一发的用例（`fs.write` 那半由票 112/118 那族钉着，本程未复算）。
+- ⇒ **AC#4 判的是"优雅取消"这一支的原子性**；`.wisp-tmp-*` 残件在硬杀后是否留下、留几枚、被不被点名，
+  **归票面 `:39` 的 AC#4b，本程一格未判**（§1 第 1 条已点名）。**"原子性整族已闭合"这句话本表不许读者说。**
+
+
 
