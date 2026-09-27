@@ -29,10 +29,25 @@ import (
 // own refusal and not the gate's.
 func fsEditBridge(t *testing.T, root string) (*Bridge, *gateSpy) {
 	t.Helper()
+	return fsEditBridgeDeps(t, root, nil)
+}
+
+// fsEditBridgeDeps is fsEditBridge with EXACTLY ONE knob: the caller may add to
+// the FSDeps the registered tools get (r2's AC#4 sets WriteChunk and Hooks.Kill,
+// the same step-boundary seam TestAtomicWriteKillsMidWrite kills fs.write with).
+// With tweak nil this is fsEditBridge unchanged - it is the same builder, not a
+// second piece of scaffolding, because a killed fs.edit must share every other
+// property (same resolver, same gate, same roster) with the cases above.
+func fsEditBridgeDeps(t *testing.T, root string, tweak func(*FSDeps)) (*Bridge, *gateSpy) {
+	t.Helper()
 	g := &gateSpy{approveAns: AnswerAllow, windowAns: AnswerAllow}
 	paths := NewPathCanonicalizer([]string{root}, nil)
+	d := FSDeps{Paths: paths}
+	if tweak != nil {
+		tweak(&d)
+	}
 	reg := NewRegistry()
-	for _, e := range BuiltinFSEntries(FSDeps{Paths: paths}) {
+	for _, e := range BuiltinFSEntries(d) {
 		if err := reg.Register(e); err != nil {
 			t.Fatalf("Register(%s): %v", e.Tool.Name(), err)
 		}
