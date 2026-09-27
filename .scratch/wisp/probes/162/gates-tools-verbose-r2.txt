@@ -1,0 +1,370 @@
+time=2026-09-27T10:46:41.943+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestA18RealTaskkillLeavesTheTargetWholeAndTheNextWriteReclaimsTheStagingFile
+=== RUN   TestA18RealTaskkillLeavesTheTargetWholeAndTheNextWriteReclaimsTheStagingFile/overwrite_branch_target_keeps_every_old_byte
+=== RUN   TestA18RealTaskkillLeavesTheTargetWholeAndTheNextWriteReclaimsTheStagingFile/new_file_branch_target_never_appears
+=== RUN   TestA18RealTaskkillLeavesTheTargetWholeAndTheNextWriteReclaimsTheStagingFile/the_next_write_reclaims_the_staging_residue
+    bridge_a18_kill_windows_test.go:230: 残留暂存文件 .wisp-tmp-817d11e1-54816-3988618289：4 字节（子进程被杀时已经写进暂存区的字节数）
+--- PASS: TestA18RealTaskkillLeavesTheTargetWholeAndTheNextWriteReclaimsTheStagingFile (2.36s)
+    --- PASS: TestA18RealTaskkillLeavesTheTargetWholeAndTheNextWriteReclaimsTheStagingFile/overwrite_branch_target_keeps_every_old_byte (1.62s)
+    --- PASS: TestA18RealTaskkillLeavesTheTargetWholeAndTheNextWriteReclaimsTheStagingFile/new_file_branch_target_never_appears (0.67s)
+    --- PASS: TestA18RealTaskkillLeavesTheTargetWholeAndTheNextWriteReclaimsTheStagingFile/the_next_write_reclaims_the_staging_residue (0.03s)
+=== RUN   TestBridgeRefusesARealJunctionOnTheReadRoute
+=== RUN   TestBridgeRefusesARealJunctionOnTheReadRoute/fs.read_through_a_real_junction
+=== RUN   TestBridgeRefusesARealJunctionOnTheReadRoute/fs.list_through_a_real_junction
+--- PASS: TestBridgeRefusesARealJunctionOnTheReadRoute (0.12s)
+    --- PASS: TestBridgeRefusesARealJunctionOnTheReadRoute/fs.read_through_a_real_junction (0.00s)
+    --- PASS: TestBridgeRefusesARealJunctionOnTheReadRoute/fs.list_through_a_real_junction (0.00s)
+=== RUN   TestBridgeWritesNothingThroughARealJunction
+=== RUN   TestBridgeWritesNothingThroughARealJunction/fs.write_over_the_junctioned_target
+=== RUN   TestBridgeWritesNothingThroughARealJunction/fs.write_a_new_file_through_the_junction
+=== RUN   TestBridgeWritesNothingThroughARealJunction/fs.trash_through_the_junction
+=== RUN   TestBridgeWritesNothingThroughARealJunction/fs.move_through_the_junction
+=== RUN   TestBridgeWritesNothingThroughARealJunction/fs.delete_through_the_junction
+--- PASS: TestBridgeWritesNothingThroughARealJunction (1.34s)
+    --- PASS: TestBridgeWritesNothingThroughARealJunction/fs.write_over_the_junctioned_target (0.11s)
+    --- PASS: TestBridgeWritesNothingThroughARealJunction/fs.write_a_new_file_through_the_junction (0.42s)
+    --- PASS: TestBridgeWritesNothingThroughARealJunction/fs.trash_through_the_junction (0.26s)
+    --- PASS: TestBridgeWritesNothingThroughARealJunction/fs.move_through_the_junction (0.41s)
+    --- PASS: TestBridgeWritesNothingThroughARealJunction/fs.delete_through_the_junction (0.14s)
+=== RUN   TestJunctionInsideAnAllowedRootCannotReachAnAListFile
+--- PASS: TestJunctionInsideAnAllowedRootCannotReachAnAListFile (0.28s)
+=== RUN   TestBridgeRefusesTheRealShortNameOfAnAListFile
+--- PASS: TestBridgeRefusesTheRealShortNameOfAnAListFile (0.02s)
+=== RUN   TestShortNameSpellingGetsTheSameVerdictAsTheLongOne
+=== RUN   TestShortNameSpellingGetsTheSameVerdictAsTheLongOne/an_approved_out_of_scope_short_name_reads_the_file_the_card_named
+--- PASS: TestShortNameSpellingGetsTheSameVerdictAsTheLongOne (0.02s)
+    --- PASS: TestShortNameSpellingGetsTheSameVerdictAsTheLongOne/an_approved_out_of_scope_short_name_reads_the_file_the_card_named (0.01s)
+=== RUN   TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing
+time=2026-09-27T10:46:46.527+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing1618340405\003\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T10:46:46.539+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T02:46:46Z duration_ms=11
+time=2026-09-27T10:46:46.552+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing1618340405\003\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T10:46:46.560+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T02:46:46Z duration_ms=7
+time=2026-09-27T10:46:46.566+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T10:46:46.570+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestWavedThroughJunctionWriteBooksAnApprovedRowThatWroteNothing (0.45s)
+=== RUN   TestRealToolCallWritesRewriteAccountIntoAudit
+--- PASS: TestRealToolCallWritesRewriteAccountIntoAudit (0.02s)
+=== RUN   TestUnusableRootIsVisibleInTheAuditRecord
+--- PASS: TestUnusableRootIsVisibleInTheAuditRecord (0.01s)
+=== RUN   TestAccountRecordIsWrittenEvenWithNothingToReport
+--- PASS: TestAccountRecordIsWrittenEvenWithNothingToReport (0.01s)
+=== RUN   TestSensitiveReadAcrossTheBridgeOpensItsTaskScope
+--- PASS: TestSensitiveReadAcrossTheBridgeOpensItsTaskScope (0.02s)
+=== RUN   TestC1ToolContract
+--- PASS: TestC1ToolContract (0.00s)
+=== RUN   TestToolConcurrencyCeilingIsFour
+--- PASS: TestToolConcurrencyCeilingIsFour (0.05s)
+=== RUN   TestPerToolTimeoutHonoredViaContext
+--- PASS: TestPerToolTimeoutHonoredViaContext (0.04s)
+=== RUN   TestCapabilitySetIsFrozen
+--- PASS: TestCapabilitySetIsFrozen (0.00s)
+=== RUN   TestUndeclaredCapabilityHardRejects
+--- PASS: TestUndeclaredCapabilityHardRejects (0.00s)
+=== RUN   TestC4SlotsWithoutAnImplementationAreNotSilent
+--- PASS: TestC4SlotsWithoutAnImplementationAreNotSilent (0.00s)
+=== RUN   TestC4RegistryRejectsBadDeclarations
+--- PASS: TestC4RegistryRejectsBadDeclarations (0.00s)
+=== RUN   TestRiskDecisionRoutesEachLevelToItsBranch
+=== RUN   TestRiskDecisionRoutesEachLevelToItsBranch/L0_passes_and_no_gate_is_consulted
+=== RUN   TestRiskDecisionRoutesEachLevelToItsBranch/L1_uses_the_pending-window_callback
+=== RUN   TestRiskDecisionRoutesEachLevelToItsBranch/L1_window_timeout_means_execute
+=== RUN   TestRiskDecisionRoutesEachLevelToItsBranch/L1_veto_returns_a_failure_to_the_model,_not_to_the_user
+=== RUN   TestRiskDecisionRoutesEachLevelToItsBranch/L2_uses_the_pending-approval_callback
+=== RUN   TestRiskDecisionRoutesEachLevelToItsBranch/L2_approval_timeout_auto-rejects
+=== RUN   TestRiskDecisionRoutesEachLevelToItsBranch/NoGate_fails_closed_above_L0
+--- PASS: TestRiskDecisionRoutesEachLevelToItsBranch (0.00s)
+    --- PASS: TestRiskDecisionRoutesEachLevelToItsBranch/L0_passes_and_no_gate_is_consulted (0.00s)
+    --- PASS: TestRiskDecisionRoutesEachLevelToItsBranch/L1_uses_the_pending-window_callback (0.00s)
+    --- PASS: TestRiskDecisionRoutesEachLevelToItsBranch/L1_window_timeout_means_execute (0.00s)
+    --- PASS: TestRiskDecisionRoutesEachLevelToItsBranch/L1_veto_returns_a_failure_to_the_model,_not_to_the_user (0.00s)
+    --- PASS: TestRiskDecisionRoutesEachLevelToItsBranch/L2_uses_the_pending-approval_callback (0.00s)
+    --- PASS: TestRiskDecisionRoutesEachLevelToItsBranch/L2_approval_timeout_auto-rejects (0.00s)
+    --- PASS: TestRiskDecisionRoutesEachLevelToItsBranch/NoGate_fails_closed_above_L0 (0.00s)
+=== RUN   TestDeclaredRiskIsOnlyAFloor
+--- PASS: TestDeclaredRiskIsOnlyAFloor (0.02s)
+=== RUN   TestToolCallRowsAreComplete
+time=2026-09-27T10:46:46.802+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestToolCallRowsAreComplete3568836577\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T10:46:46.815+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T02:46:46Z duration_ms=12
+time=2026-09-27T10:46:46.828+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestToolCallRowsAreComplete3568836577\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T10:46:46.837+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T02:46:46Z duration_ms=8
+time=2026-09-27T10:46:46.843+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T10:46:46.847+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestToolCallRowsAreComplete (0.12s)
+=== RUN   TestBridgeIsTheLoopToolProvider
+--- PASS: TestBridgeIsTheLoopToolProvider (0.00s)
+=== RUN   TestFSEditKeepsABOMItWasNotAskedToTouch
+    fs_edit_ac34_test.go:103: AC#3 BOM 正向读数：31 字节 → 31 字节，前三字节仍为 EF BB BF，BOM 出现 1 次，文案="fs.edit 已改写 C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSEditKeepsABOMItWasNotAskedToTouch459983866\\001\\report.md：1 枚编辑全部生效，31 字节 / 2 行 → 31 字节 / 2 行（临时文件+原子重命名）"
+--- PASS: TestFSEditKeepsABOMItWasNotAskedToTouch (0.03s)
+=== RUN   TestFSEditOnACRLFFileRefusesAnLFSpelledOld
+    fs_edit_ac34_test.go:161: AC#3 CRLF 反向读数：23 字节的纯 CRLF 文件里 LF 写法的 old 被响亮拒绝（文案含文件长度 23，证明读到了整文件），同一文件上不含换行的 old 立即命中并落盘 ⇒ 这是正确拒绝，不是读不到
+--- PASS: TestFSEditOnACRLFFileRefusesAnLFSpelledOld (0.03s)
+=== RUN   TestFSEditOnACRLFFileAppliesACRLFSpelledOldAndStaysCRLF
+    fs_edit_ac34_test.go:202: AC#3 CRLF 正向读数：23 字节 → 30 字节，CRLF 对 3→4，裸 CR/裸 LF 均为 0（行尾未被改写），文案="fs.edit 已改写 C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSEditOnACRLFFileAppliesACRLFSpelledOldAndStaysCRLF301280847\\001\\crlf-hit.txt：1 枚编辑全部生效，23 字节 / 3 行 → 30 字节 / 4 行（临时文件+原子重命名）"
+--- PASS: TestFSEditOnACRLFFileAppliesACRLFSpelledOldAndStaysCRLF (0.02s)
+=== RUN   TestFSEditDoesNotRewriteAnLFFilesLineEndings
+    fs_edit_ac34_test.go:250: AC#3 LF 双向读数：20 字节 → 27 字节，裸 LF 4 条、CR 0 枚（LF 文件的行尾没被改）
+--- PASS: TestFSEditDoesNotRewriteAnLFFilesLineEndings (0.03s)
+=== RUN   TestFSEditLineEndingForensicsRefusesRealSpellings
+=== RUN   TestFSEditLineEndingForensicsRefusesRealSpellings/crlf_file_lf_spelled_old
+    fs_edit_ac34_test.go:330: 归一取证：23 字节文件（行尾形 纯 CRLF）被 0 命中拒掉一枚归一后可命中 1 次的 old；落盘前后一字未变
+=== RUN   TestFSEditLineEndingForensicsRefusesRealSpellings/cr_only_file_lf_spelled_old
+    fs_edit_ac34_test.go:330: 归一取证：20 字节文件（行尾形 纯 CR）被 0 命中拒掉一枚归一后可命中 1 次的 old；落盘前后一字未变
+=== RUN   TestFSEditLineEndingForensicsRefusesRealSpellings/mixed_file_old_over_the_crlf_line_lf_spelled
+    fs_edit_ac34_test.go:330: 归一取证：22 字节文件（行尾形 混合(CRLF=2 CR=0 LF=1)）被 0 命中拒掉一枚归一后可命中 1 次的 old；落盘前后一字未变
+=== RUN   TestFSEditLineEndingForensicsRefusesRealSpellings/mixed_file_old_over_the_lf_line_crlf_spelled
+    fs_edit_ac34_test.go:330: 归一取证：22 字节文件（行尾形 混合(CRLF=2 CR=0 LF=1)）被 0 命中拒掉一枚归一后可命中 1 次的 old；落盘前后一字未变
+=== RUN   TestFSEditLineEndingForensicsRefusesRealSpellings/lf_file_crlf_spelled_old
+    fs_edit_ac34_test.go:330: 归一取证：20 字节文件（行尾形 纯 LF）被 0 命中拒掉一枚归一后可命中 1 次的 old；落盘前后一字未变
+--- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings (0.07s)
+    --- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings/crlf_file_lf_spelled_old (0.01s)
+    --- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings/cr_only_file_lf_spelled_old (0.01s)
+    --- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings/mixed_file_old_over_the_crlf_line_lf_spelled (0.01s)
+    --- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings/mixed_file_old_over_the_lf_line_crlf_spelled (0.02s)
+    --- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings/lf_file_crlf_spelled_old (0.02s)
+=== RUN   TestFSEditSilentShapeChangesLandToday
+=== RUN   TestFSEditSilentShapeChangesLandToday/an_old_that_carries_the_bom_deletes_it
+    fs_edit_ac34_test.go:372: 缺陷读数①（钉住今天的行为，不是批准它）：14 字节带 BOM 的文件，old 从偏移 0 起并含 BOM ⇒ BOM 被当普通字节替换掉，落盘 11 字节、前三字节 41 4c 50，答复无任何提示（IsError=false）
+=== RUN   TestFSEditSilentShapeChangesLandToday/an_lf_spelled_new_in_a_crlf_file_lands_mixed_endings
+    fs_edit_ac34_test.go:413: 缺陷读数②（同上，不是批准）：纯 CRLF 文件里插入一段 LF 写法的 new ⇒ 落盘后 3 组 CRLF + 1 条裸 LF，答复（"fs.edit 已改写 C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSEditSilentShapeChangesLandTodayan_lf_spelled_new_in_a_crl405972225\\001\\crlf-mixed.txt：1 枚编辑全部生效，23 字节 / 3 行 → 30 字节 / 4 行（临时文件+原子重命名）"）里没有任何行尾提示 ⇒ 票面 :34「CRLF 文件改完还是 CRLF」今天只在 new 也按 CRLF 拼写时成立
+--- PASS: TestFSEditSilentShapeChangesLandToday (0.04s)
+    --- PASS: TestFSEditSilentShapeChangesLandToday/an_old_that_carries_the_bom_deletes_it (0.02s)
+    --- PASS: TestFSEditSilentShapeChangesLandToday/an_lf_spelled_new_in_a_crlf_file_lands_mixed_endings (0.02s)
+=== RUN   TestFSEditKilledMidWriteLeavesTheTargetByteIdentical
+    fs_edit_ac34_test.go:497: AC#4(a)(b) 读数：改前 26 字节 → 杀点 write:16（边界在下一块落笔前触发，暂存件里此刻 8 字节）→ 目标仍是 26 字节原字节；目录内 .wisp-tmp-* 残件 0 枚，台账 ["在 C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSEditKilledMidWriteLeavesTheTargetByteIdentical299227078\\001 创建临时文件 .wisp-tmp-817d11e1-43364-3954666116" "在步骤「write:16」前停止：模拟进程在此刻被杀" "向临时文件写入 8 字节" "写入未完成：已停止于 write:16：模拟进程在此刻被杀" "删除临时文件 .wisp-tmp-817d11e1-43364-3954666116（目标从头到尾未被改动）"]
+--- PASS: TestFSEditKilledMidWriteLeavesTheTargetByteIdentical (0.02s)
+=== RUN   TestFSEditWithoutTheStagedWriterWouldCorruptTheTarget
+    fs_edit_ac34_test.go:600: AC#4(c) 反面实验读数：同一批字节、同一道 write:16 杀点，摘掉 temp+rename 之后目标从 26 字节变成 8 字节（"ALPHA-LO"），既不是原文也不是要落的内容；事后 fs.read 返回 IsError=false ErrorClass="" Truncated=false，把损坏原文照读照回 ⇒ 这发损坏从此看不见。装回 temp+rename（上一枚用例）则目标一字未动。
+--- PASS: TestFSEditWithoutTheStagedWriterWouldCorruptTheTarget (0.03s)
+=== RUN   TestFSEditRefusesANonLiteralOld
+    fs_edit_test.go:130: 判据 1+2 读数：命中前 50 字节 / 命中失败后 50 字节（一字未变），文案="fs.edit 拒绝执行：第 1 枚编辑的 old 在文件里找不到（0 命中，文件 50 字节）。old 必须与文件内容逐字一致，包含全部空白与换行（the old string must match exactly including all whitespace and newlines）；先用 fs.read 读回原文再照抄那一段。本次调用一个字也没有写，目标文件保持原状。"
+--- PASS: TestFSEditRefusesANonLiteralOld (0.01s)
+=== RUN   TestFSEditRefusesAnAmbiguousOldIsADistinctError
+    fs_edit_test.go:171: 判据 3 读数：old 在 40 字节文件里命中 2 处，先数后拒，落盘前后一字未变
+--- PASS: TestFSEditRefusesAnAmbiguousOldIsADistinctError (0.01s)
+=== RUN   TestFSEditRefusesAnEmptyOldIsAWholeFileInsert
+    fs_edit_test.go:210: 判据 4 空 old 读数：两形（old:"" 与缺 old 字段）都拒，文件保持 29 字节
+--- PASS: TestFSEditRefusesAnEmptyOldIsAWholeFileInsert (0.02s)
+=== RUN   TestFSEditIsAllOrNothingAcrossABatch
+=== RUN   TestFSEditIsAllOrNothingAcrossABatch/no_op_edit_in_the_batch
+    fs_edit_test.go:282: 全有或全无读数：本批 2 枚编辑，其中一枚不成立（空批＝整批不成立）⇒ 一个字也不落盘，文件仍是 26 字节
+=== RUN   TestFSEditIsAllOrNothingAcrossABatch/overlapping_edits
+    fs_edit_test.go:282: 全有或全无读数：本批 2 枚编辑，其中一枚不成立（空批＝整批不成立）⇒ 一个字也不落盘，文件仍是 26 字节
+=== RUN   TestFSEditIsAllOrNothingAcrossABatch/second_edit_misses
+    fs_edit_test.go:282: 全有或全无读数：本批 2 枚编辑，其中一枚不成立（空批＝整批不成立）⇒ 一个字也不落盘，文件仍是 26 字节
+=== RUN   TestFSEditIsAllOrNothingAcrossABatch/empty_batch
+    fs_edit_test.go:282: 全有或全无读数：本批 0 枚编辑，其中一枚不成立（空批＝整批不成立）⇒ 一个字也不落盘，文件仍是 26 字节
+--- PASS: TestFSEditIsAllOrNothingAcrossABatch (0.07s)
+    --- PASS: TestFSEditIsAllOrNothingAcrossABatch/no_op_edit_in_the_batch (0.02s)
+    --- PASS: TestFSEditIsAllOrNothingAcrossABatch/overlapping_edits (0.01s)
+    --- PASS: TestFSEditIsAllOrNothingAcrossABatch/second_edit_misses (0.02s)
+    --- PASS: TestFSEditIsAllOrNothingAcrossABatch/empty_batch (0.02s)
+=== RUN   TestFSEditAppliesABatchOnDisk
+    fs_edit_test.go:318: 对照读数：26 字节 / 4 行 → fs.edit 已改写 C:\Users\swq\AppData\Local\Temp\TestFSEditAppliesABatchOnDisk1909739547\001\ok.txt：2 枚编辑全部生效，26 字节 / 4 行 → 32 字节 / 5 行（临时文件+原子重命名）
+    fs_edit_test.go:319: 对照读数：AppliedSteps=["在 C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSEditAppliesABatchOnDisk1909739547\\001 创建临时文件 .wisp-tmp-817d11e1-43364-2507486409" "向临时文件写入 32 字节" "临时文件已落盘并关闭" "原子重命名 .wisp-tmp-817d11e1-43364-2507486409 → C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSEditAppliesABatchOnDisk1909739547\\001\\ok.txt（目标此刻起为新内容）"]
+--- PASS: TestFSEditAppliesABatchOnDisk (0.02s)
+=== RUN   TestSweepReclaimsOnlyItsOwnStagingFiles
+--- PASS: TestSweepReclaimsOnlyItsOwnStagingFiles (0.28s)
+=== RUN   TestSweepNamingSchemeRejectsNearMisses
+--- PASS: TestSweepNamingSchemeRejectsNearMisses (0.09s)
+=== RUN   TestSweepNeverDeletesThroughARealJunction
+--- PASS: TestSweepNeverDeletesThroughARealJunction (0.23s)
+=== RUN   TestSweepSparesATempFileHeldByAnotherProcess
+--- PASS: TestSweepSparesATempFileHeldByAnotherProcess (1.94s)
+=== RUN   TestFSReadReturnsTheFileAndTaintsIt
+--- PASS: TestFSReadReturnsTheFileAndTaintsIt (0.01s)
+=== RUN   TestFSReadTaintFeedsR4
+--- PASS: TestFSReadTaintFeedsR4 (0.02s)
+=== RUN   TestFSListSummarizesADirectory
+--- PASS: TestFSListSummarizesADirectory (0.02s)
+=== RUN   TestFSListHonoursItsCap
+--- PASS: TestFSListHonoursItsCap (0.04s)
+=== RUN   TestEmptyAllowlistAuthorizesNothing
+--- PASS: TestEmptyAllowlistAuthorizesNothing (0.01s)
+=== RUN   TestSensitiveFileIsDeniedNotEscalated
+--- PASS: TestSensitiveFileIsDeniedNotEscalated (0.02s)
+=== RUN   TestFSRegistrationIsTheD34Roster
+--- PASS: TestFSRegistrationIsTheD34Roster (0.00s)
+=== RUN   TestDeleteEnabledAddsFSDelete
+--- PASS: TestDeleteEnabledAddsFSDelete (0.00s)
+=== RUN   TestToolsDirectoryShape
+--- PASS: TestToolsDirectoryShape (0.01s)
+=== RUN   TestD34WriteMatrix
+=== RUN   TestD34WriteMatrix/read_inside_allowlist_is_L0
+=== RUN   TestD34WriteMatrix/read_out_of_allowlist_is_L2_and_is_a_verdict_not_a_dormant_rule
+=== RUN   TestD34WriteMatrix/list_out_of_allowlist_is_L2
+=== RUN   TestD34WriteMatrix/write_new_file_is_L1
+=== RUN   TestD34WriteMatrix/write_over_existing_is_L2_via_R8
+=== RUN   TestD34WriteMatrix/write_out_of_allowlist_is_L2
+=== RUN   TestD34WriteMatrix/trash_is_L1_because_the_bin_can_give_it_back
+=== RUN   TestD34WriteMatrix/move_same_volume_new_destination_is_L1
+=== RUN   TestD34WriteMatrix/move_over_existing_destination_is_L2
+=== RUN   TestD34WriteMatrix/move_across_volumes_is_L2
+=== RUN   TestD34WriteMatrix/delete_when_enabled_is_L2
+--- PASS: TestD34WriteMatrix (0.16s)
+    --- PASS: TestD34WriteMatrix/read_inside_allowlist_is_L0 (0.01s)
+    --- PASS: TestD34WriteMatrix/read_out_of_allowlist_is_L2_and_is_a_verdict_not_a_dormant_rule (0.00s)
+    --- PASS: TestD34WriteMatrix/list_out_of_allowlist_is_L2 (0.01s)
+    --- PASS: TestD34WriteMatrix/write_new_file_is_L1 (0.02s)
+    --- PASS: TestD34WriteMatrix/write_over_existing_is_L2_via_R8 (0.01s)
+    --- PASS: TestD34WriteMatrix/write_out_of_allowlist_is_L2 (0.01s)
+    --- PASS: TestD34WriteMatrix/trash_is_L1_because_the_bin_can_give_it_back (0.01s)
+    --- PASS: TestD34WriteMatrix/move_same_volume_new_destination_is_L1 (0.03s)
+    --- PASS: TestD34WriteMatrix/move_over_existing_destination_is_L2 (0.02s)
+    --- PASS: TestD34WriteMatrix/move_across_volumes_is_L2 (0.02s)
+    --- PASS: TestD34WriteMatrix/delete_when_enabled_is_L2 (0.01s)
+=== RUN   TestCrossVolumeRuleIsR8
+--- PASS: TestCrossVolumeRuleIsR8 (0.00s)
+=== RUN   TestOverwriteDetectionFollowsTheCanonicalPath
+--- PASS: TestOverwriteDetectionFollowsTheCanonicalPath (0.04s)
+=== RUN   TestAtomicWriteKillsMidWrite
+=== RUN   TestAtomicWriteKillsMidWrite/overwrite_target_keeps_its_old_bytes
+=== RUN   TestAtomicWriteKillsMidWrite/new_file_target_does_not_appear_at_all
+=== RUN   TestAtomicWriteKillsMidWrite/a_clean_write_lands_and_round_trips
+--- PASS: TestAtomicWriteKillsMidWrite (0.06s)
+    --- PASS: TestAtomicWriteKillsMidWrite/overwrite_target_keeps_its_old_bytes (0.02s)
+    --- PASS: TestAtomicWriteKillsMidWrite/new_file_target_does_not_appear_at_all (0.02s)
+    --- PASS: TestAtomicWriteKillsMidWrite/a_clean_write_lands_and_round_trips (0.02s)
+=== RUN   TestWriteRefusesABodyOverTheCap
+--- PASS: TestWriteRefusesABodyOverTheCap (0.01s)
+=== RUN   TestFSTrashGoesToTheRecycleBin
+--- PASS: TestFSTrashGoesToTheRecycleBin (0.40s)
+=== RUN   TestFSTrashNeverFallsBackToAnUnlink
+--- PASS: TestFSTrashNeverFallsBackToAnUnlink (0.06s)
+=== RUN   TestDeleteIsAbsentFromTheRosterWhenTheFlagIsOff
+--- PASS: TestDeleteIsAbsentFromTheRosterWhenTheFlagIsOff (0.04s)
+=== RUN   TestDeleteEnabledRegistersItAsL2
+=== RUN   TestDeleteEnabledRegistersItAsL2/refused_by_the_gate_it_writes_nothing
+=== RUN   TestDeleteEnabledRegistersItAsL2/approved_it_deletes_and_says_it_is_permanent
+--- PASS: TestDeleteEnabledRegistersItAsL2 (0.05s)
+    --- PASS: TestDeleteEnabledRegistersItAsL2/refused_by_the_gate_it_writes_nothing (0.02s)
+    --- PASS: TestDeleteEnabledRegistersItAsL2/approved_it_deletes_and_says_it_is_permanent (0.02s)
+=== RUN   TestFSMoveSameVolume
+--- PASS: TestFSMoveSameVolume (0.04s)
+=== RUN   TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop
+--- PASS: TestCrossVolumeMoveStopsWithTwoCopiesOnLateStop (0.02s)
+=== RUN   TestVetoAfterWorkStartedProducesAppliedSteps
+--- PASS: TestVetoAfterWorkStartedProducesAppliedSteps (0.03s)
+=== RUN   TestCancelBusIsNotWiredMeansNoVetoChannel
+--- PASS: TestCancelBusIsNotWiredMeansNoVetoChannel (0.01s)
+=== RUN   TestFSWriteSilentLossIsNotReported
+time=2026-09-27T10:46:50.935+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestFSWriteSilentLossIsNotReported1670948229\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T10:46:50.949+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T02:46:50Z duration_ms=13
+time=2026-09-27T10:46:50.967+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestFSWriteSilentLossIsNotReported1670948229\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T10:46:50.978+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T02:46:50Z duration_ms=11
+time=2026-09-27T10:46:50.985+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T10:46:50.990+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    fswrite_silentloss_ac1_test.go:124: AC#1(a) 落盘前 672 字节 / 24 行；落盘后 450 字节 / 18 行；少了 6 行 222 字节
+    fswrite_silentloss_ac1_test.go:142: AC#1(b) IsError=false Truncated=false RiskLevel=L2 ErrorClass=""
+    fswrite_silentloss_ac1_test.go:144: AC#1(b) Result.Text="已写入 C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSWriteSilentLossIsNotReported1670948229\\001\\notes.txt（450 字节，临时文件+原子重命名）"
+    fswrite_silentloss_ac1_test.go:146: AC#1(b) AppliedSteps[0]="在 C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSWriteSilentLossIsNotReported1670948229\\001 创建临时文件 .wisp-tmp-817d11e1-43364-1315501678"
+    fswrite_silentloss_ac1_test.go:146: AC#1(b) AppliedSteps[1]="向临时文件写入 450 字节"
+    fswrite_silentloss_ac1_test.go:146: AC#1(b) AppliedSteps[2]="临时文件已落盘并关闭"
+    fswrite_silentloss_ac1_test.go:146: AC#1(b) AppliedSteps[3]="原子重命名 .wisp-tmp-817d11e1-43364-1315501678 → C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSWriteSilentLossIsNotReported1670948229\\001\\notes.txt（目标此刻起为新内容）"
+    fswrite_silentloss_ac1_test.go:174: AC#1(c) tool_call 行：tool=fs.write risk=L2 decision=allow outcome=success error_class=""
+    fswrite_silentloss_ac1_test.go:176: AC#1(c) tool_call 行的全部列名：[ID TaskID Seq Tool ArgsJSON RiskLevel Decision DecidedAt StartedAt EndedAt Outcome ErrorClass CorrelationID GrantID]
+    fswrite_silentloss_ac1_test.go:193: AC#1(c) audit: "tools: call kind=success task=task-1 corr=corr-1 tool=fs.write risk=L2 decision=allow outcome=success rules_hit=[R1 R8] in_allowlist_scope=true reason=\"R1: 工具声明为下界（L1）; R8: 不可逆操作（覆盖已有内容）\""
+    fswrite_silentloss_ac1_test.go:193: AC#1(c) audit: "tools: PATH-ACCOUNT task=task-1 tool=fs.write roots=1 rewritten=[] unusable=[]"
+    fswrite_silentloss_ac1_test.go:205: AC#1(c) fs.read 事后复读：450 字节，Truncated=false，文本里没有任何行数/大小字段（Text 就是文件内容本身）
+    fswrite_silentloss_ac1_test.go:211: AC#1 读数结论：丢了 6 行 222 字节；Result.Text / AppliedSteps / tool_call 行 / audit 行 / fs.read 事后复读 五处信号全部为零 ⇒ 今天的 fs.write 对"整文件写回时漏抄"没有任何检测
+--- PASS: TestFSWriteSilentLossIsNotReported (0.16s)
+=== RUN   TestPathCanonicalizerAccountsForRewrittenRoots
+--- PASS: TestPathCanonicalizerAccountsForRewrittenRoots (0.01s)
+=== RUN   TestTicket107AllowlistJudgmentTwoShapes
+    paths_ticket107_portable_test.go:57: shape R root="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107AllowlistJudgmentTwoShapes2236336167\\001\\proj" target="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107AllowlistJudgmentTwoShapes2236336167\\001\\proj\\a.txt" roots=[c:\users\swq\appdata\local\temp\testticket107allowlistjudgmenttwoshapes2236336167\001\proj] InAllowlist=true
+    paths_ticket107_portable_test.go:58: shape E root="%WISP107_ROOT%\\proj" target="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107AllowlistJudgmentTwoShapes2236336167\\001\\proj\\a.txt" roots=[c:\users\swq\appdata\local\temp\testticket107allowlistjudgmenttwoshapes2236336167\001\proj] rewritten=["%WISP107_ROOT%\\proj" -> C:\Users\swq\AppData\Local\Temp\TestTicket107AllowlistJudgmentTwoShapes2236336167\001\proj (env)] unusable=[] InAllowlist=true
+    paths_ticket107_portable_test.go:60: cross feed (root from shape R, canonical from shape E) InAllowlist=true
+--- PASS: TestTicket107AllowlistJudgmentTwoShapes (0.01s)
+=== RUN   TestTicket107AllowlistBoundaryIsComponentWise
+--- PASS: TestTicket107AllowlistBoundaryIsComponentWise (0.01s)
+=== RUN   TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing
+    paths_ticket107b_probes_test.go:108: mklink /J C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing3422750110\001\proj -> C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing3422750110\001\outside: Junction created for C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing3422750110\001\proj <<===>> C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing3422750110\001\outside
+    paths_ticket107b_probes_test.go:109: premise signals for "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing3422750110\\001\\proj" -> "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing3422750110\\001\\outside": lstat(err=<nil>, modeLink=false) readlink("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing3422750110\\001\\outside", err=<nil>) eval(link)="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing3422750110\\001\\proj",<nil> eval(through)="",The system cannot find the path specified.
+    paths_ticket107b_probes_test.go:120: Canonicalize("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing3422750110\\001\\proj\\marker.txt") refused: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions (judging the lexical spelling instead)
+    paths_ticket107b_probes_test.go:121: roots=[] rewritten=[] unusable=["%WISP107B_A_ROOT%\\proj": risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions] judged="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing3422750110\\001\\proj\\marker.txt" opened="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing3422750110\\001\\proj\\marker.txt"
+--- PASS: TestTicket107bProbeASymlinkedRewrittenRootAuthorizesNothing (0.12s)
+=== RUN   TestTicket107bProbeCLinkInsideAllowedRootStaysOutside
+    paths_ticket107b_probes_test.go:158: mklink /J C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside312365565\001\proj\esc -> C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside312365565\001\outside: Junction created for C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside312365565\001\proj\esc <<===>> C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside312365565\001\outside
+    paths_ticket107b_probes_test.go:159: premise signals for "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside312365565\\001\\proj\\esc" -> "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside312365565\\001\\outside": lstat(err=<nil>, modeLink=false) readlink("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside312365565\\001\\outside", err=<nil>) eval(link)="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside312365565\\001\\proj\\esc",<nil> eval(through)="",The system cannot find the path specified.
+    paths_ticket107b_probes_test.go:165: roots=[c:\users\swq\appdata\local\temp\testticket107bprobeclinkinsideallowedrootstaysoutside312365565\001\proj] rewritten=["%WISP107B_C_ROOT%\\proj" -> C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside312365565\001\proj (env)] unusable=[]
+    paths_ticket107b_probes_test.go:178: Canonicalize("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeCLinkInsideAllowedRootStaysOutside312365565\\001\\proj\\esc\\marker.txt") refused: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions (judging the lexical spelling instead)
+--- PASS: TestTicket107bProbeCLinkInsideAllowedRootStaysOutside (0.12s)
+=== RUN   TestTicket107bProbeBJudgedTreeIsTheOpenedTree
+    paths_ticket107b_probes_test.go:201: mklink /J C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeBJudgedTreeIsTheOpenedTree21336500\001\proj -> C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeBJudgedTreeIsTheOpenedTree21336500\001\outside: Junction created for C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeBJudgedTreeIsTheOpenedTree21336500\001\proj <<===>> C:\Users\swq\AppData\Local\Temp\TestTicket107bProbeBJudgedTreeIsTheOpenedTree21336500\001\outside
+    paths_ticket107b_probes_test.go:202: premise signals for "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeBJudgedTreeIsTheOpenedTree21336500\\001\\proj" -> "C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeBJudgedTreeIsTheOpenedTree21336500\\001\\outside": lstat(err=<nil>, modeLink=false) readlink("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeBJudgedTreeIsTheOpenedTree21336500\\001\\outside", err=<nil>) eval(link)="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeBJudgedTreeIsTheOpenedTree21336500\\001\\proj",<nil> eval(through)="",The system cannot find the path specified.
+    paths_ticket107b_probes_test.go:209: Canonicalize("C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeBJudgedTreeIsTheOpenedTree21336500\\001\\proj\\marker.txt") refused: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions (judging the lexical spelling instead)
+    paths_ticket107b_probes_test.go:211: unexpanded link root: roots=[] unusable=["C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeBJudgedTreeIsTheOpenedTree21336500\\001\\proj": risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions] judged="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeBJudgedTreeIsTheOpenedTree21336500\\001\\proj\\marker.txt" opened="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket107bProbeBJudgedTreeIsTheOpenedTree21336500\\001\\proj\\marker.txt" InAllowlist=false
+--- PASS: TestTicket107bProbeBJudgedTreeIsTheOpenedTree (0.12s)
+=== RUN   TestWorkspaceSwitchNarrowsWhatTheAssessorJudges
+    paths_workspace_test.go:86: AC#3(i): C:\Users\swq\AppData\Local\Temp\TestWorkspaceSwitchNarrowsWhatTheAssessorJudges1648628464\001\beta write L1 -> L2 after switching to C:\Users\swq\AppData\Local\Temp\TestWorkspaceSwitchNarrowsWhatTheAssessorJudges1648628464\001\alpha; inside the workspace still L1
+--- PASS: TestWorkspaceSwitchNarrowsWhatTheAssessorJudges (0.02s)
+=== RUN   TestWorkspaceSwitchRefusesOutOfScopeAndMissingPaths
+--- PASS: TestWorkspaceSwitchRefusesOutOfScopeAndMissingPaths (0.01s)
+=== RUN   TestWorkspaceSwitchRefusesAnExpandedSpelling
+=== RUN   TestWorkspaceSwitchRefusesAnExpandedSpelling/leading_tilde
+    paths_workspace_test.go:155: expanded spelling refused as required: risk: expansion moved this path onto a tree the caller did not name: ~ expands to C:\Users\swq (home); act on the expanded tree only if you asked for it by name
+=== RUN   TestWorkspaceSwitchRefusesAnExpandedSpelling/environment_variable
+    paths_workspace_test.go:172: expanded spelling refused as required: risk: expansion moved this path onto a tree the caller did not name: %TEMP% expands to C:\Users\swq\AppData\Local\Temp (env); act on the expanded tree only if you asked for it by name
+--- PASS: TestWorkspaceSwitchRefusesAnExpandedSpelling (0.00s)
+    --- PASS: TestWorkspaceSwitchRefusesAnExpandedSpelling/leading_tilde (0.00s)
+    --- PASS: TestWorkspaceSwitchRefusesAnExpandedSpelling/environment_variable (0.00s)
+=== RUN   TestWorkspaceSwitchRefusesAJunctionToOutside
+    paths_workspace_test.go:220: junction workspace refused with C26's reason: risk: path traverses a reparse point (junction/symlink) not covered by reparse_point_exceptions
+--- PASS: TestWorkspaceSwitchRefusesAJunctionToOutside (0.11s)
+=== RUN   TestCanonicalizeReturnsAPathTheOSCanOpen
+--- PASS: TestCanonicalizeReturnsAPathTheOSCanOpen (0.01s)
+=== RUN   TestCanonicalizeAgreesWithTheOSName
+--- PASS: TestCanonicalizeAgreesWithTheOSName (0.00s)
+=== RUN   TestFoldPathKeepsPosixBackslashesDistinct
+--- PASS: TestFoldPathKeepsPosixBackslashesDistinct (0.00s)
+=== RUN   TestDirOfBaseOfCutOnThePlatformSeparator
+--- PASS: TestDirOfBaseOfCutOnThePlatformSeparator (0.00s)
+=== RUN   TestRecycleBinStructLayoutMatchesWin32
+--- PASS: TestRecycleBinStructLayoutMatchesWin32 (0.00s)
+=== RUN   TestShellTrashLeavesARecycleBinEntryTheOSCanEnumerate
+--- PASS: TestShellTrashLeavesARecycleBinEntryTheOSCanEnumerate (0.15s)
+=== RUN   TestShellTrashRefusesAMissingPathWithoutDeletingAnything
+--- PASS: TestShellTrashRefusesAMissingPathWithoutDeletingAnything (0.01s)
+=== RUN   TestTicket90ModeReachesRoutingAsParameter
+--- PASS: TestTicket90ModeReachesRoutingAsParameter (0.00s)
+=== RUN   TestTicket90TwoBridgesDoNotShareOneMode
+--- PASS: TestTicket90TwoBridgesDoNotShareOneMode (0.00s)
+=== RUN   TestTicket90UnwiredModeSourceIsTheStrictestMode
+--- PASS: TestTicket90UnwiredModeSourceIsTheStrictestMode (0.00s)
+=== RUN   TestTicket90IrreversibleStillAsksInEveryMode
+--- PASS: TestTicket90IrreversibleStillAsksInEveryMode (0.00s)
+=== RUN   TestTicket90TaintEscalationNeverSilenced
+--- PASS: TestTicket90TaintEscalationNeverSilenced (0.00s)
+=== RUN   TestTicket90TierADenySurvivesEveryMode
+--- PASS: TestTicket90TierADenySurvivesEveryMode (0.04s)
+=== RUN   TestTicket90ModeCarriesNoAllowAuthority
+--- PASS: TestTicket90ModeCarriesNoAllowAuthority (0.00s)
+=== RUN   TestTicket90BlacklistGateIsCalledOnLivePath
+--- PASS: TestTicket90BlacklistGateIsCalledOnLivePath (0.03s)
+=== RUN   TestLoopPassesDeclaredL1WriteThroughTheGate
+time=2026-09-27T10:46:51.885+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopPassesDeclaredL1WriteThroughTheGate3838570816\001\db\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T10:46:51.908+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T02:46:51Z duration_ms=22
+time=2026-09-27T10:46:51.943+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopPassesDeclaredL1WriteThroughTheGate3838570816\001\db\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T10:46:51.952+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T02:46:51Z duration_ms=9
+time=2026-09-27T10:46:51.960+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T10:46:51.964+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestLoopPassesDeclaredL1WriteThroughTheGate (3.23s)
+=== RUN   TestLoopStillRefusesL1WhenNoGateIsRegistered
+time=2026-09-27T10:46:55.093+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopStillRefusesL1WhenNoGateIsRegistered1880554235\001\db\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T10:46:55.118+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T02:46:55Z duration_ms=25
+time=2026-09-27T10:46:55.137+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestLoopStillRefusesL1WhenNoGateIsRegistered1880554235\001\db\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T10:46:55.147+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T02:46:55Z duration_ms=9
+time=2026-09-27T10:46:55.157+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T10:46:55.176+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestLoopStillRefusesL1WhenNoGateIsRegistered (0.19s)
+=== RUN   TestL1WriteGoesThroughTheRealBlockWindow
+--- PASS: TestL1WriteGoesThroughTheRealBlockWindow (3.02s)
+=== RUN   TestVetoInsideTheWindowWritesNothing
+--- PASS: TestVetoInsideTheWindowWritesNothing (0.01s)
+=== RUN   TestLateVetoRendersTheApprovalLayersAppliedStepsReport
+--- PASS: TestLateVetoRendersTheApprovalLayersAppliedStepsReport (3.02s)
+=== RUN   TestApprovedL2ThatStopsMidWriteIsNotRenderedAsNeverStarted
+--- PASS: TestApprovedL2ThatStopsMidWriteIsNotRenderedAsNeverStarted (0.03s)
+=== RUN   TestFSReadOnlyNeverOpensACard
+--- PASS: TestFSReadOnlyNeverOpensACard (0.02s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	19.524s

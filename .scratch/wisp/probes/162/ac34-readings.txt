@@ -1,0 +1,14 @@
+# 票 162-r2 AC#3/AC#4 原始读数（从 gates-tools-verbose-r2.txt 抽取，未编辑文本；生成 2026-09-27 10:49:06 +0800）
+    fs_edit_ac34_test.go:103: AC#3 BOM 正向读数：31 字节 → 31 字节，前三字节仍为 EF BB BF，BOM 出现 1 次，文案="fs.edit 已改写 C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSEditKeepsABOMItWasNotAskedToTouch459983866\\001\\report.md：1 枚编辑全部生效，31 字节 / 2 行 → 31 字节 / 2 行（临时文件+原子重命名）"
+    fs_edit_ac34_test.go:161: AC#3 CRLF 反向读数：23 字节的纯 CRLF 文件里 LF 写法的 old 被响亮拒绝（文案含文件长度 23，证明读到了整文件），同一文件上不含换行的 old 立即命中并落盘 ⇒ 这是正确拒绝，不是读不到
+    fs_edit_ac34_test.go:202: AC#3 CRLF 正向读数：23 字节 → 30 字节，CRLF 对 3→4，裸 CR/裸 LF 均为 0（行尾未被改写），文案="fs.edit 已改写 C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSEditOnACRLFFileAppliesACRLFSpelledOldAndStaysCRLF301280847\\001\\crlf-hit.txt：1 枚编辑全部生效，23 字节 / 3 行 → 30 字节 / 4 行（临时文件+原子重命名）"
+    fs_edit_ac34_test.go:250: AC#3 LF 双向读数：20 字节 → 27 字节，裸 LF 4 条、CR 0 枚（LF 文件的行尾没被改）
+    fs_edit_ac34_test.go:330: 归一取证：23 字节文件（行尾形 纯 CRLF）被 0 命中拒掉一枚归一后可命中 1 次的 old；落盘前后一字未变
+    fs_edit_ac34_test.go:330: 归一取证：20 字节文件（行尾形 纯 CR）被 0 命中拒掉一枚归一后可命中 1 次的 old；落盘前后一字未变
+    fs_edit_ac34_test.go:330: 归一取证：22 字节文件（行尾形 混合(CRLF=2 CR=0 LF=1)）被 0 命中拒掉一枚归一后可命中 1 次的 old；落盘前后一字未变
+    fs_edit_ac34_test.go:330: 归一取证：22 字节文件（行尾形 混合(CRLF=2 CR=0 LF=1)）被 0 命中拒掉一枚归一后可命中 1 次的 old；落盘前后一字未变
+    fs_edit_ac34_test.go:330: 归一取证：20 字节文件（行尾形 纯 LF）被 0 命中拒掉一枚归一后可命中 1 次的 old；落盘前后一字未变
+    fs_edit_ac34_test.go:372: 缺陷读数①（钉住今天的行为，不是批准它）：14 字节带 BOM 的文件，old 从偏移 0 起并含 BOM ⇒ BOM 被当普通字节替换掉，落盘 11 字节、前三字节 41 4c 50，答复无任何提示（IsError=false）
+    fs_edit_ac34_test.go:413: 缺陷读数②（同上，不是批准）：纯 CRLF 文件里插入一段 LF 写法的 new ⇒ 落盘后 3 组 CRLF + 1 条裸 LF，答复（"fs.edit 已改写 C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSEditSilentShapeChangesLandTodayan_lf_spelled_new_in_a_crl405972225\\001\\crlf-mixed.txt：1 枚编辑全部生效，23 字节 / 3 行 → 30 字节 / 4 行（临时文件+原子重命名）"）里没有任何行尾提示 ⇒ 票面 :34「CRLF 文件改完还是 CRLF」今天只在 new 也按 CRLF 拼写时成立
+    fs_edit_ac34_test.go:497: AC#4(a)(b) 读数：改前 26 字节 → 杀点 write:16（边界在下一块落笔前触发，暂存件里此刻 8 字节）→ 目标仍是 26 字节原字节；目录内 .wisp-tmp-* 残件 0 枚，台账 ["在 C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSEditKilledMidWriteLeavesTheTargetByteIdentical299227078\\001 创建临时文件 .wisp-tmp-817d11e1-43364-3954666116" "在步骤「write:16」前停止：模拟进程在此刻被杀" "向临时文件写入 8 字节" "写入未完成：已停止于 write:16：模拟进程在此刻被杀" "删除临时文件 .wisp-tmp-817d11e1-43364-3954666116（目标从头到尾未被改动）"]
+    fs_edit_ac34_test.go:600: AC#4(c) 反面实验读数：同一批字节、同一道 write:16 杀点，摘掉 temp+rename 之后目标从 26 字节变成 8 字节（"ALPHA-LO"），既不是原文也不是要落的内容；事后 fs.read 返回 IsError=false ErrorClass="" Truncated=false，把损坏原文照读照回 ⇒ 这发损坏从此看不见。装回 temp+rename（上一枚用例）则目标一字未动。

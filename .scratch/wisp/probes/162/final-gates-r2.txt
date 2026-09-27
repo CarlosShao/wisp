@@ -1,0 +1,46 @@
+# 票 162-r2 门禁读数（两格全部落盘之后跑的，顺序＝派单 §5；生成 2026-09-27 10:4x +08）
+
+## 1. go test ./internal/tools/ -count=1 -v
+rc=0  ok  github.com/CarlosShao/wisp/internal/tools  19.524s
+顶层（^--- 只在列零计数，子用例是缩进的）：
+  ^=== RUN  = 141（含子用例）
+  ^--- PASS = 94
+  ^--- FAIL = 0
+  ^--- SKIP = 0
+  panic 行数 = 0
+原始逐行输出＝同目录 gates-tools-verbose-r2.txt；AC#3/AC#4 读数抽取件＝ac34-readings.txt
+
+## 2. 名册两向差集（go test -list '.*'）
+进场基线（step-0，改动之前）＝ 86 枚顶层 → roster-baseline-before-r2.txt
+交件时             ＝ 94 枚顶层 → roster-after-r2.txt
+"基线有而现在无"    ＝ 0 枚      → roster-missing-in-r2.txt（空件）
+"现在新增"          ＝ 8 枚      → roster-added-in-r2.txt（逐枚点名，全部在 internal/tools/fs_edit_ac34_test.go）
+派单那句"r1 基线 run=86 pass=86 fail=0 skip=0"＝现量对上（进场 86 枚、交件 94＝86+本程 8）。
+
+## 3. go vet ./internal/tools/
+无输出，rc=0
+
+## 4. bash tools/d22scan/runtests.sh -C tools/d22scan ./...
+runtests.sh: OK - packages=[./...] top-level: PASS=34 FAIL=0 SKIP=0, === RUN=76, '[no tests to run]'=0
+rc=0（＝派单给的基线同数）
+
+## 5. sh scripts/d22scan.sh
+d22scan: clean - no D22 ban violations; live scope work:
+  bans #1-5 internal/=206, bans #1-5 cmd/=23, ban #6 frontend/=85,
+  ban #7 internal/tools/=19, ban #8 design/=39, ban #8 frontend/=85,
+  ban #8 internal/=418, ban #8 cmd/=45
+rc=0
+对照 r1 入库后读数：ban #7 internal/tools/ 仍 19（本程新文件是 _test.go，不在生产码射程内）；
+ban #8 internal/ 417 → 418（＋1＝本程那枚测试文件，注释与 _test.go 在该射程内）。
+
+## 6. gofumpt
+gofumpt --version = v0.12.0 (go1.27.1)
+甲形（已跟踪 .go，git ls-files "*.go" 分母 545 枚）＝ 0 行 → gofumpt-tracked.txt（空件）
+乙形（已跟踪＋未跟踪）＝ 1 行 → gofumpt-tracked-and-untracked.txt
+  唯一一行＝.scratch\wisp\probes\161\r5\negative-control\bad-sample.go＝别的票故意留的坏样本，
+  可归因、未删；本程三枚改动文件（fs_edit_ac34_test.go / fs_edit_test.go / fs.go）都不在表内＝干净。
+
+## 7. 未跑（登记为没测，不是测过）
+staticcheck —— 派单 §6：本机读不了 go1.27 的 export data，会产"干净的绿"，故不跑、不当证据。
+cmd/wisp 全量 —— 需要 third_party\sherpa-onnx 在 PATH（既有账，见 HANDOVER §4.0s），本程改动不越
+  internal/tools 的包边界，未跑该包。
