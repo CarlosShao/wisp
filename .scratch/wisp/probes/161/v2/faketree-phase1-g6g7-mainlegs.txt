@@ -1,0 +1,49 @@
+## G6 主尺（票 161 AC#6②第一族）OpenTask↔CloseTask：派发了环路却没在同一文件关掉那一枚 id
+# 与 G5 的分工：G5 盘「不过桥、直接对 risk 层开 scope」那一形，G6 盘「过桥的 task 生命周期」那一形。
+# 排 internal/tools/bridge.go 的理由与 G5 排 internal/risk 同一条：OpenTask／CloseTask 的定义本体
+#   在那儿（:633 与 :684），把定义算成调用点＝名册每改一行注释就响一次，那是噪音不是读数。
+# 今日真实枚数（09-27 现量，两向分开登记）：正向 0 枚／反向 1 枚＝cmd/wisp/run.go。
+#   正向那 0 枚**不是**「都关好了」：开方唯一的生产调用点（bridge.go:559 b.OpenTask(dec.TaskID)）
+#   正好落在被排掉的定义本体文件里，这条射程的结构就没有开方可数——所以这一腿的响只由反向撑着，
+#   「新造一发开了却没关的它必须响」那件事交给（甲）合成树那发主证，不靠这条射程的空 0。
+
+## G6 主尺 OpenTask↔CloseTask 成对普查（排 *_test.go、排定义本体 internal/tools/bridge.go；两向都算）
+$ git grep -nEw 'OpenTask|CloseTask' 8388cae359ad32d6483f206f09b6b04062964110 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/tools/bridge.go
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+8388cae359ad32d6483f206f09b6b04062964110:internal/fake/taskopen.go:4:func (b *BridgeX) Dispatch() { b.OpenTask("t-1") }
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   UNPAIRED internal/fake/taskopen.go (开方调用点=1)
+# 反向名册（CloseTask 出现过、同一文件却没见过 OpenTask 的文件；这一味＝「关过却没开过」）：
+#   （空）
+# 反向未成对枚数＝0   （0＝反向没响）
+# 未成对枚数＝1   （0＝这把尺没响／>0＝逐枚点名如上）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=1   （本枚子句的响＝未成对枚数；0＝不响）
+
+## G7 主尺（票 161 AC#6②第二族）Defer↔DisposalScope：挂了收尾却没绑到声明的 scope／反向＝拿着 scope 却没挂收尾
+# 定义本体＝internal/plugin/disposal.go（type DisposalScope :129、Defer :186、DeferNamed :191、
+#   Dispose :253），与 G5 排 internal/risk、G6 排 bridge.go 同一条理由，排掉它。
+# 开方写 'Defer(Named)?' 而不是 'Defer'：本程现量 printf 'x.DeferNamed(y)' | grep -Ew 'Defer' ⇒ rc=1，
+#   -w 把 DeferNamed 当另一个词，光写 Defer 会漏掉一半的收尾登记点（换成 Defer(Named)? 后 rc=0）。
+# 合方同理写 '(New)?DisposalScope'：grep -Ew 'DisposalScope' 对 'plugin.NewDisposalScope(...)' 也是 rc=1
+#   ——同一个词被前缀粘住，只排 DisposalScope 会把「用 NewDisposalScope 造了 scope、又 Defer 到它上面」的
+#   文件误判成未成对。今天这一改不动任何读数：本程现量 git grep -nEw NewDisposalScope <锚> -- internal cmd
+#   排测试排定义本体 ⇒ rc=1，生产码里一枚构造点都还没有，所以合方名册与改前逐字相同。
+# 今日真实枚数：正向 0 枚（Defer／DeferNamed 的生产调用点全在被排掉的定义本体里，测试之外零枚）／
+#   反向 3 枚＝internal/memory/retention.go、internal/observe/goroutine.go、internal/proc/shutdown.go。
+#   反向这 3 枚里 retention.go:98 是真拿 scope 的签名，另两枚各有一味是「代码行尾随注释」被算进
+#   调用行的已知粗糙处（pair() 只剔以 // 开头的整行）——逐枚人来判真漏／委托，本程不替它判。
+
+## G7 主尺 Defer↔DisposalScope 成对普查（排 *_test.go、排定义本体 internal/plugin/disposal.go；两向都算）
+$ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' 8388cae359ad32d6483f206f09b6b04062964110 -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/plugin/disposal.go
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+8388cae359ad32d6483f206f09b6b04062964110:internal/fake/defersonly.go:4:func (x *X) Tear() { x.Defer(x.close) }
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   UNPAIRED internal/fake/defersonly.go (开方调用点=1)  # 同文件另见收尾动词，判「真漏／委托」
+# 反向名册（(New)?DisposalScope 出现过、同一文件却没见过 Defer(Named)? 的文件；这一味＝「关过却没开过」）：
+#   （空）
+# 反向未成对枚数＝0   （0＝反向没响）
+# 未成对枚数＝1   （0＝这把尺没响／>0＝逐枚点名如上）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=1   （本枚子句的响＝未成对枚数；0＝不响）
+
