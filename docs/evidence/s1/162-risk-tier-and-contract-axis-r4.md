@@ -211,3 +211,26 @@ gofumpt -l（甲形＝已跟踪 .go ＋ 本程新增两枚）    → 0 行
 - **本程交回三枚提交**：`7a41af51`（AC#5 四枚用例）／`27f0cb8a`（派单 §3 清扫链一枚，升成用例钉）／`9c00bb33`（gofumpt 甲形归零）。逐枚 `git log --oneline -1`＋`show --name-only` 的原样输出在本文件 §3.2／§5／§6 对应小节与提交信息内。
 - **AC#5／AC#6 两格一律未勾**，等非实现者表（`162-v3`）。裁决者建议先看三处：① §3.3 里 `fs.write` 多一枚 R8 而 `fs.edit` 没有——那是"同族"的合法差异还是缺口，归它判；② §3.4 M-1 之下档位与通道**都不红**，红只在规则集与审计行——这条判断（"档位字符串不足以当凭据"）值得复算；③ §2 里"空白 path 到不了法官"这一形状（审计行写成 `in_allowlist_scope=true`）是不是另一枚该记账的缺口，本程判它**不归本票**（尺在 `assessor_test.go:172` 与 `bridge_junction_windows_test.go`），可复核。
 - 票面 Progress log 一节由本程追加（最后一步，写前 `git status --porcelain -- 票面` 为空，已核）。
+
+### 11.1 本件自身的提交（原样输出，取数＝`git log --oneline -1` 与 `git -c core.quotePath=false show --name-only HEAD`）
+
+```
+b542bc1c 162-r4 AC#6: 契约轴凭证＋AC#5／§3 交件件落盘（docs/evidence/s1/162-risk-tier-and-contract-axis-r4.md）
+
+docs/evidence/s1/162-risk-tier-and-contract-axis-r4.md
+```
+
+同一批的另外三枚（本文件 §3.2／§5／§6 引用的就是它们）：
+
+```
+7a41af51 162-r4 AC#5: fs.edit 的越界判定钉在 C26 的 R2 上，并与 fs.write 并排读数
+internal/tools/fs_edit_ac5_gate_r4_test.go
+27f0cb8a 162-r4 派单 §3: 把「fs.edit 的写盘会不会带走死进程留下的暂存残件」从〔现读码〕升成用例钉
+internal/tools/fs_edit_ac5_sweep_r4_windows_test.go
+9c00bb33 162-r4 AC#5 收尾：gofumpt 甲形归零（只动 composite literal 的换行形状，零判语改动）
+internal/tools/fs_edit_ac5_gate_r4_test.go
+```
+
+父链核对：`git log --format='%h parent=%p' -1 7a41af51` ⇒ `7a41af51 parent=4cee47f2`（同树另一程 `171-r2` 的提交，本程未动它）。
+本小节之后的那一枚提交（票面 Progress log ＋本小节同批）的号本文件里预填不了——**它落号之后由裁决者或编排者复算，本程不引未跑出来的读数**。
+
