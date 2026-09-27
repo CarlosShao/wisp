@@ -1,0 +1,1 @@
+pathresolver-bypass	internal/	v1 fixture: directory-prefix entry on purpose (mirrors 161-r1 B6)

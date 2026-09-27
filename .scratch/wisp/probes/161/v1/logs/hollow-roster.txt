@@ -1,0 +1,1 @@
+d22scan -self-test: FATAL C:/Users/swq/AppData/Local/Temp/wisp161v1/out/empty-roster.go: no `// Bans (` header: the self-test reads its roster out of that block, so a move or a reword there must come with a re-read of this file, not a silent empty list

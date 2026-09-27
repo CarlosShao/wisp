@@ -1,0 +1,3 @@
+d22scan -self-test: FATAL the table does not cover the tool (1 hole(s)); an unrun self-test is not a green self-test
+d22scan -self-test:   HOLE tag "wallclock-timeout" has only an expect-ring sample - a gate that is always ringing has never been shown to be able to stay quiet, which is the tautological-check shape this repo has rejected twice
+exit status 2

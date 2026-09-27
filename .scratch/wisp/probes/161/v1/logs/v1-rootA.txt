@@ -1,0 +1,2 @@
+d22scan: "C:\\Users\\swq\\AppData\\Local\\Temp\\wisp161v1\\fakeroots\\rootA" has only 3 production .go files under internal/ and cmd/, want >= 10: the ban scan would be a no-op
+d22scan: this tool is its own Go module; run `scripts/d22scan.sh` or `cd tools/d22scan && go run . -root ../../` (see tools/d22scan/main.go doc comment)

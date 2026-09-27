@@ -1,0 +1,19 @@
+d22scan: gitignore rules NOT APPLIED - git cannot be consulted in C:/Users/swq/AppData/Local/Temp/wisp161v1/fakeroots/rootB: `git rev-parse --show-prefix`: fatal: not a git repository (or any of the parent directories): .git; every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+d22scan: examined 12 production Go files under internal/ and cmd/ of C:/Users/swq/AppData/Local/Temp/wisp161v1/fakeroots/rootB
+d22scan: scope bans #1-5 internal/      examined  11 production Go files
+d22scan: scope bans #1-5 cmd/           examined   1 production Go files
+d22scan: scope ban #6 frontend/         examined   1 text files
+d22scan: scope ban #7 internal/tools/   examined   1 production Go files
+d22scan: scope ban #8 design/           examined   1 text files
+d22scan: scope ban #8 frontend/         examined   1 text files
+d22scan: scope ban #8 internal/         examined  11 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined   1 Go files, comments and _test.go included
+internal/v1/s1.go:8: [bare-goroutine] bare `go s.worker(...)` is banned (D22/D38b, R16: named calls count too): use observe.Registry.Spawn (named, owner, recover boundary)
+internal/v1/s6.go:6: [pathresolver-bypass] filepath.Abs outside the C26 PathResolver is banned (D22); see tools/d22scan/allowlist.txt for the sanctioned exceptions
+internal/v1/s6.go:7: [pathresolver-bypass] filepath.Clean outside the C26 PathResolver is banned (D22); see tools/d22scan/allowlist.txt for the sanctioned exceptions
+internal/v1/s7.go:3: [plaintext-key] identifier probeAPIKey holds a plaintext key literal (D22/C28: SecretStore refs only)
+internal/v1/s8.go:3: [mirror-hash] hash material mentioned together with a mirror (C29/F3: hashes come from the signed manifest only)
+internal/v1/s8.go:4: [mirror-hash] hash material mentioned together with a mirror (C29/F3: hashes come from the signed manifest only)
+internal/v1/s9.go:6: [wallclock-timeout] wall-clock delta (Sub(time.Now())) in what must be monotonic logic (D42#9/D22)
+internal/v1/s5.go:7: [emoji] ban #8 glyph in scope internal/ is banned (D23): non-comment text, string literals included; comments are exempt per Q-46(c)
+d22scan: 8 finding(s); D22 bans are not negotiable (see PLAN.md D22, tools/d22scan/allowlist.txt)

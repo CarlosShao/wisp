@@ -1,0 +1,40 @@
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:97: design/assets/tokens.css declares --glass-ring but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:98: design/assets/tokens.css declares --glass-hi but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:99: design/assets/tokens.css declares --glass-hi-soft but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:100: design/assets/tokens.css declares --border-soft but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:101: design/assets/tokens.css declares --fg-primary but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:102: design/assets/tokens.css declares --fg-secondary but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:103: design/assets/tokens.css declares --fg-tertiary but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:104: design/assets/tokens.css declares --accent but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:105: design/assets/tokens.css declares --accent-line but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:106: design/assets/tokens.css declares --danger but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:107: design/assets/tokens.css declares --danger-line but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:108: design/assets/tokens.css declares --warn but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:109: design/assets/tokens.css declares --warn-line but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:110: design/assets/tokens.css declares --success but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:111: design/assets/tokens.css declares --success-line but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:112: design/assets/tokens.css declares --info but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:113: design/assets/tokens.css declares --info-line but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:114: design/assets/tokens.css declares --warm but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:115: design/assets/tokens.css declares --warm-line but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:116: design/assets/tokens.css declares --orb-hi but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:117: design/assets/tokens.css declares --orb-body but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:118: design/assets/tokens.css declares --orb-body-2 but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:119: design/assets/tokens.css declares --orb-rim but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:120: design/assets/tokens.css declares --orb-shadow but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:121: design/assets/tokens.css declares --tint-accent-hi but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:122: design/assets/tokens.css declares --tint-success-hi but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:123: design/assets/tokens.css declares --tint-success-lo but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:124: design/assets/tokens.css declares --tint-warm-hi but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:125: design/assets/tokens.css declares --tint-warm-lo but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:126: design/assets/tokens.css declares --tint-warn-hi but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:127: design/assets/tokens.css declares --tint-warn-lo but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:128: design/assets/tokens.css declares --tint-danger-hi but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:129: design/assets/tokens.css declares --tint-danger-lo but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:130: design/assets/tokens.css declares --tint-neutral-hi but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:131: design/assets/tokens.css declares --tint-neutral-mid but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:532: docs/evidence/s1/c21-native-tokens.md:132: design/assets/tokens.css declares --tint-neutral-lo but frontend/src/styles/tokens.generated.css does not carry it
+    tokens_fourway_test.go:547: only 0 of 78 colour rows completed all four legs - the check is not doing its job
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.055s
+FAIL
