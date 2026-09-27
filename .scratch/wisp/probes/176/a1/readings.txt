@@ -1,0 +1,48 @@
+# 176-a1 起跑口普查读数
+# generated=2026-09-27T23:58:51+08:00  HEAD=f6a4eebd38e8ce9d53878e8443ad063645e33b2b  branch=dev
+
+## R1 RunAsync 定义行（存在性；不存在则本票票面措辞要改写）
+$ grep -rn 'func (l \*Loop) RunAsync' --include='*.go' internal/
+grep: internal/: No such file or directory
+count=0
+
+## R2 RunAsync 生产调用点（点号调用形，排 _test.go）
+$ grep -rn '\.RunAsync(' --include='*.go' internal/ cmd/ | grep -v _test.go
+count=0
+
+## R2b 同尺含测试（对照：命中全在测试里）
+$ grep -rn '\.RunAsync(' --include='*.go' internal/ cmd/ | wc -l
+count=0
+grep: internal/: No such file or directory
+grep: cmd/: No such file or directory
+
+## R3 TaskRoster.Record 生产写者（派单给的尺形原文）
+$ grep -rn '\.Record(' --include='*.go' internal/ cmd/ | grep -v _test.go
+count=0
+
+## R3b 同尺含测试（对照）
+$ grep -rn '\.Record(' --include='*.go' internal/ cmd/ | wc -l
+count=0
+
+## R3c Record 定义行（存在性）
+$ grep -rn 'func (r \*TaskRoster) Record' --include='*.go' internal/
+grep: internal/: No such file or directory
+
+## R4 裸 go func( 生产命中（ban 1 口径，排测试）
+$ grep -rn 'go func(' --include='*.go' internal/ cmd/ | grep -v _test.go
+count=0
+
+## R5 observe.Registry.Spawn 生产调用点（受管先例）
+$ grep -rn '\.Spawn(' --include='*.go' internal/ cmd/ | grep -v _test.go
+count=0
+
+## R6 禁区 (i) 自证：Loop 上收 taskID 的导出方法（= gate-clauses G3 的 pattern）
+$ grep -rnE '^func \(l \*Loop\) [A-Z][A-Za-z0-9]*\(.*taskID' internal/agent
+grep: internal/agent: No such file or directory
+count=0
+
+## R7 Record 的 ArtifactPath 写入点（豁免载具的唯一上游；排测试）
+$ grep -rn 'ArtifactPath:' --include='*.go' internal/ cmd/ | grep -v _test.go
+count=0
+
+# 读数完毕。判读见 docs/evidence/s1/176-background-start-port-census-a1.md

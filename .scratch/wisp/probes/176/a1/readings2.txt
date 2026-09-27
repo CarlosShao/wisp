@@ -1,0 +1,64 @@
+# 176-a1 起跑口普查读数
+# generated=2026-09-27T23:59:27+08:00  HEAD=f6a4eebd38e8ce9d53878e8443ad063645e33b2b  branch=dev
+
+## R1 RunAsync 定义行（存在性；不存在则本票票面措辞要改写）
+$ grep -rn 'func (l \*Loop) RunAsync' --include='*.go' internal/
+internal/agent/loop.go:321:func (l *Loop) RunAsync(ctx context.Context, input string) *RunningTask {
+count=1
+
+## R2 RunAsync 生产调用点（点号调用形，排 _test.go）
+$ grep -rn '\.RunAsync(' --include='*.go' internal/ cmd/ | grep -v _test.go
+count=0
+
+## R2b 同尺含测试（对照：命中全在测试里）
+$ grep -rn '\.RunAsync(' --include='*.go' internal/ cmd/ | wc -l
+count=6
+internal/agent/control_test.go:81:	task := h.loop.RunAsync(context.Background(), "慢一点也行")
+internal/agent/control_test.go:131:	task := h.loop.RunAsync(context.Background(), "现在天气怎么样")
+internal/agent/forensics_test.go:99:	task := h.loop.RunAsync(context.Background(), "六个任务并行")
+internal/agent/loop_golden_test.go:172:	task := h.loop.RunAsync(context.Background(), "六个任务并行")
+internal/agent/loop_golden_test.go:251:	task := h.loop.RunAsync(context.Background(), "慢一点也行")
+internal/agent/loop_golden_test.go:275:	task := h.loop.RunAsync(context.Background(), "两件事一起办")
+
+## R3 TaskRoster.Record 生产写者（派单给的尺形原文）
+$ grep -rn '\.Record(' --include='*.go' internal/ cmd/ | grep -v _test.go
+count=0
+
+## R3b 同尺含测试（对照）
+$ grep -rn '\.Record(' --include='*.go' internal/ cmd/ | wc -l
+count=16
+
+## R3c Record 定义行（存在性）
+$ grep -rn 'func (r \*TaskRoster) Record' --include='*.go' internal/
+internal/tools/task.go:123:func (r *TaskRoster) Record(taskID string, o TaskOutput) {
+
+## R4 裸 go func( 生产命中（ban 1 口径，排测试）
+$ grep -rn 'go func(' --include='*.go' internal/ cmd/ | grep -v _test.go
+count=0
+
+## R5 observe.Registry.Spawn 生产调用点（受管先例）
+$ grep -rn '\.Spawn(' --include='*.go' internal/ cmd/ | grep -v _test.go
+internal/agent/loop.go:324:	t.h = l.reg.Spawn("agent-task-"+id, "agent", t.root, func(c context.Context) {
+internal/agent/loop.go:650:		h := l.reg.Spawn("tool-exec-"+taskID, "agent", root, func(c context.Context) {
+internal/audio/audio.go:181:	return registry.Spawn("audio-capture", "audio", nil, run)
+internal/audio/wasapimic_windows.go:83:	observe.Default.Spawn("audio-capture", "audio", nil, func(c context.Context) {
+internal/audio/wavinjector.go:84:	observe.Default.Spawn("audio-capture", "audio", nil, func(ctx context.Context) {
+internal/ball/ball_windows.go:170:	b.sta.handle = opts.Registry.Spawn("ui-sta", "ball", nil, func(_ context.Context) {
+internal/llm/adaptertest/mockllm.go:86:	h := mockllmRegistry.Spawn("mockllm-stdout-reader", "test", spawnRoot,
+internal/memory/writer.go:79:		q.reg.Spawn("db-writer", "memory", nil, func(ctx context.Context) {
+internal/observe/logging.go:96:	h := reg.Spawn("log-flusher", "observe", p.root, w.flushLoop)
+internal/plugin/disposal.go:233:	return s.reg.Spawn(name, "scope:"+s.name, root, func(ctx context.Context) {
+internal/plugin/disposal.go:296:		h := s.reg.Spawn("disposal-worker", "scope:"+s.name, nil, func(context.Context) {
+cmd/balldebug/main.go:251:		bridgeHandle := observe.Default.Spawn(goroutineHotkeyBridge, "balldebug", bridgeRoot, func(ctx context.Context) {
+cmd/balldebug/main.go:432:	h := observe.Default.Spawn(goroutineLevelFeeder, "balldebug", root, func(ctx context.Context) {
+count=13
+
+## R6 禁区 (i) 自证：Loop 上收 taskID 的导出方法（= gate-clauses G3 的 pattern）
+$ grep -rnE '^func \(l \*Loop\) [A-Z][A-Za-z0-9]*\(.*taskID' internal/agent
+count=0
+
+## R7 Record 的 ArtifactPath 写入点（豁免载具的唯一上游；排测试）
+$ grep -rn 'ArtifactPath:' --include='*.go' internal/ cmd/ | grep -v _test.go
+count=0
+
+# 读数完毕。判读见 docs/evidence/s1/176-background-start-port-census-a1.md
