@@ -50,3 +50,6 @@ if b.paths == nil || len(dec.Paths) == 0 { return true }     // bridge.go:924-92
 ## Progress log (append-only, newest last)
 
 - [2026-09-27 18:2x] 编排者开票。来路＝`162-v3` §14 第 (c) 条，它判"不归 162、也不该在 162 造第二把尺（AC#4b 禁）"——**这句我采纳**；但它建议"并入 `internal/risk` 审计字段语义票"，而**全仓没有那样的票**，所以落成票 173。我本轮自己读了定位那一味：`internal/tools/bridge.go:923-932`（`inScope`），空路径那支在 `len(dec.Paths)==0` 处**直接 `return true`**，注释自陈"the audit line's cheap answer"⇒ **写代码的人当时就知道它是便宜答案，只是没人给它登记过**（这条与台账里"错归因会让后人删掉真正兜底的那行"同族，所以票面把注释原话抄了出来）。
+
+
+- [2026-09-27 20:3x] **编排者追加同族第二枚（本票射程扩一格，原句一字不抹；来路＝只读测量程 `174-c1`，表 `docs/evidence/s1/174-artifacts-allowlist-readback-c1.md`，提交 `53cbf0bf`）**：本票讲的是"空白路径到不了法官、审计行却写 `in_allowlist_scope=true`"——**同一枚族、不同字段**还有一发：**审批超时那一发的 `ErrorClass` 也叫 `user_rejected`**（`internal/tools/bridge.go:397-404`，人工拒与超时两路**共用同一枚 reject class 实参**；〔第二见证＝`174-c1` 现跑两发各自拿到 `class=user_rejected`，逐字读数在它表的"向一"段，**本程我未复跑**〕）。⇒ **审计与回执上"用户拒绝了"与"没人来得及回答"是两件事**，混成一枚标签会让下一次"谁拦的"这笔账读不出真因。⇒ **处置**：与本票主项同一形状（要么分两枚 class，要么回执里带上"超时"这一味），⚠ **不许**借这一格去动 `thresholds.go` 或任何审批超时常量（那是冻结件）。
