@@ -195,10 +195,12 @@ func TestShapeAFExclusionDiesWithScopeClose(t *testing.T) {
 }
 
 // W-5: ordering (ii). The "empty after normalization" check must run BEFORE
-// the exclusion, or a body that normalizes to exactly the declared path
-// flips Mark's frozen truth sentence ("returns false only when ... after
-// normalization") SILENTLY. Pinned with P-only bodies (the existing
-// TestMarkEmptyAfterNormalization feeds no P and cannot see this).
+// the exclusion, or a body that normalizes to exactly the declared path flips
+// the truth of the final sentence of Mark's frozen doc block SILENTLY (that
+// block is quoted nowhere in this file; see its byte-compare ruler in
+// docs/evidence/s1/177-shape-a-impl-r1.md). Pinned with P-only bodies (the
+// existing TestMarkEmptyAfterNormalization feeds no P and cannot see this —
+// measured: it stayed green under MUT-W5).
 func TestShapeAW5EmptyCheckPrecedesExclusion(t *testing.T) {
 	p := testProv(t, shapeAOptions(t))
 	if !p.MarkWithHostPath("task-1", SrcFSRead, "task.output", shapeAPath, shapeAPath) {
