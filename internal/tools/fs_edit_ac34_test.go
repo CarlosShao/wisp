@@ -334,15 +334,21 @@ func TestFSEditLineEndingForensicsRefusesRealSpellings(t *testing.T) {
 }
 
 // TestFSEditSilentShapeChangesLandToday is the other side of the same forensic
-// cell, and the side that is NOT safe: two calls whose bytes are a perfect
-// literal match, so nothing refuses, and the file comes out with its encoding
-// marker or its line-ending consistency gone. These assertions pin TODAY's
-// behaviour as a reading - they are a register of defects for the orchestrator
-// to rule on, and an approval of neither. If :27's normalization layer is built,
-// these two cases are the ones it has to change, which is why they are written
-// as assertions instead of as log lines.
+// cell, and the side that was NOT safe.
+//
+// IT NO LONGER PINS WHAT ITS NAME SAYS. The function name is r2's and the test
+// roster is a stability key (dispatch r3 门禁: "缺那一侧必须为 0"), so the name
+// stays; the assertions flipped in AC#3b (r3). r2 registered these two shapes as
+// readings of defects, with tripwires in place - "the answer now signals the
+// encoding change; update this case's wording" - and r3 is the cell those
+// tripwires were waiting for. Both subtests now pin the OPPOSITE: each shape is a
+// hard refusal, nothing lands, and the receipt says so. The forward direction of
+// each shape (an old copied after the BOM; a new spelled in the file's own
+// endings) is exercised by the control subtests of the same shape in
+// fs_edit_ac3b_test.go, so this cell cannot be satisfied by a tool that refuses
+// everything.
 func TestFSEditSilentShapeChangesLandToday(t *testing.T) {
-	t.Run("an_old_that_carries_the_bom_deletes_it", func(t *testing.T) {
+	t.Run("an_old_that_carries_the_bom_is_refused_r3", func(t *testing.T) {
 		root := sealableTempDir124(t)
 		original := utf8BOM + "alpha\nbeta\n"
 		target := filepath.Join(root, "bom-zero.txt")
@@ -351,30 +357,27 @@ func TestFSEditSilentShapeChangesLandToday(t *testing.T) {
 		}
 		b, _ := fsEditBridge(t, mustCanonical(t, root))
 
-		// A model that copies the first line INCLUDING what a hex/strict reader
-		// shows it, then spells the replacement in plain text, matches at offset
-		// 0 - and the three BOM bytes are inside the replaced region.
+		// The same call r2 measured landing at 14 bytes -> 11 with zero signal: a
+		// model that copies the first line INCLUDING the BOM's three bytes matches
+		// at offset 0, and the marker sits inside the replaced region.
 		out, err := b.Execute(t.Context(), req("fs.edit", editArgs(t, target,
 			map[string]any{"old": utf8BOM + "alpha", "new": "ALPHA"})))
-		if err != nil || out.IsError {
-			t.Fatalf("this call is a literal match, so nothing refuses it: out=%+v err=%v", out, err)
+		if err != nil {
+			t.Fatal(err)
 		}
-		after := readString(t, target)
-		if after != "ALPHA\nbeta\n" {
-			t.Fatalf("reading changed: got %q", after)
+		assertRefusal(t, out, "UTF-8 BOM")
+		if after := readString(t, target); after != original {
+			t.Fatalf("AC#3b① violated: the BOM-swallowing edit moved bytes:\n before=%q\n  after=%q", original, after)
 		}
-		if strings.HasPrefix(after, utf8BOM) {
-			t.Fatal("the BOM survived - this case must be re-registered once the behaviour changes")
+		if !strings.HasPrefix(readString(t, target), utf8BOM) {
+			t.Fatal("the BOM is gone - AC#3b① regressed")
 		}
-		if strings.Contains(out.Text, "BOM") || strings.Contains(out.Text, "字节序") || out.IsError {
-			t.Error("the answer now signals the encoding change; update this case's wording")
-		}
-		t.Logf("缺陷读数①（钉住今天的行为，不是批准它）：%d 字节带 BOM 的文件，old 从偏移 0 起并含 BOM ⇒ "+
-			"BOM 被当普通字节替换掉，落盘 %d 字节、前三字节 % x，答复无任何提示（IsError=false）",
-			len(original), len(after), []byte(after)[:3])
+		t.Logf("AC#3b① 翻转读数（r2 的缺陷读数①在此变红）：%d 字节带 BOM 的文件，old 从偏移 0 起并含 BOM ⇒ "+
+			"现在是硬拒、一字未落，前三字节仍 EF BB BF，IsError=%v ErrorClass=%q",
+			len(original), out.IsError, out.ErrorClass)
 	})
 
-	t.Run("an_lf_spelled_new_in_a_crlf_file_lands_mixed_endings", func(t *testing.T) {
+	t.Run("an_lf_spelled_new_in_a_crlf_file_is_refused_r3", func(t *testing.T) {
 		root := sealableTempDir124(t)
 		const original = "alpha\r\nbravo\r\ncharlie\r\n"
 		target := filepath.Join(root, "crlf-mixed.txt")
@@ -383,36 +386,23 @@ func TestFSEditSilentShapeChangesLandToday(t *testing.T) {
 		}
 		b, _ := fsEditBridge(t, mustCanonical(t, root))
 
-		// The old spans NO line break, so the CRLF file is matchable in LF-free
-		// text; the new brings bare LFs.
+		// r2's defect reading ②: the old spans no break, the new brings bare LFs,
+		// and the file came out 3 CRLF + 1 bare LF with an answer that mentioned
+		// nothing. That is now the refusal's own wording.
 		out, err := b.Execute(t.Context(), req("fs.edit", editArgs(t, target,
 			map[string]any{"old": "bravo", "new": "bravo\nbravo2"})))
-		if err != nil || out.IsError {
-			t.Fatalf("out=%+v err=%v", out, err)
+		if err != nil {
+			t.Fatal(err)
 		}
-		after := readString(t, target)
-		crlf, cr, lf := endings(after)
-		// "bravo\nbravo2" sits inside the second line, so the file keeps its three
-		// CRLF pairs and gains ONE bare LF: a mixed-ending file, unsignalled.
-		if crlf != 3 || cr != 0 || lf != 1 {
-			t.Fatalf("expected the mixed shape (3 CRLF + 1 bare LF), got crlf=%d bareCR=%d bareLF=%d in %q",
-				crlf, cr, lf, after)
+		assertRefusal(t, out, "行尾约定", "裸 LF 1 条")
+		if got := readString(t, target); got != original {
+			t.Fatalf("AC#3b② violated: the mixed-ending edit moved bytes:\n before=%q\n  after=%q", original, got)
 		}
-		// The "no signal" half. The phrases are multi-word on purpose: this
-		// subtest's own temp directory spells "mixed_endings" into the path the
-		// answer quotes, so a one-word probe would report a warning that is not
-		// there (it did, first run of this case).
-		for _, probe := range []string{"行尾", "mixed endings", "endings", "不一致"} {
-			if strings.Contains(out.Text, probe) {
-				t.Errorf("the answer now warns about endings (%q); update this case's wording", probe)
-			}
+		if crlf, cr, lf := endings(readString(t, target)); crlf != 3 || cr != 0 || lf != 0 {
+			t.Fatalf("AC#3b② violated: the file is no longer pure CRLF: %d/%d/%d", crlf, cr, lf)
 		}
-		if out.IsError {
-			t.Error("this call is supposed to succeed today; a refusal changes the reading")
-		}
-		t.Logf("缺陷读数②（同上，不是批准）：纯 CRLF 文件里插入一段 LF 写法的 new ⇒ 落盘后 3 组 CRLF + 1 条裸 LF，"+
-			"答复（%q）里没有任何行尾提示 ⇒ 票面 :34「CRLF 文件改完还是 CRLF」今天只在 new 也按 CRLF 拼写时成立",
-			out.Text)
+		t.Logf("AC#3b② 翻转读数（r2 的缺陷读数②在此变红）：纯 CRLF 文件里一枚 LF 写法的 new ⇒ 硬拒，"+
+			"落盘前后仍 3 组 CRLF / 0 裸 LF，IsError=%v ErrorClass=%q", out.IsError, out.ErrorClass)
 	})
 }
 

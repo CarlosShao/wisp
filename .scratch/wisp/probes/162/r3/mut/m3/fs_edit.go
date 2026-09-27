@@ -228,7 +228,7 @@ func (t fsEdit) Execute(ctx context.Context, params json.RawMessage, onUpdate fu
 		shift += len(m.new) - len(m.old)
 	}
 	b.WriteString(content[next:])
-	updated := b.String()
+	updated := strings.ReplaceAll(strings.ReplaceAll(b.String(), "\r\n", "\n"), "\n", "\r\n") // MUT-R3 same shape as 162-v1 MUT-3
 
 	// AC#3b shape ②: a new that spells its breaks in a style the file does not
 	// use turns a pure-CRLF (or pure-LF, or pure-CR) file into a mixed-ending one

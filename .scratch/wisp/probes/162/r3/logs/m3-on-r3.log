@@ -1,0 +1,99 @@
+time=2026-09-27T16:30:10.887+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestFSEditKeepsABOMItWasNotAskedToTouch
+    fs_edit_ac34_test.go:88: out={Text:fs.edit 拒绝执行：本批 new 会改写这份文件的行尾约定：文件原本是纯 LF，改完会变成 CRLF 2 组 / 裸 CR 0 条 / 裸 LF 0 条。请把 new 里的换行按文件自己的行尾拼写（纯 LF 的文件：换行写成 \n，单字节换行）；确实要把整份文件换成别的行尾，请改用 fs.write 整文件写回，本工具不猜行尾。old 必须与文件内容逐字一致，包含全部空白与换行（the old string must match exactly including all whitespace and newlines）。本次调用一个字也没有写，目标文件保持原状。 IsError:true RiskLevel:L2 ErrorClass:tool Truncated:false AppliedSteps:[]} err=<nil>
+--- FAIL: TestFSEditKeepsABOMItWasNotAskedToTouch (0.01s)
+=== RUN   TestFSEditOnACRLFFileRefusesAnLFSpelledOld
+    fs_edit_ac34_test.go:161: AC#3 CRLF 反向读数：23 字节的纯 CRLF 文件里 LF 写法的 old 被响亮拒绝（文案含文件长度 23，证明读到了整文件），同一文件上不含换行的 old 立即命中并落盘 ⇒ 这是正确拒绝，不是读不到
+--- PASS: TestFSEditOnACRLFFileRefusesAnLFSpelledOld (0.03s)
+=== RUN   TestFSEditOnACRLFFileAppliesACRLFSpelledOldAndStaysCRLF
+    fs_edit_ac34_test.go:202: AC#3 CRLF 正向读数：23 字节 → 30 字节，CRLF 对 3→4，裸 CR/裸 LF 均为 0（行尾未被改写），文案="fs.edit 已改写 C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSEditOnACRLFFileAppliesACRLFSpelledOldAndStaysCRLF2670350178\\001\\crlf-hit.txt：1 枚编辑全部生效，23 字节 / 3 行 → 30 字节 / 4 行（临时文件+原子重命名）"
+--- PASS: TestFSEditOnACRLFFileAppliesACRLFSpelledOldAndStaysCRLF (0.02s)
+=== RUN   TestFSEditDoesNotRewriteAnLFFilesLineEndings
+    fs_edit_ac34_test.go:237: out={Text:fs.edit 拒绝执行：本批 new 会改写这份文件的行尾约定：文件原本是纯 LF，改完会变成 CRLF 4 组 / 裸 CR 0 条 / 裸 LF 0 条。请把 new 里的换行按文件自己的行尾拼写（纯 LF 的文件：换行写成 \n，单字节换行）；确实要把整份文件换成别的行尾，请改用 fs.write 整文件写回，本工具不猜行尾。old 必须与文件内容逐字一致，包含全部空白与换行（the old string must match exactly including all whitespace and newlines）。本次调用一个字也没有写，目标文件保持原状。 IsError:true RiskLevel:L2 ErrorClass:tool Truncated:false AppliedSteps:[]} err=<nil>
+--- FAIL: TestFSEditDoesNotRewriteAnLFFilesLineEndings (0.01s)
+=== RUN   TestFSEditLineEndingForensicsRefusesRealSpellings
+=== RUN   TestFSEditLineEndingForensicsRefusesRealSpellings/crlf_file_lf_spelled_old
+    fs_edit_ac34_test.go:330: 归一取证：23 字节文件（行尾形 纯 CRLF）被 0 命中拒掉一枚归一后可命中 1 次的 old；落盘前后一字未变
+=== RUN   TestFSEditLineEndingForensicsRefusesRealSpellings/cr_only_file_lf_spelled_old
+    fs_edit_ac34_test.go:330: 归一取证：20 字节文件（行尾形 纯 CR）被 0 命中拒掉一枚归一后可命中 1 次的 old；落盘前后一字未变
+=== RUN   TestFSEditLineEndingForensicsRefusesRealSpellings/mixed_file_old_over_the_crlf_line_lf_spelled
+    fs_edit_ac34_test.go:330: 归一取证：22 字节文件（行尾形 混合(CRLF=2 CR=0 LF=1)）被 0 命中拒掉一枚归一后可命中 1 次的 old；落盘前后一字未变
+=== RUN   TestFSEditLineEndingForensicsRefusesRealSpellings/mixed_file_old_over_the_lf_line_crlf_spelled
+    fs_edit_ac34_test.go:330: 归一取证：22 字节文件（行尾形 混合(CRLF=2 CR=0 LF=1)）被 0 命中拒掉一枚归一后可命中 1 次的 old；落盘前后一字未变
+=== RUN   TestFSEditLineEndingForensicsRefusesRealSpellings/lf_file_crlf_spelled_old
+    fs_edit_ac34_test.go:330: 归一取证：20 字节文件（行尾形 纯 LF）被 0 命中拒掉一枚归一后可命中 1 次的 old；落盘前后一字未变
+--- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings (0.05s)
+    --- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings/crlf_file_lf_spelled_old (0.01s)
+    --- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings/cr_only_file_lf_spelled_old (0.01s)
+    --- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings/mixed_file_old_over_the_crlf_line_lf_spelled (0.01s)
+    --- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings/mixed_file_old_over_the_lf_line_crlf_spelled (0.01s)
+    --- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings/lf_file_crlf_spelled_old (0.01s)
+=== RUN   TestFSEditSilentShapeChangesLandToday
+=== RUN   TestFSEditSilentShapeChangesLandToday/an_old_that_carries_the_bom_is_refused_r3
+    fs_edit_ac34_test.go:375: AC#3b① 翻转读数（r2 的缺陷读数①在此变红）：14 字节带 BOM 的文件，old 从偏移 0 起并含 BOM ⇒ 现在是硬拒、一字未落，前三字节仍 EF BB BF，IsError=true ErrorClass="tool"
+=== RUN   TestFSEditSilentShapeChangesLandToday/an_lf_spelled_new_in_a_crlf_file_is_refused_r3
+    fs_edit_ac34_test.go:397: expected a hard error, got a success: {Text:fs.edit 已改写 C:\Users\swq\AppData\Local\Temp\TestFSEditSilentShapeChangesLandTodayan_lf_spelled_new_in_a_crl2682129567\001\crlf-mixed.txt：1 枚编辑全部生效，23 字节 / 3 行 → 31 字节 / 4 行（临时文件+原子重命名） IsError:false RiskLevel:L2 ErrorClass: Truncated:false AppliedSteps:[在 C:\Users\swq\AppData\Local\Temp\TestFSEditSilentShapeChangesLandTodayan_lf_spelled_new_in_a_crl2682129567\001 创建临时文件 .wisp-tmp-a813696d-62572-2937459505 向临时文件写入 31 字节 临时文件已落盘并关闭 原子重命名 .wisp-tmp-a813696d-62572-2937459505 → C:\Users\swq\AppData\Local\Temp\TestFSEditSilentShapeChangesLandTodayan_lf_spelled_new_in_a_crl2682129567\001\crlf-mixed.txt（目标此刻起为新内容）]}
+--- FAIL: TestFSEditSilentShapeChangesLandToday (0.04s)
+    --- PASS: TestFSEditSilentShapeChangesLandToday/an_old_that_carries_the_bom_is_refused_r3 (0.01s)
+    --- FAIL: TestFSEditSilentShapeChangesLandToday/an_lf_spelled_new_in_a_crlf_file_is_refused_r3 (0.03s)
+=== RUN   TestFSEditKilledMidWriteLeavesTheTargetByteIdentical
+    fs_edit_ac34_test.go:448: expected the write to reach the staging boundaries, got []
+--- FAIL: TestFSEditKilledMidWriteLeavesTheTargetByteIdentical (0.01s)
+=== RUN   TestFSEditWithoutTheStagedWriterWouldCorruptTheTarget
+    fs_edit_ac34_test.go:522: the control edit must land: out={Text:fs.edit 拒绝执行：本批 new 会改写这份文件的行尾约定：文件原本是纯 LF，改完会变成 CRLF 2 组 / 裸 CR 0 条 / 裸 LF 0 条。请把 new 里的换行按文件自己的行尾拼写（纯 LF 的文件：换行写成 \n，单字节换行）；确实要把整份文件换成别的行尾，请改用 fs.write 整文件写回，本工具不猜行尾。old 必须与文件内容逐字一致，包含全部空白与换行（the old string must match exactly including all whitespace and newlines）。本次调用一个字也没有写，目标文件保持原状。 IsError:true RiskLevel:L2 ErrorClass:tool Truncated:false AppliedSteps:[]} err=<nil>
+--- FAIL: TestFSEditWithoutTheStagedWriterWouldCorruptTheTarget (0.01s)
+=== RUN   TestFSEditRefusesAnOldThatSwallowsTheFileBOM
+    fs_edit_ac3b_test.go:134: AC#3b① 改后读数（回执）：IsError=true ErrorClass="tool" AppliedSteps=0
+    fs_edit_ac3b_test.go:136: AC#3b① 改后读数（回执文案）："fs.edit 拒绝执行：第 1 枚编辑的 old 从文件第 0 字节起，圈住了文件头那 3 字节 EF BB BF（UTF-8 BOM，文件 14 字节）。BOM 是文件自己的编码标记，不是内容：请把 old 和 new 都从 BOM 之后的第一个字节开始抄；old 必须与文件内容逐字一致，包含全部空白与换行（the old string must match exactly including all whitespace and newlines）。本次调用一个字也没有写，目标文件保持原状。"
+    fs_edit_ac3b_test.go:137: AC#3b① 改后读数（审计行，外部可见）：tools: call kind=error task=task-1 corr=corr-1 tool=fs.edit risk=L2 decision=allow outcome=error rules_hit=[R1] in_allowlist_scope=true reason="R1: 工具声明为下界（L2）"
+    fs_edit_ac3b_test.go:148: the control edit (old copied AFTER the BOM) must land: out={Text:fs.edit 拒绝执行：本批 new 会改写这份文件的行尾约定：文件原本是纯 LF，改完会变成 CRLF 2 组 / 裸 CR 0 条 / 裸 LF 0 条。请把 new 里的换行按文件自己的行尾拼写（纯 LF 的文件：换行写成 \n，单字节换行）；确实要把整份文件换成别的行尾，请改用 fs.write 整文件写回，本工具不猜行尾。old 必须与文件内容逐字一致，包含全部空白与换行（the old string must match exactly including all whitespace and newlines）。本次调用一个字也没有写，目标文件保持原状。 IsError:true RiskLevel:L2 ErrorClass:tool Truncated:false AppliedSteps:[]} err=<nil>
+--- FAIL: TestFSEditRefusesAnOldThatSwallowsTheFileBOM (0.01s)
+=== RUN   TestFSEditStillLandsAnOldStartingAtByteZeroWithoutABOM
+    fs_edit_ac3b_test.go:177: an offset-0 old in a BOM-less file must land: out={Text:fs.edit 拒绝执行：本批 new 会改写这份文件的行尾约定：文件原本是纯 LF，改完会变成 CRLF 2 组 / 裸 CR 0 条 / 裸 LF 0 条。请把 new 里的换行按文件自己的行尾拼写（纯 LF 的文件：换行写成 \n，单字节换行）；确实要把整份文件换成别的行尾，请改用 fs.write 整文件写回，本工具不猜行尾。old 必须与文件内容逐字一致，包含全部空白与换行（the old string must match exactly including all whitespace and newlines）。本次调用一个字也没有写，目标文件保持原状。 IsError:true RiskLevel:L2 ErrorClass:tool Truncated:false AppliedSteps:[]} err=<nil>
+--- FAIL: TestFSEditStillLandsAnOldStartingAtByteZeroWithoutABOM (0.01s)
+=== RUN   TestFSEditCannotBeFedAPartialBOMThroughJSON
+    fs_edit_ac3b_test.go:215: AC#3b① 射程读数：old 只带 BOM 的第 3 个字节时，落盘的是 9 字节、第 0 字节是 U+FEFF，传进来的已经不是那三个字节："fs.edit 拒绝执行：第 1 枚编辑的 old 在文件里找不到（0 命中，文件 9 字节）。old 必须与文件内容逐字一致，包含全部空白与换行（the old string must match exactly including all whitespace and newlines）；先用 fs.read 读回原文再照抄那一段。本次调用一个字也没有写，目标文件保持原状。"
+--- PASS: TestFSEditCannotBeFedAPartialBOMThroughJSON (0.01s)
+=== RUN   TestFSEditRefusesALFSpelledNewInAPureCRLFFile
+    fs_edit_ac3b_test.go:248: expected a hard error, got a success: {Text:fs.edit 已改写 C:\Users\swq\AppData\Local\Temp\TestFSEditRefusesALFSpelledNewInAPureCRLFFile1199473844\001\crlf-mixed.txt：1 枚编辑全部生效，23 字节 / 3 行 → 31 字节 / 4 行（临时文件+原子重命名） IsError:false RiskLevel:L2 ErrorClass: Truncated:false AppliedSteps:[在 C:\Users\swq\AppData\Local\Temp\TestFSEditRefusesALFSpelledNewInAPureCRLFFile1199473844\001 创建临时文件 .wisp-tmp-a813696d-62572-422526099 向临时文件写入 31 字节 临时文件已落盘并关闭 原子重命名 .wisp-tmp-a813696d-62572-422526099 → C:\Users\swq\AppData\Local\Temp\TestFSEditRefusesALFSpelledNewInAPureCRLFFile1199473844\001\crlf-mixed.txt（目标此刻起为新内容）]}
+--- FAIL: TestFSEditRefusesALFSpelledNewInAPureCRLFFile (0.02s)
+=== RUN   TestFSEditStillLandsNewEndingsWhereThereIsNoConventionToBreak
+=== RUN   TestFSEditStillLandsNewEndingsWhereThereIsNoConventionToBreak/lf_file_lands_an_lf_spelled_new
+    fs_edit_ac3b_test.go:294: the same new that ② refuses in a CRLF file must land in an LF file: out={Text:fs.edit 拒绝执行：本批 new 会改写这份文件的行尾约定：文件原本是纯 LF，改完会变成 CRLF 4 组 / 裸 CR 0 条 / 裸 LF 0 条。请把 new 里的换行按文件自己的行尾拼写（纯 LF 的文件：换行写成 \n，单字节换行）；确实要把整份文件换成别的行尾，请改用 fs.write 整文件写回，本工具不猜行尾。old 必须与文件内容逐字一致，包含全部空白与换行（the old string must match exactly including all whitespace and newlines）。本次调用一个字也没有写，目标文件保持原状。 IsError:true RiskLevel:L2 ErrorClass:tool Truncated:false AppliedSteps:[]} err=<nil>
+=== RUN   TestFSEditStillLandsNewEndingsWhereThereIsNoConventionToBreak/mixed_file_is_not_refused
+    fs_edit_ac3b_test.go:319: got "alpha\r\nBRAVO\r\nbravo2\r\ncharlie\r\n" want "alpha\r\nBRAVO\nbravo2\ncharlie\r\n"
+--- FAIL: TestFSEditStillLandsNewEndingsWhereThereIsNoConventionToBreak (0.03s)
+    --- FAIL: TestFSEditStillLandsNewEndingsWhereThereIsNoConventionToBreak/lf_file_lands_an_lf_spelled_new (0.01s)
+    --- FAIL: TestFSEditStillLandsNewEndingsWhereThereIsNoConventionToBreak/mixed_file_is_not_refused (0.02s)
+=== RUN   TestFSEditLeavesNeitherTheCRLFNorTheBareLFOfAMixedFileRewritten
+    fs_edit_ac3b_test.go:370: the落盘 bytes are not the original bytes with ONE region swapped (a forced-ending rewrite looks exactly like this): got "alpha\r\nBRAVO\r\ncharlie\r\n" want "alpha\r\nBRAVO\ncharlie\r\n"
+--- FAIL: TestFSEditLeavesNeitherTheCRLFNorTheBareLFOfAMixedFileRewritten (0.02s)
+=== RUN   TestFSEditRefusesANonLiteralOld
+    fs_edit_test.go:130: 判据 1+2 读数：命中前 50 字节 / 命中失败后 50 字节（一字未变），文案="fs.edit 拒绝执行：第 1 枚编辑的 old 在文件里找不到（0 命中，文件 50 字节）。old 必须与文件内容逐字一致，包含全部空白与换行（the old string must match exactly including all whitespace and newlines）；先用 fs.read 读回原文再照抄那一段。本次调用一个字也没有写，目标文件保持原状。"
+--- PASS: TestFSEditRefusesANonLiteralOld (0.01s)
+=== RUN   TestFSEditRefusesAnAmbiguousOldIsADistinctError
+    fs_edit_test.go:171: 判据 3 读数：old 在 40 字节文件里命中 2 处，先数后拒，落盘前后一字未变
+--- PASS: TestFSEditRefusesAnAmbiguousOldIsADistinctError (0.01s)
+=== RUN   TestFSEditRefusesAnEmptyOldIsAWholeFileInsert
+    fs_edit_test.go:210: 判据 4 空 old 读数：两形（old:"" 与缺 old 字段）都拒，文件保持 29 字节
+--- PASS: TestFSEditRefusesAnEmptyOldIsAWholeFileInsert (0.02s)
+=== RUN   TestFSEditIsAllOrNothingAcrossABatch
+=== RUN   TestFSEditIsAllOrNothingAcrossABatch/no_op_edit_in_the_batch
+    fs_edit_test.go:282: 全有或全无读数：本批 2 枚编辑，其中一枚不成立（空批＝整批不成立）⇒ 一个字也不落盘，文件仍是 26 字节
+=== RUN   TestFSEditIsAllOrNothingAcrossABatch/overlapping_edits
+    fs_edit_test.go:282: 全有或全无读数：本批 2 枚编辑，其中一枚不成立（空批＝整批不成立）⇒ 一个字也不落盘，文件仍是 26 字节
+=== RUN   TestFSEditIsAllOrNothingAcrossABatch/second_edit_misses
+    fs_edit_test.go:282: 全有或全无读数：本批 2 枚编辑，其中一枚不成立（空批＝整批不成立）⇒ 一个字也不落盘，文件仍是 26 字节
+=== RUN   TestFSEditIsAllOrNothingAcrossABatch/empty_batch
+    fs_edit_test.go:282: 全有或全无读数：本批 0 枚编辑，其中一枚不成立（空批＝整批不成立）⇒ 一个字也不落盘，文件仍是 26 字节
+--- PASS: TestFSEditIsAllOrNothingAcrossABatch (0.04s)
+    --- PASS: TestFSEditIsAllOrNothingAcrossABatch/no_op_edit_in_the_batch (0.01s)
+    --- PASS: TestFSEditIsAllOrNothingAcrossABatch/overlapping_edits (0.01s)
+    --- PASS: TestFSEditIsAllOrNothingAcrossABatch/second_edit_misses (0.01s)
+    --- PASS: TestFSEditIsAllOrNothingAcrossABatch/empty_batch (0.01s)
+=== RUN   TestFSEditAppliesABatchOnDisk
+    fs_edit_test.go:311: out={Text:fs.edit 拒绝执行：本批 new 会改写这份文件的行尾约定：文件原本是纯 LF，改完会变成 CRLF 5 组 / 裸 CR 0 条 / 裸 LF 0 条。请把 new 里的换行按文件自己的行尾拼写（纯 LF 的文件：换行写成 \n，单字节换行）；确实要把整份文件换成别的行尾，请改用 fs.write 整文件写回，本工具不猜行尾。old 必须与文件内容逐字一致，包含全部空白与换行（the old string must match exactly including all whitespace and newlines）。本次调用一个字也没有写，目标文件保持原状。 IsError:true RiskLevel:L2 ErrorClass:tool Truncated:false AppliedSteps:[]} err=<nil>
+--- FAIL: TestFSEditAppliesABatchOnDisk (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.414s
+FAIL

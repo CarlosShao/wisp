@@ -27,16 +27,12 @@ import (
 // that locating is now a question we can answer with a hard error, and every
 // refusal in this file happens BEFORE the first byte is written.
 //
-// What IS deliberately NOT here: the Unicode repair layer Pi runs as a second
-// pass after an exact match fails (判据形状 1 的第二半) - an edit that only
-// lands after a fuzzy repair is precisely the kind of silent content change this
-// tool exists to prevent, so it needs its own decision, not a bolt-on. The
-// risk-routing assertions (AC#5) are C19's and internal/risk's to own.
-//
-// AC#3b (r3) added the two refusals this file used to be silent about - an old
-// that swallows the file's BOM, and a new that breaks the file's own line-ending
-// convention. Those are NOT the normalization layer above: they refuse a shape,
-// they never widen what matches.
+// Deliberately NOT here (ticket 162 r2): CRLF/BOM handling (AC#3), the
+// risk-routing assertions (AC#5, which is C19's and internal/risk's to own),
+// and the Unicode repair layer Pi runs as a second pass after an exact match
+// fails (判据形状 1 的第二半) - an edit that only lands after a fuzzy repair is
+// precisely the kind of silent content change this tool exists to prevent, so
+// it needs its own decision, not a bolt-on.
 
 // fsEdit is the D34 locate-and-replace tool.
 type fsEdit struct{ d FSDeps }
@@ -184,18 +180,6 @@ func (t fsEdit) Execute(ctx context.Context, params json.RawMessage, onUpdate fu
 				refusalUniqueWording), nil
 		}
 		start := strings.Index(content, old)
-		// AC#3b shape ①: an old that starts inside the file's UTF-8 BOM swallows
-		// those bytes into the replaced region, and the file loses its encoding
-		// marker without the caller ever naming it. Refused HERE, before any
-		// other edit in the batch is applied and before the write, so the whole
-		// call stays all-or-nothing.
-		if n := leadingBOMLen(content); n > 0 && start < n {
-			return refusal(
-				fmt.Sprintf("第 %d 枚编辑的 old 从文件第 %d 字节起，圈住了文件头那 %d 字节 EF BB BF"+
-					"（UTF-8 BOM，文件 %d 字节）", i+1, start, n, len(content)),
-				"BOM 是文件自己的编码标记，不是内容：请把 old 和 new 都从 BOM 之后的第一个字节开始抄；"+
-					refusalExactWording), nil
-		}
 		matches = append(matches, located{old: old, new: updated, start: start, stop: start + len(old)})
 	}
 
@@ -230,35 +214,6 @@ func (t fsEdit) Execute(ctx context.Context, params json.RawMessage, onUpdate fu
 	b.WriteString(content[next:])
 	updated := b.String()
 
-	// AC#3b shape ②: a new that spells its breaks in a style the file does not
-	// use turns a pure-CRLF (or pure-LF, or pure-CR) file into a mixed-ending one
-	// - today silently, at 3 CRLF pairs plus 1 bare LF.
-	//
-	// Why this refusal cannot weld the door: every old is matched BYTE-EXACTLY
-	// against content, so when content is pure <one convention> no old taken from
-	// it can contain a foreign break. Every foreign break in `updated` therefore
-	// came out of a new the caller spelled, and only out of that new - an edit
-	// that copies the file's own convention through keeps landing. Files that
-	// have no convention (no breaks at all) or already mix are NOT touched by
-	// this check: there is nothing there to preserve, and guessing one is how a
-	// tool starts rewriting bytes nobody asked about.
-	if conv := lineEndingConvention(content); conv != "" && foreignEndings(conv, updated) > 0 {
-		who := "本批 new"
-		crlf, cr, lf := countEndings(updated)
-		for i, m := range matches {
-			if foreignEndings(conv, m.new) > 0 {
-				who = fmt.Sprintf("第 %d 枚编辑的 new", i+1)
-				break
-			}
-		}
-		return refusal(
-			fmt.Sprintf("%s 会改写这份文件的行尾约定：文件原本是纯 %s，改完会变成 CRLF %d 组 / 裸 CR %d 条 / 裸 LF %d 条",
-				who, endingName(conv), crlf, cr, lf),
-			fmt.Sprintf("请把 new 里的换行按文件自己的行尾拼写（纯 %s 的文件：%s）；"+
-				"确实要把整份文件换成别的行尾，请改用 fs.write 整文件写回，本工具不猜行尾。%s",
-				endingName(conv), endingSpelling(conv), refusalExactWording)), nil
-	}
-
 	if len(updated) > limit {
 		return refusal(fmt.Sprintf("改完的内容 %d 字节，超过单次上限 %d 字节", len(updated), limit),
 			"请缩小改动范围，或改用宿主内部的 artifacts 通道"), nil
@@ -286,87 +241,6 @@ func countNL(s string) int {
 		return 0
 	}
 	return strings.Count(s, "\n")
-}
-
-// ---------------------------------------------------------------------------
-// AC#3b's two shape checks
-// ---------------------------------------------------------------------------
-
-// leadingBOMLen is how many of a file's first bytes are a UTF-8 byte-order mark
-// (EF BB BF), else 0. Spelled as bytes because the three bytes ARE the thing: a
-// literal BOM in this source line would be invisible to whoever reads it.
-func leadingBOMLen(s string) int {
-	if strings.HasPrefix(s, "\xef\xbb\xbf") {
-		return 3
-	}
-	return 0
-}
-
-// countEndings returns how one blob spells its breaks: (crlf pairs, bare CR,
-// bare LF). A pure-CRLF blob has bareLF 0; a pure-LF blob has bareCR 0.
-func countEndings(s string) (crlf, bareCR, bareLF int) {
-	crlf = strings.Count(s, "\r\n")
-	bareCR = strings.Count(s, "\r") - crlf
-	bareLF = strings.Count(s, "\n") - crlf
-	return crlf, bareCR, bareLF
-}
-
-// lineEndingConvention names the ONE kind of break a blob uses exclusively:
-// "crlf", "lf" or "cr". It answers "" for a blob with no break at all and for
-// one that already mixes - in both cases there is no convention to preserve, so
-// the caller must not refuse anything on its behalf.
-func lineEndingConvention(s string) string {
-	crlf, cr, lf := countEndings(s)
-	switch {
-	case crlf > 0 && cr == 0 && lf == 0:
-		return "crlf"
-	case lf > 0 && cr == 0 && crlf == 0:
-		return "lf"
-	case cr > 0 && crlf == 0 && lf == 0:
-		return "cr"
-	}
-	return ""
-}
-
-// foreignEndings counts the breaks in s that are NOT how conv's file spells
-// them - the bytes this tool refuses to be the ones that introduced.
-func foreignEndings(conv, s string) int {
-	crlf, cr, lf := countEndings(s)
-	switch conv {
-	case "crlf":
-		return cr + lf
-	case "lf":
-		return crlf + cr
-	case "cr":
-		return crlf + lf
-	}
-	return 0
-}
-
-// endingName / endingSpelling render a convention for the two sentences the
-// model reads: what the file is, and how to spell a break in that file.
-func endingName(conv string) string {
-	switch conv {
-	case "crlf":
-		return "CRLF"
-	case "lf":
-		return "LF"
-	case "cr":
-		return "CR"
-	}
-	return conv
-}
-
-func endingSpelling(conv string) string {
-	switch conv {
-	case "crlf":
-		return `换行写成 \r\n，回车加换行两字节`
-	case "lf":
-		return `换行写成 \n，单字节换行`
-	case "cr":
-		return `换行写成 \r，单字节回车`
-	}
-	return "按文件原有行尾拼写"
 }
 
 // ---------------------------------------------------------------------------
