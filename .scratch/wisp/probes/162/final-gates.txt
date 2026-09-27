@@ -1,0 +1,15 @@
+### 最终一遍（全部台件已入库、commit a9d0576 之后）
+HEAD=a9d0576
+2026-09-27 10:14:09 +0800
+--- 1) scripts/d22scan.sh ---
+rc=0
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=206, bans #1-5 cmd/=23, ban #6 frontend/=85, ban #7 internal/tools/=19, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=417, ban #8 cmd/=45; ban #8 emoji coverage: design/ 39 text files; frontend/ 85 text files; internal/ 417 Go files, comments and _test.go included; cmd/ 45 Go files, comments and _test.go included
+--- 2) 甲形 gofumpt -l（已跟踪集合，此刻含 fs_edit*） ---
+543
+不干净行数=0
+--- 3) go test ./internal/tools/ ---
+rc=0
+ok  	github.com/CarlosShao/wisp/internal/tools	14.071s
+--- 4) d22scan 自测 ---
+rc=0
+runtests.sh: OK - packages=[./...] top-level: PASS=34 FAIL=0 SKIP=0, === RUN=76, '[no tests to run]'=0

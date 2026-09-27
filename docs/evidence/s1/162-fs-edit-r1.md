@@ -165,6 +165,10 @@ Pi 在精确匹配失败后再走一层 NFKC／逐行去尾空白／弯引号→
 
 ⚠ 顺序声明：全仓级那三把尺（runtests／scripts/d22scan／甲形）是在**两格全部落盘之后**跑的，
 不是先跑后落（票 162 派单 §5 点名的 AC#7 顺序缺陷）。
+**入库后复跑最后一遍**＝commit `a9d0576` 之后（`10:14:09 +08`，读数件 `probes/162/final-gates.txt`）：
+`scripts/d22scan.sh` rc=0（射程计数同上，`ban #7 internal/tools/=19` 已从 18 涨到 19＝本程那枚新文件）、
+甲形分母 543 枚 .go 不干净行数 **0**、`go test -count=1 ./internal/tools/` rc=0、
+d22scan 自测 PASS=34 FAIL=0 SKIP=0 RUN=76。四把尺两次同向。
 
 
 ## 6. 有没有动过禁改名单里的文件
