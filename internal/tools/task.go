@@ -305,7 +305,7 @@ func BuiltinTaskEntries(d TaskDeps) []Entry {
 // "任务名册未接线" refusal.
 func (d TaskDeps) pointerNotice(raw string) string {
 	if d.Paths == nil {
-		return "；注意：本进程没有接线路径授权判定者（C26），这条路径是否还读得回来无法核实，按读不到处理"
+		return "；注意：路径授权判定者未接线（fail-closed：C26 没接进来，这条路径是否还读得回来无法核实，按读不到处理）"
 	}
 	var notes []string
 	canon, err := d.Paths.Canonicalize(raw)
