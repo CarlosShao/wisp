@@ -1,0 +1,610 @@
+time=2026-09-27T12:04:13.052+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC2ResolveDataDirRefusesInsteadOfFallingBackToCWD128
+=== RUN   TestAC2ResolveDataDirRefusesInsteadOfFallingBackToCWD128/dev
+=== RUN   TestAC2ResolveDataDirRefusesInsteadOfFallingBackToCWD128/prod
+--- PASS: TestAC2ResolveDataDirRefusesInsteadOfFallingBackToCWD128 (0.01s)
+    --- PASS: TestAC2ResolveDataDirRefusesInsteadOfFallingBackToCWD128/dev (0.00s)
+    --- PASS: TestAC2ResolveDataDirRefusesInsteadOfFallingBackToCWD128/prod (0.00s)
+=== RUN   TestAC2TestDataDirBranchStillResolves128
+--- PASS: TestAC2TestDataDirBranchStillResolves128 (0.00s)
+=== RUN   TestAC2RefusalMarkersAreNotAShortenableList128
+--- PASS: TestAC2RefusalMarkersAreNotAShortenableList128 (0.00s)
+=== RUN   TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128
+=== RUN   TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128/runTextTask
+=== RUN   TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128/cmdModels
+=== RUN   TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128/cmdProviders
+=== RUN   TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128/cmdDoctor
+=== RUN   TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128/resolveSecretLayout
+--- PASS: TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128 (0.32s)
+    --- PASS: TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128/runTextTask (0.00s)
+    --- PASS: TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128/cmdModels (0.00s)
+    --- PASS: TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128/cmdProviders (0.00s)
+    --- PASS: TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128/cmdDoctor (0.23s)
+    --- PASS: TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128/resolveSecretLayout (0.00s)
+=== RUN   TestAC2RealProcessRefusesOnEveryLegWithoutAppData128
+=== RUN   TestAC2RealProcessRefusesOnEveryLegWithoutAppData128/run
+    dataroot_128_windows_test.go:69: AC#2 real process, leg "run": APPDATA unset, WISP_ENV=dev, cwd=C:\Users\swq\AppData\Local\Temp\TestAC2RealProcessRefusesOnEveryLegWithoutAppData128run286871764\001 -> rc=2
+        time=2026-09-27T12:04:18.056+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+        wisp 0.0.0-dev (unknown, built unknown)
+        WISP_ENV=dev (data dir rules: SPEC-03 §5)
+        sherpa-onnx runtime version: 1.13.8
+        wisp run: 数据根无法解析：用户配置目录不可得（OS 原话：%AppData% is not defined）：数据根本应是 <用户配置目录>\wisp-dev，而 Wisp 拒绝把它回落到当前工作目录（票 128 AC#1 量到回落会搬家：日志、config.toml、DPAPI 私钥存储与 memory.db 跟着启动目录走，换目录再启动就读到空配置）。修法：Windows 把 APPDATA 设为一个可写目录，Linux/macOS 设 XDG_CONFIG_HOME 或 HOME，然后重试。
+=== RUN   TestAC2RealProcessRefusesOnEveryLegWithoutAppData128/secret-list
+    dataroot_128_windows_test.go:69: AC#2 real process, leg "secret-list": APPDATA unset, WISP_ENV=dev, cwd=C:\Users\swq\AppData\Local\Temp\TestAC2RealProcessRefusesOnEveryLegWithoutAppData128secret-list3735030055\001 -> rc=2
+        time=2026-09-27T12:04:18.117+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+        wisp secret: 数据根无法解析：用户配置目录不可得（OS 原话：%AppData% is not defined）：数据根本应是 <用户配置目录>\wisp-dev，而 Wisp 拒绝把它回落到当前工作目录（票 128 AC#1 量到回落会搬家：日志、config.toml、DPAPI 私钥存储与 memory.db 跟着启动目录走，换目录再启动就读到空配置）。修法：Windows 把 APPDATA 设为一个可写目录，Linux/macOS 设 XDG_CONFIG_HOME 或 HOME，然后重试。
+=== RUN   TestAC2RealProcessRefusesOnEveryLegWithoutAppData128/doctor
+    dataroot_128_windows_test.go:69: AC#2 real process, leg "doctor": APPDATA unset, WISP_ENV=dev, cwd=C:\Users\swq\AppData\Local\Temp\TestAC2RealProcessRefusesOnEveryLegWithoutAppData128doctor385658265\001 -> rc=1
+        time=2026-09-27T12:04:18.174+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+        wisp doctor - build chain self-check
+        ------------------------------------------------------------------------
+        [INFO] wisp build                         version=0.0.0-dev commit=unknown built=unknown WISP_ENV=dev
+        [INFO] Go runtime                         go1.27.1 (toolchain pinned by go.mod)
+        [INFO] C29 minisign public key            untrusted comment: wisp models signing key (dev)
+        RWSjyHlPP9lPxdEQRvWj3zFLMbc1tTEkKMwTDuVXXQDxsWRpA/m5jk9j (placeholder until C29 lands; hardcoded into buildinfo per SPEC-11 §7.3)
+        [PASS] gcc (build-time)                   gcc (Rev3, Built by MSYS2 project) 16.2.0
+        [FAIL] sherpa-onnx C API                  runtime 1.13.8 does not match build pin unknown
+        [FAIL] onnxruntime.dll version            file version 1.28.2.0 does not match build pin unknown
+        [INFO] sherpa-onnx built against onnxruntime 1.28.2
+        [PASS] DLL colocated: sherpa-onnx-c-api.dll C:\Users\swq\AppData\Local\Temp\TestAC2RealProcessRefusesOnEveryLegWithoutAppData1282181191551\001\sherpa-onnx-c-api.dll
+        [PASS] DLL colocated: sherpa-onnx-cxx-api.dll C:\Users\swq\AppData\Local\Temp\TestAC2RealProcessRefusesOnEveryLegWithoutAppData1282181191551\001\sherpa-onnx-cxx-api.dll
+        [INFO] deps.toml cross-check              deps.toml not found near the exe (expected for installed copies; build-time pins already verified above)
+        [FAIL] data dir resolvable (dev)          数据根无法解析：用户配置目录不可得（OS 原话：%AppData% is not defined）：数据根本应是 <用户配置目录>\wisp-dev，而 Wisp 拒绝把它回落到当前工作目录（票 128 AC#1 量到回落会搬家：日志、config.toml、DPAPI 私钥存储与 memory.db 跟着启动目录走，换目录再启动就读到空配置）。修法：Windows 把 APPDATA 设为一个可写目录，Linux/macOS 设 XDG_CONFIG_HOME 或 HOME，然后重试。
+        ------------------------------------------------------------------------
+        wisp doctor: FAIL
+=== RUN   TestAC2RealProcessRefusesOnEveryLegWithoutAppData128/resident
+    dataroot_128_windows_test.go:69: AC#2 real process, leg "resident": APPDATA unset, WISP_ENV=dev, cwd=C:\Users\swq\AppData\Local\Temp\TestAC2RealProcessRefusesOnEveryLegWithoutAppData128resident2018012965\001 -> rc=1
+        time=2026-09-27T12:04:18.277+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+        wisp 0.0.0-dev (unknown, built unknown)
+        WISP_ENV=dev (data dir rules: SPEC-03 §5)
+        sherpa-onnx runtime version: 1.13.8
+        wisp: boot failed: proc: user config dir: %AppData% is not defined
+--- PASS: TestAC2RealProcessRefusesOnEveryLegWithoutAppData128 (4.92s)
+    --- PASS: TestAC2RealProcessRefusesOnEveryLegWithoutAppData128/run (0.09s)
+    --- PASS: TestAC2RealProcessRefusesOnEveryLegWithoutAppData128/secret-list (0.06s)
+    --- PASS: TestAC2RealProcessRefusesOnEveryLegWithoutAppData128/doctor (0.11s)
+    --- PASS: TestAC2RealProcessRefusesOnEveryLegWithoutAppData128/resident (0.05s)
+=== RUN   TestAC3EarlyRecordLandsOnDiskBeforeTheInstallRecord
+    early_log_nail_130_windows_test.go:189: early-record sink C:\Users\swq\AppData\Local\Temp\TestAC3EarlyRecordLandsOnDiskBeforeTheInstallRecord1995369833\002\logs: 1 file(s), 2 record(s), msgs=[winsec: sealing path resolver installed wisp: persistent log sink installed]
+    early_log_nail_130_windows_test.go:271: EARLY RECORD ON DISK: index 0 of 2, stamp 2026-09-27T12:04:22.136985+08:00, resolver="risk.c26Pipeline" probes_passed=0x4be83c88210; install at index 1 stamp 2026-09-27T12:04:22.1418273+08:00
+--- PASS: TestAC3EarlyRecordLandsOnDiskBeforeTheInstallRecord (3.89s)
+=== RUN   TestAC3EarlyReplayKeepsTheSinkInsideTheDataRoot
+    early_log_nail_130_windows_test.go:283: early-record sink C:\Users\swq\AppData\Local\Temp\TestAC3EarlyReplayKeepsTheSinkInsideTheDataRoot3322220747\002\logs: 1 file(s), 2 record(s), msgs=[winsec: sealing path resolver installed wisp: persistent log sink installed]
+--- PASS: TestAC3EarlyReplayKeepsTheSinkInsideTheDataRoot (4.35s)
+=== RUN   TestAC1AC2DispatchHopGate133
+    leg_dispatch_gate_133_test.go:242: dispatch ledger, read out of func main's own branches at run time (11 legs, 4 claims in this gate's registry):
+          leg default        main.go:112              installs=false handoff=false covered=ruling main.go:74                                              entries=attachParentConsole aliases=
+          leg doctor         main.go:86               installs=false handoff=false covered=test TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128 drives cmdDoctor entries=attachParentConsole|cmdDoctor aliases=
+          leg help           main.go:109              installs=false handoff=false covered=ruling main.go:70                                              entries=attachParentConsole aliases=--help|-h
+          leg models         main.go:93               installs=true  handoff=true  covered=nail TestAC2ModelsLegBooksItsHandOffVerdictOnDisk -> cmdModels entries=attachParentConsole|cmdModels aliases=
+          leg no-args        main.go:51               installs=true  handoff=false covered=nail TestAC1ResidentLegInstallsItsLogListenerOnDisk -> runResident entries=attachParentConsole|runResident aliases=
+          leg panel-assets   main.go:103              installs=false handoff=false covered=test TestAC1AC2TaintSourceLegProducesAJudgedR4 drives cmdPanelAssets entries=attachParentConsole|cmdPanelAssets aliases=
+          leg providers      main.go:83               installs=false handoff=false covered=test TestAC2EveryLegRefusesTheSameShapeAndWritesNothing128 drives cmdProviders entries=attachParentConsole|cmdProviders aliases=
+          leg run            main.go:80               installs=true  handoff=false covered=nail TestAC2SealNoticeLandsInTheRunLegLogFile -> runTextTask   entries=attachParentConsole|cmdRun aliases=
+          leg secret         main.go:91               installs=true  handoff=false covered=nail TestAC3SecretLegBooksItsAuditRecordsOnDisk -> cmdSecret   entries=cmdSecret aliases=
+          leg slo            main.go:101              installs=false handoff=false covered=test TestSLO144CorruptReportIsJudgedOnTheFirstRead drives contradictSubjectReportErr entries=cmdSLO aliases=
+          leg version        main.go:106              installs=false handoff=false covered=ruling main.go:65                                              entries=attachParentConsole|printVersions aliases=--version|-v
+    leg_dispatch_gate_133_test.go:244: blindness disclosure: run-roster disclosure: GOOS=windows, 84 startable cases read from this binary itself (`-test.list '.*'`); case names this round's ledger credited through `covered=test`: 3 distinct, 3 of them startable (one outside the roster is red above); this gate's registry: 4 claims, 0 of them outside this round's roster - every registry claim this gate makes is a case this round's binary can start. This round is a whole-package round (no -test.run filter), so the roster is the set this run's === RUN lines are drawn from.
+--- PASS: TestAC1AC2DispatchHopGate133 (0.10s)
+=== RUN   TestAC4EveryLegIsNailedOrRuled
+    leg_sink_gate_131_test.go:328: nail entry claims, checked against the dispatch closure:
+          nail "TestAC1ResidentLegInstallsItsLogListenerOnDisk" -> leg "no-args", entry "runResident": declared with the "subprocess:" prefix, so this row is a name-only claim about a real process and NOT evidence that anybody asserts "no-args"'s semantics in-process.
+          nail "TestAC2ModelsLegBooksItsHandOffVerdictOnDisk" -> leg "models", entry "cmdModels": checked, the case calls the entry this leg's dispatch reaches
+          nail "TestAC2SealNoticeLandsInTheRunLegLogFile" -> leg "run", entry "runTextTask": checked, the case calls the entry this leg's dispatch reaches
+          nail "TestAC3SecretLegBooksItsAuditRecordsOnDisk" -> leg "secret", entry "cmdSecret": checked, the case calls the entry this leg's dispatch reaches
+    leg_sink_gate_131_test.go:407: leg ledger, enumerated from source at run time:
+          leg --help       main.go:109                install=false records=false ruled=false nails=-                                                          -> no records
+          leg --version    main.go:106                install=false records=false ruled=false nails=-                                                          -> no records
+          leg -h           main.go:109                install=false records=false ruled=false nails=-                                                          -> no records
+          leg -v           main.go:106                install=false records=false ruled=false nails=-                                                          -> no records
+          leg default      main.go:112                install=false records=false ruled=false nails=-                                                          -> no records
+          leg doctor       main.go:86                 install=false records=false ruled=false nails=-                                                          -> no records
+          leg help         main.go:109                install=false records=false ruled=false nails=-                                                          -> no records
+          leg models       main.go:93                 install=true  records=true  ruled=false nails=TestAC2ModelsLegBooksItsHandOffVerdictOnDisk               -> nailed
+          leg no-args      main.go:51                 install=true  records=true  ruled=false nails=TestAC1ResidentLegInstallsItsLogListenerOnDisk             -> nailed
+          leg panel-assets main.go:103                install=false records=false ruled=false nails=-                                                          -> no records
+          leg providers    main.go:83                 install=false records=false ruled=false nails=-                                                          -> no records
+          leg run          main.go:80                 install=true  records=true  ruled=false nails=TestAC2SealNoticeLandsInTheRunLegLogFile                   -> nailed
+          leg secret       main.go:91                 install=true  records=true  ruled=false nails=TestAC3SecretLegBooksItsAuditRecordsOnDisk                 -> nailed
+          leg slo          main.go:101                install=false records=true  ruled=true  nails=-                                                          -> ruled
+          leg version      main.go:106                install=false records=false ruled=false nails=-                                                          -> no records
+--- PASS: TestAC4EveryLegIsNailedOrRuled (0.05s)
+=== RUN   TestAC2ModelsLegBooksItsHandOffVerdictOnDisk
+    leg_sink_nail_131_windows_test.go:358: leg sink C:\Users\swq\AppData\Local\Temp\TestAC2ModelsLegBooksItsHandOffVerdictOnDisk2922845625\001\logs: 3 record(s) [INFO/winsec: sealing path resolver installed INFO/wisp: persistent log sink installed INFO/models: hand-off REFUSED id=absent-in-signed-manifest-131 state=Error err=model: model id "absent-in-signed-manifest-131" not in signed manifest]
+    leg_sink_nail_131_windows_test.go:396: MODELS LEG RECORDED ON DISK: "models: hand-off REFUSED id=absent-in-signed-manifest-131 state=Error err=model: model id \"absent-in-signed-manifest-131\" not in signed manifest" (install dir=C:\Users\swq\AppData\Local\Temp\TestAC2ModelsLegBooksItsHandOffVerdictOnDisk2922845625\001\logs, exit=1)
+--- PASS: TestAC2ModelsLegBooksItsHandOffVerdictOnDisk (0.01s)
+=== RUN   TestAC3SecretLegBooksItsAuditRecordsOnDisk
+    leg_sink_nail_131_windows_test.go:427: leg sink C:\Users\swq\AppData\Local\Temp\TestAC3SecretLegBooksItsAuditRecordsOnDisk3375015418\001\logs: 2 record(s) [INFO/wisp: persistent log sink installed INFO/wisp secret: stored dpapi blob]
+    leg_sink_nail_131_windows_test.go:459: leg sink C:\Users\swq\AppData\Local\Temp\TestAC3SecretLegBooksItsAuditRecordsOnDisk3375015418\001\logs: 4 record(s) [INFO/wisp: persistent log sink installed INFO/wisp secret: stored dpapi blob INFO/wisp: persistent log sink installed WARN/wisp secret unset: deleted dpapi:nail131 (WISP_ENV=test, portable=false, forced=true, referenced_fields=1) fields=llm.providers.acme.api_key_ref]
+    leg_sink_nail_131_windows_test.go:479: SECRET LEG RECORDED ON DISK: "wisp secret: stored dpapi blob" and "wisp secret unset: deleted dpapi:nail131 (WISP_ENV=test, portable=false, forced=true, referenced_fields=1) fields=llm.providers.acme.api_key_ref" (install dir=C:\Users\swq\AppData\Local\Temp\TestAC3SecretLegBooksItsAuditRecordsOnDisk3375015418\001\logs)
+--- PASS: TestAC3SecretLegBooksItsAuditRecordsOnDisk (0.03s)
+=== RUN   TestAC2AC3DegradedLegsStillDeliverTheirVerdict
+=== RUN   TestAC2AC3DegradedLegsStillDeliverTheirVerdict/models
+=== RUN   TestAC2AC3DegradedLegsStillDeliverTheirVerdict/secret
+time=2026-09-27T12:04:26.735+08:00 level=INFO msg="wisp secret: stored dpapi blob" ref=dpapi:nail131-degraded env=test portable=false overwrote=false
+--- PASS: TestAC2AC3DegradedLegsStillDeliverTheirVerdict (0.02s)
+    --- PASS: TestAC2AC3DegradedLegsStillDeliverTheirVerdict/models (0.00s)
+    --- PASS: TestAC2AC3DegradedLegsStillDeliverTheirVerdict/secret (0.01s)
+=== RUN   TestAC3LogSinkLandsInsideTheEnvDataRoot
+--- PASS: TestAC3LogSinkLandsInsideTheEnvDataRoot (0.00s)
+=== RUN   TestAC3EmptyDataRootIsARefusalNotAFallback
+--- PASS: TestAC3EmptyDataRootIsARefusalNotAFallback (0.00s)
+=== RUN   TestAC3InstallingTheFileSinkDoesNotSilenceTheConsole
+--- PASS: TestAC3InstallingTheFileSinkDoesNotSilenceTheConsole (0.01s)
+=== RUN   TestAC2SealNoticeLandsInTheRunLegLogFile
+time=2026-09-27T12:04:26.876+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestAC2SealNoticeLandsInTheRunLegLogFile437414121\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-27T12:04:26.879+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\TestAC2SealNoticeLandsInTheRunLegLogFile437414121\001\secrets kind=explicit cleared=S-1-1-0(A;OICI;0x1200a9;;;WD) cleared_inherited="" policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    logsink_windows_test.go:167: sink dir C:\Users\swq\AppData\Local\Temp\TestAC2SealNoticeLandsInTheRunLegLogFile437414121\001\logs: 1 file(s), 1267 bytes, 3 record(s)
+    logsink_windows_test.go:196: RECORDED ON DISK: level=WARN msg=winsec: seal cleared principals that stood on this object path=C:\Users\swq\AppData\Local\Temp\TestAC2SealNoticeLandsInTheRunLegLogFile437414121\001\secrets kind=explicit cleared="S-1-1-0(A;OICI;0x1200a9;;;WD)"
+--- PASS: TestAC2SealNoticeLandsInTheRunLegLogFile (0.17s)
+=== RUN   TestAC2AuditTrailLandsInTheRunLegLogFile
+time=2026-09-27T12:04:28.559+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/27 12:04:28 mockllm: serving on http://127.0.0.1:59518 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-27T12:04:28.585+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestAC2AuditTrailLandsInTheRunLegLogFile1065789567\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-27T12:04:28.613+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAC2AuditTrailLandsInTheRunLegLogFile1065789567\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T12:04:28.623+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T04:04:28Z duration_ms=9
+time=2026-09-27T12:04:28.635+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAC2AuditTrailLandsInTheRunLegLogFile1065789567\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T12:04:28.641+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T04:04:28Z duration_ms=5
+time=2026-09-27T12:04:28.645+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T12:04:28.648+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    logsink_windows_test.go:274: sink dir C:\Users\swq\AppData\Local\Temp\TestAC2AuditTrailLandsInTheRunLegLogFile1065789567\002\logs: 1 file(s), 2953 bytes, 14 record(s)
+--- PASS: TestAC2AuditTrailLandsInTheRunLegLogFile (1.77s)
+=== RUN   TestAC2RunLegInstallsTheSinkBeforeItsFirstSealingSite
+time=2026-09-27T12:04:28.729+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestAC2RunLegInstallsTheSinkBeforeItsFirstSealingSite2626455720\001\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-27T12:04:28.731+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\TestAC2RunLegInstallsTheSinkBeforeItsFirstSealingSite2626455720\001\secrets kind=explicit cleared=S-1-1-0(A;OICI;0x1200a9;;;WD) cleared_inherited="" policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+    logsink_windows_test.go:326: sink dir C:\Users\swq\AppData\Local\Temp\TestAC2RunLegInstallsTheSinkBeforeItsFirstSealingSite2626455720\001\logs: 1 file(s), 1323 bytes, 3 record(s)
+--- PASS: TestAC2RunLegInstallsTheSinkBeforeItsFirstSealingSite (0.05s)
+=== RUN   TestAC1AC2TaintSourceLegProducesAJudgedR4
+--- PASS: TestAC1AC2TaintSourceLegProducesAJudgedR4 (0.01s)
+=== RUN   TestAC2TaintFlagDoesNotLeakIntoTheDefaultCard
+--- PASS: TestAC2TaintFlagDoesNotLeakIntoTheDefaultCard (0.01s)
+=== RUN   TestAC3TaintSourceThatTheCallDoesNotCarryIsNotAHit
+=== RUN   TestAC3TaintSourceThatTheCallDoesNotCarryIsNotAHit/declared_but_absent_from_the_outgoing_call
+=== RUN   TestAC3TaintSourceThatTheCallDoesNotCarryIsNotAHit/fragment_below_the_contract_floor_cannot_match
+--- PASS: TestAC3TaintSourceThatTheCallDoesNotCarryIsNotAHit (0.01s)
+    --- PASS: TestAC3TaintSourceThatTheCallDoesNotCarryIsNotAHit/declared_but_absent_from_the_outgoing_call (0.00s)
+    --- PASS: TestAC3TaintSourceThatTheCallDoesNotCarryIsNotAHit/fragment_below_the_contract_floor_cannot_match (0.00s)
+=== RUN   TestAC2TaintSourceIsVisibleInTheUsageBlock
+--- PASS: TestAC2TaintSourceIsVisibleInTheUsageBlock (0.01s)
+=== RUN   TestAC1MalformedTaintSourceIsRefused
+=== RUN   TestAC1MalformedTaintSourceIsRefused/no_separators
+=== RUN   TestAC1MalformedTaintSourceIsRefused/two_parts
+=== RUN   TestAC1MalformedTaintSourceIsRefused/empty_tool
+=== RUN   TestAC1MalformedTaintSourceIsRefused/empty_content
+--- PASS: TestAC1MalformedTaintSourceIsRefused (0.02s)
+    --- PASS: TestAC1MalformedTaintSourceIsRefused/no_separators (0.01s)
+    --- PASS: TestAC1MalformedTaintSourceIsRefused/two_parts (0.00s)
+    --- PASS: TestAC1MalformedTaintSourceIsRefused/empty_tool (0.01s)
+    --- PASS: TestAC1MalformedTaintSourceIsRefused/empty_content (0.01s)
+=== RUN   TestAC1CmdSideEmitsNoVerdictTokens
+--- PASS: TestAC1CmdSideEmitsNoVerdictTokens (0.00s)
+=== RUN   TestRunBooksWithASnapshotOfItsLiveQueue
+time=2026-09-27T12:04:30.327+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/27 12:04:30 mockllm: serving on http://127.0.0.1:59525 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-27T12:04:30.354+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunBooksWithASnapshotOfItsLiveQueue2172495104\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-27T12:04:30.381+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunBooksWithASnapshotOfItsLiveQueue2172495104\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T12:04:30.388+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T04:04:30Z duration_ms=7
+time=2026-09-27T12:04:30.397+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunBooksWithASnapshotOfItsLiveQueue2172495104\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T12:04:30.404+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T04:04:30Z duration_ms=5
+time=2026-09-27T12:04:30.408+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T12:04:30.411+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    panel_pump_test.go:218: booked record: map[at:2026-09-27T04:04:30Z bytes:830 depth:1 mode:ask_high_risk pending:pump-corr results:0/0 sha256:527e5d54170a9d19 ws:unset]
+    panel_pump_test.go:219: packet bytes (830): {"pending":[{"correlationId":"pump-corr","tool":"fs.read","args":["{\"path\":\"C:/Windows/win.ini\"}"],"level":"L2","rulesHit":["R2"],"reason":"R2: 目标路径在授权目录之外: C:\\Windows\\win.ini","reasonKnown":true,"sessionOverrideBlocked":false,"callChain":[],"decidedBy":"native"}],"results":[],"composer":{"mode":{"current":"ask_high_risk","names":["ask_every_step","ask_high_risk","auto_approve"],"l2ConfirmNames":["auto_approve"]},"workspace":{"set":false,"spelling":"","canonical":"","reparse":false,"rewritten":false,"reason":"未选择工作区：本轮按 [fs] allowed_dirs 授权的目录判定"},"attachments":[],"acceptedAttachmentMimes":["image/png","image/jpeg","image/gif","image/webp","video/mp4","video/quicktime"],"maxAttachmentBytes":67108864,"attachmentError":""},"generatedAt":"2026-09-27T04:04:30Z"}
+--- PASS: TestRunBooksWithASnapshotOfItsLiveQueue (3.67s)
+=== RUN   TestSnapshotWorkspaceSectionReportsTheNarrowing
+time=2026-09-27T12:04:33.960+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/27 12:04:33 mockllm: serving on http://127.0.0.1:65268 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-27T12:04:33.987+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestSnapshotWorkspaceSectionReportsTheNarrowing2347073414\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-27T12:04:34.016+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestSnapshotWorkspaceSectionReportsTheNarrowing2347073414\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T12:04:34.025+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T04:04:34Z duration_ms=8
+time=2026-09-27T12:04:34.034+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestSnapshotWorkspaceSectionReportsTheNarrowing2347073414\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T12:04:34.040+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T04:04:34Z duration_ms=6
+time=2026-09-27T12:04:34.045+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T12:04:34.048+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestSnapshotWorkspaceSectionReportsTheNarrowing (1.78s)
+=== RUN   TestThePumpIsDrivenNotJustAssembled
+time=2026-09-27T12:04:35.852+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/27 12:04:35 mockllm: serving on http://127.0.0.1:65273 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-27T12:04:35.877+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestThePumpIsDrivenNotJustAssembled1682810655\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-27T12:04:35.902+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestThePumpIsDrivenNotJustAssembled1682810655\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T12:04:35.909+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T04:04:35Z duration_ms=7
+time=2026-09-27T12:04:35.917+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestThePumpIsDrivenNotJustAssembled1682810655\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T12:04:35.922+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T04:04:35Z duration_ms=5
+time=2026-09-27T12:04:35.927+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T12:04:35.929+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestThePumpIsDrivenNotJustAssembled (1.73s)
+=== RUN   TestProvidersProbeRecordsMeasuredThinkingFalse
+time=2026-09-27T12:04:37.237+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/27 12:04:37 mockllm: serving on http://127.0.0.1:65276 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-27T12:04:37.285+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProvidersProbeRecordsMeasuredThinkingFalse3617142315\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T12:04:37.294+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T04:04:37Z duration_ms=8
+time=2026-09-27T12:04:37.305+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProvidersProbeRecordsMeasuredThinkingFalse3617142315\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T12:04:37.311+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T04:04:37Z duration_ms=6
+time=2026-09-27T12:04:37.316+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T12:04:37.320+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-09-27T12:04:37.343+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestProvidersProbeRecordsMeasuredThinkingFalse (1.42s)
+=== RUN   TestProvidersProbeRecordsMeasuredThinkingTrue
+time=2026-09-27T12:04:39.058+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/27 12:04:39 mockllm: serving on http://127.0.0.1:62299 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-27T12:04:39.112+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProvidersProbeRecordsMeasuredThinkingTrue3397738476\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T12:04:39.121+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T04:04:39Z duration_ms=8
+time=2026-09-27T12:04:39.129+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProvidersProbeRecordsMeasuredThinkingTrue3397738476\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T12:04:39.135+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T04:04:39Z duration_ms=5
+time=2026-09-27T12:04:39.140+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T12:04:39.142+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-09-27T12:04:39.161+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestProvidersProbeRecordsMeasuredThinkingTrue (1.82s)
+=== RUN   TestProvidersDiscoverListsWhatTheServerServes
+time=2026-09-27T12:04:40.766+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/27 12:04:40 mockllm: serving on http://127.0.0.1:62334 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-27T12:04:40.820+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProvidersDiscoverListsWhatTheServerServes3857732700\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T12:04:40.828+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T04:04:40Z duration_ms=8
+time=2026-09-27T12:04:40.841+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProvidersDiscoverListsWhatTheServerServes3857732700\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T12:04:40.850+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T04:04:40Z duration_ms=9
+time=2026-09-27T12:04:40.856+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T12:04:40.860+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestProvidersDiscoverListsWhatTheServerServes (1.70s)
+=== RUN   TestProvidersProbeUnconfiguredRefIsNotSilentlyKeyless
+time=2026-09-27T12:04:42.754+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/27 12:04:42 mockllm: serving on http://127.0.0.1:62338 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-27T12:04:42.806+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProvidersProbeUnconfiguredRefIsNotSilentlyKeyless3210356267\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T12:04:42.813+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T04:04:42Z duration_ms=7
+time=2026-09-27T12:04:42.820+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestProvidersProbeUnconfiguredRefIsNotSilentlyKeyless3210356267\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T12:04:42.827+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T04:04:42Z duration_ms=6
+time=2026-09-27T12:04:42.831+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T12:04:42.834+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestProvidersProbeUnconfiguredRefIsNotSilentlyKeyless (1.96s)
+=== RUN   TestAC1ResidentLegInstallsItsLogListenerOnDisk
+    resident_sink_nail_127_windows_test.go:411: resident sink C:\Users\swq\AppData\Local\Temp\TestAC1ResidentLegInstallsItsLogListenerOnDisk2642579357\002\logs: 1 file(s), 2 record(s)
+--- PASS: TestAC1ResidentLegInstallsItsLogListenerOnDisk (6.09s)
+=== RUN   TestAC1ResidentLegOutlivesItsOwnLogFailure
+--- PASS: TestAC1ResidentLegOutlivesItsOwnLogFailure (5.59s)
+=== RUN   TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink
+    resident_sink_nail_127_windows_test.go:572: resident sink C:\Users\swq\AppData\Local\Temp\TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink2281961331\002\logs: 1 file(s), 9 record(s)
+    resident_sink_nail_127_windows_test.go:618: RESIDENT LEG RECORDED ON DISK: 7 shutdown record(s), steps [1 2 3 4 5 6 7], first="shutdown step skipped (module not present)" last="shutdown step skipped (module not present)"
+    resident_sink_nail_127_windows_test.go:549: resident leg exit: exited 0
+--- PASS: TestAC1ResidentLegBooksItsShutdownBeforeClosingTheSink (6.24s)
+=== RUN   TestTicket101ManualSwitchSurvivesRestart
+time=2026-09-27T12:05:02.615+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/27 12:05:02 mockllm: serving on http://127.0.0.1:53165 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-27T12:05:02.649+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101ManualSwitchSurvivesRestart3438205722\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-27T12:05:02.680+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101ManualSwitchSurvivesRestart3438205722\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T12:05:02.689+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T04:05:02Z duration_ms=8
+time=2026-09-27T12:05:02.701+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101ManualSwitchSurvivesRestart3438205722\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T12:05:02.708+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T04:05:02Z duration_ms=7
+time=2026-09-27T12:05:02.713+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T12:05:02.716+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-09-27T12:05:02.884+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101ManualSwitchSurvivesRestart3438205722\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-27T12:05:02.905+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket101ManualSwitchSurvivesRestart (3.18s)
+=== RUN   TestTicket101UntouchedConfigRestartsAtDefault
+time=2026-09-27T12:05:05.548+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/27 12:05:05 mockllm: serving on http://127.0.0.1:53172 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-27T12:05:05.578+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101UntouchedConfigRestartsAtDefault3520661716\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-27T12:05:05.607+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101UntouchedConfigRestartsAtDefault3520661716\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T12:05:05.616+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T04:05:05Z duration_ms=8
+time=2026-09-27T12:05:05.625+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101UntouchedConfigRestartsAtDefault3520661716\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T12:05:05.634+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T04:05:05Z duration_ms=9
+time=2026-09-27T12:05:05.642+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T12:05:05.645+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-09-27T12:05:07.673+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101UntouchedConfigRestartsAtDefault3520661716\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-27T12:05:07.693+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-09-27T12:05:09.721+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101UntouchedConfigRestartsAtDefault3520661716\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-27T12:05:09.742+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    run_mode101_test.go:379: the key is still absent after 3 cold starts, as expected:
+        schema_version = 2
+        
+        [llm]
+        text_chain = ["acme/m1"]
+        
+        [llm.retry]
+        max = 1
+        backoff_ms = 1
+        
+        [llm.providers.acme]
+        protocol = "openai-chat"
+        base_url = "http://127.0.0.1:53172/v1"
+        api_key_ref = "dpapi:acme"
+        
+        [llm.providers.acme.models.m1]
+        context_window = 128000
+        
+        [fs]
+        allowed_dirs = ["C:/Users/swq/AppData/Local/Temp/TestTicket101UntouchedConfigRestartsAtDefault3520661716/002"]
+        
+        [risk]
+        l1_window_sec = 1
+        confirm_timeout_sec = 1
+--- PASS: TestTicket101UntouchedConfigRestartsAtDefault (7.84s)
+=== RUN   TestTicket101SessionGrantDoesNotCrossRestart
+time=2026-09-27T12:05:13.191+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/27 12:05:13 mockllm: serving on http://127.0.0.1:57991 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-27T12:05:13.223+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101SessionGrantDoesNotCrossRestart1565043462\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-27T12:05:13.254+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101SessionGrantDoesNotCrossRestart1565043462\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T12:05:13.266+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T04:05:13Z duration_ms=12
+time=2026-09-27T12:05:13.278+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101SessionGrantDoesNotCrossRestart1565043462\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T12:05:13.284+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T04:05:13Z duration_ms=6
+time=2026-09-27T12:05:13.289+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T12:05:13.292+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-09-27T12:05:14.324+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101SessionGrantDoesNotCrossRestart1565043462\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-27T12:05:14.348+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-09-27T12:05:15.431+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket101SessionGrantDoesNotCrossRestart (3.66s)
+=== RUN   TestTicket101ModeSwitchUsesTheRealL2Gate
+time=2026-09-27T12:05:17.121+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/27 12:05:17 mockllm: serving on http://127.0.0.1:49436 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-27T12:05:17.159+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101ModeSwitchUsesTheRealL2Gate4146168342\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-27T12:05:17.196+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101ModeSwitchUsesTheRealL2Gate4146168342\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T12:05:17.203+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T04:05:17Z duration_ms=7
+time=2026-09-27T12:05:17.212+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101ModeSwitchUsesTheRealL2Gate4146168342\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T12:05:17.219+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T04:05:17Z duration_ms=5
+time=2026-09-27T12:05:17.224+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T12:05:17.226+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket101ModeSwitchUsesTheRealL2Gate (2.11s)
+=== RUN   TestTicket101UnreadableModeFailsLoudlyAndStrict
+time=2026-09-27T12:05:18.909+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/27 12:05:18 mockllm: serving on http://127.0.0.1:49445 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-27T12:05:18.938+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101UnreadableModeFailsLoudlyAndStrict2854880843\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-27T12:05:18.965+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101UnreadableModeFailsLoudlyAndStrict2854880843\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T12:05:18.971+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T04:05:18Z duration_ms=6
+time=2026-09-27T12:05:18.980+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket101UnreadableModeFailsLoudlyAndStrict2854880843\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T12:05:18.985+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T04:05:18Z duration_ms=4
+time=2026-09-27T12:05:18.990+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T12:05:18.992+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    run_mode101_test.go:578: control log for reference (no fail-closed line expected here):
+        echo: ## scene
+        当前时间：2026-09-27 04:05 +00:00
+        wisp run: 任务 fd96f9da-b585-4b46-8013-95e8fb841876 结束（completed，1 轮，0 次工具调用，成本 0 CNY（未计价））
+        wisp run: 回复已完成
+        [audit] perm: MODE-READ origin=startup mode=auto_approve source="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket101UnreadableModeFailsLoudlyAndStrict2854880843\\002\\config.toml"
+        [audit] tools: C25 scope closed task=fd96f9da-b585-4b46-8013-95e8fb841
+=== RUN   TestTicket101UnreadableModeFailsLoudlyAndStrict/存储损坏
+time=2026-09-27T12:05:19.014+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101UnreadableModeFailsLoudlyAndStrict存储损坏1989548069\001\logs min_level=info early_records=0 early_dropped=0
+=== RUN   TestTicket101UnreadableModeFailsLoudlyAndStrict/版本不认识
+time=2026-09-27T12:05:19.028+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101UnreadableModeFailsLoudlyAndStrict版本不认识1587596220\001\logs min_level=info early_records=0 early_dropped=0
+=== RUN   TestTicket101UnreadableModeFailsLoudlyAndStrict/权限读不到
+time=2026-09-27T12:05:19.039+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket101UnreadableModeFailsLoudlyAndStrict权限读不到2636916618\001\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestTicket101UnreadableModeFailsLoudlyAndStrict (1.49s)
+    --- PASS: TestTicket101UnreadableModeFailsLoudlyAndStrict/存储损坏 (0.01s)
+    --- PASS: TestTicket101UnreadableModeFailsLoudlyAndStrict/版本不认识 (0.01s)
+    --- PASS: TestTicket101UnreadableModeFailsLoudlyAndStrict/权限读不到 (0.01s)
+=== RUN   TestRunTextTaskTextPathEndToEnd
+time=2026-09-27T12:05:20.330+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/27 12:05:20 mockllm: serving on http://127.0.0.1:51487 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-27T12:05:20.354+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskTextPathEndToEnd2749250152\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-27T12:05:20.377+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskTextPathEndToEnd2749250152\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T12:05:20.385+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T04:05:20Z duration_ms=7
+time=2026-09-27T12:05:20.393+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskTextPathEndToEnd2749250152\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T12:05:20.399+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T04:05:20Z duration_ms=6
+time=2026-09-27T12:05:20.404+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T12:05:20.407+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-09-27T12:05:20.436+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestRunTextTaskTextPathEndToEnd (1.39s)
+=== RUN   TestRunTextTaskFailNextIsClassified
+time=2026-09-27T12:05:21.695+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/27 12:05:21 mockllm: serving on http://127.0.0.1:51490 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-27T12:05:21.726+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskFailNextIsClassified3674064356\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-27T12:05:21.755+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskFailNextIsClassified3674064356\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T12:05:21.762+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T04:05:21Z duration_ms=6
+time=2026-09-27T12:05:21.770+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskFailNextIsClassified3674064356\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T12:05:21.775+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T04:05:21Z duration_ms=4
+time=2026-09-27T12:05:21.780+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T12:05:21.783+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-09-27T12:05:21.825+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestRunTextTaskFailNextIsClassified (1.39s)
+=== RUN   TestHostDispatchThroughTheAssembledBridge
+time=2026-09-27T12:05:23.081+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/27 12:05:23 mockllm: serving on http://127.0.0.1:51496 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-27T12:05:23.112+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestHostDispatchThroughTheAssembledBridge3043025431\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-27T12:05:23.139+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestHostDispatchThroughTheAssembledBridge3043025431\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T12:05:23.146+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T04:05:23Z duration_ms=6
+time=2026-09-27T12:05:23.157+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestHostDispatchThroughTheAssembledBridge3043025431\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T12:05:23.163+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T04:05:23Z duration_ms=6
+time=2026-09-27T12:05:23.168+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T12:05:23.171+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-09-27T12:05:23.341+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestHostDispatchThroughTheAssembledBridge (1.52s)
+=== RUN   TestComposedGateBlocksAWriteForTwoSeconds
+time=2026-09-27T12:05:24.629+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/27 12:05:24 mockllm: serving on http://127.0.0.1:51499 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-27T12:05:24.656+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestComposedGateBlocksAWriteForTwoSeconds2279140581\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-27T12:05:24.681+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestComposedGateBlocksAWriteForTwoSeconds2279140581\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T12:05:24.689+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T04:05:24Z duration_ms=7
+time=2026-09-27T12:05:24.697+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestComposedGateBlocksAWriteForTwoSeconds2279140581\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T12:05:24.703+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T04:05:24Z duration_ms=5
+time=2026-09-27T12:05:24.708+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T12:05:24.710+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-09-27T12:05:26.762+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestComposedGateBlocksAWriteForTwoSeconds (3.42s)
+=== RUN   TestRunTextTaskKeyResolvesInTheStore
+time=2026-09-27T12:05:28.041+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/27 12:05:28 mockllm: serving on http://127.0.0.1:62110 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-27T12:05:28.068+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskKeyResolvesInTheStore2041054289\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-27T12:05:28.093+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskKeyResolvesInTheStore2041054289\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T12:05:28.100+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T04:05:28Z duration_ms=6
+time=2026-09-27T12:05:28.109+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunTextTaskKeyResolvesInTheStore2041054289\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T12:05:28.117+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T04:05:28Z duration_ms=7
+time=2026-09-27T12:05:28.122+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T12:05:28.125+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestRunTextTaskKeyResolvesInTheStore (1.38s)
+=== RUN   TestMissingBlobFailsUnconfiguredNeverSilently
+time=2026-09-27T12:05:29.493+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/27 12:05:29 mockllm: serving on http://127.0.0.1:62114 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-27T12:05:29.525+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestMissingBlobFailsUnconfiguredNeverSilently3355541600\002\logs min_level=info early_records=0 early_dropped=0
+--- PASS: TestMissingBlobFailsUnconfiguredNeverSilently (1.38s)
+=== RUN   TestSecretArgvCarriesNoSecret
+=== RUN   TestSecretArgvCarriesNoSecret/from-stdin
+=== RUN   TestSecretArgvCarriesNoSecret/interactive-without-console
+--- PASS: TestSecretArgvCarriesNoSecret (4.41s)
+    --- PASS: TestSecretArgvCarriesNoSecret/from-stdin (0.14s)
+    --- PASS: TestSecretArgvCarriesNoSecret/interactive-without-console (0.06s)
+=== RUN   TestSecretRealBinaryRefusesValueFlag
+--- PASS: TestSecretRealBinaryRefusesValueFlag (4.58s)
+=== RUN   TestProcessCommandLineProbeHelperProcess
+--- PASS: TestProcessCommandLineProbeHelperProcess (0.00s)
+=== RUN   TestProcessCommandLineProbeDetectsAPlantedValue
+--- PASS: TestProcessCommandLineProbeDetectsAPlantedValue (0.14s)
+=== RUN   TestSecretSetGetListRoundTrip
+--- PASS: TestSecretSetGetListRoundTrip (0.03s)
+=== RUN   TestSecretSetRejectsBadNamesAndEmptyInput
+=== RUN   TestSecretSetRejectsBadNamesAndEmptyInput/traversal
+=== RUN   TestSecretSetRejectsBadNamesAndEmptyInput/dotdot
+=== RUN   TestSecretSetRejectsBadNamesAndEmptyInput/separator
+=== RUN   TestSecretSetRejectsBadNamesAndEmptyInput/space
+=== RUN   TestSecretSetRejectsBadNamesAndEmptyInput/empty
+=== RUN   TestSecretSetRejectsBadNamesAndEmptyInput/empty_stdin
+=== RUN   TestSecretSetRejectsBadNamesAndEmptyInput/multiline_stdin
+=== RUN   TestSecretSetRejectsBadNamesAndEmptyInput/no_name
+=== RUN   TestSecretSetRejectsBadNamesAndEmptyInput/two_names
+--- PASS: TestSecretSetRejectsBadNamesAndEmptyInput (0.00s)
+    --- PASS: TestSecretSetRejectsBadNamesAndEmptyInput/traversal (0.00s)
+    --- PASS: TestSecretSetRejectsBadNamesAndEmptyInput/dotdot (0.00s)
+    --- PASS: TestSecretSetRejectsBadNamesAndEmptyInput/separator (0.00s)
+    --- PASS: TestSecretSetRejectsBadNamesAndEmptyInput/space (0.00s)
+    --- PASS: TestSecretSetRejectsBadNamesAndEmptyInput/empty (0.00s)
+    --- PASS: TestSecretSetRejectsBadNamesAndEmptyInput/empty_stdin (0.00s)
+    --- PASS: TestSecretSetRejectsBadNamesAndEmptyInput/multiline_stdin (0.00s)
+    --- PASS: TestSecretSetRejectsBadNamesAndEmptyInput/no_name (0.00s)
+    --- PASS: TestSecretSetRejectsBadNamesAndEmptyInput/two_names (0.00s)
+=== RUN   TestSecretSetConfirmationMismatchStoresNothing
+--- PASS: TestSecretSetConfirmationMismatchStoresNothing (0.00s)
+=== RUN   TestSecretSetWithoutConsolePointsAtFromStdin
+--- PASS: TestSecretSetWithoutConsolePointsAtFromStdin (0.00s)
+=== RUN   TestSecretFlagsAreBoolOnly
+--- PASS: TestSecretFlagsAreBoolOnly (0.00s)
+=== RUN   TestSecretValueCarryingFlagsAreRefusedAndUnechoed
+=== RUN   TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--value
+=== RUN   TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--secret
+=== RUN   TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--key
+=== RUN   TestSecretValueCarryingFlagsAreRefusedAndUnechoed/-k
+=== RUN   TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--api-key
+=== RUN   TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--from-file
+=== RUN   TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--file
+=== RUN   TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--stdin
+=== RUN   TestSecretValueCarryingFlagsAreRefusedAndUnechoed/positional
+--- PASS: TestSecretValueCarryingFlagsAreRefusedAndUnechoed (0.00s)
+    --- PASS: TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--value (0.00s)
+    --- PASS: TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--secret (0.00s)
+    --- PASS: TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--key (0.00s)
+    --- PASS: TestSecretValueCarryingFlagsAreRefusedAndUnechoed/-k (0.00s)
+    --- PASS: TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--api-key (0.00s)
+    --- PASS: TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--from-file (0.00s)
+    --- PASS: TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--file (0.00s)
+    --- PASS: TestSecretValueCarryingFlagsAreRefusedAndUnechoed/--stdin (0.00s)
+    --- PASS: TestSecretValueCarryingFlagsAreRefusedAndUnechoed/positional (0.00s)
+=== RUN   TestSecretFromStdinWritesNoIntermediateFile
+--- PASS: TestSecretFromStdinWritesNoIntermediateFile (0.31s)
+=== RUN   TestSecretFailurePathsLogAndPrintNoPlaintext
+=== RUN   TestSecretFailurePathsLogAndPrintNoPlaintext/bad_dpapi_decrypt_(corrupted_blob,_non-portable)
+=== RUN   TestSecretFailurePathsLogAndPrintNoPlaintext/bad_dpapi_decrypt_(portable,_P13)
+=== RUN   TestSecretFailurePathsLogAndPrintNoPlaintext/unwritable_store_dir
+=== RUN   TestSecretFailurePathsLogAndPrintNoPlaintext/unset_name_(no_such_blob)
+=== RUN   TestSecretFailurePathsLogAndPrintNoPlaintext/store_write_failure_surfaces_the_ref_only
+--- PASS: TestSecretFailurePathsLogAndPrintNoPlaintext (0.06s)
+    --- PASS: TestSecretFailurePathsLogAndPrintNoPlaintext/bad_dpapi_decrypt_(corrupted_blob,_non-portable) (0.01s)
+    --- PASS: TestSecretFailurePathsLogAndPrintNoPlaintext/bad_dpapi_decrypt_(portable,_P13) (0.02s)
+    --- PASS: TestSecretFailurePathsLogAndPrintNoPlaintext/unwritable_store_dir (0.01s)
+    --- PASS: TestSecretFailurePathsLogAndPrintNoPlaintext/unset_name_(no_such_blob) (0.01s)
+    --- PASS: TestSecretFailurePathsLogAndPrintNoPlaintext/store_write_failure_surfaces_the_ref_only (0.01s)
+=== RUN   TestSecretUnsetRefusesWhileReferenced
+=== RUN   TestSecretUnsetRefusesWhileReferenced/refused_while_referenced
+=== RUN   TestSecretUnsetRefusesWhileReferenced/refused_for_a_voice.realtime_reference_too
+=== RUN   TestSecretUnsetRefusesWhileReferenced/an_unreadable_config_fails_closed
+=== RUN   TestSecretUnsetRefusesWhileReferenced/force_deletes_and_writes_an_audit_line
+=== RUN   TestSecretUnsetRefusesWhileReferenced/unreferenced_delete_is_audited_at_info
+=== RUN   TestSecretUnsetRefusesWhileReferenced/no_config_at_all_means_no_references
+--- PASS: TestSecretUnsetRefusesWhileReferenced (0.04s)
+    --- PASS: TestSecretUnsetRefusesWhileReferenced/refused_while_referenced (0.00s)
+    --- PASS: TestSecretUnsetRefusesWhileReferenced/refused_for_a_voice.realtime_reference_too (0.00s)
+    --- PASS: TestSecretUnsetRefusesWhileReferenced/an_unreadable_config_fails_closed (0.00s)
+    --- PASS: TestSecretUnsetRefusesWhileReferenced/force_deletes_and_writes_an_audit_line (0.00s)
+    --- PASS: TestSecretUnsetRefusesWhileReferenced/unreferenced_delete_is_audited_at_info (0.01s)
+    --- PASS: TestSecretUnsetRefusesWhileReferenced/no_config_at_all_means_no_references (0.01s)
+=== RUN   TestSecretSameNameUnderThreeEnvsIsThreeBlobs
+--- PASS: TestSecretSameNameUnderThreeEnvsIsThreeBlobs (0.04s)
+=== RUN   TestSecretPortableModeUsesTicket06Seam
+--- PASS: TestSecretPortableModeUsesTicket06Seam (0.03s)
+=== RUN   TestSecretEndToEndConfigRefResolvesAtRequestTime
+--- PASS: TestSecretEndToEndConfigRefResolvesAtRequestTime (0.02s)
+=== RUN   TestSecretUsageAndUnknownSubcommand
+--- PASS: TestSecretUsageAndUnknownSubcommand (0.00s)
+=== RUN   TestSecretOverwriteIsAnnounced
+--- PASS: TestSecretOverwriteIsAnnounced (0.02s)
+=== RUN   TestSLO156FixtureChildrenDoWhatTheirNamesSay
+--- PASS: TestSLO156FixtureChildrenDoWhatTheirNamesSay (0.08s)
+=== RUN   TestSLO156ExitedAsksTheOSForAChildNobodyReaped
+--- PASS: TestSLO156ExitedAsksTheOSForAChildNobodyReaped (0.05s)
+=== RUN   TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees
+    slo_exit_os_156_windows_test.go:206: Wait on a killed child reports the kill as an error (exit status 1); that is the fixture, not a failure
+--- PASS: TestSLO156LiveSubjectStaysAliveUntilTheOSDisagrees (0.01s)
+=== RUN   TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn
+--- PASS: TestSLO156ReportLoopNamesTheDeadSubjectItWasWaitingOn (0.04s)
+=== RUN   TestSLO156WaitReadyNamesTheDeadSubjectToo
+--- PASS: TestSLO156WaitReadyNamesTheDeadSubjectToo (0.04s)
+=== RUN   TestSLO144EveryPrefixOfARealReportIsUnwrittenNotCorrupt
+--- PASS: TestSLO144EveryPrefixOfARealReportIsUnwrittenNotCorrupt (0.02s)
+=== RUN   TestSLO144ReportsThatContradictThemselvesAreCorruptNow
+=== RUN   TestSLO144ReportsThatContradictThemselvesAreCorruptNow/html-head
+=== RUN   TestSLO144ReportsThatContradictThemselvesAreCorruptNow/stray-comma
+=== RUN   TestSLO144ReportsThatContradictThemselvesAreCorruptNow/wrong-type
+=== RUN   TestSLO144ReportsThatContradictThemselvesAreCorruptNow/trailing-garbage
+=== RUN   TestSLO144ReportsThatContradictThemselvesAreCorruptNow/second-document
+=== RUN   TestSLO144ReportsThatContradictThemselvesAreCorruptNow/complete-but-no-state-report
+=== RUN   TestSLO144ReportsThatContradictThemselvesAreCorruptNow/empty-object-is-a-finished-lie
+--- PASS: TestSLO144ReportsThatContradictThemselvesAreCorruptNow (0.00s)
+    --- PASS: TestSLO144ReportsThatContradictThemselvesAreCorruptNow/html-head (0.00s)
+    --- PASS: TestSLO144ReportsThatContradictThemselvesAreCorruptNow/stray-comma (0.00s)
+    --- PASS: TestSLO144ReportsThatContradictThemselvesAreCorruptNow/wrong-type (0.00s)
+    --- PASS: TestSLO144ReportsThatContradictThemselvesAreCorruptNow/trailing-garbage (0.00s)
+    --- PASS: TestSLO144ReportsThatContradictThemselvesAreCorruptNow/second-document (0.00s)
+    --- PASS: TestSLO144ReportsThatContradictThemselvesAreCorruptNow/complete-but-no-state-report (0.00s)
+    --- PASS: TestSLO144ReportsThatContradictThemselvesAreCorruptNow/empty-object-is-a-finished-lie (0.00s)
+=== RUN   TestSLO144LoopRetriesAnUnfinishedFileAndReadsTheWholeReport
+--- PASS: TestSLO144LoopRetriesAnUnfinishedFileAndReadsTheWholeReport (0.03s)
+=== RUN   TestSLO144LoopGiveUpSentencesOnRealFiles
+--- PASS: TestSLO144LoopGiveUpSentencesOnRealFiles (0.06s)
+=== RUN   TestSLO144CorruptReportIsJudgedOnTheFirstRead
+--- PASS: TestSLO144CorruptReportIsJudgedOnTheFirstRead (0.00s)
+=== RUN   TestSLO144UnfinishedReportKeepsPollingThenNamesBudgetAndBytes
+--- PASS: TestSLO144UnfinishedReportKeepsPollingThenNamesBudgetAndBytes (0.06s)
+=== RUN   TestSLO144ReportThatArrivesAfterMissingReadingsIsCollected
+--- PASS: TestSLO144ReportThatArrivesAfterMissingReadingsIsCollected (0.00s)
+=== RUN   TestSLO147UnwrittenSentenceNamesTheOffsetTheDocumentStoppedAt
+--- PASS: TestSLO147UnwrittenSentenceNamesTheOffsetTheDocumentStoppedAt (0.02s)
+=== RUN   TestSLO147LoopGiveUpSentenceAgreesWithTheBytesItRead
+--- PASS: TestSLO147LoopGiveUpSentenceAgreesWithTheBytesItRead (0.06s)
+=== RUN   TestSLO147OffsetSemanticsRenderThreeDifferentSentences
+--- PASS: TestSLO147OffsetSemanticsRenderThreeDifferentSentences (0.04s)
+=== RUN   TestSLO149CorruptSentenceNamesThePositionTheDecoderObjectedAt
+--- PASS: TestSLO149CorruptSentenceNamesThePositionTheDecoderObjectedAt (0.00s)
+=== RUN   TestSLO149CorruptLegsWithoutADecoderErrorKeepTheirOwnEnd
+--- PASS: TestSLO149CorruptLegsWithoutADecoderErrorKeepTheirOwnEnd (0.00s)
+=== RUN   TestSLO152CorruptLegWithNoNamedPositionRefusesToBorrowOne
+--- PASS: TestSLO152CorruptLegWithNoNamedPositionRefusesToBorrowOne (0.00s)
+=== RUN   TestSLO149ExitedGiveUpSentenceCarriesTheLastReading
+--- PASS: TestSLO149ExitedGiveUpSentenceCarriesTheLastReading (0.05s)
+=== RUN   TestCompositionRootClosesTheLoopTasksTaintScope
+time=2026-09-27T12:05:41.486+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/27 12:05:41 mockllm: serving on http://127.0.0.1:64731 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-27T12:05:41.511+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestCompositionRootClosesTheLoopTasksTaintScope1880245812\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-27T12:05:41.539+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestCompositionRootClosesTheLoopTasksTaintScope1880245812\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T12:05:41.548+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T04:05:41Z duration_ms=8
+time=2026-09-27T12:05:41.556+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestCompositionRootClosesTheLoopTasksTaintScope1880245812\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T12:05:41.563+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T04:05:41Z duration_ms=5
+time=2026-09-27T12:05:41.566+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T12:05:41.570+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestCompositionRootClosesTheLoopTasksTaintScope (1.80s)
+=== RUN   TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit
+time=2026-09-27T12:05:42.855+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/27 12:05:42 mockllm: serving on http://127.0.0.1:64734 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-27T12:05:42.884+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit1390226827\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-27T12:05:42.917+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit1390226827\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T12:05:42.927+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T04:05:42Z duration_ms=9
+time=2026-09-27T12:05:42.936+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit1390226827\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T12:05:42.944+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T04:05:42Z duration_ms=7
+time=2026-09-27T12:05:42.950+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T12:05:42.952+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit (1.40s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	90.017s

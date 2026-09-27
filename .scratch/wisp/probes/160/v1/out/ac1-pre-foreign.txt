@@ -1,0 +1,5 @@
+vetrc=0
+time=2026-09-27T11:58:52.094+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+V1-FOREIGN-A no-other-taints before=1 after=0 inspectHit=false
+V1-FOREIGN-B witness-tainted inspectHit=true src="unbound-scope"
+runrc=0

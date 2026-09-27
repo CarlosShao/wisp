@@ -1,0 +1,4 @@
+# github.com/CarlosShao/wisp/probes160v1ac1b
+# [github.com/CarlosShao/wisp/probes160v1ac1b]
+vet.exe: .\closebyid.go:18:54: p.CloseScope undefined (type *risk.Provenance has no field or method CloseScope)
+rc=1

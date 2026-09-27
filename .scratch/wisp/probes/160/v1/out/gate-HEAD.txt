@@ -1,0 +1,424 @@
+# 票 154 AC#1 触发门 —— 锚点 HEAD
+# 生成时刻 2026-09-27T12:01:48+08:00
+# 下一程复算＝同一条命令再跑一次，逐行 diff 名册；名册变长＝门响。
+
+## G1 生产码里构造 ToolRequest（排 internal/agent/ 自身）
+$ git grep -nE  'ToolRequest\{' HEAD -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/agent/*
+# rc=1   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G1b 生产码里任意 .Execute( 调用点（排 loop.go 与 bridge.go 自身）
+$ git grep -nE  '\.Execute\(' HEAD -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/agent/loop.go :!internal/tools/bridge.go
+# rc=1   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G2 OpenTask/CloseTask 的生产出现点（排 bridge.go 自身；今日应只剩 cmd/wisp/run.go 那一发＋它上面的注释）
+$ git grep -nE -w 'OpenTask|CloseTask' HEAD -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/tools/bridge.go
+HEAD:cmd/wisp/run.go:546:// WHY THIS HOOK OWNS THE CLOSE. CloseTask's own comment says the composition
+HEAD:cmd/wisp/run.go:563:		rt.bridge.CloseTask(taskID)
+# rc=0   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G3 Q-56 那一支落地：Loop 上出现收 taskID 的导出方法
+$ git grep -nE  '^func \(l \*Loop\) [A-Z][A-Za-z0-9]*\(.*taskID' HEAD -- internal/agent
+# rc=1   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G4 生产组合根打开 L0 直通（PassThroughUnclassifiedRisk 的字面赋值）
+$ git grep -nE  'PassThroughUnclassifiedRisk:' HEAD -- *.go :!*_test.go
+# rc=1   （1＝零命中／0＝非空＝该枚子句已响）
+
+## G5 OpenScope↔CloseScope 成对普查：生产码里开了 C25 scope 却没在同一文件关过的名册（排 internal/risk 的定义本体、排 *_test.go）
+$ git grep -nEw 'OpenScope|CloseScope' HEAD -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/*
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+HEAD:cmd/wisp/panel_assets.go:168:// has to admit: OpenScope now hands back the *Scope that owns the close, and
+HEAD:cmd/wisp/panel_assets.go:240:	// Discarded on purpose, and named so: the handle OpenScope hands back is
+HEAD:cmd/wisp/panel_assets.go:243:	_ = prov.OpenScope(taintSourceScopeID)
+HEAD:internal/tools/bridge.go:628:// risk.OpenScope now hands back the *Scope that owns the close, and the bridge
+HEAD:internal/tools/bridge.go:648:	b.scopes[taskID] = b.prov.OpenScope(taskID)
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   UNPAIRED cmd/wisp/panel_assets.go (开方调用点=1)
+#   UNPAIRED internal/tools/bridge.go (开方调用点=1)  # 同文件另见收尾动词，判「真漏／委托」
+# 未成对枚数＝2   （0＝这把尺没响／>0＝逐枚点名如上）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=2   （本枚子句的响＝未成对枚数；0＝不响）
+
+## G5 正控（形状照 G1–G4 的「正控先跑」：同一把尺打在已知「开又合」的样本上，必须不响）
+# 样本＝internal/tools/bridge.go（:642 prov.OpenScope 与 :691 prov.CloseScope 同文件成对）
+# 写法上的两条自纠（都是本程实测撞出来的，不是设想的）：
+#   (1) pathspec 必须与主尺同形再逐条排除。第一版图省事写成 'internal/tools/**/*.go'，
+#       实测 git grep rc=1、名册空、未成对 0——那是一枚**根本产不出读数的装饰腿**，
+#       它「不响」不能算正控（票 154 的 AC#3 就是拿「零区别」否掉装饰腿的）。
+#       本机现量：git grep -lEw OpenScope <锚> -- internal/tools/**/*.go => rc=1 零命中；
+#                          同尺 -- internal/tools/*.go  => rc=0 命中 bridge.go。
+#   (2) 必须排 *_test.go。第一版没排，正控自己被本程新测试里那句解释 Mark 机理的**注释**
+#       点中——那是假阳性。成对判据从此只吃调用点（见 pair() 里剔注释那一行）。
+
+## G5-正控 同尺＝主尺射程，只多排掉主尺今天点名的那一枚 panel_assets.go ⇒ 剩下的开方全是 balanced 样本
+$ git grep -nEw 'OpenScope|CloseScope' HEAD -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/risk/* :!cmd/wisp/panel_assets.go
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+HEAD:internal/tools/bridge.go:628:// risk.OpenScope now hands back the *Scope that owns the close, and the bridge
+HEAD:internal/tools/bridge.go:648:	b.scopes[taskID] = b.prov.OpenScope(taskID)
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   UNPAIRED internal/tools/bridge.go (开方调用点=1)  # 同文件另见收尾动词，判「真漏／委托」
+# 未成对枚数＝1   （0＝这把尺没响／>0＝逐枚点名如上）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=1   （本枚子句的响＝未成对枚数；0＝不响）
+
+## G5 负一负（同尺摘掉「排测试＋排定义」那两条 ⇒ 今日应非空，证明这把尺吃得住这个形状、不是结构上产不出读数的装饰）
+
+## G5-负一负 同尺不过滤任何文件
+$ git grep -nEw 'OpenScope|CloseScope' HEAD -- internal/**/*.go cmd/**/*.go
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+HEAD:cmd/wisp/panel_assets.go:168:// has to admit: OpenScope now hands back the *Scope that owns the close, and
+HEAD:cmd/wisp/panel_assets.go:240:	// Discarded on purpose, and named so: the handle OpenScope hands back is
+HEAD:cmd/wisp/panel_assets.go:243:	_ = prov.OpenScope(taintSourceScopeID)
+HEAD:internal/risk/provenance.go:17:// (ticket 160's lifetime rule: OpenScope hands back a *Scope, and that handle —
+HEAD:internal/risk/provenance.go:59:// 21, 22, 26) must (1) OpenScope at task start and close what it handed back on
+HEAD:internal/risk/provenance.go:60:// the boundary that owns the task — LANDED as a SHAPE by ticket 160: OpenScope
+HEAD:internal/risk/provenance.go:260:// owner is nil for a registration that Mark created out of a missing OpenScope
+HEAD:internal/risk/provenance.go:361:// functions — OpenScope(id) and CloseScope(id) — so any caller anywhere could
+HEAD:internal/risk/provenance.go:368:// Go imposes no use-the-return-value rule, so `p.OpenScope(id)` as a statement
+HEAD:internal/risk/provenance.go:374:// Scope is the handle OpenScope issues. It is the only thing that can close the
+HEAD:internal/risk/provenance.go:449:// OpenScope registers a task/session scope (composition root calls this at task
+HEAD:internal/risk/provenance.go:456:func (p *Provenance) OpenScope(scopeID string) *Scope {
+HEAD:internal/risk/provenance.go:500:		logf("risk/C25: scope %q not open (no OpenScope for it, or its handle already closed); taint stored — it cannot leak into other scopes", scopeID)
+HEAD:internal/risk/provenance.go:557:// OpenScope, or closed by its own handle) while the engine holds taints in
+HEAD:internal/risk/provenance.go:562:// by-id CloseScope gone, the only way to reach "not registered" is a handle
+HEAD:internal/risk/provenance.go:579:			logf("risk/C25: Inspect/CheckText on unregistered scope %q while other scopes hold taints: fail-closed R4 (ensure OpenScope at task start)", scopeID)
+HEAD:internal/risk/provenance.go:603:			Origin: "scope is not open (no OpenScope for this id, or its own handle closed it)",
+HEAD:internal/risk/provenance.go:704:			Origin: "scope is not open (no OpenScope for this id, or its own handle closed it)",
+HEAD:internal/risk/provenance_syncdirs_other_test.go:55:	p.OpenScope("task-1")
+HEAD:internal/risk/provenance_test.go:24:	p.OpenScope("task-1")
+HEAD:internal/risk/provenance_test.go:298:	p.OpenScope("task-2")
+HEAD:internal/risk/provenance_test.go:310:	handle := p.OpenScope("session-1") // ticket 160: the handle is what closes it
+HEAD:internal/risk/provenance_test.go:312:		// Stricter than the old p.CloseScope("session-1") line, which could not
+HEAD:internal/risk/provenance_test.go:329:	p.OpenScope("session-2")
+HEAD:internal/risk/provenance_test.go:339:// package's four p.CloseScope(id) calls with this: the old calls could not
+HEAD:internal/risk/provenance_test.go:357:	h1 := p.OpenScope("task-1")
+HEAD:internal/risk/provenance_test.go:376:	h2 := p.OpenScope("task-2")
+HEAD:internal/risk/provenance_test.go:471:	p.OpenScope("task-1")
+HEAD:internal/risk/provenance_test.go:739:	p2.OpenScope("s")
+HEAD:internal/risk/provenance_test.go:797:	p.OpenScope("s")
+HEAD:internal/risk/provenance_test.go:809:	p.OpenScope("s")
+HEAD:internal/risk/provenance_test.go:815:	p2.OpenScope("s")
+HEAD:internal/risk/provenance_test.go:829:	p.OpenScope("s")
+HEAD:internal/risk/provenance_test.go:908:	stale := p.OpenScope("task-victim") // generation 1 opens it
+HEAD:internal/risk/provenance_test.go:909:	fresh := p.OpenScope("task-victim") // the task restarts: ownership moves
+HEAD:internal/risk/provenance_test.go:938:	stale := p.OpenScope("task-victim")
+HEAD:internal/risk/provenance_test.go:939:	fresh := p.OpenScope("task-victim") // same id, empty: no taint anywhere in the engine
+HEAD:internal/risk/provenance_test.go:956:	h := p.OpenScope("task-1")
+HEAD:internal/risk/provenance_test.go:971:	reborn := p.OpenScope("task-1")
+HEAD:internal/risk/provenance_test.go:989:	h := p.OpenScope("task-1")
+HEAD:internal/risk/syncdirs_redteam_windows_test.go:89:	p.OpenScope("task-1")
+HEAD:internal/risk/syncdirs_redteam_windows_test.go:154:	p.OpenScope("task-1")
+HEAD:internal/risk/syncdirs_redteam_windows_test.go:222:	p.OpenScope("task-1")
+HEAD:internal/risk/syncdirs_test.go:378:	e.p.OpenScope("task-1")
+HEAD:internal/risk/syncdirs_test.go:459:	e.p.OpenScope("task-1")
+HEAD:internal/risk/syncdirs_windows_test.go:95:	p.OpenScope("task-1")
+HEAD:internal/risk/taintmatch_test.go:176:	h := p.OpenScope("s")
+HEAD:internal/risk/taintmatch_test.go:184:		h = p.OpenScope("s")
+HEAD:internal/risk/taintmatch_test.go:192:	p.OpenScope("s")
+HEAD:internal/tools/bridge.go:628:// risk.OpenScope now hands back the *Scope that owns the close, and the bridge
+HEAD:internal/tools/bridge.go:648:	b.scopes[taskID] = b.prov.OpenScope(taskID)
+HEAD:internal/tools/bridge_scope_open_ticket158_test.go:20:// 从没 OpenScope 的 scope 被 Mark 之后同样会在表上出现并带着污点（provenance.go:394，
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   UNPAIRED cmd/wisp/panel_assets.go (开方调用点=1)
+#   UNPAIRED internal/risk/provenance.go (开方调用点=5)  # 同文件另见收尾动词，判「真漏／委托」
+#   UNPAIRED internal/risk/provenance_syncdirs_other_test.go (开方调用点=1)
+#   UNPAIRED internal/risk/provenance_test.go (开方调用点=19)  # 同文件另见收尾动词，判「真漏／委托」
+#   UNPAIRED internal/risk/syncdirs_redteam_windows_test.go (开方调用点=3)
+#   UNPAIRED internal/risk/syncdirs_test.go (开方调用点=2)
+#   UNPAIRED internal/risk/syncdirs_windows_test.go (开方调用点=1)
+#   UNPAIRED internal/risk/taintmatch_test.go (开方调用点=3)
+#   UNPAIRED internal/tools/bridge.go (开方调用点=1)  # 同文件另见收尾动词，判「真漏／委托」
+# 未成对枚数＝9   （0＝这把尺没响／>0＝逐枚点名如上）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=9   （本枚子句的响＝未成对枚数；0＝不响）
+
+## 附：G1 的负一负（同尺摘掉排测试那一条 ⇒ 今日即非空，证明模式吃得住这个形状，不是结构上产不出读数的装饰）
+$ git grep -cE 'ToolRequest\{' HEAD -- internal cmd 里 *_test.go 的枚数
+15
+
+## 附：今日 production .Execute( 全名册（不过滤）＝G1b 的排除项本体
+HEAD:internal/agent/loop.go:730:		return l.opt.Tools.Execute(ctx, req)
+HEAD:internal/agent/loop.go:734:	out, err := l.opt.Tools.Execute(tctx, req)
+HEAD:internal/tools/bridge.go:463:	res, err := entry.Tool.Execute(ectx, req.Args, onUpdate)
+
+## G6 主尺（票 161 AC#6②第一族）OpenTask↔CloseTask：派发了环路却没在同一文件关掉那一枚 id
+# 与 G5 的分工：G5 盘「不过桥、直接对 risk 层开 scope」那一形，G6 盘「过桥的 task 生命周期」那一形。
+# 排 internal/tools/bridge.go 的理由与 G5 排 internal/risk 同一条：OpenTask／CloseTask 的定义本体
+#   在那儿（:633 与 :684），把定义算成调用点＝名册每改一行注释就响一次，那是噪音不是读数。
+# 今日真实枚数（09-27 现量，两向分开登记）：正向 0 枚／反向 1 枚＝cmd/wisp/run.go。
+#   正向那 0 枚**不是**「都关好了」：开方唯一的生产调用点（bridge.go:559 b.OpenTask(dec.TaskID)）
+#   正好落在被排掉的定义本体文件里，这条射程的结构就没有开方可数——所以这一腿的响只由反向撑着，
+#   「新造一发开了却没关的它必须响」那件事交给（甲）合成树那发主证，不靠这条射程的空 0。
+
+## G6 主尺 OpenTask↔CloseTask 成对普查（排 *_test.go、排定义本体 internal/tools/bridge.go；两向都算）
+$ git grep -nEw 'OpenTask|CloseTask' HEAD -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/tools/bridge.go
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+HEAD:cmd/wisp/run.go:546:// WHY THIS HOOK OWNS THE CLOSE. CloseTask's own comment says the composition
+HEAD:cmd/wisp/run.go:563:		rt.bridge.CloseTask(taskID)
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   （空）
+# 反向名册（CloseTask 出现过、同一文件却没见过 OpenTask 的文件；这一味＝「关过却没开过」）：
+#   UNPAIRED-REV cmd/wisp/run.go (合方调用点=1)  # 同文件没见过开方：人来判「真漏／委托」
+# 反向未成对枚数＝1   （0＝反向没响）
+# 未成对枚数＝1   （0＝这把尺没响／>0＝逐枚点名如上）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=1   （本枚子句的响＝未成对枚数；0＝不响）
+
+## G6 正控（同一把尺打在已知「开了又关」的样本上，两向都必须不响）
+# 样本＝internal/tools/bridge.go 自己：:559 的 b.OpenTask 与 :684 的 CloseTask 在同一枚文件里。
+# 这条射程是真吃得住的（本程现量 git grep rc=0、剔注释后 3 行调用点），不是「射程里根本没这东西」
+#   那种空 0——那种 0 不算正控（票 154 AC#3 就是拿「零区别」否掉装饰腿的，G5 的自纠 (1) 同一条）。
+
+## G6-正控 同尺只放已知「开又合」的那一枚 internal/tools/bridge.go ⇒ 两向都必须 0 枚
+$ git grep -nEw 'OpenTask|CloseTask' HEAD -- internal/tools/bridge.go :!*_test.go
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+HEAD:internal/tools/bridge.go:559:	b.OpenTask(dec.TaskID)
+HEAD:internal/tools/bridge.go:626:// OpenTask opens the C25 taint scope for one task - ticket 19's
+HEAD:internal/tools/bridge.go:636:// calls, and a caller that opens a scope and never reaches CloseTask still
+HEAD:internal/tools/bridge.go:639:func (b *Bridge) OpenTask(taskID string) {
+HEAD:internal/tools/bridge.go:651:// CloseTask closes one task's taint scope. The composition root defers this on
+HEAD:internal/tools/bridge.go:689:func (b *Bridge) CloseTask(taskID string) {
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   （空）
+# 反向名册（CloseTask 出现过、同一文件却没见过 OpenTask 的文件；这一味＝「关过却没开过」）：
+#   （空）
+# 反向未成对枚数＝0   （0＝反向没响）
+# 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=0   （本枚子句的响＝未成对枚数；0＝不响）
+
+## G6 负一负（同尺摘掉「排测试＋排定义」两条 ⇒ 今日应非空，证明这把尺吃得住这个形状）
+# 今日真实枚数：正向 0 枚／反向 1 枚＝cmd/wisp/run.go。测试文件里 OpenTask 与 CloseTask 同文件成对
+#   （internal/tools/bridge_scope_open_ticket158_test.go），所以摘掉过滤也点不出正向未成对——
+#   本程不把它谎称成点得出；正向那一向的证＝（甲）合成树。
+
+## G6-负一负 同尺不过滤任何文件
+$ git grep -nEw 'OpenTask|CloseTask' HEAD -- internal/**/*.go cmd/**/*.go
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+HEAD:cmd/wisp/run.go:546:// WHY THIS HOOK OWNS THE CLOSE. CloseTask's own comment says the composition
+HEAD:cmd/wisp/run.go:563:		rt.bridge.CloseTask(taskID)
+HEAD:cmd/wisp/task_scope_close_151_test.go:7://	   一整轮真 `wisp run`，要求任务结束时那发 CloseTask 的审计行带着**本轮
+HEAD:cmd/wisp/task_scope_close_151_test.go:16:// 承重读数（变异＝只把 admitTask 里那一发 CloseTask 摘掉，其余一字不动）：
+HEAD:internal/tools/bridge.go:559:	b.OpenTask(dec.TaskID)
+HEAD:internal/tools/bridge.go:626:// OpenTask opens the C25 taint scope for one task - ticket 19's
+HEAD:internal/tools/bridge.go:636:// calls, and a caller that opens a scope and never reaches CloseTask still
+HEAD:internal/tools/bridge.go:639:func (b *Bridge) OpenTask(taskID string) {
+HEAD:internal/tools/bridge.go:651:// CloseTask closes one task's taint scope. The composition root defers this on
+HEAD:internal/tools/bridge.go:689:func (b *Bridge) CloseTask(taskID string) {
+HEAD:internal/tools/bridge_scope_open_ticket158_test.go:6:// b.OpenTask(dec.TaskID)，本包 115/79/0/0 零枚红；同一发变异换到 cmd/wisp 才红
+HEAD:internal/tools/bridge_scope_open_ticket158_test.go:12://     读数的那枚变异（摘掉 OpenTask）唯一直接改变的包内状态。
+HEAD:internal/tools/bridge_scope_open_ticket158_test.go:13://  2. 收尾那一条 CloseTask 审计行必须报 was_open=true / dropped=1 —— 判据 1 的**后果**，
+HEAD:internal/tools/bridge_scope_open_ticket158_test.go:22:// "Mark 之后 ScopeTaints 非空"这把尺**量不出 OpenTask 在不在**——本包 fs_test.go:35 正是
+HEAD:internal/tools/bridge_scope_open_ticket158_test.go:116:			"bridge.scopes 里没有 %q。这一味（mark 里的 b.OpenTask）是本包对 C25 开侧唯一的"+
+HEAD:internal/tools/bridge_scope_open_ticket158_test.go:121:	b.CloseTask(taintedTask)
+HEAD:internal/tools/bridge_scope_open_ticket158_test.go:133:			"（was_open=false 就是开侧那一味丢了的形状：CloseTask 会照常打点、"+
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   （空）
+# 反向名册（CloseTask 出现过、同一文件却没见过 OpenTask 的文件；这一味＝「关过却没开过」）：
+#   UNPAIRED-REV cmd/wisp/run.go (合方调用点=1)  # 同文件没见过开方：人来判「真漏／委托」
+# 反向未成对枚数＝1   （0＝反向没响）
+# 未成对枚数＝1   （0＝这把尺没响／>0＝逐枚点名如上）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=1   （本枚子句的响＝未成对枚数；0＝不响）
+
+## G7 主尺（票 161 AC#6②第二族）Defer↔DisposalScope：挂了收尾却没绑到声明的 scope／反向＝拿着 scope 却没挂收尾
+# 定义本体＝internal/plugin/disposal.go（type DisposalScope :129、Defer :186、DeferNamed :191、
+#   Dispose :253），与 G5 排 internal/risk、G6 排 bridge.go 同一条理由，排掉它。
+# 开方写 'Defer(Named)?' 而不是 'Defer'：本程现量 printf 'x.DeferNamed(y)' | grep -Ew 'Defer' ⇒ rc=1，
+#   -w 把 DeferNamed 当另一个词，光写 Defer 会漏掉一半的收尾登记点（换成 Defer(Named)? 后 rc=0）。
+# 合方同理写 '(New)?DisposalScope'：grep -Ew 'DisposalScope' 对 'plugin.NewDisposalScope(...)' 也是 rc=1
+#   ——同一个词被前缀粘住，只排 DisposalScope 会把「用 NewDisposalScope 造了 scope、又 Defer 到它上面」的
+#   文件误判成未成对。今天这一改不动任何读数：本程现量 git grep -nEw NewDisposalScope <锚> -- internal cmd
+#   排测试排定义本体 ⇒ rc=1，生产码里一枚构造点都还没有，所以合方名册与改前逐字相同。
+# 今日真实枚数：正向 0 枚（Defer／DeferNamed 的生产调用点全在被排掉的定义本体里，测试之外零枚）／
+#   反向 3 枚＝internal/memory/retention.go、internal/observe/goroutine.go、internal/proc/shutdown.go。
+#   反向这 3 枚里 retention.go:98 是真拿 scope 的签名，另两枚各有一味是「代码行尾随注释」被算进
+#   调用行的已知粗糙处（pair() 只剔以 // 开头的整行）——逐枚人来判真漏／委托，本程不替它判。
+
+## G7 主尺 Defer↔DisposalScope 成对普查（排 *_test.go、排定义本体 internal/plugin/disposal.go；两向都算）
+$ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' HEAD -- internal/**/*.go cmd/**/*.go :!*_test.go :!internal/plugin/disposal.go
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+HEAD:internal/memory/retention.go:20:// governed by a DisposalScope (C11): disposal cancels its ctx and joins it.
+HEAD:internal/memory/retention.go:96:// DisposalScope (C11: the scope's Dispose cancels and joins it). It returns
+HEAD:internal/memory/retention.go:98:func (s *Store) StartRetentionJob(scope *plugin.DisposalScope, cfg RetentionConfig) {
+HEAD:internal/memory/retention.go:100:		panic("memory: StartRetentionJob requires a DisposalScope")
+HEAD:internal/observe/goroutine.go:34:	CategoryTemporary GoroutineCategory = "temporary" // inside a DisposalScope
+HEAD:internal/observe/goroutine.go:54:// TemporaryNames are DisposalScope-scoped goroutines (D38b). disposal-worker
+HEAD:internal/plugin/doc.go:3:// DisposalScope (C11).
+HEAD:internal/plugin/doc.go:9://   - DisposalScope (C11): the deterministic-disposal primitive shared by the
+HEAD:internal/plugin/doc.go:18:// goja). This ticket implements only DisposalScope.
+HEAD:internal/proc/shutdown.go:23://	5. ASR/TTS/KWS sessions released (DisposalScope reverse order)
+HEAD:internal/proc/shutdown.go:85:	ReleaseSpeechSessions func(ctx context.Context) error // step 5 (speech, via DisposalScope)
+HEAD:internal/proc/shutdown.go:161:	// 5: native speech sessions via DisposalScope.
+HEAD:internal/risk/provenance.go:19:// the session's DisposalScope and a new session never inherits old taints).
+HEAD:internal/risk/provenance.go:62:// does not hold it. Still OPEN inside (1): the "Defer it onto the task's
+HEAD:internal/risk/provenance.go:63:// DisposalScope" half, because no *plugin.DisposalScope reaches tools/agent/cmd
+HEAD:internal/risk/provenance.go:423:// disposalScope.Defer(func() { _ = scope.Close() }) — the handle, not the id,
+HEAD:internal/session/doc.go:6://   - build the session-level DisposalScope (C11 hierarchy: session > task >
+HEAD:internal/speech/doc.go:6://   - engine/session lifecycle: load, infer, release (inside a DisposalScope,
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   （空）
+# 反向名册（(New)?DisposalScope 出现过、同一文件却没见过 Defer(Named)? 的文件；这一味＝「关过却没开过」）：
+#   UNPAIRED-REV internal/memory/retention.go (合方调用点=2)  # 同文件没见过开方：人来判「真漏／委托」
+#   UNPAIRED-REV internal/observe/goroutine.go (合方调用点=1)  # 同文件没见过开方：人来判「真漏／委托」
+#   UNPAIRED-REV internal/proc/shutdown.go (合方调用点=1)  # 同文件没见过开方：人来判「真漏／委托」
+# 反向未成对枚数＝3   （0＝反向没响）
+# 未成对枚数＝3   （0＝这把尺没响／>0＝逐枚点名如上）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=3   （本枚子句的响＝未成对枚数；0＝不响）
+
+## G7 正控（同一把尺打在已知「收尾与 scope 同文件」的样本上，两向都必须不响）
+# 样本＝internal/plugin/disposal.go 自己：Defer／DeferNamed 与 DisposalScope 同文件 ⇒ 两向 0 枚，
+#   且名册非空（本程现量 git grep rc=0），不是「射程里没这东西」那种空 0。
+
+## G7-正控 同尺只放定义本体 internal/plugin/disposal.go 这一枚已知「两向都有」的样本
+$ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' HEAD -- internal/plugin/disposal.go :!*_test.go
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+HEAD:internal/plugin/disposal.go:16:// DisposalScope — contract C11 (D39 deepened; SPEC-01 §6).
+HEAD:internal/plugin/disposal.go:18:// Semantics: Defer registers destroy actions; Dispose runs them
+HEAD:internal/plugin/disposal.go:97:// Option configures a DisposalScope.
+HEAD:internal/plugin/disposal.go:98:type Option func(*DisposalScope)
+HEAD:internal/plugin/disposal.go:103:	return func(s *DisposalScope) { s.timeout = d }
+HEAD:internal/plugin/disposal.go:109:	return func(s *DisposalScope) { s.reg = r }
+HEAD:internal/plugin/disposal.go:114:	return func(s *DisposalScope) { s.releaser = mr }
+HEAD:internal/plugin/disposal.go:119:	return func(s *DisposalScope) { s.slo = sr }
+HEAD:internal/plugin/disposal.go:127:// DisposalScope is the C11 deterministic-disposal primitive. Zero value is
+HEAD:internal/plugin/disposal.go:128:// not usable; use NewDisposalScope.
+HEAD:internal/plugin/disposal.go:129:type DisposalScope struct {
+HEAD:internal/plugin/disposal.go:152:// NewDisposalScope creates a scope derived from parent (nil = detached). The
+HEAD:internal/plugin/disposal.go:155:func NewDisposalScope(name string, parent context.Context, opts ...Option) *DisposalScope {
+HEAD:internal/plugin/disposal.go:160:	s := &DisposalScope{
+HEAD:internal/plugin/disposal.go:178:func (s *DisposalScope) Ctx() context.Context { return s.ctx }
+HEAD:internal/plugin/disposal.go:181:func (s *DisposalScope) Name() string { return s.name }
+HEAD:internal/plugin/disposal.go:183:// Defer registers a destroy action (auto-named step-<n>). Returns false if
+HEAD:internal/plugin/disposal.go:186:func (s *DisposalScope) Defer(fn func()) bool {
+HEAD:internal/plugin/disposal.go:187:	return s.DeferNamed("", fn)
+HEAD:internal/plugin/disposal.go:190:// DeferNamed registers a named destroy action. See Defer.
+HEAD:internal/plugin/disposal.go:191:func (s *DisposalScope) DeferNamed(name string, fn func()) bool {
+HEAD:internal/plugin/disposal.go:208:		slog.Error("disposal_incomplete: Defer called after Dispose",
+HEAD:internal/plugin/disposal.go:225:// scope; the scope's own per-fn recover contract covers Defer actions.
+HEAD:internal/plugin/disposal.go:226:func (s *DisposalScope) Go(name string, fn func(ctx context.Context)) *observe.Handle {
+HEAD:internal/plugin/disposal.go:245:func (s *DisposalScope) Incomplete() bool {
+HEAD:internal/plugin/disposal.go:253:func (s *DisposalScope) Dispose() DisposeResult {
+HEAD:internal/plugin/disposal.go:349:func (s *DisposalScope) waitPending(total observe.Timeout) int {
+HEAD:internal/plugin/disposal.go:364:func (s *DisposalScope) peakBytes() int64 {
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   （空）
+# 反向名册（(New)?DisposalScope 出现过、同一文件却没见过 Defer(Named)? 的文件；这一味＝「关过却没开过」）：
+#   （空）
+# 反向未成对枚数＝0   （0＝反向没响）
+# 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=0   （本枚子句的响＝未成对枚数；0＝不响）
+
+## G7 负一负（同尺不过滤任何文件 ⇒ 今日应非空，证明这把尺吃得住这个形状）
+# 今日真实枚数：正向 1 枚＝internal/risk/provenance_test.go（出现 Defer 却没在同一文件出现
+#   DisposalScope 这个词）／反向 3 枚＝主尺那三枚 ⇒ 合计 4 枚。
+
+## G7-负一负 同尺不过滤任何文件
+$ git grep -nEw 'Defer(Named)?|(New)?DisposalScope' HEAD -- internal/**/*.go cmd/**/*.go
+# 逐行读数（名册本体，供下一程 diff；这一份含注释行）：
+HEAD:internal/memory/retention.go:20:// governed by a DisposalScope (C11): disposal cancels its ctx and joins it.
+HEAD:internal/memory/retention.go:96:// DisposalScope (C11: the scope's Dispose cancels and joins it). It returns
+HEAD:internal/memory/retention.go:98:func (s *Store) StartRetentionJob(scope *plugin.DisposalScope, cfg RetentionConfig) {
+HEAD:internal/memory/retention.go:100:		panic("memory: StartRetentionJob requires a DisposalScope")
+HEAD:internal/memory/retention_test.go:187:// and DisposalScope governance: after Dispose the goroutine is joined (C11
+HEAD:internal/memory/retention_test.go:193:	scope := plugin.NewDisposalScope("test-retention", nil,
+HEAD:internal/observe/goroutine.go:34:	CategoryTemporary GoroutineCategory = "temporary" // inside a DisposalScope
+HEAD:internal/observe/goroutine.go:54:// TemporaryNames are DisposalScope-scoped goroutines (D38b). disposal-worker
+HEAD:internal/plugin/disposal.go:16:// DisposalScope — contract C11 (D39 deepened; SPEC-01 §6).
+HEAD:internal/plugin/disposal.go:18:// Semantics: Defer registers destroy actions; Dispose runs them
+HEAD:internal/plugin/disposal.go:97:// Option configures a DisposalScope.
+HEAD:internal/plugin/disposal.go:98:type Option func(*DisposalScope)
+HEAD:internal/plugin/disposal.go:103:	return func(s *DisposalScope) { s.timeout = d }
+HEAD:internal/plugin/disposal.go:109:	return func(s *DisposalScope) { s.reg = r }
+HEAD:internal/plugin/disposal.go:114:	return func(s *DisposalScope) { s.releaser = mr }
+HEAD:internal/plugin/disposal.go:119:	return func(s *DisposalScope) { s.slo = sr }
+HEAD:internal/plugin/disposal.go:127:// DisposalScope is the C11 deterministic-disposal primitive. Zero value is
+HEAD:internal/plugin/disposal.go:128:// not usable; use NewDisposalScope.
+HEAD:internal/plugin/disposal.go:129:type DisposalScope struct {
+HEAD:internal/plugin/disposal.go:152:// NewDisposalScope creates a scope derived from parent (nil = detached). The
+HEAD:internal/plugin/disposal.go:155:func NewDisposalScope(name string, parent context.Context, opts ...Option) *DisposalScope {
+HEAD:internal/plugin/disposal.go:160:	s := &DisposalScope{
+HEAD:internal/plugin/disposal.go:178:func (s *DisposalScope) Ctx() context.Context { return s.ctx }
+HEAD:internal/plugin/disposal.go:181:func (s *DisposalScope) Name() string { return s.name }
+HEAD:internal/plugin/disposal.go:183:// Defer registers a destroy action (auto-named step-<n>). Returns false if
+HEAD:internal/plugin/disposal.go:186:func (s *DisposalScope) Defer(fn func()) bool {
+HEAD:internal/plugin/disposal.go:187:	return s.DeferNamed("", fn)
+HEAD:internal/plugin/disposal.go:190:// DeferNamed registers a named destroy action. See Defer.
+HEAD:internal/plugin/disposal.go:191:func (s *DisposalScope) DeferNamed(name string, fn func()) bool {
+HEAD:internal/plugin/disposal.go:208:		slog.Error("disposal_incomplete: Defer called after Dispose",
+HEAD:internal/plugin/disposal.go:225:// scope; the scope's own per-fn recover contract covers Defer actions.
+HEAD:internal/plugin/disposal.go:226:func (s *DisposalScope) Go(name string, fn func(ctx context.Context)) *observe.Handle {
+HEAD:internal/plugin/disposal.go:245:func (s *DisposalScope) Incomplete() bool {
+HEAD:internal/plugin/disposal.go:253:func (s *DisposalScope) Dispose() DisposeResult {
+HEAD:internal/plugin/disposal.go:349:func (s *DisposalScope) waitPending(total observe.Timeout) int {
+HEAD:internal/plugin/disposal.go:364:func (s *DisposalScope) peakBytes() int64 {
+HEAD:internal/plugin/disposal_test.go:13:func testScope(t *testing.T, name string, opts ...Option) (*DisposalScope, *observe.Registry) {
+HEAD:internal/plugin/disposal_test.go:17:	s := NewDisposalScope(name, context.Background(), opts...)
+HEAD:internal/plugin/disposal_test.go:26:	s.DeferNamed("A", func() { order = append(order, "A") })
+HEAD:internal/plugin/disposal_test.go:27:	s.DeferNamed("B", func() { order = append(order, "B") })
+HEAD:internal/plugin/disposal_test.go:28:	s.DeferNamed("C", func() { order = append(order, "C") })
+HEAD:internal/plugin/disposal_test.go:53:	s.DeferNamed("first", func() { record("first") })
+HEAD:internal/plugin/disposal_test.go:54:	s.DeferNamed("second", func() { record("second") })
+HEAD:internal/plugin/disposal_test.go:87:	s.DeferNamed("panics", func() { panic("destroy failed: injected") })
+HEAD:internal/plugin/disposal_test.go:88:	s.DeferNamed("middle", func() { order = append(order, "middle") })
+HEAD:internal/plugin/disposal_test.go:89:	s.DeferNamed("last", func() { order = append(order, "last") })
+HEAD:internal/plugin/disposal_test.go:125:	s.DeferNamed("never-runs", func() { ran = append(ran, "never-runs") })
+HEAD:internal/plugin/disposal_test.go:126:	s.DeferNamed("blocks", func() { <-blocked }) // hangs until released below
+HEAD:internal/plugin/disposal_test.go:168:	s := NewDisposalScope("task-tail", context.Background(),
+HEAD:internal/plugin/disposal_test.go:182:	s.DeferNamed("fns", func() { audit.append("deferred-fns") })
+HEAD:internal/plugin/disposal_test.go:249:	if ok := s.Defer(func() {}); ok {
+HEAD:internal/plugin/disposal_test.go:250:		t.Fatal("Defer after Dispose must report false")
+HEAD:internal/plugin/doc.go:3:// DisposalScope (C11).
+HEAD:internal/plugin/doc.go:9://   - DisposalScope (C11): the deterministic-disposal primitive shared by the
+HEAD:internal/plugin/doc.go:18:// goja). This ticket implements only DisposalScope.
+HEAD:internal/proc/shutdown.go:23://	5. ASR/TTS/KWS sessions released (DisposalScope reverse order)
+HEAD:internal/proc/shutdown.go:85:	ReleaseSpeechSessions func(ctx context.Context) error // step 5 (speech, via DisposalScope)
+HEAD:internal/proc/shutdown.go:161:	// 5: native speech sessions via DisposalScope.
+HEAD:internal/risk/provenance.go:19:// the session's DisposalScope and a new session never inherits old taints).
+HEAD:internal/risk/provenance.go:62:// does not hold it. Still OPEN inside (1): the "Defer it onto the task's
+HEAD:internal/risk/provenance.go:63:// DisposalScope" half, because no *plugin.DisposalScope reaches tools/agent/cmd
+HEAD:internal/risk/provenance.go:423:// disposalScope.Defer(func() { _ = scope.Close() }) — the handle, not the id,
+HEAD:internal/risk/provenance_test.go:294:// --- scope lifetime / DisposalScope (AC #5) ----------------------------------
+HEAD:internal/risk/provenance_test.go:306:	// C11/DisposalScope binding: closing the scope (session end) must drop
+HEAD:internal/risk/provenance_test.go:308:	scope := plugin.NewDisposalScope("session-1", context.Background())
+HEAD:internal/risk/provenance_test.go:311:	scope.Defer(func() {
+HEAD:internal/risk/provenance_test.go:313:		// fail: a Defer-ed closer that cannot close its own scope is the bug.
+HEAD:internal/risk/provenance_test.go:315:			t.Errorf("DisposalScope must be able to close the scope it was handed: %v", err)
+HEAD:internal/session/doc.go:6://   - build the session-level DisposalScope (C11 hierarchy: session > task >
+HEAD:internal/speech/doc.go:6://   - engine/session lifecycle: load, infer, release (inside a DisposalScope,
+# 成对名册基准（开过、却没在同一文件关过的文件；空＝这把尺没响）：
+#   （空）
+# 反向名册（(New)?DisposalScope 出现过、同一文件却没见过 Defer(Named)? 的文件；这一味＝「关过却没开过」）：
+#   UNPAIRED-REV internal/memory/retention.go (合方调用点=2)  # 同文件没见过开方：人来判「真漏／委托」
+#   UNPAIRED-REV internal/memory/retention_test.go (合方调用点=1)  # 同文件没见过开方：人来判「真漏／委托」
+#   UNPAIRED-REV internal/observe/goroutine.go (合方调用点=1)  # 同文件没见过开方：人来判「真漏／委托」
+#   UNPAIRED-REV internal/proc/shutdown.go (合方调用点=1)  # 同文件没见过开方：人来判「真漏／委托」
+# 反向未成对枚数＝4   （0＝反向没响）
+# 未成对枚数＝4   （0＝这把尺没响／>0＝逐枚点名如上）
+# git grep rc=0（1＝本射程里这一族一枚都没有——那是「射程里没这东西」，不是「都关好了」；两种 0 枚响含义不同）
+# rc=4   （本枚子句的响＝未成对枚数；0＝不响）
+
+## 聚合退码（票 161 AC#6①）：只累计【声明与实测不符】的腿
+# 判据**不是**「任何一腿响⇒脚本非 0」——见文件头 want 那一段与本票票面 09-27 09:1x 的 > 块：
+#   G2／G5-负一负／G6／G6-负一负／G7／G7-负一负 今天按设计就该响，把它们计进退码
+#   ＝把票 161 AC#7 刚收掉的恒红形状从另一扇门放回来（同一枚错，台账 A320／A321）。
+# 每腿判定（ok＝说到做到／BAD＝言行不一；这一份同样逐行可 diff）：
+# ok   腿=G1 声明=quiet 实测=quiet
+# ok   腿=G1b 声明=quiet 实测=quiet
+# ok   腿=G2 声明=ring 实测=ring
+# ok   腿=G3 声明=quiet 实测=quiet
+# ok   腿=G4 声明=quiet 实测=quiet
+# ok   腿=G5 声明=ring 实测=ring
+# BAD  腿=G5pos 声明=quiet 实测=ring
+# ok   腿=G5neg 声明=ring 实测=ring
+# ok   腿=G6 声明=ring 实测=ring
+# ok   腿=G6pos 声明=quiet 实测=quiet
+# ok   腿=G6neg 声明=ring 实测=ring
+# ok   腿=G7 声明=ring 实测=ring
+# ok   腿=G7pos 声明=quiet 实测=quiet
+# ok   腿=G7neg 声明=ring 实测=ring
+# 腿数＝14 声明与实测不符＝1
+# 聚合退码＝1   （0＝每一腿的响与不响都和自己登记的声明一致；>0＝有腿言行不一）
+# 翻一枚声明让退码跟着变那发证据不在这里，在 .scratch/wisp/probes/161/r6/flip-declaration.sh

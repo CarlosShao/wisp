@@ -1,0 +1,10 @@
+{
+ "Replace": {
+  "D:/work/workspace/projects plans/Wisp/internal/risk/provenance.go": "D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/160/v1/prebase/provenance.go.34c0b4e4",
+  "D:/work/workspace/projects plans/Wisp/internal/risk/provenance_test.go": "D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/160/v1/prebase/provenance_test.go.34c0b4e4",
+  "D:/work/workspace/projects plans/Wisp/internal/risk/taintmatch_test.go": "D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/160/v1/prebase/taintmatch_test.go.34c0b4e4",
+  "D:/work/workspace/projects plans/Wisp/internal/tools/bridge.go": "D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/160/v1/prebase/bridge.go.34c0b4e4",
+  "D:/work/workspace/projects plans/Wisp/internal/tools/bridge_scope_open_ticket158_test.go": "D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/160/v1/prebase/bridge_scope_open_ticket158_test.go.34c0b4e4",
+  "D:/work/workspace/projects plans/Wisp/cmd/wisp/panel_assets.go": "D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/160/v1/prebase/panel_assets.go.34c0b4e4"
+ }
+}

@@ -1,0 +1,3 @@
+time=2026-09-27T11:58:49.731+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+V1-OPENONLY leak-inspect hit=true src="web.fetch" taints=1 guessed-id-taints=0
+rc=0
