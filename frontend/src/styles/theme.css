@@ -19,10 +19,24 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* ---------- Tailwind namespaces: the library's own mapping ----------------- */
+
+/* The one translucency knob (设置屏「面板背景不透明度」, ticket 128-era row).
+   It used to live on `.wisp-shell`, a class NOBODY ever mounted, so dragging
+   the slider changed one custom property and nothing on screen - the knob was
+   live in the DOM and dead to the eye. The window's own background is read
+   through the two utilities every surface actually uses (bg-page / bg-surface),
+   so one property now reaches all of them.
+
+   100% is an identity: color-mix(in srgb, C 100%, transparent) === C, so the
+   shipped look is byte-identical until the user drags the slider. Below 100%
+   the window goes translucent - but whether anything is VISIBLE through it is
+   the host's call, not this page's: WebView2 only composites a transparent
+   desktop when the Go side hands it one (ticket 33 / C27). Do not add a
+   backdrop-filter here hoping to fake it: there is nothing to blur yet. */
 @theme inline {
-  --color-page: var(--page);
+  --color-page: color-mix(in srgb, var(--page) var(--panel-alpha), transparent);
+  --color-surface: color-mix(in srgb, var(--surface) var(--panel-alpha), transparent);
   --color-canvas: var(--canvas);
-  --color-surface: var(--surface);
   --color-inset: var(--inset);
   --color-hover: var(--hover);
   --color-hover-2: var(--hover-2);
@@ -87,20 +101,15 @@
 }
 
 /* ---------- the panel shell ------------------------------------------------
-   Minimal and solid: page behind, surface window, hairline edges. The one
-   transparency knob is --panel-alpha (settings screen), applied to the window
-   surface itself; 100% is the shipped default. */
-.wisp-shell {
-  background: color-mix(in srgb, var(--surface) var(--panel-alpha), transparent);
-  color: var(--ink);
-  font-family: var(--font-sans-stack);
-}
-.wisp-window {
-  border-radius: var(--radius-card);
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow-overlay);
-  overflow: hidden;
-}
+   RETIRED 2026-09-27: `.wisp-shell` / `.wisp-window` are gone, and that is the
+   fix, not a cleanup. Both were dead - no component ever put either class on
+   anything - and the settings screen's one live control was wired to a property
+   only `.wisp-shell` read, so the transparency slider moved a number that
+   nothing consumed. The knob now rides the two utilities the window actually
+   paints with (see the @theme inline block above), so there is exactly one
+   mechanism and it cannot be unmounted again.
+
+   Minimal and solid: page behind, surface window, hairline edges. */
 
 /* ---------- keyframes the adapted library components reference by name -----
    Verbatim names from beautiful-ui globals.css (MIT) - adapted components
