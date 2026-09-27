@@ -25,6 +25,7 @@ import {
   Trash,
   type LucideIcon,
 } from "lucide-react";
+import { GlideMenu } from "@/components/ai-native/glide-menu";
 import { cn } from "@/lib/cn";
 
 export interface PaletteItem {
@@ -191,7 +192,14 @@ export function PaletteScreen({
             <span className="text-[12px] text-ink-3">换个说法再试一次</span>
           </div>
         ) : (
-          <div className="p-1.5" role="listbox">
+          /* Two channels, the same split the sidebar uses after the GlideMenu
+             swap: the MOUSE highlight is the library's glide layer (it follows
+             the pointer and leaves when the pointer leaves), and the KEYBOARD
+             cursor is a fixed accent bar that does not get dragged away when
+             you move the mouse. Painting both as a background wash meant the
+             two fought over one visual slot - hover the list and you lost track
+             of where Enter would land. */
+          <GlideMenu className="p-1.5" highlightClassName="inset-x-1.5 rounded-[6px] bg-hover" rowSelector="[data-menu-row]">
             {shown.map((group) => (
               <div className="flex flex-col" key={group.name}>
                 <p className="px-2 pb-1 pt-2 text-[11px] font-medium uppercase tracking-[0.06em] text-ink-3">
@@ -204,9 +212,10 @@ export function PaletteScreen({
                     <button
                       aria-selected={on}
                       className={cn(
-                        "flex h-9 w-full items-center gap-2.5 rounded-[6px] px-2 text-left transition-colors duration-100",
-                        on ? "bg-hover" : "hover:bg-hover",
+                        "relative flex h-9 w-full items-center gap-2.5 rounded-[6px] py-0 pr-2 pl-2.5 text-left transition-colors duration-100",
+                        on ? "text-ink" : "text-ink-2 hover:text-ink",
                       )}
+                      data-menu-row
                       id={`palette-row-${index}`}
                       key={item.label}
                       onClick={() => onSelect?.(item)}
@@ -215,8 +224,14 @@ export function PaletteScreen({
                       style={{ animation: "fade-in 200ms ease-out both" }}
                       type="button"
                     >
+                      {on ? (
+                        <span
+                          aria-hidden="true"
+                          className="absolute bottom-1.5 left-0.5 top-1.5 w-[2px] rounded-full bg-accent"
+                        />
+                      ) : null}
                       <ItemIcon icon={item.icon} />
-                      <span className="min-w-0 flex-1 truncate text-[13px] text-ink">
+                      <span className="min-w-0 flex-1 truncate text-[13px]">
                         {item.label}
                       </span>
                       {item.hint && (
@@ -227,7 +242,7 @@ export function PaletteScreen({
                 })}
               </div>
             ))}
-          </div>
+          </GlideMenu>
         )}
 
         {/* the palette's keyboard vocabulary, as kbd hints */}
