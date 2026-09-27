@@ -97,7 +97,7 @@ r6 自己的 `faketree.sh` 我**未运行**（同上，它写自己的 logs 目�
    G7 立刻变 `quiet` 而声明还是 `ring` ⇒ 聚合 **rc=1**，看起来像"引入了回归"，实际是尺的精度变好了。
    `gate-clauses.sh:174` 那句"逐枚都是 09-27 在锚上现量登记的今天真值"已经承认声明是**锚点级快照**，⇒ 结论：
    **任何改动 `pair()`/`diffsets()` 词表或剔注释规则的一程，必须在同一发提交里重登记 `want` 行**，否则聚合红的是"声明过期"。
-   （台账归口：见本表 §4「对编排者的不服」末段——我不动 `docs/reports/**`，这一条要编排者落 `A##`。）
+   （台账归口：见本表 §5「对编排者的不服」第 2 条——我不动 `docs/reports/**`，这一条要编排者落 `A##`／`R##`。）
 
 ### 1.4 本格未做／边界
 
@@ -108,3 +108,152 @@ r6 自己的 `faketree.sh` 我**未运行**（同上，它写自己的 logs 目�
   本锚上 `git grep -nE 'DEFERRED|DEFER\(' <锚> -- cmd/wisp/run.go internal/tools/bridge.go` 只命中 `bridge.go:627 DEFERRED(C25-loop-wiring)`，
   指向的是 ticket 19 的环路接线，**不是这一枚**。⇒ 我不把它算进"真漏"，但**建议编排者核它有没有账**（我无 `docs/reports/**` 写面）。
 - AC#6 这一格我的档位：§1.1／§1.2／§1.3 的**全部读数＝〔我本轮现跑过〕**；r6 自己的日志＝〔盘上有件，我未复算〕（我只抽查了它的两形设计，并另建了同等复现）。
+
+## 2. AC#4 —— 反向判据：摘掉那对样本里"违规"那一枚，CI 会不会红
+
+全部读数＝**〔我本轮现跑过〕**。方法：把 `tools/d22scan` 整枚模块按锚上的已跟踪清单 `cp --parents` 到 **仓外** `/tmp/wisp161v2/d22`
+（`git diff --name-only <锚> -- tools/d22scan` ＝空 ⇒ 副本＝锚上字节；`sha256sum selftestsamples.go` ＝ **`7ea3f1d8f664ac61a0e3287b5fc2fc4c6a0bc94871a0fcc9005f57790d85daf5`**，
+与 r4 记的"摘前＝摘后"那一枚哈希逐字相同 ⇒ 我这副本与 r4 当时那棵树同源）。**一字节生产码／一字节仓内件都没改**（删除只在 `/tmp` 的副本里）。
+摘的那一味＝`selftestsamples.go:190-195`（ban #5 `mirror-hash` 名册里**唯一**的 `wantRing`；摘后 `grep -n 'mirror-hash'` 只剩 `:191 wantSilent`，`sha256` 变 `268f25ab…`）。
+
+### 2.1 基线（同一副本，未摘）
+
+- `go run . -self-test` ⇒ **rc=0**，末行逐字 `d22scan -self-test: clean - all 34 direction checks passed (19 expect-ring, 15 expect-silent)`。
+- `go build -o d22base.exe .` ⇒ 二进制 rc=0，末行同上。
+- `sh tools/d22scan/runtests.sh -C tools/d22scan ./...` ⇒ `PASS=28 FAIL=0 SKIP=6 === RUN=76`、**rc=1**。
+  ⚠ 这枚 rc=1 **不是新增红**，是 `runtests.sh` 对 `SKIP` 的合法拒绝（脚本头第 2 条规矩："SKIP is NOT a pass"），
+  而跳过的 6 枚全是"要在真仓里才跑"的用例（`TestCheckRootAcceptsRealRepo`／`TestScannerSelfScanOfRealRepoIsGreen`／`TestScopeReportMatchesRealCoverage`／
+  `TestRealRepoBan8CoversFrontendTreeAtBan6sCount`／`TestLedgerCountsMatchAnIndependentWalk`／`TestRealRepoLedgerIsHonest`）⇒ **28＋6＝34**，与盘上／编排者复跑的 34 对得上。
+  我这侧的分母与真树不同一事，**登记成"读数受副本环境影响"，不登记成缺陷**。
+
+### 2.2 两形分开答（派单 §1 明令不许合并）
+
+| 形 | 命令 | 摘样本后 | 逐字凭据 |
+|---|---|---|---|
+| **二进制那一形** | `go build` ＋ `d22rem.exe -self-test` | **rc=2**，且**一行用例都没跑**（输出里 `pinned because` 行数＝0） | `FATAL the table does not cover the tool (1 hole(s)); an unrun self-test is not a green self-test` ＋ `HOLE tag "mirror-hash" has only an expect-silent sample - a ban whose violating sample was deleted cannot be distinguished from a ban that was never implemented` |
+| **CI 那一形** | `go run . -self-test`（＝`ci.yml:105` 那一步的原命令，`working-directory: tools/d22scan`） | **rc=1**，stdout 末行 `exit status 2` | 同一份 FATAL/HOLE 文本，退码却是 1 |
+
+⇒ **本格的答案是两句话**：
+（一）**CI 那一步会不会红＝会**（非零即红；我按锚现读那一步**不带 `if:`、不带 `continue-on-error`**，`sed -n '83,107p'` 全段只有 `name`／注释／`run`／`working-directory`）。
+（二）**CI 看到的是 1 而不是 2** ⇒ "空心拒答(2)"与"真命中(1)"在退码上**同色**，丢的是"这次是拒答还是命中"那一格诊断，诊断只活在 stdout 文本里。
+⇒ 编排者 09-27 那条"别替它们合并"的更正**我独立复现成立**（`go run` 把子进程任何非零退码压成 1，本仓的门都走 `go run`：`ci.yml:105` 与 `scripts/d22scan.sh:54`）。
+（顺带：**第三种颜色**——`go test` 那一形在同一条摘过的树上 `PASS=28→25 / FAIL=0→3`，翻色三枚＝
+`TestSelfTestEntryPassesEveryCase`／`TestSelfTestRosterAuditRejectsAHollowTable`／**`TestSelfTestFlagIsWiredInTheBuiltBinary`**（它自己 `go build` 再要求 rc=0，`selftest_test.go:176-205`）。
+⇒ CI 里第 74 步（正控）与第 83 步（自检）**两步同色变红**，且 74 排在 83 前面。r4 只报两枚的理由我判是它的**证法**：`-overlay` 只喂给它自己的 `go test` 进程，而那枚用例内部另起一次 `go build`、不吃 overlay ⇒ 在它那一形下天然免疫。
+**这一条的档位＝〔对源码的读＋我这侧的实测对照〕，我没有复跑 overlay 那一形**；我不把它算成 r4 读错，算成**它的证法在爆炸半径上少报一枚用例**。）
+
+### 2.3 承重那一问：摘掉哪一味，会存在一发变异从此打不红？摘掉"空心就拒答"那一味呢？
+
+变异体＝把 ban #5 的发射点 `main.go:771` 改成 `if false {`（禁令永不发火，其余一字未动）；
+空心审计＝`selftest.go:355` 的 `return holes` 改成 `return nil`（一发 `sed`，不碰其它判据）。
+
+| 发 | 名册 | 空心审计 | 变异 #5 打哑 | 结果 |
+|---|---|---|---|---|
+| (a) | 完整 | **在** | 是 | **rc=1**，逐字 `ban #5 mirror-hash ring FAIL … did NOT ring: no "mirror-hash" finding anywhere in the fixture …` ⇒ **变异打得红** |
+| (b) | 摘掉 #5 唯一 ring | 在 | 否 | **rc=2**（CI 形 rc=1）＝审计把"摘样本"这个动作本身拦下 |
+| (c) | 完整 | **摘掉** | 否 | **rc=0 clean 34 项** ⇒ 单摘这一味**今天不改变颜色**（名册完整时它是惰性的） |
+| (d) | 摘掉 #5 唯一 ring | **摘掉** | **是** | **rc=0**，末行 `clean - all 33 direction checks passed (18 expect-ring, 15 expect-silent)` ⇒ **这一发变异从此打不红，实测存在** |
+
+⇒ **答"摘掉哪一味"**：只有"空心审计"那一味能造出逃逸，且**必须与某一 tag 唯一的 `wantRing` 样本一起摘**（(c) 单独不逃逸、(b) 单独被拦）。
+⇒ **答"摘掉空心就拒答那一味呢"**：它买的**不是**"防这一程把禁令改哑"——那是 ring case 自己的活，(a) 已证它打得红；
+它买的是**"防下一程把样本摘掉、从而让 ring case 消失"**这一枚时序。删掉它＝把这扇门交给"没有人会去摘样本"这个假设，
+而 (d) 就是那个假设破产时的读数（**门自己印 clean，一行 #5 的东西都没看过**）。
+⇒ 所以本格的"承重操作定义"是：**tag 级配对的空心审计 ＋ 每 tag 的 ring case，两味互为备份，任何单独一味都不是承重**；
+"摘掉任一单独一味今天不改变颜色"这件事我量了（(c)），它**不是**装饰的证据，它是备份的形状。
+
+**AC#4 我的裁决＝〔成立〕**（票面那句"把违规样本摘掉 CI 会不会红"答得出、且我复跑；"装饰"这一支被 (d) 排除，因为**要同时删两味**才逃逸，而这两味都有用例钉着）。
+⚠ 但我要把 (d) 单独递给编排者：**今天没有任何一把尺在"两味同时被摘"时响**——`go test` 那三枚里只有 `TestSelfTestRosterAuditRejectsAHollowTable` 钉审计，
+若下一程连那条断言一起摘，CI 无读。这不是 AC#4 的缺陷（判据问的是"摘掉样本"，不是"摘掉判据"），是**下一程最省事的那条路**。
+
+## 3. AC#7 —— 取证机械自己撞全仓门那一枚：归因仪器与那道顺序
+
+全部读数＝**〔我本轮现跑过〕**（被验物＝`.scratch/wisp/probes/161/r5/attrib.sh` ＋ `ci.yml:152-172` 那一步；r4 的 `probes/161/r4/attrib.sh` 我只读不跑）。
+我的两枚改件在**我自己的写面** `.scratch/wisp/probes/161/v2/`（`attrib-noknown.sh`），另两枚在仓外 `/tmp/wisp161v2/emptyrepo/probe/`；**r5 原件一字节未动**（跑它 = 只读）。
+
+### 3.1 问①：摘掉"票面 `.scratch/wisp/issues/<NN>-*.md` 真存在"那一味，仪器会不会变成自证式恒绿？——**会，但不是静默的**
+
+我把 `ticket_known()` 改成恒 `printf '1'`（＝只看路径形状、不查票面），其余一字未动：
+
+- 递同一发行给**原尺**：`UNATTRIBUTABLE .scratch/wisp/probes/999/bad-sample.go (path claims ticket 999 but .scratch/wisp/issues/999-*.md does not exist …) <== REAL INJURY`，**rc=1**。
+- 递给**摘掉那一味的尺**：`ticket-999 .scratch/wisp/probes/999/bad-sample.go (untracked, parse_err=0)`，**rc=0** ⇒ **任何假票号都被判"归得出"**＝票面担心的那一枚恒绿形状，实测成立。
+- **但它自己当场抓住**：`sh attrib-noknown.sh --self-test` ⇒ `cases=8 failures=4`、**rc=1**（四枚 FAIL 全是该响的：`999` 两发／`777` 一发／`internal/tools/not_a_bench_path.go` 一发被读成 `ticket-` 且 rc=0；
+  三枚该静的照旧 PASS，含"另一张真票 169 的路径"⇒ **不是"喂什么都响"**）。
+
+⇒ 归因规则那**两条都要成立**这一味是承重的（删了立刻自证），且这一味**有成对样本钉着**——这就是票面要的"删掉它哪一发会重新漏"的可复算答案。
+⚠ **一枚我要报给编排者的洞**：CI 里 `attrib.sh` 只出现一次（`ci.yml:172`，参数 `--tracked-only`）⇒ **`--self-test` 不在 CI**。
+所以"归因规则被改坏"这一发**今天只有本地跑自测才会红**，CI 不红。票 161 AC#2 那句"把自检装成规矩（一枚 CI 入口把这些自检全部跑一遍）"对**这把尺没有做到**（对扫描器做到了：`ci.yml:105`）。⇒ 建议登记成残余，归口具名（本程无 `docs/reports/**` 写面）。
+
+### 3.2 问②：甲形那一步有没有空心保护？——**有，且只有一行；那一行在 CI 里没有守卫**
+
+在**仓外**另建一棵空 git 树（`/tmp/wisp161v2/emptyrepo`：`git init` ＋ `go.mod` ＋ `probe/attrib.sh`，**零枚已跟踪 `.go`**），跑 CI 的原命令：
+
+- 原件：`attrib.sh: (A) ruler saw 0 tracked .go files - refusing to report 'empty' from a ruler that was handed nothing` ⇒ **rc=2**。
+- 摘掉那一味（删 `attrib.sh:338` 的 `[ "$TRACKED_GO" -gt 0 ] || …`，其余不动）：**同一棵树、同一条命令** ⇒
+  `(A) tracked-tree  lines=0 files=0  rule: MUST be empty` ＋ `GREEN (tracked-only) - (A) empty over 0 tracked .go files` ⇒ **rc=0**。
+
+⇒ 甲形那一步**不是第二枚恒绿**（派单 §1 明令的那一发我亲手量了）；但也⇒ **它的空心保护只有这一行，而 `--self-test` 的 8 发全是 `classify_line` 的样本、没有一发钉这条守卫**
+⇒ 删掉它 CI **不红**。这一枚与 3.1 的洞同因（自测没进 CI），**修法同一发**：给 `attrib.sh --self-test` 加一发"递 0 枚文件必须 rc=2"的合成样本并把自测接进 CI（**我不做，也不建议顺手做**——它动 `ci.yml`，是票 134 定过的地界）。
+
+### 3.3 问③：那句"说得出删掉它哪一发会重新漏"——我亲手删了两发
+
+上面 3.1（删票面存在性检查）与 3.2（删空心守卫）**都是我自己执行的删除**，两发各自当场变色：前者让假票号静、自己的 `--self-test` 4/8 红；后者让零输入变 GREEN、rc 从 2 掉到 0。
+⇒ 这句**答得出，且答的是读数不是形容词**。顺序那一半（`gofumpt -l .`／`d22scan.sh`／`go vet` 必须在台件全部入库之后跑最后一次）：
+在 CI 里由"CI 跑的是检出树"这一事实**天然成立**（甲形那一步排在 `gofmt (gofumpt)` **之后**、`git show <锚>:ci.yml` 现读第 136→152 行，位置＝r5 自陈"就坐在既有那步之后，没往上顶"，与锚一致）；
+本地那一半（r5 `logs/e1..e4`"台件全部入库后再跑一次"）＝**〔日志＋归档，我未复算〕**。
+
+### 3.4 那枚已知常红会不会吃掉后面步骤的读数——**不会（按作业答）**
+
+`internal/panel/tokens_fourway_test.go` 属 `internal/panel`，本锚上跑它的只有 `scripts/portable-tests.sh`（现读 `:141`／`:179` 两处点名），
+而那枚脚本被 `test-core`／`test-windows` 作业调（`ci.yml:341`／`:511`）⇒ **与 `lint` 作业（我全部 AC#4／AC#7 读数所在地）不是同一枚作业**，
+GitHub 里作业互相不阻塞，所以它吃不到我的读数。
+⚠ 同一作业**内部**确实会吃：`lint` 的六步没有 `if:` ⇒ 上面一步红，后面不跑（"谁先红"的因果就是 ci.yml 注释自己写的那件事）——
+这也是为什么 §2.2 我把"74 步与 83 步同时红、且 74 在前"记下来。
+**我没跑它、没修它、没 Skip 它、没动任何断言**（派单 §4）；"它今天到底红不红"这一条我的档位是〔盘上有件／票面与台账点名，**我未复算**〕。
+
+## 4. 我没测什么／哪些读数受并程影响
+
+- **并程影响（此刻另一程在写 `internal/tools/**`）**：本表**没有一处**读工作树的 `internal/**`／`cmd/**`——生产码读数全走 `git show <锚>:<path>` 与 `git grep <锚>`；
+  仪器读数是 `git diff --name-only <锚>` 先证明"盘上＝锚上同字节"再跑的；`go test`／`go run` 全在 `/tmp` 副本里。
+  唯一的并程痕迹＝`runtests.sh` 那发的 `PASS=28/SKIP=6`（副本不是 git 检出 ⇒ 六枚真仓用例跳过），已在 §2.1 记账，**不影响任何一条裁决**。
+- **没测**：CI runner 一次未跑（我只在本地跑 CI 步里的原命令）；r4 的 `-overlay` 证法未复跑（§2.2 那句"为什么少报一枚"是源码读＋我这侧对照）；
+  r5 的 `tracked-dirty-proof.sh`／`logs/e1..e4` 未复算；r6 的 `faketree.sh`／`flip-declaration.sh` **未运行**（它们写 `probes/161/r6/logs/**`，在我的写面外；我另建了同等两发）；
+  `internal/panel/tokens_fourway_test.go` 未跑（见 §3.4）；票 158 那枚 G5 活形状（`cmd/wisp/panel_assets.go:232`）未裁（票面红线）。
+- **删除命令**：全程 `rm -rf`／`rm`／`rmdir`／`del`／`git rm`／`clean`／`--amend`／`reset`／`rebase`／`stash`／`checkout .` **零次**。
+  （唯一被执行过的删除是 `selftest.go` 里 `runSelfCase` 对自己 `os.MkdirTemp` 的 `defer os.RemoveAll`，由派单指定的命令带出，在 `/tmp` 内、不是我发起。）
+  仓外副本（`/tmp/wisp161v2/**`）与其中的三棵合成树按"只建不删"留着等清点。
+
+## 5. 对编排者的不服（三格裁完，按派单 §8 第 6 项）
+
+1. **你那两枚 `>`（09:1x／10:0x）我判：09:1x 那枚成立且是这一格的骨架，10:0x 那枚**方向对但落点偏了**。**
+   10:0x 说 r6"把未裁的问题钉成事实"。我裁完的读数是：**4 枚里没有一枚是真漏**（§1.3），所以它钉住的不是"漏"这个事实；
+   可它确实钉歪了另一样——**G7 的 `ring` 今天为真的理由是两枚注释 token ＋一枚函数签名**，
+   而台件注释（`gate-clauses.sh:288-291`）把这三枚写成了"反向 3 枚＝retention／goroutine／shutdown"，读者会以为那是三处待判的资源。**没裁的问题是"是不是真漏"，更窄的问题是"这三枚里有多少是代码"** ——后者才是这一格该红而没人量的地方。
+2. **"那 4 枚"这个数我接了，但它的构成我改写**：`4 = 1 枚跨文件分工（真读数） + 1 枚签名/字符串（词表缺一味：`Go` 不并入方） + 2 枚尾随注释（根本不是代码）`。
+   ⇒ 派单 §2 第一支（"任何一枚真漏 ⇒ 单立账"）**不触发**；但我建议另登一枚**仪器精度**账（`pair()` 的剔注释只剔整行 ⇒ 同行尾随注释算调用点），
+   归口＝`probes/154/gate-clauses.sh` 的尺本体（票 154/158 那条线），**不是**票 161、更不是票 169。
+3. **"这轮不进 CI"我判：对聚合那把尺成立；但你顺带把归因尺的自测留在了 CI 外，那一枚是漏的。**
+   §3.1／§3.2 两发我实测：`attrib.sh` 的两味承重保护（票面存在性检查／空心守卫）**被删之后 CI 都不红**，因为 CI 只跑 `--tracked-only`、从不跑 `--self-test`。
+   这与"进 CI 要先答哪一腿的红该阻塞推送"（你的理由）不是同一件事——`--self-test` 是**这把尺自己的成对样本**，
+   它进 CI 不需要新的阻塞语义，只要"自测红＝这台件坏了＝红"。票面 AC#2 对扫描器正是这么做的（`ci.yml:105`）。⇒ 这条我不推翻你的裁定，我推翻它的**适用范围**。
+4. **你那句"像把未裁的问题钉成事实"里的"恒响也算装饰"我不用**：恒响至少是**会响**；本格的形状反过来——**声明会响、但响的原因是注释**。
+   ⇒ 我的判据写法（可复算）：`sh probes/154/gate-clauses.sh <锚>` 取 `## G7 主尺` 段的每一枚 `UNPAIRED-REV`，再对每枚 `git show <锚>:<file> | sed -n '<行>p'`，
+   **肉眼分"代码里的词／注释里的词"**；分不出来时不许登记"该响"，要登记"该响，因为 N 枚里有 M 枚是注释"。
+
+## 6. 三格档位（只许派单 §8 那四档）
+
+| 格 | 裁决 | 档位 |
+|---|---|---|
+| AC#4 反向判据（两形＋承重那一问） | **成立**（两形分开：CI 形 rc=1／二进制形 rc=2；(d) 一发证明"摘样本＋摘审计"能逃逸 ⇒ 两味互为备份） | 〔我本轮现跑过〕（overlay 那一形的对照＝〔源码读＋我这侧实测，未复跑 overlay〕） |
+| AC#6① 聚合退码 | **成立**（两向翻声明各打红一发、两枚同时翻⇒rc=2、还原⇒0 且名册只差生成时刻一行） | 〔我本轮现跑过〕 |
+| AC#6② 两族成对普查 | **成立，但带一枚仪器精度残余**（合成树三向我自己另建并复跑：phase1 两族正向各响 1 枚／phase2 回到 0 且 `git grep rc=0`／phase3 删样本后 0 且 `git grep rc=1`）；那 4 枚反向**逐枚判为形状使然、零枚真漏** | 〔我本轮现跑过〕（r6 自己的两份日志＝〔盘上有件，我未复算〕） |
+| AC#7①②③ | **成立**（三问各亲手删／复跑一发：删票面存在性⇒假票号变静＋`--self-test` 4/8 红；删空心守卫⇒零输入 GREEN rc=0 vs 原件 rc=2；顺序那半在 CI 天然成立） | 〔我本轮现跑过〕（r5 `logs/e1..e4`＝〔日志＋归档，我未复算〕） |
+
+⇒ **票面六格里本表判成立的三格（AC#4／AC#6／AC#7）我一格都没勾**（派单 §4）；勾与不勾是编排者的动作，翻勾凭据＝本表 §2／§3／§1 各节。
+
+`next=` 交回编排者，按优先级：
+① 三格翻勾凭据已给（本表 §2／§1／§3）；
+② 建议登两枚残余（我无 `docs/reports/**` 写面）：**R-a＝`attrib.sh --self-test` 不在 CI ⇒ 归因规则与空心守卫删了 CI 不红**（§3.1/§3.2）；
+**R-b＝`pair()` 只剔整行注释 ⇒ 同行尾随注释被算成调用点，G7 今天 3 枚反向里 2 枚是注释**（§1.3，归口票 154/158 的尺本体）；
+③ 若要接聚合门进 CI（撤销口令"把 161 的聚合门接进 CI"），**先修 §1.3 那条"枚数不进判据"**——否则新长的未成对枚数躲在 `ring` 声明里，聚合永远 `ok`；
+④ `probes/161/v2/**` 里我的两枚改件（`attrib-noknown.sh` 等）是**故意改坏的仪器**，别当仪器用；
+⑤ 未做：`-overlay` 那一形的对照复跑、`internal/panel` 那枚常红的现跑（两枚都属"不必为本格裁决而跑"）。
