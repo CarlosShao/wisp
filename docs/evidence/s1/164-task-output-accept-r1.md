@@ -9,6 +9,31 @@
 
 ---
 
+## 0. 票面射程（判据的一部分，不是背景）——AC 两格＋五条"编排者定案"连行号
+
+票面行号取自 `.scratch/wisp/issues/164-…-the-output-leg.md`（HEAD 版，本程 `sed -n` 现量）。
+
+- **`:25` AC#2 未修码读数**：今天"起一个后台东西、再读它的输出"这一发**能不能做到**？量它响不响
+  （做不到＝本票成立；做得到＝编排者判断错，直接报回）。
+- **`:26` AC#3 输出太长那一格**：截断策略必须**带可找回的指针**（"全文在哪、怎么续读"），
+  **不许只截不指**；照 `PLAN.md:431` 既有的"超 4000 token 落 artifacts、上下文留头尾＋路径"那条做，**不新造**。
+
+**09-27 18:5x 五条编排者定案（`:31-36`），本表逐条裁定它落没落地：**
+
+| 定案 | 行号 | 一句话内容 | 本程裁 |
+|---|---|---|---|
+| ① 续读形状＝**不新造游标** | `:32` | `task.output` 只给"头 500＋尾 200＋总长＋可续读路径"那一形，不发明第二套分页；`fs.read` 无偏移那一半归 `Q-59`，批不批都有归宿 | **落地**：参数只有 `{task_id}`（`task.go:166-168`），无 offset/cursor；形状照 `spill.go:141` 同句 |
+| ② 持久性＝**v1 不做跨重启名册** | `:33` | 按 taskID 查不到必须**响亮**返回"查不到这个任务"，**绝对不许空返回** | **落地**：`task.go:204-208` 返回 `IsError`＋点名 id＋"这是『没有这条记录』，不是『任务没有输出』"；`TestUnknownTaskIDIsLoudNotEmpty` 钉住 |
+| ③ 能力声明＝**不碰 C3** | `:34` | `PLAN.md:2564` 第 4 列是 `—`，"要第 12 枚能力"这一支不触发 | **落地**：`TaskOutputDecl()` 的 `Capabilities`/`Needs` 皆 `nil`（`task.go:253-262`） |
+| ④ 落点硬约束＝**入口不许做成 `internal/agent` 上收 `taskID` 的导出方法** | `:35` | 那枚形状正被 `gate-clauses.sh` 的 **G3 腿**盯着；入口放 tools 侧；裸 `go func(` 禁；不许在 `risk.PathResolver` 之外用 `filepath.Clean\|Abs` 拼 artifacts 路径 | **落地**（但**理由里有半枚伪约束**，见 §7.2）：`internal/agent` 零字节；G3 pattern 命中 0 行 |
+| ⑤ AC#4〔今天无法判定〕登记 | `:36` | 生产零后台写者 ⇒ **不许硬造一发永不响的判据当装饰**；实现那一格时先造对象、再答"未修码响不响" | **本程核：被告没有为 AC#4 造装饰判据**（新增 10 枚用例全在 AC#2/AC#3 射程，名册差集可查，见 §8） |
+
+⚠ 定案④里那句"不许在 `risk.PathResolver` 之外用 `filepath.Clean|Abs`"——本程现量
+`internal/tools/task.go` 的 import 块（`:3-13`）**既无 `path/filepath` 也无 `os`** ⇒ 那一脚从形状上不存在；
+`d22scan.sh` rc=0 独立见证（§8）。
+
+---
+
 ## 1. step-0 五件〔现跑〕
 
 ```
@@ -277,3 +302,203 @@ cmd/wisp/run.go:357           // 一句注释（本程 AC#3 自己写的）
 ① AC#3 的〔成立〕**只覆盖截断与指针形状**，不覆盖"真机能读到"；
 ② `task.output` 目前对真模型**不可达**（名册零写者），下一格（后台起跑口）没做之前**不许**把它算进产品能力；
 ③ 指针能不能被模型**自己**走通，取决于票 174（artifacts 目录默认不在 `[fs] allowed_dirs`）——那枚不归本票，本程没测。
+
+---
+
+## 7. 三枚点名的攻击
+
+### 7.1 攻击①：同源拷贝 `takeHeadTokens`/`takeTailTokens` vs `takeTokens`/`takeTokensLast` —— **语义今天没分叉；归属没写；不可接受的是"没归属"这一半**
+
+逐字节比（本程做法：把 `internal/agent/spill.go:259-287` 两枚函数**只做改名**
+（`takeTokens→takeHeadTokens`、`takeTokensLast→takeTailTokens`）与**只把 `utf8Start` 换成 `utf8.RuneStart`**，
+再与 `internal/tools/task.go` 的同两枚 `diff`）〔现跑〕：
+
+```
+$ diff /tmp/a.txt /tmp/b.txt
+18,19c18,19
+< 	n := budget * 4          |  > 	n := len(s) - budget*4
+< 	if n >= len(s) {         |  > 	if n <= 0 {
+22,24c22,23
+< 	start := len(s) - n      |  > 	for n < len(s) && !utf8.RuneStart(s[n]) {
+< 	for start < len(s) …     |  > 		n++
+< 		start++                |  > 	return s[n:]
+< 	}
+< 	return s[start:]
+diff-rc=1        ← 差异**全部落在 takeTailTokens 一枚里**；takeHeadTokens 归一化后逐字节相同
+```
+
+**语义裁：两枚函数等价，rune 边界处理同源。** 逐条：
+- 谓词同源：`internal/agent/prompt.go:301` 写的是 `func utf8Start(b byte) bool { return b&0xC0 != 0x80 }`，
+  这正是标准库 `utf8.RuneStart` 的定义体〔读码〕⇒ 换名不换行为，**不是**"看着像同源其实不同"那一形。
+- 头：`budget<=0→""`、`n=budget*4`、`n>=len(s)→s`、回退到 rune 起始位、`s[:n]` —— **逐字节相同**。
+- 尾：被告把"剩余长度"直接写进 `n`（`n := len(s)-budget*4`），agent 那枚写成"预算"再倒减（`start := len(s)-n`）。
+  守卫条件互为改写：`budget*4 >= len(s)` ⟺ `len(s)-budget*4 <= 0`；起点同为 `len(s)-budget*4`；
+  前扫到 rune 起始位的循环同体 ⇒ **数值上逐点相同，只是变量承载的东西换了一个人**。
+- 唯一真实的语义**差异在调用侧**，不在拷贝里：agent 那族作用在已经 `capped` 的串上并顺带记 `KeptHead/KeptTail`
+  （`spill.go:136-140`），`task.output` 作用在名册全文上、只把数字写进桩句。本程判这**不是分叉**，
+  是同一把刀切两种东西。
+
+**两枚拷贝各归谁、以后谁改谁？—— 票面、`AGENTS.md`、两份证据件里都没有这一句。**〔读码〕
+`task.go:275-279` 只标了**来路**（"local copies of … `spill.go takeTokens/takeTokensLast`"），
+没标**方向**。这正是票 141 返工过的那枚形状（同源拷贝逐枚没归属）。
+⇒ 本程给的处置口径（**不由本程落**，本程不动 `internal/**`）：
+名册里 `takeTokens`/`takeTokensLast` 是权威（它服务 D15 的 4000/500/200 那套预算，`PLAN.md:431` 认的是它），
+`task.go` 那两枚是**追随者**；要么把两枚收进一处（`internal/agent` 导出自由函数，或落一枚 `internal/textcut` 之类的小包，
+两边都引），要么在 `task.go` 头上写死"改 `spill.go` 必须同步改这里，反之亦然"＋补一枚**逐枚对照的等值测试**
+（同输入两族输出必须相同）。本程倾向后者之外的那一枚：**收进一处**，因为 §7.2 刚把"为了不响 G3 所以必须拷贝"这唯一的技术理由拆掉。
+
+### 7.2 攻击②：那半枚伪约束 —— **不可接受（比拷贝本身更重）**
+
+现读的 G3 腿本体〔现跑，`.scratch/wisp/probes/154/gate-clauses.sh`〕：
+
+```
+:363  want G3 quiet
+:364  want_n 0
+:365  run "G3 Q-56 那一支落地：Loop 上出现收 taskID 的导出方法" \
+:366      '^func \(l \*Loop\) [A-Z][A-Za-z0-9]*\(.*taskID' '' internal/agent
+```
+
+（派单 §2.2 说 pattern 在 `:366-368` —— 实际是 `:363-366`，`want` 两行在它上面；本程以量到的为准。）
+
+拿三枚候选形状**喂进那枚 pattern**（仓外 `/tmp/g3probe.txt`，不改主树）〔现跑〕：
+
+```
+func (l *Loop) TakeTokens(s string, budget int) string {     -> 不响
+func TakeTokens(s string, budget int) string {               -> 不响
+func (l *Loop) ReadTaskOutput(taskID string) string {        -> 响（第 3 行，命中 1 行）
+```
+
+⇒ 结论三条，一条比一条硬：
+1. **导出自由函数 `agent.TakeTokens(s, budget)` 撞不到 G3**（pattern 要求 `^func (l *Loop) ` 这个接收者）。
+2. 连"**导出成 `Loop` 的方法**"这一支也撞不到——pattern 还要求同一行出现字面量 `taskID`，
+   而这两枚纯字符串切片函数**签名里没有、也不该有 `taskID`**。⇒ **那枚仪器对本程这一对拷贝，一个形状都不响。**
+3. 所以"为了不响 G3"不能当"必须拷贝"的理由。被告注释里**每一枚事实都真**（G3 存在、`want_n 0`、
+   射程是 `Loop` 收 `taskID` 那一形、定案④确实要求入口在 tools 侧）——
+   但它被放在**"deliberately local copies … rather than new exported methods on agent.Loop"** 这句的**理由位**上，
+   而那枚理由能否掉的形状**从来就不是唯一的备选**（真备选是自由函数/共享小包，G3 看不见）。
+
+**裁：不可接受。** 这按派单 §2.2 的说法就是"**给一个设计选择编了一个仪器理由**"，
+本程同意那一句的严重性判据：它会误导下一程——下一程读到"因为 G3 所以我们不能导出"会以为
+**G3 是一堵覆盖'任何 agent 侧新出口'的墙**，从而继续在 tools 侧造第二份、第三份拷贝。
+票 141 那起返工烧掉的正是"逐枚没归属的同源拷贝"，而这次拷贝还附带一枚**站不住的仪器理由**，比那次更值得纠。
+**该删的是那半句仪器引用，留下定案④那半句真约束**（"入口在 tools 侧"是 owner 裁的，不是尺子裁的）。
+⚠ 本程不动 `internal/**`，这一条是**给编排者的改文案账**，不是本程的产出。
+
+### 7.3 攻击③：C25 污染源标记 —— **复算为真，归票 175，不算本票 AC#3 的账**
+
+派单点名的两处读数，本程**复算＋纠行号**〔现跑／读码〕：
+
+| 派单说法 | 本程量到的 | 真伪 |
+|---|---|---|
+| `bridge.go:551-553`：`mark` 在 `!risk.IsSensitiveSource(dec.Tool)` 时直接 return | **逐字相符**：`:551 func (b *Bridge) mark(dec Decision, res Result) {`／`:552 if b.prov == nil \|\| dec.TaskID == "" \|\| !risk.IsSensitiveSource(dec.Tool) {`／`:553 return` | 真 |
+| `internal/risk/provenance.go:94-99`＝8 个名字的名册，`task.output` 不在内 | **名册确为 8 枚，但行号偏**：8 枚是**常量块 `:84-91`**（`SrcFSRead`/`SrcSearchContent`/`SrcClipboardRead`/`SrcSystemGet`/`SrcWebFetch`/`SrcDocRead`/`SrcScreenCapture`/`SrcTranscript`），`:96-98` 是同一批名字组成的 `sensitiveSourceTools` 切片；`IsSensitiveSource` 是它的线性查表 | 实质真、行号需纠 |
+| 派单问："有没有看漏 `Origin`／`res.Origin` 是否产码自己填／还有别的盖戳路径吗" | 三处本程**都查了**：① `task.go` 全文**从不设 `Origin`**——生产里只有 `fs.go:148/158/170/212/218/238`、`fs_edit.go:138` 设它〔现跑 grep〕；② `PathParams` 为 `nil` ⇒ `dec.Paths` 空 ⇒ 就算过了名册那道闸，`origin` 也会是 `""`；③ **全仓另一枚 `Mark` 调用点只有 `cmd/wisp/panel_assets.go:245`**，那是 `taintSourceFlag` 的**显式声明源**清单（面板侧仿真用，`len(f.sources)==0` 就返回 nil），**不是**一条通用结果盖戳路径；④ `internal/agent/` 里 `Provenance`／`.Mark(` **零命中**〔现跑〕⇒ 环路不盖戳，桥是唯一生产盖戳点 | 无看漏；派单的读法成立 |
+
+**本程额外量到的一枚（派单没问，但它决定票 175 怎么修）**：风险层**并没有**把非名册工具挡在外面——
+`provenance.go:489-491` 写的是 `if !IsSensitiveSource(tool) { logf("… recorded fail-closed as sensitive anyway …") }`，
+即 **`Mark()` 对任何工具名都会照记**，只是打一行日志。⇒ **闸门只有 `bridge.go:552` 那一枚调用侧的早退**，
+不是契约层的硬墙。后果：票 175 的最小修法可以只在 tools 侧动（把 `task.output` 加进名册，或让 `mark` 的闸门看
+`Decl` 上的一枚"结果可能含外部内容"属性），**不需要**改 `risk` 的语义；但那样一来 `origin` 会是空串，
+桩文本里那枚 artifacts 路径才是真正有信息量的 origin —— 这一句本程**只登记、不设计**，射程外。
+
+**是不是真破口＋最坏后果什么形状**：是真破口，**今天潜伏**——`task.output` 的**全部工作**就是把一段
+"别的东西吐出来的字节"（后台命令的 stdout，其上游可能是网络/文件/子进程）搬回模型上下文，
+而 D30 那族间接提示注入防护靠的就是 C25 污染标记；名字不在名册 ⇒ 这段内容**以原生工具结果的身份**进上下文，
+下游看不出它不是模型自己写的。
+⚠ **但本程拒绝用"线没接"给它降级**（派单 §1 末bullet 引的 `Q-49` 前例就是这一形）：
+名册今天零写者（§6 现量）⇒ 这枚破口在真机上**打不通**；而**票 164 AC#4／票 163 要做的正是那根线**。
+⇒ 排序风险（给编排者的一句话）：**票 175 必须与"后台写者"同片落，不能排在它后面**，
+否则本票交完的那一程就是 `Q-49` 的复读。本程**没动** `internal/risk/**`，**没把它算进 AC#3 的账**。
+
+---
+
+## 8. 门禁（本程自己重跑，没有一个数从被告那里引）
+
+| 门 | 命令〔现跑〕 | 本程读数 | 与被告自报 |
+|---|---|---|---|
+| 逐包测试 | `go test -count=1 ./internal/tools/ ./internal/agent/` | **rc=0**；`ok tools 19.131s`／`ok agent 2.551s` | 一致 |
+| 同上 `-v` 四数 | `go test -count=1 -v …`＋`grep -c` | RUN **248** ／顶层 PASS **182** ／FAIL **0** ／SKIP **0** | 一致（被告 248/182/0/0） |
+| 名册两向差集 | `comm -3 <(锚点净名册) <(HEAD 名册)` | **左栏 0 枚**（无被吞读数）／**右栏 10 枚**，全名见台件第 [7] 段；锚点净名册 **172** | 一致（被告 0/10）；**锚点那 172 是本程自己解出来的，不是引的** |
+| D22 静态扫 | `sh scripts/d22scan.sh` | **rc=0**，`clean - no D22 ban violations`；与本票相关两行：`ban #7 internal/tools/=20 production Go files`、`ban #8 internal/=425`、`ban #8 cmd/=45` | 一致 |
+| d22scan 自测 | `bash tools/d22scan/runtests.sh -C tools/d22scan ./...` | **rc=0**，`top-level: PASS=34 FAIL=0 SKIP=0, === RUN=76, '[no tests to run]'=0` | 一致 |
+| 门_clause 尺 | `sh .scratch/wisp/probes/154/gate-clauses.sh` | **rc=0**；`腿数＝14 声明与实测不符＝0`；`腿数断言：名册=14 声明=14 记账=14 缺腿=0 空头声明=0`；`聚合退码＝0`；G3/G5/G6/G7 四腿**都在场且言行相符** | **与派单 §3 那句"19:40:17 现量 rc=0／14 腿／不符 0"完全一致 ⇒ 编排者给实现程的那句"没造出未成对收尾"没被推翻** |
+| 格式 | `export PATH="$PATH:$(go env GOPATH)/bin"; gofumpt --version` | **`v0.12.0 (go1.27.1)`** | 一致 |
+| 格式（`-l`） | `gofumpt -l internal/tools/task.go internal/tools/task_output_leg_test.go internal/tools/task_output_ac2_before_test.go cmd/wisp/run.go` | **空**（unformatted＝0 枚） | 一致 |
+| 契约轴 | `git -c core.quotePath=false diff --name-only f206e9f HEAD` ∩ `^(docs/specs/\|docs/PLAN\.md\|internal/risk/\|internal/panel/\|internal/agent/\|…/thresholds\.go\|tools/d22scan/\|allowlist\|\.github\|golden)` | **0 命中**（11 枚变更全在 `cmd/wisp/run.go`／`internal/tools/` 三枚／票面／台账／派单／证据件／新立的 174、175 票面） | 一致 |
+| 生产可编译 | `go build ./cmd/wisp/` | **BUILD_OK** | 一致 |
+| `flip-declaration.sh` | **没跑**（派单硬令：它会脏 tracked 的 `logs/flip-*.txt`） | 本程结束后那 6＋1 枚 `flip-*.txt` 仍是开工前就有的 ` M` 状态，**本程没改它们** | — |
+
+⚠ **gofumpt 对"本程名下 `.go` 文件"这一格**：本程名下**没有** `.go`（台件是一枚 `.sh` ＋一份 `.log`），
+所以对**被测的**四枚 `.go` 现量 `-l`＝空。`probes/164/v1/**` 里**没有 SLO 阈值、没有 golden、没有 `thresholds.go` 的抄录**（§12）。
+
+**被告的一处口径本程复算为不符（不影响判语）**：证据件 §4 说 `RunAsync` "非测试命中只有两行注释"——
+HEAD 上实际是 **4 行**（定义本体 `loop.go:321` ＋它自己的文档注释 `:320` ＋`bridge.go:663` ＋
+**它自己这次新加的 `cmd/wisp/run.go:357`**），被告写那行时 `run.go:357` 还不存在 ⇒ **过期一句**，不是假话。
+关键结论（**生产调用点 0 枚**）复算为**真**。
+
+**派单一处行号本程纠**：票面定案①（`:32`）写 `fs.read` 上限"同文件 `:36`"，本程现量
+`defaultMaxReadBytes = 256 * 1024` 在 **`internal/tools/fs.go:55`**；被告证据件写的是 `:55`（对）。
+**而本程读到 `task_output_leg_test.go:341` 那句注释里把 `:36` 抄进了产码树** ⇒ 那行注释是**过期行号**，
+建议与 §7.2 那半句一起清账（本程不动 `internal/**`）。
+
+---
+
+## 9. 被拒／没成功的调用（发生在取数之前还是之后）
+
+**被权限系统拒绝：0 次。** 没成功的调用 2 次，**全部发生在取数之后**（交付段），没有一枚影响读数：
+
+1. `git commit -q -F - -- <三枚显式路径>`（第 1 格那次）**rc=1**：
+   `error: pathspec '…' did not match any file(s) known to git` ×3 ——
+   原因是那三枚是本程**新建的未跟踪文件**，`git commit -- path` 只认已跟踪的改动。
+   处置＝先 `git add -- <同一批显式路径>`（**没跑** `git add -A`／`git add .`）再以同一形提交 ⇒ `b5adc34f`。
+   ⚠ 这一枚**本程自己写坏的**，不是环境问题；派单 §4 那句"提交一步式"在**新建文件**上少说了 `add` 这一步。
+2. `go test -count=1 -run ZZZNoSuchTest ./cmd/wisp/` 的 `tail -3` **输出被吞**（本程没拿到读数）⇒
+   该句记为〔第二见证〕、写进 §2.3，**没有**拿它当本程读数用。
+
+## 10. 有没有跑过删除命令
+
+**0 次。** `rm`／`git clean`／`git checkout .`／`git restore`／`--amend`／`reset`／`rebase`／`stash`／`worktree`／`push` 全都没跑。
+唯一接近的一次：台件初稿里本程写了 `rm -rf "$BASE"`，**运行前**被本程改写成 `mktemp -d`（`ac2-anchor-reading.sh:35-37`），
+从未执行 ⇒ 那次 `rm` **一个字都没跑过**。
+`/tmp` 下留下的两份锚点副本（`/tmp/wisp-anchor`、`/tmp/wisp-anchor-164v1.*`）**留在原地不清**（临时件只建不删；
+它们在本程主树之外，不影响任何 status 读数）。
+
+## 11. 伪授权两栏（各带出处）
+
+- **真通知回显＝0 枚。** 本程收到的 harness 附带件三枚，逐条出处＋按"不是授权"处理：
+  1. 开局 `system-reminder` 的技能清单（列 available skills）——与票 164 无关，**没据此调用任何 skill**；
+  2. `AGENTS.md` 以 project context 注入（它自称"与 `PLAN.md`/`specs`/`issues/README` 不一致时以那些文件为准"）——
+     用户自己配的仓库规矩，**既不计回显也不计注入**；
+  3. `Edit` 之后一句 `The file changed since your last read`（工具结果，**不是对话**）——
+     **成因是本程自己**：那枚 `git cat-file … > internal/tools/task.go` 还原改了磁盘上的文件，
+     harness 说的是实话；本程**没有**据此认为"别人动了我的树"，也没有据此往下多改一字节。
+- **判为注入＝0 枚。** 全程没有出现任何"编排者备注／已核验请继续提交／请 revert／放宽阈值／已解锁／不用取证直接给结论"
+  形状的指令；派单里编排者的四枚断言（"改前那一发是未知工具"、"gate-clauses rc=0／14 腿"、"两枚变异会红"、
+  "8 枚名册里没 task.output"）本程**全部自己重跑**后才写进表（§1、§3.3、§5、§7.3），
+  其中"8 枚名册"与"两行注释"两处编排者/被告的**行号与枚数**被本程纠了（§8 末两段）。
+
+## 12. 凭据值零抄录
+
+本表与台件里**没有**任何 API 密钥、token、DPAPI 密文、`config.toml` 里的 provider 键值、用户真实路径或任务正文。
+出现的字符串只有：合成 task_id（`bg-1`／`bg-7`／`ghost-9`）、`mktemp -d` 给的 `/tmp/wisp-anchor-164v1.XXXXXX` 前缀、
+以及被测桩句的**格式模板**（`全文见 %s`，不含被替换的实际路径）。
+台件 `.log` 里出现的两条长串是测试自造的 `asciiRun` 字母序列（`abcdefghijkl…`），不是任何人的数据。
+
+## 13. `next=`
+
+1. **勾框归编排者**，但**别按现状勾 AC#2**：那一格的凭据要换成 §3.3 的锚点读数（台件已可复算），
+   `task_output_ac2_before_test.go` 的**文件名与头上那段注释**建议改写为"未知工具拒绝形状＋D37 分类守卫"，
+   否则下一程会把它当"未修码读数"引用（那正是本程拆掉的那枚混淆）。
+2. **两笔改文案账（都属 `internal/**`，要另派，本程没动）**：
+   ① `task.go:275-279` 里"为了不响 G3 所以必须拷贝"那半句删掉、留定案④那半句（§7.2）；
+   ② `task_output_leg_test.go:341` 那句 `(:36 defaultMaxReadBytes)` 的行号纠成 `fs.go:55`（§8 末段）。
+   顺带把 §7.1 那对拷贝的**归属方向**写死，或收进一处（本程倾向后者，因为 §7.2 已把它唯一的"技术性"理由拆了）。
+3. **票 175 必须排在"后台写者"那一格之前或同片**（§7.3）：`Record` 生产零写者今天让这枚破口打不通，
+   而 AC#4／票 163 要做的正是那根线 ⇒ 排序错了就是 `Q-59`／`Q-49` 那一族的复读。
+   ⚠ 本程另记一枚派单没问的读数：`provenance.go:489-491` 的 `Mark()` **对任何工具名都照记**（只打日志），
+   闸门**只有** `bridge.go:552` 那一枚调用侧早退 ⇒ 票 175 的最小修法在 tools 侧，不在 risk 侧。
+4. **§4.3 那枚"指针不校验存在性"**：`task.go:227` 的条件是 `ArtifactPath != ""`、无 `stat`，
+   "路径是假的"那一支今天**不响**。它不在 AC#3 的字面射程内、且与票 174 相邻——
+   建议由编排者判它归 174（"指针走不通"）还是单立一枚，本程**没有**为它写判据（那需要动 `internal/**`）。
+5. **AC#4 仍然〔今天无法判定〕**（定案⑤原样成立）：本程现量 `RunAsync` 生产调用点 **0 枚**、
+   `TaskRoster.Record` 生产写者 **0 枚** ⇒ 那一格要先造出"还在写的后台尾巴"再谈判据。
