@@ -241,6 +241,18 @@ func (t taskOutput) Execute(ctx context.Context, params json.RawMessage, onUpdat
 	var stub string
 	if rec.ArtifactPath != "" {
 		notice := t.d.pointerNotice(rec.ArtifactPath)
+		// Ticket 177 shape A (Q-61甲, precise exemption): the path printed at
+		// the end of the stub below is text the HOST just wrote itself - it
+		// comes from the roster record, never from content this tool read.
+		// Declaring it on the per-call box lets C25 keep this whole stub
+		// indexed EXCEPT the window this path occupies, so a model that
+		// re-reads its own pointer is not blocked by R4 while every other
+		// byte of it still taints like normal. The stub's wording and shape
+		// are frozen by PLAN.md:2564 / ticket 164's accepted AC#3 - nothing
+		// here changes a character the model reads.
+		if box := hostPathBoxFromCtx(ctx); box != nil {
+			box.set(rec.ArtifactPath)
+		}
 		stub = fmt.Sprintf(
 			"%s\n[…输出已落文件：省略 %d 字符，总长 %d 字节 / 约 %d token%s，全文见 %s…]\n%s",
 			head, totalBytes-len(head)-len(tail), totalBytes, totalTokens, notice, rec.ArtifactPath, tail)
