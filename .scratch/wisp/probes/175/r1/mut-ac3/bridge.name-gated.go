@@ -575,7 +575,7 @@ var outsideContentTools = map[string]bool{
 // plus the tools answered with outside content. It is the ONE gate in front of
 // Mark on this side of the seam.
 func marksProvenance(tool string) bool {
-	return risk.IsSensitiveSource(tool) || outsideContentTools[tool]
+	return risk.IsSensitiveSource(tool) // MUTANT 175-r1: the name gate is back (pre-fix shape)
 }
 
 // mark records C25 provenance for one result.

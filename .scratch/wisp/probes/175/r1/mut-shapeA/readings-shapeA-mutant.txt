@@ -1,0 +1,7 @@
+time=2026-09-27T20:45:13.227+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestSensitiveReadAcrossTheBridgeOpensItsTaskScope (0.01s)
+    bridge_scope_open_ticket158_test.go:98: 非敏感源 fs.list 也开了 scope，task="task-158-plain"：开账必须挂在敏感源上，不能挂在每一次 Execute 上
+    bridge_scope_open_ticket158_test.go:107: 敏感读没有跑成，本条判据失去前提：out={Text:L2 审批通道尚未接入（票 21），已拒绝执行 IsError:true RiskLevel:L2 ErrorClass:user_rejected Truncated:false AppliedSteps:[]} err=<nil>
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.058s
+FAIL

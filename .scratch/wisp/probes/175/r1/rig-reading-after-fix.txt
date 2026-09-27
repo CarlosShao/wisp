@@ -1,0 +1,19 @@
+== rosters under test ==
+IsSensitiveSource("task.output") = false   IsSensitiveSource("web.fetch") = true
+A1 execute            err=<nil> iserror=false risk=L0 text_prefix="外来内容探针 ZZ175r1-forei"
+A2 mark_return_early  bridge saw no marking path: bridge lines mentioning "task.output" = []
+A3 risk_log C25 lines ["risk/C25: sync-dir detection has no confirmed (env/registry/config) location — paths under the user profile fall back to sync-suspect (P12 safe default)" "risk/C25: Mark tool \"task.output\" is not a SPEC-06 §5 source; recorded fail-closed as sensitive anyway (origin=\"\")"]
+A4.1 scope_taints      n=1 [{175r1-A-task-output task.output  45 1790513416}]
+A4.2 r4_inspect_hit    true src="task.output" channel="notify"
+A4.3 close_audit       ["tools: C25 scope closed task=175r1-A-task-output was_open=true dropped=1 open_scopes=0 close_err=<nil>"]
+B1 execute            err=<nil> iserror=false risk=L0
+B2 risk_log C25 lines ["risk/C25: sync-dir detection has no confirmed (env/registry/config) location — paths under the user profile fall back to sync-suspect (P12 safe default)" "risk/C25: Mark tool \"task.output\" is not a SPEC-06 §5 source; recorded fail-closed as sensitive anyway (origin=\"\")"]
+B3.1 scope_taints      n=1 [{175r1-B-web-fetch web.fetch https://example/foreign-body 45 1790513416}]
+B3.2 r4_inspect_hit    true src="web.fetch https://example/foreign-body" channel="notify"
+B3.3 close_audit       ["tools: C25 scope closed task=175r1-A-task-output was_open=true dropped=1 open_scopes=0 close_err=<nil>" "tools: C25 scope closed task=175r1-B-web-fetch was_open=true dropped=1 open_scopes=0 close_err=<nil>"]
+C1 direct Mark()      returned=true (engine accepts an off-roster name)
+C2 risk_log C25 lines ["risk/C25: sync-dir detection has no confirmed (env/registry/config) location — paths under the user profile fall back to sync-suspect (P12 safe default)" "risk/C25: Mark tool \"task.output\" is not a SPEC-06 §5 source; recorded fail-closed as sensitive anyway (origin=\"\")" "risk/C25: Mark tool \"task.output\" is not a SPEC-06 §5 source; recorded fail-closed as sensitive anyway (origin=\"\")"]
+C3.1 scope_taints      n=1 [{175r1-C-direct-mark task.output  45 1790513416}]
+C3.2 r4_inspect_hit    true src="task.output" channel="notify"
+C3.3 close_audit       ["tools: C25 scope closed task=175r1-A-task-output was_open=true dropped=1 open_scopes=0 close_err=<nil>" "tools: C25 scope closed task=175r1-B-web-fetch was_open=true dropped=1 open_scopes=0 close_err=<nil>" "tools: C25 scope closed task=175r1-C-direct-mark was_open=false dropped=1 open_scopes=0 close_err=<nil>"]
+E1 tool_result_origin "" err=<nil>  (empty => task.output names no source of its own)

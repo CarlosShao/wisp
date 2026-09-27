@@ -1,0 +1,7 @@
+time=2026-09-27T20:49:33.350+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestTaskOutputMarkAndGate (0.00s)
+    bridge_mark_provenance_ticket175_test.go:119: task.output 读回来的外部内容没有盖 C25 来源标记：scope "task-175-mark" 的污点表=[]。同一份文本经名册内的门读回来是要盖戳的——换个门读回来就不盖，就是票 175 的破口
+    bridge_mark_provenance_ticket175_test.go:130: 外来的任务输出被读回来之后，R4 一侧不再看得见它：Inspect("task-175-mark", notify) 未命中，污点表=[]
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.054s
+FAIL

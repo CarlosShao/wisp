@@ -547,40 +547,9 @@ func (b *Bridge) timeoutFor(entry Entry) time.Duration {
 	return b.defTm
 }
 
-// outsideContentTools are the tools whose successful result IS content that
-// came from outside, even though their name is not one of the C25 sensitive
-// sources. The roster in internal/risk/provenance.go is an illustrative list of
-// the SPEC-06 §5 sources, not an exhaustive one: risk.Mark() itself accepts any
-// tool name (an off-roster one is recorded fail-closed and only logs,
-// provenance.go:489-491, pinned by internal/risk/provenance_test.go), so the
-// only thing that ever stopped a mark was THIS call site's guard. Adjudicated
-// in docs/evidence/s1/175-c25-marking-roster-scope-c1.md (branch A).
-//
-// task.output is here because its answer is, by definition, "what a background
-// task printed" (D34 row PLAN.md:2564): the bytes came from outside the model,
-// and reading the same text through fs.read would have marked it. Which tools
-// belong on this list is an implementation judgement, and
-// TestEveryRegisteredToolIsClassifiedForMarking is what stops the judgement
-// from being skipped when a new tool lands - it is the reason the roster cannot
-// silently grow a hole again.
-//
-// The list is deliberately narrow. A result that only confirms a local write
-// carries no outside content, and marking everything would turn the R4 gate
-// into a refusal machine (measured: 175-r1 dispatch, shape-甲 mutant run).
-var outsideContentTools = map[string]bool{
-	"task.output": true,
-}
-
-// marksProvenance is the bridge's marking criterion: the C25 source roster,
-// plus the tools answered with outside content. It is the ONE gate in front of
-// Mark on this side of the seam.
-func marksProvenance(tool string) bool {
-	return risk.IsSensitiveSource(tool) || outsideContentTools[tool]
-}
-
 // mark records C25 provenance for one result.
 func (b *Bridge) mark(dec Decision, res Result) {
-	if b.prov == nil || dec.TaskID == "" || !marksProvenance(dec.Tool) {
+	if b.prov == nil || dec.TaskID == "" {
 		return
 	}
 	origin := res.Origin
