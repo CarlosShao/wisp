@@ -79,3 +79,11 @@ grep -rn '\bArtifact\b' --include=*.go internal/agent/ internal/tools/ cmd/ | gr
 6. `docs/reports/pending-and-issues.md`（Q-61/A346/A347 的台账本体）**没读**：不在我的写面，
    也没读的必要；因此"owner 已批甲"这一条我只引派单与票面，不声称台账已核。
 7. 没测真机上 `agent.Loop` 未接审批通道遇到 L2 的行为＝票 177 **AC#0 至今零读数**，本程没做（派单 §1 未授权我做丙腿）。
+
+## 5. 交件时的树位（后补，不改上面任何读数）
+
+起手锚 `640d30c5`；两件交件落在 `09dd3698` 之上（本程期间编排者推进了三枚 commit：`bb3eae02`／`ad363d58`／`09dd3698`）。
+尺：`git diff --stat 640d30c5..HEAD -- internal/ cmd/ docs/` **只列出 docs 四枚** ⇒
+`internal/**`＋`cmd/**` 自起手以来**一字节未变** ⇒ 本表所有行号引用（`task.go:245-246`、`bridge.go:560`、
+`provenance.go:662`、`loop.go:76/708`、`spill.go:141-145` 等）在交件那一刻仍然对得上，不必重锚。
+上面 §1/§2 的读数取自起手那一刻，未在新树上重跑（新树只多 docs 与票面文字，不影响 Go 读数）。
