@@ -1,0 +1,31 @@
+time=2026-09-27T22:41:37.103+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestMarkEmptyAfterNormalization
+--- PASS: TestMarkEmptyAfterNormalization (0.01s)
+=== RUN   TestMarkUnknownSourceToolFailClosed
+--- PASS: TestMarkUnknownSourceToolFailClosed (0.01s)
+=== RUN   TestConcurrentMarkInspect
+--- PASS: TestConcurrentMarkInspect (0.01s)
+=== RUN   TestScopeCloseRefusesAnotherOwnersRegistration
+--- PASS: TestScopeCloseRefusesAnotherOwnersRegistration (0.00s)
+=== RUN   TestM1RigALegReReadOfHostPathIsClean
+--- PASS: TestM1RigALegReReadOfHostPathIsClean (0.01s)
+=== RUN   TestM1RigBRestOfHostMarkStillIndexed
+--- PASS: TestM1RigBRestOfHostMarkStillIndexed (0.01s)
+=== RUN   TestM1RigCLegForeignMarkStillHits
+--- PASS: TestM1RigCLegForeignMarkStillHits (0.01s)
+=== RUN   TestM1RigDLegNeverMintedPathStillHits
+--- PASS: TestM1RigDLegNeverMintedPathStillHits (0.01s)
+=== RUN   TestM1RigEPathOnlyMarkStillRecorded
+    provenance_test.go:1089: row-2 failure mode: a mark whose whole content is P must still be RECORDED, just un-indexed there
+--- FAIL: TestM1RigEPathOnlyMarkStillRecorded (0.01s)
+=== RUN   TestM1RigFExemptionDiesWithScope
+--- PASS: TestM1RigFExemptionDiesWithScope (0.01s)
+=== RUN   TestFragmentMatchExactBoundary
+--- PASS: TestFragmentMatchExactBoundary (0.00s)
+=== RUN   TestFragmentIndexShortSourceNeverMatches
+--- PASS: TestFragmentIndexShortSourceNeverMatches (0.00s)
+=== RUN   TestFragmentHashCollisionCannotFakeHit
+--- PASS: TestFragmentHashCollisionCannotFakeHit (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	0.157s
+FAIL

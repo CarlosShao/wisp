@@ -1,0 +1,8 @@
+time=2026-09-27T22:40:03.514+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-09-27T22:40:06.903+08:00 level=INFO msg="scope disposed" scope=session-1 completed=1 failed=0 disposal_incomplete=false timed_out=false
+--- FAIL: TestM1RigBRestOfHostMarkStillIndexed (0.01s)
+    provenance_test.go:1046: positive control: a non-path fragment of the exempted mark must still hit R4
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	5.450s
+ok  	github.com/CarlosShao/wisp/internal/tools	15.881s
+FAIL

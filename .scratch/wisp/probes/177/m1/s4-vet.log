@@ -1,0 +1,5 @@
+# github.com/CarlosShao/wisp/internal/risk
+# [github.com/CarlosShao/wisp/internal/risk]
+vet.exe: internal\risk\taintmatch_test.go:31:55: not enough arguments in call to newFragmentIndex
+	have (string, number)
+	want (string, int, [][2]int)

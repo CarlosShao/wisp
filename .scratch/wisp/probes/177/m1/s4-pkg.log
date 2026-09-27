@@ -1,0 +1,25 @@
+# github.com/CarlosShao/wisp/internal/risk [github.com/CarlosShao/wisp/internal/risk.test]
+internal\risk\taintmatch_test.go:31:31: not enough arguments in call to newFragmentIndex
+	have (string, number)
+	want (string, int, [][2]int)
+internal\risk\taintmatch_test.go:51:34: not enough arguments in call to newFragmentIndex
+	have (string, number)
+	want (string, int, [][2]int)
+internal\risk\taintmatch_test.go:66:31: not enough arguments in call to newFragmentIndex
+	have (string, number)
+	want (string, int, [][2]int)
+internal\risk\taintmatch_test.go:108:73: not enough arguments in call to newFragmentIndex
+	have (string, number)
+	want (string, int, [][2]int)
+internal\risk\taintmatch_test.go:124:31: not enough arguments in call to newFragmentIndex
+	have (string, number)
+	want (string, int, [][2]int)
+internal\risk\taintmatch_test.go:134:64: not enough arguments in call to newFragmentIndex
+	have (string, number)
+	want (string, int, [][2]int)
+internal\risk\taintmatch_test.go:148:31: not enough arguments in call to newFragmentIndex
+	have (string, number)
+	want (string, int, [][2]int)
+FAIL	github.com/CarlosShao/wisp/internal/risk [build failed]
+ok  	github.com/CarlosShao/wisp/internal/tools	15.925s
+FAIL
