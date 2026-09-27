@@ -472,6 +472,35 @@ func (p *Provenance) OpenScope(scopeID string) *Scope {
 // Returns false only when the content has no matchable characters after
 // normalization.
 func (p *Provenance) Mark(scopeID, tool, origin, content string) bool {
+	return p.MarkWithHostPath(scopeID, tool, origin, content, "")
+}
+
+// MarkWithHostPath is Mark plus the ticket 177 shape-A declaration (Q-61甲,
+// A349/A353): hostPath, when non-empty, is the ONE concrete path string the
+// host itself just wrote into content (e.g. the re-read pointer embedded by
+// task.output's stub). The exemption is precise — only the normalized window
+// that hostPath occupies inside THIS mark is kept out of the fragment index;
+// every other window of this mark, and every window of every other mark, is
+// indexed exactly as before. A foreign text that later carries the same path
+// therefore still hits R4 (that is what the W-2 catcher pins); directory,
+// prefix, config-item or global rosters are NOT part of the approved shape.
+//
+// Two orderings are load-bearing and not interchangeable:
+//
+//	(i)  the span is located in normalized coordinates (runeIndexOf over
+//	     []rune(norm)), because normalizeTaint drops whitespace and zero-width
+//	     runes — a raw offset into content would exclude the wrong windows;
+//	(ii) the "empty after normalization" check above runs BEFORE any
+//	     exclusion, so a body that normalizes to exactly hostPath is still
+//	     recorded (Mark returns true, one mark) — reversing this would silently
+//	     flip the truth of the final sentence of Mark's doc block just above,
+//	     which is frozen contract text and must not be edited or weakened.
+//
+// The located span lives nowhere but this call: it is consumed while building
+// the index and dies with the taintMark it excluded windows for (Scope.Close
+// drops marks and any exemption with them). Nothing per-scope is kept, because
+// a scope-level path list would be a new roster (177-c1 §2, A353).
+func (p *Provenance) MarkWithHostPath(scopeID, tool, origin, content, hostPath string) bool {
 	norm := normalizeTaint(content)
 	if norm == "" {
 		logf("risk/C25: mark %s origin=%q skipped: empty after normalization", tool, origin)
@@ -489,9 +518,23 @@ func (p *Provenance) Mark(scopeID, tool, origin, content string) bool {
 	if !IsSensitiveSource(tool) {
 		logf("risk/C25: Mark tool %q is not a SPEC-06 §5 source; recorded fail-closed as sensitive anyway (origin=%q)", tool, origin)
 	}
+	var skip [][2]int
+	if hp := normalizeTaint(hostPath); hp != "" {
+		nhp := []rune(hp)
+		// Ordering (i): locate the declared span AFTER normalization, over the
+		// same rune slice the index is about to be built from.
+		if lo := runeIndexOf(rp, nhp); lo >= 0 {
+			skip = [][2]int{{lo, lo + len(nhp)}}
+			logf("risk/C25: 177 shape-A exemption excludes normalized span [%d,%d) of the host-minted path from mark %s origin=%q; every other window of this mark stays indexed", lo, lo+len(nhp), tool, origin)
+		} else {
+			// The declared path is not in this content: the exemption claims
+			// nothing it can prove, so it excludes nothing (fail-closed).
+			logf("risk/C25: declared host path absent from mark %s origin=%q content after normalization: nothing excluded", tool, origin)
+		}
+	}
 	m := &taintMark{
 		tool: tool, origin: origin,
-		idx: newFragmentIndex(string(rp), p.minChars),
+		idx: newFragmentIndex(string(rp), p.minChars, skip...),
 		at:  observe.NowWallUTC().Unix(),
 	}
 	p.mu.Lock()
