@@ -1,0 +1,3 @@
+pat=Dispatch\(.*EvApprovalNeeded ctlroot_hits=0
+pat=\.Native\(\|\.Panel\(\|\.Veto\(\|DecideFromNative\|DecideFromPanel\|SetLoaded(\|Replay( ctlroot_hits=0
+pat=\.Prompt( ctlroot_hits=1
