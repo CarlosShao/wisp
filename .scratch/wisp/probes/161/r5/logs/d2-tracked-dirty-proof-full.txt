@@ -1,0 +1,48 @@
+tracked-dirty-proof: repo  = /d/work/workspace/projects plans/Wisp
+tracked-dirty-proof: copy  = /tmp/wisp-161-r5-trackeddirty.Y82apT   (outside the repo; left in place when this ends)
+tracked-dirty-proof: roster = git ls-files '*.go' | sed -n '1,40p'  -> 40 files, copied with cp --parents
+tracked-dirty-proof: victim = .scratch/wisp/probes/147/zz147probe_windows_test.go  (the file that gets dirtied, inside the copy only)
+warning: in the working copy of 'go.mod', LF will be replaced by CRLF the next time Git touches it
+tracked-dirty-proof: copy's own index now tracks 40 .go files
+
+===== 1. pristine copy -> expect GREEN (this is form (A) answering normally) =====
+== (A) tracked tree: git ls-files -z '*.go' | xargs -0 D:\work\base\gopath/bin/gofumpt.exe -l   (tracked .go files handed to it: 40)
+
+attrib.sh: gofumpt v0.12.0 (go1.27.1)
+attrib.sh: (A) tracked-tree  lines=0 files=0  rule: MUST be empty
+attrib.sh: (B) not run in --tracked-only mode - a checkout has no bench working tree to attribute
+attrib.sh: attribution rule = .scratch/wisp/probes/<NN>/** AND a real .scratch/wisp/issues/<NN>-*.md
+attrib.sh: GREEN (tracked-only) - (A) empty over 40 tracked .go files
+tracked-dirty-proof: pristine rc=0
+TRACKED_PRISTINE_RC=0
+
+===== 2. dirty .scratch/wisp/probes/147/zz147probe_windows_test.go inside the copy -> expect RED (TRACKED-DIRTY, rc=1) =====
+== (A) tracked tree: git ls-files -z '*.go' | xargs -0 D:\work\base\gopath/bin/gofumpt.exe -l   (tracked .go files handed to it: 40)
+   TRACKED-DIRTY	.scratch/wisp/probes/147/zz147probe_windows_test.go	(last commit touching it: -)	<== CI IS RED ON THIS
+
+attrib.sh: gofumpt v0.12.0 (go1.27.1)
+attrib.sh: (A) tracked-tree  lines=1 files=1  rule: MUST be empty
+attrib.sh: (B) not run in --tracked-only mode - a checkout has no bench working tree to attribute
+attrib.sh: attribution rule = .scratch/wisp/probes/<NN>/** AND a real .scratch/wisp/issues/<NN>-*.md
+attrib.sh: RED (tracked-only) - tracked-dirty=1 files_dirty=1. The CI gofmt step and this step read the same denominator; this one additionally refuses to answer when handed 0 files.
+tracked-dirty-proof: dirtied rc=1
+TRACKED_DIRTY_RC=1
+
+===== 3. restore the victim from the repo's tracked bytes -> expect GREEN =====
+tracked-dirty-proof: byte-identical to /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/147/zz147probe_windows_test.go after restore
+== (A) tracked tree: git ls-files -z '*.go' | xargs -0 D:\work\base\gopath/bin/gofumpt.exe -l   (tracked .go files handed to it: 40)
+
+attrib.sh: gofumpt v0.12.0 (go1.27.1)
+attrib.sh: (A) tracked-tree  lines=0 files=0  rule: MUST be empty
+attrib.sh: (B) not run in --tracked-only mode - a checkout has no bench working tree to attribute
+attrib.sh: attribution rule = .scratch/wisp/probes/<NN>/** AND a real .scratch/wisp/issues/<NN>-*.md
+attrib.sh: GREEN (tracked-only) - (A) empty over 40 tracked .go files
+tracked-dirty-proof: restored rc=0
+TRACKED_RESTORED_RC=0
+
+===== 4. the SAME command handed ZERO tracked .go files -> expect rc=2, never rc=0 =====
+attrib.sh: (A) ruler saw 0 tracked .go files - refusing to report 'empty' from a ruler that was handed nothing
+tracked-dirty-proof: hollow-guard rc=2  (copy=/tmp/wisp-161-r5-hollowguard.ncBBhW, tracked .go files in it: 0)
+
+tracked-dirty-proof: readings - pristine rc=0, dirtied rc=1, restored rc=0, handed-nothing rc=2
+tracked-dirty-proof: form (A)'s TRACKED-DIRTY leg is now MEASURED in both directions, on a tree nobody else shares, and its 0-file refusal is measured too
