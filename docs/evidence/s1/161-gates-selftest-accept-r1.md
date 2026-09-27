@@ -70,3 +70,68 @@ B2 被我的 s4 扩张（map 字面量与 IndexExpr 左值赋值同族两形今�
 
 **恒真/空心自查**：表内每一枚"不响"都有同跑同 tag 的"响"作控制（见控制列）；rootA 的骨架下限由 main 的 ≥10 文件守卫硬拒。
 ⇒ 本程没有一枚"永远不响的检"，也没有一枚"递给尺 0 枚文件报干净"。
+
+---
+
+## 2. AC#2 裁决：〔成立〕——默认立场"它可能是假的"没有被证实：全部读数由本程在仓外锚副本上亲跑
+
+被验面＝`tools/d22scan/{selftest.go,selftestsamples.go,selftest_test.go,main.go}` ＋ `.github/workflows/ci.yml` 的 lint 新步。
+**本程一字节未改**（三发单点回退全部打在 `/tmp/wisp161v1/tree` 的副本上，跑完 `cmp` 复原＝RESTORED-IDENTICAL）。
+
+### 2.1 基线（档位＝〔我本轮现跑过〕）
+
+`cd tools/d22scan && go run . -self-test`（副本内）⇒ **rc=0**，尾行
+`clean - all 34 direction checks passed (19 expect-ring, 15 expect-silent)`；
+名册行 `roster read from main.go = 8 numbered ban(s) [...] + 1 finding type(s); 34 cases, 9 tag(s) covered`。
+⇒ 枚数与本程 §1.1 的 `// Bans` 现读一致；19/15 为工具自打的 `countWant`，本程按样本表逐 tag 手点复核同为 ring=19/silent=15。
+**tag 级承重名册**（ring 枚数）：bare-goroutine **4**／plaintext-key 2／wallclock 2／panel-approval 2／artifact 2／emoji 4／
+**pathresolver-bypass 1**／**mirror-hash 1**／**unparseable 1**——ring=1 的其实有**三枚 tag**，不止 mirror-hash 一族（见 §2.3 与 next=）。
+日志 `probes/161/v1/logs/selftest-baseline.txt`。
+
+### 2.2 `go test` 那一腿
+
+`bash tools/d22scan/runtests.sh -C tools/d22scan ./...`（副本内）⇒ **`PASS=34 FAIL=0 SKIP=0`、`=== RUN=76`、rc=0**
+（`logs/runtests.txt`）。⚠ 一枚如实登记：`selftest_test.go:178` 有一发**条件性** `t.Skipf`（仅当 PATH 上没有 go 工具链时跳过
+`TestSelfTestFlagIsWiredInTheBuiltBinary`）——它不豁免任何断言的语义，且 runtests 的零-SKIP 规则实测 SKIP=0。本程**没动它**（派单禁）。
+
+### 2.3 单点回退进攻（三发，全在副本）
+
+| 发 | 摘什么 | 预期 | 实测 | 日志 |
+|---|---|---|---|---|
+| ① | bare-goroutine 四枚 ring 里摘 `leaknamed.go` 一枚 | **仍绿**（tag 级承重，摘一枚符合设计） | **rc=0**：`clean - all 33 direction checks passed (18 expect-ring, 15 expect-silent)` | `logs/mut1-leaknamed-gone.txt` |
+| ② | `mirror-hash` **唯一** ring 样本摘掉 | **必须红＋零行用例** | `go run` 退 **1**（二进制自身退 **2**，输出末行 `exit status 2`）：`FATAL the table does not cover the tool (1 hole(s); an unrun self-test is not a green self-test` ＋ `HOLE tag "mirror-hash" has only an expect-silent sample ...`，**一条 case 行都没打** | `logs/mut2-mirror-ring-gone.txt` |
+| ③ | wallclock **唯一** silent 样本摘掉（恒真方向的对称回退） | 必须红 | 同形：`rc(got run)=1`／二进制 2，`HOLE tag "wallclock-timeout" has only an expect-ring sample - ... tautological-check shape this repo has rejected twice` | `logs/mut3-wallclock-silent-gone.txt` |
+
+⇒ "摘任意一味是否有一发变异从此打不红"：对**每枚 tag 的末枚方向样本**，②③两形实测会红且**在跑任何用例之前**红（名册空心 ⇒ 拒出判语），
+这一条今天由本程**实测**而非引用。摘非末枚（①）不红是设计而非缺陷，本件按操作定义把它和②③分开记。
+
+### 2.4 空心保护（递给尺 0 枚文件必须硬退出）
+
+- `-self-test-roster` 指向一份无 `// Bans` 头的文件 ⇒ 二进制 **rc=2**＋`FATAL ...: no `// Bans (` header ...`（`logs/hollow-roster.txt`）。
+- CI 甲形那步（`sh .scratch/wisp/probes/161/r5/attrib.sh --tracked-only`）：锚副本上 ⇒ **rc=0、`(A) lines=0 files=0`、分母 531**
+  （`logs/attrib-tracked.txt`，gofumpt `v0.12.0 (go1.27.1)` 由脚本自打）；
+  再在一枚 `git init` 后**零枚 .go** 的空仓副本跑同一条 ⇒ **rc=2**＋
+  `(A) ruler saw 0 tracked .go files - refusing to report 'empty' from a ruler that was handed nothing`（`logs/hollow-emptyrepo.txt`）。
+  ⇒ 这一发同时钉住甲形步不是第二枚恒绿。
+- `attrib.sh --self-test`（判据分类器双向自测）⇒ **cases=8 failures=0 rc=0**：5 枚必须响（含 `TRACKED<CI-RED>` 与两枚假票号）＋
+  3 枚必须不响（含"另一枚真票 169 的路径"）（`logs/attrib-selftest.txt`）。
+
+### 2.5 CI 可达性（那一问的答案，按 ci.yml 锚字节现量）
+
+- 那步在 `lint` 作业**第 4 个 step / 第 2 个 run 步**（ci.yml:83–106：`run: go run . -self-test`、`working-directory: tools/d22scan`、
+  解析出的键只有 `name/run/working-directory` ⇒ **无 `if:`、无 `continue-on-error`**）；它前面只有 checkout、setup-go、
+  和"D22 scanner positive control"（`runtests.sh -C tools/d22scan`）三步。
+- **`internal/panel/tokens_fourway_test.go` 的常红会不会吃掉这一步？**：不会——本程两向现量：
+  ① 它（`TestC21DesignTokensFourWayAgree`）在锚副本上实测 **rc=1 常红坐实**（本程只判断、未修、未 Skip，尾部 40 行在
+  `logs/fourway-tail40.txt`）；② 它的归口是 `scripts/portable-tests.sh`（core 清单第 141 行含 `internal/panel`）
+  ＝**test-core / test-windows 作业**，而整份 ci.yml `grep -c 'needs:'` = **0** ⇒ 作业间无依赖链，GitHub 的
+  "首个失败之后不跑"只在**同一作业内**生效。lint 作业没有任何一步编译或运行 `internal/panel`。
+- lint 作业内**真正**能吃掉这一步的前置风险（登记给编排者，不是退回项）：第 3 步 runtests 含
+  `TestScannerSelfScanOfRealRepoIsGreen`／`TestRealRepoLedgerIsHonest` 两枚真仓扫描用例——票 169 那一族的前端字形若再红，
+  第 3 步先响、第 4 步的 self-test 读数就失踪。锚上实测两枚全绿（34/0/0），今天不构成缺口；这正是 AC#6"聚合退码/步骤归因"那一族。
+
+### 2.6 对"无实现者自证"这一档的处置
+
+`docs/evidence/s1/161-selftests-r3.md` 现量 **262 行、止于 §3**，AC#2 一节确实不存在 ⇒ 编排者 23:5x 那格的档位声明
+〔编排者代提并复跑，非实现者自证〕**与盘相符**。本表 §2 以非实现者现跑补上验收腿；**代码本体经四路进攻（2.1–2.4）无一谎**。
+⇒ AC#2 **成立**。实现者自证缺口本体不在验收权限内补，登记在 next=。
