@@ -1,0 +1,30 @@
+time=2026-09-27T15:58:44.712+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestFSEditRefusesANonLiteralOld
+    fs_edit_test.go:130: 判据 1+2 读数：命中前 50 字节 / 命中失败后 50 字节（一字未变），文案="fs.edit 拒绝执行：第 1 枚编辑的 old 在文件里找不到（0 命中，文件 50 字节）。old 必须与文件内容逐字一致，包含全部空白与换行（the old string must match exactly including all whitespace and newlines）；先用 fs.read 读回原文再照抄那一段。本次调用一个字也没有写，目标文件保持原状。"
+--- PASS: TestFSEditRefusesANonLiteralOld (0.02s)
+=== RUN   TestFSEditRefusesAnAmbiguousOldIsADistinctError
+    fs_edit_test.go:171: 判据 3 读数：old 在 40 字节文件里命中 2 处，先数后拒，落盘前后一字未变
+--- PASS: TestFSEditRefusesAnAmbiguousOldIsADistinctError (0.01s)
+=== RUN   TestFSEditRefusesAnEmptyOldIsAWholeFileInsert
+    fs_edit_test.go:210: 判据 4 空 old 读数：两形（old:"" 与缺 old 字段）都拒，文件保持 29 字节
+--- PASS: TestFSEditRefusesAnEmptyOldIsAWholeFileInsert (0.02s)
+=== RUN   TestFSEditIsAllOrNothingAcrossABatch
+=== RUN   TestFSEditIsAllOrNothingAcrossABatch/no_op_edit_in_the_batch
+    fs_edit_test.go:282: 全有或全无读数：本批 2 枚编辑，其中一枚不成立（空批＝整批不成立）⇒ 一个字也不落盘，文件仍是 26 字节
+=== RUN   TestFSEditIsAllOrNothingAcrossABatch/overlapping_edits
+    fs_edit_test.go:282: 全有或全无读数：本批 2 枚编辑，其中一枚不成立（空批＝整批不成立）⇒ 一个字也不落盘，文件仍是 26 字节
+=== RUN   TestFSEditIsAllOrNothingAcrossABatch/second_edit_misses
+    fs_edit_test.go:282: 全有或全无读数：本批 2 枚编辑，其中一枚不成立（空批＝整批不成立）⇒ 一个字也不落盘，文件仍是 26 字节
+=== RUN   TestFSEditIsAllOrNothingAcrossABatch/empty_batch
+    fs_edit_test.go:282: 全有或全无读数：本批 0 枚编辑，其中一枚不成立（空批＝整批不成立）⇒ 一个字也不落盘，文件仍是 26 字节
+--- PASS: TestFSEditIsAllOrNothingAcrossABatch (0.04s)
+    --- PASS: TestFSEditIsAllOrNothingAcrossABatch/no_op_edit_in_the_batch (0.01s)
+    --- PASS: TestFSEditIsAllOrNothingAcrossABatch/overlapping_edits (0.01s)
+    --- PASS: TestFSEditIsAllOrNothingAcrossABatch/second_edit_misses (0.01s)
+    --- PASS: TestFSEditIsAllOrNothingAcrossABatch/empty_batch (0.01s)
+=== RUN   TestFSEditAppliesABatchOnDisk
+    fs_edit_test.go:318: 对照读数：26 字节 / 4 行 → fs.edit 已改写 C:\Users\swq\AppData\Local\Temp\TestFSEditAppliesABatchOnDisk1875427463\001\ok.txt：2 枚编辑全部生效，26 字节 / 4 行 → 32 字节 / 5 行（临时文件+原子重命名）
+    fs_edit_test.go:319: 对照读数：AppliedSteps=["在 C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSEditAppliesABatchOnDisk1875427463\\001 创建临时文件 .wisp-tmp-89c2c4e3-37080-2193685434" "向临时文件写入 32 字节" "临时文件已落盘并关闭" "原子重命名 .wisp-tmp-89c2c4e3-37080-2193685434 → C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSEditAppliesABatchOnDisk1875427463\\001\\ok.txt（目标此刻起为新内容）"]
+--- PASS: TestFSEditAppliesABatchOnDisk (0.02s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.294s

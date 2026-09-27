@@ -102,3 +102,69 @@ V1-AC#1(c) 事后 fs.read：219 字节 Truncated=false ErrorClass=""
 AC#1 的"没有信号"是**被断言钉住的读数**，不是叙述。本程另钉一条更硬的方向盘：
 `if strings.Contains(out.Text, "375")` ⇒ 只要有人把**被减数**放进回执，本程这发也红。
 **没有一支是恒真的**（本格的"未修码"就是今天这块码，M-5 是它的反向对照）。
+
+## 3. 第②格＝AC#2〔**成立**〕——四枚拒绝各有一枚用例，且**两问都过**
+
+### 3a 本程自己跑的正读数（未变异，`-overlay` 之外的真实工作树）
+
+```
+go test -count=1 -v -run 'TestFSEditRefuses|TestFSEditIsAllOrNothing|TestFSEditAppliesABatchOnDisk' ./internal/tools/  → rc=0
+判据 1+2 读数：命中前 50 字节 / 命中失败后 50 字节（一字未变），文案含 "0 命中，文件 50 字节" +
+              "must match exactly including all whitespace and newlines" + "先用 fs.read 读回原文"
+判据 3 读数：  old 在 40 字节文件里命中 2 处，先数后拒，落盘前后一字未变
+判据 4 读数：  两形（old:"" 与缺 old 字段）都拒，文件保持 29 字节
+全有或全无读数：四批各 "本批 N 枚…一个字也不落盘，文件仍是 26 字节"（四腿 no_op/overlapping/second_misses/empty_batch 全 PASS）
+对照读数：    26 字节 / 4 行 → 32 字节 / 5 行，台账四步含 "创建临时文件 .wisp-tmp-…" 与 "原子重命名 …（目标此刻起为新内容）"
+```
+
+⇒ 与 r1 §3 表里的四组数**逐枚一致**（50→50／40 字节 2 处→0／29→29／26→26／对照 26→32、4 行→5 行）。**复算一致，不是照抄。**
+
+### 3b "这一发在未修码上响不响"——本程**实测**，不是叙述
+
+本程造了 M-0＝**摘掉 `fs_write.go:775` 那一行注册**（`{Tool: fsEdit{d: d}, Decl: FSEditDecl(d)},`），
+即回到"162 没落码时 fs.edit 不存在"的形状，再跑同样五枚用例（原始件 `logs/m0.log`）：
+
+```
+COUNT=1 / PROOF FSEditDecl-hits-in-mutated-copy=0
+--- FAIL: TestFSEditRefusesANonLiteralOld                    文案="未知工具 fs.edit，可用工具见 list_tools"
+--- FAIL: TestFSEditRefusesAnAmbiguousOldIsADistinctError    （同形）
+--- FAIL: TestFSEditRefusesAnEmptyOldIsAWholeFileInsert      （同形）
+--- FAIL: TestFSEditIsAllOrNothingAcrossABatch               （同形）
+--- FAIL: TestFSEditAppliesABatchOnDisk                      （同形）
+```
+
+⇒ 逐枚答复：**五枚用例在"未修码"上全部不响**——它们**红**，而且红因是"未知工具"，
+不是"这一段被拒了"。这条实测有两层用处：
+① 它证明这四枚拒绝**不是靠"工具不存在"混过去的**（那样它们会**恒绿**，实测是**恒红**）；
+② 它同时点名**"不响的那一支"**（派单要求单独点名）：这四枚意图今天真正走的通路是
+**`fs.write` 整文件重抄**，那一支**今天确实不响**——由本程 §2 自己量到（375→219、五处信号全安静）。
+⇒ **"未修码响不响"这一问的答案不能引用"未知工具"那一支当证据**（那本来就会响）；
+能引用的只有 §2 那发。本表把这两支分开写，就是防这一形。
+
+### 3c 判"算不算放水"只看两条——本程现量
+
+- **断言有没有被动过？** 两向都查了：
+  - `git diff -U1 5e83808..HEAD -- internal/tools/fs_test.go` ⇒ 名册三处计数 **5→6／6→7／5→6**（变大＝多一枚工具必须被登记），
+    且两枚 `map[string]risk.Level` / `declared` 表**各加一行 `"fs.edit": risk.L2` / `"fs.edit": "L2"`**
+    ⇒ 这两枚表是**逐名遍历**的（漏一名即红），**方向是变严**，没有一处删除断言或放宽阈值。
+  - `git diff a9d05761..HEAD -- internal/tools/fs_edit_test.go`（＝r1 交件后 → 现在）⇒
+    **删除行只有 1 行**：`for _, e := range BuiltinFSEntries(FSDeps{Paths: paths}) {` 被换成用 `d` 的同形；
+    其余全是新增的 builder 函数。**r1 那 5 枚用例的断言文本一字未动**（r2 §2 那句"一字未改"复算＝**成立**）。
+- **helper 是不是改前就有的？** `git log --oneline -S <名字> --reverse -- internal/tools/` 逐枚现量：
+
+  | helper | 最早出现的提交 | 判定 |
+  |---|---|---|
+  | `sealableTempDir124` | `dfa3dc44`（票 124/119 那批） | **改前就有** |
+  | `mustCanonical` | `64c5fea3`（票 20） | **改前就有** |
+  | `noStagingFilesLeft` | `94827e45`（票 20） | **改前就有** |
+  | `readString` | `94827e45`（票 20） | **改前就有** |
+  | `gateSpy` | `64c5fea3`（票 20） | **改前就有** |
+  | `structFieldsOf`／`countLines` | `0cb8864b`（＝162-r1 自己） | 本票新建，**但只长在 162 自己的新测试文件里**，没替换任何既有断言 |
+
+- **四枚拒绝的"响亮"形状本身有牙**：`assertRefusal` 同时要求 `IsError`、`ErrorClass=="tool"`（D37 让模型能自纠）、
+  文案含补救动作、**`AppliedSteps` 必须为空**。⚠ 一票否决项：**判据 3 那枚反过来断言文案里不得出现 `0 命中`**
+  （两枚错必须可分辨）——本程 M-1 变异（见 §6）把它打到红，说明这条可分辨性不是装饰。
+
+⇒ **AC#2 判成立**：四枚各有一枚用例（判据 1／2／3／4 全覆盖，且 4 拆成"空 old 两形＋四批全有或全无"）、
+对照组 `TestFSEditAppliesABatchOnDisk` 让"永远说不"无法满足本格、放水两问都过。
+
