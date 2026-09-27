@@ -168,3 +168,72 @@ COUNT=1 / PROOF FSEditDecl-hits-in-mutated-copy=0
 ⇒ **AC#2 判成立**：四枚各有一枚用例（判据 1／2／3／4 全覆盖，且 4 拆成"空 old 两形＋四批全有或全无"）、
 对照组 `TestFSEditAppliesABatchOnDisk` 让"永远说不"无法满足本格、放水两问都过。
 
+## 4. 第③格＝AC#3〔**成立**〕——三发本程自己另跑一遍，另把 AC#3b 的**前提**复算了
+
+### 4a 票面 `:34` 三句，本程自己的夹具（`overlay-mine.json`，原始件 `logs/mine.txt`）
+
+```
+V1-AC#3 正向①（CRLF 还是 CRLF）：23 字节纯 CRLF → 28 字节，CRLF 对 4→5，裸 CR/裸 LF 0/0
+     夹具自己先验 endings(original)==(4,0,0)，插的那一行按 CRLF 拼写
+V1-AC#3 正向②（BOM 还在）：      24 字节带 BOM → 26 字节，前三字节仍 EF BB BF，BOM 出现 1 次
+     断言在字节层（[]byte(after)[:3]）＋全文等值（只有命中段可变）
+V1-AC#3 反向（不许改 LF 行尾）：  14 字节 → 12 字节，裸 LF 3 条、CR 0 枚
+     断言 strings.ContainsRune(after,'\r')==false 且全等等值
+→ --- PASS 三枚全过（rc=0）
+```
+
+实现者那三发的读数本程从**本轮现跑的名册输出**里逐枚取到（`logs/gate-gotest.json`，同一遍门禁跑出来的）：
+
+```
+AC#3 BOM 正向读数：31 字节 → 31 字节，前三字节仍为 EF BB BF，BOM 出现 1 次
+AC#3 CRLF 正向读数：23 字节 → 30 字节，CRLF 对 3→4，裸 CR/裸 LF 均为 0
+AC#3 CRLF 反向读数：23 字节的纯 CRLF 文件里 LF 写法的 old 被响亮拒绝（文案含文件长度 23），
+                   同一文件上不含换行的 old 立即命中并落盘 ⇒ 正确拒绝，不是读不到
+AC#3 LF 双向读数：  20 字节 → 27 字节，裸 LF 4 条、CR 0 枚
+```
+
+⇒ **两向复算一致**，且"正确拒绝 vs 根本读不到"那一问他们给的三件凭据本程认：
+文案里带 `文件 23 字节`（只有把整文件读成功才算得出）、`读取目标失败` 反向断言、同批字节紧接一次命中落盘。
+
+### 4b AC#3b 的**前提**复算（派单明令："如果你发现我写进票面的前提本身错了，报回来"）
+
+本程自己造了两形（不同夹具、不同字节数），读数（`logs/mine.txt`）：
+
+```
+V1-AC#3b① 命中段跨过 BOM：IsError=false ErrorClass="" 9 字节 → 6 字节，前三字节 41 4c 50（"ALP"）
+        Text="fs.edit 已改写 …\s1.txt：1 枚编辑全部生效，9 字节 / 1 行 → 6 字节 / 1 行（临时文件+原子重命名）"
+        探针 "BOM"／"字节序"／"编码" 三者均不在文案里
+V1-AC#3b② LF 写法的 new 落进纯 CRLF 文件：IsError=false ErrorClass="" 落盘后 CRLF=3 裸CR=0 裸LF=1
+        探针 "行尾"／"不一致"／"mixed endings"／"endings" 均不在文案里
+```
+
+⇒ **票面 `:36`/`:37` 写的前提本程复算＝成立，两形今天确实都静默**（本程数字 9→6 与他们的 14→11 同向，
+比例一致：都是 BOM 三字节被当普通字节吃掉；②同样是 3 组 CRLF＋1 条裸 LF）。
+**票面不用改。** 本格把这一笔写清楚是为了留一条反面记录：**这一族今天仍会安静改坏**，
+只是那两格（AC#3b/AC#4b）尚未实现 ⇒ **归 AC#3b，不改 AC#3 的判语**（派单："那是两码事"）。
+
+### 4c AC#3 的"恒真那一问"——本程用 M-3 变异实测，不叙述
+
+M-3＝**只**把 `fs_edit.go` 落盘前的 `updated` 强制成 CRLF（`strings.ReplaceAll(…,"\r\n","\n")`→`…,"\n","\r\n"`）。
+这一味正是"安静把行尾改掉"的最小实现。跑 `-overlay=overlay-m3c.json -run 'TestFSEdit|TestV1'`（`logs/m3.log`）：
+
+```
+--- FAIL: TestFSEditKeepsABOMItWasNotAskedToTouch                    （实现者：BOM 那枚）
+--- FAIL: TestFSEditDoesNotRewriteAnLFFilesLineEndings               （实现者：LF 行尾那枚）
+--- FAIL: TestFSEditSilentShapeChangesLandToday/{an_old_that_carries_the_bom_deletes_it,
+                                                an_lf_spelled_new_in_a_crlf_file_lands_mixed_endings}
+--- FAIL: TestFSEditAppliesABatchOnDisk                              （对照枚，全文等值断言）
+--- FAIL: TestV1AC3ThreeShotsOnMyOwnFixtures/{bom_survives,lf_file_endings_untouched}   （本程自有两枚）
+--- FAIL: TestV1AC3bPremiseTheTwoShapesClaimedSilent/{shape1…,shape2…}                   （本程那两枚前提尺）
+```
+
+⇒ **响**，而且**本程自造的三枚与实现者的三枚同向红**：AC#3 的断言不是装饰。
+**不响的支（点名）**：同一发 M-3 下
+`TestFSEditOnACRLFFileAppliesACRLFSpelledOldAndStaysCRLF`（CRLF 文件改完还是 CRLF 那枚正向）**与**
+`TestFSEditLineEndingForensicsRefusesRealSpellings`（五形取证）**都仍绿**——
+前者因为对纯 CRLF 文件强制 CRLF 是恒等变换，后者因为 M-3 不动定位通路。
+⇒ 这三枚合起来才是完整的一族：**"改完还是 CRLF"这一句今天没有单独能钉住它的尺**，
+它只在"LF 文件那侧"被 M-3 抓到。**这一格本程判成立但把这一笔点名给 r3**：
+将来若真做行尾归一，缺的是"纯 CRLF 文件被强改成别的形状"那一枚反向尺（M-3 就是它的模板）。
+
+
