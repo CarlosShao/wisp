@@ -1,0 +1,44 @@
+!!  PRE-FIX PASS: the working-copy gate is byte-identical to git show f1b99a70c3dfdad04f34094306b5942a06355f52 - so every
+!!  '修完之后' assertion below is EXPECTED to fail in this run. That failure is the reading
+!!  the ticket demands (这一发今天不响); it is not this instrument misbehaving.
+
+===== PART 1 (AC#7): one run() leg, 2 枚 then 3 枚. Does the exit code move? =====
+warning: in the working copy of 'cmd/wisp/g2_state_one.go', LF will be replaced by CRLF the next time Git touches it
+-- state1 committed at 533b701 (synthetic tree, outside /d/work/workspace/projects plans/Wisp)
+   state1: leg G2 really measures 2 行 | pristine prints 命中行数=NO-READING | fixed prints 命中行数=NO-READING
+   state1 aggregate rc: pristine=6 fixed=6
+warning: in the working copy of 'cmd/wisp/g2_state_two.go', LF will be replaced by CRLF the next time Git touches it
+-- state2 committed at 2f546db (same tree, nothing deleted)
+   state2: leg G2 really measures 3 行 | pristine prints 命中行数=NO-READING | fixed prints 命中行数=NO-READING
+   state2 aggregate rc: pristine=6 fixed=6
+   which legs the FIXED aggregate calls out in state2:
+       # BAD  腿=G5 声明=ring 基线=1枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+       # BAD  腿=G5neg 声明=ring 基线=8枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+       # BAD  腿=G6 声明=ring 基线=1枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+       # BAD  腿=G6neg 声明=ring 基线=1枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+       # BAD  腿=G7 声明=ring 基线=3枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+       # BAD  腿=G7neg 声明=ring 基线=4枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+  ok    the two states differ by exactly ONE hit inside leg G2 (2 -> 3), nothing else in the tree moved
+  ok    UNMODIFIED CODE (AC#7 hole reproduced): 2 枚 -> 3 枚 moves the aggregate exit code NOT AT ALL (rc=6 both ways) - run() legs still only know 空/非空
+  FAIL  FIXED CODE did not react (rc=6 both) - AC#7's 枚数 judgement is decoration (expected in the PRE-FIX PASS)
+   --     the fixed ruler's extra BAD is attributable to leg G2 alone (see the list above)
+
+===== PART 2 (AC#8-1): a whole leg deleted. Does the exit code move? =====
+   pristine: 摘掉 G6 -> rc=0  腿数＝13 声明与实测不符＝0
+   fixed:    摘掉 G6 -> rc=0  腿数＝13 声明与实测不符＝0
+   which legs the FIXED aggregate calls out:
+  ok    UNMODIFIED CODE (AC#8-1 hole reproduced): a leg deleted outright, aggregate exit code still 0 - 腿数 only ever printed, nothing asserted
+  FAIL  FIXED CODE stayed 0 with a leg missing - AC#8-1's 腿数 assertion is decoration (expected in the PRE-FIX PASS)
+
+===== PART 3 (AC#8-2): 实测 < 基线 - allowed to stay quiet, must print a readable table =====
+   pristine: 基线 8->9（实测 8）-> rc=0  STALE 表行数=0
+   fixed:    基线 8->9（实测 8）-> rc=0  STALE 表行数=0
+   fixed 那一份的表（原样）：
+  ok    变好仍然不计进退码（两把尺都 rc=0）：这一格没有把门换成'为好消息响'的恒红形状（台账 A320／A321）
+   --     pristine 那一把只有一行行内注（'注=读数变好了'），单列的表一枚没有
+  FAIL  FIXED CODE printed no 基线过期 table naming the stale leg - AC#8-2 stays human-eyes-only (expected in the PRE-FIX PASS)
+
+r2-run-legs-and-subtraction.sh: logs kept (created, never deleted): /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/171/r2/logs/part{1,2,3}-*.txt
+r2-run-legs-and-subtraction.sh: gate copies + synthetic tree left in place at /tmp/wisp-171-r2.3nM8fK and /tmp/wisp-171-r2-tree.JPW8SJ
+r2-run-legs-and-subtraction.sh: this run wrote NOTHING inside /d/work/workspace/projects plans/Wisp (the repo's gate bytes were read, never edited)
+r2-run-legs-and-subtraction.sh: RED - at least one assertion above failed (PRE-FIX PASS expected: 1).

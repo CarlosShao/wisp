@@ -1,0 +1,49 @@
+
+===== PART 1 (AC#7): one run() leg, 2 枚 then 3 枚. Does the exit code move? =====
+warning: in the working copy of 'cmd/wisp/g2_state_one.go', LF will be replaced by CRLF the next time Git touches it
+-- state1 committed at 77bbff9 (synthetic tree, outside /d/work/workspace/projects plans/Wisp)
+   state1: leg G2 really measures 2 行 | pristine prints 命中行数=NO-READING | fixed prints 命中行数=2
+   state1 aggregate rc: pristine=6 fixed=6
+warning: in the working copy of 'cmd/wisp/g2_state_two.go', LF will be replaced by CRLF the next time Git touches it
+-- state2 committed at 187b41e (same tree, nothing deleted)
+   state2: leg G2 really measures 3 行 | pristine prints 命中行数=NO-READING | fixed prints 命中行数=3
+   state2 aggregate rc: pristine=6 fixed=7
+   which legs the FIXED aggregate calls out in state2:
+       # BAD  腿=G2 声明=ring 基线=2枚 实测=3枚 因=新增命中（票 171 AC#7：实测 > 基线）
+       # BAD  腿=G5 声明=ring 基线=1枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+       # BAD  腿=G5neg 声明=ring 基线=8枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+       # BAD  腿=G6 声明=ring 基线=1枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+       # BAD  腿=G6neg 声明=ring 基线=1枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+       # BAD  腿=G7 声明=ring 基线=3枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+       # BAD  腿=G7neg 声明=ring 基线=4枚 实测=0枚 因=空/非空那一味与声明不符（票 161 AC#6①）
+  ok    the two states differ by exactly ONE hit inside leg G2 (2 -> 3), nothing else in the tree moved
+  ok    UNMODIFIED CODE (AC#7 hole reproduced): 2 枚 -> 3 枚 moves the aggregate exit code NOT AT ALL (rc=6 both ways) - run() legs still only know 空/非空
+  ok    FIXED CODE: the same jump moves the aggregate exit code (6 -> 7) - a second hit can no longer hide inside 非空
+   --     the fixed ruler's extra BAD is attributable to leg G2 alone (see the list above)
+
+===== PART 2 (AC#8-1): a whole leg deleted. Does the exit code move? =====
+   pristine: 摘掉 G6 -> rc=0  腿数＝13 声明与实测不符＝0
+   fixed:    摘掉 G6 -> rc=1  腿数＝13 声明与实测不符＝1
+   which legs the FIXED aggregate calls out:
+       # BAD  腿=G6 声明=在册应跑 实测=腿不在场 因=整条腿没跑（票 171 AC#8①：腿数断言）
+  ok    UNMODIFIED CODE (AC#8-1 hole reproduced): a leg deleted outright, aggregate exit code still 0 - 腿数 only ever printed, nothing asserted
+  ok    FIXED CODE: deleting the same leg moves the exit code (0 -> 1)
+
+===== PART 3 (AC#8-2): 实测 < 基线 - allowed to stay quiet, must print a readable table =====
+   pristine: 基线 8->9（实测 8）-> rc=0  STALE 表行数=0
+   fixed:    基线 8->9（实测 8）-> rc=0  STALE 表行数=1
+   fixed 那一份的表（原样）：
+       ## 基线过期（票 171 AC#8②）：实测低于基线的腿，逐枚列成一张表
+       # 这一味**不**计进退码：变好了不算言行不一（算了就是把门换成「为好消息响」的恒红形状，台账 A320／A321）。
+       # 改前它只是聚合行里那句「注=读数变好了」，现量＝退码 0、单列表 0 枚（只有人眼看得见）。
+       # 表头：腿 | 声明 | 基线（want_n） | 实测 | 差 | 处置
+       # STALE 腿=G5neg 声明=ring 基线=9枚 实测=8枚 差=1枚 处置=把 want_n 核下来；样本一枚没变好而是被摘掉的，先回答谁摘的
+       # 基线过期枚数＝1   （核它的那一把＝.scratch/wisp/probes/161/r6/flip-declaration.sh 新增的那一格）
+  ok    变好仍然不计进退码（两把尺都 rc=0）：这一格没有把门换成'为好消息响'的恒红形状（台账 A320／A321）
+   --     pristine 那一把只有一行行内注（'注=读数变好了'），单列的表一枚没有
+  ok    FIXED CODE: 基线过期单列成一张表并点名了那一枚腿（G5neg）
+
+r2-run-legs-and-subtraction.sh: logs kept (created, never deleted): /d/work/workspace/projects plans/Wisp/.scratch/wisp/probes/171/r2/logs/part{1,2,3}-*.txt
+r2-run-legs-and-subtraction.sh: gate copies + synthetic tree left in place at /tmp/wisp-171-r2.naCXNh and /tmp/wisp-171-r2-tree.ybwirJ
+r2-run-legs-and-subtraction.sh: this run wrote NOTHING inside /d/work/workspace/projects plans/Wisp (the repo's gate bytes were read, never edited)
+r2-run-legs-and-subtraction.sh: GREEN - run() legs now carry 枚数, a deleted leg moves the exit code, and a stale baseline is a table rather than a sentence.

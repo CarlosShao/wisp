@@ -14,6 +14,16 @@
 #     并新增 pair() 的第四味 handle＝「开方把句柄丢了（`_ =` 或裸调用）⇒ 这一族在这枚文件里结构上关不掉，
 #     合方写什么都不算关」。G6／G7 明写 '-'：它们的开方（OpenTask 无返回值、Defer 返回 bool）不交句柄。
 #   两格撞同一枚 pair helper ⇒ 同一程做完（票面 171 AC#6 末行「别拆两程各改一次同一个函数」）。
+#   ③ 票 171 r1 的形制一字未动：pair 腿仍然「实测 > 基线才 BAD」、拿不到 want_n 直接死（rc=4）。
+# 票 171 r2 追加（09-27，**只加声明、加味、加断言；一枚腿没删、一条 pathspec 射程没减**）：
+#   ① AC#7＝枚数进 run() 那一族腿：G1／G1b／G2／G3／G4 从此也登记 want_n（run 腿的枚数＝命中行数），
+#     记账交给 pair 腿那同一枚 book_count——不再有"只有 0／非 0"的第二套判法。
+#     ⚠ 不选"逐枚相等"那一形，理由与 AC#2 结案记录同一条（相等的形会让改好了也变红＝台账 A320／A321）。
+#   ② AC#8①＝腿数断言：腿的名册只写在 LEGS_EXPECT 一处（腿数从它现算，不在第二个地方抄一遍号）；
+#     want() 先核腿号在不在册／有没有重复，聚合段再核【名册里每一腿都真的记过账】——
+#     整条腿被摘掉（want 与它的 run()/pair() 一起删）从此是一枚 BAD，不是一句没人看的打印。
+#   ③ AC#8②＝SHR 那一味仍然**不计进退码**（变好了不算言行不一），但单列一张【基线过期】表，
+#     不再只是聚合行里那句行内注；核它的那一把＝probes/161/r6/flip-declaration.sh 新增的那一格。
 # 用法：bash .scratch/wisp/probes/154/gate-clauses.sh [锚点]   > 读数文件
 # 规矩：只做 grep／不写仓里任何东西；名册变了即门响。
 #   （G5 的 pair() 为求差集用了一次 bash herestring，临时件走 $TMPDIR、不落仓；
@@ -30,8 +40,13 @@ NT=':_test.go'
 #   want <腿号> <ring|quiet> [rev]  —— 开跑前登记这一腿今天该不该响；rev＝成对普查两向都算。
 #   ring＝该响（run()：名册非空／pair()：未成对≥1 枚）／quiet＝不该响（零命中／0 枚）。
 # 票 171 AC#2 加味：
-#   want_n <枚数>                   —— 紧跟 want、只给 pair 腿登记【基线枚数】；这一腿的响从此是
-#                                     「实测枚数 > 基线」，不再是「实测非空」。run 腿用不上（它没有枚数）。
+#   want_n <枚数>                   —— 紧跟 want 登记【基线枚数】。票 171 AC#2 时它只管 pair 腿
+#                                     （枚数＝未成对），票 171 AC#7 起 run 腿也必填（枚数＝命中行数）；
+#                                     没登记就记账＝死在起跑线上（rc=4），下一程新加一条腿不可能悄悄退回
+#                                     「空／非空」那一形。
+# 票 171 AC#8① 加味：
+#   LEGS_EXPECT                     —— 腿的名册（唯一一处写这些腿号的地方）；want() 核腿号在不在册，
+#                                     聚合段核名册里每一腿都记过账，缺一枚＝一枚 BAD。
 # ⚠ 这一枚**不是**「任何一腿响⇒脚本非 0」：本文件里 G2、G5-负一负、G6、G6-负一负、G7、G7-负一负
 #   今天按设计就该响（G5 主尺那 1 枚是票 158 登记在册的活形状），把它们计进退码＝把票 161 AC#7
 #   刚收掉的恒红形状从另一扇门放回来（同一枚错，台账 A320／A321）。
@@ -42,12 +57,38 @@ COUNT=''
 AGG=''
 AGG_BAD=0
 LEG_COUNT=0
+STALE=''
+STALE_COUNT=0
+LEG_SEEN=''
+BOOKED=''
+WANT_COUNT=0
+
+# ---- 票 171 AC#8①：腿的名册。枚数（14）不在别处再写一遍，聚合段从这张表现算 ----
+# 这张表就是"登记期望值写进尺旁边、与九腿 want 同源"那一格的答案：腿号只在这里出现一次，
+# want() 拿它核对，聚合段拿它求缺——所以摘掉一整条腿＝这张表缺一枚＝退码跟着动。
+LEGS_EXPECT='G1 G1b G2 G3 G4 G5 G5pos G5neg G6 G6pos G6neg G7 G7pos G7neg'
+LEG_EXPECT_COUNT=0
+for __le in $LEGS_EXPECT; do LEG_EXPECT_COUNT=$((LEG_EXPECT_COUNT + 1)); done
 
 want() { # $1 腿号 $2 ring|quiet [$3 rev]
+	# 票 171 AC#8①：腿号先对名册。重复／打错／不在册一律死在起跑线上（rc=3）——
+	# 一张对不上账的名册比没有名册更坏：它会把"缺腿"那枚读数折成假 0。
+	case " $LEG_SEEN " in
+	*" $1 "*)
+		echo "想死在起跑线上：腿 $1 第二次 want——同一条腿记两次账＝腿数与实测从此对不上" >&2
+		exit 3
+		;;
+	esac
+	if ! printf '%s\n' $LEGS_EXPECT | grep -qxF "$1"; then
+		echo "想死在起跑线上：腿 $1 不在 LEGS_EXPECT 名册里——新加一枚腿要同时在名册登记（票 171 AC#8①）" >&2
+		exit 3
+	fi
 	LEG="$1"
 	EXPECT="$2"
 	REV=0
 	COUNT=''
+	WANT_COUNT=$((WANT_COUNT + 1))
+	LEG_SEEN="$LEG_SEEN $LEG"
 	if [ "${3:-}" = "rev" ]; then REV=1; fi
 	if [ "$EXPECT" != ring ] && [ "$EXPECT" != quiet ]; then
 		echo "想死在起跑线上：腿 $LEG 的声明 '$EXPECT' 不是 ring／quiet 之一——声明打错＝聚合是枚哑弹" >&2
@@ -55,7 +96,7 @@ want() { # $1 腿号 $2 ring|quiet [$3 rev]
 	fi
 }
 
-# want_n（票 171 AC#2）：pair 腿的基线枚数。放在 want 之后、pair 之前＝「开跑前先登记」这条没破。
+# want_n（票 171 AC#2，票 171 AC#7 起两族腿都管）：基线枚数。放在 want 之后、腿之前＝「开跑前先登记」这条没破。
 # 不校「quiet 却登记了 N>0」那种自相矛盾的声明——book_count 里【空/非空】那一味先它一步响，
 # 而且 flip-declaration.sh 正是靠改 want 那一行来验「声明还连着退码」，起跑线上把脚本打死会把
 # 它要证的那件事（聚合累计声明与实测不符）换成另一件事（脚本崩在登记处）。
@@ -73,30 +114,23 @@ want_n() { # $1 基线枚数
 	COUNT="$1"
 }
 
-book() { # $1 这一腿的实测（ring|quiet|git-grep-rc-N）；与 want 的声明比对，只把【不符】计进退码
-	local verdict
-	if [ "$EXPECT" = "$1" ]; then
-		verdict='ok  '
-	else
-		verdict='BAD '
-		AGG_BAD=$((AGG_BAD + 1))
-	fi
-	LEG_COUNT=$((LEG_COUNT + 1))
-	AGG="$AGG# $verdict 腿=$LEG 声明=$EXPECT 实测=$1
-"
-}
-
-# book_count（票 171 AC#2）：pair 腿的记账。$1＝实测未成对枚数（两向之和），$2＝那一发 git grep 的 rc。
+# book_count：两族腿共用的记账（票 171 r2 起 run 腿也走这一枚，「只有 0／非 0」那一套从此不存在了；
+# 改前那枚只管 run 腿的 book() 因此整枚删掉——留着它就是同一件事的第二个判法，正是"同源拷贝"的形状）。
+# $1＝实测枚数（pair 腿＝未成对枚数；run 腿＝命中行数） $2＝那一发 git grep 的 rc
+# $3＝kind：unpaired（默认＝pair 腿）| hits（run 腿，票 171 AC#7）。kind 只决定红句里「新增」后面
+#   那两个词，判据算术一枚不多一枚不少 ⇒ AC#2 结案记录的逐字红句（腿=G5 …因=新增未成对）仍然对得上。
 # 两味**并集**，一枚腿最多计一进退码（不重复计）：
 #   ① 票 161 AC#6① 那一味（空／非空 vs want 的 ring／quiet）——一字不改地继续校，
 #      否则 .scratch/wisp/probes/161/r6/flip-declaration.sh 那发「翻声明退码跟着变」会被我换成另一件事；
-#   ② 票 171 AC#2 那一味（实测枚数 vs want_n 基线）——同一条腿里新增的第二枚从此躲不进「非空」。
+#   ② 票 171 AC#2／AC#7 那一味（实测枚数 vs want_n 基线）——同一条腿里新增的第二枚从此躲不进「非空」。
 # 实测 < 基线 打 SHR 不计退码：改好了不算言行不一（要算的话这把门就为好消息响，
 # 下一程就去放宽它——那正是票 161 AC#7／台账 A320、A321 收掉的恒红形状）。
+# 但 SHR 从此**单列一张【基线过期】表**（票 171 AC#8②）：改前它只是聚合行里的一句行内注，
+# 现量那一发（want_n 8 抬成 9、实测 8）＝退码 0、单列表 0 枚，也就是"只有人眼看得见"。
 book_count() {
-	local n="$1" rrc="$2" verdict meas bin='quiet' why=''
+	local n="$1" rrc="$2" kind="${3:-unpaired}" verdict meas bin='quiet' why=''
 	if [ -z "$COUNT" ]; then
-		echo "想死在起跑线上：pair 腿 $LEG 没登记 want_n 基线——枚数不进判据＝票 171 AC#2 那枚洞还开着" >&2
+		echo "想死在起跑线上：腿 $LEG 没登记 want_n 基线——枚数不进判据＝票 171 AC#2／AC#7 那枚洞还开着" >&2
 		exit 4
 	fi
 	meas="${n}枚"
@@ -111,16 +145,24 @@ book_count() {
 		why=' 因=空/非空那一味与声明不符（票 161 AC#6①）'
 	elif [ "$n" -gt "$COUNT" ]; then
 		verdict='BAD '
-		why=' 因=新增未成对（票 171 AC#2：实测 > 基线）'
+		if [ "$kind" = hits ]; then
+			why=' 因=新增命中（票 171 AC#7：实测 > 基线）'
+		else
+			why=' 因=新增未成对（票 171 AC#2：实测 > 基线）'
+		fi
 	elif [ "$n" -lt "$COUNT" ]; then
-		# 变好＝不算言行不一，但基线于是过期了，逐行打出来给下一程核。这一味**不**计进退码。
+		# 变好＝不算言行不一，但基线于是过期了：行进聚合表（逐字照改前），同时进文末单列的那张表。
 		verdict='SHR '
 		why=' 注=读数变好了，基线过期，下一程把 want_n 核下来'
+		STALE="$STALE# STALE 腿=$LEG 声明=$EXPECT 基线=${COUNT}枚 实测=${n}枚 差=$((COUNT - n))枚 处置=把 want_n 核下来；样本一枚没变好而是被摘掉的，先回答谁摘的
+"
+		STALE_COUNT=$((STALE_COUNT + 1))
 	else
 		verdict='ok  '
 	fi
 	[ "$verdict" = 'BAD ' ] && AGG_BAD=$((AGG_BAD + 1))
 	LEG_COUNT=$((LEG_COUNT + 1))
+	BOOKED="$BOOKED $LEG"
 	AGG="$AGG# $verdict 腿=$LEG 声明=$EXPECT 基线=${COUNT}枚 实测=$meas$why
 "
 }
@@ -171,14 +213,18 @@ run() { # $1 标题 $2 pattern $3 额外 git-grep 旗标 $4.. pathspecs
 	echo "## $title"
 	echo "\$ git grep -nE $flags '$pat' $A -- $*"
 	# shellcheck disable=SC2068
-	git grep -nE $flags "$pat" "$A" -- $@
-	local rc=$?
+	# 票 171 AC#7：名册先收进变量再原样打出来（行内容一字不差，只是多次数一遍行），
+	# 因为这一族腿的响从此看枚数：命中行数 vs want_n 登记的基线。
+	local roster rc hits
+	roster="$(git grep -nE $flags "$pat" "$A" -- $@ 2>/dev/null)"; rc=$?
+	if [ -n "$roster" ]; then printf '%s\n' "$roster"; fi
+	hits="$(printf '%s' "$roster" | grep -c . || true)"
+	echo "# 命中行数＝$hits   （票 171 AC#7：run 腿的枚数就是它——同一条腿里的第二枚从此躲不进「非空」）"
+	echo "# 基线枚数＝${COUNT:-（没登记）}   （want_n 登记的那一发；AC#7 起 run 腿也必填，没登记＝rc=4）"
 	echo "# rc=$rc   （1＝零命中／0＝非空＝该枚子句已响）"
-	# 票 161 AC#6①：run() 这一形的响＝名册非空（git grep rc=0）；rc>1 是尺自己坏了，也算不符。
-	local meas='quiet'
-	[ "$rc" -eq 0 ] && meas='ring'
-	if [ "$rc" -gt 1 ]; then meas="git-grep-rc-$rc"; fi
-	book "$meas"
+	# 票 161 AC#6① 那一味（空／非空）＋票 171 AC#7 那一味（枚数 vs 基线）都在 book_count 里；
+	# rc>1 仍是「尺自己坏了」，那一味在 book_count 里先它一步。改前的 book() 已并入 book_count。
+	book_count "$hits" "$rc" hits
 }
 
 pair() { # 成对普查：$1 标题 $2 开方 pattern $3 合方 pattern $4 handle|- $5.. pathspecs
@@ -229,8 +275,10 @@ pair() { # 成对普查：$1 标题 $2 开方 pattern $3 合方 pattern $4 handl
 		echo "#   （空）"
 	fi
 	# 票 171 AC#6：合方认下句柄那一形之后，「这一文件的关是谁关的」必须说出来给人判——
-	# 泛用 Close() 是本仓到处都是的动词（现量：非测试生产码 40 枚文件里有 Close()），
-	# 一把只按文件求差集的尺分辨不出那只 Close() 是不是这族的句柄，所以它别想安静地混过去。
+	# 泛用 Close() 是本仓到处都是的动词（现量：非测试生产码 42 枚文件里有 Close()，命令＝
+	#   git grep -lEw 'Close\(\)' <锚> -- 'internal/**/*.go' 'cmd/**/*.go' ':!*_test.go' | wc -l，
+	#   票 171 r2 在锚 f1b99a70 重量仍是 42；改前这句写的 40＝票面 AC#8 那条「顺带一字」的账），
+	#   一把只按文件求差集的尺分辨不出那只 Close() 是不是这族的句柄，所以它别想安静地混过去。
 	if [ "$mode" = handle ] && [ -n "$generic" ]; then
 		gk="$(printf '%s\n' "$calls" | grep -Ew "$open" | cut -d: -f2 | sort -u |
 			while IFS= read -r f; do [ -z "$f" ] && continue
@@ -292,24 +340,33 @@ if [ "${1:-}" = "--diffsets" ]; then
 fi
 
 # ---- 以下每一腿的 want＝票 161 AC#6① 的声明，逐枚都是 09-27 在锚上现量登记的今天真值 ----
+# 票 171 AC#7：run 腿（G1／G1b／G2／G3／G4）的 want_n 也是同一次现量登记的【命中行数】，命令逐枚是
+#   git grep -nE <该腿的 pattern> <锚> -- <该腿的 pathspec 原样> | grep -c .
+# 本程在锚 f1b99a70 现量：G1=0／G1b=0／G2=2／G3=0／G4=0（G2 那 2 行＝cmd/wisp/run.go 的调用点与它上面的注释，
+# run 腿的枚数吃整张名册，注释行也算——这与 pair 腿"只吃调用点"是两回事，票面 AC#1 那枚尺洞不归本程）。
 want G1 quiet
+want_n 0
 run "G1 生产码里构造 ToolRequest（排 internal/agent/ 自身）" \
 	'ToolRequest\{' '' "$GO" "$GO2" ':!*_test.go' ':!internal/agent/*'
 
 want G1b quiet
+want_n 0
 run "G1b 生产码里任意 .Execute( 调用点（排 loop.go 与 bridge.go 自身）" \
 	'\.Execute\(' '' "$GO" "$GO2" ':!*_test.go' ':!internal/agent/loop.go' ':!internal/tools/bridge.go'
 
 # G2 今天【该响】：名册非空是它的工作——cmd/wisp/run.go 那一发 CloseTask 就在册。
 want G2 ring
+want_n 2
 run "G2 OpenTask/CloseTask 的生产出现点（排 bridge.go 自身；今日应只剩 cmd/wisp/run.go 那一发＋它上面的注释）" \
 	'OpenTask|CloseTask' '-w' "$GO" "$GO2" ':!*_test.go' ':!internal/tools/bridge.go'
 
 want G3 quiet
+want_n 0
 run "G3 Q-56 那一支落地：Loop 上出现收 taskID 的导出方法" \
 	'^func \(l \*Loop\) [A-Z][A-Za-z0-9]*\(.*taskID' '' internal/agent
 
 want G4 quiet
+want_n 0
 run "G4 生产组合根打开 L0 直通（PassThroughUnclassifiedRisk 的字面赋值）" \
 	'PassThroughUnclassifiedRisk:' '' '*.go' ':!*_test.go'
 
@@ -463,12 +520,55 @@ echo "# 判据**不是**「任何一腿响⇒脚本非 0」——见文件头 wa
 echo "#   G2／G5-负一负／G6／G6-负一负／G7／G7-负一负 今天按设计就该响，把它们计进退码"
 echo "#   ＝把票 161 AC#7 刚收掉的恒红形状从另一扇门放回来（同一枚错，台账 A320／A321）。"
 echo "# 每腿判定（ok＝说到做到／BAD＝言行不一／SHR＝读数比基线好＝基线过期但不算言行不一；这一份同样逐行可 diff）："
-echo "# 票 171 AC#2：pair 腿多两列——基线＝want_n 登记的枚数、实测＝这一腿自己数出来的枚数。"
-echo "#   退码累计的是【声明与实测不符】，而 pair 腿的「不符」现在有两味：空/非空（票 161 AC#6①）与"
-echo "#   实测>基线（票 171 AC#2）。run 腿没有枚数，行形状逐字照改前。"
+echo "# 票 171 AC#2／AC#7：pair 腿与 run 腿现在都是同一套两列——基线＝want_n 登记的枚数、"
+echo "#   实测＝这一腿自己数出来的枚数（pair 腿＝未成对，run 腿＝命中行数）。"
+echo "#   退码累计的是【声明与实测不符】，而「不符」现在有三味：空/非空（票 161 AC#6①）、"
+echo "#   实测>基线（票 171 AC#2／AC#7）与【腿不在场】（票 171 AC#8①）。"
+# ---- 票 171 AC#8①：腿数断言。改前这一格只有「腿数＝14」一句打印，摘掉一整条腿它打印 13 然后退 0 ----
+# 名册（LEGS_EXPECT）里每一腿都必须真的记过账；缺一枚就是一枚 BAD，计进退码。
+# 反向也校：want 登记过、却没有对应的 run()／pair()（＝只删腿不删声明）同样是一枚 BAD。
+MISSING_COUNT=0
+for __e in $LEGS_EXPECT; do
+	case " $BOOKED " in
+	*" $__e "*) ;;
+	*)
+		MISSING_COUNT=$((MISSING_COUNT + 1))
+		AGG="$AGG# BAD  腿=$__e 声明=在册应跑 实测=腿不在场 因=整条腿没跑（票 171 AC#8①：腿数断言）
+"
+		AGG_BAD=$((AGG_BAD + 1))
+		;;
+	esac
+done
+PHANTOM_COUNT=0
+for __s in $LEG_SEEN; do
+	case " $BOOKED " in
+	*" $__s "*) ;;
+	*)
+		PHANTOM_COUNT=$((PHANTOM_COUNT + 1))
+		AGG="$AGG# BAD  腿=$__s 声明=want 登记过 实测=只声明没跑腿 因=腿被摘掉而声明留着（票 171 AC#8①）
+"
+		AGG_BAD=$((AGG_BAD + 1))
+		;;
+	esac
+done
 if [ -n "$AGG" ]; then printf '%s' "$AGG"; fi
 echo "# 腿数＝$LEG_COUNT 声明与实测不符＝$AGG_BAD"
-echo "# 聚合退码＝$AGG_BAD   （0＝每一腿的响与不响都和自己登记的声明一致；>0＝有腿言行不一）"
+echo "# 腿数断言：名册=$LEG_EXPECT_COUNT 声明=$WANT_COUNT 记账=$LEG_COUNT 缺腿=$MISSING_COUNT 空头声明=$PHANTOM_COUNT"
+if [ "$LEG_COUNT" = "$LEG_EXPECT_COUNT" ] && [ "$WANT_COUNT" = "$LEG_EXPECT_COUNT" ] &&
+	[ "$MISSING_COUNT" = 0 ] && [ "$PHANTOM_COUNT" = 0 ]; then
+	echo "# 腿数断言＝相符（名册上每一腿都记了账）"
+else
+	echo "# 腿数断言＝不符（缺腿=$MISSING_COUNT 空头声明=$PHANTOM_COUNT）——已逐枚计入上面那张表的 BAD"
+fi
+# ---- 票 171 AC#8②：SHR（实测 < 基线）不计进退码，但单列一张读得到的【基线过期】表 ----
+echo
+echo "## 基线过期（票 171 AC#8②）：实测低于基线的腿，逐枚列成一张表"
+echo "# 这一味**不**计进退码：变好了不算言行不一（算了就是把门换成「为好消息响」的恒红形状，台账 A320／A321）。"
+echo "# 改前它只是聚合行里那句「注=读数变好了」，现量＝退码 0、单列表 0 枚（只有人眼看得见）。"
+echo "# 表头：腿 | 声明 | 基线（want_n） | 实测 | 差 | 处置"
+if [ -n "$STALE" ]; then printf '%s' "$STALE"; else echo "#   （空＝今天没有任何一条腿的读数低于基线）"; fi
+echo "# 基线过期枚数＝$STALE_COUNT   （核它的那一把＝.scratch/wisp/probes/161/r6/flip-declaration.sh 新增的那一格）"
+echo "# 聚合退码＝$AGG_BAD   （0＝每一腿的响与不响都和自己登记的声明一致，且名册上每一腿都在场；>0＝有腿言行不一）"
 echo "# 翻一枚声明让退码跟着变那发证据不在这里，在 .scratch/wisp/probes/161/r6/flip-declaration.sh"
 if [ "$AGG_BAD" -gt 125 ]; then
 	echo "# 不符腿数大于 125，退码截在 125（够红了，别拿溢出当读数）"

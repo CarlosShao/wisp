@@ -1,0 +1,4 @@
+7f78a163 票 171（171-r2 写码位·件②）AC#7＋AC#8 的台件落盘，并先在**未修码**上取到读数： `sh .scratch/wisp/probes/171/r2/r2-run-legs-and-subtraction.sh`（BASE=f1b99a70 的尺＝git show 取出的改前字节） => rc=1（PRE-FIX PASS，改后一侧本就该失败），三发"今天不响"逐字如下（读数存 logs/harness-pre-fix.txt）：  AC#7 同一条 run() 腿 G2 命中 2 枚 -> 3 枚：聚合退码 6 -> 6（一动不动；真树 G2 现量 2 行，两态各 2/3 行）  AC#8-1 从尺的副本里整条摘掉 G6 腿：聚合退码 0（腿数只打印、无断言）  AC#8-2 把 G5neg 的 want_n 8 -> 9（实测 8＝变好）：退码 0、单列的『基线过期』表 0 行（只有行内注，人眼才看得见） 台件写面只有 probes/171/r2/**；样本落 $TMPDIR 合成树（不在仓内、无 worktree、无 checkout、只建不删）。
+    台件写面只有 probes/171/r2/**；样本落 $TMPDIR 合成树（不在仓内、无 worktree、无 checkout、只建不删）。
+
+.scratch/wisp/probes/171/r2/r2-run-legs-and-subtraction.sh
