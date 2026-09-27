@@ -1,0 +1,2 @@
+c0ffee0000000000000000000000000000000000:internal/fake/z.go:3:// OpenTask opens the C25 taint scope for one task.
+c0ffee0000000000000000000000000000000000:internal/fake/z.go:9:	s.CloseTask("task-1")

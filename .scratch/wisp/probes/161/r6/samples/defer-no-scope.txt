@@ -1,0 +1,4 @@
+c0ffee0000000000000000000000000000000000:internal/fake/w.go:12:	s.Defer(func() {})
+c0ffee0000000000000000000000000000000000:internal/fake/w.go:13:	s.DeferNamed("cleanup", func() {})
+c0ffee0000000000000000000000000000000000:internal/fake/v.go:7:	scope := plugin.NewDisposalScope("task", ctx)
+c0ffee0000000000000000000000000000000000:internal/fake/v.go:8:	scope.Defer(func() {})

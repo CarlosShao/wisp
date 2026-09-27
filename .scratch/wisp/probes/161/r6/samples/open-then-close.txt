@@ -1,0 +1,4 @@
+c0ffee0000000000000000000000000000000000:internal/fake/x.go:9:	t.OpenTask("task-1")
+c0ffee0000000000000000000000000000000000:internal/fake/x.go:11:	defer t.CloseTask("task-1")
+c0ffee0000000000000000000000000000000000:internal/fake/y.go:4:	s.OpenTask("task-2")
+c0ffee0000000000000000000000000000000000:internal/fake/y.go:8:	s.CloseTask("task-2")

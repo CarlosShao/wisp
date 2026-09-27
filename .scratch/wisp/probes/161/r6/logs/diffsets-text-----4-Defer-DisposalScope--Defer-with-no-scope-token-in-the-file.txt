@@ -1,0 +1,8 @@
+# 票 154 AC#1 触发门 —— 锚点 --diffsets
+# 生成时刻 2026-09-27T09:46:16+08:00
+# 下一程复算＝同一条命令再跑一次，逐行 diff 名册；名册变长＝门响。
+# diffsets 模式：开方=Defer(Named)? 合方=(New)?DisposalScope（名册 4 行 → 剔注释后调用行 4 行）
+# 正向（Defer(Named)? 却没 (New)?DisposalScope）：
+#   internal/fake/w.go
+# 反向（(New)?DisposalScope 却没 Defer(Named)?）：
+#   （空）

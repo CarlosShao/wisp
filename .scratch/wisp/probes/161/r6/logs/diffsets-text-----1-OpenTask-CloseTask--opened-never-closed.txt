@@ -1,0 +1,8 @@
+# 票 154 AC#1 触发门 —— 锚点 --diffsets
+# 生成时刻 2026-09-27T09:46:03+08:00
+# 下一程复算＝同一条命令再跑一次，逐行 diff 名册；名册变长＝门响。
+# diffsets 模式：开方=OpenTask 合方=CloseTask（名册 2 行 → 剔注释后调用行 2 行）
+# 正向（OpenTask 却没 CloseTask）：
+#   internal/fake/x.go
+# 反向（CloseTask 却没 OpenTask）：
+#   internal/fake/y.go
