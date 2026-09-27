@@ -71,7 +71,11 @@ const JOBS = [
     component: "GlideMenu",
     adapted: true,
     subs: [['className={`pointer-events-none absolute ${highlightClassName}`}', 'className={`m-glide pointer-events-none absolute ${highlightClassName}`}']],
-    manual: "its glide span carries class m-glide, which is what the motion tiers in styles/theme.css address (data-motion=off pins it).",
+    subs: [
+      ['className={`group/glide-menu relative ${className}`}', 'className={`group/glide-menu ${positioned} ${className}`}'],
+      ['  const moveTo = (target: EventTarget | null) => {', '  // The measuring container must be the positioning context. `position` is one\n  // property, so a caller asking for `absolute` (a popover that must not take\n  // layout space) cannot beat a hardcoded `relative` by ordering class names -\n  // the loser is whichever utility Tailwind emits last, and the symptom is the\n  // menu becoming a block that pushes its own panel around.\n  const positioned = /\\b(absolute|fixed|sticky)\\b/.test(className) ? "" : "relative";\n\n  const moveTo = (target: EventTarget | null) => {'],
+    ],
+    manual: "its glide span carries class m-glide, which is what the motion tiers in styles/theme.css address (data-motion=off pins it). The positioning context became opt-out for the reason in the code comment - the right rail's tab dropdown passes absolute and a hardcoded relative silently turned that menu into a block.",
     mounted: "the sidebar's three-section list, its bottom block, the command palette rows, the right rail's launcher cards / review file list / scope menu / file tree, the task monitor popover, the workspace picker, the approval queue and the task list. NOT a duplicate of src/components/glide-highlight.tsx: this one is a HOVER layer (follows the pointer, leaves when the pointer leaves) and that one is a CONTROLLED selection (sits on an activeKey and stays). The library and react-bits both have no controlled equivalent - react-bits' GlideSelect is a whole select widget, not a layer.",
   },
   {

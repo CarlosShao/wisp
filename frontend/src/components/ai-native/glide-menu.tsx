@@ -49,6 +49,16 @@ export function GlideMenu({
   const [box, setBox] = useState<{ top: number; height: number } | null>(null);
   const [visible, setVisible] = useState(false);
 
+  // The measuring container has to be the positioning context, which is what
+  // upstream's hardcoded `relative` was for. It cannot simply stay hardcoded:
+  // `position` is one property, so a caller asking for `absolute` (a popover
+  // that must NOT take up layout space - the right rail's tab dropdown) gets a
+  // fight it cannot win by ordering the class names, and the loser is whichever
+  // utility Tailwind happens to emit last. Symptom when that happens: the menu
+  // becomes a block, pushes the tab strip down the panel, and the panel grows a
+  // hole above it. So: relative unless the caller says otherwise.
+  const positioned = /\b(absolute|fixed|sticky)\b/.test(className) ? "" : "relative";
+
   const moveTo = (target: EventTarget | null) => {
     const container = ref.current;
     if (!(target instanceof Element) || !container) return;
@@ -62,7 +72,7 @@ export function GlideMenu({
 
   return (
     <div
-      className={`group/glide-menu relative ${className}`}
+      className={`group/glide-menu ${positioned} ${className}`}
       onBlurCapture={(event) => {
         if (!ref.current?.contains(event.relatedTarget as Node | null)) setVisible(false);
       }}
