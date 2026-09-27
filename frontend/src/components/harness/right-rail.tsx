@@ -192,7 +192,27 @@ const BROWSER_URL = "wisp.local/preview/生成页面";
  * also a separate decision again: app-harness keeps it collapsed until you
  * click the toggle, or until the agent asks for a tab (openRequest).
  */
-export function RightRail({ openRequest }: { openRequest?: RailOpenRequest }) {
+export interface RightRailProps {
+  openRequest?: RailOpenRequest;
+  tabs?: readonly RailTabDef[];
+  reviewFiles?: readonly ReviewFile[];
+  reviewScopes?: readonly string[];
+  fileTree?: readonly TreeRow[];
+  workspaceRoot?: string;
+  terminalLines?: readonly { kind: "cmd" | "out" | "ok"; text: string }[];
+  browserUrl?: string;
+}
+
+export function RightRail({
+  openRequest,
+  tabs = TAB_DEFS,
+  reviewFiles = REVIEW_FILES,
+  reviewScopes = REVIEW_SCOPES,
+  fileTree = TREE,
+  workspaceRoot = WORKSPACE_ROOT,
+  terminalLines = TERMINAL_LINES,
+  browserUrl = BROWSER_URL,
+}: RightRailProps) {
   // ZCode 的标签容器模型：打开集合 + 激活 + 最近关闭栈 + 下拉。
   const [openTabs, setOpenTabs] = useState<RailTabKey[]>([]);
   const [activeTab, setActiveTab] = useState<RailTabKey | null>(null);
@@ -258,7 +278,7 @@ export function RightRail({ openRequest }: { openRequest?: RailOpenRequest }) {
           </svg>
         </button>
         {openTabs.map((key) => {
-          const def = TAB_DEFS.find((t) => t.key === key);
+          const def = tabs.find((t) => t.key === key);
           if (!def) return null;
           const on = key === active;
           return (
@@ -325,7 +345,7 @@ export function RightRail({ openRequest }: { openRequest?: RailOpenRequest }) {
             <p className="px-1.5 pb-0.5 pt-1.5 text-[10.5px] font-medium uppercase tracking-[0.08em] text-ink-3">
               可打开
             </p>
-            {TAB_DEFS.filter((t) => !openTabs.includes(t.key) && menuMatches(t)).map((def) => (
+            {tabs.filter((t) => !openTabs.includes(t.key) && menuMatches(t)).map((def) => (
               <button
                 className="flex w-full items-center gap-2 rounded-chip px-1.5 py-1.5 text-left"
                 data-menu-row
@@ -339,13 +359,13 @@ export function RightRail({ openRequest }: { openRequest?: RailOpenRequest }) {
                 {def.keys ? <kbd className="kbd shrink-0">{def.keys}</kbd> : null}
               </button>
             ))}
-            {openTabs.filter((k) => menuMatches(TAB_DEFS.find((t) => t.key === k)!)).length > 0 && (
+            {openTabs.filter((k) => menuMatches(tabs.find((t) => t.key === k)!)).length > 0 && (
               <>
                 <p className="px-1.5 pb-0.5 pt-2 text-[10.5px] font-medium uppercase tracking-[0.08em] text-ink-3">
                   已打开
                 </p>
-                {openTabs.filter((k) => menuMatches(TAB_DEFS.find((t) => t.key === k)!)).map((key) => {
-                  const def = TAB_DEFS.find((t) => t.key === key)!;
+                {openTabs.filter((k) => menuMatches(tabs.find((t) => t.key === k)!)).map((key) => {
+                  const def = tabs.find((t) => t.key === key)!;
                   return (
                     <div className="flex items-center gap-2 rounded-chip px-1.5 py-1.5" data-menu-row key={key}>
                       <span className="min-w-0 flex-1 truncate text-left text-[12px] text-ink">{def.label}</span>
@@ -363,13 +383,13 @@ export function RightRail({ openRequest }: { openRequest?: RailOpenRequest }) {
                 })}
               </>
             )}
-            {closedTabs.filter((k) => menuMatches(TAB_DEFS.find((t) => t.key === k)!)).length > 0 && (
+            {closedTabs.filter((k) => menuMatches(tabs.find((t) => t.key === k)!)).length > 0 && (
               <p className="px-1.5 pb-0.5 pt-2 text-[10.5px] font-medium uppercase tracking-[0.08em] text-ink-3">
                 最近关闭的标签页
               </p>
             )}
-            {closedTabs.filter((k) => menuMatches(TAB_DEFS.find((t) => t.key === k)!)).map((key) => {
-              const def = TAB_DEFS.find((t) => t.key === key)!;
+            {closedTabs.filter((k) => menuMatches(tabs.find((t) => t.key === k)!)).map((key) => {
+              const def = tabs.find((t) => t.key === key)!;
               return (
                 <button
                   className="flex w-full items-center gap-2 rounded-chip px-1.5 py-1.5 text-left"
@@ -402,7 +422,7 @@ export function RightRail({ openRequest }: { openRequest?: RailOpenRequest }) {
             className="flex w-full flex-col gap-2.5"
             highlightClassName="inset-x-0 rounded-card bg-hover"
           >
-            {TAB_DEFS.map((def) => (
+            {tabs.map((def) => (
               <button
                 className="group relative flex w-full items-center gap-3 rounded-card border border-line bg-surface p-4 text-left shadow-card transition-colors duration-150 hover:border-accent/40"
                 data-menu-row
@@ -429,16 +449,16 @@ export function RightRail({ openRequest }: { openRequest?: RailOpenRequest }) {
       ) : (
         <>
           {/* ── 审查：作用域下拉 + 文件 diff 列表（ZCode 审查页形态） ────── */}
-          {active === "review" && <ReviewPane />}
+          {active === "review" && <ReviewPane files={reviewFiles} scopes={reviewScopes} />}
 
           {/* ── 工作区文件：C26 授权范围内的树 + 路径锁说明 ─────────────── */}
-          {active === "files" && <FilesPane />}
+          {active === "files" && <FilesPane fileTree={fileTree} workspaceRoot={workspaceRoot} />}
 
           {/* ── 终端：tooltip 暗面 + 等宽回滚 + 块光标（只读演示） ───────── */}
-          {active === "terminal" && <TerminalPane />}
+          {active === "terminal" && <TerminalPane lines={terminalLines} />}
 
           {/* ── 浏览器：地址栏 + 渲染的演示页（内核未定案，据实标注） ───── */}
-          {active === "browser" && <BrowserPane />}
+          {active === "browser" && <BrowserPane url={browserUrl} />}
         </>
       )}
     </aside>
@@ -460,17 +480,17 @@ function IconFor({ def }: { def: RailTabDef }) {
 
 /* ── 工作区文件面板 ──────────────────────────────────────────────────────── */
 
-function FilesPane() {
+function FilesPane({ fileTree, workspaceRoot }: { fileTree: readonly TreeRow[]; workspaceRoot: string }) {
   const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(new Set());
   const [open, setOpen] = useState<string | null>(null);
 
   // A directory hides its subtree when collapsed; a file is a leaf and only
   // carries the "this is the row you are on" state.
-  const visible = TREE.filter((row, i) => {
+  const visible = fileTree.filter((row, i) => {
     if (row.kind !== "dir") return true;
     for (let j = i - 1; j >= 0; j--) {
-      if (TREE[j].kind === "dir" && TREE[j].depth < row.depth) {
-        return !collapsed.has(TREE[j].name);
+      if (fileTree[j].kind === "dir" && fileTree[j].depth < row.depth) {
+        return !collapsed.has(fileTree[j].name);
       }
     }
     return true;
@@ -479,8 +499,8 @@ function FilesPane() {
   return (
     <section aria-label="工作区文件" className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <div className="flex shrink-0 items-center gap-2 border-b border-line px-3 py-2">
-        <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-ink-2" title={WORKSPACE_ROOT}>
-          {WORKSPACE_ROOT}
+        <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-ink-2" title={workspaceRoot}>
+          {workspaceRoot}
         </span>
         <button
           className="flex shrink-0 items-center gap-1 rounded-control px-1.5 py-1 text-[11.5px] text-ink-2 transition-colors duration-150 hover:bg-hover hover:text-ink"
@@ -492,6 +512,11 @@ function FilesPane() {
         </button>
       </div>
 
+      {visible.length === 0 ? (
+        <p className="px-3 py-4 text-[11.5px] leading-relaxed text-ink-3">
+          还没有收到工作区文件。面板不许自己造数据，这里只说明它缺 C17 的读口与票 35 的推送。
+        </p>
+      ) : (
       <GlideMenu
         className="min-h-0 flex-1 overflow-y-auto py-1"
         highlightClassName="inset-x-1.5 rounded-chip bg-hover"
@@ -555,6 +580,7 @@ function FilesPane() {
           );
         })}
       </GlideMenu>
+      )}
 
       <p className="shrink-0 border-t border-line px-3 py-2 text-[10.5px] leading-[1.6] text-ink-3">
         一缕只能读写你授权的目录；工作区必须落在其中（C26 拒绝符号链接外指）。
@@ -566,9 +592,9 @@ function FilesPane() {
 
 /* ── 审查面板 ─────────────────────────────────────────────────────────────── */
 
-function ReviewPane() {
+function ReviewPane({ files, scopes }: { files: readonly ReviewFile[]; scopes: readonly string[] }) {
   const [scopeOpen, setScopeOpen] = useState(false);
-  const [scope, setScope] = useState<(typeof REVIEW_SCOPES)[number]>("未暂存");
+  const [scope, setScope] = useState(scopes[0] ?? "未暂存");
   const [openFile, setOpenFile] = useState<string | null>(null);
 
   return (
@@ -601,7 +627,7 @@ function ReviewPane() {
               className="flex flex-col"
               highlightClassName="inset-x-0 rounded-chip bg-hover"
             >
-              {REVIEW_SCOPES.map((s) => (
+              {scopes.map((s) => (
                 <button
                   className="relative flex w-full items-center gap-2 rounded-chip px-2 py-1.5 text-left text-[12px] text-ink"
                   data-menu-row
@@ -627,8 +653,13 @@ function ReviewPane() {
       </div>
 
       {/* 文件列表：类型 tile + 名 + 目录 + diff 统计 + chevron 展开 diff */}
+      {files.length === 0 ? (
+        <p className="px-3 py-4 text-[11.5px] leading-relaxed text-ink-3">
+          还没有收到审查数据。面板不许自己造数据，这里只说明它缺 C17 的读口与票 35 的推送。
+        </p>
+      ) : (
       <GlideMenu className="min-h-0 flex-1 overflow-y-auto" highlightClassName="inset-x-1.5 rounded-chip bg-hover">
-        {REVIEW_FILES.map((file) => {
+        {files.map((file) => {
           const expanded = openFile === file.name;
           return (
             <div className="border-b border-line last:border-b-0" key={file.name}>
@@ -667,13 +698,14 @@ function ReviewPane() {
           );
         })}
       </GlideMenu>
+      )}
     </section>
   );
 }
 
 /* ── 终端面板（只读演示：tooltip 暗面在明暗两主题下都是深底） ──────────────── */
 
-function TerminalPane() {
+function TerminalPane({ lines }: { lines: readonly { kind: "cmd" | "out" | "ok"; text: string }[] }) {
   return (
     <section aria-label="终端" className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <div className="flex items-center gap-1.5 border-b border-line px-3 py-2 text-[11.5px] text-ink-2">
@@ -683,7 +715,11 @@ function TerminalPane() {
         <span className="ml-1.5 font-mono">wisp — 终端</span>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto p-3 font-mono text-[11.5px] leading-[1.9]" style={{ background: "var(--tooltip-bg)", color: "var(--tooltip-fg)" }}>
-        {TERMINAL_LINES.map((line, i) => (
+        {lines.length === 0 ? (
+          <p className="text-[11.5px] leading-relaxed text-tooltip-muted">
+            还没有收到终端会话。面板不许自己造数据，这里只说明它缺 C17 的读口与票 35 的推送。
+          </p>
+        ) : lines.map((line, i) => (
           <div
             className={cn(
               "whitespace-pre-wrap",
@@ -710,7 +746,7 @@ function TerminalPane() {
 
 /* ── 浏览器面板（地址栏 + 渲染的演示页；内核走插件还是内置待 owner 定案） ──── */
 
-function BrowserPane() {
+function BrowserPane({ url }: { url: string }) {
   return (
     <section aria-label="浏览器" className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <div className="flex shrink-0 items-center gap-1 border-b border-line px-2 py-1.5">
@@ -718,7 +754,7 @@ function BrowserPane() {
         <ChevronRight aria-hidden="true" className="shrink-0 text-ink-3" size={14} strokeWidth={2} />
         <RotateCw aria-hidden="true" className="shrink-0 text-ink-3" size={12} strokeWidth={2} />
         <span className="ml-1 min-w-0 flex-1 truncate rounded-control bg-inset px-2 py-1 font-mono text-[10.5px] text-ink-2 shadow-hairline">
-          {BROWSER_URL}
+          {url}
         </span>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto bg-page">
