@@ -192,7 +192,19 @@ docs/evidence/s1/164-task-output-impl-r1-ac2-ac3.md
 internal/tools/task_output_ac2_before_test.go
 ```
 
-**AC#3 那一格**：记在下一枚 commit 之后（本件与它同程提交；未跑出的读数不预先引用）。
+**AC#3 那一格**：
+
+```
+$ git log --oneline -1
+24d1c09b 164-r1 AC#3: task.output 落地，截断必须带能找回全文的指针
+$ git -c core.quotePath=false show --name-only HEAD        （尾部四枚路径）
+cmd/wisp/run.go
+docs/evidence/s1/164-task-output-impl-r1-ac2-ac3.md
+internal/tools/task.go
+internal/tools/task_output_leg_test.go
+```
+
+**票面 Progress log 那一枚 commit**：本件与它同程提交，故其记录只能写"见 `git log --oneline -3`"——本程**不预先引用**还没跑出来的号。
 
 ---
 
