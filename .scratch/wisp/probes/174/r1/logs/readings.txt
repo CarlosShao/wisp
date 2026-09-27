@@ -1,0 +1,39 @@
+==== 174-r1 BEFORE arm, label=before ====
+[A-outside] spill path=C:\Users\swq\AppData\Local\Temp\TestProbe174R1PointerHonestyBefore398114459\001\artifacts\tool-output-call-1.txt
+[A-outside] isError=false truncated=true announcement="[…输出已落文件：省略 48833 字符，总长 51633 字节 / 约 12908 token，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe174R1PointerHonestyBefore398114459\\001\\artifacts\\tool-output-call-1.txt…]"
+[A-outside] 提到读不到=false 提到不存在=false 提到不是一般文件=false 提到未接线=false 全文见=true 不可找回=false
+[A-outside] the fact behind the words, fs.read on that path: isError=true level=L2 class="user_rejected" text="L2 审批通道尚未接入（票 21），已拒绝执行"
+[B-ghost] path-said="[…输出已落文件：省略 48833 字符，总长 51633 字节 / 约 12908 token，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe174R1PointerHonestyBefore398114459\\001\\artifacts\\tool-output-does-not-exist.txt…]"
+[B-ghost] 提到读不到=false 提到不存在=false 提到不是一般文件=false 提到未接线=false 全文见=true 不可找回=false
+[B-dir] path-said="[…输出已落文件：省略 48833 字符，总长 51633 字节 / 约 12908 token，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe174R1PointerHonestyBefore398114459\\001\\artifacts…]"
+[B-dir] 提到读不到=false 提到不存在=false 提到不是一般文件=false 提到未接线=false 全文见=true 不可找回=false
+[POS-ctrl] path-said="[…输出已落文件：省略 48833 字符，总长 51633 字节 / 约 12908 token，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe174R1PointerHonestyBefore398114459\\001\\artifacts\\inside-root-real-file.txt…]"
+[POS-ctrl] 提到读不到=false 提到不存在=false 提到不是一般文件=false 提到未接线=false 全文见=true 不可找回=false
+[POS-ctrl] fs.read of the control path: isError=false level=L0 bytes=51633 (whole file is 51633)
+==== 174-r1 BEFORE arm, label=before done ====
+==== 174-r1 AFTER arm (judge wired), label=after ====
+[after A-outside] dataDir=C:\Users\swq\AppData\Local\Temp\TestProbe174R1PointerHonestyAfter4174769956\001 artifacts=C:\Users\swq\AppData\Local\Temp\TestProbe174R1PointerHonestyAfter4174769956\001\artifacts spill=C:\Users\swq\AppData\Local\Temp\TestProbe174R1PointerHonestyAfter4174769956\001\artifacts\tool-output-call-1.txt
+[after A-outside] isError=false truncated=true announcement="[…输出已落文件：省略 48833 字符，总长 51633 字节 / 约 12908 token；注意：这条路径现在读不到，它不在你被授权的目录范围内，fs.read 会被拒；要用户先把所属目录加进 [fs] allowed_dirs 才读得回来，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe174R1PointerHonestyAfter4174769956\\001\\artifacts\\tool-output-call-1.txt…]"
+[after A-outside] 提到读不到=true 提到不存在=false 提到不是一般文件=false 提到未接线=false 全文见=true 不可找回=false
+[after A-outside] fs.read of that same path: isError=true level=L2 class="user_rejected"
+[after B-ghost] announcement="[…输出已落文件：省略 48833 字符，总长 51633 字节 / 约 12908 token；注意：这条路径现在读不到，宿主登记的那份副本文件并不存在，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe174R1PointerHonestyAfter4174769956\\001\\artifacts\\tool-output-does-not-exist.txt…]"
+[after B-ghost] 提到读不到=true 提到不存在=true 提到不是一般文件=false 提到未接线=false 全文见=true 不可找回=false
+[after B-dir] announcement="[…输出已落文件：省略 48833 字符，总长 51633 字节 / 约 12908 token；注意：这条路径现在读不到，它存在但不是一般文件（是目录或别的形状），全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe174R1PointerHonestyAfter4174769956\\001\\artifacts…]"
+[after B-dir] 提到读不到=true 提到不存在=false 提到不是一般文件=true 提到未接线=false 全文见=true 不可找回=false
+[after POS-ctrl] announcement="[…输出已落文件：省略 48833 字符，总长 51633 字节 / 约 12908 token，全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe174R1PointerHonestyAfter4174769956\\001\\artifacts\\inside-root-real-file.txt…]"
+[after POS-ctrl] 提到读不到=false 提到不存在=false 提到不是一般文件=false 提到未接线=false 全文见=true 不可找回=false
+[after POS-ctrl] fs.read of the control path: isError=false level=L0 bytes=51633 (whole file is 51633)
+==== 174-r1 AFTER arm, label=after done ====
+==== 174-r1 BEFORE arm, label=after-nojudge ====
+[A-outside] spill path=C:\Users\swq\AppData\Local\Temp\TestProbe174R1PointerHonestyBefore2912642579\001\artifacts\tool-output-call-1.txt
+[A-outside] isError=false truncated=true announcement="[…输出已落文件：省略 48833 字符，总长 51633 字节 / 约 12908 token；注意：路径授权判定者未接线（fail-closed：C26 没接进来，这条路径是否还读得回来无法核实，按读不到处理），全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe174R1PointerHonestyBefore2912642579\\001\\artifacts\\tool-output-call-1.txt…]"
+[A-outside] 提到读不到=true 提到不存在=false 提到不是一般文件=false 提到未接线=true 全文见=true 不可找回=false
+[A-outside] the fact behind the words, fs.read on that path: isError=true level=L2 class="user_rejected" text="L2 审批通道尚未接入（票 21），已拒绝执行"
+[B-ghost] path-said="[…输出已落文件：省略 48833 字符，总长 51633 字节 / 约 12908 token；注意：路径授权判定者未接线（fail-closed：C26 没接进来，这条路径是否还读得回来无法核实，按读不到处理），全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe174R1PointerHonestyBefore2912642579\\001\\artifacts\\tool-output-does-not-exist.txt…]"
+[B-ghost] 提到读不到=true 提到不存在=false 提到不是一般文件=false 提到未接线=true 全文见=true 不可找回=false
+[B-dir] path-said="[…输出已落文件：省略 48833 字符，总长 51633 字节 / 约 12908 token；注意：路径授权判定者未接线（fail-closed：C26 没接进来，这条路径是否还读得回来无法核实，按读不到处理），全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe174R1PointerHonestyBefore2912642579\\001\\artifacts…]"
+[B-dir] 提到读不到=true 提到不存在=false 提到不是一般文件=false 提到未接线=true 全文见=true 不可找回=false
+[POS-ctrl] path-said="[…输出已落文件：省略 48833 字符，总长 51633 字节 / 约 12908 token；注意：路径授权判定者未接线（fail-closed：C26 没接进来，这条路径是否还读得回来无法核实，按读不到处理），全文见 C:\\Users\\swq\\AppData\\Local\\Temp\\TestProbe174R1PointerHonestyBefore2912642579\\001\\artifacts\\inside-root-real-file.txt…]"
+[POS-ctrl] 提到读不到=true 提到不存在=false 提到不是一般文件=false 提到未接线=true 全文见=true 不可找回=false
+[POS-ctrl] fs.read of the control path: isError=false level=L0 bytes=51633 (whole file is 51633)
+==== 174-r1 BEFORE arm, label=after-nojudge done ====
