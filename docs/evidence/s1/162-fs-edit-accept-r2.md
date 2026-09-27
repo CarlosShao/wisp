@@ -91,4 +91,40 @@ would decoded old match file bytes [2:5]=bf 61 6c ? false
 
 ⇒ 这一形**根本进不来**（编、解两向都回不来那三个字节），不是"修好了"；①唯一可达形＝"覆盖整枚 BOM"，而那形有响亮拒（本程 2b）。`TestFSEditCannotBeFedAPartialBOMThroughJSON` 两向读数与本程独立复算一致。
 
-<!-- 后续格逐格追加 -->
+## 3. 件② 那半格反向尺 —— 判语：**成立**（最硬一问：那句话**成立**，v1 两枚绿**不是洞**）
+
+**最硬的一问先答**：派单要求"要么找到一发非恒等的强制改行尾（＝假闭退回），要么独立复算支持它"。本程**独立复算支持**，过程如下。
+
+1. **M-3 副本亲验**（`.scratch/wisp/probes/162/r3/mut/m3/fs_edit.go`，diff 对 `ff000784` 原件）：变异体＝
+   `updated := strings.ReplaceAll(strings.ReplaceAll(b.String(), "\r\n", "\n"), "\n", "\r\n")`——先塌后涨。
+   代数复算：**纯 CRLF**（无裸 `\r` 无裸 `\n`）塌成 LF 再涨回 CRLF＝逐字节恒等；**纯 CR**（既无 `\r\n` 也无 `\n`）两遍 ReplaceAll 都不可作用＝恒等；**含裸 LF 的混合**（裸 LF 被涨成 CRLF）＝非恒等；**纯 LF**＝非恒等。副本反扫 `present=1/absent=0`（`MUT-R3 same shape` 在、`updated := b.String()` 0 命中）＝变异非静默。**找不到任何"对纯 CRLF 或纯 CR 非恒等、又配得上'强制 CRLF'这个名字"的改法**——若把强制写成裸 `\n`→`\r\n` 不先塌（会造出 `\r\r\n`），那已经不是"盖约定"而是"损坏字节"，v1 正向那枚逐字节相等断言当场就能抓（本程 4 验证同一判断：真红的全在非恒等形上）。
+2. **红绿名册本程亲跑**（`-overlay=r3/overlay-m3.json -run '^TestFSEdit'`，锚 HEAD；原始件 `probes/162/v2/logs/m3-on-r3.log`）：
+   - `TestFSEditLeavesNeitherTheCRLFNorTheBareLFOfAMixedFileRewritten` **红**（那半格要的正是这一条）；
+   - `TestFSEditOnACRLFFileAppliesACRLFSpelledOldAndStaysCRLF` **绿**、`TestFSEditLineEndingForensicsRefusesRealSpellings` **绿**——v1 点名的两枚复算仍绿；
+   - 新尺在 base overlay（未修码）与修码后都绿（§4 恒真栏）＝它不是"喂什么都会响"。
+3. **两枚绿的"为什么绿"各有结构性理由（读断言本体，不是听转述）**：CRLF 正向那枚夹具＝纯 CRLF、old/new 全 CRLF 拼写，M-3 对它的落盘字节是恒等（1 的复算）⇒ **该夹具形状上不可能长出对这一族变异的判别力**；五形取证那枚每一腿都在**写入之前** 0 命中拒掉（`fs_edit_ac34_test.go:328-329` 断"拒＋文件未动"）⇒ 落盘期的任何变异**物理上到不了它**。判别器唯一能长的形状＝"含 CRLF、又不是只有 CRLF"——正是新尺的 22 字节混合夹具。**结论：那半格不是假闭。**
+4. **一处时序漂移入账（不返工）**：本程 HEAD 上同一命令红 **12** 枚 ≠ r3 存档 logs 的 **11** 枚。差的那一枚＝`TestFSEditRealTaskkill…`（30.45s），红因**合法且正当**：M-3 把它的 LF 夹具目标盖成 CRLF，落盘前撞上②号守卫、子进程硬拒不写盘，父进程"30s 没等到 write:8 边界"响亮失败——恰是 r3 §4 那句"这一味现在有人会挡"的读数。r3 那一遍量于件②用例入库**之前**，两本账各对自己那一刻为真；登记给下一程，别让读者以为谁数错了。
+5. **残留一枚射程外盲点（只登记，不折进本格）**："改完还是 **CR**"方向今天没有任何落盘用例（纯 CR 只存在于取证那枚的**拒**腿里）——对"裸 CR→CRLF"这一族规范化，整包当前无红。它与 r3 自报的"混合行尾不被告知"同族、越出票面 `:37` 那两形 ⇒ 归 owner 新判据，不归本程加判。
+
+## 4. 件③ AC#4b 真硬杀 —— 判语：**成立**
+
+### 4a SKIP=0 复跑（本程口径＝编排者 16:52 同口径）
+
+```
+$ go test -count=1 -v ./internal/tools/    → rc=0
+RUN=150  顶层 PASS=101  FAIL=0  SKIP=0  panic=0
+--- PASS: TestA18RealTaskkillLeavesTheTargetWholeAndTheNextWriteReclaimsTheStagingFile (0.98s)
+--- PASS: TestFSEditRealTaskkillLeavesTheTargetWholeAndNamesTheStagingResidue (0.68s)
+```
+
+与派单转述的"101/0/0"对上；本格与 A18 同遍 PASS＝"本机有分母"的凭据独立成立（非推论）。
+`t.Skip` 复核：`grep -n "t\.Skip"` 该文件 1 命中、位置＝`:36` **注释句**（"There is no t.Skip in this file"）——真调用 0 枚；`taskkill` 缺失走 `t.Fatalf`（`:159`）＝硬失败不静退。**"非 Windows 那一支未经验证"这个措辞：认。** `//go:build windows` 使它在 Linux 上根本不进编译，既无分母也无读数，诚实标法只有这一种。
+
+### 4b 三条判据逐条复算
+
+- **(a) 字节**：本程跑内读数 `fs_edit_ac4b_kill_windows_test.go:220`＝目标 31 字节＝改前原文、74 字节 `"ALPHA-KILLED…"` 一字未现；`:214` 的 `HasPrefix(got,intended)`／`Contains(got,new)` 反向断言在位。尺非死开关：本程 M-4 overlay 亲跑该枚（`logs/m4-on-ac4b.log`）⇒ **红于 :210 `got 4 字节 41 4c 50 48`**，与 r3 读数同向；`(b)` 被 `(a)` 挡＝编排者 16:5x 已裁"故意不改是对的"，本程复核无新证据翻它。
+- **(b) 残件点名**：本程遍内 `:253` 点名 `.wisp-tmp-5c06588b-36180-1572977897`（4 字节、内容 `"ALPH"`＝新内容前 4 字节，`len!=1` 即 `t.Fatalf`）——形状与 r3 那枚逐字节同款，**可重跑性由本程这一遍亲证**。⚠ **一处持续性更正**：本程跑后 `find %TEMP%`（只读）＝r3 具名残件与本程残件都已不在盘上——用例 PASS 后 Go 的 `t.TempDir()` 收尾连目录一起收（§5b 自注"目录级回收是 Go 收尾做的"与此一致），所以"残件留在盘上等回收"**只在执行窗内为真**，可复核凭据是那行点名日志而不是那个文件本身。判语不受影响（断言在窗内、先量残件后跑 fs.read 的顺序在码上）；措辞入账。本程全程**没清、没还原、也无法清**（不存在可清之物）。
+- **清扫器那枚小账（编排者"顺手判一下"，判语如下）**：**不必在本格钉用例，机制已有尺。** 现量：清扫器＝`reclaimStaging`（定义 `fs_staging.go:192`），调用点在**共用的** `stageAndRename` 内（`fs_write.go:288`，先扫后 `CreateTemp`），`fs.edit` 恰走这一枚函数（`fs_edit.go:271`）；"下一次写盘带走残件"这一行为已被 A18 的第③子例钉住（`bridge_a18_kill_windows_test.go:216 the_next_write_reclaims_the_staging_residue`）＋ `fs_staging_windows_test.go` 两腿。缺的只是"`fs.edit` 杀后 → 下一次写盘"这一特定链条的点名回归——属共享层之上的归因糖，**建议归 AC#6 那程一并处理**（r3 §12 第 5 条的最小形状可用），不因它退回、不因它加派。
+
+<!-- 后续格追加 -->
+
