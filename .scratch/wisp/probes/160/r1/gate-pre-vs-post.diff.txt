@@ -1,0 +1,206 @@
+2c2
+< # 生成时刻 2026-09-27T11:21:19+08:00
+---
+> # 生成时刻 2026-09-27T11:44:57+08:00
+30,32c30,34
+< HEAD:cmd/wisp/panel_assets.go:232:	prov.OpenScope(taintSourceScopeID)
+< HEAD:internal/tools/bridge.go:642:		b.prov.OpenScope(taskID)
+< HEAD:internal/tools/bridge.go:695:		b.prov.CloseScope(taskID)
+---
+> HEAD:cmd/wisp/panel_assets.go:168:// has to admit: OpenScope now hands back the *Scope that owns the close, and
+> HEAD:cmd/wisp/panel_assets.go:240:	// Discarded on purpose, and named so: the handle OpenScope hands back is
+> HEAD:cmd/wisp/panel_assets.go:243:	_ = prov.OpenScope(taintSourceScopeID)
+> HEAD:internal/tools/bridge.go:628:// risk.OpenScope now hands back the *Scope that owns the close, and the bridge
+> HEAD:internal/tools/bridge.go:648:	b.scopes[taskID] = b.prov.OpenScope(taskID)
+35c37,38
+< # 未成对枚数＝1   （0＝这把尺没响／>0＝逐枚点名如上）
+---
+> #   UNPAIRED internal/tools/bridge.go (开方调用点=1)  # 同文件另见收尾动词，判「真漏／委托」
+> # 未成对枚数＝2   （0＝这把尺没响／>0＝逐枚点名如上）
+37c40
+< # rc=1   （本枚子句的响＝未成对枚数；0＝不响）
+---
+> # rc=2   （本枚子句的响＝未成对枚数；0＝不响）
+53,54c56,57
+< HEAD:internal/tools/bridge.go:642:		b.prov.OpenScope(taskID)
+< HEAD:internal/tools/bridge.go:695:		b.prov.CloseScope(taskID)
+---
+> HEAD:internal/tools/bridge.go:628:// risk.OpenScope now hands back the *Scope that owns the close, and the bridge
+> HEAD:internal/tools/bridge.go:648:	b.scopes[taskID] = b.prov.OpenScope(taskID)
+56,57c59,60
+< #   （空）
+< # 未成对枚数＝0   （0＝这把尺没响／>0＝逐枚点名如上）
+---
+> #   UNPAIRED internal/tools/bridge.go (开方调用点=1)  # 同文件另见收尾动词，判「真漏／委托」
+> # 未成对枚数＝1   （0＝这把尺没响／>0＝逐枚点名如上）
+59c62
+< # rc=0   （本枚子句的响＝未成对枚数；0＝不响）
+---
+> # rc=1   （本枚子句的响＝未成对枚数；0＝不响）
+66,77c69,86
+< HEAD:cmd/wisp/panel_assets.go:232:	prov.OpenScope(taintSourceScopeID)
+< HEAD:internal/risk/provenance.go:56:// 21, 22, 26) must (1) OpenScope at task start and Defer(CloseScope) on the
+< HEAD:internal/risk/provenance.go:337:// OpenScope registers a task/session scope (composition root calls this at
+< HEAD:internal/risk/provenance.go:339:func (p *Provenance) OpenScope(scopeID string) {
+< HEAD:internal/risk/provenance.go:347:// CloseScope drops every taint bound to a scope (wire via
+< HEAD:internal/risk/provenance.go:348:// disposalScope.Defer(p.CloseScope) — disposal MUST not leak taints past the
+< HEAD:internal/risk/provenance.go:350:func (p *Provenance) CloseScope(scopeID string) {
+< HEAD:internal/risk/provenance.go:387:		logf("risk/C25: scope %q not open (CloseScope raced or composition gap); taint stored — it cannot leak into other scopes", scopeID)
+< HEAD:internal/risk/provenance.go:438:// OpenScope, or Inspect after CloseScope) while the engine holds taints in
+< HEAD:internal/risk/provenance.go:453:			logf("risk/C25: Inspect/CheckText on unregistered scope %q while other scopes hold taints: fail-closed R4 (ensure OpenScope at task start)", scopeID)
+< HEAD:internal/risk/provenance.go:477:			Origin: "scope is not open (OpenScope missing or already closed)",
+< HEAD:internal/risk/provenance.go:578:			Origin: "scope is not open (OpenScope missing or already closed)",
+---
+> HEAD:cmd/wisp/panel_assets.go:168:// has to admit: OpenScope now hands back the *Scope that owns the close, and
+> HEAD:cmd/wisp/panel_assets.go:240:	// Discarded on purpose, and named so: the handle OpenScope hands back is
+> HEAD:cmd/wisp/panel_assets.go:243:	_ = prov.OpenScope(taintSourceScopeID)
+> HEAD:internal/risk/provenance.go:17:// (ticket 160's lifetime rule: OpenScope hands back a *Scope, and that handle —
+> HEAD:internal/risk/provenance.go:59:// 21, 22, 26) must (1) OpenScope at task start and close what it handed back on
+> HEAD:internal/risk/provenance.go:60:// the boundary that owns the task — LANDED as a SHAPE by ticket 160: OpenScope
+> HEAD:internal/risk/provenance.go:260:// owner is nil for a registration that Mark created out of a missing OpenScope
+> HEAD:internal/risk/provenance.go:361:// functions — OpenScope(id) and CloseScope(id) — so any caller anywhere could
+> HEAD:internal/risk/provenance.go:368:// Go imposes no use-the-return-value rule, so `p.OpenScope(id)` as a statement
+> HEAD:internal/risk/provenance.go:374:// Scope is the handle OpenScope issues. It is the only thing that can close the
+> HEAD:internal/risk/provenance.go:449:// OpenScope registers a task/session scope (composition root calls this at task
+> HEAD:internal/risk/provenance.go:456:func (p *Provenance) OpenScope(scopeID string) *Scope {
+> HEAD:internal/risk/provenance.go:500:		logf("risk/C25: scope %q not open (no OpenScope for it, or its handle already closed); taint stored — it cannot leak into other scopes", scopeID)
+> HEAD:internal/risk/provenance.go:557:// OpenScope, or closed by its own handle) while the engine holds taints in
+> HEAD:internal/risk/provenance.go:562:// by-id CloseScope gone, the only way to reach "not registered" is a handle
+> HEAD:internal/risk/provenance.go:579:			logf("risk/C25: Inspect/CheckText on unregistered scope %q while other scopes hold taints: fail-closed R4 (ensure OpenScope at task start)", scopeID)
+> HEAD:internal/risk/provenance.go:603:			Origin: "scope is not open (no OpenScope for this id, or its own handle closed it)",
+> HEAD:internal/risk/provenance.go:704:			Origin: "scope is not open (no OpenScope for this id, or its own handle closed it)",
+79,93c88,108
+< HEAD:internal/risk/provenance_test.go:23:	p.OpenScope("task-1")
+< HEAD:internal/risk/provenance_test.go:297:	p.OpenScope("task-2")
+< HEAD:internal/risk/provenance_test.go:309:	p.OpenScope("session-1")
+< HEAD:internal/risk/provenance_test.go:310:	scope.Defer(func() { p.CloseScope("session-1") })
+< HEAD:internal/risk/provenance_test.go:322:	p.OpenScope("session-2")
+< HEAD:internal/risk/provenance_test.go:340:	p.OpenScope("task-1")
+< HEAD:internal/risk/provenance_test.go:358:	p.CloseScope("task-1")
+< HEAD:internal/risk/provenance_test.go:359:	p.OpenScope("task-2")
+< HEAD:internal/risk/provenance_test.go:364:	p.CloseScope("task-2") // disposes the taints -> engine empty again
+< HEAD:internal/risk/provenance_test.go:454:	p.OpenScope("task-1")
+< HEAD:internal/risk/provenance_test.go:722:	p2.OpenScope("s")
+< HEAD:internal/risk/provenance_test.go:780:	p.OpenScope("s")
+< HEAD:internal/risk/provenance_test.go:792:	p.OpenScope("s")
+< HEAD:internal/risk/provenance_test.go:798:	p2.OpenScope("s")
+< HEAD:internal/risk/provenance_test.go:812:	p.OpenScope("s")
+---
+> HEAD:internal/risk/provenance_test.go:24:	p.OpenScope("task-1")
+> HEAD:internal/risk/provenance_test.go:298:	p.OpenScope("task-2")
+> HEAD:internal/risk/provenance_test.go:310:	handle := p.OpenScope("session-1") // ticket 160: the handle is what closes it
+> HEAD:internal/risk/provenance_test.go:312:		// Stricter than the old p.CloseScope("session-1") line, which could not
+> HEAD:internal/risk/provenance_test.go:329:	p.OpenScope("session-2")
+> HEAD:internal/risk/provenance_test.go:339:// package's four p.CloseScope(id) calls with this: the old calls could not
+> HEAD:internal/risk/provenance_test.go:357:	h1 := p.OpenScope("task-1")
+> HEAD:internal/risk/provenance_test.go:376:	h2 := p.OpenScope("task-2")
+> HEAD:internal/risk/provenance_test.go:471:	p.OpenScope("task-1")
+> HEAD:internal/risk/provenance_test.go:739:	p2.OpenScope("s")
+> HEAD:internal/risk/provenance_test.go:797:	p.OpenScope("s")
+> HEAD:internal/risk/provenance_test.go:809:	p.OpenScope("s")
+> HEAD:internal/risk/provenance_test.go:815:	p2.OpenScope("s")
+> HEAD:internal/risk/provenance_test.go:829:	p.OpenScope("s")
+> HEAD:internal/risk/provenance_test.go:908:	stale := p.OpenScope("task-victim") // generation 1 opens it
+> HEAD:internal/risk/provenance_test.go:909:	fresh := p.OpenScope("task-victim") // the task restarts: ownership moves
+> HEAD:internal/risk/provenance_test.go:938:	stale := p.OpenScope("task-victim")
+> HEAD:internal/risk/provenance_test.go:939:	fresh := p.OpenScope("task-victim") // same id, empty: no taint anywhere in the engine
+> HEAD:internal/risk/provenance_test.go:956:	h := p.OpenScope("task-1")
+> HEAD:internal/risk/provenance_test.go:971:	reborn := p.OpenScope("task-1")
+> HEAD:internal/risk/provenance_test.go:989:	h := p.OpenScope("task-1")
+100,105c115,119
+< HEAD:internal/risk/taintmatch_test.go:176:	p.OpenScope("s")
+< HEAD:internal/risk/taintmatch_test.go:181:		p.CloseScope("s")
+< HEAD:internal/risk/taintmatch_test.go:182:		p.OpenScope("s")
+< HEAD:internal/risk/taintmatch_test.go:190:	p.OpenScope("s")
+< HEAD:internal/tools/bridge.go:642:		b.prov.OpenScope(taskID)
+< HEAD:internal/tools/bridge.go:695:		b.prov.CloseScope(taskID)
+---
+> HEAD:internal/risk/taintmatch_test.go:176:	h := p.OpenScope("s")
+> HEAD:internal/risk/taintmatch_test.go:184:		h = p.OpenScope("s")
+> HEAD:internal/risk/taintmatch_test.go:192:	p.OpenScope("s")
+> HEAD:internal/tools/bridge.go:628:// risk.OpenScope now hands back the *Scope that owns the close, and the bridge
+> HEAD:internal/tools/bridge.go:648:	b.scopes[taskID] = b.prov.OpenScope(taskID)
+108a123
+> #   UNPAIRED internal/risk/provenance.go (开方调用点=5)  # 同文件另见收尾动词，判「真漏／委托」
+109a125
+> #   UNPAIRED internal/risk/provenance_test.go (开方调用点=19)  # 同文件另见收尾动词，判「真漏／委托」
+113c129,131
+< # 未成对枚数＝5   （0＝这把尺没响／>0＝逐枚点名如上）
+---
+> #   UNPAIRED internal/risk/taintmatch_test.go (开方调用点=3)
+> #   UNPAIRED internal/tools/bridge.go (开方调用点=1)  # 同文件另见收尾动词，判「真漏／委托」
+> # 未成对枚数＝9   （0＝这把尺没响／>0＝逐枚点名如上）
+115c133
+< # rc=5   （本枚子句的响＝未成对枚数；0＝不响）
+---
+> # rc=9   （本枚子句的响＝未成对枚数；0＝不响）
+159,162c177,180
+< HEAD:internal/tools/bridge.go:632:// construction: read CloseTask before adding a caller that opens a scope.
+< HEAD:internal/tools/bridge.go:633:func (b *Bridge) OpenTask(taskID string) {
+< HEAD:internal/tools/bridge.go:646:// CloseTask closes one task's taint scope. The composition root defers this on
+< HEAD:internal/tools/bridge.go:684:func (b *Bridge) CloseTask(taskID string) {
+---
+> HEAD:internal/tools/bridge.go:636:// calls, and a caller that opens a scope and never reaches CloseTask still
+> HEAD:internal/tools/bridge.go:639:func (b *Bridge) OpenTask(taskID string) {
+> HEAD:internal/tools/bridge.go:651:// CloseTask closes one task's taint scope. The composition root defers this on
+> HEAD:internal/tools/bridge.go:689:func (b *Bridge) CloseTask(taskID string) {
+186,189c204,207
+< HEAD:internal/tools/bridge.go:632:// construction: read CloseTask before adding a caller that opens a scope.
+< HEAD:internal/tools/bridge.go:633:func (b *Bridge) OpenTask(taskID string) {
+< HEAD:internal/tools/bridge.go:646:// CloseTask closes one task's taint scope. The composition root defers this on
+< HEAD:internal/tools/bridge.go:684:func (b *Bridge) CloseTask(taskID string) {
+---
+> HEAD:internal/tools/bridge.go:636:// calls, and a caller that opens a scope and never reaches CloseTask still
+> HEAD:internal/tools/bridge.go:639:func (b *Bridge) OpenTask(taskID string) {
+> HEAD:internal/tools/bridge.go:651:// CloseTask closes one task's taint scope. The composition root defers this on
+> HEAD:internal/tools/bridge.go:689:func (b *Bridge) CloseTask(taskID string) {
+194,196c212,214
+< HEAD:internal/tools/bridge_scope_open_ticket158_test.go:113:			"bridge.scopes 里没有 %q。这一味（mark 里的 b.OpenTask）是本包对 C25 开侧唯一的"+
+< HEAD:internal/tools/bridge_scope_open_ticket158_test.go:118:	b.CloseTask(taintedTask)
+< HEAD:internal/tools/bridge_scope_open_ticket158_test.go:130:			"（was_open=false 就是开侧那一味丢了的形状：CloseTask 会照常打点、"+
+---
+> HEAD:internal/tools/bridge_scope_open_ticket158_test.go:116:			"bridge.scopes 里没有 %q。这一味（mark 里的 b.OpenTask）是本包对 C25 开侧唯一的"+
+> HEAD:internal/tools/bridge_scope_open_ticket158_test.go:121:	b.CloseTask(taintedTask)
+> HEAD:internal/tools/bridge_scope_open_ticket158_test.go:133:			"（was_open=false 就是开侧那一味丢了的形状：CloseTask 会照常打点、"+
+235,239c253,256
+< HEAD:internal/risk/provenance.go:16:// (the DisposalScope lifetime — scopes are opened by the composition root and
+< HEAD:internal/risk/provenance.go:56:// 21, 22, 26) must (1) OpenScope at task start and Defer(CloseScope) on the
+< HEAD:internal/risk/provenance.go:57:// task's DisposalScope, (2) call Mark(...) on every SPEC-06 §5 sensitive
+< HEAD:internal/risk/provenance.go:335:// --- scope lifetime (DisposalScope binding) ----------------------------------
+< HEAD:internal/risk/provenance.go:348:// disposalScope.Defer(p.CloseScope) — disposal MUST not leak taints past the
+---
+> HEAD:internal/risk/provenance.go:19:// the session's DisposalScope and a new session never inherits old taints).
+> HEAD:internal/risk/provenance.go:62:// does not hold it. Still OPEN inside (1): the "Defer it onto the task's
+> HEAD:internal/risk/provenance.go:63:// DisposalScope" half, because no *plugin.DisposalScope reaches tools/agent/cmd
+> HEAD:internal/risk/provenance.go:423:// disposalScope.Defer(func() { _ = scope.Close() }) — the handle, not the id,
+362,370c379,388
+< HEAD:internal/risk/provenance.go:16:// (the DisposalScope lifetime — scopes are opened by the composition root and
+< HEAD:internal/risk/provenance.go:56:// 21, 22, 26) must (1) OpenScope at task start and Defer(CloseScope) on the
+< HEAD:internal/risk/provenance.go:57:// task's DisposalScope, (2) call Mark(...) on every SPEC-06 §5 sensitive
+< HEAD:internal/risk/provenance.go:335:// --- scope lifetime (DisposalScope binding) ----------------------------------
+< HEAD:internal/risk/provenance.go:348:// disposalScope.Defer(p.CloseScope) — disposal MUST not leak taints past the
+< HEAD:internal/risk/provenance_test.go:293:// --- scope lifetime / DisposalScope (AC #5) ----------------------------------
+< HEAD:internal/risk/provenance_test.go:305:	// C11/DisposalScope binding: closing the scope (session end) must drop
+< HEAD:internal/risk/provenance_test.go:307:	scope := plugin.NewDisposalScope("session-1", context.Background())
+< HEAD:internal/risk/provenance_test.go:310:	scope.Defer(func() { p.CloseScope("session-1") })
+---
+> HEAD:internal/risk/provenance.go:19:// the session's DisposalScope and a new session never inherits old taints).
+> HEAD:internal/risk/provenance.go:62:// does not hold it. Still OPEN inside (1): the "Defer it onto the task's
+> HEAD:internal/risk/provenance.go:63:// DisposalScope" half, because no *plugin.DisposalScope reaches tools/agent/cmd
+> HEAD:internal/risk/provenance.go:423:// disposalScope.Defer(func() { _ = scope.Close() }) — the handle, not the id,
+> HEAD:internal/risk/provenance_test.go:294:// --- scope lifetime / DisposalScope (AC #5) ----------------------------------
+> HEAD:internal/risk/provenance_test.go:306:	// C11/DisposalScope binding: closing the scope (session end) must drop
+> HEAD:internal/risk/provenance_test.go:308:	scope := plugin.NewDisposalScope("session-1", context.Background())
+> HEAD:internal/risk/provenance_test.go:311:	scope.Defer(func() {
+> HEAD:internal/risk/provenance_test.go:313:		// fail: a Defer-ed closer that cannot close its own scope is the bug.
+> HEAD:internal/risk/provenance_test.go:315:			t.Errorf("DisposalScope must be able to close the scope it was handed: %v", err)
+396c414
+< # ok   腿=G5pos 声明=quiet 实测=quiet
+---
+> # BAD  腿=G5pos 声明=quiet 实测=ring
+404,405c422,423
+< # 腿数＝14 声明与实测不符＝0
+< # 聚合退码＝0   （0＝每一腿的响与不响都和自己登记的声明一致；>0＝有腿言行不一）
+---
+> # 腿数＝14 声明与实测不符＝1
+> # 聚合退码＝1   （0＝每一腿的响与不响都和自己登记的声明一致；>0＝有腿言行不一）

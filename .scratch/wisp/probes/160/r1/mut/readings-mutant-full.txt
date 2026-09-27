@@ -1,0 +1,6 @@
+--- FAIL: TestScopeCloseRefusesAnotherOwnersRegistration (0.01s)
+--- FAIL: TestScopeCloseRefusedOnEmptyRegistrationIsStillVisible (0.01s)
+--- SKIP: TestSyncRegistryProbeLive (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	4.804s
+FAIL

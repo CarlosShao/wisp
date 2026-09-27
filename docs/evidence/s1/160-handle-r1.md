@@ -190,3 +190,78 @@ internal/risk/provenance.go:58   internal/tools/bridge.go:627   cmd/wisp/panel_a
 
 1. **审计行格式变了**：`internal/tools/bridge.go:697-698` 追加 `close_err=%v`。改它的理由是判据 (i)"失败必须外部可见（不是只多一行日志）"——审计行是这条腿唯一跨包可见的口，不带上就把认身份的拒绝又变回包内私事。两枚现存读它的用例（`internal/tools/bridge_scope_open_ticket158_test.go` 判据 2、`cmd/wisp/task_scope_close_151_test.go` 两枚）**按 substring 匹配**，本程 `internal/tools` 全绿实测；`cmd/wisp` 那两枚受 DLL 环境影响，读数在 §5。
 2. **G5 这把尺的合方词根失效**：G5 数的是"`OpenScope` 有没有配 `CloseScope`"（`.scratch/wisp/probes/154/gate-clauses.sh:205-206`），而 `CloseScope` 今天整枚消失 ⇒ 全仓合方名册变空。本程改前两次现量都是 1 枚（`gate-pre-change-HEAD.txt`／`gate-pre-change-HEAD-repeat.txt`），改后读数在 §6 现跑现填。**这一格是票 158／161 的地界（`probes/154/**` 不在本程写面），本程不改它，只把读数交回去。**
+
+---
+
+## 5. 第③格＝AC#3 —— 反向判据，两问都答（台件：`probes/160/r1/mut/`，**零改动 `internal/`**）
+
+**台件怎么做到不动生产码**：`go test -overlay=probes/160/r1/mut/overlay.json ./internal/risk/` —— 变异体
+`provenance.no-identity.go` 在编译期**替换** `internal/risk/provenance.go`，工作树全程
+`git status --porcelain -- internal/ cmd/` **空输出**（跑完现量在案）。变异内容＝把
+`Scope.Close` 里 `case reg.owner != s: return ErrScopeNotOwner` 那一味摘掉（其余全留），
+就是 160-c1 LEG 4 那枚 `CloseAny(scopeID)` 形状放回真码。
+
+### 第一问：摘掉"认身份"，是否存在一发跨包误关从此打不红？—— **存在，且改前全仓零枚尺吃得住**
+
+| Build | `internal/risk` 全量（`-v` 逐名） | 结果 |
+|---|---|---|
+| **装上（出货形状）** | 103 PASS／1 SKIP／0 FAIL，104 枚 | `ok 4.776s` |
+| **摘掉认身份（overlay 变异体）** | **只有 2 枚红**：`TestScopeCloseRefusesAnotherOwnersRegistration`（`provenance_test.go:913` `a handle that no longer owns the id must be refused, got <nil>`）、`TestScopeCloseRefusedOnEmptyRegistrationIsStillVisible`（`:941` `empty registration must still refuse a non-owner, got <nil>`）；**其余 101 枚照绿，连 SKIP 那一枚都没变** | `FAIL 4.804s` |
+
+⇒ 那两枚正控**是本程造的**（改前不存在，160-c1 §2.5 的"正控今天不存在"这句被本程**实测复现**：同一变异体下，除这两枚之外**没有任何一枚现存包内断言会红**，包括 `TestDisposalScopeClearsTaints`／`TestInspectUnknownScopeIsEmptyStore`／`TestScopesNeverInherit` 这三枚最贴身的）。
+⇒ 判据成色：**装上＝绿／摘掉＝红，且只有这两枚红** ⇒ 这一味**承重**，不是装饰。两枚红都读的是**函数之外的三把量**（`error` 返回值、`ScopeTaints` 账本、`Inspect` 判决），"只多一行日志"的形状过不了。
+
+### 第二问：摘掉它，有没有任何**外部可见**读数变过？—— **没有一枚变过（跨包），这正是本味的承重证据**
+
+同一变异体打在跨包口上：`go test -overlay=… ./internal/tools/ -count=1 -v` → **`ok 14.852s`，零 FAIL**（出货形状 `ok 18.897s`，两枚读数同名同状态）。⇒ 160-c1 §2.5 列的三条"外部可见读数"（`bridge.go` 审计行的 `was_open`／`dropped`、`:453` 那条条件日志、`Origin` 串里 `already closed` 的混格）**在摘掉认身份之后一枚都不动** —— 那三条今天**不区分谁关的**，这句从〔转抄·他人锚〕升成〔本机读数〕。
+⇒ 唯一会动的跨包口是本程**新加**的 `close_err=%v` 那一格（变异体下它打成 `close_err=<nil>`），而它今天**没有任何 tools 侧用例钉着** —— 见 §7 残项 ①。
+
+---
+
+## 6. 门禁（三格全部落盘后跑，顺序照派单 §6）
+
+| 尺 | 命令 | 读数 |
+|---|---|---|
+| risk 四数＋名册差集 | `go test ./internal/risk/ -count=1 -v` 逐名，基线用 `-overlay` 把六枚改动文件映回 `34c0b4e4` 复跑 | 改前 **99 PASS／0 FAIL／1 SKIP／100 枚**；改后 **103／0／1／104**；**"改前有改后无"＝0 枚**（`comm -23` 空），新增 4 枚全是本程点名的正控（`pre-base/roster-risk-{pre,post}.txt`、`roster-risk-lost.txt`） |
+| tools | `go test ./internal/tools/ -count=1` | **ok 15.336s**（本程自己的基线：改前同一条命令 **ok 16.236s**；**未采用派单警告的 162-r1 那个 86**） |
+| vet | `go vet ./internal/risk/ ./internal/tools/ ./cmd/wisp/` | **rc=0**（生产码 `go build ./...` 亦 rc=0） |
+| cmd/wisp 健康 bench | `PATH=$PWD/third_party/sherpa-onnx:$PATH go test ./cmd/wisp/ -count=1` | **ok 115.178s** —— 换健康 bench 后**量得到**，且 `CloseTask` 那条腿唯一的机器两枚**逐名 PASS**：`TestCompositionRootClosesTheLoopTasksTaintScope (1.54s)`、`TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit (1.43s)`。⚠ 本机不接 PATH 时仍是 `0xc0000135`，**那是既有环境红，本程未把它算进自己头上** |
+| d22scan 自测 | `bash tools/d22scan/runtests.sh -C tools/d22scan ./...` | **OK — PASS=34 FAIL=0 SKIP=0，`[no tests to run]`=0** |
+| d22scan 主尺 | `sh scripts/d22scan.sh` | **rc=0**，`clean - no D22 ban violations` |
+| gofumpt | `command -v gofumpt` → **NOT ON PATH**；`ls ~/go/bin` → 空 | **本程未跑**（与 160-c1 §1 末条同一台机器同一缺件）。代用尺＝`gofmt -l $(git ls-files "*.go")`（甲形，已跟踪全集合）→ **0 行**；`gofmt -l internal/ cmd/` → 0 行 |
+
+### 6.1 计时红与真红逐名（派单 §5 要求）
+
+`TestResolvePerCallBudget`（`pathresolver_budget_norace_test.go:34`，阈值 1.000 ms/op，`thresholds.go` 一字节未动）：
+改前一趟 `ok 5.674s`、改后 `-v` 全量 **0 FAIL**，**本程四趟 risk 全量跑里它一枚都没红过**。
+⇒ 归类＝**本程未复现的既有计时噪声**（160-c1 §2.5 记到的是 1.200ms 那一趟）；**未动阈值、未 Skip、未改名**；真红：本程 **0 枚**。
+唯一 SKIP＝`TestSyncRegistryProbeLive`，**改前改后同一状态**（环境件，非本程引入）。
+
+### 6.2 ⚠ 本程造成的一道门 regress（不在写面，报回不修）
+
+`bash .scratch/wisp/probes/154/gate-clauses.sh HEAD` 改后 **rc=1**（改前 **rc=0**）：
+
+| 腿 | 改前 | 改后 |
+|---|---|---|
+| G5 主尺 | UNPAIRED **1 枚**（`cmd/wisp/panel_assets.go`） | UNPAIRED **2 枚**：`panel_assets.go` ＋ **`internal/tools/bridge.go`（假阳性——它今天照旧在 `CloseTask` 里关）** |
+| **G5 正控**（同尺再排掉 `panel_assets.go`，声明 quiet＝必须不响） | 0 枚，quiet | **1 枚，ring** ⇒ `BAD` |
+| 其余 13 腿（G1/G1b/G2/G3/G4/G5neg/G6±/G7±） | 全部与声明一致 | **全部不变，仍一致** |
+| 聚合退码 | **0** | **1** |
+
+读数文件：`gate-pre-change-HEAD.txt`／`gate-post-change-HEAD.txt`／`gate-pre-vs-post.diff.txt`（206 行）／`gate-aggregate-post.txt`。
+
+**根因**：`gate-clauses.sh:205-206` 那把尺的合方词根写死成 `CloseScope`，而 AC#2 判据 (iii) 选的支正是"**旧口子消失**"⇒ 合方词在全仓不再出现。
+**为什么本程不顺手修**：改它＝改 `probes/154/**`，那枚文件**不在派单 §7 的逐枚写面名单里**（禁改名单也没列它，属"没点名"而非"点名禁改"），而票 154/158/161 的证据件按行 diff 这份名册——本程一改就把三张已验收票的读数面动了。
+**给门 owner 的最小形状**（一句话，不需要新语义）：把 G5 的合方词根从 `CloseScope` 换成 `\bClose\b` 或 `Close Scope|scope.Close|Close()`，并把 `bridge.go` 那一枚 UNPAIRED 的"同文件另见收尾动词"注释升成判据；**不动 `want` 声明**。
+⇒ **本票 AC#2 与门 G5 之间不是一致而是互斥**：换形状必然让 G5 的正控腿响。这一格**必须**由非实现者裁一次，本程不自取。
+
+---
+
+## 7. 残项登记（本程没做／做不到／不在批准单位，逐条指名）
+
+1. **`close_err=%v` 那一格没有 tools 侧用例钉着**。要钉就得往 `internal/tools/bridge_scope_open_ticket158_test.go` 里**新增**断言，而 §7 写面只许本程对该文件做"签名连带的形状改动"（§4.5 那一枚 `!= nil`）。⇒ 交验收程判：留（＝跨包外部可见读数有一格没人守）或补一张票。
+2. **`Scope` 非并发安全（同一枚句柄上 race 两次 `Close`）**：`s.closed` 是句柄私有量、在 `p.mu` 之内读写，但两枚**不同**句柄关**不同** scope 完全安全；同一句柄并发关会给出两次 `nil`。文档已写明，未加锁（加锁要引入 per-handle 状态＝碰 D38，不在本单）。
+3. **`Mark` 造出来的无主登记（`scopeReg.owner == nil`）今天谁也关不掉**：这是 fail-closed 方向（丢污点＝开闸，`bridge.go:650-653` 原话同向），但它是**一枚新的、永久性的泄漏形**——改前 `CloseScope(id)` 还能收掉它。⇒ 属票面 `:35` **AC#4"明写它治不到什么"**那一格的射程，本单不含 AC#4，**只登记不裁**。
+4. **G5 regress**（§6.2）。
+5. **台账行号过期**：`docs/reports/pending-and-issues.md:7660` 逐字引 `provenance.go:55-61`，本程该段位移到 `:58-64`。禁改面，未动。
+6. **票面一格没勾**：票面 AC#4（`:35`）／AC#5（`:36`）不在派单 §7 的三格里，本程**不代勾票面**（进度由编排者代落）。

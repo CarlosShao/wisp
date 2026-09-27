@@ -1,0 +1,4 @@
+    provenance_test.go:913: a handle that no longer owns the id must be refused, got <nil>
+--- FAIL: TestScopeCloseRefusesAnotherOwnersRegistration (0.01s)
+    provenance_test.go:941: empty registration must still refuse a non-owner, got <nil>
+--- FAIL: TestScopeCloseRefusedOnEmptyRegistrationIsStillVisible (0.01s)

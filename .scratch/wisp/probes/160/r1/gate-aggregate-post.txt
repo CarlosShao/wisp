@@ -1,0 +1,15 @@
+# ok   腿=G1 声明=quiet 实测=quiet
+# ok   腿=G1b 声明=quiet 实测=quiet
+# ok   腿=G2 声明=ring 实测=ring
+# ok   腿=G3 声明=quiet 实测=quiet
+# ok   腿=G4 声明=quiet 实测=quiet
+# ok   腿=G5 声明=ring 实测=ring
+# BAD  腿=G5pos 声明=quiet 实测=ring
+# ok   腿=G5neg 声明=ring 实测=ring
+# ok   腿=G6 声明=ring 实测=ring
+# ok   腿=G6pos 声明=quiet 实测=quiet
+# ok   腿=G6neg 声明=ring 实测=ring
+# ok   腿=G7 声明=ring 实测=ring
+# ok   腿=G7pos 声明=quiet 实测=quiet
+# ok   腿=G7neg 声明=ring 实测=ring
+# 聚合退码＝1   （0＝每一腿的响与不响都和自己登记的声明一致；>0＝有腿言行不一）
