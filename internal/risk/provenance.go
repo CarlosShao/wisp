@@ -1,6 +1,7 @@
 package risk
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -13,8 +14,10 @@ import (
 // exfiltration channels (SPEC-06 §5, D33/F4, D30①, 16.9#1).
 //
 // Model: every sensitive-source read is Mark()ed under a task/session scope
-// (the DisposalScope lifetime — scopes are opened by the composition root and
-// Closed on Dispose, so a new session never inherits old taints). Before any
+// (ticket 160's lifetime rule: OpenScope hands back a *Scope, and that handle —
+// not the id — is what closes it, so the composition root defers the handle onto
+// the session's DisposalScope and a new session never inherits old taints).
+// Before any
 // call executes, Inspect() checks the outgoing parameters against every
 // tainted fragment in that scope; a >=8-char normalized contiguous fragment
 // hit is the R4 upgrade to L2, and the verdict names the source.
@@ -53,8 +56,14 @@ import (
 // prefer Inspect()/CheckText() directly (wiring lands with tickets 20/21/22/26).
 //
 // DEFERRED(C25-loop-wiring): the agent loop / tool providers (tickets 10, 20,
-// 21, 22, 26) must (1) OpenScope at task start and Defer(CloseScope) on the
-// task's DisposalScope, (2) call Mark(...) on every SPEC-06 §5 sensitive
+// 21, 22, 26) must (1) OpenScope at task start and close what it handed back on
+// the boundary that owns the task — LANDED as a SHAPE by ticket 160: OpenScope
+// now returns *Scope, the close is a method on it, and it refuses a caller who
+// does not hold it. Still OPEN inside (1): the "Defer it onto the task's
+// DisposalScope" half, because no *plugin.DisposalScope reaches tools/agent/cmd
+// in production today (160-c1 §2.2) and laying that pipe means touching
+// internal/agent — outside what ticket 160 was approved to open. Remaining
+// items, unchanged: (2) call Mark(...) on every SPEC-06 §5 sensitive
 // source output, (3) gate outgoing calls with Inspect(scope, tool, params)
 // (or CheckText for the TTS/HTTP-body channels), and (4) record the R4 source
 // name in the tool_call forensics row via the existing DAO — Hit.Fragment
@@ -232,7 +241,7 @@ type taintMark struct {
 // concurrent use.
 type Provenance struct {
 	mu       sync.RWMutex
-	scopes   map[string][]*taintMark
+	scopes   map[string]*scopeReg
 	minChars int
 	maxSrc   int
 	maxScan  int
@@ -240,6 +249,20 @@ type Provenance struct {
 	maxMarks int
 	channel  map[string][]string
 	sync     *syncSet
+}
+
+// scopeReg is ONE registration of one scope id: its taints and the single
+// handle entitled to drop them, in one value under one mutex. Ticket 160 put
+// those two halves together on purpose — internal/tools/bridge.go keeping its
+// own open-ledger beside the engine's was how ticket 158's blind spot got
+// written (a scope can only be in one book).
+//
+// owner is nil for a registration that Mark created out of a missing OpenScope
+// (the fail-closed marking path at Mark's head): nobody was ever issued a
+// handle for it, so nobody may close it either.
+type scopeReg struct {
+	marks []*taintMark
+	owner *Scope
 }
 
 // Hit describes one R4 taint finding.
@@ -306,7 +329,7 @@ func NewProvenance(o ProvOptions) *Provenance {
 		ch[t] = merged
 	}
 	p := &Provenance{
-		scopes:   map[string][]*taintMark{},
+		scopes:   map[string]*scopeReg{},
 		minChars: minChars,
 		maxSrc:   maxSrc,
 		maxScan:  maxScan,
@@ -332,25 +355,114 @@ func NewProvenance(o ProvOptions) *Provenance {
 	return p
 }
 
-// --- scope lifetime (DisposalScope binding) ----------------------------------
+// --- scope lifetime (handle carries its own closer) --------------------------
+//
+// This is ticket 160's shape. Before it, scope lifetime was TWO independent
+// functions — OpenScope(id) and CloseScope(id) — so any caller anywhere could
+// name any id, and "forgot to close" was only a breach of discipline. The
+// close side is now a method on the handle the open side hands back, and the
+// id it closes is a private field of that handle.
+//
+// What this does NOT buy, measured rather than claimed (see
+// docs/evidence/s1/160-handle-r1.md §3, rig .scratch/wisp/probes/160/r1/ac1/):
+// Go imposes no use-the-return-value rule, so `p.OpenScope(id)` as a statement
+// still compiles and still leaks. Forgetting to close stays a doorbell problem
+// (G5 in .scratch/wisp/probes/154/gate-clauses.sh, G6/G7 next to it). What this
+// DOES buy is the other half: what cannot be written any more is closing
+// somebody else's scope.
 
-// OpenScope registers a task/session scope (composition root calls this at
-// task start; idempotent).
-func (p *Provenance) OpenScope(scopeID string) {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	if _, ok := p.scopes[scopeID]; !ok {
-		p.scopes[scopeID] = nil
-	}
+// Scope is the handle OpenScope issues. It is the only thing that can close the
+// registration it was issued for: the id is unexported, so a caller cannot name
+// a scope it was not given, and Close checks that the engine still attributes
+// that id to this handle before it drops anything.
+//
+// A Scope is not safe to Close concurrently with itself (one Close racing
+// another on the SAME handle), and it is not a value to copy: copy it by
+// pointer. Different handles closing different scopes are independent and take
+// the engine's own lock.
+type Scope struct {
+	p      *Provenance
+	id     string
+	closed bool // set by this handle's own successful Close; the idempotence key
 }
 
-// CloseScope drops every taint bound to a scope (wire via
-// disposalScope.Defer(p.CloseScope) — disposal MUST not leak taints past the
-// session, AC: new sessions never inherit).
-func (p *Provenance) CloseScope(scopeID string) {
+// Errors returned by Scope.Close. Every refusal here is a return value, not a
+// log line: the caller can branch on it and a test can pin it.
+var (
+	// ErrScopeAlreadyClosed: this handle already closed this scope. Close is
+	// idempotent — the second call changes nothing and says so.
+	ErrScopeAlreadyClosed = errors.New("risk: scope already closed by this handle")
+	// ErrScopeNotOwner: the id is registered to a different handle now (it was
+	// re-opened by a newer owner, or a stale handle outlived its generation).
+	// This is the mis-close ticket 160 exists to refuse.
+	ErrScopeNotOwner = errors.New("risk: scope is registered to a different handle")
+	// ErrScopeNotOpen: nothing is registered under this id — already dropped by
+	// the owning handle.
+	ErrScopeNotOpen = errors.New("risk: scope is not open")
+)
+
+// ID reports the scope id this handle was issued for. Reading the id is not
+// owning the scope: this hands out no power to close, in this package or any
+// other — there is no by-id close route left to call.
+func (s *Scope) ID() string {
+	if s == nil {
+		return ""
+	}
+	return s.id
+}
+
+// Close drops every taint bound to this handle's scope, and is the only way to
+// do it. Returns nil on the one successful close; every refusal is one of the
+// three errors above and leaves the engine untouched (no marks dropped, so no
+// R4 window opens — the fail-closed direction, same rule as Mark's budget path).
+//
+// Idempotent in the sense the contract asks for: closing twice never panics and
+// never double-drops, the second call just reports ErrScopeAlreadyClosed.
+//
+// Wire it on the boundary that owns the task lifetime, e.g.
+// disposalScope.Defer(func() { _ = scope.Close() }) — the handle, not the id,
+// is what the deferred closure carries.
+func (s *Scope) Close() error {
+	if s == nil || s.p == nil {
+		return ErrScopeNotOpen
+	}
+	p := s.p
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	delete(p.scopes, scopeID)
+	if s.closed {
+		return ErrScopeAlreadyClosed
+	}
+	reg := p.scopes[s.id]
+	switch {
+	case reg == nil:
+		s.closed = true // nothing left to close; this handle is spent either way
+		return ErrScopeNotOpen
+	case reg.owner != s:
+		return ErrScopeNotOwner // someone else owns this id now — touch nothing
+	}
+	delete(p.scopes, s.id)
+	reg.owner = nil
+	s.closed = true
+	return nil
+}
+
+// OpenScope registers a task/session scope (composition root calls this at task
+// start) and HANDS BACK the handle that owns it.
+//
+// Re-opening a live id is allowed and is a change of ownership, not a no-op:
+// the returned handle becomes the registered owner, the previous one goes stale
+// and its Close starts answering ErrScopeNotOwner. The existing taints carry
+// over — re-opening must not silently drop marks, that would be fail-open.
+func (p *Provenance) OpenScope(scopeID string) *Scope {
+	s := &Scope{p: p, id: scopeID}
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	if reg := p.scopes[scopeID]; reg != nil {
+		reg.owner = s // new generation owns it; marks stay exactly as they were
+		return s
+	}
+	p.scopes[scopeID] = &scopeReg{owner: s}
+	return s
 }
 
 // Mark records one sensitive-source read in a scope. Provenance identity is
@@ -383,15 +495,18 @@ func (p *Provenance) Mark(scopeID, tool, origin, content string) bool {
 		at:  observe.NowWallUTC().Unix(),
 	}
 	p.mu.Lock()
-	if _, ok := p.scopes[scopeID]; !ok {
-		logf("risk/C25: scope %q not open (CloseScope raced or composition gap); taint stored — it cannot leak into other scopes", scopeID)
+	reg := p.scopes[scopeID]
+	if reg == nil {
+		logf("risk/C25: scope %q not open (no OpenScope for it, or its handle already closed); taint stored — it cannot leak into other scopes", scopeID)
+		reg = &scopeReg{} // no owner was ever issued: nobody may close it either
+		p.scopes[scopeID] = reg
 	}
-	if n := len(p.scopes[scopeID]); n >= p.maxMarks {
+	if n := len(reg.marks); n >= p.maxMarks {
 		// D32 memory budget exceeded: keep the taint (dropping it would be a
 		// fail-open) but make the budget miss visible for the SLO counters.
 		logf("risk/C25: scope %q holds %d tainted sources (MaxScopeSources=%d, D32 budget); keeping every taint — index memory grows past the budget, see docs/PRECHECK.md", scopeID, n, p.maxMarks)
 	}
-	p.scopes[scopeID] = append(p.scopes[scopeID], m)
+	reg.marks = append(reg.marks, m)
 	p.mu.Unlock()
 	if truncated {
 		logf("risk/C25: source %s origin=%q truncated to MaxSourceRunes=%d; fragments past the cap can be missed (documented residual)", tool, origin, p.maxSrc)
@@ -413,7 +528,11 @@ func (p *Provenance) ScopeTaints(scopeID string) []TaintInfo {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 	var out []TaintInfo
-	for _, m := range p.scopes[scopeID] {
+	reg := p.scopes[scopeID]
+	if reg == nil {
+		return nil
+	}
+	for _, m := range reg.marks {
 		out = append(out, TaintInfo{
 			ScopeID: scopeID, Tool: m.tool, Origin: m.origin,
 			RuneLen: m.idx.nrunes, MarkedAt: m.at,
@@ -435,21 +554,28 @@ const (
 
 // scopeMarks snapshots a scope's taint marks. The second result reports the
 // fail-closed condition: the scope id is not registered at all (typo, missing
-// OpenScope, or Inspect after CloseScope) while the engine holds taints in
+// OpenScope, or closed by its own handle) while the engine holds taints in
 // some scope — exactly the shape of the "wiring got the scope id wrong" bug,
 // which must upgrade rather than pass (adversarial report M-1).
+//
+// Ticket 160 note, since this function's third branch is what AC#3 pins: with
+// by-id CloseScope gone, the only way to reach "not registered" is a handle
+// that closed its own scope, or a call that never opened one. A foreign close
+// cannot land here any more — it is refused by Scope.Close before it touches
+// the map, which is the difference between "already closed by you" and "closed
+// by somebody else" that this ledger could not express before.
 func (p *Provenance) scopeMarks(scopeID string) ([]*taintMark, bool) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
-	marks := p.scopes[scopeID]
-	if len(marks) > 0 {
-		return marks[:len(marks):len(marks)], false // snapshot (append never mutates the shared prefix)
+	reg := p.scopes[scopeID]
+	if reg != nil && len(reg.marks) > 0 {
+		return reg.marks[:len(reg.marks):len(reg.marks)], false // snapshot (append never mutates the shared prefix)
 	}
-	if _, known := p.scopes[scopeID]; known {
+	if reg != nil {
 		return nil, false // opened and empty: this session read nothing tainted
 	}
-	for _, m := range p.scopes {
-		if len(m) > 0 {
+	for _, r := range p.scopes {
+		if len(r.marks) > 0 {
 			logf("risk/C25: Inspect/CheckText on unregistered scope %q while other scopes hold taints: fail-closed R4 (ensure OpenScope at task start)", scopeID)
 			return nil, true
 		}
@@ -474,7 +600,7 @@ func (p *Provenance) Inspect(scopeID, tool string, params map[string]any) (Hit, 
 	if unbound {
 		return Hit{
 			ScopeID: scopeID, Channel: ChUnknown, SrcTool: SrcUnboundScope,
-			Origin: "scope is not open (OpenScope missing or already closed)",
+			Origin: "scope is not open (no OpenScope for this id, or its own handle closed it)",
 		}, true
 	}
 	if len(marks) == 0 {
@@ -575,7 +701,7 @@ func (p *Provenance) CheckText(scopeID string, ch Channel, text string) (Hit, bo
 	if unbound {
 		return Hit{
 			ScopeID: scopeID, Channel: ch, SrcTool: SrcUnboundScope,
-			Origin: "scope is not open (OpenScope missing or already closed)",
+			Origin: "scope is not open (no OpenScope for this id, or its own handle closed it)",
 		}, true
 	}
 	if len(marks) == 0 {

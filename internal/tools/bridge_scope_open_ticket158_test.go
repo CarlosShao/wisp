@@ -67,10 +67,13 @@ func (s *logSink158) containing(sub string) []string {
 }
 
 // scopeOpened158 reads the bridge's own open-scope ledger under its lock.
+// Since ticket 160 the ledger holds the *risk.Scope handles (the only things
+// that can close those scopes) rather than a bool, so "opened" is "a handle is
+// registered" - the same predicate, no weaker assertion.
 func scopeOpened158(b *Bridge, taskID string) bool {
 	b.mu.Lock()
 	defer b.mu.Unlock()
-	return b.scopes[taskID]
+	return b.scopes[taskID] != nil
 }
 
 func TestSensitiveReadAcrossTheBridgeOpensItsTaskScope(t *testing.T) {

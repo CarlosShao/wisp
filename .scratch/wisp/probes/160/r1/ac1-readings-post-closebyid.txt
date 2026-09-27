@@ -1,0 +1,2 @@
+# github.com/CarlosShao/wisp/probes160r1closebyid
+.\closebyid.go:32:4: p.CloseScope undefined (type *risk.Provenance has no field or method CloseScope)

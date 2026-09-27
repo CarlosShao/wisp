@@ -173,13 +173,15 @@ func TestFragmentHashCollisionCannotFakeHit(t *testing.T) {
 func BenchmarkMarkFullSource(b *testing.B) {
 	src := strings.Repeat("敏感-token-内容 ", 20000) // > MaxSourceRunes once normalized
 	p := NewProvenance(ProvOptions{NoProbe: true})
-	p.OpenScope("s")
+	h := p.OpenScope("s")
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		p.Mark("s", SrcFSRead, "/big", src)
-		p.CloseScope("s")
-		p.OpenScope("s")
+		if err := h.Close(); err != nil {
+			b.Fatalf("Close(%q): %v", h.ID(), err)
+		}
+		h = p.OpenScope("s")
 	}
 }
 

@@ -139,8 +139,8 @@ type Bridge struct {
 	classifier risk.SensitiveClassifier
 
 	mu     sync.Mutex
-	seqs   map[string]int64 // task id -> tool_call.seq
-	scopes map[string]bool  // task id -> C25 scope opened
+	seqs   map[string]int64       // task id -> tool_call.seq
+	scopes map[string]*risk.Scope // task id -> the handle that opened it (ticket 160: the ONLY thing that can close it)
 }
 
 // New composes a Bridge. It never returns a partially enforcing bridge: a nil
@@ -183,7 +183,7 @@ func New(o Options) *Bridge {
 		},
 		classifier: NewSensitiveClassifier(),
 		seqs:       map[string]int64{},
-		scopes:     map[string]bool{},
+		scopes:     map[string]*risk.Scope{},
 	}
 	if len(o.Authorized) > 0 {
 		b.authz = newCapSet(o.Authorized...)
@@ -624,23 +624,28 @@ func safeFacts(ctx context.Context, hook func(context.Context, map[string]any, [
 }
 
 // OpenTask opens the C25 taint scope for one task - ticket 19's
-// DEFERRED(C25-loop-wiring) item (1). Idempotent; Execute opens lazily so a
-// caller that forgot cannot get an untainted read.
+// DEFERRED(C25-loop-wiring) item (1), landed as a shape by ticket 160:
+// risk.OpenScope now hands back the *Scope that owns the close, and the bridge
+// holds on to it. Idempotent; Execute opens lazily so a caller that forgot
+// cannot get an untainted read.
 //
-// The open side is per CALL (mark above), the close side is per TASK and lives
-// in another package, so nothing here keeps the two sides in step by
-// construction: read CloseTask before adding a caller that opens a scope.
+// What changed for the reader who was warned by the old text: the close side no
+// longer lives in another package as a bare function anyone can call with any
+// id. It lives in THIS map, as the handle this line stored. The residual the
+// old text named is still true in one respect - Execute/close are separate
+// calls, and a caller that opens a scope and never reaches CloseTask still
+// leaks; G5 in .scratch/wisp/probes/154/gate-clauses.sh is the doorbell for
+// that, not the compiler (measured, 160-handle-r1.md §3).
 func (b *Bridge) OpenTask(taskID string) {
 	if b.prov == nil || taskID == "" {
 		return
 	}
 	b.mu.Lock()
-	open := b.scopes[taskID]
-	b.scopes[taskID] = true
-	b.mu.Unlock()
-	if !open {
-		b.prov.OpenScope(taskID)
+	defer b.mu.Unlock()
+	if _, open := b.scopes[taskID]; open {
+		return
 	}
+	b.scopes[taskID] = b.prov.OpenScope(taskID)
 }
 
 // CloseTask closes one task's taint scope. The composition root defers this on
@@ -687,15 +692,21 @@ func (b *Bridge) CloseTask(taskID string) {
 	}
 	dropped := len(b.prov.ScopeTaints(taskID))
 	b.mu.Lock()
-	open := b.scopes[taskID]
+	scope := b.scopes[taskID]
+	open := scope != nil
 	delete(b.scopes, taskID)
 	left := len(b.scopes)
 	b.mu.Unlock()
+	var closeErr error
 	if open {
-		b.prov.CloseScope(taskID)
+		// The handle this bridge was issued is what closes the scope - there is
+		// no by-id route left to call, and this one refuses a caller that does
+		// not hold the handle. The refusal is a return value, so it is readable
+		// here and on the audit line below, not only in a log the engine prints.
+		closeErr = scope.Close()
 	}
-	b.log("tools: C25 scope closed task=%s was_open=%v dropped=%d open_scopes=%d",
-		taskID, open, dropped, left)
+	b.log("tools: C25 scope closed task=%s was_open=%v dropped=%d open_scopes=%d close_err=%v",
+		taskID, open, dropped, left, closeErr)
 }
 
 // assessorFor returns the assessor whose R4 input is bound to this task's

@@ -117,3 +117,76 @@ LEG2-outsight  taints(id known)=1   taints(id guessed)=0
 ### 3.9 本格判据落定（写死，给后两格当尺）
 
 **改前的"只开不关"这一形：编译器不拦（vet rc=0）／测试不响（两包全绿）／门只点到一个文件名（G5 名册 1 枚）／事后零观察口（`ScopeTaints` 要 id）。** 四把尺的读数全在案 ⇒ AC#1 **量到了**，不必停手。
+
+---
+
+## 4. 第②格＝AC#2 —— 换形状（句柄自带关闭动作＋认身份＋幂等）
+
+### 4.1 新形状（`internal/risk/provenance.go`，逐枚现量行号在 §4.6）
+
+```go
+type Scope struct { p *Provenance; id string; closed bool }   // id 非导出
+func (p *Provenance) OpenScope(scopeID string) *Scope          // 交回句柄；重开＝换主人，污点原样留着
+func (s *Scope) Close() error                                  // 唯一的关路；认身份
+func (s *Scope) ID() string                                    // 读 id 不给关的权力
+var ErrScopeAlreadyClosed / ErrScopeNotOwner / ErrScopeNotOpen  // 三种拒绝各一枚
+type scopeReg struct { marks []*taintMark; owner *Scope }       // p.scopes 的值类型
+```
+
+**"两本账塌成一本书"落在这儿**：`p.scopes` 今天一枚值同时装"这个 scope 的污点"与"当前谁有权关它"，一把 `p.mu` 守。旧的导出 `CloseScope(scopeID string)` **整枚删掉**——不是收非导出、不是留白名单，是**没有这条路**。
+
+### 4.2 三条硬判据，各一发实测（都是真跑的输出，不是措辞）
+
+| 判据 | 用例／命令 | 读数 |
+|---|---|---|
+| **(i)** 拿别人的句柄关别人的登记 ⇒ 失败且**外部可见** | `TestScopeCloseRefusesAnotherOwnersRegistration`（`provenance_test.go`，本程新增）：`stale` 开 → `fresh` 重开同一 id → `Mark` → `stale.Close()` | `--- PASS`：`stale.Close()` 回 `ErrScopeNotOwner`；`ScopeTaints=1`（**一枚没掉**）；`Inspect` 仍出 `SrcWebFetch` 的 R4 命中；`fresh.Close()` 仍成功。**三把读数全在函数之外**——只多打一行日志的形状过不了这一发 |
+| **(i′)** 同一形落在**空**登记上（160-c1 §2.3 预测的静默那一支） | `TestScopeCloseRefusedOnEmptyRegistrationIsStillVisible` | `--- PASS`：全引擎零污点时 `stale.Close()` 仍回 `ErrScopeNotOwner`，且 `p.scopes` 里那一格**还在**——静默放行形被这枚判据钉住 |
+| **(ii)** 同一枚句柄关两次 ⇒ 幂等，**第二次读数说清** | `TestScopeCloseIsIdempotent` | `--- PASS`：第 1 次 `nil`；第 2、3 次 `ErrScopeAlreadyClosed`（与"别人已经关了"的 `ErrScopeNotOwner`／"根本没这枚登记"的 `ErrScopeNotOpen` **分格**，正是 AC#3 抱怨的 `already closed` 混格被拆开）；spent 句柄重开新登记后仍回 `ErrScopeAlreadyClosed`；`nil` receiver 不 panic |
+| **(iii)** 旧口子不留后门 | `.scratch/wisp/probes/160/r1/ac1-closebyid/`（改前**编译得过、跑得通、受害者静默消失**的那台件） | **改后不再编译**：`closebyid.go:32:4: p.CloseScope undefined (type *risk.Provenance has no field or method CloseScope)`（`ac1-readings-post-closebyid.txt`）⇒ 运行时侧的 companion 断言＝`TestScopeIDGrantsNoPower`（`--- PASS`） |
+
+⇒ **(iii) 走的是"旧口子消失"那一支**，不是"留给已登记的调用方"：仓里今天没有任何一处能按 id 关 scope，`internal/tools` 的关腿只剩"开的时候拿到的那枚东西"（§4.3）。
+
+### 4.3 三处生产调用点逐枚改口（派单 §3 点名的那三枚，无第四枚）
+
+| # | 位置（改前行号） | 改口 |
+|---|---|---|
+| 1 | `internal/tools/bridge.go:642` 开腿 | `OpenTask` 现在把 `b.prov.OpenScope(taskID)` 交回的句柄**存进桥的账本**：`b.scopes`（`:143`）值类型 `bool` → `*risk.Scope`，构造点 `:186` 跟着改。**这是开腿的必要连带**（160-c1 §2.3 乙表第 4 行原话："容器类型与幂等逻辑一起改"），不是新开的第三枚地界。幂等判据从 `if !open` 变成 `if _, open := b.scopes[taskID]; open { return }`，同一把尺 |
+| 2 | `internal/tools/bridge.go:695` 关腿 | `b.prov.CloseScope(taskID)` → `scope.Close()`，返回的 `error` 存进 `closeErr`，**并进审计行**：`tools: C25 scope closed task=%s was_open=%v dropped=%d open_scopes=%d close_err=%v`。⚠ 这条**格式变了**（追加一格 `close_err`），见 §4.7 的影响登记 |
+| 3 | `cmd/wisp/panel_assets.go:232` 只开不合 | `prov.OpenScope(...)` → **`_ = prov.OpenScope(...)`**＋四行说明。行为一字未变（照样只开不合、照样泄漏），变的是它**必须写出自己在丢弃**——160-c1 LEG 3 与 §3 的读数说编译器拦不住这一形，所以这一枚交给门（G5），不假装被类型系统治了 |
+
+### 4.4 五枚同源拷贝逐枚改口（派单 §1.24 的"必须逐枚改口"）
+
+| # | 位置（改前） | 改口后说的是什么 | 状态 |
+|---|---|---|---|
+| 1 | `provenance.go:16-17` | 原："scopes are opened by the composition root and **Closed on Dispose**" | 改成"OpenScope 交回 `*Scope`，**是那枚句柄**被 Defer 到 session 的 DisposalScope 上关"——`Closed on Dispose` 那句今天在生产码里从不发生（160-c1 §2.4 第 1 行原话），不再假装它发生 | **改口** |
+| 2 | `provenance.go:347-349`（`CloseScope` 自己的文档） | 原："wire via `disposalScope.Defer(p.CloseScope)`" | 函数已被删；新的 `Scope.Close` 文档写 `disposalScope.Defer(func() { _ = scope.Close() })`——**Defer 的是句柄，不是 id** | **改口** |
+| 3 | `provenance.go:436-440`＋`:453` | 注释版＋日志版 | 注释版（`scopeMarks` 的文档）整段重写，明写"外人关不动 ⇒ 只剩'你自己关过'与'从来没开过'两种"；**日志版 `:453` 原文一字未动**（它说的还是那件事），因为它是 AC#3 三条外部可见读数之一，本程要它保持可比 | 注释**改口**／日志**保持** |
+| 4 | `bridge.go:626-632` | 原："the close side is per TASK and lives in **another package**, so nothing here keeps the two sides in step by construction" | 改成：关侧现在**就在这本账里**（开腿存进去的那枚句柄）；同时**保留**旧句子里今天仍真的那一半——开／合仍是两次调用、忘了合照样泄漏、门是 G5 不是编译器 | **改口** |
+| 5 | `panel_assets.go:161-165` | 原："a CLI probe has no task, so it names one **and closes nothing**" | 行为描述**保持原文**（它还是对的），后面追加四行：这一枚是**写明故意的丢弃**，且"关不掉别人的"从今天起是类型事实 | **改口（追加）** |
+
+另有三枚**弱同族**（160-c1 §2.4 末登记，不点名标记）：`bridge.go` 的 `CloseTask` 长注（`:646-683`）**一字未动**——它逐枚描述"哪几腿没 owner"，那件事本程没改；`provenance_test.go:305-306` 测试注释、`bridge_scope_open_ticket158_test.go:19-24` 注释随 §4.5 的连带改动一起看过，**没有一处再自称逐字抄 `provenance.go:55-61` 而内容已经不符**。
+
+### 4.5 签名连带失效的测试文件（逐枚列名＋只改形状、不削断言）
+
+编译器现量：**只有 3 枚测试文件真的编不过**（派单引的"6 枚"是**碰到这两个词的文件数**，`OpenScope` 交回一个值时**丢弃是合法的** ⇒ 22 枚开点一枚都不必改）。逐枚：
+
+| 文件 | 改了什么 | 断言强了还是弱了 |
+|---|---|---|
+| `internal/risk/provenance_test.go` | `:310` `scope.Defer(func(){ p.CloseScope("session-1") })` → 持句柄 `handle` 并 `handle.Close()`，**且新增 `t.Errorf` 检查这次关必须成功**；`:358`／`:364` → 新增 helper `mustClose(t, s *Scope)`；`:339`／`:359` 两枚开点改为捕获句柄；imports 加 `errors`；新增 §4.2 那 4 枚用例 | **变强**（旧写法关失败了没人知道，新写法会红） |
+| `internal/risk/taintmatch_test.go` | `:176` 捕获句柄、`:181` → `h.Close()` 且 `b.Fatalf` 检查错误 | **变强**（benchmark 现在会因 refused close 而红） |
+| `internal/tools/bridge_scope_open_ticket158_test.go` | `:73` `return b.scopes[taskID]` → `return b.scopes[taskID] != nil` ＋注释 | **等价**（同一谓词，"账本里有没有这一枚 task id"） |
+
+⇒ 4 枚 `CloseScope` 点全部转成句柄形；22 枚开点**零改动**（实测：`go vet ./internal/risk/ ./internal/tools/ ./cmd/wisp/` rc=0，改前它先报的正是这 3 枚文件）。
+
+### 4.6 `DEFERRED(C25-loop-wiring)` 枚数尺（派单 §1.14 要求的自带尺）
+
+`git grep -n "DEFERRED.C25-loop-wiring." -- internal cmd tools` → **恰 3 枚**：
+```
+internal/risk/provenance.go:58   internal/tools/bridge.go:627   cmd/wisp/panel_assets.go:164
+```
+枚数没变、一枚没删。⚠ 两笔连带：**① `provenance.go` 那一枚的行号 55 → 58**（拷贝 #1 的改口多了两行），而 `docs/reports/pending-and-issues.md:7660` **逐字引着 `provenance.go:55-61`** ——那枚行号现在过期，`docs/reports/**` 是禁改面，本程不动，**报回请编排者补账**。② 第 (1) 条的文字按派单允许的"只许改成已落地"改了，且**只落地了形状那一半**：`Defer 到任务的 DisposalScope` 那一半在文中明写 STILL OPEN 并给理由（三层管道出批准单位），(2)(3)(4) **一字未兑现**。
+
+### 4.7 本格改动的两笔连带影响（都是读数逼出来的，登记不藏）
+
+1. **审计行格式变了**：`internal/tools/bridge.go:697-698` 追加 `close_err=%v`。改它的理由是判据 (i)"失败必须外部可见（不是只多一行日志）"——审计行是这条腿唯一跨包可见的口，不带上就把认身份的拒绝又变回包内私事。两枚现存读它的用例（`internal/tools/bridge_scope_open_ticket158_test.go` 判据 2、`cmd/wisp/task_scope_close_151_test.go` 两枚）**按 substring 匹配**，本程 `internal/tools` 全绿实测；`cmd/wisp` 那两枚受 DLL 环境影响，读数在 §5。
+2. **G5 这把尺的合方词根失效**：G5 数的是"`OpenScope` 有没有配 `CloseScope`"（`.scratch/wisp/probes/154/gate-clauses.sh:205-206`），而 `CloseScope` 今天整枚消失 ⇒ 全仓合方名册变空。本程改前两次现量都是 1 枚（`gate-pre-change-HEAD.txt`／`gate-pre-change-HEAD-repeat.txt`），改后读数在 §6 现跑现填。**这一格是票 158／161 的地界（`probes/154/**` 不在本程写面），本程不改它，只把读数交回去。**

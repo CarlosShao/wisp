@@ -2,6 +2,7 @@ package risk
 
 import (
 	"context"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
@@ -306,8 +307,14 @@ func TestDisposalScopeClearsTaints(t *testing.T) {
 	// every taint; the new session's scope starts clean (AC #5).
 	scope := plugin.NewDisposalScope("session-1", context.Background())
 	p := NewProvenance(baseOptions(t))
-	p.OpenScope("session-1")
-	scope.Defer(func() { p.CloseScope("session-1") })
+	handle := p.OpenScope("session-1") // ticket 160: the handle is what closes it
+	scope.Defer(func() {
+		// Stricter than the old p.CloseScope("session-1") line, which could not
+		// fail: a Defer-ed closer that cannot close its own scope is the bug.
+		if err := handle.Close(); err != nil {
+			t.Errorf("DisposalScope must be able to close the scope it was handed: %v", err)
+		}
+	})
 
 	p.Mark("session-1", SrcFSRead, "/legacy/secret", marker)
 	if _, ok := p.Inspect("session-1", "notify", map[string]any{"text": marker}); !ok {
@@ -328,6 +335,16 @@ func TestDisposalScopeClearsTaints(t *testing.T) {
 	}
 }
 
+// mustClose asserts a handle's own Close succeeds. Ticket 160 replaced the
+// package's four p.CloseScope(id) calls with this: the old calls could not
+// report anything, so a refused close would have passed silently.
+func mustClose(t *testing.T, s *Scope) {
+	t.Helper()
+	if err := s.Close(); err != nil {
+		t.Fatalf("Close(%q): %v", s.ID(), err)
+	}
+}
+
 func TestInspectUnknownScopeIsEmptyStore(t *testing.T) {
 	// M-1 (adversarial report): the old default on an unregistered scope was
 	// "treated as untainted" = pass. Missing information must produce a DENY,
@@ -337,7 +354,7 @@ func TestInspectUnknownScopeIsEmptyStore(t *testing.T) {
 	if _, ok := p.Inspect("ghost", "notify", map[string]any{"text": marker}); ok {
 		t.Fatal("unknown scope with an empty engine cannot carry taint")
 	}
-	p.OpenScope("task-1")
+	h1 := p.OpenScope("task-1")
 	p.Mark("task-1", SrcWebFetch, "https://a", marker)
 
 	hit, ok := p.Inspect("ghost", "notify", map[string]any{"text": "unrelated"})
@@ -355,13 +372,13 @@ func TestInspectUnknownScopeIsEmptyStore(t *testing.T) {
 		t.Error("CheckText on an unbound scope must fail closed")
 	}
 	// A closed scope (session ended) is the same shape of mistake.
-	p.CloseScope("task-1")
-	p.OpenScope("task-2")
+	mustClose(t, h1)
+	h2 := p.OpenScope("task-2")
 	if _, h := p.Inspect("task-2", "notify", map[string]any{"text": "x"}); h {
 		t.Fatal("an opened-and-empty scope is legitimately untainted")
 	}
 	p.Mark("task-2", SrcFSRead, "/f", marker)
-	p.CloseScope("task-2") // disposes the taints -> engine empty again
+	mustClose(t, h2) // disposes the taints -> engine empty again
 	if _, h := p.Inspect("task-2", "notify", map[string]any{"text": marker}); h {
 		t.Fatal("after Dispose the engine holds no taint: no hit is correct (AC#5)")
 	}
@@ -873,4 +890,108 @@ func anyContains(list []string, sub string) bool {
 		}
 	}
 	return false
+}
+
+// --- ticket 160: the handle carries its own closer, and the closer knows whose
+// it is. These are the three hard criteria of AC#2 plus AC#3's positive control;
+// the mutation rig that proves the last one is load-bearing is
+// .scratch/wisp/probes/160/r1/mut/ (go test -overlay, nothing in internal/ is
+// edited to run it).
+
+// TestScopeCloseRefusesAnotherOwnersRegistration is AC#2 criterion (i) and the
+// sample AC#3 said did not exist before: one owner's handle reaching for a
+// registration that now belongs to somebody else, on a scope that carries a
+// taint. Every reading here is outside the function under test - a return value,
+// the ledger, and a verdict - so a refusal that only logged would fail this.
+func TestScopeCloseRefusesAnotherOwnersRegistration(t *testing.T) {
+	p := NewProvenance(baseOptions(t))
+	stale := p.OpenScope("task-victim") // generation 1 opens it
+	fresh := p.OpenScope("task-victim") // the task restarts: ownership moves
+	p.Mark("task-victim", SrcWebFetch, "https://v", marker)
+
+	if err := stale.Close(); !errors.Is(err, ErrScopeNotOwner) {
+		t.Fatalf("a handle that no longer owns the id must be refused, got %v", err)
+	}
+	// Refusal must touch nothing: the taint is still on the ledger...
+	if got := len(p.ScopeTaints("task-victim")); got != 1 {
+		t.Fatalf("refused close still dropped marks: ScopeTaints=%d want 1", got)
+	}
+	// ...and the gate still fires on the victim's own next call.
+	hit, ok := p.Inspect("task-victim", "notify", map[string]any{"text": marker})
+	if !ok || hit.SrcTool != SrcWebFetch {
+		t.Fatalf("victim lost its R4 verdict to a foreign close: %+v ok=%v", hit, ok)
+	}
+	// The registered owner can still do its own job.
+	mustClose(t, fresh)
+	if _, ok := p.Inspect("task-victim", "notify", map[string]any{"text": marker}); ok {
+		t.Fatal("the owning handle must still be able to close")
+	}
+}
+
+// TestScopeCloseRefusedOnEmptyRegistrationIsStillVisible covers the OTHER half
+// of AC#3's question - 160-c1 §2.3 predicted that a mis-close landing on a
+// registered-but-empty scope is silent (scopeMarks' last branch). That shape is
+// now unreachable by a foreign close, and the refusal is still readable even
+// when there is nothing tainted anywhere.
+func TestScopeCloseRefusedOnEmptyRegistrationIsStillVisible(t *testing.T) {
+	p := NewProvenance(baseOptions(t))
+	stale := p.OpenScope("task-victim")
+	fresh := p.OpenScope("task-victim") // same id, empty: no taint anywhere in the engine
+	if err := stale.Close(); !errors.Is(err, ErrScopeNotOwner) {
+		t.Fatalf("empty registration must still refuse a non-owner, got %v", err)
+	}
+	if _, known := p.scopes["task-victim"]; !known {
+		t.Fatal("refused close removed the registration: the empty case is not fail-closed")
+	}
+	mustClose(t, fresh)
+}
+
+// TestScopeCloseIsIdempotent is AC#2 criterion (ii): closing twice must not
+// panic and must not pretend the second call did anything. The second reading
+// is a distinct sentinel, so "I closed it" and "somebody else already took it"
+// do not collapse into one格 (the conflation 160-c1 §2.5 blamed on the
+// "already closed" Origin string).
+func TestScopeCloseIsIdempotent(t *testing.T) {
+	p := NewProvenance(baseOptions(t))
+	h := p.OpenScope("task-1")
+	p.Mark("task-1", SrcFSRead, "/f", marker)
+
+	if err := h.Close(); err != nil {
+		t.Fatalf("first Close of an owned scope: %v", err)
+	}
+	if got := len(p.ScopeTaints("task-1")); got != 0 {
+		t.Fatalf("first Close left %d marks", got)
+	}
+	for i := 0; i < 2; i++ {
+		if err := h.Close(); !errors.Is(err, ErrScopeAlreadyClosed) {
+			t.Fatalf("repeat Close #%d: want ErrScopeAlreadyClosed, got %v", i+2, err)
+		}
+	}
+	// A dropped registration stays dropped, and re-opening hands out a NEW owner.
+	reborn := p.OpenScope("task-1")
+	if err := h.Close(); !errors.Is(err, ErrScopeAlreadyClosed) {
+		t.Fatalf("the spent handle must stay spent, got %v", err)
+	}
+	mustClose(t, reborn)
+	// The zero handle and a never-issued one refuse rather than panic.
+	var nilScope *Scope
+	if err := nilScope.Close(); !errors.Is(err, ErrScopeNotOpen) {
+		t.Fatalf("nil receiver Close: want ErrScopeNotOpen, got %v", err)
+	}
+}
+
+// TestScopeIDGrantsNoPower pins the other half of criterion (iii): reading the
+// id off a handle is fine, and it is not a capability. There is no by-id close
+// to call - the compile-time proof is .scratch/wisp/probes/160/r1/ac1-closebyid/,
+// which stops building after this change; this is the runtime companion.
+func TestScopeIDGrantsNoPower(t *testing.T) {
+	p := NewProvenance(baseOptions(t))
+	h := p.OpenScope("task-1")
+	if h.ID() != "task-1" {
+		t.Fatalf("ID() = %q", h.ID())
+	}
+	mustClose(t, h)
+	if _, ok := p.scopes["task-1"]; ok {
+		t.Fatal("owning handle did not drop the registration")
+	}
 }

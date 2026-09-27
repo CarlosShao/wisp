@@ -163,6 +163,14 @@ func splitFacts(value string) []string {
 // the product the scope id is a task id owned by the agent loop (ticket 19's
 // DEFERRED(C25-loop-wiring) item 1); a CLI probe has no task, so it names one
 // and closes nothing - the engine lives and dies inside this process.
+//
+// Ticket 160 left that behavior exactly as written and changed what the code
+// has to admit: OpenScope now hands back the *Scope that owns the close, and
+// this call throws it away on purpose. What can no longer be written here is
+// closing somebody ELSE's scope - there is no by-id close left to reach for.
+// "Nobody ever closed this one" stays G5's job in
+// .scratch/wisp/probes/154/gate-clauses.sh, not the compiler's, which lets the
+// discard through (measured: docs/evidence/s1/160-handle-r1.md §3).
 const taintSourceScopeID = "panel-assets-l2"
 
 // taintSource is one declared sensitive-source read: the operator says which
@@ -229,7 +237,10 @@ func (f *taintSourceFlag) detector() risk.TaintDetector {
 		return nil
 	}
 	prov := risk.NewProvenance(risk.ProvOptions{NoProbe: true})
-	prov.OpenScope(taintSourceScopeID)
+	// Discarded on purpose, and named so: the handle OpenScope hands back is
+	// this scope's only closer, and a process-lifetime probe has no boundary to
+	// close it on. `_ =` says out loud what the old bare statement hid.
+	_ = prov.OpenScope(taintSourceScopeID)
 	for _, s := range f.sources {
 		prov.Mark(taintSourceScopeID, s.tool, s.origin, s.content)
 	}
