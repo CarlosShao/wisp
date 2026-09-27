@@ -1,0 +1,38 @@
+== [1] 锚点 f206e9f 上 task.output 这个字面量在 Go 源码里是否存在 ==
+  -> 0 命中（锚点上全仓 Go 无此名）
+== [2] 锚点上 internal/tools 有无 task*.go ==
+  -> 无 task*.go
+== [3] 锚点上生产注册表由哪几枚 Entries 组成（cmd/wisp/run.go） ==
+341:	for _, e := range tools.BuiltinFSEntries(tools.FSDeps{
+== [4] 锚点上 Lookup 失败支的文案本体 ==
+251:			"未知工具 "+req.Name+"，可用工具见 list_tools",
+== [5] 同一枚改前用例：改前树 vs 改后树，读数是否逐字相同 ==
+-- 改前树（f206e9f）--
+    task_output_ac2_before_test.go:52: AC#2 BEFORE verbatim: IsError=true ErrorClass="tool" Truncated=false Text="未知工具 task.output，可用工具见 list_tools"
+--- PASS: TestTaskOutputAC2BeforeLegIsUnreachable (0.01s)
+-- 改后树（HEAD）--
+    task_output_ac2_before_test.go:52: AC#2 BEFORE verbatim: IsError=true ErrorClass="tool" Truncated=false Text="未知工具 task.output，可用工具见 list_tools"
+--- PASS: TestTaskOutputAC2BeforeLegIsUnreachable (0.01s)
+  -> 两行 Text 逐字相同 ⇒ 该用例的读数与被测树无关（它自建注册表、且注册表是手抄的 BuiltinFSEntries）
+== [6] 生产调用者那一问（HEAD 现量） ==
+-- 名册写者：cmd/ 与 internal/ 里对 TaskRoster.Record 的调用（排测试） --
+  -> 0 枚写者
+-- RunAsync 的非测试命中 --
+internal/agent/loop.go:320:// RunAsync spawns the task on a roster-named goroutine and returns immediately.
+internal/agent/loop.go:321:func (l *Loop) RunAsync(ctx context.Context, input string) *RunningTask {
+internal/tools/bridge.go:663:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+cmd/wisp/run.go:357:	// RunAsync still has zero production call sites (measured, evidence file
+== [7] 锚点树基线名册 vs HEAD 名册（两向 comm） ==
+锚点(净)=172 HEAD=182
+消失的一栏=0
+新增的一栏=10
+TestLongOutputPointerRecoversEveryByte
+TestMissingArgsAndUnwiredRoster
+TestNoCopyFileAnnouncesLoss
+TestPointerPast256KiBIsNotFullyReadable
+TestRosterIsNotAPathSurface
+TestTaskOutputAC2AfterLegIsReachable
+TestTaskOutputAC2BeforeLegIsUnreachable
+TestTruncationBudgetsAreRead
+TestTruncationShapeIsTheD15Triple
+TestUnknownTaskIDIsLoudNotEmpty
