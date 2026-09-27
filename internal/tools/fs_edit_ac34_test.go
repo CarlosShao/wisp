@@ -443,6 +443,19 @@ func TestFSEditKilledMidWriteLeavesTheTargetByteIdentical(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// (a) THE HEADLINE, FIRST. 162-v1 measured the old order: under its M-4 (the
+	// staging call taken out of fs.edit) this case went red at the boundary probe
+	// below, and the byte-level assertion underneath it never ran - one
+	// assertion's failure swallowed another's reading. The load claim of AC#4 is
+	// "the target holds the pre-edit bytes", so that is the first thing read; the
+	// probes after it only say HOW GOOD the reading is (the seam fired where we
+	// named it), and they are all still here, not one weaker. Order matters for
+	// the counterfactual above too: with the byte check first, a rig that breaks
+	// atomicity reports damage, not a missing step name.
+	if got := readString(t, target); got != original {
+		t.Fatalf("AC#4 violated: after a mid-write kill the target holds %d bytes %q, want the original %q",
+			len(got), got, original)
+	}
 	// (0) the seam actually fired at the byte boundary we named, and only there.
 	if len(killed) == 0 || killed[0] != "create-temp" {
 		t.Fatalf("expected the write to reach the staging boundaries, got %q", killed)
@@ -457,11 +470,6 @@ func TestFSEditKilledMidWriteLeavesTheTargetByteIdentical(t *testing.T) {
 		t.Fatalf("the kill boundary was never reached, the case proves nothing: %q", killed)
 	}
 
-	// (a) THE HEADLINE: the target is the pre-edit bytes, byte for byte.
-	if got := readString(t, target); got != original {
-		t.Fatalf("AC#4 violated: after a mid-write kill the target holds %d bytes %q, want the original %q",
-			len(got), got, original)
-	}
 	// (b) today's actual shape is BOTH halves of the "或": no .wisp-tmp-* file
 	// survives AND the ledger names the one that was removed.
 	noStagingFilesLeft(t, root)
@@ -485,7 +493,7 @@ func TestFSEditKilledMidWriteLeavesTheTargetByteIdentical(t *testing.T) {
 			namedTemp, namedRemoval, out.AppliedSteps)
 	}
 	t.Logf("AC#4(a)(b) 读数：改前 %d 字节 → 杀点 write:16（边界在下一块落笔前触发，暂存件里此刻 8 字节）"+
-		"→ 目标仍是 %d 字节原字节；"+
+		"→ 目标仍是 %d 字节原字节（字节断言现在跑在边界探针之前）；"+
 		"目录内 .wisp-tmp-* 残件 0 枚，台账 %q", len(original), len(readString(t, target)), out.AppliedSteps)
 }
 

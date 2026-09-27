@@ -1,0 +1,7 @@
+time=2026-09-27T16:37:57.071+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestFSEditKilledMidWriteLeavesTheTargetByteIdentical
+    fs_edit_ac34_test.go:448: expected the write to reach the staging boundaries, got ["write:8" "write:16"]
+--- FAIL: TestFSEditKilledMidWriteLeavesTheTargetByteIdentical (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.083s
+FAIL

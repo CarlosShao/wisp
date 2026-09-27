@@ -1,0 +1,7 @@
+time=2026-09-27T16:38:44.020+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestFSEditKilledMidWriteLeavesTheTargetByteIdentical
+    fs_edit_ac34_test.go:456: AC#4 violated: after a mid-write kill the target holds 8 bytes "ALPHA-LO", want the original "alpha\nbravo\ncharlie\ndelta\n"
+--- FAIL: TestFSEditKilledMidWriteLeavesTheTargetByteIdentical (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.092s
+FAIL
