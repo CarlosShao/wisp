@@ -138,8 +138,10 @@ func TestFSEditAndFSWriteShareTheOutOfScopeVerdict(t *testing.T) {
 		}
 		w, a := g.counts()
 		dec := g.approvalDecision()
-		got = append(got, reading{"fs.write", dec.Level, dec.RulesHit, dec.Reason,
-			out.ErrorClass, out.Text, w, a})
+		got = append(got, reading{
+			"fs.write", dec.Level, dec.RulesHit, dec.Reason,
+			out.ErrorClass, out.Text, w, a,
+		})
 		if out.ErrorClass != "user_rejected" {
 			t.Errorf("fs.write out of scope: ErrorClass=%q, want user_rejected (a refusal is not a host fault, SPEC-07 §2)", out.ErrorClass)
 		}
@@ -164,8 +166,10 @@ func TestFSEditAndFSWriteShareTheOutOfScopeVerdict(t *testing.T) {
 		}
 		w, a := g.counts()
 		dec := g.approvalDecision()
-		got = append(got, reading{"fs.edit", dec.Level, dec.RulesHit, dec.Reason,
-			out.ErrorClass, out.Text, w, a})
+		got = append(got, reading{
+			"fs.edit", dec.Level, dec.RulesHit, dec.Reason,
+			out.ErrorClass, out.Text, w, a,
+		})
 		if out.ErrorClass != "user_rejected" {
 			t.Errorf("fs.edit out of scope: ErrorClass=%q, want user_rejected", out.ErrorClass)
 		}
