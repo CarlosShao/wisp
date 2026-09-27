@@ -1,0 +1,28 @@
+== v1 grep rulers on anchor copy 61ff1c0 (anchor=8efece3) ==
+-- C layer: non-test .Prompt( calls --
+internal/agent/approval/gate.go:260:	if err := g.ui.Prompt(ctx, p); err != nil {
+internal/agent/approval/gate.go:486:	if err := g.ui.Prompt(ctx, p); err != nil {
+-- B layer: non-test PendingWindow/PendingApproval call sites --
+internal/agent/approval/gate.go:236:		a, why := g.PendingApproval(ctx, d)
+internal/tools/bridge.go:380:		a, why := b.gate.PendingWindow(ctx, *dec)
+internal/tools/bridge.go:395:		a, why := b.gate.PendingApproval(ctx, *dec)
+cmd/wisp/run.go:479:	ans, why := rt.gate.PendingApproval(ctx, tools.Decision{
+-- D layer: EvApprovalNeeded non-test mentions --
+internal/statemachine/events.go:35:	EvApprovalNeeded  Event = "tools.approval-needed"   // #17
+internal/statemachine/table.go:118:		D43: 17, From: StateActing, Event: EvApprovalNeeded, To: StateConfirming,
+internal/statemachine/table.go:123:		D43: 17, From: StateActing, Event: EvApprovalNeeded, To: StateAwaitingApproval,
+-- D layer: Dispatch(EvApprovalNeeded non-test (expect empty; rc of grep) --
+grep_rc=1
+-- answer side: call-site pattern (comments included, judged per line) --
+internal/agent/approval/doc.go:32://   - hand Queue.Native() to the ball click / native card / hotkey handlers
+internal/agent/approval/doc.go:33://     and Queue.Panel() to the ticket 37 panel bridge;
+-- positive controls on /tmp/wisp161v1/ctlroot --
+pat=\.Prompt\( hits=1
+pat=Dispatch(.*EvApprovalNeeded hits=0
+pat=\.(Native|Panel|Veto|DecideFromNative|DecideFromPanel|SetLoaded|Replay)\( hits=1
+pat=Dispatch\(.*EvApprovalNeeded ctlroot_hits=0
+pat=\.Native\(\|\.Panel\(\|\.Veto\(\|DecideFromNative\|DecideFromPanel\|SetLoaded(\|Replay( ctlroot_hits=0
+pat=\.Prompt( ctlroot_hits=1
+== corrected control re-run (earlier loop line had my own ERE parenthesis bug: 'Dispatch(.*' under -E is Unmatched -> recorded 0; original call-28 run under default BRE recorded 1. Both kept.) ==
+pat=-F Dispatch(EvApprovalNeeded ctlroot_hits=1
+pat=-E answer-side ctlroot_hits=1
