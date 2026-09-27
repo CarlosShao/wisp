@@ -37,6 +37,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { GlideHighlight } from "@/components/glide-highlight";
+import { GlideMenu } from "@/components/ai-native/glide-menu";
 import { cn } from "@/lib/cn";
 
 export type RailTabKey = "review" | "files" | "terminal" | "browser";
@@ -309,9 +310,9 @@ export function RightRail({ openRequest }: { openRequest?: RailOpenRequest }) {
             you have thrown away the one you had. The list is therefore every
             tab, not just the open ones. */}
         {menuOpen && (
-          <div
+          <GlideMenu
             className="absolute left-1 right-1 top-full z-40 mt-1 rounded-card border border-line bg-surface p-1.5 shadow-overlay"
-            style={{ animation: "pop-in 160ms var(--ease-out-strong) both" }}
+            highlightClassName="inset-x-0 rounded-[6px] bg-hover"
           >
             <label className="mb-1 flex h-8 items-center gap-2 rounded-control bg-inset px-2.5 shadow-hairline">
               <input
@@ -326,7 +327,8 @@ export function RightRail({ openRequest }: { openRequest?: RailOpenRequest }) {
             </p>
             {TAB_DEFS.filter((t) => !openTabs.includes(t.key) && menuMatches(t)).map((def) => (
               <button
-                className="flex w-full items-center gap-2 rounded-chip px-1.5 py-1.5 text-left hover:bg-hover"
+                className="flex w-full items-center gap-2 rounded-chip px-1.5 py-1.5 text-left"
+                data-menu-row
                 key={def.key}
                 onClick={() => reopenTab(def.key)}
                 title={def.blurb}
@@ -345,11 +347,11 @@ export function RightRail({ openRequest }: { openRequest?: RailOpenRequest }) {
                 {openTabs.filter((k) => menuMatches(TAB_DEFS.find((t) => t.key === k)!)).map((key) => {
                   const def = TAB_DEFS.find((t) => t.key === key)!;
                   return (
-                    <div className="flex items-center gap-2 rounded-chip px-1.5 py-1.5 hover:bg-hover" key={key}>
+                    <div className="flex items-center gap-2 rounded-chip px-1.5 py-1.5" data-menu-row key={key}>
                       <span className="min-w-0 flex-1 truncate text-left text-[12px] text-ink">{def.label}</span>
                       <span
                         aria-label={`关闭 ${def.label}`}
-                        className="flex size-4 shrink-0 items-center justify-center rounded-[4px] text-ink-3 hover:bg-line/70 hover:text-ink"
+                        className="flex size-4 shrink-0 items-center justify-center rounded-[4px] text-ink-3 hover:text-ink"
                         onClick={() => closeTab(key)}
                         role="button"
                         tabIndex={-1}
@@ -370,7 +372,8 @@ export function RightRail({ openRequest }: { openRequest?: RailOpenRequest }) {
               const def = TAB_DEFS.find((t) => t.key === key)!;
               return (
                 <button
-                  className="flex w-full items-center gap-2 rounded-chip px-1.5 py-1.5 text-left hover:bg-hover"
+                  className="flex w-full items-center gap-2 rounded-chip px-1.5 py-1.5 text-left"
+                  data-menu-row
                   key={key}
                   onClick={() => reopenTab(key)}
                   type="button"
@@ -380,7 +383,7 @@ export function RightRail({ openRequest }: { openRequest?: RailOpenRequest }) {
                 </button>
               );
             })}
-          </div>
+          </GlideMenu>
         )}
       </div>
 

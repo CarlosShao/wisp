@@ -39,8 +39,9 @@
    Colours: token utilities only, zero literals; no emoji.
    ============================================================================ */
 
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { ChevronDown, CircleAlert, Folder, Moon, Plus, Search, Settings, Sun, X } from "lucide-react";
+import { GlideMenu } from "@/components/ai-native/glide-menu";
 import { cn } from "@/lib/cn";
 import { ValuePill } from "@/components/ai-native/value-pill";
 import type {
@@ -99,14 +100,6 @@ export function HarnessSidebar({
 }: HarnessSidebarProps) {
   const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(new Set());
   const [projectOpen, setProjectOpen] = useState(true);
-  const [hovered, setHovered] = useState<string | null>(null);
-  const [box, setBox] = useState<{ top: number; height: number } | null>(null);
-  const navRef = useRef<HTMLDivElement>(null);
-  const itemRefs = useRef<Record<string, HTMLButtonElement | HTMLDivElement | null>>({});
-
-  const setItemRef = (key: string) => (el: HTMLButtonElement | HTMLDivElement | null) => {
-    itemRefs.current[key] = el;
-  };
 
   // The query actually filters. It used to be rendered into a controlled input
   // and then read by nothing: the box looked like search, accepted typing, and
@@ -114,14 +107,14 @@ export function HarnessSidebar({
   // no state - and a group with no surviving row drops out entirely so the
   // headings cannot stack up over an empty column.
   //
-  // useMemo is load-bearing, not an optimisation. The glide effect below lists
+  // The projection is memoised so the arrays are stable across renders, which
+  // keeps any future effect that depends on them from re-running. It used to be
+  // load-bearing rather than tidy: the hand-written glide effect below listed
   // these in its dependency array, and a projection built inline gets a fresh
-  // identity on every render: effect -> setBox(new object) -> render -> fresh
-  // array -> effect ... That loop only bites once a row is actually hoverable
-  // (with hovered null the effect returns early), which is exactly why a
-  // screenshot pass never sees it and the first mouse move does. Memoising
-  // keeps the identity pinned to the inputs, which is what the old prop-based
-  // dependency had for free.
+  // identity every render, which spun the effect into a Maximum-update-depth
+  // loop the first time a row was hovered. That effect is gone (the library's
+  // GlideMenu measures from the DOM), so this is hygiene now - but the hazard
+  // is real and the comment stays.
   const q = searchValue.trim().toLowerCase();
   const shownGroups = useMemo(
     () =>
@@ -137,28 +130,6 @@ export function HarnessSidebar({
     () => project.children.filter((child) => !q || child.title.toLowerCase().includes(q)),
     [project.children, q],
   );
-
-  // 滑翔高亮：一枚 bg-hover 方块量测着落到 hovered ?? active 行（上游逐字，
-  // 键域扩到三段全部行种）。行被折叠隐藏时量测落空，方块淡出。
-  //
-  // The equality guard is the second half of that lesson: a fresh {top,height}
-  // object is never equal to the old one, so an unguarded setBox re-renders
-  // even when the numbers did not move. Comparing here means the effect can be
-  // re-run by anything at all without being able to spin.
-  useLayoutEffect(() => {
-    const container = navRef.current;
-    const target = itemRefs.current[hovered ?? activeSessionId ?? ""];
-    if (!container || !target) {
-      setBox((current) => (current === null ? current : null));
-      return;
-    }
-    const containerRect = container.getBoundingClientRect();
-    const targetRect = target.getBoundingClientRect();
-    const next = { top: targetRect.top - containerRect.top, height: targetRect.height };
-    setBox((current) =>
-      current !== null && current.top === next.top && current.height === next.height ? current : next,
-    );
-  }, [hovered, activeSessionId, shownGroups, collapsed, projectOpen, automations, shownChildren, project]);
 
   function toggleGroup(title: string) {
     setCollapsed((current) => {
@@ -239,30 +210,20 @@ export function HarnessSidebar({
           </span>
         </button>
 
-        {/* 三段式主体：滑翔高亮覆盖全部行种 */}
-        <div ref={navRef} className="relative flex flex-col gap-2" onMouseLeave={() => setHovered(null)}>
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 rounded-[7px] bg-hover"
-            style={{
-              top: box?.top ?? 0,
-              height: box?.height ?? 0,
-              opacity: box ? 1 : 0,
-              transition:
-                "top 220ms cubic-bezier(0.23,1,0.32,1), height 220ms cubic-bezier(0.23,1,0.32,1), opacity 150ms ease",
-            }}
-          />
-
+        {/* 三段式主体：hover 层用 beautiful-ui 的 GlideMenu（库件，别再手写）
+            「当前会话」走另一条通道——一根不动的 accent 左标。原来两者抢同一
+            个视觉位：你划过别的行时当前会话的高亮被滑走，于是就不知道自己在
+            哪个会话里了。现在 hover 会滑、当前会话恒在，各管各的。 */}
+        <GlideMenu className="flex flex-col gap-2" highlightClassName="inset-x-0 rounded-[7px] bg-hover">
           {/* ── 自动化段：状态圆点行 + 右缘齿轮位（hover 显现） ── */}
           <div>
             <SectionHeader label="自动化" />
             <div className="flex flex-col gap-px">
               {automations.map((automation) => (
                 <div
-                  key={automation.id}
-                  ref={setItemRef(`auto:${automation.id}`)}
-                  onMouseEnter={() => setHovered(`auto:${automation.id}`)}
                   className="group relative z-10 flex w-full items-center gap-2 rounded-[7px] px-2 py-1.5"
+                  data-menu-row
+                  key={automation.id}
                 >
                   <span
                     aria-hidden="true"
@@ -291,10 +252,9 @@ export function HarnessSidebar({
           <div>
             <SectionHeader label="工作区" />
             <button
-              ref={setItemRef("project")}
               type="button"
               aria-expanded={projectOpen}
-              onMouseEnter={() => setHovered("project")}
+              data-menu-row
               onClick={() => setProjectOpen((current) => !current)}
               className="relative z-10 flex w-full items-center gap-1.5 rounded-[7px] px-2 py-1.5 text-left transition-[color,transform] duration-150 active:scale-[0.96]"
             >
@@ -317,18 +277,23 @@ export function HarnessSidebar({
                   return (
                     <button
                       key={child.id}
-                      ref={setItemRef(`child:${child.id}`)}
                       type="button"
                       aria-current={isActive ? "page" : undefined}
-                      onMouseEnter={() => setHovered(`child:${child.id}`)}
-                      onFocus={() => setHovered(`child:${child.id}`)}
-                      onBlur={() => setHovered(null)}
+                      data-menu-row
                       onClick={() => onSelectSession(child.id)}
                       className={cn(
-                        "relative z-10 flex w-full items-center gap-2 rounded-[7px] py-1.5 pl-6 pr-2 text-left transition-[color,transform] duration-150 active:scale-[0.96]",
-                        isActive ? "font-medium text-ink" : "text-ink-2",
+                        "group/row relative z-10 flex w-full items-center gap-2 rounded-[7px] py-1.5 pr-2 text-left transition-[color,transform] duration-150 active:scale-[0.96]",
+                        isActive ? "pl-6 font-medium text-ink" : "pl-6 text-ink-2",
                       )}
                     >
+                      {/* The session you are IN is a fixed accent bar, not a
+                          highlight the hover layer can slide away. */}
+                      {isActive ? (
+                        <span
+                          aria-hidden="true"
+                          className="absolute bottom-1.5 left-2 top-1.5 w-[2px] rounded-full bg-accent"
+                        />
+                      ) : null}
                       <ChildStatusIcon status={child.status} />
                       <span className="min-w-0 flex-1 truncate text-[13px]">{child.title}</span>
                     </button>
@@ -365,18 +330,21 @@ export function HarnessSidebar({
                         return (
                           <button
                             key={row.id}
-                            ref={setItemRef(row.id)}
                             type="button"
                             aria-current={isActive ? "page" : undefined}
-                            onMouseEnter={() => setHovered(row.id)}
-                            onFocus={() => setHovered(row.id)}
-                            onBlur={() => setHovered(null)}
+                            data-menu-row
                             onClick={() => onSelectSession(row.id)}
                             className={cn(
-                              "relative z-10 flex w-full items-center gap-2 rounded-[7px] px-2 py-1.5 text-left transition-[color,transform] duration-150 active:scale-[0.96]",
-                              isActive ? "font-medium text-ink" : "text-ink-2",
+                              "relative z-10 flex w-full items-center gap-2 rounded-[7px] py-1.5 pr-2 text-left transition-[color,transform] duration-150 active:scale-[0.96]",
+                              isActive ? "pl-4 font-medium text-ink" : "px-2 text-ink-2",
                             )}
                           >
+                            {isActive ? (
+                              <span
+                                aria-hidden="true"
+                                className="absolute bottom-1.5 left-1 top-1.5 w-[2px] rounded-full bg-accent"
+                              />
+                            ) : null}
                             <span className="min-w-0 flex-1 truncate text-[13px]">{row.title}</span>
                             {row.badge ? (
                               <span className="shrink-0 text-[10.5px] text-ink-3">{row.badge.label}</span>
@@ -396,7 +364,7 @@ export function HarnessSidebar({
               </div>
             )}
           </div>
-        </div>
+        </GlideMenu>
       </div>
 
       {/* 底部：用量 + 设置 + 主题（此块不进滑翔区，发丝线分隔） */}
