@@ -1,0 +1,12 @@
+--- PASS: TestMarkEmptyAfterNormalization (0.01s)
+--- PASS: TestShapeAHostReReadOfDeclaredPathIsClean (0.01s)
+--- PASS: TestShapeAW1RestOfHostMarkStillIndexed (0.01s)
+--- PASS: TestShapeAW2ForeignMarkCarryingSamePathStillHits (0.01s)
+--- PASS: TestShapeAW3NeverMintedSiblingUnderSameDirStillHits (0.01s)
+--- PASS: TestShapeAW4PositionalExclusionNeverLeavesHostMark (0.01s)
+--- PASS: TestShapeAFExclusionDiesWithScopeClose (0.01s)
+--- FAIL: TestShapeAW5EmptyCheckPrecedesExclusion (0.01s)
+--- PASS: TestShapeAOrderOneSpanLocatedAfterNormalization (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	0.114s
+FAIL
