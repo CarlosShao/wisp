@@ -40,6 +40,7 @@ RiskLevel 列是 C19 融合后的**默认结论**；实际判定在调用时算�
 | `fs.list` | 列目录 | L0 / L2（越界） | fs.read | S3 | — |
 | `fs.write` | 新建文件 | L1 | fs.write | S3 | temp + 原子 rename（D31） |
 | `fs.write` | 覆盖已存在 | L2 | fs.write | S3 | C19/R8 |
+| **`fs.edit`** | 字面定位替换已存在文件里的一小段 | **L2** | fs.write | S3 | 票 162 新增，镜像 `PLAN.md` D34；字面子串唯一命中才落盘，temp＋原子 rename |
 | `fs.move` | 移动/重命名 | L1 | fs.write | S3 | 跨盘 = 复制+删 → L2 |
 | `fs.trash` | 移入回收站 | **L1** | fs.write | S3 | ⭐ 可用性收益最大：场景①大部分操作 L2→L1，缓解 B2 |
 | `fs.delete` | 永久删除 | L2 | fs.write | S3 | **默认不注册**，`[fs] delete_enabled=true` 才有 |
