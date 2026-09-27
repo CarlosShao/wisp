@@ -1,7 +1,8 @@
-import { StrictMode } from "react";
+import { StrictMode, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "@/App";
 import { AppHarness } from "@/components/harness/app-harness";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { Showcase } from "@/components/showcase";
 import { HARNESS_BANNER } from "@/fixtures/harness";
 import "./styles/theme.css";
@@ -78,9 +79,37 @@ if (harness === "1" || harness === "2") {
   document.body.prepend(note);
 }
 
+/**
+ * The three roots, each behind its own boundary. A throw in the product panel
+ * must not be able to take the showcase down with it, and vice versa - and the
+ * product panel is the one that matters.
+ *
+ * Scope, because it is easy to over-claim: this catches RENDER-time throws.
+ * It does not catch throws from event handlers, and the two most likely ones
+ * live there (Composer.send and the L2 card's 拒绝, both of which reach
+ * lib/panel.ts and throw when no native host is attached). Those need their
+ * own handling; see error-boundary.tsx for the same note on the other side.
+ *
+ * The area label is what the fallback says, so the three read differently
+ * instead of all three saying "出错了".
+ */
+const ROOTS = {
+  product: { area: "面板", node: <App /> },
+  app: { area: "演示应用", node: <AppHarness /> },
+  showcase: { area: "组件总览", node: <Showcase /> },
+} as const;
+
+function root(): ReactNode {
+  if (harness === "1") return ROOTS.app.node;
+  if (harness === "2") return ROOTS.showcase.node;
+  return ROOTS.product.node;
+}
+
+const area = harness === "1" ? ROOTS.app.area : harness === "2" ? ROOTS.showcase.area : ROOTS.product.area;
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    {harness === "1" ? <AppHarness /> : harness === "2" ? <Showcase /> : <App />}
+    <ErrorBoundary area={area}>{root()}</ErrorBoundary>
   </StrictMode>,
 );
 
