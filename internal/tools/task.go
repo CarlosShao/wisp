@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 	"sync"
 	"unicode/utf8"
@@ -31,6 +32,14 @@ type TaskDeps struct {
 	// taskOutput answers fail-closed instead of pretending the task list is
 	// merely empty.
 	Roster *TaskRoster
+	// Paths is the SAME C26 canonicalizer the fs tools are wired with, and it
+	// is the only sanctioned way for this tool to answer "can the pointer I am
+	// about to hand the model actually be read right now" (ticket 174 AC#2).
+	// Nil means the host never wired a judge: taskOutput then fails closed and
+	// SAYS so in the reply instead of silently vouching for the path. Deciding
+	// that question any other way - filepath.Clean/Abs of one's own - is the
+	// D22 ban AGENTS §1.2 states verbatim, so there is no other way here.
+	Paths *PathCanonicalizer
 	// SpillTokens / SpillHeadTokens / SpillTailTokens override the D15(3)
 	// truncation shape. Zero means the frozen reference values below, and the
 	// AC#3 test that pins the shape shrinks them to prove the numbers are
@@ -223,11 +232,18 @@ func (t taskOutput) Execute(ctx context.Context, params json.RawMessage, onUpdat
 	// The pointer branch. A copy file is the D15(3) norm; its absence is a
 	// defect the model has to be told about, because the alternative - a stub
 	// with no path - is precisely "只截不指".
+	//
+	// Ticket 174 AC#2: when the pointer IS given, it still must not promise a
+	// road back that does not exist. The path stays in the reply (that is
+	// PLAN.md:2564's shape and ticket 164's already-accepted AC#3), and
+	// pointerNotice adds what is actually true about it, in the same text the
+	// model reads - not in a log line, not in a Go error.
 	var stub string
 	if rec.ArtifactPath != "" {
+		notice := t.d.pointerNotice(rec.ArtifactPath)
 		stub = fmt.Sprintf(
-			"%s\n[…输出已落文件：省略 %d 字符，总长 %d 字节 / 约 %d token，全文见 %s…]\n%s",
-			head, totalBytes-len(head)-len(tail), totalBytes, totalTokens, rec.ArtifactPath, tail)
+			"%s\n[…输出已落文件：省略 %d 字符，总长 %d 字节 / 约 %d token%s，全文见 %s…]\n%s",
+			head, totalBytes-len(head)-len(tail), totalBytes, totalTokens, notice, rec.ArtifactPath, tail)
 	} else {
 		stub = fmt.Sprintf(
 			"%s\n[…输出已截断且无副本文件：省略 %d 字符，总长 %d 字节 / 约 %d token，"+
@@ -266,6 +282,49 @@ func TaskOutputDecl() Decl {
 // not here.
 func BuiltinTaskEntries(d TaskDeps) []Entry {
 	return []Entry{{Tool: taskOutput{d: d}, Decl: TaskOutputDecl()}}
+}
+
+// pointerNotice answers, in the words the model will read, whether the copy
+// file a pointer names can actually be fetched right now. "" means yes: the
+// path is inside an authorized root and is a real regular file, and then this
+// tool stays quiet - a reply that warned about every healthy pointer would be
+// noise, not honesty (ticket 174 AC#2's reverse criterion).
+//
+// Two shapes make it speak, and they are judged by different facts:
+//
+//	authorization  C26 decides it, through the same *PathCanonicalizer fs.read
+//	               is judged by: Canonicalize, then InAllowlist. Nothing here
+//	               normalizes a path by hand (D22 / AGENTS §1.2).
+//	existence      os.Stat on the exact string being printed. Read-only: this
+//	               function never creates, moves, truncates or removes
+//	               anything, which is what keeps a "is it there" check from
+//	               becoming a cleanup path.
+//
+// No judge wired is NOT "assume readable": the answer says it cannot be
+// verified, which is the same fail-closed shape as Execute's
+// "任务名册未接线" refusal.
+func (d TaskDeps) pointerNotice(raw string) string {
+	if d.Paths == nil {
+		return "；注意：本进程没有接线路径授权判定者（C26），这条路径是否还读得回来无法核实，按读不到处理"
+	}
+	var notes []string
+	canon, err := d.Paths.Canonicalize(raw)
+	switch {
+	case err != nil:
+		notes = append(notes, "注意：这条路径现在读不到，C26 连规范化都没通过（"+err.Error()+"）")
+	case !d.Paths.InAllowlist(canon):
+		notes = append(notes, "注意：这条路径现在读不到，它不在你被授权的目录范围内，fs.read 会被拒；"+
+			"要用户先把所属目录加进 [fs] allowed_dirs 才读得回来")
+	}
+	if st, statErr := os.Stat(raw); statErr != nil {
+		notes = append(notes, "注意：这条路径现在读不到，宿主登记的那份副本文件并不存在")
+	} else if !st.Mode().IsRegular() {
+		notes = append(notes, "注意：这条路径现在读不到，它存在但不是一般文件（是目录或别的形状）")
+	}
+	if len(notes) == 0 {
+		return ""
+	}
+	return "；" + strings.Join(notes, "；")
 }
 
 // takeHeadTokens returns the leading budget tokens of s, 4 bytes per token
