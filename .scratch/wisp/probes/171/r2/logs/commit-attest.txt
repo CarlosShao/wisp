@@ -53,3 +53,8 @@ docs/evidence/s1/162-risk-tier-and-contract-axis-r4.md
 12ad498b 票 171（171-r2 写码位·件⑤）证据件落盘：docs/evidence/s1/171-run-legs-and-subtraction-r2.md（十三节，按派单 §6 的顺序） step-0 五件／本程没测什么／AC#7 两向读数（合成树同一条 G2 腿 2 枚->3 枚：改前 6->6、改后 6->7）＋十四腿改前改后全表／ AC#8 三处（整腿摘除 0->1、SHR 仍 rc=0 但单列一张『基线过期』表、与 AC#7 同程）＋flip 十格全量 rc=0／ 单独一节"我有没有减射程"（两把尺同一枚锚，十四腿名册两向 comm 全空、合计 151 行对 151 行、射程行增删 0 枚）／ 40->42 现量（两枚锚同数）／门禁四数（d22scan rc=0、runtests PASS=34 FAIL=0 SKIP=0 RUN=76、gofumpt v0.12.0）／ 权限拒绝 0 次（一次 Edit 未匹配＝非权限，发生在取数之后）／删除命令 0 次／伪授权两栏 0／凭据零抄录／next= 五条。 自报两处缺陷：r2-roster-diff.sh 第一版是恒真比较（六枚对照腿段名取错，已改）、覆掉后没留原件； flip 文件头那句 "6 of 14 legs ringing" 与现量 7 响/7 静不符＝过期文字，本程未动、入账归编排者。
 .scratch/wisp/probes/171/r2/logs/commit-attest.txt
 docs/evidence/s1/171-run-legs-and-subtraction-r2.md
+
+=== 件⑥ commit 原样输出 ===
+0abb2e5f 票 171（171-r2 写码位·件⑥）Progress log 追加一行（只追加、零勾、newest last）： AC#7＋AC#8 两格一次做完的现场账——step-0 锚 f1b99a70、五枚 run 腿基线现量 0/0/2/0/0、 硬判据两向（同一条 G2 腿 2 枚->3 枚：未修码 6->6、修完 6->7）、AC#8 三处各自两向（整腿摘除 0->1、 SHR 仍 rc=0 但单列表 0->1 枚、与 AC#7 同程）、flip 只新增一格且十格全量 rc=0、 两把尺同一枚锚的名册两向 comm 全空（151 对 151、射程行增删 0 枚）、 门禁四数（gate rc=0／d22scan rc=0／runtests 34-0-0 与 RUN=76／gofumpt v0.12.0）、40->42 已核、 删除命令 0 次／权限拒绝 0 次／伪授权 0 栏／凭据零抄录；自报第一版 r2-roster-diff 的恒真比较与被覆掉的原件。 本程未勾任何框（勾归编排者）。AC#1／AC#3 未领未动。
+.scratch/wisp/issues/171-three-ruler-holes-ticket-161-cannot-carry-aggregate-rs-selftest-not-in-ci-trailing-comments-counted-as-calls-and-count-blind-pair-legs.md
+.scratch/wisp/probes/171/r2/logs/commit-attest.txt
