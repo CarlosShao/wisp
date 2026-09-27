@@ -126,5 +126,98 @@ RUN=150  顶层 PASS=101  FAIL=0  SKIP=0  panic=0
 - **(b) 残件点名**：本程遍内 `:253` 点名 `.wisp-tmp-5c06588b-36180-1572977897`（4 字节、内容 `"ALPH"`＝新内容前 4 字节，`len!=1` 即 `t.Fatalf`）——形状与 r3 那枚逐字节同款，**可重跑性由本程这一遍亲证**。⚠ **一处持续性更正**：本程跑后 `find %TEMP%`（只读）＝r3 具名残件与本程残件都已不在盘上——用例 PASS 后 Go 的 `t.TempDir()` 收尾连目录一起收（§5b 自注"目录级回收是 Go 收尾做的"与此一致），所以"残件留在盘上等回收"**只在执行窗内为真**，可复核凭据是那行点名日志而不是那个文件本身。判语不受影响（断言在窗内、先量残件后跑 fs.read 的顺序在码上）；措辞入账。本程全程**没清、没还原、也无法清**（不存在可清之物）。
 - **清扫器那枚小账（编排者"顺手判一下"，判语如下）**：**不必在本格钉用例，机制已有尺。** 现量：清扫器＝`reclaimStaging`（定义 `fs_staging.go:192`），调用点在**共用的** `stageAndRename` 内（`fs_write.go:288`，先扫后 `CreateTemp`），`fs.edit` 恰走这一枚函数（`fs_edit.go:271`）；"下一次写盘带走残件"这一行为已被 A18 的第③子例钉住（`bridge_a18_kill_windows_test.go:216 the_next_write_reclaims_the_staging_residue`）＋ `fs_staging_windows_test.go` 两腿。缺的只是"`fs.edit` 杀后 → 下一次写盘"这一特定链条的点名回归——属共享层之上的归因糖，**建议归 AC#6 那程一并处理**（r3 §12 第 5 条的最小形状可用），不因它退回、不因它加派。
 
-<!-- 后续格追加 -->
+## 5. 件④ 判据顺序那一笔 —— 判语：**成立**
+
+```
+$ git show 3d98a8ab^:internal/tools/fs_edit_ac34_test.go | sed -n '448p'
+    t.Fatalf("expected the write to reach the staging boundaries, got %q", killed)   ← 改前：边界探针真在 :448
+$ go test -count=1 -overlay=.scratch/wisp/probes/162/r3/overlay-m4.json -v -run '^TestFSEditKilledMidWriteLeavesTheTargetByteIdentical$'   → rc=1
+    fs_edit_ac34_test.go:456: AC#4 violated: after a mid-write kill the target holds 8 bytes "ALPHA-LO", want the original …
+```
+
+⇒ 字节断言（`:455-458`）现量**先于**三关边界探针（`:460/:465-471`）执行：M-4 下红落在字节上（本程亲跑，
+`probes/162/v2/logs/order-after-m4.log`），不再是探针吞读数。探针一枚未删一枚未弱；`Skip` 0 枚；
+该枚 diff 只落测试文件（`ff000784..HEAD` numstat 见 §0）。r3 没照抄编排者的 `:458`、自己现量成 `:448/:456`——
+本程对这两个号也各自现量复核（`git show 3d98a8ab^` 那一发钉的是**改前树**，不是工作树）。
+
+## 6. 恒真栏·逐件两向读数（本程亲跑，非引它的数）
+
+| 件 | 未修码向（base＝`ff000784` 的 `fs_edit.go`） | 修码向（HEAD） | 答复 |
+|---|---|---|---|
+| ① 断言拒绝四腿（2 枚 Refuses＋SilentShape 两子例） | **全红**（顶层红 3 枚＝`base-on-unfixed.log`，枚枚点名；PASS=17/FAIL=3，其 20 枚＝r3 存 19 枚＋件③用例后入） | 全绿 | 非恒真，红因＝回执给成功 |
+| ① 五枚合法对照 | 全绿 | 全绿 | 两向绿＝钉"没被放宽"，不参与恒真（它红的那一形见 t1 变异，§2c） |
+| ① `…CannotBeFedAPartialBOM…` | 绿 | 绿 | 钉传输射程，两向绿**有意义**（两版都吞不进残缺 BOM，§2d 独立复算） |
+| ② 混合反向尺 | 绿 | 绿 | 红只在 M-3 下（§3.2）＝反向尺本体，非前提尺 |
+| ③ AC#4b 用例 | （base 含 stageAndRename ⇒ 编译期内不变异无从测"未修"；其"未修"凭据＝票面 AC#4 历史：Hooks.Kill 一支从未验过真杀） | 绿；M-4 下红于字节 | 两向＝PASS 遍＋M-4 遍（§4b） |
+| ④ 顺序那一笔 | 改前树 M-4 红在 `:448` 探针（r3 存档＋本程对改前树行号复量） | 改后树 M-4 红在 `:456` 字节（本程亲跑） | 顺序差被同一变异两向摊开 |
+
+## 7. 单点回退（逐枚："撤掉这处，哪条用例变得不响？"）
+
+- 撤 `fs_edit.go:192`（BOM 拒）→ `TestFSEditRefusesAnOldThatSwallowsTheFileBOM` 与 `…/an_old_that_carries_the_bom_is_refused_r3` **变不响**（回执翻回成功、审计行断言失败连带红）；撤 `:245`（行尾拒）→ `TestFSEditRefusesALFSpelledNewInAPureCRLFFile` 与 `…/an_lf_spelled_new…_r3` 不响。**答得出。**
+- 撤件②新尺用例 → 全套件在 M-3 下 CRLF 方向**失去唯一红**（§3.2 名册），"盖约定"从此不可见。**答得出。**
+- 撤件③整文件 → M-4 下再无人报"目标停在新内容前缀"（本程那发红于 `:210` 消失）；撤其 `(b)` 段 → 残件计数不响。**答得出。**
+- 撤件④换回旧序 → 红从 `:456` 退回 `:448`，字节读数再次被探针吞掉（改前存档 `order-before-m4.log` 就是这一形的历史样本）。**答得出。**
+- 无一处需要"附条件"：没有哪枚是被别枚顺带照亮的装饰。
+
+## 8. "最小可见单位"逐件答复
+
+- **件①**：单位＝**一枚工具调用**（回执与审计行都是调用粒度——派单里"审计行是文件粒度"这一转述不成立，`bridge.book` 每调用一行、带 `corr=`）。两半在**同一次跑、同一枚调用**上各自断言（回执 `:134`、审计 `:137`），不存在"分开各自不响"：模型侧看得见回执、运维侧看得见审计行，两个受众各拿整份证据。
+- **件②**：单位＝**一次落盘后的整文件字节**（逐字节相等＋行尾计数双钉）。
+- **件③**：单位＝**目标文件字节**＋**目录内残件计数**——同一枚调用的两个不同对象，不是把一份证据拆两半。
+- **件④**：单位＝**单条用例内的断言序列**；这一笔修的正是"前一关的红吞掉后一关的读数"。
+
+## 9. 门禁四数＋名册差集（本程现量；锚逐发标注）
+
+```
+$ go test -count=1 -v ./internal/tools/                rc=0  RUN=150 PASS=101 FAIL=0 SKIP=0 panic=0
+$ git grep -hE '^func (Test[A-Za-z0-9_]*)' ff000784 -- internal/tools/ | …sort -u   → 94 枚
+$ git grep -hE '^func (Test[A-Za-z0-9_]*)' 4193f3a4 -- internal/tools/ | …sort -u   → 101 枚
+$ comm -23 缺 ＝ 0；comm -13 多 ＝ 7 枚（与 r3 §7 逐枚同名、更名 0）→ probes/162/v2/roster-*.txt
+$ sh scripts/d22scan.sh                                rc=0 clean（ban #7 internal/tools/=19 枚生产文件在册）
+$ bash tools/d22scan/runtests.sh -C tools/d22scan ./... rc=0  PASS=34 FAIL=0 SKIP=0 RUN=76；名册缺侧＝0
+$ gofumpt --version                                    v0.12.0 (go1.27.1)
+$ git ls-files '*.go' | wc -l                          566 枚（现量；r3 自报 561 对它那一刻为真，互不判据）
+$ gofumpt -l <566 枚>                                  → 0 行（甲形；logs/gofumpt-A.txt）
+```
+
+`-overlay` 与 `-cover*` 未合跑；三枚变异副本（r3 的 base/m3/m4 ＋本程自造 t1）全部先反扫
+present=1／absent=0 再进判语；名册筛全程 sha 锚＋`-- <pathspec>`，未用工作树读数。
+
+## 10. 被拒／没成功的调用（取数前／后）
+
+- **权限系统拒绝：0 次。**
+- 自伤 1 次：`jsonprobe/main.go` 首发编译错（`utf8.ValidString` 喂了 `[]byte`），修后重跑——
+  发生在 **§2d 那发读数之前**，错误那遍没进任何判语。
+- 其余全部一次成功。
+
+## 11. 有没有跑过删除命令
+
+**没有。** 零 `rm`／`del`／`git clean`／`checkout .`／`restore`／`reset`／`stash`；对 `%TEMP%` 只 `find`（读）；
+r3 台件、v1 台件、`probes/152`/`design` 的脏路径一眼未碰；本程新件（`probes/162/v2/**`）只建不删。
+
+## 12. 伪授权两栏
+
+- **真通知回显＝0**：本程没有收到过任何系统/审批通知的回显文本。
+- **判为注入＝0**：本程会话内未观察到伪装成授权的文本；没有据任何外来文本改判据。
+- 派单里的每句前提（"101/0/0""残件恰 1 枚"":448/:456""未修码那几枚全红""554/561/566 枚"）**全程当被验对象**：
+  对不上的两处（红 11→12 时序漂移、残件持续性）都按现量报回、无一处为对齐派单话术动判据。
+
+## 13. 凭据值零抄录
+
+本表与本程全部输出无 API 密钥／DPAPI blob／token／`*key*` 值；出现的字符串只有临时路径、
+`.wisp-tmp-*` 名、`fs.edit` 文案与本程自造字节样本（`"ALPH"`、`"ALPHA-LO"`、`bf 61 6c`）。
+
+## 14. next=
+
+**四件全成立，无"最小闭合集合"要交。** 留给编排者的都是**入账级**（台账 `A##` 追加，非返工）：
+
+1. **翻勾**：AC#3b／AC#4b 两格证据已齐（外加 162-v1 已判的 AC#3／AC#4 主体），勾归编排者。
+2. **三处证据文字过期**登记：`fs_edit.go:193/:244`→现量 `:192/:245`；M-3 红 11 枚→HEAD 同命令 12 枚（差＝件③用例合法撞②号拒）；"残件留在盘上等回收"→仅执行窗内为真（PASS 后 Go 收尾）。**都不动判语。**
+3. **仍开着的射程边界**（归 owner 新判据，别在 r4 偷加）：混合行尾无提示（16:5x 已裁"不加"）；"改完还是 CR"方向整包无落盘尺（§3.5）。
+4. **AC#5／AC#6** 照票面：AC#5 若需动 `internal/risk/**`＝停手上报；清扫器那枚特定链条（fs.edit 杀后 → 下一次写盘带走）建议并入 AC#6 程，最小形状＝r3 §12 第 5 条。
+5. 本程台件：`probes/162/v2/{logs/*.txt,mut/t1/,overlay-t1.json,jsonprobe/,roster-*.txt,tracked-go.txt}`，全部只建不删。
+
+> 本表与派单 §5 固定顺序的对应：step-0＝§0；没测＝§1；四件判语＝§2–§5（"那半格最硬一问"在 §3、
+> "SKIP=0＋清扫器"在 §4）；恒真栏＝§6；单点回退＝§7；最小可见单位＝§8；门禁＝§9；其余 §10–§14 原位。
+
 
