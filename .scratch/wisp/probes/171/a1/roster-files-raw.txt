@@ -1,0 +1,463 @@
+@C 506cbae7 09-26 20:49 票 158 验收 r1 · §0/§1：三把判据仪器各自的正控读数（锚 c7f638c）
+
+.scratch/wisp/probes/158/accept-r1/bridge.anchor.go
+.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go
+.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go
+.scratch/wisp/probes/158/accept-r1/census-at-my-anchor.txt
+.scratch/wisp/probes/158/accept-r1/cli-after-copy.txt
+.scratch/wisp/probes/158/accept-r1/cli-baseline-a1.log
+.scratch/wisp/probes/158/accept-r1/cli-before-copy.txt
+.scratch/wisp/probes/158/accept-r1/d22scan-direct.txt
+.scratch/wisp/probes/158/accept-r1/d22scan-script.txt
+.scratch/wisp/probes/158/accept-r1/g5-with-risk.txt
+.scratch/wisp/probes/158/accept-r1/gate-at-anchor.txt
+.scratch/wisp/probes/158/accept-r1/gofumpt-full.err
+.scratch/wisp/probes/158/accept-r1/gofumpt-full.txt
+.scratch/wisp/probes/158/accept-r1/gofumpt-narrow.txt
+.scratch/wisp/probes/158/accept-r1/gofumpt-version.txt
+.scratch/wisp/probes/158/accept-r1/make-rig-a1.sh
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go
+.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go
+.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go
+.scratch/wisp/probes/158/accept-r1/mut/guard.as-is.go
+.scratch/wisp/probes/158/accept-r1/mut/guard.no1.go
+.scratch/wisp/probes/158/accept-r1/mut/guard.no2.go
+.scratch/wisp/probes/158/accept-r1/mut/guard.no3.go
+.scratch/wisp/probes/158/accept-r1/mut/guard.stub.go
+.scratch/wisp/probes/158/accept-r1/overlay-canary-a1.json
+.scratch/wisp/probes/158/accept-r1/overlay-noopentask-a1.json
+.scratch/wisp/probes/158/accept-r1/ovl/r1-stubmut.json
+.scratch/wisp/probes/158/accept-r1/ovl/r2-stub.json
+.scratch/wisp/probes/158/accept-r1/ovl/r3-m2full.json
+.scratch/wisp/probes/158/accept-r1/ovl/r4-m2no3.json
+.scratch/wisp/probes/158/accept-r1/ovl/r5-m1no1.json
+.scratch/wisp/probes/158/accept-r1/ovl/r6-m1no2.json
+.scratch/wisp/probes/158/accept-r1/ovl/r7-m3full.json
+.scratch/wisp/probes/158/accept-r1/pair-census-a1.sh
+.scratch/wisp/probes/158/accept-r1/pair-census-a1.txt
+.scratch/wisp/probes/158/accept-r1/roster-baseline.txt
+.scratch/wisp/probes/158/accept-r1/roster-mut.txt
+.scratch/wisp/probes/158/accept-r1/run-cmdwisp-m3.log
+.scratch/wisp/probes/158/accept-r1/run-r1-stubmut.log
+.scratch/wisp/probes/158/accept-r1/run-r2-stub.log
+.scratch/wisp/probes/158/accept-r1/run-r3-m2full.log
+.scratch/wisp/probes/158/accept-r1/run-r4-m2no3.log
+.scratch/wisp/probes/158/accept-r1/run-r5-m1no1.log
+.scratch/wisp/probes/158/accept-r1/run-r6-m1no2.log
+.scratch/wisp/probes/158/accept-r1/run-r7-m3full.log
+.scratch/wisp/probes/158/accept-r1/tools-baseline.log
+.scratch/wisp/probes/158/accept-r1/tools-mut.log
+.scratch/wisp/probes/158/accept-r1/vet.txt
+docs/evidence/s1/158-gate-scope-blind-spot-r1-accept-r1.md
+@C 15ff2bee 09-26 21:18 docs(票 77/36-40 进度追记): owner 交回 ZCode 后的 commit 链与 AC 对照（只追加不勾框）——AC#2 需非实现者复核、AC#4 可出台账证据、AC#1/3/6 仍 blocked（33/145/push）；五张屏票补可视壳进度注记
+
+.scratch/wisp/issues/158-the-gate-stands-outside-the-shape-that-is-live-today-openscope-closescope-has-no-clause-and-the-bridge-scope-open-is-guarded-only-in-another-package.md
+.scratch/wisp/issues/36-result-history-panel.md
+.scratch/wisp/issues/37-approval-ui-l2.md
+.scratch/wisp/issues/38-command-palette-tasks.md
+.scratch/wisp/issues/39-config-editor-gui.md
+.scratch/wisp/issues/40-security-privacy-cost-pages.md
+.scratch/wisp/issues/77-frontend-scaffold-reactbits-beautifului-shadcn.md
+@C 5afa666b 09-26 21:21 docs(前端 log §8 事故自陈): 15ff2be 目录级 pathspec 扫入编排者票 158 在途编辑（18/5）——内容无丢失未推送，不重写；process 修正=pathspec 一律到文件
+
+docs/reports/frontend-session-log-zcode.md
+@C 611ae8b9 09-26 21:26 fix(票 169 甲案): right-rail.tsx:108 假终端文案里的 U+2713 换成 OK——一枚装饰字符曾同时摘掉 CI 四道静态门（lint 自检红→后续步全跳过且无声）；d22scan 复跑 rc=0、全仓 0 finding
+
+frontend/src/components/harness/right-rail.tsx
+@C fbe12c71 09-26 21:28 docs(前端 log §8 事故链自陈): 三连违例分陈（目录 pathspec 吞 158 落勾账／5afa666 未验先写／611ae8b 先 commit 后测）+ 已验证事实与票 169 闭合读数
+
+docs/reports/frontend-session-log-zcode.md
+@C 16364e63 09-26 21:53 evidence(票161 r1 §0-§2): 门禁盲区普查台件＋读数基线——生产字节零改动；派单§4"两枚已知红"在锚 fbe12c7 上已被 611ae8b(21:26) 取代成"零枚红"，按§9 报回不动判据
+
+.scratch/wisp/probes/161/r1/.gitignore
+.scratch/wisp/probes/161/r1/README.md
+.scratch/wisp/probes/161/r1/bench.sh
+.scratch/wisp/probes/161/r1/logs/al-overbroad.scan.log
+.scratch/wisp/probes/161/r1/logs/b1-clean.scan.log
+.scratch/wisp/probes/161/r1/logs/b1-closure-bad.scan.log
+.scratch/wisp/probes/161/r1/logs/b1-named-bad.scan.log
+.scratch/wisp/probes/161/r1/logs/b1-probe-testfile.scan.log
+.scratch/wisp/probes/161/r1/logs/b2-bad.scan.log
+.scratch/wisp/probes/161/r1/logs/b2-clean.scan.log
+.scratch/wisp/probes/161/r1/logs/b2-probe-alias.scan.log
+.scratch/wisp/probes/161/r1/logs/b3-bad.scan.log
+.scratch/wisp/probes/161/r1/logs/b3-clean.scan.log
+.scratch/wisp/probes/161/r1/logs/b3-probe-structlit.scan.log
+.scratch/wisp/probes/161/r1/logs/b4-clean.scan.log
+.scratch/wisp/probes/161/r1/logs/b4-sub-bad.scan.log
+.scratch/wisp/probes/161/r1/logs/b4-unix-bad.scan.log
+.scratch/wisp/probes/161/r1/logs/b5-bad.scan.log
+.scratch/wisp/probes/161/r1/logs/b5-clean.scan.log
+.scratch/wisp/probes/161/r1/logs/b6-bad.scan.log
+.scratch/wisp/probes/161/r1/logs/b6-clean.scan.log
+.scratch/wisp/probes/161/r1/logs/b6-probe-comment.scan.log
+.scratch/wisp/probes/161/r1/logs/b7-bad.scan.log
+.scratch/wisp/probes/161/r1/logs/b7-clean.first-run-rang-on-comment.log
+.scratch/wisp/probes/161/r1/logs/b7-clean.scan.log
+.scratch/wisp/probes/161/r1/logs/b8-comment-clean.scan.log
+.scratch/wisp/probes/161/r1/logs/b8-probe-bands.scan.log
+.scratch/wisp/probes/161/r1/logs/b8-scope-bad.scan.log
+.scratch/wisp/probes/161/r1/logs/bench-all.log
+.scratch/wisp/probes/161/r1/logs/gorun-b8-scope-bad.log
+.scratch/wisp/probes/161/r1/logs/post-baseline-runtests.log
+.scratch/wisp/probes/161/r1/logs/post-d22scan-sh.log
+.scratch/wisp/probes/161/r1/logs/post-gofumpt.txt
+.scratch/wisp/probes/161/r1/logs/post-passnames.txt
+.scratch/wisp/probes/161/r1/logs/pre-baseline-d22scan-sh.log
+.scratch/wisp/probes/161/r1/logs/pre-baseline-findings.txt
+.scratch/wisp/probes/161/r1/logs/pre-baseline-govet-inmodule.log
+.scratch/wisp/probes/161/r1/logs/pre-baseline-govet.log
+.scratch/wisp/probes/161/r1/logs/pre-baseline-runtests.log
+.scratch/wisp/probes/161/r1/logs/pre-passnames.txt
+.scratch/wisp/probes/161/r1/logs/skeleton-clean.scan.log
+.scratch/wisp/probes/161/r1/logs/summary.tsv
+.scratch/wisp/probes/161/r1/logs/unp-bad.scan.log
+.scratch/wisp/probes/161/r1/logs/unp-hides-bans.scan.log
+docs/evidence/s1/161-gate-blindspot-r1.md
+@C e8092351 09-26 21:59 evidence(票161 r1 §3-§9): AC#1 逐枚读数 27 发＋六枚盲区登记——`// Bans` 名册 8 枚禁令今天全点得到，门不瞎但瞎在更窄的六处
+
+docs/evidence/s1/161-gate-blindspot-r1.md
+@C 0492cd5d 09-26 22:01 evidence(票161 r1 §5.6-§5.7): 终判三本日志(pre/post/final 四数同、名册两向差集皆空)+AC#5 名册 45 枚全在我写面内；票面追加落盘未提交的现场处置
+
+.scratch/wisp/probes/161/r1/logs/final-ac5-roster.txt
+.scratch/wisp/probes/161/r1/logs/final-passnames.txt
+.scratch/wisp/probes/161/r1/logs/final-runtests.log
+.scratch/wisp/probes/161/r1/logs/ticket-file-sha-before.txt
+docs/evidence/s1/161-gate-blindspot-r1.md
+@C 7e8cfdc7 09-26 22:02 evidence(票161 r1 §5.6 收尾): AC#5 名册改取到三枚提交后的 49 枚＋自指一句＋第三遍全仓扫描 rc=0/0 finding
+
+.scratch/wisp/probes/161/r1/logs/final-ac5-roster.txt
+.scratch/wisp/probes/161/r1/logs/final-d22scan-sh.log
+docs/evidence/s1/161-gate-blindspot-r1.md
+@C 8995b366 09-26 22:35 probes(票161 r2 AC#3): 门铃普查的四把尺＋三枚台件＋两版错读原样留件
+
+.scratch/wisp/probes/161/r2/fix/neg_comment_and_string.gofix
+.scratch/wisp/probes/161/r2/fix/pos2_risk_pkg_producer.gofix
+.scratch/wisp/probes/161/r2/fix/pos_known_positive.gofix
+.scratch/wisp/probes/161/r2/fix_pos2_risk.gofix
+.scratch/wisp/probes/161/r2/fix_pos_known.gofix
+.scratch/wisp/probes/161/r2/log_controls.txt
+.scratch/wisp/probes/161/r2/log_rulerA_final.txt
+.scratch/wisp/probes/161/r2/log_rulerA_fixtures.txt
+.scratch/wisp/probes/161/r2/log_rulerA_repo.txt
+.scratch/wisp/probes/161/r2/log_rulerA_repo_detail.txt
+.scratch/wisp/probes/161/r2/log_rulerA_trap.txt
+.scratch/wisp/probes/161/r2/log_rulerB2_err.txt
+.scratch/wisp/probes/161/r2/log_rulerB2_raw.json
+.scratch/wisp/probes/161/r2/log_rulerB2a_raw.json
+.scratch/wisp/probes/161/r2/log_rulerB_err.txt
+.scratch/wisp/probes/161/r2/log_rulerB_final.json
+.scratch/wisp/probes/161/r2/log_rulerB_raw.json
+.scratch/wisp/probes/161/r2/log_rulerB_report.txt
+.scratch/wisp/probes/161/r2/log_rulerC_err.txt
+.scratch/wisp/probes/161/r2/log_rulerC_final.json
+.scratch/wisp/probes/161/r2/log_rulerC_raw.json
+.scratch/wisp/probes/161/r2/ruler_a_emit.json
+.scratch/wisp/probes/161/r2/ruler_a_enum.py
+.scratch/wisp/probes/161/r2/ruler_b2_ast.go.txt
+.scratch/wisp/probes/161/r2/ruler_b_ast.go.txt
+.scratch/wisp/probes/161/r2/ruler_b_dump.py
+.scratch/wisp/probes/161/r2/ruler_c_producers.go.txt
+.scratch/wisp/probes/161/r2/run_controls.py
+@C cd999794 09-26 22:36 evidence(票161 r2 AC#3 交件): 门铃普查答话——生产码发问点 2 枚、路由点 4 枚、判定生产者 L1 25/L2 98、D43#17 门铃生产发起 0 枚、答案侧 7 枚符号生产调用点各 0 枚
+
+docs/evidence/s1/161-doorbell-census-r1.md
+@C feed0a17 09-26 22:36 probes(票161 r2 §15 补件): 把证据件里 tee 到的那枚 gofumpt 读数落成留件
+
+.scratch/wisp/probes/161/r2/log_gofumpt_lines.txt
+@C 27f798ec 09-26 22:41 ledger(A313-A315)＋票 158 落勾归属与换病因＋新立 169/170＋161 追加 AC#6/AC#7＋三枚派单存档
+
+.scratch/wisp/dispatches/2026-09-26-213x-impl-161-r1-gate-blindspot-census.md
+.scratch/wisp/dispatches/2026-09-26-213x-readonly-161-r2-doorbell-census.md
+.scratch/wisp/dispatches/2026-09-26-221x-impl-161-r3-selftests-and-stop-the-bleeding.md
+.scratch/wisp/issues/158-the-gate-stands-outside-the-shape-that-is-live-today-openscope-closescope-has-no-clause-and-the-bridge-scope-open-is-guarded-only-in-another-package.md
+.scratch/wisp/issues/160-scope-open-returns-a-handle-carrying-its-own-closer.md
+.scratch/wisp/issues/161-gates-need-their-own-gates-self-tests-in-ci-plus-is-the-approval-door-ever-rung.md
+.scratch/wisp/issues/169-a-single-decorative-glyph-in-frontend-makes-the-repo-wide-gate-red-and-kills-every-ci-step-after-it.md
+.scratch/wisp/issues/170-the-cli-legs-l1-block-window-has-nobody-to-veto-it-asks-and-then-executes.md
+.scratch/wisp/probes/169/orch/d22scan-2117.log
+.scratch/wisp/probes/169/orch/d22scan-220x.log
+docs/reports/pending-and-issues.md
+@C 0d176473 09-26 22:44 停车点 4.0s（09-26 22:4x）：票 158 五格成立/AC#5 换病因仍不闭＋161-r3 在飞＋新立 169/170 两枚要 owner 的票＋推送继续按住的具名理由
+
+docs/reports/HANDOVER.md
+@C e3f5980a 09-26 23:28 票 161 r3 第一格（AC#7① 止血）：把 3 枚入库台件格式化到 gofumpt 干净，并用读数证明变异一字未变
+
+.scratch/wisp/probes/158/accept-r1/mut/guard.no1.go
+.scratch/wisp/probes/158/accept-r1/mut/guard.no2.go
+.scratch/wisp/probes/158/accept-r1/mut/guard.no3.go
+.scratch/wisp/probes/161/r3/.gitignore
+.scratch/wisp/probes/161/r3/extract-red.sh
+.scratch/wisp/probes/161/r3/logs/interim-d22scan-sh.txt
+.scratch/wisp/probes/161/r3/logs/post-gofumpt-l-full.txt
+.scratch/wisp/probes/161/r3/logs/post-r4-m2no3.log
+.scratch/wisp/probes/161/r3/logs/post-r4-m2no3.rc
+.scratch/wisp/probes/161/r3/logs/post-r4-m2no3.red.norm.txt
+.scratch/wisp/probes/161/r3/logs/post-r4-m2no3.red.txt
+.scratch/wisp/probes/161/r3/logs/post-r5-m1no1.log
+.scratch/wisp/probes/161/r3/logs/post-r5-m1no1.rc
+.scratch/wisp/probes/161/r3/logs/post-r5-m1no1.red.norm.txt
+.scratch/wisp/probes/161/r3/logs/post-r5-m1no1.red.txt
+.scratch/wisp/probes/161/r3/logs/post-r6-m1no2.log
+.scratch/wisp/probes/161/r3/logs/post-r6-m1no2.rc
+.scratch/wisp/probes/161/r3/logs/post-r6-m1no2.red.norm.txt
+.scratch/wisp/probes/161/r3/logs/post-r6-m1no2.red.txt
+.scratch/wisp/probes/161/r3/logs/pre-gofumpt-d-no1.txt
+.scratch/wisp/probes/161/r3/logs/pre-gofumpt-d-no2.txt
+.scratch/wisp/probes/161/r3/logs/pre-gofumpt-d-no3.txt
+.scratch/wisp/probes/161/r3/logs/pre-r4-m2no3.log
+.scratch/wisp/probes/161/r3/logs/pre-r4-m2no3.rc
+.scratch/wisp/probes/161/r3/logs/pre-r4-m2no3.red.norm.txt
+.scratch/wisp/probes/161/r3/logs/pre-r4-m2no3.red.txt
+.scratch/wisp/probes/161/r3/logs/pre-r5-m1no1.log
+.scratch/wisp/probes/161/r3/logs/pre-r5-m1no1.rc
+.scratch/wisp/probes/161/r3/logs/pre-r5-m1no1.red.norm.txt
+.scratch/wisp/probes/161/r3/logs/pre-r5-m1no1.red.txt
+.scratch/wisp/probes/161/r3/logs/pre-r6-m1no2.log
+.scratch/wisp/probes/161/r3/logs/pre-r6-m1no2.rc
+.scratch/wisp/probes/161/r3/logs/pre-r6-m1no2.red.norm.txt
+.scratch/wisp/probes/161/r3/logs/pre-r6-m1no2.red.txt
+.scratch/wisp/probes/161/r3/logs/pre-runtests.log
+.scratch/wisp/probes/161/r3/logs/pre-staticcheck-d22scan.txt
+.scratch/wisp/probes/161/r3/logs/pre-topnames.txt
+.scratch/wisp/probes/161/r3/logs/txt-overlay-r5.log
+.scratch/wisp/probes/161/r3/logs/txt-overlay-r5.red.txt
+.scratch/wisp/probes/161/r3/logs/vet-crossmodule-verbatim.txt
+.scratch/wisp/probes/161/r3/ovl/r5-m1no1-fromtxt.json
+.scratch/wisp/probes/161/r3/pre-format/guard.no1.go.txt
+.scratch/wisp/probes/161/r3/pre-format/guard.no2.go.txt
+.scratch/wisp/probes/161/r3/pre-format/guard.no3.go.txt
+.scratch/wisp/probes/161/r3/run-mut.sh
+docs/evidence/s1/161-selftests-r3.md
+@C 3e56e680 09-26 23:37 票 161 r3 撞顶代提（AC#2 自检入口落地＋AC#7 判据改两形读）＋ledger(A318)
+
+.github/workflows/ci.yml
+.scratch/wisp/issues/161-gates-need-their-own-gates-self-tests-in-ci-plus-is-the-approval-door-ever-rung.md
+.scratch/wisp/probes/161/r3/gate-order.sh
+.scratch/wisp/probes/161/r3/logs/cell2-runtests.log
+.scratch/wisp/probes/161/r3/logs/ci-diff-analysis.txt
+.scratch/wisp/probes/161/r3/logs/orch-runtests-2335.log
+.scratch/wisp/probes/161/r3/logs/post-staticcheck-ci-pin.txt
+.scratch/wisp/probes/161/r3/logs/post-topnames.txt
+.scratch/wisp/probes/161/r3/logs/pre-staticcheck-ci-pin.txt
+.scratch/wisp/probes/161/r3/logs/selftest-first-run.txt
+.scratch/wisp/probes/161/r3/logs/selftest-run2.txt
+.scratch/wisp/probes/161/r3/logs/selftest-run3.txt
+.scratch/wisp/probes/161/r3/logs/selftest-run4.txt
+.scratch/wisp/probes/161/r3/logs/selftest-run5.txt
+docs/reports/pending-and-issues.md
+tools/d22scan/main.go
+tools/d22scan/selftest.go
+tools/d22scan/selftest_test.go
+tools/d22scan/selftestsamples.go
+@C 70a106e5 09-26 23:39 派单存档 161-r4（AC#7② 门输出归因仪器＋AC#4 真摘一次）：写死 ≤60 次工具调用的预算硬顶——今天已连着两枚死在"活没做完就被掐断"
+
+.scratch/wisp/dispatches/2026-09-26-235x-impl-161-r4-gate-order-attribution.md
+@C 339b67a1 09-26 23:40 停车点 4.0s 追加（23:5x）：161-r3 撞顶后代提的复跑读数＋AC#7 那条"永远产不出读数"的判据改两形＋161-r4 在飞（派单写死 ≤60 次工具调用）
+
+docs/reports/HANDOVER.md
+@C 77e9ed2c 09-26 23:53 票 161 r4：AC#7② 归因仪器（两形各自出读数）＋ AC#4 真摘一次
+
+.scratch/wisp/issues/161-gates-need-their-own-gates-self-tests-in-ci-plus-is-the-approval-door-ever-rung.md
+.scratch/wisp/probes/161/r4-pre-runtests.log
+.scratch/wisp/probes/161/r4-pre-runtests.log.roster.txt
+.scratch/wisp/probes/161/r4/attrib.sh
+.scratch/wisp/probes/161/r4/logs/attrib-run1-baseline.txt
+.scratch/wisp/probes/161/r4/logs/attrib-run2-fixed.txt
+.scratch/wisp/probes/161/r4/logs/attrib-run3-final-clean.txt
+.scratch/wisp/probes/161/r4/logs/attrib-run4-negative-control-red.txt
+.scratch/wisp/probes/161/r4/logs/attrib-run5-final.txt
+.scratch/wisp/probes/161/r4/logs/d22scan-sh-final.txt
+.scratch/wisp/probes/161/r4/logs/gate-order-r3-probe.txt
+.scratch/wisp/probes/161/r4/logs/roster-post.txt
+.scratch/wisp/probes/161/r4/logs/roster-pre.txt
+.scratch/wisp/probes/161/r4/logs/runtests-mirror-ring-removed.log
+.scratch/wisp/probes/161/r4/logs/runtests-mirror-ring-removed.log.roster.txt
+.scratch/wisp/probes/161/r4/logs/runtests-post-restore.log
+.scratch/wisp/probes/161/r4/logs/runtests-post-restore.log.roster.txt
+.scratch/wisp/probes/161/r4/logs/selftest-baregoroutine-ring1-removed.txt
+.scratch/wisp/probes/161/r4/logs/selftest-control-intact.txt
+.scratch/wisp/probes/161/r4/logs/selftest-mirror-ring-removed.txt
+.scratch/wisp/probes/161/r4/removed/.gitignore
+.scratch/wisp/probes/161/r4/removed/intact-stdout.txt
+.scratch/wisp/probes/161/r4/removed/overlay.json
+.scratch/wisp/probes/161/r4/removed/overlay2.json
+.scratch/wisp/probes/161/r4/removed/removed-stdout.txt
+.scratch/wisp/probes/161/r4/removed/selftestsamples.no-baregoroutine-ring1.go
+.scratch/wisp/probes/161/r4/removed/selftestsamples.no-mirror-ring.go
+.scratch/wisp/probes/161/r4/removed/sha256-after.txt
+.scratch/wisp/probes/161/r4/removed/sha256-before.txt
+docs/evidence/s1/161-gate-order-r4.md
+@C 22ecf9db 09-26 23:55 票 161 r4 补一格：提交之后再跑的（甲）读数（AC#7② 的"尺最后跑"）
+
+.scratch/wisp/probes/161/r4/logs/attrib-run6-post-commit.txt
+docs/evidence/s1/161-gate-order-r4.md
+@C ffbf4630 09-26 23:56 票 161 r4 补 §0：把票面 AC#4／AC#7 两格连行号抄进证据件（派单 §0 第 4 件）
+
+docs/evidence/s1/161-gate-order-r4.md
+@C d49a5beb 09-26 23:58 票 161 r4 next= 补第 5 件：三把尺里我只归因了 gofumpt 那一把（含补跑的 vet 读数）
+
+.scratch/wisp/probes/161/r4/logs/go-vet-root.txt
+docs/evidence/s1/161-gate-order-r4.md
+@C 71cff1cc 09-27 00:02 ledger(A319)＋票 161 代落 161-r4 交件与我三裁＋161-r5 派单存档
+
+.scratch/wisp/dispatches/2026-09-27-001x-impl-161-r5-attrib-selftest-and-ci-leg.md
+.scratch/wisp/issues/161-gates-need-their-own-gates-self-tests-in-ci-plus-is-the-approval-door-ever-rung.md
+docs/reports/pending-and-issues.md
+@C 83e2320d 09-27 08:49 161-r5 cell 1: attrib.sh gains a text-fed classifier self-test
+
+.scratch/wisp/probes/161/r5/README.md
+.scratch/wisp/probes/161/r5/attrib.sh
+.scratch/wisp/probes/161/r5/logs/a0-r4-baseline.txt
+.scratch/wisp/probes/161/r5/logs/c1-selftest.txt
+.scratch/wisp/probes/161/r5/logs/c2-selftest-green.txt
+.scratch/wisp/probes/161/r5/logs/c3-r5-both-forms-post-move.txt
+.scratch/wisp/probes/161/r5/logs/c4-r4-both-forms-post-move.txt
+@C e67a5773 09-27 08:49 161-r5 cell 2: CI gains the tracked-set leg of the formatting gate
+
+.github/workflows/ci.yml
+@C c664478c 09-27 08:50 161-r5 cell 3: form (A)'s TRACKED-DIRTY leg is measured, in an out-of-repo copy
+
+.scratch/wisp/probes/161/r5/logs/d1-tracked-dirty-proof.txt
+.scratch/wisp/probes/161/r5/logs/d2-tracked-dirty-proof-full.txt
+.scratch/wisp/probes/161/r5/tracked-dirty-proof.sh
+@C 79394ae3 09-27 08:52 161-r5 evidence: the three cells, with the rulers run last
+
+.scratch/wisp/probes/161/r5/logs/e1-attrib-post-commits.txt
+.scratch/wisp/probes/161/r5/logs/e2-d22scan-post-commits.txt
+.scratch/wisp/probes/161/r5/logs/e3-vet-d22scan-module.txt
+.scratch/wisp/probes/161/r5/logs/e4-vet-root.txt
+.scratch/wisp/probes/161/r5/logs/g1-runtests-pre.log
+.scratch/wisp/probes/161/r5/logs/g1.roster.txt
+.scratch/wisp/probes/161/r5/logs/g2-runtests-post.log
+.scratch/wisp/probes/161/r5/logs/g2.roster.txt
+.scratch/wisp/probes/161/r5/logs/g3-d22scan-sh.txt
+docs/evidence/s1/161-attrib-selftest-r5.md
+@C ea415e70 09-27 08:54 161-r5: append the progress cell for the three cells
+
+.scratch/wisp/issues/161-gates-need-their-own-gates-self-tests-in-ci-plus-is-the-approval-door-ever-rung.md
+@C 413ea903 09-27 09:03 ledger(A320)＋票 161 代落 161-r5 顶回我那一条：不删、把伤样本格式化到干净
+
+.scratch/wisp/issues/161-gates-need-their-own-gates-self-tests-in-ci-plus-is-the-approval-door-ever-rung.md
+docs/reports/pending-and-issues.md
+@C 8efece37 09-27 09:18 票 161 AC#6 判据两处自纠（我本轮现量出来的）＋161-r6／161-v1 两份派单存档
+
+.scratch/wisp/dispatches/2026-09-27-092x-accept-161-v1-selftests-ac1-ac2-ac3.md
+.scratch/wisp/dispatches/2026-09-27-092x-impl-161-r6-gate-aggregate-rc-and-pair-legs.md
+.scratch/wisp/issues/161-gates-need-their-own-gates-self-tests-in-ci-plus-is-the-approval-door-ever-rung.md
+@C 6b0a9f00 09-27 09:21 ledger(A321)：派单前先把 AC#6 那两腿要的那发读数自己跑一遍——两腿都有毛病且相反
+
+docs/reports/pending-and-issues.md
+@C aa2c0f44 09-27 09:22 ledger(A321) 时刻自纠：两节标题落笔前没重新 date，读数朝未来漂
+
+docs/reports/pending-and-issues.md
+@C f17b62f8 09-27 09:31 evidence(票161 v1验收 §0-§1): AC#1 独立复算成立——名册现读8枚、自造11发假根样本(6枚亲手打响+4枚盲区复算+B2扩张)、另登记V1-N1/N2两枚相邻形状;锚8efece37全读数取仓外副本
+
+.scratch/wisp/probes/161/v1/logs/attrib-selftest.txt
+.scratch/wisp/probes/161/v1/logs/attrib-tracked.txt
+.scratch/wisp/probes/161/v1/logs/d22scan-sh.txt
+.scratch/wisp/probes/161/v1/logs/fourway-tail40.txt
+.scratch/wisp/probes/161/v1/logs/go-version.txt
+.scratch/wisp/probes/161/v1/logs/hollow-emptyrepo.txt
+.scratch/wisp/probes/161/v1/logs/hollow-roster.txt
+.scratch/wisp/probes/161/v1/logs/mut1-leaknamed-gone.txt
+.scratch/wisp/probes/161/v1/logs/mut2-mirror-ring-gone.txt
+.scratch/wisp/probes/161/v1/logs/mut3-wallclock-silent-gone.txt
+.scratch/wisp/probes/161/v1/logs/runtests.txt
+.scratch/wisp/probes/161/v1/logs/selftest-baseline.txt
+.scratch/wisp/probes/161/v1/logs/selftestsamples.as-run.txt
+.scratch/wisp/probes/161/v1/logs/v1-rootA.txt
+.scratch/wisp/probes/161/v1/logs/v1-rootB.txt
+.scratch/wisp/probes/161/v1/logs/v1-rootC.txt
+.scratch/wisp/probes/161/v1/logs/v1-rootD.txt
+.scratch/wisp/probes/161/v1/samples/allowlist.b6-suppress.txt
+.scratch/wisp/probes/161/v1/samples/allowlist.empty.txt
+.scratch/wisp/probes/161/v1/samples/broken.go.txt
+.scratch/wisp/probes/161/v1/samples/rootB/internal/v1/s1.go
+.scratch/wisp/probes/161/v1/samples/rootB/internal/v1/s2.go
+.scratch/wisp/probes/161/v1/samples/rootB/internal/v1/s3.go
+.scratch/wisp/probes/161/v1/samples/rootB/internal/v1/s4.go
+.scratch/wisp/probes/161/v1/samples/rootB/internal/v1/s5.go
+.scratch/wisp/probes/161/v1/samples/rootB/internal/v1/s6.go
+.scratch/wisp/probes/161/v1/samples/rootB/internal/v1/s7.go
+.scratch/wisp/probes/161/v1/samples/rootB/internal/v1/s8.go
+.scratch/wisp/probes/161/v1/samples/rootB/internal/v1/s9.go
+docs/evidence/s1/161-gates-selftest-accept-r1.md
+@C 359bb87e 09-27 09:33 evidence(票161 v1验收 §2): AC#2 成立——基线34项双向现跑、三发单点回退(摘非末枚仍绿/摘mirror-hash末枚ring拒出判语/摘wallclock末枚silent对称红)、空心保护两形rc=2坐实、CI可达性:fourway常红在test-core/test-windows作业且ci.yml零needs链吃不掉lint第4步读数;全程仓外副本、生产零字节
+
+docs/evidence/s1/161-gates-selftest-accept-r1.md
+@C 15327948 09-27 09:36 evidence(票161 v1验收 §3-§9): AC#3 成立——grep 族换尺重数与 r2 四格同向(2/4/0/0)、三控制1/1/1(含自曝一发模式括号错并留双份)、C层半枚防回归按 panel_pump_test:211 原文复算;附对编排者三笔不服、被拒0枚、删除命令0次、伪授权0/0、next= 五件;锚8efece3不变
+
+docs/evidence/s1/161-gates-selftest-accept-r1.md
+@C 4267bb3c 09-27 09:36 票 164 契约文本落地（owner 批准，台账 A322）：D34 新增 task.output＋§7 加一条 task.list/cancel 的 DEFERRED＋SPEC-07 镜像
+
+docs/PLAN.md
+docs/specs/SPEC-07-tools-and-plugins.md
+@C bd7475ff 09-27 09:37 evidence(票161 v1验收 补): AC#3 尺归档件 ac3-rulers.txt 入册(前一枚 pathspec 提交只带已跟踪路径,新日志漏网,按只建不删补提)
+
+.scratch/wisp/probes/161/v1/logs/ac3-rulers.txt
+@C addb760d 09-27 09:38 evidence(票161 v1验收 补2): 控制复跑原始件入册,写面内不留未跟踪悬挂件
+
+.scratch/wisp/probes/161/v1/logs/ac3-rulers.txt.controls.tmp
+@C 5d11b8fb 09-27 09:48 票 161 AC#6①（161-r6）：给 probes/154/gate-clauses.sh 装上聚合退码
+
+.scratch/wisp/probes/154/gate-clauses.sh
+.scratch/wisp/probes/161/r6/flip-declaration.sh
+@C 9f530571 09-27 09:49 票 161 AC#6②（161-r6）：两族成对普查各成一腿＋会响证据两形（甲主证／乙只证算术）
+
+.scratch/wisp/probes/161/r6/diffsets-text.sh
+.scratch/wisp/probes/161/r6/faketree.sh
+.scratch/wisp/probes/161/r6/logs/diffsets-text-----1-OpenTask-CloseTask--opened-never-closed.txt
+.scratch/wisp/probes/161/r6/logs/diffsets-text-----2-OpenTask-CloseTask--opened-then-closed-in-the-same-file.txt
+.scratch/wisp/probes/161/r6/logs/diffsets-text-----3-OpenTask-CloseTask--open-verb-only-inside-a-comment.txt
+.scratch/wisp/probes/161/r6/logs/diffsets-text-----4-Defer-DisposalScope--Defer-with-no-scope-token-in-the-file.txt
+.scratch/wisp/probes/161/r6/logs/faketree-phase1.txt
+.scratch/wisp/probes/161/r6/logs/faketree-phase2.txt
+.scratch/wisp/probes/161/r6/logs/faketree-phase3.txt
+.scratch/wisp/probes/161/r6/logs/flip-1.txt
+.scratch/wisp/probes/161/r6/logs/flip-2.txt
+.scratch/wisp/probes/161/r6/logs/flip-3.txt
+.scratch/wisp/probes/161/r6/logs/flip-4.txt
+.scratch/wisp/probes/161/r6/logs/flip-5.txt
+.scratch/wisp/probes/161/r6/logs/flip-6.txt
+.scratch/wisp/probes/161/r6/logs/flip-baseline.txt
+.scratch/wisp/probes/161/r6/logs/flip-restored.txt
+.scratch/wisp/probes/161/r6/samples/comment-only.txt
+.scratch/wisp/probes/161/r6/samples/defer-no-scope.txt
+.scratch/wisp/probes/161/r6/samples/open-only.txt
+.scratch/wisp/probes/161/r6/samples/open-then-close.txt
+@C b2447301 09-27 09:50 ledger(A323＋A324)＋票 161 三格翻勾：161-v1 非实现者表三格全〔成立〕、无退回项
+
+.scratch/wisp/issues/161-gates-need-their-own-gates-self-tests-in-ci-plus-is-the-approval-door-ever-rung.md
+docs/reports/pending-and-issues.md
+@C b067db0a 09-27 09:51 票 161 AC#6（161-r6）：交件证据件＋更正自己台件里一句说错的计数
+
+docs/evidence/s1/161-gate-aggregate-r6.md
+@C 30121fef 09-27 09:57 ledger(A325)＋票 161 代落 161-r6 交件与我四裁＋161-v2 派单存档
+
+.scratch/wisp/dispatches/2026-09-27-100x-accept-161-v2-ac4-ac6-ac7.md
+.scratch/wisp/issues/161-gates-need-their-own-gates-self-tests-in-ci-plus-is-the-approval-door-ever-rung.md
+docs/reports/pending-and-issues.md
+@C bc65d975 09-27 10:08 票 161 验收 161-v2 第 1 节（AC#6）：聚合退码两向翻声明我现跑有牙＋合成树三发我自己另建复现＋那 4 枚反向逐枚裁为形状使然（G7 靠注释响这条另立残余）
+
+.scratch/wisp/probes/161/v2/aggregate-flips.txt
+.scratch/wisp/probes/161/v2/faketree-phase1-g6g7-mainlegs.txt
+.scratch/wisp/probes/161/v2/faketree-phase2-g6g7-mainlegs.txt
+.scratch/wisp/probes/161/v2/faketree-phase3-g6g7-mainlegs.txt
+docs/evidence/s1/161-gates-accept-r2.md
+@C a7f2d790 09-27 10:18 票 161 验收 161-v2 第 2-5 节（AC#4＋AC#7＋没测什么＋对编排者的不服）
+
+.scratch/wisp/probes/161/v2/attrib-noknown.sh
+.scratch/wisp/probes/161/v2/delete-experiments.sh
+docs/evidence/s1/161-gates-accept-r2.md
+@C 1a95eaa6 09-27 10:20 票 161 验收 161-v2 补一段：那枚常红在 lint 作业吃不到我的读数（作业隔离），它自己那格里吞不吞名册要跑一次比名册差集才知道——本程未跑、未修、未 Skip
+
+docs/evidence/s1/161-gates-accept-r2.md
+@C e0405d57 09-27 10:29 ledger(A326)＋票 161 结案改名 -done＋立票 171（三枚带不走的尺洞）＋162 代落 r1 交件与三裁
+
+.scratch/wisp/issues/161-gates-need-their-own-gates-self-tests-in-ci-plus-is-the-approval-door-ever-rung-done.md
+.scratch/wisp/issues/162-add-the-patch-one-region-tool-instead-of-rewriting-whole-files.md
+.scratch/wisp/issues/171-three-ruler-holes-ticket-161-cannot-carry-aggregate-rs-selftest-not-in-ci-trailing-comments-counted-as-calls-and-count-blind-pair-legs.md
+docs/reports/HANDOVER.md
+docs/reports/pending-and-issues.md
