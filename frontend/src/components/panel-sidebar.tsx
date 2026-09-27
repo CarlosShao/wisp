@@ -17,8 +17,13 @@ import { cn } from "@/lib/cn";
 export type PanelSidebarSection =
   | "chat"
   | "approval"
+  | "palette"
   | "tasks"
   | "ball"
+  | "config"
+  | "security"
+  | "privacy"
+  | "cost"
   | "settings";
 
 export interface PanelSidebarProps {
@@ -50,7 +55,9 @@ export function PanelSidebar({
 }: PanelSidebarProps) {
   return (
     <aside className="flex h-full w-60 min-w-60 shrink-0 flex-col border-r border-line bg-surface">
-      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-2">
+      {/* The aria-label is the gate's needle: render-nav counts rows inside
+          this landmark to prove the sidebar renders every view. */}
+      <nav aria-label="面板视图" className="flex min-h-0 flex-1 flex-col overflow-y-auto p-2">
         {/* workspace row */}
         <button
           type="button"
@@ -88,11 +95,16 @@ export function PanelSidebar({
             <div className="flex flex-col gap-px">
               {(
                 [
-                  { key: "chat", label: "对话", icon: null },
-                  { key: "approval", label: `审批${pendingCount ? ` (${pendingCount})` : ""}`, icon: null },
-                  { key: "tasks", label: "任务", icon: null },
-                  { key: "ball", label: "球状态", icon: null },
-                ] as { key: PanelSidebarSection; label: string; icon: null }[]
+                  { key: "chat", label: "对话" },
+                  { key: "approval", label: `审批${pendingCount ? ` (${pendingCount})` : ""}` },
+                  { key: "palette", label: "命令" },
+                  { key: "tasks", label: "任务" },
+                  { key: "ball", label: "球状态" },
+                  { key: "config", label: "设置" },
+                  { key: "security", label: "安全" },
+                  { key: "privacy", label: "隐私" },
+                  { key: "cost", label: "成本" },
+                ] as { key: PanelSidebarSection; label: string }[]
               ).map((item) => {
                 const on = item.key === active;
                 return (
@@ -100,6 +112,7 @@ export function PanelSidebar({
                     key={item.key}
                     type="button"
                     aria-current={on ? "page" : undefined}
+                    aria-label={item.label}
                     data-menu-row
                     onClick={() => onSelect(item.key)}
                     className={cn(
@@ -127,7 +140,7 @@ export function PanelSidebar({
             </p>
           </div>
         </GlideMenu>
-      </div>
+      </nav>
 
       {/* bottom block */}
       <GlideMenu

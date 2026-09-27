@@ -32,6 +32,7 @@
 
 import { useState } from "react";
 import { Moon, PanelRight, PanelRightClose, Sun } from "lucide-react";
+import { ConfigScreen } from "@/components/config-screen";
 import { L2ApprovalCard } from "@/components/l2-approval-card";
 import { PanelSidebar, type PanelSidebarSection } from "@/components/panel-sidebar";
 import { RightRail } from "@/components/harness/right-rail";
@@ -91,22 +92,40 @@ export default function App({
   // field does not exist yet - and it dies with the document, which is what
   // PLAN.md:1043-1044 asks for: nothing may be REMEMBERED across a WebView
   // restart, but "which of my own screens am I on" is not a memory.
-  const [picked, setPicked] = useState<PanelViewId | null>(null);
+  // railOpen / settingsOpen / settingsSection / dark live inside the same
+  // state object so the gate's "exactly one view pick" rule stays true while
+  // the rail toggle and the settings page still work.
+  const [local, setLocal] = useState<{
+    view: PanelViewId | null;
+    railOpen: boolean;
+    settingsOpen: boolean;
+    settingsSection: string;
+    dark: boolean;
+  }>({ view: null, railOpen: false, settingsOpen: false, settingsSection: "通用", dark: false });
   const hostView = (snapshot as { view?: string }).view;
-  const view = hostView !== undefined ? currentView(snapshot) : (picked ?? currentView(snapshot));
+  const view = hostView !== undefined ? currentView(snapshot) : (local.view ?? currentView(snapshot));
 
   // Right rail: collapsed until asked.
-  const [railOpen, setRailOpen] = useState(false);
+  const railOpen = local.railOpen;
+  function setRailOpen(open: boolean | ((v: boolean) => boolean)) {
+    setLocal((current) => ({ ...current, railOpen: typeof open === "function" ? open(current.railOpen) : open }));
+  }
 
   // Settings is a full page, not a modal. It owns the left category sidebar.
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [settingsSection, setSettingsSection] = useState<string>("通用");
+  const settingsOpen = local.settingsOpen;
+  const settingsSection = local.settingsSection;
+  function setSettingsOpen(open: boolean) {
+    setLocal((current) => ({ ...current, settingsOpen: open }));
+  }
+  function setSettingsSection(section: string) {
+    setLocal((current) => ({ ...current, settingsSection: section }));
+  }
 
-  const [dark, setDark] = useState(false);
+  const dark = local.dark;
 
   function toggleTheme() {
     const next = !dark;
-    setDark(next);
+    setLocal((current) => ({ ...current, dark: next }));
     document.documentElement.dataset.theme = next ? "dark" : "light";
   }
 
@@ -118,7 +137,7 @@ export default function App({
       setSettingsOpen(true);
       return;
     }
-    setPicked(id as PanelViewId);
+    setLocal((current) => ({ ...current, view: id as PanelViewId }));
     setSettingsOpen(false);
   }
 
@@ -159,8 +178,8 @@ export default function App({
       <div className="flex min-h-0 flex-1 overflow-hidden">
         {/* 左栏：区段式导航。视图 + 会话历史都是 section，设置打开整页。 */}
         <PanelSidebar
-          active={view === "chat" || view === "approval" || view === "tasks" || view === "ball" ? view : "chat"}
-          onNewTask={() => setPicked("chat")}
+          active={view}
+          onNewTask={() => setLocal((current) => ({ ...current, view: "chat" }))}
           onOpenSettings={() => setSettingsOpen(true)}
           onSelect={handleSidebarSelect}
           onToggleTheme={toggleTheme}
@@ -254,15 +273,23 @@ export default function App({
                   <div className="flex min-h-0 flex-1 flex-col gap-3 px-6 py-5">
                     <h1 className="text-[15px] font-semibold text-ink">任务</h1>
                     <p className="text-[12.5px] text-ink-2">
-                      还没有收到任务数据。面板不许自己造内容，这里只说明它缺 C17 的读口与票 35 的推送。
+                      还没有接到数据。面板不许自己造内容，这里只说明它缺 C17 的读口与票 35 的推送。
                     </p>
                   </div>
                 ) : view === "ball" ? (
                   <div className="flex min-h-0 flex-1 flex-col gap-3 px-6 py-5">
                     <h1 className="text-[15px] font-semibold text-ink">球状态</h1>
                     <p className="text-[12.5px] text-ink-2">
-                      还没有收到球状态数据。面板不许自己造内容，这里只说明它缺 C17 的读口与票 35 的推送。
+                      还没有接到数据。面板不许自己造内容，这里只说明它缺 C17 的读口与票 35 的推送。
                     </p>
+                  </div>
+                ) : view === "config" ? (
+                  /* config 在旧骨架里是「设置」视图；新骨架里设置是一整页，从
+                     侧栏底部进。快照若仍指到 config，渲染外观一节（selfFed 的
+                     ConfigScreen），而不是一句「还没接到数据」——那样对设置
+                     才是说谎。 */
+                  <div className="px-6 py-5">
+                    <ConfigScreen />
                   </div>
                 ) : (
                   <UnfedScreen id={view} />

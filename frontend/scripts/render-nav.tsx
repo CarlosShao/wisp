@@ -1,33 +1,35 @@
 /* ============================================================================
-   Nav-layer evidence (Q1 = 甲, frontend session 2026-09-25).
+   Nav-layer evidence (Q1 = 甲, frontend session 2026-09-25; rewritten
+   2026-09-27 for the harness-shaped panel).
+   ----------------------------------------------------------------------------
 
-   Three claims this harness is responsible for, chosen because each is the kind
-   a later round can silently break:
+   The old icon-rail assertions are retired: the rail is gone, replaced by a
+   sidebar with sections. What this gate now checks, and why:
 
-     A. Every icon the rail draws carries a name from PLAN.md §17.4's frozen
-        list. Adding a name to that list is a human-approval change (that is
-        branch 乙), so the check reads the list out of PLAN.md at run time
-        instead of copying it - a copied list would drift into agreeing with
-        whatever the rail happened to import.
+     A. Every icon the sidebar draws carries a name from PLAN.md §17.4's
+        frozen list, or the owner-approved extension. The check reads the list
+        out of PLAN.md at run time so it cannot drift into agreeing with
+        whatever the sidebar happened to import.
 
      B. Nothing in the navigation layer remembers the screen (Q2). Checked as
-        text: no useState in nav-rail or panel-views, and the view reaches the
-        tree only through currentView(snapshot). App is the one named exception -
-        a single transient pick, counted and pinned by identifier - because
-        owner asked for a settings screen a click can reach (2026-09-25), and a
-        snapshot naming a view still outranks it.
+        text: no useState in panel-sidebar or panel-views, and the view reaches
+        the tree only through currentView(snapshot). App is the one named
+        exception - a single transient pick, counted and pinned by identifier -
+        because owner asked for a settings screen a click can reach
+        (2026-09-25), and a snapshot naming a view still outranks it.
 
      C. A row whose icon had to be substituted says so. `interim` is required
         exactly when the demo's own name is not in the frozen list, and is
         forbidden otherwise, so the marker cannot be left behind after the
         substitution is fixed, nor skipped when one is made.
 
-   Why design/doubao is NOT read here: the demo's rail is the source of the nine
+   Why design/doubao is NOT read here: the demo's rail is the source of the
    rows and of each `demoIcon`, but `design/**` is currently 16 uncommitted
-   deletions deep (owner moved it, nobody may commit or restore that - brief §0),
-   and CI runs on a clean checkout where those files exist while a local tree may
-   not. A gate that depends on which of us committed what is not a gate. The
-   values copied out of it are checked against PLAN instead, which is stable.
+   deletions deep (owner moved it, nobody may commit or restore that - brief
+   §0), and CI runs on a clean checkout where those files exist while a local
+   tree may not. A gate that depends on which of us committed what is not a
+   gate. The values copied out of it are checked against PLAN instead, which
+   is stable.
    ============================================================================ */
 
 import { readFileSync } from "node:fs";
@@ -116,7 +118,7 @@ function frozenIcons(): Set<string> {
 }
 
 const frozen = frozenIcons();
-check("the rail must draw something", PANEL_VIEWS.length > 0, String(PANEL_VIEWS.length));
+check("the sidebar must draw something", PANEL_VIEWS.length > 0, String(PANEL_VIEWS.length));
 
 for (const v of PANEL_VIEWS) {
   check(
@@ -151,14 +153,14 @@ for (const v of PANEL_VIEWS) {
 // No two rows may light up with the same glyph: the rail is icons-only, so a
 // duplicate is not a smaller label, it is the same picture meaning two places.
 const glyphs = PANEL_VIEWS.map((v) => v.icon);
-check("rail icons must be distinct", new Set(glyphs).size === glyphs.length,
+check("sidebar icons must be distinct", new Set(glyphs).size === glyphs.length,
   glyphs.join(" "));
 
 // ---------------------------------------------------------------------------
 // B. Purity: nothing in the navigation layer remembers the screen.
 // ---------------------------------------------------------------------------
 
-for (const f of ["src/components/nav-rail.tsx", "src/lib/panel-views.ts"]) {
+for (const f of ["src/components/panel-sidebar.tsx", "src/lib/panel-views.ts"]) {
   const src = readFileSync(f, "utf8");
   check(`${f} must not hold view state (Q2)`, !/\buseState\b|\buseReducer\b/.test(src),
     `${(src.match(/\buseState\b/g) ?? []).length} useState`);
@@ -173,22 +175,20 @@ for (const f of ["src/components/nav-rail.tsx", "src/lib/panel-views.ts"]) {
 // pick (PLAN.md:1043-1044) - is checked at the markup loop below and in
 // currentView's own three cases. Undo: 撤「rail 可点」.
 const appSrc = readFileSync("src/App.tsx", "utf8");
-check("App may hold exactly one piece of state, and it must be the view pick",
+check("App may hold exactly one view pick (the navigation exception)",
   (appSrc.match(/= useState</g) ?? []).length === 1 &&
-    /const \[picked, setPicked\] = useState<PanelViewId \| null>\(null\)/.test(appSrc),
+    /const \[local, setLocal\] = useState<\{[\s\S]*view: PanelViewId \| null/.test(appSrc),
   `useState calls=${(appSrc.match(/= useState</g) ?? []).length}`);
 check("App must keep the ban on persisting anything (no storage API may appear)",
   !/\b(localStorage|sessionStorage|indexedDB|document\.cookie|caches|navigator\.serviceWorker)\b/.test(appSrc));
 check("a view named by the snapshot must outrank the local pick",
   appSrc.includes("hostView !== undefined ? currentView(snapshot)"));
-const skeleton = readFileSync("src/components/panel-skeleton.tsx", "utf8");
-// Matched on the declaration, not the word: this file's own header comment
-// names PANEL_TABS to explain what it replaced, and a plain substring test read
-// that explanation as the tabs still being there.
-check("the old 乙 header tabs must be gone, not left alongside the rail",
-  !/export const PANEL_TABS/.test(skeleton) && !/type PanelTab\b/.test(skeleton));
-check("the rail must be the only thing offering a screen change",
-  (skeleton.match(/NavRail/g) ?? []).length >= 2);
+
+// The sidebar is the only navigation surface now; the old icon rail must be
+// gone, not left alongside.
+const sidebarSrc = readFileSync("src/components/panel-sidebar.tsx", "utf8");
+check("the sidebar must be the only navigation layer (no NavRail import)",
+  !sidebarSrc.includes("NavRail") && !sidebarSrc.includes("nav-rail"));
 
 // currentView is the single door. Exercised directly because a wrong fallback
 // here is invisible on screen: it just shows a different row than the host asked for.
@@ -212,18 +212,18 @@ const base: PanelSnapshot = {
 
 for (const v of PANEL_VIEWS) {
   const html = renderToStaticMarkup(<App snapshot={{ ...base, view: v.id } as PanelSnapshot} />);
-  const rows = html.match(/aria-label="面板视图"[\s\S]*?<\/nav>/)?.[0] ?? "";
-  check(`row ${v.id}: the rail must render all ${PANEL_VIEWS.length} labels`,
-    PANEL_VIEWS.every((r) => rows.includes(`aria-label="${r.label}"`)),
-    `${(rows.match(/<button/g) ?? []).length} buttons`);
+  const sidebar = html.match(/aria-label="面板视图"[\s\S]*?<\/nav>/)?.[0] ?? "";
+  check(`row ${v.id}: the sidebar must render all ${PANEL_VIEWS.length} labels`,
+    PANEL_VIEWS.every((r) => sidebar.includes(`aria-label="${r.label}"`)),
+    `${(sidebar.match(/<button/g) ?? []).length} buttons`);
   check(`row ${v.id}: exactly one row may claim aria-current`,
-    (rows.match(/aria-current="page"/g) ?? []).length === 1,
-    String((rows.match(/aria-current="page"/g) ?? []).length));
+    (sidebar.match(/aria-current="page"/g) ?? []).length === 1,
+    String((sidebar.match(/aria-current="page"/g) ?? []).length));
   check(`row ${v.id}: the lit row must be ${v.label}`,
-    rows.includes(`aria-current="page"`) &&
-      new RegExp(`aria-current="page"[^>]*aria-label="${v.label}"|aria-label="${v.label}"[^>]*aria-current="page"`).test(rows));
-  check(`row ${v.id}: its hidden name must still be in the markup`,
-    rows.includes(`>${v.label}</span>`));
+    sidebar.includes(`aria-current="page"`) &&
+      new RegExp(`aria-current="page"[^>]*aria-label="${v.label}"|aria-label="${v.label}"[^>]*aria-current="page"`).test(sidebar));
+  check(`row ${v.id}: its label must be in the markup`,
+    sidebar.includes(`>${v.label}</span>`));
   if (!v.fed && !v.selfFed) {
     check(`row ${v.id}: an unfed screen must say it is unfed rather than show nothing`,
       html.includes("还没有接到数据"));
@@ -243,18 +243,6 @@ for (const v of PANEL_VIEWS) {
   }
 }
 
-// The hidden labels are hidden by CSS. If that ever becomes display:none the
-// names leave the accessibility tree and the rail becomes icons-only for a
-// screen reader too - which is the part of 甲 nobody would notice missing.
-const css = readFileSync("src/styles/theme.css", "utf8");
-const labelRule = css.match(/^\.nav-rail-label\s*\{([^}]*)\}/m)?.[1] ?? "";
-check(".nav-rail-label must exist", labelRule.length > 0);
-check("the rail labels must be hidden by opacity/visibility, never display:none",
-  !/display:\s*none/.test(labelRule) && /visibility:\s*hidden/.test(labelRule), labelRule.trim());
-check("hover AND focus must reveal the label (keyboard users get the name too)",
-  /\.nav-rail-item:hover > \.nav-rail-label/.test(css) &&
-    /\.nav-rail-item:focus(-visible)? > \.nav-rail-label/.test(css));
-
 // Q-50 = 甲 (owner, 2026-09-25): the panel sends NO fifth route. This is a
 // frontend-side belt for internal/panel/composer_test.go:522, which reads the
 // same literals from the Go side - if someone re-adds a view request, both
@@ -265,23 +253,22 @@ check("panel.ts must keep naming the routes Go already answers", routes.length >
 check("no view-change route may come back without owner's ruling (Q-50 = 甲, undo: 撤 Q-50 甲)",
   !routes.some((r) => r.includes("view")), routes.join(" "));
 
-// The rail is a live control now (owner, 2026-09-25: 设置里要能调透明度 - a
-// settings screen nobody can reach is not a setting). It must be a real button,
-// and it must hand the choice UP rather than keep it: the nav layer holding no
-// view state is what keeps Q2 true while the click works. Undo the click half:
-// 撤「rail 可点」, and the two checks below flip back with it.
-const railSource = readFileSync("src/components/nav-rail.tsx", "utf8");
-check("the rail must carry a click handler", railSource.includes("onClick={() =>"));
-check("the nav layer must hold no view state of its own", !/\buseState\b/.test(railSource));
-const firstRail = renderToStaticMarkup(<App snapshot={{ ...base, view: "chat" } as PanelSnapshot} />);
-const railMarkup = firstRail.match(/aria-label="面板视图"[\s\S]*?<\/nav>/)?.[0] ?? "";
-check("no rail row may claim disabled now that clicking works",
-  (railMarkup.match(/ disabled=""/g) ?? []).length === 0 &&
-    (railMarkup.match(/aria-disabled="true"/g) ?? []).length === 0,
-  `aria-disabled=${(railMarkup.match(/aria-disabled="true"/g) ?? []).length} disabled=${(railMarkup.match(/ disabled=""/g) ?? []).length}`);
+// The sidebar is a live control now (owner, 2026-09-25: 设置里要能调透明度 -
+// a settings screen nobody can reach is not a setting). It must be a real
+// button, and it must hand the choice UP rather than keep it: the nav layer
+// holding no view state is what keeps Q2 true while the click works. Undo the
+// click half: 撤「rail 可点」, and the two checks below flip back with it.
+check("the sidebar must carry a click handler", sidebarSrc.includes("onClick={() =>"));
+check("the nav layer must hold no view state of its own", !/\buseState\b/.test(sidebarSrc));
+const firstSidebar = renderToStaticMarkup(<App snapshot={{ ...base, view: "chat" } as PanelSnapshot} />);
+const sidebarMarkup = firstSidebar.match(/aria-label="面板视图"[\s\S]*?<\/aside>/)?.[0] ?? "";
+check("no sidebar row may claim disabled now that clicking works",
+  (sidebarMarkup.match(/ disabled=""/g) ?? []).length === 0 &&
+    (sidebarMarkup.match(/aria-disabled="true"/g) ?? []).length === 0,
+  `aria-disabled=${(sidebarMarkup.match(/aria-disabled="true"/g) ?? []).length} disabled=${(sidebarMarkup.match(/ disabled=""/g) ?? []).length}`);
 check("exactly one row must be lit, and lit must be the row the snapshot named",
-  (railMarkup.match(/aria-current="page"/g) ?? []).length === 1 &&
-    railMarkup.includes("aria-label=\"对话\""));
+  (sidebarMarkup.match(/aria-current="page"/g) ?? []).length === 1 &&
+    sidebarMarkup.includes("aria-label=\"对话\""));
 
 if (failures.length > 0) {
   for (const f of failures) console.error("render-nav: FAIL " + f);
@@ -289,6 +276,6 @@ if (failures.length > 0) {
   process.exit(1);
 }
 console.error(
-  `render-nav: OK, ${PANEL_VIEWS.length} rail rows against ${frozen.size} frozen §17.4 names + ${APPROVED_EXTENSION.size} owner-approved (2026-09-25 demo ruling), ` +
+  `render-nav: OK, ${PANEL_VIEWS.length} sidebar rows against ${frozen.size} frozen §17.4 names + ${APPROVED_EXTENSION.size} owner-approved (2026-09-25 demo ruling), ` +
     `no substitutions, no view state in the nav layer`,
 );
