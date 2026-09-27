@@ -75,3 +75,67 @@
 | **真检的反证（比"改前不响"更硬的一向）** | 三枚自有变异打改后码（§5） | m2 摘认身份 ⇒ **恰好两枚认身份用例红**、其余 101＋SKIP 照旧；m1 摘幂等分格 ⇒ **恰好幂等用例红**；m3 摘 nil 守卫 ⇒ 该用例 panic 红。**每一味摘掉都有且只有点名它的用例红** ⇒ 这四枚不是恒真，是**承重探针**。 |
 
 ⇒ 本仓否过四次的形状（用例在坏码上从不响）这一发**没有蒙过去**：两向＋变异反证三路全在案。
+
+### 3.3 AC#3 —— 判语：**成立**
+
+本程**自造三枚变异**（`-overlay`，工作树 `internal/**` 全程零写入；实现者的 `mut/provenance.no-identity.go` 未用作本程证据），两问各自独立复算：
+
+- **第一问**（摘掉认身份，是否存在跨包误关从此打不红？）：**存在之"改前全仓零尺"由本程 §4 变异反证坐实；改后不成立——摘掉即红。** m2（把 `reg.owner != s` 换成 `reg.owner != s && false`，即"关别人的也认"放回真码）打在 `./internal/risk/ -v`：**恰好 2 枚红**（两枚认身份用例，`--- FAIL: TestScopeCloseRefusesAnotherOwnersRegistration`／`--- FAIL: TestScopeCloseRefusedOnEmptyRegistrationIsStillVisible`），**其余 101 PASS＋1 SKIP 一枚没动**（`out/mut-m2-accept-foreign-risk.txt`）。⇒ 与 r1 交回的同问读数（101 绿／2 红）**同名同数对上**＝正控成立，且这是本程自己打出来的。
+- **第二问**（摘掉它有无任何外部可见读数变过？）：m2 打 `./internal/tools/` → **`ok 15.066s`、零 FAIL**（出货形状本程基线 `ok 13.986s` 同包同向）。⇒ 跨包口上**摘与不摘完全不可分**——连新加的 `close_err=%v` 那格也没有任何 tools 侧用例钉着（`git grep -n 'was_open|open_scopes|close_err' -- '*.go'` 非注释命中只有 `bridge.go:708` 打印处与 `bridge_scope_open_ticket158_test.go:122/:133` 的 `was_open=true` substring 判据，**没有一枚吃 `close_err`**）。⇒ r1 §5 末"唯一会动的跨包口没人钉"这句**复算属实**，其 §7 残项 ① 登记成立——**本程不代它补**（写面所限），是否补票归编排者（§12）。
+
+## 5. 本程自造变异逐枚表＋承重结论
+
+| 变异 | 改动（一处谓词/守卫，其余全留） | `./internal/risk/ -v` 红名 | 其余 | `./internal/tools/` |
+|---|---|---|---|---|
+| **m1** 幂等分格摘一格 | `:432` `if s.closed {` → `if false {`（重关落进 `reg==nil` 格，AlreadyClosed 变 NotOpen） | `TestScopeCloseIsIdempotent` 1 枚 | 102 PASS＋1 SKIP 照绿 | ok 13.923s 零 FAIL |
+| **m2** 认身份摘掉（=实现者同谓词的**另一发形状**） | `:440` `case reg.owner != s:` → `case reg.owner != s && false:` | 两枚认身份用例 2 枚 | 101 PASS＋1 SKIP 照绿 | ok 15.066s 零 FAIL |
+| **m3** nil 守卫摘掉 | `:426` `if s == nil \|\| s.p == nil {` → `if false {` | `TestScopeCloseIsIdempotent` 处 **panic（nil deref）打崩整套**（崩前 60 PASS，SKIP 未及跑） | 整包 FAIL rc=1 | ok 14.133s 零 FAIL |
+
+（枚数命令：`grep -cE '^--- PASS' out/mut-*-risk.txt` 等，全份在 `out/`。）
+
+**承重结论（操作定义式）**：**摘掉 `Scope.Close` 守卫链上任意一味（幂等分格／认身份／nil 守卫），是否存在一发变异从此打不红？——包内不存在**：本程三发各自都有**且只有**点名它的那枚用例红（m3 连崩带红），而这三味在**出货码**上同机同测全绿（§7）。**跨包存在**：三枚变异下 `internal/tools` 全绿＝句柄语义在包外**零可分辨**，这一味的价值**全部押在包内这 4 枚新用例上**——它们红了才有门可看。故 AC#3"承重、不是装饰"的判语**成立**，附带 §3.3 的"close_err 无人钉"残项（它把"外部可见"那一问的答案诚实交回，本程核其属实）。
+
+## 6. 派单 §3 两笔单独问句
+
+**(a) 自取射程那一枚**（`internal/tools/bridge_scope_open_ticket158_test.go:73`）：
+- **"类型一改它就编不过"成立**：本程只把这一枚文件映回 `34c0b4e4` 旧形（`-overlay=prebase/overlay-t158-revert.json`）打 `go vet ./internal/tools/`，编译**停在且只停在**这一行——`.\.scratch\...34c0b4e4:73:9: cannot use b.scopes[taskID] (map index expression of type *risk.Scope) as bool value in return statement`，其余文件对新 `bridge.go` 全部编过。⇒ 这是**类型事实**、不是自取扩张。
+- **有没有顺手放宽别处断言**：`git show f576cf08 -- 三枚测试文件 | grep '^-' | grep -E 'Errorf|Fatal|if '` → **空**（该 commit 对测试面**零删除断言行**）；`:73` 谓词等价性复核：改前 `b.scopes[taskID]`（bool＝登记在否），改后 `!= nil`（`OpenScope` 返回值恒非 nil：`provenance.go:456-466` 两条路径都 `return s`）⇒ **同一谓词，档位不变**。
+- **名册里还有没有第三枚同类连带件**：排 `internal/risk` 包内直用后，`git grep "risk\.Scope\b"` ⇒ 仅 `bridge.go:143/:186`＋一枚注释；`git grep "CloseScope"` ⇒ 生产码零命中（只剩注释与 docs）。**没有第三枚。**
+
+**(b) G5pos 门 regress**：本程**独立复现**——`bash .scratch/wisp/probes/154/gate-clauses.sh 34c0b4e4` ⇒ `gate_rc=0`、G5 主尺 1 枚（`panel_assets.go`）、正控 quiet；同一脚本打 `HEAD` ⇒ `gate_rc=1`、G5 主尺 **2 枚**（`panel_assets.go`＋`internal/tools/bridge.go` 假阳性）、聚合块 `BAD 腿=G5pos 声明=quiet 实测=ring`、`腿数＝14 声明与实测不符＝1`（`out/gate-34c0b4e4.txt`／`out/gate-HEAD.txt`）。**该 regress 已被独立复现、归票 171（新 AC#5）、不在本格射程**——`probes/154/**` 一个字节未动，本程未修、不代裁。
+
+## 7. 门禁四数＋名册差集（本程现量；逐包单跑）
+
+| 尺 | 读数 |
+|---|---|
+| `sh scripts/d22scan.sh` | **rc=0**，`clean - no D22 ban violations`（ban#8 internal/ 418、cmd/ 45、frontend/ 85、design/ 39；生产 Go 229） |
+| `bash tools/d22scan/runtests.sh -C tools/d22scan ./...` | **OK — PASS=34 FAIL=0 SKIP=0，`=== RUN`=76，`[no tests to run]`=0**（基线现量，未背派单数） |
+| `go test -count=1 -v ./internal/risk/` | **ok 3.757s；103 PASS／0 FAIL／1 SKIP**（唯一 SKIP＝`TestSyncRegistryProbeLive`）。⚠ 口径登记：本程按 `^--- ` 顶层名计数；与编排者的 RUN=172（含子测试）不同口径，互不指认。派单 §2 的 103/0/1 本程**独立量得同数** |
+| `go test -count=1 ./internal/tools/` | **ok 13.986s** |
+| `PATH=$PWD/third_party/sherpa-onnx:$PATH go test -count=1 -v ./cmd/wisp/` | **rc=0，ok 90.017s，84 PASS／0 FAIL／0 SKIP**；点名两枚 CloseTask 机器：`TestCompositionRootClosesTheLoopTasksTaintScope PASS (1.80s)`、`TestAdmitTaskRevokeRemovesTheCrossTaskTaintHit PASS (1.40s)`（`out/cmdwisp-bench.txt`）⇒ r1 的健康 bench 档位本程**已复算** |
+| `go build ./...` ／ `go vet ./internal/risk/ ./internal/tools/ ./cmd/wisp/` | **rc=0／rc=0** |
+| 名册差集（pre-full overlay ↔ 工作树） | 改前 100 枚（99P+1S）／改后 104 枚（103P+1S）；**"改前有改后无"＝0 枚**（`out/roster-lost.txt` 空）；新增恰 4 枚＝§4 那四枚正控（`out/roster-gained.txt`） |
+
+## 8. 被拒／没成功的调用
+
+- 工具调用**零被拒**。**两处本程自伤的仪器错，都发生在取数之前、读数作废重跑**：① 第一轮 overlay 的 JSON 被 heredoc 分段 `>` 覆写截掉开头（`parsing overlay JSON` rc=1）；② 同轮 overlay 路径用了 git-bash 的 `$PWD`（`/d/...` msys 形）与 go 需要的 `D:/...` 不匹配 ⇒ **overlay 静默变 no-op**，那轮 `ac1b` 的"PRE"读数实为打在新码上（编译错误即证）。两错同轮被发现（PRE 腿编译停在自己的 CloseScope 调用上不合预期 ⇒ 起疑查文件），修正后 §3.1/§4/§5 全部读数出自修正轮。**教训形状与 158 台账 I-3 同族：overlay 静默失效不自报错，靠"预期外反向"抓。**
+- `go run` 把子进程非零退码压成 1 的坑本轮未踩到（腿腿退码可分）。
+
+## 9. 有没有跑过删除命令
+
+**没有。** 全程无 `rm`/`del`/`git clean`/`checkout`/`reset`/`amend`/`rebase`/`stash`/`switch`；台件只建不删；分支全程 `dev`（step-0 §1.2 与本节提交时的 `git show` 同一程复见）。
+
+## 10. 伪授权两栏
+
+- **当作授权用掉的**：无。本程动过的面＝`docs/evidence/s1/160-handle-accept-r1.md`＋`.scratch/wisp/probes/160/v1/**`，出处＝派单 §5 写面名单逐字。
+- **明确拒当授权用的**：① 实现者交件 `160-handle-r1.md` 的每一句"实测＝X"——一律只当待复算断言（本程另造样本重走）；② 派单 §2 三笔"编排者已核"数（门 rc=0／gofumpt 548 零红／risk 103-0-1）——只作对照锚、本程各配了现量或显式登记"代跑档"；③ 票面 Status 行与 AC 勾选框——未碰（勾由编排者核后代落）；④ `probes/160/r1/**`、`probes/154/**` 只读只跑、零写入。
+
+## 11. 凭据值零抄录
+
+本程读数中出现的唯一"marker"类字符串是本程自造的合成哨兵（`VVaccept160-*`），无任何 API 密钥／token／真实凭据值被读取或抄录。
+
+## 12. next=
+
+- 三格判语已齐（全"成立"）⇒ **交编排者落票面勾选与台账**（本程未勾一格、未改 Status）。
+- 待编排者拍板的三笔残项：① `close_err` 那一格要不要补一枚 tools 侧钉（r1 §7.1＋本程 §3.3 复算属实＝补票或明记"无人守"）；② `ErrScopeNotOpen` 非 nil-spent 形无专测（本程 §3.2 观察）——归 AC#4 射程还是并 ①；③ G5pos regress 已归票 171，本格只登记独立复现。
+- AC#4（票面 `:35`）／AC#5（`:36`）未裁、未派——票 160 关闭仍差这两格。
