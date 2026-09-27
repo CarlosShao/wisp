@@ -1,0 +1,31 @@
+=== U: is EvDone's Text the full reply or a summary? (loop.go finish) ===
+	}
+	// The terminal row is the audit record of HOW the task ended, so it must
+	// survive the very cancellation that ended it: detaching from ctx keeps
+	// memory's writer from abandoning the write (an already-dead ctx makes
+	// BeginTx fail outright). The 2s bound is a context deadline, not a
+	// wall-clock difference (D42#9).
+	wctx, cancelWrite := terminalWriteCtx(ctx)
+	defer cancelWrite()
+	if err := j.finishTask(wctx, taskLogState(status), firstRunes(summary, 400),
+		int64(cost.Usage.InputTokens), int64(cost.Usage.OutputTokens),
+		cost.Micros, errClass); err != nil {
+		l.log().Warn("agent: task_log finish failed", "err", err, "task", res.TaskID)
+	}
+	l.publish(Event{
+		Kind: EvDone, TaskID: res.TaskID, Text: summary,
+		TokensIn: cost.Usage.InputTokens, TokensOut: cost.Usage.OutputTokens,
+	})
+	return *res
+}
+
+// terminalWriteTimeout bounds a detached forensics write. It is a context
+=== U2: what feeds 'summary' in finish ===
+922:	summary := res.Text
+923:	if summary == "" {
+924:		summary = msg
+933:	if err := j.finishTask(wctx, taskLogState(status), firstRunes(summary, 400),
+939:		Kind: EvDone, TaskID: res.TaskID, Text: summary,
+=== V: does RunAsync's bookkeeping reach TaskRoster at all today? (bridge/task coupling census) ===
+cmd/wisp/run.go:216:	tasks    *tools.TaskRoster
+cmd/wisp/run.go:362:	for _, e := range tools.BuiltinTaskEntries(tools.TaskDeps{Roster: rt.tasks}) {

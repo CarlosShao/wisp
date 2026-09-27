@@ -1,0 +1,87 @@
+=== G: CancelBus (D31) definition + API ===
+internal/tools/bridge.go:78:	// Cancel is the D31 seam (see cancel.go): the veto poll a running tool
+internal/tools/bridge.go:83:	Cancel CancelBus
+internal/tools/bridge.go:131:	cancel   CancelBus
+internal/tools/bridge.go:459:		defer b.cancel.Complete(orDefault(req.CorrelationID, req.TaskID))
+internal/tools/bridge.go:523:		if kind == OutcomeKindError && b.cancel.Vetoed(orDefault(dec.CorrelationID, dec.TaskID)) {
+internal/tools/bridge.go:631:	if len(res.AppliedSteps) == 0 && !b.cancel.Vetoed(corr) {
+internal/tools/bridge.go:634:	rep := b.cancel.Report(dec, res)
+internal/tools/cancel.go:8:// CancelBus is the D31 seam between this package and the approval layer's veto
+internal/tools/cancel.go:21:type CancelBus interface {
+internal/tools/cancel.go:41:	bus  CancelBus
+internal/tools/doc.go:17://     writer, the applied-steps ledger (Result.AppliedSteps + CancelBus) and
+=== G2: cancel file ===
+cancel.go
+=== H: panel pump.go public API ===
+3:// The snapshot pump: the first place production BUILDS the packet the panel is
+4:// rendered from (ticket 35's data half).
+6:// WHAT WAS TRUE BEFORE THIS FILE. Snapshot (composer.go:44) has four fields and
+7:// NewSnapshot (composer.go:63) had zero non-test callers, so "the panel displays
+8:// authority and requests it" (composer.go:6-12) described a packet nobody sent.
+9:// ticket 145's census measured the same thing from the other side and named the
+10:// disease in composer.go:41-43: "a view model that only a test can build is a
+11:// view model production never sends". Moving Snapshot into production code did
+12:// not move its callers, so this file's job is exactly that move: constructors
+13:// called from a running process, over values read out of live objects.
+15:// WHAT THIS FILE IS NOT: the transport. There is no Go -> page channel in this
+16:// tree today - no WebView2 host (ticket 33 is unclaimed), no postMessage writer,
+17:// no local HTTP/SSE/websocket server, and assets.go:8 quotes D29 saying there
+18:// must not be one. docs/evidence/s1/35-panel-snapshot-pump-r1.md §1.2 measures
+19:// all four. So this pump stops at the byte boundary: Marshal hands out the JSON,
+20:// Publish hands it to src.Out, and src.Out is the one line a later ticket
+21:// re-points at the host. The last mile is NOT here, and it was not invented
+22:// here either - a file the renderer polls would be a second channel, which
+23:// composer.go:14 ("no second channel") and D29 both refuse.
+25:// NO NEW KEYS. Snapshot keeps its four JSON keys and frontend/src/lib/panel.ts
+26:// is untouched, so TestComposerContractTypesMatchFrontend (composer_test.go:48)
+27:// stays the two-way ruler it is. Adding the fifth key - the "which screen" one -
+28:// is Q-51 territory and ticket 145 AC#3 already answered it: not in this slice.
+29:// Nor does this file reach for the six fields ticket 145 marks as having no
+30:// vocabulary in the repository (thinkingMs / reasoningMs / durationMs / humanText
+31:// / fragment / IconClass): a pump that fills a field with a constant to look
+32:// complete is the same failure this file exists to end.
+34:// TICKET 145's landing pass re-measured both numbers in that paragraph and
+35:// neither one was wrong, only small. The pins are four: adding a key also
+36:// reddens approval_test.go:105 and the two byte-level key-set nails in
+37:// pump_test.go (:111-124, :270-276), which is the sharper of the two guards -
+38:// the reconciliations read json tags, so an untagged exported field passes
+39:// them while encoding/json still emits it (registered, not used). And the
+40:// no-source list is seven: approval.remainingMs joins it, because the L1
+41:// countdown has no producer either - approval.EventTick is declared and
+42:// emitted nowhere in the tree, the Remaining that is emitted carries the
+43:// static window length (gate.go:274, :387, :510-513), and the live countdown
+44:// is gate.go:257's clock.After, which exposes no "how much is left". What the
+45:// pump CAN fill from live objects is named in the evidence file with a
+46:// removal check behind each one: docs/evidence/s1/145-snapshot-fields-landed-r1.md.
+=== I: G3 quiet leg pattern in gate-clauses.sh (line numbers measured) ===
+1:# 票 154 AC#1 —— 触发门的读数生成器（可复算）。G1／G1b／G2／G3／G4 出自票 154；
+19:#   ① AC#7＝枚数进 run() 那一族腿：G1／G1b／G2／G3／G4 从此也登记 want_n（run 腿的枚数＝命中行数），
+69:LEGS_EXPECT='G1 G1b G2 G3 G4 G5 G5pos G5neg G6 G6pos G6neg G7 G7pos G7neg'
+343:# 票 171 AC#7：run 腿（G1／G1b／G2／G3／G4）的 want_n 也是同一次现量登记的【命中行数】，命令逐枚是
+345:# 本程在锚 f1b99a70 现量：G1=0／G1b=0／G2=2／G3=0／G4=0（G2 那 2 行＝cmd/wisp/run.go 的调用点与它上面的注释，
+363:want G3 quiet
+365:run "G3 Q-56 那一支落地：Loop 上出现收 taskID 的导出方法" \
+=== I2: lines 355-375 of gate-clauses.sh ===
+	'\.Execute\(' '' "$GO" "$GO2" ':!*_test.go' ':!internal/agent/loop.go' ':!internal/tools/bridge.go'
+
+# G2 今天【该响】：名册非空是它的工作——cmd/wisp/run.go 那一发 CloseTask 就在册。
+want G2 ring
+want_n 2
+run "G2 OpenTask/CloseTask 的生产出现点（排 bridge.go 自身；今日应只剩 cmd/wisp/run.go 那一发＋它上面的注释）" \
+	'OpenTask|CloseTask' '-w' "$GO" "$GO2" ':!*_test.go' ':!internal/tools/bridge.go'
+
+want G3 quiet
+want_n 0
+run "G3 Q-56 那一支落地：Loop 上出现收 taskID 的导出方法" \
+	'^func \(l \*Loop\) [A-Z][A-Za-z0-9]*\(.*taskID' '' internal/agent
+
+want G4 quiet
+want_n 0
+run "G4 生产组合根打开 L0 直通（PassThroughUnclassifiedRisk 的字面赋值）" \
+	'PassThroughUnclassifiedRisk:' '' '*.go' ':!*_test.go'
+
+# G5（票 158 AC#2 新增）射程＝OpenScope↔CloseScope 的成对普查。
+# G1–G4 盯的是「宿主派发工具却没关环路那一枚 id」那一族（过桥那条腿），
+# 而「不过桥、直接对 risk 层开一枚 scope」这一形今天有活样板：
+=== J: who calls Loop.Run / RunAsync in production (the sync path today) ===
+cmd/wisp/run.go:622:	res := loop.Run(ctx, task)

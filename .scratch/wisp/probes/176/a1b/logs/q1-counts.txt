@@ -1,0 +1,18 @@
+=== N1: RunAsync PRODUCTION call sites (test-excluded), the counting ruler verbatim ===
+$ grep -rn "\.RunAsync(" --include="*.go" internal/ cmd/ | grep -v _test.go | wc -l
+0
+--- the lines themselves (empty = zero) ---
+=== N1b: RunAsync TEST call sites (for contrast, not counted) ===
+6
+=== N1c: declaration exists? ===
+internal/agent/loop.go:321:func (l *Loop) RunAsync(ctx context.Context, input string) *RunningTask {
+=== N2: TaskRoster.Record PRODUCTION writers (test-excluded) ===
+$ grep -rn "\.Record(" --include="*.go" internal/ cmd/ | grep -v _test.go | wc -l
+0
+=== N2b: same but narrowed to the roster receiver var names actually in play ===
+0
+=== N2c: test writers of .Record( (contrast) ===
+16
+internal/observe/earlylog_130_test.go
+internal/tools/task_output_leg_test.go
+internal/tools/task_output_pointer_notice_test.go

@@ -1,0 +1,101 @@
+=== Q: agent Sink interface + event kinds (is there a task-end hook?) ===
+10:// The loop's outward event surface. Everything a user can see about a running
+16:// EventKind enumerates what the loop reports.
+17:type EventKind string
+20:	// EvTextDelta streams assistant text.
+21:	EvTextDelta EventKind = "text_delta"
+22:	// EvReasoningDelta streams provider reasoning text (provider-gated).
+23:	EvReasoningDelta EventKind = "reasoning_delta"
+24:	// EvToolStart announces an executed call.
+25:	EvToolStart EventKind = "tool_start"
+26:	// EvToolEnd announces a finished call with its outcome.
+27:	EvToolEnd EventKind = "tool_end"
+28:	// EvReminder announces an injected C22 gradient reminder.
+29:	EvReminder EventKind = "reminder"
+30:	// EvStuck announces a C22 brake: the task stopped, and why, visibly.
+31:	EvStuck EventKind = "stuck"
+32:	// EvControl announces a D11(1) control word handled without the LLM.
+33:	EvControl EventKind = "control"
+34:	// EvError announces a classified failure (SPEC-05 §3.4: failures are
+36:	EvError EventKind = "error"
+37:	// EvDone closes the task.
+38:	EvDone EventKind = "done"
+41:// Event is one loop publication. Fields are meaningful per Kind; Text is
+44:type Event struct {
+45:	Kind      EventKind
+63:type Sink interface {
+64:	Publish(Event)
+71:func (NopSink) Publish(Event) {}
+81:	events []Event
+85:func (s *RecordSink) Publish(e Event) {
+91:// Events returns a snapshot copy of the recorded events.
+92:func (s *RecordSink) Events() []Event {
+95:	out := make([]Event, len(s.events))
+101:func (s *RecordSink) LastOf(k EventKind) *Event {
+102:	evs := s.Events()
+104:		if evs[i].Kind == k {
+112:func (s *RecordSink) Of(k EventKind) int {
+114:	for _, e := range s.Events() {
+115:		if e.Kind == k {
+=== Q2: who implements Sink in cmd/ ===
+cmd/wisp/run.go:594:		Sink:     consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot},
+cmd/wisp/run.go:769:func (c consoleSink) Publish(e agent.Event) {
+=== R: RunningTask struct fields (what the host can read after Wait) ===
+func (l *Loop) Steer(text string) bool {
+	if !l.opt.Config.SteeringEnabled || strings.TrimSpace(text) == "" {
+		return false
+	}
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.steer = append(l.steer, userMessage(text))
+	return true
+}
+
+// RunningTask is a task spawned through the registry under the D38 roster name
+// agent-task-<id>.
+type RunningTask struct {
+	ID   string
+	root *observe.Root
+	h    *observe.Handle
+
+	done   chan struct{}
+	result Result
+}
+
+// Root exposes the task root (ctx + join counter).
+func (t *RunningTask) Root() *observe.Root { return t.root }
+
+// Cancel requests cancellation (root ctx, honoured loop -> stream -> tool).
+func (t *RunningTask) Cancel() { t.root.Cancel() }
+=== S: Result struct fields ===
+82:type Result struct {
+83-	TaskID string
+84-	Status Status
+85-	// Text is the final assistant text (the reply to present/route, D10).
+86-	Text string
+87-	// Message is the user-visible status line for non-clean endings (Stuck,
+88-	// truncation, failure, control ack). Never empty when Status != completed.
+89-	Message    string
+90-	Rounds     int
+91-	Usage      llm.Usage
+92-	CostMicros int64
+93-	Currency   string
+94-	ToolCalls  int
+95-	ToolLog    []ToolResultLog
+96-	Brake      Brake
+97-	// ReminderLevels records the C22 ladder rungs that fired (e.g. [3 5]).
+98-	ReminderLevels []int
+99-	// Compression reports the last history compression pass (zero if none).
+100-	Compression CompressionReport
+101-	// RootPending is the task root's undrained goroutine count at finish
+102-	// (D38e: a completed task has drained to 0).
+103-	RootPending int
+104-	Err         *observe.Error
+105-}
+106-
+107-// Config carries the loop's policy knobs; zero values fall back to the scaled
+108-// D15/D39/C22 defaults.
+109-type Config struct {
+110-	// Model and ContextWindow come from the resolved role endpoint. A zero
+111-	// ContextWindow is read from provider Info().MaxContextWindow.
+112-	Model         string

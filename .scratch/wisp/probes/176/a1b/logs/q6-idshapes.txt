@@ -1,0 +1,74 @@
+=== T: newTaskID minting shape (does a task id look like a tool-call id?) ===
+internal/agent/loop.go:1107:func newTaskID() string {
+internal/agent/loop.go-1108-	var b [16]byte
+internal/agent/loop.go-1109-	if _, err := rand.Read(b[:]); err != nil {
+internal/agent/loop.go-1110-		// Entropy source unavailable: fall back to a clock-derived unique id.
+internal/agent/loop.go-1111-		n := time.Now().UnixNano()
+internal/agent/loop.go-1112-		for i := range b {
+internal/agent/loop.go-1113-			b[i] = byte(n >> (8 * uint(i%8)))
+internal/agent/loop.go-1114-		}
+internal/agent/loop.go-1115-	}
+internal/agent/loop.go-1116-	b[6] = (b[6] & 0x0f) | 0x40
+internal/agent/loop.go-1117-	b[8] = (b[8] & 0x3f) | 0x80
+internal/agent/loop.go-1118-	h := hex.EncodeToString(b[:])
+internal/agent/loop.go-1119-	return h[0:8] + "-" + h[8:12] + "-" + h[12:16] + "-" + h[16:20] + "-" + h[20:]
+=== T2: Event struct fields (does EvDone carry TaskID?) ===
+type Event struct {
+	Kind      EventKind
+	TaskID    string
+	Text      string
+	ToolName  string
+	CallID    string
+	Outcome   string
+	Verb      ControlVerb
+	Stop      llm.StopReason
+	TokensIn  int
+	TokensOut int
+	// RepeatLevel carries the C22 ladder rung that fired (D43 row #19 guard
+	// input Facts.RepeatLevel).
+	RepeatLevel int
+	Err         *observe.Error
+}
+
+// Sink receives loop events. Implementations must not block: the loop calls
+// Publish synchronously on the task goroutine.
+=== T3: where the loop emits EvDone ===
+internal/agent/loop.go:939:		Kind: EvDone, TaskID: res.TaskID, Text: summary,
+cmd/wisp/run.go:798:	case agent.EvDone:
+=== T4: consoleSink.Publish ===
+	stream  *panel.StreamLog
+	publish func()
+}
+
+func (c consoleSink) Publish(e agent.Event) {
+	changed := false
+	switch e.Kind {
+	case agent.EvTextDelta:
+		fmt.Fprint(c.out, e.Text)
+		if c.stream != nil {
+			c.stream.Append(e.TaskID, e.Text)
+		}
+	case agent.EvReasoningDelta:
+		// Reasoning is shown as it is what the thinking probe measures; it is
+		// never mixed into the reply text. It is equally kept out of the
+		// snapshot's results section, whose contract is an assistant RESULT
+		// (panel.ResultChunk, composer.go:51-56); the reasoning field is
+		// ticket 145 row 3, which is a key the snapshot does not have.
+		fmt.Fprint(c.out, e.Text)
+	case agent.EvToolStart:
+		fmt.Fprintf(c.out, "\n[工具 %s]\n", e.ToolName)
+		changed = true
+	case agent.EvToolEnd:
+		fmt.Fprintf(c.out, "[工具 %s -> %s]\n", e.ToolName, e.Outcome)
+		changed = true
+	case agent.EvStuck:
+		fmt.Fprintf(c.out, "\n[停滞] %s\n", e.Text)
+		changed = true
+	case agent.EvError:
+		if e.Err != nil {
+			fmt.Fprintf(c.out, "\n[错误 %s] %s\n", e.Err.Class, e.Err.Detail)
+		}
+		changed = true
+	case agent.EvDone:
+		// The reply is over; the packet the panel renders has to carry that, or
+		// the result region would stream forever on a finished task.

@@ -1,0 +1,78 @@
+anchor: f6a4eebd38e8ce9d53878e8443ad063645e33b2b branch=dev date=2026-09-27 23:56 +0800
+=== M1a: does the symbol RunAsync exist at all? (all *.go, incl tests) ===
+internal/agent/control_test.go:81:	task := h.loop.RunAsync(context.Background(), "慢一点也行")
+internal/agent/control_test.go:131:	task := h.loop.RunAsync(context.Background(), "现在天气怎么样")
+internal/agent/forensics_test.go:99:	task := h.loop.RunAsync(context.Background(), "六个任务并行")
+internal/agent/loop.go:320:// RunAsync spawns the task on a roster-named goroutine and returns immediately.
+internal/agent/loop.go:321:func (l *Loop) RunAsync(ctx context.Context, input string) *RunningTask {
+internal/agent/loop_golden_test.go:172:	task := h.loop.RunAsync(context.Background(), "六个任务并行")
+internal/agent/loop_golden_test.go:251:	task := h.loop.RunAsync(context.Background(), "慢一点也行")
+internal/agent/loop_golden_test.go:265:		t.Errorf("RunAsync root pending = %d, want 0", got)
+internal/agent/loop_golden_test.go:275:	task := h.loop.RunAsync(context.Background(), "两件事一起办")
+internal/tools/bridge.go:719:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+cmd/wisp/run.go:357:	// RunAsync still has zero production call sites (measured, evidence file
+rc=0
+=== M1b: RunAsync whole repo (excl frontend/design) ===
+./.scratch/wisp/probes/158/accept-r1/bridge.anchor.go:658:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/158/accept-r1/bridge.canary-a1.go:658:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/158/accept-r1/bridge.noopentask-a1.go:657:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/158/accept-r1/mut/bridge.as-is.go:658:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/158/accept-r1/mut/bridge.M1.go:657:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/158/accept-r1/mut/bridge.M2.go:658:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/158/accept-r1/mut/bridge.M3.go:658:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/158/mut/bridge.canary.go:658:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/158/mut/bridge.noopentask.go:657:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/158/r2b/bridge.canary-r2.go:658:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/158/r2b/bridge.noopentask-r2.go:657:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/175/r1/mut-ac3/bridge.name-gated.go:694:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./.scratch/wisp/probes/175/r1/mut-shapeA/bridge.shapeA-unconditional-mark.go:663:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+./cmd/wisp/run.go:357:	// RunAsync still has zero production call sites (measured, evidence file
+./internal/agent/control_test.go:81:	task := h.loop.RunAsync(context.Background(), "慢一点也行")
+./internal/agent/control_test.go:131:	task := h.loop.RunAsync(context.Background(), "现在天气怎么样")
+./internal/agent/forensics_test.go:99:	task := h.loop.RunAsync(context.Background(), "六个任务并行")
+./internal/agent/loop.go:320:// RunAsync spawns the task on a roster-named goroutine and returns immediately.
+./internal/agent/loop.go:321:func (l *Loop) RunAsync(ctx context.Context, input string) *RunningTask {
+./internal/agent/loop_golden_test.go:172:	task := h.loop.RunAsync(context.Background(), "六个任务并行")
+./internal/agent/loop_golden_test.go:251:	task := h.loop.RunAsync(context.Background(), "慢一点也行")
+./internal/agent/loop_golden_test.go:265:		t.Errorf("RunAsync root pending = %d, want 0", got)
+./internal/agent/loop_golden_test.go:275:	task := h.loop.RunAsync(context.Background(), "两件事一起办")
+./internal/tools/bridge.go:719:// mints itself (Run/RunAsync -> newTaskID, internal/agent/loop.go:332/:321).
+rc=0
+=== M1c: any 'Async' named method on agent loop ===
+internal/agent/approval/fakes_test.go:177:func spawn(t *testing.T, fn func()) {
+internal/agent/loop.go:321:func (l *Loop) RunAsync(ctx context.Context, input string) *RunningTask {
+internal/audio/audio.go:180:func SpawnCapture(registry *observe.Registry, run func(ctx context.Context)) *observe.Handle {
+internal/observe/goroutine.go:262:func (r *Registry) Spawn(name, owner string, root *Root, fn func(ctx context.Context)) *Handle {
+internal/tools/bridge_a18_kill_windows_test.go:101:func spawnA18Writer(t *testing.T, dir, target string) string {
+internal/tools/fs_edit_ac4b_kill_windows_test.go:120:func spawnFSEditKillWriter(t *testing.T, dir, target, signal string) string {
+cmd/balldebug/main.go:427:func spawnLevelFeeder(b *ball.Ball, amp float32, on bool) (*observe.Root, *observe.Handle) {
+cmd/wisp/slo_exit_os_156_windows_test.go:320:func slo156Spawn(t *testing.T, role string) *exec.Cmd {
+rc=0
+=== M2a: TaskRoster type + Record method definition ===
+internal/tools/task.go:34:	Roster *TaskRoster
+internal/tools/task.go:104:// TaskRoster is the process-local background task table (ticket 164 ruling 2:
+internal/tools/task.go:110:type TaskRoster struct {
+internal/tools/task.go:115:// NewTaskRoster returns an empty roster, ready to share between host and tools.
+internal/tools/task.go:116:func NewTaskRoster() *TaskRoster {
+internal/tools/task.go:117:	return &TaskRoster{byTask: map[string]TaskOutput{}}
+internal/tools/task.go:123:func (r *TaskRoster) Record(taskID string, o TaskOutput) {
+internal/tools/task.go:139:func (r *TaskRoster) Look(taskID string) (TaskOutput, bool) {
+internal/tools/task.go:152:func (r *TaskRoster) Count() int {
+cmd/wisp/run.go:216:	tasks    *tools.TaskRoster
+cmd/wisp/run.go:361:	rt.tasks = tools.NewTaskRoster()
+--- Record method decl ---
+internal/agent/approval/ticket146_liveapprovals_backing_test.go:264:func TestLiveApprovalsInPlaceWriteCannotReachTheQueueRecord(t *testing.T) {
+internal/tools/bridge_path_account_ticket105_test.go:145:func TestUnusableRootIsVisibleInTheAuditRecord(t *testing.T) {
+internal/tools/recycle_windows.go:221:func findRecycleRecord(bin string, before map[string]bool, canonical string) (string, error) {
+internal/tools/task.go:123:func (r *TaskRoster) Record(taskID string, o TaskOutput) {
+cmd/wisp/early_log_nail_130_windows_test.go:185:func TestAC3EarlyRecordLandsOnDiskBeforeTheInstallRecord(t *testing.T) {
+cmd/wisp/resident_sink_nail_127_windows_test.go:367:func sinkHasARecord(dir string) bool {
+cmd/wisp/resident_sink_nail_127_windows_test.go:402:	if !pollUntil127(200, func() bool { return sinkHasARecord(sinkDir) }) {
+=== M2b: production writers of .Record( (test-excluded) ===
+rc=1
+=== M2c: count of the same, test-excluded ===
+0
+=== M2d: for contrast, test-side .Record( hits (not counted, just named) ===
+internal/observe/earlylog_130_test.go
+internal/tools/task_output_leg_test.go
+internal/tools/task_output_pointer_notice_test.go

@@ -1,0 +1,137 @@
+=== A: Spiller decl + call sites ===
+internal/agent/loop.go:181:	sp       *Spiller
+internal/agent/loop.go:238:		sp:       NewSpiller(opt.Config.ArtifactsDir, b),
+internal/agent/spill.go:33:// Spiller caps and spills tool output against a scaled budget set.
+internal/agent/spill.go:34:type Spiller struct {
+internal/agent/spill.go:42:// NewSpiller builds a spiller writing into dir (the store's artifacts dir).
+internal/agent/spill.go:43:func NewSpiller(dir string, b Budgets) *Spiller { return &Spiller{dir: dir, b: b} }
+internal/agent/spill.go:68:func (s *Spiller) CapRaw(text string) (string, bool) {
+internal/agent/spill.go:84:func (s *Spiller) Prepare(callID, text string) (Spill, error) {
+internal/agent/spill.go:150:func (s *Spiller) nextSequence() int {
+internal/tools/task.go:89:// already holds spilled bytes and internal/agent's Spiller already writes the
+internal/winsec/winsec.go:95:// caller's job - see agent.Spiller.Prepare's documented last-writer-wins swap.
+=== A2: where loop.go calls the spiller ===
+26://	         ceiling 4, C22 per-tool timeout, D15(3) result spill)
+75:	Spilled    bool
+121:	// ArtifactsDir is the memory store's artifacts directory (spill writes
+181:	sp       *Spiller
+238:		sp:       NewSpiller(opt.Config.ArtifactsDir, b),
+583:// timeout, then D15(3) spill, then the results back into the history. Tool
+701:		// D15(3) spill of whatever goes back into the context.
+704:			l.log().Warn("agent: spill failed", "err", err, "call", c.ID)
+707:			log.Spilled = sp.Spilled
+=== B: call-id addressing inside spill naming ===
+internal/agent/compress.go:196:		ledger = append(ledger, toolCallIDs(victims)...)
+internal/agent/compress.go:214:	rep.PreservedIDs = dedupe(append(allToolCallIDs(out), ledger...))
+internal/agent/compress.go:316:// toolCallIDs lists tool_use ids plus tool_result references of a slice.
+internal/agent/compress.go:317:func toolCallIDs(msgs []llm.Message) []string {
+internal/agent/compress.go:332:func allToolCallIDs(hist []llm.Message) []string {
+internal/agent/journal.go:68:func (t *taskJournal) startCall(ctx context.Context, callID, tool string, args json.RawMessage, risk string) int64 {
+internal/agent/journal.go:89:	t.rows[callID] = rowID
+internal/agent/journal.go:105:func (t *taskJournal) finish(ctx context.Context, callID string, rowID int64, outcome, errorClass string) {
+internal/agent/journal.go:109:		rowID = t.rows[callID]
+internal/agent/loop.go:70:	CallID     string
+internal/agent/loop.go:647:			TaskID: taskID, CorrelationID: taskID, CallID: p.call.ID,
+internal/agent/loop.go:675:		log := ToolResultLog{CallID: c.ID, Name: c.Name, Rejected: p.rejected}
+internal/agent/loop.go:717:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID,
+internal/agent/loop.go:835:			CallID: c.ID, Name: c.Name, Outcome: OutcomeTruncated,
+internal/agent/loop.go:840:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID, ToolName: c.Name,
+internal/agent/loop.go:870:			CallID: c.ID, Name: c.Name,
+internal/agent/loop.go:875:			Kind: EvToolEnd, TaskID: taskID, CallID: c.ID, ToolName: c.Name,
+internal/agent/sink.go:49:	CallID    string
+internal/agent/spill.go:81:// threshold. callID identifies the tool call; it is model-supplied, so it is
+internal/agent/spill.go:84:func (s *Spiller) Prepare(callID, text string) (Spill, error) {
+internal/agent/spill.go:105:	name := artifactName(callID, s.nextSequence())
+internal/agent/spill.go:184:func artifactName(callID string, seq int) string {
+internal/agent/spill.go:185:	id := encodeArtifactID(callID)
+internal/agent/spill.go:196:		id = cutEncodedID(id, maxArtifactIDBytes) + "-" + digestArtifactID(callID)
+internal/agent/spill.go:209:func encodeArtifactID(callID string) string {
+internal/agent/spill.go:212:	b.Grow(len(callID))
+internal/agent/spill.go:213:	for i := 0; i < len(callID); i++ {
+internal/agent/spill.go:214:		c := callID[i]
+internal/agent/spill.go:237:func digestArtifactID(callID string) string {
+internal/agent/spill.go:238:	sum := sha256.Sum256([]byte(callID))
+=== C: AppliedSteps machinery ===
+internal/agent/approval/doc.go:35://     Result.AppliedSteps;
+internal/agent/approval/report.go:14:// AppliedSteps is the only evidence of what the call already did, and it is
+internal/agent/approval/report.go:15:// filled by the tool that did it (internal/tools.Result.AppliedSteps), which
+internal/agent/approval/report.go:33:	// AppliedSteps is verbatim from tools.Result.AppliedSteps.
+internal/agent/approval/report.go:34:	AppliedSteps []string
+internal/agent/approval/report.go:54://  2. on a hit, stop, and return Result{AppliedSteps: <what actually landed>};
+internal/agent/approval/report.go:98:		AppliedSteps: append([]string(nil), res.AppliedSteps...),
+internal/agent/approval/report.go:109:	if len(rep.AppliedSteps) > 0 {
+internal/agent/approval/report.go:117:	rep.UnreportedSteps = rep.Vetoed && len(rep.AppliedSteps) == 0
+internal/agent/approval/report.go:129:	case r.Vetoed && len(r.AppliedSteps) > 0:
+internal/agent/approval/report.go:131:	case len(r.AppliedSteps) > 0:
+internal/agent/approval/report.go:145:	for _, s := range r.AppliedSteps {
+internal/agent/tools.go:74:	// AppliedSteps is the D31 ledger the tool reported for itself (see
+internal/agent/tools.go:75:	// tools.Result.AppliedSteps): what already landed when the call stopped
+internal/agent/tools.go:79:	AppliedSteps []string
+internal/tools/bridge.go:508:		AppliedSteps: append([]string(nil), res.AppliedSteps...),
+internal/tools/bridge.go:631:	if len(res.AppliedSteps) == 0 && !b.cancel.Vetoed(corr) {
+internal/tools/bridge.go:643:		corr, dec.Tool, len(res.AppliedSteps), txt)
+internal/tools/doc.go:17://     writer, the applied-steps ledger (Result.AppliedSteps + CancelBus) and
+internal/tools/fs_write.go:115:	return Result{Text: s.head(what), IsError: true, AppliedSteps: s.snapshot()}
+internal/tools/fs_write.go:326:			AppliedSteps: se.snapshot(),
+internal/tools/fs_write.go:344:			IsError: true, AppliedSteps: se.snapshot(),
+internal/tools/fs_write.go:351:		AppliedSteps: se.snapshot(),
+internal/tools/fs_write.go:409:			IsError: true, AppliedSteps: se.snapshot(),
+internal/tools/fs_write.go:420:		AppliedSteps: se.snapshot(),
+=== D: cancel bus / Cancel paths (non-test) ===
+internal/tools/bridge.go:540:func (b *Bridge) execContext(ctx context.Context, timeout time.Duration) (context.Context, context.CancelFunc) {
+internal/agent/loop.go:300:func (t *RunningTask) Cancel() { t.root.Cancel() }
+internal/agent/loop.go:346:	defer root.Cancel()
+internal/agent/loop.go:531:			root.Cancel()
+internal/agent/loop.go:956:func terminalWriteCtx(ctx context.Context) (context.Context, context.CancelFunc) {
+=== E: observe.Registry owner/recover enforcement ===
+17:// name (matched against the frozen D38 roster), an owner, and an optional task
+155:	Owner     string     `json:"owner"`
+170:		"owner", ev.Owner,
+179:// GoroutineInfo is one live roster entry (aggregated by name+owner).
+225:	owner string
+254://   - owner is the subsystem that started it (e.g. "agent", "test").
+262:func (r *Registry) Spawn(name, owner string, root *Root, fn func(ctx context.Context)) *Handle {
+272:			"goroutine", name, "owner", owner)
+276:	r.live[gkey{name, owner}]++
+281:	go r.run(h, name, owner, root, fn)
+286:func (r *Registry) run(h *Handle, name, owner string, root *Root, fn func(context.Context)) {
+296:		if rec := recover(); rec != nil {
+299:				Owner:     owner,
+319:				Detail: fmt.Sprintf("panic in goroutine %q (owner %s): %s", name, owner, ev.Recovered),
+332:		r.live[gkey{name, owner}]--
+333:		if r.live[gkey{name, owner}] <= 0 {
+334:			delete(r.live, gkey{name, owner})
+381:// Snapshot lists the live goroutines aggregated by (name, owner), sorted for
+390:			Owner:    k.owner,
+=== F: panel async produce->backfill pipe ===
+approval.go
+approval_test.go
+assets.go
+assets_test.go
+attachments.go
+attachments_test.go
+bridge.go
+bridge_test.go
+composer.go
+composer_handlers.go
+composer_handlers_test.go
+composer_test.go
+doc.go
+frontend_hygiene_test.go
+l2_grant_boundary_test.go
+pump.go
+pump_test.go
+tokens_fourway_test.go
+workspace.go
+workspace_test.go
+--- panel pump/inject greps ---
+internal/observe/sampler.go:130:	// acceptance gate (e.g. the 700MB work peak before S3/S5 backfill,
+internal/observe/thresholds.go:5:// Frozen SLO thresholds (ticket 08; D32 16.3.2 as backfilled by docs/SLO.md
+internal/observe/thresholds.go:17:// S3/S5 tree measurements backfill it (docs/SLO.md §2 keeps the distinction).
+internal/observe/thresholds.go:125:		// docs/SLO.md §2: 700MB is a target until S3/S5 backfill - sampled
+internal/panel/pump.go:145:func NewSnapshotPump(src PumpSources) *SnapshotPump {
+internal/panel/pump.go:150:func (p *SnapshotPump) Snapshot() Snapshot {
+internal/panel/pump.go:204:func (p *SnapshotPump) Marshal() ([]byte, error) {
+internal/panel/pump.go:215:func (p *SnapshotPump) Publish() (Snapshot, []byte, error) {
+internal/panel/pump.go:240:func (p *SnapshotPump) Publishes() int {
+internal/panel/pump.go:249:func (p *SnapshotPump) count() {

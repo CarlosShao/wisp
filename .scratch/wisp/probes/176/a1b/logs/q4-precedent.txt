@@ -1,0 +1,45 @@
+=== K: all observe Registry.Spawn users in production (the owner/recover precedent) ===
+internal/agent/loop.go:324:	t.h = l.reg.Spawn("agent-task-"+id, "agent", t.root, func(c context.Context) {
+internal/agent/loop.go:650:		h := l.reg.Spawn("tool-exec-"+taskID, "agent", root, func(c context.Context) {
+internal/audio/audio.go:180:func SpawnCapture(registry *observe.Registry, run func(ctx context.Context)) *observe.Handle {
+internal/audio/audio.go:181:	return registry.Spawn("audio-capture", "audio", nil, run)
+internal/audio/wasapimic_windows.go:83:	observe.Default.Spawn("audio-capture", "audio", nil, func(c context.Context) {
+internal/audio/wavinjector.go:84:	observe.Default.Spawn("audio-capture", "audio", nil, func(ctx context.Context) {
+internal/ball/ball_windows.go:170:	b.sta.handle = opts.Registry.Spawn("ui-sta", "ball", nil, func(_ context.Context) {
+internal/llm/adaptertest/mockllm.go:86:	h := mockllmRegistry.Spawn("mockllm-stdout-reader", "test", spawnRoot,
+internal/memory/writer.go:79:		q.reg.Spawn("db-writer", "memory", nil, func(ctx context.Context) {
+internal/observe/logging.go:96:	h := reg.Spawn("log-flusher", "observe", p.root, w.flushLoop)
+internal/plugin/disposal.go:233:	return s.reg.Spawn(name, "scope:"+s.name, root, func(ctx context.Context) {
+internal/plugin/disposal.go:296:		h := s.reg.Spawn("disposal-worker", "scope:"+s.name, nil, func(context.Context) {
+cmd/balldebug/main.go:251:		bridgeHandle := observe.Default.Spawn(goroutineHotkeyBridge, "balldebug", bridgeRoot, func(ctx context.Context) {
+cmd/balldebug/main.go:432:	h := observe.Default.Spawn(goroutineLevelFeeder, "balldebug", root, func(ctx context.Context) {
+=== L: bare go func( in production (d22scan ban 1 census, for reference) ===
+0
+=== M: G2 leg scope vars in gate-clauses.sh ===
+34:GO='internal/**/*.go'
+35:GO2='cmd/**/*.go'
+=== N: OpenTask/CloseTask production occurrences ===
+internal/tools/bridge.go:570:	b.OpenTask(dec.TaskID)
+internal/tools/bridge.go:682:// OpenTask opens the C25 taint scope for one task - ticket 19's
+internal/tools/bridge.go:692:// calls, and a caller that opens a scope and never reaches CloseTask still
+internal/tools/bridge.go:695:func (b *Bridge) OpenTask(taskID string) {
+internal/tools/bridge.go:707:// CloseTask closes one task's taint scope. The composition root defers this on
+internal/tools/bridge.go:745:func (b *Bridge) CloseTask(taskID string) {
+cmd/wisp/run.go:564:// WHY THIS HOOK OWNS THE CLOSE. CloseTask's own comment says the composition
+cmd/wisp/run.go:581:		rt.bridge.CloseTask(taskID)
+=== O: run.go - where the Loop is built and where Run is called ===
+21://	                -> agent.Loop(provider, bridge, AdmitTask=D47 hook)
+361:	rt.tasks = tools.NewTaskRoster()
+362:	for _, e := range tools.BuiltinTaskEntries(tools.TaskDeps{Roster: rt.tasks}) {
+561:// defers (internal/agent/loop.go:366). The revocation now also closes the
+569:// readings were rejected: closing after loop.Run returns would skip every
+591:	loop, err := agent.New(agent.Options{
+604:		AdmitTask: rt.admitTask,
+622:	res := loop.Run(ctx, task)
+=== P: panel pump - PumpSources shape + any goroutine in panel ===
+20:// Publish hands it to src.Out, and src.Out is the one line a later ticket
+41:// countdown has no producer either - approval.EventTick is declared and
+108:type PumpSources struct {
+126:	// Out is the far end of the exit. Today the only production assembly attaches
+130:	Out func(snapshot Snapshot, data []byte) error
+225:	if p.src.Out == nil {
