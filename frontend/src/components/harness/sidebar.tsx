@@ -40,7 +40,7 @@
    ============================================================================ */
 
 import { useLayoutEffect, useRef, useState } from "react";
-import { ChevronDown, CircleAlert, Folder, Moon, Plus, Search, Settings, Sun } from "lucide-react";
+import { ChevronDown, CircleAlert, Folder, Moon, Plus, Search, Settings, Sun, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { ValuePill } from "@/components/ai-native/value-pill";
 import type {
@@ -50,6 +50,11 @@ import type {
 } from "@/fixtures/harness-app";
 
 export type { HarnessWorkspaceInfo };
+
+/** The id of the quick-search field, exported so the mounter can wire the "/"
+    shortcut the kbd chip has always advertised. A chip that promises a key and
+    has no listener is worse than no chip: it teaches people to stop reading. */
+export const SESSION_SEARCH_ID = "harness-session-search";
 
 /** 工作区段嵌套会话行的行首状态图标：红圈叹号=failed（已拒绝）、蓝点=
     streaming（进行中）、无=done（已完成，占位空槽保持对齐）。 */
@@ -103,6 +108,18 @@ export function HarnessSidebar({
     itemRefs.current[key] = el;
   };
 
+  // The query actually filters. It used to be rendered into a controlled input
+  // and then read by nothing: the box looked like search, accepted typing, and
+  // changed no row on screen. Both lists are derived here - pure projection,
+  // no state - and a group with no surviving row drops out entirely so the
+  // headings cannot stack up over an empty column.
+  const q = searchValue.trim().toLowerCase();
+  const hit = (title: string) => !q || title.toLowerCase().includes(q);
+  const shownGroups = groups
+    .map((group) => ({ ...group, rows: group.rows.filter((row) => hit(row.title)) }))
+    .filter((group) => group.rows.length > 0);
+  const shownChildren = project.children.filter((child) => hit(child.title));
+
   // 滑翔高亮：一枚 bg-hover 方块量测着落到 hovered ?? active 行（上游逐字，
   // 键域扩到三段全部行种）。行被折叠隐藏时量测落空，方块淡出。
   useLayoutEffect(() => {
@@ -115,7 +132,7 @@ export function HarnessSidebar({
     const containerRect = container.getBoundingClientRect();
     const targetRect = target.getBoundingClientRect();
     setBox({ top: targetRect.top - containerRect.top, height: targetRect.height });
-  }, [hovered, activeSessionId, groups, collapsed, projectOpen, automations, project]);
+  }, [hovered, activeSessionId, shownGroups, collapsed, projectOpen, automations, shownChildren, project]);
 
   function toggleGroup(title: string) {
     setCollapsed((current) => {
@@ -158,14 +175,30 @@ export function HarnessSidebar({
         <label className="mb-1 flex h-8 items-center gap-2 rounded-control bg-inset px-2.5 shadow-hairline">
           <Search aria-hidden="true" className="shrink-0 text-ink-3" size={12} strokeWidth={2} />
           <input
+            id={SESSION_SEARCH_ID}
             value={searchValue}
             onChange={(event) => onSearchChange(event.target.value)}
             placeholder={searchPlaceholder}
             className="min-w-0 flex-1 bg-transparent text-[12.5px] text-ink outline-none placeholder:text-ink-3"
           />
-          <kbd className="flex size-4.5 shrink-0 items-center justify-center rounded-[5px] bg-surface text-[10px] text-ink-3 shadow-hairline">
-            /
-          </kbd>
+          {/* Once the field actually filters, the "/" chip stops being the only
+              thing in the box: a clear affordance is what makes a filter
+              recoverable, so the key hint yields to a reset while there is
+              something to reset. */}
+          {searchValue ? (
+            <button
+              type="button"
+              aria-label="清空搜索"
+              onClick={() => onSearchChange("")}
+              className="flex size-4.5 shrink-0 items-center justify-center rounded-[5px] text-ink-3 transition-colors duration-100 hover:bg-hover hover:text-ink"
+            >
+              <X aria-hidden="true" size={11} strokeWidth={2.4} />
+            </button>
+          ) : (
+            <kbd className="flex size-4.5 shrink-0 items-center justify-center rounded-[5px] bg-surface text-[10px] text-ink-3 shadow-hairline">
+              /
+            </kbd>
+          )}
         </label>
 
         {/* accent action：新建任务（上游逐字的 accent 行 + 加号徽章圆） */}
@@ -251,9 +284,9 @@ export function HarnessSidebar({
               <Folder aria-hidden="true" className="shrink-0 text-ink-2" size={13} strokeWidth={1.8} />
               <span className="min-w-0 flex-1 truncate text-[13px] text-ink-2">{project.name}</span>
             </button>
-            {projectOpen && (
+            {projectOpen && shownChildren.length > 0 && (
               <div className="flex flex-col gap-px">
-                {project.children.map((child) => {
+                {shownChildren.map((child) => {
                   const isActive = child.id === activeSessionId;
                   return (
                     <button
@@ -282,7 +315,7 @@ export function HarnessSidebar({
           {/* ── 最近任务段：现会话历史（分组折叠 / 会话行 / 滑翔解剖不变） ── */}
           <div>
             <SectionHeader label="最近任务" />
-            {groups.map((group) => {
+            {shownGroups.map((group) => {
               const isCollapsed = collapsed.has(group.label);
               return (
                 <div key={group.label}>
@@ -331,8 +364,10 @@ export function HarnessSidebar({
                 </div>
               );
             })}
-            {groups.every((g) => g.rows.length === 0) && (
-              <div className="px-2 py-3 text-[12px] text-ink-3">没有匹配的会话</div>
+            {shownGroups.length === 0 && (
+              <div className="px-2 py-3 text-[12px] text-ink-3">
+                {q ? `没有匹配「${searchValue.trim()}」的会话` : "还没有会话"}
+              </div>
             )}
           </div>
         </div>

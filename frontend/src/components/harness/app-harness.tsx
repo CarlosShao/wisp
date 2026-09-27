@@ -28,7 +28,7 @@ import { EntityChip } from "@/components/ai-native/entity-chip";
 import { PaletteScreen } from "@/components/palette-screen";
 import { FirstrunOverlay, RB_FIRSTRUN } from "@/components/harness/firstrun-overlay";
 import { HarnessMain } from "@/components/harness/main";
-import { HarnessSidebar } from "@/components/harness/sidebar";
+import { HarnessSidebar, SESSION_SEARCH_ID } from "@/components/harness/sidebar";
 import { RightRail } from "@/components/harness/right-rail";
 import { SettingsModal } from "@/components/harness/settings-modal";
 import { ToastStack, RB_TOASTS } from "@/components/harness/toast";
@@ -70,12 +70,26 @@ export function AppHarness() {
   }
 
   // Ctrl+K opens the command palette - the one keyboard verb every harness
-  // shares. Esc closes whichever overlay is up, topmost first.
+  // shares. "/" focuses the sidebar's session search, which is what the kbd
+  // chip beside that field has always claimed. Esc closes whichever overlay is
+  // up, topmost first.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setPaletteOpen((v) => !v);
+        return;
+      }
+      if (e.key === "/" && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        // Never take the key from wherever the user is already typing.
+        const el = document.activeElement;
+        if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) return;
+        const box = document.getElementById(SESSION_SEARCH_ID);
+        if (box instanceof HTMLInputElement) {
+          e.preventDefault();
+          box.focus();
+          box.select();
+        }
         return;
       }
       if (e.key === "Escape") {
