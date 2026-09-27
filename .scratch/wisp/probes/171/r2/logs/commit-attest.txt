@@ -58,3 +58,8 @@ docs/evidence/s1/171-run-legs-and-subtraction-r2.md
 0abb2e5f 票 171（171-r2 写码位·件⑥）Progress log 追加一行（只追加、零勾、newest last）： AC#7＋AC#8 两格一次做完的现场账——step-0 锚 f1b99a70、五枚 run 腿基线现量 0/0/2/0/0、 硬判据两向（同一条 G2 腿 2 枚->3 枚：未修码 6->6、修完 6->7）、AC#8 三处各自两向（整腿摘除 0->1、 SHR 仍 rc=0 但单列表 0->1 枚、与 AC#7 同程）、flip 只新增一格且十格全量 rc=0、 两把尺同一枚锚的名册两向 comm 全空（151 对 151、射程行增删 0 枚）、 门禁四数（gate rc=0／d22scan rc=0／runtests 34-0-0 与 RUN=76／gofumpt v0.12.0）、40->42 已核、 删除命令 0 次／权限拒绝 0 次／伪授权 0 栏／凭据零抄录；自报第一版 r2-roster-diff 的恒真比较与被覆掉的原件。 本程未勾任何框（勾归编排者）。AC#1／AC#3 未领未动。
 .scratch/wisp/issues/171-three-ruler-holes-ticket-161-cannot-carry-aggregate-rs-selftest-not-in-ci-trailing-comments-counted-as-calls-and-count-blind-pair-legs.md
 .scratch/wisp/probes/171/r2/logs/commit-attest.txt
+
+=== 件⑦ commit 原样输出 ===
+bae773d1 票 171（171-r2 写码位·件⑦收尾）结案前再跑一次尺＋七枚提交的原样输出归册： sh .scratch/wisp/probes/154/gate-clauses.sh 在结案锚上仍 rc=0、腿数＝14 声明与实测不符＝0、 腿数断言＝相符、基线过期枚数＝0（logs/gate-final-recheck.txt）；commit-attest.txt 收 件①..⑥ 逐枚 git log --oneline -1 与 git -c core.quotePath=false show --name-only 的原样输出（共享工作树里 162-r4 的提交夹在中间，故逐枚点名本程自己的号，未改写别人的那几枚）。
+.scratch/wisp/probes/171/r2/logs/commit-attest.txt
+.scratch/wisp/probes/171/r2/logs/gate-final-recheck.txt
