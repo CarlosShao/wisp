@@ -98,7 +98,21 @@ type fragmentIndex struct {
 // an empty index that can never match (a source shorter than the fragment
 // floor has no >=8-char contiguous fragment — documented residual, see
 // Provenance docs).
-func newFragmentIndex(norm string, n int) *fragmentIndex {
+//
+// The optional skip spans (ticket 177 shape A, Q-61甲/A349: the PRECISE
+// exemption of host-minted paths only) are half-open rune ranges [lo,hi) in
+// the NORMALIZED coordinate space of norm: a window that OVERLAPS a span is
+// never hashed. Nothing else about the index changes — src stays the full
+// normalized text and contains() keeps verifying every hash hit through
+// strings.Contains, so no window the contract would call a fragment can be
+// invented by the exclusion, and every window clear of the spans is indexed
+// exactly as before. The spans are inputs to this one build: they are not
+// stored on the Provenance or on any scope (a per-scope path roster is
+// explicitly NOT approved; 177-c1 §2), so an exemption can only ever die with
+// the mark it was declared for. Spans must be located AFTER normalization
+// (see MarkWithHostPath) — a raw-byte offset into content is not a coordinate
+// in norm.
+func newFragmentIndex(norm string, n int, skip ...[2]int) *fragmentIndex {
 	rp := []rune(norm)
 	f := &fragmentIndex{n: n, src: norm, nrunes: len(rp)}
 	if n < 1 {
@@ -111,6 +125,9 @@ func newFragmentIndex(norm string, n int) *fragmentIndex {
 	hashes := make([]uint64, 0, len(rp)-n+1)
 	win := make([]rune, n)
 	for i := 0; i+n <= len(rp); i++ {
+		if windowExcluded(i, n, skip) {
+			continue // spans: windows overlapping a declared span stay out
+		}
 		copy(win, rp[i:i+n])
 		hashes = append(hashes, hashWindow(win))
 	}
@@ -128,6 +145,45 @@ func newFragmentIndex(norm string, n int) *fragmentIndex {
 	}
 	f.hashes = hashes[:k]
 	return f
+}
+
+// windowExcluded reports whether the window [i, i+n) overlaps any skip span.
+// Overlap (not containment) is deliberate: a window that straddles a span
+// edge carries part of the exempted text, and shape A exempts a HOST-WRITTEN
+// span, not a best-guess cut. Dropping the straddling windows only shrinks the
+// indexed set toward the declared span (the safe direction); the rest of the
+// mark keeps every window clear of it (ticket 177 W-1).
+func windowExcluded(i, n int, skip [][2]int) bool {
+	for _, s := range skip {
+		if i < s[1] && s[0] < i+n {
+			return true
+		}
+	}
+	return false
+}
+
+// runeIndexOf returns the start of needle in hay, or -1. Both are rune
+// slices in normalized space — locating a declared span with this and NOT
+// with strings.Index over the raw content is the ticket 177 hard ordering
+// (i): normalizeTaint drops whitespace and zero-width runes, so a raw offset
+// is the wrong coordinate for the index built over norm.
+func runeIndexOf(hay, needle []rune) int {
+	if len(needle) == 0 || len(needle) > len(hay) {
+		return -1
+	}
+	for i := 0; i+len(needle) <= len(hay); i++ {
+		match := true
+		for j, r := range needle {
+			if hay[i+j] != r {
+				match = false
+				break
+			}
+		}
+		if match {
+			return i
+		}
+	}
+	return -1
 }
 
 // contains reports whether any window of paramNorm (a normalized candidate)
