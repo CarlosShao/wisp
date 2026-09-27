@@ -450,6 +450,11 @@ func (b *Bridge) run(ctx context.Context, req agent.ToolRequest, entry Entry,
 	// context. The handle carries the correlation id the veto is keyed on, and
 	// Complete releases the gate's post-handoff record when the call is over.
 	ectx = withCancel(ectx, cancelHandle{corr: orDefault(req.CorrelationID, req.TaskID), bus: b.cancel})
+	// Ticket 177 shape A: a fresh per-call box for the ONE path this call's
+	// tool might itself write into its result text (task.output's re-read
+	// pointer is the only declaration today). Per-call by construction, so an
+	// exemption can never be keyed onto another call's output.
+	ectx, hostPaths := withHostPathBox(ectx)
 	if b.cancel != nil {
 		defer b.cancel.Complete(orDefault(req.CorrelationID, req.TaskID))
 	}
@@ -525,7 +530,7 @@ func (b *Bridge) run(ctx context.Context, req agent.ToolRequest, entry Entry,
 	// the context. Marking runs on the CONTENT and only for successful
 	// results (an error text carries no user data).
 	if !res.IsError {
-		b.mark(dec, res)
+		b.mark(dec, res, hostPaths.get())
 	}
 	return b.close(ctx, req, dec, out, kind)
 }
@@ -547,8 +552,14 @@ func (b *Bridge) timeoutFor(entry Entry) time.Duration {
 	return b.defTm
 }
 
-// mark records C25 provenance for one result.
-func (b *Bridge) mark(dec Decision, res Result) {
+// mark records C25 provenance for one result. hostPath is this call's shape-A
+// declaration from the box below ("" when the tool wrote no host-minted path):
+// risk only ever excludes that exact span inside THIS mark, and the marking
+// gate itself (IsSensitiveSource) is unchanged. task.output is not in the
+// SPEC-06 §5 roster yet (ticket 175's leg), so no production mark carries a
+// non-empty hostPath today; the carrier lands now so that leg lands next to
+// it, and the bridge-level reverse criterion ships with that batch.
+func (b *Bridge) mark(dec Decision, res Result, hostPath string) {
 	if b.prov == nil || dec.TaskID == "" || !risk.IsSensitiveSource(dec.Tool) {
 		return
 	}
@@ -557,10 +568,55 @@ func (b *Bridge) mark(dec Decision, res Result) {
 		origin = dec.Paths[0]
 	}
 	b.OpenTask(dec.TaskID)
-	if !b.prov.Mark(dec.TaskID, dec.Tool, origin, res.Text) {
+	if !b.prov.MarkWithHostPath(dec.TaskID, dec.Tool, origin, res.Text, hostPath) {
 		b.log("tools: %s result produced no matchable taint fragment (origin=%q)",
 			dec.Tool, origin)
 	}
+}
+
+// hostPathBox is the ticket 177 shape-A carrier between a tool that just wrote
+// a concrete path into its own result text and the bridge that marks that text
+// ("包内未导出的通道" - the vehicle 177-m1 measured as zero-red: no new field
+// on the C1 Result, no new exported method anywhere, no per-scope roster).
+// One box per call, hung on the call's context; the tool sets it, the bridge
+// reads it once at marking time, and it dies with the call.
+type hostPathBox struct {
+	mu   sync.Mutex
+	path string
+}
+
+type hostPathBoxKey struct{}
+
+func withHostPathBox(ctx context.Context) (context.Context, *hostPathBox) {
+	box := &hostPathBox{}
+	return context.WithValue(ctx, hostPathBoxKey{}, box), box
+}
+
+// hostPathBoxFromCtx lets a tool declare its own host-minted path. A nil
+// result (context built by a test or another caller, not by Bridge.execute)
+// is not an error - the declaration is simply absent, and marking proceeds
+// with nothing excluded.
+func hostPathBoxFromCtx(ctx context.Context) *hostPathBox {
+	box, _ := ctx.Value(hostPathBoxKey{}).(*hostPathBox)
+	return box
+}
+
+func (h *hostPathBox) set(p string) {
+	if h == nil || p == "" {
+		return
+	}
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	h.path = p
+}
+
+func (h *hostPathBox) get() string {
+	if h == nil {
+		return ""
+	}
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	return h.path
 }
 
 // cancelText asks the D31 bus for one call's applied-steps report, and returns
