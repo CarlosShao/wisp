@@ -1,0 +1,24 @@
+# 票 162-r2 入库后复跑最后一遍（三枚提交全部落地之后；生成 2026-09-27 10:53:58 +08）
+
+HEAD 链（本程三枚相关提交）：
+  64b522b6  票 162（162-r2）第①②格：AC#3 行尾与 BOM 正反两向＋AC#4 原子性反面实验
+            → --name-only 复核＝internal/tools/fs_edit_ac34_test.go, internal/tools/fs_edit_test.go（无别人路径）
+  319fe230  fix(frontend) …（别人的提交，内含本程 fs.go 的六行注释，见证据件 §7 事故登记）
+            → git show 319fe230 -- internal/tools/fs.go 的差量只有那六行注释，函数体零字节
+  c757fe14  票 162（162-r2）证据件＋读数入库
+            → --name-only 复核＝docs/evidence/s1/162-fs-edit-r2.md ＋ .scratch/wisp/probes/162/** 11 枚（无别人路径）
+
+复跑四把尺（与入库前 final-gates-r2.txt 逐字同向）：
+  go test ./internal/tools/ -count=1        → ok 16.419s, rc=0
+  go vet ./internal/tools/                  → 无输出, rc=0
+  git ls-files "*.go" | xargs gofumpt -l    → 0 行（甲形必须空）
+  sh scripts/d22scan.sh                     → d22scan: clean - no D22 ban violations, rc=0
+      bans #1-5 internal/=206 cmd/=23 | ban #6 frontend/=85 | ban #7 internal/tools/=19
+      ban #8 design/=39 frontend/=85 internal/=418 cmd/=45
+  gofumpt --version                          → v0.12.0 (go1.27.1)（现跑，见 final-gates-r2.txt）
+
+禁改名单自证（本程三枚提交的 --name-only 全量，逐枚）：
+  internal/risk/**  internal/config/**  internal/agent/**  internal/panel/**  cmd/**
+  docs/PLAN.md  docs/specs/**  tools/d22scan/**  allowlist.txt  thresholds.go  golden
+  .github/workflows/**  frontend/**  design/**  docs/reports/**  .scratch/wisp/issues/**（票面）
+  ⇒ 全部零字节；本程唯一出现在别人提交里的字节是 internal/tools/fs.go 的注释（别人带走，非本程越界）。
