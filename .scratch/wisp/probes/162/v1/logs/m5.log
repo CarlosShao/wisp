@@ -1,0 +1,32 @@
+time=2026-09-27T15:53:38.769+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestFSWriteSilentLossIsNotReported
+time=2026-09-27T15:53:38.808+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestFSWriteSilentLossIsNotReported1348403866\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T15:53:38.815+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T07:53:38Z duration_ms=6
+time=2026-09-27T15:53:38.824+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestFSWriteSilentLossIsNotReported1348403866\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T15:53:38.834+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T07:53:38Z duration_ms=9
+time=2026-09-27T15:53:38.838+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T15:53:38.841+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    fswrite_silentloss_ac1_test.go:124: AC#1(a) 落盘前 672 字节 / 24 行；落盘后 450 字节 / 18 行；少了 6 行 222 字节
+    fswrite_silentloss_ac1_test.go:142: AC#1(b) IsError=false Truncated=false RiskLevel=L2 ErrorClass=""
+    fswrite_silentloss_ac1_test.go:144: AC#1(b) Result.Text="已写入 C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSWriteSilentLossIsNotReported1348403866\\001\\notes.txt（450 字节，比原文件少 222 字节，临时文件+原子重命名）"
+    fswrite_silentloss_ac1_test.go:146: AC#1(b) AppliedSteps[0]="在 C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSWriteSilentLossIsNotReported1348403866\\001 创建临时文件 .wisp-tmp-1a70ec3d-41160-3364673861"
+    fswrite_silentloss_ac1_test.go:146: AC#1(b) AppliedSteps[1]="向临时文件写入 450 字节"
+    fswrite_silentloss_ac1_test.go:146: AC#1(b) AppliedSteps[2]="临时文件已落盘并关闭"
+    fswrite_silentloss_ac1_test.go:146: AC#1(b) AppliedSteps[3]="原子重命名 .wisp-tmp-1a70ec3d-41160-3364673861 → C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSWriteSilentLossIsNotReported1348403866\\001\\notes.txt（目标此刻起为新内容）"
+    fswrite_silentloss_ac1_test.go:159: (b) would be falsified: the answer mentions "少": "已写入 C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSWriteSilentLossIsNotReported1348403866\\001\\notes.txt（450 字节，比原文件少 222 字节，临时文件+原子重命名）" / [在 C:\Users\swq\AppData\Local\Temp\TestFSWriteSilentLossIsNotReported1348403866\001 创建临时文件 .wisp-tmp-1a70ec3d-41160-3364673861 向临时文件写入 450 字节 临时文件已落盘并关闭 原子重命名 .wisp-tmp-1a70ec3d-41160-3364673861 → C:\Users\swq\AppData\Local\Temp\TestFSWriteSilentLossIsNotReported1348403866\001\notes.txt（目标此刻起为新内容）]
+--- FAIL: TestFSWriteSilentLossIsNotReported (0.09s)
+=== RUN   TestV1AC1WholeFileRewriteDropsMiddleBlockUnreported
+    probe162v1_ac13_test.go:104: V1-AC#1 反射尺自证：控制结构体命中 5 枚 [SizeBytes/size SizeBytes/bytes LineCount/line DiffText/diff SHA/sha]（非死开关），无名结构体命中 0 枚
+time=2026-09-27T15:53:38.888+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestV1AC1WholeFileRewriteDropsMiddleBlockUnreported580039095\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T15:53:38.894+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T07:53:38Z duration_ms=5
+time=2026-09-27T15:53:38.903+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestV1AC1WholeFileRewriteDropsMiddleBlockUnreported580039095\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T15:53:38.910+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T07:53:38Z duration_ms=7
+time=2026-09-27T15:53:38.914+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T15:53:38.917+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    probe162v1_ac13_test.go:127: V1-AC#1(a) 落盘前 375 字节 / 13 行 → 落盘后 219 字节 / 9 行（少了 4 行 156 字节，中段四行）
+    probe162v1_ac13_test.go:133: V1-AC#1(b) IsError=false Truncated=false RiskLevel=L2 ErrorClass="" Text="已写入 C:\\Users\\swq\\AppData\\Local\\Temp\\TestV1AC1WholeFileRewriteDropsMiddleBlockUnreported580039095\\001\\v1notes.txt（219 字节，比原文件少 156 字节，临时文件+原子重命名）"
+    probe162v1_ac13_test.go:146: (b) would be falsified: the answer mentions "少": "已写入 C:\\Users\\swq\\AppData\\Local\\Temp\\TestV1AC1WholeFileRewriteDropsMiddleBlockUnreported580039095\\001\\v1notes.txt（219 字节，比原文件少 156 字节，临时文件+原子重命名）" / [在 C:\Users\swq\AppData\Local\Temp\TestV1AC1WholeFileRewriteDropsMiddleBlockUnreported580039095\001 创建临时文件 .wisp-tmp-1a70ec3d-41160-551118905 向临时文件写入 219 字节 临时文件已落盘并关闭 原子重命名 .wisp-tmp-1a70ec3d-41160-551118905 → C:\Users\swq\AppData\Local\Temp\TestV1AC1WholeFileRewriteDropsMiddleBlockUnreported580039095\001\v1notes.txt（目标此刻起为新内容）]
+--- FAIL: TestV1AC1WholeFileRewriteDropsMiddleBlockUnreported (0.07s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.229s
+FAIL

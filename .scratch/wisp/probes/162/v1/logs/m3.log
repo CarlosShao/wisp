@@ -1,0 +1,119 @@
+time=2026-09-27T15:53:30.182+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestFSEditKeepsABOMItWasNotAskedToTouch
+    fs_edit_ac34_test.go:97: the edit changed more than the matched bytes:
+         got="\ufefftitle: 报表\r\nstatus: final\r\n"
+        want="\ufefftitle: 报表\nstatus: final\n"
+--- FAIL: TestFSEditKeepsABOMItWasNotAskedToTouch (0.02s)
+=== RUN   TestFSEditOnACRLFFileRefusesAnLFSpelledOld
+    fs_edit_ac34_test.go:161: AC#3 CRLF 反向读数：23 字节的纯 CRLF 文件里 LF 写法的 old 被响亮拒绝（文案含文件长度 23，证明读到了整文件），同一文件上不含换行的 old 立即命中并落盘 ⇒ 这是正确拒绝，不是读不到
+--- PASS: TestFSEditOnACRLFFileRefusesAnLFSpelledOld (0.02s)
+=== RUN   TestFSEditOnACRLFFileAppliesACRLFSpelledOldAndStaysCRLF
+    fs_edit_ac34_test.go:202: AC#3 CRLF 正向读数：23 字节 → 30 字节，CRLF 对 3→4，裸 CR/裸 LF 均为 0（行尾未被改写），文案="fs.edit 已改写 C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSEditOnACRLFFileAppliesACRLFSpelledOldAndStaysCRLF1162625390\\001\\crlf-hit.txt：1 枚编辑全部生效，23 字节 / 3 行 → 30 字节 / 4 行（临时文件+原子重命名）"
+--- PASS: TestFSEditOnACRLFFileAppliesACRLFSpelledOldAndStaysCRLF (0.02s)
+=== RUN   TestFSEditDoesNotRewriteAnLFFilesLineEndings
+    fs_edit_ac34_test.go:242: the LF edit changed bytes outside the match:
+         got="alpha\r\nbravo\r\nbravo2\r\ncharlie\r\n"
+        want="alpha\nbravo\nbravo2\ncharlie\n"
+--- FAIL: TestFSEditDoesNotRewriteAnLFFilesLineEndings (0.02s)
+=== RUN   TestFSEditLineEndingForensicsRefusesRealSpellings
+=== RUN   TestFSEditLineEndingForensicsRefusesRealSpellings/crlf_file_lf_spelled_old
+    fs_edit_ac34_test.go:330: 归一取证：23 字节文件（行尾形 纯 CRLF）被 0 命中拒掉一枚归一后可命中 1 次的 old；落盘前后一字未变
+=== RUN   TestFSEditLineEndingForensicsRefusesRealSpellings/cr_only_file_lf_spelled_old
+    fs_edit_ac34_test.go:330: 归一取证：20 字节文件（行尾形 纯 CR）被 0 命中拒掉一枚归一后可命中 1 次的 old；落盘前后一字未变
+=== RUN   TestFSEditLineEndingForensicsRefusesRealSpellings/mixed_file_old_over_the_crlf_line_lf_spelled
+    fs_edit_ac34_test.go:330: 归一取证：22 字节文件（行尾形 混合(CRLF=2 CR=0 LF=1)）被 0 命中拒掉一枚归一后可命中 1 次的 old；落盘前后一字未变
+=== RUN   TestFSEditLineEndingForensicsRefusesRealSpellings/mixed_file_old_over_the_lf_line_crlf_spelled
+    fs_edit_ac34_test.go:330: 归一取证：22 字节文件（行尾形 混合(CRLF=2 CR=0 LF=1)）被 0 命中拒掉一枚归一后可命中 1 次的 old；落盘前后一字未变
+=== RUN   TestFSEditLineEndingForensicsRefusesRealSpellings/lf_file_crlf_spelled_old
+    fs_edit_ac34_test.go:330: 归一取证：20 字节文件（行尾形 纯 LF）被 0 命中拒掉一枚归一后可命中 1 次的 old；落盘前后一字未变
+--- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings (0.05s)
+    --- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings/crlf_file_lf_spelled_old (0.01s)
+    --- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings/cr_only_file_lf_spelled_old (0.01s)
+    --- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings/mixed_file_old_over_the_crlf_line_lf_spelled (0.01s)
+    --- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings/mixed_file_old_over_the_lf_line_crlf_spelled (0.01s)
+    --- PASS: TestFSEditLineEndingForensicsRefusesRealSpellings/lf_file_crlf_spelled_old (0.01s)
+=== RUN   TestFSEditSilentShapeChangesLandToday
+=== RUN   TestFSEditSilentShapeChangesLandToday/an_old_that_carries_the_bom_deletes_it
+    fs_edit_ac34_test.go:364: reading changed: got "ALPHA\r\nbeta\r\n"
+=== RUN   TestFSEditSilentShapeChangesLandToday/an_lf_spelled_new_in_a_crlf_file_lands_mixed_endings
+    fs_edit_ac34_test.go:398: expected the mixed shape (3 CRLF + 1 bare LF), got crlf=4 bareCR=0 bareLF=0 in "alpha\r\nbravo\r\nbravo2\r\ncharlie\r\n"
+--- FAIL: TestFSEditSilentShapeChangesLandToday (0.04s)
+    --- FAIL: TestFSEditSilentShapeChangesLandToday/an_old_that_carries_the_bom_deletes_it (0.02s)
+    --- FAIL: TestFSEditSilentShapeChangesLandToday/an_lf_spelled_new_in_a_crlf_file_lands_mixed_endings (0.02s)
+=== RUN   TestFSEditKilledMidWriteLeavesTheTargetByteIdentical
+    fs_edit_ac34_test.go:497: AC#4(a)(b) 读数：改前 26 字节 → 杀点 write:16（边界在下一块落笔前触发，暂存件里此刻 8 字节）→ 目标仍是 26 字节原字节；目录内 .wisp-tmp-* 残件 0 枚，台账 ["在 C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSEditKilledMidWriteLeavesTheTargetByteIdentical3330598587\\001 创建临时文件 .wisp-tmp-032e66b1-30824-1501266220" "在步骤「write:16」前停止：模拟进程在此刻被杀" "向临时文件写入 8 字节" "写入未完成：已停止于 write:16：模拟进程在此刻被杀" "删除临时文件 .wisp-tmp-032e66b1-30824-1501266220（目标从头到尾未被改动）"]
+--- PASS: TestFSEditKilledMidWriteLeavesTheTargetByteIdentical (0.01s)
+=== RUN   TestFSEditWithoutTheStagedWriterWouldCorruptTheTarget
+    fs_edit_ac34_test.go:600: AC#4(c) 反面实验读数：同一批字节、同一道 write:16 杀点，摘掉 temp+rename 之后目标从 26 字节变成 8 字节（"ALPHA-LO"），既不是原文也不是要落的内容；事后 fs.read 返回 IsError=false ErrorClass="" Truncated=false，把损坏原文照读照回 ⇒ 这发损坏从此看不见。装回 temp+rename（上一枚用例）则目标一字未动。
+--- PASS: TestFSEditWithoutTheStagedWriterWouldCorruptTheTarget (0.02s)
+=== RUN   TestFSEditRefusesANonLiteralOld
+    fs_edit_test.go:130: 判据 1+2 读数：命中前 50 字节 / 命中失败后 50 字节（一字未变），文案="fs.edit 拒绝执行：第 1 枚编辑的 old 在文件里找不到（0 命中，文件 50 字节）。old 必须与文件内容逐字一致，包含全部空白与换行（the old string must match exactly including all whitespace and newlines）；先用 fs.read 读回原文再照抄那一段。本次调用一个字也没有写，目标文件保持原状。"
+--- PASS: TestFSEditRefusesANonLiteralOld (0.01s)
+=== RUN   TestFSEditRefusesAnAmbiguousOldIsADistinctError
+    fs_edit_test.go:171: 判据 3 读数：old 在 40 字节文件里命中 2 处，先数后拒，落盘前后一字未变
+--- PASS: TestFSEditRefusesAnAmbiguousOldIsADistinctError (0.01s)
+=== RUN   TestFSEditRefusesAnEmptyOldIsAWholeFileInsert
+    fs_edit_test.go:210: 判据 4 空 old 读数：两形（old:"" 与缺 old 字段）都拒，文件保持 29 字节
+--- PASS: TestFSEditRefusesAnEmptyOldIsAWholeFileInsert (0.02s)
+=== RUN   TestFSEditIsAllOrNothingAcrossABatch
+=== RUN   TestFSEditIsAllOrNothingAcrossABatch/no_op_edit_in_the_batch
+    fs_edit_test.go:282: 全有或全无读数：本批 2 枚编辑，其中一枚不成立（空批＝整批不成立）⇒ 一个字也不落盘，文件仍是 26 字节
+=== RUN   TestFSEditIsAllOrNothingAcrossABatch/overlapping_edits
+    fs_edit_test.go:282: 全有或全无读数：本批 2 枚编辑，其中一枚不成立（空批＝整批不成立）⇒ 一个字也不落盘，文件仍是 26 字节
+=== RUN   TestFSEditIsAllOrNothingAcrossABatch/second_edit_misses
+    fs_edit_test.go:282: 全有或全无读数：本批 2 枚编辑，其中一枚不成立（空批＝整批不成立）⇒ 一个字也不落盘，文件仍是 26 字节
+=== RUN   TestFSEditIsAllOrNothingAcrossABatch/empty_batch
+    fs_edit_test.go:282: 全有或全无读数：本批 0 枚编辑，其中一枚不成立（空批＝整批不成立）⇒ 一个字也不落盘，文件仍是 26 字节
+--- PASS: TestFSEditIsAllOrNothingAcrossABatch (0.04s)
+    --- PASS: TestFSEditIsAllOrNothingAcrossABatch/no_op_edit_in_the_batch (0.01s)
+    --- PASS: TestFSEditIsAllOrNothingAcrossABatch/overlapping_edits (0.01s)
+    --- PASS: TestFSEditIsAllOrNothingAcrossABatch/second_edit_misses (0.01s)
+    --- PASS: TestFSEditIsAllOrNothingAcrossABatch/empty_batch (0.01s)
+=== RUN   TestFSEditAppliesABatchOnDisk
+    fs_edit_test.go:315: the batch did not land as expected:
+         got="ALPHA\r\nbravo\r\nCHARLIE\r\nextra\r\ndelta\r\n"
+        want="ALPHA\nbravo\nCHARLIE\nextra\ndelta\n"
+--- FAIL: TestFSEditAppliesABatchOnDisk (0.01s)
+=== RUN   TestV1AC1WholeFileRewriteDropsMiddleBlockUnreported
+    probe162v1_ac13_test.go:104: V1-AC#1 反射尺自证：控制结构体命中 5 枚 [SizeBytes/size SizeBytes/bytes LineCount/line DiffText/diff SHA/sha]（非死开关），无名结构体命中 0 枚
+time=2026-09-27T15:53:30.526+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestV1AC1WholeFileRewriteDropsMiddleBlockUnreported1973593031\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-27T15:53:30.536+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-27T07:53:30Z duration_ms=9
+time=2026-09-27T15:53:30.544+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestV1AC1WholeFileRewriteDropsMiddleBlockUnreported1973593031\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-27T15:53:30.550+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-27T07:53:30Z duration_ms=6
+time=2026-09-27T15:53:30.554+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-27T15:53:30.557+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    probe162v1_ac13_test.go:127: V1-AC#1(a) 落盘前 375 字节 / 13 行 → 落盘后 219 字节 / 9 行（少了 4 行 156 字节，中段四行）
+    probe162v1_ac13_test.go:133: V1-AC#1(b) IsError=false Truncated=false RiskLevel=L2 ErrorClass="" Text="已写入 C:\\Users\\swq\\AppData\\Local\\Temp\\TestV1AC1WholeFileRewriteDropsMiddleBlockUnreported1973593031\\001\\v1notes.txt（219 字节，临时文件+原子重命名）"
+    probe162v1_ac13_test.go:158: V1-AC#1(c) row tool=fs.write risk=L2 decision=allow outcome=success error_class=""
+    probe162v1_ac13_test.go:163: V1-AC#1(c) memory.ToolCall 字段名=[ID TaskID Seq Tool ArgsJSON RiskLevel Decision DecidedAt StartedAt EndedAt Outcome ErrorClass CorrelationID GrantID]
+    probe162v1_ac13_test.go:167: V1-AC#1(c) agent.ToolOutcome 字段名=[Text IsError RiskLevel ErrorClass Truncated AppliedSteps] size-bearing=[]
+    probe162v1_ac13_test.go:169: V1-AC#1(c) Result 字段名=[Text IsError Truncated Origin AppliedSteps] size-bearing=[]
+    probe162v1_ac13_test.go:172: V1-AC#1(c) audit: "tools: call kind=success task=task-1 corr=corr-1 tool=fs.write risk=L2 decision=allow outcome=success rules_hit=[R1 R8] in_allowlist_scope=true reason=\"R1: 工具声明为下界（L1）; R8: 不可逆操作（覆盖已有内容）\""
+    probe162v1_ac13_test.go:172: V1-AC#1(c) audit: "tools: PATH-ACCOUNT task=task-1 tool=fs.write roots=1 rewritten=[] unusable=[]"
+    probe162v1_ac13_test.go:181: V1-AC#1(c) 事后 fs.read：219 字节 Truncated=false ErrorClass=""
+    probe162v1_ac13_test.go:182: V1-AC#1 结论：漏抄中段 4 行 156 字节，Result.Text / AppliedSteps / tool_call 行 / audit 行 / 事后 fs.read 五处读数全为安静 ⇒ 票面 :32 的前提由验收位自己复算成立
+--- PASS: TestV1AC1WholeFileRewriteDropsMiddleBlockUnreported (0.09s)
+=== RUN   TestV1AC3ThreeShotsOnMyOwnFixtures
+=== RUN   TestV1AC3ThreeShotsOnMyOwnFixtures/crlf_file_stays_crlf
+    probe162v1_ac13_test.go:220: V1-AC#3 正向①：23 字节纯 CRLF → 28 字节，CRLF 对 4→5，裸 CR/裸 LF 0/0
+=== RUN   TestV1AC3ThreeShotsOnMyOwnFixtures/bom_survives
+    probe162v1_ac13_test.go:242: changed beyond the match: "\ufeffname: v1\r\nstate: closed\r\n"
+=== RUN   TestV1AC3ThreeShotsOnMyOwnFixtures/lf_file_endings_untouched
+    probe162v1_ac13_test.go:263: AC#3 violated: CR appeared in an LF file: "one\r\n2\r\nthree\r\n"
+--- FAIL: TestV1AC3ThreeShotsOnMyOwnFixtures (0.05s)
+    --- PASS: TestV1AC3ThreeShotsOnMyOwnFixtures/crlf_file_stays_crlf (0.01s)
+    --- FAIL: TestV1AC3ThreeShotsOnMyOwnFixtures/bom_survives (0.02s)
+    --- FAIL: TestV1AC3ThreeShotsOnMyOwnFixtures/lf_file_endings_untouched (0.02s)
+=== RUN   TestV1AC3bPremiseTheTwoShapesClaimedSilent
+=== RUN   TestV1AC3bPremiseTheTwoShapesClaimedSilent/shape1_old_spanning_the_bom
+    probe162v1_ac13_test.go:295: V1-AC#3b① 读数：IsError=false ErrorClass="" 9 字节 → 7 字节，前三字节 41 4c 50，Text="fs.edit 已改写 C:\\Users\\swq\\AppData\\Local\\Temp\\TestV1AC3bPremiseTheTwoShapesClaimedSilentshape1_old_spanning_t3353636957\\001\\s1.txt：1 枚编辑全部生效，9 字节 / 1 行 → 7 字节 / 1 行（临时文件+原子重命名）"
+    probe162v1_ac13_test.go:306: expected 9 -> 6 bytes (BOM's three bytes consumed), got 7 ("ALPHA\r\n")
+=== RUN   TestV1AC3bPremiseTheTwoShapesClaimedSilent/shape2_lf_spelled_new_into_a_pure_crlf_file
+    probe162v1_ac13_test.go:330: V1-AC#3b② 读数：IsError=false ErrorClass="" 落盘后 CRLF=4 裸CR=0 裸LF=0，Text="fs.edit 已改写 C:\\Users\\swq\\AppData\\Local\\Temp\\TestV1AC3bPremiseTheTwoShapesClaimedSilentshape2_lf_spelled_new451866664\\001\\s2.txt：1 枚编辑全部生效，17 字节 / 3 行 → 24 字节 / 4 行（临时文件+原子重命名）"
+    probe162v1_ac13_test.go:336: expected exactly one bare LF (mixed endings), got 0
+--- FAIL: TestV1AC3bPremiseTheTwoShapesClaimedSilent (0.03s)
+    --- FAIL: TestV1AC3bPremiseTheTwoShapesClaimedSilent/shape1_old_spanning_the_bom (0.01s)
+    --- FAIL: TestV1AC3bPremiseTheTwoShapesClaimedSilent/shape2_lf_spelled_new_into_a_pure_crlf_file (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.594s
+FAIL
