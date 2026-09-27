@@ -32,3 +32,19 @@ docs/evidence/s1/162-risk-tier-and-contract-axis-r4.md
 .scratch/wisp/probes/171/r2/logs/part2-nog6-pristine.txt
 .scratch/wisp/probes/171/r2/logs/part3-stale-fixed.txt
 .scratch/wisp/probes/171/r2/logs/part3-stale-pristine.txt
+
+=== 件④ commit 原样输出 ===
+822e2001 票 171（171-r2 写码位·件④）AC#8② 的"核它的那一把"＋射程未减的集合差：  flip-declaration.sh 只**新增一格**（stale：want_n 8->9、实测 8）——既有九格语义一字节未动，    全量读数 rc=0：baseline ok、flip1..6 逐格 ok（含两枚同翻＝2）、新格两条 ok（退码仍 0＋表里点名 G5neg）、    restore ok 且与 baseline 相等。改前对照（logs/flip-pre-fix.txt）同一把九格全绿、但没有这一格。  r2-roster-diff.sh＝两把尺（git show f1b99a70 的改前字节 vs 工作副本）打同一枚锚，十四枚腿名册两向 comm：    新增点名 0 枚／退场 0 枚，合计名册行数 改前=151 改后=151；射程行增删 0 枚。    ⚠ 这枚脚本第一版是**恒真比较**：六枚对照腿的段名取了 echo 那行标题（pair() 随后自己打 ## 标题、    awk 段界立刻结束）⇒ 六枚全报 0/0；改取 pair() 自己那行之后 G5pos=88／G5neg=16／G7pos=28 才是真读数。 门禁现量：sh scripts/d22scan.sh rc=0（clean）；bash tools/d22scan/runtests.sh -C tools/d22scan ./...  rc=0、PASS=34 FAIL=0 SKIP=0、=== RUN=76、名册 34 枚（logs/runtests-roster.txt）；  gofumpt v0.12.0（go1.27.1）现跑，本程写面 0 枚 .go ⇒ gofumpt -l 0 行。
+.scratch/wisp/probes/161/r6/flip-declaration.sh
+.scratch/wisp/probes/171/r2/logs/commit-attest.txt
+.scratch/wisp/probes/171/r2/logs/d22scan.txt
+.scratch/wisp/probes/171/r2/logs/flip-post-fix.txt
+.scratch/wisp/probes/171/r2/logs/gate-post-at-anchor.txt
+.scratch/wisp/probes/171/r2/logs/gate-pre-at-anchor.txt
+.scratch/wisp/probes/171/r2/logs/gofumpt-version.txt
+.scratch/wisp/probes/171/r2/logs/legs-table-post.txt
+.scratch/wisp/probes/171/r2/logs/legs-table-pre.txt
+.scratch/wisp/probes/171/r2/logs/roster-diff.txt
+.scratch/wisp/probes/171/r2/logs/runtests-roster.txt
+.scratch/wisp/probes/171/r2/logs/runtests.txt
+.scratch/wisp/probes/171/r2/r2-roster-diff.sh
