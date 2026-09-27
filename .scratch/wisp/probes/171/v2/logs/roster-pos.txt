@@ -1,0 +1,146 @@
+r2-roster-diff.sh: anchor d63975ae  pre-fix ruler (git show 19513cce) rc=1  working-copy ruler rc=0
+  腿=G1     改前名册=0   改后名册=0   新增点名=0 退场=0
+  腿=G1b    改前名册=0   改后名册=0   新增点名=0 退场=0
+  腿=G2     改前名册=2   改后名册=2   新增点名=0 退场=0
+  腿=G3     改前名册=0   改后名册=0   新增点名=0 退场=0
+  腿=G4     改前名册=0   改后名册=0   新增点名=0 退场=0
+  腿=G5     改前名册=2   改后名册=2   新增点名=1 退场=1
+     新增/退场逐字：
+       	#   DISCARD-HANDLE cmd/wisp/panel_assets.go
+       #   UNPAIRED internal/tools/bridge.go (开方调用点=1)  # 同文件另见收尾动词，判「真漏／委托」
+  腿=G5pos  改前名册=1   改后名册=88  新增点名=88 退场=1
+     新增/退场逐字：
+       #   UNPAIRED internal/tools/bridge.go (开方调用点=1)  # 同文件另见收尾动词，判「真漏／委托」
+       	f1b99a70:cmd/balldebug/diff_windows.go:224:	defer f.Close()
+       	f1b99a70:cmd/balldebug/main.go:234:			b.Close()
+       	f1b99a70:cmd/balldebug/main.go:266:			b.Close()
+       	f1b99a70:cmd/balldebug/main.go:358:	b.Close()
+       	f1b99a70:cmd/balldebug/shot_windows.go:119:		f.Close()
+       	f1b99a70:cmd/llmrecord/main.go:102:	defer resp.Body.Close()
+       	f1b99a70:cmd/wisp/logsink.go:113:	_ = s.pipeline.Close()
+       	f1b99a70:cmd/wisp/models.go:304:	defer machine.Close()
+       	f1b99a70:cmd/wisp/providers.go:185:	defer func() { _ = store.Close() }()
+       	f1b99a70:cmd/wisp/run.go:517:		_ = rt.store.Close()
+       	f1b99a70:cmd/wisp/slo_windows.go:306:			_ = pipeline.Close()
+       	f1b99a70:cmd/wisp/slo_windows.go:315:			_ = pipeline.Close()
+       	f1b99a70:cmd/wisp/slo_windows.go:329:	_ = pipeline.Close()
+       	f1b99a70:internal/audio/device.go:39:	Close() error
+       	f1b99a70:internal/audio/device.go:65:	Close() error
+       	f1b99a70:internal/audio/mmdevice_windows.go:136:func (w *mmDeviceWatcher) Close() error {
+       	f1b99a70:internal/audio/wasapi_windows.go:238:		_ = s.Close() // release the half-initialized client (idempotent)
+       	f1b99a70:internal/audio/wasapi_windows.go:408:func (s *wasapiStream) Close() error {
+       	f1b99a70:internal/audio/wasapimic_windows.go:183:	defer func() { _ = stream.Close() }() // closure: closes whatever stream is CURRENT (swap-safe)
+       	f1b99a70:internal/audio/wasapimic_windows.go:202:			_ = stream.Close()
+       	f1b99a70:internal/audio/wasapimic_windows.go:250:	_ = (*stream).Close()
+       	f1b99a70:internal/ball/ball_windows.go:904:func (b *Ball) Close() {
+       	f1b99a70:internal/config/parse.go:216:		_ = tmp.Close()
+       	f1b99a70:internal/config/parse.go:220:		tmp.Close()
+       	f1b99a70:internal/config/parse.go:223:	if err := tmp.Close(); err != nil {
+       	f1b99a70:internal/llm/discover.go:70:	defer resp.Body.Close()
+       	f1b99a70:internal/llm/systemproxy_windows.go:58:	defer k.Close()
+       	f1b99a70:internal/memory/dao_memory.go:136:	defer rows.Close()
+       	f1b99a70:internal/memory/dao_memory.go:76:	defer rows.Close()
+       	f1b99a70:internal/memory/dao_misc.go:175:	defer rows.Close()
+       	f1b99a70:internal/memory/dao_misc.go:250:	defer rows.Close()
+       	f1b99a70:internal/memory/dao_misc.go:85:	defer rows.Close()
+       	f1b99a70:internal/memory/dao_misc.go:97:	defer rows.Close()
+       	f1b99a70:internal/memory/dao_profile.go:115:	defer rows.Close()
+       	f1b99a70:internal/memory/dao_providerhealth.go:182:	defer rows.Close()
+       	f1b99a70:internal/memory/dao_tasklog.go:101:	defer rows.Close()
+       	f1b99a70:internal/memory/dao_toolcall.go:116:	defer rows.Close()
+       	f1b99a70:internal/memory/dao_toolcall.go:127:	defer rows.Close()
+       	f1b99a70:internal/memory/open.go:208:		_ = s.reader.Close()
+       	f1b99a70:internal/memory/open.go:219:		_ = s.Close()
+       	f1b99a70:internal/memory/open.go:253:func (s *Store) Close() error {
+       	f1b99a70:internal/memory/open.go:266:			_ = s.reader.Close()
+       	f1b99a70:internal/memory/open.go:269:			_ = s.writer.Close()
+       	f1b99a70:internal/memory/open.go:300:		_ = boot.Close()
+       	f1b99a70:internal/memory/open.go:304:		_ = boot.Close()
+       	f1b99a70:internal/memory/open.go:308:		_ = boot.Close()
+       	f1b99a70:internal/memory/open.go:317:		_ = boot.Close()
+       	f1b99a70:internal/memory/open.go:325:		if err := boot.Close(); err != nil {
+       	f1b99a70:internal/memory/open.go:336:			_ = boot.Close()
+       	f1b99a70:internal/memory/open.go:342:	_ = boot.Close()
+       	f1b99a70:internal/memory/open.go:532:	defer in.Close()
+       	f1b99a70:internal/memory/open.go:538:		out.Close()
+       	f1b99a70:internal/memory/open.go:541:	return out.Close()
+       	f1b99a70:internal/models/archive.go:25:	defer f.Close()
+       	f1b99a70:internal/models/archive.go:86:			out.Close()
+       	f1b99a70:internal/models/archive.go:89:		if err := out.Close(); err != nil {
+       	f1b99a70:internal/models/downloader.go:397:	defer resp.Body.Close()
+       	f1b99a70:internal/models/downloader.go:428:	defer f.Close()
+       	f1b99a70:internal/models/downloader.go:490:	defer f.Close()
+       	f1b99a70:internal/models/downloader.go:683:	defer f.Close()
+       	f1b99a70:internal/models/downloader.go:725:	defer in.Close()
+       	f1b99a70:internal/models/downloader.go:730:	defer out.Close()
+       	f1b99a70:internal/observe/diagnostics.go:202:	if err := zw.Close(); err != nil {
+       	f1b99a70:internal/observe/diagnostics.go:208:	if err := f.Close(); err != nil {
+       	f1b99a70:internal/observe/diagnostics.go:81:			f.Close()
+       	f1b99a70:internal/observe/logging.go:115:func (p *LogPipeline) Close() error {
+       	f1b99a70:internal/observe/logging.go:118:	return p.writer.Close()
+       	f1b99a70:internal/observe/logging.go:260:	cerr := w.file.Close()
+       	f1b99a70:internal/observe/logging.go:281:func (w *rollingWriter) Close() error {
+       	f1b99a70:internal/observe/logging.go:82:			_ = w.Close()
+       	f1b99a70:internal/panel/attachments.go:225:	defer func() { _ = rc.Close() }()
+       	f1b99a70:internal/proc/boot_windows.go:109:		_ = job.Close()
+       	f1b99a70:internal/proc/boot_windows.go:147:		hooks.CloseJob = func(context.Context) error { return rt.Job.Close() }
+       	f1b99a70:internal/proc/boot_windows.go:97:			_ = job.Close()
+       	f1b99a70:internal/proc/jobscope_windows.go:170:func (j *JobScope) Close() error {
+       	f1b99a70:internal/statemachine/machine.go:169:func (m *Machine) Close() {
+       	f1b99a70:internal/tools/bridge.go:628:// risk.OpenScope now hands back the *Scope that owns the close, and the bridge
+       	f1b99a70:internal/tools/bridge.go:648:	b.scopes[taskID] = b.prov.OpenScope(taskID)
+       	f1b99a70:internal/tools/bridge.go:706:		closeErr = scope.Close()
+       	f1b99a70:internal/tools/fs.go:150:	defer f.Close() //nolint:errcheck // read-only handle, Close's error is not actionable
+       	f1b99a70:internal/tools/fs.go:214:	defer dir.Close() //nolint:errcheck // read-only handle
+       	f1b99a70:internal/tools/fs_write.go:302:		_ = tmp.Close()
+       	f1b99a70:internal/tools/fs_write.go:322:	if err := tmp.Close(); err != nil {
+       	f1b99a70:internal/tools/fs_write.go:507:	defer src.Close() //nolint:errcheck // read-only handle
+       	f1b99a70:internal/tools/fs_write.go:520:	_ = tmp.Close()
+       	f1b99a70:internal/winsec/winsec.go:118:		_ = f.Close()
+       	f1b99a70:internal/winsec/winsec.go:123:		_ = f.Close()
+       	f1b99a70:internal/winsec/winsec.go:127:	if err := f.Close(); err != nil {
+  腿=G5neg  改前名册=9   改后名册=16  新增点名=8 退场=1
+     新增/退场逐字：
+       	#   DISCARD-HANDLE cmd/wisp/panel_assets.go
+       	#   DISCARD-HANDLE internal/risk/provenance.go
+       	#   DISCARD-HANDLE internal/risk/provenance_syncdirs_other_test.go
+       	#   DISCARD-HANDLE internal/risk/provenance_test.go
+       	#   DISCARD-HANDLE internal/risk/syncdirs_redteam_windows_test.go
+       	#   DISCARD-HANDLE internal/risk/syncdirs_test.go
+       	#   DISCARD-HANDLE internal/risk/syncdirs_windows_test.go
+       	#   DISCARD-HANDLE internal/risk/taintmatch_test.go
+       #   UNPAIRED internal/tools/bridge.go (开方调用点=1)  # 同文件另见收尾动词，判「真漏／委托」
+  腿=G6     改前名册=1   改后名册=1   新增点名=0 退场=0
+  腿=G6pos  改前名册=6   改后名册=6   新增点名=0 退场=0
+  腿=G6neg  改前名册=1   改后名册=1   新增点名=0 退场=0
+  腿=G7     改前名册=3   改后名册=3   新增点名=0 退场=0
+  腿=G7pos  改前名册=28  改后名册=28  新增点名=0 退场=0
+  腿=G7neg  改前名册=4   改后名册=4   新增点名=0 退场=0
+  合计名册行数：改前=57 改后=151   （两向 comm 全空＝射程一枚未动）
+  pathspec 本体是否被改：git diff 19513cce HEAD -- .scratch/wisp/probes/154/gate-clauses.sh 里含 ":!" 或 "$GO" 的增删行：
+       +# 票 171 r1 追加（09-27，**只加声明、加味、加形状；一枚腿没删、一条 pathspec 射程没减**）：
+       +# 票 171 r2 追加（09-27，**只加声明、加味、加断言；一枚腿没删、一条 pathspec 射程没减**）：
+       -pair() { # 成对普查（票 158 G5 用）：$1 标题 $2 开方 pattern $3 合方 pattern $4.. pathspecs
+       +pair() { # 成对普查：$1 标题 $2 开方 pattern $3 合方 pattern $4 handle|- $5.. pathspecs
+       +	#   git grep -lEw 'Close\(\)' <锚> -- 'internal/**/*.go' 'cmd/**/*.go' ':!*_test.go' | wc -l，
+       +#   git grep -nE <该腿的 pattern> <锚> -- <该腿的 pathspec 原样> | grep -c .
+       -	'OpenScope' 'CloseScope' "$GO" "$GO2" ':!*_test.go' ':!internal/risk/*'
+       +	'OpenScope' 'CloseScope|Close\(\)' handle "$GO" "$GO2" ':!*_test.go' ':!internal/risk/*'
+       -	'OpenScope' 'CloseScope' "$GO" "$GO2" ':!*_test.go' ':!internal/risk/*' ':!cmd/wisp/panel_assets.go'
+       +	'OpenScope' 'CloseScope|Close\(\)' handle "$GO" "$GO2" ':!*_test.go' ':!internal/risk/*' ':!cmd/wisp/panel_assets.go'
+       -	'OpenScope' 'CloseScope' "$GO" "$GO2"
+       +	'OpenScope' 'CloseScope|Close\(\)' handle "$GO" "$GO2"
+       -	'OpenTask' 'CloseTask' "$GO" "$GO2" ':!*_test.go' ':!internal/tools/bridge.go'
+       +	'OpenTask' 'CloseTask' - "$GO" "$GO2" ':!*_test.go' ':!internal/tools/bridge.go'
+       -	'OpenTask' 'CloseTask' 'internal/tools/bridge.go' ':!*_test.go'
+       +	'OpenTask' 'CloseTask' - 'internal/tools/bridge.go' ':!*_test.go'
+       -	'OpenTask' 'CloseTask' "$GO" "$GO2"
+       +	'OpenTask' 'CloseTask' - "$GO" "$GO2"
+       -	'Defer(Named)?' '(New)?DisposalScope' "$GO" "$GO2" ':!*_test.go' ':!internal/plugin/disposal.go'
+       +	'Defer(Named)?' '(New)?DisposalScope' - "$GO" "$GO2" ':!*_test.go' ':!internal/plugin/disposal.go'
+       -	'Defer(Named)?' '(New)?DisposalScope' 'internal/plugin/disposal.go' ':!*_test.go'
+       +	'Defer(Named)?' '(New)?DisposalScope' - 'internal/plugin/disposal.go' ':!*_test.go'
+       -	'Defer(Named)?' '(New)?DisposalScope' "$GO" "$GO2"
+       +	'Defer(Named)?' '(New)?DisposalScope' - "$GO" "$GO2"
+r2-roster-diff.sh: RED - 有名册位移，按票面那是必须上报的发现，不是可以放宽的旋钮。
+positive-control rc=1

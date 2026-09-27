@@ -1,0 +1,44 @@
+--- commit 4cee47f2 ---
+.scratch/wisp/probes/171/r2/logs/gate-pre-fix.txt
+--- commit 7f78a163 ---
+.scratch/wisp/probes/171/r2/r2-run-legs-and-subtraction.sh
+--- commit 290aa63e ---
+.scratch/wisp/probes/154/gate-clauses.sh
+.scratch/wisp/probes/171/r2/logs/commit-attest.txt
+.scratch/wisp/probes/171/r2/logs/flip-pre-fix.txt
+.scratch/wisp/probes/171/r2/logs/gate-post-fix.txt
+.scratch/wisp/probes/171/r2/logs/harness-post-fix.txt
+.scratch/wisp/probes/171/r2/logs/harness-pre-fix.txt
+.scratch/wisp/probes/171/r2/logs/part1-state1-fixed.txt
+.scratch/wisp/probes/171/r2/logs/part1-state1-pristine.txt
+.scratch/wisp/probes/171/r2/logs/part1-state2-fixed.txt
+.scratch/wisp/probes/171/r2/logs/part1-state2-pristine.txt
+.scratch/wisp/probes/171/r2/logs/part2-nog6-fixed.txt
+.scratch/wisp/probes/171/r2/logs/part2-nog6-pristine.txt
+.scratch/wisp/probes/171/r2/logs/part3-stale-fixed.txt
+.scratch/wisp/probes/171/r2/logs/part3-stale-pristine.txt
+--- commit 822e2001 ---
+.scratch/wisp/probes/161/r6/flip-declaration.sh
+.scratch/wisp/probes/171/r2/logs/commit-attest.txt
+.scratch/wisp/probes/171/r2/logs/d22scan.txt
+.scratch/wisp/probes/171/r2/logs/flip-post-fix.txt
+.scratch/wisp/probes/171/r2/logs/gate-post-at-anchor.txt
+.scratch/wisp/probes/171/r2/logs/gate-pre-at-anchor.txt
+.scratch/wisp/probes/171/r2/logs/gofumpt-version.txt
+.scratch/wisp/probes/171/r2/logs/legs-table-post.txt
+.scratch/wisp/probes/171/r2/logs/legs-table-pre.txt
+.scratch/wisp/probes/171/r2/logs/roster-diff.txt
+.scratch/wisp/probes/171/r2/logs/runtests-roster.txt
+.scratch/wisp/probes/171/r2/logs/runtests.txt
+.scratch/wisp/probes/171/r2/r2-roster-diff.sh
+--- commit 12ad498b ---
+.scratch/wisp/probes/171/r2/logs/commit-attest.txt
+docs/evidence/s1/171-run-legs-and-subtraction-r2.md
+--- commit 0abb2e5f ---
+.scratch/wisp/issues/171-three-ruler-holes-ticket-161-cannot-carry-aggregate-rs-selftest-not-in-ci-trailing-comments-counted-as-calls-and-count-blind-pair-legs.md
+.scratch/wisp/probes/171/r2/logs/commit-attest.txt
+--- commit bae773d1 ---
+.scratch/wisp/probes/171/r2/logs/commit-attest.txt
+.scratch/wisp/probes/171/r2/logs/gate-final-recheck.txt
+--- commit 032b8736 ---
+.scratch/wisp/probes/171/r2/logs/commit-attest.txt
