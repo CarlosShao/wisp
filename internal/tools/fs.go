@@ -19,10 +19,12 @@ import (
 //	fs.read  L0 inside [fs] allowed_dirs, L2 out of scope via R2
 //	fs.list  L0 / L2, same rule, capability fs.read
 //
-// The write half (fs.write / fs.trash / fs.move, plus the delete_enabled-gated
-// fs.delete) is in fs_write.go and shares this file's FSDeps: same C26
-// resolver, same caps, one registration entry point (BuiltinFSEntries). The
-// [fs] allowed_dirs first-use ask flow is still open (see doc.go).
+// The write half (fs.write / fs.edit / fs.trash / fs.move, plus the
+// delete_enabled-gated fs.delete) is in fs_write.go and, for fs.edit (ticket
+// 162), in fs_edit.go; all of it shares this file's FSDeps: same C26 resolver,
+// same caps, one registration entry point (BuiltinFSEntries) and the same D31
+// staged writer (stageAndRename). The [fs] allowed_dirs first-use ask flow is
+// still open (see doc.go).
 
 // FSDeps is what an fs tool needs from the host.
 type FSDeps struct {
