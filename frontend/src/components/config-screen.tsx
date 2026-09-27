@@ -43,27 +43,15 @@ import { Chip } from "@/components/ai-native/chip";
 import { ProgressRing } from "@/components/ai-native/progress-ring";
 import { SegmentedControl } from "@/components/ai-native/segmented-control";
 import { cn } from "@/lib/cn";
+import {
+  MOTION_TIERS,
+  applyMotionTier,
+  readMotionTier,
+  type MotionTier,
+} from "@/lib/motion";
 
 /** The knob the frost reads. Kept as one name so nothing else can drift. */
 const ALPHA_VAR = "--panel-alpha";
-
-/** The animation switch, owner 2026-09-26: 「动画该装就装…让用户自己选择是
-    多一点性能开销还是选择更轻量」. "off" is what theme.css's
-    [data-motion="off"] block listens for; removing the attribute is full
-    motion. Memory-only, exactly like the alpha knob. */
-const MOTION_ATTR = "data-motion";
-type MotionTier = "全开" | "关闭";
-
-/** SegmentedControl 的泛型实参：两档就是全部档位（「降低」档等真需求出现再说）。 */
-const MOTION_TIERS: readonly MotionTier[] = ["全开", "关闭"];
-
-function applyMotionTier(tier: MotionTier) {
-  if (tier === "关闭") {
-    document.documentElement.setAttribute(MOTION_ATTR, "off");
-  } else {
-    document.documentElement.removeAttribute(MOTION_ATTR);
-  }
-}
 
 /**
  * The default comes from the generated token table, not from a number typed
@@ -122,7 +110,9 @@ function EffectBadge({ live }: { live: boolean }) {
 
 export function ConfigScreen() {
   const [alpha, setAlpha] = useState<number | null>(() => readPanelAlpha());
-  const [motion, setMotion] = useState<MotionTier>("全开");
+  // Read the tier back off the document rather than mirroring it: a tier set
+  // anywhere (a test, a future bridge field) is the tier the control shows.
+  const [motion, setMotion] = useState<MotionTier>(() => readMotionTier());
 
   function moveAlpha(next: number) {
     document.documentElement.style.setProperty(ALPHA_VAR, `${next}%`);

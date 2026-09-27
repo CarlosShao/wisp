@@ -36,6 +36,7 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
+import { GlideHighlight } from "@/components/glide-highlight";
 import { cn } from "@/lib/cn";
 
 export type RailTabKey = "review" | "files" | "terminal" | "browser";
@@ -239,12 +240,13 @@ export function RightRail({ openRequest }: { openRequest?: RailOpenRequest }) {
     >
       {/* ── 标签条：⌄ 下拉 + 可关标签 + ＋ 重开 ─────────────────────────── */}
       <div className="relative flex shrink-0 items-stretch gap-0.5 border-b border-line bg-inset p-1">
+        <GlideHighlight activeKey={active} layoutKey={openTabs.join("|")} radius="6px" />
         <button
           aria-expanded={menuOpen}
           aria-label="标签页列表"
           className={cn(
-            "flex w-7 shrink-0 items-center justify-center rounded-control text-ink-2 transition-colors duration-150 hover:bg-hover hover:text-ink",
-            menuOpen && "bg-hover text-ink",
+            "relative z-10 flex w-7 shrink-0 items-center justify-center rounded-control text-ink-2 transition-colors duration-150 hover:text-ink",
+            menuOpen && "text-ink",
           )}
           onClick={() => setMenuOpen((v) => !v)}
           title="标签页列表"
@@ -262,9 +264,10 @@ export function RightRail({ openRequest }: { openRequest?: RailOpenRequest }) {
             <button
               aria-selected={on}
               className={cn(
-                "group flex min-w-0 flex-1 items-center justify-center gap-1 rounded-control px-2 py-1.5 text-[12px] font-medium transition-colors duration-150",
-                on ? "bg-surface text-ink shadow-btn" : "text-ink-2 hover:bg-hover hover:text-ink",
+                "group relative z-10 flex min-w-0 flex-1 items-center justify-center gap-1 rounded-control px-2 py-1.5 text-[12px] font-medium transition-colors duration-150",
+                on ? "text-ink" : "text-ink-2 hover:text-ink",
               )}
+              data-glide-key={key}
               key={key}
               onClick={() => setActiveTab(key)}
               role="tab"
@@ -290,17 +293,21 @@ export function RightRail({ openRequest }: { openRequest?: RailOpenRequest }) {
           );
         })}
         <button
-          aria-label="打开最近关闭的标签页"
-          className="flex w-7 shrink-0 items-center justify-center rounded-control text-ink-2 transition-colors duration-150 hover:bg-hover hover:text-ink disabled:pointer-events-none disabled:opacity-40"
-          disabled={closedTabs.length === 0}
-          onClick={() => reopenTab(closedTabs[0])}
-          title={closedTabs.length ? `打开 ${TAB_DEFS.find((t) => t.key === closedTabs[0])?.label}` : "没有最近关闭的标签页"}
+          aria-label="打开更多"
+          className="relative z-10 flex w-7 shrink-0 items-center justify-center rounded-control text-ink-2 transition-colors duration-150 hover:text-ink"
+          onClick={() => setMenuOpen((v) => !v)}
+          title="打开更多"
           type="button"
         >
           <Plus aria-hidden="true" size={13} strokeWidth={2.2} />
         </button>
 
-        {/* ── 下拉：搜索 + 打开的标签页 + 最近关闭的标签页 ─────────────── */}
+        {/* ── 下拉：搜索 + 全部可打开的标签页 + 最近关闭的 ───────────────
+            This is what makes a SECOND tab reachable. The launcher only shows
+            while nothing is open, so without this list the rail would be
+            permanently single-tab: close back to the launcher to add one and
+            you have thrown away the one you had. The list is therefore every
+            tab, not just the open ones. */}
         {menuOpen && (
           <div
             className="absolute left-1 right-1 top-full z-40 mt-1 rounded-card border border-line bg-surface p-1.5 shadow-overlay"
@@ -315,25 +322,45 @@ export function RightRail({ openRequest }: { openRequest?: RailOpenRequest }) {
               />
             </label>
             <p className="px-1.5 pb-0.5 pt-1.5 text-[10.5px] font-medium uppercase tracking-[0.08em] text-ink-3">
-              打开的标签页
+              可打开
             </p>
-            {openTabs.filter((k) => menuMatches(TAB_DEFS.find((t) => t.key === k)!)).map((key) => {
-              const def = TAB_DEFS.find((t) => t.key === key)!;
-              return (
-                <div className="flex items-center gap-2 rounded-chip px-1.5 py-1.5 hover:bg-hover" key={key}>
-                  <span className="min-w-0 flex-1 truncate text-left text-[12px] text-ink">{def.label}</span>
-                  <span
-                    aria-label={`关闭 ${def.label}`}
-                    className="flex size-4 shrink-0 items-center justify-center rounded-[4px] text-ink-3 hover:bg-line/70 hover:text-ink"
-                    onClick={() => closeTab(key)}
-                    role="button"
-                    tabIndex={-1}
-                  >
-                    <X aria-hidden="true" size={9} strokeWidth={2.6} />
-                  </span>
-                </div>
-              );
-            })}
+            {TAB_DEFS.filter((t) => !openTabs.includes(t.key) && menuMatches(t)).map((def) => (
+              <button
+                className="flex w-full items-center gap-2 rounded-chip px-1.5 py-1.5 text-left hover:bg-hover"
+                key={def.key}
+                onClick={() => reopenTab(def.key)}
+                title={def.blurb}
+                type="button"
+              >
+                <IconFor def={def} />
+                <span className="min-w-0 flex-1 truncate text-[12px] text-ink-2">{def.label}</span>
+                {def.keys ? <kbd className="kbd shrink-0">{def.keys}</kbd> : null}
+              </button>
+            ))}
+            {openTabs.filter((k) => menuMatches(TAB_DEFS.find((t) => t.key === k)!)).length > 0 && (
+              <>
+                <p className="px-1.5 pb-0.5 pt-2 text-[10.5px] font-medium uppercase tracking-[0.08em] text-ink-3">
+                  已打开
+                </p>
+                {openTabs.filter((k) => menuMatches(TAB_DEFS.find((t) => t.key === k)!)).map((key) => {
+                  const def = TAB_DEFS.find((t) => t.key === key)!;
+                  return (
+                    <div className="flex items-center gap-2 rounded-chip px-1.5 py-1.5 hover:bg-hover" key={key}>
+                      <span className="min-w-0 flex-1 truncate text-left text-[12px] text-ink">{def.label}</span>
+                      <span
+                        aria-label={`关闭 ${def.label}`}
+                        className="flex size-4 shrink-0 items-center justify-center rounded-[4px] text-ink-3 hover:bg-line/70 hover:text-ink"
+                        onClick={() => closeTab(key)}
+                        role="button"
+                        tabIndex={-1}
+                      >
+                        <X aria-hidden="true" size={9} strokeWidth={2.6} />
+                      </span>
+                    </div>
+                  );
+                })}
+              </>
+            )}
             {closedTabs.filter((k) => menuMatches(TAB_DEFS.find((t) => t.key === k)!)).length > 0 && (
               <p className="px-1.5 pb-0.5 pt-2 text-[10.5px] font-medium uppercase tracking-[0.08em] text-ink-3">
                 最近关闭的标签页

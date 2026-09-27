@@ -263,15 +263,68 @@ html[data-harness-banner="row"] #root {
   }
 }
 
-/* --- the animation switch (owner 2026-09-26: 动画该装就装，但要有一个
-   关闭/降低动画的设置项，让用户自己在性能开销和轻量之间选) -------------------
-   Two tiers today: full (default) and off. html[data-motion="off"] is the same
-   0.01ms floor as prefers-reduced-motion - one selector, every keyframe in the
-   tree goes still, including the two PLAN-frozen loops (the caret breath and
-   the L2 ball ring): a user preference to stop motion outranks a visual spec
-   the same way prefers-reduced-motion does. The panel is stateless
-   (PLAN.md:1044), so the switch lives in memory only; ticket 145's snapshot
-   field is what makes it survive a WebView restart. */
+/* ============================================================================
+   Motion tiers (owner 2026-09-27: 动画该装就装，但要有档位，不能只有「用不用」)
+   ----------------------------------------------------------------------------
+   The vocabulary lives in src/lib/motion.ts; this is where it bites.
+
+     full  (no attribute, or data-motion="full")  everything runs. The default:
+            a panel that never moves is a screenshot, not a product.
+     lite  (data-motion="lite")  only the CPU hogs stop.
+     off   (data-motion="off")   everything stops.
+
+   WHY LITE IS "JUMP TO THE LAST FRAME" AND NOT "animation: none"
+   ------------------------------------------------------------------
+   The expensive half of this tree's motion is loops (`infinite` never lets the
+   compositor idle) and filter animations (a blur repaints every frame). Those
+   live inside vendored beautiful-ui files as inline `animation:` styles, and
+   vendored files are not hand-edited - the next re-vendor reverts them, and a
+   tier that only works until the next vendor run is not a tier.
+
+   So lite does not reach inside them. It compresses time instead: the
+   animation is 1ms long, undelayed, played once, and holds its last frame.
+   What you see is the FINISHED state of every entrance (fade-up lands fully
+   visible, stream-in lands with no blur, the spin lands a full turn) and a
+   still frame for every loop. That is strictly better than freezing: with
+   `animation: none` a loop stops wherever the clock happened to catch it, and
+   three of ours would stop in a state you cannot read - the L2 ball ring lands
+   at opacity 0.2, the pixel loaders at 0.15, the mic bars squashed to 0.35.
+   Those three are corrected immediately below.
+
+   Cost of the approach: one extra composite frame per animation, once, and
+   then nothing. Hover transitions are untouched - they only cost when they
+   fire.
+   ============================================================================ */
+
+/* tier: lite - compress time; everything lands on its final frame */
+[data-motion="lite"] *,
+[data-motion="lite"] *::before,
+[data-motion="lite"] *::after {
+  animation-duration: 1ms !important;
+  animation-delay: 0s !important;
+  animation-iteration-count: 1 !important;
+  animation-fill-mode: forwards !important;
+}
+
+/* The three whose last frame is unreadable get a readable one instead.
+   The selector is the animation NAME inside the inline style - that is the
+   only handle these vendored elements offer, and it is greppable, so a new
+   vendored loop with the same problem is one grep away from being caught. */
+[data-motion="lite"] .l2-ball-ring {
+  opacity: 1 !important;
+  transform: none !important;
+}
+[data-motion="lite"] [style*="pixel-on"] {
+  opacity: 1 !important;
+}
+[data-motion="lite"] [style*="eq-bounce"] {
+  transform: scaleY(1) !important;
+}
+
+/* tier: off - the floor. One selector, every keyframe in the tree goes still,
+   including the two PLAN-frozen loops (the caret breath and the L2 ball ring):
+   a user preference to stop motion outranks a visual spec the same way
+   prefers-reduced-motion does. */
 [data-motion="off"] *,
 [data-motion="off"] *::before,
 [data-motion="off"] *::after {
@@ -279,13 +332,12 @@ html[data-harness-banner="row"] #root {
   animation-iteration-count: 1 !important;
   transition-duration: 0.01ms !important;
 }
-[data-motion="off"] .nav-glide {
-  transition: none;
+[data-motion="off"] .nav-glide,
+[data-motion="off"] .m-glide {
+  transition: none !important;
 }
 [data-motion="off"] .screen-enter {
   animation: none;
 }
-[data-motion="off"] .l2-ball-ring,
-[data-motion="off"] .stream-caret.is-streaming {
-  animation: none;
-}
+
+
