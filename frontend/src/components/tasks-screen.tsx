@@ -19,6 +19,7 @@
    ============================================================================ */
 
 import { useState } from "react";
+import { GlideMenu } from "@/components/ai-native/glide-menu";
 import { cn } from "@/lib/cn";
 
 export type TaskStatus = "running" | "approval" | "blocked" | "queued" | "failed" | "done";
@@ -142,7 +143,10 @@ export function TasksScreen({ tasks }: { tasks: readonly TaskRow[] }) {
       </div>
 
       {/* the list */}
-      <div className="overflow-hidden rounded-card border border-line bg-surface shadow-card">
+      <GlideMenu
+        className="overflow-hidden rounded-card border border-line bg-surface shadow-card"
+        highlightClassName="inset-x-1.5 rounded-control bg-hover"
+      >
         {shown.length === 0 ? (
           <p className="px-3 py-6 text-center text-[12px] text-ink-3">
             这一档下没有任务。
@@ -150,7 +154,8 @@ export function TasksScreen({ tasks }: { tasks: readonly TaskRow[] }) {
         ) : (
           shown.map((task, i) => (
             <div
-              className="flex h-11 items-center gap-2.5 border-b border-line px-3 transition-colors duration-100 last:border-b-0 hover:bg-hover"
+              className="flex h-11 items-center gap-2.5 border-b border-line px-3 last:border-b-0"
+              data-menu-row
               key={task.id}
               style={{ animation: `fade-up 450ms cubic-bezier(0.23,1,0.32,1) ${i * 80}ms both` }}
             >
@@ -175,7 +180,7 @@ export function TasksScreen({ tasks }: { tasks: readonly TaskRow[] }) {
             </div>
           ))
         )}
-      </div>
+      </GlideMenu>
     </div>
   );
 }

@@ -9,6 +9,7 @@
    ============================================================================ */
 
 import { Pin } from "lucide-react";
+import { GlideMenu } from "@/components/ai-native/glide-menu";
 import { cn } from "@/lib/cn";
 
 export interface MonitorEnvRow {
@@ -64,6 +65,7 @@ export function MonitorPopover({ open, env, agents, onPin }: MonitorPopoverProps
       aria-label="任务监控"
       style={{ animation: "pop-in 180ms var(--ease-out-strong) both" }}
     >
+      <GlideMenu className="flex flex-col" highlightClassName="inset-x-0 rounded-chip bg-hover">
       <div className="flex items-center justify-between gap-2 pb-1">
         <p className="text-[12.5px] font-semibold text-ink">任务监控</p>
         <button
@@ -83,7 +85,7 @@ export function MonitorPopover({ open, env, agents, onPin }: MonitorPopoverProps
       </p>
       <div className="flex flex-col gap-0.5">
         {env.map((row) => (
-          <div className="flex items-center gap-2 rounded-chip px-1.5 py-1.5 text-[12px] hover:bg-hover" key={row.label}>
+          <div className="relative flex items-center gap-2 rounded-chip px-1.5 py-1.5 text-[12px]" data-menu-row key={row.label}>
             <span className="min-w-0 flex-1 truncate text-ink-2">{row.label}</span>
             <span className="shrink-0 font-mono text-[11.5px] tabular-nums text-ink" title={row.value}>
               {row.value}
@@ -98,7 +100,7 @@ export function MonitorPopover({ open, env, agents, onPin }: MonitorPopoverProps
       </p>
       <div className="flex flex-col gap-0.5">
         {agents.map((agent) => (
-          <div className="flex items-center gap-2 rounded-chip px-1.5 py-1.5 text-[12px] hover:bg-hover" key={agent.id}>
+          <div className="relative flex items-center gap-2 rounded-chip px-1.5 py-1.5 text-[12px]" data-menu-row key={agent.id}>
             <AgentAvatar />
             <span className="min-w-0 flex-1 truncate text-ink-2" title={agent.name}>
               {agent.name}
@@ -107,6 +109,7 @@ export function MonitorPopover({ open, env, agents, onPin }: MonitorPopoverProps
           </div>
         ))}
       </div>
+    </GlideMenu>
     </div>
   );
 }

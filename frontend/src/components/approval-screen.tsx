@@ -21,6 +21,7 @@
    ============================================================================ */
 
 import { TriangleAlert } from "lucide-react";
+import { GlideMenu } from "@/components/ai-native/glide-menu";
 import { cn } from "@/lib/cn";
 import type { ApprovalCardView, PanelSnapshot } from "@/lib/panel";
 
@@ -45,7 +46,10 @@ function RowLevelBadge({ level }: { level: string }) {
 
 function QueueRow({ view }: { view: ApprovalCardView }) {
   return (
-    <li className="flex items-center gap-2 rounded-control px-2.5 py-2 transition-colors duration-100 hover:bg-hover">
+    <li
+      className="flex items-center gap-2 rounded-control px-2.5 py-2"
+      data-menu-row
+    >
       <RowLevelBadge level={view.level} />
       <span className="min-w-0 flex-1 truncate font-mono text-[13px] font-medium text-ink">
         {view.tool}
@@ -92,11 +96,14 @@ export function ApprovalScreen({ snapshot }: { snapshot: PanelSnapshot }) {
           队列当前为空。待确认请求由原生侧 Go 推送：出现需要人工确认的调用时，会在这里排队并在面板顶部出卡。
         </p>
       ) : (
-        <ul className="m-0 flex list-none flex-col gap-1 p-0">
+        <GlideMenu
+          className="flex list-none flex-col gap-1 p-0"
+          highlightClassName="inset-x-0 rounded-control bg-hover"
+        >
           {pending.map((view) => (
             <QueueRow key={view.correlationId} view={view} />
           ))}
-        </ul>
+        </GlideMenu>
       )}
     </section>
   );

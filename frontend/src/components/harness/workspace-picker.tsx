@@ -35,6 +35,7 @@
    ============================================================================ */
 
 import { Check, FolderOpen, History, Search } from "lucide-react";
+import { GlideMenu } from "@/components/ai-native/glide-menu";
 import { EntityChip } from "@/components/ai-native/entity-chip";
 
 /** The workspace the decision chain is currently scoped to. */
@@ -115,56 +116,66 @@ export function WorkspacePicker({
           />
         </div>
 
-        {/* 当前工作区行：EntityChip + mono 路径 + Check。 */}
-        <div className="mt-3 flex items-center gap-2 rounded-control border border-line bg-inset px-2.5 py-2">
-          <EntityChip color="var(--accent)" name={current.name} />
-          <span
-            className="min-w-0 flex-1 truncate font-mono text-[11.5px] text-ink-2"
-            title={current.path}
-          >
-            {current.path}
-          </span>
-          <Check aria-hidden="true" className="size-3.5 shrink-0 text-green" />
-        </div>
-
-        {/* 最近工作区：hover:bg-hover，点击即 onPick 意图。 */}
-        <p className="mt-3 text-[11px] font-medium uppercase tracking-[0.06em] text-ink-3">
-          最近
-        </p>
-        <ul className="m-0 mt-1 flex max-h-[240px] list-none flex-col overflow-y-auto p-0">
-          {shown.map((row) => (
-            <li key={row.path}>
-              <button
-                className="flex w-full items-center gap-2 rounded-control px-2.5 py-2 text-left transition-colors duration-100 hover:bg-hover"
-                onClick={() => onPick?.(row.path)}
-                type="button"
-              >
-                <History aria-hidden="true" className="size-3.5 shrink-0 text-ink-3" />
-                <span
-                  className="min-w-0 flex-1 truncate font-mono text-[11.5px] text-ink"
-                  title={row.path}
-                >
-                  {row.path}
-                </span>
-                <span className="shrink-0 text-[11px] text-ink-3">{row.lastUsed}</span>
-              </button>
-            </li>
-          ))}
-          {shown.length === 0 && (
-            <li className="px-2.5 py-3 text-[11.5px] text-ink-3">没有匹配的工作区</li>
-          )}
-        </ul>
-
-        {/* 底部浏览行：回调位，不接行为。 */}
-        <button
-          className="mt-2 flex w-full items-center gap-2 rounded-control border border-line px-2.5 py-2 text-left transition-colors duration-100 hover:bg-hover"
-          onClick={() => onBrowse?.()}
-          type="button"
+        <GlideMenu
+          className="flex w-full flex-col"
+          highlightClassName="inset-x-0 rounded-control bg-hover"
         >
-          <FolderOpen aria-hidden="true" className="size-3.5 shrink-0 text-ink-3" />
-          <span className="flex-1 text-[12px] text-ink">浏览…</span>
-          <span className="text-[11px] text-ink-3">打开目录选择器</span>
-        </button>
+          {/* 当前工作区行：EntityChip + mono 路径 + Check。 */}
+          <div
+            className="relative mt-3 flex items-center gap-2 rounded-control border border-line bg-inset px-2.5 py-2"
+            data-menu-row
+          >
+            <EntityChip color="var(--accent)" name={current.name} />
+            <span
+              className="min-w-0 flex-1 truncate font-mono text-[11.5px] text-ink-2"
+              title={current.path}
+            >
+              {current.path}
+            </span>
+            <Check aria-hidden="true" className="size-3.5 shrink-0 text-green" />
+          </div>
+
+          {/* 最近工作区：hover 由 GlideMenu 统一，点击即 onPick 意图。 */}
+          <p className="mt-3 text-[11px] font-medium uppercase tracking-[0.06em] text-ink-3">
+            最近
+          </p>
+          <ul className="m-0 mt-1 flex max-h-[240px] list-none flex-col overflow-y-auto p-0">
+            {shown.map((row) => (
+              <li key={row.path}>
+                <button
+                  className="flex w-full items-center gap-2 rounded-control px-2.5 py-2 text-left"
+                  data-menu-row
+                  onClick={() => onPick?.(row.path)}
+                  type="button"
+                >
+                  <History aria-hidden="true" className="size-3.5 shrink-0 text-ink-3" />
+                  <span
+                    className="min-w-0 flex-1 truncate font-mono text-[11.5px] text-ink"
+                    title={row.path}
+                  >
+                    {row.path}
+                  </span>
+                  <span className="shrink-0 text-[11px] text-ink-3">{row.lastUsed}</span>
+                </button>
+              </li>
+            ))}
+            {shown.length === 0 && (
+              <li className="px-2.5 py-3 text-[11.5px] text-ink-3">没有匹配的工作区</li>
+            )}
+          </ul>
+
+          {/* 底部浏览行：回调位，不接行为。 */}
+          <button
+            className="mt-2 flex w-full items-center gap-2 rounded-control border border-line px-2.5 py-2 text-left"
+            data-menu-row
+            onClick={() => onBrowse?.()}
+            type="button"
+          >
+            <FolderOpen aria-hidden="true" className="size-3.5 shrink-0 text-ink-3" />
+            <span className="flex-1 text-[12px] text-ink">浏览…</span>
+            <span className="text-[11px] text-ink-3">打开目录选择器</span>
+          </button>
+        </GlideMenu>
       </div>
     </div>
   );

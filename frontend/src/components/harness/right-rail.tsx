@@ -36,7 +36,7 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
-import { GlideHighlight } from "@/components/glide-highlight";
+import { GlideHighlight, RowMark } from "@/components/glide-highlight";
 import { GlideMenu } from "@/components/ai-native/glide-menu";
 import { cn } from "@/lib/cn";
 
@@ -398,10 +398,14 @@ export function RightRail({ openRequest }: { openRequest?: RailOpenRequest }) {
         >
           <p className="text-[13px] font-semibold text-ink">打开面板</p>
           <p className="mb-1 text-[11.5px] text-ink-3">选择要在侧边面板中查看的内容。</p>
-          <div className="flex w-full flex-col gap-2.5">
+          <GlideMenu
+            className="flex w-full flex-col gap-2.5"
+            highlightClassName="inset-x-0 rounded-card bg-hover"
+          >
             {TAB_DEFS.map((def) => (
               <button
-                className="group flex w-full items-center gap-3 rounded-card border border-line bg-surface p-4 text-left shadow-card transition-colors duration-150 hover:border-accent/40"
+                className="group relative flex w-full items-center gap-3 rounded-card border border-line bg-surface p-4 text-left shadow-card transition-colors duration-150 hover:border-accent/40"
+                data-menu-row
                 key={def.key}
                 onClick={() => reopenTab(def.key)}
                 type="button"
@@ -420,7 +424,7 @@ export function RightRail({ openRequest }: { openRequest?: RailOpenRequest }) {
                 ) : null}
               </button>
             ))}
-          </div>
+          </GlideMenu>
         </div>
       ) : (
         <>
@@ -488,7 +492,10 @@ function FilesPane() {
         </button>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto py-1">
+      <GlideMenu
+        className="min-h-0 flex-1 overflow-y-auto py-1"
+        highlightClassName="inset-x-1.5 rounded-chip bg-hover"
+      >
         {visible.map((row) => {
           const isDir = row.kind === "dir";
           const shut = isDir && collapsed.has(row.name);
@@ -496,9 +503,10 @@ function FilesPane() {
             <button
               aria-expanded={isDir ? !shut : undefined}
               className={cn(
-                "flex w-full items-center gap-1.5 rounded-chip py-1 pr-2 text-left transition-colors duration-100 hover:bg-hover",
-                open === row.name ? "bg-hover" : "",
+                "relative flex w-full items-center gap-1.5 rounded-chip py-1 pr-2 text-left transition-colors duration-100",
+                open === row.name ? "text-ink" : "text-ink-2",
               )}
+              data-menu-row
               key={`${row.depth}:${row.name}`}
               onClick={() => {
                 setOpen(row.name);
@@ -514,6 +522,7 @@ function FilesPane() {
               style={{ paddingLeft: 8 + row.depth * 12 }}
               type="button"
             >
+              {open === row.name ? <RowMark /> : null}
               {isDir ? (
                 <ChevronRight
                   aria-hidden="true"
@@ -545,7 +554,7 @@ function FilesPane() {
             </button>
           );
         })}
-      </div>
+      </GlideMenu>
 
       <p className="shrink-0 border-t border-line px-3 py-2 text-[10.5px] leading-[1.6] text-ink-3">
         一缕只能读写你授权的目录；工作区必须落在其中（C26 拒绝符号链接外指）。
@@ -588,37 +597,45 @@ function ReviewPane() {
             className="absolute left-3 top-full z-30 mt-1 w-44 rounded-card border border-line bg-surface p-1 shadow-overlay"
             style={{ animation: "pop-in 160ms var(--ease-out-strong) both" }}
           >
-            {REVIEW_SCOPES.map((s) => (
-              <button
-                className="flex w-full items-center gap-2 rounded-chip px-2 py-1.5 text-left text-[12px] text-ink hover:bg-hover"
-                key={s}
-                onClick={() => {
-                  setScope(s);
-                  setScopeOpen(false);
-                }}
-                type="button"
-              >
-                <span className={cn("w-3.5 shrink-0", s === scope ? "text-accent-ink" : "invisible")}>
-                  <svg fill="none" height="11" stroke="currentColor" strokeLinecap="round" strokeWidth="2.4" viewBox="0 0 24 24" width="11">
-                    <path d="M20 6L9 17l-5-5" />
-                  </svg>
-                </span>
-                {s}
-              </button>
-            ))}
+            <GlideMenu
+              className="flex flex-col"
+              highlightClassName="inset-x-0 rounded-chip bg-hover"
+            >
+              {REVIEW_SCOPES.map((s) => (
+                <button
+                  className="relative flex w-full items-center gap-2 rounded-chip px-2 py-1.5 text-left text-[12px] text-ink"
+                  data-menu-row
+                  key={s}
+                  onClick={() => {
+                    setScope(s);
+                    setScopeOpen(false);
+                  }}
+                  type="button"
+                >
+                  {s === scope ? <RowMark /> : null}
+                  <span className={cn("w-3.5 shrink-0", s === scope ? "text-accent-ink" : "invisible")}>
+                    <svg fill="none" height="11" stroke="currentColor" strokeLinecap="round" strokeWidth="2.4" viewBox="0 0 24 24" width="11">
+                      <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                  </span>
+                  {s}
+                </button>
+              ))}
+            </GlideMenu>
           </div>
         )}
       </div>
 
       {/* 文件列表：类型 tile + 名 + 目录 + diff 统计 + chevron 展开 diff */}
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <GlideMenu className="min-h-0 flex-1 overflow-y-auto" highlightClassName="inset-x-1.5 rounded-chip bg-hover">
         {REVIEW_FILES.map((file) => {
           const expanded = openFile === file.name;
           return (
             <div className="border-b border-line last:border-b-0" key={file.name}>
               <button
                 aria-expanded={expanded}
-                className="flex w-full items-center gap-2 px-3 py-2 text-left transition-colors duration-100 hover:bg-hover"
+                className="relative flex w-full items-center gap-2 px-3 py-2 pl-3.5 text-left transition-colors duration-100"
+                data-menu-row
                 onClick={() => setOpenFile(expanded ? null : file.name)}
                 type="button"
               >
@@ -649,7 +666,7 @@ function ReviewPane() {
             </div>
           );
         })}
-      </div>
+      </GlideMenu>
     </section>
   );
 }

@@ -55,6 +55,32 @@ interface Rect {
     would re-render on every frame of a scroll for no visible change. */
 const EPS = 0.5;
 
+/**
+ * The one way this tree says "you are here".
+ *
+ * Every list in the panel marks its selected row with THIS and nothing else:
+ * sidebar sessions, command palette rows, the review file list, the file tree,
+ * the task monitor's agent rows, the workspace picker, the launcher cards. One
+ * component rather than a className copied into nine files, because the first
+ * time it was copied into two they drifted and the panel stopped reading as one
+ * surface.
+ *
+ * It is a fixed accent bar on the left edge, deliberately NOT a background
+ * wash: the background is the hover channel (GlideMenu), and two things in one
+ * slot means moving the pointer erases where you are.
+ */
+export function RowMark({ className }: { className?: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={cn(
+        "pointer-events-none absolute bottom-1.5 left-0.5 top-1.5 w-[2px] rounded-full bg-accent",
+        className,
+      )}
+    />
+  );
+}
+
 function sameRect(a: Rect, b: Rect): boolean {
   return (
     Math.abs(a.top - b.top) < EPS &&

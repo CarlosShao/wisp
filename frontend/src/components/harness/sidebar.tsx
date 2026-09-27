@@ -367,8 +367,13 @@ export function HarnessSidebar({
         </GlideMenu>
       </div>
 
-      {/* 底部：用量 + 设置 + 主题（此块不进滑翔区，发丝线分隔） */}
-      <div className="flex flex-col gap-1 border-t border-line p-2">
+      {/* 底部：用量 + 设置 + 主题。这块之前自己带 hover:bg-hover，现在是第二个
+          GlideMenu —— 和上面那段三段主体用同一套库件，免得同一条侧栏里两种
+          悬停手感。 */}
+      <GlideMenu
+        className="flex flex-col gap-1 border-t border-line p-2"
+        highlightClassName="inset-x-2 rounded-[7px] bg-hover"
+      >
         <div className="flex items-center gap-1.5 px-2 py-1">
           {usage.map((u) => (
             <span className="flex min-w-0 items-center gap-1" key={u.label}>
@@ -379,16 +384,18 @@ export function HarnessSidebar({
         </div>
         <button
           type="button"
+          data-menu-row
           onClick={onOpenSettings}
-          className="flex w-full items-center gap-2 rounded-[7px] px-2 py-1.5 text-left text-[12.5px] text-ink-2 transition-colors duration-150 hover:bg-hover hover:text-ink"
+          className="flex w-full items-center gap-2 rounded-[7px] px-2 py-1.5 text-left text-[12.5px] text-ink-2 transition-colors duration-150 hover:text-ink"
         >
           <Settings aria-hidden="true" size={13} strokeWidth={1.8} />
           设置
         </button>
         <button
           type="button"
+          data-menu-row
           onClick={onToggleTheme}
-          className="flex w-full items-center gap-2 rounded-[7px] px-2 py-1.5 text-left text-[12.5px] text-ink-2 transition-colors duration-150 hover:bg-hover hover:text-ink"
+          className="flex w-full items-center gap-2 rounded-[7px] px-2 py-1.5 text-left text-[12.5px] text-ink-2 transition-colors duration-150 hover:text-ink"
         >
           {theme === "dark" ? (
             <Sun aria-hidden="true" size={13} strokeWidth={1.8} />
@@ -397,7 +404,7 @@ export function HarnessSidebar({
           )}
           {theme === "dark" ? "浅色" : "暗色"}
         </button>
-      </div>
+      </GlideMenu>
     </aside>
   );
 }
