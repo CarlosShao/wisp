@@ -171,6 +171,21 @@ Pi 在精确匹配失败后再走一层 NFKC／逐行去尾空白／弯引号→
 d22scan 自测 PASS=34 FAIL=0 SKIP=0 RUN=76。四把尺两次同向。
 
 
+## 5b. 两格之间的交叉核对（〔本轮现跑〕）
+
+- **AC#1 的读数在 AC#2 落码之后复跑一遍**：`probes/162/ac1-reading-after-ac2.txt` 与
+  `probes/162/ac1-reading.txt` 逐行 `diff` 只差两处临时目录名与暂存文件名
+  （`TestFSWriteSilentLossIsNotReported<随机>`／`.wisp-tmp-<owner>-<pid>-<随机>`），
+  **实质读数一字未变**（672/24 → 450/18、少 6 行 222 字节、L2/allow/success、
+  五处信号仍为 0）⇒ 第②格没有污染第①格的读数，也不需要重跑第①格。
+- **别的包有没有被这枚新工具碰红**：`go test -count=1 ./internal/agent/... ./internal/risk/ ./cmd/wisp/`
+  ⇒ `internal/agent` ok／`internal/agent/approval` ok／`internal/risk` ok／
+  **`cmd/wisp` 首跑 `exit status 0xc0000135`（0.046s，零枚用例执行）**＝本仓记忆里那条既有账
+  （`docs/reports/HANDOVER.md:567`：源码构建的 wisp.exe 加载期就要 sherpa DLL，缺 DLL 时零输出红，
+  "会被误读成这条路径没走"）。把 `third_party\sherpa-onnx` 放进 PATH 后复跑 ⇒
+  **`ok github.com/CarlosShao/wisp/cmd/wisp 91.668s`**。
+  ⇒ 那枚红与本程改动**无因果**（连进程起步都没过），且本程改动在全仓范围内不红任何一处。
+
 ## 6. 有没有动过禁改名单里的文件
 
 **无。** 派单 §4 禁改名单逐项自证：`docs/PLAN.md`／`docs/specs/**`／`internal/risk/**`／

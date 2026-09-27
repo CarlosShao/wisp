@@ -1,0 +1,17 @@
+=== RUN   TestFSWriteSilentLossIsNotReported
+    fswrite_silentloss_ac1_test.go:124: AC#1(a) 落盘前 672 字节 / 24 行；落盘后 450 字节 / 18 行；少了 6 行 222 字节
+    fswrite_silentloss_ac1_test.go:142: AC#1(b) IsError=false Truncated=false RiskLevel=L2 ErrorClass=""
+    fswrite_silentloss_ac1_test.go:144: AC#1(b) Result.Text="已写入 C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSWriteSilentLossIsNotReported541307203\\001\\notes.txt（450 字节，临时文件+原子重命名）"
+    fswrite_silentloss_ac1_test.go:146: AC#1(b) AppliedSteps[0]="在 C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSWriteSilentLossIsNotReported541307203\\001 创建临时文件 .wisp-tmp-f45f7e53-64524-35653282"
+    fswrite_silentloss_ac1_test.go:146: AC#1(b) AppliedSteps[1]="向临时文件写入 450 字节"
+    fswrite_silentloss_ac1_test.go:146: AC#1(b) AppliedSteps[2]="临时文件已落盘并关闭"
+    fswrite_silentloss_ac1_test.go:146: AC#1(b) AppliedSteps[3]="原子重命名 .wisp-tmp-f45f7e53-64524-35653282 → C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSWriteSilentLossIsNotReported541307203\\001\\notes.txt（目标此刻起为新内容）"
+    fswrite_silentloss_ac1_test.go:174: AC#1(c) tool_call 行：tool=fs.write risk=L2 decision=allow outcome=success error_class=""
+    fswrite_silentloss_ac1_test.go:176: AC#1(c) tool_call 行的全部列名：[ID TaskID Seq Tool ArgsJSON RiskLevel Decision DecidedAt StartedAt EndedAt Outcome ErrorClass CorrelationID GrantID]
+    fswrite_silentloss_ac1_test.go:193: AC#1(c) audit: "tools: call kind=success task=task-1 corr=corr-1 tool=fs.write risk=L2 decision=allow outcome=success rules_hit=[R1 R8] in_allowlist_scope=true reason=\"R1: 工具声明为下界（L1）; R8: 不可逆操作（覆盖已有内容）\""
+    fswrite_silentloss_ac1_test.go:193: AC#1(c) audit: "tools: PATH-ACCOUNT task=task-1 tool=fs.write roots=1 rewritten=[] unusable=[]"
+    fswrite_silentloss_ac1_test.go:205: AC#1(c) fs.read 事后复读：450 字节，Truncated=false，文本里没有任何行数/大小字段（Text 就是文件内容本身）
+    fswrite_silentloss_ac1_test.go:211: AC#1 读数结论：丢了 6 行 222 字节；Result.Text / AppliedSteps / tool_call 行 / audit 行 / fs.read 事后复读 五处信号全部为零 ⇒ 今天的 fs.write 对"整文件写回时漏抄"没有任何检测
+--- PASS: TestFSWriteSilentLossIsNotReported (0.10s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.146s
