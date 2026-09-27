@@ -141,3 +141,58 @@
 - **AC#7：〔成立〕**。判据（run 腿带枚数、2→3 未修码不响/修完响）本程独立复算两向为真（6→6 vs 6→7）。**附带登记一条**：④ run 腿分子＝命中行数含注释（真树 G2 两枚里 `run.go:546` 是注释）⇒ **AC#1 那枚洞今天开在 AC#7 这扇门上**；实现程**未偷修**（改口径＝收窄射程，归 AC#1）、也未拿它冒充已完成。**不据此退回 AC#7**（洞是 AC#1 的，AC#1 未勾是另一回事）。
 - **AC#8：〔成立〕**。①腿数断言真承重（摘腿 rc 0→1；牙在循环、不在那句 echo）；②SHR 单列表 + flip 新格**核的是表内容（腿身份＋枚数）非只核打印**（③-teeth/③-count0 双红），SHR 未混进退码（两版 rc 都 0，A320/A321 那扇门没开）；③与 AC#7 同程、十四腿基线全复算（§4 名册=14/声明=14/记账=14）。**附带登记一条低危**：③-limit＝新格不核行内差值算术（篡成 `差=0枚` 仍绿）；**不构成退回**（该数字与门控 SHR 分支的是同一批变量，正常不可矛盾）。
 - **无需最小闭合集合**（两格均〔成立〕）。若要顺手收的**非阻塞**小项：(A) 让 flip 新格连 `实测=${n}枚 差=$((COUNT-n))枚` 一起 grep 死（补 ③-limit）；(B) 票面 AC#8 症状里"删样本不删腿"那发正面台件仍缺（实现程 `next=#2` 自认）。二者都**不影响本轮裁决**，留编排者定档。
+
+## 15. 提交记录（原样贴，非引用）
+
+第一枚（表本体＋`probes/171/v2/**` 全部复算台件与变异，38 枚文件）：
+
+```
+$ git log --oneline -1
+12a8a967 验收 171-v2（非实现者）：AC#7＋AC#8 两格判〔成立〕，登记④/③两枚非退回发现
+```
+
+```
+$ git -c core.quotePath=false show --name-only --format='%H %ci %s' HEAD
+12a8a967d6633d36c61bfba36b2ebecdd3c9281d 2026-09-27 19:08:24 +0800 验收 171-v2（非实现者）：AC#7＋AC#8 两格判〔成立〕，登记④/③两枚非退回发现
+
+.scratch/wisp/probes/171/v2/gate-290aa63e.sh
+.scratch/wisp/probes/171/v2/gate-f1b99a70.sh
+.scratch/wisp/probes/171/v2/logs/contract-commits.txt
+.scratch/wisp/probes/171/v2/logs/d22scan.txt
+.scratch/wisp/probes/171/v2/logs/flip-real.txt
+.scratch/wisp/probes/171/v2/logs/gate-post-at-anchor.txt
+.scratch/wisp/probes/171/v2/logs/gate-pre-at-anchor.txt
+.scratch/wisp/probes/171/v2/logs/gate-real.txt
+.scratch/wisp/probes/171/v2/logs/gate-ruler.diff
+.scratch/wisp/probes/171/v2/logs/post-at-f1b99a70.txt
+.scratch/wisp/probes/171/v2/logs/post-hits.txt
+.scratch/wisp/probes/171/v2/logs/pre-at-f1b99a70.txt
+.scratch/wisp/probes/171/v2/logs/pre-hits.txt
+.scratch/wisp/probes/171/v2/logs/roster-pos.txt
+.scratch/wisp/probes/171/v2/logs/runtests.txt
+.scratch/wisp/probes/171/v2/mutations/post-noG1-loopsdead.sh
+.scratch/wisp/probes/171/v2/mutations/post-noG1.sh
+.scratch/wisp/probes/171/v2/mutations/post-stale-count0.sh
+.scratch/wisp/probes/171/v2/mutations/post-stale-lie.sh
+.scratch/wisp/probes/171/v2/mutations/post-stale-wrongleg.sh
+.scratch/wisp/probes/171/v2/mutations/post-stale.sh
+.scratch/wisp/probes/171/v2/mutations/pre-noG1.sh
+.scratch/wisp/probes/171/v2/mutations/pre-stale.sh
+.scratch/wisp/probes/171/v2/mutations/res-3-count0.txt
+.scratch/wisp/probes/171/v2/mutations/res-3-limit.txt
+.scratch/wisp/probes/171/v2/mutations/res-3-teeth3.txt
+.scratch/wisp/probes/171/v2/mutations/res-5-1b.txt
+.scratch/wisp/probes/171/v2/mutations/res-post-noG1.txt
+.scratch/wisp/probes/171/v2/mutations/res-post-stale.txt
+.scratch/wisp/probes/171/v2/mutations/res-pre-noG1.txt
+.scratch/wisp/probes/171/v2/mutations/res-pre-stale.txt
+.scratch/wisp/probes/171/v2/r2-roster-diff-copy.sh
+.scratch/wisp/probes/171/v2/synth/cl-290aa63e-state_2calls.txt
+.scratch/wisp/probes/171/v2/synth/cl-290aa63e-state_3calls.txt
+.scratch/wisp/probes/171/v2/synth/cl-f1b99a70-state_2calls.txt
+.scratch/wisp/probes/171/v2/synth/cl-f1b99a70-state_3calls.txt
+.scratch/wisp/probes/171/v2/synth/commits.txt
+docs/evidence/s1/171-run-legs-accept-v2.md
+```
+
+（写面核过＝38 枚路径全在 `docs/evidence/s1/171-run-legs-accept-v2.md` ＋ `.scratch/wisp/probes/171/v2/` 两枚新建之内，越界 0 枚。工作树里 `.gitignore`／`probes/152/my152.py`／`152-…-accept-r1.md`／`design/**` 16 枚删除／`probes/161/r6/logs/flip-*.txt` 都**不是本程的**：未提交、未还原、未评论。）
