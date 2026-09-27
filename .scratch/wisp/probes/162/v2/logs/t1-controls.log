@@ -1,0 +1,21 @@
+time=2026-09-27T17:06:45.077+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestFSEditRefusesAnOldThatSwallowsTheFileBOM
+    fs_edit_ac3b_test.go:134: AC#3b① 改后读数（回执）：IsError=true ErrorClass="tool" AppliedSteps=0
+    fs_edit_ac3b_test.go:136: AC#3b① 改后读数（回执文案）："fs.edit 拒绝执行：第 1 枚编辑的 old 从文件第 0 字节起，圈住了文件头那 3 字节 EF BB BF（UTF-8 BOM，文件 14 字节）。BOM 是文件自己的编码标记，不是内容：请把 old 和 new 都从 BOM 之后的第一个字节开始抄；old 必须与文件内容逐字一致，包含全部空白与换行（the old string must match exactly including all whitespace and newlines）。本次调用一个字也没有写，目标文件保持原状。"
+    fs_edit_ac3b_test.go:137: AC#3b① 改后读数（审计行，外部可见）：tools: call kind=error task=task-1 corr=corr-1 tool=fs.edit risk=L2 decision=allow outcome=error rules_hit=[R1] in_allowlist_scope=true reason="R1: 工具声明为下界（L2）"
+    fs_edit_ac3b_test.go:154: AC#3b① 合法对照：14 字节 → 14 字节，前三字节仍是 EF BB BF，文案="fs.edit 已改写 C:\\Users\\swq\\AppData\\Local\\Temp\\TestFSEditRefusesAnOldThatSwallowsTheFileBOM4049291175\\001\\bom-zero.txt：1 枚编辑全部生效，14 字节 / 2 行 → 14 字节 / 2 行（临时文件+原子重命名）"
+--- PASS: TestFSEditRefusesAnOldThatSwallowsTheFileBOM (0.03s)
+=== RUN   TestFSEditStillLandsAnOldStartingAtByteZeroWithoutABOM
+    fs_edit_ac3b_test.go:177: an offset-0 old in a BOM-less file must land: out={Text:fs.edit 拒绝执行：第 1 枚编辑的 old 从文件第 0 字节起，圈住了文件头那 0 字节 EF BB BF（UTF-8 BOM，文件 11 字节）。BOM 是文件自己的编码标记，不是内容：请把 old 和 new 都从 BOM 之后的第一个字节开始抄；old 必须与文件内容逐字一致，包含全部空白与换行（the old string must match exactly including all whitespace and newlines）。本次调用一个字也没有写，目标文件保持原状。 IsError:true RiskLevel:L2 ErrorClass:tool Truncated:false AppliedSteps:[]} err=<nil>
+--- FAIL: TestFSEditStillLandsAnOldStartingAtByteZeroWithoutABOM (0.01s)
+=== RUN   TestFSEditStillLandsNewEndingsWhereThereIsNoConventionToBreak
+=== RUN   TestFSEditStillLandsNewEndingsWhereThereIsNoConventionToBreak/lf_file_lands_an_lf_spelled_new
+    fs_edit_ac3b_test.go:300: AC#3b② 合法对照二（LF 文件 + LF 写法 new）：20 字节 → 27 字节，未被拒绝
+=== RUN   TestFSEditStillLandsNewEndingsWhereThereIsNoConventionToBreak/mixed_file_is_not_refused
+    fs_edit_ac3b_test.go:321: AC#3b② 合法对照三（已混合的文件不被告知该长成什么样）：22 字节 → 29 字节，行尾形 混合(CRLF=2 CR=0 LF=2)
+--- PASS: TestFSEditStillLandsNewEndingsWhereThereIsNoConventionToBreak (0.03s)
+    --- PASS: TestFSEditStillLandsNewEndingsWhereThereIsNoConventionToBreak/lf_file_lands_an_lf_spelled_new (0.02s)
+    --- PASS: TestFSEditStillLandsNewEndingsWhereThereIsNoConventionToBreak/mixed_file_is_not_refused (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.123s
+FAIL
