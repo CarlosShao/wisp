@@ -68,6 +68,7 @@ RiskLevel 列是 C19 融合后的**默认结论**；实际判定在调用时算�
 | `reminder.set/list/cancel` | 一次性提醒（只发通知） | L1 / L0 / L1 | notify | **S4** | D12 窄例外：不做周期性/触发执行/跨重启补发/OS 级调度 |
 | `memory.save` / `memory.recall` | 显式记忆 | L1 / L0 | memory | S4 | D20 |
 | `task.list` / `task.cancel` | 查看/取消任务 | L0 / L1 | — | **S7** | 「被阻塞的东西必须可见」的 Agent 侧手段 |
+| **`task.output`** | 读一个后台任务吐了什么（含续读） | **L0** | — | **S7** | 票 164 新增，镜像 `PLAN.md` D34；截断按 D15 规矩（头 500＋尾 200＋总长＋路径），**只截不指＝不合格** |
 | `list_tools` | 元工具 | L0 | — | **S1** | D15②兜底 |
 | `shell.exec` | 任意命令 | L2（白名单命中 → L1） | shell | S3 | **默认禁用**；argv 向量强制 |
 | **`shell.session`** | 在一条活着的会话里跑下一条命令 | **L2** | shell | S3 | 票 163 新增，镜像 `PLAN.md` D34；一次性外观、常驻内核；会话绑任务作用域；每发命令仍按 R6 判；**不引 PTY** |
