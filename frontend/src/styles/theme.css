@@ -100,6 +100,26 @@
   --stop: var(--danger);
 }
 
+/* ---------- the host document ----------------------------------------------
+   Normally <body> is a plain block and every app root carries h-screen, so the
+   product path is exactly as it was. The attribute is set by main.tsx for the
+   app-shaped harness ONLY (?harness=1), and it turns the document into a flex
+   column so the demo banner can be a real row instead of a position:fixed lid
+   over the top bar. Nothing here runs on the product path. */
+html[data-harness-banner="row"],
+html[data-harness-banner="row"] body {
+  height: 100%;
+}
+html[data-harness-banner="row"] body {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+html[data-harness-banner="row"] #root {
+  flex: 1;
+  min-height: 0;
+}
+
 /* ---------- the panel shell ------------------------------------------------
    RETIRED 2026-09-27: `.wisp-shell` / `.wisp-window` are gone, and that is the
    fix, not a cleanup. Both were dead - no component ever put either class on

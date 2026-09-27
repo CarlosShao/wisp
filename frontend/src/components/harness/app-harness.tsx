@@ -96,7 +96,11 @@ export function AppHarness() {
   }
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-page text-ink">
+    // h-full, not h-screen: main.tsx makes the document a flex column for this
+    // page (?harness=1) so the demo banner can be a real row, and #root has
+    // already been given the height left over by that row. h-screen here would
+    // ask for a second full viewport and push the composer out of the window.
+    <div className="flex h-full w-full overflow-hidden bg-page text-ink">
       <HarnessSidebar
         activeSessionId={sessionId}
         automations={AUTOMATIONS}

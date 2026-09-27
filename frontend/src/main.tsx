@@ -21,11 +21,31 @@ import "./styles/theme.css";
  */
 const harness = new URLSearchParams(location.search).get("harness");
 
+/**
+ * The demo banner is a LAYOUT ROW, not an overlay.
+ *
+ * It used to be position:fixed on a 100vh app, so it sat on top of the first
+ * ~26px of the tree: the harness top bar vanished under it and the sidebar's
+ * workspace row was sliced in half. The owner asked for the banner to be
+ * always there and closable (2026-09-26) - "always there" is not "covering the
+ * header" - so for the app-shaped harness it now takes its own row: the
+ * attribute below makes <body> a flex column and lets #root take the rest,
+ * which is what lets the app root be h-full instead of h-screen.
+ *
+ * harness=2 (the component showcase) is a long scrolling page, so its banner
+ * keeps the overlay form - there is no top bar down there to hide.
+ *
+ * The product path never sets the attribute, so none of this applies to it.
+ */
 if (harness === "1" || harness === "2") {
+  const isApp = harness === "1";
+  if (isApp) {
+    document.documentElement.dataset.harnessBanner = "row";
+  }
   const note = document.createElement("div");
   note.setAttribute("role", "note");
   note.style.cssText = [
-    "position:fixed", "left:0", "right:0", "top:0", "z-index:9999",
+    isApp ? "flex:0 0 auto" : "position:fixed;left:0;right:0;top:0;z-index:9999",
     "display:flex", "align-items:center", "gap:8px",
     "padding:4px 10px", "font:500 11px/1.4 ui-monospace,monospace",
     "background:var(--warn-soft)", "color:var(--warn)", "border-bottom:1px solid var(--warn-line)",
@@ -47,10 +67,15 @@ if (harness === "1" || harness === "2") {
     "font:inherit", "border-radius:999px",
     "background:transparent", "color:inherit",
   ].join(";");
+  // Closing is a pure DOM removal (out of the React tree, never persisted) and
+  // the row it leaves behind closes with it, because #root is the flex sibling.
   close.addEventListener("click", () => note.remove());
   note.append(close);
 
-  document.body.append(note);
+  // prepend, not append: once <body> is a flex column the banner has to be the
+  // FIRST child, or it lands after #root and pins itself to the bottom edge -
+  // which hid the top bar and covered the sidebar's bottom block instead.
+  document.body.prepend(note);
 }
 
 createRoot(document.getElementById("root")!).render(
