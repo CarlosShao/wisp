@@ -37,7 +37,10 @@
 - [ ] **AC#1 实体层有生产调用者**：派生入口在非测试码里有真听众（⚠ 今天"零调用方有两种成因：差一根线／差一整层"＝`A382`/`A391`，本票起手就要分清是哪一种）。
 - [ ] **AC#2 名册与状态同源**：子代理状态**只能**是 D43 那一集；判据要能区分"填了真状态"与"字段恒空"（票 181 `AC#7` 那枚空转教训）。
 - [ ] **AC#3 每子代理一条流、不许合并**：上面第 2 层那发结构判据。
-- [ ] **AC#4 阻塞态可见**：`blocked`／`waiting-approval` 在载体里有一格，且界面拿得到（`PLAN.md:1127` 那起事故的对应物）。
+- [x] **AC#4 阻塞态可见**：`blocked`／`waiting-approval` 在载体里有一格，且界面拿得到（`PLAN.md:1127` 那起事故的对应物）。
+  **09-28 22:4x 翻勾（账 `A416`）**：生产路径判据 `TestRunPacketMarksTheRosterRowACardIsHolding`（`cmd/wisp/subagent_blocked_197_test.go`，commit `237e64f4`，**产码零改动**），
+  我整包复跑到终态 `ok 109.672s`、零 FAIL；五发单点变异逐字在 `docs/evidence/s1/197-blocked-carrier-r4.md`。
+  ⚠ **只勾"有一格且拿得到"这一半**：今天这枚旗**只报 L2**（L1 短窗口里等的孩子在名册上恒读 `false`，因为 `LiveApprovals` 只遍历 `q.pending`）——**那一半留在 `A416` 待裁，不算本格**。
 - [ ] **AC#5 子代理不自带"允许"出口**：与 `Q-49` 丙那批判据同族；正控＝造一枚"子代理自己批自己"的假腿 ⇒ 要红。
 - [ ] **AC#6 取消语义**：父任务取消时子代理怎么收（`TaskRoster` 今天有没有 owner／recover 那条链要现读）；⚠ 裸 `go func(` 而无 owner／recover 是 `AGENTS.md` §1.2 硬禁。
 
