@@ -50,3 +50,25 @@
   现量第 3 条的复核：`unwired_test.go` 的"名册"（`TestEveryLockedSectionKeyIsAccountedFor` `:311`）
   **射程只有 `risk`/`fs`/`net`/`plugins` 四枚 locked section** ⇒ `[panel] width` 不在册是设计如此，
   本票第二格既不是"补登记"也不是"新发现"；**落点本程不选，交编排者**。
+- 09-28 17:5x `180-a1`（只读普查·派单 §B；本程锚 `38fc7c0e`，非票面锚 `039efb47`）：
+  **AC 框一枚未勾、产码零字节未动**；只跑尺与读码，表在 `docs/evidence/s1/180-panel-width-ownership-a1.md`。
+  ① **今天没有人决定面板窗口尺寸，因为本树没有面板窗口**——
+  `internal/panel/doc.go:16`／`internal/panel/pump.go:15-17`／`cmd/wisp/run.go:438` 三处注释同指票 33/35 未落；
+  尺 `grep -rn "NewWindow\|SetBounds\|Rect{\|Width:" --include=*.go internal/panel/ | grep -v _test` **空输出 rc=1**；
+  `go.mod` 里 webview 依赖**零枚**；仓内唯一真窗口是球，其尺寸走 `internal/ball/ball_windows.go:233` 的 `opts.SizePx`
+  （默认与钳位 `:64`/`:144-151`），与 `[panel] width` 无关系——**别把球那一格当成面板的归属**。
+  ② `default:"640"` 那一族＝`internal/config/schema.go:525-535` 的五枚字段
+  （`enabled` `width` `height` `keep_alive_in_session` `scale`），生产读取方**逐枚现量各 0**
+  （五把尺各空输出 rc=1，原文贴证据件 §2；尺射程只有 `internal/ cmd/ tools/`，`frontend/**` 与 `design/**` 不入任何零命中宣称）。
+  生产里唯一碰到这枚 struct 的两处都不"读值去行动"：`internal/config/manager.go:211` 整块指针拷贝＋`:217` 整块比较；
+  `internal/config/defaults.go:60` 的反射只把 `default:` 标签**写进**字段。
+  连热加载的回执也停在字符串上：`rep.Hot` 全树命中三处全是 append（`manager.go:219`/`:278`/`:334`），无一处取值行动。
+  ③ **规格要求它生效**（不是真空，故本票＝补实现那一支，不是改规格文字）：
+  `docs/PLAN.md:2726` 逐字「**三档生效级别**：`hot`（立即生效）· `reload`（需重载子系统，如换 ASR 模型）· `restart`（需重启进程）。」
+  ＋`docs/PLAN.md:2743` 逐字「| `[panel]` | `enabled` `width` `height` `keep_alive_in_session`(true) `scale` | `hot` |」
+  ＋`docs/specs/SPEC-03-config-secrets-envs.md:39` 同行（`width(int)=640` … `hot`）。
+  ⚠ 但要求**只由 `hot` 那一格承载**：`docs/specs/SPEC-08-ui-ball-panel.md:143-154`（§5.1 宿主）只写单例窗口/资源加载/resync，
+  **没有一句把窗口尺寸指到 `cfg.Panel.Width`**——宿主侧文本是缺的，这条归编排者裁。
+  ⚠ 风险栏（照派单 §B 末条预写；`AC#2`/`AC#3` 本程**未做**）：**不许用"把 `default:"640"` 改掉"交差**；
+  票面问的"缺哪一跳"今天答案是**整条链**——宿主（票 33）与载体（票 35）都不在，
+  且尺寸这一维在快照名册里也不存在（`internal/panel/composer.go:57-62` 只有四枚 key）。
