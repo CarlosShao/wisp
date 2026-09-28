@@ -102,3 +102,53 @@
 
 - [ ] **AC#2b（09-28 追加，未做）**：把上面 1～5 落成快照里的两维——**① 当前可选模型清单**（provider＋model id＋`Display`，来源＝配置目录 ∩ `enabled=true`；⚠ 不许把未启用的也列进去）；**② 当前模型的思考档位集**（＝`Capabilities.Thinking` 决定"有没有这一维" ＋ 该适配器实际接受的档位词表决定"有哪几档"，两问分开答）。**判据要钉"值来自真源"**：拿一份两模型／两档位的假配置树喂进去，快照里读到的清单与那棵树逐字一致（与票 92 那格同形），⚠ 不许用"字段非空"充当判据。**本格只做"显示"**：任何"面板改档位／换模型"的**写回**都不在此格，它要 `internal/panel/bridge.go:42-45` 那四枚 `panel.*` 之外**新增方法＝C17 契约变更** ⇒ 已并入 `Q-64`（**默认不做**）。
   ⚠ 与 AC#2 的分工：AC#2 的结论"落地集＝空"**保留不抹**，它当时量的是"十四行表里那些字段有没有源"；本格是**新增两维**，所以**不算推翻 AC#2、也不算替它翻勾**。⚠ **判据要说准（我一度用错尺）**：`sed -n '3473,3488p' docs/PLAN.md | grep -nE "模型|档位|思考|monitor"` 现量**命中 2 行**——但那两行是**状态名"思考中（等 LLM 首 token）"**（`:4` 与 `:9` 那两行），**与"思考档位"同名不同物**；十四行表里**真正要求"模型清单／档位集"的行＝零枚**（尺：`sed -n '3473,3488p' docs/PLAN.md | grep -nE "模型|档位|effort|thinking_intensity"` ⇒ 逐枚点名后为 0）。⇒ **别拿"grep 到'思考'两字"当"这一维已被要求过"的证据**，这是"同名不同物"那一族在中文关键词上的复发。
+
+## Progress log（append-only）
+
+### 09-28 17:4x–18:0x　`145-r2` 写腿（派单 `.scratch/wisp/dispatches/2026-09-28-174x-impl-145-r2-snapshot-growth-with-nail-preapproval.md`；证据件 `docs/evidence/s1/145-snapshot-growth-r2.md`）
+
+- **三格 `AC#2`／`AC#6`／`AC#2b` 一律未勾**（勾要非实现者表），本程一格未自勾、票面原文一字未改、未抹。
+- **落的维数＝0；拿掉的维数＝14 枚候选逐枚点名**（证据件 §2 那张表：`composer.models`／`composer.efforts`／
+  `approval.windowMs`／`approval.vetoChannels`／`approval.remainingMs`／`run.reasoning`／`run.usage`（实时）／
+  `run.status`／`tools[]`／`cost`／`failures[]`／`failures[].humanText`／`view`／`approval.depth`——
+  每枚都写着"真源在哪一行"与"AC#6 答不出的原因"）。**一行生产码未改。**
+- **构造点枚数（派单 `起手必做` 第 3 条那把尺按字面量是空的，具名更正）**：
+  `grep -rn "PanelSnapshot{" --include=*.go internal/ cmd/ | grep -v _test.go` ⇒ **0 枚**——Go 侧那枚类型叫
+  **`Snapshot`**（`internal/panel/composer.go:57`，四字段 `:58-61`），`PanelSnapshot` 是 TS 侧 interface 名
+  （配对行在 `composer_test.go:60`）。按真身现量：`Snapshot{` 非测试命中 **5 枚**，其中面板的 3 枚**全不是装配点**
+  （`composer.go:97` 是 `NewSnapshot` 自己的 return、`pump.go:228` 与 `cmd/wisp/panel_pump.go:248` 是零值错误支），
+  另 2 枚同名不同物（`internal/perm/store.go:247`、`internal/ball/liquid.go:276`）。
+  **真·生产构造链只有唯一一枚装配根＝`cmd/wisp/run.go:442`（读口行 `:443-448` 共六根线）→ `internal/panel/pump.go:207`
+  → `internal/panel/composer.go:97`**；`NewSnapshotPump(` 的非测试调用者＝**1**。
+- **字段枚数 起手→终态：`Snapshot` 4→4、`ComposerState` 7→7（本程未加字段）**。
+- **`pump_test.go:124`／`:276` 那两枚具名解冻本程未使用**（两行一字未动）：没有第五枚键时把它们从"恰好四枚"
+  换成"随结构体"＝买不到任何东西、还白丢一枚钉；派单自己那句"没有正控＝把门换成好看"在此更严。
+  改法与正控形状（含 r1 §2.7／R6 那枚"无标签导出字段两把尺看不见"的仪器缺口要一起钉住）写在证据件 §4 R-2。
+- **停手报回三枚**（证据件 §4，具名、可复核，本程未擅自办也未据此扩权）：
+  **R-1** 派单前提"在生产构造点填真值"落不了地——`cmd/wisp/run.go:442` 不在这次写面（`A388` 逐枚点名）；这就是 r1 §8 的
+  R2，只是今天**只剩它一把锁**：C 锁已由派单自己解开、B 锁已被判成"更红是预期后果"，而 D 锁（`run.go` 读口＋记录点）
+  与 E 锁（**AC#6 的用例之家**，r1 的 R1）仍在。⇒ 本程按"答不出的字段直接不要"结为**落地集空**，不造填常量的字段。
+  **R-3** `AC#2b` 两枚前提与现量不符：①票面点 5"复用 `cmd/wisp/models.go:104 cmdModels` 的取数"指向的是
+  **签名下载清单**（`modelsList` `cmd/wisp/models.go:205-225` 打 `store.manifest.Models`，`:206-208` 注释逐字
+  "not about this boot's [models] section"），**不是** `llm.providers.<name>.models.<id>` 配置目录（`schema.go:345,348,400`
+  ∩ `:369-371 Enabled`）——复用复不出来；②票面点 4 要的"各家真接受的档位词表"**量出来了**：
+  `openairesponses/request.go:63`＝三档、`anthropic/request.go:92`＝三档、`openaichat/adapter.go:14-17`＝**一档都不映射**
+  （"intentionally NOT mapped…严格端点会 400"），而**这三张表全是包内私有 `var`、全仓无导出访问器**
+  ⇒ 这一维缺的是**源**不是字段；另 `Capabilities.Thinking`（`schema.go:330`）是人填的声明位，
+  核实位在 SQLite `provider_health`（读 DAO `internal/memory/dao_providerhealth.go:170,178` **零枚非测试调用者**），
+  发现式录入把 capabilities 全填 false（`internal/llm/discover.go:116-121`）⇒ 不许把"未探测"画成"不支持"。
+- **在册三枚红**（`TestComposerContractTypesMatchFrontend`／`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`／
+  `TestC21DesignTokensFourWayAgree`）：进场逐名复量一致、**未修、未放宽、未豁免**；`frontend/**`／`design/**` 零写面，
+  TS 那份"应当长这样"逐键清单在证据件 §5（由 owner 自己带）。
+- **门禁读数**（原始件 `.scratch/wisp/probes/145/r2/`）：`./internal/panel/` rc=1／`=== RUN` 137／PASS 81／FAIL 3／SKIP 0；
+  `./cmd/wisp/` rc=0／RUN 149／PASS 89／FAIL 0／SKIP 0（DLL 进 `PATH` 直跑，未走 `scripts/wisp-cli-tests.sh`）；
+  `gofumpt -l internal/panel/ cmd/wisp/` **空**；`sh scripts/d22scan.sh` **rc=0 clean**（bans #1-5 `internal/=211`＋`cmd/=24`、
+  ban #6 `frontend/=85`、ban #7 `internal/tools/=21`、ban #8 `design/=39`／`frontend/=85`／`internal/=441`／`cmd/=47`）。
+  ⚠ **欠读一枚照实登记**：`probes/154/gate-clauses.sh` 本程**未跑**（零码改动；证据件 §7 N3）。
+- **Git**：只 commit、**未 push**；每次带显式 pathspec 逐枚点名（起手 `git diff --cached --name-only`＝空，全程未动别家暂存态）；
+  禁面（`go.mod`／`go.sum`／`thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／`bridge.go:42-45`／
+  三枚冻结测试件／`internal/risk/**`）零字节；仓内零删除命令。
+- **离"那十四态能真画"还差什么（本程现量口径）**：卡点已不再是"哪一维没源"——普查甲组那 12 行的源大多还在，
+  真正没源的仍是那 7 枚（`thinkingMs`／`reasoningMs`／`durationMs`／`humanText`／`fragment`／`IconClass`／`remainingMs`）
+  加 `run.phase`（映射表不存在）与本轮新点名的**"各家档位词表"（私有 `var`、无导出）**；
+  而**有源那批今天一律还差同一件事**：装配根多接一根读口线（R-1）＋一枚能落断言的用例之家（R-2）。
