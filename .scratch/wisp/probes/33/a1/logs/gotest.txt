@@ -1,0 +1,27 @@
+time=2026-09-28T15:09:10.778+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+    composer_test.go:79: Snapshot <-> PanelSnapshot: 4 JSON keys reconciled
+    composer_test.go:74: Go ComposerState emits [git] that interface ComposerState does not declare
+    composer_test.go:79: ComposerState <-> ComposerState: 7 JSON keys reconciled
+    composer_test.go:79: ModeView <-> ComposerMode: 3 JSON keys reconciled
+    composer_test.go:79: WorkspaceView <-> ComposerWorkspace: 6 JSON keys reconciled
+    composer_test.go:79: AttachmentRef <-> ComposerAttachment: 9 JSON keys reconciled
+    composer_test.go:79: ResultChunk <-> ResultChunkView: 3 JSON keys reconciled
+--- FAIL: TestNoGitSwitchCapabilityInThePanelSurface (0.26s)
+    composer_test.go:321: a git branch/repository switcher exists in the panel surface; owner cut it from the product (票 92 AC#7):internal\panel\git.go: git.go:18: // half: "switch branch / switch worktree" needs the page -> Go hop (a postMessage
+    composer_test.go:324: AC#7 negative criterion held: no git switch entry point in frontend/ or internal/panel/ (production files)
+--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.06s)
+    frontend_hygiene_test.go:216: a second style source appeared in code the bundle actually ships:
+          frontend/src/components/harness/right-rail.tsx:89: diff: [{ sign: "+", text: "  --page: #fafafb;  /* beautiful-ui 主题收编 */" }],
+        Add or reference a C21 token in design/assets/tokens.css instead.
+    frontend_hygiene_test.go:219: 57 files reachable from main.tsx carry colour literals only in the generated theme
+--- FAIL: TestReadGitWorktreePointerFile (0.02s)
+    git_test.go:210: the attached worktree "C:\\Users\\swq\\AppData\\Local\\Temp\\TestReadGitWorktreePointerFile318209043\\001\\main tree\\attached" is missing from [{Path:C:\Users\swq\AppData\Local\Temp\TestReadGitWorktreePointerFile318209043\001\main tree Branch:dev Sha: Detached:false Main:true} {Path: Branch:attached/branch Sha: Detached:false Main:false}]
+--- FAIL: TestGitDimensionHasNoModelCallableTool (0.01s)
+    git_test.go:353: the C17 panel.* whitelist in bridge.go = [panel.attachment.add panel.message.send panel.mode.request panel.workspace.request], want the four methods this ticket may not extend - read-only display rides the existing snapshot push, so a fifth method means the read half got tied back to the action half
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+    tokens_fourway_test.go:441: read design/assets/tokens.css: open D:\work\workspace\projects plans\Wisp\design\assets\tokens.css: The system cannot find the path specified.
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	1.269s
+ok  	github.com/CarlosShao/wisp/internal/config	1.016s
+FAIL

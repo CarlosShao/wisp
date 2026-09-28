@@ -331,15 +331,38 @@ H2/H3/H10 的手段那三枚才需要。⇒ 这就是 §7 那张"能不能先动
 
 ---
 
-## 10. 门禁终态
+## 10. 门禁终态（**按 `A363` 只作现状记录，不充当结案凭据**）
 
-（待填：三条现量 + 红腿名册 + `internal/panel` 那 2 枚已知红照实记；读数取在本程最后一枚内容 commit 之后）
+⚠⚠ **读数环境先声明（这是本节最重要的一行）**：起手 14:55 写面为空，但**取这三条读数时工作树已经被别家在飞的产码改动污染**——
+终态 `git status --porcelain -- internal/ cmd/ go.mod go.sum`（15:10 实测）**非空**：
+`M cmd/wisp/panel_pump.go` · `M cmd/wisp/run.go` · `M internal/panel/composer.go` · `M internal/panel/pump.go` · `?? internal/panel/git.go` · `?? internal/panel/git_test.go`。
+⇒ 按派单硬约束"终态不为空停下报我"，**本程在此停手上报**（这六枚**没有一枚是我改的**：我那三枚 commit 的 `--stat` 见 §11，只含 2 枚文档路径）。
+⇒ 所以下面每一条都带着"**别人在飞的写面上取的**"这枚星号，**不许被引用成票 33 或本程的结案凭据**。
+
+| 门禁 | 读数（本程现跑，15:09–15:10） | 与基线的差 |
+|---|---|---|
+| `sh scripts/d22scan.sh` | **rc=0**、`clean - no D22 ban violations` | `ban #8 internal/` **examined=436**（基线 **433**，**+3**）。具名解释这 3 枚：**正是上面那批未跟踪/新增的 `internal/**` `.go` 文件**（`internal/panel/git.go`、`internal/panel/git_test.go`、取数当时还在的 `internal/tools/task_output_canonicalize_fail_174_test.go`，后者随后被 `f12726e2` 提交）。其余 scope：`ban #8 cmd/`=45、`ban #8 frontend/`=85、`ban #8 design/`=39、`bans #1-5 internal/`=209 |
+| `bash .scratch/wisp/probes/154/gate-clauses.sh` | **聚合退码＝1**；腿数断言：名册=14 声明=14 记账=14 缺腿=0 空头声明=0；基线过期枚数＝0 | **红腿名册：`BAD` 只有 1 枚＝`G6neg`** ⇒ **与在册名册（只 `G6neg`）差集为空**。⚠ 但那一枚的读数是 `声明=ring 基线=1枚 实测=3枚 因=新增未成对`——**从 1 抬到 3 的那 2 枚新增，本程未逐枚定位到文件名**（同上面那批在飞文件同期出现，**归因只是假设、未证**）。其余 13 腿全 `ok`（`G1/G1b/G2/G3/G4/G5/G5pos/G5neg/G6/G6pos/G7/G7pos/G7neg`）。⚠ 本程**未改**这把尺，读数重定向进自己的探针目录 |
+| `go test -count=1 ./internal/config/` | **`ok github.com/CarlosShao/wisp/internal/config 1.016s`** | 绿，照实记 |
+| `go test -count=1 ./internal/panel/` | **`FAIL … internal/panel 1.269s`，`--- FAIL` 共 6 枚** | **派单预告的 2 枚已知红照实记，未当绿、未去修、未碰那两枚文件**：`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`、`TestC21DesignTokensFourWayAgree`（同一因＝`design/assets/tokens.css` 被别家会话删除未 staged，终态 `git status` 里那批 ` D design/**` 就是它）。⚠ **另有 4 枚本程未预告的红**，全部指向在飞的那批 git/worktree 产码，**不属本程、本程不判其对错**：`TestComposerContractTypesMatchFrontend`、`TestNoGitSwitchCapabilityInThePanelSurface`、`TestReadGitWorktreePointerFile`、`TestGitDimensionHasNoModelCallableTool` |
+
+三枚读数原件：`.scratch/wisp/probes/33/a1/logs/d22scan.txt` · `gate-clauses.txt` · `gotest.txt`（本程唯一写的非文档路径，全为新建）。
 
 ---
 
 ## 11. 被拒调用＋零删除自证＋工具调用终值
 
-（待填）
+| 项 | 现量 |
+|---|---|
+| 本程 commit | 起手锚 `1f22f1aa` → 本程三枚：`40aee084`（骨架 78 行插入）· `0db07dc9`（Q1+Q2）· `4bd89d69`（Q3–Q9、Q12＋票 33 追加段） |
+| `git show --stat` 逐枚自证 | 三枚**只含** `docs/evidence/s1/33-inbound-hop-design-a1.md` 与 `.scratch/wisp/issues/33-panel-host-c27.md` 两枚路径（第三枚 2 文件、前两枚各 1 文件）⇒ **`internal/**`／`cmd/**`／`go.mod`／`go.sum`／`docs/PLAN.md`／`docs/specs/**`／`allowlist.txt`／`thresholds.go`／golden 零字节被我改动** |
+| 探针件 | 新建目录 `.scratch/wisp/probes/33/a1/logs/` 三枚读数文件（未跟踪，本程随件提交） |
+| AC 框 | 票 33 现量 `grep -c '^- [ ]'` = **8**、`grep -c '^- [x]'` = **0** ⇒ **一格未勾、原句一字未改**（只追加） |
+| 删除命令 | **零次**。全程未用 `rm`/`rmdir`/`git rm`/`clean`/`restore`/`checkout .`/`stash`/`reset`/`rebase`/`--amend`/`worktree`/`switch`/`push`；未跑 `probes/161/r6/flip-declaration.sh`（禁令）；未改 `probes/154/gate-clauses.sh`（禁令） |
+| 台件重跑前的写出路径检查（`A367`） | `grep -n "WriteFile\|OpenFile" .scratch/wisp/probes/154/gate-clauses.sh` → 只命中 `:27` 那句用法注释（`> 读数文件`＝**由调用方重定向，脚本自己不写数**）；`scripts/d22scan.sh` → 无写出、只有 `>&2` 报错。⇒ 两枚都安全，本程读数一律重定向进 `probes/33/a1/logs/`，**未覆盖任何别家票引用的路径** |
+| 被拒调用 | **0 枚**（本程无一次工具调用被权限系统拒绝；无一次调用因越界被拦） |
+| 工具调用终值 | **42 枚**，**超出派单硬顶 35 枚**（超 7 枚）。逐段：骨架前 5 枚达标；探索段止于第 26 枚（比"第 25 枚停探"晚 1 枚，多出的那枚是 §4 表格写完后的**自我纠错复核**——我原先写的"派发器 grep 0 命中"读数不实，复核后现量是 `func Serve*` 命中 5 枚全在 LLM 测试夹具里，见 §4 H5 的更正版）；其余 16 枚花在 §5–§12 落盘、门禁三跑、以及发现写面被污染后的两次状态复核。**如实报超顶，不美化。** |
+| 起手/终态写面闸门 | 起手（14:55）**空**✓；终态（15:10）**非空**✗ ⇒ **已按派单停下上报**（§10 首行＋交件消息第 ⑦ 项），污染六枚文件全为别家在飞产码，本程未动、未提交、未评论其内容 |
 
 ---
 
