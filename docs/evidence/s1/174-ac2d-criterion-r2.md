@@ -72,26 +72,43 @@ unwired control verbatim: announce="[…输出已落文件：省略 17200 字符
 5. 端到端 `wisp run` 未跑（本机缺 DLL 是 174-c1 的现量事实）。
 6. 全仓其它包的门禁本程未跑（派单只列四把尺）。
 
-## ⑤ 门禁终态
-
-（本节的数取在**本程最后一枚 commit 之后**；若终表与提交顺序有先后，以 `git log` 为凭）
+## ⑤ 门禁终态（取在本程最后一枚 commit `f12726e2` 之后；读数原文落 `.scratch/wisp/probes/174/r2/logs/`）
 
 | 尺 | 读数 |
 |---|---|
-| `go test -count=1 ./internal/tools/` | 待填 |
-| `sh scripts/d22scan.sh` | 待填（`ban #8 internal/` 枚数解释见下行） |
-| `bash .scratch/wisp/probes/154/gate-clauses.sh` | 待填（**比红腿名册不比退码**） |
-| `gofumpt -l internal/tools/task_output_canonicalize_fail_174_test.go` | 空（第 14 枚调用现量：`gofumpt-rc=0`、零行输出） |
-| 两枚模板冻结钉 md5 复量 | 待填 |
-| 产码零改动自证 `git diff --numstat 40aee084..HEAD -- internal/ cmd/` | 待填 |
+| `go test -count=1 ./internal/tools/` | `ok github.com/CarlosShao/wisp/internal/tools 15.808s`（基线 `ok 15.812s` 未漂）；同包 `-v` 名册现量：`=== RUN` **186**、顶层＋子测试的 `FAIL`/`SKIP` **0** |
+| `sh scripts/d22scan.sh` | `rc=0`、`clean - no D22 ban violations`；`ban #8 internal/ examined 436`（派单基线 433） |
+| `bash .scratch/wisp/probes/154/gate-clauses.sh` | `rc=1`；`腿数＝14 声明与实测不符＝1`；红腿名册＝**只 `G6neg`**（`# BAD 腿=G6neg 声明=ring 基线=1枚 实测=3枚 因=新增未成对（票 171 AC#2：实测 > 基线）`）；`基线过期枚数＝0`；**比名册不比退码⇒与在册基线同形（本程未加腿、未改这把尺）** |
+| `"$(go env GOPATH)/bin/gofumpt" -l internal/tools/task_output_canonicalize_fail_174_test.go` | `rc=0`、`output-lines=0`（逐字空） |
+
+**`ban #8 internal/` 433 ⇒ 436 的具名解释**：派单预告「你加测试件会变 434」是对的，多出的两枚不是本程的。自锚点起 `internal/` 名下新增（尺：`git diff --name-status 40aee084..HEAD -- internal/ | grep '^A'`）＝
+1. `internal/tools/task_output_canonicalize_fail_174_test.go` ← **本程唯一一枚**（433→434）
+2. `internal/panel/git.go` ← 同批 `181-r1`
+3. `internal/panel/git_test.go` ← 同批 `181-r1`
+
+**产码零改动自证**：`git diff --numstat 40aee084..f12726e2 -- internal/ cmd/` 全文＝**一行**
+`152	0	internal/tools/task_output_canonicalize_fail_174_test.go`
+⇒ 非 `_test.go` 的行为**空**；`internal/tools/task.go`／`bridge.go`／`cmd/wisp/run.go`／`internal/risk/**` 在该区间零字节（`0` 删除列，零文件）。第二枚 commit `f12726e2` 名下只有 `.scratch/wisp/probes/174/r2/**` ＋本表。
+
+**两枚模板冻结钉复量（未变，但派单给的基线数复现不出来——如实登记）**
+- 位置与内容尺：`sed -n '299p'` ＝ `func TestPointerNoticeKeepsTheD153StubShape(t *testing.T) {`、`sed -n '349p'` ＝ `func TestHealthyReplyStillMatchesThePreFixTemplate(t *testing.T) {`（两枚钉仍在派单说的行号上）。
+- **强证「一字未动」**：`git log --oneline 40aee084..HEAD -- internal/tools/task_output_pointer_notice_test.go` ＝**空**；整文件 md5 `54cbbb4db55a2662d7c1a06c0a351347` ＝ `git cat-file blob 40aee084:internal/tools/task_output_pointer_notice_test.go | md5sum` 同值。⇒ 任何推导式下的 md5 都不可能被本程改动。
+- 174-v1 那枚「相等关系」我用自己的推导式复现了：剥行首缩进＋剥行尾换行后，`task_output_pointer_notice_test.go:360` 与 `git show 51c32ef9:internal/tools/task.go:229` **同为 `bfd625a35f5add5e1e650a59c0fe1eb3`**。
+- ⚠ 但派单写的基线 **`8bd433707c1fd9039ac2103da08e7d22` 在我试的四种推导式里都没出现**（其余三支：原行仅剥 CR＝`6d3b7c37d88c5caf99e0df91fa548970`；剥缩进再剥尾逗号＝`0e24d511412deb1d40438d5a9d259d01`；原行含尾换行＝`bfd625…` 系）。⇒ **不是产码漂了，是那枚推导式没随基线一起入库**（`174-v1` 只留了结果没留算法）。附带一枚事实：`internal/tools/task_output_pointer_notice_test.go` 在 `51c32ef9` **根本不存在**（`git cat-file blob 51c32ef9:<file>` 报 `path … exists on disk, but not in '51c32ef9'`），它随 `9ae0be78` 才进仓 ⇒ 拿 `51c32ef9` 当"两枚钉的同期基线"这句话本身要重写。**要更正请把「推导式定义」补进入库，不要改这两个数字。**
+
 
 ## ⑥ 被拒调用 ＋ 零删除 ＋ 终值
 
-- 被拒／失败调用：**零枚被权限系统拒绝**。一处**仪器自伤**要如实登记：第一次并门禁那发里 `grep -cE '^--- FAIL...'` 命中数＝**0** ⇒ 退出码 1 ⇒ 同条 `&&` 链在它之后的 `sh scripts/d22scan.sh` **没跑**（我据此重跑了一发）。这不是被拒，是链式写法把"零枚红"读成了失败——**读数只作废那一发里 d22scan 的缺位**，`ok 15.523s`／`=== RUN 186`／`FAIL+SKIP 0` 三行是真读数。
-- **零删除命令**：全程只用 `mkdir -p`／`cp`／`printf > 新文件`／`Write`／`Edit`，没有 `rm`／`rmdir`／`git clean`／`git restore`／`git checkout .`，也没有动 `probes/161/r6/flip-declaration.sh`（未跑）。
-- 还原自证：变异只在 `.scratch/wisp/probes/174/r2/mut/` 的副本上；`internal/tools/task.go` 从未成为写入目标 ⇒ `git status --porcelain -- internal/ cmd/` 只应出现**新建的 `_test.go`**（别人在飞的 `internal/panel/git.go` 不是本程的，见下）。
-- 共享树噪声登记（**不评论、不动**）：终态写面出现 `?? internal/panel/git.go`＝同批 `181-r1` 的在飞件，非本程产物。
-- 工具调用终值：见 §7 末行。
+- 被拒／失败调用：**零枚被权限系统拒绝**。三发仪器自伤，如实列（都不改判据、不影响入库读数）：
+  1. 第 20 枚调用里 `grep -cE '^--- FAIL|^    --- FAIL|^    --- SKIP'` 命中数＝**0** ⇒ 退出码 1 ⇒ 同条 `&&` 链在它之后的 `sh scripts/d22scan.sh` **那一发没跑**。作废的只有那一发里 d22scan 的缺位；`ok 15.523s`／`=== RUN 186`／`FAIL+SKIP 0` 是真读数。d22scan 在第 24 枚调用重跑（终值在 §5）。
+  2. 第 22 枚调用 `git commit -- <新建件路径>` 报 `pathspec … did not match any file(s) known to git`——新建件要先 `git add` 再带 pathspec commit。零副作用，同调用内改正（两枚 commit 都仍带显式 pathspec）。
+  3. 第 25 枚调用 `git show --stat=always --numstat` 报 `invalid --stat value` ⇒ 那一枚 commit 的 numstat 没打到；区间自证（§5 的 `git diff --numstat 40aee084..f12726e2`）不受影响。
+- 夹具自伤一枚（**不是产码缺陷**，已写进判据注释）：第一版用 `pointerRe` 断指针，`--- FAIL: TestCanonicalizeFailureFailsClosedInReply174` 报在 `全文见    …]`——那枚正则要 `\S`，而本夹具的路径就是空白。改成拿 roster 里那串原样比对指针。
+- **零删除命令**：全程只用 `mkdir -p`／`cp`／`printf > 新文件`／`Write`／`Edit`，没有 `rm`／`rmdir`／`git clean`／`git restore`／`git checkout .`，也没跑 `probes/161/r6/flip-declaration.sh`（未跑）。
+- 还原自证：变异只在 `.scratch/wisp/probes/174/r2/mut/` 的副本上；`internal/tools/task.go` 从未是写入目标（§5 numstat 为凭）。
+- 共享树噪声登记（**不评论、不动、不提交**）：`cmd/wisp/panel_pump.go`、`cmd/wisp/run.go`、`internal/panel/{composer,pump,git,git_test}.go`、`docs/evidence/s1/152-subject-death-never-measured-r1-accept-r1.md` ＝同批 `181-r1`／别家的在飞与已提交件；终态里 `internal/panel/git.go`＋`git_test.go` 已由它们自己提交（我不替它们 add 一个字节）。
+- **工具调用终值＝28 枚**（硬顶 30；第 22 枚之后没有新探索，只有自证与终态读数）。骨架第 6 枚落盘（派单要 ≤5，偏差见 §1）。
+
 
 ## ⑦ next
 
