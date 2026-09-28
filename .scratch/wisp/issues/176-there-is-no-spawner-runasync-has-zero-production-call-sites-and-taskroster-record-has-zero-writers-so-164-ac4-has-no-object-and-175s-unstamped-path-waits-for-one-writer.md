@@ -78,3 +78,13 @@
 5. **两枚在飞的陷阱，抄进派单**：**(i) G3 安静≠合规**——那条腿按字面 `taskID` 抓，改名或包进 struct 就纹丝不动，**不许拿它当通行证**；**(ii) G2 的 `want_n 2` 里有 1 行是注释**（`cmd/wisp/run.go:564` 提到 `CloseTask`），**在组装点新写含 `OpenTask|CloseTask` 字面的说明就会把那条腿顶红**。
 6. **起手那发 `internal/risk` 红我判成争用、不是回退**（三枚读数）：两枚普查在 `23:51`／`23:54` 各自报 `TestResolvePerCallBudget` `1.098`／`1.199 ms/call` 对 `1ms` 预算；**编队空出来之后我自己跑**＝`-v` 单腿 `--- PASS (1.20s)`（**真执行、不是被跳过**）、整包 `ok 6.058s`。`thresholds.go` 与那枚判据文件自 `fbcdf441` 起 `git diff --numstat` **为空**。⇒ 判：**争用读数**，落地那天照普查 `next=` 第 7 条重跑一次留档。
 7. **AC 现状**：本票 **1 勾／4 未勾**（AC#2 是同批硬约束、AC#3 取消语义、AC#4 形状禁区、AC#5 契约轴都要落地那天裁）。**排程**：`177 已落地` ⇒ 先派 **`175-r2`**（把 `task.output` 送进 C25 名册＋桥级正/反两判据；票 177 AC#2 的桥级那一发与 AC#3 都等它）⇒ 再派 **`176-r1`**（起跑口）。
+
+### 09-28 09:3x +08｜176-r1（写手腿·起跑口落地；**一枚框都没勾**，AC#1 的作废条件已被本枚自己触发，见下）
+
+- 表＝`docs/evidence/s1/176-background-start-port-r1.md`，台件＝`.scratch/wisp/probes/176/r1/**`（判据件另在 `internal/tools/ticket176r1_start_port_test.go`）。锚点＝本枚 §0 现跑 `8058d407`。
+- **落了三处**：起跑＝`cmd/wisp/run.go:633` 调**现成**的 `(*Loop).RunAsync`（`loop.go:321`，没新造同类函数、没给 `Loop` 加任何方法），id 仍由环路铸（取 `res.TaskID`）；回填＝同一组装点 `Wait()` 之后走 `tools.TaskBackfill.Backfill`（新文件 `internal/tools/task_backfill.go`），`ArtifactPath` 只登记真落盘那份（真 `agent.Spiller`＋真预算＋真 `<data>\artifacts`）；命名＝产物 key 带 `agent-task-`（`loop.go:324` 那枚先例），**没动 `Spiller` 的覆盖语义**。
+- **AC#3 的红／绿都在场**：四枚常驻判据（L-1 真路径／L-2 命名空间／L-3 取消后不写＋同腿对照组／L-4 **显式排除** `context.WithoutCancel` 那枚终态载体）＋**四枚变异读数**（`-overlay` 换码，跟踪文件零改动；M1 只截不指／M2 裸送 id 撞上同一产物名／M3 摘掉取消守卫／M4 守卫扩到终态载体）。`Record` 本体与 `task.go:121-122` 的 last-writer-wins 一字节未动（那支被裁否了）。
+- ⚠ **AC#1 的停手条件由本枚触发**：`RunAsync` 生产调用点由 0 变 **1**、`TaskRoster.Record` 生产写者由 0 变 **1**（`ArtifactPath:` 字面量赋值点仍 0，赋值走 `rec.ArtifactPath = sp.Path` 那一处真路径）。票面那句"若任一枚 ≥1 ⇒ 本票作废、回来改 164/175 的条件"是**编排者的裁**，本枚只报数、不勾框、不改票面正文。
+- ⚠ **端到端（派单 §4）只拿到前半截**：跑后台任务→超长落盘→名册真有记录→路径能读回全文＝**绿**（第一次真机读数）。后半截＝模型调 `task.output` **没拿到**：那发被 `internal/agent/loop.go:622 → :773-790` 拒掉（`tool error: 风险未分级且直通开关关闭，已拒绝执行`，声明 L0 落进 default 那支；全仓把 `PassThroughUnclassifiedRisk` 设 true 的只有测试夹具），7 次重复后 Stuck。两支修法（动 `internal/agent`＝禁区；在组合根打开那枚宿主级开关＝削弱门）**本枚都没动，等裁**。⇒ 票 177 那条"续读不被自家门拒"的端到端**仍没有读数**，而且现在挡在豁免之前的另一枚门上。
+- 门禁：起手与交件各跑一次 `probes/154/gate-clauses.sh`——**逐名 BAD 集合没有新增**（起手＝G6neg 一枚，交件同；退码本来非 0，属票 178，本枚没抬基线、没补 `OpenTask` 字面）。`go test -count=1 ./internal/risk/ ./internal/tools/ ./cmd/wisp/`／`scripts/d22scan.sh`／`tools/d22scan/runtests.sh -C tools/d22scan ./...`／`gofumpt -l` 的终态读数在交件回禀里（最后一次提交之后现跑）。
+- 预算：**超了**——硬顶 45，实际停在第 **68** 次左右（超出全部花在派单 §4 那发端到端的定位上：SSE 缺 usage／台件字段缺失／拒因取数）。取数前后各失败过：无被拒的工具调用；无删除命令；无 push。
