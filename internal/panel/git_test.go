@@ -678,3 +678,44 @@ func hasPackedRefs(p string) bool {
 // equalStrings is already declared in this package's test files
 // (l2_grant_boundary_test.go:1919) with the same signature, so it is used here
 // rather than shadowed.
+
+// TestReadGitForWorkspaceConsumesRewriteAccount is ticket 181's AC#6, the
+// judgement piece for ticket 102's rule on the git dimension (181-r2): the leg
+// that renders git must read the rewrite account the WorkspaceView carries, not
+// reach past it for the coordinate alone.
+func TestReadGitForWorkspaceConsumesRewriteAccount(t *testing.T) {
+	dir := t.TempDir()
+
+	t.Run("not_rewritten_is_the_ordinary_road", func(t *testing.T) {
+		ws := WorkspaceView{Set: true, Spelling: dir, Canonical: dir}
+		got := ReadGitForWorkspace(ws)
+		want := ReadGit(dir)
+		if got.Kind != want.Kind || got.Reason != want.Reason || got.CurrentWorktree != want.CurrentWorktree {
+			t.Errorf("account-aware entry disagreed with the plain read: got kind=%q reason=%q tree=%q, want kind=%q reason=%q tree=%q",
+				got.Kind, got.Reason, got.CurrentWorktree, want.Kind, want.Reason, want.CurrentWorktree)
+		}
+		if strings.Contains(got.Reason, "c26") {
+			t.Errorf("a view with rewritten=false was narrated as rewritten: %q", got.Reason)
+		}
+	})
+
+	t.Run("rewritten_must_say_so_out_loud", func(t *testing.T) {
+		ws := WorkspaceView{Set: true, Spelling: `%WISP181R2%\named`, Canonical: dir, Rewritten: true}
+		got := ReadGitForWorkspace(ws)
+		if !strings.Contains(got.Reason, "rewritten=true") {
+			t.Errorf("reason %q does not name the rewrite account: a moved coordinate would read as the operator's own folder", got.Reason)
+		}
+		if !strings.Contains(got.Reason, ws.Spelling) || !strings.Contains(got.Reason, ws.Canonical) {
+			t.Errorf("reason %q must carry both the spelling the user named and the tree C26 moved it to", got.Reason)
+		}
+		if got.CurrentWorktree != ws.Canonical {
+			t.Errorf("currentWorktree = %q, want the expanded coordinate %q (candidate 2 would drop the dimension instead; that ruling is open)", got.CurrentWorktree, ws.Canonical)
+		}
+	})
+
+	t.Run("unset_view_probes_nothing", func(t *testing.T) {
+		if got := ReadGitForWorkspace(UnsetWorkspaceView()); got.Kind != GitKindUnreadable {
+			t.Errorf("kind = %q for an unset workspace, want %q", got.Kind, GitKindUnreadable)
+		}
+	})
+}

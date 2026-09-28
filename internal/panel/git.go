@@ -224,6 +224,53 @@ func ReadGit(workspaceRoot string) GitView {
 	return view
 }
 
+// ReadGitForWorkspace is the account-aware entry to the git dimension (ticket
+// 181's AC#6 debt, ticket 102's rule).
+//
+// ReadGit takes a bare string and therefore cannot know whether the coordinate
+// it was handed is the one the operator named. A WorkspaceView carries C26's
+// rewrite account on its own fields (composer.go:189-191 — Rewritten, plus
+// Spelling at :184), which is exactly what its header promises: the account
+// "must be visible as such in the panel instead of being presented as 'your
+// folder'". So the leg that renders the git dimension consumes the account here
+// instead of reaching past it for Canonical.
+//
+// A view that was never rewritten is the ordinary road and behaves exactly as
+// before, byte for byte.
+func ReadGitForWorkspace(ws WorkspaceView) GitView {
+	if ws.Rewritten {
+		return GitViewRewritten(ws)
+	}
+	return ReadGit(ws.Canonical)
+}
+
+// GitViewRewritten is the git dimension for a workspace coordinate that C26's
+// expansion step moved onto another tree.
+//
+// DISPOSITION = AC#β, and the orchestrator rules on it; this is the single line
+// of the packet where that ruling lands. What is implemented here is candidate
+// ① — report the expanded truth AND say out loud that the path was rewritten,
+// the shape internal/tools/paths.go:82-93 already uses for config roots
+// (RewrittenRoots is recorded and reported, never silently swallowed).
+// Candidate ② would be `return newGitView(GitKindUnreadable, <reason>)`,
+// dropping the whole dimension; candidate ③ — show Canonical with no word of
+// the account — is the disease this function exists to close, and is not
+// implemented anywhere.
+//
+// MEASURED TODAY: this branch is unreachable on the current tree. The only
+// producer that ever sets WorkspaceView.Rewritten is RequestWorkspaceSwitch
+// (workspace.go:104-111), and its success path runs after res.Actable() at
+// workspace.go:85, which errors on any rewritten spelling — so a view that
+// reaches the packet has Rewritten == false. The branch is defence in depth for
+// the day the upstream loosens, which is the same reason workspace.go:83-85
+// re-reads the account "on the native side of the boundary".
+func GitViewRewritten(ws WorkspaceView) GitView {
+	view := ReadGit(ws.Canonical)
+	view.Reason = "注意：这条工作区路径被 C26 的展开步改写过（账户 rewritten=true），" +
+		"下面报的是改写后的树 " + ws.Canonical + "，不是原拼法 " + ws.Spelling + "。" + view.Reason
+	return view
+}
+
 // gitDirs is the pair of locations a probe resolves: the per-tree git dir
 // (HEAD, index, commondir) and the shared git dir (refs, packed-refs,
 // worktrees/), plus the working tree that owns the shared one.
