@@ -1,0 +1,7 @@
+time=2026-09-28T14:33:45.013+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestPointer185C1SameNameDifferentDirectoryStillHits (0.01s)
+    pointer_185_c1_ac7_probe_test.go:71: AC#7: a same-name sibling under another directory, spelled verbatim in the body, must still hit R4 (basename-level exemption = widening)
+time=2026-09-28T14:33:47.391+08:00 level=INFO msg="scope disposed" scope=session-1 completed=1 failed=0 disposal_incomplete=false timed_out=false
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	4.435s
+FAIL

@@ -1,0 +1,2 @@
+# github.com/CarlosShao/wisp/internal/tools
+.\.scratch\wisp\probes\185\c1\mut\fs_broken.go:4:1: syntax error: imports must appear before other declarations
