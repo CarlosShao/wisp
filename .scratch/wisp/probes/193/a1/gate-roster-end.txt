@@ -1,0 +1,52 @@
+2026-09-28 15:xx +08 — 193-a1 终态门禁读数影件（只读程；原件是各行命令的 stdout）
+
+HEAD 取数时：a10832ef（本程骨架 420dda62 之后 181-r1 又落了件）
+git status --porcelain -- internal/ cmd/ go.mod ： M internal/panel/git_test.go（别家在飞件，本程未提交未还原）
+
+--- sh scripts/d22scan.sh（退码 0，clean）---
+runtests.sh: OK - packages=[./...] top-level: PASS=34 FAIL=0 SKIP=0, === RUN=76, '[no tests to run]'=0
+d22scan: examined 232 production Go files under internal/ and cmd/
+d22scan: scope bans #1-5 internal/      examined 209 production Go files
+d22scan: scope bans #1-5 cmd/           examined  23 production Go files
+d22scan: scope ban #6 frontend/         examined  85 text files
+d22scan: scope ban #7 internal/tools/   examined  21 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined  85 text files
+d22scan: scope ban #8 internal/         examined 436 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined  45 Go files, comments and _test.go included
+（与起手那把 d22scan-start.txt 逐字一致）
+
+--- bash .scratch/wisp/probes/154/gate-clauses.sh（比红腿名册，不比退码）---
+# BAD  腿=G6neg 声明=ring 基线=1枚 实测=3枚 因=新增未成对（票 171 AC#2：实测 > 基线）
+# 腿数＝14 声明与实测不符＝1
+# 腿数断言：名册=14 声明=14 记账=14 缺腿=0 空头声明=0
+# 腿数断言＝相符（名册上每一腿都记了账）
+# 聚合退码＝1
+（BAD 名册只有 G6neg 一枚＝与在册基线一致；起手那把同值。重跑前已按派单 §1 grep 过它自己的写出路径：无 WriteFile/OpenFile/追加重定向。）
+
+--- go test -count=1 ./internal/config/ ---
+起手 ok 0.951s ／ 终态 ok 1.055s（绿）
+
+--- go test -count=1 ./internal/panel/（只照实记名册，不许当绿）---
+起手与终态名册逐字相同，3 枚 FAIL：
+  --- FAIL: TestComposerContractTypesMatchFrontend        （composer_test.go:74 Go 侧 git 字段未在 TS 声明＝181-r1 在飞件）
+  --- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme （frontend_hygiene_test.go:216，预告红）
+  --- FAIL: TestC21DesignTokensFourWayAgree               （tokens_fourway_test.go:441 read design/assets/tokens.css 文件不在＝别家删除未 staged，预告红）
+FAIL github.com/CarlosShao/wisp/internal/panel 1.382s（起手）／1.232s（终态）
+
+--- go test -count=1 ./internal/ball/（起手一把，终态未复跑）---
+  --- FAIL: TestC21TableColourRowsMatchTokensCSS          （tokens_table_test.go:1468 同一枚缺失 CSS，红话自陈 "the CSS leg of this check must never skip"）
+
+--- Q1 那把 grep（现跑）---
+尺：frontend/|design/ 在 **/*_test.go 命中 9 枚文件；逐枚现读后真会读前端/设计内容并判红的测试 12 枚（见主表 §②.3）。
+
+--- Q3 那把 grep（现跑，逐字命令与读数）---
+grep -rn "PanelSection" --include=*.go internal/ cmd/ | grep -v _test.go
+  internal/config/schema.go:123   （字段挂载 Panel PanelSection `toml:"panel"`）
+  internal/config/schema.go:524   （注释 "PanelSection is [panel]; hot-tier."）
+  internal/config/schema.go:525   （type 定义）
+grep -rn "\.Panel\." --include=*.go internal/ cmd/ | grep -v _test.go | wc -l -> 0
+PanelSection 字段枚数（schema.go:525-535 现读）= 5：Enabled / Width / Height / KeepAliveInSession / Scale
+  其中带 default: 的 = 3（Enabled true、Width 640、KeepAliveInSession true）
+internal/config/schema.go 全文件 default:" 计数 = 69
+⇒ 上游〔180-c1＋182-c1〕"PanelSection 那 18 枚带 default 的字段"这一枚数本程复不出来；"整节零读者"成立且更强（5/5 零读者）。
