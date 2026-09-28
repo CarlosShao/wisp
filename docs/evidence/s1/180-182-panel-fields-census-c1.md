@@ -118,24 +118,104 @@
 
 ## 4. 票 182 AC#1 — 「任务监控」那一栏的堆数与逐堆名
 
-- 堆数（现量）：TBD
-- 逐堆名 ＋ 「我在谁那儿看到的这一堆」：TBD
+**堆数（现量）＝7 堆。** 每一堆都必须写"我在谁那儿看到的这一堆"；
+⚠ **owner 给的截图是外部产品（qoder）的界面，不是本仓规格**——本表只按仓内文本现量，
+凡只出现在票 182 票面"目测清单"里的那一堆，都明写成"目测、无规格"。
 
-## 5. 票 182 AC#2 — 逐堆三档定性（有源／无源但规格要求／规格真空）
+| # | 堆名 | 我在谁那儿看到的这一堆（现跑出处） |
+|---|---|---|
+| S1 | 子代理／后台任务状态 | 票 182 AC#1 目测清单；"子代理"在产品侧**仓内零命中**（尺见 §5），issue 池里的"子代理"全指开发分工不是功能 |
+| S2 | 环境信息（本地路径／分支／未提交枚数／提交或推送） | 票 182 AC#1 目测清单 ＋ 票 181 票面（分支／工作树）＋ 票 186（composer 那一排的 git，**不同地界**） |
+| S3 | 代码审查 diff | 票 77:364 逐字"`5e23d99`（右栏三标签定案：审查/终端/浏览器）"、票 77:384 逐字"审查/终端/浏览器三面板、任务监控弹窗"；＋票 182 目测 |
+| S4 | 工作区文件树 | **只在票 182 票面的目测清单里**；尺 `grep -rln "文件树" .scratch/wisp/issues/*.md` ⇒ 票 77／票 186 里**没有**这三个字（本程 14:5x 现跑，命中集合见 `probes/182/c1/stack-rulers-precise.txt`） |
+| S5 | 内置终端 | 票 77:364／:384（右栏标签之一）＋票 182 目测＋D34 表 `PLAN.md:2569` 的 `shell.session` 行 |
+| S6 | 浏览器 | 票 77:364／:384（右栏第三标签）；票 182 目测清单**没有它** ⇒ 本程按仓内文本补进堆数 |
+| S7 | 成本与 token | 票 182 目测清单 ＋ **票 145 那张十四行表的第 12 行**（`docs/evidence/s1/145-snapshot-field-census-r1.md:182` 逐字 `| 12 | :3486 | 成本 | \`Cost{In,Out,Cached,Micros,Currency}\` | ✅ 五枚全有源 |`；该行对应的 `PLAN.md` 真身今天在 `:3492`，票 145 引的号已漂 6 行） |
 
-TBD
+堆数口径：S1–S7 是我能从**仓内文本**逐枚点名的堆；owner 目测清单里那六项**全部落进**了 S1–S7，
+没有被丢掉或被合并。**没有一列"其它"**——那一栏里若还有别的堆，需要下一位以仓内文本为准补点名。
+
+## 5. 票 182 AC#2 — 逐堆三档定性（每档一条现跑尺）
+
+尺与命中数原始读数：`.scratch/wisp/probes/182/c1/stack-rulers.txt` 与 `stack-rulers-precise.txt`。
+正控（证明尺本身能打数）：同一批调用里 `任务/会话状态机` 那把尺命中 **34**、
+`成本 token 用量` **12**、`fs list / tree` **11** ⇒ **"0 命中"这几发不是尺坏了**。
+
+| 堆 | 三档 | 现跑尺 ⇒ 命中 | 取到真值要从哪枚函数走 |
+|---|---|---|---|
+| S1 子代理 | **规格真空**（别造） | `grep -rnE "(Subagent\|sub_agent\|SpawnAgent\|DelegateTask\|fanout)" --include=*.go internal/ cmd/` ⇒ **0** | 无源可走：产品里今天**没有**子代理这一层 |
+| S1 后台任务 | **有源**（缺载体） | `grep -n "type TaskRoster" -A / Roster` ⇒ `internal/tools/task.go:110` 在场，生产写入者 `task_backfill.go:115` | `TaskRoster.Record/Look/Count`（`internal/tools/task.go:123/139/152`）；装配点 `cmd/wisp/run.go:364`＋`:639`。⚠ 它存的是 `TaskOutput`（输出续读用），**没有状态／耗时／名字** ⇒ 借它显示"任务在跑什么"要新加维度 |
+| S2 本地路径 | **有源**（已有载体） | `grep -rn "type WorkspaceView" -A 12 internal/panel/` ⇒ `composer.go:174-186`（`Set/Spelling/Canonical/Reparse/Rewritten`） | `panel.NewComposerState`（`composer.go:210`）→ 已在 `Snapshot.Composer.Workspace`；落地者＝票 92（`-done`） |
+| S2 分支／工作树 | **无源但已有人要求**（票 181，非冻结契约） | `grep -rnE "\b(HEAD\|branch\|worktree)\b" --include=*.go internal/panel/ internal/config/ cmd/` ⇒ 6 命中**全是注释里的 control-flow "branch"**，真 git 读面 **0** | 无：今天没有任何函数读 `.git/HEAD`。唯一 git 命中来自 `internal/risk/blacklist.go:214-217,329`（`.git-credentials`／`.git/config` 的**拉黑路径分类**，是判级不是读面） |
+| S2 未提交枚数 | **规格真空**（票 182 AC#4 把它划给"本票那一堆"，但本票只普查不实现） | 同 S3 尺 ⇒ **0** | 无 |
+| S3 审查 diff | **无源＋规格真空** | 尺（票 182 现量第 4 条同形）`grep -rn "git diff\|diff --numstat\|numstat\|unified diff" --include=*.go internal/ cmd/` ⇒ **0** | 无 |
+| S4 文件树 | **模型侧有源、宿主侧读面无源；面板那一维规格真空** | `grep -rn "FSListDecl\|fs\.list" --include=*.go internal/ cmd/` ⇒ 11 命中，全在 `internal/tools/fs.go`（`:190 Name() "fs.list"`、`:307 FSListDecl`）与注释 | 真值走 `fs.list` 的执行体（`internal/tools/fs.go`），但它带 **D34 风险分级**（`PLAN.md:2534` 逐字 `| \`fs.list\` | 列目录 | L0 / L2（越界） | \`fs.read\` | S3 | — |`），且是**模型调用面**不是宿主读面 ⇒ 见 §6 那句"要不要共享实现" |
+| S5 内置终端 | **工具那一维＝无源但规格要求（D34 表内行）**；**面板载体＝规格真空** | `grep -rnE "\b(PTY\|pty\|ShellSession\|shell\.session)\b\|cmd\.exe" --include=*.go internal/ cmd/` ⇒ **1 命中且是注释**（`internal/risk/rules_shell.go:10` 讲 cmd.exe 转义），PTY 零命中 | 无：`shell.session` 在 D34（`PLAN.md:2569` 逐字 `| **\`shell.session\`** | **在一条活着的会话里跑下一条命令（工作目录与环境延续）** | **L2** | \`shell\` | S3 | 票 163（20…`）但**生产注册表里没有它**——现跑尺 ⇒ 生产在册工具名只有 `"fs.read" "fs.list" "fs.edit" "fs.delete" "fs.move" "fs.trash" "fs.write" "task.output"`（`internal/tools/*.go` 的 `Name()` 集合 × `cmd/wisp/run.go:345/365` 两个注册循环） |
+| S6 浏览器 | **无源**；⛔ **实现路径＝未定义即停项，本程不判** | `grep -rnE "browser\|Browser" --include=*.go internal/ cmd/` ⇒ 6 命中全在 `internal/risk/blacklist.go:227-239`（浏览器凭据库拉黑）与 `cmd/wisp/panel_assets.go:8` 注释 | 无。**`web.search` 实现路径是 `AGENTS §2` 逐字列出的"未定义即停"项（S3 前）** ⇒ 碰到就停手，不选路 |
+| S7 成本／token | **有源**（缺载体） | `grep -rnE "(CostOf\|TrackCost\|total_tokens\|TotalTokens\|microUSD\|MicroUSD)" --include=*.go internal/ cmd/` ⇒ **12** 命中 | `internal/agent/cost.go:38 AddUsage(p config.Price, u llm.Usage) int64` → `guard.go:155 AddCost` → `loop.go:976 publishUsage`；实时 token 另有 `llm.StreamEvent.Usage`（票 145 表 §2.13 已点名）。⚠ 票 145 那行还挂着**单位口径未定案**（`config.Price` 是 micro-USD，`task_log.currency` 默认 CNY） |
 
 ## 6. 票 182 AC#3 — 逐堆归属指认表（含「没票认领」那一列）
 
-TBD
+⚠ 规矩：指认前**逐枚现跑**过那张票的 AC 标题（`grep -n "AC#" <票文件>`），命中的原文列在下面；
+近亲票（186 的 git 切换、187 的模型档位）**不拿来填空**。
+
+| 堆 | 归属 | 现跑凭据（那张票的 AC 逐字／或其反证） |
+|---|---|---|
+| S1 后台任务状态 | **没票认领 ⇒ 要立票** | 票 145 十四行表**逐行点名**只有：思考中／SSE 流式／推理过程／工具调用／工具调用（展开）／审批等待／L2 确认卡／L1 阻止窗口／L2 原生降级卡／错误／Stuck／成本／已取消／注入检出——**没有"后台任务"这一行**（尺：`sed -n '168,192p' docs/evidence/s1/145-snapshot-field-census-r1.md`） |
+| S1 子代理 | **没票认领 ⇒ 要立票，且先得有规格**（规格真空） | issue 池全文尺 `grep -rlniE "任务监控\|文件树\|内置终端" .scratch/wisp/issues/*.md` ⇒ 只 3 枚（182／186／77），"子代理"在产品侧零命中 |
+| S2 本地路径 | **已有票落地**（票 92，已 `-done`） | `92-panel-composer-mode-attachments-workspace-done.md` AC#3 逐字"工作区选择：一次真实切换后，**(i)** 后续操作的风险判定用的是新工作区" |
+| S2 分支／工作树（只读显示） | **票 181** | 票 181 AC#1 逐字"① 当前分支（`.git/HEAD` 的 `ref:` 行…）；② 本地分支列表＋远端分支名…③ 已有工作树（`.git/worktrees/` 目录枚举）" ⇒ 这一堆**真写着这件事** |
+| S2 未提交枚数／提交／推送 | **没票认领 ⇒ 要立票**（＋动作那一半是雷区，见 §7） | 票 181 AC#4 只管"非 git 目录那一形"的显示；票 186:48 逐字"不动输入框宽度（＝票 180）、**不裁任务监控那一栏缺哪些堆（＝票 182）**" ⇒ 186 明确不认领 |
+| S3 审查 diff | **没票认领 ⇒ 要立票** | 票 181 AC#3 逐字"交付里**不许出现**任何模型可调用的 `git.*` 工具…`internal/panel/bridge.go:42-45` 那四枚 `panel.*` **一枚不许加**" ⇒ 181 只走只读快照通道，不含 diff |
+| S4 文件树 | **没票认领 ⇒ 要立票** | 无一张票的 AC 写着"面板显示工作区树"；`fs.list` 的票面归口是 S3 工具切片（D34 行 `PLAN.md:2534`），不是面板载体 |
+| S5 内置终端（工具地基） | **票 163（只登记依赖，本程不重开）** | 票 163 AC#1b 逐字"`shell.exec` 与 `shell.session` 两枚名字在生产注册表里都不存在…差集非空就不许进实现格"（与 §5 现跑在册名册一致） |
+| S5 内置终端（面板载体） | **没票认领 ⇒ 要立票** | 票 163 的 AC 全是工具/会话本体，无"面板"字样 |
+| S6 浏览器 | **没票认领（Go 侧）**；前端标签在票 77 | 票 77:364／:384 是**组件清单不是 Go 数据源**（票 182 现量第 1 条同判）；⚠ 实现路径撞 `AGENTS §2` 未定义即停项 |
+| S7 成本／token | **票 145 第 12 行**（落地格 AC#2 未勾）＋ 配额那一层票 44 | 票 145 表行 12 逐字见 §4 表末；票 83 AC#1 表 `:156` 逐字 `| \`cost.{daily_budget,monthly_budget,alert_threshold,over_budget}\` | … | 📋 票 44（C23） |` |
+
+**AC#3 特别要答的那一句（宿主侧读面 vs 模型侧工具要不要共享实现）——本程只报现状、交编排者裁**：
+- 现状：仓里已经有**两次**把边界写成"只读显示不走模型工具"的定案文本——
+  票 181 AC#3（"只读显示走**已有的快照推送通道**，不需要新请求方法"）与
+  票 186 AC#5（"不许把切换能力塞进 `internal/tools/` 的执行面"）。
+- 风险点：`fs.list`／`task.output` 都是**带 D34 风险分级的模型调用面**（`fs.list` 是 `L0 / L2（越界）`）。
+  面板若直接复用同一执行体，就把这两级**渗进面板通道**（反向是把面板变成执行面）；
+  若另写一份宿主侧读面，则同一目录列表**两份实现**会漂（票 146 那族"显示与真用分账会静默漂"同形）。
+  ⇒ **两条都有代价，本程不选，交编排者裁**。
 
 ## 7. 票 182 AC#5 — 雷区清单（逐堆：有无面板发起的批准／写动作）
 
-TBD
+禁令逐字（`AGENTS §1.2` 抄自 SPEC-06/票 141 交付版）：**"由面板侧来源的 L2『允许』"** 是禁止项；
+已定案口径逐字（`docs/PLAN.md:2027`）：
+`① **L2 的「允许」决策不接受来自面板的调用**（\`approval.decide\` 服务端直接拒绝 panel 来源的 allow）`
+`② 面板只提供**「拒绝」与「查看完整参数」**…③ 批准只能由原生侧产生：**悬浮球点击 / 原生确认卡按钮 / 全局快捷键**`
 
-## 8. 面板要的字段清单（交编排者转前端会话）
+| 堆 | 有无面板发起的批准／写动作 | 现状凭据（现跑） |
+|---|---|---|
+| S1 后台任务状态 | **无**（只读） | `Snapshot` 四枚里没有任务字段（`composer.go:57-62`） |
+| S2 环境信息 | ⚠ **有（在"提交或推送"那一项上）** | owner 目测清单里那一支就是写动作；`git` 子进程今天全仓零次（§5 尺）；票 181 票面标题逐字"…the **two mutating actions** would need C17 whitelist methods" ⇒ **待人拍板**，不许并进只读那一堆 |
+| S3 审查 diff | 只读那一半**无**；⚠ "接受／回滚改动"那一半＝写动作（`fs.write`／`fs.edit` 级，L2） | 今天 diff 零源 ⇒ 两半都不存在；登记为**立票时的边界** |
+| S4 文件树 | 只读**无**；⚠ 树上带删除／移动＝写动作（在册 `fs.delete`／`fs.trash`／`fs.move` 全 L2） | 生产在册名册（§5 S5 行） |
+| S5 内置终端 | ⚠ **最大雷**：面板里敲命令＝执行面进面板通道；批准来源问题直接撞 `PLAN.md:2027` ①③ | 票 163 AC#4 逐字"常驻会话**不许**变成'授权一次就一直放行'…不许动 `internal/agent/approval/**`" |
+| S6 浏览器 | 只读浏览无；⚠ 若带"在页面里执行/登录"＝撞 `AGENTS §1.2` 的"只靠 CSP＋净化的方案已被否决"（`PLAN.md:2027` ⑤） | 零源 |
+| S7 成本／token | **无**（只读） | `publishUsage` 是出站播报，不是入口 |
+| （参照格）审批卡 | **现状合规**：面板四枚方法里没有 `decide`／`allow` | `internal/panel/bridge.go:42-45` 逐字四枚＝`panel.mode.request`／`panel.workspace.request`／`panel.attachment.add`／`panel.message.send` |
 
-TBD
+⇒ **本程不提"顺手把批准接上"**；上表 4 处 ⚠ 一律**单列为待人拍板项**（见 §12）。
+
+## 8. 面板要的字段清单（交编排者转前端会话；本程不写 `frontend/**`、不裁 TS interface）
+
+枚数＝**8 枚**（A 组 1 ＋ B 组 7）。来源逐枚标注"已存在／要新写／规格真空"。
+
+| # | 字段（Go 侧候选名） | 属哪堆 | 来源档位 |
+|---|---|---|---|
+| A1 | `Panel.Width`（＋同段 `Height`/`Scale`/`KeepAliveInSession`） | 票 180 | **字段已在、值无读者**；`Width`/`KeepAliveInSession` 带 `default`，`Height`/`Scale` 连 `default` 都没有（`schema.go:525-535`）⇒ 生效链整条缺（宿主不存在） |
+| B1 | `Run.Phase`／后台任务状态 | S1 | **无源**（子代理）／**有源缺载体**（`TaskRoster`，但没有状态维） |
+| B2 | `Env.Branch`／`Env.Worktrees` | S2 | **无源**，票 181 已要求（AC#1 三支） |
+| B3 | `Env.UncommittedCount` | S2 | **无源＋规格真空** |
+| B4 | `Review.Diff` | S3 | **无源＋规格真空** |
+| B5 | `Tree.Entries` | S4 | 模型侧有源（`fs.list`）／宿主侧无源＋规格真空 |
+| B6 | `Terminal.Session` | S5 | **无源**，工具地基＝票 163（在册零实现） |
+| B7 | `Cost{In,Out,Cached,Micros,Currency}` | S7 | **五枚全有源**（票 145 行 12），缺载体＋单位口径未定案 |
 
 ## 9. 本程没测什么（逐名）
 
