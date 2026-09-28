@@ -727,3 +727,50 @@ func TestComposerRenderFixtureTellsTheTruth(t *testing.T) {
 	}
 	t.Logf("render fixture verified across %d painted states", len(blocks))
 }
+
+// TestComposerCurrentModelTravelsOnlyFromItsReader is ticket 145 AC#6 for the
+// composer.currentModel key: the packet carries exactly what the model reader
+// handed the pump, and a pump assembled without that reader names no model.
+//
+// The producer this rides on is cmd/wisp/panel_pump.go's currentModel() over
+// llm.Endpoint.Model (internal/llm/resolver.go:46), handed over at the one
+// production assembly root (cmd/wisp/run.go, the PumpSources literal next to the
+// git reader). Nothing in this file fills a constant, and the two arms are
+// stated apart on purpose: "nobody read it" and "the read came back blank" are
+// the same blank string with different flags, which is what lets the renderer
+// say 未探测 instead of lying that no model exists.
+func TestComposerCurrentModelTravelsOnlyFromItsReader(t *testing.T) {
+	snap := NewSnapshotPump(PumpSources{
+		Model: func() string { return "deepseek-v4-pro" },
+	}).Snapshot()
+	if snap.Composer.CurrentModel != "deepseek-v4-pro" {
+		t.Errorf("composer.currentModel = %q, want the reader's bytes verbatim", snap.Composer.CurrentModel)
+	}
+	if !snap.Composer.ModelKnown {
+		t.Error("composer.modelKnown = false for a model a reader named")
+	}
+
+	bare := NewSnapshotPump(PumpSources{}).Snapshot()
+	if bare.Composer.CurrentModel != "" {
+		t.Errorf("no reader named a model: composer.currentModel = %q, want blank", bare.Composer.CurrentModel)
+	}
+	if bare.Composer.ModelKnown {
+		t.Error("no reader means modelKnown=false - an unread model is never rendered as a known one")
+	}
+
+	blank := NewSnapshotPump(PumpSources{Model: func() string { return "" }}).Snapshot()
+	if blank.Composer.CurrentModel != "" || blank.Composer.ModelKnown {
+		t.Errorf("empty read gave currentModel=%q known=%v, want blank+false",
+			blank.Composer.CurrentModel, blank.Composer.ModelKnown)
+	}
+
+	data, err := NewSnapshotPump(PumpSources{
+		Model: func() string { return "glm-5" },
+	}).Marshal()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(data), `"currentModel":"glm-5"`) {
+		t.Errorf("the exit bytes do not carry the reader's model:\n%s", data)
+	}
+}
