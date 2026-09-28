@@ -619,7 +619,26 @@ func (rt *agentRuntime) execute(task string) int {
 	ctx, cancel := context.WithTimeout(context.Background(),
 		time.Duration(cfg.LLM.TimeoutMS)*time.Millisecond)
 	defer cancel()
-	res := loop.Run(ctx, task)
+	// 起跑口（票 176-r1）：这一程的任务走**现成**的异步入口
+	// internal/agent/loop.go:321，而不是新造一枚同类函数。三件事是这条线的全部要求：
+	//   ① id 仍由环路铸（RunningTask.ID / res.TaskID）。组合根自造 id 直接上桥
+	//      是上面那段说明里已经登记过的未收口开放端，不走那条路。
+	//   ② 名册回填只在 Wait() 之后：那枚 Wait 同时 join 结果信号与登记册句柄，
+	//      所以任务真的收口（D38e 的 join 计数归零）以后才有人写它的输出。
+	//   ③ 写之前看一眼取消态：被取消掉的任务不再回填（票 176 AC#3 的正方；
+	//      判据本体与反向读数在 internal/tools/ticket176r1_start_port_test.go）。
+	// 回填走真落盘那套：spills 用的就是环路自己那枚 D15(3) 写入器（同一
+	// artifacts 目录、同一份缩放后的预算），产物 key 带 agent-task- 前缀，
+	// 不与模型 supplied 的 call id 共用命名空间（internal/tools/task_backfill.go）。
+	bg := loop.RunAsync(ctx, task)
+	res := bg.Wait()
+	_, why := (tools.TaskBackfill{
+		Roster: rt.tasks,
+		Spills: agent.NewSpiller(filepath.Join(rt.spec.dataDir, "artifacts"), loop.Budgets()),
+	}).Backfill(bg.Root().Ctx, res.TaskID, res.Text)
+	if why != "" {
+		rt.auditf("wisp run: 后台任务的输出没有进名册：%s", why)
+	}
 
 	class := ""
 	if res.Err != nil {
