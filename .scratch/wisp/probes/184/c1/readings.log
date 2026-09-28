@@ -1,0 +1,238 @@
+184-c1 census  date=2026-09-28 13:10:40  HEAD=0662a35aba55b523d3f5f8bb8f99f9d83ba4a6b6  branch=dev
+git status --porcelain -- internal/ cmd/ :
+[end status]
+==================== 8 RULERS (re-measured vs ticket) ====================
+
+### CMD: git show HEAD:internal/agent/journal.go | grep -n -B1 -A8 'Decision values'
+27-
+28:// Decision values (tool_call.decision). Ticket 21 replaces the pass-through
+29-// decision with real gate outcomes; the vocabulary is already frozen here.
+30-const (
+31-	DecisionAllow      = "allow"
+32-	DecisionAllowGrant = "allow_session_grant"
+33-	DecisionReject     = "reject"
+34-	DecisionTimeout    = "timeout"
+35-	DecisionBatchAggr  = "batch_aggregated"
+36-)
+
+### CMD: git show HEAD:internal/memory/models.go | grep -n -A9 'toolCallDecisions'
+135:// toolCallDecisions are the tool_call.decision enum values (DDL comment).
+136:var toolCallDecisions = map[string]bool{
+137-	"allow":               true,
+138-	"allow_session_grant": true,
+139-	"reject":              true,
+140-	"timeout":             true,
+141-	"batch_aggregated":    true,
+142-}
+143-
+144-// toolCallOutcomes are the tool_call.outcome enum values (DDL comment).
+145-var toolCallOutcomes = map[string]bool{
+--
+173:	if tc.Decision != "" && !toolCallDecisions[tc.Decision] {
+174-		return fmt.Errorf("memory: invalid tool_call.decision %q", tc.Decision)
+175-	}
+176-	if tc.Outcome != "" && !toolCallOutcomes[tc.Outcome] {
+177-		return fmt.Errorf("memory: invalid tool_call.outcome %q", tc.Outcome)
+178-	}
+179-	if tc.ErrorClass != "" {
+180-		return observe.ValidateErrorClass(tc.ErrorClass)
+181-	}
+182-	return nil
+
+### CMD: git show HEAD:internal/memory/models.go | grep -n -A2 'invalid tool_call.decision'
+174:		return fmt.Errorf("memory: invalid tool_call.decision %q", tc.Decision)
+175-	}
+176-	if tc.Outcome != "" && !toolCallOutcomes[tc.Outcome] {
+
+### CMD: git show HEAD:internal/memory/dao_toolcall.go | grep -n -A4 'func (s \*Store) DecideToolCall'
+45:func (s *Store) DecideToolCall(ctx context.Context, id int64, decision string, grantID *int64) error {
+46-	if !toolCallDecisions[decision] {
+47-		return fmt.Errorf("memory: invalid tool_call.decision %q", decision)
+48-	}
+49-	now := observe.NowWallUTC().Unix()
+
+### CMD: git show HEAD:docs/specs/SPEC-02-data-storage.md | nl -ba | sed -n '78,80p'
+    78	  risk_level     TEXT NOT NULL,          -- 'L0'|'L1'|'L2'
+    79	  decision       TEXT,                   -- 'allow'|'allow_session_grant'|'reject'|'timeout'|'batch_aggregated'
+    80	  decided_at     INTEGER,
+
+### CMD: git show HEAD:docs/PLAN.md | grep -n '取证记录'
+2703:| `tool_call` | `id` PK, `task_id` FK, `seq`, `tool`, `args_json`, **`risk_level`**, **`decision`**, `decided_at`, `started_at`, `ended_at`, `outcome`, `error_class`, **`correlation_id`**, `grant_id` | `task_id,seq` · `correlation_id` | **30 天** | **取证记录**：每次工具调用与审批决策。owner 是隐私敏感用户 —— **"它到底对我的机器做了什么"必须可查**，这是信任的前提。`grant_id` 关联 D45 的会话授权 |
+
+### CMD: git grep -n -I 'GrantID:' HEAD -- internal/ cmd/ ; echo rc=$?
+rc=1
+
+### CMD: git grep -n -I 'DecideToolCall(' HEAD -- internal/ cmd/
+
+### CMD: git show HEAD:internal/memory/privacy.go | grep -n -A2 'if r.Decision != ""'
+100:			if r.Decision != "" {
+101-				detail += " · " + r.Decision
+102-			}
+
+### CMD: git show HEAD:internal/tools/bridge.go | grep -n 'dec.DecisionColumn = agent.DecisionAllow'
+374:		dec.DecisionColumn = agent.DecisionAllow
+386:			dec.DecisionColumn = agent.DecisionAllow
+400:			dec.DecisionColumn = agent.DecisionAllow
+
+### CMD: git show HEAD:internal/agent/loop.go | grep -n 'j.decide(ctx, rowID, DecisionAllow)'
+794:		j.decide(ctx, rowID, DecisionAllow)
+803:		j.decide(ctx, rowID, DecisionAllow)
+
+### CMD: git show HEAD:internal/agent/journal.go | grep -n -A7 'func riskColumn'
+150:func riskColumn(risk string) string {
+151-	switch risk {
+152-	case memory.RiskL1, memory.RiskL2:
+153-		return risk
+154-	default:
+155-		return memory.RiskL0
+156-	}
+157-}
+
+### CMD: git show HEAD:internal/agent/journal.go | grep -n 'riskColumn('
+80:		RiskLevel:     riskColumn(risk),
+150:func riskColumn(risk string) string {
+
+### CMD: git grep -n 'PassThroughUnclassifiedRisk' HEAD -- internal/ cmd/ | grep -v '_test.go'
+
+### CMD: git grep -n 'PassThroughUnclassifiedRisk: true' HEAD
+HEAD:wisp/probes/154/census-pairs.txt:369:352d3d8:internal/agent/harness_test.go:116:		PassThroughUnclassifiedRisk: true,
+==================== AC#1 five booking sites + neighbours ====================
+
+### CMD: git show HEAD:internal/tools/bridge.go | nl -ba | sed -n '371,416p'
+   371	func (b *Bridge) route(ctx context.Context, dec *Decision, sil risk.Silenced) (bool, string) {
+   372		switch sil.Level {
+   373		case risk.L0:
+   374			dec.DecisionColumn = agent.DecisionAllow
+   375			return true, ""
+   376	
+   377		case risk.Deny:
+   378			dec.DecisionColumn = agent.DecisionReject
+   379			return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
+   380	
+   381		case risk.L1:
+   382			a, why := b.gate.PendingWindow(ctx, *dec)
+   383			switch a {
+   384			case AnswerAllow, AnswerTimeout:
+   385				// The L1 window running out unopposed MEANS EXECUTE (SPEC-06 §2).
+   386				dec.DecisionColumn = agent.DecisionAllow
+   387				return true, ""
+   388			case AnswerVeto:
+   389				dec.DecisionColumn = agent.DecisionReject
+   390				return false, orDefault(why, "用户在 L1 确认窗口中否决了本次操作")
+   391			default:
+   392				dec.DecisionColumn = agent.DecisionReject
+   393				return false, orDefault(why, "L1 确认窗口未放行，已拒绝执行")
+   394			}
+   395	
+   396		case risk.L2:
+   397			a, why := b.gate.PendingApproval(ctx, *dec)
+   398			switch a {
+   399			case AnswerAllow:
+   400				dec.DecisionColumn = agent.DecisionAllow
+   401				return true, ""
+   402			case AnswerTimeout:
+   403				// The queue never waits forever: an unanswered L2 auto-REJECTS
+   404				// (ticket 21), deliberately the opposite polarity from L1.
+   405				dec.DecisionColumn = agent.DecisionTimeout
+   406				return false, orDefault(why, "审批超时未确认，已自动拒绝")
+   407			default:
+   408				dec.DecisionColumn = agent.DecisionReject
+   409				return false, orDefault(why, "L2 审批未通过，已拒绝执行")
+   410			}
+   411	
+   412		default:
+   413			// An impossible level means a broken judge: fail closed (R9's posture).
+   414			dec.DecisionColumn = agent.DecisionReject
+   415			return false, "风险判定返回了不可能的等级，已 fail-closed 拒绝"
+   416		}
+
+### CMD: git show HEAD:internal/agent/loop.go | nl -ba | sed -n '783,806p'
+   783	func (l *Loop) decideRisk(ctx context.Context, j *taskJournal, rowID int64, info ToolInfo) (ok, unbooked bool, why string) {
+   784		risk := info.RiskLevel
+   785		switch risk {
+   786		case RiskL1, RiskL2:
+   787			if l.opt.AdmitTask == nil {
+   788				j.decide(ctx, rowID, DecisionReject)
+   789				return false, false, "该操作属于 " + risk + " 级，审批通道尚未接入（ticket 21），已拒绝执行"
+   790			}
+   791			return true, true, ""
+   792		case RiskL0:
+   793			// A declared tier, the lowest one: run it, interrupt nobody (D4).
+   794			j.decide(ctx, rowID, DecisionAllow)
+   795			return true, false, ""
+   796		default:
+   797			// Reached only by RiskUnclassified ("") and by anything the directory
+   798			// declares no tier for; both fail closed while the switch is off.
+   799			if !l.opt.Config.PassThroughUnclassifiedRisk {
+   800				j.decide(ctx, rowID, DecisionReject)
+   801				return false, false, "风险未分级且直通开关关闭，已拒绝执行"
+   802			}
+   803			j.decide(ctx, rowID, DecisionAllow)
+   804			return true, false, ""
+   805		}
+   806	}
+
+### CMD: git show HEAD:internal/tools/bridge.go | nl -ba | sed -n '943,965p'
+   943		decision := dec.DecisionColumn
+   944		if decision == "" {
+   945			decision = agent.DecisionAllow
+   946			if kind != OutcomeKindSuccess {
+   947				decision = agent.DecisionReject
+   948			}
+   949		}
+   950		outcome := kind.outcomeColumn()
+   951		errClass := kind.errorClass()
+   952		tc := memory.ToolCall{
+   953			TaskID:        req.TaskID,
+   954			Seq:           b.nextSeq(req.TaskID),
+   955			Tool:          req.Name,
+   956			ArgsJSON:      sanitizeArgs(req.Args),
+   957			RiskLevel:     dec.LevelString(),
+   958			Decision:      decision,
+   959			Outcome:       outcome,
+   960			ErrorClass:    errClass,
+   961			CorrelationID: orDefault(req.CorrelationID, req.TaskID),
+   962		}
+   963		if _, err := b.j.InsertToolCall(ctx, tc); err != nil {
+   964			b.log("tools: tool_call insert failed task=%s tool=%s: %v", req.TaskID, req.Name, err)
+   965		}
+==================== AC#2 decision-COLUMN readers (not the tools.Decision struct) ====================
+
+### CMD: git grep -nE 'if r.Decision|\+ r.Decision|r\.Decision !=|got\.Decision|\.Decision = decision' HEAD -- internal/ cmd/
+
+### CMD: git grep -nE 'tools\.Decision|risk\.Decision' HEAD -- cmd/ internal/panel/ internal/tools/bridge.go internal/agent/approval/ | head
+==================== AC#4 cost-table inputs ====================
+
+### CMD: git show HEAD:internal/memory/schema.go | grep -n -A3 'Enum-shaped columns'
+14:// Enum-shaped columns (task_log.error_class, tool_call
+15-// risk_level/decision/outcome) are validated at the DAO layer
+16-// (observe.ValidateErrorClass and friends), NOT as SQL CHECKs, precisely so
+17-// this text never forks from the spec.
+
+### CMD: git show HEAD:internal/memory/schema.go | grep -n 'decision '
+76:  decision       TEXT,                   -- 'allow'|'allow_session_grant'|'reject'|'timeout'|'batch_aggregated'
+
+### CMD: git show HEAD:internal/memory/schema.go | grep -nE 'migrationChain|{from:|SchemaVersionTarget'
+122:// SchemaVersionTarget is the schema version this binary produces (SPEC-02 §3:
+129:const SchemaVersionTarget = 2
+166:// migrationChain is the ordered version chain. The base step creates the
+168:var migrationChain = []migrationStep{
+169:	{from: 0, to: 1, apply: applyV1},
+170:	{from: 1, to: 2, apply: applyV2},
+
+### CMD: git grep -n 'SchemaVersionTarget' HEAD -- internal/memory/schema.go
+
+### CMD: git grep -nE 'len\(.*[Dd]ecision\)|== 5|five decision' HEAD -- '*_test.go' ; echo rc=$?
+rc=1
+
+### CMD: git ls-files HEAD 2>/dev/null | grep -iE 'migration' ; echo rc=$? ; echo "[migration dir search done]"
+rc=1
+[migration dir search done]
+==================== AC#5b D45 approval_grant PRODUCERS (non-test) ====================
+
+### CMD: git grep -n 'InsertGrant(' HEAD -- internal/ cmd/ | grep -v '_test.go' ; echo rc=$?
+rc=1
+==================== AC#6 decision VALUES passed to j.decide (out-of-map risk) ====================
+
+### CMD: git grep -n '\.decide(ctx\|\.decide(wctx' HEAD -- internal/agent/loop.go
+[census done]
