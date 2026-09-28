@@ -191,6 +191,34 @@ cb14a8b237382b32d4d2a442c9eddd63741d83cc 180-a1(片①): 票 180 Progress log �
 5. **`TaskOutput` 到底该装哪几枚任务态**＝未定案（§5 冲突 2），我不替规格填。
 6. 起手名册里的 30 枚 `design/**` 删除与 `docs/evidence/s1/152-...-accept-r1.md` 那处脏改**不是我动的**，本程一律不碰、不还原、不提交。
 
+## 8. 终态闸门：逐枚具名差集（锚 `11028523` 前一刻现跑）
+
+```
+$ awk 'f&&/^```/{exit} /^## 0\./{g=1} g&&/^```/{f=1;next} f{print}' <本件> | sort > /tmp/188r1-start.txt
+$ git status --porcelain | sort > /tmp/188r1-end.txt
+start=76 end=78
+--- 起手有、终态无 ---
+?? .scratch/wisp/dispatches/2026-09-28-175x-wave-data-carriers-182a-180a-189a-190a-188r.md
+--- 终态有、起手无 ---
+?? .zcodeignore
+ M .scratch/wisp/issues/189-the-review-stack-needs-uncommitted-count-and-per-file-diff-but-go-side-has-zero-source.md
+ M docs/evidence/s1/145-snapshot-growth-r2.md
+?? .scratch/wisp/probes/145/r2/gate-final-panel.txt
+?? docs/evidence/s1/189-uncommitted-count-design-a1.md
+```
+
+逐枚归属（**本程一枚都不是自己造的脏件**）：
+- `?? .zcodeignore`：**本件 §0 抄录时漏了一枚**（起手 `git status` 原文里它有，见本报告第一条工具输出）。更正走"追加新条目"、不改写上面 §0 那 76 行正文——这一格就是那处更正。不是脏件。
+- dispatch 那枚从 `??` 消失：编排者把派单文件提交了（别人 commit 掉，不是本程删除）。
+- `189-*.md`／`145-snapshot-growth-r2.md`／`probes/145/r2/gate-final-panel.txt`／`189-uncommitted-count-design-a1.md`：`189-a1`／`145-r2`／`182-a1` 三条腿在飞期间新产生的脏件，本程一律未碰。
+- 本程的四枚提交只带显式 pathspec，逐枚是 `docs/evidence/s1/188-task-state-r1.md`（片①②③）与票 188 那枚工单（片④），**零产码、零 `internal/**` 写面**；`git show --name-only` 已贴在 §1.3/1.4。
+
+## 9. 结论（写给编排者的那一句）
+
+`AC#2` 这一格**未落**，落点在写面外＋映射表是规格真空＋写面内既有断言会红三件事同时成立；
+需要的是 (i)/(ii) 那一枚具名解冻，以及"后台任务态 -> D43 那 20 枚名字"的定案归属。
+`AC#1`（子代理那一维）与 `internal/panel/**` 本程**一枚未碰**。
+
 ## 1.3 / 1.4 本程两枚提交的原文（逐枚 `git show --name-only`）
 
 ```
