@@ -113,6 +113,9 @@ func packetTasks197(t *testing.T, data []byte) carrier197Wire {
 	if err := json.Unmarshal(raw, &sect); err != nil {
 		t.Fatalf("tasks section unreadable: %v (%s)", err, raw)
 	}
+	// The byte-level reading of the positive wire shape, so §② of the evidence
+	// file quotes bytes this run published rather than a Go struct it re-marshalled.
+	t.Logf("tasks wire bytes: %s", raw)
 	return sect
 }
 

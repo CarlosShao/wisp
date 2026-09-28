@@ -331,6 +331,12 @@ func Test197SpawnPublishesIdentityRow(t *testing.T) {
 	if got := h.streamText(key); !strings.Contains(got, "已派生") || !strings.Contains(got, "已结束") {
 		t.Errorf("这条子代理的流没有两段生命周期：%q", got)
 	}
+	// 收口的那一半（载体层 r3）：Close 也算这条流的一次写出，不是可选的装饰。
+	// 少了它，页面上这一行在一个早就结束的任务上永远显示"还在流"——
+	// consoleSink 对根任务做的正是这一步（agent.EvDone → Close）。
+	if !h.streamClosed(key) {
+		t.Errorf("流键 %q 在子代理收口后没有被 Close：那一页会一直显示在流", key)
+	}
 	if !strings.Contains(res.Text, foreign197A) {
 		t.Errorf("结论没有回到父任务：%q", res.Text)
 	}
