@@ -1,0 +1,3 @@
+ok  	github.com/CarlosShao/wisp/internal/risk	4.472s
+ok  	github.com/CarlosShao/wisp/internal/tools	15.961s
+ok  	github.com/CarlosShao/wisp/internal/agent	1.918s

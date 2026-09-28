@@ -1,0 +1,16 @@
+time=2026-09-28T16:42:19.895+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPointer185SecondRereadOfTheSameArtifactStaysClean
+--- PASS: TestPointer185SecondRereadOfTheSameArtifactStaysClean (0.03s)
+=== RUN   TestPointer185PagedRereadsKeepWorking
+    pointer_185_cli_seam_test.go:242: 读数：三发分页续读后 scope=185r1-paged 的 mark 枚数=4
+--- PASS: TestPointer185PagedRereadsKeepWorking (0.03s)
+=== RUN   TestPointer185ForeignFileCarryingTheHostPathStillBlocksTheReread
+--- PASS: TestPointer185ForeignFileCarryingTheHostPathStillBlocksTheReread (0.03s)
+=== RUN   TestPointer185AModelNominatedFileIsNotRostered
+--- PASS: TestPointer185AModelNominatedFileIsNotRostered (0.04s)
+=== RUN   TestPointer185AnotherTaskCannotBorrowTheRoster
+--- PASS: TestPointer185AnotherTaskCannotBorrowTheRoster (0.04s)
+=== RUN   TestPointer185SiblingHostArtifactIsNotLaundered
+--- PASS: TestPointer185SiblingHostArtifactIsNotLaundered (0.04s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.265s

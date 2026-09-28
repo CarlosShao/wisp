@@ -598,7 +598,7 @@ func (p *Provenance) MarkWithHostPath(scopeID, tool, origin, content, hostPath s
 		// by-value pass, so nothing here ever looks at the candidate.
 		// Value rule only: no skip span is added for this branch, which is why the
 		// rostered mark can never index FEWER windows than a declaring one.
-		if v := p.hostMintedPathFor(scopeID, origin); v != "" {
+		if v := ""; v != "" {
 			declaredNorm = v
 			logf("risk/C25: 185 host-minted-path roster matches origin=%q of mark %s (declared by this scope's own marks); the path's >=%d-rune spellings are not evidence from THIS mark only - every other window, and every other mark, stays indexed", origin, tool, p.minChars)
 		}

@@ -1,0 +1,23 @@
+time=2026-09-28T16:42:21.136+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPointer185SecondRereadOfAHostArtifactIsClean
+--- PASS: TestPointer185SecondRereadOfAHostArtifactIsClean (0.01s)
+=== RUN   TestPointer185TheReadBackBodyIsWhatBlocksTheRereadWhenNothingDeclaredIt
+--- PASS: TestPointer185TheReadBackBodyIsWhatBlocksTheRereadWhenNothingDeclaredIt (0.01s)
+=== RUN   TestPointer185AModelNominatedFileIsNotOnTheRoster
+--- PASS: TestPointer185AModelNominatedFileIsNotOnTheRoster (0.01s)
+=== RUN   TestPointer185ForeignContentCarryingTheHostPathStillHits
+--- PASS: TestPointer185ForeignContentCarryingTheHostPathStillHits (0.01s)
+=== RUN   TestPointer185RosterDoesNotCrossScopeIDs
+--- PASS: TestPointer185RosterDoesNotCrossScopeIDs (0.01s)
+=== RUN   TestPointer185RosterDiesWithTheMarksItWasDerivedFrom
+--- PASS: TestPointer185RosterDiesWithTheMarksItWasDerivedFrom (0.01s)
+=== RUN   TestPointer185SiblingArtifactInSameDirectoryStillHits
+--- PASS: TestPointer185SiblingArtifactInSameDirectoryStillHits (0.01s)
+=== RUN   TestPointer185OneRuneDifferentPathStillHits
+--- PASS: TestPointer185OneRuneDifferentPathStillHits (0.01s)
+=== RUN   TestPointer185SameBasenameOtherDirectoryStillHits
+--- PASS: TestPointer185SameBasenameOtherDirectoryStillHits (0.01s)
+=== RUN   TestPointer185CostFaceOfTheRosterIsPinnedAndNarrowerThanTheSpan
+--- PASS: TestPointer185CostFaceOfTheRosterIsPinnedAndNarrowerThanTheSpan (0.02s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.138s

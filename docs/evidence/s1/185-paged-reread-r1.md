@@ -86,3 +86,9 @@
   证据／产码与台账（派单 §开头写"再读工单本体与它的上游证据（必读）"，且 §2 每格都要"先测→再写"
   的未修码读数，量与行号都不许照抄票面）⇒ 骨架表落在第 **17** 枚。**这一格是本程的纪律违规，自报。**
   后果评估：零产码改动、零脏件、无假读数（起手名册在动码前就取全了）。
+
+## ⑬ appendix: machine readings (ASCII index; narrative cells ②-⑫ in the leg reply, this leg ran out of tool calls)
+
+- logs: .scratch/wisp/probes/185/r1/logs/tools-185-landed.txt, risk-185-landed.txt, pkg-tails.txt, panel-fails.txt
+- mutants + overlays: .scratch/wisp/probes/185/r1/mut-m1..m4, ov-m1..m4.json (pre/post md5 in the leg reply)
+- unfixed-anchor red readings: package risk and tools runs on HEAD production (git diff --stat empty), text in the leg reply

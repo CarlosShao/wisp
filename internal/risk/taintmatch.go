@@ -104,9 +104,13 @@ type fragmentIndex struct {
 	// positional exemption dies the moment the marked output happens to repeat
 	// one of the path's own windows. A candidate window whose spelling occurs
 	// inside declaredPath is therefore not evidence FROM THIS MARK ONLY - exact
-	// string comparison, never hash equality, and never a roster: the slice
-	// lives on this index and dies with this mark (Scope.Close drops it with
-	// every other window). Set by attachDeclaredPath before the mark is ever
+	// string comparison, never hash equality. Since ticket 185 (ledger A381) the
+	// same field is also everything the per-scope host-minted-path roster is
+	// made of (hostpath_185.go reads this scope's marks to exempt one read-back
+	// mark), and the sentence of this paragraph that still holds is the next one:
+	// the slice lives on this index and dies with this mark (Scope.Close drops it
+	// with every other window), because that roster is this projection and not
+	// stored state. Set by attachDeclaredPath before the mark is ever
 	// published, so readers still never observe a half-built index; it is read
 	// by contains, which is what makes it different from the write-only window
 	// spelling list adversarial report M-5 had deleted.
@@ -126,10 +130,17 @@ type fragmentIndex struct {
 // normalized text and contains() keeps verifying every hash hit through
 // strings.Contains, so no window the contract would call a fragment can be
 // invented by the exclusion, and every window clear of the spans is indexed
-// exactly as before. The spans are inputs to this one build: they are not
-// stored on the Provenance or on any scope (a per-scope path roster is
-// explicitly NOT approved; 177-c1 §2), so an exemption can only ever die with
-// the mark it was declared for. Spans must be located AFTER normalization
+// exactly as before. The spans are inputs to this one build: they are stored on
+// no Provenance and on no scope, so a POSITIONAL exemption can only ever die with
+// the mark it was declared for. Correction, ticket 185 (ledger A381,
+// owner-approved 2026-09-28 16:5x): the clause this paragraph used to carry —
+// that "a per-scope path roster is explicitly NOT approved" (177-c1 §2, A353) —
+// was overturned by that approval, so a scope-bound roster is now sanctioned
+// (撤销口令「撤分页」). What landed is its narrowest form (hostpath_185.go): a
+// roster DERIVED from the declaring marks of this very scope, never a stored
+// list, consulted for the provenance a mark already carries and never against
+// the candidate parameter, value rule only — so this build receives no new skip
+// span from that route. Spans must be located AFTER normalization
 // (see MarkWithHostPath) — a raw-byte offset into content is not a coordinate
 // in norm.
 func newFragmentIndex(norm string, n int, skip ...[2]int) *fragmentIndex {
