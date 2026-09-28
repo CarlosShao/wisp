@@ -15,15 +15,21 @@
    costs one hairline and never repeats a word. It is also the only shape that
    survives a 60-turn session without pushing the conversation off screen.
 
-   A note on react-bits, because the header of the vendored file claims
-   otherwise: the piece vendored as react-bits/animated-list.tsx is a
-   scale-and-fade-on-scroll list, not this. There is no Line Sidebar in that
-   repo to vendor, so this is built here over the same vocabulary the library
-   uses (a measured marker, transitions on transform/opacity only). Claiming it
-   were vendored would be a false provenance note in the tree.
+   A correction, and it is worth more than the component
+   ------------------------------------------------------
+   The first version of this file's header claimed that react-bits has no Line
+   Sidebar, and that this was therefore built here instead. **That was wrong.**
+   The local clone at D:\work\AI\component library\react-bits has
+   src/content/Components/LineSidebar, at the same commit everything else in
+   this tree was vendored from. The mistake was grepping the react-bits files
+   ALREADY vendored into this repo instead of the clone itself - and answering
+   a question about a library by looking at a five-file subset of it.
 
-   It stays hidden until there is more than one turn: a rail with a single mark
-   on it is furniture pretending to be a control.
+   So: the real component is react-bits/line-sidebar.tsx, vendored with its
+   provenance header, and IT is what a cursor-proximity rail should use. This
+   file is kept for the places that want a plain static list with no proximity
+   effect - which is a genuinely different thing, not a worse one. Two shapes,
+   two names, and the header of each says which is which.
    ============================================================================ */
 
 import { useEffect, useRef, useState } from "react";

@@ -346,12 +346,57 @@ check("a non-repo workspace must render no branch chip at all",
 check("the branch name must be read, never defaulted to a literal branch",
   /current:\s*string/.test(gitSrc) && !/current:\s*"main"/.test(gitSrc));
 
-// The turn rail for long conversations.
+// The turn rail for long conversations. Owner 2026-09-28 supplied the react-bits
+// LineSidebar source after the first cut claimed react-bits had no such
+// component - it does, in the local clone, and it is now vendored. These two
+// assertions are the memory: the component must stay vendored, and the honest
+// header on the hand-rolled list must keep saying it is the OTHER shape.
 const railSrc = readFileSync("src/components/turn-rail.tsx", "utf8");
+const lsSrc = readFileSync("src/components/react-bits/line-sidebar.tsx", "utf8");
+check("the cursor-proximity rail must be the vendored react-bits LineSidebar",
+  /from "@\/components\/react-bits\/line-sidebar"/.test(appSrc));
+check("LineSidebar must keep its provenance header (upstream commit + licence)",
+  /5480708039d5fba65741802f3811097ab81e3db5/.test(lsSrc) && /Commons Clause/.test(lsSrc));
+check("LineSidebar must carry no colour literal (upstream's three hexes are gone)",
+  !/#[0-9a-fA-F]{3,8}/.test(lsSrc) && !/#[0-9a-fA-F]{3,8}/.test(
+    readFileSync("src/components/react-bits/line-sidebar.css", "utf8")));
+check("LineSidebar must default its colours to tokens, not upstream's purple",
+  lsSrc.includes('"var(--accent)"') && lsSrc.includes('"var(--ink-3)"'));
+check("the hand-rolled list must not claim react-bits lacks the component",
+  /That was wrong|was wrong/.test(railSrc) && !/There is no Line Sidebar/.test(railSrc));
 check("a long conversation must have a way back to earlier turns",
-  defaultHtml.includes("对话轮次") || /<TurnRail/.test(appSrc));
-check("the turn rail must hide itself when there is nothing to navigate",
-  /turns\.length < 2/.test(railSrc));
+  /turns\.length > 1/.test(appSrc));
+// And the other half: with turns present the rail MUST be in the markup. The
+// zero-turn case is the one you can see in the browser; this is the one that
+// only shows up for a real user, so it is asserted here instead of being
+// assumed from the guard above.
+const withTurns = renderToStaticMarkup(
+  <App
+    snapshot={
+      {
+        ...base,
+        results: [
+          { correlationId: "c1", text: "第一轮：把截图按日期归档", done: true },
+          { correlationId: "c2", text: "第二轮：补一个工作树", done: true },
+          { correlationId: "c3", text: "第三轮：跑一遍门禁", done: true },
+        ],
+      } as PanelSnapshot
+    }
+  />,
+);
+check("with more than one turn the LineSidebar must actually render",
+  withTurns.includes("line-sidebar__list") && withTurns.includes("line-sidebar__item"),
+  `${(withTurns.match(/line-sidebar__item/g) ?? []).length} items`);
+check("every turn must be listed, and each must be clickable by name",
+  ["把截图按日期归档", "补一个工作树", "跑一遍门禁"].every((t) => withTurns.includes(t)));
+check("the rail must be hidden with a single turn (furniture pretending to be a control)",
+  !renderToStaticMarkup(
+    <App
+      snapshot={
+        { ...base, results: [{ correlationId: "c1", text: "只有一轮", done: true }] } as PanelSnapshot
+      }
+    />,
+  ).includes("line-sidebar__list"));
 
 // The settings page: eleven categories, each saying its own thing. The first
 // pass gave every unfed category the SAME sentence, so the rail could not tell

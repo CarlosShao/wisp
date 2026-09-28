@@ -43,10 +43,10 @@ import { GitBranchChip } from "@/components/git-branch";
 import { MonitorPopover } from "@/components/harness/monitor-popover";
 import { PaletteScreen } from "@/components/palette-screen";
 import { PromptBar } from "@/components/ai-native/prompt-bar";
+import { LineSidebar } from "@/components/react-bits/line-sidebar";
 import { RightRail } from "@/components/harness/right-rail";
 import { SettingsPage } from "@/components/harness/settings-page";
 import { PanelSidebar } from "@/components/panel-sidebar";
-import { TurnRail } from "@/components/turn-rail";
 import { useDismiss } from "@/lib/use-dismiss";
 import { currentView, type PanelViewId } from "@/lib/panel-views";
 import type { ComposerState, PanelSnapshot } from "@/lib/panel";
@@ -229,12 +229,11 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
               aria-expanded={local.monitorOpen}
               aria-label="任务监控"
               onClick={() => setLocal((c) => ({ ...c, monitorOpen: !c.monitorOpen }))}
-              className={`flex h-7 items-center gap-1.5 rounded-control px-2 text-[11.5px] transition-colors duration-150 ${
+              className={`flex h-7 size-7 shrink-0 items-center justify-center rounded-control transition-colors duration-150 ${
                 local.monitorOpen ? "bg-hover text-ink" : "text-ink-2 hover:bg-hover hover:text-ink"
               }`}
             >
-              <Activity aria-hidden="true" size={13} />
-              <span className="hidden sm:inline">任务监控</span>
+              <Activity aria-hidden="true" size={14} />
             </button>
             {local.monitorOpen ? (
               <div className="absolute right-0 top-full z-40 mt-1.5">
@@ -332,6 +331,7 @@ export default function App({ snapshot = EMPTY }: { snapshot?: PanelSnapshot }) 
                     onEffortChange={(effort) => setLocal((c) => ({ ...c, effort }))}
                     onPermissionChange={() => undefined}
                     onSend={() => undefined}
+                    onJump={(id) => setLocal((c) => ({ ...c, activeTurn: id }))}
                     permission={composer.mode.current}
                     snapshot={snapshot}
                     tiers={tiers}
@@ -413,6 +413,7 @@ function Conversation({
   effort,
   onEffortChange,
   onSend,
+  onJump,
 }: {
   snapshot: PanelSnapshot;
   tiers: string[];
@@ -423,6 +424,7 @@ function Conversation({
   effort: string;
   onEffortChange: (key: string) => void;
   onSend: (text: string) => void;
+  onJump: (id: string) => void;
 }) {
   // One turn per result chunk, keyed by correlationId. The rail needs at least
   // two marks to be worth drawing, and TurnRail hides itself below that.
@@ -434,11 +436,22 @@ function Conversation({
   return (
     <>
       <div className="flex min-h-0 flex-1 overflow-hidden">
-        <TurnRail
-          activeId={turns.length > 0 ? turns[turns.length - 1]!.id : null}
-          onJump={() => undefined}
-          turns={turns}
-        />
+        {/* react-bits LineSidebar: the cursor-proximity rail for long
+            conversations. Mounted only past one turn - a rail with a single
+            mark is furniture pretending to be a control. */}
+        {turns.length > 1 ? (
+          <div className="flex w-44 shrink-0 items-center border-r border-line px-2">
+            <LineSidebar
+              fontSize={0.8}
+              itemGap={10}
+              items={turns.map((t) => t.label)}
+              markerLength={26}
+              maxShift={14}
+              onItemClick={(index) => onJump(turns[index]!.id)}
+              showIndex
+            />
+          </div>
+        ) : null}
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
           <div className="mx-auto flex w-full max-w-[720px] flex-1 flex-col px-6">
             {snapshot.results.length === 0 ? (
