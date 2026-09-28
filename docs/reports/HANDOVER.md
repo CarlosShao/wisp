@@ -82,7 +82,32 @@
 
 ⚠️ **16:3x 追加（接续的人先看这条）**：**本地有两个 commit 被有意压着不推**——`dfe9d9f`（票 87 AC#1 文档）与 `63ef895`（票 77 已交的三框）。原因与判据见 registry **A61③**：`frontend/` 一进 HEAD，扫描器的 drift guard 就会让 `lint` 的 D22 那一步红，从而把后面刚拿到首张绿证的 `go vet (module)` 重新挡成 skipped。⇒ **等票 88（`tools/d22scan` 的 ban #6 翻牌）交回后再推**，别顺手 `git push`。此刻在飞：`agent-ticket82`（`internal/risk` 测试分层）、`agent-ticket87`（审批提前拒绝）、`agent-ticket88`（翻牌 + 回答"ban #6 真能扫到几个文件"）、`agent-ticket77-c`（票 77 断点接续：AC#1 → AC#3 → AC#4(ban #8) → AC#6）。
 
-## 4. 在途状态（**最新是下面的 4.0u（09-27 11:1x）；4.0t（09-27 10:2x）及更早各节整段保留供追溯**）
+## 4. 在途状态（**最新是下面的 4.0v（09-28 20:5x）；4.0u（09-27 11:1x）及更早各节整段保留供追溯**）
+
+## 4.0v 停车点（**2026-09-28 20:5x 版；新会话从这一节起读**，4.0u（09-27 11:1x）及更早只作追溯）
+
+- **owner 当前的口径（09-28 原话逐字留在账 `A399`）**：「从现在开始，**别鸡吧看那个初始方案了**……别看初始方案，或者什么这个那个的门禁，把什么都自己主动舍弃了」
+  「别人怎么做的，你就怎么做，**别鸡吧天天问我**……**必须特么做完整功能**」「**我需要你反复调研，反复学习，继续深挖到底有没有疏漏之处**」。
+  ⇒ 这句**只放开"拿规格/门禁当理由砍功能"这一支**；**不放开**：不 push、仓内不删、`frontend/**`＋`design/**` 零写、凭据不进对话、**改契约仍须人工批准**。
+- **今天落了什么（逐枚我自己复跑，非转述）**：票 197 子代理**实体层**（`b9fa815b`）＋**流层**（197-r2）＋**修正腿**（`7ea14ce3`／`64c1eea0`／`ece4402f`：池 8→4 对齐 D38d 天花板＋常驻钉＋两发正控实测红＋补那枚"注释声称存在而盘上没有"的两包同键钉）；
+  票 200 **读项目说明文件**（`84feec44` 新包 `internal/projctx` 468 行＋`a90677e9` 修：把 C26 改写账户读上、面板那枚键接了泵并换成**五状态对象** `loaded/none_found/off/refused/not_run`）。
+- **今天立的票（都带现量与判据，未派）**：**198**（新机器根本跑不起来——零枚代码创建 `config.toml`）／**201**（**到点该问的没人能答**：三种答复入口生产零调用者 ⇒ L1 自动执行、L2 自动拒绝）／**211**（**真 8 枚并发子代理要动 D38/D32＝契约级**；甲已落、乙等 owner 一句话，我不催）／**212**（注释声称"读数在某文件里"而那文件不存在；分母已粗算：`.md` 引用 188 行、盘上不存在 **0 枚**、不可机读 1 处 ⇒ **先出逐枚名册才许加 ban**）。
+- **差集调研到第三轮**：给人看的那版＝`docs/reports/missing-features-2026-09-28-v2.md`；本轮三件原始件＝
+  `survey-2026-09-28-oc-mobile-vscode-extensions.md`（31276）／`-dsh-ui-packages.md`（72227）／`-minimax-agent-modules.md`（105745）。
+  ⚠ **本轮推翻我两处旧账，更正已在 `A413`**：① 「Go 侧子代理实体 0 命中」**只在 `A397`/`A400` 那一刻为真**；② 快捷键不是"完全没有"而是**〔建了但没接〕**（4 枚可改键在 `[hotkey]`、`NewHotkeyReloader` 生产调用只在 `cmd/balldebug/main.go:237`、`cmd/wisp/` 0 处）——**这两种"没有"下一步动作完全不同，以后写差集必须分形**。
+- **下一格从哪儿接（照此顺序）**：
+  ① 派 **票 197 载体层 r3**：把名册与"每枚子代理自己的流"送进 `Snapshot`，并**收敛两包重复的 `SubagentStreamKey*`**（panel 侧为真源、`cmd/wisp` 注入，账 `A406` 已裁）。
+     ⚠ **r3 只做 outbound**：DSH 现量是"点进去那一页"＝`ui-subagent`、寻址 `{parent,child,mode}`，而我们 `ResultChunk` 只有 `correlationId`／`text`／`done` 三枚键 ⇒ **"这行是谁的"不在线上**；**若 r3 认为要新增入向方法＝C17 契约面，停手上报**，不许自己加。
+  ② 派 **198**、**201** 的落地腿（201 撞 `cmd/wisp/**`＋`internal/agent/**` 写面 ⇒ 与 r3 串行）。
+  ③ 队列里：票 174 AC#2b/2c/2d、181 AC#7、186/187、188-r3 生产者、185-r2、`G6neg` 1→3 归因、`run.go:370-371` 那枚过期注释、C25 `NoProbe:true` 让 R4 从不响（先只读量）。
+- **今天的全仓红名册（逐名；引用要带口径＋锚点 sha）**：`internal/panel` **4 枚**在册——
+  `TestApprovalCardViewJSONKeysMatchFrontendTypes`（Go 发 `instructions` 而 `frontend/src/lib/panel.ts` 的 `PanelSnapshot` 未声明；**转绿那一跳在零写面里，由 owner 带给界面那支**，逐字段形状已在票 200「09-28 20:5x 更正」一节写好）
+  ＋历史三枚 `TestComposerContractTypesMatchFrontend`／`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`／`TestC21DesignTokensFourwayAgree`（**不修不 Skip**）；`internal/risk` **今天全绿**（`ok 4.490s`）。
+- **仪器三枚坑（本轮又验/又踩）**：① `cmd/wisp`、`internal/tools` 测试**必须**带 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`，否则 `exit status 0xc0000135`（**一枚用例都不跑**，看着像包坏）；
+  ② `gofumpt` 不在 PATH 但在 `"$GOPATH/bin/gofumpt.exe"`（本机 v0.12.0）——**`gofmt -l` 空 ≠ gofumpt 空**；今天跟踪集里 `internal/`＋`cmd/` 已 **0 枚**未净；
+  ③ `.scratch/wisp/probes/**` 那"5 枚未净"要分口径：**4 枚在 `-l` 名单里、第 5 枚（`185/c1/mut/fs_broken.go`）是让尺退出 2 的错误行**；那 4 枚是刻意做坏的变异样本、不归本轮修，**下次推送 `ci.yml:136` 会因它们红**（同一步的颜色只看 stdout，**尺自己的 rc 会被 `if [ -n ]` 吃掉**）。
+- **推送：继续按住**（`origin/dev` 仍在 `f7478d37`，本地领先 600+ 枚；owner 未给推的口令，且 `slo-full` 跑在本机 runner 上、取数期间不推）。
+- **编队（此刻）**：在飞 **0 枚**；本轮收并核过 `197-r1b`／`197-r1c`／`200-r1`／`200-r2`／调研三腿＝**7 枚**。台账到 `A413`。
 
 ## 4.0u 停车点（**2026-09-27 11:1x 版；新会话从这一节起读**，4.0t 及更早只作追溯）
 
