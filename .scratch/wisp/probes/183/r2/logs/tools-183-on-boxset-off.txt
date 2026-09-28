@@ -1,0 +1,12 @@
+time=2026-09-28T14:01:28.687+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPointer183BackfilledArtifactRereadStaysClean
+    pointer_183_cli_seam_test.go:208: 照宿主指针的续读判成 "L2", want L0（R4 又咬住宿主自己写下的指针了）
+        桩：WISP179R2-background-output-line.WISP179R2-background-output-line.WISP179R2-background-output-line.WISP179R2-background- …[剪]… ground-output-line.WISP179R2-background-output-line.WISP179R2-background-output-line.WISP179R2-background-output-line.WI
+    pointer_183_cli_seam_test.go:212: 续读那一发被拒了：{Text:L2 审批通道尚未接入（票 21），已拒绝执行 IsError:true RiskLevel:L2 ErrorClass:user_rejected Truncated:false AppliedSteps:[]}
+--- FAIL: TestPointer183BackfilledArtifactRereadStaysClean (0.02s)
+=== RUN   TestPointer183SiblingArtifactInTheSameDirectoryStillHits
+    pointer_183_cli_seam_test.go:269: 同一发桩里宿主自己声明的那条路径判成 "L2", want L0：豁免连声明方都不放了
+--- FAIL: TestPointer183SiblingArtifactInTheSameDirectoryStillHits (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.207s
+FAIL

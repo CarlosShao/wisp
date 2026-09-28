@@ -1,0 +1,7 @@
+time=2026-09-28T14:00:08.324+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPointer183BackfilledArtifactRereadStaysClean
+--- PASS: TestPointer183BackfilledArtifactRereadStaysClean (0.03s)
+=== RUN   TestPointer183SiblingArtifactInTheSameDirectoryStillHits
+--- PASS: TestPointer183SiblingArtifactInTheSameDirectoryStillHits (0.02s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.096s
