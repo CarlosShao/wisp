@@ -297,4 +297,24 @@ naive-walk cost=199.703ms dirs=1231 files=12000 untrackedCandidates=8684  (autho
 
 ## 11. 终态自证（逐枚 `git show --name-status`，不用区间 diff）
 
-（本件 commit 之后由同程的终态闸门回显填在这里；起手名册＝§0 那 77 枚。）
+**我的写面只有两枚文件**（片① `465c060a`，`git show --name-status` 原文）：
+
+```
+465c060a 189-a1(只读·派单§C): 证据件 189-uncommitted-count-design-a1.md — …（AC 框一枚未勾）
+
+M	.scratch/wisp/issues/189-the-review-stack-needs-uncommitted-count-and-per-file-diff-but-go-side-has-zero-source.md
+A	docs/evidence/s1/189-uncommitted-count-design-a1.md
+```
+
+`git show --name-only HEAD` 里 **`internal/panel/composer.go`／`pump.go`／`cmd/wisp/panel_pump.go`／`internal/panel/git*.go` 命中＝0**（grep 现跑回显 `NONE-OF-THEM (zero)`）⇒ 在飞的 `145-r2` 写面与票 181 那枚读面我都没碰。仓内**零删除**、**未 push**。
+
+**终态闸门（`date`＝Mon Sep 28 18:00:20 CST 2026，锚 `465c060a`）**：`git status --porcelain` 终态 **77 枚** ＝ 起手 **77 枚**，逐枚具名差集（`comm -23`／`comm -13` 对 `/tmp/189a1-start-roster.txt` 与终态文件）**只有两枚、都归别人**：
+
+| 差集 | 条目 | 归因（逐枚具名，非我造成） |
+|---|---|---|
+| 只在起手 | `?? .scratch/wisp/dispatches/2026-09-28-175x-wave-data-carriers-182a-180a-189a-190a-188r.md` | 别人的 `971b7dad ledger(A389)＋立 Q-71` 把它提交了 ⇒ 从 `??` 名册消失（那枚提交的 name-only 见 §1） |
+| 只在终态 | ` M docs/evidence/s1/188-task-state-r1.md` | `188-r1` 写腿在我取名册之后继续改它自己那枚证据件（`500bc98e` 之后又动了一次） |
+
+⇒ **除这两枚外逐枚相同；我这一程造成的净差集＝空**。
+
+**探针与临时件**：纯 Go 探针与所有名册／diff 读数都落在**仓外**（`/tmp/gitprobe/main.go`、`/tmp/189a1-start-roster.txt`、`/tmp/189a1-end-roster.txt`、`/tmp/st-plain.txt`、`/tmp/diff-all.patch`），仓内**没有**为本轮新增任何台件；按"临时件只建不删"（`issues/README` 规则 8）它们留在 `/tmp` 不删。
