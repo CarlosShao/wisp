@@ -196,3 +196,4 @@ declaration consumed by 37's native card.
   `github.com/CarlosShao/wisp/frontend` 那枚 `all:dist` embed，副本必须带上 `frontend/dist`）花两枚、M1 首发写残 `_ = ctx` 导致 build failed 重跑花两枚、终态门禁复跑三件花三枚。
   **未据此放宽任何断言、未改任何冻结件。**
   **撤销口令：「撤 33 progress 33-r3」**（撤＝只删本节＋留一行撤销记录，不改写上面任何一行）。
+- [ ] **AC#10（09-28 17:5x 编排者追加，来路＝`180-a1` 普查＋账 `A391`；不勾，勾要非实现者裁）**：宿主真起来那天，**`[panel]` 那五枚字段必须有生产者**——`width`／`height`／`scale` 要真去设窗口边界（`internal/config/schema.go:525-535` 是定义处，生产读取方现量＝**各 0**），且规格逐字要求 `hot` 生效（`PLAN.md:2743`＋`SPEC-03:39`）。⚠ 判据要能区分"读值并真设边界"与"只在测试里读一下"；**不许用"把 `default:"640"` 改掉"交差**（票 180 `AC#3` 同一条雷）。

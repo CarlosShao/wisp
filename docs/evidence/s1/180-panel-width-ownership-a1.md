@@ -249,3 +249,6 @@ M	docs/reports/pending-and-issues.md
 ```
 
 本件自身那枚 commit 只带 `docs/evidence/s1/180-panel-width-ownership-a1.md` 一枚路径（显式 pathspec，未用 git add -A / git add .）；其 name-status 与终态名册差集贴在交件回报里。本程未用区间 diff 自证只读。
+
+### §6.2 编排者追加更正（09-28 17:5x，账 `A391`；不动上文任何一格）
+交件时点位更正：本节当时写"树上多出一枚 `971b7dad`"，**实为三枚**——`971b7dad`（A389 台账）／`500bc98e`（`188-r1` 片①）／`9b6a1be5`（`190-a1`），**三枚都没碰本程两条路径**（我逐枚 `git show --name-status` 复跑过）。差集四条已具名（dispatches 那枚被入库、`probes/145/r2/`＋`145-snapshot-growth-r2.md`＝`145-r2` 在飞、`188-task-state-r1.md`＝`188-r1` 在飞），**零枚出自本程**。另：本程 `AC#1` 已由我复跑对格后翻勾（三枚尺读数我重跑到手：`internal/panel/` 非测试里尺寸形状 **0 命中**、五枚 `[panel]` 字段生产读取方各 **0**）。

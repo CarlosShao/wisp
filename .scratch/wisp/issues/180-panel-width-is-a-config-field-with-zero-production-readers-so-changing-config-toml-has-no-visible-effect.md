@@ -19,7 +19,7 @@
 
 ## AC（每格都要答"这一发在未修码上响不响"）
 
-- [ ] **AC#1 先判归属，再谈修法**：逐枚答三问并落表——① 面板窗口尺寸今天由**谁**决定（现读 `internal/panel/` 里创建窗口/WebView 的那处，给出 file:line；尺：`grep -rn "NewWindow\|SetBounds\|Rect{\|Width:" --include=*.go internal/panel/ | grep -v _test`）；② `cfg.Panel.Width` 到它之间**缺哪一跳**；③ D36 配置树里这一项的**规格出处**是哪一行（尺：`grep -n "\[panel\]" -A 6 docs/PLAN.md` 与 `grep -rn "width" docs/specs/SPEC-03*.md docs/specs/SPEC-08*.md`）——**规格有没有要求它生效**，决定本票是"补实现"还是"改规格文字（＝人工批准）"。
+- [x] **AC#1 先判归属，再谈修法**（09-28 17:5x 编排者复跑对格后勾：三问答完且我今天自己重跑过——**没有任何人**决定面板尺寸，因为这棵树里**根本没有面板窗口**：`internal/panel/pump.go:15-17` 逐字"no WebView2 host"、`grep -rn "NewWindow\|SetBounds\|Rect{\|Width:" --include=*.go internal/panel/ | grep -v _test`＝**0 命中**、那五枚 `[panel]` 字段的生产读取方各 **0**；规格要它生效＝`PLAN.md:2743` 逐字 `hot`；唯一真窗口是球（`internal/ball/ball_windows.go:233`，与 `[panel] width` 无关）＝账 `A391`）：逐枚答三问并落表——① 面板窗口尺寸今天由**谁**决定（现读 `internal/panel/` 里创建窗口/WebView 的那处，给出 file:line；尺：`grep -rn "NewWindow\|SetBounds\|Rect{\|Width:" --include=*.go internal/panel/ | grep -v _test`）；② `cfg.Panel.Width` 到它之间**缺哪一跳**；③ D36 配置树里这一项的**规格出处**是哪一行（尺：`grep -n "\[panel\]" -A 6 docs/PLAN.md` 与 `grep -rn "width" docs/specs/SPEC-03*.md docs/specs/SPEC-08*.md`）——**规格有没有要求它生效**，决定本票是"补实现"还是"改规格文字（＝人工批准）"。
 - [ ] **AC#2 正向落地（若 AC#1 判"规格要求生效"）**：把那一跳接上，并给一发**常驻判据**：设成两个不同值 ⇒ 面板侧读到的尺寸**随之变**（不许只断"字段非零"）。⚠ 判据要能区分"接上了"与"又抄了一遍默认值"。
 - [ ] **AC#3 反向判据（与 AC#2 成对，缺一形＝装饰）**：**不许**用"把默认值改掉"来交差——把 `default:"640"` 改成别的数而**不接读者**，本票判不通过（那只是把一枚装饰换成另一枚）。若 AC#1 判"规格今天不要求生效"，则正解是**响亮地登记**：在配置项注释＋`docs/reports/pending-and-issues.md` 里写明"此项 RESERVED，设了不生效，缺口在票 N"，**不许静默留着**。
 - [ ] **AC#4 顺带查同族**：`internal/config/schema.go` 里**还有几枚**"有 `default` 但生产零读者"的字段（尺：对每一枚字段名跑 `grep -rn "\.<字段名>" --include=*.go internal/ cmd/ | grep -v _test.go`，逐枚记 0/非 0）。⚠ 枚数只许现量、不许目测；本票**不修**它们，只出名单并逐枚归口（新票或既有票），⚠ 不许写"以后加固"。
@@ -72,3 +72,4 @@
   ⚠ 风险栏（照派单 §B 末条预写；`AC#2`/`AC#3` 本程**未做**）：**不许用"把 `default:"640"` 改掉"交差**；
   票面问的"缺哪一跳"今天答案是**整条链**——宿主（票 33）与载体（票 35）都不在，
   且尺寸这一维在快照名册里也不存在（`internal/panel/composer.go:57-62` 只有四枚 key）。
+- 09-28 17:5x 编排者收 `180-a1`（只读普查，两枚 commit `cb14a8b2`／`35abbc40` 只动票面与它自己证据件）：`AC#1` 勾（我复跑对格）。**排程结论（这一条比表更重要）**：面板尺寸这一维缺的**不是"接线那一行"，是整整一个窗口**——今天这棵树里没有面板窗口，所以 `AC#2`（正向落地）**排在票 33 的 WebView2 宿主之后**（H2／H3），本轮不排进队列；为免它再空一次，我已把"宿主必须读 `[panel] width/height/scale` 并真去设边界"追加成**票 33 的新格 `AC#10`**。另记一枚过期注释（`internal/panel/pump.go:15-17` 逐字写着"ticket 33 is unclaimed"——**33 早已被认领、片 A／片 B 都已落**）：归 `145-r2` 交件后的下一枚 `internal/panel` 写腿顺带更正，**现在不动那枚文件**（它在别人写面上）。
