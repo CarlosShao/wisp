@@ -175,9 +175,35 @@ func TestReadGitWorktreePointerFile(t *testing.T) {
 	}
 	// git keeps the reverse pointer in the shared dir: <common>/worktrees/<name>/
 	// gitdir names the .git FILE inside that tree, and the reader derives the
-	// tree's root as its parent. Without this file the entry has no path at all.
+	// tree's root as its parent. The content is written here in the shape git
+	// itself writes - a BARE path with no "gitdir: " header, which is what the
+	// live probe on this repository caught the first version of the reader
+	// getting wrong (every attached path came back empty).
 	if err := os.WriteFile(filepath.Join(mainRoot, ".git", "worktrees", "attached", "gitdir"),
-		[]byte("gitdir: "+filepath.Join(attachedDir, ".git")+"\n"), 0o644); err != nil {
+		[]byte(filepath.Join(attachedDir, ".git")+"\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	// A second attached tree written with the prefixed spelling, so the reader is
+	// held to accepting both rather than to whichever one the fixture happened to
+	// imitate.
+	prefixed := filepath.Join(mainRoot, "attached-prefixed")
+	if err := os.MkdirAll(prefixed, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	prefixedGit := filepath.Join(mainRoot, ".git", "worktrees", "prefixed")
+	if err := os.MkdirAll(prefixedGit, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(prefixedGit, "HEAD"),
+		[]byte("ref: refs/heads/prefixed/pointer\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(prefixedGit, "gitdir"),
+		[]byte("gitdir: "+filepath.Join(prefixed, ".git")+"\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(prefixedGit, "commondir"),
+		[]byte("../..\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	// Absolute pointer, exactly the shape census §② measured on D:/wt/fe.
@@ -200,9 +226,10 @@ func TestReadGitWorktreePointerFile(t *testing.T) {
 	if view.CurrentWorktree != attachedDir {
 		t.Errorf("currentWorktree = %q, want the attached tree this probe started in", view.CurrentWorktree)
 	}
-	// Both trees must be listed: main (not in worktrees/) plus attached.
-	if len(view.Worktrees) != 2 {
-		t.Fatalf("worktrees = %+v, want 2 entries (main + attached)", view.Worktrees)
+	// Every tree must be listed: main (which is NOT inside worktrees/) plus both
+	// attached ones.
+	if len(view.Worktrees) != 3 {
+		t.Fatalf("worktrees = %+v, want 3 entries (main + 2 attached)", view.Worktrees)
 	}
 	if !view.Worktrees[0].Main {
 		t.Errorf("worktrees[0] = %+v, want the main tree first", view.Worktrees[0])
@@ -218,6 +245,20 @@ func TestReadGitWorktreePointerFile(t *testing.T) {
 	}
 	if attached.Branch != branch || attached.Main {
 		t.Errorf("attached entry = %+v, want branch %q and Main=false", attached, branch)
+	}
+	var found *GitWorktree
+	for i := range view.Worktrees {
+		if view.Worktrees[i].Path == prefixed {
+			found = &view.Worktrees[i]
+		}
+	}
+	if found == nil || found.Branch != "prefixed/pointer" {
+		t.Errorf("the prefixed-spelling tree %q did not resolve: %+v", prefixed, view.Worktrees)
+	}
+	for i, e := range view.Worktrees {
+		if e.Path == "" {
+			t.Errorf("worktrees[%d] = %+v, want a resolved path for every entry", i, e)
+		}
 	}
 	if !equalStrings(view.Branches, []string{"attached/branch", "dev"}) {
 		t.Errorf("branches = %v, want the shared refs/heads walked recursively", view.Branches)
@@ -546,6 +587,21 @@ func TestReadGitOnThisRepositoryIsSelfConsistent(t *testing.T) {
 	if !view.Worktrees[0].Main || view.Worktrees[0].Path != view.RepoRoot {
 		t.Errorf("first worktree entry = %+v, want this repository's main tree (%q)",
 			view.Worktrees[0], view.RepoRoot)
+	}
+	// Every ATTACHED entry has to carry a resolved path. This repository's own
+	// attached trees are the live data that caught the first version of the
+	// reader returning "" for all of them, because git writes the reverse
+	// pointer as a bare path and the reader demanded the "gitdir: " header.
+	for i, e := range view.Worktrees[1:] {
+		if e.Path == "" {
+			t.Errorf("attached entry %d = %+v, want the path its gitdir pointer names", i+1, e)
+			continue
+		}
+		if st, err := os.Stat(e.Path); err != nil {
+			t.Logf("attached entry %d path not present on this machine (%v) - prunable shape, reported not hidden", i+1, err)
+		} else if !st.IsDir() {
+			t.Errorf("attached entry %d path %q is not a directory", i+1, e.Path)
+		}
 	}
 }
 

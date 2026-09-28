@@ -318,8 +318,21 @@ func parseGitdirFile(content string) string {
 	return ""
 }
 
-// readCommondir follows the commondir file that points from a per-tree git
-// dir to the shared one (this repository: "../..").
+// plainGitdirPath reads the reverse pointer that sits at
+// <common>/worktrees/<name>/gitdir. git writes it as a BARE path; the "gitdir: "
+// header belongs to the other file (the one inside a linked tree). Both spellings
+// are accepted here, because dropping every attached path to an empty string over
+// a prefix is the failure this function was written after being measured live.
+func plainGitdirPath(content string) string {
+	line := firstLine(content)
+	if v, ok := strings.CutPrefix(line, "gitdir:"); ok {
+		return strings.TrimSpace(v)
+	}
+	return line
+}
+
+// readCommondir follows the commondir file, which points from one linked tree's
+// private git dir to the shared one (this repository: "../..").
 func readCommondir(worktreeGitDir string) (string, bool) {
 	raw, err := os.ReadFile(filepath.Join(worktreeGitDir, "commondir"))
 	if err != nil {
@@ -448,8 +461,11 @@ func listLinkedWorktrees(commonGitDir string) []GitWorktree {
 		branch, sha, detached, _, _ := readHead(dir)
 		path := ""
 		if raw, err := os.ReadFile(filepath.Join(dir, "gitdir")); err == nil {
-			if p := parseGitdirFile(string(raw)); p != "" {
-				// gitdir names the .git FILE inside the tree.
+			// This file is the OTHER spelling: git writes the reverse pointer as
+			// a bare path, with no "gitdir: " header (measured live on this
+			// repository's two attached trees - requiring the prefix here reads
+			// every attached path as empty).
+			if p := plainGitdirPath(string(raw)); p != "" {
 				path = filepath.Dir(p)
 			}
 		}
