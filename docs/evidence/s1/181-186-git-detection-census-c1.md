@@ -68,17 +68,60 @@
 5. 快照里 git 这一维的字段（`ComposerState` 今天六枚字段无 git 维＝票 181 现量第 4 条）。
 6. **git 只读面本体**（§②③④ 那三堆读法）＝本票唯一真正"从零写"的产码，且**不依赖票 33**。
 
-## ⑥ Q5 切换的连带面（票 186 AC#6 雏形）：授权根／产物目录／C25 名册与 per-scope mark／会话历史与取证行／上下文预算 `BudgetsFor`——逐样"保留／重建／作废"＋"切了会不会留下上一棵树的证据"
+## ⑥ Q5 切换的连带面（票 186 AC#6 雏形）——逐样"保留／重建／作废"＋"会不会留下上一棵树的证据"
 
-（待填·⑥）
+先记一条**结构前置**（现读 `internal/tools/paths_workspace.go:27-29,72-94`）：面板换树**只许收窄、不许放宽**——`SetWorkspaceRoot` 自己写着 "the narrowing must be structurally impossible to widen"，候选树必须已在 `[fs] allowed_dirs` 内（`inRoots`），且取消收窄只有 `ClearWorkspace()`（:97）这一条内部腿，`RequestWorkspaceSwitch` 对空输入直接拒（`ResolveWorkspace` :52-54 ⇒ **今天面板连"切回未选择"都做不到**）。⇒ **面板能去的树＝操作者先在配置里授权过的树**（票 102／C26 复用，这一层本票不改写）。
 
-## ⑦ Q6 非 git 目录那一形（票 181 AC#4／票 186 AC#4）：快照这一维送什么才算"说实话"＋一句人话文案＋三形怎么分（读不到／没权限／不是仓库）
+| 连带面 | 现跑读数／具名落点 | 切换后的行为 | 会不会留下上一棵树的证据 |
+|---|---|---|---|
+| ① 授权根／`allowed_dirs`（C26） | `paths_workspace.go:72-73`（不在 roots 内 ⇒ 拒收窄）、`:87-89`（末道复核） | **保留**（配置根一字不动；只换 workspace 那一枚字段） | 不会——但**能去的树集合由配置决定**，面板没有"申请新树"的腿 |
+| ② 产物目录（`agent.Spiller` 的根） | `cmd/wisp/run.go:640`＝`NewSpiller(filepath.Join(rt.spec.dataDir,"artifacts"),...)`；`internal/agent/loop.go:238`＝`NewSpiller(opt.Config.ArtifactsDir, b)`；`spill.go:43` `dir` 是**构造期字段** | **保留**（装配期一次定死，**不在工作区根之下**＝票 174／`Q-60` 同一条） | ⚠ **会**：上一棵树产生的产物仍躺在同一目录、仍可被后续轮读到；要"随树走"必须重装配 Spiller（改动面＝装配根＋Q-60 那条精确豁免），本票不动 |
+| ③ C25 污染名册与 per-scope mark | `internal/risk/provenance.go:248` `scopes map[string]*scopeReg`、`:460 OpenScope(scopeID)`、`:540 MarkWithHostPath(scopeID,...)`；调用侧 `internal/tools/bridge.go:535,566-579`——键是 **`dec.TaskID`** | ⚠ **名册根本不认识"树"**：键＝taskID，与工作区无绑定；今天**没有任何代码在切工作区时动 scope**（`provenance.go:453` 注释：`OpenScope` 由装配根在**任务起点**调） | ⚠ **会，且是最硬的一维**：同一 taskID 跨树继续跑 ⇒ 旧树的污点片段继续命中、新树的读作不自开水准；⇒ 落地**必须**把"换树"绑成"关旧 scope＋开新 scope"（或直接换 taskID），否则就是票 183/185 那根管子第四次咬人 |
+| ④ 会话历史与取证行 | 历史＝进程内：`internal/agent/loop.go:256 History()`、`:1016 replaceHistory()`；`internal/session/` 目录**只有 `doc.go`**（会话持久化未落地）；审计行＝`internal/panel/workspace.go:93-96`（SWITCH-REFUSED）／`:100-102`（SWITCH，带 from/to/spelling/reparse/rewritten） | 历史**保留**（切换不清）；审计两形**已经如实** | ⚠ 历史**会**：上一棵树的文件内容与路径继续在上下文里进模型。审计这一维不缺，**接线时不许绕过 `RequestWorkspaceSwitch` 自己写一份**（票 186 AC#3(iii)） |
+| ⑤ 上下文预算 `BudgetsFor(<窗口>)` | `internal/agent/budgets.go:85`（按 `ctxWindow` 缩放 D15/D39 阈值）、`internal/agent/loop.go:215 b := BudgetsFor(window)` | **保留**——键是**模型窗口**不是工作区，切树不重算也不需要重算 | 间接**会**：预算没变、历史没清 ⇒ 同一份预算继续吃上一棵树的历史（溢写阈值/spill 判定跟着旧内容走） |
 
-（待填·⑦）
+**一句话代价**：切换这一发**真正要动的不是面板，是"换树＝换作用域"这条不变式**（②③④⑤ 四样今天全都**不随树走**）；只读显示那一半则**一样都不欠**。
 
-## ⑧ 面板要的字段清单（枚数＋每枚来源；交编排者转前端会话，本程不碰前端）
+## ⑦ Q6 非 git 目录那一形（票 181 AC#4／票 186 AC#4）：必须显式回答
 
-（待填·⑧）
+**建议字段形状**（宿主侧只读面产出，`kind` 是**枚举**、不是布尔）：
+
+```
+git = {
+  kind:      "not_a_repo" | "unreadable" | "permission_denied" | "repo",
+  reason:    "这棵工作区目录及其以上都没有 .git，所以没有分支可显示",   // 人话，必填
+  repoRoot:  "",          // kind=repo 才填
+  branch:    "",          // kind=repo 才填
+  detachedSha:""          // 仅 detached
+}
+```
+
+**三形怎么分（读侧判据，全部可现测）**：
+- `not_a_repo`＝从工作区根逐级往上到盘根**都没命中** `.git`（目录形或文件形都算命中）⇒ 这是"这里不是仓库"。
+- `permission_denied`＝命中了 `.git` 但 `stat`/`open` 返 `EACCES`/`EPERM`（或 Windows 上的拒绝访问）⇒ 这是"我看不到"，**不许**降级成 `not_a_repo`。
+- `unreadable`＝IO 层其他失败（重解析点被 C26 拒、路径不存在、`gitdir:` 指向已消失的目录＝票 186 的"上一棵树被删了"这一形）⇒ 与上两形分开报。
+- 判据要点：`gitdir:` 指向不存在时**不能**算 `not_a_repo`（那是 `.git` 文件在、仓库没了＝`unreadable` 带一句原因）。
+
+**人话文案（一枚，不许留空）**："这棵工作区不是一棵 git 树 ⇒ 没有分支／工作树可切；要按版本切，请选一棵 git 仓库目录（并先在配置里授权它）。" ⚠ 禁三形：留空／空数组／默认画成 `master`（票 92／145 的"宁缺毋造"同形；票 181 AC#4 明写不许静默）。三档候选（不显示／显示"非代码工作区"／显示未知）的**取舍由编排者裁**，本件只交形状与后果：**不显示**＝用户以为功能坏了；**"非代码工作区"**＝最贴近真话且不需要网络；**"未知"**＝把 IO 失败与"不是仓库"糊成一枚，正是票 147 判过的"档位不许显示成未知"那一族。
+
+## ⑧ 面板要的字段清单（交编排者转前端会话；本程不碰 `frontend/**`）
+
+**枚数：9 枚**（＋1 枚状态枚）。每枚都标"来源＝今天已有／本票新增读面"，无一枚需要起外部进程：
+
+| # | 字段 | 来源（现量／具名落点） |
+|---|---|---|
+| 1 | `git.kind`（`repo`／`not_a_repo`／`permission_denied`／`unreadable`） | **新增读面**：逐级 `.git` 探测（§② 三形现量） |
+| 2 | `git.reason`（人话一句，必填） | 新增读面；文案见 §⑦ |
+| 3 | `git.branch`（symref 名）**或** `git.detachedSha`（40 位） | 新增读面＝`<gitdir>/HEAD`；本仓两形真值：`dev`、`bb61dc5c…`（§②） |
+| 4 | `git.isDetached`（布尔） | 同上（HEAD 是否以 `ref: ` 开头） |
+| 5 | `git.repoRoot`（规范化仓库根） | 新增读面：目录形＝`.git` 父目录；文件形＝`gitdir`＋`commondir`（实测 `../..`） |
+| 6 | `git.currentWorktree`（这棵工作树的路径） | 新增读面＝工作区根本身（与 `WorkspaceView.Canonical` 对齐，`panel_pump.go:82-86` **今天已有**） |
+| 7 | `git.worktrees[]`（路径＋分支/sha，**含主工作树**） | 新增读面＝`.git/worktrees/*` 枚举＋主仓拼接（§③；漏主仓＝下拉里没有用户正在的那枚） |
+| 8 | `git.branches[]`（本地分支全集） | 新增读面＝**递归**走 `refs/heads`（§④：单层 ls 在本仓少报一枚）；packed-refs 存在时要并按（本仓无此文件） |
+| 9 | `git.remoteBranches[]`（**默认不送**） | 本仓实测 6 枚 loose、2 枚 remote；语义＝上次 fetch 的缓存 ⇒ 送就要带"可能过期"，**属扩字段、请编排者裁**（§④） |
+
+另需 1 枚**状态枚**（不是 git 数据）：`git.switchBlocked`（有程在飞时拒绝切换的原因一句）——票 186 AC#3(i) 要求实现方**选一支并给判据**，本件只把"要有这一枚字段才不至于点了没反应"交出来。
+⚠ 这 9＋1 枚**全部走已有的快照推送通道**（出向管子今天真在跑：`cmd/wisp/panel_pump.go:159/223/241`），**不需要新增任何 C17 白名单方法**（只读那一半）；"切换"那两枚动作要的是**§⑤ 那条入向通道**，与白名单加枚数是两件事（`panel.workspace.request` 已在册，够不够用见 §⑤）。
 
 ## ⑨ 本程没测什么（逐名；不写"其余都覆盖了"）
 

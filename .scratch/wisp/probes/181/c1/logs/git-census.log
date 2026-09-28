@@ -1,0 +1,83 @@
+== head/time ==
+Mon Sep 28 14:43:35 CST 2026
+4813567e Mon Sep 28 14:42:58 2026 +0800
+== ruler 1: does any Go file read git? (expect empty) ==
+== ruler 2/3: workspace switch handler + callers ==
+76:func RequestWorkspaceSwitch(scope PathScope, input string, audit AuditFunc) (WorkspaceView, error) {
+internal/panel/bridge.go:17:// (ModeRequest.Parse / DecodeAttachmentPayload / RequestWorkspaceSwitch), so
+internal/panel/workspace.go:70:// RequestWorkspaceSwitch performs one workspace switch and audits it.
+internal/panel/workspace.go:76:func RequestWorkspaceSwitch(scope PathScope, input string, audit AuditFunc) (WorkspaceView, error) {
+cmd/wisp/panel_pump.go:79:// reparse/rewrite account live on the request path (RequestWorkspaceSwitch),
+== ruler 4: write-surface gate (must be empty) ==
+== Q1: .git shape at repo root + HEAD content ==
+.git IS DIR
+HEAD bytes: ref: refs/heads/dev
+== Q1/Q2: ground truth (read-only listing) ==
+worktree D:/work/workspace/projects plans/Wisp
+HEAD 4813567e215ca33db2e65ae3efe097d61156f1c1
+branch refs/heads/dev
+
+worktree D:/tmp/wisp136instr-r1/wt-head
+HEAD bb61dc5c0c5b15783db8736ea5e6fccd6fa50e3f
+detached
+
+worktree D:/wt/fe
+HEAD 16c2f03820350530d4f05465a8c0e9ea7f47fe8c
+branch refs/heads/dsh/feat/frontend-p0-v2
+
+== Q1: linked worktree .git files (file shape, gitdir: prefix) ==
+path=D:/tmp/wisp136instr-r1/wt-head
+  .git IS FILE content=[gitdir: D:/work/workspace/projects plans/Wisp/.git/worktrees/wt-head]
+path=D:/wt/fe
+  .git IS FILE content=[gitdir: D:/work/workspace/projects plans/Wisp/.git/worktrees/fe]
+== Q2: main repo .git/worktrees enumeration ==
+worktree-dir=.git/worktrees/fe/ HEAD=[ref: refs/heads/dsh/feat/frontend-p0-v2] gitdir=[D:/wt/fe/.git] commondir=[../..]
+  entries: COMMIT_EDITMSG HEAD ORIG_HEAD commondir gitdir index logs refs 
+worktree-dir=.git/worktrees/wt-head/ HEAD=[bb61dc5c0c5b15783db8736ea5e6fccd6fa50e3f] gitdir=[D:/tmp/wisp136instr-r1/wt-head/.git] commondir=[../..]
+  entries: HEAD ORIG_HEAD commondir gitdir index logs refs 
+== Q3: branch enumeration (recursive vs one-level) ==
+one-level ls count = 3
+recursive find count = 4
+ground truth git branch --list count = 4
+.git/refs/heads/dev
+.git/refs/heads/dsh/feat/frontend-p0
+.git/refs/heads/dsh/feat/frontend-p0-v2
+.git/refs/heads/master
+packed-refs present = NO
+refs/remotes files = 6
+remote url lines in .git/config (count only, values never logged) = 2
+== Q4: inbound hop consumers (expect zero production callers) ==
+internal/panel/bridge.go:16:// ParseComposerRequest the payload still goes through the same guards
+internal/panel/bridge.go:81:// ParseComposerRequest reads one postMessage string. Every refusal is an error
+internal/panel/bridge.go:84:func ParseComposerRequest(raw string) (ComposerRequest, error) {
+internal/panel/bridge.go:113:// made it past ParseComposerRequest: it names the id so the user's own action is
+internal/panel/composer_handlers.go:37:// WebView2 "event -> ParseComposerRequest" hop does not exist in this tree
+cmd/wisp/run.go:229:	// Nothing calls it yet - the WebView2 "event -> ParseComposerRequest" hop does
+internal/panel/bridge.go:43:	MethodWorkspaceRequest = "panel.workspace.request"
+internal/panel/bridge.go:106:	case MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend:
+== Q5: workspace-root ripple targets ==
+internal/panel/workspace.go:39:	WorkspaceRoot() string
+internal/panel/workspace.go:43:	// SetWorkspaceRoot narrows scope to an already-resolved root.
+internal/panel/workspace.go:44:	SetWorkspaceRoot(root string) error
+internal/panel/workspace.go:80:	previous := scope.WorkspaceRoot()
+internal/panel/workspace.go:87:		} else if sErr := scope.SetWorkspaceRoot(actable); sErr != nil {
+internal/panel/workspace.go:118:	now := scope.WorkspaceRoot()
+internal/tools/paths_workspace.go:40:func (p *PathCanonicalizer) WorkspaceRoot() string {
+internal/tools/paths_workspace.go:78:// SetWorkspaceRoot narrows subsequent judgements to root, which MUST already
+internal/tools/paths_workspace.go:82:func (p *PathCanonicalizer) SetWorkspaceRoot(root string) error {
+internal/agent/loop.go:238:		sp:       NewSpiller(opt.Config.ArtifactsDir, b),
+internal/agent/spill.go:43:func NewSpiller(dir string, b Budgets) *Spiller { return &Spiller{dir: dir, b: b} }
+cmd/wisp/run.go:640:		Spills: agent.NewSpiller(filepath.Join(rt.spec.dataDir, "artifacts"), loop.Budgets()),
+internal/agent/budgets.go:14:// a Budgets field produced by BudgetsFor.
+internal/agent/budgets.go:82:// BudgetsFor scales every D15/D39 threshold by ctxWindow. An unknown window
+internal/agent/budgets.go:85:func BudgetsFor(ctxWindow int) Budgets {
+internal/agent/loop.go:215:	b := BudgetsFor(window)
+internal/risk/provenance.go:17:// (ticket 160's lifetime rule: OpenScope hands back a *Scope, and that handle —
+internal/risk/provenance.go:59:// 21, 22, 26) must (1) OpenScope at task start and close what it handed back on
+internal/risk/provenance.go:60:// the boundary that owns the task — LANDED as a SHAPE by ticket 160: OpenScope
+internal/risk/provenance.go:264:// owner is nil for a registration that Mark created out of a missing OpenScope
+internal/risk/provenance.go:365:// functions — OpenScope(id) and CloseScope(id) — so any caller anywhere could
+internal/risk/provenance.go:372:// Go imposes no use-the-return-value rule, so `p.OpenScope(id)` as a statement
+internal/risk/provenance.go:378:// Scope is the handle OpenScope issues. It is the only thing that can close the
+internal/risk/provenance.go:453:// OpenScope registers a task/session scope (composition root calls this at task
+== done ==
