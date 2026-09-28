@@ -1,0 +1,34 @@
+=== RUN   TestPointer183RefereeTwinFragmentOutsideSpanStaysExempted
+--- PASS: TestPointer183RefereeTwinFragmentOutsideSpanStaysExempted (0.01s)
+=== RUN   TestPointer183RefereeControlBodyWithoutTwinIsClean
+--- PASS: TestPointer183RefereeControlBodyWithoutTwinIsClean (0.01s)
+=== RUN   TestPointer183PathAppearingTwiceInBodyStaysExempted
+--- PASS: TestPointer183PathAppearingTwiceInBodyStaysExempted (0.01s)
+=== RUN   TestPointer183BodySecretOutsideSpanStillHits
+--- PASS: TestPointer183BodySecretOutsideSpanStillHits (0.01s)
+=== RUN   TestPointer183ForeignMarkCarryingSamePathStillHits
+--- PASS: TestPointer183ForeignMarkCarryingSamePathStillHits (0.01s)
+=== RUN   TestPointer183AlmostPathInSameHostMarkStillHits
+--- PASS: TestPointer183AlmostPathInSameHostMarkStillHits (0.01s)
+=== RUN   TestPointer183WorstCaseOfTheLandedExemptionIsPinned
+--- PASS: TestPointer183WorstCaseOfTheLandedExemptionIsPinned (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.120s
+== HEAD exit=0 ==
+=== RUN   TestPointer183RefereeTwinFragmentOutsideSpanStaysExempted
+--- PASS: TestPointer183RefereeTwinFragmentOutsideSpanStaysExempted (0.01s)
+=== RUN   TestPointer183RefereeControlBodyWithoutTwinIsClean
+--- PASS: TestPointer183RefereeControlBodyWithoutTwinIsClean (0.01s)
+=== RUN   TestPointer183PathAppearingTwiceInBodyStaysExempted
+--- PASS: TestPointer183PathAppearingTwiceInBodyStaysExempted (0.01s)
+=== RUN   TestPointer183BodySecretOutsideSpanStillHits
+--- PASS: TestPointer183BodySecretOutsideSpanStillHits (0.01s)
+=== RUN   TestPointer183ForeignMarkCarryingSamePathStillHits
+--- PASS: TestPointer183ForeignMarkCarryingSamePathStillHits (0.01s)
+=== RUN   TestPointer183AlmostPathInSameHostMarkStillHits
+--- PASS: TestPointer183AlmostPathInSameHostMarkStillHits (0.01s)
+=== RUN   TestPointer183WorstCaseOfTheLandedExemptionIsPinned
+--- PASS: TestPointer183WorstCaseOfTheLandedExemptionIsPinned (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	(cached)
+== HEAD exit=0 ==

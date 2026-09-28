@@ -1,0 +1,23 @@
+time=2026-09-28T13:25:51.600+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPointer183RefereeTwinFragmentOutsideSpanStaysExempted
+    pointer_183_test.go:163: 183 referee: the host's own pointer must stay re-readable even when the body spells one of its windows elsewhere, got hit taint-hit channel=unclassified.exfil-scan source=fs.read task.output fragment_len=8
+--- FAIL: TestPointer183RefereeTwinFragmentOutsideSpanStaysExempted (0.01s)
+=== RUN   TestPointer183RefereeControlBodyWithoutTwinIsClean
+--- PASS: TestPointer183RefereeControlBodyWithoutTwinIsClean (0.00s)
+=== RUN   TestPointer183PathAppearingTwiceInBodyStaysExempted
+    pointer_183_test.go:214: 183 second face: a path the host wrote twice must not be evidence against the model's reread, got hit taint-hit channel=unclassified.exfil-scan source=fs.read task.output fragment_len=8
+--- FAIL: TestPointer183PathAppearingTwiceInBodyStaysExempted (0.00s)
+=== RUN   TestPointer183BodySecretOutsideSpanStillHits
+--- PASS: TestPointer183BodySecretOutsideSpanStillHits (0.00s)
+=== RUN   TestPointer183ForeignMarkCarryingSamePathStillHits
+    pointer_183_test.go:259: AC#3: hit must be attributed to the foreign mark, got "fs.read"
+--- FAIL: TestPointer183ForeignMarkCarryingSamePathStillHits (0.00s)
+=== RUN   TestPointer183AlmostPathInSameHostMarkStillHits
+--- PASS: TestPointer183AlmostPathInSameHostMarkStillHits (0.01s)
+=== RUN   TestPointer183WorstCaseOfTheLandedExemptionIsPinned
+    pointer_183_test.go:316: 183 cost side moved (an extra card is now raised for text that only spells the host's own path): taint-hit channel=notify source=fs.read task.output fragment_len=8
+--- FAIL: TestPointer183WorstCaseOfTheLandedExemptionIsPinned (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	0.077s
+FAIL
+== M1 exit=1 ==

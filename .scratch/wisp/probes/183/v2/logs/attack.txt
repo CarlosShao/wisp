@@ -1,0 +1,16 @@
+time=2026-09-28T13:30:59.641+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestV183AttackSiblingSharingPrefixStillHits
+    zz183v2_probe_test.go:44: L1 hit as expected: taint-hit channel=unclassified.exfil-scan source=fs.read task.output fragment_len=8
+--- PASS: TestV183AttackSiblingSharingPrefixStillHits (0.01s)
+=== RUN   TestV183AttackSubRunOfDeclaredPathIsTheEscapeSet
+    zz183v2_probe_test.go:55: L2 sub-run parameter hit=false (clean)
+    zz183v2_probe_test.go:64: L2: escape set = strings wholly inside the host's own declared path spelling
+--- PASS: TestV183AttackSubRunOfDeclaredPathIsTheEscapeSet (0.01s)
+=== RUN   TestV183AttackExemptionNotBorrowableAcrossScopes
+    zz183v2_probe_test.go:89: L3 foreign mark still evidence in its own scope: taint-hit channel=unclassified.exfil-scan source=web.fetch https://evil.example/v183 fragment_len=8
+--- PASS: TestV183AttackExemptionNotBorrowableAcrossScopes (0.01s)
+=== RUN   TestV183AttackUndeclaredSecondMarkKeepsTheRereadRefused
+    zz183v2_probe_test.go:115: L4 second-shot hit stays, attributed to the undeclared read-back mark: taint-hit channel=unclassified.exfil-scan source=fs.read C:\Users\swq\AppData\Roaming\wisp\artifacts\tool-output-agent-task-v183c0ffee.txt fragment_len=8
+--- PASS: TestV183AttackUndeclaredSecondMarkKeepsTheRereadRefused (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.069s

@@ -1,0 +1,18 @@
+=== RUN   TestPointer183RefereeTwinFragmentOutsideSpanStaysExempted
+--- PASS: TestPointer183RefereeTwinFragmentOutsideSpanStaysExempted (0.00s)
+=== RUN   TestPointer183RefereeControlBodyWithoutTwinIsClean
+--- PASS: TestPointer183RefereeControlBodyWithoutTwinIsClean (0.00s)
+=== RUN   TestPointer183PathAppearingTwiceInBodyStaysExempted
+--- PASS: TestPointer183PathAppearingTwiceInBodyStaysExempted (0.01s)
+=== RUN   TestPointer183BodySecretOutsideSpanStillHits
+--- FAIL: TestPointer183BodySecretOutsideSpanStillHits (0.00s)
+=== RUN   TestPointer183ForeignMarkCarryingSamePathStillHits
+--- PASS: TestPointer183ForeignMarkCarryingSamePathStillHits (0.00s)
+=== RUN   TestPointer183AlmostPathInSameHostMarkStillHits
+--- FAIL: TestPointer183AlmostPathInSameHostMarkStillHits (0.00s)
+=== RUN   TestPointer183WorstCaseOfTheLandedExemptionIsPinned
+--- FAIL: TestPointer183WorstCaseOfTheLandedExemptionIsPinned (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	0.066s
+FAIL
+== M5 exit=1 ==
