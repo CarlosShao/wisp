@@ -9020,3 +9020,23 @@ r1 **没动手**，因为票面 `:8` 只给到 `internal/tools/**` 的**测试�
 - **写面告警（给任何后来程）**：此刻 `cmd/wisp/**` 与 `internal/panel/**` 有**未提交的半成品**。
   带显式 pathspec 的提交**不会**吞它们，但**任何不带 pathspec 的动作会**——这正是票 182 AC#7 那族风险的第二现例。
 - **编队（此刻）**：在飞 **1 枚写腿**＝`197-r3b`；已交并核过 **56 枚**。**推送继续按住**。**待 owner：零枚**。台账到 `A414`。
+
+## A415（09-28 22:0x）：收 `197-r3b`（载体层入库，四枚 commit）；⚠ **它顶我对"终态"的说法顶对了——我自己那发整包读数就是红的**
+
+- **入库四枚**：`335b8d2b`（载体层，**10 枚文件** 1748/33——不是我派单说的 7 枚：`internal/panel/subagent_roster_197.go` 229 行、其测试件 477 行、新包 `internal/streamkey/streamkey.go` 44 行都**承重**，照我那张 pathspec 提交会得到一棵编不过的树）
+  ＋`7e3e7663`（把前一腿**没人调用**的 `streamClosed` helper 变成活判据）＋`c4647234`（证据件 `wc -c`＝32967＋台件与逐发读数）＋`3b0a17ed`（§⑥-2 补一格）。
+- ⚠ **我派单里写"`cmd/wisp` 读数还没回来，你自己跑"——它回来说是 FAIL，我核了我自己那发后台跑：`FAIL github.com/CarlosShao/wisp/cmd/wisp 106.468s`（21:0x，跑的就是那棵未提交的树）**。
+  ⇒ 也就是说**未提交的半成品整包是红的**，而前一腿把 `-run` 单跑的 `PASS` 当成了终态（它的 `probes/197/r3/final-v-four-pkgs.txt` 21:43 整包红、21:42 单跑绿，两发都在盘上）。
+  **"单跑绿＝交件"这一形今天第二次**（第一次是 `197-r1` 那轮我把包内判据当生产判据）。**规矩并入：任何"绿"的声称必须带整包 `-v` 点数，`-run` 只算中间读数。**
+- **我复跑过的（不是转述）**：四枚新判据逐名 `ok`（`TestRunPacketCarriesTheSubagentItsRosterRowFed`／`TestSubagentStreamKeyHasOneMintSite`／`TestAPumpWithoutARosterReaderSendsFourKeys`／`TestAStatusOutsideD43NeverReachesTheWire`，`cmd/wisp`＋`internal/panel` 两包）；
+  它的生产路径读数是**真字节**：`packet tasks section: rows=2 poolCap=4 child=<uuid> runStatus=Thinking afterStatus=Settling key=subagent:<uuid> bytes=2789`；溢出那发 `rows=34 streams=34 truncated=true elided=0 dropped=[]`。
+  键的落点＝**嵌进 `Snapshot` 的 `omitempty` 指针**（`composer.go:91 Tasks`），所以 `pump_test.go:123`／`:291` 那两枚"四枚顶层键"钉**一字未动仍绿**，"有读者必发"由新增常驻判据钉住——**这条路比我派单给的两条都好，我收下**。
+- **它问我的三格，我裁**：① **AC#4 生产判据（`blockedOnApproval` 在真包上钉）＝做**——它说前一腿"这棵树里没法从外面造那枚卡"讲重了，宿主自己就有线（`run.go:577-579` `AdmitTextTask`＋`PendingApproval`），代价＝`cmd/wisp` 20-30 行测试、**产码零改动**；
+  ② 根行的状态维今天没人填＝**留在票 196**，本腿"空并且带原因"那枚钉可接受；③ 真装配上 `elided>0`／`dropped` 点名不可达（mockllm 400 字节上限）＝**登记为"面板层钉住、生产层未量"**，不追。
+- ⚠ **界面那一跳现在变成两枚键**（我在票 197 同节已写全逐字段形状，owner 自己带给界面那支）：红句逐字 `Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare`——
+  `instructions` 来自票 200、`tasks` 来自本票。**`ResultChunk` 三枚键一枚没加**，"点进去那一页"的正文靠 `results` 节里 `correlationId === streamKey` 那条，**所以今天不需要新增任何 C17 入向方法**。
+- ⚠ **又一枚"注释声称盘上核不到的数"**：`internal/panel/subagent_roster_197.go:36` 写着那是 C17 的"第 5 枚 composer 方法"，而全仓非测试码里 `PanelBridge` **只有两枚注释命中**（`internal/panel/doc.go:2/:9`、`gate.go:595`）——**Go 侧今天没有这个接口**。
+  归 **票 212** 那一族（注释不许声称没发生/核不到的事），本条**只登记未修**。
+- **代落件**：`.scratch/wisp/probes/197/{r1b,r1c,r3}/**`＋`orch-verify-145r3.txt`＋`orch-verify-197r2.txt`（前几腿的逐发读数一直停在工作树上没入库；`3b0a17ed` 已具名说明"验收程要么从工作树读、要么由编排者代落"）⇒ **本枚我代落**。
+  `docs/evidence/s1/152-subject-death-never-measured-r1-accept-r1.md`（`M`）**仍不是我的**，继续不碰。
+- **编队（此刻）**：在飞 **0 枚**；`197` 三层（实体／流／载体）**全部入库并被我复跑**；已交并核过 **57 枚**。**推送继续按住**。**待 owner：零枚**。台账到 `A415`。

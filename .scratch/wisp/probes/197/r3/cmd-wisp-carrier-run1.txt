@@ -1,0 +1,63 @@
+time=2026-09-28T21:42:26.214+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestRunPacketCarriesTheSubagentItsRosterRowFed
+time=2026-09-28T21:42:27.380+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/28 21:42:27 mockllm: serving on http://127.0.0.1:59724 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-28T21:42:27.415+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunPacketCarriesTheSubagentItsRosterRowFed1170194518\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-09-28T21:42:27.439+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketCarriesTheSubagentItsRosterRowFed1170194518\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-28T21:42:27.446+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-28T13:42:27Z duration_ms=7
+time=2026-09-28T21:42:27.455+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketCarriesTheSubagentItsRosterRowFed1170194518\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-28T21:42:27.460+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-28T13:42:27Z duration_ms=5
+time=2026-09-28T21:42:27.465+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-28T21:42:27.467+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-09-28T21:42:27.473+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-a5c5fb19-fc08-4cb8-a9d7-954dbf378865 owner=tools
+    subagent_carrier_197_test.go:370: packet tasks section: rows=2 poolCap=4 child=a5c5fb19-fc08-4cb8-a9d7-954dbf378865 runStatus=Settling afterStatus=Settling key=subagent:a5c5fb19-fc08-4cb8-a9d7-954dbf378865 bytes=2788
+--- PASS: TestRunPacketCarriesTheSubagentItsRosterRowFed (1.72s)
+=== RUN   TestSubagentStreamKeyHasOneMintSite
+--- PASS: TestSubagentStreamKeyHasOneMintSite (0.12s)
+=== RUN   TestRunPacketReportsTheStreamLogPastItsBound
+time=2026-09-28T21:42:29.422+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/28 21:42:29 mockllm: serving on http://127.0.0.1:59730 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-28T21:42:29.448+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunPacketReportsTheStreamLogPastItsBound1664948472\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-28T21:42:29.476+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketReportsTheStreamLogPastItsBound1664948472\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-28T21:42:29.483+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-28T13:42:29Z duration_ms=7
+time=2026-09-28T21:42:29.493+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketReportsTheStreamLogPastItsBound1664948472\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-28T21:42:29.501+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-28T13:42:29Z duration_ms=8
+time=2026-09-28T21:42:29.508+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-28T21:42:29.510+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-09-28T21:42:29.516+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-38f98220-0062-420a-a9c0-90b06bd90a71 owner=tools
+time=2026-09-28T21:42:29.522+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-2749a6fc-f1b1-44af-962a-d0ac195291df owner=tools
+time=2026-09-28T21:42:29.529+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-3f4e93aa-bc9a-4620-b336-09ff071fb699 owner=tools
+time=2026-09-28T21:42:29.534+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-3c768425-99a5-4dd9-96d4-67054972f08f owner=tools
+time=2026-09-28T21:42:29.539+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-1c2bd79a-a587-4e0d-8aba-6215e0502b84 owner=tools
+time=2026-09-28T21:42:29.545+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-d11ae399-54e4-45ef-8601-7790e89b4ca0 owner=tools
+time=2026-09-28T21:42:29.549+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-c3d36abb-c777-4688-88f9-6c7950d9b5ae owner=tools
+time=2026-09-28T21:42:29.554+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-6c662a74-4126-4549-ac74-33a9ad2637e7 owner=tools
+time=2026-09-28T21:42:29.557+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-c341c09a-98e1-49aa-9b57-c705f8fbb49b owner=tools
+time=2026-09-28T21:42:29.562+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-d5a21db8-b6f8-4890-a61c-009fa69321a5 owner=tools
+time=2026-09-28T21:42:29.569+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-d3438c23-3402-48c2-a16d-92ddca0e6659 owner=tools
+time=2026-09-28T21:42:29.573+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-59635360-8db9-487e-999b-5657b2e98a16 owner=tools
+time=2026-09-28T21:42:29.577+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-553d6285-36bd-4e41-9db1-201c3686ec49 owner=tools
+time=2026-09-28T21:42:29.582+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-d1fa0221-d530-4f8d-9dfb-7918889f69fd owner=tools
+time=2026-09-28T21:42:29.587+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-fca794e2-c0b2-48ef-85d7-e3fcb858c2b8 owner=tools
+time=2026-09-28T21:42:29.593+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-58aea759-26ab-43a4-8be6-b798fe5e3636 owner=tools
+time=2026-09-28T21:42:29.598+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-632b6ce3-1a13-4c57-b22e-eb1fa67380a1 owner=tools
+time=2026-09-28T21:42:29.602+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-6c97b1dc-c255-42b1-8178-4592fde235f9 owner=tools
+time=2026-09-28T21:42:29.607+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-b62386ce-c8f1-41d6-a2df-a9fdbc0706cf owner=tools
+time=2026-09-28T21:42:29.613+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-b1762311-312f-402d-a418-53227237d925 owner=tools
+time=2026-09-28T21:42:29.618+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-eab9adc7-132d-4e51-b6ef-025e65d9a5a1 owner=tools
+time=2026-09-28T21:42:29.623+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-1667aa9c-bce3-4604-aea9-d4c4ab939df0 owner=tools
+time=2026-09-28T21:42:29.630+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-2a12d1c7-f27e-4ccb-9b2e-5847ef36ec45 owner=tools
+time=2026-09-28T21:42:29.635+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-f74ea9ef-7e0f-43e2-81ae-1d804150249c owner=tools
+time=2026-09-28T21:42:29.640+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-2ebd46bf-ff84-48e0-941c-3ab2c2bec19d owner=tools
+time=2026-09-28T21:42:29.645+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-6e1fc9ee-cadc-4def-918e-7b9aa02d5d68 owner=tools
+time=2026-09-28T21:42:29.651+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-6188aeec-22a8-4ac5-afdb-e589708f0c42 owner=tools
+time=2026-09-28T21:42:29.657+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-8b581eea-c44c-441f-a010-39da026dc1da owner=tools
+time=2026-09-28T21:42:29.662+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-6efb471a-8618-46f3-802c-084f27e30708 owner=tools
+time=2026-09-28T21:42:29.668+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-f0ddc29a-c248-420a-9ffe-c273991317bf owner=tools
+time=2026-09-28T21:42:29.673+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-e7adcc81-f143-4e41-81be-cde9fff9b80f owner=tools
+time=2026-09-28T21:42:29.677+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-02cdb6b5-ae75-41ed-9aa3-eca9bffdac3e owner=tools
+time=2026-09-28T21:42:29.681+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-ec973d68-4e65-449d-b98a-6614d591b207 owner=tools
+    subagent_carrier_197_test.go:573: bound crossed: rows=34 streams=34 truncated=true elided=0 dropped=[]
+--- PASS: TestRunPacketReportsTheStreamLogPastItsBound (1.63s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	3.534s

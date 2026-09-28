@@ -43,3 +43,25 @@
 
 ## 禁区
 `frontend/**`／`design/**` 零写面（连内容都不转述）；`PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`／C17 白名单既有名字一字不动（**改判只落 `A##` 台账，不动冻结文字，除非另有一句批准**）；**不新增方法名**（名册补齐是票 194 的射程，别在这票里顺手加）；`internal/risk/**` 不许绕过（子代理的落盘读回同样走 C25 盖戳那套，票 175／176／183 一族）。
+
+## 要 owner 带给界面那支的一跳（09-28 21:5x，`197-r3b` 落地之后；Go 侧改不了，也不是待拍板项）
+
+- ⚠ **本票文件名尾巴那句"go-side-has-zero-subagent-entity"从今天起是历史状态**：实体层（`b9fa815b`）＋载体层（`335b8d2b`）已入库。
+  文件名**不动**（`-done` 后缀才是防重领的唯一键），**引用时以这一节为准**。
+- **现象**：`internal/panel` 的 `TestApprovalCardViewJSONKeysMatchFrontendTypes` 今天红因**是两枚键**，红句逐字＝
+  `Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare`
+  （`instructions` 那枚是票 200 带来的，见 `200` 票面同节；**`tasks` 是这票带来的**）。
+- **转绿只有一跳**：界面那侧 `frontend/src/lib/panel.ts` 的 `PanelSnapshot` 补 `tasks?:` 一枚**对象**（Go 侧 `internal/panel/composer.go:91` `Tasks *TaskRosterSection`，带 `omitempty`）。
+  **不许**为过尺让 Go 少发一个键、也不许改尺或加豁免——那把尺判的就是"加字段必两侧同批移动"。
+- **`tasks` 这一节的字段（逐字取自 `internal/panel/subagent_roster_197.go`，21:5x 现读）**：
+  节上＝`rows`（数组，**总是发**、可空）· `inFlightSlots` number · `poolCap` number（今天＝4，等于桥的工具并发天花板，见票 211）·
+  `streamTruncated` boolean · `streamElidedRunes` number · `droppedStreamKeys` string 数组（**总是发**、可空）；
+  `rows` 每枚＝`taskId` · `label` · `kind`（`root`／`subagent`）· `parentTaskId`（根为空串）·
+  `status`（**只用 D43 那 20 枚名字**，`statemachine.Valid` 是判据）· `statusKnown` boolean · `statusReason?` ·
+  `streamKey`（＝`subagent:<taskId>`；**同一包 `results` 节里 `correlationId === streamKey` 的那一条就是"点进去那一页"的正文**）·
+  `blockedOnApproval` · `streamTruncated` · `streamElidedRunes` · `streamDropped`。
+- **画的时候两件别做错**：① `statusKnown=false` 要显示"状态还不知道，因为……"（`statusReason` 就是那句原因），**不许把空 `status` 当成"没在跑"**；
+  ② `streamTruncated`／`droppedStreamKeys` 是流被截断／被丢的实话——要么显示"这里少了 N 段"，要么明说没显示，**不许静默**。
+- **入向那一跳今天不需要**（写腿现读结论，我复核过字节）：名册行自带 `streamKey`、正文走现成 `results` 节 ⇒ **没有新增任何 C17 方法名**。
+  只有界面那支坚持要"宿主记住当前这格装的是哪枚会话"时才需要一枚入向方法——**那才是契约变更，要另落 `A##` 再动**。
+- **撤销口令**：界面那支若决定这版先不画名册，Go 侧把 `Tasks` 那枚键退回不 marshal（**同批那两枚判据钉一起退**），"子代理上界面"那一格随之退回并具名记账——**不许留"键在、值恒缺"**。

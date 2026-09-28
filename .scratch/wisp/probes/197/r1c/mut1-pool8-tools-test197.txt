@@ -1,0 +1,36 @@
+time=2026-09-28T20:25:34.402+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test197SpawnPublishesIdentityRow
+time=2026-09-28T20:25:34.407+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-d5caac91-6771-4269-bcc6-02db37cc9092 owner=tools
+--- PASS: Test197SpawnPublishesIdentityRow (0.00s)
+=== RUN   Test197RowExistsBeforeFirstChildModelCall
+time=2026-09-28T20:25:34.409+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-515ee0ec-4a37-4a2d-9705-b78e990d353c owner=tools
+--- PASS: Test197RowExistsBeforeFirstChildModelCall (0.00s)
+=== RUN   Test197SubagentPoolNeverExceedsBridgeCeiling
+    subagent_197_test.go:370: 池 8 大于桥的 D38d 天花板 4：多出来的 4 枚会被桥排成队，名册却说它们在跑；诚实数 = 天花板（票 211 甲），要更多并发得先动契约（票 211 乙），不是改这枚常量
+--- FAIL: Test197SubagentPoolNeverExceedsBridgeCeiling (0.00s)
+=== RUN   Test197SpawnDescriptionNamesTheRealPoolCap
+--- PASS: Test197SpawnDescriptionNamesTheRealPoolCap (0.00s)
+=== RUN   Test197SubagentPoolCapsAtBridgeCeiling
+    subagent_197_test.go:409: 池 8 大于桥的天花板 4：这一发要同时占 8 枚桥位，多出来的会排在 sem 后面起跑不了；先修 Test197SubagentPoolNeverExceedsBridgeCeiling 那条账
+--- FAIL: Test197SubagentPoolCapsAtBridgeCeiling (0.00s)
+=== RUN   Test197FullPoolRefusesNextSpawnWithReadableReason
+    subagent_197_test.go:494: 池 8 大于桥的天花板 4：先修 Test197SubagentPoolNeverExceedsBridgeCeiling
+--- FAIL: Test197FullPoolRefusesNextSpawnWithReadableReason (0.00s)
+=== RUN   Test197ChildCannotDeriveSubagent
+time=2026-09-28T20:25:34.410+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-9973cdf4-ffa0-4a0d-8775-9f3724293b3e owner=tools
+--- PASS: Test197ChildCannotDeriveSubagent (0.00s)
+=== RUN   Test197ConclusionCarriesTaskOutputTaint
+time=2026-09-28T20:25:34.411+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-30f101f5-e17e-46b5-9e8e-d0b24103b473 owner=tools
+time=2026-09-28T20:25:34.411+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-a057fb72-dfef-40e8-81a3-6a2df48cc871 owner=tools
+--- PASS: Test197ConclusionCarriesTaskOutputTaint (0.00s)
+=== RUN   Test197CancelIsPerRowAndNeverCascades
+time=2026-09-28T20:25:34.411+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-85a3092a-bdf3-4ad1-b5a7-face6078fd8e owner=tools
+--- PASS: Test197CancelIsPerRowAndNeverCascades (0.00s)
+=== RUN   Test197SubagentHasNoSelfApprovalOutlet
+time=2026-09-28T20:25:34.412+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-32c6f946-7f41-4bf7-b787-d3267594c85a owner=tools
+--- PASS: Test197SubagentHasNoSelfApprovalOutlet (0.00s)
+=== RUN   Test197StreamKeyShapeIsLiteral
+--- PASS: Test197StreamKeyShapeIsLiteral (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.070s
+FAIL

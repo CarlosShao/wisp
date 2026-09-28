@@ -1,0 +1,9 @@
+time=2026-09-28T19:50:55.690+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test197SubagentPoolNeverExceedsBridgeCeiling
+    subagent_197_test.go:363: 池 8 大于桥的 D38d 天花板 4：多出来的 4 枚会被桥排成队，名册却说它们在跑；诚实数 = 天花板（票 211 甲），要更多并发得先动契约（票 211 乙），不是改这枚常量
+--- FAIL: Test197SubagentPoolNeverExceedsBridgeCeiling (0.00s)
+=== RUN   Test197SpawnDescriptionNamesTheRealPoolCap
+--- PASS: Test197SpawnDescriptionNamesTheRealPoolCap (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.056s
+FAIL

@@ -1,0 +1,17 @@
+--- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.11s)
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	2.675s
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.062s
+ok  	github.com/CarlosShao/wisp/internal/tools	20.312s
+ok  	github.com/CarlosShao/wisp/internal/risk	6.882s
+FAIL
+=== d22scan ===
+d22scan: scope ban #8 frontend/         examined  85 text files
+d22scan: scope ban #8 internal/         examined 442 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined  47 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=211, bans #1-5 cmd/=24, ban #6 frontend/=85, ban #7 internal/tools/=21, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=442, ban #8 cmd/=47; ban #8 emoji coverage: design/ 39 text files; frontend/ 85 text files; internal/ 442 Go files, comments and _test.go included; cmd/ 47 Go files, comments and _test.go included
+=== gate-clauses ===
+# 每腿判定（ok＝说到做到／BAD＝言行不一／SHR＝读数比基线好＝基线过期但不算言行不一；这一份同样逐行可 diff）：
+# BAD  腿=G6neg 声明=ring 基线=1枚 实测=3枚 因=新增未成对（票 171 AC#2：实测 > 基线）

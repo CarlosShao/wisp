@@ -1,0 +1,13 @@
+time=2026-09-28T20:26:20.772+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestSubagentStreamKeyPrefixAgreesAcrossBothPackages
+    subagent_stream_key_197_test.go:32: 两包的前缀分家了：tools = "subagent-", panel = "subagent:"（写侧键与读侧键从此对不上，名册里的子代理会有流却没人读得到）
+    subagent_stream_key_197_test.go:39: 前缀 = "subagent-", want "subagent:"（§0 冻的键形状：全小写、冒号分隔）
+--- FAIL: TestSubagentStreamKeyPrefixAgreesAcrossBothPackages (0.00s)
+=== RUN   TestSubagentStreamKeyBuildersAgreeAcrossBothPackages
+    subagent_stream_key_197_test.go:60: 同一个 id "task-197-a" 两侧拼出不同的键：tools = "subagent-task-197-a", panel = "subagent:task-197-a"
+    subagent_stream_key_197_test.go:60: 同一个 id "00000000-0000-4000-8000-000000000000" 两侧拼出不同的键：tools = "subagent-00000000-0000-4000-8000-000000000000", panel = "subagent:00000000-0000-4000-8000-000000000000"
+    subagent_stream_key_197_test.go:60: 同一个 id "带中文的id" 两侧拼出不同的键：tools = "subagent-带中文的id", panel = "subagent:带中文的id"
+--- FAIL: TestSubagentStreamKeyBuildersAgreeAcrossBothPackages (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.082s
+FAIL

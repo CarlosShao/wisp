@@ -1,0 +1,8 @@
+d22scan: scope bans #1-5 cmd/           examined  24 production Go files
+d22scan: scope ban #6 frontend/         examined  85 text files
+d22scan: scope ban #7 internal/tools/   examined  22 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined  85 text files
+d22scan: scope ban #8 internal/         examined 449 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined  48 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=214, bans #1-5 cmd/=24, ban #6 frontend/=85, ban #7 internal/tools/=22, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=449, ban #8 cmd/=48; ban #8 emoji coverage: design/ 39 text files; frontend/ 85 text files; internal/ 449 Go files, comments and _test.go included; cmd/ 48 Go files, comments and _test.go included

@@ -1,0 +1,8 @@
+--- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.13s)
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	2.167s
+FAIL
+=== 本程 6 枚 ===
+ok  	github.com/CarlosShao/wisp/internal/panel	0.163s
