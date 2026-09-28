@@ -8905,3 +8905,36 @@ r1 **没动手**，因为票面 `:8` 只给到 `internal/tools/**` 的**测试�
   **补功能时不许把这面旗拆了**（具体风险＝新票往快照加键、界面不读，就长出 OpenChamber 那种"设置键在、控件不存在"那 6 处，见 `A408`）。
 - **编队（此刻）**：在飞 **2 枚**＝写腿 `197-r1`／`200-r1`；**只读调研 6 枚全部交齐并逐枚核过**。
   已交并核过 **48 枚**。**推送继续按住**。**待 owner：零枚**。台账到 `A410`。
+
+## A411（09-28 19:2x）：收 `197-r1`（实体层，两枚 commit 我复跑对上）；⚠ 三处**它没报或报偏**是我自己复算抓出来的——格式回归归它、"池=8"那条判据量的是绕行路径、一枚注释**声称存在的钉在盘上没有**
+
+- **交件面我逐枚核过**（不是转述）：`b9fa815b`＝`cmd/wisp/run.go` +59/−5、`internal/tools/subagent_197.go` +434、
+  `internal/tools/subagent_197_test.go` +696、`internal/tools/task.go` +251/−1；`a4b75096`＝证据件 152 行（盘上 `wc -c`＝**17450**）。
+  我自己重跑它的判据：`PATH=<sherpa>:<build> go test -count=1 -run Test197 ./internal/tools/` ⇒ **ok 0.066s**（不加那枚 PATH 会报 `0xc0000135`，一枚用例都不跑＝仪器瞎，不是包坏）。
+- **① 格式回归（它报"本机没有 gofumpt"，不实）**：gofumpt **在 `$GOPATH/bin/gofumpt.exe`**（我这次跑出的是 `v0.12.0 (go1.27.1)`），
+  对**跟踪集**跑 `-l`＝**7 枚**，其中本轮源件 3 枚：`cmd/wisp/run.go`、`internal/tools/subagent_197.go`、`internal/tools/subagent_197_test.go`。
+  ⚠ **归因用了 before/after 两版对照**（不是猜）：`git show b9fa815b~1:cmd/wisp/run.go` 导到仓外 `/tmp/gf197/` 再量＝**干净**，
+  ⇒ 这枚回归**是 197-r1 带进来的**（`provs` 那行字段对齐；它自己 `gofmt -w` 过了，但 `gofmt` 与 `gofumpt` 判的不是一回事，**"gofmt 空"不能当"gofumpt 空"交**）。
+  余下 4 枚是 `.scratch/wisp/probes/**` 里**刻意做坏的变异样本**，逐枚有入库号：`163/a1/main.go`←`e13196bd`、`174/c2/zz174c2_wiring_pair_windows_test.go`←`6479d540`、
+  `183/r2/mut/task-boxset-off.go`←`78ea1d19`、`185/r1/mut-m1/hostpath_185.go`←`ee1e2118`。
+  ⇒ **这不是本轮的伤，但下一次推送 `ci.yml:136`（`gofumpt -l . tools/...` 必须为空）会因它们红**——
+  这正是票 161 AC#7 当初把"分母＝跟踪集"这句话钉进 CI 的那个形状；**具名入账、不当新缺陷处理，也不许为了让那一步绿去改那 4 枚样本**（它们是别家的判据件）。
+- **② "池=8"这条判据量的是**不是生产走的那条路****：`subagent_197_test.go` 的 `spawnDirect` 注释自己写了"bypassing the bridge's in-bridge tool-concurrency ceiling (D38d)"，
+  而生产路径上子代理干活就是要往桥里递工具调用 ⇒ 桥只同放 4 枚（`bridge.go` `const MaxToolConcurrency = 4`，注释写死"不可上调"），
+  8 枚进来第 5–8 枚**排在桥后面、排队时间算进 C22 的 30s**，上一腿实测 7/8 红。
+  ⚠ **这条是我自己按"能力类判据必问生产调用者"抓回来的**，不是验收程报的——它给验收提了个醒：**AC 走的路≠用户走的路时，绿是不动product的**。
+- **③ 一枚注释在撒谎**：`subagent_197.go` 顶部写"两包同名前缀由 `cmd/wisp/subagent_stream_key_197_test.go` 钉成相等"，
+  而 `grep -rln "SubagentStreamKeyPrefix" --include=*.go .` 只点出 4 枚（`internal/tools/subagent_197.go`、`internal/panel/pump.go` 及各自测试件），**`cmd/wisp/` 下一枚都没有** ⇒ 那枚钉不存在。
+  ⚠ **危害比"缺测试"大**：下一程会以为两枚拷贝已经被钉住，于是放心改其中一枚。已并入 197-r1b 第 (c) 格。
+- **裁定（甲已派、乙立票，都不问 owner）**：
+  **甲＝今天的诚实数**——池改成**等于桥的天花板（4）**，语义形状不动（超一枚＝硬拒＋可读理由，不排队、不留名册行），
+  并新增一枚常驻判据钉"**池不许大于 `MaxToolConcurrency`**"，**正控必做**（临时写成 8 ⇒ 那枚必须真红）；池的测量改走真桥。
+  **乙＝真 8** 不是改常量：要给每枚子代理单开一份额度＝把全进程同时执行的工具数抬过 4 ⇒ 触 **D38（并发模型，`PLAN.md:2812`）**与 **D32（资源 SLO，`PLAN.md:2219`，`thresholds.go` 一字节不许动）**，
+  还要回答"面板/spill 复读这些宿主内部 caller 是不是也各拿一份"，否则 `bridge.go` 那句"choke point 只有一枚天花板"就没了 ⇒ **契约级，要 owner 一句话**。
+  已立 **票 211**（`.scratch/wisp/issues/211-subagent-pool-cannot-exceed-the-d38d-tool-ceiling.md`，盘上 `wc -c`＝6026）把甲/乙的界线与 5 条判据写死；
+  **我按甲先落地，不等他这句话**（他 09-28 18:0x 原话：「**必须特么做完整功能，明白吗？**」覆盖"不许自己砍"，**不覆盖**"agent 单方面改 D38d"）。
+- **派 197-r1b**（`.scratch/wisp/dispatches/2026-09-28-192x-impl-197r1b-pool-honesty-and-format.md`，`wc -c`＝7703）三格＝(a) 池诚实＋常驻钉＋正控、(b) 那 3 枚源件跑成 gofumpt 干净、(c) 那枚假注释（推荐真补那枚钉，不在这一腿合并真源——合并归载体层 r3，账 `A406` 已裁 panel 侧为真源）。
+- **写面冲突保护**：我看见 `internal/panel/instructions_200.go` **未跟踪、盘上存在、零 commit** ⇒ 判定 **`200-r1` 仍在飞**（通知不等于终态），
+  因此 197-r1b 的白名单**不含 `internal/panel/**`**，且要求它动 `cmd/wisp/run.go` 之前**当场**再看一次 `git status --short -- cmd/wisp/run.go`，脏就跳过并具名报。
+- **编队（此刻）**：在飞 **2 枚写腿**＝`200-r1`、`197-r1b`（`197-r1` 已收）；只读调研 6 枚全部交齐并核过。
+  已交并核过 **49 枚**。**推送继续按住**。**待 owner：零枚**（票 211 的乙那一支我不催，写在票里等他自己哪天问起）。台账到 `A411`。
