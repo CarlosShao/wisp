@@ -764,8 +764,18 @@ func (l *Loop) dispatch(ctx context.Context, j *taskJournal, rowID int64,
 //     about to veto (ticket 12's assembly, ruling A13). Where none is wired the
 //     old refusal stands: an unapproved write must not run just because a host
 //     forgot its gate.
+//   - a declared L0 call is executed directly and books its own allow: D4
+//     (docs/PLAN.md:127-129) fixes that tier as "只读，无副作用 - 直接执行，
+//     不打断", and it is a tier, not an absence of one. tools.levelString
+//     returns memory.RiskL0 for everything the assessor did not raise, so
+//     fs.read / fs.list / task.output arrive here as L0 (ticket 179: before
+//     this branch existed they fell into the unclassified arm below and were
+//     refused on any host that left the switch off, i.e. every real one).
 //   - an unclassified call still obeys PassThroughUnclassifiedRisk, which is a
-//     host-level policy switch, not a verdict.
+//     host-level policy switch, not a verdict. "Unclassified" is asked the same
+//     way riskLabel asks it - against RiskUnclassified - never as "not L1 and
+//     not L2", and anything else the directory declares no tier for fails
+//     closed here too.
 //
 // The second result reports "booked nothing" (gate-owned routing) so the caller
 // can drop its own pending row instead of leaving one open forever.
@@ -779,7 +789,13 @@ func (l *Loop) decideRisk(ctx context.Context, j *taskJournal, rowID int64, info
 			return false, false, "该操作属于 " + risk + " 级，审批通道尚未接入（ticket 21），已拒绝执行"
 		}
 		return true, true, ""
+	case RiskL0:
+		// A declared tier, the lowest one: run it, interrupt nobody (D4).
+		j.decide(ctx, rowID, DecisionAllow)
+		return true, false, ""
 	default:
+		// Reached only by RiskUnclassified ("") and by anything the directory
+		// declares no tier for; both fail closed while the switch is off.
 		if !l.opt.Config.PassThroughUnclassifiedRisk {
 			j.decide(ctx, rowID, DecisionReject)
 			return false, false, "风险未分级且直通开关关闭，已拒绝执行"
