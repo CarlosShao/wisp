@@ -70,7 +70,7 @@ func (r *rig176r1) handler(w http.ResponseWriter, req *http.Request) {
 			Role    string          `json:"role"`
 			Content json.RawMessage `json:"content"`
 			Name    string          `json:"name"`
-			CallID   string          `json:"tool_call_id"`
+			CallID  string          `json:"tool_call_id"`
 		} `json:"messages"`
 	}
 	if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
