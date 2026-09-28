@@ -1,0 +1,41 @@
+--- git diff 内容审查
+hits=0
+--- PTY/终端会话
+hits=1
+internal/risk/rules_shell.go:10:// cmd.exe escape caret, and control characters. Presence of ANY of these in
+--- 分支/worktree 读面
+hits=6
+internal/panel/composer_handlers.go:33:// all three档 (R20). No branch of this file is silent, and adding the gate
+cmd/wisp/panel_assets.go:16:// WISP-LEG-COVERAGE-RULING: panel-assets is dispatched by main; the card branch
+cmd/wisp/panel_assets.go:19:// carries (internal/panel's //go:embed bundle), so deleting this branch costs an
+cmd/wisp/panel_pump.go:93:// object is carried verbatim. The second branch is not a summary - it is the
+cmd/wisp/slo_windows.go:733:			// and a truncated document has none), so on this branch it carries no
+cmd/wisp/slo_windows.go:876:	// the only safe one - and it is the branch ticket 149's case 13 (a child
+--- 子代理 spawn
+hits=0
+--- 任务/会话状态机
+hits=34
+internal/ball/anim.go:44:	case statemachine.StateThinking:
+internal/ball/anim.go:50:	case statemachine.StateActing:
+internal/ball/ball_windows.go:489:	case statemachine.StateThinking:
+internal/ball/liquid.go:64:	case statemachine.StateListening, statemachine.StateThinking,
+internal/ball/liquid.go:66:		statemachine.StateWarm, statemachine.StateActing:
+internal/ball/statevisual.go:167:	case statemachine.StateThinking:
+--- 成本 token 用量
+hits=12
+internal/agent/compress.go:109:// TotalTokens estimates the history cost.
+internal/agent/compress.go:110:func (c *Compressor) TotalTokens(hist []llm.Message) int {
+internal/agent/compress.go:120:	return c.TotalTokens(hist) > c.b.HistoryCompressTokens
+internal/agent/compress.go:175:	rep := CompressionReport{TokensBefore: c.TotalTokens(hist)}
+internal/agent/compress.go:212:	rep.TokensAfter = c.TotalTokens(out)
+internal/agent/compress.go:248:		n += c.TotalTokens(r.msgs)
+--- 生产注册的工具名
+hits=10
+cmd/wisp/run.go:176:	// keep. Registered before rt.close() so the shutdown defer below runs
+cmd/wisp/run.go:338:	// (`Registry.Register` refuses "notify": "name must be 'namespace.action'").
+cmd/wisp/run.go:343:	// and list_tools keeps its D15(2) in-loop answer. Registering notify as a
+cmd/wisp/run.go:349:		if err := reg.Register(e); err != nil {
+cmd/wisp/run.go:366:		if err := reg.Register(e); err != nil {
+internal/tools/registry.go:91:// Register validates and adds one entry. Validation failures are returned as
+--- WorkspaceView 字段
+hits=0

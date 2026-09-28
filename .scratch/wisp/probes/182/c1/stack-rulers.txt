@@ -1,0 +1,50 @@
+hits=41
+internal/agent/loop.go:771://     fs.read / fs.list / task.output arrive here as L0 (ticket 179: before
+internal/risk/provenance.go:92:	// SrcTaskOutput is what a background task printed: outside content by
+internal/risk/provenance.go:94:	SrcTaskOutput = "task.output"
+internal/risk/provenance.go:102:	SrcTaskOutput,
+internal/risk/provenance.go:485:// task.output's stub). The exemption is precise — only the normalized window
+internal/tools/bridge.go:456:	// tool might itself write into its result text (task.output's re-read
+internal/tools/bridge.go:560:// gate itself (IsSensitiveSource) is unchanged. task.output joined that roster
+internal/tools/task.go:19://	task.output  L0  read what a background task printed   (this file)
+hits=5
+internal/risk/blacklist.go:214:	case homeS != "" && aEq(cand, anchorForms(anchorPath(homeS, `.git-credentials`))):
+internal/risk/blacklist.go:215:		return ClassA, "~/.git-credentials"
+internal/risk/blacklist.go:217:		return ClassA, ".git/config"
+internal/risk/blacklist.go:324:// hasGitConfigSegment reports whether the path is exactly <...>/.git/config.
+internal/risk/blacklist.go:329:		if s == ".git" && i+2 == len(segs) && segs[i+1] == "config" {
+hits=155
+internal/agent/approval/approval.go:22:// last-30s warning - is a duration handed to After, never a difference between
+internal/agent/approval/approval.go:251:// Two items with the same correlation id at different times (a replay) still
+internal/agent/approval/approval.go:252:// differ, because the sequence number is folded in.
+internal/agent/approval/queue.go:41:	// reply carrying one of those names is not a reply for a different request.
+internal/agent/approval/queue.go:46:	// and the sequence number, so a nonce cannot be replayed onto a different
+internal/agent/approval/ui.go:120:// differs: an unknown correlation id is a mis-routed reply, a bad grant is a
+internal/agent/guard.go:231:// equivalent objects written with a different key order or spacing count as
+internal/agent/loop.go:946:	// wall-clock difference (D42#9).
+hits=11
+internal/agent/loop.go:771://     fs.read / fs.list / task.output arrive here as L0 (ticket 179: before
+internal/tools/doc.go:12://   - the fs family, per D34: fs.read/fs.list (L0 pair, ticket 20 segment 1)
+internal/tools/fs.go:20://	fs.list  L0 / L2, same rule, capability fs.read
+internal/tools/fs.go:39:	// MaxListEntries caps one fs.list (default 500).
+internal/tools/fs.go:175:// fs.list (C1 Tool, D34 row 2)
+internal/tools/fs.go:190:func (fsList) Name() string           { return "fs.list" }
+internal/tools/fs.go:236:		onUpdate(fmt.Sprintf("fs.list 列出 %d 条目", len(names)))
+internal/tools/fs.go:307:// FSListDecl is the host-side declaration for fs.list (same capability as
+hits=303
+internal/agent/approval/gate.go:543:// exactly one call site that passes a non-empty value: PendingApproval, with
+internal/agent/approval/pending_read.go:56:// empty slice it allocated".
+internal/agent/approval/queue.go:172:// addressed by that is NOT the key the queue just issued. An empty or
+internal/agent/approval/queue.go:342:// else, including an empty one.
+internal/agent/approval/report.go:37:	// the reason this field exists rather than an empty slice.
+internal/agent/approval/ui.go:145:	// bypassable: an empty or stale value returns ErrBadGrant.
+internal/agent/compress.go:150:// withTraceTask tags ctx with the task a compression pass belongs to. An empty
+internal/agent/control.go:65:	// Text is the user-visible acknowledgement (may be empty).
+hits=6
+internal/risk/blacklist.go:227:	case aAnyForm(cand, func(s string) bool { return isBrowserCredentialStore(baseName(s)) }):
+internal/risk/blacklist.go:228:		return ClassA, "browser credential store"
+internal/risk/blacklist.go:336:// isBrowserCredentialStore matches the credential databases of Chromium-based
+internal/risk/blacklist.go:337:// browsers by file name (profiles move; the fail-safe direction is a
+internal/risk/blacklist.go:339:func isBrowserCredentialStore(base string) bool {
+cmd/wisp/panel_assets.go:8:// something in the binary can hand back the page bytes without a browser being
+hits=0

@@ -38,3 +38,30 @@
 ## Progress log
 
 - 09-28 10:2x 编排者立票：上面五把尺本程现跑（锚 `039efb47`）。未派。
+- 09-28 14:5x `182-c1`（只读普查，与票 180 合派一程；表 `docs/evidence/s1/180-182-panel-fields-census-c1.md` §4–§8）：
+  **AC 框一枚没勾、产码零字节未动、`frontend/**` 没读没引**。要点：
+  **堆数现量＝7**（S1 子代理／后台任务、S2 环境信息、S3 审查 diff、S4 文件树、S5 内置终端、S6 浏览器、S7 成本 token）；
+  S6「浏览器」是票面目测清单**没有**、但仓内文本有的那一堆（`issues/77-...md:364`／`:384` 逐字"右栏三标签定案：审查/终端/浏览器"），
+  已按仓内文本补进；"文件树"三个字全池只命中本票一枚（尺现跑）。
+  三档现量：`git diff` **0**、PTY／`shell.session` **0**（唯一命中是 `internal/risk/rules_shell.go:10` 的注释）、
+  git 分支／worktree **0** 真读面（6 命中全是注释里的 control-flow "branch"；仓内唯一 `.git` 触碰是
+  `internal/risk/blacklist.go:214-217,329` 的拉黑路径分类＝判级不是读面）、子代理 **0**；
+  **有源缺载体**三枚：`TaskRoster`（`internal/tools/task.go:110-152`，但没有"状态"维）、
+  `WorkspaceView`（`internal/panel/composer.go:174-186`，已在快照里）、成本 token
+  （`internal/agent/cost.go:38 AddUsage` → `guard.go:155 AddCost` → `loop.go:976 publishUsage`）。
+  **生产在册名册（现跑订正，先前一行把 `probe.count` 记进生产是错的——它是 `internal/tools/bridge_test.go:233` 的测试替身）**：
+  两个注册循环 `cmd/wisp/run.go:345 tools.BuiltinFSEntries(...)` 与 `:365 tools.BuiltinTaskEntries(...)`；
+  `BuiltinFSEntries` 逐字只有 `{Tool: fsRead{d: d}, Decl: FSReadDecl()}, {Tool: fsList{d: d}, Decl: FSListDecl()},`
+  ＋ `return append(out, BuiltinFSWriteEntries(d)...)`（`internal/tools/fs.go:325-331`），
+  `BuiltinTaskEntries` 逐字只有一枚 `task.output`（`internal/tools/task.go:295-297`）。
+  ⇒ **本程只把 `fs.read`/`fs.list`/`task.output` 三枚核到名册级**（写腿那几枚在 `BuiltinFSWriteEntries` 里，本程没展开）；
+  **`shell.exec`／`shell.session` 不在任何一支里**，与票 163 AC#1b 同读数。
+  归属：**没票认领＝7 处要点名立票**（S1 两堆、S2 未提交枚数、S3、S4、S5 面板载体、S6 Go 侧）；
+  可并格只有 S7→票 145 行 12（`docs/evidence/s1/145-snapshot-field-census-r1.md:182`，AC#2 未勾）
+  与 S2 分支→票 181 AC#1（三支逐字写着分支／工作树）；S5 工具地基＝只登记依赖到票 163，本程没重开。
+  ⚠ 指认前逐枚 `grep` 过 145／181／186／187／163／92／33／35 的 AC 标题：
+  票 186 `:48` 逐字"不裁任务监控那一栏缺哪些堆（＝票 182）"⇒ **186 明确不认领**，没拿它填空。
+  雷区（AC#5）：⚠ 4 处——面板 git 提交／推送、diff 接受／回滚、文件树删除／移动、面板内置终端；
+  现状合规那一格是 `internal/panel/bridge.go:42-45` 四枚 `panel.*` 里**没有** `decide`/`allow`。
+  **本程没提"顺手把批准接上"**，四枚 ⚠ 一律单列为待人拍板项（表 §12）；
+  AC#3 特别问的"宿主侧读面要不要与模型侧工具共享实现"＝两条都有代价，**本程不选，交编排者裁**。

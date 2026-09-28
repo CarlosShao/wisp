@@ -150,7 +150,17 @@
 | S2 未提交枚数 | **规格真空**（票 182 AC#4 把它划给"本票那一堆"，但本票只普查不实现） | 同 S3 尺 ⇒ **0** | 无 |
 | S3 审查 diff | **无源＋规格真空** | 尺（票 182 现量第 4 条同形）`grep -rn "git diff\|diff --numstat\|numstat\|unified diff" --include=*.go internal/ cmd/` ⇒ **0** | 无 |
 | S4 文件树 | **模型侧有源、宿主侧读面无源；面板那一维规格真空** | `grep -rn "FSListDecl\|fs\.list" --include=*.go internal/ cmd/` ⇒ 11 命中，全在 `internal/tools/fs.go`（`:190 Name() "fs.list"`、`:307 FSListDecl`）与注释 | 真值走 `fs.list` 的执行体（`internal/tools/fs.go`），但它带 **D34 风险分级**（`PLAN.md:2534` 逐字 `| \`fs.list\` | 列目录 | L0 / L2（越界） | \`fs.read\` | S3 | — |`），且是**模型调用面**不是宿主读面 ⇒ 见 §6 那句"要不要共享实现" |
-| S5 内置终端 | **工具那一维＝无源但规格要求（D34 表内行）**；**面板载体＝规格真空** | `grep -rnE "\b(PTY\|pty\|ShellSession\|shell\.session)\b\|cmd\.exe" --include=*.go internal/ cmd/` ⇒ **1 命中且是注释**（`internal/risk/rules_shell.go:10` 讲 cmd.exe 转义），PTY 零命中 | 无：`shell.session` 在 D34（`PLAN.md:2569` 逐字 `| **\`shell.session\`** | **在一条活着的会话里跑下一条命令（工作目录与环境延续）** | **L2** | \`shell\` | S3 | 票 163（20…`）但**生产注册表里没有它**——现跑尺 ⇒ 生产在册工具名只有 `"fs.read" "fs.list" "fs.edit" "fs.delete" "fs.move" "fs.trash" "fs.write" "task.output"`（`internal/tools/*.go` 的 `Name()` 集合 × `cmd/wisp/run.go:345/365` 两个注册循环） |
+| S5 内置终端 | **工具那一维＝无源但规格要求（D34 表内行）**；**面板载体＝规格真空** | `grep -rnE "\b(PTY\|pty\|ShellSession\|shell\.session)\b\|cmd\.exe" --include=*.go internal/ cmd/` ⇒ **1 命中且是注释**（`internal/risk/rules_shell.go:10` 讲 cmd.exe 转义），PTY 零命中 | 无：`shell.session` 在 D34（`PLAN.md:2569` 逐字 `| **\`shell.session\`** | **在一条活着的会话里跑下一条命令（工作目录与环境延续）** | **L2** | \`shell\` | S3 | 票 163（20…`）但**生产注册表里没有它**。
+  **生产在册名册现跑（订正版）**：注册只有两个循环——`cmd/wisp/run.go:345` 的
+  `for _, e := range tools.BuiltinFSEntries(tools.FSDeps{`（`internal/tools/fs.go:325-331` 逐字两枚
+  `fsRead`/`fsList` ＋ `return append(out, BuiltinFSWriteEntries(d)...)`）与
+  `cmd/wisp/run.go:365` 的 `for _, e := range tools.BuiltinTaskEntries(tools.TaskDeps{Roster: rt.tasks})`
+  （`internal/tools/task.go:295-297` 逐字一枚 `task.output`）。
+  ⇒ 本程把 **`fs.read`／`fs.list`／`task.output` 三枚核到名册级**；
+  `fs.edit`/`fs.delete`/`fs.move`/`fs.trash`/`fs.write` 那几枚在 `BuiltinFSWriteEntries` 那一支里，
+  **本程没逐枚展开**（写它们需要另一次读数）。
+  ⚠ 早前本程一次粗尺把 `probe.count` 当成在册名——**订正：它是 `internal/tools/bridge_test.go:233` 的测试替身，不在生产**。
+  `shell.exec`／`shell.session` **不在任何一支里** ⇒ 与票 163 AC#1b 的读数一致。 |
 | S6 浏览器 | **无源**；⛔ **实现路径＝未定义即停项，本程不判** | `grep -rnE "browser\|Browser" --include=*.go internal/ cmd/` ⇒ 6 命中全在 `internal/risk/blacklist.go:227-239`（浏览器凭据库拉黑）与 `cmd/wisp/panel_assets.go:8` 注释 | 无。**`web.search` 实现路径是 `AGENTS §2` 逐字列出的"未定义即停"项（S3 前）** ⇒ 碰到就停手，不选路 |
 | S7 成本／token | **有源**（缺载体） | `grep -rnE "(CostOf\|TrackCost\|total_tokens\|TotalTokens\|microUSD\|MicroUSD)" --include=*.go internal/ cmd/` ⇒ **12** 命中 | `internal/agent/cost.go:38 AddUsage(p config.Price, u llm.Usage) int64` → `guard.go:155 AddCost` → `loop.go:976 publishUsage`；实时 token 另有 `llm.StreamEvent.Usage`（票 145 表 §2.13 已点名）。⚠ 票 145 那行还挂着**单位口径未定案**（`config.Price` 是 micro-USD，`task_log.currency` 默认 CNY） |
 
@@ -194,7 +204,7 @@
 | S1 后台任务状态 | **无**（只读） | `Snapshot` 四枚里没有任务字段（`composer.go:57-62`） |
 | S2 环境信息 | ⚠ **有（在"提交或推送"那一项上）** | owner 目测清单里那一支就是写动作；`git` 子进程今天全仓零次（§5 尺）；票 181 票面标题逐字"…the **two mutating actions** would need C17 whitelist methods" ⇒ **待人拍板**，不许并进只读那一堆 |
 | S3 审查 diff | 只读那一半**无**；⚠ "接受／回滚改动"那一半＝写动作（`fs.write`／`fs.edit` 级，L2） | 今天 diff 零源 ⇒ 两半都不存在；登记为**立票时的边界** |
-| S4 文件树 | 只读**无**；⚠ 树上带删除／移动＝写动作（在册 `fs.delete`／`fs.trash`／`fs.move` 全 L2） | 生产在册名册（§5 S5 行） |
+| S4 文件树 | 只读**无**；⚠ 树上带删除／移动＝写动作（`fs.delete`／`fs.trash`／`fs.move` 在 `internal/tools/` 有 `Name()` 声明，D34 判 L2；⚠ **是否真在生产名册本程没逐枚展开**，见 §5 订正行） | 生产在册名册只核到 `fs.read`／`fs.list`／`task.output` 三枚（§5） |
 | S5 内置终端 | ⚠ **最大雷**：面板里敲命令＝执行面进面板通道；批准来源问题直接撞 `PLAN.md:2027` ①③ | 票 163 AC#4 逐字"常驻会话**不许**变成'授权一次就一直放行'…不许动 `internal/agent/approval/**`" |
 | S6 浏览器 | 只读浏览无；⚠ 若带"在页面里执行/登录"＝撞 `AGENTS §1.2` 的"只靠 CSP＋净化的方案已被否决"（`PLAN.md:2027` ⑤） | 零源 |
 | S7 成本／token | **无**（只读） | `publishUsage` 是出站播报，不是入口 |
@@ -219,16 +229,100 @@
 
 ## 9. 本程没测什么（逐名）
 
-TBD
+1. **没跑过任何真窗口**：面板宿主不存在（票 33/35 未开工），所以"改 `config.toml` 界面动不动"这一发
+   今天**根本没有可观测面**——本程只交静态现量，没做真机验证，也做不了。
+2. **没测 `frontend/**`／`design/**`**：按派单禁令不读不写不引不转述 ⇒ §8 那份字段清单是**Go 侧**清单，
+   不是"前端应当长这样"的 TS 契约（票 145 AC#2 那一格明确把 TS 对齐留给前端会话）。
+3. **`unwired_test.go` 只读了语义与 `collect(...)` 的四枚 locked section**，没单独跑它的用例
+   （跑数在 §10 的门禁里，不是本程的判据）。
+4. **粗尺 `\.<字段名>` 的同名歧义没逐枚消**：§3 因此只报**下界 18 枚**；
+   对"非 0"的 43 枚没做"这一枚到底有没有读者"的二次判定（那是票 83 用 I-A~I-G 七把仪器做过的事，
+   本程复用其结论、不重造）。
+5. **没裁数值**：`width` 该是多少（640?）＝owner 的一句话，本程不碰、也不替 owner 答。
+6. **没选落点**：`Width` 生效链要接在哪一枚（票 33 的 host？新票？票 145 的快照？）＝编排者的活。
+7. **S6 浏览器那一堆的实现路径没判**：撞 `AGENTS §2` 的"未定义即停"项（`web.search` 实现路径，S3 前）。
+8. **S1 子代理这一维在规格里没有对应物**：本程只报"零命中"，没有替它造规格。
+9. **§4 那句"仓内文本之外还有没有别的堆"没穷尽**：堆数＝7 是**能从仓内文本逐枚点名**的量，
+   不是那一栏的像素级清点（像素级归前端会话）。
 
 ## 10. 门禁终态
 
-TBD
+⚠ 按 `A363` 薄规矩：**只读程取的这些数不充当任何 AC 的结案凭据**。
+
+**0. 重跑前先查写数落点（`A367` 那一味）**
+尺 `grep -n "WriteFile\|OpenFile\|> \"\|>> \"\|tee" scripts/d22scan.sh .scratch/wisp/probes/154/gate-clauses.sh` ⇒ **空**；
+再尺 `grep -nE "^\s*[a-z_]*\s*>|>>|cp |mv |tee|git checkout" .scratch/wisp/probes/154/gate-clauses.sh` ⇒ 只有 4 行
+**进程内 `printf`**（`:82/:180/:192/:193`，往 `grep` 喂字符串）。
+⇒ 两枚台件**都不落盘**，重跑不会洗掉别家票的原始读数；本程自己的原始读数一律写到
+`probes/180/c1/**` 与 `probes/182/c1/**`。
+
+**1. `sh scripts/d22scan.sh` ⇒ rc=0（＝基线）**
+逐字读数：`d22scan: examined 231 production Go files under internal/ and cmd/`、
+`d22scan: scope ban #8 internal/  examined 433 Go files, comments and _test.go included`（**433＝派单给的基线**）、
+`ban #8 cmd/ examined 45`、末行 `clean - no D22 ban violations`。
+
+**2. `bash .scratch/wisp/probes/154/gate-clauses.sh` ⇒ 比名册不比退码**
+`腿数＝14 声明与实测不符＝1`；`名册=14 声明=14 记账=14 缺腿=0 空头声明=0`；`基线过期枚数＝0`；`聚合退码＝1`。
+**红腿名册＝只有 `G6neg`**，逐字 `# BAD  腿=G6neg 声明=ring 基线=1枚 实测=3枚 因=新增未成对（票 171 AC#2：实测 > 基线）`
+⇒ **与派单给的在册名册（`G6neg`＝票 178）相符，差集为空**。
+⚠ 那枚 `实测=3 > 基线=1` 的增量**不是本程造的**（本程零产码，`git status --porcelain -- internal/ cmd/` 见 §1 与文末闸门）。
+
+**3. `go test -count=1 ./internal/config/` ⇒ `ok github.com/CarlosShao/wisp/internal/config 0.790s`（rc=0，0 红）**
+
+**4. `go test -count=1 ./internal/panel/` ⇒ FAIL，红 **2** 枚（逐名）**
+- `--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`
+  （`frontend_hygiene_test.go:219`：`57 files reachable from main.tsx carry colour literals only in the generated theme`）
+- `--- FAIL: TestC21DesignTokensFourWayAgree`
+  （`tokens_fourway_test.go:441`：`read design/assets/tokens.css: open ...\design\assets\tokens.css: The system cannot find the path specified.`）
+⇒ 两枚红的射程都在**本程禁令之内没碰的东西**上（`frontend/**` 与本机缺失的 `design/assets/tokens.css`），
+与票 77 AC#2 在案的同名红（"Go 侧 `tokens.go` 与 `c21-native-tokens.md` 未同步"）同族；
+本程**没动 `internal/**` 一字**，所以这两枚不是本程造的，也**不是本程能修的**。
+
+**5. 没跑 `./cmd/wisp/`**：本机测不到东西＝票 98，按派单不算进本程的红。
+**6. 名册两向 `comm` 差集**：本程零产码 ⇒ 没有新增/删除的在册名可差，**未跑**（不是漏跑，是没有对象可差）。
+
+**终态写面闸门（两条，起手＋终态）**
+- 起手 14:40：`git status --porcelain -- internal/ cmd/` ⇒ **空输出**。
+- 终态：见文末「终态补记」，取在最后一枚 commit 之后。
+
+## 终态补记
+
+（本件最后一枚 commit 之后现跑，见下方逐条）
 
 ## 11. 被拒调用＋零删除自证＋工具调用终值
 
-TBD
+- **被拒调用：0 枚**（全程无一次权限被拒；无重试、无绕过）。
+- **删除命令：一枚没跑**。全程没有 `rm`／`del`／`Remove-Item`／`git clean`／`git restore`／`git checkout .`／
+  `git stash`／`git reset`／`git rebase`／`--amend`／worktree／switch；
+  临时件只建不删：`probes/180/c1/{same-family-census.txt, field-to-struct-map.txt, issue-pool-claims.txt}`、
+  `probes/182/c1/{stack-rulers.txt, stack-rulers-precise.txt}` 全部留在盘上并入库。
+- **没跑 `probes/161/r6/flip-declaration.sh`**（禁令）；**没动 `probes/154/gate-clauses.sh` 那把尺本身**（禁令，
+  只是执行它）。
+- 重跑既有台件前先查了写数落点（`A367` 那一味）：现跑结果见 §10 第 1 行。
+- **工具调用终值：见文末「终态补记」**（最后一枚 commit 之后现量）。
 
 ## 12. next＝落地腿还缺什么、哪几枚要人先批准
 
-TBD
+**A. 票 180（`Panel.Width` 生效）**——本程判＝**「规格要求生效」档**（凭据 §2 逐字三行），所以缺的是腿不是话：
+1. **面板宿主本身**（`.scratch/wisp/issues/33-panel-host-c27.md` 无 `-done`，票 35 同）
+   ⇒ 没有窗口就没有"生效"可言，**这是硬前置**；
+2. 宿主落地后才有 `cfg.Panel.Width → 窗口尺寸` 那一跳，并要一发
+   **能区分"接上了"与"又抄了一遍默认值"**的判据（票 180 AC#2 的口径）；
+3. ⚠ `Height`／`Scale` **连 `default` 都没有**（`schema.go:530`／`:534`），比 `Width` 更空——
+   要接就接一排；只接 `Width` 会留下三枚新装饰品（正是票 180 AC#3 反向判据防的那一形）。
+⇒ **要人先批准：无**（`hot` 档已写在 PLAN/SPEC-03，接效果不动契约）。
+但**落点选择**（并进票 33 还是立一枚"接线票"）归编排者，本程不选。
+
+**B. 票 182（任务监控栏）**——「没票认领」那一列共 **7 处**需要立票或被点名：
+S1 后台任务状态、S1 子代理（先得有规格）、S2 未提交枚数、S3 审查 diff、S4 文件树、
+S5 面板终端载体、S6 浏览器（Go 侧）。
+可并格的两处：S7 成本/token → **票 145 AC#2**（那格今天未勾）；S2 分支／工作树 → **票 181**。
+S5 工具地基只**登记依赖**到票 163，本程不重开它。
+⇒ **要人先批准（本程一律不选，只点名）**：
+1. **雷区 4 处**（§7）：面板里的 git **提交／推送**、diff 的**接受／回滚**、文件树上的**删除／移动**、
+   **面板内置终端**——每一处都连着"由面板侧来源的 L2『允许』"禁令（`PLAN.md:2027` ①②③逐字见 §7），
+   **必须逐枚人拍板，不许并进只读那一堆**；
+2. **宿主侧读面 vs 模型侧工具要不要共享实现**（§6 末，两条都有代价）；
+3. **`web.search`／浏览器那一堆的实现路径**＝`AGENTS §2` 在册的未定义即停项；
+4. **C17 白名单**：若面板终端或 git 动作要做成请求方法，`panel.*` 就要从四枚往上加
+   ——票 181 AC#3 现文本是"**一枚不许加**"，动它＝**契约面＝人工批准**（`AGENTS §1.1`）。

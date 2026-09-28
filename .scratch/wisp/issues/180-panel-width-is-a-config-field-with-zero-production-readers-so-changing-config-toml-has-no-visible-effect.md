@@ -35,3 +35,18 @@
 ## Progress log
 
 - 09-28 10:2x 编排者立票：上面三把尺本程现跑（锚 `039efb47`）。未派。
+- 09-28 14:4x `180-c1`（只读普查，与票 182 合派一程；表 `docs/evidence/s1/180-182-panel-fields-census-c1.md` §2–§3）：
+  **AC 框一枚没勾、产码零字节未动**。现跑复核（起手 HEAD `e9ef94d0`，非票面锚 `039efb47`）——
+  ① 字段仍在 `internal/config/schema.go:527-528`（`default:"640"`）；
+  ② 尺 `grep -rn "\.Width" --include=*.go internal/ cmd/ | grep -v _test.go` ⇒ **仍然空输出（0 读者）**；
+  `PanelSection` 生产里唯一被碰到的是 `internal/config/manager.go:211` 的**整块指针拷贝**，不读值不生效；
+  ③ 三档结论＝**「规格要求生效」**：`PLAN.md:2726` 逐字「`hot`（立即生效）」＋`PLAN.md:2743` 把 `width` 列进 `[panel]` 的 `hot` 行
+  ＋`SPEC-03-config-secrets-envs.md:39` 同行；SPEC-08 里 `width` 唯一命中是 `:218` 的 SVG `stroke-width`，与面板窗口无关。
+  **缺的不是"一跳"是整条链**：这棵树今天**没有面板窗口**（`internal/panel/doc.go:16`／`pump.go:16`／`cmd/wisp/run.go:438`
+  三处注释逐字指票 33/35 未开工），⇒ 票面 AC#1 的"谁决定尺寸"答案是**没有人**。
+  AC#4 同族现量：带 `default:` 的行 **69**、去重字段名 **61**、**零生产读者 18 枚**（下界，粗尺同名歧义见表 §3），
+  逐枚名与 struct 见表；⚠ **这 18 枚全部已在票 83（done）的 AC#1 全量表里登记并归口**
+  （`issues/83-...md:155` 逐字把 `panel.{enabled,width,height,keep_alive_in_session,scale}` 归给 📋 票 33/34/36）。
+  现量第 3 条的复核：`unwired_test.go` 的"名册"（`TestEveryLockedSectionKeyIsAccountedFor` `:311`）
+  **射程只有 `risk`/`fs`/`net`/`plugins` 四枚 locked section** ⇒ `[panel] width` 不在册是设计如此，
+  本票第二格既不是"补登记"也不是"新发现"；**落点本程不选，交编排者**。
