@@ -85,3 +85,20 @@
 - 代价我认：本票净产出停在"注释＋判词"。表对这一形状的判断是**"这正是它自己选的形状，不是失职"** ⇒ 我按这句结案为**部分结案**，`-done` 不加。
 
 **留给 owner 的一句（不催）**：面板要不要显示"当前是哪一屏"（`Q-51` 那一族）仍是界面侧的未答项；它不解，AC#2 这一格就一直是空的——**但这是设计要等的东西，不是后端的欠账**。
+
+---
+
+### 09-28 10:2x 编排者追加（新格 **AC#2b**：前端 composer 那两枚空数组 `models`／`efforts` 的**源我今天量到了**——本票 AC#2 当年那句"落地集＝空"对这两枚字段**已过期**，原句不抹）
+
+**来路**：前端那侧递给 owner 的"要拍板三件事"第 ② 件（"模型列表＋思考强度档位 — PromptBar 的 `models`／`efforts` 现在是空数组（所以那两个按钮不画）。需要快照上多两个字段：有哪些模型、当前模型支持哪几档思考"）。它把这件事摆成了**待拍板**；我按盘上现量判：**它不是拍板项，是本票 AC#2 那一格欠的载体**。台账 `A360`。
+
+**现量（锚 `039efb47`，本程现跑，每把尺可复制）**
+
+1. **快照里没有这两维**：`grep -rn "type ComposerState struct" -A 26 internal/panel/composer.go` ⇒ 六枚字段＝mode／workspace／attachments／acceptedAttachmentMimes／maxAttachmentBytes／attachmentError（`internal/panel/composer.go:200-207`），**没有 models、没有 efforts**；`Snapshot` 四枚（`:57-62`）同样没有。⇒ 前端那两个数组为空**是 Go 没送**，与本票主结论同形（"宁缺毋造"是既有裁定，不是前端的缺陷）。
+2. **模型清单有源**：`internal/config/schema.go:345`（注释逐字 `ModelSpec is llm.providers.<name>.models.<model-id>: one catalog entry`）＋ `:348`（`type ModelSpec struct`），带 `Display`（人看的名）与 `Capabilities`；尺 `grep -nE "type ModelSpec|// ModelSpec is|type Capabilities struct" internal/config/schema.go` ⇒ `:324`／`:345`／`:348`。
+3. **"支持不支持思考"有权威位**：`internal/config/schema.go:324-332` 的 `Capabilities` 位集里**逐字有 `Thinking bool`**（还有 Text/Vision/AudioIn/AudioOut/Realtime/FC/Stream），且其注释写明"**声明可由人填，但必须由探测核实（票 11）**，探测结果本身住在 SQLite `provider_health`、这里刻意不留字段（存储分家）"。⇒ **档位的第一维（能不能思考）不是新数据，是既有位。**
+4. **档位词表有源且已被校验**：`internal/config/schema.go:290-291` 逐字 `// ThinkingIntensity is one of off|low|medium|high (enum enforced).` ＋ `ThinkingIntensity string \`toml:"thinking_intensity" default:"off"\``；校验在 `internal/config/validate.go:211-233`（四枚 role 逐一验枚举）；适配器侧各家有各自映射（`internal/llm/openairesponses/request.go:62-63` 的 `effortLevels`＝low|medium|high；`internal/llm/anthropic/adapter.go:18` 映射到 `thinking` 参数）。⚠ **注意这里有一形真分歧要裁**：配置侧词表是**四档（含 `off`）**，OpenAI 兼容侧映射表只有**三档（无 `off`）**——`off` 在那些适配器上是"不发这个参数"还是"发不出去就报错"，本票 AC#2b 必须逐家量出来再画进快照，**不许把四档原样送出去当作每家都支持**。
+5. **现成的读面**：`cmd/wisp/models.go:104 cmdModels`（`wisp models` 那条腿，票 131 给它补过钉）已经在"列目录里的模型"这件事上取过一次真值 ⇒ AC#2b 的正解形状是**复用它的取数**，不是新写一套。
+
+- [ ] **AC#2b（09-28 追加，未做）**：把上面 1～5 落成快照里的两维——**① 当前可选模型清单**（provider＋model id＋`Display`，来源＝配置目录 ∩ `enabled=true`；⚠ 不许把未启用的也列进去）；**② 当前模型的思考档位集**（＝`Capabilities.Thinking` 决定"有没有这一维" ＋ 该适配器实际接受的档位词表决定"有哪几档"，两问分开答）。**判据要钉"值来自真源"**：拿一份两模型／两档位的假配置树喂进去，快照里读到的清单与那棵树逐字一致（与票 92 那格同形），⚠ 不许用"字段非空"充当判据。**本格只做"显示"**：任何"面板改档位／换模型"的**写回**都不在此格，它要 `internal/panel/bridge.go:42-45` 那四枚 `panel.*` 之外**新增方法＝C17 契约变更** ⇒ 已并入 `Q-64`（**默认不做**）。
+  ⚠ 与 AC#2 的分工：AC#2 的结论"落地集＝空"**保留不抹**，它当时量的是"十四行表里那些字段有没有源"；本格是**新增两维**，所以**不算推翻 AC#2、也不算替它翻勾**。⚠ **判据要说准（我一度用错尺）**：`sed -n '3473,3488p' docs/PLAN.md | grep -nE "模型|档位|思考|monitor"` 现量**命中 2 行**——但那两行是**状态名"思考中（等 LLM 首 token）"**（`:4` 与 `:9` 那两行），**与"思考档位"同名不同物**；十四行表里**真正要求"模型清单／档位集"的行＝零枚**（尺：`sed -n '3473,3488p' docs/PLAN.md | grep -nE "模型|档位|effort|thinking_intensity"` ⇒ 逐枚点名后为 0）。⇒ **别拿"grep 到'思考'两字"当"这一维已被要求过"的证据**，这是"同名不同物"那一族在中文关键词上的复发。

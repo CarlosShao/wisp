@@ -63,3 +63,17 @@
   允许的方向是"让它真跑起来"或"跑不起来就响亮失败"，**两者都不是把清单改短**。
   next= 可派（它不碰任何在飞代理的文件；`cmd/wisp/` 此刻无人写）。但**先等本轮 push 出去**——
   它可能需要看 CI 上 `test-windows` 的步级结论，而那要一次真 run（AC#1(iii)）。
+
+---
+
+> **09-28 10:5x 编排者追加（更正标题里那句"永远"，原文不抹；来路＝写手程 `179-r1` 推翻我传下去的一句、我复算成立）**
+>
+> **标题那句"在这台机器上永远测不到任何东西"里的"永远"为假。** 同一台机器、同一棵树上加一枚**在册**的 PATH 前缀就绿：
+> `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test -count=1 ./cmd/wisp/`。
+> 出处不是我推的，是仓里既有脚本头部逐字记着的四发读数之一——`scripts/wisp-cli-tests.sh:20` 逐字
+> `windows, PATH=third_party/sherpa-onnx ... runtests.sh: PASS=33 FAIL=0 SKIP=0, === RUN=67, rc=0, 51.1s -> GREEN`；
+> 且这一步**已经挂在 CI 上**（尺：`grep -n "wisp-cli-tests" .github/workflows/ci.yml` ⇒ **`:475`**，注释 `:458-460` 写明"DLLs are on PATH, which is exactly what…"，由票 111 AC#4 接的）。
+>
+> **本票剩下的真身是两格，不是"黑洞"**：① **裸 `go test ./cmd/wisp/` 的红是加载期缺 DLL、不是包坏**（这一形今天还会骗人——我 09-28 09:59 就用 `-run XXX_NONE_PKG` 复现过 `0xc0000135`，并据此把"CLI 只能走 `-overlay`"写进了两份派单与三枚票面，**那句是错的**，已在 `A361` 记账）；② **ubuntu 腿那 19 枚未解释的红**（脚本头部逐字：`ubuntu, CGO_ENABLED=1 ... 19 of 29 top-level cases FAIL, rc=1, 127.4s`），那才是本票真正还欠着的账。
+>
+> **处置＝登记为"可结案候选"，不当场结案**：结案要非实现者裁两问——(a) ①那一形要不要收成一枚"取数口令"（凡跑 `cmd/wisp` 必带那枚 PATH 前缀，写进 `AGENTS`／派单模板）而不是留一张常开的票；(b) ②那 19 枚红归因做没做（票 111 的 AC#4 只登记了读数，没逐枚归因）。⚠ **不许因为"CI 绿了"就宣布本票结案**——CI 的绿只覆盖 windows 那一腿，ubuntu 那 19 枚到今天仍是〔未定性〕。
