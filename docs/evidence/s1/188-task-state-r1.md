@@ -168,10 +168,40 @@ cb14a8b237382b32d4d2a442c9eddd63741d83cc 180-a1(片①): 票 180 Progress log �
 而 `145-r2` 正在 `internal/panel/composer.go`／`pump.go` 加快照字段（本单顶部点名的在飞写腿）。
 ⇒ 这一判据要钉的是"**状态维真实落地的那一枚载体**没有面板写腿"，载体没定 = 只能交一枚扫空气的死钉（无正控 ⇒ 按 `A389`／"负向尺必配正控"那条我不交）。**载体定案后我再落 `AC#3`，且那一发要自带"种一发面板写腿必响"的正控。**
 
-## 6. 门禁读数
+## 6. 门禁读数（原样，本程零产码 ⇒ 读的是"我没弄脏任何东西"）
 
-未裁完。
+- `sh scripts/d22scan.sh`（锚 `945a4d92`）：**clean - no D22 ban violations**。
+  分母逐名（`ban #8 internal/`＝**文件枚数、不是违规数**）：
+  `bans #1-5 internal/=211, #1-5 cmd/=24, ban #6 frontend/=85, ban #7 internal/tools/=21, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=441, ban #8 cmd/=47`；
+  另 `examined 235 production Go files under internal/ and cmd/`、`skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/]`。
+  ⚠ 票 188 `AC#6` 写的基线是 `ban #8 internal/` **examined=433**，现读 **441** ⇒ 别家加文件（含 145-r2／33-r3），按 `A384`/`A387` 口径**涨不等于漂移**。
+  同一次跑里 d22scan 自带仪器：`runtests.sh: OK - packages=[./...] top-level: PASS=34 FAIL=0 SKIP=0`。
+- `bash .scratch/wisp/probes/154/gate-clauses.sh`：**BAD 名册＝只 `G6neg`**（`声明=ring 基线=1枚 实测=3枚 因=新增未成对（票 171 AC#2）`），与任务书在册口径一致；
+  其余 13 腿逐行 `ok`（`G1 0/0`、`G1b 0/0`、`G2 2/2`、`G3 0/0`、`G4 0/0`、`G5 1/1`、`G5pos 0/0`、`G5neg 8/8`、`G6 1/1`、`G6pos 0/0`、`G7 3/3`、`G7pos 0/0`、`G7neg 4/4`）。
+  **`probes/161/r6/flip-declaration.sh` 一枚都没跑**（任务书禁跑，且起手名册里它那 9 枚 `flip-*.txt` 日志是别人在飞的脏件）。
+- `"$(go env GOPATH)/bin/gofumpt" -l internal/memory/`：**空输出**（本程对 `internal/memory/` 零写，包形状本来就是干净的）。
+- `go test -count=1 ./internal/memory/`：`ok github.com/CarlosShao/wisp/internal/memory 12.810s`。
 
-## 7. 没测到什么
+## 7. 没测到什么（本程射程的洞，逐条具名）
 
-未裁完。
+1. **没测 `./internal/tools/` 与 `./internal/agent/`**：本程零产码，且那两包里有别家在飞的腿（`internal/tools/pointer_185_cli_seam_test.go` 被点名、`internal/agent` 是本单禁区）⇒ 票面 `AC#6` 那两包的读数**未采**，别当绿。
+2. **没测 `./internal/panel/`**：三枚在册红（`TestComposerContractTypesMatchFrontend`／`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`／`TestC21DesignTokensFourWayAgree`）按任务书不修不当绿，且 `145-r2` 正在里面写 ⇒ 本程不进去量。
+3. **没跑 `cmd/wisp` 相关**：要带 `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"` 才不报 `0xc0000135`（票 98），而 `cmd/wisp/**` 是本程写面之外、无产码可测。
+4. **没有变异载体／正控**：本程零产码 ⇒ 没有任何"哪行改动→哪条红"的实发记录；§4 那三组负向钉是**读断言**得到的，不是我种出来的红。载体定案后落 `AC#2`/`AC#3` 时才需要那一栏。
+5. **`TaskOutput` 到底该装哪几枚任务态**＝未定案（§5 冲突 2），我不替规格填。
+6. 起手名册里的 30 枚 `design/**` 删除与 `docs/evidence/s1/152-...-accept-r1.md` 那处脏改**不是我动的**，本程一律不碰、不还原、不提交。
+
+## 1.3 / 1.4 本程两枚提交的原文（逐枚 `git show --name-only`）
+
+```
+$ git log --oneline -1   (片① 之后)
+500bc98e 188-r1(片①): 证据件骨架——起手名册逐枚抄录＋起手锚 38fc7c0e＋cb14a8b2 逐枚 show 原文
+
+$ git show --name-only --format="%H %s" HEAD   (片①)
+500bc98eb82a19d4debe729b9f3716dce471f65a 188-r1(片①): 证据件骨架——起手名册逐枚抄录＋起手锚 38fc7c0e＋cb14a8b2 逐枚 show 原文
+
+docs/evidence/s1/188-task-state-r1.md
+
+$ git log --oneline -1   (片② 之后)
+945a4d92 188-r1(片②): 证据件 §2-§5 落格——现量（Record 在 internal/tools、memory 侧 State 已在非 D43）＋D43 名字出处（statemachine/states.go:11-31）＋撞钉预检三组命中＋停手上报
+```
