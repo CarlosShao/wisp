@@ -1,0 +1,3 @@
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+--- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.06s)
