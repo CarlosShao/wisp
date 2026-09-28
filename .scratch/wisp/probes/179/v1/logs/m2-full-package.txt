@@ -1,0 +1,29 @@
+time=2026-09-28T12:00:22.486+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-09-28T12:00:22.488+08:00 level=INFO msg="agent: history compressed" tokens_before=30090 tokens_after=6586 threshold=12000 msgs_before=45 msgs_after=10 compressed_msgs=36 kept_raw_rounds=3 history_changed=true
+time=2026-09-28T12:00:22.488+08:00 level=INFO msg="agent: history compressed" tokens_before=30090 tokens_after=6108 threshold=12000 msgs_before=45 msgs_after=10 compressed_msgs=36 kept_raw_rounds=3 history_changed=true
+time=2026-09-28T12:00:22.488+08:00 level=INFO msg="agent: history compressed" tokens_before=505 tokens_after=401 threshold=384 msgs_before=10 msgs_after=7 compressed_msgs=4 kept_raw_rounds=3 history_changed=true
+time=2026-09-28T12:00:22.497+08:00 level=INFO msg="agent: history compressed" tokens_before=1236 tokens_after=780 threshold=384 msgs_before=18 msgs_after=10 compressed_msgs=9 kept_raw_rounds=3 history_changed=true
+--- FAIL: TestDeclaredL0RunsWhenPassThroughIsOff179 (0.07s)
+    declared_l0_risk_179_test.go:104: decision = "", want "allow"
+--- FAIL: TestCancelledTaskPersistsTerminalRows (0.07s)
+    forensics_test.go:161: row sleep decision = "", want allow
+    forensics_test.go:161: row sleep decision = "", want allow
+    forensics_test.go:161: row sleep decision = "", want allow
+    forensics_test.go:161: row sleep decision = "", want allow
+    forensics_test.go:161: row sleep decision = "", want allow
+    forensics_test.go:161: row sleep decision = "", want allow
+time=2026-09-28T12:00:23.724+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTaskLogAndToolCallRows3992781472\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-28T12:00:23.731+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-28T04:00:23Z duration_ms=6
+time=2026-09-28T12:00:23.737+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTaskLogAndToolCallRows3992781472\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-28T12:00:23.743+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-28T04:00:23Z duration_ms=5
+time=2026-09-28T12:00:23.753+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-28T12:00:23.755+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-09-28T12:00:24.129+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestMaxTokensFailsAllToolCallsOfThatMessage2210682392\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-28T12:00:24.139+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-28T04:00:24Z duration_ms=9
+time=2026-09-28T12:00:24.146+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestMaxTokensFailsAllToolCallsOfThatMessage2210682392\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-28T12:00:24.151+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-28T04:00:24Z duration_ms=4
+time=2026-09-28T12:00:24.155+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-28T12:00:24.157+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/agent	1.725s
+FAIL
