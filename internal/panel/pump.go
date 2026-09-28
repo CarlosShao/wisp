@@ -112,6 +112,12 @@ type PumpSources struct {
 	Mode func() risk.Mode
 	// Workspace reads the narrowed root as native resolved it.
 	Workspace func() WorkspaceView
+	// Git reads the host-side git dimension for that same root (ticket 181). It
+	// is a reader, not a value, so a pump assembled without one reports
+	// "unreadable" instead of a section full of zero values - and it is the ONLY
+	// route this dimension takes: there is no git tool for the model to call, and
+	// no inbound method for a switch to arrive on.
+	Git func() GitView
 	// Results reads the streamed assistant text so far.
 	Results func() []ResultChunk
 	// AttachmentMax is the composer's per-attachment ceiling. Zero means
@@ -187,6 +193,11 @@ func (p *SnapshotPump) Snapshot() Snapshot {
 		// AC#4 through the pump: a mode nobody read is reported as unknown, and
 		// never as the strictest-sounding or the safest-sounding default.
 		composer.Mode = ModeUnknownView()
+	}
+	if p.src.Git != nil {
+		// NewComposerState left this section saying "not probed"; a reader that
+		// exists overwrites it with what the files actually say.
+		composer.Git = p.src.Git()
 	}
 
 	now := time.Now

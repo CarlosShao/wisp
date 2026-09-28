@@ -86,6 +86,24 @@ func (rt *agentRuntime) workspaceView() panel.WorkspaceView {
 	return panel.WorkspaceViewFromRoot(rt.paths.WorkspaceRoot())
 }
 
+// gitView reports the read-only git dimension (ticket 181) for the tree this run
+// is actually scoped to.
+//
+// The root handed to the reader is the SAME value workspaceView put in
+// WorkspaceView.Canonical, read from the SAME call - not a second resolution of
+// "where am I". Two sections of one packet naming different trees is exactly the
+// failure the 09-27 incident (front-end switched branch under commits that were
+// still landing) made expensive, so the coordinate the user reads has to be one
+// coordinate.
+//
+// panel.ReadGit is a pure filesystem read: no external git process, no tool the
+// model can call, and nothing here can switch a branch or a worktree - the
+// inbound hop for that does not exist in this tree, which is what
+// git.switchBlocked in the packet says out loud.
+func (rt *agentRuntime) gitView() panel.GitView {
+	return panel.ReadGit(rt.workspaceView().Canonical)
+}
+
 // panelArgs shapes one live call's argument bytes into the argv-shaped list
 // ApprovalCardView.args shows. Two real shapes exist: a call that carries an
 // argv vector (what risk.Facts.ShellArgv is built from, and what

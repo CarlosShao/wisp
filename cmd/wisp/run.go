@@ -443,6 +443,7 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		Verdicts:  rt.liveVerdicts,
 		Mode:      rt.modes.PermissionMode,
 		Workspace: rt.workspaceView,
+		Git:       rt.gitView,
 		Results:   rt.stream.Chunks,
 		Out:       rt.bookPanelSnapshot,
 	})

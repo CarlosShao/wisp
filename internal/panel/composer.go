@@ -89,6 +89,11 @@ func NewSnapshot(pending []ApprovalCardView, results []ResultChunk,
 	if composer.AttachmentMIMEs == nil {
 		composer.AttachmentMIMEs = AcceptedMIMETypes()
 	}
+	if composer.Git.Kind == "" {
+		// Same rule as the mode two lines up: a git dimension nobody read is
+		// stated as unread, never as an empty section that renders as "no repo".
+		composer.Git = GitViewNotProbed()
+	}
 	return Snapshot{
 		Pending:     pending,
 		Results:     results,
@@ -204,6 +209,11 @@ type ComposerState struct {
 	AttachmentMIMEs  []string        `json:"acceptedAttachmentMimes"`
 	MaxAttachmentB   int64           `json:"maxAttachmentBytes"`
 	AttachmentReason string          `json:"attachmentError"`
+	// Git is the read-only git dimension (ticket 181). It is a NEW KEY on a
+	// section whose key set is pinned by the frontend contract, and the
+	// declaration that matches it on the page side is not this session's to
+	// write - see the note on Snapshot above and Q-51.
+	Git GitView `json:"git"`
 }
 
 // NewComposerState assembles the composer section from native state.
@@ -217,6 +227,9 @@ func NewComposerState(mode risk.Mode, ws WorkspaceView, atts []AttachmentRef, ma
 		Attachments:     atts,
 		AttachmentMIMEs: AcceptedMIMETypes(),
 		MaxAttachmentB:  maxBytes,
+		// A section built without a git reader says so, the way the mode says
+		// "unknown" rather than naming the safest档 (AC#4 of ticket 92, inherited).
+		Git: GitViewNotProbed(),
 	}
 }
 
