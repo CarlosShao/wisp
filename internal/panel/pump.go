@@ -54,6 +54,7 @@ import (
 
 	"github.com/CarlosShao/wisp/internal/projctx"
 	"github.com/CarlosShao/wisp/internal/risk"
+	"github.com/CarlosShao/wisp/internal/streamkey"
 )
 
 // NativeVerdict is one live approval as the host reads it off its own queue.
@@ -141,6 +142,19 @@ type PumpSources struct {
 	// r1 behaviour (empty list, omitempty, no key) made "you turned it off" and
 	// "this project has no AGENTS.md" indistinguishable on the wire.
 	Instructions func() *projctx.Bundle
+	// Tasks reads the roster this process is running (ticket 197 载体层): every
+	// task row the host can name, which of them are subagents of whom, the D43
+	// state each was filed under, and what the shared stream log lost to its
+	// bound. It is a reader for the same reason every field above is one - a
+	// value the caller shapes is a value the pump cannot be trusted about - and a
+	// nil reader is the ONLY way the packet carries no "tasks" key at all.
+	//
+	// The status dimension arrives already judged: the host answers it with
+	// tools.TaskOutput.StateAnswer and this pump carries the three halves through
+	// untouched, because TestTaskState188AC3PanelHasNoWriteLeg
+	// (internal/tools/task_state_188_test.go) walks this package for a panel-side
+	// write leg on that dimension and this carrier is not going to be one.
+	Tasks func() TaskRosterState
 	// AttachmentMax is the composer's per-attachment ceiling. Zero means
 	// MaxAttachmentBytes, the constant the broker itself defaults to
 	// (attachments.go:186), so the packet never advertises a ceiling that the
@@ -238,6 +252,15 @@ func (p *SnapshotPump) Snapshot() Snapshot {
 		// status even when the file list is empty. Whatever the loader last did
 		// is what this says, including "nothing yet".
 		snap.Instructions = InstructionsSectionFromBundle(p.src.Instructions())
+	}
+	if p.src.Tasks != nil {
+		// Same rule one line down: a pump with a roster reader always sends the
+		// key, because "this run has spawned nothing" and "this host cannot see
+		// subagents" are two different things a page must not render the same.
+		// The pending cards are passed in because a row whose task has a card on
+		// the queue right now is the one state a subagent list must never hide
+		// (PLAN.md:1127 records that as somebody else's real incident).
+		snap.Tasks = TaskRosterSectionFrom(p.src.Tasks(), cards)
 	}
 	return snap
 }
@@ -394,20 +417,28 @@ const (
 
 	// SubagentStreamKeyPrefix is the key shape ticket 197 §0 writes down: one
 	// subagent = one stream, "subagent:<taskID>", literal lowercase, the task id
-	// passed through verbatim. The tools leg feeds it, the panel reads it, and
-	// neither leg gets to invent a second spelling.
-	SubagentStreamKeyPrefix = "subagent:"
+	// passed through verbatim. It is an ALIAS now, not a copy: internal/streamkey
+	// owns the literal, because the writing leg (internal/tools) and this reading
+	// leg may not import each other, and two copies of one spelling is how a page
+	// starts lying about which agent wrote which line - change it on the writer
+	// and every roster row keeps its state while the page under its key goes
+	// empty, with nothing in either package able to see that. Ruling A406 named
+	// this package the reader's source and cmd/wisp the injector; 197-r3 collapsed
+	// the duplicated copy into that one mint site and
+	// TestSubagentStreamKeyHasOneMintSite (cmd/wisp) is the resident nail against a
+	// re-fork.
+	SubagentStreamKeyPrefix = streamkey.SubagentPrefix
 )
 
 // SubagentStreamKey is the one spelling of a subagent's stream key. An empty or
 // whitespace-only task id yields "": a stream belonging to no task is not a
 // stream, and Append("") would otherwise open a row the panel cannot attribute
-// to anybody (see Chunks - the key IS the row's identity here).
+// to anybody (see Chunks - the key IS the row's identity here). The guard lives
+// in streamkey now, so the writing side gets the same answer for a blank id -
+// that divergence (panel returned "", tools returned "subagent") is the one
+// 197-r1b left documented at §⑤2 and 载体层 r3 closes.
 func SubagentStreamKey(taskID string) string {
-	if strings.TrimSpace(taskID) == "" {
-		return ""
-	}
-	return SubagentStreamKeyPrefix + taskID
+	return streamkey.Subagent(taskID)
 }
 
 // NewStreamLog builds an empty results log. maxKeys <= 0 means DefaultStreamKeys.
@@ -568,4 +599,50 @@ func (s *StreamLog) DroppedKeys() []string {
 	out := make([]string, len(s.dropped))
 	copy(out, s.dropped)
 	return out
+}
+
+// StreamTruncation is what ONE key of the log cost the bound. It is the
+// per-stream half of the same three facts Truncated / ElidedRunes / DroppedKeys
+// give the whole log, and it exists because a host cannot put "this page is
+// missing its middle" on a row without knowing which row paid for it.
+type StreamTruncation struct {
+	// Truncated is true when this key's own row no longer holds its own full
+	// stream, i.e. when its text carries the inline "[truncated: N runes elided]"
+	// marker. A log that is truncating while this row stayed under the retained
+	// window reports false, and that is the truth, not a missing read.
+	Truncated bool
+	// ElidedRunes is how many runes THIS stream lost. Runes, not bytes: the
+	// bound is counted in runes on purpose (pump.go's streamTruncateKeepRunes),
+	// so a Chinese row and an ASCII row pay the same measure.
+	ElidedRunes int
+	// Dropped is true when the log stopped tracking this key at the hard ceiling,
+	// which means the page for it has no row at all - the loudest of the three,
+	// and never folded into a neighbour's row instead (197-r2 §1 乙).
+	Dropped bool
+}
+
+// TruncationFor reads one key's own truncation. An unknown key answers the
+// zero value with Dropped set only if it really was dropped: "nothing was lost
+// from this stream" and "nobody has written to this stream" are the same reading
+// here, and both mean the row that exists is the row in full.
+func (s *StreamLog) TruncationFor(key string) StreamTruncation {
+	if s == nil || key == "" {
+		return StreamTruncation{}
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for _, d := range s.dropped {
+		if d == key {
+			return StreamTruncation{Dropped: true}
+		}
+	}
+	st, ok := s.kept[key]
+	if !ok {
+		return StreamTruncation{}
+	}
+	elided := st.seen - 2*streamTruncateKeepRunes
+	if elided <= 0 {
+		return StreamTruncation{}
+	}
+	return StreamTruncation{Truncated: true, ElidedRunes: elided}
 }

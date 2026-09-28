@@ -117,6 +117,95 @@ func (rt *agentRuntime) instructionBundle() *projctx.Bundle {
 	return rt.instrLoader.Last()
 }
 
+// taskRosterState is the pump's reader for ticket 197's 载体层: which tasks this
+// process is running, which of them are subagents of whom, and what each one's
+// own page still has on it.
+//
+// WHY THE ENUMERATION SET IS "TASKS THIS PROCESS ADMITTED". tools.TaskRoster
+// deliberately has no list-everything port (its own Count comment says task.list
+// is DEFERRED and a listing mode on task.output would smuggle it back), so this
+// reader walks the ids admitTask saw - the root loop's and every child loop's,
+// since task.spawn wraps the SAME hook - and then walks each one's descendants.
+// Nothing is invented: a task that was admitted but never filed a row is simply
+// absent, and a row whose host never admitted its task can only be reached
+// through a parent that was.
+//
+// Every value is read, never shaped: Kind / Label / ParentTaskID come out of the
+// roster's own record, the status dimension out of the roster's own StateAnswer,
+// the pool numbers out of the roster's own counter and its own cap, and the
+// truncation facts out of the stream log this run is writing. The stream key is
+// the one thing minted here, with panel's own function - the composition root is
+// where A406 said the injection belongs, and it is also the only place that
+// knows both halves: a subagent writes under "subagent:<taskID>" (internal/tools
+// feeds its lifecycle lines and its own text sink through the StreamLog handed
+// to it), a root under its bare task id (consoleSink's Append(e.TaskID, ...)).
+//
+// Rows come out of a map, so they are unordered here; panel.TaskRosterSectionFrom
+// sorts by task id, which is what keeps the packet bytes - and the sha256 the
+// ledger books of them - reproducible run to run.
+func (rt *agentRuntime) taskRosterState() panel.TaskRosterState {
+	var state panel.TaskRosterState
+	if rt == nil || rt.tasks == nil {
+		return state
+	}
+	rt.taskMu.Lock()
+	ids := append([]string(nil), rt.seenTasks...)
+	rt.taskMu.Unlock()
+
+	rows := make(map[string]panel.TaskRow, len(ids))
+	add := func(rec tools.TaskRecord) {
+		if _, dup := rows[rec.TaskID]; dup {
+			return
+		}
+		key := rec.TaskID
+		if rec.Out.Kind == tools.TaskKindSubagent {
+			key = panel.SubagentStreamKey(rec.TaskID)
+		}
+		// The status dimension is read through the host's OWN judge, which is what
+		// it was written for: its comment says the reason string is for "a display
+		// surface (the panel snapshot's task section ... which is ticket 145's
+		// carrier and is deliberately NOT built here)" (internal/tools/task.go:145).
+		// This leg is that carrier, so the reading goes through that function and
+		// nowhere else. Nothing here re-decides a status, and nothing on the panel
+		// side assigns one - see TestTaskState188AC3PanelHasNoWriteLeg.
+		status, statusReason := rec.Out.StateAnswer()
+		trunc := rt.stream.TruncationFor(key)
+		rows[rec.TaskID] = panel.TaskRow{
+			TaskID:            rec.TaskID,
+			ParentTaskID:      rec.Out.ParentTaskID,
+			Label:             rec.Out.Label,
+			Kind:              rec.Out.Kind,
+			Status:            string(status),
+			StatusKnown:       status != "",
+			StatusReason:      statusReason,
+			StreamKey:         key,
+			StreamTruncated:   trunc.Truncated,
+			StreamElidedRunes: trunc.ElidedRunes,
+			StreamDropped:     trunc.Dropped,
+		}
+	}
+	for _, id := range ids {
+		if out, ok := rt.tasks.Look(id); ok {
+			add(tools.TaskRecord{TaskID: id, Out: out})
+		}
+		for _, rec := range rt.tasks.Descendants(id) {
+			add(rec)
+		}
+	}
+	for i := range rows {
+		state.Rows = append(state.Rows, rows[i])
+	}
+	state.InFlightSlots = rt.tasks.InFlightSubagents()
+	// The cap the refusal measures against, read off the same constant the tool
+	// reads: ticket 211's account (pool == the bridge's D38d ceiling) becomes a
+	// number the page can show instead of a sentence in a Go comment.
+	state.PoolCap = tools.MaxConcurrentSubagents
+	state.StreamTruncated = rt.stream.Truncated()
+	state.StreamElidedRunes = rt.stream.ElidedRunes()
+	state.DroppedStreamKeys = rt.stream.DroppedKeys()
+	return state
+}
+
 // gitView reports the read-only git dimension (ticket 181) for the tree this run
 // is actually scoped to.
 //

@@ -72,6 +72,23 @@ type Snapshot struct {
 	// key from a live reader is pump.go's job and run.go's assembly; a key whose
 	// value can never arrive is the shape ledger A408 names as 文案在、控件不在.
 	Instructions *InstructionsSection `json:"instructions,omitempty"`
+	// Tasks is ticket 197's carrier: which tasks this process is running, which
+	// of them are subagents and whose, what D43 name each one is filed under,
+	// which key holds each one's own work page, and how much of that page the
+	// stream log had to drop to keep its bound.
+	//
+	// It is a pointer with omitempty for the same reason the field above is, and
+	// the same two byte-level nails (pump_test.go:123, :291) still pass for the
+	// same reason: a pump assembled WITHOUT a roster reader sends four keys, which
+	// is the shape those nails pin, and a pump that has one always sends the key -
+	// including when nothing has been spawned, because the section then says so
+	// with an empty rows array plus the pool numbers rather than by disappearing.
+	// Adding it is a contract move and is reported as one: the two-way
+	// reconciliations against frontend/src/lib/panel.ts (approval_test.go:105,
+	// composer_test.go:48) now name "tasks" as a key the interface does not
+	// declare, which is that ruler doing the job ticket 77 pinned it for, and the
+	// page-side declaration is the UI leg's to write (Q-51, ledger A383).
+	Tasks *TaskRosterSection `json:"tasks,omitempty"`
 }
 
 // ResultChunk is one streamed assistant chunk.

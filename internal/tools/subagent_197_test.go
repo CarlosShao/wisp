@@ -144,8 +144,11 @@ type sub197Harness struct {
 	dir      *fake197Dir
 	streamMu sync.Mutex
 	streams  map[string][]string
-	muAdmit  sync.Mutex
-	admits   []string
+	// closed keys are the streams whose row said "finished" - the half ticket
+	// 197's 载体层 added, see sub197StreamFeed.
+	closed  map[string]bool
+	muAdmit sync.Mutex
+	admits  []string
 }
 
 func newSub197Harness(t *testing.T) *sub197Harness {
@@ -155,6 +158,7 @@ func newSub197Harness(t *testing.T) *sub197Harness {
 		prov:    risk.NewProvenance(risk.ProvOptions{NoProbe: true, SyncRoots: nil}),
 		dir:     &fake197Dir{},
 		streams: map[string][]string{},
+		closed:  map[string]bool{},
 	}
 	h.roster.MarkRoot(parent197, "根任务")
 	return h
@@ -177,11 +181,7 @@ func (h *sub197Harness) buildWith(t *testing.T, childProvider func() llm.LlmProv
 		Roster:      h.roster,
 		Provenance:  h.prov,
 		ParentTools: h.dir,
-		Stream: func(key, text string) {
-			h.streamMu.Lock()
-			h.streams[key] = append(h.streams[key], text)
-			h.streamMu.Unlock()
-		},
+		Stream:      sub197StreamFeed{h: h},
 		BaseOptions: func() (agent.Options, bool) {
 			opt := agent.Options{Provider: childProvider(), Tools: h.dir}
 			if admitWired {
@@ -257,6 +257,35 @@ func (h *sub197Harness) streamText(key string) string {
 	h.streamMu.Lock()
 	defer h.streamMu.Unlock()
 	return strings.Join(h.streams[key], " | ")
+}
+
+// streamClosed reports whether one key's stream was closed, i.e. whether the row
+// the page renders says "this stream is finished". Ticket 197's 载体层 made Close
+// part of the injected channel for exactly that: without it every settled
+// subagent keeps streaming on screen.
+func (h *sub197Harness) streamClosed(key string) bool {
+	h.streamMu.Lock()
+	defer h.streamMu.Unlock()
+	return h.closed[key]
+}
+
+// sub197StreamFeed is this suite's stand-in for the panel's stream log: the two
+// methods tools.SubagentStreamSink names, which is the whole shape production
+// hands over (*panel.StreamLog satisfies it as it stands, which cmd/wisp's
+// carrier test then measures end to end). Close is recorded rather than dropped
+// so the assertions can see a closed stream at all.
+type sub197StreamFeed struct{ h *sub197Harness }
+
+func (f sub197StreamFeed) Append(key, text string) {
+	f.h.streamMu.Lock()
+	defer f.h.streamMu.Unlock()
+	f.h.streams[key] = append(f.h.streams[key], text)
+}
+
+func (f sub197StreamFeed) Close(key string) {
+	f.h.streamMu.Lock()
+	defer f.h.streamMu.Unlock()
+	f.h.closed[key] = true
 }
 
 // AC#1 - the row exists with three real identity values, and the conclusion is

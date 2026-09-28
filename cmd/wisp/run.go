@@ -254,6 +254,16 @@ type agentRuntime struct {
 	// stream is the results section's producer: the deltas this run streams,
 	// accumulated so a snapshot can carry them.
 	stream *panel.StreamLog
+	// seenTasks are the task ids this process admitted - every root loop and
+	// every child loop, because agent.Options.AdmitTask is the one hook both of
+	// them pass through (internal/agent/loop.go:360, and task.spawn wraps the
+	// same hook at internal/tools/subagent_197.go's opt.AdmitTask). It is the
+	// enumeration set for the panel's roster reader: tools.TaskRoster has no
+	// "list everything" port, and minting one is ticket 194's roster work, not
+	// this leg's. taskMu guards it because admitTask runs on each task's own
+	// goroutine while the pump reads it from the approval UI's and the sink's.
+	taskMu    sync.Mutex
+	seenTasks []string
 	// instrLoader is ticket 200's project-instruction loader for the CURRENT run,
 	// kept so the panel pump has a live reader for the instructions carrier
 	// (200-r2, AC#7's second hop). instrMu guards it because execute() writes it
@@ -473,7 +483,13 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		// reports what was loaded (or which of the five states stopped it)
 		// instead of a key that can never carry a value.
 		Instructions: rt.instructionBundle,
-		Out:          rt.bookPanelSnapshot,
+		// ticket 197 载体层's reader, added in the shape the line above it
+		// established (票 200's hop): the carrier exists on the pump, so the
+		// assembly root owes it a reader of a live object, or the wire key can
+		// never arrive. This one reads the roster this process is running plus
+		// the stream log this process is writing - see panel_pump.go.
+		Tasks: rt.taskRosterState,
+		Out:   rt.bookPanelSnapshot,
 	})
 	rt.ui.publish = rt.publishPanelSnapshot
 
@@ -518,7 +534,11 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		Roster:      rt.tasks,
 		ParentTools: rt.bridge,
 		Provenance:  rt.c25,
-		Stream:      func(key, text string) { rt.stream.Append(key, text) },
+		// The panel's stream log itself, handed over as the two methods the
+		// spawner needs (tools.SubagentStreamSink). It is the log rather than a
+		// closure around it because Close is half of the job: a finished
+		// subagent whose row never says done streams forever on the page.
+		Stream:      rt.stream,
 		BaseOptions: func() (agent.Options, bool) { return rt.loopOpt, rt.loopOptSet },
 	}) {
 		if err := reg.Register(e); err != nil {
@@ -635,6 +655,7 @@ func (rt *agentRuntime) auditf(format string, args ...any) {
 // dispatches on the bridge directly (no admission, no boundary). That shape is
 // recorded as an open end, not silently folded into this line.
 func (rt *agentRuntime) admitTask(taskID string) func() {
+	rt.noteTask(taskID)
 	revoke := rt.gate.AdmitTextTask(taskID)
 	return func() {
 		if revoke != nil {
@@ -642,6 +663,24 @@ func (rt *agentRuntime) admitTask(taskID string) func() {
 		}
 		rt.bridge.CloseTask(taskID)
 	}
+}
+
+// noteTask records that a task of this process was admitted, which is what makes
+// it nameable by the panel's roster reader (ticket 197 载体层). It adds no state
+// of its own: the row behind an id is the roster's, and a task that was admitted
+// but never filed a row is simply not in the packet.
+func (rt *agentRuntime) noteTask(taskID string) {
+	if rt == nil || taskID == "" {
+		return
+	}
+	rt.taskMu.Lock()
+	defer rt.taskMu.Unlock()
+	for _, seen := range rt.seenTasks {
+		if seen == taskID {
+			return
+		}
+	}
+	rt.seenTasks = append(rt.seenTasks, taskID)
 }
 
 // execute runs one task through the loop and presents the result.

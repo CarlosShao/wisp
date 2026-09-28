@@ -12,6 +12,7 @@ import (
 	"github.com/CarlosShao/wisp/internal/observe"
 	"github.com/CarlosShao/wisp/internal/risk"
 	"github.com/CarlosShao/wisp/internal/statemachine"
+	"github.com/CarlosShao/wisp/internal/streamkey"
 )
 
 // The subagent layer (ticket 197 leg A: 实体层).
@@ -40,12 +41,16 @@ import (
 // Subagent identity, pool and depth constants. They live in this one file on
 // purpose: leg B (internal/panel) reads the KEY SHAPE, not these numbers.
 const (
-	// SubagentStreamKeyPrefix is ticket 197 §0's frozen stream key shape:
-	// "subagent:<taskID>", lower-case, colon separated, the task id passed
-	// through verbatim with no processing. internal/panel/pump.go carries the
-	// same literal for the reading side; the two packages must not import each
-	// other, so cmd/wisp/subagent_stream_key_197_test.go pins them equal.
-	SubagentStreamKeyPrefix = "subagent:"
+	// SubagentStreamKeyPrefix is ticket 197 §0's frozen stream key shape, and as
+	// of the 载体层 leg it is an ALIAS of internal/streamkey's one literal, not a
+	// second copy of it. Before that, this package and internal/panel each wrote
+	// the string "subagent:" themselves, and only the composition root - the one
+	// place that imports both - could notice a drift (the pair of pins in
+	// cmd/wisp/subagent_stream_key_197_test.go, kept in force). Now a re-fork of
+	// the literal is what goes red, mechanically:
+	// TestSubagentStreamKeyHasOneMintSite scans the tree and allows exactly one
+	// non-test file to contain it.
+	SubagentStreamKeyPrefix = streamkey.SubagentPrefix
 
 	// TaskKindRoot and TaskKindSubagent are the roster's two kinds. A root row
 	// has no parent; a subagent row always names the task that derived it.
@@ -101,9 +106,13 @@ const (
 // subagentInFlightState is the one D43 name that means "still holding a slot".
 const subagentInFlightState = subagentStateRunning
 
-// SubagentStreamKey is the ONE way this package names a subagent's stream.
+// SubagentStreamKey is the ONE way this package names a subagent's stream, and
+// it is streamkey's function, not a second spelling: the writing side and the
+// reading side now cannot disagree by construction. A blank task id yields "",
+// which this package used to answer with the bare prefix - a row nobody could
+// attribute to. Divergence named and closed by 197-r1b §⑤2.
 func SubagentStreamKey(taskID string) string {
-	return SubagentStreamKeyPrefix + taskID
+	return streamkey.Subagent(taskID)
 }
 
 // SubagentDeps is what task.spawn needs from the host. Every field is a seam the
@@ -125,10 +134,32 @@ type SubagentDeps struct {
 	// happen, and the reply then says so out loud instead of handing the parent an
 	// untraced outside text.
 	Provenance *risk.Provenance
-	// Stream receives the per-subagent key/text pair (subagent:<taskID>).
-	// nil means no reader is wired; the lifecycle then stays visible in the
-	// roster alone, which is honest as long as nothing claims a stream exists.
-	Stream func(key, text string)
+	// Stream is the subagent's text channel, and it is the panel's stream log
+	// handed over as the two methods this package needs - nothing more, so the
+	// tool layer holds no pointer to the view layer and no new field enters the
+	// AC#6 "is this an approval outlet?" enumeration.
+	//
+	// 197-r3 widened it from a bare append to Append+Close, and that is the whole
+	// carrier fix: opt.Sink used to be nil outright, so a child's streamed deltas
+	// were discarded and its work page held exactly the two lifecycle lines below
+	// (197-r2's own §6.1 is the reading that named it), and Close was the missing
+	// half of "this page is finished" - without it every subagent row streamed
+	// forever on a settled task, which is the failure consoleSink's EvDone branch
+	// exists to prevent for a root.
+	//
+	// nil keeps the pre-r3 shape (lifecycle lines only, no page) and is a
+	// statement about the assembly, never a degraded claim: nothing below pretends
+	// a child streamed when it was given nowhere to stream to.
+	Stream SubagentStreamSink
+}
+
+// SubagentStreamSink is the whole text surface one subagent has. *panel.StreamLog
+// satisfies it as it stands, which is why the composition root can hand the log
+// itself over instead of wrapping it, and why this package needs neither the
+// panel's types nor a second channel.
+type SubagentStreamSink interface {
+	Append(key, text string)
+	Close(key string)
 }
 
 type subagentSpawn struct{ d SubagentDeps }
@@ -246,9 +277,15 @@ func (t subagentSpawn) Execute(ctx context.Context, params json.RawMessage, onUp
 	opt.Tools = newSubagentToolProvider(t.d.ParentTools)
 	opt.Registry = observe.NewRegistry()
 	// The child's text must NOT ride the parent's console sink: that is how two
-	// tasks' output gets merged into one visible stream. Its own stream key is
-	// fed through deps.Stream instead.
+	// tasks' output gets merged into one visible stream. It gets its own sink,
+	// built from the one text channel the host injected, and that channel keys the
+	// child by its own task id (see SubagentDeps.Stream for why r3 had to widen it
+	// - before this leg the child had NO sink at all, so its streaming work was
+	// thrown away and the page was two lifecycle lines).
 	opt.Sink = nil
+	if t.d.Stream != nil {
+		opt.Sink = subagentTextSink{d: t.d}
+	}
 	// The child is admitted through the PARENT's admission hook, i.e. the host's
 	// one approval queue - which is also the second publisher of its roster row
 	// (the loop calls this before its first model call, internal/agent/loop.go:360).
@@ -353,6 +390,9 @@ func (t subagentSpawn) finalize(parentID, childID, label string, res agent.Resul
 	})
 	t.d.Roster.DetachCancel(childID)
 	t.feed(childID, fmt.Sprintf("已结束（%s）", string(state)))
+	// The row the page renders is closed here, not left open: "已结束" as text
+	// without done=true would still read as a stream in flight.
+	t.feedDone(childID)
 	return t.stampConclusion(parentID, childID, text)
 }
 
@@ -401,8 +441,56 @@ func (t subagentSpawn) stampConclusion(parentID, childID, text string) string {
 }
 
 func (t subagentSpawn) feed(childID, text string) {
-	if t.d.Stream != nil {
-		t.d.Stream(SubagentStreamKey(childID), text)
+	if t.d.Stream == nil {
+		return
+	}
+	key := SubagentStreamKey(childID)
+	if key == "" {
+		// A child with no id has no stream to write to, and appending under ""
+		// would open a row the panel cannot attribute to anybody.
+		return
+	}
+	t.d.Stream.Append(key, text)
+}
+
+// feedDone closes one child's own stream, i.e. puts done=true on the row the page
+// renders. Without it a finished subagent keeps streaming on screen forever,
+// which is the failure internal/panel's Close exists for (pump.go:443-461) and
+// what consoleSink's EvDone branch says out loud for a root task.
+func (t subagentSpawn) feedDone(childID string) {
+	if t.d.Stream == nil {
+		return
+	}
+	key := SubagentStreamKey(childID)
+	if key == "" {
+		return
+	}
+	t.d.Stream.Close(key)
+}
+
+// subagentTextSink is the child loop's own sink (ticket 197 载体层). Two rules
+// make it a sibling of cmd/wisp's consoleSink rather than a copy of it: nothing
+// here writes to stdout, because two tasks' text on one console is a merge; and
+// every line goes under the CHILD's own stream key, so the page opened by
+// clicking that row is that agent's work and nobody else's.
+//
+// Like the console sink it must never block - the loop publishes synchronously on
+// the task's goroutine - and reasoning deltas stay out of the results channel for
+// the reason consoleSink gives: panel.ResultChunk's contract is an assistant
+// RESULT (internal/panel/composer.go's ResultChunk header).
+type subagentTextSink struct{ d SubagentDeps }
+
+func (s subagentTextSink) Publish(e agent.Event) {
+	if s.d.Stream == nil {
+		return
+	}
+	switch e.Kind {
+	case agent.EvTextDelta:
+		s.d.Stream.Append(SubagentStreamKey(e.TaskID), e.Text)
+	case agent.EvDone:
+		if key := SubagentStreamKey(e.TaskID); key != "" {
+			s.d.Stream.Close(key)
+		}
 	}
 }
 
