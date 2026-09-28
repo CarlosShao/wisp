@@ -1,0 +1,229 @@
+package panel
+
+// The subagent carrier (ticket 197 leg C: 载体层).
+//
+// WHAT THIS FILE IS. Legs A and B made a subagent real (task.spawn derives a
+// child that gets its own task id, its own row in tools.TaskRoster and its own
+// stream key) and made its stream honest (StreamLog truncates instead of
+// merging, and names what it drops). Neither of them reached the page: the
+// roster had no reader on the pump, and the three truncation accessors
+// (Truncated / ElidedRunes / DroppedKeys) had zero production callers, so
+// 197-r2's own §6.2 named this file's absence as the reason "一行被截断的文字在
+// 页面上和全文长得一样". This is the hop that moves both onto the wire.
+//
+// WHAT IT DELIBERATELY IS NOT:
+//   - not a judge of status. Whether a filed word is one of D43's 20 names is
+//     answered by tools.TaskOutput.StateAnswer (internal/tools/task.go:153) at
+//     the composition root, and this package copies that answer through - it does
+//     not import internal/statemachine and it does not assign to a State field,
+//     which is not a style choice: TestTaskState188AC3PanelHasNoWriteLeg
+//     (internal/tools/task_state_188_test.go:343) walks every non-test source in
+//     this package for exactly that shape, and the carrier leg that could have
+//     written it chose to obey the nail rather than retarget it. Ticket 197 §2(c)
+//     asks for one state vocabulary with statemachine.Valid as the judge; that is
+//     still true, it is just exercised one hop away from the wire.
+//   - not an approval outlet. Nothing here lets a page answer a card, and
+//     nothing here claims a subagent can approve its own (ticket 197 AC#5,
+//     Q-49 丙). blockedOnApproval below is a READ of cards already in the same
+//     packet, joined by correlation id, not a route to them.
+//   - not a new C17 method. Clicking a row is navigation inside data the host
+//     already pushed: the page needs the row's streamKey and then reads that
+//     key's own row out of the same snapshot's results section. Compare the
+//     reference shape this repository surveyed: the sibling harness opens a
+//     child by {parent, child, mode} inside its own UI workspace and renders
+//     the SAME conversation components over the child session - no host call
+//     (docs/reports/survey-2026-09-28-dsh-ui-packages.md §3.2). An inbound
+//     "load session X into pane Y" would be a fifth composer method, which is a
+//     contract change (C17) and is handed back, not made.
+
+import "sort"
+
+// TaskRow is one roster row as the HOST hands it to the pump - the same copy,
+// not-judgement shape as NativeVerdict above (pump.go:59). internal/panel must
+// not import internal/tools, so the composition root does the mapping, and it is
+// also the only place that knows both halves of a row's stream: which key it
+// writes under, and what that key's log entry lost to the bound.
+type TaskRow struct {
+	// TaskID is the row's own id, minted by the loop that runs it
+	// (agent.newTaskID), not by this carrier.
+	TaskID string
+	// ParentTaskID is the task that derived this one. Empty means a root row.
+	// The entity leg files the deriving call's correlation id, and the agent
+	// loop dispatches with CorrelationID == TaskID (internal/agent/loop.go:647),
+	// so on the production path this reads as the parent's task id.
+	ParentTaskID string
+	// Label is the row's short title (a subagent's description, the root's own
+	// task text). It is text the host filed, carried verbatim: a carrier that
+	// summarised it would be writing the sentence the user reads.
+	Label string
+	// Kind is the host's vocabulary (tools.TaskKindRoot / TaskKindSubagent).
+	// This package neither validates nor translates it - see the note on Status.
+	Kind string
+	// Status / StatusKnown / StatusReason are the three halves of
+	// tools.TaskOutput.StateAnswer as the host read it: a D43 name and true when
+	// the host filed one, or empty and false plus the host's own sentence for
+	// why. This carrier does not decide which of the two it got.
+	Status       string
+	StatusKnown  bool
+	StatusReason string
+	// StreamKey is the key this row's own stream is filed under, minted by the
+	// host (panel.SubagentStreamKey for a subagent, the task id itself for the
+	// root - see cmd/wisp's consoleSink, which appends under e.TaskID).
+	StreamKey string
+	// StreamTruncated / StreamElidedRunes / StreamDropped are this ONE stream's
+	// cost, read off the live StreamLog by the host. They say how much of this
+	// row's own page is missing; the section-level numbers are the whole log's.
+	StreamTruncated   bool
+	StreamElidedRunes int
+	StreamDropped     bool
+}
+
+// TaskRosterState is the pump's reader value: the rows plus the two facts about
+// the pool and the stream log that no row carries by itself.
+//
+// The pool numbers come from the roster's own counter rather than from a count
+// of rows, because a slot is reserved BEFORE a row exists and released when the
+// child has joined (tools.TaskRoster.TryAcquireSubagentSlot), so "rows on file"
+// and "children the pool is holding" are two different truths and the panel
+// must not silently pick one.
+type TaskRosterState struct {
+	Rows              []TaskRow
+	InFlightSlots     int
+	PoolCap           int
+	StreamTruncated   bool
+	StreamElidedRunes int
+	DroppedStreamKeys []string
+}
+
+// TaskRowView is one roster row as the page reads it. Every field is a copy of
+// something the host already holds; nothing here is derived from a second
+// assessment.
+type TaskRowView struct {
+	TaskID       string `json:"taskId"`
+	Label        string `json:"label"`
+	Kind         string `json:"kind"`
+	ParentTaskID string `json:"parentTaskId"`
+	// Status is a D43 name, and it is empty EXACTLY when StatusKnown is false:
+	// an unread status dimension is never rendered as a word this repository
+	// did not file. That is ticket 92 AC#4's rule for the mode, inherited here.
+	Status      string `json:"status"`
+	StatusKnown bool   `json:"statusKnown"`
+	// StatusReason is the honest half of an unknown status, in the host's own
+	// words - the second return of tools.TaskOutput.StateAnswer, which exists
+	// precisely so a display surface can say "no status was filed" instead of
+	// printing a verdict (internal/tools/task.go:145-152).
+	StatusReason string `json:"statusReason,omitempty"`
+	// StreamKey is the address of this row's own work page: the results
+	// section's row with correlationId == streamKey IS the text to render.
+	// This is the field that answers "这一行是谁的", and it answers it without
+	// adding a key to ResultChunk (whose three JSON keys are the contract
+	// reconciled by TestComposerContractTypesMatchFrontend).
+	StreamKey string `json:"streamKey"`
+	// BlockedOnApproval reports that a card for this very task is on the queue
+	// right now - the join that keeps a blocked subagent visible instead of
+	// quietly waiting (the sibling harness's real incident: 被阻塞的子代理在所有
+	// 界面上都不可见). It reads the same packet's pending section, so it cannot
+	// disagree with what the user is being shown.
+	BlockedOnApproval bool `json:"blockedOnApproval"`
+	// StreamTruncated / StreamElidedRunes / StreamDropped describe this row's
+	// own stream. "少了多少" is a number, never a shrug, and never silent.
+	StreamTruncated   bool `json:"streamTruncated"`
+	StreamElidedRunes int  `json:"streamElidedRunes"`
+	StreamDropped     bool `json:"streamDropped"`
+}
+
+// TaskRosterSection is the carrier's whole answer: which tasks this process is
+// running, which of them are subagents of whom, and how much of their text the
+// packet actually still has.
+//
+// It is a pointer with omitempty on Snapshot for the same reason Instructions is
+// (composer.go:62-74): the only way this key stays absent is the only way it
+// honestly can - a pump assembled with no roster reader. A pump that HAS the
+// reader always sends the key, including when the run has spawned nothing, so
+// "no subagents yet" and "this host cannot see subagents at all" stay two
+// different readings on the wire.
+type TaskRosterSection struct {
+	// Rows is every row the host could read, ordered by task id so the packet
+	// bytes are reproducible (the ledger books a sha256 of them).
+	Rows []TaskRowView `json:"rows"`
+	// InFlightSlots is how many pool slots the host is holding, and PoolCap is
+	// the cap it holds them against. Both are read, not counted from Rows: see
+	// TaskRosterState for the window where the two differ.
+	InFlightSlots int `json:"inFlightSlots"`
+	PoolCap       int `json:"poolCap"`
+	// StreamTruncated says the shared stream log went past its key bound, so at
+	// least one row on this packet is no longer the full stream it started as.
+	StreamTruncated bool `json:"streamTruncated"`
+	// StreamElidedRunes is the log's total, across every stream it had to fold.
+	StreamElidedRunes int `json:"streamElidedRunes"`
+	// DroppedStreamKeys names every stream the log stopped tracking at the hard
+	// ceiling. Naming them is the difference between "this page lost a section"
+	// and "somebody merged it into a row that is still here" (197-r2 §1 乙).
+	// Empty array means none, never "unread".
+	DroppedStreamKeys []string `json:"droppedStreamKeys"`
+}
+
+// TaskRosterSectionFrom renders the host's read as the packet's section, and it
+// is the only place on the panel side that decides whether a state name is
+// allowed on the wire.
+//
+// pending is this same pump's approval cards: a row whose task has a card in
+// that list is blocked on approval, which is the one thing a subagent list must
+// never hide. Matching is on correlation id because the agent loop dispatches
+// with CorrelationID == TaskID (internal/agent/loop.go:647); a host that used a
+// different pairing would show these rows as not blocked, and that is a
+// statement about the pairing, not a guess to paper over.
+func TaskRosterSectionFrom(state TaskRosterState, pending []ApprovalCardView) *TaskRosterSection {
+	sect := &TaskRosterSection{
+		Rows:              make([]TaskRowView, 0, len(state.Rows)),
+		InFlightSlots:     state.InFlightSlots,
+		PoolCap:           state.PoolCap,
+		StreamTruncated:   state.StreamTruncated,
+		StreamElidedRunes: state.StreamElidedRunes,
+		DroppedStreamKeys: append([]string(nil), state.DroppedStreamKeys...),
+	}
+	if sect.DroppedStreamKeys == nil {
+		// An empty array, not null: "nothing was dropped" has to be readable
+		// without a nil check that a renderer will skip.
+		sect.DroppedStreamKeys = []string{}
+	}
+	waiting := make(map[string]bool, len(pending))
+	for _, card := range pending {
+		if card.CorrelationID != "" {
+			waiting[card.CorrelationID] = true
+		}
+	}
+	dropped := make(map[string]bool, len(state.DroppedStreamKeys))
+	for _, k := range state.DroppedStreamKeys {
+		dropped[k] = true
+	}
+	for _, row := range state.Rows {
+		view := TaskRowView{
+			TaskID:            row.TaskID,
+			Label:             row.Label,
+			Kind:              row.Kind,
+			ParentTaskID:      row.ParentTaskID,
+			Status:            row.Status,
+			StatusKnown:       row.StatusKnown,
+			StatusReason:      row.StatusReason,
+			StreamKey:         row.StreamKey,
+			BlockedOnApproval: row.TaskID != "" && waiting[row.TaskID],
+			StreamTruncated:   row.StreamTruncated,
+			StreamElidedRunes: row.StreamElidedRunes,
+			StreamDropped:     row.StreamDropped || dropped[row.StreamKey],
+		}
+		if !view.StatusKnown {
+			// A name the host's judge refused never travels as a status. This is
+			// the one thing this package enforces, and it enforces it by dropping
+			// the value, not by translating it - translating would be the second
+			// vocabulary ticket 196 was filed for.
+			view.Status = ""
+			if view.StatusReason == "" {
+				view.StatusReason = "宿主没有给出这一维的读数（fail-closed：不替任务编一个状态）"
+			}
+		}
+		sect.Rows = append(sect.Rows, view)
+	}
+	sort.Slice(sect.Rows, func(i, j int) bool { return sect.Rows[i].TaskID < sect.Rows[j].TaskID })
+	return sect
+}

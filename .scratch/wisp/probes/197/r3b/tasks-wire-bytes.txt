@@ -1,0 +1,17 @@
+time=2026-09-28T21:59:00.259+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestRunPacketCarriesTheSubagentItsRosterRowFed
+time=2026-09-28T21:59:01.633+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/28 21:59:01 mockllm: serving on http://127.0.0.1:56042 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-28T21:59:01.679+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunPacketCarriesTheSubagentItsRosterRowFed4158882464\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-09-28T21:59:01.709+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketCarriesTheSubagentItsRosterRowFed4158882464\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-28T21:59:01.716+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-28T13:59:01Z duration_ms=7
+time=2026-09-28T21:59:01.724+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketCarriesTheSubagentItsRosterRowFed4158882464\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-28T21:59:01.729+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-28T13:59:01Z duration_ms=5
+time=2026-09-28T21:59:01.734+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-28T21:59:01.737+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-09-28T21:59:01.743+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-bcfd9825-1d98-4a46-a9c7-b175724c70d7 owner=tools
+    subagent_carrier_197_test.go:278: tasks wire bytes: {"rows":[{"taskId":"4dc60786-2001-4395-9788-79fbe3247be5","label":"总结一下 rootprompt197r3 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","kind":"root","parentTaskId":"","status":"","statusKnown":false,"statusReason":"宿主没有登记这一维（fail-closed：不替任务编一个状态）","streamKey":"4dc60786-2001-4395-9788-79fbe3247be5","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"bcfd9825-1d98-4a46-a9c7-b175724c70d7","label":"载体层正控：把一句话原样说出来","kind":"subagent","parentTaskId":"4dc60786-2001-4395-9788-79fbe3247be5","status":"Thinking","statusKnown":true,"streamKey":"subagent:bcfd9825-1d98-4a46-a9c7-b175724c70d7","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false}],"inFlightSlots":1,"poolCap":4,"streamTruncated":false,"streamElidedRunes":0,"droppedStreamKeys":[]}
+    subagent_carrier_197_test.go:388: packet tasks section: rows=2 poolCap=4 child=bcfd9825-1d98-4a46-a9c7-b175724c70d7 runStatus=Thinking afterStatus=Settling key=subagent:bcfd9825-1d98-4a46-a9c7-b175724c70d7 bytes=2789
+--- PASS: TestRunPacketCarriesTheSubagentItsRosterRowFed (1.83s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.903s

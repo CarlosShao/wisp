@@ -1,0 +1,6 @@
+time=2026-09-28T21:58:55.099+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test197SpawnPublishesIdentityRow
+time=2026-09-28T21:58:55.102+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-7df6100a-ee34-4824-9fc7-e48952d1b453 owner=tools
+--- PASS: Test197SpawnPublishesIdentityRow (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.045s

@@ -1,0 +1,6 @@
+time=2026-09-28T21:55:26.251+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestSubagentStreamKeyHasOneMintSite (0.12s)
+    subagent_carrier_197_test.go:433: the stream key literal "subagent:" is minted in 2 non-test sources [internal/panel/pump.go internal/streamkey/streamkey.go], want exactly one: internal/streamkey/streamkey.go
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.195s
+FAIL

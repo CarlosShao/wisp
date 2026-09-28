@@ -1,0 +1,7 @@
+time=2026-09-28T21:55:05.462+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestAStatusOutsideD43NeverReachesTheWire (0.00s)
+    subagent_roster_197_test.go:298: status = "running": a name the host's judge refused still reached the wire, which is the second vocabulary ticket 197 §2(c) forbids
+    subagent_roster_197_test.go:322: a blank status with no reason is the shape StateAnswer exists to prevent
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.043s
+FAIL

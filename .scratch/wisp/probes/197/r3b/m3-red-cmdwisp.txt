@@ -1,0 +1,17 @@
+time=2026-09-28T21:55:13.720+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-09-28T21:55:15.123+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/28 21:55:15 mockllm: serving on http://127.0.0.1:60018 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-28T21:55:15.159+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunPacketCarriesTheSubagentItsRosterRowFed3817855382\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-09-28T21:55:15.189+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketCarriesTheSubagentItsRosterRowFed3817855382\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-28T21:55:15.197+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-28T13:55:15Z duration_ms=7
+time=2026-09-28T21:55:15.206+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketCarriesTheSubagentItsRosterRowFed3817855382\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-28T21:55:15.218+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-28T13:55:15Z duration_ms=10
+time=2026-09-28T21:55:15.222+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-28T21:55:15.224+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-09-28T21:55:15.232+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-f03648b0-aab4-485f-9013-2d6e2a9ff069 owner=tools
+--- FAIL: TestRunPacketCarriesTheSubagentItsRosterRowFed (1.85s)
+    subagent_carrier_197_test.go:339: the child's own streamed reply never reached its own row: "已派生：载体层正控：把一句话原样说出来" - this is the hop the carrier leg exists to close
+    subagent_carrier_197_test.go:385: packet tasks section: rows=2 poolCap=4 child=f03648b0-aab4-485f-9013-2d6e2a9ff069 runStatus=Thinking afterStatus=Settling key=subagent:f03648b0-aab4-485f-9013-2d6e2a9ff069 bytes=2735
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	1.931s
+FAIL
