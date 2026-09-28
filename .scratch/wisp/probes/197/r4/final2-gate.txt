@@ -1,0 +1,14 @@
+=== HEAD ===
+237e64f4cfd4fe65a3be6db7c5f40b16103649c5
+=== status cmd internal ===
+(empty above = restored)
+=== build ===
+build rc=0
+=== vet ===
+vet rc=0
+=== gofumpt ===
+gofumpt rc=0
+=== panel ===
+panel rc=1
+=== cmdwisp ===
+cmdwisp rc=0

@@ -1,0 +1,12 @@
+=== HEAD ===
+da1d9289da89cab700ce599149fe7e4b01e66ad7
+=== build ===
+build rc=0
+=== vet ===
+vet rc=0
+=== panel ===
+panel rc=1
+=== tools ===
+tools rc=0
+=== cmdwisp ===
+cmdwisp rc=0

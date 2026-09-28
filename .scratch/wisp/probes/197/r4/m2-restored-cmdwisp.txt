@@ -1,0 +1,1 @@
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.130s

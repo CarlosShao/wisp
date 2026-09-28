@@ -1,0 +1,6 @@
+time=2026-09-28T22:26:52.390+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestTheRosterReaderPutsSubagentsOnTheWire (0.00s)
+    subagent_roster_197_test.go:165: the child has an L2 card on the queue and the packet does not say so: 「被阻塞的子代理在所有界面上都不可见」 is somebody else's recorded incident
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.051s
+FAIL

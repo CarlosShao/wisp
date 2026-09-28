@@ -1,0 +1,16 @@
+time=2026-09-28T22:27:31.341+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-09-28T22:27:32.969+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/28 22:27:32 mockllm: serving on http://127.0.0.1:59849 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-28T22:27:33.004+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRunPacketMarksTheRosterRowACardIsHolding4007731795\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-09-28T22:27:33.032+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketMarksTheRosterRowACardIsHolding4007731795\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-28T22:27:33.041+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-28T14:27:33Z duration_ms=9
+time=2026-09-28T22:27:33.054+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRunPacketMarksTheRosterRowACardIsHolding4007731795\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-28T22:27:33.062+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-28T14:27:33Z duration_ms=6
+time=2026-09-28T22:27:33.067+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-28T22:27:33.070+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-09-28T22:27:33.077+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-a5da9b13-f404-4503-9ce6-bb379398daa0 owner=tools
+--- FAIL: TestRunPacketMarksTheRosterRowACardIsHolding (8.33s)
+    subagent_blocked_197_test.go:165: no packet the run published carries the card on its queue (pending [{CorrelationID:a5da9b13-f404-4503-9ce6-bb379398daa0-elsewhere Tool:ticket197.blocked.probe Args:[] Level:L2 RulesHit:[] Reason:票 197 AC#4 的正控：名册行要能读出「有一张授权卡正挂着」 ReasonKnown:true SessionOverrideBlocked:false CallChain:[] DecidedBy:native}], wanted one card named "a5da9b13-f404-4503-9ce6-bb379398daa0"); the run displayed 1 card(s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	8.391s
+FAIL

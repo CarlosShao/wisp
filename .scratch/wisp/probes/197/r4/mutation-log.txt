@@ -1,0 +1,82 @@
+=========== BASELINE (committed tree + this case, no mutation) ===========
+--- m0-baseline-cmdwisp rc=0
+ok  	github.com/CarlosShao/wisp/cmd/wisp	5.780s
+--- m0-baseline-panel rc=0
+ok  	github.com/CarlosShao/wisp/internal/panel	0.050s
+=========== M1 unplug the join's reader: the pump stops handing the cards over ===========
+263:		snap.Tasks = TaskRosterSectionFrom(p.src.Tasks(), nil) // MUTATION-M1
+--- m1-red-cmdwisp rc=1
+--- FAIL: TestRunPacketMarksTheRosterRowACardIsHolding (2.11s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	2.198s
+FAIL
+    subagent_blocked_197_test.go:168: tasks wire bytes: {"rows":[{"taskId":"bb825e0c-e689-41a8-b8b1-2cde5ae794c4","label":"载体层正控：把一句话原样说出来","kind":"subagent","parentTaskId":"e8fc3928-464e-4cd7-b240-04d095c31482","status":"Thinking","statusKnown":true,"streamKey":"subagent:bb825e0c-e689-41a8-b8b1-2cde5ae794c4","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"e8fc3928-464e-4cd7-b240-04d095c31482","label":"总结一下 rootprompt197r3 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","kind":"root","parentTaskId":"","status":"","statusKnown":false,"statusReason":"宿主没有登记这一维（fail-closed：不替任务编一个状态）","streamKey":"e8fc3928-464e-4cd7-b240-04d095c31482","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false}],"inFlightSlots":1,"poolCap":4,"streamTruncated":false,"streamElidedRunes":0,"droppedStreamKeys":[]}
+    subagent_blocked_197_test.go:171: the packet carries a card for "bb825e0c-e689-41a8-b8b1-2cde5ae794c4" and its roster row still reads blockedOnApproval=false: 「被阻塞的子代理在所有界面上都不可见」 is the incident ticket 197 AC#4 names, and a carrier that misses it is the reason that field exists
+    subagent_blocked_197_test.go:222: tasks wire bytes: {"rows":[{"taskId":"bb825e0c-e689-41a8-b8b1-2cde5ae794c4","label":"载体层正控：把一句话原样说出来","kind":"subagent","parentTaskId":"e8fc3928-464e-4cd7-b240-04d095c31482","status":"Settling","statusKnown":true,"streamKey":"subagent:bb825e0c-e689-41a8-b8b1-2cde5ae794c4","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"e8fc3928-464e-4cd7-b240-04d095c31482","label":"总结一下 rootprompt197r3 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","kind":"root","parentTaskId":"","status":"","statusKnown":false,"statusReason":"宿主没有登记这一维（fail-closed：不替任务编一个状态）","streamKey":"e8fc3928-464e-4cd7-b240-04d095c31482","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false}],"inFlightSlots":0,"poolCap":4,"streamTruncated":false,"streamElidedRunes":0,"droppedStreamKeys":[]}
+    subagent_blocked_197_test.go:234: blocked row on the run's own packet: task=bb825e0c-e689-41a8-b8b1-2cde5ae794c4 status=Thinking streamKey=subagent:bb825e0c-e689-41a8-b8b1-2cde5ae794c4 card=ticket197.blocked.probe pending=1 bytes=3092 sha256=53b4c5ed5b6d6813 | after the card: blocked=false answer=reject why="任务上下文已结束，审批请求已作废并按拒绝处理"
+--- m1-red-panel rc=1
+--- FAIL: TestTheRosterReaderPutsSubagentsOnTheWire (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.049s
+FAIL
+RESTORED_CLEAN internal/panel/pump.go
+--- m1-restored-cmdwisp rc=0
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.992s
+=========== M2 the flag hard-off (constant false) ===========
+210:			BlockedOnApproval: false, // MUTATION-M2
+--- m2-red-cmdwisp rc=1
+--- FAIL: TestRunPacketMarksTheRosterRowACardIsHolding (2.07s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	2.141s
+FAIL
+    subagent_blocked_197_test.go:168: tasks wire bytes: {"rows":[{"taskId":"2ae56dee-a7e4-44e4-9c99-02d5aaeda579","label":"总结一下 rootprompt197r3 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","kind":"root","parentTaskId":"","status":"","statusKnown":false,"statusReason":"宿主没有登记这一维（fail-closed：不替任务编一个状态）","streamKey":"2ae56dee-a7e4-44e4-9c99-02d5aaeda579","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"c3517fa7-c1db-4b7a-92ce-4779eb8dfd70","label":"载体层正控：把一句话原样说出来","kind":"subagent","parentTaskId":"2ae56dee-a7e4-44e4-9c99-02d5aaeda579","status":"Thinking","statusKnown":true,"streamKey":"subagent:c3517fa7-c1db-4b7a-92ce-4779eb8dfd70","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false}],"inFlightSlots":1,"poolCap":4,"streamTruncated":false,"streamElidedRunes":0,"droppedStreamKeys":[]}
+    subagent_blocked_197_test.go:171: the packet carries a card for "c3517fa7-c1db-4b7a-92ce-4779eb8dfd70" and its roster row still reads blockedOnApproval=false: 「被阻塞的子代理在所有界面上都不可见」 is the incident ticket 197 AC#4 names, and a carrier that misses it is the reason that field exists
+    subagent_blocked_197_test.go:222: tasks wire bytes: {"rows":[{"taskId":"2ae56dee-a7e4-44e4-9c99-02d5aaeda579","label":"总结一下 rootprompt197r3 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","kind":"root","parentTaskId":"","status":"","statusKnown":false,"statusReason":"宿主没有登记这一维（fail-closed：不替任务编一个状态）","streamKey":"2ae56dee-a7e4-44e4-9c99-02d5aaeda579","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"c3517fa7-c1db-4b7a-92ce-4779eb8dfd70","label":"载体层正控：把一句话原样说出来","kind":"subagent","parentTaskId":"2ae56dee-a7e4-44e4-9c99-02d5aaeda579","status":"Settling","statusKnown":true,"streamKey":"subagent:c3517fa7-c1db-4b7a-92ce-4779eb8dfd70","blockedOnApproval":false,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false}],"inFlightSlots":0,"poolCap":4,"streamTruncated":false,"streamElidedRunes":0,"droppedStreamKeys":[]}
+    subagent_blocked_197_test.go:234: blocked row on the run's own packet: task=c3517fa7-c1db-4b7a-92ce-4779eb8dfd70 status=Thinking streamKey=subagent:c3517fa7-c1db-4b7a-92ce-4779eb8dfd70 card=ticket197.blocked.probe pending=1 bytes=3092 sha256=3f20d4b0d5188a20 | after the card: blocked=false answer=reject why="任务上下文已结束，审批请求已作废并按拒绝处理"
+--- m2-red-panel rc=1
+--- FAIL: TestTheRosterReaderPutsSubagentsOnTheWire (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.051s
+FAIL
+RESTORED_CLEAN internal/panel/subagent_roster_197.go
+--- m2-restored-cmdwisp rc=0
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.130s
+=========== M3 the flag hard-on (constant true) ===========
+210:			BlockedOnApproval: true, // MUTATION-M3
+--- m3-red-cmdwisp rc=1
+--- FAIL: TestRunPacketMarksTheRosterRowACardIsHolding (2.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	2.094s
+FAIL
+    subagent_blocked_197_test.go:168: tasks wire bytes: {"rows":[{"taskId":"14fa6c1e-829f-4913-a8bf-d8a7e7bf47ce","label":"载体层正控：把一句话原样说出来","kind":"subagent","parentTaskId":"1b2ad18e-e173-4388-b80f-698fcbd3ed3b","status":"Thinking","statusKnown":true,"streamKey":"subagent:14fa6c1e-829f-4913-a8bf-d8a7e7bf47ce","blockedOnApproval":true,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"1b2ad18e-e173-4388-b80f-698fcbd3ed3b","label":"总结一下 rootprompt197r3 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","kind":"root","parentTaskId":"","status":"","statusKnown":false,"statusReason":"宿主没有登记这一维（fail-closed：不替任务编一个状态）","streamKey":"1b2ad18e-e173-4388-b80f-698fcbd3ed3b","blockedOnApproval":true,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false}],"inFlightSlots":1,"poolCap":4,"streamTruncated":false,"streamElidedRunes":0,"droppedStreamKeys":[]}
+    subagent_blocked_197_test.go:191: the root row reads blocked although no card names it (the only card is "14fa6c1e-829f-4913-a8bf-d8a7e7bf47ce"): the join is by correlation id, not by anything being in flight
+    subagent_blocked_197_test.go:222: tasks wire bytes: {"rows":[{"taskId":"14fa6c1e-829f-4913-a8bf-d8a7e7bf47ce","label":"载体层正控：把一句话原样说出来","kind":"subagent","parentTaskId":"1b2ad18e-e173-4388-b80f-698fcbd3ed3b","status":"Settling","statusKnown":true,"streamKey":"subagent:14fa6c1e-829f-4913-a8bf-d8a7e7bf47ce","blockedOnApproval":true,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false},{"taskId":"1b2ad18e-e173-4388-b80f-698fcbd3ed3b","label":"总结一下 rootprompt197r3 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","kind":"root","parentTaskId":"","status":"","statusKnown":false,"statusReason":"宿主没有登记这一维（fail-closed：不替任务编一个状态）","streamKey":"1b2ad18e-e173-4388-b80f-698fcbd3ed3b","blockedOnApproval":true,"streamTruncated":false,"streamElidedRunes":0,"streamDropped":false}],"inFlightSlots":0,"poolCap":4,"streamTruncated":false,"streamElidedRunes":0,"droppedStreamKeys":[]}
+    subagent_blocked_197_test.go:224: the card is gone and the row still reads blocked: the field would then be a constant, and a constant is what ticket 181 AC#7 was filed over (rows after: {TaskID:14fa6c1e-829f-4913-a8bf-d8a7e7bf47ce Label:载体层正控：把一句话原样说出来 Kind:subagent ParentTaskID:1b2ad18e-e173-4388-b80f-698fcbd3ed3b Status:Settling StatusKnown:true StatusReason: StreamKey:subagent:14fa6c1e-829f-4913-a8bf-d8a7e7bf47ce BlockedOnApproval:true StreamTruncated:false StreamElidedRunes:0 StreamDropped:false})
+    subagent_blocked_197_test.go:234: blocked row on the run's own packet: task=14fa6c1e-829f-4913-a8bf-d8a7e7bf47ce status=Thinking streamKey=subagent:14fa6c1e-829f-4913-a8bf-d8a7e7bf47ce card=ticket197.blocked.probe pending=1 bytes=3090 sha256=7a09ec336d729c52 | after the card: blocked=true answer=reject why="任务上下文已结束，审批请求已作废并按拒绝处理"
+RESTORED_CLEAN internal/panel/subagent_roster_197.go
+--- m3-restored-cmdwisp rc=0
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.763s
+=========== M4 unplug the whole carrier at the assembly root ===========
+491:		Tasks: nil, // MUTATION-M4
+--- m4-red-cmdwisp rc=1
+--- FAIL: TestRunPacketMarksTheRosterRowACardIsHolding (1.93s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	1.989s
+FAIL
+    subagent_blocked_197_test.go:168: the packet carries no tasks key at all: {"pending":[{"correlationId":"53cc9506-da9e-4de7-99b0-09574c8b7b38","tool":"ticket197.blocked.probe","args":[],"level":"L2","rulesHit":[],"reason":"票 197 AC#4 的正控：名册行要能读出「有一张授权卡正挂着」","reasonKnown":true,"sessionOverrideBlocked":false,"callChain":[],"decidedBy":"native"}],"results":[{"correlationId":"subagent:53cc9506-da9e-4de7-99b0-09574c8b7b38","text":"已派生：载体层正控：把一句话原样说出来echo: ## scene\n当前时间：2026-09-28 14:27 +00:00","done":false},{"correlationId":"164765fd-ce0a-471c-ae71-a70cfe65a9c9","text":"echo: ## scene\n当前时间：2026-09-28 14:27 +00:00","done":true}],"composer":{"mode":{"current":"ask_every_step","names":["ask_every_step","ask_high_risk","auto_approve"],"l2ConfirmNames":["auto_approve"]},"workspace":{"set":false,"spelling":"","canonical":"","reparse":false,"rewritten":false,"reason":"未选择工作区：本轮按 [fs] allowed_dirs 授权的目录判定"},"attachments":[],"acceptedAttachmentMimes":["image/png","image/jpeg","image/gif","image/webp","video/mp4","video/quicktime"],"maxAttachmentBytes":67108864,"attachmentError":"","git":{"kind":"unreadable","reason":"本轮未选择工作区，git 这一维没有可探测的目录","branch":"","detachedSha":"","isDetached":false,"repoRoot":"","currentWorktree":"","worktrees":[],"branches":[],"switchBlocked":"切换分支／切换工作树今天不可用：网页到宿主的那一跳还没有落地（无 postMessage 接收器、无 router、无 WebView2 宿主），面板只有快照这一条出向通道"},"currentModel":"m1","modelKnown":true},"generatedAt":"2026-09-28T14:27:19Z","instructions":{"status":"none_found","reason":"已启用并查过：工作区逐级向上的每一层目录和数据目录里都没有说明文件（不是被配置关掉的）。","files":[]}}
+RESTORED_CLEAN cmd/wisp/run.go
+--- m4-restored-cmdwisp rc=0
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.437s
+=========== M5 the card names a different key (the row must NOT flip) ===========
+121:				TaskID: id, CorrelationID: id + "-elsewhere", Tool: blocked197Tool, // MUTATION-M5
+--- m5-red-cmdwisp rc=1
+--- FAIL: TestRunPacketMarksTheRosterRowACardIsHolding (8.33s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	8.391s
+FAIL
+    subagent_blocked_197_test.go:165: no packet the run published carries the card on its queue (pending [{CorrelationID:a5da9b13-f404-4503-9ce6-bb379398daa0-elsewhere Tool:ticket197.blocked.probe Args:[] Level:L2 RulesHit:[] Reason:票 197 AC#4 的正控：名册行要能读出「有一张授权卡正挂着」 ReasonKnown:true SessionOverrideBlocked:false CallChain:[] DecidedBy:native}], wanted one card named "a5da9b13-f404-4503-9ce6-bb379398daa0"); the run displayed 1 card(s)
+RESTORED_CLEAN cmd/wisp/subagent_blocked_197_test.go
+--- m5-restored-cmdwisp rc=0
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.940s
+=========== FINAL TREE STATE (tracked production + this case) ===========
+FINAL_DONE
