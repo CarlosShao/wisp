@@ -1,0 +1,6 @@
+# gofumpt -l over the TRACKED set (git ls-files -z '*.go' | xargs -0 gofumpt.exe -l), taken at 2026-09-28 20:13:31 +0800, AFTER 200-r2 formatting
+.scratch\wisp\probes\163\a1\main.go
+.scratch\wisp\probes\174\c2\zz174c2_wiring_pair_windows_test.go
+.scratch\wisp\probes\183\r2\mut\task-boxset-off.go
+.scratch\wisp\probes\185\r1\mut-m1\hostpath_185.go
+xargs rc=123

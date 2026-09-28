@@ -1,0 +1,8 @@
+.scratch\wisp\probes\163\a1\main.go
+.scratch\wisp\probes\174\c2\zz174c2_wiring_pair_windows_test.go
+.scratch\wisp\probes\183\r2\mut\task-boxset-off.go
+.scratch\wisp\probes\185\c1\mut\fs_broken.go:4:1: imports must appear before other declarations
+.scratch\wisp\probes\185\r1\mut-m1\hostpath_185.go
+internal\agent\instructions_test.go
+internal\tools\subagent_197.go
+internal\tools\subagent_197_test.go

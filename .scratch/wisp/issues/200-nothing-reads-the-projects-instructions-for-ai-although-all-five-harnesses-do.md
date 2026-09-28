@@ -63,8 +63,31 @@ C17 白名单**既有方法名**不动（只允许**新增快照字段**那一�
   `bytes` number · `truncatedBytes?` number（预算裁掉的字节数，为 0 时不发）· `dropped?` boolean（**整份被预算挤掉**，界面要能说"这份没生效"）·
   `duplicateOf?` string（这份并进了哪份，同一物理文件经两级目录只注入一次）· `source?` string（C25 来源名，现值 `"fs.read"`）。
   ⚠ 键带 `omitempty` ⇒ **没加载时这枚键根本不在 JSON 里**；界面**不许**把"键不存在"画成"已加载但为空"，也不许画成"功能没开"（那三种状态今天分不出，Go 侧正在补）。
+- **200-r2 更正上面那两行（走的是甲，形状换了，键数没换）**：派单 §2(b) 判"`omitempty` ＋空 bundle 返回 nil ⇒ `off` 与`开着但没文件`marshal 成同一枚键不存在"，
+  200-r2 已按甲落地，所以 `instructions` 现在是**一枚对象**而不是数组，形状逐字照 `internal/panel/instructions_200.go`：
+  `status` string（五枚之一：`loaded`／`none_found`／`off`／`refused`／`not_run`）· `reason?` string（非 loaded 状态逐字带上加载器自己的那句原因）·
+  `files` **数组**（元素形状就是上面那八个字段，没读到时是 `[]`，**不是 `null`**）。
+  ⇒ 界面只需要声明**一枚** `instructions?:`，`PanelSnapshot` 的键数仍是五枚（`TestApprovalCardViewJSONKeysMatchFrontendTypes` 的红句子逐字未变），
+  而 `refused` 这一枚是票 102 的改写账户拒读那一支（200-r2 §2(a)），`not_run` 是"加载器已接线但这一轮还没跑过加载"。
+  **泵没有接上 reader 的宿主**（测试与任何未接装配）仍然一个键都不发 ⇒ 那才是 `omitempty` 唯一合法的缺席形。
+  读数与判据：`docs/evidence/s1/200-project-instructions-r2.md` §2(b)、`internal/panel/instructions_200_test.go`、`cmd/wisp/instructions_200r2_test.go`。
 - **转绿判据（界面那支交完我复跑）**：`go test -count=1 ./internal/panel/` 里 `TestApprovalCardViewJSONKeysMatchFrontendTypes` 由红转绿，
   且另外三枚在册常红（`TestComposerContractTypesMatchFrontend`／`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`／`TestC21DesignTokensFourwayAgree`）**名册不变**。
+
+### ⚠ 09-28 20:5x 更正上面那一跳的形状（`200-r2` 把载体换宽了，我原来那行"补一枚数组"已经过期，别按它做）
+
+- `200-r2`（commit `a90677e9`）选了甲并**多走一步**：`instructions` 不再是"裸列表＋`omitempty`"，改成**带状态的一节**
+  （`internal/panel/composer.go:74` `Instructions *InstructionsSection`，节内三枚键在 `internal/panel/instructions_200.go:73/77/79`），
+  原因正是我给的那条现量——旧形状下"功能没开"和"开着但目录里没说明文件"marshal 出**同一枚"键不存在"**，界面无法说真话。
+- **请按这个新形状声明**（`PanelSnapshot` 上补 `instructions?:` 一枚**对象**，不是数组）：
+  `status` string ＝ **五枚之一**：`loaded`／`none_found`／`off`／`refused`／`not_run`（**这就是界面要画的那句实话**：开了但没找到／你关掉了／路径被改写所以拒读／这一轮还没跑到／真加载了）·
+  `reason?` string（给人看的短句，为空时不发）· `files` 数组（**总是发**，可以为空数组），元素逐字段＝
+  `path` string · `tier` string（`"project"`／`"global"`）· `depth` number（0＝工作区本身，越大越外面，`-1`＝全局档）· `bytes` number ·
+  `truncatedBytes?` number（预算裁掉的字节数，0 时不发）· `dropped?` boolean（**整份被预算挤掉**，要能显示"这份没生效"）·
+  `duplicateOf?` string（这份并进了哪份，同一物理文件经两级目录只注入一次）· `source?` string（C25 来源名，现值 `"fs.read"`）。
+- ⚠ 键仍带 `omitempty` ⇒ **"键不存在"这一形还在**，但它现在只代表一件小事（装配根没给这一节），**五枚状态都在 `status` 里**；
+  界面**不许**把"键不存在"画成"已加载但为空"。
+
 - **撤销口令**：若界面那支决定"这一版先不显示说明清单"，则 Go 侧回到 200-r2 的**乙**（把键从 marshal 里摘掉），
   那一格 AC#7 当场退回并在本票具名记账——**不许留着"键在值恒缺"这一形**（同 `A408` 点名的反面教材）。
 

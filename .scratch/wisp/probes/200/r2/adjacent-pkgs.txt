@@ -1,0 +1,4 @@
+ok  	github.com/CarlosShao/wisp/internal/tools	16.531s
+ok  	github.com/CarlosShao/wisp/internal/config	1.455s
+ok  	github.com/CarlosShao/wisp/internal/agent	2.212s
+ok  	github.com/CarlosShao/wisp/internal/llm	41.127s

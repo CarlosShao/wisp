@@ -1,0 +1,23 @@
+# TestResolvePerCallBudget 复量读数，2026-09-28 20:13:43 +0800，PATH 按派单带上 third_party/sherpa-onnx:build
+
+## A) 单跑 -run TestResolvePerCallBudget（派单说编排者这样跑三遍全绿），同一命令连跑 3 发
+ok  	github.com/CarlosShao/wisp/internal/risk	1.127s
+ok  	github.com/CarlosShao/wisp/internal/risk	1.326s
+ok  	github.com/CarlosShao/wisp/internal/risk	2.393s
+
+## B) 整包单跑 internal/risk（全包，含那枚计时尺），连跑 3 发
+ok  	github.com/CarlosShao/wisp/internal/risk	4.176s
+ok  	github.com/CarlosShao/wisp/internal/risk	2.856s
+ok  	github.com/CarlosShao/wisp/internal/risk	3.970s
+
+## C) 派单 §0.2 那发五包并行命令，200-r2 改后连跑 2 轮（见 final-gate-5pkgs.txt）
+ok  	github.com/CarlosShao/wisp/internal/risk	7.215s
+ok  	github.com/CarlosShao/wisp/internal/risk	6.270s
+
+## D) 起手那一发（改前，preflight-gate.txt 逐字）
+time=2026-09-28T19:44:44.762+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestResolvePerCallBudget (1.54s)
+    pathresolver_budget_norace_test.go:34: C26 Resolve: 1139468 ns/op = 1.139 ms/op (budget 1.000 ms, 1116 samples)
+    pathresolver_budget_norace_test.go:37: C26 budget breach: Resolve averages 1.139468ms per call, budget 1ms
+--- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (0.09s)
+    pathresolver_rewrite_account_test.go:200: ..\..\cmd\wisp\run.go:686 reads Result.Canonical without reading the rewrite account (Actable/Rewritten) - ticket 102's hole re-opened by a new consumer
