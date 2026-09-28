@@ -371,24 +371,7 @@ func TestGitDimensionHasNoModelCallableTool(t *testing.T) {
 			"into a model-callable tool, which is a contract change this ticket does not make", row)
 	}
 
-	var offenders []string
-	scanErr := filepath.Walk(filepath.Join(root, "internal", "tools"), func(p string, st os.FileInfo, err error) error {
-		if err != nil || st.IsDir() || !strings.HasSuffix(p, ".go") || strings.HasSuffix(p, "_test.go") {
-			return nil
-		}
-		data, rErr := os.ReadFile(p)
-		if rErr != nil {
-			return nil
-		}
-		for _, m := range gitToolNameRe.FindAllString(string(data), -1) {
-			rel, _ := filepath.Rel(root, p)
-			offenders = append(offenders, rel+": "+m)
-		}
-		return nil
-	})
-	if scanErr != nil {
-		t.Fatalf("scan internal/tools: %v", scanErr)
-	}
+	offenders := gitToolNamesUnder(filepath.Join(root, "internal", "tools"))
 	if len(offenders) > 0 {
 		t.Errorf("a git.* tool name appears in internal/tools production code (%s) - the read surface "+
 			"must reach the panel through the snapshot, never through a tool the model can call",
@@ -409,6 +392,12 @@ func TestGitDimensionHasNoModelCallableTool(t *testing.T) {
 var (
 	gitToolNameRe = regexp.MustCompile(`"(git\.[a-z0-9_.-]+)"`)
 	panelMethodRe = regexp.MustCompile(`"(panel\.[a-z0-9_.-]+)"`)
+	// d34ToolNameRe matches a tool name the way D34's table writes it - in
+	// BACKTICKS, not double quotes. The positive control caught the first version
+	// of this door looking for the quoted spelling, which no markdown row can
+	// produce: that door was green because it was blind, not because the table
+	// was clean.
+	d34ToolNameRe = regexp.MustCompile("`(git\\.[a-z0-9_.-]+)`")
 )
 
 // whitelistMethodsFromSource reads the method names off the file that declares
@@ -447,7 +436,7 @@ func d34ToolRowMentioningGit(plan string) string {
 			continue
 		}
 		cell := strings.TrimSpace(strings.Split(strings.TrimSpace(l), "|")[1])
-		if m := gitToolNameRe.FindString(cell); m != "" {
+		if m := d34ToolNameRe.FindString(cell); m != "" {
 			return strings.TrimSpace(l)
 		}
 	}
@@ -459,6 +448,82 @@ func d34ToolRowMentioningGit(plan string) string {
 func composerMethodWhitelist() []string {
 	return []string{
 		MethodModeRequest, MethodWorkspaceRequest, MethodAttachmentAdd, MethodMessageSend,
+	}
+}
+
+// gitToolNamesUnder returns every `"git.*"` tool-name literal in a tree's
+// production Go files. Split out of the criterion above so that criterion can be
+// pointed at a knowingly wrong tree the way TestPlantedComposerModeWriteGoesRed
+// does for the mode door: a negative criterion that has never been seen to fire
+// is a sentence, not an instrument.
+func gitToolNamesUnder(root string) []string {
+	var offenders []string
+	// Walk errors are ignored deliberately - this reports what it could read, and
+	// the caller asserts on the list.
+	_ = filepath.Walk(root, func(p string, st os.FileInfo, err error) error {
+		if err != nil || st.IsDir() || !strings.HasSuffix(p, ".go") || strings.HasSuffix(p, "_test.go") {
+			return nil
+		}
+		data, rErr := os.ReadFile(p)
+		if rErr != nil {
+			return nil
+		}
+		for _, m := range gitToolNameRe.FindAllStringSubmatch(string(data), -1) {
+			offenders = append(offenders, filepath.Base(p)+": \""+m[1]+"\"")
+		}
+		return nil
+	})
+	sort.Strings(offenders)
+	return offenders
+}
+
+// TestPlantedGitToolShapesGoRed is the positive control for AC#3's three doors.
+// Every plant is the exact drift the door exists to catch, read by the same
+// helper the resident criterion runs - and the real tree has to stay quiet under
+// it.
+func TestPlantedGitToolShapesGoRed(t *testing.T) {
+	dir := t.TempDir()
+	plant := "package tools\n\n// A branch switcher offered to the model.\n" +
+		"func (gitSwitch) Name() string { return \"git.switch\" }\n"
+	if err := os.WriteFile(filepath.Join(dir, "git_switch.go"), []byte(plant), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	// A _test.go file is outside the door's file set on purpose and must not fire.
+	if err := os.WriteFile(filepath.Join(dir, "noise_test.go"), []byte(plant), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	got := gitToolNamesUnder(dir)
+	if len(got) != 1 || !strings.Contains(got[0], "git.switch") {
+		t.Errorf("planted a git.switch tool and the scan returned %v, want exactly that one hit", got)
+	}
+	if clean := gitToolNamesUnder(filepath.Join(panelRepoRoot(t), "internal", "tools")); len(clean) != 0 {
+		t.Errorf("the tool door fires on the real tree too: %v", clean)
+	}
+
+	// Door 3: a fifth panel.* method declared in the whitelist file.
+	five := "package panel\n\nconst (\n" +
+		"\tMethodModeRequest      = \"panel.mode.request\"\n" +
+		"\tMethodWorkspaceRequest = \"panel.workspace.request\"\n" +
+		"\tMethodAttachmentAdd    = \"panel.attachment.add\"\n" +
+		"\tMethodMessageSend      = \"panel.message.send\"\n" +
+		"\tMethodWorktreeSwitch   = \"panel.worktree.switch\"\n)\n"
+	fivePath := filepath.Join(dir, "bridge_five.go")
+	if err := os.WriteFile(fivePath, []byte(five), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if n := len(whitelistMethodsFromSource(t, fivePath)); n != 5 {
+		t.Errorf("planted a fifth panel.* method and the whitelist scan counted %d, want 5", n)
+	}
+	if real := whitelistMethodsFromSource(t, filepath.Join(panelRepoRoot(t), "internal", "panel", "bridge.go")); len(real) != 4 {
+		t.Errorf("the whitelist door reads %d methods on the real bridge.go, want 4", len(real))
+	}
+
+	// Door 1: a git row inside the D34 section, and the same row outside it.
+	if d34ToolRowMentioningGit("### D34 内置工具权威表\n\n| Tool | Level |\n|---|---|\n| `git.branch` | L0 |\n") == "" {
+		t.Error("planted a git row inside the D34 section and the table scan did not see it")
+	}
+	if d34ToolRowMentioningGit("## Something else\n\n| `git.branch` | L0 |\n") != "" {
+		t.Error("the D34 door fires outside the D34 section")
 	}
 }
 
