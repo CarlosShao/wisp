@@ -1,0 +1,6 @@
+		reply, err := disp.Handle(ctx, raw)
+		arrived++
+		_ = disp
+		var err error
+		reply := "MUT1-dispatch-never-called"
+		if err != nil {

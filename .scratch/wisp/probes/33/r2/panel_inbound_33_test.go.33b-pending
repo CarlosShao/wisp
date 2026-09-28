@@ -1,0 +1,434 @@
+package main
+
+// Ticket 33 AC#9 (slice B) - the inbound leg's own judgements, and the one
+// instrument that makes "the router exists but nobody calls it" a visible shape.
+//
+// WHY A CASE HAS TO READ THE CALLER OFF THE DISK. composer_dispatch.go shipped
+// with a Handle that production never reached, and every test in the tree stayed
+// green while it did, because each of them constructed the dispatch itself. A
+// function that exists and is called only from tests is, in the running product,
+// a function that does not exist. TestAC9ComposerDispatchHasAProductionCaller
+// therefore does not call anything: it parses this directory's non-test sources
+// and asks which variables hold a *panel.ComposerDispatch and whether any of
+// them is sent Handle. Delete or rename cmd/wisp/panel_inbound.go's one call and
+// this case is red with no compile error involved, which is the reading the other
+// three cases cannot give (they would go red only because the leg stopped
+// working, and a leg that never existed also never works).
+//
+// WHY THE OTHER THREE RUN THE REAL LEG IN-PROCESS. cmdPanelInbound takes its
+// whole world through panelInboundIO, so these cases feed it a stdin and a temp
+// data root and read what came out - the same config.NewManager/perm.New/
+// panel.ModeWriteHandler chain a real invocation walks, over a config.toml on
+// disk. The accepted-request case asserts the BYTE THAT CHANGED ON DISK, not a
+// string this package wrote about it.
+
+import (
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"os"
+	"path/filepath"
+	"reflect"
+	"sort"
+	"strings"
+	"testing"
+)
+
+const (
+	// inboundPanelSource is the only sender identity bridge.go accepts.
+	inboundPanelSource = "panel-composer"
+	// inboundRid is the correlation id these cases ask the audit trail to carry.
+	inboundRid = "rid-33b"
+)
+
+// runInboundLeg33 is the leg, driven the way main.go drives it.
+func runInboundLeg33(t *testing.T, stdin, dataDir string) (code int, out, errLog string) {
+	t.Helper()
+	var o, e strings.Builder
+	code = cmdPanelInbound(nil, panelInboundIO{
+		stdin:   strings.NewReader(stdin),
+		stdout:  &o,
+		stderr:  &e,
+		dataDir: dataDir,
+	})
+	return code, o.String(), e.String()
+}
+
+// newInboundDataDir33 seeds a data root whose档 is the loosest one, so a
+// narrowing request below is a request the write leg can actually answer.
+// Starting from the strictest档 would make every case here a refusal case, which
+// is a fine thing to test but not the one AC#9 asks for.
+func newInboundDataDir33(t *testing.T, mode string) string {
+	t.Helper()
+	dir := t.TempDir()
+	cfg := "[risk]\npermission_mode = \"" + mode + "\"\n"
+	path := filepath.Join(dir, configFileName)
+	if err := os.WriteFile(path, []byte(cfg), 0o600); err != nil {
+		t.Fatalf("cannot seed %s: %v", path, err)
+	}
+	return dir
+}
+
+// readInboundCfg33 returns the档 the file on disk now says. It reads the value
+// rather than comparing whole files because config.NewManager migrates a
+// hand-written seed (it stamps schema_version and the defaults) on the way in:
+// the only thing these cases may assert about the bytes is the one field this
+// leg owns, which is also the assertion a reviewer can re-run.
+func readInboundCfg33(t *testing.T, dir string) string {
+	t.Helper()
+	b, err := os.ReadFile(filepath.Join(dir, configFileName))
+	if err != nil {
+		t.Fatalf("cannot read back the config the leg was supposed to write: %v", err)
+	}
+	for _, line := range strings.Split(string(b), "\n") {
+		trimmed := strings.TrimSpace(line)
+		if !strings.HasPrefix(trimmed, "permission_mode") {
+			continue
+		}
+		_, val, ok := strings.Cut(trimmed, "=")
+		if !ok {
+			t.Fatalf("permission_mode line carries no value: %q", trimmed)
+		}
+		return strings.Trim(strings.TrimSpace(val), `"'`)
+	}
+	return ""
+}
+
+// TestAC9InboundLegFromStdinReachesTheWriteLeg is judgement ①: one envelope on
+// stdin, and the mode write leg really ran.
+func TestAC9InboundLegFromStdinReachesTheWriteLeg(t *testing.T) {
+	dir := newInboundDataDir33(t, "auto_approve")
+	before := readInboundCfg33(t, dir)
+	if before != "auto_approve" {
+		t.Fatalf("the seeded档 on disk reads %q, not auto_approve, so this case proves nothing", before)
+	}
+	line := `{"method":"panel.mode.request","requestId":"` + inboundRid +
+		`","source":"` + inboundPanelSource + `","to":"ask_every_step"}` + "\n"
+
+	code, out, errLog := runInboundLeg33(t, line, dir)
+
+	if code != 0 {
+		t.Errorf("exit=%d want 0; stdout=%q stderr=%q", code, out, errLog)
+	}
+	if !strings.Contains(out, "已受理") {
+		t.Errorf("the leg did not receipt the accepted request: stdout=%q", out)
+	}
+	if after := readInboundCfg33(t, dir); after != "ask_every_step" {
+		t.Errorf("Handle was reached but the write leg never moved the档 on disk: before=%q after=%q", before, after)
+	}
+}
+
+// TestAC9InboundLegRefusesUnlistedMethodAndAuditsIt is judgement ②: a method
+// name outside bridge.go's closed set is refused AND written to the audit -
+// slice A's own refusal machinery (ComposerDispatch.Handle -> record ->
+// "INBOUND-DISPATCH"), reached through this leg rather than re-implemented here.
+func TestAC9InboundLegRefusesUnlistedMethodAndAuditsIt(t *testing.T) {
+	dir := newInboundDataDir33(t, "ask_every_step")
+	before := readInboundCfg33(t, dir)
+	// panel.review.allow is the name Q-49's family reached for: it is not in the
+	// roster, so it must never become a path, and it must not vanish quietly.
+	line := `{"method":"panel.review.allow","requestId":"` + inboundRid +
+		`","source":"` + inboundPanelSource + `"}` + "\n"
+
+	code, out, errLog := runInboundLeg33(t, line, dir)
+
+	if code != 1 {
+		t.Errorf("a refused request must not exit 0: exit=%d stdout=%q", code, out)
+	}
+	if !strings.Contains(out, "panel.review.allow") || !strings.Contains(out, "被拒绝") {
+		t.Errorf("the user-facing sentence does not name the refused method: stdout=%q", out)
+	}
+	if !strings.Contains(errLog, "INBOUND-DISPATCH") {
+		t.Errorf("the refusal was returned but not recorded: stderr=%q", errLog)
+	}
+	if !strings.Contains(errLog, inboundRid) {
+		t.Errorf("the audit line cannot be matched to the request that made it: stderr=%q", errLog)
+	}
+	if strings.Contains(errLog, "panel: MODE-REFUSED") {
+		t.Errorf("an unlisted method reached the mode handler at all: stderr=%q", errLog)
+	}
+	if after := readInboundCfg33(t, dir); after != before {
+		t.Errorf("a refused request changed the档 on disk:\n before=%q\n after=%q", before, after)
+	}
+}
+
+// TestAC9InboundLegRefusesRosterMethodWithNoHandler is judgement ②'s second
+// door: a name the roster DOES answer whose socket this assembly never attached
+// must come back named, not as a nil dereference and not as a silence.
+func TestAC9InboundLegRefusesRosterMethodWithNoHandler(t *testing.T) {
+	dir := newInboundDataDir33(t, "ask_every_step")
+	line := `{"method":"panel.workspace.request","requestId":"` + inboundRid +
+		`","source":"` + inboundPanelSource + `","path":"D:/somewhere"}` + "\n"
+
+	code, out, errLog := runInboundLeg33(t, line, dir)
+
+	if code != 1 {
+		t.Errorf("exit=%d want 1 (the request was refused): stdout=%q", code, out)
+	}
+	if !strings.Contains(out, "处理器未接入") {
+		t.Errorf("the refusal does not say which layer is missing: stdout=%q", out)
+	}
+	if !strings.Contains(errLog, "panel.workspace.request") {
+		t.Errorf("the audit line does not name the method that has no handler: stderr=%q", errLog)
+	}
+}
+
+// TestAC9ComposerDispatchHasAProductionCaller is judgement ③, the反例. It is a
+// source scan with no fixtures: a non-test file in this directory has to bind a
+// *panel.ComposerDispatch to a name and send that name Handle. Renaming the
+// method, routing around the router, or deleting the leg reddens this case while
+// every internal/panel test keeps passing - which is exactly the state slice A
+// shipped in, and the reason this file exists.
+func TestAC9ComposerDispatchHasAProductionCaller(t *testing.T) {
+	sites := inboundHandleCallSites33(t)
+	if len(sites) == 0 {
+		t.Errorf("AC#9 RED: no NON-test file in cmd/wisp sends Handle to a *panel.ComposerDispatch. " +
+			"The router would be a function only tests can reach, which in the running product is a function that does not exist (this is the exact shape ticket 33 slice A shipped with, and the shape 33-a1 §4 named as the single hole across H4-H9). " +
+			"Expected at least one call site in the style of cmd/wisp/panel_inbound.go's `disp.Handle(ctx, raw)`.")
+	}
+	// The listener also has to be reachable from the command an operator types:
+	// a production caller nobody dispatches is the same hole one level up.
+	src := readInboundMainSrc33(t)
+	if !strings.Contains(src, `case "panel-inbound":`) {
+		t.Errorf("AC#9 RED: main.go dispatches no `panel-inbound` case, so the leg this package just assembled has no way to be started.")
+	}
+	if !strings.Contains(src, "wisp panel-inbound") {
+		t.Errorf("AC#9 RED: the usage block does not document `wisp panel-inbound`; an operator cannot find the inbound seam, and ticket 133's gate reads the usage block as its second census of this leg.")
+	}
+}
+
+// inboundDispatchVars33 collects, per non-test file, the identifiers this
+// package binds to a *panel.ComposerDispatch. Two shapes count, because the leg
+// uses the second one: a composite literal assigned to a name, and the result of
+// a function whose declared result is that type.
+func inboundDispatchVars33(t *testing.T) map[string][]string {
+	t.Helper()
+	fset := token.NewFileSet()
+	files, err := filepath.Glob("*.go")
+	if err != nil || len(files) == 0 {
+		t.Fatalf("AC#9 RED (the instrument, not the code): cannot enumerate this directory's sources: %v", err)
+	}
+	out := map[string][]string{}
+	for _, name := range files {
+		if strings.HasSuffix(name, "_test.go") {
+			continue
+		}
+		f, err := parser.ParseFile(fset, name, nil, 0)
+		if err != nil {
+			t.Fatalf("AC#9 RED (the instrument, not the code): cannot parse %s: %v", name, err)
+		}
+		// Functions that hand back a dispatch, and WHICH result it is:
+		// `newPanelInboundDispatch` returns (*panel.ComposerDispatch, error), so
+		// the binding below pairs results with left-hand sides by position.
+		builders := map[string]int{}
+		ast.Inspect(f, func(n ast.Node) bool {
+			fd, ok := n.(*ast.FuncDecl)
+			if !ok || fd.Type.Results == nil || fd.Name == nil {
+				return true
+			}
+			for i, r := range fd.Type.Results.List {
+				if inboundDispatchType33(r.Type) {
+					builders[fd.Name.Name] = i
+					break
+				}
+			}
+			return true
+		})
+		var names []string
+		ast.Inspect(f, func(n ast.Node) bool {
+			as, ok := n.(*ast.AssignStmt)
+			if !ok || as.Tok != token.DEFINE || len(as.Lhs) == 0 {
+				return true
+			}
+			for li, lhs := range as.Lhs {
+				id, ok := lhs.(*ast.Ident)
+				if !ok || id.Name == "_" {
+					continue
+				}
+				if len(as.Rhs) == 1 {
+					ce, ok := as.Rhs[0].(*ast.CallExpr)
+					if ok {
+						if fn, ok := ce.Fun.(*ast.Ident); ok {
+							if pos, isBuilder := builders[fn.Name]; isBuilder && pos == li {
+								names = append(names, id.Name)
+								continue
+							}
+						}
+					}
+				}
+				rhs := ast.Expr(nil)
+				if li < len(as.Rhs) {
+					rhs = as.Rhs[li]
+				}
+				if rhs != nil && inboundDispatchValue33(rhs) {
+					names = append(names, id.Name)
+				}
+			}
+			return true
+		})
+		if len(names) > 0 {
+			out[name] = dedupeInbound33(names)
+		}
+	}
+	return out
+}
+
+// inboundHandleCallSites33 returns "file:line" for every call of the shape
+// <dispatch var>.Handle(...) in a non-test file.
+func inboundHandleCallSites33(t *testing.T) []string {
+	t.Helper()
+	vars := inboundDispatchVars33(t)
+	if len(vars) == 0 {
+		return nil
+	}
+	fset := token.NewFileSet()
+	files, _ := filepath.Glob("*.go")
+	sort.Strings(files)
+	var sites []string
+	for _, name := range files {
+		if strings.HasSuffix(name, "_test.go") {
+			continue
+		}
+		want := vars[name]
+		if len(want) == 0 {
+			continue
+		}
+		f, err := parser.ParseFile(fset, name, nil, parser.ParseComments)
+		if err != nil {
+			continue
+		}
+		ast.Inspect(f, func(n ast.Node) bool {
+			ce, ok := n.(*ast.CallExpr)
+			if !ok {
+				return true
+			}
+			se, ok := ce.Fun.(*ast.SelectorExpr)
+			if !ok || se.Sel.Name != "Handle" {
+				return true
+			}
+			id, ok := se.X.(*ast.Ident)
+			if !ok {
+				return true
+			}
+			for _, w := range want {
+				if id.Name == w {
+					sites = append(sites, name+":"+itoa33(fset.Position(ce.Pos()).Line))
+				}
+			}
+			return true
+		})
+	}
+	sort.Strings(sites)
+	return sites
+}
+
+// inboundDispatchValue33 recognises `&panel.ComposerDispatch{...}` and
+// `panel.ComposerDispatch{...}`.
+func inboundDispatchValue33(e ast.Expr) bool {
+	lit, ok := e.(*ast.CompositeLit)
+	if !ok {
+		return false
+	}
+	if amp, ok := lit.Type.(*ast.UnaryExpr); ok && amp.Op == token.AND {
+		return inboundDispatchType33(amp.X)
+	}
+	return inboundDispatchType33(lit.Type)
+}
+
+func inboundDispatchType33(e ast.Expr) bool {
+	star, ok := e.(*ast.StarExpr)
+	if ok {
+		e = star.X
+	}
+	se, ok := e.(*ast.SelectorExpr)
+	if !ok {
+		return false
+	}
+	pkg, ok := se.X.(*ast.Ident)
+	if !ok {
+		return false
+	}
+	return pkg.Name == "panel" && se.Sel.Name == "ComposerDispatch"
+}
+
+func readInboundMainSrc33(t *testing.T) string {
+	t.Helper()
+	b, err := os.ReadFile("main.go")
+	if err != nil {
+		t.Fatalf("AC#9 RED (the instrument, not the code): cannot read main.go: %v", err)
+	}
+	return string(b)
+}
+
+func dedupeInbound33(in []string) []string {
+	seen := map[string]bool{}
+	var out []string
+	for _, s := range in {
+		if !seen[s] {
+			seen[s] = true
+			out = append(out, s)
+		}
+	}
+	return out
+}
+
+func itoa33(i int) string {
+	if i == 0 {
+		return "0"
+	}
+	var b []byte
+	for i > 0 {
+		b = append([]byte{byte('0' + i%10)}, b...)
+		i /= 10
+	}
+	return string(b)
+}
+
+// TestAC9InboundFlagSurfaceIsNarrow pins the two shapes an operator can reach by
+// accident: an unknown argument refuses rather than reading stdin forever, and a
+// leg with no data root says which rule it is refusing on. cmdPanelInbound's
+// dataDir field is what every other case here injects; this one checks the
+// argv-side of the same door so the flag parse cannot become dead code that a
+// mutation is free to delete.
+func TestAC9InboundFlagSurfaceIsNarrow(t *testing.T) {
+	dir := newInboundDataDir33(t, "ask_every_step")
+	if code, _, errLog := runInboundLeg33(t, "", dir); code != 0 {
+		t.Errorf("an empty stdin is not a failure: exit=%d stderr=%q", code, errLog)
+	}
+	var e strings.Builder
+	unknownCode := cmdPanelInbound([]string{"-nonsense"}, panelInboundIO{
+		stdin: strings.NewReader(""), stdout: &strings.Builder{}, stderr: &e, dataDir: dir,
+	})
+	if unknownCode != 2 {
+		t.Errorf("unknown argv must refuse with the setup class: exit=%d stderr=%q", code, e.String())
+	}
+	if !strings.Contains(e.String(), "-nonsense") {
+		t.Errorf("the refusal does not name the argument it refused: %q", e.String())
+	}
+	if _, bad := parsePanelInboundFlags([]string{"-data"}, ""); bad == "" {
+		t.Errorf("-data with no directory must be refused")
+	}
+	// Ticket 128 AC#2's shape, on this leg: no data root named, so nothing is
+	// opened and nothing is written. The leg refuses instead of resolving, and
+	// panel_inbound.go's header names why taking on the resolution is not this
+	// slice's call.
+	empty := t.TempDir()
+	t.Chdir(empty)
+	var nb strings.Builder
+	code := cmdPanelInbound(nil, panelInboundIO{
+		stdin:  strings.NewReader(`{"method":"panel.mode.request","requestId":"` + inboundRid + `","source":"` + inboundPanelSource + `","to":"auto_approve"}`),
+		stdout: &strings.Builder{}, stderr: &nb,
+	})
+	if code != 2 {
+		t.Errorf("a leg with no data root must refuse with the setup class, not run: exit=%d stderr=%q", code, nb.String())
+	}
+	if left, err := os.ReadDir(empty); err == nil && len(left) > 0 {
+		t.Errorf("the refusing leg wrote into the working directory anyway (%d entries) - that is the fallback ticket 128 AC#2 exists to close", len(left))
+	}
+	// The leg with no injectable root takes the production resolution, which on
+	// a machine without one refuses the same way `wisp run` does (ticket 128
+	// AC#2). reflect keeps this honest about what was compared.
+	if got := reflect.TypeOf(panelInboundIO{}.dataDir).Kind().String(); got != "string" {
+		t.Errorf("panelInboundIO.dataDir is a %s, so the injection these cases rely on is not the one the header claims", got)
+	}
+}

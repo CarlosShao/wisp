@@ -1,0 +1,23 @@
+time=2026-09-28T17:08:28.445+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC9InboundLegFromStdinReachesTheWriteLeg
+    panel_inbound_33_test.go:117: Handle was reached but the write leg never moved the档 on disk: before="auto_approve" after="auto_approve"
+--- FAIL: TestAC9InboundLegFromStdinReachesTheWriteLeg (0.01s)
+=== RUN   TestAC9InboundLegRefusesUnlistedMethodAndAuditsIt
+    panel_inbound_33_test.go:136: a refused request must not exit 0: exit=0 stdout="wisp panel-inbound: 第 1 行已受理，处理器已被调用\n"
+    panel_inbound_33_test.go:139: the user-facing sentence does not name the refused method: stdout="wisp panel-inbound: 第 1 行已受理，处理器已被调用\n"
+    panel_inbound_33_test.go:142: the refusal was returned but not recorded: stderr="wisp panel-inbound: 收到 1 封 / 受理 1 封 / 拒绝 0 封（数据根 C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC9InboundLegRefusesUnlistedMethodAndAuditsIt773769263\\001）\n"
+    panel_inbound_33_test.go:145: the audit line cannot be matched to the request that made it: stderr="wisp panel-inbound: 收到 1 封 / 受理 1 封 / 拒绝 0 封（数据根 C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC9InboundLegRefusesUnlistedMethodAndAuditsIt773769263\\001）\n"
+--- FAIL: TestAC9InboundLegRefusesUnlistedMethodAndAuditsIt (0.01s)
+=== RUN   TestAC9InboundLegRefusesRosterMethodWithNoHandler
+    panel_inbound_33_test.go:166: exit=0 want 1 (the request was refused): stdout="wisp panel-inbound: 第 1 行已受理，处理器已被调用\n"
+    panel_inbound_33_test.go:169: the refusal does not say which layer is missing: stdout="wisp panel-inbound: 第 1 行已受理，处理器已被调用\n"
+    panel_inbound_33_test.go:172: the audit line does not name the method that has no handler: stderr="wisp panel-inbound: 收到 1 封 / 受理 1 封 / 拒绝 0 封（数据根 C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC9InboundLegRefusesRosterMethodWithNoHandler1299781247\\001）\n"
+--- FAIL: TestAC9InboundLegRefusesRosterMethodWithNoHandler (0.01s)
+=== RUN   TestAC9ComposerDispatchHasAProductionCaller
+    panel_inbound_33_test.go:185: AC#9 RED: no NON-test file in cmd/wisp sends Handle to a *panel.ComposerDispatch. The router would be a function only tests can reach, which in the running product is a function that does not exist (this is the exact shape ticket 33 slice A shipped with, and the shape 33-a1 §4 named as the single hole across H4-H9). Expected at least one call site in the style of cmd/wisp/panel_inbound.go's `disp.Handle(ctx, raw)`.
+--- FAIL: TestAC9ComposerDispatchHasAProductionCaller (0.01s)
+=== RUN   TestAC9InboundFlagSurfaceIsNarrow
+--- PASS: TestAC9InboundFlagSurfaceIsNarrow (0.01s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.101s
+FAIL

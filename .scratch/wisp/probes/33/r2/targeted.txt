@@ -1,0 +1,4 @@
+# github.com/CarlosShao/wisp/cmd/wisp [github.com/CarlosShao/wisp/cmd/wisp.test]
+cmd\wisp\panel_inbound_33_test.go:403:80: undefined: code
+FAIL	github.com/CarlosShao/wisp/cmd/wisp [build failed]
+FAIL

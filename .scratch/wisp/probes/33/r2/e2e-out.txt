@@ -1,0 +1,4 @@
+wisp panel-inbound: 第 1 行已受理，处理器已被调用
+wisp panel-inbound: 第 2 行被拒绝：面板请求被拒绝 [panel.review.allow rid-e2e-2]：panel: composer request refused: 方法 "panel.review.allow" 不是面板 composer 通路的能力入口
+wisp panel-inbound: 第 3 行被拒绝：面板请求被拒绝 [panel.workspace.request rid-e2e-3]：panel: 该方法在名册内，但本机未接入处理器: 方法 "panel.workspace.request" 的处理器未接入（requestId="rid-e2e-3"），档位/工作区/附件/消息均未变化
+wisp panel-inbound: 第 4 行被拒绝：面板请求被拒绝 [panel.mode.request rid-e2e-4]：panel: 确认腿未接入，档位不得变宽: 请求 "rid-e2e-4" 要把档位从 ask_every_step 放宽到 auto_approve，而本机没有接入 L2 确认腿（R20/M4：只有变宽要确认）

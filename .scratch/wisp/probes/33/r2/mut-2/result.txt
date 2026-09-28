@@ -1,0 +1,7 @@
+time=2026-09-28T17:05:31.007+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestAC9InboundLegRefusesUnlistedMethodAndAuditsIt (0.01s)
+    panel_inbound_33_test.go:142: the refusal was returned but not recorded: stderr="wisp panel-inbound: 收到 1 封 / 受理 0 封 / 拒绝 1 封（数据根 C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC9InboundLegRefusesUnlistedMethodAndAuditsIt671416525\\001）\n"
+    panel_inbound_33_test.go:145: the audit line cannot be matched to the request that made it: stderr="wisp panel-inbound: 收到 1 封 / 受理 0 封 / 拒绝 1 封（数据根 C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC9InboundLegRefusesUnlistedMethodAndAuditsIt671416525\\001）\n"
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.094s
+FAIL

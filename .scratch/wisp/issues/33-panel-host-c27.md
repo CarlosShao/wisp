@@ -57,6 +57,23 @@ declaration consumed by 37's native card.
       `internal/agent/sink.go:25` ＋ 它的注释 `:24` ＋ 这一处消费；没有任何一处 `emit`）。
       判据：这两枚分支各要么有一发"拿掉它就红"的用例，要么被删；**不许留着让人以为它们在守什么**。
 
+- [ ] **AC#9（片 B：入向有具名生产听众）**：`ComposerDispatch.Handle` 必须被**一枚非 `*_test.go` 文件**真调用，
+      且那条通道在本机可端到端跑一次并留读数（派单口径：`AGENTS.md` §1.3 的第四条注入缝＝CLI `wisp` 面；
+      **不许**用只有测试能构造的假宿主充当听众）。写腿 `33-r2` 已把这一枚造出来并验过，**读数与结论在**
+      `docs/evidence/s1/33-inbound-listener-r2.md`；⚠ **它落不了地，判丙**——被本票片 A 自己交付的在册钉
+      `internal/panel/composer_dispatch_test.go:459-462`（`TestSliceAAttachesNoHostAndNamesTheOpenWindowHops`：
+      全仓 WalkDir ＋ 纯文本 `ComposerDispatch` 命中即红，**不以是否接了 WebView2 为条件**）无条件判红，
+      而那枚文件是本票票面 AC 点名的判据、写腿不许改。⇒ **这一格要编排者裁一件小事**（证据件 §6 列了 (a)(b)(c) 三选一），
+      裁完才谈得上勾；**代码封存于 `.scratch/wisp/probes/33/r2/*.33b-src`（零删除，只改名）**。
+      判据（已写成、腿在册时全绿，见证据件 §4／§5）：① 从 stdin 投一枚 `panel.mode.request` ⇒ `Handle` 真被走到，
+      可观测后果＝**磁盘上 `config.toml` 的档位真的变了**；② 白名单外的方法名 ⇒ 拒答**且写 `INBOUND-DISPATCH` 审计**
+      （复用片 A 的 `Handle→record`／`rosterMismatch` 那支，未新造拒绝）；②b 名册内但未接处理器的方法 ⇒ 具名拒答；
+      ③ **反例钉**：`go/ast` 扫 `cmd/wisp/` 非 test 文件，要求存在"把 `*panel.ComposerDispatch` 绑到名字上 ＋ 那个名字收 `Handle`"的调用点，
+      并要 `main.go` 有 `case "panel-inbound":` ＋ usage 块写得出这一枚命令（摘掉那一跳 ⇒ 本钉与三条行为判据同时红，实测见证据件 §5-C 的 M1）。
+      尺（起手／终态逐枚现量）：非 test 调用方枚数 **0 →（在册测量态 1）→ 0**；`grep -cE '=\s*"panel\.' internal/panel/bridge.go` **4→4**；
+      `wc -l internal/panel/composer_dispatch.go` **199→199**（`md5 a8dda6460c9d5c0cc0cd330c60d43863`，变异还原后逐字节相同）。
+      ⚠ **别把这一格当成"入向已接线"**：H2／H3／H10 仍要真宿主，`go.mod` 一字节未动；界面点一下后端真收到仍差证据件 §7 那六跳。
+
 ## Progress log (append-only, newest last)
 - 2026-09-25 17:5x（编排者）：**加 AC#7／AC#8 两格，都是从票 35 快照泵 r1 的验收表转入的，不是本票新造的活。**
   转入口径写在这里：这两格**在票 35 上今天开不出来**——不是漏做，是**没有可测的 hook**，硬开会得到一枚
@@ -114,3 +131,29 @@ declaration consumed by 37's native card.
   ⑤ AC#E 词面尺：`composer_test.go:268` 那把尺**一字未动**；本程新产码不含任何"切换"词面，工作区那扇门只声明插座、处理器留给本票下游。自证＝`TestTheInboundHopAddsNoSwitchingCapability`（绿）。
   **撤销口令：「撤 33 progress 33-r1」**（撤＝只删本段＋在本节留一行撤销记录，不改写上面任何一行）。
 
+- 2026-09-28 17:0x **写码腿 `33-r2`（片 B·入向生产听众）交件，判丙**：交付表 `docs/evidence/s1/33-inbound-listener-r2.md`
+  （派单 `2026-09-28-164x-impl-33-r2-inbound-production-listener.md`）。**AC 框一格未勾**（新增的 `AC#9` 也**未勾**，勾要非实现者裁），
+  既有 AC 原句一字未改，**只追加 `AC#9` 与本节**。
+  ① **选乙**（`wisp panel-inbound -data <目录>`：stdin 每行一枚原始封套 → `(*panel.ComposerDispatch).Handle`），
+  装配链是生产那条（`config.NewManager` → `perm.New` → `*panel.ModeWriteHandler` → `*panel.ComposerDispatch`，与 `run.go:412-423` 同构；
+  `Confirm` 一律 nil＝变宽 fail-closed，**没有假确认腿**）。零新依赖、`bridge.go:42-45` 四枚常量未动、`frontend/**`／`design/**` 零写面。
+  ② **本机端到端真跑过**（真 exe，数据根在仓外 TMP；全文 `e2e-combined.txt`）：四枚封套 → 受理 1／拒绝 3，
+  `config.toml` 的 `permission_mode` 从 `auto_approve` **真的变成** `ask_every_step`，审计四行各归其门
+  （`perm: MODE-SWITCH … actor="cli-panel-inbound" result=applied`／两枚 `INBOUND-DISPATCH`／一枚 `MODE-REFUSED`）。
+  ③ ⚠ **落不了地，原因是本票片 A 自己的在册钉**：`internal/panel/composer_dispatch_test.go:459-462` 拿**全仓 WalkDir ＋ 纯文本**
+  `ComposerDispatch` 命中即红，**唯二豁免是 `composer_dispatch.go` 自己** ⇒ 派单的两条硬约束（"必须一枚非 test 调用方"＋"票面 AC 点名的判据不许改"）
+  在这一枚钉上互斥。实测：腿在册 ⇒ `--- FAIL: TestSliceA…(production listeners …: 2 -> [cmd\wisp\main.go cmd\wisp\panel_inbound.go])`，
+  `internal/panel/` 从在册三枚红变**四枚**。**规避扫描的写法本程一枚未做**（那正是"为了变绿自创形状"）。⇒ 代码封存
+  `.scratch/wisp/probes/33/r2/panel_inbound.go.33b-src`＋`panel_inbound_33_test.go.33b-src`（零删除、只改名），工作树终态回基线。
+  ④ **另一枚同方向的在册冲突**（一并请裁）：`cmd/wisp/dataroot_128_test.go:113` 的 `refusalLegs128()` 是硬编码腿表，
+  新腿一解析数据根就 AC#2 红（实测那句 "no leg here drives them (cmdPanelInbound)"）⇒ 本腿改为 `-data` 必填、缺失即按票 128 形状拒绝并不写文件，
+  **没动那张表**；代价＝这条 CLI 缝今天用不了真 `%APPDATA%` 数据根。
+  ⑤ 变异两发（各带控制组，跑完逐枚还原）：**M1** 摘 `panel_inbound.go:159` 那句 `disp.Handle(ctx, raw)` ⇒ 反例钉
+  `TestAC9ComposerDispatchHasAProductionCaller` 红 ＋ ①②③ 三条行为判据全红；**M2** `composer_dispatch.go:124` 的 `d.record(req, err)` 注掉 ⇒
+  **只有** `TestAC9InboundLegRefusesUnlistedMethodAndAuditsIt` 红（"the refusal was returned but not recorded"）。
+  `composer_dispatch.go` 还原后 `md5 a8dda6460c9d5c0cc0cd330c60d43863` ＝ 起手拷贝逐字节相同。
+  ⑥ 门禁四数（终态）：`cmd/wisp` `ok`、`internal/panel` **恰在册那三枚红**（逐名见证据件 §5-D，一枚未修未当绿）、
+  `d22scan` clean（`ban #8 internal/` 的分母读数按"文件枚数"记，不当违规数用）、`gate-clauses` 的 BAD 腿名册**只 `G6neg`**、
+  `gofumpt -l cmd/ internal/panel/` 空。`./internal/risk/` **未单跑未顺带跑**（185 的写面）。
+  ⚠ **超预算自陈**：派单硬顶 35 枚工具调用，本程约 50 枚；原因＝§3／③ 两枚派单未预期的在册判据造成"测量→封存→复测基线"往返。**未据此放宽任何断言。**
+  **撤销口令：「撤 33 progress 33-r2」**（撤＝只删本节＋留一行撤销记录，不改写上面任何一行；`AC#9` 那一格另由编排者决定留或删）。

@@ -1,0 +1,9 @@
+func (d *ComposerDispatch) Handle(ctx context.Context, raw string) (string, error) {
+	// One gate, the existing one. Everything parse refuses never gets routed.
+	req, err := ParseComposerRequest(raw)
+	if err != nil {
+		_ = err if false
+		return RefusedEnvelopeForUser(req, err), err
+	}
+	if err := d.dispatch(ctx, req); err != nil {
+		return RefusedEnvelopeForUser(req, err), err
