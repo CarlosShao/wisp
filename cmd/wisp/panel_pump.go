@@ -109,6 +109,23 @@ func (rt *agentRuntime) gitView() panel.GitView {
 	return panel.ReadGitForWorkspace(rt.workspaceView())
 }
 
+// currentModel reports the model id this boot really resolved for its text role.
+//
+// The source is the single endpoint the runtime built (run.go:308 assigns it,
+// and llm.Endpoint.Model is internal/llm/resolver.go:46) - the bytes the
+// provider chain is being asked for right now. It is deliberately NOT a second
+// lookup of the [llm.providers] catalog: the catalog answers "which models
+// could be picked", which has no exported reader in this tree (ticket 187's
+// family), while this answers only "which one is answering". No constant stands
+// in for it: an endpoint that was never resolved yields "" and the packet then
+// says modelKnown=false.
+func (rt *agentRuntime) currentModel() string {
+	if rt == nil {
+		return ""
+	}
+	return rt.endpoint.Model
+}
+
 // panelArgs shapes one live call's argument bytes into the argv-shaped list
 // ApprovalCardView.args shows. Two real shapes exist: a call that carries an
 // argv vector (what risk.Facts.ShellArgv is built from, and what

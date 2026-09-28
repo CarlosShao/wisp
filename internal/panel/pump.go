@@ -118,6 +118,13 @@ type PumpSources struct {
 	// route this dimension takes: there is no git tool for the model to call, and
 	// no inbound method for a switch to arrive on.
 	Git func() GitView
+	// Model reads the model id this boot resolved (llm.Endpoint.Model), ticket
+	// 145 AC#2b's "which model is answering". It is one live string read off the
+	// endpoint the runtime already built - not the selectable catalog and not
+	// the per-adapter effort vocabulary, neither of which is exported here. nil
+	// means nobody read it, and the packet then reports modelKnown=false
+	// instead of naming a model or blanking one.
+	Model func() string
 	// Results reads the streamed assistant text so far.
 	Results func() []ResultChunk
 	// AttachmentMax is the composer's per-attachment ceiling. Zero means
@@ -198,6 +205,13 @@ func (p *SnapshotPump) Snapshot() Snapshot {
 		// NewComposerState left this section saying "not probed"; a reader that
 		// exists overwrites it with what the files actually say.
 		composer.Git = p.src.Git()
+	}
+	if p.src.Model != nil {
+		// Same shape one line up: NewComposerState built this section with no
+		// model named and modelKnown unset, because nothing had been read yet.
+		// Only a reader that exists can fill either half.
+		composer.CurrentModel = p.src.Model()
+		composer.ModelKnown = composer.CurrentModel != ""
 	}
 
 	now := time.Now

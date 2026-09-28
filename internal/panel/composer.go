@@ -214,6 +214,16 @@ type ComposerState struct {
 	// declaration that matches it on the page side is not this session's to
 	// write - see the note on Snapshot above and Q-51.
 	Git GitView `json:"git"`
+	// CurrentModel is the model id this boot actually resolved for its text
+	// role, handed over at the pump's assembly root from the one endpoint the
+	// runtime built (llm.Endpoint.Model). It is NOT a selectable catalog and NOT
+	// an effort-tier set - neither of those has an exported source in this tree
+	// (ticket 187's family), so this section carries the single fact that does.
+	// ModelKnown is the honest half, same rule as the card's reasonKnown and the
+	// git section's empty Kind: a pump assembled without a model reader says
+	// "nobody read it", and the renderer must not show that as "no model".
+	CurrentModel string `json:"currentModel"`
+	ModelKnown   bool   `json:"modelKnown"`
 }
 
 // NewComposerState assembles the composer section from native state.

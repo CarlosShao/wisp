@@ -444,6 +444,7 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		Mode:      rt.modes.PermissionMode,
 		Workspace: rt.workspaceView,
 		Git:       rt.gitView,
+		Model:     rt.currentModel,
 		Results:   rt.stream.Chunks,
 		Out:       rt.bookPanelSnapshot,
 	})
