@@ -22,9 +22,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 	"testing"
 
@@ -389,78 +393,245 @@ func TestDispatcherSpellsNoRouteLiteralOfItsOwn(t *testing.T) {
 // ----------------------------------------------- the honesty nails (AC#D / #E)
 
 // TestSliceAAttachesNoHostAndNamesTheOpenWindowHops is 33-a1 §7.4's fourth
-// judgement: delivery must state, in a form that can go red, that the real-window
-// hops are still open. Two readings: this package imports no WebView2 symbol at
-// all (durable - that is what slice A *is*), and no production file outside
-// internal/panel constructs a ComposerDispatch (a tripwire - it flips the day
-// slice B's host wires the receive callback, and updating it is that ticket's
-// job, not a defect in this one).
+// judgement, restated (ruling A386, ticket 33 slice B) as a CAPABILITY ruler.
+//
+// What it asks now, and only this: does this tree attach a native host / WebView2
+// message channel? It answers by looking for the symbol family such an attachment
+// cannot be written without (CoreWebView2 / WebView2 / WebMessage identifiers in
+// production Go sources, and a webview module in go.mod / go.sum), never for a
+// type's NAME. The predecessor scanned the repo's text for "ComposerDispatch", so
+// it read "a CLI seam calls the router" and "somebody wired the window and passed
+// it off as a working panel" as the same event - a wording ruler that blocked the
+// very listener ticket 33 slice B was dispatched to land.
+//
+// What green here means, stated exactly: no host is attached. It says NOTHING
+// about whether the panel can click - the inbound router has a production caller
+// today (cmd/wisp/panel_inbound.go, `wisp panel-inbound`) and this test is green
+// with it, which is precisely the reading the ticket carries: 票 33 AC#9 says the
+// panel still cannot be clicked, because H2 (the control is created), H3
+// (WebMessageReceived takes the page's bytes into Go) and H10 (the reply goes back
+// to the page) are all still open. When one of those lands, the first leg below
+// goes red and the window's own ticket has to say so - "do not let a green here
+// stand in for a panel that can click" is still the sentence this nail is for.
+//
+// It is not a door unless it can go red, so the test carries its own positive
+// control: the SAME predicate is run over throwaway trees written OUTSIDE this
+// repository (t.TempDir; a scan of the real disk cannot see a -overlay file, and
+// a carrier that the ruler cannot see would make this a nail with no door).
+// Two legs must fire (a fake host source, a fake webview dependency) and one leg
+// must stay silent (the CLI-seam shape the old wording ruler reddened on) - see
+// the sub-tests.
 func TestSliceAAttachesNoHostAndNamesTheOpenWindowHops(t *testing.T) {
 	root := panelRepoRoot(t)
-	var hostSymbols []string
-	err := filepath.WalkDir(filepath.Join(root, "internal", "panel"), func(p string, d os.DirEntry, err error) error {
-		if err != nil || d.IsDir() || !strings.HasSuffix(p, ".go") || strings.HasSuffix(p, "_test.go") {
-			return err
-		}
-		data, err := os.ReadFile(p)
-		if err != nil {
-			return err
-		}
-		for _, sym := range []string{"go-webview2", "CreateCoreWebView2", "WebMessageReceived", "PostWebMessage"} {
-			if strings.Contains(string(data), sym) {
-				rel, _ := filepath.Rel(root, p)
-				hostSymbols = append(hostSymbols, rel+":"+sym)
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		t.Fatalf("scan internal/panel: %v", err)
-	}
-	if len(hostSymbols) != 0 {
-		t.Errorf("slice A was supposed to add no host symbol; found %v", hostSymbols)
+	hits := hostChannelCapabilityHits(t, root)
+	t.Logf("native-host capability hits in %s: %d -> %v", root, len(hits), hits)
+	if len(hits) != 0 {
+		t.Errorf("a native host / WebView2 message channel is attached in this tree (%v) while ticket 33's "+
+			"real-window ACs are still unticked: that is H2/H3/H10 landing - say so on the ticket, do not let a "+
+			"green here stand in for a panel that can click", hits)
 	}
 
-	var production []string
+	t.Run("positive-control", func(t *testing.T) {
+		// Carrier A: a production source that hosts the control. Nothing here is
+		// imported by the product and nothing here is a *_test.go file, which is
+		// what makes it the shape the predicate is supposed to catch.
+		a := t.TempDir()
+		writeHostCarrier(t, a, filepath.Join("internal", "panel"), "host_windows.go", `package panel
+
+type CoreWebView2 struct{}
+
+func (w *CoreWebView2) WebMessageReceived(sender, args any) error { return nil }
+
+func (w *CoreWebView2) PostWebMessageAsJson(json string) error { return nil }
+`)
+		if got := hostChannelCapabilityHits(t, a); len(got) == 0 {
+			t.Errorf("POSITIVE CONTROL RED (the ruler, not the product): a tree whose production source hosts a "+
+				"CoreWebView2 and takes WebMessageReceived answered 0 capability hits, so the check above is a "+
+				"door with no latch. Hits would have named the file and the symbol: got %v", got)
+		} else {
+			t.Logf("carrier A (fake host source) -> %d hit(s) %v", len(got), got)
+		}
+
+		// Carrier B: the dependency half. A host is normally bought, not written,
+		// so go.mod / go.sum are read too.
+		b := t.TempDir()
+		writeHostCarrier(t, b, "", "go.mod", "module github.com/CarlosShao/wisp\n\nrequire github.com/jchv/go-webview2 v0.0.0-20220111092826-5ea30c1aaa37\n")
+		writeHostCarrier(t, b, "", "go.sum", "github.com/jchv/go-webview2 v0.0.0-20220111092826-5ea30c1aaa37 h1:8vXupf01+8Q7j94hb8jLZ4J0K+zxuu6W1JxG2rHpNzA=\n")
+		if got := hostChannelCapabilityHits(t, b); len(got) == 0 {
+			t.Errorf("POSITIVE CONTROL RED (the ruler, not the product): a tree whose go.mod requires a webview "+
+				"binding answered 0 capability hits, so the dependency half of the check is not wired. got %v", got)
+		} else {
+			t.Logf("carrier B (webview dependency) -> %d hit(s) %v", len(got), got)
+		}
+
+		// Carrier C is the discrimination leg, and the reason this rewrite is a
+		// narrower instrument rather than a loosened one: the shape that reddened
+		// the wording ruler - a non-test production file that constructs a
+		// ComposerDispatch and sends it Handle, with no window anywhere - must
+		// stay silent under the capability ruler. Reddening on it again would put
+		// this file back in the way of ticket 33's own inbound leg.
+		c := t.TempDir()
+		writeHostCarrier(t, c, filepath.Join("cmd", "wisp"), "panel_inbound.go", `package main
+
+import "github.com/CarlosShao/wisp/internal/panel"
+
+func run() {
+	disp := &panel.ComposerDispatch{}
+	_, _ = disp.Handle(nil, "{}")
+}
+`)
+		if got := hostChannelCapabilityHits(t, c); len(got) != 0 {
+			t.Errorf("NEGATIVE CONTROL RED (the ruler is still a wording ruler): an inbound CLI seam with no host "+
+				"answered %d capability hit(s) %v - only the presence of a native host / WebView2 message channel "+
+				"may redden this test", len(got), got)
+		} else {
+			t.Logf("carrier C (CLI seam, no host) -> 0 hits, as required")
+		}
+	})
+}
+
+// hostChannelSymbols are the identifier anchors of a WebView2 host attachment.
+// They are substrings because the generated COM bindings carry them inside longer
+// names (add_WebMessageReceived, CreateCoreWebView2EnvironmentWithOptions,
+// get_WebMessageAsJson), and a host written through those spellings is exactly
+// what this ruler is for. Case-sensitive on purpose: the camel spelling is what
+// the binding uses, while prose in this repository says "WebView2 hosting" in
+// comments - and comments are not identifiers, which is the whole reason this
+// predicate parses sources instead of grepping them (measured 2026-09-28: 27
+// production .go files describe the missing host in prose; reddening on prose
+// would have made this test red since before slice A existed).
+var hostChannelSymbols = []string{"CoreWebView2", "WebView2", "WebMessage"}
+
+// hostModuleTokens are the go.mod / go.sum half of the same question: a WebView2
+// host is normally imported, not hand-written. docs/specs and the local spike
+// (scripts/spike/webview2-latency) name the binding as github.com/jchv/go-webview2,
+// so a module path containing "webview" is the signal. Case-insensitive here,
+// because module paths are lower-case by convention and a renamed fork still says
+// what it is.
+var hostModuleTokens = []string{"webview", "msedge"}
+
+// hostChannelCapabilityHits reads root's PRODUCTION sources for the host family
+// and returns "relpath:line:what" per hit. Out of scope, and named so nobody has
+// to guess: test files (a host is a shipping thing, and this very file spells the
+// symbols in its own carrier strings), the directory set below, comments, and
+// string literals. A host reached through a hand-rolled COM vtable that spells
+// none of these names in an identifier is outside this ruler's sight - the
+// dependency half is what would catch it, and 票 33's window leg is where that
+// shape would actually arrive.
+func hostChannelCapabilityHits(t *testing.T, root string) []string {
+	t.Helper()
+	var hits []string
+	fset := token.NewFileSet()
 	walk := filepath.WalkDir(root, func(p string, d os.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
-		name := d.Name()
 		if d.IsDir() {
-			switch name {
-			// frontend/ and design/ are another session's ground and are not
-			// read by this slice at all: skipping them here is what lets this
-			// walk say "the whole repo" without walking through a no-read zone.
-			case ".git", "node_modules", "dist", "third_party", "scripts", "docs", "frontend", "design":
+			switch d.Name() {
+			// .git and the build trees carry no product source; scripts/ holds this
+			// repository's own WebView2 latency spike, which is deliberately not the
+			// shipped host, and the set below is the one the predecessor skipped -
+			// frontend/ and design/ are another session's ground and this slice reads
+			// neither. .scratch/ is the ticket pool: other slices keep probe copies
+			// there (several of them renamed copies of run.go), and a red from one of
+			// those would accuse the product of something a scratch tree did.
+			case ".git", ".scratch", "node_modules", "dist", "third_party", "scripts", "docs", "frontend", "design", "build":
 				return filepath.SkipDir
 			}
 			return nil
 		}
-		if !strings.HasSuffix(name, ".go") || strings.HasSuffix(name, "_test.go") {
-			return nil
-		}
+		name := d.Name()
 		rel, _ := filepath.Rel(root, p)
-		if filepath.ToSlash(rel) == filepath.ToSlash(filepath.Join("internal", "panel", "composer_dispatch.go")) {
+		rel = filepath.ToSlash(rel)
+		if strings.HasSuffix(name, ".go") && !strings.HasSuffix(name, "_test.go") {
+			src, err := os.ReadFile(p)
+			if err != nil {
+				return err
+			}
+			f, err := parser.ParseFile(fset, p, src, 0)
+			if err != nil {
+				// Unparseable production source is itself a finding: the alternative
+				// is a ruler that quietly skips the file it cannot read.
+				hits = append(hits, rel+":0:unparseable: "+err.Error())
+				return nil
+			}
+			for _, imp := range f.Imports {
+				path := strings.Trim(imp.Path.Value, `"`)
+				if hostModulePathHit(path) {
+					hits = append(hits, fmt.Sprintf("%s:%d:imports %s", rel, fset.Position(imp.Pos()).Line, path))
+				}
+			}
+			ast.Inspect(f, func(n ast.Node) bool {
+				id, ok := n.(*ast.Ident)
+				if !ok {
+					return true
+				}
+				if sym := hostChannelSymbolHit(id.Name); sym != "" {
+					hits = append(hits, fmt.Sprintf("%s:%d:identifier %s", rel, fset.Position(id.Pos()).Line, sym))
+				}
+				return true
+			})
 			return nil
 		}
-		data, err := os.ReadFile(p)
-		if err != nil {
-			return err
-		}
-		if strings.Contains(string(data), "ComposerDispatch") {
-			production = append(production, rel)
+		if name == "go.mod" || name == "go.sum" {
+			src, err := os.ReadFile(p)
+			if err != nil {
+				return err
+			}
+			for i, line := range strings.Split(string(src), "\n") {
+				if strings.HasPrefix(strings.TrimSpace(line), "//") {
+					continue
+				}
+				for _, tok := range hostModuleTokens {
+					if strings.Contains(strings.ToLower(line), tok) {
+						hits = append(hits, fmt.Sprintf("%s:%d:dependency %q", rel, i+1, tok))
+						break
+					}
+				}
+			}
 		}
 		return nil
 	})
 	if walk != nil {
-		t.Fatalf("scan repo for production listeners: %v", walk)
+		t.Fatalf("scan %s for host capability: %v", root, walk)
 	}
-	t.Logf("production listeners of ComposerDispatch (excluding its own file): %d -> %v", len(production), production)
-	if len(production) != 0 {
-		t.Errorf("a production listener appeared outside internal/panel (%v) while ticket 33's six real-window "+
-			"ACs are still unticked: that is H2/H3/H10 landing - say so on the ticket, do not let a green here "+
-			"stand in for a panel that can click", production)
+	sort.Strings(hits)
+	return hits
+}
+
+// hostChannelSymbolHit returns the anchor an identifier carries, or "" when the
+// identifier says nothing about hosting.
+func hostChannelSymbolHit(name string) string {
+	for _, sym := range hostChannelSymbols {
+		if strings.Contains(name, sym) {
+			return sym
+		}
+	}
+	return ""
+}
+
+func hostModulePathHit(path string) bool {
+	lower := strings.ToLower(path)
+	for _, tok := range hostModuleTokens {
+		if strings.Contains(lower, tok) {
+			return true
+		}
+	}
+	return false
+}
+
+// writeHostCarrier puts one throwaway file into a repository-external temp tree.
+// t.TempDir hands back a directory outside the repository and removes it itself,
+// which is why this file needs no delete step and why no carrier can be mistaken
+// for product source.
+func writeHostCarrier(t *testing.T, root, dir, name, content string) {
+	t.Helper()
+	where := filepath.Join(root, dir)
+	if err := os.MkdirAll(where, 0o755); err != nil {
+		t.Fatalf("carrier dir: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(where, name), []byte(content), 0o600); err != nil {
+		t.Fatalf("carrier file: %v", err)
 	}
 }
 
