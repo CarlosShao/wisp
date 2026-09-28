@@ -1,0 +1,35 @@
+time=2026-09-28T12:42:58.630+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPointer183RefereeTwinFragmentOutsideSpanStaysExempted
+    pointer_183_test.go:156: 183 referee: the host's own pointer must stay re-readable even when the body spells one of its windows elsewhere, got hit taint-hit channel=unclassified.exfil-scan source=fs.read task.output fragment_len=8
+--- FAIL: TestPointer183RefereeTwinFragmentOutsideSpanStaysExempted (0.01s)
+=== RUN   TestPointer183RefereeControlBodyWithoutTwinIsClean
+--- PASS: TestPointer183RefereeControlBodyWithoutTwinIsClean (0.00s)
+=== RUN   TestPointer183PathAppearingTwiceInBodyStaysExempted
+    pointer_183_test.go:207: 183 second face: a path the host wrote twice must not be evidence against the model's reread, got hit taint-hit channel=unclassified.exfil-scan source=fs.read task.output fragment_len=8
+--- FAIL: TestPointer183PathAppearingTwiceInBodyStaysExempted (0.00s)
+=== RUN   TestPointer183BodySecretOutsideSpanStillHits
+--- PASS: TestPointer183BodySecretOutsideSpanStillHits (0.00s)
+=== RUN   TestPointer183ForeignMarkCarryingSamePathStillHits
+    pointer_183_test.go:252: AC#3: hit must be attributed to the foreign mark, got "fs.read"
+--- FAIL: TestPointer183ForeignMarkCarryingSamePathStillHits (0.01s)
+=== RUN   TestPointer183AlmostPathInSameHostMarkStillHits
+--- PASS: TestPointer183AlmostPathInSameHostMarkStillHits (0.00s)
+=== RUN   TestShapeAHostReReadOfDeclaredPathIsClean
+--- PASS: TestShapeAHostReReadOfDeclaredPathIsClean (0.00s)
+=== RUN   TestShapeAW1RestOfHostMarkStillIndexed
+--- PASS: TestShapeAW1RestOfHostMarkStillIndexed (0.00s)
+=== RUN   TestShapeAW2ForeignMarkCarryingSamePathStillHits
+--- PASS: TestShapeAW2ForeignMarkCarryingSamePathStillHits (0.00s)
+=== RUN   TestShapeAW3NeverMintedSiblingUnderSameDirStillHits
+--- PASS: TestShapeAW3NeverMintedSiblingUnderSameDirStillHits (0.00s)
+=== RUN   TestShapeAW4PositionalExclusionNeverLeavesHostMark
+--- PASS: TestShapeAW4PositionalExclusionNeverLeavesHostMark (0.00s)
+=== RUN   TestShapeAFExclusionDiesWithScopeClose
+--- PASS: TestShapeAFExclusionDiesWithScopeClose (0.00s)
+=== RUN   TestShapeAW5EmptyCheckPrecedesExclusion
+--- PASS: TestShapeAW5EmptyCheckPrecedesExclusion (0.00s)
+=== RUN   TestShapeAOrderOneSpanLocatedAfterNormalization
+--- PASS: TestShapeAOrderOneSpanLocatedAfterNormalization (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	0.102s
+FAIL

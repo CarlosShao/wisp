@@ -1,0 +1,18 @@
+time=2026-09-28T12:49:40.939+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestFreq183RealBodiesAgainstTheUnfixedRule
+    zz183freq_test.go:105: corpus docs/specs/SPEC-06-security-gating.md unreadable: open D:\work\workspace\projects plans\Wisp\docs\specs\SPEC-06-security-gating.md: The system cannot find the file specified.
+    zz183freq_test.go:105: corpus docs/specs/SPEC-08-ball-and-panel.md unreadable: open D:\work\workspace\projects plans\Wisp\docs\specs\SPEC-08-ball-and-panel.md: The system cannot find the file specified.
+    zz183freq_test.go:141: REAL-BODY FREQUENCY on UNFIXED code: 3 of 10 bodies make the host's own pointer unreadable
+    zz183freq_test.go:143:   AGENTS.md                          hit=true  \swq\app swq\appd wq\appda q\appdat \appdata appdata\ ppdata\r pdata\ro data\roa ata\roam ta\roami a\roamin \roaming roaming\
+    zz183freq_test.go:143:   docs/PLAN.md                       hit=false 
+    zz183freq_test.go:143:   docs/reports/HANDOVER.md           hit=false 
+    zz183freq_test.go:143:   internal/agent/loop.go             hit=true  \swq\app swq\appd wq\appda q\appdat \appdata appdata\ ppdata\r pdata\ro data\roa ata\roam ta\roami a\roamin \roaming roaming\
+    zz183freq_test.go:143:   internal/tools/bridge.go           hit=false 
+    zz183freq_test.go:143:   cmd/wisp/run.go                    hit=false 
+    zz183freq_test.go:143:   scripts/d22scan.sh                 hit=false 
+    zz183freq_test.go:143:   go.mod                             hit=false 
+    zz183freq_test.go:143:   synthetic:dir-listing              hit=true  \swq\app swq\appd wq\appda q\appdat \appdata appdata\ ppdata\r pdata\ro data\roa ata\roam ta\roami a\roamin \roaming roaming\
+    zz183freq_test.go:143:   synthetic:plain-prose              hit=false 
+--- PASS: TestFreq183RealBodiesAgainstTheUnfixedRule (0.06s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.105s

@@ -1,0 +1,31 @@
+time=2026-09-28T12:43:00.275+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPointer183RefereeTwinFragmentOutsideSpanStaysExempted
+--- PASS: TestPointer183RefereeTwinFragmentOutsideSpanStaysExempted (0.01s)
+=== RUN   TestPointer183RefereeControlBodyWithoutTwinIsClean
+--- PASS: TestPointer183RefereeControlBodyWithoutTwinIsClean (0.00s)
+=== RUN   TestPointer183PathAppearingTwiceInBodyStaysExempted
+--- PASS: TestPointer183PathAppearingTwiceInBodyStaysExempted (0.00s)
+=== RUN   TestPointer183BodySecretOutsideSpanStillHits
+--- PASS: TestPointer183BodySecretOutsideSpanStillHits (0.00s)
+=== RUN   TestPointer183ForeignMarkCarryingSamePathStillHits
+--- PASS: TestPointer183ForeignMarkCarryingSamePathStillHits (0.00s)
+=== RUN   TestPointer183AlmostPathInSameHostMarkStillHits
+--- PASS: TestPointer183AlmostPathInSameHostMarkStillHits (0.01s)
+=== RUN   TestShapeAHostReReadOfDeclaredPathIsClean
+--- PASS: TestShapeAHostReReadOfDeclaredPathIsClean (0.00s)
+=== RUN   TestShapeAW1RestOfHostMarkStillIndexed
+--- PASS: TestShapeAW1RestOfHostMarkStillIndexed (0.00s)
+=== RUN   TestShapeAW2ForeignMarkCarryingSamePathStillHits
+--- PASS: TestShapeAW2ForeignMarkCarryingSamePathStillHits (0.01s)
+=== RUN   TestShapeAW3NeverMintedSiblingUnderSameDirStillHits
+--- PASS: TestShapeAW3NeverMintedSiblingUnderSameDirStillHits (0.01s)
+=== RUN   TestShapeAW4PositionalExclusionNeverLeavesHostMark
+--- PASS: TestShapeAW4PositionalExclusionNeverLeavesHostMark (0.01s)
+=== RUN   TestShapeAFExclusionDiesWithScopeClose
+--- PASS: TestShapeAFExclusionDiesWithScopeClose (0.00s)
+=== RUN   TestShapeAW5EmptyCheckPrecedesExclusion
+--- PASS: TestShapeAW5EmptyCheckPrecedesExclusion (0.00s)
+=== RUN   TestShapeAOrderOneSpanLocatedAfterNormalization
+--- PASS: TestShapeAOrderOneSpanLocatedAfterNormalization (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.118s

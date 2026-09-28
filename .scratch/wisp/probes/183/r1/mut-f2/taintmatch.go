@@ -86,31 +86,11 @@ func hashWindow(w []rune) uint64 {
 // spellings parallel to the hashes, which cost ~5x the index memory on a full
 // source and was never read (verification is a substring search over src).
 // Dropped per adversarial report M-5.
-//
-// Ticket 183 adds exactly one field, declaredPath, and it IS read (by contains,
-// for the value rule of MarkWithHostPath); everything else this block says
-// about the storage still holds.
 type fragmentIndex struct {
 	n      int      // effective window size in runes (>=1, contract floor 8)
 	src    string   // normalized source content (the verification corpus)
 	nrunes int      // rune count of src (introspection only)
 	hashes []uint64 // sorted, deduped window hashes
-
-	// declaredPath holds the normalized host-minted path of ticket 177 shape A
-	// (see provenance.go MarkWithHostPath) when THIS mark declared one, and nil
-	// for every ordinary mark. Ticket 183: the positional skip span only covers
-	// the FIRST normalized occurrence of that path, while the same 8-rune
-	// spellings get indexed again from any other place in the body, so a purely
-	// positional exemption dies the moment the marked output happens to repeat
-	// one of the path's own windows. A candidate window whose spelling occurs
-	// inside declaredPath is therefore not evidence FROM THIS MARK ONLY - exact
-	// string comparison, never hash equality, and never a roster: the slice
-	// lives on this index and dies with this mark (Scope.Close drops it with
-	// every other window). Set by attachDeclaredPath before the mark is ever
-	// published, so readers still never observe a half-built index; it is read
-	// by contains, which is what makes it different from the write-only window
-	// spelling list adversarial report M-5 had deleted.
-	declaredPath []rune
 }
 
 // newFragmentIndex indexes norm (already normalized) for >=n-rune substring
@@ -133,6 +113,15 @@ type fragmentIndex struct {
 // (see MarkWithHostPath) — a raw-byte offset into content is not a coordinate
 // in norm.
 func newFragmentIndex(norm string, n int, skip ...[2]int) *fragmentIndex {
+	return newFragmentIndexSkippingValues(norm, n, nil, skip...)
+}
+
+// newFragmentIndexSkippingValues is newFragmentIndex plus a VALUE-keyed
+// exemption (ticket 183 family F2): exempt holds the window spellings of one
+// declared host-minted string, and a window whose spelling is in that set stays
+// out of the index at EVERY position of THIS build. MUTATION 183-r1 F2,
+// measurement only.
+func newFragmentIndexSkippingValues(norm string, n int, exempt map[string]bool, skip ...[2]int) *fragmentIndex {
 	rp := []rune(norm)
 	f := &fragmentIndex{n: n, src: norm, nrunes: len(rp)}
 	if n < 1 {
@@ -149,6 +138,9 @@ func newFragmentIndex(norm string, n int, skip ...[2]int) *fragmentIndex {
 			continue // spans: windows overlapping a declared span stay out
 		}
 		copy(win, rp[i:i+n])
+		if exempt != nil && exempt[string(win)] {
+			continue // values: windows spelling the declared string stay out too
+		}
 		hashes = append(hashes, hashWindow(win))
 	}
 	sort.Slice(hashes, func(i, j int) bool { return hashes[i] < hashes[j] })
@@ -206,6 +198,21 @@ func runeIndexOf(hay, needle []rune) int {
 	return -1
 }
 
+// windowSpellings enumerates every n-rune window of norm as a set, i.e. the
+// exact fragment spellings the declared string itself would produce. MUTATION
+// 183-r1 F2, measurement only.
+func windowSpellings(norm string, n int) map[string]bool {
+	rp := []rune(norm)
+	if n < 1 || len(rp) < n {
+		return nil
+	}
+	out := make(map[string]bool, len(rp)-n+1)
+	for i := 0; i+n <= len(rp); i++ {
+		out[string(rp[i:i+n])] = true
+	}
+	return out
+}
+
 // contains reports whether any window of paramNorm (a normalized candidate)
 // occurs in the indexed source, returning the matched fragment. paramNorm
 // must be a prefix of the fully normalized candidate already windowed by the
@@ -220,13 +227,6 @@ func (f *fragmentIndex) contains(paramNorm string) (string, bool) {
 	win := make([]rune, n)
 	for i := 0; i+n <= len(rp); i++ {
 		copy(win, rp[i:i+n])
-		if len(f.declaredPath) >= n && spellsDeclaredPath(f.declaredPath, win) {
-			// Ticket 183: this candidate window literally spells part of the path
-			// the host itself wrote into THIS mark, so it is no evidence against
-			// the model that was handed that path - at any position, which is
-			// exactly what the positional skip span above could not promise.
-			continue
-		}
 		h := hashWindow(win)
 		if j := sort.Search(len(f.hashes), func(j int) bool { return f.hashes[j] >= h }); j < len(f.hashes) && f.hashes[j] == h {
 			w := string(rp[i : i+n])
@@ -237,36 +237,4 @@ func (f *fragmentIndex) contains(paramNorm string) (string, bool) {
 		}
 	}
 	return "", false
-}
-
-// attachDeclaredPath hangs the ONE host-minted path of ticket 177 shape A on the
-// index built for the mark that declared it (ticket 183). Callers must invoke it
-// while the mark is still local, before the index is published to a scope, so
-// the immutability the type documents keeps holding for every reader.
-func (f *fragmentIndex) attachDeclaredPath(hostPathNorm string) {
-	f.declaredPath = []rune(hostPathNorm)
-}
-
-// spellsDeclaredPath reports whether window (the caller's candidate window, n
-// runes) occurs as a contiguous run inside declared (the normalized path this
-// mark declared). Rune-exact by construction: no hash is consulted, so a 64-bit
-// collision can never exempt a window that does not literally spell the path,
-// and no window that is NOT part of the declared string is ever skipped.
-func spellsDeclaredPath(declared, window []rune) bool {
-	if len(window) == 0 || len(window) > len(declared) {
-		return false
-	}
-	for i := 0; i+len(window) <= len(declared); i++ {
-		match := true
-		for j := range window {
-			if declared[i+j] != window[j] {
-				match = false
-				break
-			}
-		}
-		if match {
-			return true
-		}
-	}
-	return false
 }

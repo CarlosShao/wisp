@@ -504,39 +504,6 @@ func (p *Provenance) Mark(scopeID, tool, origin, content string) bool {
 // the index and dies with the taintMark it excluded windows for (Scope.Close
 // drops marks and any exemption with them). Nothing per-scope is kept, because
 // a scope-level path list would be a new roster (177-c1 §2, A353).
-//
-// Delivery semantic correction, ticket 183 (ledger A363; orchestrator-approved
-// strengthening - the sentences above stay exactly as written and none of them
-// is complete on its own any more): the sentence "only the normalized window
-// that hostPath occupies inside THIS mark is kept out of the fragment index"
-// describes the POSITIONAL half of the exemption, which 183-a1 measured to be
-// the whole of what shape A actually delivered - and that was not enough on the
-// real CLI. What lands now is positional-plus-VALUE, still inside THIS mark only:
-// the declared string is also attached to this mark's index
-// (taintmatch.go attachDeclaredPath, read by contains), so a candidate fragment
-// that spells part of the host-minted path is not evidence from this mark at ANY
-// position, not merely at the one position the span locator found. The reason
-// this is needed: the index hashes windows after sort+dedupe (positions gone)
-// and contains() re-verifies against the whole normalized body, so any single
-// repetition of one of the path's >=8-rune spellings elsewhere in the marked
-// body re-created the very windows the span was supposed to keep out, and the
-// model's reread of the host's own pointer hit R4 (artifact 20000 bytes, reread
-// 0 bytes). Three boundaries keep this from being a different contract: (1) it
-// is not per-token taint tracking - taintmatch.go's header still rules that out
-// and nothing here propagates taint along tokens, it only ignores windows whose
-// own spelling occurs inside one string this call declared; (2) it is not a
-// by-value pass on the parameter side (ticket 183 AC#5 (1)) - no roster, no
-// scope-level path list, no comparison of the parameter against a name table:
-// the exempt set is derived from the mark's own declaration and dies with the
-// mark; (3) every fragment that spells nothing of the declared path stays
-// indexed, and every other mark (including a foreign one carrying the same
-// path) is indexed exactly as before - those three faces are the permanent legs
-// of internal/risk/pointer_183_test.go (ruler: grep -n "^func Test"
-// internal/risk/pointer_183_test.go). Known cost, pinned by
-// TestPointer183WorstCaseOfTheLandedExemptionIsPinned: body text of THIS mark
-// that happens to spell >=8 consecutive runes of the declared path (its drive
-// or directory prefix is the realistic case) stops being evidence against a
-// reread - one fewer L2 card in that shape, never a wider index.
 func (p *Provenance) MarkWithHostPath(scopeID, tool, origin, content, hostPath string) bool {
 	norm := normalizeTaint(content)
 	if norm == "" {
@@ -556,14 +523,14 @@ func (p *Provenance) MarkWithHostPath(scopeID, tool, origin, content, hostPath s
 		logf("risk/C25: Mark tool %q is not a SPEC-06 §5 source; recorded fail-closed as sensitive anyway (origin=%q)", tool, origin)
 	}
 	var skip [][2]int
-	declaredNorm := "" // ticket 183: THIS mark's own value rule, empty = no declaration
+	var exempt map[string]bool // MUTATION 183-r1 F2: value-keyed, measurement only
 	if hp := normalizeTaint(hostPath); hp != "" {
 		nhp := []rune(hp)
 		// Ordering (i): locate the declared span AFTER normalization, over the
 		// same rune slice the index is about to be built from.
 		if lo := runeIndexOf(rp, nhp); lo >= 0 {
 			skip = [][2]int{{lo, lo + len(nhp)}}
-			declaredNorm = hp
+			exempt = windowSpellings(hp, p.minChars)
 			logf("risk/C25: 177 shape-A exemption excludes normalized span [%d,%d) of the host-minted path from mark %s origin=%q; every other window of this mark stays indexed", lo, lo+len(nhp), tool, origin)
 		} else {
 			// The declared path is not in this content: the exemption claims
@@ -573,21 +540,8 @@ func (p *Provenance) MarkWithHostPath(scopeID, tool, origin, content, hostPath s
 	}
 	m := &taintMark{
 		tool: tool, origin: origin,
-		idx: newFragmentIndex(string(rp), p.minChars, skip...),
+		idx: newFragmentIndexSkippingValues(string(rp), p.minChars, exempt, skip...),
 		at:  observe.NowWallUTC().Unix(),
-	}
-	if declaredNorm != "" {
-		// Ticket 183 (root cause 183-a1 judged as (d)): the span above excludes
-		// windows by POSITION while the index hashes and the verification corpus
-		// compare by STRING SET, so one repetition of the path's own 8-rune
-		// spelling anywhere else in this body re-indexed the exemption and the
-		// model's reread of the pointer the HOST wrote hit R4 (20000 bytes of
-		// artifact, 0 bytes read back). Attaching the declared string to this
-		// index makes its own windows non-evidence at every position, while
-		// every fragment that spells nothing of it stays indexed exactly as
-		// before - and the mark is still local here, so nothing observes a
-		// half-built index.
-		m.idx.attachDeclaredPath(declaredNorm)
 	}
 	p.mu.Lock()
 	reg := p.scopes[scopeID]
