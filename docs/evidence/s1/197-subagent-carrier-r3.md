@@ -196,6 +196,9 @@ tasks wire bytes: {"rows":[{"taskId":"4dc60786-...","label":"总结一下 rootpr
    `FAIL github.com/CarlosShao/wisp/cmd/wisp 104.387s` ＋ `--- FAIL: TestRunPacketCarriesTheSubagentItsRosterRowFed`，
    红句逐字见 §①。同目录 `cmd-wisp-carrier-run1.txt`（21:42）里同一枚用例是 `--- PASS (1.72s)`——**同一棵树、两枚相反读数**，
    差别只在整包 vs `-run` 单跑。前一腿把后者当成了终态。⇒ 这条不是"没来得及写判据"，是**判据本身写错**（§② 末）。
+   ⚠ 本条引的两枚文件（`.scratch/wisp/probes/197/r3/{final-v-four-pkgs,cmd-wisp-carrier-run1}.txt`）**在工作树上、还没入库**
+   （`git ls-files .scratch/wisp/probes/197` 只有本腿的 `r3b/**`；`r1b/`、`r1c/`、`r3/` 三批都还是未跟踪件）——
+   验收程要复算这条，得先从工作树读，或让编排者把前两批按 200-r2 那一次"代落"的规矩一起入库。**本腿没有替前几腿提交它们的读数。**
 3. **派单 §2(a) 只点了 `TestApprovalCardViewJSONKeysMatchFrontendTypes` 一枚，实际是两枚**：
    新增顶层键同样打红 `TestComposerContractTypesMatchFrontend`（两枚都从真 marshal 的字节里数键）。
    本腿终态逐字＝`approval_test.go:129: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare`。
