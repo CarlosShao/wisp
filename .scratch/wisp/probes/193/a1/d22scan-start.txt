@@ -1,0 +1,25 @@
+2026-09-28 15:xx +08 — 193-a1 起手读数影件（只读程；原件是本程 `sh scripts/d22scan.sh` 的 stdout）
+
+命令：sh scripts/d22scan.sh
+退码：0（clean）
+HEAD：72078779
+internal/ cmd/ go.mod 脏件起手现量： M internal/panel/git.go / M internal/panel/git_test.go（181-r1 在飞件，本程未碰）
+
+d22scan.sh: positive control - runtests.sh -C tools/d22scan ./...
+runtests.sh: OK - packages=[./...] top-level: PASS=34 FAIL=0 SKIP=0, === RUN=76, '[no tests to run]'=0
+d22scan.sh: scan of /d/work/workspace/projects plans/Wisp
+d22scan: skipped as git-ignored: 1 file(s) under 1 ignored director(ies) [frontend/dist/assets/], decided by frontend/.gitignore (2 path(s))
+d22scan: examined 232 production Go files under internal/ and cmd/ of D:/work/workspace/projects plans/Wisp
+d22scan: scope bans #1-5 internal/      examined 209 production Go files
+d22scan: scope bans #1-5 cmd/           examined  23 production Go files
+d22scan: scope ban #6 frontend/         examined  85 text files
+d22scan: scope ban #7 internal/tools/   examined  21 production Go files
+d22scan: scope ban #8 design/           examined  39 text files
+d22scan: scope ban #8 frontend/         examined  85 text files
+d22scan: scope ban #8 internal/         examined 436 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined  45 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=209, bans #1-5 cmd/=23, ban #6 frontend/=85, ban #7 internal/tools/=21, ban #8 design/=39, ban #8 frontend/=85, ban #8 internal/=436, ban #8 cmd/=45; ban #8 emoji coverage: design/ 39 text files; frontend/ 85 text files; internal/ 436 Go files, comments and _test.go included; cmd/ 45 Go files, comments and _test.go included
+
+旁证（现跑，用于判 436 是不是脏件抬的）：
+  git ls-files --others --exclude-standard -- internal/ cmd/  -> 0 行（无未跟踪 .go）
+  find internal cmd -name '*.go' | wc -l                      -> 481 (= 436 + 45)
