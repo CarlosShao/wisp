@@ -52,6 +52,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/CarlosShao/wisp/internal/projctx"
 	"github.com/CarlosShao/wisp/internal/risk"
 )
 
@@ -128,6 +129,18 @@ type PumpSources struct {
 	Model func() string
 	// Results reads the streamed assistant text so far.
 	Results func() []ResultChunk
+	// Instructions reads what this process's project-instruction loader actually
+	// did on its last turn (ticket 200 AC#7, wired by 200-r2). It is a reader of
+	// the loader's live bundle, not a value the caller shapes, so the packet
+	// cannot claim a state the loader never reached.
+	//
+	// A nil reader is the ONE case in which the wire carries no "instructions"
+	// key at all, and that is the shape pump_test's byte nails pin. A reader that
+	// exists always sends the key - including when there is nothing to show,
+	// because the section then names which of the five states it is. The old
+	// r1 behaviour (empty list, omitempty, no key) made "you turned it off" and
+	// "this project has no AGENTS.md" indistinguishable on the wire.
+	Instructions func() *projctx.Bundle
 	// AttachmentMax is the composer's per-attachment ceiling. Zero means
 	// MaxAttachmentBytes, the constant the broker itself defaults to
 	// (attachments.go:186), so the packet never advertises a ceiling that the
@@ -219,7 +232,14 @@ func (p *SnapshotPump) Snapshot() Snapshot {
 	if p.src.Now != nil {
 		now = p.src.Now
 	}
-	return NewSnapshot(cards, results, composer, now())
+	snap := NewSnapshot(cards, results, composer, now())
+	if p.src.Instructions != nil {
+		// The reader exists, so the section always goes on the wire - with a
+		// status even when the file list is empty. Whatever the loader last did
+		// is what this says, including "nothing yet".
+		snap.Instructions = InstructionsSectionFromBundle(p.src.Instructions())
+	}
+	return snap
 }
 
 // Marshal is the exit function: the bytes the panel would be rendered from.

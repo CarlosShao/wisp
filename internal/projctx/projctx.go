@@ -102,6 +102,16 @@ type LoadedFile struct {
 	DuplicateOf string `json:"duplicate_of,omitempty"`
 }
 
+// SkipReason vocabulary (ticket 200-r2). Skipped is a sentence for a human to
+// read; SkipReason is the same fact for a consumer to branch on, and it exists
+// because the panel must be able to tell "you turned this off" from "the host
+// refused to read that tree" from "we looked and found none" without parsing
+// Chinese prose. A Bundle that read something carries no SkipReason.
+const (
+	SkipConfigOff      = "config_off"
+	SkipRewriteRefused = "rewrite_refused"
+)
+
 // Bundle is one turn's load result. Block is the only thing that may reach a
 // prompt; Files is the honest manifest for the log and the panel carrier.
 type Bundle struct {
@@ -110,6 +120,9 @@ type Bundle struct {
 	BudgetTokens int
 	UsedTokens   int
 	Skipped      string
+	// SkipReason names the skip from the vocabulary above ("" = nothing was
+	// skipped). See the constant block for why the prose is not enough.
+	SkipReason string
 }
 
 // Manifest renders the "what did I actually load" lines (AC#3/#7/#8). An empty
@@ -161,6 +174,12 @@ type Options struct {
 	// Prov + ScopeID are the C25 stamping target. nil is reported loudly.
 	Prov    *risk.Provenance
 	ScopeID string
+	// Refused, when non-empty, is the host refusing to hand this loader ANY
+	// directory to read (ticket 200-r2, ticket 102's rule): the sentence is what
+	// gets printed instead of a load, and both directories are ignored. It
+	// outranks Enabled on purpose - a host refusal is not the user turning the
+	// feature off, and the two states must not print the same sentence.
+	Refused string
 	// Log receives every manifest line, once per turn.
 	Log func(string)
 }
@@ -226,8 +245,15 @@ func (l *Loader) Turn() *Bundle {
 }
 
 func (l *Loader) load() *Bundle {
+	if l.o.Refused != "" {
+		// The host refused: no directory is walked, no file is opened, and the
+		// reason is printed instead of a silence. This outranks the config
+		// switch on purpose - a refusal is not the user turning the feature off,
+		// and the two must not read the same.
+		return &Bundle{Skipped: l.o.Refused, SkipReason: SkipRewriteRefused}
+	}
 	if !l.o.Enabled {
-		return &Bundle{Skipped: "已按你的配置跳过：agent.project_instructions_enabled=false，" +
+		return &Bundle{SkipReason: SkipConfigOff, Skipped: "已按你的配置跳过：agent.project_instructions_enabled=false，" +
 			"本轮一份项目说明都没有读（不是没找到，是被配置关掉的）。"}
 	}
 	dedup := &identity{paths: map[string]string{}, hashes: map[string]string{}}

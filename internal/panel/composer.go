@@ -59,13 +59,19 @@ type Snapshot struct {
 	Results     []ResultChunk      `json:"results"`
 	Composer    ComposerState      `json:"composer"`
 	GeneratedAt string             `json:"generatedAt"`
-	// Instructions is ticket 200's loaded-project-instruction manifest: which
-	// files this run followed, how many bytes each, and whether any was
-	// truncated or dropped. omitempty is deliberate - an unloaded turn adds no
-	// fifth wire key, so pump_test's byte nails keep their current reading.
-	// Populating it in production is the pump's job at the composition root;
-	// see docs/evidence/s1/200-project-instructions-r1.md.
-	Instructions []ProjectInstructionFile `json:"instructions,omitempty"`
+	// Instructions is ticket 200's carrier: which project instruction files this
+	// run followed, and - when it followed none - which of the five states that
+	// is (off / none_found / refused / not_run / loaded). 200-r2 replaced the
+	// bare list with this section precisely because a list plus omitempty made
+	// four different truths marshal as one missing key.
+	//
+	// A pointer with omitempty is not a shortcut around pump_test's byte nails:
+	// it is the one honest encoding of "this host has no instructions reader".
+	// A pump that HAS one always sends the key, and a pump that does not sends
+	// four keys, exactly the shape pump_test.go:123 and :291 pin. Filling the
+	// key from a live reader is pump.go's job and run.go's assembly; a key whose
+	// value can never arrive is the shape ledger A408 names as 文案在、控件不在.
+	Instructions *InstructionsSection `json:"instructions,omitempty"`
 }
 
 // ResultChunk is one streamed assistant chunk.

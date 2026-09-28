@@ -35,6 +35,7 @@ import (
 	"strings"
 
 	"github.com/CarlosShao/wisp/internal/panel"
+	"github.com/CarlosShao/wisp/internal/projctx"
 	"github.com/CarlosShao/wisp/internal/tools"
 )
 
@@ -84,6 +85,36 @@ func (rt *agentRuntime) workspaceView() panel.WorkspaceView {
 		return panel.UnsetWorkspaceView()
 	}
 	return panel.WorkspaceViewFromRoot(rt.paths.WorkspaceRoot())
+}
+
+// setInstructionLoader books the loader this run attached, so the pump's
+// instructions reader has something live to read. Called once per run from
+// execute(), after the loop exists and before its first turn.
+func (rt *agentRuntime) setInstructionLoader(l *projctx.Loader) {
+	rt.instrMu.Lock()
+	defer rt.instrMu.Unlock()
+	rt.instrLoader = l
+}
+
+// instructionBundle is the pump's reader for ticket 200 AC#7's carrier, and it
+// is the hop 200-r1 left unconnected: the carrier field existed, no production
+// reader did, so the wire key could never arrive - the shape ledger A408 names
+// for widgets and this file's own header names for view models.
+//
+// It reads the loader's LAST bundle and shapes nothing: nil before a run has
+// attached one (the pump then reports not_run, with a reason, rather than
+// dropping the key), and after that whatever the loader actually did - loaded,
+// none found, config off, or refused by the rewrite account.
+func (rt *agentRuntime) instructionBundle() *projctx.Bundle {
+	if rt == nil {
+		return nil
+	}
+	rt.instrMu.Lock()
+	defer rt.instrMu.Unlock()
+	if rt.instrLoader == nil {
+		return nil
+	}
+	return rt.instrLoader.Last()
 }
 
 // gitView reports the read-only git dimension (ticket 181) for the tree this run

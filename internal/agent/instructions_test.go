@@ -262,7 +262,6 @@ func TestHostileInstructionFileMovesNoAuthorityKnob(t *testing.T) {
 	if bytes.Contains(bytes.Join(plain.requestBodies(), []byte(" ")), []byte("WISP200HOSTILEBLOCK")) {
 		t.Fatal("the un-attached harness carried the hostile text")
 	}
-
 }
 
 // The seven D39 sections stay exactly as they were: this ticket adds no

@@ -254,6 +254,12 @@ type agentRuntime struct {
 	// stream is the results section's producer: the deltas this run streams,
 	// accumulated so a snapshot can carry them.
 	stream *panel.StreamLog
+	// instrLoader is ticket 200's project-instruction loader for the CURRENT run,
+	// kept so the panel pump has a live reader for the instructions carrier
+	// (200-r2, AC#7's second hop). instrMu guards it because execute() writes it
+	// while publishes read it from the approval UI's and the sink's goroutines.
+	instrMu     sync.Mutex
+	instrLoader *projctx.Loader
 	// lastSnap / lastSnapBytes are the most recent packet this run built, kept
 	// for the same reason consoleApprovalUI.cards is kept: the production path
 	// records what it did, and a reader asks afterwards. The ledger cannot hold
@@ -460,7 +466,14 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		Git:       rt.gitView,
 		Model:     rt.currentModel,
 		Results:   rt.stream.Chunks,
-		Out:       rt.bookPanelSnapshot,
+		// ticket 200 AC#7's second hop, closed by 200-r2: the carrier existed at
+		// r1 and NOTHING read it, which is the same shape as ledger A408's
+		// "文案在、控件不在" moved from the widget side to the wire side. This
+		// reader hands the pump the loader's own last bundle, so the packet
+		// reports what was loaded (or which of the five states stopped it)
+		// instead of a key that can never carry a value.
+		Instructions: rt.instructionBundle,
+		Out:          rt.bookPanelSnapshot,
 	})
 	rt.ui.publish = rt.publishPanelSnapshot
 
@@ -674,26 +687,36 @@ func (rt *agentRuntime) execute(task string) int {
 	// siblings) and attach them to the loop assembled just above, so what the
 	// repository says about itself reaches the request instead of living in a
 	// struct nobody fills. Every input comes from an owner that already exists:
-	// the workspace from the view the path resolver feeds, the global tier's
-	// directory from the layout decider (the same dir config.toml lives in), the
-	// budget from this loop's own scaled D39 prompt total, the token estimator
-	// from the loop's package, and the C25 engine from the one this process has.
+	// the workspace from the view the path resolver feeds (through the account
+	// below, not past it), the global tier's directory from the layout decider
+	// (the same dir config.toml lives in), the budget from this loop's own scaled
+	// D39 prompt total, the token estimator from the loop's package, and the C25
+	// engine from the one this process has.
 	// The switch is agent.project_instructions_enabled, default on; off means the
 	// loader reads nothing and prints why instead of going silent.
-	ws := rt.workspaceView()
-	instrWorkspace := ""
-	if ws.Set {
-		instrWorkspace = ws.Canonical
+	//
+	// 200-r2's two changes, both load-bearing:
+	//   - the ticket 102 rewrite account is consumed BEFORE a tree is named. This
+	//     file hands the whole WorkspaceView to panel and never reaches past the
+	//     account for its path, so a %VAR% or ~ rewrite cannot decide which
+	//     repository writes the model's system prompt;
+	//   - the loader is kept on the runtime so the panel pump has a READER for
+	//     the carrier ticket 200 AC#7 asked for. At r1 the carrier existed and
+	//     nothing filled it - the wire's version of 文案在、控件不在 (ledger A408).
+	instrReq := panel.ProjectInstructionLoadRequestFor(rt.workspaceView(), rt.spec.dataDir)
+	if instrReq.Refused != "" {
+		rt.auditf("wisp run: %s", instrReq.Refused)
 	}
 	instrScope := rt.c25.OpenScope("run:project-instructions")
 	defer instrScope.Close()
 	rt.auditf("wisp run: 项目说明加载器 workspace=%q globalDir=%q enabled=%v budget=%d",
-		instrWorkspace, rt.spec.dataDir, cfg.Agent.ProjectInstructionsEnabled,
+		instrReq.WorkspaceDir, instrReq.GlobalDir, cfg.Agent.ProjectInstructionsEnabled,
 		loop.Budgets().PromptTotal)
-	loop.AttachProjectInstructions(projctx.New(projctx.Options{
-		WorkspaceDir: instrWorkspace,
-		GlobalDir:    rt.spec.dataDir,
+	instrLoader := projctx.New(projctx.Options{
+		WorkspaceDir: instrReq.WorkspaceDir,
+		GlobalDir:    instrReq.GlobalDir,
 		Enabled:      cfg.Agent.ProjectInstructionsEnabled,
+		Refused:      instrReq.Refused,
 		BudgetTokens: loop.Budgets().PromptTotal,
 		Tokenize:     agent.ApproxTokens,
 		Prov:         rt.c25,
@@ -701,7 +724,9 @@ func (rt *agentRuntime) execute(task string) int {
 		// A format verb, never the line itself: auditf takes a format, and a
 		// file path is data, not a directive.
 		Log: func(s string) { rt.auditf("projctx: %s", s) },
-	}))
+	})
+	rt.setInstructionLoader(instrLoader)
+	loop.AttachProjectInstructions(instrLoader)
 
 	ctx, cancel := context.WithTimeout(context.Background(),
 		time.Duration(cfg.LLM.TimeoutMS)*time.Millisecond)
