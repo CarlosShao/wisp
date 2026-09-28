@@ -133,7 +133,8 @@
 - 跑过的删除命令：**无**。本程命令全集：`date`／`git log|status|add|commit|show|diff`／`ls`／`mkdir -p`／`grep`／`go test`／`sh scripts/d22scan.sh`／`bash gate-clauses.sh`／`tail`。`rm`／`del`／`Remove-Item`／`clean`／`restore`／`stash`／`--amend`／`rebase`／`worktree`／`switch` **零枚**；`probes/161/r6/flip-declaration.sh` **未跑**（派单禁）。
 - 重跑既有台件前的 sink 检查（派单 ⚠ 条）：`grep -n "WriteFile\|OpenFile" .scratch/wisp/probes/154/gate-clauses.sh` → **0 命中**；对 `probes/174/r1`／`probes/174/v1` 的 `.sh`／`.ps1` 同样 **0 命中**（那两家的读数不是我造的）。⇒ 本程所有新读数只落进 `probes/174/c2/logs/`（`probe.txt`／`gate-d22scan.txt`／`gate-clauses.txt`／`gate-gotest.txt`／`readings.txt`），**没有就地覆盖型 sink**，别家票逐行引用的读数未被洗掉（`A367` 那一族）。
 - ⚠ 一处如实：本程**复跑**了 `scripts/d22scan.sh` 与 `gate-clauses.sh` 两把既有尺（它们只读、不写跟踪件，上面有 sink 证明），落点全在我的 `logs/`。
-- 工具调用终值：**35 枚／硬顶 35**；第 25 枚后**未开新探索**，只在做落盘·台件·门禁·提交。骨架第一枚 commit 落在第 **6** 枚调用（比派单的"≤5"晚一枚：我在写之前先花一枚现量"这枚新文件是否已存在"，以免覆盖跟踪件——`ls docs/evidence/s1 | grep 174` 现量只有 `c1`／`r1`／`v1` 三枚）。
+- 工具调用终值：**33 枚／硬顶 35**（本件最后这枚更正在第 32-33 枚，只动本文字）；**新探索在第 23 枚之后停止**，其后全在落盘·造台件·跑门禁·提交。骨架第一枚 commit 落在第 **6** 枚调用（比派单的"≤5"晚一枚：我在写之前先花一枚现量"这枚新文件是否已存在"，以免覆盖跟踪件——`ls docs/evidence/s1 | grep 174` 现量只有 `c1`／`r1`／`v1` 三枚）。
+- ⚠ 一处逐字自证：本程 commit 的 `git show --numstat` 里**唯一非零的删除列＝`111 16 docs/evidence/s1/174-wiring-cost-census-c2.md`**，那 16 行是本程自己在第 5 枚调用新建的**骨架占位行**（每节的"（待填…）"），删除列对**任何一枚起手即存在的跟踪件＝逐枚 0**（票 174 面 `2 0`＝纯追加，其余全是新建件）。
 
 ## 10. next：落地腿派之前还缺什么（含要不要人先批准哪一格）
 
