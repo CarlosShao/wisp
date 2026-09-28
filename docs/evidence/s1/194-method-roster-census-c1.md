@@ -168,14 +168,42 @@ C 堆（撞禁区／要先有批准）**3 枚**（`approval.decide`①、`config
 4. **没跑**：`go test ./internal/config/ ./internal/risk/ ./internal/tools/`（票 194 AC#7 要求逐包四连；本程是只读普查、派单 §3 只点名 `./internal/panel/`）⇒ 另三包的今天红态**本程不背书**。全仓面我只经由 `scripts/d22scan.sh` 自带的 `runtests.sh` 见到一行 `packages=[./...] top-level: PASS=34 FAIL=0 SKIP=0`，⚠ **它与本程随后现量的 3 枚 panel 红互相矛盾**（同树在飞件所致，本程不裁谁对、不改尺）。
 5. **尺的边界**：§3 的"有货"判定靠**能力近邻**而非同名，属我的解读；若编排者要求"只认同名实现"，则 23 枚里 19 枚应直接归"没货"。两种口径的差我已逐枚写出（PROD 命中列＋地基列分两栏）。
 
-## §8 门禁终态（只读程取数，`A363`：不充当结案凭据）
+## §8 门禁终态（只读程取数；⚠ 按 `A363` **不充当结案凭据**）
 
-（待填）
+读数时刻：`2026-09-28 16:22 +0800`（本机 `date` 现读），取在本程第二枚 commit（`72199c38`）**之后**。
+原始输出存 `.scratch/wisp/probes/194/c1/logs/{d22scan,gate-clauses}-terminal.txt`。
+
+| 门禁 | 尺 | 终态读数 | 与基线 |
+|---|---|---|---|
+| ① `sh scripts/d22scan.sh`（ban #8 `internal/`） | 派单 §3 点名 | **438** 枚 Go 文件（`clean - no D22 ban violations`，rc＝0） | **与基线 438 同值＝零漂移**；⚠ 未出现派单警告的"更高"情形，故 `181-r2`／`185-r1` 在飞新增件今天没进这一面 |
+| ② 同尺的 `cmd/` 那一栏 | 顺带现量 | **45** 枚，`ban #1-5 cmd/`=23，`ban #7 internal/tools/`=21，`ban #6 frontend/`=85，`ban #8 design/`=39 | 本程不判这些面的历史基线（未在册），只报现量 |
+| ③ `bash .scratch/wisp/probes/154/gate-clauses.sh`（**比红腿名册，不比退码**） | 派单 §3 点名 | 红腿名册＝**只 `G6neg` 一枚**（`声明=ring 基线=1枚 实测=3枚 因=新增未成对`）；`腿数＝14 声明与实测不符＝1`；`基线过期枚数＝0`；退码＝1 | **名册与在册一致（只 G6neg）**；⚠ 但枚数从登记的 1 涨到 3 ⇒ 本程**不动尺、不修腿、不跑 `flip-declaration.sh`**（禁止项）。该增长与本程无关：本程两枚 commit 只加 `.md`＋`.txt` |
+| ④ `go test -count=1 ./internal/panel/` | 派单 §3 点名 | **3 枚红，逐名照实记**：`TestComposerContractTypesMatchFrontend`／`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`／`TestC21DesignTokensFourWayAgree` ⇒ `FAIL github.com/CarlosShao/wisp/internal/panel 1.153s` | **与派单点名的三枚一字不差**；本程**未当绿、未修、未动那两把尺**。⚠ 红因指向同树在建件（`design/assets/tokens.css` 磁盘上不存在、前端样式面新增件），具体面不引不转述（禁读面） |
+
+⚠ **一枚矛盾登记（不当结论）**：`scripts/d22scan.sh` 自带的 `runtests.sh` 在同一时刻报 `packages=[./...] top-level: PASS=34 FAIL=0 SKIP=0`，与本程随后现量的 3 枚 panel 红**互相矛盾**。本程**不裁谁对**（两把尺都属"不许改"的对象），只把两形都贴出来——正是票 194 AC#7「两形都贴」的意思。
 
 ## §9 被拒调用＋零删除自证＋工具调用终值
 
-（待填）
+- **被系统拒绝的调用**：**零枚**。
+- **自误一枚（如实报）**：第 9 枚调用我写了 `git status --porcelain --cached`——`--cached` 不是 `git status` 的合法选项，rc＝**129**，命令在 `git add` 之后、`git commit` 之前中止 ⇒ **那一发没有产生任何 commit**（下一发用 `git diff --cached --name-status` 重跑并核暂存清单，得到 `A docs/evidence/s1/194-method-roster-census-c1.md` 恰好一枚才提交）。
+- **零删除自证**：本程**未执行任何**删除／还原／清理类命令（无 `rm`／`del`／`git clean`／`git restore`／`git checkout .`／`stash`／`reset`／`rebase`／`--amend`／`worktree`／无 `add -A`／`add .`）；三次写面动作全部是 `新建文件（Write）`、`追加段落（Edit）`、`git add -- <显式 pathspec> ＋ git commit`。⚠ 磁盘上 `design/**` 有大量 ` D`（删除）状态条目——**不是本程所为、本程未读未引其内容**（`design/**` 属禁读面），起手那次 `git status` 就照见它们已在树里。
+- **不push**：本程只 commit 两枚（`a90908b2`、`72199c38`）＋最后一枚文档 commit；`git push` 未执行、不该由本程执行（`AGENTS §1.4`）。
+- **工具调用终值**：**27 枚**（硬顶 35）。⚠ **自报过错一处**：本程中途在若干条回复里把累计数报成了 10／12／13／18／20／22／24／25／27／28／30／32／33——**那是错的**，逐条数回来实际是 23 枚即到 §9 之前。**实际计数＝27**（本枚终枚在内），未触硬顶；⚠ **误报本身记在这里，不留成"读者以为快撞顶了"的形状**。
+- **探索停止线合规**：真正的第 25 枚之后只做了终枚 commit 与核账，未开任何新探索。
+- **写面闸门核账（派单 §1 新规矩 `A374`）**：起手名册＝**空集**；终态 `git status --porcelain -- internal/ cmd/`＝**空集**；`git status --porcelain | grep -cE " internal/| cmd/"`＝**0** ⇒ **逐枚具名差集为空，闸门通过**。⚠ 同树其它位置（`.gitignore`、`design/**`、`.scratch/wisp/probes/**`、`docs/evidence/s1/152-*.md`、多枚 `part*-*.txt` 等）脏着，**全是别家写腿的活，本程一律不动、不提交、不评论**。
+- 本程写面实际只碰三处（合规）：`docs/evidence/s1/194-method-roster-census-c1.md`（新建）·`.scratch/wisp/probes/194/c1/logs/*.txt`（新建，读数只往这里写）·票 194 Progress log **追加一段**（不改原句、**未勾任何 AC 框**）。
 
 ## §10 next＝派写腿之前还缺哪几枚批准
 
-（待填）
+**先给一句结论：本表不支持"18 枚一次补完"这个形状**——18 枚里 **11 枚需要新的后端能力或新门控**（B 堆 4 ＋ A/B 之间 4 ＋ C 堆 3），**只有 7 枚是"有货只差名字"**。
+
+1. **AC#3 的逐枚 `A##` 批准**（堆 1 那 7–8 枚要不要一次批齐）：批"名册"≠批"每一枚"，票面明令不许拿"owner 批了名册"当全域通行证。
+2. **`grants.revoke` 算不算撞禁区②**——本程现量到**反方逐字证据**（`internal/agent/approval/queue.go:378-380`：「refusing is the fail-closed direction, which is why the panel may do it (SPEC-06 §9）」）⇒ 撤销是收紧一侧；但字面上它仍是"面板直接改权限状态"。**这条只能人裁，本程不裁。**
+3. **`config.set` 能不能只开非安全节那一半**：今天**没有分节写地基**（`internal/config/` 现量唯一写手是 `Manager.SetPermissionMode` `permmode.go:64`，而那枚正好是禁区②的形状）⇒ 要么先建"分节＋安全节判定＋L2 重确认"的地腿（另立票），要么这一枚不派。**不许用 `SetPermissionMode` 当捷径。**
+4. **`approval.decide` 的口径确认**：只补 `reject` 一支（`Queue.reject` `queue.go:393` 已在）、`allow` 一支不接（`queue.go:343` 需原生单用 nonce，`grantNonce:326`／`grants.spend:354` 已是结构性闸门）＋ AC#4② 那枚"面板来源的批准不许变成放行"的常驻判据怎么落。
+5. **这张表本身还是 S5 待批提案**（`SPEC-08:156` 标题逐字「【SPEC 提案，S5 定稿走契约批准】」）⇒ "向一枚未定稿的提案对齐"要不要先走 S5 切片卡批准，还是"按提案文字先补、定稿时再对一次"。**这一条是最容易被跳过的一枚。**
+6. **票面两处行号引用错位**（allow 侧禁令实为 `SPEC-08:167`、`config.set` 为 `:168`）：要不要落一条更正入账（本程不改票面原句、不改 `docs/specs/**` 一字）。
+7. **堆 2 那 4 枚是真功能票不是改名票**：`models.list`／`models.delete`／`transcript.get`／`panel.resync` 各需"做不做＋落哪个切片"的批准，否则就是第二枚"有名无实现"（`panel.resync` 已是前例）。
+8. **出向 5 枚要不要进同一张名册**（本程建议**分表**：方向不同，混进 `bridge.go` 的入向常量会让入向白名单与出向事件名合成一枚名册——那正是票 194 要治的病的镜像）⇒ 待裁。
+9. **生产听众那一环**：`ComposerDispatch.Handle` `composer_dispatch.go:120` 现量零枚生产调用者 ⇒ **票 33 的 H2/H3 不建，补完名册仍是一枚都点不动**。要不要先派 H2/H3，再派名册补齐（顺序若相反，交付面上会出现"18 枚新门 + 零听众"的形状）。
+10. **口径待裁**：票 145 那张"十六字段表"与本程现量的 Go 侧 `Snapshot` **顶层 4 字段**（`composer.go:57-62`）是不是同一件事的两级视图——本程不读前端、不复量。

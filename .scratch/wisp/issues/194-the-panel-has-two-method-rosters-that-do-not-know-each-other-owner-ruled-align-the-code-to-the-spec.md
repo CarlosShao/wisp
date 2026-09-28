@@ -33,3 +33,11 @@
 ## Progress log
 
 - 09-28 16:5x 编排者立票：来路＝`33-a1` 现量＋`Q-67` 由 owner 当场裁「按当前规格补，别搞债务了」（逐字 `A381`）。⚠ 我把他的裁定读成**以 `SPEC-08` 那张表为准、把代码侧补齐**（不是反过来改规格迁就代码），并把它拆成"先交逐枚代价表、再分批落地"两层——因为那 18 枚里有几枚今天连后端能力都没有，一次做完会把 AC#2 那三条禁区卷进来。未派。
+- 09-28 16:2x 只读普查程 `194-c1` 交代价表（**AC 框一枚未勾，产码／`go.mod`／`docs/PLAN.md`／`docs/specs/**` 零字节不动**）：表＝`docs/evidence/s1/194-method-roster-census-c1.md`，读数＝`.scratch/wisp/probes/194/c1/logs/`。锚 `8ca2291f`（未漂）；两枚 commit `a90908b2`／`72199c38`＋文档终枚，只 commit 未 push。
+  - **枚数**：票面「18 枚」**对**（现数 `SPEC-08:163-173` 展开＝18 具名），加 `:174` 事件推送那一行 5 枚＝**23 具名**；代码那份现量 **4 枚**（`bridge.go:42-45`），交集**零枚**，⚠ 反向也零枚（那 4 枚规格未列 ⇒ 名册是并集问题不是替换问题）。
+  - **三堆**：A 有货只差名字 **7**｜A/B 有数据面缺读取面 **4**｜B 后端真没货 **4**（`panel.resync`／`transcript.get`／`models.list`／`models.delete`）｜C 撞禁区要先裁 **3**。23 枚里产码同名命中只 3 枚，其中 2 枚是噪声 ⇒ **"有货"全靠按能力找同物异名**。
+  - **撞禁区逐名（本程只标不裁）**：`approval.decide` 撞①（`SPEC-08:167` 逐字，allow 侧有结构性 nonce 闸 `queue.go:326/343/354`，reject 侧现成 `:393`）；`config.set` 撞③（`:168`）**且其唯一现成写手 `Manager.SetPermissionMode` `permmode.go:64` 天生撞②**；`grants.revoke` 待裁②（反方逐字证据 `queue.go:378-380`「fail-closed … which is why the panel may do it」）。⇒ 派单里那句"停手上报"在这一枚枚上成立：**没有任何一支能靠"按规格补"顺手动到这三条。**
+  - **具名更正两处**：① 票 AC#2／派单 §2 的行号错位（allow 侧＝`167` 非 `169`；`config.set`＝`168` 非 `170`，各偏 2 行；引文本身逐字对得上）；② 票面称 `privacy.purge`「今天连后端能力都还没有」——**存储层已实现**（`PurgePrivacy` `privacy.go:170` 等 7 枚），缺的是面板路由与确认门。
+  - **事件推送五枚**：`task.delta`／`approval.request`＝**有内容没这个名字**（整份 `Snapshot` 的两段 `composer.go:57-62`）；`ball.state`＝内容在**另一条原生管**（`Ball.SetState` `ball_windows.go:306`）；`tool.chip`／`cost.tick`＝**真没内容**（数据面在 `dao_misc.go:169`，从未进快照）。管子真在跑（`cmd/wisp/panel_pump.go:264`）。
+  - ⚠ **别拿名册补齐冒充按钮能点**：`ComposerDispatch.Handle`（`composer_dispatch.go:120`）生产调用者**现量仍零枚** ⇒ 18 枚**无一例外**要等票 33 的 H2/H3。另有未定稿前提：这张表自己的标题写着「【SPEC 提案，**S5 定稿走契约批准**】」（`SPEC-08:156`）。
+  - **门禁四数（`A363`：不充当结案凭据）**：`ban #8 internal/`＝**438**（与基线同值＝零漂移，`cmd/`＝45）；`gate-clauses.sh` 红腿名册＝**只 `G6neg`**（与在册一致，但枚数 1→3，本程不动尺不修腿）；`./internal/panel/`＝**3 枚红逐名照实记**（未当绿未修）；写面闸门＝**终态空集＝起手空集，差集为零**。工具调用终值 **27／硬顶 35**（本程中途把自报累计数报高过，已具名更正）；零删除自证通过（树里 `design/**` 的 ` D` 条目非本程所为、未读未引）。
