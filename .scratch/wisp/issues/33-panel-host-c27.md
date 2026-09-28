@@ -66,3 +66,32 @@ declaration consumed by 37's native card.
   这两格买的是"接上那天要顺手量"，不是把 35 的活搬过来。
   出处逐字在 `docs/evidence/s1/35-panel-snapshot-pump-r1-accept-r1.md`（F-PUMP-4／§7 第 3 条／F-PUMP-6）。
   **撤销口令：「撤 33 AC#7 AC#8」**（撤＝只删这两格＋在本节留一行撤销记录，不改写上面任何一行）。
+- 2026-09-28 15:1x（只读设计核 `33-a1`，**零产码、AC 框一格未勾**）：交件全文
+  `docs/evidence/s1/33-inbound-hop-design-a1.md`。本节只记四句结论，**不改写上面任何一行**：
+  ① **"网页点一下 → Go 收到"这一跳被拆成 10 环（H1–H10），其中 H4–H9 六环一环都不引用 WebView2 符号**
+  （现量：`grep -c webview go.mod` = 0；`ParseComposerRequest` 的签名就是 `raw string`，`bridge.go:84`）。
+  ⇒ **票 186／187 不是"整体等地基"，是能先动 Go 侧那一半**（最小入向那片 = 1 枚新产码文件 + 1 枚同包测试 +
+  零依赖 + 有 ubuntu CI 分母 + 零批准）。真宿主那片（H2/H3/H10 的手段）今天**在 windows scope 零用例分母**，
+  要它就得先拍"改门禁形状"或"接受该腿分母＝本机人工"。
+  ② **一枚规格级缺口，只报不填**：SPEC-08 §5.1 那五条宿主责任（`:143-154`）点名了生命周期／资源服务
+  （`AddWebResourceRequestedFilter`，是**出向**）／无状态／Runtime 缺失／correlationId 分区，
+  **没有一条写"消息接收"**；本票票面 `grep -nE "WebMessage|postMessage|inbound|receive"` = **0 命中**，
+  而票 35 把 `bridge transport + dispatch`（`:7` slot A）划给自己、可 transport 要的那只手长在本票的窗口上，
+  本票 `:33` Out of scope 又明写 bridge protocol 归 35。⇒ **入向接收器今天介于两票之间、两票都没逐字认领**；
+  责任矩阵少一行是本跳断口的规格根因（补哪一行由编排者定，本程不动票面）。
+  ③ **C17 白名单"定到哪一步"的现量比"待定稿"更难看**：规格侧 SPEC-08 `:163-174` 那 12 枚 invoke 方法名
+  在**非测试 Go 代码里 0 命中**，代码侧 `bridge.go:42-45` 那 4 枚（`panel.mode.request` /
+  `panel.workspace.request` / `panel.attachment.add` / `panel.message.send`）在 **`docs/specs/**` 里 0 命中**
+  ⇒ **两条平行线，交集为 0**；节标题自带 `【SPEC 提案，S5 定稿走契约批准】`（`:156`）。`C24 GojaHostAPI`
+  初始集一个名字都还没定（产码命中只有 `internal/config/manager.go`、`schema.go` 的配置字段）。
+  ④ **P11（冷拉起 >2s 那条待定项）的现量其实已经在仓里**：`docs/evidence/s0/02-spike-report.md` §3.4
+  两 run 的 cold P95 = 1041.6 / 1256.4 ms（**均未越过 2s，也均在 D32 冷 ≤1500ms 内**），唯一越过 1500ms 的是
+  "进程内首次 create（竞争态）"那枚 1808.9 ms；而入向这一跳自己的传输成本有一枚可算的代理指标：
+  **hot 浏览器往返 p50 = 3.5 ms**（量的就是 `w.Bind` JS→Go 那一趟，`scripts/spike/webview2-latency/main.go:118-134`）。
+  ⚠ 两 run 同机、2026-09-19 未复跑，`grep -n "P11" docs/reports/pending-and-issues.md` = **0 命中**
+  ⇒ 这条待定项在真相源台账里**没有对应 `A##`**，自偿要编排者先入册。
+  ⚠ 本程另发现**一枚对本票不利的依赖现量**（利好写腿）：go-webview2 已被仓内那枚独立模块
+  `scripts/spike/go.mod:9` 钉过（`v0.0.0-20260205173254-56598839c808`，含 indirect `go-winloader`）且
+  `scripts/spike/bin/webview2-latency.exe` 真编译过 ⇒ "这枚依赖在本机能不能解析链接"**S0 已答**，
+  本票落地时只剩"并进根 `go.mod` + `go.sum` + `deps.toml` 许可登记"三处动作（今天三处都 0 命中）。
+  **撤销口令：「撤 33 progress 33-a1」**（撤＝只删本段＋在本节留一行撤销记录）。
