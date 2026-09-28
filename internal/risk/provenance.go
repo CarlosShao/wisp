@@ -89,6 +89,9 @@ const (
 	SrcDocRead       = "doc.read"
 	SrcScreenCapture = "screen.capture"
 	SrcTranscript    = "asr.transcript"
+	// SrcTaskOutput is what a background task printed: outside content by
+	// origin, however domestic the door that reads it back is (ticket 175).
+	SrcTaskOutput = "task.output"
 )
 
 // sensitiveSourceTools is the SPEC-06 §5 set (marker-side only; a Mark() for
@@ -96,6 +99,7 @@ const (
 var sensitiveSourceTools = []string{
 	SrcFSRead, SrcSearchContent, SrcClipboardRead, SrcSystemGet,
 	SrcWebFetch, SrcDocRead, SrcScreenCapture, SrcTranscript,
+	SrcTaskOutput,
 }
 
 // IsSensitiveSource reports whether a tool is in the contract marking set.

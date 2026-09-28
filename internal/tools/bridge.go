@@ -555,10 +555,12 @@ func (b *Bridge) timeoutFor(entry Entry) time.Duration {
 // mark records C25 provenance for one result. hostPath is this call's shape-A
 // declaration from the box below ("" when the tool wrote no host-minted path):
 // risk only ever excludes that exact span inside THIS mark, and the marking
-// gate itself (IsSensitiveSource) is unchanged. task.output is not in the
-// SPEC-06 §5 roster yet (ticket 175's leg), so no production mark carries a
-// non-empty hostPath today; the carrier lands now so that leg lands next to
-// it, and the bridge-level reverse criterion ships with that batch.
+// gate itself (IsSensitiveSource) is unchanged. task.output joined that roster
+// with ticket 175-r2, which is the first day a non-empty hostPath is reachable
+// here at all: 177 shipped the carrier, nothing shipped the name. The
+// bridge-level pair that keeps both halves honest - a foreign text naming the
+// same artifact still hits R4, the host's own pointer stays re-readable - lives
+// in internal/tools/ticket175r2_stamp_live_test.go.
 func (b *Bridge) mark(dec Decision, res Result, hostPath string) {
 	if b.prov == nil || dec.TaskID == "" || !risk.IsSensitiveSource(dec.Tool) {
 		return
