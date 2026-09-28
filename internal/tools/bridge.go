@@ -210,7 +210,9 @@ func (b *Bridge) Paths() *PathCanonicalizer { return b.paths }
 // RiskLevel carries the DECLARED level, which is only the R1 lower bound; the
 // verdict is computed per call in Execute. A host that gates on this field
 // before calling Execute is gating on a lower bound - which is exactly the
-// hazard in agent.Loop.decideRisk (internal/agent/loop.go:719-738), and why
+// hazard in agent.Loop.decideRisk (internal/agent/loop.go:783-806, measured at
+// ticket 179's anchor; the pointer this comment carried, 719-738, had drifted),
+// and why
 // ticket 21 replaces that function with this bridge's verdict.
 func (b *Bridge) Tools(_ context.Context) ([]agent.ToolInfo, error) {
 	entries := b.reg.List()

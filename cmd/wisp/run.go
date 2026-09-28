@@ -354,8 +354,11 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	// task.output (ticket 164 AC#3, D34 row PLAN.md:2564, L0) reads the
 	// process-local task table above. ⚠ WHO FILLS IT IS NOT THIS TICKET: the
 	// background spawn and its cancel are AC#4's and ticket 163's land, and
-	// RunAsync still has zero production call sites (measured, evidence file
-	// 164-task-output-impl-r1-ac2-ac3.md §4). Until a spawner records into it,
+	// RunAsync now has one production call site (measured: the line below in
+	// this same file, :633 `bg := loop.RunAsync(ctx, task)`, landed with
+	// ticket 176 AC#1; the count was zero when evidence file
+	// 164-task-output-impl-r1-ac2-ac3.md §4 recorded it). Until a spawner
+	// records into it,
 	// every call here answers "查不到这个任务" - loud, per 票 164 定案②, and
 	// never an empty success that would read as "the task printed nothing".
 	rt.tasks = tools.NewTaskRoster()
