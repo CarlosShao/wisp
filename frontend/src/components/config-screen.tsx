@@ -108,7 +108,19 @@ function EffectBadge({ live }: { live: boolean }) {
   );
 }
 
-export function ConfigScreen() {
+export function ConfigScreen({
+  heading = "设置",
+  lede = "外观一节的八行键。能动的只有面板不透明度和界面动画两行，其余各行今天没有数据源，所以它们不显示数字。",
+}: {
+  /** The heading this screen prints for itself. Defaults to 设置 because that
+      is what it says standalone (?harness=2 and the render harnesses). The
+      settings PAGE passes its category name instead - owner 2026-09-28: the
+      page already says 设置 in its own bar, and two 设置 headings stacked on
+      each other is a layout bug, not a title. */
+  heading?: string;
+  /** The sentence under the heading. Same reason: the page has its own lede. */
+  lede?: string;
+}) {
   const [alpha, setAlpha] = useState<number | null>(() => readPanelAlpha());
   // Read the tier back off the document rather than mirroring it: a tier set
   // anywhere (a test, a future bridge field) is the tier the control shows.
@@ -126,10 +138,8 @@ export function ConfigScreen() {
 
   return (
     <section aria-label="设置" className="flex min-w-0 flex-col gap-1">
-      <h2 className="text-[15px] font-semibold text-ink">设置</h2>
-      <p className="text-[12.5px] text-ink-2">
-        外观一节的八行键。能动的只有面板不透明度和界面动画两行，其余各行今天没有数据源，所以它们不显示数字。
-      </p>
+      <h2 className="text-[15px] font-semibold text-ink">{heading}</h2>
+      <p className="text-[12.5px] text-ink-2">{lede}</p>
 
       <div className="mt-1 flex flex-col">
         {APPEARANCE_ROWS.map((row) => {
@@ -200,7 +210,11 @@ export function ConfigScreen() {
       </p>
 
       <div className="mt-2 flex flex-col gap-1 text-[11px] leading-[1.6] text-ink-3">
-        <span>通用 / 语音 / 大模型 / 安全 / 隐私 / 成本 六节还没有对应实现。</span>
+        {/* The six other sections are no longer "not implemented, sorry" - they
+            are real rows on the settings page's own category rail, each saying
+            what feed it is waiting for. Pointing at them beats repeating a
+            paragraph here that the page contradicts. */}
+        <span>其余各类在左边那一列上，各自写着它在等哪个数据源。</span>
         <span>设置项里没有一格能改变权限档位或工作区，那是面板的边界（P9）。</span>
       </div>
     </section>
