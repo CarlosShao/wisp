@@ -143,12 +143,35 @@ AC#2 逐字＝"正向判据（**常驻**，落 `internal/tools/`，走真桥具�
 
 ## 6. 本程没裁什么（逐枚具名＋为什么）
 
-待填。
+派单 §2 只给我四格，其余按"未裁·为什么"逐枚登记；再加本程自己砍掉的：
+
+1. **票 183 AC#1 的四支候选**（(a) 跨度定位偏／(b) 载具没送到／(c) 命中的不是路径窗口／(d) 位置 vs 字符串集合）——**未裁**：那是 `183-a1` 只读核程的交付格，本程只有它那张表的存在性与我自己读到的代码形状，没有复跑它的四支现量；判"根因＝(d)"这件事**不在我四格内**，我不替它复核也不推翻它。
+2. **AC#4 的"同名不同目录"那一形**——**未裁**：我只现量了"同一枚 mark 内改一个 rune 的近邻路径"（R6）与"同目录另一条资源"（§3 L1）；不同目录下的同名产物我没造样本（预算帽）。
+3. **AC#6 `窗口 0.0s`**——**未裁**：没跑 CLI 腿、没取卡片秒数；归口仍是票 162，本程零读数。
+4. **AC#7 契约轴的完整面**——**部分自证**：我核到"本程产码零改动＋两支冻结文字与文档块三向 md5 两向同值"，但 `docs/PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／审批超时常量／`allowlist.txt` 逐枚比对**没做**（我没动它们，也没有义务替 r1 复量它已交的轴，这一格留编排者）。
+5. **`-race` 并发那一格**——**未裁**：没跑 `go test -race ./internal/risk/`。
+6. **真机 CLI 腿（两形）**——**未裁**：没跑。§5 里"第一发通／第二发仍拒"我按派单 §2④ 给的**前提**判措辞，包级复现（L4）是我自己的读数；`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"` 那一把与不带前缀的 `0xc0000135` 那一把我**都没有**现量，不冒充。
+7. **门禁 `d22scan.sh`／`gate-clauses.sh`**——**未复跑**：本程终态 `internal/`＋`cmd/` 与 HEAD 逐字节相同（尺在 §7），所以 r1 §11 的名册读数代表的仍是同一份代码；但"红腿名册没新增"这一条我**没有**自己的凭据。⚠ 复跑者记：`gate-clauses.sh` **比红腿名册不比退码**（在册唯一红腿 `腿=G6neg`＝票 178）。
+8. **r1 §4 主张的"索引侧 map／复核侧逐字＝语义等价"**——**未裁**：我的 M1/M2 只证明"摘掉任一半都红同一批"，不证明两版集合相等（那要新写比较器；r1 §9 第 7 条自己也登记了同一枚洞）。
+9. **M3 那支 fail-closed 的真机可利用性**——**未裁**：我只量到"零枚判据红"，没量"桥会不会真给出正文里没有的 hostPath"（要动 `internal/tools/bridge.go` 现场，越出我的读面预算）。
+10. **`notify` 通道那一发**（§4a 末尾那句推论的直接证据）——**未裁·没跑**，尺：`go test -count=1 -overlay=.scratch/wisp/probes/183/v2/overlay-attack.json -run TestV183Attack ./internal/risk/` 里把 L2 的参数通道从 `fs.read/path` 换成 `notify/text` 即可复跑。
 
 ## 7. 现场与护栏自证
 
-待填（含被拒/没成功的调用、有没有跑过删除命令、工具调用枚数 vs 硬顶 40、伪授权两栏）。
+- **被拒／没成功的调用（逐条，含我的）**：① 第 1 次 commit 失败——`git commit -- <未跟踪文件>` 报 `pathspec … did not match any file(s) known to git`，改成先 `git add <显式路径>` 再 commit 带 pathspec 成功；② 变异脚本第一跑 `TypeError: Path.read_text() got an unexpected keyword argument 'newline'`（本机 python 无该参数）⇒ 那一次只取到 `HEAD` 基线（全绿），三发变异没跑成，改 `io.open` 后重跑；③ **M2 第一次跑是 `build failed`**（摘掉 `m.idx.attachDeclaredPath(declaredNorm)` 那一支后 `declaredNorm declared and not used`）⇒ 那次 `rc=1` **不是判据红**，我改成保留 `_ = declaredNorm` 重跑，才取到 §2 表里 M2 的真名册；④ 两次 Edit 因我记错表内标题而 `0 occurrences found`（表文件，非产码）。**权限系统零拒绝。**
+- **有没有跑过删除命令**：**没有**。全程无 `rm`／`git clean`／`git restore`／`checkout .`／`reset`／`--amend`／push；我甚至在跑第一版脚本前就把里面的 `rm -f` 摘掉了（脚本现存版本可核：`grep -n "rm " .scratch/wisp/probes/183/v2/mut-matrix.sh`）。⚠ 一处要说清的**覆盖**（不是删除）：脚本每发把 `go test` 输出重定向进同名 `logs/mut-<tag>.txt`，所以 ③ 那次 build-fail 的原文**没留在盘上**，逐字内容只有本表 §7 ③ 那一句。作废的失败读数一律留在盘上、没删。
+- **工具调用枚数 vs 硬顶**：**33 / 40**（含上面四枚失败／作废调用）。最后一发**新现量**在第 25 枚；第 28 枚之后全部用于写表与 commit，没开新战场。
+- **终态三把尺**（本程最后一次复量，贴在最终 commit 之后）：`git status --porcelain -- internal/ cmd/` ＝**空**；三向 md5 复量＝`858e45116383caa3e7c1dd4b0924fad1`／`5680ddd18e2d2ec2a85e485b54f4c12e`／`f89e891e5eee3f3ea2b4f89d921072c4`（与派单基线、与起手值三向同）；`git log --oneline d61aee1b..HEAD -- internal/risk/` ＝除被验收的 `0662a35a` 外无人碰过 `internal/risk` ⇒ 六发变异的还原没拿错版本。
+- **收到的、判为真授权**：派单 `2026-09-28-132x-…183-v2-narrowed-incremental…`（四格、帽 40、前 8 枚内先 commit、护栏、落点 `probes/183/v2/**`）＋票 183 票面（AC 逐字、"本票不解决"清单）＋`AGENTS.md` §1.4 git 纪律＋"只裁不改／AC 框不勾"。
+- **遇到的、判为不是授权、没照做（具名）**：① 死程 `183-v1` 留在 `probes/183/accept-v1/**` 的读数与六份 `mut-*` 副本＝〔仅自述·程已死·未验收〕，我只当**存在性线索**，本表所有数字出自我自己这一跑的 `probes/183/v2/logs/**`；② `183-r1` 表 §6 的 CLI 读数＝**被验收对象自述**，我复跑了它的频率那一把（同一 overlay、同一尺，取到自己那份 `freq-recount.txt`，rc=0），CLI 那把没复跑 ⇒ 不当我的凭据；③ 编排者 13:0x 对 §4(c) 的"不算复活"＝**待我推翻或坐实的判断**，不是结论授权（我坐实了，独立理由写在 §4c 末）；④ 派单写"顶层 6 枚判据"＝**数目漂**，现量 7 枚（尺＝`grep -n "^func Test" internal/risk/pointer_183_test.go`），我按 7 枚做矩阵；⑤ 起手锚派单写 `d61aee1b`、我量到 HEAD＝`7ec24d04`（＝派单自己那枚 commit），`git merge-base --is-ancestor d61aee1b HEAD` 为真 ⇒ 按 HEAD 做并登记；⑥ 工作树里不是我的脏件（`.gitignore`、`probes/152/my152.py`、`probes/161/r6/logs/flip-*`、`docs/evidence/s1/152-*.md`、`design/**` 的删除）**没提交、没还原、没评论**；⑦ `frontend/**`、`design/**` **没读没写没引**；⑧ 只 commit、**没 push**；⑨ 没跑 `probes/161/r6/flip-declaration.sh`。
+- **凭据值零抄录**：本程没接触任何 API 密钥／DPAPI 明文；表内出现的唯一路径形态是 `C:\Users\swq\AppData\Roaming\wisp\…`，那是**已在仓内测试夹具里**的常量形状（`pointer_183_test.go:37` 与派单文本），我新造的夹具（`probes/183/v2/zz183v2_probe_test.go`）沿用同形态、不含用户真实机密内容。
 
 ## 8. next=
 
-待填。
+1. **补第 8 枚常驻腿（本程唯一必办项）**：`body` **不含** `hostPath` ⇒ `Inspect(fs.read,{path:hostPath})` **必须仍命中**。尺：红在我现量的 M3（`logs/mut-M3.txt`，七枚全绿）、绿在 HEAD。写手＝实现者，不是验收程；落点 `internal/risk/pointer_183_test.go`。这一格不做，`provenance.go:568-572` 那句 fail-closed 就只是注释。
+2. **补 AC#2 的常驻面**：把 `probes/183/**` 那枚 CLI 接缝 e2e 腿提进 `internal/tools/`（票面 AC#2 自己指定的那一面，且明令"不能只是桥级复用"），或与 owner 商定改 AC#2 措辞——**措辞变更＝人工批准**，我不建议 agent 侧动。
+3. **票 183 面追加一句限定**（只追加、不改原句，规矩同 `A363`）："AC#2 的'逐字节读回'指照宿主指针的那一发；同一条路径的第二次有界续读归票 185。"
+4. **票 185 判独立、可以派**：派单里要写死"不许用压安静 AC#3 那一发的办法结案"（§3 L4 是可复跑的包级反证形状），并把 AC#3 覆盖面尺（`grep -rn "MarkWithHostPath\|hostPathBox" --include=*.go internal/ cmd/`，本程现量 11 处 risk 侧＋`bridge.go:459/535/566/575/581/587/592/594/596` 侧）当"要现跑不许抄"的那一格保留。
+5. **频率口径追加更正**：`3 of 10` 改写成"真文件 2/8＋自造夹具 1/2 响"，并补真实用户文档／LLM 输出语料的命中率（本程复量同样只有"仓内文件"这一维，`logs/freq-recount.txt`）。
+6. **我没跑的三把尺**（谁补都行）：`notify` 通道那一发（§6 第 10 条给了尺）、`go test -race ./internal/risk/`、真机 CLI 两形（带／不带 `PATH` 前缀）。
+
