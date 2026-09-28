@@ -497,8 +497,9 @@ func run() {
 // what this ruler is for. Case-sensitive on purpose: the camel spelling is what
 // the binding uses, while prose in this repository says "WebView2 hosting" in
 // comments - and comments are not identifiers, which is the whole reason this
-// predicate parses sources instead of grepping them (measured 2026-09-28: 27
-// production .go files describe the missing host in prose; reddening on prose
+// predicate parses sources instead of grepping them (measured 2026-09-28, ruler
+// = grep -rlniE "webview2|WebMessage" --include=*.go internal/ cmd/ tools/ minus
+// _test.go: 18 production .go files describe the missing host in prose; reddening on prose
 // would have made this test red since before slice A existed).
 var hostChannelSymbols = []string{"CoreWebView2", "WebView2", "WebMessage"}
 
