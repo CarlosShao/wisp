@@ -50,3 +50,21 @@ C17 白名单**既有方法名**不动（只允许**新增快照字段**那一�
 ## 已知的相邻事项（别在本票里顺手做）
 - 全局级说明与"首次启动自动生成项目说明"（`/init` 那一形）＝另立，本票只做**读**。
 - 面板里"选哪份说明生效"的开关界面＝界面那支的活，本票只交载体与那句打印。
+
+## 要 owner 带给界面那支的一跳（Go 侧改不了，也不是待拍板项——就一行声明）
+
+- **现象**：`internal/panel` 今天多一枚在册红 `TestApprovalCardViewJSONKeysMatchFrontendTypes`，
+  红句子原文＝`Go Snapshot emits [instructions] that interface PanelSnapshot does not declare`。
+- **成因**：Go 侧（票 200 AC#7 的载体，`internal/panel/composer.go:68`）开始发 `instructions` 这枚键，
+  而界面那侧的类型 `frontend/src/lib/panel.ts` 的 `PanelSnapshot` 里**没有这枚声明**。那枚尺的作用就是"**加字段必红、逼两侧同批移动**"。
+- **`frontend/**` 对我和对我派的任何腿都是零写面** ⇒ 这一跳**只能由界面那支做**。请把它原样带过去：
+  在 `PanelSnapshot` 上补 `instructions?:` 一枚数组，元素形状逐字段照 Go 侧（`internal/panel/instructions_200.go:18-39`）：
+  `path` string · `tier` string（`"project"`／`"global"`）· `depth` number（0＝工作区本身，越大越外面，`-1`＝全局档）·
+  `bytes` number · `truncatedBytes?` number（预算裁掉的字节数，为 0 时不发）· `dropped?` boolean（**整份被预算挤掉**，界面要能说"这份没生效"）·
+  `duplicateOf?` string（这份并进了哪份，同一物理文件经两级目录只注入一次）· `source?` string（C25 来源名，现值 `"fs.read"`）。
+  ⚠ 键带 `omitempty` ⇒ **没加载时这枚键根本不在 JSON 里**；界面**不许**把"键不存在"画成"已加载但为空"，也不许画成"功能没开"（那三种状态今天分不出，Go 侧正在补）。
+- **转绿判据（界面那支交完我复跑）**：`go test -count=1 ./internal/panel/` 里 `TestApprovalCardViewJSONKeysMatchFrontendTypes` 由红转绿，
+  且另外三枚在册常红（`TestComposerContractTypesMatchFrontend`／`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`／`TestC21DesignTokensFourwayAgree`）**名册不变**。
+- **撤销口令**：若界面那支决定"这一版先不显示说明清单"，则 Go 侧回到 200-r2 的**乙**（把键从 marshal 里摘掉），
+  那一格 AC#7 当场退回并在本票具名记账——**不许留着"键在值恒缺"这一形**（同 `A408` 点名的反面教材）。
+

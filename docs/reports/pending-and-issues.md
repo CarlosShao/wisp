@@ -8938,3 +8938,32 @@ r1 **没动手**，因为票面 `:8` 只给到 `internal/tools/**` 的**测试�
   因此 197-r1b 的白名单**不含 `internal/panel/**`**，且要求它动 `cmd/wisp/run.go` 之前**当场**再看一次 `git status --short -- cmd/wisp/run.go`，脏就跳过并具名报。
 - **编队（此刻）**：在飞 **2 枚写腿**＝`200-r1`、`197-r1b`（`197-r1` 已收）；只读调研 6 枚全部交齐并核过。
   已交并核过 **49 枚**。**推送继续按住**。**待 owner：零枚**（票 211 的乙那一支我不催，写在票里等他自己哪天问起）。台账到 `A411`。
+
+## A412（09-28 19:4x）：收 `200-r1`（票 200 项目说明加载器，commit `84feec44`）——它交回的"归因未定案"里有一枚**我判红了，而且红句子里就写着它自己那行**
+
+- **它报对的部分我逐枚复跑**：起手锚点 `937357c3`；面＝9 枚 pathspec（`internal/projctx/projctx.go` +468、`projctx_test.go` +442、
+  `internal/agent/instructions_test.go` +305、`internal/agent/prompt.go` +58/−1、`internal/config/schema.go` +4、
+  `internal/panel/composer.go` +7、`internal/panel/instructions_200.go` +72、`cmd/wisp/run.go` +35/−1、证据件 +87/盘上 `wc -c`＝17545）；
+  `internal/tools` 在该 commit 里**命中 0 枚**（它承诺的"没碰另一腿的写面"，我核了）；我现跑 `projctx` **ok 0.187s**、`config` **ok 1.221s**。
+- ⚠ **判红一枚（它写成"该目录我零写、归因未定案"——那句只对了一半）**：`go test -count=1 ./internal/risk/` 今天**唯一红**＝
+  `TestC26RewriteAccountIsConsumedAtEverySecurityLeg`，红句子原文 `..\..\cmd\wisp\run.go:686 reads Result.Canonical without reading the rewrite account (Actable/Rewritten) - ticket 102's hole re-opened by a new consumer`。
+  **因果我做了对照**：`git show 84feec44~1:cmd/wisp/run.go | grep -c '\.Canonical'`＝**0** ⇒ 改后＝**1**（正是它新加的 `instrWorkspace = ws.Canonical`），
+  且 `grep -c 'Actable(\|\.Rewritten' cmd/wisp/run.go`＝**0**。⇒ **"我没写那个目录"不等于"与我无关"**：那枚尺**按文件扫全仓**，
+  新的**消费者**在哪打红就在哪修。**归因定案：200-r1 把票 102/181 那枚在册判据打红了。**
+- ⚠ **第二枚具名账（它自己已诚实留手，我复算证实并升级为硬要求）**：面板载体 `composer.go:68` 的 `instructions` 键**今天没有生产者**
+  （`grep` 在 `internal/panel/pump.go` 零命中，只有 `instructions_200.go:41/65` 那两个待用的构造函数）＋`omitempty` ⇒
+  **缺值时那枚键在 JSON 里根本不存在**，界面按"有没有这个键"分支的代码会永远走"没有"那一支且**无人能发现**。
+  这正是我刚在 `A408` 里点名为反面教材的 OpenChamber"文案在、控件不存在"那一形，**换了层而已** ⇒ 要求要么把两跳接上并给端到端读数，要么**摘掉键并具名退回 AC#7 那一半**（二选一，不许"键在值恒缺"）。
+- **在册常红逐名（我 19:4x 现量，全仓口径）**：`internal/panel`＝**4 枚**＝`TestApprovalCardViewJSONKeysMatchFrontendTypes`（**新增红因**：Go 发 `instructions` 而 `frontend/src/lib/panel.ts` 的 `PanelSnapshot` 未声明；
+  转绿只有一跳，而 `frontend/**` 对我和对我派的腿**都是零写面** ⇒ **这一跳进票面、由 owner 自己带给界面那支**，我不代转、也不绕尺）
+  ＋`TestComposerContractTypesMatchFrontend`＋`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`＋`TestC21DesignTokensFourwayAgree`（后三枚在册，**不修不 Skip**）。
+- **一枚它报的红我不复现**：`TestResolvePerCallBudget`——它在 `84feec44` 之后**单跑三遍全绿**（ok 1.2s / 1.4s / 1.4s）。
+  ⇒ 规矩不变：**写"今天应该红"必须自带能复跑的尺**；否则这条从票面上摘掉，别留给下一程当已知红。
+- **格式门现状（比 `A411` 又走了一步）**：跟踪集里 gofumpt 未净源件从 3 枚变成 **3 枚但换了一批**——
+  `internal/tools/subagent_197.go`、`internal/tools/subagent_197_test.go`（归 **197-r1b**）＋ **新带进来的 `internal/agent/instructions_test.go`**（归 **200-r2**）；
+  `cmd/wisp/run.go` 被 200 那一改**顺手格式化干净了** ⇒ 我已把 run.go 从 197-r1b 的写面里**摘掉**（同文件两人写＝撞车）。
+  `.scratch/wisp/probes/**` 那 4 枚刻意做坏的变异样本照旧（`e13196bd`／`6479d540`／`78ea1d19`／`ee1e2118`），**不动、不当新伤**。
+- **已派两腿**（各带自己的撞钉预检与正控要求）：`197-r1b`（池诚实 4＋常驻钉＋"改成 8 必红"的正控／那两枚 tools 件格式化／补上 `subagent_197.go` 注释**声称存在而盘上没有**的那枚两包同键钉）
+  ＋`200-r2`（读改写账户**并按行为判**不是按字骗尺／`instructions` 键二选一＋反向"没开"与"目录里没有"要能分／自己那枚格式化／不复现的红要么给复现命令要么摘掉）。
+- **编队（此刻）**：在飞 **2 枚写腿**＝`197-r1b`、`200-r2`；`197-r1`、`200-r1` 已收并复算。只读调研 6 枚全交并核过。
+  已交并核过 **50 枚**。**推送继续按住**。**待 owner：零枚**（票 200 那一跳界面侧的 TS 声明进票面，不摆成待拍板）。台账到 `A412`。

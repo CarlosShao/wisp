@@ -38,9 +38,12 @@
   `cmd/wisp/run.go`、`internal/tools/subagent_197.go`、`internal/tools/subagent_197_test.go` ＋ 4 枚 `.scratch/wisp/probes/**` 的变异样本（后 4 枚**不归你**，别动）。
 - `gofumpt` **不在 PATH 但在 `$GOPATH/bin`**：Windows 下 `"$GOPATH/bin/gofumpt.exe"`。上一轮报"本机没有 gofumpt"是不实（`gofmt -l` 空 ≠ gofumpt 空，两者判的不是一回事）。
 - 我核过：`cmd/wisp/run.go` 在 `b9fa815b` 之前是**干净**的，这枚回归是 197 那一腿带进来的。
-- ⚠ **写面冲突保护**：动 `cmd/wisp/run.go` 之前**当场**跑 `git status --short -- cmd/wisp/run.go`；
-  如果那一刻它是脏的（说明有别的腿正在改它），**跳过这枚文件**、只处理另外两枚，并在证据件里具名报"run.go 那一刻被别人占着，我没动"。别硬合并、别替别人格式化。
-- 交件判据：`git ls-files -z '*.go' | xargs -0 "$GOPATH/bin/gofumpt.exe" -l` 的输出里**不再出现** `internal/`、`cmd/` 下的任何文件（`.scratch/wisp/probes/**` 那 4 枚允许还在，逐名列出）。
+- ⚠ **写面冲突保护（19:4x 更新，这一段覆盖上面那条"当场看 git status"）**：`200-r1` 已交件 `84feec44`，
+  它那一改顺手把 `cmd/wisp/run.go` 格式化干净了——**现在跟踪集里 gofumpt 未净的源件只剩 3 枚**：
+  `internal/tools/subagent_197.go`、`internal/tools/subagent_197_test.go`（**归你**）＋ `internal/agent/instructions_test.go`（**归 200-r2，你别动**）。
+  ⇒ **`cmd/wisp/run.go` 从你的写面里去掉**（另一腿 `200-r2` 马上要改它，同文件两人写＝撞车）；你只碰上面点名给你的那两枚＋(c) 的新测试件。
+- 交件判据：`git ls-files -z '*.go' | xargs -0 "$GOPATH/bin/gofumpt.exe" -l` 的输出里**不再出现** `internal/tools/` 下那两枚（
+  `.scratch/wisp/probes/**` 那 4 枚与 `internal/agent/instructions_test.go` 允许还在，逐名列出）。
 
 ### (c) 一枚**假注释**：`SubagentStreamKeyPrefix` 的那枚"钉住两枚拷贝相等"的测试**盘上不存在**
 
