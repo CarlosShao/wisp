@@ -1,0 +1,6 @@
+time=2026-09-28T15:43:15.834+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestAttributionFieldsReachTheHandlerUnchanged (0.00s)
+    composer_dispatch_test.go:359: handler saw requestId "rid-mutated-by-the-router", want "rid-77" verbatim: the router rewrote the correlation key the audit trail depends on
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.045s
+FAIL

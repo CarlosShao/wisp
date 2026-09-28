@@ -1,0 +1,4 @@
+--- FAIL: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (0.05s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	4.305s
+FAIL

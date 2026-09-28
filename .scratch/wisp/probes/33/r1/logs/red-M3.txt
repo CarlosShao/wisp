@@ -1,0 +1,11 @@
+time=2026-09-28T15:43:13.509+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestEveryListedMethodWithoutAHandlerIsRefusedNotDropped (0.00s)
+    --- FAIL: TestEveryListedMethodWithoutAHandlerIsRefusedNotDropped/workspace (0.00s)
+        composer_dispatch_test.go:269: unhandled panel.workspace.request request returned <nil>, want panel: 该方法在名册内，但本机未接入处理器
+    --- FAIL: TestEveryListedMethodWithoutAHandlerIsRefusedNotDropped/attachment (0.00s)
+        composer_dispatch_test.go:269: unhandled panel.attachment.add request returned <nil>, want panel: 该方法在名册内，但本机未接入处理器
+    --- FAIL: TestEveryListedMethodWithoutAHandlerIsRefusedNotDropped/message (0.00s)
+        composer_dispatch_test.go:269: unhandled panel.message.send request returned <nil>, want panel: 该方法在名册内，但本机未接入处理器
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.041s
+FAIL

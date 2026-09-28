@@ -1,0 +1,53 @@
+== pristine sha256 32e39e0a6edb0fc47f627593f8665fcc1d7660e7af60c94f8257c0cc132c2c0c
+== GREEN run (all 33-r1 nails, unmutated) ==
+rc=0
+ok  	github.com/CarlosShao/wisp/internal/panel	0.180s
+
+== MUTANT M1 ==
+sed: s|return d.Mode.HandleModeRequest(ctx, req)|return nil|
+mutation applied (hash changed): 37a77a28c6dc8bff
+rc=1
+--- FAIL: TestRawEnvelopeReachesTheAttachedModeHandlerExactlyOnce (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.041s
+FAIL
+FAIL lines: 1
+
+== MUTANT M2 ==
+sed: s|return d.rosterMismatch(req)|return nil|
+mutation applied (hash changed): 5c089f7fc1e03045
+rc=1
+--- FAIL: TestRosterMismatchBackstopRefusesInsteadOfAccepting (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.044s
+FAIL
+FAIL lines: 1
+
+== MUTANT M3 ==
+sed: s|return d.unattached(req)|return nil|g
+mutation applied (hash changed): d4b8378525159ecd
+rc=1
+--- FAIL: TestEveryListedMethodWithoutAHandlerIsRefusedNotDropped (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.041s
+FAIL
+FAIL lines: 4
+
+== MUTANT M4 ==
+sed: s|\tswitch req.Method {|\treq.RequestID = "rid-mutated-by-the-router" // MUTANT M4\n\tswitch req.Method {|
+mutation applied (hash changed): 2c314ff50f196779
+rc=1
+--- FAIL: TestAttributionFieldsReachTheHandlerUnchanged (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.045s
+FAIL
+FAIL lines: 1
+
+== RESTORE CHECK ==
+before=32e39e0a6edb0fc47f627593f8665fcc1d7660e7af60c94f8257c0cc132c2c0c
+after =32e39e0a6edb0fc47f627593f8665fcc1d7660e7af60c94f8257c0cc132c2c0c
+IDENTICAL: file restored byte for byte
+
+== GREEN run again after restore ==
+rc=0
+ok  	github.com/CarlosShao/wisp/internal/panel	0.166s

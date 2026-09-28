@@ -1,0 +1,6 @@
+time=2026-09-28T15:43:08.799+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestRawEnvelopeReachesTheAttachedModeHandlerExactlyOnce (0.00s)
+    composer_dispatch_test.go:139: write leg called 0 time(s), want exactly 1: routing was removed or doubled, and the档 did not move once (composer_handlers.go:141)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.041s
+FAIL
