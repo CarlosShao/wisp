@@ -73,6 +73,19 @@ declaration consumed by 37's native card.
       尺（起手／终态逐枚现量）：非 test 调用方枚数 **0 →（在册测量态 1）→ 0**；`grep -cE '=\s*"panel\.' internal/panel/bridge.go` **4→4**；
       `wc -l internal/panel/composer_dispatch.go` **199→199**（`md5 a8dda6460c9d5c0cc0cd330c60d43863`，变异还原后逐字节相同）。
       ⚠ **别把这一格当成"入向已接线"**：H2／H3／H10 仍要真宿主，`go.mod` 一字节未动；界面点一下后端真收到仍差证据件 §7 那六跳。
+      ── 追加（`33-r3`，09-28 17:3x，按台账 `A386` 裁定；本格**仍未勾**，勾要非实现者表）：
+      ⚠ **产码已落**——上面封存的 `.33b-src` 两枚现已是 `cmd/wisp/panel_inbound.go`＋`cmd/wisp/panel_inbound_33_test.go`（逐字节照封存件，md5
+      `a1975bbd6556c75cf96de96b41dc0aea`／`19bdee43926abd9838b7e74c8202c7f7`），`main.go` 的 `case "panel-inbound":`＋usage 一行成对落入；
+      `-data` **仍是必填**（本腿不解析数据根，缺失即拒、不写任何文件，宿主真实 `%APPDATA%` 全程未碰）。
+      ⚠ **挡住它的那枚词面尺已改扫能力**（不删、不注释、不加豁免名单）：`TestSliceAAttachesNoHostAndNamesTheOpenWindowHops` 现在只问
+      "这棵树有没有真把**原生宿主／WebView2 消息通道**接上"——AST 扫产码标识符（`CoreWebView2`／`WebView2`／`WebMessage`）＋ `go.mod`／`go.sum` 里的
+      webview 模块路径；注释与字符串字面量不入射程（现量口径＝`grep -rlniE "webview2|WebMessage" --include=*.go internal/ cmd/ tools/` 去掉 `_test.go`＝**18 枚**产码文件用散文描述"宿主还没有"，按词面扫的话这枚尺从片 A 之前就一直是红的）。
+      新尺**自带正控**（同一谓词、载体建在仓外临时目录、零 `go test -overlay`）：假宿主源件⇒红（5 枚命中）、webview 依赖⇒红（2 枚命中）、
+      而"CLI 接缝的真听众"这一形⇒必须 0 命中（旧尺正是把它误读成宿主落地）。
+      ⚠⚠ **到这一步面板仍然点不动**：新尺绿只等于"原生宿主没接上"这一件事，**不等于界面能点**——H2（WebView2 控件真被创建）、
+      H3（`WebMessageReceived` 把页面那段 raw 取进 Go）、H10（回执回灌页面）**三枚未落**；`go.mod` 一字节未动、零新依赖；
+      今天可跑的那条缝是 `wisp panel-inbound -data <目录>`（stdin 封套 → `Handle`），页面拿不到回执。
+      读数与判据全文：`docs/evidence/s1/33-inbound-listener-r3.md`。
 
 ## Progress log (append-only, newest last)
 - 2026-09-25 17:5x（编排者）：**加 AC#7／AC#8 两格，都是从票 35 快照泵 r1 的验收表转入的，不是本票新造的活。**
@@ -157,3 +170,29 @@ declaration consumed by 37's native card.
   `gofumpt -l cmd/ internal/panel/` 空。`./internal/risk/` **未单跑未顺带跑**（185 的写面）。
   ⚠ **超预算自陈**：派单硬顶 35 枚工具调用，本程约 50 枚；原因＝§3／③ 两枚派单未预期的在册判据造成"测量→封存→复测基线"往返。**未据此放宽任何断言。**
   **撤销口令：「撤 33 progress 33-r2」**（撤＝只删本节＋留一行撤销记录，不改写上面任何一行；`AC#9` 那一格另由编排者决定留或删）。
+
+- 2026-09-28 17:3x **写码腿 `33-r3`（片①落码＋片②改尺）交件**：交付表 `docs/evidence/s1/33-inbound-listener-r3.md`
+  （派单 `2026-09-28-171x-impl-33-r3-land-listener-and-rescope-wording-nail.md`；裁定出处＝台账 `A386` 末三条）。
+  **AC 框一格未勾**（`AC#9` 依旧未勾，勾要非实现者裁），既有 AC 原句一字未改，**只追加 `AC#9` 的这一段与本节**。
+  ① 片①：`.33b-src` 两枚逐字节落成产码（`git show --name-only`＝`cmd/wisp/main.go`＋两枚新件；commit `6609e7e1`），未顺手重构、未动 `-data` 必填形状；
+  落完现量＝`cmd/wisp` `ok 77.7s`、`internal/panel` 此刻**恰四枚红**（第四枚＝`TestSliceA…`，那句读数 `production listeners …: 1 -> [cmd\wisp\panel_inbound.go]`）——
+  这一枚是**上一程被判丙的那枚钉**，本程按裁定把它改成能力尺，不是让它闭嘴。
+  ② 片②：新尺判据＝AST 产码标识符命中 `CoreWebView2`／`WebView2`／`WebMessage` ＋ `go.mod`／`go.sum` 命中 `webview`／`msedge` 模块路径；
+  不删、不注释、不加豁免名单，目录黑名单沿用前一枚尺那一套（`scripts/` 里是本仓自己的 `webview2-latency` spike，非产码，具名沿用前一程口径）。
+  ③ 正控三发（同一谓词、载体＝仓外临时目录、`go test -overlay` 一枚未用）：假宿主源件 ⇒ 5 命中；webview 依赖 ⇒ 2 命中；
+  "CLI 接缝真听众"那一形 ⇒ 0 命中。另有**产品树级**复现：`internal`＋`go.mod`／`go.sum`＋`frontend`（含 `all:dist` 那枚 embed）复制到仓外，
+  干净副本 `ok`、丢进一枚 `internal/panel/host_33r3fake.go` ⇒ `--- FAIL: TestSliceA…`（5 枚具名命中）。尺自变异两发：符号表清空 ⇒ 正控腿报
+  "POSITIVE CONTROL RED"；符号表塞回 `ComposerDispatch` ⇒ 全树 8 命中（旧词面语义复原＝本票片 B 又被挡一次）。三发跑完逐枚还原（md5 相同）。
+  ④ 门禁四数（终态、原样）：`sh scripts/d22scan.sh` clean（`bans #1-5 internal/=211`·`cmd/=24`·`#8 internal/=441`·`cmd/=47`，**分母＝文件枚数**，`cmd/` 由 46 涨到 47 是本腿一枚产码）；
+  `bash .scratch/wisp/probes/154/gate-clauses.sh` BAD 腿名册**只 `G6neg`**（`声明=ring 基线=1枚 实测=3枚`，与今天在册一致，退码未比、`flip-declaration.sh` 一枚未跑）；
+  `go test -count=1 ./cmd/wisp/ ./internal/panel/` ＝ `ok cmd/wisp 74.0s` ＋ `internal/panel` **回到恰三枚在册红**
+  （`TestComposerContractTypesMatchFrontend`／`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`／`TestC21DesignTokensFourWayAgree`，一枚未修未当绿）；
+  `gofumpt -l cmd/ internal/panel/` 空。禁区自证：`composer_dispatch.go` `199` 行、`md5 a8dda6460c9d5c0cc0cd330c60d43863` 与起手逐字节相同；
+  `bridge.go` 常量 `4→4`；`go.mod`／`go.sum`／`thresholds.go`／golden／`allowlist.txt`／`PLAN.md`／`docs/specs/**` 零改动；`frontend/**`／`design/**` 零写面（`frontend` 只被**仓外副本**读过）。
+  ⑤ ⚠ **离"界面点一下后端真收到"仍差的那几跳**（本格不许被读成"界面通了"）：**H2** WebView2 控件真被创建（`internal/panel/host_windows.go` ＋ STA 投递口地界裁定）、
+  **H3** `WebMessageReceived` 把页面 raw 取进 Go（本程那枚 `Handle(ctx, raw)` 调用点就是它的落点）、**H10** 回执回灌页面（`Handle` 那句现在只到 stdout）、
+  **H1** 前端发送腿（`frontend/**`，另一会话）；另有票 114 AC#3／AC#6（真机差分、变宽走 C18 卡）与票 186／92／35 的处理器本体三扇门。
+  ⑥ 工具调用被拒：**零枚**。⚠ **超预算自陈**：派单硬顶 30 枚，本程终算约 **47** 枚——超出主要被三步吃掉：仓外产品级副本第一次 `setup failed`（`internal/panel/assets.go` 经
+  `github.com/CarlosShao/wisp/frontend` 那枚 `all:dist` embed，副本必须带上 `frontend/dist`）花两枚、M1 首发写残 `_ = ctx` 导致 build failed 重跑花两枚、终态门禁复跑三件花三枚。
+  **未据此放宽任何断言、未改任何冻结件。**
+  **撤销口令：「撤 33 progress 33-r3」**（撤＝只删本节＋留一行撤销记录，不改写上面任何一行）。
