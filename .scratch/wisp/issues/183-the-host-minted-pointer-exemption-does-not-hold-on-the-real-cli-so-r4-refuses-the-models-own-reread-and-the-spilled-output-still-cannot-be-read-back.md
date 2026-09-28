@@ -54,3 +54,5 @@
 ## Progress log
 
 - 09-28 11:3x 编排者立票：上面五把尺本程现跑（锚 `4fbda6a5`，读数我自己从文件里逐字取）。未派。
+- 09-28 12:1x 只读核 `183-a1` 交件（表 `docs/evidence/s1/183-exemption-why-not-live-a1.md`，AC#1 那一格）：四支候选逐支给现量＋变异兑现，判定**根因＝(d)**——豁免按「位置」排除，命中判定用的是去重后的哈希集＋对整段归一化正文的 `strings.Contains`，两处都位置无关 ⇒ 被豁免窗口里那 8-rune 串只要在正文别处出现过一次，豁免当场失效（真机读数 `frag="-output-" hit=true`，出处 `probes/183/a1/logs/mark-hit.txt`）。**(a)(b)(c) 全部不成立**：坐标 `lo=2101` vs 原始字节 `2244` 两者差 143 且用的是前者；载具送到了（`hostPathBytes=155 lo=767 skip=[[767,921]] excluded=162`，⇒ 派单"回填与当场不同一条"这一前提**证伪**）；命中片段是路径本体不是中文说明。决定性变异 M-D1：只把标记正文换成与路径零同款 8-gram 的正文，同一份生产码同一个 CLI 接缝上那一发就 `hit=false` 并「整份读回逐字节相等」。
+- 09-28 顺手两格：八枚常驻判据全在 `internal/risk` 包级、且都不喂「路径同款片段在正文重复」这一形（这就是"全绿挡不住"的具体答案，不是"覆盖不足"）；`dropped=1` 裁的是 run B 自己当场那枚 mark（`marks=1`，名册进程级共享／mark per-scope）。推荐落地点＝`provenance.go:541` 把豁免跨度从喂给 `newFragmentIndex` 的文本里物理挖掉（`taintmatch.go` 一字不动、不必动 `provenance.go:468-473`），但 `MarkWithHostPath` 文档块那句语义要变强＝**人工批准面**，已在 §6 具名报回。**AC#2..AC#8 一枚没做、一枚没勾。**⚠ 另报一枚排程坑：起手第一发被在飞的 `179-v1` 脏件 `internal/agent/loop.go` 污染（读出"风险未分级"），已用 `git show HEAD:` 钉进 overlay 重跑——`183-r1` 派之前建议先收掉 179-v1。跟踪文件零改动（`git status --porcelain -- internal/ cmd/` 每次变异后均为空）。

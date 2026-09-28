@@ -1,0 +1,2 @@
+MARK scope=f9ce0ecd-cfe9-4507-bf46-1e967198afcc tool=task.output origin="" contentBytes=3204 normRunes=3172 truncated=false minChars=8 maxSrc=262144 hostPathBytes=155 hostPathNormRunes=155 lo=2101 skip=[[2101 2256]] windows=3051 excluded=162 hashed=136 rawByteIndex=2244
+MATCH scope=f9ce0ecd-cfe9-4507-bf46-1e967198afcc marks=1 markTool=task.output paramRunes=155 paramNormHead="c:\\users\\swq\\appdata\\loc" paramNormTail="ec-82dd-1e165b1c391b.txt" frag="-output-" hit=true

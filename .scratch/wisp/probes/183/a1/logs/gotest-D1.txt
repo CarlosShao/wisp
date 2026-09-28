@@ -1,0 +1,16 @@
+time=2026-09-28T12:04:13.820+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-09-28T12:04:13.837+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestRereadHostPointerOnCLISeam183a1569628442\001\logs min_level=info early_records=1 early_dropped=0
+time=2026-09-28T12:04:13.864+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRereadHostPointerOnCLISeam183a1569628442\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-28T12:04:13.871+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-28T04:04:13Z duration_ms=5
+time=2026-09-28T12:04:13.878+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestRereadHostPointerOnCLISeam183a1569628442\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-28T12:04:13.883+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-28T04:04:13Z duration_ms=4
+time=2026-09-28T12:04:13.887+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-28T12:04:13.889+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- FAIL: TestRereadHostPointerOnCLISeam183a1 (0.24s)
+    zz183a1_e2e_test.go:353: 产物里的字节换了：20040 vs 20000
+    zz183a1_e2e_test.go:434: 整份读回逐字节相等：20040 == 20040（sha256 603cf4e66b57da9eaa4b4b133e96bddc5a88bdd647c4bdff9e2cdcca6de8f64b）
+    zz183a1_e2e_test.go:445: 有界读回的字节数不等：产物前缀 10000 / 读回 10002（max_bytes=10000）
+    zz183a1_e2e_test.go:449: 有界读回的前 10000 字节与产物不逐字节相等
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	0.298s
+FAIL
