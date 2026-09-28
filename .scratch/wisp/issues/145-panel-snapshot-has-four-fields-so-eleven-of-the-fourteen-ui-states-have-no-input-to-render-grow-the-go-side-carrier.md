@@ -152,3 +152,4 @@
   真正没源的仍是那 7 枚（`thinkingMs`／`reasoningMs`／`durationMs`／`humanText`／`fragment`／`IconClass`／`remainingMs`）
   加 `run.phase`（映射表不存在）与本轮新点名的**"各家档位词表"（私有 `var`、无导出）**；
   而**有源那批今天一律还差同一件事**：装配根多接一根读口线（R-1）＋一枚能落断言的用例之家（R-2）。
+- 09-28 18:0x 编排者收 `145-r2`（四枚 commit，零产码、三枚停手上报）：14 枚候选逐枚点名拒收（含 `approval.depth`＝复述字段当装饰）＝**`AC#6` 第一次真生效**，`AC#2` 未落不勾。⚠ **真锁在我的排程里**：唯一生产装配根＝`cmd/wisp/run.go:442`（`panel.NewSnapshotPump`），而 `run.go` 是我给所有写腿划的禁区 ⇒ **`145-r3` 与票 174 `AC#2b` 合并成一程、同开这一行**（射程＝只到给 `PumpSources` 多接一根读口，不动 `:365`、不碰冻结文字）。另记我派单两把坏尺：用 `PanelSnapshot` grep 构造点必得 0（Go 侧叫 `Snapshot`）；我预解冻的 `pump_test.go:124/:276` 在无新键时不该改（顶回成立，作废）。账 `A393`。
