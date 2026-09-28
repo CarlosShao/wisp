@@ -1,127 +1,181 @@
 /* ============================================================================
-   Panel sidebar (product path, rebuilt 2026-09-28 after the first attempt
-   translated the old 9-row icon rail into 9 rows of text and called it a
-   design).
+   Panel sidebar - the WORKSPACE SESSION TREE (2026-09-28, third cut).
    ----------------------------------------------------------------------------
-   What the first attempt got wrong, recorded so it cannot come back:
+   Two cuts of this file were wrong, and both are recorded because the third
+   one is only correct if you know why the second one was not.
 
-     1. 设置 appeared TWICE - once as a row in the section list, once at the
-        bottom. The same door in two places is not a choice, it is a bug.
-     2. The section list carried all NINE legacy rail rows. Five of them
-        (命令 / 设置 / 安全 / 隐私 / 成本) are not views a person navigates
-        to: 命令 is the Ctrl+K palette, and the other four are settings
-        CATEGORIES, which live on the settings page. Putting them in the
-        sidebar made the sidebar a transcription of a retired icon strip
-        instead of a shape with a job.
-     3. No search field, even though the shape owner approved has one.
-     4. 会话历史 was a sentence pretending to be a section.
+   Cut 1 (the icon rail's successor) put nine rows in a section. Settings
+   appeared twice, and five of the nine were not navigation at all.
 
-   The shape now, top to bottom, is the approved one:
+   Cut 2 fixed that by printing the same nine rows with nicer type. It was
+   still wrong, and owner's words were: 「这不就是工作区会话的骨架树吗，怎么出来
+   什么审批，任务，球状态」 - a sidebar's job is to show you YOUR WORK, not to
+   be a menu of subsystems. So:
 
-     workspace chip -> search -> 新建对话 -> 面板 section (the four places
-     the main column can go) -> 会话历史 section (time groups) -> a hairline
-     -> 设置 / 主题.
+     审批  left the sidebar. It is a CARD that appears when a gated tool call
+           needs you, plus a count on the header. A permanent row for
+           something that is empty 99% of the time teaches you to ignore it.
+     任务  left the sidebar for the top bar's 任务监控 popover, which is where
+           a live view of running work belongs.
+     球状态 left the panel entirely. The ball is a native Direct2D surface
+           (D29) and has no business in the panel's navigation; its SETTINGS
+           live on the settings page.
+
+   What is left is the tree, and it is the shape the ?harness=1 walkthrough
+   already established: a workspace row, the sessions under it, and recent
+   sessions by time. Nothing else.
 
    Colours: token utilities only, zero literals; no emoji.
    ============================================================================ */
 
 import { Fragment, useMemo, useState } from "react";
-import { ChevronDown, Moon, Plus, Search, Settings, Sun, X } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  CircleAlert,
+  Folder,
+  Moon,
+  Plus,
+  Search,
+  Settings,
+  Sun,
+  X,
+} from "lucide-react";
 import { GlideMenu } from "@/components/ai-native/glide-menu";
 import { cn } from "@/lib/cn";
 
-/** The four places the main column can go. Each is a SECTION of the sidebar,
-    not a page of its own: clicking one swaps the main column, it does not
-    open a window. */
-export type PanelSectionId = "chat" | "approval" | "tasks" | "ball";
+/** A session row's state. The icon vocabulary is the harness's own: red alert
+    = refused, accent dot = streaming, nothing = done. */
+export type SessionState = "done" | "failed" | "streaming";
 
-/** One 会话历史 row. Empty until Go pushes a session list (ticket 166), which
-    is why the list is a prop and not a constant in this file. */
-export interface PanelSessionRow {
+export interface TreeSession {
   id: string;
   title: string;
-  /** Muted right-edge text (time or state), verbatim. */
+  state: SessionState;
+  /** Muted right-edge text (time or status), verbatim. */
   meta?: string;
 }
 
-export interface PanelSessionGroup {
-  /** 今天 / 近 7 天 / 更早. */
-  label: string;
-  rows: readonly PanelSessionRow[];
-}
-
 export interface PanelSidebarProps {
-  /** Which of the four the main column is showing. */
-  active: PanelSectionId;
-  onSelect: (id: PanelSectionId) => void;
+  /** Which session the main column is showing, or null. */
+  activeSessionId: string | null;
+  onSelectSession: (id: string) => void;
+  onNewTask: () => void;
   onOpenSettings: () => void;
   onToggleTheme: () => void;
   theme: "light" | "dark";
-  /** True while the settings page is up, so the bottom row lights as the
-      place you actually are. */
   settingsOpen: boolean;
-  /** The workspace row's two lines. Both come from the snapshot's composer
-      section; when Go has not filled it the caller passes the reason. */
+  /** The workspace line. Path comes from the snapshot's C26-resolved field. */
   workspaceName: string;
   workspacePath: string;
-  /** Native approval queue depth, or 0. Drives the 审批 badge. */
-  pendingCount: number;
-  /** Time-grouped session history. Empty array is the honest empty state. */
-  sessionGroups: readonly PanelSessionGroup[];
-  activeSessionId: string | null;
-  onSelectSession: (id: string) => void;
+  /** Sessions under the workspace row. Empty today (ticket 166 owns the feed). */
+  workspaceSessions: readonly TreeSession[];
+  /** Recent sessions by time bucket (今天 / 近 7 天 / 更早). */
+  historyGroups: readonly { label: string; rows: readonly TreeSession[] }[];
 }
 
-/** 面板 section 的四行。写死在这里而不是从 panel-views 过滤，是有意的：
-    那张表是「屏的词汇表」（门禁按它查图标名），不是「侧栏该显示几行」。
-    两者混过一次，代价是设置出现在两个地方。 */
-const SECTION_ROWS: readonly { id: PanelSectionId; label: string; hint: string }[] = [
-  { id: "chat", label: "对话", hint: "当前这次对话" },
-  { id: "approval", label: "审批", hint: "等你点头的操作" },
-  { id: "tasks", label: "任务", hint: "正在跑和排队的活" },
-  { id: "ball", label: "球状态", hint: "悬浮球现在在哪个态" },
-];
-
-function SectionHeader({ label, action }: { label: string; action?: React.ReactNode }) {
+function SectionHeader({ label }: { label: string }) {
   return (
-    <div className="flex items-center gap-1 px-2 pb-1 pt-2 text-[10.5px] font-medium tracking-[0.08em] text-ink-3">
-      <span className="min-w-0 flex-1 truncate">{label}</span>
-      {action}
+    <div className="px-2 pb-1 pt-2 text-[10.5px] font-medium tracking-[0.08em] text-ink-3">
+      {label}
     </div>
   );
 }
 
-export function PanelSidebar({
+/** The leading state glyph on a session row. A leaf slot is kept for `done` so
+    every row's text starts at the same x - a column that jitters when a
+    session changes state is unreadable. */
+function StateGlyph({ state }: { state: SessionState }) {
+  return (
+    <span className="flex w-3.5 shrink-0 justify-center">
+      {state === "failed" ? (
+        <CircleAlert aria-hidden="true" className="shrink-0 text-red" size={12} strokeWidth={2} />
+      ) : state === "streaming" ? (
+        <span aria-hidden="true" className="block size-1.5 rounded-full bg-accent" />
+      ) : null}
+    </span>
+  );
+}
+
+function SessionRow({
+  session,
   active,
   onSelect,
+  indent,
+}: {
+  session: TreeSession;
+  active: boolean;
+  onSelect: () => void;
+  indent: number;
+}) {
+  return (
+    <button
+      type="button"
+      aria-current={active ? "page" : undefined}
+      aria-label={session.title}
+      data-menu-row
+      onClick={onSelect}
+      style={{ paddingLeft: 8 + indent * 12 }}
+      className={cn(
+        // relative z-10: the GlideMenu highlight is an absolutely-positioned
+        // sibling and paints OVER any row that does not raise itself. Omitting
+        // it hid the 设置 label behind a grey bar on 2026-09-28.
+        "relative z-10 flex w-full items-center gap-1.5 rounded-[7px] py-1.5 pr-2 text-left transition-[color,transform] duration-150 active:scale-[0.96]",
+        active ? "font-medium text-ink" : "text-ink-2",
+      )}
+    >
+      {/* Where you are is a FIXED accent bar, never the hover block: the
+          highlight glides, and a marker that glides is a marker you lose. */}
+      {active ? (
+        <span
+          aria-hidden="true"
+          className="absolute bottom-1.5 left-1 top-1.5 w-[2px] rounded-full bg-accent"
+        />
+      ) : null}
+      <StateGlyph state={session.state} />
+      <span className="min-w-0 flex-1 truncate text-[13px]">{session.title}</span>
+      {session.meta ? (
+        <span className="shrink-0 text-[10.5px] tabular-nums text-ink-3">{session.meta}</span>
+      ) : null}
+    </button>
+  );
+}
+
+export function PanelSidebar({
+  activeSessionId,
+  onSelectSession,
+  onNewTask,
   onOpenSettings,
   onToggleTheme,
   theme,
   settingsOpen,
   workspaceName,
   workspacePath,
-  pendingCount,
-  sessionGroups,
-  activeSessionId,
-  onSelectSession,
+  workspaceSessions,
+  historyGroups,
 }: PanelSidebarProps) {
   const [query, setQuery] = useState("");
+  const [workspaceOpen, setWorkspaceOpen] = useState(true);
   const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(new Set());
 
-  // The search box filters the history below it. Memoised so the array keeps
-  // its identity across renders: a projection built inline gets a fresh
-  // identity every render, and any effect keyed on it spins (this tree hit a
-  // Maximum-update-depth loop that way once already - see sidebar.tsx).
+  // The search box filters the tree under it. Memoised so the arrays keep their
+  // identity: a projection built inline gets a fresh one every render, and any
+  // effect keyed on it spins (this tree already hit a Maximum-update-depth loop
+  // that way - see harness/sidebar.tsx).
   const q = query.trim().toLowerCase();
-  const shownGroups = useMemo(
+  const shownWorkspace = useMemo(
+    () => (q ? workspaceSessions.filter((s) => s.title.toLowerCase().includes(q)) : workspaceSessions),
+    [workspaceSessions, q],
+  );
+  const shownHistory = useMemo(
     () =>
-      sessionGroups
-        .map((group) => ({
-          ...group,
-          rows: q ? group.rows.filter((row) => row.title.toLowerCase().includes(q)) : group.rows,
+      historyGroups
+        .map((g) => ({
+          ...g,
+          rows: q ? g.rows.filter((s) => s.title.toLowerCase().includes(q)) : g.rows,
         }))
-        .filter((group) => group.rows.length > 0),
-    [sessionGroups, q],
+        .filter((g) => g.rows.length > 0),
+    [historyGroups, q],
   );
 
   function toggleGroup(label: string) {
@@ -133,25 +187,21 @@ export function PanelSidebar({
     });
   }
 
-  const historyEmpty = shownGroups.length === 0;
+  const nothingToShow = shownWorkspace.length === 0 && shownHistory.length === 0;
 
   return (
     <aside className="flex h-full w-60 min-w-60 shrink-0 flex-col border-r border-line bg-surface">
-      <nav
-        aria-label="面板导航"
-        className="flex min-h-0 flex-1 flex-col overflow-y-auto p-2"
-      >
-        {/* 工作区行：名字 + 路径。路径是快照里 C26 授权后的那条，不是用户
-            输入框里还没提交的那条。 */}
+      <nav aria-label="工作区会话" className="flex min-h-0 flex-1 flex-col overflow-y-auto p-2">
+        {/* workspace row: the root of the tree */}
         <button
-          title={workspacePath}
           type="button"
-          className="mb-2 flex w-full items-center gap-2.5 rounded-control p-1.5 text-left transition-[background-color,transform] duration-100 hover:bg-hover active:scale-[0.96]"
+          title={workspacePath}
+          className="mb-1.5 flex w-full items-center gap-2.5 rounded-control p-1.5 text-left transition-[background-color,transform] duration-100 hover:bg-hover active:scale-[0.96]"
         >
           <span className="flex size-8 shrink-0 items-center justify-center rounded-[8px] bg-ink text-[13px] font-semibold text-surface">
-            {/* The monogram is W, not the first character of 一缕: a lone
-                horizontal stroke in a dark tile reads as a minus sign, which
-                is the one thing a workspace chip must not look like. */}
+            {/* W, not 一: a lone horizontal stroke in a dark tile reads as a
+                minus sign, which is the one thing a workspace chip must not
+                look like. */}
             W
           </span>
           <span className="min-w-0 flex-1">
@@ -162,10 +212,12 @@ export function PanelSidebar({
               {workspacePath}
             </span>
           </span>
+          <ChevronDown aria-hidden="true" className="shrink-0 rotate-180 text-ink-3" size={12} strokeWidth={2} />
         </button>
 
-        {/* 搜索：过滤下面的会话历史。有内容时让位给清除键，否则给 "/" 角标
-            —— 一个角标承诺的键，必须真的有监听器接它。 */}
+        {/* search: filters the tree. The clear button replaces the "/" chip
+            while there is something to clear - a key hint that never gives way
+            teaches people to stop reading the box. */}
         <label className="mb-1 flex h-8 items-center gap-2 rounded-control bg-inset px-2.5 shadow-hairline">
           <Search aria-hidden="true" className="shrink-0 text-ink-3" size={12} strokeWidth={2} />
           <input
@@ -191,139 +243,114 @@ export function PanelSidebar({
           )}
         </label>
 
-        {/* 主行动：新建对话。整页 harness 的 accent 行 + 加号徽章圆。 */}
         <button
           type="button"
-          onClick={() => onSelect("chat")}
+          onClick={onNewTask}
           className="mb-1 flex w-full items-center gap-2 rounded-control px-2 py-1.5 text-[13px] font-medium text-accent transition-[background-color,transform] duration-100 hover:bg-accent-tint active:scale-[0.96]"
         >
-          <span className="min-w-0 flex-1 truncate text-left">新建对话</span>
+          <span className="min-w-0 flex-1 truncate text-left">新建任务</span>
           <span className="flex size-4 shrink-0 items-center justify-center rounded-full bg-accent text-white">
             <Plus aria-hidden="true" size={9} strokeWidth={3} />
           </span>
         </button>
 
-        <GlideMenu
-          className="flex flex-col gap-0.5"
-          highlightClassName="inset-x-0 rounded-[7px] bg-hover"
-        >
-          {/* ── 面板区段：主栏能去的四个地方 ─────────────────────────────── */}
+        <GlideMenu className="flex flex-col gap-0.5" highlightClassName="inset-x-0 rounded-[7px] bg-hover">
+          {/* ── 工作区：项目行 + 挂在它下面的会话 ────────────────────────── */}
           <div>
-            <SectionHeader label="面板" />
-            <div className="flex flex-col gap-px">
-              {SECTION_ROWS.map((row) => {
-                const on = row.id === active;
-                return (
-                  <button
-                    key={row.id}
-                    type="button"
-                    aria-current={on ? "page" : undefined}
-                    aria-label={row.label}
-                    title={row.hint}
-                    data-menu-row
-                    onClick={() => onSelect(row.id)}
-                    className={cn(
-                      "relative z-10 flex w-full items-center gap-2 rounded-[7px] py-1.5 pr-2 text-left transition-[color,transform] duration-150 active:scale-[0.96]",
-                      on ? "pl-3.5 font-medium text-ink" : "pl-3.5 text-ink-2",
-                    )}
-                  >
-                    {/* 你在这一行：一根不动的 accent 左标。hover 滑块会滑走，
-                        「我在这」不能跟着滑走。 */}
-                    {on ? (
-                      <span
-                        aria-hidden="true"
-                        className="absolute bottom-1.5 left-1 top-1.5 w-[2px] rounded-full bg-accent"
-                      />
-                    ) : null}
-                    <span className="min-w-0 flex-1 truncate text-[13px]">{row.label}</span>
-                    {row.id === "approval" && pendingCount > 0 ? (
-                      <span className="shrink-0 rounded-full bg-accent-tint px-1.5 py-px text-[10.5px] font-medium tabular-nums text-accent-ink">
-                        {pendingCount}
-                      </span>
-                    ) : null}
-                  </button>
-                );
-              })}
-            </div>
+            <SectionHeader label="工作区" />
+            <button
+              type="button"
+              aria-expanded={workspaceOpen}
+              aria-label={workspaceName}
+              data-menu-row
+              onClick={() => setWorkspaceOpen((v) => !v)}
+              className="relative z-10 flex w-full items-center gap-1.5 rounded-[7px] px-2 py-1.5 text-left transition-[color,transform] duration-150 active:scale-[0.96]"
+            >
+              <ChevronRight
+                aria-hidden="true"
+                className={cn("shrink-0 text-ink-3 transition-transform duration-150", workspaceOpen && "rotate-90")}
+                size={10}
+                strokeWidth={2.2}
+              />
+              <Folder aria-hidden="true" className="shrink-0 text-ink-2" size={13} strokeWidth={1.8} />
+              <span className="min-w-0 flex-1 truncate text-[13px] text-ink-2">{workspaceName}</span>
+              {shownWorkspace.length > 0 ? (
+                <span className="shrink-0 text-[10.5px] tabular-nums text-ink-3">{shownWorkspace.length}</span>
+              ) : null}
+            </button>
+            {workspaceOpen && shownWorkspace.length > 0 ? (
+              <div className="flex flex-col gap-px">
+                {shownWorkspace.map((session) => (
+                  <SessionRow
+                    active={session.id === activeSessionId}
+                    indent={1}
+                    key={session.id}
+                    onSelect={() => onSelectSession(session.id)}
+                    session={session}
+                  />
+                ))}
+              </div>
+            ) : null}
+            {/* The empty line lives UNDER the project row, where a file tree
+                puts it. It was floating between the row and the next section,
+                which read as a status message about the sidebar rather than as
+                "this folder has nothing in it yet". */}
+            {workspaceOpen && shownWorkspace.length === 0 ? (
+              <p className="py-1 pl-6 pr-2 text-[11.5px] leading-[1.6] text-ink-3">
+                {q ? "没有匹配的会话。" : "这个工作区下还没有会话。"}
+              </p>
+            ) : null}
           </div>
 
-          {/* ── 会话历史区段：按时间分组，可折叠；空时是一句实话 ─────────── */}
-          <div>
-            <SectionHeader label="会话历史" />
-            {historyEmpty ? (
-              <p className="px-3 py-2 text-[12px] leading-[1.6] text-ink-3">
-                {q ? `没有匹配「${query.trim()}」的会话` : "还没有会话"}
-                {!q ? "。面板不自己造会话，原生侧推送后这里才会有内容。" : "。"}
-              </p>
-            ) : (
-              shownGroups.map((group) => {
-                const shut = collapsed.has(group.label);
-                return (
-                  <Fragment key={group.label}>
-                    <button
-                      type="button"
-                      aria-expanded={!shut}
-                      onClick={() => toggleGroup(group.label)}
-                      className="flex w-full items-center gap-1 px-2 pb-0.5 pt-1 text-[10.5px] font-medium tracking-[0.06em] text-ink-3"
-                    >
-                      <ChevronDown
-                        aria-hidden="true"
-                        className={cn(
-                          "shrink-0 transition-transform duration-150",
-                          shut && "-rotate-90",
-                        )}
-                        size={10}
-                        strokeWidth={2.2}
+          {/* ── 最近任务：按时间分组，可折叠 ─────────────────────────────── */}
+          {shownHistory.map((group) => {
+            const shut = collapsed.has(group.label);
+            return (
+              <Fragment key={group.label}>
+                <SectionHeader label={group.label} />
+                <button
+                  type="button"
+                  aria-expanded={!shut}
+                  onClick={() => toggleGroup(group.label)}
+                  className="flex w-full items-center gap-1 px-2 pb-0.5 text-[10.5px] font-medium tracking-[0.06em] text-ink-3"
+                >
+                  <ChevronDown
+                    aria-hidden="true"
+                    className={cn("shrink-0 transition-transform duration-150", shut && "-rotate-90")}
+                    size={10}
+                    strokeWidth={2.2}
+                  />
+                  <span className="min-w-0 flex-1 truncate text-left">{group.label}</span>
+                  <span className="shrink-0 tabular-nums">{group.rows.length}</span>
+                </button>
+                {!shut && (
+                  <div className="flex flex-col gap-px">
+                    {group.rows.map((session) => (
+                      <SessionRow
+                        active={session.id === activeSessionId}
+                        indent={1}
+                        key={session.id}
+                        onSelect={() => onSelectSession(session.id)}
+                        session={session}
                       />
-                      <span className="min-w-0 flex-1 truncate text-left">{group.label}</span>
-                    </button>
-                    {!shut && (
-                      <div className="flex flex-col gap-px">
-                        {group.rows.map((row) => {
-                          const on = row.id === activeSessionId;
-                          return (
-                            <button
-                              key={row.id}
-                              type="button"
-                              aria-current={on ? "page" : undefined}
-                              data-menu-row
-                              onClick={() => onSelectSession(row.id)}
-                              className={cn(
-                                "relative z-10 flex w-full items-center gap-2 rounded-[7px] py-1.5 pr-2 text-left transition-[color,transform] duration-150 active:scale-[0.96]",
-                                on ? "pl-3.5 font-medium text-ink" : "pl-3.5 text-ink-2",
-                              )}
-                            >
-                              {on ? (
-                                <span
-                                  aria-hidden="true"
-                                  className="absolute bottom-1.5 left-1 top-1.5 w-[2px] rounded-full bg-accent"
-                                />
-                              ) : null}
-                              <span className="min-w-0 flex-1 truncate text-[13px]">{row.title}</span>
-                              {row.meta ? (
-                                <span className="shrink-0 text-[10.5px] tabular-nums text-ink-3">
-                                  {row.meta}
-                                </span>
-                              ) : null}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </Fragment>
-                );
-              })
-            )}
-          </div>
+                    ))}
+                  </div>
+                )}
+              </Fragment>
+            );
+          })}
         </GlideMenu>
+
+        {nothingToShow && q ? (
+          <p className="px-3 py-2 text-[12px] leading-[1.6] text-ink-3">
+            没有匹配「{query.trim()}」的会话。
+          </p>
+        ) : null}
       </nav>
 
-      {/* ── 底部：设置与主题。设置在这张侧栏里只出现这一次 ────────────────
-          The rows carry relative z-10 for the same reason the nav rows do:
-          the GlideMenu highlight block is an absolutely-positioned sibling, and
-          without the z-index it paints OVER the label. That shipped as a grey
-          bar where 设置 should have been - the button was still clickable,
-          which is exactly why nobody noticed. */}
+      {/* bottom: settings and theme. 设置 appears exactly ONCE in this whole
+          sidebar - the duplicate shipped on 2026-09-27 and the gate now pins
+          the count. */}
       <GlideMenu
         className="flex flex-col gap-1 border-t border-line p-2"
         highlightClassName="inset-x-2 rounded-[7px] bg-hover"
@@ -340,10 +367,7 @@ export function PanelSidebar({
           )}
         >
           {settingsOpen ? (
-            <span
-              aria-hidden="true"
-              className="absolute bottom-1.5 left-0.5 top-1.5 w-[2px] rounded-full bg-accent"
-            />
+            <span aria-hidden="true" className="absolute bottom-1.5 left-0.5 top-1.5 w-[2px] rounded-full bg-accent" />
           ) : null}
           <Settings aria-hidden="true" size={13} strokeWidth={1.8} />
           设置

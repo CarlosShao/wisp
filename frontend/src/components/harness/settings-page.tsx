@@ -90,6 +90,15 @@ const CATEGORIES: readonly Category[] = [
     purpose: "首次使用的几步，以及随时能重看的说明。",
     waiting: "还没收到引导进度。首启那套画面在首启屏上，不在这里重画一遍。",
   },
+  {
+    // 球状态 was a row in the left sidebar until 2026-09-28. Owner: 「这个球
+    // 是识别语音才会出来的，特么要是球的设置，那就放设置里去，要是球本身，那
+    // 就不应该出现在主面板」. The ball itself is a native Direct2D surface
+    // (D29) and has no business being navigated to; its SETTINGS are here.
+    name: "悬浮球",
+    purpose: "球的大小、空闲透明度、鼠标穿透、唤醒词、热键。",
+    waiting: "还没读到球的配置。球是原生画的（D29），页面改不到它——这几项归原生侧，面板只读不写。",
+  },
 ];
 
 export function SettingsPage({

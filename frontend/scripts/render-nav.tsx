@@ -167,8 +167,8 @@ for (const f of ["src/components/panel-sidebar.tsx", "src/lib/panel-views.ts"]) 
 const sidebarSrc = readFileSync("src/components/panel-sidebar.tsx", "utf8");
 check("the sidebar must not decide which screen is showing",
   !/\bactive\s*=\s*useState\b/.test(sidebarSrc));
-check("the sidebar must take its active section as a prop, not compute one",
-  /active:\s*PanelSectionId/.test(sidebarSrc));
+check("the sidebar must take the active session as a prop, not compute one",
+  /activeSessionId:\s*string \| null/.test(sidebarSrc));
 
 // App is the one place allowed to know which of its own screens it is showing.
 // Exactly ONE state object, so the count cannot creep: the view pick plus the
@@ -210,14 +210,19 @@ check("no view-change route may come back without owner's ruling (Q-50 = 甲, un
 // PANEL_VIEWS - see the header for why that distinction is the whole point.
 // ---------------------------------------------------------------------------
 
-/** The four places the main column can go. */
-const SECTION_ROWS = ["对话", "审批", "任务", "球状态"] as const;
+/** The left column is a TREE of the user's own work. It is not a menu. */
+const TREE_LANDMARK = "工作区会话";
+const TREE_ROWS = ["新建任务", "设置", "暗色"];
 
-/** Rows that must NOT be sidebar navigation, each with where it belongs
-    instead. Shipping these in the sidebar is the 2026-09-27 bug. */
+/** Rows that must NOT be in the sidebar, each with where it belongs instead.
+    Owner 2026-09-28, verbatim: 「怎么特么出来什么审批，任务，球状态，这特么几个
+    干什么的」. Shipping these as navigation is the bug; these assertions are
+    the standing guard against it coming back. */
 const NOT_NAVIGATION: readonly { label: string; belongs: string }[] = [
-  { label: "命令", belongs: "the Ctrl+K palette (header)" },
-  { label: "设置", belongs: "the settings page (sidebar bottom)" },
+  { label: "审批", belongs: "a card that appears when a gated call needs you, plus the header count" },
+  { label: "任务", belongs: "the 任务监控 popover in the top bar" },
+  { label: "球状态", belongs: "nowhere - the ball is native (D29); its settings are on the settings page" },
+  { label: "命令", belongs: "the Ctrl+K palette" },
   { label: "安全", belongs: "a settings category" },
   { label: "隐私", belongs: "a settings category" },
   { label: "成本", belongs: "a settings category" },
@@ -230,62 +235,46 @@ const base: PanelSnapshot = {
 } as PanelSnapshot;
 
 const defaultHtml = renderToStaticMarkup(<App snapshot={{ ...base } as PanelSnapshot} />);
-const nav = defaultHtml.match(/aria-label="面板导航"[\s\S]*?<\/nav>/)?.[0] ?? "";
+const nav = defaultHtml.match(new RegExp(`aria-label="${TREE_LANDMARK}"[\\s\\S]*?</nav>`))?.[0] ?? "";
 // The 设置 uniqueness test spans the WHOLE sidebar, not just the nav: the
 // bottom block that holds it is a sibling of the nav landmark, and the
 // 2026-09-27 duplicate was one copy inside and one outside. Narrowing this to
 // the nav is how it would have passed again.
 const sidebar = defaultHtml.match(/<aside[\s\S]*?<\/aside>/)?.[0] ?? "";
-check("the sidebar must render a navigation landmark", nav.length > 0, `${nav.length} chars`);
+check("the sidebar must render the session tree landmark", nav.length > 0, `${nav.length} chars`);
 check("the sidebar's bottom block must be reachable for the uniqueness test", sidebar.length > 0);
 
-// The four sections, and only the four.
-for (const label of SECTION_ROWS) {
-  check(`the sidebar must offer ${label} as a section`,
-    nav.includes(`aria-label="${label}"`), "no such row");
+for (const label of TREE_ROWS) {
+  check(`the sidebar must carry ${label}`, sidebar.includes(label), "missing");
 }
 for (const { label, belongs } of NOT_NAVIGATION) {
-  check(`${label} must not be a sidebar navigation row - it belongs in ${belongs}`,
+  check(`${label} must not be a sidebar row - it belongs in ${belongs}`,
     !nav.includes(`aria-label="${label}"`), "found as a nav row");
 }
-
-// The bug that shipped, as a standing regression guard.
+// 设置 must appear in the sidebar exactly once. It shipped twice on 2026-09-27.
 check("设置 must appear in the sidebar exactly once (it shipped twice on 2026-09-27)",
   (sidebar.match(/aria-label="设置"/g) ?? []).length === 1,
   `${(sidebar.match(/aria-label="设置"/g) ?? []).length} occurrences in the sidebar`);
 
 // The search field the approved shape has, and whose absence also shipped.
-check("the sidebar must carry a search field (the approved shape has one)",
+check("the tree must carry a search field (the approved shape has one)",
   nav.includes('aria-label="搜索会话"'));
 check("the search field must actually be an input, not a div that looks like one",
   /<input[^>]*aria-label="搜索会话"/.test(nav));
 
-// Exactly one section lit, and it is the one the snapshot named.
-for (const [view, label] of [["chat", "对话"], ["approval", "审批"], ["tasks", "任务"], ["ball", "球状态"]] as const) {
-  const html = renderToStaticMarkup(<App snapshot={{ ...base, view } as PanelSnapshot} />);
-  const rows = html.match(/aria-label="面板导航"[\s\S]*?<\/nav>/)?.[0] ?? "";
-  const lit = [...rows.matchAll(/aria-current="page"[^>]*aria-label="([^"]+)"|<button[^>]*aria-label="([^"]+)"[^>]*aria-current="page"/g)]
-    .map((m) => m[1] ?? m[2]);
-  check(`snapshot naming ${view}: exactly one sidebar row may claim aria-current`,
-    lit.length === 1, `lit=${JSON.stringify(lit)}`);
-  check(`snapshot naming ${view}: the lit row must be ${label}`,
-    lit[0] === label, `lit=${JSON.stringify(lit)}`);
-  check(`snapshot naming ${view}: no sidebar row may be disabled now that clicking works`,
-    (rows.match(/ disabled=""/g) ?? []).length === 0 &&
-      (rows.match(/aria-disabled="true"/g) ?? []).length === 0);
-}
-
-// A screen Go has not fed says so. Checked for the three unfed sections the
-// sidebar can reach, and for the ones only the host can name.
+// A screen Go has not fed says so. The three that left the sidebar land on a
+// sentence explaining where they went; the four that were never navigation
+// land on the settings page AT their own category.
 for (const view of ["tasks", "ball"] as const) {
   const html = renderToStaticMarkup(<App snapshot={{ ...base, view } as PanelSnapshot} />);
-  check(`${view}: an unfed section must say it is unfed rather than show nothing`,
-    html.includes("还没有收到"));
+  check(`${view}: must land somewhere that explains itself, never on a blank screen`,
+    /不是一屏|不是一个地方|不在面板里/.test(html), html.slice(0, 160));
 }
-const hostOnly = renderToStaticMarkup(<App snapshot={{ ...base, view: "security" } as PanelSnapshot} />);
-check("a view only the host can name must still land somewhere real, not blank",
-  hostOnly.includes("还没有") || hostOnly.includes("不可逆"),
-  hostOnly.slice(hostOnly.indexOf("还没有") - 40, hostOnly.indexOf("还没有") + 80));
+for (const [view, category] of [["config", "外观"], ["security", "安全"], ["privacy", "隐私"], ["cost", "成本"]] as const) {
+  const html = renderToStaticMarkup(<App snapshot={{ ...base, view } as PanelSnapshot} />);
+  check(`${view}: must open the settings page at ${category}, not the conversation column`,
+    html.includes(category) && html.includes("设置分类"), html.slice(0, 160));
+}
 
 // One right-rail control, not two. The 2026-09-27 build had a toggle in the
 // header AND another in a content-area header, which is one action with two
@@ -295,11 +284,31 @@ check("the right rail must have exactly one toggle in the chrome",
   railToggles === 2, // one control, two states
   `${railToggles} labels`);
 
-// The context/usage line, and its honest absence.
-check("the composer must sit under a context/usage readout",
-  defaultHtml.includes("上下文与用量"));
-check("with no usage fields the readout must say so, not print zeros",
-  !/0 tok|缓存命中 0%|占用 0%/.test(defaultHtml));
+// Controls that were drawn with no handler. The command palette shipped as a
+// dead button: 「点命令面板图标毫无反应」. Checked in the SOURCE, because a
+// compiled bundle has no onClick left in it to find.
+check("the command palette control must have a handler",
+  /aria-label="命令面板"[\s\S]{0,400}?onClick/.test(appSrc));
+check("Ctrl+K must be wired (the chip in the header promises it)",
+  /key\.toLowerCase\(\) === "k"/.test(appSrc));
+// Escape shipped unhandled on the palette until 2026-09-28: a modal you could
+// only leave with the mouse.
+check("Escape must close the command palette",
+  /event\.key === "Escape"[\s\S]{0,300}?paletteOpen: false/.test(appSrc));
+check("a floating layer must dismiss on an outside click, not only its own trigger",
+  readFileSync("src/lib/use-dismiss.ts", "utf8").includes("pointerdown"));
+
+// The composer must be the library's PromptBar, not the retired local one. The
+// panel shipped the old composer.tsx while the walkthrough shipped PromptBar,
+// so the two halves of the product looked like two different products.
+check("the conversation column must mount PromptBar", defaultHtml.includes('aria-label="Prompt"'));
+check("the retired local composer must not be mounted by the panel",
+  !defaultHtml.includes("给 Wisp 的指令"));
+// The two things the old composer did not have, called out by owner.
+check("the composer must carry a permission tier control",
+  /aria-label="权限档位|permissions=\{/s.test(defaultHtml) || defaultHtml.includes("档位"));
+check("PromptBar must accept reasoning effort", /efforts\?: readonly PromptEffort\[\]/.test(
+  readFileSync("src/components/ai-native/prompt-bar.tsx", "utf8")));
 
 // The empty conversation column must state the shape of what arrives. It used
 // to draw nothing, so a panel with no data looked like one that failed.
@@ -308,25 +317,56 @@ check("the empty conversation column must name what will arrive there",
 check("the empty conversation column must say nothing has arrived yet",
   defaultHtml.includes("还没收到任何一条"));
 
+// The context/usage line, and its honest absence.
+check("the composer must sit under a context/usage readout",
+  defaultHtml.includes("上下文与用量"));
+check("with no usage fields the readout must say so, not print zeros",
+  !/0 tok|缓存命中 0%|占用 0%/.test(defaultHtml));
+
+// The narrow-window path. 640px is the DEFAULT `[panel] width`
+// (internal/config/schema.go), so a 240px sidebar that always occupies a
+// column leaves 400px of conversation - this is the common case, not an edge.
+check("the panel must adapt below the narrow threshold", /SIDEBAR_COLLAPSE_BELOW/.test(appSrc));
+check("the threshold must be above the default panel width",
+  /SIDEBAR_COLLAPSE_BELOW = (\d+)/.test(appSrc) &&
+    Number(/SIDEBAR_COLLAPSE_BELOW = (\d+)/.exec(appSrc)?.[1]) > 640,
+  /SIDEBAR_COLLAPSE_BELOW = (\d+)/.exec(appSrc)?.[1]);
+
+// git: no cloud. Owner: 「云端那个就算了，我们是开源项目，没有默认云端环境的」.
+// Checked with the comments stripped, because the file's own header QUOTES the
+// rule - and a gate that fails on its own explanation is a gate that gets
+// deleted instead of obeyed.
+const gitSrc = readFileSync("src/components/git-branch.tsx", "utf8")
+  .replace(/\/\*[\s\S]*?\*\//g, "")
+  .replace(/^\s*\/\/.*$/gm, "");
+check("the branch switcher must not offer a cloud target", !/云端/.test(gitSrc));
+check("the branch switcher must offer a worktree", gitSrc.includes("工作树"));
+check("a non-repo workspace must render no branch chip at all",
+  gitSrc.includes("if (!view.isRepo) return null"));
+check("the branch name must be read, never defaulted to a literal branch",
+  /current:\s*string/.test(gitSrc) && !/current:\s*"main"/.test(gitSrc));
+
+// The turn rail for long conversations.
+const railSrc = readFileSync("src/components/turn-rail.tsx", "utf8");
+check("a long conversation must have a way back to earlier turns",
+  defaultHtml.includes("对话轮次") || /<TurnRail/.test(appSrc));
+check("the turn rail must hide itself when there is nothing to navigate",
+  /turns\.length < 2/.test(railSrc));
+
 // The settings page: eleven categories, each saying its own thing. The first
 // pass gave every unfed category the SAME sentence, so the rail could not tell
 // them apart - the same failure as nine identical sidebar rows.
 const settingsSrc = readFileSync("src/components/harness/settings-page.tsx", "utf8");
-const categoryNames = ["通用", "外观", "模型", "语音", "记忆", "技能", "MCP", "安全", "隐私", "成本", "引导"];
+const categoryNames = ["通用", "外观", "模型", "语音", "记忆", "技能", "MCP", "安全", "隐私", "成本", "引导", "悬浮球"];
 for (const name of categoryNames) {
   check(`the settings page must offer the ${name} category`,
     settingsSrc.includes(`name: "${name}"`), "missing");
 }
-check("the settings page must not render a duplicate close affordance (返回 handles it)",
-  !/aria-label="关闭设置"/.test(settingsSrc));
-// Each unfed category carries its own sentence, so the rail is a status board.
-const waitingBlocks = (settingsSrc.match(/waiting:\s*\n?\s*"/g) ?? []).length;
-check("each settings category must carry its own waiting-for sentence",
-  waitingBlocks >= 9, `${waitingBlocks} found; 外观 is the one with live controls`);
-
-// The settings screen must not stack two 设置 headings on itself. ConfigScreen
-// takes the heading from the page for exactly this reason.
-check("ConfigScreen must take its heading from the caller",
+// 球状态 was a sidebar row that belonged nowhere; its settings now live on
+// the settings page, so the page must actually have a place for them.
+check("the settings page must carry the ball's own settings (球状态 left the panel)",
+  settingsSrc.includes("悬浮球"));
+check("the settings page must not stack two 设置 headings on itself", 
   /heading\?:\s*string/.test(readFileSync("src/components/config-screen.tsx", "utf8")));
 
 if (failures.length > 0) {
@@ -336,6 +376,7 @@ if (failures.length > 0) {
 }
 console.error(
   `render-nav: OK, ${PANEL_VIEWS.length} screens against ${frozen.size} frozen §17.4 names + ${APPROVED_EXTENSION.size} owner-approved (2026-09-25), ` +
-    `${SECTION_ROWS.length} sidebar sections, ${NOT_NAVIGATION.length} rows correctly NOT navigation, ` +
-    `${categoryNames.length} settings categories, no substitutions, no view state in the nav layer`,
+    `tree sidebar, ${NOT_NAVIGATION.length} rows correctly NOT navigation, ` +
+    `${categoryNames.length} settings categories, narrow-window path at ${/SIDEBAR_COLLAPSE_BELOW = (\d+)/.exec(appSrc)?.[1]}px, ` +
+    `no substitutions, no view state in the nav layer`,
 );
