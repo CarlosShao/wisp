@@ -72,3 +72,5 @@ Git：只 commit 不 push；`git add -A`／`git add .`／`commit -a` 一律禁�
 ## Progress log
 
 - 09-28 09:5x 编排者立票：上面 8 把尺全部本程现跑（锚 `cf527f32`，`git status --porcelain -- internal/ cmd/` 空）。未派。
+
+- 09-28 10:3x 写手程 `179-r1` 落第一／二枚 commit（`ec520750` 修法＋三枚常驻判据、`b6c34d34` AC#6 两枚指针），交件表 `docs/evidence/s1/179-declared-l0-refused-r1.md`。**AC 框一枚没勾**：AC#2/#3/#4/#5/#6 做完且测过，AC#1 没跑成（`176-r1` 台件在本机不带 PATH 就是 `0xc0000135`，我没重跑那发 7 次拒绝），AC#7 部分（三包 PASS＋gofumpt 空，d22scan／runtests／gate-clauses 三枚读数落在最后一枚 commit 之后取，逐字在交件回复），AC#8 未结案（真机 CLI 上 `task.output` 已执行、那句"风险未分级"已消失，但 `fs.read` 续读那一发断在**我自己台件**的 rig 判据形状——我用 content 文本找 call id，而 call id 在 `tool_call_id` 字段里；**没有**冒出 L2／R4／"查不到这个任务"）。两笔要报的不符：起手 HEAD＝`039efb47`（派单写 `cf527f32`，两者间只有文档件）；票面第 13 段"桥具的两枚测试工具恰好声明成 L0"行号属 `blockingProvider`，`newHarness` 默认那枚 `NewEchoProvider()`（`internal/agent/tools.go:123-131`）**根本不写 RiskLevel**，所以既有 loop 用例是靠"未分级＋开关开着"走过去，我的正向判据因此自建声明 L0 目录。工具调用 55/55，到顶停手。
