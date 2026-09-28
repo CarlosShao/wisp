@@ -53,6 +53,7 @@
   **(c)** 接受歧义并在 `docs/reports` 里明写"取证面不区分自动放行与人工批准"。⇒ 三形都不许顺手动 `riskColumn`（第 7 把尺裁定它按现有 schema 是对的）。
 - [ ] **AC#6 判"错误被丢掉"那一支要不要单独归口**：`internal/agent/journal.go:101` 的 `_ =`——如果校验今天可能失败（枚举例如写入者给了没登记的值），那**取证行会静默消失**。⇒ 现量：今天有没有任何生产路径会给 `DecideToolCall` 传一枚不在 map 里的值（尺：`grep -rn "DecideToolCall\|j.decide(" --include=*.go internal/ | grep -v _test.go`，逐枚看传入值来源）。判"要单开立票"就**停手报回**，别在本票里顺手改。
 - [ ] **AC#7 门禁（只读票也要跑一次全仓那一档）**：`sh scripts/d22scan.sh`（⚠ 现量在册基线：`ban #8 internal/` **431**，取数时刻 09-28 11:2x 由 `179-r2` 钉；你这一跑只要**不涨**，涨了就是你带了写件进来）＋ `bash .scratch/wisp/probes/154/gate-clauses.sh` **比红腿名册不比退码**（今天在册唯一红腿＝`G6neg`＝票 178；尺：`grep "BAD" <输出> | grep -oE "腿=G[0-9a-z]+" | sort -u` ＋ `comm -3`）＋ `git status --porcelain -- internal/ cmd/` 终态为空。**不许**跑 `probes/161/r6/flip-declaration.sh`（跑一次就脏跟踪日志）。
+  > ⚠ **09-28 12:5x 编排者追加的排程约束（今天有效）**：本格**放在最后一步跑**，且跑之前先看 `git status --porcelain -- internal/ cmd/`——同机此刻有程在 `internal/risk/**` 上做变异，**吃脏件换来的"红"或"绿"都不算读数**；跑不动就记〔未取到·争用〕并具名说明（本编队的老规矩：响亮拒绝胜过假绿）。另 `ban #8 internal/` 若从 431 变 **432**，那是 `183-r1` 新判据件的账，**不是回退**。
 - [ ] **AC#8 契约轴禁令**：`docs/PLAN.md`、`docs/specs/**`、`internal/memory/schema.go`／`models.go`、`thresholds.go`／golden／审批超时常量／`allowlist.txt` **一字节不许动**；**不许新增 `decision` 值**；不许改 `riskColumn`。⇒ 判"必须动这些才答得清"＝**停手上报**（那是要我批准，不是你自己决定）。
 - [ ] **AC#9 交件表**落 `docs/evidence/s1/184-audit-vocabulary-census-c1.md`，含：本程**没**测什么、被拒／没成功的调用、有没有跑过删除命令、工具调用枚数 vs 硬顶、伪授权两栏、凭据值零抄录。**AC 框由编排者翻，你只交读数。**
 

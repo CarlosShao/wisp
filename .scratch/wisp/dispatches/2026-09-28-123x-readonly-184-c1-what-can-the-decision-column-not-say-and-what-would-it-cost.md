@@ -20,10 +20,14 @@
 - **AC#5 先找**不动契约**的那半条路**（我提三形，逐形给可达性＋最坏后果，不许照抄我的判断）：**(a)** 导出面文案（`privacy.go:99-101` 的 `detail` 在 `L0+allow` 时写人话"自动放行（按档位，未询问）"，**列里的字一字不动**；⚠ 它成立与否依赖 AC#3）；**(b)** 真把 `grant_id` 填上（尺：`grep -rn "approval_grant" --include=*.go internal/ | grep -v _test.go` ⇒ D45 的授权记录今天**有没有生产者**；没有就报"这一形要先等 D45 落地"）；**(c)** 接受歧义并在 `docs/reports` 明写。⚠ 三形都**不许**顺手改 `riskColumn`（票面第 7 把尺已裁定它是 `SPEC-02:76` 逼出来的，不是缺陷）。
 - **AC#6 `_ =` 那一支要不要单独归口**：`internal/agent/journal.go:101` 逐字 `_ = j.DecideToolCall(ctx, rowID, decision, nil)`。现量：今天有没有任何生产路径会给它传一枚不在 map 里的值（尺：`grep -rn "DecideToolCall\|j.decide(" --include=*.go internal/ | grep -v _test.go` 逐枚看传入值来源）。判"要立票"就**报回**，本票里不许动。
 
-## 2. 门禁（只读票也要跑"全仓那一档"）
+## 2. 门禁（只读票也要跑"全仓那一档"，但**排程有硬约束**）
 
-`sh scripts/d22scan.sh` ⇒ **rc=0 且 `ban #8 internal/ 431`**（⚠ 431 是 09-28 11:2x 由 `179-r2` 钉的在册基线；你这跑**只许不涨**，涨了＝你带了写件进来）｜`bash .scratch/wisp/probes/154/gate-clauses.sh` ⇒ **比红腿名册不比退码**（今天在册唯一红腿 `腿=G6neg`＝票 178；尺：`grep "BAD" <输出> | grep -oE "腿=G[0-9a-z]+" | sort -u` ＋ 与 `probes/179/v1/logs/gate-clauses.txt` 做 `comm -3`）｜终态 `git status --porcelain -- internal/ cmd/` 为空。
-⚠ **不许跑** `probes/161/r6/flip-declaration.sh`（跑一次就脏跟踪日志）。⚠ **不要跑 Go 包级测试套件**（今天 `183-r1` 那枚写码程在同机上会做变异，你我一跑就互污；你要的数全在 grep／sed／扫描器这三档里，够）。
+⚠ **今天同机另有一枚写码程 `183-r1` 与一枚验收程 `183-v1` 会在 `internal/risk/**` 上做临时变异** ⇒ 你若在同一时刻跑会**互污**（本编队 09-28 实测过：`-overlay` 不保护你不吃别人的脏件）。所以：
+- **先交你的六格读数，门禁放在最后一步跑**；跑之前先 `git status --porcelain -- internal/ cmd/` 看一次：**不为空＝有人正在变异**，那就等或改到下一轮，并把这一格记成**〔未取到·争用〕**——**不许**把"争用时的红"算成别人的账，也**不许**拿"看起来绿"当凭据。
+- `sh scripts/d22scan.sh` ⇒ **rc=0 且 `ban #8 internal/ 431`**（⚠ 431 是 09-28 11:2x 由 `179-r2` 钉的在册基线；`183-r1` 若落了新判据件会到 **432**，那是**它的账**、具名登记别当自己的回退；再涨才是你带了写件进来）
+- `bash .scratch/wisp/probes/154/gate-clauses.sh` ⇒ **比红腿名册不比退码**（今天在册唯一红腿 `腿=G6neg`＝票 178；尺：`grep "BAD" <输出> | grep -oE "腿=G[0-9a-z]+" | sort -u`）；跑不动就按上面那格记〔未取到·争用〕并具名说明
+- 终态 `git status --porcelain -- internal/ cmd/` 为空（**你名下**必须为空）。
+⚠ **不许跑** `probes/161/r6/flip-declaration.sh`（跑一次就脏跟踪日志）。⚠ **不要跑 Go 包级测试套件**（`go test ./internal/...` 那一档全免；你要的数全在 grep／sed／扫描器这三档里，够）。
 
 ## 3. 写面（超出即越权）
 
