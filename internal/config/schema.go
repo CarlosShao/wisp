@@ -438,6 +438,10 @@ type AgentSection struct {
 	LoopGuard LoopGuard `toml:"loop_guard"`
 	// SteeringEnabled allows mid-run user steering.
 	SteeringEnabled bool `toml:"steering_enabled" default:"true"`
+	// ProjectInstructionsEnabled is ticket 200's switch for reading a
+	// project's own instruction files (AGENTS.md / CLAUDE.md and friends).
+	// Default on; off means not one file is read and the loader says why.
+	ProjectInstructionsEnabled bool `toml:"project_instructions_enabled" default:"true"`
 }
 
 // RiskSection is the locked [risk] section (D36 rule 1: any loosening needs L2 re-confirm).

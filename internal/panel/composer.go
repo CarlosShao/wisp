@@ -59,6 +59,13 @@ type Snapshot struct {
 	Results     []ResultChunk      `json:"results"`
 	Composer    ComposerState      `json:"composer"`
 	GeneratedAt string             `json:"generatedAt"`
+	// Instructions is ticket 200's loaded-project-instruction manifest: which
+	// files this run followed, how many bytes each, and whether any was
+	// truncated or dropped. omitempty is deliberate - an unloaded turn adds no
+	// fifth wire key, so pump_test's byte nails keep their current reading.
+	// Populating it in production is the pump's job at the composition root;
+	// see docs/evidence/s1/200-project-instructions-r1.md.
+	Instructions []ProjectInstructionFile `json:"instructions,omitempty"`
 }
 
 // ResultChunk is one streamed assistant chunk.

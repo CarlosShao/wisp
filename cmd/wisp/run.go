@@ -52,6 +52,7 @@ import (
 	"github.com/CarlosShao/wisp/internal/observe"
 	"github.com/CarlosShao/wisp/internal/panel"
 	"github.com/CarlosShao/wisp/internal/perm"
+	"github.com/CarlosShao/wisp/internal/projctx"
 	"github.com/CarlosShao/wisp/internal/risk"
 	"github.com/CarlosShao/wisp/internal/secret"
 	"github.com/CarlosShao/wisp/internal/tools"
@@ -227,7 +228,7 @@ type agentRuntime struct {
 	// source names, or a child's outside text travels a channel nobody owns).
 	c25 *risk.Provenance
 	// provs is the built provider chain, kept for the probe path.
-	provs []llm.LlmProvider // built chain, kept for the probe path
+	provs    []llm.LlmProvider // built chain, kept for the probe path
 	names    []string
 	endpoint llm.Endpoint
 	gate     *approval.Gate
@@ -669,6 +670,39 @@ func (rt *agentRuntime) execute(task string) int {
 		fmt.Fprintf(rt.stderr, "wisp run: agent 环路装配失败：%v\n", err)
 		return 1
 	}
+	// ticket 200: read the project's own instruction files (AGENTS.md and its
+	// siblings) and attach them to the loop assembled just above, so what the
+	// repository says about itself reaches the request instead of living in a
+	// struct nobody fills. Every input comes from an owner that already exists:
+	// the workspace from the view the path resolver feeds, the global tier's
+	// directory from the layout decider (the same dir config.toml lives in), the
+	// budget from this loop's own scaled D39 prompt total, the token estimator
+	// from the loop's package, and the C25 engine from the one this process has.
+	// The switch is agent.project_instructions_enabled, default on; off means the
+	// loader reads nothing and prints why instead of going silent.
+	ws := rt.workspaceView()
+	instrWorkspace := ""
+	if ws.Set {
+		instrWorkspace = ws.Canonical
+	}
+	instrScope := rt.c25.OpenScope("run:project-instructions")
+	defer instrScope.Close()
+	rt.auditf("wisp run: 项目说明加载器 workspace=%q globalDir=%q enabled=%v budget=%d",
+		instrWorkspace, rt.spec.dataDir, cfg.Agent.ProjectInstructionsEnabled,
+		loop.Budgets().PromptTotal)
+	loop.AttachProjectInstructions(projctx.New(projctx.Options{
+		WorkspaceDir: instrWorkspace,
+		GlobalDir:    rt.spec.dataDir,
+		Enabled:      cfg.Agent.ProjectInstructionsEnabled,
+		BudgetTokens: loop.Budgets().PromptTotal,
+		Tokenize:     agent.ApproxTokens,
+		Prov:         rt.c25,
+		ScopeID:      instrScope.ID(),
+		// A format verb, never the line itself: auditf takes a format, and a
+		// file path is data, not a directive.
+		Log: func(s string) { rt.auditf("projctx: %s", s) },
+	}))
+
 	ctx, cancel := context.WithTimeout(context.Background(),
 		time.Duration(cfg.LLM.TimeoutMS)*time.Millisecond)
 	defer cancel()

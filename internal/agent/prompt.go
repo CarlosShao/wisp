@@ -96,12 +96,34 @@ type PromptInput struct {
 	ResidentIndex string
 }
 
+// InstructionSource is the ticket 200 seam: whoever owns the project
+// instruction files (internal/projctx) hands this loop one turn's block of
+// guidance text plus the manifest that says what it was. It is an interface,
+// not a struct field, so the agent package never learns how the files were
+// found - and never gains a path from them to a gate decision.
+//
+// BlockForTurn is called once per assembled request, i.e. once per turn, which
+// is also where the per-turn "what did I load" print happens. An empty block
+// means nothing was injected: the assembler then renders exactly the D39
+// sections it rendered before this ticket existed.
+type InstructionSource interface {
+	BlockForTurn() string
+	ManifestForTurn() []string
+}
+
 // Assembler renders D39 sections and turns them into a C5 request.
 type Assembler struct {
 	budgets  Budgets
 	identity string
 	safety   string
 	style    string
+	// Instructions is ticket 200's project-instruction source (nil = feature
+	// not wired, which renders no block at all). It is deliberately NOT one of
+	// the seven D39 sections: the section table, its budgets and its
+	// cache-prefix order are frozen by D39, and a per-project block does not
+	// belong in that frozen set. It rides on the System content instead, which
+	// stays byte-stable across turns for an unchanged workspace.
+	Instructions InstructionSource
 	// Cache is the provider's caching capability (C5 contract addition).
 	Cache llm.CacheSupport
 	// Model is the request model id.
@@ -215,9 +237,16 @@ func (a *Assembler) suffixSections(in PromptInput) []Section {
 // the conversation, then the volatile suffix message, and the cache
 // breakpoint after System when the provider supports explicit breakpoints.
 func (a *Assembler) Build(in PromptInput, history []llm.Message) *llm.Request {
+	sys := a.SystemPrefix(in)
+	// Ticket 200: the project's own instructions join the system content, AFTER
+	// the D39 prefix blocks and as its own part, so the byte-stable prefix stays
+	// byte-stable and the guidance/authority split below is auditable as a unit.
+	if block := a.projectInstructionBlock(); block != "" {
+		sys = append(sys, llm.TextPart{Text: block})
+	}
 	req := &llm.Request{
 		Model:             a.Model,
-		System:            a.SystemPrefix(in),
+		System:            sys,
 		Messages:          append([]llm.Message{}, history...),
 		Tools:             in.Injection.ToolDefs,
 		Temperature:       a.Temperature,
@@ -233,6 +262,34 @@ func (a *Assembler) Build(in PromptInput, history []llm.Message) *llm.Request {
 		req.CacheBreakpoints = []int{-1}
 	}
 	return req
+}
+
+// projectInstructionBlock pulls this turn's guidance block ("" when the feature
+// is not wired, disabled by config, or found nothing).
+func (a *Assembler) projectInstructionBlock() string {
+	if a.Instructions == nil {
+		return ""
+	}
+	return a.Instructions.BlockForTurn()
+}
+
+// AttachProjectInstructions wires ticket 200's loader into this loop's
+// assembler. This is the whole agent-side surface: the loader can only ever
+// hand back text and a manifest, and the composition root (cmd/wisp) is the
+// party that decides the workspace, the data dir and the config switch.
+func (l *Loop) AttachProjectInstructions(src InstructionSource) {
+	l.asm.Instructions = src
+}
+
+// ProjectInstructionManifest is this turn's "what did I actually load" list,
+// in the shape the panel carrier wants (ticket 200 AC#7). It reads the loop's
+// wired source, so an unwired loop reports one honest line rather than a
+// plausible empty list.
+func (l *Loop) ProjectInstructionManifest() []string {
+	if l.asm.Instructions == nil {
+		return []string{"agent: 没有接入项目说明加载器（组合根本轮没有 attach）"}
+	}
+	return l.asm.Instructions.ManifestForTurn()
 }
 
 // ---------------------------------------------------------------------------
