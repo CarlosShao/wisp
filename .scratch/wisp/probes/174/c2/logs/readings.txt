@@ -1,0 +1,6 @@
+# github.com/CarlosShao/wisp/internal/tools [github.com/CarlosShao/wisp/internal/tools.test]
+.\.scratch\wisp\probes\174\c2\zz174c2_wiring_pair_windows_test.go:73:9: cannot use res (variable of struct type agent.ToolOutcome) as Result value in return statement
+.\.scratch\wisp\probes\174\c2\zz174c2_wiring_pair_windows_test.go:143:34: r.RiskLevel undefined (type Result has no field or method RiskLevel)
+.\.scratch\wisp\probes\174\c2\zz174c2_wiring_pair_windows_test.go:143:47: r.ErrorClass undefined (type Result has no field or method ErrorClass)
+FAIL	github.com/CarlosShao/wisp/internal/tools [build failed]
+FAIL
