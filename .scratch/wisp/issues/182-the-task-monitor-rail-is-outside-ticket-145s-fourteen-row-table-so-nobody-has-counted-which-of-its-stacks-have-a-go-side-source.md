@@ -65,3 +65,35 @@
   现状合规那一格是 `internal/panel/bridge.go:42-45` 四枚 `panel.*` 里**没有** `decide`/`allow`。
   **本程没提"顺手把批准接上"**，四枚 ⚠ 一律单列为待人拍板项（表 §12）；
   AC#3 特别问的"宿主侧读面要不要与模型侧工具共享实现"＝两条都有代价，**本程不选，交编排者裁**。
+- 09-28 17:5x `182-a1`（只读普查·表 `docs/evidence/s1/182-rail-stacks-census-a1.md`）：
+  **AC 框一枚没勾、产码零字节未动、`frontend/**` 没读没引**（按本票 AC#7 从严，与任务书"读可以"那一处**冲突已具名报回**）。
+  锚：起手 `38fc7c0e`，中途被编排者推进到 `971b7dad`（`ledger(A389)`，只碰 `dispatches/**`＋台账，未碰本程任何尺的射程）。
+  **堆数现数＝竖条今天真有名有位 7 枚**（主尺 `grep -rn --include=*.js "RbPanels.register(" design/doubao/demo/`＝7；
+  对照真值两把：`index.html:173-177` 装载的五枚脚本内 3＋1＋1＋1＋1＝7、`^\s*label:` 尺 8 枚剔 `app.js:300` 命令面板假阳＝7，三数合一）。
+  逐枚＝K1 上下文（CWD／附件／上下文预算三行）、K2 活动、K3 审批、K4 文件、K5 插件、K6 审阅、K7 终端。
+  ⚠ **枚数与 `182-c1` 相同（都是 7）但成员不同**——c1 那 7 枚里的"浏览器／子代理"今天不在注册表，多出的
+  "上下文／活动／审批／插件"是它没数的 ⇒ **另记三枚"有名无位"**：K8 子代理（票 188 AC#1，已摆 owner `A389`／`Q-71`）、
+  K9 后台任务（demo 把它混写进 K2 时间线 `rightbar.js:90`）、K10 浏览器（只在 `issues/77:364/:384` 文本里）。
+  ⇒ **这一栏全量可点名＝10 枚**，本票 AC#1 那句"枚数只许现量不许目测"至此第一次真被数过。
+  三档现量：**有源＋已有载体**＝K1 两行（`composer.go:207`/`:208-211`，票 92）＋K3（`composer.go:58`）；
+  **有源缺载体**＝K1 token（`cost.go:23→:38`→`guard.go:155`→`loop.go:976`，面板零消费者）、K2（`sink.go:64/:85`）、
+  K9（`task.go:110-112` 现读 struct 三行＝**名册在、状态维确实没有**，与票 188 AC#2 前提**一致**）；
+  **无源但规格要求**＝K4 文件树（宿主侧无；模型侧有 `fs.go:309`/`run.go:345`）、K6 未提交枚数与 diff
+  （`git.go:172/:141` 只读 refs 那一族，`GitView:117` 无 uncommitted 维）、K7 终端（地基自陈未注册 `unwired.go:63-76`）；
+  **规格真空**＝K5 插件（`internal/plugin/` 只有 `disposal.go` 那一族，**零"列出已装"读面**）、K8、K10。
+  ⚠ **与票 181 的分工有一格过期要写腿注意**：票 181 **今天已落地**（`internal/panel/git.go` 整支＋
+  `composer.go:216 Git GitView`＋生产调用者 `cmd/wisp/panel_pump.go:109`）⇒ 本票 AC#4 那格"git 状态显示＝181"不再是纸面分工。
+  归属（AC#3）：**只差载体的一批全指票 145 那一集**（K1 token→行 12 成本、K2 活动→那张十四行表要**新增一行**、
+  K9→状态维进 K2 那枚 `Feed`）；K4→票 190、K6→票 189（**同 struct 加字段、不动快照键集**，避 `Q-51`；
+  先例见 `git.go:113` 逐字"remoteBranches is deliberately NOT a field"）、K7 地基→只登记到票 163、K9 名册→164、输出可读性→174；
+  **候选池无人认领、须立新票或摆 owner＝K5 插件与 K7 的面板载体与 K10 浏览器**（票 186 不认领那一格沿用 c1 出处、本程不复算）。
+  雷区（AC#5）**现数 6 枚**：附件 remove（demo `rightbar.js:16/:74`；`bridge.go:42-45` 四枚名册里**没有** `attachment.remove`）、
+  面板批准（`rightbar.js:159-162` 只跳屏，Go 侧无 `decide`/`allow`）、文件树删除／移动（本程**未复算** `rb-files.js`，转记 c1 §12）、
+  **插件开关**（`rb-plugins.js:65 data-plg-toggle`＋条目带 `on:`／`level:`＝写配置＋改档位，最硬的一枚）、
+  diff 接受／回滚（转记 c1）、**新建终端**（`rb-terminal.js:26`＝面板里发起执行）。⇒ 六枚**一律单列待人拍板**，
+  逐字指回 `AGENTS §1.2`"由面板侧来源的 L2『允许』"与 `Q-49` 那一族；**本程没提"顺手把批准接上"**。
+  ⚠ **一处前提可能对不上代码，具名报回不替裁**：任务书 §E 说状态维写面在 `internal/memory/**` 的 `Record`，
+  本程现读 `grep -rn --include=*.go -E "type Record struct|type Job struct|type BackgroundJob" internal/|grep -v _test.go`＝**0 命中**
+  （同一次调用里正控 `^type TaskRoster struct` 命中 `internal/tools/task.go:110`，尺能响）⇒ 状态维真身在 `TaskRoster`/`TaskOutput`。
+  未裁完（具名，见证据件 §8）：`rb-files.js`／`rb-review.js` 的 `data-*` 名册、两把字面尺**未打正控**故相应 0 命中记〔不可判〕、
+  票 145 十四行表只复算到行 12。预算 21 枚／上限 20，超那 1 枚被"零命中尺串了 `&&`"吃掉，已具名。
