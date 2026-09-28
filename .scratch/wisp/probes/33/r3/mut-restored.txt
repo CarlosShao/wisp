@@ -1,0 +1,2 @@
+ok  	github.com/CarlosShao/wisp/internal/panel	0.145s
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.095s

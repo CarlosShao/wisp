@@ -1,0 +1,80 @@
+ M .gitignore
+ M .scratch/wisp/issues/33-panel-host-c27.md
+ M .scratch/wisp/probes/152/my152.py
+ M .scratch/wisp/probes/161/r6/logs/flip-1.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-2.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-3.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-4.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-5.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-6.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-baseline.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-restored.txt
+ D design/assets/base.css
+ D design/assets/icons.js
+ D design/assets/theme.js
+ D design/assets/tokens.css
+ M design/doubao/README.md
+ M design/doubao/demo/app.js
+ M design/doubao/demo/index.html
+ M design/doubao/demo/styles.css
+ D design/index.html
+ D design/screens/approval.html
+ D design/screens/ball.html
+ D design/screens/chat.html
+ D design/screens/config.html
+ D design/screens/cost.html
+ D design/screens/firstrun.html
+ D design/screens/palette.html
+ D design/screens/privacy.html
+ D design/screens/security.html
+ D design/screens/states.html
+ D design/screens/tasks.html
+ M docs/evidence/s1/152-subject-death-never-measured-r1-accept-r1.md
+ M internal/panel/composer_dispatch_test.go
+?? .scratch/wisp/.scratch/
+?? .scratch/wisp/probes/139/accept-r1/
+?? .scratch/wisp/probes/152/overlay-probe1-on-samppost.json
+?? .scratch/wisp/probes/156/__pycache__/
+?? .scratch/wisp/probes/156/mut-156-r2/asis.log
+?? .scratch/wisp/probes/156/zero156-r4-head.sh
+?? .scratch/wisp/probes/156/zero156-r4-work/
+?? .scratch/wisp/probes/158/r2/
+?? .scratch/wisp/probes/161/r2/__pycache__/
+?? .scratch/wisp/probes/161/r2/ctl/
+?? .scratch/wisp/probes/161/r5/negative-control/
+?? .scratch/wisp/probes/161/r6/logs/flip-7.txt
+?? .scratch/wisp/probes/162/r4/
+?? .scratch/wisp/probes/162/v1-baseline-gotest.txt
+?? .scratch/wisp/probes/176/r1/logs/gate-clauses-end-bad.txt
+?? .scratch/wisp/probes/176/r1/logs/gate-clauses-end.txt
+?? .scratch/wisp/probes/176/r1/logs/gate-clauses-start-bad.txt
+?? .scratch/wisp/probes/176/r1/logs/gate-clauses-start.txt
+?? .scratch/wisp/probes/183/accept-v1/
+?? .scratch/wisp/probes/185/c1/logs/d22scan-post-final.txt
+?? .scratch/wisp/probes/33/r2/d22scan-final.txt
+?? .scratch/wisp/probes/33/r2/gate-final.txt
+?? .scratch/wisp/probes/33/r2/status-final.txt
+?? .scratch/wisp/probes/33/r2/status-start.txt
+?? .scratch/wisp/probes/33/r3/
+?? .scratch/wisp/probes/999/
+?? .zcodeignore
+?? design/doubao/01-ball-states.jpg
+?? design/doubao/demo/lib/
+?? design/doubao/demo/rb-files.js
+?? design/doubao/demo/rb-plugins.js
+?? design/doubao/demo/rb-review.js
+?? design/doubao/demo/rb-terminal.js
+?? design/doubao/demo/rightbar.js
+?? design/doubao/demo/screens/home.js
+?? design/doubao/demo/screenshots/
+?? design/doubao/demo/sidebar.js
+?? design/old/
+?? docs/evidence/s1/33-inbound-listener-r3.md
+?? part1-state1-fixed.txt
+?? part1-state1-pristine.txt
+?? part1-state2-fixed.txt
+?? part1-state2-pristine.txt
+?? part2-nog6-fixed.txt
+?? part2-nog6-pristine.txt
+?? part3-stale-fixed.txt
+?? part3-stale-pristine.txt

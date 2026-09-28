@@ -1,0 +1,4 @@
+    composer_dispatch_test.go:429: a native host / WebView2 message channel is attached in this tree ([internal/panel/host_33r3fake.go:3:identifier CoreWebView2 internal/panel/host_33r3fake.go:5:identifier CoreWebView2 internal/panel/host_33r3fake.go:5:identifier WebMessage internal/panel/host_33r3fake_windows.go:4:identifier CoreWebView2 internal/panel/host_33r3fake_windows.go:6:identifier CoreWebView2 internal/panel/host_33r3fake_windows.go:6:identifier WebMessage internal/panel/host_33r3fake_windows.go:8:identifier CoreWebView2 internal/panel/host_33r3fake_windows.go:8:identifier WebMessage]) while ticket 33's real-window ACs are still unticked: that is H2/H3/H10 landing - say so on the ticket, do not let a green here stand in for a panel that can click
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	0.139s
+FAIL

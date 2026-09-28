@@ -1,0 +1,5 @@
+    composer_dispatch_test.go:427: native-host capability hits in D:\work\workspace\projects plans\Wisp: 0 -> []
+    composer_dispatch_test.go:448: POSITIVE CONTROL RED (the ruler, not the product): a tree whose production source hosts a CoreWebView2 and takes WebMessageReceived answered 0 capability hits, so the check above is a door with no latch. Hits would have named the file and the symbol: got []
+    composer_dispatch_test.go:464: carrier B (webview dependency) -> 2 hit(s) [go.mod:3:dependency "webview" go.sum:1:dependency "webview"]
+    composer_dispatch_test.go:488: carrier C (CLI seam, no host) -> 0 hits, as required
+--- FAIL: TestSliceAAttachesNoHostAndNamesTheOpenWindowHops (0.09s)
