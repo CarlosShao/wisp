@@ -246,6 +246,22 @@ $ for h in $(git log --format=%h --grep='^145-r2' dev); do git show --name-only 
 `frontend/**`／`design/**`／`cmd/wisp/run.go`／`internal/panel/bridge.go`／`internal/panel/{composer,pump}.go`／
 `cmd/wisp/panel_pump.go`／`internal/panel/pump_test.go`／三枚冻结测试件 —— **一枚都不在本程 commit 集里**。
 **未 push**：`git branch -r --contains 359e467a` ＝**空**（本程两枚全只在本地 `dev`）。
+⚠ 续记第三枚时现量到的两件事：① 本程三枚 commit 逐枚 `git show --name-only` ＝
+`8f1ab773`（证据件＋5 枚台件）／`359e467a`（票面那一枚）／`e7f63efb`（证据件那一枚），**别家路径零枚**；
+② 它们中间夹进别家的 `95da23bf`／`05c5656d`／`8c671afb`（票 182／190／180 与台账）——
+所以**取 HEAD 时 `git show HEAD` 可能是别人的那一枚**，本程的账一律按 `--grep='^145-r2'` 自取（上面那条命令可复算）。
+
+### 6.5 终态复跑（本程交完之后同一把尺再发一次）
+
+```
+$ go test -count=1 -v ./internal/panel/        # 原始件 probes/145/r2/gate-final-panel.txt
+rc=1   === RUN 137   --- FAIL 3
+$ diff <(改前 FAIL 名册逐名) <(终态 FAIL 名册逐名)   →  差集＝空（仍恰那三枚在册红）
+```
+
+⇒ 本程三枚 commit 只动 `docs/`＋`.scratch/`，包颜色与名册**逐名不变**——在此它说明的是"没越界"，不是"没做活"
+（做了什么的判定在 §2／§4：落地集空＝量出来的结论）。`cmd/wisp` 未复跑：本程对它零字节，且 §6.1 那一发
+（rc=0／RUN 149／PASS 89／FAIL 0）取的就是包含本程写面在内的当前树。
 
 ---
 
