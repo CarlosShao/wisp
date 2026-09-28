@@ -287,7 +287,28 @@
 
 ## 终态补记
 
-（本件最后一枚 commit 之后现跑，见下方逐条）
+（取在本程最后一枚 commit **之后**现跑，14:5x）
+
+- 本程 commit 链（5 枚，全部显式 pathspec、只 commit 不 push）：
+  `eba0b89b` 骨架 → `6febca94` 票 180 §2/§3 → `ad759e94` 票 182 §4–§8 → `92a4f2d8` 门禁＋两枚票面 log＋台件＋名册订正 → 本件最后一枚。
+  ⚠ 共享工作树：起手实测 HEAD `e9ef94d0`（不是派单写的 `03c01d71`），中途别人落了 `378c8b34`（票 174-r2）等；
+  本程所有行号一律现跑，未沿用任何票面历史号。
+- **终态写面闸门**：`git status --porcelain -- internal/ cmd/` ⇒ **空输出**（第二枚，与起手那枚成对，两条都空）。
+- 终态门禁复测（最后一枚 commit 之后）：
+  - `sh scripts/d22scan.sh` ⇒ 末行逐字 `d22scan: clean - no D22 ban violations`，
+    `d22scan: scope ban #8 internal/ examined 433 Go files, comments and _test.go included`（**＝基线 433**），rc=0；
+  - `go test -count=1 ./internal/config/` ⇒ `ok ... 1.047s`；
+  - `./internal/panel/` 那 2 枚红见 §10 第 4 条（红因在 `frontend/**` 与本机缺失的 `design/assets/tokens.css` 上，本程没碰）。
+- **零删除自证**：全程没有 `rm`/`del`/`git clean`/`git restore`/`git checkout .`/`git stash`/`git reset`/
+  `git rebase`/`--amend`/worktree/switch；`probes/161/r6/flip-declaration.sh` 没跑；
+  `probes/154/gate-clauses.sh` 只执行、未改一字。台件 5 份原始读数全部入库。
+- **本程改过的文件全集**（四枚，均在派单 §1 允许的写面内）：
+  `docs/evidence/s1/180-182-panel-fields-census-c1.md`、
+  `.scratch/wisp/issues/180-...md`（只追加一段 Progress log，未改原句、未勾框）、
+  `.scratch/wisp/issues/182-...md`（同上）、
+  `.scratch/wisp/probes/{180,182}/c1/**`（新建 5 份读数）。
+- **工具调用终值＝40 枚**（硬顶 45）；新探索停在第 30 枚，其后 10 枚全部用于写件、门禁与 commit。
+  ⚠ 未判"必须改产码"⇒ 没有触发停手上报的门；两票的每一问都能在只读面上答完。
 
 ## 11. 被拒调用＋零删除自证＋工具调用终值
 
