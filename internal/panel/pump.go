@@ -48,6 +48,7 @@ package panel
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -286,32 +287,119 @@ func (p *SnapshotPump) count() {
 // honest version of a field the pump must fill; a made-up id would be the packet
 // lying about its own provenance.
 //
-// Overflow MERGES and never drops: at maxKeys the two oldest chunks are
-// concatenated, which is what a stream looks like when you stop splitting it.
-// That is the small end of ticket 35 AC#5's backpressure rule (the queue-level
-// merge belongs to the transport), and it is here because a pump that grows
-// without bound is not a pump.
+// Overflow TRUNCATES and never merges (ticket 197 leg B re-cut this rule, which
+// previously folded the two oldest chunks into one row). The fold was tolerable
+// while the only producer was a single `wisp run` task, because the two rows it
+// joined were two sentences of one answer. A subagent's stream is not interchangeable
+// text: the owner clicks one subagent to read THAT agent's work, and a row carrying
+// two agents' sentences would show them something false about provenance - the same
+// disease D30 names for tool output, arriving through the display side instead of the
+// model side. So past the key bound every key keeps its own chunk, each chunk keeps
+// its own head and tail, and the elided middle is said out loud in that chunk's text.
+// The bound is still a bound: it moved from "how many rows exist" to "how many runes
+// each row holds", and past a hard ceiling whole keys stop being tracked and are
+// NAMED in DroppedKeys() - "nobody is showing this one" is a different sentence from
+// "somebody merged this one".
+//
+// What this file does NOT do is put either fact on the wire: ResultChunk keeps its
+// three JSON keys (composer.go:65-69, mirrored by frontend/src/lib/panel.ts's
+// ResultChunkView, which this leg may not touch - see
+// TestComposerContractTypesMatchFrontend). The accessors below are the host-facing
+// half; carrying the marker into the packet is ticket 197's carrier leg (197-r3).
 type StreamLog struct {
-	mu      sync.Mutex
-	order   []string
-	chunks  map[string]ResultChunk
-	maxKeys int
+	mu        sync.Mutex
+	order     []string
+	chunks    map[string]ResultChunk
+	kept      map[string]*streamKept
+	maxKeys   int
+	truncated bool
+	elided    int
+	dropped   []string
 }
 
-// DefaultStreamKeys is how many concurrent result streams a pump tracks before
-// it starts merging. 32 is generous against the only producer today (one task
-// per `wisp run`) and small enough to bound a long-lived resident process.
-const DefaultStreamKeys = 32
+// streamKept is what one row retains of ITS OWN stream once the log is
+// truncating: the first streamTruncateKeepRunes runes, a sliding window of the
+// last streamTruncateKeepRunes, and how many runes that stream has produced in
+// total. It exists so that clamping is idempotent - a fold re-run over an already
+// folded row would otherwise eat the head it promised to keep and stack a second
+// marker inside the first. The text the panel sees is always this state rendered,
+// never a string edited in place, which is also why a stream's own text can
+// mention a marker without being parsed by anything.
+type streamKept struct {
+	head []rune
+	tail []rune
+	seen int
+}
+
+// absorb feeds one delta into the retained tail window and reports how many runes
+// it pushed out of it - the log's own count of what the bound cost.
+func (st *streamKept) absorb(delta []rune) int {
+	st.seen += len(delta)
+	st.tail = append(st.tail, delta...)
+	over := len(st.tail) - streamTruncateKeepRunes
+	if over <= 0 {
+		return 0
+	}
+	st.tail = st.tail[over:]
+	return over
+}
+
+// render is the row the panel reads: its own head, its own tail, and between them
+// a marker that counts the middle this ONE stream lost. Nothing from another key
+// can appear here - the state is per key.
+func (st *streamKept) render() string {
+	elided := st.seen - 2*streamTruncateKeepRunes
+	if elided <= 0 {
+		return string(append(append([]rune{}, st.head...), st.tail...))
+	}
+	return fmt.Sprintf("%s...[truncated: %d runes elided]...%s", string(st.head), elided, string(st.tail))
+}
+
+const (
+	// DefaultStreamKeys is how many concurrent result streams a pump tracks at
+	// full fidelity. 32 stays generous against the pre-197 producer (one task per
+	// `wisp run`) and, now that overflow truncates instead of merging, it bounds
+	// runes-per-row rather than the number of rows a subagent fan-out may open.
+	DefaultStreamKeys = 32
+
+	// StreamKeyHardCeilingMultiple is how far past maxKeys the key set may grow
+	// before whole keys start being dropped (and named). Two bound × the per-chunk
+	// floor below is the point where the bookkeeping, not the text, is the cost.
+	StreamKeyHardCeilingMultiple = 2
+
+	// streamTruncateKeepRunes is the head AND the tail every chunk keeps once the
+	// log is in truncated mode. Runes, not bytes: a byte cut would split the
+	// Chinese this project streams and hand the panel mojibake.
+	streamTruncateKeepRunes = 256
+
+	// SubagentStreamKeyPrefix is the key shape ticket 197 §0 writes down: one
+	// subagent = one stream, "subagent:<taskID>", literal lowercase, the task id
+	// passed through verbatim. The tools leg feeds it, the panel reads it, and
+	// neither leg gets to invent a second spelling.
+	SubagentStreamKeyPrefix = "subagent:"
+)
+
+// SubagentStreamKey is the one spelling of a subagent's stream key. An empty or
+// whitespace-only task id yields "": a stream belonging to no task is not a
+// stream, and Append("") would otherwise open a row the panel cannot attribute
+// to anybody (see Chunks - the key IS the row's identity here).
+func SubagentStreamKey(taskID string) string {
+	if strings.TrimSpace(taskID) == "" {
+		return ""
+	}
+	return SubagentStreamKeyPrefix + taskID
+}
 
 // NewStreamLog builds an empty results log. maxKeys <= 0 means DefaultStreamKeys.
 func NewStreamLog(maxKeys int) *StreamLog {
 	if maxKeys <= 0 {
 		maxKeys = DefaultStreamKeys
 	}
-	return &StreamLog{chunks: map[string]ResultChunk{}, maxKeys: maxKeys}
+	return &StreamLog{chunks: map[string]ResultChunk{}, kept: map[string]*streamKept{}, maxKeys: maxKeys}
 }
 
-// Append adds one delta to its key's chunk.
+// Append adds one delta to its key's chunk. A key the log already tracks is
+// only ever appended to - never re-keyed, never folded into a neighbour.
 func (s *StreamLog) Append(key, text string) {
 	if s == nil || text == "" {
 		return
@@ -322,11 +410,14 @@ func (s *StreamLog) Append(key, text string) {
 	if !ok {
 		s.chunks[key] = ResultChunk{CorrelationID: key, Text: text}
 		s.order = append(s.order, key)
-		s.mergeOverflowLocked()
+		s.enforceBoundLocked()
 		return
 	}
 	cur.Text += text
 	s.chunks[key] = cur
+	if s.truncated {
+		s.clampLocked(key)
+	}
 }
 
 // Close marks one key's chunk as the end of its stream. An unknown key still
@@ -342,7 +433,7 @@ func (s *StreamLog) Close(key string) {
 	if !ok {
 		s.chunks[key] = ResultChunk{CorrelationID: key, Done: true}
 		s.order = append(s.order, key)
-		s.mergeOverflowLocked()
+		s.enforceBoundLocked()
 		return
 	}
 	cur.Done = true
@@ -363,18 +454,98 @@ func (s *StreamLog) Chunks() []ResultChunk {
 	return out
 }
 
-// mergeOverflowLocked folds the oldest chunk into the one behind it until the
-// log is back inside its bound. The fold keeps BOTH texts, so what the panel
-// loses is a split, never a sentence. Caller holds s.mu.
-func (s *StreamLog) mergeOverflowLocked() {
-	for len(s.order) > s.maxKeys && len(s.order) >= 2 {
-		oldest, next := s.order[0], s.order[1]
-		merged := s.chunks[next]
-		merged.Text = s.chunks[oldest].Text + merged.Text
-		merged.Done = merged.Done || s.chunks[oldest].Done
-		s.chunks[next] = merged
-		delete(s.chunks, oldest)
-		copy(s.order, s.order[1:])
-		s.order = s.order[:len(s.order)-1]
+// enforceBoundLocked is ticket 197's overflow rule, and its one invariant is that
+// no key is ever folded into another: past maxKeys the log declares itself
+// truncating and clamps every chunk to its OWN head and tail; only past the hard
+// ceiling does a key stop being tracked, and then it is named in s.dropped. Caller
+// holds s.mu.
+func (s *StreamLog) enforceBoundLocked() {
+	if len(s.order) <= s.maxKeys {
+		return
 	}
+	s.truncated = true
+	for _, k := range s.order {
+		s.clampLocked(k)
+	}
+	ceiling := s.maxKeys * StreamKeyHardCeilingMultiple
+	for len(s.order) > ceiling {
+		oldest := s.order[0]
+		s.order = s.order[1:]
+		delete(s.chunks, oldest)
+		delete(s.kept, oldest)
+		s.dropped = append(s.dropped, oldest)
+	}
+}
+
+// clampLocked puts one key's row under the retained window, creating that window
+// the first time the row is over it and folding in whatever the row grew by since.
+// It never runs over another key's text, and re-running it on a row already under
+// the fold changes nothing - which is the difference between "this stream lost its
+// middle" and the old fold's "these two streams became one row". Caller holds s.mu.
+func (s *StreamLog) clampLocked(key string) {
+	c := s.chunks[key]
+	if st, ok := s.kept[key]; ok {
+		// The row is already under the fold: the only text that may have been added
+		// is the delta Append put on top of the rendered window, so re-render from
+		// state and drop the raw tail difference into the counted elision.
+		delta := []rune(strings.TrimPrefix(c.Text, st.render()))
+		if len(delta) > 0 {
+			s.elided += st.absorb(delta)
+		}
+		c.Text = st.render()
+		s.chunks[key] = c
+		return
+	}
+	r := []rune(c.Text)
+	if len(r) <= streamTruncateKeepRunes*2 {
+		return
+	}
+	st := &streamKept{
+		head: r[:streamTruncateKeepRunes],
+		tail: r[len(r)-streamTruncateKeepRunes:],
+		seen: len(r),
+	}
+	s.kept[key] = st
+	s.elided += len(r) - 2*streamTruncateKeepRunes
+	c.Text = st.render()
+	s.chunks[key] = c
+}
+
+// Truncated reports the log went past its key bound, so at least one row is no
+// longer the full stream it started as. Full fidelity below the bound is the
+// promise; this is the accessors' way of saying when it stopped holding.
+func (s *StreamLog) Truncated() bool {
+	if s == nil {
+		return false
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.truncated
+}
+
+// ElidedRunes is how many runes the truncations removed in total. A number, not
+// a shrug: "truncated" that cannot say how much it lost is the same lie with a
+// label on it.
+func (s *StreamLog) ElidedRunes() int {
+	if s == nil {
+		return 0
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.elided
+}
+
+// DroppedKeys names every key the log stopped tracking at the hard ceiling, oldest
+// first. It is the honest remainder of a bound: the panel shows no row for these,
+// and the host can say WHICH ones and say they were never merged into a row that is
+// still on screen.
+func (s *StreamLog) DroppedKeys() []string {
+	if s == nil {
+		return nil
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	out := make([]string, len(s.dropped))
+	copy(out, s.dropped)
+	return out
 }

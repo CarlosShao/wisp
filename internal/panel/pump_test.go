@@ -19,8 +19,8 @@ import (
 //	    as unknown / unset / empty, never as a value the host did not have.
 //	TestAnUnreadableModeNeverRendersAsASafeOne     AC#4 across the pump, not just
 //	    across NewSnapshot: an invalid mode from a live reader is still "unknown".
-//	TestTheStreamLogMergesInsteadOfDropping        the results section is bounded
-//	    by folding, and the text survives the fold.
+//	TestTheStreamLogTruncatesInsteadOfMerging      the results section is bounded by
+//	    eliding each stream's own middle - ticket 197 leg B's re-cut of the fold.
 //	TestPublishWithoutAnExitReports                no exit is a named failure, not
 //	    a successful-looking drop.
 //	TestPublishHandsTheBytesToTheAttachedExit      the exit gets exactly the bytes
@@ -162,7 +162,13 @@ func TestAnUnreadableModeFromALiveReaderStillRendersUnknown(t *testing.T) {
 	}
 }
 
-func TestTheStreamLogMergesInsteadOfDropping(t *testing.T) {
+func TestTheStreamLogTruncatesInsteadOfMerging(t *testing.T) {
+	// Ticket 197 leg B re-cut the overflow rule, so this case's old assertions -
+	// "two rows, both texts kept, folded" - pin exactly the behaviour the ticket
+	// called a lie. What it asserted that has nothing to do with folding is
+	// asserted here still, in the stronger form: the bound holds, deltas
+	// accumulate into their own key, Close ends THAT key, and no row is ever two
+	// producers' text.
 	sl := NewStreamLog(2)
 	sl.Append("a", "one ")
 	sl.Append("b", "two ")
@@ -170,38 +176,48 @@ func TestTheStreamLogMergesInsteadOfDropping(t *testing.T) {
 	sl.Close("c")
 
 	chunks := sl.Chunks()
-	if len(chunks) > 2 {
-		t.Fatalf("chunks = %+v, want the log inside the bound it was built with", chunks)
+	if len(chunks) != 3 {
+		t.Fatalf("chunks = %+v, want one row per key: folding two keys into one row is "+
+			"a panel showing one agent doing two agents' work", chunks)
 	}
-	// The bound has to hold under pressure, not just after one fold: 50 keys
-	// through a 2-key log still shows two chunks and still shows every delta,
-	// which is also how a leaked key in the map would surface.
+	byKey := map[string]ResultChunk{}
+	for _, c := range chunks {
+		byKey[c.CorrelationID] = c
+	}
+	for key, want := range map[string]string{"a": "one ", "b": "two ", "c": "three"} {
+		if byKey[key].Text != want {
+			t.Errorf("row %q = %q, want exactly %q with no neighbour's text", key, byKey[key].Text, want)
+		}
+	}
+	if !byKey["c"].Done || byKey["a"].Done || byKey["b"].Done {
+		t.Errorf("done = c:%v a:%v b:%v, want only the key Close() named: the old fold OR-ed "+
+			"a neighbour's Done onto the row", byKey["c"].Done, byKey["a"].Done, byKey["b"].Done)
+	}
+	if !sl.Truncated() {
+		t.Error("3 keys through a 2-key bound reported no truncation")
+	}
+	if sl.ElidedRunes() != 0 {
+		t.Errorf("elided = %d, want 0: short streams keep full fidelity past the bound", sl.ElidedRunes())
+	}
+
+	// The bound still has to hold under pressure, just not by joining rows: 50
+	// keys through a 2-key log keeps at most the hard ceiling of rows, names every
+	// key it stopped tracking, and never puts two deltas in one row.
 	big := NewStreamLog(2)
 	for i := 0; i < 50; i++ {
 		big.Append("k"+strconv.Itoa(i), "x"+strconv.Itoa(i))
 	}
 	got := big.Chunks()
-	if len(got) > 2 {
-		t.Errorf("after 50 keys the log holds %d chunks, want the bound kept", len(got))
+	if len(got) > 2*StreamKeyHardCeilingMultiple {
+		t.Errorf("after 50 keys the log holds %d chunks, want the hard ceiling kept", len(got))
 	}
-	var all2 strings.Builder
 	for _, c := range got {
-		all2.WriteString(c.Text)
-	}
-	for i := 0; i < 50; i++ {
-		if !strings.Contains(all2.String(), "x"+strconv.Itoa(i)) {
-			t.Fatalf("delta %d was dropped by the merge: %q", i, all2.String())
+		if want := "x" + strings.TrimPrefix(c.CorrelationID, "k"); c.Text != want {
+			t.Fatalf("row %q = %q, want its own delta %q", c.CorrelationID, c.Text, want)
 		}
 	}
-	var all strings.Builder
-	for _, c := range chunks {
-		all.WriteString(c.Text)
-	}
-	joined := all.String()
-	for _, want := range []string{"one ", "two ", "three"} {
-		if !strings.Contains(joined, want) {
-			t.Errorf("merged text %q lost %q: overflow must fold, never drop content", joined, want)
-		}
+	if len(big.DroppedKeys()) != 50-len(got) {
+		t.Errorf("dropped = %v, want the %d keys no row covers", big.DroppedKeys(), 50-len(got))
 	}
 
 	// Deltas accumulate into the key's own chunk; Close ends that stream.
