@@ -225,6 +225,28 @@ $ git branch --show-current             dev
 `frontend/**`／`design/**`／`cmd/wisp/run.go`／`bridge.go`／`internal/panel/**.go`／`pump_test.go` —— **一枚都不该出现在里面**。
 终态 `git status --porcelain` 与起手名册（§0.2）的逐枚具名差集＝**本程那三枚路径**，其余别家一枚不动。
 
+### 6.4 本程 commit 集（现量复算式，交件时续记）
+
+```
+$ git log --format="%h %s" --grep='^145-r2' dev
+$ for h in $(git log --format=%h --grep='^145-r2' dev); do git show --name-only --format= $h; done | sort -u
+```
+
+| 枚 | 内容 | `--name-only` 并集 |
+|---|---|---|
+| `145-r2(交件)` | 证据件＋台件 `probes/145/r2/**`（5 枚读数件） | `docs/evidence/s1/145-snapshot-growth-r2.md`＋`.scratch/wisp/probes/145/r2/{gate-before-panel,gate-before-cmdwisp,roster-before-panel-fail,gofumpt,d22scan}.txt` |
+| `359e467a 145-r2(票面)` | 票 145 Progress log 追加一节（`git diff --numstat`＝**50 行 `+`、0 行 `-`**，原文零删） | `.scratch/wisp/issues/145-…carrier.md`（唯一一枚） |
+
+⇒ 路径并集＝**证据件＋台件＋票面那一枚**，共三枚路径。
+⚠ **共享 index 撞别家的实发**：本程第二枚 commit 之前，`git diff --cached --name-only` 现量到别家 staged 的
+`issues/180`／`issues/190`／`issues/33`／`evidence/s1/180-panel-width-ownership-a1.md`／`docs/reports/pending-and-issues.md`
+五枚（**非本程所为、未 unstage、未动其暂存态**）⇒ 那一枚 commit 走的是
+`git commit -- <显式 pathspec>` 形式（结果 `git show --name-only 359e467a` 只含本程那一枚，复算命令见上）。
+⇒ `go.mod`／`go.sum`／`thresholds.go`／golden／`allowlist.txt`／`docs/PLAN.md`／`docs/specs/**`／`internal/risk/**`／
+`frontend/**`／`design/**`／`cmd/wisp/run.go`／`internal/panel/bridge.go`／`internal/panel/{composer,pump}.go`／
+`cmd/wisp/panel_pump.go`／`internal/panel/pump_test.go`／三枚冻结测试件 —— **一枚都不在本程 commit 集里**。
+**未 push**：`git branch -r --contains 359e467a` ＝**空**（本程两枚全只在本地 `dev`）。
+
 ---
 
 ## 7. 本程**没**测什么（不假装核过）
