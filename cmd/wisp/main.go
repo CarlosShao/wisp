@@ -38,6 +38,9 @@ Usage:
   wisp panel-assets  embedded panel bundle (ticket 77): -manifest lists what the
                    binary carries, -render <path> writes the bytes the WebView2
                    host would serve (proof the UI needs no node and no network)
+  wisp panel-inbound  inbound panel dispatch leg (ticket 33 AC#9): reads one raw
+                   composer envelope per stdin line and hands it to the inbound
+                   router; -data names the data root (this leg never resolves one)
   wisp slo         SLO sampling driver (ticket 08): one state per run, JSON
                    verdict; driven by scripts/slo-check.ps1
   wisp version     print version information
@@ -103,6 +106,12 @@ func main() {
 	case "panel-assets":
 		attachParentConsole()
 		os.Exit(cmdPanelAssets(args[1:]))
+	case "panel-inbound":
+		// Ticket 33 AC#9: the inbound router's first production listener. Console
+		// leg (stdin envelopes in, sentences out), so attachParentConsole like the
+		// other operator-driven commands; it writes only the -data root named here.
+		attachParentConsole()
+		os.Exit(cmdPanelInbound(args[1:], panelInboundIO{}))
 	case "version", "--version", "-v":
 		attachParentConsole()
 		printVersions("")
