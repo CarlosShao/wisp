@@ -11,6 +11,7 @@ import (
 
 	"github.com/CarlosShao/wisp/internal/agent"
 	"github.com/CarlosShao/wisp/internal/risk"
+	"github.com/CarlosShao/wisp/internal/statemachine"
 )
 
 // The D34 task family (ticket 164). Only one of the three registered names has
@@ -99,6 +100,55 @@ type TaskOutput struct {
 	// D15(3) spill file). Empty means no copy exists, and taskOutput then
 	// says so out loud instead of truncating silently.
 	ArtifactPath string
+	// State is this task's status dimension, as the host filed it (ticket 188
+	// AC#2, ruling A394 (i): the carrier is this struct, not memory.TaskLog).
+	//
+	// Its type is statemachine.State, whose value set is the verbatim in-repo
+	// copy of D43's frozen transition table: internal/statemachine/states.go:11-31
+	// - a file whose own header line :8 reads "names exactly as in D43 / SPEC-08" -
+	// sourced from docs/PLAN.md:3055 plus the 40 transitions at :3061-3100.
+	// Typing the field that way is what makes "no invented state names" a
+	// structural fact instead of a convention, and statemachine.Valid (states.go:39)
+	// is the judge every writer here goes through.
+	//
+	// What this field is NOT: it is not memory.TaskLog.State
+	// (internal/memory/models.go:62, and its schema at :57 carries no CHECK).
+	// That column is already being fed done / cancelled / running / succeeded by
+	// internal/agent/loop.go:983-998 and cmd/wisp/run.go:651-670 - four words,
+	// none of them on the D43 table. Reconciling the two vocabularies is ticket
+	// 196's, and per A394 this ticket does not unify them, does not read that
+	// column and does not touch either producer.
+	//
+	// Empty means the host filed none. That is a real answer and StateAnswer
+	// announces it, rather than this record quietly reading as "finished".
+	State statemachine.State
+}
+
+// StateAnswer reads the status dimension of one roster record the same way
+// pointerNotice reads its pointer below: it never vouches for what it cannot
+// check.
+//
+//	(state, "")      the host filed one of D43's 20 names
+//	("", reason)     nothing was filed, or what was filed is not a D43 name
+//
+// The reason string is what a display surface (the panel snapshot's task
+// section, which is ticket 145's carrier and is deliberately NOT built here)
+// is supposed to show instead of a verdict. A reader that skipped this
+// function and printed its own word would be hardcoding the status - the
+// exact shape ticket 188 AC#2's "值来自真名册，不许硬编码" forbids - and a writer
+// that bypassed it would be how a fifth legacy word (ticket 196's defect)
+// slips into this dimension, which is why both branches below are named and
+// loud.
+func (o TaskOutput) StateAnswer() (statemachine.State, string) {
+	if o.State == "" {
+		return "", "宿主没有登记这一维（fail-closed：不替任务编一个状态）"
+	}
+	if !statemachine.Valid(o.State) {
+		return "", fmt.Sprintf(
+			"登记的「%s」不是 D43 状态机表里的 20 个名字之一（票 188 AC#2：不许自造；"+
+				"memory 侧那套旧词表属票 196，本维不接它）", string(o.State))
+	}
+	return o.State, ""
 }
 
 // TaskRoster is the process-local background task table (ticket 164 ruling 2:

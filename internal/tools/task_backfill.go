@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/CarlosShao/wisp/internal/agent"
+	"github.com/CarlosShao/wisp/internal/statemachine"
 )
 
 // This file is the WRITE side of ticket 164's process-local task table, the
@@ -56,6 +57,22 @@ const taskArtifactPrefix = "agent-task-"
 type TaskBackfill struct {
 	Roster *TaskRoster
 	Spills *agent.Spiller
+	// State is the D43 name the host wants filed on every record this
+	// backfiller lands (ticket 188 AC#2's write leg). Zero is today's
+	// production shape: cmd/wisp/run.go:640-647 builds this struct with the two
+	// fields above only, so the records it files keep State == "" and
+	// TaskOutput.StateAnswer says 「宿主没有登记这一维」 out loud instead of
+	// inventing a verdict. Wiring a real name is one line in the composition
+	// root, and it is NOT this ticket's射程 (A394: the producer rewiring belongs
+	// to ticket 196).
+	//
+	// It is typed statemachine.State so the vocabulary can only come from D43's
+	// copy in internal/statemachine/states.go:11-31, and Backfill still checks
+	// statemachine.Valid before it writes: a host that hands this door a legacy
+	// word (done / cancelled / running / succeeded) gets its filing refused with
+	// a reason, which is what stops ticket 196's second vocabulary from leaking
+	// into this dimension one call at a time.
+	State statemachine.State
 }
 
 // Backfill files one background task's answer so task.output can find it.
@@ -93,12 +110,21 @@ func (b TaskBackfill) Backfill(ctx context.Context, taskID, text string) (TaskOu
 		return TaskOutput{}, "这个任务没有宿主铸的 id（id 只由环路生成，组合根不许自造一枚）"
 	case text == "":
 		return TaskOutput{}, "这个任务没有留下正文（空正文不进名册，免得「查不到」和「没打印」被读成同一件事）"
+	case b.State != "" && !statemachine.Valid(b.State):
+		// Refused before the table is touched, and the reason travels with the
+		// refusal like every other branch here: a host wired to a name that is
+		// not on D43's table is a wiring bug, and the fix is not to file the
+		// bad word anyway. Zero State never lands here, so today's production
+		// behaviour is unchanged to the byte.
+		return TaskOutput{}, "宿主给这一维登记的「" + string(b.State) +
+			"」不是 D43 状态机表里的 20 个名字之一（票 188 AC#2：不许自造；" +
+			"memory 侧那套旧词表属票 196），这条记录没有落进名册"
 	}
 	if stopped, why := Stopped(ctx); stopped {
 		return TaskOutput{}, "任务已取消，不再写它的输出：" + why
 	}
 
-	rec := TaskOutput{Text: text}
+	rec := TaskOutput{Text: text, State: b.State}
 	var spillWhy string
 	if b.Spills != nil {
 		sp, err := b.Spills.Prepare(taskArtifactPrefix+taskID, text)
