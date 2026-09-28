@@ -55,6 +55,16 @@ summaries + budgets), plus Models and Diagnostics views.
       display; capability-filtered role dropdowns (voice roles hide non-voice models); chain
       drag-order persisted; quota edits enforced ranges.**
 - [ ] Visual sign-off vs the three design screens; zero-emoji + hex scans green.
+- [ ] **Privacy/tool-call rows must not read better than reality: when a row carries
+      `risk_level == "L0"` and `decision == "allow"`, the rendered detail (and the exported
+      bundle's human-readable field) must say it was auto-allowed by tier and that nobody was
+      asked - not a bare "allow".** Landing point today is the string built in
+      `internal/memory/privacy.go` (ruler: `grep -n "r.Decision" internal/memory/privacy.go`);
+      the column value itself must stay verbatim (取证面不许改字, 见票 184 AC#5(a)).
+      > **09-28 13:2x 编排者追加（来源＝票 184 的只读普查 `docs/evidence/s1/184-audit-vocabulary-census-c1.md`＋台账 `A365`，不是新规矩，是把已量到的事实挂到 Will-wire-it 那张票上）**：
+      > `tool_call.decision` 只有五枚冻结值（`internal/agent/journal.go:26-38`，域被 `internal/memory/models.go:136-142` 机器强制），**没有一枚的意思是"档位即放行、没问过人"**；普查逐枚读了五处记 `allow` 的地方，分档＝**从不弹卡纯机器自批 2 处**（`bridge.go:374`／`loop.go:794`）、**靠沉默放行 1 处**（`bridge.go:386`，L1 窗口超时未否决也记 `allow`）、**真人点头 1 处**（`bridge.go:400`）、**生产到不了 1 处**（`loop.go:803`）。唯一能分别"依据哪份授权"的 `grant_id` **生产零填充**（`journal.go:101` 逐字传 `nil`，且 `_ =` 把错误丢掉），而 D45 的 `InsertGrant` **生产零调用方** ⇒ 填它今天是一具空壳。
+      > ⚠ **为什么挂在这张票而不是单开立一张写码票**：普查现量 **`ListPrivacy`／`ExportPrivacy` 在生产里零调用方**（尺：`grep -rn "ListPrivacy\|ExportPrivacy" --include=*.go internal/ cmd/ | grep -v _test` ⇒ 只命中 `internal/memory/privacy.go` 自己）⇒ **今天没有任何一行字被摊给人看过**，单开一枚"改文案"的腿会落在一根没接线的管子上。本票开工接那页时，这一格就是它的硬 AC。
+      > ⚠ 加一枚 `decision` 值＝**人工批准面**（要同动 `SPEC-02:79`＋`PLAN.md:2703`）；普查量的代价是**零迁移、新老库不分叉**（该列是无 CHECK 的自由 TEXT），但**收益只有"机器可查询地区分"**，文案那一形就能给人话那一份 ⇒ 编排者 13:2x 裁：**暂不摆 owner**，等本票真需要机读区分时再摆（口令「票 184 要摆 Q」）。
 
 ## Progress log (append-only, newest last)
 
