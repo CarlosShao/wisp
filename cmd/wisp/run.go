@@ -362,7 +362,7 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	// every call here answers "查不到这个任务" - loud, per 票 164 定案②, and
 	// never an empty success that would read as "the task printed nothing".
 	rt.tasks = tools.NewTaskRoster()
-	for _, e := range tools.BuiltinTaskEntries(tools.TaskDeps{Roster: rt.tasks}) {
+	for _, e := range tools.BuiltinTaskEntries(tools.TaskDeps{Roster: rt.tasks, Paths: rt.paths}) {
 		if err := reg.Register(e); err != nil {
 			fmt.Fprintf(s.stderr, "wisp run: 工具注册失败（%s）：%v\n", e.Tool.Name(), err)
 			return rt, 2
