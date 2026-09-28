@@ -329,3 +329,63 @@ func TestPointer183WorstCaseOfTheLandedExemptionIsPinned(t *testing.T) {
 		t.Fatalf("183 confinement side: hit must come from the foreign mark, got %q", h.SrcTool)
 	}
 }
+
+// ptr183BodyAbsentPath is ticket 183 AC#9's fixture: the SAME host-stub family
+// as the referee, but the declared path is NOT in the body. What the body does
+// carry are windows OF that path - the drive+directory spelling
+// (ptr183DirSpelling) and the "-output-" filler - which is exactly what a real
+// stub says when it names the artifacts directory without spelling one file.
+// Symbol ruler for the branch this pins:
+//
+//	grep -n "declared path is not in this content" internal/risk/provenance.go
+//
+// MarkWithHostPath promises that a declaration this body cannot prove excludes
+// NOTHING (fail-closed). Before this leg, nothing tested it: 183-v2's mutation
+// M3 (attach declaredNorm without requiring runeIndexOf to hit) left every leg
+// in this file green with exit=0, so the promise lived only as a comment.
+const ptr183BodyAbsentPath = "报告头部 " + ptr183Secret +
+	" 中段 […输出已落文件：省略 17200 字符，总长 20000 字节，全文都在 " +
+	ptr183DirSpelling + `\tool-output-` +
+	" 这一批文件里，具体文件名被截断，下次给出…]\n尾部段落 WISP183R1-background-output-line. 结束"
+
+// AC#9 - the eighth permanent leg, and the only teeth the fail-closed branch
+// has. A mark whose body never spells the declared path may not use that path
+// as an exemption: the model's reread of it still has to hit R4.
+//
+// GREEN on today's code (this leg tests that the leg EXISTS and that the branch
+// holds, it does not self-certify a defect); RED under 183-v2's M3, which is
+// what makes it a catcher rather than a comment. The mechanism M3 breaks: with
+// declaredNorm attached unconditionally, EVERY >=8-rune window of the candidate
+// path spells the declaration, so contains() skips all of them and the hit
+// disappears - even though the body proves nothing about that path.
+//
+// The two fixture assertions below are the anti-vacuity halves: the leg is only
+// measuring the fail-closed branch if (1) the declared path really is absent
+// from the normalized body, and (2) the body really does spell at least one
+// >=8-rune window of it (otherwise "still hits" would be green because nothing
+// could ever hit).
+func TestPointer183DeclaredPathAbsentFromBodyStillHits(t *testing.T) {
+	nb := []rune(normalizeTaint(ptr183BodyAbsentPath))
+	np := []rune(normalizeTaint(ptr183Path))
+	nd := []rune(normalizeTaint(ptr183DirSpelling))
+	if runeIndexOf(nb, np) != -1 {
+		t.Fatal("fixture broken: this leg is the declared-path-ABSENT shape, the path must not occur in the body")
+	}
+	if len(nd) < contractMinFragmentChars || !strings.Contains(normalizeTaint(ptr183Path), normalizeTaint(ptr183DirSpelling)) {
+		t.Fatalf("fixture broken: the pinned fragment must be a >=%d-rune window of the declared path (got %d runes)", contractMinFragmentChars, len(nd))
+	}
+	if len(runeWindowHits(nb, nd)) == 0 {
+		t.Fatal("fixture broken: the body must spell at least one real window of the declared path, or this leg asserts nothing")
+	}
+	p := testProv(t, baseOptions(t))
+	if !p.MarkWithHostPath("task-1", SrcFSRead, "task.output", ptr183BodyAbsentPath, ptr183Path) {
+		t.Fatal("host stub must be marked")
+	}
+	h, ok := p.Inspect("task-1", "fs.read", map[string]any{"path": ptr183Path})
+	if !ok {
+		t.Fatal("AC#9 fail-closed: a body that never spells the declared path must not exempt a reread of it (if this goes red, MarkWithHostPath's absent-path branch became a comment again)")
+	}
+	if h.SrcTool != SrcFSRead {
+		t.Fatalf("AC#9: the hit must come from this mark's own non-exempt windows, got %q", h.SrcTool)
+	}
+}
