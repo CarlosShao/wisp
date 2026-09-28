@@ -1,0 +1,30 @@
+175-r2 readings index (anchor 9ca57217, branch dev)
+written by the leg; every count below has its command next to it.
+
+baseline / budget contention
+  go test -count=1 -run TestResolvePerCallBudget ./internal/risk/        -> run1 ok 1.430s ; run2 FAIL 1.030 ms/op vs 1ms ; run3 (post-fix) ok 2.089s  => contention / re-run green, thresholds.go untouched
+  go test -count=1 ./internal/risk/ ./internal/tools/                     -> baseline ok 4.036s / ok 15.120s ; post-fix ok 7.430s / ok 18.159s
+  go test -count=1 -v ./internal/tools/ | grep -cE '^=== RUN'             -> 178 ; ... grep -cE '^--- FAIL' -> 0
+
+criteria files
+  grep -c '^func Test.*175r2' internal/tools/ticket175r2_stamp_live_test.go  -> 5
+  grep -n 'sensitiveSourceTools = \[\]string{' -A 4 internal/risk/provenance.go -> 9 names (was 8 at anchor :96-99)
+  git diff --numstat HEAD~2 -- internal/tools/task_output_leg_test.go internal/risk/provenance_test.go internal/risk/thresholds.go -> empty (0 files touched)
+
+pre-fix anchor readings and post-fix readings: see d22scan-after.txt sibling evidence file
+  docs/evidence/s1/175-task-output-stamped-r2.md sections 4.1 / 4.2 / 5
+
+mutations (each landed with grep -n first, restored with grep -c after)
+  M1a provenance.go:709  if !gateOpen && !isPathKey(k) -> if !gateOpen          -> ALL GREEN, not counted: that branch is not the code path judging fs.read path candidates
+  M1b provenance.go     exempt path-shaped candidate values at match time        -> FAIL TestForeignMentionOfHostPathStillHitsR4OnRealBridge175r2 x3
+  M2  task.go:254       box.set(rec.ArtifactPath) -> _ = box                      -> FAIL TestHostMintedPointerRereadStaysCleanOnRealBridge175r2 x2
+                                                                                   -> FAIL TestLongOutputPointerRecoversEveryByte (:220) and TestPointerPast256KiBIsNotFullyReadable (:381)
+  M3  bridge.go:565     drop the roster gate (stamp every success)                -> FAIL TestNonContentResultStaysUnmarked175r2 x2
+  bak1-provenance.go / bak1-task.go / bak1-bridge.go are the pre-mutation copies (created, never deleted)
+
+gates
+  sh scripts/d22scan.sh                                                   -> rc=0 clean (d22scan-after.txt)
+  sh .scratch/wisp/probes/154/gate-clauses.sh                            -> rc=0, "腿数＝14 声明与实测不符＝0" (gate-clauses-after.txt)
+  bash tools/d22scan/runtests.sh -C tools/d22scan ./...                   -> rc=0, PASS=34 FAIL=0 SKIP=0, === RUN=76, [no tests to run]=0 (runtests-after.txt)
+  gofumpt --version (from $(go env GOPATH)/bin)                           -> v0.12.0 (go1.27.1); -l on the three .go files -> empty
+  NOT re-measured: the two-way comm -3 roster diff (no such section in runtests output); end-to-end leg (ticket 176 has no spawner)
