@@ -213,8 +213,21 @@ type agentRuntime struct {
 	// tasks is ticket 164's process-local background-task table: the only
 	// thing task.output reads. v1 keeps no roster across restarts (票 164
 	// 定案②), so a restart answers "查不到这个任务" rather than empty.
-	tasks    *tools.TaskRoster
-	provs    []llm.LlmProvider // built chain, kept for the probe path
+	tasks *tools.TaskRoster
+	// loopOpt / loopOptSet are ticket 197's derivation seam: the agent.Options
+	// the CURRENT root loop was assembled with, kept so task.spawn builds its
+	// child from the SAME host wiring (same C5 provider, same admission hook,
+	// same budgets) instead of inventing a second runtime next to it. Set in
+	// execute(), read through SubagentDeps.BaseOptions per spawn.
+	loopOpt    agent.Options
+	loopOptSet bool
+	// c25 is the provenance engine the bridge was built with, kept so the
+	// spawner can stamp a subagent's conclusion into the PARENT task's scope
+	// under the existing risk.SrcTaskOutput source name (197 §0: no invented
+	// source names, or a child's outside text travels a channel nobody owns).
+	c25 *risk.Provenance
+	// provs is the built provider chain, kept for the probe path.
+	provs []llm.LlmProvider // built chain, kept for the probe path
 	names    []string
 	endpoint llm.Endpoint
 	gate     *approval.Gate
@@ -450,6 +463,13 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	})
 	rt.ui.publish = rt.publishPanelSnapshot
 
+	// c25 is the ONE C25 engine this process has: the bridge marks sensitive
+	// results with it, and task.spawn stamps a subagent's conclusion into its
+	// parent's scope with the same engine under the same registered source name
+	// (risk.SrcTaskOutput). Handing the spawner a second engine would split the
+	// taint index the R4 checks read.
+	c25 := risk.NewProvenance(risk.ProvOptions{NoProbe: true})
+	rt.c25 = c25
 	rt.bridge = tools.New(tools.Options{
 		Registry: reg,
 		Paths:    rt.paths,
@@ -462,7 +482,7 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		// R4 stays dormant: probing every result for sensitive sources needs
 		// the C25 detector's own wiring (ticket 25), and a dormant R4 is the
 		// honest state, not a weakened one.
-		Provenance:     risk.NewProvenance(risk.ProvOptions{NoProbe: true}),
+		Provenance:     c25,
 		DefaultTimeout: time.Duration(cfg.Agent.PerToolTimeoutMS) * time.Millisecond,
 		OnDecision: func(d tools.Decision) {
 			rt.auditf("wisp run: 风险判定 tool=%s level=%s rules=%v reason=%q",
@@ -470,6 +490,29 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		},
 		Logf: rt.auditf,
 	})
+
+	// task.spawn (ticket 197 leg A) is the only tool this run adds beyond D34's
+	// rows, and it is wired to the objects this runtime is actually running: the
+	// same roster task.output reads, the same bridge as the child's tool surface
+	// (the spawner filters task.spawn out of it, so a child never even sees the
+	// name - depth 1 by structure, not by counting), the same C25 engine, the
+	// panel's stream log for the subagent:<taskID> keys, and the agent.Options the
+	// current root loop was assembled with. Before execute() has assembled one the
+	// snapshot is unset and the tool answers a fail-closed refusal instead of
+	// starting a runtime of its own.
+	for _, e := range tools.BuiltinSubagentEntries(tools.SubagentDeps{
+		Roster:      rt.tasks,
+		ParentTools: rt.bridge,
+		Provenance:  rt.c25,
+		Stream:      func(key, text string) { rt.stream.Append(key, text) },
+		BaseOptions: func() (agent.Options, bool) { return rt.loopOpt, rt.loopOptSet },
+	}) {
+		if err := reg.Register(e); err != nil {
+			fmt.Fprintf(s.stderr, "wisp run: 工具注册失败（%s）：%v\n", e.Tool.Name(), err)
+			return rt, 2
+		}
+	}
+
 	return rt, 0
 }
 
@@ -593,7 +636,7 @@ func (rt *agentRuntime) execute(task string) int {
 	prov := rt.provs[0]
 	info := prov.Info()
 	ep := rt.endpoint
-	loop, err := agent.New(agent.Options{
+	opts := agent.Options{
 		Provider: prov,
 		Tools:    rt.bridge,
 		Sink:     consoleSink{out: rt.stdout, stream: rt.stream, publish: rt.publishPanelSnapshot},
@@ -616,7 +659,12 @@ func (rt *agentRuntime) execute(task string) int {
 				time.Millisecond,
 			SteeringEnabled: cfg.Agent.SteeringEnabled,
 		},
-	})
+	}
+	// ticket 197: task.spawn reads this snapshot to build its child loop, so a
+	// subagent is assembled by the SAME host wiring as its parent (same provider,
+	// same admission hook, same budgets) and not by a runtime invented here.
+	rt.loopOpt, rt.loopOptSet = opts, true
+	loop, err := agent.New(opts)
 	if err != nil {
 		fmt.Fprintf(rt.stderr, "wisp run: agent 环路装配失败：%v\n", err)
 		return 1
@@ -636,6 +684,12 @@ func (rt *agentRuntime) execute(task string) int {
 	// artifacts 目录、同一份缩放后的预算），产物 key 带 agent-task- 前缀，
 	// 不与模型 supplied 的 call id 共用命名空间（internal/tools/task_backfill.go）。
 	bg := loop.RunAsync(ctx, task)
+	// The root's own identity goes into the roster the moment its id exists, so
+	// the tree task.spawn builds has something to hang under (kind=root, no
+	// parent). State is deliberately NOT filed here: that producer rewiring is
+	// ticket 196's per ruling A394, so StateAnswer keeps saying 「宿主没有登记这一维」
+	// for a root row and only subagent rows carry a D43 name.
+	rt.tasks.MarkRoot(bg.ID, task)
 	res := bg.Wait()
 	_, why := (tools.TaskBackfill{
 		Roster: rt.tasks,

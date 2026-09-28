@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 	"sync"
 	"unicode/utf8"
@@ -122,6 +123,16 @@ type TaskOutput struct {
 	// Empty means the host filed none. That is a real answer and StateAnswer
 	// announces it, rather than this record quietly reading as "finished".
 	State statemachine.State
+	// ParentTaskID is the task that derived this one; empty means this row is a
+	// root (ticket 197 §0: one identity dimension, no second status field).
+	ParentTaskID string
+	// Label is the short title of the work - the task's NAME only, never its
+	// body, which stays in Text. It is what a roster row reads as in a list.
+	Label string
+	// Kind is TaskKindRoot or TaskKindSubagent (see subagent_197.go), and the
+	// spawner's depth check reads it: a subagent may not derive another.
+	// Empty means the host filed no kind, which is how every pre-197 row reads.
+	Kind string
 }
 
 // StateAnswer reads the status dimension of one roster record the same way
@@ -160,16 +171,42 @@ func (o TaskOutput) StateAnswer() (statemachine.State, string) {
 type TaskRoster struct {
 	mu     sync.RWMutex
 	byTask map[string]TaskOutput
+	// cancel is the ONE stop path a subagent has: the child loop's own
+	// context.CancelFunc, handed over at spawn time and read back by Cancel.
+	// No second cancel mechanism exists for a roster row by design (197 §0).
+	cancel map[string]func()
+	// reservedSubagents counts the spawn calls holding a pool slot, i.e. the
+	// subagents in flight. It is a counter and not a scan because a slot is
+	// reserved BEFORE the child exists (its id is not) and released only when the
+	// child has joined, and the rows on both sides of that window would otherwise
+	// either double-count or count nothing.
+	reservedSubagents int
+	// watchers are the rows a reader asked to keep an eye on (ticket 197: the
+	// display layer needs "a row appeared / moved" without re-polling a table it
+	// cannot snapshot atomically). Sends are non-blocking by design: a slow reader
+	// loses an intermediate state, never the row itself, and never holds the lock.
+	watchers map[string][]chan TaskOutput
 }
 
 // NewTaskRoster returns an empty roster, ready to share between host and tools.
 func NewTaskRoster() *TaskRoster {
-	return &TaskRoster{byTask: map[string]TaskOutput{}}
+	return &TaskRoster{
+		byTask:   map[string]TaskOutput{},
+		cancel:   map[string]func(){},
+		watchers: map[string][]chan TaskOutput{},
+	}
 }
 
 // Record files (or replaces) one task's output. Last writer wins: a retried
 // task's later output is the answer, and D15(3) already documents the same
 // semantics for the spill artifacts it points at.
+//
+// The one exception is identity (ticket 197): ParentTaskID / Label / Kind are
+// preserved from the row already on file when the incoming record leaves them
+// empty, because the host's write side (TaskBackfill) files {Text, State} and
+// would otherwise erase the parent link of a row the spawner just published.
+// Text, ArtifactPath and State are NOT preserved - an empty State is a real
+// answer that StateAnswer announces (ticket 188), not a hole to paper over.
 func (r *TaskRoster) Record(taskID string, o TaskOutput) {
 	if r == nil || taskID == "" {
 		return
@@ -179,7 +216,44 @@ func (r *TaskRoster) Record(taskID string, o TaskOutput) {
 	if r.byTask == nil {
 		r.byTask = map[string]TaskOutput{}
 	}
+	if prev, ok := r.byTask[taskID]; ok {
+		if o.ParentTaskID == "" {
+			o.ParentTaskID = prev.ParentTaskID
+		}
+		if o.Label == "" {
+			o.Label = prev.Label
+		}
+		if o.Kind == "" {
+			o.Kind = prev.Kind
+		}
+	}
 	r.byTask[taskID] = o
+	for _, ch := range r.watchers[taskID] {
+		select {
+		case ch <- o:
+		default:
+		}
+	}
+}
+
+// WatchRow returns a channel that receives every later write to one row, from
+// the moment it is asked for. It is how a reader sees a subagent's row appear
+// and move without polling, and it is deliberately a live view only: a row
+// written before the call is not replayed (Look is the way to read that).
+func (r *TaskRoster) WatchRow(taskID string) <-chan TaskOutput {
+	if r == nil || taskID == "" {
+		ch := make(chan TaskOutput)
+		close(ch)
+		return ch
+	}
+	ch := make(chan TaskOutput, 8)
+	r.mu.Lock()
+	if r.watchers == nil {
+		r.watchers = map[string][]chan TaskOutput{}
+	}
+	r.watchers[taskID] = append(r.watchers[taskID], ch)
+	r.mu.Unlock()
+	return ch
 }
 
 // Look returns one record. The bool is the ONLY way a caller learns "no such
@@ -206,6 +280,182 @@ func (r *TaskRoster) Count() int {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	return len(r.byTask)
+}
+
+// TaskRecord is one roster row with the key it is filed under. The display layer
+// needs both (ticket 197 leg B reads the stream by task id), and Look's bool is
+// deliberately not smuggled in here: a record that is not in the table simply
+// never appears in a list built from it.
+type TaskRecord struct {
+	TaskID string
+	Out    TaskOutput
+}
+
+// Descendants returns every row this task derived, directly or through a chain,
+// nearest generation first. That read port is what lets the panel open a subagent
+// by clicking into its parent (ticket 197 §0: 名册里一行有状态、可查、可停的记录).
+// It walks ParentTaskID only; a row with no parent is a root and is never
+// anybody's descendant, so a cycle in hand-filed data cannot hang this loop: the
+// seen-set below stops it.
+func (r *TaskRoster) Descendants(taskID string) []TaskRecord {
+	if r == nil || taskID == "" {
+		return nil
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	var out []TaskRecord
+	frontier := []string{taskID}
+	seen := map[string]bool{taskID: true}
+	for len(frontier) > 0 {
+		next := make([]string, 0, len(frontier))
+		for _, parent := range frontier {
+			for id, o := range r.byTask {
+				if o.ParentTaskID != parent || seen[id] {
+					continue
+				}
+				seen[id] = true
+				out = append(out, TaskRecord{TaskID: id, Out: o})
+				next = append(next, id)
+			}
+		}
+		frontier = next
+	}
+	sort.Slice(out, func(i, j int) bool {
+		if out[i].TaskID == out[j].TaskID {
+			return out[i].TaskID < out[j].TaskID
+		}
+		return out[i].TaskID < out[j].TaskID
+	})
+	return out
+}
+
+// PublishSubagent files (or re-files) the identity row of one subagent as
+// in-flight. Both publishers of ticket 197's row - the spawner's goroutine and
+// the child loop's own admission hook - call this with the SAME values, so
+// last-writer-wins is idempotent and the row exists before the child's first
+// model call either way.
+func (r *TaskRoster) PublishSubagent(taskID, parentTaskID, label string) {
+	r.Record(taskID, TaskOutput{
+		ParentTaskID: parentTaskID, Label: label, Kind: TaskKindSubagent,
+		State: statemachine.State(subagentStateRunning),
+	})
+}
+
+// MarkRoot files the root identity for a task the host is running itself.
+//
+// State is deliberately NOT written here: the root task's producer still files
+// no D43 name (ruling A394 keeps that rewiring with ticket 196), so
+// StateAnswer keeps saying 「宿主没有登记这一维」 for a root row. What lands is
+// the parent link (none) and the kind, which is what makes the tree readable.
+func (r *TaskRoster) MarkRoot(taskID, label string) {
+	r.Record(taskID, TaskOutput{Label: label, Kind: TaskKindRoot})
+}
+
+// TryAcquireSubagentSlot reserves one of the shared pool's slots. The pool is
+// process-wide: the root and all of its descendants count against the same
+// limit, because they share this table. release is idempotent, and every caller
+// must reach it exactly once - on the refusal paths and after the child joins.
+func (r *TaskRoster) TryAcquireSubagentSlot(limit int) (release func(), ok bool) {
+	if r == nil {
+		return func() {}, false
+	}
+	if limit <= 0 {
+		limit = 1
+	}
+	r.mu.Lock()
+	if r.reservedSubagents >= limit {
+		r.mu.Unlock()
+		return func() {}, false
+	}
+	r.reservedSubagents++
+	var once sync.Once
+	r.mu.Unlock()
+	return func() {
+		once.Do(func() {
+			r.mu.Lock()
+			if r.reservedSubagents > 0 {
+				r.reservedSubagents--
+			}
+			r.mu.Unlock()
+		})
+	}, true
+}
+
+// InFlightSubagents reports how many slots the pool is holding.
+func (r *TaskRoster) InFlightSubagents() int {
+	if r == nil {
+		return 0
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.reservedSubagents
+}
+
+// RunningSubagentIDs names the rows currently in flight. It reads the D43
+// dimension, so the ids it returns are the ones a reader can also see in the
+// panel; the refusal text uses it to say WHICH subagents are holding the pool.
+func (r *TaskRoster) RunningSubagentIDs() []string {
+	if r == nil {
+		return nil
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	var ids []string
+	for id, o := range r.byTask {
+		if o.Kind == TaskKindSubagent && o.State == statemachine.State(subagentInFlightState) {
+			ids = append(ids, id)
+		}
+	}
+	sort.Strings(ids)
+	return ids
+}
+
+// AttachCancel stores the child's own context.CancelFunc as the ONLY stop path
+// for that row. Re-attaching replaces it (last writer wins, same as Record).
+func (r *TaskRoster) AttachCancel(taskID string, cancel func()) {
+	if r == nil || taskID == "" || cancel == nil {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if r.cancel == nil {
+		r.cancel = map[string]func(){}
+	}
+	r.cancel[taskID] = cancel
+}
+
+// DetachCancel forgets one row's stop handle once the child has joined: a cancel
+// after that would be a no-op pretending to be a stop.
+func (r *TaskRoster) DetachCancel(taskID string) {
+	if r == nil {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	delete(r.cancel, taskID)
+}
+
+// Cancel stops exactly one roster row through the handle it was spawned with, and
+// never touches anybody else's - not the parent, not a sibling. The bool plus
+// reason pair is the same fail-closed shape as Look's: "no such handle" is a
+// different fact from "already stopped", and Cancel says which one it found.
+func (r *TaskRoster) Cancel(taskID string) (bool, string) {
+	if r == nil || taskID == "" {
+		return false, "没有这条任务 id（宿主没登记过它）"
+	}
+	r.mu.RLock()
+	cancel := r.cancel[taskID]
+	o, known := r.byTask[taskID]
+	r.mu.RUnlock()
+	if !known {
+		return false, fmt.Sprintf("查不到任务 %s：v1 的任务名册只在本进程内，重启后不保留（票 164 定案②）", taskID)
+	}
+	if cancel == nil {
+		return false, fmt.Sprintf("任务 %s 没有在跑（kind=%s，state=%s），没有可停的句柄",
+			taskID, o.Kind, string(o.State))
+	}
+	cancel()
+	return true, ""
 }
 
 // ---------------------------------------------------------------------------
