@@ -1,0 +1,6 @@
+{
+ "Replace": {
+  "D:/work/workspace/projects plans/Wisp/internal/risk/provenance.go": "D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/183/orch/mut-prefix/provenance.go",
+  "D:/work/workspace/projects plans/Wisp/internal/risk/taintmatch.go": "D:/work/workspace/projects plans/Wisp/.scratch/wisp/probes/183/orch/mut-prefix/taintmatch.go"
+ }
+}

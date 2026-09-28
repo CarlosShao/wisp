@@ -43,6 +43,7 @@ owner 从第一天在意的那句"超长的输出，我能不能让它自己读�
 - [ ] **AC#4 与票 183 共用那枚代价面**：AC#2 无论选哪支，都要复量第 4 把尺那一面（真实正文命中率 3/10 那把尺）并具名说"这次往前推一步，让哪一类外来正文不再算证据"。**不许**只报收益不报退让。
 - [ ] **AC#5 门禁**：逐包 `go test -count=1 ./internal/risk/`（**单跑**）＋`./internal/tools/`＋`./internal/agent/`；CLI 那一面走 `-overlay` **且带在册 PATH 前缀**（`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`，两形都要贴）；`sh scripts/d22scan.sh`；`gate-clauses.sh` **比红腿名册不比退码**；⚠ 终态读数取在最后一枚 commit 之后。⚠ **排程护栏**：`-overlay` 不保护你不吃别人的在飞脏件——起手复量 `git status --porcelain -- internal/ cmd/`，不为空就把你要依赖的每枚跟踪件用 `git show HEAD:<path>` 钉进自己的 overlay；**不许跑** `probes/161/r6/flip-declaration.sh`；注释里凡自指本文件行号，写"符号名＋`grep -n` 尺"，**不写死号**。
 - [ ] **AC#6 契约轴**：`docs/PLAN.md`、`docs/specs/**`、`thresholds.go`／golden／审批超时常量／`allowlist.txt` 一字节不许动；`internal/risk/provenance.go:468-473`（`Mark` 契约文字）与 `internal/risk/taintmatch.go:11-15`（逐 token 追踪已被否决）保持不动（基线 md5 在 `A363`／`A364`）；**票 183 的文档块原 25 行同样不许改写**，要更正只许追加。
+- [ ] **AC#7（09-28 14:1x 由票 183 的 AC#4 归口过来·纯测试面·零产码）**：`同名不同目录` 那一形——同一个**文件名**挂在另一枚目录下、宿主正文里逐字拼出那条兄弟路径、而宿主只声明了自己那一条 ⇒ 续读兄弟**必须仍命中 R4**。⚠ 它和 `183-r2` 已落的那枚"同目录兄弟"是**两枚不同的洞**：那枚防"放宽到目录级"，这枚防"放宽到**文件名／basename**级"。今天修法是按整条归一化串逐字比、看着到不了这一形——**但"看着到不了"不是凭据**（票 183 整张票的教训就是这句）。⇒ 本格今天**应当是绿的**，所以它是**"不许弄坏"的守卫，不许充当本票新增的牙**；它的牙必须现量：对"豁免改成只比 basename"那一发变异（走 `-overlay`，别动跟踪件）它要红。落点＝`internal/tools/pointer_183_cli_seam_test.go` 同批加一枚，或 `internal/risk/pointer_183_test.go` 第 9 枚（尺 `grep -c "^func Test" internal/risk/pointer_183_test.go`＝**8**，别抄票面）。
 
 ## 本票**不**解决
 
@@ -54,3 +55,4 @@ owner 从第一天在意的那句"超长的输出，我能不能让它自己读�
 ## Progress log
 
 - 09-28 13:0x 编排者立票：上面 5 把尺本程现跑（锚 `0662a35a`，`git status --porcelain -- internal/ cmd/` 起手为空）。第 55／60 行两枚读数我自己从文件里逐字取。⚠ 本票与票 183 AC#2 的"一次成功算不算达标"是同一场官司，**归属等 `183-v1` 交完再裁**；裁完之前**不派**。未派。
+- 09-28 14:1x 编排者：**归属已裁完、本票解除按住**（`183-v2` 判"独立"，我照它翻勾并把票 183 改名 `-done`）。本程真机重跑再确认一次阻断者仍是这枚（HEAD=`78ea1d19`，带在册 PATH 前缀）：第一发续读 `kind=success risk=L0 rules_hit=[]`，第二发 `kind=refused risk=L2 rules_hit=[R4] reason="R4: 包含来自 fs.read …"`，台件 `TestRereadHostPointerOnCLISeam183a1` 在 HEAD 上 `--- FAIL (60.10s)` 红在 `zz183r1_e2e_test.go:373`。⚠ 同批**新加 AC#7**（票 183 AC#4 那支"同名不同目录"零读数、原话不改、归口到本票）。⇒ 下一枚＝**`185-c1`（只读普查，先答 AC#2 那三支的现量与代价，不许直接派落地腿）**。未派之前不改任何勾。
