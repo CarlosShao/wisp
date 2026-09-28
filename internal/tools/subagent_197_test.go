@@ -3,6 +3,7 @@ package tools
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"reflect"
 	"strings"
 	"sync"
@@ -78,8 +79,10 @@ func (p *fake197Provider) Stream(ctx context.Context, _ *llm.Request, emit func(
 	}
 	if askSpawn {
 		_ = emit(llm.StreamEvent{Type: llm.EvToolCallStart, ToolCallID: "call-197-spawn", ToolName: "task.spawn"})
-		_ = emit(llm.StreamEvent{Type: llm.EvToolCallArgsDelta, ToolCallID: "call-197-spawn",
-			ArgsDelta: `{"description":"孙代理","prompt":"再派一枚"}`})
+		_ = emit(llm.StreamEvent{
+			Type: llm.EvToolCallArgsDelta, ToolCallID: "call-197-spawn",
+			ArgsDelta: `{"description":"孙代理","prompt":"再派一枚"}`,
+		})
 		_ = emit(llm.StreamEvent{Type: llm.EvToolCallEnd, ToolCallID: "call-197-spawn", ToolName: "task.spawn"})
 		_ = emit(llm.StreamEvent{Type: llm.EvStop, Stop: llm.StopToolUse})
 		_ = emit(llm.StreamEvent{Type: llm.EvDone})
@@ -137,7 +140,6 @@ func (d *fake197Dir) calls() []string {
 type sub197Harness struct {
 	roster   *TaskRoster
 	bridge   *Bridge
-	deps     *SubagentDeps
 	prov     *risk.Provenance
 	dir      *fake197Dir
 	streamMu sync.Mutex
@@ -167,7 +169,8 @@ func (h *sub197Harness) build(t *testing.T, childProvider func() llm.LlmProvider
 // "provenance engine not wired" fail-closed branch gets exercised against the
 // real tool instead of a stand-in.
 func (h *sub197Harness) buildWith(t *testing.T, childProvider func() llm.LlmProvider,
-	admitWired bool, mutate func(*SubagentDeps)) {
+	admitWired bool, mutate func(*SubagentDeps),
+) {
 	t.Helper()
 	reg := NewRegistry()
 	deps := SubagentDeps{
@@ -195,14 +198,15 @@ func (h *sub197Harness) buildWith(t *testing.T, childProvider func() llm.LlmProv
 	if mutate != nil {
 		mutate(&deps)
 	}
-	h.deps = &deps
 	for _, e := range append(BuiltinTaskEntries(TaskDeps{Roster: h.roster}), BuiltinSubagentEntries(deps)...) {
 		if err := reg.Register(e); err != nil {
 			t.Fatalf("Register(%s): %v", e.Tool.Name(), err)
 		}
 	}
-	h.bridge = New(Options{Registry: reg, Provenance: h.prov, Gate: NoGate{},
-		Logf: func(string, ...any) {}})
+	h.bridge = New(Options{
+		Registry: reg, Provenance: h.prov, Gate: NoGate{},
+		Logf: func(string, ...any) {},
+	})
 }
 
 // spawnResult dispatches one task.spawn call through the real bridge, so the
@@ -318,8 +322,10 @@ func Test197RowExistsBeforeFirstChildModelCall(t *testing.T) {
 	h := newSub197Harness(t)
 	started := make(chan struct{}, 1)
 	release := make(chan struct{})
-	prov := &fake197Provider{name: "child", answer: foreign197A, roster: h.roster,
-		started: started, release: release}
+	prov := &fake197Provider{
+		name: "child", answer: foreign197A, roster: h.roster,
+		started: started, release: release,
+	}
 	h.build(t, func() llm.LlmProvider { return prov }, true)
 
 	done := make(chan Result, 1)
@@ -345,35 +351,83 @@ func Test197RowExistsBeforeFirstChildModelCall(t *testing.T) {
 	}
 }
 
-// spawnDirect runs the real tool with the same per-call context the bridge builds
-// (corr = the parent task id), bypassing the bridge's in-bridge tool-concurrency
-// ceiling (D38d). That ceiling is lower than this ticket's 8-slot pool, so holding
-// eight children at once through eight bridge calls would queue them against the
-// C22 30s budget instead of measuring the cap. The ceiling itself is reported in
-// the evidence file; every other leg here still goes through the real bridge.
-func (h *sub197Harness) spawnDirect(ctx context.Context, label, prompt string) (Result, error) {
-	tctx := withCancel(ctx, cancelHandle{corr: parent197})
-	return subagentSpawn{d: *h.deps}.Execute(tctx,
-		json.RawMessage(`{"description":"`+label+`","prompt":"`+prompt+`"}`), nil)
+// AC#2 (ticket 211 甲) - the resident nail on the pool's number: the roster may
+// never admit MORE subagents than the bridge can run at once. This is a
+// comparison of two independent readings (MaxConcurrentSubagents is written as
+// the literal 4 in subagent_197.go, MaxToolConcurrency is the D38d ceiling in
+// bridge.go, which this ticket did not touch by one byte), so it is not the
+// tautology the dispatch forbids: writing the pool back to 8 turns this leg red.
+// That positive control was run at delivery and its before/after readings are in
+// docs/evidence/s1/197-subagent-entity-r1b.md.
+//
+// Why a bigger pool is a lie and not extra capacity: one in-flight spawn holds
+// one bridge slot for its child's whole life (bridge.run keeps the semaphore
+// held across entry.Tool.Execute), so every admitted child above the ceiling is
+// a row the roster prints as 「在跑」 while the machine has it queued inside the
+// bridge - which is exactly the 7/8-red shape ticket 197 leg A reported.
+func Test197SubagentPoolNeverExceedsBridgeCeiling(t *testing.T) {
+	if MaxConcurrentSubagents > MaxToolConcurrency {
+		t.Errorf("池 %d 大于桥的 D38d 天花板 %d：多出来的 %d 枚会被桥排成队，名册却说它们在跑；"+
+			"诚实数 = 天花板（票 211 甲），要更多并发得先动契约（票 211 乙），不是改这枚常量",
+			MaxConcurrentSubagents, MaxToolConcurrency, MaxConcurrentSubagents-MaxToolConcurrency)
+	}
+	if MaxConcurrentSubagents <= 0 {
+		t.Errorf("池常量 = %d：一枚都不许跑的话，task.spawn 这条路本身就不该存在", MaxConcurrentSubagents)
+	}
 }
 
-// AC#2 - the pool is 8, shared by the root and all its descendants, and the 9th
-// is a hard refusal with a readable reason (never a silent queue). Reverse
-// control: 8 all finish.
-func Test197SubagentPoolCapsAtEight(t *testing.T) {
+// AC#2's second half - the number the MODEL reads is the number the pool holds.
+// subagentSpawn.Description() is generated from the constants; a hand-typed "8"
+// there would keep selling the old cap to the model after the pool was lowered,
+// and the model plans its fan-out from that sentence.
+func Test197SpawnDescriptionNamesTheRealPoolCap(t *testing.T) {
+	desc := (subagentSpawn{}).Description()
+	for _, want := range []string{
+		fmt.Sprintf("上限 %d 枚", MaxConcurrentSubagents),
+		fmt.Sprintf("深度 %d", MaxSubagentDepth),
+	} {
+		if !strings.Contains(desc, want) {
+			t.Errorf("给模型读的说明文本里没有 %q（文本与常量已经分家）：%q", want, desc)
+		}
+	}
+}
+
+// AC#4 - the cap measured on the production path: MaxConcurrentSubagents
+// task.spawn calls issued concurrently by the parent through the REAL bridge all
+// run, all four bridge slots are genuinely busy, the roster shows exactly that
+// many running rows, and every one of them finishes.
+//
+// This replaces the pre-211 leg that drove the tool directly (spawnDirect), and
+// spawnDirect is gone rather than documented: with the pool pinned to the
+// ceiling there is nothing left for a bridge bypass to measure that this leg
+// does not measure better. The old bypass is why "8" survived a green suite -
+// it counted the roster's bookkeeping while the bridge, the only thing that can
+// actually run a child, never entered the picture.
+func Test197SubagentPoolCapsAtBridgeCeiling(t *testing.T) {
 	h := newSub197Harness(t)
-	started := make(chan struct{}, MaxConcurrentSubagents+1)
+	if MaxConcurrentSubagents > MaxToolConcurrency {
+		t.Fatalf("池 %d 大于桥的天花板 %d：这一发要同时占 %d 枚桥位，多出来的会排在 sem 后面起跑不了；"+
+			"先修 Test197SubagentPoolNeverExceedsBridgeCeiling 那条账",
+			MaxConcurrentSubagents, MaxToolConcurrency, MaxConcurrentSubagents)
+	}
+
+	started := make(chan struct{}, MaxConcurrentSubagents)
 	release := make(chan struct{})
 	h.build(t, func() llm.LlmProvider {
-		return &fake197Provider{name: "child", answer: foreign197A,
-			started: started, release: release}
+		return &fake197Provider{
+			name: "child", answer: foreign197A,
+			started: started, release: release,
+		}
 	}, true)
 
 	results := make(chan Result, MaxConcurrentSubagents)
 	errs := make(chan error, MaxConcurrentSubagents)
 	for i := 0; i < MaxConcurrentSubagents; i++ {
 		go func(i int) {
-			res, err := h.spawnDirect(context.Background(), string(rune('A'+i)), "并发任务")
+			// t.Context(), not Background: a leg that fails before close(release)
+			// must not leave children parked in the bridge until the package
+			// deadline. Nothing in here touches t from the goroutine.
+			res, err := h.spawnResult(t.Context(), string(rune('A'+i)), "并发任务")
 			if err != nil {
 				errs <- err
 				return
@@ -382,29 +436,22 @@ func Test197SubagentPoolCapsAtEight(t *testing.T) {
 		}(i)
 	}
 	for i := 0; i < MaxConcurrentSubagents; i++ {
-		<-started
-	}
-	if got := h.roster.InFlightSubagents(); got != MaxConcurrentSubagents {
-		t.Fatalf("池内占位 = %d, want %d", got, MaxConcurrentSubagents)
-	}
-
-	ninth, err := h.spawnDirect(t.Context(), "第九枚", "再来一枚")
-	if err != nil {
-		t.Fatalf("第 9 枚调用: %v", err)
-	}
-	if !ninth.IsError {
-		t.Fatalf("第 9 枚没有被硬拒：%s", ninth.Text)
-	}
-	for _, want := range []string{"8", "拒绝派生"} {
-		if !strings.Contains(ninth.Text, want) {
-			t.Errorf("超限理由不可读：%q 里没有 %q", ninth.Text, want)
+		select {
+		case <-started:
+		case <-t.Context().Done():
+			t.Fatalf("只有 %d/%d 枚子代理真的起了跑：桥的天花板 %d 拦下了多出来的那几枚（票 211 的症状）",
+				i, MaxConcurrentSubagents, MaxToolConcurrency)
 		}
 	}
 	if got := h.roster.InFlightSubagents(); got != MaxConcurrentSubagents {
-		t.Errorf("被拒的那一枚占了池位：in-flight = %d, want %d（硬拒不是排队）", got, MaxConcurrentSubagents)
+		t.Fatalf("池内占位 = %d, want %d（%d 枚都在跑却少占位，池与桥就不是一回事了）",
+			got, MaxConcurrentSubagents, MaxConcurrentSubagents)
+	}
+	if ids := h.roster.RunningSubagentIDs(); len(ids) != MaxConcurrentSubagents {
+		t.Errorf("名册里「在跑」的行数 = %d, want %d：%+v", len(ids), MaxConcurrentSubagents, ids)
 	}
 	if rows := len(h.childRows()); rows != MaxConcurrentSubagents {
-		t.Errorf("被拒的那一枚在名册里留了行：%d, want %d", rows, MaxConcurrentSubagents)
+		t.Errorf("名册行数 = %d, want %d", rows, MaxConcurrentSubagents)
 	}
 
 	close(release)
@@ -414,8 +461,10 @@ func Test197SubagentPoolCapsAtEight(t *testing.T) {
 			t.Fatalf("并发派生出错：%v", err)
 		case r := <-results:
 			if r.IsError {
-				t.Errorf("8 枚以内的一枚失败了（反控）：%s", r.Text)
+				t.Errorf("天花板以内的一枚失败了（反控）：%s", r.Text)
 			}
+		case <-t.Context().Done():
+			t.Fatal("放开之后没等到全部收尾")
 		}
 	}
 	if rows := h.childRows(); len(rows) != MaxConcurrentSubagents {
@@ -426,13 +475,122 @@ func Test197SubagentPoolCapsAtEight(t *testing.T) {
 	}
 }
 
+// AC#3 - with the pool full, the next spawn is a hard refusal with a readable
+// reason naming the ids that hold it; it takes no slot and leaves no row. Still
+// measured through the real bridge (no bypass).
+//
+// How the pool is filled matters: now that the pool EQUALS the ceiling, N real
+// children also occupy all N bridge slots, so a (N+1)-th call could only queue
+// behind them and never reach the tool - the refusal branch would be unreachable
+// and this leg would be a 30s timeout dressed up as a pass. Production does have
+// a shape that fills the pool while giving the bridge slots back: the parent
+// stops listening (its call returns, the child keeps running and keeps its
+// slot - the no-cascade rule ticket 197 §0 froze). That is the shape driven
+// below, and the gap between it and "5 concurrent spawns from one live parent"
+// is reported in the evidence file rather than hidden.
+func Test197FullPoolRefusesNextSpawnWithReadableReason(t *testing.T) {
+	h := newSub197Harness(t)
+	if MaxConcurrentSubagents > MaxToolConcurrency {
+		t.Fatalf("池 %d 大于桥的天花板 %d：先修 Test197SubagentPoolNeverExceedsBridgeCeiling",
+			MaxConcurrentSubagents, MaxToolConcurrency)
+	}
+
+	started := make(chan struct{}, MaxConcurrentSubagents)
+	release := make(chan struct{})
+	h.build(t, func() llm.LlmProvider {
+		return &fake197Provider{
+			name: "child", answer: foreign197A,
+			started: started, release: release,
+		}
+	}, true)
+
+	returned := make(chan Result, MaxConcurrentSubagents)
+	cancels := make([]context.CancelFunc, MaxConcurrentSubagents)
+	for i := 0; i < MaxConcurrentSubagents; i++ {
+		ctx, cancel := context.WithCancel(t.Context())
+		cancels[i] = cancel
+		go func(i int) {
+			res, err := h.spawnResult(ctx, string(rune('A'+i)), "占住池位")
+			if err != nil {
+				returned <- Result{Text: err.Error(), IsError: true}
+				return
+			}
+			returned <- res
+		}(i)
+		<-started
+	}
+	for _, cancel := range cancels {
+		cancel()
+	}
+	for i := 0; i < MaxConcurrentSubagents; i++ {
+		res := <-returned
+		if !res.IsError || !strings.Contains(res.Text, "没有被级联取消") {
+			t.Errorf("父任务不听了，那一枚却没说实话：%q", res.Text)
+		}
+	}
+	// Live views attached before the children are let go, so the drain below is
+	// joined through the roster's own write stream (no polling, no wall clock).
+	watches := make([]<-chan TaskOutput, 0, MaxConcurrentSubagents)
+	for _, id := range h.roster.RunningSubagentIDs() {
+		watches = append(watches, h.roster.WatchRow(id))
+	}
+	if got := h.roster.InFlightSubagents(); got != MaxConcurrentSubagents {
+		t.Fatalf("父任务不听了，池却回收了占位：%d, want %d（孩子在跑，位就得留着）",
+			got, MaxConcurrentSubagents)
+	}
+	running := h.roster.RunningSubagentIDs()
+	if len(running) != MaxConcurrentSubagents {
+		t.Fatalf("名册里在跑的行数 = %d, want %d：%+v", len(running), MaxConcurrentSubagents, running)
+	}
+
+	// The bridge has its slots back now, so this call really reaches the tool.
+	next, err := h.spawnResult(t.Context(), "多出来的那枚", "再来一枚")
+	if err != nil {
+		t.Fatalf("多出来的那一枚调用: %v", err)
+	}
+	if !next.IsError {
+		t.Fatalf("池已满，多出来的那一枚却没被硬拒：%s", next.Text)
+	}
+	for _, want := range []string{"拒绝派生", "不是排队", fmt.Sprintf("上限 %d 枚", MaxConcurrentSubagents)} {
+		if !strings.Contains(next.Text, want) {
+			t.Errorf("超限理由不可读：%q 里没有 %q", next.Text, want)
+		}
+	}
+	for _, id := range running {
+		if !strings.Contains(next.Text, id) {
+			t.Errorf("理由没点名占着池的那枚 %s：%q", id, next.Text)
+		}
+	}
+	if got := h.roster.InFlightSubagents(); got != MaxConcurrentSubagents {
+		t.Errorf("被拒的那一枚占了池位：in-flight = %d, want %d（硬拒不是排队）", got, MaxConcurrentSubagents)
+	}
+	if rows := len(h.childRows()); rows != MaxConcurrentSubagents {
+		t.Errorf("被拒的那一枚在名册里留了行：%d, want %d", rows, MaxConcurrentSubagents)
+	}
+
+	// The refused call did not park anything either: the real children still
+	// finish on their own and hand their slots back.
+	close(release)
+	for _, watch := range watches {
+		final := waitUntilSettled(t, watch)
+		if final.State == statemachine.StateThinking {
+			t.Errorf("放行之后的行还停在跑：%+v", final)
+		}
+	}
+	if got := h.roster.InFlightSubagents(); got != 0 {
+		t.Errorf("全部结束后可位没回收：%d, want 0", got)
+	}
+}
+
 // AC#3 - depth 1, structurally: task.spawn is not in the child's directory at
 // all, a child that asks for it by name is refused with the reason, and the
 // child's own run derives no second-generation row.
 func Test197ChildCannotDeriveSubagent(t *testing.T) {
 	h := newSub197Harness(t)
-	child := &fake197Provider{name: "child", answer: "我试了派一枚，失败了",
-		askSpawnFirstTurn: true}
+	child := &fake197Provider{
+		name: "child", answer: "我试了派一枚，失败了",
+		askSpawnFirstTurn: true,
+	}
 	h.build(t, func() llm.LlmProvider { return child }, true)
 
 	// The directory the child is offered is the parent's minus task.spawn.
@@ -690,7 +848,12 @@ func Test197StreamKeyShapeIsLiteral(t *testing.T) {
 	if SubagentStreamKeyPrefix != "subagent:" {
 		t.Errorf("前缀 = %q, want subagent:", SubagentStreamKeyPrefix)
 	}
-	if MaxConcurrentSubagents != 8 || MaxSubagentDepth != 1 {
-		t.Errorf("池/深度常量漂了：%d / %d, want 8 / 1", MaxConcurrentSubagents, MaxSubagentDepth)
+	if MaxSubagentDepth != 1 {
+		t.Errorf("深度常量漂了：%d, want 1", MaxSubagentDepth)
 	}
+	// The pool is deliberately NOT pinned to a hand-typed number in this leg:
+	// "8" sitting here next to a bridge that runs 4 is exactly how the stale cap
+	// stayed green through a whole suite. Its honest reading is a relationship
+	// with the bridge's D38d ceiling, measured by
+	// Test197SubagentPoolNeverExceedsBridgeCeiling (ticket 211 甲).
 }

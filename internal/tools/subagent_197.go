@@ -56,7 +56,21 @@ const (
 	// and every one of its descendants share this ONE pool (it lives on the
 	// roster, which is process-local), and exceeding it is a hard refusal with a
 	// readable reason - never a silent queue into somewhere nobody can see.
-	MaxConcurrentSubagents = 8
+	//
+	// The number is the bridge's D38d ceiling (MaxToolConcurrency in
+	// internal/tools/bridge.go, which is a frozen contract and not tunable
+	// upward), NOT a number picked from the roster's side: one in-flight spawn
+	// holds one bridge slot for its child's whole life, because the bridge keeps
+	// the semaphore held across entry.Tool.Execute. A pool LARGER than that
+	// ceiling would therefore admit rows the machine cannot actually run at once
+	// - the extra children sit queued inside the bridge while the roster already
+	// shows them as running, which is the exact lie ticket 211 was filed for.
+	// internal/tools/subagent_197_test.go's
+	// Test197SubagentPoolNeverExceedsBridgeCeiling is the resident nail: raise
+	// this constant above the ceiling and that leg goes red. It is written as the
+	// number 4, not as an alias of MaxToolConcurrency, so that leg compares two
+	// independent readings instead of one constant against itself.
+	MaxConcurrentSubagents = 4
 
 	// MaxSubagentDepth is how deep the tree may go: 1, i.e. a subagent may not
 	// derive a subagent. Enforced structurally (the child's tool directory has no
@@ -136,11 +150,15 @@ func (subagentSpawn) Name() string { return "task.spawn" }
 
 // Description carries the two facts the model cannot be allowed to guess:
 // cancellation does not cascade, and a subagent cannot derive a subagent.
+// The two numbers are read from the constants, never typed by hand: a model-facing
+// sentence that says "8" while the pool holds 4 is the same lie ticket 211 was
+// filed for, just told to the model instead of to the user.
 func (subagentSpawn) Description() string {
-	return "派生一枚子代理去独立完成一个子任务，等它跑完并把结论带回本任务；" +
-		"它会在任务名册里留下一行有父子关系与状态的记录，可以用 task.cancel 单独停它；" +
-		"注意：停掉父任务不会级联停掉子代理（要停它得单独停）；" +
-		"子代理不能再派生子代理（深度 1），同时在跑的子代理上限 8 枚"
+	return fmt.Sprintf("派生一枚子代理去独立完成一个子任务，等它跑完并把结论带回本任务；"+
+		"它会在任务名册里留下一行有父子关系与状态的记录，可以用 task.cancel 单独停它；"+
+		"注意：停掉父任务不会级联停掉子代理（要停它得单独停）；"+
+		"子代理不能再派生子代理（深度 %d），同时在跑的子代理上限 %d 枚",
+		MaxSubagentDepth, MaxConcurrentSubagents)
 }
 
 func (subagentSpawn) Parameters() JSONSchema { return subagentSpawnSchema }
@@ -302,10 +320,12 @@ func (t subagentSpawn) Execute(ctx context.Context, params json.RawMessage, onUp
 	case <-ctx.Done():
 		// The parent's call went away. The child keeps running and stays in the
 		// roster; nothing here cancels it.
-		return Result{Text: fmt.Sprintf(
-			"父任务这一侧已经不等了（%v）。子代理 %s 没有被级联取消，它仍在名册里，"+
-				"可以单独停它：它的流键是 %s。", ctx.Err(), bg.ID, SubagentStreamKey(bg.ID)),
-			IsError: true}, nil
+		return Result{
+			Text: fmt.Sprintf(
+				"父任务这一侧已经不等了（%v）。子代理 %s 没有被级联取消，它仍在名册里，"+
+					"可以单独停它：它的流键是 %s。", ctx.Err(), bg.ID, SubagentStreamKey(bg.ID)),
+			IsError: true,
+		}, nil
 	case res := <-done:
 		return t.answer(bg.ID, label, res, stampWhy), nil
 	}
