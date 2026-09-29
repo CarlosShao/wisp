@@ -29,17 +29,22 @@ test-core 的唯一根因是一条顶层 SKIP。**并且更正了我一句话**�
 
 ## AC（1:1，裁决表 `docs/evidence/s1/110-*.md` 由验收方出）
 
-- [ ] **AC#1** 先给**现状读数**：把 CI 每一次 job 的**每一步**跑了哪些包列出来（`gh api .../runs/<id>/jobs --jq` 读 steps + 日志里 `ok <pkg>` 的集合），
+- [x] **AC#1** 先给**现状读数**：把 CI 每一次 job 的**每一步**跑了哪些包列出来（`gh api .../runs/<id>/jobs --jq` 读 steps + 日志里 `ok <pkg>` 的集合），
       与仓内包清单对账 ⇒ 明确指出"`internal/winsec` 在 CI 上出现 0 次"是不是事实，以及**还有哪个包同样零覆盖**（不许只报 winsec 一个）。
-- [ ] **AC#2** 落一步**真会跑 winsec 测试**的门禁（windows job），并给一次**步级**成功读数（run id + job id + step 号）。
+      `done-fix-1` 勾＝尺一：本腿现读表 `docs/evidence/s1/110-adversarial-acceptance.md:14`「AC#1 | 全 CI 每一步实跑哪些包 × `go list ./...` 对账；点名 winsec 0 次与**其余**零覆盖包 | **通过（口径更正 1 处）** | 单 run 全量＝〔独立复现〕；"全 CI 历史"外推＝〔日志＋归档，我抽验〕」；尺二＝这格要的交付物是**贴出来的对账表**，它就在票面：`:65`–`:74`（逐字 `:72`「**全 CI 里出现过的被测包 = 20 个。仓内 `go list ./...` = 33 个。**」、`:74`「**顺手发现：零覆盖的不止 winsec。** 有 `_test.go` 却从未在任何 CI 步里作为被测包出现的，共 **6 个包**」），验收方那边还自己复算了一遍（票面 `:99` 记「AC#1 对账表验收方自己复算：`go list ./...` = **33**；我自己下载 `35591482293` 的全量日志（241 193 B）…」）。⚠ **两句没销的话留在这儿**：①`gh api` 与 `go list` 本腿都不许跑（一个要网络、一个要编译），这两发是引来的；②票面 `:88` 自己写着"未办：AC#1 点名的**另 5 个零覆盖包**"——那 5 个包今天仍没人接（`internal/ball` 11 个 test 文件、`cmd/wisp` 5、`internal/perm` 2…），本格翻的是"读数给出了"，不是"零覆盖都补齐了"。
+- [x] **AC#2** 落一步**真会跑 winsec 测试**的门禁（windows job），并给一次**步级**成功读数（run id + job id + step 号）。
       ⚠ **加严可以直接做**；**放宽/删步骤/把失败改成 `continue-on-error` 一律不许**。
       若加进去第一天就红 ⇒ **那是发现，不是失败**：红名逐条登记，不许为了绿而放宽断言或调阈值。
+      `done-fix-1` 勾＝尺一：表 `110-…md:15`「AC#2 | 落一步真会跑 winsec 测试的门禁（windows job）+ 一次**步级**读数 | **通过（步级读数已存在；步本身红 ⇒ 登记为发现）** | 〔独立复现〕 | `gh api repos/CarlosShao/wisp/actions/runs/35595651898/jobs` → **job…**」；尺二＝这一步今天在树里，且只有这一步：`grep -n 'internal/winsec\|winsec-tests' .github/workflows/ci.yml`＝`:398` `- name: "Windows ACL sealing gate (internal/winsec's own tests, ticket 110)"`、`:439` `run: bash scripts/winsec-tests.sh`（另 `:406` 那句注释逐字留着「string `ok github.com/CarlosShao/wisp/internal/winsec` appeared ZERO…」＝AC#1 那笔账被钉进步面），`ls scripts/winsec-tests.sh` 在场。⚠ 表判语里"步本身红⇒登记为发现"这句本腿照抄不抹：那正是后来咬到别人的那条反噬（见 AC#5 的追加行）。
 - [ ] **AC#3** 这道新步要**自己会红**：在 `/tmp` 快照里把 winsec 某条安全断言人为弄坏（例如私有集改成按名字比）⇒ 新步必须 rc≠0；
       同时证明它**不是空仪器**（把包清单改成不含 winsec ⇒ 应有"扫描空=红"的守卫或显式失败）。
       每发变异同链 `grep -n` 证落地、先 `go build` rc=0（**编译失败不算变异**）。
+      `done-fix-1` 追加（己类·判不了，本腿不翻勾）：尺一过了——表 `110-…md:16`「AC#3 | 新步自己会红 + 不是空仪器（同链 `grep -n` 证落地、先 `go build` rc=0） | **通过（三发全部独立复现）** | 〔独立复现〕 | 全部在 `/tmp/wisp-ac110-snap`；仓库树 winsec 全程未动。**M1 安全断言弄坏**…」；尺二只能靠跑：这三发（弄坏安全断言⇒rc≠0、把包清单改成不含 winsec⇒空扫描守卫红、每发先 `go build` rc=0）本腿一律不许跑（禁编译），"会不会红"读不出来 ⇒ 缺的读数＝这三发变异在**当前 HEAD** 的纯净快照上的一次非实现者复跑。本腿能静态读到的只有仪器本身（`scripts/winsec-tests.sh` 在场、`ci.yml:439` 那一步指向它）。
 - [ ] **AC#4** `R-93-4` 一并收：给出"windows 腿确实把 `TestSyncRegistryProbeLive` 纳入分母"的**步级证据**，或明写它为什么不该被纳入。
+      `done-fix-1` 追加（戊类·**附条件的兑现句在码里、但无表侧复算**，⛔ 不翻勾）：**待非实现者抽验，缺的读数是**——"那行理由文本算不算 `R-93-4` 要的步级证据"由非实现者认一次（本腿现读表 `110-…md:17` 对这格判的是「**通过（附条件：步级证据至今不存在）**」〔日志＋归档，我抽验〕——**条件兑现这句话是票面/码里读的，不是表里裁的**）。盘上面本腿今天在树里读到了：`grep -n 'ticket 110' scripts/portable-tests.sh`＝`:326` 那行的理由文本逐字含「**As of ticket 110 AC#4** the windows leg carries `./internal/risk/` in its scope, so this row is re-verified against the compiled WINDOWS test binary (go test -list) and printed with its reason in that step's log - **which is the step-level answer R-93-4 asked for**」。⇒ 这一枚本腿记为"形状齐、裁决缺"（与 `A440` 第③条那 9 枚同处置），要翻请连那发 `go test -list` 的步级读数一起看。
 - [ ] **AC#5** 门禁：`bash -n` 改动脚本 rc=0；`sh scripts/d22scan.sh` 纯净快照 rc=0 且台账各 scope 不降；
       ⚠ 新步若排在"会失败的步骤"之后 ⇒ **必须** `if: always()` 或挪到前面（本仓实测过一道门因此从未执行过一次）。
+      `done-fix-1` 追加（己类·判不了，本腿不翻勾）：尺一过了——表 `110-…md:18`「AC#5 | `bash -n` rc=0；`sh scripts/d22scan.sh` 纯净快照 rc=0 且各 scope 不降；新步不得排在会失败的步之后 | **通过（附一条后果登记）** | 〔独立复现〕 | `bash -n scripts/winsec-tests.sh` rc=0、`bash -n scripts/portable-…」」；尺二只能靠跑（`bash -n`/`d22scan.sh` 都是执行，本腿禁），而那批 rc 只对当时的树负责 ⇒ 缺的读数＝这两发在当前 HEAD 上的一次非实现者读数。⚠ **本格第三句的后果今天仍挂在开放池里**：票 110 那步加进去后"把后面的步骤全吃掉"（改名 commit `f161c690` 正文自陈），本腿现量 **票 111 `un=10`／票 112 `un=5`／票 140 `un=4`，三张都不带 `-done`** ⇒ 这格即便翻勾也不是"零后果"。
 
 ## Rules（本仓固定）
 
