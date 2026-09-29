@@ -395,11 +395,19 @@ func Test197RowExistsBeforeFirstChildModelCall(t *testing.T) {
 // That positive control was run at delivery and its before/after readings are in
 // docs/evidence/s1/197-subagent-entity-r1b.md.
 //
-// Why a bigger pool is a lie and not extra capacity: one in-flight spawn holds
-// one bridge slot for its child's whole life (bridge.run keeps the semaphore
-// held across entry.Tool.Execute), so every admitted child above the ceiling is
-// a row the roster prints as 「在跑」 while the machine has it queued inside the
-// bridge - which is exactly the 7/8-red shape ticket 197 leg A reported.
+// Why the pool must still not exceed the ceiling. The reason this nail was
+// filed with has since been falsified: ticket 222 AC#2 makes a spawn that is
+// waiting for its child hand the bridge slot back (giveBackWhileWaiting in
+// subagent_197.go), so a waiting parent holds none of the four permits and the
+// ceiling caps no longer how many children may EXIST at once - they may, what
+// the ceiling caps is how many of them may be executing a tool in the same
+// instant. The conclusion stands on the other half of the same fact: a pool
+// above the ceiling still admits children the machine cannot run at once, they
+// queue for the permits while the roster prints every admitted row as 「在跑」 -
+// which is exactly the 7/8-red shape ticket 197 leg A reported. Raise
+// MaxConcurrentSubagents and this leg still goes red; ticket 222's M6 reading
+// (pool 8 against a bridge of 4, four legs red) is recorded in
+// docs/evidence/s1/222-spawn-holds-bridge-permit-v1.md.
 func Test197SubagentPoolNeverExceedsBridgeCeiling(t *testing.T) {
 	if MaxConcurrentSubagents > MaxToolConcurrency {
 		t.Errorf("池 %d 大于桥的 D38d 天花板 %d：多出来的 %d 枚会被桥排成队，名册却说它们在跑；"+
