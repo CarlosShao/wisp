@@ -12,7 +12,7 @@
 |---|---|---|---|
 | 1 | `104-…-done.md:65` | AC#5 与票 89 第 4 条的分工写清 | **可翻勾**（已翻，`1d5678fb` 之后本腿 commit） |
 | 2 | `110-…-done.md:44` | AC#4 `R-93-4` 一并收（步级证据或明写为何不该纳入） | **可翻勾**（走"或"的第二支；已翻） |
-| 3 | `113-…-done.md:76` | 〔待填〕 | 〔待填〕 |
+| 3 | `113-…-done.md:76` | AC#6 把 `R-108-2` 边界写进包文档（只增不减／不动判定分支／容器读数不受影响） | **可翻勾**（已翻原框，依编排者 `:85` 裁定） |
 | 4 | `115-…-done.md:49` | 〔待填〕 | 〔待填〕 |
 | 5 | `115-…-done.md:53` | 〔待填〕 | 〔待填〕 |
 | 6 | `115-…-done.md:66` | 〔待填〕 | 〔待填〕 |
@@ -63,12 +63,22 @@
 ⚠ **推翻 `done-fix-1` 分类之处（第 1 条）**：它把这格记为"戊·形状齐、裁决缺，要翻请连那发 `go test -list` 读数一起看"，本腿认为那发读数是另一张账的对象，本格按"或"句的第二支已闭合。**分歧已在票面追加行里写明，交编排者裁。**
 三行定性：现象＝一枚 windows 专属用例被记在 ledger 而不进 RUN 分母；本机被入侵证据＝无（本腿只读文件与只读 git）；最坏后果形状＝若那条论证错了，真实注册表行为在 CI 永不被执行（覆盖缺口），不是对任何已交付码的放宽或授权。
 
-## 第 3 格 — `113-posix-platformverifypplacement-has-no-link-leg-done.md:76`
+## 第 3 格 — `113-posix-platformverifypplacement-has-no-link-leg-done.md:76`（AC#6）
 
-判据原文（票面）：〔待填〕
-本腿现跑的尺：〔待填〕
-读数：〔待填〕
-结论：〔待填〕
+判据原文（票面 `:61`＋`:66`）：
+> `- [ ] **AC#6（编排者 20:2x 追加，只改文档不改语义）** 把 R-108-2 的边界写进 internal/winsec/doc.go 一段话：…`
+> `判据：该文件 git diff 只增不减；不新增/不修改任何判定分支；容器内 AC#5 那三门读数不受影响。`
+
+本腿现跑的尺与读数：
+1. `git show --numstat --format="%h %s" 1499efe` → `1499efe8 docs(113,AC#6): R-108-2 的边界写进 winsec.go 包文档——守卫管拼写/祖先链/树归属，不管"这棵树归谁"`；两行 `18 0 internal/winsec/winsec.go`、`62 0 .scratch/wisp/issues/113-…-has-no-link-leg.md`（**删除列两枚都是 0**，且 commit 真在历史里）。
+2. `git show 1499efe -- internal/winsec/winsec.go | grep '^+' | grep -v '^+++' | wc -l` ＝ **18**；同集 `grep -vc '^+[[:space:]]*//'` ＝ **0** ⇒ 18 行全是注释，零行可执行码被加或被删。
+3. `Read internal/winsec/winsec.go:40-54`：`:40-42`（"None of them asks whose tree it is"）＝"管拼写/祖先链/树归属、不管这棵树归谁"；`:42-45`（"Given a foreign absolute path … SealFile succeeds - on Windows that strips an explicit S-1-1-0 grant"）；`:46-49`（"a ruled boundary, not a gap (ticket 113 AC#6, answering R-108-2) … belongs to the caller's data-root discipline (tickets 76/95)"）。`grep -n "S-1-1-0" internal/winsec/winsec.go`＝只有 `:44` 一处，且落在注释里。
+4. 表侧对口：`docs/evidence/s1/113-adversarial-acceptance.md:18`「| AC#6 文档边界（`R-108-2` 落 `winsec.go` 头部） | 票面自述"还没做" | …**验收现场工作树里确有一段未提交的 +18 行注释**…⇒ 未 commit = 未交件」＋ `:110`「**AC#6 必须落成真 commit**…判据是 `git diff` 只增不减、不动判定分支⇒ 在此之前**票面 AC#6 那格不许勾**」。
+
+第三条判据（容器读数不受影响）怎么办：本腿禁跑编译/门，**不复跑**；改用构造证——尺 2 量出"零行可执行码变动"、注释在 `package winsec`（`:55`）之上 ⇒ 不可能改变任何用例结果。票面 `:82-83` 那组 `16/16 与 32/32, rc=0` 是实现方自述，本腿**不当凭据**。
+
+结论：**可翻勾**（原框 `- [ ]`→`- [x]`，删除列 1）。翻的是验收方自己给的那两条条件的兑现，不是绕过它们；编排者本票面 `:85`「**我的裁定：以"翻转原框"为准（框翻转不是抹内容，删除列 1 可接受）**」是这条动作的授权文本，`done-fix-1` 因怕越权未翻，本腿引的正是它自己点出的那条例文。
+⚠ **行号漂（`A442` 那一类）**：`done-fix-1` 追加行里写"追加勾 `:66`""编排者 `:79` 裁定"，本腿现量分别是 `:71` 与 `:85`——内容逐字对得上、指针漂了 5/6 行。
 
 ## 第 4 格 — `115-…-done.md:49`
 
