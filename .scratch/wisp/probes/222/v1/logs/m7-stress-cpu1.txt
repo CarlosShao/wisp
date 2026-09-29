@@ -1,0 +1,123 @@
+time=2026-09-29T18:09:53.489+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T18:09:53.494+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-2f3decc3-514d-4a50-a5d9-38c00d04664e owner=tools
+time=2026-09-29T18:09:53.494+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-92e69bcc-a6e6-41c1-b4af-8ba2241b1487 owner=tools
+time=2026-09-29T18:09:53.494+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-b5147169-c2b4-425b-961c-a72f3ebb04e2 owner=tools
+time=2026-09-29T18:09:53.494+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-b7044857-dc06-41c1-bf63-d4d302a7e9e7 owner=tools
+--- PASS: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T18:09:53.495+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-2d3f800c-2275-41e2-9475-42e611cfbdcc owner=tools
+time=2026-09-29T18:09:53.495+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-744a0ff8-30b1-438c-9c20-182508afb2d0 owner=tools
+time=2026-09-29T18:09:53.495+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-4fa1226d-943e-4680-a67c-bcfcb23b81e3 owner=tools
+time=2026-09-29T18:09:53.495+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-3d9a544a-3ec8-4218-a470-fd67a4e27758 owner=tools
+--- PASS: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T18:09:53.496+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-2ff0e73b-34f7-4287-a701-3aae4db587c5 owner=tools
+time=2026-09-29T18:09:53.496+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-baf5d1be-9d80-46b8-ab35-826c1904c12a owner=tools
+time=2026-09-29T18:09:53.496+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-c6d0dea6-10d5-41bd-af9d-b21df297935c owner=tools
+time=2026-09-29T18:09:53.496+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-0b9e4a0b-1084-4160-810e-d203e5cea18d owner=tools
+--- PASS: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T18:09:53.497+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-c919ffa1-c3ca-4a1a-9848-84ea9d114ad0 owner=tools
+time=2026-09-29T18:09:53.497+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-060404a4-8981-4231-bb8b-1b809fdcd48a owner=tools
+time=2026-09-29T18:09:53.497+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-8c4714c3-ee02-4a43-b91f-7e433e31e377 owner=tools
+time=2026-09-29T18:09:53.497+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-d239318d-c167-4373-9cea-4fac910a2220 owner=tools
+--- PASS: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T18:09:53.497+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-fca18172-48c5-4baf-b601-681f0f46bbf1 owner=tools
+time=2026-09-29T18:09:53.498+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-df47205c-729e-4fa5-a997-523d5de8f392 owner=tools
+time=2026-09-29T18:09:53.498+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-fd97a1d2-e33c-4848-b020-dbdbee6f0e2b owner=tools
+time=2026-09-29T18:09:53.498+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-e47ce2ae-bfce-48cf-8c72-5b939d0c977f owner=tools
+--- PASS: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T18:09:53.498+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-21d81651-6666-4646-a5ec-2241983f94e5 owner=tools
+time=2026-09-29T18:09:53.498+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-8c0b9479-8e7b-410d-91ce-fbffa84c4447 owner=tools
+time=2026-09-29T18:09:53.498+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-d47278d0-bb62-49b4-9d62-5a38afb8565b owner=tools
+time=2026-09-29T18:09:53.498+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-76e43464-00ad-44bb-beb4-a12c0aff2947 owner=tools
+--- PASS: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T18:09:53.499+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-552c1d8d-589c-4a24-8d06-6918e9a176ba owner=tools
+time=2026-09-29T18:09:53.499+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-10026544-c5d7-469d-9740-834bcd3aab85 owner=tools
+time=2026-09-29T18:09:53.499+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-55806d94-61ac-4916-ba42-9ccb1b71edd8 owner=tools
+time=2026-09-29T18:09:53.499+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-b386381d-2a73-4fad-8cdf-de8de9f0bd3b owner=tools
+--- PASS: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T18:09:53.499+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-af6b54e3-cb84-4baf-9c99-7486be43ddde owner=tools
+time=2026-09-29T18:09:53.499+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-386bcb34-a3fc-4d90-b533-0157e0bb8b1e owner=tools
+time=2026-09-29T18:09:53.500+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-a32fca1c-5c35-41b4-9b3c-568e622e75e4 owner=tools
+time=2026-09-29T18:09:53.500+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-7ca2acda-2e8f-4cb4-a9aa-49db98c9ed39 owner=tools
+--- PASS: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T18:09:53.500+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-a2ee3bce-4673-472f-b788-d9429e30f3cd owner=tools
+time=2026-09-29T18:09:53.500+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-c3396821-1810-4534-bb40-32c9c2e3a5aa owner=tools
+time=2026-09-29T18:09:53.500+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-ff1791c6-cc6d-4615-9211-019d8d0fc991 owner=tools
+time=2026-09-29T18:09:53.500+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-af1a6f58-6182-4894-8e41-9fc987c5e798 owner=tools
+--- PASS: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T18:09:53.501+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-eb9a17d6-f6de-44e8-b1e5-1df9569dffdf owner=tools
+time=2026-09-29T18:09:53.501+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-b4e889ca-ced9-49b5-abbc-2b5db5e1c3b9 owner=tools
+time=2026-09-29T18:09:53.501+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-656d1da5-051a-4c40-af07-f47cb9f417c3 owner=tools
+time=2026-09-29T18:09:53.501+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-776c9236-11d3-41a6-8b96-ef166bf1536d owner=tools
+--- PASS: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T18:09:53.501+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-eab05c69-6757-453a-958a-805d31f630e1 owner=tools
+time=2026-09-29T18:09:53.501+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-36986d40-b7bf-40db-90c8-192c040fe076 owner=tools
+time=2026-09-29T18:09:53.501+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-83a51a11-289b-40af-b9a5-c24e5c072db9 owner=tools
+time=2026-09-29T18:09:53.501+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-3aaea560-ce03-40e9-a862-03cd16928776 owner=tools
+--- PASS: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T18:09:53.502+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-ab456cc9-2ca9-471b-b9af-fed9b362877f owner=tools
+time=2026-09-29T18:09:53.502+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-db3cd672-5d3d-41ee-b6cc-652e579461a1 owner=tools
+time=2026-09-29T18:09:53.503+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-d99ce0ba-a9d3-43ce-9b30-48054eaf3a10 owner=tools
+time=2026-09-29T18:09:53.503+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-ff854428-6b44-4a3f-b935-7525c20d2852 owner=tools
+--- PASS: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T18:09:53.503+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-eec190b3-4568-4810-bca1-d5cbe44ce0f6 owner=tools
+time=2026-09-29T18:09:53.503+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-e403b0f4-4090-48de-afad-aef991bdd07f owner=tools
+time=2026-09-29T18:09:53.503+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-4b314ca3-d413-4f78-ab64-2b65fee54c52 owner=tools
+time=2026-09-29T18:09:53.503+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-4881a594-8b13-49c3-9c99-394d530567c9 owner=tools
+--- PASS: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T18:09:53.503+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-5f28bfd5-f6aa-4389-8635-a872f21003bc owner=tools
+time=2026-09-29T18:09:53.503+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-52a33ac6-8e98-479d-a91f-dbade98b41a6 owner=tools
+time=2026-09-29T18:09:53.504+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-22eac828-c75c-462e-bcca-4ec072ca8320 owner=tools
+time=2026-09-29T18:09:53.504+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-c660fa4c-893d-4c1a-aecf-d4546e1a96e7 owner=tools
+--- PASS: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T18:09:53.504+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-92e4c87d-ac64-4a2e-9781-5d322b061556 owner=tools
+time=2026-09-29T18:09:53.504+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-4720b83c-e591-4337-8149-439be38a0be3 owner=tools
+time=2026-09-29T18:09:53.504+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-1658ceab-b152-4aa7-a081-4f49804c2170 owner=tools
+time=2026-09-29T18:09:53.504+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-9504795b-b9fa-462d-8572-03a2a6739644 owner=tools
+--- PASS: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T18:09:53.504+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-0250e9f1-78e2-4f0c-afd6-3f6a277ae79a owner=tools
+time=2026-09-29T18:09:53.504+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-1d89ff4c-dbb8-4ec2-ad9a-643f5b5d563b owner=tools
+time=2026-09-29T18:09:53.504+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-bf936474-4350-4641-b7a4-f907a1d68c4c owner=tools
+time=2026-09-29T18:09:53.504+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-afe99f25-3f96-4bde-bef5-96632c363551 owner=tools
+--- PASS: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T18:09:53.505+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-6d86d09b-dfd3-47f6-8491-816a53dc5fa4 owner=tools
+time=2026-09-29T18:09:53.505+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-5d4fad90-d258-498c-82c0-48cb89374c80 owner=tools
+time=2026-09-29T18:09:53.505+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-0cf10985-4e8e-4182-822e-e9d70d431ee7 owner=tools
+time=2026-09-29T18:09:53.505+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-f9877aeb-aa12-4de5-950b-2a333d5b9e94 owner=tools
+--- PASS: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T18:09:53.505+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-c4ab7e8f-38de-468d-8660-e8f7b58e8caf owner=tools
+time=2026-09-29T18:09:53.505+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-a5309f01-8120-4292-823a-be59eaafc650 owner=tools
+time=2026-09-29T18:09:53.505+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-60e42d86-15ca-41b8-8ee2-afdd52289709 owner=tools
+time=2026-09-29T18:09:53.505+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-418d2867-1a3e-4a8b-9e25-d8f85dd41a0c owner=tools
+--- PASS: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T18:09:53.506+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-9c07b22c-fcb2-4a70-a8d2-064b393beaff owner=tools
+time=2026-09-29T18:09:53.506+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-3828bb10-9019-4bf0-a03e-bd5bf60c538b owner=tools
+time=2026-09-29T18:09:53.506+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-52b07310-5556-48ae-ab5a-56cd8fa5f7a2 owner=tools
+time=2026-09-29T18:09:53.506+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-62f77765-483e-4147-8a3b-cf4e1a599ec6 owner=tools
+--- PASS: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T18:09:53.506+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-a5b5a491-95b0-45a4-86fc-3e793aa1f82c owner=tools
+time=2026-09-29T18:09:53.506+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-79971b20-9d88-4a6b-95c7-0fb5d206f6af owner=tools
+time=2026-09-29T18:09:53.506+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-890e4068-ed88-4147-9820-d6f9dc65d9aa owner=tools
+time=2026-09-29T18:09:53.506+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-6594e34a-91b5-4ab3-b326-554e1f4eefb8 owner=tools
+--- PASS: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.057s

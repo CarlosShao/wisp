@@ -1,0 +1,62 @@
+time=2026-09-29T18:16:47.697+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test222SpawnConclusionArrivesThroughRealBridgeChildren
+time=2026-09-29T18:16:47.701+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-4bac8241-d312-446d-b6e4-ad643efceebe owner=tools
+time=2026-09-29T18:16:47.701+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-a9644a88-d50f-4818-aa3f-7f45f4a824e1 owner=tools
+time=2026-09-29T18:16:47.701+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-5b81fba7-3cfa-429c-9805-5fd14e77c6c1 owner=tools
+time=2026-09-29T18:16:47.701+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-d92207e2-8ab3-437d-83aa-0585b4c7f572 owner=tools
+    subagent_222_test.go:385: 孩子 c4 的工具调用起跑时已有 4 枚父任务返回，want 0：它是等父任务的 per-tool 预算到点才挤上桥的
+    subagent_222_test.go:385: 孩子 c1 的工具调用起跑时已有 4 枚父任务返回，want 0：它是等父任务的 per-tool 预算到点才挤上桥的
+    subagent_222_test.go:385: 孩子 c2 的工具调用起跑时已有 4 枚父任务返回，want 0：它是等父任务的 per-tool 预算到点才挤上桥的
+    subagent_222_test.go:385: 孩子 c3 的工具调用起跑时已有 4 枚父任务返回，want 0：它是等父任务的 per-tool 预算到点才挤上桥的
+    subagent_222_test.go:400: 父任务 0 收到的是错误而不是结论："工具 task.spawn 超时（50ms），已协作式中止"
+    subagent_222_test.go:400: 父任务 1 收到的是错误而不是结论："工具 task.spawn 超时（50ms），已协作式中止"
+    subagent_222_test.go:400: 父任务 2 收到的是错误而不是结论："工具 task.spawn 超时（50ms），已协作式中止"
+    subagent_222_test.go:400: 父任务 3 收到的是错误而不是结论："工具 task.spawn 超时（50ms），已协作式中止"
+    subagent_222_test.go:418: 结论 "子代理 1 的结论正文 222" 出现在 0 枚父任务回复里, want 1（[{工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []}]）
+    subagent_222_test.go:418: 结论 "子代理 2 的结论正文 222" 出现在 0 枚父任务回复里, want 1（[{工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []}]）
+    subagent_222_test.go:418: 结论 "子代理 3 的结论正文 222" 出现在 0 枚父任务回复里, want 1（[{工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []}]）
+    subagent_222_test.go:418: 结论 "子代理 4 的结论正文 222" 出现在 0 枚父任务回复里, want 1（[{工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []}]）
+    subagent_222_test.go:422: 全部跑完池位没回收：2, want 0
+    subagent_222_test.go:429: 全部结束后桥位没回到空：1, want 0
+--- FAIL: Test222SpawnConclusionArrivesThroughRealBridgeChildren (0.20s)
+=== RUN   Test222SpawnConclusionArrivesThroughRealBridgeChildren
+time=2026-09-29T18:16:47.903+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-3a96a741-f0a7-45b0-8a0c-5abf85b6a4da owner=tools
+time=2026-09-29T18:16:47.903+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-d5bbc548-c0f0-4e13-b6cd-6303ccc71d6e owner=tools
+time=2026-09-29T18:16:47.903+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-bdad5954-5f56-4f2c-8b78-cfe90ba4bba1 owner=tools
+time=2026-09-29T18:16:47.904+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-92795be8-451f-4915-84f2-f820c3846be6 owner=tools
+    subagent_222_test.go:385: 孩子 c1 的工具调用起跑时已有 4 枚父任务返回，want 0：它是等父任务的 per-tool 预算到点才挤上桥的
+    subagent_222_test.go:385: 孩子 c2 的工具调用起跑时已有 4 枚父任务返回，want 0：它是等父任务的 per-tool 预算到点才挤上桥的
+    subagent_222_test.go:385: 孩子 c3 的工具调用起跑时已有 4 枚父任务返回，want 0：它是等父任务的 per-tool 预算到点才挤上桥的
+    subagent_222_test.go:385: 孩子 c4 的工具调用起跑时已有 4 枚父任务返回，want 0：它是等父任务的 per-tool 预算到点才挤上桥的
+    subagent_222_test.go:400: 父任务 0 收到的是错误而不是结论："工具 task.spawn 超时（50ms），已协作式中止"
+    subagent_222_test.go:400: 父任务 1 收到的是错误而不是结论："工具 task.spawn 超时（50ms），已协作式中止"
+    subagent_222_test.go:400: 父任务 2 收到的是错误而不是结论："工具 task.spawn 超时（50ms），已协作式中止"
+    subagent_222_test.go:400: 父任务 3 收到的是错误而不是结论："工具 task.spawn 超时（50ms），已协作式中止"
+    subagent_222_test.go:418: 结论 "子代理 1 的结论正文 222" 出现在 0 枚父任务回复里, want 1（[{工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []}]）
+    subagent_222_test.go:418: 结论 "子代理 2 的结论正文 222" 出现在 0 枚父任务回复里, want 1（[{工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []}]）
+    subagent_222_test.go:418: 结论 "子代理 3 的结论正文 222" 出现在 0 枚父任务回复里, want 1（[{工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []}]）
+    subagent_222_test.go:418: 结论 "子代理 4 的结论正文 222" 出现在 0 枚父任务回复里, want 1（[{工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []}]）
+--- FAIL: Test222SpawnConclusionArrivesThroughRealBridgeChildren (0.20s)
+=== RUN   Test222SpawnConclusionArrivesThroughRealBridgeChildren
+time=2026-09-29T18:16:48.104+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-6a5aa789-df1e-4100-85f1-7f418730b1ec owner=tools
+time=2026-09-29T18:16:48.104+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-43e240bd-85fc-41f3-b367-5d553e64cddb owner=tools
+time=2026-09-29T18:16:48.104+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-899f709a-ade0-499e-a68b-27fe7ea46f73 owner=tools
+time=2026-09-29T18:16:48.104+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-6b30f86f-2647-4ed8-9bc9-a95b8408cfee owner=tools
+    subagent_222_test.go:385: 孩子 c4 的工具调用起跑时已有 4 枚父任务返回，want 0：它是等父任务的 per-tool 预算到点才挤上桥的
+    subagent_222_test.go:385: 孩子 c2 的工具调用起跑时已有 4 枚父任务返回，want 0：它是等父任务的 per-tool 预算到点才挤上桥的
+    subagent_222_test.go:385: 孩子 c3 的工具调用起跑时已有 4 枚父任务返回，want 0：它是等父任务的 per-tool 预算到点才挤上桥的
+    subagent_222_test.go:385: 孩子 c1 的工具调用起跑时已有 4 枚父任务返回，want 0：它是等父任务的 per-tool 预算到点才挤上桥的
+    subagent_222_test.go:400: 父任务 0 收到的是错误而不是结论："工具 task.spawn 超时（50ms），已协作式中止"
+    subagent_222_test.go:400: 父任务 1 收到的是错误而不是结论："工具 task.spawn 超时（50ms），已协作式中止"
+    subagent_222_test.go:400: 父任务 2 收到的是错误而不是结论："工具 task.spawn 超时（50ms），已协作式中止"
+    subagent_222_test.go:400: 父任务 3 收到的是错误而不是结论："工具 task.spawn 超时（50ms），已协作式中止"
+    subagent_222_test.go:418: 结论 "子代理 1 的结论正文 222" 出现在 0 枚父任务回复里, want 1（[{工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []}]）
+    subagent_222_test.go:418: 结论 "子代理 2 的结论正文 222" 出现在 0 枚父任务回复里, want 1（[{工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []}]）
+    subagent_222_test.go:418: 结论 "子代理 3 的结论正文 222" 出现在 0 枚父任务回复里, want 1（[{工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []}]）
+    subagent_222_test.go:418: 结论 "子代理 4 的结论正文 222" 出现在 0 枚父任务回复里, want 1（[{工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []} {工具 task.spawn 超时（50ms），已协作式中止 true false  []}]）
+    subagent_222_test.go:422: 全部跑完池位没回收：3, want 0
+    subagent_222_test.go:429: 全部结束后桥位没回到空：1, want 0
+--- FAIL: Test222SpawnConclusionArrivesThroughRealBridgeChildren (0.20s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.650s
+FAIL

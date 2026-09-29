@@ -1,0 +1,25 @@
+time=2026-09-29T18:04:04.298+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test222SpawnConclusionArrivesThroughRealBridgeChildren
+time=2026-09-29T18:04:04.301+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-797777ea-2cb3-4133-b86e-463e6787bdad owner=tools
+time=2026-09-29T18:04:04.301+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-5a67a22b-5a95-45d7-8875-5ec56a8e2456 owner=tools
+time=2026-09-29T18:04:04.301+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-56d08695-ba66-4f2e-94a0-c893c10874f1 owner=tools
+time=2026-09-29T18:04:04.301+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-e072c341-d98b-47f1-bfb3-384f4f44798d owner=tools
+    subagent_222_test.go:392: 父任务拿到结论：只等到 0/4 枚，护栏到点（这一发真挂住了，不是读数不同）
+--- FAIL: Test222SpawnConclusionArrivesThroughRealBridgeChildren (30.00s)
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T18:04:34.303+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-10eab545-6e93-411e-8f1b-c9e6e8ecb40c owner=tools
+time=2026-09-29T18:04:34.303+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-cc7c4578-77ba-4929-be4e-39dd81d9dabd owner=tools
+time=2026-09-29T18:04:34.303+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-56dc0fcc-d92b-4fc6-978b-e86e5226d819 owner=tools
+time=2026-09-29T18:04:34.303+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-df889daa-25ee-4392-985b-b387b74e2323 owner=tools
+    subagent_222_test.go:457: 父任务拿到结论：只等到 0/4 枚，护栏到点（这一发真挂住了，不是读数不同）
+--- FAIL: Test222WaitingParentHoldsNoBridgeSlot (30.00s)
+=== RUN   Test222CeilingStillCapsExecutedCallsWhileParentsWait
+time=2026-09-29T18:05:04.304+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-2f30aad0-0652-4fdb-addb-b059d5a9ed79 owner=tools
+time=2026-09-29T18:05:04.304+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-e24f95b9-1878-4a2c-9593-4a8cc056eeff owner=tools
+time=2026-09-29T18:05:04.304+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-9a628f6d-b022-43ce-a57d-723f7c4996e2 owner=tools
+time=2026-09-29T18:05:04.304+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-96266a20-4915-4577-b3d3-4d7c17a21522 owner=tools
+    subagent_222_test.go:518: 父任务拿到结论：只等到 0/4 枚，护栏到点（这一发真挂住了，不是读数不同）
+--- FAIL: Test222CeilingStillCapsExecutedCallsWhileParentsWait (30.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	90.037s
+FAIL

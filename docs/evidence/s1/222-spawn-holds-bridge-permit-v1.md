@@ -348,6 +348,7 @@ go test ./internal/risk -count=1                                                
 - `bash scripts/d22scan.sh` ＝ **clean — no D22 ban violations**（bans#1-5 internal/=219、cmd/=29、ban#6 frontend/=85、ban#7 internal/tools/=22、ban#8 四路）
 - `git status --porcelain -- cmd/wisp internal/` ＝ **空**；四枚文件 `sha1sum` 与起手**逐字节相同**：`bridge.go 36a1d2b9…`／`subagent_197.go df860999…`／`subagent_222_test.go b3938cf0…`／`subagent_197_test.go 3ff5c9a7…`
 - 三枚 222 用例复量 `-count=3` ＝ **9/9 PASS，各 0.00s**（机器不空：同时有只读腿在 grep，故三发定案而非单发）
-- 本腿**零 push**、**零产码写入**、commit 逐枚带显式 pathspec；工作树里别人的脏改动（`.gitignore`、`design/**` 一批删除、`probes/152/**`、`probes/161/r6/logs/**`、`probes/222/orch/**` 等）**一枚没动**；临时件**只建不删**（`.scratch/wisp/probes/222/v1/**`：`mut222.py`＋`mut11.py`＋9 枚 mutations 目录＋18 份原始日志）。
+- 本腿**零 push**、**零产码写入**、commit 逐枚带显式 pathspec；工作树里别人的脏改动（`.gitignore`、`design/**` 一批删除、`probes/152/**`、`probes/161/r6/logs/**`、`probes/222/orch/**` 等）**一枚没动**；临时件**只建不删**（`.scratch/wisp/probes/222/v1/**`＝`mut222.py`＋`mut11.py`＋**12 枚** mutations 目录（asis 对照在内）＋**17 份**原始日志）。
+
 
 
