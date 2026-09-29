@@ -418,16 +418,25 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 			return rt, 2
 		}
 	}
-	// task.output (ticket 164 AC#3, D34 row PLAN.md:2564, L0) reads the
-	// process-local task table above. ⚠ WHO FILLS IT IS NOT THIS TICKET: the
-	// background spawn and its cancel are AC#4's and ticket 163's land, and
-	// RunAsync now has one production call site (measured: the line below in
-	// this same file, :633 `bg := loop.RunAsync(ctx, task)`, landed with
-	// ticket 176 AC#1; the count was zero when evidence file
-	// 164-task-output-impl-r1-ac2-ac3.md §4 recorded it). Until a spawner
-	// records into it,
-	// every call here answers "查不到这个任务" - loud, per 票 164 定案②, and
-	// never an empty success that would read as "the task printed nothing".
+	// The task family (ticket 164 AC#3, plus ticket 221 甲形 per ruling A434) is
+	// what reads and stops the process-local task table above:
+	//
+	//	task.output  reads back what one row's task printed
+	//	task.cancel  stops ONE subagent the CALLING task itself derived
+	//
+	// Both are registered from tools.BuiltinTaskEntries below, so this line is
+	// task.cancel's production landing point (ticket 221 AC#2: TaskRoster's Cancel
+	// had zero production callers until the tool that reads it got registered -
+	// count it with a grep for calls of that method outside _test, which answers
+	// exactly one hit now, internal/tools/task.go's taskCancel.Execute; the
+	// description of the measure is spelled out here without the call syntax on
+	// purpose, so this comment can never be miscounted as a caller).
+	// Who FILLS the roster is ticket 197's spawner, which now
+	// does (PublishSubagent on both the spawn goroutine and the child's admission
+	// hook), and the row a cancelled child lands on is finalised by that spawner's
+	// finish watcher, not by this tool. A call for an id nobody filed still answers
+	// "查不到这个任务" - loud, per 票 164 定案②, and never an empty success that
+	// would read as "the task printed nothing".
 	rt.tasks = tools.NewTaskRoster()
 	for _, e := range tools.BuiltinTaskEntries(tools.TaskDeps{Roster: rt.tasks, Paths: rt.paths}) {
 		if err := reg.Register(e); err != nil {

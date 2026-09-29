@@ -600,7 +600,6 @@ func TaskOutputDecl() Decl {
 func BuiltinTaskEntries(d TaskDeps) []Entry {
 	return []Entry{
 		{Tool: taskOutput{d: d}, Decl: TaskOutputDecl()},
-		{Tool: taskCancel{d: d}, Decl: taskCancelDecl()},
 	}
 }
 
@@ -634,7 +633,7 @@ func (taskCancel) Description() string {
 	return fmt.Sprintf("停掉你自己派出的那一枚子代理：只有派生它的父任务能停它，"+
 		"子代理停兄弟、停自己都一律被拒（深度上限 %d 的树里，别人才不是你的孩子）；"+
 		"停掉父任务不会级联停掉子代理，停掉一枚子代理也只动它那一行——"+
-		"那一行不会消失，它会落到 D43 已有的状态名上",
+		"那一行不会消失，它落到哪个 D43 状态、被谁停的，宿主都记账",
 		MaxSubagentDepth)
 }
 
@@ -762,7 +761,7 @@ func (t taskCancel) Execute(ctx context.Context, params json.RawMessage, onUpdat
 					"已停掉子代理 %s（%s）。只动了这一行：%s 的父任务仍是 %s，那一行没有消失，"+
 						"它的流已经收到终态，状态落在 D43 已有的名「%s」（被宿主停掉这一支借的是 Muted，本票不新造态名）。"+
 						"停掉父任务不会级联停掉子代理，反过来也一样：这次停止没有碰它的任何兄弟，也没有碰 %s。"+
-						"这次停止由 %s 发起，目标是 %s。",
+						"这一停记在宿主审计里（谁停的＝%s，停了谁＝%s）。",
 					target, final.Label, target, rec.ParentTaskID, string(st), rec.ParentTaskID, caller, target),
 			}, nil
 		}

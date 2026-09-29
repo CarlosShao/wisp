@@ -340,7 +340,7 @@ func (t subagentSpawn) Execute(ctx context.Context, params json.RawMessage, onUp
 	// the call's values (its cancel handle carrier, the C25 boxes) while dropping
 	// its cancellation and its deadline, so the child is a task the host can still
 	// find, stop and audit - not a detached goroutine.
-	childCtx, cancelChild := context.WithCancel(context.WithoutCancel(ctx))
+	childCtx, cancelChild := context.WithCancel(ctx)
 	bg := child.RunAsync(childCtx, prompt)
 	t.d.Roster.PublishSubagent(bg.ID, parentID, label)
 	t.d.Roster.AttachCancel(bg.ID, cancelChild)

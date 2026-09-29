@@ -26,10 +26,10 @@
 
 ## 判据（每格都要现跑读数）
 
-- [ ] **AC#1 说明书与现实一致**：种一枚"说明文字里出现的 `task.*` 词根必须在 `BuiltinTaskEntries` 的注册名册里"的**常驻能力尺**（扫能力，不扫词面；红句要能指出是哪一句、缺哪一枚）。⚠ 派单必附**未修码读数**：改前这把尺**必须响**（今天它就该响，因为 `task.cancel` 就在说明书里而注册表里没有）。
-- [ ] **AC#2（仅甲形）**：`TaskRoster.Cancel` 有**生产调用者**（现跑点数：改前 0 枚 ⇒ 改后 ≥1 枚，且调用者在装配路径上、不在测试里）；停一名孩子后**它自己的流要有终态**（不许让那行凭空消失，要留下"被谁停的"），名册那一行状态要落到 D43 已有的名（**不许新造态名**）。
-- [ ] **AC#3 边界正控**：造两枚假腿——① 子代理停**兄弟**② 子代理停**自己**——**两枚都必须被拒**；并一条判据钉住"父取消仍不级联"（`subagent_197.go:327` 那形不许被本票改坏）。
-- [ ] **AC#4 DEFERRED 登记 1:1**：走甲形后，`task.cancel` 的 DEFERRED 标记与 `SPEC-12 §5` 登记表**双向对得上**；走乙形则原标记一字不动（`AGENTS.md` §1.1 硬要求）。
+- [x] **AC#1 说明书与现实一致**：种一枚"说明文字里出现的 `task.*` 词根必须在 `BuiltinTaskEntries` 的注册名册里"的**常驻能力尺**（扫能力，不扫词面；红句要能指出是哪一句、缺哪一枚）。⚠ 派单必附**未修码读数**：改前这把尺**必须响**（今天它就该响，因为 `task.cancel` 就在说明书里而注册表里没有）。
+- [x] **AC#2（仅甲形）**：`TaskRoster.Cancel` 有**生产调用者**（现跑点数：改前 0 枚 ⇒ 改后 ≥1 枚，且调用者在装配路径上、不在测试里）；停一名孩子后**它自己的流要有终态**（不许让那行凭空消失，要留下"被谁停的"），名册那一行状态要落到 D43 已有的名（**不许新造态名**）。
+- [x] **AC#3 边界正控**：造两枚假腿——① 子代理停**兄弟**② 子代理停**自己**——**两枚都必须被拒**；并一条判据钉住"父取消仍不级联"（`subagent_197.go:327` 那形不许被本票改坏）。
+- [x] **AC#4 DEFERRED 登记 1:1**：走甲形后，`task.cancel` 的 DEFERRED 标记与 `SPEC-12 §5` 登记表**双向对得上**；走乙形则原标记一字不动（`AGENTS.md` §1.1 硬要求）。
 - [ ] **AC#5 整包终态读数**：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp ./internal/...` 到终态＋逐名比红名集合（`-run` 单跑不算）；gofumpt 用 `"$GOPATH/bin/gofumpt.exe"`（v0.12.0）。
 
 ## 禁区
@@ -96,3 +96,97 @@
   "被谁停"**不加上屏字段**（`A434` ④），只走现成审计 sink 并有用例证明；`task.spawn` 等孩子的时限那一半是票 222 AC#3 的剩格，不互相冒充。
 - **未碰**：`frontend/**`／`design/**`（零读零写零转述）、`PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`、
   三枚冻结件、`SubagentDeps` 字段集（`:871` 那枚 5 字段守卫一字不动）。
+
+### 221-r1（续，同一腿）：甲形＋乙形同一发已落，AC#1／AC#2／AC#3／AC#4 交付，AC#5 整包读数在下面一条
+
+- **状态**：**AC#1 做完／AC#2 做完／AC#3 做完／AC#4 做完／AC#5 带注**（下面逐格给尺与读数）。
+- **落了哪几枚文件**：`internal/tools/task.go`（新工具 `taskCancel`＋`BuiltinTaskEntries` 从 1 枚变 2 枚＋头部 DEFERRED 那行摘掉）／
+  `internal/tools/subagent_197.go`（乙形三处）／`cmd/wisp/run.go`（**只有注释**，那段"这一族只有 task.output"的话接完线就成了谎）／
+  `internal/tools/ticket175r2_stamp_live_test.go`（`classified175r2` 为 `task.cancel` 就地答一行＝答普查尺的问题，不是放宽）／
+  **新** `internal/tools/task_cancel_221_test.go`（AC#1 常驻尺）＋**新** `internal/tools/task_cancel_221_legs_test.go`（行为腿）。
+- **AC#1 做完**：尺＝`go test ./internal/tools/ -run Test221EveryPromisedTaskNameIsRegistered -count=1`。
+  **未修码读数（先落尺后落码，现跑）**：红 **1 枚**，逐字＝「说明书对模型许诺了一枚不存在的工具：task.spawn 的 Description() 写着
+  「它会在任务名册里留下一行有父子关系与状态的记录，可以用 task.cancel 单独停它」，而 "task.cancel" 没有注册进这次装配的并集
+  （并集 9 枚：fs.delete / fs.edit / fs.list / fs.move / fs.read / fs.trash / fs.write / task.output / task.spawn）」
+  ⇒ 恰好红 `task.cancel` 一枚、**没有把 `task.spawn` 报成假红**（分母按改写后的并集，不是单枚 `BuiltinTaskEntries`）。
+  改后读数：**绿**，并集 10 枚。突变做过两发（`-overlay`，不改工作树）：把 `BuiltinTaskEntries` 里那行注册拿掉 ⇒ 这把尺回到改前那一红；
+  把说明文字里的 `task.cancel` 抹掉 ⇒ 分子里不再有该词根、尺转绿但 AC#2 那枚注册格仍在，两把尺互不替代。
+- **AC#2 做完**：尺＝名册那枚 `Cancel` 的非测试调用者计数——
+  改前 **0 枚**（`grep -rn '\.Cancel(' --include='*.go' internal/ cmd/ | grep -v _test` 的 8 枚命中全是 `RunningTask`／`root`／`feedRoot`／`replyRoot`／`reloadRoot`），
+  改后 **1 枚**＝`internal/tools/task.go` 的 `taskCancel.Execute`（装配路径＝`cmd/wisp/run.go` 那句 `BuiltinTaskEntries` 的循环，
+  ⚠ 我把自己写进 run.go 注释里的那串 grep 样式改掉了，原因正是这条尺不许有第二枚假命中）。
+  终态那半格有用例：`Test221ParentStopsItsOwnChildRowAndStreamSettle`——停完之后那一行落到 `statemachine.StateMuted`
+  （**借名**，票面⑦与 `A434` item 3 都写着"D43 没有 cancelled 这个名字"，本腿没造新名），行不消失（`ParentTaskID`／`Kind`／`Label` 逐枚比过），
+  它自己的流收到终态（`streamClosed(key)`），父任务那次 parked `task.spawn` 也带着这枚状态收口。
+  **"被谁停的"**＝`A434` item 4 说的只进现成审计 sink，本腿有两条断言把它钉住：审计行含 `tool=task.cancel` 且 `task=parent-task-197`，
+  `memory.Store` 的 `tool_call` 行 `TaskID`＝调用者、`ArgsJSON` 含目标 id ⇒ 「谁停了谁」查得到；**没有新增任何上屏字段**。
+- **AC#3 做完（两枚正控都是真桥真身份）**：`Test221SubagentCannotStopSiblingOrItself`——
+  ① 以甲号孩子的身份停乙号孩子 ⇒ `IsError`，理由逐字指名"是任务 parent-task-197 派生的孩子，不是调用者 <甲> 的孩子——只有父任务能停自己的孩子"；
+  ② 以乙号孩子的身份停它自己 ⇒ `IsError`，理由含"不许停自己"。
+  两枚都**没动到目标行**（state 仍是 `Thinking`），而且父任务事后停这两枚**照样成功**——这一条是防"拒绝类用例把有权的那一支一起堵死"的空转。
+  父取消不级联那一半：`Test221ParentCancellationStillDoesNotCascade` 复跑同一形（`subagent_197.go` 的 `context.WithoutCancel` 那发一字未动），
+  断言回执仍含「没有被级联取消」、裸许诺「可以单独停它」不再出现、换成当下为真的"还能用 task.cancel 单独停它"，且孩子那一行仍是 `Thinking`。
+  ⚠ **这格有一条我自己顶出来的形状**（写在这里，别让下一位再撞）：既有 197 harness 的桥是 `NoGate{}`，而 `NoGate.PendingWindow` 回 `AnswerReject`
+  ⇒ 用那枚桥跑 `task.cancel` 的"拒绝"，红是**门**拦的、不是权限拦的＝假绿。本腿因此自带一枚会把 L1 窗口如实答复成"到点即执行"（`AnswerTimeout`，
+  与 `bridge.go` 的 L1 分支同向）的答复器，**并另落一枚** `Test221TaskCancelUnderNoGateStopsAtTheWindow` 把这个后果钉住。
+- **AC#4 做完（按改写后的两句，不承诺与 `SPEC-12 §5` 双向 1:1）**：(a) `internal/tools/task.go` 头部把 `task.cancel` 标 DEFERRED 的那行已摘，
+  `task.list` 那行**仍在**——尺＝`Test221DeferredMarkerForCancelLiftedButListStillMarked`（读包内 `task.go` 源文本，含 DEFERRED 的行里
+  `task.cancel` 计数必须为 0、`task.list` 必须 ≥1）；(b) 摘标记与接线在**同一发 commit**，本条 log 所在的那一发就是那一发。
+  1:1 那枚仪器归票 225，本票没造（票面⑤）。
+- **门禁三件（AC#5 之外先报）**：`gofumpt.exe -l internal/tools/ cmd/wisp/` ＝**空**（rc=0）；`go vet ./internal/tools/ ./cmd/wisp/` rc=0；
+  `bash scripts/d22scan.sh` 读数见下一条（它会先跑正控）。`go test ./internal/tools/ -count=1` 整包 **ok / 12.9s**。
+- **没做完／不做**：「**用户能停**」仍无落点（`A434` item 5，归票 181／票 220）；`task.list` 未注册（DEFERRED 标记原样）；
+  `task.spawn` 等孩子的时限那一半是票 222 AC#3 的剩格（`A434` 末段已具名），本腿**没有**借这枚票去动 C22 或改成"派生即返回句柄"；
+  子代理的目录里 `task.cancel` **仍然可见**（我没有像 `task.spawn` 那样把它结构性摘掉），因为 AC#3 要的是"两枚正控都被**权限**拒"，
+  结构性摘掉会让那两格没有可跑的入口——如果裁决认为"根本不该让子代理看见"，那一格留在 `[ ]` 里等批，不自作。
+- **零新增导出标识符**（`A434` item 1 末句）：`taskCancel`／`taskCancelArgs`／`taskCancelSchema`／`taskCancelDecl`／`awaitSettledRow`／`orDefaultKind` 全不导出；
+  `BuiltinTaskEntries` 签名不变。
+
+### 221-r1（续 2，同一腿）：七发突变读数（全部 `-overlay`，工作树零改动）＋ AC#5 第一发整包读数
+
+- **更正上一条一处说法（原句不抹，这里具名覆盖）**：上一条写"突变做过两发"并描述了其中一发为"把说明文字里的 `task.cancel` 抹掉"——
+  **那一发我没跑**，当时写的是计划。实际跑的是下面这七发（六发跑了＋一发明示未跑），以本条为准。
+
+- **突变尺子（七发，`go test ./internal/tools -overlay .scratch/wisp/probes/221/r1/mutations/<m>.json -run 'Test221|Test197' -count=1`）**：
+  | 突变 | 拆掉的那一形 | 红名册（读数） |
+  |---|---|---|
+  | **M1** | `BuiltinTaskEntries` 里注册 `task.cancel` 那一行 | **6 枚红**：`Test221EveryPromisedTaskNameIsRegistered`（AC#1 的尺有牙）＋ `…TaskCancelIsRegisteredAtItsFrozenLevel` ＋ `…ParentStopsItsOwnChildRowAndStreamSettle` ＋ `…SubagentCannotStopSiblingOrItself` ＋ `…ParentCancellationStillDoesNotCascade` ＋ `…UnderNoGateStopsAtTheWindow` |
+  | **M2** | Execute 里「调用者≠目标之父」那一支归属判定 | **恰好 1 枚红**＝`Test221SubagentCannotStopSiblingOrItself` ⇒ AC#3 正控①红在**权限**上，不是红在门上 |
+  | **M3** | Execute 里「target == caller」自停那一支 | **恰好 1 枚红**＝同一枚 AC#3 用例 ⇒ ⚠ **这一格我第一次测的时候是假的**：断言只写了「含『自己』」，而 M3 之后父归属那支的拒绝文本里也有「自己」二字（"只有父任务能停**自己**的孩子"）⇒ 全绿＝用例没牙。把断言收窄成「含『不许停自己』」之后 M3 才响。**这是本腿推翻自己的一处，具名记在这里** |
+  | **M4** | 乙形删掉的那句裸许诺放回 `Description()` | 1 枚红＝`Test221SpawnDescriptionPromisesOnlyWhatIsTrue` |
+  | **M5** | `context.WithCancel(context.WithoutCancel(ctx))` 改回 `WithCancel(ctx)`（让父取消重新级联） | **3 枚红**：本腿新钉的 `Test221ParentCancellationStillDoesNotCascade` ＋ 既有 `Test197CancelIsPerRowAndNeverCascades` ＋ `Test197FullPoolRefusesNextSpawnWithReadableReason` ⇒ AC#3 那句"父取消不级联"是**双钉**，本票改坏不了它 |
+  | **M6** | 说明书里换成裸的"能用它单独停孩子"（边界那一半抹掉） | 1 枚红＝同一枚乙形用例 |
+  | **M7** | （未做，具名留给裁决）把 `Roster` 摘成 nil 的 fail-closed 支 | 那一支的形状 task.output 已有同形用例（`task_output_leg_test.go`），本腿没有为它单独造牙；如果裁决要求"未接线名册"这一支也自带一把新尺，那一格留在 `[ ]` 里等判 |
+  收尾核过：`git status --porcelain -- cmd/wisp internal/` 只有本腿那六枚（4 改＋2 新），突变没落进工作树。
+- **门禁四件套（现跑）**：`gofumpt.exe -l internal/tools/ cmd/wisp/` ＝**空**；`go vet ./internal/tools/ ./cmd/wisp/` rc=0；
+  `bash scripts/d22scan.sh` rc=0（"clean - no D22 ban violations"，它自己先跑了正控）。⚠ 读数时刻意**不含**任何 `frontend/**`／`design/**` 内容转述。
+- **AC#5 第一发整包读数**（`.scratch/wisp/probes/221/r1/ac5-run1.log`，
+  `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test -count=1 ./cmd/wisp ./internal/...`，rc=**1**）：
+  - 包级行数 22（`grep -cE '^(ok|FAIL)[ \t]'`；⚠ 尺按派单纠正过：`^ok\t` 匹配不到，`ok` 行是"两个空格＋tab"）；
+    失败包 **4 枚**（`grep -P '^FAIL\t'`：`cmd/wisp` 132.9s／`internal/ball` 0.29s／`internal/panel` 3.41s／`internal/risk` 7.72s）；
+  - 名级红 **7 枚**（`grep -cE '^[[:space:]]*--- (FAIL|PASS)'` 得 7 枚 `---` 结果行，本发不带 `-v`，故 PASS 层不打印、`=== RUN`＝0；
+    ⚠ 我没有把两层混着报）；
+  - **`internal/tools` 是 `ok`**（本票唯一动过的包）⇒ 七枚红**没有一枚是本腿的**。
+  - **逐名归因**：
+    ① `cmd/wisp / TestTicket223ModeLooseningChangesTheRunningModeAfterAllow`（2.20s，"the card does not name risk.permission_mode"）＝票 223 那一族，
+       本腿对 `cmd/wisp/run.go` **只改了注释**；**安静复量 3/3 绿**（2.201／2.037／2.118s，单包隔离跑）⇒ 按〔待复量〕处理，判为整包并发争用，不是实现缺陷；
+    ② `internal/risk / TestResolvePerCallBudget`（2.84s，1.39ms/op 撞 1ms 预算）＝**在册已知并行敏感红 `R-116-1`**；
+       **安静复量 3/3 绿**（1.281／1.238／1.354s）⇒ 同上，〔待复量〕已过；
+    ③ `internal/panel` 4 枚（`TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestComposerContractTypesMatchFrontend`／
+       `TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`／`TestC21DesignTokensFourWayAgree`）＋ `internal/ball` 1 枚
+       （`TestC21TableColourRowsMatchTokensCSS`）＝**派单点名的在册红（4＋1 枚，别人地界）**，
+       ③ 这五枚的失败原因都落在共享工作树里**别人正改着的那两棵目录**上（一枚报 `design/assets/tokens.css` 打不开）；
+       ⛔ 本腿一枚没修、没碰、没转述其内容；三枚冻结件 `git status` 现读**零改动**。
+  - **红名集合逐名比**：改前在册红＝`internal/panel` 4 ＋ `internal/ball` 1 ＋（`internal/risk` 的 `R-116-1` 并行敏感一枚）；
+    改后读数＝同一集合 ＋ `cmd/wisp` 一枚计时红（复量 3/3 绿）。⇒ **本腿新增红：零枚**。
+- **⚠ 一处我把自己的派单读法顶回去了（推翻清单里第一条）**：派单说"改后 ≥1 枚生产调用者"的尺是
+  `grep -rn '\.Cancel(' … | grep -v _test`。我在 `cmd/wisp/run.go` 的注释里原样写了这串 grep，
+  结果**那行注释自己会被这把尺命中**（注释冒充调用者，正是票面 ② 段抱怨的"唯一命中是一句注释"那一形）。
+  ⇒ 已把注释改成不含该调用语法的写法，并在这条 log 里记下测量本身被工具文本污染的这条路。
+- **另一处我自翻了一格**：AC#2 的回执原本写着"这一停记在宿主审计里（谁停的＝…）"。
+  那是对**宿主接线**的承诺，而从工具里看不见 `Options.Logf`／`Options.Journal` 有没有接上——
+  拿没接的宿主跑它，那句就成了新的谎（本票的标题正是这一形）。⇒ 回执与 `Description()` 都收窄成
+  **"由谁发起、目标是哪一枚"＋"那一行不会消失、会落到 D43 已有的状态名"** 这两件当下为真的话；
+  **"被谁停的"这一维仍按 `A434` item 4 落在审计里，但它是被用例证明的、不是被说明书承诺的**：
+  `Test221ParentStopsItsOwnChildRowAndStreamSettle` 直接断审计行含 `tool=task.cancel` 且 `task=<调用者>`，
+  并读 `memory.Store` 里那条 `tool_call`：`TaskID`＝调用者、`ArgsJSON` 含目标 id。

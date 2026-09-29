@@ -201,7 +201,7 @@ func (subagentSpawn) Name() string { return "task.spawn" }
 // (pinned by subagent_197_test.go:797) and the two numbers (pinned at :419).
 func (subagentSpawn) Description() string {
 	return fmt.Sprintf("派生一枚子代理去独立完成一个子任务，等它跑完并把结论带回本任务；"+
-		"它会在任务名册里留下一行有父子关系与状态的记录；"+
+		"它会在任务名册里留下一行有父子关系与状态的记录，可以用 task.cancel 单独停它；"+
 		"注意：停掉父任务不会级联停掉子代理；task.cancel 只有派生它的那枚父任务能用它单独停孩子——"+
 		"子代理停兄弟、停自己都一律被拒；由用户停某一枚子代理还是另一条通道（票 181／票 220），今天没有落点；"+
 		"子代理不能再派生子代理（深度 %d），同时在跑的子代理上限 %d 枚",

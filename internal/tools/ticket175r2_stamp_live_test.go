@@ -331,13 +331,18 @@ func TestHostMintedPointerRereadStaysCleanOnRealBridge175r2(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 var classified175r2 = map[string]string{
-	"fs.read":     "marked: C25 source roster (SPEC-06 §5)",
-	"fs.list":     "unstamped: a listing this process composed, no foreign body",
-	"fs.write":    "unstamped: a confirmation of a local write",
-	"fs.edit":     "unstamped: a confirmation of a local edit",
-	"fs.trash":    "unstamped: a confirmation of a local delete",
-	"fs.move":     "unstamped: a confirmation of a local move",
-	"fs.delete":   "unstamped: a confirmation of a local delete (opt-in family)",
+	"fs.read":   "marked: C25 source roster (SPEC-06 §5)",
+	"fs.list":   "unstamped: a listing this process composed, no foreign body",
+	"fs.write":  "unstamped: a confirmation of a local write",
+	"fs.edit":   "unstamped: a confirmation of a local edit",
+	"fs.trash":  "unstamped: a confirmation of a local delete",
+	"fs.move":   "unstamped: a confirmation of a local move",
+	"fs.delete": "unstamped: a confirmation of a local delete (opt-in family)",
+	// Ticket 221 甲形 registers task.cancel, so this census demands an answer
+	// for it in the same commit: its reply is a receipt about a row the host
+	// itself filed - no outside body flows back through it. ⚠ This line is the
+	// census being answered, not loosened: delete it and the leg goes red again.
+	"task.cancel": "unstamped: a receipt naming which roster row this call stopped",
 	"task.output": "marked: C25 roster since ticket 175-r2, its answer is what a task printed",
 }
 
