@@ -24,3 +24,12 @@
 ## 禁区
 
 不动 `PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`；不动三枚冻结件（`internal/panel/tokens_fourway_test.go`／`internal/panel/l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`）；不新增导出名；`frontend/**`／`design/**` 零读零写零转述；⚠ **本票与票 223 同源但射程不同**：223 管"接线"，225 管"账目对得上"，**不许把两票的合成一票做**。
+
+> ✅ **09-29 12:2x 已派已收（腿 `225-a1`，`docs/evidence/s1/225-deferred-registry-audit.md`，46,705 字节，提交 `dd7c447f`＋`3397dbd0`）；编排者现读复验，台账 `A429`。三格结论落定＋两枚比原票面更硬的补充：**
+> - **表一**：〔§5 有对应行〕**3 枚**／〔该补一行〕**3 枚**（`queue`／`audio, ticket 09`／`update/rollback`）／〔该摘或改写〕**12 枚**（14 处，占 54%）。⚠ **"1:1"这个措辞本身今天不成立**——`macOS/Linux`＋`P12-macos` 两枚标记共用 §5 同一行＝**N:1**。
+> - **表二（反向）**：12 行 DEFERRED 里**只有 2 行**有代码标记 ⇒ **10 行"登记了而代码查无此人"**，最危险 5 行＝剪贴板历史／`doc.read` xlsx-OCR／`system.eject`／完整错误文案／i18n（编排者用自己那份 22 枚名册交叉核过：这五件事一枚标记都没有，而相邻代码是活的）。
+> - ⛔ **补充①（编排者现跑）：这条规矩规定的载体从来没建过**——`SPEC-12:94` 逐字要求标记写成 `// DEFERRED(D-xx): … → docs/DEFERRED.md#锚点`，而 `ls docs/DEFERRED.md` ＝ **不存在**，且 22 枚标记**没有任何一枚**带那一段后缀。⇒ **补建 `docs/DEFERRED.md`＝动 `SPEC-12 §6` 交付物清单＝契约面＝要人批**；**默认动作＝不建**，只把这一条摆在这张票的待人批清单里。
+> - ⛔ **补充②（编排者现跑复现）：一处类型词与登记表相反**——`internal/tools/registry.go:55` 逐字 `{Kind: KindMCP, Ticket: "REJECTED: D13/16.9#7, interface slot only"}`，而 §5 把 MCP client 登记为 **RESERVED**；两者给后续人的指令相反（`REJECTED`＝不得被修复，`RESERVED`＝只留接口位）。⇒ **不由编排者也不由腿裁**，进待人批清单。
+> - **表三归口**：`config/doc.go:14` 该改标记、落点归**票 223**；`watchdog/doc.go:18` 该改标记，但"watchdog 建一圈 vs `cmd/wisp` 自己起"是拓扑选择、牵 D25/D38 ⇒ **归编排者＋owner**。
+> - **AC#4 按原意按住**：正向检查要先有一枚人工"别名字典"＝新真相源 ⇒ **本轮不建仪器、不进 CI**；并记一枚实现坑：按行 `grep "implemented by ticket"` 只命中 9 枚、**注释折行漏 5 枚**。
+> - ⚠ **本腿留下一枚共享索引事故（详见 `A429`）**：第一次 `git commit` **没带 pathspec** ⇒ `dd7c447f` 把在飞腿 `222-r1` 已 `add` 未提交的 `internal/tools/subagent_222_test.go` 一起收走（盘上量得零丢失，不改写历史；`dd7c447f` **不作** `internal/tools` 的"已核过绿"锚点）。⇒ **今后派单的 Git 纪律改成把 pathspec 写进 `commit` 本身**，并**报路径必须报到包级**（本腿正文写 `registry.go:55` 没写包名，真位置 `internal/tools/registry.go:55`）。
