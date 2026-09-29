@@ -69,7 +69,43 @@
 
 ## 2. 常驻名额与看门狗（`internal/observe/goroutine.go` 全文 ＋ `RosterReport`／`Unknown` 的判据与消费者）
 
-〔待填〕
+尺与口径：`wc -l internal/observe/goroutine.go` ＝ **425 行**（票面记 `:44` 有 `ui-sta` ⇒ **复认未漂**）。以下行号均为现核。
+
+**在册形状（全文清点）**
+
+- `:31-36` 五枚类别：`resident`／`on_demand`／`per_task`／`temporary`／`unknown`（注释逐字 "NOT in the roster: leak symptom"）。
+- `:40` `const ResidentBaseline = 6`；`:43-45` `ResidentNames = {"ui-sta", "audio-capture", "hotkey-listener", "db-writer", "watchdog", "log-flusher"}`（`ui-sta` 在 `:44`）。
+- `:48` `OnDemandNames = {"kws-infer"}`；`:52` `PerTaskPrefixes = {"agent-task-", "tool-exec-", "approval-waiter"}`；`:57-60` `TemporaryNames` 7 枚（含 `panel-host`）。
+- `:64-82` `ClassifyGoroutine`：先查常驻表→按需表→**前缀**匹配 per-task→临时表→否则 `CategoryUnknown`。⚠ **它是"名字→类别"的纯字符串函数，没有任何"这一枚属于哪个进程角色"的输入**。
+- `:88-149` `Root`：`Ctx`＋`Cancel`＋`pending` 计数；`:132-149` `Root.Wait(timeout)`＝单调 `NewTimeout` 轮询 `Pending()`（2ms 步进）⇒ **AC#4 需要的 join 原语现成**。注释 `:130-131` 逐字："The 3s cap used by the D38(e) shutdown sequence lives in proc, not here."
+- `:188-196` `RosterReport{Total, Resident, OnDemand, PerTask, Temporary, Unknown []string, ResidentOverBaseline bool}`。
+- `:200-210` `Handle`：`Done() <-chan struct{}`／`Err() error` ⇒ **每枚 Spawn 都返句柄，join 面现成**。
+- `:230` `var Default = NewRegistry()` —— **进程级单例**，注释逐字 "so the watchdog sees one picture"。`boot_windows.go:72` 里 `rt.Registry = observe.Default` ⇒ 常驻腿的 `rt.Registry` 与 CLI 腿 `approval_reply.go:421`／`config_reload.go:119` 用的 `observe.Default` **是同一枚对象**。
+- `:262-283` `Spawn`：`:269` 分类，`:270-273` **`CategoryUnknown` 只做一件事——`slog.Warn("goroutine outside the D38 roster (leak symptom)")`**；`:276` `live[{name,owner}]++`、`:279` `root.addPending(1)`；`:281` 全仓唯一被豁免的 `go` 语句。⛔ **没有拒绝、没有阈值、没有报警对象**。
+- `:405-425` `RosterReport()`：按类别把 `Snapshot()` 的计数相加，`:422` `rep.ResidentOverBaseline = rep.Resident > ResidentBaseline`，`:423` 排序 `Unknown`。⚠ **`Unknown` 与 `PerTask` 在这里只是被填进结构体，没有任何比较**：全仓没有 `PerTask > 3` 之类的判据（尺＝`grep -rn "ResidentBaseline|ResidentOverBaseline|PerTask"`，非 `.scratch`，命中仅 `goroutine.go` 自身＋`boot_windows.go:108`＋两枚测试文件）。
+
+**`RosterReport` 到底谁在读（现跑的尺）**
+
+尺＝`grep -rn --include=*.go "RosterReport|ResidentBaseline|ResidentOverBaseline"` 剥 `.scratch`：
+
+- **生产调用者＝1 枚**：`internal/proc/boot_windows.go:108 if rep := rt.Registry.RosterReport(); rep.ResidentOverBaseline {` → `:110` `return nil, fmt.Errorf("proc: resident goroutine baseline exceeded at boot")` → 调用侧 `resident_windows.go:42-45` 打印 `boot failed` 并 `os.Exit(1)`。
+  ⇒ **它是"开机时一次性自检"，不是循环看门狗**；`Boot` 之后没有任何东西再查这枚数。
+- 测试调用者：`internal/agent/loop_golden_test.go:286/293`、`internal/observe/goroutine_test.go:74/102/106/196/202/268`。
+- **`RosterReport.Unknown` 的生产消费者＝0 枚**（`Unknown` 只在 `goroutine.go:419/423` 被写、被 `goroutine_test.go:204` 断言；`cmd/balldebug/main.go:40`、`cmd/wisp/approval_always.go:33`、`internal/memory/writer.go:24` 三处只是**注释里提到**）。⇒ **没有"把 Unknown 判成什么颜色／是否报警"这回事**，能观察到的只有 `Spawn` 那行 WARN。
+
+**"看门狗在跑"这一句：现跑尺的结果＝不成立**
+
+- `ls internal/watchdog/` ＝ **只有 `doc.go` 一枚文件，零实现**。`internal/watchdog/doc.go:18` 逐字 `DEFERRED(watchdog loop/thresholds): implemented by ticket 42.` ⚠ 票面把这行记在 `internal/observe/goroutine.go:18` 一带——**位置错**：现核 `goroutine.go` 全文**零枚 `DEFERRED(` 标记**（尺＝`grep -rn "DEFERRED" internal/observe/` ⇒ 命中只有 `doc.go:22`（JSONL sink/redaction/diagnostics/CostMeter）与 `diagnostics.go:23/28/52/179`（登记表载体本身））。`goroutine.go:23-25` 那句是 "AST scan lands with ticket 08; a grep-level regression test runs meanwhile"。
+- `grep -rn --include=*.go "internal/watchdog"` 非 `.scratch` ⇒ 命中全是**注释与一枚 reachability 测试**（`cmd/wisp/config_reload.go:27/31`、`internal/config/manager.go:19`、`internal/models/assembly_reachability_121_test.go:41`），**零 import 者、零调用者**。
+- 但**名额名 `watchdog` 今天确实在被用**：`cmd/wisp/config_reload.go:119 rt.reloadHandle = observe.Default.Spawn("watchdog", "config", rt.reloadRoot, rt.configReloadTick)`（票 223 交付的**配置热加载 1s tick**，`config_reload.go:87` 注释逐字 "SPEC-03 §4.3's 1s watchdog tick"；`internal/config/manager.go:18-19` 逐字承认"the resident 'watchdog' goroutine cmd/wisp spawns for `wisp run` … internal/watchdog's own loop is still ticket 42's"）。⇒ 这一枚住在**CLI 腿**（`startConfigReload` 由 `assembleRuntime` 调用），**常驻腿没有它**（`resident_windows.go` 不 import config）。
+
+**唯一真在数 goroutine 的门（不是看门狗，是量具）**
+
+- `internal/observe/thresholds.go`（**冻结件，本腿只读**）：`:36` `goroutineLimitSleeping = 6 // D38b resident baseline`、`:37` `goroutineLimitArmed = 7 // + kws-infer`。
+- 判据在 `thresholds.go:156-184` `goroutineVerdict`：`Sleeping` 行 `Pass: rep.GoroutinesMax <= goroutineLimitSleeping, Gate: true`（`:161-162`）；`Armed` 行 `<=7`（`:174-175`）；**其余态 `Limit: "record", Gate: false`**（`:179-182`，Note 逐字 "per-task counts vary; D38b roster report governs"）。
+- ⚠ **`GoroutinesMax` 的口径＝总数，不是常驻类别**：`sampler.go:325` `rep.GoroutinesMax = maxInt(..., sm.Goroutines)`，而 `sm.Goroutines` 来自 `sampler.go:365`（及 `:515` settle 同形）`Goroutines: s.reg.Count()`；`goroutine.go:344-352` `Count()` 把 `live` 里**所有** key 的计数相加。⇒ **同一枚"6"在两处含义不同**：`ResidentOverBaseline` 数的是"名字落在常驻表里的总数"，SLO 门数的是"这枚 registry 上活着的 goroutine 总数"。这是 §6① 的直接证据。
+- **谁评估这枚门**：`grep -rn "observe.NewSampler"` 剥 `.scratch` ⇒ **2 枚，都在 `cmd/wisp/slo_windows.go`（`:283` in-tree、`:385` out-of-tree）**；`SampleState(` 生产调用者 2 枚（`:387`、`:436`）、`CheckSettle(` 1 枚（`:985`）。⇒ **产品运行时里没有任何东西在评估 SLO 门**；门只活在 `wisp slo` 这把量具与测试里。
+- ⚠ 顺带量到：`thresholds.go:166-171` 逐字承认 goroutine "are only readable in-process, so an out-of-tree row reports the measuring skeleton's own roster" ⇒ 外测那一行的 `<=6` **数的不是被侧的那条腿**。
 
 ---
 
