@@ -103,12 +103,45 @@ done
 
 ## AC#3 父侧结论通道要么真、要么明说不做（票面 `:37`）
 
-判语：**未判**
+**判语：不成立（半格；两支甲/乙都没走，且两支都还缺批准）**
 
-依据（文件:行，现读）：未填
-是否新造导出名：未填
-突变读数：未填
-还原自证：未填
+**现读依据**
+
+| 事实 | 出处（现读） |
+|---|---|
+| 甲形（`task.spawn` 立即返回句柄）**没做**：`:382-393` 仍是 `select { case <-ctx.Done(): … case res := <-done: … }`，调用阻塞到孩子结束才返回 | `internal/tools/subagent_197.go:382-393` |
+| 乙形（等待不受 tool 超时约束）**没做**：`TaskSpawnDecl()` 仍不设 `Timeout` ⇒ `timeoutFor` 落 `b.defTm` ⇒ 生产值＝`cfg.Agent.PerToolTimeoutMS`（未配置 `DefaultToolTimeout = 30s`）；带 deadline 的 `ectx` 在取到许可**之后**才建，而它就是等待用的那枚 ctx | `subagent_197.go:202-211`／`bridge.go:545-557`／`bridge.go:28`／`cmd/wisp/run.go:570` |
+| 丙形（交还许可）**确实落了**且不改上面两行 | `subagent_197.go:356` ＋ `bridge.go:688-700` |
+
+**⛔ 越权检查（本腿任务书点名的那枚扳机）＝没有踩**
+`git show bfc55b5b -- internal/tools/bridge.go internal/tools/subagent_197.go` 新增的顶层声明**逐枚现读＝六枚，全小写开头**：`inFlightSlot`／`take`／`giveBack`／`inFlightSlotKey`／`withInFlightSlot`／`giveBackWhileWaiting` ⇒ **零枚新导出名**；源名复用现成 `risk.SrcTaskOutput`（`subagent_197.go:463` 往父任务作用域盖戳），**没有** `subagent.output` 之类的新名字；`SubagentDeps` 仍是 5 枚字段（`:128-148`：Roster／BaseOptions／ParentTools／Provenance／Stream），197 那枚字段枚举守卫不必重谈。**所以 AC#3 不是因为越权判不成立的。**
+
+**突变读数（本格的新尺＝M11，打在已修的产码上，产码一枚字节未动）**
+只改测试件里的两样东西（`-overlay`，台件在 `mutations/m11-budget-50ms-gated/`）：把 C22 旋钮 `subagent_222_test.go:70 h222PreFixBudget` 从 `3 * time.Second` 缩到 **`50 * time.Millisecond`**，并给孩子在第一枚模型调用里加一段 **200ms 的 `late`**（＝"孩子真的在干活、比父任务的预算久"这件事的生产情形）。三发 `-count=3` 读数**逐发相同、3/3 红、每发 0.20s**：
+
+- `:395`（突变件里漂到 `:400`）四枚父任务**全**收到 `"工具 task.spawn 超时（50ms），已协作式中止"`；
+- `:413`→`:418` 四枚孩子的结论各出现 **0** 次；
+- `:380`→`:385` 因果读数：`孩子 c1…c4 的工具调用起跑时已有 **4** 枚父任务返回`——孩子**照样挤上了桥**（丙形生效，父确实不占许可），只是**到得比父任务的预算晚**。
+
+⇒ 生产上把 50ms 换成 `cfg.Agent.PerToolTimeoutMS`（未配置 30s）：子代理真干活是几分钟量级 ⇒ **父任务必然收到超时文案、孩子继续跑并正常落名册**＝"名册对、父任务错"那枚分裂**今天仍在**。票面 `:69` 与台账 `A430 :9273` 那句"只修掉一半"由本腿**复现成读数**，不是文字推断。
+（⚠ 诚实记一发更早的尝试 **M10**＝只把旋钮改成 `1ms`、不加 `late`：`-count=3` 里 **1 红 2 绿**。原因是纯内存假流程真能在 1ms 内跑完⇒ **M10 是撞运的、不算尺**，本格判语只用 M11。顺带读出一枚对该文件的认识：`SpawnConclusion` 那枚用例的确定性靠的是 gate＋3s 的**富余**，而不是靠断言本身。）
+
+
+**两支为什么都不能由 agent 自裁（具名，勿互相冒充已完）**
+- 乙＝给这枚调用一枚 C22 豁免 ⇒ 顶到 `bridge.go:30-31` 逐字 "nothing here can switch enforcement off"＝**契约面**。
+- 甲＝改 `task.spawn` 语义 ⇒ 票面 `:37` 明写"**要先落一枚 `A##`**"；本腿现查台账：**没有任何一条 `A##` 落的是甲形**——`A420 :9144` 把它列为"要点头的那一支"、`A430 :9273` 原样升级给 owner、`A434`（13:10）批的是**票 221 的甲形＝注册 `task.cancel`**，而且 `:9330` 逐字写着"父任务等孩子的时限那一维不在这里（那是票 222 的 AC#3 剩半格，两支都要另外批）"。⇒ **别把 `A434` 当成本票甲形的批准，它不是。**
+
+**还原自证**：`git status --porcelain -- cmd/wisp internal/` ＝空；M10 的台件在 `.scratch/wisp/probes/222/v1/mutations/m10-budget-1ms/`，测试件 `sha1sum` 仍 `b3938cf0…`。
+
+**可复跑的尺**
+```
+export PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"
+python .scratch/wisp/probes/222/v1/mut11.py
+go test ./internal/tools -count=3 -run 'Test222SpawnConclusion' -v \
+  -overlay=.scratch/wisp/probes/222/v1/mutations/m11-budget-50ms-gated/overlay.json
+# 期望：3/3 红（每发 0.20s）：四枚"超时（50ms）"＋四枚结论出现 0 次＋"已有 4 枚父任务返回"
+```
+
 
 ---
 
