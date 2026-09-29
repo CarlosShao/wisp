@@ -106,13 +106,50 @@ FAIL	github.com/CarlosShao/wisp/internal/config	0.738s
 
 ## ④ 逐格裁决 AC#1..AC#6
 
-〔待填〕
+时刻 `2026-09-29 14:07 +08`。每格：〔成立／不成立／成立但带注〕＋作依据的原文行＋"把实现拿掉会不会红"。
+
+- **AC#1 手改不许被吞 —— 成立，但带硬注。**
+  依据：`g0` 基线整包 `ok`（`writeguard_226_test.go` 全绿）；`a1-config-mutated.txt:10` 把 `allowdirs.go` 合并拿掉后 `--- FAIL: TestAC1AllowedDirsWriteKeepsAHandEditedKey`（:74 `got 56, want 60`）、`a1-cmdwisp-mutated.txt:12` CLI 接缝同突变 `--- FAIL: TestAC1AlwaysBranchDoesNotRevertAHandEditedKey`。`a4-control-inverted.txt` 证明常驻正控 `TestAC1ControlSnapshotWriteIsWhatRevertsTheHandEdit` 非恒真（反接即 :111 "the control has lost its teeth"）。**拿掉合并＝红**，答案：会。
+  ⚠ 硬注：AC#1 的字面判据只钉住"**改一枚键的值**"这一支；用户"**删一行**"这一支没有任何用例覆盖，且实测删的行会被补回成 schema 默认值（详见 §⑤）。⇒ 票面"运行期间你手改的任何其它键会被悄悄还原"这句，对"删"这一形今天仍未被 AC#1 的判据接住。
+
+- **AC#2 冲突必须响亮 —— 成立，但带注。**
+  依据：`a1-config-mutated.txt` 拿掉合并后 AC#2 三枚用例同时红（:127 未报实际写的键、:154 干净写未在 INFO 报键、:170 竟接受了不可读文件并覆盖）；`writeguard.go:168-185` 分叉走 `slog.Warn` 且 `kept_in_file_not_in_memory` 点名保留的手改、`written` 点名实改的键。**拿掉合并＝红**，答案：会。
+  ⚠ 注：合并报告里"什么都不写就不动文件"的承诺，只在 **schema 已是当前版** 时成立——`b4-probe-migration-inside-read.txt` Y2、`b6-probe-nothing-written-branch.txt` W2/W3 显示：手删 `schema_version` 行或塞入旧版文件时，`readConfigFile` 的迁移-on-读会把文件重排成 canonical（bytes 变、mtime 变、操作者注释丢、落 `config.toml.bak-1`），**即便 mergeWrite 走的是 `nothing written` 早返回支也一样**。这是继承自 loader 的行为、非本票新造，但 AC#2 文案"不白丢注释"要据此收窄。
+
+- **AC#3 `statOwnWrite` 认领范围收窄 —— 成立。**
+  依据：本腿 §③① 亲跑的"无条件认领"突变，稳定红 **2 枚**（`writeguard_226_test.go:224` "adopted a stat for content this process never read; the hand edit is now invisible forever"、:259 "the hand-added [fs] entry was never judged; our write hid it (AC#3)"），与 v1 `a3-config-unconditional-adopt.txt` 逐字一致。**把"有分叉就不认领"改成无条件认领＝红**，答案：会 ⇒ **AC#3 那格不是装饰**。`d-probe-d36-adopt-bypass.txt` S3/S4 另证：分叉外键保留在文件里时不认领、下一轮读到并按 D36 rule 1 拒放宽＝**没有把甲变成绕过 D36 的后门**。
+
+- **AC#4 同形的另一处一起处理 —— 成立。**
+  依据：`a2-config-permmode-mutated.txt:14` 拿掉 `permmode.go` 合并后 `--- FAIL: TestAC4PermissionModeWriteKeepsAHandEditedKey`（:278 `got 56, want 60`）；`c3-permmode-rollback-removed.txt:7` 拿掉 mode 写失败回滚后 `--- FAIL: TestGuardedWriteFailureRollsBackMemory`（:387）。`g0` 显示 `internal/perm ok`、冻结件 `TestTicket90PersistFailureKeepsMemory` 仍 PASS。**拿掉＝红**，答案：会。`SetPermissionMode` 与 `AddAllowedDir` 同批改，未只修新入口。
+
+- **AC#5 "可撤销"那一半要有真路径 —— 半格成立（落库那半），另半未闭。**
+  依据：`writeguard_226_test.go:308` `TestAC5SetAllowedDirsPersistsARevocationWithoutAClobber`（`g0` 绿）把"零调用者零用例"的 `SetAllowedDirs` 首次钉成受守卫写（撤销落库、且不覆盖别的手改）。`a1-config-mutated.txt` 拿掉合并后此例红（:324 revocation reverted the hand edit）。**落库＝会红**。但票面 AC#5 要求"**既能落库、又能被答复语法触发**"，答复语法那半不在本票射程（属票 219/224）——实现腿 §8 自己也记为未闭。**这一格只有半边为真**，另半边推迟事项须按 `SPEC-12 §5` 五字段登记（见 §⑥）。
+
+- **AC#6 整包终态 —— 成立（零新增红），口径见下。**
+  依据：v1 三发 `f-full-suite`／`f2-full-suite-terminal`／`f3-full-suite-final` **均为 24 包 ok、FAIL 名册恰为 5 例**＝`internal/ball` `TestC21TableColourRowsMatchTokensCSS`＋`internal/panel` 四例（`TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestComposerContractTypesMatchFrontend`／`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`／`TestC21DesignTokensFourWayAgree`），且三发 `internal/risk` 皆 `ok`（5.754／5.624／6.023s）、`internal/config ok`、`internal/perm ok`、`cmd/wisp ok`（81.8—86.1s）、`tools ok`。这 5 例＝别人地界的历史红（另一队删 `design/assets/tokens.css`＋面板契约字段差，`A427`/`A428`），**非本票新增**。
+  ⚠ 读数矛盾已断：编排者 13:01:37 那一发是 **23 包 ok／3 包 FAIL 共 6 例**，多出 `internal/risk/TestResolvePerCallBudget`＝**并发争用假红**（撞在实现腿收尾的门上），编排者 13:02:57 空机器 `-count=3` 复量 0.281／0.272／0.290 ms/op（预算 1.000）三发全 PASS（台账 `A432`）。⇒ **"零新增红"的比对基线以 v1 这三发安静期 24-ok 读数为准**（全量落盘、未接 head/tail、逐名比红名册）；编排者 13:01:37 那发属争用期、其 risk 例不计入本票名册。本腿未新跑整包（非第 3 节点名两发之一），不另立第四发读数。`f-d22scan.txt` 另证仪器侧：末行 `d22scan: clean - no D22 ban violations`、`runtests.sh OK PASS=34 FAIL=0`（此处 34＝d22scan 自检包计数，与本票 34 发读数无关）。
 
 ---
 
 ## ⑤ 「删行会不会被补回」结论
 
-〔待填〕
+时刻 `2026-09-29 14:07 +08`。⛔ 未自跑（v1 `b-*`＋`probe*/main.go` 读数已足），据以下原始输出定论：
+
+**直接答案：会。** 用户从 `config.toml` 里**删掉一行标量键或整节**，一次受守卫的写会**把那行补回文件**——补成 **schema 默认值**（不是本进程内存里那枚值）。
+
+- `b-probe-deleted-lines.txt` B1/B2：手删 `size` 行后受守卫写 → `RESULT ... size line re-added to the file : true`、`ball.size on disk now : 56`、`memory ball.size : 60`（补回的是默认 56，非内存的 60）。
+- `b2-probe-deleted-shapes.txt`：P1 非默认标量删→补回 56；P2 默认标量删→补回；P3 整节删→header+行都补回；P5 `schema_version` 行删→补回 2；P6 `base_url` 删→补回 `''`。
+
+**是哪段代码"允许"它补回的**：`readConfigFile(m.path)`（`writeguard.go:118`）重读磁盘时，缺失的标量键会被填成结构体默认；`mergeWrite` 以 `base = deepCopyConfig(disk)`（`:141`）为底、`SaveFile` 序列化整个结构体 ⇒ 文件里那行"缺席"与"等于默认"在结构体模型里**不可区分**，于是缺的标量行被重新落盘成默认值。
+
+**边界（不会被补回的那一支）**：`b2` P4 删一个 **map 条目**（provider 子表）→ `[llm.providers.deepseek]` header `write put it back: false`、`loaded-after: providers=0` ⇒ map 项的"缺席"被保留、**不补回**。
+
+**⇒ 对票面的后果**：AC#1 只钉住了"**改值**"这一支（`writeguard_226_test.go` 全部用"把 56 改成 60"作手改），**"删行"这一支既没有用例、且实测会被还原成默认**。这正是工单第 4 行编排者自己起的那枚疑问的结论——**成立**：票 226 的 AC#1 覆盖面不完整。
+
+**建议（本腿不拍、留给编排者）**：
+1. 要么新增判据（如 **AC#1-b**：手删一枚标量行 ⇒ 受守卫写不得把它按默认值补回 / 或明确"删行＝回落默认"是可接受语义并写进用户可见文案），要么另立一票；
+2. 且**建议把这行为钉成常驻用例**（现有 `b-*` 只是台件、非 `*_test.go`）：至少断言"删一枚非默认标量行后跑受守卫写，文件里该行的值等于默认、且 `kept_in_file_not_in_memory` 有报（与内存分叉时不认领）"——否则该语义无回归防护；
+3. 迁移-on-读在 `nothing written` 支仍重排文件（Y2/W2/W3）这一条**也建议立一枚常驻用例**钉住"schema 落后时受守卫写会重排并丢注释"，把它从"隐性副作用"变成"被断言的已知代价"。
 
 ---
 
