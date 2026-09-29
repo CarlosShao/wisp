@@ -1,0 +1,970 @@
+=== RUN   TestDockGeometryShape
+--- PASS: TestDockGeometryShape (0.00s)
+=== RUN   TestDockTangentMeansGapZero
+--- PASS: TestDockTangentMeansGapZero (0.00s)
+=== RUN   TestDockPosKeepsTheOrbTangentAtEveryRampLevel
+--- PASS: TestDockPosKeepsTheOrbTangentAtEveryRampLevel (0.00s)
+=== RUN   TestDockSquashIsMonotonicAndClamped
+--- PASS: TestDockSquashIsMonotonicAndClamped (0.00s)
+=== RUN   TestDockProgressReadsThePush
+--- PASS: TestDockProgressReadsThePush (0.00s)
+=== RUN   TestNearestDockEdgePicksTheEdgeYouPushed
+--- PASS: TestNearestDockEdgePicksTheEdgeYouPushed (0.00s)
+=== RUN   TestDockedLeavesAHittableStrip
+--- PASS: TestDockedLeavesAHittableStrip (0.00s)
+=== RUN   TestDockFreePosKeepsTheBallReachable
+--- PASS: TestDockFreePosKeepsTheBallReachable (0.00s)
+=== RUN   TestDockOnSecondaryMonitorWithNegativeOrigin
+--- PASS: TestDockOnSecondaryMonitorWithNegativeOrigin (0.00s)
+=== RUN   TestDockHoverPopBackWalksTheRampHome
+--- PASS: TestDockHoverPopBackWalksTheRampHome (0.00s)
+=== RUN   TestDockRampWalksItsBudget
+--- PASS: TestDockRampWalksItsBudget (0.00s)
+=== RUN   TestRegisterAllLiveSet
+--- PASS: TestRegisterAllLiveSet (0.00s)
+=== RUN   TestRegisterAllSplitsFailureFamilies
+time=2026-09-29T17:56:02.607+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-09-29T17:56:02.609+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=panel binding=Ctrl+Alt+Bogus+ err="unknown key \"Bogus\" in hotkey \"Ctrl+Alt+Bogus+\""
+time=2026-09-29T17:56:02.609+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=mute
+time=2026-09-29T17:56:02.609+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=cancel
+time=2026-09-29T17:56:02.609+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=panel
+--- PASS: TestRegisterAllSplitsFailureFamilies (0.00s)
+=== RUN   TestUnregisterAllDropsKnownSlots
+--- PASS: TestUnregisterAllDropsKnownSlots (0.00s)
+=== RUN   TestHotkeyStatusString
+--- PASS: TestHotkeyStatusString (0.00s)
+=== RUN   TestHotkeyReloaderRebindsOnConfigChange
+time=2026-09-29T17:56:02.609+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+R mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=4
+time=2026-09-29T17:56:02.609+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+Q mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=4
+--- PASS: TestHotkeyReloaderRebindsOnConfigChange (0.00s)
+=== RUN   TestHotkeyReloaderSectionsHookIgnoresOtherSections
+time=2026-09-29T17:56:02.609+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+Q mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+J live=4
+--- PASS: TestHotkeyReloaderSectionsHookIgnoresOtherSections (0.00s)
+=== RUN   TestApplyHotkeyDefaults
+--- PASS: TestApplyHotkeyDefaults (0.00s)
+=== RUN   TestParseAccelerator
+--- PASS: TestParseAccelerator (0.00s)
+=== RUN   TestDefaultHotkeys
+--- PASS: TestDefaultHotkeys (0.00s)
+=== RUN   TestLiquidRotationIsMonotonicInLevel
+--- PASS: TestLiquidRotationIsMonotonicInLevel (0.00s)
+=== RUN   TestLiquidConvergesAndBorderFadesInOnSilence
+--- PASS: TestLiquidConvergesAndBorderFadesInOnSilence (0.00s)
+=== RUN   TestSummonBurstIsBoundedAndRetires
+--- PASS: TestSummonBurstIsBoundedAndRetires (0.00s)
+=== RUN   TestMotionOnlyAppliesInPrototypeMode
+--- PASS: TestMotionOnlyAppliesInPrototypeMode (0.00s)
+=== RUN   TestBorderIsNeverAppliedInOneFrame
+--- PASS: TestBorderIsNeverAppliedInOneFrame (0.00s)
+=== RUN   TestBorderGlidesInAfterTheSessionEnds
+--- PASS: TestBorderGlidesInAfterTheSessionEnds (0.00s)
+=== RUN   TestSpeakingGlidesTheBorderBackOut
+--- PASS: TestSpeakingGlidesTheBorderBackOut (0.00s)
+=== RUN   TestTransitionTimerSetIsTheFrozenTimerSet
+--- PASS: TestTransitionTimerSetIsTheFrozenTimerSet (0.00s)
+=== RUN   TestSleepingFrameLosesTheBorderAuthority
+--- PASS: TestSleepingFrameLosesTheBorderAuthority (0.00s)
+=== RUN   TestLiquidDrivenStateSet
+--- PASS: TestLiquidDrivenStateSet (0.00s)
+=== RUN   TestPushLevelIsInputHardened
+--- PASS: TestPushLevelIsInputHardened (0.00s)
+=== RUN   TestRepaintIsSkippedWhenNothingChanged
+--- PASS: TestRepaintIsSkippedWhenNothingChanged (0.00s)
+=== RUN   TestPositionStoreRoundTrip
+--- PASS: TestPositionStoreRoundTrip (0.01s)
+=== RUN   TestResolvePosition
+=== RUN   TestResolvePosition/saved_visible_on_its_monitor:_kept
+=== RUN   TestResolvePosition/saved_partially_off_right_edge:_clamped
+=== RUN   TestResolvePosition/saved_monitor_detached:_primary_default
+=== RUN   TestResolvePosition/nothing_saved:_primary_default
+=== RUN   TestResolvePosition/saved_point_on_no_monitor:_that-monitor_default_impossible_->_primary
+=== RUN   TestResolvePosition/primary_detection_when_listed_second
+--- PASS: TestResolvePosition (0.00s)
+    --- PASS: TestResolvePosition/saved_visible_on_its_monitor:_kept (0.00s)
+    --- PASS: TestResolvePosition/saved_partially_off_right_edge:_clamped (0.00s)
+    --- PASS: TestResolvePosition/saved_monitor_detached:_primary_default (0.00s)
+    --- PASS: TestResolvePosition/nothing_saved:_primary_default (0.00s)
+    --- PASS: TestResolvePosition/saved_point_on_no_monitor:_that-monitor_default_impossible_->_primary (0.00s)
+    --- PASS: TestResolvePosition/primary_detection_when_listed_second (0.00s)
+=== RUN   TestDefaultPositionInsideWorkArea
+--- PASS: TestDefaultPositionInsideWorkArea (0.00s)
+=== RUN   TestC21TableColourRowsMatchCode
+    tokens_table_test.go:780: light table reuses the :root value by cascade for 2 field(s): BallHalo, OnSolid (the table states this in prose above its light rows)
+    tokens_table_test.go:805: verified 114/114 colour rows against tokens.go (40 palette fields checked in code -> table, 36 look colours, 4 looks)
+--- PASS: TestC21TableColourRowsMatchCode (0.00s)
+=== RUN   TestC21GeometryRowsMatchCodeConstants
+    tokens_table_test.go:955: docs/evidence/s1/c21-native-tokens.md:169: this row states a rule (缓动) without naming a Go constant, so there is no value to compare
+    tokens_table_test.go:1059: MATCHED WITHOUT THE PROMISED UNIT (4): BallSizeMaxPx=72 @ docs/evidence/s1/c21-native-tokens.md:141, BallSizeMinPx=44 @ docs/evidence/s1/c21-native-tokens.md:141, FontSizeMicroPx=11 @ docs/evidence/s1/c21-native-tokens.md:159, FontSizeMonoPx=12.5 @ docs/evidence/s1/c21-native-tokens.md:159
+    tokens_table_test.go:1063: NUMBERS NO NAMED CONSTANT CLAIMS (36): 0.35 @ docs/evidence/s1/c21-native-tokens.md:155, 0.55 @ docs/evidence/s1/c21-native-tokens.md:162, 0.8s @ docs/evidence/s1/c21-native-tokens.md:151, 1 @ docs/evidence/s1/c21-native-tokens.md:154, 1 @ docs/evidence/s1/c21-native-tokens.md:155, 1 @ docs/evidence/s1/c21-native-tokens.md:162, 1 @ docs/evidence/s1/c21-native-tokens.md:163, 1000 @ docs/evidence/s1/c21-native-tokens.md:165, 10fps @ docs/evidence/s1/c21-native-tokens.md:149, 160ms @ docs/evidence/s1/c21-native-tokens.md:157, 180ms @ docs/evidence/s1/c21-native-tokens.md:167, 2 @ docs/evidence/s1/c21-native-tokens.md:167, 2.1 @ docs/evidence/s1/c21-native-tokens.md:157, 220ms @ docs/evidence/s1/c21-native-tokens.md:167, 260ms @ docs/evidence/s1/c21-native-tokens.md:148, 2px @ docs/evidence/s1/c21-native-tokens.md:152, 3 @ docs/evidence/s1/c21-native-tokens.md:151, 300ms @ docs/evidence/s1/c21-native-tokens.md:167, 32 @ docs/evidence/s1/c21-native-tokens.md:168, 33 @ docs/evidence/s1/c21-native-tokens.md:163, 33ms @ docs/evidence/s1/c21-native-tokens.md:165, 34.72px @ docs/evidence/s1/c21-native-tokens.md:145, 4.2 @ docs/evidence/s1/c21-native-tokens.md:163, 56 @ docs/evidence/s1/c21-native-tokens.md:145, 62 @ docs/evidence/s1/c21-native-tokens.md:145, 74 @ docs/evidence/s1/c21-native-tokens.md:157, 74 @ docs/evidence/s1/c21-native-tokens.md:162, 74 @ docs/evidence/s1/c21-native-tokens.md:163, 8 @ docs/evidence/s1/c21-native-tokens.md:145, 8 @ docs/evidence/s1/c21-native-tokens.md:157, 8 @ docs/evidence/s1/c21-native-tokens.md:167, 838 @ docs/evidence/s1/c21-native-tokens.md:145, 900ms @ docs/evidence/s1/c21-native-tokens.md:167, 96dpi @ docs/evidence/s1/c21-native-tokens.md:161, 96dpi @ docs/evidence/s1/c21-native-tokens.md:166, 96dpi @ docs/evidence/s1/c21-native-tokens.md:168
+    tokens_table_test.go:1065: checked 67 constant declarations across 29 geometry rows against 56 exported tokens.go constants + 11 tabled from hit.go/liquid.go
+--- PASS: TestC21GeometryRowsMatchCodeConstants (0.01s)
+=== RUN   TestC21TokenConsumerReport
+    tokens_table_test.go:1149: ZERO-CONSUMER TOKENS (27 of 116 checked; 89 are referenced by 18 non-test files):
+    tokens_table_test.go:1156:   UNCONSUMED BallSizeLargePx (declared at docs/evidence/s1/c21-native-tokens.md:143)
+    tokens_table_test.go:1156:   UNCONSUMED BallSizeSmallPx (declared at docs/evidence/s1/c21-native-tokens.md:142)
+    tokens_table_test.go:1156:   UNCONSUMED CountdownFontPx (declared at docs/evidence/s1/c21-native-tokens.md:159)
+    tokens_table_test.go:1156:   UNCONSUMED DurBaseMs (declared at docs/evidence/s1/c21-native-tokens.md:147)
+    tokens_table_test.go:1156:   UNCONSUMED DurFastMs (declared at docs/evidence/s1/c21-native-tokens.md:146)
+    tokens_table_test.go:1156:   UNCONSUMED DurSlowMs (declared at docs/evidence/s1/c21-native-tokens.md:148)
+    tokens_table_test.go:1156:   UNCONSUMED FirstRunGuidePulseMs (declared at docs/evidence/s1/c21-native-tokens.md:154)
+    tokens_table_test.go:1156:   UNCONSUMED FontSizeMonoPx (declared at docs/evidence/s1/c21-native-tokens.md:159)
+    tokens_table_test.go:1156:   UNCONSUMED Palette.FgPrimary
+    tokens_table_test.go:1156:   UNCONSUMED Palette.FgTertiary
+    tokens_table_test.go:1156:   UNCONSUMED Palette.GlassHi
+    tokens_table_test.go:1156:   UNCONSUMED Palette.GlassHiSoft
+    tokens_table_test.go:1156:   UNCONSUMED Palette.GlassRing
+    tokens_table_test.go:1156:   UNCONSUMED Palette.InfoLine
+    tokens_table_test.go:1156:   UNCONSUMED Palette.OrbShadow
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintAccentHi
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintDangerHi
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintDangerLo
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintNeutralHi
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintNeutralLo
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintSuccessHi
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintSuccessLo
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintWarmHi
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintWarmLo
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintWarnHi
+    tokens_table_test.go:1156:   UNCONSUMED Palette.TintWarnLo
+    tokens_table_test.go:1156:   UNCONSUMED looks[*].Deep
+    tokens_table_test.go:1198: 未接线豁免: 24 row(s) attribute all 27 zero-consumer token(s); 89/116 checked tokens are live
+--- PASS: TestC21TokenConsumerReport (0.01s)
+=== RUN   TestC21CodeTokensAreTabledOrExempt
+    tokens_table_test.go:1304: EXEMPT HTClient (hit.go) is outside the table on purpose: Win32 hit-test return value, not a design token
+    tokens_table_test.go:1304: EXEMPT HTTransparent (hit.go) is outside the table on purpose: Win32 hit-test return value, not a design token
+    tokens_table_test.go:1304: EXEMPT HTNowhere (hit.go) is outside the table on purpose: Win32 hit-test return value, not a design token
+    tokens_table_test.go:1304: EXEMPT AltSummonSpace (hotkey_windows.go) is outside the table on purpose: Default hotkey text (SPEC-04 surface), not a C21 token
+--- PASS: TestC21CodeTokensAreTabledOrExempt (0.05s)
+=== RUN   TestC21TableColourRowsMatchTokensCSS
+    tokens_table_test.go:1468: read design/assets/tokens.css: open D:\work\workspace\projects plans\Wisp\design\assets\tokens.css: The system cannot find the path specified. - the CSS leg of this check must never skip
+--- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+=== RUN   TestTokenGoldenValues
+--- PASS: TestTokenGoldenValues (0.00s)
+=== RUN   TestPremultipliedDerivation
+--- PASS: TestPremultipliedDerivation (0.00s)
+=== RUN   TestNoHardcodedColorsInBallPackage
+--- PASS: TestNoHardcodedColorsInBallPackage (0.01s)
+=== RUN   TestVisualForCoversAllTwentyStates
+--- PASS: TestVisualForCoversAllTwentyStates (0.00s)
+=== RUN   TestSleepingSizeTruthTable
+--- PASS: TestSleepingSizeTruthTable (0.00s)
+=== RUN   TestRecordedSleepingDiffBoxIsNotA44pxBody
+--- PASS: TestRecordedSleepingDiffBoxIsNotA44pxBody (0.00s)
+=== RUN   TestAnimatedWhitelist
+--- PASS: TestAnimatedWhitelist (0.00s)
+=== RUN   TestAnimationPolicyZeroTimerInSleeping
+--- PASS: TestAnimationPolicyZeroTimerInSleeping (0.00s)
+=== RUN   TestHitTestAndDPIInjection
+--- PASS: TestHitTestAndDPIInjection (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/ball	0.132s
+time=2026-09-29T17:56:02.815+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestApprovalCardViewFromRealAssessor
+    approval_test.go:54: real assessor verdict: level=L2 rules=[R1 R8] reason="R1: 工具声明为下界（L1）; R8: 不可逆操作（永久删除）"
+--- PASS: TestApprovalCardViewFromRealAssessor (0.00s)
+=== RUN   TestApprovalCardViewMarksMissingReason
+--- PASS: TestApprovalCardViewMarksMissingReason (0.00s)
+=== RUN   TestApprovalCardViewJSONKeysMatchFrontendTypes
+    approval_test.go:134: ApprovalCardView <-> ApprovalCardView: 10 JSON keys reconciled
+    approval_test.go:134: ResultChunk <-> ResultChunkView: 3 JSON keys reconciled
+    approval_test.go:129: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+    approval_test.go:134: Snapshot <-> PanelSnapshot: 6 JSON keys reconciled
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+=== RUN   TestPanelSnapshotSurvivesWebviewRestart
+    approval_test.go:167: snapshot round-tripped through 899 bytes of JSON with 1 pending card(s)
+--- PASS: TestPanelSnapshotSurvivesWebviewRestart (0.00s)
+=== RUN   TestAnchorOnlyBundleIsNotBuiltAndFailsClosed
+--- PASS: TestAnchorOnlyBundleIsNotBuiltAndFailsClosed (0.00s)
+=== RUN   TestCheckRejectsEntryNamingAnUnembeddedAsset
+--- PASS: TestCheckRejectsEntryNamingAnUnembeddedAsset (0.00s)
+=== RUN   TestCheckAcceptsAConsistentBundle
+--- PASS: TestCheckAcceptsAConsistentBundle (0.00s)
+=== RUN   TestCheckIgnoresOutsideAndFragmentReferences
+--- PASS: TestCheckIgnoresOutsideAndFragmentReferences (0.00s)
+=== RUN   TestBuiltinBundleIsCompleteOrAbsentNeverHalf
+    assets_test.go:144: verdict: bundle complete - entry 1044 bytes, 2 asset refs, 4 embedded files
+--- PASS: TestBuiltinBundleIsCompleteOrAbsentNeverHalf (0.00s)
+=== RUN   TestResolveRefusesPathsOutsideTheBundle
+--- PASS: TestResolveRefusesPathsOutsideTheBundle (0.00s)
+=== RUN   TestAcceptsAndStoresEachSupportedType
+=== RUN   TestAcceptsAndStoresEachSupportedType/shot.png
+    attachments_test.go:125: stored: artifact=attachment-e1f5c234e80b19af.png bytes=16 mime=image/png
+=== RUN   TestAcceptsAndStoresEachSupportedType/photo.jpg
+    attachments_test.go:125: stored: artifact=attachment-9f6c9d639ad1155a.jpg bytes=12 mime=image/jpeg
+=== RUN   TestAcceptsAndStoresEachSupportedType/clip.mp4
+    attachments_test.go:125: stored: artifact=attachment-a097c197ed8b9340.mp4 bytes=20 mime=video/mp4
+=== RUN   TestAcceptsAndStoresEachSupportedType/anim.gif
+    attachments_test.go:125: stored: artifact=attachment-01075758a3f9dded.gif bytes=18 mime=image/gif
+=== RUN   TestAcceptsAndStoresEachSupportedType/pic.webp
+    attachments_test.go:125: stored: artifact=attachment-583434d1fd31cfcc.webp bytes=32 mime=image/webp
+--- PASS: TestAcceptsAndStoresEachSupportedType (0.02s)
+    --- PASS: TestAcceptsAndStoresEachSupportedType/shot.png (0.00s)
+    --- PASS: TestAcceptsAndStoresEachSupportedType/photo.jpg (0.00s)
+    --- PASS: TestAcceptsAndStoresEachSupportedType/clip.mp4 (0.00s)
+    --- PASS: TestAcceptsAndStoresEachSupportedType/anim.gif (0.00s)
+    --- PASS: TestAcceptsAndStoresEachSupportedType/pic.webp (0.00s)
+=== RUN   TestRefusesUnsupportedAndMasqueradingInputsLoudly
+=== RUN   TestRefusesUnsupportedAndMasqueradingInputsLoudly/empty_file_is_refused,_not_dropped
+=== RUN   TestRefusesUnsupportedAndMasqueradingInputsLoudly/exe_disguised_as_png_is_refused_and_named_as_an_executable
+=== RUN   TestRefusesUnsupportedAndMasqueradingInputsLoudly/unknown_type_without_a_declared_mime_is_refused
+=== RUN   TestRefusesUnsupportedAndMasqueradingInputsLoudly/lying_declared_mime_is_refused_even_when_the_bytes_are_a_png
+=== RUN   TestRefusesUnsupportedAndMasqueradingInputsLoudly/path-injection_file_name_is_refused_and_nothing_is_written
+=== RUN   TestRefusesUnsupportedAndMasqueradingInputsLoudly/2_GB_is_refused_on_its_declared_size_without_reading_a_byte
+=== RUN   TestRefusesUnsupportedAndMasqueradingInputsLoudly/a_source_lying_about_its_size_is_refused_mid-read,_not_truncated
+=== RUN   TestRefusesUnsupportedAndMasqueradingInputsLoudly/nil_source_and_nil_sink_are_refused_at_construction,_not_at_send
+--- PASS: TestRefusesUnsupportedAndMasqueradingInputsLoudly (0.01s)
+    --- PASS: TestRefusesUnsupportedAndMasqueradingInputsLoudly/empty_file_is_refused,_not_dropped (0.00s)
+    --- PASS: TestRefusesUnsupportedAndMasqueradingInputsLoudly/exe_disguised_as_png_is_refused_and_named_as_an_executable (0.00s)
+    --- PASS: TestRefusesUnsupportedAndMasqueradingInputsLoudly/unknown_type_without_a_declared_mime_is_refused (0.00s)
+    --- PASS: TestRefusesUnsupportedAndMasqueradingInputsLoudly/lying_declared_mime_is_refused_even_when_the_bytes_are_a_png (0.00s)
+    --- PASS: TestRefusesUnsupportedAndMasqueradingInputsLoudly/path-injection_file_name_is_refused_and_nothing_is_written (0.00s)
+    --- PASS: TestRefusesUnsupportedAndMasqueradingInputsLoudly/2_GB_is_refused_on_its_declared_size_without_reading_a_byte (0.00s)
+    --- PASS: TestRefusesUnsupportedAndMasqueradingInputsLoudly/a_source_lying_about_its_size_is_refused_mid-read,_not_truncated (0.00s)
+    --- PASS: TestRefusesUnsupportedAndMasqueradingInputsLoudly/nil_source_and_nil_sink_are_refused_at_construction,_not_at_send (0.00s)
+=== RUN   TestSecondIdenticalAttachmentIsDeduplicatedNotOverwritten
+--- PASS: TestSecondIdenticalAttachmentIsDeduplicatedNotOverwritten (0.00s)
+=== RUN   TestMessageCarriesAttachmentRefsAndRefusals
+    attachments_test.go:302: agent-facing text:
+        看看这个
+        [附件] name=clip.mp4 mime=video/mp4 kind=video bytes=20 path=C:\Users\swq\AppData\Local\Temp\TestMessageCarriesAttachmentRefsAndRefusals1167509634\001\attachment-a097c197ed8b9340.mp4
+        [附件未送达] evil.png: "evil.png" 的类型（可执行文件（MS-DOS/PE 头 "MZ"））不受支持；本产品的附件只接受 image/png / image/jpeg / image/gif / image/webp / video/mp4 / video/quicktime
+        （这些附件没有进入本轮，请用户确认后重试或改用受支持的类型）
+--- PASS: TestMessageCarriesAttachmentRefsAndRefusals (0.00s)
+=== RUN   TestAttachmentPayloadCarriesTheBytes
+=== RUN   TestAttachmentPayloadCarriesTheBytes/a_real_png_arrives_whole_through_base64
+=== RUN   TestAttachmentPayloadCarriesTheBytes/undecodable_base64_is_refused,_not_stored_as_nothing
+=== RUN   TestAttachmentPayloadCarriesTheBytes/a_truncated_payload_is_refused,_not_stored_short
+=== RUN   TestAttachmentPayloadCarriesTheBytes/an_empty_payload_is_refused
+--- PASS: TestAttachmentPayloadCarriesTheBytes (0.00s)
+    --- PASS: TestAttachmentPayloadCarriesTheBytes/a_real_png_arrives_whole_through_base64 (0.00s)
+    --- PASS: TestAttachmentPayloadCarriesTheBytes/undecodable_base64_is_refused,_not_stored_as_nothing (0.00s)
+    --- PASS: TestAttachmentPayloadCarriesTheBytes/a_truncated_payload_is_refused,_not_stored_short (0.00s)
+    --- PASS: TestAttachmentPayloadCarriesTheBytes/an_empty_payload_is_refused (0.00s)
+=== RUN   TestComposerEnvelopeAcceptsItsFourRequests
+--- PASS: TestComposerEnvelopeAcceptsItsFourRequests (0.00s)
+=== RUN   TestComposerEnvelopeRefusesSpoofingAndUndecorableRequests
+=== RUN   TestComposerEnvelopeRefusesSpoofingAndUndecorableRequests/a_request_that_names_an_approval_decision_is_not_a_composer_method
+=== RUN   TestComposerEnvelopeRefusesSpoofingAndUndecorableRequests/a_missing_requestId_is_refused
+=== RUN   TestComposerEnvelopeRefusesSpoofingAndUndecorableRequests/a_forged_or_absent_source_is_refused
+=== RUN   TestComposerEnvelopeRefusesSpoofingAndUndecorableRequests/undecodable_and_non-object_payloads_are_refused,_not_defaulted
+=== RUN   TestComposerEnvelopeRefusesSpoofingAndUndecorableRequests/the_refusal_text_keeps_the_request_identifiable
+--- PASS: TestComposerEnvelopeRefusesSpoofingAndUndecorableRequests (0.00s)
+    --- PASS: TestComposerEnvelopeRefusesSpoofingAndUndecorableRequests/a_request_that_names_an_approval_decision_is_not_a_composer_method (0.00s)
+    --- PASS: TestComposerEnvelopeRefusesSpoofingAndUndecorableRequests/a_missing_requestId_is_refused (0.00s)
+    --- PASS: TestComposerEnvelopeRefusesSpoofingAndUndecorableRequests/a_forged_or_absent_source_is_refused (0.00s)
+    --- PASS: TestComposerEnvelopeRefusesSpoofingAndUndecorableRequests/undecodable_and_non-object_payloads_are_refused,_not_defaulted (0.00s)
+    --- PASS: TestComposerEnvelopeRefusesSpoofingAndUndecorableRequests/the_refusal_text_keeps_the_request_identifiable (0.00s)
+=== RUN   TestFrontendComposerRequestsMatchTheEnvelope
+--- PASS: TestFrontendComposerRequestsMatchTheEnvelope (0.00s)
+=== RUN   TestRawEnvelopeReachesTheAttachedModeHandlerExactlyOnce
+--- PASS: TestRawEnvelopeReachesTheAttachedModeHandlerExactlyOnce (0.00s)
+=== RUN   TestAcceptedRequestInventsNoReplyLine
+--- PASS: TestAcceptedRequestInventsNoReplyLine (0.00s)
+=== RUN   TestRoutingDoesNotBypassTheNativeModeGate
+--- PASS: TestRoutingDoesNotBypassTheNativeModeGate (0.00s)
+=== RUN   TestUnlistedMethodNameIsRefusedAndAudited
+--- PASS: TestUnlistedMethodNameIsRefusedAndAudited (0.00s)
+=== RUN   TestRosterMismatchBackstopRefusesInsteadOfAccepting
+--- PASS: TestRosterMismatchBackstopRefusesInsteadOfAccepting (0.00s)
+=== RUN   TestEveryListedMethodWithoutAHandlerIsRefusedNotDropped
+=== RUN   TestEveryListedMethodWithoutAHandlerIsRefusedNotDropped/workspace
+=== RUN   TestEveryListedMethodWithoutAHandlerIsRefusedNotDropped/attachment
+=== RUN   TestEveryListedMethodWithoutAHandlerIsRefusedNotDropped/message
+--- PASS: TestEveryListedMethodWithoutAHandlerIsRefusedNotDropped (0.00s)
+    --- PASS: TestEveryListedMethodWithoutAHandlerIsRefusedNotDropped/workspace (0.00s)
+    --- PASS: TestEveryListedMethodWithoutAHandlerIsRefusedNotDropped/attachment (0.00s)
+    --- PASS: TestEveryListedMethodWithoutAHandlerIsRefusedNotDropped/message (0.00s)
+=== RUN   TestAttachedHandlerIsWhatRunsForItsOwnMethod
+--- PASS: TestAttachedHandlerIsWhatRunsForItsOwnMethod (0.00s)
+=== RUN   TestTamperedSourceIsRefusedByTheSameDoor
+--- PASS: TestTamperedSourceIsRefusedByTheSameDoor (0.00s)
+=== RUN   TestAttributionFieldsReachTheHandlerUnchanged
+--- PASS: TestAttributionFieldsReachTheHandlerUnchanged (0.00s)
+=== RUN   TestDispatcherSpellsNoRouteLiteralOfItsOwn
+--- PASS: TestDispatcherSpellsNoRouteLiteralOfItsOwn (0.00s)
+=== RUN   TestSliceAAttachesNoHostAndNamesTheOpenWindowHops
+    composer_dispatch_test.go:427: native-host capability hits in D:\work\workspace\projects plans\Wisp: 0 -> []
+=== RUN   TestSliceAAttachesNoHostAndNamesTheOpenWindowHops/positive-control
+    composer_dispatch_test.go:452: carrier A (fake host source) -> 5 hit(s) [internal/panel/host_windows.go:3:identifier CoreWebView2 internal/panel/host_windows.go:5:identifier CoreWebView2 internal/panel/host_windows.go:5:identifier WebMessage internal/panel/host_windows.go:7:identifier CoreWebView2 internal/panel/host_windows.go:7:identifier WebMessage]
+    composer_dispatch_test.go:464: carrier B (webview dependency) -> 2 hit(s) [go.mod:3:dependency "webview" go.sum:1:dependency "webview"]
+    composer_dispatch_test.go:488: carrier C (CLI seam, no host) -> 0 hits, as required
+--- PASS: TestSliceAAttachesNoHostAndNamesTheOpenWindowHops (0.13s)
+    --- PASS: TestSliceAAttachesNoHostAndNamesTheOpenWindowHops/positive-control (0.01s)
+=== RUN   TestTheInboundHopAddsNoSwitchingCapability
+--- PASS: TestTheInboundHopAddsNoSwitchingCapability (0.00s)
+=== RUN   TestTheModeLadderThisGateJudgesAgainstIsTheDocumentedThree
+--- PASS: TestTheModeLadderThisGateJudgesAgainstIsTheDocumentedThree (0.00s)
+=== RUN   TestAWideningModeRequestIsRefusedWhenNoL2ConfirmLegIsAttached
+--- PASS: TestAWideningModeRequestIsRefusedWhenNoL2ConfirmLegIsAttached (0.00s)
+=== RUN   TestAWideningRequestWithAnAttachedLegReachesTheOneWriterAndRaisesNoSecondCard
+--- PASS: TestAWideningRequestWithAnAttachedLegReachesTheOneWriterAndRaisesNoSecondCard (0.00s)
+=== RUN   TestAStricterOrEqualModeRequestNeedsNoConfirmLeg
+--- PASS: TestAStricterOrEqualModeRequestNeedsNoConfirmLeg (0.00s)
+=== RUN   TestAModeRequestIsRefusedBeforeAnyWriteWhenTheAssemblyIsIncomplete
+=== RUN   TestAModeRequestIsRefusedBeforeAnyWriteWhenTheAssemblyIsIncomplete/no_write_leg_at_all
+=== RUN   TestAModeRequestIsRefusedBeforeAnyWriteWhenTheAssemblyIsIncomplete/current档_unreadable
+=== RUN   TestAModeRequestIsRefusedBeforeAnyWriteWhenTheAssemblyIsIncomplete/unknown_spelling
+=== RUN   TestAModeRequestIsRefusedBeforeAnyWriteWhenTheAssemblyIsIncomplete/empty_target
+=== RUN   TestAModeRequestIsRefusedBeforeAnyWriteWhenTheAssemblyIsIncomplete/another_method
+--- PASS: TestAModeRequestIsRefusedBeforeAnyWriteWhenTheAssemblyIsIncomplete (0.00s)
+    --- PASS: TestAModeRequestIsRefusedBeforeAnyWriteWhenTheAssemblyIsIncomplete/no_write_leg_at_all (0.00s)
+    --- PASS: TestAModeRequestIsRefusedBeforeAnyWriteWhenTheAssemblyIsIncomplete/current档_unreadable (0.00s)
+    --- PASS: TestAModeRequestIsRefusedBeforeAnyWriteWhenTheAssemblyIsIncomplete/unknown_spelling (0.00s)
+    --- PASS: TestAModeRequestIsRefusedBeforeAnyWriteWhenTheAssemblyIsIncomplete/empty_target (0.00s)
+    --- PASS: TestAModeRequestIsRefusedBeforeAnyWriteWhenTheAssemblyIsIncomplete/another_method (0.00s)
+=== RUN   TestTheWriteLegsOwnRefusalIsReturnedUntouched
+--- PASS: TestTheWriteLegsOwnRefusalIsReturnedUntouched (0.00s)
+=== RUN   TestComposerContractTypesMatchFrontend
+    composer_test.go:74: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+    composer_test.go:79: Snapshot <-> PanelSnapshot: 6 JSON keys reconciled
+    composer_test.go:74: Go ComposerState emits [git currentModel modelKnown] that interface ComposerState does not declare
+    composer_test.go:79: ComposerState <-> ComposerState: 9 JSON keys reconciled
+    composer_test.go:79: ModeView <-> ComposerMode: 3 JSON keys reconciled
+    composer_test.go:79: WorkspaceView <-> ComposerWorkspace: 6 JSON keys reconciled
+    composer_test.go:79: AttachmentRef <-> ComposerAttachment: 9 JSON keys reconciled
+    composer_test.go:79: ResultChunk <-> ResultChunkView: 3 JSON keys reconciled
+--- FAIL: TestComposerContractTypesMatchFrontend (0.00s)
+=== RUN   TestPlantedComposerModeWriteGoesRed
+=== RUN   TestPlantedComposerModeWriteGoesRed/approval.decide_planted_in_composer_trips_ban_#6
+    composer_test.go:132: red as required: 1 line(s) matched, first=composer.tsx:4: <button onClick={() => bridge?.postMessage(JSON.stringify({ method: "approval.decide", target: "mode", to: "auto_approve" }))}>
+=== RUN   TestPlantedComposerModeWriteGoesRed/panel.mode.set_planted_in_composer_trips_the_ticket_92_gate
+    composer_test.go:132: red as required: 2 line(s) matched, first=composer.tsx:1: export function setMode(next: string): void {
+=== RUN   TestPlantedComposerModeWriteGoesRed/door_2_ignores_comment_prose_but_not_code_behind_a_comment_opener
+--- PASS: TestPlantedComposerModeWriteGoesRed (0.13s)
+    --- PASS: TestPlantedComposerModeWriteGoesRed/approval.decide_planted_in_composer_trips_ban_#6 (0.00s)
+    --- PASS: TestPlantedComposerModeWriteGoesRed/panel.mode.set_planted_in_composer_trips_the_ticket_92_gate (0.00s)
+    --- PASS: TestPlantedComposerModeWriteGoesRed/door_2_ignores_comment_prose_but_not_code_behind_a_comment_opener (0.00s)
+=== RUN   TestModeViewHasNoWriteSurface
+--- PASS: TestModeViewHasNoWriteSurface (0.00s)
+=== RUN   TestModeRequestResolvesThroughRisksOwnParser
+--- PASS: TestModeRequestResolvesThroughRisksOwnParser (0.00s)
+=== RUN   TestComposerStateSurvivesPanelCloseAndReopen
+    composer_test.go:240: composer state round-tripped through 1146 bytes: mode="ask_high_risk" workspace="D:\\work\\notes" attachments=1
+--- PASS: TestComposerStateSurvivesPanelCloseAndReopen (0.00s)
+=== RUN   TestUnknownModeNeverRendersAsASafeOne
+--- PASS: TestUnknownModeNeverRendersAsASafeOne (0.00s)
+=== RUN   TestNoGitSwitchCapabilityInThePanelSurface
+    composer_test.go:324: AC#7 negative criterion held: no git switch entry point in frontend/ or internal/panel/ (production files)
+--- PASS: TestNoGitSwitchCapabilityInThePanelSurface (0.20s)
+=== RUN   TestTheRendererHoldsExactlyOneDoorToTheHost
+    composer_test.go:524: renderer door held: 64 files scanned, 2 host call sites (all in src/lib/panel.ts), 5 panel.* route literals
+--- PASS: TestTheRendererHoldsExactlyOneDoorToTheHost (0.01s)
+=== RUN   TestPlantedRendererDoorShapesGoRed
+    composer_test.go:582: red as required: 2 outside call sites, 1 assembled routes, 1 unknown literals, door 2 named 1 line(s)
+--- PASS: TestPlantedRendererDoorShapesGoRed (0.01s)
+=== RUN   TestComposerRenderFixtureTellsTheTruth
+    composer_test.go:728: render fixture verified across 3 painted states
+--- PASS: TestComposerRenderFixtureTellsTheTruth (0.00s)
+=== RUN   TestComposerCurrentModelTravelsOnlyFromItsReader
+--- PASS: TestComposerCurrentModelTravelsOnlyFromItsReader (0.00s)
+=== RUN   TestPanelFrontendIsStateless
+    frontend_hygiene_test.go:193: scanned 64 frontend/src files for 7 persistence APIs: 0 hits
+--- PASS: TestPanelFrontendIsStateless (0.14s)
+=== RUN   TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme
+    frontend_hygiene_test.go:216: a second style source appeared in code the bundle actually ships:
+          frontend/src/components/harness/right-rail.tsx:89: diff: [{ sign: "+", text: "  --page: #fafafb;  /* beautiful-ui 主题收编 */" }],
+        Add or reference a C21 token in design/assets/tokens.css instead.
+    frontend_hygiene_test.go:219: 57 files reachable from main.tsx carry colour literals only in the generated theme
+--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.06s)
+=== RUN   TestVendoredDemoComponentsAreNotMounted
+    frontend_hygiene_test.go:242: vendored ai-native: 18 mounted (button.tsx chip.tsx code-block.tsx context-cards.tsx diff-table.tsx entity-chip.tsx loading-state.tsx progress-ring.tsx prompt-bar.tsx segmented-control.tsx shimmer.tsx status-pill.tsx streaming-text.tsx switch.tsx text-row.tsx thinking.tsx tool-chips.tsx value-pill.tsx), 3 unmounted upstream demos (approval-card.tsx stream-text.tsx task-rows.tsx)
+--- PASS: TestVendoredDemoComponentsAreNotMounted (0.03s)
+=== RUN   TestFrontendHasNoEmoji
+    frontend_hygiene_test.go:278: ban #8 self-armed: 72 frontend files scanned, 0 emoji-range characters
+--- PASS: TestFrontendHasNoEmoji (0.02s)
+=== RUN   TestFrontendNeverNamesAnApprovalDecision
+    frontend_hygiene_test.go:314: ban #6 twin check: 84 frontend files (node_modules and dist excluded) carry no approval-decision identifier
+--- PASS: TestFrontendNeverNamesAnApprovalDecision (0.06s)
+=== RUN   TestReadGitSyntheticSymrefRepo
+--- PASS: TestReadGitSyntheticSymrefRepo (0.01s)
+=== RUN   TestReadGitDetachedSyntheticTree
+--- PASS: TestReadGitDetachedSyntheticTree (0.00s)
+=== RUN   TestReadGitWorktreePointerFile
+--- PASS: TestReadGitWorktreePointerFile (0.01s)
+=== RUN   TestReadGitRelativePointerFile
+--- PASS: TestReadGitRelativePointerFile (0.01s)
+=== RUN   TestReadGitVanishedPointerIsUnreadable
+--- PASS: TestReadGitVanishedPointerIsUnreadable (0.00s)
+=== RUN   TestReadGitNonRepoSaysSoOutLoud
+--- PASS: TestReadGitNonRepoSaysSoOutLoud (0.00s)
+=== RUN   TestReadGitWithoutAWorkspaceDoesNotProbe
+--- PASS: TestReadGitWithoutAWorkspaceDoesNotProbe (0.00s)
+=== RUN   TestGitDimensionHasNoModelCallableTool
+--- PASS: TestGitDimensionHasNoModelCallableTool (0.00s)
+=== RUN   TestPlantedGitToolShapesGoRed
+--- PASS: TestPlantedGitToolShapesGoRed (0.01s)
+=== RUN   TestGitSectionTravelsInTheSnapshotPacket
+--- PASS: TestGitSectionTravelsInTheSnapshotPacket (0.01s)
+=== RUN   TestPumpWithoutGitReaderSaysUnreadable
+--- PASS: TestPumpWithoutGitReaderSaysUnreadable (0.00s)
+=== RUN   TestReadGitOnThisRepositoryIsSelfConsistent
+--- PASS: TestReadGitOnThisRepositoryIsSelfConsistent (0.00s)
+=== RUN   TestReadGitForWorkspaceConsumesRewriteAccount
+=== RUN   TestReadGitForWorkspaceConsumesRewriteAccount/not_rewritten_is_the_ordinary_road
+=== RUN   TestReadGitForWorkspaceConsumesRewriteAccount/rewritten_must_say_so_out_loud
+=== RUN   TestReadGitForWorkspaceConsumesRewriteAccount/unset_view_probes_nothing
+--- PASS: TestReadGitForWorkspaceConsumesRewriteAccount (0.00s)
+    --- PASS: TestReadGitForWorkspaceConsumesRewriteAccount/not_rewritten_is_the_ordinary_road (0.00s)
+    --- PASS: TestReadGitForWorkspaceConsumesRewriteAccount/rewritten_must_say_so_out_loud (0.00s)
+    --- PASS: TestReadGitForWorkspaceConsumesRewriteAccount/unset_view_probes_nothing (0.00s)
+=== RUN   TestRewrittenWorkspaceViewYieldsNoDirectoryAtAll
+--- PASS: TestRewrittenWorkspaceViewYieldsNoDirectoryAtAll (0.01s)
+=== RUN   TestTheInstructionStatesDoNotShareOneWireShape
+--- PASS: TestTheInstructionStatesDoNotShareOneWireShape (0.01s)
+=== RUN   TestAPumpWithoutAnInstructionsReaderSendsNoKey
+--- PASS: TestAPumpWithoutAnInstructionsReaderSendsNoKey (0.01s)
+=== RUN   TestWithInstructionsKeepsTheR1CarrierContract
+--- PASS: TestWithInstructionsKeepsTheR1CarrierContract (0.00s)
+=== RUN   TestAnsweredPanelRoutesCarryNoApprovalDecision
+    l2_grant_boundary_test.go:1304: answered inbound routes = [panel.attachment.add panel.message.send panel.mode.request panel.workspace.request]; 4 declared Method* constants; 0 approval-shaped names on either side
+--- PASS: TestAnsweredPanelRoutesCarryNoApprovalDecision (0.01s)
+=== RUN   TestRealGuardRefusesEveryAssemblableApprovalRouteName
+    l2_grant_boundary_test.go:1540: behavioural sweep of the running guard: asked=528 assembled route names, answeredByRealGuard=0, hits=[]
+--- PASS: TestRealGuardRefusesEveryAssemblableApprovalRouteName (0.00s)
+=== RUN   TestNoInboundEnvelopeCanBindAnApprovalVerdict
+    l2_grant_boundary_test.go:1579: ComposerRequest binds 20 JSON keys [artifact attachments dataBase64 declaredMime deduplicated id kind method mime name name path reason requestId sizeBytes sizeBytes source stored text to]; 0 verdict-shaped; AST scan of internal/panel: 0 findings
+--- PASS: TestNoInboundEnvelopeCanBindAnApprovalVerdict (0.01s)
+=== RUN   TestGrantVocabularyIsNotSatisfiedByTheRealEnvelopes
+=== RUN   TestGrantVocabularyIsNotSatisfiedByTheRealEnvelopes/outcome_on_the_envelope
+    l2_grant_boundary_test.go:1626: flagged as required: plantedOutcomeEnvelope.Outcome binds "outcome"
+=== RUN   TestGrantVocabularyIsNotSatisfiedByTheRealEnvelopes/allowOnce_on_the_envelope
+    l2_grant_boundary_test.go:1626: flagged as required: plantedAllowFlag.Allow binds "allowOnce"
+=== RUN   TestGrantVocabularyIsNotSatisfiedByTheRealEnvelopes/a_verdict_smuggled_inside_an_embedded_struct
+    l2_grant_boundary_test.go:1626: flagged as required: plantedVerdictIn.Decision.Verdict binds "Verdict"
+--- PASS: TestGrantVocabularyIsNotSatisfiedByTheRealEnvelopes (0.00s)
+    --- PASS: TestGrantVocabularyIsNotSatisfiedByTheRealEnvelopes/outcome_on_the_envelope (0.00s)
+    --- PASS: TestGrantVocabularyIsNotSatisfiedByTheRealEnvelopes/allowOnce_on_the_envelope (0.00s)
+    --- PASS: TestGrantVocabularyIsNotSatisfiedByTheRealEnvelopes/a_verdict_smuggled_inside_an_embedded_struct (0.00s)
+=== RUN   TestJSONKeyDerivationAgreesWithEncodingJSON
+=== RUN   TestJSONKeyDerivationAgreesWithEncodingJSON/i_the_AST_key_rule_matches_encoding/json's,_spelling_by_spelling
+=== RUN   TestJSONKeyDerivationAgreesWithEncodingJSON/ii_the_AST_list_and_the_reflection_list_are_one_list
+    l2_grant_boundary_test.go:1874: AttachmentRef: 9 keys agreed by both instruments [artifact deduplicated id kind mime name reason sizeBytes stored]
+    l2_grant_boundary_test.go:1874: ComposerRequest: 7 keys agreed by both instruments [attachments method path requestId source text to]
+    l2_grant_boundary_test.go:1874: ModeRequest: 2 keys agreed by both instruments [correlationId to]
+    l2_grant_boundary_test.go:1874: AttachmentPayload: 4 keys agreed by both instruments [dataBase64 declaredMime name sizeBytes]
+=== RUN   TestJSONKeyDerivationAgreesWithEncodingJSON/iii_the_decoder_is_the_third_vote_and_the_verdict_words_are_not_bindable
+    l2_grant_boundary_test.go:1913: AttachmentPayload: 4 listed keys confirmed bindable, 24 verdict spellings confirmed not bindable
+    l2_grant_boundary_test.go:1913: AttachmentRef: 9 listed keys confirmed bindable, 24 verdict spellings confirmed not bindable
+    l2_grant_boundary_test.go:1913: ComposerRequest: 7 listed keys confirmed bindable, 24 verdict spellings confirmed not bindable
+    l2_grant_boundary_test.go:1913: ModeRequest: 2 listed keys confirmed bindable, 24 verdict spellings confirmed not bindable
+--- PASS: TestJSONKeyDerivationAgreesWithEncodingJSON (0.01s)
+    --- PASS: TestJSONKeyDerivationAgreesWithEncodingJSON/i_the_AST_key_rule_matches_encoding/json's,_spelling_by_spelling (0.00s)
+    --- PASS: TestJSONKeyDerivationAgreesWithEncodingJSON/ii_the_AST_list_and_the_reflection_list_are_one_list (0.00s)
+    --- PASS: TestJSONKeyDerivationAgreesWithEncodingJSON/iii_the_decoder_is_the_third_vote_and_the_verdict_words_are_not_bindable (0.00s)
+=== RUN   TestGrantWireShapesAreRefusedAtTheDoor
+=== RUN   TestGrantWireShapesAreRefusedAtTheDoor/the_historical_wire_shape_is_refused_because_Go_does_not_answer_its_route
+=== RUN   TestGrantWireShapesAreRefusedAtTheDoor/every_answered_route_drops_a_smuggled_verdict
+--- PASS: TestGrantWireShapesAreRefusedAtTheDoor (0.00s)
+    --- PASS: TestGrantWireShapesAreRefusedAtTheDoor/the_historical_wire_shape_is_refused_because_Go_does_not_answer_its_route (0.00s)
+    --- PASS: TestGrantWireShapesAreRefusedAtTheDoor/every_answered_route_drops_a_smuggled_verdict (0.00s)
+=== RUN   TestPlantedGrantWiringGoesRedInASnapshot
+=== RUN   TestPlantedGrantWiringGoesRedInASnapshot/A_an_envelope_that_grows_an_outcome_field_goes_red
+    l2_grant_boundary_test.go:2108: red as required:
+          bridge.go:77: inbound envelope ComposerRequest can bind the JSON key "outcome" - a verdict a page can set, which D33/F2 and R20 keep native-side only: Outcome string `json:"outcome,omitempty"`
+=== RUN   TestPlantedGrantWiringGoesRedInASnapshot/B_Go_answering_panel.approval.request_goes_red
+    l2_grant_boundary_test.go:2120: red as required:
+          bridge.go:104: Go answers the inbound route "panel.approval.request", whose own name is an approval decision - a panel-side allow door (AGENTS.md §1.2 ban #6, D33/F2)
+=== RUN   TestPlantedGrantWiringGoesRedInASnapshot/E_a_guard_route_reached_through_a_var_or_a_concatenation_is_named,_not_dropped
+    l2_grant_boundary_test.go:2151: loud as required, and the names are not invented:
+          bridge.go:106: "panel.review." + acceptE3Tail
+          bridge.go:106: acceptE2Route
+=== RUN   TestPlantedGrantWiringGoesRedInASnapshot/F_a_route_named_outside_the_guard_still_reaches_the_pool
+    l2_grant_boundary_test.go:2197: pool sees "panel.review.allow" at [l2-plant-f.go:7] while the snapshot's guard case list does not; the half that asks the RUNNING guard about that name - and about every other name grantRoutePrefixes x grantRouteWords can build - is TestRealGuardRefusesEveryAssemblableApprovalRouteName, which is standing rather than a negative control here (F-R2-3)
+=== RUN   TestPlantedGrantWiringGoesRedInASnapshot/G_an_inbound_envelope_with_a_renamed_route_key_is_still_seeded_from_its_decode
+    l2_grant_boundary_test.go:2243: seeded from its own decode and red as required:
+          l2-plant-g.go:8: inbound envelope grantViaCmd can bind the JSON key "outcome" - a verdict a page can set, which D33/F2 and R20 keep native-side only: Outcome string `json:"outcome"`
+=== RUN   TestPlantedGrantWiringGoesRedInASnapshot/H_a_verdict_tagged_without_a_name_is_still_found_under_its_field_name
+    l2_grant_boundary_test.go:2287: red as required, on the spelling the wire uses:
+          l2-plant-h.go:8: inbound envelope grantByFieldName can bind the JSON key "Outcome" - a verdict a page can set, which D33/F2 and R20 keep native-side only: Outcome string `json:",omitempty"`
+=== RUN   TestPlantedGrantWiringGoesRedInASnapshot/C_a_wired_grant_door_goes_red_on_both_halves
+    l2_grant_boundary_test.go:2308: red as required:
+          bridge.go:104: Go answers the inbound route "panel.approval.request", whose own name is an approval decision - a panel-side allow door (AGENTS.md §1.2 ban #6, D33/F2)
+          grant_handler.go:8: inbound envelope grantThrough can bind the JSON key "outcome" - a verdict a page can set, which D33/F2 and R20 keep native-side only: Outcome string `json:"outcome"`
+=== RUN   TestPlantedGrantWiringGoesRedInASnapshot/D_the_historical_JSX_button_is_invisible_to_this_instrument
+    l2_grant_boundary_test.go:2332: ZERO INSTRUMENT COVERAGE, measured not assumed: a tree holding the verbatim 53a1359^ button (send("grant") -> panel.approval.request carrying outcome:"grant") reads CLEAN to this instrument, because it reads Go and the violation is drawn in JSX.
+--- PASS: TestPlantedGrantWiringGoesRedInASnapshot (0.21s)
+    --- PASS: TestPlantedGrantWiringGoesRedInASnapshot/A_an_envelope_that_grows_an_outcome_field_goes_red (0.03s)
+    --- PASS: TestPlantedGrantWiringGoesRedInASnapshot/B_Go_answering_panel.approval.request_goes_red (0.02s)
+    --- PASS: TestPlantedGrantWiringGoesRedInASnapshot/E_a_guard_route_reached_through_a_var_or_a_concatenation_is_named,_not_dropped (0.02s)
+    --- PASS: TestPlantedGrantWiringGoesRedInASnapshot/F_a_route_named_outside_the_guard_still_reaches_the_pool (0.02s)
+    --- PASS: TestPlantedGrantWiringGoesRedInASnapshot/G_an_inbound_envelope_with_a_renamed_route_key_is_still_seeded_from_its_decode (0.03s)
+    --- PASS: TestPlantedGrantWiringGoesRedInASnapshot/H_a_verdict_tagged_without_a_name_is_still_found_under_its_field_name (0.02s)
+    --- PASS: TestPlantedGrantWiringGoesRedInASnapshot/C_a_wired_grant_door_goes_red_on_both_halves (0.02s)
+    --- PASS: TestPlantedGrantWiringGoesRedInASnapshot/D_the_historical_JSX_button_is_invisible_to_this_instrument (0.02s)
+=== RUN   TestThePumpBuildsThePacketFromWhatTheHostHolds
+--- PASS: TestThePumpBuildsThePacketFromWhatTheHostHolds (0.00s)
+=== RUN   TestAPumpWithNoReadersSaysSoInsteadOfInventingState
+--- PASS: TestAPumpWithNoReadersSaysSoInsteadOfInventingState (0.00s)
+=== RUN   TestAnUnreadableModeFromALiveReaderStillRendersUnknown
+--- PASS: TestAnUnreadableModeFromALiveReaderStillRendersUnknown (0.00s)
+=== RUN   TestTheStreamLogTruncatesInsteadOfMerging
+--- PASS: TestTheStreamLogTruncatesInsteadOfMerging (0.00s)
+=== RUN   TestPublishWithoutAnExitReportsInsteadOfPretending
+--- PASS: TestPublishWithoutAnExitReportsInsteadOfPretending (0.00s)
+=== RUN   TestPublishHandsTheBytesToTheAttachedExit
+--- PASS: TestPublishHandsTheBytesToTheAttachedExit (0.00s)
+=== RUN   TestTheRosterReaderPutsSubagentsOnTheWire
+--- PASS: TestTheRosterReaderPutsSubagentsOnTheWire (0.00s)
+=== RUN   TestAPumpWithoutARosterReaderSendsFourKeys
+--- PASS: TestAPumpWithoutARosterReaderSendsFourKeys (0.00s)
+=== RUN   TestAStatusOutsideD43NeverReachesTheWire
+--- PASS: TestAStatusOutsideD43NeverReachesTheWire (0.00s)
+=== RUN   TestTruncationFactsRideThePacket
+--- PASS: TestTruncationFactsRideThePacket (0.00s)
+=== RUN   TestDroppedStreamsAreNamedOnTheWire
+--- PASS: TestDroppedStreamsAreNamedOnTheWire (0.00s)
+=== RUN   TestSubagentStreamKeyIsTheOneSpelling
+--- PASS: TestSubagentStreamKeyIsTheOneSpelling (0.00s)
+=== RUN   TestNPlusOneSubagentsEachGetTheirOwnStream
+--- PASS: TestNPlusOneSubagentsEachGetTheirOwnStream (0.00s)
+=== RUN   TestTwoSubagentsWritingAtOnceDoNotPolluteEachOther
+--- PASS: TestTwoSubagentsWritingAtOnceDoNotPolluteEachOther (0.00s)
+=== RUN   TestOverflowTruncatesEachStreamsOwnHeadAndTail
+--- PASS: TestOverflowTruncatesEachStreamsOwnHeadAndTail (0.00s)
+=== RUN   TestHardCeilingDropsWholeKeysAndNamesThem
+--- PASS: TestHardCeilingDropsWholeKeysAndNamesThem (0.00s)
+=== RUN   TestC21DesignTokensFourWayAgree
+    tokens_fourway_test.go:441: read design/assets/tokens.css: open D:\work\workspace\projects plans\Wisp\design\assets\tokens.css: The system cannot find the path specified.
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+=== RUN   TestWorkspaceSwitchAuditsAndAppliesACleanPath
+    workspace_test.go:69: audit: workspace: SWITCH from="" to="D:\\work\\Wisp\\notes" spelling="D:\\work\\Wisp\\notes" reparse=false rewritten=false rewrites= result=ok
+--- PASS: TestWorkspaceSwitchAuditsAndAppliesACleanPath (0.00s)
+=== RUN   TestWorkspaceSwitchPropagatesC26sReparseRefusal
+--- PASS: TestWorkspaceSwitchPropagatesC26sReparseRefusal (0.00s)
+=== RUN   TestWorkspaceSwitchRefusesARewrittenAccountEvenIfTheResolverSaysOK
+--- PASS: TestWorkspaceSwitchRefusesARewrittenAccountEvenIfTheResolverSaysOK (0.00s)
+=== RUN   TestWorkspaceSwitchKeepsThePreviousScopeOnFailure
+--- PASS: TestWorkspaceSwitchKeepsThePreviousScopeOnFailure (0.00s)
+=== RUN   TestWorkspaceSwitchDetectsAScopeThatMovedAnyway
+--- PASS: TestWorkspaceSwitchDetectsAScopeThatMovedAnyway (0.00s)
+=== RUN   TestWorkspaceViewRenderedForSnapshots
+--- PASS: TestWorkspaceViewRenderedForSnapshots (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	1.182s
+time=2026-09-29T17:56:02.816+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestR9PanicInSubAssessorFailsClosed
+--- PASS: TestR9PanicInSubAssessorFailsClosed (0.00s)
+=== RUN   TestR9PanicInWiredDependencyFailsClosed
+--- PASS: TestR9PanicInWiredDependencyFailsClosed (0.00s)
+=== RUN   TestFusionTakesMaxSeverity
+--- PASS: TestFusionTakesMaxSeverity (0.00s)
+=== RUN   TestFusionSingleDenyBeatsAnyConfirm
+--- PASS: TestFusionSingleDenyBeatsAnyConfirm (0.00s)
+=== RUN   TestFusionR4BlocksSessionOverride
+--- PASS: TestFusionR4BlocksSessionOverride (0.00s)
+=== RUN   TestDecisionGoldenSnapshots
+--- PASS: TestDecisionGoldenSnapshots (0.00s)
+=== RUN   TestClassifyAnchorSpellingIsNotVerdict
+--- PASS: TestClassifyAnchorSpellingIsNotVerdict (0.07s)
+=== RUN   TestClassifySpellingInvariance
+--- PASS: TestClassifySpellingInvariance (0.02s)
+=== RUN   TestCanonicalInputGainsNoSecondForm
+--- PASS: TestCanonicalInputGainsNoSecondForm (0.01s)
+=== RUN   TestOverrideOnlyAcceptsTheResolvedForm
+--- PASS: TestOverrideOnlyAcceptsTheResolvedForm (0.05s)
+=== RUN   TestAListWinsWhereBothTablesHit
+--- PASS: TestAListWinsWhereBothTablesHit (0.01s)
+=== RUN   TestClassifyFailClosedWhenSpellingUnprovable
+--- PASS: TestClassifyFailClosedWhenSpellingUnprovable (0.07s)
+=== RUN   TestResolvePerCallBudget
+    pathresolver_budget_norace_test.go:34: C26 Resolve: 328471 ns/op = 0.328 ms/op (budget 1.000 ms, 3621 samples)
+--- PASS: TestResolvePerCallBudget (1.25s)
+=== RUN   TestC26ExpansionMustNotRewriteOntoAnotherTree
+=== RUN   TestC26ExpansionMustNotRewriteOntoAnotherTree/percent_env_var_spelling
+    pathresolver_expansion_test.go:80: risk.c26Pipeline.Resolve (seam installed into winsec): refused as required: risk: expansion moved this path onto a tree the caller did not name: C:\Users\swq\AppData\Local\Temp\TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp81372153\001\a%WISP102PROBE_TARGET%b\artifacts expands to C:\Users\swq\AppData\Local\Temp\TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp81372153\001\aelsewhereb\artifacts (env); act on the expanded tree only if you asked for it by name
+    pathresolver_expansion_test.go:83: winsec.ResolvePath (sealing caller's view): refused as required: winsec: refusing to seal C:\Users\swq\AppData\Local\Temp\TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp81372153\001\a%WISP102PROBE_TARGET%b\artifacts: risk: expansion moved this path onto a tree the caller did not name: C:\Users\swq\AppData\Local\Temp\TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp81372153\001\a%WISP102PROBE_TARGET%b\artifacts expands to C:\Users\swq\AppData\Local\Temp\TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp81372153\001\aelsewhereb\artifacts (env); act on the expanded tree only if you asked for it by name
+    pathresolver_expansion_test.go:86: risk.syncSet.resolveTarget (fs.write sync judgement): refused as required: risk: expansion moved this path onto a tree the caller did not name: C:\Users\swq\AppData\Local\Temp\TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp81372153\001\a%WISP102PROBE_TARGET%b\artifacts expands to C:\Users\swq\AppData\Local\Temp\TestC26ExpansionMustNotRewriteOntoAnotherTreepercent_env_var_sp81372153\001\aelsewhereb\artifacts (env); act on the expanded tree only if you asked for it by name
+=== RUN   TestC26ExpansionMustNotRewriteOntoAnotherTree/leading_tilde_spelling
+    pathresolver_expansion_test.go:95: risk.c26Pipeline.Resolve ~ ~\wisp102-tilde-probe\artifacts: refused as required: risk: expansion moved this path onto a tree the caller did not name: ~\wisp102-tilde-probe\artifacts expands to C:\Users\swq\wisp102-tilde-probe\artifacts (home); act on the expanded tree only if you asked for it by name
+    pathresolver_expansion_test.go:98: winsec.ResolvePath ~ ~\wisp102-tilde-probe\artifacts: refused as required: winsec: refusing to seal ~\wisp102-tilde-probe\artifacts: risk: expansion moved this path onto a tree the caller did not name: ~\wisp102-tilde-probe\artifacts expands to C:\Users\swq\wisp102-tilde-probe\artifacts (home); act on the expanded tree only if you asked for it by name
+    pathresolver_expansion_test.go:101: risk.syncSet.resolveTarget ~ ~\wisp102-tilde-probe\artifacts: refused as required: risk: expansion moved this path onto a tree the caller did not name: ~\wisp102-tilde-probe\artifacts expands to C:\Users\swq\wisp102-tilde-probe\artifacts (home); act on the expanded tree only if you asked for it by name
+    pathresolver_expansion_test.go:95: risk.c26Pipeline.Resolve ~ ~/wisp102-tilde-probe/artifacts: refused as required: risk: expansion moved this path onto a tree the caller did not name: ~/wisp102-tilde-probe/artifacts expands to C:\Users\swq\wisp102-tilde-probe\artifacts (home); act on the expanded tree only if you asked for it by name
+    pathresolver_expansion_test.go:98: winsec.ResolvePath ~ ~/wisp102-tilde-probe/artifacts: refused as required: winsec: refusing to seal ~/wisp102-tilde-probe/artifacts: risk: expansion moved this path onto a tree the caller did not name: ~/wisp102-tilde-probe/artifacts expands to C:\Users\swq\wisp102-tilde-probe\artifacts (home); act on the expanded tree only if you asked for it by name
+    pathresolver_expansion_test.go:101: risk.syncSet.resolveTarget ~ ~/wisp102-tilde-probe/artifacts: refused as required: risk: expansion moved this path onto a tree the caller did not name: ~/wisp102-tilde-probe/artifacts expands to C:\Users\swq\wisp102-tilde-probe\artifacts (home); act on the expanded tree only if you asked for it by name
+--- PASS: TestC26ExpansionMustNotRewriteOntoAnotherTree (0.00s)
+    --- PASS: TestC26ExpansionMustNotRewriteOntoAnotherTree/percent_env_var_spelling (0.00s)
+    --- PASS: TestC26ExpansionMustNotRewriteOntoAnotherTree/leading_tilde_spelling (0.00s)
+=== RUN   TestPathResolverJunctionWindows
+--- PASS: TestPathResolverJunctionWindows (0.09s)
+=== RUN   TestPathResolverShortNameAListDenied
+--- PASS: TestPathResolverShortNameAListDenied (0.01s)
+=== RUN   TestPathResolverUNCAListDenied
+--- PASS: TestPathResolverUNCAListDenied (0.01s)
+=== RUN   TestPathResolverExtendedLengthPrefixAListDenied
+--- PASS: TestPathResolverExtendedLengthPrefixAListDenied (0.01s)
+=== RUN   TestPathResolverCaseAndDotMixDenied
+--- PASS: TestPathResolverCaseAndDotMixDenied (0.01s)
+=== RUN   TestReparseExceptionExplicitPathOnly
+--- PASS: TestReparseExceptionExplicitPathOnly (0.16s)
+=== RUN   TestAListDenyAndUnoverridable
+--- PASS: TestAListDenyAndUnoverridable (0.01s)
+=== RUN   TestBListDefaultDenyAndOverride
+--- PASS: TestBListDefaultDenyAndOverride (0.01s)
+=== RUN   TestResolveIdempotent
+--- PASS: TestResolveIdempotent (0.01s)
+=== RUN   TestResolveExpansion
+--- PASS: TestResolveExpansion (0.01s)
+=== RUN   TestC26RewriteAccountIsRecorded
+=== RUN   TestC26RewriteAccountIsRecorded/percent_env_var
+=== RUN   TestC26RewriteAccountIsRecorded/dollar_env_var
+=== RUN   TestC26RewriteAccountIsRecorded/leading_home_tilde
+=== RUN   TestC26RewriteAccountIsRecorded/clean_absolute_is_not_marked
+=== RUN   TestC26RewriteAccountIsRecorded/unexpandable_construct_is_not_marked
+--- PASS: TestC26RewriteAccountIsRecorded (0.00s)
+    --- PASS: TestC26RewriteAccountIsRecorded/percent_env_var (0.00s)
+    --- PASS: TestC26RewriteAccountIsRecorded/dollar_env_var (0.00s)
+    --- PASS: TestC26RewriteAccountIsRecorded/leading_home_tilde (0.00s)
+    --- PASS: TestC26RewriteAccountIsRecorded/clean_absolute_is_not_marked (0.00s)
+    --- PASS: TestC26RewriteAccountIsRecorded/unexpandable_construct_is_not_marked (0.00s)
+=== RUN   TestC26RewrittenSyncRootDoesNotDisarmSuspectNet
+--- PASS: TestC26RewrittenSyncRootDoesNotDisarmSuspectNet (0.00s)
+=== RUN   TestC26RewriteAccountIsConsumedAtEverySecurityLeg
+--- PASS: TestC26RewriteAccountIsConsumedAtEverySecurityLeg (0.03s)
+=== RUN   TestResolveCanonicalIsPlatformShaped
+--- PASS: TestResolveCanonicalIsPlatformShaped (0.00s)
+=== RUN   TestResolveKeepsSeparatorsOutOfPosixNames
+--- PASS: TestResolveKeepsSeparatorsOutOfPosixNames (0.00s)
+=== RUN   TestDoubleSlashSpellingIsNotUNC
+--- PASS: TestDoubleSlashSpellingIsNotUNC (0.00s)
+=== RUN   TestTierAAnchorsMatchNativeSpelling
+=== RUN   TestTierAAnchorsMatchNativeSpelling/~/.ssh/**
+=== RUN   TestTierAAnchorsMatchNativeSpelling/~/.ssh/_dir_itself
+=== RUN   TestTierAAnchorsMatchNativeSpelling/~/.git-credentials
+=== RUN   TestTierAAnchorsMatchNativeSpelling/~/.aws/credentials
+=== RUN   TestTierAAnchorsMatchNativeSpelling/~/.kube/config
+=== RUN   TestTierAAnchorsMatchNativeSpelling/.git/config
+=== RUN   TestTierAAnchorsMatchNativeSpelling/%APPDATA%\wisp\config.toml
+=== RUN   TestTierAAnchorsMatchNativeSpelling/%APPDATA%\Microsoft\Protect\**
+=== RUN   TestTierAAnchorsMatchNativeSpelling/%LOCALAPPDATA%\Microsoft\Credentials\**
+=== RUN   TestTierAAnchorsMatchNativeSpelling/browser_credential_store
+--- PASS: TestTierAAnchorsMatchNativeSpelling (0.02s)
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/~/.ssh/** (0.00s)
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/~/.ssh/_dir_itself (0.00s)
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/~/.git-credentials (0.00s)
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/~/.aws/credentials (0.00s)
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/~/.kube/config (0.00s)
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/.git/config (0.00s)
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/%APPDATA%\wisp\config.toml (0.00s)
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/%APPDATA%\Microsoft\Protect\** (0.00s)
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/%LOCALAPPDATA%\Microsoft\Credentials\** (0.00s)
+    --- PASS: TestTierAAnchorsMatchNativeSpelling/browser_credential_store (0.00s)
+=== RUN   TestOverrideKeyKeepsPosixBackslashesDistinct
+--- PASS: TestOverrideKeyKeepsPosixBackslashesDistinct (0.00s)
+=== RUN   TestSyncAncestorWalkVerifiesNativeChain
+--- PASS: TestSyncAncestorWalkVerifiesNativeChain (0.00s)
+=== RUN   TestPointer183RefereeTwinFragmentOutsideSpanStaysExempted
+--- PASS: TestPointer183RefereeTwinFragmentOutsideSpanStaysExempted (0.00s)
+=== RUN   TestPointer183RefereeControlBodyWithoutTwinIsClean
+--- PASS: TestPointer183RefereeControlBodyWithoutTwinIsClean (0.00s)
+=== RUN   TestPointer183PathAppearingTwiceInBodyStaysExempted
+--- PASS: TestPointer183PathAppearingTwiceInBodyStaysExempted (0.00s)
+=== RUN   TestPointer183BodySecretOutsideSpanStillHits
+--- PASS: TestPointer183BodySecretOutsideSpanStillHits (0.00s)
+=== RUN   TestPointer183ForeignMarkCarryingSamePathStillHits
+--- PASS: TestPointer183ForeignMarkCarryingSamePathStillHits (0.00s)
+=== RUN   TestPointer183AlmostPathInSameHostMarkStillHits
+--- PASS: TestPointer183AlmostPathInSameHostMarkStillHits (0.00s)
+=== RUN   TestPointer183WorstCaseOfTheLandedExemptionIsPinned
+--- PASS: TestPointer183WorstCaseOfTheLandedExemptionIsPinned (0.00s)
+=== RUN   TestPointer183DeclaredPathAbsentFromBodyStillHits
+--- PASS: TestPointer183DeclaredPathAbsentFromBodyStillHits (0.00s)
+=== RUN   TestPointer185SecondRereadOfAHostArtifactIsClean
+--- PASS: TestPointer185SecondRereadOfAHostArtifactIsClean (0.00s)
+=== RUN   TestPointer185TheReadBackBodyIsWhatBlocksTheRereadWhenNothingDeclaredIt
+--- PASS: TestPointer185TheReadBackBodyIsWhatBlocksTheRereadWhenNothingDeclaredIt (0.01s)
+=== RUN   TestPointer185AModelNominatedFileIsNotOnTheRoster
+--- PASS: TestPointer185AModelNominatedFileIsNotOnTheRoster (0.00s)
+=== RUN   TestPointer185ForeignContentCarryingTheHostPathStillHits
+--- PASS: TestPointer185ForeignContentCarryingTheHostPathStillHits (0.00s)
+=== RUN   TestPointer185RosterDoesNotCrossScopeIDs
+--- PASS: TestPointer185RosterDoesNotCrossScopeIDs (0.00s)
+=== RUN   TestPointer185RosterDiesWithTheMarksItWasDerivedFrom
+--- PASS: TestPointer185RosterDiesWithTheMarksItWasDerivedFrom (0.01s)
+=== RUN   TestPointer185SiblingArtifactInSameDirectoryStillHits
+--- PASS: TestPointer185SiblingArtifactInSameDirectoryStillHits (0.00s)
+=== RUN   TestPointer185OneRuneDifferentPathStillHits
+--- PASS: TestPointer185OneRuneDifferentPathStillHits (0.00s)
+=== RUN   TestPointer185SameBasenameOtherDirectoryStillHits
+--- PASS: TestPointer185SameBasenameOtherDirectoryStillHits (0.00s)
+=== RUN   TestPointer185CostFaceOfTheRosterIsPinnedAndNarrowerThanTheSpan
+--- PASS: TestPointer185CostFaceOfTheRosterIsPinnedAndNarrowerThanTheSpan (0.01s)
+=== RUN   TestExfilSyncWriteWindowsSpellingInvariant
+=== RUN   TestExfilSyncWriteWindowsSpellingInvariant/sync_root,_native_spelling
+=== RUN   TestExfilSyncWriteWindowsSpellingInvariant/sync_root,_all-forward-slash
+=== RUN   TestExfilSyncWriteWindowsSpellingInvariant/sync_root,_both_separators_at_once
+=== RUN   TestExfilSyncWriteWindowsSpellingInvariant/sync_root,_forward_slash_under_a_backslash_parent
+=== RUN   TestExfilSyncWriteWindowsSpellingInvariant/plain_dir,_native_spelling
+=== RUN   TestExfilSyncWriteWindowsSpellingInvariant/plain_dir,_all-forward-slash
+=== RUN   TestExfilSyncWriteWindowsSpellingInvariant/plain_dir,_both_separators_at_once
+--- PASS: TestExfilSyncWriteWindowsSpellingInvariant (0.02s)
+    --- PASS: TestExfilSyncWriteWindowsSpellingInvariant/sync_root,_native_spelling (0.00s)
+    --- PASS: TestExfilSyncWriteWindowsSpellingInvariant/sync_root,_all-forward-slash (0.00s)
+    --- PASS: TestExfilSyncWriteWindowsSpellingInvariant/sync_root,_both_separators_at_once (0.00s)
+    --- PASS: TestExfilSyncWriteWindowsSpellingInvariant/sync_root,_forward_slash_under_a_backslash_parent (0.00s)
+    --- PASS: TestExfilSyncWriteWindowsSpellingInvariant/plain_dir,_native_spelling (0.00s)
+    --- PASS: TestExfilSyncWriteWindowsSpellingInvariant/plain_dir,_all-forward-slash (0.00s)
+    --- PASS: TestExfilSyncWriteWindowsSpellingInvariant/plain_dir,_both_separators_at_once (0.00s)
+=== RUN   TestMarkInspectSourceAttribution
+--- PASS: TestMarkInspectSourceAttribution (0.00s)
+=== RUN   TestMarkNegativeNoTaintNoHit
+--- PASS: TestMarkNegativeNoTaintNoHit (0.00s)
+=== RUN   TestMarkEmptyAfterNormalization
+--- PASS: TestMarkEmptyAfterNormalization (0.00s)
+=== RUN   TestMarkUnknownSourceToolFailClosed
+--- PASS: TestMarkUnknownSourceToolFailClosed (0.00s)
+=== RUN   TestSensitiveSourceSetComplete
+--- PASS: TestSensitiveSourceSetComplete (0.00s)
+=== RUN   TestFourChannelExfilSuite
+=== RUN   TestFourChannelExfilSuite/web.search_query
+=== RUN   TestFourChannelExfilSuite/notify_text
+=== RUN   TestFourChannelExfilSuite/notify_url
+=== RUN   TestFourChannelExfilSuite/clipboard.write
+=== RUN   TestFourChannelExfilSuite/fs.write_into_sync_dir
+--- PASS: TestFourChannelExfilSuite (0.01s)
+    --- PASS: TestFourChannelExfilSuite/web.search_query (0.00s)
+    --- PASS: TestFourChannelExfilSuite/notify_text (0.00s)
+    --- PASS: TestFourChannelExfilSuite/notify_url (0.00s)
+    --- PASS: TestFourChannelExfilSuite/clipboard.write (0.00s)
+    --- PASS: TestFourChannelExfilSuite/fs.write_into_sync_dir (0.00s)
+=== RUN   TestR4EndToEndViaAssessor
+--- PASS: TestR4EndToEndViaAssessor (0.01s)
+=== RUN   TestSyncWriteNegative
+--- PASS: TestSyncWriteNegative (0.01s)
+=== RUN   TestDetectorUnknownToolScansEverything
+--- PASS: TestDetectorUnknownToolScansEverything (0.01s)
+=== RUN   TestScopesNeverInherit
+--- PASS: TestScopesNeverInherit (0.00s)
+=== RUN   TestDisposalScopeClearsTaints
+time=2026-09-29T17:56:04.842+08:00 level=INFO msg="scope disposed" scope=session-1 completed=1 failed=0 disposal_incomplete=false timed_out=false
+--- PASS: TestDisposalScopeClearsTaints (0.00s)
+=== RUN   TestInspectUnknownScopeIsEmptyStore
+--- PASS: TestInspectUnknownScopeIsEmptyStore (0.00s)
+=== RUN   TestNamedChannelParamEscape
+=== RUN   TestNamedChannelParamEscape/table_key_still_gets_its_contract_label
+=== RUN   TestNamedChannelParamEscape/renamed_query_key
+=== RUN   TestNamedChannelParamEscape/abbreviated_key
+=== RUN   TestNamedChannelParamEscape/harmless_table_key,_tainted_extra_key
+=== RUN   TestNamedChannelParamEscape/payload_under_another_name
+=== RUN   TestNamedChannelParamEscape/nested_object_payload
+=== RUN   TestNamedChannelParamEscape/array_payload
+=== RUN   TestNamedChannelParamEscape/[]string_payload
+=== RUN   TestNamedChannelParamEscape/byte_payload
+=== RUN   TestNamedChannelParamEscape/deep_map_under_an_unknown_key
+--- PASS: TestNamedChannelParamEscape (0.00s)
+    --- PASS: TestNamedChannelParamEscape/table_key_still_gets_its_contract_label (0.00s)
+    --- PASS: TestNamedChannelParamEscape/renamed_query_key (0.00s)
+    --- PASS: TestNamedChannelParamEscape/abbreviated_key (0.00s)
+    --- PASS: TestNamedChannelParamEscape/harmless_table_key,_tainted_extra_key (0.00s)
+    --- PASS: TestNamedChannelParamEscape/payload_under_another_name (0.00s)
+    --- PASS: TestNamedChannelParamEscape/nested_object_payload (0.00s)
+    --- PASS: TestNamedChannelParamEscape/array_payload (0.00s)
+    --- PASS: TestNamedChannelParamEscape/[]string_payload (0.00s)
+    --- PASS: TestNamedChannelParamEscape/byte_payload (0.00s)
+    --- PASS: TestNamedChannelParamEscape/deep_map_under_an_unknown_key (0.00s)
+=== RUN   TestWriteGateNotSelectedByPayloadKey
+--- PASS: TestWriteGateNotSelectedByPayloadKey (0.04s)
+=== RUN   TestWriteGatePlainLocalWriteNotFlagged
+--- PASS: TestWriteGatePlainLocalWriteNotFlagged (0.02s)
+=== RUN   TestWriteGateEveryPathTargetJudged
+=== RUN   TestWriteGateEveryPathTargetJudged/decoy_path_+_real_dest
+=== RUN   TestWriteGateEveryPathTargetJudged/reversed_order
+=== RUN   TestWriteGateEveryPathTargetJudged/file+destination,_no_tool_name
+=== RUN   TestWriteGateEveryPathTargetJudged/three-way:_path+dest_non-sync,_file_in_sync_root
+=== RUN   TestWriteGateEveryPathTargetJudged/single_sync_dest_only
+=== RUN   TestWriteGateEveryPathTargetJudged/casing_decoy:_Path_hides_the_sync_target_from_an_exact-match_scan
+=== RUN   TestWriteGateEveryPathTargetJudged/path-shaped_key_with_no_checkable_value
+--- PASS: TestWriteGateEveryPathTargetJudged (0.02s)
+    --- PASS: TestWriteGateEveryPathTargetJudged/decoy_path_+_real_dest (0.00s)
+    --- PASS: TestWriteGateEveryPathTargetJudged/reversed_order (0.00s)
+    --- PASS: TestWriteGateEveryPathTargetJudged/file+destination,_no_tool_name (0.00s)
+    --- PASS: TestWriteGateEveryPathTargetJudged/three-way:_path+dest_non-sync,_file_in_sync_root (0.00s)
+    --- PASS: TestWriteGateEveryPathTargetJudged/single_sync_dest_only (0.00s)
+    --- PASS: TestWriteGateEveryPathTargetJudged/casing_decoy:_Path_hides_the_sync_target_from_an_exact-match_scan (0.00s)
+    --- PASS: TestWriteGateEveryPathTargetJudged/path-shaped_key_with_no_checkable_value (0.00s)
+=== RUN   TestWriteGateAllPathsNonSyncStaysExempt
+--- PASS: TestWriteGateAllPathsNonSyncStaysExempt (0.04s)
+=== RUN   TestDeepNestingFailsClosedNotSilent
+--- PASS: TestDeepNestingFailsClosedNotSilent (0.00s)
+=== RUN   TestNormalizationEndToEnd
+=== RUN   TestNormalizationEndToEnd/full-width
+=== RUN   TestNormalizationEndToEnd/zero-width_split
+=== RUN   TestNormalizationEndToEnd/soft-hyphen
+=== RUN   TestNormalizationEndToEnd/bom/word-joiner
+=== RUN   TestNormalizationEndToEnd/combining_mark
+=== RUN   TestNormalizationEndToEnd/lowercase
+=== RUN   TestNormalizationEndToEnd/whitespace_split
+--- PASS: TestNormalizationEndToEnd (0.00s)
+    --- PASS: TestNormalizationEndToEnd/full-width (0.00s)
+    --- PASS: TestNormalizationEndToEnd/zero-width_split (0.00s)
+    --- PASS: TestNormalizationEndToEnd/soft-hyphen (0.00s)
+    --- PASS: TestNormalizationEndToEnd/bom/word-joiner (0.00s)
+    --- PASS: TestNormalizationEndToEnd/combining_mark (0.00s)
+    --- PASS: TestNormalizationEndToEnd/lowercase (0.00s)
+    --- PASS: TestNormalizationEndToEnd/whitespace_split (0.00s)
+=== RUN   TestFragmentThresholdClampedToContractFloor
+--- PASS: TestFragmentThresholdClampedToContractFloor (0.00s)
+=== RUN   TestFragmentThresholdStricterAllowed
+--- PASS: TestFragmentThresholdStricterAllowed (0.00s)
+=== RUN   TestResidualLimitsAreLoggedNotSilent
+--- PASS: TestResidualLimitsAreLoggedNotSilent (0.00s)
+=== RUN   TestConcurrentMarkInspect
+--- PASS: TestConcurrentMarkInspect (0.00s)
+=== RUN   TestLLMParaphraseResidual
+--- PASS: TestLLMParaphraseResidual (0.00s)
+=== RUN   TestScopeCloseRefusesAnotherOwnersRegistration
+--- PASS: TestScopeCloseRefusesAnotherOwnersRegistration (0.00s)
+=== RUN   TestScopeCloseRefusedOnEmptyRegistrationIsStillVisible
+--- PASS: TestScopeCloseRefusedOnEmptyRegistrationIsStillVisible (0.00s)
+=== RUN   TestScopeCloseIsIdempotent
+--- PASS: TestScopeCloseIsIdempotent (0.00s)
+=== RUN   TestScopeIDGrantsNoPower
+--- PASS: TestScopeIDGrantsNoPower (0.00s)
+=== RUN   TestRuleDeclaredR1
+--- PASS: TestRuleDeclaredR1 (0.00s)
+=== RUN   TestRulePathAllowlistR2
+--- PASS: TestRulePathAllowlistR2 (0.00s)
+=== RUN   TestRuleSensitivePathR3
+--- PASS: TestRuleSensitivePathR3 (0.00s)
+=== RUN   TestRuleTaintR4
+--- PASS: TestRuleTaintR4 (0.00s)
+=== RUN   TestRuleNetworkR5
+--- PASS: TestRuleNetworkR5 (0.00s)
+=== RUN   TestRuleShellR6
+--- PASS: TestRuleShellR6 (0.00s)
+=== RUN   TestRuleBatchScaleR7
+--- PASS: TestRuleBatchScaleR7 (0.00s)
+=== RUN   TestRuleIrreversibleR8
+--- PASS: TestRuleIrreversibleR8 (0.00s)
+=== RUN   TestShapeAHostReReadOfDeclaredPathIsClean
+--- PASS: TestShapeAHostReReadOfDeclaredPathIsClean (0.00s)
+=== RUN   TestShapeAW1RestOfHostMarkStillIndexed
+--- PASS: TestShapeAW1RestOfHostMarkStillIndexed (0.00s)
+=== RUN   TestShapeAW2ForeignMarkCarryingSamePathStillHits
+--- PASS: TestShapeAW2ForeignMarkCarryingSamePathStillHits (0.00s)
+=== RUN   TestShapeAW3NeverMintedSiblingUnderSameDirStillHits
+--- PASS: TestShapeAW3NeverMintedSiblingUnderSameDirStillHits (0.00s)
+=== RUN   TestShapeAW4PositionalExclusionNeverLeavesHostMark
+--- PASS: TestShapeAW4PositionalExclusionNeverLeavesHostMark (0.00s)
+=== RUN   TestShapeAFExclusionDiesWithScopeClose
+--- PASS: TestShapeAFExclusionDiesWithScopeClose (0.00s)
+=== RUN   TestShapeAW5EmptyCheckPrecedesExclusion
+--- PASS: TestShapeAW5EmptyCheckPrecedesExclusion (0.00s)
+=== RUN   TestShapeAOrderOneSpanLocatedAfterNormalization
+--- PASS: TestShapeAOrderOneSpanLocatedAfterNormalization (0.00s)
+=== RUN   TestSyncAncestorActableLegFailsClosedOnMovedAncestor116
+    syncdirs_ancestor_actable_leg_116_test.go:218: raw="C:\\Users\\swq\\AppData\\Local\\Temp\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1162864665723\\001\\%WISP116ANC\\\\B%\\new.md"
+         anc="C:\\Users\\swq\\AppData\\Local\\Temp\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1162864665723\\001\\%WISP116ANC\\B%"
+         moved="C:\\Users\\swq\\AppData\\Local\\Temp\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1162864665723\\wisp116-escape"
+        verdict: Sync=true Root={Provider:sync-suspect Path: Source:suspect-fallback} Why="write target spelling could not be anchored on a C26-verifiable ancestor (8.3/\\\\?\\/missing chain); fail-closed as sync-suspect: risk: expansion moved this path onto a tree the caller did not name: C:\\Users\\swq\\AppData\\Local\\Temp\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1162864665723\\001\\%WISP116ANC\\B% expands to C:\\Users\\swq\\AppData\\Local\\Temp\\TestSyncAncestorActableLegFailsClosedOnMovedAncestor1162864665723\\wisp116-escape (env); act on the expanded tree only if you asked for it by name"
+--- PASS: TestSyncAncestorActableLegFailsClosedOnMovedAncestor116 (0.01s)
+=== RUN   TestSyncFirstActableLegStillRefusesEnvRewriteAtVerdict116
+--- PASS: TestSyncFirstActableLegStillRefusesEnvRewriteAtVerdict116 (0.00s)
+=== RUN   TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116
+--- PASS: TestSyncFirstActableLegStillRefusesHomeRewriteAtVerdict116 (0.00s)
+=== RUN   TestSyncAncestorLegStillMatchesPlainSameTreeWrite116
+--- PASS: TestSyncAncestorLegStillMatchesPlainSameTreeWrite116 (0.00s)
+=== RUN   TestSyncAncestorLegReResolvesThroughJunctionToRealTree
+--- PASS: TestSyncAncestorLegReResolvesThroughJunctionToRealTree (0.05s)
+=== RUN   TestSyncAncestorLegNotExemptedStaysFailClosed
+--- PASS: TestSyncAncestorLegNotExemptedStaysFailClosed (0.05s)
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes
+    syncdirs_redteam_windows_test.go:85: sync root long  = C:\Users\swq\AppData\Local\Temp\TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes3336742640\001\profile\OneDrive Copilot Sync
+    syncdirs_redteam_windows_test.go:86: sync root 8.3   = C:\Users\swq\AppData\Local\Temp\TESTSY~1\001\profile\ONEDRI~1
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/plain_long_spelling
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/extended-length_\\?\_spelling
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/OS_8.3_short-name_spelling
+=== RUN   TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/8.3_+_\\?\_combined
+--- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes (0.02s)
+    --- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/plain_long_spelling (0.00s)
+    --- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/extended-length_\\?\_spelling (0.00s)
+    --- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/OS_8.3_short-name_spelling (0.00s)
+    --- PASS: TestSyncRedTeamNewFileSpellingsDeniedAndLandNoBytes/8.3_+_\\?\_combined (0.00s)
+=== RUN   TestSyncRedTeamGuardPlainNewFileWriteAllowed
+    syncdirs_redteam_windows_test.go:152: non-sync dir 8.3 = C:\Users\swq\AppData\Local\Temp\TESTSY~1\001\profile\work
+--- PASS: TestSyncRedTeamGuardPlainNewFileWriteAllowed (0.02s)
+=== RUN   TestSyncRedTeamUnverifiableChainFailClosed
+--- PASS: TestSyncRedTeamUnverifiableChainFailClosed (1.28s)
+=== RUN   TestSyncRedTeamRealOneDrive
+    syncdirs_redteam_windows_test.go:215: P12 evidence: live OneDrive root via env: C:\Users\swq\OneDrive
+    syncdirs_redteam_windows_test.go:234: no 8.3 alias exists for the live root C:\Users\swq\OneDrive (name is already 8.3-clean); the \\?\ legs below still cross the boundary
+    syncdirs_redteam_windows_test.go:247: real root spelling judged sync=true root=OneDrive/env why="write target is under a detected sync root"
+    syncdirs_redteam_windows_test.go:252: R4 hit channel=fs.write.syncdir source=fs.read C:\Users\swq\contract.pdf
+    syncdirs_redteam_windows_test.go:247: real root spelling judged sync=true root=OneDrive/env why="write target is under a detected sync root"
+    syncdirs_redteam_windows_test.go:252: R4 hit channel=fs.write.syncdir source=fs.read C:\Users\swq\contract.pdf
+--- PASS: TestSyncRedTeamRealOneDrive (0.00s)
+=== RUN   TestSyncDefaultLocationProbe
+--- PASS: TestSyncDefaultLocationProbe (0.00s)
+=== RUN   TestSyncDropboxHostDBConfig
+--- PASS: TestSyncDropboxHostDBConfig (0.01s)
+=== RUN   TestSyncFixtureFallbackAndMatch
+--- PASS: TestSyncFixtureFallbackAndMatch (0.01s)
+=== RUN   TestSyncFallbackNotDisarmableByWeakRoot
+--- PASS: TestSyncFallbackNotDisarmableByWeakRoot (0.02s)
+=== RUN   TestSyncUnverifiedRootKeepsFallback
+--- PASS: TestSyncUnverifiedRootKeepsFallback (0.01s)
+=== RUN   TestSyncEnvConfiguredRoots
+--- PASS: TestSyncEnvConfiguredRoots (0.01s)
+=== RUN   TestSyncRegistryProbeTable
+=== RUN   TestSyncRegistryProbeTable/empty_hive_yields_nothing
+=== RUN   TestSyncRegistryProbeTable/personal_+_business_accounts,_decoys_ignored
+=== RUN   TestSyncRegistryProbeTable/duplicate_accounts_dedupe
+=== RUN   TestSyncRegistryProbeTable/dropbox_installer_path
+--- PASS: TestSyncRegistryProbeTable (0.00s)
+    --- PASS: TestSyncRegistryProbeTable/empty_hive_yields_nothing (0.00s)
+    --- PASS: TestSyncRegistryProbeTable/personal_+_business_accounts,_decoys_ignored (0.00s)
+    --- PASS: TestSyncRegistryProbeTable/duplicate_accounts_dedupe (0.00s)
+    --- PASS: TestSyncRegistryProbeTable/dropbox_installer_path (0.00s)
+=== RUN   TestSyncSuspectFallbackIsComponentBounded
+--- PASS: TestSyncSuspectFallbackIsComponentBounded (0.01s)
+=== RUN   TestSyncNormalNewFileWriteNotFlagged
+--- PASS: TestSyncNormalNewFileWriteNotFlagged (0.01s)
+=== RUN   TestSyncSuspectFallbackWhenUndetectable
+--- PASS: TestSyncSuspectFallbackWhenUndetectable (0.01s)
+=== RUN   TestSyncUnresolvablePathFailClosed
+--- PASS: TestSyncUnresolvablePathFailClosed (0.00s)
+=== RUN   TestSyncDotDotTailFailsClosed
+--- PASS: TestSyncDotDotTailFailsClosed (0.01s)
+=== RUN   TestSyncRootsIntrospection
+--- PASS: TestSyncRootsIntrospection (0.00s)
+=== RUN   TestSyncDetectionOnThisMachine
+    syncdirs_test.go:491: P12 evidence: detected OneDrive root via env: C:\Users\swq\OneDrive
+    syncdirs_test.go:509: P12 evidence: OneDrive at C:\Users\swq\OneDrive flagged as sync channel
+--- PASS: TestSyncDetectionOnThisMachine (0.00s)
+=== RUN   TestSyncConfirmedGradesDisarmFallbackWindows
+--- PASS: TestSyncConfirmedGradesDisarmFallbackWindows (0.01s)
+=== RUN   TestWriteGatePlainTargetInsideProfileWindows
+--- PASS: TestWriteGatePlainTargetInsideProfileWindows (0.01s)
+=== RUN   TestSyncRegistryProbeLive
+    syncdirs_windows_test.go:133: no registry-grade sync record on this machine (HKCU Accounts without UserFolder is the documented reality here)
+--- SKIP: TestSyncRegistryProbeLive (0.00s)
+=== RUN   TestNormalizeTaintContractForm
+--- PASS: TestNormalizeTaintContractForm (0.00s)
+=== RUN   TestFragmentMatchExactBoundary
+--- PASS: TestFragmentMatchExactBoundary (0.00s)
+=== RUN   TestFragmentMatchAcrossTransforms
+--- PASS: TestFragmentMatchAcrossTransforms (0.00s)
+=== RUN   TestFragmentMatchCJK
+--- PASS: TestFragmentMatchCJK (0.00s)
+=== RUN   TestNormalizeTaintDropsIgnorableChars
+=== RUN   TestNormalizeTaintDropsIgnorableChars/zwsp
+=== RUN   TestNormalizeTaintDropsIgnorableChars/zwnj+zwj
+=== RUN   TestNormalizeTaintDropsIgnorableChars/soft_hyphen
+=== RUN   TestNormalizeTaintDropsIgnorableChars/word_joiner
+=== RUN   TestNormalizeTaintDropsIgnorableChars/bom
+=== RUN   TestNormalizeTaintDropsIgnorableChars/combining_marks
+=== RUN   TestNormalizeTaintDropsIgnorableChars/full-width_+_ignorable_mix
+--- PASS: TestNormalizeTaintDropsIgnorableChars (0.00s)
+    --- PASS: TestNormalizeTaintDropsIgnorableChars/zwsp (0.00s)
+    --- PASS: TestNormalizeTaintDropsIgnorableChars/zwnj+zwj (0.00s)
+    --- PASS: TestNormalizeTaintDropsIgnorableChars/soft_hyphen (0.00s)
+    --- PASS: TestNormalizeTaintDropsIgnorableChars/word_joiner (0.00s)
+    --- PASS: TestNormalizeTaintDropsIgnorableChars/bom (0.00s)
+    --- PASS: TestNormalizeTaintDropsIgnorableChars/combining_marks (0.00s)
+    --- PASS: TestNormalizeTaintDropsIgnorableChars/full-width_+_ignorable_mix (0.00s)
+=== RUN   TestFragmentIndexShortSourceNeverMatches
+--- PASS: TestFragmentIndexShortSourceNeverMatches (0.00s)
+=== RUN   TestFragmentHashCollisionCannotFakeHit
+--- PASS: TestFragmentHashCollisionCannotFakeHit (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	3.792s
+FAIL
