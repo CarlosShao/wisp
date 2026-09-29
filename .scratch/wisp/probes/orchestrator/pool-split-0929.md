@@ -205,9 +205,30 @@
 
 ---
 
-## 7. 混合票
+## 7. 混合票（18 枚：同一枚票里真有两笔以上不同归属的交付）
 
-（占位：跨桶票，写明哪一半属后端）。
+> 这 18 枚**没被硬塞进单桶**。每行写明跨了哪几桶、**哪一半属后端**（＝你们要背的那半）。
+
+| 票 | 跨的桶 | 属后端的那一半（据以分类片段＋行号） |
+|---|---|---|
+| 12 | 后端＋仪器＋文档 | 后端＝`cmd/wisp` 文本路端到端；`1|notify/list_tools`、`1|RSS gate`（仪器＝那把 RSS/SLO 尺，文档＝`docs/SLO.md` 附录 B） |
+| 15 | 后端＋仪器 | 后端＝VAD／流式 ASR／engine slot mutex，`1|VAD + streaming ASR`；仪器＝`1|CER harness` |
+| 37 | 界面＋后端 | **后端＝`internal/panel/approval.go` 的 C17 入键与队列签发键做一次显式对账＋一条"两张卡共存取消其一绝不命中另一"用例**；界面＝`44|vs design/screens/approval.html` 人眼签收 |
+| 45 | 后端＋仪器 | 后端＝guard 落码，`1|disk-full/WAL guard`；仪器＝disk-full fixture（虚拟盘／quota） |
+| 53 | 后端＋仪器 | 后端＝wrapper plugin 本体；仪器＝`1|acceptance artifact`（e2e／mocked transport 那格） |
+| 58 | 界面＋后端 | **后端＝English voice chain 过自己那套基线门＋延迟重测**；界面＝`All UI via locale files`（含 frontend render paths） |
+| 59 | 后端＋文档 | 后端＝`Go binding builds + links`＋cgo smoke；文档＝`License verdict recorded` |
+| 62 | 后端＋仪器＋文档 | 后端＝`internal/ball` 质感残留（已移交 65/68）；仪器＝AC#8「对抗验收＋1:1 裁决表**从未执行**」；文档＝AC#7「签字与回填 SPEC-08 仍欠」（`21` 那张归属表） |
+| 72 | 后端＋仪器 | 后端＝`internal/winsec` 判定修复（`3|已入库 f1033e1`）；仪器＝AC#4 runner 半边／AC#6 改名（`3|都不在代理手里`） |
+| 77 | 界面＋仪器 | **后端＝`7|AC#4 欠在 tools/d22scan` ban #8 的 `frontend/` 作用域那一行（票面逐字标"编排者地界"）＋ `16|AC#6 的 lint-frontend job 已写进 ci.yml`**；界面＝余下 AC#1/#3 正解在 `frontend/` |
+| 112 | 仪器＋后端 | 后端＝`6|Packages: internal/winsec/`（三条用例**与它们走过的判定**）；仪器＝CI 那一步的 run/job/step 读数 |
+| 122 | 仪器＋后端 | 仪器＝lint 钉版与 CI 步；**后端＝`16|Packages: 按 checker 分批动`（34／78 条 finding 分布在多包产码，含 `SA4000` 真缺陷）** |
+| 125 | 后端＋仪器 | 后端＝POSIX 那侧 C26 安装不上；仪器＝`1|POSIX 侧零正向用例` |
+| 145 | 后端＋界面 | 后端＝`internal/panel` 的 `Snapshot` 扩成真载体；界面＝`20|TS 侧 interface 的对齐不写 frontend/**` |
+| 150 | 文档＋仪器 | 文档＝给 `SPEC-12 §5` 补登记行；仪器＝`1|没有任何仪器扫它`。**整枚 blocked：`3|三选一的前置是人工批准`（`Q-55`）** |
+| 158 | 后端＋仪器 | 后端＝`OpenScope/CloseScope` 补条款（`internal/tools`）；仪器＝`1|本包零断言` |
+| 193 | 后端＋仪器＋界面 | 后端＝Go 侧字段＋生效链（`schema.go` 的 `[panel]` 那节）；仪器＝`1|逐枚放开卡前端的门禁`（d22scan ban 射程）；界面＝`16|AC#5 界面那半不在本票写面` |
+| 201 | 后端＋界面 | 后端＝gate 的"答"侧（`DecideFrom*`／`Veto` 生产零调用者）；界面＝答复入口三处，其中**球／托盘那两处其实是 `internal/ball`（Go）**、只有面板那处属界面。⚠ 剩余四格的前置是**票 228 那枚宿主**，不是接线 |
 
 ---
 
