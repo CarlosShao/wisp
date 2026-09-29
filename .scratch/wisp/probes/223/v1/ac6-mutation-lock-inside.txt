@@ -1,0 +1,41 @@
+Tue Sep 29 15:58:48 CST 2026
+MUTATION 223-v1: internal/config/manager.go 裁决挪回持锁段（基线 SHA256 32dd1989…dc34, blob 4cde0f49…80a7）
+RULER-1: go test ./internal/config -count=1 -v -timeout 3m -run 'TestConfirmLockedRunsOutsideTheManagerLock|TestCheckAndReloadAsksOncePerFileChange'
+time=2026-09-29T15:58:49.730+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestConfirmLockedRunsOutsideTheManagerLock
+time=2026-09-29T15:58:55.747+08:00 level=WARN msg="config: locked loosening approved via L2 re-confirmation (D36 rule 1)" section=fs keys=[fs.allowed_dirs]
+    manager_223_test.go:115: ConfirmLocked could not call Config(): the hook still runs inside the Manager lock
+--- FAIL: TestConfirmLockedRunsOutsideTheManagerLock (6.02s)
+=== RUN   TestCheckAndReloadAsksOncePerFileChange
+time=2026-09-29T15:58:55.764+08:00 level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+--- PASS: TestCheckAndReloadAsksOncePerFileChange (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/config	6.064s
+FAIL
+EXIT_CONFIG=1
+Tue Sep 29 15:58:55 CST 2026
+RULER-2: go test ./cmd/wisp -count=1 -v -timeout 4m -run 'TestTicket223HandEditedFsLooseningCostsAnL2Card'
+time=2026-09-29T15:58:59.805+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket223HandEditedFsLooseningCostsAnL2Card
+time=2026-09-29T15:59:00.821+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/29 15:59:00 mockllm: serving on http://127.0.0.1:54553 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-29T15:59:00.842+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223HandEditedFsLooseningCostsAnL2Card3040319834\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-09-29T15:59:00.864+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223HandEditedFsLooseningCostsAnL2Card3040319834\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-29T15:59:00.871+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-29T07:59:00Z duration_ms=6
+time=2026-09-29T15:59:00.877+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223HandEditedFsLooseningCostsAnL2Card3040319834\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-29T15:59:00.882+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-29T07:59:00Z duration_ms=4
+time=2026-09-29T15:59:00.886+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-29T15:59:00.887+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    config_reload_223_test.go:264: no "config.reload" card was displayed within 40s; stdout:
+        wisp run: 答复监听已接入（卡片上给了编号）。原生侧：yes <编号> / no <编号> [理由] / veto <编号>；面板路线：panel-no <编号> [理由]、panel-yes <编号>（这一条只会被服务端 API 拒绝）、head / view <编号> 看卡片；quit 退出监听。
+        wisp run: 配置热加载已接管（每 1s 检查一次 config.toml）。手改会按 D36 三档处理：可热加载段立即生效；[risk]/[fs]/[net]/[plugins] 的放宽要先答一张 L2 卡，不答按拒绝保留旧值；重启档的改动本次不生效，会另有一句告诉你为什么不生效。
+        
+        stderr:
+        [audit] perm: MODE-READ origin=startup mode=ask_every_step source="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket223HandEditedFsLooseningCostsAnL2Card3040319834\\002\\config.toml"
+        [audit] config: HOT-RELOAD state=armed tick=1s path="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket223HandEditedFsLooseningCostsAnL2Card3040319834\\002\\config.toml" goroutine=watchdog owner=config d36_confirm=on restart_notice=on detail="本进程会每 tick 重读 config.toml：手改的可热加载段立即生效，锁定段的放宽要先过一张 L2 卡，重启档会明确告知不生效"
+--- FAIL: TestTicket223HandEditedFsLooseningCostsAnL2Card (41.12s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	41.173s
+FAIL
+EXIT_CMDWISP=1
+Tue Sep 29 15:59:41 CST 2026

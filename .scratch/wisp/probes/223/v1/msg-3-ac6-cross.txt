@@ -1,0 +1,1 @@
+ledger(223-v1 AC#6+AC#1/2/3/7+编排者代落代跑+跨票226): AC#6 成立——锁内突变两枚 Config()-readable 用例都转红(manager_223_test.go:115 逐名 + cmd/wisp 41.12s 自死锁),TestCheckAndReloadAsksOnce 在锁内仍 PASS 故它对锁不敏感具名除名;还原哈希逐字相同 32dd1989..dc34;跨票现测——226 那枚唯一走真宿主的用例靠"跑不满 1 秒"过关(3/3 PASS 但 1.11/0.91/0.93s),它注释里"nothing polls"从 248095d1 起是假的,热档手改会被 tick 认领,登记落点建议票 227 加一格;build/d22scan/vet 三把门复跑皆 0
