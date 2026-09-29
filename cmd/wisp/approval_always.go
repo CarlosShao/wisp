@@ -100,9 +100,9 @@ func (s *replySurface) always(corr string) (string, error) {
 		defer root.Cancel()
 		s.runWidening(ctx, corr, dir, rule)
 	})
-	return "要存的规则：" + rule + "\n  这会再起一张 L2 卡（第二重确认，PLAN.md:1645-1646），"+
-		"卡上会印自己的编号；同意它才真写进 config.toml，"+
-		"不答按 C18 超时落拒绝、什么都不写。"+
+	return "要存的规则：" + rule + "\n  这会再起一张 L2 卡（第二重确认，PLAN.md:1645-1646），" +
+		"卡上会印自己的编号；同意它才真写进 config.toml，" +
+		"不答按 C18 超时落拒绝、什么都不写。" +
 		"注意：写入后由下一次启动读取，本次运行仍按现有 [fs] 名单判定。", nil
 }
 
@@ -174,7 +174,8 @@ func (rt *agentRuntime) bookWaitingState(via string) {
 	}
 	st, awaiting := rt.liveCards.waitingState()
 	if !awaiting {
-		rt.auditf("approval: WAITING-STATE state=none awaiting=false producer=%q", via)
+		rt.auditf("approval: WAITING-STATE state=none awaiting=false tracked=%d producer=%q",
+			len(rt.liveCards.pending()), via)
 		return
 	}
 	card, _ := rt.liveCards.h.AwaitingHuman()

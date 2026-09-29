@@ -1101,6 +1101,14 @@ func (u *consoleApprovalUI) Prompt(_ context.Context, p approval.Prompt) error {
 	// and ticket 201's 「允许只长在原生侧」).
 	if u.live != nil {
 		u.live.record(p)
+		// AC#6 (ticket 201): the instant a card exists is the instant someone is
+		// being waited on, so that fact is booked HERE, on the same statement
+		// that made the card answerable, and not inferred downstream. Printed
+		// before the card's own lines, because the reading has to exist even if
+		// the printer is the thing that fails next.
+		if u.run != nil {
+			u.run.bookWaitingState("ui-prompt")
+		}
 	}
 	fmt.Fprintf(u.out, "\n[确认 %s %s] %s\n", p.Level, p.Tool, p.Reason)
 	for _, r := range p.RulesHit {
@@ -1126,11 +1134,6 @@ func (u *consoleApprovalUI) Prompt(_ context.Context, p approval.Prompt) error {
 	// is worth sending.
 	if u.publish != nil {
 		u.publish()
-	}
-	// AC#6 (ticket 201): the instant a card exists is the instant someone is
-	// being waited on, so that fact is booked here and not inferred downstream.
-	if u.run != nil {
-		u.run.bookWaitingState("ui-prompt")
 	}
 	return nil
 }

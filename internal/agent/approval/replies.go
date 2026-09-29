@@ -284,17 +284,15 @@ func (r *Replies) WaitingState() (statemachine.State, bool) {
 	if r == nil {
 		return "", false
 	}
-	_, awaiting := r.AwaitingHuman()
-	if awaiting {
-		if s := statemachine.StateAwaitingApproval; statemachine.Valid(s) {
-			return s, true
-		}
+	card, awaiting := r.AwaitingHuman()
+	if awaiting && card.Level != "L1" {
+		// A settled L2 answer, or a queue that holds items the host has not
+		// finished displaying: either way there is a C18 card being waited on.
+		return statemachine.StateAwaitingApproval, true
 	}
 	for _, c := range r.Pending() {
 		if c.Level == "L1" {
-			if s := statemachine.StateConfirming; statemachine.Valid(s) {
-				return s, true
-			}
+			return statemachine.StateConfirming, true
 		}
 	}
 	return "", false
