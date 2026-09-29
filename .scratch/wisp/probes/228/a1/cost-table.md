@@ -130,7 +130,22 @@
 
 ## 4. D32 的资源口径（25MB／40MB 与 handle 数，**从 PLAN.md 现读**，不引票面转述）
 
-〔待填〕
+现核锚点：`PLAN.md:2221 ## 16.3 D32 — 资源 SLO 与延迟预算（**整体取代 D18 的两张表**）`。
+
+- **口径本体**（`:2223-2235`，`### 16.3.1 度量口径`）：`:2232-2233` 逐字 `唯一合法口径：Wisp 进程树私有内存 = Σ(常驻主进程 + 所有子进程) 的 Private Bytes`；`:2235` 逐字 `实现方式必须是 Job Object（C30），不是遍历进程快照`（并给了 `JOB_OBJECT_MEMORY_INFO.ProcessMemoryUsed` 这个 API 名）。`:2227-2228` 逐字：WebView2 派生 3–5 个 `msedgewebview2.exe`、各 ~60–120MB，面板一开树内瞬间多 200–500MB。
+- **附带指标**（`:2242-2245`）：逐字 `GDI 对象数 · User 对象数 · 句柄数 · goroutine 数 · 线程数` 全部纳入 SLO 采样与诊断包；`:2244-2245` 点名"分层窗口 + Direct2D + WebView2 的典型泄漏是 GDI/User 对象，RSS 上完全看不出来，直到 `CreateWindowEx` 开始失败"。⇒ **这一句是本票"球挂进哪条腿"的直接代价维度**。
+- **两个数本体**（`:2247` `### 16.3.2 内存与 CPU 上限（按态查表）`、表体 `:2253-2261`）：
+  - `:2255` `Sleeping`（空闲，KWS 关，**无子进程**）＝ **≤ 25MB / ≤ 40MB**（Y／X 两档并存）、CPU ≤ 0.5%、附加硬约束逐字含 `句柄 <300 · GDI <200 · goroutine ≤6`。
+  - `:2256` `Armed` ＝ 90/110MB、goroutine ≤7；`:2259` 面板开启 ＝ ≤600MB（含 WebView2 3–5 子进程）；`:2260` 工作峰值 ≤700MB；`:2261` 回落＝`Settling` 触发后 10s 内回到该态上限，且 `必须显式 debug.FreeOSMemory()`。
+  - `:2249-2251`：25MB 是"路径 Y（语音子进程）"那一档、40MB 是"路径 X（同进程 cgo）"那一档，**X 放宽是因为 onnxruntime DLL 卸不掉**。⚠ 这两档的取舍由 `PLAN.md:2025`（§15 第 4 项定案）写明**"不在方案里预选路径"、"X/Y 由 S0 spike 判定"** ⇒ **25/40 这枚数今天仍是两档并存，不是已定的一档**。
+- **实现侧口径与冻结件读数**（本腿只读，一字未动）：
+  - `internal/proc/jobscope_windows.go:125-142` `TreePrivateBytes()` 的实现是**逐 pid 调 psapi `GetProcessMemoryInfo` 取 `PrivateUsage` 相加**（`:223-242`），**不是** `PLAN.md:2235` 点名的 `JOB_OBJECT_MEMORY_INFO.ProcessMemoryUsed`。
+  - `internal/proc/treemetrics_windows.go:65-70` 逐字说明主进程**不**被 assign 进 Job（"assigning self to a KILL_ON_JOB_CLOSE job would kill the process at graceful shutdown"），而是作为树根手工并入统计（`:80-88`）。⇒ **口径＝"Job 里的子进程 ＋ 自己"，与 `PLAN.md:2233` 的 Σ(主＋子) 一致，与 `:2235` 点名的 API 名不一致**（事实级，供写腿知道数从哪来）。
+  - `internal/observe/thresholds.go`（**冻结件，只读**）：`:19` `memCapSleeping = 25 << 20` ⇒ **冻结件里的 Sleeping 只有 25MB 一档，没有 40MB 那一档**；`:33-34` `gdiLimitAll = 200`、`handleLimitAll = 600` ⚠ **与 `PLAN.md:2255` 的"句柄 <300"不同**——差别写在 `thresholds.go:10-14` 的 Ruling 1 里，逐字：`D32 wrote "handles <300" pre-measurement; the measured layered-window + D2D + DWrite stack alone holds ~420 handles, so every state that carries the ball window stack gates at <600 (measured 420 + margin)`。
+  ⇒ **本票最重要的一枚"量过的数"就在这里**：**"带球窗口栈"的句柄数＝约 420（实测，出自 `thresholds.go:11-12` 的 Ruling 1 记录）**，且这枚数是"整个分层窗口＋D2D＋DWrite 栈"的，不是"CLI 腿里多起一枚 STA"的增量。⚠ **口径要点明**：这是**被写进冻结件注释的实测结论**（2026-09-19 编排者裁定），本腿**没有**复跑任何测量（本腿禁跑二进制），也没有在仓里找到那台 spike 的原始读数文件——见 §8。
+  - `:36-37` `goroutineLimitSleeping = 6`／`goroutineLimitArmed = 7`；`:156-184` `goroutineVerdict` 只在 Sleeping／Armed 两态 `Gate: true`，其余态 `Limit: "record"`。
+  - `:24` `memCapWorkPeak = 700 << 20 // TARGET (gate=false) until S3/S5`——冻结件自己承认 700MB 未验收（与 `PLAN.md:2025` 第⑤支一致）。
+- ⚠ **D32 的"句柄 <300／GDI <200／goroutine ≤6"这一行是按"Sleeping 态的常驻进程"写的**，`PLAN.md` 里**没有任何一行**给出"CLI 腿在一发任务期间宿主一枚球"的内存或句柄读数。⇒ 该格在 §7 表里一律写"**没量过**"，只有"带球窗口栈 ≈420 句柄"这一枚是量过的、且它来自冻结件注释而非本腿。
 
 ---
 
