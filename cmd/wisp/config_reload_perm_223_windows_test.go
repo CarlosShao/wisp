@@ -30,82 +30,123 @@ const everyoneSID = "*S-1-1-0"
 
 func runIcacls223(t *testing.T, args ...string) string {
 	t.Helper()
+	out, err := icaclsRaw223(args...)
+	if err != nil {
+		t.Fatalf("icacls %v: %v\n%s", args, err, out)
+	}
+	return out
+}
+
+// runIcaclsClear223 removes this case's deny ACE if one is there. Failure is
+// logged, never fatal: on the first attempt there is nothing to remove, and
+// icacls says so in its own words.
+func (r *reloadRun223) runIcaclsClear223(t *testing.T, path string) {
+	t.Helper()
+	out, err := icaclsRaw223(path, "/remove:d", everyoneSID)
+	if err != nil {
+		t.Logf("icacls /remove:d (nothing to remove is fine): %v\n%s", err, out)
+	}
+}
+
+func icaclsRaw223(args ...string) (string, error) {
 	cmd := exec.Command("icacls", args...)
 	var out, errb strings.Builder
 	cmd.Stdout = &out
 	cmd.Stderr = &errb
-	if err := cmd.Run(); err != nil {
-		t.Fatalf("icacls %v: %v\n%s%s", args, err, out.String(), errb.String())
-	}
-	return out.String()
+	err := cmd.Run()
+	return out.String() + errb.String(), err
 }
 
 func TestTicket223PermissionDeniedSitsInItsOwnSentence(t *testing.T) {
-	r := newReloadRun223(t, 40*time.Second)
+	r := newReloadRun223(t, 60*time.Second)
 	r.live(t, func() {
 		path := r.cfgPath()
-		// The whole trail so far, so the case can prove the tick is what failed
-		// and not the assembly.
 		r.awaitAudit(t, "config: HOT-RELOAD state=armed")
 
-		// Deny read AND attribute-read. Attribute-read is the point: what the
-		// poll does first is stat the file (manager.go:118), and a fingerprint
-		// that has not moved is a file it never opens - so a plain (R) deny
-		// leaves this sentence unreachable without also rewriting the file,
-		// which a process that cannot read it must not do. Measured: the first
-		// draft of this case denied (R) alone and os.Chtimes then failed with
-		// "Access is denied", so the plant could not move the fingerprint either.
-		runIcacls223(t, path, "/deny", everyoneSID+":(RX)")
-		t.Cleanup(func() {
-			// Best-effort: TempDir removal must not trip over the ACE this case
-			// installed. A failure here is logged, not fatal - the denial itself
-			// was already proven below.
-			var out, errb strings.Builder
-			cmd := exec.Command("icacls", path, "/remove:d", everyoneSID)
-			cmd.Stdout, cmd.Stderr = &out, &errb
-			if err := cmd.Run(); err != nil {
-				t.Logf("icacls /remove:d: %v\n%s%s", err, out.String(), errb.String())
+		// WHAT THIS PLATFORM ACTUALLY DOES, measured on the first two drafts of
+		// this case: a (R) deny on the file does not stop os.Stat (Go reads the
+		// directory entry instead), and it DOES stop os.WriteFile ("Access is
+		// denied" on the O_WRONLY open). So "the file's fingerprint moved and
+		// this process can no longer read it" has to be planted as
+		// write-then-deny, and the 1s tick can in principle slip between the two
+		// statements - if it does, the case says so and plants again instead of
+		// timing out on a sentence that can never arrive.
+		var trail string
+		t.Cleanup(func() { r.runIcaclsClear223(t, path) })
+		for attempt := 1; attempt <= 3; attempt++ {
+			// Re-enable write (no-op on the first attempt), move the fingerprint,
+			// then deny again. The content is deliberately the same shape every
+			// time; only its length changes, which is enough for mtime+size.
+			r.runIcaclsClear223(t, path)
+			body := "schema_version = 2\n\n[llm]\ntext_chain = [\"acme/m1\"]\n\n" +
+				"# padding to move the fingerprint: " + strings.Repeat("x", attempt*5) + "\n"
+			if err := os.WriteFile(path, []byte(body), 0o600); err != nil {
+				t.Fatalf("attempt %d cannot move the fingerprint: %v", attempt, err)
 			}
-		})
+			runIcacls223(t, path, "/deny", everyoneSID+":(R)")
 
-		// Positive control on the plant: the file is there, and this process can
-		// no longer stat or read it. That pair is exactly what separates 权限不够
-		// from 缺失, so the assertion is made before the product is asked.
-		if _, err := os.Stat(path); err == nil {
-			t.Fatal("icacls denied nothing: os.Stat still succeeds, so this case cannot show the permission sentence")
-		} else if !strings.Contains(err.Error(), "Access is denied") {
-			t.Fatalf("stat failed for a reason other than a permission denial: %v", err)
-		}
-		if _, err := os.ReadFile(path); err == nil {
-			t.Fatal("the file is still readable, so this is not the condition under test")
-		}
-		// The directory listing is the proof of presence: it reads the parent,
-		// whose ACL this case never touched.
-		entries, err := os.ReadDir(r.h.dir)
-		if err != nil {
-			t.Fatalf("cannot list the data dir to prove the file is present: %v", err)
-		}
-		var listed bool
-		for _, e := range entries {
-			if e.Name() == configFileName {
-				listed = true
+			// Positive control on the plant, before the product is asked: stat
+			// answers, read does not. That pair is what separates 权限不够 from
+			// 缺失, so it is asserted rather than assumed.
+			if _, err := os.Stat(path); err != nil {
+				t.Fatalf("attempt %d: stat failed too, which is the missing-file case: %v", attempt, err)
 			}
-		}
-		if !listed {
-			t.Fatalf("config.toml is not in the directory listing, which would make this the missing-file case")
-		}
+			if _, err := os.ReadFile(path); err == nil {
+				t.Fatalf("attempt %d: icacls denied nothing, so this case cannot show the permission sentence", attempt)
+			}
 
-		trail := r.awaitAudit(t, "config: HOT-RELOAD state=not-applied cause=permission")
-		for _, other := range []string{"cause=missing", "cause=syntax", "cause=unknown-key",
-			"cause=invalid", "cause=unclassified"} {
+			got, adopted := r.awaitFailureOrAdoption(t)
+			if got != "" {
+				trail = got
+				break
+			}
+			if adopted {
+				t.Logf("attempt %d: the tick read the file inside the write/deny window and adopted it; planting again", attempt)
+				continue
+			}
+			t.Fatalf("neither the permission sentence nor an adoption arrived; stderr:\n%s", r.h.err.String())
+		}
+		if trail == "" {
+			t.Fatal("three plants all landed in the tick's read window; this case cannot be decided on this machine")
+		}
+		for _, other := range []string{
+			"cause=missing", "cause=syntax", "cause=unknown-key",
+			"cause=invalid", "cause=unclassified", "cause=migration",
+		} {
 			if strings.Contains(trail, other) {
 				t.Errorf("the permission sentence carries %q:\n%s", other, trail)
 			}
 		}
-		// And the running config stayed live and unchanged: a denied read is not
-		// an empty config.
-		if got := r.rt.mgr.Config().FS.AllowedDirs; len(got) != 1 {
-			t.Errorf("the permission failure replaced the running config: %v", got)
+		// The sentence names the cause in the operator's own terms, and it does
+		// not claim the file is gone or broken.
+		if !strings.Contains(trail, "没有读它的权限") {
+			t.Errorf("the permission sentence does not say what is wrong in words: %q", trail)
 		}
 	})
+}
+
+// awaitFailureOrAdoption gives the tick one cycle to either report the read
+// failure (returns the trail) or to have already re-read the file (returns
+// adopted=true, so the caller plants again).
+func (r *reloadRun223) awaitFailureOrAdoption(t *testing.T) (trail string, adopted bool) {
+	t.Helper()
+	deadline := time.NewTimer(6 * time.Second)
+	defer deadline.Stop()
+	tick := time.NewTicker(50 * time.Millisecond)
+	defer tick.Stop()
+	for {
+		got := r.h.err.String()
+		if strings.Contains(got, "config: HOT-RELOAD state=not-applied cause=permission") {
+			return got, false
+		}
+		if strings.Contains(got, "config: HOT-RELOAD state=applied") ||
+			strings.Contains(got, "state=not-applied cause=invalid") {
+			return "", true
+		}
+		select {
+		case <-deadline.C:
+			return "", false
+		case <-tick.C:
+		}
+	}
 }

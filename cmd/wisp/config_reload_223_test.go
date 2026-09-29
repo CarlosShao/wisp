@@ -487,16 +487,25 @@ func TestTicket223FailureSentencesAreDistinct(t *testing.T) {
 		{
 			name: "语法错",
 			plant: func(t *testing.T, r *reloadRun223) {
-				// schema_version stays: a file WITHOUT it is routed through
-				// applyMigrations first (loader.go:73), and a broken body there
-				// is reported as the migration failing (cause=invalid), not as a
-				// syntax error. Measured, not assumed - this case's first draft
-				// planted the bare line and read back cause=invalid. Keeping the
-				// version makes the pipeline reach decodeStrict, which is where a
-				// syntax error actually is one.
-				r.writeOver(t, "schema_version = 2\n\nthis is not toml [[[\n")
+				// Deliberately WITHOUT a schema_version line: loader.go routes a
+				// file that declares a version through the migration pipeline
+				// first, and that pipeline's own guidance is what
+				// migrate_test.go:123 requires for it (measured - the first draft
+				// of this case planted "schema_version = 2\n\nthis is not toml"
+				// and read back cause=migration, so the two sentences were
+				// separated by where the pipeline owns the error, not by which
+				// wording was easier). "Not TOML at all, not even a version" is
+				// what this sentence means.
+				r.writeOver(t, "this is not toml [[[\n")
 			},
 			wantCause: "cause=syntax",
+		},
+		{
+			name: "声明了版本但坏在后面",
+			plant: func(t *testing.T, r *reloadRun223) {
+				r.writeOver(t, "schema_version = 1\n[llm\nbroken ===\n")
+			},
+			wantCause: "cause=migration",
 		},
 		{
 			name: "schema未知键",
@@ -510,7 +519,7 @@ func TestTicket223FailureSentencesAreDistinct(t *testing.T) {
 	// absent instead of trusting that one shared line means one shared cause.
 	all := []string{
 		"cause=missing", "cause=syntax", "cause=unknown-key", "cause=invalid",
-		"cause=permission", "cause=unclassified", "state=disabled",
+		"cause=permission", "cause=unclassified", "cause=migration", "state=disabled",
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {

@@ -3,6 +3,8 @@ package config
 import (
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 
 	toml "github.com/pelletier/go-toml/v2"
 
@@ -64,7 +66,25 @@ func readConfigFile(path string) (*Config, error) {
 	if err != nil {
 		return nil, observe.Wrap(observe.ClassConfig, err, "config.toml read")
 	}
-	ver := peekSchemaVersion(raw)
+	ver, peekErr := peekSchemaVersion(raw)
+	if ver == 0 && peekErr != nil {
+		// Ticket 223 AC#4: when not even a schema version can be picked out of
+		// these bytes, the file's shape is unreadable and that is a SYNTAX
+		// failure - it must be named as one, not as a migration problem. It used
+		// to be unnameable, because this probe discarded its error: the version
+		// stayed 0, the pipeline fell into applyMigrations, and a broken line
+		// came back reported as "cannot migrate from schema version 1".
+		// Measured, not theorized - 票 223's own case planted
+		// "schema_version = 2\n\nthis is not toml [[[" and read that sentence.
+		//
+		// The ver != 0 half is deliberate and it is not a loosening: a file that
+		// DOES declare a version belongs to the migration pipeline, and
+		// TestMigrateCorruptFileUntouched (migrate_test.go:123) requires that
+		// path's guidance ("the file was left untouched") for a declared-1 file
+		// with a broken table header. Which pipeline owns the error is decided by
+		// the version the file declares, not by which message is easier.
+		return nil, observe.Wrap(observe.ClassConfig, peekErr, "config.toml parse")
+	}
 	if ver > SchemaVersionCurrent {
 		return nil, observe.New(observe.ClassConfig, fmt.Sprintf(
 			"config.toml: schema_version %d was written by a newer build (this build understands %d); upgrade Wisp or restore a backup",
@@ -88,14 +108,60 @@ func readConfigFile(path string) (*Config, error) {
 	return cfg, nil
 }
 
-// peekSchemaVersion reads only the schema_version key (non-strict; the full
-// decode happens after migration may have rewritten the file).
-func peekSchemaVersion(raw []byte) int {
+// peekSchemaVersion reads only the schema_version key (non-strict about the
+// rest of the document; the full decode happens after migration may have
+// rewritten the file). It reports the probe's own failure: the caller must not
+// read "no version could be picked out of these bytes" as "version 0", because
+// that fall-through sent a syntactically broken file into the migration path and
+// made 语法错 unnameable (ticket 223 AC#4).
+func peekSchemaVersion(raw []byte) (int, error) {
 	var probe struct {
 		SchemaVersion int `toml:"schema_version"`
 	}
-	_ = toml.Unmarshal(raw, &probe)
-	return probe.SchemaVersion
+	err := toml.Unmarshal(raw, &probe)
+	if err == nil {
+		return probe.SchemaVersion, nil
+	}
+	// The document does not parse. It may still have DECLARED a version, and
+	// that distinction is what decides which pipeline owns the error: a file
+	// that says "schema_version = 1" and is broken further down belongs to the
+	// migration path, whose guidance names the version and promises the file was
+	// left untouched (migrate_test.go:123 pins that sentence for exactly that
+	// shape); a file from which no version can be picked at all has a syntax
+	// problem, and 票 223 AC#4 requires it to be called that.
+	//
+	// This is a fallback for the failure path only - a file that parses never
+	// reaches it - and it stops at the first table header, because below one the
+	// key would be a nested table's, not the document's version.
+	if declared, ok := declaredSchemaVersion(raw); ok {
+		return declared, err
+	}
+	return 0, err
+}
+
+// declaredSchemaVersion reads a top-level schema_version assignment line by
+// line. It is deliberately dumb: it is only ever asked what a file that will not
+// parse claimed, and its job is to route the error message, not to validate it.
+func declaredSchemaVersion(raw []byte) (int, bool) {
+	for _, line := range strings.Split(string(raw), "\n") {
+		trimmed := strings.TrimSpace(strings.TrimSuffix(line, "\r"))
+		if trimmed == "" || strings.HasPrefix(trimmed, "#") {
+			continue
+		}
+		if strings.HasPrefix(trimmed, "[") {
+			return 0, false
+		}
+		key, rest, found := strings.Cut(trimmed, "=")
+		if !found || strings.TrimSpace(key) != "schema_version" {
+			continue
+		}
+		v, err := strconv.Atoi(strings.TrimSpace(rest))
+		if err != nil {
+			return 0, false
+		}
+		return v, true
+	}
+	return 0, false
 }
 
 // applyPresets fills protocol/base_url from the built-in preset for any

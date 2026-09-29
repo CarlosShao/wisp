@@ -108,6 +108,9 @@ func (rt *agentRuntime) startConfigReload() {
 	}
 	rt.reloadRoot = observe.NewRoot("config-reload")
 	// The two hooks ticket 223 found with zero production assignment points.
+	// (Mutation readings m1/m2 were taken against commented-out copies of these
+	// three lines at 15:16:52 and 15:19:20; docs/evidence/s1/223-hot-reload-wiring-r1.md
+	// carries the red readings, and both lines are back.)
 	rt.mgr.ConfirmLocked = rt.confirmLockedLoosening
 	rt.mgr.OnRestartPending = rt.reportRestartPending
 	// AC#1's production caller. Owner names the subsystem that spawned it; the
@@ -197,7 +200,7 @@ func (rt *agentRuntime) reportReload(rep *config.Report) {
 			// verdicts did not. Say it instead of letting the operator infer.
 			fmt.Fprintf(rt.stdout,
 				"wisp run: 注意 - 本次运行的路径判定仍按启动时建好的 C26 名单，"+
-					"新放宽的目录要重启进程才参与判定（原因：canonicalizer 只在装配时构造一次）。")
+					"新放宽的目录要重启进程才参与判定（原因：canonicalizer 只在装配时构造一次）。\n")
 			rt.auditf("config: D36-SECTION section=fs effect=memory-only-this-run "+
 				"detail=%q", "本次运行的 C26 canonicalizer 是启动时建的，放宽只对下一次启动生效")
 		}
@@ -332,6 +335,20 @@ func describeReloadFailure(err error) string {
 			return "cause=unknown-key detail=\"" +
 				"config.toml 语法没问题，但里面有这份 schema 不认的键（拼错的键会被这样拒绝，而不是被忽略）。" +
 				"本次运行继续用内存里的旧配置\""
+		case strings.Contains(d, "cannot migrate from schema version") ||
+			strings.Contains(d, "no migration registered"):
+			// Its own sentence because it has its own fix: this file declares a
+			// version this build cannot carry forward, and the config layer's
+			// message already promises the file was left untouched. Measured
+			// boundary (票 223 r1): a file that declares a version and is broken
+			// further down lands HERE, not in 语法错 - loader.go routes anything
+			// with a readable declared version through the migration pipeline,
+			// which is what migrate_test.go:123 requires. Saying "migrate" here
+			// and "syntax" only for bytes from which not even a version can be
+			// picked is the honest line, and it is drawn by measurement.
+			return "cause=migration detail=\"" +
+				"config.toml 声明了一个这份 Wisp 不会迁移的 schema_version（文件被原样留着，不会被重置）。" +
+				"本次运行继续用内存里的旧配置；升级 Wisp 或恢复备份才会读它\""
 		case strings.HasPrefix(d, "config.toml:"):
 			return "cause=invalid detail=\"" +
 				"config.toml 语法没问题，但内容被校验拒绝（值不合法或引用解不开）。" +

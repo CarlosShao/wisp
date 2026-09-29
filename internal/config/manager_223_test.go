@@ -83,8 +83,10 @@ func TestConfirmLockedRunsOutsideTheManagerLock(t *testing.T) {
 		case seenViaConfig = <-selfCh:
 		default:
 		}
-		observedCh <- observation{selfReadOK: selfOK, otherReadOK: otherOK,
-			pendingValue: seenViaConfig}
+		observedCh <- observation{
+			selfReadOK: selfOK, otherReadOK: otherOK,
+			pendingValue: seenViaConfig,
+		}
 		<-release // park on the "human"
 		return true
 	}
