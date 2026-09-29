@@ -10,21 +10,6 @@
 
 - 参照仓（本机现读，一律只读，被研仓里零写入）：`D:\work\AI\open source\` 下 6 家
   ＝ `Step-Code` / `deepseek-harness` / `minimax-code` / `openchamber` / `pi` / `pi-upstream`。
-- 已知坑与对应纪律：
-  - `openchamber`＝tarball 解包快照、**无 `.git`** ⇒ 不引提交历史，每条都带 `文件:行`。
-  - `deepseek-harness` 本机**两套装在不同版本**（npm `0.1.0-rc.6` 与 `~/.dsh/profiles` 257 枚包 `0.1.6-alpha.1`）
-    ⇒ 引 DSH 结论一律写明「哪份安装＋哪个版本」。
-  - 本轮**不新增克隆**，只把盘上这六家读穿。
-- 我方一侧的「有没有」＝只按 Go 侧现读 ＋ 票面/台账判定；`frontend/**` 与 `design/**` **零读零引零转述**。
-- 每条挂一个状态标记：〔已证＝我们真做了〕／〔建了但没接＝码在、生产没人调〕／〔仅文档＝规格写了、盘上没有〕／〔别人也没有〕。
-- 〔待填：分母读数（各家文件枚数）与本轮实读枚数，见 §7〕
-
----
-
-## §0 口径与分母（先说数字，再说读了多少）
-
-- 参照仓（本机现读，一律只读，被研仓里零写入）：`D:\work\AI\open source\` 下 6 家
-  ＝ `Step-Code` / `deepseek-harness` / `minimax-code` / `openchamber` / `pi` / `pi-upstream`。
 - **六家今天都有没有提交历史（这条改了上一版的前提）**：`Step-Code`／`deepseek-harness`／`minimax-code`／`pi`／`pi-upstream`
   **五家都有 `.git`**（HEAD 与各自主张的日期见 §5-2），**只有 `openchamber` 是 tarball 快照、没有 `.git`**
   ⇒ 只有 openchamber 需要"每一条都带 `文件:行`、不引历史"；其余五家两者都可以引（本版仍一律带 `文件:行`，因为那只尺更严）。
@@ -239,10 +224,30 @@
 
 ## §3 表三 · 状态文案（同一件事各家显示成哪几句原话）
 
-〔待填〕
+> 尺：下面每一句都是**文件里的原文**（英文串照抄英文、中文串照抄中文），不是我的转述。
+> 各家路径都在 `D:\work\AI\open source\` 下；`openchamber` 无提交历史，它的每一行只能当"当下快照"引。
 
 | 这件事 | 各家原话（点名＋`文件:行`） | 我们这边现在显示什么 |
 |---|---|---|
+| **它在动**（正在生成回复） | minimax：`Running`，前面一枚 `◇`（`minimax-code/packages/tui/src/tui/shell/activity-line.ts:241`）；Pi 系：`Thinking...`（`pi-upstream/packages/coding-agent/src/modes/interactive/interactive-mode.ts:455`，那是"把思考过程藏起来时用的默认标签"）；DeepSeek 的子代理行：状态点只有 进行中／完成／静止 三名（`deepseek-harness/packages/client/ui-subagent/src/SubagentHeaderLineage.tsx:334`） | 我们显示的是**状态名**不是短句：20 枚名字逐字 `FirstRun/Sleeping/Armed/Muted/Listening/Thinking/Acting/Speaking/Warm/Conversation/Confirming/AwaitingApproval/Settling/Downloading/Unconfigured/NoNetwork/Error/Queued/Stuck/WatchdogAlert`（`internal/statemachine/states.go:11-31`，上面那行注释逐字 "names exactly as in D43 / SPEC-08"）〔已证〕 |
+| **正在压缩上下文** | minimax：`Compacting context`（`activity-line.ts:257`）与 `Compacting now`（`packages/tui/src/tui/transcript/context-visualization.ts:211`）；Pi 系那枚命令**收自定义指令**（`pi-upstream/.../interactive-mode.ts:6858`）；DeepSeek 是"遮蔽、不删除，零参数，只人触发"（`deepseek-harness/packages/compaction/compaction/src/index.ts:143`、`types.ts:115-119`〔腿报〕）；openchamber 走服务端压缩，另有"被钉住的内容不进压缩区"（转引 `survey-2026-09-29-command-catalog-across-harnesses.md:35`） | ⚠ **20 枚状态名里没有"正在压缩"这一名**（本轮逐名读过上面那张名册），界面无从显示这一刻。**这一格是本版新查出来的，第三版没写过** |
+| **正在重试** | minimax：`Retrying model request`，或者把模型给的那句话接上（`activity-line.ts:245`）；Pi 系：`Retry failed after ${attempt} attempts: ${finalError}`（`interactive-mode.ts:3649`） | 有重试的**数**（`internal/config/schema.go:306-307` 最大次数与退避毫秒）〔已证＝键在并被读〕，**没有给用户看的那一句**〔仅文档〕 |
+| **正在重连** | minimax：`Reconnecting`，后面用 ` · ` 拼上原因（`activity-line.ts:252`） | 有 `NoNetwork` 这枚状态名，**没有"正在重连"这一形** |
+| **正在停**（人按了停止） | minimax：`Stopping response`，错误色＋图标 `!`（`activity-line.ts:259-260`）；DeepSeek 的停止控件是**两击**：首击上膛、3 秒内确认击才真杀，行状态先 `stopping` 再进已结束分组、detail 写 `cancelled by the user`（`deepseek-harness/packages/client/ui-jobs/README.zh.md:30`） | 我们的 `Stuck` 说的是"**它自己撞线被刹停**"，不是"**人叫它停**"；两击上膛在 Go 侧 0 个生产落点（本轮复量） |
+| **出错了** | minimax：`Runtime error`，或 `Error · <那句话>`（`activity-line.ts:264`）；Pi 系兜底串 `Unknown error occurred`（`interactive-mode.ts:1181`）；openchamber：`Folder access is required.`（`openchamber/packages/ui/src/lib/i18n/messages/en.ts:2313`）、`Camera access is off. Enable it in Settings to scan a QR code.`（同文件 `:150`） | 有 `Error` 状态名＋错误分类（D37）〔已证＝状态名在表上〕；**界面上那句人话本轮没量到**〔界面地界·不读〕 |
+| **此刻无事可做** | minimax：活动行**直接不渲染**（`activity-line.ts:141` 逐字 `if (safeWidth === 0 || this.state.phase === 'idle') return []`）；DeepSeek 后台任务那一格**没见到一枚任务就什么都不画**（`ui-jobs/README.zh.md:26` 逐字："普通对话不会为未使用的能力长出控件"） | 我们这颗球**恒有一个状态**（它是常驻视觉件，形状不同，不算缺）；⚠ 面板那一侧"没接上的能力会不会长出控件"这一维**只在数据层管住了**（"没值就不发那个键"，`internal/panel/pump.go:133-141`）〔已证〕 |
+| **在等你批准** | openchamber：`Permission required`（`en.ts:619`）＋卡上三枚 `Allow once`／`Always…`／`Deny`（`packages/ui/src/components/chat/PermissionCard.tsx:407-442`）；minimax：给人看的双语三名 `已允许／需要确认／已拒绝`（`minimax-code/packages/agent-modules/permission/src/reason-format.ts:27-30`）；DeepSeek：面板只给 `allowed-once`／`rejected` 两枚（`deepseek-harness/packages/client/ui-approval/src/client/contract/slots.ts:66`） | 有两个状态名（`Confirming`／`AwaitingApproval`）〔已证〕，**但"仅这一次"这个动词在面板上没有出口**（见 §4.C）；四条应答出口不可用时各说实话：`语音取消不可用`／`面板取消不可用（票 37 未接入）`／`悬浮球取消不可用`／`Esc 取消不可用`（`internal/agent/approval/approval.go:106-114`）〔已证在产码里〕 |
+| **拒绝了，还要告诉模型** | minimax：给模型那份**前缀固定英文** `[permission:denied source=<source>]`，注释逐字"这样模型和日志检索在任何界面语言下都能解析出来源"（`reason-format.ts:324-338`），来源四枚 `user`／`rule`／`safety`／`safety-immune`（`:306`） | 搜这一族串 **0 命中**〔根本没做〕 |
+| **它在转圈** | minimax 给模型的提醒逐字：`[runaway guard] The same tool error family has now occurred ${occurrences} times in a row. Do not retry the same route unchanged. …`（`packages/agent-modules/runaway-guard/src/reminder.ts:72-101`），**每套都挂一段"别把这条存进记忆"的防污染后缀**（`:59-60`） | 撞线时给人的那一条在（`EvStuck`，`internal/agent/sink.go:30-32`＋`internal/agent/loop.go:470-483`）〔已证〕；**按信号分套、说给模型听的话术没有**；防污染后缀这一维本轮**仍没量**（第三版 4.7 也标"没查"，本版维持"没量"） |
+| **附件相关的三句** | minimax：`无法预览 · 附件仍可发送`（`packages/tui/src/tui/features/composer/copy.zh-Hans.ts:5`）、`Cannot attach ${洗过的路径}: path is not a file.`（`attachments.ts:85-87`）、清单行 `N. 文件名 · mime · 人类可读字节数`（`:105-108`）；openchamber：`Anhänge sind zu groß zum Senden. Bitte versuche, die Anzahl oder Größe der Bilder zu reduzieren.`（`openchamber/packages/ui/src/lib/i18n/messages/de.ts:2240`） | **三句都没有**：受理器在、没人把结果发出去（`internal/panel/pump.go:226` 仍传空实参）〔建了但没接〕 |
+| **在等一件它自己会好的事**（等待态怎么写） | openchamber：`Waiting for the dev server` ＋第二行解释 `It is not accepting connections yet. This page will load as soon as it does.`（`en.ts:1345-1346`）；另有 `Waiting for reviewer`／`Waiting for implementer`（`:1698-1699`） | **没有这种"两行式"等待文案**的先例；最接近的一句反而是我们自己的：`切换分支／切换工作树今天不可用：网页到宿主的那一跳还没有落地（无 postMessage 接收器、无 router、无 WebView2 宿主）`（`internal/panel/git.go:82`）〔已证在产码里〕——**这句的形状其实比别家更诚实，但全仓只有这一处** |
+| **正在加载／加载失败** | minimax：`正在加载会话历史…`＋`Esc 取消`＋失败时 `Enter 重试 · Esc 关闭`（`packages/tui/src/tui/features/session-mutation/copy.zh-Hans.ts:6-8`）、`无法加载历史消息。`（`:94`）；DeepSeek：加载失败的提供方**被报告出来而不藏起其他提供方**，并给**重试**（`deepseek-harness/packages/client/ui-settings-subagent/README.zh.md:30`） | 〔界面地界·不读〕Go 侧没有"会话历史页"这一物 |
+| **这件事现在做不了，但告诉你怎么做才能做** | minimax：`停止当前回复后才能修改会话历史。`（`copy.zh-Hans.ts:23`）、`请先开始或恢复一个会话，再浏览历史。`（`:33`）、`请退出计划模式后再回退此会话。`（`:113`）、`请打开父会话后再执行回退。`（`:114`）；另一族**连退出路径一起给**：`${usage} is unavailable in side conversations. Press Ctrl+C to return to the main session first.`（`packages/tui/src/tui/commands/catalog.ts:760-766`） | **没有这一族句子**〔根本没做〕。我们的"做不了"是通道级实话（上面那四枚"取消不可用"），**没有"你该先做哪一步"那一半** |
+| **一半成功一半失败时怎么说** | minimax：`已回退 {turns} · 工作区文件未变`／`已回退 {turns} · 已还原 {files}`（`copy.zh-Hans.ts:88-89`）、`会话已回退，但部分文件改动未能还原。{error}`（`:160`）、`回退已完成，但当前会话视图刷新失败。请重新打开会话并确认状态。`（`:109`） | **没有这种"分段承认"的文案**；我们最接近的做法是"键在、值缺就响亮报"（`internal/config/unwired.go`，147 行、6 枚拒收键）〔已证〕 |
+| **改了配置但这次没生效，要不要告诉用户** | Step-Code：明说要先重启——`Restart Step to activate plugin contributions.`（`Step-Code/packages/coding-agent/src/step/plugins.ts:1185`）、`Restart Step to start the plugin's MCP server.`（`:1334`）、兜底 `No marketplaces configured.`（`:1395`）／`No marketplace named '${name}' is configured.`（`:999`）；DeepSeek：**免重启**（技能目录有监听器，`deepseek-harness/packages/skill-filesystem/src/index.ts:249-262`〔腿报〕）；openchamber：MCP **有健康状态**（`packages/ui/src/stores/useMcpStore.ts:34-40`〔腿报〕） | ⚠ **三家分两派，但"改了不生效也不告诉用户"这一形别家都不选**。我们是"靠重启生效"占多数（三档生效级别在 `docs/PLAN.md` 的 D36），**界面上没有任何一处会说出"这一枚要重启"** |
+| **还没有会话时**（空态） | Pi 系：`Session cwd not found`（`pi-upstream/.../interactive-mode.ts:2680`）；minimax：`暂无历史用户消息。发送消息后即可使用编辑、回退或分支。`、`暂无可用的已持久化用户提示词。发送消息后请重试 /fork。`（`copy.zh-Hans.ts:46,135`） | 〔界面地界·不读〕⚠ Go 侧已有同形先例，值得点名给界面那支：**名册为空时仍然发那一节**，用空数组＋池数字说明"这次没派过任何孩子"——**"没有"与"看不见"不许画成同一个样子**（`internal/panel/composer.go` 的 `Tasks` 节注释＋`internal/panel/pump.go:133-141`）〔已证〕 |
+
+> ⚠ 本表的"跨家"只在我**逐家点到行**的那些事件上成立。没点到的事件（例如"额度用尽""磁盘满了"）我不写"别家都／都没有"。
 
 ---
 
@@ -371,4 +376,62 @@
 
 ## §7 本轮读数的分母与实读量（口径附命令）
 
-〔待填〕
+**甲·参照仓分母（`D:\work\AI\open source\`，尺＝`find <家> -type f | wc -l`；代码件另给一把尺）**
+
+| 家 | 全部文件 | `.ts`／`.tsx`（排 `node_modules`／`dist`） | `.go` | 有 `.git`？ | 本轮读到的深度 |
+|---|---|---|---|---|---|
+| Step-Code | 1,438 | 1,153 | 0 | 有 | 定向读：`step/feedback/{bundle,consent}.ts`、`step/plugins.ts`、`step/slash-commands.ts`、`step/features/step.ts`、`core/slash-commands.ts`（抽点＋逐行读被引那几段） |
+| deepseek-harness（克隆 0.1.7-rc.2） | 13,880 | 5,146 | 0 | 有 | `packages/client` 66 条目全名册（52 枚 `ui-*`＋14 枚非 `ui-*`，逐名列出）；本轮**新增读穿 8 枚设置类包的 README**（见下方丙） |
+| minimax-code | 4,287 | 3,261 | 0 | 有 | `packages` 15 枚全名册；`agent-modules` 12 枚（第三版已并）；**本轮新增**＝`agent-modules` 之外的名册与分枚数＋`packages/tui` 的 6 枚文案件（`copy.en.ts`／`copy.zh-Hans.ts` 各两族，共 400 行，其中 173 行整枚通读） |
+| openchamber（**无 `.git`**） | 5,659 | 2,234 | 0 | **没有** | `packages` 8 枚全名册；`packages/ui/src` ＝ **3,187 枚文件**（568 `.tsx`＋1,418 `.ts`）；`ui/src/apps` ＝ 52 枚（带移动字样 36 枚）；`components/sections` ＝ 21 项名册；`lib/i18n/messages/en.ts` 定向抽句；本轮**未通读**任何一枚巨件 |
+| pi | 37 | 0 | 0 | 有 | **不是编码助手**（本轮复核：37 枚文件、0 枚 ts，与 `survey-2026-09-29-command-catalog-across-harnesses.md:17` 的读数同值）⇒ 本版不引它 |
+| pi-upstream | 1,969 | 1,597 | 0 | 有 | 定向读：`core/slash-commands.ts`、`modes/interactive/interactive-mode.ts`（抽 6 段带行）、`packages/tui/src/autocomplete.ts` |
+
+**乙·那六份本仓调研件（尺＝`wc -l`）与本轮实读**
+
+| 文件 | 行数 | 本轮实读 |
+|---|---|---|
+| `missing-features-2026-09-28-v3.md`（上一版） | 772 | **全读**（两段各通读一次） |
+| `survey-2026-09-28-composer-plus-menu.md` | 557 | **全读**（`:14-398` 与 `:399-557` 两段） |
+| `survey-2026-09-28-dsh-ui-packages.md` | 431 | **全读** |
+| `survey-2026-09-28-minimax-agent-modules.md` | 801 | **读 `:36-801`**（前面 `:1-35` 是标题与分母节，只抽过结构与读数，未通读正文） |
+| `survey-2026-09-28-oc-mobile-vscode-extensions.md` | 148 | **全读** |
+| `survey-2026-09-29-command-catalog-across-harnesses.md` | 61 | **全读** |
+
+⇒ **本腿只"并回"了这些件已经调研过的东西**，没有重复它们的调研；我只在下面三处亲自复核了 `文件:行`：
+① 五家 `.git` 有无；② `61 枚` 那个分母（复现不出来，见 §5-4）；③ DeepSeek 三枚对象与版本（见 §5-3）。
+
+**丙·本轮新读的参照面（不是重抄旧件，是打未覆盖面）**
+
+- DeepSeek 8 枚设置类包的说明文件：`ui-settings-agent-loop`、`ui-settings-shell`、`ui-settings-subagent`、`ui-settings-web-search`、
+  `ui-settings-models`、`ui-settings-general`、`ui-settings-plugins`、`ui-settings-plugin-inventory`、`ui-settings-account`
+  ⇒ 尺＝`Grep` 于 `deepseek-harness/packages/client/ui-settings-*/README.zh.md`，命中的每一条都进了 §2 表二。
+  ⚠ 这些是**说明文件**不是实现；`ui-*` 的 `src/**` 本轮一枚没读（第三版腿 2 同样没读，两版都不许当成"读过实现"）。
+- minimax 的界面文案双份件：`packages/tui/src/tui/features/session-mutation/{copy.en.ts,copy.zh-Hans.ts,copy.ts}`
+  与 `features/composer/{copy.en.ts,copy.ts,copy.zh-Hans.ts}`（尺＝`find packages/tui -name 'copy*.ts'`＝**6 枚**，行数见上）
+  ⇒ 这一族是 §3 表三的主要出处，第三版**完全没有引过**（它的 minimax 部分只读了 `agent-modules`）。
+- minimax 活动行：`packages/tui/src/tui/shell/activity-line.ts`（状态词表与逐相位文案）。
+- `minimax-code/third_party/pi-mono/`（本轮偶然发现：**minimax 仓里带着一份 Pi 的第三方副本**）
+  ⇒ 影响：任何"minimax 有 X"的结论都要先确认不是从这份 Pi 副本里读来的。本轮 §3 表三的 minimax 引文**全部出自 `packages/` 下**，未取自 `third_party/`。
+
+**丁·我方一侧本轮的现读（尺全部是 grep/ls/awk，未跑任何编译或测试）**
+
+| 量 | 今天读数 | 尺 |
+|---|---|---|
+| 配置项总数 | **173 枚键／19 个 section** | `grep -cE 'toml:"[a-z_0-9]+"' internal/config/schema.go`；section 名册 `internal/config/schema.go:108-133` |
+| 状态名总数 | **20 枚** | `internal/statemachine/states.go:11-31` 逐名读 |
+| 往外冒的消息种类 | **9 种**、`Event` 里无 序号／时间／轮次 | `sed -n '18,45p' internal/agent/sink.go` 逐名数＋`awk 'NR>=44&&NR<=70'` 搜三枚字段名 0 命中 |
+| 会话持久层 | 目录下**只有 1 枚文件**（`doc.go`） | `ls internal/session/` |
+| 名册行的字段 | 仍是 文本／产物路径／状态／父亲／名字／种类 **六枚**，无花费无计时 | `awk '/^type TaskOutput struct/,/^}/' internal/tools/task.go` |
+| 刷给界面那包内容的键 | **6 枚**（待答／结果／输入框／生成时刻／项目说明／名册） | `awk '/^type Snapshot struct/,/^}/' internal/panel/composer.go` |
+| 输入框载体的字段 | **9 枚**（含 4 枚附件相关） | `awk '/^type ComposerState struct/,/^}/' internal/panel/composer.go \| grep -c "json:"` |
+| 附件受理器的生产调用者 | **0**（只有定义那一行） | `grep -rn "Ingest(" --include=*.go internal cmd \| grep -v _test` |
+| 键位热改桥的生产调用者 | **1 处，且在调试工具里** | `grep -rn "NewHotkeyReloader" --include=*.go . \| grep -v _test` |
+| 命令名册／斜杠命令目录 | **0 命中** | `grep -rln --include=*.go -iE "slashcommand\|commandcatalog\|CommandRegistry" internal/ cmd/` |
+| 技能配置键 | **0**（同文件插件键 8） | `grep -c Skill`／`grep -c Plugin internal/config/schema.go` |
+| 刹车粒度 | 仍是整轮签名 | `grep -n "turnSignature" internal/agent/guard.go`（定义 `:234`、调用 `:166`） |
+| 刹车总开关 | **0 命中** | `grep -rniE "loop_guard.*enabled\|LoopGuardEnabled" --include=*.go internal/` |
+| 策略版本号 | **0 命中** | `grep -rniE "policy_version\|strategyVersion\|strategy_version" --include=*.go internal/` |
+| 送达账本／"丢了"状态 | **0 命中** | `grep -rniE "deliveredAt\|delivered_at\|TaskLost" --include=*.go internal/tools internal/memory internal/agent` |
+| 反问用户／逐事件台账 | **0 命中** | `grep -rniE "ask_user\|askuser\|user_question\|trajectory" --include=*.go internal/ cmd/` |
+| 面板入向四道门 | 装配在产命令里，**1 道有处理器、3 道明写空** | `cmd/wisp/panel_inbound.go:232-240`＋`internal/panel/composer_dispatch.go:62` |
