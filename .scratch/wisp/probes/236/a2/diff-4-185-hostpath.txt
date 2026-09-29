@@ -1,0 +1,15 @@
+diff .scratch/wisp/probes/185/r1/mut-m1/hostpath_185.go.orig .scratch/wisp/probes/185/r1/mut-m1/hostpath_185.go
+--- .scratch/wisp/probes/185/r1/mut-m1/hostpath_185.go.orig
++++ .scratch/wisp/probes/185/r1/mut-m1/hostpath_185.go
+@@ -86,4 +86,10 @@
+ }
+ 
+ // tail24 is mutation M1 only: relax the whole-path compare to the last 24 runes (the file-name half).
+-func tail24(s string) string { r := []rune(s); if len(r) > 24 { return string(r[len(r)-24:]) }; return s }
++func tail24(s string) string {
++	r := []rune(s)
++	if len(r) > 24 {
++		return string(r[len(r)-24:])
++	}
++	return s
++}

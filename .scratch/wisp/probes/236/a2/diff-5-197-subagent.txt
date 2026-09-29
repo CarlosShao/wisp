@@ -1,0 +1,20 @@
+diff .scratch/wisp/probes/197/r1c/pre/subagent_197.go.orig .scratch/wisp/probes/197/r1c/pre/subagent_197.go
+--- .scratch/wisp/probes/197/r1c/pre/subagent_197.go.orig
++++ .scratch/wisp/probes/197/r1c/pre/subagent_197.go
+@@ -302,10 +302,12 @@
+ 	case <-ctx.Done():
+ 		// The parent's call went away. The child keeps running and stays in the
+ 		// roster; nothing here cancels it.
+-		return Result{Text: fmt.Sprintf(
+-			"父任务这一侧已经不等了（%v）。子代理 %s 没有被级联取消，它仍在名册里，"+
+-				"可以单独停它：它的流键是 %s。", ctx.Err(), bg.ID, SubagentStreamKey(bg.ID)),
+-			IsError: true}, nil
++		return Result{
++			Text: fmt.Sprintf(
++				"父任务这一侧已经不等了（%v）。子代理 %s 没有被级联取消，它仍在名册里，"+
++					"可以单独停它：它的流键是 %s。", ctx.Err(), bg.ID, SubagentStreamKey(bg.ID)),
++			IsError: true,
++		}, nil
+ 	case res := <-done:
+ 		return t.answer(bg.ID, label, res, stampWhy), nil
+ 	}

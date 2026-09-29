@@ -1,0 +1,21 @@
+diff .scratch/wisp/probes/222/v1/mutations/m11-budget-50ms-gated/subagent_222_test.go.orig .scratch/wisp/probes/222/v1/mutations/m11-budget-50ms-gated/subagent_222_test.go
+--- .scratch/wisp/probes/222/v1/mutations/m11-budget-50ms-gated/subagent_222_test.go.orig
++++ .scratch/wisp/probes/222/v1/mutations/m11-budget-50ms-gated/subagent_222_test.go
+@@ -181,7 +181,7 @@
+ 
+ 	started chan<- struct{}
+ 	release <-chan struct{}
+-	late      time.Duration
++	late    time.Duration
+ }
+ 
+ func (c *child222) Stream(ctx context.Context, _ *llm.Request, emit func(llm.StreamEvent) error) error {
+@@ -288,7 +288,7 @@
+ 					answer:  fmt.Sprintf("子代理 %d 的结论正文 222", n),
+ 					started: h.started,
+ 					release: h.release,
+-					late:     200 * time.Millisecond,
++					late:    200 * time.Millisecond,
+ 				},
+ 				Tools:     h.bridge,
+ 				AdmitTask: func(string) func() { return func() {} },

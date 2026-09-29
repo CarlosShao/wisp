@@ -1,0 +1,12 @@
+diff .scratch/wisp/probes/183/r2/mut/task-boxset-off.go.orig .scratch/wisp/probes/183/r2/mut/task-boxset-off.go
+--- .scratch/wisp/probes/183/r2/mut/task-boxset-off.go.orig
++++ .scratch/wisp/probes/183/r2/mut/task-boxset-off.go
+@@ -250,7 +250,7 @@
+ 		// byte of it still taints like normal. The stub's wording and shape
+ 		// are frozen by PLAN.md:2564 / ticket 164's accepted AC#3 - nothing
+ 		// here changes a character the model reads.
+-	_ = hostPathBoxFromCtx(ctx)
++		_ = hostPathBoxFromCtx(ctx)
+ 		stub = fmt.Sprintf(
+ 			"%s\n[…输出已落文件：省略 %d 字符，总长 %d 字节 / 约 %d token%s，全文见 %s…]\n%s",
+ 			head, totalBytes-len(head)-len(tail), totalBytes, totalTokens, notice, rec.ArtifactPath, tail)

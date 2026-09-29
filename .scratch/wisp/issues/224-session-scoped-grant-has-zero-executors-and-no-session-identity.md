@@ -41,3 +41,14 @@
 ## 禁区
 
 不动 `docs/PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`；不动 `internal/perm/ticket90_persist_test.go`（三枚钉各管一头）／`internal/panel/l2_grant_boundary_test.go`（冻结件，且它的词根表禁 `allow`／`grant`／`decision`／`verdict` 等十二词×两拼 ⇒ **新字段只叫 `reason` 安全**）／`tokens_fourway_test.go`；不新增 C17 方法名；`frontend/**`／`design/**` 零写零转述；⚠ 与票 201／222／223 同撞 `cmd/wisp`／`internal/agent` ⇒ **串行**。
+
+### 2026-09-29 23:5x 编排者增量 — 撞钉预检（腿 `nail-1`，台件 `.scratch/wisp/probes/nail/1/precheck.md`＝**38,240 字节**）抓到**一枚与本票 AC#2 极性相反、今天还绿着的常驻钉**：⛔ 不写清这条就派 224 写腿，必然造出一枚假绿或一枚真红
+
+- **那枚钉，我现读复认（锚点 `98df640a`）**：`cmd/wisp/run_mode101_test.go`——`:400` 有字面量 `const session = "session-before-restart"`，`:427-441` 的注释与断言逐字为「Refused with the grant live IN ITS OWN SESSION, too: the assembly hands the bridge a mode, **never a grant source** (`Options.Confirmations` nil)」＋ `if !firstErr { t.Fatalf("boot 1 already let the B-tier .env write through …") }`。⇒ 它把"**带着生效中的本会话授权，同类写入仍必须被拒**"钉成了期望；而本票 **AC#2（`:36`）要的是相反的方向**（答复"本会话内允许" ⇒ 命中授权就不再弹卡）。
+- ⚠ **对腿那句"今天绿纯属侥幸"的更正（我把它写成两件事，别合并）**：它绿**不是因为字面量撞不上**，而是因为**生产那一侧今天根本没有授权来源**——我现跑 `grep -rn "Confirmations:" --include=*.go internal cmd`＝**1 命中，且在测试里**（`internal/tools/ticket90_test.go:524`），生产装配零枚 ⇒ `:427-441` 那句"never a grant source"**今天是真话**。本票 AC#1 现读也写着"生产铸造者＝0"。**⇒ 两件事叠加（没有铸造者＋没有授权来源）使这枚钉成立；本票一旦落地，恰好就是把这两件都打掉**，所以这枚钉**必须与本票 AC#2 同批改期望**，否则：不接⇒AC#2 假绿；接了⇒那枚钉红。
+- **我给的派单口径（写腿照做，验收腿照此判；三条一枚都不许少）**：
+  1. **授权改写 `cmd/wisp/run_mode101_test.go:427-441` 的期望**（该件**不是**冻结件，可改），但那两句注释必须改成**带条件的事实句**（不许留"never a grant source"这种在改后会变成假话的绝对句），且**逐字保留它原本要防的东西**（B 档 `.env` 在无授权时仍被拒）。
+  2. **加一枚锁**：断言"生产铸造的 session id **永远不等于** `session-before-restart` 这类测试字面量"——⛔ 没这条，AC#4（`:38`，反控／正控）会**假绿**：字面量若哪天被生产码复用，反控那发根本不红。
+  3. **交回时两发读数**：改前该钉绿的具名读数＋改后同一枚按新期望跑的结果（红必须能还原成绿）；并 `git status --porcelain -- internal cmd` 为空。
+- **相邻两枚禁字段核（本票不许顺手绕）**：`internal/tools/ticket90_test.go:431` 用反射钉死 `tools.Decision` **不许长 grant/allow 字段**、`agent.ToolRequest` **不许长 mode/allow 字段**。⇒ 本票要加的"会话身份"落在哪一枚结构上**是设计决定，不是实现细节**：写腿只能**提出落点**（`SessionID` 挂哪、谁铸、谁读），由**非实现者验收腿**判"这算不算那枚禁字段核的射程内"。⛔ 不许写腿自己边写边判、更不许动三枚冻结件（`internal/panel/tokens_fourway_test.go`／`internal/panel/l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`，本增量一句也不引其内容）。
+- **排程**：本票写腿落 `internal/tools/bridge.go`＋`cmd/wisp/run.go` ⇒ ⛔ **与在飞裁决腿 `235-v1` 串行**（它此刻正占 `internal/tools` 的测试与突变窗口；同包并发＝互相洗读数）。票 213／214／220 三张卡的结论是"有钉但都可用、不必改票面"，各自的界线已写进 `precheck.md`，派单时逐张抄过去。

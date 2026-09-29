@@ -1,0 +1,13 @@
+diff .scratch/wisp/probes/174/c2/zz174c2_wiring_pair_windows_test.go.orig .scratch/wisp/probes/174/c2/zz174c2_wiring_pair_windows_test.go
+--- .scratch/wisp/probes/174/c2/zz174c2_wiring_pair_windows_test.go.orig
++++ .scratch/wisp/probes/174/c2/zz174c2_wiring_pair_windows_test.go
+@@ -138,7 +138,8 @@
+ 			oa := c2Call(t, after, "task.output", map[string]any{"task_id": shape.id})
+ 			probeRead := func(b *Bridge, tag string) {
+ 				r := c2Call(t, b, "fs.read", map[string]any{
+-					"path": filepath.ToSlash(shape.path)})
++					"path": filepath.ToSlash(shape.path),
++				})
+ 				t.Logf("  [%s/%s] fs.read  -> isError=%v level=%v class=%q bytes=%d",
+ 					tag, shape.id, r.IsError, r.RiskLevel, r.ErrorClass, len(r.Text))
+ 			}

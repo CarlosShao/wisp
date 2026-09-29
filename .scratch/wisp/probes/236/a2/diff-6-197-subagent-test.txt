@@ -1,0 +1,78 @@
+diff .scratch/wisp/probes/197/r1c/pre/subagent_197_test.go.orig .scratch/wisp/probes/197/r1c/pre/subagent_197_test.go
+--- .scratch/wisp/probes/197/r1c/pre/subagent_197_test.go.orig
++++ .scratch/wisp/probes/197/r1c/pre/subagent_197_test.go
+@@ -78,8 +78,10 @@
+ 	}
+ 	if askSpawn {
+ 		_ = emit(llm.StreamEvent{Type: llm.EvToolCallStart, ToolCallID: "call-197-spawn", ToolName: "task.spawn"})
+-		_ = emit(llm.StreamEvent{Type: llm.EvToolCallArgsDelta, ToolCallID: "call-197-spawn",
+-			ArgsDelta: `{"description":"孙代理","prompt":"再派一枚"}`})
++		_ = emit(llm.StreamEvent{
++			Type: llm.EvToolCallArgsDelta, ToolCallID: "call-197-spawn",
++			ArgsDelta: `{"description":"孙代理","prompt":"再派一枚"}`,
++		})
+ 		_ = emit(llm.StreamEvent{Type: llm.EvToolCallEnd, ToolCallID: "call-197-spawn", ToolName: "task.spawn"})
+ 		_ = emit(llm.StreamEvent{Type: llm.EvStop, Stop: llm.StopToolUse})
+ 		_ = emit(llm.StreamEvent{Type: llm.EvDone})
+@@ -167,7 +169,8 @@
+ // "provenance engine not wired" fail-closed branch gets exercised against the
+ // real tool instead of a stand-in.
+ func (h *sub197Harness) buildWith(t *testing.T, childProvider func() llm.LlmProvider,
+-	admitWired bool, mutate func(*SubagentDeps)) {
++	admitWired bool, mutate func(*SubagentDeps),
++) {
+ 	t.Helper()
+ 	reg := NewRegistry()
+ 	deps := SubagentDeps{
+@@ -201,8 +204,10 @@
+ 			t.Fatalf("Register(%s): %v", e.Tool.Name(), err)
+ 		}
+ 	}
+-	h.bridge = New(Options{Registry: reg, Provenance: h.prov, Gate: NoGate{},
+-		Logf: func(string, ...any) {}})
++	h.bridge = New(Options{
++		Registry: reg, Provenance: h.prov, Gate: NoGate{},
++		Logf: func(string, ...any) {},
++	})
+ }
+ 
+ // spawnResult dispatches one task.spawn call through the real bridge, so the
+@@ -318,8 +323,10 @@
+ 	h := newSub197Harness(t)
+ 	started := make(chan struct{}, 1)
+ 	release := make(chan struct{})
+-	prov := &fake197Provider{name: "child", answer: foreign197A, roster: h.roster,
+-		started: started, release: release}
++	prov := &fake197Provider{
++		name: "child", answer: foreign197A, roster: h.roster,
++		started: started, release: release,
++	}
+ 	h.build(t, func() llm.LlmProvider { return prov }, true)
+ 
+ 	done := make(chan Result, 1)
+@@ -365,8 +372,10 @@
+ 	started := make(chan struct{}, MaxConcurrentSubagents+1)
+ 	release := make(chan struct{})
+ 	h.build(t, func() llm.LlmProvider {
+-		return &fake197Provider{name: "child", answer: foreign197A,
+-			started: started, release: release}
++		return &fake197Provider{
++			name: "child", answer: foreign197A,
++			started: started, release: release,
++		}
+ 	}, true)
+ 
+ 	results := make(chan Result, MaxConcurrentSubagents)
+@@ -431,8 +440,10 @@
+ // child's own run derives no second-generation row.
+ func Test197ChildCannotDeriveSubagent(t *testing.T) {
+ 	h := newSub197Harness(t)
+-	child := &fake197Provider{name: "child", answer: "我试了派一枚，失败了",
+-		askSpawnFirstTurn: true}
++	child := &fake197Provider{
++		name: "child", answer: "我试了派一枚，失败了",
++		askSpawnFirstTurn: true,
++	}
+ 	h.build(t, func() llm.LlmProvider { return child }, true)
+ 
+ 	// The directory the child is offered is the parent's minus task.spawn.

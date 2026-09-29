@@ -1,0 +1,11 @@
+diff .scratch/wisp/probes/163/a1/main.go.orig .scratch/wisp/probes/163/a1/main.go
+--- .scratch/wisp/probes/163/a1/main.go.orig
++++ .scratch/wisp/probes/163/a1/main.go
+@@ -2,6 +2,7 @@
+ //  1. 真注册表（照 cmd/wisp/run.go 的组合形状）里 shell.exec / shell.session 在不在；
+ //  2. 两发现实的独立 spawn：先 cd 再 pwd —— 量「第二条命令不知道第一条」；
+ //  3. 退出码是不是 Wait 状态取回的字段，并把「从输出文本里猜」那一味做成读数。
++//
+ // logdir 由旗标传入，调用方（gotest.sh）取脚本自身目录，不继承 CWD。
+ package main
+ 

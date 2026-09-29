@@ -1,0 +1,7 @@
+.scratch\wisp\probes\161\r5\negative-control\bad-sample.go
+.scratch\wisp\probes\162\r4\fs_write_m2.go
+.scratch\wisp\probes\226\v1\probe2\main.go
+.scratch\wisp\probes\226\v1\probe3\main.go
+.scratch\wisp\probes\226\v1\probe4\main.go
+.scratch\wisp\probes\226\v1\probe7\main.go
+.scratch\wisp\probes\235\v1\mut\prereadoff-m3_222_test.go
