@@ -35,9 +35,8 @@
 | `grep -n "time.Now\|\.Sub(\|time.Since\|Unix(" cmd/wisp/config_reload.go` | 只命中 `:37` 那一行**注释**（`//` 开头）。尺的判定：`tools/d22scan/main.go:759-770` 对每行 `TrimSpace` 后 `HasPrefix(code,"//")` 就 `continue` ⇒ 注释行不进 `wallclockRe`；非注释行**零命中** |
 | `grep -n "time.Now\|\.Sub(\|time.Since" internal/config/manager.go` | **零命中** |
 
-## AC#1 生产里真有人在轮询
-
-〔待填〕
+> **小节顺序说明（骨架先落盘留下的次序，不是漏写）**：本表按 `起手读数 → AC#1 → AC#2 → AC#3 → AC#7 → AC#5 → AC#6 → AC#4 → 编排者代落代跑 → 跨票 → 推翻清单 → 票面对照 → 没做完 → 时刻表 → 六节大白话` 排列。
+> ⛔ **没有任何一格是空的**：七格各有唯一一枚带判语的标题（`grep "^## AC#" `＝7 枚），骨架期的 3 处〔待填〕占位已在收工前删除。
 
 ## AC#1 生产里真有人在轮询 —— **成立（带注：这圈 tick 没被 join，是同类违约的第二枚实例）**
 
@@ -138,7 +137,7 @@
   - 收工自查＝`git status --porcelain -- internal/config cmd/wisp` 与 `git diff --stat -- internal/config cmd/wisp` **皆空**；本腿全程**没有 commit 任何源码**。
 - **另附注（产品事实，与突变无关）**：卡片挂在 `rt.reloadRoot.Ctx` 上（`config_reload.go:246`），`rt.close()` 取消该根（`run.go:701-703`）⇒ 收口时未答的卡被放弃、落拒绝，不会"顺手变宽"。但**放弃 ≠ 等待**：`reloadHandle` 无人 join（见 AC#1 的注）。
 
-## AC#4 不生效与读不到是四句话 —— **成立但带注（注＝有一句会说反，见推翻清单第 4 条）**
+## AC#4 不生效与读不到是四句话 —— **成立但带注（注＝有一句会说反，见推翻清单第 1 条）**
 
 
 - 台件＝**`go test -overlay`**（物理件全在 `.scratch/wisp/probes/223/v1/overlay/`：`zz_v1probe_config_test.go`／`zz_v1probe_cmdwisp_test.go`／`overlay.json`；**`internal/config` 与 `cmd/wisp` 目录里不存在这两枚文件，本腿零源码改动**）。
@@ -161,16 +160,8 @@
   | I1 首行就是 `[fs]` | `0,false` | `cause=syntax` | 对 |
   | K1 版本被写成字符串 | `0,false` | `cause=syntax` | 对（严格讲该归"值不合法"，但本腿不据此加码） |
   | M1 合法 v1 | 走真迁移 | `APPLIED hot=[] reload=[] restart=[] locked=0`，文件被重写并留 `.bak-1` | 对（唯一一发改了文件，符合 SPEC-03 §4.4） |
-- ⇒ **结论**：AC#4 的字面判据（四件各一句、不许合成一句）**成立**；`语法错` 这句话从"生产里不可能出现"变成"可达且有 9 发读数"，这是真修好。带注的部分＝决定句子归谁的**实际规则不是"能不能读出版本"，而是"读出的版本等不等于 2 ＋ go-toml 抛的是哪一种错误对象"**，于是一批"声明了当前版本又语法坏"的文件被告知"语法没问题"。这条具名进推翻清单第 4 条，**建议另立票**（修法要动 `describeReloadFailure` 的分类或 `formatDecodeError` 的 Detail 前缀，都不是本腿权限）。
+- ⇒ **结论**：AC#4 的字面判据（四件各一句、不许合成一句）**成立**；`语法错` 这句话从"生产里不可能出现"变成"可达且有 9 发读数"，这是真修好。带注的部分＝决定句子归谁的**实际规则不是"能不能读出版本"，而是"读出的版本等不等于 2 ＋ go-toml 抛的是哪一种错误对象"**，于是一批"声明了当前版本又语法坏"的文件被告知"语法没问题"。这条具名进推翻清单第 1 条，**建议另立票**（修法要动 `describeReloadFailure` 的分类或 `formatDecodeError` 的 Detail 前缀，都不是本腿权限）。
 - ⛔ 本腿**没有**为了让它绿去改判据，也没有碰 `internal/config/migrate_test.go:123` 那句既有断言（现读该行仍在，包仍绿）。
-
-## AC#6 裁决不在锁内（任务二：专属突变）
-
-〔待填〕
-
-## AC#7 "重启后生效"那一档要有出口 —— **成立但带注（AC#5 里那枚红就是它的用例）**
-
-〔待填〕
 
 ## 编排者代落＋代跑这两件事的独立裁决
 
