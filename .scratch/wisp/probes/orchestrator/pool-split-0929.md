@@ -12,9 +12,100 @@
 
 ---
 
-## 1. 后端-Go
+## 1. 后端-Go（83 枚）
 
-（占位：产码落 `internal/**`／`cmd/**`／`tools/**` 的纯后端票）。
+> 判据：该枚自己具名把写面／产码落点放在 `internal/**`／`cmd/**`／`tools/**`。
+> 片段一栏是**该枚文件里的原文子串**（≤12 字为主），行号＝该枚文件的行号，`1`＝标题行。
+> 归类口径＝**本编队要写的东西**（不是"禁改名单"里出现的路径）。
+
+| 票 | 行 | 据以分类的原文片段 |
+|---|---|---|
+| 20 | 1 | first tool family |
+| 21 | 1 | Approval gates minimal |
+| 22 | 1 | web.search/fetch/open |
+| 23 | 1 | system.\*, window.\* |
+| 24 | 1 | doc.read + local search |
+| 26 | 1 | TTS output |
+| 27 | 1 | Punctuation restoration |
+| 28 | 1 | SessionScope (C31) |
+| 29 | 1 | Memory system |
+| 30 | 1 | Result routing (D10) |
+| 31 | 1 | reminder.\* tools |
+| 33 | 1 | C27 PanelManager |
+| 35 | 1 | PanelBridge (C17) |
+| 41 | 1 | KWS wake word |
+| 42 | 1 | Watchdog |
+| 43 | 1 | Power & lifecycle |
+| 44 | 1 | CostMeter (C23) |
+| 47 | 1 | TaskScheduler + PathLock |
+| 48 | 1 | ApprovalQueue full |
+| 49 | 1 | Session grants |
+| 50 | 1 | Tier1 manifest plugins |
+| 51 | 1 | Tier2 goja runtime |
+| 52 | 1 | D46 command plugins |
+| 55 | 1 | macOS port |
+| 60 | 1 | C32 RealtimeEngine |
+| 61 | 1 | Cloud voice providers |
+| 64 | 1 | 热键接线 |
+| 65 | 1 | 玻璃质感返工 |
+| 68 | 1 | prototypeVisuals |
+| 103 | 9 | `internal/winsec/` |
+| 108 | 1 | 票 103 的守卫 |
+| 109 | 1 | 跨账户写窗 |
+| 114 | 1 | 门放在原生侧 |
+| 120 | 1 | check-then-act |
+| 128 | 1 | resolveDataDir |
+| 130 | 1 | 没有听众 |
+| 132 | 1 | 0 个生产调用者 |
+| 138 | 1 | TerminateJobObject |
+| 139 | 1 | compress.go 全文零条日志 |
+| 148 | 1 | cloneDecision 只护住 |
+| 160 | 1 | 自带关闭动作的句柄 |
+| 163 | 1 | 补一条常驻会话 |
+| 164 | 1 | 再补输出这一腿 |
+| 165 | 1 | 先出方案、你点头再动手 |
+| 166 | 1 | Go 侧那一腿 |
+| 167 | 1 | Go 侧那一腿 |
+| 168 | 1 | 做成可关的插件 |
+| 170 | 1 | 没有人能否决 |
+| 173 | 3 | 写面＝`internal/tools/bridge.go` |
+| 174 | 3 | 写面＝`internal/tools/**` |
+| 175 | 3 | 写面＝`internal/risk/provenance.go` |
+| 176 | 1 | 没有一个起跑口 |
+| 177 | 1 | 四支候选里三支要人拍板 |
+| 179 | 1 | Loop.decideRisk |
+| 180 | 1 | 生产码零读者 |
+| 181 | 1 | 一行读 git 的代码都没有 |
+| 185 | 1 | 被桥当场盖成 |
+| 186 | 1 | 本地／工作树／分支之间切 |
+| 187 | 1 | 要能当场改 |
+| 188 | 1 | 没有 Go 侧来源 |
+| 189 | 1 | Go 侧零来源 |
+| 190 | 1 | 宿主侧无源 |
+| 191 | 18 | 走的是同一套门控 |
+| 192 | 13 | 能预览哪几类 |
+| 194 | 1 | 补齐代码侧 |
+| 195 | 1 | 按节写入这层地基 |
+| 196 | 1 | 两套词表 |
+| 197 | 19 | 三层都要落地 |
+| 198 | 1 | 没有代码创建 `config.toml` |
+| 200 | 1 | 一枚代码都没有 |
+| 211 | 1 | 得先动 D38d 那枚天花板 |
+| 213 | 24 | 落点定案＝复用现成那枚解析器 |
+| 214 | 7 | 落点定案 |
+| 215 | 26 | 开关的落点 |
+| 216 | 24 | 落点选"显示前统一洗" |
+| 219 | 42 | 三枚按钮长在原生答复面 |
+| 220 | 1 | 布尔本身就是假的 |
+| 221 | 1 | 今天没注册 |
+| 222 | 1 | 占着桥的执行许可 |
+| 223 | 1 | 一次都没被调用过 |
+| 224 | 1 | 零执行者 |
+| 226 | 1 | 写回 `config.toml` |
+| 228 | 1 | 不在能干活的那条进程里 |
+
+⚠ 三枚**看着像界面但其实属这桶**，因为球是原生 Go 渲染的：`64`／`65`／`68`（`internal/ball`，实测各票 body 内 `internal/ball` 命中、`frontend` 命中 0）。
+⚠ 反向：`166`／`167`／`180`／`181`／`186`／`187`／`193` 的 Status 里都写了「界面腿归 owner 委托的那支」——那是**声明界面那半不做**，不是落点在界面，所以留在本桶（`193` 例外，见混合桶）。
 
 ---
 
