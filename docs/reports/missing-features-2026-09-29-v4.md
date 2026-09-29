@@ -513,6 +513,7 @@ minimax 的词表允许"当前／新工作树／已有工作树"作会话去处�
 - 正确说法：本版（和第三版）所有 DeepSeek 的行号都出自 **①源码克隆 0.1.7-rc.2**，**不是任何一套装机版**。引用时必须带上这句。
 
 **5-4 〔数错，而且是分母写歪〕"移动那一面 61 枚命名件"。**
+- ⚠⚠ **编排者 09-29 16:3x 自己复跑对尺，把这一条改正：推翻"半成立"，但本条说"复现不出来"说过头了。** 我现跑三把：`find .../ui/src/apps -type f`＝**52**（与本版一致）；`find .../ui/src/apps \( -iname '*mobile*' -o -iname '*widget*' \)`＝**36**（一致）；`find .../packages/ui/src -type f -iname '*mobile*'`＝**61**（**逐枚对上原始调研件那句"61 枚"**，出处 `docs/reports/survey-2026-09-28-oc-mobile-vscode-extensions.md` 第 0 节"溢出面"那行，它的口径写的就是 `packages/ui/src` 全域）。⇒ **正确的说法只有一句：第三版把口径标签贴错了地方**——那 61 枚属"`ui/src` 全域按 `*mobile*`"，不属"`ui/src/apps/` 那个目录"；**数字本身复现得出来**。本版按"含 widget"那一把尺得到 62，与我这把 61 只差在**要不要把 `*widget*` 算进"移动命名件"**（这是口径差、不是谁数错）。⛔ 因此**不许按本条现在的措辞把原始调研件那句"61"当错误删掉**——要改的是第三版那一行的**范围名字**，不是那个数。
 - 第三版说了什么：第 766 行「`packages/ui/src/apps/` **61 枚**移动命名件只全读 6 枚」。
 - 今天读数：`openchamber/packages/ui/src/apps/` 目录里**一共只有 52 枚文件**（尺 `find .../apps -type f | wc -l` ＝52），其中文件名带"mobile/widget"的是 **36 枚**；把范围放大到整个 `packages/ui/src`（3,187 枚文件）才是 **62 枚**（尺 `find openchamber/packages/ui/src \( -iname '*mobile*' -o -iname '*widget*' \) -type f | wc -l`）。
 - 正确说法：**"61"这个数在任何一把尺下都复现不出来**，而"只全读 6 枚"这个覆盖率是照着那个错分母说的。本版改写为：**整个 `ui/src` 有 62 枚带移动字样的件，其中 `apps/` 目录内 36 枚**。
