@@ -41,11 +41,32 @@
 
 ### 1.3 二十连跑判据（同一把尺）
 
-〔待填：等 20 发跑完〕
+尺（逐字，与 1.1 同一条、台件同一个脚本）：`export PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`，再 `go test ./cmd/wisp -count=1 -run 'TestTicket223RestartTierSaysItWillNotApply'` **20 发**，原始件 `.scratch/wisp/probes/223/r2/flake-20.txt`（未接 `| head`／`| tail`；跑前 `ps -W` 现查＝空，无别的 `go test` 在飞；shot 1 起手 16:38:55、shot 20 起手 16:40:15、约 16:40:3x 收尾）。
+
+**逐发 exit 码：20/20 全 0**——
+
+| 发 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| EXIT | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+
+`TOTAL=20 FAILS=0`；每发各有一行 `ok github.com/CarlosShao/wisp/cmd/wisp`（耗时 1.957s～2.285s 逐发在案；尺不带 `-v`，逐名 PASS 行不在这把尺的输出里——20 枚 `ok` 行在原始件内逐发可数）。对照改前 25 发 1 红（1.1）与历史 2/20：判据"同一把尺连跑 20 发全绿"**满足**。⛔ 未出现票 227 射程的 `always_write_no_clobber_226_test.go`——尺只 `-run` 本用例，且整包单发里它也没有红（见三把门节 `final-packages.txt`）。
 
 ### 1.4 正控（拿掉那句产品文案必须红）
 
-〔待填〕
+突变形状＝**改产码**（比改期望串更硬：证的是整条链"产品句子→轮询→断言"）：把 `cmd/wisp/config_reload.go` 里 `reportRestartPending` 的 stdout `Fprintf` 整段注释掉（两行审计 `:282`/`:284` 保留），跑一发 `go test ./cmd/wisp -count=1 -v -run 'TestTicket223RestartTierSaysItWillNotApply'`，原始件 `.scratch/wisp/probes/223/r2/positive-control-m1.txt`（16:41:57→16:42:43）。
+
+- **读数＝红，`EXIT=1`，`--- FAIL: TestTicket223RestartTierSaysItWillNotApply (42.18s)`**（40s 轮询期限＋运行时间＝形状正确：不是秒过，是等到了期限）。
+- 红句逐字：
+
+  > `config_reload_223_test.go:481: stdout never carried "本次运行不会生效" within 40s; full stdout:`
+
+  贴出的 stdout 里只有"答复监听已接入……"＋"配置热加载已接管……"两行通用文案；同一发的 stderr 里 `state=restart-pending`、`RESTART-PENDING detail=`、`state=applied` 三行审计都在——**正是"轮询非恒真"的直接证明：句子被拿掉时用例必红，句子在场时（1.3）用例必绿。**
+- 还原（⛔ 用 `git cat-file`，未碰 `checkout`/`restore`/`reset`/`stash`/`clean`）：`git cat-file blob HEAD:cmd/wisp/config_reload.go > cmd/wisp/config_reload.go`。
+- **certutil SHA256 两哈希逐字**（突变前基线＝还原后，`diff` 输出空＋`git status --porcelain -- cmd/wisp/config_reload.go` 空）：
+
+  `542f705ab7e3c7501ecd479c4096ffdda8a2192858ee7ce3557248a0d34f4670` ＝ `542f705ab7e3c7501ecd479c4096ffdda8a2192858ee7ce3557248a0d34f4670`
+
+  （原件落盘：`hash-config_reload-baseline.txt`／`hash-config_reload-restored.txt`）
 
 ## 任务二：AC#4 两句会说反的话归位
 
@@ -93,35 +114,82 @@ if peekErr != nil && ver >= SchemaVersionCurrent {
 
 ### 2.4 牙（把修法拿掉必须红）
 
-〔待填：还原 `c774f8da` 版 loader.go 后的红句原文、还原读数与哈希〕
+拿掉方式＝把 `internal/config/loader.go` 整枚还原成**改前锚点的 blob**：`git cat-file blob c774f8da:internal/config/loader.go > internal/config/loader.go`（r2 新支随之消失；⛔ 未用 `checkout`/`restore`/`reset`/`stash`/`clean`）。跑 `go test ./cmd/wisp -count=1 -v -run 'TestTicket223R2FailureSentenceRouting'`，原始件 `.scratch/wisp/probes/223/r2/teeth-loader-removed.txt`（约 16:43，`EXIT=1`）：
+
+- **读数＝恰红 5 发、其余 3 发照绿**——红的正是被修法接管的那 5 形，对照形（A1 读不出版本／A2 声明旧版／解析得开＋未知键）不动：
+
+  `--- FAIL: .../声明当前版_注释以方括号开头_C1`、`.../声明当前版_CRLF_E1`、`.../声明当前版_无空格_G1`、`.../声明当前版_缩进版本行_L1`、`.../声明未来版_正文语法坏_J1`（5 枚）
+  `--- PASS: .../读不出版本_A1_基线不动`、`.../声明旧版_坏表头_A2_仍归迁移`、`.../解析得开_未知键_不抢语法错`（3 枚）
+
+- 红句逐字（5 枚同形，G1 为例）：
+
+  > `config_sentences_223r2_test.go:111: shape 声明当前版_无空格_G1 is booked "cause=invalid detail=\"config.toml 语法没问题，但内容被校验拒绝（值不合法或引用解不开）。本次运行继续用内存里的旧配置\"", want it to open with "cause=syntax" - the two sentences swapped again`
+
+  ——这就是 223-v1 推翻清单第 1 条实测到的那个错句，用例把它原文抄回。**用例有牙：拿掉修法必红。**
+- 还原：`git cat-file blob HEAD:internal/config/loader.go > internal/config/loader.go`。**certutil SHA256 两哈希逐字**（改法后基线＝还原后，`diff` 空＋`git status --porcelain -- internal/config cmd/wisp` 空）：
+
+  `14251d9fa271e4eb93c7d58961fa49a494480b3fb71f2904242f9dabb28b0d30` ＝ `14251d9fa271e4eb93c7d58961fa49a494480b3fb71f2904242f9dabb28b0d30`
+
+  （原件落盘：`hash-loader-baseline.txt`／`hash-loader-restored.txt`）
+- 还原后的整包单发（`final-packages.txt`，16:44:00→16:45:53）：`ok internal/config 0.787s`＋`ok cmd/wisp 110.376s`——**含 `migrate_test.go:123` 那枚既有断言在内全绿**（`internal/config` 是整包 `-count=1` 跑的），且 226 那枚靠时序过关的用例这一发也没有红（读数在案，归因照旧是票 227 的账，本腿不动）。
 
 ## 三把门（原始结论落盘）
 
 | 门 | 读数 | 原始件 |
 |---|---|---|
-| `go build ./...` | 〔待填〕 | 〔待填〕 |
-| `gofumpt -l <本腿动过的文件>` | 〔待填〕 | 〔待填〕 |
-| `sh scripts/d22scan.sh` | 〔待填〕 | 〔待填〕 |
+| `go build ./...` | **`BUILD_EXIT=0`**（16:46:02） | `.scratch/wisp/probes/223/r2/gates-final.txt` |
+| `gofumpt -l <本腿动过的四枚文件>` | **零输出＝四枚全净**（新用例文件初稿被点名一次，`gofumpt -w` 修平后复检净） | 同上 |
+| `sh scripts/d22scan.sh` | **`d22scan: clean - no D22 ban violations`**，`D22SCAN_EXIT=0`；口径现抄：bans #1-5 扫 248 枚生产 Go 件（internal 219＋cmd 29），ban #8 含注释与 `_test.go` 扫 internal 460＋cmd 63 枚（**本腿新增/修改的四枚全在射程内且未报**）；自检 `runtests.sh: OK - PASS=34 FAIL=0 SKIP=0` | 同上 |
+| 附加：整包单发 `./internal/config ./cmd/wisp` | 两包 `ok`（`EXIT=0`） | `final-packages.txt` |
+
+⛔ `thresholds.go`、golden、`allowlist.txt`、三枚冻结件：全程零接触（本腿连打开都没有打开过）；`tools/d22scan` 一字未动。
 
 ## 定性（涉及"会说反的话"字样，按派单要求自带三行）
 
-〔待填：①现象出现在哪 ②有没有本机被入侵的证据 ③最坏后果是什么形状〕
+① **现象出现在哪**：本机 `wisp run` 进程手改 `config.toml` 后重读失败时、写给操作员看的那句中文的**归句选择**（测试腿红则是用例的读时序）——纯文案路由与测试写法层面。
+② **有没有本机被入侵的证据**：**没有**。零外部输入、零网络、零权限变化；所有失败路径的行为面从头到尾都是"本次重读不生效、内存继续用旧配置"（fail-kept），没有放宽过任何东西、没有绕过任何一张卡、SLO/阈值零接触。**这不是安全事件，是一次会说反的提示语＋一枚读早了的断言。**
+③ **最坏后果是什么形状**：改前——操作员把语法改坏，却被告诉"语法没问题，是内容不合法"，**排查方向被指错**（该看那一行 TOML 写法的人去查值），当次热加载不生效、旧配置继续跑；改后——这句归位，且由常驻用例双向钉住。测试侧最坏是"拿掉产品句子用例照绿"的装饰风险，1.4 正控已把它排除。
 
 ## 没做完／判不了（具名）
 
-〔待填；含：若 20 连跑里冒出 `always_write_no_clobber_226_test.go`（票 227 射程）的红——不修、具名登记〕
+1. **AC#5 的"整包终态"这把大尺本腿没有重跑**（`./cmd/wisp ./internal/...` 全量）：派单明令"不许跑整包门禁超过必要次数"，本腿只跑了动过的两枚整包（`internal/config` 全包＋`cmd/wisp` 全包各一发，均 `ok`）。v1 表在册的另外 6 枚红（`internal/ball` 1＋`internal/panel` 4 枚历史红、`internal/risk` 争用型 1）不属 r2 射程、本腿未碰；**"r2 之后 AC#5 该不该按终态翻勾"＝编排者复跑裁**（本表只交"本票用例自身那枚红已确定性堵上"的读数）。
+2. **J1（声明未来版＋正文语法坏）归语法错是本腿的现读裁**，依据＝派单条形 1（读得出声明版本而正文语法坏 ⇒ 必须报语法错那一句）＋"声明未来版的坏文件没有迁移可跑"；若编排者认为该保 newer-build 句（v1 判它"半说反"而非"说反"），改法是给新支加 `ver == SchemaVersionCurrent` 半条件＋用例改一行期望——**我没有自作扩大成两可形状，把裁点具名交回**。
+3. **`OnReload` 档在 `wisp run` 仍无生产赋值点**（v1 没做完第 3 条）：不在 r2 两格射程，本腿一字未动、复认仍在。归属仍待人拍板。
+4. **票 227 那枚跨票账没有触发**：整包单发里 `always_write_no_clobber_226_test.go` 在内全绿（`final-packages.txt` 的 `ok cmd/wisp 110.376s`）；20 连跑那把尺只 `-run` 本票用例、**根本不跑 226 那枚**（不算它的读数）。pool-2 警告的"1s tick 被 20 连跑转起来"没有咬到它。**不修、不立账——本腿没观测到红。**
+5. **翻勾判定不归本腿**：本腿是写腿（实现者），AC#4/AC#5 两格的成立与否按 D22 双角色只能出自非实现者新表＋编排者复跑；本表只交读数。
+6. 绿名册逐名对拉（v1 没做完第 1 条）仍缺分母件口径，本腿未做（不属两格射程）。
 
 ## 时刻表（本腿现跑）
 
-| 时刻(`date` 现读) | 命令 | 落盘 | 结果 |
+| 时刻(+0800，`date` 现读) | 命令 | 落盘 | 结果 |
 |---|---|---|---|
-| 〔待填〕 | | | |
+| 16:27:20 | 起手：锚点 `c774f8da`；`git diff --cached --name-only`＝空；`ps -W`＝空 | 本表起手节 | 索引干净、无门在飞 |
+| 16:2x | Write 骨架＋`git commit -F … -- <两枚 pathspec>` | 本表 | `28475620` |
+| ~16:28→16:31 | **改前复现** 25 发（PATH→`go test ./cmd/wisp -count=1 -run 'TestTicket223RestartTierSaysItWillNotApply'`，台件 `shots_223r2.sh`） | `pre-fix-repro.txt` | **25 发 1 红（shot 3，红句 `:453`）** |
+| 16:31→16:34 | 四枚 Go 件改动（awaitStdout／loader 新支／新用例／三处注释归真）＋`go build ./...`＋`go vet` 两包 | — | 净 |
+| ~16:35 | 新用例首跑（`-count=1 -v -run TestTicket223R2FailureSentenceRouting`） | `routing-test-first-run.txt` | 8/8 PASS 0.53s |
+| 16:38:55→~16:40:3x | **修后判据 20 连发**（同一把尺；跑前 `ps -W`＝空） | `flake-20.txt` | **20/20 EXIT=0** |
+| ~16:41 | `certutil -hashfile … SHA256` 基线两枚 | `hash-*-baseline.txt` | 见 1.4／2.4 |
+| 16:41:57→16:42:43 | **任务一正控**：产品 stdout 句子注释掉后一发 `-v` | `positive-control-m1.txt` | **FAIL 42.18s**；`git cat-file blob HEAD:…` 还原，哈希逐字相同 |
+| ~16:43 | **任务二牙**：`git cat-file blob c774f8da:… > loader.go` 后一发 `-v` | `teeth-loader-removed.txt` | **恰红 C1/E1/G1/L1/J1、对照三发绿**；`HEAD` 还原，哈希逐字相同 |
+| 16:44:00→16:45:53 | 整包单发 `go test ./internal/config ./cmd/wisp -count=1 -timeout 20m`（跑前 `ps -W` 现查＝空） | `final-packages.txt` | `ok 0.787s`／`ok 110.376s` |
+| 16:46:02→16:46:20 | **三把门**：`go build ./...`／`gofumpt -l`（四枚）／`sh scripts/d22scan.sh` | `gates-final.txt` | 0／净／clean |
+| 收工 | 票面追加一行 Status（旧两条逐字保留）；⛔ 不翻勾、不 `-done`、不 push | 票面＋本表 | 各节已齐 |
 
 ## 交回编排者的六节（大白话）
 
-**① 两件事各自动了哪几枚文件、行数**〔待填：`git diff --numstat` 原文〕
-**② 任务一 20 发逐发 exit 码与正控红句**〔待填〕
-**③ 任务二改前／改后两句原文并排＋新增用例有牙读数**〔待填〕
-**④ 三把门原始结论**〔待填〕
-**⑤ 票 223 该不该翻勾**〔待填——本腿是写腿，不自翻勾；只报"我这边两格缺口堵没堵上"〕
-**⑥ 没做完／判不了**〔待填〕
+**① 两件事各自动了哪几枚文件、行数**（`git diff --numstat c774f8da..HEAD` 原文：`11 6 cmd/wisp/config_reload.go`、`51 10 cmd/wisp/config_reload_223_test.go`、`124 0 cmd/wisp/config_sentences_223r2_test.go`、`24 6 internal/config/loader.go`；代码＝`5a755c3c`，骨架＝`28475620`）——任务一只动测试件（helper＋一处读法改轮询＋注释归真，⛔ 产品文案零改动）；任务二动 `loader.go`（新支）＋新用例一枚新文件＋`config_reload.go` 纯注释归真。
+
+**② 任务一**：改前 25 发复现出 1 红（第 3 发，红句与历史逐字同形），改后**同一把尺 20 发 exit 码全 0**（每发 `ok`、耗时 1.957～2.285s 逐发在案）。正控＝把产品那句"本次运行不会生效"注释掉再跑：用例 **42.18 秒红**，红句逐字 `stdout never carried "本次运行不会生效" within 40s`，而同一发 stderr 里两行 restart 审计仍在——**轮询不是恒真的装饰，是真在等那句话**；还原前后 SHA256 逐字相同（`542f705a…34f4670`）。
+
+**③ 任务二改前／改后两句原文并排＋新增用例有牙读数**——同一枚文件（声明 `schema_version = 2`、正文语法坏）：
+- 改前那句（错）：`cause=invalid detail="config.toml 语法没问题，但内容被校验拒绝（值不合法或引用解不开）。本次运行继续用内存里的旧配置"`
+- 改后那句（对）：`cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"`
+
+新增常驻用例 `TestTicket223R2FailureSentenceRouting`（8 形双向钉）首跑 8/8 绿；**拿掉修法必红**：还原成改前 loader 后恰红 C1/E1/G1/L1/J1 五发（红句逐字含 `the two sentences swapped again`，把错句原文抄回），对照三发（读不出版本／声明旧版／解析得开＋未知键）纹丝不动——迁移管线那格（`migrate_test.go:123` 的既有断言）一字未动、`internal/config` 整包仍绿；还原哈希逐字相同（`14251d9f…b28b0d30`）。
+
+**④ 三把门原始结论**：`go build ./...` 退出 0；`gofumpt -l` 对本腿四枚文件零输出；`d22scan` "clean - no D22 ban violations"（口径：bans #1-5 生产 248 枚，ban #8 含注释与 `_test.go` 扫 internal 460＋cmd 63 枚——本腿四枚全在射程内未报）。附加整包单发：`internal/config` 0.787s `ok`＋`cmd/wisp` 110.376s `ok`。原始输出全在 `gates-final.txt`／`final-packages.txt`。
+
+**⑤ 票 223 该不该翻勾**：**本腿是写腿，不自翻勾；七格一格没勾、票面不 `-done`**（派单令＋D22 双角色）。能交回的只有读数：v1 表里 AC#5 那枚"本票自己的红"已确定性堵上（20/20＋正控非恒真），AC#4 那句会说反的话已归位（有牙常驻用例双向钉住），全部现跑于含本腿改动的锚点。AC#5 的整包终态与两格翻勾＝等编排者复跑＋非实现者新表裁；对 J1 归句若有另一判法，见"没做完"第 2 条具名改法。
+
+**⑥ 没做完／判不了**：整包终态大尺没重跑（派单限制）；J1 归语法错＝现读裁、裁点具名交回；`OnReload` 档仍无人接（不在射程，复认仍在）；票 227 的 226 时序账本腿没观测到红、不动；翻勾不归实现者；绿名册逐名对拉仍缺分母件口径。（涉及"会说反／权限"字样的三行定性见专节——这两件事都不是安全事件。）

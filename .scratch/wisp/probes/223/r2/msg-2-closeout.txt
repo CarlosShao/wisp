@@ -1,0 +1,15 @@
+evidence+probes(223-r2): 交回——AC#5 堵口 20/20＋正控红 42.18s／AC#4 两句归位＋8 形有牙用例／三把门净；票面追加一条 Status、七格仍不翻勾
+
+r2 收工读数全量落盘：
+- pre-fix-repro.txt（改前 25 发 1 红，红句 :453 与历史逐字同形）
+- flake-20.txt（修后同一把尺 20 连发 EXIT 全 0，TOTAL=20 FAILS=0）
+- positive-control-m1.txt（注释产品句子→FAIL 42.18s，红句 stdout never
+  carried；hash-config_reload-{baseline,restored}.txt 逐字相同）
+- routing-test-first-run.txt（新用例首跑 8/8 绿）／teeth-loader-removed.txt
+  （还原改前 loader→恰红 C1/E1/G1/L1/J1、对照 3 形绿；
+  hash-loader-{baseline,restored}.txt 逐字相同）
+- final-packages.txt（internal/config 0.787s ok＋cmd/wisp 110.376s ok）
+- gates-final.txt（go build=0／gofumpt -l 净／d22scan clean）
+票面只追加新 Status 一条（含待裁点：J1 归句），旧两条逐字保留；
+七格一格不勾、不 -done；migrate_test.go:123／thresholds.go／golden／
+allowlist／三枚冻结件零接触；未 push。
