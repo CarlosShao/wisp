@@ -151,7 +151,36 @@
 
 ## 5. 球侧的收口形状（`internal/ball/*` ＋ `cmd/balldebug/main.go` 量具）
 
-〔待填〕
+尺＝逐枚打开读全文／关键段；票面记的 `:664-681`、`:86-91`、`:20-23`、`:47`、`:78-85`、`:904` **全部复认未漂**。
+
+**`internal/ball/ball_windows.go`（现核 1000 行级；关键形状）**
+
+- `:49-60` `Events` 九枚回调全是**裸 `func()`**（宿主传进来的闭包），`:35-46` `EventKind` 十枚枚举含 `EvTrayPanel/EvTrayMute/EvTrayPauseWake/EvTrayExit`。⇒ **`internal/ball` 不 import 审批包**（复认票面"现量"表第 5 行：它只把"用户选了哪一项"发出去，语义由宿主定）。
+- `:63-78` `Options`：`Registry *observe.Registry`，`:159-161` nil ⇒ `observe.Default`。
+- `:81` 注释逐字 `One Ball per process`；`:137-140` `activeBall atomic.Pointer[Ball]` ＋ 单一 `ballWndProc` 回调 ⇒ **同进程第二枚球不可用**；`:949-955` `registerBallClass` 走 `sync.Once`。
+- `:170-172` **`ui-sta` 的 Spawn 形状**（票面 AC#4 指的"那一形"）：`b.sta.handle = opts.Registry.Spawn("ui-sta", "ball", nil, func(_ context.Context) { b.sta.start(...) })`。⚠ **root 传的是 `nil`** ⇒ 这一枚**不挂任何 `observe.Root` 的 pending 计数**，只能靠 `Handle.Done()` join，`Root.Wait()` 对它无效。
+- `:196` `exStyle = wsExLayered|wsExTopmost|wsExToolWindow|wsExNoActivate`、`:212` `wsPopup`（`:197-207` 注释解释了为什么必须是 POPUP）。
+- `:306` `SetState(s statemachine.State)` ＝ D43 态的驱动入口（`balldebug` 全程用它：`cmd/balldebug/main.go:287/317/352/489/498/505/511/517/523/632`）。⚠ 这就是票 201 AC#6b"球真进那一态"要动的**唯一现成入口**。
+- `:664-681` `wmAppTray`：左键 → `OnTrayPanel`；右键 → `showMenu(...)` 返回值 `menuOpenPanel/menuMute/menuPauseWake/menuExit` 四分支各 `b.fire(...)`。⚠ `:723 func (b *Ball) fire(fn func())` 是回调派发点。
+- `:904-937` **`Close()` 的正确收口形状**（票面记 `:904`，复认）：`closed.Swap(true)` 幂等 → `PostTask` 里 `stopAnimTimer`+`stopLiquidTimer`+`unregisterAll(hwnd)`+`tray.remove()`+`rend.release()`+`DestroyWindow`（`:924` 现在**检查返回值并 slog.Error**）→ `<-done`（`:933`）→ `:934-936` **`<-b.sta.handle.Done()` join ui-sta 线程**。⇒ 注释 `:903` 逐字"After Close returns, the process holds no ball-side USER/GDI/D2D objects"——**球侧自己是把收口做完的，缺的是宿主有没有调它**。
+
+**`internal/ball/sta_windows.go`（162 行）**
+
+- `:47` `start` **阻塞直到消息泵退出**：`:52-53` `runtime.LockOSThread()`、`:62` `CoInitializeEx(STA)`、`:77-93` `GetMessage` 循环、`:80-82` `c == 0`（WM_QUIT）才 `break`、`:95` `releaseCOM()`。票面记 `:47` 复认。
+- `:127-143` `PostTask`（跨线程投递，`hwnd == 0` 时**就地执行**并注释说明是为了不让调用方死等于死线程）；`:156-162` `quit()`＝`PostMessage(wmNull)`＋`PostQuitMessage(0)`。
+
+**`internal/ball/tray_windows.go`（109 行）**
+
+- `:17-24` `trayUID = 0x5701` ＋ 四枚命令 id `menuOpenPanel=1 / menuMute=2 / menuPauseWake=3 / menuExit=4`（票面 `:20-23` 复认）。
+- `:86-91` 四枚标签逐字 `"打开面板" / "静音" / "暂停唤醒" / "退出"` ⇒ **这四处是字符串字面量，按票面禁区那条属 d22scan ban #8 射程**（本腿不跑仪器，只点名形状）。
+- `:5-6` 文件头注释逐字 `left click = open panel (no-op stub until ticket 33)` ⇒ **票面"托盘有个空 stub 那句是错的"这一条在本腿得到双重复认**：ball 侧只有注释，真正那句 `fmt.Println("tray: open panel (stub, ticket 33)")` 在**消费者** `cmd/balldebug/main.go:199`。
+- `:62-67` `remove()`＝`Shell_NotifyIconW(NIM_DELETE)`（由 `Close()` 在 STA 线程上调）。
+
+**量具 `cmd/balldebug/main.go`（663 行，⛔ 本腿只读未执行）**
+
+- `:78-85` `handleCount()`＝`kernel32!GetProcessHandleCount`（`:76`）；`:174` 启动即打一行 `balldebug: start handles=%d`。`:8-9` 文件头逐字：它打印 handle 数是"so the window-stack SLO gate (<600, docs/SLO.md) is measurable" ⇒ **量具现成但住在 debug 件里**（复认票面"现量"表第 3 支）。
+- `:33-47` 自陈：两枚自有 goroutine 名**故意不借产品名册**（`balldebug-hotkey-bridge`／`balldebug-level-feeder`），后果逐字 "one 'goroutine outside the D38 roster' WARN per spawn plus an entry in RosterReport.Unknown"，并点名"要消音得改 `internal/observe/goroutine.go` 的 `TemporaryNames`，那不是本票的决定"。⇒ **这是本腿在 §2 之外独立复认"Unknown 没有报警消费者、只有 WARN 日志"的一枚现场证据。**
+- `:188-211` 宿主接法：`statemachine.New` ＋ `ball.New(Options{Events: ..., Registry: observe.Default})`，九枚回调全是 `fmt.Println` 或 `gesture(b, m, kind)`（`:591`）；`:234/266/358` 三条退出路径都调 `b.Close()`。⇒ **今天全仓唯一一份"怎么当球的宿主"就是这枚 debug 件**（写腿若接球，参照系只有它）。
 
 ---
 
