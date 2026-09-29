@@ -314,6 +314,39 @@
 
 ## 7. 票 97 —— `97-dead-strict-param-and-the-comment-that-invents-a-caller-done.md`（2 枚）
 
+> 本腿现量：un = 2（`:53` `:55`）；AC 区共 5 枚，已勾 3 枚在 `:45` `:48` `:51`（un/chk 两条尺现跑：un=2／chk=3）。
+
+### 7.1 `:53` AC#4 注释与代码一致 —— **丙（账在票 230 AC#2；⚠ 本腿重读确认那句注释今天仍然撒谎，所以是"丙而活未死"）**
+
+- 原文行首逐字：`- [ ] **AC#4** 注释与代码一致：贴出你改前后的注释原文，并说明**新注释的每句话在代码里能找到对应物**。`
+- 缺什么，说得出口：`internal/agent/approval/queue.go:247` 的注释逐字（本腿现读）
+  「// stays an unknown correlation id. This function is the only reader of q.alias」——而 `q.alias` 在同文件里
+  有 **5 处命中**：`:197`、`:200`、`:210`、`:216`、`:257`（本腿现跑 `grep -n 'q\.alias' internal/agent/approval/queue.go`）。
+  验收方当年就把它记成外项：`docs/evidence/s1/97-adversarial-acceptance.md:34` 逐字
+  「**R-97-1** `queue.go:247` 那句 "This function is the only reader of `q.alias`" 字面为假（`:197`/`:210` 也读）」，
+  并在 `:16` 的 AC#4 行记「**通过（附 2 条找不到对应物的句子）**」。
+- 归口去处**本腿现读**：`230-four-cells-left-unfinished-inside-closed-tickets.md:21` 是一枚 `- [ ]`，逐字
+  「**AC#2 票 97 那句注释改成实话**：`queue.go:247` 的"唯一读者"要么改成"另有 `:197`／`:210` 两处读者，
+  但 `allow` 侧仍不可达，理由是……"，要么把那两处读者的存在具名解释掉」
+  ⇒ 活已被开放票 230 具名接走 ⇒ 判**丙**；⚠ 但**这枚丙的功能面为零**：230 AC#2 要的就是改那一行注释，
+  它一天不勾，97 这格一天就没有可翻的凭据。
+- ⛔ 不判丁、也不判乙：判据本体（"注释不许撒谎"）今天未兑现；它是 AC 区的正式一格，不是措辞残留。
+
+### 7.2 `:55` AC#5 门禁（按包）—— **甲（残余真活＝当前 HEAD 上的五个数；同一"门禁过期"形状见 6.3）**
+
+- 原文行首逐字：`- [ ] **AC#5** 门禁（按包）：`gofmt -l`/`gofumpt -l` 空、`go vet ./internal/agent/approval/` rc=0、`
+- 缺什么：**`gofmt -l`／`gofumpt -l` 空、`go vet` rc=0、`go test -count=2` 四数逐条点名（2 条 SKIP 必须点名）、
+  收尾 `sh scripts/d22scan.sh`** 这五发在**当前 HEAD** 上的一次非实现者读数。凭据（本腿现读）：
+  `docs/evidence/s1/97-adversarial-acceptance.md:17` 的 AC#5 行逐字开头
+  「**通过（PASS 相加≠RUN 的写法要更正，数字自洽）** | 〔独立复现〕 | 全部在 `f140079` 纯净快照…」
+  ⇒ 验收方的数**绑在 `f140079` 那棵快照树上**，对本锚点 `fac60ad4` 的树无效；本腿被派单禁跑任何门 ⇒ **补不了这把尺**。
+- 同一条里还留了一笔**没销的格式账**：`:36` 逐字「**R-97-3** 票内计数式"58+38+2 = 98 对得上"跨层相加
+  （顶层 58 + 子测试 38 + 顶层 SKIP 2），正确式子是"顶层 60（58 PASS + 2 SKIP」」⇒ 记甲时把这笔一起带上。
+- 归口核查：本腿把 230 的 5 枚框（`:19 :21 :22 :23 :24`）逐条读下来，**没有一枚**接"97 的门禁重跑" ⇒ 不是丙。
+- ⚠ 结构性话与 6.3 同一条：门禁类 AC 在结案票里天生会过期。**票 92 AC#6 与票 97 AC#5 是同一个形状**
+  （读数绑旧快照／HEAD 无新读数），建议编排者把它们当**一枚类别**处置（统一改成"结案时点有效"或统一搬出勾框），
+  别一张票一个判法。
+
 ## 8. 票 104 —— `104-sealfile-silently-drops-inherited-grants-done.md`（2 枚）
 
 ## 9. 票 105 —— `105-c26-rewrite-account-has-no-production-reader-done.md`（2 枚）
