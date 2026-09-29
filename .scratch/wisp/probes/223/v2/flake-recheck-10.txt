@@ -1,0 +1,26 @@
+=== START ===
+Tue Sep 29 17:22:48 CST 2026
+尺：go test ./cmd/wisp -count=1 -run 'TestTicket223RestartTierSaysItWillNotApply' × 10
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.247s
+shot 1/10 EXIT=0
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.065s
+shot 2/10 EXIT=0
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.100s
+shot 3/10 EXIT=0
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.147s
+shot 4/10 EXIT=0
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.093s
+shot 5/10 EXIT=0
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.120s
+shot 6/10 EXIT=0
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.028s
+shot 7/10 EXIT=0
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.017s
+shot 8/10 EXIT=0
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.061s
+shot 9/10 EXIT=0
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.084s
+shot 10/10 EXIT=0
+TOTAL=10 FAILS=0
+=== END ===
+Tue Sep 29 17:23:32 CST 2026

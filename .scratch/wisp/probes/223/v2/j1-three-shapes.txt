@@ -1,0 +1,38 @@
+=== START date ===
+Tue Sep 29 17:13:31 CST 2026
+=== anchor ===
+4dcc803c
+=== 台件＝overlay 虚拟件 cmd/wisp/zz_v2probe_cmdwisp_test.go（物理件 .scratch/wisp/probes/223/v2/overlay/），只 t.Logf 不判等
+=== 尺：go test -overlay .scratch/wisp/probes/223/v2/overlay/overlay.json ./cmd/wisp -count=1 -v -run TestV2ProbeJ1Shapes
+time=2026-09-29T17:13:35.398+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestV2ProbeJ1Shapes
+    zz_v2probe_cmdwisp_test.go:55: SHAPE a_未来版_正文语法坏
+          declared body = "schema_version = 99\nbroken [[[\n"
+          reload err    = config: config.toml parse: toml: expected character =
+          PRODUCTION LINE = cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+    zz_v2probe_cmdwisp_test.go:56: SHAPE b_未来版_正文解析得开
+          declared body = "schema_version = 99\n\n[app]\nbogus_future_only_key = 1\n"
+          reload err    = config: config.toml: schema_version 99 was written by a newer build (this build understands 2); upgrade Wisp or restore a backup
+          PRODUCTION LINE = cause=invalid detail="config.toml 语法没问题，但内容被校验拒绝（值不合法或引用解不开）。本次运行继续用内存里的旧配置"
+    zz_v2probe_cmdwisp_test.go:57: SHAPE c_未来版_顶层未知键
+          declared body = "schema_version = 99\nthis_key_does_not_exist = 1\n"
+          reload err    = config: config.toml: schema_version 99 was written by a newer build (this build understands 2); upgrade Wisp or restore a backup
+          PRODUCTION LINE = cause=invalid detail="config.toml 语法没问题，但内容被校验拒绝（值不合法或引用解不开）。本次运行继续用内存里的旧配置"
+    zz_v2probe_cmdwisp_test.go:58: SHAPE d_当前版_顶层未知键_对照
+          declared body = "schema_version = 2\nthis_key_does_not_exist = 1\n"
+          reload err    = config: config.toml: unknown key "this_key_does_not_exist" at line 2
+          PRODUCTION LINE = cause=unknown-key detail="config.toml 语法没问题，但里面有这份 schema 不认的键（拼错的键会被这样拒绝，而不是被忽略）。本次运行继续用内存里的旧配置"
+    zz_v2probe_cmdwisp_test.go:59: SHAPE e_当前版_解析得开_对照
+          declared body = "schema_version = 2\n"
+          reload err    = <nil>
+          report        = hot=[] reload=[] restart=[] locked=0
+    zz_v2probe_cmdwisp_test.go:60: SHAPE f_未来版_合法键全对_对照
+          declared body = "schema_version = 99\n\n[ball]\nsize = 64\n"
+          reload err    = config: config.toml: schema_version 99 was written by a newer build (this build understands 2); upgrade Wisp or restore a backup
+          PRODUCTION LINE = cause=invalid detail="config.toml 语法没问题，但内容被校验拒绝（值不合法或引用解不开）。本次运行继续用内存里的旧配置"
+--- PASS: TestV2ProbeJ1Shapes (0.39s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.445s
+EXIT=0
+=== END date ===
+Tue Sep 29 17:13:35 CST 2026

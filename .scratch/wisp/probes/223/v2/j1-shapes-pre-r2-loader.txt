@@ -1,0 +1,50 @@
+=== START date ===
+Tue Sep 29 17:20:14 CST 2026
+=== anchor ===
+1bb7477a
+=== loader.go 基线（改法后）哈希 ===
+SHA256 hash of internal/config/loader.go:
+14251d9fa271e4eb93c7d58961fa49a494480b3fb71f2904242f9dabb28b0d30
+CertUtil: -hashfile command completed successfully.
+=== 换回 c774f8da 形状后哈希 ===
+SHA256 hash of internal/config/loader.go:
+f9c93512776ed94bde9068e29dce082b42d800bbbee3ee8b3865df7d85c624ca
+CertUtil: -hashfile command completed successfully.
+=== 尺：同 ③ 节那条 overlay 台件，只换 loader.go 的形状 ===
+time=2026-09-29T17:20:17.633+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestV2ProbeJ1Shapes
+    zz_v2probe_cmdwisp_test.go:55: SHAPE a_未来版_正文语法坏
+          declared body = "schema_version = 99\nbroken [[[\n"
+          reload err    = config: config.toml: schema_version 99 was written by a newer build (this build understands 2); upgrade Wisp or restore a backup
+          PRODUCTION LINE = cause=invalid detail="config.toml 语法没问题，但内容被校验拒绝（值不合法或引用解不开）。本次运行继续用内存里的旧配置"
+    zz_v2probe_cmdwisp_test.go:56: SHAPE b_未来版_正文解析得开
+          declared body = "schema_version = 99\n\n[app]\nbogus_future_only_key = 1\n"
+          reload err    = config: config.toml: schema_version 99 was written by a newer build (this build understands 2); upgrade Wisp or restore a backup
+          PRODUCTION LINE = cause=invalid detail="config.toml 语法没问题，但内容被校验拒绝（值不合法或引用解不开）。本次运行继续用内存里的旧配置"
+    zz_v2probe_cmdwisp_test.go:57: SHAPE c_未来版_顶层未知键
+          declared body = "schema_version = 99\nthis_key_does_not_exist = 1\n"
+          reload err    = config: config.toml: schema_version 99 was written by a newer build (this build understands 2); upgrade Wisp or restore a backup
+          PRODUCTION LINE = cause=invalid detail="config.toml 语法没问题，但内容被校验拒绝（值不合法或引用解不开）。本次运行继续用内存里的旧配置"
+    zz_v2probe_cmdwisp_test.go:58: SHAPE d_当前版_顶层未知键_对照
+          declared body = "schema_version = 2\nthis_key_does_not_exist = 1\n"
+          reload err    = config: config.toml: unknown key "this_key_does_not_exist" at line 2
+          PRODUCTION LINE = cause=unknown-key detail="config.toml 语法没问题，但里面有这份 schema 不认的键（拼错的键会被这样拒绝，而不是被忽略）。本次运行继续用内存里的旧配置"
+    zz_v2probe_cmdwisp_test.go:59: SHAPE e_当前版_解析得开_对照
+          declared body = "schema_version = 2\n"
+          reload err    = <nil>
+          report        = hot=[] reload=[] restart=[] locked=0
+    zz_v2probe_cmdwisp_test.go:60: SHAPE f_未来版_合法键全对_对照
+          declared body = "schema_version = 99\n\n[ball]\nsize = 64\n"
+          reload err    = config: config.toml: schema_version 99 was written by a newer build (this build understands 2); upgrade Wisp or restore a backup
+          PRODUCTION LINE = cause=invalid detail="config.toml 语法没问题，但内容被校验拒绝（值不合法或引用解不开）。本次运行继续用内存里的旧配置"
+--- PASS: TestV2ProbeJ1Shapes (0.39s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.463s
+EXIT=0
+=== 还原为 HEAD blob（42220c9c…）＋哈希 ===
+SHA256 hash of internal/config/loader.go:
+14251d9fa271e4eb93c7d58961fa49a494480b3fb71f2904242f9dabb28b0d30
+CertUtil: -hashfile command completed successfully.
+=== 收工 git status（应为空） ===
+=== END date ===
+Tue Sep 29 17:20:18 CST 2026

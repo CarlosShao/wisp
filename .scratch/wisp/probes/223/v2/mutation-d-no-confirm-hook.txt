@@ -1,0 +1,64 @@
+=== START date ===
+Tue Sep 29 17:14:37 CST 2026
+=== anchor ===
+4dcc803c
+=== 突变前 config_reload.go 基线哈希 ===
+SHA256 hash of cmd/wisp/config_reload.go:
+388da4a1e81df99a0b557000c368d386cd9234da69721948e2e11e2c0d8e9851
+CertUtil: -hashfile command completed successfully.
+=== 突变＝注释掉 :114 rt.mgr.ConfirmLocked = rt.confirmLockedLoosening（:115 的 OnRestartPending 与 :119 的 tick 保留）
+=== 尺：go test ./cmd/wisp -count=1 -v -timeout 8m -run 'TestTicket223HandEditedFsLooseningCostsAnL2Card|TestTicket223ModeLooseningChangesTheRunningModeAfterAllow'
+BUILD_EXIT=0
+time=2026-09-29T17:14:44.770+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket223HandEditedFsLooseningCostsAnL2Card
+time=2026-09-29T17:14:45.977+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/29 17:14:45 mockllm: serving on http://127.0.0.1:56185 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-29T17:14:46.003+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223HandEditedFsLooseningCostsAnL2Card223412813\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-09-29T17:14:46.032+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223HandEditedFsLooseningCostsAnL2Card223412813\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-29T17:14:46.038+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-29T09:14:46Z duration_ms=6
+time=2026-09-29T17:14:46.044+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223HandEditedFsLooseningCostsAnL2Card223412813\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-29T17:14:46.050+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-29T09:14:46Z duration_ms=5
+time=2026-09-29T17:14:46.054+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-29T17:14:46.056+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-09-29T17:14:47.058+08:00 level=WARN msg="config: locked loosening rejected; keeping previous values" section=fs keys=[fs.allowed_dirs]
+    config_reload_223_test.go:295: no "config.reload" card was displayed within 40s; stdout:
+        wisp run: 答复监听已接入（卡片上给了编号）。原生侧：yes <编号> / no <编号> [理由] / veto <编号>；面板路线：panel-no <编号> [理由]、panel-yes <编号>（这一条只会被服务端 API 拒绝）、head / view <编号> 看卡片；quit 退出监听。
+        wisp run: 配置热加载已接管（每 1s 检查一次 config.toml）。手改会按 D36 三档处理：可热加载段立即生效；[risk]/[fs]/[net]/[plugins] 的放宽要先答一张 L2 卡，不答按拒绝保留旧值；重启档的改动本次不生效，会另有一句告诉你为什么不生效。
+        wisp run: [fs] 的放宽本次没有生效（原因：那张 L2 重新确认没有拿到「允许」）。旧的严格值仍在用，你写的这一行还在文件里：[fs.allowed_dirs]
+        
+        stderr:
+        [audit] perm: MODE-READ origin=startup mode=ask_every_step source="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket223HandEditedFsLooseningCostsAnL2Card223412813\\002\\config.toml"
+        [audit] config: HOT-RELOAD state=armed tick=1s path="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket223HandEditedFsLooseningCostsAnL2Card223412813\\002\\config.toml" goroutine=watchdog owner=config d36_confirm=on restart_notice=on detail="本进程会每 tick 重读 config.toml：手改的可热加载段立即生效，锁定段的放宽要先过一张 L2 卡，重启档会明确告知不生效"
+        [audit] config: HOT-RELOAD state=applied hot=[] reload=[] restart=[] locked=1
+        [audit] config: D36-SECTION section=fs direction=loosen approved=false effect=kept-old-values keys=[fs.allowed_dirs]
+        [audit] config: HOT-RELOAD state=denied section=fs keys=[fs.allowed_dirs] detail="放宽没有被确认（卡片被拒绝、被否决或没人答），内存里继续用旧值；配置文件里的那一行没有被丢掉，也没有被偷偷生效"
+--- FAIL: TestTicket223HandEditedFsLooseningCostsAnL2Card (41.32s)
+=== RUN   TestTicket223ModeLooseningChangesTheRunningModeAfterAllow
+time=2026-09-29T17:15:27.250+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/29 17:15:27 mockllm: serving on http://127.0.0.1:56206 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-29T17:15:27.270+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow533663877\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-09-29T17:15:27.293+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow533663877\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-29T17:15:27.300+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-29T09:15:27Z duration_ms=6
+time=2026-09-29T17:15:27.308+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow533663877\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-29T17:15:27.313+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-29T09:15:27Z duration_ms=5
+time=2026-09-29T17:15:27.318+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-29T17:15:27.320+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-09-29T17:15:28.322+08:00 level=WARN msg="config: locked loosening rejected; keeping previous values" section=risk keys=[risk.permission_mode]
+    config_reload_223_test.go:442: no "config.reload" card was displayed within 40s; stdout:
+        wisp run: 答复监听已接入（卡片上给了编号）。原生侧：yes <编号> / no <编号> [理由] / veto <编号>；面板路线：panel-no <编号> [理由]、panel-yes <编号>（这一条只会被服务端 API 拒绝）、head / view <编号> 看卡片；quit 退出监听。
+        wisp run: 配置热加载已接管（每 1s 检查一次 config.toml）。手改会按 D36 三档处理：可热加载段立即生效；[risk]/[fs]/[net]/[plugins] 的放宽要先答一张 L2 卡，不答按拒绝保留旧值；重启档的改动本次不生效，会另有一句告诉你为什么不生效。
+        wisp run: [risk] 的放宽本次没有生效（原因：那张 L2 重新确认没有拿到「允许」）。旧的严格值仍在用，你写的这一行还在文件里：[risk.permission_mode]
+        
+        stderr:
+        [audit] perm: MODE-READ origin=startup mode=ask_every_step source="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow533663877\\002\\config.toml"
+        [audit] config: HOT-RELOAD state=armed tick=1s path="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket223ModeLooseningChangesTheRunningModeAfterAllow533663877\\002\\config.toml" goroutine=watchdog owner=config d36_confirm=on restart_notice=on detail="本进程会每 tick 重读 config.toml：手改的可热加载段立即生效，锁定段的放宽要先过一张 L2 卡，重启档会明确告知不生效"
+        [audit] config: HOT-RELOAD state=applied hot=[] reload=[] restart=[] locked=1
+        [audit] config: D36-SECTION section=risk direction=loosen approved=false effect=kept-old-values keys=[risk.permission_mode]
+        [audit] config: HOT-RELOAD state=denied section=risk keys=[risk.permission_mode] detail="放宽没有被确认（卡片被拒绝、被否决或没人答），内存里继续用旧值；配置文件里的那一行没有被丢掉，也没有被偷偷生效"
+--- FAIL: TestTicket223ModeLooseningChangesTheRunningModeAfterAllow (41.26s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	82.675s
+FAIL
+EXIT=1
+=== END date ===
+Tue Sep 29 17:16:07 CST 2026

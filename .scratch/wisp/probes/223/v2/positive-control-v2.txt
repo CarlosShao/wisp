@@ -1,0 +1,33 @@
+=== START date ===
+Tue Sep 29 17:09:14 CST 2026
+=== anchor ===
+b04c3754
+=== 突变说明：cmd/wisp/config_reload.go 的 reportRestartPending stdout Fprintf 整段注释掉（两行 stderr 审计保留）
+=== 尺：go test ./cmd/wisp -count=1 -v -run 'TestTicket223RestartTierSaysItWillNotApply'
+time=2026-09-29T17:09:18.323+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket223RestartTierSaysItWillNotApply
+time=2026-09-29T17:09:19.388+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/29 17:09:19 mockllm: serving on http://127.0.0.1:50726 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-29T17:09:19.415+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply3457674355\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-09-29T17:09:19.443+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply3457674355\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-29T17:09:19.449+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-29T09:09:19Z duration_ms=6
+time=2026-09-29T17:09:19.455+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply3457674355\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-29T17:09:19.461+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-29T09:09:19Z duration_ms=5
+time=2026-09-29T17:09:19.465+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-29T17:09:19.466+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+    config_reload_223_test.go:481: stdout never carried "本次运行不会生效" within 40s; full stdout:
+        wisp run: 答复监听已接入（卡片上给了编号）。原生侧：yes <编号> / no <编号> [理由] / veto <编号>；面板路线：panel-no <编号> [理由]、panel-yes <编号>（这一条只会被服务端 API 拒绝）、head / view <编号> 看卡片；quit 退出监听。
+        wisp run: 配置热加载已接管（每 1s 检查一次 config.toml）。手改会按 D36 三档处理：可热加载段立即生效；[risk]/[fs]/[net]/[plugins] 的放宽要先答一张 L2 卡，不答按拒绝保留旧值；重启档的改动本次不生效，会另有一句告诉你为什么不生效。
+        
+        stderr:
+        [audit] perm: MODE-READ origin=startup mode=ask_every_step source="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket223RestartTierSaysItWillNotApply3457674355\\002\\config.toml"
+        [audit] config: HOT-RELOAD state=armed tick=1s path="C:\\Users\\swq\\AppData\\Local\\Temp\\TestTicket223RestartTierSaysItWillNotApply3457674355\\002\\config.toml" goroutine=watchdog owner=config d36_confirm=on restart_notice=on detail="本进程会每 tick 重读 config.toml：手改的可热加载段立即生效，锁定段的放宽要先过一张 L2 卡，重启档会明确告知不生效"
+        [audit] config: HOT-RELOAD state=restart-pending sections=[app] effect=next-process-start tier=restart
+        [audit] config: RESTART-PENDING detail="这些键只在进程启动时被读一次并交给平台层（开机自启注册、单实例锁、界面语言），本次运行没有重新加载它们的路径；内存里继续用旧值，文件里的新值没有被丢掉，重启进程后生效" keys=["app.language" "app.autostart" "app.single_instance"]
+        [audit] config: HOT-RELOAD state=applied hot=[] reload=[] restart=[app] locked=0
+--- FAIL: TestTicket223RestartTierSaysItWillNotApply (42.18s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	42.221s
+FAIL
+EXIT=1
+Tue Sep 29 17:10:00 CST 2026
