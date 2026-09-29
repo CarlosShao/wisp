@@ -47,6 +47,7 @@ wisp secret unset <name>      # 删除 blob，并检查是否仍被 config 引�
       —— 未勾原因：`TestSecretEndToEndConfigRefResolvesAtRequestTime` 证明了 ref→`config.LoadFile`→
       `ProviderKeys`→`Authorization` 头真的上线，但发请求的是测试自己的 http client，不是
       `internal/llm` 的 provider；provider 那一段是调用方自证的（README 规则：安全判定不得由调用方选择器决定）。
+      `done-fix-1` 追加（甲类·**账在票 12**，⛔ 不翻勾）：接管票核实**通过**——`12-cli-text-path-s1-gate.md:109` 是一枚 `- [x]`，其正文 `:112` 逐字「**Handed here from ticket 63 AC#6**, whose end-to-end proves ref→`config.LoadFile`→`ProviderKeys` but issues the request with its own http client」，完成判据与闭环记在 `:115`–`:116`（「—— **A8 就此闭环**：`cmd/wisp/run_test.go::TestRunTextTaskKeyResolvesInTheStore`…＋`TestMissingBlobFailsUnconfiguredNeverSilently`」）。盘上面本腿也现读了：`internal/llm/resolver.go:17`/`:30`/`:139`/`:144` 真在解析 `api_key_ref`（含"没有 key resolver 就 Unconfigured"那条响亮失败）。⇒ 这一格的账**已换到票 12 名下并已勾**，63 这框按派单不翻（翻它＝替别人的一手交付在这里再记一次，两处两个日期）。
 - [x] 对抗验收由非实现者执行，报告含与本表 **1:1 的裁决表**（README 规则 6）。
       —— 验收报告：`docs/evidence/s1/63-adversarial-acceptance.md`（编排者亲自执行：派出的验收代理
       在 26 次工具调用后被平台连接中断杀死，它已种下的变异 M2 被我保存到仓库外、跑完、再还原生产文件）。
