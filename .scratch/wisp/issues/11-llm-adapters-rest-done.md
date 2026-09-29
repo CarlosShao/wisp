@@ -53,6 +53,7 @@ switching and the complete user-visible failure-semantics table (§14.2) enforce
 - [ ] Probe suite: mockllm control endpoints emulate fc-capable / fc-broken / vision-capable
       providers → probe results land in provider_health with correct ✓/✗; declared-vs-measured
       mismatch event emitted.
+      `done-fix-1` add (甲类·**账在票 12**，⛔ not ticked): the ticket face says so itself — `:66`（09-20 10:20Z log，`agent-ticket11-probe-2`）逐字「**LEFT AC#6 UNTICKED on purpose**」三条原因（装配根没人调 / thinking 沿用票 09 的检查 / audio 按契约推票 61），改名 commit `9293518d` 正文逐字「**AC#6 transferred as A11**, ruling R12」（本腿 `git show -s --format=%B 9293518d` 现读）。接管票核实**通过**：`12-cli-text-path-s1-gate.md:120` 是一枚 `- [x]`，`:123` 逐字「Handed here from ticket 11 AC#6, registered as **A11**」，`:128` 逐字「**A11 就此闭环**」（正反两向都钉）。盘上面本腿今天在树里现读三处都在：`internal/llm/probe_health.go:14` 头部注释自称「Ticket 11 AC#6, consumer side」、`cmd/wisp/providers.go:189`/`:195` 真在消费 `llm.ProbeMismatch`、`cmd/wisp/providers_test.go:143` 有「the declared-vs-measured event was not announced」这条断言。⇒ 三条原因里第一条已由票 12 兑现并勾上；后两条（thinking／audio）的射程在票 12／票 61，本腿不替它们判。
 - [x] Token bucket: rpm=10 fixture → 11th request within 60s waits locally (no 429 from server).
 
 ## Progress log (append-only, newest last)
