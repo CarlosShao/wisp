@@ -15,6 +15,18 @@
 5. **owner 那句"/可以调出 MCPs"五家都没做**：只有 Step-Code 有 `/mcp`，而且是**只读回显"配置了 vs 加载了"**。⇒ 与票 215 的禁区一致：**MCP 这轮不接**，最多在名册里留个位置（且要按第 4 条那形"只回显、不动手"）。
 6. ⚠ **反面参照**：openchamber 的"命令＝给用户看一句＋给模型塞一段指令"（`slashCommands.ts:1-13`）**不要照抄**——它与"面板侧来源的 L2 允许"那条禁令同源（账 `A207`／`Q-49` 那一族）。
 
+## 09-29 11:3x 第二轮：一枚**会挡住本票的钉**已现读确认 ⇒ 落点必须换（编排者自己 `sed` 过原文）
+
+> 来源＝只读腿 `213-c1`（产出件 `.scratch/wisp/probes/213/c1/inventory.md`，**35,987 字节**，编排者 `wc -c` 现核）＋外部对照件 `docs/reports/survey-2026-09-29-command-catalog-across-harnesses.md`。
+>
+> 1. ⛔ **本票原来"新建一枚命令登记表"的思路会撞一枚现存的钉**：`internal/panel/l2_grant_boundary_test.go` 的 `poolJudgedByRealGuard` 会把包里**任何"第二枚 route 形状的 switch/if 链"**报成——注释原文逐字「a second switch/if chain … **exactly the shape a handler registry takes**」（`internal/panel/composer_dispatch.go:20-26` 复述了这枚钉的行为，并注明 default 分支**拒绝并留审计**、今天外部到不了）。
+>    ⇒ **这不是"别家怎么做我们怎么做"的问题，是我们自己仓里有一枚负向钉的射程盖到了本票要写的东西**（这正是 `A` 字头那族"派写腿前先跑撞钉预检"该拦住的事，这次在派之前就拦住了）。
+>    ⇒ **落点定案＝不新建登记表，复用现成那枚解析器**：`internal/agent/control.go:36` 一带是**本仓唯一一枚"名字→本地执行、不走 LLM"的现成解析器**（D11 控制词那条链，`control.go:51` ← `loop.go:341`，`213-c1` 报〔已证〕）。
+>    ⚠ **仍未裁完的一格（不许由写腿自行决定）**：复用 `control.go` 是否把"面板侧新增命令名"变成 **C17 那张闭集方法表**（`internal/tools/bridge.go:42-45`，今天 **4 枚**）的第五次扩面——**若是，先落 `A##` 再动码**（本票禁区已写"不新增 C17 方法名，加形参也要先 `A##`"）。
+> 2. **分母（写进给人看的那版，必须带口径）**：后端命令数 **DSH 6**（名册由插件运行时注册 ⇒ 静态数不满，写"至少 6"）、**pi-upstream 24**、**Step-Code 22 builtin ＋ 16 product**、**minimax 约 45-52**（三把尺给出 45／48／"41＋11 spread"，**引数必须带尺**）、**openchamber 15＝9＋6**（9 那组编排者复现，6 那组〔腿报〕）。⚠ 对照结论一句话：**别家命令数是我们的一百倍以上，而其中大量枚背后只有一句提示词**（openchamber 那 9 枚／minimax `/review`＝常量 `'Please review my uncommitted changes.'`／Step-Code `/init`＝发一串 `*_PROMPT`）⇒ **本票 AC 里"名册每项必须标 会改系统状态／只递一段话"这一栏不许省**（用户点错的预期由我们背）。
+> 3. **别家三派"改了要不要重启"我们今天要选一派**：DSH skills **8 桶＋watcher 免重启**、Step-Code 装／卸／MCP **一律 "Restart Step"**、openchamber MCP **有健康状态**。⇒ **"改了不生效又不告诉用户"三家都不选**；本票的"这次到底生效了没有"照 `internal/panel/instructions_200.go:26-40` 那五枚态＋`:59 Dropped`（"必须能说它没生效"）现成形状做，**不新造态**。
+> 4. ⚠ **顺带更正我自己旧账的一处措辞**（账 `A416`）：那里写"附件四枚键早就在"——**现读：那四枚是快照字段**（`internal/panel/composer.go:238-241`：`attachments`／`acceptedAttachmentMimes`／`maxAttachmentBytes`／`attachmentError`），**`internal/config/` 里 `grep -i attachment` 今天零命中**（编排者自己跑，空结果）。⇒ **"键在"要说清是"发给界面的键在"，配置层那四枚键并不存在**；票 214 的落点按这个改（先把配置层缺的那几枚键要不要补裁掉，再谈接线）。
+
 ## 现量（起手逐条复算，别信这里的行号）
 
 | 事实 | 读数 | 尺 |
