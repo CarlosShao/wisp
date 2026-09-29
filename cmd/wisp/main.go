@@ -133,9 +133,29 @@ func main() {
 // cmdRun is the S1 text path (ticket 12): runTextTask assembles the whole
 // stack - credential store, config, provider, approval gate, host bridge,
 // agent loop - and the exit code reflects the task's error class.
+//
+// Ticket 211 added the answer side. attachParentConsole already ran at the call
+// site above, so on a GUI-subsystem build the standard handles are the console's
+// by the time interactiveStdin looks at them; it returns nil for a pipe, a
+// redirected file or a start with no console at all, and that case is said out
+// loud rather than left as a silent difference in posture (AC#7's 「明确且响亮」:
+// with nobody able to answer, an L2 card resolves as a reject and an L1 window
+// has no one to oppose it - both of which the operator is entitled to know
+// before the run, not from an exit code afterwards).
 func cmdRun(args []string) int {
 	printVersions("")
-	return runTextTask(runSpec{argv: args, stdout: os.Stdout, stderr: os.Stderr})
+	reply := interactiveStdin()
+	if reply == nil {
+		fmt.Fprintln(os.Stderr,
+			"wisp run: 本机没有可交互控制台，本轮没有人能答复卡片："+
+				"L2 卡会等到超时后按拒绝处理，L1 窗口没有人能否决（要能当场答复，请在终端里跑）")
+	}
+	return runTextTask(runSpec{
+		argv:   args,
+		stdout: os.Stdout,
+		stderr: os.Stderr,
+		reply:  reply,
+	})
 }
 
 // printVersions writes the common version block (prefix used by callers).

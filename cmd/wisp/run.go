@@ -128,6 +128,22 @@ type runSpec struct {
 	// agentRuntime.auditf books the audit trail through it so the ledger lands
 	// on disk without the same sentence reaching the console twice.
 	sink *logSink
+	// reply is the operator's ANSWER stream for the confirmations this run
+	// displays (ticket 211). nil means nobody can answer, which is exactly what
+	// every run before this field was: an L2 card waits out the C18 deadline and
+	// auto-rejects, an L1 window cannot be opposed. cmdRun fills it with the
+	// console's input handle when one is really interactive; the CLI tests fill it
+	// with a scripted reader, which is the injection seam AGENTS.md §1.3 names
+	// for `wisp run` - it is not a mock standing in for a missing subsystem,
+	// because the subsystem here IS a human typing at this terminal.
+	reply io.Reader
+	// replyVeto is the veto channel this host's cancel transport really is
+	// (ticket 211). Production leaves it empty because a console run wires none
+	// of SPEC-06 §2's four channels, and an empty value makes Gate.Veto say that
+	// back instead of letting this process claim a cancel path it does not have.
+	// A host that DOES own one - the ball click, the global Esc hook - names it
+	// here and marks it loaded in the same step.
+	replyVeto approval.Channel
 }
 
 // runTextTask executes one CLI text task and returns the process exit code.
@@ -234,6 +250,19 @@ type agentRuntime struct {
 	gate     *approval.Gate
 	ui       *consoleApprovalUI
 	bridge   *tools.Bridge
+	// liveCards is the native-side ledger of the cards this run displayed: the
+	// one place a displayed card's single-use grant is kept, and therefore the
+	// one thing that makes an allow possible at all (ticket 211). It is filled
+	// by the injected UI, which is the only recipient of the grant, and read by
+	// the reply surface. A card leaves it when it is answered, dismissed, or
+	// handed off to execution.
+	liveCards *nativeCards
+	// reply is this run's answer side, and replyRoot/replyHandle its owner and
+	// goroutine. All three stay nil when no reply source was handed in, which is
+	// the honest statement that nobody can answer this run's cards.
+	reply       *replySurface
+	replyRoot   *observe.Root
+	replyHandle *observe.Handle
 	// modes is the assembled owner of the permission mode (ticket 90's storage,
 	// ticket 101's wire): the read the bridge consults once per call, and the
 	// only object in this process that may change the档.
@@ -402,7 +431,16 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	// The approval layer (A13). Channels loaded here are the honest set for a
 	// console run: no floating ball, no global Esc hook, so an L1 window can
 	// only expire unvetoed and an L2 card can only time out into a reject.
-	rt.ui = &consoleApprovalUI{out: s.stdout}
+	//
+	// Ticket 211 changed one half of that sentence and left the other half
+	// standing: the console can now ANSWER a card (a reply source, attached at
+	// the end of this function), so an L2 card no longer has to be a question
+	// nobody hears. What it still cannot do is veto an L1 window, because none
+	// of SPEC-06 §2's four veto channels (ball / Esc / KWS / panel) exists in a
+	// terminal - so NewChannels() stays empty and runSpec.replyVeto stays unset,
+	// and approval_reply.go says what both of those choices protect.
+	rt.liveCards = newNativeCards()
+	rt.ui = &consoleApprovalUI{out: s.stdout, live: rt.liveCards}
 	rt.gate = approval.New(approval.Options{
 		UI:              rt.ui,
 		Channels:        approval.NewChannels(),
@@ -547,6 +585,14 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		}
 	}
 
+	// The answer side, last - so a reply can never arrive at a half-built
+	// runtime (ticket 211). With no reply source this is a no-op and the run
+	// keeps the posture it had before the field existed: cards get shown, nobody
+	// answers them, and each route resolves on its own clock.
+	if s.reply != nil {
+		rt.attachReplyListener(s.reply, s.replyVeto)
+	}
+
 	return rt, 0
 }
 
@@ -611,8 +657,18 @@ func (rt *agentRuntime) windowCount() int {
 	return rt.ui.shown()
 }
 
-// close releases the store.
+// close releases the store and stands the reply listener down.
+//
+// The cancel is not a join: a listener parked in a blocking Read on the
+// operator's stream does not observe a context, so the root's Cancel is what
+// stops it from taking any further reply (runReplyLoop checks ctx.Err() per line
+// and refuses to act on one after that). For a CLI process that is the whole
+// requirement - the goroutine dies with the process, and a pipe an end-to-end
+// test closed returns EOF on its own.
 func (rt *agentRuntime) close() {
+	if rt.replyRoot != nil {
+		rt.replyRoot.Cancel()
+	}
 	if rt.store != nil {
 		_ = rt.store.Close()
 	}
@@ -985,8 +1041,16 @@ func (c consoleSink) Publish(e agent.Event) {
 }
 
 // consoleApprovalUI is the injected presentation surface for a console run: it
-// prints the card and the countdown events. It never answers on the user's
-// behalf, which is exactly why an L2 card here ends in an auto-reject.
+// prints the card and the countdown events.
+//
+// It still never answers on the user's behalf - it decides nothing, and the
+// gate's own comment on that rule is unchanged. What ticket 211 added is the
+// other half of a native surface: it HOLDS what an answer needs. The card's
+// single-use grant arrives in Prompt and is booked into live, the ledger the
+// reply surface spends from, and the card's id is printed because an operator
+// cannot answer a question they cannot address. An L2 card on a run with no
+// reply source attached still ends in an auto-reject, and that is the route's
+// own behaviour rather than this surface answering for anyone.
 type consoleApprovalUI struct {
 	out io.Writer
 	// cards counts how many confirmations this surface actually displayed, so a
@@ -994,6 +1058,10 @@ type consoleApprovalUI struct {
 	// gate".
 	mu    sync.Mutex
 	cards int
+	// live is the native-side ledger of displayed cards (ticket 211). nil means
+	// this surface stands alone, exactly as every pre-211 console run did: it
+	// shows cards and holds nothing that could answer one.
+	live *nativeCards
 	// publish puts one snapshot on the wire after the approval state moved. The
 	// assembly root attaches it (assembleRuntime); nil means this surface is
 	// standing alone, which is what every pre-ticket-35 console run was.
@@ -1013,6 +1081,20 @@ func (u *consoleApprovalUI) Prompt(_ context.Context, p approval.Prompt) error {
 	u.mu.Lock()
 	u.cards++
 	u.mu.Unlock()
+	// The grant is booked before anything is printed. The order is the point:
+	// from the moment a card is on screen someone may answer it, and the answer
+	// needs the proof this surface was handed - which is also why the ledger
+	// lives here and nowhere the page can reach (approval.go's grant comment,
+	// and ticket 211's 「允许只长在原生侧」).
+	if u.live != nil {
+		u.live.record(liveCard{
+			CorrelationID: p.CorrelationID,
+			Tool:          p.Tool,
+			Level:         p.Level,
+			Grant:         p.Grant,
+			Window:        p.Window,
+		})
+	}
 	fmt.Fprintf(u.out, "\n[确认 %s %s] %s\n", p.Level, p.Tool, p.Reason)
 	for _, r := range p.RulesHit {
 		fmt.Fprintf(u.out, "  规则 %s\n", r)
@@ -1024,6 +1106,14 @@ func (u *consoleApprovalUI) Prompt(_ context.Context, p approval.Prompt) error {
 		fmt.Fprintf(u.out, "  影响路径：%s\n", strings.Join(p.Paths, ", "))
 	}
 	fmt.Fprintf(u.out, "  窗口 %.1fs\n", p.Window.Seconds())
+	// The address the operator answers against. Without it C18's 「回复按
+	// correlationId 路由」 is a rule a terminal user cannot obey, and a reply
+	// that names nothing is a reply the gate has to refuse as an unknown
+	// correlation. Printed last so the rule lines above it keep their shape for
+	// the cross-surface card comparison in panel_pump_test.go.
+	if u.live != nil {
+		fmt.Fprintf(u.out, "  卡片编号：%s\n", p.CorrelationID)
+	}
 	// The card is on screen, so the queue now has one more pending item than it
 	// did a microsecond ago: this is the first moment a snapshot about this task
 	// is worth sending.
@@ -1036,6 +1126,16 @@ func (u *consoleApprovalUI) Prompt(_ context.Context, p approval.Prompt) error {
 // Update prints the transient states (countdown, warning, dismissal, handoff).
 func (u *consoleApprovalUI) Update(_ context.Context, e approval.Event) error {
 	fmt.Fprintf(u.out, "[%s] %s\n", e.Kind, e.Text)
+	// Both kinds that end a card also end its answerability: a dismissed card
+	// left the queue, and a started one handed off to execution, so a reply
+	// arriving afterwards is a lost vote either way and the ledger must not keep
+	// a spendable grant for it (queue.revokeGrants would burn it regardless).
+	switch e.Kind {
+	case approval.EventDismissed, approval.EventStarted:
+		if u.live != nil {
+			u.live.forget(e.CorrelationID)
+		}
+	}
 	// Only the two kinds that move the queue publish a packet. A tick or a
 	// warning changes a countdown the four-key snapshot has no field for, so
 	// publishing on it would book the same packet over and over while claiming

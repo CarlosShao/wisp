@@ -29,6 +29,14 @@
    "一直"落到 D45 已设计的那张 `approval_grant` 表（现量：DAO 齐全、**生产零写手**）。
 4. **等答复时球要变样子**：二十态里"等人"那一态要真被驱动（现在产品路径没有状态生产者）。
 
+> ⚠ **09-29 12:3x 收 `201-r1` 的半成品（腿死于轮次上限，不是做完；产码我代落 commit，读数我自己跑）**
+> - **盘上有**：新件 `cmd/wisp/approval_reply.go`（23,711 字节）＋`cmd/wisp/approval_reply_211_test.go`（26,269）＋`approval_reply_stdin_{windows,other}.go`；改 `cmd/wisp/main.go`（+21/−1）／`run.go`（+104/−4）／`gate.go`（+16/0）／`queue.go`（+32/0）。⚠ 文件头注释与测试文件名写着 **"Ticket 211"**——**那是我派单写错的编号**（211 是"池 8 vs 桥天花板 4"那枚契约票），同一枚文件 `:15`／`:44` 又正确引用本票 ⇒ **续腿顺手把注释与文件名改回 201**。
+> - **我自己的读数**（编队已安静才跑）：`go build ./...` 净；`go test ./cmd/wisp` **ok 76.919s**／`./internal/agent/approval` **ok 0.362s**／`./internal/tools` **ok 12.861s**／`./internal/panel` **4 FAIL**＝`TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestComposerContractTypesMatchFrontend`／`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`／`TestC21DesignTokensFourwayAgree`——**这四枚是历史在册红（`HANDOVER` §4.0v 那张表），本半成品没新增红、也没把它们修绿**。
+> - **逐格现判**：**AC#1 半**——只有**控制台/stdin 那一枚入口**（`main.go:147` `reply := interactiveStdin()` ⇒ `run.go:593` `rt.attachReplyListener(...)`），球／托盘／面板 WebView **三处仍零**；它真调 `DecideFromNative`（`approval_reply.go:204`）与 `DecideFromPanel`（`:265`，`:271` 注释自陈"这条路今天被路由单独拒掉、留着当反控"）⇒ **"答"这一侧第一次有了生产调用者**，但"至少两枚入口"不满足。**AC#7 成立**（无界面时响亮兜底＝这枚监听器本身）。**AC#3 方向对**（面板侧 `allow` 被**路由**拒、不是被便利豁免）。**AC#4／AC#5／AC#6 未见实现**。
+> - ⛔ **AC#2 是我自己写反的一格**：原句要"L1 挂起等人、超时落拒绝"——**与冻结语义冲突**：`internal/tools/bridge.go:384-386` 注释逐字「**The L1 window running out unopposed MEANS EXECUTE (SPEC-06 §2)**」，L1 的既定语义就是"不打断就干"，到点自动拒绝的是 **L2**。**我的裁定＝不翻极性**（翻它＝动 SPEC-06/D31，要 owner 一句话，已按 `[H#]` 记档、不催）；**AC#2 改写为**："L1 等待期间**能被否决**、**等待态在名册上可见**（票 220 那一格）；到点无答复**仍按 SPEC-06 §2 执行**"。
+> - ⚠ **AC#5 我写错了对象，与本仓三枚钉互斥，就地改**：原句要 `approval_grant` 的授权"重启后仍在"——**那正是 `internal/perm/ticket90_persist_test.go:220` 判死的形状**（"session grant does NOT survive a restart"，文件头逐字"They are three test functions on purpose"），也撞 `PLAN.md:1642`「会话结束后授权**必须**失效」。⇒ **改写**："落库只落**长期**那一支，其真落点＝往 `[fs] allowed_dirs` 加一行（持久、**可撤销**），并按 `PLAN.md:1645-1646` **必须触发一次 L2 重新确认**；`approval_grant` 的 **session** 那一支**必须不**活过重启"。
+> - ⇒ **续腿 `201-r2` 的射程**：AC#4／AC#6 要么落地、要么**具名报"这格要宿主面（球/托盘），今天做不到的原因是 X"**；AC#1 的入口数现跑点数报我；⛔ **不许动 L1 极性**、不许动 `ticket90_persist_test.go` 那三枚钉、命名避开 `internal/panel/l2_grant_boundary_test.go:1882-1886` 那十二个词根（**只叫 `reason` 安全**，且那枚是冻结件）。
+
 ## 验收判据（草，逐格要 `file:line` 与正控）
 - [ ] **AC#1 有人能答**：三枚入口至少两枚有**生产调用者**（球或托盘算一枚，面板算一枚）。
 - [ ] **AC#2 L1 不再自动执行**：造一发 L1 ⇒ **挂起等人**；正控＝超时那支必须落在"拒绝"，**不许落在"执行"**（这条要能判红）。

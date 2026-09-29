@@ -351,6 +351,10 @@ func (q *Queue) allow(corr, nonce string) error {
 		q.mu.Unlock()
 		return ErrNotPending
 	}
+	// Read while the lock is held: the answer line has to name the call the
+	// grant authorised, and a settled item is the one thing this queue must
+	// never re-describe from a stale pointer.
+	tool := it.Dec.Tool
 	spent := it.grants.spend(nonce, it.bind)
 	q.mu.Unlock()
 	if !spent {
@@ -360,6 +364,12 @@ func (q *Queue) allow(corr, nonce string) error {
 	if !q.deliver(it, answer{a: tools.AnswerAllow, why: "用户在原生侧批准了本次操作"}) {
 		return ErrNotPending
 	}
+	// Ticket 211 AC (答复要进审计): the successful allow used to be the silent
+	// half of this funnel - only a FORGERY wrote a line, so the ledger could
+	// show every rejected card and never the answered one. One line per settled
+	// answer, on every route, is what makes 「谁答的、答了什么」 a reading
+	// instead of an inference from the absence of a refusal.
+	q.logf("approval: ANSWER-ALLOW corr=%s tool=%s route=native decision=allow", corr, tool)
 	return nil
 }
 
@@ -393,6 +403,10 @@ func (q *Queue) revokeGrants(corr string) {
 func (q *Queue) reject(corr, reason string) error {
 	q.mu.Lock()
 	it := q.lookupForRefusalLocked(corr)
+	tool := ""
+	if it != nil {
+		tool = it.Dec.Tool
+	}
 	q.mu.Unlock()
 	if it == nil {
 		return ErrUnknownCorrelation
@@ -404,6 +418,15 @@ func (q *Queue) reject(corr, reason string) error {
 	if !q.deliver(it, answer{a: tools.AnswerReject, why: why}) {
 		return ErrNotPending
 	}
+	// The refusal half of the same ticket-211 line: this funnel is where all
+	// five refusal routes (native, panel, both DecideFrom* routers, the veto
+	// channel) land, so booking the settled answer HERE is what makes the
+	// ledger complete without any route having to remember to write its own.
+	// The reason is carried verbatim because it is the same string the model
+	// reads back (tools/bridge.go's orDefault(why, …) on the reject branches) -
+	// a human's 「no, because …」 has to be inspectable in the audit, not only
+	// in the conversation. observe's handler bounds a logged string itself.
+	q.logf("approval: ANSWER-REJECT corr=%s tool=%s decision=reject reason=%q", corr, tool, why)
 	return nil
 }
 
@@ -414,6 +437,15 @@ func (q *Queue) expire(it *qitem) answer {
 		why: fmt.Sprintf("审批超时（%d 秒未确认），C18 一律判拒绝，已自动拒绝", int(q.timeout.Seconds())),
 	}
 	if q.deliver(it, a) {
+		// Ticket 211's second criterion is about this line as much as about the
+		// answer: an unanswered L2 is booked as a TIMEOUT THAT REFUSED, and the
+		// audit has to say so in words an auditor can grep. The decision value
+		// is written as the pair the gate and the bridge both mean
+		// (timeout => reject), never as a bare "timeout", because "timeout"
+		// alone is exactly what an L1 window's expiry also is - and that one
+		// executes.
+		q.logf("approval: ANSWER-EXPIRED corr=%s tool=%s decision=timeout->reject after=%ds",
+			it.Corr, it.Dec.Tool, int(q.timeout.Seconds()))
 		return a
 	}
 	if got, ok := q.takeAnswer(it); ok {

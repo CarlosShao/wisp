@@ -278,6 +278,13 @@ func (g *Gate) PendingWindow(ctx context.Context, d tools.Decision) (tools.Answe
 			}
 			why := fmt.Sprintf("用户在 L1 确认窗口中通过「%s」否决了本次操作（取消窗口，非撤销已写出的内容）",
 				channelNames[v.Channel])
+			// The veto tier of the answer audit (ticket 211): an L1 window is not
+			// a queue item, so nothing downstream books it - the queue's
+			// ANSWER-ALLOW / ANSWER-REJECT lines can only ever describe an L2
+			// card. Without this line the ledger would hold every answer that
+			// refused to run EXCEPT the one that stopped a write mid-window.
+			g.logf("approval: ANSWER-VETO corr=%s tool=%s channel=%s decision=veto",
+				corr, d.Tool, v.Channel)
 			_ = g.ui.Update(ctx, Event{Kind: EventDismissed, CorrelationID: corr, Text: why})
 			return tools.AnswerVeto, why
 
@@ -287,6 +294,15 @@ func (g *Gate) PendingWindow(ctx context.Context, d tools.Decision) (tools.Answe
 			// correlation stays tracked so a later veto yields an applied-steps
 			// report instead of a false "nothing happened".
 			g.markStarted(corr, d.Tool)
+			// Booked, because the polarity of this branch is the one thing on the
+			// L1 route an operator cannot see from the card: the window ended with
+			// no veto, so the call RUNS. This line records that fact in the same
+			// ANSWER-* family the L2 queue writes; it changes nothing about it.
+			// Asking whether it *should* refuse instead is a D4 / SPEC-06 §2
+			// contract question (票 201 AC#2), not a line an implementation leg
+			// may quietly flip - see that ticket's「禁区」and docs/reports ledger.
+			g.logf("approval: ANSWER-EXPIRED corr=%s tool=%s decision=timeout->execute after=%s",
+				corr, d.Tool, g.window)
 			_ = g.ui.Update(ctx, Event{
 				Kind: EventStarted, CorrelationID: corr,
 				Text: "确认窗口结束，未收到否决，开始执行",
