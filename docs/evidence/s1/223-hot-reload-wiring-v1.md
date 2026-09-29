@@ -36,7 +36,7 @@
 | `grep -n "time.Now\|\.Sub(\|time.Since" internal/config/manager.go` | **零命中** |
 
 > **小节顺序说明（骨架先落盘留下的次序，不是漏写）**：本表按 `起手读数 → AC#1 → AC#2 → AC#3 → AC#7 → AC#5 → AC#6 → AC#4 → 编排者代落代跑 → 跨票 → 推翻清单 → 票面对照 → 没做完 → 时刻表 → 六节大白话` 排列。
-> ⛔ **没有任何一格是空的**：七格各有唯一一枚带判语的标题（`grep "^## AC#" `＝7 枚），骨架期的 3 处〔待填〕占位已在收工前删除。
+> ⛔ **没有任何一格是空的**：七格各有唯一一枚带判语的标题（`grep "^## AC#" `＝7 枚），骨架期留下的 4 处〔待填〕占位已全部删除（最后一枚在 `61c88753` 之后由收工自查补删）。
 
 ## AC#1 生产里真有人在轮询 —— **成立（带注：这圈 tick 没被 join，是同类违约的第二枚实例）**
 
@@ -75,7 +75,6 @@
 - 出口内容（现读 `config_reload.go:278-294`）：两行审计（`state=restart-pending sections=%v effect=next-process-start tier=restart` ＋ `RESTART-PENDING detail=` 里带**为什么**与 `restartTierKeys`＝`app.language / app.autostart / app.single_instance`，`:299-301`）＋ 一行 stdout 句子（"这些段的改动本次运行不会生效……原因：……涉及：……"）。**不是"静默不生效"**：`planApp`（`manager.go:351-356`）把 restart 键**留在旧值**并进 `rep.Restart`，注释逐字承认"the silence here is the bug that file closes"。
 - 独立性：它是**单独一枚用例**（`TestTicket223RestartTierSaysItWillNotApply`），没与 AC#2 立即档合并——票面这条禁合的要求满足。
 - **注（＝AC#5 那枚红的归属）**：这枚用例**自身有读序竞态**，本腿安静单跑 5 发 **4 PASS／1 FAIL**（详见 AC#5）。失败的是**断言写法**（`config_reload_223_test.go:452` 对 stdout 单发读，而被等的最后一枚信号是 `:442` 的 stderr 审计行，生产代码 `config_reload.go:284`→`:288` 之间就是窗口），**不是产品句子缺失**——同发里两行 restart 审计都已到位。**判语：AC#7 的产品事实成立、验收用例不稳**。这一格要翻勾，必须先把那枚断言改成轮询（**本腿不修**：非实现者腿不产码）。
-〔待填〕
 
 ## AC#5 整包终态读数（任务一：带 `-v`）—— **不成立（终态有一枚本票自己的红，且它不是争用）**
 
