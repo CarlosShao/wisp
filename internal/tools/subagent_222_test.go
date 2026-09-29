@@ -45,6 +45,17 @@ import (
 //     nothing can run until a parent's budget freed its slot, so the number it
 //     writes down is nonzero.
 //
+// Ticket 235 AC#2 added one more ruler to all three legs, and it is the one that
+// reads which side moved first: a child's arrival on the bridge must precede any
+// parent's return (h.awaitChildOnBridge222). Causally it always does - a parent's
+// conclusion comes from its child, and the child only reaches its conclusion
+// after its tool call has come back through the bridge - so the reading costs
+// microseconds on the fixed shape. Hand the child a tool surface that bypasses
+// the bridge (the M3 shape, the child back on a fake197Dir) and nothing ever
+// arrives while the parents still collect their conclusions one by one, which is
+// exactly what that leg now reads red at 0.00s instead of leaning on the 30s
+// guard rail below it.
+//
 // The per-tool budget these legs build the bridge with is a test-local knob
 // (Options.DefaultTimeout; production reads cfg.Agent.PerToolTimeoutMS at
 // cmd/wisp/run.go:562). It exists so the pre-fix reading arrives about three
@@ -114,6 +125,14 @@ type probe222 struct {
 
 	runs atomic.Int32
 
+	// arrived is ticket 235 AC#2's arrival signal: one non-blocking token per
+	// execution that really reached the bridge. It carries no verdict by itself -
+	// h.awaitChildOnBridge222 below is what reads it - and its buffer (16) is
+	// bigger than the most this file ever sends (the reverse-control leg's 6 host
+	// calls plus MaxConcurrentSubagents children = 10), so the send can never
+	// become the thing a leg waits on.
+	arrived chan struct{}
+
 	held    atomic.Int32
 	maxSeen atomic.Int32
 
@@ -151,6 +170,10 @@ func (p *probe222) Execute(ctx context.Context, params json.RawMessage, _ func(s
 		}
 	}
 	p.runs.Add(1)
+	select {
+	case p.arrived <- struct{}{}:
+	default:
+	}
 	p.in <- probeRun222{
 		mark:        a.Mark,
 		slotsHeld:   len(p.h.bridge.sem),
@@ -237,9 +260,10 @@ func newH222(t *testing.T) *h222 {
 	}
 	h.roster.MarkRoot(parent222, "根任务 222")
 	h.probe = &probe222{
-		h:    h,
-		name: probe222Tag,
-		in:   make(chan probeRun222, 16),
+		h:       h,
+		name:    probe222Tag,
+		in:      make(chan probeRun222, 16),
+		arrived: make(chan struct{}, 16),
 	}
 	h.bridge = New(Options{
 		Registry:       NewRegistry(),
@@ -351,6 +375,51 @@ func (h *h222) parkParents(t *testing.T, n int) {
 	}
 }
 
+// awaitChildOnBridge222 is ticket 235 AC#2's pre-read: it reads WHICH side moved
+// first before the leg goes on to collect n records. On the fixed shape a child's
+// arrival on the bridge always precedes any parent's return - the parent's
+// conclusion comes from its child, and the child only reaches that conclusion
+// after its tool call has come back through the bridge - so this returns in
+// microseconds and asserts nothing but the ordering. Hand the child a tool
+// surface that bypasses the bridge (the M3 shape) and nothing arrives while the
+// parents keep collecting conclusions, which is the reading this now fails on
+// instead of the 30s guard rail of the await behind it.
+//
+// The parent result it may pick up is handed straight back, so the leg's own
+// await over h.parents still sees all n of them. h.parents is buffered at
+// 2*MaxConcurrentSubagents and never holds more than n at once.
+func (h *h222) awaitChildOnBridge222(t *testing.T) {
+	t.Helper()
+	timer := time.NewTimer(h222SafetyBound)
+	defer timer.Stop()
+	select {
+	case <-h.probe.arrived:
+	case res := <-h.parents:
+		h.parents <- res
+		t.Fatalf("桥上的到达信号一枚都没有，而第一枚父任务已经拿到了结论（真桥上累计执行 %d 次，"+
+			"反控那一发里这些全是宿主调用，孩子一次都没上桥）：%q ——"+
+			"孩子的工具面绕开了真桥＝A420 的第 7 环，票 235 AC#2 这一发就是为它加的",
+			h.probe.runs.Load(), res.Text)
+	case <-timer.C:
+		t.Fatalf("前置读数两头都没到（桥上到达 0 枚，父任务已返回 %d/%d 枚），护栏到点："+
+			"这一发真挂住了，不是读数不同", len(h.parents), MaxConcurrentSubagents)
+	}
+}
+
+// drainBridgeArrivals empties the arrival signal, so that every token
+// awaitChildOnBridge222 reads afterwards can only have come from a child. The
+// reverse-control leg calls it after wg.Wait(): a host call sends its arrival
+// before it returns, so by then all of them are already buffered here.
+func (h *h222) drainBridgeArrivals() {
+	for {
+		select {
+		case <-h.probe.arrived:
+		default:
+			return
+		}
+	}
+}
+
 // AC#1 - the production shape gets its first ruler: n parents wait, each child
 // runs a real tool call ON THE SAME BRIDGE, and every parent must get its own
 // child's conclusion back rather than the timeout wording the bridge writes when
@@ -367,6 +436,12 @@ func Test222SpawnConclusionArrivesThroughRealBridgeChildren(t *testing.T) {
 	n := MaxConcurrentSubagents
 	h.parkParents(t, n)
 	close(h.release)
+	// Ticket 235 AC#2: the pre-read in front of the await below. This leg was the
+	// only one of the three that ever noticed a child whose tool surface bypasses
+	// the bridge, and it noticed only after the 30s guard rail fired; the arrival
+	// ordering decides that in microseconds, so the rail is a rail again and not
+	// the assertion.
+	h.awaitChildOnBridge222(t)
 
 	// The gate keeps every child inside its bridge call until all n arrived, so
 	// "the child ran while its parent was still waiting" is a fact this leg
@@ -454,6 +529,11 @@ func Test222WaitingParentHoldsNoBridgeSlot(t *testing.T) {
 	}
 
 	close(h.release)
+	// Ticket 235 AC#2: this leg used to be blind to a child whose tool surface
+	// bypasses the bridge - the bypassing child still hands its parent a
+	// conclusion, so every assertion above reads the same either way. The arrival
+	// ordering is what tells the two shapes apart, and it reads in microseconds.
+	h.awaitChildOnBridge222(t)
 	results := await222Tokens(t, "父任务拿到结论", h.parents, n)
 	for i, res := range results {
 		if res.IsError {
@@ -514,7 +594,14 @@ func Test222CeilingStillCapsExecutedCallsWhileParentsWait(t *testing.T) {
 		t.Errorf("宿主探针跑了 %d 次, want %d（排队的调用挤不进来＝天花板被说破的反面）", got, oversubscribed)
 	}
 
+	// The host probes above filled the arrival signal, and ticket 235's pre-read
+	// is about the children only. wg.Wait() has returned, so every host send is
+	// already buffered here and no child has been released yet: emptying the
+	// channel now means whatever awaitChildOnBridge222 reads next came from a
+	// child.
+	h.drainBridgeArrivals()
 	close(h.release)
+	h.awaitChildOnBridge222(t)
 	results := await222Tokens(t, "父任务拿到结论", h.parents, n)
 	for i, res := range results {
 		if res.IsError {
