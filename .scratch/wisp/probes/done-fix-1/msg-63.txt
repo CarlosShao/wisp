@@ -1,0 +1,10 @@
+账目落地 done-fix-1（票 63）：那一格是甲类，追加"账在票 12"的具名指针，不翻勾
+
+- 63-…-done.md:46（端到端 api_key_ref 被真 provider 解析）框下追加一行：账在票 12。
+- 接管票核实通过：12-cli-text-path-s1-gate.md:109 是 - [x]，:112 逐字
+  "Handed here from ticket 63 AC#6, whose end-to-end proves ref→config.LoadFile→ProviderKeys
+  but issues the request with its own http client"，:116 记 "A8 就此闭环"
+  （cmd/wisp/run_test.go::TestRunTextTaskKeyResolvesInTheStore + TestMissingBlobFailsUnconfiguredNeverSilently）。
+- 盘上面本腿今天现读：internal/llm/resolver.go:17/:30/:139/:144 真在解析 api_key_ref，
+  含"没有 key resolver 就 Unconfigured"那条响亮失败。
+- 按派单不翻勾（翻它＝把票 12 名下那笔一手交付在这里再记一次）。票面 numstat＝1 增 / 0 删。

@@ -1,0 +1,12 @@
+账目落地 done-fix-1（票 11）：AC#6 那格是甲类，追加具名指针与今天的树里三处形状，不翻勾
+
+- 11-…-done.md:53（capability probe suite）框下追加一行：账在票 12（A11）。
+- 票面自己写着：:66（agent-ticket11-probe-2 的 log）逐字 "LEFT AC#6 UNTICKED on purpose" 三条原因；
+  改名 commit 9293518d 正文第 1 行逐字 "ticket 11 DONE with a 1:1 verdict table;
+  AC#6 transferred as A11, ruling R12"（本腿 git show -s --format=%B 现读）。
+- 接管票核实通过：12-…md:120 是 - [x]，:123 逐字 "Handed here from ticket 11 AC#6, registered as A11"，
+  :128 逐字 "A11 就此闭环"（正反两向都钉）。
+- 今天的树里三处都在：internal/llm/probe_health.go:14（自陈 "Ticket 11 AC#6, consumer side"）、
+  cmd/wisp/providers.go:189/:195（消费 llm.ProbeMismatch）、cmd/wisp/providers_test.go:143
+  （"the declared-vs-measured event was not announced" 这条断言）。
+- thinking／audio 那两条原因的射程在票 12／票 61，本腿不替它们判。票面 numstat＝1 增 / 0 删。
