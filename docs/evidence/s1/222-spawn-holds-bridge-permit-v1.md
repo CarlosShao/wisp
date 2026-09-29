@@ -14,11 +14,48 @@
 
 ## AC#1 生产形状第一次有尺（票面 `:35`）
 
-判语：**未判**
+**判语：成立（带两枚注，注不推翻判据本身）**
 
-依据（文件:行，现读）：未填
-突变读数（锚点＝数字真正所在那一行）：未填
-还原自证：未填
+**现读依据（文件:行＝本腿 `801e8547` 上现跑的尺，非转述）**
+
+| 事实 | 出处（现读） |
+|---|---|
+| 孩子的工具面走真桥＝**唯一**载荷行是 `ParentTools: h.bridge` | `internal/tools/subagent_222_test.go:278` |
+| `Tools: h.bridge` 那行是**死行**：产码随后无条件覆写 `opt.Tools = newSubagentToolProvider(t.d.ParentTools)` | `internal/tools/subagent_197.go:284` ⟸ 覆写 `subagent_222_test.go:288` |
+| 包装器把孩子的调用**逐字转交桥**，不另开路 | `internal/tools/subagent_197.go:567` `return p.inner.Execute(ctx, req)` |
+| 桥的 `Execute` 就是取许可那枚入口 | `internal/tools/bridge.go:438-442`（`slot.take(b.sem)` ＋ `defer slot.giveBack()`） |
+| 生产形状确实是同一枚桥 | `cmd/wisp/run.go:589 ParentTools: rt.bridge` |
+| 三枚新用例真名与行号 | `subagent_222_test.go:362`／`:434`／`:469`；`go test ./internal/tools -list '.*'` 现跑＝**161 枚顶层**，其中含 `222` 的 **3 枚** |
+
+**突变读数（全部走 `go test -overlay`，工作树零写入；overlay  inert 性由 `asis` 对照证明：两枚产码文件从 `git cat-file blob HEAD:` 逐字节取回、`diff` 空、跑出的名册与基线一致）**
+
+| 号 | 突变内容（台件在 `.scratch/wisp/probes/222/v1/mutations/<id>/`） | 读数 |
+|---|---|---|
+| 基线 | 未突变 | `internal/tools` 整包 `-count=1 -v`＝**161 PASS／0 FAIL／0 SKIP**（`--- PASS` 计数，13.081s）；三枚 222 用例各 **0.00s 绿** |
+| **M1＝修之前那一发**（删 `subagent_197.go:356 giveBackWhileWaiting(ctx)`） | 正控 | **三枚全红**：`WaitingParentHoldsNoBridgeSlot` **0.00s**（`subagent_222_test.go:443`"占着 4 枚桥位，want 0"）、`CeilingStillCaps…` **0.00s**（`:477`）、`SpawnConclusion…` **3.00s** 红在内容（`:395` 四枚父任务全收到 `工具 task.spawn 超时（3000ms），已协作式中止`；`:413` 四枚结论各出现 **0** 次）⇒ **两枚 0.00s、不靠挂死、不靠超时**，第三条按票面 `:35` 允许的第三种判据形态（断言父侧拿到的是孩子结论）判红，且用的是台件自己的 3s 旋钮而不是生产的 30s |
+| **M3＝把孩子换回 `h.dir` 形状**（`ParentTools`/`Tools` 都改指 `fake197Dir{}`） | AC#1 空心攻击（本腿任务书点名的那发） | `SpawnConclusion…` **红**，但红在 `:374`"只等到 0/4 枚，**护栏到点**"＝**30.00s 的 guard rail**，另两枚 **绿**（0.00s） |
+| **M4＝孩子仍在跑探针但绕开桥**（新增 `bypass222` 目录直调 `probe.Execute`，不取许可） | 更阴的一发 | `SpawnConclusion…` **0.00s 红**：`:387`"第 4 枚孩子的工具调用起跑时桥位占用 **0** 枚, want 4" ⇒ "走真桥"这半条被**读数**钉住，不是被"有没有结果"钉住 |
+
+**注①（不许瞒）**：AC#1 要求的"孩子工具面走真桥"确实有尺，但**只有 `Test222SpawnConclusionArrivesThroughRealBridgeChildren` 一枚能看见它**——M3 与 M4 之下另两枚用例照绿。M3（票面 `:19` 记录的原始 `h.dir` 形状）下这枚用例是**靠 30s 护栏才红**的，正是票面 `:35` 警告的"等超时才红"那形的一种；M4（保留工具执行、只绕开许可）才是 0.00s 读数判红。判据文字没有被违反（`:35` 的"秒级"约束射程＝**未修码那一发＝M1**，M1 两枚 0.00s），但下一位若要把 `h.dir` 那形也钉成读数红，缺的断言是"起跑前孩子在桥上的次数"应在 `await` **之前**先读一次 `h.probe.runs`。本腿不改测试件，只具名。
+
+**注②**：台件里 `:288 Tools: h.bridge` 是死行（被 `subagent_197.go:284` 覆写）。它没有让用例变松（载荷行是 `:278`），但文件头 `:269-271` 那句"That one line is the whole difference"指的必须是 `ParentTools` 那行才成立——本腿现读确认：是 `:278`。
+
+**还原自证**：全程 `-overlay`，工作树未被写过一枚字节。本腿每发突变后现跑
+`git status --porcelain -- cmd/wisp internal/` ＝ **空**（见文末逐发记录），
+且四枚文件 `sha1sum` 与起手值逐字节相同：
+`bridge.go 36a1d2b9…`／`subagent_197.go df860999…`／`subagent_222_test.go b3938cf0…`／`subagent_197_test.go 3ff5c9a7…`。
+
+**可复跑的尺（一格一把）**
+```
+export PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"
+python .scratch/wisp/probes/222/v1/mut222.py m1-drop-giveback
+go test ./internal/tools -count=1 -run 'Test222' -v \
+  -overlay=.scratch/wisp/probes/222/v1/mutations/m1-drop-giveback/overlay.json   # 期望：3 枚红（0.00/0.00/3.00s）
+python .scratch/wisp/probes/222/v1/mut222.py m4-child-bypasses-bridge
+go test ./internal/tools -count=1 -run 'Test222' -v \
+  -overlay=.scratch/wisp/probes/222/v1/mutations/m4-child-bypasses-bridge/overlay.json  # 期望：:387 读数红 0.00s
+```
+
 
 ---
 
