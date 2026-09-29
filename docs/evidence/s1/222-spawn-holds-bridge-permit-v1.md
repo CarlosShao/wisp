@@ -162,18 +162,21 @@ go test ./internal/tools -count=3 -run 'Test222SpawnConclusion' -v \
 
 **还在对谁许诺**：`Description()` 的读者是模型（它进工具目录随请求一起发出去）。票 221 文件 `:18` 逐字「模型会照说明书办事：它以为能停掉自己派出去的孩子，于是**不会去找别的退路**」——本腿核过这句的前提今天仍成立：全仓 Go 侧 `task.cancel` 的**非注释命中只有那一行说明书**（尺见下）。
 
-**可复跑的尺（两把 grep，零产码）**
+**可复跑的尺（三把 grep，零产码；本腿逐把现跑，读数写在后面）**
 ```
-# 说明书里的 task.* 词根
-grep -n '"task\.' internal/tools/subagent_197.go internal/tools/task.go   # 命中 :196 那句 task.cancel
-# 注册名册
-grep -n "func BuiltinTaskEntries" -A 3 internal/tools/task.go             # 只 task.output
-grep -n "func BuiltinSubagentEntries" -A 3 internal/tools/subagent_197.go # 只 task.spawn
-# 全仓 Go 侧 task.cancel 的非注释命中面
-grep -rn "task\.cancel" --include=*.go internal/ cmd/ | grep -v "_test.go" | grep -vE "^\S+:[0-9]+:\s*//"
-# ⇒ 只剩 subagent_197.go:196 那一行 = 许诺在册、实现在册外 = 这把尺今天该响
+# ① 说明书里的 task.* 词根          ⇒ 读数：task.cancel（唯一命中）
+sed -n '/func (subagentSpawn) Description/,/^}/p' internal/tools/subagent_197.go \
+  | grep -o 'task\.[a-z]*' | sort -u
+# ② 注册名册（Tool.Name() 的返回值）⇒ 读数：task.output ＋ task.spawn（两枚）
+grep -rh 'func (.*) Name() string { return "task\.' internal/tools/*.go \
+  | grep -o 'task\.[a-z]*' | sort -u
+# ③ 全仓 Go 侧 task.cancel 的非注释命中面 ⇒ 读数：只剩 subagent_197.go:196 那一行说明书
+grep -rn "task\.cancel" --include=*.go internal/ cmd/ | grep -v "_test.go" \
+  | grep -vE "^\S+:[0-9]+:\s*//"
 ```
-票 221 的 AC#1 要的正是把这把"说明书词根 ⊆ 注册名册"的尺做成常驻能力尺，**改前必须响**——本腿这发就是它的改前响度样本。
+①−② 的差集非空＝这把尺今天该响。票 221 的 AC#1 要的正是把它做成常驻能力尺，**改前必须响**——本腿这三发就是它的改前响度样本。
+（⚠ 自我更正一次：本格子件首版把①写成了 `grep -n '"task\.'`，那把打的是 `Name()` 的返回值而不是说明书句子，现跑读数里 :196 并不出现；上面这版才是能复跑的那把。改判据文字＝零，只是把尺写对。）
+
 
 **登记一枚本格射程外、但同族的谎（只具名，不改判语）**：`subagent_197.go:195` 说明书第一句"派生一枚子代理去独立完成一个子任务，**等它跑完并把结论带回本任务**"——本腿 **M11** 已把它量成假（孩子比父任务 per-tool 预算久时，父任务收到的是桥的超时文案、结论 0 次到达，见 AC#3 那格）。AC#4 的字面只点名两处"可以单独停它"，所以本格不因此加判；但**谁结案 AC#4，就得同一批面对这一句**，否则票 221 交完之后说明书仍有一句为假。⛔ 两枚票同撞 `internal/tools/subagent_197.go` ⇒ 串行、同批只一枚碰（票面 `:38`／`:46`）。
 
@@ -186,11 +189,45 @@ grep -rn "task\.cancel" --include=*.go internal/ cmd/ | grep -v "_test.go" | gre
 
 ## AC#5 池帽与桥帽的关系要现读定性（票面 `:39`）
 
-判语：**未判**
+**判语：成立带注（论证成立；注＝守这枚论证的**盘上理由**已经过期，本格不许靠它复述）**
 
-依据（文件:行，现读）：未填
-`PLAN.md:2849`（D38）逐字核：未填
-突变读数：未填
+**盘上形状（现读，本腿未动任何帽值）**
+
+| 事实 | 出处 |
+|---|---|
+| 桥的执行许可仍是字面 4 | `internal/tools/bridge.go:24 const MaxToolConcurrency = 4` |
+| 池仍是字面 4（不是桥帽的别名，故意写成数字） | `internal/tools/subagent_197.go:85 MaxConcurrentSubagents = 4`（理由写在 `:60-84`） |
+| 冻结文字逐字仍在原行 | `docs/PLAN.md:2849`「**工具并发上限 = 4**（防 LLM 一次发 50 个 tool call 打爆机器；也与 D45 的批量聚合配合 —— 4 路并发足以让批量场景快起来）」（`:2850` 是它的续行；D38 标题在 `:2818`，背压小标题在 `:2845`） |
+| 同值三处旁证本腿逐枚现读 | `docs/specs/SPEC-01-architecture.md:134`、`SPEC-01:26`（「工具执行（工具并发 ≤4）」）、`SPEC-05-agent-core.md:70`（「与工具并发 ≤4」） |
+| 契约面一字未动 | `git diff --stat beaeaeba..HEAD -- docs/PLAN.md docs/specs/ internal/risk/thresholds.go` ＝ **空**（本腿现跑） |
+
+**本腿对两问的裁定**
+
+1. **"修完之后池＝4 是否仍必要？"→ 机制上不再必要。** 丙形落地后，父等待不占许可（AC#2 的 M1 读数：占用 0），池与桥在机制上**解耦**：桥帽约束"同一瞬间在跑的工具调用数"，池帽约束"同时存在的孩子数"，两枚数字相等**不再是被桥逼出来的**。盘上仍写 4，是一枚**被保留的设计选择**。
+2. **"池若写 8 违不违反 `PLAN.md:2849`？"→ 不违反。** 那句话的射程逐字是"工具并发上限"＋给出的理由是"一次发 50 个打爆机器"＝**正在执行的工具调用数**；轮转不抬高同时执行数。本腿的反控读数支持这句：`maxSeen`（同时执行数）＝4（`subagent_222_test.go:497`），且 M5 证明该断言不是恒真——把桥帽抬到 8，同发它就读到 6 并判红。**⇒ "8 枚孩子在 4 枚许可上轮转、单轮并发仍是 4"这条论证成立，不需要为它先改契约。**（票面 `:30`／台账 `A420:9141` 的推断，本腿复现。）
+
+**突变读数（M6＝只在台件里把池写 8，桥仍 4；整包 `-v` 现跑）**：红 4 枚，逐名与逐句原文如下——
+
+- `Test197SubagentPoolNeverExceedsBridgeCeiling`（`subagent_197_test.go:403`）**0.00s 红**，`:405` 原文：「池 8 大于桥的 D38d 天花板 4：多出来的 4 枚会被桥排成队，名册却说它们在跑；诚实数 = 天花板（**票 211 甲**），要更多并发**得先动契约**（票 211 乙），不是改这枚常量」；
+- `Test197SubagentPoolCapsAtBridgeCeiling`（`:441`）红，`:444`；`Test197FullPoolRefusesNextSpawnWithReadableReason`（`:526`）红，`:529`（这两枚 r1 未点名 ⇒ **它的"两枚钉子"数少了两枚**，实测三枚 197 钉子＋一枚 222 用例）；
+- `Test222SpawnConclusionArrivesThroughRealBridgeChildren` **3.00s 红**：8 枚父任务全收「工具 task.spawn 超时（3000ms），已协作式中止」、8 枚结论各 0 次、`:380` 记「孩子 c5/c6 起跑时已有 **8** 枚父任务返回」＝**池 8 时后 4 枚孩子只能在 gate 打开后才上桥**。
+
+**注①（这一条是 AC#5 的真正交付物，别抄 r1 的理由）**：守池=4 的那枚钉子，**它写在盘上的理由已经被票 222 证伪**。`internal/tools/subagent_197_test.go:398-402` 逐字：「one in-flight spawn **holds one bridge slot for its child's whole life** (bridge.run keeps the semaphore held across entry.Tool.Execute)」——丙形之后这句**不再为真**（`subagent_197.go:356` 在等待前交还）。同理它那句"要更多并发得先动契约（票 211 乙）"正是票 222 §"为什么 211 的前提塌了"（票面 `:26-30`）作废的推断。⇒ **AC#5 的结论只能站在新理据上：抬池不是契约问题，是"名册把排队的孩子印成「在跑」"这枚诚实性问题＋三枚钉子的重写问题 ⇒ 归 owner 一句话。** `222-r1` 自己在 §⑧ 登记过"两段理由过期但断言照旧绿、本腿未碰那枚文件"，本腿复核为**真**且把它升级为具名缺陷：文件＝`internal/tools/subagent_197_test.go:398-402`，与票 221 同撞 `internal/tools`，**串行**。
+**注②（不许把 M6 的红当成"池 8 有害"的证据）**：M6 里那枚 222 用例红，成因是台件的 `gate222` 要求 8 枚孩子**同时**inside 桥，而桥只有 4 枚许可——这是**测试构造出来的阻塞**，不是生产形状。它只证明"这枚用例的分母跟着 `MaxConcurrentSubagents` 走"。票面 `:39` 禁的是"靠测试绿了过"，本腿对称地补一句：**也不许靠测试红了就判池 8 有害**。
+**注③（本腿边界）**：本格只裁论证与盘上形状，⛔ 没动 `PLAN.md`／`docs/specs/**` 一字、没把任何帽值改成 8（M5/M6 只存在于 `.scratch/wisp/probes/222/v1/mutations/*/` 的台件里，工作树 `git status --porcelain -- cmd/wisp internal/` ＝空）。
+
+**可复跑的尺**
+```
+export PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"
+python .scratch/wisp/probes/222/v1/mut222.py m6-pool-to-8
+go test ./internal/tools -count=1 -v \
+  -overlay=.scratch/wisp/probes/222/v1/mutations/m6-pool-to-8/overlay.json | grep -E '^--- FAIL'
+# 期望 4 枚红：Test197SubagentPoolNeverExceedsBridgeCeiling / …CapsAtBridgeCeiling /
+#              Test197FullPoolRefusesNextSpawnWithReadableReason / Test222SpawnConclusion…(3.00s)
+grep -n "工具并发上限 = 4" docs/PLAN.md            # 2849，仍在
+git diff --stat beaeaeba..HEAD -- docs/PLAN.md docs/specs/   # 空
+```
+
 
 ---
 
