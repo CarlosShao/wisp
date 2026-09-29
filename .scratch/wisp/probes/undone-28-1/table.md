@@ -83,7 +83,7 @@
 
 ## 2. 票 11 —— `11-llm-adapters-rest-done.md`（1 枚）
 
-> 本腿现量：un = 1（`:53`）；票面 8 枚 AC 里 7 枚已勾。
+> 本腿现量：un = 1（`:53`）；票面 AC 框共 7 枚（`^- \[x\]`=6 ＋ `^- \[ \]`=1，两条命令现跑，非心算）。
 
 ### 2.1 `:53` Probe suite（fc-capable / fc-broken / vision-capable → provider_health + mismatch 事件）—— **丙（正式移交票 12，代号 A11，且接收方已闭环）**
 
@@ -114,6 +114,35 @@
   若裁决者要按丁翻勾，得先补这一眼。
 
 ## 3. 票 63 —— `63-credential-entry-cli-done.md`（1 枚）
+
+> 本腿现量：un = 1（`:46`）；AC 框共 7 枚（chk=6 ＋ un=1，两条 `grep -c` 现跑）。
+
+### 3.1 `:46` 端到端：`api_key_ref = "secret:<id>"` 被 provider 解析出发请求 —— **丙（正式移交票 12，代号 A8，接收方已闭环且出自非实现者）**
+
+- 原文行首逐字：`- [ ] 端到端：`wisp secret set` 存好后，config 里 `api_key_ref = "secret:<id>"` 能被 provider 解析出发请求（用 mockllm，测试里用假 key）。`
+- 当年为什么不勾，票面自己写了（`:47-49` 逐字）：`TestSecretEndToEndConfigRefResolvesAtRequestTime` 证明了
+  ref→`config.LoadFile`→`ProviderKeys`→`Authorization` 头真上线，但「发请求的是测试自己的 http client，
+  不是 `internal/llm` 的 provider；provider 那一段是调用方自证的」。⇒ 缺的东西很具体：**由 provider 自己发出去的那一发**。
+- 移交是 git 记录，不是转述：本腿现跑
+  `git log -S'Handed here from ticket 63' -- .scratch/wisp/issues/12-cli-text-path-s1-gate.md`
+  → `25d5c3ca|CarlosShao|2026-09-20|docs(tickets): hand ticket 63's unticked AC#6 to ticket 12, registered as A8`
+- 归口去处**本腿现读**（`12-cli-text-path-s1-gate.md`，无 `-done` 后缀＝仍开放，un=3）：
+  - `:109` 是一枚 **`- [x]`**，逐字「Key comes from the store, not the config: the provider that serves the `wisp run` request is」
+  - `:112` 逐字「(not one a test-written client set). **Handed here from ticket 63 AC#6**, whose end-to-end proves」
+  - `:117-118` 逐字「—— **A8 就此闭环**：`cmd/wisp/run_test.go::TestRunTextTaskKeyResolvesInTheStore`（provider 自己
+    发出请求、key 从 DPAPI 存储解析）+ `TestMissingBlobFailsUnconfiguredNeverSilently`（正是上面那条变异判据…）」
+- 盘上凭据（本腿现读，允许地界）：`cmd/wisp/run_test.go:420` `func TestRunTextTaskKeyResolvesInTheStore(t *testing.T)`、
+  `:446` `func TestMissingBlobFailsUnconfiguredNeverSilently(t *testing.T)`、`:25` 头注释逐字
+  「TestRunTextTaskKeyResolvesInTheStore A8: the Authorization header the」
+- 凭据出处＝**非实现者**：票 12 的实现代理 `agent-ticket12-assembly` 跑完 165 次工具调用后
+  「票面 8 个 AC 框一个没勾、Progress log 一行没写」（台账式记录在 `12:162`，`agent=orchestrator`），
+  A8 那段的闭环文字与「我亲自跑通（含在 ok 13.794s 那一批里）」（`12:119`）都是**编排者对账时补写并亲自跑的**。
+- ⇒ 判**丙**。与丁的分界同 11：`-done` 票的这格已被具名移交，记丁会造成 63/12 双重计账；
+  建议处置＝这格改成指向 A8 的引用（或搬出勾框），**不是翻勾**。
+- ⚠ 附带一条给裁决者：票 63 的 `:46` 与票 12 的 `:109` 说的是**同一次端到端**，
+  而票 12 那张 A8 框已经勾了 ⇒ 这类"移交＋接收方已勾"的残余格（本腿在票 11 已核到一枚同形状，
+  其余各票本腿按同一规矩逐枚核，见下文对应节）
+  **不该再回到分母**，只需在票面上留指针。
 
 ## 4. 票 80 —— `80-blacklist-overrides-never-wired-to-gate-done.md`（3 枚）
 
