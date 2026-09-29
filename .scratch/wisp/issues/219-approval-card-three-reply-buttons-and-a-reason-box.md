@@ -91,3 +91,10 @@
 ② **`Q-49` 丙那扇门的修复版**＝AC#3 的前置（今天它是**退回**状态）；
 ③ **票 216**（显示底座：理由与卡片文案都要洗过控制字符）；
 ④ **票 187/193**（"批量撤销误批的一直允许"）＝"长期"那一支的撤销面。
+
+> ⚠ **09-29 14:3x 收只读普查腿 `201-c2` 顺带顶回本票三处过期口径（原句全留、就地更正；尺与复跑表见 `.scratch/wisp/probes/201/c2/census.md` 第 0 节＋"票面 vs 现读"那张表，账见 `A437`）**
+> - **第 12 行那组"现行号"又漂了**：现读＝**`internal/agent/approval/gate.go:638 DecideFromPanel`／`:626 DecideFromNative`／`:387 Veto`**（我写的那组 622／610／371 各漂 16／16／16）。⚠ **更要紧的一层**：**`cmd/wisp/approval_reply.go` 今天已经不调这三枚了**——它调的是 `Replies` 那一层（`:210 Allow`／`:278 PanelAllow`／`:249 PanelReject`／`:251 Reject`／`:310 Veto`），真正的路由已搬进 `internal/agent/approval/replies.go`（那三枚在 `replies.go:325/:372/:377/:401/:427` 被调）。**照我写的行号办事会指错文件。**
+> - **第 27 行"没有 `SetAllowedDirs`"这句今天不成立**：**`internal/config/allowdirs.go:109` 有**（注释 `:95` 逐字「the 撤销 half of AddAllowedDir」）。**而且票 226 刚落地的 13 枚用例里有 2 枚在测它**（`internal/config/writeguard_226_test.go:313`、`:350`）⇒ 我那句"零用例"同步过期。**准确说法＝"有实现、有用例、生产调用者 0 枚"**（我自己现跑复认同一枚数）⇒ **本票"长期那一支的撤销面"缺的仍然只是入口、不缺底座**，代价比第 27 行写的小。
+> - **第 31 行的禁名词表起点在 `:1881` 不是 `:1882`**（`candidates := []string{` 那一行，表体到 `:1886`，仍是 12 词根×两拼）。⚠ 另记一枚**未行级证**：这枚表的 AST 扫描到底只覆盖 `internal/panel` 还是扫得到 `cmd/`，普查腿没追进 `goSourceFiles`（`:360` 定义、调用点 `:726`／`:2024`）拿到 `dir` 字面值 ⇒ **只有注释级自陈（`:1579`／`:127`）**。**保守做法不变：新增可解码结构体一律别放 `internal/panel`，答复字段只叫 `reason`。**
+> - **另两枚会影响本票落点的现读**：① **`Answer` 词表只有 4 枚**（`internal/tools/gate.go:78 allow`／`:80 reject`／`:83 veto`／`:88 timeout`，我自己跑尺复认）⇒ **"本次会话内允许"在答复词表里根本没有对应值**，那一支的落点是 `approval_grant.scope`（`internal/memory/models.go:105 GrantScopeSession`，**生产写手 0**）＝**票 224 的射程**，本票不许顺手做；② 装配处那枚确认钩子现在在 **`cmd/wisp/run.go:341 config.NewManager(cfgPath, nil)`**（票 223 写腿的靶心；`NewManager` 在 `:341`，不是票 219 原来写的 `:334`）。
+> ⚠ **一处别读歪**：上面①里"L1 窗口今天全仓无枚举口"这句**普查腿现跑复认成立**（`grep -n 'g\.windows' internal/agent/approval/gate.go` 只有 `:321/:324/:330/:393` 四处＝查重／写／删／按 corr 查）⇒ **按钮"该对哪一枚任务作答"那一格仍归票 220**，不因今天答复侧函数有了生产调用者而变易。
