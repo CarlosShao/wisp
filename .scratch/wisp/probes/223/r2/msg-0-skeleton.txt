@@ -1,0 +1,10 @@
+evidence(223-r2): 骨架先落盘（写腿两格射程具名：AC#5 轮询化 / AC#4 两句归正）
+
+起手锚点 c774f8da，分支 dev。本腿只做派单两件事，不扩射程：
+① 任务一：TestTicket223RestartTierSaysItWillNotApply 间歇红（v1 腿 5 发 1 红＋
+   编排者 15 发 1 红＝2/20）改 stdout 有界轮询，判据＝同一把尺 20 连跑全绿＋
+   正控（拿掉产品文案必须红）；
+② 任务二：AC#4 overlay 实测 C1/E1/G1/L1 四发"声明当前版＋正文语法坏"被说成
+   cause=invalid「语法没问题」——两句归反，修 loader.go 路由并补一发常驻用例，
+   证明有牙（拿掉修法必须红）。
+票 223 不翻勾、不 -done；migrate_test.go:123 一字不动；thresholds.go/golden 零接触。
