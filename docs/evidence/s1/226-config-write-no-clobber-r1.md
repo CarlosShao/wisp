@@ -178,6 +178,11 @@ internal/config/writeguard_226_test.go
   ⇒ 索引里**没有别人的东西**，所以这一发可以提；提交后 `git show --stat 78988901` 实测就是这 14 枚、`2049 insertions(+) / 28 deletions(-)`。
 - **第二枚 commit 之前**（本证据件 §3–§9 与 AC#6 那两枚读数件）：实际索引输出与 sha 记在 §10。
 
-## 10. 第二枚 commit
+## 10. 第二枚 commit 实测
 
-〔提交后回填：pathspec 清单、提交前索引实测输出、sha〕
+- **pathspec（写进 `git commit -F - --` 本身）**：`docs/evidence/s1/226-config-write-no-clobber-r1.md`、`.scratch/wisp/probes/226/r1/ac6-full-suite.txt`、`.scratch/wisp/probes/226/r1/ac6-full-suite-start.txt`。
+- **提交前 `git diff --cached --name-only` 的实际输出**：`git add` 之前**为空**；`git add -- <上面三枚>` 之后逐字为
+  `.scratch/wisp/probes/226/r1/ac6-full-suite-start.txt` / `.scratch/wisp/probes/226/r1/ac6-full-suite.txt` / `docs/evidence/s1/226-config-write-no-clobber-r1.md` ⇒ 索引里没有别人的东西。
+- **sha `361b314a`**（committer 时间 `2026-09-29T12:58:45+08:00`），`3 files changed, 224 insertions(+), 9 deletions(-)`。
+- ⚠ 两件需具名的外部事实：① 我的两枚 commit 之间，编排者自己提交了 `6cf2cc60`（`12:57:40`，`A431` 那枚）——我现跑 `git show --stat 6cf2cc60` 核对它的文件清单＝`docs/reports/pending-and-issues.md`／`docs/reports/HANDOVER.md`／`docs/reports/missing-features-2026-09-28-v3.md`＋一枚工单，**不含本票任何一枚文件**，所以它没带走我的活、我也没带走它的；② 那一发之后盘上 HEAD 已不是本腿起手锚点 `4540d5b1`，本件所有行号与读数都取自我自己这两枚 commit 的盘上状态（`78988901` 前后），不是起手锚点。
+- 本件（§10 回填）在第三枚 commit 里；那一发的 pathspec 只有这一枚 `.md`，提交前索引实测输出同样先为空。
