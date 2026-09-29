@@ -24,32 +24,33 @@ import (
 // where a waiting parent and a working child ever meet the same four slots was
 // never executed by any test in this repository - ledger A420's ring 7, and the
 // reason the shape stayed invisible through a green suite. Every leg below wires
-// SubagentDeps.ParentTools to the bridge itself, which is what cmd/wisp/run.go
+// SubagentDeps.ParentTools to the bridge itself, which is what cmd/wisp/run.go:581
 // does in production, so the mutual waiting is measured instead of inferred.
 //
 // No leg here judges a hang. Each one decides from a reading:
 //   - Test222WaitingParentHoldsNoBridgeSlot samples len(bridge.sem) at the
 //     instant every parent has announced "I am about to wait". The deterministic
 //     marker is the task.spawn onUpdate delta, which the tool emits after the
-//     point where it gives the slot up: 0 with the fix, 4 without it, and both
-//     readings arrive in microseconds.
+//     point where it gives the slot up: 0 with the fix, 4 without it - and both
+//     readings arrive in microseconds, no deadline involved.
 //   - Test222SpawnConclusionArrivesThroughRealBridgeChildren reads which TEXT the
-//     parent gets back: its own child's conclusion, or the
-//     「父任务这一侧已经不等了」 error. Removing the fix makes that a content
-//     failure, not a timeout.
+//     parent gets back: its own child's conclusion, or the timeout wording the
+//     bridge writes when the parent's own per-tool budget ran out. Removing the
+//     fix makes that a content failure.
 //   - Test222CeilingStillCapsExecutedCallsWhileParentsWait is the reverse control
 //     AC#2 demands: concurrent EXECUTIONS through the bridge stay at the frozen
 //     four (PLAN.md D38d's reason - one turn must not swamp the machine) while the
-//     parents wait, and each probe records how many parents had already returned
-//     at the moment it was allowed to run. That recording is the causal half -
-//     before the fix a probe can only run after a parent's deadline freed its slot,
-//     so the number it writes down is nonzero.
+//     parents wait. Each probe additionally records how many parents had already
+//     returned at the moment it started, which is the causal half: before the fix
+//     nothing can run until a parent's budget freed its slot, so the number it
+//     writes down is nonzero.
 //
 // The per-tool budget these legs build the bridge with is a test-local knob
-// (Options.DefaultTimeout; production reads cfg.Agent.PerToolTimeoutMS in
-// cmd/wisp/run.go). It exists so the pre-fix reading arrives about a second and a
-// half after the spawn instead of half a minute later. No assertion here is "we
-// waited and nothing came".
+// (Options.DefaultTimeout; production reads cfg.Agent.PerToolTimeoutMS at
+// cmd/wisp/run.go:562). It exists so the pre-fix reading arrives about three
+// seconds after the spawn instead of half a minute later, with enough slack that
+// a loaded machine cannot turn a post-fix run into a false red. No assertion here
+// is "we waited and nothing came".
 
 const (
 	parent222   = "parent-task-222"
@@ -60,16 +61,20 @@ const (
 	// two independent readings that can disagree are a measurement, one constant
 	// compared against itself is not. TestToolConcurrencyCeilingIsFour compares
 	// what it observes against MaxToolConcurrency and therefore cannot see that
-	// constant being raised (A420 names that by way of excuse); this one can.
+	// constant being raised (A420 names that); these legs can.
 	h222CeilingLiteral = 4
 
-	// h222PreFixBudget is the C22 budget these legs hand the bridge.
-	h222PreFixBudget = 1500 * time.Millisecond
+	// h222PreFixBudget is the C22 budget these legs hand the bridge: big enough
+	// that real work here (a fake provider plus an in-memory probe) cannot exhaust
+	// it by accident, small enough that the pre-fix reading is seconds.
+	h222PreFixBudget = 3 * time.Second
 
 	// h222SafetyBound is only a guard rail: if it ever fires, something in here is
 	// parked forever (the first candidate being a slot handed back twice, which
-	// blocks on an empty semaphore). It is never the assertion that decides.
-	h222SafetyBound = 20 * time.Second
+	// blocks forever on an empty semaphore - the last check of
+	// Test222CeilingStillCapsExecutedCallsWhileParentsWait is the other ruler for
+	// that shape). It is never the assertion that decides.
+	h222SafetyBound = 30 * time.Second
 )
 
 // h222 is the ticket 222 harness: ONE real bridge carrying both sides of the
@@ -82,13 +87,14 @@ type h222 struct {
 	// parents receives every parent's Result. The probes read its LENGTH while
 	// they run, which is the causal (not time-based) half of AC#2: with the fix a
 	// child's call executes while all parents are still waiting, so the number
-	// recorded is 0; without the fix nothing can execute until a parent's deadline
+	// recorded is 0; without the fix nothing executes until a parent's budget
 	// freed its slot, so the number recorded is at least 1.
 	parents chan Result
 
 	// parked receives the task.spawn "已派生" delta, which the tool emits AFTER the
-	// point where it gives the bridge slot back. Receiving N of them therefore
-	// means N parents stand at the wait, with no polling involved.
+	// point where it gives the bridge slot back. Holding N of them therefore means
+	// N parents stand at the wait with their slots already returned - no polling,
+	// no wall clock.
 	parked chan string
 
 	probe *probe222
@@ -100,7 +106,8 @@ type h222 struct {
 // probe222 is the tool the children call - and the only way to see the bridge's
 // execution window from the inside. It counts the calls running at the same
 // moment, samples len(bridge.sem) and the number of parents that had already
-// returned, and can park on gate222 so a leg gets a stable picture.
+// returned, and parks on gate222 when a leg set one so that several of them are
+// provably in flight at once.
 type probe222 struct {
 	h    *h222
 	name string
@@ -120,8 +127,11 @@ type probeRun222 struct {
 	returnedYet int
 }
 
-func (p *probe222) Name() string        { return p.name }
-func (p *probe222) Description() string { return "票 222 的探针：孩子在真桥上执行的那一枚工具" }
+func (p *probe222) Name() string { return p.name }
+func (p *probe222) Description() string {
+	return "票 222 的探针：孩子在真桥上执行的那一枚工具"
+}
+
 func (p *probe222) Parameters() JSONSchema {
 	return JSONSchema(`{"type":"object","properties":{"mark":{"type":"string"}},"additionalProperties":true}`)
 }
@@ -160,9 +170,8 @@ func (p *probe222) Execute(ctx context.Context, params json.RawMessage, _ func(s
 // that does WORK: turn 1 asks for a tool through the real bridge, turn 2 answers.
 // The two barriers make the interleaving deterministic without a wall clock - the
 // child announces itself inside its first model call and parks there until the leg
-// has every parent in place, so no child can slip onto the bridge before the
-// parents are all holding (which is exactly the case a pre-fix reading must not be
-// able to pass by luck).
+// has every parent in place, so no child can slip onto the bridge early and let a
+// pre-fix run pass by luck.
 type child222 struct {
 	id     string
 	answer string
@@ -238,15 +247,19 @@ func newH222(t *testing.T) *h222 {
 		Gate:           NoGate{},
 		DefaultTimeout: h222PreFixBudget,
 		Logf:           func(string, ...any) {},
-		OnUpdate: func(_, tool, delta string) {
+		OnUpdate: func(_, _, delta string) {
 			if strings.HasPrefix(delta, "task.spawn 已派生子代理") {
-				h.parked <- tool + "|" + delta
+				h.parked <- delta
 			}
 		},
 	})
+	// Resident: true is D15(1) and it is load-bearing here, not decoration: a
+	// non-resident entry is selected per turn by the loop's own retrieval, so a
+	// child asking for this tool by name could be refused before the call ever
+	// reached the bridge - which would make these legs measure the wrong thing.
 	if err := h.bridge.Registry().Register(Entry{
 		Tool: h.probe,
-		Decl: Decl{Declared: risk.L0, Provider: KindBuiltin},
+		Decl: Decl{Declared: risk.L0, Provider: KindBuiltin, Resident: true},
 	}); err != nil {
 		t.Fatalf("Register(%s): %v", probe222Tag, err)
 	}
@@ -305,8 +318,8 @@ func (h *h222) launchParents(t *testing.T, n int) {
 	}
 }
 
-// awaitTokens collects n values from ch, with the guard rail as the only way to
-// come back early. A fired guard rail is reported as what it would mean.
+// awaitTokens collects n values from ch. The guard rail is the only way it comes
+// back early, and it says what a fired rail would mean.
 func awaitTokens[T any](t *testing.T, name string, ch <-chan T, n int) []T {
 	t.Helper()
 	out := make([]T, 0, n)
@@ -323,37 +336,59 @@ func awaitTokens[T any](t *testing.T, name string, ch <-chan T, n int) []T {
 	return out
 }
 
+// parkParents puts n parents at the wait and proves the children are alive but
+// held: every child is inside its first model call and every parent has emitted
+// its spawn delta, which the tool emits AFTER it gave the bridge slot back.
+func (h *h222) parkParents(t *testing.T, n int) {
+	t.Helper()
+	h.launchParents(t, n)
+	awaitTokens(t, "孩子进入第一枚模型调用", h.started, n)
+	if got := len(h.parked); got != n {
+		t.Fatalf("只有 %d/%d 枚父任务到达等待点（父任务没派生成功，等待读数就无从谈起）", got, n)
+	}
+	if got := len(h.parents); got != 0 {
+		t.Fatalf("已经有 %d 枚父任务返回了，这一发的等待读数就是假的", got)
+	}
+}
+
 // AC#1 - the production shape gets its first ruler: n parents wait, each child
 // runs a real tool call ON THE SAME BRIDGE, and every parent must get its own
-// child's conclusion back rather than the 「父任务这一侧已经不等了」 error.
+// child's conclusion back rather than the timeout wording the bridge writes when
+// the parent gave up waiting.
 //
-// Removing the fix turns this red on CONTENT (IsError plus the wrong text), not
-// on a hang: the parents collect their own per-tool deadline and the leg decides
-// from the text that came back.
+// Removing the fix turns this red on CONTENT (IsError plus the wrong text) and on
+// the probe's own record of how many parents had already returned when it was
+// finally allowed to run - not on a hang.
 func Test222SpawnConclusionArrivesThroughRealBridgeChildren(t *testing.T) {
 	h := newH222(t)
 	h.wireSpawn(t)
+	h.probe.gate222 = make(chan struct{})
 
 	n := MaxConcurrentSubagents
-	h.launchParents(t, n)
-	awaitTokens(t, "孩子进入第一枚模型调用", h.started, n)
-	awaitTokens(t, "父任务到达等待点", h.parked, n)
-
-	if got := len(h.parents); got != 0 {
-		t.Fatalf("父任务还没等到孩子就返回了 %d 枚（这一发要量的正是等待期间发生了什么）", got)
-	}
+	h.parkParents(t, n)
 	close(h.release)
 
+	// The gate keeps every child inside its bridge call until all n arrived, so
+	// "the child ran while its parent was still waiting" is a fact this leg
+	// establishes rather than a race it hopes to win.
 	runs := awaitTokens(t, "孩子在桥上跑工具调用", h.probe.in, n)
 	if got := h.probe.runs.Load(); got != int32(n) {
-		t.Errorf("孩子在真桥上的工具调用跑了 %d 次，want %d（孩子的工具面没接到桥上＝A420 的第 7 环）", got, n)
+		t.Errorf("孩子在真桥上的工具调用跑了 %d 次, want %d（孩子的工具面没接到桥上＝A420 的第 7 环）", got, n)
 	}
 	for _, r := range runs {
 		if r.returnedYet != 0 {
-			t.Errorf("孩子 %s 的工具调用起跑时已有 %d 枚父任务返回，want 0：它是等父任务自己超时才挤上桥的", r.mark, r.returnedYet)
+			t.Errorf("孩子 %s 的工具调用起跑时已有 %d 枚父任务返回，want 0：它是等父任务的 per-tool 预算到点才挤上桥的",
+				r.mark, r.returnedYet)
 		}
 	}
+	// The n-th token proves all n children were inside the bridge at the same
+	// instant, i.e. the waiting parents had really given the slots back.
+	if last := runs[n-1]; last.slotsHeld != h222CeilingLiteral {
+		t.Errorf("第 %d 枚孩子的工具调用起跑时桥位占用 %d 枚, want %d（池内 %d 枚孩子该同时跑在 %d 枚许可上）",
+			n, last.slotsHeld, h222CeilingLiteral, n, h222CeilingLiteral)
+	}
 
+	close(h.probe.gate222)
 	results := awaitTokens(t, "父任务拿到结论", h.parents, n)
 	for i, res := range results {
 		if res.IsError {
@@ -385,6 +420,9 @@ func Test222SpawnConclusionArrivesThroughRealBridgeChildren(t *testing.T) {
 		t.Errorf("同时在桥上跑的工具调用数 %d 超过了冻结的 %d（不占许可地等，不等于把天花板说破）",
 			got, h222CeilingLiteral)
 	}
+	if got := len(h.bridge.sem); got != 0 {
+		t.Errorf("全部结束后桥位没回到空：%d, want 0", got)
+	}
 }
 
 // AC#2 - the shape that caused the whole ticket gets pinned: while every parent
@@ -398,9 +436,7 @@ func Test222WaitingParentHoldsNoBridgeSlot(t *testing.T) {
 	h.wireSpawn(t)
 
 	n := MaxConcurrentSubagents
-	h.launchParents(t, n)
-	awaitTokens(t, "孩子进入第一枚模型调用", h.started, n)
-	awaitTokens(t, "父任务到达等待点", h.parked, n)
+	h.parkParents(t, n)
 
 	held := len(h.bridge.sem)
 	if held != 0 {
@@ -409,9 +445,6 @@ func Test222WaitingParentHoldsNoBridgeSlot(t *testing.T) {
 	}
 	if got := cap(h.bridge.sem); got != h222CeilingLiteral {
 		t.Errorf("桥的执行许可总数 = %d, want %d（D38d 那枚数字不许被这枚票改动）", got, h222CeilingLiteral)
-	}
-	if got := len(h.parents); got != 0 {
-		t.Errorf("已经有 %d 枚父任务返回了，这一发的等待读数就是假的", got)
 	}
 	if got := h.roster.InFlightSubagents(); got != n {
 		t.Errorf("池内占位 = %d, want %d（不占桥的许可不等于把孩子从池里摘掉）", got, n)
@@ -439,9 +472,7 @@ func Test222CeilingStillCapsExecutedCallsWhileParentsWait(t *testing.T) {
 	h.probe.gate222 = make(chan struct{})
 
 	n := MaxConcurrentSubagents
-	h.launchParents(t, n)
-	awaitTokens(t, "孩子进入第一枚模型调用", h.started, n)
-	awaitTokens(t, "父任务到达等待点", h.parked, n)
+	h.parkParents(t, n)
 	if held := len(h.bridge.sem); held != 0 {
 		t.Fatalf("等待孩子的父任务占着 %d 枚桥位，want 0（反控的前半：先把许可还不回来）", held)
 	}
@@ -469,7 +500,7 @@ func Test222CeilingStillCapsExecutedCallsWhileParentsWait(t *testing.T) {
 	}
 	for _, r := range running {
 		if r.returnedYet != 0 {
-			t.Errorf("探针 %s 起跑时已有 %d 枚父任务返回，want 0：修前正是这样，谁都只能在父任务超时之后才上桥",
+			t.Errorf("探针 %s 起跑时已有 %d 枚父任务返回，want 0：修前正是这样，谁都只能在父任务预算到点之后才上桥",
 				r.mark, r.returnedYet)
 		}
 		if r.slotsHeld > h222CeilingLiteral {

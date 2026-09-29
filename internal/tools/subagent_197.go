@@ -64,12 +64,19 @@ const (
 	//
 	// The number is the bridge's D38d ceiling (MaxToolConcurrency in
 	// internal/tools/bridge.go, which is a frozen contract and not tunable
-	// upward), NOT a number picked from the roster's side: one in-flight spawn
-	// holds one bridge slot for its child's whole life, because the bridge keeps
-	// the semaphore held across entry.Tool.Execute. A pool LARGER than that
-	// ceiling would therefore admit rows the machine cannot actually run at once
-	// - the extra children sit queued inside the bridge while the roster already
-	// shows them as running, which is the exact lie ticket 211 was filed for.
+	// upward), NOT a number picked from the roster's side. Ticket 222 changed
+	// WHY the two numbers mean the same thing, not what they are: a spawn that is
+	// waiting for its child no longer holds a bridge slot (see
+	// giveBackWhileWaiting), so the ceiling is no longer a limit on how many
+	// children may EXIST at once - it is the limit on how many of them may be
+	// executing a tool in the same instant. A pool LARGER than that ceiling would
+	// therefore still admit rows the machine cannot run at once: the extra
+	// children now take turns (轮转) through the four execution slots instead of
+	// starving behind their own parents' holds, and the roster would still print
+	// all of them as 「在跑」, which is the lie ticket 211 was filed for. Whether
+	// the pool should be raised to 8 on top of a ceiling of 4 is NOT this file's
+	// call (ticket 222 AC#5 hands that reading to the owner); until it is made,
+	// the constant stays equal to the ceiling and
 	// internal/tools/subagent_197_test.go's
 	// Test197SubagentPoolNeverExceedsBridgeCeiling is the resident nail: raise
 	// this constant above the ceiling and that leg goes red. It is written as the
@@ -328,6 +335,25 @@ func (t subagentSpawn) Execute(ctx context.Context, params json.RawMessage, onUp
 	bg := child.RunAsync(childCtx, prompt)
 	t.d.Roster.PublishSubagent(bg.ID, parentID, label)
 	t.d.Roster.AttachCancel(bg.ID, cancelChild)
+	// Ticket 222 (丙): the wait below is not an execution, so it must not hold a
+	// D38d bridge token. Until here the spawn held one across the whole wait for
+	// its child, and the child asks for one of those SAME tokens to run any tool
+	// (cmd/wisp hands the bridge over as SubagentDeps.ParentTools) - with the pool
+	// full, every parent collected its own per-tool deadline and answered
+	// "不等了"/"工具 task.spawn 超时" while a healthy child sat queued behind the slot
+	// its own parent was holding. Giving the token back costs the frozen ceiling
+	// nothing: at most four tool calls still RUN at once, because a parked parent
+	// runs nothing. The token is not taken back afterwards (see inFlightSlot for
+	// why reacquiring would recreate the block), and everything this call still
+	// does after the wait - finalize, the C25 stamp, the journal row - is
+	// bookkeeping, not capability execution.
+	//
+	// The call sits HERE, ahead of the two "已派生" lines below, on purpose: a
+	// reader that has seen this call's spawn delta therefore knows the slot is
+	// already back, which is what makes ticket 222's occupancy leg decide without
+	// a deadline. The pool slot is a different thing and is NOT handed back here -
+	// the child still owns it until it really joins.
+	giveBackWhileWaiting(ctx)
 	t.feed(bg.ID, "已派生："+label)
 	if onUpdate != nil {
 		onUpdate(fmt.Sprintf("task.spawn 已派生子代理 %s（%s）", bg.ID, label))

@@ -435,9 +435,11 @@ func (b *Bridge) run(ctx context.Context, req agent.ToolRequest, entry Entry,
 	dec.Timeout = timeout
 
 	// D38d ceiling. A cancelled task must not queue behind a full semaphore.
+	slot := &inFlightSlot{}
 	select {
 	case b.sem <- struct{}{}:
-		defer func() { <-b.sem }()
+		slot.take(b.sem)
+		defer slot.giveBack()
 	case <-ctx.Done():
 		return b.close(ctx, req, dec, agent.ToolOutcome{
 			Text:       "任务已取消，调用未执行",
@@ -448,6 +450,7 @@ func (b *Bridge) run(ctx context.Context, req agent.ToolRequest, entry Entry,
 
 	ectx, cancel := b.execContext(ctx, timeout)
 	defer cancel()
+	ectx = withInFlightSlot(ectx, slot)
 	// D31: the running tool's only window onto the approval layer is its own
 	// context. The handle carries the correlation id the veto is keyed on, and
 	// Complete releases the gate's post-handoff record when the call is over.
@@ -621,6 +624,79 @@ func (h *hostPathBox) get() string {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	return h.path
+}
+
+// inFlightSlot is ticket 222's carrier for the ONE D38d ceiling token a running
+// call holds, hung on that call's context the way ticket 177 hangs its per-call
+// box: no new exported name, no new field on any contract type, nothing outside
+// this package can reach for it.
+//
+// Why it exists: run takes the token before entry.Tool.Execute and gave it back
+// only when the tool returned. For every tool that is right - holding while
+// executing is what "at most four tool calls at once" means. For task.spawn it
+// was wrong: the call spends its whole life waiting for a child that needs one of
+// those SAME four tokens to do its work, so every parent collected its own
+// per-tool deadline while its child queued behind the slot the parent was holding
+// (ticket 222's chain, rings 1-6; ledger A420). The frozen reason behind the
+// ceiling (PLAN.md D38d) is one turn must not swamp the machine, and a call that
+// is waiting runs nothing.
+//
+// The handoff is one-way: a call that gave its token back does not take another
+// one before returning. Re-acquiring would put the parent straight back into the
+// queue it just left, ending the wait with a subtler copy of the same block.
+// Everything such a call still does after the wait is bookkeeping (roster row,
+// C25 stamp, journal row), not capability execution, so nothing runs outside the
+// ceiling: the invariant moves to the one D38d's wording actually states, at most
+// four EXECUTIONS at once.
+//
+// It is deliberately not a public seam. Handing back is only honest for a call
+// that does nothing but wait from that point on, and today exactly one tool
+// qualifies. It is deliberately not a SubagentDeps field either: 197's
+// Test197SubagentHasNoSelfApprovalOutlet enumerates that struct's field set as
+// the "is this a second approval outlet?" check, and a slot handle would trip it.
+type inFlightSlot struct {
+	once sync.Once
+	sem  chan struct{}
+}
+
+// take records the token run has just acquired. Only run calls it, on the
+// goroutine that owns the slot, before that call's context is handed to the tool.
+func (s *inFlightSlot) take(sem chan struct{}) { s.sem = sem }
+
+// giveBack returns the token at most once and reports whether THIS call is the
+// one that gave it up. The once is load-bearing twice over: run defers it and the
+// tool may already have called it, and draining an empty semaphore would block
+// the returning goroutine forever - the hang this ticket refuses to leave behind.
+func (s *inFlightSlot) giveBack() bool {
+	gave := false
+	s.once.Do(func() {
+		if s.sem != nil {
+			<-s.sem
+			s.sem = nil
+			gave = true
+		}
+	})
+	return gave
+}
+
+type inFlightSlotKey struct{}
+
+func withInFlightSlot(ctx context.Context, s *inFlightSlot) context.Context {
+	return context.WithValue(ctx, inFlightSlotKey{}, s)
+}
+
+// giveBackWhileWaiting is the whole seam a waiting tool needs: it hands the
+// bridge token back for as long as the call only waits, and reports whether this
+// call ever held one. A context not built by Bridge.run (a tool invoked
+// directly, e.g. by a test or another host) holds no token and gets false, which
+// is a statement about the caller, never an error - the tool waits exactly as it
+// did before. It never blocks.
+func giveBackWhileWaiting(ctx context.Context) bool {
+	s, ok := ctx.Value(inFlightSlotKey{}).(*inFlightSlot)
+	if !ok || s == nil {
+		return false
+	}
+	return s.giveBack()
 }
 
 // cancelText asks the D31 bus for one call's applied-steps report, and returns
