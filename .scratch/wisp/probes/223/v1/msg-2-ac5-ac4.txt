@@ -1,0 +1,1 @@
+ledger(223-v1 AC#5+AC#4): AC#5 不成立——带 -v 的终态抓到一枚本票自己的红(TestTicket223RestartTierSaysItWillNotApply,安静单跑5发1红,非争用),红名册按用例名集合7枚逐名给全;AC#4 成立但带注——17发对抗输入实测:peekErr 不再被丢掉(语法错那句真可达),但"声明了当前版本又语法坏"的4发被归成 cause=invalid 那句"语法没问题",实现腿自述的边界规则被推翻一半

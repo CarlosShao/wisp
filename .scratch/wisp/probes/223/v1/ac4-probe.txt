@@ -1,0 +1,219 @@
+Tue Sep 29 15:54:12 CST 2026
+RULER: go test -overlay .scratch/wisp/probes/223/v1/overlay/overlay.json ./internal/config -count=1 -v -run TestV1ProbeLoaderClassification
+time=2026-09-29T15:54:13.236+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestV1ProbeLoaderClassification
+=== RUN   TestV1ProbeLoaderClassification/A1_票面基线_无版本且语法坏
+    zz_v1probe_test.go:61: PROBE "A1_票面基线_无版本且语法坏"  (实现腿 AC#4 种的那一发)
+    zz_v1probe_test.go:62:   declaredSchemaVersion -> value=0 ok=false
+    zz_v1probe_test.go:63:   peekSchemaVersion     -> ver=0 peekErrNil=false
+    zz_v1probe_test.go:65:   readConfigFile        -> ERR class-text="config: config.toml parse: toml: expected character ="
+    zz_v1probe_test.go:72:   file untouched
+=== RUN   TestV1ProbeLoaderClassification/A2_票面基线_声明1且坏表头
+    zz_v1probe_test.go:61: PROBE "A2_票面基线_声明1且坏表头"  (migrate_test.go:123 钉住的形状)
+    zz_v1probe_test.go:62:   declaredSchemaVersion -> value=1 ok=true
+    zz_v1probe_test.go:63:   peekSchemaVersion     -> ver=1 peekErrNil=false
+    zz_v1probe_test.go:65:   readConfigFile        -> ERR class-text="config: config.toml: cannot migrate from schema version 1: not valid TOML: toml: expected character ]; the file was left untouched - fix or restore it manually, it will never be silently reset"
+    zz_v1probe_test.go:72:   file untouched
+=== RUN   TestV1ProbeLoaderClassification/B1_版本写在section里
+    zz_v1probe_test.go:61: PROBE "B1_版本写在section里"  (任务①：非文件头)
+    zz_v1probe_test.go:62:   declaredSchemaVersion -> value=0 ok=false
+    zz_v1probe_test.go:63:   peekSchemaVersion     -> ver=0 peekErrNil=true
+    zz_v1probe_test.go:65:   readConfigFile        -> ERR class-text="config: config.toml: migration to schema version 2 produced an invalid config (config: config.toml: unknown key \"app.schema_version\" at line 4); the file was left untouched"
+    zz_v1probe_test.go:72:   file untouched
+=== RUN   TestV1ProbeLoaderClassification/B2_版本写在section里且语法坏
+    zz_v1probe_test.go:61: PROBE "B2_版本写在section里且语法坏"  (任务①的对抗发)
+    zz_v1probe_test.go:62:   declaredSchemaVersion -> value=0 ok=false
+    zz_v1probe_test.go:63:   peekSchemaVersion     -> ver=0 peekErrNil=false
+    zz_v1probe_test.go:65:   readConfigFile        -> ERR class-text="config: config.toml parse: toml: expected character ="
+    zz_v1probe_test.go:72:   file untouched
+=== RUN   TestV1ProbeLoaderClassification/C1_注释行以方括号开头
+    zz_v1probe_test.go:61: PROBE "C1_注释行以方括号开头"  (任务②)
+    zz_v1probe_test.go:62:   declaredSchemaVersion -> value=2 ok=true
+    zz_v1probe_test.go:63:   peekSchemaVersion     -> ver=2 peekErrNil=false
+    zz_v1probe_test.go:65:   readConfigFile        -> ERR class-text="config: config.toml: line 3, col 8: expected character ="
+    zz_v1probe_test.go:72:   file untouched
+=== RUN   TestV1ProbeLoaderClassification/D1_多行字符串里有一行以方括号开头_无版本
+    zz_v1probe_test.go:61: PROBE "D1_多行字符串里有一行以方括号开头_无版本"  (任务③)
+    zz_v1probe_test.go:62:   declaredSchemaVersion -> value=0 ok=false
+    zz_v1probe_test.go:63:   peekSchemaVersion     -> ver=0 peekErrNil=false
+    zz_v1probe_test.go:65:   readConfigFile        -> ERR class-text="config: config.toml parse: toml: expected character ="
+    zz_v1probe_test.go:72:   file untouched
+=== RUN   TestV1ProbeLoaderClassification/D2_多行字符串里有一行以方括号开头_版本在其后
+    zz_v1probe_test.go:61: PROBE "D2_多行字符串里有一行以方括号开头_版本在其后"  (任务③的对抗发：扫描器会不会先撞假表头就停)
+    zz_v1probe_test.go:62:   declaredSchemaVersion -> value=0 ok=false
+    zz_v1probe_test.go:63:   peekSchemaVersion     -> ver=0 peekErrNil=false
+    zz_v1probe_test.go:65:   readConfigFile        -> ERR class-text="config: config.toml parse: toml: expected character ="
+    zz_v1probe_test.go:72:   file untouched
+=== RUN   TestV1ProbeLoaderClassification/E1_CRLF且声明版本
+    zz_v1probe_test.go:61: PROBE "E1_CRLF且声明版本"  (任务④)
+    zz_v1probe_test.go:62:   declaredSchemaVersion -> value=2 ok=true
+    zz_v1probe_test.go:63:   peekSchemaVersion     -> ver=2 peekErrNil=false
+    zz_v1probe_test.go:65:   readConfigFile        -> ERR class-text="config: config.toml: line 2, col 8: expected character ="
+    zz_v1probe_test.go:72:   file untouched
+=== RUN   TestV1ProbeLoaderClassification/E2_CRLF无版本
+    zz_v1probe_test.go:61: PROBE "E2_CRLF无版本"  (任务④的对照)
+    zz_v1probe_test.go:62:   declaredSchemaVersion -> value=0 ok=false
+    zz_v1probe_test.go:63:   peekSchemaVersion     -> ver=0 peekErrNil=false
+    zz_v1probe_test.go:65:   readConfigFile        -> ERR class-text="config: config.toml parse: toml: expected character ="
+    zz_v1probe_test.go:72:   file untouched
+=== RUN   TestV1ProbeLoaderClassification/F1_BOM且声明版本
+    zz_v1probe_test.go:61: PROBE "F1_BOM且声明版本"  (任务⑤)
+    zz_v1probe_test.go:62:   declaredSchemaVersion -> value=0 ok=false
+    zz_v1probe_test.go:63:   peekSchemaVersion     -> ver=0 peekErrNil=false
+    zz_v1probe_test.go:65:   readConfigFile        -> ERR class-text="config: config.toml parse: toml: invalid character at start of key: ï"
+    zz_v1probe_test.go:72:   file untouched
+=== RUN   TestV1ProbeLoaderClassification/G1_无空格写法
+    zz_v1probe_test.go:61: PROBE "G1_无空格写法"  (任务⑥)
+    zz_v1probe_test.go:62:   declaredSchemaVersion -> value=2 ok=true
+    zz_v1probe_test.go:63:   peekSchemaVersion     -> ver=2 peekErrNil=false
+    zz_v1probe_test.go:65:   readConfigFile        -> ERR class-text="config: config.toml: line 2, col 8: expected character ="
+    zz_v1probe_test.go:72:   file untouched
+=== RUN   TestV1ProbeLoaderClassification/H1_同名键出现两次
+    zz_v1probe_test.go:61: PROBE "H1_同名键出现两次"  (任务⑦：TOML 里重复键＝解析错)
+    zz_v1probe_test.go:62:   declaredSchemaVersion -> value=2 ok=true
+    zz_v1probe_test.go:63:   peekSchemaVersion     -> ver=2 peekErrNil=false
+    zz_v1probe_test.go:65:   readConfigFile        -> ERR class-text="config: config.toml parse: toml: key schema_version is already defined"
+    zz_v1probe_test.go:72:   file untouched
+=== RUN   TestV1ProbeLoaderClassification/I1_首行就是fs表
+    zz_v1probe_test.go:61: PROBE "I1_首行就是fs表"  (任务⑧)
+    zz_v1probe_test.go:62:   declaredSchemaVersion -> value=0 ok=false
+    zz_v1probe_test.go:63:   peekSchemaVersion     -> ver=0 peekErrNil=false
+    zz_v1probe_test.go:65:   readConfigFile        -> ERR class-text="config: config.toml parse: toml: expected character ="
+    zz_v1probe_test.go:72:   file untouched
+=== RUN   TestV1ProbeLoaderClassification/J1_声明未来版本99且语法坏
+    zz_v1probe_test.go:61: PROBE "J1_声明未来版本99且语法坏"  (版本探针读到 99 会走哪一句)
+    zz_v1probe_test.go:62:   declaredSchemaVersion -> value=99 ok=true
+    zz_v1probe_test.go:63:   peekSchemaVersion     -> ver=99 peekErrNil=false
+    zz_v1probe_test.go:65:   readConfigFile        -> ERR class-text="config: config.toml: schema_version 99 was written by a newer build (this build understands 2); upgrade Wisp or restore a backup"
+    zz_v1probe_test.go:72:   file untouched
+=== RUN   TestV1ProbeLoaderClassification/K1_版本被写成字符串
+    zz_v1probe_test.go:61: PROBE "K1_版本被写成字符串"  (Atoi 解不开时归谁)
+    zz_v1probe_test.go:62:   declaredSchemaVersion -> value=0 ok=false
+    zz_v1probe_test.go:63:   peekSchemaVersion     -> ver=0 peekErrNil=false
+    zz_v1probe_test.go:65:   readConfigFile        -> ERR class-text="config: config.toml parse: toml: cannot decode TOML string into struct field struct { SchemaVersion int \"toml:\\\"schema_version\\\"\" }.SchemaVersion of type int"
+    zz_v1probe_test.go:72:   file untouched
+=== RUN   TestV1ProbeLoaderClassification/L1_行首缩进的版本行
+    zz_v1probe_test.go:61: PROBE "L1_行首缩进的版本行"  (TrimSpace 支不支持)
+    zz_v1probe_test.go:62:   declaredSchemaVersion -> value=2 ok=true
+    zz_v1probe_test.go:63:   peekSchemaVersion     -> ver=2 peekErrNil=false
+    zz_v1probe_test.go:65:   readConfigFile        -> ERR class-text="config: config.toml: line 2, col 8: expected character ="
+    zz_v1probe_test.go:72:   file untouched
+=== RUN   TestV1ProbeLoaderClassification/M1_合法v1需要真迁移
+    zz_v1probe_test.go:61: PROBE "M1_合法v1需要真迁移"  (对照组：这句话本就该归迁移管线)
+    zz_v1probe_test.go:62:   declaredSchemaVersion -> value=1 ok=true
+    zz_v1probe_test.go:63:   peekSchemaVersion     -> ver=1 peekErrNil=true
+    zz_v1probe_test.go:67:   readConfigFile        -> OK schema_version=2 ball.size=56
+    zz_v1probe_test.go:70:   *** FILE WAS REWRITTEN by the load pipeline (40 -> 41 bytes)
+--- PASS: TestV1ProbeLoaderClassification (0.05s)
+    --- PASS: TestV1ProbeLoaderClassification/A1_票面基线_无版本且语法坏 (0.00s)
+    --- PASS: TestV1ProbeLoaderClassification/A2_票面基线_声明1且坏表头 (0.00s)
+    --- PASS: TestV1ProbeLoaderClassification/B1_版本写在section里 (0.00s)
+    --- PASS: TestV1ProbeLoaderClassification/B2_版本写在section里且语法坏 (0.00s)
+    --- PASS: TestV1ProbeLoaderClassification/C1_注释行以方括号开头 (0.00s)
+    --- PASS: TestV1ProbeLoaderClassification/D1_多行字符串里有一行以方括号开头_无版本 (0.00s)
+    --- PASS: TestV1ProbeLoaderClassification/D2_多行字符串里有一行以方括号开头_版本在其后 (0.00s)
+    --- PASS: TestV1ProbeLoaderClassification/E1_CRLF且声明版本 (0.00s)
+    --- PASS: TestV1ProbeLoaderClassification/E2_CRLF无版本 (0.00s)
+    --- PASS: TestV1ProbeLoaderClassification/F1_BOM且声明版本 (0.00s)
+    --- PASS: TestV1ProbeLoaderClassification/G1_无空格写法 (0.00s)
+    --- PASS: TestV1ProbeLoaderClassification/H1_同名键出现两次 (0.00s)
+    --- PASS: TestV1ProbeLoaderClassification/I1_首行就是fs表 (0.00s)
+    --- PASS: TestV1ProbeLoaderClassification/J1_声明未来版本99且语法坏 (0.00s)
+    --- PASS: TestV1ProbeLoaderClassification/K1_版本被写成字符串 (0.00s)
+    --- PASS: TestV1ProbeLoaderClassification/L1_行首缩进的版本行 (0.00s)
+    --- PASS: TestV1ProbeLoaderClassification/M1_合法v1需要真迁移 (0.01s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/config	0.076s
+EXIT_CONFIG=0
+Tue Sep 29 15:54:13 CST 2026
+RULER: go test -overlay .scratch/wisp/probes/223/v1/overlay/overlay.json ./cmd/wisp -count=1 -v -run TestV1ProbeProductionSentence
+time=2026-09-29T15:54:16.460+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestV1ProbeProductionSentence
+=== RUN   TestV1ProbeProductionSentence/A1_票面基线_无版本且语法坏
+    zz_v1probe_test.go:67: SENTENCE "A1_票面基线_无版本且语法坏"
+    zz_v1probe_test.go:68:   raw err = config: config.toml parse: toml: expected character =
+    zz_v1probe_test.go:69:   PRODUCTION LINE = config: HOT-RELOAD state=not-applied cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestV1ProbeProductionSentence/A2_票面基线_声明1且坏表头
+    zz_v1probe_test.go:67: SENTENCE "A2_票面基线_声明1且坏表头"
+    zz_v1probe_test.go:68:   raw err = config: config.toml: cannot migrate from schema version 1: not valid TOML: toml: expected character ]; the file was left untouched - fix or restore it manually, it will never be silently reset
+    zz_v1probe_test.go:69:   PRODUCTION LINE = config: HOT-RELOAD state=not-applied cause=migration detail="config.toml 声明了一个这份 Wisp 不会迁移的 schema_version（文件被原样留着，不会被重置）。本次运行继续用内存里的旧配置；升级 Wisp 或恢复备份才会读它"
+=== RUN   TestV1ProbeProductionSentence/B1_版本写在section里
+    zz_v1probe_test.go:67: SENTENCE "B1_版本写在section里"
+    zz_v1probe_test.go:68:   raw err = config: config.toml: migration to schema version 2 produced an invalid config (config: config.toml: unknown key "app.schema_version" at line 4); the file was left untouched
+    zz_v1probe_test.go:69:   PRODUCTION LINE = config: HOT-RELOAD state=not-applied cause=unknown-key detail="config.toml 语法没问题，但里面有这份 schema 不认的键（拼错的键会被这样拒绝，而不是被忽略）。本次运行继续用内存里的旧配置"
+=== RUN   TestV1ProbeProductionSentence/B2_版本写在section里且语法坏
+    zz_v1probe_test.go:67: SENTENCE "B2_版本写在section里且语法坏"
+    zz_v1probe_test.go:68:   raw err = config: config.toml parse: toml: expected character =
+    zz_v1probe_test.go:69:   PRODUCTION LINE = config: HOT-RELOAD state=not-applied cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestV1ProbeProductionSentence/C1_注释行以方括号开头
+    zz_v1probe_test.go:67: SENTENCE "C1_注释行以方括号开头"
+    zz_v1probe_test.go:68:   raw err = config: config.toml: line 3, col 8: expected character =
+    zz_v1probe_test.go:69:   PRODUCTION LINE = config: HOT-RELOAD state=not-applied cause=invalid detail="config.toml 语法没问题，但内容被校验拒绝（值不合法或引用解不开）。本次运行继续用内存里的旧配置"
+=== RUN   TestV1ProbeProductionSentence/D1_多行字符串里的假表头_无版本
+    zz_v1probe_test.go:67: SENTENCE "D1_多行字符串里的假表头_无版本"
+    zz_v1probe_test.go:68:   raw err = config: config.toml parse: toml: expected character =
+    zz_v1probe_test.go:69:   PRODUCTION LINE = config: HOT-RELOAD state=not-applied cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestV1ProbeProductionSentence/D2_多行字符串里的假表头_版本在其后
+    zz_v1probe_test.go:67: SENTENCE "D2_多行字符串里的假表头_版本在其后"
+    zz_v1probe_test.go:68:   raw err = config: config.toml parse: toml: expected character =
+    zz_v1probe_test.go:69:   PRODUCTION LINE = config: HOT-RELOAD state=not-applied cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestV1ProbeProductionSentence/E1_CRLF且声明版本
+    zz_v1probe_test.go:67: SENTENCE "E1_CRLF且声明版本"
+    zz_v1probe_test.go:68:   raw err = config: config.toml: line 2, col 8: expected character =
+    zz_v1probe_test.go:69:   PRODUCTION LINE = config: HOT-RELOAD state=not-applied cause=invalid detail="config.toml 语法没问题，但内容被校验拒绝（值不合法或引用解不开）。本次运行继续用内存里的旧配置"
+=== RUN   TestV1ProbeProductionSentence/E2_CRLF无版本
+    zz_v1probe_test.go:67: SENTENCE "E2_CRLF无版本"
+    zz_v1probe_test.go:68:   raw err = config: config.toml parse: toml: expected character =
+    zz_v1probe_test.go:69:   PRODUCTION LINE = config: HOT-RELOAD state=not-applied cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestV1ProbeProductionSentence/F1_BOM且声明版本
+    zz_v1probe_test.go:67: SENTENCE "F1_BOM且声明版本"
+    zz_v1probe_test.go:68:   raw err = config: config.toml parse: toml: invalid character at start of key: ï
+    zz_v1probe_test.go:69:   PRODUCTION LINE = config: HOT-RELOAD state=not-applied cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestV1ProbeProductionSentence/G1_无空格写法
+    zz_v1probe_test.go:67: SENTENCE "G1_无空格写法"
+    zz_v1probe_test.go:68:   raw err = config: config.toml: line 2, col 8: expected character =
+    zz_v1probe_test.go:69:   PRODUCTION LINE = config: HOT-RELOAD state=not-applied cause=invalid detail="config.toml 语法没问题，但内容被校验拒绝（值不合法或引用解不开）。本次运行继续用内存里的旧配置"
+=== RUN   TestV1ProbeProductionSentence/H1_同名键出现两次
+    zz_v1probe_test.go:67: SENTENCE "H1_同名键出现两次"
+    zz_v1probe_test.go:68:   raw err = config: config.toml parse: toml: key schema_version is already defined
+    zz_v1probe_test.go:69:   PRODUCTION LINE = config: HOT-RELOAD state=not-applied cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestV1ProbeProductionSentence/I1_首行就是fs表
+    zz_v1probe_test.go:67: SENTENCE "I1_首行就是fs表"
+    zz_v1probe_test.go:68:   raw err = config: config.toml parse: toml: expected character =
+    zz_v1probe_test.go:69:   PRODUCTION LINE = config: HOT-RELOAD state=not-applied cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestV1ProbeProductionSentence/J1_声明未来版本99且语法坏
+    zz_v1probe_test.go:67: SENTENCE "J1_声明未来版本99且语法坏"
+    zz_v1probe_test.go:68:   raw err = config: config.toml: schema_version 99 was written by a newer build (this build understands 2); upgrade Wisp or restore a backup
+    zz_v1probe_test.go:69:   PRODUCTION LINE = config: HOT-RELOAD state=not-applied cause=invalid detail="config.toml 语法没问题，但内容被校验拒绝（值不合法或引用解不开）。本次运行继续用内存里的旧配置"
+=== RUN   TestV1ProbeProductionSentence/K1_版本被写成字符串
+    zz_v1probe_test.go:67: SENTENCE "K1_版本被写成字符串"
+    zz_v1probe_test.go:68:   raw err = config: config.toml parse: toml: cannot decode TOML string into struct field struct { SchemaVersion int "toml:\"schema_version\"" }.SchemaVersion of type int
+    zz_v1probe_test.go:69:   PRODUCTION LINE = config: HOT-RELOAD state=not-applied cause=syntax detail="config.toml 读到了但解析不了：这一行不是合法 TOML 语法（不是权限、不是缺失）。本次运行继续用内存里的旧配置；修好之后要再出现一次新的 mtime/大小才会被重读"
+=== RUN   TestV1ProbeProductionSentence/L1_行首缩进的版本行
+    zz_v1probe_test.go:67: SENTENCE "L1_行首缩进的版本行"
+    zz_v1probe_test.go:68:   raw err = config: config.toml: line 2, col 8: expected character =
+    zz_v1probe_test.go:69:   PRODUCTION LINE = config: HOT-RELOAD state=not-applied cause=invalid detail="config.toml 语法没问题，但内容被校验拒绝（值不合法或引用解不开）。本次运行继续用内存里的旧配置"
+=== RUN   TestV1ProbeProductionSentence/M1_合法v1需要真迁移
+    zz_v1probe_test.go:73: SENTENCE "M1_合法v1需要真迁移" -> APPLIED hot=[] reload=[] restart=[] locked=0
+--- PASS: TestV1ProbeProductionSentence (1.13s)
+    --- PASS: TestV1ProbeProductionSentence/A1_票面基线_无版本且语法坏 (0.07s)
+    --- PASS: TestV1ProbeProductionSentence/A2_票面基线_声明1且坏表头 (0.07s)
+    --- PASS: TestV1ProbeProductionSentence/B1_版本写在section里 (0.07s)
+    --- PASS: TestV1ProbeProductionSentence/B2_版本写在section里且语法坏 (0.07s)
+    --- PASS: TestV1ProbeProductionSentence/C1_注释行以方括号开头 (0.07s)
+    --- PASS: TestV1ProbeProductionSentence/D1_多行字符串里的假表头_无版本 (0.07s)
+    --- PASS: TestV1ProbeProductionSentence/D2_多行字符串里的假表头_版本在其后 (0.06s)
+    --- PASS: TestV1ProbeProductionSentence/E1_CRLF且声明版本 (0.07s)
+    --- PASS: TestV1ProbeProductionSentence/E2_CRLF无版本 (0.07s)
+    --- PASS: TestV1ProbeProductionSentence/F1_BOM且声明版本 (0.07s)
+    --- PASS: TestV1ProbeProductionSentence/G1_无空格写法 (0.07s)
+    --- PASS: TestV1ProbeProductionSentence/H1_同名键出现两次 (0.07s)
+    --- PASS: TestV1ProbeProductionSentence/I1_首行就是fs表 (0.07s)
+    --- PASS: TestV1ProbeProductionSentence/J1_声明未来版本99且语法坏 (0.07s)
+    --- PASS: TestV1ProbeProductionSentence/K1_版本被写成字符串 (0.06s)
+    --- PASS: TestV1ProbeProductionSentence/L1_行首缩进的版本行 (0.07s)
+    --- PASS: TestV1ProbeProductionSentence/M1_合法v1需要真迁移 (0.07s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.165s
+EXIT_CMDWISP=0
+Tue Sep 29 15:54:17 CST 2026
