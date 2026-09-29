@@ -1,0 +1,1 @@
+223-v2 第①节落盘：带 -v 的终态整包读数（起手 17:01:29／终态 17:03:53，full-v.txt 7,097 行全量未截断）——26 包＝24 ok／2 FAIL（internal/ball＋internal/panel 历史红），红名册按用例名集合恰为在册 5 枚历史红、零新增；本票那枚 TestTicket223RestartTierSaysItWillNotApply 在这发 PASS 2.14s；与 v1 那发做逐名对拉（只在 v2＝1 枚新用例、消失 0 枚、状态翻动 2 枚）；逐名绿册 1,161＋573 行落盘。AC#5 不成立的那一点在本发消除。
