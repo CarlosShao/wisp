@@ -1,0 +1,12 @@
+time=2026-09-29T23:04:58.882+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestResolvePerCallBudget
+    pathresolver_budget_norace_test.go:34: C26 Resolve: 267488 ns/op = 0.267 ms/op (budget 1.000 ms, 4130 samples)
+--- PASS: TestResolvePerCallBudget (1.16s)
+=== RUN   TestResolvePerCallBudget
+    pathresolver_budget_norace_test.go:34: C26 Resolve: 278676 ns/op = 0.279 ms/op (budget 1.000 ms, 4224 samples)
+--- PASS: TestResolvePerCallBudget (1.23s)
+=== RUN   TestResolvePerCallBudget
+    pathresolver_budget_norace_test.go:34: C26 Resolve: 306737 ns/op = 0.307 ms/op (budget 1.000 ms, 4570 samples)
+--- PASS: TestResolvePerCallBudget (1.45s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	3.865s
