@@ -21,7 +21,7 @@
 | 3 | 07 | `:59` | Hotkeys registered/re-registered on config change | **丙** | 票 64 `:44`/`:59`/`:60`；"mute→Muted"半枚只有 64 `:152` 自述＋`internal/ball/hotkey_live_test.go:225` |
 | 4 | 07 | `:61` | Multi-monitor: drag to second monitor | **丙** | 票 64 `:83`（`- [ ]`，硬件缺席）＋`:234`「本票不能置 done」 |
 | 5 | 11 | `:53` | Probe suite: mockllm control endpoints | **丙** | 移交 commit `9293518d`（"AC#6 transferred as A11"）；票 12 `:120`/`:123`/`:128`；`internal/llm/probe_health.go:14`、`cmd/wisp/providers.go:189/:195`、`providers_test.go:143` |
-| 6 | 63 | `:46` | 端到端：`api_key_ref = "secret:<id>"` 被 provider 解析 | **丙** | 移交 commit `25d5c3ca`（"registered as A8"）；票 12 `:109`/`:112`/`:117-119`；`cmd/wisp/run_test.go:420`/`:446` |
+| 6 | 63 | `:46` | 端到端：`api_key_ref = "secret:<id>"` 被 provider 解析 | **丙** | 移交 commit `25d5c3ca`（"registered as A8"）；票 12 `:109`/`:112`/`:116-119`；`cmd/wisp/run_test.go:420`/`:446` |
 | 7 | 80 | `:43` | AC#3 接线落地 + 真跑在 `risk.Gate` 上的用例 | **丙** | 票 230 `:22`（AC#3 交接要么落地要么作废）＋`:23`（(a) 半枚"本票不接"，待人工）；`internal/tools/mode.go:98` 有生产调用点、`internal/config/unwired.go:81` 说 map 无人填 |
 | 8 | 80 | `:50` | AC#4 变异双向 | **丙** | 票 230 `:22` 同一格（"把票 80 那两格转进本票"） |
 | 9 | 80 | `:54` | AC#5 门禁（只跑自己碰到的包） | **丙** | 票 83 `:57`（`- [x]` 同族门禁）；⚠ 83 那格包名只写 `internal/config` |
@@ -161,8 +161,9 @@
 - 归口去处**本腿现读**（`12-cli-text-path-s1-gate.md`，无 `-done` 后缀＝仍开放，un=3）：
   - `:109` 是一枚 **`- [x]`**，逐字「Key comes from the store, not the config: the provider that serves the `wisp run` request is」
   - `:112` 逐字「(not one a test-written client set). **Handed here from ticket 63 AC#6**, whose end-to-end proves」
-  - `:117-118` 逐字「—— **A8 就此闭环**：`cmd/wisp/run_test.go::TestRunTextTaskKeyResolvesInTheStore`（provider 自己
-    发出请求、key 从 DPAPI 存储解析）+ `TestMissingBlobFailsUnconfiguredNeverSilently`（正是上面那条变异判据…）」
+  - `:116-117` 逐字「—— **A8 就此闭环**：`cmd/wisp/run_test.go::TestRunTextTaskKeyResolvesInTheStore`（provider 自己
+    发出请求、key 从 DPAPI 存储解析）+ `TestMissingBlobFailsUnconfiguredNeverSilently`（正是上面那条变异判据…）」，
+    `:119` 逐字「我亲自跑通（含在 ok 13.794s 那一批里）」
 - 盘上凭据（本腿现读，允许地界）：`cmd/wisp/run_test.go:420` `func TestRunTextTaskKeyResolvesInTheStore(t *testing.T)`、
   `:446` `func TestMissingBlobFailsUnconfiguredNeverSilently(t *testing.T)`、`:25` 头注释逐字
   「TestRunTextTaskKeyResolvesInTheStore A8: the Authorization header the」
@@ -527,7 +528,7 @@
 - 归口核查：票 113 自己的 AC#6（`:61`，已勾，编排者追加）不是这五发的接管方；
   本腿在 230／111／112／140 四张票里 `grep -n` 也没有找到"重跑 113 门禁"的具名句 ⇒ 不是丙。
 
-## 12. 票 115 —— `115-…-while-the-cases-compare-caller-spelling-done.md`（3 枚）
+## 12. 票 115 —— `115-seal-notices-carry-the-resolvers-answer-while-the-cases-compare-caller-spelling-done.md`（3 枚）
 
 > 本腿现量：un = 3（`:44` `:58` `:64`）；AC 区共 7 枚，已勾 3 枚（`:47` `:52` `:68`），
 > 另有 **1 枚已被搬出勾框**：`- ⛔ **AC#5**` 在 `:61`（`grep -c '^- ⛔'` = 1）⇒
