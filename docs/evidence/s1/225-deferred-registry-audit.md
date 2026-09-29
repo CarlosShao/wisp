@@ -347,5 +347,23 @@
 **本腿对仓库的唯一写入＝本文件一枚**（`?? docs/evidence/s1/225-deferred-registry-audit.md`，`git status --porcelain` 现读）；
 未 push、未 add 任何其他路径、未还原/删除任何别人的脏改动。
 
+### ⚠ 更正（12:18 现跑，原句一字不抹）：上面那句**只对了"我 add 了什么"，没对住"commit 里装了什么"**
+
+- 事实：我那枚 commit＝**`dd7c447f`**，`git show --name-status` 现读列出**两枚 A**：
+  `docs/evidence/s1/225-deferred-registry-audit.md` ＋ **`internal/tools/subagent_222_test.go`（别人的在飞写腿 222-r1 的测试件，496 行）**。
+- 成因（具名到我自己的错）：我只做了 `git add -- <我的文件>`（显式 pathspec，守住了），**但 `git commit` 没带 pathspec** ⇒
+  共享工作树里**索引是全局的**，另一条腿此刻已 `git add` 但尚未提交的那枚文件被我的 commit 一起收走。
+  ⛔ 这正是 `AGENTS.md §1.4`／`issues/README` 规则 1 防的那件事——**"显式 pathspec"要一路管到 `commit` 那一步，不止 `add`**。
+  而且 222-r1 自己那枚前作 `92a4b5b7` 的消息里逐字写着"本 commit 只这一枚文件＋**一枚未提交的测试件**"⇒ 它**有意把那枚测试件留在未提交状态**，被我提走了。
+- **有没有丢东西：没有。**现跑 `git status --porcelain internal/tools/subagent_222_test.go` ＝ **空** ⇒ 盘上内容与 `HEAD` 逐字一致，
+  该文件是**被"提交"而不是被"改动/删除"**；我也**不打算**用 `reset`/`amend`/`checkout .`/`restore` 去"退回来"——
+  那四把都是禁区里的破坏性操作，且会把别人的活真弄丢。
+- **要人做的事（我不替编排者做）**：①`dd7c447f` 的**归属**要在台账具名（222-r1 的测试件出现在 225 的 commit 里，
+  照本仓"逐名比红名集合"的推送习惯，这枚 commit 的文件清单与消息不符＝**推送前先由编排者处置**：
+  要么在 `A##` 记这一笔并把 222 的核过链按 `dd7c447f` 认，要么由编排者自己决定怎么拆——**两条都不该由本腿执行**，本腿已无权改历史）；
+  ②222-r1 那条腿需要被告知"你那枚测试件已经在 `dd7c447f` 里提交了，别再重复 add／别再等它处于未跟踪态"。
+- **今后本腿形状（一句规矩，抄自这次事故）**：提交一律写成 `git commit -- <显式 pathspec>`（**commit 带 pathspec 才会绕开索引里别人的东西**），
+  并在提交后立刻 `git show --name-status` 复核文件清单只有一枚。这一把我复核了，所以才撞见。
+
 
 
