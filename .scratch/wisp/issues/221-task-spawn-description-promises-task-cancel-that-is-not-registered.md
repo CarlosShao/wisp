@@ -30,7 +30,7 @@
 - [x] **AC#2（仅甲形）**：`TaskRoster.Cancel` 有**生产调用者**（现跑点数：改前 0 枚 ⇒ 改后 ≥1 枚，且调用者在装配路径上、不在测试里）；停一名孩子后**它自己的流要有终态**（不许让那行凭空消失，要留下"被谁停的"），名册那一行状态要落到 D43 已有的名（**不许新造态名**）。
 - [x] **AC#3 边界正控**：造两枚假腿——① 子代理停**兄弟**② 子代理停**自己**——**两枚都必须被拒**；并一条判据钉住"父取消仍不级联"（`subagent_197.go:327` 那形不许被本票改坏）。
 - [x] **AC#4 DEFERRED 登记 1:1**：走甲形后，`task.cancel` 的 DEFERRED 标记与 `SPEC-12 §5` 登记表**双向对得上**；走乙形则原标记一字不动（`AGENTS.md` §1.1 硬要求）。
-- [ ] **AC#5 整包终态读数**：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp ./internal/...` 到终态＋逐名比红名集合（`-run` 单跑不算）；gofumpt 用 `"$GOPATH/bin/gofumpt.exe"`（v0.12.0）。
+- [x] **AC#5 整包终态读数**：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp ./internal/...` 到终态＋逐名比红名集合（`-run` 单跑不算）；gofumpt 用 `"$GOPATH/bin/gofumpt.exe"`（v0.12.0）。
 
 ## 禁区
 
@@ -162,7 +162,10 @@
   `bash scripts/d22scan.sh` rc=0（"clean - no D22 ban violations"，它自己先跑了正控）。⚠ 读数时刻意**不含**任何 `frontend/**`／`design/**` 内容转述。
 - **AC#5 第一发整包读数**（`.scratch/wisp/probes/221/r1/ac5-run1.log`，
   `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test -count=1 ./cmd/wisp ./internal/...`，rc=**1**）：
-  - 包级行数 22（`grep -cE '^(ok|FAIL)[ \t]'`；⚠ 尺按派单纠正过：`^ok\t` 匹配不到，`ok` 行是"两个空格＋tab"）；
+  - ⚠ 原句留档不抹：这一格第一次落盘写的是「包级行数 22（尺＝`grep -cE '^(ok|FAIL)[ \t]'`）」——
+    **那把尺我自己抄错了**（ERE 里 `\t` 不是 tab 转义，于是 `FAIL<TAB>` 那些行全匹配不到、少算 4 枚失败包），
+    纠偏与对拉写在续 3，那一发当时的失败包数（4 枚）与红名（7 枚）从头到尾没受影响。
+  - 包级 breakdown（终读）：**ok 22 枚／FAIL 4 枚／无测试文件 5 枚**；
     失败包 **4 枚**（`grep -P '^FAIL\t'`：`cmd/wisp` 132.9s／`internal/ball` 0.29s／`internal/panel` 3.41s／`internal/risk` 7.72s）；
   - 名级红 **7 枚**（`grep -cE '^[[:space:]]*--- (FAIL|PASS)'` 得 7 枚 `---` 结果行，本发不带 `-v`，故 PASS 层不打印、`=== RUN`＝0；
     ⚠ 我没有把两层混着报）；
@@ -190,3 +193,42 @@
   **"被谁停的"这一维仍按 `A434` item 4 落在审计里，但它是被用例证明的、不是被说明书承诺的**：
   `Test221ParentStopsItsOwnChildRowAndStreamSettle` 直接断审计行含 `tool=task.cancel` 且 `task=<调用者>`，
   并读 `memory.Store` 里那条 `tool_call`：`TaskID`＝调用者、`ArgsJSON` 含目标 id。
+
+### 221-r1（续 3，同一腿，收尾）：AC#5 三发整包读数＋逐名比红名集合＝本腿新增红零枚
+
+- **状态**：**AC#5 带注成立**（注的内容在下面第三发的归因里，全是别人地界的在册红与一枚并行敏感红）。
+- **三发都同一条尺**：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test -count=1 ./cmd/wisp ./internal/...`，
+  起跑前 `tasklist //FI "IMAGENAME eq go.exe"` 现量＝0（一次只跑一发），日志留在
+  `.scratch/wisp/probes/221/r1/ac5-run1.log`／`ac5-run2.log`／`ac5-run3-finaltree.log`（临时件只建不删）。
+  | 发 | 树 | rc | 包级：ok／FAIL／无测试文件 | 失败包（`grep -cP '^FAIL\t'`） | 名级红（`grep -cE '^[[:space:]]*--- FAIL'`） |
+  |---|---|---|---|---|---|
+  | 1 | 中间态（代码已全，两处面向模型的文本尾修在前） | **1** | 22／4／5 | **4**：cmd/wisp 132.9s／internal/ball 0.29s／internal/panel 3.41s／internal/risk 7.72s | **7** |
+  | 2 | 同上（尾修落在跑动期间，这一发编译到的是它自己开始时的那一版） | **1** | 23／3／5 | **3**：ball 0.24s／panel 3.09s／risk 8.08s | **6** |
+  | 3 | **终态树**＝`c44b30c4` 那一发，与交付同一版 | **1** | 23／3／5 | **3**：ball 0.27s／panel 4.71s／risk 7.89s | **6** |
+  ⚠ **抄这把尺的时候我自己踩了一次派单点名的那个坑**：`grep -cE '^(ok|FAIL)[ \t]'` 里的 `\t` 在 ERE 内**不是 tab 转义**，
+  于是 `FAIL<TAB>…` 那些行匹配不到、`ok` 行倒是全match——我第一版表格因此把 run1 报成"包级 22"（少算了 4 枚失败包）。
+  现读改为 `[[:space:]]` 与 `grep -P '^FAIL\t'` 对拉，上表就是纠正后的读数（三发的包级总数都是 22+4+5／23+3+5＝31 枚包，互相自洽）。
+- **终态那发的逐名归因**（⚠ 尺按派单纠正：包级 `ok` 行是"两空格＋tab"，用 `^(ok|FAIL)[ \t]`；名级两层不混报——
+  这三发都不带 `-v`，Go 只打印失败名，故 `=== RUN`＝0、缩进层＝0，我不会把它当"两层全量"来吹）：
+  - `internal/panel` **4 枚**：`TestC21DesignTokensFourWayAgree`／`TestApprovalCardViewJSONKeysMatchFrontendTypes`／
+    `TestComposerContractTypesMatchFrontend`／`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`；
+    `internal/ball` **1 枚**：`TestC21TableColourRowsMatchTokensCSS`。
+    ⇒ **＝派单点名的在册红（panel 4＋ball 1）**，一枚不多一枚不少，全部落在那两棵本腿零读零写的目录上
+    （其中两枚的失败正文就是"那棵树里的某个文件在工作树里当前不存在/正被别人改"这一条）。
+    ⛔ 本腿没修、没碰、没转述内容；`internal/panel/tokens_fourway_test.go` 等**三枚冻结件**
+    `git status --porcelain` 现读**零改动**。
+  - `internal/risk` **1 枚**：`TestResolvePerCallBudget`（1.39ms/op 撞 1ms 预算）＝在册已知并行敏感红 `R-116-1`；
+    **安静复量 3/3 绿**（单包隔离：1.281／1.238／1.354s）。
+  - 第一发多出来的那枚 `cmd/wisp / TestTicket223ModeLooseningChangesTheRunningModeAfterAllow`（票 223 那一族的卡片文本），
+    **安静复量 3/3 绿**（2.201／2.037／2.118s 单包隔离），第二、三发整包里 `cmd/wisp` 都是 `ok`
+    ⇒ 判为整包并发争用（那一发机器上同时有 CI 在跑），**不是实现缺陷、也不是本腿带的**：本腿对 `cmd/wisp/run.go` 只改了注释。
+  - **本腿唯一动过的包 `internal/tools` 三发全 `ok`**（run2 17.9s／run3 19.1s），另外在终态树上单独把它整包再跑一发也是
+    **`ok / 12.75s`**（`go test ./internal/tools -count=1`，不带 `-run`）。
+- **逐名比红名集合的结论**：改前在册红（panel 4＋ball 1＋risk 那枚并行敏感）＝ 改后红名集合 ⇒ **本腿新增红 0 枚**；
+  `cmd/wisp` 那一枚是〔待复量〕并已复量通过的计时红，不并入本腿缺陷账。
+- **门禁四件套终读（都在终态树上跑的，`gofumpt` 用 `$(go env GOPATH)/bin/gofumpt.exe`）**：
+  `gofumpt.exe -l internal/tools/ cmd/wisp/` ＝空（rc=0）／`go vet ./internal/tools/ ./cmd/wisp/` rc=0／
+  `bash scripts/d22scan.sh` rc=0（"clean - no D22 ban violations"）／整包 rc=1 且红名集合如上＝本腿零新增。
+- **交付锚点**：起手锚点 `a7993a9b`（本腿自取）；落点两发＝`453eebab`（草案＋预检）＋`c44b30c4`（甲形＋乙形同一发）；**未推送**（按规矩由编排者核过后再推）。
+- **收尾时仍未做的格子（不藏）**：见上一节"没做完／不做"四条原文（用户能停／`task.list`／票 222 AC#3 剩半格／
+  子代理目录里 `task.cancel` 仍可见），外加 M7 那一格（未接线名册那支没自带新尺）——**四格全部留在裁决桌上，本腿没有自批**。

@@ -1,0 +1,73 @@
+ok  	github.com/CarlosShao/wisp/cmd/wisp	128.226s
+ok  	github.com/CarlosShao/wisp/internal/agent	4.698s
+ok  	github.com/CarlosShao/wisp/internal/agent/approval	0.492s
+?   	github.com/CarlosShao/wisp/internal/agent/scheduler	[no test files]
+ok  	github.com/CarlosShao/wisp/internal/audio	16.016s
+time=2026-09-29T19:41:00.586+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-09-29T19:41:00.589+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=panel binding=Ctrl+Alt+Bogus+ err="unknown key \"Bogus\" in hotkey \"Ctrl+Alt+Bogus+\""
+time=2026-09-29T19:41:00.589+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=mute
+time=2026-09-29T19:41:00.589+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=cancel
+time=2026-09-29T19:41:00.589+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=panel
+time=2026-09-29T19:41:00.589+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+R mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=4
+time=2026-09-29T19:41:00.589+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+Q mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=4
+time=2026-09-29T19:41:00.589+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+Q mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+J live=4
+--- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+    tokens_table_test.go:1468: read design/assets/tokens.css: open D:\work\workspace\projects plans\Wisp\design\assets\tokens.css: The system cannot find the path specified. - the CSS leg of this check must never skip
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/ball	0.267s
+ok  	github.com/CarlosShao/wisp/internal/buildinfo	0.039s
+ok  	github.com/CarlosShao/wisp/internal/config	2.105s
+ok  	github.com/CarlosShao/wisp/internal/llm	42.377s
+ok  	github.com/CarlosShao/wisp/internal/llm/adaptertest	4.738s
+ok  	github.com/CarlosShao/wisp/internal/llm/anthropic	21.821s
+ok  	github.com/CarlosShao/wisp/internal/llm/golden	0.093s
+ok  	github.com/CarlosShao/wisp/internal/llm/openaichat	26.149s
+ok  	github.com/CarlosShao/wisp/internal/llm/openairesponses	26.979s
+ok  	github.com/CarlosShao/wisp/internal/memory	15.531s
+ok  	github.com/CarlosShao/wisp/internal/models	12.051s
+ok  	github.com/CarlosShao/wisp/internal/observe	4.147s
+time=2026-09-29T19:41:02.716+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestApprovalCardViewJSONKeysMatchFrontendTypes (0.00s)
+    approval_test.go:134: ApprovalCardView <-> ApprovalCardView: 10 JSON keys reconciled
+    approval_test.go:134: ResultChunk <-> ResultChunkView: 3 JSON keys reconciled
+    approval_test.go:129: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+    approval_test.go:134: Snapshot <-> PanelSnapshot: 6 JSON keys reconciled
+--- FAIL: TestComposerContractTypesMatchFrontend (0.01s)
+    composer_test.go:74: Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare
+    composer_test.go:79: Snapshot <-> PanelSnapshot: 6 JSON keys reconciled
+    composer_test.go:74: Go ComposerState emits [git currentModel modelKnown] that interface ComposerState does not declare
+    composer_test.go:79: ComposerState <-> ComposerState: 9 JSON keys reconciled
+    composer_test.go:79: ModeView <-> ComposerMode: 3 JSON keys reconciled
+    composer_test.go:79: WorkspaceView <-> ComposerWorkspace: 6 JSON keys reconciled
+    composer_test.go:79: AttachmentRef <-> ComposerAttachment: 9 JSON keys reconciled
+    composer_test.go:79: ResultChunk <-> ResultChunkView: 3 JSON keys reconciled
+--- FAIL: TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme (0.17s)
+    frontend_hygiene_test.go:216: a second style source appeared in code the bundle actually ships:
+          frontend/src/components/harness/right-rail.tsx:89: diff: [{ sign: "+", text: "  --page: #fafafb;  /* beautiful-ui 主题收编 */" }],
+        Add or reference a C21 token in design/assets/tokens.css instead.
+    frontend_hygiene_test.go:219: 57 files reachable from main.tsx carry colour literals only in the generated theme
+--- FAIL: TestC21DesignTokensFourWayAgree (0.00s)
+    tokens_fourway_test.go:441: read design/assets/tokens.css: open D:\work\workspace\projects plans\Wisp\design\assets\tokens.css: The system cannot find the path specified.
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/panel	4.707s
+ok  	github.com/CarlosShao/wisp/internal/perm	1.125s
+ok  	github.com/CarlosShao/wisp/internal/plugin	0.197s
+ok  	github.com/CarlosShao/wisp/internal/proc	3.246s
+ok  	github.com/CarlosShao/wisp/internal/projctx	0.532s
+time=2026-09-29T19:41:06.031+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+--- FAIL: TestResolvePerCallBudget (1.93s)
+    pathresolver_budget_norace_test.go:34: C26 Resolve: 1229019 ns/op = 1.229 ms/op (budget 1.000 ms, 1413 samples)
+    pathresolver_budget_norace_test.go:37: C26 budget breach: Resolve averages 1.229019ms per call, budget 1ms
+time=2026-09-29T19:41:10.464+08:00 level=INFO msg="scope disposed" scope=session-1 completed=1 failed=0 disposal_incomplete=false timed_out=false
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/risk	7.892s
+ok  	github.com/CarlosShao/wisp/internal/secret	0.554s
+?   	github.com/CarlosShao/wisp/internal/session	[no test files]
+?   	github.com/CarlosShao/wisp/internal/speech	[no test files]
+ok  	github.com/CarlosShao/wisp/internal/statemachine	0.324s
+?   	github.com/CarlosShao/wisp/internal/streamkey	[no test files]
+ok  	github.com/CarlosShao/wisp/internal/tools	19.113s
+?   	github.com/CarlosShao/wisp/internal/watchdog	[no test files]
+ok  	github.com/CarlosShao/wisp/internal/winsec	17.091s
+FAIL
+rc=1
