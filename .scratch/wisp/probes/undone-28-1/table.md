@@ -146,6 +146,58 @@
 
 ## 4. 票 80 —— `80-blacklist-overrides-never-wired-to-gate-done.md`（3 枚）
 
+> 本腿现量：un = 3（`:43` `:50` `:54`）。票面头部逐字（`:4-8`）：「本票的交付物是**裁决**，不是码：**零 Go 改动**…
+> 后续工作**全部转移到票 83**；AC#3/AC#4/AC#5 的接手方逐条写在框后」＋「编排者裁决 = 选项 (C)（见 A53②）」。
+
+### 4.1 `:43` AC#3 接线落地 + 一条真跑在 `risk.Gate` 上的用例 —— **丙（账在票 230 AC#3；⚠ 上一轮腿用的那把尺是坏的，本腿重尺后结论不变）**
+
+- 原文行首逐字：`- [ ] **AC#3** 接线落地 + 一条**真跑在 `risk.Gate` 上**的用例：同一份配置里写 override，`
+- 框后自带「⇒ **未做（被 AC#2 挡住）**」，并写明 (a) 那半的形状＝`PLAN.md:2399`「必须由人点」禁止的静态预授权。
+- 归口去处**本腿现读**（`.scratch/wisp/issues/230-four-cells-left-unfinished-inside-closed-tickets.md`，
+  **无** `-done` 后缀＝仍开放，本腿现量 un=5：`:19 :21 :22 :23 :24`）
+  - `:22` 逐字「**AC#3 票 80 的交接要么落地要么作废**：二选一——**甲＝把那格真写进票 21 的判据**…
+    或**乙＝把票 80 那两格转进本票并具名作废原交接句**。⛔ 不许留着"接手方＝票 21"这句话继续存在而票 21 一字不知。」
+  - `:23` 逐字「**AC#4 静态放行开关那一枚＝必须由人点（本票不接）**」⇒ (a) 那半**没有**被 230 接走做，
+    只是摆给 owner（＝待人拍板，Q-27 线）。
+- 悬空交接本腿自己复算，**成立**：`grep -l 'blacklist_overrides' .scratch/wisp/issues/*.md` 只命中
+  **80／83／90／230** 四张；`grep -c -i 'override' 21-approval-gates-minimal.md` = **0**（票 21 一字不知）。
+- ⛔ **推翻一枚上一轮腿的尺**：票 80 `:44` 的 `done-fix-1` 追加段引
+  「`grep -rn 'NewGate(' --include=*.go internal cmd | grep -v _test` ＝ **0 命中**（真跑在 `risk.Gate` 上那条用例今天仍无承载体）」。
+  本腿现读：`risk.Gate` 在本仓**不是构造函数**，`NewGate(` 这个串**全仓一处都没有**（含测试）——
+  它的真身是 `internal/risk/blacklist.go:76` 的函数 `func Gate(canonical string, bOverrides map[string]bool) PathDecision`。
+  **一把全仓零命中的尺证明不了任何事。**
+- ⚠ 重尺后的**新事实**（对裁决者有用，不改变判性）：`risk.Gate` **今天已有生产调用点**——
+  `internal/tools/mode.go:98` `d := risk.Gate(c, overrides)`，`overrides := b.confirmations()`（`:92`）。
+  但填这张 map 的是**运行期 L2 确认**，不是配置键；这一点仓内守卫自己写着：
+  `internal/config/unwired.go:81` 逐字「nothing populates the bOverrides map risk.Gate reads: ticket 90 gave Gate
+  a production call site (internal/tools readBlacklist…), but the confirmations that would fill this map are
+  minted only by an L2 answer, and that flow is ticket 21's approval queue」。
+  ⇒ AC#3 缺的具体东西仍然具体：**"配置里的 override 被解析成 bOverrides 并翻转那一个文件"这条腿今天没接**，
+  且 (a) 那半**卡在人工裁决**上。判丙（分母归 230），但**这是"丙而活未死"**：230 AC#3 收的是交接文书，不是这条功能。
+
+### 4.2 `:50` AC#4 变异双向 —— **丙（与 AC#3 同批，账在票 230 AC#3）**
+
+- 原文行首逐字：`- [ ] **AC#4** 变异双向：(i) 把接线断开 ⇒ AC#3 必须红；(ii) 把 (b) 的"其它文件仍 B"断言指向 override`
+- 框后逐字「⇒ **未做**：AC#3 没有码可断，变异无承载体。」⇒ 本格**没有独立生命**，AC#3 落地才有它。
+- 归口去处＝票 230 `:22` 同一格（其文字逐字写"把票 80 **那两格**转进本票"，那两格＝AC#3／AC#4）。
+- ⚠ 记一句给裁决者（与 `pool-2` 同劝告）：**只处理 AC#3 不管本格**会留下"接线有牙没验过"的第二枚洞；
+  两枚必须同批处置。
+
+### 4.3 `:54` AC#5 门禁（只跑自己碰的包）—— **丙（交接写得最标准的一枚：账在票 83 `:57`，已勾）**
+
+- 原文行首逐字：`- [ ] **AC#5** 门禁（**只跑自己碰到的包**，共树不跑整仓）：`gofmt -l <pkgs>` 空、`
+- 归口去处**本腿现读**：`83-config-keys-that-lie-must-fail-loudly-done.md:57` 是一枚 **`- [x]`**，逐字
+  「**AC#5** 门禁（只跑自己碰的包）：`gofmt -l` 空、`gofumpt -l <files>` 空、`go vet ./internal/config/` rc=0、
+  `GOOS=linux go vet ./internal/config/` rc=0、`go test -count=2 ./internal/config/` rc=0，逐跑点名 `--- SKIP`/`--- FAIL`」，
+  并且 `:60` 承接了票 80 量到的 `TestResolvePerCallBudget` 并跑抖动（「如实登记为外项，不许顺手调那个 1ms 预算」）。
+- 接手句在票 80 框后逐字：「⇒ **编排者补（A53）**：接手方 = **票 83 的 AC#5**（同两个包，而票 83 会真改 Go 文件 ⇒ 门禁有承载体）」。
+- ⚠ 一枚射程差，本腿如实报：83 那格的**包名只写 `./internal/config/`**，而票 80 的 AC#5 要求
+  `internal/risk` + `internal/config` 两个包都过门。票 80 自称「零 Go 改动 ⇒ 门禁无改动面可验」，
+  所以这格按丙处置没问题；但若裁决者想拿 83 那枚勾去翻 80 这格（＝丁路线），
+  **`internal/risk` 那半边在 83 的判据文字里没有对应物**，得另找票 83 的实跑记录才能翻。
+- 另注：框后那句「**本票永远不勾这两框**，它们是**被裁决取消**、不是**没做完**」指的是 AC#3／AC#4；
+  AC#5 这框**没人说过不勾**，它只是被具名接走了 ⇒ 若走乙类处置（搬出勾框），**别把它和 AC#3/AC#4 混成一句**。
+
 ## 5. 票 89 —— `89-0600-is-decorative-on-windows-acl-for-private-data-done.md`（1 枚）
 
 ## 6. 票 92 —— `92-panel-composer-mode-attachments-workspace-done.md`（4 枚）
