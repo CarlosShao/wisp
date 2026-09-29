@@ -16,9 +16,9 @@
 | 4 | `115-…-done.md:49` | AC#2 裁方向 A/B＋写理由代价＋明写是否推翻 104/105 | **可翻勾**（已翻；与票 230 的口径撞车已登记） |
 | 5 | `115-…-done.md:53` | AC#3 修完四枚红＋新增行为用例（正/反两半） | **可翻勾**（已翻；"转绿"证据＝`ci-step-readings-2026-09-22.md` 非实现者读数） |
 | 6 | `115-…-done.md:66` | AC#7 结案前必须有一枚远程 run id | **可翻勾**（已翻；run `35616790753` 两处独立盘上落点） |
-| 7 | `89-…-done.md:262` | 〔待填〕 | 〔待填〕 |
-| 8 | `89-…-done.md:310` | 〔待填〕 | 〔待填〕 |
-| 9 | `89-…-done.md:345` | 〔待填〕 | 〔待填〕 |
+| 7 | `89-…-done.md:262` | 「AC#1 基线 icacls 原文：下一枚 commit 给（本枚只交骨架）」 | **第四类（形状歪）**→ 行首改 `- ⛔`，原文未动 |
+| 8 | `89-…-done.md:310` | 「待办：winsec_windows.go 换真 SetNamedSecurityInfo…AC#4 链接、AC#5 失败注入」 | **第四类（形状歪）**→ 行首改 `- ⛔`，原文未动 |
+| 9 | `89-…-done.md:345` | 「待办：AC#4、AC#5、把 memory/agent/secret 三条落盘路径接上 winsec、AC#6 POSIX 点名」 | **第二类：不能翻**（框原样留 `[ ]`）＋本腿读到一枚具体反例站点 |
 
 ---
 
@@ -122,34 +122,57 @@
 
 结论：**可翻勾**。⚠ **推翻 `done-fix-1` 分类之处（第 2 条）**：它把这格记为"缺一次把这枚 run 读数落到本票名下的确认（可以是 `docs/evidence/s1/115-*.md` 里的一行）"，本腿判语＝那是**形式落点账、不是证据账**：证据已由 `ci-reader-s22` 表与编排者结案语两处独立给出；若仍要 115 名下的表，那是票 230 AC#1 的账，本格翻勾不撤它。
 
-## 第 7 格 — `89-…-done.md:262`
+## 第 7 格 — `89-…-done.md:262`（AC#1 基线 icacls 原文：下一枚 commit 给）
 
-判据原文（票面）：〔待填〕
-本腿现跑的尺：〔待填〕
-读数：〔待填〕
-结论：〔待填〕
+判据原文（票面 `:258`）：
+> `- [ ] AC#1 基线 **icacls 原文**：下一枚 commit 给（本枚只交骨架）。基线环境：Windows 11 Pro，…`
 
-## 第 8 格 — `89-…-done.md:310`
+本腿现跑的尺与读数：
+1. `sed -n '258p'` 读到该行逐字如上 ⇒ 句式是"下一枚 commit 给"＝**对下一轮的自我承诺**，不是一条可判真伪的验收判据。
+2. `grep -n "^- \[.\] \*\*\?AC#\|^- \[.\] AC#" 本票`＝判据六枚全在 `:41/:44/:47/:51/:55/:57`（AC#1–AC#6，全部 `- [x]`）；`:248` 往后是 Progress log 的逐轮交付记录，`:258` 与 `:276` 是同一件事的两笔。
+3. 兑现物在盘：`ls -l internal/winsec/acl_windows_test.go`＝**18,687 字节**；`grep -n "^func Test"`＝`:177 TestAC1BaselineProductionPaths`、`:274 TestAC1BaselineForeignACEPropagatesIntoModeOnlyWrites`；交付格 `:276 - [x] **AC#1 基线：四类私有数据的 icacls 原文**` 在场。
 
-判据原文（票面）：〔待填〕
-本腿现跑的尺：〔待填〕
-读数：〔待填〕
-结论：〔待填〕
+结论：**第四类（形状歪）**。处置＝原文逐字不动、行首 `- [ ]`→`- ⛔`（搬出分母，**不宣称完成**），与 `done-fix-1` 给的第二个选项（照票 115 AC#5 那枚乙类搬出勾框）同形。⚠ 若编排者要的是翻勾而不是搬框，尺 3 就是翻勾所需的凭据——两种处置不改变任何事实。
 
-## 第 9 格 — `89-…-done.md:345`
+## 第 8 格 — `89-…-done.md:310`（待办：真 SetNamedSecurityInfo／AC#4／AC#5）
 
-判据原文（票面）：〔待填〕
-本腿现跑的尺：〔待填〕
-读数：〔待填〕
-结论：〔待填〕
+判据原文（票面 `:309`）：
+> `- [ ] 待办：winsec_windows.go 换真 SetNamedSecurityInfo（PROTECTED DACL + 逐层封 + 传播），AC#4 链接、AC#5 失败注入。`
+
+本腿现跑的尺与读数：
+1. `Read internal/winsec/winsec_windows.go:295-310`：逐字 `windows.SetNamedSecurityInfo(path, windows.SE_FILE_OBJECT, windows.DACL_SECURITY_INFORMATION|windows.PROTECTED_DACL_SECURITY_INFORMATION, nil, nil, acl, nil)`。
+2. `grep -n "func PrivateDirAll" -A 12 internal/winsec/winsec.go`＝`:165`→`:177 privateDirAll`，注释逐字「privateDirAll is the sealing walk」＝"逐层封"。
+3. `grep -n "func propagatePrivate" internal/winsec/winsec_windows.go`＝`:595`＝"传播"。
+4. `AC#4 链接`＝本票 `:263 - [x] AC#4 构造可行性…`（判据测试 `internal/winsec/reparse_windows_test.go` 在场）；`AC#5 失败注入`＝`:346 - [x] **AC#5 失败方向只能收紧（红→绿有名字）**`（`internal/winsec/private_fail_test.go`）。
+
+结论：**第四类（待办行、不是判据）**⇒ 原文逐字不动、行首 `- ⛔` 搬出分母。本票判据段 `:41-:62` 六枚全 `- [x]`，这枚框留 `[ ]` 只会把分母虚报成一格未做。本腿未复跑任何门（禁跑）。
+
+## 第 9 格 — `89-…-done.md:345`（待办：AC#4／AC#5／三条落盘路径接上 winsec／AC#6 POSIX 点名）
+
+判据原文（票面 `:344`）：
+> `- [ ] 待办：AC#4（链接）、AC#5（失败注入）、把 memory/agent/secret 三条落盘路径接上 winsec、AC#6 的 POSIX 侧点名。`
+
+本腿现跑的尺与读数：
+1. 正向枚举 `grep -rn "winsec\.\(Private\|Seal\)" --include=*.go internal/memory internal/secret internal/agent | grep -v _test.go`＝**12 处**：memory 4（`artifacts.go:75`、`open.go:176/:188/:503`）、secret 5（`migrate.go:169/:174/:189`、`store.go:49/:79`）、agent 3（`spill.go:111/:125/:254`）。
+2. 反向枚举 `grep -rn "os\.WriteFile(\|os\.Create(\|os\.OpenFile(" …同三包… | grep -v _test.go`＝**1 处命中：`internal/memory/open.go:533 out, err := os.Create(dst)`**，位于 `func copyFile(src, dst string)`（`:527`）体内，由 `backupDatabase` 的 `:518 copyFile(src, dst+suffix)` 对 `wisp.db` 及 `-wal`/`-shm` 各调一次；`:503` 只给**父目录**下了 `PrivateDirAll(s.backupDir, 0o700)`，**备份文件本身不经 `PrivateFile`/`SealFile`**。
+3. 这笔账有没有被别票接走：`grep -rn "open.go\|backup" .scratch/wisp/issues/95-the-other-0600-sites-are-still-wide-done.md`＝命中的全是 `internal/config/migrate.go` 那两处（`:139/:165/:166/:264/:265`）⇒ **票 95 未点名 copyFile 这条腿**；票 89 判据段射程只到"四类数据"。
+4. 票 95 现状（本腿自跑，锚＝`grep -c '^- [ ]'` 与 `grep -c '^- \[x\]'`）＝**0 未勾／5 已勾**，Status 链走到 `accepted-done`。
+
+结论：**第二类：不能翻，缺的是"这三包里每一条落盘写路径各自过没过封"的逐条清单**（不是 import 到、也不是 call-site 计数）。这枚框不是纯形状行——里面那条"接上"确有未竟的一格（尺 2 那枚具体反例），所以**框原样留 `- [ ]`**，不做 ⛔ 也不做勾。
+三行定性（本格涉"权限／放宽"字样）：现象＝迁移前备份的 `wisp.db.bak-*`（含 `-wal`/`-shm`）走 `os.Create`（POSIX 侧 mode 由 umask 定；Windows 侧靠父目录 PROTECTED DACL 继承），文件自身没有具名私有集与 `verifyPrivate`；本机被入侵证据＝**无**（本腿只读文件与只读 grep，未发现任何越权读写痕迹；这是"纪律未覆盖到一枚站点"的形状，不是"已经泄漏"的读数）；最坏后果形状＝备份副本的权限面比原文件宽，正是票 89 立案那句"0600 是装饰性的"的同族形状。落点（新开一格 vs 并入 95/121 那类装配可达门）交编排者裁，本腿不代开票。
 
 ---
 
 ## 汇总
 
-- 可翻勾：〔待填〕
-- 不能翻（缺读数）：〔待填〕
-- 判不了（凭据在禁读目录）：〔待填〕
-- 形状歪（纪律句／待办行）：〔待填〕
-- 推翻 `done-fix-1` 分类的条目：〔待填〕
-- 未做完／判不了：〔待填〕
+- **可翻勾：6 枚**（第 1/2/3/4/5/6 格＝票 104 AC#5、票 110 AC#4、票 113 AC#6、票 115 AC#2/AC#3/AC#7）——全部本腿自己在盘上现读到凭据后翻了 `- [ ]`→`- [x]`，每枚都在该格下追加了一行 `done-check-1 勾＝…`。
+- **不能翻：1 枚**（第 9 格＝票 89 那条"三条落盘路径接上 winsec"的待办行）——缺的是逐条写路径清单，且本腿现读到一枚具体反例站点 `internal/memory/open.go:533`（`copyFile` 的 `os.Create`），框原样留着。
+- **判不了（凭据在被禁读目录里）：0 枚**——九格的凭据全部落在 `.scratch/wisp/issues/**`、`internal/**`、`scripts/**`、`docs/evidence/s1/**` 与只读 git 历史里，没有一枚需要读 `frontend/**`／`design/**`。
+- **形状歪（第四类）：2 枚**（第 7/8 格＝票 89 `:258`、`:309`）——原文逐字不动，只把行首 `- [ ]` 换成 `- ⛔` 搬出分母，**不宣称完成**（这正是 `done-fix-1` 留给裁决者的第二个选项）。
+- **推翻／修正 `done-fix-1` 分类的条目**：
+  1. 第 2 格（票 110 AC#4）：它把"那发 `go test -list` 步级读数"当本格的缺项 ⇒ 本腿判那是 `R-110-4`／票 111 AC#7 的账，本格是"或"句、第二支不要求读数（表 `110-…md:17` 早已"论证我认可"）。
+  2. 第 6 格（票 115 AC#7）：它把缺项写成"要把这枚 run 读数落到 115 名下的一次确认" ⇒ 本腿判那是**形式落点账、不是证据账**（证据两处独立盘上落点已在）。
+  3. 第 4/5 格（票 115 AC#2/AC#3）：它的"零枚表可引"结论本腿复量同意（`find docs/evidence -name '115*'`＝0），但本腿用的是**同一目录里另一张非实现者读数表** `docs/evidence/s1/ci-step-readings-2026-09-22.md` ⇒ 这构成与票 230 AC#1「表出来之后才谈补勾」的**口径撞车**，已逐枚登记在票面，撤不撤交编排者裁。
+  4. 第 9 格（票 89 `:345`）：它记"戊类·待非实现者逐条核" ⇒ 本腿核了，且**找到一枚未接线的具体站点**（`internal/memory/open.go:533`），所以这格不是"等裁决的形状账"而是"确有未竟的一格"。
+  5. 行号漂（`A442` 那一类）：`done-fix-1` 在第 3 格引的"追加勾 `:66`""编排者 `:79` 裁定"本腿现量为 `:71`／`:85`；票 115 面它引的 `bridge.go:864` 今天在生产里是 `bridge.go:1053`。内容全对、指针漂。
+- **没做完／判不了**：无未验格——9 枚全部给完结论。本腿**没有**做的两件事：① 任何 `go test`/`go build`/`go vet`/`gofumpt`/`d22scan` 或二进制执行（派单禁，且 `223-v2` 在跑门）；② 任何"远程 run"现取（`gh` 是二进制，同样禁）⇒ 第 5/6 格的"转绿"证据全部转引 `docs/evidence/s1/ci-step-readings-2026-09-22.md` 这张非实现者读数表，本腿只保证"自己在盘上读到过那张表并核了它的四判据"，不保证那发日志由本腿重取。

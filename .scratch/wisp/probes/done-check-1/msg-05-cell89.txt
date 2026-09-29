@@ -1,0 +1,7 @@
+抽验 done-check-1 第 7/8/9 格（票 89 三枚戊类格）：两枚第四类＋一枚第二类，零翻勾。
+
+第 7 格 `:258`＝待办／自我承诺行（"下一枚 commit 给（本枚只交骨架）"）：本票真判据在 `:41-:57`（AC#1-#6 全 - [x]），兑现物在盘（`ls -l internal/winsec/acl_windows_test.go`＝18,687 字节、`grep -n "^func Test"`＝:177 TestAC1BaselineProductionPaths＋:274 TestAC1BaselineForeignACEPropagatesIntoModeOnlyWrites）⇒ 原文逐字不动、行首改 - ⛔ 搬出分母，不宣称完成。
+第 8 格 `:309`＝待办行三条全部现读到着落（`winsec_windows.go:303-305` 真 SetNamedSecurityInfo＋PROTECTED_DACL_SECURITY_INFORMATION；`winsec.go:165/:177` privateDirAll sealing walk；`winsec_windows.go:595` propagatePrivate；AC#4 `:263`／AC#5 `:346` 已勾）⇒ 同样改 - ⛔。
+第 9 格 `:344`＝不能翻：本腿自跑 `grep -rn "winsec.(Private|Seal)" --include=*.go internal/memory internal/secret internal/agent | grep -v _test.go`＝12 处站点，反向 `grep -rn "os.WriteFile(|os.Create(|os.OpenFile(" …同三包…`＝1 处命中 `internal/memory/open.go:533 out, err := os.Create(dst)`（在 `copyFile` `:527` 体内，由 `backupDatabase` `:518` 对 wisp.db 与 -wal/-shm 各调一次；`:503` 只封了父目录 PrivateDirAll，备份文件自身不经 PrivateFile/SealFile），且 `grep -rn "open.go|backup"` 证明票 95 只点名 config/migrate.go 两处、没接这条腿 ⇒ 框原样留 - [ ]，缺的读数＝逐条写路径清单。
+三行定性（第 9 格涉权限）：现象＝备份副本走 os.Create、文件自身无具名私有集；本机被入侵证据＝无（只读文件与只读 grep）；最坏后果形状＝副本权限面比原文件宽，即票 89 那句"0600 是装饰性的"的同族形状。落点（新开一格 vs 并入 95/121）交编排者裁，本腿不代开票。
+票面删除列只出现在两行 - [ ]→- ⛔。

@@ -255,11 +255,13 @@
   再断言子项 `icacls` 原文里**不出现**该 SID；只测默认继承就是测了个空。
   落点包名 `internal/winsec`（票面建议之一）：API 中性 + `_windows.go`/`_other.go` 分平台实现，
   POSIX 侧走真 0600/0700，不静默跳过。
-- [ ] AC#1 基线 **icacls 原文**：下一枚 commit 给（本枚只交骨架）。基线环境：Windows 11 Pro，
+- ⛔ AC#1 基线 **icacls 原文**：下一枚 commit 给（本枚只交骨架）。基线环境：Windows 11 Pro，
   当前 SID `S-1-5-21-1228170099-895614386-1166154857-1001`（账户 `swq`）；本机无既存 `wisp.db`（data 根尚未创建）。
   ⚠ `internal/winsec/winsec_windows.go` 此刻是**故意的占位**（只有 `os.Chmod`，也就是仓库今天的行为），
   所以本包判据测试**预期先红**——红完才换 SetSecurityDescriptorInfo。
   `done-fix-1` 追加（戊类·凭据是**票面自己的后继格**，⛔ 不翻勾）：**待非实现者抽验，缺的读数是**——确认"这一格已被同票那枚已勾的 AC#1 作废"这件事由非实现者抽一次（本腿只能证明三枚框并存：`grep -n 'AC#1' 本票` 现量＝`:41 - [x] **AC#1** 先给基线证据`、` :258 - [ ] …（本枚只交骨架）`、`:275 - [x] **AC#1 基线：四类私有数据的 icacls 原文**`（判据测试 `internal/winsec/acl_windows_test.go`），**一张票里 "AC#1" 三枚框、两种状态**）。⚠ 本格那句"下一枚 commit 给（本枚只交骨架）"是一句**自我承诺**、不是判据；它被 `:275` 覆盖之后从没回头销。⇒ 这一格真正的账是**形状账**（该由裁决者定：翻勾、还是像票 115 AC#5／票 84 AC#3 那样把它搬出勾框），本腿两样都不做。
+  `done-check-1` 判＝**第四类（这格不是判据、是待办／自我承诺行，形状写歪）**，本腿现跑三把尺：尺一 `sed -n '258p' 本票` 逐字读到「`- [ ] AC#1 基线 **icacls 原文**：下一枚 commit 给（本枚只交骨架）。基线环境：Windows 11 Pro，`」——"下一枚 commit 给"是对下一轮的承诺句式，不是一条可判真伪的验收判据；尺二（本票真正的判据段在哪）`grep -n "^- \[.\] \*\*\?AC#\|^- \[.\] AC#" 本票`＝判据六枚全在 `:41/:44/:47/:51/:55/:57`（AC#1–AC#6，**全部 `- [x]`**），`:248` 起是 Progress log 里的逐轮交付记录，本格与 `:276` 是同一件事的两笔；尺三（那句承诺今天是否已被兑现、兑现物在不在盘上）`ls -l internal/winsec/acl_windows_test.go`＝**18,687 字节**、`grep -n "^func Test"` 现量 `:177 TestAC1BaselineProductionPaths`＋`:274 TestAC1BaselineForeignACEPropagatesIntoModeOnlyWrites`（后者正是票面 `:307` 说的那枚反向钉子），交付格 `:276 - [x] **AC#1 基线：四类私有数据的 icacls 原文**` 在场。⇒ 处置＝**原文逐字不动、只把行首 `- [ ]` 换成 `- ⛔`（搬出分母，不宣称完成、也不等于勾）**，这与 `done-fix-1` 给的第二个选项同形（票 115 AC#5 那枚乙类就是这么处理的）；`done-fix-1` 说的"一张票里 AC#1 三枚框、两种状态"本腿复量成立：`:41 [x]`／`:258 现为 ⛔`／`:276 [x]`。⚠ 若编排者认为这枚该翻勾而非搬出，本腿的尺三就是翻勾所需的凭据，撤 ⛔ 与翻 `[x]` 之间不改变任何事实。
+
 - [x] AC#4 构造可行性（**2026-09-21 `agent-ticket89b` 实测更正，原句"普通权限建不出符号链接"是错的**）：
   **这台机上未提权就能建目录符号链接**——`IsInRole(Administrator)=False`（账户 `swq` 在 Administrators 组里，
   但进程令牌没提升）+ `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock\AllowDevelopmentWithoutDevLicense = 1`
@@ -306,8 +308,10 @@
   于是"外来主体持有 MODIFY"恰好被丢掉，AC#3 三个子测试在**没有任何修复**的情况下全绿。
   现已改为剥掉路径前缀 + 数每一条 `:(` 行（注释里记了这段），且 `TestAC1BaselineForeignACEPropagatesIntoModeOnlyWrites`
   是**反向钉子**：它断言"宽父目录的 ACE 一定会传到子文件"，一旦这条不成立就红，防止判据测空气。
-- [ ] 待办：`winsec_windows.go` 换真 SetNamedSecurityInfo（PROTECTED DACL + 逐层封 + 传播），AC#4 链接、AC#5 失败注入。
+- ⛔ 待办：`winsec_windows.go` 换真 SetNamedSecurityInfo（PROTECTED DACL + 逐层封 + 传播），AC#4 链接、AC#5 失败注入。
   `done-fix-1` 追加（戊类·形状是待办行不是判据，⛔ 不翻勾）：**待非实现者抽验，缺的读数是**——"这三样都由本票别处的已勾格兑现了"这句话的一次非实现者核对。本腿今天现读到的支撑：AC#4＝`:262 - [x] AC#4 构造可行性（2026-09-21 agent-ticket89b 实测更正…）`、AC#5＝`:343 - [x] **AC#5 失败方向只能收紧（红→绿有名字）**：internal/winsec/private_fail_test.go`（框后逐字写着四条腿 + `errors.Is(err, ErrNotSealable)` + `assertNoBytesOnDisk`"磁盘上**一个字节都不许留**"）、真 SetNamedSecurityInfo 那条腿＝`internal/winsec/winsec_windows.go` 今天在场（票 104/115/118/126 的裁决表都在这枚文件上做过变异与复算，本腿不重跑）。⇒ 内容是**过期**、形状是**待办行**：它天生不是判据框，处置同 89 `:258` 那格，由裁决者定翻勾还是搬出勾框。
+  `done-check-1` 判＝**第四类（待办行、不是判据）**，三条待办本腿逐条在盘上现读到着落：尺一（"换真 SetNamedSecurityInfo＋PROTECTED DACL"）`Read internal/winsec/winsec_windows.go:295-310` 现读逐字 `if err := windows.SetNamedSecurityInfo(path, windows.SE_FILE_OBJECT, windows.DACL_SECURITY_INFORMATION|windows.PROTECTED_DACL_SECURITY_INFORMATION, nil, nil, acl, nil); err != nil {`（同文件 `grep -n "SetNamedSecurityInfo\|PROTECTED_DACL"` 只此一处真调用＋`:287` 那句注释"which is what inheritance cannot"）；尺二（"逐层封"）`grep -n "func PrivateDirAll" -A 12 internal/winsec/winsec.go`＝`:165 PrivateDirAll` → `:177 privateDirAll`，注释逐字「privateDirAll is the sealing walk」；尺三（"传播"）`grep -n "func propagatePrivate" internal/winsec/winsec_windows.go`＝`:595`；尺四（AC#4 链接、AC#5 失败注入两枚交付格）本票 `:263 - [x] AC#4 构造可行性…`（判据测试 `internal/winsec/reparse_windows_test.go` 在场）与 `:346 - [x] **AC#5 失败方向只能收紧（红→绿有名字）**`（判据测试 `internal/winsec/private_fail_test.go`）。⇒ 与 `:258` 同处置：**原文逐字不动、行首 `- [ ]`→`- ⛔` 搬出分母，不宣称完成**；本票判据段 `:41-:62`（AC#1–#6）今天六枚全 `- [x]`，这枚框留 `[ ]` 只会把分母虚报成一格未做。⚠ 本腿**没有**复跑任何门（禁跑，`223-v2` 在飞），上面四把尺全是读文件与只读 grep。
+
 - [x] **AC#3 实现落地 + 红→绿**（同一判据、同一台机、同一份 icacls 仪器）：
   `go test ./internal/winsec -count=2` **rc=0**；`-count=1 -v` 全名逐条：
   `--- PASS: TestAC1BaselineProductionPaths` / `--- PASS: TestAC1BaselineForeignACEPropagatesIntoModeOnlyWrites` /
@@ -343,6 +347,8 @@
       这种"测试自己坏了"的红会被当成实现的功劳或罪状。
 - [ ] 待办：AC#4（链接）、AC#5（失败注入）、把 memory/agent/secret 三条落盘路径接上 `winsec`、AC#6 的 POSIX 侧点名。
   `done-fix-1` 追加（戊类·形状是待办行、里面夹一条真活，⛔ 不翻勾）：**待非实现者抽验，缺的读数是**——那三条落盘路径"接上"的判据粒度（**import 到 ≠ 每条写路径都过封**）由非实现者逐条核一次。本腿今天的现读只到形状这一层：`for p in internal/memory internal/secret internal/agent; do grep -rl 'wisp/internal/winsec' --include=*.go $p | grep -v _test | wc -l; done` ＝ **memory 2 枚／secret 2 枚／agent 1 枚非测试文件 import `wisp/internal/winsec`**（命令与数都原始，不含测试文件）；其余三样本腿在票内现读到已勾：AC#4 `:262`、AC#5 `:343`、AC#6 `:57` 与 `:383` 两枚 `- [x] 门禁`。另：89 交件时自己点名的"范围外残留"由**票 95** 具名接走（`95-…-done.md:3` 逐字「来源=票 89 交件时**自己点名**的范围外残留；我没塞回票 89，那是扩界」），本腿现量 **票 95＝0 未勾／5 已勾**（⚠ 它的 Status 行 `:3` 仍写 `open`，又一枚"改名＝结案"的形状，交回编排者）。
+  `done-check-1` 判＝**第二类：不能翻，缺的是"这三包里每一条落盘写路径各自过没过封"的逐条清单**（不是 import 到、也不是 call-site 计数）。本腿现跑的尺与读数：尺一（正向枚举）`grep -rn "winsec\.\(Private\|Seal\)" --include=*.go internal/memory internal/secret internal/agent | grep -v _test.go`＝**12 处具名站点**（memory 4：`artifacts.go:75`、`open.go:176/:188/:503`；secret 5：`migrate.go:169/:174/:189`、`store.go:49/:79`；agent 3：`spill.go:111/:125/:254`）；尺二（反向枚举裸写）`grep -rn "os\.WriteFile(\|os\.Create(\|os\.OpenFile(" --include=*.go internal/memory internal/secret internal/agent | grep -v _test.go`＝**1 处命中：`internal/memory/open.go:533 out, err := os.Create(dst)`**，它在 `func copyFile(src, dst string)`（`:527`）体内，由 `backupDatabase` 的 `:518 copyFile(src, dst+suffix)` 对 `wisp.db` 及 `-wal`/`-shm` 三个对象各调一次；该函数只在 `:503` 给**父目录**下了 `winsec.PrivateDirAll(s.backupDir, 0o700)`，**备份文件本身没有任何 `PrivateFile`/`SealFile`**。尺三（这笔账是不是已被别票接走）`grep -rn "open.go\|backup" .scratch/wisp/issues/95-the-other-0600-sites-are-still-wide-done.md`＝命中的全是 `internal/config/migrate.go` 那两处（`:139/:165/:166/:264/:265`），**票 95 没有点名 `internal/memory/open.go` 的 copyFile 腿**；票 89 的判据段（`:41-:62`，AC#1–#6 全 `- [x]`）射程也只到"四类数据"。⇒ 所以这枚 `- [ ]` **原样留着**：它既不是纯形状行（里面那条"接上"确有未竟的一格），也没有任何裁决表或读数清单能替它翻勾。三行定性（本格涉"权限／放宽"字样）：现象＝迁移前备份的 `wisp.db.bak-*`（含 `-wal`/`-shm`）走 `os.Create`（POSIX 侧 mode 由 umask 定，Windows 侧靠父目录 PROTECTED DACL 继承），文件自身不经 `PrivateFile`/`verifyPrivate`；本机被入侵证据＝**无**（本腿只读文件与只读 grep，未跑任何仪器，未发现任何越权写/读痕迹，这条是"纪律未覆盖到一枚站点"的形状，不是"已经泄漏"的读数）；最坏后果形状＝备份副本的权限面比它复制的原文件宽（POSIX 上是 mode 位、Windows 上是"只靠继承没有具名私有集"），而这正是票 89 立案时那句"0600 是装饰性的"的同族形状——落点该是新开一格还是并进取票 95/121 那类装配可达门，交编排者裁，本腿不代开票。
+
 - [x] **AC#5 失败方向只能收紧（红→绿有名字）**：`internal/winsec/private_fail_test.go`（无 build tag，两平台都跑）。
   注入点 = `applyDescriptor` 这个包内接缝（不是"假装失败"，是真的把平台实现换掉）：
   `TestAC5FailedSealRefusesTheWrite` 4/4 子测试绿，且要求**同时**满足 ①错误里 `errors.Is(err, ErrNotSealable)`
