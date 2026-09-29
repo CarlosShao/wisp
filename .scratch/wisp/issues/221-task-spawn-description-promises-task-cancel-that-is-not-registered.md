@@ -65,3 +65,34 @@
 **别家形状（它按口径读了四家，我核了两家原文）**：取消这件事**别家做成独立工具**——DSH 有 `job_kill`、minimax 有 `task_stop`；Step-Code 反过来，做成父任务的一个动作 `action:"stop"`，**而它正是"谁能停"那一维没有防护的那家**（反面件）。**三家都：停了以后那一行不删**。⇒ 与 ③④ 的形状一致，甲形照此走。
 
 **排程与下一步**：此刻**没有别的腿在写** `internal/tools/task.go`／`subagent_197.go`／`cmd/wisp`（票 220 未派、票 201 的写腿已交完并进树），⇒ 按上面改写后的闸门口径，**甲形闸门是开的**。⚠ 但我仍**不并发派写腿**：`226-v1`（突变验收，正在飞）会临时改 `internal/config` 并跑全仓测试，写腿同期跑门会互相洗出假红（今天已经撞过一次，见 `A432`）。⇒ **顺序＝`226-v1` 交完 → 票 223 写腿 → `222-v1` → 票 221 甲形写腿**（乙形那三处删句**并进甲形同一发**，别分两次改 `subagent_197.go`）。
+
+---
+
+## Progress log (append-only, newest last)
+
+### 221-r1（产码腿，09-29 起手，锚点 `a7993a9b`＝本腿自取）：落点草案＋撞钉预检已盘，状态全 UNJUDGED
+
+- **状态**：**进行中／骨架已落**。AC#1–AC#5 **五格全部 `[ ]`＝UNJUDGED**，判据落点与尺写在
+  `.scratch/wisp/probes/221/r1/plan.md`（该文件里 UNJUDGED 字样就是"还没判"的标记，逐格核销时会减少）。
+- **起手现跑（改前读数，逐条自己跑的尺）**：`task.cancel` 在产码里 **4 处**（`subagent_197.go:196` 的许诺、
+  `task.go:23` 的 DEFERRED 标记、`task.go:576`／`:593` 的注释）；`TaskRoster.Cancel` 的非测试调用者 **0 枚**
+  （`grep -rn '\.Cancel(' --include='*.go' internal/ cmd/ | grep -v _test` 的 8 枚命中全是 `RunningTask`／`root`／
+  `feedRoot`／`replyRoot`／`reloadRoot`，不是名册那枚）；`单独停它` 产码命中 **2 处**（`:196`、`:389`），
+  与 `A433`/本票 ② 记的"三处"一致（`:197` 那个括号是同一句的续行尾巴）。
+- **预检顶出来的一枚真形状（写在最前面，因为它改变我的用例写法）**：
+  `NoGate.PendingWindow`（`internal/tools/gate.go:138`）**回的是 `AnswerReject`**——「L1 确认窗口尚未接入（票 21），已拒绝执行」。
+  而 `PLAN.md:2564`（只读）那一行写的是 `task.list / task.cancel | 查看/取消任务 | **L0 / L1**`，
+  ⇒ 按冻结表 `task.cancel` 声明 **L1**。后果＝**既有那些用 `NoGate` 的 harness 里 `task.cancel` 根本进不到 `Execute`**，
+  所以 AC#3 的两枚正控**绝不能**拿 NoGate 的桥去跑（那"红"是门拒的、不是权限拒的＝假绿）。
+  ⇒ 本腿的边界用例自带一枚会如实答复 L1 窗口的答复器，且**另有**一格专门证明"NoGate 下它被如实拒绝"这句话。
+- **打算动的文件**（5 枚，逐枚理由在 probe 件 §1）：`internal/tools/task.go`（注册＋DEFERRED 摘标记同发）、
+  `internal/tools/subagent_197.go`（乙形三处，**保住** `"停掉父任务不会级联"` 与 `"没有被级联取消"` 两枚字面量）、
+  `internal/tools/ticket175r2_stamp_live_test.go`（那枚普查尺逐字写着"新工具请就地回答"，加一行分类答语＝**答问不是放宽**）、
+  **新** `internal/tools/task_cancel_221_test.go`（AC#1 常驻尺＋AC#2＋AC#3）、`cmd/wisp/run.go`（**只改注释**：
+  它现在写着这一族只有 `task.output`，接完线那句话就成了新的谎）。
+- **本腿刻意零新增导出标识符**（`A434` ① 末句）：`taskCancel`／`taskCancelSchema`／`taskCancelDecl` 一律小写不导出，
+  `BuiltinTaskEntries` 签名不变。撞到必须新增的格子就停手上报，不自造。
+- **不做并具名的格子**（不许变隐形缺格）：「**用户能停**」归票 181／票 220（`A434` ⑤）；`task.list` 的 DEFERRED 标记**一字不动**；
+  "被谁停"**不加上屏字段**（`A434` ④），只走现成审计 sink 并有用例证明；`task.spawn` 等孩子的时限那一半是票 222 AC#3 的剩格，不互相冒充。
+- **未碰**：`frontend/**`／`design/**`（零读零写零转述）、`PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`、
+  三枚冻结件、`SubagentDeps` 字段集（`:871` 那枚 5 字段守卫一字不动）。
