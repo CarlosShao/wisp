@@ -1,0 +1,18 @@
+账目落地 done-fix-1（票 92）：3 枚翻勾 + 4 枚追加凭据行，删除列只有改框那三行
+
+翻勾的三枚（尺一＝现读裁决表该行原文，尺二＝今天的树里现读盘上面，两把都过）：
+- AC#2 附件响亮失败＝92b-adversarial-acceptance.md:135 通过〔独立复现，MUT-H 11 枚红〕
+  ＋ internal/panel/attachments_test.go:130/:268/:331 三枚承载用例在位
+- AC#3 工作区切换＝92-adversarial-acceptance.md:92 通过 ＋ 92b:136 沿用
+  ＋ internal/panel/workspace_test.go:48/:72 ＋ internal/tools/paths_workspace_test.go:41
+- AC#4 面板关闭不丢＝92:113 通过 ＋ 92b:136 沿用 ＋ internal/panel/composer_test.go:208/:246
+  （92:117 那句"真机路径尚未存在"原样抄进凭据行，没有抹平）
+
+没翻的四枚：
+- AC#1（甲）＝账在票 114 AC#5(:50) 与 AC#8–AC#11；92b:134 判"不通过"；票 114 仍开放（7 未勾）
+- AC#5（己）＝92b:137 逐字"(iii) 未重做"，缺一次独立复跑，本腿禁跑门
+- AC#6 由 pool-2 的戊**改判己**：92b:138 的"通过（数字全复算）"只对 91b5fc4/a8f9459 那两棵树负责
+- AC#7 由 pool-2 的戊**改判丁**：判据要 grep frontend/，本腿禁读；Go 面形状在位（composer_test.go:269-270）
+
+票面 numstat＝10 增 / 3 删，删除那三行全是改框行；本腿零编译、零改票名、零删文件。
+交付件 .scratch/wisp/probes/done-fix-1/ledger-of-fixes.md 同步填了 §A 起手复量与票 92 明细。

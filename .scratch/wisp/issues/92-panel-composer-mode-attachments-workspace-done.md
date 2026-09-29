@@ -52,26 +52,33 @@ POSIX/docker 读数与四条残留都在 Progress log 的 checkpoint 2/3；建�
 - [ ] **AC#1** 面板**只读地**显示当前档位（三档之一），并且**面板侧不存在任何能改档位的路径**：
       给出 `ban #6` 家族的正向钉子——在快照里往 composer 组件种一个"直接改 mode"的调用，扫描/用例必须红
       （或者你论证它为什么不该被 `ban #6` 抓住、并把它挂到别的门上）。**不许**新建第二条独立通道。
-- [ ] **AC#2** 附件通路：粘贴/选择**图片与视频**能把字节送到 Go 侧并出现在消息里。
+      `done-fix-1` 追加（甲类·不翻勾）：账在**票 114**＝`114-composer-request-has-no-production-caller-and-the-real-gate-must-be-native.md:50` AC#5「不越界：面板侧**只许显示 + 发起请求**（R20 的明写）。工作区/档位两个输入口不得变成授权口」逐字覆盖本格那件事，另有 `:63` AC#8／`:67` AC#9／`:72` AC#10／`:75` AC#11 接 `R-92b-1/2/3` 与 `R-92-2`；本腿现读 `docs/evidence/s1/92b-adversarial-acceptance.md:134`「AC#1 档位只读 | **不通过**（按派单口径：门的覆盖面残留）」。⛔ 不翻勾的理由＝接管票 114 **仍开放**（现量 `grep -c -- '^- \[ \]'` 该票＝**7 枚未勾**、`^- \[x\]`＝**2 枚**）。
+- [x] **AC#2** 附件通路：粘贴/选择**图片与视频**能把字节送到 Go 侧并出现在消息里。
       ⚠ **不支持的类型必须响亮失败并告知用户**，不许静默丢弃（票 83 的"说谎的配置键"同族）：
       给出你测过的**每一类**输入与各自的结论（png / jpg / mp4 / 一个 0 字节文件 / 一个伪装成 .png 的 .exe /
       一个 2GB 的文件 / 一个带 `\` 和 `..` 的文件名）。**字节进去了 ≠ agent 能理解** ⇒
       视频**语义理解**不在本票（挂 **Q-28**），本票只保证"不骗人 + 不越权 + 不吃掉用户的意图"。
-- [ ] **AC#3** 工作区选择：一次真实切换后，**(i)** 后续操作的风险判定用的是新工作区，
+      `done-fix-1` 勾＝表 `docs/evidence/s1/92b-adversarial-acceptance.md:135`「AC#2 附件响亮失败 | **通过** | 〔独立复现〕 | MUT-H：统一出口改 `nil` ⇒ 11 枚红，点名到 7 个子测试」（本腿现读该行原文）＋现验 `grep -n 'func Test' internal/panel/attachments_test.go`＝`:130 TestRefusesUnsupportedAndMasqueradingInputsLoudly`／`:268 TestMessageCarriesAttachmentRefsAndRefusals`／`:331 TestAttachmentPayloadCarriesTheBytes` 三枚在位。
+- [x] **AC#3** 工作区选择：一次真实切换后，**(i)** 后续操作的风险判定用的是新工作区，
       **(ii)** reparse/junction 指向外部的那次切换**被拒且给出原因**（C26），**(iii)** 切换写进审计。
-- [ ] **AC#4** 反向：面板**关闭**（球唤醒但不展开面板）时，档位与已选工作区都**不丢**，
+      `done-fix-1` 勾＝表 `92-adversarial-acceptance.md:92`「**结论：通过。**」（本腿现读 `:88-96`，(i) 由验收方自写 `TestProbe92WorkspaceNarrowsAssessor` 独立复现）＋ `92b-…md:136`「AC#3 / AC#4 | **沿用上一轮"通过"** | 〔日志＋归档，我抽验〕」＋现验三件事各有承载用例：`grep -rn 'func TestWorkspaceSwitch' internal/panel internal/tools`＝`internal/panel/workspace_test.go:48 TestWorkspaceSwitchAuditsAndAppliesACleanPath`（(iii) 审计）、`internal/panel/workspace_test.go:72 TestWorkspaceSwitchPropagatesC26sReparseRefusal`（(ii) 拒且给原因）、`internal/tools/paths_workspace_test.go:41 TestWorkspaceSwitchNarrowsWhatTheAssessorJudges`（(i) 新工作区生效）。
+- [x] **AC#4** 反向：面板**关闭**（球唤醒但不展开面板）时，档位与已选工作区都**不丢**，
       重开面板从 Go 侧恢复到同一状态（AC#5 的既有判据形状，票 77 做过一次，照做别削弱）。
+      `done-fix-1` 勾＝表 `92-adversarial-acceptance.md:113`「**结论：通过（档位见 AC#6 的 gofumpt 红，与本格无关。）**〔日志＋归档，我抽验〕」＋ `92b-…md:136` 沿用通过（抽验"承载文件 `91b5fc4..a8f9459` 零改动"）＋现验 `internal/panel/composer_test.go:208 TestComposerStateSurvivesPanelCloseAndReopen`、`:246 TestUnknownModeNeverRendersAsASafeOne`（`grep -rn` 现量两枚在位）。⚠ **表对这格留了一句没销的话**（`92-…md:117` 逐字"**恢复"这件事的真机路径尚未存在**…⇒ 与 `R-92-5`/`R-92-2` 同批补"）——本格钉的是序列化契约那一层，那句话本腿不替谁抹平。
 - [ ] **AC#5** 变异三向：(i) 把"面板只能显示"改成"面板能写 mode" ⇒ 必须有用例红；
       (ii) 把不支持类型的报错改成 `return nil` ⇒ AC#2 红；(iii) 把 reparse 那次的拒绝改成放行 ⇒
       **既有**安全用例红（不是本票新写的）。锚点=承载行为那一行，同链 grep 证落地，还原后 `git diff --quiet` 证干净；
       **编译失败不算变异**。
+      `done-fix-1` 追加（己类·判不了，本腿不翻勾）：缺的读数＝**(iii) 那一向的一次非实现者独立复跑**。本腿现读 `docs/evidence/s1/92b-adversarial-acceptance.md:137` 逐字「AC#5 变异三向 | (i) 本轮我重做为"红+绿各半"（F3a 红 / F5 绿）；(ii) MUT-H 红；**(iii) 未重做**」＋「(iii)〔仅自述，不背书〕」⇒ (i) 那一向表自己也只做到"红+绿各半"（F5 仍绿，见 `:133` R-92-1 未清）。要补的那把尺：`/tmp` 纯净快照里把 C26 reparse 拒绝改成放行 ⇒ 跑既有安全用例看它是否红（本腿被禁跑任何编译/门，无从现验；(i)(ii) 的盘上面另见票 114 名下）。
 - [ ] **AC#6** 台账与门禁（只跑自己碰的范围）：`sh scripts/d22scan.sh` 纯净树 rc=0 且贴出**逐作用域文件数**
       （`ban #6 frontend/` 的 N 必须**因为本票而变大**，这就是覆盖面证明）；`ban #8` 零 emoji；
       `gofmt -l`/`gofumpt -l` 空、`go vet ./internal/panel/` rc=0、`go test -count=2 ./internal/panel/` rc=0
       且逐条点名 SKIP/FAIL。⚠ `go test ./cmd/wisp/` 在本机是**加载期 `0xc0000135` 的既有红**（票 87 已在纯净树复现），
       不要去追，如实登记即可。
+      `done-fix-1` 追加（己类·判不了，本腿不翻勾）：这一格的两轮表读数本腿都现读过了——`92-adversarial-acceptance.md:147`「**结论：FAIL** —— 附我本机实测数字」→ `92b-…md:138`「AC#6 台账与门禁 | **通过（数字全复算）** | 〔独立复现〕」（`R-92-3` 在 `92b-…md:131` 记"已清：快照/工作树/`gofumpt -l .` 三处我都跑，全空"）。**但"通过"是对 `91b5fc4`/`a8f9459` 那两棵树的读数，对今天的树无效**：本格要的 `sh scripts/d22scan.sh` rc=0、`gofumpt -l` 空、`go test -count=2 ./internal/panel/` 四数，本腿一律不许跑（派单禁编译，`223-r2` 正在写 `cmd/wisp`／`internal/config`），一把也补不上 ⇒ 缺的读数＝这三发在**当前 HEAD** 上的一次非实现者读数。另 `92b-…md:138` 自己留了一句未销的 `R-92b-4`「⚠ 整步 `portable-tests.sh` 它未跑」。
 - [ ] **AC#7** **负判据**：把"不做 git 切换"变成可检查的东西——在 `frontend/` 与 `internal/panel/` 里
       `grep -rn` 证明没有任何分支切换/仓库选择的能力入口（owner 明令砍掉，防止后人"顺手加回来"）。
+      `done-fix-1` 追加（丁类·本腿碰不到全格，不翻勾）：**判不了，因为那一格的凭据在被禁读的目录里**——本格要求对 `frontend/` 与 `internal/panel/` 两面都 `grep -rn`，而派单对本腿写死 `frontend/**` 零读零引零转述。能验的那一半本腿验了，且形状还在：`grep -rn` 现量 `internal/panel/composer_test.go:269-270` 一枚负判据正则（`\bgit\s+checkout\b|\bgit\s+switch\b|\bswitchBranch\b|\bcheckoutBranch\b|\bchangeRepo(?:sitory)?\b|` + `\brepoPicker\b|\bbranchSelect(or)?\b|\bworktree\b|\bgit\.branch\b|\bgit\.repo\b|\bvcs\.switch\b`）、`internal/panel/composer_dispatch_test.go:648` 一枚 `banned` 名单（逐字 `"checkoutBranch", "changeRepo", "repoPicker", "branchSelect", "vcs.switch"`）；表侧读数＝本腿现读 `docs/evidence/s1/92b-adversarial-acceptance.md:139`「AC#7 不做 git 切换 | **通过** | 〔独立复现〕 | 包内用例 PASS + 我把 `fixtures/`、`dist/` 也 grep 了一遍 0 命中」。**那一发 grep 里跨 `frontend/` 的那半本腿不能替它现验** ⇒ 归丁，等一枚有 `frontend/**` 读权的腿补（同 `A440` 第④节那批"待人项"的形状；本腿不猜它红不红）。
 
 ## Rules（本仓固定）
 
