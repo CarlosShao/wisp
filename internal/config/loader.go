@@ -75,14 +75,32 @@ func readConfigFile(path string) (*Config, error) {
 		// stayed 0, the pipeline fell into applyMigrations, and a broken line
 		// came back reported as "cannot migrate from schema version 1".
 		// Measured, not theorized - 票 223's own case planted
-		// "schema_version = 2\n\nthis is not toml [[[" and read that sentence.
+		// "schema_version = 2\n\nthis is not toml [[[" and read that sentence;
+		// since 票 223 r2 the branch below names that shape correctly too.
 		//
 		// The ver != 0 half is deliberate and it is not a loosening: a file that
-		// DOES declare a version belongs to the migration pipeline, and
-		// TestMigrateCorruptFileUntouched (migrate_test.go:123) requires that
-		// path's guidance ("the file was left untouched") for a declared-1 file
-		// with a broken table header. Which pipeline owns the error is decided by
-		// the version the file declares, not by which message is easier.
+		// declares a version OLDER than this build belongs to the migration
+		// pipeline, and TestMigrateCorruptFileUntouched (migrate_test.go:123)
+		// requires that path's guidance ("the file was left untouched") for a
+		// declared-1 file with a broken table header. Which pipeline owns the
+		// error is decided by the version the file declares, not by which
+		// message is easier.
+		return nil, observe.Wrap(observe.ClassConfig, peekErr, "config.toml parse")
+	}
+	if peekErr != nil && ver >= SchemaVersionCurrent {
+		// Ticket 223 AC#4, second half (r2): the bytes DID declare a version,
+		// so branch 1 above does not fire, and the document still does not
+		// parse - the failure is the syntax of the body and the operator must
+		// hear the 语法错 sentence for it. 223-v1 measured the missing half:
+		// four declared-current shapes whose only fault was a broken line
+		// (comment-led table bracket, CRLF, tight "schema_version=2", indented
+		// version line) fell through to decodeStrict, whose DecodeError text
+		// describeReloadFailure books as cause=invalid - "语法没问题" said to a
+		// file whose one and only problem is syntax. A file already carrying
+		// this build's version (or a newer one) has no migration to run, so a
+		// parse failure inside it can only be what it is. Pinned, with the
+		// older-version half left to the migration branch above, by
+		// TestTicket223R2FailureSentenceRouting in cmd/wisp.
 		return nil, observe.Wrap(observe.ClassConfig, peekErr, "config.toml parse")
 	}
 	if ver > SchemaVersionCurrent {

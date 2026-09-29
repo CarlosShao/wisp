@@ -1,0 +1,92 @@
+=== shot 1/25 start=Tue Sep 29 16:29:06 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.166s
+=== shot 1/25 EXIT=0
+=== shot 2/25 start=Tue Sep 29 16:29:10 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.013s
+=== shot 2/25 EXIT=0
+=== shot 3/25 start=Tue Sep 29 16:29:14 CST 2026
+time=2026-09-29T16:29:16.885+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+time=2026-09-29T16:29:17.749+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/29 16:29:17 mockllm: serving on http://127.0.0.1:54452 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-29T16:29:17.768+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply1074678232\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-09-29T16:29:17.789+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply1074678232\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-29T16:29:17.795+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-29T08:29:17Z duration_ms=6
+time=2026-09-29T16:29:17.802+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket223RestartTierSaysItWillNotApply1074678232\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-29T16:29:17.806+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-29T08:29:17Z duration_ms=4
+time=2026-09-29T16:29:17.811+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-29T16:29:17.813+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- FAIL: TestTicket223RestartTierSaysItWillNotApply (1.96s)
+    config_reload_223_test.go:453: the operator is not told the edit will not land this run; stdout:
+        wisp run: 答复监听已接入（卡片上给了编号）。原生侧：yes <编号> / no <编号> [理由] / veto <编号>；面板路线：panel-no <编号> [理由]、panel-yes <编号>（这一条只会被服务端 API 拒绝）、head / view <编号> 看卡片；quit 退出监听。
+        wisp run: 配置热加载已接管（每 1s 检查一次 config.toml）。手改会按 D36 三档处理：可热加载段立即生效；[risk]/[fs]/[net]/[plugins] 的放宽要先答一张 L2 卡，不答按拒绝保留旧值；重启档的改动本次不生效，会另有一句告诉你为什么不生效。
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	2.002s
+FAIL
+=== shot 3/25 EXIT=1
+=== shot 4/25 start=Tue Sep 29 16:29:18 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.067s
+=== shot 4/25 EXIT=0
+=== shot 5/25 start=Tue Sep 29 16:29:23 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.088s
+=== shot 5/25 EXIT=0
+=== shot 6/25 start=Tue Sep 29 16:29:27 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.165s
+=== shot 6/25 EXIT=0
+=== shot 7/25 start=Tue Sep 29 16:29:31 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.149s
+=== shot 7/25 EXIT=0
+=== shot 8/25 start=Tue Sep 29 16:29:36 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.996s
+=== shot 8/25 EXIT=0
+=== shot 9/25 start=Tue Sep 29 16:29:40 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.963s
+=== shot 9/25 EXIT=0
+=== shot 10/25 start=Tue Sep 29 16:29:44 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.028s
+=== shot 10/25 EXIT=0
+=== shot 11/25 start=Tue Sep 29 16:29:48 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.137s
+=== shot 11/25 EXIT=0
+=== shot 12/25 start=Tue Sep 29 16:29:53 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.978s
+=== shot 12/25 EXIT=0
+=== shot 13/25 start=Tue Sep 29 16:29:57 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.995s
+=== shot 13/25 EXIT=0
+=== shot 14/25 start=Tue Sep 29 16:30:01 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.999s
+=== shot 14/25 EXIT=0
+=== shot 15/25 start=Tue Sep 29 16:30:05 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.018s
+=== shot 15/25 EXIT=0
+=== shot 16/25 start=Tue Sep 29 16:30:09 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.111s
+=== shot 16/25 EXIT=0
+=== shot 17/25 start=Tue Sep 29 16:30:14 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.962s
+=== shot 17/25 EXIT=0
+=== shot 18/25 start=Tue Sep 29 16:30:18 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.047s
+=== shot 18/25 EXIT=0
+=== shot 19/25 start=Tue Sep 29 16:30:22 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.027s
+=== shot 19/25 EXIT=0
+=== shot 20/25 start=Tue Sep 29 16:30:26 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.975s
+=== shot 20/25 EXIT=0
+=== shot 21/25 start=Tue Sep 29 16:30:30 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.995s
+=== shot 21/25 EXIT=0
+=== shot 22/25 start=Tue Sep 29 16:30:34 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.972s
+=== shot 22/25 EXIT=0
+=== shot 23/25 start=Tue Sep 29 16:30:38 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.979s
+=== shot 23/25 EXIT=0
+=== shot 24/25 start=Tue Sep 29 16:30:42 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.033s
+=== shot 24/25 EXIT=0
+=== shot 25/25 start=Tue Sep 29 16:30:46 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.975s
+=== shot 25/25 EXIT=0
+TOTAL=25 FAILS=1

@@ -1,0 +1,61 @@
+=== shot 1/20 start=Tue Sep 29 16:38:55 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.285s
+=== shot 1/20 EXIT=0
+=== shot 2/20 start=Tue Sep 29 16:39:00 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.055s
+=== shot 2/20 EXIT=0
+=== shot 3/20 start=Tue Sep 29 16:39:04 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.069s
+=== shot 3/20 EXIT=0
+=== shot 4/20 start=Tue Sep 29 16:39:08 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.115s
+=== shot 4/20 EXIT=0
+=== shot 5/20 start=Tue Sep 29 16:39:13 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.095s
+=== shot 5/20 EXIT=0
+=== shot 6/20 start=Tue Sep 29 16:39:17 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.115s
+=== shot 6/20 EXIT=0
+=== shot 7/20 start=Tue Sep 29 16:39:21 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.087s
+=== shot 7/20 EXIT=0
+=== shot 8/20 start=Tue Sep 29 16:39:26 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.006s
+=== shot 8/20 EXIT=0
+=== shot 9/20 start=Tue Sep 29 16:39:30 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.112s
+=== shot 9/20 EXIT=0
+=== shot 10/20 start=Tue Sep 29 16:39:34 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.053s
+=== shot 10/20 EXIT=0
+=== shot 11/20 start=Tue Sep 29 16:39:38 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.021s
+=== shot 11/20 EXIT=0
+=== shot 12/20 start=Tue Sep 29 16:39:42 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.997s
+=== shot 12/20 EXIT=0
+=== shot 13/20 start=Tue Sep 29 16:39:47 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.044s
+=== shot 13/20 EXIT=0
+=== shot 14/20 start=Tue Sep 29 16:39:51 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.050s
+=== shot 14/20 EXIT=0
+=== shot 15/20 start=Tue Sep 29 16:39:55 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.010s
+=== shot 15/20 EXIT=0
+=== shot 16/20 start=Tue Sep 29 16:39:59 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.992s
+=== shot 16/20 EXIT=0
+=== shot 17/20 start=Tue Sep 29 16:40:03 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.957s
+=== shot 17/20 EXIT=0
+=== shot 18/20 start=Tue Sep 29 16:40:07 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.063s
+=== shot 18/20 EXIT=0
+=== shot 19/20 start=Tue Sep 29 16:40:11 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.982s
+=== shot 19/20 EXIT=0
+=== shot 20/20 start=Tue Sep 29 16:40:15 CST 2026
+ok  	github.com/CarlosShao/wisp/cmd/wisp	2.022s
+=== shot 20/20 EXIT=0
+TOTAL=20 FAILS=0

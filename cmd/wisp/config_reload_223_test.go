@@ -126,6 +126,37 @@ func (r *reloadRun223) awaitAudit(t *testing.T, needle string) string {
 	}
 }
 
+// awaitStdout waits for one sentence to reach the operator's stdout and returns
+// the whole stream. It exists because the reload path writes the audit trail
+// BEFORE the operator line (reportRestartPending emits both auditf calls first,
+// then the Fprintf - cmd/wisp/config_reload.go:282/:284 -> :288), so a case
+// that awaited the audit and then read stdout ONCE has a real window and
+// reddens intermittently (ticket 223 r2 AC#5: measured 1/25 here, 1/5 on the
+// v1 leg, 1/15 by the orchestrator). The wait is bounded and monotonic - the
+// same time.Timer/time.Ticker shape awaitAudit uses, not a wall-clock
+// subtraction (AGENTS.md 1.2's banned shape). It is NOT an assertion and not a
+// loosening: a sentence that never arrives still fails the case, at this
+// helper's own deadline, with the full stdout and stderr dumped.
+func (r *reloadRun223) awaitStdout(t *testing.T, needle string) string {
+	t.Helper()
+	deadline := time.NewTimer(reloadCaseBudget)
+	defer deadline.Stop()
+	tick := time.NewTicker(20 * time.Millisecond)
+	defer tick.Stop()
+	for {
+		got := r.h.out.String()
+		if strings.Contains(got, needle) {
+			return got
+		}
+		select {
+		case <-deadline.C:
+			t.Fatalf("stdout never carried %q within %v; full stdout:\n%s\nstderr:\n%s",
+				needle, reloadCaseBudget, got, r.h.err.String())
+		case <-tick.C:
+		}
+	}
+}
+
 // awaitCard waits for the reload path to display a card and returns it.
 func (r *reloadRun223) awaitCard(t *testing.T, tool string) liveCard {
 	t.Helper()
@@ -440,7 +471,14 @@ func TestTicket223RestartTierSaysItWillNotApply(t *testing.T) {
 			t.Errorf("the restart notice does not say when it takes effect: %q", pending)
 		}
 		why := r.awaitAudit(t, "config: RESTART-PENDING detail=")
-		out := r.h.out.String()
+		// Ticket 223 r2 AC#5: the operator sentence lands on stdout AFTER the
+		// two audit lines just awaited (config_reload.go:282/:284 -> :288),
+		// so the single read that stood here caught the stream mid-write and
+		// reddened this case intermittently. Poll for the sentence with
+		// awaitStdout instead; every assertion below is unchanged verbatim,
+		// and the positive control (deleting the product sentence) still
+		// reddens - awaitStdout itself fails at its deadline.
+		out := r.awaitStdout(t, "本次运行不会生效")
 		for _, needle := range []string{"app.autostart", "开机自启", "重启进程后生效"} {
 			if !strings.Contains(why+out, needle) {
 				t.Errorf("the restart sentence omits %q; audit:\n%s\nstdout:\n%s", needle, why, out)
@@ -487,15 +525,18 @@ func TestTicket223FailureSentencesAreDistinct(t *testing.T) {
 		{
 			name: "语法错",
 			plant: func(t *testing.T, r *reloadRun223) {
-				// Deliberately WITHOUT a schema_version line: loader.go routes a
-				// file that declares a version through the migration pipeline
-				// first, and that pipeline's own guidance is what
-				// migrate_test.go:123 requires for it (measured - the first draft
-				// of this case planted "schema_version = 2\n\nthis is not toml"
-				// and read back cause=migration, so the two sentences were
-				// separated by where the pipeline owns the error, not by which
-				// wording was easier). "Not TOML at all, not even a version" is
-				// what this sentence means.
+				// Deliberately WITHOUT a schema_version line: this is
+				// loader.go's branch 1 - bytes from which not even a version
+				// can be picked. Which sentence a file WITH a declared
+				// version gets is decided by which pipeline owns its error,
+				// and 票 223 r2 narrowed that boundary: declared OLDER
+				// (below current) belongs to the migration pipeline - that
+				// is what migrate_test.go:123 pins - while declared CURRENT
+				// (or newer) with an unparseable body belongs to 语法错,
+				// because a file already carrying this build's version has
+				// no migration to run. Both halves are pinned by
+				// TestTicket223R2FailureSentenceRouting. "Not TOML at all,
+				// not even a version" is what this sub-case means.
 				r.writeOver(t, "this is not toml [[[\n")
 			},
 			wantCause: "cause=syntax",

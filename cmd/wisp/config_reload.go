@@ -340,12 +340,17 @@ func describeReloadFailure(err error) string {
 			// Its own sentence because it has its own fix: this file declares a
 			// version this build cannot carry forward, and the config layer's
 			// message already promises the file was left untouched. Measured
-			// boundary (票 223 r1): a file that declares a version and is broken
-			// further down lands HERE, not in 语法错 - loader.go routes anything
-			// with a readable declared version through the migration pipeline,
-			// which is what migrate_test.go:123 requires. Saying "migrate" here
-			// and "syntax" only for bytes from which not even a version can be
-			// picked is the honest line, and it is drawn by measurement.
+			// boundary (票 223 r1, narrowed by 票 223 r2): a file declaring a
+			// version BELOW this build's current one and broken further down
+			// lands HERE - loader.go routes it through the migration pipeline,
+			// which is what migrate_test.go:123 requires. r1 had drawn the
+			// line at "any readable declared version"; 223-v1's 17-shape
+			// overlay showed that made four declared-CURRENT shapes (whose
+			// only fault was a broken line) borrow this branch's following
+			// 语法没问题 sibling instead of 语法错. Since r2 a file declaring
+			// the current-or-newer version with an unparseable body is named
+			// a syntax error; this branch keeps exactly the shape its own
+			// fix applies to.
 			return "cause=migration detail=\"" +
 				"config.toml 声明了一个这份 Wisp 不会迁移的 schema_version（文件被原样留着，不会被重置）。" +
 				"本次运行继续用内存里的旧配置；升级 Wisp 或恢复备份才会读它\""

@@ -1,0 +1,23 @@
+test+fix(223-r2): AC#5 间歇红改有界轮询（awaitStdout）＋AC#4 两句归位（loader 路由）＋常驻路由用例
+
+任务一（AC#5 堵口，只动断言写法，⛔ 产品文案零改动）：
+- cmd/wisp/config_reload_223_test.go 新增 awaitStdout（time.Timer/Ticker 有界轮询，
+  形状逐字仿同文件 awaitAudit；monotonic 期限，非 .Sub(time.Now()) 减法，d22scan
+  ban #4 两形不沾；无裸 go func）。
+- TestTicket223RestartTierSaysItWillNotApply 的 stdout 单发读改为 awaitStdout(t,
+  "本次运行不会生效")；全部断言逐字保留、零放宽（复现＝改前 25 发 1 红，红句在
+  :453，见 probes/223/r2/pre-fix-repro.txt）。
+
+任务二（AC#4 句子路由，改在 internal/config/loader.go）：
+- readConfigFile 新增一支：peekErr != nil && ver >= SchemaVersionCurrent ⇒
+  包成 config.toml parse（语法错那句）；读不出版本仍走 branch 1；只有声明版本
+  低于当前版才交给 applyMigrations——migrate_test.go:123 一字未动、包仍绿。
+- 新增常驻用例 cmd/wisp/config_sentences_223r2_test.go
+  :: TestTicket223R2FailureSentenceRouting（8 形双向钉：C1/E1/G1/L1/J1/A1→
+  cause=syntax 且不得带「语法没问题」；A2→仍归迁移；解析得开＋未知键→不抢
+  语法错）。首跑 8/8 绿。
+- 三处过期注释归真（describeReloadFailure 迁移支、config_reload_223_test.go
+  语法错子例、loader.go branch 1 尾注），零行为改动。
+
+票 223 不翻勾、不 -done；thresholds.go/golden/allowlist/三枚冻结件零接触；
+未 push。
