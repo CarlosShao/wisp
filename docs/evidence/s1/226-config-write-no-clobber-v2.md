@@ -73,7 +73,34 @@
 
 ## ③ 本腿自跑的两发原始输出
 
-〔待填〕
+时刻 `2026-09-29 14:06 +08`（本腿起手锚点 `c039bc4e` 未动，HEAD 现为我这几枚文档 commit）。
+
+### ③① AC#3 无条件认领突变（装饰判据检测）
+
+起跑前先 `export PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"`。
+
+**突变**（`internal/config/writeguard.go`，在 `diverged := diffKeyPaths(m.cur, base)` 之后、`if len(diverged) == 0` 之前插一行无条件 `m.statOwnWrite()`；未删原 `if` 内那一句，两次认领幂等）。跑 `go test ./internal/config -count=1`，全量落盘到 `.scratch/wisp/probes/226/v2/rerun1-unconditional-adopt.txt`（**未接 `| head`／`| tail`**）：
+
+原始红句（逐字，抄自该件）：
+```
+--- FAIL: TestAC3AdoptionClaimsOnlyWhatThisWriteProduced (0.03s)
+    writeguard_226_test.go:224: the merged write adopted a stat for content this process never read; the hand edit is now invisible forever: <nil>
+--- FAIL: TestAC3HandAddedEntryIsPreservedButNotAppliedToMemory (0.02s)
+    writeguard_226_test.go:259: the hand-added [fs] entry was never judged; our write hid it (AC#3)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/config	0.738s
+```
+
+⇒ **结论：AC#3 那格不是装饰。把"仅有分叉就不认领"改成无条件认领，稳定红 2 枚**（且只红这 2 枚 AC#3 用例，AC#1/2/4/5 全绿）。这与 v1 的 `a3-config-unconditional-adopt.txt` 逐字一致（同一 :224／:259 两句），两腿独立复现 ⇒ 该判据真在测"写完之后再手改一枚键、下一次轮询要能看见"。
+
+**逐字换回 + certutil 比对**（本腿要求抄进表）：
+- 起手基线 `certutil -hashfile internal/config/writeguard.go SHA256`＝`bf82226988b83fdce151478bd51a550beec8d66caef39e5cc4096f6f55150f16`
+- 还原后同一命令＝`bf82226988b83fdce151478bd51a550beec8d66caef39e5cc4096f6f55150f16`
+- ⇒ **逐字节相同**；`git diff --stat -- internal/config/writeguard.go` 输出为空（未残留任何改列）。
+
+### ③② "删行会不会被补回"那一发
+
+**未自跑**——本腿按派单纪律"v1 已跑过则只读其读数"，`b-*`／`probe*/main.go` 七枚留下的输出已足以定论（见 §② 六行 b 族读数 + §⑤ 结论），不消耗第二次编译额度。§⑤ 即据此作答。
 
 ---
 
