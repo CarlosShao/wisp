@@ -1,0 +1,8 @@
+github.com/CarlosShao/wisp/internal/panel     RUN=304   PASS=296   FAIL=8   SKIP=0   rc=1
+github.com/CarlosShao/wisp/internal/agent/approval RUN=114   PASS=112   FAIL=0   SKIP=2   rc=0
+github.com/CarlosShao/wisp/internal/winsec    RUN=202   PASS=202   FAIL=0   SKIP=0   rc=0
+github.com/CarlosShao/wisp/internal/memory    RUN=136   PASS=134   FAIL=0   SKIP=2   rc=0
+github.com/CarlosShao/wisp/internal/secret    RUN=58    PASS=58    FAIL=0   SKIP=0   rc=0
+github.com/CarlosShao/wisp/internal/risk      RUN=396   PASS=394   FAIL=0   SKIP=2   rc=0
+github.com/CarlosShao/wisp/internal/config    RUN=230   PASS=230   FAIL=0   SKIP=0   rc=0
+github.com/CarlosShao/wisp/internal/ball      RUN=110   PASS=108   FAIL=2   SKIP=0   rc=1

@@ -50,7 +50,7 @@ switching and the complete user-visible failure-semantics table (§14.2) enforce
       failure → Error(provider), ctx preserved, resumable.
 - [x] Failure-semantics matrix: each §14.2 row has a test asserting the emitted user-visible
       event/state.
-- [ ] Probe suite: mockllm control endpoints emulate fc-capable / fc-broken / vision-capable
+- ⛔ **（2026-09-29 18:5x `gate-rerun-1` 处置＝账在仍开放的票名下，本格不再占结案票的分母；原句逐字保留、续行未动。判性来源＝只读腿 `undone-28-1` 的"丙"行＋派单票 234 AC#5，台账 `A446`；读数与 sha 请引接收票那一格，别引本行。）** Probe suite: mockllm control endpoints emulate fc-capable / fc-broken / vision-capable ⇒ **指向**＝票 12 `:120`/`:123`/`:128`（正式移交代号 A11，12 开放）
       providers → probe results land in provider_health with correct ✓/✗; declared-vs-measured
       mismatch event emitted.
       `done-fix-1` add (甲类·**账在票 12**，⛔ not ticked): the ticket face says so itself — `:66`（09-20 10:20Z log，`agent-ticket11-probe-2`）逐字「**LEFT AC#6 UNTICKED on purpose**」三条原因（装配根没人调 / thinking 沿用票 09 的检查 / audio 按契约推票 61），改名 commit `9293518d` 正文逐字「**AC#6 transferred as A11**, ruling R12」（本腿 `git show -s --format=%B 9293518d` 现读）。接管票核实**通过**：`12-cli-text-path-s1-gate.md:120` 是一枚 `- [x]`，`:123` 逐字「Handed here from ticket 11 AC#6, registered as **A11**」，`:128` 逐字「**A11 就此闭环**」（正反两向都钉）。盘上面本腿今天在树里现读三处都在：`internal/llm/probe_health.go:14` 头部注释自称「Ticket 11 AC#6, consumer side」、`cmd/wisp/providers.go:189`/`:195` 真在消费 `llm.ProbeMismatch`、`cmd/wisp/providers_test.go:143` 有「the declared-vs-measured event was not announced」这条断言。⇒ 三条原因里第一条已由票 12 兑现并勾上；后两条（thinking／audio）的射程在票 12／票 61，本腿不替它们判。

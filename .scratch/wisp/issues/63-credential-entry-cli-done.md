@@ -43,7 +43,7 @@ wisp secret unset <name>      # 删除 blob，并检查是否仍被 config 引�
 - [x] `list` 只输出 blobID+时间；`unset` 在被 config 引用时拒绝并指出引用位置，`--force` 时留审计行。
 - [x] `WISP_ENV` 三档各自独立：同一 name 在 dev/test/prod 是三个不同 blob（测试覆盖）。
 - [x] 便携模式与非便携模式两条路径都有测试（沿用票 06 的 seam 注入）。
-- [ ] 端到端：`wisp secret set` 存好后，config 里 `api_key_ref = "secret:<id>"` 能被 provider 解析出发请求（用 mockllm，测试里用假 key）。
+- ⛔ **（2026-09-29 18:5x `gate-rerun-1` 处置＝账在仍开放的票名下，本格不再占结案票的分母；原句逐字保留、续行未动。判性来源＝只读腿 `undone-28-1` 的"丙"行＋派单票 234 AC#5，台账 `A446`；读数与 sha 请引接收票那一格，别引本行。）** 端到端：`wisp secret set` 存好后，config 里 `api_key_ref = "secret:<id>"` 能被 provider 解析出发请求（用 mockllm，测试里用假 key）。 ⇒ **指向**＝票 12 `:109`/`:112`/`:116-119`（正式移交代号 A8，12 开放）
       —— 未勾原因：`TestSecretEndToEndConfigRefResolvesAtRequestTime` 证明了 ref→`config.LoadFile`→
       `ProviderKeys`→`Authorization` 头真的上线，但发请求的是测试自己的 http client，不是
       `internal/llm` 的 provider；provider 那一段是调用方自证的（README 规则：安全判定不得由调用方选择器决定）。

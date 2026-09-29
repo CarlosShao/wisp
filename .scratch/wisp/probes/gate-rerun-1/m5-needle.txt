@@ -1,0 +1,1 @@
+return sameTree(n.Path, resolved.String())

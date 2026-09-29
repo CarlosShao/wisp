@@ -1,0 +1,51 @@
+time=2026-09-29T18:39:08.909+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC1SealFileReportsTheInheritedGrantItCleared
+    inherited_narrow_notice_104_windows_test.go:121: icacls BEFORE SealFile C:\Users\swq\AppData\Local\Temp\TestAC1SealFileReportsTheInheritedGrantItCleared2070809681\001\store\readable-by-inheritance.txt
+        C:\Users\swq\AppData\Local\Temp\TestAC1SealFileReportsTheInheritedGrantItCleared2070809681\001\store\readable-by-inheritance.txt Everyone:(I)(RX)
+                                                                                                                                         NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                                                         BUILTIN\Administrators:(I)(F)
+                                                                                                                                         DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    inherited_narrow_notice_104_windows_test.go:131: icacls AFTER SealFile C:\Users\swq\AppData\Local\Temp\TestAC1SealFileReportsTheInheritedGrantItCleared2070809681\001\store\readable-by-inheritance.txt
+        C:\Users\swq\AppData\Local\Temp\TestAC1SealFileReportsTheInheritedGrantItCleared2070809681\001\store\readable-by-inheritance.txt NT AUTHORITY\SYSTEM:(F)
+                                                                                                                                         BUILTIN\Administrators:(F)
+                                                                                                                                         DESKTOP-LVS7839\swq:(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+--- PASS: TestAC1SealFileReportsTheInheritedGrantItCleared (0.07s)
+=== RUN   TestAC1DefaultLogSaysInherited
+    inherited_narrow_notice_104_windows_test.go:182: default rendering: time=2026-09-29T18:39:08.998+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\TestAC1DefaultLogSaysInherited2951466954\001\store\log-leg.txt kind=inherited cleared="" cleared_inherited=S-1-1-0(A;ID;0x1200a9;;;WD) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestAC1DefaultLogSaysInherited (0.02s)
+=== RUN   TestAC2InheritedNoticeHasANoiseBound
+=== RUN   TestAC2InheritedNoticeHasANoiseBound/a_private_tree_with_only_the_private_set_stays_quiet
+    inherited_narrow_notice_104_windows_test.go:231: leg 1 (only {me,SY,BA}) WARN count = 0
+=== RUN   TestAC2InheritedNoticeHasANoiseBound/parent_policy_change_propagates_without_a_per_child_storm
+    inherited_narrow_notice_104_windows_test.go:279: leg 2 (parent sealed first, then 6 children): total WARN = 1 (parent=1, children=0), per-child=map[c:\users\swq\appdata\local\temp\testac2inheritednoticehasanoiseboundparent_policy_change_propag2698811491\001\propagated:1]
+=== RUN   TestAC2InheritedNoticeHasANoiseBound/sealing_only_children_reports_each_of_them_once
+    inherited_narrow_notice_104_windows_test.go:331: leg 3 (parent left wide, 4 children sealed singly): total WARN = 4
+--- PASS: TestAC2InheritedNoticeHasANoiseBound (0.09s)
+    --- PASS: TestAC2InheritedNoticeHasANoiseBound/a_private_tree_with_only_the_private_set_stays_quiet (0.01s)
+    --- PASS: TestAC2InheritedNoticeHasANoiseBound/parent_policy_change_propagates_without_a_per_child_storm (0.04s)
+    --- PASS: TestAC2InheritedNoticeHasANoiseBound/sealing_only_children_reports_each_of_them_once (0.04s)
+=== RUN   TestAC3OwnGrantsStaySilentWhicheverWayTheOSNamesThem
+    inherited_narrow_notice_104_windows_test.go:387: own-trustee seal WARN count = 1 ([{Path:C:\Users\swq\AppData\Local\Temp\TestAC3OwnGrantsStaySilentWhicheverWayTheOSNamesThem1985576518\001\byname\service-witness.txt Principals:[S-1-5-6(A;;0x1200a9;;;SU)] Inherited:[]}])
+--- PASS: TestAC3OwnGrantsStaySilentWhicheverWayTheOSNamesThem (0.11s)
+=== RUN   TestSealReportsThePrincipalsItCleared
+--- PASS: TestSealReportsThePrincipalsItCleared (0.04s)
+=== RUN   TestSealNoticeIsRecordedByDefault
+    narrow_notice_windows_test.go:142: recorded notice: time=2026-09-29T18:39:09.255+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\TestSealNoticeIsRecordedByDefault3902667218\001\data kind=explicit cleared=S-1-5-6(A;OICI;0x1200a9;;;SU) cleared_inherited="" policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+--- PASS: TestSealNoticeIsRecordedByDefault (0.02s)
+=== RUN   TestNoticeAttributionKeepsTwoTreesApart
+--- PASS: TestNoticeAttributionKeepsTwoTreesApart (0.12s)
+=== RUN   TestAC118KindFieldSaysExplicitForAGrantThatStoodOnTheObjectItself
+--- PASS: TestAC118KindFieldSaysExplicitForAGrantThatStoodOnTheObjectItself (0.02s)
+=== RUN   TestAC118KindFieldSaysInheritedForAGrantTheParentHandedDown
+--- PASS: TestAC118KindFieldSaysInheritedForAGrantTheParentHandedDown (0.03s)
+=== RUN   TestAC118KindFieldSaysBothWhenTheObjectCarriedItsOwnGrantToo
+--- PASS: TestAC118KindFieldSaysBothWhenTheObjectCarriedItsOwnGrantToo (0.04s)
+=== RUN   TestSealNarrowsAndNamesThePrincipalItRemovedBySID
+    private_set_sid_windows_test.go:314: planted as strangers: [S-1-1-0 S-1-5-32-546 S-1-5-21-1228170099-895614386-1166154857-500]; planted as a private-set member: S-1-5-32-544 (LA=S-1-5-21-1228170099-895614386-1166154857-500, in set: false, set=[S-1-5-18 S-1-5-32-544 S-1-5-21-1228170099-895614386-1166154857-1001])
+--- PASS: TestSealNarrowsAndNamesThePrincipalItRemovedBySID (0.11s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	0.696s

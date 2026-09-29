@@ -1,0 +1,98 @@
+=== false-green guard: the mount must actually carry the tree ===
+go_files_under_internal=460
+posix_test_files=7
+winsec_go=32
+go version go1.27.1 linux/amd64
+GOOS=linux GOFLAGS=
+pristine_bytes=10159
+157:		if ancestorIsLink(prefix) {
+156:	for _, prefix := range pathPieces(path) {
+
+=== G-6 baseline: three packages -count=2 -v on linux ===
+g6_rc=0
+four numbers counted WITH subtests:
+RUN=574 PASS=570 FAIL=0 SKIP=4
+same log counted top-level only (the naive form): PASS=344 FAIL=0 SKIP=4
+red_name_lines=0
+SKIP names:
+TestC26RewrittenSyncRootDoesNotDisarmSuspectNet
+TestSubprocessCrashWriter
+
+=== M-4a: turn the new POSIX link leg OFF ===
+landing_hits=1
+build_rc=0
+m4a_test_rc=1
+FAIL	github.com/CarlosShao/wisp/internal/winsec	0.077s
+m4a_top_level_reds=11
+TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasNamed
+TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed
+TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing
+TestAC1POSIXSealDirThroughASymlinkRefuses
+TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth
+TestAC1POSIXSealFileThroughABackslashNamedLink
+TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone
+TestAC1POSIXUnresolvedSymlinkedRootStillRefused119
+TestAC2POSIXInjectedTestDataDirStandsAsDeclared119
+TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125
+TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119
+restored=identical
+
+=== M-4b: half-fix, the walk consults ONE level (pathPieces(path)[:1]) ===
+landing_hits=1
+build_rc=0
+m4b_test_rc=1
+FAIL	github.com/CarlosShao/wisp/internal/winsec	0.092s
+m4b_top_level_reds=11
+TestAC118POSIXPrivateFileRefusesALinkStandingWhereTheFileWasNamed
+TestAC118POSIXSealFileRefusesALinkStandingWhereTheFileWasNamed
+TestAC1POSIXPrivateFileThroughASymlinkRefusesAndWritesNothing
+TestAC1POSIXSealDirThroughASymlinkRefuses
+TestAC1POSIXSealFileRefusesALinkAncestorAtEveryDepth
+TestAC1POSIXSealFileThroughABackslashNamedLink
+TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone
+TestAC1POSIXUnresolvedSymlinkedRootStillRefused119
+TestAC2POSIXInjectedTestDataDirStandsAsDeclared119
+TestAC2POSIXSeamAcceptsTheHonestPOSIXAnswer125
+TestAC3POSIXLinkInsideAResolvedDataRootStillRefused119
+restored=identical
+
+=== G-6 gates (per package) ===
+vet_rc[./internal/winsec/]=0
+vet_rc[./internal/memory/]=0
+vet_rc[./internal/risk/]=0
+GOOS_linux_vet_rc=0
+gofmt_l_count=0
+d22scan_rc=0
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/frontend_tree_gone_while_declared_live_exits_2 (0.02s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/ban_7_tree_gone_while_declared_live_exits_2 (0.02s)
+    --- PASS: TestBuiltBinaryGoesRedEndToEnd/fully_live_fixture_exits_0 (0.02s)
+=== RUN   TestSelfTestEntryPassesEveryCase
+--- PASS: TestSelfTestEntryPassesEveryCase (0.25s)
+=== RUN   TestSelfTestRosterAuditRejectsAHollowTable
+--- PASS: TestSelfTestRosterAuditRejectsAHollowTable (0.00s)
+=== RUN   TestSelfTestRefusesToAuditAnEmptyRoster
+=== RUN   TestSelfTestRefusesToAuditAnEmptyRoster/not-a-roster
+=== RUN   TestSelfTestRefusesToAuditAnEmptyRoster/block-without-numbers
+--- PASS: TestSelfTestRefusesToAuditAnEmptyRoster (0.00s)
+    --- PASS: TestSelfTestRefusesToAuditAnEmptyRoster/not-a-roster (0.00s)
+    --- PASS: TestSelfTestRefusesToAuditAnEmptyRoster/block-without-numbers (0.00s)
+=== RUN   TestSelfTestFlagIsWiredInTheBuiltBinary
+--- PASS: TestSelfTestFlagIsWiredInTheBuiltBinary (0.79s)
+PASS
+ok  	github.com/CarlosShao/wisp/tools/d22scan	26.376s
+runtests.sh: OK - packages=[./...] top-level: PASS=34 FAIL=0 SKIP=0, === RUN=76, '[no tests to run]'=0
+d22scan.sh: scan of /work
+d22scan: gitignore rules NOT APPLIED - git cannot be consulted in /work: `git rev-parse --show-prefix`: fatal: not a git repository (or any parent up to mount point /); every path in every scope is being scanned, so the counts below may include build output (A207's machine-dependent denominator). This is the loud direction: a scanner that cannot ask git which paths are tracked does not get to skip any.
+d22scan: examined 248 production Go files under internal/ and cmd/ of /work
+d22scan: scope bans #1-5 internal/      examined 219 production Go files
+d22scan: scope bans #1-5 cmd/           examined  29 production Go files
+d22scan: scope ban #6 frontend/         examined  85 text files
+d22scan: scope ban #7 internal/tools/   examined  22 production Go files
+d22scan: scope ban #8 design/           examined  30 text files
+d22scan: scope ban #8 frontend/         examined  85 text files
+d22scan: scope ban #8 internal/         examined 460 Go files, comments and _test.go included
+d22scan: scope ban #8 cmd/              examined  63 Go files, comments and _test.go included
+d22scan: clean - no D22 ban violations; live scope work: bans #1-5 internal/=219, bans #1-5 cmd/=29, ban #6 frontend/=85, ban #7 internal/tools/=22, ban #8 design/=30, ban #8 frontend/=85, ban #8 internal/=460, ban #8 cmd/=63; ban #8 emoji coverage: design/ 30 text files; frontend/ 85 text files; internal/ 460 Go files, comments and _test.go included; cmd/ 63 Go files, comments and _test.go included
+=== restore proof: the snapshot file must equal what we mounted ===
+winsec_other_identical_to_pristine=yes
+=== DONE ===

@@ -1,0 +1,14 @@
+anchor: 06a650bd (leg started at 015f6be1)
+AC#6 replacement ruler, run 2026-09-29:
+grep -rn 'NewGate(' --include=*.go internal cmd | grep -v _test  => 0 hits
+grep -rn 'NewGate(' --include=*.go .                     => 0 hits (repo-wide, tests included)
+grep -rn 'risk.Gate(' --include=*.go internal cmd | grep -v _test =>
+internal/tools/mode.go:98:		d := risk.Gate(c, overrides)
+grep -rln 'risk.Gate(' --include=*_test.go .  (any test carrier at all) =>
+risk.Gate real def:
+76:func Gate(canonical string, bOverrides map[string]bool) PathDecision {
+production call site + its feed line:
+49:// BlacklistNote is risk.Gate's own reading of one call's paths, kept beside the
+53:// AC#5 asked for risk.Gate to stop being a function with zero production call
+91:	overrides := b.confirmations()
+98:		d := risk.Gate(c, overrides)

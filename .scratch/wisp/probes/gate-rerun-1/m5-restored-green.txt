@@ -1,0 +1,11 @@
+time=2026-09-29T18:44:16.886+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestNoticeAttributionSurvivesAn83AliasOfItsOwnTree
+    notice_attribution_115_windows_test.go:230: seal #0 typed "C:\\Users\\swq\\AppData\\Local\\Temp\\TestNoticeAttributionSurvivesAn83AliasOfItsOwnTree2432294325\\001\\wisp115longdirname\\artifact-under-test.txt" -> notice path "C:\\Users\\swq\\AppData\\Local\\Temp\\TestNoticeAttributionSurvivesAn83AliasOfItsOwnTree2432294325\\001\\wisp115longdirname\\artifact-under-test.txt" (EqualFold with the short spelling: false)
+    notice_attribution_115_windows_test.go:230: seal #1 typed "C:\\Users\\swq\\AppData\\Local\\Temp\\TESTNO~1\\001\\WISP11~1\\ARTIFA~1.TXT" -> notice path "C:\\Users\\swq\\AppData\\Local\\Temp\\TestNoticeAttributionSurvivesAn83AliasOfItsOwnTree2432294325\\001\\wisp115longdirname\\artifact-under-test.txt" (EqualFold with the short spelling: false)
+    notice_attribution_115_windows_test.go:230: seal #2 typed "C:\\Users\\swq\\AppData\\Local\\Temp\\TESTNO~1\\001\\WISP11~1\\artifact-under-test.txt" -> notice path "C:\\Users\\swq\\AppData\\Local\\Temp\\TestNoticeAttributionSurvivesAn83AliasOfItsOwnTree2432294325\\001\\wisp115longdirname\\artifact-under-test.txt" (EqualFold with the short spelling: false)
+    notice_attribution_115_windows_test.go:230: seal #3 typed "C:\\USERS\\SWQ\\APPDATA\\LOCAL\\TEMP\\TESTNOTICEATTRIBUTIONSURVIVESAN83ALIASOFITSOWNTREE2432294325\\001\\WISP115LONGDIRNAME\\ARTIFACT-UNDER-TEST.TXT" -> notice path "C:\\Users\\swq\\AppData\\Local\\Temp\\TestNoticeAttributionSurvivesAn83AliasOfItsOwnTree2432294325\\001\\wisp115longdirname\\artifact-under-test.txt" (EqualFold with the short spelling: false)
+--- PASS: TestNoticeAttributionSurvivesAn83AliasOfItsOwnTree (0.09s)
+=== RUN   TestNoticeAttributionKeepsTwoTreesApart
+--- PASS: TestNoticeAttributionKeepsTwoTreesApart (0.11s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	0.224s
