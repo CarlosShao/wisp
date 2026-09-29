@@ -240,6 +240,78 @@
 
 ## 6. 票 92 —— `92-panel-composer-mode-attachments-workspace-done.md`（4 枚）
 
+> 本腿现量：un = 4（`:52` `:68` `:73` `:79`）；AC 区共 7 枚（AC#1–AC#7），已勾 3 枚在 `:56` `:62` `:65`
+> （两条 `grep` 现跑：un=4／chk=3，非心算）。
+> 票头 Status 逐字（`:3`）「**accepted-done（附条件，条件已归位）**」＋`:9`「**条件我全部落到票 114**（见其 AC#8–AC#11），
+> 不在本票静默结案」⇒ 这张票的"残余"在票面上就已经**具名归口**过一次，本腿的任务是核实那个归口今天还在不在。
+
+### 6.1 `:52` AC#1 面板只读显示档位 + 不存在改档位路径（ban #6 正向钉子）—— **丙（账在票 114；钉子本体已在盘上，欠的是覆盖面）**
+
+- 原文行首逐字：`- [ ] **AC#1** 面板**只读地**显示当前档位（三档之一），并且**面板侧不存在任何能改档位的路径**：`
+- 归口去处**本腿现读**：`114-composer-request-has-no-production-caller-and-the-real-gate-must-be-native.md`
+  （**无** `-done` 后缀＝仍开放）`:50` 是一枚 `- [ ]`，逐字
+  「**AC#5** 不越界：面板侧**只许显示 + 发起请求**（R20 的明写）。工作区/档位两个输入口不得变成授权口；
+  `frontend/` 里出现 `approval.decide` 即 ban #6 红；零 emoji（ban #8）含测试文件与注释」；
+  覆盖面那半另对准 114 `:47` AC#4（「`R-92-1` 的覆盖面：要么把门二的扩展名集扩到与 d22scan 的文本类一致」）与
+  `:67` AC#9（「结构钉的扫描根比 `ban #6` 与"渲染器实际加载的文件集合"都窄」＝`R-92b-2`）。
+- 裁决表读数（本腿现读）：`docs/evidence/s1/92b-adversarial-acceptance.md:134` 逐字
+  「| AC#1 档位只读 | **不通过**（按派单口径：门的覆盖面残留） | 〔独立复现〕 | 反半边我钉住了（2 处合法调用点照旧绿）；正半边 F5/F6 绿 |」
+- ⚠ 本腿补一条 done-fix-1 没说的盘上事实：**AC#1 要的那枚正向钉子今天已经有实现体**——
+  `internal/panel/composer_test.go:93` `TestPlantedComposerModeWriteGoesRed`，其注释逐字
+  「is AC#1's positive nail. The fixture is a composer component written the WRONG way on purpose,
+  and the assertion is that the instruments catch it - not that the real tree happens to be quiet」，
+  两枚 planted 形状在 `:97`（`approval.decide` 改自己的 mode）与 `:109`（不含禁词的 `panel.mode.set` 写入），
+  禁词正则 `composerModeWriteRe` 在 `:88-90`。⇒ **这格欠的不是钉子本身，是"扫描根/扩展名覆盖面"**，
+  而那件事 114 已具名接走 ⇒ 判**丙**，且**丙得很干净**（功能面已落、残面有主）。
+- ⛔ 不判丁：`92b:134` 是验收方（非实现者）的**不通过**裁决，且 114 的对应格仍 `- [ ]`。
+
+### 6.2 `:68` AC#5 变异三向 —— **甲（残余真活：第 (iii) 向从未被非实现者复跑）**
+
+- 原文行首逐字：`- [ ] **AC#5** 变异三向：(i) 把"面板只能显示"改成"面板能写 mode" ⇒ 必须有用例红；`
+- 缺什么，说得出口：**三向里的 (iii)**（把 C26 reparse 那次的拒绝改成放行 ⇒ **既有**安全用例必须红）
+  与 **(i) 的绿半边**。凭据（本腿现读）：`docs/evidence/s1/92b-adversarial-acceptance.md:137` 逐字
+  「| AC#5 变异三向 | **(i) 本轮我重做为"红+绿各半"**（F3a 红 / F5 绿）；(ii) MUT-H 红；**(iii) 未重做** |
+  (i)(ii) 〔独立复现〕／(iii) 〔仅自述，不背书〕 |」
+- ⇒ (iii) 今天**只有实现方自述**，验收方明写"不背书"；(i) 那向连验收方自己也只做到"红＋绿各半"
+  （F5 仍绿＝`R-92-1` 未清，见票头 `:7`「`R-92-1` 未清（四形里 F5/F6 两形全绿）」）。
+- 归口核查：本腿把 114 的 AC 区 `:34`-`:75` 逐枚读下来，**没有任何一枚**是"重做 AC#5 的 (iii) 变异"
+  ⇒ **不是丙**；也不是乙（它是一条要读数的判据，不是承诺句）。
+- ⚠ 本腿补不了这把尺：派单禁一切编译/测试，`/tmp` 纯净快照里的变异跑属同一禁面 ⇒
+  **这一格的丁类升级只能由一枚能跑的腿做**，本腿交"甲＋那把尺的形状"（票面 `:68-72` 已写死锚点与还原证明要求）。
+
+### 6.3 `:73` AC#6 台账与门禁 —— **甲（残余真活：三发读数只对两棵旧树有效，当前 HEAD 无读数）**
+
+- 原文行首逐字：`- [ ] **AC#6** 台账与门禁（只跑自己碰的范围）：`sh scripts/d22scan.sh` 纯净树 rc=0 且贴出**逐作用域文件数**`
+- 缺什么：**`sh scripts/d22scan.sh` rc=0、`gofmt/gofumpt -l` 空、`go test -count=2 ./internal/panel/` 四数**
+  这三发在**当前 HEAD** 上的一次非实现者读数。凭据（本腿现读）：
+  - `docs/evidence/s1/92-adversarial-acceptance.md:147` 第一轮逐字
+    「**结论：FAIL —— 附我本机实测数字。**（AC#6 原文要求 `gofumpt -l` 空，它不空；且 POSIX 读数不可复现。）」
+  - `docs/evidence/s1/92b-adversarial-acceptance.md:138` 第二轮「| AC#6 台账与门禁 | **通过（数字全复算）** | 〔独立复现〕 |
+    `gofmt`/`gofumpt` 空、`go vet ./internal/panel/ ./internal/tools/ ./internal/memory/` rc=0、`go test -count=2 -v …`」
+  - ⇒ "通过"是**对 `91b5fc4`／`a8f9459` 那两棵树**的读数（票头 `:5-6` 的复算式子写的就是这两个号），
+    结案票的门禁读数天然会过期；本格还另留一句未销的 `R-92b-4`（`92b-…md:290` 逐字
+    「票面 `20:5x` 编排者注要求"AC#6/AC#7 读数必须包含整步 `portable-tests.sh` 并说清是谁的账"⇒ 92b 交件 grep `portable` **0 次命中**，未答」）
+- ⚠ 给裁决者的一条结构性话：**门禁类 AC 在 `-done` 票里永远会"过期"**，把它记成甲就等于"每次 HEAD 变化都要重跑一次已结案票的门禁"；
+  若编排者不想背这个，处置方式应该是**改判据形状**（例如"结案时点有效＋过期即由后续票的门禁继承"）并搬出勾框，
+  而不是留着它当下一次复算的靶子。本腿只指出形状，**不动手、也不替它选**。
+- 归口核查：票 83 的 `:57` 那枚门禁勾了，但那是**票 83 自己的包面**（`internal/config`），不是 92 的 `./internal/panel/` ⇒ 不是丙。
+
+### 6.4 `:79` AC#7 负判据（不做 git 切换）—— **判不了＝凭据有一半在禁读地界（`frontend/**`）**
+
+- 原文行首逐字：`- [ ] **AC#7** **负判据**：把"不做 git 切换"变成可检查的东西——在 `frontend/` 与 `internal/panel/` 里`
+- 本格要求**两面都** `grep -rn`。`frontend/**` 是派单对本腿写死的零读零引零转述地界 ⇒ **本腿无法判整格**，
+  按纪律停在这儿并具名登记（见附节）。
+- 能验的那一半本腿验了，且**形状与读数都在**：
+  - 禁词正则与用例在盘：`internal/panel/composer_test.go:269-270`（逐字
+    `\bgit\s+checkout\b|\bgit\s+switch\b|\bswitchBranch\b|\bcheckoutBranch\b|\bchangeRepo(?:sitory)?\b|` ＋
+    `\brepoPicker\b|\bbranchSelect(or)?\b|\bworktree\b|\bgit\.branch\b|\bgit\.repo\b|\bvcs\.switch\b`）
+  - 本腿现跑负向尺：`grep -rniE 'git (checkout|switch)|switchBranch|checkoutBranch|changeRepo|repoPicker|branchSelector' internal/panel --include='*.go' | grep -v '_test.go'` ＝ **0 命中**
+  - 裁决表：`docs/evidence/s1/92b-adversarial-acceptance.md:139` 逐字
+    「| AC#7 不做 git 切换 | **通过** | 〔独立复现〕 | 包内用例 PASS + 我把 `fixtures/`、`dist/` 也 grep 了一遍 0 命中」
+    ⇒ 出处＝非实现者（92b 验收腿），**但它那次 grep 跨 `fixtures/`／`dist/`，本腿不能替它现验**
+- ⇒ 本腿**不写丁**（done-fix-1 那段把它记成"丁类·本腿碰不到全格"是自相矛盾的：既碰不到就不能判丁）。
+  需要一枚有 `frontend/**` 读权的腿补半格，才谈得上翻勾。
+
 ## 7. 票 97 —— `97-dead-strict-param-and-the-comment-that-invents-a-caller-done.md`（2 枚）
 
 ## 8. 票 104 —— `104-sealfile-silently-drops-inherited-grants-done.md`（2 枚）
