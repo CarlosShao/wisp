@@ -11,7 +11,18 @@
 
 ## Baseline roster (AC#1)
 
-- UNJUDGED
+- VERDICT: baseline established, all green on `015f6be1`.
+- Yardstick (verbatim from the ticket face): `PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./internal/winsec/ ./internal/risk/ ./internal/config/ ./internal/agent/approval/ -count=1 -v`.
+  This leg added `-p 1` (packages run sequentially) on purpose: `internal/risk TestResolvePerCallBudget` is the registered parallel-load-sensitive case (`R-116-1`), and `-p 1` removes the contention variable instead of having to re-litigate it later.
+- READING: `go.exe` count before run = 0. rc=0. Per package (tab-separated `ok` lines): winsec 11.966s / risk 4.025s / config 0.892s / agent/approval 0.346s.
+  Four numbers from `-v`: RUN=471 PASS=469 FAIL=0 SKIP=2.
+- SKIP named (both are documented, neither is this ticket's): `TestSyncRegistryProbeLive` (no registry-grade sync record on this machine) and `TestDefaultDeadlineWallClockMeasurement` (intentionally slow 300s wall-clock, only under `WISP_84_MEASURE=1`).
+- Name-set roster: `.scratch/wisp/probes/gate-rerun-1/ac1-baseline-roster.txt` = 297 top-level names (295 PASS + 2 SKIP). Raw `-v` output: `ac1-baseline-v.txt` (268,251 bytes).
+- YARDSTICK DEFECT found while measuring (registering, not using it): the four numbers must NOT be counted with `grep -c '^--- PASS'`.
+  Go prints every `=== RUN` at column 0 including subtests, but subtest results are indented `    --- PASS:`. So `^--- PASS` = 295 while the true PASS count is 469 (295 top-level + 174 subtests).
+  Correct forms: `grep -c '^=== RUN'` and `grep -c '^ *--- PASS'`. RUN(471) = PASS(469) + SKIP(2) + FAIL(0) reconciles; the naive form under-reports PASS by 174 and would make any "four numbers" reading look wrong.
+  Also the dispatch's `grep -P '^FAIL\t'` rule was confirmed in practice: `grep -c '^FAIL'` on this tree's red output double-counts each failing package.
+- Historical registered reds (`internal/panel` 4 + `internal/ball` 1) are outside AC#1's package scope, so they do not appear in this baseline; they are handled per cell below.
 
 ## Mutation cells (5)
 
