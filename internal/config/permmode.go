@@ -1,8 +1,6 @@
 package config
 
 import (
-	"os"
-
 	"github.com/CarlosShao/wisp/internal/observe"
 	"github.com/CarlosShao/wisp/internal/risk"
 )
@@ -61,6 +59,14 @@ func (c *Config) PermissionMode() risk.Mode {
 //
 // A failed write rolls the in-memory value back, so the mode the runtime acts
 // on and the mode the next start reads cannot diverge.
+//
+// Ticket 226 AC#4 names this path as the older twin of the 「一直」 write - same
+// shape, one entry point earlier - and settles the pair together rather than the
+// newer half alone: the persist goes through mergeWrite, so it re-reads
+// config.toml and replaces risk.permission_mode on what the file actually holds.
+// Hand edits of any other key now survive a mode switch, and a switch made while
+// the file holds values this process does not is reported instead of quietly
+// written over.
 func (m *Manager) SetPermissionMode(mode risk.Mode) error {
 	if !mode.Valid() {
 		return observe.New(observe.ClassConfig, "config: refusing to persist an undefined permission mode")
@@ -70,13 +76,12 @@ func (m *Manager) SetPermissionMode(mode risk.Mode) error {
 
 	old := m.cur.Risk.PermissionMode
 	m.cur.Risk.PermissionMode = mode.String()
-	if err := SaveFile(m.path, m.cur); err != nil {
+	if err := m.mergeWrite(keyRiskPermissionMode, func(base *Config) {
+		base.Risk.PermissionMode = mode.String()
+	}); err != nil {
 		m.cur.Risk.PermissionMode = old
 		return observe.Wrap(observe.ClassConfig, err,
 			"config: permission_mode write failed; keeping the previous mode in memory")
-	}
-	if st, statErr := os.Stat(m.path); statErr == nil {
-		m.seenMtime, m.seenSize, m.seenValid = st.ModTime(), st.Size(), true
 	}
 	return nil
 }

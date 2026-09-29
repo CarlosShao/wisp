@@ -1,0 +1,186 @@
+time=2026-09-29T12:47:46.414+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC1AllowedDirsWriteKeepsAHandEditedKey
+    writeguard_226_test.go:74: the operator's [ball] size edit was reverted by the allowed_dirs write: got 56, want 60
+    writeguard_226_test.go:78: config.toml no longer says size = 60 on its own lines:
+        schema_version = 2
+        
+        [app]
+        language = 'zh-CN'
+        theme = 'dark'
+        autostart = false
+        single_instance = true
+        
+        [ball]
+        size = 56
+        opacity_idle = 0.35
+        click_through = true
+        hide_on_fullscreen = true
+        
+        [ball.position]
+        x = 0
+        y = 0
+        monitor = ''
+        
+        [hotkey]
+        summon = ''
+        mute = ''
+        cancel = 'Esc'
+        panel = ''
+        
+        [session]
+        warm_timeout_sec = 90
+        settling_sec = 3
+        conversation_idle_sec = 30
+        
+        [voice]
+        enabled = true
+        punctuation = true
+        conversation_mode = false
+        cloud_asr_chain = []
+        cloud_tts_chain = []
+        
+        [voice.wake_word]
+        enabled = false
+        keywords = []
+        thresholds = []
+        veto_words = ['取消', '停下', '别']
+        
+        [voice.asr]
+        provider = 'local-sherpa'
+        model = 'parakeet-zh'
+        
+        [voice.tts]
+        provider = 'local-sherpa'
+        voice = ''
+        speed = 1.0
+        
+        [voice.aec]
+        enabled = true
+        echo_ref = 'self-render'
+        
+        [voice.realtime]
+        enabled = false
+        provider = ''
+        model = ''
+        api_key_ref = ''
+        base_url = ''
+        
+        [audio]
+        input_device = 'default'
+        sample_rate = 16000
+        half_duplex = true
+        mic_muted_default = true
+        
+        [llm]
+        text_chain = []
+        timeout_ms = 60000
+        
+        [llm.roles]
+        [llm.roles.chat]
+        provider = ''
+        model = ''
+        temperature = 0.7
+        thinking_intensity = 'off'
+        max_output_tokens = 0
+        
+        [llm.roles.memory_extract]
+        provider = ''
+        model = ''
+        temperature = 0.7
+        thinking_intensity = 'off'
+        max_output_tokens = 0
+        
+        [llm.roles.handoff]
+        provider = ''
+        model = ''
+        temperature = 0.7
+        thinking_intensity = 'off'
+        max_output_tokens = 0
+        
+        [llm.roles.summarize]
+        provider = ''
+        model = ''
+        temperature = 0.7
+        thinking_intensity = 'off'
+        max_output_tokens = 0
+        
+        [llm.retry]
+        max = 3
+        backoff_ms = 1000
+        
+        [agent]
+        max_rounds = 50
+        token_budget = 200000
+        per_tool_timeout_ms = 0
+        steering_enabled = true
+        project_instructions_enabled = true
+        
+        [agent.loop_guard]
+        repeat_thresholds = [3, 5, 8]
+        
+        [risk]
+        confirm_timeout_sec = 300
+        l1_window_sec = 2
+        shell_enabled = false
+        allow_shell_string = false
+        shell_allowlist = []
+        blacklist_overrides = []
+        permission_mode = 'ask_every_step'
+        
+        [fs]
+        allowed_dirs = ['D:\data']
+        reparse_point_exceptions = []
+        delete_enabled = false
+        
+        [net]
+        allowlist = []
+        block_private_ranges = true
+        
+        [net.proxy]
+        mode = 'system'
+        url = ''
+        
+        [privacy]
+        redact_paths = false
+        diagnostics_opt_in = false
+        retention_days = 30
+        keep_transcript = false
+        keep_audio = false
+        
+        [memory]
+        l1_enabled = true
+        l1_max = 20
+        l3_retention_days = 30
+        extract_model = ''
+        
+        [panel]
+        enabled = true
+        width = 640
+        height = 0
+        keep_alive_in_session = true
+        scale = 0.0
+        
+        [cost]
+        daily_budget = 0
+        monthly_budget = 0
+        alert_threshold = 0.8
+        over_budget = 'pause'
+        
+        [models]
+        dir = ''
+        mirror = []
+        verify_signature = true
+        
+        [observe]
+        level = 'info'
+        slo_sample_interval_sec = 5
+        
+        [observe.roll]
+        size_mb = 10
+        days = 7
+        [plugins]
+        tier2_enabled = false
+--- FAIL: TestAC1AllowedDirsWriteKeepsAHandEditedKey (0.02s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/config	0.053s
+FAIL

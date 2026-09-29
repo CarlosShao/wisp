@@ -1,0 +1,7 @@
+time=2026-09-29T12:48:04.276+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC4PermissionModeWriteKeepsAHandEditedKey
+    writeguard_226_test.go:278: the mode switch reverted the operator's [ball] size edit: got 56, want 60
+--- FAIL: TestAC4PermissionModeWriteKeepsAHandEditedKey (0.03s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/config	0.058s
+FAIL

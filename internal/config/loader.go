@@ -37,29 +37,8 @@ type Resolved struct {
 // returns an error - the caller maps it to the Unconfigured state (sec 4.1:
 // never fall back to a half-configured runtime silently).
 func LoadFile(path string, res SecretResolver) (*Config, *Resolved, error) {
-	raw, err := os.ReadFile(path)
+	cfg, err := readConfigFile(path)
 	if err != nil {
-		return nil, nil, observe.Wrap(observe.ClassConfig, err, "config.toml read")
-	}
-	ver := peekSchemaVersion(raw)
-	if ver > SchemaVersionCurrent {
-		return nil, nil, observe.New(observe.ClassConfig, fmt.Sprintf(
-			"config.toml: schema_version %d was written by a newer build (this build understands %d); upgrade Wisp or restore a backup",
-			ver, SchemaVersionCurrent))
-	}
-	if ver != SchemaVersionCurrent {
-		raw, err = applyMigrations(path, raw, ver)
-		if err != nil {
-			return nil, nil, err
-		}
-	}
-	cfg := NewDefaults()
-	if err := decodeStrict(raw, cfg); err != nil {
-		return nil, nil, err
-	}
-	normalizeConfig(cfg)
-	applyPresets(cfg)
-	if err := validate(cfg); err != nil {
 		return nil, nil, err
 	}
 	resolved, err := resolveRefs(cfg, res)
@@ -67,6 +46,46 @@ func LoadFile(path string, res SecretResolver) (*Config, *Resolved, error) {
 		return nil, nil, err
 	}
 	return cfg, resolved, nil
+}
+
+// readConfigFile runs the sec 4.1 pipeline up to (and including) semantic
+// validation, and stops before api_key_ref resolution: it returns the values a
+// file declares, not the secrets behind them.
+//
+// Ticket 226 split it out for one reason. A programmatic write must re-read the
+// file it is about to replace so it can merge instead of overwrite - and that
+// re-read needs NO secret resolution (it is a read of values, and the refs
+// travel back into the file untouched). Routing that re-read through LoadFile
+// would make "the DPAPI blob is unreadable right now" refuse a config write that
+// has nothing to do with secrets, while NewManager/CheckAndReload keep using
+// LoadFile unchanged. One pipeline, one order of failures, two entry points.
+func readConfigFile(path string) (*Config, error) {
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		return nil, observe.Wrap(observe.ClassConfig, err, "config.toml read")
+	}
+	ver := peekSchemaVersion(raw)
+	if ver > SchemaVersionCurrent {
+		return nil, observe.New(observe.ClassConfig, fmt.Sprintf(
+			"config.toml: schema_version %d was written by a newer build (this build understands %d); upgrade Wisp or restore a backup",
+			ver, SchemaVersionCurrent))
+	}
+	if ver != SchemaVersionCurrent {
+		raw, err = applyMigrations(path, raw, ver)
+		if err != nil {
+			return nil, err
+		}
+	}
+	cfg := NewDefaults()
+	if err := decodeStrict(raw, cfg); err != nil {
+		return nil, err
+	}
+	normalizeConfig(cfg)
+	applyPresets(cfg)
+	if err := validate(cfg); err != nil {
+		return nil, err
+	}
+	return cfg, nil
 }
 
 // peekSchemaVersion reads only the schema_version key (non-strict; the full

@@ -1,0 +1,236 @@
+time=2026-09-29T12:49:20.534+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC1AlwaysBranchDoesNotRevertAHandEditedKey
+time=2026-09-29T12:49:21.483+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/09/29 12:49:21 mockllm: serving on http://127.0.0.1:61412 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-09-29T12:49:21.505+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestAC1AlwaysBranchDoesNotRevertAHandEditedKey3382099304\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-09-29T12:49:21.527+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAC1AlwaysBranchDoesNotRevertAHandEditedKey3382099304\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-29T12:49:21.534+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-29T04:49:21Z duration_ms=6
+time=2026-09-29T12:49:21.540+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestAC1AlwaysBranchDoesNotRevertAHandEditedKey3382099304\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-29T12:49:21.545+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-29T04:49:21Z duration_ms=4
+time=2026-09-29T12:49:21.549+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-29T12:49:21.551+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-09-29T12:49:21.560+08:00 level=WARN msg="config: wrote merged change into config.toml and kept hand edits this process does not hold (ticket 226); the file was NOT claimed as our own write, so the next reload reads it back and a loosening there is denied until it is confirmed (D36 rule 1). Only the keys listed under wrote changed value; the file is re-laid in canonical form, so comments and hand-chosen key order are not preserved" key=fs.allowed_dirs wrote=[fs.allowed_dirs] kept_in_file_not_in_memory=[app.theme]
+    always_write_no_clobber_226_test.go:74: the 长期 write reverted the operator's hand edit (ticket 226): schema_version = 2
+        
+        [app]
+        language = 'zh-CN'
+        theme = 'light'
+        autostart = false
+        single_instance = true
+        
+        [ball]
+        size = 56
+        opacity_idle = 0.35
+        click_through = true
+        hide_on_fullscreen = true
+        
+        [ball.position]
+        x = 0
+        y = 0
+        monitor = ''
+        
+        [hotkey]
+        summon = ''
+        mute = ''
+        cancel = 'Esc'
+        panel = ''
+        
+        [session]
+        warm_timeout_sec = 90
+        settling_sec = 3
+        conversation_idle_sec = 30
+        
+        [voice]
+        enabled = true
+        punctuation = true
+        conversation_mode = false
+        cloud_asr_chain = []
+        cloud_tts_chain = []
+        
+        [voice.wake_word]
+        enabled = false
+        keywords = []
+        thresholds = []
+        veto_words = ['取消', '停下', '别']
+        
+        [voice.asr]
+        provider = 'local-sherpa'
+        model = ''
+        
+        [voice.tts]
+        provider = 'local-sherpa'
+        voice = ''
+        speed = 1.0
+        
+        [voice.aec]
+        enabled = true
+        echo_ref = 'self-render'
+        
+        [voice.realtime]
+        enabled = false
+        provider = ''
+        model = ''
+        api_key_ref = ''
+        base_url = ''
+        
+        [audio]
+        input_device = 'default'
+        sample_rate = 16000
+        half_duplex = true
+        mic_muted_default = true
+        
+        [llm]
+        text_chain = ['acme/m1']
+        timeout_ms = 60000
+        
+        [llm.roles]
+        [llm.roles.chat]
+        provider = ''
+        model = ''
+        temperature = 0.7
+        thinking_intensity = 'off'
+        max_output_tokens = 0
+        
+        [llm.roles.memory_extract]
+        provider = ''
+        model = ''
+        temperature = 0.7
+        thinking_intensity = 'off'
+        max_output_tokens = 0
+        
+        [llm.roles.handoff]
+        provider = ''
+        model = ''
+        temperature = 0.7
+        thinking_intensity = 'off'
+        max_output_tokens = 0
+        
+        [llm.roles.summarize]
+        provider = ''
+        model = ''
+        temperature = 0.7
+        thinking_intensity = 'off'
+        max_output_tokens = 0
+        
+        [llm.retry]
+        max = 1
+        backoff_ms = 1
+        
+        [llm.providers]
+        [llm.providers.acme]
+        protocol = 'openai-chat'
+        base_url = 'http://127.0.0.1:61412/v1'
+        api_key_ref = 'dpapi:acme'
+        billing = ''
+        plan_credit_total_micro = 0
+        rpm = 0
+        tpm = 0
+        
+        [llm.providers.acme.compat]
+        loose = false
+        allow_missing_usage = false
+        
+        [llm.providers.acme.models]
+        [llm.providers.acme.models.m1]
+        display = ''
+        context_window = 128000
+        max_output_tokens = 0
+        thinking_levels = []
+        billing = ''
+        quota_daily_micro = 0
+        quota_monthly_micro = 0
+        enabled = false
+        
+        [llm.providers.acme.models.m1.capabilities]
+        text = false
+        vision = false
+        audio_in = false
+        audio_out = false
+        realtime = false
+        thinking = false
+        fc = false
+        stream = false
+        
+        [llm.providers.acme.models.m1.price]
+        in = 0.0
+        out = 0.0
+        cached = 0.0
+        audio_in = 0.0
+        audio_out = 0.0
+        
+        [agent]
+        max_rounds = 50
+        token_budget = 200000
+        per_tool_timeout_ms = 0
+        steering_enabled = true
+        project_instructions_enabled = true
+        
+        [agent.loop_guard]
+        repeat_thresholds = [3, 5, 8]
+        
+        [risk]
+        confirm_timeout_sec = 40
+        l1_window_sec = 2
+        shell_enabled = false
+        allow_shell_string = false
+        shell_allowlist = []
+        blacklist_overrides = []
+        permission_mode = 'ask_every_step'
+        
+        [fs]
+        allowed_dirs = ['C:/Users/swq/AppData/Local/Temp/TestAC1AlwaysBranchDoesNotRevertAHandEditedKey3382099304/002', 'C:/Users/swq/AppData/Local/Temp/TestAC1AlwaysBranchDoesNotRevertAHandEditedKey3382099304/003']
+        reparse_point_exceptions = []
+        delete_enabled = false
+        
+        [net]
+        allowlist = []
+        block_private_ranges = true
+        
+        [net.proxy]
+        mode = 'system'
+        url = ''
+        
+        [privacy]
+        redact_paths = false
+        diagnostics_opt_in = false
+        retention_days = 30
+        keep_transcript = false
+        keep_audio = false
+        
+        [memory]
+        l1_enabled = true
+        l1_max = 20
+        l3_retention_days = 30
+        extract_model = ''
+        
+        [panel]
+        enabled = true
+        width = 640
+        height = 0
+        keep_alive_in_session = true
+        scale = 0.0
+        
+        [cost]
+        daily_budget = 0
+        monthly_budget = 0
+        alert_threshold = 0.8
+        over_budget = 'pause'
+        
+        [models]
+        dir = ''
+        mirror = []
+        verify_signature = true
+        
+        [observe]
+        level = 'info'
+        slo_sample_interval_sec = 5
+        
+        [observe.roll]
+        size_mb = 10
+        days = 7
+        [plugins]
+        tier2_enabled = false
+--- FAIL: TestAC1AlwaysBranchDoesNotRevertAHandEditedKey (1.06s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	1.107s
+FAIL

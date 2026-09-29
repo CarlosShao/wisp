@@ -1,0 +1,3 @@
+ok  	github.com/CarlosShao/wisp/internal/config	0.990s
+ok  	github.com/CarlosShao/wisp/internal/perm	0.434s
+ok  	github.com/CarlosShao/wisp/cmd/wisp	84.582s
