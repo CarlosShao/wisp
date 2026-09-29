@@ -83,6 +83,36 @@
 
 ## 2. 票 11 —— `11-llm-adapters-rest-done.md`（1 枚）
 
+> 本腿现量：un = 1（`:53`）；票面 8 枚 AC 里 7 枚已勾。
+
+### 2.1 `:53` Probe suite（fc-capable / fc-broken / vision-capable → provider_health + mismatch 事件）—— **丙（正式移交票 12，代号 A11，且接收方已闭环）**
+
+- 原文行首逐字：`- [ ] Probe suite: mockllm control endpoints emulate fc-capable / fc-broken / vision-capable`
+- **移交是有 git 记录的，不是转述**：本腿现跑 `git show -s --format=%B 9293518d`，标题逐字
+  「docs(acceptance): ticket 11 DONE with a 1:1 verdict table; **AC#6 transferred as A11, ruling R12**」，
+  正文末段逐字「AC#6 is PARTIAL, not failed: the measuring half is proven, but nothing in cmd/wisp …」。
+  票面自身 `:66`（09-20 10:20Z，`agent-ticket11-probe-2`）也写「LEFT AC#6 UNTICKED on purpose」＋三条原因
+  （装配根没人调 / thinking 沿用票 09 的检查 / audio 按契约推票 61）。
+- 归口去处**本腿现读**：`.scratch/wisp/issues/12-cli-text-path-s1-gate.md`
+  （⚠ 该票文件名**不带** `-done`＝仍开放，本腿现量 un=3：`:48` `:148` `:149`）
+  - `:120` `- [x] The capability probe is actually called from the composition root: `cmd/wisp`'s provider`
+  - `:123` 逐字「event can fire on a real machine. Handed here from ticket 11 AC#6, registered as **A11**.」
+  - `:128` 逐字「—— **A11 就此闭环**」，点名 `cmd/wisp/providers_test.go` 的
+    `TestProvidersProbeRecordsMeasuredThinkingTrue` / `...False`（正反两向）、
+    `TestProvidersDiscoverListsWhatTheServerServes`、`TestProvidersProbeUnconfiguredRefIsNotSilentlyKeyless`
+- 盘上凭据（本腿现读，全在允许地界）：
+  - `internal/llm/probe_health.go:14` 逐字「// Ticket 11 AC#6, consumer side: turn probe.go's per-capability PRIMITIVE」
+  - `cmd/wisp/providers.go:189` `var mismatches []llm.ProbeMismatch` ／ `:195` `Mismatch: func(m llm.ProbeMismatch) {`
+  - `cmd/wisp/providers_test.go:143` 逐字「t.Errorf("the declared-vs-measured event was not announced:\n%s", errb)」
+- 凭据出处是**非实现者**：`9293518d` 正文自陈「Three claims I refused to take on the implementer's word」＋
+  自己下的变异（`probe_health.go:255` config-echo 变异弄红三枚探针用例），执行者是编排者验收方，不是票 11 的实现代理。
+- ⇒ 判**丙**（分母应归票 12 名下）。⚠ 与丁的分界本腿说清：这枚**事实上**已具备翻勾条件，
+  但它在 git 与票面上被**正式移交**走了；若记成丁，等于同一份活在 11/12 两张票里各算一次交付。
+  建议处置＝票 11 这格改指向 A11（或直接搬出勾框），**而不是翻勾**。
+- ⚠ 一枚本腿不替它认账的边角：原格还含 "vision-capable" 一档与 `✓/✗` 呈现，票 12 的 A11 块写的是
+  fc/thinking 两向；`grep -n 'vision' 12-…md` 的射程本腿没逐格核（超出"这枚未勾判据判性"所需），
+  若裁决者要按丁翻勾，得先补这一眼。
+
 ## 3. 票 63 —— `63-credential-entry-cli-done.md`（1 枚）
 
 ## 4. 票 80 —— `80-blacklist-overrides-never-wired-to-gate-done.md`（3 枚）
