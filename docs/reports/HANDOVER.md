@@ -108,6 +108,16 @@
 - **推送：继续按住**（`origin/dev` 仍在 `f7478d37`，`de204ff1` 起本地领先 **618 枚**；owner 没给推的口令；且 `slo-full` 跑在本机 runner、每次推送自启抢 CPU ⇒ 取数期间也不推）。
 - **时间戳自纠**：`A418` 那节标题写的是 `10:4x`，实际跑数与提交时刻是 `10:2x–10:3x`（我把标题落笔时的估计当成了读数）。不改写已提交的历史，就在这儿记一句；后续条目**先 `date` 再落头**。台账到 `A418`，本节到 `4.0w`。
 
+### 4.0w 补（09-29 12:2x，同一节的增量，不改上面原句）
+
+- **已收并核过（五枚只读，逐条我自己现读复验才认）**：`197-c2`／`213-c1`／`213-c2`／`211-c1`／`219-c1c`。台账到 **`A421`**；提交链 `de204ff1`→`1063a9ce`→`83fd5883`→`b28242e6`→`db2a7719`→`8e309d22`→`b097fc70`。证据件四枚入库：`.scratch/wisp/probes/197/r5c/census.md`（13,011）／`probes/213/c1/inventory.md`（35,987）／`probes/211/c1/cost.md`（35,702）／`docs/evidence/s1/219-approval-reply-surface-c1.md`（**122,004，已提交，不再有人在写**）。外部对照件＝`docs/reports/survey-2026-09-29-command-catalog-across-harnesses.md`。
+- ⛔ **本轮最大的一枚（＝当前第一优先，票 222）**：`task.spawn` **一边占着桥的执行许可、一边阻塞等孩子跑完** ⇒ **父任务今天必然在 per-tool 超时上收到"父任务这一侧已经不等了…"那条错误文本**；孩子自己没死（watcher 会把它落进名册）⇒ **"名册正常、父任务报错"的分裂**。链条七环逐行在我在：`bridge.go:439` 取许可／`:440` defer 放／`:449` deadline 建在取之后、`subagent_197.go:356-369` 等 `<-done`、`:277` 孩子的工具面＝`rt.bridge`（`run.go:567`）、`:327` 孩子 `WithoutCancel` 无 deadline、池 4（`:78`）＝桥 4（`bridge.go:24`）。**测试看不见**：台件给孩子的是 `fake197Dir`（`subagent_197_test.go:183`／`:186`），全仓 `grep 'Tools: h.bridge'` 零命中。
+  ⇒ **修法不动 `PLAN.md:2849` 那枚字面冻结的 4**（另见 `SPEC-01:134`／`:26`、`SPEC-05:70`）；**"抬到 8"买不到任何东西**（只是把干等放大到 8 枚）；真路＝**等孩子的这段时间不占许可**。⇒ **票 211 的前提就此塌掉**（顶部已插五格更正），**v3 清单第十二节那件"要不要为 8 改契约"不再需要他点头**。
+- ⚠ **错编号长成的事故（记在我账上）**：在飞的写腿代码文件头逐字写着「**Ticket 211** - the reply listener」（`cmd/wisp/approval_reply.go:3`），而同一枚文件 `:15`／`:44` 又正确引用票 201；**工单文件没被污染**。⇒ **交件后那批产码一律按票 201 收**（commit＋台账写 201），注释里的号由后续合法写腿顺手改；**我不在飞行期动别人正在写的文件**。⚠ 该腿**已把票 219 的 L1 那一格实现**⇒ **不要再派 L1 写腿**（撞同一批文件）。
+- **此刻在飞**：**1 枚写腿**（射程＝票 201；`cmd/wisp/approval_reply.go`、`approval_reply_211_test.go`、`approval_reply_stdin_{windows,other}.go` 已落盘，`M run.go/gate.go/queue.go/main.go`）。**它交件前不派任何写腿**（票 220／221／222／213／214 全撞 `internal/agent/approval`＋`internal/tools`＋`internal/panel`＋`cmd/wisp`）。
+- **它交件后的派单顺序（照此走）**：① 我自己复跑整包（`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp ./internal/...`）＋**逐名比红名集合**（今日基线：`approval 34／tools 158／memory 36／config 56／perm 14／cmd-wisp 97／d22scan 34` 全绿，**唯 `internal/panel 95 PASS／4 FAIL` 属别人的在飞活、不许顺手修**）→ 按**票 201 的判据表**逐格收（**不是 211**）；② 派 **222-r1**（等不占许可；甲形"立即返回句柄"要先落 `A##`）；③ 再 220 → 221 → 213（**落点已改：复用 `internal/agent/control.go:36` 那枚现成解析器，别新建登记表——`internal/panel/l2_grant_boundary_test.go:1882-1886` 那枚钉会把"第二枚 route 形状的链"判成 handler registry，而它是冻结件**）→ 214 → 219。⚠ 引号全部**按符号名现取**：本轮已实测位移 `Veto 371→387`／`DecideFromPanel 622→638`／`q.reject 393→403`／`consoleApprovalUI 990→1048`。
+- **推送：继续按住**（`origin/dev` 仍在 `f7478d37`）。**待 owner：零枚**（唯一一枚真正要他点的＝理由进结构化回看要不要动 `SPEC-02` 的表形状，我**已按不动 DDL 那一支定默认**，只按 `[H#]` 记档、不催）。台账到 `A421`。
+
 ## 4.0v 停车点（**2026-09-28 20:5x 版；新会话从这一节起读**，4.0u（09-27 11:1x）及更早只作追溯）
 
 - **owner 当前的口径（09-28 原话逐字留在账 `A399`）**：「从现在开始，**别鸡吧看那个初始方案了**……别看初始方案，或者什么这个那个的门禁，把什么都自己主动舍弃了」
