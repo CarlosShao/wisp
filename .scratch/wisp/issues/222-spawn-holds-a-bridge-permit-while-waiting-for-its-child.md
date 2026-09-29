@@ -78,3 +78,11 @@
 2. **`222-v1`（非实现者对抗验收）**，判据至少三发变异：① 删掉 `subagent_197.go:356` 那一行 ⇒ 三枚用例必须红（正控）；② 把 `giveBack()` 的 `sync.Once` 拆掉 ⇒ "同一枚许可被扣两次"那形必须红；③ 核 `MaxToolConcurrency`／`MaxConcurrentSubagents`／`PLAN.md:2849` 未被为了并发而说破（**同时执行数 ≤ 4 是反控，不许被改绿来迁就修复**）。锚点交给它自取（`git rev-parse --short HEAD`），⛔ 不许引用 `dd7c447f` 作为 `internal/tools` 的"已核过绿"锚（`A429` 事故那发）。
 
 > owner 09-28 原话（本票起手时挂在 Status 行，交付后移到这里保留）：「**子代理必须看到状态，而且点击某个子代理，能看到它们各自的流式工作页面**……这是主流 harness 必做的，不要偷懒」。**这一枚修掉的是"父任务里看不到孩子的结论"那一半；"点进去看各自的流"属票 197／票 220 的地界，不因本票结案。**
+
+## 编排者整包复跑交完（09-29 18:0x，锚点见 `git log -1`）：**AC#6 的前置到了、六格仍一枚未勾**，`222-v1` 已派
+
+- ✅ **AC#6 要的那一发由我跑齐**（件＝`.scratch/wisp/probes/222/orch/`，口径全在 `README.md`）：整包 `-count=1` ＝ **26 枚包／23 ok／3 FAIL**、`cmd/wisp 135.067s`；逐名红册（`-v`，**按用例名集合**）＝**恰 5 枚＝历史在册那 5 枚、零新增**＝`internal/ball` 1 枚（`TestC21TableColourRowsMatchTokensCSS`）＋`internal/panel` 4 枚（`TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestComposerContractTypesMatchFrontend`／`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`／`TestC21DesignTokensFourWayAgree`）。⛔ **这 5 枚属别人地界（C21 令牌与前端契约对表），不算本票新增、不许顺手修**。
+- ⚠ **两枚我自己造的坑就地登记，原话不抹**：① **`grep -c '^FAIL'` 是坏尺**——Go 无 `-v` 时每枚失败包打**两行**（一行光秃 `FAIL`、一行 `FAIL\t包名\t耗时`），我把 3 枚数成了 **7**，正尺是 `^FAIL\t`；② **`internal/risk` 那一发 FAIL 是我自己造成的**——我在后台那发 `-v` 还没跑完时就起了第二发，两发 `go test` 重叠 ⇒ 命中名 `TestResolvePerCallBudget`（`full-v.txt` 里有它那枚 2.61s 的红），单独安静复跑它 **ok 3.792s** ⇒ **争用型假红**，与前例同族（台账 `A426`／`A432`）。⇒ 本票任何时间敏感量法（四数、并发帽、耗时）**要带复量**。
+- **`222-v1` 已派**（非实现者对抗验收腿，后台在飞）。⛔ **它零产码**：不许改 `internal/**`／`cmd/**` 非测试文件、不许新增/修改 `_test.go`、突变只在台件里做并逐发自证 `git status --porcelain -- cmd/wisp internal/` ＝ 空；表落 `docs/evidence/s1/222-spawn-holds-bridge-permit-v1.md`，**骨架前 5 次调用内先提交**、之后每格一枚 commit。
+- **我给它的攻击点**（写在这格，免得事后只剩转述）：AC#1 那枚新用例**是不是真走桥**（`h.dir` 与真桥的差别落在哪一行、断言能不能区分两者，换回 `h.dir` 形状必红）；AC#2 的**反控是不是恒真**（同尺在两种相反形状下读数一样＝装饰）；AC#3 ⛔ **不许新造导出名**（仓里定的口径是复用现成源名 `task.output`）；AC#4 **预期未闭**——它要与票 221 同批发（两枚都碰 `subagent_197.go`），本格只许量"那两句'可以单独停它'今天还在、还在对谁许诺"并具名归票 221，⛔ **不许因"归 221"就判成立**；AC#5 是**契约相邻**格，只裁论证与盘上形状、⛔ 不动 `PLAN.md` 一字、不许自己把池帽改成 8。
+- **票面状态**：`^- [ ]`＝**6**（一枚未勾，等 `222-v1` 的表）；⛔ **不 `-done`**。
