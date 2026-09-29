@@ -39,19 +39,24 @@ Windows 侧票 108 已经把"祖先链是不是链接"这把刀做出来了（�
 
 ## AC（1:1，裁决表 `docs/evidence/s1/113-*.md` 由验收方出）
 
-- [ ] **AC#1** 在**容器里**先把结局复现出来（修前必须红）：POSIX 上 `SealFile` 一个穿过 symlink 的目标 ⇒
+- [x] **AC#1** 在**容器里**先把结局复现出来（修前必须红）：POSIX 上 `SealFile` 一个穿过 symlink 的目标 ⇒
       断"**要么拒并返回错误、要么只动链接本身**"，且要能证明**外来文件的 mode/属主没被动过**（前后 `os.Stat` mode + 属主读数）。
       ⚠ Git Bash 下 `docker run -v "C:\…"` 会**静默挂空目录且 rc=0＝假绿** ⇒ 用 `/d/...` 并在容器内 `ls` 证明文件在；
       `go test -c` 裸二进制会造**假读数**（本仓实测）⇒ 以容器内 `go test -v` 为准。
-- [ ] **AC#2** 给 POSIX 补上那条腿：**祖先链里的符号链接要查**（`EvalSymlinks`/`Lstat` 逐级），方向与 Windows 侧一致；
+      `done-fix-1` 勾＝表 `docs/evidence/s1/113-adversarial-acceptance.md:13`「AC#1 修前红（`ef65864`，含"外来 mode/属主前后"）| … | **我亲手复现，逐字对上**：容器 rc=1、`=== RUN` 16 / `--- PASS` 7 / `FAIL:` 9 行 … 外来文件 `before=mode=666 uid=0 gid=0 → after=mode=600` |〔独立复现〕| **绿（这一格成立）**」（本腿现读该行原文）＋现验承载用例在位：`grep -n 'func Test' internal/winsec/placement_symlink_113_other_test.go`＝`:210 TestAC1POSIXSealFileThroughASymlinkRefusesAndLeavesTheForeignTreeAlone`、`:231 …RefusesALinkAncestorAtEveryDepth`、`:261 …SealDirThroughASymlinkRefuses`、`:277 …PrivateFileThroughASymlinkRefusesAndWritesNothing`、`:302 …ThroughABackslashNamedLink`（表点名的红枚全在这五行里）。⚠ 本腿**没有重跑容器**（禁编译）：撑这格的是表在 `ef65864` 上那发独立复现＋今天树里这五枚用例，两样都在才翻。
+- [x] **AC#2** 给 POSIX 补上那条腿：**祖先链里的符号链接要查**（`EvalSymlinks`/`Lstat` 逐级），方向与 Windows 侧一致；
       ⚠ **不许把 Windows 的 `\` 折叠逻辑搬到 POSIX**（反斜杠在 POSIX 是合法文件名字符 ⇒ 两个不同名字会折成同一个串，那是**跨目录放行 fail-open**，A74③ 抓过）；
       切分要用**平台自己的分隔符**（票 108 的 `pathPieces` 那把刀已经是平台正确的，复用它，别新造）。
-- [ ] **AC#3** 反半边：正常路径（目标就在被点名的树里、祖先无链接）**必须照旧成功**，
+      `done-fix-1` 勾＝表 `113-…md:14`「AC#2 链接腿落地（复用 `pathPieces`、不折 `\`、只拒、含叶子）| `3c5d1c3` 容器 rc=0、16/16 | …腿体在 `:113-121`，`pathPieces`/`resolve.go` 一行未动，哨兵同一枚 `ErrUnresolvedPath`…|〔独立复现〕| **绿**」＋现验今天的树：`internal/winsec/winsec_other.go`（`//go:build !windows`）`:155 func platformVerifyPlacement(path string) (string, error)` 与 `:188 func ancestorIsLink(prefix string) bool`（`:189 os.Lstat(prefix)`）两枚在位，切分仍走 `pathPieces`（`grep -n 'pathPieces' internal/winsec/*.go` 非测试命中 `winsec.go:273/:278`、`placement_windows.go:56/:59`、`resolve.go:536/:693`，POSIX 侧没有第二条正规化器）；"不许折 `\`"那一半有钉子＝`placement_symlink_113_other_test.go:401 TestAC3POSIXSealDoesNotFoldABackslashIntoASeparator`。
+- [x] **AC#3** 反半边：正常路径（目标就在被点名的树里、祖先无链接）**必须照旧成功**，
       否则你只是把守卫换成"拒一切"——那不算绿（票 108 的验收两侧都量，本票也两侧都量）。
+      `done-fix-1` 勾＝表 `113-…md:15`「AC#3 反半边不误伤 | …普通文件照旧 `0666→0600`…|〔独立复现〕| **绿（判据字面成立）+ 一条未登记的误伤面（见攻#2）**」＋现验 `placement_symlink_113_other_test.go:319 TestAC3POSIXSealFileStillNarrowsAPlainFileInsideTheNamedTree`、`:353 TestAC3POSIXSealStillWorksNextToAndThroughRealDirectoriesAndLinks` 两枚在位。⚠ **它没盖住的那一面本腿追到了终点**：表的"攻#2"（合法 symlink 数据根被拒，容器内 winsec 自红 12 项、三包红 33 行）具名成了**票 119**，本腿现量 `119-posix-link-leg-refuses-legitimate-symlinked-data-roots-done.md`＝**0 未勾／7 已勾（已结案）** ⇒ 本格按判据字面翻勾，那笔误伤账不在 113 身上。
 - [ ] **AC#4** 变异：把新腿关掉 ⇒ AC#1 那条必须红；再把"祖先链只查一层"这种**半修**形状试一发 ⇒ 也要红（证明它咬的是全集不是某一行）。
+      `done-fix-1` 追加（己类·判不了，本腿不翻勾）：这一格要的**只是一发读数**，盘上没有专属物证可查——本腿现读表 `113-…md:16`「AC#4 变异四发 | MUT-A 9 红 / MUT-B 恰 1 红 / MUT-C 9 红 / MUT-D2 2 红 | **四发全部我自己下刀、自己复量**…|〔独立复现〕| **绿**」，尺一过了；**尺二过不了**：把 `winsec_other.go:188 ancestorIsLink` 关掉看 `:210` 那枚是否红，本腿被派单禁跑编译/门（`223-r2` 正在写码），无法在今天的树上重跑一发 ⇒ 缺的读数＝这四发在当前 HEAD 上的一次非实现者复跑。另表自己在 AC#4 行留了一条**未销的覆盖缺口**：`R-113-C`「叶子这一维在 `SealFile` 方向没有交付用例」（`:16` 末段）——本腿不替它判是否已闭。
 - [ ] **AC#5** 门禁：容器内 `-count=2 -v ./internal/winsec/ ./internal/memory/ ./internal/risk/` rc=0 且四数逐条点名（报 SKIP 要说是不是 `-v`；
       **`-count=2` 不缓存**，别写"×2 减缓存复用"）；本机按包 `go vet` + `GOOS=linux go vet` rc=0；`gofmt -l` 空；
       收尾必跑 `sh scripts/d22scan.sh` 纯净快照 rc=0、台账各 scope 不降。
+      `done-fix-1` 追加（己类·判不了，本腿不翻勾）：尺一＝表 `113-…md:17` 判「**绿（四数与三门），但 ban#8 那格的 sha↔数字配对错了一格**」——五包 `-count=2 -v` 复算 `540/532/0/8 rc=0`，但同一行写着「`sh scripts/d22scan.sh` rc=0，**但 ban#8 `internal/=371`，不是它报的 368**」。⇒ 这张表对这格的判语**本身带一条没对上的账**，加上本腿不许跑 `go test`／`go vet`／`gofmt`／`d22scan.sh`（派单禁编译，禁的是"跑"，不是"读"）⇒ 尺二同样补不齐。缺的读数＝这五发在当前 HEAD 上的非实现者读数，以及 `ban #8` 那一格 sha↔数字的配对更正。
 
 - [ ] **AC#6（编排者 20:2x 追加，只改文档不改语义）** 把 `R-108-2` 的边界**写进 `internal/winsec/doc.go`** 一段话：
       winsec 的守卫管的是"**拼写 / 祖先链 / 树归属**"这一级，**不管"这棵树归谁"**——
@@ -68,6 +73,7 @@ Windows 侧票 108 已经把"祖先链是不是链接"这把刀做出来了（�
         ⚠ 上面那一行的 `- [ ]` 我**没有就地翻转成 `- [x]`**：翻转那一格会让本文件 `git diff --numstat` 的**删除列变成 1**，
         与本票 Rules 的"票面 append-only（删除列 0）"和简报的"不改 Status 行以外的既有文字"直接冲突 ⇒ 勾以**追加行**的形状落在这里，
         那一格到底翻不翻（1 枚删除）交编排者裁，已登记进 `next=`。
+        `done-fix-1` 追加（戊类·凭据是**票面追加勾＋实现方自述**，⛔ 不翻勾，且本腿不替编排者翻）：**待非实现者抽验，缺的读数是**——把这 18 行包文档注释与 AC#6 原文那三条判据（只改文档、不新增判定分支、容器反半边不受影响）对一次非实现者抽验；`113-…md:18` 那行判语**已过期**（本腿现读：它写「**未交件**…`S-1-1-0` 命中数 = 0」，是对 `34a810b`/`f6a86db` 两枚 commit 量的，交付发生在它之后）。盘上面本腿已现验、三条都在：`internal/winsec/winsec.go:47` 逐字「ruled boundary, not a gap (ticket 113 AC#6, answering R-108-2): which roots」＋上面那枚追加勾 `:66`（缩进 `- [x]`）＋编排者 `:79` 裁定「以"翻转原框"为准（框翻转不是抹内容，删除列 1 可接受）」。**这条裁定与 `A440` 第③条"只引表号的 9 枚一律不直接翻"撞在同一格上** ⇒ 本腿按 `A440` 执行＝不翻，把撞车原样交回编排者裁（本腿翻一格＝替他把这条裁定落地，越权）。
 
 > **⚠ 编排者更正（20:5x，写给正在验本票的 `acceptor-ticket113`）**：AC#6 **已经交在树里了**——
 > 我派你时说过"那一格还没做、你直接记未交件"，那句话现在**过期了**：`agent-ticket113b` 交在 commit **`1499efe`**
