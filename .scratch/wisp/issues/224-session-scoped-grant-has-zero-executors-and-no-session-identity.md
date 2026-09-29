@@ -3,6 +3,13 @@
 - Status: **待派**。来源：非实现者设计复核 `219-v0`（`docs/evidence/s1/219-approval-reply-design-adversarial.md`，27,833 字节）第 3 条＋编排者复跑。
 - ⚠ **它挡住的不止票 219 的第二枚按钮**：`docs/PLAN.md:1536` 把"本会话内允许"当作**今天已有的三种硬编码确认动作之一**来写——**而这一格今天根本没有执行者**。也就是说：**冻结文字里"已存在"那一档，实建状态是〔建了但没接〕**（表在、DAO 在、没人写没人读、身份没人铸）。
 
+> ⚠ **09-29 11:5x 普查腿 `224-c1`（`.scratch/wisp/probes/224/c1/census.md`，86,894 字节／607 行，提交 `7096470d`）交回，编排者逐条现跑复认（台账 `A426`）。四格新事实改变了本票的落点与代价：**
+> ⑥ **铸造者的家其实早就划好了，只是没建**：`internal/session/` **只有 `doc.go`**，`:10` 写着要管「per-session grants ledger (D45-2)」、`:16` 挂着 `DEFERRED(SessionScope): implemented by ticket 28`。⇒ 本票乙形那句"要新增一枚契约面"**要收窄成**：面已存在（C31／`internal/session`），缺的是实现与接线；但**"会话＝什么"这一问仍属待人定案**（`doc.go` 只划边界、没定义结束点）。⚠ 顺带撞出的"标记与 `SPEC-12 §5` 不 1:1"不归本票＝票 225。
+> ⑦ **写手／读者／匹配器三件今天全为零**：`grep -rn "InsertGrant\|RevokeGrant\|ListGrantsBySession" --include=*.go internal/ cmd/ | grep -v _test` 只剩定义行与注释；另有三件**根本不存在**——`Answer` 词表里没有会话档、`ToolRequest` 里没有会话位、**全仓零枚路径模式匹配器**（`approval_grant.pattern` 没有任何代码比对它）。⇒ **"存哪／按什么匹配／什么时候查"三件套里，"匹配"那一枚是从零起。**
+> ⑧ **判定链最小落点今天拿不到 store**（写腿的硬墙）：要加"命中 grant 就不问"这一步，位置在 `internal/tools/bridge.go` 里，而 `memory.Store` 只在 `cmd/wisp/run.go` 两处存在（`perm`／`approval`／`tools` 三包**零引用**）⇒ **必须新增一枚只读 seam（照现成 `ModeSource` 那形），这是新契约面、要先落 `A##`**；普查同时排除了"塞进 `route` 的形参"那写法（`bridge.go` 里那句 `sil is a parameter, not a lookup` 逐字挡着）。
+> ⑨ **冻结钉侧两枚硬墙**（我复跑过词表与守卫，都在 `internal/panel/l2_grant_boundary_test.go`，**那枚文件一字不许动**）：`SPEC-08:171` 的 `grants.list`／`grants.revoke` 若实现成**Go 应答的入向方法**会被禁名词表**直接判死**；且 registry 腐蚀守卫使"在 `internal/panel` 新增可解码结构体"这条路**在不动冻结件的前提下走不通** ⇒ **落点必须避开 `internal/panel`**，答复字段只叫 `reason` 安全。
+> ⑩ **AC#4 今天一件都判不了红**：普查给出的三件事我已复认其必要性——**①调生产铸造函数跨两次启动断两枚 id 不等／②用生产 id 写、再用第二次生产 id 查断 0 行／③走真 `Bridge.Execute` 断"问与不问"**。⇒ **AC#4 的措辞按这三件重写，缺一件就不算判据**（本仓"恒真判据"的老形，别再交一次）。
+
 ## 现量（起手逐条复算，别信这里的行号）
 
 | 事实 | 读数 | 尺 |
@@ -11,7 +18,7 @@
 | ⛔ **生产零写手／零读者** | 那几枚 DAO 方法的**非测试调用者＝0**；`internal/agent/journal.go` 的 `DecisionAllowGrant` 决策类型**零写者** | `grep -rn 'InsertGrant\|ListGrantsBySession\|DecisionAllowGrant' --include='*.go' internal cmd \| grep -v _test` |
 | ⛔ **生产不铸造会话身份** | `grep -rn 'SessionID' --include='*.go' internal cmd \| grep -v _test` 的命中**全在 `internal/memory` 的 DAO／模型自己**（`:21`／`:35`／`:120`／`models.go:98`），**没有任何一处生成或传递 session id** | 现跑 |
 | 判定链只认最严 | `internal/risk/mode.go`（`resolveMode` 一带）把"档"判成上界，**没有"这一条 grant 命中了吗"这一步** | 现读；枚数与行号请续腿自己重取 |
-| ⚠ 三枚钉量的是**身份**不是**持久化** | `internal/perm/ticket90_persist_test.go` 里 `TestTicket90SessionGrantDoesNotSurviveRestart` 用的是**测试自己写死的两枚字符串**（`session-before-restart`／`session-after-restart`）：断"新 session 读到 0 行"，同一函数又断那一行**还活着**（留给审计）。文件头逐字 `They are three test functions on purpose`／`a single "persistence" case is how a permanent免审通行证 gets in` ⇒ **一枚"每次派生"的生产 session id 可以让三枚钉全绿而通行证实际生效** | **编排者 09-29 11:2x 自己 `sed` 逐枚读过这三段断言**（原〔腿报，未复核〕已被现读推翻为"腿说得对"）；续腿动手前仍要自己重跑一遍取现行号 |
+| ⚠ **守卫不是三枚，是四枚**（09-29 由 `224-c1` 顶回、编排者现跑复认） | `internal/perm/ticket90_persist_test.go` 里 `TestTicket90SessionGrantDoesNotSurviveRestart` 用的是**测试自己写死的两枚字符串**（`session-before-restart`／`session-after-restart`，断言在 `:234/:244/:258`）：断"新 session 读到 0 行"，同一函数又断那一行**还活着**（留给审计）。**但还有一枚同族守卫在 `cmd/wisp/run_mode101_test.go:389` `TestTicket101SessionGrantDoesNotCrossRestart`**（`:411` 用 `memory.GrantScopeSession` 写行、`:436` 先断"fixture 那行必须是活的，否则以下断言全为空"、重启后按**另一枚写死的 session 字面量**查）⇒ **准确说法＝"四枚全绿而永久通行证实际生效"是可能的**，因为**四枚都不看生产怎么铸 id**。⚠ 但也**不许把这四枚说成全瞎**：`run_mode101_test.go:432-441` 对"匹配器把 session 条件丢了"这一形**是有射程的**（它先断同一 session 读到 1 行、再断新 session 读到 0 行）。文件头逐字 `They are three test functions on purpose`／`a single "persistence" case is how a permanent免审通行证 gets in` | 编排者 09-29 11:5x **自己 `sed` 逐枚读过这四处断言**（`A426`）；续腿动手前仍要自己重跑取现行号 |
 
 ## 为什么不能顺手"生成一个 id 就行"
 
