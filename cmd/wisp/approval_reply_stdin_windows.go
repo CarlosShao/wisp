@@ -2,14 +2,14 @@
 
 package main
 
-// The console's answer stream, and when it is really there (ticket 211).
+// The console's answer stream, and when it is really there (ticket 201).
 //
 // interactiveStdin is the gate on the whole reply listener, so its rule is worth
 // stating exactly: it hands back os.Stdin only when the standard input handle is
 // a console screen-buffer input, i.e. when a human is sitting at a terminal that
 // this process owns. Everything else - a pipe, a redirected file, Explorer's
 // detached start with no console at all, CI - gets nil, which means "no answer
-// source" and therefore the pre-211 posture: the card is shown, nobody answers
+// source" and therefore the pre-201 posture: the card is shown, nobody answers
 // it, and each route resolves on its own clock.
 //
 // Why the distinction is load-bearing rather than tidy:

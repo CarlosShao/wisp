@@ -364,7 +364,7 @@ func (q *Queue) allow(corr, nonce string) error {
 	if !q.deliver(it, answer{a: tools.AnswerAllow, why: "用户在原生侧批准了本次操作"}) {
 		return ErrNotPending
 	}
-	// Ticket 211 AC (答复要进审计): the successful allow used to be the silent
+	// Ticket 201 AC (答复要进审计): the successful allow used to be the silent
 	// half of this funnel - only a FORGERY wrote a line, so the ledger could
 	// show every rejected card and never the answered one. One line per settled
 	// answer, on every route, is what makes 「谁答的、答了什么」 a reading
@@ -418,7 +418,7 @@ func (q *Queue) reject(corr, reason string) error {
 	if !q.deliver(it, answer{a: tools.AnswerReject, why: why}) {
 		return ErrNotPending
 	}
-	// The refusal half of the same ticket-211 line: this funnel is where all
+	// The refusal half of the same ticket-201 line: this funnel is where all
 	// five refusal routes (native, panel, both DecideFrom* routers, the veto
 	// channel) land, so booking the settled answer HERE is what makes the
 	// ledger complete without any route having to remember to write its own.
@@ -437,7 +437,7 @@ func (q *Queue) expire(it *qitem) answer {
 		why: fmt.Sprintf("审批超时（%d 秒未确认），C18 一律判拒绝，已自动拒绝", int(q.timeout.Seconds())),
 	}
 	if q.deliver(it, a) {
-		// Ticket 211's second criterion is about this line as much as about the
+		// Ticket 201's second criterion is about this line as much as about the
 		// answer: an unanswered L2 is booked as a TIMEOUT THAT REFUSED, and the
 		// audit has to say so in words an auditor can grep. The decision value
 		// is written as the pair the gate and the bridge both mean

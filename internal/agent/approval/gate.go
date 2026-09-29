@@ -278,7 +278,7 @@ func (g *Gate) PendingWindow(ctx context.Context, d tools.Decision) (tools.Answe
 			}
 			why := fmt.Sprintf("用户在 L1 确认窗口中通过「%s」否决了本次操作（取消窗口，非撤销已写出的内容）",
 				channelNames[v.Channel])
-			// The veto tier of the answer audit (ticket 211): an L1 window is not
+			// The veto tier of the answer audit (ticket 201): an L1 window is not
 			// a queue item, so nothing downstream books it - the queue's
 			// ANSWER-ALLOW / ANSWER-REJECT lines can only ever describe an L2
 			// card. Without this line the ledger would hold every answer that

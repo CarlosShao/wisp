@@ -1,6 +1,6 @@
 package main
 
-// Ticket 211 - the reply listener's production criteria, run against the stack
+// Ticket 201 - the reply listener's production criteria, run against the stack
 // `wisp run` assembles.
 //
 // What each case pins, and why each one is a case rather than a comment:
@@ -33,7 +33,7 @@ package main
 // The timeout POLARITY of both routes is asserted, never edited here: L2 timeout
 // rejects, L1 timeout executes (SPEC-06 §2 row L1). Changing the second one is
 // what ticket 201 AC#2 asks for, it is a D4 contract act, and it is reported in
-// docs/evidence/s1/211-reply-listener-r1.md §⑥ instead of being done quietly.
+// docs/evidence/s1/201-reply-listener-r1.md §⑥ instead of being done quietly.
 //
 // PATH warning (ticket 98): this package's test binary links sherpa-onnx and dies
 // at load (0xc0000135) unless third_party/sherpa-onnx is on PATH.
@@ -89,7 +89,7 @@ type replyHost struct {
 	out     *syncWriter
 	err     *syncWriter
 	// reply is runSpec.reply: nil means this host wired no answer source, which
-	// is the pre-211 posture and this suite's own detached-listener control.
+	// is the pre-201 posture and this suite's own detached-listener control.
 	reply io.Reader
 	// replyVeto is runSpec.replyVeto: the channel this host's cancel transport
 	// claims to be. Production leaves it empty (a console has none); one case
@@ -206,22 +206,22 @@ func TestReplyListenerAllowsAnL2CardFromTheNativeSide(t *testing.T) {
 		done    = make(chan struct{})
 	)
 	h.rtHook = func(rt *agentRuntime) {
-		revoke := rt.gate.AdmitTextTask("t211-allow")
+		revoke := rt.gate.AdmitTextTask("t201-allow")
 		defer revoke()
 		args := json.RawMessage(fmt.Sprintf(`{"path":%q,"content":"written because a human said yes"}`,
 			filepath.ToSlash(target)))
 		go func() {
 			defer close(done)
 			out, execErr = rt.bridge.Execute(context.Background(), agent.ToolRequest{
-				TaskID: "t211-allow", CorrelationID: "t211-allow-corr", CallID: "a1",
+				TaskID: "t201-allow", CorrelationID: "t201-allow-corr", CallID: "a1",
 				Name: "fs.write", Args: args,
 			})
 		}()
-		if !waitForCard187(rt.liveCards, "t211-allow-corr", 5*time.Second) {
+		if !waitForCard187(rt.liveCards, "t201-allow-corr", 5*time.Second) {
 			t.Errorf("the L2 card never reached the native ledger, so the listener had nothing to answer")
 			return
 		}
-		if _, err := fmt.Fprintln(pw, "yes t211-allow-corr"); err != nil {
+		if _, err := fmt.Fprintln(pw, "yes t201-allow-corr"); err != nil {
 			t.Errorf("writing the reply: %v", err)
 			return
 		}
@@ -244,19 +244,19 @@ func TestReplyListenerAllowsAnL2CardFromTheNativeSide(t *testing.T) {
 		t.Fatalf("the approved write never landed: %v %q", err, body)
 	}
 	sentences := h.out.String()
-	if !strings.Contains(sentences, "已允许 t211-allow-corr") {
+	if !strings.Contains(sentences, "已允许 t201-allow-corr") {
 		t.Errorf("the console never told the operator the reply was accepted:\n%s", sentences)
 	}
 	audit := h.err.String()
 	for _, want := range []string{
-		"approval: ANSWER-ALLOW corr=t211-allow-corr tool=fs.write route=native decision=allow",
-		`approval: REPLY ANSWERED corr="t211-allow-corr" tool=fs.write route="native/allow"`,
+		"approval: ANSWER-ALLOW corr=t201-allow-corr tool=fs.write route=native decision=allow",
+		`approval: REPLY ANSWERED corr="t201-allow-corr" tool=fs.write route="native/allow"`,
 	} {
 		if !strings.Contains(audit, want) {
 			t.Errorf("audit is missing the allow line %q; got:\n%s", want, audit)
 		}
 	}
-	row := toolCallByCorr187(t, h, "t211-allow-corr")
+	row := toolCallByCorr187(t, h, "t201-allow-corr")
 	if row.RiskLevel != memory.RiskL2 || row.Decision != agent.DecisionAllow ||
 		row.Outcome != agent.OutcomeSuccess {
 		t.Errorf("tool_call row = %+v, want L2/allow/success (the answered-card booking)", row)
@@ -277,25 +277,25 @@ func TestReplyListenerRejectCarriesTheOperatorsReasonToTheModel(t *testing.T) {
 		comment = "  它是临时目录"
 	)
 	h.rtHook = func(rt *agentRuntime) {
-		revoke := rt.gate.AdmitTextTask("t211-reject")
+		revoke := rt.gate.AdmitTextTask("t201-reject")
 		defer revoke()
 		args := json.RawMessage(fmt.Sprintf(`{"path":%q,"content":"must not land"}`,
 			filepath.ToSlash(target)))
 		go func() {
 			defer close(done)
 			out, _ = rt.bridge.Execute(context.Background(), agent.ToolRequest{
-				TaskID: "t211-reject", CorrelationID: "t211-reject-corr", CallID: "r1",
+				TaskID: "t201-reject", CorrelationID: "t201-reject-corr", CallID: "r1",
 				Name: "fs.write", Args: args,
 			})
 		}()
-		if !waitForCard187(rt.liveCards, "t211-reject-corr", 5*time.Second) {
+		if !waitForCard187(rt.liveCards, "t201-reject-corr", 5*time.Second) {
 			t.Error("the L2 card never reached the native ledger")
 			return
 		}
 		// A reply with control characters and a run of spaces in it: the reason
 		// is relayed into the model's tool result, so its shape is washed here
 		// while its words are not (sanitizeReplyText).
-		if _, err := fmt.Fprintln(pw, "no t211-reject-corr "+strings.ReplaceAll(reason+comment, " ", " \t")); err != nil {
+		if _, err := fmt.Fprintln(pw, "no t201-reject-corr "+strings.ReplaceAll(reason+comment, " ", " \t")); err != nil {
 			t.Errorf("writing the reply: %v", err)
 			return
 		}
@@ -321,8 +321,8 @@ func TestReplyListenerRejectCarriesTheOperatorsReasonToTheModel(t *testing.T) {
 	}
 	audit := h.err.String()
 	for _, want := range []string{
-		"approval: ANSWER-REJECT corr=t211-reject-corr tool=fs.write decision=reject",
-		`approval: REPLY ANSWERED corr="t211-reject-corr" tool=fs.write route="native/reject"`,
+		"approval: ANSWER-REJECT corr=t201-reject-corr tool=fs.write decision=reject",
+		`approval: REPLY ANSWERED corr="t201-reject-corr" tool=fs.write route="native/reject"`,
 	} {
 		if !strings.Contains(audit, want) {
 			t.Errorf("audit is missing the reject line %q; got:\n%s", want, audit)
@@ -331,7 +331,7 @@ func TestReplyListenerRejectCarriesTheOperatorsReasonToTheModel(t *testing.T) {
 	if !strings.Contains(audit, reason) {
 		t.Errorf("the audit never booked the reason the operator typed:\n%s", audit)
 	}
-	row := toolCallByCorr187(t, h, "t211-reject-corr")
+	row := toolCallByCorr187(t, h, "t201-reject-corr")
 	if row.Decision != agent.DecisionReject || row.ErrorClass != "user_rejected" {
 		t.Errorf("tool_call row = %+v, want reject/user_rejected", row)
 	}
@@ -351,17 +351,17 @@ func TestPanelRouteRefusesAnAllowBurnsTheGrantAndCanStillReject(t *testing.T) {
 	var (
 		out  agent.ToolOutcome
 		done = make(chan struct{})
-		corr = "t211-panel-corr"
+		corr = "t201-panel-corr"
 	)
 	h.rtHook = func(rt *agentRuntime) {
-		revoke := rt.gate.AdmitTextTask("t211-panel")
+		revoke := rt.gate.AdmitTextTask("t201-panel")
 		defer revoke()
 		args := json.RawMessage(fmt.Sprintf(`{"path":%q,"content":"must never land"}`,
 			filepath.ToSlash(target)))
 		go func() {
 			defer close(done)
 			out, _ = rt.bridge.Execute(context.Background(), agent.ToolRequest{
-				TaskID: "t211-panel", CorrelationID: corr, CallID: "p1",
+				TaskID: "t201-panel", CorrelationID: corr, CallID: "p1",
 				Name: "fs.write", Args: args,
 			})
 		}()
@@ -406,14 +406,14 @@ func TestPanelRouteRefusesAnAllowBurnsTheGrantAndCanStillReject(t *testing.T) {
 		"此投影不含令牌、不含允许",
 		// (2) the route-level refusal, twice: the approval layer's own line and
 		// the host's booking of what it was asked to do.
-		"approval: PANEL-ALLOW-REJECTED corr=t211-panel-corr",
-		`approval: REPLY PANEL-ALLOW-REFUSED corr="t211-panel-corr"`,
+		"approval: PANEL-ALLOW-REJECTED corr=t201-panel-corr",
+		`approval: REPLY PANEL-ALLOW-REFUSED corr="t201-panel-corr"`,
 		"面板路线不得允许",
 		// (3) the grant that surfaced on the untrusted route cannot be spent here.
-		"approval: FORGED-OR-STALE allow rejected corr=t211-panel-corr",
+		"approval: FORGED-OR-STALE allow rejected corr=t201-panel-corr",
 		// (4) the panel route's refusal works, with the reason attached.
-		"approval: ANSWER-REJECT corr=t211-panel-corr",
-		`approval: REPLY ANSWERED corr="t211-panel-corr" tool=fs.write route="panel/reject"`,
+		"approval: ANSWER-REJECT corr=t201-panel-corr",
+		`approval: REPLY ANSWERED corr="t201-panel-corr" tool=fs.write route="panel/reject"`,
 	} {
 		if !strings.Contains(audit, want) && !strings.Contains(sentences, want) {
 			t.Errorf("neither the console nor the audit says %q\nstdout:\n%s\nstderr:\n%s",
@@ -438,18 +438,18 @@ func TestUnansweredL2CardTimesOutIntoRejectNeverExecution(t *testing.T) {
 		done = make(chan struct{})
 	)
 	h.rtHook = func(rt *agentRuntime) {
-		revoke := rt.gate.AdmitTextTask("t211-timeout")
+		revoke := rt.gate.AdmitTextTask("t201-timeout")
 		defer revoke()
 		args := json.RawMessage(fmt.Sprintf(`{"path":%q,"content":"must not land on a timeout"}`,
 			filepath.ToSlash(target)))
 		go func() {
 			defer close(done)
 			out, _ = rt.bridge.Execute(context.Background(), agent.ToolRequest{
-				TaskID: "t211-timeout", CorrelationID: "t211-timeout-corr", CallID: "x1",
+				TaskID: "t201-timeout", CorrelationID: "t201-timeout-corr", CallID: "x1",
 				Name: "fs.write", Args: args,
 			})
 		}()
-		if !waitForCard187(rt.liveCards, "t211-timeout-corr", 5*time.Second) {
+		if !waitForCard187(rt.liveCards, "t201-timeout-corr", 5*time.Second) {
 			t.Error("the L2 card never reached the native ledger")
 			return
 		}
@@ -476,13 +476,13 @@ func TestUnansweredL2CardTimesOutIntoRejectNeverExecution(t *testing.T) {
 	}
 	audit := h.err.String()
 	for _, want := range []string{
-		"approval: ANSWER-EXPIRED corr=t211-timeout-corr tool=fs.write decision=timeout->reject",
+		"approval: ANSWER-EXPIRED corr=t201-timeout-corr tool=fs.write decision=timeout->reject",
 	} {
 		if !strings.Contains(audit, want) {
 			t.Errorf("audit is missing the expiry line %q; got:\n%s", want, audit)
 		}
 	}
-	row := toolCallByCorr187(t, h, "t211-timeout-corr")
+	row := toolCallByCorr187(t, h, "t201-timeout-corr")
 	if row.Decision != agent.DecisionTimeout {
 		t.Errorf("tool_call row = %+v, want decision=%s (the C18 auto-reject, not an allow)",
 			row, agent.DecisionTimeout)
@@ -494,7 +494,7 @@ func TestL1VetoNeedsAChannelTheHostReallyWired(t *testing.T) {
 		// The console leg wires none of SPEC-06 §2's four veto channels, so the
 		// veto arrives at Gate.Veto and is refused there - loudly, audited - and
 		// the L1 window keeps its frozen polarity: it expires into EXECUTION
-		// (SPEC-06 §2 row L1). This half is the evidence that ticket 211 did NOT
+		// (SPEC-06 §2 row L1). This half is the evidence that ticket 201 did NOT
 		// quietly change that, and that the run says so instead of going silent.
 		h := newReplyHost(t, 20*time.Second)
 		target := filepath.Join(h.dir, "l1-window-console-veto.txt")
@@ -505,17 +505,17 @@ func TestL1VetoNeedsAChannelTheHostReallyWired(t *testing.T) {
 		var (
 			out  agent.ToolOutcome
 			done = make(chan struct{})
-			corr = "t211-l1-console-corr"
+			corr = "t201-l1-console-corr"
 		)
 		h.rtHook = func(rt *agentRuntime) {
-			revoke := rt.gate.AdmitTextTask("t211-l1-console")
+			revoke := rt.gate.AdmitTextTask("t201-l1-console")
 			defer revoke()
 			args := json.RawMessage(fmt.Sprintf(`{"path":%q,"content":"landed through the window, unanswered"}`,
 				filepath.ToSlash(target)))
 			go func() {
 				defer close(done)
 				out, _ = rt.bridge.Execute(context.Background(), agent.ToolRequest{
-					TaskID: "t211-l1-console", CorrelationID: corr, CallID: "v1",
+					TaskID: "t201-l1-console", CorrelationID: corr, CallID: "v1",
 					Name: "fs.write", Args: args,
 				})
 			}()
@@ -580,10 +580,10 @@ func TestL1VetoNeedsAChannelTheHostReallyWired(t *testing.T) {
 		var (
 			out  agent.ToolOutcome
 			done = make(chan struct{})
-			corr = "t211-l1-veto-corr"
+			corr = "t201-l1-veto-corr"
 		)
 		h.rtHook = func(rt *agentRuntime) {
-			revoke := rt.gate.AdmitTextTask("t211-l1-veto")
+			revoke := rt.gate.AdmitTextTask("t201-l1-veto")
 			defer revoke()
 			if rt.reply == nil {
 				t.Fatal("no reply surface, so nothing could carry the veto")
@@ -600,7 +600,7 @@ func TestL1VetoNeedsAChannelTheHostReallyWired(t *testing.T) {
 			go func() {
 				defer close(done)
 				out, _ = rt.bridge.Execute(context.Background(), agent.ToolRequest{
-					TaskID: "t211-l1-veto", CorrelationID: corr, CallID: "v2",
+					TaskID: "t201-l1-veto", CorrelationID: corr, CallID: "v2",
 					Name: "fs.write", Args: args,
 				})
 			}()

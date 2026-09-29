@@ -134,7 +134,7 @@ func main() {
 // stack - credential store, config, provider, approval gate, host bridge,
 // agent loop - and the exit code reflects the task's error class.
 //
-// Ticket 211 added the answer side. attachParentConsole already ran at the call
+// Ticket 201 added the answer side. attachParentConsole already ran at the call
 // site above, so on a GUI-subsystem build the standard handles are the console's
 // by the time interactiveStdin looks at them; it returns nil for a pipe, a
 // redirected file or a start with no console at all, and that case is said out

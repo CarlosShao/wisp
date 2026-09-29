@@ -129,7 +129,7 @@ type runSpec struct {
 	// on disk without the same sentence reaching the console twice.
 	sink *logSink
 	// reply is the operator's ANSWER stream for the confirmations this run
-	// displays (ticket 211). nil means nobody can answer, which is exactly what
+	// displays (ticket 201). nil means nobody can answer, which is exactly what
 	// every run before this field was: an L2 card waits out the C18 deadline and
 	// auto-rejects, an L1 window cannot be opposed. cmdRun fills it with the
 	// console's input handle when one is really interactive; the CLI tests fill it
@@ -138,7 +138,7 @@ type runSpec struct {
 	// because the subsystem here IS a human typing at this terminal.
 	reply io.Reader
 	// replyVeto is the veto channel this host's cancel transport really is
-	// (ticket 211). Production leaves it empty because a console run wires none
+	// (ticket 201). Production leaves it empty because a console run wires none
 	// of SPEC-06 §2's four channels, and an empty value makes Gate.Veto say that
 	// back instead of letting this process claim a cancel path it does not have.
 	// A host that DOES own one - the ball click, the global Esc hook - names it
@@ -252,7 +252,7 @@ type agentRuntime struct {
 	bridge   *tools.Bridge
 	// liveCards is the native-side ledger of the cards this run displayed: the
 	// one place a displayed card's single-use grant is kept, and therefore the
-	// one thing that makes an allow possible at all (ticket 211). It is filled
+	// one thing that makes an allow possible at all (ticket 201). It is filled
 	// by the injected UI, which is the only recipient of the grant, and read by
 	// the reply surface. A card leaves it when it is answered, dismissed, or
 	// handed off to execution.
@@ -432,7 +432,7 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	// console run: no floating ball, no global Esc hook, so an L1 window can
 	// only expire unvetoed and an L2 card can only time out into a reject.
 	//
-	// Ticket 211 changed one half of that sentence and left the other half
+	// Ticket 201 changed one half of that sentence and left the other half
 	// standing: the console can now ANSWER a card (a reply source, attached at
 	// the end of this function), so an L2 card no longer has to be a question
 	// nobody hears. What it still cannot do is veto an L1 window, because none
@@ -586,7 +586,7 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	}
 
 	// The answer side, last - so a reply can never arrive at a half-built
-	// runtime (ticket 211). With no reply source this is a no-op and the run
+	// runtime (ticket 201). With no reply source this is a no-op and the run
 	// keeps the posture it had before the field existed: cards get shown, nobody
 	// answers them, and each route resolves on its own clock.
 	if s.reply != nil {
@@ -1044,7 +1044,7 @@ func (c consoleSink) Publish(e agent.Event) {
 // prints the card and the countdown events.
 //
 // It still never answers on the user's behalf - it decides nothing, and the
-// gate's own comment on that rule is unchanged. What ticket 211 added is the
+// gate's own comment on that rule is unchanged. What ticket 201 added is the
 // other half of a native surface: it HOLDS what an answer needs. The card's
 // single-use grant arrives in Prompt and is booked into live, the ledger the
 // reply surface spends from, and the card's id is printed because an operator
@@ -1058,8 +1058,8 @@ type consoleApprovalUI struct {
 	// gate".
 	mu    sync.Mutex
 	cards int
-	// live is the native-side ledger of displayed cards (ticket 211). nil means
-	// this surface stands alone, exactly as every pre-211 console run did: it
+	// live is the native-side ledger of displayed cards (ticket 201). nil means
+	// this surface stands alone, exactly as every pre-201 console run did: it
 	// shows cards and holds nothing that could answer one.
 	live *nativeCards
 	// publish puts one snapshot on the wire after the approval state moved. The
@@ -1085,7 +1085,7 @@ func (u *consoleApprovalUI) Prompt(_ context.Context, p approval.Prompt) error {
 	// from the moment a card is on screen someone may answer it, and the answer
 	// needs the proof this surface was handed - which is also why the ledger
 	// lives here and nowhere the page can reach (approval.go's grant comment,
-	// and ticket 211's 「允许只长在原生侧」).
+	// and ticket 201's 「允许只长在原生侧」).
 	if u.live != nil {
 		u.live.record(liveCard{
 			CorrelationID: p.CorrelationID,

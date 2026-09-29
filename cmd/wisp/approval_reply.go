@@ -1,6 +1,6 @@
 package main
 
-// Ticket 211 - the reply listener: the answer side of an approval, wired into
+// Ticket 201 - the reply listener: the answer side of an approval, wired into
 // the assembly that actually runs.
 //
 // WHY THIS FILE EXISTS. The 09-29 census of the approval reply surface
@@ -39,7 +39,7 @@ package main
 //     Seconds). Changing either polarity is a D4 / SPEC-06 §2 contract act,
 //     which ticket 201's AC#2 asks for and which no implementation leg may do
 //     quietly - it is registered as an open question in this leg's evidence file
-//     instead (docs/evidence/s1/211-reply-listener-r1.md §⑥).
+//     instead (docs/evidence/s1/201-reply-listener-r1.md §⑥).
 //
 // WHY A CONSOLE LISTENER AT ALL, when 票 201 names the ball and the tray first:
 // `cmd/wisp run` is the only production assembly in this tree that constructs an
