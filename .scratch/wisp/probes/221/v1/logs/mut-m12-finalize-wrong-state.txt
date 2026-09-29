@@ -1,0 +1,80 @@
+time=2026-09-29T20:01:04.570+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test197SpawnPublishesIdentityRow
+time=2026-09-29T20:01:04.574+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-fdaa564b-245c-4825-b924-dcedd2cf6c9e owner=tools
+--- PASS: Test197SpawnPublishesIdentityRow (0.00s)
+=== RUN   Test197RowExistsBeforeFirstChildModelCall
+time=2026-09-29T20:01:04.574+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-8303e5d8-0b1a-440a-bb10-7d3e4e32703b owner=tools
+--- PASS: Test197RowExistsBeforeFirstChildModelCall (0.00s)
+=== RUN   Test197SubagentPoolNeverExceedsBridgeCeiling
+--- PASS: Test197SubagentPoolNeverExceedsBridgeCeiling (0.00s)
+=== RUN   Test197SpawnDescriptionNamesTheRealPoolCap
+--- PASS: Test197SpawnDescriptionNamesTheRealPoolCap (0.00s)
+=== RUN   Test197SubagentPoolCapsAtBridgeCeiling
+time=2026-09-29T20:01:04.575+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-e0b496cf-8478-4e0f-8925-ab47cc17981d owner=tools
+time=2026-09-29T20:01:04.575+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-0c427ac1-d14a-43a5-9284-8f353560c920 owner=tools
+time=2026-09-29T20:01:04.575+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-682cd755-d258-4d5c-99b7-7951d19278b8 owner=tools
+time=2026-09-29T20:01:04.575+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-34b6f346-52f8-41b0-aa59-f4d321c0cacb owner=tools
+--- PASS: Test197SubagentPoolCapsAtBridgeCeiling (0.00s)
+=== RUN   Test197FullPoolRefusesNextSpawnWithReadableReason
+time=2026-09-29T20:01:04.576+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-fa3d29d0-802c-49b9-bcec-170a0066501f owner=tools
+time=2026-09-29T20:01:04.576+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-6ecae1df-6d1e-4d13-9831-a410b515ed27 owner=tools
+time=2026-09-29T20:01:04.576+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-02c1e588-b055-4168-bc47-e34b228bbab9 owner=tools
+time=2026-09-29T20:01:04.576+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-223095d4-0f0a-4f26-85a1-343895403d70 owner=tools
+--- PASS: Test197FullPoolRefusesNextSpawnWithReadableReason (0.00s)
+=== RUN   Test197ChildCannotDeriveSubagent
+time=2026-09-29T20:01:04.577+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-89246c18-0b62-4d91-b603-54a1b1ba92dc owner=tools
+--- PASS: Test197ChildCannotDeriveSubagent (0.00s)
+=== RUN   Test197ConclusionCarriesTaskOutputTaint
+time=2026-09-29T20:01:04.578+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-0570ba83-3d51-410e-89dc-2ea0c9aa9dac owner=tools
+time=2026-09-29T20:01:04.578+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-c32fb385-ad69-4f4f-8322-77a1113b3948 owner=tools
+--- PASS: Test197ConclusionCarriesTaskOutputTaint (0.00s)
+=== RUN   Test197CancelIsPerRowAndNeverCascades
+time=2026-09-29T20:01:04.578+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-44b51392-a988-4ce3-8bde-b5ba8a1c8187 owner=tools
+--- PASS: Test197CancelIsPerRowAndNeverCascades (0.00s)
+=== RUN   Test197SubagentHasNoSelfApprovalOutlet
+time=2026-09-29T20:01:04.579+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-d8f2cb13-a96d-4e02-9b28-5e421f05e379 owner=tools
+--- PASS: Test197SubagentHasNoSelfApprovalOutlet (0.00s)
+=== RUN   Test197StreamKeyShapeIsLiteral
+--- PASS: Test197StreamKeyShapeIsLiteral (0.00s)
+=== RUN   Test221TaskCancelIsRegisteredAtItsFrozenLevel
+time=2026-09-29T20:01:04.579+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-528cbb2b-3890-478d-b79e-f883a9075791 owner=tools
+--- PASS: Test221TaskCancelIsRegisteredAtItsFrozenLevel (0.00s)
+=== RUN   Test221DeferredMarkerForCancelLiftedButListStillMarked
+--- PASS: Test221DeferredMarkerForCancelLiftedButListStillMarked (0.00s)
+=== RUN   Test221SpawnDescriptionPromisesOnlyWhatIsTrue
+--- PASS: Test221SpawnDescriptionPromisesOnlyWhatIsTrue (0.00s)
+=== RUN   Test221ParentStopsItsOwnChildRowAndStreamSettle
+time=2026-09-29T20:01:04.609+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test221ParentStopsItsOwnChildRowAndStreamSettle3565889759\001\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-29T20:01:04.617+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-29T12:01:04Z duration_ms=8
+time=2026-09-29T20:01:04.627+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\Test221ParentStopsItsOwnChildRowAndStreamSettle3565889759\001\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-29T20:01:04.632+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-29T12:01:04Z duration_ms=5
+time=2026-09-29T20:01:04.637+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-29T20:01:04.639+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-09-29T20:01:04.649+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-9b8ddf6c-df13-428e-b429-211a6b921662 owner=tools
+    task_cancel_221_legs_test.go:326: 那一行的 state = "Settling", want "Muted"（被宿主停掉那一支借的是 D43 的 Muted，本票不新造态名）
+--- FAIL: Test221ParentStopsItsOwnChildRowAndStreamSettle (0.08s)
+=== RUN   Test221SubagentCannotStopSiblingOrItself
+time=2026-09-29T20:01:04.657+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-c4504257-7e86-4bac-8bf9-30b5a49357a2 owner=tools
+time=2026-09-29T20:01:04.657+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-82d43f1c-40fc-445d-8e62-d78295a696e7 owner=tools
+--- PASS: Test221SubagentCannotStopSiblingOrItself (0.00s)
+=== RUN   Test221ParentCancellationStillDoesNotCascade
+time=2026-09-29T20:01:04.657+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-4e667272-3d64-4ca2-accd-f7a1196e4bed owner=tools
+--- PASS: Test221ParentCancellationStillDoesNotCascade (0.00s)
+=== RUN   Test221TaskCancelUnderNoGateStopsAtTheWindow
+--- PASS: Test221TaskCancelUnderNoGateStopsAtTheWindow (0.00s)
+=== RUN   Test221EveryPromisedTaskNameIsRegistered
+--- PASS: Test221EveryPromisedTaskNameIsRegistered (0.00s)
+=== RUN   TestEveryRegisteredToolIsClassifiedForMarking175r2
+    ticket175r2_stamp_live_test.go:374: task.cancel: unstamped: a receipt naming which roster row this call stopped
+    ticket175r2_stamp_live_test.go:374: fs.list: unstamped: a listing this process composed, no foreign body
+    ticket175r2_stamp_live_test.go:374: fs.edit: unstamped: a confirmation of a local edit
+    ticket175r2_stamp_live_test.go:374: fs.move: unstamped: a confirmation of a local move
+    ticket175r2_stamp_live_test.go:374: fs.delete: unstamped: a confirmation of a local delete (opt-in family)
+    ticket175r2_stamp_live_test.go:374: fs.read: marked: C25 source roster (SPEC-06 §5)
+    ticket175r2_stamp_live_test.go:374: fs.write: unstamped: a confirmation of a local write
+    ticket175r2_stamp_live_test.go:374: fs.trash: unstamped: a confirmation of a local delete
+    ticket175r2_stamp_live_test.go:374: task.output: marked: C25 roster since ticket 175-r2, its answer is what a task printed
+--- PASS: TestEveryRegisteredToolIsClassifiedForMarking175r2 (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.115s
+FAIL

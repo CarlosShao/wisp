@@ -1,0 +1,5 @@
+time=2026-09-29T20:08:37.561+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test221DeferredMarkerForCancelLiftedButListStillMarked
+--- PASS: Test221DeferredMarkerForCancelLiftedButListStillMarked (0.00s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/tools	0.028s
