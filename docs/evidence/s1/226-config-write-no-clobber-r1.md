@@ -55,6 +55,7 @@
 | 4 | `gofumpt.exe -l`（`"$GOPATH/bin"`, v0.12.0）我改的五枚文件 | 12:51 | 空 |
 | 5 | `sh scripts/d22scan.sh`（不改这枚脚本） | 12:52 | `d22scan.txt`：步 1 正向对照 `runtests.sh: OK - packages=[./...] top-level: PASS=34 FAIL=0 SKIP=0`；步 2 `d22scan: clean - no D22 ban violations`，实扫 `internal/` 219＋`cmd/` 28 枚生产 Go 文件（`--self-test` 那枚 seed 对照在场，所以"clean"不是"仪器瞎了"） |
 | 6 | AC#6 整包终态 `go test ./cmd/wisp ./internal/... -count=1` | 见 §7 | 逐名红册见 §7 |
+| 7 | **交件时刻重跑**：`go build ./...` ＋ `go test ./internal/config ./internal/perm ./cmd/wisp -count=1` ＋ `gofumpt -l`（我改的六枚文件） | `12:59`→`13:01` | `BUILD_EXIT=0`；`ok internal/config 0.785s`／`ok internal/perm 0.257s`／`ok cmd/wisp 105.698s`；`GATE_EXIT=0`；gofumpt 那行之下为空 ⇒ **零枚未格式化文件**。这一发跑在三枚 commit 都落盘之后，证明交件时的盘上状态就是绿的、不是某发中间态 |
 
 ### 3.1 派单里预检的那四枚用例名（今天真绿，逐名从 `config-perm-named-green.txt` 抄）
 
@@ -186,3 +187,14 @@ internal/config/writeguard_226_test.go
 - **sha `361b314a`**（committer 时间 `2026-09-29T12:58:45+08:00`），`3 files changed, 224 insertions(+), 9 deletions(-)`。
 - ⚠ 两件需具名的外部事实：① 我的两枚 commit 之间，编排者自己提交了 `6cf2cc60`（`12:57:40`，`A431` 那枚）——我现跑 `git show --stat 6cf2cc60` 核对它的文件清单＝`docs/reports/pending-and-issues.md`／`docs/reports/HANDOVER.md`／`docs/reports/missing-features-2026-09-28-v3.md`＋一枚工单，**不含本票任何一枚文件**，所以它没带走我的活、我也没带走它的；② 那一发之后盘上 HEAD 已不是本腿起手锚点 `4540d5b1`，本件所有行号与读数都取自我自己这两枚 commit 的盘上状态（`78988901` 前后），不是起手锚点。
 - 本件（§10 回填）在第三枚 commit 里；那一发的 pathspec 只有这一枚 `.md`，提交前索引实测输出同样先为空。
+
+## 11. commit 台账（本腿的全部提交，逐枚 `git log`／`git show --stat` 可核）
+
+| # | sha | committer 时间（`git log -1 --format=%cI`） | 内容 | 文件数 |
+|---|---|---|---|---|
+| 1 | `78988901` | `2026-09-29T12:53:28+08:00` | 写路径本体（甲）＋两枚测试件＋证据件骨架＋5 枚读数件 | 14（`+2049/-28`） |
+| 2 | `361b314a` | `2026-09-29T12:58:45+08:00` | 证据件 §3–§9 ＋ AC#6 整包读数件 | 3（`+224/-9`） |
+| 3 | `d90b9aec` | `2026-09-29T12:59:19+08:00` | 证据件 §10 回填 | 1（`+8/-3`） |
+| 4 | 本枚 | 见 `git log -1` | 证据件 §3 行 7（交件时刻重跑的门）＋本节 | 1 |
+
+⚠ 四枚的 pathspec 全部逐枚写死在 `git commit -F - -- <…>` 里，提交前都跑了 `git diff --cached --name-only`；起手与每次 add 之前索引均为空，第二枚之前索引只有我那三枚（见 §9/§10）。**没有 push**（派单：子代理只 commit、推送由编排者核过后做）。
