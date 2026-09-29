@@ -44,6 +44,14 @@
 - [ ] **AC#5 子代理不自带"允许"出口**：与 `Q-49` 丙那批判据同族；正控＝造一枚"子代理自己批自己"的假腿 ⇒ 要红。
 - [ ] **AC#6 取消语义**：父任务取消时子代理怎么收（`TaskRoster` 今天有没有 owner／recover 那条链要现读）；⚠ 裸 `go func(` 而无 owner／recover 是 `AGENTS.md` §1.2 硬禁。
 
+> ⚠ **09-29 10:5x 现读普查交回（只读腿 `197-c2`，证据件 `.scratch/wisp/probes/197/r5c/census.md`，13011 字节；⚠ **该件由编排者代落**——派单把只读腿派成了**没有写工具的类型**，错在我；件里每一行都由编排者自己在现树重跑过尺，标了〔腿报，未复核〕的格子不许当判据用）。三格定案：
+> ① **AC#5 今天＝〔仅文档〕**：孩子结构上拿不到"答复"那一面（递给工具的 `Gate` 接口只有 `PendingWindow`／`PendingApproval`，`gate.go:99-106`；`grant` 只交给 `approval.UI.Prompt`，宿主 `consoleApprovalUI` 连印都不印，`run.go:1012-1035`），**但是"造一枚自批假腿 ⇒ 要红"今天没有任何尺会红**——`grant` 绑的是**事**不是**人**（`bindDigest(corr, taskID, tool, level, seq, args)`＝`approval.go:253`），而 `Request.Source` 逐字被注释写着「logged and **never consulted**」（`approval.go:231`，`gate.go:611`／`:618` 只进日志、`claimed_source=%q` 这个写法本身就写着"未核实的自称"）；已有的 `Test197SubagentHasNoSelfApprovalOutlet`（`subagent_197_test.go:838`）射程只有 `AdmitTask == nil` 拒绝＋字段枚数两格。
+>   ⇒ **本票 AC#5 不许勾**，直到那枚正控存在。最便宜的合法接缝＝`cmd/wisp` 的 `package main` 测试（只有那一处同时握着 concrete `*Gate` 与 spawn 那条路）：记下 `grant` 后断言 `Native().Allow(childCorr, capturedGrant)` **必须失败**。⚠ 派这枚腿前**必做撞钉预检**——它会是 `Native()`（`gate.go:572`）**第一个调用者**（今天生产零消费者，账 `A418` ③），要先看票 145／146 那族名册差集尺会不会被顶红。
+> ② **AC#6 拆成两枚具名票，本票不再自留这两格**：**票 220**＝名册那一格只看得见 L2、且同任务第二张卡静默掉格（`subagent_roster_197.go:190-210` 用 corr 建表却用 taskID 查、`pending_read.go:106-121` 只走 `q.pending`、L1 住在 `Gate.windows` 且**全仓无枚举口**、`queue.go:152-154` 把第二张卡改名成 `id#序号`）；**票 221**＝`subagent_197.go:189` 当着模型许诺「可以用 `task.cancel` 单独停它」而 `task.cancel` 未注册（`task.go:595` 只回 `task.output`，`:20-27` 逐字标 DEFERRED）、`TaskRoster.Cancel`（`task.go:442`）生产零调用者。
+>   ⇒ **"父取消不级联、且写给模型看"这一半本票已做到**（`subagent_197.go:327` 的 `context.WithoutCancel` ＋ `:360-365` 结果文本含「没有被级联取消」）；**没做到的是"孩子有停止出口"**。
+> ③ **载体那格的更正**：`blockedOnApproval`（`subagent_roster_197.go:127`）今天是一枚**布尔、不是 D43 的态**；名册上在跑的态只有 `subagent_197.go:99-104` 那四枚。**本票不许为"能画阻塞"而新造态名**（D43 转移表冻结），要动先落批准记录。
+> ⛔ 另记：原腿交回的内容里有**一行来自本编队禁读目录**，编排者已整行丢弃、不转述（证据件末节记着这件事与"派单只禁了读、没禁引"这一处模板缺陷）。
+
 ## 禁区
 `frontend/**`／`design/**` 零写面（连内容都不转述）；`PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`／C17 白名单既有名字一字不动（**改判只落 `A##` 台账，不动冻结文字，除非另有一句批准**）；**不新增方法名**（名册补齐是票 194 的射程，别在这票里顺手加）；`internal/risk/**` 不许绕过（子代理的落盘读回同样走 C25 盖戳那套，票 175／176／183 一族）。
 
