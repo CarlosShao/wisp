@@ -188,4 +188,17 @@ FAIL	github.com/CarlosShao/wisp/internal/config	0.738s
 
 ## 入库清单
 
-〔待填：wc -c〕
+时刻 `2026-09-29 14:13 +08`。
+
+- 起手锚点 `git rev-parse --short HEAD`＝`c039bc4e`（四枚被验收 commit 为其祖先；本件所有 commit 在其后）。
+- 本腿提交序列（每枚 `git commit -F - -- docs/evidence/s1/226-config-write-no-clobber-v2.md`，pathspec 写进 commit 本身；`git show --name-status --format=` 现核每枚只碰这一份 md，无夹带）：
+  - `ee40bbd0` 骨架（`A` 本 md）
+  - `29daf745` §1＋§2
+  - `1d4f6ff0` §3（AC#3 无条件认领突变自跑）
+  - `721e3864` §4＋§5
+  - `a7d70ebf` §6＋§7
+- 每次 commit 前 `git diff --cached --name-only` 实际输出＝**空**（起手与每次 add 之前索引均无别人的东西）；`git add` 之后索引里只有 `docs/evidence/s1/226-config-write-no-clobber-v2.md` 一行。**未 push。**
+- 唯一动过的源码＝`internal/config/writeguard.go`（§③① 突变→跑→逐字换回）：起手与还原后 `certutil -hashfile internal/config/writeguard.go SHA256` **均为 `bf82226988b83fdce151478bd51a550beec8d66caef39e5cc4096f6f55150f16`**、`git diff --stat` 为空 ⇒ 逐字节复原。本腿未 commit 任何源码改动。
+- 自跑读数落盘件＝`.scratch/wisp/probes/226/v2/rerun1-unconditional-adopt.txt`（全量、未接 head/tail；临时件只建不删）。
+- 未翻任何勾、未动工单／台账／`HANDOVER.md`；`frontend/**`／`design/**` 零读零写；未碰 `internal/tools/**`、`PLAN.md`、`docs/specs/**`、`thresholds.go`、golden、`allowlist.txt`、三枚冻结件。
+- 本文件最终 `wc -c`＝**31097 字节**（此数即本行写完后整份文件的字节数；下一枚 commit 的 message 里再记一次收敛后的同值）。
