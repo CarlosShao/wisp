@@ -63,3 +63,11 @@ C17 白名单**既有名字**不许动，**新增名字要先落一条 `A##`**�
 ## 与其它票的关系（别在这票里顺手做）
 - 界面那一侧"批准卡长什么样"＝界面那支的活；本票只交**Go 侧的答复通路、状态生产者与规则文本**。
 - 唤醒词否决（KWS）与语音整条＝语音那族票；本票只保证"有面可点时必问、必能答"。
+
+> ⚠ **09-29 14:3x 收只读普查腿 `201-c2`（`.scratch/wisp/probes/201/c2/census.md`，编排者代落盘＋逐条自己跑尺）⇒ 本票剩余四格的性质变了，三处就地更正（原句不抹）**
+> - **①"缺宿主原生入口"这句不完整**：普查现读——**`wisp run` 跑完一发任务就退**（`cmd/wisp/main.go:85 os.Exit(cmdRun(...))` → `cmd/wisp/run.go:220 return rt.execute(task)` → `:855 bg.Wait()` → `:914 return`，编排者复跑行号复认），而**常驻那条腿 `cmd/wisp/resident_windows.go:24/:83` 没有 gate、没有 bridge、没有任务**。⇒ **两条腿各缺另一半**，本票 AC#1／AC#3a／AC#6b **整条前置转新立的票 228**（含"球挂 run 还是挂 resident"那枚未定义即停点）。
+> - **②票面 §13／§55 那句"托盘'打开面板'那项是空 stub"口径错**：`internal/ball` 里**没有 stub**，它已经把选择发成回调了（`ball_windows.go:667/672` `b.fire(Events.OnTrayPanel)`）；那句 `fmt.Println("tray: open panel (stub, ticket 33)")` 在**消费者** `cmd/balldebug/main.go:199`。⇒ **对写腿的直接含义变了**：球那一面不缺"发"，缺"听"——落点不要在 ball 包里找空函数。
+> - **③AC#2 那半格今天缺的是一枚赋值，不是功能**：`runSpec.replyVeto` 生产赋值点＝**0**（`run.go:146` 声明、`:601` 读，我复跑复认），而**现成半成品就在场**——`internal/agent/approval/approval.go:163 DefaultChannels()` 逐字 `return NewChannels(ChannelBall, ChannelEsc)`，**生产零调用者**；装配处 **`run.go:446` 传的是空参 `approval.NewChannels()`** ⇒ **今天是被"显式关掉"，不是"没建"**。三件都在（`approval.go:147`／`:163`、`gate.go:139 Channels()`、`approval_reply.go:415-417 SetLoaded`），**只差那一枚赋值** ⇒ **这一格可以从票 228 里 separable 地早做，但它撞 `run.go` ⇒ 仍须排在票 223 之后。**
+> - **还有一条会影响票 228 排期的旧账**：`rt.close()`（`run.go:676-683`）**从不 join** 它 spawn 的 `replyHandle`（`:265`），注释 `:672-675` 自陈协程随进程死 ⇒ **D38(c)（`PLAN.md:2845`）"任务完成必须等所有派生 goroutine 退出"今天已经违约**（⚠ 这是**读到码**、不是读到尺；"有没有仪器在查这条"普查腿没查、我也没查）。**挂 GUI 之前先补这一格，否则新账叠旧账。**
+> - **答复侧今天的真实状态（免得下一位以为还要重造）**：`Gate.DecideFromNative`（`gate.go:626`）／`DecideFromPanel`（`:638`）／`Veto`（`:387`）**生产调用者 5 枚、全在 `replies.go:325/372/377/401/427`**；`Replies` 那一层由 `approval_reply.go:210/249/251/278/310` 调；待答卡数据原生面**直接读得到**（`Replies.AwaitingHuman()` `replies.go:249`、`Pending()` `:224`、`ReplyCard` 带 `CorrelationID/Level/Tool/Grant/Paths`）。⛔ **但"L1 那一发"没有枚举口**（`Gate.windows` 全仓只有 `:321/:324/:330/:393` 四处命中，我复跑）⇒ 要枚举它就撞**票 220 AC#2 甲形**，先裁甲乙。
+> - ⛔ **票面 §10 那把尺的读数（"三枚入口生产零调用者"）已过期**，上面 ③ 与 r1/r2 两节已各自解释过原因；**本票 AC#1 的"入口枚数＝1（控制台 stdin）"仍然成立**——球／托盘／面板 WebView **三处仍零**。
