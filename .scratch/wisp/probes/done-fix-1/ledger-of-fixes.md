@@ -159,5 +159,17 @@ grep 不到就不算甲、按丙处理。票 80 AC#3／AC#4 是 pool-2 自己举
 
 > 本腿在本票面上的写入：`git diff --numstat`＝**9 增 / 3 删**，三枚删除行全是 AC#1／AC#2／AC#3 的 `- [ ]`→`- [x]` 改框行；票面原有的那枚缩进 `- [x]`（`:66`）与编排者更正段一字未动。
 
+### 票 97 `97-dead-strict-param-and-the-comment-that-invents-a-caller-done.md`（起手 5 未勾／0 已勾 → 现量 **2 未勾／3 已勾**）
+
+| 面行 | 格 | pool-2 的桶 | 本腿处置 | 凭据／缺的读数 |
+|---|---|---|---|---|
+| `:45` | AC#1 `strict` 方向参数清掉 | 戊 | **翻勾** | 尺一＝`97-…md:14`「通过（第一档：0 命中我自己复算）」〔独立复现〕；尺二＝**本腿今天在树上重跑同一把 grep**：`grep -rni 'strict' internal/agent/approval/ \| wc -l`＝**0**，两枚具名函数 `queue.go:231 lookupForAllowLocked`／`:250 lookupForRefusalLocked` 在位 |
+| `:47` | AC#2 别名买不到批准＋变异 | 戊 | **翻勾（引表那发变异，如实标注）** | 尺一＝`97:15`「通过（M4 我自己重跑，同形）」，行内逐字带 `go build` rc=0＋`--- FAIL: TestAnAliasCanNeverBuyAnAllow` 断言原文＋还原 `diff -q` rc=0；尺二＝`internal/agent/approval/ticket97_alias_direction_test.go:75` 在位。⚠ 本腿**没重跑 M4**（禁编译），凭据行里写明了这一点 |
+| `:49` | AC#3 五条拒绝路线矩阵 | 戊 | **翻勾** | 尺一＝`97:16`「通过（断言与反向变异均第一档）」（列了五枚子测试名与 M3）；尺二＝本腿逐条现读同一文件：`:155 veto`／`:158 native_reject`／`:161 panel_reject`／`:164 decide_from_native`／`:169 decide_from_panel`＋`:175 if len(routes) != 5`＋`:176 t.Fatalf`＋`:181 t.Run(rt.name…)` |
+| `:50` | AC#4 注释每句要有对应物 | 丙 | **不翻勾，追加指针** | 账在**票 230 AC#2**（`230-…md:20`）；本腿今天现读＝那句仍为假：`queue.go:247` 逐字「This function is the only reader of q.alias…」，而 `grep -n 'q\.alias'` 命中 `:197/:200/:210/:216/:257` 五处；表 `97:17` 当年登记的 `R-97-1`/`R-97-2` 没有下一轮 ⇒ 实质未兑现，不是格式账 |
+| `:51` | AC#5 按包门禁五发 | 戊 | **改判己，不翻勾** | 尺一过了（`97:18` 通过，验收方自己数的 `98/58/0/2`＋38 子测试、d22scan rc=0）；尺二只能靠跑，本腿禁跑，且那批数只对 `f140079` 快照负责 ⇒ 缺＝当前 HEAD 上的一次非实现者读数。表还留了未销的 `R-97-3`（票面加法式混层） |
+
+> 本腿在本票面上的写入：`git diff --numstat`＝**9 增 / 3 删**，三枚删除行全是 AC#1／AC#2／AC#3 的改框行（逐条比对：删行与增行除 `[ ]`→`[x]` 外一字不差）。
+
 <!-- 逐票明细追加处 -->
 

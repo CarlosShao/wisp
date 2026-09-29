@@ -1,0 +1,17 @@
+账目落地 done-fix-1（票 97）：3 枚翻勾 + AC#4 指向票 230 AC#2 + AC#5 改判己
+
+翻勾三枚（两把尺都过）：
+- AC#1＝97-…md:14 通过〔独立复现〕＋本腿今天在树上重跑同一把 grep：
+  grep -rni 'strict' internal/agent/approval/ | wc -l = 0；queue.go:231/:250 两枚具名函数在位
+- AC#2＝97:15 通过（M4 验收方自己重跑，行内带 build rc=0 与 FAIL 断言原文）＋
+  internal/agent/approval/ticket97_alias_direction_test.go:75 在位（本腿没重跑 M4，凭据行已写明）
+- AC#3＝97:16 通过 ＋ 同一文件逐条现读：:155/:158/:161/:164/:169 五枚路线名、:175 len(routes)!=5 那道闸、:181 t.Run
+
+没翻两枚：
+- AC#4（丙）＝账在票 230 AC#2；本腿今天现读 queue.go:247 那句"only reader of q.alias"仍为假
+  （grep -n 'q\.alias' 命中 :197/:200/:210/:216/:257），R-97-1/R-97-2 没有下一轮 ⇒ 不是格式账
+- AC#5 由戊**改判己**：97:18 那批数（98/58/0/2＋38 子测试＋d22scan rc=0）是验收方对 f140079 快照量的，
+  本腿禁跑门、今天的树上补不齐；表另留未销的 R-97-3（加法式混层）
+
+票面 numstat＝9 增 / 3 删，三枚删除行全是改框行；Status 行一字未动（它今天仍写着 ready-for-review，
+这条归编排者裁，不在本腿射程）。

@@ -42,17 +42,22 @@ panel 无 Allow、`revokeGrants` 只读精确键、`Replay` 非答案）⇒ **�
 
 ## AC（1:1，裁决表 `docs/evidence/s1/97-*.md` 由验收方出）
 
-- [ ] **AC#1** `grep -rn "strict" internal/agent/approval/` 的读数里**不再有零调用点的方向参数**；
+- [x] **AC#1** `grep -rn "strict" internal/agent/approval/` 的读数里**不再有零调用点的方向参数**；
       或你论证它为何必须存在并给它一条用例。**二选一，写下来。**
-- [ ] **AC#2** `TestAnAliasCanNeverBuyAnAllow` 落地，且**变异**：把 allow 侧改成也查别名表 ⇒ 该用例必须红
+      `done-fix-1` 勾＝尺一：本腿现读表 `docs/evidence/s1/97-adversarial-acceptance.md:14`「AC#1 | …| **通过（第一档：0 命中我自己复算）** | 〔独立复现〕」（那行还点名了两枚函数 `queue.go:231 lookupForAllowLocked`／`:250 lookupForRefusalLocked`）；尺二＝本腿**在今天的树上重跑了这把 grep**：`grep -rni 'strict' internal/agent/approval/ | wc -l` ＝ **0**（大小写不敏感、含 `_test.go` 与注释），`grep -n 'func (q \*Queue) lookupFor' internal/agent/approval/queue.go` ＝ `:231`／`:250` 两枚仍在位 ⇒ 票选第一支（删参＋方向具名函数）这件事今天仍成立。
+- [x] **AC#2** `TestAnAliasCanNeverBuyAnAllow` 落地，且**变异**：把 allow 侧改成也查别名表 ⇒ 该用例必须红
       （锚点=承载行为那一行，同链 grep 证落地，还原后 `git diff --quiet` 证干净，**编译失败不算变异**）。
-- [ ] **AC#3** 5 条拒绝路线的矩阵用例逐条点名（每条一个子测试名），并给"其中一条被改成放行 ⇒ 有用例红"的反向变异。
+      `done-fix-1` 勾＝尺一：表 `97-…md:15`「**通过（M4 我自己重跑，同形）**」〔独立复现〕——那一行逐字记了 M4 的形状：`go build` rc=0（变异有效）、`--- FAIL: TestAnAliasCanNeverBuyAnAllow` 带原文断言 `ticket97_alias_direction_test.go:85: SECURITY: Native().Allow(...) 返回 nil：别名买到了批准`、还原 `diff -q` rc=0；尺二：`grep -n 'func TestAnAliasCanNeverBuyAnAllow' internal/agent/approval/ticket97_alias_direction_test.go` ＝ **`:75` 在位**。⚠ 老实记一句：**变异那一发本腿没有重跑**（禁编译），撑它的是表里验收方自己那一发 M4＋用例今天在位这两样；裁决者若要按 `SPEC-12 §4.3` 再抽一发，缺的就是这一发。
+- [x] **AC#3** 5 条拒绝路线的矩阵用例逐条点名（每条一个子测试名），并给"其中一条被改成放行 ⇒ 有用例红"的反向变异。
+      `done-fix-1` 勾＝尺一：表 `97-…md:16`「**通过（断言与反向变异均第一档）**」，那行逐字列了五枚子测试名 `veto` / `native_reject` / `panel_reject` / `decide_from_native` / `decide_from_panel`（`:155-173`）与 `:175` 的前题闸，反向变异 M3 由验收方自己重跑（只有 `/native_reject` 红、另 4 条 PASS）；尺二＝本腿今天逐条现读同一枚文件：`ticket97_alias_direction_test.go:155`（`"veto"`）、`:158`（`"native_reject"`）、`:161`（`"panel_reject"`）、`:164`（`"decide_from_native"`）、`:169`（`"decide_from_panel"`）、`:175` `if len(routes) != 5` ＋ `:176 t.Fatalf("R-2 登记的是 5 条拒绝路线，本矩阵只有 %d 条")`、`:181 t.Run(rt.name, …)` ⇒ 五枚路线名与"必须是 5 条"那道闸都在树里。⚠ 同样老实记：M3 反向变异那一发本腿没跑（禁编译），引的是表里验收方自己那发。
 - [ ] **AC#4** 注释与代码一致：贴出你改前后的注释原文，并说明**新注释的每句话在代码里能找到对应物**。
+      `done-fix-1` 追加（丙类·真残缺，⛔ 不翻勾）：**账在票 230 AC#2**（`230-four-cells-left-unfinished-inside-closed-tickets.md:20` 逐字要"`queue.go:247` 的'唯一读者'要么改成'另有 `:197`／`:210` 两处读者…'，要么把那两处读者的存在具名解释掉"）。本腿**今天现读两样都还是坏的**：`sed -n '240,250p' internal/agent/approval/queue.go` 里 `:247` 仍逐字写「This function is the only reader of q.alias and Queue.reject is its only caller」，而 `grep -n 'q\.alias' internal/agent/approval/queue.go` ＝ `:197`（`indexLocked` 的读-改-写）、`:200`/`:210`/`:216`（`unindexLocked` 的读与删）、`:257`（本函数自己）五处命中 ⇒ 那句"唯一读者"字面为假这件事**从验收那轮到今天没有变化**；表 `97-…md:17` 当年就把它登记成 `R-97-1`（同表另记 `R-97-2`＝commit 标题"allow 侧读别名表变成编译不过"被 M4 当场证伪）。⇒ 这不是格式账：判据的实质（注释不撒谎）今天仍未兑现，`A440` 第②条也是这么复认的。
 - [ ] **AC#5** 门禁（按包）：`gofmt -l`/`gofumpt -l` 空、`go vet ./internal/agent/approval/` rc=0、
       `go test -count=2 ./internal/agent/approval/` rc=0 且逐条点名 SKIP/FAIL
       （⚠ 票 87 的验收读数里那 **2 条 SKIP 是 `TestDefaultDeadlineWallClockMeasurement`**，
       既有、不属本票，但**必须照点名**；`go test ./cmd/wisp/` 本机是加载期 `0xc0000135` 既有红，见**票 98**，不要追）。
       **收尾前必跑 `sh scripts/d22scan.sh`**（A64②：按包门禁看不见全仓 ban）。
+      `done-fix-1` 追加（己类·判不了，本腿不翻勾）：尺一过了——表 `97-…md:18`「**通过（PASS 相加≠RUN 的写法要更正，数字自洽）**」〔独立复现〕，那行是验收方自己数的 `RUN=98／顶层 PASS=58／FAIL=0／SKIP=2／子测试 PASS=38`，并点名 2 条 SKIP＝`TestDefaultDeadlineWallClockMeasurement`、`sh scripts/d22scan.sh` rc=0。尺二补不齐：本格要的五个数只能跑出来，本腿被派单禁跑 `gofmt`／`gofumpt`／`go vet`／`go test`／`d22scan.sh`，且表那批数是对 `f140079` 快照负责的、对今天的树无效 ⇒ 缺的读数＝这五发在**当前 HEAD** 上的一次非实现者读数。另表在同一条里留了一笔**没销的格式账 `R-97-3`**（票面"58+38+2 = 98"是跨层相加，结果对、式子混层）。
 
 ## Rules（本仓固定）
 
