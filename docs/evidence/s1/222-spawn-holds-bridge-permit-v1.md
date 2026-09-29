@@ -147,10 +147,40 @@ go test ./internal/tools -count=3 -run 'Test222SpawnConclusion' -v \
 
 ## AC#4 不许留任何"对模型许诺了但没接"（票面 `:38`）
 
-判语：**未判**
+**判语：不成立（本格未闭；两句话今天还在，仍在对模型许诺。归票 221＝结案路径，不是翻勾理由）**
 
-依据（文件:行，现读）：未填
-归票 221 的具名理由：未填
+**现读依据**
+
+| 事实 | 出处（现读） |
+|---|---|
+| 许诺一：说明书正文写着"可以用 `task.cancel` 单独停它" | `internal/tools/subagent_197.go:196`（票面 `:189` 已漂 7 行，票面更正块 `:61` 说的 `:196` ＝ 本腿现读一致） |
+| 许诺二：父侧放弃那条文本写着"可以单独停它：它的流键是 %s" | `internal/tools/subagent_197.go:388-389`（票面 `:362-363` → 现读 `:388-389`） |
+| 而 `task.cancel` **没注册**：`BuiltinTaskEntries` 只返回 `task.output` 一枚 | `internal/tools/task.go:595-597` |
+| 子代理族注册名册只有 `task.spawn` | `internal/tools/subagent_197.go:218`（`BuiltinSubagentEntries`） |
+| `task.cancel` 在 Go 侧的唯一身份是**注释里的 DEFERRED 标记** | `internal/tools/task.go:23`（"DEFERRED with five fields, PLAN.md §7 :1531"）／`:576`／`:593` |
+| 两枚许诺行**不是 `222-r1` 写的、也没被它碰过** | `git blame -L194,197`／`-L386,390` 逐枚＝`7ea14ce3e`（09-28 19:54，票 197 那批）；`git show bfc55b5b -- internal/tools/subagent_197.go` 的变更行里两枚都不在 |
+
+**还在对谁许诺**：`Description()` 的读者是模型（它进工具目录随请求一起发出去）。票 221 文件 `:18` 逐字「模型会照说明书办事：它以为能停掉自己派出去的孩子，于是**不会去找别的退路**」——本腿核过这句的前提今天仍成立：全仓 Go 侧 `task.cancel` 的**非注释命中只有那一行说明书**（尺见下）。
+
+**可复跑的尺（两把 grep，零产码）**
+```
+# 说明书里的 task.* 词根
+grep -n '"task\.' internal/tools/subagent_197.go internal/tools/task.go   # 命中 :196 那句 task.cancel
+# 注册名册
+grep -n "func BuiltinTaskEntries" -A 3 internal/tools/task.go             # 只 task.output
+grep -n "func BuiltinSubagentEntries" -A 3 internal/tools/subagent_197.go # 只 task.spawn
+# 全仓 Go 侧 task.cancel 的非注释命中面
+grep -rn "task\.cancel" --include=*.go internal/ cmd/ | grep -v "_test.go" | grep -vE "^\S+:[0-9]+:\s*//"
+# ⇒ 只剩 subagent_197.go:196 那一行 = 许诺在册、实现在册外 = 这把尺今天该响
+```
+票 221 的 AC#1 要的正是把这把"说明书词根 ⊆ 注册名册"的尺做成常驻能力尺，**改前必须响**——本腿这发就是它的改前响度样本。
+
+**登记一枚本格射程外、但同族的谎（只具名，不改判语）**：`subagent_197.go:195` 说明书第一句"派生一枚子代理去独立完成一个子任务，**等它跑完并把结论带回本任务**"——本腿 **M11** 已把它量成假（孩子比父任务 per-tool 预算久时，父任务收到的是桥的超时文案、结论 0 次到达，见 AC#3 那格）。AC#4 的字面只点名两处"可以单独停它"，所以本格不因此加判；但**谁结案 AC#4，就得同一批面对这一句**，否则票 221 交完之后说明书仍有一句为假。⛔ 两枚票同撞 `internal/tools/subagent_197.go` ⇒ 串行、同批只一枚碰（票面 `:38`／`:46`）。
+
+**为什么必须留着（具名）**：票 221 文件 `:4` 逐字「⇒ **本票现在是"可派写腿"状态**，但排程在后面：`226-v1` 交完 → 票 223 → `222-v1` → 本票（甲形＋乙形三处同一发）」⇒ 甲形（注册 `task.cancel`）已有 owner 批准记录＝台账 `A434`（13:10，撤销口令「撤 221 甲」），但**注册代码今天不在树上**（上面那把尺就是证据）。AC#4 只能在票 221 的写腿落地后随它结案。
+
+**本腿零动作自证**：本格**一枚文件都没改**，也**没做任何突变**（突变只会让两句许诺更难看的红，量不出新东西）。`git status --porcelain -- cmd/wisp internal/` ＝空。
+
 
 ---
 
