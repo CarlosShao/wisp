@@ -61,12 +61,43 @@ go test ./internal/tools -count=1 -run 'Test222' -v \
 
 ## AC#2 "占着许可干等"被永久钉住（票面 `:36`）
 
-判语：**未判**
+**判语：成立（带三枚注：其中一枚推翻票面 `:78` 的突变②，一枚推翻 `bridge.go:666-669` 的注释）**
 
-依据（文件:行，现读）：未填
-反控是否恒真：未填
-突变读数：未填
-还原自证：未填
+**现读依据**
+
+| 事实 | 出处（现读） |
+|---|---|
+| 许可在取到之后交给 `inFlightSlot`，`defer` 兜底 | `internal/tools/bridge.go:438-442` |
+| 交还载体＝未导出 `inFlightSlot{once, sem}`，`giveBack` 在 `once.Do` 里 `<-s.sem` **并把 `s.sem = nil`** | `bridge.go:657-660`／`:670-680`（`:675` 那枚 nil 赋值） |
+| 工具侧入口＝未导出 `giveBackWhileWaiting(ctx)`，取不到载体返回 false、永不阻塞 | `bridge.go:688-700` |
+| 等待点的交还调用 | `internal/tools/subagent_197.go:356` |
+| 占用读数（AC#2 的正读数）＝等待瞬间 `len(h.bridge.sem)` want **0**；同时钉 `cap(...) == 4` 字面 | `subagent_222_test.go:441-445`／`:446-448` |
+| 反控读数＝父全等待时**同时执行**的调用数 `maxSeen` want **恰 4**、逐枚 `slotsHeld ≤ 4`、终态 `len(sem)==0` | `subagent_222_test.go:476-478`／`:496-500`／`:506-508`／`:524-526` |
+
+**突变读数（锚点＝数字真正所在那一行）**
+
+| 号 | 突变 | 读数 |
+|---|---|---|
+| M1 | 删 `subagent_197.go:356` | `:443` 与 `:477` 两处 **0.00s** 判红，读数＝**4 枚桥位被等待中的父任务占着**（＝票面现量链的形状被读数钉住，不靠超时、不靠挂死） |
+| **M5**（反控是否恒真） | `bridge.go:24 MaxToolConcurrency = 4 → 8`（只改台件，产码未动） | **反控不是装饰**：`Test222WaitingParentHoldsNoBridgeSlot` **0.00s 红**（`:446` 读到 `cap=8`）＋ `Test222CeilingStillCapsExecutedCallsWhileParentsWait` **0.00s 红**（`:497` 读到 `maxSeen=6`）。同发里既有钉子 `TestToolConcurrencyCeilingIsFour` **照绿**（0.03s）⇒ 该文件头 `:59-64` 与票面 A420 那句"它拿常量跟自己比，看不见常量被抬"**本腿独立复现成立**；全量名册：159 枚绿／2 枚红，两枚红都是 222 的新用例 |
+| **M2**（票面 `:78` 的突变②） | 只拆 `bridge.go:672` 的 `s.once.Do`，保留 `:675 s.sem = nil` | **三枚全绿，0.040s，`ok`** ⇒ **"拆掉 sync.Once ⇒ 双扣那形必须红"这句话不成立**（见下面推翻清单第 1 条）。形状上说得通：交还与 `defer` 兜底跑在**同一枚 goroutine 上顺序两次**，第二次被 `s.sem = nil` 拦下，`once` 在这条路径上无从发力 |
+| **M9** | 反向隔离：保留 `once.Do`，只删 `:675 s.sem = nil` | **三枚全绿，0.032s** ⇒ 两枚护栏**各自单独够用**，删一枚测不出红＝这形被**冗余**钉住（好），但注释把载荷归给了错的那枚（坏） |
+| **M8** | 两枚护栏**同时**拆掉（＝真正的"同一枚许可被扣两次"） | **三枚全红**，但每枚都红在 **30.00s 的 guard rail**（`:392`／`:457`／`:518`"只等到 0/4 枚，护栏到点"），整包 90.037s ⇒ 双扣这形**确实有尺**，可尺是**挂死护栏**，**不是** r1 自述（票面 `:68`）里那句"终态 `len(sem)=0` 兼作双扣那形的尺"——那一行（`:524`）在 M8 下根本没被执行到 |
+| **M7** | 把 `:356` 的交还挪到两条"已派生"文案**之后** | **三枚全绿**；再压 `-cpu=1 -count=20`＝20/20 绿、默认 GOMAXPROCS `-count=200`＝200/200 绿 ⇒ `subagent_197.go:351-353` 那句"a reader that has seen this call's spawn delta therefore knows the slot is already back…decide without a deadline"所声称的**因果标记没有任何断言在守**：位置挪了，用例既不会红、也不会变读数不同（本机上读数照旧是 0，因为父任务必先阻塞才轮得到读侧） |
+
+**注（AC#2 文字与读数的射程差）**：票面 `:36` 要的是"可用许可数＝4 −（父之外正在执行的真工具数）"这枚**等式**；台件里两处分别钉住了"父等待时占用＝0"（`:441`）与"探针自记占用 ≤ 4／同时执行数＝4"（`:506`／`:497`），**等式右半边只在 ≤ 方向被检查**。本腿判这不影响"占着许可干等被钉住"这一枚 AC 的成立，但把射程写清楚，别让下一位以为等式两侧都有尺。
+
+**可复跑的尺**
+```
+export PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"
+for m in m5-ceiling-to-8 m2-drop-sync-once m9-drop-nil-guard m8-double-drain-for-real m7-giveback-after-delta; do
+  python .scratch/wisp/probes/222/v1/mut222.py $m >/dev/null
+  go test ./internal/tools -count=1 -run 'Test222' -v \
+    -overlay=.scratch/wisp/probes/222/v1/mutations/$m/overlay.json | grep -E '^(--- |ok|FAIL)'
+done
+# 期望逐名：M5＝2 红 1 绿 / M2＝3 绿 / M9＝3 绿 / M8＝3 红(各 30s) / M7＝3 绿
+```
+
 
 ---
 
