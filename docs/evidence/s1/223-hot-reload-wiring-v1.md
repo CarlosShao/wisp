@@ -203,18 +203,73 @@
   - 对照：本票自己的 `TestTicket223*` 用例耗时 2.1–2.4s，`state=applied`/`restart-pending` 都在约 1s 内被观测到 ⇒ **同一枚 tick 在跑得久一点的宿主里确实会认领热档手改**。
   - ⇒ **这不是 223 的洞，但必须登记**：223 的 tick 让 226 的一枚用例的**前提失效**（"nothing polls"）且**断言语义与 D36 热档相反**，今天只有时序在替它兜底。票 227 的派单已经预感到这件事（`.scratch/wisp/issues/227-...md:40` 逐字「必须排在票 223 之后（223 一旦接上生产轮询，AC#2 那一支的行为面会变，现在钉的基线会被它冲掉）」），但 227 的 AC#1–AC#5 里**没有一格**收这一笔。⇒ **建议落点＝票 227 的 AC#3 矩阵加一格"改值（热档）→下一次真轮询可见"，或另立一票**；本腿**不改 226 的任何代码**，只裁与登记。
 
-## 推翻清单（实现腿＋编排者）
+## 推翻清单（实现腿＋编排者，逐条给我跑的尺与输出）
 
-〔待填〕
+1. **【推翻·中】实现腿 AC#4 的边界规则自述不成立**。原句（`docs/evidence/s1/223-hot-reload-wiring-r1.md:87`）：「**读不出版本＝`config.toml parse`（语法错），读得出版本＝迁移管线继续说话**」。
+   尺＝本腿的 overlay 台件 17 发（原始件 `probes/223/v1/ac4-probe.txt`）。**"读得出版本"的 6 发里只有 A2（`schema_version = 1`＋坏表头）真的走了迁移管线**；`C1/E1/G1/L1/J1` 读出的版本是 `2`（＝`SchemaVersionCurrent`，`internal/config/schema.go:28`），于是 `loader.go:93` 的 `ver != SchemaVersionCurrent` 不成立、**迁移管线根本没被调用**，错误来自 `decodeStrict`→`formatDecodeError` 的 `toml.DecodeError` 分支（`internal/config/parse.go:104-108`，Detail 形如 `config.toml: line 2, col 8: expected character =`），再被 `describeReloadFailure:352` 的 `HasPrefix("config.toml:")` 归入 **`cause=invalid`**，那句中文逐字是「config.toml **语法没问题**，但内容被校验拒绝」。**而这四发的文件毛病正是语法错** ⇒ 两句话说反。
+   ⇒ 真正决定句子归谁的是"读出的版本等不等于 2 ＋ go-toml 抛哪一种错误对象"，不是自述的那条。既有断言 `migrate_test.go:123` 未放宽、仍绿（本腿没碰它）。
+2. **【推翻·轻】"AC#5 由编排者代跑补齐"这一节标题为过**。带 `-v` 的终态多一枚红＝`TestTicket223RestartTierSaysItWillNotApply`（本票自己 AC#7 的用例），安静单跑 5 发 **4 PASS／1 FAIL**。所以那一格**没有被补齐成"终态干净"**，只补到"红名册完整"。尺与逐名见 AC#5 一节（`full-v.txt`／`restart-tier-recheck.txt`）。
+3. **【推翻·轻】实现腿 AC#6 一节的证据口径含糊**：它在同一节里把 `TestCheckAndReloadAsksOncePerFileChange` 与两枚"Config() 仍可读"用例并排写，读起来像它也证了锁外。**突变实测＝锁内形状下它仍 PASS（0.02s）** ⇒ 这枚用例只钉 `reloadMu` 序列化，**对"锁内/锁外"零敏感，不许充当 AC#6 的证据**（原始件 `ac6-mutation-lock-inside.txt` 第 11 行）。
+4. **【推翻·轻·数字自述错】**：①`cmd/wisp/config_reload.go` 自述"新建 376 行"⇒ 现读 **365 行**（`ec7a034d` 时 348、`248095d1` ＋19）；②`cmd/wisp/config_reload_223_test.go` 自述"7 例＋4 子例"⇒ 现读 **8 枚顶层用例＋4 枚子例**（`grep -c "^func Test"`）。都不影响判据，但会让人数错分母。
+5. **【推翻·中·落在票 226 的前提】**：`cmd/wisp/always_write_no_clobber_226_test.go:43-44` 那句「while the process is running and **nothing polls**」自 `248095d1` 起为假，且该用例 `:102` 的断言方向与 D36 热档相反（详见跨票一节，实测 3/3 PASS 但三发都跑不满 1s 的 tick）。**这不是 223 的代码错，是 223 让 226 的一句前提过期**。
+6. **【编排者自己的一条·单列】代跑 AC#5 缺 `-v` 的处理意见**：他那发不是错在"跑了"，是错在**把单发当终态**并写进格标题；他自己具名承认缺 `-v`（`223-...-r1.md:103`）这一点本腿**复认其诚实**。处置建议：①把那一节标题改成"对照读数（无 -v、单发、非终态）"；②终态以本腿 `full-v.txt` 为准；③今后"代跑读数"不作为可复用先例（代落码可以，代跑不行）。
+7. **【未复现·具名，不算推翻】**：实现腿的突变 **m1（`mutation-m1-gut-wiring.txt`）与 m2（`mutation-m2-no-confirm-hook.txt`）本腿没有复跑**（时间预算＋两枚突变不得并发）。本腿只对 AC#1／AC#3 给出**独立论证**（用例既不赋钩子也不自调 `CheckAndReload`，见 AC#1／AC#3 的尺）与**另一发专属突变**（AC#6 锁内那发）。所以"AC#7 拿掉接线会红"这一条我**只有 m1 的二手读数**，本腿标"未复现"。
+8. **【编造检查·零命中】**：实现腿表里所有"已接／已建"的对象我都能在盘上找到——`cmd/wisp/config_reload.go`（365 行）、`run.go:266-273/:620/:699-704`、`internal/config/manager_223_test.go`（181 行 2 例）、`cmd/wisp/config_reload_223_test.go`（572 行 8＋4）、`cmd/wisp/config_reload_perm_223_windows_test.go`（152 行 1 例）、`panel_inbound.go:211` 的第四句出口，全部现读齐；`grep -rn applyLocked --include=*.go`（产码）零命中＝旧形状确实被删。**没有发现任何一句"已修"在盘上无对应物。**
 
 ## 票面写的 vs 我读到的（不一致单列）
 
-〔待填〕
+1. 票面／派单引的 `manager.go` 行号（`:113` `:124` `:138` `:140-141` `:240`）在本锚点全部已漂：现读 `CheckAndReload` 在 `:142`、`reloadMu` `:146`、`mu` `:155`、指纹判定 `:156-159`、`plan` `:169`、解锁 `:173`、裁决 `:178-190`、再锁 `:192-196`、钩子回调 `:201-203`。**旧的 `:240 锁内调钩子`那一形已不存在**。
+2. 实现腿自报的三枚生产点行号（`:150`／`:111`／`:112`）现读 **`:153`／`:114`／`:115`**——是它自己 15:05 之后又改过注释导致的漂移，不是编造。
+3. 票面 AC#2 的"三档＝立即／重启后／**下次会话**"：现读 `internal/config/schema.go:33-44` 仍只有 `TierHot`／`TierReload`／`TierRestart`，且 `grep -rniE "next.?session|下次会话"`（排 `_test.go`）**零命中** ⇒ **没人造出第四档**（这条实现腿已顶回、编排者已复认，本腿只复核"没人偷偷加档"）。
+4. 派单猜"AC#6 突变对象大概率在两枚 `*_223_test.go`"⇒ **实测结论相反**：改测试证不了这件事，唯一的反事实是产码 `internal/config/manager.go`。本腿按后者执行并拿到两枚红。
+5. 派单说"票 226 §8.2／§⑥ 第 8 条"——现读那份表的相关文字在 `226-config-write-no-clobber-v2.md:170`（§⑥ 条 8），**内容一致**，只是编号在表里是"⑥"不是"8.2"。
 
 ## 没做完／判不了（具名清单）
 
-〔待填〕
+1. **AC#5 的"逐名比绿"我这发只做了"红名册＋总 PASS 计数"**：1158 顶层 PASS／565 子测试 PASS／7 SKIP 的**逐名清单**在 `full-v.txt` 里可查，但我**没有把它和票 223 起手名册逐枚对拉**（那需要第二枚腿或仪器）。⇒ 若下一位要"绿册逐名比对"，缺的是**起手绿册的分母件**（`.scratch/wisp/probes/223/r1-start-green-roster.txt` 已在仓里、未提交，本腿读了它的存在但没据它下结论）。
+2. **m1／m2 两发突变本腿未复跑**（见推翻清单第 7 条）。判不了的原因＝时间预算＋两枚突变腿不得并发；不缺其他信息。
+3. **`reload` 档（`OnReload`）在 `wisp run` 里仍无生产赋值点**——现跑尺只有 `cmd/balldebug/main.go:244`。这一格我**判不了"该不该由 223 闭合"**：票面七格没要求它，实现腿自己列进"没做完"第 3 条，而种一发真·语音管线手改需要可加载的模型管线键（S4/S5 地界）。⇒ **缺的是"这一格归哪张票"的人工定案，不是读数**。本腿不自填。
+4. **批准的 `[fs]` 放宽不改变本次运行的 C26 路径判定**（实现腿"没做完"第 4 条）：现读 `run.go` 里 canonicalizer 仍在装配期构造一次、无中途重置 ⇒ **这条本腿复认为"仍在"**，它要不要成为一张票＝待人拍板（`AGENTS.md` §2 未定义即停）。
+5. **那圈 tick 没被 join**（AC#1 的注）：账在册（台账 `pending-and-issues.md:9366`，派给票 228 AC#4），但**票 228 的票面现在只写了 1 枚实例（`replyHandle`）**。⇒ 需编排者把 228 的那格分母从 1 改 2，本腿不动票面。
+6. **票 226 那枚跨票时间炸弹的落点**：本腿建议 227 AC#3 矩阵加一格，但**我不改任何票面**（改票面＝契约级动作）。
+7. **`internal/panel` 4 枚＋`internal/ball` 1 枚历史红**：本腿**未读 `frontend/**`／`design/**` 一字**（零读零引零转述），也不修。（注：`d22scan` 自己会扫 `design/` 与 `frontend/` 并打印**被扫文件数**——那是仪器的射程，不是本腿读了它们；本表只转引它的计数 39／85 枚 text files，不转引任何内容。）
 
-## 门禁与尺：时刻表
+## 门禁与尺：时刻表（本腿现跑）
 
-〔待填〕
+| 时刻(+0800，`date` 现读) | 命令 | 落盘 | 结果 |
+|---|---|---|---|
+| 15:44:04 | `git rev-parse --short HEAD`／`git status`／`ps -W` | 本表起手节 | 锚点 `577ae8c7`，索引空，无 `go test` 在飞 |
+| 15:44:25 | Write 骨架 | `docs/evidence/s1/223-hot-reload-wiring-v1.md` | — |
+| 15:4x | `git commit -F … -- <两枚 pathspec>` | 同上 | `4fc03f21` |
+| 15:46:22→15:48:28 | **`go test ./cmd/wisp ./internal/... -count=1 -v -timeout 30m`**（先 export PATH） | `full-v.txt`（7057 行／841,116 字节） | 22 ok／4 FAIL；7 枚红名；`GATE_EXIT=1` |
+| 15:50:33→15:50:45 | `go test ./cmd/wisp -count=5 -v -run TestTicket223RestartTierSaysItWillNotApply` | `restart-tier-recheck.txt` | **4 PASS／1 FAIL**（＝非争用） |
+| 15:52:20→15:52:25 | `go test ./internal/risk -count=3 -v -run TestResolvePerCallBudget` | `budget-recheck.txt` | 3/3 PASS，`ok 3.839s` |
+| 15:54:12→15:54:17 | `go test -overlay … ./internal/config -run TestV1ProbeLoaderClassification` ＋ `./cmd/wisp -run TestV1ProbeProductionSentence` | `ac4-probe.txt` | 17 发逐名读数，两发 `EXIT=0` |
+| 15:58:48→15:59:41 | **AC#6 突变**：`go test ./internal/config -count=1 -v -timeout 3m -run 'TestConfirmLockedRunsOutsideTheManagerLock|TestCheckAndReloadAsksOncePerFileChange'` ＋ `go test ./cmd/wisp -count=1 -v -timeout 4m -run TestTicket223HandEditedFsLooseningCostsAnL2Card` | `ac6-mutation-lock-inside.txt` | **FAIL 6.02s／FAIL 41.12s**；第三枚 PASS |
+| 15:59:5x | `git cat-file blob HEAD:internal/config/manager.go > …` ＋ `certutil -hashfile … SHA256` | 本表 AC#6 节 | 还原后哈希＝基线 `32dd1989…dc34`，**逐字相同** |
+| 16:03:17→16:03:22 | `go test ./cmd/wisp -count=3 -v -run TestAC1AlwaysBranchDoesNotRevertAHandEditedKey` | `cross-226-tick-claims-handedit.txt` | 3/3 PASS，耗时 1.11／0.91／0.93s ⇒ 时序过关 |
+| 16:04:35→16:04:53 | `go build ./...` ＋ `sh scripts/d22scan.sh` ＋ `go vet ./cmd/wisp ./internal/config` | `gates-post-restore.txt` | 三个 `EXIT=0`；d22scan「clean - no D22 ban violations」，口径：bans #1-5 扫 248 枚生产 Go 件（internal/ 219＋cmd/ 29），ban #8 扫 460＋62 枚含注释与 `_test.go` |
+| 收工 | `git diff --stat -- internal/config cmd/wisp` | 本表 | **空**（本腿零源码改动、零 commit 产码、未 push） |
+
+## 交回编排者的六节（大白话；面向不看技术的 owner）
+
+**① 七格各自成立／不成立／带注**
+线接通了：现在真的有一个每秒醒一次的检查员在重读配置文件（AC#1 成立）。改完不用重启就生效这件事看得见摸得着了，但三种"生效级别"里第三种（重载档）仍然没人接线（AC#2 成立但带注）。把范围放宽时确实会先弹一张"要不要允许"的卡片、不点就保持旧的严格值；把范围收紧时不会骚扰你（AC#3 成立）。"读不到"和"没生效"分成四句不同的话说了，但有一种坏文件会被说成"你语法没问题"——那是假的（AC#4 成立但带注）。整体测试到终态：**这一格不成立**，因为本票自己的一个测试用例自己不稳定（AC#5 不成立）。裁决不再把整个配置层冻住，而且**今天终于有一发专门打它的突变把它打红了**（AC#6 成立）。"重启后才生效"的那一档现在有话说清了（AC#7 成立但带注——红的那枚用例就是它）。
+
+**② 任务一：带 `-v` 的那一发**
+15:46:22 起跑、15:48:28 收，原始输出 7,057 行、841KB 全量落盘（`full-v.txt`），没有任何截断。26 个包里 **22 绿 4 红**；红名单**按用例名**共 7 枚：5 枚是别人地界的老红（球 1＋面板 4），1 枚是"预算计时"用例（安静复跑 3 次全绿，确认是被别人抢了机器），**第 7 枚是本票自己的 `TestTicket223RestartTierSaysItWillNotApply`**——我把它单独拎出来安静跑了 5 次，**4 次过一次红**，所以它不是抢机器，是它自己写错了等法（等的是后台账本，读的却是屏幕那行字，两者中间有一瞬间的缝隙）。编排者那一发（23 绿 3 红共 6 枚）在他自己那一刻没毛病，但**不能当终态**——他少了 `-v`，也就少了这枚红。
+
+**③ 任务二：那发突变红了几枚、例名逐枚**
+我把"要不要放宽"的裁决**搬回到锁里面**（就是这张票要修的那个老形状），跑两枚相关包，红了两枚：
+- `internal/config/TestConfirmLockedRunsOutsideTheManagerLock`（FAIL 6.02 秒，报的话逐字就是"钩子还在锁里跑"）；
+- `cmd/wisp/TestTicket223HandEditedFsLooseningCostsAnL2Card`（FAIL 41.12 秒，卡片根本弹不出来，因为负责弹卡的代码在锁里回头找锁，自己把自己吊死了）。
+同发的第三枚 `TestCheckAndReloadAsksOncePerFileChange` **仍然绿**，所以我具名把它从 AC#6 的证据里除名——它只管"别弹两张卡"，不管锁。改完按协议用 `git cat-file` 还原，改前改后两个 SHA256 逐字相同，`git diff` 空，没收工时的源码改动。
+
+**④ 推翻清单**（详见同名一节，8 条）
+最硬的一条：实现腿说"只要读得出版本号，就交给迁移管线说话"——实测 17 发坏文件里只有 1 发真是这样，另有 4 发被归成"语法没问题、是内容不合法"，而那 4 发的毛病恰恰就是语法。第二条：编排者那一发被写成"AC#5 补齐了"，其实没补齐。第三条：实现腿把一枚不相关的用例摆进了"锁外"证据里，突变证明它对锁无感。第四、五条是数字与行号过期（365 行不是 376 行；8 枚不是 7 枚；`cmd/wisp` 那三个行号各漂 3 行）。**编排者自己那一条单独列**：代跑 AC#5 少 `-v`，问题不在"跑了"而在"把单发当终态"；建议把那节标题降格为"对照读数"，以后**代落可以、代跑不算先例**。
+
+**⑤ 该不该翻勾／该不该 `-done`**
+**我的判语不自动等于翻勾**（翻勾由你做）。按字面判据：**AC#1／AC#3／AC#6／AC#7 成立**（AC#7 带注）、**AC#2／AC#4 成立但带注**、**AC#5 不成立**——票面 AC#5 写的是"到终态＋逐名比红名集合"，而本票自己的用例在终态里红，且它红得**可复现（5 发 1 红）**。**所以这一票不该翻 `-done`**：缺的不是实现，是①把那枚用例的读序改成轮询（一行改动，属实现腿的活，不属于我）＋②给 AC#4 那句会说反的句子补一发（或另立票）。另附两笔不属于 223 但被 223 冲出来的账：226 那枚用例的前提"没人轮询"已过期（现在只是靠"跑不满一秒"侥幸过关），228 那格"没 join 的协程"分母要从 1 变 2。
+
+**⑥ 我没做完／判不了的**
+m1／m2 两发突变我没复跑（时间预算＋突变不得并发）；起手绿册的逐名对拉我没做（缺分母件的口径确认）；`OnReload` 那一档该不该由 223 闭合我判不了（缺的是归属定案，不是读数）；批准的 `[fs]` 放宽要不要中途改变路径判定，我复认为"仍未做"，但要不要立项＝待人拍板。**涉及安全／攻击字样的三行定性**（用于跨票那一节与 AC#6 那一节）：①现象出现在本机 `wisp run` 这一个进程读配置文件的时序里，以及测试用例的断言写法里；②没有任何本机被入侵的证据——没有外部代码、没有网络输入、没有权限变化；③最坏后果的形状是"一条绿用例其实在靠时序过关"和"一句会说过头的中文提示"，**不是**放宽任何权限、**不是**绕过任何一张卡。
