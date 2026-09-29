@@ -28,11 +28,34 @@
 
 ### M-1 ticket 92 `:68` — AC#5 direction (iii), verifier marked [self-report only]
 
-- UNJUDGED
+- VERDICT: PASS (has a reading now, no longer self-report only). Upgraded from [self-report only].
+- Criterion (ticket 92 `:68`, read this leg): "(iii) 把 reparse 那次的拒绝改成放行 ⇒ **既有**安全用例红（不是本票新写的）" and "编译失败不算变异".
+- Anchor read this leg: `internal/winsec/placement_windows.go:59-69` — the walk over `pathPieces(path)` whose refusal is at `:65-68`
+  (`if isReparsePoint(prefix) { return "", fmt.Errorf("%w: %s traverses a reparse point at %s ...") }`). The file's own doc comment `:23-25` names this the junction case.
+- Mutation: `if isReparsePoint(prefix) {` -> `if false && isReparsePoint(prefix) {` (refusal becomes pass-through; the predicate is still called, so nothing fails to compile).
+  Landing proof (`mutate.py` stdout, `m1-*`): needle hits in orig = 1, in mutant = 0, repl hits in mutant = 1, line count unchanged 71 -> 71. `go build -overlay m1-overlay.json ./internal/winsec/` rc=0, so this is a mutation and not a compile failure.
+- Instrument: `go test -overlay .scratch/wisp/probes/gate-rerun-1/m1-overlay.json ./internal/winsec/ ./internal/risk/ -count=1 -v -p 1` -> rc=1, `FAIL\t...internal/winsec 8.782s`, `internal/risk` still ok. Zero `0xc0000135` hits in the log (checked, so the red is a real assertion and not a load failure).
+- RED roster (7 entries = 2 top-level + 5 subtests), file `m1-red-names.txt`:
+  `TestAC3JunctionInputIsRefusedNotSealed` (+ subtest `/with_only_the_built-in_verifier`),
+  `TestAC3PlacementFloorHoldsForEverySeparatorSpelling` (+ `/all-forward-slash` `/mixed-separators` `/native-backslash` `/trailing-separator`).
+- THE PART THE CRITERION ACTUALLY TURNS ON ("not written by this ticket"): both carriers are **pre-existing** cases —
+  `internal/winsec/resolve_windows_test.go:61 TestAC3JunctionInputIsRefusedNotSealed` and `placement_symlink_113_other_test.go`-family spelling coverage —
+  neither is in ticket 92's own new files. So direction (iii) holds on current HEAD.
+- Restore proof: overlay never writes the worktree; `git status --porcelain -- internal/ cmd/wisp` = **empty** (printed in the same run).
+  Re-ran the 7 red names with no overlay -> `m1-restored-green.txt`: rc=0, `ok`, PASS=13 FAIL=0, and all 7 names are green in the AC#1 baseline roster too.
+- What is still not covered by this cell: (i) and (ii) of the same AC#5 were judged by the acceptance table itself and stay as they were; this leg only supplies (iii). `R-92b-4` is carried under G-1.
 
 ### M-2 ticket 104 `:52` — AC#3 both directions
 
-- UNJUDGED
+- VERDICT: PASS on all three legs (criterion says "双向变异" and lists three legs ①②③; all three were re-run).
+- Criterion (ticket 104 `:52-55`, read this leg): ① detection back to "explicit ACE only" ⇒ AC#1 red; ② private set judged by **name string** instead of **SID** ⇒ some case red; ③ WARN "every time" ⇒ AC#2 red. Plus "`go build` rc=0 先量到（编译失败不算变异）".
+- Anchor read this leg: `internal/winsec/winsec_windows.go:164-198 foreignPrincipals` (buckets at `:191-195`, SID skip at `:174`) and `:311-318` (the `noticeNarrowed` call guarded by `len(explicit) > 0 || len(inherited) > 0`). Doc `:163` states "Judgment is by SID throughout".
+- Three mutations, all via `-overlay`, worktree never written. Landing proof in each: needle hits 1 -> 0, repl hits 1, 716 lines -> 716.
+  - ① `if ace.inherited {` -> `if false && ace.inherited {` at `winsec_windows.go:191`. `go build` rc=0. `go test -overlay ... ./internal/winsec/ -count=1 -v -p 1` rc=1 -> **4 top-level reds**: `TestAC1SealFileReportsTheInheritedGrantItCleared`, `TestAC1DefaultLogSaysInherited` (both are AC#1's own carriers, exactly what leg ① demands), plus `TestAC118KindFieldSaysBoth...`, `TestAC118KindFieldSaysInherited...`.
+  - ② `if ace.grant && set[ace.trustee] {` -> `... set[ace.text] {` at `:174` (whitelist compared by the OS's name rendering instead of the SID). `go build` rc=0 -> rc=1, **10 top-level reds** incl. `TestSealNarrowsAndNamesThePrincipalItRemovedBySID`, `TestAC3OwnGrantsStaySilentWhicheverWayTheOSNamesThem`, `TestSealReportsThePrincipalsItCleared`, `TestNoticeAttributionKeepsTwoTreesApart` (`m2b-red-names.txt`). Leg ② is the "silently fails on a localized machine" guard and it does bite.
+  - ③ `if beforeErr == nil && (len(explicit) > 0 || len(inherited) > 0) {` -> `if beforeErr == nil {` at `:311` (report on every seal). `go build` rc=0 -> rc=1, **4 top-level reds**: `TestAC2InheritedNoticeHasANoiseBound` (AC#2's carrier, as the leg demands), `TestAC3OwnGrantsStaySilentWhicheverWayTheOSNamesThem`, `TestSealReportsThePrincipalsItCleared`, `TestNoticeAttributionKeepsTwoTreesApart`.
+- Restore proof: `git status --porcelain -- internal/ cmd/wisp` = empty after each leg; the union of all red names re-run without overlay -> `m2-restored-green.txt` rc=0, `ok`, PASS=14 FAIL=0.
+- Reading files: `m2a-red.txt` `m2b-red.txt` `m2c-red.txt` + the three `*-red-names.txt` + `m2-restored-green.txt`, all in this directory.
 
 ### M-3 ticket 110 `:39` — AC#3 the new step must go red by itself
 

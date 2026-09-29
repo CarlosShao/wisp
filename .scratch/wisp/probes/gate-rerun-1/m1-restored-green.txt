@@ -1,0 +1,303 @@
+time=2026-09-29T18:37:04.556+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC3JunctionInputIsRefusedNotSealed
+    resolve_windows_test.go:75: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3JunctionInputIsRefusedNotSealed1139167420\\001\\someone-elses-tree\\artifacts"
+        C:\Users\swq\AppData\Local\Temp\TestAC3JunctionInputIsRefusedNotSealed1139167420\001\someone-elses-tree\artifacts Everyone:(I)(OI)(CI)(RX)
+                                                                                                                          BUILTIN\Administrators:(I)(OI)(CI)(F)
+                                                                                                                          NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+                                                                                                                          DESKTOP-LVS7839\swq:(I)(OI)(CI)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    resolve_windows_test.go:79: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3JunctionInputIsRefusedNotSealed1139167420\\001\\someone-elses-tree"
+        C:\Users\swq\AppData\Local\Temp\TestAC3JunctionInputIsRefusedNotSealed1139167420\001\someone-elses-tree Everyone:(OI)(CI)(RX)
+                                                                                                                BUILTIN\Administrators:(OI)(CI)(F)
+                                                                                                                NT AUTHORITY\SYSTEM:(OI)(CI)(F)
+                                                                                                                DESKTOP-LVS7839\swq:(OI)(CI)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    resolve_windows_test.go:86: junction built: C:\Users\swq\AppData\Local\Temp\TestAC3JunctionInputIsRefusedNotSealed1139167420\002\data\link -> C:\Users\swq\AppData\Local\Temp\TestAC3JunctionInputIsRefusedNotSealed1139167420\001\someone-elses-tree
+=== RUN   TestAC3JunctionInputIsRefusedNotSealed/existing_directory_behind_the_link
+    resolve_windows_test.go:92: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3JunctionInputIsRefusedNotSealed1139167420\\001\\someone-elses-tree\\artifacts"
+        C:\Users\swq\AppData\Local\Temp\TestAC3JunctionInputIsRefusedNotSealed1139167420\001\someone-elses-tree\artifacts Everyone:(I)(OI)(CI)(RX)
+                                                                                                                          BUILTIN\Administrators:(I)(OI)(CI)(F)
+                                                                                                                          NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+                                                                                                                          DESKTOP-LVS7839\swq:(I)(OI)(CI)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    resolve_windows_test.go:92: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3JunctionInputIsRefusedNotSealed1139167420\\001\\someone-elses-tree"
+        C:\Users\swq\AppData\Local\Temp\TestAC3JunctionInputIsRefusedNotSealed1139167420\001\someone-elses-tree Everyone:(OI)(CI)(RX)
+                                                                                                                BUILTIN\Administrators:(OI)(CI)(F)
+                                                                                                                NT AUTHORITY\SYSTEM:(OI)(CI)(F)
+                                                                                                                DESKTOP-LVS7839\swq:(OI)(CI)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+=== RUN   TestAC3JunctionInputIsRefusedNotSealed/missing_directory_under_the_link
+=== RUN   TestAC3JunctionInputIsRefusedNotSealed/with_only_the_built-in_verifier
+    resolve_windows_test.go:119: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3JunctionInputIsRefusedNotSealed1139167420\\001\\someone-elses-tree\\artifacts"
+        C:\Users\swq\AppData\Local\Temp\TestAC3JunctionInputIsRefusedNotSealed1139167420\001\someone-elses-tree\artifacts Everyone:(I)(OI)(CI)(RX)
+                                                                                                                          BUILTIN\Administrators:(I)(OI)(CI)(F)
+                                                                                                                          NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+                                                                                                                          DESKTOP-LVS7839\swq:(I)(OI)(CI)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    resolve_windows_test.go:119: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3JunctionInputIsRefusedNotSealed1139167420\\001\\someone-elses-tree"
+        C:\Users\swq\AppData\Local\Temp\TestAC3JunctionInputIsRefusedNotSealed1139167420\001\someone-elses-tree Everyone:(OI)(CI)(RX)
+                                                                                                                BUILTIN\Administrators:(OI)(CI)(F)
+                                                                                                                NT AUTHORITY\SYSTEM:(OI)(CI)(F)
+                                                                                                                DESKTOP-LVS7839\swq:(OI)(CI)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+time=2026-09-29T18:37:05.932+08:00 level=WARN msg="winsec: seal cleared principals that stood on this object" path=C:\Users\swq\AppData\Local\Temp\TestAC3JunctionInputIsRefusedNotSealed1139167420\001\someone-elses-tree\artifacts kind=inherited cleared="" cleared_inherited=S-1-1-0(A;OICIID;0x1200a9;;;WD) policy="winsec owns the grants on this tree; out-of-band ACEs are removed at the next seal"
+=== NAME  TestAC3JunctionInputIsRefusedNotSealed
+    resolve_windows_test.go:132: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3JunctionInputIsRefusedNotSealed1139167420\\001\\someone-elses-tree\\artifacts"
+        C:\Users\swq\AppData\Local\Temp\TestAC3JunctionInputIsRefusedNotSealed1139167420\001\someone-elses-tree\artifacts NT AUTHORITY\SYSTEM:(F)
+                                                                                                                          NT AUTHORITY\SYSTEM:(OI)(CI)(IO)(F)
+                                                                                                                          BUILTIN\Administrators:(F)
+                                                                                                                          BUILTIN\Administrators:(OI)(CI)(IO)(F)
+                                                                                                                          DESKTOP-LVS7839\swq:(F)
+                                                                                                                          DESKTOP-LVS7839\swq:(OI)(CI)(IO)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+--- PASS: TestAC3JunctionInputIsRefusedNotSealed (1.39s)
+    --- PASS: TestAC3JunctionInputIsRefusedNotSealed/existing_directory_behind_the_link (0.04s)
+    --- PASS: TestAC3JunctionInputIsRefusedNotSealed/missing_directory_under_the_link (0.00s)
+    --- PASS: TestAC3JunctionInputIsRefusedNotSealed/with_only_the_built-in_verifier (0.04s)
+=== RUN   TestAC3PlacementFloorHoldsForEverySeparatorSpelling
+=== RUN   TestAC3PlacementFloorHoldsForEverySeparatorSpelling/native-backslash
+    seam_bypass_108_windows_test.go:247: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingnative-backs2092997133\\001\\victim"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingnative-backs2092997133\001\victim Everyone:(OI)(CI)(RX)
+                                                                                                                             BUILTIN\Administrators:(OI)(CI)(F)
+                                                                                                                             NT AUTHORITY\SYSTEM:(OI)(CI)(F)
+                                                                                                                             DESKTOP-LVS7839\swq:(OI)(CI)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:247: victim DACL before: sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+    seam_bypass_108_windows_test.go:256: fixture: own=C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingnative-backs2092997133\002\data seam=<floor>
+    seam_bypass_108_windows_test.go:257: mklink /J link -> victim: Junction created for C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingnative-backs2092997133\002\data\link <<===>> C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingnative-backs2092997133\001\victim
+    seam_bypass_108_windows_test.go:257: junction in place: C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingnative-backs2092997133\002\data\link (attributes 0x410)
+    seam_bypass_108_windows_test.go:260: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingnative-backs2092997133\\002\\data\\link\\sub\\keep-me.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingnative-backs2092997133\002\data\link\sub\keep-me.txt Everyone:(I)(RX)
+                                                                                                                                                BUILTIN\Administrators:(I)(F)
+                                                                                                                                                NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                                                                DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:261: spelling "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingnative-backs2092997133\\002\\data\\link\\sub\\keep-me.txt": foreign DACL before sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+    seam_bypass_108_windows_test.go:272: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingnative-backs2092997133\\002\\data\\link\\sub\\keep-me.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingnative-backs2092997133\002\data\link\sub\keep-me.txt Everyone:(I)(RX)
+                                                                                                                                                BUILTIN\Administrators:(I)(F)
+                                                                                                                                                NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                                                                DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:273: spelling "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingnative-backs2092997133\\002\\data\\link\\sub\\keep-me.txt": foreign DACL after  sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+=== RUN   TestAC3PlacementFloorHoldsForEverySeparatorSpelling/all-forward-slash
+    seam_bypass_108_windows_test.go:247: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingall-forward-2705927669\\001\\victim"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingall-forward-2705927669\001\victim Everyone:(OI)(CI)(RX)
+                                                                                                                             BUILTIN\Administrators:(OI)(CI)(F)
+                                                                                                                             NT AUTHORITY\SYSTEM:(OI)(CI)(F)
+                                                                                                                             DESKTOP-LVS7839\swq:(OI)(CI)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:247: victim DACL before: sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+    seam_bypass_108_windows_test.go:256: fixture: own=C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingall-forward-2705927669\002\data seam=<floor>
+    seam_bypass_108_windows_test.go:257: mklink /J link -> victim: Junction created for C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingall-forward-2705927669\002\data\link <<===>> C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingall-forward-2705927669\001\victim
+    seam_bypass_108_windows_test.go:257: junction in place: C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingall-forward-2705927669\002\data\link (attributes 0x410)
+    seam_bypass_108_windows_test.go:260: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingall-forward-2705927669\\002\\data\\link\\sub\\keep-me.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingall-forward-2705927669\002\data\link\sub\keep-me.txt Everyone:(I)(RX)
+                                                                                                                                                BUILTIN\Administrators:(I)(F)
+                                                                                                                                                NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                                                                DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:261: spelling "C:/Users/swq/AppData/Local/Temp/TestAC3PlacementFloorHoldsForEverySeparatorSpellingall-forward-2705927669/002/data/link/sub/keep-me.txt": foreign DACL before sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+    seam_bypass_108_windows_test.go:272: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingall-forward-2705927669\\002\\data\\link\\sub\\keep-me.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingall-forward-2705927669\002\data\link\sub\keep-me.txt Everyone:(I)(RX)
+                                                                                                                                                BUILTIN\Administrators:(I)(F)
+                                                                                                                                                NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                                                                DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:273: spelling "C:/Users/swq/AppData/Local/Temp/TestAC3PlacementFloorHoldsForEverySeparatorSpellingall-forward-2705927669/002/data/link/sub/keep-me.txt": foreign DACL after  sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+=== RUN   TestAC3PlacementFloorHoldsForEverySeparatorSpelling/mixed-separators
+    seam_bypass_108_windows_test.go:247: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingmixed-separa2073169465\\001\\victim"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingmixed-separa2073169465\001\victim Everyone:(OI)(CI)(RX)
+                                                                                                                             BUILTIN\Administrators:(OI)(CI)(F)
+                                                                                                                             NT AUTHORITY\SYSTEM:(OI)(CI)(F)
+                                                                                                                             DESKTOP-LVS7839\swq:(OI)(CI)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:247: victim DACL before: sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+    seam_bypass_108_windows_test.go:256: fixture: own=C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingmixed-separa2073169465\002\data seam=<floor>
+    seam_bypass_108_windows_test.go:257: mklink /J link -> victim: Junction created for C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingmixed-separa2073169465\002\data\link <<===>> C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingmixed-separa2073169465\001\victim
+    seam_bypass_108_windows_test.go:257: junction in place: C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingmixed-separa2073169465\002\data\link (attributes 0x410)
+    seam_bypass_108_windows_test.go:260: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingmixed-separa2073169465\\002\\data\\link\\sub\\keep-me.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingmixed-separa2073169465\002\data\link\sub\keep-me.txt Everyone:(I)(RX)
+                                                                                                                                                BUILTIN\Administrators:(I)(F)
+                                                                                                                                                NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                                                                DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:261: spelling "C:/Users/swq/AppData/Local/Temp/TestAC3PlacementFloorHoldsForEverySeparatorSpellingmixed-separa2073169465/002/data\\link/sub/keep-me.txt": foreign DACL before sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+    seam_bypass_108_windows_test.go:272: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingmixed-separa2073169465\\002\\data\\link\\sub\\keep-me.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingmixed-separa2073169465\002\data\link\sub\keep-me.txt Everyone:(I)(RX)
+                                                                                                                                                BUILTIN\Administrators:(I)(F)
+                                                                                                                                                NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                                                                DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:273: spelling "C:/Users/swq/AppData/Local/Temp/TestAC3PlacementFloorHoldsForEverySeparatorSpellingmixed-separa2073169465/002/data\\link/sub/keep-me.txt": foreign DACL after  sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+=== RUN   TestAC3PlacementFloorHoldsForEverySeparatorSpelling/trailing-separator
+    seam_bypass_108_windows_test.go:247: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingtrailing-sep3334753038\\001\\victim"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingtrailing-sep3334753038\001\victim Everyone:(OI)(CI)(RX)
+                                                                                                                             BUILTIN\Administrators:(OI)(CI)(F)
+                                                                                                                             NT AUTHORITY\SYSTEM:(OI)(CI)(F)
+                                                                                                                             DESKTOP-LVS7839\swq:(OI)(CI)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:247: victim DACL before: sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+    seam_bypass_108_windows_test.go:256: fixture: own=C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingtrailing-sep3334753038\002\data seam=<floor>
+    seam_bypass_108_windows_test.go:257: mklink /J link -> victim: Junction created for C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingtrailing-sep3334753038\002\data\link <<===>> C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingtrailing-sep3334753038\001\victim
+    seam_bypass_108_windows_test.go:257: junction in place: C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingtrailing-sep3334753038\002\data\link (attributes 0x410)
+    seam_bypass_108_windows_test.go:260: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingtrailing-sep3334753038\\002\\data\\link\\sub\\keep-me.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingtrailing-sep3334753038\002\data\link\sub\keep-me.txt Everyone:(I)(RX)
+                                                                                                                                                BUILTIN\Administrators:(I)(F)
+                                                                                                                                                NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                                                                DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:261: spelling "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingtrailing-sep3334753038\\002\\data\\link\\sub\\keep-me.txt/": foreign DACL before sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+    seam_bypass_108_windows_test.go:272: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingtrailing-sep3334753038\\002\\data\\link\\sub\\keep-me.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingtrailing-sep3334753038\002\data\link\sub\keep-me.txt Everyone:(I)(RX)
+                                                                                                                                                BUILTIN\Administrators:(I)(F)
+                                                                                                                                                NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                                                                DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:273: spelling "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingtrailing-sep3334753038\\002\\data\\link\\sub\\keep-me.txt/": foreign DACL after  sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+=== RUN   TestAC3PlacementFloorHoldsForEverySeparatorSpelling/doubled-separator
+    seam_bypass_108_windows_test.go:247: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdoubled-sepa3900234337\\001\\victim"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdoubled-sepa3900234337\001\victim Everyone:(OI)(CI)(RX)
+                                                                                                                             BUILTIN\Administrators:(OI)(CI)(F)
+                                                                                                                             NT AUTHORITY\SYSTEM:(OI)(CI)(F)
+                                                                                                                             DESKTOP-LVS7839\swq:(OI)(CI)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:247: victim DACL before: sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+    seam_bypass_108_windows_test.go:256: fixture: own=C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdoubled-sepa3900234337\002\data seam=<floor>
+    seam_bypass_108_windows_test.go:257: mklink /J link -> victim: Junction created for C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdoubled-sepa3900234337\002\data\link <<===>> C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdoubled-sepa3900234337\001\victim
+    seam_bypass_108_windows_test.go:257: junction in place: C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdoubled-sepa3900234337\002\data\link (attributes 0x410)
+    seam_bypass_108_windows_test.go:260: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdoubled-sepa3900234337\\002\\data\\link\\sub\\keep-me.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdoubled-sepa3900234337\002\data\link\sub\keep-me.txt Everyone:(I)(RX)
+                                                                                                                                                BUILTIN\Administrators:(I)(F)
+                                                                                                                                                NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                                                                DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:261: spelling "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdoubled-sepa3900234337\\002\\data\\link//sub\\keep-me.txt": foreign DACL before sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+    seam_bypass_108_windows_test.go:272: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdoubled-sepa3900234337\\002\\data\\link\\sub\\keep-me.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdoubled-sepa3900234337\002\data\link\sub\keep-me.txt Everyone:(I)(RX)
+                                                                                                                                                BUILTIN\Administrators:(I)(F)
+                                                                                                                                                NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                                                                DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:273: spelling "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdoubled-sepa3900234337\\002\\data\\link//sub\\keep-me.txt": foreign DACL after  sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+=== RUN   TestAC3PlacementFloorHoldsForEverySeparatorSpelling/dot-segment
+    seam_bypass_108_windows_test.go:247: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdot-segment717805384\\001\\victim"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdot-segment717805384\001\victim Everyone:(OI)(CI)(RX)
+                                                                                                                           BUILTIN\Administrators:(OI)(CI)(F)
+                                                                                                                           NT AUTHORITY\SYSTEM:(OI)(CI)(F)
+                                                                                                                           DESKTOP-LVS7839\swq:(OI)(CI)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:247: victim DACL before: sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+    seam_bypass_108_windows_test.go:256: fixture: own=C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdot-segment717805384\002\data seam=<floor>
+    seam_bypass_108_windows_test.go:257: mklink /J link -> victim: Junction created for C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdot-segment717805384\002\data\link <<===>> C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdot-segment717805384\001\victim
+    seam_bypass_108_windows_test.go:257: junction in place: C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdot-segment717805384\002\data\link (attributes 0x410)
+    seam_bypass_108_windows_test.go:260: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdot-segment717805384\\002\\data\\link\\sub\\keep-me.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdot-segment717805384\002\data\link\sub\keep-me.txt Everyone:(I)(RX)
+                                                                                                                                              BUILTIN\Administrators:(I)(F)
+                                                                                                                                              NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                                                              DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:261: spelling "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdot-segment717805384\\002\\data\\link\\.\\sub\\keep-me.txt": foreign DACL before sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+    seam_bypass_108_windows_test.go:272: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdot-segment717805384\\002\\data\\link\\sub\\keep-me.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdot-segment717805384\002\data\link\sub\keep-me.txt Everyone:(I)(RX)
+                                                                                                                                              BUILTIN\Administrators:(I)(F)
+                                                                                                                                              NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                                                              DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:273: spelling "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingdot-segment717805384\\002\\data\\link\\.\\sub\\keep-me.txt": foreign DACL after  sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+=== RUN   TestAC3PlacementFloorHoldsForEverySeparatorSpelling/extended-length-prefix
+    seam_bypass_108_windows_test.go:247: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingextended-len3505163886\\001\\victim"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingextended-len3505163886\001\victim Everyone:(OI)(CI)(RX)
+                                                                                                                             BUILTIN\Administrators:(OI)(CI)(F)
+                                                                                                                             NT AUTHORITY\SYSTEM:(OI)(CI)(F)
+                                                                                                                             DESKTOP-LVS7839\swq:(OI)(CI)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:247: victim DACL before: sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+    seam_bypass_108_windows_test.go:256: fixture: own=C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingextended-len3505163886\002\data seam=<floor>
+    seam_bypass_108_windows_test.go:257: mklink /J link -> victim: Junction created for C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingextended-len3505163886\002\data\link <<===>> C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingextended-len3505163886\001\victim
+    seam_bypass_108_windows_test.go:257: junction in place: C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingextended-len3505163886\002\data\link (attributes 0x410)
+    seam_bypass_108_windows_test.go:260: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingextended-len3505163886\\002\\data\\link\\sub\\keep-me.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingextended-len3505163886\002\data\link\sub\keep-me.txt Everyone:(I)(RX)
+                                                                                                                                                BUILTIN\Administrators:(I)(F)
+                                                                                                                                                NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                                                                DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:261: spelling "\\\\?\\C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingextended-len3505163886\\002\\data\\link\\sub\\keep-me.txt": foreign DACL before sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+    seam_bypass_108_windows_test.go:272: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingextended-len3505163886\\002\\data\\link\\sub\\keep-me.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingextended-len3505163886\002\data\link\sub\keep-me.txt Everyone:(I)(RX)
+                                                                                                                                                BUILTIN\Administrators:(I)(F)
+                                                                                                                                                NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                                                                DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:273: spelling "\\\\?\\C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingextended-len3505163886\\002\\data\\link\\sub\\keep-me.txt": foreign DACL after  sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+=== RUN   TestAC3PlacementFloorHoldsForEverySeparatorSpelling/volume-only-relative-tail
+    seam_bypass_108_windows_test.go:247: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingvolume-only-3221630290\\001\\victim"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingvolume-only-3221630290\001\victim Everyone:(OI)(CI)(RX)
+                                                                                                                             BUILTIN\Administrators:(OI)(CI)(F)
+                                                                                                                             NT AUTHORITY\SYSTEM:(OI)(CI)(F)
+                                                                                                                             DESKTOP-LVS7839\swq:(OI)(CI)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:247: victim DACL before: sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+    seam_bypass_108_windows_test.go:256: fixture: own=C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingvolume-only-3221630290\002\data seam=<floor>
+    seam_bypass_108_windows_test.go:257: mklink /J link -> victim: Junction created for C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingvolume-only-3221630290\002\data\link <<===>> C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingvolume-only-3221630290\001\victim
+    seam_bypass_108_windows_test.go:257: junction in place: C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingvolume-only-3221630290\002\data\link (attributes 0x410)
+    seam_bypass_108_windows_test.go:260: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingvolume-only-3221630290\\002\\data\\link\\sub\\keep-me.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingvolume-only-3221630290\002\data\link\sub\keep-me.txt Everyone:(I)(RX)
+                                                                                                                                                BUILTIN\Administrators:(I)(F)
+                                                                                                                                                NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                                                                DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:261: spelling "data\\link/sub/keep-me.txt": foreign DACL before sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+    seam_bypass_108_windows_test.go:272: icacls "C:\\Users\\swq\\AppData\\Local\\Temp\\TestAC3PlacementFloorHoldsForEverySeparatorSpellingvolume-only-3221630290\\002\\data\\link\\sub\\keep-me.txt"
+        C:\Users\swq\AppData\Local\Temp\TestAC3PlacementFloorHoldsForEverySeparatorSpellingvolume-only-3221630290\002\data\link\sub\keep-me.txt Everyone:(I)(RX)
+                                                                                                                                                BUILTIN\Administrators:(I)(F)
+                                                                                                                                                NT AUTHORITY\SYSTEM:(I)(F)
+                                                                                                                                                DESKTOP-LVS7839\swq:(I)(F)
+        
+        Successfully processed 1 files; Failed processing 0 files
+    seam_bypass_108_windows_test.go:273: spelling "data\\link/sub/keep-me.txt": foreign DACL after  sids=[S-1-1-0 S-1-5-32-544 S-1-5-18 S-1-5-21-1228170099-895614386-1166154857-1001] names=[Everyone BUILTIN\Administrators NT AUTHORITY\SYSTEM DESKTOP-LVS7839\swq]
+--- PASS: TestAC3PlacementFloorHoldsForEverySeparatorSpelling (1.28s)
+    --- PASS: TestAC3PlacementFloorHoldsForEverySeparatorSpelling/native-backslash (0.16s)
+    --- PASS: TestAC3PlacementFloorHoldsForEverySeparatorSpelling/all-forward-slash (0.15s)
+    --- PASS: TestAC3PlacementFloorHoldsForEverySeparatorSpelling/mixed-separators (0.15s)
+    --- PASS: TestAC3PlacementFloorHoldsForEverySeparatorSpelling/trailing-separator (0.16s)
+    --- PASS: TestAC3PlacementFloorHoldsForEverySeparatorSpelling/doubled-separator (0.16s)
+    --- PASS: TestAC3PlacementFloorHoldsForEverySeparatorSpelling/dot-segment (0.16s)
+    --- PASS: TestAC3PlacementFloorHoldsForEverySeparatorSpelling/extended-length-prefix (0.18s)
+    --- PASS: TestAC3PlacementFloorHoldsForEverySeparatorSpelling/volume-only-relative-tail (0.16s)
+PASS
+ok  	github.com/CarlosShao/wisp/internal/winsec	2.706s
+time=2026-09-29T18:37:07.664+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+testing: warning: no tests to run
+PASS
+ok  	github.com/CarlosShao/wisp/internal/risk	0.032s [no tests to run]
