@@ -62,12 +62,11 @@ import (
 	"fmt"
 	"io"
 	"strings"
-	"sync"
-	"time"
 	"unicode"
 
 	"github.com/CarlosShao/wisp/internal/agent/approval"
 	"github.com/CarlosShao/wisp/internal/observe"
+	"github.com/CarlosShao/wisp/internal/statemachine"
 )
 
 // The route labels this assembly stamps onto an approval.Request.Source.
@@ -82,86 +81,95 @@ const (
 	panelReplySource  = "cmd-wisp-console-panel-route"
 )
 
-// maxTrackedCards bounds the native ledger. The queue itself bounds pending
-// items at DefaultMaxPending (8) and an L1 window leaves the ledger on its
-// dismissal or handoff event, so this ceiling exists only for the case where an
-// event never arrives (a UI that returned an error mid-flight). Eviction is the
-// safe direction: an evicted card has no grant held for it, so it can be refused
-// but never allowed by this surface.
-const maxTrackedCards = 16
+// maxTrackedCards is the ledger's own ceiling, read off the seam that enforces
+// it (approval.MaxTrackedCards). The queue bounds pending items at its own
+// DefaultMaxPending and an L1 window leaves the ledger on its dismissal or
+// handoff event, so the ceiling exists only for the case where an event never
+// arrives (a UI that returned an error mid-flight). Eviction is the safe
+// direction: an evicted card has no grant held for it, so it can be refused but
+// never allowed by this surface.
+const maxTrackedCards = approval.MaxTrackedCards
 
 // liveCard is one confirmation this process displayed, as the answering side
 // needs it: where it is, what it is, and - native side only - the proof an allow
-// has to present.
-type liveCard struct {
-	CorrelationID string
-	Tool          string
-	Level         string
-	// Grant is the single-use native nonce Gate.PendingApproval minted for THIS
-	// card and handed to exactly one recipient, the injected UI (approval.go's
-	// grant comment). An L1 window's entry carries "" because that route has no
-	// allow verb to answer for.
-	Grant string
-	// Window is the L1 block length, zero on an L2 card.
-	Window time.Duration
-}
+// has to present. It is the seam's own card type (ticket 201 moved the ledger and
+// the route-choosing into internal/agent/approval/replies.go so a non-console
+// host has something to be handed); the alias is kept because this file's
+// sentences name its fields.
+type liveCard = approval.ReplyCard
 
 // nativeCards is the ledger the native surface fills and the reply listener
 // reads. It exists because the grant cannot travel any other way: the answer
 // arrives on a different goroutine from the one that displayed the card, so the
 // surface that received the proof has to hold it until someone spends it.
-type nativeCards struct {
-	mu    sync.Mutex
-	byID  map[string]liveCard
-	order []string
-}
+//
+// It is now a thin binding onto approval.Replies rather than a second ledger, and
+// the reason is this file's own rule: a second copy of the grant-spending and
+// route-choosing logic is how one of them grows a leniency the other does not
+// have. The methods below keep their lowercase names because they are the
+// console's vocabulary; the authority lives one package over.
+type nativeCards struct{ h *approval.Replies }
 
-func newNativeCards() *nativeCards { return &nativeCards{byID: map[string]liveCard{}} }
+func newNativeCards() *nativeCards { return &nativeCards{h: approval.NewReplies()} }
 
-// record books one displayed card, evicting the oldest when the bound is hit.
-func (n *nativeCards) record(c liveCard) {
-	if n == nil || c.CorrelationID == "" {
+// bind attaches the ledger to the Gate whose UI it was injected into and, on the
+// reply leg, to the veto channel this host really wired. Empty channel and empty
+// source labels are legal: the gate's own registry then refuses an undeliverable
+// veto, and the seam stamps its own transport names in the audit.
+func (n *nativeCards) bind(g *approval.Gate, vetoChannel approval.Channel, nativeSource, panelSource string) {
+	if n == nil || n.h == nil {
 		return
 	}
-	n.mu.Lock()
-	defer n.mu.Unlock()
-	if _, dup := n.byID[c.CorrelationID]; !dup {
-		n.order = append(n.order, c.CorrelationID)
-		for len(n.order) > maxTrackedCards {
-			drop := n.order[0]
-			n.order = n.order[1:]
-			delete(n.byID, drop)
-		}
+	n.h.Attach(approval.HostBinding{
+		Gate: g, VetoChannel: vetoChannel,
+		NativeSource: nativeSource, PanelSource: panelSource,
+	})
+}
+
+// record books one displayed card straight off the Prompt the gate handed this
+// surface, so a field a card carries cannot be forgotten by whoever is typing the
+// literal (ticket 201 AC#4 needs Paths for the rule text, and the console leg had
+// no use for them before).
+func (n *nativeCards) record(p approval.Prompt) {
+	if n == nil || n.h == nil {
+		return
 	}
-	n.byID[c.CorrelationID] = c
+	n.h.Record(p)
 }
 
 // look reads one card back. A missing entry means this surface never displayed
 // it, or it already left the screen - in both cases there is no grant to spend.
 func (n *nativeCards) look(corr string) (liveCard, bool) {
-	if n == nil {
+	if n == nil || n.h == nil {
 		return liveCard{}, false
 	}
-	n.mu.Lock()
-	defer n.mu.Unlock()
-	c, ok := n.byID[corr]
-	return c, ok
+	return n.h.Look(corr)
 }
 
 // forget drops one entry (answered, dismissed, or handed off to execution).
 func (n *nativeCards) forget(corr string) {
-	if n == nil || corr == "" {
+	if n == nil || n.h == nil {
 		return
 	}
-	n.mu.Lock()
-	defer n.mu.Unlock()
-	delete(n.byID, corr)
-	for i, c := range n.order {
-		if c == corr {
-			n.order = append(n.order[:i], n.order[i+1:]...)
-			break
-		}
+	n.h.Forget(corr)
+}
+
+// pending lists what this host is holding, oldest displayed first.
+func (n *nativeCards) pending() []liveCard {
+	if n == nil || n.h == nil {
+		return nil
 	}
+	return n.h.Pending()
+}
+
+// waitingState is ticket 201 AC#6's producer: the D43 state name this instant
+// deserves, read off the live queue and this host's own ledger rather than
+// scripted. ("", false) means nobody is being waited on.
+func (n *nativeCards) waitingState() (statemachine.State, bool) {
+	if n == nil || n.h == nil {
+		return "", false
+	}
+	return n.h.WaitingState()
 }
 
 // replySurface is the host's answer side, assembled from the faces the gate
@@ -181,6 +189,11 @@ type replySurface struct {
 	gate  *approval.Gate
 	live  *nativeCards
 	audit func(format string, args ...any)
+	// rt is the run this surface belongs to: the 长期 branch needs its config
+	// write door, its stdout and its audit sink (approval_always.go), and a
+	// surface that could not name the run it answers for could not persist
+	// anything either.
+	rt *agentRuntime
 	// vetoChannel is the channel this host's cancel transport really is. Empty
 	// means this assembly wired none of SPEC-06 §2's four, and Gate.Veto's own
 	// ChannelRegistry says so back.
@@ -189,22 +202,21 @@ type replySurface struct {
 	ctx context.Context
 }
 
-// allow spends this card's native grant through the native router.
+// allow spends this card's native grant through the native router, via the seam
+// (internal/agent/approval/replies.go). This file formats the sentence; the
+// grant lookup, the route choice and the ledger write are the seam's.
 func (s *replySurface) allow(corr string) (string, error) {
-	card, ok := s.live.look(corr)
-	if !ok {
+	card, _ := s.live.look(corr)
+	err := s.live.h.Allow(s.ctx, corr)
+	switch {
+	case errors.Is(err, approval.ErrNoTrackedCard):
 		s.record("REFUSED", corr, "", "native/allow", "本机没有这张卡的记录")
 		return "", fmt.Errorf("没有找到待答复的卡片 %q：它可能已经结束，从未显示的卡片这里也没有令牌可花", corr)
-	}
-	if card.Grant == "" {
+	case errors.Is(err, approval.ErrRouteHasNoAllow):
 		s.record("REFUSED", corr, card.Tool, "native/allow", "该路线没有允许动作")
 		return "", fmt.Errorf("%s 是执行前阻止窗口，它只有否决、没有允许（SPEC-06 §2 B1）；"+
 			"要停下它就答 veto %s", card.Level, corr)
-	}
-	err := s.gate.DecideFromNative(s.ctx, approval.Request{
-		CorrelationID: corr, Allow: true, Grant: card.Grant, Source: nativeReplySource,
-	})
-	if err != nil {
+	case err != nil:
 		s.record("REFUSED", corr, card.Tool, "native/allow", err.Error())
 		if errors.Is(err, approval.ErrBadGrant) {
 			return "", fmt.Errorf("原生令牌无效（缺失/已用/与本次请求不绑定）：%w；"+
@@ -212,7 +224,6 @@ func (s *replySurface) allow(corr string) (string, error) {
 		}
 		return "", err
 	}
-	s.live.forget(corr)
 	s.record("ANSWERED", corr, card.Tool, "native/allow", "原生侧允许")
 	return "已允许 " + corr + "（" + card.Tool + "）：调用已放行，这一发会执行", nil
 }
@@ -232,15 +243,17 @@ func (s *replySurface) reject(corr, reason string) (string, error) {
 func (s *replySurface) refuse(corr, reason string, viaPanel bool) (string, error) {
 	card, _ := s.live.look(corr)
 	route, routeText := "native", "原生侧"
+	var err error
 	if viaPanel {
 		route, routeText = "panel", "面板路线"
+		err = s.live.h.PanelReject(s.ctx, corr, reason)
+	} else {
+		err = s.live.h.Reject(s.ctx, corr, reason)
 	}
-	err := s.decide(corr, reason, viaPanel)
 	if err != nil {
 		s.record("REFUSED", corr, card.Tool, route+"/reject", err.Error())
 		return "", err
 	}
-	s.live.forget(corr)
 	s.record("ANSWERED", corr, card.Tool, route+"/reject", reason)
 	if reason == "" {
 		return "已拒绝 " + corr + "（" + routeText + "，未填理由）：未执行", nil
@@ -258,22 +271,20 @@ func (s *replySurface) panelReject(corr, reason string) (string, error) {
 // A WebView host that is handed {allow:true} for approval.decide forwards it here
 // and gets back ErrPanelAllow plus a burned nonce: the answer is refused on the
 // ROUTE, before any grant is looked at, and a grant that surfaced on this path is
-// treated as leaked (gate.go:622-634, queue.go:366-376). Nothing on this method's
-// happy path exists, because it has none.
+// treated as leaked (gate.go's DecideFromPanel branch, queue.revokeGrants).
+// Nothing on this method's happy path exists, because it has none.
 func (s *replySurface) panelAllow(corr string) (string, error) {
 	card, _ := s.live.look(corr)
-	err := s.gate.DecideFromPanel(s.ctx, approval.Request{
-		CorrelationID: corr, Allow: true, Grant: card.Grant, Source: panelReplySource,
-	})
+	offered, err := s.live.h.PanelAllow(s.ctx, corr)
 	s.record("PANEL-ALLOW-REFUSED", corr, card.Tool, "panel/allow",
-		fmt.Sprintf("claimed_source=%q grant_offered=%v err=%v", panelReplySource, card.Grant != "", err))
+		fmt.Sprintf("claimed_source=%q grant_offered=%v err=%v", panelReplySource, offered, err))
 	if err == nil {
 		// Unreachable while gate.DecideFromPanel refuses on the route. Kept as a
 		// loud fault rather than a silent success: if that branch ever stops
 		// refusing, the sentence this function prints would be the bug report.
 		return "", errors.New("安全故障：面板路线的「允许」没有被拒绝，请立即停住这条通路")
 	}
-	if card.Grant != "" {
+	if offered {
 		// The cost of ringing this door is stated, not hidden: a grant that
 		// appeared on the untrusted route is treated as leaked, so the nonce this
 		// card was holding is gone. The ledger entry STAYS, because the card is
@@ -286,19 +297,6 @@ func (s *replySurface) panelAllow(corr string) (string, error) {
 	return "", fmt.Errorf("面板路线不得允许（F2 第三层）：%w", err)
 }
 
-// decide is the one place the two routers are named, so a reviewer can point at
-// a line and say which transport a decision came in on.
-func (s *replySurface) decide(corr, reason string, viaPanel bool) error {
-	req := approval.Request{
-		CorrelationID: corr, Allow: false, Reason: reason, Source: nativeReplySource,
-	}
-	if viaPanel {
-		req.Source = panelReplySource
-		return s.gate.DecideFromPanel(s.ctx, req)
-	}
-	return s.gate.DecideFromNative(s.ctx, req)
-}
-
 // veto cancels an L1 window through the gate's veto funnel, on the channel THIS
 // host declared. It never claims a channel the assembly did not wire: with an
 // empty host channel the gate's own registry answers 「未知取消通道」, which is a
@@ -309,12 +307,11 @@ func (s *replySurface) veto(corr string) (string, error) {
 		s.record("REFUSED", corr, "", "veto", "本机没有这张卡的记录")
 		return "", fmt.Errorf("没有找到待否决的卡片 %q：窗口可能已经结束", corr)
 	}
-	err := s.gate.Veto(approval.Veto{CorrelationID: corr, Channel: s.vetoChannel})
+	err := s.live.h.Veto(corr)
 	if err != nil {
 		s.record("REFUSED", corr, card.Tool, "native/veto", err.Error())
 		return "", fmt.Errorf("否决未能送达：%w", err)
 	}
-	s.live.forget(corr)
 	s.record("ANSWERED", corr, card.Tool, "native/veto", string(s.vetoChannel))
 	return "已否决 " + corr + "（" + card.Tool + "）：窗口已取消，未执行", nil
 }
@@ -322,7 +319,7 @@ func (s *replySurface) veto(corr string) (string, error) {
 // head reads the queue's displayed item through the panel-safe projection: what
 // the page may show, which by construction carries no grant and no allow.
 func (s *replySurface) head() (string, error) {
-	item, ok := s.gate.Panel().Head()
+	item, ok := s.live.h.Head()
 	if !ok {
 		return "队头没有待审批的卡片（当前深度 " + fmt.Sprint(s.gate.Queue().Depth()) + "）", nil
 	}
@@ -331,7 +328,7 @@ func (s *replySurface) head() (string, error) {
 
 // view reads one card the same way, by the name the operator was given.
 func (s *replySurface) view(corr string) (string, error) {
-	item, ok := s.gate.Panel().View(corr)
+	item, ok := s.live.h.View(corr)
 	if !ok {
 		return "", fmt.Errorf("卡片 %q 不在待审批队列里（已结束、已作废，或从来不是 L2 卡）", corr)
 	}
@@ -399,10 +396,18 @@ func (rt *agentRuntime) attachReplyListener(in io.Reader, vetoChannel approval.C
 		gate:        rt.gate,
 		live:        rt.liveCards,
 		audit:       rt.auditf,
+		rt:          rt,
 		vetoChannel: vetoChannel,
 		ctx:         root.Ctx,
 	}
 	rt.reply = surface
+	// Bind the seam to this gate before anything can be answered: the ledger was
+	// built at assembly (it has to be, because the UI that fills it is one of the
+	// gate's own options) and it only learns the routers now. The host label
+	// travels with the binding so the audit line names this transport, and the
+	// veto channel travels with it too - see the paragraph above about the two
+	// statements being made together.
+	rt.liveCards.bind(rt.gate, vetoChannel, nativeReplySource, panelReplySource)
 	// Declaring a transport IS asserting it is up, so the two statements are made
 	// here together rather than in two places a refactor can pull apart: the card
 	// may now render 「按 Esc 键（已加载）」 because this host really will deliver
@@ -471,14 +476,17 @@ func (s *replySurface) handle(verb, corr, arg string) (string, error) {
 		return s.panelReject(corr, sanitizeReplyText(arg))
 	case "panel-yes":
 		return s.panelAllow(corr)
+	case "always":
+		return s.always(corr)
 	case "head":
 		return s.head()
 	case "view":
 		return s.view(corr)
 	case "help":
-		return "yes/no/veto（原生侧）· panel-no/panel-yes/head/view（面板路线，无允许）· quit", nil
+		return "yes/no/veto（原生侧）· always <编号>（长期：先把要存的规则印出来，再走一张 L2 重新确认卡）· " +
+			"panel-no/panel-yes/head/view（面板路线，无允许）· quit", nil
 	default:
-		return "", fmt.Errorf("未知答复指令 %q（yes/no/veto/panel-no/panel-yes/head/view/help/quit）", verb)
+		return "", fmt.Errorf("未知答复指令 %q（yes/no/veto/always/panel-no/panel-yes/head/view/help/quit）", verb)
 	}
 }
 

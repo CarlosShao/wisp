@@ -440,7 +440,7 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	// terminal - so NewChannels() stays empty and runSpec.replyVeto stays unset,
 	// and approval_reply.go says what both of those choices protect.
 	rt.liveCards = newNativeCards()
-	rt.ui = &consoleApprovalUI{out: s.stdout, live: rt.liveCards}
+	rt.ui = &consoleApprovalUI{out: s.stdout, run: rt, live: rt.liveCards}
 	rt.gate = approval.New(approval.Options{
 		UI:              rt.ui,
 		Channels:        approval.NewChannels(),
@@ -448,6 +448,14 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		ApprovalTimeout: time.Duration(cfg.Risk.ConfirmTimeoutSec) * time.Second,
 		Logf:            rt.auditf,
 	})
+	// Bind the reply ledger to the gate it answers to (ticket 201 AC#1). The
+	// ledger had to exist before the gate, because the UI that fills it is one of
+	// the gate's options; from this line on, any host surface holding this ledger
+	// can route an answer. No veto channel and no reply source yet means exactly
+	// what it says: cards are recorded, an undeliverable veto is refused by the
+	// gate's own registry, and attachReplyListener re-binds with the channel this
+	// host really wired when (and if) it has one.
+	rt.liveCards.bind(rt.gate, "", "", "")
 
 	// The permission mode (ticket 90's storage, wired here by ticket 101). This
 	// is the line that makes R20/M3 real: without it the bridge reads a nil
@@ -1053,6 +1061,11 @@ func (c consoleSink) Publish(e agent.Event) {
 // own behaviour rather than this surface answering for anyone.
 type consoleApprovalUI struct {
 	out io.Writer
+	// run is the assembly this surface belongs to, for the one thing a surface
+	// cannot do alone: book the waiting state a card puts this process into
+	// (ticket 201 AC#6). nil means a standalone surface, which prints cards and
+	// names nothing.
+	run *agentRuntime
 	// cards counts how many confirmations this surface actually displayed, so a
 	// test can tell "the gate opened a window" from "the call never reached the
 	// gate".
@@ -1087,13 +1100,7 @@ func (u *consoleApprovalUI) Prompt(_ context.Context, p approval.Prompt) error {
 	// lives here and nowhere the page can reach (approval.go's grant comment,
 	// and ticket 201's 「允许只长在原生侧」).
 	if u.live != nil {
-		u.live.record(liveCard{
-			CorrelationID: p.CorrelationID,
-			Tool:          p.Tool,
-			Level:         p.Level,
-			Grant:         p.Grant,
-			Window:        p.Window,
-		})
+		u.live.record(p)
 	}
 	fmt.Fprintf(u.out, "\n[确认 %s %s] %s\n", p.Level, p.Tool, p.Reason)
 	for _, r := range p.RulesHit {
@@ -1120,6 +1127,11 @@ func (u *consoleApprovalUI) Prompt(_ context.Context, p approval.Prompt) error {
 	if u.publish != nil {
 		u.publish()
 	}
+	// AC#6 (ticket 201): the instant a card exists is the instant someone is
+	// being waited on, so that fact is booked here and not inferred downstream.
+	if u.run != nil {
+		u.run.bookWaitingState("ui-prompt")
+	}
 	return nil
 }
 
@@ -1134,6 +1146,11 @@ func (u *consoleApprovalUI) Update(_ context.Context, e approval.Event) error {
 	case approval.EventDismissed, approval.EventStarted:
 		if u.live != nil {
 			u.live.forget(e.CorrelationID)
+		}
+		// The other half of AC#6: the wait is over, and the reading has to say
+		// so rather than leaving a stale 「等人」 standing in the log.
+		if u.run != nil {
+			u.run.bookWaitingState("ui-" + string(e.Kind))
 		}
 	}
 	// Only the two kinds that move the queue publish a packet. A tick or a
