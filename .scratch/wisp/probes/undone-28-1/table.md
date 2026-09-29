@@ -200,6 +200,44 @@
 
 ## 5. 票 89 —— `89-0600-is-decorative-on-windows-acl-for-private-data-done.md`（1 枚）
 
+> 本腿现量：un = 1，但**它不在 AC 区**——「## Acceptance criteria」的六枚框在 `:41 :44 :47 :51 :55 :57`，
+> **全部 `- [x]`**（本腿 `grep -c -- '^- \[x\]'` 含进度日志条目共 14 枚，全票唯一一枚 `- [ ]` 就是 `:348`）；
+> `:348` 的位置在「Progress log（append-only）」里面。
+
+### 5.1 `:348` 待办：AC#4（链接）、AC#5（失败注入）、三条落盘路径接 `winsec`、AC#6 POSIX 侧点名 —— **乙（勾框形状用在进度日志的待办行上；四条 item 在同票后续条目各自有落点）**
+
+- 原文逐字：`- [ ] 待办：AC#4（链接）、AC#5（失败注入）、把 memory/agent/secret 三条落盘路径接上 `winsec`、AC#6 的 POSIX 侧点名。`
+- 为什么不是判据：它是**进度日志里的一行待办**，不是本票「## Acceptance criteria」那一节的东西（本腿现读 AC 区
+  `:41`-`:57` 六枚全勾）。它列的四件事，**同票后来的已勾条目各自都写了落点**：
+  - AC#4 链接 → `:363` `- [x] **AC#4 A51②：本机可构造，用的是 junction（`mklink /J`，普通权限即可）**`
+  - AC#5 失败注入 → `:352` `- [x] **AC#5 失败方向只能收紧（红→绿有名字）**`（点名 `internal/winsec/private_fail_test.go`、
+    四条腿、`assertNoBytesOnDisk`）
+  - 三条落盘路径 → `:382` `- [x] **落盘路径接线（票面点名的三个家）**`，逐字点名
+    `agent/spill.go`／`secret/store.go`／`memory/open.go`／`memory/artifacts.go` 各自的 `PrivateDirAll`/`PrivateFile*` 落点，
+    并附生产端到端 icacls 证据（`TestAC3ProductionDataRootIsPrivateEndToEnd`、`TestAC3SpillArtifactLandsPrivate`）
+  - AC#6 POSIX 侧 → `:392` `- [x] **AC#6 门禁（只跑本票碰的包）**` 里有 `GOOS=linux go vet` 同四包 rc=0；
+    POSIX 语义另在 `:179`「⚠ POSIX 侧不适用：`sealDir` 在 `_other.go` 里没有 walk…」与 `:377`
+    `TestPOSIXSymlinkAtArtifactPositionIsNotRecursed` 具名
+- ⇒ **处置建议＝搬出勾框**（本腿不动手）：这枚之所以占分母，纯粹因为进度日志借用了 `- [ ]` 语法。
+  ⚠ 但它**不是零内容**：那行待办里"每条落盘写路径各自过没过封"这一问，今天确实有一处**没接的同族**，
+  而且已经**具名归口**到别张票——见下。
+- 残余内容的归口去处（**本腿现读**，`.scratch/wisp/issues/132-log-files-are-never-sealed-sealdirdir-has-zero-production-callers.md`，
+  **无** `-done` 后缀＝仍开放，un=5：`:31 :34 :38 :40 :43`）：
+  - 票 89 `:385-386` 自己写了「⚠ **没接的同族**（本票落点之外，要编排者拍板）：`models/downloader.go:224/:389`（staging…）、
+    `config/migrate.go:83`+`config/parse.go:213`（0o600 配置备份）、`observe/logging.go:244`（0o644 日志）、`ball/position.go:77`」
+  - 票 132 的「## 编排者增量（09-29 17:4x，起手锚点 `a8f3c020`）」（`:58` 起）逐字
+    「**本票 AC#1 那张"现状表"从此多一枚具名行，而且它不是日志**：`internal/memory/open.go:533` 的
+    **迁移前 DB 备份副本**＝全仓（本尺射程内）唯一一处"写私有数据而不经封条"的裸创建。**不必新立 AC#6**——
+    它 rides 在 AC#1 现成的分母」⇒ "逐条写路径过封"这张清单的**承载体＝票 132 AC#1**（`:31`，仍 `- [ ]`）。
+  - ⚠ 本腿只核到"132 具名接了备份副本那一处＋AC#1 现状表"，**没核**票 89 列的另外四处
+    （downloader / config 备份 / logging / ball position）是否逐条进了 132 的射程——132 正文 `:20` 的表里有
+    `config.toml` 一行（逐字「`config.toml` | **已锁** | `internal/config/parse.go:215` 调 `winsec.SealFile(tmpName)`」）。
+    **要交回这张"同族清单是否被 132 全覆盖"的核对，得由能跑尺的人做**，本腿停在这儿并注明射程。
+- ⚠ 顺带一枚引用漂移（详见附节）：本行上方 `done-fix-1` 追加段（`:349`）引
+  「其余三样本腿在票内现读到已勾：AC#4 `:262`、AC#5 `:343`、AC#6 `:57` 与 `:383`」——本腿现读这四个数：
+  AC#4 的 junction 条目在 **`:363`**（不是 262；`:265` 另有一枚同名早期条目）、AC#5 在 **`:352`**（不是 343）、
+  落盘接线在 **`:382`**（不是 383）。只有 `:57` 对得上。
+
 ## 6. 票 92 —— `92-panel-composer-mode-attachments-workspace-done.md`（4 枚）
 
 ## 7. 票 97 —— `97-dead-strict-param-and-the-comment-that-invents-a-caller-done.md`（2 枚）
