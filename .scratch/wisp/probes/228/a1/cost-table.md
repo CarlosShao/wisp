@@ -186,17 +186,43 @@
 
 ## 6. 必须具名答的三问（AC#0 前置，逐问给"读数／无读数"）
 
-### ① 常驻名额上限怎么算（按进程角色分别计／全树一个数？CLI 腿里起 `ui-sta` 会不会被判泄漏）
+### ① 常驻名额上限怎么算——按进程角色分别计，还是全树一个数？CLI 腿里起 `ui-sta` 会不会被判泄漏？
 
-〔待填〕
+**读数（代码侧，具名到行）**：
 
-### ② 看门狗会不会误报（谁读 `RosterReport`、阈值从哪来、超了以后发生什么、生产调用者点数）
+- **没有任何一处按"进程角色"计名。** 尺＝`grep -rn "ResidentBaseline|ResidentOverBaseline|ClassifyGoroutine"` 剥 `.scratch` ⇒ 判据只有 `internal/observe/goroutine.go:422`（`rep.ResidentOverBaseline = rep.Resident > ResidentBaseline`）这一枚比较；`ResidentBaseline` 是包级 `const = 6`（`:40`），`ClassifyGoroutine` 的**唯一入参是名字字符串**（`:64`），签名里没有角色／进程类型／env。⇒ 所谓"上限"是**一枚全局数字**，且它的计数口径是"名字落在 `ResidentNames` 那六枚里的存活数"（`:410-411`）。
+- 计数载体是**进程级单例 registry**：`:230 var Default = NewRegistry()`；`internal/proc/boot_windows.go:72 rt.Registry = observe.Default`。⇒ 同一进程内两条腿（若并存）共用一张表；**跨进程各数各的**，没有任何"全树一个数"的实现（`RosterReport` 只读本进程 `live` map，`goroutine.go:405-407`）。
+- ⚠ **同一枚"6"有两套互不相同的口径**（本腿认为这是 AC#0 最该被 owner 知道的一枚事实）：
+  1. `ResidentOverBaseline`＝**只数常驻表命名列**（`goroutine.go:422`）；
+  2. SLO 的 `goroutines <=6`＝**数该 registry 的存活总数**（`internal/observe/thresholds.go:161-162` 用 `rep.GoroutinesMax`，而它来自 `internal/observe/sampler.go:365 Goroutines: s.reg.Count()`，`goroutine.go:344-352` `Count()` 把所有 key 相加）。
+  ⇒ 口径 2 会把 `approval-waiter`／`tool-exec-`／`subagent-finish-*` 一并算进那 6 枚里；口径 1 不会。
+- **"CLI 腿里起 `ui-sta` 会不会被判成泄漏"——按代码今天的形状：不会有任何东西来判它。** 三条现跑尺：
+  - `ui-sta` **在册**（`goroutine.go:44`）⇒ 不触发 `CategoryUnknown` 的 WARN（`goroutine.go:269-273`）；
+  - 唯一会返回"泄漏"结论的生产代码是 `boot_windows.go:108` 那枚**开机一次性**自检，而 `grep -rn "proc.Boot("` ⇒ **`cmd/wisp/run.go` 不在调用者名单里**（调用者只有 `resident_windows.go:33`、`slo_windows.go:261`）⇒ **CLI 腿今天没有任何判据路径**；
+  - `wisp run` 里常驻名列今天**已经在用 2～3 枚**：`log-flusher`（`observe/logging.go:96`，由 `installLogSink`→`observe.InitLog` 触发，`cmd/wisp/logsink.go:149`；`run.go:195` 与 `resident_windows.go:57` 两腿都装）、`watchdog`（`config_reload.go:119`，**只在 CLI 腿**）、`db-writer`（`memory/writer.go:79`，**首次写才懒启动**）。⇒ 加一枚 `ui-sta` 后口径 1 约 3～4／6，**不会**触发 `ResidentOverBaseline`；但**口径 2 在 `Sleeping`／`Armed` 两态是硬门**（`Gate: true`），常驻腿若同时把 `approval-waiter` 常设成"随时可答复"，总数就会是 6＋1＝7 > 6 ——这一枚是**真数**不是误报，但它只在有人跑 `wisp slo` 时才成立（见 ②）。
+- ⛔ **判不了的部分（明写）**：**"这 6 枚该按角色分别计还是全树一个数"这个问题，`PLAN.md` 与代码都没有覆盖**——`PLAN.md:2838` 只写"总数上限：常驻 6＋每任务 3"（见 §3），代码里没有"角色"这个输入。要定案缺的是**"票 42 那枚看门狗按什么口径数"这一行读数**（今天不存在，`internal/watchdog/` 只有 `doc.go`）。**本腿不按口味替它填。**
 
-〔待填〕
+### ② 看门狗会不会误报？谁读 `RosterReport`、阈值从哪来、超了以后发生什么、生产调用者点数
+
+- **生产调用者点数（现跑的尺）**：
+  - `grep -rn --include=*.go "RosterReport" | 剥 .scratch` ⇒ **生产 1 枚**：`internal/proc/boot_windows.go:108`；其余 8 处命中全在测试（`internal/agent/loop_golden_test.go:286/293`、`internal/observe/goroutine_test.go:74/102/106/196/202`）与 3 处注释（`cmd/balldebug/main.go:40`、`cmd/wisp/approval_always.go:33`、`internal/memory/writer.go:24`）。
+  - `grep -rn "observe.NewSampler"` ⇒ **生产 2 枚**，同在 `cmd/wisp/slo_windows.go`（`:283` 内测、`:385` 外测）；`SampleState(` 生产 2 枚（`:387`、`:436`）、`CheckSettle(` 1 枚（`:985`）。
+  - `ls internal/watchdog/` ⇒ **只有 `doc.go`，零实现**；`grep -rn "internal/watchdog"` ⇒ **零 import 者**。`doc.go:18` 逐字 `DEFERRED(watchdog loop/thresholds): implemented by ticket 42.`
+  ⇒ ⛔ **"看门狗在跑"这一句今天不成立**；本腿按现跑尺具名写：**周期性看门狗＝零调用者、零实现**。
+- **阈值从哪来**：两枚来源、都是编译期常量——`goroutine.go:40 ResidentBaseline = 6`（给 boot 自检用）；`thresholds.go:36-37 goroutineLimitSleeping = 6 / goroutineLimitArmed = 7`（**冻结件，本腿一字未动、只读**）。⚠ **没有任何一处从 config 读阈值**（`internal/config/schema.go:605` 有 `SLOSampleIntervalSec` 这一枚采样间隔字段，但它的消费者只有量具侧；阈值本体不在配置里）。
+- **超了以后发生什么**（逐条具名）：
+  - 开机自检超 ⇒ `boot_windows.go:110` 返回 error（并先 `job.Close()`，`:109`）⇒ `resident_windows.go:42-45` 打 `"boot failed"` 并 **`os.Exit(1)`** ⇒ **拒绝启动**，这是今天唯一"超了会怎样"的真实后果。
+  - 名字不在册 ⇒ `goroutine.go:271-273` **只打一行 `slog.Warn`**；无拒绝、无报警对象、无计数（`Unknown` 生产消费者＝0，见 §2）。
+  - SLO 门不过 ⇒ `thresholds.go:162` `Pass:false, Gate:true` ⇒ 由 `wisp slo` 折成退出码（`cmd/wisp/slo_windows.go:290 exitCode := 0`、`:337 exitCode = 1`、`:339 return exitCode`）⇒ **只有量具变红，产品不会有任何动作**。
+- **会不会误报（结论级读数）**：**今天不会**——因为根本没有周期性看门狗；会误报的那枚风险是**未来票 42** 的口径选择问题（①里那两套"6"的差别就是它的输入）。本腿**不预测它会怎么选**。
 
 ### ③ 谁的进程持有 Job Object
 
-〔待填〕
+- 尺＝`grep -rn --include=*.go "CreateJobObject|OpenJobScope|AssignProcessToJobObject|KILL_ON_JOB_CLOSE" | 剥 .scratch 与 scripts/spike` ⇒ 生产命中全在 `internal/proc/jobscope_windows.go`（`:72 :77 :83 :100`）与 `boot_windows.go:87`。
+- **创建者＝`proc.Boot`**（`boot_windows.go:86-91`），持有者就是调用 Boot 的那枚进程，而 Boot 的生产调用者只有 **2 枚**：`cmd/wisp/resident_windows.go:33`（常驻腿）、`cmd/wisp/slo_windows.go:261`（`wisp slo` 量具）。⇒ **常驻那条腿持有 Job Object；`wisp run` 那条腿今天既不创建、也拿不到。**
+- **另一条腿拿不拿得到：拿不到。** `jobscope_windows.go:72` 逐字 `windows.CreateJobObject(nil, nil)`＝**匿名 Job**（名字为 NULL），全仓没有 `OpenJobObject` 调用（尺同上）⇒ 第二个进程无法按名字打开它。⇒ 谁想在 `wisp run` 里让子进程进 Job，就得**自己再开一枚 Job**，而那要经过 `proc.Boot` ⇒ 顺带撞上单实例互斥：`envfork.go:61 MutexName = Local\wisp-single-instance`（`:63 MutexEnabled: true`，仅 test env 关，`:22`），`singleinstance_windows.go:51-54` 遇 `ERROR_ALREADY_EXISTS` 直接返 `ErrAlreadyRunning`。⇒ **常驻实例在跑时，CLI 腿若走 Boot 会被"另一个实例正在运行"拒掉**（这一枚是 §7 表里"乙"支的一项具体代价）。
+- **子进程入 Job 的生产通路今天只有 1 枚**：`cmd/wisp/slo_windows.go:500 rt.Job.StartInJob(cmd)`；`grep -rn "StartInJob|\.Assign("` 剥测试与 spike ⇒ **`wisp run` 与常驻腿都没有任何子进程入 Job 的调用点**。⇒ 今天 `wisp run` 起的子进程（若有）**不受 `KILL_ON_JOB_CLOSE` 保护**（`PLAN.md:2237-2238` 点名的"孤儿 `msedgewebview2.exe` 常驻吃几百 MB"那一型，在 CLI 腿没有兜底；`PLAN.md:2870-2871` 同一句）。
+- ⚠ **D32 的内存口径依赖这枚 Job**：`jobscope_windows.go:125-142 TreePrivateBytes()` 与 `treemetrics_windows.go:65-70`（主进程不 assign 进 Job，作为树根手工并入）。⇒ **"哪条腿持有 Job"直接决定 D32 那两枚数（25MB／40MB）量的是哪棵树**（§4）。
 
 ---
 
