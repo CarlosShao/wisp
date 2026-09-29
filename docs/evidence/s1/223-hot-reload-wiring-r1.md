@@ -87,9 +87,21 @@
 - 本格**顺手挖出并修掉的一处真缺陷**（属 AC#4 可达性，不是额外功能）：`internal/config/loader.go` 的 version 探针原先 `_ =` 丢掉解析错误 ⇒ 任何语法坏的文件都得到 `ver=0`，被塞进迁移管线，报"cannot migrate from schema version 1"，"语法错"这句话**在生产里根本不可能出现**。现在规则是：**能不能从文件里读出一枚声明版本**决定这句话归谁——读不出版本＝`config.toml parse`（语法错），读得出版本＝迁移管线继续说话（`migrate_test.go:123` 那句"必须来自迁移路径并带指引"的既有断言一字未放宽，仍在绿）。这条边界是实测产物，写进了两处代码注释与本表。
 - 拿掉实现会不会红：会（m1 里 tick 一停，`state=not-applied` 永远不出现 ⇒ 缺失/语法/权限三例全红；第四句属 panel-inbound，与 tick 无关，不受 m1 影响）。
 
-## AC#5 整包终态读数 —— **未跑完（进行中）**
+## AC#5 整包终态读数 —— **由编排者代跑补齐（本腿死于 150 轮上限，这一格它没跑到）**
 
-**未判**。计划尺：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp ./internal/... -count=1 -v -timeout 30m`，逐名比红名册，起手/终态两个时刻都记进 `.scratch/wisp/probes/223/r1/`。已确认的历史红：`internal/ball` 1 ＋ `internal/panel` 4（别人地界，不算本腿新增、不顺手修）。
+> **本腿原句（标题与正文逐字保留不抹；下面所有读数都是编排者的，不是它的）**：
+>
+> ## AC#5 整包终态读数 —— **未跑完（进行中）**
+>
+> **未判**。计划尺：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp ./internal/... -count=1 -v -timeout 30m`，逐名比红名册，起手/终态两个时刻都记进 `.scratch/wisp/probes/223/r1/`。已确认的历史红：`internal/ball` 1 ＋ `internal/panel` 4（别人地界，不算本腿新增、不顺手修）。
+
+> ⚠ **这一格不是实现腿自己跑的**：`223-r1` 于 15:2x 撞到轮次上限（157 次工具调用／54 分钟），最后一句逐字「先提交当前码与测试（防止中途丢失），再继续修 AC#4 的两处可达性。」⇒ 它留下了**五枚文件的未提交改动**（含既有产码 `internal/config/loader.go`＋72/−6），**编排者自己验门后代落**（commit `248095d1`，码一字未由他改）。下面这发读数由编排者跑，**口径与本腿的计划尺不完全相同，差异写在最后一行，别当同一把尺**。
+
+- **尺与时刻**（编排者现跑）：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp ./internal/... -count=1`，起手 **15:30:50**／终态 **15:32:50**，原始输出全量落 `.scratch/wisp/probes/223/r1/orchestrator-gates.txt`（5,900 字节，**未接 `| head`／`| tail`**）。
+- **读数**：**23 枚包 `ok`／3 枚包 `FAIL` 共 6 例**（`GATE_EXIT=1`）。逐名红册：`TestC21TableColourRowsMatchTokensCSS`（`internal/ball`）＋`TestApprovalCardViewJSONKeysMatchFrontendTypes`／`TestComposerContractTypesMatchFrontend`／`TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`／`TestC21DesignTokensFourwayAgree`（`internal/panel`）＝**本票之前就在册的 5 例，别人地界，不算本票新增、不顺手修**；第 6 例 `TestResolvePerCallBudget`（`internal/risk`，1.88s）。
+- **第 6 例的归因＝争用，不是我推断**：同一把尺连复两发 `-count=3 -run 'TestResolvePerCallBudget'` ＝ **`ok 3.804s`／`ok 3.813s`**（15:33:01→15:33:10）⇒ 转绿，`thresholds.go` 一字节未动。⚠ **诚实边界**：复量时只读盘点腿 `pool-1` 仍在飞（只跑 grep、被明令禁跑编译），**所以这两发不算"完全空机"**；这是今天**第三、第四例**同类争用假红（前两例见台账 `A432`／`A437`）。
+- **与计划尺的差（具名，别让下一位以为等价）**：本腿写的是 `... -count=1 -v -timeout 30m`，编排者这一发**没带 `-v`** ⇒ **红名册完整（Go 无 `-v` 也打 `--- FAIL`），但逐名绿册没采到**。⇒ **本票 AC#5 若要"逐名比绿"那一半成立，仍缺一发带 `-v` 的终态读数**；这一发**归非实现者验收腿 `223-v1`**（同时补本腿"没做完"第 2 条那枚 AC#6 锁外专属突变）。
+- **接线前基线的对照在本文件 `:142` 那行**（本腿自记：5 枚红全在它自己那一刻半写的 `config_reload.go` 占位 import，修好后全过）——**编排者复认这一发整包已无该类红**。
 
 ## AC#6 断口二一起接上（ConfirmLocked 生产赋值点＋非锁内同步等待）—— **成立**
 
