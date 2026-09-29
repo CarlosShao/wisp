@@ -233,10 +233,43 @@ git diff --stat beaeaeba..HEAD -- docs/PLAN.md docs/specs/   # 空
 
 ## AC#6 整包终态读数 + 门禁（票面 `:40`）
 
-判语：**未判**
+**判语：成立（带两枚口径注）**
 
-编排者两把尺的引用与口径核对：未填
-本腿自跑的门禁（gofumpt / build / d22scan）：未填
+**先立可比性**：`git diff --name-only fac60ad4..HEAD -- '*.go'` ＝ **空** ⇒ 编排者那两把尺跑的 Go 树与本腿锚点 `801e8547` **逐字节同码**（那 4 枚提交只动 `.scratch/**` 与台账）；`git diff --stat beaeaeba..HEAD -- internal/tools/bridge.go internal/tools/subagent_197.go internal/tools/subagent_222_test.go` ＝ **空** ⇒ 222 的三枚交付件自 `222-r1` 起没人再动过。
+
+**引用编排者的两把尺＋口径核对（件在 `.scratch/wisp/probes/222/orch/`，本腿逐行现读）**
+
+| 他的读数 | 本腿核到的口径 |
+|---|---|
+| 整包 `-count=1`：26 枚包＝23 ok／3 FAIL，`cmd/wisp` ok 135.067s | `clean-nov.txt`（首行 `start=17:53:11`）现数：**23 行 `ok`＋3 行 `FAIL <pkg>`＋5 行 `[no test files]`＝31 行包级读数**；"26 枚"＝去掉 5 枚无测试包的口径 ✓；`cmd/wisp 135.067s` ✓ 逐字 |
+| 逐名红册＝恰 5 枚、零新增 | ⚠ **口径要说清**：`three-v.txt` 的 `-v` 只覆盖了**那 3 枚 FAIL 包**（ball／panel／risk，405 枚 `=== RUN`，包级 1 ok＋2 FAIL），**不是全量 `-v`**。全量非 `-v` 那发（`clean-nov.txt`／`full-v.txt`）里有 **6 枚 `--- FAIL` 名**＝5 枚＋`TestResolvePerCallBudget`。⇒ "恰 5 枚"是**扣除 risk 那枚争用型红之后**的集合，不是原始全量 `-v` 名册（票 223-v2 那种）。本格按"5 枚＋一枚已归因"记账，不按"原始 5 枚"记账 |
+| risk 那枚红＝两发重叠的争用型假红 | **归因方向本腿支持、机制句无法从盘上证实**：`full-v.txt` `start=17:50:18`、`clean-nov.txt` `start=17:53:11`，两发文件里**都没有结束时刻**，相差 173s——是否重叠算不出来（A432 说的是撞在 `226-w1` 收尾的门上，那不发不在本目录）。本腿**安静复量 3 发**：`-run TestResolvePerCallBudget` **PASS 1.322s**、整包 `-count=3` **ok 8.174s**、整包 `-count=1 -v` **ok 2.339s**＝**3/3 绿**；`internal/risk/thresholds.go` 与预算常量 `git diff beaeaeba..HEAD` ＝ **空**（一字节未动）。⇒ 判**不计入新增红**成立，且不放宽任何断言 |
+| 5 枚归属 | 本腿**未碰、也不许碰**：`internal/ball` 1 枚＋`internal/panel` 4 枚，逐字原因全指另一队地界（C21 令牌表与面板契约字段对表，含一枚缺失的样式源文件；那枚文件的内容本腿零读零转述） |
+
+**本腿自己现跑的门禁（票面 `:40` 点名要自己跑的这几枚）**
+
+| 门 | 命令 | 读数 |
+|---|---|---|
+| gofumpt（⚠ 裸名不在 PATH，会 127） | `"$(go env GOPATH)/bin/gofumpt.exe" -l` 三枚文件 | **空输出，exit 0**；`--version` ＝ **v0.12.0**（与票面 `:40` 同版） |
+| 编译 | `go build ./...` | **exit 0** |
+| vet | `go vet ./internal/tools` | **exit 0** |
+| D22 扫描 | `bash scripts/d22scan.sh` | **clean — no D22 ban violations**；射程计数现读：bans#1-5 internal/=219、cmd/=29、ban#6 frontend/=85、**ban#7 internal/tools/=22**、ban#8 design/=39＋frontend/=85＋internal/=460＋cmd/=63 |
+| 用例名册规模 | `go test ./internal/tools -list '.*'` | **161 枚顶层**，含 `222` 的 **3 枚**（与 r1 自述 158＋3 相符） |
+| 本腿自跑的包终态 | `go test ./internal/tools -count=1 -v` | **161 `--- PASS`／0 FAIL／0 SKIP，13.081s** |
+| 本腿自跑的 cmd/wisp | `go test ./cmd/wisp -count=1` | **ok 110.491s**（编排者 135.067s／r1 两发 77.622s／83.788s ⇒ 差异＝机器负载，**耗时不作判据**，只记三枚样本） |
+
+**注①（时间敏感量法的复量）**：本腿所有会受负载影响的读数都带了复量或跨腿样本——并发帽三读互证（`bridge.go:24` 常量字面＝4／M5 台件抬到 8 后 `cap(bridge.sem)` 读数 8 判红／`maxSeen` 读数 6 判红），`-overlay` 的 asis 对照与基线同绿（0.042s vs 0.00s 级用例）证明突变架本身不改变结果。**未做**：全量 `-v` 终态名册（那是编排者的尺，他已声明由他自己复跑翻勾，本腿不越俎）。
+**注②**：`gofumpt -l` 只对**三枚交付件**跑过（票 222 的写面就这三枚）；整仓 `-l` 没跑，那不是本票的判据。
+
+**可复跑的尺**
+```
+export PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"
+"$(go env GOPATH)/bin/gofumpt.exe" -l internal/tools/bridge.go internal/tools/subagent_197.go internal/tools/subagent_222_test.go   # 期望：空
+bash scripts/d22scan.sh | tail -2                                                                                                       # 期望：clean
+go test ./internal/tools -count=1 -v | grep -cE '^--- PASS'                                                                             # 期望：161，且 grep -c '^--- FAIL' ＝ 0
+go test ./internal/risk -count=1                                                                                        # 期望：ok（争用假红的复量样本）
+```
+
 
 ---
 
