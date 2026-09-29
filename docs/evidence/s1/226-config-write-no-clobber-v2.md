@@ -155,13 +155,34 @@ FAIL	github.com/CarlosShao/wisp/internal/config	0.738s
 
 ## ⑥ 推翻清单
 
-〔待填〕
+时刻 `2026-09-29 14:11 +08`。**实现腿 `226-w1` 证据件里站不住的句子**：
 
----
+1. **`§4 修复前红①` 报的枚数"5 枚 FAIL"在当前盘上不复现。** 工单说 `78988901` 给 `writeguard_226_test.go` 新增 13 例（文件现长 456 行、已核）；v1 用同一枚 `a1` 形状（把 `allowdirs.go` 的合并拿掉）在 `a1-config-mutated.txt` 跑出 **8 枚红**——w1 那 5 枚（`TestAC1…`／`TestAC2GuardedWrite…`／两枚 AC#3／`TestAC5…`）之外多红 `TestAC2CleanWriteReportsOneKeyAtInfoLevel`（:194）、`TestAC2UnreadableFileIsRefusedAndNothingIsWritten`（:196）、`TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt`（:207）。⇒ **w1 的读数少报了 3 枚红**（本表以 v1 现读为据；两枚读数的差异归因＝w1 的突变形状或起手盘状态与此不同，本腿不复跑 w1 台件）。
+2. **证据件里留了一格空壳**：`docs/evidence/s1/226-config-write-no-clobber-r1.md` **有两个 `## 4.` 标题**（行 84、行 97），其中行 97 那节"逐格判据"正文＝**`〔待填〕`**（行 99）——真正的逐格判据被写进了行 101 起的 `## 5.`。⇒ 该证据件带着空壳落盘，属交付缺陷，具名。
+3. **"`readConfigFile` 拆出止于 `validate`"（`§2` 行 35）对 `mergeWrite` 重读那一支没讲全**：重读走 `readConfigFile`，而它**内部仍会跑迁移并写备份**。`b4-probe-migration-inside-read.txt` Y2、`b6-probe-nothing-written-branch.txt` W2/W3 实测：手删 `schema_version` 行（或塞入 `schema_version = 1` 旧件）时，即便 `mergeWrite` 打出 `already carries this key; nothing written`，**文件照样被迁移重排、注释丢、mtime 变、落 `config.toml.bak-1`**。⇒ `§1`／`§5 AC#2`／`TestGuardedWriteDoesNotRewriteAFileThatAlreadySaysIt` 那句"不白重排、不白丢注释"**不成立**（只在 schema 已当前版时成立）；w1 正文未提这一支。
+4. **`§4` 常驻正控的存在理由被 w1 讲对、但 AC#1 的"覆盖面"讲过了。** `TestAC1ControlSnapshotWriteIsWhatRevertsTheHandEdit` 用 `SaveFile(path, m.Config())` 把**开机快照**直写、断言它确实把 `60` 改回 `56`（见测试文件 :102–114、`a4-control-inverted.txt` 反接即红）。⇒ **这个正控是有效的**（推翻"它可能恒真"的怀疑）。但同一支测的是"把内存快照直写会还原改过的键"，**不是"删一行会被补回"**；w1 正文没有这一条，所以 §5 见。
+5. **`§1` "乙省不了那枚差异器"的 grep 证据写法对不上实现**：w1 记 `grep … 只命中 internal/config/schema.go:570 的过期注释、零实现`，而 `diffKeyPaths` 是本票在 `writeguard.go:201` 现造的。⇒ 属"起手状态自述"，不算谎，但**行号 570 本腿未现核**（见 §⑦）。
+6. **`§8.1` 的推迟未落代码 `DEFERRED` 标记**：本腿 `grep -rn 'DEFERRED' internal/config/` 只命中 `doc.go:14` 的 `DEFERRED(schema/hot-reload/migration)`（属票 05），**没有票 226 的那一枚** ⇒ AC#5 答复语法那半的推迟按 `AGENTS.md` §1.1 的 1:1 要求**尚未进 `SPEC-12 §5` 登记表**（w1 自己也说"只落在本节与交回正文里"）。这是实现腿按规矩没做的登记（它无写面），但**登记责任没人接＝悬空**，见下面编排者条 9。
+
+**编排者（票面／台账）被推翻／被更正的**：
+
+7. **派单与票面的"发数"口径都不对**：工单第 3 行（我复述的派单）说 v1＝"34 发"、编排者现量＝"26 枚顶层＋7 枚 `probe*/main.go`"＝33。本腿逐枚打开＝顶层 26 枚里 `head-writeguard_226_test.go` 是测试件逐字副本、不是攻击 ⇒ **25 枚攻击／实验读数＋7 枚探针程序＝32 枚**，比 34 少 2、比 33 少 1。具名更正，见 §② 表口径行。
+8. **"排程仍照原话：本票必须先于票 223"** ——本腿现读代码**没有给 `CheckAndReload` 接生产轮询**，票 223 也尚未落地（w1 `§8.2` 同样自陈）。⇒ "必须先于 223"目前**是排程陈述、不是盘上事实**；AC#3 那条"写完之后再手改一枚键、下一次轮询要能看见"今天只由**测试里手动调 `CheckAndReload()`** 钉住，生产侧尚无轮询者。票面应把这句写成"先于 223 的接线"，别让读者以为轮询已在跑。
+9. **AC#5 的"两边谁先做都行"需要人拍**：`A424`"可撤销"的答复语法那半今天无主（w1 说属 219/224、`A428` 已把票 201 AC#5 整格转给 224）。⇒ 票 226 交了落库半边，**"可撤销"整句仍写在纸上**，须有人把这枚推迟按五字段接进 `A##`。
+10. **工单第 4 行的疑问今天有了答案，不是"不由我猜"的悬案**：编排者说"用户删掉一行会不会被补回——**结论不由我猜**"。⇒ 本腿据 v1 `b-*` 读数判定：**会被补回**（标量／节补成默认，map 条目不补）。这句疑问可以销掉、并据此决定要不要加 AC#1-b。
 
 ## ⑦ 本腿没做完／读不动的
 
-〔待填〕
+时刻 `2026-09-29 14:11 +08`。诚实列，不编：
+
+- **未自跑第二发（删行那一问）**：v1 的 `b-*`／`b2-*`／`b3-*`／`b4-*`／`b5-*`／`b6-*` 六份读数已足以下结论，本腿没有重跑 `probe*/main.go`。⇒ `probe*/main.go` 那 7 枚探针程序**本腿没有逐枚打开**，只用了它们留下的 `.txt` 输出；若要复核探针自身的构造，需另开。
+- **`§2` 表里 `a1`／`a2`／`a3` 的"改了哪一行"是按输出反推的**：本腿没有逐字节 diff 过 v1 当时的突变文本（v1 只留了 `*.txt` 读数、没留 `.go` 补丁件）。⇒ "发＝改了什么"这一列是**从红句行号＋`git show --name-status` 的文件集反推**，不是读到过补丁本身。
+- **`f-d22scan.txt` 只抽读了摘要**：`d22scan: clean - no D22 ban violations` 与 `runtests.sh … PASS=34 FAIL=0` 是 grep 现读的末行；`internal/=459`／`cmd/=59` 这类是被扫文件数（分母），不是违规数（口径同 `AGENTS.md` §1.2 与票 187 的提醒）。本腿没有逐行读完那 22,987 字节。
+- **`w1` 证据件 `§1` 的行号（`schema.go:570`）与 `§5` 各例名册未现核**：那要读 `internal/config/schema.go`，本腿没读（不在射程、也没必要，为省轮次）。
+- **AC#6 的 5 枚历史红因＝照抄编排者口径**：`frontend/**`／`design/**` 禁读，本腿没有自己去比那两族红，只把 §2 给的 `A427`/`A428` 归因与 `f-*` 里 `internal/ball`/`internal/panel` 的 5 枚红名对上。
+- **`internal/risk` 的"争用假红"结论本腿未复量**：`TestResolvePerCallBudget` 的 0.281／0.272／0.290 ms/op 安静复量是编排者 13:02:57 那一发的数（台账 `A432`），本腿没有再跑（不在第 3 节点名的两发内）。
+- **AC#3 突变后的整包没有跑**：§③① 只跑了 `go test ./internal/config -count=1`（派单①的原文命令就是这个包），没有连带跑 `cmd/wisp`／整包。
+- **工单第 3 行说的 `docs/evidence/s1/226-config-write-no-clobber-v1.md` 不存在**：本腿 `ls` 现查 v 系列只有 `…-v2.md`（就是本件），v1 那枚表**从没落盘**（v1 死在写表之前）。⇒ 工单把它写成"表＝…-v1.md"是过期陈述，编排者要更正工单那一行。
 
 ---
 
