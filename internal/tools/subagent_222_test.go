@@ -318,9 +318,9 @@ func (h *h222) launchParents(t *testing.T, n int) {
 	}
 }
 
-// awaitTokens collects n values from ch. The guard rail is the only way it comes
-// back early, and it says what a fired rail would mean.
-func awaitTokens[T any](t *testing.T, name string, ch <-chan T, n int) []T {
+// await222Tokens collects n values from ch. The guard rail is the only way it
+// comes back early, and it says what a fired rail would mean.
+func await222Tokens[T any](t *testing.T, name string, ch <-chan T, n int) []T {
 	t.Helper()
 	out := make([]T, 0, n)
 	timer := time.NewTimer(h222SafetyBound)
@@ -342,7 +342,7 @@ func awaitTokens[T any](t *testing.T, name string, ch <-chan T, n int) []T {
 func (h *h222) parkParents(t *testing.T, n int) {
 	t.Helper()
 	h.launchParents(t, n)
-	awaitTokens(t, "孩子进入第一枚模型调用", h.started, n)
+	await222Tokens(t, "孩子进入第一枚模型调用", h.started, n)
 	if got := len(h.parked); got != n {
 		t.Fatalf("只有 %d/%d 枚父任务到达等待点（父任务没派生成功，等待读数就无从谈起）", got, n)
 	}
@@ -371,7 +371,7 @@ func Test222SpawnConclusionArrivesThroughRealBridgeChildren(t *testing.T) {
 	// The gate keeps every child inside its bridge call until all n arrived, so
 	// "the child ran while its parent was still waiting" is a fact this leg
 	// establishes rather than a race it hopes to win.
-	runs := awaitTokens(t, "孩子在桥上跑工具调用", h.probe.in, n)
+	runs := await222Tokens(t, "孩子在桥上跑工具调用", h.probe.in, n)
 	if got := h.probe.runs.Load(); got != int32(n) {
 		t.Errorf("孩子在真桥上的工具调用跑了 %d 次, want %d（孩子的工具面没接到桥上＝A420 的第 7 环）", got, n)
 	}
@@ -389,7 +389,7 @@ func Test222SpawnConclusionArrivesThroughRealBridgeChildren(t *testing.T) {
 	}
 
 	close(h.probe.gate222)
-	results := awaitTokens(t, "父任务拿到结论", h.parents, n)
+	results := await222Tokens(t, "父任务拿到结论", h.parents, n)
 	for i, res := range results {
 		if res.IsError {
 			t.Errorf("父任务 %d 收到的是错误而不是结论：%q", i, res.Text)
@@ -454,7 +454,7 @@ func Test222WaitingParentHoldsNoBridgeSlot(t *testing.T) {
 	}
 
 	close(h.release)
-	results := awaitTokens(t, "父任务拿到结论", h.parents, n)
+	results := await222Tokens(t, "父任务拿到结论", h.parents, n)
 	for i, res := range results {
 		if res.IsError {
 			t.Errorf("放开之后父任务 %d 还是收到了错误：%q", i, res.Text)
@@ -493,7 +493,7 @@ func Test222CeilingStillCapsExecutedCallsWhileParentsWait(t *testing.T) {
 		}(i)
 	}
 
-	running := awaitTokens(t, "宿主侧探针起跑", h.probe.in, h222CeilingLiteral)
+	running := await222Tokens(t, "宿主侧探针起跑", h.probe.in, h222CeilingLiteral)
 	if got := h.probe.maxSeen.Load(); got != int32(h222CeilingLiteral) {
 		t.Errorf("同时执行的工具调用数 = %d, want %d（等待中的父任务不该算进来，多出来的宿主调用要挤得进来）",
 			got, h222CeilingLiteral)
@@ -515,7 +515,7 @@ func Test222CeilingStillCapsExecutedCallsWhileParentsWait(t *testing.T) {
 	}
 
 	close(h.release)
-	results := awaitTokens(t, "父任务拿到结论", h.parents, n)
+	results := await222Tokens(t, "父任务拿到结论", h.parents, n)
 	for i, res := range results {
 		if res.IsError {
 			t.Errorf("父任务 %d 在被反控压过之后收到了错误：%q", i, res.Text)
