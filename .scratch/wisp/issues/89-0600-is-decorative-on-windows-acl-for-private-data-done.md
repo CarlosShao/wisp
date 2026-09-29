@@ -259,6 +259,7 @@
   当前 SID `S-1-5-21-1228170099-895614386-1166154857-1001`（账户 `swq`）；本机无既存 `wisp.db`（data 根尚未创建）。
   ⚠ `internal/winsec/winsec_windows.go` 此刻是**故意的占位**（只有 `os.Chmod`，也就是仓库今天的行为），
   所以本包判据测试**预期先红**——红完才换 SetSecurityDescriptorInfo。
+  `done-fix-1` 追加（戊类·凭据是**票面自己的后继格**，⛔ 不翻勾）：**待非实现者抽验，缺的读数是**——确认"这一格已被同票那枚已勾的 AC#1 作废"这件事由非实现者抽一次（本腿只能证明三枚框并存：`grep -n 'AC#1' 本票` 现量＝`:41 - [x] **AC#1** 先给基线证据`、` :258 - [ ] …（本枚只交骨架）`、`:275 - [x] **AC#1 基线：四类私有数据的 icacls 原文**`（判据测试 `internal/winsec/acl_windows_test.go`），**一张票里 "AC#1" 三枚框、两种状态**）。⚠ 本格那句"下一枚 commit 给（本枚只交骨架）"是一句**自我承诺**、不是判据；它被 `:275` 覆盖之后从没回头销。⇒ 这一格真正的账是**形状账**（该由裁决者定：翻勾、还是像票 115 AC#5／票 84 AC#3 那样把它搬出勾框），本腿两样都不做。
 - [x] AC#4 构造可行性（**2026-09-21 `agent-ticket89b` 实测更正，原句"普通权限建不出符号链接"是错的**）：
   **这台机上未提权就能建目录符号链接**——`IsInRole(Administrator)=False`（账户 `swq` 在 Administrators 组里，
   但进程令牌没提升）+ `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock\AllowDevelopmentWithoutDevLicense = 1`
@@ -306,6 +307,7 @@
   现已改为剥掉路径前缀 + 数每一条 `:(` 行（注释里记了这段），且 `TestAC1BaselineForeignACEPropagatesIntoModeOnlyWrites`
   是**反向钉子**：它断言"宽父目录的 ACE 一定会传到子文件"，一旦这条不成立就红，防止判据测空气。
 - [ ] 待办：`winsec_windows.go` 换真 SetNamedSecurityInfo（PROTECTED DACL + 逐层封 + 传播），AC#4 链接、AC#5 失败注入。
+  `done-fix-1` 追加（戊类·形状是待办行不是判据，⛔ 不翻勾）：**待非实现者抽验，缺的读数是**——"这三样都由本票别处的已勾格兑现了"这句话的一次非实现者核对。本腿今天现读到的支撑：AC#4＝`:262 - [x] AC#4 构造可行性（2026-09-21 agent-ticket89b 实测更正…）`、AC#5＝`:343 - [x] **AC#5 失败方向只能收紧（红→绿有名字）**：internal/winsec/private_fail_test.go`（框后逐字写着四条腿 + `errors.Is(err, ErrNotSealable)` + `assertNoBytesOnDisk`"磁盘上**一个字节都不许留**"）、真 SetNamedSecurityInfo 那条腿＝`internal/winsec/winsec_windows.go` 今天在场（票 104/115/118/126 的裁决表都在这枚文件上做过变异与复算，本腿不重跑）。⇒ 内容是**过期**、形状是**待办行**：它天生不是判据框，处置同 89 `:258` 那格，由裁决者定翻勾还是搬出勾框。
 - [x] **AC#3 实现落地 + 红→绿**（同一判据、同一台机、同一份 icacls 仪器）：
   `go test ./internal/winsec -count=2` **rc=0**；`-count=1 -v` 全名逐条：
   `--- PASS: TestAC1BaselineProductionPaths` / `--- PASS: TestAC1BaselineForeignACEPropagatesIntoModeOnlyWrites` /
@@ -340,6 +342,7 @@
       那条红**不是实现缺陷**，是判据被编辑掉了；重加调用后才真绿。记这条是因为：红/绿名如果不带原文，
       这种"测试自己坏了"的红会被当成实现的功劳或罪状。
 - [ ] 待办：AC#4（链接）、AC#5（失败注入）、把 memory/agent/secret 三条落盘路径接上 `winsec`、AC#6 的 POSIX 侧点名。
+  `done-fix-1` 追加（戊类·形状是待办行、里面夹一条真活，⛔ 不翻勾）：**待非实现者抽验，缺的读数是**——那三条落盘路径"接上"的判据粒度（**import 到 ≠ 每条写路径都过封**）由非实现者逐条核一次。本腿今天的现读只到形状这一层：`for p in internal/memory internal/secret internal/agent; do grep -rl 'wisp/internal/winsec' --include=*.go $p | grep -v _test | wc -l; done` ＝ **memory 2 枚／secret 2 枚／agent 1 枚非测试文件 import `wisp/internal/winsec`**（命令与数都原始，不含测试文件）；其余三样本腿在票内现读到已勾：AC#4 `:262`、AC#5 `:343`、AC#6 `:57` 与 `:383` 两枚 `- [x] 门禁`。另：89 交件时自己点名的"范围外残留"由**票 95** 具名接走（`95-…-done.md:3` 逐字「来源=票 89 交件时**自己点名**的范围外残留；我没塞回票 89，那是扩界」），本腿现量 **票 95＝0 未勾／5 已勾**（⚠ 它的 Status 行 `:3` 仍写 `open`，又一枚"改名＝结案"的形状，交回编排者）。
 - [x] **AC#5 失败方向只能收紧（红→绿有名字）**：`internal/winsec/private_fail_test.go`（无 build tag，两平台都跑）。
   注入点 = `applyDescriptor` 这个包内接缝（不是"假装失败"，是真的把平台实现换掉）：
   `TestAC5FailedSealRefusesTheWrite` 4/4 子测试绿，且要求**同时**满足 ①错误里 `errors.Is(err, ErrNotSealable)`
