@@ -201,6 +201,15 @@ func newPanelInboundDispatch(dir string, auditf panel.AuditFunc) (*panel.Compose
 	if err != nil {
 		return nil, fmt.Errorf("配置未就绪（%s）：%w", cfgPath, err)
 	}
+	// Ticket 223 AC#4's fourth sentence, and it is this host's true state: the
+	// tick that re-reads config.toml lives in `wisp run` (config_reload.go), not
+	// here. panel-inbound owns no approval gate - its Confirm is nil above, on
+	// purpose - so a loosening it read could not be confirmed even if it polled,
+	// and polling without a card surface is how a silent deny gets mistaken for
+	// hot reload. Rather than fake the tier, this line says which host did not
+	// take the job, and says it once per start instead of leaving the operator to
+	// infer it from an edit that never lands.
+	auditf("%s", hotReloadDisabledPanelInbound)
 	store, err := perm.New(perm.Options{
 		Manager: mgr,
 		// nil: no L2 card on this leg, so auto_approve is unreachable and every

@@ -263,6 +263,14 @@ type agentRuntime struct {
 	reply       *replySurface
 	replyRoot   *observe.Root
 	replyHandle *observe.Handle
+	// reloadRoot / reloadHandle own this run's config-reload tick (ticket 223:
+	// the first production caller of Manager.CheckAndReload in `wisp run`). The
+	// root is what the D36 confirmation card is parked on - cancelling it at
+	// close abandons an unanswered card, which resolves as a deny - and it is
+	// also the ctx the hook reads, because ConfirmLocked's own signature carries
+	// no context.
+	reloadRoot   *observe.Root
+	reloadHandle *observe.Handle
 	// modes is the assembled owner of the permission mode (ticket 90's storage,
 	// ticket 101's wire): the read the bridge consults once per call, and the
 	// only object in this process that may change the档.
@@ -601,6 +609,16 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		rt.attachReplyListener(s.reply, s.replyVeto)
 	}
 
+	// The config-reload tick, after the answer side (ticket 223). Order matters
+	// and is not cosmetic: the tick can raise an L2 card the moment it sees a
+	// hand-edited loosening, and a card raised before the reply listener exists
+	// is a card nobody in this process can answer - which would make D33's
+	// re-confirmation resolve as a deny for a reason that has nothing to do with
+	// what the operator wrote. config_reload.go owns the three lines this call
+	// wires (CheckAndReload's caller, ConfirmLocked, OnRestartPending) and says
+	// what still does not move mid-run.
+	rt.startConfigReload()
+
 	return rt, 0
 }
 
@@ -676,6 +694,12 @@ func (rt *agentRuntime) windowCount() int {
 func (rt *agentRuntime) close() {
 	if rt.replyRoot != nil {
 		rt.replyRoot.Cancel()
+	}
+	// Stand the reload tick down (ticket 223): this is also what abandons an L2
+	// re-confirmation still waiting on a human, and an abandoned card resolves as
+	// a deny, so shutting down can never be the moment a loosening slips in.
+	if rt.reloadRoot != nil {
+		rt.reloadRoot.Cancel()
 	}
 	if rt.store != nil {
 		_ = rt.store.Close()
