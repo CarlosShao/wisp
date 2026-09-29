@@ -10,7 +10,7 @@
 
 | # | 位置 | 判据 | 结论（未验＝〔待填〕） |
 |---|---|---|---|
-| 1 | `104-…-done.md:65` | AC#5 与票 89 第 4 条的分工写清 | 〔待填〕 |
+| 1 | `104-…-done.md:65` | AC#5 与票 89 第 4 条的分工写清 | **可翻勾**（已翻，`1d5678fb` 之后本腿 commit） |
 | 2 | `110-…-done.md:44` | AC#4 `R-93-4` 一并收（步级证据或明写为何不该纳入） | 〔待填〕 |
 | 3 | `113-…-done.md:76` | 〔待填〕 | 〔待填〕 |
 | 4 | `115-…-done.md:49` | 〔待填〕 | 〔待填〕 |
@@ -24,10 +24,23 @@
 
 ## 第 1 格 — `104-sealfile-silently-drops-inherited-grants-done.md:65`（AC#5）
 
-判据原文（票面）：〔待填〕
-本腿现跑的尺：〔待填〕
-读数：〔待填〕
-结论：〔待填〕
+判据原文（票面 `:63-64`）：
+> `- [ ] **AC#5** 与票 89 第 4 条的**分工写清**：票面/commit 正文里明说"本票只补继承那一半"，并核对 `89-...-done.md` 票面第 4 条的措辞**有没有被本票读成"已全部覆盖"**——若有，登记更正，**不改它的原文**。`
+
+本腿现跑的尺（四把，全部本腿自己跑，零转述）：
+1. `grep -n 'R-104-2' .scratch/wisp/issues/89-0600-is-decorative-on-windows-acl-for-private-data-done.md`
+2. `git show --numstat --format=%h 9141d4cf -- <89 票>`
+3. `git cat-file blob 9141d4cf^:<89 票> | sed -n '157p'` 与当前 `<89 票>` `sed -n '157p'` 对拉 `diff` + `md5sum`
+4. `git show -s --format=%B 4d43447 | grep -n "继承那一半\|AC#5\|89"`；`grep -n "Inherited\b" internal/winsec/winsec_windows.go`
+
+读数：
+1. `:159` 命中，逐字「**⚠ 编排者更正（2026-09-21 21:0x，来源=`acceptor-ticket104` 的 `R-104-2`；票 104 的 AC#5 就卡在这一句）**」，更正段延伸到 `:170`。
+2. `12 0`＝该 commit 给 89 票面加 12 行、**删 0 行**（纯追加）。
+3. `diff` 空输出＋`SAME-157`，两行 `md5sum` 同为 `f4b608d555ab2de30c2ba36122627fc2`＝被更正的原句「为什么只报显式、不报继承来的」原文一字未动。
+4. commit `4d43447` 正文第 4 行逐字「…本票**只补继承那一半**。」；本票 `:152` 亦写着「**AC#5 分工**：本 commit 正文与本票只主张"补继承那一半"」。代码侧 `internal/winsec/winsec_windows.go:66/:71`（`Inherited []string`）、`:138`/`:140`（两桶分支）、`:147`（`cleared_inherited` 字段）、`:317`（`noticeNarrowed(... Principals: explicit, Inherited: inherited)`）⇒ 更正段那句"通知面扩成两桶"是当前树的事实。
+
+结论：**可翻勾**。判据两半（分工写清／更正已登记且原文未动）都由本腿在盘上现读到；`done-fix-1` 记的那句「实质已闭，接线的动作从没做」本腿认——缺的正是"由非实现者认一次"，本腿这次就是那一认。已按派单形状在原格下追加一行 `done-check-1 勾＝…`，并把行首 `- [ ]` 翻成 `- [x]`。
+补充（不改变结论、只留痕）：表 `docs/evidence/s1/104-adversarial-acceptance.md:250` 对这格判的是「**不通过**（…→ R-104-2）」，那是登记**之前**的状态；本腿不抹那行。另 `R-104-2` 在 `docs/reports/pending-and-issues.md` 里 grep 为 0 命中（表 `:231` 当年写的是「写进 104 结案语**或** `pending-and-issues.md`」，落点选了 89 票面＋104 结案语 `:5`，两个或支里落了一个，本腿判这属"登记位置二选一已兑现"、不构成缺读数）。
 
 ## 第 2 格 — `110-no-ci-step-runs-internal-winsec-done.md:44`（AC#4）
 
