@@ -85,6 +85,7 @@
 |---|---|
 | 长期规则对**本次运行**生效 | 没做。`cmd/wisp/run.go:386-389` 的 `tools.NewPathCanonicalizer` 在装配时读一次 `[fs]`，本腿写的是文件，卡片与审计都明说"下一次启动生效"。要做"当场放宽"得再造成本器重建，属新功能，不混进本票 |
 | `config.Manager.ConfirmLocked` 仍为 `nil`（`run.go:341 config.NewManager(cfgPath, nil)`） | 没改。含义：手改放宽 `[fs]` 走的是 **deny（不静默生效）**，本腿的程序化写走"调用方先起 L2 卡"这一支（`permmode.go:54-63` 已把这套先例写死）。要不要把 nil 换成真起卡的钩子，属 D36/热加载那一族的定案，本腿不自作 |
+| 认领 mtime 这件事在这枚二进制里今天其实用不上 | 写下来免得下一位误读：`allowdirs.go` 的 `statOwnWrite` 只在 `CheckAndReload` 被调时才有意义，而编排者票 223 的普查（`172bda57`）量到 `CheckAndReload` 的唯一非测试调用者是 `cmd/balldebug/main.go:243`。⇒ 留着是因为它与 `SetPermissionMode` 的既有形状一致、且在常驻/球那侧一旦接上热加载就立刻需要；**不是**本腿用来支撑"不静默生效"的论据。本腿的论据只有一条：写之前那张 L2 卡必须已经被答，判据是 `approval: REPLY WIDEN-APPLIED` 只在 `PendingApproval` 返回 allow 之后出现 |
 | D38b roster 少一枚名 | 长期支的续体沿用 `approval-waiter` 这个名字（`internal/observe/goroutine.go:52`）。新造一枚 roster 名是契约面，本腿不造，只在代码里写明原因 ⇒ 如果要让"widening worker"单独计数，需要 owner 动 D38b |
 | `approval_grant` 生产写手 | 仍为零（票面 AC#5 原句已被编排者改写为 allowed_dirs 那一支，本腿按改写后的口径交） |
 | `internal/panel` 的 4 枚历史红 | 未碰、未修绿（见 §⑧ 读数） |
