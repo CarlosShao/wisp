@@ -384,6 +384,47 @@
 
 ## 9. 票 105 —— `105-c26-rewrite-account-has-no-production-reader-done.md`（2 枚）
 
+> 本腿现量：un = 2（`:47` `:54`）；AC 区共 5 枚（AC#1 `:38`／AC#2 `:42`／AC#3 `:47`／AC#4 `:51`／AC#5 `:54`），
+> 已勾 3 枚（un/chk 两条尺现跑：un=2／chk=3）。
+
+### 9.1 `:47` AC#3 祖先重解析那条腿的行为用例 + 变异 —— **丁（今天其实已满足，凭据在票 116 名下且验收方具名放行 105 结案）**
+
+- 原文行首逐字：`- [ ] **AC#3** 补祖先重解析那条腿的**行为用例**：构造"祖先带 reparse/junction"的输入 ⇒ 断**可观察结果**`
+- 本格当年被谁卡住（本腿现读）：`docs/evidence/s1/105-adversarial-acceptance.md:116` 判 **FAIL-退回**（`R-105-2`），
+  总判 `:203` 逐字「**FAIL-退回（只退 AC#3 这一格，其余四格通过）**」⇒ 缺的东西当年很具体：**行为用例，不是符号用例**。
+- 盘上凭据（**本腿今天在树里现读**）：`internal/risk/syncdirs_ancestor_actable_leg_116_test.go`
+  - `:153` `func TestSyncAncestorActableLegFailsClosedOnMovedAncestor116`（正是"祖先腿"那一枚行为用例）
+  - `:239` / `:270` `TestSyncFirstActableLegStillRefusesEnvRewriteAtVerdict116`／`...HomeRewriteAtVerdict116`（反半边）
+  - `:307` `TestSyncAncestorLegStillMatchesPlainSameTreeWrite116`（同树成功那半）
+- 凭据出处＝**非实现者**：`docs/evidence/s1/116-adversarial-acceptance.md:1` 署名「票 116 对抗验收 —— `acceptor-ticket116`」，
+  `:108` 总判逐字「**通过（附一条非阻塞措辞修正 R-116-2）**」，理由段逐字
+  「票 116 存在的唯一理由——"删掉祖先那一次 `Actable()` 腿时，有没有一枚**行为**用例会红、而票 105 那两条仍绿"——
+  被我在 Windows 与 docker POSIX 两侧**独立复现成立**（M1/M2 各自把 `TestSyncAncestorActableLegFailsClosedOnMovedAncestor116`
+  单枚钉红、红形是 `Sync` 翻转/`Why` 丢账，非编译期符号…）」，紧接着一句逐字
+  「**票 105 能否因此结案：能。** `acceptor-ticket105b` 卡 AC#3 的那格…已被本票的行为用例补齐并独立复现」
+- ⚠ 本腿给丁类**如实划出射程边界**（这是 28 枚里唯一一枚丁，别把它读得比证据硬）：
+  ① 验收方的红/绿读数绑 `80e248c`（表 `:3` 逐字「**被验 sha**：`80e248c`（用例）＋ `63fdbd2`（票面 append）」），
+  本腿**不许跑测试**，因此只能证"用例文件与四枚函数名今天在树里"，**不能**证它今天仍绿；
+  ② 交付记在票 116 名下，不在 105 名下 ⇒ 翻 105 这框的人在票面上要留指针。
+  ⇒ 判**丁**，但**翻不翻由编排者定**；本腿按纪律**不动任何勾**。
+
+### 9.2 `:54` AC#5 门禁（按包 scope，五发＋各 scope 文件数）—— **甲（"读数绑结案时点"那一族的第 4 次出现，见 8.2 的结构性话）**
+
+- 原文行首逐字：`- [ ] **AC#5** 门禁（按包 scope）：`go test -count=2 -v` 各包 rc=0 并逐条点名 SKIP/FAIL（**报 `=== RUN` 行数 == 不同测试名 × 2**；`
+- 当年读数（非实现者，本腿现读）：`docs/evidence/s1/105-adversarial-acceptance.md:151` 那一节声明逐字
+  「**口径**：全部跑在 `f6818f2` 的**纯净快照** `/tmp/ac105b-gates`…交件的读数是在**当前工作树**量的
+  （它自己标了"树＝当前工作树"）⇒ 两处不同步的数我按快照重算，并点名差异」
+- 缺什么很具体：**`go test -count=2 -v` 各包四数 ＋ `gofmt`/`gofumpt -l` 空 ＋ `go vet` 与 `GOOS=linux go vet` 按包 rc=0
+  ＋ `sh scripts/d22scan.sh` 纯净快照 rc=0 且各 scope 文件数不降**，这五发在**当前 HEAD `fac60ad4`** 上的一次非实现者读数。
+  本腿能静态读到的只有"仪器还在"：`scripts/d22scan.sh` 在场、`tools/d22scan/main.go` 在场（本腿只 `ls`/`grep`，未跑）。
+- 归口核查：票 116 的 AC#5（`:52`，已勾）是**它自己包面**（`internal/risk/`）的门禁，不是 105 那四包 ⇒ 不是丙。
+- ⚠ 另记一枚本腿**推翻旧话**的读数（不影响判性，但影响后来人引用）：票 105 的标题与 AC#1 钉的是
+  "`RewrittenRoots()` 这本账**零生产读取者**"，本腿今天在树上重跑那把尺，**读数已经变了**——
+  `internal/tools/bridge.go:1053` 逐字 `return b.paths.Roots(), b.paths.RewrittenRoots(), b.paths.UnusableRoots()`
+  （其宿主 `:1049 func (b *Bridge) pathAccount() (roots, rewritten, unusable []string)` 本腿一并现读）。**"零生产读取者"这句今天不为真**，而它不为真正是本票 AC#2 接上的那条线；
+  引用这句话当现状的人请把票号/日期带上。那把尺具名：`grep -rn 'RewrittenRoots(' --include=*.go internal cmd | grep -v _test`
+  ⇒ 三行命中：`bridge.go:999`（注释）／`bridge.go:1053`（**真读取点**）／`paths.go:194`（定义）。
+
 ## 10. 票 110 —— `110-no-ci-step-runs-internal-winsec-done.md`（2 枚）
 
 ## 11. 票 113 —— `113-posix-platformverifypplacement-has-no-link-leg-done.md`（2 枚）
