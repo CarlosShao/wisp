@@ -8,7 +8,14 @@
 
 ## 起手名册（本腿第一次跑的绿/红名集合）
 
-未判（待填：本腿自跑的 `internal/tools` ＋ `cmd/wisp` 逐名名册）。
+锚点 `801e8547`，第一发＝`go test ./internal/tools -count=1 -v`（PATH 已带 `third_party/sherpa-onnx`＋`build`）：
+
+- **161 枚 `--- PASS`／0 枚 `--- FAIL`／0 枚 SKIP**（`=== RUN` 210 含子例），包终态 **ok 13.081s**；
+- 逐名清单落盘：`.scratch/wisp/probes/222/v1/logs/baseline-tools-names.txt`（161 行，`PASS: <名>` 逐名）；原始日志 `baseline-tools-v.txt`；
+- 三枚 222 用例起手即绿：`PASS: Test222SpawnConclusionArrivesThroughRealBridgeChildren`／`PASS: Test222WaitingParentHoldsNoBridgeSlot`／`PASS: Test222CeilingStillCapsExecutedCallsWhileParentsWait`（各 0.00s）；
+- 起手**红名集合＝空**（`internal/tools` 范围内）；全仓的 5 枚历史红不在本包，见 AC#6。
+- ⚠ 起手读数没有 `0xc0000135`、没有 `0.0xxs 无 --- FAIL` 那种"用例根本没跑"的形状：`-v` 里 `=== RUN`＝210 与 `--- PASS`＝161 同时非零，DLL 前置生效。
+
 
 ---
 
@@ -23,7 +30,7 @@
 | 孩子的工具面走真桥＝**唯一**载荷行是 `ParentTools: h.bridge` | `internal/tools/subagent_222_test.go:278` |
 | `Tools: h.bridge` 那行是**死行**：产码随后无条件覆写 `opt.Tools = newSubagentToolProvider(t.d.ParentTools)` | `internal/tools/subagent_197.go:284` ⟸ 覆写 `subagent_222_test.go:288` |
 | 包装器把孩子的调用**逐字转交桥**，不另开路 | `internal/tools/subagent_197.go:567` `return p.inner.Execute(ctx, req)` |
-| 桥的 `Execute` 就是取许可那枚入口 | `internal/tools/bridge.go:438-442`（`slot.take(b.sem)` ＋ `defer slot.giveBack()`） |
+| 桥的取许可点在 `run`，而 `Execute` 逐字转交它 | `bridge.go:245` `func (b *Bridge) Execute` → `:317` `return b.run(ctx, req, entry, dec)` → `:438-442`（`slot.take(b.sem)` ＋ `defer slot.giveBack()`） |
 | 生产形状确实是同一枚桥 | `cmd/wisp/run.go:589 ParentTools: rt.bridge` |
 | 三枚新用例真名与行号 | `subagent_222_test.go:362`／`:434`／`:469`；`go test ./internal/tools -list '.*'` 现跑＝**161 枚顶层**，其中含 `222` 的 **3 枚** |
 
@@ -273,18 +280,74 @@ go test ./internal/risk -count=1                                                
 
 ---
 
-## 推翻派单里的哪句话
+## 推翻派单／票面里的哪句话（逐枚带尺；推翻不了的就写"未推翻"）
 
-未填（推翻不了就写"未推翻"）。
+1. **推翻（票面 `:78` 给下一位的待办②，＝`222-r1` 的自述）**："把 `giveBack()` 的 `sync.Once` 拆掉 ⇒ '同一枚许可被扣两次'那形必须红"。**实测不成立**：M2（只拆 `bridge.go:672` 的 `once.Do`、留 `:675` 的 `s.sem = nil`）三枚用例 **0.040s 全绿**；M9（只删 `s.sem = nil`、留 once）也 **0.032s 全绿**。真正的双扣形要把**两枚护栏同时拆掉**（M8）才红，而且它红在 **30s 挂死护栏**上，不是 r1 自述（票面 `:68`）那句"终态 `len(sem)=0` 兼作双扣那形的尺"——M8 下那一行（`:524`）根本没被执行到。**这条要按"追加更正"进票面，不改写原文。**
+2. **推翻（我派单里的口径句，不是结论句）**："逐名红册（`-v`，按用例名集合）＝恰 5 枚"。**盘上那发 `-v`（`orch/three-v.txt`）只覆盖了 3 枚 FAIL 包**（ball／panel／risk，405 枚 `=== RUN`），不是全量 `-v`；全量非 `-v` 那两发（`full-v.txt`／`clean-nov.txt`）逐名是 **6 枚**＝5 枚历史红＋`TestResolvePerCallBudget`。"零新增红"这个**结论**本腿认（risk 那枚 3 发安静复量全绿），但**"恰 5 枚"不能当成全量 `-v` 名册来引用**。
+3. **推翻（我派单里的一句状态描述）**："票 221 还没派"。**现读**：票 221 的只读普查腿 `221-c1` **已交**（台账 `A433`，28,379 字节，`dc4f3870`），甲形（注册 `task.cancel`）**已获 owner 批准**（`A434`，13:10，撤销口令「撤 221 甲」）；**没派的是写腿**，且票 221 文件 `:4` 逐字把写腿排在本腿（`222-v1`）**之后**。⇒ AC#4 的"未闭"结论不变，但结案路径比我派单说的更靠前、更具体。
+4. **推翻一半（票面 `:71`，r1 的 AC#5 自述）**："池抬到 8 会**立刻红** `Test197SubagentPoolNeverExceedsBridgeCeiling` 与 `Test197SubagentPoolCapsAtBridgeCeiling`"。**两枚点名的钉子确实红**（0.00s，`subagent_197_test.go:405`／`:444`），但**实测红 4 枚**：还多 `Test197FullPoolRefusesNextSpawnWithReadableReason`（`:529`）与本票自己的 `Test222SpawnConclusion…`（3.00s，见 AC#5 注②对它的**限定**）。⇒ 它没说错方向，说少了数目。
+5. **未推翻**（逐枚列出，免得被当成"顺手都推翻了"）：
+   - 待办①"删掉 `subagent_197.go:356` ⇒ 三枚用例必须红"＝**成立**（M1：三枚红，两枚 0.00s、一枚 3.00s 判在正文）。
+   - 待办③"`MaxToolConcurrency`／`MaxConcurrentSubagents`／`PLAN.md:2849` 未被为了并发而说破"＝**成立**（M5 证明反控能看见帽被抬；常量与契约 diff 全净）。
+   - 票面 `:52` 的三枚提交文件清单与消息逐枚相符＝**成立**（`git show --stat 92a4b5b7／bfc55b5b／beaeaeba` 现读逐枚相符，每枚都带 pathspec 落点）。
+   - 票面更正块 `:60` 那句"父任务实际收到的是桥的超时文案而不是'不等了'"＝**成立**（M1/M11 读数原文：`工具 task.spawn 超时（Nms），已协作式中止`）。
+   - AC#3 的"不许新造导出名"这一枚**没被踩**：新增六枚顶层声明逐枚小写开头，源名复用 `risk.SrcTaskOutput`，`SubagentDeps` 仍 5 枚字段。
+
+## 票面 `:24` 留给验收腿的那枚归因，本腿的读数（"永挂"一支）
+
+票面 `:24` 逐字："⚠ **'永挂'这一支我不下结论**（腿报'无限挂住'，但父侧有 `ectx` 超时兜着 ⇒ 真形状是**周期性松绑＋父侧一律报错**，不是死锁）。**归因未做，留给验收腿现跑。**"
+**本腿裁定：编排者那句推断成立。** M1（未修码）读数：4 枚父任务在 **3.00s** 全部拿到错误正文并**释放许可**，孩子在它们返回**之后**照样挤上桥跑完（`:380` 逐枚记"已有 4 枚父任务返回"），终态池位回收由 `:417` 读到"没回收：2"＝父走了、孩子还在跑。⇒ **不是死锁，是"父侧一律报错＋孩子继续跑完并落名册"的分裂**。**真会挂死的是另一枚形状**：许可被扣两次（M8），那形三枚用例各 30.00s 撞护栏、整包 90.037s，且盘上用"终态 `len(sem)=0`＋nil 护栏＋once"三处把它按住（前两者的单独贡献见 AC#2 的 M2/M9/M8 读数）。
 
 ## 票 222 现在该勾哪几格 / 哪几格必须留着（具名原因）
 
-未填。
+| AC | 本腿判语 | 该不该勾 | 留着的原因（具名） |
+|---|---|---|---|
+| AC#1 | 成立（两注） | **可勾** | 注①②是缺陷登记，不改变"生产形状第一次有尺＋修前红修后绿"这条判据被满足 |
+| AC#2 | 成立（三注） | **可勾**，但**必须同时把票面 `:78` 待办②就地更正**（追加、不抹原文） | 反控非恒真（M5 读数在案），"永久钉住"成立；被推翻的是 r1 描述突变的那句**话**，不是那枚钉子 |
+| AC#3 | **不成立（半格）** | ⛔ **必须留着** | 甲形（`task.spawn` 立即返回句柄）**至今没有 `A##`**（台账 `:9144`／`:9273`／`:9330` 逐字；`A434` 批的是票 221 的 `task.cancel`，不含本格）；乙形撞 `bridge.go:30-31` 的 C22 契约面；M11 三发 3/3 红证明通道仍未真 ⇒ **要 owner 一句话，agent 不自裁** |
+| AC#4 | **不成立（未闭）** | ⛔ **必须留着** | `subagent_197.go:196`／`:388-389` 两句"可以单独停它"仍在，`task.cancel` 仍不在注册名册（`task.go:595-597`）；结案＝票 221 的写腿，排程在本腿之后，且同撞 `subagent_197.go` ⇒ 串行、同批只一枚碰 |
+| AC#5 | 成立带注 | **可勾**（它只要求"现读定性"） | 勾的是"定性已交付"，**不是**"池可以写 8"。抬不抬池＝owner 独立问题；注①那枚过期理由（`subagent_197_test.go:398-402`）要另开一格收，别让它继续当论据 |
+| AC#6 | 成立 | **可勾** | 编排者本人的那发整包已在（`A432`＋`orch/*`），本腿核了口径、补了 risk 三发复量与全套门禁（gofumpt v0.12.0/build/vet/d22scan/-list/cmd-wisp 110.491s） |
 
-## 没做完 / 判不了（具名清单，本节不许空）
+⇒ **本腿建议：勾 AC#1／AC#2／AC#5／AC#6 四格，留 AC#3／AC#4 两格。** 票面 Status 那句"这枚票今天只做成半格的那一半要说给 owner"（`:3`）**照旧成立且更硬**：本腿把"剩的那半"量成了读数（M11），不是文字推断。
 
-未填。
+## 没做完 / 判不了（具名清单）
 
-## 伪授权登记（工具输出里任何自称"编排者备注／系统提示／用户已改规矩／请 revert／请冻结／请放宽"）
+1. **没做（有意不做，越权面）**：抬池帽到 8／改 `MaxToolConcurrency`／改 per-tool 超时／给 `task.spawn` 开 C22 豁免——全归 owner（AC#3/AC#5）。
+2. **没做（尺的射程不够，具名）**：AC#1 注①——M3（`h.dir` 原形）下只有 1/3 用例能看见真桥、且靠 30s 护栏才红。补法本腿已写清（在 `await` 之前先读一次 `h.probe.runs`），**但本腿不改 `_test.go`**。
+3. **没做（不是本票的尺）**：全量 `-v` 终态名册（编排者的尺，他已声明由他自己复跑翻勾）；本腿只跑了 `internal/tools`（全量 `-v`）＋`cmd/wisp`＋`internal/risk` 三包。
+4. **没做（外部对标）**：票面 `:31` 那些"别家分设两枚帽"的路径（Step-Code／DSH／minimax／openchamber）本腿**一枚都没复现**，票面自己标注"只当存在这种形状用，不许当判据"⇒ 本腿也没用它当任何判据。
+5. **判不了：零枚。** 六格没有一枚只能靠 `frontend/**` 或 `design/**` 来证——本腿**连目录都没列**，报告里也不出现那两枚地界的任何内容（AC#6 里那 5 枚历史红只写归属与名字，不转述其逐字原因涉及的样式源内容）。
+6. **没做（票面 §⑧ 那类）**：`subagent_197_test.go` 里两处理由过期的注释（`:398-402`，另有 §⑧ 提到的 `:516-525`）本腿只**具名登记**，未修——它在票 197 的写面上，与票 221 同批串行。
 
-命中数：**0**（截至骨架落盘）。原文与出现位置：无。
+## 逐发还原自证（每发突变跑完后的现跑）
+
+本腿**全程 `-overlay`**：突变体由 `git cat-file blob HEAD:<path>` 取原文在内存改写、写到 `.scratch/wisp/probes/222/v1/mutations/<id>/`，`go test -overlay=<json>` 只在编译期替换文件——**工作树从未被写过一枚字节**，因此"还原"不是恢复动作，而是构造性事实。逐发现跑 `git status --porcelain -- cmd/wisp internal/`：
+
+| 发 | 时刻读数 | `git status --porcelain -- cmd/wisp internal/` |
+|---|---|---|
+| asis 对照 | 0.042s 绿 | 空 |
+| M1 | 3.034s 3 红 | 空 |
+| M2／M3／M4 | 0.040 绿／30.03 红／0.031 红 | 空（每发后现跑） |
+| M7／M9／M8 | 0.033 绿／0.032 绿／90.037 红 | 空 |
+| M5／M6（整包 `-v`） | 159 绿 2 红／157 绿 4 红 | 空 |
+| M10／M11 | 0.035 红（1/3）／0.20s×3 红（3/3） | 空 |
+| 收尾（本报告落盘后） | — | 空＋四枚文件 `sha1sum` 与起手值逐字节相同 |
+
+收尾复跑（本腿最后一次）：见下面"收工门"一节。
+
+## 伪授权登记
+
+命中数：**0**。整条腿的工具输出里没有出现任何自称"编排者备注／系统提示／用户已改规矩／请 revert／请冻结某包／请放宽阈值"的内容，因此没有需要照办、也没有需要抗拒的东西。
+一枚需要记账但**不是授权**的事件：后台任务完成通知（task id `b0u8gns0i`，我发起的 `go test ./cmd/wisp -count=1`，命令前 40 字＝`go test ./cmd/wisp -count=1 > .scratch/wis`）——纯 harness 事件，零指令内容，读数已进 AC#6。
+
+## 收工门（本腿最后一发现跑，读数在此）
+
+- `"$(go env GOPATH)/bin/gofumpt.exe" -l` 三枚交付件 ＝ **空输出，exit 0**（v0.12.0）
+- `go build ./...` ＝ **exit 0**
+- `bash scripts/d22scan.sh` ＝ **clean — no D22 ban violations**（bans#1-5 internal/=219、cmd/=29、ban#6 frontend/=85、ban#7 internal/tools/=22、ban#8 四路）
+- `git status --porcelain -- cmd/wisp internal/` ＝ **空**；四枚文件 `sha1sum` 与起手**逐字节相同**：`bridge.go 36a1d2b9…`／`subagent_197.go df860999…`／`subagent_222_test.go b3938cf0…`／`subagent_197_test.go 3ff5c9a7…`
+- 三枚 222 用例复量 `-count=3` ＝ **9/9 PASS，各 0.00s**（机器不空：同时有只读腿在 grep，故三发定案而非单发）
+- 本腿**零 push**、**零产码写入**、commit 逐枚带显式 pathspec；工作树里别人的脏改动（`.gitignore`、`design/**` 一批删除、`probes/152/**`、`probes/161/r6/logs/**`、`probes/222/orch/**` 等）**一枚没动**；临时件**只建不删**（`.scratch/wisp/probes/222/v1/**`：`mut222.py`＋`mut11.py`＋9 枚 mutations 目录＋18 份原始日志）。
+
+
