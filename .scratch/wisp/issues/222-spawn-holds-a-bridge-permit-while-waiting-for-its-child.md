@@ -1,6 +1,6 @@
 # 222 — **`task.spawn` 一边占着桥的执行许可、一边等孩子跑完** ⇒ 父任务永远在"不等了"那条错误文本上收场；而**测试看不见这一形，因为测试给孩子的工具面绕过了桥**
 
-- Status: **待派，优先级＝本编队当前第一**（owner 09-28 原话「**子代理必须看到状态，而且点击某个子代理，能看到它们各自的流式工作页面**……这是主流 harness 必做的，不要偷懒」——**这一枚不修，那一句在真机上就是坏的**）。
+- Status: **产码已交并静态核过（09-29 12:46，见文末"收 `222-r1`"那一节），⛔ 六格今天一枚没勾**——两枚前置未到：① **我自己的整包复跑**（被在飞写腿 `226-r1` 挡住：它正在改 `internal/config/allowdirs.go`／`loader.go`／`permmode.go`，而 `cmd/wisp` 与 `internal/tools` 都吃 `internal/config`⇒ 现在跑编译读到的是它半截的码）；② **非实现者终裁 `222-v1`**（`SPEC-12 §4.3`／`AGENTS.md` §0.3：验收必须由另一枚程做，实现者的自述不是翻勾依据）。⛔ **不翻 `-done`**，且**这枚票今天只做成半格的那一半要说给 owner：「派了子任务、父任务报错」这件事现在只修掉一半**。
 - 来源＝只读腿 `211-c1` 的 ④ 节（**它推翻了票 211 的前提**）＋编排者自己逐环现读（下面每一行都我自己跑过尺，不是转述）。
 - ⚠ 与票 211 的关系：**票 211 那枚"要真 8 枚得先改契约 D38d"的问题，被本票证明是问错了**——见 §"为什么 211 的前提塌了"。
 
@@ -44,3 +44,36 @@
 ⛔ **不动 `PLAN.md:2849` 那个 4**，也不动 `docs/specs/SPEC-01:134`／`:26`／`SPEC-05:70`（改它＝契约改动，要 owner 一句话）；`thresholds.go`／golden／`allowlist.txt`／C17 白名单既有名字一字不动；不新增导出方法名（票 194 是名册补齐的射程）；`frontend/**`／`design/**` 零写（连内容都不转述）；
 ⛔ **不许用"把池调到 8"来交这枚票的差**——那是把"占着许可干等"从 4 枚放大到 8 枚，症状更糟；
 ⚠ 写面撞车：本票与 **票 201**（正在飞的写腿）、**票 221** 都碰 `internal/tools/subagent_197.go`／`cmd/wisp` ⇒ **一律串行**。
+
+---
+
+## 收 `222-r1`（编排者，2026-09-29 12:46，锚点 `beaeaeba`；上面原句一字不抹，本节只追加与更正）
+
+**盘上事实（我自己跑的尺，非转述）**：三枚提交＝`92a4b5b7`（只 `docs/evidence/s1/222-spawn-permit-release-r1.md`，现读 23,258 字节）／`bfc55b5b`（只 `internal/tools/bridge.go`＋`internal/tools/subagent_197.go`＋`internal/tools/subagent_222_test.go`）／`beaeaeba`（只那枚证据件＋测试件）；文件清单与消息**逐枚相符**（`A429` 那起共享索引事故之后，这批每发 commit 都带了 pathspec）。测试件工作树 19,956 字节＝HEAD 内 19,956 字节 ⇒ `dd7c447f` 那次"被半路收走"的中间态**已闭合**。
+
+**我逐枚现读复认的冻结面**：`bridge.go:24` `const MaxToolConcurrency = 4`、`:28` `const DefaultToolTimeout = 30 * time.Second`、`subagent_197.go:85` `MaxConcurrentSubagents = 4`；`git diff beaeaeba --stat -- PLAN.md docs/specs/ internal/risk/thresholds.go` ＝ **空**。⇒ 上面那句"真正的一条路（丙）……桥仍是 4、`PLAN.md` 一字不动"**已被兑现**。
+
+**交接点（形状是真的，位置有理由）**：`subagent_197.go:356` `giveBackWhileWaiting(ctx)` 落在 `child.RunAsync`（`:335`）之后、两条"已派生"文案（`:357`／`:358-360`）之前；桥侧六枚新载体**全未导出**（`bridge.go:657`／`:664`／`:670`／`:682`／`:684`／`:694`，接线 `:438`／`:453`）⇒ 零新增导出名、`SubagentDeps` 仍 5 枚字段。
+
+### ⚠ 两处更正（它顶回我，我现读 `bridge.go:473-486` 复现，认账）
+
+1. **上面 §现量 推出的那句父侧文本，父任务其实收不到**。工具自己写的是 `subagent_197.go:389` 那段「父任务这一侧已经不等了……」，但 `bridge.go:478` 的 `errors.Is(ectx.Err(), context.DeadlineExceeded) && ctx.Err() == nil` 会在 `Execute` 返回之后把它**换成**「工具 task.spawn 超时（Nms），已协作式中止」（`:481-482`）。⇒ **形状不变**（仍 `IsError`、父侧仍拿不到孩子结论），**措辞要按这句改**；本仓判据没有一条依赖那句字面，所以不影响任何 AC。
+2. **行号漂移**：上面 AC#4 引的 `:362-363`（"可以单独停它"）现读在 **`:389`**；Description 那处现读在 **`:196`**（票面写 `:189`）。AC#4 本身仍归票 221（同撞 `subagent_197.go`），只更正坐标。
+
+### 逐格状态（⛔ 全不翻勾，等 `222-v1`＋我的整包复跑）
+
+| AC | 实现者自述 | 我今天的读数 |
+|---|---|---|
+| AC#1 | 做了 | **未翻**：三枚用例真名在盘（`subagent_222_test.go:362`／`:434`／`:469`），"孩子工具面走真桥"这半条我从码上认（`ParentTools: h.bridge`）；**但修前红与修后绿两发都是实现者自跑**，我未复跑 |
+| AC#2 | 做了 | **未翻**：同上；`giveBack` 走 `sync.Once`、终态 `len(sem)=0` 兼作"双扣"那形的尺——形状我读了，读数我没跑 |
+| AC#3 | **半做** | ⛔ **只能算半格，且它自己声明剩半支等 owner**：丙形消掉"孩子被自己的父饿死"；**等待仍受 per-tool 超时约束**（孩子跑得比 `cfg.Agent.PerToolTimeoutMS`／未配置 30s 久⇒父任务仍收到桥的超时文案，孩子继续跑并正常落名册⇒**名册对、父任务错**这枚分裂仍然存在）。乙＝给这枚调用开 C22 豁免，`bridge.go:30-31` 逐字 "nothing here can switch enforcement off" ⇒ **契约面，谁都不自裁**；甲＝`task.spawn` 立即返回句柄＋之后用现成 `task.output` 读结论 ⇒ **要先落 `A##`**。**大白话：派了子任务、父任务报错这件事，今天只修掉一半。** |
+| AC#4 | 未做（有意） | 归票 221（`221-c1` 只读普查已派，12:46） |
+| AC#5 | 只给定性 | 它量到"池抬到 8 会立刻红 `Test197SubagentPoolNeverExceedsBridgeCeiling` 与 `Test197SubagentPoolCapsAtBridgeCeiling`，且名册会出现 4 枚递不动工具的'在跑'"⇒ 这一格**不许靠测试绿了过**的要求已满足为"没靠绿过"，但仍属〔仅自述〕未复核 |
+| AC#6 | 做了 | **未翻**：它的两发原始整包日志我读了（`/tmp/222r1/gates-full.txt`、`gates-full2.txt`，各 67 行）⇒ 两发均 **24 包 ok／FAIL 只有 `internal/ball` 1 例＋`internal/panel` 4 例**，逐字原因全指另一队地界，零新增红；**`internal/risk` 这两发为绿**（6.122s／5.071s）⇒ 我在 `A428` 给的"CPU 争用型假红"归因**多了两次独立样本**。**但这不是我跑的那一发。** |
+
+### 给下一位的两枚待办（顺序有依赖）
+
+1. **等 `226-r1` 交件后**，我本人复跑并落到 `.scratch/wisp/probes/222/r1/gates-full.txt`（**绝不接 `| tail`**）：`export PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"; go test ./cmd/wisp ./internal/... -count=1`，与 `.scratch/wisp/probes/201/r2/gates-full.txt` **逐名比红名集合**（基线＝`internal/ball` 1 例＋`internal/panel` 4 例；`internal/risk` 若再红先按争用复量再归因）。
+2. **`222-v1`（非实现者对抗验收）**，判据至少三发变异：① 删掉 `subagent_197.go:356` 那一行 ⇒ 三枚用例必须红（正控）；② 把 `giveBack()` 的 `sync.Once` 拆掉 ⇒ "同一枚许可被扣两次"那形必须红；③ 核 `MaxToolConcurrency`／`MaxConcurrentSubagents`／`PLAN.md:2849` 未被为了并发而说破（**同时执行数 ≤ 4 是反控，不许被改绿来迁就修复**）。锚点交给它自取（`git rev-parse --short HEAD`），⛔ 不许引用 `dd7c447f` 作为 `internal/tools` 的"已核过绿"锚（`A429` 事故那发）。
+
+> owner 09-28 原话（本票起手时挂在 Status 行，交付后移到这里保留）：「**子代理必须看到状态，而且点击某个子代理，能看到它们各自的流式工作页面**……这是主流 harness 必做的，不要偷懒」。**这一枚修掉的是"父任务里看不到孩子的结论"那一半；"点进去看各自的流"属票 197／票 220 的地界，不因本票结案。**
