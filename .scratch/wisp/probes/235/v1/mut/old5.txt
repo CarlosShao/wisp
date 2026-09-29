@@ -1,0 +1,5 @@
+// Why a bigger pool is a lie and not extra capacity: one in-flight spawn holds
+// one bridge slot for its child's whole life (bridge.run keeps the semaphore
+// held across entry.Tool.Execute), so every admitted child above the ceiling is
+// a row the roster prints as 「在跑」 while the machine has it queued inside the
+// bridge - which is exactly the 7/8-red shape ticket 197 leg A reported.

@@ -1,0 +1,41 @@
+time=2026-09-29T23:19:40.089+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test222SpawnConclusionArrivesThroughRealBridgeChildren
+time=2026-09-29T23:19:40.098+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-4ef493f1-cdd0-4234-bfea-451576ce4b76 owner=tools
+time=2026-09-29T23:19:40.098+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-5e5f79dd-bc07-43e6-bf74-cbec4b040707 owner=tools
+time=2026-09-29T23:19:40.098+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-badf0aa2-c8ed-4b5a-8edc-04fc5a6a621b owner=tools
+time=2026-09-29T23:19:40.098+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-8c49a3c2-10b9-450d-b8e6-e403efa2396a owner=tools
+--- PASS: Test222SpawnConclusionArrivesThroughRealBridgeChildren (0.01s)
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T23:19:40.103+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-a8550a88-c7b2-4067-9275-937388337be0 owner=tools
+time=2026-09-29T23:19:40.103+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-2f94c3af-ba42-4013-a9a4-ca148f35fdfb owner=tools
+time=2026-09-29T23:19:40.103+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-221514b6-6223-4bcb-841e-50aa0d67e0e0 owner=tools
+time=2026-09-29T23:19:40.103+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-ad75dcbd-bc33-4e08-a76f-c5c5cba1d223 owner=tools
+--- PASS: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+=== RUN   Test222CeilingStillCapsExecutedCallsWhileParentsWait
+time=2026-09-29T23:19:40.105+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-707a3377-8ed9-4213-ae03-0ca20adf9a43 owner=tools
+time=2026-09-29T23:19:40.105+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-e0b585b0-6bb5-4288-a88e-5e3a175c8b3b owner=tools
+time=2026-09-29T23:19:40.105+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-b1a0fb68-775f-42a8-8bb5-2daf835ecf1b owner=tools
+time=2026-09-29T23:19:40.105+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-f4fafe31-62b8-4379-b1ba-344553ca2596 owner=tools
+--- PASS: Test222CeilingStillCapsExecutedCallsWhileParentsWait (0.00s)
+=== RUN   Test222SpawnConclusionArrivesThroughRealBridgeChildren
+time=2026-09-29T23:19:40.110+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-aa9aed22-c097-4265-ae19-6f612141fd8b owner=tools
+time=2026-09-29T23:19:40.110+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-d50bd041-1b12-428d-91dc-2199b20b2ef6 owner=tools
+time=2026-09-29T23:19:40.110+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-15856e45-b67b-4892-b547-d82189921a9a owner=tools
+time=2026-09-29T23:19:40.110+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-79a41c1c-6967-4342-8229-347e69e38a42 owner=tools
+--- PASS: Test222SpawnConclusionArrivesThroughRealBridgeChildren (0.00s)
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T23:19:40.112+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-2f93554f-67fd-443e-9527-3d9ce4c6c516 owner=tools
+time=2026-09-29T23:19:40.112+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-03afc363-9009-4905-8357-85c5ee565548 owner=tools
+time=2026-09-29T23:19:40.112+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-4ac89085-1b52-4ad2-b92f-88d8d1dde082 owner=tools
+time=2026-09-29T23:19:40.112+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-f9b5fe34-ed32-4c11-b17f-2e4417054bcf owner=tools
+--- PASS: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+=== RUN   Test222CeilingStillCapsExecutedCallsWhileParentsWait
+time=2026-09-29T23:19:40.114+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-e7dfd92d-2f53-4cdf-b5ef-76e214f44006 owner=tools
+time=2026-09-29T23:19:40.114+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-93b843f9-d382-4556-a6cb-c03e314a69b8 owner=tools
+time=2026-09-29T23:19:40.114+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-789b9f5e-932f-4c58-8039-8a124aad462d owner=tools
+    subagent_222_test.go:555: 只有 3/4 枚父任务到达等待点（父任务没派生成功，等待读数就无从谈起）
+--- FAIL: Test222CeilingStillCapsExecutedCallsWhileParentsWait (0.00s)
+time=2026-09-29T23:19:40.114+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-6d7116cc-f9c4-4713-8876-2aeac16d9e1e owner=tools
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.111s
+FAIL

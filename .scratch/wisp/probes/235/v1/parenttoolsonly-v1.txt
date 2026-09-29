@@ -1,0 +1,25 @@
+time=2026-09-29T23:25:56.765+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   Test222SpawnConclusionArrivesThroughRealBridgeChildren
+time=2026-09-29T23:25:56.769+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-19e97c1f-ee98-445a-ac27-af98bc030929 owner=tools
+time=2026-09-29T23:25:56.769+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-6e1e82af-11a7-4be5-94f6-46afc6fcb119 owner=tools
+time=2026-09-29T23:25:56.769+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-bd9b2d82-e759-4b03-b95b-786a17e1324e owner=tools
+time=2026-09-29T23:25:56.769+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-0a8032ee-589f-4200-9e75-b9d81660984f owner=tools
+    subagent_222_test.go:444: 桥上的到达信号一枚都没有，而第一枚父任务已经拿到了结论（真桥上累计执行 0 次，反控那一发里这些全是宿主调用，孩子一次都没上桥）："子代理 0a8032ee-589f-4200-9e75-b9d81660984f（甲3）已结束，状态 Settling。\n结论：\n子代理 4 的结论正文 222" ——孩子的工具面绕开了真桥＝A420 的第 7 环，票 235 AC#2 这一发就是为它加的
+--- FAIL: Test222SpawnConclusionArrivesThroughRealBridgeChildren (0.00s)
+=== RUN   Test222WaitingParentHoldsNoBridgeSlot
+time=2026-09-29T23:25:56.770+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-fac640b3-a002-4f86-943b-d08b8da8490b owner=tools
+time=2026-09-29T23:25:56.770+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-0c32241a-7b3a-4a27-9914-e036e47a48d1 owner=tools
+time=2026-09-29T23:25:56.770+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-fb553fc6-ea69-49b4-8c19-7422ca75d646 owner=tools
+time=2026-09-29T23:25:56.770+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-faf12a18-2c6b-458c-ad14-5cd842ebddaa owner=tools
+    subagent_222_test.go:536: 桥上的到达信号一枚都没有，而第一枚父任务已经拿到了结论（真桥上累计执行 0 次，反控那一发里这些全是宿主调用，孩子一次都没上桥）："子代理 fac640b3-a002-4f86-943b-d08b8da8490b（甲3）已结束，状态 Settling。\n结论：\n子代理 1 的结论正文 222" ——孩子的工具面绕开了真桥＝A420 的第 7 环，票 235 AC#2 这一发就是为它加的
+--- FAIL: Test222WaitingParentHoldsNoBridgeSlot (0.00s)
+=== RUN   Test222CeilingStillCapsExecutedCallsWhileParentsWait
+time=2026-09-29T23:25:56.770+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-469a2e1a-0746-4036-bfe0-00a2b1624fed owner=tools
+time=2026-09-29T23:25:56.770+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-53efb5ae-910e-4aea-8b30-6533f866e29b owner=tools
+time=2026-09-29T23:25:56.770+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-e10f9dd0-f63c-4c57-9ec1-aee8dfc5ff60 owner=tools
+time=2026-09-29T23:25:56.770+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=subagent-finish-fb561e2b-5dbc-4f00-bbc9-3cb311214e2e owner=tools
+    subagent_222_test.go:604: 桥上的到达信号一枚都没有，而第一枚父任务已经拿到了结论（真桥上累计执行 6 次，反控那一发里这些全是宿主调用，孩子一次都没上桥）："子代理 469a2e1a-0746-4036-bfe0-00a2b1624fed（甲3）已结束，状态 Settling。\n结论：\n子代理 1 的结论正文 222" ——孩子的工具面绕开了真桥＝A420 的第 7 环，票 235 AC#2 这一发就是为它加的
+--- FAIL: Test222CeilingStillCapsExecutedCallsWhileParentsWait (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.038s
+FAIL
