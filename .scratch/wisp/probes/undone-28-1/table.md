@@ -15,6 +15,72 @@
 
 ## 1. 票 07 —— `07-ball-state-machine-core-done.md`（4 枚）
 
+> 本腿现量：`grep -c -- '^- \[ \]'` = 4，行号 `:51 :54 :59 :61`（未勾）；已勾两枚在 `:49`、`:57`
+> （`grep -n -- '^- \[x\]'` 现读）。
+> 票面里 `done-fix-1` 已给每枚留了追加段；下面四枚的**判性由本腿独立现读**，只把那些段落当线索不当凭据。
+
+### 1.1 `:51` Visual：20 态渲染 + 人工截图对照 —— **甲（残余真活·阻在 owner 一次眼）**
+
+- 原文行首逐字：`- [ ] Visual: 20 states rendered in a debug cycle page/window; human screenshot review vs`
+- 缺什么，说得出口：**owner 本人的一次主观签收**（20 态好不好看，测试绿不代替）。凭据（全部现读、非禁读地界）：
+  - 裁决表 `docs/evidence/s1/07-adversarial-acceptance.md:10` 逐字「| 3 | 视觉证据 | **PASS（人工签收挂起）** | docs/evidence/s1/ball-states/ 截图 + c21-native-tokens.md 对照表 |」
+  - 同文件 `:14` 逐字「**待人工项**：20 态视觉的主观签收（**用户本人**）→ 已登记 docs/reports/pending-human-review.md」
+  - 台账 `docs/reports/pending-and-issues.md:7` 逐字「- [H1] **悬浮球 20 态视觉签收** — **2026-09-20 已改为实况签收**」，
+    且 `:9-10` 写「满意则关闭；不满意提修改意见转新工单」⇒ **H1 至今没有关闭行**（本腿 `grep -n 'H1'` 全量扫过台账，
+    没有任何一处把这条待人项记成已闭）⇒ 这一格等的不是读数，是一次人眼。
+- ⚠ 本腿能判到这儿为止：本格**第二个分句**要对照 `design/screens/ball.html`，那是派单写死的**禁读地界** ⇒
+  本腿**永远无法**把这枚升成丁（无法证明对照已发生）。裁决者若要判丁，得由能读 `design/**` 的人补一次核。
+- ⚠ 顺带一枚引用缺陷（不是本票的事，但影响后来人找凭据）：裁决表 `:14` 指向的
+  **`docs/reports/pending-human-review.md` 在树里不存在**（`git ls-files | grep -c 'pending-human-review'` = 0，
+  `find docs -name 'pending-human-review*'` 空）。内容实际在 `pending-and-issues.md` 的
+  「## 待人工审核（pending-human-review）」这一节（`:5` 起）。
+- 归口核查：票 65（`65-ball-glass-quality-rework.md`，本腿现量 un=6、无 `-done` 后缀＝**仍开放**）
+  接的是"玻璃质感返工"，其判据 `:57`-`:63` 里没有一枚写"20 态 debug cycle 页 / 对 `ball.html` 的 20 态签收"；
+  票 68（`68-ball-default-visuals-parity.md`，un=2、Status: review）接的是默认值翻转与差分复测，也不同事。
+  ⇒ **不是丙**（没被整枚接走），保持甲。
+
+### 1.2 `:54` Interactive：单击唤起 / Esc 取消 / 不抢焦点 / 透明区穿透 —— **丙（整枚归口票 64）**
+
+- 原文行首逐字：`- [ ] Interactive: click ball → Sleeping→Listening; Esc/click cancels from Confirming; focus`
+- 归口去处**点名并现读**：`.scratch/wisp/issues/64-ball-defects-hotkey-interactive.md`（本腿现量 un=1／chk=8，
+  文件名**不带** `-done` ⇒ 仍开放）`:72` 是一枚 **`- [x]`**，逐字
+  「交互四项各有真机测试且**不被 skip**：单击唤起、Confirming 取消、不抢焦点、透明区穿透」——四个分句与本格一一对上。
+- 07 当年确实没证据（不是本腿臆断）：`docs/evidence/s1/07-adversarial-acceptance.md:27` 裁决
+  「AC#3 交互…| **FAIL** | 唯一被点名的候选 `internal/ball/tokens_test.go:239 TestHitTestAndDPIInjection`
+  只覆盖**第 4 个分句的一半**」。
+- ⚠ 但 64 的这枚勾本身带条件：64 `:72` 之下的票面文字自陈「今天的判定是"结构成立（无静默 skip）、逐跑记录缺证"」
+  并要求「交互四项任一走 SKIP（…）就把本框退回未勾」（两句本腿现读＝64 `:78` 与 `:77`）。本腿**禁跑** `go test -tags winlive`，
+  因此既不能确认 64 那枚勾今天仍可复算，也不据此判 07 这枚为丁。⇒ **丙：账在 64 名下，07 这格不该再占本票分母。**
+
+### 1.3 `:59` Hotkeys 注册/重注册 + 静音切 Muted —— **丙（大半归口票 64；"静音"半枚只有实现方记录）**
+
+- 原文行首逐字：`- [ ] Hotkeys registered/re-registered on config change; mute toggles Muted state.`
+- 归口去处**现读**（票 64 文件同上）：
+  - `:44` `- [x] 改 [hotkey] 后热键真的重注册（端到端：改配置→按新键→球响应；旧键不再响应）。`
+  - `:59` `- [x] 注册失败两类语义分开：被占用 vs 未尝试，各自给出用户可见提示（不再只有一行 Warn）。`
+  - `:60` `- [x] 默认唤起键为 Ctrl+Alt+Q，且 Ctrl+Alt+Space 作为可配置备选写进文档`
+  - 07 侧当年同样是 FAIL：`docs/evidence/s1/07-adversarial-acceptance.md:62`
+    「AC#5 热键注册 / 配置变更后重注册；静音切换 Muted 态 | **FAIL** | 被点名候选 … 与 AC#5 语义无关」
+- ⚠ **"mute toggles Muted"那半枚没有被 64 的任何判据框逐字接住**：本腿现跑 `grep -n 'Muted' 64-*.md` 只命中
+  一处，是 Progress log `:152`「`WM_HOTKEY(mute)` → `OnMuteHotkey` → `EvMuteKey` → 机器 `Muted` 且球渲染 `Muted`；再按一次」
+  ＝**有逐跑记录、没有判据框**。盘上另有码侧对应物（`internal/ball/hotkey_live_test.go:225`
+  「TestLiveMuteHotkeyEndToEnd is A1d: the registered mute key -> OnMuteHotkey -> EvMuteKey -> the machine and
+  the ball both in Muted, and back out.」，本腿现读；该文件是 `winlive` 门控腿，本腿不跑）。
+  ⇒ 该半枚的"证据"目前**只有实现方/编排者自己的逐跑叙述**，属〔仅自述〕，**不能**据以翻 07 的勾。
+  结论仍记丙，但**请裁决者把"64 要不要为静音半枚单立一格"当成一个待决问题**。
+
+### 1.4 `:61` Multi-monitor：拖到第二屏/持久化/恢复/模拟拔出 —— **丙（归口票 64，且 64 那一格至今未勾）**
+
+- 原文行首逐字：`- [ ] Multi-monitor: drag to second monitor, persist, restore; simulated detach → primary.`
+- 归口去处**现读**：`64-ball-defects-hotkey-interactive.md:83` 是一枚 **`- [ ]`**，逐字
+  「多显示器：真拖到第二屏验证并留证；本机无第二屏则**保持未勾**并写明所需硬件」，其下一行写明
+  「本机物理单屏（`\\.\DISPLAY4` 3440x1440），**硬件缺席**」。64 `:234` 附近另写「本票**不能**置 done」。
+- 07 侧裁决：`docs/evidence/s1/07-adversarial-acceptance.md:76`「AC#6 多显示器…**PARTIAL**｜已真正验证的两段：
+  ①"模拟拔出 → 主屏"是纯函数级真断言且在默认套件内」。
+- ⇒ **丙**：活还在（缺一次副屏硬件跑），但账**已明确挂在开放票 64 名下**。
+  ⚠ 本腿补一句给裁决者：这枚是「丙」而**不等于"已交付"**——翻 07 这框＝把别人名下还欠着的一次硬件跑算成完成，
+  所以判性给丙（分母归 64）之外，**不能**同时当丁用。
+
 ## 2. 票 11 —— `11-llm-adapters-rest-done.md`（1 枚）
 
 ## 3. 票 63 —— `63-credential-entry-cli-done.md`（1 枚）
