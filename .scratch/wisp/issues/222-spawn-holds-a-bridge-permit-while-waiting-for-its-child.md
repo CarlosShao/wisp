@@ -74,6 +74,7 @@
 ### 给下一位的两枚待办（顺序有依赖）
 
 1. **等 `226-r1` 交件后**，我本人复跑并落到 `.scratch/wisp/probes/222/r1/gates-full.txt`（**绝不接 `| tail`**）：`export PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH"; go test ./cmd/wisp ./internal/... -count=1`，与 `.scratch/wisp/probes/201/r2/gates-full.txt` **逐名比红名集合**（基线＝`internal/ball` 1 例＋`internal/panel` 4 例；`internal/risk` 若再红先按争用复量再归因）。
+   ✅ **13:01:37 这一发我自己跑完了**（全量在 `.scratch/wisp/probes/222/r1/gates-full.txt`）：**23 包 ok＋5 包无测试＋3 包 FAIL 共 6 例**＝前五例与基线逐名一致（`internal/ball` 1＋`internal/panel` 4，逐字原因仍全指 `design/assets/tokens.css` 缺失与面板契约字段＝别人地界、一枚未修），第六例＝`internal/risk` 的 `TestResolvePerCallBudget` **红**——**归因已做**：那 90 秒里实现腿 `226-w1` 正在跑它自己的收尾门（两发全仓测试并发），我 13:02:57 在空机器上 `-count=3` 复量＝**0.281／0.272／0.290 ms/op（预算 1.000 ms）三发全 PASS** ⇒ **争用型假红，不是回归**，`thresholds.go` 与预算常量一字节未动（详见台账 `A432`）。⇒ **AC#6 那一格"编排者本人没跑过"这一条已补齐，但仍不翻勾**（等 `222-v1`）。关键包耗时：`cmd/wisp 103.330s`／`internal/tools 19.289s`／`internal/config 1.804s`／`internal/perm 0.569s`。
 2. **`222-v1`（非实现者对抗验收）**，判据至少三发变异：① 删掉 `subagent_197.go:356` 那一行 ⇒ 三枚用例必须红（正控）；② 把 `giveBack()` 的 `sync.Once` 拆掉 ⇒ "同一枚许可被扣两次"那形必须红；③ 核 `MaxToolConcurrency`／`MaxConcurrentSubagents`／`PLAN.md:2849` 未被为了并发而说破（**同时执行数 ≤ 4 是反控，不许被改绿来迁就修复**）。锚点交给它自取（`git rev-parse --short HEAD`），⛔ 不许引用 `dd7c447f` 作为 `internal/tools` 的"已核过绿"锚（`A429` 事故那发）。
 
 > owner 09-28 原话（本票起手时挂在 Status 行，交付后移到这里保留）：「**子代理必须看到状态，而且点击某个子代理，能看到它们各自的流式工作页面**……这是主流 harness 必做的，不要偷懒」。**这一枚修掉的是"父任务里看不到孩子的结论"那一半；"点进去看各自的流"属票 197／票 220 的地界，不因本票结案。**
