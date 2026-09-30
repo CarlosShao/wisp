@@ -228,7 +228,75 @@ OpenChamber 17 枚（`packages/vscode/package.json:61-161`，标题逐字）：
 
 ## §2 表二 · 设置页逐项表
 
-（填写中：设置项标签原文 ｜ 改了会怎样 ｜ 我方对应物或"没有" ｜ 出处）
+### 2.0 先定"设置面在哪"这一格（两家都不在 VS Code 设置页）
+
+| 家 | VS Code 原生设置页里的条目数 | 其余设置画在哪 | 出处与尺 |
+|---|---|---|---|
+| Cline | **0 项**〔已证〕——`contributes.configuration` 只剩一个标题 | webview 自己的 Settings 视图，7 个标签 | `apps/vscode/package.json:338-341`（逐字 `"properties": {}`）；标签名册 `apps/vscode/webview-ui/src/components/settings/SettingsView.tsx:52-99` |
+| OpenChamber | **2 项**〔已证〕 | webview（＝它自家 web 应用）里的设置页；扩展独有的只有那两枚＋通知页的一句提示 | `packages/vscode/package.json:249-264`；名册 `packages/ui/src/components/sections/openchamber/OpenChamberVisualSettings.tsx:307` |
+
+尺（本机复跑，两条都跑过）：
+- `python -c "import json;d=json.load(open('apps/vscode/package.json'));print(len(d['contributes']['configuration']['properties']))"` ＝ **0**
+- `python -c "import json;d=json.load(open('packages/vscode/package.json'));print(len(d['contributes']['configuration']['properties']))"` ＝ **2**
+- OpenChamber 外观/行为一页的"可见设置名"名册＝**50 枚**（口径：把 `OpenChamberVisualSettings.tsx:307` 那行 `type VisibleSetting = ...` 的联合类型逐名抽出、去重后计数；**这是"这一页可能被画出来的项目数"，不是"画出来的项目数"**——后者还要各 `shouldShow(...)` 与运行时开关）
+
+### 2.1 Cline 的设置页逐条（标签原文＝界面字面，逐条抄）
+
+页头原文 `Settings`（`apps/vscode/webview-ui/src/components/settings/SettingsView.tsx:253`）；7 个标签的原文名与提示：`API Configuration`／`Features`（提示 `Feature Settings`）／`Terminal`（`Terminal Settings`）／`General`（`General Settings`）／`Remote Config`（`Remotely configured fields`）／`About`（`About Cline`）／`Debug`（`Debug Tools`）——均出自 `SettingsView.tsx:52-99`。
+
+| 设置项标签原文 | 改了会怎样 | 我方对应物 | 出处 |
+|---|---|---|---|
+| `Allow error and usage reporting` ＋正文 `Help improve Cline by sending usage data and error reports. No code, prompts, or personal information are ever sent.` | 遥测开关；**被组织远程配置管住时打不掉并挂一枚锁图标**（tooltip 逐字 `This setting is managed by your organization's remote configuration`） | **没有这一项**〔已证：`internal/config/schema.go` 搜 `telemetry` 0 命中〕；"被上级管住"这一形我们也没有（远程配置属未定案） | `apps/vscode/webview-ui/src/components/settings/sections/GeneralSettingsSection.tsx:23-46,30-31,37-39` |
+| 界面语言（`PreferredLanguageSetting` 一件） | 选对话/命令输出用哪种语言 | **有**：`internal/config/schema.go:138` `app.language` 默认 `zh-CN` | `apps/vscode/webview-ui/src/components/settings/PreferredLanguageSetting.tsx`（由 `GeneralSettingsSection.tsx:19` 引入） |
+| `Auto Compact` ／描述 `Automatically compress conversation history.` | 打开后自动压上下文 | **有压缩器、没有这枚开关**〔已证：`internal/agent/compress.go` 在产码里；`schema.go` 搜 `compact`/`condense` 0 命中〕 | `apps/vscode/webview-ui/src/components/settings/sections/FeatureSettingsSection.tsx:33-40` |
+| `Auto Compact Strategy`：两档 `Basic`／`Agentic` | 压缩策略选档 | 没有 | `FeatureSettingsSection.tsx:198,208-209` |
+| `Web Search` ／描述 `Let the model search the web when the selected provider and model support it. Applies to new tasks.` | 允许模型搜网；**注明"只对新建任务生效"** | 待定案项（`AGENTS.md` §2 逐字列了 `web.search` 实现路径未定）；配置里没有 | `FeatureSettingsSection.tsx:214-215` |
+| `Feature Tips` ／`Show rotating tips during the thinking phase to help you discover Cline features.` | 思考阶段轮播功能提示 | 没有〔已证：`schema.go` 无此项〕 | `FeatureSettingsSection.tsx:42-48` |
+| `Background Edit` ／`Allow edits without stealing editor focus` | 改文件时不抢编辑器焦点 | 无对应物（我们没有"别人的编辑器"这个概念） | `FeatureSettingsSection.tsx:50-56` |
+| `Checkpoints` ／`Save progress at key points for easy rollback` | 打快照、可回滚 | 没有〔已证：`schema.go` 搜 `checkpoint`/`rollback` 0 命中〕 | `FeatureSettingsSection.tsx:58-64` |
+| `Worktrees` ／`Enables git worktree management for running parallel Cline tasks.` | 打开工作树管理（并行任务） | **有活、没有这枚开关**〔已证：切工作树在面板里还是那句实话 `internal/panel/git.go:82`；工单 186 在办〕 | `FeatureSettingsSection.tsx:66-72` |
+| `Hooks` ／`Enable lifecycle and tool hooks during task execution.` | 生命周期与工具钩子 | 没有〔已证：`schema.go` 搜 `hooks` 0 命中；D46 是外部命令插件、不是钩子〕 | `FeatureSettingsSection.tsx:75-81` |
+| 分组小标题原文：`Editor`／`Advanced`（大写小标） | 把上面那些分组 | 我们的配置有 section 树但没有"分组小标"的界面（D36 只在 TOML 层） | `FeatureSettingsSection.tsx:224,245` |
+| `MCP Display Mode`：`Plain Text`／`Rich Display`／`Markdown` ＋描述 `Controls how MCP responses are displayed` | 工具返回怎么渲染 | **没有、且是 D13 未定案区**（不自行填） | `FeatureSettingsSection.tsx:262-271` |
+| `VS Code Terminal`／`Background Exec`（执行模式下拉） | 命令是在**看得见的终端**里跑，还是后台管道跑 | 只有后台进程（`internal/proc`），**没有这一选**〔已证：`schema.go` 无相关键〕 | `apps/vscode/webview-ui/src/components/settings/sections/TerminalSettingsSection.tsx:105-106`（两枚 `VSCodeOption` 的原文）；判据在 `:25-26` |
+| `Shell integration timeout (seconds)` ＋校验句 `Please enter a positive number` | 等待 shell 集成就绪的秒数；**输入非法就地报错、不静默纠正** | 没有；我们有超时但没有这一枚键 | `TerminalSettingsSection.tsx:38-39,118` |
+| `Enable aggressive terminal reuse` | 复用已有终端而不是每次都新起 | 没有 | `TerminalSettingsSection.tsx:140-144` |
+| `Default Terminal Profile` | 从宿主提供的 profile 名册里挑一枚 | 没有 | `TerminalSettingsSection.tsx:146-148` |
+| 帮助句原文 `Having terminal issues?` | 出问题时的入口（指向文档） | 没有 | `TerminalSettingsSection.tsx:176` |
+| About 页分组原文 `Development`／`Resources` ＋链接 `GitHub`／`Documentation`／`Discord` | 版本与出口 | 有构建信息但没有那一屏（`internal/buildinfo`） | `apps/vscode/webview-ui/src/components/settings/sections/AboutSection.tsx:39-58` |
+| ⚠ `Remote Config`（标签原文 `Remotely configured fields`，提示 `Remotely configured fields`） | **一整页只读**：把"被远端下发的字段"列给人看，界面上不许改 | 没有这一页〔已证：`schema.go` 无 remote 概念〕；这是 owner 级"看得见哪些不是我说了算"的一格 | `SettingsView.tsx:80-82` |
+| ⚠ `Debug`（提示 `Debug Tools`） | 扩展自带调试工具页 | 我们有 `cmd/balldebug`，但那是给开发者的可执行件、不是给人点的页 | `SettingsView.tsx:97-99` |
+| API 那一页的**提供商条目数** | 逐家提供商一张卡＋模型挑选器 | 我们按 D8 抽象、配置里是"提供方＋模型名"两枚文本键（`internal/config/schema.go:210-218` 同款形状） | 名册尺（本机复跑）：`ls apps/vscode/webview-ui/src/components/settings/providers \| grep -c 'Provider.tsx$'` ＝ **28**（口径：只数文件名以 `Provider.tsx` 结尾的组件件；同目录共 42 个文件，其余是 `GenericProviderSettings.tsx` 这类公共件与 `*.test.tsx` ⇒ 「28＝有专属设置卡的提供商数」，**不是**「支持的提供商总数」） |
+
+### 2.2 OpenChamber 扩展形态的设置逐条
+
+**A. VS Code 原生设置页（全部 2 枚，描述逐字抄）**
+
+| 设置项标签原文 | 改了会怎样 | 我方对应物 | 出处 |
+|---|---|---|---|
+| `openchamber.apiUrl`（类型 `string`，默认空串）＝描述逐字 `URL of an external OpenCode API server. Leave empty to auto-start a local instance.` | 填了就连别人的服务器；留空＝本机自起一台 | **没有这一枚**〔已证：`internal/config/schema.go` 无 `api_url`/远端实例键；"连到哪台"这层在块 A 报告的移动端有、桌面没有〕 | `packages/vscode/package.json:252-256`＋`package.nls.json` 键 `configuration.apiUrl.description` |
+| `openchamber.opencodeBinary`（类型 `string`，默认空串）＝描述逐字 `Optional absolute path to the opencode CLI binary. Useful if PATH lookup fails. **Requires window reload or API restart to apply.**` | 找不到 CLI 时手动指路径；**描述里就把"要重启才生效"写给了用户** | 我们靠 `deps.toml` 解析依赖，但**界面上没有任何一处会说"这一枚要重启"**（第四版 §3 已记本格，出处 `docs/reports/missing-features-2026-09-29-v4.md:248`） | `packages/vscode/package.json:257-261`＋`package.nls.json` 键 `configuration.opencodeBinary.description` |
+
+**B. "装进扩展之后会消失的那几枚设置"——这一格是本轮独有的读法**（同一份设置代码、按宿主裁剪，逐枚带行号；均〔已证〕）：
+
+| 设置项（名册名／界面原文） | 在 VS Code 里的处置 | 为什么这样裁（注释原话或代码判据） | 我方对应 | 出处 |
+|---|---|---|---|---|
+| `theme` | **整块隐藏**：`hasThemeSettings = shouldShow('theme') && !isVSCode` | 颜色跟宿主走，不给第二套 | 我们有 `app.theme`（`internal/config/schema.go:140`，`dark` 默认），**且必须自己实现深浅两套**（没有宿主给我们供色） | `packages/ui/src/components/sections/openchamber/OpenChamberVisualSettings.tsx:698` |
+| `appearance` 分组 | 在 VS Code 里**只剩** localization（`theme`/`timeFormat`/`weekStart` 的判定式 `hasAppearanceSettings`） | 同上：外观归宿主 | 同上 | `:701-703` |
+| `terminalShell`／`terminalLoginShell` | 隐藏（`&& !isVSCode`） | 终端由宿主提供 | 我们没有宿主终端；`internal/proc` 自己起进程 ⇒ **这一枚对我们不存在也不该造** | `:705` |
+| `sessionTabs` | 隐藏（`&& !isVSCode && !isMobile`） | 会话标签页是浏览器/PWA 的概念 | 我们的面板只有一条会话视图 | `:705` |
+| `sessionGoal`（＋`sessionAssist` 段） | 隐藏；注释逐字 `The goal loop runs in the web server — VS Code only renders goal state, so the settings section is hidden there too.` | **后端没有那台 loop 就别给开关** | ⚠ 同脾气应学：我们的"写了不管用就响亮拒收"在 `internal/config/unwired.go`（第四版 `missing-features-2026-09-29-v4.md:222` 已记 6 枚），这一条形是"干脆不给开关"⇒ **两家两种做法，见 §6** | `:707,742-744`、注释 `OpenChamberVisualSettings.tsx:1935-1936` |
+| `diffLayout` | 隐藏（`shouldShow('diffLayout') && !isVSCode`） | diff 的排布由宿主编辑器决定 | 我们没有宿主编辑器 ⇒ 这一枚对我们**必须自己定**而不是隐藏 | `:737,753` |
+| 权限默认档（`PermissionDefaultModeField`） | **在 VS Code 里整枚不画**：`{isVSCode ? null : <PermissionDefaultModeField .../>}` | 档位的真相源在服务端/宿主，扩展不给第二次设置 | ⚠ 直接对上我们的 D31/D43 与 `internal/risk/mode.go:44-56`；**注意：这是"两处可设→只留一处"的先例** | `packages/ui/src/components/sections/openchamber/DefaultsSettings.tsx:365` |
+| 会话工作区那一项（`SessionWorkSettings` 里 `!isVSCode` 分支） | 隐藏 | 工作区＝宿主 workspaceFolders | 我们的对应物是 `internal/projctx` | `packages/ui/src/components/sections/openchamber/SessionWorkSettings.tsx:16,36` |
+| `subagentReadOnlyBanner`／界面原文 `Allow Prompting Subagent Sessions` | **画得出来**（不在隐藏名册里）⇒ 扩展里也能改 | 子代理会话默认**只读**，要人显式打开才能往里发话 | 〔已证〕我们有子代理名册（`internal/panel/subagent_roster_197.go`）但**没有这一枚开关，也没有默认只读这一说**；⚠ 直接对上"子级永不自批"那条改判，见 §4 | `:718,743,1924-1931`；文案 `packages/ui/src/lib/i18n/messages/en.settings.ts:2156-2157` |
+
+**C. 通知那一页在扩展形态里多出来的一句话**
+
+| 原文 | 位置 | 我方对应 | 出处 |
+|---|---|---|---|
+| `When enabled, notifications are delivered through VS Code native notifications.` | 通知页"投递"分节，在 VS Code 里替换掉浏览器那句 | 我们的通知只有托盘气泡那一条路、没有"换投递通道"这一说（`cmd/wisp/notify_windows.go:6-13`） | `packages/ui/src/lib/i18n/messages/en.settings.ts:1858`；渲染分支 `packages/ui/src/components/sections/openchamber/NotificationSettings.tsx:471-473` |
+| 同页其余原文（**逐条可对照**）：`Notification Delivery`／`Enable Notifications`／`Notify While App is Focused`／`Send test notification`／`Notification permission denied. Enable it in your browser settings.`／`Permission granted, but notifications are disabled.`／`Notification Templates`／`Variables:`／模板事件名 `completion`／`Subagent Completion`／`error`／`question`／字段名 `Title`／`Message` | 通知页 | **全部没有**〔已证：`schema.go` 搜 `notification` 0 命中；"试验证一下通知"这一枚按钮我们也从来没有〕 | `en.settings.ts:1849-1877`；`NotificationSettings.tsx:459-553` |
 
 ---
 
