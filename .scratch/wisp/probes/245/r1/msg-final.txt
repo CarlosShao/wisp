@@ -1,0 +1,13 @@
+evidence(245-r1) §6 名册对撞补逐字＋还原第二把尺：终态＝起手名册（173 行里恰好一枚差异、只在我自己的落点那一行）
+
+- 第三把尺（派单要求的交件前自查）：`grep -n "待填|填写中|TODO" docs/evidence/s1/245-*.md` 命中
+  **0 枚**＝没找到＝表内无裸占位。表现量 114 行／26,518 字节。
+- §6 加终态全量名册对撞的逐字差异：`diff start-status.txt end-status.txt` ＝ `107c107`
+  `?? .scratch/wisp/probes/245/` → `?? .scratch/wisp/probes/245/r1/end-status.txt`，
+  其余 172 行逐字未动 ⇒ 本腿终态＝起手名册；别人留下的条目一枚未提交、未删、未改。
+- 还原第二把尺（防"突变残留跟着提交"）：对 HEAD 的 blob 跑 `grep -c "if false"`＝0、
+  `grep -c "MUTATION"`＝0（两个 0＝提交进去的码里没有 M1/M2 的标记），复跑默认层
+  `ok github.com/CarlosShao/wisp/internal/ball 0.032s`。
+- §0 的 commit 清单从三枚更正成四枚（本枚）。
+
+只 commit、不 push；AC 框仍 5 未勾／0 已勾（勾归编排者）。

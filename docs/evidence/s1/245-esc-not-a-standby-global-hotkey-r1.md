@@ -11,7 +11,8 @@
 - 起手时本腿地界（`internal/ball`／`cmd/wisp`）的写面：**0 枚**（尺：`grep -c "internal/ball\|cmd/wisp" start-status.txt` ＝ **0**＝没找到＝那两枚包干净，这是好消息）。起手名册里唯一一枚 `docs/evidence/s1/` 条目是别人的 `152-subject-death-never-measured-r1-accept-r1.md`（` M`），**本腿未碰、未提交**。
 - 起跑前的进程尺（派单第 5 节，真机用例开跑前必量）：`tasklist //FI "IMAGENAME eq balldebug.exe"`／`... wisp.exe`／`... go.exe` 三条**都是 "INFO: No tasks are running which match the specified criteria."＝计数 0 枚**（`grep -c` 那把尺零命中返回 rc=1 会断 `&&`，本腿一律用 `;` 串接）。每次跑 winlive 前复量，共量 3 次，全部 0。
 - **一句话结论**：**稳态（没有卡片挂着时）注册集枚数＝3**（summon／mute／panel），`cancel` 不在场；**借用态（`Confirming` 期间）＝4**。生产默认键名一字未改（`DefaultHotkeys()` 里 `Cancel: "Esc"` 原样），只把它的作用区间从"从开机起永久绑着"改成"借—还"。
-- 本腿三枚 commit：`f91feddd`（骨架）→ `e6d6426f`（乙形码＋三枚钉同批收紧）→ 本表这一枚（见 §6）。
+- 本腿 commit（四枚，全部带显式 pathspec、只 commit 未 push）：`f91feddd`（骨架）→ `e6d6426f`（乙形码＋三枚钉同批收紧）→ `08886b8d`（表填满＋工单末尾五字段残余＋读数台件）→ 本表这一枚（§6 终态名册对撞补逐字）。
+- 还原复认的第二把尺（防"突变残留跟着提交"）：`git cat-file blob HEAD:internal/ball/hotkey_windows.go | grep -c "if false"` ＝ **0**；`git cat-file blob HEAD:internal/ball/ball_windows.go | grep -c "MUTATION"` ＝ **0**（两个 0＝没找到＝提交进去的码里没有突变标记）；还原后默认层复跑 `ok github.com/CarlosShao/wisp/internal/ball 0.032s`。
 
 ### §0.1 具名欠账一览（本腿现测，无一条来自注释自陈；⛔ 本腿一律未修）
 
@@ -101,6 +102,10 @@
 
 - 起手：`.scratch/wisp/probes/245/r1/start-status.txt` ＝ **173 行**；其中 `internal/ball`＋`cmd/wisp`＝**0 枚**。
 - 终态尺：`git status --porcelain -- internal/ball cmd/wisp` ＝ **0 枚**（本腿在这两枚包里的改动全部进了 commit）。
+- **全量名册对撞（同一条尺跑两次）**：`diff start-status.txt end-status.txt` ＝ **恰好一枚差异、只在一行**：
+  `107c107` `?? .scratch/wisp/probes/245/` → `?? .scratch/wisp/probes/245/r1/end-status.txt`
+  （＝本腿那枚临时目录从"整棵未跟踪"塌成"只剩这份收尾名册未跟踪"，其余 172 行逐字未动）。
+  判语：**本腿终态＝起手名册**（唯一动过的就是本腿自己的落点），⛔ 别人留下的条目一枚未提交、一枚未删、一枚未改；本腿跑动期间没有第二枚腿往这两枚包里写东西（起手＝终态这一点也印证了）。
 - 终态全量名册与起手名册的**差分**（本腿视角，逐条归因；⛔ 本腿没提交任何别人留下的脏条目）：
   - **本腿新增并提交的条目**：`docs/evidence/s1/245-esc-not-a-standby-global-hotkey-r1.md`（本表）、`.scratch/wisp/probes/245/r1/start-status.txt`（起手名册逐字）、`internal/ball/hotkey_windows.go`、`internal/ball/ball_windows.go`、`internal/ball/hotkey_status_test.go`、`internal/ball/hotkey_live_test.go`、`internal/ball/live_windows_test.go`、`internal/ball/interaction_live_test.go`、`cmd/wisp/resident_ball_windows.go`、`cmd/wisp/resident_ball_live_228_windows_test.go`。
   - **本腿新造、只留在盘上不提交的临时件**（`issues/README` 规则 8"只建不删"，全部在 `.scratch/wisp/probes/245/r1/`）：`msg-skeleton.txt`、`msg-code.txt`、`build.txt`、`test-ball-default.txt`、`test-cmdwisp-default.txt`、`d22scan.txt`、`winelive-hotkey-1.txt`、`m1-cmdwisp-livelive.txt`。
