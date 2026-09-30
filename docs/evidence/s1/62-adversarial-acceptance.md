@@ -283,6 +283,57 @@ flag 帮助 `:97` 写着 `-frozen` 才回到冻结档 ⇒ 判据那句"启来即
 `balldebug -diff -diff-states Sleeping`（差分表落新目录，⛔ 别写进 `ball-states/` 档案）**。
 这一步要么 owner 换壁纸、要么编排者授权本腿改系统设置——我没有这个授权，所以停在这里。
 
+### 2.3 AC#3 —— `:84` 会话态动效：五态液体颜色/流速/边框差异肉眼可辨，逐态截屏留证
+
+**判语：判据今天不可满足。**（与 `62-a1` 的 D 同向，但本腿把"缺什么"量得更死，见下面第 3 条。）
+
+**1. "肉眼可辨"这一半：仓里没有任何机器代理。**〔我现跑〕
+`grep -rniE "distinguish|distinct|可辨" --include=*_test.go internal/ball` ＝ **零命中**。
+最接近的 `TestVisualForCoversAllTwentyStates`（`internal/ball/tokens_test.go:119`）只断言
+每态 `SizePx>0 && 0<Opacity<=1`（**覆盖性**，不是**可分辨性**），而且它读的是**库默认档**
+（`:147-149` 注释逐字："read the mode the library DEFAULT is in today (prototypeVisuals off)"，
+并当场断言 `Sleeping == 12px @ 0.35`）。⇒ 没有任何一枚用例会因为"两态长得一样"而红，
+所以这一半**不是我能用突变去证的**，它按票面处置表 `:25` 归票 65＋owner 眼睛。
+
+**2. 参考图与参照页两条路本腿都走不通（具名）。**
+① owner 那两张玻璃参考图（vivo 蓝心小V 语音球）**从未入库**——`62-a1` §2.3 已核，票 65 头部现读
+`Status: blocked-on-owner（缺参考图）`；② 按规格参照页判要读 `design/**`（SPEC-08 §2.1 引的那页），
+**`design/**` 在本编队的禁读清单里，连文件名都不许列**，所以本腿**没有去看**，直接具名标不可满足。
+
+**3. "逐态截屏留证"这一半：票 62 名下只覆盖了 5 态里的 2 态。**〔我现跑〕
+```
+ls docs/evidence/s1/62-diff-{baseline,glass,border,signoff}/*-alive.png
+  baseline / glass : Sleeping, Listening, Speaking          （3 态）
+  border           : Sleeping                                 （1 态）
+  signoff          : Sleeping, Sleeping-dock-right,
+                     Listening, Listening-dock-right,
+                     Speaking, Speaking-dock-right            （6 枚 alive 图）
+```
+⇒ 判据点名的五态 **Listening / Thinking / Acting / Warm / Speaking** 里，
+票 62 名下有图的只有 **Listening、Speaking**；**Thinking、Acting、Warm ＝ 零枚**。
+旁路我核过并**不采信**：`docs/evidence/s1/12-ball-walk/` 那 7 态（Sleeping/Listening/Thinking/Acting/
+Speaking/Warm/Settling）确实齐，但 `grep -inE "frozen|prototype|liquid|glass" 12-ball-walk/diff-table.txt`
+＝ **零命中**——那张表**没记自己是哪一档渲染**，所以不能算票 62 新液态视觉的逐态凭据（它是票 12 的
+资源差分）。`docs/evidence/s1/ball-states/` 那 20 枚本腿 `ls -la` 复认：mtime **全部 09-19 21:38**
+＝旧微点期档案（`scripts/dev/ball-cycle.ps1:19` 的默认 OutDir 正指着它，⛔ 谁要重跑必须带 `-OutDir`，
+这条 `62-a1` §3 已钉，本腿复认）。
+
+**4. 还有一层会让"逐态可辨"今天根本看不到的事**：`62-visual-spec-draft.md` §0.2 自己写着
+**库默认值＝冻结档**（`prototypeVisuals=false`，全仓唯一开启者是 `cmd/balldebug/main.go:122`），
+并引 registry **A24-D2**"owner 签收的球不在默认构建里"。⇒ 五态液体差异今天只在 debug harness 里存在；
+在默认构建里画的是旧 §2.1 那 20 行。这一条不扣 AC#1（AC#1 点名 balldebug），
+但它是 AC#3 这句"会话态动效……肉眼可辨"在产品侧**无法被看到**的直接原因。
+
+**要判这一格，今天缺的东西（逐件具名）**：
+(a) owner 手上那两张玻璃参考图入库（或 owner 当场口头判"像不像"）；
+(b) 五态各一枚**新液态视觉**的差分截屏（现只有 2/5），且落**新目录**；
+(c) 若要按参照页判：给本编队解禁 `design/**` 的读权限，或由 owner 那侧的界面助手代判。
+⛔ 本腿**没有**读 `frontend/**`／`design/**` 任何字节来凑这一格。
+
+**AC#3 总判语：判据今天不可满足**（缺 (a)(b)(c) 三件，全部具名如上）。对 `62-a1`：**不推翻，加强**——
+它记的"62 名下无裁决表／参考图未落盘／要读 design"三条本腿全部复现，
+本腿另量出"逐态截屏只覆盖 2/5 态"与"没有任何可分辨性用例"这两条它没写的。
+
 <!-- NEXT-CELL -->
 
 ---
