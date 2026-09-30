@@ -169,8 +169,17 @@ func TestLive246ResidentPipelineRaisesACardAndEscVetoesIt(t *testing.T) {
 	} else {
 		t.Logf("AC#7 LIVE veto record: %s", recs[i].Msg)
 	}
-	if i := indexOfMsgContaining246(recs, "esc_borrowed=true"); i < 0 {
-		t.Errorf("AC#7 LIVE RED: no card record says the cancel key was borrowed: %v", msgsOf127(recs))
+	card := cardLedgerRecord(t, sinkDir)
+	if card == nil {
+		t.Errorf("AC#7 LIVE RED: the shipped process's ledger holds no card record: %v", msgsOf127(recs))
+	} else if card["esc_borrowed"] != true {
+		// The attribute, not the sentence: ballCardUI.Prompt books esc_borrowed as
+		// a structured field of the card record. The desktop-level proof is the
+		// observer's keydown=0 above, which no log line can fake; this is the
+		// ledger's own statement of what the surface asked Win32 for.
+		t.Errorf("AC#7 LIVE RED: the card record carries esc_borrowed=%v, want true: %v", card["esc_borrowed"], card)
+	} else if card["orb_state"] != "Confirming" {
+		t.Errorf("AC#7 LIVE RED: the card put the orb in %v, want D43's Confirming: %v", card["orb_state"], card)
 	}
 
 	// The two exit steps the task source owns have to be in the boot report's
@@ -410,6 +419,33 @@ func tailLine(all, needle string) string {
 		}
 	}
 	return "(no line containing " + needle + ")"
+}
+
+// cardLedgerRecord returns the attributes of the shipped process's own card
+// record from its JSONL ledger. sinkInstallRecord (ticket 127's decoder) carries
+// only the fields that ticket's claims are about, and AC#7's claims are about the
+// card record's OWN attributes - which orb state the surface booked and whether it
+// asked Win32 for the cancel key - so the record is decoded as a map here rather
+// than guessed at from its message text.
+func cardLedgerRecord(t *testing.T, dir string) map[string]any {
+	t.Helper()
+	for _, name := range mustGlob117(t, filepath.Join(dir, "wisp-*.jsonl")) {
+		b, err := os.ReadFile(name)
+		if err != nil {
+			t.Fatalf("read %s: %v", name, err)
+		}
+		for _, line := range strings.Split(string(b), "\n") {
+			if !strings.Contains(line, "常驻进程显示一张确认卡片") {
+				continue
+			}
+			var rec map[string]any
+			if err := json.Unmarshal([]byte(line), &rec); err != nil {
+				t.Fatalf("the card record is not a JSON object: %v\n%s", err, line)
+			}
+			return rec
+		}
+	}
+	return nil
 }
 
 // ------------------------------------------------------------------ observer
