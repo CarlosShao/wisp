@@ -126,13 +126,16 @@ func (w *WavInjector) pump(ctx context.Context, buf chan<- []byte) {
 			return
 		default:
 		}
-		w.meter.push(buf, encodeFrame(w.samples[off:min(off+FrameSamples, len(w.samples))]))
+		w.meter.push(buf, EncodeFrame(w.samples[off:min(off+FrameSamples, len(w.samples))]))
 	}
 }
 
-// encodeFrame little-endian-encodes samples into a full FrameBytes frame,
+// EncodeFrame little-endian-encodes samples into a full FrameBytes frame,
 // zero-padding the tail (finite-source contract, see the type comment).
-func encodeFrame(samples []int16) []byte {
+// Exported by ticket 241: it is the encode half of the seam codec, the
+// counterpart of DecodeFrame, so a caller outside this package can build (and
+// read) seam frames instead of re-writing the little-endian detail.
+func EncodeFrame(samples []int16) []byte {
 	frame := make([]byte, FrameBytes)
 	for i, s := range samples {
 		frame[2*i] = byte(s)

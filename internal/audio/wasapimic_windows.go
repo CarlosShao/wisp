@@ -228,7 +228,7 @@ func (m *WASAPIMicrophone) run(ctx context.Context, buf chan<- []byte, started c
 		}
 		pending = append(pending, res.Process(samples)...)
 		for len(pending) >= FrameSamples {
-			m.meter.push(buf, encodeFrame(pending[:FrameSamples]))
+			m.meter.push(buf, EncodeFrame(pending[:FrameSamples]))
 			pending = append(pending[:0], pending[FrameSamples:]...)
 		}
 	}
