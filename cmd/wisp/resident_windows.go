@@ -6,13 +6,16 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/CarlosShao/wisp/internal/buildinfo"
 	"github.com/CarlosShao/wisp/internal/proc"
 )
 
 // runResident is the no-args path: boot (env layout, Job Object, single
-// instance, goroutine registry), run the empty event loop, then exit through
+// instance, goroutine registry), host the floating ball window and its tray
+// (resident_ball_windows.go), run the empty event loop, then exit through
 // the D38(e) shutdown order. A second launch in the same session signals the
 // running instance's activation event and exits (D42#7).
 //
@@ -78,8 +81,51 @@ func runResident() {
 	sum := rt.Layout.Summary()
 	fmt.Printf("wisp: resident runtime booted (%s, data dir = %s, portable = %v, job object = on, single instance = %v)\n",
 		sum.EnvBadge(), sum.DataDir, sum.Portable, rt.Instance != nil)
-	fmt.Printf("wisp: empty event loop running; the floating ball arrives in ticket 07 (Ctrl+C exits cleanly)\n")
 
-	reason := rt.RunEventLoop()
+	// An exit request that arrives DURING boot is now a request, not a crash.
+	// The handler that stops this process is installed inside RunEventLoop, and
+	// the ball path in front of it - D2D factory, layered window, tray icon,
+	// four RegisterHotKey calls - measured 268ms on the bench machine
+	// (log stamps: sink installed 16:05:20.7746, ball booked 16:05:21.0424).
+	// Without this registration a Ctrl+C inside that window is delivered to
+	// nothing, so Go's console handler returns 0 (runtime/os_windows.go
+	// ctrlHandler), the default disposition kills the process with
+	// 0xc000013a, and the operator loses the whole D38(e) trail, the tray
+	// removal and the hot key release. Registering above, while the sink is
+	// already open and the shutdown defer is already in place, is what makes
+	// the deferred chain below the only way this function ends.
+	//
+	// It stays registered for the rest of the function: os/signal forwards to
+	// every registered channel, so proc's own context still gets the signal
+	// once it exists, and the only gap left is the few instructions between the
+	// check below and NotifyContext inside RunEventLoop - which costs one more
+	// Ctrl+C, not an unclean death.
+	bootExit := make(chan os.Signal, 1)
+	signal.Notify(bootExit, os.Interrupt, syscall.SIGTERM)
+	defer signal.Stop(bootExit)
+
+	// Ticket 228 AC#1: this leg is the process the ball belongs in (D2,
+	// PLAN.md:74 and :83-88 - layered window, tray, hot keys and the Job Object
+	// holder in one resident main process). The defer below is registered last,
+	// so LIFO runs it FIRST: D38(e) step 2's work ("hotkey + wake-word
+	// listening stops", internal/proc/shutdown.go:18) happens ahead of the
+	// sequence it is part of, and both the shutdown trail and the ball's own
+	// records still reach the sink installed above.
+	//
+	// A ball that will not come up does not stop the boot: the window, the tray
+	// and the hot keys are reported by what Win32 actually returned, and the
+	// sentence printed under this call is built from that same result.
+	rb := startResidentBall(rt.Registry)
+	defer rb.stop()
+
+	fmt.Printf("wisp: empty event loop running (no task is taken by this loop yet); %s (Ctrl+C exits cleanly)\n", rb.statusLine())
+
+	var reason string
+	select {
+	case sig := <-bootExit:
+		reason = "exit request (" + sig.String() + ") arrived during boot; the loop was never entered"
+	default:
+		reason = rt.RunEventLoop()
+	}
 	fmt.Printf("wisp: event loop ending (%s); running the D38(e) shutdown order\n", reason)
 }
