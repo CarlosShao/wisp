@@ -30,6 +30,25 @@ Status: OPEN（编排者 09-30 23:0x 立，料全部出自 `240-c1`／票 241 �
 - [ ] **AC#7 越界检查**：`git diff` 里出现 `internal/speech`（一块没写的包）、`scripts/spike`、`frontend/**`、`design/**`、`PLAN.md`、`docs/specs/**`、`internal/observe/thresholds.go`、golden、`allowlist.txt` 任一路径 ⇒ 直接退回。唤醒词／ASR／TTS **都不属于本票**。
 - [ ] **AC#8 门禁四数**：`GOFLAGS= go build ./...`、`gofumpt -l <自己动过的目录>`、`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp ./internal/audio/ ./internal/ball/ -count=1`、`./tools/d22scan/d22scan.exe`（⚠ 它是**独立模块**，只能跑那枚 exe，`go run ./tools/d22scan` 必失败），逐名照抄终态。
 
+- [ ] **AC#10（09-30 23:2x 编排者追加，来路＝`247-a1` ④ 节；勾要非实现者裁）**：**"接上了"不等于"看得见"**——本票把电平接进生产之后，屏幕上仍然**不会**出现"球随声音呼吸"，因为还有一道独立闸：`prototypeVisuals` 默认**关**（`internal/ball/statevisual.go:102`，产码里只有 `cmd/balldebug:122` 打开它），而 `SetAudioLevel` 在它关着的时候**直接 return**（`internal/ball/liquid_windows.go:52`）。⇒ 本格判据＝票面与本仓文档**不许**把"电平接好"写成"用户能看见球在动"；那一句归口**票 68 AC#2**（`statevisual.go:93` 自己写明"翻默认值"归它），⛔ 本腿不许顺手 `ball.EnablePrototypeVisuals(true)` 来让 AC#2 好看——owner 09-30 明说过「形状算你过关，好不好看以后再说」，翻视觉默认值是**样式决策**，不由接线腿代做。
+
+## 编排者裁定（09-30 23:2x，台账 `A485`）：`247-a1` 的八问逐条判完，落地腿可以派了
+
+`247-a1` 交的是 `.scratch/wisp/probes/247/a1/census.md`（271 行／54,536 字节，27 枚编号尺、三枚 `go list -deps` 名册原文已入盘）。八问裁定：
+
+| 问 | 裁 | 依据与边界（写死，免得落地腿自己猜） |
+|---|---|---|
+| **P1 默认档谁挡麦** | **甲** | 接线时**必须**把 `c.Audio.MicMutedDefault` 传给 `internal/audio/gate.go:57 WithStartMuted`，并把 `voice.enabled=false` 判为**根本不构造采集器**。⛔ 零默认值改动。现量理由：`voice.enabled`／`wake_word.enabled` 今天**没有任何产码读取处**（只有 `internal/config/manager.go:370`  reload 分层），真能挡麦的是第三枚 `audio.mic_muted_default=true`，而它**只在门被装上时生效**——不装门直接 `mic.Start` 会在 `wasapimic_windows.go:88` 同步等设备开成功＝**一双击就开麦**。乙的"自然行为"取决于接线人是否包了门，不可接受。 |
+| **P2 `Armed` 收不收电平** | **甲＋不做** | 本票**不动** `liquidDriven`（`internal/ball/liquid.go:64` 只含六态），"接好了"的判据挂 `Listening`（D43 #4 是今天真能到的态）。`Armed` 归口**唤醒词票**——因为 `EvKwsEnabled` **产码零发射者**（`internal/statemachine/table.go:55`），且 `SPEC-08 §2.1` 逐字写着 Armed **静态**＝改它要先落一枚人工批准的 `A##`，⛔ 不由写码腿顺手做。 |
+| **P3 视觉那道闸归谁** | **乙** | AC#2 的取证改用**读数型证据**（进出的两形读数＋`PrototypeVisualsEnabled()`），⛔ 不在常驻腿调 `EnablePrototypeVisuals(true)`。这条新增了一格 **AC#10** 把"看不见"这件事写进票面，防止后续程把"接好了"读成"用户看得见"。 |
+| **P4 协程记进哪枚注册表** | **甲，限定形状** | 允许在 `internal/audio` **新增一枚注入位**（把 `wasapimic_windows.go:83`／`wavinjector.go:84` 写死的 `observe.Default.Spawn("audio-capture")` 改吃传入 registry；现成的 `audio.go:180 SpawnCapture(registry, run)` 就是那枚接缝，今天**零调用者**）。⛔ **不许改任何既有导出的语义**，⛔ 不许"两枚注册表并存"（那正是 `247-a1` 的 E6 假绿形状）。⚠ 这一步**动的是票 13/241 已交付的产物**，理由与边界具名记在本条与 `A485`，撤销口令＝「**247 注册表改回**」。 |
+| **P5 设备失败要不要推状态** | **甲** | 不推状态：只把 `observe.ClassAudioDevice` 的分类＋`internal/audio/device.go:86/:89` 那两句 guidance **响亮地**打印并落 sink。⛔ **乙一律不要**——`table.go:97` 的 `EvAudioDeviceLost` 起点只有 `Listening`，启动期失败没有合法边，硬造＝改 D43 转移表（契约面）。⛔ 也不许把"拒绝启动"扩大（票 128 只定了没有数据根那一种）。 |
+| **P6 中间那枚读帧的人放哪** | **甲** | 电平在**采集腿那一侧**算（`FrameLevel`→一枚 `float32`）再交出去，跨包面只许过那枚标量。乙要多两枚直接依赖，丙会把渲染拖进采集生命周期（`audio→ball` 这条边今天不存在，U6/U7）。 |
+| **P7 文件清单要不要重抽** | **甲** | 派 `247-r1` 之前以 `246-r2` 的**终态**重跑那两把尺（它已落了 `cmd/wisp/resident_task_source_windows.go`，`RegisterShutdownHook` 的注册点从 1 处变 3 处——现量见 `A485`）。 |
+| **P8 第二枚协程没有名册槽** | **甲** | 电平在**已有的 `audio-capture` 协程内**算完再投递 ⇒ D38(b) 那六名**零膨胀**（`observe/goroutine.go:42-44`/`:270-273` 对名册外名字会 `slog.Warn` 泄漏征兆；`internal/audio/level.go:85-88` 逐字写着这件事）。⛔ 不许用"复用同名"那一支（会让 `Resident` 计数变 2、把 `PLAN.md:2831` 那句"常驻 6 个"稀释掉）。代价要**实测**：投递路径进了 pinned 线程之后，`wasapimic_windows.go:149-152` 那个循环的周期读数要复量一次并进表。 |
+
+**排程不变**：`247-r1` 仍排在 `246-r2` 之后（同占 `cmd/wisp`），并**排在票 33 宿主段之前还是之后由我按 owner 09-30 23:1x 那句功能要求定＝33 先**（他要先看见能点开的界面；本票是"球随声音动"，属他明说过后置的那一类）。
+
 ## 禁区（实现腿与验收腿共用）
 
 - ⛔ **不动 `PLAN.md` 与 `docs/specs/**` 一字**；D1–D47／C1–C32／D43 转移表是契约面，改它只能由编排者在台账落一枚 `A##`。
