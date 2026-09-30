@@ -7,6 +7,14 @@
 **Parallel slots:** 1
 **Spec refs:** SPEC-08 §5.1, D29, C27, D32 panel rows, D42#11, S5
 
+## 编排者收件（2026-09-30 23:1x，台账 `A484`）：Blocked by 07 已消 ⇒ 宿主这段提到队列头
+
+owner 当场提了一条功能要求，逐字：「问题我早就说过了，要录入key，起码我要能看到主面板，**我要点击设置，自己配置模型这些参数**，直接给你就太不合适了」。⇒ 两件事：
+
+1. **`Blocked by: 07-ball-state-machine-core` 这一行今天过期了**：球与托盘已进常驻进程（票 228，非实现者验收表 `228-resident-ball-v1.md` 裁成立，台账 `A477`）。本票顶部这行不改写（保留出处），但**排程按已解除走**。
+2. **宿主真起来那段（AC#1..AC#4：窗口生命周期／冷启 ≤1500ms 与热显 ≤200ms 的实测／embed.FS 离线供给且无监听端口／焦点回还）提到队列头**，排在写腿 `246-r2` 交件之后——它要新增 WebView2 依赖、动构建链，所以⛔ **不与票 244（GUI subsystem 构建）同批改**，也⛔ 不与 `246-r2` 并发（同占 `cmd/wisp`）。
+3. ⚠ **一处要提前说清、免得宿主起来了却交不出他要的东西**：入向白名单今天只有四枚方法（`internal/panel/bridge.go:42-45`），**零枚 config/凭据方法** ⇒ "点设置、自己录 key"这条路由属**新立的票 248**，不在本票射程内。本票的验收腿**不许**因为窗口开出来了就宣称"设置可用"。
+
 ## What to build
 The `panel` module host side: singleton PanelManager owning at most ONE WebView2 window per
 session (hide-don't-destroy), embed.FS resource serving via `AddWebResourceRequestedFilter`
