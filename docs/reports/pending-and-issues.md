@@ -9991,3 +9991,23 @@ r1 **没动手**，因为票面 `:8` 只给到 `internal/tools/**` 的**测试�
 **编队与推送**：写面空 ⇒ 队列头**票 246 AC#7**（让常驻进程真有任务源举卡）；其后 **197-r3（含 `A480` ③ 那枚名册外协程）→ 245 的 AC#6..AC#9 → 224-r3 → 242 → 244 → 票 228 后续片（含 `A482` 的 AC#8 与那处过期注释）**。**未推**；判据只认远程 tip 逐字等于本地 HEAD。
 
 **⛔ 本条里我自己又写错一处，就地更正（不抹原句）**：上面说「上一枚提交「7c93ad7c」的信息里写着"产码两枚＋台账 A482"」——**那句假话不在提交信息里，在我发给验收腿的派单里**。尺：`git log -1 --format=%B 7c93ad7c | grep -c A482` ＝ **0**（我 19:53 现跑，就在提交回执上方）。⇒ 错误的**层级**变了但性质没变：我确实把一个没落盘的台账编号当既成事实写进了交给下一程的指令里，而那枚指令是**下一程开工要读的东西**。定式再加一条：**派单里凡引用"台账 A##／某枚提交已落"，与 `grep -c` 同发**；写错层级比写错内容更容易被放过，因为查的人第一反应是去翻提交说明。
+
+## A483 — 09-30 **23:04:41**（本条「date」与紧随其后的 Edit 同发取钟）：**不空转**——按 owner 那句「只要子代理干完了，就立刻补位」补两枚腿；写腿 246-r2（票 246 AC#7）＋只读普查 247-a1（新立票 247）；⚠ 起手基线：`cmd/wisp` 这一发**全绿**
+
+**owner 的话逐字**：「你怎么这边又没反应了？还在干活吗？**不要停下啊，只要子代理干完了，就立刻补位啊，等什么呢？**」⇒ 我把"交件后先记账再等下一轮"改成"记账与补位同发"，本条就是这一轮的账。
+
+**① 写腿 246-r2（票 246 AC#7，队列头）**。派单里我裁了四条，全部是我现在能自己定的、不需要他拍的：
+- **任务源＝控制台真键盘，闸门一律复用现成的 `cmd/wisp/approval_reply_stdin_windows.go:41 interactiveStdin()`**（⛔ 不许新造第二套"是不是控制台"的判断）。那扇门只认 `STD_INPUT_HANDLE` 是 console screen buffer，pipe／重定向／Explorer detached 启动／CI 一律 nil；它文件头的理由逐字是"一个脚本能预填的流不是『用户确认过』，而是『在没有用户的情况下让确认发生』"——**任务文本比答复更危险**（它会驱动一次真工具调用），所以同一个判据必须是同一扇门。
+- **一个进程只许一枚 `approval.Gate`**：常驻腿已有 `ra.gate`（`resident_approval_windows.go:109`），做法是给 `run.go` 的 `runSpec` 加注入位（gate／UI／Replies 账本，nil＝按今天自建控制台那一套），`assembleRuntime` 仍是全仓唯一一处装配。⛔ 不许在常驻那条腿里再 `approval.New(...)` 造第二枚＝第二个"谁在等批准"的真相源（246-a1 §5 与 `A481` 裁乙形要躲开的就是这个）。
+- **任务环路的 ctx 必须挂在 `ra.root` 下面**（＝D38(e) 第 3 步 `cancelTaskRoots` 取消的那枚），否则"退出把在跑的任务取消掉"仍是假的。
+- **⚠ 本机今天没有凭据 ⇒ 真模型那一发拿不到，不许糊**：我 22:5x 现跑 `ls "$APPDATA/wisp"` ⇒ **空目录**（无 `config.toml`、无 `secrets`），凭据只能 owner 本人录入。所以判语必须分两栏〔接缝注入的四步读数〕／〔真模型四步读数＝欠账，待 owner 录入凭据〕，⛔ 不许把前者说成"任务管线已跑通"。
+
+**② 撞钉预检抓到一枚真钉**（第 64 条那把尺今天有用）：`cmd/wisp/resident_sink_nail_127_windows_test.go:97` 抄死了 `residentReachedLoop = "empty event loop running"`，而那枚文件头逐字写着"if any of them is reworded, a case in this file goes red and somebody has to say out loud where the record that proves the listener was there now lives"。AC#7 一旦把常驻那句启动文案改成"任务循环在跑"，这枚钉必红 ⇒ 派单里我当场定式＝**先改钉再改行为**：同一发增量里把常量重锚到新句子，并逐字写清"这枚断言原来保护什么（两重职责：sink 安装的 landmark ＋ 没有早于它的启动记录）／改后更强还是更弱／删掉 replay 会不会仍然红"。⛔ 不许为变绿放宽、不许删负向断言。（同一形状我 09-30 在票 245 上裁过一次：判据锚从"恰好三枚"改到"有无修饰键"，先改钉再改行为。）
+
+**③ 起手基线（我这轮自己跑的，带口径）**：`PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" go test ./cmd/wisp -count=1` ⇒ **`ok github.com/CarlosShao/wisp/cmd/wisp 152.784s`，全绿**，起跑 22:55:36／终态 22:58:12，锚 `cf540f8a`。**这枚读数与 `A482` 那枚 boot flake 不是"上一版 vs 新版"的关系**（第 75 条）：`A482` 记的是"HEAD 整包默认层 3 发 1 红"，我这发是"单包 1 发 0 红"——**两发都不是对方的推翻对象，只是各自那一次的读数**；flake 的命中率没有因此改变，`AC#8` 仍按 `A482` 归票 228。不带那枚 PATH 会得到 `exit status 0xc0000135`＋`0.0xxs`＋**一行 `--- FAIL` 都没有**＝一枚用例都没跑（仪器坑，不是红）。
+
+**④ 立票 247＋派 247-a1（只读普查）**。三把我现跑的尺（22:5x–23:0x，锚 `cf540f8a`）：`grep -rl "CarlosShao/wisp/internal/audio" --include=*.go . | grep -v "/internal/audio/" | grep -vc _test` ＝ **0**；`grep -rn "SetAudioLevel" --include=*.go internal/ cmd/` 的产码命中只有 `cmd/balldebug/main.go:418/:477`（那枚 flag 文案逐字 `synthetic audio envelope`）；`ls internal/speech/` ＝ 只有 `doc.go`。⇒ 票 241 把"PCM→`0..1` 的数"这半写完了（`level.go:96 LevelOfSamples`／`:118 FrameLevel`／`:137 DecodeFrame`），**但全仓没有一处去读它，球上那个"音量在动"至今是命令行填的假数**。票面 `.scratch/wisp/issues/247-…-reaches-the-ball.md`（50 行／8,336 字节，提交 `f0707c7b`）AC#0 摆的是**四问**：落点归谁／隐私闸门（`voice.enabled` 默认 true × `wake_word.enabled` 默认 false，"双击就采音会不会"必须答到行号）／降级三形照跑／第六环形状（`liquidDriven` 不含 `Armed`）。**落地腿 247-r1 按住排在 246-r2 之后**（同抢 `cmd/wisp`），普查腿因此⛔ 禁跑 `go build`／`vet`／`test`——它会吃到 246-r2 写到一半的码、拿脏读数。它 5 轮内已把骨架 commit（`60585af9`，census.md +33 行）。
+
+**⛔ 本条落盘过程中我又犯了一枚新形（就地记，不抹原句）**：我给 A483 追加时，把上一枚**已提交的**凭据句当 Edit 锚点，却在 `new_string` 里把那句的几个字**改写**了（写成"写写错"，还自作聪明加了一句"这是笔误"的括注）。⇒ 尺只有一枚：`git diff --numstat` 的**删除列必须为 0**；我这发第一次跑出来是 **19／1**，逐字比对才抓到，改回后 **18／0**（读数在本条里，不是转述）。**新定式：往 append-only 台账插条目之前，先把 `git diff --numstat` 跑成一发的习惯——旧条目的删除列一旦不为 0，就是我在改写历史，不管句子读起来通不通。** 这与我 09-24 记过两次的"拿下一条目标题当锚点却不带回＝静默删掉那行"同族，但损害形状不同：那次是**少一行**，这次是**多改几个字**，而改了的句子仍然通顺，所以只有那一列数字说真话。
+
+**编队与推送**：在飞 2 枚（写 246-r2 占 `cmd/wisp`／只读 247-a1 禁测量），**未推**；本条取钟时 HEAD＝`60585af9`、`git status --porcelain -- cmd internal`＝**0 行**。队列其后：**197-r3（含 `A480` ③ 那枚名册外协程）→ 245 的 AC#6..AC#9 → 224-r3 → 242 → 244 → 票 228 后续片（含 `A482` 的 AC#8 与那处过期注释）**；票 247 的落地腿排在 246-r2 交完并裁过四问之后。**推送判据不变＝远程 tip 逐字等于本地 HEAD。**
