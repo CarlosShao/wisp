@@ -47,6 +47,46 @@ Status 行（`:3`）＝ `review（改回 review：本票从未被验收）`。
 
 ## 2. 逐格细账（每裁完一格追加一节）
 
+### 2.1 AC#1 —— `:82` 可运行原型：`build\balldebug.exe -stay` 启来即是玻璃液态球，浅色与深色桌布上都清晰可见
+
+**判语：附条件（浅色／当前桌布那一半成立，深色那一半今天不可满足）。**
+
+**我现跑**：本腿把 harness 重建成 `.scratch/wisp/probes/62/v1/balldebug.exe`
+（`go build -o` 指到 scratch，⛔ 不写 `build/`、不改工作树），
+跑 `…balldebug.exe -diff .scratch/wisp/probes/62/v1/diff-selfrun -diff-states Sleeping -diff-sample 60s -diff-margin 120 -x 1720 -y 720`：
+```
+diff: place=(1720,720) margin=120px cpu-sample=1m0s cores=12 amp=6x out=…/diff-selfrun
+diff: Sleeping cpu1c= 0.002% cpuAll= 0.000% privWS= 11.51MB commit=109.91MB ws= 39.43MB
+      handles= 349 gdi=4 user=7 timers=no px>=3:2156/px>=8:2101/px>=24:1232 of 97344
+      max=193 mean=1.188 box=(136,131 40x45) clean
+```
+⇒ **差分截屏这条判据我今天由我自己复现成立**：`px>=8` ＝ **2101** 枚变化像素、成像框 **40×45**、
+`teardown=clean`。与台件 `62-diff-signoff/diff-table.txt` 的 `Sleeping` 行（`px>=8=2120`、框 44×44、
+`privWS=11.76MB`）同量级 ⇒ 不是只有实现代理看得见这个数。
+我另用肉眼看了自己刚拍的 `01-Sleeping-alive.png`：球是一颗带亮边、内部蓝紫青渐变的玻璃体，
+**背景是"一个浅色对话框压在深色桌面上"的混合底**，球在明暗两块底上都分得开。
+⚠ 但**这不算深色桌布那一半**：它不是受控的深色壁纸条件（是别人弹出的窗口），
+本腿**不去改 owner 的桌面背景设置**来造这个条件。
+
+**默认档复认**：`cmd/balldebug/main.go:122` 逐字 `ball.EnablePrototypeVisuals(!*frozen)`，
+flag 帮助 `:97` 写着 `-frozen` 才回到冻结档 ⇒ 判据那句"启来即是一个玻璃液态球"在 harness 里成立。
+⚠ 同一件事的另一面（对 AC#3/AC#7 有用，不是对 AC#1 的扣分，因为 AC#1 点名的就是 balldebug）：
+**库默认值是关的**——`internal/ball/tokens_test.go:147-149` 仍断言
+`VisualFor(…, Sleeping) == 12px @ 0.35`，注释逐字说那是"the mode the library DEFAULT is in today
+(prototypeVisuals off)"，翻这个默认值是票 68 AC#2 的活。⇒ 产品侧今天画的仍是旧微点档。
+
+**今天不可满足的那一半（具名）**：**深色桌布下同法差分一枚都没有**。
+我现查：`grep -rniE "dark|wallpaper" docs/evidence/s1/62-diff-*/*.txt` ＝ **零命中**；
+`docs/evidence/s1/ball-contrast/` 只有两枚 09-20 11:53 的 PNG
+（`same-region-no-ball.png` 4,701B、`sleeping-over-dark-taskbar.png` 4,854B），
+文件名自述是**旧微点期对任务栏**的对照，不是本球对深色桌布的差分。
+复认 `62-a1` §2.1（它引票面 `:146` 把 dark wallpaper 列进 unverified、台账 A452 同判）。
+⇒ **本腿不推翻 `62-a1` 的 AC#1 结论，只把"浅色那一半"从〔读台件〕升成〔我现跑〕。**
+
+**AC#1 总判语：附条件。** 缺的东西具名：**把桌面背景换成深色后重跑一次
+`balldebug -diff -diff-states Sleeping`（差分表落新目录，⛔ 别写进 `ball-states/` 档案）**。
+这一步要么 owner 换壁纸、要么编排者授权本腿改系统设置——我没有这个授权，所以停在这里。
+
 ### 2.2 AC#2 —— `:83` Sleeping：静态单帧、零活动定时器句柄（实测断言，非策略表）、CPU ≤0.5%
 
 **判语：附条件。** 三个子句里，"零活动定时器句柄"这一子句**已由我真删一次证成落地**；
@@ -170,6 +210,59 @@ diff: Sleeping cpu1c= 0.002% cpuAll= 0.000% privWS= 11.51MB … handles= 349 gdi
 ⇒ 判语 `成立` 的范围是"今天有一枚会真咬的实测断言，且我用突变证明它咬得住"，
 **不是**"每次 merge 前自动咬"。这一条要不要补进 CI，是编排者的决定，不是我能替它勾的。
 
+
+
+### 2.3 AC#3 —— `:84` 会话态动效：五态液体颜色/流速/边框差异肉眼可辨，逐态截屏留证
+
+**判语：判据今天不可满足。**（与 `62-a1` 的 D 同向，但本腿把"缺什么"量得更死，见下面第 3 条。）
+
+**1. "肉眼可辨"这一半：仓里没有任何机器代理。**〔我现跑〕
+`grep -rniE "distinguish|distinct|可辨" --include=*_test.go internal/ball` ＝ **零命中**。
+最接近的 `TestVisualForCoversAllTwentyStates`（`internal/ball/tokens_test.go:119`）只断言
+每态 `SizePx>0 && 0<Opacity<=1`（**覆盖性**，不是**可分辨性**），而且它读的是**库默认档**
+（`:147-149` 注释逐字："read the mode the library DEFAULT is in today (prototypeVisuals off)"，
+并当场断言 `Sleeping == 12px @ 0.35`）。⇒ 没有任何一枚用例会因为"两态长得一样"而红，
+所以这一半**不是我能用突变去证的**，它按票面处置表 `:25` 归票 65＋owner 眼睛。
+
+**2. 参考图与参照页两条路本腿都走不通（具名）。**
+① owner 那两张玻璃参考图（vivo 蓝心小V 语音球）**从未入库**——`62-a1` §2.3 已核，票 65 头部现读
+`Status: blocked-on-owner（缺参考图）`；② 按规格参照页判要读 `design/**`（SPEC-08 §2.1 引的那页），
+**`design/**` 在本编队的禁读清单里，连文件名都不许列**，所以本腿**没有去看**，直接具名标不可满足。
+
+**3. "逐态截屏留证"这一半：票 62 名下只覆盖了 5 态里的 2 态。**〔我现跑〕
+```
+ls docs/evidence/s1/62-diff-{baseline,glass,border,signoff}/*-alive.png
+  baseline / glass : Sleeping, Listening, Speaking          （3 态）
+  border           : Sleeping                                 （1 态）
+  signoff          : Sleeping, Sleeping-dock-right,
+                     Listening, Listening-dock-right,
+                     Speaking, Speaking-dock-right            （6 枚 alive 图）
+```
+⇒ 判据点名的五态 **Listening / Thinking / Acting / Warm / Speaking** 里，
+票 62 名下有图的只有 **Listening、Speaking**；**Thinking、Acting、Warm ＝ 零枚**。
+旁路我核过并**不采信**：`docs/evidence/s1/12-ball-walk/` 那 7 态（Sleeping/Listening/Thinking/Acting/
+Speaking/Warm/Settling）确实齐，但 `grep -inE "frozen|prototype|liquid|glass" 12-ball-walk/diff-table.txt`
+＝ **零命中**——那张表**没记自己是哪一档渲染**，所以不能算票 62 新液态视觉的逐态凭据（它是票 12 的
+资源差分）。`docs/evidence/s1/ball-states/` 那 20 枚本腿 `ls -la` 复认：mtime **全部 09-19 21:38**
+＝旧微点期档案（`scripts/dev/ball-cycle.ps1:19` 的默认 OutDir 正指着它，⛔ 谁要重跑必须带 `-OutDir`，
+这条 `62-a1` §3 已钉，本腿复认）。
+
+**4. 还有一层会让"逐态可辨"今天根本看不到的事**：`62-visual-spec-draft.md` §0.2 自己写着
+**库默认值＝冻结档**（`prototypeVisuals=false`，全仓唯一开启者是 `cmd/balldebug/main.go:122`），
+并引 registry **A24-D2**"owner 签收的球不在默认构建里"。⇒ 五态液体差异今天只在 debug harness 里存在；
+在默认构建里画的是旧 §2.1 那 20 行。这一条不扣 AC#1（AC#1 点名 balldebug），
+但它是 AC#3 这句"会话态动效……肉眼可辨"在产品侧**无法被看到**的直接原因。
+
+**要判这一格，今天缺的东西（逐件具名）**：
+(a) owner 手上那两张玻璃参考图入库（或 owner 当场口头判"像不像"）；
+(b) 五态各一枚**新液态视觉**的差分截屏（现只有 2/5），且落**新目录**；
+(c) 若要按参照页判：给本编队解禁 `design/**` 的读权限，或由 owner 那侧的界面助手代判。
+⛔ 本腿**没有**读 `frontend/**`／`design/**` 任何字节来凑这一格。
+
+**AC#3 总判语：判据今天不可满足**（缺 (a)(b)(c) 三件，全部具名如上）。对 `62-a1`：**不推翻，加强**——
+它记的"62 名下无裁决表／参考图未落盘／要读 design"三条本腿全部复现，
+本腿另量出"逐态截屏只覆盖 2/5 态"与"没有任何可分辨性用例"这两条它没写的。
+
 ### 2.4 AC#4 —— `:85` 音频驱动：喂已知电平（wav 注入票 13 的 C8 seam）时液面旋转幅度随电平单调变化；静音时收敛进"边框"过渡态
 
 **判语：附条件。** 单调律与"麦克风叫不醒 Sleeping"这道门**都由我真删过、都咬住**；
@@ -242,97 +335,6 @@ grep -rn "SetAudioLevel"（非测试）
 **AC#4 总判语：附条件。** 已证：单调律（M4）、静音收敛与边框（用例绿，纯模型）、
 状态门是拒绝的真来源（M2 红）且用例不是假绿（M3 红）＝〔我现跑〕。
 未证：C8 wav 端到端注入（全仓无生产者）＝具名缺件；肉眼幅度可辨＝归 owner。
-
-### 2.1 AC#1 —— `:82` 可运行原型：`build\balldebug.exe -stay` 启来即是玻璃液态球，浅色与深色桌布上都清晰可见
-
-**判语：附条件（浅色／当前桌布那一半成立，深色那一半今天不可满足）。**
-
-**我现跑**：本腿把 harness 重建成 `.scratch/wisp/probes/62/v1/balldebug.exe`
-（`go build -o` 指到 scratch，⛔ 不写 `build/`、不改工作树），
-跑 `…balldebug.exe -diff .scratch/wisp/probes/62/v1/diff-selfrun -diff-states Sleeping -diff-sample 60s -diff-margin 120 -x 1720 -y 720`：
-```
-diff: place=(1720,720) margin=120px cpu-sample=1m0s cores=12 amp=6x out=…/diff-selfrun
-diff: Sleeping cpu1c= 0.002% cpuAll= 0.000% privWS= 11.51MB commit=109.91MB ws= 39.43MB
-      handles= 349 gdi=4 user=7 timers=no px>=3:2156/px>=8:2101/px>=24:1232 of 97344
-      max=193 mean=1.188 box=(136,131 40x45) clean
-```
-⇒ **差分截屏这条判据我今天由我自己复现成立**：`px>=8` ＝ **2101** 枚变化像素、成像框 **40×45**、
-`teardown=clean`。与台件 `62-diff-signoff/diff-table.txt` 的 `Sleeping` 行（`px>=8=2120`、框 44×44、
-`privWS=11.76MB`）同量级 ⇒ 不是只有实现代理看得见这个数。
-我另用肉眼看了自己刚拍的 `01-Sleeping-alive.png`：球是一颗带亮边、内部蓝紫青渐变的玻璃体，
-**背景是"一个浅色对话框压在深色桌面上"的混合底**，球在明暗两块底上都分得开。
-⚠ 但**这不算深色桌布那一半**：它不是受控的深色壁纸条件（是别人弹出的窗口），
-本腿**不去改 owner 的桌面背景设置**来造这个条件。
-
-**默认档复认**：`cmd/balldebug/main.go:122` 逐字 `ball.EnablePrototypeVisuals(!*frozen)`，
-flag 帮助 `:97` 写着 `-frozen` 才回到冻结档 ⇒ 判据那句"启来即是一个玻璃液态球"在 harness 里成立。
-⚠ 同一件事的另一面（对 AC#3/AC#7 有用，不是对 AC#1 的扣分，因为 AC#1 点名的就是 balldebug）：
-**库默认值是关的**——`internal/ball/tokens_test.go:147-149` 仍断言
-`VisualFor(…, Sleeping) == 12px @ 0.35`，注释逐字说那是"the mode the library DEFAULT is in today
-(prototypeVisuals off)"，翻这个默认值是票 68 AC#2 的活。⇒ 产品侧今天画的仍是旧微点档。
-
-**今天不可满足的那一半（具名）**：**深色桌布下同法差分一枚都没有**。
-我现查：`grep -rniE "dark|wallpaper" docs/evidence/s1/62-diff-*/*.txt` ＝ **零命中**；
-`docs/evidence/s1/ball-contrast/` 只有两枚 09-20 11:53 的 PNG
-（`same-region-no-ball.png` 4,701B、`sleeping-over-dark-taskbar.png` 4,854B），
-文件名自述是**旧微点期对任务栏**的对照，不是本球对深色桌布的差分。
-复认 `62-a1` §2.1（它引票面 `:146` 把 dark wallpaper 列进 unverified、台账 A452 同判）。
-⇒ **本腿不推翻 `62-a1` 的 AC#1 结论，只把"浅色那一半"从〔读台件〕升成〔我现跑〕。**
-
-**AC#1 总判语：附条件。** 缺的东西具名：**把桌面背景换成深色后重跑一次
-`balldebug -diff -diff-states Sleeping`（差分表落新目录，⛔ 别写进 `ball-states/` 档案）**。
-这一步要么 owner 换壁纸、要么编排者授权本腿改系统设置——我没有这个授权，所以停在这里。
-
-### 2.3 AC#3 —— `:84` 会话态动效：五态液体颜色/流速/边框差异肉眼可辨，逐态截屏留证
-
-**判语：判据今天不可满足。**（与 `62-a1` 的 D 同向，但本腿把"缺什么"量得更死，见下面第 3 条。）
-
-**1. "肉眼可辨"这一半：仓里没有任何机器代理。**〔我现跑〕
-`grep -rniE "distinguish|distinct|可辨" --include=*_test.go internal/ball` ＝ **零命中**。
-最接近的 `TestVisualForCoversAllTwentyStates`（`internal/ball/tokens_test.go:119`）只断言
-每态 `SizePx>0 && 0<Opacity<=1`（**覆盖性**，不是**可分辨性**），而且它读的是**库默认档**
-（`:147-149` 注释逐字："read the mode the library DEFAULT is in today (prototypeVisuals off)"，
-并当场断言 `Sleeping == 12px @ 0.35`）。⇒ 没有任何一枚用例会因为"两态长得一样"而红，
-所以这一半**不是我能用突变去证的**，它按票面处置表 `:25` 归票 65＋owner 眼睛。
-
-**2. 参考图与参照页两条路本腿都走不通（具名）。**
-① owner 那两张玻璃参考图（vivo 蓝心小V 语音球）**从未入库**——`62-a1` §2.3 已核，票 65 头部现读
-`Status: blocked-on-owner（缺参考图）`；② 按规格参照页判要读 `design/**`（SPEC-08 §2.1 引的那页），
-**`design/**` 在本编队的禁读清单里，连文件名都不许列**，所以本腿**没有去看**，直接具名标不可满足。
-
-**3. "逐态截屏留证"这一半：票 62 名下只覆盖了 5 态里的 2 态。**〔我现跑〕
-```
-ls docs/evidence/s1/62-diff-{baseline,glass,border,signoff}/*-alive.png
-  baseline / glass : Sleeping, Listening, Speaking          （3 态）
-  border           : Sleeping                                 （1 态）
-  signoff          : Sleeping, Sleeping-dock-right,
-                     Listening, Listening-dock-right,
-                     Speaking, Speaking-dock-right            （6 枚 alive 图）
-```
-⇒ 判据点名的五态 **Listening / Thinking / Acting / Warm / Speaking** 里，
-票 62 名下有图的只有 **Listening、Speaking**；**Thinking、Acting、Warm ＝ 零枚**。
-旁路我核过并**不采信**：`docs/evidence/s1/12-ball-walk/` 那 7 态（Sleeping/Listening/Thinking/Acting/
-Speaking/Warm/Settling）确实齐，但 `grep -inE "frozen|prototype|liquid|glass" 12-ball-walk/diff-table.txt`
-＝ **零命中**——那张表**没记自己是哪一档渲染**，所以不能算票 62 新液态视觉的逐态凭据（它是票 12 的
-资源差分）。`docs/evidence/s1/ball-states/` 那 20 枚本腿 `ls -la` 复认：mtime **全部 09-19 21:38**
-＝旧微点期档案（`scripts/dev/ball-cycle.ps1:19` 的默认 OutDir 正指着它，⛔ 谁要重跑必须带 `-OutDir`，
-这条 `62-a1` §3 已钉，本腿复认）。
-
-**4. 还有一层会让"逐态可辨"今天根本看不到的事**：`62-visual-spec-draft.md` §0.2 自己写着
-**库默认值＝冻结档**（`prototypeVisuals=false`，全仓唯一开启者是 `cmd/balldebug/main.go:122`），
-并引 registry **A24-D2**"owner 签收的球不在默认构建里"。⇒ 五态液体差异今天只在 debug harness 里存在；
-在默认构建里画的是旧 §2.1 那 20 行。这一条不扣 AC#1（AC#1 点名 balldebug），
-但它是 AC#3 这句"会话态动效……肉眼可辨"在产品侧**无法被看到**的直接原因。
-
-**要判这一格，今天缺的东西（逐件具名）**：
-(a) owner 手上那两张玻璃参考图入库（或 owner 当场口头判"像不像"）；
-(b) 五态各一枚**新液态视觉**的差分截屏（现只有 2/5），且落**新目录**；
-(c) 若要按参照页判：给本编队解禁 `design/**` 的读权限，或由 owner 那侧的界面助手代判。
-⛔ 本腿**没有**读 `frontend/**`／`design/**` 任何字节来凑这一格。
-
-**AC#3 总判语：判据今天不可满足**（缺 (a)(b)(c) 三件，全部具名如上）。对 `62-a1`：**不推翻，加强**——
-它记的"62 名下无裁决表／参考图未落盘／要读 design"三条本腿全部复现，
-本腿另量出"逐态截屏只覆盖 2/5 态"与"没有任何可分辨性用例"这两条它没写的。
 
 ### 2.5 AC#5 —— `:86` 靠边吸附：拖到左/右/上边缘收缩半隐并留可命中区；悬停/单击弹回完整球；跨 DPI 与副屏行为正确
 
@@ -498,6 +500,50 @@ git log --numstat 48f0cfd..HEAD -- docs/specs/SPEC-08-ui-ball-panel.md
 
 **AC#7 总判语：成立（限"成文"半，框面自己声明的口径）**；签字半仍欠（R15 第 10 项 Q-1…Q-15）；
 另附一枚待定性：`5866c6fc` 对 SPEC-08 的那 1/1 行改动是甲还是乙。
+
+### 2.8 AC#8 —— `:95` 对抗验收由非实现者执行，验收报告含与上述 AC 1:1 的裁决表（README 规则 6）
+
+**判语：成立（附一条自证偏利的声明）。**
+
+**这一格判据的对象就是本文件本身**，所以它天然自证——本腿先把"我既是被判者又是判者"这件事写在明面上：
+**本格成立不等于票 62 可结案**。AC#3 今天不可满足、AC#5 不成立、AC#6 不成立，
+那三格不因本表存在而变绿；本票的 `Status: review` 与本框的未勾状态**都该保持**。
+⛔ **本腿没有翻这一枚框，也没有改任何一行框面文字**（框归编排者，见 §5 名册核对）。
+
+#### 判据的三个词，逐个给我现跑的凭据
+
+**① "由非实现者执行"** —— 可核，不靠我自我声明：
+```
+git log --name-only --format="%h" d5a59d66..HEAD | （剥掉 commit 行后按路径计数）
+   9  docs/evidence/s1/62-adversarial-acceptance.md
+   1  docs/reports/HANDOVER.md          ← 不是本腿的
+   1  docs/reports/pending-and-issues.md ← 不是本腿的
+```
+本腿自锚点 `d5a59d66` 起的**全部 9 枚提交只碰这一枚证据文件**；`internal/**`、`cmd/**`
+**一个字节都没写**（每一发突变之后 `git status --porcelain -- internal cmd` 均为空，逐次读数见 §5）。
+⇒ 票 62 的实现码本腿零行，"非实现者"这一条成立。
+⚠ 顺带记一句给编排者：这是**共享工作树**，锚点之后另外那两枚提交（HANDOVER／台账）不是我提交的，
+别把它们算进本腿的产出。
+
+**② "1:1 的裁决表"** —— §1 那张表 **8 行对 8 枚框**（`:82 :83 :84 :85 :86 :87 :88 :95`），
+一格一行、**没有合并、没有"整体通过"**；每行都有判语与凭据列，凭据一律标〔我现跑〕／〔读台件，未复跑〕。
+
+**③ "对抗"** —— 本腿**新造 5 枚红**，每枚都落在指名的那一条断言上，且每枚之前都先 grep 证明要摘的分支今天真在：
+
+| 突变 | 摘掉的东西（先 grep 证其在） | 指名的用例 | 结果 |
+|---|---|---|---|
+| M1 | `ball_windows.go:348-353` 给策略表不 grant 的态硬塞真 `SetTimer`（`anim.go` 不动） | `TestLiveSleepingZeroTimerHandles` | **红**（`hotkey_live_test.go:303`，1 枚 WM_TIMER）；同跑的**策略表**用例仍**绿** |
+| M2 | `liquidDriven` ＋ `transitionDriven` 两道门一起放行 | `TestBallLiveAudioLiquidGate` | **红**（`live_windows_test.go:640`） |
+| M3 | `liquidMotion.busy()` 恒 false（计时器永不挂） | 同一枚用例 | **红**（`:649` 正向断言）⇒ 反证那几条"没有计时器"不是假绿 |
+| M4 | `omega` 里去掉 `SpinLevelRadPerS*m.level` | `TestLiquidRotationIsMonotonicInLevel` | **红**（`liquid_test.go:30`，0.4455 vs 0.4455） |
+| M5 | `dockRampFrame` 直接 `clamp01(target)`（台阶瞬移） | `TestDockHoverPopBackWalksTheRampHome` | **红**（`dock_test.go:374`，1 帧 vs 预算 160ms） |
+
+另加两发自跑测量（§2.1／§2.6：60s 与 4s 两口径树外差分）。
+⛔ 本腿**没有**为了让任何一格变绿而放宽过断言或阈值；5 枚突变全在 `go test -overlay` 里做，
+工作树未改（`.scratch/wisp/probes/62/v1/m{1..5}/` 是临时件，按规矩只建不删）。
+
+**AC#8 总判语：成立**——三个词逐个有凭据，但**它的成立只覆盖"这份报告存在且形状对"这一件事**，
+不覆盖本票其余七格的结论。
 
 <!-- NEXT-CELL -->
 
