@@ -302,13 +302,99 @@ internal/ball/thresholds.go: No such file or directory`）。真身在
 
 ## §3 两条链的落点清单
 
-### 3.1 采集 → 电平 → 球
+### 3.0 先摆"本仓已存在的纪律与禁令"（同类形状现读，逐条带出处）
 
-（待写，一张表。）
+这两条链不是"想怎么接就怎么接"，下面每一枚都会真实挡住某个写法。全部是本腿现读的仓内文本：
 
-### 3.2 采集 → KWS → 唤起会话
+| 号 | 纪律（原文或精确转述） | 出处 | 对这两条链的直接后果 |
+|---|---|---|---|
+| P1 | 「**零新增依赖边**」是被当作**验收理由**写下来的，不是风格偏好。票 223 票面逐字：`后者零新增依赖边：run.go 已同时持有 config 与 gate`；124 的裁决逐字：`⇒ 无环、无新依赖边（§7.4 双 GOOS vet 各 rc=0 为证）`，同段还把"提成生产包会新增一条 `memory/config → proc` 的生产依赖边"当作**否决理由** | `.scratch/wisp/issues/223-checkandreload-has-zero-production-callers-hot-reload-never-runs.md:15`；`docs/evidence/s1/124-ac2b-4-conversion.md:72` | 装配根（`cmd/wisp/run.go:328 assembleRuntime`）已经同时持有 config 与 gate；**两条链的接法优先"装配根注入函数/句柄"，不要为了少写一行而新开包间直连** |
+| P2 | 状态机的副作用**设计上就是由消费者注入的**：逐字 `executes them itself - consumers (session, speech, panel, tickets 08+) wire a Sink. The zero sink is an explicit no-op`；`Sink` 的约束逐字 `Must not block and must not re-enter Dispatch synchronously` | `internal/statemachine/machine.go:24-25`、`:31-34`、`:64-68`（nil → `func(Effect){}`） | 这就是"panel/装配根注入、不新开依赖边"的**同一形状的仓内实现**：KWS 的 `kws.load`/`kws.pause`、语音的 `speech.load-vad-asr`、采集的 `audio.stop-capture` 全等着一个 Sink，**今天生产两处建机器都没给 Sink**（§3.3） |
+| P3 | `audio-capture`（pinned）线程：逐字 `runtime.LockOSThread()`；**该线程不得跑任何其他 Go 代码** | `docs/specs/SPEC-01-architecture.md:113`；实现 `internal/audio/wasapimic_windows.go:150-151` | RMS/电平/投递**能不能算在采集线程上**是一枚要裁的问题（见 §5 D-3）；现状实现里那条线程只做 open/wait/drain/resample/push |
+| P4 | goroutine 花名册：常驻**上限 6**、按需 `kws-infer`**仅 Armed 态**、`总数上限 = 常驻 6 + 每任务 3；超出即泄漏征兆` | `SPEC-01:119-124`；代码 `internal/observe/goroutine.go:41 ResidentBaseline = 6`、`:44` 六枚名、`:47 OnDemandNames = []string{"kws-infer"}` | **给电平消费者新起一条常驻 goroutine ＝ 动 D38b 名册**（契约面）；名册里已经**给 KWS 留了槽**（`kws-infer`），R17 实测该槽今天零 Spawn |
+| P5 | 禁止裸 `go func()`：必须有名字/owner/退出条件/recover 边界 | `SPEC-01:125`；AGENTS.md §1.2（`tools/d22scan` 自动扫） | 两条链新增的任何 goroutine 一律走 `observe.Registry.Spawn` |
+| P6 | 接缝**全部复用冻结契约，不新开接缝**：逐字 `本项目接缝已由冻结契约天然划定，全部复用，不新开接缝` | `docs/specs/SPEC-10-testing-acceptance.md:8` | 注入面只有 C8(`AudioSource`) / C5(`LlmProvider`) / C17(`PanelBridge`) / CLI `wisp run`；**别为电平或 KWS 造新接缝** |
+| P7 | 依赖白名单（新增须人批准）：`sherpa-onnx` Go 绑定（cgo）**已在名单内**；`webrtc-audio-processing` 也随 D47/P15 批准加入 | `SPEC-01:96-100` | 接 KWS **不需要**人批新依赖（模块已在 `go.mod:8`）；只有真要上 AEC 才碰那枚 |
+| P8 | C25 污染面：逐字 `This is the only render-side audio input in the project: no samples and no transcript text cross into the ball` | `internal/ball/liquid_windows.go:38-40` | 电平链**只许一个 float32 过界**；把 PCM 帧或转写喂进球＝违规，别为了"波纹更准"破例 |
+| P9 | D38(e) 关停 10 步：`2. 停热键与唤醒词监听`、`4. 停音频采集线程 → 关设备 ← 必须在释放 ASR 之前（否则 ASR 拿到半截 buffer）`、`5. 释放 ASR/TTS/KWS session（DisposalScope 逆序销毁）` | `SPEC-01:139-143`；实现 `cmd/wisp/resident_windows.go:66-75`（`rt.Shutdown`） | 两条链各要在关停表里挂上；KWS loader 的释放点在第 5 步，采集消费者停在第 4 步 |
+| P10 | 球的动效白名单：liquid 的过渡定时器 `may only run in a state the frozen SPEC-08 animation whitelist already grants a timer to (see transitionDriven)`；`Sleeping appears in neither list` | `internal/ball/liquid_windows.go:16-19`、`:24-27`；`internal/ball/anim.go:40-70` | 想让 `Armed` 也有动效＝同时动**冻结视觉表**（SPEC-08 §2.1 `:57`）与**定时器白名单**两枚，不是接线量级 |
+| P11 | 默认视觉开关 `prototypeVisuals` **仍是 OFF**，且注释自陈"翻默认是票 68 AC#2"、`cmd/balldebug is today the only caller that turns this on, so a library consumer (the panel, a future wisp GUI host) still gets the frozen look` | `internal/ball/statevisual.go:88-102`（`var prototypeVisuals bool` `:102`、`EnablePrototypeVisuals` `:106`）；实测调用者只有 `cmd/balldebug/main.go:122` | **整条电平链在今天默认视觉下是空转的**：`applyLevel` 第一行 `if !prototypeVisuals { return }`（`liquid_windows.go:52`） |
 
-（待写，一张表。）
+⚠ **上面这两枚（"panel 为真相源""不新开 `tools → panel` 这类依赖边"）本腿找到了逐字原文，但不在 `docs/specs/**`、也不在工单池 README，而在台账**：
+`docs/reports/pending-and-issues.md:8786-8792`（票 197 那一段）。逐字摘录：
+
+> `SubagentStreamKeyPrefix`／`SubagentStreamKey` **在两包里各定义了一份**（`internal/tools/subagent_197.go:43-48,91` 与 `internal/panel/pump.go:375-379`），
+> 我现量两条 grep 确认**双向都不 import**（`grep -rn "wisp/internal/panel" internal/tools/`＝空、反向亦空）⇒ **装配根 `cmd/wisp` 是唯一的接缝**。
+> **裁定＝`internal/panel` 那一枚是真相源** …… `internal/tools` 那份**改成由装配根注入**……
+> **不新开 tools→panel 的依赖边**（那会把"视图层"变成"工具层"的下家，方向装反）。
+
+⇒ 这条对本表的直接含义（本腿的推广，不是台账原话）：**"两包都要用的东西"一律由 `cmd/wisp` 装配根注入，
+被注入的那一枚定为真相源**；照此形——电平消费者要球 ⇒ 装配根把"投递函数"注给消费者，
+`internal/audio` 不 import `internal/ball`；KWS 要状态机 ⇒ 装配根把 machine 注给 loader，
+`internal/speech` 不 import `internal/statemachine` 之外再顺手够到 UI。
+
+扫法（负向尺，本腿真跑）：`grep -rn -iE 'panel.{0,40}真相源|真相源.{0,40}panel' docs/specs/ .scratch/wisp/issues/README.md docs/evidence/s1/`
+→ **零命中**；`grep -rn '依赖边' docs/ .scratch/wisp/issues/README.md` → **3 命中**
+（`docs/evidence/s1/124-ac2b-1-conversion.md:196`、`docs/evidence/s1/124-ac2b-4-conversion.md:72`、
+`docs/reports/pending-and-issues.md:8791`）。⇒ **结论：禁令的权威文本在台账与裁决表里，不在 spec 里**，
+引用它必须点名这两枚出处，不能写成"spec 规定"。
+
+### 3.1 表一：采集 → 电平 → 球
+
+| # | 落点 | 现状位置 | 要动什么 | 新依赖边？ | 量级 |
+|---|---|---|---|---|---|
+| 1 | **常驻 GUI 腿得先存在** | `cmd/wisp/resident_windows.go:81` 逐字 `empty event loop running; the floating ball arrives in ticket 07`、`:83 rt.RunEventLoop()`；循环本体 `internal/proc/boot_windows.go:120-131` | 在这条腿上建球＋建消费者；`internal/ball` 目前**只有 `cmd/balldebug/main.go:27` 一枚 import 者**（R11） | **新**：`cmd/wisp → internal/ball` | **缺一整块**（票 07 的地界，比电平链本身还大） |
+| 2 | 装配根 | `cmd/wisp/run.go:328 assembleRuntime`（run 腿已有）；GUI 腿**没有对应的 assemble** | GUI 腿需要一处"同时握 ball / audio / config / machine"的装配点 | — | 缺一整块（可复用 `assembleRuntime` 的形状） |
+| 3 | 建那条 ≤192ms 有界通道 | `internal/audio/audio.go:65 NewBoundedFrames()` | **补一行调用**（今天零调用者） | 无 | 补一行就通 |
+| 4 | 起真麦克风 | `internal/audio/wasapimic_windows.go:52 NewWASAPIMicrophone()`、`:69 Start(ctx, buf)` | **补一行**；opt-in 与静音要先过门（下一行） | **新**：`cmd/wisp → internal/audio` | 补一行就通 |
+| 5 | 静音/半双工门 | `internal/audio/gate.go:84 NewHalfDuplexGate(inner, path, opts...)`、`:130 SetSpeaking`、`:168 SetMuted`、`:209 Open` | **补一行**把 mic 包进门里，门再给消费者 | 无（同包） | 补一行就通 |
+| 6 | 帧解码 `[]byte → int16` | `encodeFrame` 未导出：`internal/audio/wavinjector.go:135`；包外零反向工具（R21） | 在 `internal/audio` 导出一个取样本/直接给电平的口（推荐），避免包外重抄小端 | 无 | 约 5–10 行 |
+| 7 | **RMS 本体** | **全主模块 `Sqrt` 零命中（R12）** | 新写逐帧 RMS（512 样本） | 无 | **缺一整块**（约 15 行＋用例；`FrameSamples` 已有） |
+| 8 | **0..1 归一标度** | 球侧文档 `liquid_windows.go:35` 逐字 `RMS of the last 512 samples, normalised 0..1`；**除数全仓无定义**；球唯一相关常数 `liquid.go:30 SilenceLevelGate = 0.06` 是门限不是标度 | 需要一条口径定案（§5 D-1）后落成常量 | 无 | **判定项**，不是代码量 |
+| 9 | 投进球 | `internal/ball/liquid_windows.go:42 SetAudioLevel(level float32)`（内部 `:44 b.sta.PostTask`） | **补一行**调用 | 消费者侧需握 `*ball.Ball`：由装配根注入，**不要让 `internal/audio` import ball**（撞 P1/P8） | 补一行就通 |
+| 10 | 消费者的那条 goroutine | 名册无对应槽（P4：常驻 6 已排满、按需只有 `kws-infer`） | 要么复用采集线程（撞 P3，需裁），要么动名册（D38 契约面） | 无 | **缺一整块＋可能碰契约** |
+| 11 | 视觉开关 | `statevisual.go:102` 默认 false；`liquid_windows.go:52` 直接早退 | 装配根显式 `ball.EnablePrototypeVisuals(true)`，或等票 68 AC#2 翻默认 | 无 | 补一行就通（但**默认翻转不归写腿**） |
+| 12 | 状态白名单（`Armed` 不动） | `liquid.go:60-68 liquidDriven` 六态表，**不含 Armed**；`anim.go:62` Armed 落 default 静态 | 若要求"待唤醒态波纹跟环境声动"＝扩白名单 | 无 | **缺一整块，且撞 P10（冻结视觉表＋定时器白名单）** |
+| 13 | 关停挂载 | `SPEC-01:142` step 4；`cmd/wisp/resident_windows.go:66-75` | 消费者先停、再关采集 | 无 | 补一行级 |
+| 14 | 测试注入面 | `internal/audio/wavinjector.go:48 NewWavInjector(path)` + `:40 WithInjectorPace`；现成 wav 素材 `third_party/model-fetch/x-kws/.../test_wavs/*.wav`（7 枚） | 用例走 C8 注入，不许 mock 代替真源 | 无 | 补一行就通 |
+
+**表一结论（一句话）**：14 格里 **#3/#4/#5/#9/#11/#13/#14 是"补一行就通"，#6/#7 是小块新写，#8 是判定，#1/#2/#10/#12 各是一整块**；
+其中 **#1（GUI 腿根本没有球）比 #7（没有 RMS）更靠前**——现在这条链不是"最后一公里没接"，
+是**两端都还没有家**（采集包没人 import，球包只被调试载体 import）。
+
+### 3.2 表二：采集 → KWS → 唤起会话
+
+| # | 落点 | 现状位置 | 要动什么 | 新依赖边？ | 量级 |
+|---|---|---|---|---|---|
+| 1 | **引擎包本体** | `internal/speech/` **只有 `doc.go`（21 行）**；`grep 'type .*Engine'` 主模块零命中 | 声明 C9 `WakeWordEngine` 并实现（load/infer/release、C11 DisposalScope 内释放不卸载） | — | **缺一整块**（`doc.go:19 DEFERRED(engines) … ticket 41`） |
+| 2 | sherpa 那层的引入 | 上游模块 `sherpa-onnx-go v1.13.8`（`go.mod:8`）；cgo 在上游 windows 子模块（`build_windows_amd64.go:5`）；白名单已含（P7） | 在 `internal/speech` 直接 import 绑定 | **新**：`internal/speech → github.com/k2-fsa/sherpa-onnx-go/sherpa_onnx`（**不需人批**，P7） | 补一行就通 |
+| 3 | spotter 构造的可抄答案 | `scripts/spike/model-residency/main.go:114-152`、`scripts/spike/speech-baseline/main.go:124-167`（**独立模块 R7，引不到**） | 把形状搬进 `internal/speech`：四个常数 `KeywordsThreshold 0.25 / KeywordsScore 2.0 / MaxActivePaths 4 / NumThreads 1`＋`IsReady/Decode` 节奏＋`Delete*` 释放 | 无 | 缺一整块，但**零设计** |
+| 4 | 模型路径与验签 | `models/manifest.json` 里 `kws-zipformer-wenetspeech-3.3M-2024-01-01`（R19，archive 逐文件钉哈希、含 `keywords.txt`）；`internal/models/manifest.go:94 Purposes` 含 `kws`；`downloader.go:228 VerifyInstalled` → `VerifyDir` 逐文件比哈希（R22） | 走 `Manager.Ensure` 拿目录；⚠ **自定义词不许写进模型目录**（当场验签失败） | **新**：`internal/speech → internal/models`（装配根注入目录路径可避免） | 补一行就通（前提是 #3 存在） |
+| 5 | **keywords 从哪来** | `config.WakeWord.Keywords []string`（`schema.go:199`，人话词表）vs sherpa 要 `KeywordsFile` **或** `KeywordsBuf`（R20）；出厂表 `keywords.txt` 8 行全是**拼音音素＋@中文**（R18） | 缺"文本 → 模型音素行"的那一步（PLAN.md:168 说"只需 keywords 文本文件"，但文件内容是音素化拼写） | 无 | **缺一整块**（且是"能不能拼出 hi wisp"的可行性问题，见 §5 D-4） |
+| 6 | 帧格式转换 | 采集出 `[]byte` 小端 int16（`wavinjector.go:135`）；sherpa 要 `[]float32` + sampleRate（`AcceptWaveform`，绑定 `sherpa_onnx.go:310`）；本仓只有**反向**的 `FloatToPCM16`（`resample.go:119`） | 补 `PCM16 → float32`（约 6 行）＋ 复用帧解码 #6(表一) | 无 | 约 10 行 |
+| 7 | 推理线程 | 名册槽 `kws-infer` 已声明：`observe/goroutine.go:32`（注释 `kws-infer, Armed state only`）、`:47 OnDemandNames`；`thresholds.go:38 goroutineLimitArmed = 7 // + kws-infer`；R17 实测**零 Spawn** | 用这个槽 Spawn，**不要新起名**（P4） | 无 | 补一行就通 |
+| 8 | 半双工下的 KWS 关/停 | `table.go:62 kws.pause`、`:66 kws.stop-inference`、`:71 kws.keep-alive-alert`（#9 自环，注释逐字 `D32③: KWS must NOT be unloaded`）；`PLAN.md:453` 播报期关麦&关 KWS；`audio/gate.go:130 SetSpeaking` | 副作用要有人执行——**见 #9** | 无 | 缺一整块 |
+| 9 | **副作用执行器（Sink）** | 机制在位：`machine.go:26-34 Effect/Sink`、`:162-164 for _, name := range effects { m.sink(...) }`；`table.go:36` 字段注释 `effect hook names, fired in order`；生产两处建机器**都没传 Sink**：`cmd/balldebug/main.go:188`、`cmd/wisp/models.go:303`（→ 走 `machine.go:64-68` 的显式 no-op） | 在装配根接一枚 Sink，把 `kws.load/pause/stop-inference`、`speech.load-vad-asr`、`audio.stop-capture`、`audio.discard-buffer` 分派到真子系统 | 无（Sink 由装配根注入，正合 P1/P2） | **缺一整块，但这是全表最"值"的一格**：机制、事件名、表行、测试全都在，只缺那一个接线者 |
+| 10 | 命中 → 唤起会话 | `statemachine/events.go:20 EvWakeWord`、`table.go:61`（`Armed --EvWakeWord--> Listening`，副作用 `session.scope-create` + `speech.load-vad-asr` + `kws.pause`）；R15 **生产零生产者** | KWS 命中后 `Dispatch(EvWakeWord, &Facts{KwsLoaded:true})` | 由 #9 的同一处持有 machine ⇒ **不新开 speech→statemachine 之外的边** | 补一行就通（依赖 #1/#3/#7） |
+| 11 | 进入 Armed（opt-in 生效） | `events.go:18 EvKwsEnabled`、`table.go:55`（副作用 `kws.load`）；`Facts.KwsLoaded`（`events.go:70`）；**`schema.go:197 wake_word.enabled default false`，R13 显示 `.Voice.` 在非 config 包零读者** | 需要一个读 opt-in → `Dispatch(EvKwsEnabled)` → 翻 `KwsLoaded` 的门控者；同时裁定与 `schema.go:245 voice.enabled default true` 谁门控哪种开麦（§5 D-2） | 无 | 缺一整块（约一小函数＋一枚定时器复用 reload tick） |
+| 12 | 语音否决通道翻可用 | `approval/approval.go:57 ChannelKWS`、`:161` 逐字 `the panel (ticket 37) and KWS (ticket 41) are not`、`:176-178 SetLoaded`（注释逐字 `the KWS loader calls this when its model is actually resident`）、`gate.go:137` 暴露 `Channels()`；生产唯一 `SetLoaded` 在 `cmd/wisp/approval_reply.go:416`，翻的是 `run.go:618` 传入的 `s.replyVeto`，`run.go:456-457` 逐字 `replyVeto stays unset` | KWS loader 真 resident 后调 `SetLoaded(ChannelKWS,true)` | 无 | 补一行就通 |
+| 13 | 否决词（veto words） | `schema.go:203 VetoWords` 默认 `取消,停下,别`；`approval.go:92` 文案 `说取消词`、`:99 DEFERRED(kws-veto, B1)`；`docs/specs/SPEC-04-voice-pipeline.md:70-71` 逐字要求 `Confirming 态例外：KWS 保持运行以识别否决词` | 需要第二组 keywords + 置信度判定；**绑定拿不到置信度**（R20：`KeywordSpotterResult` 只有 `Keyword`） | 无 | **缺一整块，且撞工具天花板**（§5 D-5） |
+| 14 | 常亮指示（`:462`） | 见 §2.4(c)：只有 `statevisual.go:158/288` 的 opacity，`Armed` 无图标、`anim.go:62` 静态 | 要么按 SPEC-08 现有 `Armed` 行交付，要么新增指示元素＝**视觉契约面** | 无 | 视取舍：照现有＝补一行；要新元素＝改冻结表（人批） |
+| 15 | SLO 那档今天测不到 | R：`SLOArmed` 在 `internal/observe/` 之外零命中；`cmd/wisp/slo_windows.go` 无 Armed runner | 接线后要补 Armed 行的 runner，否则 `≤90MB/≤2%` 永远是纸面 | 无 | 缺一整块 |
+
+**表二结论（一句话）**：这一条比表一**更靠前**——表一缺的是"没人按开关"，表二缺的是"开关后面还没有电器"。
+唯一能立刻兑现的高性价比格是 **#9（副作用 Sink 接线者）** 和 **#12（SetLoaded）**；
+真正的重活集中在 **#1/#3（引擎本体）** 与 **#5（唤醒词文本→音素）**。
+
+### 3.3 两表共同的第一枚前置：装配根今天没有 GUI 腿
+
+现读：`cmd/wisp/run.go:328 assembleRuntime` 是 **run 腿**的装配根，
+`cmd/wisp/resident_windows.go:81/83` 的 GUI 腿只到 `rt.RunEventLoop()`
+（实现在 `internal/proc/boot_windows.go:120`，循环体只有激活事件与信号），
+**没有 assemble、不建球、不建采集**。而"同时握着 ball + machine + config"的那段装配代码
+今天**只存在于调试载体** `cmd/balldebug/main.go:188-247`。
+⇒ 两条链无论先做哪一条，第一个动作都是**把 balldebug 里那段装配形状搬到生产 GUI 腿**
+（那是票 07 的地界）。这件事本腿只报事实，不替它排期。
 
 ---
 
