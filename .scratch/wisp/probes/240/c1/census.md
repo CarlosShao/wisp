@@ -215,8 +215,10 @@ spike 两处的精确位置：
 
 - `SLOArmed` 只在 `internal/observe` 自己体内出现（`sampler.go:43` 声明、`sampler.go:51` 进
   `SLOStates` 表、`thresholds.go:49/66/171` 查表）；
-- 跑 SLO 的 `cmd/wisp/slo_windows.go` 只出现 `SLOSleeping`（`:295`、`:984-988`）与
-  `SLOWarm`/`SLOConversation`，**没有 Armed 那一行的 runner**；
+- 跑 SLO 的 `cmd/wisp/slo_windows.go`：`-state` 一枚旗子**是收 Armed 这个名的**
+  （`:149` usage 逐字 `-state <Sleeping|Armed|Warm|Conversation|PanelOpen|WorkPeak>`，
+  校验走 `SLOState(*state).Valid()`），**但该文件零 import ball、零 SetState**，
+  进程侧也没有任何事件能进 Armed ⇒ **旗子只是标签，采到的窗口不是真 Armed**（详见 §4 F1）。
 - 而 `Facts.KwsLoaded`/`EvKwsEnabled` 生产零生产者（R15）⇒ 进程今天**无法进入 `Armed` 态**。
 
 ⚠ 另外这枚文件路径要说清，否则会找错：任务书与部分文档把它写成
@@ -380,7 +382,7 @@ internal/ball/thresholds.go: No such file or directory`）。真身在
 | 12 | 语音否决通道翻可用 | `approval/approval.go:57 ChannelKWS`、`:161` 逐字 `the panel (ticket 37) and KWS (ticket 41) are not`、`:176-178 SetLoaded`（注释逐字 `the KWS loader calls this when its model is actually resident`）、`gate.go:137` 暴露 `Channels()`；生产唯一 `SetLoaded` 在 `cmd/wisp/approval_reply.go:416`，翻的是 `run.go:618` 传入的 `s.replyVeto`，`run.go:456-457` 逐字 `replyVeto stays unset` | KWS loader 真 resident 后调 `SetLoaded(ChannelKWS,true)` | 无 | 补一行就通 |
 | 13 | 否决词（veto words） | `schema.go:203 VetoWords` 默认 `取消,停下,别`；`approval.go:92` 文案 `说取消词`、`:99 DEFERRED(kws-veto, B1)`；`docs/specs/SPEC-04-voice-pipeline.md:70-71` 逐字要求 `Confirming 态例外：KWS 保持运行以识别否决词` | 需要第二组 keywords + 置信度判定；**绑定拿不到置信度**（R20：`KeywordSpotterResult` 只有 `Keyword`） | 无 | **缺一整块，且撞工具天花板**（§5 D-5） |
 | 14 | 常亮指示（`:462`） | 见 §2.4(c)：只有 `statevisual.go:158/288` 的 opacity，`Armed` 无图标、`anim.go:62` 静态 | 要么按 SPEC-08 现有 `Armed` 行交付，要么新增指示元素＝**视觉契约面** | 无 | 视取舍：照现有＝补一行；要新元素＝改冻结表（人批） |
-| 15 | SLO 那档今天测不到 | R：`SLOArmed` 在 `internal/observe/` 之外零命中；`cmd/wisp/slo_windows.go` 无 Armed runner | 接线后要补 Armed 行的 runner，否则 `≤90MB/≤2%` 永远是纸面 | 无 | 缺一整块 |
+| 15 | SLO 那档今天进不去 | R：`SLOArmed` 在 `internal/observe/` 之外零命中；`cmd/wisp/slo_windows.go:149` 的 `-state` 旗子收 Armed 这枚名，但该文件零 import ball／零 SetState ⇒ 标签能贴、状态进不去 | 接线后要让 Armed 行**真的被测到**，否则 `≤90MB/≤2%` 永远是纸面 | 无 | 缺一整块 |
 
 **表二结论（一句话）**：这一条比表一**更靠前**——表一缺的是"没人按开关"，表二缺的是"开关后面还没有电器"。
 唯一能立刻兑现的高性价比格是 **#9（副作用 Sink 接线者）** 和 **#12（SetLoaded）**；
@@ -400,7 +402,66 @@ internal/ball/thresholds.go: No such file or directory`）。真身在
 
 ## §4 半成品名册
 
-（待写：每枚 `文件:行` + 「补一行就通」/「缺一整块」。）
+### 4.0 口径先钉住
+
+"零调用者"这一列本腿是**真跑出来的**，不是推断。尺形：
+
+```
+grep -rn "\b<符号>\b" --include='*.go' internal cmd tools | grep -v '_test.go' | grep -v '^internal/audio/' | wc -l
+```
+
+即"包外、非测试"计数。`internal/audio` 的 20 枚导出名（含常量）**全部＝0**，
+逐枚读数在 §4.1 表里合并成一行写（因为 20 枚都是同一个 0，逐行列 20 遍是噪声不是证据）；
+其余每一枚单独跑。⛔ 本腿**没跑** `go vet`／编译器来找"未使用的导出符号"，
+所以这份名册的完整性只能到"本腿想到的候选"为止，缺口如实写在 §5。
+
+本仓这条形状**不是新发现，是第六次**：票 **101**（perm 存储无生产 import 者）、
+**105**（C26 改写台账无生产读者）、**114**（composer 请求无生产调用者）、
+**117**（安全告警在生产里没听众）、**223**（`CheckAndReload` 零生产调用者、热重载从未跑）
+——票面标题就是这么写的（`.scratch/wisp/issues/101-perm-store-has-no-production-importer-done.md`
+等一批）。票 11 那段还把这条立成了规律：
+`A8、A11 两张外来框都是"测试里已证明、装配根从未调用"，票 12 规划时应把"把已存在的东西接上"当主活，`
+`不要当集成收尾`（`.scratch/wisp/issues/11-llm-adapters-rest-done.md:67`）。
+⇒ **语音这条链是这个模式目前最大的一枚实例**，前面的票都在"一函数一档"量级，这枚是"两个包"。
+
+### 4.1 名册（逐枚带 `文件:行` 与判定）
+
+| # | 名字 | 位置 | 包外非测试调用者（实测） | 判定 |
+|---|---|---|---|---|
+| A1 | `internal/audio` **整包的 20 枚导出名**：`AudioSource`/`Stater`/`Stats`/`NewBoundedFrames`/`BoundedFrameCapacity`/`SpawnCapture`/`Path`+`PathT`/`PathC`/`NewWASAPIMicrophone`/`NewWavInjector`/`WithInjectorPace`/`NewHalfDuplexGate`/`WithStartMuted`/`WithGateEvents`/`NewResampler`/`ResampleLinear`/`MonoDownmix`/`FloatToPCM16`/`DeviceError`/帧常量 | `internal/audio/*.go`（声明处见 §1.2） | **全部 0**（逐枚跑过，见 4.0；根因＝R1 无 importer） | **缺一整块调用方**——实现本体是全的，且不是桩 |
+| A2 | `SpawnCapture`（自称 capture 线程的"唯一 sanctioned entry point"） | 声明 `audio.go:180-182` | **全仓 0，连本包内都没用它**；两枚真源各自直接 `observe.Default.Spawn`（`wasapimic_windows.go:83`、`wavinjector.go:84`） | **补一行就通，且顺手修一处自相矛盾**：文档说唯一入口，实现绕过它；且这里写死 `observe.Default`，而球侧是注入式（`ball_windows.go:170 opts.Registry.Spawn`） |
+| A3 | `WASAPIMicrophone.Endpoints()`（D47 留给 P15 AEC spike 的采集/渲染端点对） | `wasapimic_windows.go:137` | 0 | 补一行就通（但要等 AEC，不着急） |
+| A4 | `HalfDuplexGate` 全套（`SetSpeaking`/`SetMuted`/`Open`/`Muted`/`Path`/`Stats`） | `gate.go:130/168/209/202/216/221` | 0 | **补一行就通**：包内测试已在跑同一条逻辑（`gate_test.go:11-16` 走真 `WavInjector`） |
+| B1 | `Ball.SetAudioLevel` | `liquid_windows.go:42` | **1，且是调试载体**：`cmd/balldebug/main.go:418`、`:477`（R4；flag 自述逐字 `synthetic audio envelope 0..1 pushed to the ball at ~30fps`，`:396` 逐字 `syllabified synthetic envelope`） | **补一行就通**（前提是表一 #6/#7/#8 那三格先有电平值） |
+| B2 | `EnablePrototypeVisuals` / `PrototypeVisualsEnabled` | `statevisual.go:106/109` | **各 1，都在 balldebug**：`cmd/balldebug/main.go:122`、`:451` | 补一行就通；但**默认翻不翻不归写腿**（`statevisual.go:88-96` 自陈翻默认＝票 68 AC#2） |
+| B3 | `LookNames` / `SetLook`（皮肤 seam，编排者 A461 已点名 `tokens.go:316/332`） | `internal/ball/tokens.go`（`LookNames`、`SetLook`） | `ball.LookNames` 2、`ball.SetLook` 1，**全在 balldebug 的 flag 与开关** | 补一行就通（样式维度 owner 已说"以后再说"，本腿不排它） |
+| B4 | `NewHotkeyReloader` | 声明 `internal/ball/hotkey_reload.go:73`（`:16` 是它自己的用法注释） | 2，**全在 `cmd/balldebug/main.go:237`** | 补一行就通（GUI 腿要有 config 驱动的快捷键时接） |
+| C1 | `EvKwsEnabled` / `EvWakeWord`（D43 #5/#7） | `events.go:18/20`，表行 `table.go:55/61` | **0 生产者**（R15） | **缺一整块**：要发它，先得有 KWS loader |
+| C2 | `Facts.KwsLoaded` | `events.go:70` | 生产 0；只有测试在填（`internal/ball/hotkey_live_test.go:238/254/272`、`window_test.go:134`） | 补一行就通（loader 起来后填） |
+| C3 | **`Options.Sink` 副作用注入口**（`Effect{D43,Name}` 全套机制） | `machine.go:26-34/39/64-68`，发射 `:162-164` | **生产两处建机器都没传**：`cmd/balldebug/main.go:188`、`cmd/wisp/models.go:303` ⇒ 走显式 no-op | ⭐ **这是全表最"值"的一格：补一个装配根 Sink 就通**，被空掉的副作用名含 `kws.load`、`kws.pause`、`kws.stop-inference`、`kws.keep-alive-alert`、`speech.load-vad-asr`、`audio.stop-capture`、`audio.discard-buffer` |
+| C4 | 上述七枚副作用名的**执行器** | 表行见 `table.go:56`（`kws.load`）、`:62`（`kws.pause`＋`speech.load-vad-asr`）、`:66`（`kws.stop-inference`）、`:71`（`kws.keep-alive-alert`）、`:52`（`speech.load-vad-asr`）、`:87`（`audio.stop-capture`）、`:94`（`audio.discard-buffer`） | 0 | **缺一整块**（C3 是它的投递机制） |
+| D1 | `ChannelKWS` + `SetLoaded` 的 KWS 分支 | `approval/approval.go:57/92/99/105/176`、`gate.go:137` | 生产 `SetLoaded` 有 1 处（`cmd/wisp/approval_reply.go:416`）但翻的是 `s.replyVeto`，`run.go:456-457` 逐字 `replyVeto stays unset` ⇒ **KWS 那一支 0** | **补一行就通**；⚠ 不许顺手把 `DefaultChannels()` 改成含 KWS（`approval.go:161` 那句诚实陈述与 `window_test.go:97` 的钉会被打红，那是"假装通道存在"） |
+| E1 | `WakeWord` 四字段（`Enabled`/`Keywords`/`Thresholds`/`VetoWords`） | `schema.go:196-203`；热载分级 `manager.go:370-375/385-386/398-399/405-407` | **0**（R13：`internal/config/` 之外 `.Voice.` 零命中） | **缺一整块读者**；配置侧本身**不用新写一行** |
+| E2 | `[voice]` 其余小节：`ASRConfig`/`TTSConfig`/`AECConfig`/`RealtimeConfig`/`ConversationMode`/两条云链 | `schema.go:207-236/240-250` | **同上，0** | 缺一整块读者（ASR/TTS 那两块的"识别"至少还在 schema 里，引擎侧同样零） |
+| E3 | `localSherpaProvider = "local-sherpa"` | `config/catalog.go:20`、`:57`（校验里拒它）、`schema.go:210/216` 默认值 | 只有**校验路径**用它（拒绝用），**没有任何一处用它去起本地引擎** | 补一行就通（但要等 E1/E2 的读者） |
+| F1 | `SLOArmed` 那一档（`memCapArmed`/`cpuLimitArmed`/`goroutineLimitArmed`） | `observe/thresholds.go:20/27/38`；状态声明 `sampler.go:43`、进表 `:51` | **`internal/observe` 之外 0**（实跑 `grep 'SLOArmed' --include=*.go cmd tools internal \| grep -v '^internal/observe/'` → rc=1）。⚠ 但旗子是收的：`cmd/wisp/slo_windows.go:149` 的 usage 明写 `-state <Sleeping\|Armed\|Warm\|Conversation\|PanelOpen\|WorkPeak>` 并用 `SLOState(*state).Valid()` 校验；同文件**零 import ball、零 SetState**（`grep 'ball\.' cmd/wisp/slo_windows.go`＝空，R11 亦证 ball 只有 balldebug 一枚 import 者）⇒ **`-state Armed` 只是给采样窗口贴标签，并不能把进程带进 Armed** | **缺一整块**（真能进 Armed 的前提＝C1/C3；在那之前 Armed 行的读数一律是"标签读数"，别拿它当验收） |
+| F2 | `captureBufferLimitConversation = 20 << 20` | `thresholds.go:42` | 注释自陈 `not measurable until the speech pipeline (tickets 15/26) runs, so it is recorded as a note, never as a fake pass` ⇒ **不进门禁** | 缺一整块（诚实挂着，别去翻它） |
+| G1 | `OnDemandNames = {"kws-infer"}` | `observe/goroutine.go:32/47` | **零 Spawn**（R17） | **补一行就通**（槽是给 KWS 留的） |
+| G2 | `ResidentNames` 里的 `hotkey-listener` | `goroutine.go:44`；`SPEC-01:119` | **零 Spawn**（R16） | 补一行就通（GUI 腿接快捷键时） |
+| H1 | KWS 模型本体与分发 | `models/manifest.json` 里 `kws-zipformer-wenetspeech-3.3M-2024-01-01`（R19，逐文件哈希含 `keywords.txt`）；`manifest.go:94 Purposes` 含 `kws`；`downloader.go:228 VerifyInstalled` | **生产码里无人按这个 ID 请求它**（实跑 `grep 'kws-zipformer-wenetspeech' --include=*.go internal cmd tools`（排测试）→ 零命中） | **补一行就通**（`Manager.Ensure(ctx, id)` 已在 `handOffModel` 那条腿上通用） |
+| I1 | `internal/speech` **整包** | 只有 `doc.go`（21 行），`:19 DEFERRED(engines) … ticket 41 (KWS)` | 0 importer（R2）；`grep 'type .*Engine'` 主模块 0 命中 | **缺一整块**（不是半成品，是空地基） |
+| I2 | `internal/watchdog` **整包** | 只有 `doc.go`，`:16-17 DEFERRED(watchdog loop/thresholds): implemented by ticket 42`，正文逐字含 `never unload KWS in Armed` | 0 | **缺一整块**；D43 #9 的 `kws.keep-alive-alert` 与 PLAN.md:514 的"按态查表"最终都要落在这（票 223 票面 `:15` 已把这圈 tick 登记成推迟件） |
+| J1 | **spike 里那两枚真 KWS 会话** | `scripts/spike/model-residency/main.go:114-152`、`scripts/spike/speech-baseline/main.go:124-167` | 生产 0、测试 0；**在另一个 module 里**（R7） | **不能"补一行"**：跨模块引不到，只能照抄形状进 `internal/speech` |
+| K1 | D11 控制词的宿主挂钩 `ControlHandler` / `Options.Control` | `internal/agent/control.go:69-73`、`loop.go:158` | **从未被赋值**（实跑 `grep 'Control:'` 生产与测试都无一处设它）⇒ 永远走 `defaultControl`（`loop.go:524`），`repeat/louder/confirm` 恒 `unhandled`（`loop.go:522-523` 注释逐字） | **补一行就通**；ASR 一通，`voice.wake_word.veto_words`（E1）与这枚是近邻，别各造一套 |
+
+### 4.2 名册统计（口径写清，免得被当成"裁过"）
+
+- 表内 **24 行**（A1-A4、B1-B4、C1-C4、D1、E1-E3、F1-F2、G1-G2、H1、I1-I2、J1、K1）。
+- 判"**补一行就通**"（含"实现齐、只缺调用方"）：**11 行**＝A2、A3、A4、B1、B2、B3、B4、C2、D1、G1、G2。
+  ⚠ 其中 **B1 与 C2/D1 是有前提的"一行"**：B1 要 A1/A2 那侧先有电平值，D1/C2 要先有 loader。
+- 判"**缺一整块**"：**13 行**。
+- **本表不是穷举**：穷举需要"未使用导出符号"仪器（编译器级），本腿按红线没跑 go 工具链，
+  所以这是"想到的候选全查完"，不是"全仓无漏"（这条写进 §5）。
 
 ---
 
