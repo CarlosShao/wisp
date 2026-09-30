@@ -215,6 +215,46 @@ grep -rn "SetAudioLevel"（非测试）
 状态门是拒绝的真来源（M2 红）且用例不是假绿（M3 红）＝〔我现跑〕。
 未证：C8 wav 端到端注入（全仓无生产者）＝具名缺件；肉眼幅度可辨＝归 owner。
 
+### 2.1 AC#1 —— `:82` 可运行原型：`build\balldebug.exe -stay` 启来即是玻璃液态球，浅色与深色桌布上都清晰可见
+
+**判语：附条件（浅色／当前桌布那一半成立，深色那一半今天不可满足）。**
+
+**我现跑**：本腿把 harness 重建成 `.scratch/wisp/probes/62/v1/balldebug.exe`
+（`go build -o` 指到 scratch，⛔ 不写 `build/`、不改工作树），
+跑 `…balldebug.exe -diff .scratch/wisp/probes/62/v1/diff-selfrun -diff-states Sleeping -diff-sample 60s -diff-margin 120 -x 1720 -y 720`：
+```
+diff: place=(1720,720) margin=120px cpu-sample=1m0s cores=12 amp=6x out=…/diff-selfrun
+diff: Sleeping cpu1c= 0.002% cpuAll= 0.000% privWS= 11.51MB commit=109.91MB ws= 39.43MB
+      handles= 349 gdi=4 user=7 timers=no px>=3:2156/px>=8:2101/px>=24:1232 of 97344
+      max=193 mean=1.188 box=(136,131 40x45) clean
+```
+⇒ **差分截屏这条判据我今天由我自己复现成立**：`px>=8` ＝ **2101** 枚变化像素、成像框 **40×45**、
+`teardown=clean`。与台件 `62-diff-signoff/diff-table.txt` 的 `Sleeping` 行（`px>=8=2120`、框 44×44、
+`privWS=11.76MB`）同量级 ⇒ 不是只有实现代理看得见这个数。
+我另用肉眼看了自己刚拍的 `01-Sleeping-alive.png`：球是一颗带亮边、内部蓝紫青渐变的玻璃体，
+**背景是"一个浅色对话框压在深色桌面上"的混合底**，球在明暗两块底上都分得开。
+⚠ 但**这不算深色桌布那一半**：它不是受控的深色壁纸条件（是别人弹出的窗口），
+本腿**不去改 owner 的桌面背景设置**来造这个条件。
+
+**默认档复认**：`cmd/balldebug/main.go:122` 逐字 `ball.EnablePrototypeVisuals(!*frozen)`，
+flag 帮助 `:97` 写着 `-frozen` 才回到冻结档 ⇒ 判据那句"启来即是一个玻璃液态球"在 harness 里成立。
+⚠ 同一件事的另一面（对 AC#3/AC#7 有用，不是对 AC#1 的扣分，因为 AC#1 点名的就是 balldebug）：
+**库默认值是关的**——`internal/ball/tokens_test.go:147-149` 仍断言
+`VisualFor(…, Sleeping) == 12px @ 0.35`，注释逐字说那是"the mode the library DEFAULT is in today
+(prototypeVisuals off)"，翻这个默认值是票 68 AC#2 的活。⇒ 产品侧今天画的仍是旧微点档。
+
+**今天不可满足的那一半（具名）**：**深色桌布下同法差分一枚都没有**。
+我现查：`grep -rniE "dark|wallpaper" docs/evidence/s1/62-diff-*/*.txt` ＝ **零命中**；
+`docs/evidence/s1/ball-contrast/` 只有两枚 09-20 11:53 的 PNG
+（`same-region-no-ball.png` 4,701B、`sleeping-over-dark-taskbar.png` 4,854B），
+文件名自述是**旧微点期对任务栏**的对照，不是本球对深色桌布的差分。
+复认 `62-a1` §2.1（它引票面 `:146` 把 dark wallpaper 列进 unverified、台账 A452 同判）。
+⇒ **本腿不推翻 `62-a1` 的 AC#1 结论，只把"浅色那一半"从〔读台件〕升成〔我现跑〕。**
+
+**AC#1 总判语：附条件。** 缺的东西具名：**把桌面背景换成深色后重跑一次
+`balldebug -diff -diff-states Sleeping`（差分表落新目录，⛔ 别写进 `ball-states/` 档案）**。
+这一步要么 owner 换壁纸、要么编排者授权本腿改系统设置——我没有这个授权，所以停在这里。
+
 <!-- NEXT-CELL -->
 
 ---
