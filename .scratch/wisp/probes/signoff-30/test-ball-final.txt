@@ -1,0 +1,13 @@
+time=2026-09-30T11:10:06.463+08:00 level=ERROR msg="hotkey occupied by another program, not registered" hotkey=mute binding=Ctrl+Alt+M err="Hot key is already registered."
+time=2026-09-30T11:10:06.464+08:00 level=ERROR msg="hotkey not attempted (bad binding)" hotkey=panel binding=Ctrl+Alt+Bogus+ err="unknown key \"Bogus\" in hotkey \"Ctrl+Alt+Bogus+\""
+time=2026-09-30T11:10:06.464+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=mute
+time=2026-09-30T11:10:06.464+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=cancel
+time=2026-09-30T11:10:06.464+08:00 level=INFO msg="hotkey disabled (unset in config)" hotkey=panel
+time=2026-09-30T11:10:06.464+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+R mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=4
+time=2026-09-30T11:10:06.464+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+Q mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+P live=4
+time=2026-09-30T11:10:06.464+08:00 level=INFO msg="ball: hotkeys rebound after config change" summon=Ctrl+Alt+Q mute=Ctrl+Alt+M cancel=Esc panel=Ctrl+Alt+J live=4
+--- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)
+    tokens_table_test.go:1468: read design/assets/tokens.css: open D:\work\workspace\projects plans\Wisp\design\assets\tokens.css: The system cannot find the path specified. - the CSS leg of this check must never skip
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/ball	0.097s
+FAIL

@@ -16,11 +16,17 @@ const (
 	HTNowhere     = 0
 )
 
-// RingMarginPx is the non-interactive rendering margin around the orb (the
-// ring/glow zone; ball.html inset -5px, Conversation -7px). It sizes the
-// window but NOT the clickable circle, which stays the orb body + a small
-// tolerance so the visible ring still counts as "the ball".
-const RingMarginPx = 8.0
+// RingMarginPx is the non-interactive rendering margin around the orb. It
+// sizes the window but NOT the clickable circle, which stays the orb body + a
+// small tolerance so the visible ring still counts as "the ball".
+//
+// The margin has to contain the widest thing a frame draws, which is the
+// Listening wave train at R+5px+16px of travel (+ a 2px badge beyond the rim):
+// R+21.75. The frozen ball.html inset (-5, Conversation -7) sized this for the
+// pre-ticket-62 ring, so the prototype's expanding waves were sliced by the
+// window rect and the ball read as a framed square (owner 09-30 sign-off).
+// 22 is the smallest value that fits the waves at every size in 44..72.
+const RingMarginPx = 22.0
 
 // ClickTolerancePx extends the clickable circle slightly beyond the orb so
 // the drawn ring belongs to the hit region (DPI-scaled at call sites).

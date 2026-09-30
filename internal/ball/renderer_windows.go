@@ -325,7 +325,28 @@ func (r *renderer) dropAssets() {
 // glowBrush returns (lazily creating) the outer-glow radial gradient at the
 // requested peak alpha (permille 0..1000). Animated states step through a
 // small alpha ladder instead of recreating a brush per frame.
-func (r *renderer) glowBrush(v Visual, permille int) unsafe.Pointer {
+// haloExtents returns the (fill, falloff) radii of the outer glow. The window
+// is a square (edge = orb + 2*RingMarginPx) while the halo fills 1.5*R out to
+// a 1.9*R falloff, so a full-size body gets its halo sliced by the rect and
+// reads as a framed square instead of a ball (owner 09-30: 「四周边边角角的，
+// 有边框」). Both radii clamp to the inscribed circle together, which leaves
+// the recorded Sleeping numbers untouched (its 1.9*R already fits) and makes
+// the clipped states end at zero alpha.
+func (r *renderer) haloExtents(R float32) (float32, float32) {
+	fill, grad := R*1.5, R*1.9
+	if fit := float32(r.w)/2 - 1; grad > fit {
+		grad = fit
+	}
+	if fit := float32(r.h)/2 - 1; grad > fit {
+		grad = fit
+	}
+	if fill > grad {
+		fill = grad
+	}
+	return fill, grad
+}
+
+func (r *renderer) glowBrush(v Visual, permille int, radius float32) unsafe.Pointer {
 	if b, ok := r.glow[permille]; ok {
 		return b
 	}
@@ -333,7 +354,7 @@ func (r *renderer) glowBrush(v Visual, permille int) unsafe.Pointer {
 	b := r.radialBrush([]d2d1GradientStop{
 		{0.45, colorF(g)},
 		{1.00, colorF(mulA(v.GlowColor, 0))},
-	}, r.center(), d2d1Point2F{0, 0}, v.SizePx*0.95, v.SizePx*0.95)
+	}, r.center(), d2d1Point2F{0, 0}, radius, radius)
 	r.glow[permille] = b
 	return b
 }
@@ -398,8 +419,9 @@ func (r *renderer) drawFrame(v Visual, phase float64) {
 		r.drawGlass(v, c, R, s)
 	} else {
 		// Legacy flat body (kept for non-glass visuals).
-		if g := r.glowBrush(v, 850); g != nil {
-			r.fillEllipse(c, R*1.5, R*1.5, g)
+		hr, hg := r.haloExtents(R)
+		if g := r.glowBrush(v, 850, hg); g != nil {
+			r.fillEllipse(c, hr, hr, g)
 		}
 		r.fillEllipse(c, R, R, r.body)
 		r.fillEllipse(d2d1Point2F{float32(r.w) * 0.32, float32(r.h) * 0.24},
@@ -519,8 +541,9 @@ func (r *renderer) drawGlass(v Visual, c d2d1Point2F, R, s float32) {
 	// animated frame must not COM-create brushes (D32 CPU discipline) - after
 	// the first visit to each rung every frame is a cache hit.
 	permille -= permille % 25
-	if g := r.glowBrush(v, permille); g != nil {
-		r.fillEllipse(c, R*1.5, R*1.5, g)
+	fillR, gradR := r.haloExtents(R)
+	if g := r.glowBrush(v, permille, gradR); g != nil {
+		r.fillEllipse(c, fillR, fillR, g)
 	}
 
 	// 2. Glass shell (cool translucent body).

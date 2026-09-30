@@ -387,7 +387,12 @@ const (
 	// DockTriggerPx is how close the orb must get to a work-area edge (px at
 	// 96 DPI, scaled per monitor) before it starts squeezing: the squash is
 	// read off the gap, so no timer is needed to animate it.
-	DockTriggerPx = 16
+	//
+	// It must stay >= RingMarginPx: a window parked fully inside the work area
+	// already sits one margin away from its tangent position, so a smaller
+	// trigger makes auto-dock unreachable at rest (09-30 sign-off raised the
+	// render margin to 22, which silently killed docking).
+	DockTriggerPx = 24
 )
 
 // Geometry + motion tokens (CSS lengths/ms verbatim; px at 96 DPI, scaled by

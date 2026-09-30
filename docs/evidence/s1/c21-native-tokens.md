@@ -163,9 +163,9 @@ alpha，`hex()` 0xRRGGBB + alpha）。D2D 使用直通 alpha 的 `D2D1_COLOR_F`�
 | 音频包络 → 液体**转速** rad/s（`liquid.go`，票 62，无 CSS 对应） | 基准 0.45 + 每单位电平 4.20 + 唤起爆发期 2.20 | `SpinBaseRadPerS` / `SpinLevelRadPerS` / `SpinSummonRadPerS` | 累加成 `Visual.LiquidAngle`（`omega`），渲染器按角度查预烘焙 ladder。票 74 把这三条从表外豁免提进本表：被删的 `SpinLevelGain`（1.0）与本行的 4.20 是同一个「转速增益」的两种说法，只有后者在动像素——A33「声明✓ / 实测✗」的正身 |
 | 包络门限与时间常数（`liquid.go`，票 62，无 CSS 对应） | 静默门 0.06 / 静音保持 150ms / attack 60ms / release 420ms | `SilenceLevelGate` / `SilenceHoldMs` / `LevelAttackTauMs` / `LevelReleaseTauMs` | 快攻慢放让音节读成节奏而非方波；门限 + 保持决定「收声」何时把边框淡入（`wantBorder`） |
 | 静止判据与过渡帧周期（`liquid.go`，票 62/64，无 CSS 对应） | 低于 0.0001 视为已settled / 过渡计时器周期 33ms | `MotionEpsilon` / `FrameIntervalMs` | epsilon 是数值噪声地板（不是观感量）；33ms 由本表 `MaxAnimFPS` 推导（1000 除以它），不另计一份 FPS |
-| 点击与渲染边界（`hit.go`，票 07，无 CSS 对应） | 环边距 8px / 点击容差 4px（96 DPI 物理 px，按显示器 DPI 缩放） | `RingMarginPx` / `ClickTolerancePx` | 前者定窗口边长（orb + 两侧边距，ring/glow 不被裁），后者把可点圆稍微扩到画出的环上；`ball.html` 的 inset 只是参照值不是出处 |
+| 点击与渲染边界（`hit.go`，票 07，无 CSS 对应） | 环边距 22px / 点击容差 4px（96 DPI 物理 px，按显示器 DPI 缩放） | `RingMarginPx` / `ClickTolerancePx` | 前者定窗口边长（orb + 两侧边距，ring/glow 不被裁），后者把可点圆稍微扩到画出的环上；`ball.html` 的 inset 只是参照值不是出处。**22 是 09-30 桌面签收当场改的**：写窗口的那一版最宽元素是票 62 的 Listening 波纹（`R+5px` 起、再走 `16px`，外沿 `R+21.75`），8px 边距把它被矩形切平＝"球看着是方的"（owner 原话「整体是个方形…那个向外扩散的波纹都被外面那个方框给局限了」）；本表这一行自己的规则就是「ring/glow 不被裁」，所以 8 从未满足它写下的判据。44..72 全档能装下波纹的最小值＝22 |
 | 边框与流动时序（票 62/64，无 CSS 对应） | 边框淡入 220ms / 收声汇聚 180ms / 唤起一次性流动 900ms | `BorderOpenMs` / `BorderCloseMs` / `SummonFlowMs` | 180ms 属 `--dur-base` 档；220ms 属 `--dur-slow` 族；900ms 是一次性动效，不受「UI 过渡 ≤300ms」预算约束（SPEC-08 §2 时长预算） |
-| 边缘吸附（票 64，无 CSS 对应） | 泊靠动画 160ms / 泊靠后仍露出 0.42 直径 / 距边 16px 内开始挤压（96 DPI，按显示器缩放） | `DockAnimMs` / `DockOverlapFrac` / `DockTriggerPx` | 挤压量按间隙距离读出差分，不需要定时器（D32 空闲零定时器纪律） |
+| 边缘吸附（票 64，无 CSS 对应） | 泊靠动画 160ms / 泊靠后仍露出 0.42 直径 / 距边 24px 内开始挤压（96 DPI，按显示器缩放） | `DockAnimMs` / `DockOverlapFrac` / `DockTriggerPx` | 挤压量按间隙距离读出差分，不需要定时器（D32 空闲零定时器纪律）。**24 是 09-30 桌面签收当场跟着 `RingMarginPx` 抬的**：窗口停在_work area_ 内时，球离切点本来就差一个渲染边距（22px），触发距离若小于边距，"停手自动泊靠"这一支今天就永远不成立（`TestBallLiveEdgeDock` 当场打红＝这条耦合的唯一仪器） |
 | 缓动 | `cubic-bezier(0.32,0.72,0,1)` | D2D 侧以分段线性近似（S1），周期动画用 ease-in-out 正弦近似 | 见 renderer |
 
 **值漂移（本票不自行裁定，列给 owner）**

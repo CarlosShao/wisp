@@ -1,0 +1,4 @@
+state	alive	dead	diff	x	y	edge	timers	cpu_pct_1core	cpu_pct_allcores	privateWorkingSet_MB	privateCommit_MB	workset_MB	handles	gdiObjects	userObjects	px_delta_ge3	px_delta_ge8	px_delta_ge24	px_total	max_delta	mean_delta	bbox_x	bbox_y	bbox_w	bbox_h	teardown
+Sleeping	01-Sleeping-alive.png	01-Sleeping-dead.png	01-Sleeping-diff.png	1720	720	72	no	0.000	0.000	11.85	111.00	39.77	352	4	6	1961	1577	1063	97344	193	1.100	138	138	36	37	clean
+Warm	02-Warm-alive.png	02-Warm-dead.png	02-Warm-diff.png	1720	720	72	yes	0.052	0.004	13.39	112.80	41.61	368	4	8	3806	3600	2351	97344	98	1.371	122	122	68	68	clean
+Speaking	03-Speaking-alive.png	03-Speaking-dead.png	03-Speaking-diff.png	1720	720	72	yes	0.057	0.005	13.08	112.93	41.31	368	4	8	3728	3440	2844	97344	183	2.646	126	125	60	62	clean
