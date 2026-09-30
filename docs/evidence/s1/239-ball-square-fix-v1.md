@@ -90,7 +90,18 @@
 
 **总判语理由**：三件里 ② 成立、① 事实成立且本腿认账（附"待 owner 单独认"的上账动作）、③ 不成立且会污染百分比类引数 ⇒ 本格**附条件**。⛔ 本腿不判"窗口放大整体过关"。
 
-## 5. AC#5 — （待裁）
+## 5. AC#5 — **成立**（附欠账声明）
+
+**判据（票面 `:37`）**：本票动过 `internal/ball` 三枚文件 ⇒ 与票 65/68 同地界；票 68 名下"出自非实现者的验收表"今天仍零份，本票读数要一并算进它那格欠账，不许另立平行真相。
+
+**逐件核验（〔我现跑〕）**：
+
+1. **文件面**：`git show 0589fd9c --stat -- internal/ball/` ＝ `hit.go 16±`、`renderer_windows.go 35±`、`tokens.go 7±`，共 3 枚、46 增 12 删；且票面指定的对比基线 `d5a59d66..0589fd9c` 与**父提交起算** `ed9730dc..0589fd9c` 在 `internal/ball/` 下的 diff **sha1 相同**（都是 `f7d30e4f…`，11:31 现验）⇒ 16 枚区间内 commit 里没有任何别人对 `internal/ball` 的夹带，"只动这三枚文件"属实。（附注：`d5a59d66` 是记账基准不是父提交——`git log -1 --format=%P 0589fd9c` ＝ `ed9730dc`，本腿已具名。）
+2. **同地界**：票 65 票头逐字"**独占 `internal/ball`**"（`65-ball-glass-quality-rework.md:7`）、票 68 票头逐字"**只碰 `internal/ball/` + `cmd/balldebug/`**"（`68-ball-default-visuals-parity.md:7`）⇒ 本票动的正是 `internal/ball` 三枚 ⇒ "与 65/68 同地界"成立。〔以上为我现 grep 到的票头自述行，票的其余正文未读——本腿不转述别人的票内判据。〕
+3. **票 68 名下验收表仍零份**：`ls docs/evidence/s1/ | grep -i 68` rc=1（含 `ball-states/`、`ball-contrast/` 两目录内也无 68 名文件，rc=1 双验）；`grep -rln "票 68" docs/evidence/s1/` 只命中 4 份（62-adversarial-acceptance、62-visual-spec-draft、64-winline RESULTS、与本表）——**没有一份是 68 名下的 1:1 裁决表**；`.scratch/wisp/issues/` 里 `68-ball-default-visuals-parity.md` **无 `-done` 后缀** ⇒ 欠账在册属实，与 A462"仍是零份"一致。
+4. **没另立平行真相**：本票的数与码同音处只有 `c21-native-tokens.md:166/:168` 两行（唯一表页〔我现读，行号与内容逐字核对过：`环边距 22px`、`距边 24px`〕）；钉它们的仪器 `TestC21GeometryRowsMatchCodeConstants` 本腿在 §2 已实证**真会响**（overlay 改 16/21 ⇒ 该枚红，红句逐字引在 §2）。本表只裁 239 五格，**明确声明不顶替票 68 名下那格**：本表读数可供 68 未来验收引用，但 68 的"出自非实现者的 1:1 表"欠账不因本表而清——这条写死在这里，就是防"平行真相"的键。
+
+**判**：四件全过 ⇒ **成立**。"读数一并算进 68 欠账"是编排者的落账动作（本腿不写台账），已列入 §6 第 2 条。
 
 ## 6. 没做完／留给编排者（⛔ 不许为空）
 
