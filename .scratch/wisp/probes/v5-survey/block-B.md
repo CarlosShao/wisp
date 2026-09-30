@@ -13,7 +13,7 @@
 | 家 | 仓库 | 取数方式 | commit sha | 日期 | 扩展本体在哪 | 版本 |
 |---|---|---|---|---|---|---|
 | **Cline** | `github.com/cline/cline` | `curl` 拉 codeload tarball（`main`）解到 `/tmp/v5b/cline-fresh`，40,530,055 字节 | `c604735fe1ce16d745f9dbf799ade79a4e3dad86`（`api.github.com` 具名） | 提交时间 `2026-09-30T02:57:24Z`（"chore(desktop): release v0.0.38"） | `apps/vscode/`（扩展 id 内部名 `claude-dev`、`displayName` ＝ `Cline`、publisher `saoudrizwan`）`apps/vscode/package.json:2-14` | **4.1.21**（`package.json:5`） |
-| **OpenChamber** | `github.com/openchamber/openchamber`（10,942 star，`api.github.com` 查得） | 同一台机 `D:\work\AI\open source\openchamber` 那份 **2026-09-28 tarball 快照**为主读面（前几轮已用同一份，行号可对），另拉 `main` 新鲜 tarball 对版本 | 新鲜快照对到的 `main` HEAD＝`d78dac542d796f20536a3bb94971aa94fbb9e48e`（`2026-09-30T00:43:13Z`） | 快照落地 `2026-09-28` | `packages/vscode/`（`displayName` `OpenChamber`、publisher `fedaykindev`）`packages/vscode/package.json:2-6` | 快照内 **2.0.3**（`packages/vscode/package.json:5`）；新鲜版另记，见 §8 |
+| **OpenChamber** | `github.com/openchamber/openchamber`（10,942 star，`api.github.com` 查得） | **本腿读的是新鲜 tarball**：`curl` 拉 codeload（`main`）解到 `/tmp/v5b/oc-fresh`，74,398,609 字节、`gzip -t` 通过；同机那份 `D:\work\AI\open source\openchamber`（2026-09-28 落的 **2.0.3** 快照）**只用来对前几轮的行号**，不作为引证面 | `d78dac542d796f20536a3bb94971aa94fbb9e48e`（`api.github.com` 具名） | 提交时间 `2026-09-30T00:43:13Z`（"fix(browser): don't retry a restored tab's dead dev server at launch"） | `packages/vscode/`（`displayName` `OpenChamber`、publisher `fedaykindev`）`packages/vscode/package.json:2-6` | **2.0.4**（`packages/vscode/package.json:5`）；⚠ 比 09-28 那份快照**多一个修订号** ⇒ 前几轮报告里指向 `packages/vscode/...` 的行号**可能与本腿读数差几行**，两处已注明（`missing-features-2026-09-29-v4.md:128,138`、`survey-2026-09-28-oc-mobile-vscode-extensions.md:38`）。本腿所有 OpenChamber 引证一律指这份新鲜快照。 |
 
 **取数代价（必须写明白）**：tarball 快照**没有 `.git`、没有 `node_modules`** ⇒
 ①**读不到提交历史**，本文件**每一条结论都带 `文件:行`**，一律不引 commit／PR／历史；
@@ -302,19 +302,176 @@ OpenChamber 17 枚（`packages/vscode/package.json:61-161`，标题逐字）：
 
 ## §3 表三 · 状态与文案表
 
-（填写中）
+> 只收**扩展形态里真会出现的句子**（宿主弹的、webview 首屏画的、审批行画的），逐句原文；第四版 §3 已收的 web/CLI 句不重抄（`docs/reports/missing-features-2026-09-29-v4.md:226-252`）。
+
+### 3.A Cline 的"要人处置"那一族句式（同一模板换宾语，共 14 形）
+
+模板：**`Cline wants to <动作> <宾语>:`**（等批准）／**`Cline is <动作>…:`**（已自动放行、正在做）。逐形原文与行号：
+
+| 原文（逐字） | 何时出现 | 我方对应句 | 出处 |
+|---|---|---|---|
+| `Cline wants to execute this command:` | 要跑命令 | **没有这一句**〔已证：`internal/agent/approval` 里的文案是四条"不可用"实话，不描述要干什么〕 | `apps/vscode/webview-ui/src/components/chat/ChatRow.tsx:319` |
+| `Cline wants to use a tool on the <server>`／`access a resource`（同一行三元式） | 要动 MCP | 没有（MCP 属 D13 未定案，不自行填） | `ChatRow.tsx:330` |
+| `Cline wants to edit this file:` | 要改已有文件 | 没有 | `ChatRow.tsx:411` |
+| `Cline is creating patches to edit this file:` | 同上但已自动放行 | 没有"已放行"这一支说法 | `ChatRow.tsx:410` |
+| `Cline wants to delete this file:` | 要删文件 | 没有 | `ChatRow.tsx:445` |
+| `Cline wants to create a new file:` | 要新建 | 没有 | `ChatRow.tsx:463` |
+| `Cline wants to read this file:` | 要读 | 没有 | `ChatRow.tsx:486` |
+| `Cline wants to view the top level files in this directory:` | 要列目录 | 没有 | `ChatRow.tsx:527` |
+| `Cline wants to recursively view all files in this directory:` | 要递归列 | 没有 | `ChatRow.tsx:549` |
+| `Cline wants to view source code definition names used in this directory:` | 要看符号名 | 没有 | `ChatRow.tsx:571` |
+| `Cline wants to search this directory for <regex>:` | 要搜 | 没有 | `ChatRow.tsx:591` |
+| `Cline wants to fetch content from this URL:`／`Cline wants to search the web for:` | 要抓网／搜网 | 没有（`web.search` 未定案） | `ChatRow.tsx:652,681` |
+| `Cline wants to start a new task:` | 要开子任务 | 没有；我们有 `internal/panel/subagent_roster_197.go`（名册）但没有那句话 | `ChatRow.tsx:1125` |
+| `Cline wants to use a subagent:`／`Cline wants to use subagents:`（单复数两句） | 要起子代理 | 没有 | `apps/vscode/webview-ui/src/components/chat/SubagentStatusRow.tsx:200` |
+| `Cline wants to use the browser:` ↔ `Cline is using the browser:` | **同一枚动作的两时态对照**（要不要问 = 有没有自动放行） | 没有；**这一形是本块最值得记的形状**：文案随"权限判定结果"改时态，而不是加一句"已自动允许" | `apps/vscode/webview-ui/src/components/chat/BrowserSessionRow.tsx:362` |
+| `Cline is condensing the conversation:` | 正在压上下文 | **我方名册里没有"正在压缩"这一态**（第四版 `missing-features-2026-09-29-v4.md:238` 已记；本轮复量名册＝20 枚，见 3.D） | `ChatRow.tsx:608` |
+| `Cline is having trouble...` | 连续出错的兜底 | 没有 | `ChatRow.tsx:314` |
+
+### 3.B Cline 的按钮与状态动词（一屏之内全览；第四版只点了三枚批准钮）
+
+| 原文 | 用在哪 | 我方对应 | 出处（同一文件＝`apps/vscode/webview-ui/src/components/chat/chat-view/shared/buttonConfig.ts`） |
+|---|---|---|---|
+| `Approve`／`Reject` | 通用工具批准 | 面板只能拒（`docs/specs/SPEC-08*.md:156-176` C17 名册） | `:49-50`（`tool_approve`） |
+| `Save`／`Reject` | **改/建/删文件时按钮换成 `Save`** | 没有这一区分 | `:57-58`（`tool_save`），判据 `:251-261`（只有 `editedExistingFile`/`newFileCreated`/`fileDeleted` 三种才走 Save） |
+| `Run Command`／`Reject` | 跑命令 | 没有 | `:67-68` |
+| `Proceed While Running` | 命令还在跑、允许它先往下走 | 没有 | `:75-76`、`:190` |
+| `Retry`／`Start New Task` | 请求失败 | 没有 | `:31-32` |
+| `Proceed Anyways`／`Start New Task` | 连错达上限、仍要继续 | 没有 | `:39-40` |
+| `Resume Task` | 回来接上 | 没有 | `:135` |
+| `Start New Task with Context` | 带着当前上下文开新任务 | 没有 | `:151` |
+| `Condense Conversation` | 手动压上下文 | 没有 | `:161` |
+| `Report GitHub issue` | 一键报障 | 没有 | `:169` |
+| `Cancel` | 流式中间态唯一的按钮 | 有对应物：四条取消出口各说实话（`internal/agent/approval/approval.go:106-114`） | `:180,191,209` |
+| `Thinking`（标题）／`Thinking...`（骨架行） | 想的时候那一行 | 我们的球有"在想"这一态（`internal/ball/statevisual.go`），但没有这句话 | `apps/vscode/webview-ui/src/components/chat/ThinkingRow.tsx:24`、`RequestStartRow.tsx:217,238` |
+| `Completed`（小标大写） | 完成块的头 | 没有这句 | `apps/vscode/webview-ui/src/components/chat/CompletionOutputRow.tsx:73` |
+| `Subagent status update unavailable.` | 子代理状态拿不到时**明说拿不到** | 同脾气先例只有 `internal/panel/git.go:82`；这一格没有 | `apps/vscode/webview-ui/src/components/chat/SubagentStatusRow.tsx:186` |
+| `The model used search patterns that don't match anything in the file. Retrying...` | 搜空了：说清**为什么**在重试 | 没有 | `apps/vscode/webview-ui/src/components/chat/ErrorRow.tsx:179` |
+| `Daily free model limit reached`／`Total Spent: `／`Request ID: ` | 额度与排障标识 | 有预算与提醒阈值（`internal/config/schema.go:544-548`）**但没有这三句** | `apps/vscode/webview-ui/src/components/chat/ClineFreeModelLimitError.tsx:128`、`CreditLimitError.tsx:63,65`、`ErrorRow.tsx:108` |
+
+### 3.C Cline 的后端相位名（7 相）——与我方 20 态对照，不是同一层东西
+
+原文（`apps/vscode/webview-ui/src/components/chat/chat-view/shared/buttonConfig.ts:368-397` 的 `switch (turnState.phase)`）：
+`idle`／`streaming`／`completed`／`resumable`／`error`／`awaiting_followup`／`awaiting_approval`。〔已证〕
+
+三点必须说清的差别（免得被读成"他们只有 7 态、我们 20 态更细"）：
+1. 这 7 相**只管一件事：底部该画哪两枚按钮**（注释逐字 `Authoritative button configuration derived from the backend-owned TurnState`，`:356-362`）；它不是生命周期全貌。
+2. 我方 20 态是**球与进程的生命周期**（`internal/statemachine/states.go:11-30`，尺：`grep -c 'State = "' internal/statemachine/states.go` ＝ **20**，本机复跑），包含声音/网络/下载/看门狗这些他们那层根本没有的东西。
+3. **可对齐的一格**：他们的 `awaiting_approval` 有配套 UI（按钮名随工具种类变），我们的 `StateAwaitingApproval` 只有状态、没有那两枚动词出口（`docs/specs/SPEC-08*.md:156-176`）。⚠ 这一格第四版已记（`missing-features-2026-09-29-v4.md:85`），此处只补"他们的相位还带 `seq`＋`anchorTs` 两枚数用来防按钮串到下一条请求"这一形（`buttonConfig.ts:61`）。
+
+### 3.D OpenChamber 扩展宿主侧的全部人话（`l10n/bundle.l10n.json` 共 **28** 键，逐句；尺：本机 `python -c "import json;print(len(json.load(open('packages/vscode/l10n/bundle.l10n.json'))))"` ＝ 28）
+
+| 原文 | 何时出现 | 我方对应 | 出处 |
+|---|---|---|---|
+| `OpenChamber: Chat sidebar is not ready` | 侧栏 webview 还没起来就点按钮 | 没有这一句（我们的面板要么开得出、要么根本没入口） | `packages/vscode/l10n/bundle.l10n.json`；调用 `packages/vscode/src/extension.ts:174,191` |
+| `OpenChamber: No active session` | 要点"把当前会话搬进标签页"但没有当前会话 | 没有 | 同上；`src/extension.ts:256` |
+| `OpenChamber: No file selected to mention` | 资源管理器里没选中文件 | 没有 | `bundle.l10n.json`；`src/extension.ts:412` 一族 |
+| `OpenChamber: Some selected entries were skipped (folders or unsupported resources)` | **多选里有不能用的：说清跳了、并说清为什么** | 我们的受理器只有一条 `path is not a file` 形状的说法？——本轮未读到，写"没有"〔已证：`internal/panel/attachments.go` 无该句〕 | `src/extension.ts:412` |
+| `OpenChamber: API connection restarted` | 手动重连连上了 | 没有 | `src/extension.ts:299` |
+| `OpenChamber: Failed to open sidebar - {0}`／`Failed to restart API - {0}` | 失败带**原始原因**插值 | 同脾气：我们的实话句会带工单号（`internal/panel/git.go:82`） | `src/extension.ts:168,301` |
+| `OpenChamber: No folder is open. Open a folder to start a new session.` | 没开文件夹时**不猜**上一个目录 | 没有 | `src/SessionEditorPanelProvider.ts:125-137` |
+| `OpenChamber [Add to Context]: No active editor`／`No text selected` | 每种点不着各一句 | 没有 | `src/extension.ts:310` 一族＋`bundle.l10n.json` |
+| `OpenChamber [Add Comment]: No active editor`／`File is outside the workspace`／**`The comment never reached the chat and was discarded`** | 评论没送进去时**明说已丢弃** | 没有；这形对我们最有价值（面板/球那条路一旦没回执，现在无处可说） | `bundle.l10n.json`；`src/InlineCommentThreads.ts` 一族 |
+| `Comment on line {0}`／`Comment on lines {0}-{1}`／`Not sent yet` | 线程标题与"还没发"状态 | 没有 | `bundle.l10n.json` |
+| `Explain the following Code / Text:`／`Improve the following Code:` | 塞进会话的那句话的开头 | 没有 | `bundle.l10n.json` |
+| `OpenCode CLI not found. Install it and ensure it's in PATH.`／`...Please install it and ensure it's in PATH.`（**两版，一字差**） | 找不到被管 CLI | 我们有 `deps.toml` 解析与拒启路径，但没有这两句 | `bundle.l10n.json`（两条并存＝可核对的漂移） |
+| `Failed to start OpenCode: {0}`／`More Info` | 起进程失败＋一枚"看详情"按钮 | 没有 | `bundle.l10n.json` |
+| `New Session`／`Session`／`Run on several models` | 编辑器标签页的标题（含兜底名） | 没有 | `bundle.l10n.json` |
+| `OpenChamber` | 通知与评论作者名（兜底标题） | 我们叫 Wisp（D28） | `bundle.l10n.json` |
+| ⚠ 名册里没有中文 | **该 bundle 的英文键自映射**（`'x' => 'x'`），另外只有 `bundle.l10n.fr.json`／`bundle.l10n.tr.json` 两份译文〔已证：`ls packages/vscode/l10n` ＝ 3 个文件〕 | 我方 `app.language` 默认 `zh-CN`（`internal/config/schema.go:138`）⇒ **宿主层文案我们自己必须写中文**，没有现成机制可借 | `packages/vscode/l10n/`（本机 `ls` 读数 3） |
+
+### 3.E OpenChamber 扩展首屏与通知的默认句
+
+| 原文 | 何时出现 | 我方对应 | 出处 |
+|---|---|---|---|
+| `Starting OpenCode API…`／`Initializing…`／`Connecting…`／`Connected!`／`Connection error`／`Reconnecting…`／`OpenCode CLI not found. Please install it first.` | 宿主 HTML 里的首屏名册（7 句 × en/fr/tr） | 没有首屏文案表 | `packages/vscode/src/webviewHtml.ts:255-299` |
+| 上面那张的**权威版**多出 4 枚：`disconnected`／`startingDevServer`／`waitingDevServer`／`loadingData`（后三枚带插值参数） | ui 包那份才是运行时用的 | 没有 | `packages/ui/src/lib/i18n/bootstrap.ts:232-290` |
+| `{agent_name} is ready` ＋ `{model_name} completed the task` | 会话完成通知默认句 | 我们的托盘气泡没有这句式（`cmd/wisp/notify_windows.go:6-13`） | `packages/vscode/webview/main.tsx:2009-2014`；同名默认句也在设置页显示：`packages/ui/src/lib/i18n/messages/en.settings.ts:1876-1877` |
+| `Tool error` ＋ `{last_message}`／`Input needed` ＋ `{last_message}` | 出错与"要你答"通知 | 没有 | `main.tsx:2027-2033,2044-2050` |
+| 兜底句 `An error occurred`／`Agent is waiting for your response`／`Agent is ready` | 模板解析不出来时**仍有整句**，不留空 | 没有 | `main.tsx:2010,2032,2049` |
+| `Only show text when something is wrong — progress states stay silent (the animated logo already signals "working")` | 首屏设计说明（注释，不是给用户看的） | 同思路我们已由球承担 | `packages/vscode/src/webviewHtml.ts:271-272` |
+
+### 3.F 我方独有、别家没有的句子（本轮复量仍在产码里）
+
+| 我方原句 | 出处 | 本轮对标读数 |
+|---|---|---|
+| 四条出口不可用时各说实话：`语音取消不可用`／`面板取消不可用（票 37 未接入）`／`悬浮球取消不可用`／`Esc 取消不可用` | `internal/agent/approval/approval.go:106-114` | 两家的审批行**没有任何一条"这条出口不通"的说明**——它们只做能做的出口。⇒ 我们更诚实，但也更啰嗦；形状级取舍见 §7 |
+| `切换分支／切换工作树今天不可用：网页到宿主的那一跳还没有落地（无 postMessage 接收器、无 router、无 WebView2 宿主）` | `internal/panel/git.go:82` | OpenChamber 的同格是一枚**看得见的按钮**＋一句"为什么点不着"（3.D 那 4 条守卫句），不是文本自述 |
+| `DEFERRED(playback)` 这类代码标记 | `internal/audio/doc.go:27` | 不在界面层，仅登记 |
 
 ---
 
 ## §4 必答一：点进某个子任务/子代理，能不能看到它各自的流式工作页面？
 
-（填写中）
+### 结论一句话
+
+- **Cline：不能。**〔已证〕扩展形态里子代理只有**一枚"状态行"**，没有它自己的流式页面可点进去；能看到的"活"只有一枚工具名的文本与三个计数。
+- **OpenChamber：能，但装进 VS Code 之后形态变了——点它是"整屏换过去"，不是"旁边再开一页"。**〔已证〕
+
+### 4.1 Cline：状态行是唯一可见物（逐项拆）
+
+| 能看到什么 | 原文／形状 | 是不是流式 | 出处（`apps/vscode/webview-ui/src/components/chat/SubagentStatusRow.tsx`） |
+|---|---|---|---|
+| 标题 | `Cline wants to use a subagent:`／复数 `Cline wants to use subagents:` | 否 | `:199-200` |
+| 每条子任务一行 | 状态图标四态：转圈（`running`）／勾（`completed`）／叉（`failed`）／斜线（`cancelled`） | 图标随推送换，**内容是整条替换、不是逐字流** | `:41-54`、`:222-240` |
+| 提示词 | 两行截断＋`Show more`（aria `Show full subagent prompt`） | 建提示词那一条在流式时**逐字长出来**（仅提示词本身，非工作过程） | `:154-176`、`:229-230` |
+| 一行统计 | 逐字模板 `${toolCalls} tools called · ${contextTokens} tokens · ${cost}` | 否，计数刷新 | `:232` |
+| **唯一"正在做什么"的线索** | `latestToolCall` 一枚字符串，**等没有详情可展开时才显示**，单行截断、等宽字体 | 半流式：只是"最新那一次工具调用"的名字 | `:233,268-270`；字段定义 `apps/vscode/src/shared/ExtensionMessage.ts:308-322` |
+| 结果 | `Show output`／`Hide output`（aria `Show subagent output`）→ 展开是**最终** `result`（Markdown）或 `error` | 否：只在 `status === "completed"`／`"failed"` 时才有 | `:225-227,254-278` |
+| 没数据时 | `Subagent status update unavailable.` | — | `:186` |
+
+**关键负向证据**〔已证〕：`SubagentStatusItem` 的字段就那 12 枚（`index/prompt/status/toolCalls/inputTokens/outputTokens/totalCost/contextTokens/contextWindow/contextUsagePercentage/latestToolCall/result/error`，`ExtensionMessage.ts:308-322`）——**没有任何"子会话 id／子 transcript 入口／子任务页路由"字段**，所以点不进去不是 UI 没做，是**数据结构里没有那条路**。批准那一侧也只有 `use_subagents` 一枚 ask（按钮 `Approve`/`Reject`，`buttonConfig.ts:98-105`），**子代理内部再要批准时，扩展里没有第二个审批面**。
+
+### 4.2 OpenChamber：扩展里点它是"换屏"，且进去默认只读
+
+| 环节 | 形状 | 是不是流式 | 出处 |
+|---|---|---|---|
+| 父会话侧的子代理面板 | 折叠段 `Subagents`，摘要位是 `busy/total`（如 `2/3`），无子代理时**整段不画**（`if (children.length === 0) return null`） | 计数随事件刷新 | `packages/ui/src/components/chat/work-status/WorkStatusSubagentsSection.tsx:80-90`；标题原文 `packages/ui/src/lib/i18n/messages/en.ts:3263` |
+| 每条子任务一行 | 名字（无题时兜底原文 `Subagent`）＋四值之一：**`needs permission`／`asked a question`／`is working`／`Done`**（优先级就按这个顺序）＋（有则）该子树成本 | 值随推送换 | `:93-121`；四句原文 `en.ts:3255-3269`；成本聚合 `:36-40`（注释逐字：嵌套子代理的花费要"滚"到直接子行下，不然会消失） |
+| 点一行的行为（**扩展形态专属分支**） | 判据逐字 `if (isEmbeddedSessionChat() || isMobile \|\| isVSCodeRuntime()) { setCurrentSession(childId, directory); return; }` ⇒ **在 VS Code 里直接把整屏切到那条子会话**；只有浏览器/PWA 才在旁边开一枚只读标签页 | — | `:62-76`；aria 原文 `Open {name}`（`en.ts:3282`） |
+| 进去之后 | 输入区被一块横条替掉，原文 **`Subagent sessions cannot be prompted.`**；除非设置页把 `Allow Prompting Subagent Sessions` 打开 | 子会话自身的流**看得见**（就是普通会话视图） | 横条组件 `packages/ui/src/components/chat/ChatContainer.tsx:601-614`；原文 `en.ts:2296`；开关 `OpenChamberVisualSettings.tsx:1924-1931` |
+| ⚠ 最响的一句（设计账，逐字抄） | 文件头注释：**"Running subagents and, more importantly, their blockers: a permission request raised by a child session has no representation in the transcript, so this panel is the only place it becomes visible."** | — | `WorkStatusSubagentsSection.tsx:20-24` |
+| 面板在扩展里挂不挂 | 挂载判据只有 `workStatusPanelMountable = !isMobile` ⇒ **VS Code 里挂得出来** | — | `ChatContainer.tsx:959-962` |
+| 子代理发起的批准会不会被认出来源 | **会**：批准卡上挂一枚来源徽标，原文 `From subagent` | — | `packages/ui/src/components/chat/PermissionDock.tsx:102`；原文 `en.ts:2331` |
+
+### 4.3 我方对照（只引 `docs/**` 与本腿现读 Go）
+
+| 这一格 | 我方现状 | 出处 |
+|---|---|---|
+| "子任务行"这件事 | 有**名册**、没有那一行：`internal/panel/subagent_roster_197.go`（名册件）与 `internal/panel/subagent_stream_197_test.go`（流件）都在，界面上那一行属于〔界面地界·不读〕 | 本机 `ls internal/panel` 读数 |
+| "子代理的批准在父任务里看得见" | **两家的形状互不相同**：Cline 数据结构里根本没有那条路〔已证 4.1〕；OpenChamber 明确写"这是唯一能看见的地方"〔已证 4.2〕 ⇒ 我们撞上的是票 197 那一问（台账在册），**本轮证据说明这一格不是可选加固，是"不建就看不见"** | `docs/reports/missing-features-2026-09-29-v4.md` 的块 3；`AGENTS.md` §2 未定案清单不含此格 |
+| "点进去会不会把父任务丢了" | OpenChamber 在扩展里就是"整屏换过去"（`setCurrentSession`），**没有任何"回来"的按钮**；这与我们"面板是低频、可关"的前提冲突 ⇒ 见 §7 | 上表 `:62-76` |
 
 ---
 
 ## §5 必答二：审批卡有没有"本次／本次会话内／长期"三档＋拒绝/允许的理由输入框？
 
-（填写中，逐家答）
+### 5.1 逐家答"三档"
+
+| 家 | 本次 | 本次会话内 | 长期 | 出处与判据 |
+|---|---|---|---|---|
+| **Cline（扩展形态）** | **有**：底部两枚按钮，随动作换名（`Approve`／`Save`／`Run Command` 各配 `Reject`） | **没有这一档**〔已证：`BUTTON_CONFIGS` 全名册里没有任何"这一会话内"条目〕 | **有**，但家不在卡上：输入框上方那一横条 `Auto-approve:` ＋ 展开的**能力级**开关（`Read files`／`Edit files`／`Execute commands`／`Fetch web content`／`Use MCP servers`，原文标签） | 卡上按钮 `apps/vscode/webview-ui/src/components/chat/chat-view/shared/buttonConfig.ts:46-105`；条与档名册 `apps/vscode/webview-ui/src/components/chat/auto-approve-menu/constants.ts:3-35`、`AutoApproveBar.tsx:109`；说明句逐字 `Let Cline take these actions without asking for approval.` `AutoApproveModal.tsx:71` |
+| ⚠ Cline 的"长期"**默认就是开着的** | — | — | 出厂默认读数：`readFiles: true`／`editFiles: true`／`useBrowser: true`／`useMcp: true`／`executeAllCommands: true`，只有 `executeSafeCommands: false` | `apps/vscode/src/shared/AutoApprovalSettings.ts:28-44`（⚠ 与我方"默认最严"正好相反：`internal/risk/mode.go:44-56`、`internal/config/schema.go:470` 默认 `ask_every_step`） |
+| **OpenChamber（扩展形态）** | **有**：卡上三枚按钮里最左那枚，原文 `Allow once`（快捷键 `alt+enter`） | **有，但不在卡上**〔已证：它是设置里一枚**每会话布尔位**，持久在宿主 `globalState['permissionAutoAccept']`，带 `revision` 单调号、跨面板广播、写操作串行化〕 | **有**：中间那枚按钮原文 `Always allow`；**能推断出规则时按钮名直接写成 `Always: {patterns}`**（前 2 条＋省略号，全量挂 `title` 悬停） | 三枚按钮 `packages/ui/src/components/chat/PermissionCard.tsx:408-443`（`once`／`always`／`reject`＋三枚 `<kbd>`）；原文 `packages/ui/src/lib/i18n/messages/en.ts:3377-3380`（`Allow once`／`Always: {patterns}`／`Always allow`／`Deny`）；会话档 `packages/vscode/src/bridge-permission-auto-accept-runtime.ts:1-32`（`sessions: Record<string, boolean>`＋`revision`）、`:54-71`（写入并广播）、`:72-103`（`api:permission-auto-accept:get\|set` 两条消息） |
+| ⚠ OpenChamber 在扩展里**不给改默认档** | — | — | 判据逐字 `{isVSCode ? null : <PermissionDefaultModeField agentName={defaultAgent} />}`——权限默认档那一枚设置在 VS Code 里**整块不画** | `packages/ui/src/components/sections/openchamber/DefaultsSettings.tsx:365` |
+
+**两家的"会话内"这一档放的地方不一样**（这是本轮新读出来的形状差，第四版没写过）：Cline 只有"这一次"和"这类永远"，中间那一档**是空的**；OpenChamber 把中间那一档**搬出卡片**、做成宿主里持久、跨端广播的一枚开关 ⇒ **卡上永远是三枚、会话档在旁边**。
+
+### 5.2 逐家答"理由输入框"
+
+| 家 | 有没有专用理由框 | 实际怎么带话 | 出处 |
+|---|---|---|---|
+| Cline | **没有**〔已证：`ActionButtons` 只画两枚 `VSCodeButton`，没有任何输入件〕 | **靠输入框捎带**：批准/拒绝那一刻把草稿整体取走，有内容就连 `text/images/files` 一起发，`responseType` 分别是 `yesButtonClicked`／`noButtonClicked`，发完 `consumeDraftSnapshot` 清草稿；无内容则**只发 responseType** | `apps/vscode/webview-ui/src/components/chat/chat-view/components/layout/ActionButtons.tsx:10-19,134-155`；发送侧 `chat-view/hooks/useMessageHandlers.ts:490-503` |
+| Cline（问答卡那一族） | 也**没有**专用框，但**把输入框当成"理由/补充"字段用**：点选项时拼 `option + ": " + inputValue` | 逐字：`text: option + (inputValue ? \`: ${inputValue?.trim()}\` : "")` | `apps/vscode/webview-ui/src/components/chat/OptionsButtons.tsx:79-85` |
+| OpenChamber | **没有**〔已证：`PermissionCard.tsx` 里无 `<textarea>`/`<input>`，`onRespond` 的入参类型是 `PermissionReply`（即 `once`/`always`/`reject` 三个码），**函数签名里就没有能放话的位置**〕 | 不带你为什么说"不" | `packages/ui/src/components/chat/PermissionCard.tsx:366-368`（`onRespond: (response: PermissionReply) => void`）、`:376-390`、`:408-443` |
+| 两家的"要人答"另有一路 | OpenChamber 把"提问"独立成一族：卡上挂 `From subagent` 徽标、多问题时显示 `{current} of {total}` 步进、并有一句注释逐字 `Forms replaced questions in OpenCode 2.x: one titled request the user answers.` | 这是"答"，不是"批"，**两家都分开了这两件事** | `packages/ui/src/components/chat/PermissionDock.tsx:102,107`；原文 `en.ts:3354`（`{current} of {total}`）、`en.ts:2331`；注释 `packages/vscode/webview/main.tsx:2039` |
+| 我方 | 〔已证〕四条应答出口不可用时各说实话，但**"允许"这一侧被结构禁掉**、也没有理由框：`docs/specs/SPEC-08*.md:156-176`；四条实话句在 `internal/agent/approval/approval.go:106-114` | 我方对应：第四版已记这一格碰 `Q-49`（要 owner 一句话），本腿不自行填 | `docs/reports/missing-features-2026-09-29-v4.md:85` |
+
+### 5.3 本轮额外钉出来的三枚形状（都带行号，供 owner 取舍）
+
+1. **"按了但后端没接住"要有专句**：OpenChamber 在评论这条路上写了 `The comment never reached the chat and was discarded`（`packages/vscode/l10n/bundle.l10n.json`）⇒ 同一族"我点了、其实没送到"的诚实句在他们那里是**成体系的**（见 §3.D）。
+2. **批准按钮上直接印"这次点下去会存成什么规则"**：`Always: {patterns}` ＋ `title` 里放全量（`PermissionCard.tsx:349-358`、`en.ts:3379`）；⚠ 第四版 `missing-features-2026-09-29-v4.md:86` 已记同一格（当时行号取自 2.0.3 快照，本腿在 2.0.4 复现＝同一函数、行号未漂）。
+3. **安全网扣住的那条要显示**：新增原文键 `heldBySafetyNet`（渲染点 `PermissionCard.tsx:304`）⇒ 他们把"这条被兜底规则扣住了"做成卡片上的一句话，而不是让它默默等超时。
 
 ---
 
