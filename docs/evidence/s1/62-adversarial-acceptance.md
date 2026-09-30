@@ -334,6 +334,75 @@ Speaking/Warm/Settling）确实齐，但 `grep -inE "frozen|prototype|liquid|gla
 它记的"62 名下无裁决表／参考图未落盘／要读 design"三条本腿全部复现，
 本腿另量出"逐态截屏只覆盖 2/5 态"与"没有任何可分辨性用例"这两条它没写的。
 
+### 2.5 AC#5 —— `:86` 靠边吸附：拖到左/右/上边缘收缩半隐并留可命中区；悬停/单击弹回完整球；跨 DPI 与副屏行为正确
+
+**判语：不成立（作为一票之框）。** 这一格要拆成三块才说得清，而**只有第一块今天可判成立**；
+`62-a1` 给这一格打的 **D（判据今天不可满足）本腿改判为「不成立」**——
+"不可满足"说的是量不了，而这一格的问题是**盘上已有的量测直接把框面顶反了**。这是本腿对 `62-a1` 的**一处改判**。
+
+#### 块一：弹回／收缩的**步进律**——今天可判成立，且我用突变证明它咬得住〔我现跑〕
+
+**M5**（台件 `.scratch/wisp/probes/62/v1/m5/`，`go test -overlay`）：
+先 grep 证明要摘的分支真在——`internal/ball/dock.go:44` 逐字
+`next = clamp01(approach(p, target, float32(dt)/float32(DockAnimMs*time.Millisecond)))`。
+把它换成 `next = clamp01(target)`（＝台阶直接跳到终点、不走路）：
+```
+go test -overlay …/m5/overlay.json ./internal/ball/ -run TestDockHoverPopBackWalksTheRampHome
+  dock_test.go:374: primary/left: the pop-out took 1 frames of ~33 ms, budget is DockAnimMs=160
+  --- FAIL: TestDockHoverPopBackWalksTheRampHome (0.00s)
+```
+基准（无 overlay）该用例 **PASS 0.00s**。⇒ "丝滑弹回"不是一句形容词，
+是一枚**数帧预算**的断言，把"瞬移"塞进产品代码它就红。
+整组 dock 律我另跑了 `-count=3` 隔离复量（硬规矩：计时类红要两发齐）：**11 枚 × 3 次全 PASS**、
+零翻转 ⇒ 这一组**不是**计时偶红：
+`TestDockGeometryShape / TestDockTangentMeansGapZero / TestDockPosKeepsTheOrbTangentAtEveryRampLevel /
+TestDockSquashIsMonotonicAndClamped / TestDockProgressReadsThePush / TestNearestDockEdgePicksTheEdgeYouPushed /
+TestDockedLeavesAHittableStrip / TestDockFreePosKeepsTheBallReachable /
+TestDockOnSecondaryMonitorWithNegativeOrigin / TestDockHoverPopBackWalksTheRampHome / TestDockRampWalksItsBudget`。
+DPI 那一半在**律**上也有覆盖：`TestHitTestAndDPIInjection`（`internal/ball/tokens_test.go:351`）
+把 96/120/144/192 四档各测中心命中／角部穿透／"窗随 DPI 变大"，整包 `-count=1` 跑出它 PASS。
+
+#### 块二：真机差分把框面的"留可命中区／收缩半隐"顶反（在册两处，本腿独立复算）
+
+- **A29②（停靠露出 ≈82% 而非 42%）**：契约值我现量在 `internal/ball/tokens.go:386`
+  ＝ `DockOverlapFrac = 0.42 // fraction of the orb left visible when docked`。
+  拿台件 `62-diff-signoff/diff-table.txt` 自己的两行做除法：未停靠 `Sleeping` 成像框 **44** 宽，
+  停靠 `Sleeping-dock-right` 成像框 **35** 宽 ⇒ **35/44 ≈ 79.5%**，与在册的"≈82%"同量级，
+  与契约的 42% 差一倍。〔我现算；输入是台件数字，未复跑真机〕
+  ⚠ 口径边界照写：`bbox_w` 是"变化像素外接框"，不是"球体露出宽度"的严格同义词，
+  所以这一发是**复认在册读数**、不是把它测成定案。
+- **成因在草案里已经写死**（`62-visual-spec-draft.md:42` 逐字）：
+  `DockSquash(1)=DockOverlapFrac=0.42`，但**"只压液斑/高光/rim 的 X 向；shell/halo/caustic 仍是整圆"**，
+  且 `DockPos` 的 `orbR` 取的是**窗口**半径。⇒ 这不是量错，是**挤压没作用到玻璃壳**，
+  所以"半隐"在屏幕上不成立。
+- **A29③（命中 21px < 可见 26px）**：同一张草案表 `:45` 逐字
+  "`r=32 vs 可见 36/42` 与 `r=21 vs 可见 26` 是**同一个缺口的两个读数**"，并说 registry 只记了 Sleeping 那格、
+  "同形排查应扩展到全球包"（⇒ 列为 Q-2，**不自行改值**）。
+  ⇒ **律与真机在这里分家**：`TestDockedLeavesAHittableStrip`（`dock_test.go:183`，断言
+  命中条 ≥ 可见球宽）今天 PASS，而真机差分说它反了。所以"律全绿"不能顶这一格。
+- 修不修**等 owner 在 R15#4/#5 拍板**（`62-a1` §2.5 已记，本腿复认）；本腿**没有**自行改任何值。
+
+#### 块三：跨 DPI 与副屏——今天不可满足（具名）
+
+本机**物理单屏**：`docs/SLO.md:181` 逐字"32GB RAM · 单屏 3440×1440"。
+⇒ 判据"副屏行为正确"缺的东西＝**一块第二显示器（或 owner 授权用虚拟屏）上的真拖拽**。
+`TestDockOnSecondaryMonitorWithNegativeOrigin` 是**负原点几何 mock**，按票 64 AC#6 当年的判例
+（其验收表明令"没拿双屏 mock 冒充"），本腿**不把它当硬件凭据**。
+"跨 DPI"那一半同样缺**真高 DPI 桌面上的差分**：现有全部真机证据都是 96 DPI
+（`62-visual-spec-draft.md` §0.3 表头逐字"默认配置 56 / 96 DPI"）。
+
+#### 顺手钉一枚与本票无关的红（防下一位归因错）
+
+整包 `go test ./internal/ball/ -count=1` 今天 **54 PASS / 1 FAIL**，那枚 FAIL 是
+`TestC21TableColourRowsMatchTokensCSS`，报错逐字：
+`read design/assets/tokens.css: … The system cannot find the path specified. - the CSS leg of this check must never skip`。
+本腿查起手名册第 14 行：` D design/assets/tokens.css`（该文件在 HEAD 里存在，`git cat-file -e` 现测），
+**是别人未提交的工作树删除**，与本票无关、与本腿的 overlay 突变无关（这一发我没带 overlay）。
+⇒ 别把它记成"票 62 名下一枚红"。
+
+**AC#5 总判语：不成立。** 块一成立（M5 红＋11×3 绿）；块二被在册两处读数顶反（本腿复算其一）；
+块三今天不可满足（缺第二块屏／缺真高 DPI 桌面）。⛔ 本腿未改任何值、未翻任何框。
+
 <!-- NEXT-CELL -->
 
 ---
