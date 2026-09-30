@@ -424,8 +424,32 @@ func TestTicket101SessionGrantDoesNotCrossRestart(t *testing.T) {
 			t.Fatalf("ListGrantsBySession: %v", err)
 		}
 		sameSession = len(rows)
-		// Refused with the grant live IN ITS OWN SESSION, too: the assembly hands
-		// the bridge a mode, never a grant source (Options.Confirmations nil).
+		// Refused with the grant live IN ITS OWN SESSION, too - and "its own session"
+		// here is the fixture's literal `session-before-restart`, which is NOT the
+		// session this boot minted.
+		//
+		// This sentence used to read "the assembly hands the bridge a mode, never a
+		// grant source (Options.Confirmations nil)". Ticket 224 made that false: the
+		// composition root now injects the read side into the bridge
+		// (cmd/wisp/run.go:653 `Grants: grantRead`) and the write side into the gate
+		// (run.go:529), both from the ledger minted at run.go:414. So the conditional
+		// that is actually doing the refusing is this one: `tools.GrantSource` answers
+		// only for the identity it holds, this row is keyed by a string no production
+		// mint can produce (session.ID.Valid demands `sess_` + 32 lowercase hex, and
+		// internal/session/grants_test.go's TestTicket224TestLiteralsAreOutsideThe
+		// MintedShape plus cmd/wisp/ticket224_assembly_test.go's
+		// TestTicket224ProductionSessionDoesNotSurviveRestart are what pin both
+		// directions of that lock), and `Options.Confirmations` stays nil either way.
+		//
+		// What this guard still has to keep true, and why the assertion below is NOT
+		// relaxed now that a grant source exists: a B-tier `.env` write stays refused
+		// when nothing authorized it. ⚠ Read the observation for what it is, though -
+		// `firstErr` comes from an approval card running out (the L2 route auto-rejects;
+		// docs/evidence/s1/224-session-grant-v1.md §6-b row 3 caught the exact audit
+		// line), so it measures "the chain still asked and nothing answered it", not "a
+		// permission verdict said no". Anyone who later flips this to "even with a live
+		// grant it must be refused" has to keep measuring cards, not refusals, or the
+		// case turns into the false-green this repository has already been bitten by.
 		_, firstWhy, firstErr = t101call(rt, 1, "fs.write", env)
 	})
 	if code != 0 {

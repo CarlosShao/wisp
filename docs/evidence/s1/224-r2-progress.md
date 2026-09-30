@@ -156,7 +156,36 @@ M4 那发把它照了出来（nil-recorder 用例在突变下打出 `GRANT-RECOR
 
 ## §3 N#3 `run_mode101_test.go` 注释半的改写账户
 
-（待填）
+**改前**（本腿现跑 `grep -n` 于改动前，逐字两行）：
+
+```
+427		// Refused with the grant live IN ITS OWN SESSION, too: the assembly hands
+428		// the bridge a mode, never a grant source (Options.Confirmations nil).
+```
+
+⇒ 后半句今天是假话：`cmd/wisp/run.go:653` 现在写着 `Grants: grantRead`（写侧 `:529`，铸造点 `:414`）。
+
+**改后**（同处，`cmd/wisp/run_mode101_test.go:427-452`，带条件的事实句）——三段各有分工：
+
+1. 保留原句要防的东西，逐字仍在第一行：`Refused with the grant live IN ITS OWN SESSION, too`，
+   并把"它的会话"当场定义为**fixture 的字面量**，不是本次启动铸出的那枚；
+2. 说明为什么这一发仍然被拒（原因换了）：`GrantSource` 只回答它自己持有的身份，
+   行上的 key 是一枚生产铸造永远产不出的串，并点名两方向锁的两枚用例
+   （`internal/session/grants_test.go` 的 `TestTicket224TestLiteralsAreOutsideTheMintedShape`
+   ＋本腿新写的 `TestTicket224ProductionSessionDoesNotSurviveRestart`）；`Options.Confirmations` 仍是 nil；
+3. ⛔ 不留绝对句、且把 224-v1 §6-b 第 3 条的极性陷阱写进注释：`firstErr` 观察到的是**审批卡超时**，
+   不是权限判定说"不"；日后若改成"带活授权也要被拒"，必须继续测**有没有弹卡**而不是"有没有被拒"。
+
+**断言半（票面锚点 `:434-441`，注释块插进去之后现在落在 `:458-465`）一个字没动**〔我现跑尺〕：`git diff --numstat` ＝ `26 / 2`，
+且 `git diff -U0` 里剥掉注释行后**没有任何非注释变更行** ⇒ 行为不可能不同。
+
+**两发读数（09-29 派单口径第 3 条）**：
+
+- 改前＝该枚在起跑基线与本腿 M4 复跑里都是绿的（`go test ./cmd/wisp/ -count=1` ok 115.487s 覆盖它，
+  编排者给的起跑读数 ok 125.521s 同样覆盖）；
+- 改后＝`go test ./cmd/wisp/ -count=1 -run TestTicket101SessionGrantDoesNotCrossRestart -v`
+  ⇒ `--- PASS: TestTicket101SessionGrantDoesNotCrossRestart (3.17s)`／`ok cmd/wisp 3.218s`〔我现跑〕。
+- `gofumpt -l` 对该文件：空。
 
 ## §4 N#5 glob 方言定案
 
