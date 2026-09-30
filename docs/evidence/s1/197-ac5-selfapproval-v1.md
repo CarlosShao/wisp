@@ -463,3 +463,12 @@ $ go list -deps ./internal/streamkey | grep wisp/                 → 只有它�
 本腿自己的 commit 名册（**全部只碰这一枚证据件，全部带显式 pathspec，全部未 push**）：
 `321110da`（骨架，§4/§5 起手即满）→ `ccc1b1cc`（§1-§3）→ 本节所在的那一发。
 
+**终态三跑**（"绿"这个字本腿只在跑过整包与还原后的定向各一遍之后才写）：
+
+| 时刻 | 跑法 | 读数 |
+|---|---|---|
+| 14:50:23 | 定向 `-run` 两枚 `-count=1 -v`（起手，未突变） | **两枚 PASS**（11.17s／0.00s，`ok 11.244s`）＝`baseline-targeted.txt` |
+| 15:09→15:11 | 整包五枚包 `-count=1`（14 发突变里的 12 发已还原之后） | `cmd/wisp ok 126.594s`（0 枚红）＝§1.5 |
+| 15:26:12→15:26:25 | 定向两枚 `-count=1 -v`（**全部 14 发还原、本腿三枚 commit 落完之后**） | **两枚 PASS**（11.19s／0.00s，`ok 11.251s`）＝`final-targeted.txt`；跑完 `git status --porcelain -- internal cmd` 仍等于起手名册（空） |
+
+
