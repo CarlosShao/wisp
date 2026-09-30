@@ -98,13 +98,16 @@ const (
 	// pipelineAbsentClaim is the loud half of a degraded assembly: the gate is
 	// there, the entry is there, and the stack that would raise a card is not.
 	pipelineAbsentClaim = "任务管线未装配"
-	// taskPostureConsole / taskPostureInjected / taskPostureAbsent are the three
-	// forms the boot report's 任务来源 field can take.
-	taskPostureConsole   = "控制台键盘（已接入）"
-	taskPostureInjected  = "仅本发的测试注入位"
-	taskPostureAbsent    = "无（任务入口未启用）"
-	taskPostureRefused   = "无（管线未装配）"
-	taskPostureNoProcess = "无（本进程没有任务源句柄）"
+	// taskPostureConsole / taskPostureInjected / taskPostureAbsent /
+	// taskPostureRefused are the four forms the boot report's 任务来源 field can
+	// take. They are one per branch of startResidentTaskSource's return, so the
+	// report can tell "no entry" apart from "entry refused to assemble" apart from
+	// "entry is a test injection" - the three of them used to print the same
+	// nothing, which is the sentence AC#7 exists to stop.
+	taskPostureConsole  = "控制台键盘（已接入）"
+	taskPostureInjected = "仅本发的测试注入位"
+	taskPostureAbsent   = "无（任务入口未启用，理由见上面那行）"
+	taskPostureRefused  = "无（任务管线未装配，理由见上面那行）"
 )
 
 // testTaskTextEnv is ticket 246 AC#7's narrow test escape hatch, and the whole of
@@ -254,7 +257,9 @@ func startResidentTaskSource(rt *proc.Runtime, ra *residentApproval) *residentTa
 		if run != nil {
 			run.close()
 		}
-		return nil
+		// Non-nil with run == nil: the entry WAS offered and the pipeline refused,
+		// which the boot report then says differently from "no console at all".
+		return src
 	}
 	src.run = run
 	src.root = observe.NewRootFrom(ra.root, "resident-task-source")
@@ -483,7 +488,7 @@ func (src *residentTaskSource) drainAndClose(ctx context.Context) error {
 func (src *residentTaskSource) taskPosture() string {
 	switch {
 	case src == nil:
-		return taskPostureNoProcess
+		return taskPostureAbsent
 	case src.run == nil:
 		return taskPostureRefused
 	case src.surface != nil:
