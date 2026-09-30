@@ -177,14 +177,19 @@ func (n *nativeCards) waitingState() (statemachine.State, bool) {
 // tomorrow the ball's buttons and the tray menu) and a panel host are handed,
 // and the method set is the whole boundary:
 //
-//	allow / reject / veto      the native route, approval.Gate.Native() faces and
-//	                           the native router; allow needs the grant.
+//	allow / session / reject / veto   the native route, approval.Gate.Native()
+//	                           faces and the native routers; allow and session
+//	                           both need the grant. `session` is ticket 224's
+//	                           D45-2 third answer: the same release, plus one
+//	                           approval_grant row per path the card named.
 //	panelReject / panelAllow   the panel route, DecideFromPanel only.
 //	head / view                the panel's read side (PanelAPI), no grant, no allow.
 //
 // There is no method here that lets a panel-sourced decision execute anything,
 // and no path that mints or forwards a grant to the panel route. That is not a
-// check this type remembers to run; it is the absence of a door.
+// check this type remembers to run; it is the absence of a door. The same holds
+// for the REMEMBERED variant: `session` reaches NativeAPI.AllowSession, and
+// PanelAPI has no Allow method for a session-flavoured sibling to attach to.
 type replySurface struct {
 	gate  *approval.Gate
 	live  *nativeCards
@@ -226,6 +231,54 @@ func (s *replySurface) allow(corr string) (string, error) {
 	}
 	s.record("ANSWERED", corr, card.Tool, "native/allow", "原生侧允许")
 	return "已允许 " + corr + "（" + card.Tool + "）：调用已放行，这一发会执行", nil
+}
+
+// session answers with D45-2's third option, 「本会话内允许」 (ticket 224).
+//
+// It is a separate verb rather than a flag on `yes` because the two answers
+// store different things and the operator has to be able to tell them apart from
+// the transcript: `yes` releases one call, `session` releases one call AND
+// writes one approval_grant row per path the card named, keyed to the identity
+// this process minted at boot.
+//
+// What it can cover is narrower than the button, and the contract is why:
+// SPEC-06 §8.3's first bullet ("L2 永不进入任何持久授权（含会话级）") means a
+// stored rule is consulted for an L1 question and never for an L2 one. This
+// console hands out L2 cards, so the honest reading of `session` on an L2 card
+// is "allow this call, and remember the scope for the L1 questions this session
+// would otherwise ask about the same tool and path". It is NOT "never ask about
+// this path again": the next L2 card for that path still arrives, and the line
+// below says so rather than letting the verb over-promise.
+//
+// The grant is written through the same native route as `yes` and needs the same
+// single-use nonce, so AGENTS.md §1.2's ban #6 holds for the remembered scope
+// exactly as it holds for the immediate one: no panel-shaped caller reaches this
+// method, and there is no panel-shaped method for it to reach.
+func (s *replySurface) session(corr string) (string, error) {
+	card, _ := s.live.look(corr)
+	err := s.live.h.AllowSession(s.ctx, corr)
+	switch {
+	case errors.Is(err, approval.ErrNoTrackedCard):
+		s.record("REFUSED", corr, "", "native/allow-session", "本机没有这张卡的记录")
+		return "", fmt.Errorf("没有找到待答复的卡片 %q：会话授权必须由一张显示过的卡片推出，"+
+			"本机账上没有它，也就没有任何东西可记", corr)
+	case errors.Is(err, approval.ErrRouteHasNoAllow):
+		s.record("REFUSED", corr, card.Tool, "native/allow-session", "该路线没有允许动作")
+		return "", fmt.Errorf("%s 是执行前阻止窗口，它只有否决、没有允许（SPEC-06 §2 B1）；"+
+			"要停下它就答 veto %s", card.Level, corr)
+	case err != nil:
+		s.record("REFUSED", corr, card.Tool, "native/allow-session", err.Error())
+		if errors.Is(err, approval.ErrBadGrant) {
+			return "", fmt.Errorf("原生令牌无效（缺失/已用/与本次请求不绑定）：%w；"+
+				"能记下授权的只有显示过这张令牌的那一发，重新显示后再答", err)
+		}
+		return "", err
+	}
+	s.record("ANSWERED", corr, card.Tool, "native/allow-session",
+		fmt.Sprintf("原生侧允许并记入本会话，paths=%d", len(card.Paths)))
+	return "已按「本会话内允许」答复 " + corr + "（" + card.Tool + "）：" +
+		"这一发已放行，卡片上那些路径对本会话后续的 L1 询问不再重复提问" +
+		"（L2 永不被会话授权覆盖，SPEC-06 §8.3 第 1 条）", nil
 }
 
 // reject refuses through the native router. The reason is not decoration: the
@@ -468,6 +521,8 @@ func (s *replySurface) handle(verb, corr, arg string) (string, error) {
 	switch verb {
 	case "yes":
 		return s.allow(corr)
+	case "session":
+		return s.session(corr)
 	case "no":
 		return s.reject(corr, sanitizeReplyText(arg))
 	case "veto":
@@ -483,10 +538,11 @@ func (s *replySurface) handle(verb, corr, arg string) (string, error) {
 	case "view":
 		return s.view(corr)
 	case "help":
-		return "yes/no/veto（原生侧）· always <编号>（长期：先把要存的规则印出来，再走一张 L2 重新确认卡）· " +
+		return "yes/session/no/veto（原生侧；session＝本会话内允许，D45-2 第三枚答复）· " +
+			"always <编号>（长期：先把要存的规则印出来，再走一张 L2 重新确认卡）· " +
 			"panel-no/panel-yes/head/view（面板路线，无允许）· quit", nil
 	default:
-		return "", fmt.Errorf("未知答复指令 %q（yes/no/veto/always/panel-no/panel-yes/head/view/help/quit）", verb)
+		return "", fmt.Errorf("未知答复指令 %q（yes/session/no/veto/always/panel-no/panel-yes/head/view/help/quit）", verb)
 	}
 }
 

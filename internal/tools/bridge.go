@@ -88,6 +88,18 @@ type Options struct {
 	// relaxed by accident. The bridge only ever reads it; switching lives in
 	// internal/perm, where a switch costs a confirmation and an audit line.
 	Modes ModeSource
+	// Grants is the READ side of the D45 scoped session grant (ticket 224), the
+	// same shape as Modes and for the same reason: nil means "no grant has ever
+	// been answered", which is the fail-closed direction, and the bridge only
+	// reads it. Populating it is the native answer route's job
+	// (approval.Gate's allow-session path over internal/session's ledger), and
+	// nothing in this package can add to it.
+	//
+	// What it can and cannot cover is a contract line, not an implementation
+	// choice: SPEC-06 §8.3's first bullet ("L2 永不进入任何持久授权（含会话级）")
+	// and PLAN.md:2148 D45-3 mean this seam is consulted for an unsilenced L1
+	// verdict and for nothing else. See Execute.
+	Grants GrantSource
 	// Confirmations returns the B-tier single-file overrides on record (the
 	// set risk.Gate's bOverrides argument was designed to receive). nil or
 	// empty means "no file has ever been confirmed", so every B-tier path stays
@@ -134,6 +146,10 @@ type Bridge struct {
 	// are read per call, and neither has a setter on the bridge.
 	modes         ModeSource
 	confirmations func() map[string]bool
+	// grants is ticket 224's third read-only injection, same shape and the same
+	// rule: read per call, no setter, and nil means no session has ever
+	// answered anything.
+	grants GrantSource
 
 	// classifier is shared: it is stateless over the frozen blacklist.
 	classifier risk.SensitiveClassifier
@@ -175,6 +191,7 @@ func New(o Options) *Bridge {
 		onDec:    o.OnDecision,
 		cancel:   o.Cancel,
 		modes:    o.Modes,
+		grants:   o.Grants,
 		confirmations: func() map[string]bool {
 			if o.Confirmations == nil {
 				return nil // no file was ever confirmed: B tier stays "ask first"
@@ -301,10 +318,32 @@ func (b *Bridge) Execute(ctx context.Context, req agent.ToolRequest) (agent.Tool
 		b.log("tools: MODE-REDLINE mode=%s still asks tool=%s rules=%v because=%s",
 			mode, req.Name, verdict.RulesHit, sil.Kept)
 	}
+
+	// --- ticket 224: a live D45 session grant may stand in for ONE question ----
+	//
+	// The gate on this branch is the contract, not a preference. SPEC-06 §8.3's
+	// first bullet ("L2 永不进入任何持久授权（含会话级）", restated at
+	// PLAN.md:2148 D45-3) says an L2 verdict is never covered by a session grant,
+	// and Deny is beyond everything. What is left is an L1 the mode did NOT
+	// already silence - the one question a stored native click can legitimately
+	// answer, because the click happened (approval's allow-session route spent a
+	// live nonce on a card naming this tool and this path) and the answer was
+	// scoped to this session. A mode that already silenced the call needs no
+	// help from here, and must not be reported as if it had been granted.
+	var grantID int64
+	if !sil.Silenced && sil.Level == risk.L1 {
+		grantID = b.sessionGrantID(ctx, req.Name, rawPaths)
+		if grantID != 0 {
+			b.log("tools: GRANT-USE tool=%s paths=%d grant_id=%d assessed=%s mode=%s "+
+				"(an authorization answered by a native click earlier in THIS session, "+
+				"not a click on this call)",
+				req.Name, len(rawPaths), grantID, verdict.Level, mode)
+		}
+	}
 	b.emit(dec)
 
 	// --- routing: L0 pass, L1 window, L2 approval, Deny never reaches a gate -
-	ok2, why := b.route(ctx, &dec, sil)
+	ok2, why := b.route(ctx, &dec, sil, grantID)
 	if !ok2 {
 		class := string(observe.ClassUserRejected)
 		if dec.Level == risk.Deny {
@@ -314,7 +353,7 @@ func (b *Bridge) Execute(ctx context.Context, req agent.ToolRequest) (agent.Tool
 	}
 
 	// --- execution under the D38d ceiling and the C22 deadline --------------
-	return b.run(ctx, req, entry, dec)
+	return b.run(ctx, req, entry, dec, grantID)
 }
 
 // ---------------------------------------------------------------------------
@@ -368,7 +407,14 @@ func (b *Bridge) capsOf(name string, entry Entry) capSet {
 // the user" or "do not ask", so the mode that decided it has to be visible in
 // the signature (AC#1). An implementation that reached for a global here would
 // put the permission switch inside the enforcement layer.
-func (b *Bridge) route(ctx context.Context, dec *Decision, sil risk.Silenced) (bool, string) {
+//
+// grantID follows the same rule for the same reason (ticket 224): whether a
+// stored session authorization answers this call is decided by the caller and
+// handed in, never re-derived here, and it is only ever consulted on the L1
+// branch. L2 and Deny have no path to it, which is SPEC-06 §8.3's first bullet
+// expressed as a switch statement rather than as a check this function might
+// forget.
+func (b *Bridge) route(ctx context.Context, dec *Decision, sil risk.Silenced, grantID int64) (bool, string) {
 	switch sil.Level {
 	case risk.L0:
 		dec.DecisionColumn = agent.DecisionAllow
@@ -379,6 +425,15 @@ func (b *Bridge) route(ctx context.Context, dec *Decision, sil risk.Silenced) (b
 		return false, "该目标被绝对禁止访问（R3 A 档，任何授权都不可豁免）：" + dec.Reason
 
 	case risk.L1:
+		if grantID != 0 {
+			// Booked as allow_session_grant, not allow: the frozen vocabulary
+			// already separates the two (agent/journal.go:30-36, and the same
+			// string is in the tool_call.decision comment at memory/schema.go:76)
+			// precisely so a reader can tell "a click answered this card" from
+			// "an earlier click, scoped to this session, covered it".
+			dec.DecisionColumn = agent.DecisionAllowGrant
+			return true, ""
+		}
 		a, why := b.gate.PendingWindow(ctx, *dec)
 		switch a {
 		case AnswerAllow, AnswerTimeout:
@@ -428,8 +483,15 @@ func dispositionOf(dec Decision) OutcomeKind {
 }
 
 // run executes the tool under the ceiling and the per-tool deadline.
+//
+// grantID is the D45 row that covered this call (0 when nothing did). It travels
+// as a parameter down to book for one reason: tool_call.grant_id is a frozen
+// column (SPEC-02 §3 / memory/schema.go:83), and "每次使用被授权通道都写
+// tool_call 日志（可取证）" (SPEC-06 §8.3, D45-2) is only true if the row names
+// which grant was spent. Decision cannot carry it - a grant field on that
+// struct is exactly what internal/tools/ticket90_test.go:444 forbids.
 func (b *Bridge) run(ctx context.Context, req agent.ToolRequest, entry Entry,
-	dec Decision,
+	dec Decision, grantID int64,
 ) (agent.ToolOutcome, error) {
 	timeout := b.timeoutFor(entry)
 	dec.Timeout = timeout
@@ -441,7 +503,7 @@ func (b *Bridge) run(ctx context.Context, req agent.ToolRequest, entry Entry,
 		slot.take(b.sem)
 		defer slot.giveBack()
 	case <-ctx.Done():
-		return b.close(ctx, req, dec, agent.ToolOutcome{
+		return b.close(ctx, req, dec, grantID, agent.ToolOutcome{
 			Text:       "任务已取消，调用未执行",
 			IsError:    true,
 			ErrorClass: string(observe.ClassCancelled),
@@ -477,7 +539,7 @@ func (b *Bridge) run(ctx context.Context, req agent.ToolRequest, entry Entry,
 	// book a class the model cannot self-correct against.
 	if errors.Is(ectx.Err(), context.DeadlineExceeded) && ctx.Err() == nil {
 		b.log("tools: %s exceeded its %dms budget", req.Name, timeout.Milliseconds())
-		return b.close(ctx, req, dec, agent.ToolOutcome{
+		return b.close(ctx, req, dec, grantID, agent.ToolOutcome{
 			Text: fmt.Sprintf("工具 %s 超时（%dms），已协作式中止",
 				req.Name, timeout.Milliseconds()),
 			IsError:    true,
@@ -489,7 +551,7 @@ func (b *Bridge) run(ctx context.Context, req agent.ToolRequest, entry Entry,
 		// still a tool-class outcome for the model to reason about (D37) and
 		// not a provider fault.
 		b.log("tools: %s execute fault: %v", req.Name, err)
-		return b.close(ctx, req, dec, agent.ToolOutcome{
+		return b.close(ctx, req, dec, grantID, agent.ToolOutcome{
 			Text:       "工具内部故障：" + err.Error(),
 			IsError:    true,
 			ErrorClass: string(observe.ClassTool),
@@ -497,7 +559,7 @@ func (b *Bridge) run(ctx context.Context, req agent.ToolRequest, entry Entry,
 	}
 	if errors.Is(ectx.Err(), context.DeadlineExceeded) && ctx.Err() == nil {
 		b.log("tools: %s exceeded its %dms budget", req.Name, timeout.Milliseconds())
-		return b.close(ctx, req, dec, agent.ToolOutcome{
+		return b.close(ctx, req, dec, grantID, agent.ToolOutcome{
 			Text: fmt.Sprintf("工具 %s 超时（%dms），已协作式中止",
 				req.Name, timeout.Milliseconds()),
 			IsError:    true,
@@ -537,7 +599,7 @@ func (b *Bridge) run(ctx context.Context, req agent.ToolRequest, entry Entry,
 	if !res.IsError {
 		b.mark(dec, res, hostPaths.get())
 	}
-	return b.close(ctx, req, dec, out, kind)
+	return b.close(ctx, req, dec, grantID, out, kind)
 }
 
 // execContext puts the C22 per-tool deadline on the caller's ctx. The budget
@@ -942,7 +1004,11 @@ func (b *Bridge) reject(ctx context.Context, req agent.ToolRequest, dec Decision
 	if dec.DecisionColumn == "" {
 		dec.DecisionColumn = agent.DecisionReject
 	}
-	b.book(ctx, req, dec, kind)
+	// grantID is 0 by construction: a rejected call was never covered by a
+	// session grant, and Execute reaches reject before the grant check on the
+	// capability/args branches and after it on the routing branch, where route
+	// only refuses when it did NOT use the grant.
+	b.book(ctx, req, dec, 0, kind)
 	b.emit(dec)
 	return agent.ToolOutcome{
 		Text:       why,
@@ -954,9 +1020,9 @@ func (b *Bridge) reject(ctx context.Context, req agent.ToolRequest, dec Decision
 
 // close books a call that reached execution and returns its outcome.
 func (b *Bridge) close(ctx context.Context, req agent.ToolRequest, dec Decision,
-	out agent.ToolOutcome, kind OutcomeKind,
+	grantID int64, out agent.ToolOutcome, kind OutcomeKind,
 ) (agent.ToolOutcome, error) {
-	b.book(ctx, req, dec, kind)
+	b.book(ctx, req, dec, grantID, kind)
 	if out.RiskLevel == "" {
 		out.RiskLevel = dec.LevelString()
 	}
@@ -988,12 +1054,23 @@ func (b *Bridge) emit(d Decision) {
 // the rule list travels in Decision (OnDecision -> the ticket 21/37 card, which
 // renders it verbatim) and in the audit line below; the row keeps the columns it
 // owns. Adding the column is a contract change, not this ticket's to make.
-func (b *Bridge) book(ctx context.Context, req agent.ToolRequest, dec Decision, kind OutcomeKind) {
+//
+// grant_id is NOT that missing column: tool_call has carried it since SPEC-02
+// §3 froze the DDL (memory/schema.go:83, "关联 approval_grant（D45）"), and until
+// ticket 224 nothing in production could fill it because nothing wrote an
+// approval_grant row. It travels as a parameter for the same reason rules_hit
+// cannot be a Decision field - the field-name scan at
+// internal/tools/ticket90_test.go:444 forbids a grant-shaped member on Decision,
+// and that ban is correct: the verdict a caller can set is the bug this
+// repository keeps re-registering.
+func (b *Bridge) book(ctx context.Context, req agent.ToolRequest, dec Decision,
+	grantID int64, kind OutcomeKind,
+) {
 	b.log("tools: call kind=%s task=%s corr=%s tool=%s risk=%s decision=%s "+
-		"outcome=%s rules_hit=%v in_allowlist_scope=%v reason=%q",
+		"outcome=%s rules_hit=%v in_allowlist_scope=%v grant_id=%d reason=%q",
 		kind, req.TaskID, orDefault(req.CorrelationID, req.TaskID), req.Name,
 		dec.LevelString(), dec.DecisionColumn, kind.outcomeColumn(),
-		dec.RulesHit, b.inScope(dec), dec.Reason)
+		dec.RulesHit, b.inScope(dec), grantID, dec.Reason)
 
 	// Ticket 105 AC#2: this is the production reader of ticket 102's rewrite
 	// account. Until here the only consumers of Roots()/RewrittenRoots()/
@@ -1035,6 +1112,10 @@ func (b *Bridge) book(ctx context.Context, req agent.ToolRequest, dec Decision, 
 		Outcome:       outcome,
 		ErrorClass:    errClass,
 		CorrelationID: orDefault(req.CorrelationID, req.TaskID),
+	}
+	if grantID != 0 {
+		g := grantID
+		tc.GrantID = &g
 	}
 	if _, err := b.j.InsertToolCall(ctx, tc); err != nil {
 		b.log("tools: tool_call insert failed task=%s tool=%s: %v", req.TaskID, req.Name, err)

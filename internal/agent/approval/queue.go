@@ -341,6 +341,24 @@ func (q *Queue) grantNonce(it *qitem) (string, error) {
 // allow is the native-only answer path. It spends a grant and refuses anything
 // else, including an empty one.
 func (q *Queue) allow(corr, nonce string) error {
+	return q.allowScoped(corr, nonce, false)
+}
+
+// allowScoped is the allow side with one extra bit: whether the answer was
+// 「仅本次」 or 「本会话内允许」 (ticket 224, D45-2's third card option).
+//
+// The bit changes the AUDIT LINE and nothing else about how the call is released
+// - the nonce is spent the same way, on the same exact key, through the same
+// lookupForAllowLocked. That is deliberate: if the session answer also behaved
+// differently inside the queue, "which verb did the user click" would stop being
+// a recorded fact and start being an inferred one.
+//
+// What the caller does with the bit is the security-relevant half, and it is
+// outside this function: Gate.allowSession is the only caller passing true, and
+// it is reachable only from the native surface (ui.go's NativeAPI). PanelAPI has
+// no Allow method at all, so a panel-sourced answer cannot express a session
+// scope any more than it can express a single allow.
+func (q *Queue) allowScoped(corr, nonce string, forSession bool) error {
 	q.mu.Lock()
 	it := q.lookupForAllowLocked(corr)
 	if it == nil {
@@ -369,8 +387,32 @@ func (q *Queue) allow(corr, nonce string) error {
 	// show every rejected card and never the answered one. One line per settled
 	// answer, on every route, is what makes 「谁答的、答了什么」 a reading
 	// instead of an inference from the absence of a refusal.
+	if forSession {
+		q.logf("approval: ANSWER-ALLOW corr=%s tool=%s route=native decision=allow-session "+
+			"(scope=session; the stored grant is written by Gate.allowSession, not here)",
+			corr, tool)
+		return nil
+	}
 	q.logf("approval: ANSWER-ALLOW corr=%s tool=%s route=native decision=allow", corr, tool)
 	return nil
+}
+
+// sessionSubject reads the (tool, paths) one pending card named, on the exact
+// key the queue issued - the same lookup the allow side uses, so the pair being
+// recorded is the pair the user was shown and nothing an alias index could
+// redirect a refusal toward.
+//
+// It is a read, not an answer: the caller still has to spend a live nonce
+// through allowScoped, and if the card leaves the queue between this call and
+// that one, the spend fails and nothing is recorded.
+func (q *Queue) sessionSubject(corr string) (string, []string, bool) {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+	it := q.lookupForAllowLocked(corr)
+	if it == nil || it.state != statePending {
+		return "", nil, false
+	}
+	return it.Dec.Tool, append([]string(nil), it.Dec.Paths...), true
 }
 
 // revokeGrants burns every live nonce of one item without answering it. A

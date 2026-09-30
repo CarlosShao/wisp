@@ -55,6 +55,7 @@ import (
 	"github.com/CarlosShao/wisp/internal/projctx"
 	"github.com/CarlosShao/wisp/internal/risk"
 	"github.com/CarlosShao/wisp/internal/secret"
+	"github.com/CarlosShao/wisp/internal/session"
 	"github.com/CarlosShao/wisp/internal/tools"
 	// The C5 adapters: llm.NewProvider resolves a config protocol enum through
 	// this registry, so a build that forgets one of these lines fails at the
@@ -227,6 +228,12 @@ type agentRuntime struct {
 	mgr   *config.Manager
 	paths *tools.PathCanonicalizer
 	store *memory.Store
+	// session is ticket 224's D45 grants ledger for THIS process: it holds the
+	// minted session identity, writes the rows a native 「本会话内允许」 answer
+	// produces, and is the read side the bridge consults. nil means this boot
+	// could not mint (or could not open the ledger), which leaves the session
+	// scope unusable and every call asking - the fail-closed direction.
+	session *session.Ledger
 	// tasks is ticket 164's process-local background-task table: the only
 	// thing task.output reads. v1 keeps no roster across restarts (票 164
 	// 定案②), so a restart answers "查不到这个任务" rather than empty.
@@ -388,6 +395,43 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	}
 	rt.store = mem
 
+	// The host session identity (ticket 224, approval record A435).
+	//
+	// One mint per process, from crypto/rand, and nothing derived: A435 clause 1
+	// forbids recomputing it from the pid / the clock / the working directory,
+	// because every approval_grant row on disk is keyed by this exact string. A
+	// recomputable id would let the next boot read the last boot's D45 grants
+	// back, which is the permanent免审通行证 internal/perm/store.go:19-27 and
+	// PLAN.md:1642 name as the thing to keep out. Clause 2 - the session ends
+	// when this process does - needs no code at all: this value dies here, so no
+	// later Covering call can be keyed with it, and AC#3 (重启必失效) holds by
+	// construction rather than by a cleanup step somebody might forget.
+	//
+	// Failing to mint is fatal for THIS feature and for nothing else: the ledger
+	// stays nil, so 「本会话内允许」 answers as a single-use allow and says so, and
+	// the bridge reads no grant source at all. A run that cannot get a session
+	// must still be a run, and it must be a run that asks.
+	sessID, err := session.Mint()
+	if err != nil {
+		fmt.Fprintf(s.stderr, "wisp run: 本次没有会话身份（%v），「本会话内允许」将按「仅本次」答复处理\n", err)
+		rt.auditf("wisp run: SESSION-MINT-FAILED err=%v (会话授权档今天不可用)", err)
+	} else {
+		ledger, lerr := session.NewLedger(session.LedgerOptions{
+			ID:    sessID,
+			Store: mem,
+			Logf:  rt.auditf,
+		})
+		if lerr != nil {
+			fmt.Fprintf(s.stderr, "wisp run: 会话授权记账不可用：%v\n", lerr)
+			rt.auditf("wisp run: SESSION-LEDGER-FAILED err=%v", lerr)
+		} else {
+			rt.session = ledger
+			// The one line that makes "which session wrote this row" answerable
+			// from the log instead of from the database afterwards.
+			rt.auditf("wisp run: SESSION-MINT id=%s (结束点＝本进程退出，A435 第 2 条)", sessID)
+		}
+	}
+
 	// C26 canonicalizer over the [fs] allowlist; the same instance is shared
 	// by the bridge and the fs tools, so the path the risk verdict judged is
 	// the path that opens.
@@ -456,6 +500,24 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	// of SPEC-06 §2's four veto channels (ball / Esc / KWS / panel) exists in a
 	// terminal - so NewChannels() stays empty and runSpec.replyVeto stays unset,
 	// and approval_reply.go says what both of those choices protect.
+	// Ticket 224's two injections of the SAME ledger, split by which side of the
+	// boundary they serve: the approval layer may only WRITE a session rule (a
+	// native click produced it), the bridge may only READ one (it decides whether
+	// a question still has to be asked). Neither gets the other's half, so no
+	// component in this process can both grant itself a rule and wave a call
+	// through on it. See the comment at the permission-mode block below for why
+	// this is not the same thing as Options.Confirmations.
+	//
+	// The typed-nil guard is load-bearing: a nil *session.Ledger assigned into an
+	// interface field yields a NON-nil interface value, and both consumers fail
+	// closed by testing that field against nil.
+	var grantRead tools.GrantSource
+	var grantWrite approval.GrantRecorder
+	if rt.session != nil {
+		grantRead = rt.session
+		grantWrite = rt.session
+	}
+
 	rt.liveCards = newNativeCards()
 	rt.ui = &consoleApprovalUI{out: s.stdout, run: rt, live: rt.liveCards}
 	rt.gate = approval.New(approval.Options{
@@ -464,6 +526,7 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		Window:          time.Duration(cfg.Risk.L1WindowSec) * time.Second,
 		ApprovalTimeout: time.Duration(cfg.Risk.ConfirmTimeoutSec) * time.Second,
 		Logf:            rt.auditf,
+		Grants:          grantWrite,
 	})
 	// Bind the reply ledger to the gate it answers to (ticket 201 AC#1). The
 	// ledger had to exist before the gate, because the UI that fills it is one of
@@ -479,10 +542,21 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 	// ModeSource, which answers the strictest档 for every call, and a manually
 	// chosen档 would be silently forgotten at the next start.
 	//
-	// What is deliberately NOT here: any grant source. tools.Options.Confirmations
-	// stays nil, because R20/M3 persists the MODE and nothing else - a D45
-	// session grant must not come back from disk just because something on this
-	// boot learned to read config.toml (PLAN.md:1640, pinned by AC#2(c)).
+	// Two other injections sit next to it, and they are NOT the same kind of
+	// thing, which is worth spelling out because this comment used to conflate
+	// two of them:
+	//
+	//   - tools.Options.Confirmations stays nil, and stays nil after ticket 224.
+	//     That field is the B-tier SINGLE-FILE override set risk.Gate reads, and
+	//     populating it is ticket 21's confirmation flow. Nothing in this
+	//     assembly touches it.
+	//   - tools.Options.Grants is new here: the read side of a D45 session grant
+	//     (internal/tools/grant.go). R20/M3 still persists the MODE and nothing
+	//     else - a session grant does not come back from disk "because this boot
+	//     learned to read config.toml". It comes back only ever keyed by the
+	//     identity minted above, which no later boot can recompute (A435 第 1
+	//     条), so PLAN.md:1642's "会话结束后授权必须失效" is the property the read
+	//     depends on rather than a rule this file has to remember to enforce.
 	confirm := s.modeConfirm
 	if confirm == nil {
 		confirm = rt.confirmModeSwitch
@@ -572,6 +646,11 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		// AC#1/AC#4's anchor line: the档 this boot read enters the decision
 		// chain here and nowhere else.
 		Modes: rt.modes,
+		// Ticket 224 AC#1/AC#2's anchor line: this is the only place a D45
+		// session authorization enters the decision chain. Nil when this boot
+		// could not mint a session, which is the state every pre-224 assembly was
+		// in and which leaves every question asked.
+		Grants: grantRead,
 		// R4 stays dormant: probing every result for sensitive sources needs
 		// the C25 detector's own wiring (ticket 25), and a dormant R4 is the
 		// honest state, not a weakened one.

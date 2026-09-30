@@ -41,6 +41,30 @@ type Options struct {
 	MaxTracked int
 	// Logf is the audit sink. A forgery attempt is always logged.
 	Logf func(format string, args ...any)
+	// Grants is the WRITE side of a D45 scoped session grant (ticket 224): the
+	// one door 「本会话内允许」 goes through on its way to a stored row.
+	//
+	// It is write-only on purpose and the interface says so (Record and nothing
+	// else), because the two halves of D45 sit on opposite sides of a boundary
+	// this package must not be able to cross. The gate may record what a native
+	// click authorized; it may NOT read grants back - that is internal/tools'
+	// job, through the read-only seam there (tools.GrantSource, implemented by
+	// internal/session's ledger). A gate that could both write and read its own
+	// authorizations is the permanent免审通行证 with a nicer UI, and
+	// internal/perm/store.go:19-27 is the boundary that says so.
+	//
+	// nil means this host cannot answer 「本会话内允许」 at all: the verb answers
+	// the current call as a single-use allow and says out loud in the audit line
+	// that the scope was dropped. It never pretends a row exists.
+	Grants GrantRecorder
+}
+
+// GrantRecorder is the whole of what the approval layer may do with a session
+// grant: write one rule for one (tool, path) pair. Satisfied by
+// *session.Ledger; declared here as one method so this package never imports
+// internal/session or internal/memory.
+type GrantRecorder interface {
+	Record(ctx context.Context, tool, pattern string) (int64, error)
 }
 
 // Gate is ticket 21's approval mechanics behind the internal/tools/gate.go
@@ -59,6 +83,9 @@ type Gate struct {
 	track    int
 	q        *Queue
 	logf     func(string, ...any)
+	// grants is ticket 224's write-only injection (Options.Grants). No method on
+	// Gate reads it back.
+	grants GrantRecorder
 
 	mu       sync.Mutex
 	windows  map[string]*window
@@ -124,6 +151,7 @@ func New(o Options) *Gate {
 		ui: ui, clock: clock, channels: ch, window: win, track: tracked,
 		q:        NewQueue(o.ApprovalTimeout, o.WarningLead, o.MaxPending, logf),
 		logf:     logf,
+		grants:   o.Grants,
 		windows:  map[string]*window{},
 		running:  map[string]*runEntry{},
 		admitted: map[string]bool{},
@@ -595,6 +623,70 @@ type nativeAPI struct{ g *Gate }
 
 func (n nativeAPI) Allow(_ context.Context, corr, grant string) error {
 	return n.g.q.allow(corr, grant)
+}
+
+// AllowSession is D45-2's third card answer (ticket 224): the same native click,
+// recorded as a rule that stands for the rest of THIS session.
+//
+// It is on NativeAPI and nowhere else, which is the whole of how this package
+// keeps SPEC-06 §9 layer 3 intact. PanelAPI has no Allow method (ui.go:152-159),
+// so there is no panel-shaped way to reach a method that would store an
+// authorization; DecideFromPanel refuses every allow on the route alone and
+// never looks at a scope. A WebView host that invents a JSON body claiming
+// 「本会话内」 arrives at DecideFromPanel and is refused there.
+//
+// The proof requirement is identical to Allow's, for the same reason: an answer
+// that creates a standing rule must be backed by the nonce this queue minted for
+// this card at display time. No nonce, no rule.
+//
+// Ordering is deliberate: the call being answered is released FIRST (through the
+// same nonce-spending funnel as Allow), and the rules are written after. That
+// way a recording failure can never leave the user's current call stuck, and it
+// can never record a rule for a card nobody answered - the spend is what proves
+// the answer, and it happens before any write.
+func (n nativeAPI) AllowSession(ctx context.Context, corr, grant string) error {
+	return n.g.allowSession(ctx, corr, grant)
+}
+
+// allowSession is the body behind NativeAPI.AllowSession.
+func (g *Gate) allowSession(ctx context.Context, corr, grant string) error {
+	// Read the subject before the answer retires the card: this is the exact
+	// (tool, paths) pair the user was shown, taken through the same exact-key
+	// lookup the allow side uses. The alias index is not in this path, so a
+	// refusal alias cannot be used to point a grant at some other call.
+	tool, paths, ok := g.q.sessionSubject(corr)
+	if !ok {
+		// Let the funnel below produce the precise error (unknown correlation
+		// vs already settled) rather than inventing a third wording here.
+		tool, paths = "", nil
+	}
+	g.logf("approval: native route corr=%s allow=true scope=session", corr)
+	if err := g.q.allowScoped(corr, grant, true); err != nil {
+		return err
+	}
+	if g.grants == nil {
+		g.logf("approval: GRANT-DROPPED corr=%s tool=%s paths=%d "+
+			"(本机没有接入会话授权记账，本次按「仅本次」放行，没有落盘任何规则)",
+			corr, tool, len(paths))
+		return nil
+	}
+	if tool == "" {
+		g.logf("approval: GRANT-DROPPED corr=%s (卡片主题在答复前已离开队列，未落盘任何规则)", corr)
+		return nil
+	}
+	for _, p := range paths {
+		id, err := g.grants.Record(ctx, tool, p)
+		if err != nil {
+			// The call itself was already released above; the scope simply did
+			// not stick, so the next同类 call asks again. That is the
+			// fail-closed direction and the line says so.
+			g.logf("approval: GRANT-RECORD-FAILED corr=%s tool=%s pattern=%q err=%v "+
+				"(本次已放行，但会话授权没记下：下一次同类操作仍会询问)", corr, tool, p, err)
+			continue
+		}
+		g.logf("approval: GRANT-RECORDED corr=%s grant_id=%d tool=%s pattern=%q", corr, id, tool, p)
+	}
+	return nil
 }
 
 func (n nativeAPI) Reject(corr, reason string) error { return n.g.q.reject(corr, reason) }

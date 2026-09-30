@@ -90,7 +90,10 @@ type ReplyCard struct {
 //
 // The method set is the whole boundary, and it is deliberately asymmetric:
 //
-//	Allow / Reject / Veto            the native route (DecideFromNative, Gate.Veto)
+//	Allow / AllowSession / Reject / Veto     the native route (DecideFromNative,
+//	                           Gate.Veto); Allow and AllowSession both spend the
+//	                           card's single-use nonce, AllowSession additionally
+//	                           records a D45 session rule (ticket 224)
 //	PanelReject / Head / View        the panel route (DecideFromPanel, PanelAPI)
 //	PanelAllow                       reaches DecideFromPanel and is refused THERE
 //	Pending / AwaitingHuman / WaitingState   read-only, no authority at all
@@ -325,6 +328,39 @@ func (r *Replies) Allow(ctx context.Context, corr string) error {
 	if err := g.DecideFromNative(ctx, Request{
 		CorrelationID: corr, Allow: true, Grant: card.Grant, Source: native,
 	}); err != nil {
+		return err
+	}
+	r.Forget(corr)
+	return nil
+}
+
+// AllowSession is the 「本会话内允许」 answer (ticket 224, D45-2's third card
+// option): the same tracked card, the same single-use native nonce, and the
+// card's own (tool, path) pair recorded as a rule for the rest of this session.
+//
+// The guardrails are the ones Allow runs, and for the same reasons: an
+// untracked correlation is ErrNoTrackedCard, an L1 window has no allow verb at
+// all so it is ErrRouteHasNoAllow (SPEC-06 §2 B1 - a countdown window cannot be
+// answered, and that does not change because the answer would be remembered),
+// and a missing or spent grant is ErrBadGrant from the queue.
+//
+// There is deliberately no PanelAllowSession. PanelAPI has no Allow method, so
+// a panel host has no door to stand in front of; adding a session-flavoured
+// sibling of the one method the panel route exists to refuse would be the
+// widening this seam is built to prevent.
+func (r *Replies) AllowSession(ctx context.Context, corr string) error {
+	card, ok := r.Look(corr)
+	if !ok {
+		return ErrNoTrackedCard
+	}
+	if card.Grant == "" {
+		return ErrRouteHasNoAllow
+	}
+	g, _, _, _ := r.routes()
+	if g == nil {
+		return ErrNoGateAttached
+	}
+	if err := g.Native().AllowSession(ctx, corr, card.Grant); err != nil {
 		return err
 	}
 	r.Forget(corr)

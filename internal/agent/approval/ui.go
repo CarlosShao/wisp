@@ -144,6 +144,18 @@ type NativeAPI interface {
 	// Allow spends grant for correlationID. grant is not optional and is not
 	// bypassable: an empty or stale value returns ErrBadGrant.
 	Allow(ctx context.Context, correlationID, grant string) error
+	// AllowSession spends the same grant for the same card and additionally
+	// records the card's own (tool, path) pair as a D45 session-scoped rule
+	// (ticket 224). It is not a stronger answer than Allow - the current call is
+	// released by the same nonce through the same funnel - it is the same answer
+	// with a remembered scope, and it needs a host that wired
+	// Options.Grants (without one it says so in the audit line and drops the
+	// scope rather than faking a rule).
+	//
+	// It exists on this interface and on no other surface: PanelAPI has no Allow
+	// method at all, so a panel-sourced host cannot store an authorization
+	// because there is no method for it to call.
+	AllowSession(ctx context.Context, correlationID, grant string) error
 	// Reject needs no proof: refusing is always safe, so the panel may do it
 	// too through PanelAPI.
 	Reject(correlationID, reason string) error
