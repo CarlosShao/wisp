@@ -144,7 +144,7 @@ internal/winsec/winsec_windows.go:313 注释
 | 装配根在哪 | **今天不存在单一装配根**。6 枚造根腿各有入口：`installLogSink`（4 枚调用点，§0.4）→ `observe.InitLog`（`logsink.go:149`）；`slo` 绕过 `installLogSink` 直连 `observe.InitLog`（`slo_windows.go:272`）；`doctor` 连 sink 都不装，直接 `probeWritable` 的 `os.MkdirAll`（`doctor.go:301`）。⇒ 形② 的"单一点"只有两枚候选：**(甲) `internal/observe/logging.go:72` 那一行**（覆盖 6 枚里的 5 枚，`doctor` 那枚天生不在管子里）；**(乙) `cmd/wisp` 新加一枚 `sealDataRoot(dir)` 并在 6 枚腿各自调用**（覆盖面全，但"单一点"退化成人肉六处，漏一处就是本票的形状） |
 | 要动的文件:函数 | 甲形：`internal/observe`（`logging.go:66`–`:75` `InitLogWithRegistry` 的 `os.MkdirAll` 换成／加上 `winsec.PrivateDirAll`），新增 `internal/observe -> internal/winsec` 直接导入；乙形：`cmd/wisp`（新 helper＋`resident_windows.go`／`run.go`／`models.go`／`secret.go`／`slo_windows.go`／`doctor.go` 六处调用点） |
 | 跨包依赖边 | 甲形＝**`observe` 新增对 `winsec` 的直接依赖**：`winsec` 是叶子 ⇒ 不闭环；且 `observe` 今天已经经 `secret` 依赖 `winsec`。⚠ 但 `logging.go:386`–`:387` 那段注释把"这条管子不许成环"写成了本包的一处理由，**它禁的是 `winsec -> observe`，没有说 `observe -> winsec` 可以**——仓里**没裁过** ⇒ 与形① 同一枚问题，见 §4 第 1 条。乙形＝**给 `cmd/wisp` 开一枚新直接导入**（现读：产码侧 `cmd/wisp` 里 `internal/winsec` 命中 5 行**全在注释**——`doctor.go:232`、`logsink.go:7`／`:132`、`resident_windows.go:48`、`secret.go:139`；`grep '"github.com/CarlosShao/wisp/internal/winsec"'` 在 `cmd/` 只命中测试件 `secret_dataroot_119b_test.go:49` ⇒ **产码导入数＝0**），这是**本票第一枚真正的新边**，且开在产码里 |
-| 失败会不会堵死启动 | 甲形：`InitLog` 已经返回 error，且两枚调用方都已选"**响亮但不拦**"（`resident_windows.go:58`–`:65`、`run.go:196`–`:203`）⇒ 封条失败会自然顺着这条既有降级路走，**不需要新裁一次失败方向**（这是甲形对形① 的实质优势）；⚠ 代价反过来：**封不上也照跑**，"根宽"这件事在 `run`／`slo` 腿上只剩一条日志，仪器之外无人知道。乙形：6 处调用点各裁一次，最容易六处不一致 |
+| 失败会不会堵死启动 | 甲形：**四条腿"响亮但不拦"、一条腿直接退 2**——`installLogSink` 失败在 `resident_windows.go:58`–`:65` 与 `run.go:196`–`:203` 都是"打印＋照跑"（原话逐字「a log directory that will not open must not become a way to keep Wisp from starting」／「it does not stop the run」），`models.go:284`／`secret.go:226` 同形；⚠ 但 **`slo` 那枚腿不是**：`cmd/wisp/slo_windows.go:272`–`:278` 现读是 `observe.InitLog` 一失败就 `wisp slo: log pipeline: %v` ＋ `return 2` ⇒ 把封条塞进 `InitLog` 会让**体检／SLO 这条自救腿**新增一种"起不来"，而 owner 恰恰要用它去诊断（这一条与 §3.4 第 3 点的 POSIX 拒绝面叠在一起看）。⇒ **同一枚改动在三条腿上给出两种失败方向，这一格要编排者裁**（§4 第 3 条）。乙形：6 处调用点各裁一次，最容易六处不一致 |
 | 最坏后果形状 | 见 1.3（甲乙同命）：**首启那一次 `PrivateDirAll(数据根)`／`SealDir(数据根)` 在 Windows 上＝对已存在整棵子树做 `propagatePrivate`**，把每一枚子档的描述符**换成显式窄集并切断继承**（`winsec_windows.go:595`–`:620`），这不是"给新建物一枚好父亲"，是**对既有树的批量 ACL 改写** |
 
 ### 1.3 两形共有的一枚硬撞钉（本腿认为 AC#1 必须先裁它，不然落地腿会当场撞上）
@@ -257,16 +257,105 @@ internal/winsec/winsec_windows.go:313 注释
 
 ## 3. POSIX 半边具名（AC#3）
 
-（待补：chmod 单档不递归的三条走法与代价＋"本机验不了"的具名口径＋要跑哪一发在哪跑。）
+### 3.1 先纠正一个会被顺嘴说错的对称句
+
+票面 `:4` 那句「POSIX 只 `chmod` 单档、不递归」是**真的**，但它推不出"POSIX 那半边和 Windows 那半边是同一件事的两套写法"。现读两条：
+
+- `internal/winsec/winsec_other.go:165`–`:170` 逐字：
+ 「sealDir narrows a directory. It **deliberately does not walk** the existing subtree the way the Windows implementation does:
+ on POSIX a child **never inherited its parent's mode in the first place**, so 'seal the tree' here would be a chmod over files
+ whose permissions somebody else set on purpose, and **the hole being closed does not exist on this platform**.」
+- 同文件 `:24`–`:41 applyDescriptorPOSIX`：`os.Chmod` 之后**回读 `info.Mode().Perm()` 并要求逐字等于 0600/0700**，读不回来就 `ErrNotSealable`（FAT/exFAT/`all_squash` 的 NFS 会在这里变红，不是跳过）。
+
+⇒ **本票的"根"这一格在 POSIX 上其实只要单档 `chmod` 就完备**（根与 `logs` 两枚目录各自 0700），
+**"递归"这一支在 POSIX 上不属于本票的必需项**；真正在 POSIX 上漏的是**每枚 `*.jsonl` 的 mode**——
+那是 `logging.go:244` 用 `os.OpenFile(name, O_CREATE|O_WRONLY|O_APPEND, 0o644)` 建的，
+⚠ **POSIX 上没有继承这回事，所以"封了根"不会让日志文件变窄**，只有"每枚文件首写前 `SealFile`"才会＝**票 132 的 AC#2，不是本票的射程**。
+⇒ 这条边界要在判据注释里逐字写出来（§3.3 给了文案草案），否则下一位会把"根封了"读成"日志不泄露了"。
+
+### 3.2 两支走法的代价（票面 `:19` 要的两选一）
+
+| 走法 | 内容 | 代价（具名） |
+|---|---|---|
+| **甲：不递归，只封"本时序里由这个进程创建的那串目录"**（本腿推荐它作为 AC#3 的答案，⛔ 但"要不要按甲写"这一条仍要编排者裁，§4 第 6 条） | `PrivateDirAll(R)`／`SealDir(R)` 各一枚单档动作，Windows 侧靠 `sealDir` 的走查顺带收窄既有子树（副作用＝§1.3 的 models 撞钉），POSIX 侧就是 `chmod 0700` | ① POSIX 的"已有子树照旧宽"＝**语义不对称是刻意的、有注释在先**（`winsec_other.go:165`–`:169`），不写进判据注释就会被读成漏了；② 每枚 jsonl 的 mode **仍不受本票管**（§3.1） |
+| **乙：给 POSIX 补一枚递归走查**（把 Windows 的 `propagatePrivate` 在 `!windows` 上也做一遍） | 新增平台半边：`winsec_other.go` 里写一棵 walk，或把 `sealDir` 改成两平台都走 | ① **正面推翻 `winsec_other.go:165`–`:169` 的存在理由**（那句写的是"这儿的洞不存在"＋"走查＝覆盖别人有意设的 mode"）⇒ 要改注释＋给新钉子的存在理由，属裁量项；② 会把票 95 那张"故意留着宽"的决定在 POSIX 上一并改写（同 §1.3 的 models 撞钉，只是换了平台）；③ **本机验不了**：这半边的任何读数只能在一台 linux 容器里产生（§3.4），而 `cmd/wisp` 连 Linux 构建都不存在（`cmd/wisp/logsink.go:52`–`:61` 逐字：「package main has no Linux build, because `GOOS=linux go vet ./cmd/wisp/` is rc=1 on the sherpa-onnx import main.go carries … nothing in this file has ever been *compiled* for Linux」）⇒ **乙形若把钉子放在 `cmd/wisp`，POSIX 那半边今天连"编译过"都证明不了，更别谈跑** |
+
+### 3.3 具名注释草案（若 AC#3 选"把 POSIX 侧今天不验写进判据"）
+
+给落地腿当起点（措辞要自带"为什么不是跳过"，本仓对跳过的态度见 `internal/winsec/private_other_test.go:15`–`:16`「A skip would be the wrong shape here」）：
+
+```
+// POSIX 半边，具名不验（票 238 AC#3）。
+// 本钉子断言的是"根与 logs 这两枚目录自己带一枚非继承的窄描述符"，
+// 这是 Windows 的说法：icacls 的 (I) 记号在 POSIX 上没有对应物，
+// chmod 之后 mode 就是那个 mode，没有"存哪儿"这一维（winsec_other.go:24-:41 只回读、不回读 flag）。
+// 因此本钉子在 !windows 下【不跑】，而【不是跳过】：
+//   - 它在 POSIX 上能判的那一半已经有人判了：internal/winsec/private_other_test.go:37
+//     TestPOSIXPrivateDirIsReally0700（PrivateDirAll 的父层与自身都必须读回 0700）；
+//   - POSIX 上真正没被管住的是每枚 wisp-*.jsonl 的 mode（logging.go:244 的 0o644），
+//     那一格属票 132 AC#2 的"每枚文件首写前 SealFile"，不属本票；
+//   - ⛔ 不许用"容器里跑过了"代替本行：这一半的实测读数必须由 §3.4 那一发产生并落在 docs/evidence/s1/238-*.md。
+```
+
+### 3.4 要跑哪一发、在哪跑（⛔ 本腿没跑，硬红线禁容器；下面每条都是给落地腿的派单手递）
+
+1. **在哪**：本机 Docker，镜像 `golang:1.27`（本地已有）。⚠ 本仓已登记的挂载坑（票 132 Rules 逐字）：
+   「POSIX 半边要 Docker **真跑**（Git Bash 下 `docker -v C:\…` 会静默挂空且 rc=0）」⇒ 仓库路径含空格（`projects plans`），
+   挂载源必须整体加引号，且**起手要先证"容器里看得见 go.mod"**再谈读数（`ls /src/go.mod` 一发，空即仪器坏了）。
+2. **跑哪一发**（本票 POSIX 半边最小集）：
+   `go test -count=2 -v ./internal/winsec/ ./internal/observe/`
+   ⛔ **不要加 `./cmd/wisp/`**：该包在 Linux 无构建（`logsink.go:52`–`:61` 逐字＋`internal/proc/crossvet_test.go:22`–`:26` 解释 cgo 与 `CGO_ENABLED=0` 那一段），
+   加上去只会拿到一条"包加载失败"，会被误读成本票的红。
+3. **正控（必带，否则这发只是重跑别人的绿）**：同一容器内先跑一次**默认 TMPDIR**，再跑一次 **`TMPDIR` 指到一枚 symlink 底下**的形式。
+   第二发的预期结果在仓里有既数：`internal/winsec/winsec_other.go:97`–`:99` 逐字
+   「R-113-B, measured in a Linux container: **81 failing lines** across this package and internal/config, internal/agent, internal/memory with **TMPDIR behind a symlink**」
+   ⇒ **这一发是本票最要紧的 POSIX 读数**：任何把封条放进 `internal/observe/logging.go`（形②‑甲）的走法，
+   都会让 `logging_test.go:243`/`:286` 两枚直接调 `InitLogWithRegistry(LogConfig{Dir: t.TempDir()…})` 的用例
+   **走进 `platformVerifyPlacement` 的拒绝面**（`winsec_other.go:155`–`:163`：任一前缀是 symlink 就 `ErrUnresolvedPath`），
+   而 `internal/observe` **不在 `proc.SealableRoot` 的下游**（那条 resolve 只发生在根解析点：`cmd/wisp/doctor.go:263`、`internal/proc/envfork.go:125`/`:245`）
+   ⇒ **后果形状**：在 macOS（`/var` 是 symlink，`winsec_other.go:100`–`:102` 已点名）与"TMPDIR 挂在链接底下"的容器里，**日志管道会开始拒绝启动**，
+   而 `wisp slo` 那枚腿的失败方向是 `return 2`（`cmd/wisp/slo_windows.go:272`–`:278` 现读：`InitLog` 一失败就打印 `wisp slo: log pipeline: %v` 并退 2），
+   **不是**常驻/`run` 那两条"响亮但不拦"⇒ 同一枚改动在三条腿上给出两种失败方向，这条要进 AC#1 的裁据（§4 第 3 条）。
+4. **另一枚 POSIX 专属的拒绝面（具名）**：`ResolvePath` 的内置闸门 `builtinVerifier.Resolve`（`internal/winsec/resolve.go:664`–`:675`）
+   第一腿就是 `filepath.IsAbs` ⇒ 一旦 `logging.go:72` 换成 `PrivateDirAll`，**一个相对拼写的 `LogConfig.Dir` 会从今天"照建"变成"拒绝并报错"**。
+   现读全仓 `LogConfig{` 只有 4 处（`logsink.go:149`、`slo_windows.go:272`、`logging_test.go:243`/`:286`），四处传的都是绝对拼写（`t.TempDir()`／`filepath.Join(DataDir,…)`）
+   ⇒ **今天不会因此多红一枚用例**〔未跑包，此条来自读断言＋名册穷举〕，但它是一条**新长出来的行为边界**，判据注释要写。
+
+### 3.5 本票 POSIX 半边的三行读法
+
+① 现象在哪出现＝盘上那枚目录的 mode（POSIX）／描述符（Windows），不在任何对外接口；
+② 有没有本机被入侵的证据＝**没有**（本腿零写入，且这台机器是 Windows，POSIX 那半边今天连现场都没有）；
+③ 最坏后果形状＝POSIX 上 `logs` 的 mode 由 `logging.go:72` 的 `0o755`（去 umask）定、每枚 jsonl 由 `0o644` 定，
+**同机其它账户可读**这一句在本腿这儿**只是代码读数、不是实测读数**（要实测就得 §3.4 那一发）⇒ 写进证据表时只能标〔读码推定〕，不许标〔实测〕。
 
 ---
 
 ## 4. 要编排者裁的（不许为空）
 
-（待补。）
+⛔ 本节每一条都是**票面没覆盖、本腿不许自己假设方向**的。每条给：争议／三支候选／本腿能量到的代价／不裁的代价。
 
----
+| # | 要裁的那一刀 | 候选与代价（本腿现读撑着的） | 不裁会怎样 |
+|---|---|---|---|
+| **1** | **两枚"传递已有、直接未裁"的依赖边能不能开到明面上**：`internal/proc -> internal/winsec`（形①）、`internal/observe -> internal/winsec`（形②‑甲） | 仓里**没有成文禁止**：`AGENTS.md` §1.2 那串禁止形状里没有依赖方向；成文的是**反方向禁**（`resolve.go:35`–`:40` 逐字「internal/winsec cannot import internal/risk, because the graph already runs risk -> observe -> secret -> winsec … so the reverse edge closes a cycle」、`logging.go:386`–`:387`、`logsink.go:132`–`:134`）。两枚直接边都不会闭环（`winsec` 是叶子，§0.4） | 落地腿自己判＝agent 单方面改架构形状；下一位会拿"注释里那句话"当规矩用，而那句话禁的是另一枚边 |
+| **2** | **封根这一手要不要带 propagation（全树走查）** | 甲＝新增"只封一层不走查"的导出名（**契约级**，照票 132 `:76` 乙支的先例：实现腿不许自己造，要回编排者落 `A##` 并摆给 owner）；乙＝走查但加子树例外表（⇒ 第二真相源，且本仓对"例外表"已有包袱：`[fs] reparse_point_exceptions` 只在判级侧、`risk/winsec_c26.go:14`–`:19` 明写"placement 不许带例外"）；丙＝只封 `<data>\logs`、根不动（⇒ **本票标题那句"根是谁造的"仍然无人答**，AC#2 判据落不了地） | 直接撞 §1.3：首启那一次会把 `<data>\models\**`（`models.go:198`）的 `BUILTIN\Users` 读权摘掉，而那正是票 95 拍板"故意留着"的决定，`no_seal_ruling_windows_test.go:21`–`:22` 逐字「decisions like that do not get made by an unrelated hardening sweep」 |
+| **3** | **封条失败的方向**（拒启动／降级照跑／分腿不同处理） | 形① 在 `Boot` 里失败＝`resident_windows.go:42`–`:45` `os.Exit(1)`＝**双击图标起不来**；形②‑甲 失败＝4 条腿照跑（`resident_windows.go:58`–`:65`、`run.go:196`–`:203`、`models.go:284`–`:286`、`secret.go:226`–`:229` 现读全是"打印＋继续"）＋**`slo` 那条直接 `return 2`**（`slo_windows.go:272`–`:278`）。⚠ 票 128 的"拒绝启动"之所以没堵死联调，靠的是台账 `A111④`（`docs/reports/pending-and-issues.md:3689`–`:3696`）那两条**在选树之前**的前置路径（`portable.txt`／`WISP_ENV=test`，代码＝`doctor.go:247`–`:267`）；**"封不上"这一步没有任何前置路径**，且全仓**没有** `--data-dir`／`WISP_DATA_DIR` 这类对外口子（同一条台账 `:3695`–`:3696` 已记为缺口） | 无条件拒启动＝堵死 owner 联调（本仓定案过的教训）；无条件降级＝"根宽"只剩一条日志，且 `slo` 这条**自救用的**腿可能先起不来 |
+| **4** | **AC#2 那把尺的射程到哪一层** | 甲＝只判"本进程创建的那串目录"（`R`、`R\logs`）：能判、正控成立、不撞 §2.6 的 R 类三枚；乙＝扩到每枚 `*.jsonl`：⇒ **票 132 的 AC#2（每枚文件首写前 `SealFile`）从"另一张票"变成本票的前置条件**，两票关系从"串行"升级成"互相承重"，要重排；丙＝再加"时序半"（X2 那一发，见 §2.4）⇒ 需要一枚能在中途读 ACL 的载体，`cmd/wisp` 里现成形状是 `logsink_windows_test.go:308`（日志文件里读记录序号），真机中途读数则要有个能停下来的钩子 | 射程写歪的后果是两种：写窄了＝AC#2 只证了"有封条"没证"首启那棵树"；写宽了＝本票悄悄把票 132 的格占了，132 的裁决表还没有一枚（`docs/evidence/s1/132-*`＝0 枚，票 132 `:88` 现读） |
+| **5** | **新尺的保 flag 解析器放哪儿** | 仓里唯一保留整条 flag 文本的解析器是 `internal/models/acl_sid_121_test.go:50 parseACELines`（＋`aceLinesForSID :100`），它在 `internal/models`；`internal/winsec/acl_windows_test.go:86 aclSIDs` 明确丢 flag。⇒ 要么抽公共测试件（跨包，动别人地界），要么在新钉子内复制一份并注明出处（多一份 parser＝多一份漂移） | 复制＝将来两边判定不一致；抽公共＝碰 `internal/models` 那枚包的地界（本腿不裁） |
+| **6** | **POSIX 半边选甲还是乙**（§3.2） | 甲＝不递归＋判据注释写明"POSIX 上封根不保护任何东西，每枚 jsonl 属票 132"；乙＝补递归＝推翻 `winsec_other.go:165`–`:169` 那段存在理由（那句现在还逐字写着"the hole being closed does not exist on this platform"），要改注释＋给新钉子的存在理由 | 不选＝落地腿会照 Windows 的直觉写一支"两边都对"的修法，而 §3.1 说这两边**不是**同一件事 |
+| **7** | **本票没有"地界"这一节** | 票面只有 `:21`–`:23`「禁区」，**没有**票 132 `:6` 那种"地界"行。而本票要动的文件横跨 `internal/observe/logging.go`、`internal/proc/boot_windows.go`、`cmd/wisp/{logsink,resident_windows,run,models,secret,slo_windows,doctor}.go`、`internal/winsec`（若走甲形新导出名）——⚠ 且票面 `:23` 自己写着"与票 132／174／175 同撞 `internal/winsec`／`internal/observe` ⇒ 串行" | 落地腿改到哪算合规无法判；跨包改动在共享工作树里容易撞别人在飞的写腿（此刻 `internal/tools`／`cmd/wisp` 有写腿） |
+| **8** | **AC#1 完成判据里那发"真机首启读数"由谁在哪跑** | 票面 `:17` 要求"一发起跑时序的真机读数（新目录、先跑常驻腿那形）"。本腿按红线**没跑**（零执行被测程序、零 `icacls`）；参照做法在 `docs/evidence/s1/128-ac1-consequences.md:9`–`:10`（仓外临时根＋两个 CWD）与 `:217`（对 `%USERPROFILE%` 之外的树**只读**） | 没这发读数，AC#1 只有"两形＋代价"，判据那一格仍不成立 |
 
 ## 5. 没做完的（不许为空）
 
-（待补。）
+1. **没跑任何测试／容器／`icacls`／被编译出来的 exe**（硬红线）。因此下面这些全是**空缺**，不许被当成已成立：
+   - §2.6 名册的"今天绿"一律标〔未跑包，此条来自读断言〕；落地腿要跑 `-count=2 -v ./cmd/wisp/ ./internal/winsec/ ./internal/observe/ ./internal/models/` 对表；
+   - **AC#1 那发真机首启读数**（新目录、先跑常驻腿）未取；
+   - **POSIX 半边未量**（§3.4 给了在哪跑、跑哪一发、两发 TMPDIR 对照与"容器起手先证 `/src/go.mod` 在不在"的仪器自检）；
+   - "宽多少、谁能读到"仍**没有读数**（票面 `:5` 那句维持原样，本腿没升级它）。
+2. **没跑 `go build ./...`**——虽然它在允许清单里，本腿主动不跑：另一枚验收腿正在**独占桌面采样 CPU 与句柄**，一发全模块编译（含 cgo/sherpa）会洗掉它的读数。
+   自证本腿没写坏东西的替代尺＝本腿三枚 commit 的文件清单（`git show --stat` 只看那三枚），**只含 `.scratch/wisp/probes/238/c1/census.md` 一枚文件、零 `.go`**。⚠ 此条是"我用编译换来了另一枚腿的读数干净"，属**口径偏离**，编排者若坚持要编译证据，请在验收轮补跑。
+3. **没量 propagation 走查的开销形状**：形① 会让常驻腿**每次启动**重写整棵数据根的描述符（`winsec_windows.go:588`–`:620`），这与 D32 的启动预算／空闲上限有没有冲突，本腿没算（要算得有读数，而那要跑真进程）。
+4. **`memory.Open` 在 `open.go:170` 用的是 `filepath.Abs`** 这一条我只登记、没有追查它与 D22 ban #2／票 102 那族"改写"的关系（不属本票射程，但会污染"哪个根被谁封"的名册）；要不要单开一枚，请裁。
+5. **没查 `frontend/**`／`design/**`**（红线：零读零写零转述）；没动台账 `docs/reports/*`（按派单：我不写）；没翻票面任何 `- [ ]`，没改票面原文；只在票面 `## Progress log` 末尾**追加**了一条指针。
+6. **票 132 面上那 5 枚勾框一枚未碰**（票面 `:23` 明令"不许顺手把票 132 的 AC 一起翻"）。
+7. **AC#2 的"逐枚"落成本腿的一种读法**（只判目录串，见 §2.1 第 3 点）——⚠ 若编排者认为票面那句"判据必须逐枚"指的是**整棵树每枚文件**，则本腿这一版**没做到**，需按 §4 第 4 条重派；我没有自行扩到那一层，因为扩了就要动票 132 的射程。
