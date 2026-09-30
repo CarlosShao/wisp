@@ -186,7 +186,7 @@
 | `git status --short -- internal/audio/` | **空** ⇒ 突变演练还原后的源文件与已提交状态逐字节一致 |
 | `go test ./internal/audio/ -count=1`（终态） | `ok github.com/CarlosShao/wisp/internal/audio 15.914s` |
 | `git diff 501c6971..HEAD -- .scratch/wisp/issues/241-*.md` | **空**；工单文件仍 `5,944` 字节 ⇒ 五枚 AC 框一枚未碰 |
-| `grep -c "（待填）" docs/evidence/s1/241-audio-level-producer-r1.md` | **0** ⇒ 无占位残留（按 09-30 死腿收尾第三把尺的姿势自量一遍；骨架那一发的八处 `（待填）` 已全部写实） |
+| 占位残留尺 `grep -c "^（待填）$" docs/evidence/s1/241-audio-level-producer-r1.md` | **0** ⇒ 骨架那八处独占一行的占位全部写实（按 09-30 死腿收尾第三把尺的姿势自量）。⚠ 天真形态 `grep -c "待填"` 实测 **1**，那一枚命中就是本行自己引用的模式串（自指），不是残留——把这条写给裁决者，免得它拿"1"当成没写完。 |
 
 本腿到此交件给 `241-v1`（裁决者≠实现者）。⚠ 给裁决者的两把必复尺：§5 那四枚突变请**独立复跑**（`python .scratch/wisp/probes/241/r1/mutation241.py`，它会自存/自还原 pristine），以及 §7 那六发跨包门禁**只有编排者/裁决者能跑**。
 
