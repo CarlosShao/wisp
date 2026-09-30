@@ -1,0 +1,173 @@
+ M .gitignore
+ M .scratch/wisp/probes/152/my152.py
+ M .scratch/wisp/probes/161/r6/logs/flip-1.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-2.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-3.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-4.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-5.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-6.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-baseline.txt
+ M .scratch/wisp/probes/161/r6/logs/flip-restored.txt
+ D design/assets/base.css
+ D design/assets/icons.js
+ D design/assets/theme.js
+ D design/assets/tokens.css
+ M design/doubao/README.md
+ M design/doubao/demo/app.js
+ M design/doubao/demo/index.html
+ M design/doubao/demo/styles.css
+ D design/index.html
+ D design/screens/approval.html
+ D design/screens/ball.html
+ D design/screens/chat.html
+ D design/screens/config.html
+ D design/screens/cost.html
+ D design/screens/firstrun.html
+ D design/screens/palette.html
+ D design/screens/privacy.html
+ D design/screens/security.html
+ D design/screens/states.html
+ D design/screens/tasks.html
+ M docs/evidence/s1/152-subject-death-never-measured-r1-accept-r1.md
+?? .scratch/.scratch/
+?? .scratch/wisp/.scratch/
+?? .scratch/wisp/probes/139/accept-r1/
+?? .scratch/wisp/probes/152/overlay-probe1-on-samppost.json
+?? .scratch/wisp/probes/156/__pycache__/
+?? .scratch/wisp/probes/156/mut-156-r2/asis.log
+?? .scratch/wisp/probes/156/zero156-r4-head.sh
+?? .scratch/wisp/probes/156/zero156-r4-work/
+?? .scratch/wisp/probes/158/r2/
+?? .scratch/wisp/probes/161/r2/__pycache__/
+?? .scratch/wisp/probes/161/r2/ctl/
+?? .scratch/wisp/probes/161/r5/negative-control/
+?? .scratch/wisp/probes/161/r6/logs/flip-7.txt
+?? .scratch/wisp/probes/162/r4/
+?? .scratch/wisp/probes/162/v1-baseline-gotest.txt
+?? .scratch/wisp/probes/176/r1/logs/gate-clauses-end-bad.txt
+?? .scratch/wisp/probes/176/r1/logs/gate-clauses-end.txt
+?? .scratch/wisp/probes/176/r1/logs/gate-clauses-start-bad.txt
+?? .scratch/wisp/probes/176/r1/logs/gate-clauses-start.txt
+?? .scratch/wisp/probes/183/accept-v1/
+?? .scratch/wisp/probes/185/c1/logs/d22scan-post-final.txt
+?? .scratch/wisp/probes/197/v1/
+?? .scratch/wisp/probes/200/gate-start.txt
+?? .scratch/wisp/probes/200/r2/final-cmdwisp-v.txt
+?? .scratch/wisp/probes/200/r2/final-v-roster.txt
+?? .scratch/wisp/probes/200/r2/start-cmdwisp-v.txt
+?? .scratch/wisp/probes/200/r2/start-v-roster.txt
+?? .scratch/wisp/probes/201/c2/msg-ticket219-fix.txt
+?? .scratch/wisp/probes/201/r2/
+?? .scratch/wisp/probes/222/r1/
+?? .scratch/wisp/probes/223/r1-start-green-roster.txt
+?? .scratch/wisp/probes/223/r1/ac4-fourth-run.txt
+?? .scratch/wisp/probes/223/r1/ac4-third-run.txt
+?? .scratch/wisp/probes/223/r1/ac5-full-final.txt
+?? .scratch/wisp/probes/223/r1/build-2.txt
+?? .scratch/wisp/probes/223/r1/cmdwisp-223-all-green.txt
+?? .scratch/wisp/probes/223/r1/cmdwisp-223-first-run.txt
+?? .scratch/wisp/probes/223/r1/cmdwisp-223-second-run.txt
+?? .scratch/wisp/probes/223/r1/cmdwisp-baseline-before-wiring.txt
+?? .scratch/wisp/probes/223/r1/config-223-unit.txt
+?? .scratch/wisp/probes/223/r1/loader-fix-run.txt
+?? .scratch/wisp/probes/223/r1/mgr-refactor.txt
+?? .scratch/wisp/probes/223/r1/msg-docs-batch-0929.txt
+?? .scratch/wisp/probes/223/r1/msg-handoff.txt
+?? .scratch/wisp/probes/223/r1/mutation-m1-gut-wiring.txt
+?? .scratch/wisp/probes/223/r1/mutation-m2-no-confirm-hook.txt
+?? .scratch/wisp/probes/223/r1/vet-1.txt
+?? .scratch/wisp/probes/223/r1/vet-2.txt
+?? .scratch/wisp/probes/223/r2/msg-a441.txt
+?? .scratch/wisp/probes/223/r2/orchestrator-flake20.txt
+?? .scratch/wisp/probes/223/v1/msg-orchestrator-batch-0929b.txt
+?? .scratch/wisp/probes/224/r2/
+?? .scratch/wisp/probes/224/v2/posctrl.go
+?? .scratch/wisp/probes/226/v1/
+?? .scratch/wisp/probes/226/v2/msg-1.txt
+?? .scratch/wisp/probes/226/v2/msg-2.txt
+?? .scratch/wisp/probes/226/v2/msg-3.txt
+?? .scratch/wisp/probes/226/v2/msg-4.txt
+?? .scratch/wisp/probes/226/v2/msg-5.txt
+?? .scratch/wisp/probes/226/v2/msg-6.txt
+?? .scratch/wisp/probes/226/v2/msg-7.txt
+?? .scratch/wisp/probes/228/a1/msg-s1.txt
+?? .scratch/wisp/probes/228/a1/msg-s2.txt
+?? .scratch/wisp/probes/228/a1/msg-s3.txt
+?? .scratch/wisp/probes/228/a1/msg-s4.txt
+?? .scratch/wisp/probes/228/a1/msg-s5.txt
+?? .scratch/wisp/probes/228/a1/msg-s6.txt
+?? .scratch/wisp/probes/228/a1/msg-s7.txt
+?? .scratch/wisp/probes/228/a1/msg-s7b.txt
+?? .scratch/wisp/probes/228/a1/msg-s89.txt
+?? .scratch/wisp/probes/228/a1/msg-skeleton.txt
+?? .scratch/wisp/probes/228/v1/commit-msg.txt
+?? .scratch/wisp/probes/235/orch-rerun/full.txt
+?? .scratch/wisp/probes/239/
+?? .scratch/wisp/probes/241/r1/level.go.pristine
+?? .scratch/wisp/probes/245/
+?? .scratch/wisp/probes/33/r2/d22scan-final.txt
+?? .scratch/wisp/probes/33/r2/gate-final.txt
+?? .scratch/wisp/probes/33/r2/status-final.txt
+?? .scratch/wisp/probes/33/r2/status-start.txt
+?? .scratch/wisp/probes/62/v1/
+?? .scratch/wisp/probes/999/
+?? .scratch/wisp/probes/ci-red/logs/
+?? .scratch/wisp/probes/done-fix-1/msg-07.txt
+?? .scratch/wisp/probes/done-fix-1/msg-104.txt
+?? .scratch/wisp/probes/done-fix-1/msg-105.txt
+?? .scratch/wisp/probes/done-fix-1/msg-110.txt
+?? .scratch/wisp/probes/done-fix-1/msg-80.txt
+?? .scratch/wisp/probes/done-fix-1/msg-89.txt
+?? .scratch/wisp/probes/done-fix-1/msg-a442.txt
+?? .scratch/wisp/probes/orchestrator/msg-245-ac3-fix.txt
+?? .scratch/wisp/probes/orchestrator/msg-a443.txt
+?? .scratch/wisp/probes/orchestrator/msg-a445.txt
+?? .scratch/wisp/probes/orchestrator/msg-a473.txt
+?? .scratch/wisp/probes/orchestrator/msg-a475.txt
+?? .scratch/wisp/probes/orchestrator/msg-a476-a477.txt
+?? .scratch/wisp/probes/orchestrator/msg-ticket245-ac3.txt
+?? .scratch/wisp/probes/pool-2/commit-msg-pool2-2.txt
+?? .scratch/wisp/probes/pool-2/commit-msg-pool2-3.txt
+?? .scratch/wisp/probes/pool-2/commit-msg-pool2-4.txt
+?? .scratch/wisp/probes/pool-2/commit-msg-pool2-5.txt
+?? .scratch/wisp/probes/pool-2/commit-msg-pool2-6.txt
+?? .scratch/wisp/probes/pool-2/commit-msg-pool2-7.txt
+?? .scratch/wisp/probes/pool-2/commit-msg-pool2-8.txt
+?? .scratch/wisp/probes/pool-2/commit-msg-pool2-9.txt
+?? .scratch/wisp/probes/pool-2/commit-msg-pool2.txt
+?? .scratch/wisp/probes/pool-2/msg-a440.txt
+?? .scratch/wisp/probes/signoff-17/SIZE.txt
+?? .scratch/wisp/probes/signoff-30/ov-head/
+?? .scratch/wisp/probes/signoff-30/shot-alive.png
+?? .scratch/wisp/probes/signoff-30/shot-alive2.png
+?? .scratch/wisp/probes/signoff-30/shot-dead.png
+?? .scratch/wisp/probes/signoff-30/stay-1.log
+?? .scratch/wisp/probes/signoff-30/stay-2.log
+?? .scratch/wisp/probes/signoff-30/stay-3.log
+?? .scratch/wisp/probes/signoff-30/stay-4.log
+?? .scratch/wisp/probes/signoff-30/test-ball-after-margin.txt
+?? .scratch/wisp/probes/signoff-30/test-ball-winelive.txt
+?? .scratch/wisp/probes/v4-survey-1/msg-final.txt
+?? .scratch/wisp/probes/v4-survey-1/msg-skeleton.txt
+?? .scratch/wisp/probes/v4-survey-1/msg-t12.txt
+?? .scratch/wisp/probes/v4-survey-1/msg-t37.txt
+?? .zcodeignore
+?? design/doubao/01-ball-states.jpg
+?? design/doubao/demo/lib/
+?? design/doubao/demo/rb-files.js
+?? design/doubao/demo/rb-plugins.js
+?? design/doubao/demo/rb-review.js
+?? design/doubao/demo/rb-terminal.js
+?? design/doubao/demo/rightbar.js
+?? design/doubao/demo/screens/home.js
+?? design/doubao/demo/screenshots/
+?? design/doubao/demo/sidebar.js
+?? design/old/
+?? part1-state1-fixed.txt
+?? part1-state1-pristine.txt
+?? part1-state2-fixed.txt
+?? part1-state2-pristine.txt
+?? part2-nog6-fixed.txt
+?? part2-nog6-pristine.txt
+?? part3-stale-fixed.txt
+?? part3-stale-pristine.txt
