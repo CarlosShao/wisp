@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"path"
 	"strings"
 	"time"
 
@@ -147,11 +148,10 @@ func (l *Ledger) Record(ctx context.Context, tool, pattern string) (int64, error
 		return 0, errors.New("session: grant 需要 tool")
 	}
 	if !recordablePattern(pattern) {
-		// A path C26 could not canonicalize renders with this marker attached
-		// (internal/tools/bridge.go:874). Storing it would store a string no
-		// later call can ever produce, i.e. a row that grants nothing but looks
-		// live in the audit view. Refuse the row instead.
 		return 0, fmt.Errorf("session: 路径模式无法记账（未经 C26 规范化的路径不落 grant）：%q", pattern)
+	}
+	if err := storeablePattern(pattern); err != nil {
+		return 0, err
 	}
 	now := l.now()
 	id, err := l.store.InsertGrant(ctx, memory.ApprovalGrant{
@@ -201,24 +201,29 @@ func (l *Ledger) Covering(ctx context.Context, tool string, paths []string) (int
 		return 0, false
 	}
 	now := l.now().Unix()
-	want := make(map[string]bool, len(paths))
+	remaining := make(map[string]bool, len(paths))
 	for _, p := range paths {
-		want[p] = true
+		remaining[p] = true
 	}
 	var first int64
 	for _, g := range rows {
-		if g.Tool != tool || !want[g.Pattern] {
+		if g.Tool != tool || !grantLive(g, now) {
 			continue
 		}
-		if !grantLive(g, now) {
-			continue
-		}
-		delete(want, g.Pattern)
-		if first == 0 {
-			first = g.ID
+		// One row can discharge several of a call's paths, and a call is covered
+		// only when EVERY path is discharged by SOME live row: the semantics of the
+		// old exact-equality version are preserved for rows that carry no wildcard,
+		// because patternCovers falls back to == for those.
+		for p := range remaining {
+			if patternCovers(g.Pattern, p) {
+				delete(remaining, p)
+				if first == 0 {
+					first = g.ID
+				}
+			}
 		}
 	}
-	if len(want) > 0 {
+	if len(remaining) > 0 {
 		return 0, false
 	}
 	l.log("session: GRANT-HIT tool=%s paths=%d grant_id=%d session=%s", tool, len(paths), first, l.id)
@@ -237,22 +242,21 @@ func grantLive(g memory.ApprovalGrant, now int64) bool {
 	return g.ExpiresAt > now
 }
 
-// recordablePattern is the matcher's whole dialect statement, so it is the one
-// place to look when the question "what counts as 路径模式" gets asked.
+// recordablePattern is the emptiness and un-resolvability gate, shared by the
+// write side and the paths a lookup may be keyed with. It is NOT the dialect -
+// the dialect lives in patternCovers, and the two are separate because a
+// requested path must never be refused for looking like a pattern.
 //
-// TODAY: exact string equality against a canonicalized path, and nothing else.
-// That is the same dialect risk.Gate's B-tier single-file override uses
-// (internal/risk: a map keyed on the resolved path), and it is the only dialect
-// the write side can produce honestly, because Record stores the path the card
-// printed.
+// What it rejects, and why each one is a row that would grant nothing:
 //
-// NOT today: glob. The frozen tests plant rows like filepath.Join(dir, "*")
-// (internal/perm/ticket90_persist_test.go:233), and SPEC-02 §3 names the column
-// `pattern`, so a wildcard dialect is clearly intended - but no document in this
-// repository defines its alphabet, and a wildcard that means "this directory
-// subtree" is a wider blast radius than anything a user clicked. Ticket 224
-// therefore does not guess one; it is registered as an open question in the
-// ticket's progress note rather than settled in code.
+//	empty / blank            - no middle term to match; the DAO refuses it anyway
+//	                           (internal/memory/dao_misc.go:21), so saying it here
+//	                           is about the error the caller gets back.
+//	路径带「无法规范化」标记 - a path C26 could not canonicalize renders with this
+//	                           marker attached (internal/tools/bridge.go:874).
+//	                           Storing it would store a string no later call can
+//	                           ever produce, i.e. a row that grants nothing but
+//	                           looks live in the audit view. Refuse the row.
 func recordablePattern(p string) bool {
 	if strings.TrimSpace(p) == "" {
 		return false
@@ -261,6 +265,75 @@ func recordablePattern(p string) bool {
 		return false
 	}
 	return true
+}
+
+// storeablePattern is the write side's extra condition, and it exists only
+// because of the dialect below: a pattern that carries the wildcard and cannot be
+// compiled would be exactly the shape N#5 was opened to prevent - a row that
+// looks like a rule in the audit view and can never match anything. Refusing it
+// at the door costs the caller an error on an answer that was never expressible,
+// which is cheaper than a live-looking row that silently grants nothing.
+//
+// A pattern without `*` is never compiled, so a literal path whose own name
+// contains a bracket - legal on Windows, e.g. `note[s].txt` - stays storeable and
+// stays an exact match.
+func storeablePattern(p string) error {
+	if !strings.Contains(p, "*") {
+		return nil
+	}
+	if _, err := path.Match(p, p); errors.Is(err, path.ErrBadPattern) {
+		return fmt.Errorf("session: 通配模式语法不合法（path.Match 判 ErrBadPattern），"+
+			"拒绝落盘一行永远不会命中的规则：%q", p)
+	}
+	return nil
+}
+
+// patternCovers is the whole 路径模式 dialect, stated in one function because
+// ticket 224's N#5 asked for it to be decided rather than deferred, and because
+// the matcher is the place where "wider than what was clicked" either exists or
+// does not.
+//
+// THE DECISION: `path.Match` (the standard library's, not a regex, not a
+// hand-rolled second dialect) - and applied ONLY to patterns that carry `*`.
+//
+// Why that one:
+//
+//   - The rows on disk and the paths being judged are both slash form
+//     (filepath.ToSlash on the way in, which is what internal/tools' canonicalizer
+//     hands back and what the frozen guards already write). `path.Match` is
+//     documented for slash-separated paths; `filepath.Match` would make the
+//     dialect depend on the OS separator, and a pattern written on one platform
+//     would silently mean something else on another.
+//   - `*` never crosses a path separator. That is the property that makes a
+//     wildcard row acceptable at all: `dir/*` means "the direct children of this
+//     directory", which is a bounded, readable blast radius. A regex `.*` means an
+//     unbounded subtree, and regex would additionally turn every `.` in a real
+//     directory name into "any character" - a widening by accident of spelling.
+//   - A card prints a canonicalized CONCRETE path, and `*` is not a legal
+//     character in a Windows file name (D7 scopes this product to Windows). So the
+//     `*`-only rule means the wildcards that reach the matcher can only ever come
+//     from a row someone wrote on purpose - never from a path a user clicked. The
+//     companion case TestTicket224PatternWithoutStarIsNeverReinterpreted pins that.
+//
+// Everything else about the term is unchanged and stays exact: `tool`, `scope`,
+// the session key and grantLive's two liveness conditions are compared with ==,
+// and a pattern that carries no `*` is compared with == and never reinterpreted -
+// so `?` and `[abc]` inside an ordinary row mean themselves, not a character class.
+func patternCovers(pattern, p string) bool {
+	if pattern == p {
+		return true
+	}
+	if !strings.Contains(pattern, "*") {
+		return false
+	}
+	ok, err := path.Match(pattern, p)
+	if err != nil {
+		// ErrBadPattern on a row that got in through the DAO anyway: fail closed,
+		// which is the same posture every other branch of this method takes. The
+		// exact test above already ran, so the row still covers its own literal.
+		return false
+	}
+	return ok
 }
 
 func (l *Ledger) log(format string, args ...any) {

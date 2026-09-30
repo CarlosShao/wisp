@@ -191,15 +191,97 @@ M4 那发把它照了出来（nil-recorder 用例在突变下打出 `GRANT-RECOR
 
 ### 选了哪一种、为什么
 
-（待填）
+**定案＝`path.Match`，且只对含 `*` 的模式生效**；其余模式一律逐字相等，永不解释。
+落点＝`internal/session/grants.go` 新增的 `patternCovers`（一个函数说完整个方言），
+写侧另加 `storeablePattern`（含 `*` 而 `path.Match` 编不过的行**当场拒绝落盘**）。
+
+为什么不选另两枚：
+
+- **不用正则**：`*` 在正则里越过 `/`，一枚 `dir/*` 行会变成"整棵子树"，
+  比用户在卡片上看到的东西宽；而正则还会把目录名里每一个 `.` 当成"任意字符"——
+  **拼写本身就能造成越权**，这不是策略选择是能读出来的事故。
+- **不自研**：会多出第二套方言要维护，而且本仓已经有了 `path.Match` 这一套
+  （slash 形式、`*` 不跨分隔符、文档写死）。自研＝日后两侧漂。
+- **不用 `filepath.Match`**：行里存的是 `filepath.ToSlash` 的形式、桥递来的也是规范化后的
+  slash 路径；`filepath.Match` 会让方言随 OS 分隔符变——同一枚行在另一平台上悄悄换个意思。
+- **为什么再叠一条"只在含 `*` 时才解释"**：卡片印的是**具体**路径，而 Windows 文件名里
+  不可能有 `*`（D7 把产品射程钉在 Windows）。于是进入解释器的通配符**只可能来自人故意写的行**，
+  永不可能来自一次点击。`note[s].txt` 被点击后不应把 `notes.txt` 一起授权——
+  `TestTicket224PatternWithoutStarIsNeverReinterpreted` 就是钉这一发的。
+- ⚠ 标准库现跑探针（本腿写的 6×15 真值表）：`/work/[a*` 是 `ErrBadPattern`，
+  而 `/work/[a-z` 与 `/work/]` **不是**错误（不成对的中括号在那儿是字面量）。
+  写侧只拒"含 `*` 且编不过"那一类，其余字面行仍可存、仍只匹配自己。
 
 ### 那枚常驻钉防住的是哪一种失败
 
-（待填）
+防的就是票面点名的**"看着有规则其实从不匹配"**，并顺带防它的两面（写坏与读宽）：
+
+| 用例（`internal/session/ticket224_pattern_dialect_test.go`，`grep -c '^func Test'`＝5） | 钉住的失败形状 |
+|---|---|
+| `TestTicket224WildcardRowCoversAConcretePath` | **HITS**：`dir/*` 行必须真覆盖一个子文件（== 匹配器下这一枚必红＝今天那形）；带 BOUNDS 对照：不跨 `/`、不匹配前缀兄弟目录、不匹配目录自身、工具项仍逐字、部分覆盖仍要问 |
+| `TestTicket224DialectIsPathMatchNotRegex` | **DIALECT**：用 path.Match 与正则**可观测分歧**的三组（`?` 单字符、`[ab]` 单字符类、正则惯用写法 `/work/.*` 在本方言里只匹配字面点开头的名）把"选的是哪一枚"变成读数而不是宣言 |
+| `TestTicket224PatternWithoutStarIsNeverReinterpreted` | **EXACTNESS**：不含 `*` 的行绝不解释 ⇒ 一次点击只可能授权它自己那一条 |
+| `TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk` | 写侧拒收编不过的通配行（盘上零行）＋DAO 硬塞进来的那种行读侧fail-closed，但**仍覆盖它自己的字面串**（兜底是相等、不是沉默） |
+| `TestTicket224PatternCoversIsTheOnlyMatcher` | 方言只住在一个函数里：直接读 `patternCovers` 的真值表，另钉"反斜杠路径不被 slash 模式覆盖"（分隔符漂移的失败形状） |
+
+三发突变的牙（全部〔我现跑〕，用完还原并 `wc -c` 自证）：
+
+```
+M6  patternCovers 退回逐字相等（return pattern == p）
+    ─ FAIL: TestTicket224WildcardRowCoversAConcretePath        （票面那一形当场复现）
+    ─ FAIL: TestTicket224DialectIsPathMatchNotRegex
+    ─ FAIL: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+    ─ FAIL: TestTicket224PatternCoversIsTheOnlyMatcher          ⇒ 4 枚红
+M7  去掉"含 * 才解释"那道闸（每行都送进 path.Match）
+    ─ FAIL: TestTicket224PatternWithoutStarIsNeverReinterpreted
+    ─ FAIL: TestTicket224PatternCoversIsTheOnlyMatcher（a?c.txt 覆盖了 abc.txt）⇒ 2 枚红
+M8  解释器换成 regexp（^pattern$）
+    ─ FAIL: TestTicket224WildcardRowCoversAConcretePath（notes/* 覆盖了 notes 自己＝越宽）
+    ─ FAIL: TestTicket224DialectIsPathMatchNotRegex
+    ─ FAIL: TestTicket224PatternCoversIsTheOnlyMatcher("*" 覆盖了 /anything）⇒ 3 枚红
+```
+
+⚠ 还原口径（与 224-v1 不同处要具名）：`internal/session/grants.go` 这枚文件**本腿有未提交的产码**，
+`git cat-file blob HEAD:` 会把 N#5 的实现一起抹掉，所以这三发用"落盘前 cp 到仓外 /tmp 的干净副本"还原
+（`cp /tmp/grants.224r2.clean`），还原后 `wc -c`＝15008、突变标记计数 0、`grep -c regexp`＝0、三包复跑绿。
+其余三枚（gate.go／session.go／bridge.go）仍一律 `git cat-file blob HEAD:<path> > <path>` 还原并验字节数。
+
+⛔ 这一格是编排者在续做里派给本腿的定案（票面 N#5 逐字"定案一种方言…选一枚并写为什么，并加一枚常驻钉"）；
+224-v1 §6-c 第 4 行曾建议它"待人拍（新 `Q##`）"。**若编排者认为方言属契约级、要 owner 拍，
+本腿的实现可以原样降格为〔待批〕**，判据与牙都已在盘上，换方言只需要换 `patternCovers` 一处。
 
 ## §5 N#6 的处置（收／不收）
 
-（待填）
+**收。** 一句话理由：224-v1 §6-c 第 6 行自己写了"轻：补一枚 interface 型检查即可"，
+而它落在 `internal/tools`（本腿射程内）、只读反射、不碰三枚冻结件——不收就得另立一枚票去补一行断言，
+那正好是本仓反复登记过的"欠账换个号码再活一遍"。
+
+落点＝**新增**一枚用例，⛔ 不改 `TestTicket224GrantSeamCarriesNoCallerSuppliedAuthority` 本体
+（改了就会被读成"放宽/替换前人的判据"，而本腿没有那个授权）：
+`internal/tools/ticket224_setter_scope_test.go` 的
+`TestTicket224BridgeGrantChannelIsOneSeamWithNoSetter`（`grep -c '^func Test'`＝1）。
+
+三半内容：
+
+1. **只许一枚 grant 形状字段**，且类型必须正是 `GrantSource`；第二枚**任何 Kind**（Func／Interface／
+   Struct／Ptr／Map／Slice）都算违规——这正是老那枚只罚 `Kind()==Func` 放过的那条路；
+2. `*Bridge` 上**不许有把动作和 grant 拼在一起的方法**（set/record/revoke/insert/add/delete/swap/replace），
+   也**不许有任何导出的 `Set*` 方法**（运行时改判决链的装配＝构造期决定被绕过）；
+3. 复述 `GrantSource` 仍只有一枚方法且方法名不含上述动词——本文件不许在接口长出写方法时照样绿。
+
+**牙（〔我现跑〕，一发突变定生死）**：M9＝往 `bridge.go` 加一行
+`func (b *Bridge) SetGrants(g GrantSource) { b.grants = g }`：
+
+```
+--- FAIL: TestTicket224BridgeGrantChannelIsOneSeamWithNoSetter
+    ticket224_setter_scope_test.go:87: (*Bridge).SetGrants names an act on a grant: ...
+    ticket224_setter_scope_test.go:94: (*Bridge).SetGrants is an exported setter on the enforcement layer: ...
+```
+
+**同一发 M9 下，老那枚窄射程钉 `TestTicket224GrantSeamCarriesNoCallerSuppliedAuthority` 复跑＝`ok`（不响）**
+⇒ N#6 说的"放过"不是修辞，是实测；本腿补的这枚是那一条路上唯一响的仪器。
+还原：`git cat-file blob HEAD:internal/tools/bridge.go > 同路径`，`wc -c`＝50699→50699、标记计数 0，
+`internal/tools` 全量复跑 ok 12.206s。
 
 ## §6 门禁四数与工作树
 
