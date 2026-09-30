@@ -119,3 +119,12 @@
 5. 界面那一跳（`PanelSnapshot` 补 `tasks?:` 一枚对象键）与本腿无关：本腿没动 marshal 形状，
    红句今天仍是 `Go Snapshot emits [instructions tasks] that interface PanelSnapshot does not declare` 那一族。
 6. 票名里那句「go-side-has-zero-subagent-entity」依旧是历史状态（现量见 §① 那张表）。
+
+### ⑦ 更正（追加，不删上面那条；同钟 2026-09-30 12:11:27 +0800）
+
+§⑤ 里那枚「`go vet ./internal/tools/` rc=1」**只在量到的那一刻成立**（12:04:59 与 12:05:17 两次读数，
+原因是别人**当时还没入库**的 `internal/tools/grant_test.go`：`grantsOf redeclared`／`mustCanonical redeclared`）。
+那枚文件随后以 `8b57a419 test(224)` 落库，本腿在 12:11:27 复跑同一把尺：**`go vet ./internal/tools/` rc=0**。
+⇒ 那条读数是**时序**，不是一枚还挂在那里的缺陷；引用 §⑤ 的人请按本条为准。
+本腿从头到尾没有动过 `internal/tools/` 任何一枚文件（`git log a818df46 657396f0 --name-only` 两枚提交里只有
+`cmd/wisp/subagent_selfapproval_197_test.go`、本票面与本台件三枚路径）。
