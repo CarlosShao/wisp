@@ -21,8 +21,12 @@ import (
 const usage = `wisp - personal voice agent for Windows
 
 Usage:
-  wisp             GUI resident process (boots the runtime skeleton, empty
-                   event loop; the floating ball window is ticket 07)
+  wisp             GUI resident process: boots the runtime skeleton, hosts the
+                   floating ball window, its tray icon and its four global hot
+                   keys in this same process, then parks in an event loop that
+                   takes no task yet (Ctrl+C stops it; the tray's Exit item has
+                   no stop path attached to it, and a ball that cannot be
+                   created is reported and does not stop the boot)
   wisp run "task"  run one task end to end through the agent loop (ticket 12:
                    the S1 text path - streamed reply + notification + exit code
                    that reflects the error class)

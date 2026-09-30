@@ -124,7 +124,14 @@ func (rt *Runtime) RunEventLoop() string {
 	for {
 		if rt.Instance != nil {
 			if code, err := windows.WaitForSingleObject(rt.Instance.ActivateEvent(), 50); err == nil && code == windows.WAIT_OBJECT_0 {
-				slog.Info("activation requested by second launch (ball bring-to-front lands with ticket 07)")
+				// What this loop does with an activation is all it does: book it
+				// and clear it. It has no window to bring forward - the floating
+				// ball belongs to whichever leg hosts it (cmd/wisp's resident
+				// path does, through internal/ball), and no path connects this
+				// event to that window in either direction today.
+				slog.Info("activation requested by second launch",
+					"handled_here", "booked and cleared only",
+					"bring_to_front", "no path from this loop to a window; the ball, when a process has one, is its host's")
 				_ = rt.Instance.ResetActivation()
 			}
 		}
