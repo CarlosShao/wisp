@@ -84,12 +84,175 @@
 | P4 | **采集协程记进哪枚注册表？**（U22：`wasapimic_windows.go:78` 写死 `observe.Default`；`audio.go:180` 那枚收 registry 的 `SpawnCapture` 零调用者；常驻腿用 `rt.Registry`，`resident_ball_windows.go:111`〔起手读数〕） | 把 `WASAPIMicrophone.Start` 改成走传入的 registry（动 `internal/audio` 产码，票 241 的地界？需你定） | 常驻腿只用默认注册表启动（不给 `WithRegistry`），并在测试里接受这一处不同 | 现在不动，登记台账 | 甲，但**这是"改已交付的票 13 产物"**，不是我该定的。见 E6 的假绿后果 |
 | P5 | **降级要不要走 D43 #14 那条边？**（`table.go:97`：`Listening` + `EvAudioDeviceLost` → `Error`。但采集失败发生在**还没进 Listening 之前**，今天球停在 `Sleeping`，U24 常驻腿只会 `SetState(Sleeping/Confirming)`） | 设备失败**不推状态**，只把 `observe.ClassAudioDevice` 的分类＋guidance 文案**响亮地**打印／落日志（票 128 口径：只有没有数据根才拒绝启动，不扩大） | 给 `EvAudioDeviceLost` 找一枚 Sleeping 起点的合法边——但我翻表**没找到**（#14 的 From 只有 Listening），那要改 D43 转移表＝契约面 | 只 `slog.Error`，用户可见面留白 | 甲。**乙一律不要**：改 D43 表只能编排者在台账落 `A##` |
 | P6 | **AC#3 的"只过一枚 `float32`"由谁保证？** 电平函数在 `internal/audio`（`level.go:118 FrameLevel → (float32, error)`），消费口在 `internal/ball`（`liquid_windows.go:42`）。中间那枚读 channel 的人放哪？ | 放 `cmd/wisp`（采集腿自己 `FrameLevel` 再 `SetAudioLevel`）＝零新边，见 ① 方案 A | 新造一枚 `internal/audio/levelfeed` 小包 → 新增两条包级边 | 让 `internal/audio` import `internal/ball` 直接推 → **audio→ball 这条边今天不存在**（U6/U7），且把渲染拖进采集的生命周期 | 甲。乙要多 2 枚直接依赖＋传递名册变化，我用 U10 同法可量，别凭感觉 |
-| P7 | **票面 AC#0 说"由编排者裁后再派 `247-r1`"，但排程又要求 247-r1 排在 246-r2 之后**——若 246-r2 的终态把 `cmd/wisp` 的文件名／钩子注册点改了，我的 ① 文件清单要不要重抽？ | 派单前重跑 U20/U24，以 246-r2 终态为准（我建议） | 直接用本件清单 | 让 247-r1 自己摸 | 甲（E9 的代价可控） |
+| P7 | **AC 框归你，本件只报盘上事实**：246-r2 若改了 `cmd/wisp` 的文件名／钩子注册点，我的 ① 文件清单要不要重抽？ | 派单前重跑 U20/U24，以 246-r2 终态为准（我建议） | 直接用本件清单 | 让 247-r1 自己摸 | 甲（E9 的代价可控） |
+| P8 | **第二枚协程（读 `buf` → 算电平 → `SetAudioLevel`）在 D38(b) 名册里没有槽**（`observe/goroutine.go:42-44` 的 `ResidentNames` 固定 6 名；`:65-82` 对名册外名字返 `CategoryUnknown`；`:270-273` 立刻 `slog.Warn(… leak symptom)`；`internal/audio/level.go:85-88` 逐字写着 "D38b leaves no spare resident slot for a level-only goroutine"） | 电平在**已有的 `audio-capture` 协程内**算完再调 `SetAudioLevel` ⇒ 名册零膨胀。代价：把一次 `FrameLevel`＋一枚跨包调用带进 D38(a) 的 pinned 线程，而 `wasapimic_windows.go:149-152` 的循环自述只列 open/wait/drain/resample/push/hotplug | 新起协程并**复用** `"audio-capture"` 这个名字 ⇒ 仪器不红，但 `Resident` 计数变 2，`PLAN.md:2831` 那句"常驻 6 个"的语义被稀释 | 本票只接**生产者半**（AC#1 的"非测试 importer ≥1"由"采集有人 Start"兑现），消费协程等 ASR/KWS 票——那时读 `buf` 的人本来就必须存在（`audio.go:23-33` 的 C8 契约就是这么设计的） | 甲在语义上最干净但碰 D38(a) 的明文清单；丙最省且不改契约。**我倾向丙**，因为甲／乙都要动一枚已冻结的口径（D38(a) 线程职责 或 D38(b) 名册计数），而那是契约面 |
 
-## ① 落点（填写中）
+## ① 落点：采集协程归常驻腿还是归 `internal/audio` 自起
 
-## ② 隐私闸门（填写中）
+起手钟点 `23:04–23:11 +0800`。凡 `cmd/wisp` 的行号＝〔起手读数，可能被 246-r2 改动〕。
 
-## ③ 降级（填写中）
+### 现状（三条边都靠尺，不靠印象）
 
-## ④ 第六环（形状）（填写中）
+| 事实 | 尺 | 读数 |
+|---|---|---|
+| `internal/audio` 的直接依赖里**只有 `internal/observe` 一枚 wisp 包**，不含 `internal/ball` | U6 | `context encoding/binary fmt …/internal/observe golang.org/x/sys/windows log/slog math os runtime strconv sync sync/atomic syscall time unsafe` |
+| `internal/ball` 的直接依赖是 `observe`＋`statemachine`，**不含 `internal/audio`** | U7 | 同上格式 |
+| `cmd/wisp` 已 import `internal/ball`／`config`／`observe`／`proc`／`statemachine`，**不含 `internal/audio`** | U8 | 名册 41 项，逐条看过 |
+| 全仓产码里**没有一枚**构造采集器、门、有界 channel 或调用电平函数 | U2 + U14 | 两次都空（grep 退出码 1） |
+| `internal/ball` 的非测试 importer 有 4 枚（含常驻腿） | U5 | `cmd/balldebug/main.go` · `cmd/wisp/resident_approval_windows.go` · `cmd/wisp/resident_ball_228_test.go` · `cmd/wisp/resident_ball_windows.go` |
+
+### 形甲：采集协程归常驻腿（`cmd/wisp`，票 246 那枚进程）
+
+**要动的文件**（起手读数，23:10:51 现跑 `ls cmd/wisp/*.go | grep -v _test` 得到 27 枚，下面只列要碰的）：
+
+1. **新增** `cmd/wisp/resident_audio_windows.go`（`//go:build windows`）：建 `NewWASAPIMicrophone()`（`internal/audio/wasapimic_windows.go:52`）→ 包 `NewHalfDuplexGate(inner, PathT, WithStartMuted(...))`（`gate.go:84`／`:57`）→ `NewBoundedFrames()`（`audio.go:65`）→ 读 buf、`FrameLevel`（`level.go:118`）→ `b.SetAudioLevel(float32)`（`internal/ball/liquid_windows.go:42`）→ 一枚响亮 verdict。
+2. `cmd/wisp/resident_windows.go`：在 `startResidentBall(rt.Registry, …)`（`:135`〔起手读数〕）之后接一段，并把退出钩子挂上（见下面"谁 join"）。
+3. **一笔藏不住的额外代价**：常驻腿**今天完全不读 config**。尺：`grep -rln "wisp/internal/config" cmd/wisp/*.go`（23:10:37，排 `_test`）命中 `config_reload.go` · `models.go` · `panel_inbound.go` · `providers.go` · `run.go`——**`resident_windows.go`／`resident_ball_windows.go` 一枚都不在**。所以 `audio.mic_muted_default` 想生效，得先把 config 读进这条腿（或从 `run.go` 把已加载的配置传下去）。⇒ 见 ② 与 ⑦-P1，这是甲形最贵的一笔，不是可选装饰。
+4. **不需要**非 Windows 桩：`cmd/wisp/resident_other.go` 已 `os.Exit(2)` 拒绝起常驻（逐字 "the resident process requires Windows … refusing to start."）；`internal/audio/wasapi_other.go` 提供 `WASAPIMicrophone` 的非 Windows 占位（`Start` 必失败），所以类型面在两个 GOOS 都存在。**但**占位体没有 `Err()`／`ThreadID()`／`Endpoints()`（我逐行看了那份文件）⇒ 消费文件若调这三枚，**必须** windows-tagged。
+
+**新增的包级依赖边**：**恰好 1 枚**，`cmd/wisp → internal/audio`。
+传递名册增量也用尺算了，不是估的：U10 `comm -23 deps-audio.txt deps-cmdwisp.txt` ⇒ **只有 1 名**（`github.com/CarlosShao/wisp/internal/audio`）；`internal/audio` 其余 143 名传递依赖（`internal/observe`、`x/sys/windows`、标准库）**已经在 `cmd/wisp` 的 276 一名册里**。
+⇒ 这枚进程今天的"零新边"叙事（`resident_windows.go:116-121` 注释逐字 "Zero new package-level dependency edges"〔起手读数〕）会被本票**合法地**打破一枚，票面要提前写明，别让验收腿当成越界。
+
+**协程 owner 走不走现成的 `observe.Root`／`rt.Registry`**：
+
+- 采集协程**已经**有 owner：`wasapimic_windows.go:78` ＝ `observe.Default.Spawn("audio-capture", "audio", nil, …)`（U22 现跑）。⚠ 它**写死 `observe.Default`**，而不是常驻腿在用的 `rt.Registry`（`internal/proc/boot_windows.go:79`：没给 `WithRegistry` 时 `rt.Registry = observe.Default`；给了就是另一枚，`resident_ball_windows.go:103-111`〔起手读数〕的注释明说"reg is the runtime's registry, not observe.Default"）。`internal/audio/audio.go:180 SpawnCapture(registry *observe.Registry, run …)` 那枚**收注册表**的入口产码零调用者（U14）。⇒ 两枚注册表并存时，`boot_windows.go:115` 的 `ResidentOverBaseline` 自检看不见采集协程（假绿，⑥-E6，交裁 ⑦-P4）。
+- 名字合法、不越名册：`observe/goroutine.go:42-44` 的 `ResidentNames` 含 `"audio-capture"`，`ResidentBaseline = 6`（`:39`）（U23）。
+- ⛔ 裸 `go func(`：仪器确实会点红——`tools/d22scan/main.go:700-707`（"bare \`go func(\` is banned (D22/D38b): use observe.Registry.Spawn (named, owner, recover boundary)"，`:700` 那行注释说明它不只匹配 FuncLit）。`observe.Registry.run`（`goroutine.go:286`）是全仓唯一被许可的 `go` 语句（`:20-24` 注释逐字 "This file contains the ONLY sanctioned `go` statement of the codebase"）。
+- **电平消费侧那枚"读 buf"的协程在 D38(b) 名册里没有槽**（本件新发现，硬约束）：`ClassifyGoroutine`（`goroutine.go:65-82`，`return CategoryUnknown` 在 `:81`）对名册外名字返回 `CategoryUnknown`，`Spawn`（`:262` 定义）随即在 `:270-273` 打 `slog.Warn("goroutine outside the D38 roster (leak symptom)")`，`RosterReport`（`:405`）把它列进 `Unknown`（`ResidentOverBaseline` 判据在 `:423` 附近，逐字 `rep.Resident > ResidentBaseline`）。票 241 的作者已经预见这件事并把它写进代码：`internal/audio/level.go:85-88` 逐字 —— *"a level reader is called from the consumer's own thread, and D38b leaves no spare resident slot for a level-only goroutine"*。
+  ⇒ 三条出路（我不裁，交 ⑦-P8）：① 电平在**已有的 `audio-capture` 协程内**算完再 `SetAudioLevel`（名册零膨胀，代价是把一次跨包调用带进 D38(a) 的 pinned 线程，而 `wasapimic_windows.go:149-152` 的循环注释逐字只列 open/wait/drain/resample/push/hotplug）；② 新起协程并复用 `"audio-capture"` 这个名字（仪器不红，但 `Resident` 计数变 2，`PLAN.md:2831` 的"常驻 6 个"语义被稀释）；③ 本票只接生产者半（AC#1），消费协程等 ASR/KWS 票——那时读 buf 的人本来就必须存在。
+
+**D38(e) 十步一字不动的前提下，退出时谁 join 它**：第 4 步 `stop-audio` 就是 join 点，接缝**现成**：
+
+- 十步在代码里与 `PLAN.md:2855-2865`（第 1 步在 `:2855`、第 4 步在 `:2859`、第 10 步在 `:2865`，23:15:25 现跑 `grep -n`）一字对齐：`internal/proc/shutdown.go:11-31`（注释）＋ `:36-47`（`StepStopAudio` 是第 4 枚）＋ `:49-60`（名字 `stop-audio`）＋ `:163` `run(StepStopAudio, hooks.StopAudio, 0)`（U21）。
+- 注册面已经通了：`proc.Runtime.RegisterShutdownHook(step, hook)` 在 `boot_windows.go:188`，`shutdown_hooks.go:51` 把 `StepStopAudio` 列进可挂钩名册，`:118-119` 落到 `hooks.StopAudio`（U20）。本仓**唯一**产码注册者目前是 `cmd/wisp/resident_windows.go:156` 的 `proc.StepCancelTasks`（票 246 AC#4）〔起手读数〕。
+- join 的动作本来就在 `Stop()` 里：`wasapimic_windows.go:94-115` —— `cancel()` 之后 `select { case <-done: return nil; case <-time.After(tm.Remaining()): slog.Error("audio capture thread did not exit within 2s (abandoned wait)") }`，上限用 `observe.NewTimeout(2 * time.Second)`（D42#9 单调，**不是**墙钟差）。⇒ 钩子体只需要 `gate.Stop()`／`mic.Stop()`，**不需要新造第 11 步**。
+- ⚠ 诚实边界：我**没有跑到**那枚 switch 分支（禁 build/test），`shutdown_hooks.go:118` 是我读到的分支不是跑到的分支（⑥-E5）。⇒ 交 `247-v1` 钉一条：注册后 `StepRecord.Name == "stop-audio"` 且记录**不是** skipped。
+
+### 形乙：`internal/audio` 自己起协程并推到球
+
+乙分两支，代价不同，都量过：
+
+- **乙-1 直推**（audio 里持有／调用 `*ball.Ball`）：新增**直接边** `internal/audio → internal/ball`，今天不存在（U6/U7）。传递名册**多 2 名**：U28 `comm -23 deps-ball.txt deps-audio.txt` ⇒ `internal/ball`、`internal/statemachine`。两个后果：
+  1. 采集层从此依赖渲染层＋D43 状态机；
+  2. `internal/audio` 在 `wasapi_other.go:6-8` 的明文承诺「the package must still compile on other GOOS values so accidental cross-packages references fail loudly, not silently」**当场破**——`internal/ball` 的 `ball_windows.go`／`d2d_windows.go`／`sta_windows.go` 全是 windows-only。
+- **乙-2 注入**（audio 自己起协程、算电平，出口是传入的 `func(float32)` 或 audio 侧声明的 sink 接口）：**边数与甲完全相同**（还是 `cmd/wisp → internal/audio` 一枚；U29 `comm -13 deps-ball.txt deps-audio.txt` 显示 ball 那侧只多 `internal/audio` 一名，说明 audio 不需要碰 ball 的任何依赖）。⚠ 关键：**乙不比甲少动 `cmd/wisp`**——`mic.Start(ctx, buf)` 总得有人调（`wasapimic_windows.go:69` 是同步等开成功的，见 ②），第 4 步钩子也总得有人注册。乙只是把"第二枚协程"的所有权从常驻腿搬进 `internal/audio`，并把 ⑦-P8 那条名册约束从 cmd 侧搬进 audio 侧。
+
+### 我的建议（仍要编排者裁，我只摆代价）
+
+**甲**。三条，全带尺：
+
+1. **边**：甲 1 枚（U10）／乙-1 1＋1 枚且带渲染依赖（U28）／乙-2 与甲同（U29）。
+2. **AC#3 只过一枚 float32**：甲天然满足——`FrameLevel` 的返回类型是 `(float32, error)`（`level.go:118`），`SetAudioLevel` 的入参是 `float32`（`liquid_windows.go:42`）；`[]byte` 只在 `internal/audio` 内部与那枚有界 channel 里活（`audio.go:29 Start(ctx, buf chan<- []byte)`）。⛔ 任何"把 samples 递过界"的写法在签名面上就红（能力型判据，不是词面型）。
+3. **dt 不该由新协程算**：球自己拥有节律时钟（`liquid_windows.go:77-85 motionDt`），新代码里若写 `time.Now().Sub(...)` 会被 `d22scan` 的 `wallclock-timeout`（`main.go:144` 那条 regexp `\.Sub\(time\.Now\(\)\)`，报在 `:764-766`）点红 ⇒ 甲形里读数的人只交 `float32`，不交时间。
+
+## ② 隐私闸门：接完之后麦克风在什么条件下真的打开
+
+### 三枚开关的真实字段名与默认值（不引派单那句话，只引 `internal/config`）
+
+| 语义名 | Go 字段 | `toml` 路径 | 默认值 | 出处（现读凭据） |
+|---|---|---|---|---|
+| `voice.enabled` | `VoiceSection.Enabled` | `voice.enabled` | **`true`** | `internal/config/schema.go:244`（struct 头）＋ `:245` `Enabled bool \`toml:"enabled" default:"true"\`` ；section 挂点在 `:114 Voice VoiceSection \`toml:"voice"\`` |
+| `wake_word.enabled` | `WakeWord.Enabled` | `voice.wake_word.enabled` | **`false`** | `schema.go:196`（struct 头）＋ `:197` `Enabled bool \`toml:"enabled" default:"false"\`` |
+| **`audio.mic_muted_default`**（本件发现的**第三枚**，也是唯一一枚真挡得住麦的） | `AudioSection.MicMutedDefault` | `audio.mic_muted_default` | **`true`** | `schema.go:269`（struct 头）＋ `:276-277` `// MicMutedDefault starts every session muted.` / `MicMutedDefault bool \`toml:"mic_muted_default" default:"true"\`` |
+
+默认值不是文档口径而是**代码事实**：`internal/config/defaults.go:54-60 NewDefaults()` 走 `applyDefaults`（`:64`），逐叶读 `default:"…"` 标签（`:73`），`reflect` 的 Bool 分支在 `:96`。⇒ 这三枚默认值由标签单点决定（D36 规则 3），**我没有动过任何一格**（本件零产码改动）。
+
+### 这两枚开关今天**有没有**被任何产码用来决定开麦
+
+尺 U13（`grep -rn "Voice\.Enabled\|WakeWord\.Enabled" --include=*.go . | grep -v _test`，23:06）⇒ 产码命中**只有 3 处，全在 `internal/config/manager.go`**：`:370`（reload 分层比较）、`:384`、`:385`（把新值抄回活配置）。**用途是"改了要不要重载"，不是"要不要开麦"**。⇒ 派单说的"方向相反"这一层成立，但更准的说法是：**这两枚今天都还没有方向**，因为没有任何消费者读它们做设备决策。
+
+### 具体形状：**双击 `wisp.exe`、什么都没配的那台机器上，这条腿会不会自己开始采音？**
+
+**不会。但不是被默认值挡住的——是因为今天根本没有那条路径。** 三重，每重都带尺：
+
+1. **常驻腿不 import `internal/audio`**：U2（`grep -rl … internal cmd tools` 空，退出码 1）＋ U8（`cmd/wisp` 名册里没有它）。⇒ 那条腿上**没有能开麦的对象**可被构造。
+2. **常驻腿连 config 都不读**：`grep -rln "wisp/internal/config" cmd/wisp/*.go` 排测试后的命中是 `config_reload.go`/`models.go`/`panel_inbound.go`/`providers.go`/`run.go`（23:10:37〔起手读数〕），`resident_windows.go` 与 `resident_ball_windows.go` **不在其中**。⇒ `voice.enabled` 的值在"一双击"那条腿上**从未被读取**。
+3. **唯一今天喂球的产码是合成数**：U3 ⇒ `cmd/balldebug/main.go:418`／`:477`，而 balldebug 不 import audio（U2/U5）⇒ 与设备无关。
+
+### 那"接完之后"呢——决定权在**接线人装没装门**，不在默认值
+
+| 接法 | 设备会不会在启动时打开 | 决定它的行 |
+|---|---|---|
+| **装了门**，并把 `mic_muted_default` 的值传进 `WithStartMuted`（`internal/audio/gate.go:57`） | **不会**。`HalfDuplexGate.Start`（`gate.go:99-112`）的明文是 `if g.effectiveOpen() { g.open = g.openInnerLocked() }`；`effectiveOpen()`（`gate.go:234-241`）第一行 `if g.muted { return false }`；`openInnerLocked()`（`:247-252`）根本不跑 ⇒ 内层 `mic.Start` 不跑 ⇒ `wasapi_windows.go:210 Open` 不跑 | `gate.go:108`（那个 `if`）× `gate.go:235-237`（muted 先返回）× `schema.go:277`（默认 true） |
+| **没装门**，直接 `mic.Start(ctx, buf)` | **会，而且是一双击就开**。`WASAPIMicrophone.Start`（`wasapimic_windows.go:69-88`）在 `:78` 起 pinned 协程后 `:88 return <-started`——**同步等开成功**；`started` 只有在 `run` 里 `openCurrent()` 成功之后才送 nil（送 nil 在 `wasapimic_windows.go:182`，两处失败早送 `started <- err` 在 `:170`／`:178`） | `wasapimic_windows.go:88` ＋ `:182` |
+
+⇒ **一句话结论**：挡住采音的既不是 `voice.enabled=true` 也不是 `wake_word.enabled=false`，而是"没人接线"这件事本身；接线时唯一可用的默认是 `audio.mic_muted_default=true`（`schema.go:277`），**而它只在门被装上时才生效**。这就是 ⑦-P1 要裁的东西（甲＝强制 `WithStartMuted(c.Audio.MicMutedDefault)` 且 `voice.enabled=false` 时不构造采集器）。
+
+### "如果改了默认值会怎样"（本票零改动，只讲清）
+
+- `audio.mic_muted_default` → `false`：`WithStartMuted(false)` ⇒ `effectiveOpen()` 为真 ⇒ **装了门的接法也会在启动时开设备**。这是三枚里唯一**直接改变开麦行为**的默认。
+- `voice.enabled` → `false`：**今天零后果**（U13：无决策读取处）。只有当接线人按 ⑦-P1 甲把它变成"不构造采集器"的条件后，它才开始挡；也就是说它的约束力是**接线造成的，不是默认值自带的**。
+- `voice.wake_word.enabled` → `true`：**今天同样零后果**，且 KWS 落地属唤醒词票（票面 AC#7 明列"唤醒词／ASR／TTS 都不属于本票"）。附带一条同向证据：进 `Armed` 的 `EvKwsEnabled` 产码零发射者（U16）。
+- ⚠ 别把"零后果"读成"无关"：`voice` 与 `wake_word` 的 `Enabled` 都在 reload-tier（`schema.go:240-243` 注释＋`manager.go:384-385`），改了会走 `rep.Reload = append(rep.Reload, "voice")`（`manager.go:412`）。
+
+## ③ 降级：设备被占／无权限／无麦／热插拔现在返回什么
+
+下面每条都是**用例的断言本体**（`sed` 逐行读），不是用例名字。文件：`internal/audio/hotplug_test.go`。
+
+| 形态 | 用例（行号） | 断言本体（逐行读到的判据） | 错误落在哪一行 |
+|---|---|---|---|
+| **设备被占**（别的程序独占） | `TestOpenOccupiedAndPermissionDenied` `hotplug_test.go:378`（注释 `:376-377`） | ① `mic.Start(ctx, buf)` **必须返回 error**（`:403-406`，逐字 "Start must fail when the device cannot be opened (D42#12)"）；② `observe.ClassOf(err) == observe.ClassAudioDevice`（`:408-411`）；③ 错误串**必须含设备名** `"Busy Mic"`（`:413-415`）；④ 必须含 `inUseGuidance`（`:417-419`）；⑤ `mic.Stats().LastError != ""`（`:420-422`，逐字 "must record the open failure"） | `device.go:100-101`（`hrAUDCLNTDeviceInUse = 0x8889000A`，码在 `:77`）→ 文案 `device.go:89 inUseGuidance`（逐字 "capture device is held in exclusive mode by another application; close that application or pick another device"） |
+| **无权限** | 同一枚用例的第二个 case（`:392-395`） | 同上五条，guidance 换 `privacyGuidance` | `device.go:98-99`（`hrEAccessDenied = 0x80070005`，码在 `:72`）→ 文案 `device.go:86 privacyGuidance`（逐字给出 Windows 设置路径 "Settings > Privacy & security > Microphone"） |
+| **热插拔：默认设备换掉** | `TestHotplugReenumerateOnce` `:199` | 初始 `openCount()==1`（`:222-224`）；帧先流出（`:225`）；`watcher.fireChange()` 后帧**继续流**（`:229-231`）；`openCount()` **恰为 2**＝只重举一次（`:232-235`）；第二枚 open 用的是**新默认设备 dev2**（`:236-242`）；`Stats().Reopens == 1`（`:243-245`）；再 fire 一次 ⇒ `Reopens==2 && openCount==3`（`:246-251`）；收尾 `mic.Err()` 必须为 nil（`:254-256`） | 循环体 `wasapimic_windows.go:194-203`（`case <-m.hotplug:` 在 `:194`，重开成功 ⇒ 换流＋换重采样器 `:200-203`）＋ `reopenOnce` `:270-281`（成功 `slog.Info` 且 `meter.reopened()`） |
+| **热插拔：重开失败（陈旧句柄）** | `TestHotplugStaleHandleFailsLoudly` `:260` | 终态错误经 `mic.Err()` 出来：分类 `ClassAudioDevice`（`:303-306`）、**含设备名** `"Dying Mic"`（`:308-310`）、含 `inUseGuidance`（`:311-313`）；`Stats().LastError` 非空（`:320-322`）；`openCount()==2`＝只试一次（`:323-325`）；**并且 buf 从此不再出帧**（`:328-340`，注释逐字 "no silent stale flow"） | `wasapimic_windows.go:195-199`（重开失败 ⇒ `meter.fail` ＋ `postErr` ＋ `return`）；`handleStreamError` `:240-256`；`postErr` `:283-287`（非阻塞，永不卡循环） |
+| **热插拔：重举本身就失败** | `TestHotplugReenumerateFailureNamesDevice` `:334` | 终态错误**必须含上一枚设备名** `"Unplugged Mic"`（`:361-364`）＋分类 `ClassAudioDevice`（`:365-368`） | `reopenOnce` `wasapimic_windows.go:271-275`，错误串逐字 "hotplug reopen failed; keeping no stale handle (previous device …)" |
+| **无麦／枚举失败** | （**没有专属用例**，我如实说） | `openCurrent()`（`wasapimic_windows.go:258-264`）把 `DefaultCaptureDevice()` 的错误 `observe.Wrap(ClassAudioDevice, err, "capture device enumeration failed")` 包成终态；枚举层的原始错误在 `mmdevice_windows.go:86-87`（逐字 `"GetDefaultAudioEndpoint(flow=…) failed (HRESULT)"`）与 `:93-94`（`GetId failed`） | ⚠ **一处文案缺口**：设备不存在时 `GetDefaultAudioEndpoint` 返 `hrAUDCLNTNotInit = 0x88890001`（码在 `device.go:74`），而 `DeviceError` 的 switch（`device.go:97-110`）里**没有 NotInit 这一枚 case** ⇒ 走 `:109` 的 default，只给码不给建议。**这条是我读 switch 读出来的，没跑到**（⑥-E5 同源）；且它走的是 `Wrap` 而非 `DeviceError`，所以实际串形要以真机读数定，我不替它编 |
+
+### 本进程该怎么"照跑并把损失说响亮"——仓里有现成参照系，不用新造
+
+| 参照 | 行号 | 它的形状（读到的，不是概括的） |
+|---|---|---|
+| **球起不来 ≠ 停止启动** | `cmd/wisp/resident_ball_windows.go:139-145`〔起手读数〕 | `ball.New` 失败 ⇒ 设 `rb.verdict`（逐字 "this process has NO floating ball window: %v"）＋ `slog.Error` ＋ `fmt.Printf`，然后 **`return rb`，不是 `os.Exit`**；同文件 `:125-126` 注释逐字 "Errors are returned as a verdict, never as a failure to boot"；调用侧 `resident_windows.go:132-134` 注释逐字 "A ball that will not come up does not stop the boot" |
+| **日志目录开不了 ≠ 停止启动** | `cmd/wisp/resident_windows.go:62-69`〔起手读数〕 | `slog` 没装上就 `fmt.Fprintf(os.Stderr, …)`，注释逐字 "Loud, and it does not stop the app" |
+| **只有"没有数据根"才拒绝启动**（票 128 的口径，不许扩大） | `internal/proc/boot_windows.go:80-84` ＋ `cmd/wisp/resident_windows.go:45-48`〔起手读数〕 | `DefaultLayout(env)` 失败 ⇒ `return nil, err`；`runResident` 拿到 err ⇒ `os.Exit(1)`。同族的硬拒只有 Job Object（`boot_windows.go:91-95`）与单实例互斥（`:98-107`）。**音频设备不在这一列** |
+| （票 128 本身） | `.scratch/wisp/issues/128-resolvedatadir-…md` | 标题与 AC#2/AC#3 是"refusal"（拒绝启动）口径——我**没有**在本件把它读成"任何失败都可拒起"，反向引用见上面第三行 |
+
+⇒ 建议形态（**零默认值改动、零拒绝启动扩大**）：采集侧任一形态失败 ⇒ ① 球继续停在 `Sleeping`、任务管线继续跑；② verdict／日志把 `observe.ClassAudioDevice` 的分类**和 `DeviceError` 已经编码进串的 guidance 原文**一起说出来，并具名是哪一形（被占／无权限／无设备／热插拔失效）——因为文案已经在 `device.go:86/89/103/105/107` 五处备好了，不需要新写；③ 顺带把 `mic.Stats()`（`wasapimic_windows.go:133`）的 `Reopens`／`FramesDropped`／`LastError` 说响亮（D38d 的"静默丢帧禁止"口径在 `audio.go:80-89`＋`audio.go:136-142`）。
+
+⛔ **不能走状态机那条边**：`internal/statemachine/table.go:97` 的 D43 #14 是 `From: StateListening, Event: EvAudioDeviceLost, To: StateError`——`From` **只有 `Listening`**。而常驻腿今天到达的状态只有 `Sleeping` 与 `Confirming`（U24：`resident_approval_windows.go:443` `b.SetState(stateForCardLevel(p.Level))` 与 `:492` `b.SetState(statemachine.StateSleeping)`〔起手读数〕）。启动期采集失败**没有合法边**可走；硬造一枚 `EvAudioDeviceLost` 的 Sleeping 起点＝改 D43 转移表＝契约面。⇒ ⑦-P5 交裁，并明确建议"乙一律不要"。
+
+⚠ SPEC-05 §3.4 的"分类＋可见"口径我是**借**来的（`docs/specs/SPEC-05-agent-core.md:76-88`，尺 U27 现跑：那张表的主语是 LLM provider 的 429/5xx/401/额度，**没有一行讲音频设备**）。借得对不对写进 ⑥-E12；本节的硬凭据一律挂在 `D42#2/#12` ＋ `observe.ClassAudioDevice` ＋ `device.go` 那五处文案上。
+
+## ④ 第六环（形状）：`liquidDriven` 当前实际含哪几态
+
+### 逐行读数（`internal/ball/liquid.go:62-70`，读的是 switch 里的六个标识符本身）
+
+```
+:62 func liquidDriven(s statemachine.State) bool {
+:63   switch s {
+:64     case statemachine.StateListening, statemachine.StateThinking,     ← 含 ①Listening ②Thinking
+:65       statemachine.StateSpeaking, statemachine.StateConversation,     ← 含 ③Speaking ④Conversation
+:66       statemachine.StateWarm, statemachine.StateActing:               ← 含 ⑤Warm ⑥Acting
+:67       return true
+:68   }
+:69   return false                                                        ← 其余全部为 false
+:70 }
+```
+
+⇒ **当前实际包含的正好 6 枚**：`Listening` · `Thinking` · `Speaking` · `Conversation` · `Warm` · `Acting`。
+⇒ **不含**：`Armed`、`Muted`、`Sleeping`、`Confirming`、`AwaitingApproval`、`Settling`、`Downloading`、`Unconfigured`、`NoNetwork`、`Error`、`Queued`、`Stuck`、`WatchdogAlert`、`FirstRun`（状态全名册 **20 枚**，逐行读自 `internal/statemachine/states.go:10-30`，同文件 `:8-9` 注释逐字 "The 20 states, names exactly as in D43 / SPEC-08"；23:14:27 现跑）。
+⇒ 同一份代码里的自述（`liquid.go:59-61`）逐字：*"liquidDriven reports whether a state receives audio-driven motion. Only session states do; Sleeping/Armed/Muted and the failure helpers are static glass frames by D32 discipline."* ——**"Armed 不进驱动表"是被当成 D32 纪律写下来的，不像是漏了**。这一句是本节判读的支点（但注释不算凭据，所以我另找三条实码，见下）。
+
+调用点三处（尺：`grep -rn "liquidDriven" internal/ball cmd | grep -v _test`）：`liquid_windows.go:56`（`applyLevel` 的第一道闸）、`liquid_windows.go:162/:164`（`motionStateChanged` 决定 beginSession/endSession）、`liquid.go:119`（`enterState` 决定 border 权威）。
+
+### 判"接好了"要不要看 `Armed` 收到电平？我的判读：**本票不该以它为判据**
+
+三条，每条都带尺：
+
+1. **`Armed` 今天不可达**。进入它的唯一合法边是 `internal/statemachine/table.go:55`（D43 #5：`From: StateSleeping, Event: EvKwsEnabled, To: StateArmed`；spec 侧同一行在 `docs/specs/SPEC-08-ui-ball-panel.md:93`）。而 `EvKwsEnabled` 在产码里**零发射者**（U16：命中只有 `events.go:18` 定义与 `table.go:55` 表格行）；常驻腿只 `SetState` 到 `Sleeping`／`Confirming`（U24）。⇒ "看 Armed 收到电平"这七个字**没有可执行的取证路径**，除非实现者另造一枚状态入口——那是伪造，不是接线。
+2. **改表＝契约面**。`docs/specs/SPEC-08-ui-ball-panel.md:61`（U26 现跑）逐字 `| Armed | opacity 0.6，直径 44px，静态 |`。把 Armed 放进 `liquidDriven` 而不同批改这行"静态"，代码与冻结表就互相打脸；而同批改 `docs/specs/**` 是本票 **AC#7 明令退回**的路径。⇒ 这条路只能在编排者台账落一枚 `A##` 之后走（票面禁区第一条）。
+3. **地界与票 62／74 重叠**（如实收窄，别说过头）：`internal/ball/tokens_test.go:141` 注释逐字点「SPEC-08 §2.1 anchors. The Sleeping size/opacity, **Armed**, Muted and the …」，`:155-156` 断言 `VisualFor(p, 56, StateArmed, 0).Opacity == 0.6`，`:298`／`:318` 把 Armed 列进静态态名册（U17）。⚠ 但 `applyTo`（`liquid.go:312-324`）只写 `LiquidLevel`/`LiquidAngle`/`SummonFlow`/`BorderAlpha`，**不写 `Opacity`** ⇒ 那枚断言**未必真红**（⑥-E8）。我说的是**同一枚状态的视觉真相归票 62／74**这个地界事实，不是"必然失败"。
+
+### 真要"补 Armed 那一格"，要动的文件（只列，不建议本票做）
+
+`internal/ball/liquid.go:62-67`（switch 加名）＋ **必须同批** `docs/specs/SPEC-08-ui-ball-panel.md:61` 的"静态"二字＋ 复核 `internal/ball/tokens_test.go:298/:318` 的名册与 `internal/ball/statevisual.go:158`／`:288` 的 Armed 映射（两处 `case statemachine.StateArmed:`，U16 读到）＋ 另给 `EvKwsEnabled` 找一枚发射者（那是唤醒词票的地界，AC#7 禁入）。
+
+### 本节最重要的产出（给编排者裁 AC#2 用）
+
+即使本票把电平接进常驻腿，**"球动了"今天仍然不可见**，两道独立的闸都在代码里、都不在本票的地界：
+
+1. `prototypeVisuals` **默认关**：`internal/ball/statevisual.go:102` `var prototypeVisuals bool`；打开它的产码调用者**只有** `cmd/balldebug/main.go:122`（U15）；`SetAudioLevel` 在它关的时候**直接 return**（`internal/ball/liquid_windows.go:51-54`）。⇒ 而 `statevisual.go:93` 注释逐字写明"翻默认值是 ticket 68 AC#2"。
+2. 常驻腿能到达的状态（`Sleeping`／`Confirming`）**两枚都不在 `liquidDriven` 里** ⇒ 电平即使送达也会被 `applyLevel` 记进 `b.liqRaw` 后丢弃（`liquid_windows.go:56-63`）。
+
+⇒ 所以本票**能**证到的是"真麦克风的电平进了球的门"（AC#2 那两枚不同的 `float32` 读数），**证不到**"球在呼吸"。把"接好了"的判据挂在 `Listening` 上也不行——那枚状态本票不产生（`EvSummon` 的边在 `table.go:51`，发射者同样不在本票地界）。这条判断直接进 ⑦-P2／P3，请裁。
