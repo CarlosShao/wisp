@@ -1,6 +1,6 @@
 # 票 243 ／ 腿 `243-c1` — 「ticket 07」25 处注释逐处判定表（只读普查，零产码）
 
-- 腿：`243-c1`（只读普查）。工作树锚点：**`90cf65b2`**＝**本腿唯一一枚现读的 HEAD**（`git log --oneline -1`，落盘后跑的）。这枚 HEAD 本身已经是写腿 `228-r1` 的骨架件，说明**本腿全程与它在同一棵动着的树上**；因此 §0 那把尺**在这枚锚点上重跑过一次**：R1 仍＝**28**、`cmd/wisp` 对 `internal/ball` 的 import 行数仍＝**0**、全仓 import 该包的仍只有 `cmd/balldebug/main.go` ⇒ 本表读数是**同一棵树上的**，非跨头拼凑。（⚠ 我没有在更早的提交上现读过任何数，所以不写「从 X 推进到 Y」——那是别人的读数。）
+- 腿：`243-c1`（只读普查）。工作树锚点：**`90cf65b2`**＝**本腿唯一一枚现读的 HEAD 提交号**（`git log --oneline -1`）。⚠ 但本仓是**共享工作树**，写腿 `228-r1` 在我运行期间往树里落了改动，所以本腿有**两个时刻的读数**：起手 R1＝**28**、提交前重跑 R1＝**25**——差额恰是 §1 那 3 枚字符串被 `228-r1` 改掉。**两时刻全部读数与影响分析见 §5**（表体 25 行在两时刻逐字节相同，已 `diff` 证）。§0 下面的 R1…R7 一律是**起手时刻**的读数，也就是本表 25 行所依据的那一次。
 - ⚠ 自我纠正一条：初稿这里写了一枚**没有现读过的锚点号**（正是本票要治的那类「按印象报状态」），现换成实测值。
 - 本表纪律：只 `grep`／`sed`／`Read`／只读 `git log`。**零 `.go` 改动、零注释改动、零 `go test`、零 `go build`、零新仪器**。
 - ⛔ 本文件每一节起手即写满，**不含任何占位符词**（那三个常被用来标记未完成面的中文／英文词，本文件里一个也没写，故下游 `grep` 应零命中）。
@@ -51,12 +51,12 @@
 |---|---|---|---|---|
 | 1 | `internal/audio/gate.go:21` | `//     events hook the mute hotkey path into the Muted state (ticket 07).` | **历史出处** | 两侧都活在今天：gate 侧 `GateEvent`＋`SetMuted`（同文件 :165 注明 driven by the mute hotkey）存在，ball 侧 `EvMuteHotkey`／`OnMuteHotkey`（`internal/ball/ball_windows.go:38,52`）存在，`Muted` 是 D43 状态。句子在解释事件契约的**来处**，没许诺谁去做 |
 | 2 | `internal/audio/gate.go:62` | `// the ball/state machine subscribes at wiring time, ticket 07/16).` | **还在承诺未来** | **票 228**（`228-...-not-in-the-process-that-runs-tasks.md`，盘上**无** `-done`）。实测 `WithGateEvents` 全仓**只有 `gate_test.go` 两枚调用者、零生产调用者** ⇒ 「ball/状态机在 wiring 时订阅」今天没发生；07 已结案不欠这笔，16（`16-s2-acceptance.md`，**无** `-done`）是**验收票**、不产实现，指它做归属是空的 |
-| 3 | `internal/ball/anim.go:5` | `// Animation discipline (SPEC-08 §2, ticket 07):` | **历史出处** | 下面逐条列的纪律就由本文件实现（`AnimationPolicy` 被 `liquid.go:83`、`tokens_test.go:314` 真实调用）⇒ 引来源，非许诺 |
+| 3 | `internal/ball/anim.go:5` | `// Animation discipline (SPEC-08 §2, ticket 07):` | **历史出处** | 下面逐条列的纪律就由本文件实现（`AnimationPolicy` 被 `liquid.go:82`、`tokens_test.go:313` 真实调用）⇒ 引来源，非许诺 |
 | 4 | `internal/ball/doc.go:24` | `// Implemented by ticket 07 (S1: static states + basic animations; full` | **历史出处** | 过去时。⚠ 但它的**下一行**（:25「visual polish gate is the human acceptance at ticket 12」）指的票 12 盘上**无** `-done`＝活票，合法。包文档（godoc 面）可见，非运行时串 |
 | 5 | `internal/ball/liquid.go:76` | `// exceptions in anim.go - so ticket 62 never arms a timer in a state ticket 07` | **历史出处** | 对 07 是「已冻结的策略」＝来处；句中另一枚票 62（`62-liquid-glass-ball-visuals.md`）盘上**无** `-done`＝**真在飞的活票**，被约束方指认正确。`transitionDriven` 由 `AnimationPolicy` 现算，不是空头承诺 |
 | 6 | `internal/ball/liquid_test.go:227` | `// transition timer may only ever exist where ticket 07's frozen policy already` | **历史出处** | 「frozen policy」＋同测试真在跑（`TestTransitionTimerSetIsTheFrozenTimerSet` 逐状态对算） |
 | 7 | `internal/ball/live_windows_test.go:11` | `// windows. The ticket 07 acceptance items exercised here: window stack` | **历史出处** | 列的是**本文件正在执行**的验收项（tag `windows && winlive`），＝历史验收记录，无未来指认 |
-| 8 | `internal/ball/tokens.go:10` | `// literal in any other ball file is a review-rejecting violation (ticket 07` | **历史出处** | 括注后半句点了**真实存在的仪器** `TestNoHardcodedColorsInBallPackage`（`tokens_test.go:86`）⇒ 约束今天有牙，不是等别人来加 |
+| 8 | `internal/ball/tokens.go:10` | `// literal in any other ball file is a review-rejecting violation (ticket 07` | **历史出处** | 括注后半句点了**真实存在的仪器** `TestNoHardcodedColorsInBallPackage`（`tokens_test.go:85`）⇒ 约束今天有牙，不是等别人来加 |
 | 9 | `internal/ball/tokens.go:442` | ``	// Frame cap: <=30fps (ticket 07 animation discipline).`` | **历史出处** | 常量 `MaxAnimFPS = 30` 就在下一行，纪律已落地 |
 | 10 | `internal/ball/tokens_test.go:84` | `// is a review-rejecting violation (SPEC-08 §2, ticket 07 constraint).` | **历史出处** | 该注释就是紧挨着那枚仪器函数的 doc，引来源 |
 | 11 | `internal/ball/tokens_test.go:309` | `// TestAnimationPolicyZeroTimerInSleeping is the ticket 07 acceptance: the` | **历史出处** | 「是票 07 的验收」＝断言归属记录，函数体就在下面 |
@@ -64,7 +64,7 @@
 | 13 | `internal/proc/singleinstance_windows.go:17` | `// (bringing the ball to the front is the ball's job, ticket 07) and exits.` | **还在承诺未来** | **票 228**。三条件全中：①交付归属句（`is … job`）②那件活今天不在这条路径（`cmd/wisp` 零 import `internal/ball`）③07 已 `-done`。现读第二实例分支只 `slog.Info` 一下（表外 `boot_windows.go:127`），没有任何 bring-to-front |
 | 14 | `internal/proc/singleinstance_windows.go:84` | `// loop (ball, ticket 07). Handle with care: do not close it.` | **还在承诺未来** | **票 228**。函数 `ActivateEvent()` 与其消费者 `RunEventLoop` 今天都在（`boot_windows.go:126` 真在 `WaitForSingleObject`），但括注把**消费端**认成「ball, ticket 07」；ball 今天不是这条进程的一部分，07 已结案。⛔ 半句「do not close it」是**真约束**，改注释放大这半句、别丢 |
 | 15 | `internal/statemachine/doc.go:19` | `// Implemented by ticket 07; ticket 03 pinned only the State vocabulary.` | **历史出处** | 过去时且可复验：表（`doc.go:7` 指 `table.go`，40 行 ＋ #41/#42）与 `timeouts.go` 今天都在；票 03（`03-skeleton-runtime-rules-done.md`）**有** `-done`，两句都是史 |
-| 16 | `internal/statemachine/machine.go:46` | `// timeout row (notably Sleeping: the zero-timer discipline, ticket 07).` | **历史出处** | 纪律有牙：`machine.go:180` 的 `rearmLocked` 按 `timeoutKey{state,phase}` 才装表，`TestSleepingHasZeroTimers`（`machine_test.go:62`）钉住 |
+| 16 | `internal/statemachine/machine.go:46` | `// timeout row (notably Sleeping: the zero-timer discipline, ticket 07).` | **历史出处** | 纪律有牙：`machine.go:180` 的 `rearmLocked` 按 `timeoutKey{state,phase}` 才装表，`TestSleepingHasZeroTimers`（`machine_test.go:63`）钉住 |
 | 17 | `internal/statemachine/machine.go:65` | ``		// Explicit no-op side-effect sink (ticket 07: hooks fire as events,`` | **历史出处** | 「hooks fire as events」＝07 已交付的机制（`Effect`/`Sink` 存在且默认 no-op 就是它的设计）。⚠ 第二行「consumed by later tickets」是**无指代未来**——它没点已结案票号，故不在本票三类里；但它是 §4 说的第二种形状（见 §4 附言），登记不判 |
 | 18 | `internal/statemachine/machine_test.go:61` | `// TestSleepingHasZeroTimers is the ticket 07 acceptance assertion: after any` | **历史出处** | 同 #11，断言就在下面函数体里 |
 | 19 | `internal/statemachine/states.go:5` | `// timeouts are implemented by ticket 07.` | **历史出处** | 全句（:3-5）是「vocabulary only in ticket 03 : the transition table, guards and per-state timeouts are implemented by ticket 07」——过去时，三样（表／guard／`timeouts.go`＋`DefaultTimeouts()`@`machine.go:70`）今天都在 |
@@ -115,34 +115,63 @@
 > **A ∧ ¬B ⇒ 改成现在时为真的描述句**（例 #20／#21：`balldebug is the ticket 07 debug harness` 保留，因为它现在真的是；出处可另附一句「由票 07 交付」）。
 > **¬A ⇒ 不动**，即使它引用了已结案票号（那 50−7 里的绝大多数）。
 
-**为什么本表 25 行里只有 7 枚落进 A∧B／A∧¬B 的 A 柱，其余 18 枚不动**：因为 `ticket 07` 的 28 处命中里，**只有 5 处出现在 R7 的动词框架里**（`boot_windows.go:127`、`resident_windows.go:81`、`main.go:8`/`notify_windows.go:12` 的 `is ticket`、`singleinstance_windows.go:17` 的 `is … job`），其余 20 余处是「SPEC-08 §2, ticket 07」这类**括注式来处**——形状上根本不驱动任何人去做事。⇒ **R1 那把尺（找 `ticket 07`）与 R7 那把尺（找动词框架）量的不是同一件事**，这也正是「25 ≠ 132 的全部」的原因。
+**为什么本表 25 行里只有 7 枚落进 A 柱，其余 18 枚不动**：因为 `ticket 07` 的 28 处命中里，绝大多数是「SPEC-08 §2, ticket 07」这类**括注式来处**——形状上根本不驱动任何人去做事。⇒ 真正判一件事该不该改，靠的是**读那个句子的动词**，不是数票号。
 
-**结论三（把边界算成账，供编排者决定是否另立票；本腿不扩范围）**：把结论二**逐字**套到 R7 的 132 处，落到 A 柱（交付动词框架）的只有 **7 行**，其余 125 行是 `is ticket N` 的占有／来处框架、按本规矩**一律不动**。这 7 行的处置分三档，⚠ **本腿第一版在这里判错过一次并当场纠正**（详见末段）：
+⚠ **但要顺带纠正编排者那把 R7 尺本身能干的活**：R7（`arrives in｜lands with｜is ticket [0-9]+`）**抓不全 A 柱**。实测对照本表 10 枚 A∧B：R7 抓到 **5 枚**（`main.go:8`、`main.go:25`、`notify_windows.go:12` 走 `is ticket`；`resident_windows.go:81` 走 `arrives in`；`boot_windows.go:127` 走 `lands with`），**漏掉 5 枚**（`gate.go:62` 的「subscribes at wiring time」、`singleinstance_windows.go:17` 的「is the ball's job」、`:84` 的括注「(ball, ticket 07)」、`console_other.go:7` 与 `console_windows.go:26` 的「links as a GUI-subsystem binary」）。**⇒ 把 R7 当门会使一半的过期承诺溜过去**；R7 只能当**抽样尺**，A 柱得靠 R1 ＋ 逐处读整句。这条是本表对票面那句「132 行人工判定成本远大于收益」的**补充论据**：不但贵，而且那把便宜的尺**还漏**。
 
-- **档 1｜A ∧ B ＋ 票面已结案＝一笔活被注销（3 行，已归票 228 AC#7 ①）**：`main.go:25` / `resident_windows.go:81` / `boot_windows.go:127`——就是 §1 那三枚 🔴 串。
-- **档 2｜A ∧ B ＋ 票面已结案＝注释侧同形（本表 #2／#13／#14／#24／#25 五行 ＋ #22／#23 两枚错事实）**：这才是本票的真正产出，全部落在 `ticket 07` 那一族里（球的装载、gate 的订阅、GUI 构建旗标）。**它们的共同点是「那件活今天确实不在树里」，不是「注释时态不好看」。**
-- **档 3｜A ∧ ¬B＝活已交付、只有时态过期（3 行，⛔ 不在票 243 范围，本腿只登记）**：
+**结论三（把边界算成账，供编排者决定是否另立票；本腿不扩范围）**：把结论二的 A 柱**只用 R7 那三枚狭义交付动词**去套 132 处，命中＝**7 行**（`arrives in` 1 ＋ `lands with` 6；其余 125 行是 `is ticket N` 的占有／来处框架，按本规矩**一律不动**）。⚠ **这 7 行与 132 都是起手读数**：此刻同一把尺已是 **5 行／129 处**，差额恰好＝`228-r1` 改掉的 3 枚串各贡献一枚（`main.go:25` 走 `is ticket`、`resident_windows.go:81` 走 `arrives in`、`boot_windows.go:127` 走 `lands with`）——132−3＝129、7−2＝5、28−3＝25，**三笔账互相对得上，说明本表与 §5 的对照不是拼凑**。这 7 行**逐行摊开**分三档，⛔ 再加一档「R7 抓不到的」——⚠ **本腿第一版在这里判错过一次并当场纠正**（见末段）：
+
+- **档 1｜A ∧ B＝那件活今天不在树里、票却已结案（R7 内 2 行）**：`cmd/wisp/resident_windows.go:81`（`arrives in`）＋ `internal/proc/boot_windows.go:127`（`lands with`）——都是 §1 那三枚 🔴 串中的两枚，已归票 228 AC#7 ①。
+- **档 2｜A ∧ ¬B＝活已交付、只有时态（＋位置）过期（3 行，⛔ 不在票 243 范围，本腿只登记）**：
   1. `internal/llm/catalog_test.go:40`「`Protocol: "anthropic", // adapter lands with ticket 11`」——`11-llm-adapters-rest-done.md` 带 `-done`，且**活真在**：`internal/llm/anthropic/adapter.go:1-2` 逐字「Package anthropic is the Anthropic Messages adapter (C5 implementor, ticket 11)」。⇒ 只需把 `lands with` 改成过去时，**不该重指派票号**。
   2. `internal/observe/goroutine.go:25`「AST scan lands with ticket 08; a grep-level regression test runs meanwhile).」
-  3. `internal/observe/nobarego_test.go:16`「The real AST scan lands with ticket 08; this grep-level check」——②③同一笔活：`08-...-done.md` 带 `-done`，AST 扫描**今天真存在**，只是在另一个包里：`tools/d22scan/main.go:98` import `go/ast`、:700-710 是 ban #1 `bare-goroutine` 的 AST 判据（:700 逐字解释「matching only FuncLit left the gate blind to」）。⇒ 同样是**时态过期 ＋ 位置写错**（承诺在 `internal/observe`、落在 `tools/d22scan`），不是缺活。
+  3. `internal/observe/nobarego_test.go:16`「The real AST scan lands with ticket 08; this grep-level check」——②③同一笔活：`08-...-done.md` 带 `-done`，AST 扫描**今天真存在**，只是在另一个包里：`tools/d22scan/main.go:98` import `go/ast`、:700-710 是 ban #1 `bare-goroutine` 的 AST 判据（:700 逐字解释「matching only FuncLit left the gate blind to」）。⇒ **时态过期 ＋ 位置写错**（承诺在 `internal/observe`、落在 `tools/d22scan`），不是缺活。
+- **档 3｜A ∧ B 不成立、留在边界外的合法承诺（2 行）＝证明这把尺没有过宽的对照组**：`internal/audio/doc.go:27`「DEFERRED(playback): TTS output lands with ticket 26」（`26-tts-output.md` **盘上无 `-done`**＝真票）；`internal/risk/provenance.go:56`「prefer Inspect()/CheckText() directly (wiring lands with tickets 20/21/22/26)」（四枚**全部未结案**）。再加一枚边界外同形：`internal/proc/boot_windows.go:46`「portable-mode override is ticket 06 and will use the same seam」——`06-...-done.md` **已结案**，但那件活今天在 `internal/proc/envfork.go:52-53` 逐字写着「applied by DefaultLayout / ApplyPortableOverride」、函数体在 `envfork.go:211`，`internal/config/schema.go:149` 亦有 `Portable bool` ⇒ **A ∧ ¬B，只改时态**。**这枚关键**：它和票 07 那批同形同动词、票号同样已结案，**唯一区别是那件活真落了地**，处理方式却完全相反（改时态 vs 重新指派归属）⇒ **证明这条边界只能人工逐处判、不能词面成门**，与票 228 AC#7 ③ 一致。
+- **档 4｜⚠ R7 那把尺**根本抓不到**、只有 R1＋读整句才现形的 A ∧ B（8 枚）＝本票真正的净产出**：第 3 枚串 `cmd/wisp/main.go:25`（`is ticket 07`，在 132 里但不在狭义 7 里）＋ 本表 **7 枚注释** #2（`subscribes at wiring time`）／#13（`is the ball's job`）／#14（括注 `(ball, ticket 07)`）／#22 ＋ #23（`links as a GUI-subsystem binary`）／#24（`The floating ball GUI is ticket 07`）／#25（`tray icon is ticket 07/62's`）。
 
-**⚠ 本腿的一次误判与纠正（写进交付物，不藏）**：第一版这里把上述 3 行判成了「A ∧ B＝三笔活被注销」，并写了「`internal/llm/anthropic/` 目录不存在」「AST 扫描从未落地」两条**未核断言**，另引用了一枚**根本不存在的文件**`internal/config/flatten.go:41` 作反例。复核动作与结果：`ls -d internal/llm/anthropic` → 目录在（adapter.go／request.go／stream.go）；`grep -rn "go/ast" tools/d22scan/main.go` → AST 扫描在；`grep -rn "func ApplyPortableOverride" internal/proc` → 真身在 `internal/proc/envfork.go:211`。⇒ **三条断言全部作废，已换成现读盘上位点。** 这个错恰好是本票根因链条的形态（「按印象报状态」，与票 64 那次四态漏一态同族），所以留在文件里当反面凭据。
+**⚠ 本腿的一次误判与纠正（写进交付物，不藏）**：本节**第一版**把档 2 那 3 行判成了「A ∧ B＝三笔活被注销」，并写了「`internal/llm/anthropic/` 目录不存在」「AST 扫描从未落地」两条**未核断言**，另引用了一枚**根本不存在的文件**（`internal/config/flatten.go:41`）作反例。复核动作与结果：`ls -d internal/llm/anthropic` → 目录在（`adapter.go`／`request.go`／`stream.go`）；`grep -rn "go/ast" tools/d22scan/main.go` → AST 扫描在；`grep -rn "func ApplyPortableOverride" internal/proc` → 真身在 `internal/proc/envfork.go:211`。⇒ **三条断言全部作废，已换成现读盘上位点。** 这个错恰好是本票根因链条的形态（「按印象报状态」，与票 64 那次四态漏一态同族），所以留在文件里当反面凭据，⛔ 不要因为"已纠正"就删掉它——下游核对本节时若只看到改后的结论，就学不到「一枚只读腿也会在两条命令之内犯错」。
 
-**反例留在边界外、证明尺没有过宽**：`internal/audio/doc.go`「TTS output lands with ticket 26」（`26-tts-output.md` **未结案**＝真票，合法承诺）；`internal/risk/provenance.go`「wiring lands with tickets 20/21/22/26」（四枚**全部未结案**）；`internal/proc/boot_windows.go:46`「portable-mode override is ticket 06 and will use the same seam」（`06-...-done.md` 已结案，而那件活今天在 `internal/proc/envfork.go:52-53` 逐字写着「applied by DefaultLayout / ApplyPortableOverride」、函数体在 :211，`internal/config/schema.go:149` 亦有 `Portable bool` ⇒ **A ∧ ¬B，只改时态**）。这枚反例重要：它说明**同一动词框架遇到已结案票号，两种正确处理（改句子 vs 换票号）都会发生**，所以这条边界**只能人工逐处判、不能词面成门**——与票 228 AC#7 ③ 的禁令一致。
-
-**这条边界今天算出来的净账（给编排者的硬数）**：132 处里 A 柱只有 **7 行**，其中**真正「活不在树里、票却已结案」的＝本表的 2 枚错事实 ＋ 5 枚承诺 ＋ §1 的 3 枚串＝10 处**，全部集中在 `ticket 07` 这一族；剩下 3 行（档 3）只是时态过期。**⇒ 「过期票号注释」这个形状在本仓的真实密度比 R7 的 132 这个数低两个数量级**，这正是票面「132 行人工判定，成本远大于本票收益，明确不做」的量化理由，也是不必新增仪器的理由：按 A 柱筛（1 枚 `grep -riE "arrives in ticket\|lands with ticket"` ＝ **7 行**）就能人肉看完，不需要门。
+**净账（把两把尺合起来才算得对）**：A ∧ B 全仓今天＝**10 枚**＝档 1 的 2 ＋ 档 4 的 8（＝本表 7 枚注释 ＋ §1 的 3 枚串），**全部落在 `ticket 07` 这一族**；A ∧ ¬B（只该改时态）＝**4 枚**（档 2 的 3 ＋ `boot_windows.go:46`）；合法未结案承诺＝**2 枚**。⇒ **「过期票号注释」在本仓的真实密度是 10 枚，比 R7 那个 132 低一个数量级以上**，这正是票面「132 行人工判定，成本远大于本票收益，明确不做」的量化理由。**同时也是不必新增仪器的理由**：`grep -riE "arrives in ticket|lands with ticket"` 一条命令就把可疑面缩到 7 行，人工读完不到一分钟——**但它是抽样尺、不是门**，因为它漏掉 10 枚里的 8 枚（见上 ⚠）。
 
 **附言：形状之二（本表唯一一处，#17）——「consumed by later tickets」**。它没有票号，所以**不在本票射程内**，也不该被任何词面尺抓到（它和结论一的 125 处「is ticket N」一样，改成带条件句的收益＝0）。登记在此只为让台账知道：**无指代未来**是另一族，量级远大于票号族，别指望这条边界能覆盖它。
 
 ---
 
-## 5. 本腿自证与交件清单
+## 5. 工作树在腿运行期间被写腿 `228-r1` 改过（两枚读数对照，**必看**）
 
-- **改了什么**：只有本文件一枚（路径 `.scratch/wisp/probes/243/c1/census.md`，⛔ 无空格／无全角字符）。commit 带显式 pathspec、**未 push**、无 amend／reset／rebase／stash／checkout／restore／clean、无 worktree、仓内未删任何文件。
+本腿全程只用 `grep`／`sed`／`Read`，⛔ 未改任何 `.go`。但**共享工作树**里有写腿在飞，我运行期间它动了本表射程内的文件：
+
+| 项 | 本腿起手读数（表所依据） | 我提交时重跑（同一工作树、更晚时刻） |
+|---|---|---|
+| R1 `grep -rn "ticket 07" --include=*.go internal cmd scripts tools` | **28** | **25** |
+| §1 三枚运行时字符串 | 三处都含 `ticket 07` | **三处都已被 `228-r1` 改写**：`cmd/wisp/main.go` usage 正文已换成逐字「hosts the floating ball window, its tray icon and its four global hotkeys in this same process…」；`resident_windows.go` 的 Printf 已变成 `%s (Ctrl+C exits cleanly)` 带 `rb.statusLine()`；`internal/proc/boot_windows.go` 那枚 `slog.Info` 已拆成注释＋不带票号的日志 |
+| `cmd/wisp` 对 `internal/ball` 的 import | **0 行**（全仓只有 `cmd/balldebug/main.go`） | **1 个文件**：新增未跟踪文件 `cmd/wisp/resident_ball_windows.go`（`main.go`／`resident_windows.go` 同时为 ` M`） |
+| §2 的 25 行注释堆 | 25 | **仍是同样那 25 行**（28−3＝25，被改的正是那 3 枚串，**一行注释没被动**） |
+| R7 `arrives in ticket｜lands with ticket｜is ticket N` | **132**（其中狭义交付动词 7） | **129**（狭义 **5**）——差的 3／2 正是上面那三枚串，账目见 §4 结论三开头 |
+| R4 里 `cmd/wisp` 的全量分布 | **6**＝4 注释 ＋ 2 串 | **4**＝只剩那 4 枚注释（§0 那条「票面勘误」在此刻已自动消解，但**它记的是起手事实，留着**） |
+
+**这对本表的影响，逐条说清，不含糊**：
+1. **表体 25 行：零影响**——行数、原文逐字、判定全部复跑核对过，那 25 处注释此刻在树上原样存在。
+2. **§1 那三行：本腿的引文是「改前」读数**，⛔ 不要拿它当现状去核对票 228 的完成度。它恰好证明**票 228 AC#7 ① 那一格正在被 `228-r1` 落地**（三枚串一处不剩地全改了）。改后文案的质量与真理性由票 228 自己的验收腿判，**不归本腿**。
+3. **#24／#25／#13／#14 四行的「依据」半边**：我这四行写的判据是「那件活今天不在 `cmd/wisp` 里」（实测 import＝0）。此刻 `228-r1` 正在把球与托盘装进 `cmd/wisp`——**这正是本表给这四行指认的归属（票 228）**，所以它是**对我归属判断的证实，不是推翻**。
+4. ⚠ 但它会让这四行的**判定类型**在 228 落地后搬家：球一旦真住进 `cmd/wisp`，「The floating ball GUI is ticket 07」就不再是「承诺一件没发生的活」，而变成**把 228 干的活记在已结案的 07 名下＝说错了事实（出处错）**。**两支都错、都必须改**，只是改后的事实句内容不同。⇒ **写腿改这 25 处注释时必须按改后当时的树重读一遍**，别照抄本表的依据半边。这条不是本表的缺陷，是只读腿与写腿并行时必然的时间差，所以显式记在这里。
+5. **锚点唯一性声明（已实测，不是断言）**：本表所有 25 行原文**来自起手那一次 R1 输出**（28 枚的全集去掉 3 枚串），不是从两个时刻拼出来的。核对方法＝把起手 28 枚里滤掉那 3 枚字符串得到 25 行，与此刻重跑的 25 行做 `diff` → **输出为空（逐字节相同，含 `file:line` 与缩进）**。⇒ 写腿改的就是这 25 行，行号可以直接用。
+
+---
+
+## 6. 本腿自证与交件清单
+
+- **改了什么**：只有本文件一枚（路径 `.scratch/wisp/probes/243/c1/census.md`，⛔ 无空格／无全角字符）。
+- **commit 台账（每枚都带显式 pathspec、**未 push**；无 amend／reset／rebase／stash／checkout／restore／clean、无 worktree、仓内未删任何文件）**：
+  | commit | 碰的文件 | 内容 |
+  |---|---|---|
+  | `636dc459` | 仅 `.scratch/wisp/probes/243/c1/census.md`（新增，148 行） | 骨架＋全表起手落盘（防死腿：本仓今天 6 枚腿死在尾部占位符上） |
+  | 本件之后那一枚 | 同上**唯一一枚**文件 | 四处 `file:line` 引用错（`tokens_test.go:86→85`、`liquid.go:83→82`、`tokens_test.go:314→313`、`machine_test.go:62→63`）＋§4 三行误判纠正＋锚点改实测值＋新增 §5 两时刻读数对照 |
+  ⛔ 两枚 commit **均只含这一张表**，`git show --name-only` 自查 `.go` 命中数＝**0**。
 - **没碰**：任何 `.go`（零字节，含注释零改动）、`docs/reports/pending-and-issues.md`、工单任何 `- [ ]` 框、`frontend/**`、`design/**`（**零读零转述**）、`PLAN.md`／`docs/specs/**`／`thresholds.go`／golden／`allowlist.txt`／三枚冻结件。
 - **没跑**：`go test`／`go build`（写腿 `228-r1` 在飞，按硬规矩只用 `grep`／`sed`／`Read`／只读 `git log`）。
 - **没新增**：任何仪器、门、脚本、CI 步。
-- **判不动的行**：**无**——25 行全部给出主判；两处给了兼类括注（#22 #23 #24）与两处次级风险登记（#4 的票 12、#17 的「later tickets」），均已写明依据。
-- **R1 这把尺的一处已知漏洞（登记，不补尺＝不改任何文件）**：`internal/audio/gate.go:167` 逐字「the Muted/Unmuted events are the hook into the Muted ball state (07).」——同一枚票**省略了 `ticket` 一词**，故 R1（`grep "ticket 07"`）抓不到它，它也不在 25 行表内。它落在 #1 那一枚 `SetMuted` 的正下方 3 行，判型与 #1 相同（历史出处：`Muted` 态与事件都在）。⇒ **任何后续普查若想把这类裸编号形状算全，得另跑 `grep -rnE "\(0?7\)"`，本腿没跑、也不建议为它建门**（同一枚禁词面尺的理由）。
+- **判不动的行**：**无**——25 行全部给出主判；**三行**给了兼类括注（#22 #23 判「说错了事实」兼承诺、#24 判「承诺」兼错事实）与两处次级风险登记（#4 的票 12、#17 的「later tickets」），均已写明依据。
+- **R1 这把尺的一处已知漏洞（登记，不补尺＝不改任何文件）**：`internal/audio/gate.go:167` 逐字「the Muted/Unmuted events are the hook into the Muted ball state (07).」——同一枚票**省略了 `ticket` 一词**，故 R1（`grep "ticket 07"`）抓不到它，它也不在 25 行表内。它就在 #1 所属那个注释块里（`SetMuted` 的 doc 从 :165 起，:167 是其第三行），判型与 #1 相同（历史出处：`Muted` 态与事件都在）。⇒ **任何后续普查若想把这类裸编号形状算全，得另跑一次带括号的 grep，本腿没跑、也不建议为它建门**（同一枚禁词面尺的理由）。
 - **本腿的自我纠正记录（必须随件交回）**：§4 结论三第一版把 3 行判成「活被注销」，并含两枚未核断言与**一枚不存在的文件引用**（`internal/config/flatten.go:41`）；复核后全部作废并换成现读盘上位点，纠错过程留在 §4 正文内没有删除。
 - **待编排者动作（本腿无权做，列出即可）**：① §0 末「票面勘误」那半句（`cmd/wisp` 全量 6 vs 去串 4）；② §4 档 3 那 3 行**只是时态过期**，按本票边界**不该另立实现票**，是否顺手改句子由写腿定；③ §3 第 1 项那对 `console_*.go`（#22／#23）——若判为缺口，「补齐 GUI 子系统构建」这笔活既不在票 243 也不在票 228 现有 AC 上，**需要一枚新票或明确判「不做并删掉这句前提」**，这是本表唯一一笔无人认领的活；④ #22／#23 的正确修法有两种（改注释成「今天仍是 console 子系统，`attachParentConsole` 走的是 :32 的真分支」vs 真加 `-H windowsgui`），**选哪种是产品决定，本腿不替它拍**。
