@@ -189,25 +189,43 @@ func TestAC246ShippedResidentProcessOwnsItsCancelStep(t *testing.T) {
 
 	said := pollUntil127(400, func() bool {
 		out := leg.stdout.String()
-		return strings.Contains(out, gateAssembledClaim) && strings.Contains(out, cancelStepRosterClaim)
+		posture := strings.Contains(out, ballUpClaim) || strings.Contains(out, ballAbsentClaim)
+		return posture && strings.Contains(out, cancelStepRosterClaim)
 	})
 	out := leg.stdout.String()
 	if !said {
 		leg.stop()
-		t.Fatalf("AC#1/#4 RED: the shipped resident process never printed both gate sentences.\n%s\n"+
-			"Expected one of %q plus %q: the first is the assembly root reporting the gate it injected, "+
-			"the second is the D38(e) steps it registered hooks for. A leg that stopped wiring the gate says "+
-			"neither, and that is the reading this case exists to catch.",
-			leg.console(), gateAssembledClaim, cancelStepRosterClaim)
-	}
-	if !strings.Contains(out, gateAssembledClaim) && !strings.Contains(out, gateAbsentClaim) {
-		leg.stop()
-		t.Fatalf("AC#1 RED: the gate sentence is neither assembled nor un-assembled:\n%s", leg.console())
+		t.Fatalf("AC#1/#4 RED: the shipped resident process never printed both its ball posture and its "+
+			"registered D38(e) steps.\n%s\n"+
+			"Expected one of %q / %q plus %q: the pair is what this process knows about its own window and "+
+			"the step it registered a hook for. A leg that stopped wiring says neither.",
+			leg.console(), ballUpClaim, ballAbsentClaim, cancelStepRosterClaim)
 	}
 	if !strings.Contains(out, cancelStepRosterClaim) {
 		leg.stop()
 		t.Fatalf("AC#4 RED: the boot report does not name step 3 as owned by this process (%q):\n%s",
 			cancelStepRosterClaim, leg.console())
+	}
+	// The coherence check, which is what makes the injection itself observable.
+	// Which half is required depends on the desktop, and that is the point:
+	// bindBallHost loads the Esc channel only when Win32 gave this process a window
+	// AND the assembly root handed it a cancel executor, so a leg that lost the
+	// injection has to say 审批门未装配 while still owning step 3 - and a leg that
+	// advertises the channel with no executor behind the key fails here.
+	switch {
+	case strings.Contains(out, ballUpClaim):
+		if !strings.Contains(out, gateAssembledClaim) {
+			t.Errorf("AC#1 RED: the ball window is up but the gate is not assembled: %s"+
+				" A window whose cancel key fires into nothing must not advertise the channel; if this is the"+
+				" residue of deleting the injection in resident_windows.go, that is exactly the lie.",
+				leg.console())
+		}
+	case strings.Contains(out, ballAbsentClaim):
+		if !strings.Contains(out, gateAbsentClaim) {
+			t.Errorf("AC#1 RED: no ball window, yet the gate claims to be assembled: %s", leg.console())
+		}
+	default:
+		t.Fatalf("AC#1 RED: the process named neither ball posture: %s", leg.console())
 	}
 
 	if err := leg.breakToLoop(); err != nil {
@@ -275,6 +293,47 @@ func tailContaining246(all, needle string) string {
 		}
 	}
 	return "(no line containing " + needle + ")"
+}
+
+// TestAC246ChannelNeedsBothWindowAndExecutor is the coherence guard on its own
+// two legs. The assembly may advertise the Esc cancel channel only when BOTH
+// facts hold: Win32 gave this process a ball window to borrow the key for, and
+// the assembly root handed that window a cancel executor. Each half is refused
+// here from the side this package can build:
+//
+//   - no executor: the host is started exactly the way resident_windows.go starts
+//     it, with a real startResidentBall call, so on a desktop rb.b is a live
+//     window and the refusal can only come from the missing executor;
+//   - no window: the failed-creation shape (246-a1's D-5).
+//
+// On a machine with no desktop both legs collapse to the second reading, which is
+// still a real assertion - it is the loaded flag that must stay false either way.
+func TestAC246ChannelNeedsBothWindowAndExecutor(t *testing.T) {
+	// leg 1: window present or not, but definitely no injected executor.
+	ra := newResidentApproval()
+	rb := startResidentBall(observe.NewRegistry(), nil)
+	if rb.cancelHosted {
+		t.Fatal("cancelHosted true for a host started with a nil executor")
+	}
+	if bound := ra.bindBallHost(rb); bound {
+		t.Fatalf("bindBallHost loaded the cancel channel with no executor behind it (ball up = %v)", rb.b != nil)
+	}
+	if ra.gate.Channels().Loaded(approval.ChannelEsc) {
+		t.Fatalf("Esc advertised with no cancel executor injected; the ball window behind this host: %v", rb.b != nil)
+	}
+	if line := ra.residentStatusLine(); !strings.Contains(line, "审批门未装配") {
+		t.Fatalf("statusLine = %q while nothing was injected", line)
+	}
+	rb.stop()
+
+	// leg 2: the other half, taken from the same function the production host uses.
+	ra2 := newResidentApproval()
+	if bound := ra2.bindBallHost(&residentBall{cancelHosted: true}); bound {
+		t.Fatal("bindBallHost claimed a window that the failed-creation shape does not have")
+	}
+	if ra2.gate.Channels().Loaded(approval.ChannelEsc) {
+		t.Fatal("Esc advertised with no ball window")
+	}
 }
 
 // TestAC246VetoSentenceWithNoCard pins that the injected cancel path cannot
