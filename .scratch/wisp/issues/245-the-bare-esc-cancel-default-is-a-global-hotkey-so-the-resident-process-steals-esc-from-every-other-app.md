@@ -29,7 +29,11 @@
 
 - [ ] **AC#1 稳态名册里不含裸 Esc**：常驻腿起来之后、**没有卡挂着**的时候，实测注册集只能是三枚（`summon`／`mute`／`panel`），**`cancel` 不得在场**。尺＝`HotkeyReport().Bindings()`／`Live()` 现读，交回时带逐字读数（⚠ 别再拿"4/4 live"当好消息）。
 - [ ] **AC#2 `Confirming` 内借、离开还**：造一发真机——卡片挂起时按 Esc 真的否决（复用票 64 那一族），**卡片撤下后再按 Esc，别的程序要能收到**（判据形状＝"还"这一步有具名读数，不是只测"借"）。
-- [ ] **AC#3 ⛔ 撞钉预检的三枚钉要同批改期望，一枚都不许偷偷绕**（我 09-30 16:3x 现读出来的射程）：① `internal/ball/live_windows_test.go:69` 逐字红句「**the live ball did not register its four hotkeys**」＝它把"四枚都注册"钉成了期望；② `cmd/wisp/resident_ball_228_test.go` 与 `resident_windows.go` 里那两处**新写的用户可见文案**含「hotkeys live 4/4」；③ `internal/ball/hotkey_live_test.go` 的 `liveHotkeys()` 注释（它现在写着"生产默认是裸 Esc、我们躲开"，本票落地后**这句会变成假话**）。⇒ 三处一律改成**带条件的事实句**＋把①那枚钉**收紧**（不是放宽：从"恰好四枚"改成"稳态三枚＋借用时四枚"）。⛔ **不许靠删断言或改期望值蒙过去**。
+- [ ] **AC#3 ⛔ 撞钉预检的三枚钉要同批改期望，一枚都不许偷偷绕**（09-30 **17:0x 我再跑一遍把②的指认更正过**——我先前写「两处文案含 hotkeys live 4/4」是**词面指认写歪了**，盘上逐字没有那串，真实形状见下）：
+  ① `internal/ball/live_windows_test.go:68-70` 现读逐字 `if got := b.HotkeyReport(); !got.AllLive() || len(got.Live()) != 4 {` ＋红句「the live ball did not register its four hotkeys」＝它把"恰好四枚在场"钉成了期望 ⇒ **本票落地后这一发必然红**，要改成**稳态三枚＋借用时四枚**（⚠ **收紧**不是放宽：判据要能同时抓"该借的时候没借上"和"稳态里多绑了一枚"）。
+  ② `cmd/wisp/resident_ball_windows.go:111` 现读逐字 `hotkeys live %d/4: %s`（**枚数是 `len(rep.Live())` 现算的、不是写死的字面量**）＋`:114` 的 slog 字段 `"hotkeys_live", len(rep.Live())` ⇒ 落地后这行**自然变成 3/4**，不用改文案，但**必须确认它变的值与判据一致**；另有 `cmd/wisp/resident_ball_live_228_windows_test.go:144/:151` 那两把尺：`:144` 只取 `verdict` 里 "hotkeys live" 那段当日志、**不断枚数**，`:151` 只在 **"hotkeys live 0/4"** 时红 ⇒ **乙形（3/4）不会打红它**，但它 `:148-150` 那段注释写着"A ball whose **four** hot keys all failed to register" ⇒ **这句注释在本票之后会变成半假话**，一并改成带条件事实句。
+  ③ `internal/ball/hotkey_live_test.go:33-36` 的 `liveHotkeys()` 注释（现逐字：生产默认是裸 Esc、真机测试刻意改绑 `Ctrl+Alt+V` 以免吞掉整台桌面的 Esc）⇒ **本票落地后"生产默认稳态也绑裸 Esc"这半句会变假**，要改成"稳态不绑、Confirming 期间借"的事实句。⚠ ⛔ **不许顺手把那几枚用例改回绑裸 Esc**——它们在稳态里躲开裸 Esc 仍然是对的（借期只有几秒，用例不该把整段跑批挂在借期内）。
+  ⇒ 三处一律改成**带条件的事实句**；⛔ **不许靠删断言或改期望值蒙过去**；⛔ 不许新增词面型仪器。
 - [ ] **AC#4 用户要能改**：`[hotkey] cancel` 真被常驻腿读进去（这条依赖票 228 的"常驻腿接 `config.toml`"那一格，**本票不许自己造第二条配置通路**——若 228 那格还没做，本格判不了就写成"阻塞于票 228"，不许假绿）。
 - [ ] **AC#5 残余登记**：乙形下"借 Esc 那 2–3 秒会吞别处的 Esc"这半条**今天不修**，按 `SPEC-12 §5` 五字段登记成推迟项（完成判据＋残缺表现），⛔ 不许只在票里写一句"以后再说"。
 
