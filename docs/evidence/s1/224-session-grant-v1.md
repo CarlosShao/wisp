@@ -187,7 +187,50 @@ go test ./cmd/wisp/ -count=1 -run Probe224v1 -v -overlay=.scratch/wisp/probes/22
 
 ## §7 我攻不动的地方
 
-- ⚛ **真机重启**：`wisp run` 全流程要 LLM provider／WebView2／桌面句柄，本腿无法在本机做一次真冷启动再冷启动，只能用 `cmd/wisp` 既有的 `h.start(...)` 台架〔读台件，需现跑确认它真的另起一发进程〕替代；若那台架是同进程复用对象，"重启必失效"就只剩构造函数级证据，我攻不动到端到端。
+- ⚛⚛ **"重启"这一格最硬的那份证据我拿不到**：我用的 `t101host.start` 〔读台件 `cmd/wisp/run_mode101_test.go:145-147` 逐字〕是
+  `"Restart" in every case below is a second runTextTask over the same dir: a new process surface`——**同一测试进程里的第二次装配**，不是第二枚 OS 进程。
+  ⇒ 我的 PROBE-B 证的是"**第二次装配铸出新 key**"，**不是"第二次真进程铸出新 key"**。
+  ⚠ 这条限制**同样打在交件那枚旧钉 `TestTicket101SessionGrantDoesNotCrossRestart` 上**（同一台架），也打在票面⑩ 那句"跨两次启动"的措辞上
+  ⇒ **今天这台仓里没有任何一枚仪器能区分这两种"重启"**；要真两枚进程得走真机启动那类台架，本腿没有那条时间预算。这一条是**判语上限**，不是缺陷指控。
+- ⛔ 上面这条**推翻了我在 §1 写"需现跑确认它真的另起一发进程"的那个悬念**：确认完了，**它没有另起进程**。§1 的生产读数因此一律按"第二次装配"口径读。
 - ⚛ **面板（WebView2）侧**：`PanelAPI` 有没有可能长出会话档入口，要靠 `internal/panel/l2_grant_boundary_test.go`（**冻结件，只读不跑**）的词表判断，我不能改它来探边界。
 - ⚛ **`internal/audio` 在飞**：若 224 的读数与那枚包有耦合（我不读它、不跑它），我判不动，会具名写在这条上而不是归因。
 - ⚛ **随机源故障分支**：`session.Mint()` 的 `crypto/rand` 失败路径没有注入口，我无法在不改产码的前提下注入，因此"铸不出来时只关掉这一档"这一支只能读、不能打。
+- ⚛ **我没攻的一支**：`Gate.allowSession` 里"卡片主题在答复前已离开队列 ⇒ `GRANT-DROPPED`"那一支（`gate.go` 的 `tool == ""` 分支）——要造它得让 queue 的 item 在 `sessionSubject` 与 `allowScoped` 之间消失，我没有不动产码的注入口。
+- ⚛ **`internal/audio` 在飞（票 241）**：本腿零碰、零跑、零归因。⚠ 但我必须具名一处**口径**：`go test ./cmd/wisp/` 会把那枚包链进测试二进制，我这发 cmd/wisp 全量跑（156.567s，M4 那轮）是在 241 的写腿**可能正改 `internal/audio`** 的窗口里跑的 ⇒ 那轮读数我只当"cmd/wisp 相关用例没被 224 的 M4 打红"用，**不当"全仓此刻绿"用**。
+
+## §6 续（同一节，按时间追加；每条都带 file:line 与读数）
+
+### §6‑c 其他五格之外、本腿现跑量到的缺陷／欠账（逐条给落点）
+
+| # | 事实 | 建议落点 |
+|---|---|---|
+| 1 | **答复路零判据**：M4（`gate.go:678` 的 `Record` 摘掉，答复照旧放行、盘上零行、还照打 `GRANT-RECORDED`）下 approval 0.318s／session 0.332s／tools 12.187s／cmd/wisp 156.567s **四包一枚不红** | 续票或本票返工：`internal/agent/approval` 加一枚"AllowSession ⇒ recorder 收到卡片自己印的 (tool,path)"＋`cmd/wisp` 加一枚"动词 `session` ⇒ 盘上真有一行" |
+| 2 | **真 `memory.Store` 的 `tool_call.grant_id` 列零用例**（交件用桩 `t224Journal` 断；我只在审计行里读到 `grant_id=1`） | 与 ①同一批发，用真 store 读回那一列 |
+| 3 | **"同进程两次 mint 不等"推不出"跨进程两次 mint 不等"**（§3），且今天没有任何仪器能区分（§7 第一条） | 判据措辞要写死"第二次装配"还是"第二枚真进程"，并把 M1 那发突变钉成回归位 |
+| 4 | `recordablePattern` 只认"逐字相等"、**glob 方言未定案**；`ticket90_persist_test.go:233` 那种 `filepath.Join(dir,"*")` 行**写了等于没写**，今天无仪器拦 | ⚠ 待人拍（新 `Q##`）；⛔ 不是本腿可以替 owner 挑的 |
+| 5 | `clockCeilingDefault = memory.GrantAuditTTL`（30 天）只是兜底，**"会话时长"没定案**（A435 第 2 条只裁了"今天＝进程退出"） | ⚠ 待人拍 |
+| 6 | `TestTicket224GrantSeamCarriesNoCallerSuppliedAuthority` 的 setter 半只罚 `Kind()==Func` 的字段，interface 型可换源不响（§1） | 轻：补一枚 interface 型检查即可 |
+
+### §6‑d 关于"翻不翻框"：本腿**一枚不翻**，只交判语
+
+按硬约束 1，票面 5 枚 `- [ ]` 未碰、`-done` 后缀未加。给编排者的建议（**不是本腿的权限**）：
+**AC#1 可翻**（附 §6‑a 那半条件）、**AC#5 可翻**；**AC#2／AC#3 不可翻**（判据不存在，不是实现不存在）；**AC#4 由你定**——反控本身有牙（M1 两枚红），但⑩ 的①"跨两次启动"在盘上没有。
+⚠ 三行建议都**不许**被当成"实现没做"：实现我判它成立（§1 的生产读数在那儿）；缺的是**判据**。
+
+### 突变腿的自证（硬约束 8）
+
+- **加虚拟测试文件用 `-overlay`**：`.scratch/wisp/probes/224/v1/overlay.json` 把 `cmd/wisp/zz_probe_224v1_test.go` 映射到仓外探针，**跟踪文件零改动**。
+  ⚠ 本仓已知坑"`-overlay` 对读盘的测试结构性失明"——**我这发不受它影响且理由要写清**：overlay 只喂编译器，探针读的是 `t.TempDir()` 下的真 `wisp.db`、真文件系统与真装配根的 `[audit]` 行，**没有任何一处去读那枚被替换的路径**。
+- **四发改产码的突变（M1／M2／M3／M3b／M4）一律"落盘跑完立刻还原"**，还原只用 `git cat-file blob HEAD:<path> > <path>`，每发前后 `wc -c` 自证：
+  `internal/session/session.go` 4174→4174；`internal/tools/bridge.go` 50699→50699（三次分别验）；`internal/agent/approval/gate.go` 31010→31010。**没有一枚跟踪文件被写成 0 字节**。
+- **每发先证突变真的落地再跑**：`M1` 第一发因让 `hex` 变成未用导入而 `[build failed]`（那发读数作废、不采），改法后用 `grep -c 'wisp-pid-derived'`＝1 才跑；
+  `M3b` 前两发分别因 `case risk.L2` 重复（Go 编译错误）与缩进／转义写错而**没落地**（`sed -n '452p'` 证明），那两发的"只有形状半红"我一律作废，**直到 v4 打出 `:320 produced 0 approval cards` 才算数**。
+- **交件前工作树**：`git status --porcelain -- internal cmd`＝**空**〔我现跑，每次还原后各验一次〕；别人那几枚脏文件（`.gitignore`／`design/**`／`probes/**`／`internal/audio/**`）零碰、零还原、零提交。
+
+### 仪器复核（死腿自述的两处，我现跑对了一遍）
+
+- `go vet ./internal/session/ ./internal/tools/ ./internal/agent/approval/ ./cmd/wisp/` ⇒ **rc=0**〔我现跑〕
+  ⇒ 死腿自述里那句"⛔ `go vet ./cmd/wisp/` 目前不吃读数（`subagent_selfapproval_197_test.go` 让整包编译不过）"**今天已不成立**，那是别人的在飞件，与本票无关，也**不许**再拿它当 224 的挡箭牌。
+- `cd tools/d22scan && go run . -root ../../` ⇒ **clean，rc=0**〔我现跑 12:4x〕，`bans #1-5 internal/=223、cmd/=29`（口径＝**被扫文件数，不是违规数**）。
+  与死腿自述的 222／465 之差是其后其它票落地产生的**文件数漂移**，不属违规；`ban #6/#8 frontend/` 与 `ban #8 design/` 两行我只当仪器射程记账，**零读其内容、零引其结论**（两层禁）。
