@@ -118,7 +118,70 @@ internal/winsec/winsec_windows.go:313 注释
 
 ## 1. 两形代价表（AC#1）
 
-（待补：形①常驻腿自封／形②装配根先封根，各自的落点文件:函数、跨包依赖边、失败方向、最坏后果形状、blast radius。）
+先定一件不在争议里的事：**"封根"这一手今天只有三种下法**，因为 `winsec` 的产码面就这么多（§0.3）——
+`SealDir(path)`（**Windows 侧＝`applyDescriptor` ＋ `propagatePrivate` 全树走查**，`winsec_windows.go:588`–`:620`；POSIX 侧＝单档 `chmod`，`winsec_other.go:170`），
+`PrivateDirAll(path)`（`winsec.go:165`→`:177`–`:218`：只封"自己创建的那几层＋点名的那一层"，**祖先一律不碰**，`winsec.go:152`–`:157`），
+`SealFile`／`PrivateFile*`（单档）。
+⚠ **仓里没有"只封一层、不走查子树"的导出名**（`applyDescriptor` 是包内的，`winsec.go`/`winsec_windows.go` 都没外露）。
+⇒ **任何一形如果不想在首启时把整棵已存在的数据根重写一遍描述符，就要新增一枚导出名＝按票 132 `:76` 乙支的先例属契约级，实现腿不许自己造**（这一条要编排者裁，见 §4 第 2 条）。
+
+### 1.1 形①：常驻腿（`internal/proc`）自己调封条
+
+| 项 | 现量 |
+|---|---|
+| 要动的文件:函数 | `internal/proc/boot_windows.go`：`Boot()`（`:57`）在 `:77`–`:84` 拿到 `layout` 之后插一枚封条；新增导入 `internal/winsec`；或走 `bootConfig`（`:40`–`:43`）＋`BootOption`（`:37`–`:54`，现有两枚 `WithLayout`／`WithRegistry`） |
+| 覆盖哪些腿 | **只 2 枚**：`cmd/wisp/resident_windows.go:33`、`cmd/wisp/slo_windows.go:261`（全仓 `proc.Boot` 产码调用者＝这 2 枚，尺见 §0.4）。⚠ `wisp secret` 明写不走 Boot（`cmd/wisp/secret.go:31` 逐字「This command never calls proc.Boot」），`run`／`models`／`providers`／`doctor` 也不走 |
+| 漏掉的腿 | §0.4 那 6 枚造根腿里**有 4 枚这条边管不到**（`run.go:195`、`models.go:284`、`secret.go:226`、`doctor.go:301`）⇒ **同一台机器换一条腿首启，根照样宽**，而这枚票的判据要的正是"哪条腿先跑" |
+| 跨包依赖边 | **不新开可执行依赖**：`internal/proc` 今天就经 `observe`(`boot_windows.go:18`)→`secret`(`redact.go:10`)→`winsec`(`store.go:10`) 传递依赖 `winsec`；`winsec` 产码侧零内部导入（叶子，§0.4 第 3 条）⇒ 直接边**不可能闭环**。**"给 proc 新增对 winsec 的依赖"这一条本仓允不允许＝没有任何成文禁止**：`AGENTS.md` 禁止清单里没有依赖方向条；仓里唯一写死的同类规矩是反方向的（`logging.go:386`「winsec must not import observe」、`logsink.go:132`、`risk/winsec_c26.go:7`–`:11`「winsec cannot import risk」）。⇒ **此条要编排者裁**（§4 第 1 条） |
+| 有没有现成注入模式可照抄 | **有两枚**：① `internal/risk/winsec_c26.go:20` 的 `init()` 把 resolver **装进** winsec（"能力在下游、接线在上游"这一族的样板）；② `proc.BootOption`（`WithLayout`／`WithRegistry`）已是"装配方注入函数／对象"的现成 seam ⇒ 形①′＝由 `cmd/wisp` 传 `WithRootSealer(func(string) error)` 进 Boot，**proc 零新增导入**，代价是多一枚导出 option＋每个 Boot 调用点都得传（漏传＝静默不封，正好是这族票抓了九次的形状） |
+| 失败会不会堵死启动 | **会，而且是最直接的一枚**：`resident_windows.go:42`–`:45` 现读是 `if err != nil { "wisp: boot failed"; os.Exit(1) }` ⇒ 封条一旦从 `Boot` 返回错误，**双击图标那条腿直接起不来**。本仓已定案这是要躲的开法：票 128 的"拒绝启动"之所以没堵死联调，靠的是台账 `docs/reports/pending-and-issues.md:3689`–`:3696`（`A111④`）现读的两条前置路径——**① `portable.txt` 挨着 exe 直接返回 `<exeDir>\data` 并结束，② `WISP_ENV=test` 走 `proc.TestDataDir()`，③ 只有前两条都不成立才去问 `%APPDATA%`**（代码＝`cmd/wisp/doctor.go:247`–`:267`）。⚠ **这两条前置路径救不了封条失败**：它们在"**选哪棵树**"这一步之前，不在"**这棵树封不封得上**"这一步之前——便携目录插在一块 FAT/exFAT 的 U 盘上、test 根落在一台只读卷的 CI 上，两条路都会走到"封不上"。⇒ **要么封条失败降级为响亮告警＋照起（照 `resident_windows.go:58`–`:65`／`run.go:196`–`:203` 那两枚既有开法的原话「a log directory that will not open must not become a way to keep Wisp from starting」），要么这一枚要先给 owner 摆代价再裁**（§4 第 3 条） |
+| 最坏后果形状 | (a) **半修**：常驻／`slo` 两条时序收窄，另外 4 条照旧 ⇒ AC#2 那把尺若不限定腿，会读成"时好时坏"，很容易被下一位当成仪器坏了；(b) 封条在 `Boot` 里＝**每次启动都走一遍 `propagatePrivate` 全树**，在 Windows 上这意味着 `wisp` 常驻进程每次起都会**把整棵数据根的描述符重写一次**（含 `<data>\models`，见 1.3 的票 95 撞钉），常驻腿是天天起的进程，这把锤子的**重复开销与不可逆面**都要读数（本腿没量，见 §5） |
+
+### 1.2 形②：由装配根在起任何腿之前把根封一次
+
+| 项 | 现量 |
+|---|---|
+| 装配根在哪 | **今天不存在单一装配根**。6 枚造根腿各有入口：`installLogSink`（4 枚调用点，§0.4）→ `observe.InitLog`（`logsink.go:149`）；`slo` 绕过 `installLogSink` 直连 `observe.InitLog`（`slo_windows.go:272`）；`doctor` 连 sink 都不装，直接 `probeWritable` 的 `os.MkdirAll`（`doctor.go:301`）。⇒ 形② 的"单一点"只有两枚候选：**(甲) `internal/observe/logging.go:72` 那一行**（覆盖 6 枚里的 5 枚，`doctor` 那枚天生不在管子里）；**(乙) `cmd/wisp` 新加一枚 `sealDataRoot(dir)` 并在 6 枚腿各自调用**（覆盖面全，但"单一点"退化成人肉六处，漏一处就是本票的形状） |
+| 要动的文件:函数 | 甲形：`internal/observe`（`logging.go:66`–`:75` `InitLogWithRegistry` 的 `os.MkdirAll` 换成／加上 `winsec.PrivateDirAll`），新增 `internal/observe -> internal/winsec` 直接导入；乙形：`cmd/wisp`（新 helper＋`resident_windows.go`／`run.go`／`models.go`／`secret.go`／`slo_windows.go`／`doctor.go` 六处调用点） |
+| 跨包依赖边 | 甲形＝**`observe` 新增对 `winsec` 的直接依赖**：`winsec` 是叶子 ⇒ 不闭环；且 `observe` 今天已经经 `secret` 依赖 `winsec`。⚠ 但 `logging.go:386`–`:387` 那段注释把"这条管子不许成环"写成了本包的一处理由，**它禁的是 `winsec -> observe`，没有说 `observe -> winsec` 可以**——仓里**没裁过** ⇒ 与形① 同一枚问题，见 §4 第 1 条。乙形＝**给 `cmd/wisp` 开一枚新直接导入**（现读：产码侧 `cmd/wisp` 里 `internal/winsec` 命中 5 行**全在注释**——`doctor.go:232`、`logsink.go:7`／`:132`、`resident_windows.go:48`、`secret.go:139`；`grep '"github.com/CarlosShao/wisp/internal/winsec"'` 在 `cmd/` 只命中测试件 `secret_dataroot_119b_test.go:49` ⇒ **产码导入数＝0**），这是**本票第一枚真正的新边**，且开在产码里 |
+| 失败会不会堵死启动 | 甲形：`InitLog` 已经返回 error，且两枚调用方都已选"**响亮但不拦**"（`resident_windows.go:58`–`:65`、`run.go:196`–`:203`）⇒ 封条失败会自然顺着这条既有降级路走，**不需要新裁一次失败方向**（这是甲形对形① 的实质优势）；⚠ 代价反过来：**封不上也照跑**，"根宽"这件事在 `run`／`slo` 腿上只剩一条日志，仪器之外无人知道。乙形：6 处调用点各裁一次，最容易六处不一致 |
+| 最坏后果形状 | 见 1.3（甲乙同命）：**首启那一次 `PrivateDirAll(数据根)`／`SealDir(数据根)` 在 Windows 上＝对已存在整棵子树做 `propagatePrivate`**，把每一枚子档的描述符**换成显式窄集并切断继承**（`winsec_windows.go:595`–`:620`），这不是"给新建物一枚好父亲"，是**对既有树的批量 ACL 改写** |
+
+### 1.3 两形共有的一枚硬撞钉（本腿认为 AC#1 必须先裁它，不然落地腿会当场撞上）
+
+`internal/models/no_seal_ruling_windows_test.go:27` `TestAC3ExtractionIsDeliberatelyNotSealed` 现读逐字（`:13`–`:22`）：
+
+> 「Ticket 95 AC#3's other half: this class is left inherit-wide **ON PURPOSE**, and a test that measures it is what separates that from an unwired site. …
+> If somebody later routes archive.go's extraction through winsec, this test goes red. **That is intended**: sealing here is a product decision
+> （it is what would stop a second instance running under another account, e.g. a service account, from reusing a GB-sized cache），
+> and **decisions like that do not get made by an unrelated hardening sweep**.」
+
+而模型缓存**就在数据根里**（`cmd/wisp/models.go:198` 逐字 `return filepath.Join(dataDir, "models")`）。
+⇒ 形①／形② 任何一枚用 `SealDir(根)` 或 `PrivateDirAll(根)`（Windows 都带 `propagatePrivate` 走查），**首启那一次就会把 `<data>\models\**` 的 `BUILTIN\Users` 读权摘掉**——那正是票 95 拍板"故意留着"的那一枚产品决定。
+⚠ 具名口径：那枚测试**本身不会因此变红**（它自建 `t.TempDir()` 里的宽父档再解压，不跑生产腿；〔未跑包，此条来自读断言〕），
+**变红的是决定本身**：盘上真实数据根的 models 缓存被无关的一轮加固走查收窄，而仓里唯一提醒这件事的文字就在那枚测试的注释里。
+⇒ 这一条我判不准该怎么裁，**明写：要编排者裁**（§4 第 2 条），三支候选代价摆在那里：
+①封根但**不走查**（⇒ 要新增导出名＝契约级）；②走查但**排除**某些子树（⇒ 要在 winsec 里种一张例外表，本仓对"例外表"的历史包袱见票 106／`private_set_sid`，且这是第二真相源）；③只封 `logs` 那一棵、根不动（⇒ 回到"根是谁造的"仍未答，本票的 AC#2 就无从判）。
+
+### 1.4 还有两枚不能顺手带上的口子
+
+1. ⛔ **别把"封根"写成"根边界"**：本仓已裁过 `allowed_dirs` 是**判级输入、不是执行时硬边界**（批准的 L2 卡能读根外，见 `AGENTS.md` 引的 D4／`PLAN.md` 那条与台账 `Q-60` 的处置）。ACL 收窄描述符**不改变任何一条判级路径**，所以"顺手让它成为硬边界"这件事既不会发生，也不该被写进方案当免费午餐。
+2. ⚠ **"路径已解析"这句话说不满**：`PrivateDirAll`／`SealDir` 的参数会过 C26（`winsec.go:158`–`:164`＋`risk/winsec_c26.go:39`–`:45` 的 `Actable()`，票 102 的改写会报**拒绝**而不是报成功）；
+   但 `logging.go:72` 那枚 `os.MkdirAll` **什么也不解析**——所以"同一个拼写在两条腿上指的是同一棵树"这句话**今天不成立**，
+   首启那棵树是谁造的，可能取决于拼写而不是取决于腿。另：`internal/memory/open.go:170` 在封根前用的是 `filepath.Abs(dir)`（相对拼写会拼到 CWD 上）⇒
+   落地腿若新增第二处绝对化，直接撞 `AGENTS.md` §1.2 那条 ban #2（`risk.PathResolver` 之外不许用 `filepath.Clean|Abs` 做文件系统决策）。
+
+### 1.5 两形并排（一行一栏，给编排者裁的时候对着看）
+
+| 判据 | 形①（常驻腿自封） | 形②‑甲（`logging.go:72` 处封） | 形②‑乙（`cmd/wisp` 每腿封一次） |
+|---|---|---|---|
+| 覆盖造根腿 | **2／6**（resident、slo） | **5／6**（doctor 不在管子里） | 6／6（靠人肉六处） |
+| 新增包依赖边 | proc→winsec（传递已有，不闭环；**未裁**） | observe→winsec（传递已有，不闭环；**未裁**） | cmd/wisp→winsec（**产码侧第一枚**） |
+| 照抄现成注入模式 | `BootOption`（`WithLayout` 同形）／`risk/winsec_c26.go` 的 `init()` 安装 | 无（改的是包内第一行创建） | `installLogSink` 那一枚"每腿各调一次"的现成形状 |
+| 封条失败是否堵启动 | **默认会堵**（`resident_windows.go:42` `os.Exit(1)`），需另裁 | **默认不堵**（两条调用腿已定"响亮但不拦"） | 取决于六处各怎么写＝**最易六处不一致** |
+| POSIX 半边 | **碰不到**（`Boot` 是 `//go:build windows`，非 Windows 没有常驻腿：`resident_other.go:23`–`:24` 逐字拒绝启动并 `os.Exit(2)`） | 碰得到（`logging.go:72` 是 untagged；但 `chmod` 单档不递归，见 §3） | 碰得到，同样受 §3 限制 |
+| 全树 ACL 改写风险 | **有**（每次启动走查一遍） | **有**（首次建根那一次走查） | **有**（同左） |
+| 本票 AC#2 那把尺能不能判它 | 只能判 2 条时序，另 4 条仍红 ⇒ 会被读成仪器坏 | 能判 5 条时序 | 能判 6 条，但漏任一条就整枚失效 |
 
 ---
 
