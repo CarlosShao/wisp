@@ -52,7 +52,7 @@
 
 **耦合可视面的边界（本腿主动扩了一枪，票面没要求）**：把 m1/m2 各跑**全量非 live** 套件，红名册＝`TestC21GeometryRowsMatchCodeConstants`＋`TestC21TableColourRowsMatchTokensCSS` 两枚（0.106s/0.098s，11:42:36）。geometry 那枚的红句逐字 `c21-native-tokens.md:168: DockTriggerPx = 16, but this row states no UNCLAIMED number equal to it`——它测的是**表↔码一致**，不是"trigger≥margin"这条律；11 枚 dock 律单元测试（`dock_test.go`，含 `TestDockProgressReadsThePush` 用 `const trigger = DockTriggerPx` 那枚）在 16/21 下**全绿**（它们用合成几何自洽）。⇒ A462 那句"这条耦合今天只有那两枚 live 用例看得见"**与本腿实测一致，成立**。
 
-**桌面与树自证**：三发 live 相关跑前后 `tasklist` 读数均 0（没留进程）；`git status --porcelain -- internal/ cmd/` 全程为空（11:35:49 setup 后、11:37:13 m3 建后各自证一次）。
+**桌面与树自证**：三发 live 相关跑前后 `tasklist` 读数均 0（没留进程）；`git status --porcelain -- internal/ cmd/` 在本腿两次插桩自证为空（11:35:49 setup 后、11:37:13 m3 建后）。**收尾终态（11:50:55 复核〔我现跑〕）照实记**：该命令现余三行 `?? internal/session/grants.go`、`?? internal/session/session.go`、`?? internal/tools/grant.go`——全是**并行在跑的别的腿**的未跟踪半成品（`internal/tools` 地界，本票禁区外、本腿一枚字节未碰，按红线"临时件只建不删"原样留）；本腿自身在 `internal/`、`cmd/` 下的足迹＝**零**：全程写过的路径只有 `docs/evidence/s1/239-ball-square-fix-v1.md` 与 `.scratch/wisp/probes/239/**`（overlay 突变件、二进制、差分表），产码文件一枚未建未改。
 
 ## 3. AC#3 — **成立**（"对 Sleeping 恒等"这句话有牙）
 
