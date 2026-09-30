@@ -1,0 +1,5 @@
+X1-constant-numerator                      rc=1 red=5 TestLevelFullScaleSquareEndpoints, TestLevelIsLinearInAmplitude, TestLevelSilentFrameIsExactZero, TestLevelSineAgainstRootTwo, TestLevelSineToleranceIsNamedAndBounded
+X2-tolerance-wide-enough-to-pass-anything  rc=1 red=1 TestLevelSineToleranceIsNamedAndBounded
+X3-wrong-denominator                       rc=1 red=4 TestLevelFullScaleSquareEndpoints, TestLevelOverBoundedChannelFromWavInjector, TestLevelSineAgainstRootTwo, TestLevelSineToleranceIsNamedAndBounded
+X4-hidden-compression-curve                rc=1 red=4 TestLevelFullScaleSquareEndpoints, TestLevelIsLinearInAmplitude, TestLevelOverBoundedChannelFromWavInjector, TestLevelSineAgainstRootTwo
+restored pristine: rc=0 red=0 (none)
