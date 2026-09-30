@@ -212,7 +212,133 @@ V1API EncodeFrame panics on over-length input: runtime error: index out of range
 
 ## §3 AC#3 判语：定向突变的读数（本腿自己这一轮的数）
 
-（待填）
+**判语：成立。** 17 发突变（15 发改 `level.go` ＋ 1 发改载体 `audio.go` ＋ 1 发复算 r1 自己的 X3）
+＋ 1 发**注释级正控**。**十枚新增用例没有一枚是装饰**——每一枚都被至少一发突变打红（§3.3 的覆盖表就是这一句的证明）。
+
+台件：`.scratch/wisp/probes/241/v1/mutation_v1.py`（rev4，读数 `mutation-run-rev4.log` ＋ `mutation-v1-readings.txt`）
+与 `mutation_v1_m16.py`／`mutation_v1_m17.py`。时刻 `14:22:20 → 14:27:00`（rev4）、`14:27:58`、`14:28:41 → 14:28:57`。
+
+⛔ **盘上零污染**：全部突变**只用 `go test -overlay` 注入 `.scratch` 里的副本**，
+`internal/audio/` 的四个文件**一次都没被写过**，所以本腿**没有"还原"这一步**，也没有"把跟踪文件清成 0 字节"的可能。
+终态尺：`git status --porcelain -- internal cmd` ⇒ **空**（＝本腿起手名册）；
+`wc -c internal/audio/{level.go,level_test.go,wavinjector.go,wasapimic_windows.go}` ⇒ **6,941／15,247／6,676／8,587**，
+与本腿起手头一把尺逐字节相同。
+
+### 3.1 ⚠⚠ 先交本腿这把尺自己的两次故障（不交这两条，下表那 14 发红不可信）
+
+派单说"宁可表里留没判完，也不要交一枚全在脑子里的件"，本腿把这条扩展到**尺本身**：
+
+- **rev1 故障**：M1 的锚点 `sumSquares += v * v → sumSquares += 0` **删掉了循环变量 `v` 的唯一用处** ⇒
+  突变体**根本编不过**（`declared and not used: v`）。而 rev1 把它读成 `rc=1 red_count=0`，
+  **看起来完全像"测试没抓到这一发"**。这是本腿差点误判 AC#3 的成因，与 09-30 那条
+  "`exit status 0xc0000135` 且没有 `--- FAIL` 行＝用例根本没跑，别判成红"是同一味病的另一形。
+- **rev2 故障（更严重）**：解析器匹配 `"--- FAIL "`，而 Go 打的是 `"--- FAIL: "`（冒号粘在词上）⇒
+  **12 发突变全体报成 `red_count=0`**，也就是"包全绿、测试是装饰"——**一个彻底反过来的读数**。
+  抓它的原因是**唯一一次把 baseline 也当读数用**：`BASELINE rc=0 skip=[]`，
+  而这个包已知必须 SKIP `TestLiveWasapiSmoke` ⇒ **skip 为空＝解析器瞎了**，不是包干净。
+- rev3/rev4 起的四道防护（都在台件里，编排者可复跑）：① baseline 必须 `rc=0` **且**必须复现那枚已知 SKIP，否则 harness 拒跑；
+  ② 出现 `build failed` **直接抛异常**，绝不当成"绿"或"没抓到"；③ **C0 注释级正控**（只把注释里 `C8` 改成 `C9`）
+  **必须存活**——一枚连注释都能变红的尺不是在量标度；④ 末尾 `INSTRUMENT-SELFCHECK` 行，
+  rev4 实读 **`control_survived=True real_mutants_with_red=14/15 => OK`**。
+- ⚠ 一枚**假警报**也如实记：14:21 单发跑 M13 时自检查行报过 `BLIND-HARNESS-ALERT`，
+  原因是过滤运行里正控 `C0` 压根没执行（`ctl_line` 为空）。rev4 全量跑已给 `OK`；
+  台件里那一支现在对过滤跑明写 `NOT-APPLICABLE` 而不喊 BLIND。
+
+### 3.2 十七发突变的前后读数
+
+| 发 | 改法（锚点 → 改成） | rc | 指名打红的用例 |
+|---|---|---|---|
+| C0 **正控** | 注释里 `C8 seam`→`C9 seam`（语义中性） | **0** | **无（必须存活；它活了）** |
+| M1 | 分子恒零：`sumSquares += v * v`→`v * 0` | 1 | Endpoints, OverBoundedChannel, SineAgainstRootTwo, SineToleranceBound（4）|
+| M2 | 返回常数：`return rms / LevelFullScale`→`return math.Sqrt(0.25) + rms*0` | 1 | Endpoints, IsLinear, **SilentFrameIsExactZero**, SineAgainstRootTwo, SineToleranceBound（5）|
+| M3 | 容差放宽到 `1e9` | 1 | **只有 SineToleranceIsNamedAndBounded**（1）|
+| M4 | 容差收窄到 `1e-9` | 1 | IsLinear, SineAgainstRootTwo, SineToleranceBound（3）|
+| M5 | 容差**正好摆在钉的上界 `1e-3`** | **0** | **存活**（见 §3.5，这不是洞）|
+| M6 | 分母换 `32767.0`（票面自己提的那一档） | 1 | Endpoints, OverBoundedChannel（2）|
+| M7 | 整条取负 `return -rms / LevelFullScale` | 1 | Endpoints, IsLinear, OverBoundedChannel, **SilentFrameIsExactZero**, SineAgainstRootTwo, SineToleranceBound（6）|
+| M8 | 偷偷加增益 ×2 | 1 | Endpoints, OverBoundedChannel, SineAgainstRootTwo（3）|
+| M9 | 偷偷折压缩（开方） | 1 | Endpoints, IsLinear, OverBoundedChannel, SineAgainstRootTwo（4）|
+| M10 | 帧长判据 `!=`→`<`（放过两帧） | 1 | **只有 TestFrameLevelRejectsNonSeamFrames**（1）|
+| M11 | 均值分母差一：`len(samples)`→`len(samples)-1` | 1 | Endpoints, OverBoundedChannel, SineAgainstRootTwo（3）|
+| M12 | `DecodeFrame` 字节序颠倒 | 1 | Endpoints, IsLinear, OverBoundedChannel, SineAgainstRootTwo, **SeamCodecRoundTrip**（5）|
+| M13 | **隐藏状态**：累加器提成包级 `v1Accum` ＋ 调用次数进分子 | 1 | Endpoints, IsLinear, OverBoundedChannel, **SameInputSameBits**, SineAgainstRootTwo, SineToleranceBound（6）|
+| M14 | 检测器换成**均值绝对值**（RMS 的最像替身） | 1 | **只有 SineAgainstRootTwo**（1）|
+| M15 | 均值绝对值 **＋** 容差同时放到被允许的 `1e-3` | 1 | **只有 SineAgainstRootTwo**（1）|
+| M16 | 改**载体**：`audio.go` 的 `FrameSamples 512→511` | 1 | **只有 TestLevelFrameIsOneSeamFrame**（1）|
+| M17 | 复算 r1 自述的 X3：`LevelFullScale 32768→16384` | 1 | Endpoints, OverBoundedChannel, SineAgainstRootTwo, SineToleranceBound（4）|
+
+（表中用例名省了公共前缀 `TestLevel`；`SineToleranceBound` ＝ `TestLevelSineToleranceIsNamedAndBounded`。）
+
+### 3.3 派单点名的三件事，逐个直答
+
+**① "AC#1 那三发到底有没有牙"** ⇒ **有牙，但牙的分布不均，这一条必须写清**：
+
+- 票面 AC#3 点名的两形都验了：**分子改成常数**＝M1（4 枚红）／M2（5 枚红）；**容差放宽**＝M3（1 枚红）。
+  ⇒ **AC#3 的字面要求成立**。
+- ⚠ **M1（分子恒零）之下 `TestLevelSilentFrameIsExactZero` 是绿的**——一枚恒零生产者读静音帧也是 0。
+  即 AC#1 的"第一发（静默⇒严格 0）"**单独照不到一个死掉的生产者**；真正把 M1 打红的是**第二发（端点）**。
+  票面那句"三发缺一发算不成立"到这里被实测坐实成了一句**有内容的话**。
+- ⚠⚠ **本腿最结构性的发现**：M14/M15 把 RMS 换成**均值绝对值**之后，
+  **十枚用例里只有一枚变红**（`TestLevelSineAgainstRootTwo`）。
+  ⇒ **方波那几枚端点钉根本不区分"RMS"与"另一个齐次幅值泛函"**（方波的 RMS 就等于它的均值绝对值）；
+  **唯一钉住"开方均值"这个函数形状的是第三发那枚正弦钉**。
+  直接后果（已落 §6.2 台账动作）：**谁将来把正弦那枚用例当冗余删掉，这个包就再也区分不了 RMS 与均值绝对值，
+  而包级门禁会全绿。** 这条也反过来支撑 §1 的判语：AC#1 的牙主要在正弦发上。
+- 十枚用例的**红名覆盖表**（本腿从 rev4＋M16 的原始输出聚合，非手写）：
+  `SilentFrameIsExactZero`←M2/M7；`FullScaleSquareEndpoints`←M1/M2/M6/M7/M8/M9/M11/M12/M13/M17；
+  `SineAgainstRootTwo`←M1/M2/M4/M7/M8/M9/M11/M12/M13/M14/M15/M17；
+  `IsLinearInAmplitude`←M2/M4/M7/M9/M12/M13；`SineToleranceIsNamedAndBounded`←M1/M2/M3/M4/M7/M13/M17；
+  `SameInputSameBits`←**只有 M13**；`FrameLevelRejectsNonSeamFrames`←**只有 M10**；
+  `SeamCodecRoundTrip`←**只有 M12**；`OverBoundedChannelFromWavInjector`←M1/M2/M6/M7/M8/M9/M11/M12/M13/M17；
+  `FrameIsOneSeamFrame`←**只有 M16（载体突变）**。
+  ⇒ **10/10 都有牙**，但**其中四枚各只被一发照到**，而那四发**不在 r1 自己的名册里**（它只打了 X1–X4）
+  ⇒ **删掉那四枚中任意一枚，就等于关掉唯一照它的那条缝**。这一条是本腿对 AC#3 的增量，写进台账。
+
+**② "严格 0 是不是真严格"** ⇒ **真严格，两路都验**：
+
+- 实测路（§1.2/§1.6）：单枚 `±1` 样本的帧读 `1.3486991523486091e-06`，**不是 `0.0`**；
+  只有逐枚全零才读 0；`LevelOfSamples` 与 `FrameLevel` 两形的 `Signbit` 都是 `false`。
+- 突变路：M7（整条取负）把 `TestLevelSilentFrameIsExactZero` 打进红名册（6 枚之一）
+  ⇒ **`math.Signbit` 那一枚断言不是摆设，它就是"负零也被钉"这句话的实证**。
+- 与球侧 `SilenceLevelGate = 0.06` 的关系（本腿只做算术、不碰 `internal/ball`）：
+  `internal/ball/liquid.go:215` 拿 `raw` 与门限直接比（`if raw < SilenceLevelGate`），而 `raw` 就是
+  `SetAudioLevel` 收到的那个数 ⇒ **`level.go` 定的量程与球侧门限活在同一个数域上，这句话在盘上说不说得通：说得通**。
+  换算本腿自己复算：`20*log10(0.06) = -24.436974992327126 dBFS`；`0.06` 作 RMS 对应正弦峰值 `2780.457` 枚 int16；
+  本腿实喂 amp 2780 的整周期正弦读 `0.05998977395253116`（**没过**），amp 3000 读 `0.06473793649783069`（**过了**）
+  ⇒ **r1 §9(c) 那笔算术在它自己的量程上对得上**。
+  **判不了的部分照写**：正常说话的 RMS 落在哪一档，仓里零真声音读数，本腿也零开麦（§7）。
+
+**③ 端点声明** ⇒ **两枚读数都落在声称值上，无一超出**：
+满幅方波（整帧 `-32768`）读 **`1`**（float64 与 float32 两形）；`±32767` 方波读 **`0.999969482421875`**
+＝具名常量 `FullScaleSquareLevel` 逐位等。⇒ 任一读数没落在声称之外，AC#1 那半句不因端点判不成立。
+⚠ 一处**口径精度**要说清（不是失败）：`FrameLevel` 返回 `float32`，打印成 `0.9999695` 是 Go 的
+**float32 最短往返表示**、不是精度损失——`32767×2⁻¹⁵` 只需 15 位有效位而 `float32` 有 24 位，
+所以 `level_test.go:96` 的 `float64(got) != FullScaleSquareLevel` 是**逐位成立**的（M6/M9/M11 都把它打红过，证明它是活的）。
+
+### 3.4 r1 自述的四发突变：本腿复算**四发全部逐名对上**
+
+r1 §5 那张 X1–X4 表不是空话，但按规矩**复跑才算裁决凭据**：
+
+| r1 声称 | 本腿复算载体 | 枚数与名册是否一致 |
+|---|---|---|
+| X1 分子改常数 ⇒ 5 枚 | 本腿 M2（同一形状） | **一致**（同 5 枚） |
+| X2 容差 `1e9` ⇒ 1 枚 | 本腿 M3 | **一致**（同 1 枚） |
+| X3 分母 `16384` ⇒ 4 枚 | 本腿 M17（照它原值复跑） | **一致**（同 4 枚，集合相等） |
+| X4 折压缩 ⇒ 4 枚 | 本腿 M9（同一形状） | **一致**（同 4 枚） |
+
+⇒ **r1 §5 的读数表判为诚实**。本腿另加的 13 发是**它没打过的形状**，
+其中 M5/M14/M15/M16 是专门为"这枚钉的射程到底到哪里"设计的。
+
+### 3.5 M5 那枚"存活"是本票设计里的**上界本身**，不是洞
+
+`TestLevelSineToleranceIsNamedAndBounded` 的三支是 `>= LevelLSB`、`<= 1e-3`、`gap > 100*tol`；
+把容差**正好摆到 `1e-3`** 时三支全为真（`<=` 含等号；`100×1e-3 = 0.1 <` 实测八度间距 `0.176778960510595`）⇒ 整包绿。
+这不违反 AC#3，因为 AC#3 要的是"**放宽到任何输入都能过**"，而 `1e-3` 远做不到：
+**M15 就是这一问的实答**——容差放到 `1e-3` 的同时换成均值绝对值检测器，`TestLevelSineAgainstRootTwo` **照样红**。
+⇒ 判读：**钉的可用区间是 `[3.0517578125e-05, 1e-3]`（两端含），而这个区间的上端仍然窄到照得出"另一种幅值泛函"**。
+本腿把它写成台账建议而不是缺陷：`level.go` 的注释可补一句"容差上界是 `1e-3` 本身、含等号，摆到 `1e-3` 仍在钉内"，
+免得后人以为 `5e-5` 是被钉死的唯一值。
+
 
 ---
 
@@ -285,7 +411,58 @@ git diff --name-status 501c6971..HEAD | grep -E "^(M|A)\s+(cmd/wisp|internal/bal
 
 ## §5 附：编排者三处就地改账核得对不对
 
-（待填）
+派单说这三处是"编排者自己写错、被实现腿当场顶正并就地改账"，要我顺手核改得对不对。
+**三处全部改对了**，逐处给本腿自己的尺。凭据底座：`git diff --numstat 501c6971..HEAD -- .scratch/wisp/issues/241-*.md`
+⇒ **`3 3`**（增 3 删 3），与台账 `A466` 那句"删除列 3＝正是这三处"**逐字对上**；
+`git log --oneline -- 该文件` ⇒ 只有 `501c6971`（立票）与 `541a9b2b`（收件改账）两发，都是编排者的。
+
+### 5.1 事实 2 的出处（`internal/audio/gate.go` → `internal/ball/liquid.go:30`）：**改对了**
+
+本腿现跑 `grep -rn "SilenceLevelGate" --include=*.go .`（排 `.scratch`）⇒ 五枚命中：
+
+- 定义 `internal/ball/liquid.go:30`（本腿 `sed -n '30p'` 逐字节读回：`SilenceLevelGate   = 0.06 // envelope below this counts as "nobody speaking"`）
+- 使用 `internal/ball/liquid.go:215`（`if raw < SilenceLevelGate {`）
+- 测试 `internal/ball/liquid_test.go:60`、`internal/ball/tokens_table_test.go:552`
+- **`internal/audio/` 里只剩 `level.go` 的两行注释在引它**（`:13` 与 `:39`）——正是票面新写的那句"`internal/audio` 里今天只有 `level.go` 的注释在引它"。
+- `grep -c "SilenceLevelGate" internal/audio/gate.go` ⇒ **0 枚（rc=1＝没找到，这就是好消息）**：旧出处那枚文件里根本没有这个符号。
+
+⇒ 改账准确，且**判语没被改动**（"它是判静默的门限、不是量程"这条在真出处上同样成立：`:215` 那支是"要不要开始算静默时长"的比较，不是量程定义）。
+`240-c1` §1.4 那行本来就写的是 `liquid.go:30` ⇒ 普查是对的、抄票时抄错，这也与票面新写的括注一致。
+
+### 5.2 AC#1 的"半幅正弦"口径（改成"两头发各自钉"）：**改对了，而且盘上真是两头都钉**
+
+算术这一头本腿用 Python 独立复算（整数级、不走被测代码）：
+满幅正弦 `1/√2 = 0.7071067812`、半幅 `1/(2√2) = 0.3535533906`。原句"半幅正弦 ⇒ 与 `1/√2` 的偏差"
+把两端口径混了，**顶正是对的**。
+盘上那一头本腿逐行读了 `level_test.go:132-166`：里面是**四条独立 `t.Fatalf`**——
+满幅对 `1/√2`、半幅对 `rootTwo/2`、`FrameLevel` float32 接缝形的满幅与半幅各一条、再加四分幅对 `rootTwo/4`；
+**不是"钉一头、另一头当推论"**。⇒ 票面新口径"判据按两头发各自钉收（本票终态：两头都钉住了）"**与盘上形状一致**。
+本腿的实测偏差：满幅 `2.313e-05`、半幅 `1.127e-06`、四分幅 `2.265e-06`，全在具名容差 `5e-5` 内（§1.2）。
+
+### 5.3 AC#5 与禁区那句自相矛盾（裁"四数照跑、被禁的是跨包 `go test`"）：**裁得对，且本腿按同一口径执行了**
+
+票面 `:43` 原文"本腿不跑 `go test` 之外的门禁"与 `:39` 要四数**确实互相拉扯**——
+`build`／`gofumpt`／`vet`／`d22scan` 本来一枚都不是 `go test`，按字面执行反而拿不到 AC#5 要求的数。
+编排者的裁法（四数照跑、禁的只是"跑别的包的 `go test`"）是**唯一能让两句同时为真**的读法，
+不是择一忽视。`241-r1` 的执行形状本腿核过：`gofumpt`/`vet` 收窄到 `internal/audio`、
+`build ./...` 与 `d22scan -root .` 天然全模块/全仓（这两发**无法限定范围**，如实交读数并把归因交给编排者）⇒
+**读成合规**，与票面现在写的"它按最窄一致解执行……不读成越界"一致。
+本腿自己这一轮跑的四数（§6.1）**同一口径**，且**一枚跨包 `go test` 都没跑**（本腿唯一跑过的 `go test` 目标是 `./internal/audio/`）。
+
+⚠ **本腿给这一格补一句该写进票面的话**：`go build ./...` 与 `d22scan -root .` 在**共享工作树**里
+天然会把**别人半成品**的状态一起吃进来。本轮这两发都 rc=0，所以没暴露问题；
+但**一旦它们红了，红的可能不是本票的码**。建议 AC#5 那行补"红时须按 commit 归因，不得直接算本票不成立"——
+这与 §4.2 那枚 AC#4 的口径缺口是**同一味药**。
+
+### 5.4 顺带：本票引用名字的**存在性**本腿逐枚验了（09-30 那条"注释里指名一枚不存在的测试"的教训）
+
+`level.go`/`level_test.go` 的注释与断言里点名的东西，本腿逐枚查了真身：
+`FrameSamples`/`FrameBytes`/`FrameDuration`/`TargetRate`/`BoundedFrameCapacity`/`NewBoundedFrames`/
+`NewWavInjector`/`Stats.FramesSent`/`FramesDropped` **全部在 `audio.go`/`wavinjector.go` 里存在**；
+`level_test.go` 自用的辅助 `decodeOrFail`/`mustLevel`/`squareFrame`/`wholeCycleSine`/`writeWav` 全部有定义
+（`writeWav` 在同包既有测试里，本腿确认它不是新造的）。
+⇒ **本票没有"拿一枚不存在的名字当凭据"这一形。**
+
 
 ---
 

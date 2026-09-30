@@ -1,0 +1,40 @@
+=== RUN   TestV1ProbeReadings
+    zz_v1_probe_test.go:39: V1END all-minus-32768   LevelOfSamples=1 FrameLevel(float32)=1
+    zz_v1_probe_test.go:40: V1END plus-minus-32767  LevelOfSamples=0.999969482421875 FrameLevel(float32)=0.9999695 FullScaleSquareLevel=0.999969482421875
+    zz_v1_probe_test.go:41: V1END plus-minus-1      LevelOfSamples=3.0517578125e-05 LevelLSB=3.0517578125e-05
+    zz_v1_probe_test.go:49: V1ZERO single-sample=1 LevelOfSamples=1.3486991523486091e-06 FrameLevel=1.3486991e-06 err=<nil> exactZero=false belowSilenceGate=true
+    zz_v1_probe_test.go:49: V1ZERO single-sample=-1 LevelOfSamples=1.3486991523486091e-06 FrameLevel=1.3486991e-06 err=<nil> exactZero=false belowSilenceGate=true
+    zz_v1_probe_test.go:53: V1ZERO theoretical smallest nonzero = 1.3486991523486091e-06 (LevelLSB/sqrt(512) = 1.348699152348609e-06)
+    zz_v1_probe_test.go:58: V1ZERO silent LevelOfSamples bits=0 signbit=false
+    zz_v1_probe_test.go:60: V1ZERO silent FrameLevel bits=0 signbit=false
+    zz_v1_probe_test.go:67: V1GATE sine amp=1000 level=0.021578141170418997 clears-0.06=false
+    zz_v1_probe_test.go:67: V1GATE sine amp=2000 level=0.04315975796695891 clears-0.06=false
+    zz_v1_probe_test.go:67: V1GATE sine amp=2780 level=0.05998977395253116 clears-0.06=false
+    zz_v1_probe_test.go:67: V1GATE sine amp=3000 level=0.06473793649783069 clears-0.06=true
+    zz_v1_probe_test.go:67: V1GATE sine amp=4096 level=0.08838528733901062 clears-0.06=true
+    zz_v1_probe_test.go:67: V1GATE sine amp=8192 level=0.176778960510595 clears-0.06=true
+    zz_v1_probe_test.go:67: V1GATE sine amp=16384 level=0.3535522639041434 clears-0.06=true
+    zz_v1_probe_test.go:69: V1GATE 20*log10(0.06) = -24.436974992327126 dBFS; 0.06 as RMS maps to peak int16 = 2780.457000710495
+    zz_v1_probe_test.go:77: V1DC constant-minus-32768 = 1
+    zz_v1_probe_test.go:82: V1DC constant-20000 = 0.6103515625 (pure DC, no AC at all)
+    zz_v1_probe_test.go:94: V1END half-minus32768-half-plus32767 = 0.9999847413273546
+    zz_v1_probe_test.go:100: V1SINE cycles=0 level=0 dev-from-1/sqrt2=0.7071067811865476 within-5e-5=false
+    zz_v1_probe_test.go:100: V1SINE cycles=1 level=0.7070843290027281 dev-from-1/sqrt2=2.2452183819465787e-05 within-5e-5=true
+    zz_v1_probe_test.go:100: V1SINE cycles=3 level=0.7070843290027281 dev-from-1/sqrt2=2.2452183819465787e-05 within-5e-5=true
+    zz_v1_probe_test.go:100: V1SINE cycles=7 level=0.7070843290027281 dev-from-1/sqrt2=2.2452183819465787e-05 within-5e-5=true
+    zz_v1_probe_test.go:100: V1SINE cycles=8 level=0.707083649288286 dev-from-1/sqrt2=2.313189826153028e-05 within-5e-5=true
+    zz_v1_probe_test.go:100: V1SINE cycles=9 level=0.7070843290027281 dev-from-1/sqrt2=2.2452183819465787e-05 within-5e-5=true
+    zz_v1_probe_test.go:100: V1SINE cycles=64 level=0.7070887435870493 dev-from-1/sqrt2=1.803759949825512e-05 within-5e-5=true
+    zz_v1_probe_test.go:100: V1SINE cycles=255 level=0.7070843290027281 dev-from-1/sqrt2=2.2452183819465787e-05 within-5e-5=true
+    zz_v1_probe_test.go:100: V1SINE cycles=256 level=0 dev-from-1/sqrt2=0.7071067811865476 within-5e-5=false
+    zz_v1_probe_test.go:106: V1API EncodeFrame(len=513) reached; see panic probe
+--- PASS: TestV1ProbeReadings (0.00s)
+=== RUN   TestV1ProbeEncodeFrameOverLength
+    zz_v1_probe_test.go:121: V1API EncodeFrame panics on over-length input: runtime error: index out of range [1024] with length 1024
+--- FAIL: TestV1ProbeEncodeFrameOverLength (0.00s)
+=== RUN   TestV1ProbeCodecAsymmetry
+    zz_v1_probe_test.go:137: V1API DecodeFrame(2048 bytes) -> 1024 samples err=<nil> (accepts non-seam length)
+--- PASS: TestV1ProbeCodecAsymmetry (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/audio	0.021s
+FAIL

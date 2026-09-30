@@ -1,0 +1,20 @@
+BASELINE(no mutation) rc=0 red=[] skip=['TestLiveWasapiSmoke']
+C0-comment-only-control          rc=0 red_count=0 red=[]
+   ^^ mutant SURVIVED (whole package stayed green)
+M1-numerator-zero                rc=1 red_count=4 red=['TestLevelFullScaleSquareEndpoints', 'TestLevelOverBoundedChannelFromWavInjector', 'TestLevelSineAgainstRootTwo', 'TestLevelSineToleranceIsNamedAndBounded']
+M2-return-constant-half          rc=1 red_count=5 red=['TestLevelFullScaleSquareEndpoints', 'TestLevelIsLinearInAmplitude', 'TestLevelSilentFrameIsExactZero', 'TestLevelSineAgainstRootTwo', 'TestLevelSineToleranceIsNamedAndBounded']
+M3-tolerance-wide-1e9            rc=1 red_count=1 red=['TestLevelSineToleranceIsNamedAndBounded']
+M4-tolerance-narrow-1e-9         rc=1 red_count=3 red=['TestLevelIsLinearInAmplitude', 'TestLevelSineAgainstRootTwo', 'TestLevelSineToleranceIsNamedAndBounded']
+M5-tolerance-at-bound-1e-3       rc=0 red_count=0 red=[]
+   ^^ mutant SURVIVED (whole package stayed green)
+M6-denominator-32767             rc=1 red_count=2 red=['TestLevelFullScaleSquareEndpoints', 'TestLevelOverBoundedChannelFromWavInjector']
+M7-negative-scale                rc=1 red_count=6 red=['TestLevelFullScaleSquareEndpoints', 'TestLevelIsLinearInAmplitude', 'TestLevelOverBoundedChannelFromWavInjector', 'TestLevelSilentFrameIsExactZero', 'TestLevelSineAgainstRootTwo', 'TestLevelSineToleranceIsNamedAndBounded']
+M8-gain-two-x                    rc=1 red_count=3 red=['TestLevelFullScaleSquareEndpoints', 'TestLevelOverBoundedChannelFromWavInjector', 'TestLevelSineAgainstRootTwo']
+M9-compress-sqrt                 rc=1 red_count=4 red=['TestLevelFullScaleSquareEndpoints', 'TestLevelIsLinearInAmplitude', 'TestLevelOverBoundedChannelFromWavInjector', 'TestLevelSineAgainstRootTwo']
+M10-framelength-too-lax          rc=1 red_count=1 red=['TestFrameLevelRejectsNonSeamFrames']
+M11-mean-divisor-off-by-one      rc=1 red_count=3 red=['TestLevelFullScaleSquareEndpoints', 'TestLevelOverBoundedChannelFromWavInjector', 'TestLevelSineAgainstRootTwo']
+M12-decode-byte-order-swapped    rc=1 red_count=5 red=['TestLevelFullScaleSquareEndpoints', 'TestLevelIsLinearInAmplitude', 'TestLevelOverBoundedChannelFromWavInjector', 'TestLevelSineAgainstRootTwo', 'TestSeamCodecRoundTrip']
+M13-hidden-state-accumulator     rc=1 red_count=6 red=['TestLevelFullScaleSquareEndpoints', 'TestLevelIsLinearInAmplitude', 'TestLevelOverBoundedChannelFromWavInjector', 'TestLevelSameInputSameBits', 'TestLevelSineAgainstRootTwo', 'TestLevelSineToleranceIsNamedAndBounded']
+M14-mean-abs-detector            rc=1 red_count=1 red=['TestLevelSineAgainstRootTwo']
+M15-mean-abs-at-admitted-ceiling rc=1 red_count=1 red=['TestLevelSineAgainstRootTwo']
+INSTRUMENT-SELFCHECK control_survived=True real_mutants_with_red=14/15 => OK

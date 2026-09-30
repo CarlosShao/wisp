@@ -1,0 +1,99 @@
+=== RUN   TestGateHalfDuplexClosedZeroFrames
+--- PASS: TestGateHalfDuplexClosedZeroFrames (0.63s)
+=== RUN   TestGatePathCFullDuplex
+--- PASS: TestGatePathCFullDuplex (0.11s)
+=== RUN   TestGateMutedEvents
+--- PASS: TestGateMutedEvents (0.88s)
+=== RUN   TestGateStartMuted
+--- PASS: TestGateStartMuted (0.44s)
+=== RUN   TestGateStopIdempotent
+--- PASS: TestGateStopIdempotent (0.00s)
+=== RUN   TestHotplugReenumerateOnce
+time=2026-09-30T14:25:07.307+08:00 level=INFO msg="audio capture reopened after device change" source=wasapi-mic device="Fake Mic B"
+time=2026-09-30T14:25:07.411+08:00 level=INFO msg="audio capture reopened after device change" source=wasapi-mic device="Fake Mic B"
+--- PASS: TestHotplugReenumerateOnce (0.28s)
+=== RUN   TestHotplugStaleHandleFailsLoudly
+time=2026-09-30T14:25:07.579+08:00 level=ERROR msg="audio source failed" source=wasapi-mic error="audio_device: hotplug reopen failed; keeping no stale handle (previous device Dying Mic): audio_device: Open capture on device Dying Mic (0x8889000A): capture device is held in exclusive mode by another application; close that application or pick another device"
+--- PASS: TestHotplugStaleHandleFailsLoudly (0.40s)
+=== RUN   TestHotplugReenumerateFailureNamesDevice
+time=2026-09-30T14:25:07.955+08:00 level=ERROR msg="audio source failed" source=wasapi-mic error="audio_device: hotplug reopen failed; keeping no stale handle (previous device Unplugged Mic): audio_device: capture device enumeration failed: audio_device: no capture endpoint present"
+--- PASS: TestHotplugReenumerateFailureNamesDevice (0.07s)
+=== RUN   TestOpenOccupiedAndPermissionDenied
+=== RUN   TestOpenOccupiedAndPermissionDenied/occupied_(exclusive_mode)
+time=2026-09-30T14:25:07.966+08:00 level=ERROR msg="audio source failed" source=wasapi-mic error="audio_device: Initialize(shared mode) on device Busy Mic (0x8889000A): capture device is held in exclusive mode by another application; close that application or pick another device"
+=== RUN   TestOpenOccupiedAndPermissionDenied/permission_denied
+time=2026-09-30T14:25:07.966+08:00 level=ERROR msg="audio source failed" source=wasapi-mic error="audio_device: Initialize(shared mode) on device Busy Mic (0x80070005): microphone access denied: allow desktop apps to use the microphone under Windows Settings > Privacy & security > Microphone"
+--- PASS: TestOpenOccupiedAndPermissionDenied (0.00s)
+    --- PASS: TestOpenOccupiedAndPermissionDenied/occupied_(exclusive_mode) (0.00s)
+    --- PASS: TestOpenOccupiedAndPermissionDenied/permission_denied (0.00s)
+=== RUN   TestEndpointsPairQueryable
+--- PASS: TestEndpointsPairQueryable (0.00s)
+=== RUN   TestPinnedThreadStable10s
+time=2026-09-30T14:25:09.530+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=1 dropped_bytes_total=1024 bounded_window=192ms frame_ms=32
+time=2026-09-30T14:25:10.532+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=12 dropped_bytes_total=12288 bounded_window=192ms frame_ms=32
+time=2026-09-30T14:25:11.586+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=23 dropped_bytes_total=23552 bounded_window=192ms frame_ms=32
+time=2026-09-30T14:25:12.615+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=34 dropped_bytes_total=34816 bounded_window=192ms frame_ms=32
+time=2026-09-30T14:25:13.665+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=45 dropped_bytes_total=46080 bounded_window=192ms frame_ms=32
+time=2026-09-30T14:25:14.693+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=56 dropped_bytes_total=57344 bounded_window=192ms frame_ms=32
+time=2026-09-30T14:25:15.701+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=67 dropped_bytes_total=68608 bounded_window=192ms frame_ms=32
+time=2026-09-30T14:25:16.772+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=78 dropped_bytes_total=79872 bounded_window=192ms frame_ms=32
+time=2026-09-30T14:25:17.779+08:00 level=WARN msg="audio frames dropped: bounded channel full (slow consumer)" source=wasapi-mic dropped_frames_total=89 dropped_bytes_total=91136 bounded_window=192ms frame_ms=32
+--- PASS: TestPinnedThreadStable10s (10.04s)
+=== RUN   TestLiveWasapiSmoke
+    hotplug_test.go:527: live WASAPI smoke requires WISP_LIVE_MIC=1 and a real microphone (鐪熸満鍐掔儫寰呯エ 16)
+--- SKIP: TestLiveWasapiSmoke (0.00s)
+=== RUN   TestCaptureLoopWavIntegrity
+--- PASS: TestCaptureLoopWavIntegrity (1.07s)
+=== RUN   TestLevelSilentFrameIsExactZero
+--- PASS: TestLevelSilentFrameIsExactZero (0.00s)
+=== RUN   TestLevelFullScaleSquareEndpoints
+    level_test.go:97: full-scale square = 0.9999847412109375, want exactly 0.999969482421875 (= 32767/32768)
+--- FAIL: TestLevelFullScaleSquareEndpoints (0.00s)
+=== RUN   TestLevelSineAgainstRootTwo
+    level_test.go:136: full-scale sine level = 0.8408826608, want 0.7071067812 (1/sqrt(2)) within the named tolerance 5e-05 (off by 1.338e-01)
+--- FAIL: TestLevelSineAgainstRootTwo (0.00s)
+=== RUN   TestLevelIsLinearInAmplitude
+    level_test.go:178: scale is not linear: level(8192) = 0.4204509014267837, level(16384) = 0.5946026100717549, drift 0.24629919278181256 over 2*tolerance 0.0001
+--- FAIL: TestLevelIsLinearInAmplitude (0.00s)
+=== RUN   TestLevelSineToleranceIsNamedAndBounded
+--- PASS: TestLevelSineToleranceIsNamedAndBounded (0.00s)
+=== RUN   TestLevelSameInputSameBits
+--- PASS: TestLevelSameInputSameBits (0.00s)
+=== RUN   TestFrameLevelRejectsNonSeamFrames
+--- PASS: TestFrameLevelRejectsNonSeamFrames (0.00s)
+=== RUN   TestSeamCodecRoundTrip
+--- PASS: TestSeamCodecRoundTrip (0.00s)
+=== RUN   TestLevelOverBoundedChannelFromWavInjector
+    level_test.go:357: frame 0 level = 0.70710677, want exactly 0.5 (square wave at half of LevelFullScale)
+--- FAIL: TestLevelOverBoundedChannelFromWavInjector (0.10s)
+=== RUN   TestLevelFrameIsOneSeamFrame
+--- PASS: TestLevelFrameIsOneSeamFrame (0.00s)
+=== RUN   TestResample48kTo16kLengthExact
+--- PASS: TestResample48kTo16kLengthExact (0.00s)
+=== RUN   TestResamplerSineSNR48k
+--- PASS: TestResamplerSineSNR48k (0.00s)
+=== RUN   TestResamplerSineSNR44k1
+--- PASS: TestResamplerSineSNR44k1 (0.00s)
+=== RUN   TestResamplerChunkInvariant
+--- PASS: TestResamplerChunkInvariant (0.00s)
+=== RUN   TestResamplerLatencyBounded
+--- PASS: TestResamplerLatencyBounded (0.00s)
+=== RUN   TestResamplerPassthroughAndFlush
+--- PASS: TestResamplerPassthroughAndFlush (0.00s)
+=== RUN   TestMonoDownmixAndFloatConvert
+--- PASS: TestMonoDownmixAndFloatConvert (0.00s)
+=== RUN   TestWavInjectorFrameExact
+--- PASS: TestWavInjectorFrameExact (0.10s)
+=== RUN   TestWavInjectorRateConversion
+--- PASS: TestWavInjectorRateConversion (0.00s)
+=== RUN   TestWavInjectorBackpressureDropCounted
+--- PASS: TestWavInjectorBackpressureDropCounted (1.44s)
+=== RUN   TestWavInjectorCtxCancel
+--- PASS: TestWavInjectorCtxCancel (0.16s)
+=== RUN   TestWavInjectorBadFile
+--- PASS: TestWavInjectorBadFile (0.01s)
+=== RUN   TestBoundedWindowInvariants
+--- PASS: TestBoundedWindowInvariants (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/audio	15.764s
+FAIL
