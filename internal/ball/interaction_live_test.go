@@ -172,6 +172,9 @@ func TestLiveConfirmingCancelAndEscReturned(t *testing.T) {
 			},
 		},
 	})
+	// AC#1 at the interaction level: with no card waiting, this real window holds
+	// three hot keys and the desktop still has its Esc.
+	requireIdleRoster(t, b)
 
 	// Walk D43 to Confirming: #4 summon, #11 vad-stop, #15 first token with a
 	// tool call, #17 approval needed at L1.
@@ -197,6 +200,9 @@ func TestLiveConfirmingCancelAndEscReturned(t *testing.T) {
 	if !waitFor(2*time.Second, func() bool { return b.EscTakenOver() }) {
 		t.Fatal("entering Confirming did not take Esc over (B1)")
 	}
+	// AC#2, first end: the borrow is not a flag we wrote, it is a registration
+	// Win32 made - the bare Esc leaves the desktop for the length of the card.
+	requireEscBorrowed(t, b)
 	if got := readState(t, b); got != statemachine.StateConfirming {
 		t.Fatalf("ball renders %s, want Confirming", got)
 	}
@@ -206,9 +212,14 @@ func TestLiveConfirmingCancelAndEscReturned(t *testing.T) {
 	if !waitFor(2*time.Second, func() bool { return m.State() == statemachine.StateActing }) {
 		t.Fatalf("the cancel hotkey in Confirming left the machine in %s, want Acting (D43 #22)", m.State())
 	}
+	// AC#2, second end - the half this ticket exists for: once the card is gone
+	// the key is handed BACK, and "handed back" is read from Win32 (a foreign
+	// id can register the bare Esc again), not from our own bookkeeping. This is
+	// also why release does not re-bind the configured cancel key.
 	if b.EscTakenOver() {
 		t.Fatal("Esc still taken over outside Confirming: B1 return violated")
 	}
+	requireEscReturned(t, b)
 	// Esc itself must be ours to give back: while Confirming, an injected bare
 	// Esc is the user's cancel.
 	if _, err := m.Dispatch(statemachine.EvApprovalNeeded, &statemachine.Facts{ApprovalLevel: 1}); err != nil {
@@ -221,8 +232,8 @@ func TestLiveConfirmingCancelAndEscReturned(t *testing.T) {
 	if !injectBinding(t, "Esc") {
 		t.Skipf("SKIP-LOUD: injected Esc never reached the input stream, so this run did NOT prove the " +
 			"physical bare-Esc cancel during Confirming. The takeover itself, the WM_HOTKEY routing of the " +
-			"cancel id and the D43 #22 veto were asserted above; the B1 return is asserted below by the real " +
-			"registration of the configured binding.")
+			"cancel id and the D43 #22 veto were asserted above; the B1 return is asserted below by the " +
+			"desktop probe that registers the bare Esc on a foreign id.")
 	}
 	if !waitFor(2*time.Second, func() bool { return m.State() == statemachine.StateActing }) {
 		t.Fatalf("the taken-over Esc did not cancel Confirming (machine %s)", m.State())
@@ -231,15 +242,19 @@ func TestLiveConfirmingCancelAndEscReturned(t *testing.T) {
 	if b.EscTakenOver() {
 		t.Fatal("Esc not returned after the session")
 	}
-	if rep := b.HotkeyReport(); !rep.IsLive(hkCancel) {
-		t.Errorf("after the B1 return the configured cancel binding is not live: %+v", rep.Bindings())
-	}
+	// Ticket 245 replaced "the configured cancel binding is live again" with the
+	// opposite expectation: after the return the idle roster must be three and
+	// Win32 must report the bare Esc unclaimed. A release that re-registered the
+	// configured binding would put the production default (a bare Esc) back on
+	// the desktop, which is the defect this test now has to be able to see.
+	requireEscReturned(t, b)
 
 	// A single click cancels too (the same veto event, the gesture table says).
 	if _, err := m.Dispatch(statemachine.EvApprovalNeeded, &statemachine.Facts{ApprovalLevel: 1}); err != nil {
 		t.Fatalf("into Confirming again: %v", err)
 	}
 	syncBall()
+	requireEscBorrowed(t, b) // the card is up again, so the borrow is too
 	requireFreeOfDock(t, b)
 	var wr rect
 	pGetWindowRect.Call(uintptr(b.DebugHWND()), unsafePtr(&wr))
@@ -253,6 +268,9 @@ func TestLiveConfirmingCancelAndEscReturned(t *testing.T) {
 	if b.EscTakenOver() {
 		t.Error("click-cancel left Esc taken over")
 	}
+	// The click end of the veto path owes the same return reading as the key
+	// end: whoever dismissed the card, the bare Esc is not ours any more.
+	requireEscReturned(t, b)
 }
 
 // TestLiveNeverStealsFocus covers clause 3. What is asserted here is the

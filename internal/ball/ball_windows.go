@@ -239,7 +239,12 @@ func (b *Ball) createOnSTA(s *staThread) error {
 		return errR
 	}
 
-	// Tray + hotkeys live on the same window.
+	// Tray + hotkeys live on the same window. registerAll binds the three slots
+	// an idle ball may hold and leaves the cancel slot standby (ticket 245): the
+	// production cancel binding is a bare Esc, and RegisterHotKey is
+	// desktop-wide, so binding it here would take Esc from every other app for
+	// the whole life of the process. Confirming borrows it through
+	// TakeEscForCancel and ReleaseEscAfterSession hands it back.
 	t, errT := addTrayIcon(b.hwnd, "Wisp")
 	if errT != nil {
 		return errT
@@ -798,6 +803,13 @@ func (b *Ball) reclampPosition() {
 // HotkeyReloader bridge logs it (ticket 64 A1). Rebind is idempotent - same
 // bindings in, same live set out - so a host may call it on every config
 // poll; HotkeyReloader still diffs so the Win32 churn happens once per change.
+//
+// A rebind drops an in-flight Esc borrow (escTakenOver below): the new binding
+// set is the idle set, and the idle set does not include cancel (ticket 245).
+// A host that rebinds while a card is waiting therefore has to call
+// TakeEscForCancel again on the next state sync - no caller does that today
+// because the config poll and the card live on different legs, and the residual
+// is named in ticket 245 rather than papered over.
 func (b *Ball) RebindHotkeys(cfg HotkeyConfig) HotkeyReport {
 	var rep HotkeyReport
 	b.uiRun(func() {
@@ -852,26 +864,45 @@ func cloneAccel(m map[uint32]Accelerator) map[uint32]Accelerator {
 // (B1). Idempotent. Callable from an Events callback (see uiRun): the B1 law
 // is exactly "take Esc over when the machine enters Confirming", and that
 // verdict arrives inside a gesture callback.
+//
+// Ticket 245: this is the ONLY path that registers the cancel id. An idle ball
+// leaves it standby (see registerAllWith), so the bare-Esc production default is
+// not a desktop-wide hot key except for the 2-3 seconds a card is waiting - the
+// half of the cost that form B leaves on the table is named in the ticket's
+// residual entry, not hidden here.
 func (b *Ball) TakeEscForCancel() {
 	b.uiRun(func() {
 		if b.escTakenOver {
 			return
 		}
-		if takeEsc(b.hwnd) {
-			b.escTakenOver = true
+		if err := takeEsc(b.hwnd); err != nil {
+			// The borrow was refused: say it on the report (Problems() names it)
+			// rather than leaving a card with no cancel key and no explanation.
+			b.hotkeyReport = b.hotkeyReport.withCancel(cancelFailedLine(err))
+			b.registeredHotkeys = b.hotkeyReport.Live()
+			return
 		}
+		b.escTakenOver = true
+		b.hotkeyReport = b.hotkeyReport.withCancel(cancelBorrowedLine())
+		b.registeredHotkeys = b.hotkeyReport.Live()
 	})
 }
 
-// ReleaseEscAfterSession hands Esc back to the configured cancel binding
-// (B1: "会话结束必须归还"). Idempotent.
+// ReleaseEscAfterSession hands Esc back to the desktop (B1: "会话结束必须归还")
+// and returns the cancel slot to standby - it is NOT re-bound to the configured
+// binding, because that binding's product default is the very bare Esc this
+// ticket is about. Idempotent.
 func (b *Ball) ReleaseEscAfterSession() {
 	b.uiRun(func() {
 		if !b.escTakenOver {
 			return
 		}
-		releaseEsc(b.hwnd, b.cancelBinding)
+		releaseEsc(b.hwnd)
 		b.escTakenOver = false
+		// Back to the idle line for whatever the user configured (standby /
+		// disabled / unparsable), so the report describes the set Win32 holds.
+		b.hotkeyReport = b.hotkeyReport.withCancel(cancelIdleLine(b.cancelBinding))
+		b.registeredHotkeys = b.hotkeyReport.Live()
 	})
 }
 

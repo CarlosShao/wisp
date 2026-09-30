@@ -58,10 +58,18 @@ type residentBall struct {
 }
 
 // startResidentBall creates the floating ball window, the tray icon and the
-// four global hotkeys on the ui-sta thread internal/ball owns (that thread is
+// ball's global hotkeys on the ui-sta thread internal/ball owns (that thread is
 // the ball's own Registry.Spawn with the frozen D38b resident name "ui-sta",
 // so this function starts no goroutine of its own - D38a's "one STA/UI thread,
 // ball and panel share it" law is satisfied by not adding a second one).
+//
+// How many keys this leg actually holds (ticket 245): THREE. summon / mute /
+// panel register at boot; the fourth slot, cancel, is left standby by
+// internal/ball because its production binding is a bare Esc and RegisterHotKey
+// is desktop-wide. Confirming borrows that slot for the length of a card, and
+// this leg has no card path (no approval gate, no state machine), so it never
+// borrows it - which is the point of the ticket: the resident process must not
+// take the user's Esc key while it is just sitting there.
 //
 // reg is the runtime's registry, not observe.Default, so a boot that overrode
 // the registry (internal/proc.WithRegistry) books its UI thread where the rest
@@ -101,8 +109,11 @@ func startResidentBall(reg *observe.Registry) *residentBall {
 	rep := b.HotkeyReport()
 
 	// Every [hotkey] outcome is said, never swallowed. A ball that came up with
-	// none of its four keys registered looked exactly like a working demo until
+	// none of its keys registered looked exactly like a working demo until
 	// ticket 64 A1b named it, so the problems print before the summary does.
+	// Since ticket 245 the idle set is three of the four slots: cancel is
+	// standby, which is NOT a problem line (Problems() skips it on purpose), so
+	// a clean boot here prints nothing and still holds no Esc.
 	for _, line := range rep.Problems() {
 		slog.Error("ball: " + line)
 		fmt.Printf("wisp: %s\n", line)

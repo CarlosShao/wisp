@@ -65,9 +65,17 @@ func TestBallLiveLifecycle(t *testing.T) {
 	if !windowAlive(hwnd) {
 		t.Fatalf("ball window %v is not a window after New", hwnd)
 	}
-	if got := b.HotkeyReport(); !got.AllLive() || len(got.Live()) != 4 {
-		t.Fatalf("the live ball did not register its four hotkeys: %+v", got.Bindings())
+	// Ticket 245 tightened this nail from "exactly four" to "exactly the three
+	// an idle ball may hold, and NOT the cancel slot". The tightening is
+	// two-directional on purpose: one extra entry (a ball that binds cancel, or
+	// binds the bare Esc) is red, and one missing entry (a hotkey that failed to
+	// register) is red too. See requireIdleRoster for the second half - the
+	// desktop probe that shows the bare Esc is really free while we are idle.
+	if got := b.HotkeyReport(); !got.AllLive() || len(got.Live()) != 3 {
+		t.Fatalf("the live ball did not register its three idle hotkeys (summon/mute/panel, cancel is "+
+			"borrowed only during Confirming): %+v", got.Bindings())
 	}
+	requireIdleRoster(t, b)
 	afterNew := handlesOfProcess()
 
 	t.Cleanup(func() {
@@ -107,19 +115,22 @@ func TestBallLiveLifecycle(t *testing.T) {
 		t.Fatal("animation timer alive in Sleeping (zero-timer discipline broken)")
 	}
 
-	// B1: Esc takeover during Confirming, released at session end.
+	// B1 / ticket 245, both ends on one real window: Confirming borrows the bare
+	// Esc (live set goes 3 -> 4 and Win32 stops handing Esc to anybody else),
+	// and leaving Confirming hands it back (live set 4 -> 3 and Win32 says the
+	// key is free again). The old shape logged "another app holds it" and
+	// carried on whether or not the ball had even tried; that logged-skip is now
+	// only available when the attempt is on the report as refused (HotkeyError /
+	// HotkeyTaken), which a mutated "never borrow" cannot produce.
 	b.SetState(statemachine.StateConfirming)
 	b.TakeEscForCancel()
+	requireEscBorrowed(t, b)
+	b.SetState(statemachine.StateSleeping)
+	b.ReleaseEscAfterSession()
+	requireEscReturned(t, b)
 	time.Sleep(100 * time.Millisecond)
-	if !b.EscTakenOver() {
-		t.Log("Esc registration busy (another app holds it); takeover not assertable this run")
-	} else {
-		b.SetState(statemachine.StateSleeping)
-		b.ReleaseEscAfterSession()
-		time.Sleep(100 * time.Millisecond)
-		if b.EscTakenOver() {
-			t.Fatal("Esc not returned after session end (B1 violation)")
-		}
+	if b.EscTakenOver() {
+		t.Fatal("Esc not returned after session end (B1 violation)")
 	}
 
 	// Handle gate (orchestrator ruling, docs/SLO.md): window-bearing stack

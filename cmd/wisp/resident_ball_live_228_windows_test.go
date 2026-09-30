@@ -145,11 +145,25 @@ func TestLive228ResidentLegOwnsABallWindowOnTheDesktop(t *testing.T) {
 		hot = verdict[i:min(len(verdict), i+80)]
 	}
 	t.Logf("AC#1 LIVE: hwnd=%v pid=%d owns the ball window; %s", mine[0], leg.pid(), hot)
-	// A ball whose four hot keys all failed to register still looks like a
-	// working window, which is exactly how ticket 64 A1b survived a sign-off
-	// run. Zero live keys on the live tier is a finding, not a detail.
+	// Two counts are findings here, and they are findings about DIFFERENT bugs
+	// (ticket 64 A1b and ticket 245, in that order):
+	//   0/4 - a ball that registered nothing still looks like a working window,
+	//         which is exactly how A1b survived a sign-off run;
+	//   4/4 - the idle ball bound the cancel slot too. The production cancel
+	//         binding is a bare Esc and RegisterHotKey is desktop-wide, so 4/4
+	//         at idle means this process takes Esc from every other application
+	//         on the machine while no card is waiting. The steady roster is
+	//         three (summon/mute/panel); the fourth slot appears only while
+	//         Confirming borrows it, and this leg has no card path at all.
+	// The count is read from the number the process prints, which is
+	// len(HotkeyReport().Live()) - the registration set, not a sentence about it.
 	if strings.Contains(verdict, "hotkeys live 0/4") {
-		t.Errorf("AC#1 RED: the ball came up with none of its four global hot keys registered.\n%s", verdict)
+		t.Errorf("AC#1 RED: the ball came up with none of its global hot keys registered.\n%s", verdict)
+	}
+	if strings.Contains(verdict, "hotkeys live 4/4") {
+		t.Errorf("AC#1 RED (ticket 245): the idle resident ball registered all four hot key slots, so the "+
+			"cancel slot is a desktop-wide hot key while nothing is being confirmed. The idle roster is three "+
+			"(summon/mute/panel); cancel is borrowed only during Confirming.\n%s", verdict)
 	}
 
 	// Leave the way an operator does, then require the window to be gone: the

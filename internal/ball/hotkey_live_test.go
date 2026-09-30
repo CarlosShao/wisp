@@ -31,14 +31,88 @@ const spareHKID = 900
 
 // liveHotkeys is the test binding set. It deliberately avoids the product
 // defaults that are known-occupied on this machine (Ctrl+Alt+W, measured) and
-// the bare "Esc" cancel default: registering Esc as a GLOBAL hotkey swallows
-// Esc from every other app on the desktop for the whole test run, so the live
-// tests bind a modifier combination instead (see the ticket's found-defect
-// note). F11/F12 are also occupied here (measured 2026-09-20: real 1409),
-// which is why the previous ticket's F9-F12 fixture "passed" with nothing
-// registered.
+// keeps a modifier combination for cancel: an idle ball no longer registers
+// cancel at all (ticket 245 - the production default is a bare Esc, and
+// RegisterHotKey would take Esc from every other app on the desktop for the
+// whole test run), and while the borrow is live the suite must still be able
+// to tell "our cancel slot" apart from "the key the user configured". F11/F12
+// are also occupied here (measured 2026-09-20: real 1409), which is why the
+// previous ticket's F9-F12 fixture "passed" with nothing registered.
 func liveHotkeys() HotkeyConfig {
 	return HotkeyConfig{Summon: "Ctrl+Alt+Q", Mute: "Ctrl+Alt+M", Cancel: "Ctrl+Alt+V", Panel: "Ctrl+Alt+B"}
+}
+
+// escBorrowProbe asks Win32 - not our own bookkeeping - whether the bare Esc
+// is unclaimed on this desktop right now: register it on an id the ball never
+// uses, then drop it immediately. ERROR_HOTKEY_ALREADY_REGISTERED means
+// somebody holds it, and while the ball has borrowed it that somebody is us.
+//
+// This is the ruler behind ticket 245 AC#2's SECOND half - "还". The takeover
+// flag alone only proves we wrote a bool; what the desktop can still use is a
+// fact about Win32, and it is the same fact the defect was made of.
+//
+// The call runs on the window's owning thread (Win32 refuses it anywhere else)
+// and unregisters again before returning, so a probe that says "free" leaves
+// nothing bound behind.
+func escBorrowProbe(t *testing.T, b *Ball) (free bool, err error) {
+	t.Helper()
+	res := make(chan error, 1)
+	b.sta.PostTask(func() {
+		r, _, e := pRegisterHotKey.Call(uintptr(b.hwnd), uintptr(spareHKID),
+			uintptr(modNoRepeat), uintptr(vkEscape))
+		if r == 0 {
+			if errno, ok := e.(syscall.Errno); ok && errno != 0 {
+				res <- errno
+				return
+			}
+			res <- syscall.EINVAL
+			return
+		}
+		pUnregisterHotKey.Call(uintptr(b.hwnd), uintptr(spareHKID))
+		res <- nil
+	})
+	if e := <-res; e != nil {
+		if errors.Is(e, windows.ERROR_HOTKEY_ALREADY_REGISTERED) {
+			return false, nil
+		}
+		return false, e
+	}
+	return true, nil
+}
+
+// requireEscBorrowed is the non-skippable form of "Confirming really took Esc".
+// It accepts exactly two readings: the bare Esc is in OUR registration set
+// (then the desktop probe must see it as taken), or we tried and Win32 refused
+// it (a foreign app holds bare Esc on this machine - reported, never passed
+// off as a borrow). A ball that never attempted the borrow reads as standby and
+// fails here, which is the whole point: the alternative would be a ruler that
+// cannot tell "no borrow needed" from "borrow code deleted".
+func requireEscBorrowed(t *testing.T, b *Ball) {
+	t.Helper()
+	rep := b.HotkeyReport()
+	if len(rep.Live()) != 4 {
+		line, _ := rep.Binding(hkCancel)
+		if line.Status == HotkeyStandby {
+			t.Fatalf("ticket 245 RED: Confirming never attempted the Esc borrow (cancel line still "+
+				"standby, live set holds %d of the 4 slots): %+v", len(rep.Live()), rep.Bindings())
+		}
+		if line.Status == HotkeyTaken || line.Status == HotkeyError {
+			t.Logf("SKIP-LOUD: the Esc borrow was ATTEMPTED and refused by Win32 (%v) - another program on "+
+				"this desktop owns bare Esc, so this run did not prove the borrowed key reaches the shell. "+
+				"It did prove the ball tries (that is what ticket 245's borrow path is).", line.Err)
+			return
+		}
+		t.Fatalf("after the borrow the live set holds %d entries, want 4: %+v", len(rep.Live()), rep.Bindings())
+	}
+	if got := rep.Live()[hkCancel]; got.VK != vkEscape {
+		t.Fatalf("the borrowed cancel slot holds VK 0x%X, want VK_ESCAPE 0x1B: %+v", got.VK, rep.Bindings())
+	}
+	if free, err := escBorrowProbe(t, b); err != nil {
+		t.Fatalf("the bare-Esc probe could not run: %v", err)
+	} else if free {
+		t.Fatal("ticket 245 RED: the ball says it borrowed Esc, but the desktop still has it free - " +
+			"the borrow registered on some other key, not on VK_ESCAPE")
+	}
 }
 
 // TestLiveHotkeyRebindEndToEnd is the A1 proof on a running instance: a real
@@ -66,14 +140,13 @@ func TestLiveHotkeyRebindEndToEnd(t *testing.T) {
 	})
 
 	// 1. The registration set at boot is asserted, not assumed (registry A1:
-	// "四项默认热键全注册失败、测试仍报 PASS").
+	// "四项默认热键全注册失败、测试仍报 PASS"). Since ticket 245 the idle set is
+	// THREE, and the missing one is the cancel slot by design.
 	boot := b.HotkeyReport()
 	if !boot.AllLive() {
 		t.Fatalf("boot registration incomplete: %+v", boot.Bindings())
 	}
-	if len(boot.Live()) != 4 {
-		t.Fatalf("live set = %d entries, want 4: %+v", len(boot.Live()), boot.Bindings())
-	}
+	requireIdleRoster(t, b)
 	if got := boot.Live()[hkSummon].VK; got != 'Q' {
 		t.Fatalf("summon registered as VK 0x%X, want 'Q' (0x51)", got)
 	}
@@ -98,7 +171,7 @@ func TestLiveHotkeyRebindEndToEnd(t *testing.T) {
 	seen := waitFor(3*time.Second, func() bool {
 		r.Check()
 		live := b.RegisteredHotkeys()
-		return len(live) == 4 && live[hkSummon].VK == 'R'
+		return len(live) == 3 && live[hkSummon].VK == 'R'
 	})
 	if !seen {
 		live := b.RegisteredHotkeys()
@@ -197,8 +270,16 @@ func TestLiveHotkeyOccupiedVsNotAttempted(t *testing.T) {
 	cfg.Mute = ""
 	cfg.Panel = "Ctrl+Alt+NotAKey+"
 	rep2 := b.RebindHotkeys(cfg)
-	if !rep2.IsLive(hkCancel) {
-		t.Errorf("cancel dropped after siblings failed: %+v", rep2.Bindings())
+	// Cancel is the slot this test used to assert as "still live after its
+	// neighbours broke". Ticket 245 moved that property to the borrow: an idle
+	// ball must NOT hold cancel, so what has to survive a broken neighbour set is
+	// the cancel path's ABILITY to take Esc when Confirming asks for it.
+	if c, _ := rep2.Binding(hkCancel); c.Status != HotkeyStandby {
+		t.Errorf("cancel line after siblings failed = %+v, want standby (present in the report, "+
+			"never bound while idle)", c)
+	}
+	if rep2.IsLive(hkCancel) {
+		t.Error("ticket 245 RED: the rebalanced idle set still holds the cancel slot")
 	}
 	if mt, _ := rep2.Binding(hkMute); mt.Status != HotkeyDisabled || mt.Status.Attempted() {
 		t.Errorf("unset mute = %q, want disabled/never-attempted", mt.Status)
@@ -220,6 +301,16 @@ func TestLiveHotkeyOccupiedVsNotAttempted(t *testing.T) {
 	if got := rep3.Live()[hkSummon].VK; got != 'Q' {
 		t.Fatalf("summon VK = 0x%X, want 'Q'", got)
 	}
+	// The cancel path's ability, asserted once the spare id is really free (the
+	// probe inside these helpers registers bare Esc on that id, so it must not
+	// still be squatted). This is what survived from ticket 64's "cancel is not
+	// dropped when its neighbours fail": the slot is idle-unbound by design, and
+	// the borrow that binds it has to work anyway - then give Esc back.
+	requireIdleRoster(t, b)
+	b.TakeEscForCancel()
+	requireEscBorrowed(t, b)
+	b.ReleaseEscAfterSession()
+	requireEscReturned(t, b)
 }
 
 // TestLiveMuteHotkeyEndToEnd is A1d: the registered mute key -> OnMuteHotkey ->
@@ -327,6 +418,47 @@ func TestLiveSleepingZeroTimerHandles(t *testing.T) {
 	if after := cnt.wmTimer.Load(); after != before {
 		t.Fatalf("%d WM_TIMER messages still arriving 600ms after the return to Sleeping", after-before)
 	}
+}
+
+// requireIdleRoster is AC#1 on a real window: the idle registration set is
+// EXACTLY summon / mute / panel, the cancel slot is not in it, and - because a
+// count alone could be three by accident - the bare Esc must be free on the
+// desktop at that moment. The two halves are the same ruler run twice: the
+// pre-245 ball read 4 live with Esc bound, and a ball that simply failed to
+// register anything would read 0 or 1.
+func requireIdleRoster(t *testing.T, b *Ball) {
+	t.Helper()
+	rep := b.HotkeyReport()
+	if _, held := rep.Live()[hkCancel]; held {
+		t.Fatalf("ticket 245 RED: the idle ball holds the cancel hot key: %+v", rep.Bindings())
+	}
+	if len(rep.Live()) != 3 {
+		t.Fatalf("idle live set = %d entries, want exactly 3 (summon/mute/panel): %+v",
+			len(rep.Live()), rep.Bindings())
+	}
+	if !rep.IsLive(hkSummon) || !rep.IsLive(hkMute) || !rep.IsLive(hkPanel) {
+		t.Fatalf("idle live set is not summon/mute/panel: %+v", rep.Bindings())
+	}
+	if c, _ := rep.Binding(hkCancel); c.Status != HotkeyStandby {
+		t.Errorf("idle cancel line = %+v, want standby", c)
+	}
+	free, err := escBorrowProbe(t, b)
+	if err != nil {
+		t.Fatalf("the bare-Esc probe could not run: %v", err)
+	}
+	if !free {
+		t.Fatal("ticket 245 RED: bare Esc is claimed on this desktop while the ball is idle")
+	}
+}
+
+// requireEscReturned is AC#2's "还" half on a real window: the roster is idle
+// again AND Win32 itself reports the bare Esc unclaimed.
+func requireEscReturned(t *testing.T, b *Ball) {
+	t.Helper()
+	if b.EscTakenOver() {
+		t.Fatal("ticket 245 RED: Esc still marked taken over after the session end")
+	}
+	requireIdleRoster(t, b)
 }
 
 // ------------------------------------------------------------------ helpers

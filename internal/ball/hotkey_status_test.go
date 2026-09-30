@@ -20,15 +20,21 @@ import (
 
 // fakeRegistry is an in-memory RegisterHotKey: it records what was attempted
 // and can be told which combinations fail (and with which error).
+//
+// attemptedAcc (ticket 245) is the parallel accelerator list: "which slot did
+// it try" alone cannot answer "did anything bind the bare Esc", which is the
+// question this ticket is about.
 type fakeRegistry struct {
-	attempted []uint32
-	unattempt []uint32 // ids whose UnregisterHotKey was called
-	fail      map[uint32]error
-	held      map[string]bool // "mods|vk" -> already owned
+	attempted    []uint32
+	attemptedAcc []Accelerator // parallel to attempted
+	unattempt    []uint32      // ids whose UnregisterHotKey was called
+	fail         map[uint32]error
+	held         map[string]bool // "mods|vk" -> already owned
 }
 
 func (f *fakeRegistry) register(id uint32, acc Accelerator) error {
 	f.attempted = append(f.attempted, id)
+	f.attemptedAcc = append(f.attemptedAcc, acc)
 	if err, ok := f.fail[id]; ok {
 		return err
 	}
@@ -47,6 +53,44 @@ func (f *fakeRegistry) unregister(id uint32) {
 	f.unattempt = append(f.unattempt, id)
 }
 
+// attemptsOf counts RegisterHotKey calls made for one id (the return leg of the
+// borrow must be exactly the borrow's one attempt - a release that re-binds
+// would show up here as a second one).
+func (f *fakeRegistry) attemptsOf(id uint32) int {
+	n := 0
+	for _, got := range f.attempted {
+		if got == id {
+			n++
+		}
+	}
+	return n
+}
+
+// unregistersOf counts UnregisterHotKey calls made for one id.
+func (f *fakeRegistry) unregistersOf(id uint32) int {
+	n := 0
+	for _, got := range f.unattempt {
+		if got == id {
+			n++
+		}
+	}
+	return n
+}
+
+// bindsEsc reports whether any attempt registered the bare VK_ESCAPE with no
+// modifier but MOD_NOREPEAT - the spelling RegisterHotKey takes desktop-wide.
+// ParseAccelerator("Esc") produces exactly this accelerator, so the helper
+// catches both shapes of the defect: the borrow, and an idle pass that binds a
+// configured bare Esc.
+func (f *fakeRegistry) bindsEsc() bool {
+	for _, acc := range f.attemptedAcc {
+		if acc.VK == vkEscape && acc.Mods == modNoRepeat {
+			return true
+		}
+	}
+	return false
+}
+
 func accelKey(a Accelerator) string { return fmt.Sprintf("%d|%d", a.Mods, a.VK) }
 
 func fullConfig() HotkeyConfig {
@@ -55,31 +99,218 @@ func fullConfig() HotkeyConfig {
 
 // TestRegisterAllLiveSet asserts the registration SET itself - the thing no
 // test in this repo ever checked (ticket 64 A1: "四项默认热键全注册失败、测试仍报 PASS").
+//
+// Ticket 245 rewrote the expected set from four to three, and that edit is a
+// TIGHTENING in two directions at once, so both halves are asserted here:
+//   - an idle ball may hold EXACTLY summon / mute / panel - one more, or one
+//     less, is red (the old "exactly four" would have called the pre-245 bug
+//     green, which is why it is not enough any more);
+//   - and the thing it may never hold while idle is the cancel slot, which the
+//     production default spells as a bare Esc. That is asserted as an
+//     accelerator, not as a slot name: bindsEsc() must be false on the idle
+//     pass, and true the moment the borrow runs (the positive control below,
+//     in the same fake registry - a ruler that only ever sees "no Esc" because
+//     nothing registers ever would be a blind ruler).
 func TestRegisterAllLiveSet(t *testing.T) {
 	reg := &fakeRegistry{}
 	rep := registerAllWith(0, fullConfig(), reg.register)
 
-	want := []uint32{hkSummon, hkMute, hkCancel, hkPanel}
+	want := []uint32{hkSummon, hkMute, hkPanel}
 	if len(reg.attempted) != len(want) {
-		t.Fatalf("attempted %v, want all four %v", reg.attempted, want)
+		t.Fatalf("attempted %v, want exactly the three idle slots %v (cancel is standby, ticket 245)",
+			reg.attempted, want)
+	}
+	for _, id := range reg.attempted {
+		if id == hkCancel {
+			t.Fatalf("the idle registration pass bound the cancel slot: %v", reg.attempted)
+		}
 	}
 	live := rep.Live()
-	if len(live) != 4 {
-		t.Fatalf("live set %v, want 4 entries", live)
+	if len(live) != 3 {
+		t.Fatalf("live set = %d entries %v, want exactly 3 (summon/mute/panel)", len(live), live)
 	}
 	for _, id := range want {
 		if !rep.IsLive(id) {
 			t.Errorf("id %d not live; report %v", id, rep.Bindings())
 		}
 	}
+	if _, held := live[hkCancel]; held {
+		t.Errorf("cancel is in the idle live set: %+v", rep.Bindings())
+	}
+	if reg.bindsEsc() {
+		t.Errorf("the idle pass registered a bare Esc (mods|vk seen: %v); every other app on this desktop "+
+			"just lost its Esc key (ticket 245)", reg.attemptedAcc)
+	}
+	cancel, ok := rep.Binding(hkCancel)
+	if !ok {
+		t.Fatalf("no cancel line in %+v", rep.Bindings())
+	}
+	if cancel.Status != HotkeyStandby {
+		t.Errorf("cancel status = %q, want standby (configured, parsable, not bound while idle)", cancel.Status)
+	}
+	if cancel.Binding != "Esc" {
+		t.Errorf("cancel binding string = %q, want the configured Esc (the report keeps the user's spelling)", cancel.Binding)
+	}
+	if cancel.Status.Attempted() {
+		t.Error("standby must be a never-attempted status")
+	}
+	if cancel.Acc != (Accelerator{}) {
+		t.Errorf("standby carries accelerator %+v, want the zero value (Acc is zero when not attempted)", cancel.Acc)
+	}
 	if !rep.AllLive() {
-		t.Error("AllLive false with every binding accepted")
+		t.Error("AllLive false with every idle-allowed binding accepted")
 	}
 	if p := rep.Problems(); len(p) != 0 {
 		t.Errorf("problems on a clean run: %v", p)
 	}
 	if live[hkSummon].VK != 'Q' || live[hkMute].VK != 'M' {
 		t.Errorf("live accelerators wrong: %+v", live)
+	}
+}
+
+// TestDefaultHotkeysIdlePassHoldsNoEsc is AC#1 over the PRODUCT DEFAULTS (not
+// a test fixture): DefaultHotkeys() is what cmd/wisp's resident leg hands
+// ball.New, so this is the deterministic half of "the shipped process does not
+// take Esc from the desktop".
+func TestDefaultHotkeysIdlePassHoldsNoEsc(t *testing.T) {
+	reg := &fakeRegistry{}
+	rep := registerAllWith(0, DefaultHotkeys(), reg.register)
+	if reg.bindsEsc() {
+		t.Fatalf("the production defaults bound a bare Esc globally: %v", reg.attemptedAcc)
+	}
+	if len(rep.Live()) != 3 {
+		t.Fatalf("idle live set with the production defaults = %d, want 3: %+v", len(rep.Live()), rep.Bindings())
+	}
+	if rep.IsLive(hkCancel) {
+		t.Fatalf("cancel live with the production defaults: %+v", rep.Bindings())
+	}
+	// Positive control for the same fixture one line further: DefaultHotkeys
+	// really does say Esc, so the assertion above is not passing because the
+	// default changed (it must not change - PLAN.md D43 row 22 is frozen).
+	if d := DefaultHotkeys(); d.Cancel != "Esc" {
+		t.Fatalf("the cancel default moved to %q; ticket 245 form B keeps the key name", d.Cancel)
+	}
+	if c, _ := rep.Binding(hkCancel); c.Binding != "Esc" || c.Status != HotkeyStandby {
+		t.Fatalf("cancel line = %+v, want the Esc default left standby", c)
+	}
+}
+
+// TestCancelBorrowRoundTrip is AC#2's two ends at the deterministic layer: the
+// borrow binds the bare Esc and the report follows it; the return DROPS it and
+// the report follows back - and the return must not re-bind anything, because
+// re-binding the configured default is the defect this ticket is about.
+func TestCancelBorrowRoundTrip(t *testing.T) {
+	reg := &fakeRegistry{}
+	rep := registerAllWith(0, fullConfig(), reg.register)
+	if reg.attemptsOf(hkCancel) != 0 {
+		t.Fatalf("idle pass attempted cancel: %v", reg.attempted)
+	}
+
+	// --- borrow (what entering Confirming does)
+	if err := takeEscWith(reg.unregister, reg.register); err != nil {
+		t.Fatalf("borrow refused by the fake registry: %v", err)
+	}
+	if reg.attemptsOf(hkCancel) != 1 {
+		t.Fatalf("cancel attempts after the borrow = %d, want exactly 1: %v", reg.attemptsOf(hkCancel), reg.attempted)
+	}
+	if !reg.bindsEsc() {
+		t.Fatalf("the borrow did not bind the bare Esc: %v", reg.attemptedAcc)
+	}
+	borrowed := rep.withCancel(cancelBorrowedLine())
+	if len(borrowed.Live()) != 4 {
+		t.Fatalf("live set while borrowed = %d, want 4: %+v", len(borrowed.Live()), borrowed.Bindings())
+	}
+	if got := borrowed.Live()[hkCancel]; got.VK != vkEscape || got.Mods != modNoRepeat {
+		t.Errorf("cancel registered as %+v, want the bare VK_ESCAPE with MOD_NOREPEAT", got)
+	}
+	if !borrowed.AllLive() {
+		t.Error("AllLive false while the borrow is live")
+	}
+	if p := borrowed.Problems(); len(p) != 0 {
+		t.Errorf("a successful borrow produced problems: %v", p)
+	}
+
+	// --- return (what leaving Confirming does). THIS is the "还" reading:
+	// unregister, and nothing re-registered afterwards.
+	releaseEscWith(reg.unregister)
+	if reg.unregistersOf(hkCancel) < 1 {
+		t.Fatal("the return never called UnregisterHotKey for the cancel slot")
+	}
+	if reg.attemptsOf(hkCancel) != 1 {
+		t.Fatalf("cancel registration attempts = %d after the return, want still 1 - the return must drop "+
+			"the slot, never re-bind the configured binding (that is ticket 245's defect coming back)",
+			reg.attemptsOf(hkCancel))
+	}
+	returned := borrowed.withCancel(cancelIdleLine(fullConfig().Cancel))
+	if len(returned.Live()) != 3 {
+		t.Fatalf("live set after the return = %d, want 3: %+v", len(returned.Live()), returned.Bindings())
+	}
+	if c, _ := returned.Binding(hkCancel); c.Status != HotkeyStandby || c.Binding != "Esc" {
+		t.Errorf("cancel after the return = %+v, want standby with the configured spelling kept", c)
+	}
+	if !returned.AllLive() {
+		t.Error("AllLive false after a clean return")
+	}
+
+	// Borrow twice without returning is the shape of a re-sync while a card is
+	// still up: the second attempt must be refused by the registry that already
+	// holds it, and the caller must be told (TakeEscForCancel is idempotent on
+	// top of that, but the primitive itself does not lie).
+	if err := takeEscWith(reg.unregister, reg.register); err == nil {
+		t.Error("double borrow succeeded without a return: the fake registry is not modelling 1409")
+	}
+}
+
+// TestCancelBorrowFailureIsAProblemLine pins the one failure path the ticket
+// rules out silently: if Win32 refuses the borrow (another app owns bare Esc),
+// Confirming has no cancel key and the report must SAY so, not leave the slot
+// reading as if everything were fine.
+func TestCancelBorrowFailureIsAProblemLine(t *testing.T) {
+	reg := &fakeRegistry{fail: map[uint32]error{hkCancel: syscall.EINVAL}}
+	if err := takeEscWith(reg.unregister, reg.register); err == nil {
+		t.Fatal("a failing registrar reported a successful borrow")
+	}
+	rep := registerAllWith(0, fullConfig(), (&fakeRegistry{}).register).
+		withCancel(cancelFailedLine(syscall.EINVAL))
+	if rep.AllLive() {
+		t.Error("AllLive true while the borrow failed")
+	}
+	line := strings.Join(rep.Problems(), "\n")
+	if !strings.Contains(line, "cancel") || !strings.Contains(line, "was not registered") {
+		t.Errorf("the failed borrow produced no user-visible line: %q", line)
+	}
+	if c, _ := rep.Binding(hkCancel); c.Status.Attempted() != true {
+		t.Error("a refused borrow must be an attempted status")
+	}
+}
+
+// TestStandbyIsNotDisabledAndNotAProblem keeps the three never-attempted
+// statuses apart: the user turning a key off, a binding that is junk, and the
+// cancel slot being idle-unbound by design must not collapse into one line -
+// they mean three different things to the person reading the log.
+func TestStandbyIsNotDisabledAndNotAProblem(t *testing.T) {
+	rep := registerAllWith(0, fullConfig(), (&fakeRegistry{}).register)
+	cancel, _ := rep.Binding(hkCancel)
+	mute, _ := rep.Binding(hkMute)
+	if cancel.Status == mute.Status {
+		t.Fatalf("cancel standby and mute-disabled share a status (%v)", cancel.Status)
+	}
+	if strings.Contains(cancel.Status.String(), "unset in config") {
+		t.Errorf("the standby line claims the user unset the key: %q", cancel.Status.String())
+	}
+	// An empty cancel binding is still the user's choice, not standby.
+	off := registerAllWith(0, HotkeyConfig{Summon: "Ctrl+Alt+Q"}, (&fakeRegistry{}).register)
+	if c, _ := off.Binding(hkCancel); c.Status != HotkeyDisabled {
+		t.Errorf("unset cancel = %q, want disabled (the user asked for no key)", c.Status)
+	}
+	// A junk cancel binding still reports the config bug, standby or not.
+	junk := registerAllWith(0, HotkeyConfig{Summon: "Ctrl+Alt+Q", Cancel: "Ctrl+Alt+NotAKey+"},
+		(&fakeRegistry{}).register)
+	if c, _ := junk.Binding(hkCancel); c.Status != HotkeyUnparsable || c.Status.Attempted() {
+		t.Errorf("junk cancel = %+v, want unparsable-and-never-attempted", c)
+	}
+	if p := strings.Join(junk.Problems(), "\n"); !strings.Contains(p, "cancel") {
+		t.Errorf("the junk cancel binding vanished from the user-visible problems: %q", p)
 	}
 }
 
@@ -94,9 +325,20 @@ func TestRegisterAllSplitsFailureFamilies(t *testing.T) {
 	cfg := HotkeyConfig{Summon: "Ctrl+Alt+Q", Mute: "Ctrl+Alt+M", Cancel: "Esc", Panel: "Ctrl+Alt+Bogus+"}
 	rep := registerAllWith(0, cfg, reg.register)
 
-	// summon + cancel survive a neighbour's failure.
-	if !rep.IsLive(hkSummon) || !rep.IsLive(hkCancel) {
+	// summon survives a neighbour's failure. Cancel used to be asserted here as
+	// "also live"; since ticket 245 an idle ball must NOT hold cancel, so the
+	// independence-of-the-cancel-path property is asserted where it now lives:
+	// after the same broken set, the borrow still gets its registration (the
+	// cancel slot does not inherit its neighbours' failures).
+	if !rep.IsLive(hkSummon) {
 		t.Fatalf("one failure dropped the others: %+v", rep.Bindings())
+	}
+	if c, _ := rep.Binding(hkCancel); c.Status != HotkeyStandby {
+		t.Errorf("cancel while neighbours failed = %q, want standby (idle balls never bind it)", c.Status)
+	}
+	borrowReg := &fakeRegistry{}
+	if err := takeEscWith(borrowReg.unregister, borrowReg.register); err != nil {
+		t.Errorf("the cancel path is not independent: borrow failed after neighbours failed (%v)", err)
 	}
 	// mute: ATTEMPTED and refused with 1409 => occupied.
 	mute, _ := rep.Binding(hkMute)
@@ -145,6 +387,11 @@ func TestRegisterAllSplitsFailureFamilies(t *testing.T) {
 // TestUnregisterAllDropsKnownSlots pins why rebind unregisters all four ids:
 // a slot we lost track of would otherwise return 1409 on the next rebind and
 // be misreported as "occupied by another program".
+//
+// Ticket 245 adds a second reason for the cancel id specifically: an Esc the
+// ball borrowed during Confirming is a slot this process holds even though the
+// idle pass never registered it, so shutdown and rebind must still drop it -
+// otherwise the borrowed key outlives the window that borrowed it.
 func TestUnregisterAllDropsKnownSlots(t *testing.T) {
 	reg := &fakeRegistry{}
 	unregisterAllWith(reg.unregister)
@@ -165,6 +412,8 @@ func TestUnregisterAllDropsKnownSlots(t *testing.T) {
 }
 
 // TestHotkeyStatusString checks the log/UI vocabulary is stable and specific.
+// Every status the code can produce is listed here on purpose: a new status
+// with no line in this table is a status nobody can decode from a log.
 func TestHotkeyStatusString(t *testing.T) {
 	cases := map[HotkeyStatus]string{
 		HotkeyLive:       "live",
@@ -172,11 +421,17 @@ func TestHotkeyStatusString(t *testing.T) {
 		HotkeyUnparsable: "not attempted (binding cannot be parsed)",
 		HotkeyTaken:      "occupied by another app",
 		HotkeyError:      "registration failed",
+		HotkeyStandby:    "not bound while idle (cancel is borrowed only during Confirming)",
 	}
 	for s, want := range cases {
 		if got := s.String(); got != want {
 			t.Errorf("status %d = %q, want %q", s, got, want)
 		}
+	}
+	// The two never-attempted-but-different cases must not read the same way:
+	// one is the user's choice, the other is this process's design rule.
+	if HotkeyDisabled.String() == HotkeyStandby.String() {
+		t.Error("disabled and standby share a sentence")
 	}
 }
 
