@@ -66,6 +66,12 @@ type escVetoFunc func() string
 // the ball was never created.
 type residentBall struct {
 	b *ball.Ball
+	// cancelHosted records whether the assembly root actually handed this host a
+	// cancel executor (ticket 246 AC#3). It is a fact about the wiring, taken in
+	// the same statement that installs the event, and the gate reads it before it
+	// advertises the Esc channel: a window whose cancel key fires into nothing
+	// must not be reported as a leg that can be vetoed by Esc.
+	cancelHosted bool
 	// verdict is the operator-facing fact about the ball in THIS process,
 	// built from what Win32 actually returned rather than from a hope. It is
 	// written in the same statement that stores (or does not store) the ball,
@@ -103,7 +109,7 @@ type residentBall struct {
 //
 // Errors are returned as a verdict, never as a failure to boot.
 func startResidentBall(reg *observe.Registry, onCancelEsc escVetoFunc) *residentBall {
-	rb := &residentBall{}
+	rb := &residentBall{cancelHosted: onCancelEsc != nil}
 
 	b, err := ball.New(ball.Options{
 		// Sleeping is the only state this leg may claim on its own: nothing here

@@ -142,6 +142,14 @@ func (ra *residentApproval) bindBallHost(rb *residentBall) bool {
 			"四条否决通道全部保持未加载（Esc 无处可借，卡片无处可呈）")
 		return false
 	}
+	if !rb.cancelHosted {
+		// A window with no executor behind the cancel key: the borrow would be
+		// advertised and the press would be booked as "no executor". Both halves
+		// of that are lies the channel registry is not allowed to tell.
+		ra.residentAuditf("resident-approval: 本进程有悬浮球窗口，但装配根没有注入取消执行者，" +
+			"Esc 通道保持未加载（advertise 一枚按不动的键＝B1 禁止的形状）")
+		return false
+	}
 	ra.mu.Lock()
 	ra.escLoad = true
 	ra.mu.Unlock()
@@ -349,8 +357,11 @@ func (ra *residentApproval) detachBall() {
 // because "imported the approval package" and "runs confirmations" are different
 // claims and only the first is true here.
 func (ra *residentApproval) residentStatusLine() string {
-	if !ra.ui.hasBall() {
-		return "审批门未装配（本进程没有可承载卡片的悬浮球窗口）"
+	ra.mu.Lock()
+	loaded := ra.escLoad
+	ra.mu.Unlock()
+	if !loaded {
+		return "审批门未装配（本进程没有可承载卡片的悬浮球窗口，或装配根没有注入取消执行者）"
 	}
 	return fmt.Sprintf("审批门已装配进本进程（取消通道：Esc 已加载；等待中的确认项：%d）",
 		len(ra.cards.Pending()))
