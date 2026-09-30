@@ -360,6 +360,13 @@ type agentRuntime struct {
 // the Unconfigured state (SPEC-03 §4.1: never fall back to a half-configured
 // runtime silently), which exits 2 with a named reason.
 func assembleRuntime(s runSpec) (*agentRuntime, int) {
+	// The result poster is defaulted HERE, not only in runTextTask, because
+	// execute() calls it on every task's way out and a caller that assembled
+	// through this function without going through runTextTask (ticket 246 AC#7's
+	// resident leg does exactly that) would otherwise be calling a nil func.
+	if s.notify == nil {
+		s.notify = postSystemNotification
+	}
 	rt := &agentRuntime{spec: s, stdout: s.stdout, stderr: s.stderr, notify: s.notify}
 	cfgPath := filepath.Join(s.dataDir, configFileName)
 	st, err := secret.NewStore(s.dataDir)

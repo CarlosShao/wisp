@@ -231,6 +231,19 @@ func startResidentTaskSource(rt *proc.Runtime, ra *residentApproval) *residentTa
 	}
 
 	src := &residentTaskSource{ra: ra, rt: rt}
+	// The entry claim prints BEFORE the assembly, not after: which source this
+	// process accepted is a fact about interactiveStdin() and the injection
+	// predicate, and a pipeline that then refuses to assemble must not be able to
+	// swallow it. The order is also the reading a case checks - entry claim,
+	// pipeline verdict, boot report - three separate statements of three separate
+	// facts.
+	if console != nil {
+		fmt.Printf("wisp: %s：%s\n", taskEntryConsoleClaim, consoleEntryHelpLine)
+	}
+	if injectedText != "" {
+		fmt.Printf("wisp: %s（%s）：这是只在本机测试台件里受理的一发任务文本，本机没有可交互控制台，"+
+			"挂起的卡片只能由取消键否决\n", taskEntryInjectedClaim, testTaskTextEnv)
+	}
 	// The injection is the whole of ruling 2.2: the gate, the surface it shows
 	// cards on and the ledger those cards were booked into all come from ra, and
 	// assembleRuntime builds everything else around them. reply stays nil - this
@@ -244,6 +257,10 @@ func startResidentTaskSource(rt *proc.Runtime, ra *residentApproval) *residentTa
 		ui:      ra.ui,
 		cards:   ra.cards,
 		taskCtx: ra.root,
+		// D10's result path is named rather than inherited from a default: this
+		// leg has a ball but no panel, so a finished task arrives as a
+		// notification exactly the way the console leg presents one.
+		notify: postSystemNotification,
 	}
 	run, code := assembleRuntime(spec)
 	if code != 0 {
@@ -300,11 +317,8 @@ func startResidentTaskSource(rt *proc.Runtime, ra *residentApproval) *residentTa
 	if console != nil {
 		src.handle = observe.Default.Spawn(taskSourceConsoleGoroutine, "agent", src.root,
 			func(ctx context.Context) { src.runConsoleLoop(ctx, console, os.Stdout) })
-		fmt.Printf("wisp: %s：%s\n", taskEntryConsoleClaim, consoleEntryHelpLine)
 	}
 	if injectedText != "" {
-		fmt.Printf("wisp: %s（%s）：这是只在本机测试台件里受理的一发任务文本，本机没有可交互控制台，"+
-			"挂起的卡片只能由取消键否决\n", taskEntryInjectedClaim, testTaskTextEnv)
 		if err := src.submitTask(injectedText); err != nil {
 			slog.Error("task source: 注入的任务没有起来", "err", err)
 			fmt.Printf("wisp: 任务没有起来（%v）\n", err)
