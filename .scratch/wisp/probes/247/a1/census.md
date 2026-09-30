@@ -56,6 +56,19 @@
 
 ⚠ 本票**没有**跑过 `go build`／`go vet`／`go test`／任何 `./...`（派单禁令，`246-r2` 在写同棵树）；U6–U10、U18 全部是**指名单包**的 `go list`，`internal/audio`／`internal/ball` 不在它的地界里，`cmd/wisp` 只做了 `go list -deps`（纯解析，不吃类型检查的一半）。
 
+### ⑤bis 复量记录：`246-r2` 在我写 ①-④ 期间落了 `bb37fac2`，`cmd/wisp` 的三枚读数当场变了
+
+复量钟点 `23:16:28`／`23:16:34`／`23:16:41 +0800`（同一轮里跑的，不是引用旧数）。这正是 ⑥-E9 与 ⑦-P7 预警的那件事，所以按实记账：
+
+| 尺 | 起手读数（23:0x） | 复量读数（23:16） | 对本件结论的影响 |
+|---|---|---|---|
+| U24（`cmd/wisp` 里 `SetState` 的产码调用者） | `resident_approval_windows.go:443`／`:492` | **完全未变**（同两枚行号） | ③／④ 里"常驻腿只到 `Sleeping`／`Confirming`"这句**仍然成立** |
+| U20（`RegisterShutdownHook` 的产码注册者） | 只有 `resident_windows.go:156`（`StepCancelTasks`） | **变成 3 处**：`resident_windows.go:157`（行号＋1）＋ **新增** `cmd/wisp/resident_task_source_windows.go:289`（循环注册）＋ 注释 `resident_approval_windows.go:268` | ① "谁 join 它"那一小节**因此更强**：接缝不但存在，而且**已经被同腿用两次**（`resident_task_source_windows.go:286-287` 注册 `proc.StepSchedulerClose` 与 `proc.StepFlushAndCloseDB`）。⇒ 本件在 ③ 引的"响亮但不致命"形状，246-r2 已给出**第三枚**同形先例：注册失败走 `slog.Error` ＋ `fmt.Printf(… 这一步会被记为 skipped …)`，不 `os.Exit`（`:289-293`） |
+| U8／U2（`cmd/wisp` 是否 import `internal/audio`） | 不含／零 importer | **仍为 0**（`go list -f … ./cmd/wisp \| tr ' ' '\n' \| grep -c "internal/audio"` ⇒ `0`；`grep -rln "CarlosShao/wisp/internal/audio" --include=*.go internal cmd tools` ⇒ 空，退出码 1） | ② 的核心读数**没有过期**：AC#1 的"接前读数"此刻仍是 0，可直接用 |
+| （新事实，起手时不存在） | — | `resident_task_source_windows.go:131` `const taskSourceConsoleGoroutine = "approval-waiter"`、`:126 const taskSourceGoroutinePrefix = "agent-task-resident-"`，两枚都经 `observe.Default.Spawn`（`:296`／`:401`） | **加强 ⑦-P8**：246-r2 新起的两枚协程都**小心地落在 D38(b) 名册内**（`approval-waiter` 是 per-task 名、`agent-task-` 是 per-task 前缀，见 `observe/goroutine.go:52` 的 `PerTaskPrefixes`）。⇒ 本仓当下的纪律是"不为新协程擅自起名"，那么电平协程同样无处可起——这不是我的推测，是对面刚做出的选择 |
+
+⛔ 我没有据此改任何结论，只把行号与"第几枚先例"记成两栏；派 `247-r1` 前仍应按 ⑦-P7 以 246-r2 终态重抽一次（它此刻仍在飞）。
+
 ## ⑥ 我可能写错的条目（对抗我自己）
 
 | # | 我写下的哪一条 | 为什么可能错 | 若错了会怎样 |
@@ -125,7 +138,7 @@
 **D38(e) 十步一字不动的前提下，退出时谁 join 它**：第 4 步 `stop-audio` 就是 join 点，接缝**现成**：
 
 - 十步在代码里与 `PLAN.md:2855-2865`（第 1 步在 `:2855`、第 4 步在 `:2859`、第 10 步在 `:2865`，23:15:25 现跑 `grep -n`）一字对齐：`internal/proc/shutdown.go:11-31`（注释）＋ `:36-47`（`StepStopAudio` 是第 4 枚）＋ `:49-60`（名字 `stop-audio`）＋ `:163` `run(StepStopAudio, hooks.StopAudio, 0)`（U21）。
-- 注册面已经通了：`proc.Runtime.RegisterShutdownHook(step, hook)` 在 `boot_windows.go:188`，`shutdown_hooks.go:51` 把 `StepStopAudio` 列进可挂钩名册，`:118-119` 落到 `hooks.StopAudio`（U20）。本仓**唯一**产码注册者目前是 `cmd/wisp/resident_windows.go:156` 的 `proc.StepCancelTasks`（票 246 AC#4）〔起手读数〕。
+- 注册面已经通了：`proc.Runtime.RegisterShutdownHook(step, hook)` 在 `boot_windows.go:188`，`shutdown_hooks.go:51` 把 `StepStopAudio` 列进可挂钩名册，`:118-119` 落到 `hooks.StopAudio`（U20）。起手时本仓**唯一**产码注册者是 `cmd/wisp/resident_windows.go:156` 的 `proc.StepCancelTasks`（票 246 AC#4）〔起手读数〕；**23:16 复量已变成 3 处、且 246-r2 已用同一接缝注册了第 1 步与第 7 步**（见上面 ⑤bis 那一栏）⇒ 这条接缝不是纸面可能性，是同一枚进程里跑通过的形状（`StepStopAudio` 那一格本身仍无人注册，那正是本票要填的）。
 - join 的动作本来就在 `Stop()` 里：`wasapimic_windows.go:94-115` —— `cancel()` 之后 `select { case <-done: return nil; case <-time.After(tm.Remaining()): slog.Error("audio capture thread did not exit within 2s (abandoned wait)") }`，上限用 `observe.NewTimeout(2 * time.Second)`（D42#9 单调，**不是**墙钟差）。⇒ 钩子体只需要 `gate.Stop()`／`mic.Stop()`，**不需要新造第 11 步**。
 - ⚠ 诚实边界：我**没有跑到**那枚 switch 分支（禁 build/test），`shutdown_hooks.go:118` 是我读到的分支不是跑到的分支（⑥-E5）。⇒ 交 `247-v1` 钉一条：注册后 `StepRecord.Name == "stop-audio"` 且记录**不是** skipped。
 
