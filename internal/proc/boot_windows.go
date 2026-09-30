@@ -32,6 +32,12 @@ type Runtime struct {
 	Instance  *SingleInstance
 	Registry  *observe.Registry
 	StartedAt time.Time // wall clock, for boot records only
+
+	// shutdownHooks is the registration seam of the D38(e) sequence (ticket 246
+	// AC#4). Boot always fills it, so a runtime built through Boot can hand a
+	// step to the module that owns it instead of leaving seven steps with no
+	// producer. It carries no order: RunShutdownSequence still walks 1..10.
+	shutdownHooks *ShutdownHookSet
 }
 
 // BootOption adjusts Boot (tests, embedders).
@@ -66,6 +72,7 @@ func Boot(env buildinfo.Env, opts ...BootOption) (*Runtime, error) {
 	}
 
 	rt := &Runtime{Env: env, StartedAt: observe.NowWallUTC()}
+	rt.shutdownHooks = &ShutdownHookSet{}
 	if cfg.registry != nil {
 		rt.Registry = cfg.registry
 	} else {
@@ -148,9 +155,18 @@ func (rt *Runtime) RunEventLoop() string {
 // (Job close; single-instance release is an OS no-op at process death but is
 // released explicitly after the sequence). Later tickets register their hooks
 // on the same sequence - the order itself is frozen and audited.
+//
+// Since ticket 246 AC#4 that registration entry exists: RegisterShutdownHook
+// attaches a step's owner, and the set is read here as a snapshot. Two facts
+// did not move: RunShutdownSequence still walks steps 1..10 in the frozen
+// order, and a step nobody registered is still recorded as skipped - registering
+// is what changes the record, never the promise that the record is honest.
 func (rt *Runtime) Shutdown(fast bool) []StepRecord {
 	hooks := ShutdownHooks{}
-	if rt.Job != nil {
+	if rt.shutdownHooks != nil {
+		hooks = rt.shutdownHooks.Hooks()
+	}
+	if hooks.CloseJob == nil && rt.Job != nil {
 		hooks.CloseJob = func(context.Context) error { return rt.Job.Close() }
 	}
 	records := RunShutdownSequence(hooks, ShutdownOptions{Fast: fast})
@@ -158,4 +174,30 @@ func (rt *Runtime) Shutdown(fast bool) []StepRecord {
 		_ = rt.Instance.Release()
 	}
 	return records
+}
+
+// RegisterShutdownHook attaches one hook to this runtime's D38(e) sequence.
+// Ticket 246 AC#4's shape: the module that owns a step hands it to the process
+// at assembly time, so the audit trail says what ran instead of saying
+// "skipped" seven times.
+//
+// The errors it returns are the guarantees: a step that has no hook slot
+// (8 and 10), a slot that already has an owner, a nil hook, and a sequence that
+// has already started, are each refused. See shutdown_hooks.go for why each one
+// is a refusal rather than a quiet overwrite.
+func (rt *Runtime) RegisterShutdownHook(step ShutdownStep, hook func(ctx context.Context) error) error {
+	if rt.shutdownHooks == nil {
+		rt.shutdownHooks = &ShutdownHookSet{}
+	}
+	return rt.shutdownHooks.Register(step, hook)
+}
+
+// RegisteredShutdownSteps lists the steps this process has an owner for, in
+// sequence order. The boot report reads it so "which steps really run" is a
+// fact taken off the registration, not off a comment.
+func (rt *Runtime) RegisteredShutdownSteps() []ShutdownStep {
+	if rt.shutdownHooks == nil {
+		return nil
+	}
+	return rt.shutdownHooks.Registered()
 }

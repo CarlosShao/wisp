@@ -19,19 +19,29 @@ package main
 // picked that leg ("走甲"), and this file is that ruling's first installment.
 //
 // What this installment deliberately is NOT. The resident leg has no task
-// pipeline, no microphone, no approval gate and no panel host today, so this
-// file starts no state machine and answers no card: every gesture the ball
-// surfaces is recorded by name and said out loud as unhosted. Advancing the
-// orb into Listening because a click arrived would be this process claiming a
-// listen path it does not have - the same shape that made the run leg's empty
-// runSpec.replyVeto a load-bearing choice rather than a missing assignment
-// (cmd/wisp/run.go:141-147, ledger A472). Making those gestures real is
-// ticket 228 AC#2/AC#3 and the approval-gate legs, not this one.
+// pipeline, no microphone and no panel host, so this file starts no state machine
+// of its own and answers no card on the user's behalf: every gesture the ball
+// surfaces except one is recorded by name and said out loud as unhosted.
+// Advancing the orb into Listening because a click arrived would be this process
+// claiming a listen path it does not have - the same shape that made the run
+// leg's empty runSpec.replyVeto a load-bearing choice rather than a missing
+// assignment (cmd/wisp/run.go:141-147, ledger A472).
+//
+// What changed since (ticket 246, the sentence above is the ticket-228 wording
+// and it is kept because it is still most of the truth): the assembly root now
+// injects an approval gate into this leg (cmd/wisp/resident_approval_windows.go),
+// so ONE of D43's four veto channels - the Esc cancel hot key - has an executor
+// here. It is handed in as a function value by startResidentBall's parameter, so
+// this file still knows nothing about approvals, cards or channels: that
+// knowledge lives in the assembly root, which is the shape ticket 246's ruling
+// (ledger A481, form 乙) asked for. The ball-click veto, the KWS veto word and
+// the panel's reject button remain unhosted here, each with its own ticket.
 //
 // Failure posture: a ball that cannot be created is loud and non-fatal, the
 // same stance installLogSink takes above. A machine with no desktop (a service
 // session, a CI runner) must still boot, still hold its Job Object and still
-// leave through the D38(e) order; it just has to say it has no ball.
+// leave through the D38(e) order; it just has to say it has no ball - and the
+// gate it built then says out loud that it has nowhere to show a card.
 
 import (
 	"fmt"
@@ -42,6 +52,13 @@ import (
 	"github.com/CarlosShao/wisp/internal/observe"
 	"github.com/CarlosShao/wisp/internal/statemachine"
 )
+
+// escVetoFunc is the whole of what the ball host knows about the thing that
+// happens when the cancel key is pressed: somebody handed this process a function
+// that turns that press into a sentence. nil means no gate was injected (the
+// shape every leg had before ticket 246, and the shape a host that cannot build
+// one falls back to), and the gesture is then recorded as unhosted.
+type escVetoFunc func() string
 
 // residentBall is this process's handle on the floating ball: the window and
 // its owner's side of the teardown, plus the one sentence the boot report
@@ -63,25 +80,36 @@ type residentBall struct {
 // so this function starts no goroutine of its own - D38a's "one STA/UI thread,
 // ball and panel share it" law is satisfied by not adding a second one).
 //
-// How many keys this leg actually holds (ticket 245): THREE. summon / mute /
-// panel register at boot; the fourth slot, cancel, is left standby by
+// How many keys this leg actually holds (ticket 245): THREE at idle. summon /
+// mute / panel register at boot; the fourth slot, cancel, is left standby by
 // internal/ball because its production binding is a bare Esc and RegisterHotKey
-// is desktop-wide. Confirming borrows that slot for the length of a card, and
-// this leg has no card path (no approval gate, no state machine), so it never
-// borrows it - which is the point of the ticket: the resident process must not
-// take the user's Esc key while it is just sitting there.
+// is desktop-wide.
+//
+// Since ticket 246 the Confirming borrow is reachable FROM this leg: the
+// assembly root injects an approval gate (resident_approval_windows.go), a real
+// card puts the orb in Confirming, and that card's Prompt is what calls
+// Ball.TakeEscForCancel - so the cancel slot is held for the 2-3 seconds a
+// window is open and handed back when it closes. Before that injection the
+// borrow existed only in cmd/balldebug, which is the reverse gap ticket 246 was
+// filed for. What has NOT changed: a resident leg with no card in flight holds
+// three keys, not four, and an L2 queue card does not borrow the key at all.
 //
 // reg is the runtime's registry, not observe.Default, so a boot that overrode
 // the registry (internal/proc.WithRegistry) books its UI thread where the rest
 // of the process is booked.
 //
+// onCancelEsc is the injected cancel executor (escVetoFunc). nil is legal and
+// means what it always meant: the gesture is recorded as unhosted.
+//
 // Errors are returned as a verdict, never as a failure to boot.
-func startResidentBall(reg *observe.Registry) *residentBall {
+func startResidentBall(reg *observe.Registry, onCancelEsc escVetoFunc) *residentBall {
 	rb := &residentBall{}
 
 	b, err := ball.New(ball.Options{
-		// Sleeping is the only state this leg may claim: nothing here is
-		// listening, thinking, acting or waiting on anyone.
+		// Sleeping is the only state this leg may claim on its own: nothing here
+		// is listening, thinking, acting or waiting on anyone. A card that IS
+		// waiting moves the orb through the injected gate's UI, which returns it
+		// here the moment nobody is being waited on.
 		Initial:  statemachine.StateSleeping,
 		Hotkeys:  ball.DefaultHotkeys(),
 		Registry: reg,
@@ -89,7 +117,7 @@ func startResidentBall(reg *observe.Registry) *residentBall {
 			OnClickBall:     func() { recordBallGesture("click") },
 			OnSummonHotkey:  func() { recordBallGesture("summon-hotkey") },
 			OnMuteHotkey:    func() { recordBallGesture("mute-hotkey") },
-			OnCancelHotkey:  func() { recordBallGesture("cancel-hotkey") },
+			OnCancelHotkey:  func() { recordCancelHotkey(onCancelEsc) },
 			OnPanelHotkey:   func() { recordBallGesture("panel-hotkey") },
 			OnTrayPanel:     func() { recordBallGesture("tray-open-panel") },
 			OnTrayMute:      func() { recordBallGesture("tray-mute") },
@@ -123,7 +151,8 @@ func startResidentBall(reg *observe.Registry) *residentBall {
 		len(rep.Live()), hotkeySummary(b))
 	slog.Info("ball: the resident leg created the floating ball window",
 		"hotkeys_live", len(rep.Live()), "hotkeys", hotkeySummary(b),
-		"gestures", "recorded only: this leg has no task pipeline, no microphone and no approval gate")
+		"gestures", "recorded only except the cancel key: this leg has no task pipeline and no microphone, "+
+			"and D43's four veto channels are reduced here to the one the assembly root injected (ticket 246)")
 	return rb
 }
 
@@ -160,7 +189,13 @@ func (rb *residentBall) stop() {
 // ballGestureWhy is the single reason every unhosted gesture gets: said to the
 // console, booked in the log file, and identical between the two so neither can
 // drift into a claim the other does not make.
-const ballGestureWhy = "this process has no task pipeline, no microphone, no approval gate and no panel host, so the gesture has no executor here"
+//
+// It names the cancel key as the exception on purpose. Since ticket 246 the
+// resident process does hold an approval gate, so the pre-246 sentence ("no
+// approval gate") would have become a lie told by eight gestures in order to
+// cover the one that stopped being one.
+const ballGestureWhy = "this process has no task pipeline, no microphone and no panel host, so the gesture has no executor here; " +
+	"the only cancel route this leg executes is the Esc key the assembly root wired (ticket 246)"
 
 // recordBallGesture books one ball gesture that arrived with nowhere to go.
 //
@@ -170,6 +205,26 @@ const ballGestureWhy = "this process has no task pipeline, no microphone, no app
 func recordBallGesture(name string) {
 	slog.Warn("ball gesture arrived with no executor", "gesture", name, "why", ballGestureWhy)
 	fmt.Printf("wisp: ball %s: %s\n", name, ballGestureWhy)
+}
+
+// recordCancelHotkey is the ONE gesture in this leg with an executor: the
+// assembly root's injected cancel function decides what a cancel-key press
+// means, and this file only says what came back.
+//
+// A nil executor is the pre-ticket-246 shape and is reported as such rather than
+// swallowed - a cancel key that fires into nothing is exactly the defect class
+// ticket 245 and 246 were filed about, so it gets a line of its own in both the
+// console and the ledger.
+func recordCancelHotkey(onCancelEsc escVetoFunc) {
+	if onCancelEsc == nil {
+		slog.Warn("cancel hotkey fired with no executor", "why",
+			"the assembly root injected no approval gate into this leg, so the borrow cannot be spent")
+		fmt.Printf("wisp: ball cancel-hotkey: no approval gate was injected into this process, so the press decided nothing\n")
+		return
+	}
+	sentence := onCancelEsc()
+	slog.Info("ball: the cancel key was handled by the injected approval gate", "outcome", sentence)
+	fmt.Printf("wisp: %s\n", sentence)
 }
 
 // recordBallDragEnd says the one thing the drag path owes the user: the orb

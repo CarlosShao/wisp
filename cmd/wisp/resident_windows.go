@@ -5,8 +5,10 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/CarlosShao/wisp/internal/buildinfo"
@@ -104,6 +106,21 @@ func runResident() {
 	signal.Notify(bootExit, os.Interrupt, syscall.SIGTERM)
 	defer signal.Stop(bootExit)
 
+	// Ticket 246 AC#1, form 乙 (orchestrator ruling, ledger A481): the approval
+	// gate is BUILT HERE, by the assembly root, and handed down as a function
+	// value and a binding. The resident file does not compose a gate of its own -
+	// that would be the second truth source 246-a1 §5 reason 1 refuses, and it is
+	// the same shape ticket 238's cut-1 blocked ("两枚正向依赖边一律不开、改注入",
+	// extended to this ticket by the ruling named above).
+	//
+	// Zero new package-level dependency edges: cmd/wisp already imports
+	// internal/agent/approval, internal/ball, internal/proc and internal/tools in
+	// production code (run.go:47, resident_ball_windows.go:41, this file's own
+	// import block), and internal/proc and internal/ball stay leaves. The ruler
+	// for that claim is `GOOS=windows go list -deps ./cmd/wisp`, run before and
+	// after, in this leg's evidence table.
+	ra := newResidentApproval()
+
 	// Ticket 228 AC#1: this leg is the process the ball belongs in (D2,
 	// PLAN.md:74 and :83-88 - layered window, tray, hot keys and the Job Object
 	// holder in one resident main process). The defer below is registered last,
@@ -115,8 +132,42 @@ func runResident() {
 	// A ball that will not come up does not stop the boot: the window, the tray
 	// and the hot keys are reported by what Win32 actually returned, and the
 	// sentence printed under this call is built from that same result.
-	rb := startResidentBall(rt.Registry)
+	rb := startResidentBall(rt.Registry, ra.vetoByEsc)
 	defer rb.stop()
+
+	// The gate is bound to the ball only if the ball exists, and it is detached
+	// BEFORE the window goes away: after Ball.Close posts WM_QUIT there is no STA
+	// thread left to answer a release, and a card settling at that moment must
+	// say so rather than block. Defer order is the mechanism - this line is
+	// registered after rb.stop() above, so LIFO runs it first.
+	defer ra.detachBall()
+	ra.bindBallHost(rb)
+
+	// Ticket 246 AC#4: D38(e) step 3 ("all task root ctxs cancelled -> wait
+	// <= 3s") gets the one thing it never had - a producer. Before this,
+	// internal/proc/boot_windows.go built a fresh ShutdownHooks{} per call and
+	// filled only CloseJob, so a card still waiting when an exit signal arrived
+	// was killed by the OS instead of being refused, and the audit trail recorded
+	// the step as skipped. The ORDER is untouched: RunShutdownSequence still
+	// walks 1..10 (shutdown.go:112, pinned by TestShutdownOrderAudit), and a step
+	// nobody registered is still honestly recorded as skipped - which is why a
+	// refusal to register below is printed and not fatal: the record stays true
+	// either way, it just says the harder thing.
+	if err := rt.RegisterShutdownHook(proc.StepCancelTasks, ra.cancelTasks); err != nil {
+		slog.Error("proc: 第 3 步（取消任务根）未能注册为钩子，退出时待确认项不会被有序拒绝",
+			"step", int(proc.StepCancelTasks), "err", err)
+		fmt.Printf("wisp: 退出序列第 3 步未注册（%v）：卡片挂起时收到退出信号，这一步会被记为 skipped\n", err)
+	}
+
+	// The boot report names the steps this process really owns, taken off the
+	// registration rather than off a comment (AC#4's "不许撒谎" half).
+	registered := rt.RegisteredShutdownSteps()
+	names := make([]string, 0, len(registered))
+	for _, s := range registered {
+		names = append(names, fmt.Sprintf("%d:%s", int(s), s.Name()))
+	}
+	fmt.Printf("wisp: %s; D38(e) steps with an owner in this process: %s\n",
+		ra.statusLine(), strings.Join(names, ", "))
 
 	// The boot report has to match what happens next: if an exit request already
 	// arrived during the ball path, printing "empty event loop running" and then
