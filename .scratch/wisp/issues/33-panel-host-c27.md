@@ -34,6 +34,8 @@ owner 当场提了一条功能要求，逐字：「问题我早就说过了，�
 
 - [ ] **AC#11（09-30 23:4x 编排者追加，来路＝`33-h1` ④ 节 J6）**：**清检出能建**——把仓拷进临时目录（不带未跟踪产物）后 `GOFLAGS= go build ./...` 必须通过；若今天不通过，本票**不许**用"提交 `frontend/**` 产物"或"改 `.gitignore` 加豁免"来让它通过（那两条分别撞两层禁令与 `A207` 那味 index-aware 过滤），要**停手上报**由我改派构建链那侧。判据自带反向证：把 embed 模式改成一个不存在的路径 ⇒ 构建**必须**失败（证的是"这枚判据有牙齿"，不是"我改了就红"）。
 
+- [ ] **AC#12（10-01 00:0x 编排者追加，来路＝我自己量的那枚 `.gitkeep`；勾仍归非实现者）**：**"能构建"不等于"有页面可发"**。现量：库里 `frontend/dist` 只跟踪**一枚 `.gitkeep`**（尺：`git ls-files frontend` ⇒ `frontend/dist/.gitkeep`），而活模式是 `frontend/embed.go:19` 的 `//go:embed all:dist`——`all:` 连点文件一起收，所以**AC#11 今天很可能是绿的，而绿的原因是目录里躺着一枚占位文件**。⇒ 本票不许把 AC#11 的绿当成"面板有内容"：判据要能区分**"embed 只匹配到占位文件"**与**"真有一包页面产物"**（问能力：embed 后的文件系统条目数／关键入口是否真存在，⛔ 不问构建退出码、不问文案）。⚠ 产物由界面侧那枚 agent 产出，本编队⛔ 不写 `frontend/**` ⇒ 这一格在"谁把 dist 填上"落定前**勾不了**，与票 248 的 AC#9 是同一件事的两面（同一枚归口）。
+
 ## What to build
 The `panel` module host side: singleton PanelManager owning at most ONE WebView2 window per
 session (hide-don't-destroy), embed.FS resource serving via `AddWebResourceRequestedFilter`
