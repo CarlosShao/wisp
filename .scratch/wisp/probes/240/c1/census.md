@@ -28,7 +28,7 @@
 
 （§0 未完：后续节追加尺子编号从 R11 起。）
 
-### §0 追加尺（§1/§2 现跑，读数照抄）
+### §0 追加尺（§1/§2/§3 现跑，读数照抄）
 
 | # | 尺 | 本机真实读数 | 口径 |
 |---|---|---|---|
@@ -467,4 +467,63 @@ grep -rn "\b<符号>\b" --include='*.go' internal cmd tools | grep -v '_test.go'
 
 ## §5 我答不上来的
 
-（待写，本节不许为空。）
+> 本节按本仓规矩**不许为空**。下面分三档：
+> 5.1 是需要人（或编排者）裁的判定项——本腿只有事实，没有判断权；
+> 5.2 是本腿尺子的射程限制（读法上的诚实）；
+> 5.3 是本腿**明确没查**的东西，写出来免得下一程以为"普查腿查过了"。
+
+### 5.1 待人裁的判定项（每条都自带"为什么本腿答不了"）
+
+| 号 | 问题 | 本腿能给的 | 为什么答不了 |
+|---|---|---|---|
+| **D-1** | **RMS 到 0..1 的标度到底是什么？** 线性 `rms/32767`？还是要加增益/压缩？ | 球的文档只写了 `RMS of the last 512 samples, normalised 0..1`（`liquid_windows.go:35`）；**除数全仓无定义**；球侧唯一相邻常数 `SilenceLevelGate = 0.06`（`liquid.go:30`）是"判静默"的门限 | 这是**观感口径**，不是代码事实。线性标度下正常语音 RMS 大致落在很窄的低区间，可能整链"接了但看不出在动"；定标度要有真声音＋真桌面，本腿零跑进程、零读视觉层 |
+| **D-2** | `voice.enabled`（`schema.go:245`，**default true**）与 `wake_word.enabled`（`schema.go:197`，**default false**）谁门控哪一种开麦？ | 两枚都在、都进热载分级（`manager.go:370-375`），**都零读者**（R13） | `PLAN.md:460` 说的"默认不开麦"精确指 KWS 常开听音（`:460` 括注 `D2 已定 KWS 为 opt-in`），但**"会话内开麦"由谁放行**今天没有代码表达过；接线腿若读错这一枚，默认配置就会开麦，那是把"能写进 README 第一行的强论证"（`PLAN.md:461`）自己拆掉 |
+| **D-3** | 电平（RMS）**能不能算在 pinned `audio-capture` 线程上**？ | `SPEC-01:113` 逐字 `该线程不得跑任何其他 Go 代码`；现实现那条线程只做 open/wait/drain/resample/push（`wasapimic_windows.go:188-234`）；名册常驻上限 6 已满（`SPEC-01:119`、`goroutine.go:41`） | "逐帧算个标量"算不算"其他 Go 代码"是本腿无权做的解释性裁定。两支代价不同：算在那条线程上＝零新 goroutine、不碰名册，但撞 P3 的字面；另起消费者＝干净，但要动名册（**D38 契约面，改契约＝人批**） |
+| **D-4** | **"Hi, wisp" 这枚唤醒词在这枚模型上拼得出来吗？** | 出厂 `keywords.txt` 8 行全是**拼音音素＋`@中文`**（R18：`n ǐ h ǎo j ūn g ē @你好军哥` 这种形状），模型是 `kws-zipformer-wenetspeech-3.3M`（`PLAN.md:156`，wenetspeech＝中文语音数据）；`tokens.txt` 1627 字节（R19） | 本腿**没有跑过推理**（红线），也没有查 sherpa 的英文音素表能不能与 pinyin token 集混拼。`PLAN.md:168` 那句"不需要训练，只需 keywords 文本文件"是真的，但它没有回答"**这枚模型认得哪些音素**"。这是新形态的可行性第一问 |
+| **D-5** | **逐词置信度阈值（`Thresholds []float64`，`schema.go:201`）今天拿得到吗？** | 绑定的 `KeywordSpotterResult` **只有 `Keyword string` 一个字段**（`sherpa_onnx.go:2333-2335`，`GetResult` 只映射 `p.keyword`，`:2471-2477`）；可用的只有全局 `KeywordsThreshold`（`KeywordSpotterConfig` `:2328`，spike 里取 0.25） | 配置契约（`schema.go:193-195` 注释逐字 `Thresholds are per-keyword confidences (0..1), keywords[i] pairs with thresholds[i]`）**与绑定能力之间有一道本腿无法用接线抹平的缝**。要"逐词阈值"要么给上游提补丁、要么改成"关键词级全局阈值＋词表分档"——后者是**契约解释**，不归写腿 |
+| **D-6** | `Armed`（待唤醒）态要不要让液体/波纹跟着环境声动？ | `liquidDriven`（`liquid.go:60-68`）不含 Armed；`anim.go:62` 把 Armed 判静态；`SPEC-08:57` 冻结行逐字 `Armed \| opacity 0.6，直径 44px，静态`；`liquid_windows.go:16-19` 要求定时器只能跑在冻结白名单已给定时器的态里 | 扩 Armed＝**同时动冻结视觉表与定时器白名单**（P10），两支都要动 D43 之外的东西。这是契约变更，不是接线 |
+| **D-7** | 语音链的第一个动作其实是"**GUI 腿要有装配根**"（表一 #1/#2、§3.3）——这算语音票的活还是票 07 的活？ | GUI 腿今天到 `rt.RunEventLoop()` 为止（`resident_windows.go:83`，实现 `internal/proc/boot_windows.go:120`），`resident_windows.go:81` 逐字 `the floating ball arrives in ticket 07`；"同时握 ball+machine+config"那段只存在于 `cmd/balldebug/main.go:188-247` | 排期与票界是编排者的权。本腿只报：**不先决定这一枚，表一/表二里的"补一行就通"没有一行能真落地**（那一行没有地方可写） |
+| **D-8** | 电平消费者用不用 `kws-infer` 那枚按需槽？ | 槽注释写死 `kws-infer, Armed state only`（`goroutine.go:32`）、`SPEC-01:120` 同 | 电平消费者服务的态（Listening 等会话态）**与槽的适用态不重合**；硬套会把名册语义用歪。属"读起来允许、实际装不下"的那类缝，要人点名 |
+
+### 5.2 本腿尺子的射程限制
+
+1. **零编译、零测试、零门禁**（红线）。所以本腿**不能**断言：
+   `internal/audio` 今天能不能编译过、那 20 枚"包外零调用者"里有没有其实已被包内正确使用的（本腿只在包内计数上做了排除，未做类型检查）、
+   以及任何 SLO 数字是否真的会红。**§2.3 的两档预算本腿只核对了"常量在位且 PLAN 数字对得上"，没核对"闸门真的会响"。**
+2. **"零 importer"这一结论的射程**＝主模块 `github.com/CarlosShao/wisp`。
+   `scripts/spike` 是**另一个 module**（`scripts/spike/go.mod:1`），它不 import `internal/audio`（本腿未在其中搜过 `wisp/internal/`），
+   所以严格说法是：**"两个模块各自独立，主模块内无人 import"**。
+3. **grep 型否定读数一律可能有漏**：本腿用的是"包外非测试计数"，
+   对**别名 import**、**同一 package 拆多目录**、**interface 方法名与函数名不同**（例如通过接口变量调 `SetAudioLevel`）
+   这三种形状不敏感。本腿对 `AudioSource` 接口方法调用做过一次目测（`internal/` 内除 `audio` 自身外无调用点），
+   但**没有做穷举**。
+4. **`.scratch/**` 下别人在飞的探针件本腿一律排除在计数外**，也**不转述其内容**（除一处例外：
+   `docs/evidence/s1/124-*` 与 `.scratch/wisp/issues/223-*.md` 是任务书要我找的"同类禁令"，属裁决/票面文本，不是探针读数）。
+5. **`frontend/**` 与 `design/**` 零读零写零转述**（红线）。直接后果：**本腿无法核对
+   "语音波纹控件"的视觉定义**（§5.1 D-1/D-6 之所以只能停在"代码事实"这一层，这就是原因）。
+   涉及那两层的判断，下一程要另派能读的腿。
+6. **台账 `docs/reports/pending-and-issues.md` 本腿只读、只引行号**（红线一致，一字节未改）。
+   §3.0 那段"依赖边禁令"是从 `:8786-8792` 逐字摘的，**那条裁定的射程原本是票 197 的流键问题**，
+   本腿在 §3.0 里写明了"这是本腿的推广，不是台账原话"。
+
+### 5.3 本腿查到哪一步为止（前两行其实已经查到边界，后五行是真没查；别当成查过）
+
+| 条目 | 本腿查到哪一步／为什么值得下一程继续 |
+|---|---|
+| **`scripts/spike` 有没有被任何门禁/CI 跑过** | 本腿**查到了**：`.github/workflows/` 里 `grep -i spike` **零命中** ⇒ spike 不在任何 CI 作业里，是**一次性证据工具**。所以 §2.2 那句"照抄形状"没有 CI 保护，抄错了没人报红 |
+| **`webrtc-audio-processing`（P7 里 AEC 那枚白名单项）在不在依赖里** | 本腿**查到了**：`grep -c -i webrtc go.mod go.sum` → **各 0** ⇒ 规格批准的是**许可**，仓里**还没有这个依赖**。Path C 的真 barge-in 今天连依赖都没有 |
+| **运行期 DLL 与链接期 DLL 的来源差异** | 本腿**查到了**并已在 §2.1 落定；权威解释就在 `deps.toml:8-14`（逐字要点：Go 绑定自带 prebuilt mingw copy ⇒ `cgo linking works with zero local C toolchain configuration`；放在 `wisp.exe` 旁边的 DLL 来自主线 shared release 并"colocated-DLL rule, SPEC-11 §7.1"由 `scripts/build.ps1` 拷）。**本腿没查**：`sherpa-onnx-cxx-api.dll` 运行期到底有没有人用它（第三枚 DLL 在 `doctor.go:83` 的自检名单里，但那是"文件在不在"，不是"有没有被加载"） |
+| **`internal/models` 的下载/验签在真机上能不能拿到 KWS 模型** | 清单齐（R19），`Ensure`/`VerifyInstalled` 有测试与非测试调用者（`cmd/wisp/models.go:303` 那条腿），但本腿**没跑任何下载**，无法证明那个 32,654,866 字节的 archive 现在拉得动、哈希对得上 |
+| **唤醒词命中到 `Listening` 的 ≤300ms 延迟预算** | `PLAN.md:535`（D32 修订版在 `:2325`）那行延迟预算本腿只读了字面、没逐行抽整表。今天整条链不存在，**无从量**；但接线后第一枚要量的就是它，且它决定 KWS 是否值得常开 |
+| **自定义唤醒词与 C29 验签的冲突有没有被任何测试钉过** | 本腿只从 `VerifyInstalled`→`VerifyDir` 的逐文件比哈希（R22）**推出**"写进模型目录会当场失败"，**没找到任何一条测试在钉这件事**（正向钉"写了就红"或反向钉"外置就绿"都没有）。这枚要么是真缺口、要么在 `docs/evidence/s1/**` 有别人钉过——本腿没逐份翻裁决表 |
+| **`internal/panel` / `internal/perm` / `internal/risk` 这三面与语音链的相互作用** | 本腿只按任务书去找"依赖边禁令"，没系统查"面板侧要不要显示'正在听'、静音快捷键要不要过权限档"。这三面今天对 `.Voice.` 都是零读者（R13 的射程内），但**"零读者"不等于"零冲突面"** |
+
+---
+
+## 附：本腿的口径自检（三句）
+
+1. 本腿**没有**给出任何"应该可以"式结论：每一格要么带 `文件:行`，要么写"未查/待人裁"。
+2. 本腿**没有**改动任何生产代码、判据复选框、golden、阈值文件、台账、HANDOVER、`PLAN.md`、`docs/specs/**`；
+   唯一写入文件是本份 `census.md`，临时目录只有 `.scratch/wisp/probes/240/`（只建不删）。
+3. 本腿**没有**跑 `go build`／`go test`／`gofumpt`／`go vet`／`d22scan`，
+   以避开那枚正在独占桌面跑 live 测试的腿。
