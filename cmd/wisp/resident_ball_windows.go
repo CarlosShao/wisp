@@ -112,7 +112,7 @@ func startResidentBall(reg *observe.Registry) *residentBall {
 		len(rep.Live()), hotkeySummary(b))
 	slog.Info("ball: the resident leg created the floating ball window",
 		"hotkeys_live", len(rep.Live()), "hotkeys", hotkeySummary(b),
-		"gestures_hosted", "none: this leg has no task pipeline yet")
+		"gestures", "recorded only: this leg has no task pipeline, no microphone and no approval gate")
 	return rb
 }
 
@@ -126,9 +126,10 @@ func (rb *residentBall) statusLine() string {
 	return rb.verdict
 }
 
-// stop tears the ball down: hotkey unregistration, tray icon removal, window
-// destroy, then the join of the ui-sta thread (Ball.Close does all four in that
-// order on the STA thread and waits). It is the work D38(e) step 2 names -
+// stop tears the ball down: Ball.Close runs the animation stop, the hotkey
+// unregistration, the tray removal, the renderer release and the window destroy
+// on the STA thread, then posts WM_QUIT and joins the ui-sta handle
+// (internal/ball/ball_windows.go:904). It is the work D38(e) step 2 names -
 // "hotkey + wake-word listening stops" (internal/proc/shutdown.go:18) - and
 // runResident registers it as the defer that runs BEFORE rt.Shutdown walks the
 // frozen sequence, so the hot keys are released ahead of the Job Object close

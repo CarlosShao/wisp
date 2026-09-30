@@ -118,13 +118,17 @@ func runResident() {
 	rb := startResidentBall(rt.Registry)
 	defer rb.stop()
 
-	fmt.Printf("wisp: empty event loop running (no task is taken by this loop yet); %s (Ctrl+C exits cleanly)\n", rb.statusLine())
-
+	// The boot report has to match what happens next: if an exit request already
+	// arrived during the ball path, printing "empty event loop running" and then
+	// never entering the loop would be exactly the kind of sentence AC#7 exists
+	// for. The ball status is true in either branch, so it prints in either.
 	var reason string
 	select {
 	case sig := <-bootExit:
-		reason = "exit request (" + sig.String() + ") arrived during boot; the loop was never entered"
+		reason = "exit request (" + sig.String() + ") arrived during boot; the event loop was never entered"
+		fmt.Printf("wisp: %s; %s\n", reason, rb.statusLine())
 	default:
+		fmt.Printf("wisp: empty event loop running (no task is taken by this loop yet); %s (Ctrl+C exits cleanly)\n", rb.statusLine())
 		reason = rt.RunEventLoop()
 	}
 	fmt.Printf("wisp: event loop ending (%s); running the D38(e) shutdown order\n", reason)
