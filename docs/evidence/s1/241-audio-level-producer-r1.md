@@ -177,10 +177,22 @@
 - **SLO 阈值／golden／`thresholds.go`**：一字节未动；无任何断言被放宽（§3 那两枚自我修正方向都是**收紧**）。
 - **未新增**：goroutine、定时器、channel、依赖边、`sherpa` 引用。
 
+### 8.1 交件前终检（12:18:03 +0800 复跑，三枚 commit 落盘之后）
+
+| 尺 | 读数 |
+|---|---|
+| `for c in bccc6165 193daefb 1f339ad6; do git show --pretty=format: --name-only $c; done` | 全部 7 枚文件：`docs/evidence/s1/241-audio-level-producer-r1.md`、`internal/audio/{level.go,level_test.go,wavinjector.go,wasapimic_windows.go}`、`.scratch/wisp/probes/241/r1/{mutation241.py,mutation-readings.txt}` |
+| 同一条流水过 AC#4 禁区筛 `grep -E "^(cmd/wisp\|internal/ball\|internal/speech\|internal/panel\|internal/observe/thresholds.go\|PLAN.md\|docs/specs/\|frontend/\|design/)"` | **零命中（rc=1）** ⇒ AC#4 那一路径筛为空 |
+| `git status --short -- internal/audio/` | **空** ⇒ 突变演练还原后的源文件与已提交状态逐字节一致 |
+| `go test ./internal/audio/ -count=1`（终态） | `ok github.com/CarlosShao/wisp/internal/audio 15.914s` |
+| `git diff 501c6971..HEAD -- .scratch/wisp/issues/241-*.md` | **空**；工单文件仍 `5,944` 字节 ⇒ 五枚 AC 框一枚未碰 |
+| `grep -c "（待填）" docs/evidence/s1/241-audio-level-producer-r1.md` | **0** ⇒ 无占位残留（按 09-30 死腿收尾第三把尺的姿势自量一遍；骨架那一发的八处 `（待填）` 已全部写实） |
+
+本腿到此交件给 `241-v1`（裁决者≠实现者）。⚠ 给裁决者的两把必复尺：§5 那四枚突变请**独立复跑**（`python .scratch/wisp/probes/241/r1/mutation241.py`，它会自存/自还原 pristine），以及 §7 那六发跨包门禁**只有编排者/裁决者能跑**。
+
 ---
 
 ## 9. 票面与盘上不一致的三处（上报，票面文字本腿未改）
-
 按派单要求："如果和票面冲突，以票面为准，并在交件里指出冲突"。这三处都是**票面现量表**与盘上的差别，不涉及判据本身：
 
 - **(a) 事实 2 的出处写错**。票面写 `SilenceLevelGate = 0.06` 的出处是 `internal/audio/gate.go`（"编排者本轮现读"）。实测：`internal/audio/gate.go` **零命中**这个符号；它在 **`internal/ball/liquid.go:30`**（定义）与 `:215`（使用）。`240-c1` §1.4 那一行写的是 `liquid.go:30`，是对的——**是票面表格抄错了，不是普查错了**。判语不受影响（"它是判静默的门限、不是量程"这一条完全成立）。
