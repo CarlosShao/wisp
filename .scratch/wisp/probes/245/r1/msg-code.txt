@@ -1,0 +1,57 @@
+产码(245-r1) 乙形落地：稳态不绑 cancel 那一枚，Esc 只在 Confirming 被借走、离开即还
+
+工单裁走乙：不改默认键名（D43 转移表＝C12 冻结，一字未动），只把 cancel 那枚的
+作用区间改回它本来被写成的样子——借—还。票面：
+.scratch/wisp/issues/245-the-bare-esc-cancel-default-is-a-global-hotkey-so-the-resident-process-steals-esc-from-every-other-app.md
+
+internal/ball/hotkey_windows.go
+- 新增 HotkeyStandby（第 6 枚状态，追加在末尾＝不重排既有 iota）：配置有效且能解析、
+  但稳态就是没绑。它既不是 HotkeyDisabled（用户没关任何东西），也不是失败。
+- registerAllWith：cancel 那一枚走 cancelIdleLine，只分类不注册（空＝disabled、
+  垃圾＝unparsable 照旧可见、有效＝standby）；其余三枚照旧全绑。
+- AllLive／Problems 认识 standby：稳态三枚全绿、不产出问题行；借失败＝HotkeyError，
+  仍然出现在 Problems 里（不静默）。
+- takeEsc／releaseEsc 改造成可注入接缝（takeEscWith／releaseEscWith）：借＝注册裸
+  VK_ESCAPE（modNoRepeat），还＝只撤销、绝不回头再绑配置里那枚默认 Esc——再绑就是
+  本票要修的缺陷本身。takeEsc 返回 error 而不是 bool，好让失败那支能上报。
+- HotkeyReport.withCancel／cancelBorrowedLine／cancelFailedLine：借用与归还都会把
+  报告改成"Win32 此刻真的握着的那套"，Live() 才是判据读的那枚数。
+- ApplyHotkeyDefaults 的注释补一句：cancel 那枚默认不等于"现在就绑着"。
+
+internal/ball/ball_windows.go
+- TakeEscForCancel：借成功＝cancel 行转 live（裸 Esc）并同步 registeredHotkeys；
+  借被拒＝转 HotkeyError 并留下 err，不再只写一个 bool。
+- ReleaseEscAfterSession：撤销借用并把行退回 standby（按配置字符串重新分类）。
+- RebindHotkeys 注释写明"重绑会丢掉在飞的借用"这一既有边界（残余进表）。
+
+cmd/wisp/resident_ball_windows.go：startResidentBall 与问题行注释改成带枚数的事实句
+（这条腿今天就三枚，且它没有卡片路径，永远不会借）；hotkeys live %d/4 那枚文案按票面
+AC#3② 一字不动，值自然从 4/4 变 3/4。
+
+测试（三枚钉同批改期望，⛔ 一枚没删、⛔ 没放宽、⛔ 没新增扫注释的词面型仪器）：
+- 默认层 hotkey_status_test.go：TestRegisterAllLiveSet 由"恰好四枚"收紧成"稳态恰好三枚
+  且 cancel 不在场，且注册集里没有裸 Esc"；新增 TestDefaultHotkeysIdlePassHoldsNoEsc
+  （生产默认那一发）、TestCancelBorrowRoundTrip（借—还两头＋还之后注册次数仍为 1＝
+  "还"不是再绑一次）、TestCancelBorrowFailureIsAProblemLine、TestStandbyIsNotDisabledAnd
+  NotAProblem；TestRegisterAllSplitsFailureFamilies 的"cancel 没被邻居带倒"改判成借路
+  径依然能落地；TestHotkeyStatusString 补 standby 一词并钉住它不与 disabled 同句。
+- 真机层：hotkey_live_test.go 新增 escBorrowProbe／requireIdleRoster／requireEscBorrowed／
+  requireEscReturned——判据问能力：向 Win32 用别枚 id 注册裸 Esc，借期必须 1409、
+  还完必须成功；AC#3③ 那段注释改成"稳态根本不绑"的带条件事实句，用例仍绑 Ctrl+Alt+V
+  （票面明令不许改回裸 Esc）。
+- live_windows_test.go:68 那枚钉（AC#3①）：len(Live())!=4 → !=3 ＋ requireIdleRoster；
+  B1 那段的"记录一下继续跑"改成不可跳过：没尝试＝红，尝试被拒＝具名 SKIP-LOUD。
+- interaction_live_test.go（AC#2 两头发）：借住时用 Win32 探针证明桌面拿不到 Esc，
+  撤下后用同一把探针证明它回来了；原来那句"归还后配置那枚应重新 live"按乙形改掉。
+- cmd/wisp/resident_ball_live_228_windows_test.go（AC#3②）：那段注释改成条件事实句，
+  并新增"hotkeys live 4/4 就是红"这一枚读数（稳态四枚全在场＝裸 Esc 被抢走）。
+
+读数（本机 09-30 17:2x，桌面安静：balldebug.exe／wisp.exe 计数均 0）：
+- go build ./... rc=0；go vet ./internal/ball／-tags winlive／./cmd/wisp 全 rc=0；gofmt -l 空。
+- go test -tags winlive ./internal/ball -run 'TestLiveHotkey|TestLiveConfirmingCancelAnd
+  EscReturned|TestBallLiveLifecycle'：4 枚 PASS，SKIP-LOUD 0 枚。
+- go test ./internal/ball：唯一一枚红是 TestC21TableColourRowsMatchTokensCSS，起因是工作树里
+  design/assets/tokens.css 处于删除态（起手名册第 14 行，非本腿所造；本腿零读 design／frontend）。
+
+本腿不勾任何 AC 框（归编排者）；只 commit、不 push。AC#4 判"阻塞于票 228"，AC#5 残余五字段
+进 docs/evidence/s1/245-esc-not-a-standby-global-hotkey-r1.md。

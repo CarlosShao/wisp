@@ -50,3 +50,27 @@
 - ⛔ **排在队列最前**（先于 `197-r3`／`224-r3`／`242`）：理由是**它影响的是他这台机器现在的键盘**，不是仓里的账。
 - 动 `internal/ball`＋`cmd/wisp` ⇒ ⛔ 与票 228 的后续片串行；⚠ **跑真机热键用例前 `tasklist //FI "IMAGENAME eq balldebug.exe"` 与 `wisp.exe` 都必须为 0**（本仓实测：自己的调试进程占着全局热键会造出 **8 枚假红**）。
 - ⚠ 与票 244（GUI 子系统）同属"这一轮之后才看得见的外观/行为"，两枚**互不阻塞**，但**别同一批改**：244 改构建链、245 改热键稳态，读数面不同，混在一枚腿里出事无法归因。
+
+## 残余登记（乙形那半条代价，`SPEC-12 §5` 五字段；AC#5 的落点）
+
+> 由产码腿 `245-r1` 于 09-30 17:3x 追加。同一份内容逐字在裁决支持表 `docs/evidence/s1/245-esc-not-a-standby-global-hotkey-r1.md` §4.1。
+> ⚠ **`docs/specs/SPEC-12-roadmap-governance.md` §5 那张表本身是产码腿禁地**（"不改 `docs/specs/**` 一字"），所以这一行**要由编排者搬进那张表**；本腿也**没有**在代码里加 `DEFERRED(D-xx)` 标记，因为 `issues/README` 硬约束要求标记与登记表 **1:1 双向**对得上——造一枚没人登记的标记＝当场把那道核对打破。
+
+| 字段 | 内容 |
+|---|---|
+| **类型／项** | DEFERRED：`Confirming` 借 `Esc` 那 2–3 秒仍吞别处的 `Esc`（票 245 乙形残余） |
+| **为什么现在不做（依据）** | 本票「裁定」三支理由走的都是"稳态不绑"，没裁"借期也不抢"；要把借期也消掉得换新机制（低级键盘钩子／只在面板内取消），属新契约面。借期长度不是自由参数：`internal/statemachine/timeouts.go:48` 现读 `{state: StateConfirming}: {3 * time.Second, EvConfirmExpired}`＝L1 窗口上限 3 秒（`SPEC-06` 的 2–3 秒） |
+| **完成判据** | 卡片挂着期间按 `Esc`：Wisp 的否决生效（D43 #22）**且**同一发里焦点在别的应用时那个应用也收到 `Esc`（现读形状的判据，不是"我们不再记账了"）；若结论是"做不到不抢"，就要给出**不接管全局 `Esc`** 的第二条否决通路并过 `Confirming` 那族真机用例 |
+| **当前残缺表现** | 等批的那 2–3 秒内别的应用收不到 `Esc`（记事本关窗、资源管理器改名、对话框取消、游戏/编辑器退全屏那一段会失灵）；反向同样存在：想否决 Wisp 时若焦点在别处，那发 `Esc` 归 Wisp |
+| **前置／落哪个模块·切片／谁做／触发条件** | 落 `internal/ball`（`takeEscWith`／`releaseEscWith` 这一对）＋ `internal/agent/approval` 的卡片生命周期；切片＝票 228 后续片把卡片接进常驻腿之后（S6 之后的球／门控联动面）；谁做＝**编排者立后续票**（产码腿不许自己开票），形状需 owner 定（钩子 vs 只在面板取消）；触发条件＝常驻腿出现真卡片，或 owner 实机撞到"那两三秒按 `Esc` 没反应"任一条 |
+
+### 本腿另交的四条具名残余（不是推迟项，是归属清楚的账，详见表 §0.1／§4.2）
+
+1. **AC#4＝阻塞于票 228**：常驻腿整棵 `config.toml` 没接（`cmd/wisp/resident_ball_windows.go:86` 逐字 `Hotkeys:  ball.DefaultHotkeys(),`），本腿未新增第二条配置通路。
+2. `cmd/wisp/main.go:25-26` 那句 usage `its four global hot keys` 在本票之后成半假话 ⇒ 归票 228 的 AC#7/AC#8 文案面（台账 `A477` 已把 `main.go` 那族句子判归 228），本腿不跨票改。
+3. `RebindHotkeys` 会丢掉一次在飞的借用（`internal/ball/ball_windows.go:822`，既有形状，本腿只补注释未改行为）⇒ 票 228 后续片。
+4. **待人拍板（本腿按票面字面取了严的一支）**：用户把 `[hotkey] cancel` 配成带修饰键的组合时，稳态**也不绑**它——票面 AC#1 写的是无条件"只能是三枚"。另一种读法（只有裸键才不绑）会让 AC#3① 那枚钉的"稳态三枚"不成立。⇒ 见表 §5 J#2，需编排者／owner 一句定案。
+
+## Progress log
+
+- [2026-09-30T17:37:19+08:00] agent=245-r1 claimed=票 245（产码腿，非裁决腿） did=乙形落地：稳态不绑 cancel（`HotkeyStandby`）＋`takeEscWith`/`releaseEscWith` 接成唯一借用路径；三枚 AC#3 钉同批收紧（另加两枚票面未点名的同类计数钉）；真机探针 `escBorrowProbe` 证借还两头；M1/M2a/M2b 三发突变逐发红过并逐发还原成绿；本表末尾追加五字段残余登记与这节 log evidence=docs/evidence/s1/245-esc-not-a-standby-global-hotkey-r1.md（commits f91feddd／e6d6426f／本枚） skipped=none（本票无前端面） next=交非实现者对抗验收；AC 框一枚未勾（5 未勾／0 已勾，勾归编排者）；Status 那一行按编排者原文保留未改，⛔ 未新增 `DEFERRED(D-xx)` 代码标记（理由见上）

@@ -1,0 +1,14 @@
+time=2026-09-30T17:26:45.866+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestLive228ResidentLegOwnsABallWindowOnTheDesktop
+    resident_ball_live_228_windows_test.go:147: AC#1 LIVE: hwnd=6621770 pid=24792 owns the ball window; hotkeys live 4/4: summon=Ctrl+Alt+Q live, mute=Ctrl+Alt+M live, cancel=Esc live,
+    resident_ball_live_228_windows_test.go:164: AC#1 RED (ticket 245): the idle resident ball registered all four hot key slots, so the cancel slot is a desktop-wide hot key while nothing is being confirmed. The idle roster is three (summon/mute/panel); cancel is borrowed only during Confirming.
+        wisp 0.0.0-dev (unknown, built unknown)
+        WISP_ENV=test (data dir rules: SPEC-03 §5)
+        sherpa-onnx runtime version: 1.13.8
+        wisp: resident runtime booted (Wisp · test, data dir = C:\Users\swq\AppData\Local\Temp\TestLive228ResidentLegOwnsABallWindowOnTheDesktop714986216\002, portable = false, job object = on, single instance = false)
+        wisp: empty event loop running (no task is taken by this loop yet); the floating ball window is up in this process (tray icon added, hotkeys live 4/4: summon=Ctrl+Alt+Q live, mute=Ctrl+Alt+M live, cancel=Esc live, panel=Ctrl+Alt+P live) (Ctrl+C exits cleanly)
+live228: pid 24792 created and destroyed its WispBallWindow window through the D38(e) order
+--- FAIL: TestLive228ResidentLegOwnsABallWindowOnTheDesktop (3.95s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/cmd/wisp	4.005s
+FAIL

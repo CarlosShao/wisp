@@ -1,0 +1,38 @@
+evidence+probes(245-r1) 表填满＋工单末尾交五字段残余：AC#1 成立（稳态 Live()=3）／AC#2 成立（借还两头各有读数）／AC#3 成立（三枚钉收紧且 M1/M2 逐发红过）／AC#4 阻塞于票 228／AC#5 成立（登记落两处，SPEC-12 那一行归编排者搬）
+
+docs/evidence/s1/245-esc-not-a-standby-global-hotkey-r1.md（§0–§6 全部填满，占位符尺
+`grep -n "待填|填写中|TODO"` 命中 0 枚）：
+- §0 起手名册（173 行逐字存 probes 目录）＋起跑前三枚进程计数均 0＋一句话结论
+  「稳态注册集枚数＝3，借用态＝4」。
+- §0.1 具名欠账 N#1..N#5（本腿现测，本腿一枚未修）。
+- §1 逐格判语：AC#1 成立（出厂进程那发读数逐字 `hotkeys live 3/4: ... cancel=Esc not
+  bound while idle (...)`）／AC#2 成立（借＝探针回"桌面拿不到"、还＝探针回"free"＋
+  报告回 standby）／AC#3 成立（含 M1 一发把三枚钉全打红的逐字红句）／AC#4 阻塞于票 228
+  （凭据 `cmd/wisp/resident_ball_windows.go:86` 逐字 `Hotkeys:  ball.DefaultHotkeys(),`）
+  ／AC#5 成立（SPEC-12 §5 那一行本身要人工落，本腿禁地；未造 DEFERRED 代码标记的理由写明）。
+- §2 突变名册：M1（稳态真绑裸 Esc）／M2a（进 Confirming 不尝试）／M2b（谎报借到）
+  三发逐发红句、逐发 `git cat-file blob HEAD:` 还原并 `git diff --quiet` 复认；
+  M3 判不需要另开（releaseEscWith 只有一行，默认层那枚 attemptsOf 断言直接钉住）。
+- §3 门禁读数：go build／go vet（含 -tags winlive 与 GOOS=linux internal/ball）／gofmt -l
+  ／scripts/d22scan.sh（种子正控 PASS=34 FAIL=0 SKIP=0 ＋ 真扫 clean、examined 253）
+  ／internal/ball 默认层（唯一一枚红＝TestC21TableColourRowsMatchTokensCSS，起手名册第
+  14 行 ` D design/assets/tokens.css` 归因，非本腿）／internal/ball 真机四枚 PASS、
+  SKIP-LOUD 0 枚／cmd/wisp 默认层 ok 148.421s／cmd/wisp 真机 PASS 3.96s。
+  ⛔ 未跑 gofumpt（本机没有，不跨网络装工具）＝记在 §5 J#3，不当成读过。
+- §4 残余：AC#5 五字段（完成判据／残缺表现／前置／谁做／触发条件齐全）＋另四条具名账。
+- §5 判不动：J#1 SPEC-12 表是禁地／J#2 带修饰键的 cancel 稳态该不该绑（本腿按票面字面
+  取严，分叉上交）／J#3 gofumpt 不可用／J#4 "别的应用真收到 Esc" 这半句本腿证不到
+  （只证到 Win32 报告该键无人占）／J#5 CI 其余档／J#6 外部程序占住裸 Esc 那一支本机未走到。
+- §6 名册核对：终态 internal/ball＋cmd/wisp＝0 枚＝起手同名册；别人留下的条目一枚未提交；
+  AC 框计数 5 未勾／0 已勾＝与起手一致（勾归编排者）。
+
+.scratch/wisp/issues/245-...md：末尾追加「残余登记（五字段）」一节＋Progress log 一节。
+git diff --numstat 删除列＝0（编排者原文一字未动，⛔ AC 框一枚没碰，Status 那行按原样保留），
+新增 24 行。没有新增 DEFERRED 代码标记——那会打破 issues/README 要求的"标记↔SPEC-12 §5
+1:1 双向"，而那张表在本腿禁地里，只能由编排者搬。
+
+.scratch/wisp/probes/245/r1/：本腿全部读数（build／test-ball-default／test-cmdwisp-default／
+d22scan／winelive-hotkey-1／m1-cmdwisp-livelive＝M1 那发出厂进程自己打出的
+`hotkeys live 4/4: ... cancel=Esc live ...` 逐字）＋两枚 commit 正文草稿。只建不删。
+
+只 commit、不 push。

@@ -1,0 +1,13 @@
+evidence(245-r1): 骨架先交——AC 逐格判语表头＋突变名册＋门禁读数＋残余＋判不动＋名册核对六节占位
+
+产码腿 245-r1 起手第 5 轮内交骨架（派单硬要求：严禁先做完再回来写表）。
+本表性质＝实现者自述，不是非实现者的对抗验收裁决；AC 框一枚都不勾，勾由编排者判。
+
+- docs/evidence/s1/245-esc-not-a-standby-global-hotkey-r1.md：§0 起手名册与结论占位／
+  §1 判据逐格表（AC#1 稳态注册集／AC#2 借还与两头读数／AC#3 三枚钉同批收紧／
+  AC#4 阻塞于票 228／AC#5 残余五字段）／§2 突变名册／§3 门禁读数／§4 残余／
+  §5 判不动的地方／§6 名册核对。
+- .scratch/wisp/probes/245/r1/start-status.txt：起手 git status --porcelain 全量名册逐字，
+  取数时刻 09-30 17:0x +08，HEAD＝25ce3ce9（共享工作树，终态判据＝等于这一份）。
+
+工单：.scratch/wisp/issues/245-...md（裁定走乙：稳态不绑 cancel，进 Confirming 才 takeEsc、离开 releaseEsc）。
