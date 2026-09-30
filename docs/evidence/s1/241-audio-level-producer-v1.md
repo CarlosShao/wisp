@@ -506,6 +506,21 @@ git diff --name-status 501c6971..HEAD | grep -E "^(M|A)\s+(cmd/wisp|internal/bal
 | `go test ./internal/audio/ -count=1` | 14:38:16 → 14:38:33 | **`ok github.com/CarlosShao/wisp/internal/audio 16.005s`** | 与首发的 `16.593s` 同数量级；两发都 FAIL=0 |
 | 跑前 `tasklist //FI "IMAGENAME eq balldebug.exe"` | 14:38:12 | **0 枚**（`INFO: No tasks are running which match the specified criteria.`） | 与首发的 0 枚一致 ⇒ 两枚真设备用例这两轮都是**真跑了**（首发 `-v` 名册里 `TestPinnedThreadStable10s (10.06s) PASS` 可证） |
 
+### 6.1c 交件前最后一发（第 6 枚 commit 落盘之后，本腿的**真正终态**）
+
+| 门禁 | 时刻 +08 | 读数 |
+|---|---|---|
+| `go test ./internal/audio/ -count=1` | 14:43:17 → 14:43:33 ＋ 14:43:43 → 14:43:59 | 两发都 **`ok github.com/CarlosShao/wisp/internal/audio`**，第二发 **15.587s** |
+| `go build ./...` | 14:43:59 后 | **rc=0** |
+| `./tools/d22scan/d22scan.exe -root .` | 14:44 前后 | **rc=0** |
+| `gofumpt -l internal/ cmd/` | 14:44 前后 | **空输出、rc=0** |
+| 跑前 `tasklist //FI "IMAGENAME eq balldebug.exe"` | 14:43:17 | **0 枚** |
+| `git status --porcelain -- internal cmd` | 14:43:33／14:44 | **空**＝起手名册 |
+
+⇒ §6.1／§6.1b／§6.1c **三发四数全绿且互不矛盾**，AC#5 的"终态逐名照抄"由这三张表共同充当凭据。
+⛔ **前两发里 `go vet` 与 `gofumpt` 各带正控**（§6.1 那行 2b），第三发是**纯复跑**（本腿后半程只写 markdown，没碰任何源文件）。
+
+
 
 
 ### 6.2 留给编排者的台账动作（本腿不产码、不翻框、不改票面，逐条具名）
