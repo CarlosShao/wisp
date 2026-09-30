@@ -59,3 +59,11 @@
 ## 编排者增量 — 09-30 **14:47:10**：接一枚从票 241 挖出来的**过期落点指认**（本票因此多一格）
 
 - [ ] **AC#7 「resident_windows.go:81」那行注释今天是假话，且它已经被三程原样传递**：现读逐字「wisp: empty event loop running; the floating ball arrives in ticket 07 (Ctrl+C exits cleanly)」——**票 07 早已结案**（盘上文件「07-ball-state-machine-core-done.md」），"要等票 07 才来"这句把本票（228）该干的活指给了一个不存在的未来。传递链：该注释 → 普查「240-c1 §3.1 第 1 行」→ 「241-r1」票面正文两处归属 → 均由「241-v1」当场挖出并上交（它按硬约束没碰「cmd/wisp」）。**完成判据**＝① 注释改成带条件的事实句（说清"今天这行进程里确实没有球，把球装进来是本票的活"）；② 票面正文那两处「欠票 07」的作废声明由我 09-30 在票 241 落笔（已落）；③ ⛔ **不新增仪器去扫注释里的票号**——词面型尺会误伤，这条债的归属靠台账与票面，不靠新门。凭据出处：「docs/evidence/s1/241-audio-level-producer-v1.md」§2.3。
+- [ ] **AC#7 的射程更正（09-30 15:3x，账 `A471`；这条是上面那一格的正文补，不是第二格）**：本格原来只写「resident_windows.go:81」**那一行，太窄**。我现跑 `grep -rn "ticket 07" --include=*.go internal cmd scripts tools`＝**28 处命中**，按"谁读得到"分两堆，两堆处理方式不一样：
+  ① **3 处不在注释里，是打给人看／写进日志的字符串** ⇒ **这三处才是本格的完成判据**（逐处改成带条件的事实句，说清"今天这条进程里确实没有球，把球装进来是 228 的活"）：
+  「cmd/wisp/main.go:25」⚠ **它落在 `const usage = ` 那枚反引号原始串里＝`wisp -h` 打给用户的正文**（逐字「the floating ball window is ticket 07」，我 `sed -n '20,30p'` 复认），**不是注释、用户今天真读得到**；
+  「cmd/wisp/resident_windows.go:81」是 `fmt.Printf` 的运行时输出（本格起手记的那一处）；
+  「internal/proc/boot_windows.go:127」是 `slog.Info` 的运行时日志（逐字「activation requested by second launch (ball bring-to-front lands with ticket 07)」）。
+  ⚠ 第三处在 `internal/proc`、跨了本票地界：改的是一枚字符串、**不新增依赖边**，所以本票可以做，但交件时必须具名写清"动了 `internal/proc` 那一行"。
+  ② 其余 **25 处是注释**（其中 **6 处在 `*_test.go`**）——**大部分是合法的历史出处**（「Implemented by ticket 07」＝过去时、「SPEC-08 §2, ticket 07 constraint」＝引来源），少数是**还在承诺未来**。逐处判"历史出处 vs 过期承诺"⛔ **不塞进本格**（那会让 AC#7 永远勾不上），另立**票 243**（只读普查，零产码）。
+  ⛔ 原判据第 ③ 条**继续有效、且对两堆都成立**：**不新增扫注释里票号的词面型仪器**——上面那把 `grep` 是**派单与台账用的尺，不是门**。
