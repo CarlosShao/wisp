@@ -35,3 +35,4 @@
 - 测量坑：跑真机热键／桌面用例前 `tasklist //FI "IMAGENAME eq balldebug.exe"` 与 `wisp.exe` 计数必须为 0；`cmd/wisp` 缺 sherpa PATH 会 `0xc0000135` 且**无 `--- FAIL`**＝根本没跑。
 
 ## Progress log (append-only, newest last)
+- [2026-09-30 18:2x +08] agent=246-a1 did=前段只读普查交件 `.scratch/wisp/probes/246/a1/census.md`(206 行/31,880 字节, 占位符 0, 骨架先落 f9cbe725→填满 63508c50)。三条现读凭据独立复认成立; 两形代价表各 ①-⑥; 依赖边差集为空(甲乙合规做都 0 条新增包级边, cmd/wisp 已 import agent/approval/ball/proc); D38(e) step3 cancel-task-roots 是 proc 侧两形共用缺口(boot_windows.go:151-161 只填 CloseJob, step1-7 零生产者)。建议乙形(装配根注入, 守"唯一接缝"、不造第二真相源), 最短链『卡片进得来+Esc 真能否决一次』可只注入裸 gate(不需 loop/provider/config/麦)。硬契约改动≈0(D43/C12 一字未动), 需告知功能 3-4 枚, proc hook 注册入口是否算契约面待 owner 裁。go build/vet rc=0; 未跑 go test; A480④ 未归因红留落地腿。零产码、未碰任何 AC 框。next=编排者裁甲/乙后派落地腿
