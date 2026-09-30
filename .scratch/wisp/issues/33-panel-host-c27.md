@@ -15,6 +15,25 @@ owner 当场提了一条功能要求，逐字：「问题我早就说过了，�
 2. **宿主真起来那段（AC#1..AC#4：窗口生命周期／冷启 ≤1500ms 与热显 ≤200ms 的实测／embed.FS 离线供给且无监听端口／焦点回还）提到队列头**，排在写腿 `246-r2` 交件之后——它要新增 WebView2 依赖、动构建链，所以⛔ **不与票 244（GUI subsystem 构建）同批改**，也⛔ 不与 `246-r2` 并发（同占 `cmd/wisp`）。
 3. ⚠ **一处要提前说清、免得宿主起来了却交不出他要的东西**：入向白名单今天只有四枚方法（`internal/panel/bridge.go:42-45`），**零枚 config/凭据方法** ⇒ "点设置、自己录 key"这条路由属**新立的票 248**，不在本票射程内。本票的验收腿**不许**因为窗口开出来了就宣称"设置可用"。
 
+## 编排者裁定（09-30 23:4x，台账 `A486`）：`33-h1` 的八问逐条判完，落地腿 `33-r1` 可以派
+
+普查件＝`.scratch/wisp/probes/33/h1/census.md`（**367 行／74,999 字节**，占位符现量 **0**，70 枚编号尺，三枚 commit 写面只有这一路径；我按三把尺复认过行数与零占位符）。八问裁定：
+
+| 问 | 裁 | 依据与边界（写死，落地腿不许自行改形） |
+|---|---|---|
+| **J1 宿主投 `ui-sta` 还是独立 STA 线程** | **甲：投现成的 `ui-sta`** | 独立那一支要**新增 D38(b) 名册外的一枚协程名**＝改名册属契约面，要人工批准，⛔ 本票不许顺手要。代价要**当场证**：`pkg/edge/chromium.go:96-111` 的 `Embed` 自带嵌套 `GetMessageW` 泵直到 `inited`，四类回调直接落在 `ui-sta` 上 ⇒ **落地腿的第一枚用例就证"泵期间球仍能出帧、消息仍被派发"**（普查 ⑨ 第 3 条明写它只有行号与 Win32 语义、**没跑过**）。证不出来就**停手上报**，⛔ 不许改成独立线程绕过。 |
+| **J2 缺 runtime 走哪支** | **降级＋响亮，⛔ 任何路径都不许让 `log.Fatalf` 可达** | 普查在库的错误两支里翻出 **2 枚 `log.Fatalf`**，与票面 AC#5「no-crash」正面对撞。⇒ 判据＝用票面已有的 rename/mask fixture（本机装了运行时**不是**跳过这一格的理由），并具名写出我们**不走**那两枚会 fatal 的 API。 |
+| **J3 `1808.9ms` 那一形算不算本票冷启口径＋P11 要不要入册** | **算另一枚口径名，不并入判据；P11 未触发，不改契约** | 三口径分开报：`cold`（沿用 S0 口径，判绿用它，P95 现量 1256.4）／`cold-embed`（embed 供给＋CSP 那两件新成本，1808.9 那一形归这里）／`recreate`。⇒ **P11（冷拉起 >2s 才重评 L2 卡回原生）两形都 <2000，未触发**；⛔ `docs/SLO.md` 与 `internal/observe/thresholds.go` 一字节不动（现量：那文件里**零枚延迟毫秒字段**，只有 `memCapPanel`），读数只进证据表。`cold-embed 1808.9 > 1500` 这一条我登记为**已知代价**（INTERIM），⛔ 不摆给 owner 做选择题。 |
+| **J4 落点甲／乙** | **甲：宿主进装配根 `cmd/wisp`，`internal/panel` 保持零平台分叉** | 两形的依赖增量是**同一批 9 枚包名**，差别只在"挂哪枚包、那枚包有几份 CI 分母"，而 `internal/panel` 是仓里**唯一零平台分叉包**且在 ubuntu 有分母 ⇒ 把 Windows-only 宿主塞进去会毁掉那一格。现成旁证：`cmd/wisp/panel_assets.go:13` 逐字写着这枚宿主"expected to call the same panel.Assets API"。⚠ 票 197／238 那两条推广到本票，**普查已具名标成"这是我的推广"**，我沿用同一姿势。 |
+| **J5 `GOPROXY=goproxy.cn` 取 go.sum hash 撞不撞 ban #5** | **撞，禁止** | ban #5＝从镜像站取哈希。⇒ 依赖只能走 `go mod` 正常解析、哈希由 Go 自己写 `go.sum`；⛔ 不许手工抄任何 hash 进文件，⛔ 不许从镜像目录取。**拉不到就停手上报**，不许为变绿放宽。普查另登记一条：**上游"最新 tag"两发网络尺都失败**（`WebFetch github.com/jchv/go-webview2` fetch failed），所以"最新 tag"这一格是〔未核到〕，落地时按本机 module cache 里已有的 zip/mod 走（它现量：纯 Go 零 cgo、离线可拉、要加的是 **2 枚 module／4 行 `go.sum`／9 枚包名**，`x/sys` 不抬）。 |
+| **J6 票面 embed 路径 vs 活的 `all:dist`** | **按现存活接缝（`panel.Assets` 那枚 `all:dist`）做；票面那行路径不作为判据；但"清检出必须能建"升成本票一枚硬判据** | 三枚现量把这件事钉住了：票面写的 `assets/web/dist` **两种口径都不存在**；`.gitignore:24` 整条忽略且**无锚豁免**；Go 官方原话＝空目录匹配被忽略、模式不匹配则 **the build will fail**。⇒ 我**不改 `docs/specs/**` 一字**，改在本票面具名说明"规格那行的路径不作为判据"。**新增 AC#11（见下）**：在**干净检出**（临时目录另拷一份、不带未跟踪产物）里 `go build ./...` 必须通过；⚠ 我 23:4x 现量 `git ls-files frontend`＝**85 枚已跟踪文件**（`frontend/.gitignore`／`VENDORED.md` 等），**dist 那批是不是在内我没查**——这一格正是 AC#11 要证的：如果产物不入库，那"能构建"要靠构建链（票 244／CI 那侧）而不是靠谁手工生成，**不许把 `frontend/**` 提交进来糊它**（两层禁令）。 |
+| **J7 "无监听端口"那半要不要进 windows CI scope** | **L1 进仓当常驻用例，L2 只留本机证据并具名登记"CI 里没有这一半"** | L1＝`go/ast` 扫宿主包 import（禁 `net`／`net/http`），在 ubuntu core scope **有真分母**（`scripts/portable-tests.sh:179`）；L2＝`GetExtendedTcpTable` 且**必须过滤 `dwState==LISTEN`**（现成那枚只数行数不读 state，直接拿来会判错，`internal/proc/treemetrics_windows.go:269`）。⛔ 词面 `netstat` 门一律不做（全仓 **0 命中**＝那种门必恒真）。`winlive` 在 CI 里**零岗位**＝这是第四枚"只在开机那台机器上成立"的同形坑，**登记而不假装覆盖**。 |
+| **J8 33 与 248 谁先** | **33 先（owner 要先看见能点的窗口）；两枚可并行开发、不可合批** | 关键读数＝本票可做到**零 `internal/panel` 写面** ⇒ 与票 248（要动 `internal/panel/bridge.go`）不互斥；⛔ 但**不合并 commit**，也⛔ 不与票 244（GUI subsystem，同动构建链）同批改。串行事实：**`246-r2` 已死于 150 轮帽**（`A486`），它的残留我已收尾、`cmd/wisp` 现为干净 HEAD ⇒ `33-r1` 可以开工，前提是先复跑一次整包并逐名比红名册。 |
+
+## 新增判据（本票自加，勾仍归非实现者）
+
+- [ ] **AC#11（09-30 23:4x 编排者追加，来路＝`33-h1` ④ 节 J6）**：**清检出能建**——把仓拷进临时目录（不带未跟踪产物）后 `GOFLAGS= go build ./...` 必须通过；若今天不通过，本票**不许**用"提交 `frontend/**` 产物"或"改 `.gitignore` 加豁免"来让它通过（那两条分别撞两层禁令与 `A207` 那味 index-aware 过滤），要**停手上报**由我改派构建链那侧。判据自带反向证：把 embed 模式改成一个不存在的路径 ⇒ 构建**必须**失败（证的是"这枚判据有牙齿"，不是"我改了就红"）。
+
 ## What to build
 The `panel` module host side: singleton PanelManager owning at most ONE WebView2 window per
 session (hide-don't-destroy), embed.FS resource serving via `AddWebResourceRequestedFilter`
