@@ -53,6 +53,10 @@
 ## 与其它票的关系（别在本票里顺手做）
 
 - **票 201**：本票是它 AC#1／AC#3a／AC#6b 三格的**唯一前置**；**AC#2 的那半格可以早做**——只差把 `runSpec.replyVeto`（`run.go:146`）设上、并按 `approval_reply.go:415-417` 那道 `SetLoaded` 的门，三件现成品都在（`approval.go:147`／`:163`、`gate.go:139`），**缺的只是那一枚赋值**。要不要单独拆一小腿先做，由排程决定，但**它撞 `run.go` ⇒ 仍须排在票 223 之后**。
+  ⛔ **上面那句"缺的只是那一枚赋值"是我（编排者）自己写错的，09-30 15:4x 现读推翻，原句不抹、账 `A472`**：`cmd/wisp/run.go:141-147` 逐字写着「Production leaves it empty because a console run wires **none** of SPEC-06 §2's four channels, and an empty value makes `Gate.Veto` say that back **instead of letting this process claim a cancel path it does not have**」＋「A host that DOES own one - the ball click, the global Esc hook - names it here **and marks it loaded in the same step**」。
+  **两把现量尺**（我现跑）：① `grep -rn "ChannelEsc" --include=*.go internal cmd \| grep -v _test.go` ⇒ 命中**全在 `internal/agent/approval/` 自己的定义里**（`approval.go:55/:61/:90/:111/:163`），**没有任何宿主把它设上**；② 全局热键那套东西**在场但只在球包里**——`internal/ball/hotkey_windows.go:434 takeEsc`（逐字 "binds VK_ESCAPE as the cancel hotkey (B1 Confirming takeover)"）、`:374 registerAll`，而**唯一把它跑起来的宿主是旁支程序 `cmd/balldebug`**（`:224`、`:255`）。
+  ⇒ **结论（这一处是"照我写的做会造出一枚谎"）**：在 `wisp run` 里把 `replyVeto` 设成 `ChannelEsc`／把 `NewChannels()` 换成 `DefaultChannels()` ＝ **让一条纯命令行进程对外声称自己能按 Esc 取消、并往卡片上印"按 Esc 键"**，而那形里既没有球也没有热键钩子。`run.go:501` 那段注释把这枚留空写成 **load-bearing 的诚实选择**，不是漏了赋值。
+  ⇒ **改后的落点**：这一半**必须在"球进常驻那条腿"之后才有对象可声明**（宿主先真的有 ball click／`takeEsc` 那条路，再按 `run.go:147` 那句"names it here and marks it loaded in the same step"同一步设上＋`SetLoaded`）。⛔ **不许再有人拿"只差一行赋值"来拆这一小片**；票 201 `AC#2` 那半格的真实前置＝**本票的载体主体**。
 - **票 220**：谁先造"L1 那一发的只读枚举口"要先裁（它 AC#2 甲形与本票第⑤问同一枚位置）——**两腿各造一次＝两份枚举器**。
 - **票 227**：配置写路径的覆盖面补全，排在**本票之后**（本票会真去写 `allowed_dirs`，那一天的基线才作数）。
 

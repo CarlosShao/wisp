@@ -9849,3 +9849,18 @@ r1 **没动手**，因为票面 `:8` 只给到 `internal/tools/**` 的**测试�
 **仪器口径教训两枚（入长期记录）**：① **「go test ./...」里那枚 ns／op 预算尺会被同批并跑的包饿**——腿那发里「internal/risk TestResolvePerCallBudget」红，单独复跑同包「ok 3.761s」、逐字读数 0.277 ms／op 对预算 1.000 ms ⇒ **凡用全仓扫做突变读数，性能类判据必须单包复跑才入账**；这是「A465」那次同一枚尺第二次以同一成因出现，这次带完整归因。② **写腿留在文件末尾的"脚注指向"会把下一腿带偏**（C3：脚注指「ui.go」的「PanelItem」，实测改了全绿，因为那一形进不了快照字节；而"真形"——把活令牌带进线上包——当场红）⇒ **派单里凡引用别人写的落点指认，必须先自己跑一遍那枚改动**，这与「验证盲区的固定问法」第 64 条是同一族。
 
 **编队与推送**：四条残余的去处已逐条落名——C1／C2／C3 三枚**尺的修法**归**「197-r3」**（动被测文件必须同批把 P1／M1 真形／D1 三发当正控重跑，台件「.scratch/wisp/probes/197/v1/」可复用）；C4 与出向读面归**票 242**；注释普查归**票 243**。队列（全部串行，两腿绝不并发跑突变）：**197-r3 → 224-r3 → 228-r1 → 242 → 243**；另「239-v1」已交、「238」八刀已裁、「241」已结案。**推送**：本条之前未推＝**65 枚**，含本条＝**66 枚**，⛔ **仍不推**（触发条件不变＝这批验收腿交完＋我整包门禁＋逐名比红名集合；本机「slo-full」一跑就抢 CPU 洗读数）。**本轮我零产码**（只动票面与台账），「go test」只跑了那一发定向复认。
+
+## A472 — 09-30 **15:43:32**（标题的钟由 date 插值）：我自己票面那句"AC#2 只差一行赋值"被现读推翻 ⇒ **照它做会造出一枚谎**；顺带把 228 的第一片派出去
+
+**触发**：派写腿前按规矩跑撞钉预检（本仓已为这一步付过两次学费），跑的不是"新符号名有没有人提"，而是**逐枚读带那个语义名词的断言与注释**。命中的两行把我自己的票面打穿了：
+- 「cmd/wisp/run.go:141-147」逐字：「Production leaves it empty because a console run wires **none** of SPEC-06 §2's four channels, and an empty value makes Gate.Veto say that back **instead of letting this process claim a cancel path it does not have**」＋「A host that DOES own one - the ball click, the global Esc hook - names it here **and marks it loaded in the same step**」；
+- 「cmd/wisp/run.go:495-503」那段又把「so NewChannels() stays empty and runSpec.replyVeto stays unset」写成**当下事实**，并把「the console can now ANSWER a card」与「it still cannot veto an L1 window」分成两半。
+**两把尺（我现跑）**：①「grep -rn ChannelEsc --include=*.go internal cmd」剥去「_test.go」⇒ 命中**全在「internal/agent/approval/」自己的定义里**（「approval.go:55／:61／:90／:111／:163」），**没有任何宿主把它设上**；② 全局热键那套东西**在场、但只在球包里**——「internal/ball/hotkey_windows.go:434 takeEsc」逐字「binds VK_ESCAPE as the cancel hotkey (B1 Confirming takeover)」＋「:374-378 registerAll」，而**唯一把它跑起来的宿主是旁支程序「cmd/balldebug」**（「:224」、「:255」）。
+⇒ **结论：票 228「与其它票的关系」那一节里我自己写的"AC#2 那半格可以早做——只差把 runSpec.replyVeto 设上、并按 SetLoaded 那道门，缺的只是那一枚赋值"是错的**。在「wisp run」里设上＝让一条纯命令行进程**对外声称自己有一条它没有的取消路径**，还会往卡片上印「按 Esc 键」——那枚留空是 **load-bearing 的诚实选择**，不是漏了一行。
+**处置**：票面**原句不抹**，就地追加"⛔ 上面那句是我（编排者）自己写错的、09-30 现读推翻"的更正一节（含两把尺的读数与改后的落点：veto 通道必须由"真的有那条通道的那枚宿主"**在同一步**设上并标 loaded ⇒ 票 201 AC#2 那半格的真实前置＝**票 228 载体主体**，不是它前面的一小片）。⚠ **记法（这是同族第三次）**：票面／台账里"只差一行／只要设上／缺的只是赋值"这类**缩小射程的断言＝待验断言**，派腿前必须自己把被指认的那枚文件读一遍那一行**为什么**空着——上一族是"注释里的票号＝待验断言"（「A470」／票 243），这次是"我自己给的解释"。
+
+**本轮派两枚腿（都后台，不占主会话）**：
+- 「228-r1」（写腿）＝**球进常驻那条腿**：只做 AC#1（「internal/ball」的生产引用者从 1 枚「cmd/balldebug」变成「≥1 枚来自 cmd/wisp 那条真跑任务的腿」）＋AC#7 那三处过期文案；⛔ 明令不许设 replyVeto／不许换 DefaultChannels（派单里把本条作废理由与两把尺原样抄给它了），不许碰 AC#2／AC#3／AC#5，不许翻任何框；新起的每一枚 goroutine 今天就得走「observe.Registry.Spawn」＋具名 category（「ui-sta」／「hotkey-listener」）并按「internal/proc/shutdown.go:17」那串 D38(e) 十步挂收口；跑测试必带 sherpa PATH（缺了是 0xc0000135 且无 FAIL 行＝一枚没跑），动桌面前「tasklist」核 balldebug.exe／wisp.exe 均 0。
+- 「243-c1」（只读普查）＝那 25 处注释的逐处判定表；⛔ 派单里禁它跑「go test／go build」（写腿正占「cmd/wisp」＋「internal/ball」的读数窗口，同包并发＝互相洗读数），只用 grep／sed／Read；结案归属一律按盘上「-done」核，不许引 Status 行。
+
+**编队与推送**：队列＝**197-r3（三枚尺的修）→ 224-r3（N#7 反斜杠写侧拒收＋N#8 真进程重启）→ 242 → 票 228 的后续片**，全部串行（跑突变的腿两枚绝不并发）。**推送**：本条之前未推＝66 枚，含本条＝**67 枚**，⛔ **仍不推**（触发条件不变＝这批腿交完＋我整包门禁＋逐名比红名集合；本机「slo-full」一跑就抢 CPU）。**本轮我零产码**（只动票面与台账）；「go test」只跑了「A471」里那一发定向复认。
