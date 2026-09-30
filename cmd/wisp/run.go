@@ -145,6 +145,32 @@ type runSpec struct {
 	// A host that DOES own one - the ball click, the global Esc hook - names it
 	// here and marks it loaded in the same step.
 	replyVeto approval.Channel
+	// gate, ui and cards are ticket 246 AC#7's injection points, and they exist
+	// for exactly one reason: a process may hold ONE approval gate. The resident
+	// leg builds its gate at boot (resident_approval_windows.go, form 乙 per
+	// orchestrator ruling A481) because the ball and the Esc channel have to be
+	// bound before anything can answer a card, and that gate is what the task
+	// pipeline this file assembles must use.
+	//
+	// Leaving all three nil is what every caller before this field was, and what
+	// every caller still leaves them for `wisp run`: assembleRuntime composes the
+	// console gate, the console UI and a fresh Replies ledger exactly as before.
+	// Handing a gate in WITHOUT the ledger and the UI it was built with is
+	// refused below rather than patched over, because a second ledger next to a
+	// first gate is the second "who is waiting on whom" truth source that 246-a1
+	// §5 reason 1 and ledger A481 exist to keep out.
+	gate *approval.Gate
+	ui   approval.UI
+	// cards is the Replies ledger the injected UI books its displayed cards
+	// into, and therefore the ledger the answer side spends grants from.
+	cards *approval.Replies
+	// taskCtx is the parent of the context this run's task loop runs on. nil
+	// means context.Background(), which is what `wisp run` has always meant: the
+	// process is the task's lifetime. A host that outlives one command line names
+	// its OWN task root here (ticket 246 AC#7's ruling 2.3: the resident leg's
+	// loop must hang under the ctx that D38(e) step 3 cancels, or "leaving
+	// cancels the running task" stays a sentence with no mechanism behind it).
+	taskCtx context.Context
 }
 
 // runTextTask executes one CLI text task and returns the process exit code.
@@ -518,24 +544,55 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		grantWrite = rt.session
 	}
 
-	rt.liveCards = newNativeCards()
-	rt.ui = &consoleApprovalUI{out: s.stdout, run: rt, live: rt.liveCards}
-	rt.gate = approval.New(approval.Options{
-		UI:              rt.ui,
-		Channels:        approval.NewChannels(),
-		Window:          time.Duration(cfg.Risk.L1WindowSec) * time.Second,
-		ApprovalTimeout: time.Duration(cfg.Risk.ConfirmTimeoutSec) * time.Second,
-		Logf:            rt.auditf,
-		Grants:          grantWrite,
-	})
-	// Bind the reply ledger to the gate it answers to (ticket 201 AC#1). The
-	// ledger had to exist before the gate, because the UI that fills it is one of
-	// the gate's options; from this line on, any host surface holding this ledger
-	// can route an answer. No veto channel and no reply source yet means exactly
-	// what it says: cards are recorded, an undeliverable veto is refused by the
-	// gate's own registry, and attachReplyListener re-binds with the channel this
-	// host really wired when (and if) it has one.
-	rt.liveCards.bind(rt.gate, "", "", "")
+	// Two postures, and the second one is ticket 246 AC#7 (orchestrator ruling
+	// 2.2: 「一个进程只许一枚 approval.Gate」):
+	//
+	//   - no injected gate: this assembly owns the gate, the console surface and
+	//     a fresh ledger, exactly as every run since ticket 12 has done;
+	//   - injected gate: the host built all three BEFORE it called here (the
+	//     resident leg needs the ball bound to that gate's UI to load its Esc
+	//     channel, and the ball exists before a config file is ever read), and
+	//     this function owes that host the one thing it never had - a task
+	//     pipeline that asks through THAT gate instead of standing a second one
+	//     next to it.
+	//
+	// The cost of the second shape is named, not hidden: a gate built before this
+	// function ran cannot have been handed the session ledger minted above, so
+	// 「本会话内允许」 has no writer here. That is the state approval.Gate answers
+	// with when Options.Grants is nil - the call is released, nothing is stored,
+	// and the gate books `approval: GRANT-DROPPED ... 本机没有接入会话授权记账`
+	// on the route (gate.go's allowSession). resident_windows.go prints the same
+	// limit at boot; widening it needs the gate itself moved into this function,
+	// which is a ruling about AC#1's form 乙, not a line this leg may write.
+	if s.gate != nil {
+		if s.cards == nil || s.ui == nil {
+			fmt.Fprintf(s.stderr, "wisp run: 注入的审批门必须连同它自己的界面与会话账本一起递进来"+
+				"（gate=%v ui=%v cards=%v），已拒绝装配\n", s.gate, s.ui, s.cards)
+			return rt, 2
+		}
+		rt.gate = s.gate
+		rt.ui = nil // no console surface in a process whose cards go to another host
+		rt.liveCards = &nativeCards{h: s.cards}
+	} else {
+		rt.liveCards = newNativeCards()
+		rt.ui = &consoleApprovalUI{out: s.stdout, run: rt, live: rt.liveCards}
+		rt.gate = approval.New(approval.Options{
+			UI:              rt.ui,
+			Channels:        approval.NewChannels(),
+			Window:          time.Duration(cfg.Risk.L1WindowSec) * time.Second,
+			ApprovalTimeout: time.Duration(cfg.Risk.ConfirmTimeoutSec) * time.Second,
+			Logf:            rt.auditf,
+			Grants:          grantWrite,
+		})
+		// Bind the reply ledger to the gate it answers to (ticket 201 AC#1). The
+		// ledger had to exist before the gate, because the UI that fills it is one of
+		// the gate's options; from this line on, any host surface holding this ledger
+		// can route an answer. No veto channel and no reply source yet means exactly
+		// what it says: cards are recorded, an undeliverable veto is refused by the
+		// gate's own registry, and attachReplyListener re-binds with the channel this
+		// host really wired when (and if) it has one.
+		rt.liveCards.bind(rt.gate, "", "", "")
+	}
 
 	// The permission mode (ticket 90's storage, wired here by ticket 101). This
 	// is the line that makes R20/M3 real: without it the bridge reads a nil
@@ -628,7 +685,16 @@ func assembleRuntime(s runSpec) (*agentRuntime, int) {
 		Tasks: rt.taskRosterState,
 		Out:   rt.bookPanelSnapshot,
 	})
-	rt.ui.publish = rt.publishPanelSnapshot
+	// The console surface publishes a packet when the approval state moves. A
+	// host whose cards go somewhere else (ticket 246 AC#7's injected gate) has no
+	// console surface here, and its own UI owns its publishing - which this leg
+	// does NOT give it: the panel route is ticket 33/35's, not AC#7's, and
+	// inventing a second publish path from the resident side would be a claim
+	// about a page this process cannot show. The pump stays assembled and its
+	// bytes keep landing in this run's ledger, exactly as panel_pump.go says.
+	if rt.ui != nil {
+		rt.ui.publish = rt.publishPanelSnapshot
+	}
 
 	// c25 is the ONE C25 engine this process has: the bridge marks sensitive
 	// results with it, and task.spawn stamps a subagent's conclusion into its
@@ -763,12 +829,27 @@ func (rt *agentRuntime) auditModeUnreadable(path string, err error) {
 		"档位读不到：本进程不缓存任何上一次的宽松值，决策链不会被装配（退出码 2）")
 }
 
+// displayedCounter is the one question a host-side presentation surface answers
+// about its own output: how many cards did it actually put in front of somebody.
+// It is an interface rather than the concrete resident type because run.go is
+// not build-tagged and the ball surface is (resident_approval_windows.go), and
+// because the count is the surface's own fact, never this file's inference.
+type displayedCounter interface {
+	displayedCards() int
+}
+
 // windowCount reports how many confirmation cards the composed gate displayed.
 func (rt *agentRuntime) windowCount() int {
-	if rt.ui == nil {
-		return 0
+	if rt.ui != nil {
+		return rt.ui.shown()
 	}
-	return rt.ui.shown()
+	// A run assembled with an injected gate (ticket 246 AC#7) shows nothing on a
+	// console, so the honest count is the one the host's own surface keeps. With
+	// neither, this run displayed nothing and 0 is the reading.
+	if d, ok := rt.spec.ui.(displayedCounter); ok {
+		return d.displayedCards()
+	}
+	return 0
 }
 
 // close releases the store and stands the reply listener down.
@@ -943,7 +1024,17 @@ func (rt *agentRuntime) execute(task string) int {
 	rt.setInstructionLoader(instrLoader)
 	loop.AttachProjectInstructions(instrLoader)
 
-	ctx, cancel := context.WithTimeout(context.Background(),
+	// The task's own deadline rides on the parent this host named (runSpec.taskCtx,
+	// ticket 246 AC#7's ruling 2.3). For `wisp run` the parent is
+	// context.Background(), which is what this line always produced: the process
+	// IS the task's lifetime. For the resident leg the parent is that process's
+	// task root, so D38(e) step 3's cancel is what ends a running task rather
+	// than a sentence about it.
+	baseCtx := rt.spec.taskCtx
+	if baseCtx == nil {
+		baseCtx = context.Background()
+	}
+	ctx, cancel := context.WithTimeout(baseCtx,
 		time.Duration(cfg.LLM.TimeoutMS)*time.Millisecond)
 	defer cancel()
 	// 起跑口（票 176-r1）：这一程的任务走**现成**的异步入口

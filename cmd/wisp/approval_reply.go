@@ -443,7 +443,43 @@ func (rt *agentRuntime) attachReplyListener(in io.Reader, vetoChannel approval.C
 	if rt == nil || rt.gate == nil || in == nil {
 		return
 	}
-	root := observe.NewRoot("approval-reply")
+	// The console leg owns its ledger, so it binds here. A host that handed its
+	// gate AND its ledger in (ticket 246 AC#7) does not: re-attaching would stamp
+	// this file's console transport names onto a ledger another surface filled,
+	// and the audit line would then name the wrong transport for a real card.
+	surface := rt.newReplySurface(nil, vetoChannel, rt.spec.gate == nil)
+	// The goroutine goes through the registry like every other one in this
+	// process (D22 ban #1): name from the D38 per-task roster, owner named, and
+	// the recover boundary installed by Registry.run rather than a local recover.
+	rt.replyHandle = observe.Default.Spawn("approval-waiter", "approval", rt.replyRoot,
+		func(ctx context.Context) {
+			runReplyLoop(ctx, surface, in, rt.stdout)
+		})
+	fmt.Fprintf(rt.stdout,
+		"wisp run: 答复监听已接入（卡片上给了编号）。原生侧：yes <编号> / no <编号> [理由] / veto <编号>；"+
+			"面板路线：panel-no <编号> [理由]、panel-yes <编号>（这一条只会被服务端 API 拒绝）、"+
+			"head / view <编号> 看卡片；quit 退出监听。\n")
+}
+
+// newReplySurface builds this run's answer side and returns it, WITHOUT starting
+// a reader. attachReplyListener is the console's caller and does the spawn;
+// ticket 246 AC#7's resident leg needs the same surface driven from a stream that
+// also carries task texts, and a second verb table would be the second copy
+// approval_reply.go's own rule refuses ("a second copy is how one of them grows
+// a leniency the other does not have").
+//
+// root names the owner of the reply side's lifetime: nil keeps today's
+// behaviour (a detached process-level root named "approval-reply"), and a host
+// that must be cancellable from its own task root passes one derived from it.
+// rebindLedger is the same question run.go asks: only the assembly that built
+// the ledger gets to say which transport and which veto channel it answers on.
+func (rt *agentRuntime) newReplySurface(root *observe.Root, vetoChannel approval.Channel, rebindLedger bool) *replySurface {
+	if rt == nil || rt.gate == nil {
+		return nil
+	}
+	if root == nil {
+		root = observe.NewRoot("approval-reply")
+	}
 	rt.replyRoot = root
 	surface := &replySurface{
 		gate:        rt.gate,
@@ -460,25 +496,22 @@ func (rt *agentRuntime) attachReplyListener(in io.Reader, vetoChannel approval.C
 	// travels with the binding so the audit line names this transport, and the
 	// veto channel travels with it too - see the paragraph above about the two
 	// statements being made together.
-	rt.liveCards.bind(rt.gate, vetoChannel, nativeReplySource, panelReplySource)
+	if rebindLedger {
+		rt.liveCards.bind(rt.gate, vetoChannel, nativeReplySource, panelReplySource)
+	}
 	// Declaring a transport IS asserting it is up, so the two statements are made
 	// here together rather than in two places a refactor can pull apart: the card
 	// may now render 「按 Esc 键（已加载）」 because this host really will deliver
 	// that cancel, and Gate.Veto's registry check will let it land.
+	//
+	// The host that injected its gate already made that statement - and made it
+	// conditionally, on a ball window that Win32 really gave it
+	// (resident_approval_windows.go's bindBallHost). Such a host passes the empty
+	// channel here, so this line cannot load a channel that process does not own.
 	if vetoChannel != "" {
 		rt.gate.Channels().SetLoaded(vetoChannel, true)
 	}
-	// The goroutine goes through the registry like every other one in this
-	// process (D22 ban #1): name from the D38 per-task roster, owner named, and
-	// the recover boundary installed by Registry.run rather than a local recover.
-	rt.replyHandle = observe.Default.Spawn("approval-waiter", "approval", root,
-		func(ctx context.Context) {
-			runReplyLoop(ctx, surface, in, rt.stdout)
-		})
-	fmt.Fprintf(rt.stdout,
-		"wisp run: 答复监听已接入（卡片上给了编号）。原生侧：yes <编号> / no <编号> [理由] / veto <编号>；"+
-			"面板路线：panel-no <编号> [理由]、panel-yes <编号>（这一条只会被服务端 API 拒绝）、"+
-			"head / view <编号> 看卡片；quit 退出监听。\n")
+	return surface
 }
 
 // runReplyLoop reads the operator's answers until the stream ends or the run's
