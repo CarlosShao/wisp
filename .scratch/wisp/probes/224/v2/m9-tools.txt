@@ -1,0 +1,10 @@
+time=2026-09-30T13:48:04.957+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket224GrantSeamCarriesNoCallerSuppliedAuthority
+--- PASS: TestTicket224GrantSeamCarriesNoCallerSuppliedAuthority (0.00s)
+=== RUN   TestTicket224BridgeGrantChannelIsOneSeamWithNoSetter
+    ticket224_setter_scope_test.go:87: (*Bridge).SetGrants names an act on a grant: the bridge may read one seam and must not be able to install, remove or trade it at runtime (that is a caller-side authority reached after construction)
+    ticket224_setter_scope_test.go:94: (*Bridge).SetGrants is an exported setter on the enforcement layer: options are chosen at New() and appear in the assembly log; a runtime re-wire does not
+--- FAIL: TestTicket224BridgeGrantChannelIsOneSeamWithNoSetter (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.039s
+FAIL

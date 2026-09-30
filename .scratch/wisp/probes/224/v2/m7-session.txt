@@ -1,0 +1,147 @@
+=== RUN   TestTicket224MintIsRandomAndValid
+--- PASS: TestTicket224MintIsRandomAndValid (0.00s)
+=== RUN   TestTicket224TestLiteralsAreOutsideTheMintedShape
+--- PASS: TestTicket224TestLiteralsAreOutsideTheMintedShape (0.00s)
+=== RUN   TestTicket224RecordWritesOneRowPerAnswer
+time=2026-09-30T13:49:22.996+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224RecordWritesOneRowPerAnswer531181376\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-30T13:49:23.003+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-30T05:49:22Z duration_ms=5
+time=2026-09-30T13:49:23.008+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224RecordWritesOneRowPerAnswer531181376\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-30T13:49:23.014+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-30T05:49:23Z duration_ms=6
+time=2026-09-30T13:49:23.019+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-30T13:49:23.021+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224RecordWritesOneRowPerAnswer (0.06s)
+=== RUN   TestTicket224RecordRefusesUnusableSubjects
+time=2026-09-30T13:49:23.052+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224RecordRefusesUnusableSubjects2899627868\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-30T13:49:23.057+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-30T05:49:23Z duration_ms=5
+time=2026-09-30T13:49:23.064+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224RecordRefusesUnusableSubjects2899627868\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-30T13:49:23.069+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-30T05:49:23Z duration_ms=5
+time=2026-09-30T13:49:23.073+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-30T13:49:23.075+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/blank_tool
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/no_pattern
+=== RUN   TestTicket224RecordRefusesUnusableSubjects/unresolved_path
+--- PASS: TestTicket224RecordRefusesUnusableSubjects (0.05s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/blank_tool (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/no_pattern (0.00s)
+    --- PASS: TestTicket224RecordRefusesUnusableSubjects/unresolved_path (0.00s)
+=== RUN   TestTicket224CoveringMatchesItsOwnSession
+time=2026-09-30T13:49:23.102+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224CoveringMatchesItsOwnSession68618258\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-30T13:49:23.107+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-30T05:49:23Z duration_ms=5
+time=2026-09-30T13:49:23.114+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224CoveringMatchesItsOwnSession68618258\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-30T13:49:23.119+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-30T05:49:23Z duration_ms=4
+time=2026-09-30T13:49:23.122+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-30T13:49:23.124+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_tool
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/another_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/no_paths
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/blank_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/unresolved_path
+=== RUN   TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two
+--- PASS: TestTicket224CoveringMatchesItsOwnSession (0.05s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_tool (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/another_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/no_paths (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/blank_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/unresolved_path (0.00s)
+    --- PASS: TestTicket224CoveringMatchesItsOwnSession/partial_coverage_of_two (0.00s)
+=== RUN   TestTicket224CoveringDoesNotCrossToANewSession
+time=2026-09-30T13:49:23.151+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224CoveringDoesNotCrossToANewSession48799633\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-30T13:49:23.157+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-30T05:49:23Z duration_ms=5
+time=2026-09-30T13:49:23.163+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224CoveringDoesNotCrossToANewSession48799633\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-30T13:49:23.169+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-30T05:49:23Z duration_ms=5
+time=2026-09-30T13:49:23.175+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-30T13:49:23.177+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224CoveringDoesNotCrossToANewSession (0.05s)
+=== RUN   TestTicket224ExpiredOrRevokedRowIsNotLive
+time=2026-09-30T13:49:23.203+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224ExpiredOrRevokedRowIsNotLive58942571\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-30T13:49:23.208+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-30T05:49:23Z duration_ms=5
+time=2026-09-30T13:49:23.217+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224ExpiredOrRevokedRowIsNotLive58942571\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-30T13:49:23.223+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-30T05:49:23Z duration_ms=5
+time=2026-09-30T13:49:23.230+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-30T13:49:23.232+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224ExpiredOrRevokedRowIsNotLive (0.06s)
+=== RUN   TestTicket224LedgerFailsClosedOnStoreErrors
+--- PASS: TestTicket224LedgerFailsClosedOnStoreErrors (0.00s)
+=== RUN   TestTicket224NewLedgerRefusesHandWrittenIDs
+time=2026-09-30T13:49:23.267+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224NewLedgerRefusesHandWrittenIDs250297115\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-30T13:49:23.274+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-30T05:49:23Z duration_ms=7
+time=2026-09-30T13:49:23.281+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224NewLedgerRefusesHandWrittenIDs250297115\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-30T13:49:23.286+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-30T05:49:23Z duration_ms=5
+time=2026-09-30T13:49:23.290+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-30T13:49:23.292+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224NewLedgerRefusesHandWrittenIDs (0.05s)
+=== RUN   TestTicket224WildcardRowCoversAConcretePath
+time=2026-09-30T13:49:23.309+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224WildcardRowCoversAConcretePath1735774983\002\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-30T13:49:23.315+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-30T05:49:23Z duration_ms=5
+time=2026-09-30T13:49:23.324+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224WildcardRowCoversAConcretePath1735774983\002\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-30T13:49:23.332+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-30T05:49:23Z duration_ms=7
+time=2026-09-30T13:49:23.336+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-30T13:49:23.339+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224WildcardRowCoversAConcretePath (0.06s)
+=== RUN   TestTicket224DialectIsPathMatchNotRegex
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character
+time=2026-09-30T13:49:23.366+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224DialectIsPathMatchNotRegexquestion_mark_is_a_singl3118486227\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-30T13:49:23.371+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-30T05:49:23Z duration_ms=4
+time=2026-09-30T13:49:23.377+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224DialectIsPathMatchNotRegexquestion_mark_is_a_singl3118486227\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-30T13:49:23.382+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-30T05:49:23Z duration_ms=5
+time=2026-09-30T13:49:23.386+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-30T13:49:23.388+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character
+time=2026-09-30T13:49:23.415+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224DialectIsPathMatchNotRegexbracket_is_a_class_over_459969602\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-30T13:49:23.420+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-30T05:49:23Z duration_ms=5
+time=2026-09-30T13:49:23.426+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224DialectIsPathMatchNotRegexbracket_is_a_class_over_459969602\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-30T13:49:23.432+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-30T05:49:23Z duration_ms=5
+time=2026-09-30T13:49:23.435+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-30T13:49:23.437+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern
+time=2026-09-30T13:49:23.464+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224DialectIsPathMatchNotRegexa_regex-shaped_row_is_ho4133259367\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-30T13:49:23.470+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-30T05:49:23Z duration_ms=6
+time=2026-09-30T13:49:23.476+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224DialectIsPathMatchNotRegexa_regex-shaped_row_is_ho4133259367\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-30T13:49:23.481+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-30T05:49:23Z duration_ms=4
+time=2026-09-30T13:49:23.485+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-30T13:49:23.486+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224DialectIsPathMatchNotRegex (0.15s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/question_mark_is_a_single_character (0.05s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/bracket_is_a_class_over_one_character (0.05s)
+    --- PASS: TestTicket224DialectIsPathMatchNotRegex/a_regex-shaped_row_is_honoured_as_a_literal_pattern (0.05s)
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted
+time=2026-09-30T13:49:23.513+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224PatternWithoutStarIsNeverReinterpreted2352789137\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-30T13:49:23.519+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-30T05:49:23Z duration_ms=5
+time=2026-09-30T13:49:23.525+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224PatternWithoutStarIsNeverReinterpreted2352789137\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-30T13:49:23.530+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-30T05:49:23Z duration_ms=4
+time=2026-09-30T13:49:23.534+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-30T13:49:23.537+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt
+    ticket224_pattern_dialect_test.go:224: the row "/work/note[s].txt" covers "/work/notes.txt": a class was interpreted in a row that never said wildcard, so a path nobody clicked is authorized by a path somebody did
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt
+    ticket224_pattern_dialect_test.go:224: the row "/work/a?c.txt" covers "/work/abc.txt": a class was interpreted in a row that never said wildcard, so a path nobody clicked is authorized by a path somebody did
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt
+    ticket224_pattern_dialect_test.go:224: the row "/work/[a-c].txt" covers "/work/b.txt": a class was interpreted in a row that never said wildcard, so a path nobody clicked is authorized by a path somebody did
+=== RUN   TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt
+--- FAIL: TestTicket224PatternWithoutStarIsNeverReinterpreted (0.05s)
+    --- FAIL: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/note[s].txt (0.00s)
+    --- FAIL: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/a?c.txt (0.00s)
+    --- FAIL: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/[a-c].txt (0.00s)
+    --- PASS: TestTicket224PatternWithoutStarIsNeverReinterpreted//work/plain.txt (0.00s)
+=== RUN   TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk
+time=2026-09-30T13:49:23.565+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk1354557295\001\data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-30T13:49:23.571+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-30T05:49:23Z duration_ms=6
+time=2026-09-30T13:49:23.578+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk1354557295\001\data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-30T13:49:23.582+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-30T05:49:23Z duration_ms=4
+time=2026-09-30T13:49:23.586+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-30T13:49:23.587+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-09-30T13:49:23.608+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk1354557295\002\ghost-data\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-09-30T13:49:23.614+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-09-30T05:49:23Z duration_ms=6
+time=2026-09-30T13:49:23.619+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk1354557295\002\ghost-data\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-09-30T13:49:23.624+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-09-30T05:49:23Z duration_ms=5
+time=2026-09-30T13:49:23.628+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-09-30T13:49:23.630+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestTicket224MalformedWildcardIsRefusedAtTheDoorAndIgnoredOnDisk (0.10s)
+=== RUN   TestTicket224PatternCoversIsTheOnlyMatcher
+    ticket224_pattern_dialect_test.go:346: patternCovers("/work/a?c.txt", "/work/abc.txt") = true, want false (no star, so no interpretation at all)
+--- FAIL: TestTicket224PatternCoversIsTheOnlyMatcher (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/session	0.699s
+FAIL

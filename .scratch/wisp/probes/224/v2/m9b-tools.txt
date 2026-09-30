@@ -1,0 +1,9 @@
+time=2026-09-30T13:48:32.528+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestTicket224GrantSeamCarriesNoCallerSuppliedAuthority
+--- PASS: TestTicket224GrantSeamCarriesNoCallerSuppliedAuthority (0.00s)
+=== RUN   TestTicket224BridgeGrantChannelIsOneSeamWithNoSetter
+    ticket224_setter_scope_test.go:54: Bridge carries 2 grant-shaped fields, want exactly 1: [grants(tools.GrantSource, kind interface) grantsAlt(tools.GrantSource, kind interface)]. The pre-224 bridge carried none and ticket 224 added one read seam; a second channel is a second place an authorization source can come from, and only one of them is in the audit log
+--- FAIL: TestTicket224BridgeGrantChannelIsOneSeamWithNoSetter (0.00s)
+FAIL
+FAIL	github.com/CarlosShao/wisp/internal/tools	0.029s
+FAIL
