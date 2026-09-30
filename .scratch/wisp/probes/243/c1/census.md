@@ -35,7 +35,7 @@
 
 | 🔴 位点 | 载体（现读） | 现读原文逐字 | 今天为何是假话／误导 | 归属 |
 |---|---|---|---|---|
-| `cmd/wisp/main.go:25` | ⚠ `const usage = ` 反引号原始串＝**`wisp -h` 打给用户的正文** | `                   event loop; the floating ball window is ticket 07)` | 用户今天真读得到；票 07 已 `-done`，而 `cmd/wisp` **零 import `internal/ball`**（实测：全仓 import 该包的只有 `cmd/balldebug/main.go`）⇒ 「球窗口＝等票 07」把一个不存在的未来念给用户听 | 票 228 AC#7 ① |
+| `cmd/wisp/main.go:25` | ⚠ `const usage = ` 反引号原始串＝**`wisp -h` 打给用户的正文** | `                   event loop; the floating ball window is ticket 07)` | 用户今天真读得到；票 07 已 `-done`，而 `cmd/wisp` **零 import `internal/ball`**（⚠ **起手实测**，此刻 `228-r1` 正在补这笔，见 §5 第 3 行）⇒ 「球窗口＝等票 07」把一个不存在的未来念给用户听 | 票 228 AC#7 ① |
 | `cmd/wisp/resident_windows.go:81` | `fmt.Printf` 运行时输出 | ``	fmt.Printf("wisp: empty event loop running; the floating ball arrives in ticket 07 (Ctrl+C exits cleanly)\n")`` | 就是骗过三程的那一枚（`240-c1` §3.1 → `241-r1` → `241-v1`）。`arrives in` ＝ 交付动词 ＋ 已结案票号 | 票 228 AC#7 ① |
 | `internal/proc/boot_windows.go:127` | `slog.Info` 运行时日志 | ``				slog.Info("activation requested by second launch (ball bring-to-front lands with ticket 07)")`` | 跨了 `internal/proc` 地界；`lands with` ＝ 交付动词 ＋ 已结案票号。该分支今天**只打日志再 `ResetActivation()`**，没有任何 bring-to-front | 票 228 AC#7 ①（⚠ 动 `internal/proc` 一行，交件须具名；本腿只登记） |
 
