@@ -209,7 +209,7 @@ func TestLive246ExitRefusesAHangingL2Card(t *testing.T) {
 	}
 	defer ra.detachBall()
 
-	if err := rt.RegisterShutdownHook(proc.StepCancelTasks, ra.cancelTasks); err != nil {
+	if err := rt.RegisterShutdownHook(proc.StepCancelTasks, ra.cancelTaskRoots); err != nil {
 		t.Fatalf("RegisterShutdownHook(step 3): %v", err)
 	}
 	audit := captureAudit246(t)
@@ -300,7 +300,7 @@ func TestLive246ExitAbandonsAHangingL1Window(t *testing.T) {
 	defer rb.stop()
 	ra.bindBallHost(rb)
 	defer ra.detachBall()
-	if err := rt.RegisterShutdownHook(proc.StepCancelTasks, ra.cancelTasks); err != nil {
+	if err := rt.RegisterShutdownHook(proc.StepCancelTasks, ra.cancelTaskRoots); err != nil {
 		t.Fatalf("RegisterShutdownHook(step 3): %v", err)
 	}
 	audit := captureAudit246(t)

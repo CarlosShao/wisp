@@ -109,7 +109,7 @@ func newResidentApproval() *residentApproval {
 	ra.gate = approval.New(approval.Options{
 		UI:       ra.ui,
 		Channels: approval.NewChannels(),
-		Logf:     ra.auditf,
+		Logf:     ra.residentAuditf,
 	})
 	ra.cards = approval.NewReplies()
 	ra.cards.Attach(approval.HostBinding{
@@ -126,7 +126,7 @@ func newResidentApproval() *residentApproval {
 // arrive here, and so do the two sentences only this file can say. stderr alone
 // would be the pre-ticket-105 posture that R-105-1 called out, so the line goes
 // through the installed sink as well.
-func (ra *residentApproval) auditf(format string, args ...any) {
+func (ra *residentApproval) residentAuditf(format string, args ...any) {
 	line := fmt.Sprintf(format, args...)
 	slog.Info("audit: " + line)
 	fmt.Printf("wisp: [audit] %s\n", line)
@@ -138,16 +138,16 @@ func (ra *residentApproval) auditf(format string, args ...any) {
 // unloaded and says why once.
 func (ra *residentApproval) bindBallHost(rb *residentBall) bool {
 	if rb == nil || rb.b == nil {
-		ra.auditf("resident-approval: 审批门已装配，但本进程没有悬浮球窗口，" +
+		ra.residentAuditf("resident-approval: 审批门已装配，但本进程没有悬浮球窗口，" +
 			"四条否决通道全部保持未加载（Esc 无处可借，卡片无处可呈）")
 		return false
 	}
 	ra.mu.Lock()
 	ra.escLoad = true
 	ra.mu.Unlock()
-	ra.ui.bind(rb.b)
+	ra.ui.attachBall(rb.b)
 	ra.gate.Channels().SetLoaded(approval.ChannelEsc, true)
-	ra.auditf("resident-approval: 审批门已装配进常驻进程，取消通道 Esc 已加载（本票只落 Esc 一条通道；" +
+	ra.residentAuditf("resident-approval: 审批门已装配进常驻进程，取消通道 Esc 已加载（本票只落 Esc 一条通道；" +
 		"单击球 / KWS 否决词 / 面板拒绝三条仍按各自归口未接入）")
 	return true
 }
@@ -194,7 +194,7 @@ type residentCard struct {
 // D47 is respected the way run.go respects it for a host card: the task is
 // admitted for the length of the confirmation and revoked on the way out, so an
 // unregistered task cannot reach this gate at all.
-func (ra *residentApproval) ask(ctx context.Context, c residentCard) (tools.Answer, string) {
+func (ra *residentApproval) askConfirmation(ctx context.Context, c residentCard) (tools.Answer, string) {
 	if c.TaskID == "" || c.Reason == "" {
 		return tools.AnswerReject, "宿主发起的确认必须自报任务标识与理由，已 fail-closed 拒绝"
 	}
@@ -216,7 +216,7 @@ func (ra *residentApproval) ask(ctx context.Context, c residentCard) (tools.Answ
 		// and the desktop without its Esc key, which is precisely the residue
 		// ticket 245 was filed to remove. settle() is idempotent and re-checks
 		// the ledger, so a concurrent card still waiting is never disturbed.
-		ra.ui.settle()
+		ra.ui.settleOrb()
 	}()
 
 	revoke := ra.gate.AdmitTextTask(c.TaskID)
@@ -253,7 +253,7 @@ func (ra *residentApproval) ask(ctx context.Context, c residentCard) (tools.Answ
 func (ra *residentApproval) AskOnTaskRoot(c residentCard) (tools.Answer, string) {
 	taskCtx, cancelTask := context.WithCancel(ra.root)
 	defer cancelTask()
-	return ra.ask(taskCtx, c)
+	return ra.askConfirmation(taskCtx, c)
 }
 
 // cancelTasks IS D38(e) step 3 for this process ("all task root ctxs cancelled
@@ -272,7 +272,7 @@ func (ra *residentApproval) AskOnTaskRoot(c residentCard) (tools.Answer, string)
 //     gate writes no line for that branch;
 //  3. the in-flight asks are waited for, bounded by the ctx this hook was handed
 //     (shutdown.go:83 - exceeding it abandons and records, it does not hang).
-func (ra *residentApproval) cancelTasks(ctx context.Context) error {
+func (ra *residentApproval) cancelTaskRoots(ctx context.Context) error {
 	ra.mu.Lock()
 	ra.closed = true
 	ra.mu.Unlock()
@@ -284,7 +284,7 @@ func (ra *residentApproval) cancelTasks(ctx context.Context) error {
 			if err := ra.cards.Reject(ctx, card.CorrelationID,
 				"常驻进程退出：未获批准，按拒绝处理（未执行）"); err != nil {
 				failed++
-				ra.auditf("resident-approval: 退出序列拒绝对待卡片 %s 失败：%v", card.CorrelationID, err)
+				ra.residentAuditf("resident-approval: 退出序列拒绝对待卡片 %s 失败：%v", card.CorrelationID, err)
 				continue
 			}
 			refused++
@@ -293,7 +293,7 @@ func (ra *residentApproval) cancelTasks(ctx context.Context) error {
 			// can be opposed, not answered), so the honest record for it is the
 			// one this file writes before the root cancel below resolves it.
 			abandoned++
-			ra.auditf("approval: RESIDENT-WINDOW-ABANDONED corr=%s tool=%s decision=reject "+
+			ra.residentAuditf("approval: RESIDENT-WINDOW-ABANDONED corr=%s tool=%s decision=reject "+
 				"reason=%q channel=none", card.CorrelationID, card.Tool,
 				"常驻进程退出，L1 确认窗口未放行，未执行")
 			ra.cards.Forget(card.CorrelationID)
@@ -312,18 +312,18 @@ func (ra *residentApproval) cancelTasks(ctx context.Context) error {
 		}
 		select {
 		case <-deadline:
-			ra.auditf("resident-approval: 退出序列第 3 步到点仍有 %d 张卡片在等，已弃等并记录（D38e）", n)
+			ra.residentAuditf("resident-approval: 退出序列第 3 步到点仍有 %d 张卡片在等，已弃等并记录（D38e）", n)
 			return fmt.Errorf("proc: 退出第 3 步到点，仍有 %d 个等待未收口: %w", n, ctx.Err())
 		case <-time.After(10 * time.Millisecond):
 		}
 	}
-	ra.auditf("resident-approval: 退出第 3 步完成：拒绝待批卡片 %d 张、作废 L1 窗口 %d 张、路由失败 %d 张；"+
+	ra.residentAuditf("resident-approval: 退出第 3 步完成：拒绝待批卡片 %d 张、作废 L1 窗口 %d 张、路由失败 %d 张；"+
 		"任务根已取消，无等待残留", refused, abandoned, failed)
 	return nil
 }
 
-// liveAsks reports how many confirmations are between "asked" and "answered".
-func (ra *residentApproval) liveAsks() int {
+// liveConfirmations reports how many confirmations are between "asked" and "answered".
+func (ra *residentApproval) liveConfirmations() int {
 	ra.mu.Lock()
 	defer ra.mu.Unlock()
 	return ra.live
@@ -334,7 +334,7 @@ func (ra *residentApproval) liveAsks() int {
 // answer), and the veto channel is unloaded again so a late arrival cannot be
 // booked as a cancel on a key this process no longer holds.
 func (ra *residentApproval) detachBall() {
-	ra.ui.detach()
+	ra.ui.releaseBall()
 	ra.mu.Lock()
 	was := ra.escLoad
 	ra.escLoad = false
@@ -348,8 +348,8 @@ func (ra *residentApproval) detachBall() {
 // what exists (a gate, one loaded channel) and what does not (a task source),
 // because "imported the approval package" and "runs confirmations" are different
 // claims and only the first is true here.
-func (ra *residentApproval) statusLine() string {
-	if !ra.ui.attached() {
+func (ra *residentApproval) residentStatusLine() string {
+	if !ra.ui.hasBall() {
 		return "审批门未装配（本进程没有可承载卡片的悬浮球窗口）"
 	}
 	return fmt.Sprintf("审批门已装配进本进程（取消通道：Esc 已加载；等待中的确认项：%d）",
@@ -373,31 +373,31 @@ type ballCardUI struct {
 	shown int
 }
 
-func (u *ballCardUI) bind(b *ball.Ball) {
+func (u *ballCardUI) attachBall(b *ball.Ball) {
 	u.mu.Lock()
 	defer u.mu.Unlock()
 	u.b = b
 }
 
-func (u *ballCardUI) detach() {
+func (u *ballCardUI) releaseBall() {
 	u.mu.Lock()
 	defer u.mu.Unlock()
 	u.b = nil
 }
 
-func (u *ballCardUI) attached() bool {
+func (u *ballCardUI) hasBall() bool {
 	u.mu.Lock()
 	defer u.mu.Unlock()
 	return u.b != nil
 }
 
-func (u *ballCardUI) ball() *ball.Ball {
+func (u *ballCardUI) currentBall() *ball.Ball {
 	u.mu.Lock()
 	defer u.mu.Unlock()
 	return u.b
 }
 
-func (u *ballCardUI) count() int {
+func (u *ballCardUI) displayedCards() int {
 	u.mu.Lock()
 	defer u.mu.Unlock()
 	return u.shown
@@ -415,7 +415,7 @@ func (u *ballCardUI) count() int {
 // the queue's refusal funnel (approval/gate.go's ticket-87 branch), which is the
 // gate's behaviour, not this file's.
 func (u *ballCardUI) Prompt(_ context.Context, p approval.Prompt) error {
-	b := u.ball()
+	b := u.currentBall()
 	if b == nil {
 		slog.Error("approval: 卡片无处呈现（本进程没有悬浮球窗口），已 fail-closed 拒绝",
 			"corr", p.CorrelationID, "tool", p.Tool, "level", p.Level)
@@ -455,7 +455,7 @@ func (u *ballCardUI) Update(_ context.Context, e approval.Event) error {
 	switch e.Kind {
 	case approval.EventDismissed, approval.EventStarted:
 		u.ra.cards.Forget(e.CorrelationID)
-		u.settle()
+		u.settleOrb()
 	case approval.EventWarning:
 		slog.Warn("approval: 常驻进程卡片进入醒目提示", "corr", e.CorrelationID, "text", e.Text)
 	}
@@ -469,11 +469,11 @@ func (u *ballCardUI) Update(_ context.Context, e approval.Event) error {
 //
 // It re-reads the ledger before touching anything, so with two cards live the
 // first dismissal does not cancel the second one's borrow.
-func (u *ballCardUI) settle() {
+func (u *ballCardUI) settleOrb() {
 	if _, awaiting := u.ra.cards.AwaitingHuman(); awaiting {
 		return
 	}
-	b := u.ball()
+	b := u.currentBall()
 	if b == nil {
 		return
 	}

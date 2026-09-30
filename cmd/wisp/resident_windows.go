@@ -153,7 +153,7 @@ func runResident() {
 	// nobody registered is still honestly recorded as skipped - which is why a
 	// refusal to register below is printed and not fatal: the record stays true
 	// either way, it just says the harder thing.
-	if err := rt.RegisterShutdownHook(proc.StepCancelTasks, ra.cancelTasks); err != nil {
+	if err := rt.RegisterShutdownHook(proc.StepCancelTasks, ra.cancelTaskRoots); err != nil {
 		slog.Error("proc: 第 3 步（取消任务根）未能注册为钩子，退出时待确认项不会被有序拒绝",
 			"step", int(proc.StepCancelTasks), "err", err)
 		fmt.Printf("wisp: 退出序列第 3 步未注册（%v）：卡片挂起时收到退出信号，这一步会被记为 skipped\n", err)
@@ -167,7 +167,7 @@ func runResident() {
 		names = append(names, fmt.Sprintf("%d:%s", int(s), s.Name()))
 	}
 	fmt.Printf("wisp: %s; D38(e) steps with an owner in this process: %s\n",
-		ra.statusLine(), strings.Join(names, ", "))
+		ra.residentStatusLine(), strings.Join(names, ", "))
 
 	// The boot report has to match what happens next: if an exit request already
 	// arrived during the ball path, printing "empty event loop running" and then

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"sort"
 	"sync"
 )
 
@@ -42,19 +41,28 @@ var ErrHookAlreadyRegistered = errors.New("proc: 该退出步骤已注册钩子�
 // ErrHookSetSealed means the shutdown sequence has already read this set.
 var ErrHookSetSealed = errors.New("proc: 退出序列已开始，钩子注册面已封闭")
 
-// hookableSteps is the closed roster of slots ShutdownHooks carries, keyed by the
-// step each one runs at. It is derived from the frozen sequence's own constants,
+// hookableRoster is the closed list of slots ShutdownHooks carries, in the order
+// the frozen sequence walks them. It is built from the sequence's own constants,
 // so it cannot drift into offering a ninth hookable step.
-var hookableSteps = map[ShutdownStep]bool{
-	StepSchedulerClose:        true,
-	StepStopHotkeyKWS:         true,
-	StepCancelTasks:           true,
-	StepStopAudio:             true,
-	StepReleaseSpeechSessions: true,
-	StepDestroyPanel:          true,
-	StepFlushAndCloseDB:       true,
-	StepCloseJob:              true,
+var hookableRoster = []ShutdownStep{
+	StepSchedulerClose,
+	StepStopHotkeyKWS,
+	StepCancelTasks,
+	StepStopAudio,
+	StepReleaseSpeechSessions,
+	StepDestroyPanel,
+	StepFlushAndCloseDB,
+	StepCloseJob,
 }
+
+// hookableSteps is that roster as a set, for the Register lookup.
+var hookableSteps = func() map[ShutdownStep]bool {
+	m := make(map[ShutdownStep]bool, len(hookableRoster))
+	for _, s := range hookableRoster {
+		m[s] = true
+	}
+	return m
+}()
 
 // ShutdownHookSet holds the hooks one runtime registered. Its zero value is
 // ready to use.
@@ -133,13 +141,18 @@ func (hs *ShutdownHookSet) Hooks() ShutdownHooks {
 // Registered lists the steps that currently have an owner, ascending. It is the
 // read-only answer to "which of the ten steps does this process really run", so
 // a boot report can state it instead of implying it.
+//
+// The walk is over the declared roster, not a sort: internal/proc stays a leaf
+// package (ticket 246 AC#1 is measured as an empty import difference), and a
+// fixed eight-element list does not need a general sort to come out in order.
 func (hs *ShutdownHookSet) Registered() []ShutdownStep {
 	hs.mu.Lock()
 	defer hs.mu.Unlock()
 	out := make([]ShutdownStep, 0, len(hs.filled))
-	for s := range hs.filled {
-		out = append(out, s)
+	for _, s := range hookableRoster {
+		if hs.filled[s] {
+			out = append(out, s)
+		}
 	}
-	sort.Slice(out, func(i, j int) bool { return out[i] < out[j] })
 	return out
 }

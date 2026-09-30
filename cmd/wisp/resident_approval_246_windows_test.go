@@ -94,7 +94,7 @@ func TestAC246CardWithNoWindowFailsClosedThroughTheRealGate(t *testing.T) {
 	ra := newResidentApproval()
 	ra.bindBallHost(&residentBall{})
 
-	ans, why := ra.ask(context.Background(), residentCard{
+	ans, why := ra.askConfirmation(context.Background(), residentCard{
 		TaskID: "host:246-no-window",
 		Tool:   residentCardTool,
 		Level:  risk.L1,
@@ -109,10 +109,10 @@ func TestAC246CardWithNoWindowFailsClosedThroughTheRealGate(t *testing.T) {
 	if _, awaiting := ra.cards.AwaitingHuman(); awaiting {
 		t.Fatal("a card that was never displayed is still waiting on a human")
 	}
-	if n := ra.liveAsks(); n != 0 {
+	if n := ra.liveConfirmations(); n != 0 {
 		t.Fatalf("liveAsks() = %d after the ask returned, want 0", n)
 	}
-	if n := ra.ui.count(); n != 0 {
+	if n := ra.ui.displayedCards(); n != 0 {
 		t.Fatalf("the UI displayed %d cards with no ball attached", n)
 	}
 	// The orb's state name for this level, and the fact no state was claimed here.
@@ -138,7 +138,7 @@ func TestAC246CancelStepHookRunsOnTheRealShutdownSequence(t *testing.T) {
 	if got := rt.RegisteredShutdownSteps(); len(got) != 0 {
 		t.Fatalf("a fresh runtime already owns steps %v", got)
 	}
-	if err := rt.RegisterShutdownHook(proc.StepCancelTasks, ra.cancelTasks); err != nil {
+	if err := rt.RegisterShutdownHook(proc.StepCancelTasks, ra.cancelTaskRoots); err != nil {
 		t.Fatalf("RegisterShutdownHook(step 3): %v", err)
 	}
 
@@ -158,13 +158,123 @@ func TestAC246CancelStepHookRunsOnTheRealShutdownSequence(t *testing.T) {
 	}
 
 	// After the sequence has walked, this gate must refuse to ask anything.
-	ans, why := ra.ask(context.Background(), residentCard{
+	ans, why := ra.askConfirmation(context.Background(), residentCard{
 		TaskID: "host:246-after-shutdown", Tool: residentCardTool, Level: risk.L1,
 		Reason: "退出序列之后还想签一张卡",
 	})
 	if ans != tools.AnswerReject || !strings.Contains(why, "退出序列") {
 		t.Fatalf("answer after shutdown = %s (%q), want reject naming the exit sequence", ans, why)
 	}
+}
+
+// TestAC246ShippedResidentProcessOwnsItsCancelStep is AC#1 and AC#4 on the
+// command line the owner actually double clicks: no arguments, in a real process,
+// read out of its own console and its own on-disk log.
+//
+// It exists because the in-process cases above could be satisfied by a gate that
+// nothing assembles. Two facts have to survive the boundary of the shipped
+// binary: the boot report names the step this process registered as its own, and
+// the D38(e) trail the process writes on the way out contains the sentence only
+// the hook can write. Deleting the registration in resident_windows.go takes both
+// readings away, and this case goes red with them.
+//
+// No branch of the desktop state is skipped here: a leg with no ball prints the
+// un-assembled gate sentence, and the cancel step is still registered, because
+// what step 3 cancels is the task root, not a window.
+func TestAC246ShippedResidentProcessOwnsItsCancelStep(t *testing.T) {
+	exe := buildWispForTest(t)
+	dataDir := t.TempDir()
+	leg := bootResidentLeg(t, exe, dataDir)
+	sinkDir := logSinkDir(dataDir)
+
+	said := pollUntil127(400, func() bool {
+		out := leg.stdout.String()
+		return strings.Contains(out, gateAssembledClaim) && strings.Contains(out, cancelStepRosterClaim)
+	})
+	out := leg.stdout.String()
+	if !said {
+		leg.stop()
+		t.Fatalf("AC#1/#4 RED: the shipped resident process never printed both gate sentences.\n%s\n"+
+			"Expected one of %q plus %q: the first is the assembly root reporting the gate it injected, "+
+			"the second is the D38(e) steps it registered hooks for. A leg that stopped wiring the gate says "+
+			"neither, and that is the reading this case exists to catch.",
+			leg.console(), gateAssembledClaim, cancelStepRosterClaim)
+	}
+	if !strings.Contains(out, gateAssembledClaim) && !strings.Contains(out, gateAbsentClaim) {
+		leg.stop()
+		t.Fatalf("AC#1 RED: the gate sentence is neither assembled nor un-assembled:\n%s", leg.console())
+	}
+	if !strings.Contains(out, cancelStepRosterClaim) {
+		leg.stop()
+		t.Fatalf("AC#4 RED: the boot report does not name step 3 as owned by this process (%q):\n%s",
+			cancelStepRosterClaim, leg.console())
+	}
+
+	if err := leg.breakToLoop(); err != nil {
+		leg.stop()
+		t.Fatalf("GenerateConsoleCtrlEvent on the leg's own group: %v\n%s", leg.pid(), err)
+	}
+	if !leg.exitedWithin(400) {
+		leg.stop()
+		t.Fatalf("the leg took the exit request and never left through its own shutdown path.\n%s", leg.console())
+	}
+	if leg.waitErr != nil {
+		t.Errorf("AC#4 RED: the shipped process exited with %v; a cancel step that errors on an empty set of "+
+			"tasks is a teardown defect, not a cosmetic one.\n%s", leg.waitErr, leg.console())
+	}
+
+	recs := readResidentSink(t, sinkDir)
+	hookLine := indexOfMsgContaining246(recs, cancelStepBookedMsg)
+	if hookLine < 0 {
+		t.Fatalf("AC#4 RED: the on-disk log of the shipped process holds no %q record (of %d records: %v).\n"+
+			"That sentence is written by the registered hook, inside the frozen sequence: no record means the "+
+			"step ran outside it or not at all, which is the fork ticket 246 closed.",
+			cancelStepBookedMsg, len(recs), msgsOf127(recs))
+	}
+	// And the trail still says ten steps with nothing failing, so the registration
+	// did not cost the sequence anything. "shutdown step skipped (module not present)"
+	// is the honest record for the six steps this ticket does not own and is NOT a
+	// failure; only a step that ran and broke, or blew its deadline, is.
+	for _, bad := range []string{"shutdown step failed", "abandoned wait"} {
+		if idx := indexOfMsgContaining246(recs, bad); idx >= 0 {
+			t.Errorf("AC#4 RED: the shipped process booked %q: %q", bad, msgsOf127(recs)[idx])
+		}
+	}
+	if !strings.Contains(leg.stdout.String(), "10 steps, 0 failed") {
+		t.Errorf("AC#4 RED: the console does not report a clean 10-step exit: %q",
+			tailContaining246(leg.stdout.String(), "shutdown order"))
+	}
+}
+
+const (
+	// gateAssembledClaim / gateAbsentClaim are the two forms the boot report can
+	// take, copied as literals on purpose: rewording resident_approval_windows.go
+	// has to be a deliberate act here too.
+	gateAssembledClaim = "审批门已装配进本进程"
+	gateAbsentClaim    = "审批门未装配"
+	// cancelStepRosterClaim is the half that names the registered step.
+	cancelStepRosterClaim = "3:cancel-task-roots"
+	// cancelStepBookedMsg is the hook's own completion sentence in the log file.
+	cancelStepBookedMsg = "resident-approval: 退出第 3 步完成"
+)
+
+func indexOfMsgContaining246(recs []sinkInstallRecord, needle string) int {
+	for i, r := range recs {
+		if strings.Contains(r.Msg, needle) {
+			return i
+		}
+	}
+	return -1
+}
+
+func tailContaining246(all, needle string) string {
+	lines := strings.Split(all, "\n")
+	for i := len(lines) - 1; i >= 0; i-- {
+		if strings.Contains(lines[i], needle) {
+			return lines[i]
+		}
+	}
+	return "(no line containing " + needle + ")"
 }
 
 // TestAC246VetoSentenceWithNoCard pins that the injected cancel path cannot
@@ -188,21 +298,21 @@ func TestAC246VetoSentenceWithNoCard(t *testing.T) {
 // may not read as a leg that can show a card either.
 func TestAC246StatusLineSaysWhatTheLegDoesNot(t *testing.T) {
 	ra := newResidentApproval()
-	line := ra.statusLine()
+	line := ra.residentStatusLine()
 	if !strings.Contains(line, "审批门未装配") {
 		t.Fatalf("statusLine before any ball = %q, want the un-assembled sentence", line)
 	}
 	if bound := ra.bindBallHost(&residentBall{}); bound {
 		t.Fatal("bindBallHost claimed a window that is not there")
 	}
-	if line := ra.statusLine(); !strings.Contains(line, "审批门未装配") {
+	if line := ra.residentStatusLine(); !strings.Contains(line, "审批门未装配") {
 		t.Fatalf("statusLine after binding an empty host = %q, want the un-assembled sentence", line)
 	}
 	// The other half: the sentence this leg prints must never be a promise that a
 	// card is on screen somewhere. That claim belongs to a panel host, and this
 	// process links none (approval_always.go:165).
 	for _, forbidden := range []string{"看得见", "面板已就绪", "已显示卡片"} {
-		if strings.Contains(ra.statusLine(), forbidden) {
+		if strings.Contains(ra.residentStatusLine(), forbidden) {
 			t.Fatalf("statusLine says %q, which this leg cannot mean: %q", forbidden, line)
 		}
 	}
