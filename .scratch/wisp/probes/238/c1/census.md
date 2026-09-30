@@ -187,7 +187,71 @@ internal/winsec/winsec_windows.go:313 注释
 
 ## 2. 一把不恒真的常驻尺（AC#2）
 
-（待补：判据全文＋正控设计＋"今天绿着会被打红"的名册。）
+### 2.1 这把尺要判的那一句，物理上只有一种问法
+
+`(I)` 不是"权限宽不宽"的记号，是**这条 ACE 存在哪儿**的记号。仓里已把它说死（`internal/winsec/acl_windows_test.go:383`–`:387` 逐字）：
+
+> 「every child above holds its foreign grant by **inheritance only**, and an inherited ACE is **not stored in the child** - it is recomputed
+> from the parent the moment the parent's DACL changes. … A test written against an arbitrary stray file would **pass for the wrong reason and pin nothing**.」
+
+⇒ 三个直接后果，写在这里是为了让落地腿不必再撞一遍：
+
+1. **"根是谁造的"这件事只有在根自己那枚对象上读得出来**：`<data>` 带非 `(I)` 的私有 ACE ⇔ 有封条碰过它；纯 `(I)` ⇔ 从建好到今天没有任何一枚封条碰过它（**也包括"曾经过宽、后来父被收窄"那种**——OS 重算之后它看起来和"生来窄"一模一样）。
+2. **子档上问不出创建者**：`wisp.db-wal`/`-shm` 这类"封好的父里后来生的孩子"（`internal/memory/open.go:173`–`:175` 逐字选择**用继承**做机制）与"生来宽的树里没人管的孩子"，文本读数是同一枚 `pure (I)` ⇒ **把它们逐枚判成"必须带非 (I)"＝把本仓选定的机制判成缺陷**。
+3. 所以本票 AC#2 那句"判据必须逐枚"，本腿把它落成：**对本次时序里"由这个进程创建的那串目录"逐枚判**（首启常驻腿＝`<data>` 与 `<data>\logs` 两枚；`wisp run` 那形再多一枚 `<data>\secrets` 之类），
+   ⛔ **不是**"整棵树每一枚文件都必须带非 `(I)`"。要不要把范围扩到每枚 jsonl 文件＝**这一条要编排者裁**（§4 第 4 条：扩了会把票 132 的 AC#2「每个文件首写前 `SealFile`」变成前置条件，两票就从"串行"变成"互相承重"）。
+
+### 2.2 恒真形状在本票有两种犯法，都点名
+
+- 形状 A（票面 `:18` 点名的那枚）：「至少一枚带非 `(I)` 的 ACE 就算过」——同族事故是 `132-c3` §6.4：`bak-0-1` 今天就在 8 份互不相关的日志里都带非 `(I)`（机制＝`:503` 第二次调用时 `sealDir`→`propagatePrivate` **事后补封**），"至少一枚"那种尺**今天就绿＝测空气**。本票若写"这棵树里至少一枚对象带非 `(I)`"，**同一条顶正原样适用**：`run` 腿跑过一次 `memory.Open` 之后 `<data>` 就是显式窄的，而常驻腿那条时序仍然全树纯 `(I)`——"至少一枚"会**在修好的机器上绿、在有洞的机器上也绿**。
+- 形状 B（本腿新点的一枚）：**沿用现有助手就等于沿用它的盲区**。`aclSIDs`（`acl_windows_test.go:86`）取 `line[:i]`（`i := strings.LastIndex(line, ":(")`），**flags 被丢掉**；`privateACLError`（`:119`）只看 SID 集合；这正是 `132-c3` §6.2 说的"判结果不判程序"三环。⇒ 新尺**必须自带一枚逐 ACE 保 flag 的解析器**（`internal/models/acl_sid_121_test.go:50 parseACELines` 是同族里唯一保留整条 flag 文本的解析器，可作起点；⚠ 它在 `internal/models`，跨包复用要么抽公共件、要么在测试内复制并注明出处——本腿不裁这一枚，见 §4 第 5 条）。
+
+### 2.3 判据草案（写成一枚能常驻的行为尺，不写常量名）
+
+**载体**：`cmd/wisp` 里一枚新钉子（与 `resident_sink_nail_127_windows_test.go`／`leg_sink_nail_131_windows_test.go` 同族同形），**驱动真实腿、跑真实进程或真实函数**，⛔ 不是"用 mock 代替真的"。
+
+**判据**（每一步都在本机新建的、**父档未被人为加宽**的临时根上跑；这正是"非恒真"的一半，见 §2.4 的对照）：
+
+1. 取一个空的新根 `R`（`t.TempDir()` 拼接一个尚不存在的 `wisp` 目录名；⛔ 不许碰 `%APPDATA%`，票 132 AC#1 那句"一律用仓外临时根、owner 真实数据目录一字不许多写"同样管本票）。
+2. 只跑**首启时序**：常驻腿＝`installLogSink(R)`（或 `runResident` 的真进程形，同 127 那枚钉子的 `buildWispForTest`＋`bootResidentLeg`）；⛔ 中途**不许**调用 `memory.Open`／`secret.NewStore`——一旦调用，后来的封条会把根修成显式窄，那把"曾经谁造的"这一问题**擦掉了**（本票 1.5 表里那枚"事后走查"就是这件事，`132-c3` §6.4 已实测过一次）。
+3. 逐枚取"这一步新建出来的目录串"：`R`、`R\logs`。对每一枚：
+ - 读 `icacls`，**保留 flag**，筛出"主体 SID ∈ {当前用户, SYSTEM, Administrators}"的那几行；
+ - **要求其中至少一条不带 `(I)`**（＝这条私有授权是这个对象**自己的**，是某枚封条写上去的）；
+ - 同时要求**不带任何外来主体的授权**（沿用 `privateACLError` 那句"foreign SID"判语，或它的等价），否则"被谁封的"没意义。
+ 任一枚不满足 ⇒ 红，红名点到**那一枚对象的路径**，不点整棵树（逐枚的红名才读得出是谁造的）。
+4. **对照枚（同一次跑里必须同时在场，否则这枚尺自己就是恒真的）**：对 `R\secrets`（由 `secret.NewStore`→`PrivateDirAll` 造，**已知带非 `(I)`**）跑**同一条判据**，要求**绿**。
+ 既有真机读数对表：`docs/evidence/s1/128-ac1-consequences.md:149`（`secrets` 六条**全不带 `(I)`**）vs `:150`–`:153`（`wisp-dev`、`logs`、`config.toml`、`jsonl` **全带 `(I)`**）⇒ 判据的两侧各有实测锚，不是推理出来的。
+
+### 2.4 自带正控（票面 `:18` 要求的"把新封条注释掉必红"）
+
+| 变异 | 必须红的是哪一枚 | 为什么红得起来 |
+|---|---|---|
+| **X1＝把新加的封条那一行注释掉** | §2.3 那枚新钉子的**第 3 步**（`R`、`R\logs` 逐枚） | 注释掉之后建根只剩 `logging.go:72` 那枚 `os.MkdirAll`，`MkdirAll` 在 Windows 上不写任何描述符（本仓原话：`acl_windows_test.go:158`–`:159`「os.MkdirAll's 0o700 … on Windows it does nothing to access control, which is the point」），也没有 `PROTECTED_DACL` 那一手（`winsec_windows.go:377` 的 `inherit = OBJECT_INHERIT_ACE|CONTAINER_INHERIT_ACE` 才是决定子档权限的那一手）⇒ 根**只剩 `(I)`** ⇒ 第 3 步必红 |
+| **X2＝把封条挪到"装完 listener 之后"** | 同一枚钉子的第 3 步**不会红**（根最终是显式窄） | 这一发专门用来证明 §2.3 判的是**存在性**不是**时序**；所以钉子必须另配一发**时序半**：在第 2 步之后、封条之前插一次读数（同形做法仓里有现成参照——`logsink_windows_test.go:308 TestAC2RunLegInstallsTheSinkBeforeItsFirstSealingSite` 就是把"先后"当独立一发来判的）。**这一半要不要写进判据＝要编排者裁**（§4 第 4 条） |
+| **X3＝把 §2.3 的第 4 步对照枚删掉** | 新钉子自己 | 删掉对照枚之后，任何"整棵树的 `(I)` 状态读错了"的走法都不会被发现；本仓对负向尺的规矩就是"必配种 X 必响的正控" |
+
+⚠ **不许写成"至少一枚"**（§2.2 形状 A）；⛔ **不许把判据降级成 grep 新符号名**——第 64 条纪律：行为型钉只写产物不写常量名，`d22scan` 也没有任何一条认得封条（§0.4 第 4 条），所以**唯一能常驻的是行为读数尺**。
+
+### 2.5 今天这枚尺是红的还是绿的——具名口径
+
+- **本腿不跑测试**（硬红线）。按读断言＋读代码给结论：§2.3 在第 3 步上**今天必红**，因为产码侧没有任何一条腿对 `<data>` 或 `<data>\logs` 下过封条（§0.3：`SealDir` 产码调用者 0；§0.4 第 1 条：6 枚造根腿里没有一枚先封根；唯一会收窄根的 `open.go:176` 只有 `run.go:384`/`providers.go:180` 两枚调用者，且都在 sink 之后）。
+- **"算未修码"的锚点**（本仓规矩：派单写"这枚判据今天应该红"必须自带哪枚 commit 算未修码＋自证尺）：**起手锚点 `bf26dfc`（本腿现读 `git log -1`）＝未修码**；自证尺两条＝§0.3 的 `git grep -n "SealDir" -- internal cmd tools ':!*/*_test.go'`（6 行全在 winsec 包内）＋§0.4 第 1 条的造根名册。⇒ 落地腿必须**钉子与封条同枚 commit 落地**，否则门禁当天就多一条红。
+
+### 2.6 名册：今天绿着、会被这把新尺／这枚新封条打红的用例（逐枚读断言得来）
+
+⛔ 全表判语一律标〔未跑包，此条来自读断言〕（本轮禁 `go test`）。分两类：**R 类＝被"尺"打红**（只有在新尺改写**共享助手**时才发生，草案 §2.3 特意自带解析器，就是为了让这一类不发生）；**F 类＝被"封条落地"打红**（无论选哪一形都要正面处理，属派单里"要重写就写清被删断言的存在理由"的那一档）。
+
+| 用例（文件:行:名） | 类 | 今天为什么绿 | 会不会红／为什么 | 本腿判 |
+|---|---|---|---|---|
+| `internal/winsec/acl_windows_test.go:332 TestAC2SealedDirCoversFilesItNeverTouched`（`:355`/`:371`/`:372`/`:378` 四处 `assertPrivateACL`） | R | 它测的就是"**winsec 从没碰过的孩子靠继承也该窄**"（`:349`–`:350` 逐字「Files winsec never touched, created inside the sealed root, must inherit privacy from it - that is the whole coverage argument」） | **若把 `(I)` 判据塞进共享助手 `assertPrivateACL`／`privateACLError` ⇒ 必红**，而且红得没道理（判的是本仓选定机制） | ⛔ 禁止复用那两枚助手；新尺自带解析器 |
+| `internal/winsec/production_windows_test.go:18 TestAC3ProductionDataRootIsPrivateEndToEnd`（`:42`–`:52` 判 SQLite 写的 `wisp.db`/`-wal`/`-shm`；`:59 sweepPrivate`） | R | 同上：`-wal`/`-shm` **只可能靠继承**（`open.go:173`–`:175` 的原话） | 同上一条，塞进共享助手 ⇒ 必红 | ⛔ 同上 |
+| `internal/winsec/migrate_windows_test.go:72`、`:113`（`:104 sweepPrivate(secrets)`；`:42` 注释逐字「The parent is not winsec's to seal」） | R/F | 它同时钉住"**父目录不归 winsec 封**" | 塞共享助手 ⇒ 红（父档纯 `(I)` 是**故意的**）；形② 若封到根以上一层 ⇒ 直接违背 `:42` 那句话 | 具名：`winsec.go:152`–`:157`「Ancestors above path are never touched」是既有裁决，新尺射程不许越过它 |
+| `cmd/wisp/logsink_windows_test.go:137 TestAC2SealNoticeLandsInTheRunLegLogFile` | F | 它数的是 `hits`（`msg == sealNoticeMsg` 的记录）**恰好 1 条**（`:174`），且 `:181` 要求那条的路径等于 `secrets`（`assertNamesTree117` 比叶子名） | 新封条若在 `secret.NewStore` **之前**封了根，而 `run` 腿这枚用例已把 `R\secrets` 用 `icacls … /grant *S-1-1-0:(OI)(CI)(RX)` 加宽（`:146`）⇒ 封根那次走查会**先把 Everyone 摘掉**（`winsec_windows.go:595`–`:620`），到 `PrivateDirAll(secrets)` 时无东西可清 ⇒ `len(hits)!=1` 直接 `t.Fatalf`；即便仍有 1 条，那条点名的是**根**、叶子名不等 ⇒ `assertNamesTree117` 红 | **必被红**（形②‑甲/乙 在 `installLogSink` 之前封根这一形）；处置＝要么封根放在"只封不 propagation"的形态（需新导出名，§1 开头），要么这枚用例的判语要重写并写清存在理由 |
+| `cmd/wisp/logsink_windows_test.go:308 TestAC2RunLegInstallsTheSinkBeforeItsFirstSealingSite` | F | 它钉 `first == 1`（只有 install 记录可以在 seal 通知之前） | 封条早于 listener ⇒ 通知进票 130 的早缓冲、被 `FlushEarlyLogRecords`（`logsink.go:173`）排在**记录 0** ⇒ `first` 变 0；封条插在 `InitLog` 之后、booking 之前 ⇒ 通知落文件仍在 booking 之前，同样 `first!=1` | **必被红**，除非新封条放在 install booking **之后**（那是 §2.4 的 X2，把窗口留在生产里） |
+| `cmd/wisp/resident_sink_nail_127_windows_test.go:393`（断言在 `:423`–`:436`：记录 0 必须＝早缓冲回放的裁决、`:434` 「install booking is record %d, want 1: the replayed early records come first **and nothing else**」）＋同文件 `:543`（`:587`–`:588` 再钉一次记录 0） | F | 票 130 把"记录 0 是谁"钉成了两枚钉子 | 同上：常驻腿的封条若早于 `installLogSink`，回放名册多一条 ⇒ 两枚都红；⚠ **且红不红取决于这台机器的临时根父档给不给 `BUILTIN\Users`**（`132-c3` §6.3 记过「ticket 95 measured hosts where %TEMP%'s parent grants BUILTIN\Users」）⇒ 是一枚**主机相关**的红，最难查的那种 | 派单里必须点名这两枚；本腿判：**要么显式规定"封条不许发通知到早缓冲"，要么改这两枚的索引判语并重写其存在理由**（不许放宽成 `>=1`） |
+| `internal/models/no_seal_ruling_windows_test.go:27 TestAC3ExtractionIsDeliberatelyNotSealed`（注释 `:13`–`:22`） | F（决定层） | 它自建宽父档＋本地解压，不走生产腿 | 用例本身不会红〔未跑包，此条来自读断言〕；**红的是票 95 的决定**：封根的全树走查会在真机把 `<data>\models\**` 的 `BUILTIN\Users` 读权摘掉（`models.go:198`） | ⚠ 见 §1.3／§4 第 2 条 |
+| `cmd/wisp/resident_sink_nail_127_windows_test.go:498 TestAC1ResidentLegOutlivesItsOwnLogFailure` | F | 它要求"日志目录开不出来时**照起**"，并要求那枚挡路的普通文件**还在**（`:527`–`:529`） | 只要封条失败仍走 `resident_windows.go:58`–`:65` 那种"响亮但不拦"就**不红**；若形① 把封条塞进 `Boot` 并 `return err` ⇒ 这枚钉子（和 `:393`／`:543` 两枚）会一起红，红因＝启动被堵死 | 具名：这一行就是"失败方向"的仪器代价，编排者裁 §4 第 3 条时对着它看 |
+| `internal/winsec/reparse_windows_test.go:103/:170/:209/:327`（`TestAC4…IsNotRecursed/IsNotWalked/SealedWalkSkipsLinks`）、`internal/winsec/private_other_test.go:60 TestPOSIXSymlinkAtArtifactPositionIsNotRecursed` | F | 钉的是"走查**永不穿链接**"与 POSIX 侧**故意不递归** | 若为补 POSIX 半边而给 `sealDir` 加递归（§3 的丙支），**POSIX 这枚不会红**（它测的是 `RemoveUnlinked`），但 `winsec_other.go:165`–`:169` 那段**存在理由**会被推翻，而那句写的是「It deliberately does not walk the existing subtree … would be a chmod over files whose permissions somebody else set on purpose」 | ⚠ POSIX 递归＝要重写这段注释＋给新钉子的存在理由，属裁量项（§4 第 6 条） |
 
 ---
 
