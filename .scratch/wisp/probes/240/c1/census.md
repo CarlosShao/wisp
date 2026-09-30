@@ -139,9 +139,164 @@ Conversation/Warm/Acting` 返回 true；`Armed`、`Sleeping`、`Muted` 不在表
 
 ---
 
-## §2 KWS 侧：绑定怎么引的、谁建过 spotter、两档预算的落点、opt-in 与指示
+## §2 KWS 侧：绑定怎么引的、谁建过 spotter、两档预算、opt-in 与指示
 
-（待写。）
+### 2.1 sherpa-onnx 的 Go 绑定在本仓是怎么引的（cgo 那层在哪）
+
+三层，逐层给出处：
+
+1. **Go 绑定＝上游模块，不在本仓。** `go.mod` 直依赖第 1 行就是
+   `github.com/k2-fsa/sherpa-onnx-go v1.13.8`（R8），`sherpa-onnx-go-{linux,macos,windows}`
+   三枚是 indirect。`sherpa-onnx-go@v1.13.8/sherpa_onnx/` 里只有三个转发文件
+   （`sherpa_onnx_windows.go` 等，`type KeywordSpotter = sherpa.KeywordSpotter` 这种别名）。
+2. **cgo 那层在上游的平台模块里，不在本仓。** 实现在
+   `~/go/pkg/mod/github.com/k2-fsa/sherpa-onnx-go-windows@v1.13.8/sherpa_onnx.go`
+   （`NewKeywordSpotter` 在 `:2396` 段、`GetResult` 在 `:2471`），链接开关在
+   同目录 `build_windows_amd64.go:5`，逐字：
+   `#cgo LDFLAGS: -L ${SRCDIR}/lib/x86_64-pc-windows-gnu -lsherpa-onnx-c-api -lonnxruntime`。
+   ⇒ **要点：链接期用的是 module cache 里那三枚 DLL，本仓 `third_party/` 那份不参与链接。**
+3. **本仓 `third_party/sherpa-onnx/` 只有运行期 DLL。** 实测（R9）：
+   `onnxruntime.dll`(17,799,168B) + `sherpa-onnx-c-api.dll`(4,605,952B) +
+   `sherpa-onnx-cxx-api.dll`(259,584B) + `.cache-manifest.json`，**零 `.go`、零 `.h`**。
+   它的作用是"加载期 PATH 上要有 DLL"，`cmd/wisp` 的一堆测试头注释就是这个
+   （例：`cmd/wisp/always_write_no_clobber_226_test.go:24-25` 逐字
+   `this package's test binary links sherpa-onnx and dies at load (0xc0000135) unless
+   third_party/sherpa-onnx is on PATH`）。
+4. **版本钉与自校验在位**：`deps.toml` 里 `sherpa-onnx` 与 `go-binding-sherpa-onnx` 两段
+   被 `cmd/wisp/doctor.go:166-177` 解析，`doctor.go:60-68` 拿运行期
+   `sherpa.GetVersion()` 与 `buildinfo.SherpaOnnxVersion` 对撞，不等就 FAIL。
+   ⇒ **这是全仓唯一一处生产代码真的调 sherpa 的地方**（R5：`doctor.go:60/81`、`main.go:165`，
+   全是"报版本号"，没有一处推理）。
+
+**模型侧的分发已经就绪**（这块别漏）：C29 清单 `models/manifest.json` 有 6 枚条目、
+其中 `kws-zipformer-wenetspeech-3.3M-2024-01-01` purpose=`kws`，带 archive sha256
+`b2f7c896…`、`size_bytes=32654866`，并在 archive 内**逐文件**钉了
+`encoder/decoder/joiner.int8.onnx` + `tokens.txt` + **`keywords.txt`（sha256 `46de8c68…`，286 字节）**
+（R19，两份清单 `models/manifest.json` 与 `build/models/manifest.json` 各 6 枚）。
+`internal/models/manifest.go:94` 的合法 purpose 表含 `"kws"`。
+
+### 2.2 全仓有没有任何一处创建 keyword-spotter 的代码
+
+**有，两处；两处都不在生产、也不在测试。** 按"生产 / 测试 / 其它"三分：
+
+| 分类 | 命中 | 判定 |
+|---|---|---|
+| **生产码**（`internal/**`、`cmd/**`，排除 `_test.go`） | **0 处** | `NewKeywordSpotter` 零命中；`internal/speech` 连类型都没声明（§1.3） |
+| **测试码**（`_test.go`） | **0 处** | 本腿 `grep -rn 'KeywordSpotter' --include='*_test.go' internal cmd tools` 零命中（口径限制：`.scratch` 下别人的探针件不算，也未被本腿转述） |
+| **spike 码**（独立模块 `scripts/spike`，R7） | **2 处，且是完整能跑的真代码** | 见下 |
+
+spike 两处的精确位置：
+
+- `scripts/spike/model-residency/main.go:114 func kwsConfig(modelsDir string) (*sherpa.KeywordSpotter, string)`，
+  `:116` 真建 spotter（`KeywordsFile`、`KeywordsThreshold: 0.25`、`KeywordsScore: 2.0`、
+  `MaxActivePaths: 4`、`NumThreads: 1`、`Provider: "cpu"`），`:142 openKws()` 里 `:143 NewKeywordStream`
+  → `:145-148` 1 秒静音 warmup（`AcceptWaveform(16000, chunk)` + `IsReady`/`Decode` 循环）
+  → `:151-152` `DeleteOnlineStream`/`DeleteKeywordSpotter`。
+- `scripts/spike/speech-baseline/main.go:124-167`：同一套配置，`:147 NewKeywordStream`，
+  `:149-155` 喂 **3 秒** 512 样本块并解码（注释自称 `realistic Armed state`），
+  `:164-167` 释放；`:131` 行注释逐字 `NumThreads: 1, // D32: intra_op_num_threads pinned to 1`。
+
+⇒ 这两处的价值要如实说：**它们是本仓唯一一份"怎么把 KWS 跑起来"的可抄答案**，
+包括模型文件名拼法、四个阈值常数、chunk 尺寸（512 = `audio.FrameSamples`）、
+以及 `IsReady`/`Decode` 的取结果节奏。但它们**不读 config、不产事件、不进名册**，
+而且**在另一个 module 里**——`internal/speech` 引不到它们，只能照抄形状。
+
+### 2.3 `PLAN.md:527/528` 两档预算在代码里对应哪些常量
+
+对应关系是**精确到数字**的，位置全部在 `internal/observe/thresholds.go`：
+
+| PLAN.md 那一档 | 原文（本腿 `sed` 现读） | 代码常量 | 实测换算 |
+|---|---|---|---|
+| `:527` 空闲态（KWS 关） | `≤ 25MB` / `≤ 0.5%（1min 均值）` / 麦克风关闭·零网络长连接·零周期性磁盘写入·悬浮球静态不做动画 | `thresholds.go:19 memCapSleeping int64 = 25 << 20`；`:26 cpuLimitSleeping = 0.5`；`:36 goroutineLimitSleeping = 6`；`:191-205 sleepingConstraints`（`disk_write_ops == 0`、`tcp_connections == 0`，均 `Gate: true`） | `25 << 20 = 26,214,400 字节 = 25 MiB`（口径：`mb()` 在 `:208` 用 `1<<20`，即 MiB 而非 MB） |
+| `:528` 待唤醒态（KWS 开） | `≤ 90MB` / `≤ 2%` / 音频缓冲不落盘（D16） | `thresholds.go:20 memCapArmed int64 = 90 << 20`；`:27 cpuLimitArmed = 2.0`；`:38 goroutineLimitArmed = 7 // + kws-infer` | `90 << 20 = 94,371,840 字节`；`7 = 常驻 6（goroutine.go:41 ResidentBaseline）+ 1` |
+
+判定：**数字全在、闸门也真的会红，但"待唤醒"那一档今天测不到、也进不去。** 现跑尺（R：
+`grep -rn 'SLOArmed' --include=*.go cmd tools internal | grep -v '^internal/observe/'` → **零命中，rc=1**）：
+
+- `SLOArmed` 只在 `internal/observe` 自己体内出现（`sampler.go:43` 声明、`sampler.go:51` 进
+  `SLOStates` 表、`thresholds.go:49/66/171` 查表）；
+- 跑 SLO 的 `cmd/wisp/slo_windows.go` 只出现 `SLOSleeping`（`:295`、`:984-988`）与
+  `SLOWarm`/`SLOConversation`，**没有 Armed 那一行的 runner**；
+- 而 `Facts.KwsLoaded`/`EvKwsEnabled` 生产零生产者（R15）⇒ 进程今天**无法进入 `Armed` 态**。
+
+⚠ 另外这枚文件路径要说清，否则会找错：任务书与部分文档把它写成
+`internal/ball/thresholds.go`——**该路径不存在**（本腿实测 `sed: can't read
+internal/ball/thresholds.go: No such file or directory`）。真身在
+**`internal/observe/thresholds.go`**。本腿两枚都没动（红线一致：一字节都不许改）。
+
+`:514` 那行"看门狗阈值必须按态查表：在 `Armed` 态用 25MB 阈值会触发卸载 KWS，直接杀掉唤醒词"
+的落点也就是 `thresholds.go:47 stateMemCap`/`:64 stateCPULimit` 这两个按 `SLOState` 查表的函数
+——**表已经画对了**；`internal/watchdog/` 本身**只有 `doc.go` 一个文件**
+（`doc.go:16-17` 逐字 `DEFERRED(watchdog loop/thresholds): implemented by ticket 42`），
+所以"按态查表去执行动作"那一半没人做。
+
+### 2.4 `PLAN.md:460`「默认不开麦（opt-in）」与 `:462`「KWS 激活时常亮可见指示」有没有落点
+
+任务书要求分"配置项 / 状态位 / 界面指示"三处各判。逐处：
+
+**(a) 配置项——三件套里 `:460` 有完整落点，`internal/observe`/`cmd` 无人执行。**
+
+| 落点 | 位置 | 状态 |
+|---|---|---|
+| 默认 false 的开关 | `internal/config/schema.go:197` `Enabled bool` + tag `toml:"enabled" default:"false"`（**这枚是 `wake_word.enabled`**） | ✅ 在 |
+| ⚠ 同一棵树上的另一枚开关 | `schema.go:245` `VoiceSection.Enabled` + tag `toml:"enabled" default:"true"`（`voice.enabled` 默认 **true**） | 在，但**方向相反**：`:460` 那句"默认不开麦"精确对应的是 `wake_word.enabled=false`（常开听音），**不是** `voice.enabled`。接线腿必须自己裁定"哪一枚门控哪一种开麦"，否则默认配置下会读到一个 true（见 §5 D-2） |
+| 挂在 `[voice]` 树下 | `schema.go:247` 字段 `WakeWord`，tag `toml:"wake_word"`；类型声明在 `schema.go:196 type WakeWord struct` | ✅ 在 |
+| 关键词与逐词阈值 | `schema.go:199 Keywords []string`、`:201 Thresholds []float64`、`:203 VetoWords`（默认 `取消,停下,别`） | ✅ 在 |
+| 热载分级 | `internal/config/manager.go:370-375`（`WakeWord.Enabled`/`Keywords` 变更算 **reload-tier**）、`:385-386`/`:398-399`（写回）、`:405-407`（`Thresholds`/`VetoWords` 算 hot-tier） | ✅ 在，且判据齐全 |
+| **读它并决定开不开麦的消费者** | **无**（R13：`internal/config/` 之外 `.Voice.` 零命中） | ❌ 缺 |
+
+⇒ 精确说法：`:460` 的"默认不开麦"今天是**被动成立**的——不是因为有代码守住它，
+而是因为**根本没人能开麦**。这一点对接线腿很要命：接线之后这句会从"碰巧成立"变成
+"必须被实现"，落点就是那个缺失的消费者。
+
+**(b) 状态位——两套都建好了，两套都零生产者。**
+
+- `internal/statemachine`：`events.go:18 EvKwsEnabled`（D43 #5）、`events.go:20 EvWakeWord`（#7）、
+  `events.go:70 Facts.KwsLoaded`、`table.go:55`（`Sleeping --EvKwsEnabled--> Armed`，副作用
+  `kws.load`）、`table.go:61`（`Armed --EvWakeWord--> Listening`，副作用
+  `session.scope-create` + `speech.load-vad-asr` + `kws.pause`）、`table.go:76/80` 与
+  `:237/238` 两处 `kws-loaded`/`kws-not-loaded` 守卫（#10、#32）、`table.go:66` `kws.stop-inference`、
+  `table.go:71` `kws.keep-alive-alert`（#9 Armed 自环，注释逐字 `D32③: KWS must NOT be unloaded`）。
+  ⇒ **转移表这半是完整的**（D43 冻结的就是这张）。缺的全在"谁发事件"：R15 实测
+  `EvKwsEnabled`/`EvWakeWord` 生产零命中。
+- `internal/agent/approval`：`approval.go:57 ChannelKWS = "kws"`、`:61` 进 `allChannels`、
+  `:92` 文案 `说取消词`、`:99 DEFERRED(kws-veto, B1)`、`:105` 的 `case ChannelKWS:`、
+  `:161` 逐字 `the panel (ticket 37) and KWS (ticket 41) are not`（`DefaultChannels()` 只放
+  Ball+Esc，`:162`）、`:176-178 SetLoaded`（注释逐字 `the KWS loader calls this when its model
+  is actually resident`）、`gate.go:137` 暴露 `Channels()` 给"the KWS loader (ticket 41)"。
+  ⇒ 唯一生产 `SetLoaded` 调用在 `cmd/wisp/approval_reply.go:416`，它翻的是
+  `run.go:618` 传进来的 `s.replyVeto`，**不会是 KWS**；`run.go:456-457` 逐字说明控制台腿
+  `NewChannels() stays empty and runSpec.replyVeto stays unset`。
+  **也就是说：今天没有任何一条路径会把 KWS 通道谎报成可用**，`window_test.go:92-100` 还把
+  这条正反两向钉着（`:97` 逐字 `KWS 未加载却报为可用（这是在假装支持）`，`:100` 要求文案含
+  「语音取消不可用」）。这是好事，接线时别把它改松。
+
+**(c) 界面指示——只有"半透明静态球"这一形，且它同时是冻结视觉表规定的形状。**
+
+| 候选落点 | 位置 | 是不是 `:462` 要的"常亮可见指示" |
+|---|---|---|
+| 冻结表 `Armed` 行 | `internal/ball/statevisual.go:158 case statemachine.StateArmed: v.Opacity = 0.6`（对应 `docs/specs/SPEC-08-ui-ball-panel.md:57` 逐字 `Armed \| opacity 0.6，直径 44px，静态`） | **是冻结表对 Armed 的全部规定**；它是"待命态可辨"，不是"麦克风正开"的交代 |
+| 原型视觉 `Armed` 行 | `statevisual.go:288 v.Opacity = 0.92` | 同上，只差透明度 |
+| 图标 | `statevisual.go:11-21` 的 `IconKind` 枚举里**没有 Armed 专用图标**（`IconMic` 归 Conversation、`IconAudioLines` 归 Listening）；`Armed` 分支不设 `v.Icon`，取零值 `IconNone` | ❌ 缺 |
+| 动画 | `internal/ball/anim.go:62` 把 `Armed` 落进 `default: return AnimPolicy{AnimNone, 0}`，注释逐字 `Sleeping, Armed, Muted, ...: static` | ❌ 明确静态 |
+| "麦开"的唯一交代在别处 | `SPEC-08:71` 逐字 `Conversation \| **danger 常亮环，不得渐隐、不得弱于 Confirming**（麦克风开着的唯一交代）` | 那是**会话态**，不是 KWS 待命态 |
+| 一键静音快捷键 | `internal/ball/hotkey_reload.go`、`internal/ball` 的 `EvMuteKey` 链路（D43 #8/#10） | ✅ `:462` 的后半有落点；且 `observe/goroutine.go:44` 的 `hotkey-listener` 常驻名今天**零 Spawn**（R16） |
+
+⇒ `:462` 前半句（常亮可见指示）**今天没有专属落点**：能拿的只有 `Armed` 的透明度差；
+`SPEC-04:47` 与 `SPEC-04 §6:80` 两处把这句要求各写了一遍，代码侧只有 opacity。
+另外这枚指示在 owner 的"平时不挂界面"新形态里**没有载体**（编排者已在 A461 把这句列为
+"新形态第一枚判据"），本腿不重复裁它，只把代码事实摆出来。
+
+**隐私三件套（`:460`/`:462`/`:463`）按事实三行定性：**
+- 现象在哪出现：`:463`（音频缓冲永不落盘/不写日志）在 `internal/audio` 内部**是做着的**——
+  `audio.go:18-20` 明文规则、`audio.go:136-141` 的丢弃日志只带计数/窗口/帧长、
+  `audio.go:152` 的失败日志只带 source 名与 error 串；本腿在 `internal/` 全树未见任何写音频
+  文件的路径。`:460`（默认不开麦）今天的成立方式是"没人能开麦"（R1/R13）。
+- 有没有本机被入侵的证据：**没有。本腿零证据。** 本腿也没跑任何进程。
+- 最坏后果是什么形状：现状最坏＝"想接还接不上"（缺引擎、缺消费者、缺电平）。
+  接线之后最坏＝按默认配置仍不开麦（`schema.go:197` default false），
+  要开必须用户显式改 `[voice] wake_word.enabled` 并触发 reload-tier（`manager.go:370`）。
+  ⇒ **不写成"窃听风险"这类没有证据的定性；本腿判"未定性"，事实如上。**
 
 ---
 
