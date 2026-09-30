@@ -9,19 +9,34 @@
 
 ---
 
-## 0. 逐格 1:1 表（骨架；判语随 §1-§3 落定）
+## 0. 逐格 1:1 表（判语；每一格的读数都在 §1-§3 里带着自己的命令）
 
-| 格 | 工单要求的东西 | 本腿现量落点 | 判语 |
+**总裁＝`AC#5` 成立，附四条具名条件**（四条都不推翻"子代理拿不到允许"这件事本身，见 §0.2）。
+⛔ 本腿**没有**碰票面任何 `- [ ]` 框（终态尺：`git status --porcelain .scratch/wisp/issues/` 空，§6）。
+
+| 格 | 工单／普查要求的东西 | 本腿现量落点 | 判语 |
 |---|---|---|---|
-| AC#5 正控（"造一枚自批假腿 ⇒ 要红"） | 普查 §① 留下的唯一 Go 侧欠账 | 见 §1 的 M5/M6 两发 | （待 §1 落定） |
-| AC#5 行为半（孩子够不到允许） | 空令牌／假令牌／自称来源／跨卡借证／重放／面板递证／烧后再试 | 逐发错误码见 §1 基线读数 | （待 §1） |
-| AC#5 结构半（没有出口可够） | 装配可达性＋`tools.Gate` 方法集 | 反射腿＋M3/M4 | （待 §1） |
-| "令牌不外泄" | 快照字节／名册行／流式正文／spawn 正文／stdout／stderr／持久日志 | M1/M2 | （待 §1） |
-| **正控之正控**：宿主那一发真的落盘 | `rec.allowedLanded` 与文件真存在 | §1 基线＋"死路假绿"专项核查 | （待 §1） |
-| 拒绝是谁给的（门 vs 权限） | 本仓栽过的假绿形状 | 逐枚判，见 §2 | （待 §2） |
-| 甲／乙复判 | `internal/streamkey` 那一形 | 见 §3 | （待 §3） |
+| **正控**（"造一枚自批假腿 ⇒ 要红"） | 普查 §① 那句"今天没有任何尺会红"的欠账；接缝＝`Native().Allow(childCorr, capturedGrant)` 必须失败 | `:428/:429/:450/:466/:472` 五发花令牌的尝试逐发 `ErrBadGrant`／`ErrUnknownCorrelation`；**M6**（`allowScoped` 不校验令牌）⇒ `:250` 两发"竟然没有被拒"当场红 | ✅ **成立**——普查点名的那枚接缝被逐字执行了，且它有牙 |
+| 行为半（每一发都被拒**且理由可核**） | 拒因必须是"令牌不对"，不是"这条路由没在跑" | `:238-258` 六枚用例；**但** D1（把 `ErrBadGrant` 换成 `ErrPanelAllow`）**全绿** | ⚠ **附条件 C2**：六枚共用 `{ErrBadGrant, ErrPanelAllow}` 一枚集合⇒**尺分不清门与权限**（§2.2） |
+| 结构半（没有出口可够） | 装配可达性＋`tools.Gate` 方法集恰好两枚 | 反射腿绿；**M3** 指名 `tools.SubagentDeps.Door197: interface tools.answerDoor197 declares Allow()`；**M4** 指名 `tools.Options.Gate: interface tools.Gate declares Allow()`＋方法集变三枚；自带种门正控在场 | ✅ **成立**（两发突变都指名，且 M4 需要 `-overlay`，口径见 §1.0） |
+| 令牌不外泄（七枚载具） | 快照／名册（工具侧）／流式正文／**spawn 正文**／stdout／stderr／持久日志 | P1 读数：`stdout=2163 stderr=6879 log=12619 snap=3261 roster=160 chunk=137 `**`spawn=0`**；M1 真形红快照、M2 红 stdout、M2b 红 stderr＋日志 | ⚠ **附条件 C1**：第七枚载具（`rec.spawnText`，`:149` 声明、`:308` 读、**全文无赋值**）恒空＝**宣称了但没测**（§1.2） |
+| **正控之正控**：宿主那一发真的落盘 | "如果宿主那一发其实没落盘，'每一发都被拒'就可能是整条路都是死的" | 基线 `宿主允许=<nil>`＋`落盘=true/false`＋审计 `ANSWER-ALLOW`＋**D3**（原生允许改投 `AnswerReject`）⇒ 红**只在** `:277/:280` 正控那两行、**六发拒因一字未变** | ✅ **是真的**，不是死路造成的假绿（§1.1 D3 行、§2.3） |
+| 拒绝是谁给的（门 vs 权限） | 本仓栽过 `NoGate` 那枚形状 | 七枚"被拒"逐枚判（§2.1）：**没有一枚**来自 `NoGate`；`waitForChildCard197:131` 那枚 `"L2"` 是承重的（**D4** 换成 `"L1"` ⇒ 红在具名前置读数上）；生产侧三句文案逐字互不相同 | ✅ **本文件里没有那枚形状**；但尺侧的混用成立＝条件 C2 |
+| 甲／乙复判 | `internal/streamkey` 那一形满不满足裁定 | §3：编排者那把尺 0 命中（＋本腿加的 `go list -deps` 两向 0）**只量到 R1**；R2（panel 为真相源）与 R3（装配根注入格式化函数）**盘上都没做** | ⚠ **甲＝方向对、理由错**，建议台账追加"改判"式更正（§3.5，归编排者落账） |
 
-其余 6 枚未勾的 AC（#0/#1/#2/#3/#6）不由本腿裁，票面 §09-29 已把 AC#6 两格移给票 220／221。
+### 0.2 四条附条件逐名（都是**尺**的缺陷，不是产码的缺陷）
+
+- **C1（载具虚报一格）**：`subagent_selfapproval_197_test.go` 的 `spawnText` 从未赋值 ⇒ 该格恒绿。
+  修＝要么把它接上（`spawn197` 已经握着那份正文），要么把 §WHAT IT MEASURES (4) 与 `197-r1` §② 那两处"spawn 正文"删到实话。
+- **C2（门/权限混用）**：`:254` 那枚两值集合改成**逐枚哨兵表**（收紧，不是放宽）。⇒ 新腿跑 **D1** 那发必须红。
+- **C3（脚注指错落点）**：文件末尾 `M1` 那行指向 `ui.go` 的 `PanelItem`，实测**改了东西全绿**（它根本进不了快照字节）；
+  照它跑的下一腿会误判"这格没牙"。⇒ 脚注要改成"进 `NativeVerdict`/`ApprovalCardView` 那一路"或直接删，并注明**M1 真形**（本腿已给台件）。
+- **C4（用例名不符实）**：`:466` 那发不是"跨卡借证"，是"同名重放已花掉的令牌"（两张卡共用 corr）；
+  真跨卡那一形**要造两枚同时活着的卡**，配合 D2（`bindDigest` 零尺）＝同一块石头，建议**单开一票**。
+
+⇒ **这五条之外没有可退回项**：AC#5 声称要防的那个结局（孩子自己批自己）在**任何一发突变下都被当场抓住**——
+M6 甚至同时抓出了"那张只被面板路线递过令牌的卡真的执行了、文件真的被写出来"这一形（`:284/:291` 两行红）。
+
 
 ---
 
@@ -87,7 +102,7 @@
    而"面板可见载具带着活令牌"这一形**今天全仓无尺**（扫全仓的读数见 §1.4）。⚠ 这不是被测文件的判据坏了——
    **M1 真形（令牌真的进了线上包）当场红**——是**脚注把下一腿带偏**：照它跑会误判"这格没牙"。
 2. **"跨卡借证"那一发其实不是跨卡**：`startChildWrite197`（`:109`）把 `CorrelationID` 写成 `taskID`，
-   于是两次 `fs.write` 挂出来的两张卡**共用同一个 correlation id**——**十一发读数里 `t.Logf` 的三枚 id 逐次全等**
+   于是两次 `fs.write` 挂出来的两张卡**共用同一个 correlation id**——**所有打出 `t.Logf` 那行的 13 发读数里，三枚 id 逐次全等**（尺：对 `.scratch/wisp/probes/197/v1/*/run-*.txt` 与 `baseline-targeted.txt` 反查 `child=<id> corr1=<同 id> corr2=<同 id>`，命中 **13**，与含 `child=` 的文件数 **13** 相等 ⇒ 没有一发出现「两张卡不同名」）
    （例：`child=corr1=corr2=45ce09d5-6621-40c9-88ca-858f7b6b29d9`）。所以 `:466` 那一发实际是
    "在同一个名字下重放一枚已花掉的令牌"，**测的是新鲜度，不是跨卡绑定**；真正的"两张同时活着的卡、A 的令牌花到 B 上"
    这一形**本文件今天构造不出来**（加上 D2 的读数，绑定那一层全仓无尺）。
@@ -95,7 +110,10 @@
 3. **`M1、M2 会同时打红冻结件 `internal/panel/l2_grant_boundary_test.go``（进度件 §③ 第 4 行那句）本腿复核为不成立**：
    那枚冻结件的射程是**入向**envelope（它找的是本包自己的 JSON **decode** 调用与 `panel.*` 路由，见其文件头 facet 1/2/3），
    M2 是 `cmd/wisp` 往 stdout 印东西，与它无交集；M1 真形本腿刻意走**已有的 `reason` 字符串键**，
-   也不需要新增键 ⇒ **两发都不会打红那枚冻结件**。反过来说更值得记：**"用已有字符串键 smuggle 一枚令牌"这一形今天没有任何尺看得见**
+   也不需要新增键 ⇒ **两发都不会打红那枚冻结件**。
+   （支持这一句的两把现量尺：`grep -n "cmd/wisp\|run\.go\|consoleApprovalUI" internal/panel/l2_grant_boundary_test.go` ＝ **零命中**；
+   它的读盘面是本包 AST，不越界到 `cmd/wisp`。）
+   反过来说更值得记：**"用已有字符串键 smuggle 一枚令牌"这一形今天没有任何尺看得见**
    （新增 json 键那一形才有 `TestApprovalCardViewJSONKeysMatchFrontendTypes` 那把尺，而那把尺今天**本来就红**，
    在册名册见 §1.5，不能拿来当互证）。
 
@@ -145,7 +163,7 @@ FAIL	github.com/CarlosShao/wisp/internal/panel	          1.261s   ← 在册四�
 `TestPanelColourLiteralsLiveOnlyInTheGeneratedTheme`／`TestC21DesignTokensFourWayAgree`，
 **与 `197-r4` §① 登记的起手在册红同一枚数同一名字**（界面侧键名册与色表，最后一枚的红句逐字
 `read design/assets/tokens.css: … cannot find the path specified`）⇒ **相对 `subagent_blocked_197_test.go` 那一族没有多出一枚红**，
-本腿的十二发突变没在树上留下任何东西。⚠ `internal/streamkey` **没有自己的测试**（`[no test files]`），
+本腿那 14 发突变没在树上留下任何东西。⚠ `internal/streamkey` **没有自己的测试**（`[no test files]`），
 它的守卫全在 `cmd/wisp` 那枚单一铸造点钉上（§3 用得到这一条）。
 
 
@@ -328,36 +346,120 @@ $ go list -deps ./internal/streamkey | grep wisp/                 → 只有它�
 
 ## 4. 没做完／留给编排者
 
-⚠ 这一节在**骨架提交**时就写满（本仓今天死了 6 枚腿，全是"正文写完、尾部自证节留占位符"同一形状）。
-按交件时刻它会随 §1-§3 更新；此刻先如实记下列欠账：
+⛔ 不留半成品：这一节在骨架提交（`321110da`）时就已写满，以下是**交件时刻**的版本（欠账变了就改它，不删旧事实）。
 
-1. **§1 的六发突变与 §2 的定向突变此刻尚未跑完**——本骨架先落盘是为了"死 also 有判语位"，
-   不是因为已经判了。任何后来引用本件的人：读到这里往下的格，只有在 §1-§3 有逐字读数时才成立。
-2. **本腿不判票面其余 6 枚未勾框**（AC#0/#1/#2/#3/#6），也不勾任何框（⛔ 票面 `- [ ]` 一枚不碰，归编排者）。
-3. **等编排者做的台账动作**（本腿无权落 `A##`／`Q##`／`R##`，只具名提出）：
-   - `AC#5` 若本腿判成立，票面那一格仍带着"正控"半句的历史说明，翻勾文案要引本件的 §1 读数，不要引 `197-r1` 的自述。
-   - §3 的复判结论若要落地，台账 `:9776` 那一行需要**追加更正**（append-only，不删原句）。
-   - 若 §2 抓出恒真判据，需要新开一枚具名票（形状像票 220/221 那种拆法），别塞回票 197。
-4. **仪器口径限制先登记**：`-overlay` 对读盘的测试结构性失明（本用例的 `readRunLogDir197` 与 `os.Stat` 两半都读盘），
-   本腿用真文件替换做突变；哪一发用哪一半覆盖，会在 §1 逐发具名。
-5. 注释级地雷（派单第 9 条）：`cmd/wisp/resident_windows.go:81` 的过期指认本腿**不改**（归属已定为票 228 AC#7）；
-   本腿只负责核"同一行还有没有别的过期断言"，结论在 §5。
+### 4.1 等编排者做的台账／派单动作（本腿无权落 `A##`／`Q##`／`R##`，也不动票面框）
+
+1. **`AC#5` 那一格要不要翻勾**：本腿总裁＝**成立，附四条具名条件**（§0.2）。
+   翻勾文案请引本件 §1.1 的逐发读数（尤其 **M6** 与 **D3** 两发），**不要引 `197-r1` 的自述**——
+   它 §② 那句"载具扫描…`task.spawn` 回给父模型的正文"经 P1 实测**是虚的**（C1），照它写会把一格判语建立在一枚不存在的读数上。
+2. **写腿腿（下一程）的三枚修**，都是尺的修法、不是产码的修：
+   ① 被测文件末尾脚注 `M1` 那行改落点或删除（C3）；
+   ② `:254` 那枚两值集合改**逐枚哨兵表**（C2），改完必须让 **D1** 那发红；
+   ③ `:466` 那一发的名字／注释从"跨卡借证"改成实话（C4）。
+   ⚠ 这三处若由写腿动被测文件，**必须同时把 P1/M1b/D1 三发当正控跑一遍**（本腿台件可直接复用）。
+3. **建议新开一票（本腿不塞回票 197）**，判据形状两条、同一块石头：
+   - 造**两枚同时活着、不同 correlation id** 的卡，把 A 的**活**令牌花到 B 上 ⇒ 要红（今天 D2 全绿，`bindDigest` 那层零尺）；
+   - `approval.PanelItem`（`PanelAPI.Head()/View()` 的出向读面）**不得带 grant**——
+     `approval.go:223`／`pending_read.go:9`／`cmd/wisp/approval_reply.go:28` **三处注释都这么写，全仓零仪器**（M1a 实测，§1.4）。
+     最便宜的判据＝反射扫 `PanelItem` 字段名＋把 `l2_grant_boundary_test.go` 那族的射程从"入向 envelope"扩到"出向读面"。
+4. **§3 的甲／乙复判要落一次台账更正**（append-only，追加，不改 `:9776` 原句）：
+   建议措辞见 §3.5；同时把 `:8788` 那句"装配根 `cmd/wisp` 是唯一的接缝"标成**已被现形作废的历史描述**，
+   并提醒后续引用它做依赖边裁定时按 `:9761` 自己立的规矩**具名写成推广**。
+5. **`197-r1` 进度件 §⑥.3 那句"本腿按甲执行并上报"** 本腿判它**上报姿势正确**（它没有自行结案、没有动那三处、
+   也没有把"197-r3 要执行"当已完成）——这条是给它记的一枚正面事实，别在更正时顺手抹掉。
+
+### 4.2 仪器口径教训（写出来给下一腿，不属判语）
+
+- ⚠ **`go test ./...` 里的 ns/op 预算尺会被同批并跑的包饿**：M1a-sweep 那发里 `internal/risk TestResolvePerCallBudget` 红，
+  本腿随后**单独**复跑同包 ⇒ `ok 3.761s`（同发日志逐字 `277143 ns/op = 0.277 ms/op (budget 1.000 ms, 4527 samples)`）。
+  ⇒ 凡用全仓扫做突变读数，性能类判据**必须单包复跑才入账**；同一发里 `cmd/wisp` 从 126.594s 涨到 143.673s 是同一成因。
+- ⚠ **M4 这一形做不成"单点真文件突变"**：`tools.Gate` 是接口，加方法会连带要求 `internal/perm/ticket90_persist_test.go`
+  里那枚 `t90gate` 实现它——**那是冻结件，本腿不能动**。本腿改用 `-overlay` 买编译期替换（买到什么／买不到什么已写在 §1.0）。
+- ⚠ 在册常红引用时要带归因：`internal/panel` 4 枚是登记的界面键名册／色表常红；
+  `internal/ball TestC21TableColourRowsMatchTokensCSS` 的成因是**别人在工作树里删了 `design/assets/tokens.css`**
+  （未突变的基线同样红），⛔ `internal/ball`／`internal/audio` 不是本腿地界，本腿**只记归因、不判、不改**。
+- ⚠ 本腿**没有**跑过未突变的 `go test ./...` 全仓基线（只在 M1a 下跑过一次＋单独复跑 risk/ball）⇒
+  全仓基线名册请引 `197-r4` §① 与 `241-v1` 的在册读数，别当本腿的读数用。
+
+### 4.3 本腿明确没做的事
+
+- 没动票面 6 枚未勾框（AC#0/#1/#2/#3/#6 不由本腿裁）、没动任何产码、没动三枚冻结件、没动阈值／golden／`allowlist.txt`。
+- 没读 `frontend/**`／`design/**`（连结论都没引；§1.4 那句 `tokens.css` 缺失是**测试红句里的路径名**，不是本腿去读了那两层）。
+- 没 push；只 commit；每枚 commit 都带显式 pathspec（`git commit --only <那一枚文件>`）。
+
 
 ---
 
 ## 5. 本腿攻不动的地方
 
-（同样在骨架期写满，按交件时刻更新。）
+判不动就写判不动。每一格都注明**为什么**攻不动，以及本腿用别的方式旁证到了哪里。
 
-1. **"模型真的发出 tool_call"这一支攻不动**：`mockllm` 只会回显，脚本不出 tool_call，
-   所以孩子的调用是从**装配好的真桥**以孩子身份发出去的（文件 §WHAT IT DOES NOT CLAIM 自己写着）。
-   ⇒ 本腿无法判"模型侧是否也可能自批"，那一格要看 mockllm 的能力，不属票 197 AC#5，判不动就是判不动。
-2. **界面那两层攻不动**：`frontend/**`／`design/**` 是本编队两层禁（不读、结论不引），
-   工单 `:62-66` 那枚 `tasks?:` 键转绿的一跳归界面那支，本腿既不核也不判。
-3. **L1 短窗口的"被拒"攻不动**：票面 §09-29 与 `A416` 已经记载 L1 那一支在名册上恒读 `false`
-   （`LiveApprovals` 只遍历 `q.pending`），那是票 220 的地界；本腿若在这枚文件里发现同样混淆，只具名上报、不判那一格。
-4. **sha-to-ledger 那一半**：本用例**故意不**调 `publishPanelSnapshot`（197-r4 同纪律），
-   挂卡那一枚快照的 sha 落账这一跳在本腿可见范围外；`subagent_carrier_197_test.go` 那一族盖的是别的形状。
-5. **`0xc0000135` 类假红**：跑 live 用例必须带 sherpa/build 两枚 PATH，否则 `exit status 0xc0000135`
-   且没有 `--- FAIL` 行＝用例根本没跑。本腿每发都会先确认名册里出现了 `--- PASS`/`--- FAIL` 才算读数。
-6. **300 秒 C18 超时**：正控含真 L2 卡与超时路径，看到 `300.0x s` 的 FAIL 本腿先怀疑审批超时常量，不判成性能回归。
+1. **"模型真的发出 `tool_call`"那一支攻不动**：`mockllm` 只会回显、脚本不出 tool_call，
+   所以孩子的调用是从装配好的真桥以孩子身份发出的（文件 `:39-43` 自己声明，本腿同意那是
+   **mockllm 的能力问题、不是 AC#5 的格**）。⇒ 本腿**无法**判"模型侧是否也可能自批"。
+   旁证到的部分：`internal/tools/subagent_197.go:526` 那条 sink 与 `task.spawn` 那道深度检查走同一枚桥，
+   所以"身份"这一半是真的；"谁按的按钮"那一半不是。
+2. **真·跨卡绑定那一形造不出来**（不是不想造）：要把 A 的**活**令牌花到 B 上，需要
+   **两枚同时 pending、不同 correlation id** 的卡；本文件两次 `fs.write` 因 `:109` 把
+   `CorrelationID` 写成 taskID 而**共用一个名字**（13 发读数逐字如此）。
+   改那一枚常量能得到两枚不同 corr，但要用它做绑定判据就得**重排整段用例**
+   （先挂两枚都不答、再互相花令牌、再各带自己的正控）——那是**重写这枚用例的一半**，越过验收腿的射程。
+   ⇒ 判"造不出"，判据形状写进 §4.1.3 的新票；D2 那发只证明"今天没有任何东西看守绑定"。
+3. **反射腿的动态类型盲区**：`findAllowDoors197` 读的是**静态类型**（文件 `:44-49` 自己声明）。
+   "某枚字段的静态类型是 ask-only 接口、真正塞进去的具体类型带 `Allow`"这一形**这枚尺结构性照不到**；
+   M4 只覆盖"接口**声明**里出现答复动词"那一半。⇒ 另一半要另一种判据
+   （装配完成后对 `opts.Gate` 的 `reflect.TypeOf` 具体类型再扫一遍），本腿**不做、也不替它签绿**。
+4. **`sha`-to-ledger 那一跳**：本用例**故意不**调 `publishPanelSnapshot`（与 197-r4 同一纪律），
+   "挂卡那一枚快照字节 == 落账那枚 sha"在本腿可见范围外。本腿只核到替代的两条实话：
+   `snap.Pending` 里认得出这张卡（`snapClearedCar`，基线绿）**且**这一程至少落账过一枚快照
+   （`:356` 那条 `ledgerSummaries145` 非空，基线绿）。
+5. **界面那两层攻不动**：`frontend/**`／`design/**` 两层禁（不读、结论不引）。
+   工单 `:62-66` 那枚 `tasks?:` 键转绿的一跳归界面那支；本腿唯一与它们沾边的一条读数是一个**测试红句里的路径名**
+   （`design/assets/tokens.css` 不存在），那不是本腿去读了那两层。
+6. **L1 那一半"被拒是谁给的"不归本腿判**：票面 §09-29 与 `A416` 记载 L1 短窗口在名册上恒读 `false`
+   （`LiveApprovals` 只遍历 `q.pending`），那是票 220 的地界。本腿只把**这枚文件里**的 L2 承重防呆验了（D4），
+   没有替票 220 判任何东西。
+7. **两枚仪器坑本腿是绕过去的、不是攻不破**：每发都带 sherpa＋build 两枚 PATH，
+   14 发读数**每一发都出现 `--- PASS` 或 `--- FAIL` 行**（⇒ 没有一枚是 `0xc0000135` 那种"根本没跑"）；
+   最长一发 31.12s（D4），**没有一枚接近 300.0x s**，所以本件里没有 C18 审批超时混进来的红。
+8. **注释级地雷：同一枚过期指认不止那一行（派单第 9 条要的"别的过期断言"）——本腿一行未改，具名上交**
+   本腿自己确认 `07-ball-state-machine-core-done.md` **在盘上＝票 07 早已结案**，然后把
+   "球／托盘图标／GUI 归票 07"这一类指认在 Go 侧逐枚抽了出来：
+
+   | 落点 | 逐字片段 | 本腿判读 |
+   |---|---|---|
+   | `cmd/wisp/resident_windows.go:81` | `the floating ball arrives in ticket 07` | **已知过期**（已登记为票 228 AC#7），本腿不改 |
+   | `cmd/wisp/main.go:25` | `wisp GUI resident process (boots the runtime skeleton, empty event loop; the floating ball window is ticket 07)` | ⚠ **同一类，而且它不是注释——是 `wisp -h` 打给用户的 usage 正文**；后果比 :81 重（过期指认会被 owner 当场读到） |
+   | `cmd/wisp/main.go:8` | `The floating ball GUI is ticket 07.` | 同一类（Ticket 03 scope 注释里的将来时归属） |
+   | `cmd/wisp/notify_windows.go:12` | `the resident process's own tray icon is ticket 07/62's, in internal/ball` | 同一类，且**同时**指向票 07 与票 62（票 62 也早已结案） |
+   | `internal/proc/boot_windows.go:127` | `ball bring-to-front lands with ticket 07` | 同一类；⚠ `internal/proc` **不在本腿写面**，本腿只读了一枚函数体确认这行真会打到日志里 |
+   | `cmd/wisp/console_other.go:7`／`console_windows.go:26` | `links as a GUI-subsystem binary (ticket 07)`／`the windowsgui subsystem (the final GUI build, ticket 07)` | **未判**（这两句像历史归属而非将来承诺；要判得先查那次链接改动出自哪枚票，本腿没有据此下结论） |
+   | `cmd/balldebug/main.go:3`／`:590` | `the ticket 07 debug harness` | **未判**（balldebug 是已交付台件，归属看起来成立；那一带属球的地界，本腿不归因） |
+
+   ⇒ **给编排者的一句话**：票 228 AC#7 现在的完成判据只钉 `resident_windows.go:81` **一行**，
+   而同一类过期归属在 `cmd/wisp`／`internal/proc` 里**至少还有四行**（其中一行是**打给用户看的正文**）。
+   照现有判据改完，这条链会在下一个文件里继续传——**这正是 `240-c1 → 241-r1` 那三程传递的形状，只是这次不是一行是一族**。
+   ⛔ 本腿一行未动（既没改 `cmd/wisp` 里那几处，也没碰 `internal/proc`）。
+
+---
+
+## 6. 终态自证（交件时刻现跑）
+
+钟：`2026-09-30 15:19:39 +0800` 落笔上一节，下面这组读数在 **2026-09-30 15:24:49 +0800** 前后全部现跑（同一把 `date` 现读），全部**在 14 发突变都已还原之后**：
+
+| 尺 | 读数 |
+|---|---|
+| `go build ./...` | **rc=0** |
+| `/d/work/base/gopath/bin/gofumpt.exe -l internal/ cmd/` | **输出空**（rc=0）＝没有一枚文件待格式化 |
+| `./tools/d22scan/d22scan.exe -root .` | **`clean - no D22 ban violations`，rc=0**；口径提示：`ban #8 internal/=473`、`cmd/=65` 是**被扫文件数**（含 `_test.go`），不是违规数；那句 `skipped as git-ignored: 1 file(s) under frontend/dist/assets/` 是既有 gitignore 形状，不是本腿留的 |
+| **`git status --porcelain -- internal cmd`** | **空＝与本腿起手名册相同**（起手也是空；⛔ 本件不写"必须为空"这种绝对式，只写"等于起手名册"） |
+| `git status --porcelain .scratch/wisp/issues/` | **空**＝票面一枚 `- [ ]` 都没碰（翻勾归编排者） |
+| `git status --porcelain docs/PLAN.md docs/specs tools/d22scan/allowlist.txt internal/observe/thresholds.go internal/panel/tokens_fourway_test.go internal/panel/l2_grant_boundary_test.go internal/perm/ticket90_persist_test.go` | **空**＝冻结件与阈值一字节未动 |
+| 每发突变后的还原自证 | 14 发里**动过盘上文件的那 13 发**全部逐枚打印 `RESTORE <path> bytes=<n> exact=True`（M4 走 `-overlay`，盘上文件自始至终没被写过，因此它没有 RESTORE 行——这正是选它的原因），且每发末尾 `git status --porcelain -- internal cmd` 回 `''`（驱动器 `mut.py` 的 finally 分支，跑失败也还原） |
+| 本腿自己的一发废读数（具名，不藏） | M4 **第一次**跑出来是 `[setup failed]`，红句逐字 `found packages tools (bridge.go) and approval (gate.go) in ...internal\tools`＝**本腿驱动器自己的 bug**（overlay 的虚拟文件用 basename 命名，两枚同名 `gate.go` 撞成一枚），不是被测物的读数；修完（加序号前缀）复跑才是 §1.1 表里那一发 M4 |
+| 别人在工作树里的脏文件 | `.gitignore`／`design/**` 那 16 枚删除／`docs/evidence/s1/152-*`／`.scratch/wisp/probes/**` **原位未动、未提交**（本腿只往 `probes/197/v1/` 里**新建**台件，只建不删） |
+
+本腿自己的 commit 名册（**全部只碰这一枚证据件，全部带显式 pathspec，全部未 push**）：
+`321110da`（骨架，§4/§5 起手即满）→ `ccc1b1cc`（§1-§3）→ 本节所在的那一发。
+
