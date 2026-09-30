@@ -92,12 +92,67 @@ M4 那发把它照了出来（nil-recorder 用例在突变下打出 `GRANT-RECOR
 
 ### 真 `tool_call.grant_id` 列的覆盖
 
-（待填）
+两处，各管一头：
+
+| 落点 | 钉住什么 | 现跑读数 |
+|---|---|---|
+| `internal/tools/ticket224_grantid_column_test.go`（1 枚用例） | 桥写的值经**真 `memory.Store`** 落进列、再由第二个句柄按 (task, corr) 读回；断言是**连接**而不是指针：`grant_id` 必须指向一枚真实存在的 `approval_grant` 行（同 tool 同 pattern、未撤销）；对照组＝同库同一次启动里未授权那一发必须 `NULL` | 正常码 `--- PASS`（0.07s）；突变 M5（`bridge.go:1116` 的 `if grantID != 0 {` 改 `if false {`）⇒ **本枚红**，且 `grant_test.go:445` 那枚桩侧同红（说明这一发的牙两半都有）；还原后 `internal/tools` 全绿 12.263s，`bridge.go` 50699→50699 |
+| `cmd/wisp/ticket224_assembly_test.go` 第二枚用例 | 装配根铸的 ledger + 装配根的桥 + 真 store：命中授权的那发 `decision=allow_session_grant` 且 `grant_id`＝真行 id，未命中那发 `cards=1`／`grant_id=NULL` | `--- PASS`（2.98s） |
+
+为什么这比 224-v1 §2-③ 说的"零覆盖"多了一寸：`internal/memory/dao_test.go:355` 单独往返过这一列，
+`grant_test.go:445` 单独断过桥递出的指针，**两半从来没接起来**——桥到 DAO 之间丢掉这一列，全仓没有一枚用例会红。
+
+### 装配侧两枚（N#1 的写／读两格）
+
+`cmd/wisp/ticket224_assembly_test.go`〔本腿新建，`grep -c '^func Test'`＝3〕：
+
+- `TestTicket224SessionVerbPutsARowOnDiskInTheAssembledRun`＝**写**格。答复走 `runSpec.reply`
+  那枚 CLI 注入缝（AGENTS.md §1.3 允许的形状，不是 mock 顶替真件），断言盘上的行的
+  `pattern` **等于卡片自己印的路径**（不是本测试自己写的串），`scope/session`、`tool` 取自卡片、
+  `expires_at > created_at`、`revoked_at IS NULL`，另断审计行的 `grant_id`＝真行 id、
+  且**第二个句柄按铸造 id 读得回来**。M4 下这一枚**红**（`0 approval_grant rows ... want 1`，逐字带铸造 id 与卡片印的路径）。
+- `TestTicket224LiveGrantStopsTheAssembledBridgeFromAsking`＝**读**格（见上一节）。
+- `TestTicket224ProductionSessionDoesNotSurviveRestart`＝N#2，见 §2。
+
+⚠ 观测口径：两枚都读 `rt.windowCount()`（**弹卡计数**），⛔ 不读"有没有被拒"——
+224-v1 §6-b 第 3 条点名的正是那一形（L1 窗口超时＝放行，"被拒"是那道门给的，不是权限判定给的）。
 
 
 ## §2 N#2 幻影用例：写用例还是改注释
 
-（待填）
+**选了"写用例"，并且同时改了注释。** 理由一句话：那三处注释指的东西（跨启动的铸造者、
+测试字面量锁的"贵方向"、票面⑩ 的①②两件控制）**本来就是判据缺的那一格**，把注释删掉只是把
+缺口换个写法留在盘上；写出来才让 AC#3 那一格有可跑的东西。而注释也一律改了——因为用例存在之后，
+原话"cross-process／needs two boots"仍然**过量声称**，必须带上判定上限。
+
+- 用例：`cmd/wisp/ticket224_assembly_test.go` 的 `TestTicket224ProductionSessionDoesNotSurviveRestart`
+  （名字逐字等于三处注释指的那枚）。台架＝`run_mode101_test.go` 的 `t101host`（同目录第二次 `runTextTask`）。
+- 票面⑩ 的三件控制，缺一不算判据：
+  ① 两次装配铸出两枚不同 id（`id2 == id1` 直接 `t.Fatalf`）；
+  ② 用 boot 1 的生产 id 写、再用 boot 2 的生产 id 查 ⇒ **0 行**；
+  ③ 同一发 `fs.write` 走**真 `rt.bridge.Execute`**（经 `t101call`）⇒ 第二次**弹卡 ≥ 1**，
+     并另断那一行的 `decision != allow_session_grant` 且 `grant_id IS NULL`。
+  ⚠ ③ 的极性与 224-v1 §6-b 第 3 条一致：断的是**有没有弹卡**，不是"有没有被拒"（L1 窗口到点＝执行）。
+- 反控实测〔我现跑，M1＝`internal/session/session.go:99` 的 `Mint()` 改成派生十六进制串，
+  即 224-v1 §2 表那一发〕：
+
+  ```
+  --- FAIL: TestTicket224ProductionSessionDoesNotSurviveRestart (0.93s)
+      ticket224_assembly_test.go:481: the second assembly minted boot 1's identity
+      "sess_776973702d7069642d64657269766564": 「本次会话内」 would then be a permanent pass, ...
+  --- FAIL: TestTicket224MintIsRandomAndValid / TestTicket224CoveringDoesNotCrossToANewSession  (internal/session)
+  ```
+
+  还原：`git cat-file blob HEAD:internal/session/session.go > 同路径`，`wc -c`＝4174→4174，突变标记计数 0。
+- 判定上限（**逐字写在用例文件头部**，不在本表代它声称）：`run_mode101_test.go:72-76` 那句
+  `"Restart" in every case below is a second runTextTask over the same dir: a new process surface`
+  ＋ `:143-158` 的 `start` ⇒ 第二次装配**仍是同一个测试进程**。
+  ⛔ 因此今天全仓没有任何仪器能区分"重启"的两种含义，这条上限同时打在交件那枚旧钉、
+  本腿这枚新用例与票面⑩ 的措辞上；要真两枚 OS 进程得另建台架，本票没有那条时间预算。
+- 三处注释的处置（票面锚点 `:20`／`:94`／`:134` 的三处，本腿现跑 `grep -n` 落在
+  `internal/session/grants_test.go:23`／`:99`／`:145`；外加第四处 `internal/tools/grant_test.go:6`）：
+  逐枚改成**"该用例现在存在＋它声称得了的那一半"**，⛔ 不留"指着不存在的东西"的指针，也不留过量声称。
+  `git diff --numstat` 删除列＝5／1，与替换行数相等（没有吞行）。
 
 ## §3 N#3 `run_mode101_test.go` 注释半的改写账户
 

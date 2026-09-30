@@ -20,6 +20,13 @@ package session
 //	      TestTicket224ProductionSessionDoesNotSurviveRestart; a derived id makes
 //	      AC#3's case red by construction, and the row-lock test says why
 //
+// ⚠ That cmd/wisp case is a pointer to a REAL case since ticket 224-r2
+// (cmd/wisp/ticket224_assembly_test.go); before that it named a test nobody had
+// written, which 224-v1 §6-a judged as this ticket's heaviest defect. Read its own
+// header for what it can and cannot claim: its "restart" is a SECOND ASSEMBLY
+// inside the same test process, so it proves the minted key changes per assembly -
+// not per OS process, which no instrument in this repository distinguishes.
+//
 // AC#2's 写/读/失效 are three functions because the AC says they must be, and the
 // reason is in internal/perm/ticket90_persist_test.go's header: a merged
 // persistence case can only ever be satisfied by the looser half.
@@ -89,9 +96,15 @@ func (b brokenStore) ListGrantsBySession(context.Context, string) ([]memory.Appr
 // deriving from the process number, the clock, the working directory or anything
 // else recomputable. Two mints INSIDE one process share all of those inputs, so
 // any derivation from them would collide here - which is the strongest form of
-// this claim a single-process test can make. The cross-process form
-// ("两次启动断两枚 id 不等") needs two boots and lives in cmd/wisp:
-// TestTicket224ProductionSessionDoesNotSurviveRestart.
+// this claim a single-process test can make. The second-boot form
+// ("两次启动断两枚 id 不等") is cmd/wisp's
+// TestTicket224ProductionSessionDoesNotSurviveRestart (ticket224_assembly_test.go,
+// written by 224-r2; this comment pointed at that name for a case that did not yet
+// exist). ⛔ Its ceiling has to travel with any quote of it: that case's second
+// boot is a second assembly in the SAME test process, so neither this file's
+// same-process pair nor that case distinguishes "restart" as a new OS process -
+// which is why this function asserts 200 distinct mints rather than trusting
+// construction.
 func TestTicket224MintIsRandomAndValid(t *testing.T) {
 	seen := map[ID]bool{}
 	for i := 0; i < 200; i++ {
@@ -130,8 +143,12 @@ func TestTicket224MintIsRandomAndValid(t *testing.T) {
 // could ever equal one, AC#4's control would go green while granting nothing.
 //
 // This is the cheap direction. The expensive direction - "a session the REAL
-// assembly minted is never one of those literals" - needs the production minting
-// point and lives in cmd/wisp's TestTicket224ProductionSessionDoesNotSurviveRestart.
+// assembly minted is never one of those literals" - is asserted by the production
+// minting point in cmd/wisp's TestTicket224ProductionSessionDoesNotSurviveRestart
+// (cmd/wisp/ticket224_assembly_test.go, written by ticket 224-r2; until then this
+// comment pointed at a name no file defined). That case compares BOTH of its
+// boots' minted ids against both literals, so the lock now has both directions,
+// with the same ceiling as everywhere else here: two assemblies, one test process.
 func TestTicket224TestLiteralsAreOutsideTheMintedShape(t *testing.T) {
 	for _, lit := range []string{
 		"session-before-restart",

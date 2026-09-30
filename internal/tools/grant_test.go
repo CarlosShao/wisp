@@ -5,7 +5,9 @@ package tools
 // These are the internal/tools half of AC#2's 读 leg. The 写 and 失效 halves have
 // their own cases elsewhere on purpose (internal/session/grants_test.go books the
 // row and measures invalidation against a second minted identity; cmd/wisp's
-// ticket224 production case runs a whole boot). AC#2's own wording is why they
+// ticket224_assembly_test.go, added by ticket 224-r2, runs whole boots and reads
+// the real tool_call.grant_id column back off disk - see
+// ticket224_grantid_column_test.go for the store-side half of that). AC#2's own wording is why they
 // are not one test: "三格各自有独立用例，不许合并成一枚持久化用例", and
 // internal/perm/ticket90_persist_test.go's header says the same thing about the
 // restart pair - a merged persistence case can only ever be satisfied by the
