@@ -17,7 +17,8 @@ import (
 
 // runResident is the no-args path: boot (env layout, Job Object, single
 // instance, goroutine registry), host the floating ball window and its tray
-// (resident_ball_windows.go), run the empty event loop, then exit through
+// (resident_ball_windows.go), take the task source AC#7 added
+// (resident_task_source_windows.go), run the event loop, then exit through
 // the D38(e) shutdown order. A second launch in the same session signals the
 // running instance's activation event and exits (D42#7).
 //
@@ -159,6 +160,22 @@ func runResident() {
 		fmt.Printf("wisp: 退出序列第 3 步未注册（%v）：卡片挂起时收到退出信号，这一步会被记为 skipped\n", err)
 	}
 
+	// Ticket 246 AC#7: the hop every earlier leg left open. The gate above can
+	// show a card, the ball above can veto one and step 3 above can refuse one on
+	// the way out - and AskOnTaskRoot / askConfirmation still had zero product
+	// callers, so nothing was going to raise one. This call is the caller: it reads
+	// the operator's console through interactiveStdin() (the same gate ticket 201's
+	// answer side uses, and the only one this process may test), assembles the task
+	// pipeline through cmd/wisp/run.go with ra's gate injected, and books the two
+	// D38(e) steps that entry owns (1 and 7). Every degraded branch inside it - no
+	// console, no config.toml, no credential - prints and returns nil, because the
+	// only condition that may stop this boot is the one ticket 128 settled.
+	//
+	// It runs after bindBallHost so the veto channel this leg advertises is
+	// already the honest one, and before the report below so the step roster the
+	// report prints includes whatever this registered.
+	src := startResidentTaskSource(rt, ra)
+
 	// The boot report names the steps this process really owns, taken off the
 	// registration rather than off a comment (AC#4's "不许撒谎" half).
 	registered := rt.RegisteredShutdownSteps()
@@ -166,20 +183,22 @@ func runResident() {
 	for _, s := range registered {
 		names = append(names, fmt.Sprintf("%d:%s", int(s), s.Name()))
 	}
-	fmt.Printf("wisp: %s; D38(e) steps with an owner in this process: %s\n",
-		ra.residentStatusLine(), strings.Join(names, ", "))
+	fmt.Printf("wisp: %s; 任务来源：%s; D38(e) steps with an owner in this process: %s\n",
+		ra.residentStatusLine(), src.taskPosture(), strings.Join(names, ", "))
 
 	// The boot report has to match what happens next: if an exit request already
-	// arrived during the ball path, printing "empty event loop running" and then
+	// arrived during the ball path, printing "resident event loop running" and then
 	// never entering the loop would be exactly the kind of sentence AC#7 exists
-	// for. The ball status is true in either branch, so it prints in either.
+	// for. The ball status and the task-source posture are true in either branch,
+	// so they print in either.
 	var reason string
 	select {
 	case sig := <-bootExit:
 		reason = "exit request (" + sig.String() + ") arrived during boot; the event loop was never entered"
 		fmt.Printf("wisp: %s; %s\n", reason, rb.statusLine())
 	default:
-		fmt.Printf("wisp: empty event loop running (no task is taken by this loop yet); %s (Ctrl+C exits cleanly)\n", rb.statusLine())
+		fmt.Printf("wisp: resident event loop running (task source: %s); %s (Ctrl+C exits cleanly)\n",
+			src.taskPosture(), rb.statusLine())
 		reason = rt.RunEventLoop()
 	}
 	fmt.Printf("wisp: event loop ending (%s); running the D38(e) shutdown order\n", reason)

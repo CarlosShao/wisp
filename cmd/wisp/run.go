@@ -244,7 +244,7 @@ func runTextTask(s runSpec) int {
 	if s.onRuntime != nil {
 		s.onRuntime(rt)
 	}
-	return rt.execute(task)
+	return rt.execute(s.taskCtx, task)
 }
 
 // runtime is the assembled S1 stack.
@@ -941,7 +941,14 @@ func (rt *agentRuntime) noteTask(taskID string) {
 }
 
 // execute runs one task through the loop and presents the result.
-func (rt *agentRuntime) execute(task string) int {
+//
+// parent is the context the task derives from, and the three-way default is the
+// whole of ticket 246 AC#7's ruling 2.3: a caller that names none gets
+// context.Background() (what `wisp run` has always meant - the process IS the
+// task's lifetime), a run assembled with runSpec.taskCtx gets that host's task
+// root, and a host that submits one task at a time passes a root derived from it
+// so a single task can be cancelled without touching the entry that produced it.
+func (rt *agentRuntime) execute(parent context.Context, task string) int {
 	cfg := rt.cfg
 	prov := rt.provs[0]
 	info := prov.Info()
@@ -1024,13 +1031,15 @@ func (rt *agentRuntime) execute(task string) int {
 	rt.setInstructionLoader(instrLoader)
 	loop.AttachProjectInstructions(instrLoader)
 
-	// The task's own deadline rides on the parent this host named (runSpec.taskCtx,
-	// ticket 246 AC#7's ruling 2.3). For `wisp run` the parent is
-	// context.Background(), which is what this line always produced: the process
-	// IS the task's lifetime. For the resident leg the parent is that process's
-	// task root, so D38(e) step 3's cancel is what ends a running task rather
-	// than a sentence about it.
-	baseCtx := rt.spec.taskCtx
+	// The task's own deadline rides on the parent named above (ticket 246 AC#7's
+	// ruling 2.3). For `wisp run` that is context.Background(), which is what this
+	// line always produced. For the resident leg it is a root under the ctx that
+	// D38(e) step 3 cancels, so "leaving cancels the running task" is a mechanism
+	// and not a sentence.
+	baseCtx := parent
+	if baseCtx == nil {
+		baseCtx = rt.spec.taskCtx
+	}
 	if baseCtx == nil {
 		baseCtx = context.Background()
 	}

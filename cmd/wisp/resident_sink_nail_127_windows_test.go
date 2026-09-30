@@ -94,7 +94,29 @@ const (
 	residentInstallMsg = "wisp: persistent log sink installed"
 	// residentReachedLoop is printed by runResident only after the install
 	// attempt and the shutdown defer are both behind it.
-	residentReachedLoop = "empty event loop running"
+	//
+	// RE-ANCHORED by ticket 246 AC#7 (leg 246-r2), and the reason is this file's
+	// own rule rather than a convenience: the sentence it pointed at said "empty
+	// event loop running (no task is taken by this loop yet)", and AC#7 is the
+	// increment that makes that clause false - the resident leg now has a task
+	// entry, so the landmark had to move onto the part of the sentence that is
+	// still doing the same job. What the claim protects did not move and is not
+	// weaker:
+	//
+	//   - duty 1 (the sink landmark): this line still only arrives from the branch
+	//     that ran AFTER installLogSink and the shutdown defer, so a child whose
+	//     console never reaches it is still read as "the disk record proves
+	//     little";
+	//   - duty 2 (no earlier start record): unchanged, and it is the record index
+	//     assertions above that carry it, not this string;
+	//   - delete the replay in cmd/wisp/logsink.go and these cases still go red on
+	//     record 0, exactly as before.
+	//
+	// The new token is true in BOTH branches of the print (console entry wired or
+	// not) and false in the during-boot-exit branch, which is the same shape the
+	// old one had. The task-source posture now rides on the same line, and a case
+	// in resident_task_source_246_windows_test.go reads that half.
+	residentReachedLoop = "resident event loop running"
 	// residentRefusalPrefix is the loud fallback that must appear on the
 	// console when the sink cannot be installed, and residentRefusalPromise is
 	// the half of that sentence telling the operator what is lost.

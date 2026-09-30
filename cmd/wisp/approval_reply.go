@@ -514,6 +514,17 @@ func (rt *agentRuntime) newReplySurface(root *observe.Root, vetoChannel approval
 	return surface
 }
 
+// splitReplyLine is the console's line grammar, extracted from runReplyLoop by
+// ticket 246 AC#7 so the resident leg's single console reader can use the SAME
+// parse. It is two Cut calls and not an authority: which verbs mean what is
+// replySurface.handle's business, and a host that parsed lines its own way would
+// be a second copy of the one thing that decides whether an answer counts.
+func splitReplyLine(line string) (verb, corr, arg string) {
+	verb, rest, _ := strings.Cut(line, " ")
+	corr, arg, _ = strings.Cut(strings.TrimSpace(rest), " ")
+	return verb, corr, strings.TrimSpace(arg)
+}
+
 // runReplyLoop reads the operator's answers until the stream ends or the run's
 // reply root is cancelled.
 func runReplyLoop(ctx context.Context, s *replySurface, in io.Reader, out io.Writer) {
@@ -527,9 +538,7 @@ func runReplyLoop(ctx context.Context, s *replySurface, in io.Reader, out io.Wri
 		if line == "" || strings.HasPrefix(line, "#") {
 			continue
 		}
-		verb, rest, _ := strings.Cut(line, " ")
-		corr, arg, _ := strings.Cut(strings.TrimSpace(rest), " ")
-		arg = strings.TrimSpace(arg)
+		verb, corr, arg := splitReplyLine(line)
 		if verb == "quit" {
 			fmt.Fprintln(out, "wisp run: 答复监听已退出；卡片仍在等待，未答复的那一张按各自的超时处理")
 			return
