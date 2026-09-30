@@ -19,6 +19,28 @@
 
 - [ ] **AC#1.. 待 `246-a1` 交回后由编排者落**（现在填＝凭想象写判据，本仓已因此白跑过两次）。
 
+## 编排者裁定 — 09-30 **18:40**（账 `A481`）：`246-a1` 两形代价已交，**我裁走乙（装配根注入）**；AC#0 翻勾，判据从"待补"改成本票下面的六格
+
+**盘上实证**：表 `.scratch/wisp/probes/246/a1/census.md`＝**206 行／31,880 字节、真占位符 0 枚**；四枚 commit 逐枚 `git log -1` 复认（「f9cbe725 骨架 18:29 → 63508c50 填满 18:38 → 56c6c46f 票面一行 18:38 → 2e67b24f 起手名册 18:39」）；它零改产码（`git status --porcelain internal cmd docs/PLAN.md`＝**0 枚**）、票面 AC 框一枚未动。
+**我另跑的三把复认尺（乙形的三条承重理由我逐条自己读过，不是信它）**：① `cmd/wisp/approval_reply.go:67` 与 `cmd/wisp/run.go:47` **今天就在产码里 import `internal/agent/approval`** ⇒ 乙形**确实零新增包级边**；② `cmd/wisp/run.go:336 assembleRuntime`／`:782 (*agentRuntime).close` 在场，而常驻那条腿 `cmd/wisp/resident_windows.go:118` 只做了 `rb := startResidentBall(rt.Registry)` ⇒ 甲形要复刻 `assembleRuntime` ＝**在同一棵树里造第二个审批门真相源**；③ `internal/proc/boot_windows.go:151-161` 现读逐字 `hooks := ShutdownHooks{}` 之后**只填 `CloseJob`** ⇒ D38(e) 十步里第 1–7 步今天**零生产者**（它这条判语成立）。
+
+## 灰区那一枚，我自己裁（⛔ 不摆给 owner，因为代码自己的注释已经答了）
+
+`246-a1` 把"给 `proc.Shutdown` 补钩子注册入口算不算契约面"判不动上交。我裁：**不算**。凭据是那段注释**逐字**写着「Later tickets register their hooks on the same sequence - **the order itself is frozen and audited**」（`internal/proc/boot_windows.go:148-150`）⇒ 冻结的是**顺序**，注册入口是它**预先写给后续票的**。本条即批准记录；⛔ 十步顺序一字不许动，只准往里挂钩子。
+
+## 判据（本票现行射程＝最短链：让一张真卡片进得来、Esc 真能否决一次、退出时不撒谎）
+
+- [x] **AC#0 两形代价摆开并裁完**（凭据＝上面三把我自己跑的尺＋表 §甲/§乙；裁定＝**乙**）。
+- [ ] **AC#1 装配根注入一枚真审批门到常驻腿**：由 `cmd/wisp`（装配根）把 gate 递进常驻那条腿，⛔ **不开任何新包级依赖边**（尺＝`go list -deps`／import 差集落地前后**逐名相同**）。完成判据＝差集现跑读数进表。
+- [ ] **AC#2 一张真卡片能在常驻进程里挂起来**：走 `gate.go:188/246/415`＋`replies.go:252/455` 那一族既有机制造**真**待决项（⛔ 不许 mock 代替真的来报完成），状态机真进 `Confirming`。**可见证据今天只到"日志＋状态位"那一层**：⛔ 面板开不出来是既成事实（`approval_always.go:165` 逐字 this binary links no WebView2 host），所以这一格**不许写成"用户看得见卡片"**。
+- [ ] **AC#3 `Confirming` 期间 Esc 真能否决一次、完事归还**：复用票 245 那套"第二个进程观察 Esc"的台件（⚠ 与票 245 AC#9 有先后：**台件先进仓，本格才守得住回归**）；完成判据＝借到／否决生效／归还后另一进程收得到 Esc 三形读数都在。
+- [ ] **AC#4 卡片挂着时收到退出信号不许撒谎**：D38(e) 顺序一字不动，把"取消任务根"做成**真注册的钩子**（现在只填 `CloseJob`＝第 1–7 步零生产者），并保证待决卡片在退出路径上被判**拒绝＋留审计**；完成判据＝一发真机：卡片挂起 → 发退出 → `StepRecord` 里那一步**不是 skipped**，且 `problems()` 不冒出"有未注册产物"的假账。
+- [ ] **AC#5 起手第一发必须先归因那枚红**：`cmd/wisp` 默认层今天有**一枚未归因的红**（用例名丢失，账 `A480` ④）⇒ 本腿开工前跑默认层、把红名取出来、判"起手即在 vs 本票造成"，读数写进表 §门禁；⛔ 不许当已知常红略过、也不许顺手修别人的东西。
+- [ ] **AC#6 四条否决通道的其余三条不许顺手做**：单击球与 KWS 否决词、面板拒绝本票**不实现**（面板属前端会话、由 owner 自己带话；KWS 属唤醒词那一段）⇒ 完成判据＝票面「Progress log」具名写"本票只落 `Esc` 一条通道，另三条各有归口"，⛔ 不许留成"看起来四条都通了"。
+
+**归口（`246-a1` 的 D-1..D-5，我一枚没动）**：proc 七步空转＝本票 AC#4；缺注册入口＝本票 AC#4 的前置（灰区已裁）；过期注释两处（含 `ball_windows.go:809-812`）归票 228 后续片与票 245；那枚红归因＝本票 AC#5；`ball.New` 失败路径清理归票 228。
+**串行**：本票动 `cmd/wisp`＋`internal/proc` ⇒ ⛔ 与票 228 后续片、票 245 AC#6..AC#9 全部串行；派单必写"此刻哪几枚包有别的写腿"。
+
 ## 禁区
 
 - ⛔ 不动 `docs/PLAN.md`／`docs/specs/**`／`docs/SLO.md`／`internal/observe/thresholds.go`／golden／`allowlist.txt`／三枚冻结件（`internal/panel/tokens_fourway_test.go`／`l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`）；D43 转移表那句"四条否决通道"**本票只能去实现它，不能去改它**。
