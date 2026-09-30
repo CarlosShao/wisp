@@ -118,7 +118,95 @@
 
 ## §2 AC#2 判语：两枚断点有没有逐条判、有没有默默留空
 
-（待填）
+**判语：成立（附两枚具名条件）**——两枚断点都逐条给了判、没有默默留空、也没有把"生产那一环"假装做完；
+但**环② 的闭合形状带一枚本票新开的 panic 面**，而**欠票的那两个名里有一枚是已关闭的票**。两枚都具名在下面。
+
+### 2.1 "有没有假装做完"这一格：本腿现跑尺，一票否决形状先排掉
+
+派单点名要核这一条。尺与读数（本腿 14:1x 现跑）：
+
+- `grep -rln "CarlosShao/wisp/internal/audio" --include=*.go .`（排 `.scratch`）⇒ **零命中**。
+  ⇒ 票面事实 3"采集栈写完零 importer"交件时**仍未被本票改变**，`internal/audio` 之外没有任何新增接线。
+- `grep -rn "FrameLevel|LevelOfSamples|DecodeFrame|EncodeFrame|LevelFullScale|SineLevelTolerance|FullScaleSquareLevel|LevelLSB|MinLevel|MaxLevel" --include=*.go internal cmd tools scripts`（排 `internal/audio/`）
+  ⇒ **与本票符号相关的生产命中：零**。唯一那几条命中是 `cmd/wisp/leg_sink_nail_131_windows_test.go:333`
+  与 `resident_sink_nail_127_windows_test.go:140/457` 的结构体字段 `MinLevel string `json:"min_level"`
+  ——**同名不同物**（日志档位，不是电平），本腿逐行读过才这么判；它不是本票的消费者，也不会与本票的常量冲突（不同包、不同类型）。
+  ⚠ 顺手给编排者一句：`MinLevel`/`MaxLevel` 这对手感很泛的名字将来会被装配根 import，
+  到时候与日志/配置侧的同名概念在同一个文件里并存，**是命名债不是今天的缺陷**。
+- `grep -rn "Sqrt" --include=*.go internal cmd tools`（排 `_test.go`）⇒ 生产命中只有 `internal/audio/level.go:105` 一枚。
+
+⇒ **结论：它没装。** 交件自述（`241-r1` §4 表格）说的是"补到测试级消费者路径为止"，并把生产那一半具名欠出去；
+盘上事实与这句话**逐字相符**，不存在"注释里有个不存在的调用者"那一形（本腿按 09-30 那条教训专门查了这一枚）。
+
+### 2.2 环②（`encodeFrame` 未导出）：方向补齐了，**编码那一半是partial**
+
+做了的（本腿逐行现读）：`encodeFrame` → `EncodeFrame`（`wavinjector.go:138`），
+`git show 193daefb` 的 diff 本腿逐字节读过——**两处调用点同批改完**（`wavinjector.go:129`、`wasapimic_windows.go:231`），
+函数体逐字未动（含尾零填充），语义确实"改名前后相同"，r1 这句成立。
+新增 `DecodeFrame`（`level.go:137`）是全仓此前不存在的反向工具（普查 R21 逐字"全仓无 `PCM16ToFloat`/`decodeFrame`"）。
+包内测试 `TestSeamCodecRoundTrip`（`level_test.go:276`）钉往返、尾零、奇数字节拒解、**并单独钉了小端字节序**。
+
+⛔ **但本腿的探针抓到一枚未声明的前置**（存档 `probe-readings.txt`，14:07:41）：
+
+```
+V1API EncodeFrame panics on over-length input: runtime error: index out of range [1024] with length 1024
+```
+
+- 复现形状：`EncodeFrame` 收到 **513 枚** `int16`（`FrameSamples+1`）。函数体是
+  `frame := make([]byte, FrameBytes)` 后 `for i, s := range samples { frame[2*i] = ... }`（`wavinjector.go:139-143`），
+  **既没检查也不文档化 `len(samples) <= FrameSamples`**。
+- 今天打不到：两处生产调用点都把长度夹在 `FrameSamples` 以内（`wavinjector.go:129` 的 `min(off+FrameSamples, len(...))`、
+  `wasapimic_windows.go:231` 的 `pending[:FrameSamples]`），本腿逐行核过。⇒ **不是线上缺陷。**
+- 但它是**本票新开的一枚面**：改名之前 `encodeFrame` 是包内私有，调用者只有那两枚、夹得住；
+  导出之后它的消费者恰恰是"装配根里那个还没写的循环体"（正是 §2.3 欠出去的那一环），
+  而那一步最自然的写法就是"把手上攒的样本一把丢进 `EncodeFrame`"。
+  **测试名册对此是空的**：`grep -n "EncodeFrame(" internal/audio/*.go` ⇒ 九处引用全是 ≤512 枚的正常帧
+  与一枚 2 样本的小帧，**没有一枚喂过 `FrameSamples+1`**（本腿现跑名册，不是推断）。
+- 与另一半还**不对称**：`DecodeFrame` 明确文档化"any whole number of samples"（`level.go:135-136`），
+  本腿实喂 2048 字节 ⇒ 解出 1024 样本、`err=nil`（读数 `V1API DecodeFrame(2048 bytes) -> 1024 samples`）。
+  **解码是全函数、编码是偏函数，而这份不对称只写在了一半上。**
+- 判语分量：**不推翻 AC#2 的字面要求**（它的要求是"要么补上并给出包内测试，要么具名留给哪枚票"，它补了、也测了）。
+  记为**附条件①**：导出形带一枚**未声明、未文档、零测试覆盖**的 panic 前置。
+  修法有两条且都很小：要么在 `EncodeFrame` 头部夹掉/报错，要么把前置写进注释并补一枚
+  `FrameSamples+1` 的用例把边界钉住。**这条不归本腿做**（裁决者不产码），落给编排者派。
+
+### 2.3 环①（`NewBoundedFrames` 零消费者）：包内侧真通了，**欠票的两个名里有一枚是死票**
+
+包内侧这一半**是真的端到端，不是自说自话**：`TestLevelOverBoundedChannelFromWavInjector`（`level_test.go:310`）
+真建 `NewBoundedFrames()`（`:326`，并钉 `cap(buf) == BoundedFrameCapacity()`）、
+真用 C8 接缝的 `WavInjector` 作生产者（`:322`，素材是 `t.TempDir()` 里现写的 wav，**没有用 mock 代替真源**）、
+在消费者线程上逐帧排空、每帧断言**严格 `0.5`（零容差）**、并回头核 `Stats().FramesSent/FramesDropped`。
+本腿的突变把这一枚打死过四次（分子归零、分母换 32767、折压缩、字节序颠倒都让它红，见 §3），
+⇒ 它是本票最有牙的端到端钉之一。
+
+⛔ **附条件②：欠票具名具了一枚已关闭的票。** r1 §4 把生产那一半写成"地界是**票 07 的 GUI 腿** ＋ 票 228 之后的消费腿"。
+本腿现查工单池：
+
+- `.scratch/wisp/issues/07-ball-state-machine-core-done.md` ⇒ 文件名带 `-done`，正文首行逐字
+  `# 07 — Ball shell + state machine core (20 states, 40 transitions, hotkeys, tray) (DONE ✅)`、
+  `**Status:** done`。按 AGENTS.md §1.5，`-done` 后缀是**防重领的唯一键** ⇒ **票 07 是关着的，债不能停在它身上**。
+- 真正活着的那枚是 `.scratch/wisp/issues/228-ball-and-tray-are-not-in-the-process-that-runs-tasks.md`（无 `-done`），
+  它的标题说的就是"球和托盘根本不在能干活的那条进程里"，且票面逐字 `⛔ **AC#1..AC#6 一格不勾**（它们是实现格，实现腿还没动）`。
+  ⇒ 这一环的地界**只有 228（及其后的消费腿）这一枚名成立**。
+- ⚠ **根子不在写腿身上，在代码注释里**：`cmd/wisp/resident_windows.go:81` 现读逐字
+  `wisp: empty event loop running; the floating ball arrives in ticket 07 (Ctrl+C exits cleanly)`。
+  票 07 已经关闭而这行注释还说球"arrives in ticket 07"，普查 `240-c1` §3.1 第 1 行又照抄了它，
+  r1 再照抄普查 ⇒ **一条过期的落点指认在盘上把三程串了一遍，而今天没有任何仪器看得见它**。
+  本腿**不碰 `cmd/wisp`**（那是票 224 的地界，硬约束 2），只把这行原文与它的过期性上交。
+- 判语分量：**"不许默默留空"这一条它是满足的**（具了名、也说了 owner 那一裁 D-1），
+  所以 AC#2 记成立；但**"具名"的质量不够**——两枚名里一枚是死票，
+  按这条债今天实际**没有有效归属**。这一枚必须落台账（§6.2）。
+
+### 2.4 另外三环（③RMS／④标度／⑤投递）：本腿逐条看过，判定与票面口径一致
+
+- 环③（`Sqrt` 零命中＝缺一整块）：**已闭合**，见 §2.1 最后那把尺。
+- 环④（`0..1` 标度无定义，普查 §5 把它登记成**判定项 D-1**）：本票只把**可测那一半**定成代码，
+  **观感那一半（要不要增益/压缩）没有替 owner 裁**——`level.go:41-48` 逐字把这条留给消费腿，
+  并有 `TestLevelIsLinearInAmplitude` 作"不许偷偷折曲线"的钉（本腿的 M8 纯增益与 M9 开方压缩两发都把它打红了，见 §3）。
+  ⇒ **判它这一格处理得对**：写代码的程没有顺手替人拍板，而这正是编排者 12:22 那句"维持线性、等真声音实测再摆"要的形态。
+- 环⑤（投递到球的那根线程）：**未碰，且应当未碰**（在 `internal/ball`，票面禁区）。本腿确认
+  `internal/ball` 零改动（§4 的逐枚 pathspec 筛）。
+
 
 ---
 
@@ -130,7 +218,68 @@
 
 ## §4 AC#4 判语：越界检查与"生产那一环"的诚实性
 
-（待填）
+**判语：成立**（并附一枚**尺本身的口径纠正**给编排者，见 §4.2——按票面字面跑这把尺会**误退本票**）。
+
+### 4.1 逐枚 pathspec 筛（本腿现跑）
+
+`241-r1` 名下共 **5 枚 commit**（`bccc6165` 骨架 / `193daefb` 码 / `1f339ad6` 表满 / `73231f46` §8.1 终检 / `bfd4e524` 尺自指修正），
+`git show --pretty=format: --name-only` 逐枚抽出来去重，**全集只有 7 枚文件**：
+
+```
+.scratch/wisp/probes/241/r1/mutation-readings.txt
+.scratch/wisp/probes/241/r1/mutation241.py
+docs/evidence/s1/241-audio-level-producer-r1.md
+internal/audio/level.go
+internal/audio/level_test.go
+internal/audio/wasapimic_windows.go
+internal/audio/wavinjector.go
+```
+
+按 AC#4 那六个禁区路径名筛（`cmd/wisp`／`internal/ball`／`internal/speech`／`PLAN.md`／`docs/specs/`／`thresholds.go`），
+再顺手把 `docs/SLO.md`／`allowlist.txt`／golden／三枚冻结件一并筛上 ⇒ **筛为空，rc=1**（"没找到＝好消息"）。
+
+**AC 框那一格本腿换了把更硬的尺**：不是"框数还是 5"，而是**谁碰过这枚工单**。
+`git log --oneline -- .scratch/wisp/issues/241-*.md` ⇒ **只有两发**：`501c6971`（编排者立票）与
+`541a9b2b`（编排者收件改账），**两枚都是编排者的 commit，写腿从头到尾没碰过工单文件**。
+现跑 `- [ ]` = **5 枚**、`- [x]` = **0 枚** ⇒ 五枚框一枚未翻。这比"数一下框数"强：
+它排除了"改完又勾回去"这种数框数照不到的形状。
+
+**阈值与冻结件（整段范围尺，不只本票）**：`git diff --name-only 501c6971..HEAD` 里
+`thresholds.go`／`docs/SLO.md`／`allowlist.txt`／`golden`／三枚冻结件（`tokens_fourway_test.go`／
+`l2_grant_boundary_test.go`／`internal/perm/ticket90_persist_test.go`）**全部零命中（rc=1）**。
+⇒ 不止 241 没动，**整段锚点范围里没有任何程动过它们**。
+
+**`frontend/**`／`design/**` 两层禁**：本票 7 枚文件里零命中；本裁决件不含任何来自那两层的结论
+（本腿一次都没读它们，`d22scan` 输出里那两行的**枚数**是仪器的被扫计数、不是内容转述，本腿只把它当门禁读数用）。
+
+### 4.2 ⚠ 这把尺按票面字面跑会**误退本票**——具名给编排者
+
+票面 AC#4 逐字写的是"**`git diff` 里出现** `cmd/wisp`／…任一路径 ⇒ 直接退回"。
+本腿先照字面跑了整段范围那一形：
+
+```
+git diff --name-status 501c6971..HEAD | grep -E "^(M|A)\s+(cmd/wisp|internal/ball|internal/speech|PLAN\.md|docs/specs/|internal/observe/thresholds\.go)"
+  ⇒ cmd/wisp/approval_reply.go
+    cmd/wisp/run.go
+    cmd/wisp/run_mode101_test.go
+    cmd/wisp/subagent_selfapproval_197_test.go
+    cmd/wisp/ticket224_assembly_test.go
+```
+
+**这五枚不是本票的**：它们属于并行在飞的**票 224／票 197**（`git log` 上对应 `1c601fab`／`ba5db093`／`e8ed5fef`／`43d9096f`／`aa66ab51` 那一串，
+且 `internal/session/`、`internal/tools/grant*.go`、`internal/agent/approval/*` 同批出现，是 224 的形状）。
+⇒ **共享工作树里"git diff 出现某路径"这句必须有归属口径**，否则任何一张票的越界检查都会被邻居的活打红。
+本腿采用的口径是：**AC#4 只判本票名下 commit 的 pathspec 全集**（§4.1 那把尺），
+并在 §4.2 这里把字面尺的读数一并交出来，让编排者知道两种读法各自给什么。
+**建议把这句口径补进票面 AC#4 或禁区段**（一句话即可："`git diff` 指本票 commit 的 pathspec 集，不含并行写腿"）——
+本腿**不改票面**，只登记（§6.2）。
+
+### 4.3 "有没有把生产那一环悄悄假装做完"
+
+判**没有**，凭据在 §2.1：全仓对 `internal/audio` 的 import **零命中**、新符号在 `internal/audio` 之外**零生产调用者**，
+而 `241-r1` §4 那张表自己写的是"补到测试级消费者路径为止／生产消费者具名欠两枚票"。
+**盘上事实与它的自述逐字相符**，不存在"注释里虚构一个调用者"那一形（本腿逐枚核了它引用的符号名与测试名，见 §5.4）。
+
 
 ---
 
