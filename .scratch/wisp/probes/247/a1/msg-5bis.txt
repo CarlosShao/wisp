@@ -1,0 +1,15 @@
+docs(247-a1): ⑤bis 复量记录——246-r2 的 bb37fac2 在我写 ①-④ 期间落盘，三枚 cmd/wisp 读数当场重抽
+
+同一轮里跑的复量（23:16:28 / 23:16:34 / 23:16:41 +0800），不是引用旧数：
+- U24 SetState 调用者：未变（resident_approval_windows.go:443/:492）⇒ ③④ 的"只到 Sleeping/Confirming"仍成立
+- U8/U2 cmd/wisp 是否 import internal/audio：仍为 0（go list 计数 0；grep 空、退出码 1）⇒ AC#1 的接前读数没过期
+- U20 RegisterShutdownHook：从 1 处变 3 处，resident_windows.go 行号 156→157，
+  新增 resident_task_source_windows.go:289 已注册第 1 步与第 7 步
+  ⇒ ① 的"退出谁 join"由"接缝存在"升级为"同一枚进程里已经跑通过两次"；
+    ③ 的"响亮但不致命"多出第三枚同形先例（注册失败 slog.Error + Printf"记为 skipped"，不 os.Exit）
+- 新事实：246-r2 起的两枚协程名字都落在 D38(b) 名册内（approval-waiter / agent-task-，
+  对照 observe/goroutine.go:52 的 PerTaskPrefixes）⇒ 加强 ⑦-P8：本仓当下纪律是不为新协程擅自起名，
+  电平协程同样无处可起。
+
+零结论改动，只把行号与先例数记成"起手／复量"两栏；派 247-r1 前仍按 ⑦-P7 以 246-r2 终态重抽。
+零产码改动。

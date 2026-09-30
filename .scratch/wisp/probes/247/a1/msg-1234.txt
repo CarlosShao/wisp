@@ -1,0 +1,43 @@
+docs(247-a1): ①-④ 结论表写满（四问各带现读凭据）＋⑦ 补 P8 名册无槽一件
+
+① 落点：甲（cmd/wisp 拥有采集）新增包级直接边恰好 1 枚 cmd/wisp→internal/audio，
+  传递名册增量也量了（U10 comm -23 只出 1 名，其余 143 名已在 cmd/wisp 的 276 一名册里）；
+  乙-1 直推要多 audio→ball 一条边并破 internal/audio 的跨 GOOS 承诺（U28 多 2 名），
+  乙-2 注入与甲同边、并不省 cmd/wisp 的改动。
+  退出 join 走现成接缝 proc.RegisterShutdownHook(StepStopAudio)（boot_windows.go:188 +
+  shutdown_hooks.go:118-119 + shutdown.go:163），Stop() 自身已带 2s 有界 join（wasapimic:94-115），
+  十步顺序一字不动、不新造第 11 步。
+  本件新发现一条硬约束并写进 ⑦-P8：D38(b) 名册里没有第二枚电平协程的槽
+  （ResidentNames 固定 6 名、名册外即 CategoryUnknown + leak warn；
+  level.go:85-88 的明文早已写着这句话）。
+
+② 隐私闸门：三枚开关的真名与默认值取自 internal/config/schema.go
+  （voice.enabled :245 = true；voice.wake_word.enabled :197 = false；
+  audio.mic_muted_default :277 = true —— 派单没点名的第三枚，也是唯一一枚真挡得住麦的）。
+  读声：voice.enabled / wake_word.enabled 的产码读取处只有 config/manager.go 三处（U13），
+  没有任何一处用它决定开不开麦。一双击会不会采音：不会，但挡住它的是"没路径"
+  （cmd/wisp 零 audio importer + 常驻腿根本不读 config），不是默认值。
+  接完之后决定权在装没装门：gate.go:108 × :235-237 挡得住；不装门直接 mic.Start
+  则在 wasapimic_windows.go:88 同步等设备开成功，一双击就开麦。零默认值改动。
+
+③ 降级：逐行读了 TestOpenOccupiedAndPermissionDenied / TestHotplugReenumerateOnce /
+  TestHotplugStaleHandleFailsLoudly / TestHotplugReenumerateFailureNamesDevice 的断言本体
+  （五条断言逐条带 hotplug_test.go 行号），并如实标出"无麦"没有专属用例、
+  且 DeviceError 的 switch 里没有 hrAUDCLNTNotInit 的 case（读 switch 得出，没跑到）。
+  "照跑并把损失说响亮"的参照系用仓里现成的两枚（resident_ball_windows.go:139-145 verdict 不 Exit、
+  resident_windows.go:62-69 loud 但不停 boot），并写死票 128 口径不扩大：
+  只有 DefaultLayout/Job/mutex 失败才 os.Exit(1)。
+  ⛔ 明确判掉一条歧路：D43 #14（table.go:97）的 From 只有 Listening，
+  启动期失败没有合法边；硬造就是要改转移表。
+
+④ 第六环：liquidDriven 当前实际含 6 态逐行读出（Listening/Thinking/Speaking/Conversation/
+  Warm/Acting，liquid.go:64-66），其余 20 枚状态名册里的全为 false。
+  判"接好了"不该看 Armed 收到电平，三条实码：EvKwsEnabled 产码零发射者（Armed 今天不可达）、
+  SPEC-08-ui-ball-panel.md:61 明写 Armed 静态（改它属契约面且撞 AC#7 禁改路径）、
+  tokens_test.go:155 那枚镜像断言只钉 Opacity 而 applyTo 不写 Opacity（所以我说地界重叠，不说必然红）。
+  本节最重要的产出：即使接上，球今天仍不会"呼吸"——两道闸都不在本票地界
+  （prototypeVisuals 默认关 statevisual.go:102，只有 balldebug:122 打开；
+  常驻腿可达的 Sleeping/Confirming 两枚都不在 liquidDriven 里）。
+
+零产码改动；写点只有 .scratch/wisp/probes/247/a1/census.md。
+未跑 go build/vet/test 与任何 ./...（禁）；cmd/wisp 行号全部标〔起手读数，可能被 246-r2 改动〕。

@@ -1,0 +1,17 @@
+docs(247-a1): ⑤⑥⑦ 三节先写满并落盘（27 枚尺的真实读数 ＋ 13 条自我对抗 ＋ 7 件交裁）
+
+按派单硬要求：⑤⑥⑦ 排在 ①-④ 之前，且这三节留空＝整份件不算交件。
+
+⑤ 每把尺带原样命令＋取数钟点（23:04-23:09 +0800）＋ stdout 原样读数。关键三枚：
+- U10 comm -23 deps-audio deps-cmdwisp ⇒ cmd/wisp 接 audio 只多 1 名传递依赖
+- U13 voice.enabled / wake_word.enabled 的产码读取处只有 internal/config/manager.go 三处，
+  没有任何一处用它决定开不开麦
+- U15 prototypeVisuals 默认关，产码只有 cmd/balldebug:122 打开 ⇒ SetAudioLevel 在常驻腿里是惰性的
+
+⑥ 含两处我自己踩过的尺：U14 第一版没排 .scratch 被 241/v1 变异体淹了 30 行假命中（E2），
+U1 那把尺认文本不认编译器（E1）。禁 build/test 的前提下 E5 明说"读到分支不等于跑到分支"。
+
+⑦ 七件逐条摆甲／乙／不做，其中 P1（默认档到底谁挡麦）与 P3（AC#2 的可见性闸）我判不动，
+因为它们分别牵 AC#4 取证形态与票 68 AC#2 的归口。
+
+零产码改动；写点只有 .scratch/wisp/probes/247/a1/census.md。

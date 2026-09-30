@@ -1,0 +1,9 @@
+docs(247): 票面只追加一行 247-a1 的 Progress log（AC 框一枚未碰）
+
+普查件已在盘上：.scratch/wisp/probes/247/a1/census.md（271 行／54,536 字节），
+commits 60585af9（骨架）→ 457a824e（⑤⑥⑦ 先满）→ 77a3b442（①-④）→ 5c33ad30（⑤bis 复量）。
+
+本枚对票面的改动＝1 insertion / 0 deletion（git diff --numstat 现量），
+追加位置在「## Progress log」小节末尾，紧邻那行小节标题原文一起带上做的 Edit
+（编排者点过两次的静默删标题坑）；
+"- [ ]" 现量 9 枚、"- [x]" 现量 0 枚，Status 行与现量表一字未动。

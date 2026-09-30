@@ -1,0 +1,10 @@
+docs(247-a1): 本腿临时件入盘（三枚 go list -deps 名册原文 ＋ 五枚 commit message 底稿）
+
+按 issues/README 规则 8「临时件只建不删」：本枚不删任何文件，只把自己造出来的原件留进探针目录。
+
+deps-audio.txt 144 名 · deps-ball.txt 145 名 · deps-cmdwisp.txt 276 名 · deps-cmdwisp-win.txt 276 名
+（后两枚 GOOS=windows 与裸跑 diff 为空，尺 U18；U10 的 comm -23 与 U28/U29 的 comm 差集
+全部从这三枚原文算出，读数已在 census.md 的 ⑤ 表里，留原件是为了让验收腿能自己重算而不必重跑 go list）。
+
+msg-*.txt 是本腿五条 commit 的 message 底稿（含反引号与单引号的中文长段一律走 Write 落文件
+再 git commit -F，没有用 shell heredoc，防里面反引号被真执行）。
