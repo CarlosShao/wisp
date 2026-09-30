@@ -22,16 +22,16 @@
 
 | 票面格 | 原文要求（要点） | 本表节 | 判语 |
 |---|---|---|---|
-| AC#1 `:33` 身份有唯一的铸造点 | 改前生产铸造者＝0／改后 ≥1；具名写出"会话结束"是哪一行代码在做什么 | §1 | （填写中） |
-| AC#2 `:34-35` 三件套齐全 | 写／读／失效三格各自独立用例；⛔ 不许合并成一枚"持久化"用例 | §2 | （填写中） |
-| AC#3 `:36` 重启必失效 | 进程重启 ⇒ 同类请求重新弹卡 | §3 | （填写中） |
-| AC#4 `:38` 反控（正控！） | 种"派生式 session id 让授权跨会话仍生效"的假腿 ⇒ AC#2／AC#3 至少一枚必须红；三枚钉全绿而授权实际生效 ⇒ 本票判失败 | §4 | （填写中） |
-| AC#5 `:39` 不许把"长期"混进这一票 | "长期／永久允许"落 `[fs] allowed_dirs`，不是这张票的射程 | §5 | （填写中） |
-| 派单增量第 1 条（具名缺口） | 同批改 `cmd/wisp/run_mode101_test.go:427-441` 的期望与两句注释 | §1／§6 | （填写中） |
-| 派单增量第 2 条（加一枚锁） | 断言生产铸造的 id **永远不等于** `session-before-restart` 这类测试字面量 | §2／§4 | （填写中） |
-| 派单增量第 3 条（两发读数） | 改前该钉绿的读数＋改后按新期望跑的结果；`git status --porcelain -- internal cmd` 为空 | §6 | （填写中） |
-| 派单必答 2「拒绝是谁给的」 | 会话授权的"拒"不许由 `approval.NoGate` 的 `PendingWindow` 代答；定向突变必须红 | §2／§4 | （填写中） |
-| 派单必答 3「有没有执行者」 | `internal/session` 那 271 行是否真到达 `cmd/wisp` 装配路径；会话身份是否宿主铸造、不许调用方自报 | §1／§3 | （填写中） |
+| AC#1 `:33` 身份有唯一的铸造点 | 改前生产铸造者＝0／改后 ≥1；具名写出"会话结束"是哪一行代码在做什么 | §1 | **成立（附一条条件＝§6‑a）** |
+| AC#2 `:34-35` 三件套齐全 | 写／读／失效三格各自独立用例；⛔ 不许合并成一枚"持久化"用例 | §2 | **不成立**（不合并做到了；"答复⇒落行"零判据，M4 全盘绿） |
+| AC#3 `:36` 重启必失效 | 进程重启 ⇒ 同类请求**重新弹卡** | §3 | **不成立**（实现成立；交件无重启、无"弹卡"观测） |
+| AC#4 `:38` 反控（正控！） | 种"派生式 session id 让授权跨会话仍生效"的假腿 ⇒ AC#2／AC#3 至少一枚必须红；三枚钉全绿而授权实际生效 ⇒ 本票判失败 | §4 | **附条件成立**（M1 两枚红＝有牙；缺⑩ 的①"跨两次启动"） |
+| AC#5 `:39` 不许把"长期"混进这一票 | "长期／永久允许"落 `[fs] allowed_dirs`，不是这张票的射程 | §5 | **成立** |
+| 派单增量第 1 条（具名缺口） | 同批改 `cmd/wisp/run_mode101_test.go:427-441` 的期望与两句注释 | §6‑b | **漏做**（断言半不必改且仍真；注释半 `:427-428` 今天已是假话） |
+| 派单增量第 2 条（加一枚锁） | 断言生产铸造的 id **永远不等于** `session-before-restart` 这类测试字面量 | §6‑a／§1 | **半做**（便宜方向 `TestTicket224TestLiteralsAreOutsideTheMintedShape` 有；贵方向被推给一枚不存在的用例，由我探针代判） |
+| 派单增量第 3 条（两发读数） | 改前该钉绿的读数＋改后同一枚按新期望跑的结果；`git status --porcelain -- internal cmd` 为空 | §6 | **未交**（没改就没有"改后"；`git status --porcelain -- internal cmd` 我现跑＝**空**，两枚 commit 后工作树那两枚包干净） |
+| 派单必答 2「拒绝是谁给的」 | 会话授权的"拒"不许由 `approval.NoGate` 的 `PendingWindow` 代答；定向突变必须红；门的文案不许被权限复用 | §2 | **本票无该形状**（8 枚全读"弹卡计数"，无一枚观测"被拒"；M2 五枚红）；⚠ 文案那条靠"根本没有可复用的拒绝文案"满足，**无仪器钉住** |
+| 派单必答 3「有没有执行者」 | `internal/session` 那 271 行是否真到达 `cmd/wisp` 装配出来的那条路；会话身份是否宿主铸造、不许调用方自报 | §1／§3 | **实现到达（我现跑探针）；交件不证明它到达**（幻影用例）；身份＝宿主铸造、调用方无法自报（三条独立证据） |
 
 ## §1 AC#1 身份有唯一的铸造点 — **成立（附一条条件，见 §6‑a）**
 
@@ -84,13 +84,82 @@ go test ./cmd/wisp/ -count=1 -run Probe224v1 -v -overlay=.scratch/wisp/probes/22
 - 头两版探针我判错了一次并**当场纠正**：`fs.read` 在 allowlist 内是 **L0**（逐字 `risk=L0 ... reason="无规则命中（L0 直接执行）"`），`fs.write` 覆盖**已存在**的文件是 **L2**（逐字 `rules_hit=[R1 R8]`＋`R8: 不可逆操作（覆盖已有内容）`）⇒ 两者都到不了"未被静默的 L1"那一格，第一版据此误报过"AC#2 读 FAILS"。**结论以第三版为准**（`fs.write` 到不存在的路径＝只有 R1 命中＝L1），两版失败读数留在台件不删。
 - 探针里那枚"活授权在场、同一条调用变成 L2 仍弹卡"的正控读数＝`l2_cards=1`（同一 boot、同一枚 grant）。
 
-## §2 AC#2 三件套齐全（写／读／失效） — （填写中）
+## §2 AC#2 三件套齐全（写／读／失效） — **不成立**
 
-## §3 AC#3 重启必失效 — （填写中）
+票面原文：**写**（答复"本会话内允许" ⇒ `approval_grant` 真有一行，带 session 身份＋工具＋模式＋创建时间）／**读**（下一次同类请求命中它 ⇒ **不再弹卡**）／**失效**（会话结束 ⇒ 同一身份查不到、行为回到"要问"），三格各自独立用例、⛔ 不许并成一枚"持久化"用例。
 
-## §4 AC#4 反控（正控！） — （填写中）
+### 先答它形式上做到的部分（成立的那半）
 
-## §5 AC#5 不许把"长期"混进这一票 — （填写中）
+- **不许合并**这一条做到了：三格是**四枚独立顶层函数**〔我现跑 `grep -c '^func Test'`＝session 9 枚＋tools 8 枚〕，
+  `TestTicket224RecordWritesOneRowPerAnswer`（写）／`TestTicket224CoveringMatchesItsOwnSession`＋`TestTicket224LiveGrantStopsTheL1Question`（读）／`TestTicket224CoveringDoesNotCrossToANewSession`（失效），
+  文件头逐字引 `ticket90_persist_test.go` 的 "They are three test functions on purpose" 作理由 ⇒ **这一条不是装饰**。
+- 17 枚 12:2x 全绿〔我现跑 `-run Ticket224 -v`，逐枚 `--- PASS`；命令与读数在 §1 表下〕。
+
+### 判失败的三处，逐处具名
+
+1. **"写"那一跳零判据**（最重）。票面写的是"**答复** ⇒ 有一行"，而答复到落行之间有四跳：`replySurface.session`（`cmd/wisp/approval_reply.go:236`）→ `Replies.AllowSession`（`internal/agent/approval/replies.go:337`）→ `Gate.allowSession`（`gate.go:651`）→ `Ledger.Record`（`internal/session/grants.go`）。**四跳零用例**：两枚 commit 没往 `internal/agent/approval/` 与 `cmd/wisp/` 落任何测试文件〔读台件：`8b57a419 --name-only`＝2 枚文件〕。
+   ⇒ 我不接受"读代码看着通"，所以做了**定向突变 M4**：把 `gate.go:678` 的 `id, err := g.grants.Record(ctx, tool, p)` 换成 `id, err := int64(0), error(nil)`（答复照旧放行、**盘上一行不落**，还照样打 `GRANT-RECORDED`）。〔我现跑，用完 `git cat-file blob HEAD:` 还原，`wc -c` 前后都＝31010〕
+   ```
+   ok  github.com/CarlosShao/wisp/internal/agent/approval   0.318s
+   ok  github.com/CarlosShao/wisp/internal/session          0.332s
+   ok  github.com/CarlosShao/wisp/internal/tools           12.187s
+   ok  github.com/CarlosShao/wisp/cmd/wisp                156.567s   ← 相关四包一枚不红
+   ```
+   **⇒ 今天把"本会话内允许"整档的记账摘掉，全套件仍然全绿。**这不是"覆盖薄弱"，是**该格的判据不存在**——而且它恰好是 `grant_test.go:14-17` 自己立的目标：
+   「the failure this feature can have is not "it broke" but **"it silently grants nothing and everything still asks"**」。突变 M4 造的正是这个形状，用例一枚不响。
+2. **"读"那一格的两半从未接起来**：tools 侧 8 枚全部用 `t224Grants` **桩**（`grant_test.go:51`），不碰真 ledger；session 侧的 `Covering` 用真 SQLite 但不碰 bridge；把它们接起来那一枚，两处注释都指向 `cmd/wisp` 的幻影用例（§6‑a）。
+   ⇒ 交件里"下一次同类请求命中它 ⇒ 不再弹卡"这句话**没有任何一次执行**。（我补的探针执行了并判绿：装配根 `tools: GRANT-USE tool=fs.write paths=1 grant_id=1 assessed=L1 mode=ask_every_step` ＋ `windows_before=1 → windows_after_total=1`＝delta 0 ⇒ **实现成立、判据缺**。）
+3. **"失效"只测了"查不到"，没测"行为回到要问"**：`TestTicket224CoveringDoesNotCrossToANewSession` 断的是 `rows==0` 与 `Covering==false`（ledger 层）；票面那句"行为回到'要问'"属 bridge／装配层，交件里无人断。
+
+### 逐枚扫 1,067 行的"恒真／装饰"结果（必答 2 的账）
+
+- ⛔ **没发现"其实恒真"的假绿判据**，而且**必答 2 点名的那个形状在本票根本不成立**——理由要写清：tools 侧 8 枚的"问与不问"全部读 `t90Gate` 的 `windows/approvals` **计数**（`grant_test.go:204/221/268/282/319/336/408/431`），
+  〔读台件 `internal/tools/ticket90_test.go:113-122`〕`t90Gate.PendingWindow` 默认回 `AnswerTimeout`，而 bridge 的 L1 分支逐字 `case AnswerAllow, AnswerTimeout:`＝**超时即执行**；所以这些用例观测的是"**有没有弹卡**"，**没有任何一枚观测"被拒绝"**。
+  ⇒ 本票**没有**出现"L1 穿过 `approval.NoGate`、把门的 `AnswerReject` 当权限判定"的形状；"会话授权会拒"这句话在两枚新测试里**一次都没被断过**。（它出现在**没被改的那枚旧钉**里，见 §6‑b 第 3 条。）
+- **定向突变的牙齿实测（四条腿，全部指名用例红；每条用完即还原并 `wc -c` 自证）**：
+  | 突变 | 改的那一支 | 红的用例（〔我现跑〕逐枚具名） |
+  |---|---|---|
+  | **M1** | `session.go:99` 的 `Mint()` 改成 `hex.EncodeToString([]byte("wisp-pid-derived"))`（16 字节⇒形状合法、每发进程算出**同一枚** key＝票面点名的假腿） | `TestTicket224MintIsRandomAndValid`（`grants_test.go:108`）／`TestTicket224CoveringDoesNotCrossToANewSession`（`:355`）＝**2 枚红**；四枚旧钉照绿（§3） |
+  | **M2** | `bridge.go:428` `if grantID != 0 {` → `if true \|\| grantID != 0 {`＝**把权限那一支单独改成放行** | `LiveGrantStopsTheL1Question`（:205 对照半）／`PartialPathCoverageStillAsks`（:269/:283）／`GrantSourceThatCannotAnswerMeansAsking`（两枚子用例 :409）／`PathlessCallIsNeverGranted`（:432）／`GrantedCallBooksAllowSessionGrantWithItsRow`（:483 对照半）＝**5 枚红** |
+  | **M3** | `bridge.go:334` 摘掉 `&& sil.Level == risk.L1`（L2／Deny 也去问授权） | `SessionGrantNeverCoversL2`（:324/:339）／`SessionGrantNeverCoversDeny`（:373） |
+  | **M3b** | M3 ＋ `route` 的 L2 分支插入 `if grantID != 0 { … return true }`＝**把"AC 声称要防的结局"（L2 被会话授权覆盖）真造出来** | 同上两枚**再加行为半**：:320 `declared-L2 call with a live grant produced 0 approval cards, want 1`、:336 同 ⇒ **行为半不是装饰，两半都有牙** |
+- ⚠ **文案射程要具名**（必答 2 后半句"门拦下的文案不许复用权限拦下的文案"）：
+  〔我现跑 grep〕新增代码**不产出任何拒绝文案**——`GrantSource` 只有 `Covering` 一枚方法（只答"要不要免问"），`route` 的 L1 grant 分支 `return true, ""`；三处新字符串是审计行前缀（`tools: GRANT-USE`／`session: GRANT-HIT`／`approval: GRANT-DROPPED`）与控制台答复行。
+  ⇒ **这一条是靠"根本没有可复用的文案"满足的，不是靠用例钉住的**：两枚新测试里**没有一枚断过任何 reason/文案**（〔我现跑〕`grep -n "Contains\|Reason\|reason"` 在 1,067 行里只命中 2 枚结构性 `strings.Contains`：`grant_test.go:234` 断规范化形式、`:511` 断字段名）。谁日后写"会话授权拒了"这句话，本票没有仪器拦他复用门的那句。
+- ⚠ **三处轻微装饰／窄射程**（够不上判失败，逐枚记账）：
+  ① `GrantSourceThatCannotAnswerMeansAsking` 的 `errOn` 子用例：桩自己把 err 译成 `(0,false)`（`grant_test.go:88`），bridge 只看见"没覆盖"，与"没命中"同形 ⇒ 该子用例断的其实是 bridge 对 false 的反应；真 fail-closed 半在 `TestTicket224LedgerFailsClosedOnStoreErrors`。
+  ② `GrantedCallBooksAllowSessionGrantWithItsRow` 用桩 `t224Journal` 断 `row.GrantID` ⇒ **真 `memory.Store` 的 `tool_call.grant_id` 列今天零用例**（我的探针只读到审计行 `grant_id=1`，没读回那一列）。
+  ③ `TestTicket224GrantSeamCarriesNoCallerSuppliedAuthority` 的"Bridge 无 setter"半只罚 `Kind()==Func` 的字段（§1 已具名）。
+
+## §3 AC#3 重启必失效 — **不成立**（实现成立，判据不存在）
+
+- 交件里最接近的一枚是 `TestTicket224CoveringDoesNotCrossToANewSession`：它**不重启**，是**同一进程内两枚 `Mint()`**。ledger 层的性质是真的（钥匙不同⇒读 0 行），
+  但票面 AC#3 那句是"**进程重启 ⇒ 同类请求重新弹卡**"——**重启**这一跳与**弹卡**这一观测，交件里都没有；两处注释把它推给幻影用例（§6‑a）。
+- ⚠ 更要紧：**"同进程两次 mint 不等"推不出"跨进程两次 mint 不等"**。今天 `Mint()` 无进程外状态，所以由构造成立；但**没有用例钉住它**（M1 那一红来自"同进程两次相等"，它救不了"跨进程相等而同进程不等"这一形，例如拿启动时刻的秒级时钟派生）。
+- 四枚旧钉在同一发 M1 下**全部照绿**〔我现跑〕：`ok github.com/CarlosShao/wisp/internal/perm 0.204s`（`-run Ticket90`＝三枚钉）＋`ok github.com/CarlosShao/wisp/cmd/wisp 3.298s`（`-run TestTicket101SessionGrantDoesNotCrossRestart`＝第四枚）
+  ⇒ 票面 ⑩/⚠ 那句"**四枚全绿而永久通行证实际生效是可能的**"由我**实测复现**，不是复述。
+  并且通行证**真的生效**：M1 下我的生产探针报 `two boots minted the SAME id "sess_776973702d7069642d64657269766564"` ＋ `boot 2's session can read 1 grant rows left by boot 1, want 0` ＋ `after a restart the same L1 call showed 0 windows, want >=1` ⇒ **第二发进程带着上一发的授权静默写了盘**。
+- **实现层我判它成立**（§1／正常码下的生产读数）：boot2 铸出不同 key、读 0 行、同类 L1 请求重新弹卡
+  （`PROBE-B id1=sess_cee79de7… id2=sess_b8ea814f… rows_id1=1 rows_id2=0 boot1_delta=0 boot1_l2=1 boot2_windows=1`）；死会话那一行**没被删**（`rows_id1=1`，SPEC-02 §4 的 30 天审计窗）。
+- ⇒ 判语只能给**不成立**：票面⑩已把 AC#3/AC#4 的措辞重写成"①跨两次启动／②生产 id 写＋第二次生产 id 查／③真 `Bridge.Execute`"，**缺一件就不算判据**，而①在盘上一件都没有。
+
+## §4 AC#4 反控（正控！） — **附条件成立**
+
+- 票面第一句「种一条'派生式 session id 让授权跨会话仍生效'的假腿 ⇒ **AC#2／AC#3 至少一枚必须红**」：**成立**，由 M1 实测两枚红（§3），且红的是**性质断言**而不是巧合；再加 §2 表的 M2／M3／M3b，判定链侧、支路侧、行为侧的牙齿都现跑验过。
+- 票面第二句（⑩ 重写后的三件判据）：**缺一件**——
+  ① 调**生产**铸造函数跨两次启动断两枚 id 不等 ⇒ **盘上无用例**（幻影；只有本腿探针跑过）；
+  ② 用生产 id 写、再用第二次生产 id 查断 0 行 ⇒ **半件**（`Mint()` 就是生产那枚函数，但没跨启动）；
+  ③ 走真 `Bridge.Execute` 断"问与不问" ⇒ **有**（tools 侧 8 枚都走真 `Execute`），但授权侧接的是桩、不是 ledger。
+- 条件（一句话）：**反控本身不假绿，但它今天只在 ledger 层红；"生产那层能不能被这枚假腿打红"由我补的仪器判的，交件的仪器看不见**。把①落成真用例即升为成立——我这发探针可直接作底稿（§6‑a）。
+
+## §5 AC#5 不许把"长期"混进这一票 — **成立**
+
+〔我现跑〕四条边界全部干净：
+- 两枚 commit 的 `--name-only` 12 枚文件里**不含** `cmd/wisp/approval_always.go`、不含 `internal/perm/**`（`git show --stat -- cmd/wisp/approval_always.go internal/perm/` 输出为空）⇒"长期"那条档（`always <编号>` → `[fs] allowed_dirs`）一字未动；
+- 新代码只写 `memory.GrantScopeSession` 一枚 scope 值〔我现跑 `grep -rn "GrantScope" internal/session/*.go cmd/wisp/*.go \| grep -v _test`＝仅 `grants.go:158`〕；
+- `grep -rn "allowed_dirs" internal/session/ internal/tools/grant.go`＝0 命中；
+- 面板侧**没有**长出"允许"：`git show 3b78c246 -- internal/agent/approval/ \| grep -E "^\+func .*Panel\|^\+.*PanelAllow"` 只命中一行注释，逐字 "There is deliberately no PanelAllowSession"；新增方法只有 `nativeAPI.AllowSession` 与 `Replies.AllowSession`，后者要求 `card.Grant != ""` 且走 `g.Native()`。
+- ⛔ 本腿**没有**跑或改 `internal/panel/l2_grant_boundary_test.go`（冻结件，禁词表只作读台件引用），两枚 commit 也没有新增 C17 方法名。
 
 ## §6 没做完／留给编排者的台账动作
 
