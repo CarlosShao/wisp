@@ -142,6 +142,79 @@ D32 的 0.5% 阈值**一个字没动**"；附录 C 更用同窗口对照把差�
 **AC#2 总判语：附条件。** 凭据构成：定时器子句＝我现跑的定向突变（1 红 1 绿）；
 CPU 子句＝读台件（且我现量到窗口口径缺一条 60s 树外带球读数）；静态单帧＝读代码＋间接。
 
+### 2.4 AC#4 —— `:85` 音频驱动：喂已知电平（wav 注入票 13 的 C8 seam）时液面旋转幅度随电平单调变化；静音时收敛进"边框"过渡态
+
+**判语：附条件。** 单调律与"麦克风叫不醒 Sleeping"这道门**都由我真删过、都咬住**；
+但**这一格判据点名的注入路径（票 13 的 C8 wav seam）今天在全仓没有生产者**，
+现有读数全部来自一枚 debug 二进制里的**合成**电平。
+
+#### 两形突变（硬规矩 #2：不许透过一道会自己拒绝的门去判"拒绝"）
+
+`Ball.applyLevel` 的拒绝不是一个门，而是**两道**（`internal/ball/liquid.go`）：
+`liquidDriven(state)`（`:62`，会话族才收电平）与 `liquidMotion.busy(state)`（`:299`，内部先问
+`transitionDriven(state)`）。⚠ 只拆第一道会得出**假结论**——`syncLiquidTimer` 仍被 `busy()` 拦住，
+计时器根本不会挂，用例照样绿，看着像"仪器不咬"，其实是我只拆了一半。所以 M2 一次拆两道。
+
+台件：`.scratch/wisp/probes/62/v1/m2|m3|m4/`（全部 `go test -overlay`，工作树未动）。
+
+**形 A＝M2（把门那支改成放行：两个 state gate 一律 return true）**
+```
+go test -tags winlive -overlay …/m2/overlay.json ./internal/ball/ -run TestBallLiveAudioLiquidGate
+  live_windows_test.go:640: audio level armed a timer in Sleeping
+  --- FAIL: TestBallLiveAudioLiquidGate (0.28s)
+```
+⇒ 基准（同 tag、无 overlay）该用例 **PASS 1.00s**。Sleeping 里那枚"电平被丢掉"的**拒绝，
+确实是这两道门给的**，不是别处给的——这条结论现在才允许入账。
+
+**形 B＝M3（把判定改成恒不成立：`busy()` 永远 false，液体计时器永不挂）**
+```
+go test -tags winlive -overlay …/m3/overlay.json ./internal/ball/ -run TestBallLiveAudioLiquidGate
+  live_windows_test.go:649: a summoned orb in Listening must run the liquid burst timer
+  --- FAIL: TestBallLiveAudioLiquidGate (0.29s)
+```
+⇒ 这一发专治"假绿"：如果 `TestBallLiveAudioLiquidGate` 里 Sleeping 那几条"没有计时器"是因为
+**全仓任何态都挂不上计时器**而白捡的，那 M3 之后它会继续绿。它没绿，红在正向断言上
+（Listening 召唤态**必须**挂上 burst 计时器）。⇒ **那枚用例有正向对照、量得到东西**，
+形 A 的红不是运气。
+
+**M4（单调律本身）**：`liquid.go:224-225` 的 `omega` 去掉 `SpinLevelRadPerS*m.level` 一项。
+```
+go test -overlay …/m4/overlay.json ./internal/ball/ -run TestLiquidRotationIsMonotonicInLevel
+  liquid_test.go:30: rotation travel must grow with the level: level 0.15 gave 0.4455 rad, previous level gave 0.4455
+  --- FAIL: TestLiquidRotationIsMonotonicInLevel (0.00s)
+```
+⇒ 基准 PASS 0.00s。**"随电平单调"这条不是文档里的形容词，是一枚会红的用例**，
+且电平一被从角速度里摘掉就立刻平掉（0.4455 vs 0.4455，同一数）。
+静音→边框那一半：`TestLiquidConvergesAndBorderFadesInOnSilence` 基准 **PASS**（纯模型、仿真时间，
+断言 `border` 在 `BorderOpenMs` 内到位、且 `border` 必须**单调推进**，`liquid_test.go:179`）。
+
+#### 本格今天拿不出的那件东西（具名）
+
+判据逐字写着"喂已知电平（**wav 注入票 13 的 C8 seam**）"。我现查生产者：
+```
+grep -rln "CarlosShao/wisp/internal/ball" --include=*.go（剥掉 internal/ball 自身与 *_test.go）
+  → ./cmd/balldebug/main.go        ← 全仓唯一一个非测试 importer
+grep -rn "SetAudioLevel"（非测试）
+  → 只有 cmd/balldebug/main.go:418、:477
+```
+`internal/audio` 侧 C8 的测试骨干在（`internal/audio/wavinjector.go:15` `WavInjector is the C8 test backbone`），
+**但仓里没有任何一行把它接到球上**。而 balldebug 用的电平源，flag 帮助文本逐字：
+`cmd/balldebug/main.go:106` — `"synthetic audio envelope 0..1 pushed to the ball at ~30fps (0 = feed nothing)"`；
+实现 `feedLevels`（`:404-421`）＝ 33ms ticker，每第 12 拍把 `amp` 除以 4 当作"句间呼吸"。
+⇒ **今天所有 AC#4 的电平读数都是合成标量，不是 wav 经 C8 seam。** 产品二进制 `wisp.exe` 里
+**根本没有球**（零 importer），所以这条端到端路径连"产品侧宿主"都还不存在。
+⚠ 这不是"实现方撒谎"——`62-ball-visual-prototype.md` 与票面 Progress log 从没声称跑过 wav；
+是**判据点名的凭据类型与盘上有的凭据类型不同名**。⇒ 记 `附条件`，缺的东西具名：
+**一条 `WavInjector → RMS/包络 → Ball.SetAudioLevel` 的端到端注入读数**（票面 `:106` 里 62-C 自己
+也把 "AC#4 measured with wav injection" 写在 next 栏，即当时未量）。
+
+另有一半仍归人：**"液面旋转幅度"作为肉眼看得见的幅度**（模型里的 `angle` 单调 ≠ 屏幕上的旋涡看得出快慢），
+按票 62 处置表 `:26`"未验收 ⇒ 票 65 同批"，与 AC#3 一样要 owner 两发电量对比的眼睛。
+
+**AC#4 总判语：附条件。** 已证：单调律（M4）、静音收敛与边框（用例绿，纯模型）、
+状态门是拒绝的真来源（M2 红）且用例不是假绿（M3 红）＝〔我现跑〕。
+未证：C8 wav 端到端注入（全仓无生产者）＝具名缺件；肉眼幅度可辨＝归 owner。
+
 <!-- NEXT-CELL -->
 
 ---
