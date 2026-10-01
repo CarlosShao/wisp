@@ -116,6 +116,16 @@ declaration consumed by 37's native card.
       今天可跑的那条缝是 `wisp panel-inbound -data <目录>`（stdin 封套 → `Handle`），页面拿不到回执。
       读数与判据全文：`docs/evidence/s1/33-inbound-listener-r3.md`。
 
+## 编排者收件（10-01 10:3x，实现腿 `33-r1` 交件；⛔ 六格判语一律等验收腿 `33-v1`，本节只记"我盘上核到了什么"）
+
+**盘上卫生（我 10:33:59 现量，HEAD＝`94bd133e`）**：五枚提交逐枚 `git log -1` 复认——`e4ed8304`(09:52 证据件⑥⑦⑧先落)→`697b4fae`(10:10 宿主＋依赖＋测试)→`b1e3d94a`(10:26 把专用线程 harness 从产码移走，理由＝它自己撞了 `AGENTS.md` §1.2 那条 ban #1「裸 `go func(` 无 owner/recover」)→`fafe0445`(10:26 **单独一枚**按我 `A489` 的裁定反转那枚负向钉)→`f0ad3b51`(10:32 结论表)。⛔ `git status --porcelain -- cmd internal`＝**0 行**；⛔ 产码里 `MUT-` 残留＝**0 处**；票面 AC 框**它一枚没碰**（`git diff f1e7a3e2..HEAD -- .scratch/wisp/issues/` 里出现的复选框行全是**我自己**那两枚提交的内容）。
+
+**反转后的钉我复认落地**：`internal/panel/composer_dispatch_test.go:433` 现为 `TestPanelHostIsAttachedAndNamesTheWindowHops`，旧名只剩两枚注释（`:17`／`:396`）⇒ 归档日志里那个名字不用去追改。**这枚钉从此变成"必须有宿主"的锁**——它反转是**我**的裁定（`A489` 甲形），有没有牙由 `33-v1` 用定向突变判，不由我签字。
+
+**⛔ 一条今天最要紧的未接上事实（我在派单里就防着"import 了≠装起来了"这一形，现量确认）**：**面板今天仍然开不出来**。宿主代码进了仓（`cmd/wisp/panel_host_windows.go`），但 `grep -rn "PanelManager" cmd/wisp/main.go cmd/wisp/resident_windows.go cmd/wisp/run.go`＝**0 命中**——实现腿**没有**把常驻那条腿的 `OnPanelHotkey` 接上，也**没有**为绕开阻塞而偷加第二枚线程；它交回两枚依赖边界（`pkg/edge` 控制器 `PutBounds` 吃模块私有类型 ⇒ 多文件资源过滤器接不上；`go-webview2` 开窗是阻塞嵌套 `GetMessageW` 泵，从球的 `ui-sta` 泵再入 ⇒ panic）。⇒ 这两条真伪与边界由 `33-v1` 复认，**成立与否决定我要不要把"泵所有权"摆给 owner**（另一条形＝加第二枚常驻线程受 `observe.ResidentNames` 六枚冻结名册限制＝契约变更＝要他一句话）。**在它裁完之前，本票不许 `-done`、AC#1..AC#4 不许翻勾。**
+
+**记在我身上的一枚派单疏漏（小、可补，具名）**：我给 `33-r1` 的派单写死了"⛔ AC 框一枚不许碰"，**但没写"必须在下面这节 Progress log 里逐枚提交留一条 `agent=… did=… next=…`"**（模板里那句"只许在进度记录里写我做了什么"这次漏了）⇒ 它五枚提交在票面上没有对应进度行，历史只剩证据件那份自述。处置＝**本节就是编排者代记**，⛔ 不冒充实现方自述、不改写它任何一行；今后派单模板补上这一句（同条已进我的记忆文件）。
+
 ## Progress log (append-only, newest last)
 - 2026-09-25 17:5x（编排者）：**加 AC#7／AC#8 两格，都是从票 35 快照泵 r1 的验收表转入的，不是本票新造的活。**
   转入口径写在这里：这两格**在票 35 上今天开不出来**——不是漏做，是**没有可测的 hook**，硬开会得到一枚
