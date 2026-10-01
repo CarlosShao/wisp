@@ -172,7 +172,7 @@
 | 三枚冻结件 | `git diff --numstat eed229e4..HEAD -- internal/panel/tokens_fourway_test.go internal/panel/l2_grant_boundary_test.go internal/perm/ticket90_persist_test.go`＝**空** |
 | `go.mod`／`go.sum` | `git diff --numstat eed229e4..HEAD -- go.mod go.sum`＝**空**；⛔ 没跑 `go get`、⛔ 没跑 `go mod tidy`（它在 HEAD 上 exit 1，会造出不属本程的 diff） |
 | `frontend/**`／`design/**` | `git diff --name-only eed229e4..HEAD -- frontend design`＝**空**；两层禁令自证：我只跑过 `git ls-files`／`git status --ignored`／`git check-ignore` 三枚**条目名**尺，⛔ 未打开一枚前端／设计文件 |
-| 票面 | `git diff --numstat eed229e4..HEAD -- .scratch/wisp/issues/33-panel-host-c27.md`＝**1 增／0 删**＝只有我那一条 Progress log 追加行。⚠ 一枚**归因要说清**的数：现读 `^- [ ]`＝**13**（我锚点处是 12）＝**多的那一枚不是我翻的**，是编排者 `0ecd725c`（`11:47`，`A497`，新开票面 AC#14）；`^- [x]`＝1（AC#11，编排者 11:1x 翻的，早于我起手）。⛔ 我全程没碰任何复选框 |
+| 票面 | `git diff --numstat eed229e4..HEAD -- .scratch/wisp/issues/33-panel-host-c27.md`＝**1 增／0 删**＝那一发只有我那一条 Progress log 追加行（终态数与逐枚归因见 §⑧）。⚠ 一枚**归因要说清**的数：现读 `^- [ ]`＝**13**（我锚点处是 12）＝**多的那一枚不是我翻的**，是编排者 `0ecd725c`（`11:47`，`A497`，新开票面 AC#14）；`^- [x]`＝1（AC#11，编排者 11:1x 翻的，早于我起手）。⛔ 我全程没碰任何复选框 |
 | `docs/reports/pending-and-issues.md` | 未动（`git diff --numstat eed229e4..HEAD -- docs/reports/pending-and-issues.md`＝空） |
 | git 纪律 | 只 commit、⛔ 未 push；每枚提交都带**显式 pathspec**；`git add -A`／`.`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean` **零次**；仓内**零删除**；突变全在仓外 `%TEMP%/33r4-clean` |
 
@@ -296,12 +296,12 @@ PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" GOFLAGS= \
 |---|---|
 | `git status --porcelain -- cmd internal` | 起手（`11:30:24`，HEAD `eed229e4`）＝**0 行**；终态＝**0 行**＝等于起手名册 ✓（本程写过的两枚测试文件已全部提交，仓内零残留、零突变体） |
 | `git diff --numstat eed229e4..HEAD -- cmd internal` | `cmd/wisp/panel_host_gate_test.go 250/25`＋`cmd/wisp/panel_host_windows_test.go 516/66`＝**只有这两枚路径**，⛔ 零枚产码文件。删除列逐名解释（一共 91 行，全是"被替换掉的旧仪器"，没有一行是别人的活）：`panel_host_gate_test.go` 那 25 行＝① 旧 `TestEmbeddedDistCleanCheckoutHasPlaceholderOnly_AC12` 的注释与函数体（0 枚 `t.Errorf` 的那枚空尺，被 `TestPanelBundleShapeSeparatesAnchorFromRealPage_AC12` 取代）② 旧 import 块（新增 `go/ast`／`strconv`／`internal/panel` 三行，重写整块故计入删除）；`panel_host_windows_test.go` 那 66 行＝① 旧 `countWebviewChildren`（全机按名数分母）② 旧 `listenSocketsForPID`（`class=4`／`state=10`／静默 `return 0` 那枚恒真尺）③ 旧 AC#4 那一跳（只有 `t.Logf` 的 4 行）＋它头上那 8 行注释，判据整体迁进新用例 `TestAC4FocusReturnToPriorWindowGap33r2`（取样时刻修正＋4 枚真断言）。⇒ **零枚既有断言被删掉不补**，迁移逐名可对 |
-| `wc -l -c docs/evidence/s1/33-panel-host-c27-r4.md` | 交付判据＝**307 行／60,593 字节**（取数时刻 `12:14:34`，本行已入列；若与本行自身字节数有 ±一位数误差，以编排者复尺为准——本程此后不再改本件） |
+| `wc -l -c docs/evidence/s1/33-panel-host-c27-r4.md` | 交付判据＝**307 行／61,085 字节**（取数时刻 `12:18:10`，本行已入列；若与本行自身字节数有 ±一位数误差，以编排者复尺为准——本程此后不再改本件） |
 
 ### 收尾其它读数（同批发）
 
 - 本程提交清单（逐枚 `git log --format="%h %ad %s"` 现量）：`0a17c9fd`（`11:37` 证据件骨架，④⑤⑥ 起手写满）→ `2288265b`（`11:55` 六格装牙，只两枚 `*_test.go`，766 增／91 删）→ `c8e715e3`（`12:08` 把那枚 U+26D4 请出断言字符串，1 增／1 删）→ `2dd28ace`（`12:09` 证据件终态＋票面两条 Progress log）→ 本枚（复跑读数＋§⑤ 第 25/26 条＋这行清单）。⛔ 全程只 commit、**未 push**。
 - 每一枚提交的 pathspec 都是显式单文件／双文件；`git add -A`／`.` 零次；`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean` 零次；仓内零删除（副本里也只用覆盖还原，没有 `rm`）。
-- 票面：`git diff --numstat eed229e4..HEAD -- .scratch/wisp/issues/33-panel-host-c27.md`＝**1 增／0 删**（我那一条 Progress log 追加行），复选框**一枚未碰**；表里 §③ 已把"多出来的那枚 `- [ ]`＝AC#14"归给编排者自己的 `0ecd725c`。
+- 票面：`git diff --numstat eed229e4..HEAD -- .scratch/wisp/issues/33-panel-host-c27.md`＝**33 增／3 删**（终态 `12:15:34` 复尺，此后本程又追加过一行）。⚠ **那 3 枚删除列不是本程的**——尺＝逐枚 `git show --numstat`：本程每枚触碰票面的提交**删除列都是 0**（只追加 Progress log 行），而那 3 枚删行出自编排者自己的 `0ecd725c`（他票面原话"票面三处标签就地补正"＝改了自己的行）。复选框：现读 `^- [ ]`＝**13**／`^- [x]`＝**1**，与我锚点处（12／1）之差＝编排者新加的 AC#14，⛔ 本程一枚未碰。§③ 那行写的是当时态（1 增／0 删），两处不矛盾，取数时刻都标着。
 - 台件目录：`.scratch/wisp/probes/33/r4/`（`baseline-roster.txt`／`final-roster.txt`／`logs/baseline-start.txt`／`logs/targeted-1..3.txt`／`logs/focus-alone.txt`／`logs/latency-count10.txt`／`logs/mut-b-ac12.txt`／`logs/mut-d-focus.txt`／`logs/final-pkg.txt`／`logs/d22scan.txt`／`logs/d22scan-after.txt`）；仓外副本 `%TEMP%/33r4-clean/`（含 `ipv6probe/main.go`）——**只建不删**，全部留在盘上供复尺。
 - ⛔ 本程没做的：没翻任何 AC 框、没动台账、没读没写 `frontend/**`／`design/**`、没碰三枚冻结件／阈值／golden／allowlist／`PLAN.md`／`specs`／`BUILD.md`／`SLO.md`、没跑 `go mod tidy`／`go get`、没放宽任何既有断言、没在仓内建 worktree。
