@@ -111,3 +111,14 @@
   但真机侧今天**无任何台件读满 10 条 `StepRecord`**（只看 `residentShutdownRecord` 存在与相对位置）。
   判不动的 5 格已按 甲／乙／不做 交裁：census §⑦ F1（托盘点击可注入面）、F2（哪一族能完整覆盖）、F3（空窗坑最小可测形状）、
   F4（`buildWispForTest` 是否产 `-H=windowsgui` 第二产物，本腿未现读）、F5（要不要新增跨进程读 10 条记录的仪器）。
+- `228-a2` 第二发（终态）：`①②③④` 正文补完，并**自查出并改正了第一发的两处假读数**（详见 census §⑥ E4/E5/E11）。
+  最重要的三格新读数：① 全仓 `*_test.go` 里 `wmAppTray`/`showMenu`/`menuExit`/`recordTrayExit` **零命中**（尺 R13）⇒ 托盘命令分流今天**四族台件皆未碰**；
+  ② `internal/proc` 的日志面**只为 skipped／失败／fast 出声**（`shutdown.go:130/145/147/172`），成功步与第 8/10 步零日志（尺 R19）
+  ⇒ **"审计记录里 1..10 都在"在真机盘面上结构性读不到**，不是缺台件；进程内唯一读满 10 条 `StepRecord` 的现成形状是
+  `cmd/wisp/resident_approval_246_windows_test.go:145-158`（尺 R23）。
+  ③ 普查挖出任务描述之外的第四枚成员 `cmd/wisp/resident_ball_live_228_windows_test.go:89`（真机进程 × 跨进程真窗句柄 × 要求窗灭），
+  它是现存码里离 AC#11 ⓑ 最近的一枚；其触发器 `breakToLoop`（`resident_sink_nail_127_windows_test.go:253`）仍是控制台事件。
+  会自动变红的两枚（其余不会，凭据 census §④ D-1）：第七枚常驻协程 → `internal/proc/boot_windows.go:115-118` **Boot 直接失败**；
+  新增 `internal/ball.Events` 键 → `cmd/wisp/resident_ball_228_test.go:319-322`。
+  交裁 7 格：census §⑦ F1（托盘命令可确定性送达）／F2（拒绝猜修法）／F3（空窗最小形状甲乙）／F4（`-H=windowsgui` 第二产物）／
+  F5（真机侧十步读面）／F6（族② 沉默是否算缺陷）／F7（winlive 两包桌面互斥）。本腿零产码零构建，未 push。
