@@ -33,6 +33,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -323,6 +324,75 @@ func TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe(t *testing.T) {
 		gitHeadShortForTest(t), answer, present, len(probes))
 	if present == 0 {
 		t.Errorf("after a real cold start the live document contains NONE of the %d element ids the embedded entry declares (the page itself answered %q). That is ticket 33 AC#13: the round-trip probe page is the last document shown, so the user sees a stub instead of the panel. Product side: bringUp must hand the entry over AFTER the probe - the probe stays, because it is where cold usable is decided", len(probes), answer)
+	}
+}
+
+// ---------------------------------------------------------------------------
+// AC#13's order-dependent red, root cause, nailed DETERMINISTICALLY (leg 33-r6)
+// ---------------------------------------------------------------------------
+
+// postQuitProc reaches the same user32 PostQuitMessage go-webview2's Terminate is
+// (webview.go:381-383), so this test plants exactly the message the library plants.
+var postQuitProc = pnlModUser32.NewProc("PostQuitMessage")
+
+// TestAC13BringUpSurvivesAReusedThreadQuit is the deterministic form of the red that
+// only appeared when a window-owning thread ran before AC13. The full-package shape
+// is a race (the Go scheduler has to hand AC13's panel-sta a pooled thread that an
+// earlier hostThreadHarness returned via UnlockOSThread while it still carried a
+// WM_QUIT), so it is not a stable instrument. Here the same poison is planted on THIS
+// locked thread on purpose, then the product's own bringUp runs on it.
+//
+// Why this is the red: go-webview2's window procedure calls w.Terminate() on
+// WM_DESTROY (webview.go:242-243), and Terminate is a bare PostQuitMessage onto
+// whichever thread pumped the close. A thread that hosted a now-destroyed panel
+// window therefore carries a pending WM_QUIT into the next bring-up: the library's
+// Embed loop (pkg/edge chromium.go:96-111) dequeues that quit from GetMessageW,
+// breaks with inited still 0 and e.webview never assigned, and Init
+// (chromium.go:130-136, no guard on the nil) panics with exactly the recovered string
+// in the ticket's log. The fix is drainStaleQuitBeforeCreate at the top of bringUp.
+//
+// The reverse control: delete that one call from bringUp and this test fails on the
+// planted quit (NewWithOptions panics before the window exists), reported by name -
+// not by a 15-second timeout, because the panic is what is being pinned here.
+func TestAC13BringUpSurvivesAReusedThreadQuit(t *testing.T) {
+	dataPath := filepath.Join(os.TempDir(), "wisp-33r6-reused-thread-quit")
+	disp := &panel.ComposerDispatch{Mode: &recordingModeHandler{}}
+	mgr := NewPanelManager(disp, builtinAssetsOrTestNil(t), dataPath)
+
+	type outcome struct {
+		err     error
+		panicked any
+		created bool
+	}
+	res := make(chan outcome, 1)
+	go func() {
+		// owner: test bring-up on a deliberately reused (poisoned) thread; recover below.
+		var o outcome
+		defer func() {
+			o.panicked = recover()
+			res <- o
+		}()
+		runtime.LockOSThread()
+		defer runtime.UnlockOSThread()
+		// Plant the exact pending quit a prior window owner would have left behind.
+		postQuitProc.Call(0)
+		o.err = mgr.bringUp(context.Background())
+		// Read the verdict BEFORE teardown clears it.
+		o.created = mgr.IsCreated()
+		mgr.Destroy()
+	}()
+
+	o := <-res
+	t.Logf("AC#13 reused-thread root cause: planted one WM_QUIT on this locked thread, then ran bringUp - panicked=%v err=%v created=%v",
+		o.panicked, o.err, o.created)
+	if o.panicked != nil {
+		t.Errorf("bringUp on a thread carrying a pending WM_QUIT %v (the recovered panic) instead of draining it and creating the window. This is ticket 33 AC#13's order-dependent red reproduced deterministically: the library's Embed loop (pkg/edge chromium.go:96-111) dequeued the quit and Init (chromium.go:131) dereferenced the nil control. Fix: bringUp must call drainStaleQuitBeforeCreate before NewWithOptions", o.panicked)
+	}
+	if o.err != nil {
+		t.Errorf("bringUp returned an error on the reused thread: %v (a created window is expected; with the drain in place a pre-existing quit is no reason to refuse to bring the panel up)", o.err)
+	}
+	if !o.created {
+		t.Errorf("bringUp reported success but no window was created on the reused thread (created=%v) - the panel would be blank for the user", o.created)
 	}
 }
 

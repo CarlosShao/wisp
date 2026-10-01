@@ -1,0 +1,17 @@
+33-r6 修 AC13 顺序依赖红：bringUp 建窗前先排干线程残留 WM_QUIT + 一枚确定性根因钉
+
+根因（依赖源码已证，非假设）：go-webview2 wndproc 在 WM_DESTROY 调 w.Terminate()
+(webview.go:242-243)，Terminate 是裸 PostQuitMessage(webview.go:381-383) 投到"泵那扇窗关闭
+消息的那条线程"队列。一条托管过已销毁面板窗的线程，再拿去 bringUp 时 Embed 的 GetMessageW
+(pkg/edge chromium.go:96-111)会先取出这枚 quit、r==0 早退、inited 仍 0、e.webview 从未赋值，
+Init(chromium.go:130-136)对 nil 解引用即整包那枚真红的 panic。
+
+整包形＝调度器 race（前序 hostThreadHarness 用 UnlockOSThread 把带 quit 的线程还给池，AC13 的
+panel-sta 偶发落到它上面）；本腿把同一枚 quit 用 PostQuitMessage 定植在这条锁死的线程上，
+钉 TestAC13BringUpSurvivesAReusedThreadQuit 确定性复现：修在＝窗建起来 created=true 绿，
+抽掉那行 drainStaleQuitBeforeCreate＝当场 panic 红（不靠 15s 超时）。
+
+修法（最小面，产码 cmd/wisp/panel_host_windows.go）：bringUp 进 NewWithOptions 之前排干本线程
+队列里的 WM_QUIT（PeekMessage 过滤 0x12..0x12 PM_REMOVE，只碰 quit、只碰这条线程、只在建窗前）。
+出货 residentPanel.loop 锁而不解本不复发，但 Destroy-then-Show 那条 recreate 面同形可达，
+故落产码而非只改测试。未碰依赖、未 go mod、未动 internal。
