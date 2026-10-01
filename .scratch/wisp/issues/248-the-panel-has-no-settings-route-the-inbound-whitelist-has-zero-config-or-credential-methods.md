@@ -60,6 +60,13 @@ Status: OPEN（编排者 09-30 23:1x 立，来路＝owner 当场提的功能要�
   **本格只许两选一，不许第三形**：ⓘ 把 `approval.New` 移进 `assembleRuntime` ⇒ **这是改票 246 AC#1 裁过的乙形次序**，动手前必须先由编排者落一枚具名 `A##` 批准记录（文件／行／理由／边界／撤销口令），且要兜住"移动会不会破 `Confirming` 那一维"；ⓑ 不移动，那么在设置页那几项的**回执文案**里逐字写明"这两项只作用于跑任务的进程，常驻腿今天用常量 300s／3s"——⛔ 不许只写"已保存"就把差异藏起来（与 AC#8 那条"不许出现'保存即生效'"同族）。
   ⚠ 判据形状＝**反向＋正控**：种一发 `confirm_timeout_sec` 改动 ⇒ 若走 ⓑ，页面必须显式声明不影响常驻腿；若走 ⓘ，`GRANT-DROPPED` 那行**必须不再出现**且"本次会话内允许"要真落一行（凭据复用票 224 r2 那套仪器，⛔ 不许新造）。撤销口令「248 别动常驻门」。
 
+- [ ] **AC#11（新补，10-01 10:2x 编排者追加，来路＝派腿前我自己跑的撞钉预检；这一格决定 AC#7 落在哪枚函数上）**：**配置写只能走"按键的受保护写"那一族，⛔ 不许用整份快照序列化器**。现量凭据（`internal/config`，全路径＋行号）：① 受保护原语＝`(*Manager).mergeWrite(ownedKey string, setOn func(base *Config))`（`internal/config/writeguard.go:111`，票 226 立的；它**先重读文件**、只替换自己那枚键，三形都不静默：文件读不回来⇒拒写并报错、文件已是新值⇒一字不写、真写了⇒报告"哪些键路径变了"＋"哪些外来手改被保留"）；② **既有先例三枚**（都长这个形状，照着写就不算自创）：`internal/config/allowdirs.go:62 AddAllowedDir`／`internal/config/allowdirs.go:109 SetAllowedDirs`／`internal/config/permmode.go:70 SetPermissionMode`；③ ⛔ **`SaveFile`（`internal/config/loader.go:238-249`）是 serializer 不是 merge**——`writeguard.go:5-17` 逐字写着"每一枚程序化写入都用本进程启动时加载的值重写 `config.toml`……操作者手改的任意一枚键会被一发聊天答复悄悄复原，而那枚写还会把文件新的 mtime＋size 认领成'我自己的'，于是连重载路径都看不见它刚毁了什么"＝**票 226 存在的理由**。用它就等于把票 226 修好的洞重新打开。
+  **本格三条判据（缺一格不算完成）**：
+  1. **正向**：种一发并发形状——面板侧写 A 键的同时，另有一枚**进程外手改**的 B 键已经在文件里 ⇒ 落盘后 **B 键必须逐字还在**（凭据＝写前写后各读一次文件比对，⛔ 不许只看 `rc=0`）；负向＝那一枚 setter 写失败时 A 键不许出现"半落"。
+  2. **多枚字段一次保存＝逐枚键各一发受保护写（裁甲）**，⛔ 本票不许自创"多键原子写"新原语（那是票 226 地界，要另批另裁）；中途失败即停，**回执必须逐枚列出实际落盘的键路径**——`mergeWrite` case 3 已经给得出这份报告（`diffKeyPaths`，`writeguard.go:201`），⛔ 不许压平成一句"已保存"（与 AC#8 那句"不许出现'保存即生效'"同族）。
+  3. **AC#7 那枚"写前必校验"的落点＝新增那枚导出 setter 内、进 `mergeWrite` 之前**。现量理由（别按"应该已经校验了"来写）：`grep -n "validate" internal/config/writeguard.go`＝**零命中**⇒ 校验今天不在这条写路径上，AC#7 是真缺口；⛔ 不许改 `mergeWrite` 本体（票 226 地界，且它会波及既有三枚 setter）。
+  ⚠ **一枚本来会挡住本票的钉，射程我量窄了——具名撤除顾虑**：票 224 的 N#9 记着"那枚钉是词面型（禁 `Set*`），日后任何与授权无关的合法 setter 都会被它打红"。我 10:2x 现读真身 `internal/tools/ticket224_setter_scope_test.go:80-97`：它扫的是 **`reflect.PointerTo(bTyp)` 那一枚 `(*tools.Bridge)` 的方法集**（`:93` 逐字 `if strings.HasPrefix(m.Name, "Set")` ⇒ 红句是「(*Bridge).%s is an exported setter on the enforcement layer」），**不覆盖 `internal/config.Manager`**。⇒ 本票新增 `Manager.Set*` 那形**今天不会撞它**，N#9 保持待裁、不再算本票的挡路项。撤销口令「248 别动受保护写」。
+
 ## 3. 禁区（实现腿与验收腿共用）
 
 - ⛔ `frontend/**` 与 `design/**` **两层禁令**：不许读、结论也不许引到它们身上。
