@@ -193,11 +193,26 @@
 ---
 
 
-## E. 收尾三把尺（终态填）
+## E. 收尾三把尺（终态现量）
 
-| 尺 | 起手 | 终态 |
+| 尺 | 起手 | 终态（`11:12:07`，HEAD `345b058b`） |
 |---|---|---|
-| `git status --porcelain -- cmd internal` | 0 行（`10:35:27`／`94bd133e`） | 未判（须**等于起手名册**） |
-| `git diff 94bd133e..HEAD -- cmd internal` | （锚＝起手 HEAD） | 未判（须**为空**） |
-| 三节自对抗非空＋占位符 `grep -c` 为 0 | — | 未判 |
+| `git status --porcelain -- cmd internal` | **0 行**（`10:35:27`／HEAD `94bd133e`） | **0 行**＝等于起手名册 ✓（我全程只在工作树里做过两枚突变，逐枚 `git cat-file blob HEAD:<path> > <path>` 还原并 md5 比对：`e75b9b2e36772ca4cae6043a6dbe7384` 三处相同） |
+| `git diff 94bd133e..HEAD -- cmd internal` | （锚＝起手 HEAD） | **空**（`--name-only` 枚数＝**0**）✓——HEAD 期间从 `94bd133e` 走到 `0d993d66`／`3398e6f1`／`34c28c5c`／`345b058b`（别枚只读腿与编排者的 docs 件），`cmd`／`internal` 一字未变 ⇒ 我的锚与读数仍然同一条线 |
+| 三节自对抗非空＋占位符 `grep -c` 为 0 | — | §A **37 条**（逐条真读数＋时刻＋HEAD）／§B **17 条**／§C **14 条**（逐条甲／乙／不做＋现量）。尺：`grep -c "填写中｜待填｜TODO｜未判"`（把词换成全角竖线以免自我指涉）现量＝**1 命中，且那一枚命中就是本行自己写下的这条尺名**（`11:12:56` 现跑）⇒ **除去本行以外为 0** ✓。另两枚 `占位` 字样是 AC#12 的**领域用语**（`.gitkeep` 那枚占位文件，逐字在 §A#30／§C#6），不是空格。全文 `wc -l -c`＝**218 行／59,916 字节**（`11:12:56`，交付判据取这一发） |
+
+### 其它收尾读数（同发取，`11:11`–`11:12`）
+
+- 交付判据（不是回执）：`wc -l -c docs/evidence/s1/33-panel-host-c27-v1.md`。
+- 票面卫生：`git diff --numstat 7a41db9b..HEAD -- .scratch/wisp/issues/33-panel-host-c27.md`＝实现腿**零行**；我自己全程没碰票面任何一枚 `- [ ]`／`- [x]`（勾框归编排者）。
+- 我这两枚提交的 pathspec 都是显式单文件（`docs/evidence/s1/33-panel-host-c27-v1.md`）；`git add -A`／`.`／`--amend`／`reset`／`rebase`／`stash`／`checkout .`／`clean` **零次**；⛔ 未 push。
+- 我只读未动的禁区清单终态：`go.mod`／`go.sum`／`internal/observe/thresholds.go`／`docs/SLO.md`／`docs/BUILD.md`／`docs/PLAN.md`／`docs/specs/**`／三枚冻结件／`tools/d22scan/allowlist.txt`／`frontend/**`／`design/**` ⇒ 全部由 `git status`＋`git diff --numstat` 双尺现量为零改动（`frontend/dist` 里那 3 枚别人未跟踪产物我只数过条目名、⛔ 未读内容）。
+- 我跑过的全部构建/测试都在 `PATH` 带 `third_party/sherpa-onnx:build` 的前提下取数（§A#9/#19/#23/#26），无一条是 `0xc0000135` 那种"用例根本没跑"的空读数。
+
+### 交给编排者的三行结论（我不翻勾、不补判语）
+
+1. **六格里只有 AC#11 我判成立**（且我自己仓外证了它的牙齿）；AC#1／AC#2／AC#12 是"读数真、判据形不齐／归口未落"；**AC#3 与 AC#4 我判不成立**——AC#3 的"无监听端口"那一维今天**没有任何会响的检**（L2 两枚常量错位，我已用真开端口的突变＋仓外探针把根因定位到行），AC#4 的焦点回还**一条断言都没有**。
+2. **"宿主真装起来了"与"用户能开出一个窗口"之间差的不是细节，是一整跳**：`PanelManager` 生产调用者＝0 枚，常驻的 `OnPanelHotkey`/`OnTrayPanel` 仍只打点，所以 owner 那句"起码我要能看到主面板"在本票这六格里**没有被满足**，也⛔ 不许被这六格的任何绿读成满足。
+3. **两枚停手上报里只有一枚是真的**：ui-sta 再入那枚我判〔仅自述，前提有源码依据〕，需要下一程留栈文或按 §C#9 那枚"只差导出包装"的小口重裁；`w32.Rect` 那枚**理由不成立**（导出的 `(*edge.Chromium).Resize()` 就是高层 API 自己用来定位控制器的那一步）⇒ 它把一枚产品形状决策报成了依赖边界，我按派单要求把这一句定性写死在这里，供你决定要不要摆 owner。
+
 
