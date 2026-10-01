@@ -122,10 +122,10 @@ func (hh *hostThreadHarness) stopHostThread() { hh.stopping.Store(true) }
 // ---------------------------------------------------------------------------
 
 var (
-	t33r5User32         = windows.NewLazySystemDLL("user32.dll")
-	t33r5RegisterClassW = t33r5User32.NewProc("RegisterClassW")
-	t33r5CreateWindowEx = t33r5User32.NewProc("CreateWindowExW")
-	t33r5DefWindowProcW = t33r5User32.NewProc("DefWindowProcW")
+	t33r5User32          = windows.NewLazySystemDLL("user32.dll")
+	t33r5RegisterClassW  = t33r5User32.NewProc("RegisterClassW")
+	t33r5CreateWindowEx  = t33r5User32.NewProc("CreateWindowExW")
+	t33r5DefWindowProcW  = t33r5User32.NewProc("DefWindowProcW")
 	t33r5DestroyWindow   = t33r5User32.NewProc("DestroyWindow")
 	t33r5GetModuleHandle = windows.NewLazySystemDLL("kernel32.dll").NewProc("GetModuleHandleW")
 )

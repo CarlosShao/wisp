@@ -532,10 +532,10 @@ func TestBallGestureWithoutPanelHostStillRecords(t *testing.T) {
 // Windows' foreground rights (which is what makes the end-to-end ruler in
 // TestAC4FocusReturnToPriorWindowGap33r5 environment-gated on assertion 3):
 //
-//   1. a sample that turns out to be the panel itself must not overwrite the honest
-//      prior - that overwrite IS the defect 33-v1 §A#27 found;
-//   2. the recorded prior survives a Hide, so the next Hide still has a target (see
-//      the reasoning on PanelManager.Hide).
+//  1. a sample that turns out to be the panel itself must not overwrite the honest
+//     prior - that overwrite IS the defect 33-v1 §A#27 found;
+//  2. the recorded prior survives a Hide, so the next Hide still has a target (see
+//     the reasoning on PanelManager.Hide).
 //
 // Under the pre-33-r5 code both statements are false by construction (Show assigned
 // GetForegroundWindow() unconditionally, after the window already had the focus), so

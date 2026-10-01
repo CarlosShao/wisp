@@ -172,7 +172,7 @@ func newResidentComposerDispatch(dataDir string, auditf panel.AuditFunc) (*panel
 func newResidentPanelManager(dataDir string) (*PanelManager, error) {
 	auditf := func(format string, args ...any) {
 		line := fmt.Sprintf(format, args...)
-		slog.Info("panel host: "+line)
+		slog.Info("panel host: " + line)
 		fmt.Printf("wisp: %s\n", line)
 	}
 	disp, err := newResidentComposerDispatch(dataDir, auditf)
