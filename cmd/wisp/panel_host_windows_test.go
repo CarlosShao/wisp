@@ -87,7 +87,17 @@ func (hh *hostThreadHarness) runOnThread(fn func() error) error {
 			pnlPumpOnce()
 			time.Sleep(5 * time.Millisecond)
 		}
-		runtime.UnlockOSThread()
+		// DO NOT runtime.UnlockOSThread() here. This goroutine owns a real WebView2
+		// window; when the test's mgr.Destroy() posts WM_CLOSE and the pump dispatches
+		// it, go-webview2's wndproc calls w.Terminate() on WM_DESTROY (webview.go:242-243),
+		// which is a bare PostQuitMessage (webview.go:381-383) onto THIS thread's queue.
+		// If this goroutine unlocked and returned, that thread - carrying a pending
+		// WM_QUIT - would go back to the Go thread pool, and a later resident panel-sta
+		// the scheduler happens to place on it would hit the AC#13/AC#14 panic in
+		// Embed's GetMessageW loop (pkg/edge chromium.go:96-111). Leaving the thread
+		// locked means the runtime destroys it when the goroutine returns, so its
+		// quit dies with it. This mirrors the shipping invariant in
+		// cmd/wisp/panel_resident_windows.go: loop() locks for life and never unlocks.
 	}()
 	select {
 	case err := <-errCh:
