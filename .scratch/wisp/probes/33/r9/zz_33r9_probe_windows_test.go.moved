@@ -1,0 +1,326 @@
+//go:build windows
+
+package main
+
+// 33-r9 PROBE (not a ruler). Measurement rig for ticket 33's FIFTH SHAPE: 33-v2
+// 问② (.scratch ... docs/evidence/s1/33-panel-host-c27-v2.md §5b 问②) says the
+// four-shape grid in 33-r7's modes-grid.txt always uses the same "previous owner"
+// - a window whose Go owner already Destroyed it - and that the table therefore
+// does not cover "a thread carrying one LIVE, legal window owner plus one WM_CLOSE
+// posted at it". This file measures that shape against the product's own bringUp
+// and nothing else. It asserts no AC and changes no semantics: ⛔ it never pumps
+// another owner's queue before the create it is measuring (the pump below runs
+// only to make the plant unambiguous, before the plant, and to release the thread
+// AFTER every reading is taken).
+//
+// Moved out of the package to .scratch/wisp/probes/33/r9/ once the readings are on
+// disk, the same way 33-r7's zz_33r7_probe_windows_test.go was.
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"path/filepath"
+	"runtime"
+	"strings"
+	"sync/atomic"
+	"testing"
+	"time"
+	"unsafe"
+
+	"github.com/CarlosShao/wisp/internal/panel"
+	"golang.org/x/sys/windows"
+)
+
+var (
+	t33r9User32           = windows.NewLazySystemDLL("user32.dll")
+	t33r9PostMessage      = t33r9User32.NewProc("PostMessageW")
+	t33r9IsWindow         = t33r9User32.NewProc("IsWindow")
+	t33r9GetQueueStatus   = t33r9User32.NewProc("GetQueueStatus")
+	t33r9EnumThreadWindow = t33r9User32.NewProc("EnumThreadWindows")
+)
+
+var t33r9WinCount atomic.Int64
+
+var t33r9EnumProc = windows.NewCallback(func(hwnd, lparam uintptr) uintptr {
+	t33r9WinCount.Add(1)
+	return 1
+})
+
+func t33r9ThreadWindows(tid uint32) int {
+	t33r9WinCount.Store(0)
+	t33r9EnumThreadWindow.Call(uintptr(tid), uintptr(t33r9EnumProc), 0)
+	return int(t33r9WinCount.Load())
+}
+
+func t33r9Tid() uint32 { return uint32(windows.GetCurrentThreadId()) }
+
+// t33r9Live asks user32 whether a handle is still a window.
+func t33r9Live(h uintptr) bool {
+	r, _, _ := t33r9IsWindow.Call(h)
+	return r != 0
+}
+
+// t33r9Head names the first queued message on this thread WITHOUT removing it.
+func t33r9Head() string {
+	var m pnlMsg
+	r, _, _ := pnlPeekMessageW.Call(uintptr(unsafe.Pointer(&m)), 0, 0, 0, 0)
+	if r == 0 {
+		return "empty"
+	}
+	return fmt.Sprintf("msg 0x%X on hwnd 0x%X", m.message, uintptr(m.hwnd))
+}
+
+// t33r9ClosePeek runs the product's own check and returns its two readings as text.
+func t33r9ClosePeek() string {
+	dirty, hwnd := staleCloseQueued()
+	return fmt.Sprintf("staleCloseQueued=%v hwnd=0x%X", dirty, hwnd)
+}
+
+// t33r9PostClose posts (never sends) one WM_CLOSE at a window and says what
+// PostMessageW answered, so a failed plant is visible as a failed plant.
+func t33r9PostClose(h uintptr) string {
+	r, _, errno := t33r9PostMessage.Call(h, uintptr(pnlWmClose), 0, 0)
+	return fmt.Sprintf("PostMessageW returned=%v lastErr=%v", r != 0, errno)
+}
+
+// t33r9Run is one probe run's readings, carried back to the reporting goroutine.
+type t33r9Run struct {
+	panicked  any
+	tid       uint32
+	notes     []string
+	createErr error
+	created   bool
+	secondErr error
+	elapsedMS int64
+}
+
+func (o *t33r9Run) say(format string, args ...any) {
+	o.notes = append(o.notes, fmt.Sprintf(format, args...))
+}
+
+// TestZzR9ShapeFive is the fifth shape: a LIVE window owner on one locked thread,
+// plus one undispatched WM_CLOSE posted at it, and then the product's own bringUp.
+// Three runs in-process are enough here because nothing in this shape is expected
+// to take the binary down: the refusal returns before NewWithOptions.
+func TestZzR9ShapeFive(t *testing.T) {
+	for i := 1; i <= 3; i++ {
+		o := runT33r9Shape("five", filepath.Join(os.TempDir(), fmt.Sprintf("wisp-33r9-five-%d", i)))
+		t.Logf("RUN %d [five] tid=%d panicked=%v bringUp#2 err=%v created=%v elapsed=%dms",
+			i, o.tid, o.panicked, o.createErr, o.created, o.elapsedMS)
+		for _, n := range o.notes {
+			t.Logf("   | %s", n)
+		}
+	}
+}
+
+// TestZzR9ShapeControl is the comparison shape 33-v2 问② says the grid already had:
+// the same thread, the same window, but its Go owner Destroyed it and the thread
+// dispatched that close itself. If the check reads these two shapes the same way,
+// no recovery action can ever tell a live owner from a dead one.
+// TestZzR9ShapeFivePlain is the fifth shape again, but the live window is a PLAIN
+// top-level window (no WebView2, no browser child processes). Two reasons to measure
+// it separately: it is the carrier the shipping nail in 33-r9's test file can use
+// without adding msedgewebview2 processes to AC#1's tree count, and it answers a
+// question the WebView2 form cannot - does the product's check care whose window the
+// queued close belongs to at all?
+func TestZzR9ShapeFivePlain(t *testing.T) {
+	for i := 1; i <= 3; i++ {
+		res := make(chan t33r9Plain, 1)
+		go func() {
+			// owner: 33-r9 probe thread, plain window only.
+			var o t33r9Plain
+			defer func() { o.panicked = recover(); res <- o }()
+			runtime.LockOSThread()
+			o.tid = t33r9Tid()
+			hwnd, err := createEditorWindow(fmt.Sprintf("wisp 33r9 plain live owner %d", i))
+			if err != nil {
+				o.say("the plain window could not be built: %v", err)
+				return
+			}
+			o.hwnd = hwnd
+			live := uintptr(hwnd)
+			o.say("plain window live: hwnd=0x%X IsWindow=%v thread windows=%d | %s",
+				live, t33r9Live(live), t33r9ThreadWindows(o.tid), t33r9ClosePeek())
+			o.say("plant %s; head=%s", t33r9PostClose(live), t33r9Head())
+			dirty, closedHwnd := staleCloseQueued()
+			o.say("PRE-CREATE CHECK: staleCloseQueued=%v hwnd=0x%X names-the-plain-window=%v", dirty, closedHwnd, closedHwnd == live)
+			victim := NewPanelManager(&panel.ComposerDispatch{Mode: &recordingModeHandler{}}, nil,
+				filepath.Join(os.TempDir(), fmt.Sprintf("wisp-33r9-plain-%d", i)))
+			start := time.Now()
+			o.createErr = victim.bringUp(context.Background())
+			o.created = victim.IsCreated()
+			o.elapsedMS = time.Since(start).Milliseconds()
+			StillQueued, _ := staleCloseQueued()
+			o.say("bringUp on the plain-carrier thread: err=%v created=%v in %dms (IsWindow(0x%X) still %v, close still queued %v)",
+				o.createErr, o.created, o.elapsedMS, live, t33r9Live(live), StillQueued)
+			// Release duty, ON the thread that owns the window, after every reading:
+			// dispatching the queued WM_CLOSE is what destroys the plain window
+			// (DefWindowProc answers WM_CLOSE with DestroyWindow), so this is the
+			// same "pump to quiet" the resident thread's owner would have to do.
+			p, left, head := releaseThreadClean()
+			o.say("released on its own thread: dispatched %d, windows left=%d, head=%s, IsWindow(0x%X)=%v", p, left, head, live, t33r9Live(live))
+		}()
+		o := <-res
+		t.Logf("RUN %d [five-plain] tid=%d panicked=%v created=%v elapsed=%dms", i, o.tid, o.panicked, o.created, o.elapsedMS)
+		for _, n := range o.notes {
+			t.Logf("   | %s", n)
+		}
+		if o.created {
+			t.Errorf("the plain carrier did not refuse: bringUp created a window on a thread that owes somebody a WM_CLOSE")
+		}
+	}
+}
+
+// t33r9Plain carries the plain-carrier run's readings, including the handle the
+// reporting side needs for its own release check.
+type t33r9Plain struct {
+	panicked  any
+	tid       uint32
+	hwnd      windows.HWND
+	notes     []string
+	createErr error
+	created   bool
+	elapsedMS int64
+}
+
+func (o *t33r9Plain) say(format string, args ...any) {
+	o.notes = append(o.notes, fmt.Sprintf(format, args...))
+}
+
+// plainWindowKey stashes the ruler's own window handle between the measuring
+// goroutine and the releasing code (it must be destroyed ON its thread, which is
+// gone by then, so the pump takes the close instead).
+type t33r9Extra struct{ destroyWindow windows.HWND }
+
+func TestZzR9ShapeControl(t *testing.T) {
+	for i := 1; i <= 3; i++ {
+		o := runT33r9Shape("control", filepath.Join(os.TempDir(), fmt.Sprintf("wisp-33r9-ctl-%d", i)))
+		t.Logf("RUN %d [control] tid=%d panicked=%v bringUp#2 err=%v created=%v elapsed=%dms",
+			i, o.tid, o.panicked, o.createErr, o.created, o.elapsedMS)
+		for _, n := range o.notes {
+			t.Logf("   | %s", n)
+		}
+	}
+}
+
+func runT33r9Shape(shape, data string) t33r9Run {
+	res := make(chan t33r9Run, 1)
+	go func() {
+		// owner: 33-r9 probe thread; recovered below.
+		var o t33r9Run
+		defer func() { o.panicked = recover(); res <- o }()
+		runtime.LockOSThread()
+		o.tid = t33r9Tid()
+
+		// The window that is about to become the subject: the product's own bring-up,
+		// on this thread, with its Go manager kept ALIVE in the "five" shape.
+		owner := NewPanelManager(&panel.ComposerDispatch{Mode: &recordingModeHandler{}}, nil, data)
+		if err := owner.bringUp(context.Background()); err != nil {
+			o.say("owner bringUp FAILED, the plant cannot be built: %v", err)
+			return
+		}
+		liveHwnd := owner.windowHandle()
+		o.say("owner bringUp ok: hwnd=0x%X live=%v thread windows=%d | %s",
+			liveHwnd, t33r9Live(liveHwnd), t33r9ThreadWindows(o.tid), t33r9ClosePeek())
+
+		// Make the plant unambiguous: run the window's own traffic to idle BEFORE
+		// posting the close (33-r7's discipline). Nothing is pumped after the plant.
+		idle := pumpThreadToQuiet(4096)
+		o.say("pumped %d message(s) to idle BEFORE the plant; head=%s | %s", idle, t33r9Head(), t33r9ClosePeek())
+
+		if shape == "five" {
+			// The plant: one WM_CLOSE at a window whose owner is alive and knows it.
+			plant := t33r9PostClose(liveHwnd)
+			o.say("plant %s; IsWindow(0x%X)=%v owner.IsCreated=%v head=%s",
+				plant, liveHwnd, t33r9Live(liveHwnd), owner.IsCreated(), t33r9Head())
+		} else {
+			owner.Destroy()
+			pumped := pumpThreadToQuiet(4096)
+			o.say("owner.Destroy() then pumped %d to quiet (the close was DISPATCHED by the thread's own owner); IsWindow(0x%X)=%v thread windows=%d",
+				pumped, liveHwnd, t33r9Live(liveHwnd), t33r9ThreadWindows(o.tid))
+		}
+
+		// What the product's check sees, read directly, before any create runs.
+		dirty, closedHwnd := staleCloseQueued()
+		o.say("PRE-CREATE CHECK: staleCloseQueued=%v hwnd=0x%X (owner hwnd 0x%X, same=%v) head=%s thread windows=%d",
+			dirty, closedHwnd, liveHwnd, dirty && closedHwnd == liveHwnd, t33r9Head(), t33r9ThreadWindows(o.tid))
+
+		// The subject: the product's own bring-up on the same thread.
+		victim := NewPanelManager(&panel.ComposerDispatch{Mode: &recordingModeHandler{}}, nil, data+"-second")
+		start := time.Now()
+		o.createErr = victim.bringUp(context.Background())
+		o.created = victim.IsCreated()
+		o.elapsedMS = time.Since(start).Milliseconds()
+		o.say("bringUp#2: err=%v created=%v in %dms", o.createErr, o.created, o.elapsedMS)
+
+		// What the live window and the plant did while the refusal was happening.
+		mask, _, _ := t33r9GetQueueStatus.Call(0x0000FFFF)
+		o.say("AFTER the refusal: IsWindow(owner 0x%X)=%v owner.IsCreated=%v | %s | head=%s | thread windows=%d | mask=0x%X",
+			liveHwnd, t33r9Live(liveHwnd), owner.IsCreated(), t33r9ClosePeek(), t33r9Head(),
+			t33r9ThreadWindows(o.tid), uint32(mask))
+
+		// The second Show, and the third, on both managers: the refusal road and the
+		// live owner's own road. Nothing here pumps or cleans.
+		o.secondErr = victim.Show(context.Background())
+		o.say("SECOND Show on the refused manager: err=%v created=%v (same road? refusal mentions WM_CLOSE=%v)",
+			o.secondErr, victim.IsCreated(), strings.Contains(fmt.Sprint(o.secondErr), "WM_CLOSE"))
+		thirdErr := victim.Show(context.Background())
+		o.say("THIRD Show on the refused manager: err=%v created=%v", thirdErr, victim.IsCreated())
+		if err := owner.Show(context.Background()); err != nil {
+			o.say("Show on the LIVE owner: err=%v", err)
+		} else {
+			o.say("Show on the LIVE owner: ok, hwnd still 0x%X live=%v", owner.windowHandle(), t33r9Live(uintptr(owner.windowHandle())))
+		}
+
+		// Release duty AFTER every reading (the discipline 33-r7's nail demands of a
+		// window-owning thread): the live owner first, then dispatch to empty.
+		owner.Destroy()
+		victim.Destroy()
+		p, left, head := releaseThreadClean()
+		o.say("released: dispatched %d, windows left=%d, head=%s", p, left, head)
+		// And DO NOT runtime.UnlockOSThread(): this thread owned a real WebView2
+		// window, so it goes back to the pool only if the readings above came back
+		// clean - and even then the runtime simply ends the thread here, which is
+		// what cmd/wisp/panel_host_windows_test.go's harness does for the same reason.
+	}()
+	return <-res
+}
+
+// TestZzR9ThreadExitTakesItsWindow measures the one thing that decides whether
+// "restart a clean thread" is a repair: what becomes of a window that is still
+// alive on a locked thread when that thread ends. Deliberately a plain window (no
+// WebView2 in this reading), because the question is the Win32 thread-exit rule.
+func TestZzR9ThreadExitTakesItsWindow(t *testing.T) {
+	for i := 1; i <= 3; i++ {
+		res := make(chan [2]uintptr, 1)
+		go func() {
+			// owner: 33-r9 probe thread; plain window only, no browser.
+			defer func() {
+				if r := recover(); r != nil {
+					res <- [2]uintptr{0, 0}
+				}
+			}()
+			runtime.LockOSThread()
+			h, err := createEditorWindow(fmt.Sprintf("wisp 33r9 live owner %d", i))
+			if err != nil {
+				t.Logf("EXIT-RUN %d: the plain window could not be built: %v", i, err)
+				res <- [2]uintptr{0, 0}
+				return
+			}
+			before := uintptr(h)
+			pumpThreadToQuiet(64)
+			res <- [2]uintptr{before, uintptr(t33r9ThreadWindows(t33r9Tid()))}
+			// Return WITHOUT unlocking: the runtime ends this OS thread, which is
+			// exactly what the resident panel thread does when its loop returns.
+		}()
+		got := <-res
+		if got[0] == 0 {
+			t.Logf("EXIT-RUN %d: no window built, nothing measured", i)
+			continue
+		}
+		time.Sleep(150 * time.Millisecond)
+		t.Logf("EXIT-RUN %d: window 0x%X owned by a locked thread that has ended: IsWindow=%v (it owned %d window(s) while alive)",
+			got[0], got[0], t33r9Live(got[0]), got[1])
+	}
+}

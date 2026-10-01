@@ -1,0 +1,8 @@
+time=2026-10-01T17:35:01.889+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestZzR9ThreadExitTakesItsWindow
+    zz_33r9_probe_windows_test.go:248: EXIT-RUN 89197154: window 0x5510A62 owned by a locked thread that has ended: IsWindow=false (it owned 3 window(s) while alive)
+    zz_33r9_probe_windows_test.go:248: EXIT-RUN 89262690: window 0x5520A62 owned by a locked thread that has ended: IsWindow=false (it owned 3 window(s) while alive)
+    zz_33r9_probe_windows_test.go:248: EXIT-RUN 89328226: window 0x5530A62 owned by a locked thread that has ended: IsWindow=false (it owned 3 window(s) while alive)
+--- PASS: TestZzR9ThreadExitTakesItsWindow (0.61s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.699s

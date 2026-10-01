@@ -1,0 +1,11 @@
+=== go build ./... ===
+rc=0
+=== go vet ./cmd/wisp ===
+rc=0
+=== gofumpt -l (my paths) ===
+rc=0 (no paths above = clean)
+=== desktop hygiene ===
+12
+=== orphan wisp.test / go.exe ===
+1
+2

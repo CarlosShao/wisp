@@ -1,0 +1,23 @@
+time=2026-10-01T17:37:25.510+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestZzR9ShapeFivePlain
+    zz_33r9_probe_windows_test.go:165: RUN 1 [five-plain] tid=22940 panicked=<nil> created=false elapsed=0ms
+    zz_33r9_probe_windows_test.go:167:    | plain window live: hwnd=0x780F3C IsWindow=true thread windows=3 | staleCloseQueued=false hwnd=0x0
+    zz_33r9_probe_windows_test.go:167:    | plant PostMessageW returned=true lastErr=The operation completed successfully.; head=msg 0x31F on hwnd 0x780F3C
+    zz_33r9_probe_windows_test.go:167:    | PRE-CREATE CHECK: staleCloseQueued=true hwnd=0x780F3C names-the-plain-window=true
+    zz_33r9_probe_windows_test.go:167:    | bringUp on the plain-carrier thread: err=panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0x780F3C. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message created=false in 0ms (IsWindow(0x780F3C) still true, close still queued true)
+    zz_33r9_probe_windows_test.go:167:    | released on its own thread: dispatched 7, windows left=0, head=empty, IsWindow(0x780F3C)=false
+    zz_33r9_probe_windows_test.go:165: RUN 2 [five-plain] tid=26464 panicked=<nil> created=false elapsed=0ms
+    zz_33r9_probe_windows_test.go:167:    | plain window live: hwnd=0x1290D78 IsWindow=true thread windows=3 | staleCloseQueued=false hwnd=0x0
+    zz_33r9_probe_windows_test.go:167:    | plant PostMessageW returned=true lastErr=The operation completed successfully.; head=msg 0x31F on hwnd 0x1290D78
+    zz_33r9_probe_windows_test.go:167:    | PRE-CREATE CHECK: staleCloseQueued=true hwnd=0x1290D78 names-the-plain-window=true
+    zz_33r9_probe_windows_test.go:167:    | bringUp on the plain-carrier thread: err=panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0x1290D78. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message created=false in 0ms (IsWindow(0x1290D78) still true, close still queued true)
+    zz_33r9_probe_windows_test.go:167:    | released on its own thread: dispatched 2, windows left=0, head=empty, IsWindow(0x1290D78)=false
+    zz_33r9_probe_windows_test.go:165: RUN 3 [five-plain] tid=30488 panicked=<nil> created=false elapsed=0ms
+    zz_33r9_probe_windows_test.go:167:    | plain window live: hwnd=0x12A0D78 IsWindow=true thread windows=3 | staleCloseQueued=false hwnd=0x0
+    zz_33r9_probe_windows_test.go:167:    | plant PostMessageW returned=true lastErr=The operation completed successfully.; head=msg 0x31F on hwnd 0x12A0D78
+    zz_33r9_probe_windows_test.go:167:    | PRE-CREATE CHECK: staleCloseQueued=true hwnd=0x12A0D78 names-the-plain-window=true
+    zz_33r9_probe_windows_test.go:167:    | bringUp on the plain-carrier thread: err=panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0x12A0D78. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message created=false in 0ms (IsWindow(0x12A0D78) still true, close still queued true)
+    zz_33r9_probe_windows_test.go:167:    | released on its own thread: dispatched 2, windows left=0, head=empty, IsWindow(0x12A0D78)=false
+--- PASS: TestZzR9ShapeFivePlain (0.31s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	0.420s

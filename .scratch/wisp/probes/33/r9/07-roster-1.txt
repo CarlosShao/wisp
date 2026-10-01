@@ -1,0 +1,145 @@
+time=2026-10-01T17:51:20.240+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestPanelRouteRefusesAnAllowBurnsTheGrantAndCanStillReject
+time=2026-10-01T17:51:21.887+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/01 17:51:21 mockllm: serving on http://127.0.0.1:60286 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-01T17:51:21.916+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestPanelRouteRefusesAnAllowBurnsTheGrantAndCanStillReject3236964990\002\logs min_level=info early_records=2 early_dropped=0
+time=2026-10-01T17:51:21.943+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestPanelRouteRefusesAnAllowBurnsTheGrantAndCanStillReject3236964990\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-01T17:51:21.953+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-01T09:51:21Z duration_ms=8
+time=2026-10-01T17:51:21.961+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestPanelRouteRefusesAnAllowBurnsTheGrantAndCanStillReject3236964990\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-01T17:51:21.966+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-01T09:51:21Z duration_ms=4
+time=2026-10-01T17:51:21.971+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-01T17:51:21.973+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+time=2026-10-01T17:51:22.037+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestPanelRouteRefusesAnAllowBurnsTheGrantAndCanStillReject (1.81s)
+=== RUN   TestNativeHostSeamRefusesAPanelSourcedAllow
+time=2026-10-01T17:51:23.294+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=mockllm-stdout-reader owner=test
+2026/10/01 17:51:23 mockllm: serving on http://127.0.0.1:55078 (golden dir D:\work\workspace\projects plans\Wisp\internal\llm\testdata\golden)
+time=2026-10-01T17:51:23.316+08:00 level=INFO msg="wisp: persistent log sink installed" dir=C:\Users\swq\AppData\Local\Temp\TestNativeHostSeamRefusesAPanelSourcedAllow3436762977\002\logs min_level=info early_records=0 early_dropped=0
+time=2026-10-01T17:51:23.340+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestNativeHostSeamRefusesAPanelSourcedAllow3436762977\002\backup\wisp.db.bak-0-1 from=0 to=1
+time=2026-10-01T17:51:23.349+08:00 level=INFO msg="schema migration step applied" component=memory from=0 to=1 started_at=2026-10-01T09:51:23Z duration_ms=9
+time=2026-10-01T17:51:23.359+08:00 level=INFO msg="pre-migration backup written" component=memory backup=C:\Users\swq\AppData\Local\Temp\TestNativeHostSeamRefusesAPanelSourcedAllow3436762977\002\backup\wisp.db.bak-1-2 from=1 to=2
+time=2026-10-01T17:51:23.367+08:00 level=INFO msg="schema migration step applied" component=memory from=1 to=2 started_at=2026-10-01T09:51:23Z duration_ms=8
+time=2026-10-01T17:51:23.374+08:00 level=INFO msg="schema migration complete" component=memory schema_version=2
+time=2026-10-01T17:51:23.377+08:00 level=INFO msg="startup WAL checkpoint (TRUNCATE) done" component=memory wal_pages_before=0 pages_moved=0
+--- PASS: TestNativeHostSeamRefusesAPanelSourcedAllow (1.35s)
+=== RUN   TestTicket223PanelInboundSaysHotReloadIsDisabled
+--- PASS: TestTicket223PanelInboundSaysHotReloadIsDisabled (0.01s)
+=== RUN   TestAC4EveryLegIsNailedOrRuled
+    leg_sink_gate_131_test.go:328: nail entry claims, checked against the dispatch closure:
+          nail "TestAC1ResidentLegInstallsItsLogListenerOnDisk" -> leg "no-args", entry "runResident": declared with the "subprocess:" prefix, so this row is a name-only claim about a real process and NOT evidence that anybody asserts "no-args"'s semantics in-process.
+          nail "TestAC2ModelsLegBooksItsHandOffVerdictOnDisk" -> leg "models", entry "cmdModels": checked, the case calls the entry this leg's dispatch reaches
+          nail "TestAC2SealNoticeLandsInTheRunLegLogFile" -> leg "run", entry "runTextTask": checked, the case calls the entry this leg's dispatch reaches
+          nail "TestAC3SecretLegBooksItsAuditRecordsOnDisk" -> leg "secret", entry "cmdSecret": checked, the case calls the entry this leg's dispatch reaches
+    leg_sink_gate_131_test.go:407: leg ledger, enumerated from source at run time:
+          leg --help       main.go:124                install=false records=false ruled=false nails=-                                                          -> no records
+          leg --version    main.go:121                install=false records=false ruled=false nails=-                                                          -> no records
+          leg -h           main.go:124                install=false records=false ruled=false nails=-                                                          -> no records
+          leg -v           main.go:121                install=false records=false ruled=false nails=-                                                          -> no records
+          leg default      main.go:127                install=false records=false ruled=false nails=-                                                          -> no records
+          leg doctor       main.go:95                 install=false records=false ruled=false nails=-                                                          -> no records
+          leg help         main.go:124                install=false records=false ruled=false nails=-                                                          -> no records
+          leg models       main.go:102                install=true  records=true  ruled=false nails=TestAC2ModelsLegBooksItsHandOffVerdictOnDisk               -> nailed
+          leg no-args      main.go:60                 install=true  records=true  ruled=false nails=TestAC1ResidentLegInstallsItsLogListenerOnDisk             -> nailed
+          leg panel-assets main.go:112                install=false records=false ruled=false nails=-                                                          -> no records
+          leg panel-inbound main.go:115                install=false records=false ruled=false nails=-                                                          -> no records
+          leg providers    main.go:92                 install=false records=false ruled=false nails=-                                                          -> no records
+          leg run          main.go:89                 install=true  records=true  ruled=false nails=TestAC2SealNoticeLandsInTheRunLegLogFile                   -> nailed
+          leg secret       main.go:100                install=true  records=true  ruled=false nails=TestAC3SecretLegBooksItsAuditRecordsOnDisk                 -> nailed
+          leg slo          main.go:110                install=false records=true  ruled=true  nails=-                                                          -> ruled
+          leg version      main.go:121                install=false records=false ruled=false nails=-                                                          -> no records
+--- PASS: TestAC4EveryLegIsNailedOrRuled (0.07s)
+=== RUN   TestPanelHostOpensNoListeningSocketL1
+--- PASS: TestPanelHostOpensNoListeningSocketL1 (0.00s)
+=== RUN   TestPanelBundleShapeSeparatesAnchorFromRealPage_AC12
+    panel_host_gate_test.go:109: AC#12 reading (head 28f7ba8c): shape=page-bundle built=true entry-bytes=1044 entry-ctype="text/html; charset=utf-8" entry-err=<nil> refs=2 check-err=<nil> manifest-entries=4 manifest-err=<nil> | git-metadata=true tracked=1 tracked-beyond-anchor=0 tracked-has-entry=false ignored-or-untracked=2
+--- PASS: TestPanelBundleShapeSeparatesAnchorFromRealPage_AC12 (0.21s)
+=== RUN   TestPanelHostRealWindowHopAndLifecycle
+    panel_host_windows_test.go:544: cold bring-up measured on this box: 715.489 ms (HEAD 28f7ba8c at read time, 2026-10-01T17:51:24+08:00)
+    panel_host_windows_test.go:591: AC#1 denominators (head 28f7ba8c): our tree webview=7 direct-children=1 tree-pids=7 | machine-wide msedgewebview2=19 | same HWND 0x1340ea0 across hide->re-show=true
+    panel_host_windows_test.go:596: hot re-show measured on this box: 35.362 ms
+    panel_host_windows_test.go:623: AC#3 listening-socket ruler (head 28f7ba8c): IPv4 rows=375 LISTEN-owned-by-tree=0 ; IPv6 rows=39 LISTEN-owned-by-tree=0 err=<nil>
+    panel_host_windows_test.go:649: AC#1 after Destroy (head 28f7ba8c), ONE sample and no timing claim: our tree webview baseline 0 -> now 7, machine-wide 12 -> 19. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (0.89s)
+=== RUN   TestAC4FocusReturnToPriorWindowGap33r5
+    panel_host_windows_test.go:753: AC#4 focus hop (head 28f7ba8c): foreground before any panel 0x1340ea0 | the ruler's own editor window 0xd4b0c3a | foreground while hidden (prior) 0xd4b0c3a | after Show 0x24009be | panel hwnd 0x24009be | prevFocus recorded at Show 0xd4b0c3a | after Hide 0xd4b0c3a | Hide attempted restore to 0xd4b0c3a (SetForegroundWindow 1, SetFocus 223022138)
+--- PASS: TestAC4FocusReturnToPriorWindowGap33r5 (0.59s)
+=== RUN   TestPanelHostLatencyPercentilesAC2
+    panel_host_windows_test.go:796: AC#2 appendix (head 28f7ba8c, n=1, same-process consecutive runs):
+    panel_host_windows_test.go:802:   sample  1: cold=715.489 ms hot=35.362 ms at 2026-10-01T17:51:24+08:00
+    panel_host_windows_test.go:808: AC#2 percentiles over 1 runs (nearest-rank): cold P50=715.489 P95=715.489 (budget 1500) | hot P50=35.362 P95=35.362 (budget 200)
+    panel_host_windows_test.go:812: AC#2 P11 line (cold > 2000 ms) - max cold observed over these runs: 715.489 ms
+--- PASS: TestPanelHostLatencyPercentilesAC2 (0.00s)
+=== RUN   TestAC3ListeningSocketRulerSeesItsOwnListener
+    panel_host_windows_test.go:863: AC#3 positive control: IPv4 table rows=370, this pid owned 0 before / 1 while 127.0.0.1:58578 is listening
+    panel_host_windows_test.go:885: AC#3 positive control, IPv6 family: listening on [::1]:58579, table rows=40, this pid owns 1 LISTEN rows (baseline 0)
+    panel_host_windows_test.go:911: AC#3 positive control verdict: ruler counts a real listener (0 -> 1) and stops after Close (0)
+--- PASS: TestAC3ListeningSocketRulerSeesItsOwnListener (0.01s)
+=== RUN   TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe
+    panel_resident_windows_test.go:315: AC#13 probes from the resolved entry (1044 bytes): 1 id(s) [root]
+time=2026-10-01T17:51:25.208+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold 786.3 ms, hot path 0.0 ms)
+    panel_resident_windows_test.go:327: AC#13 page answer (head 28f7ba8c): "1" - 1 of 1 probe id(s) present in the live document
+time=2026-10-01T17:51:26.172+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-01T17:51:26.173+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- PASS: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (0.97s)
+=== RUN   TestAC13BringUpSurvivesAReusedThreadQuit
+    panel_resident_windows_test.go:483: AC#13 reused-thread root cause: planted one WM_QUIT on this locked thread, then ran bringUp - panicked=<nil> err=<nil> created=true
+    panel_resident_windows_test.go:485: AC#13 reused-thread release: tid=31912 dispatched 3 message(s) before unlocking; windows left on that thread=0 queue head=empty
+--- PASS: TestAC13BringUpSurvivesAReusedThreadQuit (0.79s)
+=== RUN   TestAC13BringUpRefusesAThreadWithAQueuedClose
+    panel_resident_windows_test.go:569: AC#13 queued-close: tid=31912 first bringUp ok, pumped 0 to idle, Destroy left a queued close (hwnd 0xF90F2A, plantQueued=true), then bringUp#2 err=panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0xF90F2A. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message created=false; the close was still queued after the refusal=true; released with windows=0 queue head=empty
+--- PASS: TestAC13BringUpRefusesAThreadWithAQueuedClose (0.85s)
+=== RUN   TestAC13NamedRefusalEndsThePanelThreadInsteadOfRefusingForever
+time=2026-10-01T17:51:27.817+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+    panel_resident_windows_test.go:689: fifth-shape plant on the panel thread: hwnd=0xFA0F2A live=true PostMessageW(WM_CLOSE) returned=true lastErr=The operation completed successfully. | check reads queued=true names-the-live-window=true
+time=2026-10-01T17:51:27.863+08:00 level=ERROR msg="panel host: show failed on the panel thread" via=33r9-nail err="panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0xFA0F2A. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message"
+wisp: panel could not open (panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0xFA0F2A. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message): 33r9-nail
+time=2026-10-01T17:51:27.863+08:00 level=ERROR msg="panel thread: retiring without a panel window after a named refusal" via=33r9-nail err="panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0xFA0F2A. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message" shows=1
+wisp: panel thread will take no further requests: panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0xFA0F2A. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message
+time=2026-10-01T17:51:27.864+08:00 level=INFO msg="panel thread ending" why="no window to pump" window_opened=false
+    panel_resident_windows_test.go:759: refusal-to-retirement: settle=14.6013ms second RequestShow accepted=false in 0s | thread retired=true isFinished=true | the planted live window 0xFA0F2A IsWindow=false | startUpErr=panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0xFA0F2A. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message | statusLine="panel thread could not start: panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0xFA0F2A. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message"
+time=2026-10-01T17:51:27.879+08:00 level=INFO msg="panel thread exited cleanly" shows=2 toggles=0 disposals=0
+--- PASS: TestAC13NamedRefusalEndsThePanelThreadInsteadOfRefusingForever (0.06s)
+=== RUN   TestAC14AwaitedBindingReplyReachesThePage
+time=2026-10-01T17:51:27.879+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold 370.2 ms, hot path 0.0 ms)
+    panel_resident_windows_test.go:825: AC#14 nail 1 (reply hop), page's own words: "REPLIED,REPLIED,REPLIED" (Go's handler was reached by 3 of the 3 real requests)
+time=2026-10-01T17:51:28.382+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-01T17:51:28.382+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- PASS: TestAC14AwaitedBindingReplyReachesThePage (0.50s)
+=== RUN   TestAC14GoSideEvalPushReachesThePage
+time=2026-10-01T17:51:28.382+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold 326.8 ms, hot path 0.0 ms)
+    panel_resident_windows_test.go:867: AC#14 nail 2 (Eval push hop), page's own words: title="PUSHED-33R5-OK"
+time=2026-10-01T17:51:28.855+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-01T17:51:28.855+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- PASS: TestAC14GoSideEvalPushReachesThePage (0.47s)
+=== RUN   TestPanelThreadIsSTAAndExitsCleanly
+time=2026-10-01T17:51:28.855+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold 306.9 ms, hot path 0.0 ms)
+time=2026-10-01T17:51:29.179+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-01T17:51:29.179+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+    panel_resident_windows_test.go:910: panel thread up and down: hwnd 0x33c0a98, exits observed, shows=1
+time=2026-10-01T17:51:29.179+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- PASS: TestPanelThreadIsSTAAndExitsCleanly (0.32s)
+=== RUN   TestPanelThreadNameIsNotInResidentRoster
+--- PASS: TestPanelThreadNameIsNotInResidentRoster (0.00s)
+=== RUN   TestBallPanelGesturesReachThePanelThread
+time=2026-10-01T17:51:29.180+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (panel-hotkey, cold 340.2 ms, hot path 0.0 ms)
+time=2026-10-01T17:51:29.554+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-01T17:51:29.557+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=2 disposals=0
+--- PASS: TestBallPanelGesturesReachThePanelThread (0.38s)
+=== RUN   TestBallGestureWithoutPanelHostStillRecords
+time=2026-10-01T17:51:29.559+08:00 level=WARN msg="ball gesture arrived with no executor" gesture=panel-hotkey why="this process has no task pipeline and no microphone, so the gesture has no executor here; the gestures that DO have one are the cancel key the assembly root wired (ticket 246) and the two panel gestures that reach the resident panel thread (ticket 33)"
+wisp: ball panel-hotkey: this process has no task pipeline and no microphone, so the gesture has no executor here; the gestures that DO have one are the cancel key the assembly root wired (ticket 246) and the two panel gestures that reach the resident panel thread (ticket 33)
+--- PASS: TestBallGestureWithoutPanelHostStillRecords (0.00s)
+=== RUN   TestAC4PriorFocusSurvivesARefusedPanelSample
+time=2026-10-01T17:51:29.563+08:00 level=WARN msg="goroutine outside the D38 roster (leak symptom)" goroutine=panel-sta owner="panel host (ticket 33)"
+wisp: panel window is up (test-harness, cold 328.4 ms, hot path 0.0 ms)
+    panel_resident_windows_test.go:996: the host recorded the ruler's own editor window 0x2330eba as the prior - exactly the value a real user's editor would be
+time=2026-10-01T17:51:30.114+08:00 level=INFO msg="panel thread ending" why="the library pump returned" window_opened=true
+time=2026-10-01T17:51:30.114+08:00 level=INFO msg="panel thread exited cleanly" shows=1 toggles=0 disposals=0
+--- PASS: TestAC4PriorFocusSurvivesARefusedPanelSample (0.55s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	10.005s

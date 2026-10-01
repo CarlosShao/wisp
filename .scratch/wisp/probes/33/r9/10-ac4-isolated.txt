@@ -1,0 +1,9 @@
+time=2026-10-01T17:59:59.664+08:00 level=INFO msg="winsec: sealing path resolver installed" resolver=risk.c26Pipeline probes_passed=2
+=== RUN   TestAC4FocusReturnToPriorWindowGap33r5
+    panel_host_windows_test.go:753: AC#4 focus hop (head 28f7ba8c): foreground before any panel 0x30176 | the ruler's own editor window 0x13b0782 | foreground while hidden (prior) 0x30176 | after Show 0x48507e2 | panel hwnd 0x48507e2 | prevFocus recorded at Show 0x30176 | after Hide 0x30176 | Hide attempted restore to 0x30176 (SetForegroundWindow 1, SetFocus 0)
+--- PASS: TestAC4FocusReturnToPriorWindowGap33r5 (0.87s)
+=== RUN   TestAC4FocusReturnToPriorWindowGap33r5
+    panel_host_windows_test.go:753: AC#4 focus hop (head 28f7ba8c): foreground before any panel 0x30176 | the ruler's own editor window 0x3a50aa8 | foreground while hidden (prior) 0x3a50aa8 | after Show 0xb2b0cd8 | panel hwnd 0xb2b0cd8 | prevFocus recorded at Show 0x3a50aa8 | after Hide 0x3a50aa8 | Hide attempted restore to 0x3a50aa8 (SetForegroundWindow 1, SetFocus 61147816)
+--- PASS: TestAC4FocusReturnToPriorWindowGap33r5 (0.41s)
+PASS
+ok  	github.com/CarlosShao/wisp/cmd/wisp	1.383s
