@@ -1,0 +1,6 @@
+33-r6 骨架 + 起手锚点：定位 AC13 顺序依赖红因＝hostThreadHarness 把带 WM_QUIT 的窗口线程还给池
+
+- 起手：HEAD 05f91799, dev, status-start.txt 242 行
+- 依赖源码确认形状：webview.go:242-243 WMDestroy->w.Terminate() (裸 PostQuitMessage)，
+  panel_host_windows_test.go:90 UnlockOSThread 归还窗口线程
+- 证据件写满 ⑤⑥⑦ 自我对抗三节，判据表 ①-④/⑤ 待填
