@@ -1,0 +1,7 @@
+33-r6 证据 ①②③：最小复现（组B两枚 harness 真窗先跑致 AC13 15.01s 红）+ 确定性单线程样本 + 定性 + 反控红句
+
+- 组跑读数落表：AC13 单跑绿；单 harness+AC13 绿；两 harness+AC13 count=5 命中 2/5 枚 15.01s 目标红
+- 确定性最小样本（删探针前逐字）：A 定植 WM_QUIT 不排干=panic nil-deref；B 排干后建窗成功
+- 定性：触发者＝测试卫生（hostThreadHarness Unlock 把带 quit 线程还给池）；根 hazard＝产品鲁棒性
+  （bringUp 假设来建窗线程 quit-clean，recreate 面同形可达）⇒ 修法落产码
+- 反控：删 drainStaleQuitBeforeCreate() 那行 → 钉当场 panic 红（非 15s 超时）；已 git cat-file 还原 md5 复确
