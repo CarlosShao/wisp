@@ -184,15 +184,79 @@ func evalOnPanelThread(t *testing.T, rp *residentPanel, js string) {
 }
 
 // ---------------------------------------------------------------------------
+// How the page talks back in this file, and why it is the door that already exists.
+//
+// Every verdict below is built from a string the PAGE sent, per ruling P2. What the
+// page does NOT need is a new binding: registering one means creating a fresh document
+// after the Bind, and a ruler that re-creates the document can no longer tell what a
+// COLD START ended on. 33-r5 found this out by running its own reverse control (swap
+// the two SetHtml calls in bringUp) against a ruler that stayed GREEN - the re-serve
+// was covering the mutation. So the reports ride window.wispDispatch, the product's own
+// inbound door, as real composer envelopes the test's recording handler reads back.
+// That door is bound before any page exists, so it is present in whatever document the
+// host ends on, and the ruler now changes nothing about the document lifecycle.
+// ---------------------------------------------------------------------------
+
+// all returns every request the recording handler was actually reached with.
+func (h *recordingModeHandler) all() []panel.ComposerRequest {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	return append([]panel.ComposerRequest(nil), h.reqs...)
+}
+
+// awaitReport waits for the page to send one report under the given requestId and
+// returns the payload it carried. Silence within the budget is a failed measurement and
+// is reported as one.
+func awaitReport(t *testing.T, h *recordingModeHandler, requestID, what string) string {
+	t.Helper()
+	deadline := time.Now().Add(panelThreadWait)
+	for time.Now().Before(deadline) {
+		for _, req := range h.all() {
+			if req.RequestID == requestID {
+				return req.To
+			}
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+	t.Fatalf("no report %q from the page within %v (what DID arrive at the door: %s). %s cannot be decided without the page's own answer, and the three shapes that are all true with no reply (Dispatch called, Eval returned, Go-side channel closed) are not assertions",
+		requestID, panelThreadWait, describeRequests(h), what)
+	return ""
+}
+
+// describeRequests renders what the door received, so a missing report can be told
+// apart from a report that arrived under a different name.
+func describeRequests(h *recordingModeHandler) string {
+	parts := make([]string, 0, 8)
+	for _, req := range h.all() {
+		to := req.To
+		if len(to) > 24 {
+			to = to[:24] + "..."
+		}
+		parts = append(parts, req.RequestID+"="+to)
+	}
+	if len(parts) == 0 {
+		return "nothing at all"
+	}
+	return strings.Join(parts, ", ")
+}
+
+// reportJSEnv builds the raw envelope the page posts to the product's door, with
+// payload spliced into the to field.
+func reportJSEnv(requestID, payload string) string {
+	return "'{\"method\":\"panel.mode.request\",\"requestId\":\"" + requestID +
+		"\",\"source\":\"panel-composer\",\"to\":\"' + (" + payload + ") + '\"}'"
+}
+
+// ---------------------------------------------------------------------------
 // AC#13
 // ---------------------------------------------------------------------------
 
 var entryIDRe = regexp.MustCompile(`id=["']([A-Za-z0-9_:\-.]{1,64})["']`)
 
-// entryIDProbes extracts element ids the live document can be asked about. The ids
-// come out of the SAME Go-side resolve the product serves from (panel.Assets), so
-// this ruler never opens a frontend file, and the probe list is what makes the
-// assertion about content rather than about a call being made.
+// entryIDProbes extracts element ids the live document can be asked about. The ids come
+// out of the SAME Go-side resolve the product serves from (panel.Assets), so this ruler
+// never opens a frontend file, and the probe list is what makes the assertion be about
+// content rather than about a call having been made.
 func entryIDProbes(t *testing.T) []string {
 	t.Helper()
 	assets, err := panel.BuiltinAssets()
@@ -221,198 +285,147 @@ func entryIDProbes(t *testing.T) []string {
 	return out
 }
 
-// TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe is ticket 33 AC#13's ruler:
-// after a real cold start the document in the window must be the embedded page,
-// not the round-trip probe the host shows while it checks the message channel.
-//
-// The question is put to the page and answered by the page: Go asks the live
-// document, id by id, whether the entry's own elements exist, and the document's
-// answer comes back through a Go-side binding. That shape is what gives this
-// instrument teeth against the exact defect (a SetHtml ordering change flips the
-// answer from every-id-present to no-id-present); an assertion like "SetHtml was
-// called" or "the entry bytes were read" could not tell the two orders apart.
-func TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe(t *testing.T) {
-	probes := entryIDProbes(t)
-	if len(probes) == 0 {
-		t.Skipf("AC#13 has no subject in this tree: the embed resolves no entry, so there is no page content to be covered. Named skip; the working-tree reading is the one that ran in docs/evidence/s1/33-panel-host-c27-r5.md")
-	}
-	rp, mgr := startPanelForTest(t)
-	showAndWait(t, rp)
-
-	reports := make(chan string, 4)
-	bindReceiptOnThread(t, rp, panelProbeReportBinding, reports)
-	recreateDocumentOnThread(t, rp, mgr)
-
-	js := probeJS(panelProbeReportBinding, probes)
-	evalOnPanelThread(t, rp, js)
-
-	var answer string
-	select {
-	case answer = <-reports:
-	case <-time.After(panelThreadWait):
-		t.Fatalf("the page never answered the AC#13 probe within %v - the document in the window reported nothing, which is also what a stuck or blank page does", panelThreadWait)
-	}
-	present := 0
-	for _, b := range answer {
-		if b == '1' {
-			present++
-		}
-	}
-	t.Logf("AC#13 page answer (head %s): %q of %d probe id(s) present in the live document", gitHeadShortForTest(t), answer, len(probes))
-	if present == 0 {
-		t.Errorf("after a real cold start the live document contains NONE of the %d element ids the embedded entry declares (page said %q). That is the shape ticket 33 AC#13 names: the round-trip probe page is the last document shown, so the user sees a stub instead of the panel. Product side: bringUp must serve the entry AFTER the probe, and the probe stays because it is where cold 'usable' is decided", len(probes), answer)
-	}
-}
-
-const panelProbeReportBinding = "wisp33r5Report"
-
-// bindReceiptOnThread registers a one-string-argument binding that forwards what
-// the page hands it to a Go channel. Bind runs on the panel thread for the same
-// reason Eval does.
-func bindReceiptOnThread(t *testing.T, rp *residentPanel, name string, sink chan string) {
-	t.Helper()
-	done := make(chan error, 1)
-	if !rp.post(func() {
-		w := rp.mgr.currentWindow()
-		if w == nil {
-			done <- fmt.Errorf("no window on the panel thread")
-			return
-		}
-		done <- w.Bind(name, func(text string) string {
-			select {
-			case sink <- text:
-			default:
-			}
-			return "seen"
-		})
-	}) {
-		t.Fatalf("the panel thread refused the Bind request (startUp error: %v)", rp.startUpErr())
-	}
-	select {
-	case err := <-done:
-		if err != nil {
-			t.Fatalf("Bind %q on the panel thread: %v", name, err)
-		}
-	case <-time.After(panelThreadWait):
-		t.Fatalf("the panel thread never ran the Bind request within %v", panelThreadWait)
-	}
-}
-
-// recreateDocumentOnThread re-serves the entry document. It is needed because a
-// JS binding is injected into documents created AFTER the Bind call, and this
-// binding is a ruler, not part of the product. Re-serving the entry keeps AC#13's
-// subject intact: the document under test is still the embedded page.
-func recreateDocumentOnThread(t *testing.T, rp *residentPanel, mgr *PanelManager) {
-	t.Helper()
-	done := make(chan struct{})
-	if !rp.post(func() {
-		if err := mgr.serveEntry(); err != nil {
-			t.Errorf("re-serving the entry for the ruler: %v", err)
-		}
-		close(done)
-	}) {
-		t.Fatalf("the panel thread refused the re-serve request")
-	}
-	select {
-	case <-done:
-	case <-time.After(panelThreadWait):
-		t.Fatalf("the panel thread never re-served the document within %v", panelThreadWait)
-	}
-}
-
-// probeJS asks the live document, one by one, whether the entry's elements are
-// there, and reports the answer bitmap back through the given binding.
-func probeJS(binding string, ids []string) string {
-	parts := make([]string, 0, len(ids))
+// probeJS asks the live document, id by id, whether the entry's elements are there, and
+// posts the answer bitmap back through the door that is already in the page.
+func probeJS(ids []string) string {
+	parts := make([]string, 0, len(ids)+2)
+	parts = append(parts, "var b='';")
 	for _, id := range ids {
 		parts = append(parts, fmt.Sprintf("b += (document.getElementById(%q) ? '1' : '0');", id))
 	}
-	return "(function(){ var b=''; " + strings.Join(parts, " ") +
-		" if (window." + binding + ") window." + binding + "(b); })();"
+	parts = append(parts, "window.wispDispatch("+reportJSEnv("ac13-probe", "b")+");")
+	return "(function(){ " + strings.Join(parts, " ") + " })();"
+}
+
+// TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe is ticket 33 AC#13's ruler: after a
+// real cold start the document in the window must be the embedded page, not the
+// round-trip probe the host shows while it checks the message channel.
+//
+// The question goes to the live document and the document answers: does it carry the
+// entry's own elements? That form is what gives this instrument teeth against the exact
+// defect - swapping the two SetHtml calls flips the answer from every-id-present to
+// none-present - where "SetHtml was called" or "the entry bytes were read" would tell
+// the two orders apart just as little as the old t.Logf did.
+func TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe(t *testing.T) {
+	probes := entryIDProbes(t)
+	if len(probes) == 0 {
+		t.Skipf("AC#13 has no subject in this tree: the embed resolves no entry, so there is no page content that could be covered. Named skip; the working-tree reading is the one that ran, recorded in docs/evidence/s1/33-panel-host-c27-r5.md")
+	}
+	rp, mgr := startPanelForTest(t)
+	showAndWait(t, rp)
+	h := mgr.disp.Mode.(*recordingModeHandler)
+
+	evalOnPanelThread(t, rp, probeJS(probes))
+
+	answer := awaitReport(t, h, "ac13-probe", "AC#13")
+	present := strings.Count(answer, "1")
+	t.Logf("AC#13 page answer (head %s): %q - %d of %d probe id(s) present in the live document",
+		gitHeadShortForTest(t), answer, present, len(probes))
+	if present == 0 {
+		t.Errorf("after a real cold start the live document contains NONE of the %d element ids the embedded entry declares (the page itself answered %q). That is ticket 33 AC#13: the round-trip probe page is the last document shown, so the user sees a stub instead of the panel. Product side: bringUp must hand the entry over AFTER the probe - the probe stays, because it is where cold usable is decided", len(probes), answer)
+	}
 }
 
 // ---------------------------------------------------------------------------
 // AC#14, nail 1: the reply to an awaited JS binding
 // ---------------------------------------------------------------------------
 
-// ac14AwaitJS makes the page do the thing C17 names ("回复必须按 correlationId
-// 路由"): call the real door, AWAIT its return value, and report what arrived. A
-// reply that never lands shows up as NOT_RESOLVED in the page's own words, which
-// is the only form of evidence ruling P2 accepts.
-func ac14AwaitJS(binding string) string {
-	return `(async function(){
-  var out = [];
-  for (var i = 0; i < 3; i++) {
-    var env = '{"method":"panel.mode.request","requestId":"ac14-' + i + '","source":"panel-composer","to":"ask_every_step"}';
-    var got = 'NOT_RESOLVED';
-    try {
-      got = await Promise.race([
-        Promise.resolve(window.` + binding + `(env)).then(function(v){ return 'REPLIED:' + v; }),
-        new Promise(function(res){ setTimeout(function(){ res('TIMEOUT-2S'); }, 2000); })
-      ]);
-    } catch (e) { got = 'THREW:' + String(e); }
-    out.push(i + '=' + got);
-  }
-  if (window.wisp33r5ReplyReport) window.wisp33r5ReplyReport(out.join('|'));
-})();`
+// ac14AwaitJS makes the page do the thing C17 names (a push whose reply is routed by
+// correlationId): call the real door three times, AWAIT each return value, and report
+// each outcome back through that same door. A reply that never lands is reported as
+// NOT_RESOLVED in the page's own words, which is the only evidence shape ruling P2
+// accepts.
+//
+// Two build notes, both learned the hard way on this box. (1) Every envelope is
+// composed by Go, not by JS: in JS two adjacent string literals separated only by a
+// line break MERGE, so the first version of this script asked for a requestId whose
+// text was literally `ac14-" + i + "` and the ruler then waited for a report nobody
+// had sent. (2) The script is one line and opens with a beacon, so "the page never
+// answered" and "the page never ran what I sent it" are different readings.
+func ac14AwaitJS() string {
+	envs := make([]string, 0, 3)
+	reports := make([]string, 0, 3)
+	for i := 0; i < 3; i++ {
+		envs = append(envs, fmt.Sprintf(`'{"method":"panel.mode.request","requestId":"ac14-%d","source":"panel-composer","to":"ask_every_step"}'`, i))
+		reports = append(reports, fmt.Sprintf(`'ac14r-%d'`, i))
+	}
+	env := func(ridExpr, toExpr string) string {
+		return "'{\"method\":\"panel.mode.request\",\"requestId\":\"' + " + ridExpr +
+			" + '\",\"source\":\"panel-composer\",\"to\":\"' + " + toExpr + " + '\"}'"
+	}
+	return "(async function(){" +
+		"var ENVS=[" + strings.Join(envs, ",") + "];" +
+		"var REP=[" + strings.Join(reports, ",") + "];" +
+		// The beacon: proves the script ran, before anything can await.
+		"window.wispDispatch(" + env("'ac14r-beacon'", "'SCRIPT-RAN'") + ");" +
+		"for (var i = 0; i < ENVS.length; i++) {" +
+		"var got = 'NOT_RESOLVED';" +
+		"try { got = await Promise.race([" +
+		"Promise.resolve(window.wispDispatch(ENVS[i])).then(function(v){ return 'REPLIED'; })," +
+		"new Promise(function(res){ setTimeout(function(){ res('TIMEOUT-2S'); }, 2000); })" +
+		"]); } catch (e) { got = 'THREW'; }" +
+		"window.wispDispatch(" + env("REP[i]", "got.replace(/[^A-Za-z0-9-]/g, '')") + ");" +
+		"} })();"
 }
 
 func TestAC14AwaitedBindingReplyReachesThePage(t *testing.T) {
 	rp, mgr := startPanelForTest(t)
 	showAndWait(t, rp)
-
 	h := mgr.disp.Mode.(*recordingModeHandler)
-	reports := make(chan string, 4)
-	bindReceiptOnThread(t, rp, "wisp33r5ReplyReport", reports)
-	recreateDocumentOnThread(t, rp, mgr)
-	evalOnPanelThread(t, rp, ac14AwaitJS(panelDispatchBinding))
 
-	var answer string
-	select {
-	case answer = <-reports:
-	case <-time.After(panelThreadWait):
-		t.Fatalf("the page never reported the AC#14 awaited values within %v. Without a report from the page there is NO evidence either way: the three shapes that are all true with no reply (Dispatch called, Eval no error, Go-side done closed) are not assertions", panelThreadWait)
+	evalOnPanelThread(t, rp, ac14AwaitJS())
+
+	outcomes := make([]string, 0, 3)
+	for i := 0; i < 3; i++ {
+		outcomes = append(outcomes, awaitReport(t, h, fmt.Sprintf("ac14r-%d", i), "AC#14's reply hop"))
 	}
-	t.Logf("AC#14 nail 1 (reply hop), page's own words: %q (mode handler calls seen by Go: %d)", answer, h.count())
-	if !strings.Contains(answer, "REPLIED:") {
-		t.Errorf("the awaited JS binding reply never reached the page: the page reported %q. Go did receive the calls (handler saw %d), so this is the H10 half, not H3: webview.Dispatch only queues a closure and posts a thread message, and only the library's Run() drains that queue (33-p1 §A, R25 vs R26). The panel thread must hand its pump to Run()", answer, h.count())
+	joined := strings.Join(outcomes, ",")
+	calls := countRequests(h, "ac14-")
+	t.Logf("AC#14 nail 1 (reply hop), page's own words: %q (Go's handler was reached by %d of the 3 real requests)", joined, calls)
+	if strings.Contains(joined, "NOT_RESOLVED") || strings.Contains(joined, "TIMEOUT-2S") ||
+		strings.Contains(joined, "THREW") || !strings.Contains(joined, "REPLIED") {
+		t.Errorf("the awaited JS binding reply did not reach the page: the page reported %q. Go did receive the calls (%d reached the handler), so this is the H10 half and not H3: webview.Dispatch only appends a closure and posts a thread message, and only the library's Run() drains that queue (33-p1 §A, R25 versus R26). The panel thread has to hand its pump over to Run()", joined, calls)
 	}
-	if strings.Contains(answer, "NOT_RESOLVED") || strings.Contains(answer, "TIMEOUT-2S") {
-		t.Errorf("only part of the reply hop arrived: the page reported %q - every one of the three awaited calls has to resolve for C17's push-and-route to hold", answer)
-	}
-	if h.count() < 3 {
-		t.Errorf("the page says it got replies but Go only saw %d handler call(s) of 3 - the two halves of this hop must agree", h.count())
+	if calls != 3 {
+		t.Errorf("the page says replies arrived but Go was reached by %d of the 3 real requests - the two halves of this hop have to agree, and one instrument may not stand in for both", calls)
 	}
 }
 
+// countRequests counts recorded requests whose requestId starts with prefix - how the
+// ruler separates the page's three real calls from its three reports.
+func countRequests(h *recordingModeHandler, prefix string) int {
+	n := 0
+	for _, req := range h.all() {
+		if strings.HasPrefix(req.RequestID, prefix) {
+			n++
+		}
+	}
+	return n
+}
+
 // ---------------------------------------------------------------------------
-// AC#14, nail 2: the Go -> page Eval push (a DIFFERENT dimension)
+// AC#14, nail 2: the Go -> page Eval push (a DIFFERENT dimension, its own nail)
 // ---------------------------------------------------------------------------
 
+// TestAC14GoSideEvalPushReachesThePage is the second nail and stays a separate test:
+// 33-p1 §A measured the push dimension arriving (R27, 907ms) while the reply dimension
+// did not (R25) in the same process, and ticket 33's own wording forbids blending the
+// two into one sentence.
 func TestAC14GoSideEvalPushReachesThePage(t *testing.T) {
 	rp, mgr := startPanelForTest(t)
 	showAndWait(t, rp)
+	h := mgr.disp.Mode.(*recordingModeHandler)
 
-	reports := make(chan string, 4)
-	bindReceiptOnThread(t, rp, "wisp33r5PushReport", reports)
-	recreateDocumentOnThread(t, rp, mgr)
-
-	// A value the page can only know if Go's push landed. This nail deliberately
-	// does not await a binding: it asks "can Go put something into the document",
-	// which 33-p1 R27 measured arriving even in a host whose reply hop was broken.
+	// A value the page can only know if Go's push landed. This nail never awaits a
+	// binding, so nothing here can be satisfied by the reply hop, and vice versa.
 	const pushed = "PUSHED-33R5-OK"
 	evalOnPanelThread(t, rp, fmt.Sprintf("document.title = %q;", pushed))
-	evalOnPanelThread(t, rp, "if (window.wisp33r5PushReport) window.wisp33r5PushReport(document.title);")
+	evalOnPanelThread(t, rp, "window.wispDispatch("+reportJSEnv("ac14-push", "document.title")+");")
 
-	var answer string
-	select {
-	case answer = <-reports:
-	case <-time.After(panelThreadWait):
-		t.Fatalf("the page never reported its own title within %v - the push instrument got no answer", panelThreadWait)
-	}
+	answer := awaitReport(t, h, "ac14-push", "AC#14's push hop")
 	t.Logf("AC#14 nail 2 (Eval push hop), page's own words: title=%q", answer)
 	if answer != pushed {
-		t.Errorf("Go's Eval push did not reach the document: title is %q, want %q. This is the push dimension, separate from the awaited-reply dimension asserted in TestAC14AwaitedBindingReplyReachesThePage - one arriving says nothing about the other", answer, pushed)
+		t.Errorf("Go's Eval push did not reach the document: the page reports its title as %q, want %q. This is the push dimension, separate from the awaited-reply dimension in TestAC14AwaitedBindingReplyReachesThePage - one arriving says nothing about the other", answer, pushed)
 	}
 }
 
