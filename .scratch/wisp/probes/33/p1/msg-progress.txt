@@ -1,0 +1,28 @@
+probe(33-p1) ticket progress line, plus one self-logged formatting defect
+
+Appends one agent=33-p1 entry to the ticket's append-only Progress log, newest
+last, so the leg is on the ticket's own history (33-a2 set that precedent; the
+orchestrator named the missing line a dispatch gap in A486).
+
+Ticket hygiene, measured after the write:
+- git diff --numstat on the ticket = 1 insertion / 0 deletions
+- checkbox counts unchanged: 13 unchecked / 1 checked (same as the
+  orchestrator's own 12:12 reading)
+- no existing line rewritten, no AC box touched
+
+Also records 5-19 in probe.md: my progress line carries 22 inner backticks while
+that section's convention wraps each entry in a single pair, so the rendered
+inline-code span closes early. Content is byte-intact and nothing executed (the
+line was written with the Edit tool, not an unquoted heredoc, which is the path
+that really runs backticked text). Fixing it means either rewriting a 5.7 KB
+line or in-place-rewriting a tracked ticket file - both riskier than a cosmetic
+span, so I logged it instead of touching it, and left the call to the
+orchestrator rather than letting the next accept leg find it.
+
+Probe deliverable itself is unchanged in substance: both questions answered in
+c9c3e323 (Q1 = branch (c) order-reversal, not panic and not a permanent block;
+Q2 = the binding reply reaches the page only under Run(), while a direct Eval
+reaches it even under the current self-pump).
+
+next: orchestrator sets the 33-r5 brief from sections A and B; the five cells I
+still cannot decide are named in 7-jie-1..5.
