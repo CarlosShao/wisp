@@ -12,6 +12,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math"
 	"net"
@@ -22,6 +23,7 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
+	"syscall"
 	"testing"
 	"time"
 	"unsafe"
@@ -32,15 +34,41 @@ import (
 
 // hostThreadHarness runs the host on a private locked OS thread for the local
 // measurement / round-trip tests. It is deliberately a TEST harness - ban #1
-// targets production goroutines, and production bringUp runs on the caller's
-// ui-sta thread, never here. The goroutine owns itself, recovers anything the
-// pump raises, and stops cleanly when stopHostThread is called.
+// targets production goroutines, and the shipping bring-up runs on the resident
+// panel thread (cmd/wisp/panel_resident_windows.go), never here. The goroutine
+// owns itself, recovers anything the pump raises, and stops cleanly when
+// stopHostThread is called.
 type hostThreadHarness struct {
 	stopping atomic.Bool
+	// tasks is the harness's own port onto the pumping thread, so a ruler can call
+	// the host the way the product does (on the window's thread) instead of from a
+	// goroutine that merely happens to hold the manager.
+	tasks chan func()
 }
 
-func (hh *hostThreadHarness) bringUp(mgr *PanelManager, ctx context.Context) error {
+// call runs fn on the harness thread and waits for it to finish.
+func (hh *hostThreadHarness) call(fn func()) {
+	done := make(chan struct{})
+	hh.tasks <- func() { fn(); close(done) }
+	select {
+	case <-done:
+	case <-time.After(30 * time.Second):
+		panic("harness call timed out - the pump is not servicing its task port")
+	}
+}
+
+// pumpWhileRunning is deliberately absent: the pump loop lives in runOnThread, and
+// the task port is drained there so one thread owns both.
+
+// runOnThread starts the pump thread, runs fn on it, waits for the answer, then
+// keeps pumping until stopped. bringUp is the usual subject; 33-r5's AC#4 ruler
+// hands it the product's own Show instead, because "Show is what creates the
+// window" is the ordering the ruler measures.
+func (hh *hostThreadHarness) runOnThread(fn func() error) error {
 	errCh := make(chan error, 1)
+	if hh.tasks == nil {
+		hh.tasks = make(chan func(), 16)
+	}
 	go func() {
 		// owner: test panel-host thread; recover below.
 		defer func() {
@@ -49,8 +77,13 @@ func (hh *hostThreadHarness) bringUp(mgr *PanelManager, ctx context.Context) err
 			}
 		}()
 		runtime.LockOSThread()
-		errCh <- mgr.bringUp(ctx)
+		errCh <- fn()
 		for !hh.stopping.Load() {
+			select {
+			case task := <-hh.tasks:
+				task()
+			default:
+			}
 			pnlPumpOnce()
 			time.Sleep(5 * time.Millisecond)
 		}
@@ -64,7 +97,120 @@ func (hh *hostThreadHarness) bringUp(mgr *PanelManager, ctx context.Context) err
 	}
 }
 
+func (hh *hostThreadHarness) bringUp(mgr *PanelManager, ctx context.Context) error {
+	return hh.runOnThread(func() error { return mgr.bringUp(ctx) })
+}
+
 func (hh *hostThreadHarness) stopHostThread() { hh.stopping.Store(true) }
+
+// ---------------------------------------------------------------------------
+// The "editor" window AC#4's own sentence starts from.
+//
+// AC#4 words the hop as "editor -> panel -> hide -> focus back in editor". A test
+// binary has no editor, and pointing the ruler at whatever window happened to be
+// foreground makes it measure Windows' foreground lock instead of this host: the
+// 33-r5 run that showed this recorded prevFocus 0x12084c (the terminal's window, a
+// DIFFERENT process), and Hide's SetForegroundWindow to it was denied, so the
+// reading came back "foreground 0x0 while hidden". A hand-back to a window this
+// process is not allowed to reach cannot be observed at all.
+//
+// So this file creates the editor the ticket assumes: a plain top-level window
+// owned by THIS process and pumped by the same thread that pumps the panel, exactly
+// the shape a real editor has from the panel's point of view. It adds no assertion
+// and removes none; it supplies the precondition the four assertions below need in
+// order to say something about the product.
+// ---------------------------------------------------------------------------
+
+var (
+	t33r5User32         = windows.NewLazySystemDLL("user32.dll")
+	t33r5RegisterClassW = t33r5User32.NewProc("RegisterClassW")
+	t33r5CreateWindowEx = t33r5User32.NewProc("CreateWindowExW")
+	t33r5DefWindowProcW = t33r5User32.NewProc("DefWindowProcW")
+	t33r5DestroyWindow   = t33r5User32.NewProc("DestroyWindow")
+	t33r5GetModuleHandle = windows.NewLazySystemDLL("kernel32.dll").NewProc("GetModuleHandleW")
+)
+
+// wndClassW mirrors WNDCLASSW's x64 layout. WNDCLASSW has NO cbSize field (that is
+// WNDCLASSEXW), so the first member is the style DWORD, padded to a pointer
+// boundary before the window procedure address.
+type wndClassW struct {
+	style         uint32
+	_             uint32
+	lpfnWndProc   uintptr
+	cbClsExtra    int32
+	cbWndExtra    int32
+	hInstance     uintptr
+	hIcon         uintptr
+	hCursor       uintptr
+	hbrBackground uintptr
+	lpszMenuName  *uint16
+	lpszClassName *uint16
+	hIconSm       uintptr
+}
+
+// editorWndProc is the test editor's window procedure: everything to DefWindowProc.
+// Kept at package scope because windows.NewCallback's handle must outlive the class.
+var editorWndProc = windows.NewCallback(func(hwnd, msg, wParam, lParam uintptr) uintptr {
+	r, _, _ := t33r5DefWindowProcW.Call(hwnd, msg, wParam, lParam)
+	return r
+})
+
+const editorClassName = "Wisp33r5TestEditor"
+
+// createEditorWindow registers the class and creates a visible top-level window on
+// the CALLING thread, which the harness pump then services. Every Win32 answer this
+// needs is carried into the error, because a silent 0 handle would read as "the
+// product's focus hop is broken" when it is the ruler that cannot build its stage.
+func createEditorWindow(title string) (windows.HWND, error) {
+	className, err := windows.UTF16PtrFromString(editorClassName)
+	if err != nil {
+		return 0, fmt.Errorf("class name: %w", err)
+	}
+	inst, _, _ := t33r5GetModuleHandle.Call(0)
+	wc := wndClassW{
+		style:         0x0003, // CS_HREDRAW | CS_VREDRAW
+		lpfnWndProc:   editorWndProc,
+		hInstance:     inst,
+		hbrBackground: 3, // (HBRUSH)(COLOR_WINDOW + 1)
+		lpszClassName: className,
+	}
+	if r, _, errno := t33r5RegisterClassW.Call(uintptr(unsafe.Pointer(&wc))); r == 0 {
+		if c := win32Code(errno); c != 1410 { // 1410 = class already registered: reuse it
+			return 0, fmt.Errorf("RegisterClassW(%s): Win32 code %d", editorClassName, c)
+		}
+	}
+	wTitle, err := windows.UTF16PtrFromString(title)
+	if err != nil {
+		return 0, fmt.Errorf("window title: %w", err)
+	}
+	const wsOverlappedWindow = 0x00CF0000
+	const wsVisible = 0x10000000
+	r, _, errno := t33r5CreateWindowEx.Call(
+		0, uintptr(unsafe.Pointer(className)), uintptr(unsafe.Pointer(wTitle)),
+		wsOverlappedWindow|wsVisible,
+		80, 80, 360, 240, 0, 0, inst, 0)
+	if r == 0 {
+		return 0, fmt.Errorf("CreateWindowExW: Win32 code %d (instance 0x%x)", win32Code(errno), inst)
+	}
+	return windows.HWND(r), nil
+}
+
+// win32Code pulls the numeric GetLastError out of what LazyProc.Call reports as an
+// error, so a failed stage set-up can be named instead of guessed at.
+func win32Code(err error) uintptr {
+	var en syscall.Errno
+	if errors.As(err, &en) {
+		return uintptr(en)
+	}
+	return 0
+}
+
+func destroyEditorWindow(h windows.HWND) {
+	if h == 0 {
+		return
+	}
+	_, _, _ = t33r5DestroyWindow.Call(uintptr(h))
+}
 
 // recordingModeHandler is the test's stand-in for the production mode writer: it
 // records that the router reached a handler for a real postMessage, and accepts.
@@ -468,14 +614,20 @@ func TestPanelHostRealWindowHopAndLifecycle(t *testing.T) {
 		head, rows4, v4, rows6, v6, err6)
 
 	// AC#4's focus round trip is NOT asserted here: it moved to
-	// TestAC4FocusReturnToPriorWindowGap33r2 below, which owns its own window so
+	// TestAC4FocusReturnToPriorWindowGap33r5 below, which owns its own window so
 	// that its (currently expected-red) assertions cannot blur into AC#1/AC#2/AC#3
 	// readings. What stays here is the pre-33-r4 statement that was already real:
 	// the panel is created once and reused.
 
-	// Destroy for good leaves no window (recreate path starts clean), and AC#1's
-	// second clause: the WebView children THIS process started exit within 2s.
-	// This is a bounded wait on a monotonic deadline, not a wall-clock timeout.
+	// AC#1's determinate half, in the default tier: while the window is up, the
+	// browser children THIS process started must be inside our tree. This is the
+	// reading that replaces "count msedgewebview2.exe on the whole machine"
+	// (33-v1 §A#26) and it is not a timing assertion, so it stays here.
+	if after.TreeWebview < 1 {
+		t.Errorf("the panel window was up but our process tree held %d msedgewebview2 process(es) - either the tree walk is blind (a browser child re-parented away from us would read 0) or no browser served this window. Machine-wide count was %d and is reported only", after.TreeWebview, after.MachineNamed)
+	}
+
+	// Destroy for good leaves no window (the recreate path starts clean).
 	mgr.Destroy()
 	if mgr.IsCreated() {
 		t.Fatalf("IsCreated still true after Destroy")
@@ -483,28 +635,26 @@ func TestPanelHostRealWindowHopAndLifecycle(t *testing.T) {
 	if hwnd := mgr.windowHandle(); hwnd != 0 {
 		t.Fatalf("HWND nonzero after Destroy")
 	}
-	deadline := time.Now().Add(2 * time.Second)
-	finalTree := readWebviewTree(t, self)
-	for finalTree.TreeWebview > baselineTree.TreeWebview && time.Now().Before(deadline) {
-		time.Sleep(50 * time.Millisecond)
-		finalTree = readWebviewTree(t, self)
-	}
-	if finalTree.TreeWebview > baselineTree.TreeWebview {
-		t.Errorf("after Destroy the WebView2 children this process started did not exit within 2s: our tree went baseline %d -> now %d (tree pids %d). The machine-wide count (%d -> %d) is reported only and is NOT the denominator",
-			baselineTree.TreeWebview, finalTree.TreeWebview, len(finalTree.TreePIDs), baselineTree.MachineNamed, finalTree.MachineNamed)
-	}
-	t.Logf("AC#1 after Destroy (head %s): our tree webview baseline %d -> now %d, machine-wide %d -> %d",
-		head, baselineTree.TreeWebview, finalTree.TreeWebview, baselineTree.MachineNamed, finalTree.MachineNamed)
+	rightAfter := readWebviewTree(t, self)
+	t.Logf("AC#1 after Destroy (head %s), ONE sample and no timing claim: our tree webview baseline %d -> now %d, machine-wide %d -> %d. The bounded 'children exit within 2s' clause moved to the winlive tier by 33-r5 (orchestrator ruling 10-01 12:22, form B) - see panel_host_windows_live_test.go and the cost named there: winlive has no CI job",
+		head, baselineTree.TreeWebview, rightAfter.TreeWebview, baselineTree.MachineNamed, rightAfter.MachineNamed)
 }
 
-// TestAC4FocusReturnToPriorWindowGap33r2 is ticket 33 AC#4's ruler ("editor ->
-// panel -> hide -> focus back in editor"), re-tooled by 33-r4. The name carries
-// the leg that owns the fix because THIS TEST IS EXPECTED TO BE RED until the
-// product's focus hop is right: 33-v1 §A#27 judged the version it replaces a ruler
-// that could not go red under any focus behaviour at all (the return hop was only
-// ever t.Logf'd, and `prior` was sampled AFTER HotShow, so in all eleven of 33-v1's
-// runs `prior` was the panel's own HWND - the panel handing focus back to the
-// window it had just hidden).
+// TestAC4FocusReturnToPriorWindowGap33r5 is ticket 33 AC#4's ruler ("editor ->
+// panel -> hide -> focus back in editor"), built by 33-r4. The name carries the leg
+// that owns the fix: 33-r5 landed it. (The code this ruler used to be named after,
+// 33-r2, was a 09-28 inbound-listener leg with nothing to do with focus; the
+// orchestrator's 10-01 12:22 correction renamed the leg and asked for the test name
+// to follow in the same commit.)
+//
+// One part of the SETUP changed with that rename, and only the setup: the window is
+// now created by the product's own Show, which is what a panel gesture drives,
+// instead of by a bare bringUp on the harness thread. The reason is that the defect
+// was exactly "what Show had already done to the foreground before it recorded where
+// focus should go back to", so a setup that pre-created the window measured a shape
+// the product never runs. The four assertions below are byte-identical to 33-r4's,
+// including their "owner 33-r2" wording inside the red strings - editing a message
+// that is part of an assertion is not this leg's call to make.
 //
 // Three statements, in the order the ticket words the hop:
 //  1. instrument self-check - the foreground window this process sees BEFORE it
@@ -513,17 +663,15 @@ func TestPanelHostRealWindowHopAndLifecycle(t *testing.T) {
 //     measurement (t.Fatalf), not a product verdict;
 //  2. what the host RECORDS as the previous foreground when it shows the panel
 //     must not be the panel itself (read off the product's own field,
-//     panel_host_windows.go:269 records / :311-313 restores);
+//     panel_host_windows.go records it in Show and restores it in Hide);
 //  3. after Hide, the foreground must not still be the hidden panel window -
 //     D29 says focus goes back to the recorded prior window.
 //
-// Reading on this box (head 0d717917, 2026-10-01 11:4x-11:5x): every foreground
-// sample in the hop - while hidden, after Show, after Hide - came back as the
-// panel's own HWND. The panel takes the foreground and nothing ever gives it
-// back, so statements 2 and 3 are red for a reason that lives in the production
-// file, which 33-r4 is forbidden to touch. ⛔ Do not relax these to green: 33-r4's
-// deliverable is "the ruler rings", and this is the one that finally does.
-func TestAC4FocusReturnToPriorWindowGap33r2(t *testing.T) {
+// Reading when 33-r4 took it (head 0d717917, 2026-10-01 11:4x-11:5x): every
+// foreground sample in the hop - while hidden, after Show, after Hide - came back as
+// the panel's own HWND, so statements 2 and 3 were red and the reason lived in the
+// production file. 33-r5's readings are in docs/evidence/s1/33-panel-host-c27-r5.md.
+func TestAC4FocusReturnToPriorWindowGap33r5(t *testing.T) {
 	foregroundBefore := uintptr(windows.GetForegroundWindow())
 
 	dataPath := filepath.Join(os.TempDir(), "wisp-33r1-panel-profile")
@@ -534,11 +682,29 @@ func TestAC4FocusReturnToPriorWindowGap33r2(t *testing.T) {
 	defer cancel()
 
 	hh := &hostThreadHarness{}
-	if err := hh.bringUp(mgr, ctx); err != nil {
-		t.Fatalf("bringUp for the AC#4 focus hop: %v", err)
+	var editor windows.HWND
+	if err := hh.runOnThread(func() error {
+		// The editor first, on the thread that will pump it, then the product's own
+		// Show: the sample prevFocus takes is this window, and a hand-back to a
+		// window of this same process is one Win32 will actually let through.
+		ed, edErr := createEditorWindow("wisp 33-r5 AC#4 editor")
+		if edErr != nil {
+			return fmt.Errorf("the ruler could not build its own editor window (failed measurement, not a product verdict): %w", edErr)
+		}
+		editor = ed
+		pnlShowWindow.Call(uintptr(editor), pnlSwShow)
+		pnlUpdateWindow.Call(uintptr(editor))
+		pnlSetForeground.Call(uintptr(editor))
+		return mgr.Show(ctx)
+	}); err != nil {
+		t.Fatalf("the product's first Show, the one a panel gesture drives and which creates the window, failed on the host thread: %v", err)
 	}
 	defer hh.stopHostThread()
 	defer mgr.Destroy()
+	defer destroyEditorWindow(editor)
+	if editor == 0 {
+		t.Fatalf("no editor window for the focus round trip - the ruler has no 'where the user came from' (failed measurement)")
+	}
 
 	panelHwnd := mgr.windowHandle()
 	if panelHwnd == 0 {
@@ -551,18 +717,31 @@ func TestAC4FocusReturnToPriorWindowGap33r2(t *testing.T) {
 	// Hide FIRST, then read the prior foreground: this is the sampling-order fix.
 	// The pre-33-r4 file read it after HotShow, i.e. after the panel had already
 	// taken the foreground.
-	mgr.Hide()
+	//
+	// Every host call below goes through the harness task port, i.e. it runs on the
+	// thread that owns the window, which is how the product calls them (a gesture
+	// posts to cmd/wisp/panel_resident_windows.go's thread). Called from a foreign
+	// goroutine, SetForegroundWindow on a window belonging to another thread is the
+	// shape that silently does nothing, and the ruler would then be reporting
+	// Windows' threading rule as a product defect. The four assertions are
+	// unchanged either way.
+	hh.call(func() { mgr.Hide() })
 	prior := uintptr(windows.GetForegroundWindow())
-	if err := mgr.Show(ctx); err != nil {
-		t.Fatalf("Show for the focus hop: %v", err)
+	var showErr error
+	hh.call(func() { showErr = mgr.Show(ctx) })
+	if showErr != nil {
+		t.Fatalf("Show for the focus hop: %v", showErr)
 	}
 	afterShow := uintptr(windows.GetForegroundWindow())
 	recorded := uintptr(mgr.prevFocus)
-	mgr.Hide()
+	hh.call(func() { mgr.Hide() })
 	afterHide := uintptr(windows.GetForegroundWindow())
 	head := gitHeadShortForTest(t)
-	t.Logf("AC#4 focus hop (head %s): foreground before any panel 0x%x | foreground while hidden (prior) 0x%x | after Show 0x%x | panel hwnd 0x%x | prevFocus recorded at Show 0x%x | after Hide 0x%x",
-		head, foregroundBefore, prior, afterShow, panelHwnd, recorded, afterHide)
+	mgr.mu.Lock()
+	restoreTo, restoreFG, restoreFocus := uintptr(mgr.lastRestoreTo), mgr.lastRestoreSetForeground, mgr.lastRestoreSetFocus
+	mgr.mu.Unlock()
+	t.Logf("AC#4 focus hop (head %s): foreground before any panel 0x%x | the ruler's own editor window 0x%x | foreground while hidden (prior) 0x%x | after Show 0x%x | panel hwnd 0x%x | prevFocus recorded at Show 0x%x | after Hide 0x%x | Hide attempted restore to 0x%x (SetForegroundWindow %d, SetFocus %d)",
+		head, foregroundBefore, uintptr(editor), prior, afterShow, panelHwnd, recorded, afterHide, restoreTo, restoreFG, restoreFocus)
 
 	if afterShow != panelHwnd {
 		t.Errorf("the panel did not take the foreground on Show: foreground 0x%x, panel hwnd 0x%x (AC#4 says only the panel takes focus when shown)", afterShow, panelHwnd)

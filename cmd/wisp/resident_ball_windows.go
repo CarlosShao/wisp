@@ -19,9 +19,9 @@ package main
 // picked that leg ("走甲"), and this file is that ruling's first installment.
 //
 // What this installment deliberately is NOT. The resident leg has no task
-// pipeline, no microphone and no panel host, so this file starts no state machine
-// of its own and answers no card on the user's behalf: every gesture the ball
-// surfaces except one is recorded by name and said out loud as unhosted.
+// pipeline and no microphone, so this file starts no state machine of its own and
+// answers no card on the user's behalf: every gesture the ball surfaces except one
+// is recorded by name and said out loud as unhosted.
 // Advancing the orb into Listening because a click arrived would be this process
 // claiming a listen path it does not have - the same shape that made the run
 // leg's empty runSpec.replyVeto a load-bearing choice rather than a missing
@@ -59,6 +59,44 @@ import (
 // shape every leg had before ticket 246, and the shape a host that cannot build
 // one falls back to), and the gesture is then recorded as unhosted.
 type escVetoFunc func() string
+
+// ballHostHook is how the assembly root hands the ball host one capability it does
+// not know how to build. It follows the shape ticket 246's ruling (ledger A481) set
+// for the cancel executor: the resident ball file receives a function value and
+// stays ignorant of what is behind it, so this package keeps one dependency edge
+// per thing instead of importing the panel host from here.
+type ballHostHook func(*panelHostHooks)
+
+// panelHostHooks holds the panel-side executors, all optional. A nil showPanel is
+// the pre-ticket-33 shape: the gesture is recorded and said out loud as unhosted.
+type panelHostHooks struct {
+	showPanel func(via string) bool
+}
+
+// withPanelHost hands the ball host the thing that opens the panel window
+// (ticket 33). It is a hook and not a parameter so the three existing
+// two-argument call sites of startResidentBall keep compiling untouched.
+func withPanelHost(showPanel func(via string) bool) ballHostHook {
+	return func(h *panelHostHooks) { h.showPanel = showPanel }
+}
+
+// requestPanelOpen answers one of the two panel gestures. Without an executor it
+// records the gesture the way every other unhosted one is recorded; with one it
+// asks, and says out loud when the answer was "the panel thread will not take the
+// request" - a hot key that fires into a full or finished queue is exactly the
+// silence tickets 245 and 246 were filed about.
+func (h *panelHostHooks) requestPanelOpen(via string) func() {
+	if h.showPanel == nil {
+		return func() { recordBallGesture(via) }
+	}
+	return func() {
+		if !h.showPanel(via) {
+			const why = "the panel thread took no request (it is starting up, its queue is full, or it already exited)"
+			slog.Warn("panel gesture could not be handed over", "gesture", via, "why", why)
+			fmt.Printf("wisp: ball %s: %s\n", via, why)
+		}
+	}
+}
 
 // residentBall is this process's handle on the floating ball: the window and
 // its owner's side of the teardown, plus the one sentence the boot report
@@ -100,6 +138,15 @@ type residentBall struct {
 // filed for. What has NOT changed: a resident leg with no card in flight holds
 // three keys, not four, and an L2 queue card does not borrow the key at all.
 //
+// What changed since (ticket 33, this file's second injection). The panel hot key
+// and the tray's open-panel item stop here too: they are handed to the assembly
+// root's panel host as a function value (withPanelHost), which posts them to the
+// resident panel's OWN STA thread (cmd/wisp/panel_resident_windows.go, orchestrator
+// ruling P1). What this file still does not know is anything about WebView2, the
+// window, or what a shown panel means - and the two gestures still do not carry an
+// approval: opening the panel grants nothing, and the panel side can never answer
+// "allow" (internal/agent/approval/ui.go: PanelAPI has no Allow method).
+//
 // reg is the runtime's registry, not observe.Default, so a boot that overrode
 // the registry (internal/proc.WithRegistry) books its UI thread where the rest
 // of the process is booked.
@@ -108,8 +155,12 @@ type residentBall struct {
 // means what it always meant: the gesture is recorded as unhosted.
 //
 // Errors are returned as a verdict, never as a failure to boot.
-func startResidentBall(reg *observe.Registry, onCancelEsc escVetoFunc) *residentBall {
+func startResidentBall(reg *observe.Registry, onCancelEsc escVetoFunc, hooks ...ballHostHook) *residentBall {
 	rb := &residentBall{cancelHosted: onCancelEsc != nil}
+	hs := panelHostHooks{}
+	for _, apply := range hooks {
+		apply(&hs)
+	}
 
 	b, err := ball.New(ball.Options{
 		// Sleeping is the only state this leg may claim on its own: nothing here
@@ -124,8 +175,8 @@ func startResidentBall(reg *observe.Registry, onCancelEsc escVetoFunc) *resident
 			OnSummonHotkey:  func() { recordBallGesture("summon-hotkey") },
 			OnMuteHotkey:    func() { recordBallGesture("mute-hotkey") },
 			OnCancelHotkey:  func() { recordCancelHotkey(onCancelEsc) },
-			OnPanelHotkey:   func() { recordBallGesture("panel-hotkey") },
-			OnTrayPanel:     func() { recordBallGesture("tray-open-panel") },
+			OnPanelHotkey:   hs.requestPanelOpen("panel-hotkey"),
+			OnTrayPanel:     hs.requestPanelOpen("tray-open-panel"),
 			OnTrayMute:      func() { recordBallGesture("tray-mute") },
 			OnTrayPauseWake: func() { recordBallGesture("tray-pause-wake") },
 			OnTrayExit:      recordTrayExit,
@@ -196,12 +247,16 @@ func (rb *residentBall) stop() {
 // console, booked in the log file, and identical between the two so neither can
 // drift into a claim the other does not make.
 //
-// It names the cancel key as the exception on purpose. Since ticket 246 the
-// resident process does hold an approval gate, so the pre-246 sentence ("no
-// approval gate") would have become a lie told by eight gestures in order to
-// cover the one that stopped being one.
-const ballGestureWhy = "this process has no task pipeline, no microphone and no panel host, so the gesture has no executor here; " +
-	"the only cancel route this leg executes is the Esc key the assembly root wired (ticket 246)"
+// It names the two gestures that are NOT unhosted as exceptions, on purpose. Since
+// ticket 246 the resident process holds an approval gate (the cancel key), and
+// since ticket 33 it holds a panel host (the panel hot key and the tray's open-panel
+// item, which reach the dedicated panel thread through panelHostHooks). The
+// pre-246 wording ("no approval gate", "no panel host") would otherwise be a
+// sentence every remaining gesture tells in order to cover the ones that stopped
+// being one.
+const ballGestureWhy = "this process has no task pipeline and no microphone, so the gesture has no executor here; " +
+	"the gestures that DO have one are the cancel key the assembly root wired (ticket 246) and the two panel " +
+	"gestures that reach the resident panel thread (ticket 33)"
 
 // recordBallGesture books one ball gesture that arrived with nowhere to go.
 //

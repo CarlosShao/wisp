@@ -122,6 +122,33 @@ func runResident() {
 	// after, in this leg's evidence table.
 	ra := newResidentApproval()
 
+	// Ticket 33 AC#1..AC#4: the panel host, on its own dedicated STA thread
+	// (orchestrator ruling P1). It is BUILT here, by the assembly root, and handed
+	// to the ball host as a function value - the same shape ticket 246's ruling
+	// (ledger A481) set for the cancel executor, so resident_ball_windows.go keeps
+	// knowing nothing about WebView2 and this file keeps knowing nothing about the
+	// approval UI.
+	//
+	// Building the manager is the first non-test call of NewPanelManager in this
+	// repository: until now the host existed only in a test binary, which is what
+	// made AC#1..AC#4 read as "the host works" instead of "the user can open it".
+	//
+	// A panel that cannot be assembled does not stop the boot (same posture as
+	// installLogSink and startResidentBall): it is printed, and the boot report
+	// below says which shape this process is in. Its teardown is the defer that
+	// runs AFTER rb.stop() above registers - LIFO, so the panel thread ends last
+	// and the frozen D38(e) ten-step order (internal/proc/shutdown.go) is not
+	// touched: no new step, no new hook name on that closed roster.
+	rp, rpErr := newResidentPanelManager(rt.Layout.DataDir)
+	var panel *residentPanel
+	if rpErr != nil {
+		slog.Error("panel host: this process has no panel", "err", rpErr)
+		fmt.Printf("wisp: panel host unavailable (%v): the panel hot key and the tray item will be recorded, not executed\n", rpErr)
+	} else {
+		panel = startResidentPanel(rt.Registry, rp)
+		defer panel.stop()
+	}
+
 	// Ticket 228 AC#1: this leg is the process the ball belongs in (D2,
 	// PLAN.md:74 and :83-88 - layered window, tray, hot keys and the Job Object
 	// holder in one resident main process). The defer below is registered last,
@@ -133,7 +160,9 @@ func runResident() {
 	// A ball that will not come up does not stop the boot: the window, the tray
 	// and the hot keys are reported by what Win32 actually returned, and the
 	// sentence printed under this call is built from that same result.
-	rb := startResidentBall(rt.Registry, ra.vetoByEsc)
+	rb := startResidentBall(rt.Registry, ra.vetoByEsc, withPanelHost(func(via string) bool {
+		return panel.RequestToggle(via)
+	}))
 	defer rb.stop()
 
 	// The gate is bound to the ball only if the ball exists, and it is detached
@@ -183,8 +212,8 @@ func runResident() {
 	for _, s := range registered {
 		names = append(names, fmt.Sprintf("%d:%s", int(s), s.Name()))
 	}
-	fmt.Printf("wisp: %s; 任务来源：%s; D38(e) steps with an owner in this process: %s\n",
-		ra.residentStatusLine(), src.taskPosture(), strings.Join(names, ", "))
+	fmt.Printf("wisp: %s; 任务来源：%s; 面板：%s; D38(e) steps with an owner in this process: %s\n",
+		ra.residentStatusLine(), src.taskPosture(), panel.statusLine(), strings.Join(names, ", "))
 
 	// The boot report has to match what happens next: if an exit request already
 	// arrived during the ball path, printing "resident event loop running" and then

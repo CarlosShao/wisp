@@ -154,40 +154,58 @@ func TestPanelBundleShapeSeparatesAnchorFromRealPage_AC12(t *testing.T) {
 	}
 }
 
-// TestAC1SessionDisposeHasNoProductionTriggerYet_AC1 turns 33-v1 §A#14's reading
+// TestAC1SessionDisposeHasAProductionTrigger_AC1 turns 33-v1 §A#14's reading
 // ("NewPanelManager has exactly one call site in the whole repo, and it is a
-// test") into an instrument. AC#1's second clause is "session dispose destroys",
-// which the product path cannot reach today: nothing outside _test.go constructs a
-// host, so there is no session whose dispose could tear one down. The explicit
-// Destroy mechanism itself IS asserted (in the winlive lifecycle test).
+// test") into an instrument, and 33-r5's wiring is what flipped its branch: the
+// resident leg now constructs the host (cmd/wisp/panel_resident_windows.go), so the
+// case stops skipping and asserts AC#1's second clause for real - a session that
+// builds a panel host must also hold the place that tears the window down.
 //
-// It skips while no production constructor exists and turns into a red that
-// demands a destroy call site the moment someone wires the host - so this is not a
-// permanent exemption, and it is not an empty t.Logf ruler either.
+// Tightened per the orchestrator's ruling 4 (10-01 12:12), which named the exact
+// false green to avoid: 33-r4's version counted ANY method call named Destroy in a
+// production file, and the two sites it found were the host letting go of the
+// WebView2 CONTROL inside its own file (the bind-failure branch, and PanelManager's
+// own Destroy body). Those would have satisfied the rule even if no session ever
+// called it. Now the receiver has to be the manager: either an identifier this file
+// bound from a *PanelManager factory call, or a field named mgr/manager (the
+// spelling the resident thread's teardown uses). A Destroy on anything else is still
+// counted and printed, it just no longer passes.
 //
-// ⛔ Deliberately imprecise on purpose, and named here: once a production
-// constructor exists the second leg only requires SOME `.Destroy()` call in a non-
-// test file of this package, not one proven to be on the session-teardown path.
-// Tightening that is 33-r2's job (and the orchestrator's, for the ticket's tick).
-func TestAC1SessionDisposeHasNoProductionTriggerYet_AC1(t *testing.T) {
-	ctorHits, destroyHits := panelHostProductionSites(t)
-	t.Logf("AC#1 dispose scan: %d production constructor(s) %v | %d .Destroy() call site(s) %v",
-		len(ctorHits), ctorHits, len(destroyHits), destroyHits)
+// The positive control that proves the tightening has teeth is a deletion, not an
+// addition: take the manager Destroy out of the resident teardown and this case goes
+// red naming what it saw. Reading in docs/evidence/s1/33-panel-host-c27-r5.md.
+func TestAC1SessionDisposeHasAProductionTrigger_AC1(t *testing.T) {
+	ctorHits, teardownHits, controlDestroys := panelHostProductionSites(t)
+	t.Logf("AC#1 dispose scan: %d production constructor(s) %v | %d manager-teardown site(s) %v | %d other .Destroy() call site(s), WebView2 control teardown and NOT a session dispose %v",
+		len(ctorHits), ctorHits, len(teardownHits), teardownHits, len(controlDestroys), controlDestroys)
 	if len(ctorHits) == 0 {
-		t.Skipf("AC#1's 'session dispose destroys' clause is unreachable in the product path: this package has 0 non-test call sites of NewPanelManager (destroy sites found: %d). The resident legs still only record the gesture (33-v1 §A#15 - OnPanelHotkey / OnTrayPanel bodies are recordBallGesture calls), so there is no session teardown path to hook. Explicit Destroy is asserted in TestPanelHostRealWindowHopAndLifecycle; the dispose half belongs to 33-r2.", len(destroyHits))
+		t.Skipf("AC#1's 'session dispose destroys' clause is unreachable in the product path: this package has 0 non-test call sites of NewPanelManager (other Destroy sites found: %d). Explicit Destroy is asserted in TestPanelHostRealWindowHopAndLifecycle; the resident wiring is ticket 33's.", len(controlDestroys))
 	}
-	if len(destroyHits) == 0 {
-		t.Errorf("a production site now constructs the panel host (%s) but no non-test file in this package calls Destroy - the window would outlive the session, which is AC#1's second clause", strings.Join(ctorHits, ", "))
+	if len(teardownHits) == 0 {
+		t.Errorf("a production site now constructs the panel host (%s) but no non-test file calls Destroy ON THE MANAGER. The %d .Destroy() call(s) this package does have [%s] release the WebView2 control inside the host's own file, which is not a session tearing its window down: AC#1's second clause would still be unmet and the panel would outlive the session",
+			strings.Join(ctorHits, ", "), len(controlDestroys), strings.Join(controlDestroys, ", "))
 	}
-	t.Logf("AC#1 dispose reachability: %d production constructor(s) [%s], %d Destroy call site(s) [%s]",
-		len(ctorHits), strings.Join(ctorHits, ", "), len(destroyHits), strings.Join(destroyHits, ", "))
+	t.Logf("AC#1 dispose reachability: %d production constructor(s) [%s], %d manager teardown site(s) [%s]",
+		len(ctorHits), strings.Join(ctorHits, ", "), len(teardownHits), strings.Join(teardownHits, ", "))
 }
 
-// panelHostProductionSites walks the NON-TEST Go files of this package (the go
-// test working directory is the package dir) and returns file:line for (a) calls
-// that construct the host and (b) method calls named Destroy. A parse failure is a
-// failed measurement, not a zero.
-func panelHostProductionSites(t *testing.T) (ctorHits, destroyHits []string) {
+// panelHostFactories are the functions that hand back a *PanelManager. An
+// identifier bound from either of them means "this file holds the host".
+var panelHostFactories = map[string]bool{
+	"NewPanelManager":         true,
+	"newResidentPanelManager": true,
+}
+
+// panelManagerFields are the field names this package stores the manager under, so
+// rp.mgr.Destroy() reads as a manager teardown and w.Destroy() does not.
+var panelManagerFields = map[string]bool{"mgr": true, "manager": true}
+
+// panelHostProductionSites walks the NON-TEST Go files of this package (the go test
+// working directory is the package dir) and returns file:line for (a) calls that
+// construct the host, (b) Destroy calls whose receiver is the manager, and (c)
+// Destroy calls on anything else. A parse failure is a failed measurement, not a
+// zero.
+func panelHostProductionSites(t *testing.T) (ctorHits, managerDestroyHits, otherDestroyHits []string) {
 	t.Helper()
 	entries, err := os.ReadDir(".")
 	if err != nil {
@@ -205,28 +223,74 @@ func panelHostProductionSites(t *testing.T) (ctorHits, destroyHits []string) {
 			t.Fatalf("parse production file %s for the dispose scan: %v", name, err)
 		}
 		scanned++
+		holderNames := map[string]bool{}
+		var ctors, destroys []*ast.CallExpr
 		ast.Inspect(f, func(n ast.Node) bool {
-			call, ok := n.(*ast.CallExpr)
-			if !ok {
-				return true
-			}
-			switch fun := call.Fun.(type) {
-			case *ast.Ident:
-				if fun.Name == "NewPanelManager" {
-					ctorHits = append(ctorHits, fmtPos(fset, name, fun))
+			switch node := n.(type) {
+			case *ast.AssignStmt:
+				for _, rhs := range node.Rhs {
+					call, ok := rhs.(*ast.CallExpr)
+					if !ok {
+						continue
+					}
+					fn, ok := call.Fun.(*ast.Ident)
+					if !ok || !panelHostFactories[fn.Name] {
+						continue
+					}
+					for _, lhs := range node.Lhs {
+						if id, ok := lhs.(*ast.Ident); ok && id.Name != "_" {
+							holderNames[id.Name] = true
+						}
+					}
 				}
-			case *ast.SelectorExpr:
-				if fun.Sel != nil && fun.Sel.Name == "Destroy" {
-					destroyHits = append(destroyHits, fmtPos(fset, name, fun.Sel))
+			case *ast.CallExpr:
+				switch fun := node.Fun.(type) {
+				case *ast.Ident:
+					if panelHostFactories[fun.Name] {
+						ctors = append(ctors, node)
+					}
+				case *ast.SelectorExpr:
+					if fun.Sel != nil && fun.Sel.Name == "Destroy" {
+						destroys = append(destroys, node)
+					}
 				}
 			}
 			return true
 		})
+		for _, call := range ctors {
+			ctorHits = append(ctorHits, fmtPos(fset, name, call.Fun))
+		}
+		for _, call := range destroys {
+			sel, ok := call.Fun.(*ast.SelectorExpr)
+			if !ok {
+				continue
+			}
+			pos := fmtPos(fset, name, sel.Sel)
+			if managerReceiver(sel.X, holderNames) {
+				managerDestroyHits = append(managerDestroyHits, pos)
+				continue
+			}
+			otherDestroyHits = append(otherDestroyHits, pos)
+		}
 	}
 	if scanned == 0 {
 		t.Fatalf("the dispose scan parsed 0 production files - the instrument is not looking at the package it claims to cover")
 	}
-	return ctorHits, destroyHits
+	return ctorHits, managerDestroyHits, otherDestroyHits
+}
+
+// managerReceiver reports whether x names the panel manager: an identifier this file
+// bound from a factory call, or a field access whose field is one of the names the
+// package stores the manager under.
+func managerReceiver(x ast.Expr, holderNames map[string]bool) bool {
+	switch rec := x.(type) {
+	case *ast.Ident:
+		return holderNames[rec.Name]
+	case *ast.SelectorExpr:
+		return rec.Sel != nil && panelManagerFields[rec.Sel.Name]
+	default:
+		return false
+	}
 }
 
 func fmtPos(fset *token.FileSet, file string, pos ast.Node) string {

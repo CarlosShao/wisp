@@ -19,30 +19,37 @@ package main
 //     (panel.ComposerDispatch.Handle) and whose return value is the receipt the
 //     page gets back. That is H2 (control created) + H3 (page bytes reach Go) +
 //     H10 (reply reaches the page) landing together on a real host.
-//   - The window's messages must belong to the thread that pumps them, so bringUp
-//     runs on whatever thread its caller is on. The shipping seam J1 ruled (create
-//     the host from an internal/ball ui-sta Events callback) is NOT yet wired: a
-//     re-entrant bringUp from inside the ball's ui-sta DispatchMessageW loop
-//     panics on this box, because go-webview2's window bring-up runs a BLOCKING
-//     nested GetMessageW pump that cannot be a co-resident of the ball's own pump
-//     (see docs/evidence/s1/33-panel-host-c27-r1.md §⑧ - a stop-and-report, no
-//     second UI thread was added to dodge it). The local measurement tests own a
-//     locked OS thread for their one window - a test harness, not the shipping
-//     resident topology, and it registers no goroutine name.
-//
-// Library gap that scopes AC#3 honestly (recorded in the evidence table, ⑧):
-// pkg/edge does expose AddWebResourceRequestedFilter, but the same edge layer
-// sizes its controller with ICoreWebView2Controller.PutBounds, whose parameter
-// type is go-webview2's INTERNAL w32.Rect - unimportable from this module, and
-// the vtbl that would let a caller build the rect by hand is unexported too. A
-// controller we cannot size renders blank, so a rendering window can only be
-// driven through the high-level webview2.WebView API, which does not surface the
-// resource-request filter. Serving therefore uses SetHtml/Navigate over embedded
-// bytes (still offline, still no listener) rather than AddWebResourceRequested
-// Filter. Turning the page bundle into many files served through the filter
-// needs a library decision (a replace/fork, or a different binding) - a
-// dependency/architecture call, which per AGENTS.md is human-approved, so this
-// leg stops and reports it instead of inventing a shape.
+//   - The window's messages belong to the thread that pumps them, so bringUp runs
+//     on the resident panel's OWN dedicated STA thread
+//     (cmd/wisp/panel_resident_windows.go, orchestrator ruling P1 at 10-01 13:12),
+//     never on the ball's ui-sta. Why not ui-sta, now measured rather than asserted:
+//     calling bring-up re-entrantly from a window callback of a thread that is
+//     already pumping returns fine, but the outer pump's iteration freezes for the
+//     whole nested pump and up to five tasks already queued on that thread get run
+//     EARLY by the nested one (about 0.55s per open) - docs/evidence/s1/... the 33-p1
+//     probe, R34/R35 with positive control R36. 33-p1 also corrected this file's
+//     earlier claim that re-entry "panics on this box": the natural shape does not
+//     panic; the nil dereference needs a FORCED WM_QUIT during create (R37) or an
+//     MTA-initialised thread (R32/R39). A test harness still owns its own locked
+//     thread for the local measurements; that harness is not the shipping topology.
+//   - Because the resident thread hands the pump over to the library's own Run(),
+//     a Go->page reply is actually delivered: webview.Dispatch only appends to the
+//     library's private queue and posts a thread message, and the queue's only
+//     reader is Run(). A host that pumps by hand instead never drains it, so the
+//     page's awaited binding reply does not arrive (33-p1 §A, R25 vs R26).
+
+// What is NOT a library gap (this paragraph was wrong before and is corrected
+// here, ticket 33 AC#13's stop-and-report): AddWebResourceRequestedFilter is
+// exported by pkg/edge, and the claim that a caller cannot size a controller
+// because ICoreWebView2Controller.PutBounds takes go-webview2's INTERNAL w32.Rect
+// does not block anything - (*edge.Chromium).Resize() (pkg/edge/
+// chromium_amd64.go:12) is exported, sizes the controller from its own
+// GetClientRect, and is what the high-level wrapper already calls after a
+// successful Embed (webview.go:343). So "many files served through a resource
+// request filter" is a product-shape decision, not a dependency boundary.
+// What is still NOT proven, and is not claimed here: whether that path gives the
+// panel the 420x260 size this host asks WindowOptions for. Today serving goes
+// through SetHtml over embedded bytes (still offline, still no listener).
 
 import (
 	"context"
@@ -76,6 +83,14 @@ var (
 	pnlDispatchMsgW  = pnlModUser32.NewProc("DispatchMessageW")
 	pnlTranslateMsg  = pnlModUser32.NewProc("TranslateMessage")
 	pnlSetForeground = pnlModUser32.NewProc("SetForegroundWindow")
+	pnlGetAncestor   = pnlModUser32.NewProc("GetAncestor")
+)
+
+// GetAncestor flags (winuser.h). GA_ROOT walks to the top-level window a handle
+// belongs to, which is how Show tells "the window the user came from" apart from
+// one of the panel's own child windows.
+const (
+	pnlGaRoot = 3
 )
 
 const (
@@ -96,10 +111,16 @@ type pnlMsg struct {
 	_       uint32 // x64 padding DWORD
 }
 
-// PanelManager owns at most one panel window per session. It is safe for
-// concurrent Show/Hide/IsShown calls; the WebView2 control itself is only touched
-// on the thread that created the window (see bringUp's runtime.LockOSThread and
-// the ui-sta hosting note above).
+// PanelManager owns at most one panel window per session. The mutex makes its
+// state readable from any goroutine; it does NOT make the WebView2 control
+// thread-safe, and this file deliberately contains no runtime.LockOSThread of its
+// own - the rule is that every method touching the control (bringUp/Show/Hide/
+// Destroy) runs on the thread that created the window. In the resident process
+// that thread is cmd/wisp/panel_resident_windows.go's dedicated panel thread,
+// which is the only place that locks the OS thread, initialises COM as STA and
+// hands the pump to the library's Run(). Earlier wording here pointed at a
+// "bringUp's runtime.LockOSThread" that does not exist in this file; the lock is
+// real now, and it lives in that one caller (33-r5, ticket 33 dispatch item 6).
 type PanelManager struct {
 	mu       sync.Mutex
 	w        webview2.WebView
@@ -110,9 +131,19 @@ type PanelManager struct {
 
 	created bool
 	shown   bool
-	// prevFocus is the foreground window recorded at the moment Show brought the
-	// panel forward; Hide hands focus back to it (D29 focus return).
+	// prevFocus is the foreground window recorded BEFORE anything in Show can
+	// move the foreground, and never the panel's own window (see
+	// setPriorFocusLocked). Hide hands focus back to it and then clears it, so a
+	// second Hide cannot restore a stale handle (D29 focus return, ticket 33 AC#4).
 	prevFocus windows.HWND
+
+	// lastRestoreTo / lastRestoreSetForeground / lastRestoreSetFocus are what the
+	// most recent Hide tried and what Win32 answered (0 means "no restore was
+	// attempted"). They exist so AC#4's readings are per-run facts instead of
+	// inference; see Hide.
+	lastRestoreTo            windows.HWND
+	lastRestoreSetForeground uintptr
+	lastRestoreSetFocus      uintptr
 
 	// lastColdMs / lastHotMs are the most recent measured bring-up latencies on
 	// THIS host instance (D32 panel rows: cold <=1500ms, hot <=200ms). They are
@@ -159,6 +190,18 @@ func (m *PanelManager) windowHandle() uintptr {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	return uintptr(m.hwnd)
+}
+
+// currentWindow returns the live control handle (nil before creation and after
+// Destroy). The resident panel thread publishes exactly this value to decide where
+// a request goes: while it is nil the thread's own channel is the route, once it is
+// set the library's Dispatch queue (which only Run() drains) is. Reading it under
+// the manager lock is what keeps "the window exists" and "the pump can be reached"
+// from being two different instants.
+func (m *PanelManager) currentWindow() webview2.WebView {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.w
 }
 
 // bringUp creates the ONE window on the calling thread and returns once the
@@ -216,20 +259,37 @@ func (m *PanelManager) bringUp(ctx context.Context) error {
 	m.created = true
 	m.mu.Unlock()
 
-	// Hand the embedded entry bytes straight to the control (offline: the bytes
-	// come from the //go:embed bundle, never from a socket).
-	if err := m.serveEntry(); err != nil {
-		w.Eval("document.title='panel assets unavailable'")
-	}
-
-	// Prove the message channel is live before declaring cold "usable": ask the
-	// page to call the binding and take the first receipt as the round trip.
+	// AC#13's order, and it is the whole fix: prove the message channel first,
+	// hand the page over LAST. firstRoundTripLocked shows a document of its own,
+	// so running it after serveEntry meant every cold start finished on the probe
+	// page instead of the panel (ticket 33 AC#13, 33-v1 §AC#3 "供给那半"). The
+	// probe stays - it is where cold "usable" is decided - it just no longer gets
+	// the last word about what the user sees.
 	rtMs := m.firstRoundTripLocked(ctx, t0)
+
+	if err := m.serveEntry(); err != nil {
+		m.serveNotBuiltNoticeLocked()
+	}
 
 	m.mu.Lock()
 	m.lastColdMs = rtMs
 	m.mu.Unlock()
 	return nil
+}
+
+// serveNotBuiltNoticeLocked replaces the page with an explicit offline notice when
+// the embed carries no bundle. It is a SetHtml of a document this host writes, so
+// the user is never left looking at the round-trip probe page, and it still opens
+// no socket and loads nothing over the network.
+func (m *PanelManager) serveNotBuiltNoticeLocked() {
+	m.mu.Lock()
+	w := m.w
+	m.mu.Unlock()
+	if w == nil {
+		return
+	}
+	w.SetHtml(`<!doctype html><html><head><meta charset="utf-8"><title>panel assets unavailable</title>` +
+		`</head><body><p>panel assets unavailable: the embedded bundle is not built.</p></body></html>`)
 }
 
 // serveEntry resolves the embedded index.html and pushes it into the control.
@@ -253,10 +313,19 @@ func (m *PanelManager) serveEntry() error {
 
 // Show reveals the window (creating it on first use) and returns focus
 // bookkeeping. The caller must be on the window's message-pumping thread.
+//
+// AC#4's whole hop depends on the ORDER of two statements here: the prior
+// foreground window is sampled BEFORE bringUp runs, because bringing the control
+// up already takes the foreground (measured by 33-r4: in every run the value read
+// after creation was the panel's own HWND, so Hide handed focus back to the window
+// it had just hidden). The sampled value goes through setPriorFocusLocked, which
+// refuses to record the panel itself or one of its own child windows.
 func (m *PanelManager) Show(ctx context.Context) error {
 	m.mu.Lock()
 	created := m.created
 	m.mu.Unlock()
+
+	prior := windows.GetForegroundWindow()
 	if !created {
 		if err := m.bringUp(ctx); err != nil {
 			return err
@@ -266,7 +335,7 @@ func (m *PanelManager) Show(ctx context.Context) error {
 	m.mu.Lock()
 	hwnd := m.hwnd
 	shown := m.shown
-	m.prevFocus = windows.GetForegroundWindow()
+	m.setPriorFocusLocked(prior)
 	m.mu.Unlock()
 
 	pnlShowWindow.Call(uintptr(hwnd), pnlSwShow)
@@ -279,6 +348,39 @@ func (m *PanelManager) Show(ctx context.Context) error {
 	m.shown = true
 	m.mu.Unlock()
 	return nil
+}
+
+// setPriorFocusLocked records the caller's foreground sample for Hide to hand
+// focus back to, and refuses samples that cannot be a real "where the user came
+// from": the panel's own top-level window, or any window whose root IS the panel.
+// Refusing keeps prevFocus at the last honest value instead of overwriting it with
+// the panel, which is what made AC#4 red (33-v1 §A#27, 33-r4 §① 格 2).
+//
+// The caller must hold m.mu.
+func (m *PanelManager) setPriorFocusLocked(prior windows.HWND) {
+	if prior == 0 {
+		return
+	}
+	if m.hwnd != 0 && sameRootWindow(prior, m.hwnd) {
+		return
+	}
+	m.prevFocus = prior
+}
+
+// sameRootWindow reports whether a and b are the same top-level window or one is a
+// child of the other, by comparing what GetAncestor(GA_ROOT) resolves them to.
+// An unreadable handle resolves to 0 and therefore to "not the same window": a
+// failed lookup must not silently drop a legitimate focus-restore target.
+func sameRootWindow(a, b windows.HWND) bool {
+	if a == b {
+		return true
+	}
+	ra, _, _ := pnlGetAncestor.Call(uintptr(a), pnlGaRoot)
+	rb, _, _ := pnlGetAncestor.Call(uintptr(b), pnlGaRoot)
+	if ra == 0 || rb == 0 {
+		return false
+	}
+	return ra == rb
 }
 
 // HotShow is Show for an already-created window; it also measures the hot path
@@ -296,21 +398,57 @@ func (m *PanelManager) HotShow(ctx context.Context) error {
 }
 
 // Hide takes the window off screen without destroying it, and hands focus back to
-// whatever window was foreground before Show (D29).
+// the window Show recorded as the user's prior foreground (D29).
+//
+// The recorded window is NOT cleared afterwards, and that is a measured decision,
+// not an oversight: with a clear, a Show whose only foreground sample is the panel
+// itself (which setPriorFocusLocked correctly refuses) leaves the next Hide with no
+// target at all, and the reading on this box is "focus never went back". Keeping it
+// means the honest prior survives one refused sample, and a stale or already-closed
+// handle is a SetForegroundWindow that returns 0 - recorded below, never retried.
+//
+// The two Win32 return codes are stored, not acted on: a denial is Windows'
+// foreground lock (a process that owns no foreground rights cannot move the
+// foreground), and this host does not sleep-and-retry it, because that would turn an
+// unstable product path into a green test (ticket 33 ruling, 10-01 12:12, item 2).
+// lastRestoreTo / lastRestoreSetForeground / lastRestoreSetFocus carry the per-run
+// handles instead.
 func (m *PanelManager) Hide() {
 	m.mu.Lock()
 	hwnd := m.hwnd
 	prev := m.prevFocus
 	m.shown = false
+	m.lastRestoreTo = 0
+	m.lastRestoreSetForeground = 0
+	m.lastRestoreSetFocus = 0
 	m.mu.Unlock()
 	if hwnd == 0 {
 		return
 	}
 	pnlShowWindow.Call(uintptr(hwnd), pnlSwHide)
 	pnlUpdateWindow.Call(uintptr(hwnd))
-	if prev != 0 {
-		pnlSetForeground.Call(uintptr(prev))
-		pnlSetFocus.Call(uintptr(prev))
+	if prev == 0 {
+		return
+	}
+	rf, _, _ := pnlSetForeground.Call(uintptr(prev))
+	rc, _, _ := pnlSetFocus.Call(uintptr(prev))
+	m.mu.Lock()
+	m.lastRestoreTo = prev
+	m.lastRestoreSetForeground = rf
+	m.lastRestoreSetFocus = rc
+	m.mu.Unlock()
+}
+
+// terminateOnThisThread asks the window's message loop to end. It must be called
+// ON the thread that owns the window: the underlying library implements Terminate
+// as PostQuitMessage, which posts WM_QUIT to the CALLING thread's queue. Calling it
+// from anywhere else ends the wrong loop and leaves the panel pumping forever.
+func (m *PanelManager) terminateOnThisThread() {
+	m.mu.Lock()
+	w := m.w
+	m.mu.Unlock()
+	if w != nil {
+		w.Terminate()
 	}
 }
 
@@ -341,11 +479,22 @@ func (m *PanelManager) dispatchRaw(ctx context.Context, raw string) (string, err
 	return m.disp.Handle(ctx, raw)
 }
 
-// firstRoundTripLocked drives one JS -> Go -> JS cycle and returns its duration,
-// pumping the thread's queue until the receipt arrives or a monotonic deadline
-// passes (a bounded wait, not a wall-clock timeout). It proves the WebView2
-// message channel is really wired on this host (H3+H10) before cold latency is
-// reported.
+// firstRoundTripLocked drives one JS -> Go cycle and returns its duration, pumping
+// the thread's queue until the Go side sees the probe binding or a monotonic
+// deadline passes (a bounded wait, not a wall-clock timeout).
+//
+// What this proves and what it does NOT (orchestrator ruling P2, 10-01 13:12):
+// its range is "the page reached Go" (H3). The `done` channel closes inside the Go
+// body of the binding, which happens before any reply has to travel back, so this
+// function is NOT evidence for AC#14 - 33-p1 §A measured a run where ECHO_CALLS=3
+// (page to Go, arrived) and the awaited replies all stayed unresolved in the same
+// process. AC#14's receipt hop has its own ruler, whose assertion is made of what
+// the PAGE reports back, and a second one for Go-side Eval push; the two are
+// separate dimensions and stay separate tests.
+//
+// The probe page it shows is transient by design and, since AC#13 was fixed, is no
+// longer the last word: bringUp runs this BEFORE serveEntry, so the document the
+// user ends on is the embedded entry.
 func (m *PanelManager) firstRoundTripLocked(ctx context.Context, t0 time.Time) float64 {
 	m.mu.Lock()
 	w := m.w
