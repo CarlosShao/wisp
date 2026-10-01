@@ -392,43 +392,58 @@ func TestDispatcherSpellsNoRouteLiteralOfItsOwn(t *testing.T) {
 
 // ----------------------------------------------- the honesty nails (AC#D / #E)
 
-// TestSliceAAttachesNoHostAndNamesTheOpenWindowHops is 33-a1 §7.4's fourth
-// judgement, restated (ruling A386, ticket 33 slice B) as a CAPABILITY ruler.
+// TestPanelHostIsAttachedAndNamesTheWindowHops is the SAME capability ruler that
+// arrived as TestSliceAAttachesNoHostAndNamesTheOpenWindowHops (33-a1 §7.4's fourth
+// judgement, restated as a capability ruler by ruling A386). Its predicate -
+// "does this tree attach a native host / WebView2 message channel?" - is unchanged;
+// what INVERTED is the expectation it is held against, by orchestrator ruling A489
+// when ticket 33's window leg (H2 the control is created, H3 the page's raw reaches
+// Go, H10 the reply reaches the page) was landed by leg 33-r1.
 //
-// What it asks now, and only this: does this tree attach a native host / WebView2
-// message channel? It answers by looking for the symbol family such an attachment
-// cannot be written without (CoreWebView2 / WebView2 / WebMessage identifiers in
-// production Go sources, and a webview module in go.mod / go.sum), never for a
-// type's NAME. The predecessor scanned the repo's text for "ComposerDispatch", so
-// it read "a CLI seam calls the router" and "somebody wired the window and passed
-// it off as a working panel" as the same event - a wording ruler that blocked the
-// very listener ticket 33 slice B was dispatched to land.
+// The predecessor's contract was "green == no host attached"; the doc carried the
+// one sentence that made the flip legitimate - "when one of those lands, the first
+// leg below goes red and the window's own ticket has to say so". 33-r1 is that leg,
+// and this file is the "say so". The function is RENAMED because a nail whose name
+// contradicts what it now asserts is a stale指认 this repository does not tolerate:
+// it asks, and only this, that a native host / WebView2 message channel IS attached
+// - a production identifier from the family (CoreWebView2 / WebView2 / WebMessage in
+// non-test Go sources, or an import path carrying webview/msedge) AND a webview
+// module in the main module's go.mod. Either signal missing => red.
 //
-// What green here means, stated exactly: no host is attached. It says NOTHING
-// about whether the panel can click - the inbound router has a production caller
-// today (cmd/wisp/panel_inbound.go, `wisp panel-inbound`) and this test is green
-// with it, which is precisely the reading the ticket carries: 票 33 AC#9 says the
-// panel still cannot be clicked, because H2 (the control is created), H3
-// (WebMessageReceived takes the page's bytes into Go) and H10 (the reply goes back
-// to the page) are all still open. When one of those lands, the first leg below
-// goes red and the window's own ticket has to say so - "do not let a green here
-// stand in for a panel that can click" is still the sentence this nail is for.
+// What green here means, stated exactly: a host is attached. It STILL does not mean
+// "the panel can click" the way a user wants it - the real multi-file page served
+// through AddWebResourceRequestedFilter and the settings route (ticket 248) are open
+// work; the evidence for 33-r1's window ACs and the go-webview2 hosting gaps ride in
+// docs/evidence/s1/33-panel-host-c27-r1.md. This nail guards one fact: nobody can
+// now ship a tree that quietly links no host while the panel ticket reads done.
 //
-// It is not a door unless it can go red, so the test carries its own positive
-// control: the SAME predicate is run over throwaway trees written OUTSIDE this
-// repository (t.TempDir; a scan of the real disk cannot see a -overlay file, and
-// a carrier that the ruler cannot see would make this a nail with no door).
-// Two legs must fire (a fake host source, a fake webview dependency) and one leg
-// must stay silent (the CLI-seam shape the old wording ruler reddened on) - see
-// the sub-tests.
-func TestSliceAAttachesNoHostAndNamesTheOpenWindowHops(t *testing.T) {
+// Teeth, unchanged and doubled:
+//   - the two POSITIVE controls (a fake host source, a fake webview dependency) must
+//     still make the predicate fire, and the CLI-seam shape must still stay silent -
+//     they exercise hostChannelCapabilityHits, which is the same function as before.
+//   - a new REVERSE control proves the inverted latch has teeth: a throwaway tree
+//     whose host identifiers are neutralised (no WebView2/CoreWebView2/WebMessage, no
+//     webview go.mod) must be one the assertion rejects - i.e. the "host attached"
+//     condition is genuinely decidable, not a nail that is always green because the
+//     tree happens to carry a host.
+//
+// All carriers are written OUTSIDE this repository (t.TempDir); a scan of the real
+// disk cannot see a -overlay file, and a carrier the ruler cannot see would make
+// this a nail with no door. The old name now lives only in archived gate logs.
+func TestPanelHostIsAttachedAndNamesTheWindowHops(t *testing.T) {
 	root := panelRepoRoot(t)
 	hits := hostChannelCapabilityHits(t, root)
-	t.Logf("native-host capability hits in %s: %d -> %v", root, len(hits), hits)
-	if len(hits) != 0 {
-		t.Errorf("a native host / WebView2 message channel is attached in this tree (%v) while ticket 33's "+
-			"real-window ACs are still unticked: that is H2/H3/H10 landing - say so on the ticket, do not let a "+
-			"green here stand in for a panel that can click", hits)
+	prodSignal, depSignal := hostSignals(hits)
+	t.Logf("native-host capability hits in %s: %d -> %v (production=%v dependency=%v)", root, len(hits), hits, prodSignal, depSignal)
+	if !prodSignal {
+		t.Errorf("no native host / WebView2 message channel is attached in this tree: no production source carries a " +
+			"CoreWebView2/WebView2/WebMessage identifier or a webview import. Ticket 33 landed H2/H3/H10 - a tree that " +
+			"links no host while the panel window ACs read done is exactly the false-green this nail now forbids")
+	}
+	if !depSignal {
+		t.Errorf("the main module does not require a webview module (go.mod/go.sum carry no webview/msedge path): " +
+			"a host is normally bought, not hand-written, so a production identifier with no dependency behind it is " +
+			"not an attached host")
 	}
 
 	t.Run("positive-control", func(t *testing.T) {
@@ -488,6 +503,56 @@ func run() {
 			t.Logf("carrier C (CLI seam, no host) -> 0 hits, as required")
 		}
 	})
+
+	t.Run("reverse-positive-control", func(t *testing.T) {
+		// The inverted latch must be able to reject a tree that carries NO host.
+		// Carrier D is a host whose production identifiers are NEUTRALISED - the
+		// window wiring is described without ever naming a WebView2/CoreWebView2/
+		// WebMessage identifier or importing a webview module - so hostSignals must
+		// report (false, false) and the top-level assertion's red condition is
+		// genuinely reachable. If this carrier ever reports a host signal, the ruler
+		// reads prose/shape as a host again (the wording-ruler bug) and the inverted
+		// nail would be always-green, i.e. a nail with no latch.
+		d := t.TempDir()
+		writeHostCarrier(t, d, filepath.Join("cmd", "wisp"), "panel_host_neutralised.go", `package main
+
+// windowHost brings up the browser control, takes the page's message and hands a
+// reply back. The identifiers below are deliberately spelled WITHOUT the WebView2
+// family so the capability ruler stays blind to them - this is the neutralised
+// carrier the reverse control needs.
+type windowHost struct{ ctrl ctrlHandle }
+
+type ctrlHandle struct{}
+
+func (h *windowHost) onMessage(raw string) string { return h.reply(raw) }
+func (h *windowHost) reply(string) string        { return "" }
+`)
+		dhits := hostChannelCapabilityHits(t, d)
+		dprod, ddep := hostSignals(dhits)
+		t.Logf("carrier D (host identifiers neutralised) -> %d hit(s) %v (production=%v dependency=%v)", len(dhits), dhits, dprod, ddep)
+		if dprod || ddep {
+			t.Errorf("REVERSE CONTROL RED (the ruler reads a host where none is named): a carrier that spells no "+
+				"CoreWebView2/WebView2/WebMessage identifier and imports no webview module answered production=%v "+
+				"dependency=%v - the inverted 'host attached' latch would never be able to go red", dprod, ddep)
+		}
+	})
+}
+
+// hostSignals splits the capability hits into the two halves the inverted
+// assertion needs: production identifiers / imports that a WebView2 host cannot be
+// written without, and a webview module present in go.mod / go.sum. A hit string
+// from hostChannelCapabilityHits is tagged ":identifier", ":imports" or
+// ":dependency", so the split is on those tags, never on a filename.
+func hostSignals(hits []string) (production, dependency bool) {
+	for _, h := range hits {
+		switch {
+		case strings.Contains(h, ":identifier ") || strings.Contains(h, ":imports "):
+			production = true
+		case strings.Contains(h, ":dependency "):
+			dependency = true
+		}
+	}
+	return production, dependency
 }
 
 // hostChannelSymbols are the identifier anchors of a WebView2 host attachment.
