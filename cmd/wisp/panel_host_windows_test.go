@@ -12,10 +12,13 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 	"unsafe"
@@ -23,6 +26,42 @@ import (
 	"github.com/CarlosShao/wisp/internal/panel"
 	"golang.org/x/sys/windows"
 )
+
+// hostThreadHarness runs the host on a private locked OS thread for the local
+// measurement / round-trip tests. It is deliberately a TEST harness - ban #1
+// targets production goroutines, and production bringUp runs on the caller's
+// ui-sta thread, never here. The goroutine owns itself, recovers anything the
+// pump raises, and stops cleanly when stopHostThread is called.
+type hostThreadHarness struct {
+	stopping atomic.Bool
+}
+
+func (hh *hostThreadHarness) bringUp(mgr *PanelManager, ctx context.Context) error {
+	errCh := make(chan error, 1)
+	go func() {
+		// owner: test panel-host thread; recover below.
+		defer func() {
+			if r := recover(); r != nil {
+				errCh <- fmt.Errorf("panel host pump panicked: %v", r)
+			}
+		}()
+		runtime.LockOSThread()
+		errCh <- mgr.bringUp(ctx)
+		for !hh.stopping.Load() {
+			pnlPumpOnce()
+			time.Sleep(5 * time.Millisecond)
+		}
+		runtime.UnlockOSThread()
+	}()
+	select {
+	case err := <-errCh:
+		return err
+	case <-time.After(30 * time.Second):
+		return context.DeadlineExceeded
+	}
+}
+
+func (hh *hostThreadHarness) stopHostThread() { hh.stopping.Store(true) }
 
 // recordingModeHandler is the test's stand-in for the production mode writer: it
 // records that the router reached a handler for a real postMessage, and accepts.
@@ -123,10 +162,11 @@ func TestPanelHostRealWindowHopAndLifecycle(t *testing.T) {
 
 	baselineChildren := countWebviewChildren(t)
 
-	if err := mgr.bringUpOnNewThread(ctx); err != nil {
-		t.Fatalf("bringUpOnNewThread: %v (WebView2 window creation is available on this box - the S0 spike coldonly returned coldMs=862.431 at %s; a nil here means the host, not the environment)", err, time.Now().Format(time.RFC3339))
+	hh := &hostThreadHarness{}
+	if err := hh.bringUp(mgr, ctx); err != nil {
+		t.Fatalf("bringUp on the test thread: %v (WebView2 window creation is available on this box - the S0 spike coldonly returned coldMs=862.431 at %s; a nil here means the host, not the environment)", err, time.Now().Format(time.RFC3339))
 	}
-	defer mgr.Stop()
+	defer hh.stopHostThread()
 	defer mgr.Destroy()
 
 	if !mgr.IsCreated() {

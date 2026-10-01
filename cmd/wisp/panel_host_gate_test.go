@@ -7,9 +7,11 @@ package main
 // independent of GOOS.
 
 import (
+	"archive/zip"
 	"bytes"
 	"go/parser"
 	"go/token"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -97,15 +99,20 @@ func TestCleanCheckoutBuilds_AC11(t *testing.T) {
 	}
 	tmp := t.TempDir()
 
-	archive := exec.Command("git", "archive", "HEAD")
+	// git archive must be rooted at the repo root, not the package dir the test
+	// runs from, or the extracted tree is a subdir with no top-level go.mod and the
+	// clean build can never find its main module.
+	archive := exec.Command("git", "archive", "--format=zip", "HEAD")
+	archive.Dir = repoRootForTest(t)
 	blob, err := archive.Output()
 	if err != nil {
 		t.Fatalf("git archive HEAD: %v", err)
 	}
-	extract := exec.Command("tar", "-x", "-C", tmp)
-	extract.Stdin = bytes.NewReader(blob)
-	if out, err := extract.CombinedOutput(); err != nil {
-		t.Fatalf("extract HEAD archive into %s: %v: %s", tmp, err, out)
+	if err := unzipTree(t, blob, tmp); err != nil {
+		t.Fatalf("extract HEAD zip into %s: %v", tmp, err)
+	}
+	if _, err := os.Stat(filepath.Join(tmp, "go.mod")); err != nil {
+		t.Fatalf("clean-checkout: go.mod not at %s after extract (%v)", tmp, err)
 	}
 
 	build := exec.Command("go", "build", "./...")
@@ -116,6 +123,53 @@ func TestCleanCheckoutBuilds_AC11(t *testing.T) {
 		t.Fatalf("clean-checkout go build ./... failed: %v\n%s", err, tail(string(out), 4000))
 	}
 	t.Logf("clean-checkout go build ./... ok in %s", tmp)
+}
+
+// unzipTree writes a `git archive --format=zip` blob into dst using the standard
+// library only. git archive never emits absolute or ".." paths, but the guard is
+// kept so a malformed entry can never write outside dst.
+func unzipTree(t *testing.T, blob []byte, dst string) error {
+	t.Helper()
+	zr, err := zip.NewReader(bytes.NewReader(blob), int64(len(blob)))
+	if err != nil {
+		return err
+	}
+	for _, f := range zr.File {
+		name := filepath.Clean(strings.ReplaceAll(f.Name, "\\", "/"))
+		if name == "." || strings.HasPrefix(name, "..") || filepath.IsAbs(name) {
+			continue
+		}
+		target := filepath.Join(dst, filepath.FromSlash(name))
+		if !strings.HasPrefix(target, filepath.Clean(dst)+string(os.PathSeparator)) && target != filepath.Clean(dst) {
+			continue
+		}
+		if f.FileInfo().IsDir() {
+			if err := os.MkdirAll(target, 0o755); err != nil {
+				return err
+			}
+			continue
+		}
+		if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
+			return err
+		}
+		rc, err := f.Open()
+		if err != nil {
+			return err
+		}
+		outf, err := os.OpenFile(target, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
+		if err != nil {
+			rc.Close()
+			return err
+		}
+		if _, err := io.Copy(outf, rc); err != nil {
+			rc.Close()
+			outf.Close()
+			return err
+		}
+		rc.Close()
+		outf.Close()
+	}
+	return nil
 }
 
 func tail(s string, n int) string {

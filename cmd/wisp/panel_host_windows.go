@@ -19,13 +19,16 @@ package main
 //     (panel.ComposerDispatch.Handle) and whose return value is the receipt the
 //     page gets back. That is H2 (control created) + H3 (page bytes reach Go) +
 //     H10 (reply reaches the page) landing together on a real host.
-//   - The window's messages must belong to a thread that pumps them. In the
-//     resident process that thread is the shared ui-sta (J1: the host is created
-//     from an internal/ball Events callback, which already runs on ui-sta, so no
-//     second UI thread and no new D38b roster name is added). A standalone
-//     bring-up (the `wisp panel` diagnostic and the local measurement tests)
-//     owns a locked OS thread for its one window; that is a measurement harness,
-//     not the shipping resident topology, and it registers no goroutine name.
+//   - The window's messages must belong to the thread that pumps them, so bringUp
+//     runs on whatever thread its caller is on. The shipping seam J1 ruled (create
+//     the host from an internal/ball ui-sta Events callback) is NOT yet wired: a
+//     re-entrant bringUp from inside the ball's ui-sta DispatchMessageW loop
+//     panics on this box, because go-webview2's window bring-up runs a BLOCKING
+//     nested GetMessageW pump that cannot be a co-resident of the ball's own pump
+//     (see docs/evidence/s1/33-panel-host-c27-r1.md §⑧ - a stop-and-report, no
+//     second UI thread was added to dodge it). The local measurement tests own a
+//     locked OS thread for their one window - a test harness, not the shipping
+//     resident topology, and it registers no goroutine name.
 //
 // Library gap that scopes AC#3 honestly (recorded in the evidence table, ⑧):
 // pkg/edge does expose AddWebResourceRequestedFilter, but the same edge layer
@@ -44,9 +47,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"runtime"
 	"sync"
-	"sync/atomic"
 	"time"
 	"unsafe"
 
@@ -119,9 +120,6 @@ type PanelManager struct {
 	// internal/observe/thresholds.go, untouched here.
 	lastColdMs float64
 	lastHotMs  float64
-
-	// stopping tells the private-thread pump loop (bringUpOnNewThread) to exit.
-	stopping atomic.Bool
 }
 
 // NewPanelManager wires one host to the inbound router and the embedded asset
@@ -331,13 +329,6 @@ func (m *PanelManager) Destroy() {
 	}
 }
 
-// Stop ends the private-thread pump loop started by bringUpOnNewThread. It is a
-// no-op when the host is driven from the resident ui-sta (no private thread).
-// The window itself is torn down by Destroy.
-func (m *PanelManager) Stop() {
-	m.stopping.Store(true)
-}
-
 // dispatchRaw runs one page envelope through the router. Kept separate from the
 // bind closure so a test can call the same code path the page reaches.
 func (m *PanelManager) dispatchRaw(ctx context.Context, raw string) (string, error) {
@@ -416,41 +407,5 @@ func pnlPumpOnce() {
 		}
 		pnlTranslateMsg.Call(uintptr(unsafe.Pointer(&m)))
 		pnlDispatchMsgW.Call(uintptr(unsafe.Pointer(&m)))
-	}
-}
-
-// bringUpOnNewThread creates the window on a private locked OS thread and keeps
-// that thread pumping it for the returned manager's lifetime. This is the shape
-// the `wisp panel` diagnostic and the local measurement tests use on a machine
-// with a desktop session; it is NOT the resident topology (the resident process
-// drives the host from a ui-sta Events callback and never calls this).
-//
-// It starts one goroutine that owns its OS thread and recovers anything the pump
-// raises, so a panic cannot take the process down silently; the goroutine exits
-// when Stop is called.
-func (m *PanelManager) bringUpOnNewThread(ctx context.Context) error {
-	errCh := make(chan error, 1)
-	go func() {
-		// owner: this panel host thread; recover below.
-		defer func() {
-			if r := recover(); r != nil {
-				errCh <- fmt.Errorf("panel host pump panicked: %v", r)
-			}
-		}()
-		runtime.LockOSThread()
-		errCh <- m.bringUp(ctx)
-		// Keep the creating thread alive and pumping until told to stop.
-		for !m.stopping.Load() {
-			pnlPumpOnce()
-			time.Sleep(5 * time.Millisecond)
-		}
-		runtime.UnlockOSThread()
-	}()
-
-	select {
-	case err := <-errCh:
-		return err
-	case <-time.After(30 * time.Second):
-		return fmt.Errorf("panel host: bring-up did not return within its bound")
 	}
 }
