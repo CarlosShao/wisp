@@ -235,3 +235,12 @@ $ comm -13 … ⇒ 新增 0 名      $ comm -23 … ⇒ 减少 0 名
 ## §7 收尾三把尺
 
 ## §8 next
+
+---
+
+## §9 编排者收尾标注（10-01 09:5x，**不是本腿写的**，账 `A488`）
+
+- **本腿死因与残值**：09:29 连接中断（`Unable to connect to the service`，114 次工具调用／22,139,980 token／9 小时 45 分）。§2／§5／§6 写在盘上但**没来得及提交**，由我代提为 `6b8327d4`（95 增／4 删，删的只有它自己那三行"（本节随…补满）"占位与两枚旧标题）。**⛔ §7／§8 至今为空，我不代填**——填了就把"谁做的判"洗混。判 AC#7 用的凭据是 §1–§6 六节，那六节都有它自己现跑的尺，不缺。
+- **我替它补跑的三把尺（09:31 现量，HEAD＝`6b8327d4`）**：① `git status --porcelain -- cmd internal`＝**0 行**；② `git diff --numstat -- cmd internal`＝**0 行**；③ `grep -rn "MUT-" --include=*.go cmd internal` 在**产码**里＝**0 处**（测试里 15 处是早先票号留在注释里的历史指认）。六枚被改锚点逐枚 `grep` 复现原句：`resident_task_source_windows.go:218 interactiveStdin()`／`run.go:574 if s.gate != nil {`／`run.go:1046 baseCtx := parent`／`resident_windows.go:177 src := startResidentTaskSource`／`resident_windows.go` 地标句子 2 处／`resident_task_source_windows.go:185 case env != buildinfo.EnvTest:` 1 处 ⇒ **六枚突变一行都没有留在盘上**。
+- **§5 第 11 条那句"ball 红不是本票、不是 flake"我现跑定案**：`go test ./internal/ball ./cmd/wisp`（带 sherpa PATH）＝`--- FAIL: TestC21TableColourRowsMatchTokensCSS (0.00s)`，红句逐字「read design/assets/tokens.css: ... The system cannot find the path specified - the CSS leg of this check must never skip」（`internal/ball/tokens_table_test.go:1465`，红在 `:1468`）；同发 `ok github.com/CarlosShao/wisp/cmd/wisp 158.207s`＝**0 枚红**。⇒ 那枚红由**工作树里别人未提交的 `design/assets/tokens.css` 删除**造成（`git status` 现读 `D design/assets/tokens.css`），**非票 246 造成、非 flake**；⛔ 我不还原、不提交、不删那个地界，整包门禁时逐名比红名集合，不许把它算成新增红、也不许为它放宽任何断言。
+- **它交回的十一条判不动已全部裁完**（K1–K11，逐条写在票面「编排者收件」一节），落成三格新判据：票 244 新 AC#5（`-H=windowsgui` 会把刚接上的任务源静默关掉、仪器不响 ⇒ 切之前必须先答"GUI 进程的任务源从哪来"＋必须有一枚会响的尺带正控）／票 248 新 AC#10（常驻那枚门今天吃不到 `confirm_timeout_sec`、`GRANT-DROPPED` 只两选一）／票 228 新 AC#10（两处"我没有任务管线"的自述里有 `:160` 是真打进台账的那句）。**K5 那一笔是本腿这轮挖出的最重账，功劳记它。**
