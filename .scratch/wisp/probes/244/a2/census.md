@@ -82,27 +82,99 @@
 
 ---
 
-## ① GUI 进程里"谁举任务"与"谁能答复卡片"分别还剩什么
+## ① GUI 进程里"谁举任务"与"谁能答复卡片"分别还剩什么（票面 AC#5 ⓐ）
 
-填写中。
+### ①.0 先说本腿读出的一件不对称（它决定 AC#5 ⓐ 的答案形状，⛔ 不是我在选）
+
+票面 AC#5 ⓐ 给了三条候选（面板／托盘／别的），三条说的都是**任务源**。我这把尺量到的是：**"允许"那一半不在这三条的射程里，因为面板这一候选在设计上就不能允许**——`internal/agent/approval/ui.go:164-171` 的 `PanelAPI` 只有 `Reject`/`Head`/`View`、**没有 `Allow` 方法**，`internal/agent/approval/gate.go:730-743` 的 `DecideFromPanel` 对 `r.Allow` **按路线直接拒并烧掉该卡新增号**（`q.revokeGrants`），`internal/agent/approval/replies.go:431-445` 更把"`err==nil`"本身定义为安全故障。这不是"票 33 还没做"，这是 `AGENTS.md` §1.2 那条"由面板侧来源的 L2「允许」"禁令的具名实现。
+
+⇒ **结论（读数，不是建议）**：切 GUI 之后，
+- **任务源**：控制台那一支归零（下表 A），候选只剩三条未落地的路；
+- **"允许"**：**归零，且三条候选里只有"原生侧"那两条（托盘／原生卡片按钮／热键）有可能补上**，面板路永远补不上这一格（S9/S11/S12）。
+- 唯一能到达 `NativeAPI.Allow` 的产码漏斗是 `cmd/wisp/approval_reply.go:213-241`（`replySurface.allow`），它的驱动者只有两枚、都挂在 `interactiveStdin()` 那根线上（S10）。
+
+### ①.1 A 表：任务源（"谁举任务"）——每个入口的产码调用者枚数现量
+
+| 入口 | 构造点（全路径＋行号，blob） | 产码调用者枚数 | 今天可达？ | 切 `-H=windowsgui` 后 |
+|---|---|---|---|---|
+| **控制台 `task <文本>` 动词**（票 246 AC#7 那一条） | `cmd/wisp/resident_task_source_windows.go:358-366`（`:363`＝`submitTask`，blob `018152a8…`）；环路起于 `:317-320`，**只在 `console != nil` 时才起**（`:287-290`、`:317`） | **1**（`submitTask` 调用者之一） | **可达**（今天 CUI＋真控制台缓冲，S3/S6） | **归零**〔推，机制现量：`interactiveStdin()`＝`approval_reply_stdin_windows.go:41-52` 要 `GetConsoleMode` 成功；GUI＋Explorer 拉起没有控制台缓冲，S6/S7〕 |
+| **测试注入位 `WISP_TEST_TASK_TEXT`** | `cmd/wisp/resident_task_source_windows.go:321-326` | **1**（`submitTask` 另一枚调用者） | 可达，但三把锁：`env==test`＋`WISP_TEST_DATA_DIR`＋数据根逐字相等（`:178-197`） | **prod 双击仍归零**（构建烘进 `DefaultEnv=prod`，`scripts/build.ps1:107`）；test 路不看控制台 ⇒ **这条不会被 GUI 切断**（§⑦ 7.3） |
+| **面板 composer `message` 方法**（候选甲，票 33＋248 那条路） | 槽位声明 `internal/panel/composer_dispatch.go:106`（`Message MessageRequestHandler`），分派点 `:155`（`d.Message == nil` ⇒ 具名拒绝）；唯一产码装配点 `cmd/wisp/panel_inbound.go:238`＝**`Message: nil`**（blob `af228d67…`） | **0** | 不可达（槽位 nil，且 `panel-inbound` 是一条 CLI 管、不是窗口） | 仍 0，除非票 33 的宿主＋票 248 的 message 处理器落地。⚠ **WebView2 今天零产码导入**：`grep jchv/go-webview2` 只命中测试字符串与 `scripts/spike`（独立 module），`go.mod:19`＝`// indirect`（S13，取数 09:50 前）；`33-r1` 正在写这格 ⇒ **本行在我读完之后必然变**，标〔待复认〕 |
+| **托盘四枚按钮**（候选乙，票 228 AC#2） | 菜单构造 `internal/ball/tray_windows.go:86-91`（四枚 `appendItem`，常量 `:20-23`，blob `fa59c301…`）→ 分流 `internal/ball/ball_windows.go:674-684`（blob `b34ccf13…`）→ 常驻腿执行者 `cmd/wisp/resident_ball_windows.go:128-131`（blob `cff7244f…`） | **真执行者 0**：三枚＝`recordBallGesture("tray-*")`（`:211-214` 只 `slog.Warn`＋`fmt.Printf`），一枚＝`recordTrayExit`（`:253-257` 逐字"has no stop path attached to it"）。菜单项里**没有任何"起任务"这一项** | 不可达（按了只会打一行日志） | 不变：GUI 与这格无关（它本来就 0）。**要动的文件**＝`cmd/wisp/resident_ball_windows.go:128-131`（换执行者）＋`internal/ball/tray_windows.go:86-91`（**加第五枚项**才谈得上"从托盘举任务"）＋一个新文本源（托盘没有键盘输入面，⛔ 票面没写这格怎么解） |
+| **四枚全局热键**（候选丙里我自己找的一枚） | `internal/ball/ball_windows.go:656-667`（`wmHotkey` 分流 summon/mute/cancel/panel）→ `cmd/wisp/resident_ball_windows.go:124-127` | **1**（只有 `:126 OnCancelHotkey → recordCancelHotkey`，且它是**否决**不是举任务，见 B 表）；summon/mute/panel＝`recordBallGesture` **0 执行者** | summon/panel 不可达（按了打日志） | **热键与子系统无关**（`RegisterHotKey` 是桌面级的，GUI 进程照注册）⇒ **这是唯一一形"切完还活着"的输入通道**，今天它的产码执行者只有 cancel 一枚。**甲/乙/丙三条候选都没提它** ⇒ 本腿具名交回：AC#5 ⓐ 的候选清单是否要加"热键"第四枚＝**交编排者裁**（票面没覆盖） |
+| **麦克风／KWS** | `internal/agent/approval/approval.go:57`（`ChannelKWS`，注释逐字"spoken veto word (ticket 41)"） | **0**（`resident_approval_windows.go:101` 起注册表空，只有 `:157 SetLoaded(ChannelEsc,true)`） | 不可达 | 不变；owner 09-30「还是用这个语音球吧」那一支的归口在票 228/KWS，**不在本格**（票面 AC#5 末段已具名） |
+
+**小结（A）**：`submitTask` 的产码调用者**总数＝2**（`:322` 注入／`:363` 控制台），两枚的**可达性各自挂在**"环境是 test"与"有真控制台缓冲"上 ⇒ **prod＋GUI 这一形，两条同时归零**（票面 AC#5 的判断我复认成立，不是新发现）。要恢复"举任务"，只有：面板 message 处理器（票 33+248，产码 0）、托盘新增项（产码 0，且缺文本源）、或票面未列的热键（切完唯一还活着的输入面，但同样缺文本源）。
+
+### ①.2 B 表：答复卡片——"允许／拒绝"每个入口现量
+
+| 入口 | 构造点 | 产码调用者枚数 | 性质 | 切 GUI 后 |
+|---|---|---|---|---|
+| 控制台答复词 `yes`/`session`/`always`（**允许**） | `cmd/wisp/approval_reply.go:562-582`（词表 `:564` yes／`:566` session／`:576` always）→ `:213`/`:259`/`always`(`cmd/wisp/approval_always.go:70`) → `:215 h.Allow`／`:259 h.AllowSession` | **2 枚驱动者**：`approval_reply.go:546`（`runReplyLoop`，喂 `run.go:770` 的 `runSpec.reply`＝`main.go:153` 的 `interactiveStdin()`）＋`resident_task_source_windows.go:381`（`runConsoleLoop`） | **允许**（原生侧 `NativeAPI`） | **两枚同死**〔推，同一闸门 S6〕。这是"卡片除了 Esc 之外还剩哪些允许入口"的**唯一**真身，切完剩 **0** |
+| 控制台 `no`/`veto`／`panel-no` | 同词表 `:568`/`:570`/`:572` → `:288 reject`→`:296 refuse` | 同上 2 | 拒绝 | 同上归零 |
+| 控制台 `panel-yes` | 词表 `:574` → `:329 panelAllow` → `:331 h.PanelAllow` | 2（同一漏斗） | **不是入口**：`gate.go:730` 按路线拒＋烧新增号（S12，§⑦ 7.5） | 归零（本来就不通） |
+| **Esc 全局键** | `cmd/wisp/resident_ball_windows.go:126` → `:224-234 recordCancelHotkey` → `cmd/wisp/resident_windows.go:136` 注入的 `ra.vetoByEsc` → `cmd/wisp/resident_approval_windows.go:171-179`（`:179 ra.cards.Veto(...)`，blob `d790a7e1…`） | **1** | **只否决**（`Replies.Veto`＝`replies.go:455`，走 `gate.Veto`，无 allow 语义） | **还活着**（热键与子系统无关）⇒ 切完 GUI 进程里"卡片能做的事"只剩**否决**这一枚 |
+| 球单击＝`ChannelBall` | 通道常量 `approval.go:54`；常驻腿 `resident_approval_windows.go:38-39` 逐字"ChannelBall, ChannelKWS and ChannelPanel stay unloaded in this process (ticket 246 AC#6)"；球侧 `cmd/wisp/resident_ball_windows.go:123 OnClickBall: recordBallGesture("click")` | **0** | 未装载 | 不变（0） |
+| 面板拒绝按钮＝`ChannelPanel` | `approval.go:56`；`PanelAPI.Reject` 存在（`ui.go:168`） | **0 产码宿主**（无 WebView2 导入，S13；`internal/panel/pump.go:16` 那行"ticket 33 unclaimed"被 `cmd/wisp/approval_always.go:165` 引为凭据） | 拒绝可达（若落地）、**允许永不可达**（结构性） | 不变：拒绝这一半在票 33+248 之后**可能**活；允许那一半与 GUI 切换无关，**规格禁止** |
+| KWS 取消词 | `approval.go:57` | **0**（`SetLoaded` 只给 Esc，`:157`） | 不可达 | 不变 |
+
+**B 表小结（这条正面回答票面要我单独答的那一问）**：切完 GUI，一张挂在球上的卡片，**产码里还剩的"允许"入口枚数＝0**；还剩的**任何**答复入口只有 **Esc 否决** 一枚（`resident_approval_windows.go:179`）。L2 卡于是变成"没人能允许、只能被否决或等到超时按拒绝"——正是 `cmd/wisp/approval_reply_stdin_windows.go:11-13` 与 `main.go:154-158` 今天写在代码里的那句"pre-201 posture"。**要恢复"允许"，只能走原生侧**（`NativeAPI` 是唯一有 `Allow` 的面，`ui.go:143-158`），而原生侧今天能挂的只有两形：**托盘加一枚"允许当前卡"**或**球单击＝允许**（`ChannelBall` 那枚未装载通道），两者都是**新产码＋新决策**，票面没写、我不选（§⑧ G1）。
 
 ---
 
 ## ② 构建入口名册：今天有几处会产出 `wisp.exe`，切 GUI 要动哪几处
 
-填写中。
+**名册＝"今天真实会产出一枚可执行 `wisp.exe`／同形二进制的位置"，全部现量（S15–S18、S22）。**
+
+| # | 入口 | file:line | 它今天做什么 | 切 GUI 要不要动 |
+|---|---|---|---|---|
+| B1 | **唯一的产码构建行** | `scripts/build.ps1:123`（blob `3593e87b438a4e2d1673fa0fa7af8285429ed57e`） | `& $go.Source build -trimpath -ldflags $ldflags -o build\wisp.exe ./cmd/wisp`；环境在 `:115-119`（`CGO_ENABLED=1`、`CC`、`GOOS=windows`、`GOARCH=amd64`、`GOPROXY` 默认 `https://goproxy.cn,direct`） | **这一处是唯一的 flag 面**。⛔ 全仓 `-H` 枚数＝**0**（S14 那把尺唯一的命中是二进制 blob `scripts/spike/bin/goja-caps.exe`，不是构建链） |
+| B2 | flag 数组本体 | `scripts/build.ps1:103-110` | 六枚**全是 `-X`**（Version/Commit/BuildDate/DefaultEnv/SherpaOnnxVersion/OnnxRuntimeVersion），零枚 `-H` | **要动的就这 8 行**（加一枚 `"-H=windowsgui"`）⇒ **票面 AC#1 的最小改动面＝1 枚文件的 1 个数组** |
+| B3 | 产物哈希（同一次构建的下游） | `scripts/build.ps1:146`（`$artifacts` 名单含 `wisp.exe`）→ `:150-157` 写 `build\SHA256SUMS` | flag 一改，exe 字节变、`SHA256SUMS` 必重生 | 不用改代码，但交件读数要**在哈希之后重取**（票面"改前/改后都要写在交件里"） |
+| B4 | 冒烟 | `scripts/build.ps1:161-163` | 跑 `build\wisp.exe doctor`，**只判 `$LASTEXITCODE`**（`:163`），不读 stdout、不读子系统 | **切完照样绿**（§⑦ 7.11）⇒ 这是一枚"看着验过、其实没验这一维"的仪器；要不要给它加一把 `objdump` 钉子＝**交编排者**（§⑧ G5） |
+| B5 | CI 调用者（**不是第二处 flag 面**） | `.github/workflows/ci.yml:453`（job `test-windows:387`，步名 `:448`）／`:550`（`slo-smoke:532`）／`:613`（`slo-full:590`） | 三枚步骤都是 `-File scripts/build.ps1 -Env dev` | **CI 一字不用改**（flag 全在 build.ps1 里）；但注意 `:597-602` 那段注释在解释"runner 上的 DLL/PATH 兜底"，形态一改这三枚步骤的**产物外观**同时变（`slo-full` 跑在 self-hosted runner＝票面排程段具名的"取数期间不改构建链"） |
+| B6 | 会自动重建产物的脚本 | `scripts/slo-check.ps1:104-108`（缺 `wisp.exe` 就自己调 `scripts/build.ps1 -Env dev`） | 消费方在 `:69`（默认 `-WispExe build\wisp.exe`）、`:325`/`:344`/`:365`（三发 `wisp slo -out <file>`）、`:155`（进程名清单认 `wisp.exe`/`wisp-cli.exe`） | 不用改；**但它是"取数期间不许改构建链"的那枚原因**（票面排程段） |
+| B7 | 人读的命令面（**禁改**） | `docs/BUILD.md:45`（`powershell … -File scripts\build.ps1 -Env dev`）、`:48-57`（六步流程含"冒烟：运行 `build\wisp.exe doctor`"） | 手册 | ⛔ 不动一字；过期行见下面"具名登记" |
+| B8 | **不过 build.ps1 的第二枚产码路径（测试临时件）** | `cmd/wisp/secret_argv_windows_test.go:174`＝`exec.Command(goExe,"build","-o",exe,"./cmd/wisp")`（**不带 `-ldflags`**） | 在 `t.TempDir()` 里编一枚**自己的** `wisp.exe` 跑真机 DPAPI 用例 | **不改、也不会因 AC#1 变**：它编出来的永远是默认 CUI ⇒ **这条腿的"真机"读的是测试二进制，不是出厂产物**（§⑧ G5 的第二证据）。同形另有 `cmd/wisp/resident_approval_live_246_windows_test.go:417`（编 `./cmd/wisp/testdata/esclistener`）、`internal/llm/openaichat/mockllm_integ_test.go:65`、`tools/d22scan/scan_test.go:2256`／`selftest_test.go:181` |
+| B9 | 另一枚可执行产物（**不产 wisp.exe**） | `scripts/dev/ball-cycle.ps1:28-30`＝`& $go build -o $env:TEMP\wisp-balldebug.exe cmd\balldebug` | 调试壳的 20 状态循环 | 与本票无关；⚠ 它是 `internal/ball` 四枚托盘/热键**唯一有真执行者**的地方（`cmd/balldebug/main.go:195-206`）⇒ §① 那句"import 了≠装起来了"的反面样本 |
+| B10 | 独立 module／镜像 | `scripts/spike/go.mod`（独立 module，`scripts/spike/*.exe` 是预编译 blob）；`docker/builder.Dockerfile:1-9`（`FROM golang:1.27-bookworm`、`ENV CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64`，`:3` 逐字"the PRIMARY supported build path is native Windows (scripts/build.ps1, docs/BUILD.md)"）；`docker/mockllm.Dockerfile:10` 只编 mockllm | 交叉构建便利镜像**没有 CMD/构建行**（全文 9 行，`wc -l`＝9，零命中 `build.ps1` 之外的构建命令） | **不用动**；名册列它是为了说"没有第二处 flag 藏在镜像里" |
+| B11 | 语言／工具链现量 | `go version`＝`go1.27.1 windows/amd64`；`go.mod:1-5`＝`module github.com/CarlosShao/wisp`／`go 1.27`／`toolchain go1.27.1`（blob `6ccb3fd1…`）；`git status --porcelain -- go.mod go.sum`＝**0 行**（起手） | — | `-H=windowsgui` 与 `-trimpath`／cgo 无冲突（**这一条是〔推〕：我没跑任何构建**，票面 AC#1 要求实现腿带命令全文交件） |
+| B12 | `cmd/wisp` 的 `//go:build` 分布（本票要动的那两枚文件在标签面上） | 21 枚 `//go:build windows`／7 枚 `!windows`／40 枚无标签（S20 现量 71 枚文件）。**`console_windows.go` 属 `windows` 组、`console_other.go` 属 `!windows` 组、`main.go` 无标签** | 切 flag 只影响 Windows 产物的子系统维；`console_other.go` 在 Windows 下根本不参与编译 | **⚠ 名册里最容易被漏的一格**：`-H=windowsgui` 只改 Windows 产物，而**那句"linking as GUI"的假话写在 `!windows` 文件里**（`console_other.go:7`）⇒ 改构建链**不会**让任何 POSIX 编译失败来提醒你修注释，注释只能靠人（AC#3） |
+
+**具名登记（禁改文件里的过期文字，照票面 AC#4 这一形只做登记，不动一字）**
+- `docs/BUILD.md:87`「windowsgui 子系统切换（`-H=windowsgui`）推迟到票 07」——**票面已点名它是过期**（票 07 已带 `-done` 结案、没带走这格），本腿复认那行仍在原位。
+- `docs/BUILD.md:90-92` 那段"临时构建验证 AttachConsole"——票面 AC#0 已具名"过期读数、不可继承"；本腿补一句它的机制同身：`:92` 的"已有合法 stdout 时跳过 attach"＝`cmd/wisp/console_windows.go:35` 那个 early return（S7）。
+- **票面没提的两处**（§⑧ G6）：`docs/BUILD.md:51`「前端：跳过（S5 之前无 frontend）」、`docs/BUILD.md:67-71` 那段"无参＝常驻进程…悬浮球窗口在票 07""`wisp.exe run` CLI 占位（真实 agent 循环在票 10）"——今天都已过期（球在票 228 进了常驻腿、`run` 在票 10/12 之后是真环路）。⛔ 我没改，只点名。
+- ⚠ **票面 AC#5 ③ 那一处路径写错**：AC#5 引 `docs/specs/SPEC-11-build-deployment-containerization.md:50`，仓里**没有这枚文件**（`ls docs/specs/ | grep -c deployment`＝**0**）；真身＝`docs/specs/SPEC-11-build-deploy-containerization.md:50`，**行号与逐字内容都对**（`:50`＝「CLI 与 GUI 同一二进制：无参 = GUI（`-H=windowsgui`）；`wisp run` 子命令 `AttachConsole(ATTACH_PARENT_PROCESS)` 输出。【SPEC】」）。票面开头的现量表用的是**正确**文件名 ⇒ 只是 AC#5 那一处笔误，登记不改票框。
 
 ---
 
 ## ③ 切完之后四条 CLI 腿各自还能不能工作
 
-填写中。
+**先给名册现量**（`cmd/wisp/main.go:88-132` 逐枚读，blob `e5e98ea89d49810dafb6baa41d5c419ca6cfaaa0`）：**11 枚分支**＝`run:89`／`providers:92`／`doctor:95`／`secret:100`／`models:102`／`slo:110`／`panel-assets:112`／`panel-inbound:115`／`version:121`／`help:124`／`default:127`（编排者给的"四条"是子集，另有 7 枚）。`attachParentConsole` 覆盖面＝**11/11**（10 枚在 `main.go:65,90,93,96,108,113,119,122,125,128`，2 枚在腿自己文件里：`cmd/wisp/secret.go:183`、`cmd/wisp/slo_windows.go:254`；S7）。⛔ **下面四腿全部结论标〔读码推的〕，本腿没跑过任何一发**。
+
+| 腿 | 输出去向（现量行号） | GUI 子系统下看不看得见〔推〕 | `> out.txt` 那一形（票面 AC#2 ②）怎么成立〔推〕 | 今天有仪器盯着吗 |
+|---|---|---|---|---|
+| `wisp run` | `cmd/wisp/main.go:151-165`：`printVersions`（`:152`→`:168-172` `fmt.Printf`＝stdout）＋`runSpec{stdout: os.Stdout, stderr: os.Stderr, reply: interactiveStdin()}`；日志另落盘＝`cmd/wisp/run.go:222 installLogSink(s.dataDir)` | 从 cmd.exe 手打：取决于句柄继承那一形（§⑧ G3，**我没量**）；从 Explorer／无父控制台：`attachParentConsole` 的 `AttachConsole(ATTACH_PARENT_PROCESS)` 无目标 ⇒ stdout 无处可去，**但 slog 仍进文件**（两套 sink 命运不同）。⚠ **答复侧同死**：`reply` 就是 `interactiveStdin()`（`main.go:153`）⇒ 切完的 GUI 产物里 `wisp run` **没有人能答复卡片**，`main.go:155-158` 那句响亮警告会变成**每次都响** | `os.Stdout` 是被重定向的文件句柄 ⇒ `GetStdHandle(STD_OUTPUT_HANDLE)` 非 0 ⇒ `console_windows.go:35` **early return、不 attach** ⇒ 写文件照旧。凭据形状＝`docs/BUILD.md:92` 同一机制的旧读数（**过期**，票面 AC#0 已具名） | **零**（S8：全仓无一枚测试碰 `attachParentConsole`/`AttachConsole`；`wisp run` 的答复侧只在 `go test` 二进制里跑，那个二进制永远 CUI，见 B8） |
+| `wisp doctor` | `cmd/wisp/doctor.go:115-129` 全 `fmt.Println`/`Printf`＝**stdout**；退出码 `cmd/wisp/main.go:97-99`（`cmdDoctor()` 返 bool 才 `os.Exit(1)`） | 同上分两形。⚠ **冒烟不受影响**：`scripts/build.ps1:163` 只判 `$LASTEXITCODE` ⇒ 人看不见那 10 行 PASS，脚本仍绿（§⑦ 7.11） | 同一 early-return 机制 ⇒ 重定向照旧成立〔推〕 | **半枚**：`scripts/build.ps1:161-163` 是 doctor 的唯一自动消费者，**但它断言的是退出码，不是"输出可达"**（这一维＝零） |
+| `wisp slo` | `cmd/wisp/slo_windows.go:254` attach；报告 `-out <file>`（用法行 `:170`"default stdout"），错误全走 `os.Stderr`（`:221-333`）；`scripts/slo-check.ps1:325/344/365` **三发都带 `-out`** | 取数走**文件** ⇒ 这一腿是四腿里对 GUI 切换**最免疫**的；风险只剩"stderr 无处可去"（装配失败那几行在 GUI＋无父控制台时看不见）〔推〕 | `-out` 是指名文件、不是 stdout 重定向 ⇒ 那一形对本腿**不构成风险** | 有，但**量的不是这一维**：SLO 阈值在 `internal/observe/thresholds.go`（禁改），`slo-check.ps1:104` 还会**自己重跑 build.ps1** ⇒ 取数期间改构建链＝同一格读数被两种子系统混着产（票面排程段那句警告的机制解释） |
+| `wisp panel-inbound` | `cmd/wisp/panel_inbound.go:99-187`：`s.stdin` 默认 `os.Stdin`（`:100-102`）→ `:149-150` `bufio.NewScanner`；受理/拒绝句走 `s.stdout`（`:165`/`:173`），审计走 `s.stderr`（`:139`、`:180-182`）；退码 2/1/0（`:57-59` 注释＋`:116`/`:132`/`:145`/`:176-186`） | ⚠ **这条腿的输入是 stdin 本体，不是 `interactiveStdin()`**——它没调那枚闸门（全仓只有两枚调用者，`main.go:153` 与 `resident_task_source_windows.go:218`，S6）⇒ **管道／重定向喂行照旧工作**〔推〕；但 GUI＋无控制台＋**没管道**时 `os.Stdin` 无有效句柄 ⇒ `sc.Err()` 那一支（`:175-178`）会打"输入流中断"并返 2〔推，未量〕 | `echo '…' \| wisp.exe panel-inbound -data X` 那一形**与 attach 无关**（它不重绑 stdin，除非走了 `rebindStdHandle(STD_INPUT_HANDLE,"CONIN$")` 那一支 `console_windows.go:42`）；`> out.txt` 只影响输出面，同 early-return 机制〔推〕 | **一枚**，但它不管子系统：`cmd/wisp/panel_inbound_33_test.go`（票面 AC#9 那枚"读盘判据"）——本腿现量 `grep attachParentConsole --include=*_test.go`＝0（S8）⇒ **没有任何仪器测过这腿在什么句柄下能收到行** |
+
+**顺带一格（票面 ① 的候选"丙＝`wisp panel-inbound` 是不是合法第三入口"）**：**不是**，三把现量：① 它的 `Message` 槽位＝`nil`（`cmd/wisp/panel_inbound.go:238`）⇒ 没有能起任务的处理器；② 它**根本没有审批门**——`Confirm: nil` 两处（`:218`、`:228`），文件头 `:32-39` 逐字"CONFIRM IS NIL, ON PURPOSE"、`:205-207` 逐字"panel-inbound owns no approval gate"⇒ 它既不能允许也不能拒绝一张卡；③ 它是**另一个进程**，而票 246 ruling 2.2 的"ONE GATE PER PROCESS"（`cmd/wisp/resident_task_source_windows.go:35-43`）正是要禁止"第二个门"。⇒ 它今天是一枚**权限档写腿**（`perm.Store`＋`ModeWriteHandler`，`:213-231`），不是任务源、也不是答复入口。
 
 ---
 
 ## ④ 三形时机（甲＝现在切／乙＝等 33+248／丙＝永远不切）
 
-填写中。
+> ⛔ 本节只列"谁受影响＋谁能看见＋撤销代价"，**不替编排者选形**。票面 AC#5 末段已把既定序写成盘上判据（"本格未答 ⓐ 之前，票 244 整票不许动构建链；顺序＝33 → 248 → 才轮到 AC#1"），⚠ 我在 §①.0 量到的是：**这条既定序只解任务源，不解"允许"那一半**（面板结构性不能允许，`internal/agent/approval/ui.go:164-171`＋`internal/agent/approval/gate.go:730`）⇒ 乙形按票面走完之后，"允许入口枚数"仍是 **0**，这一点要不要算"AC#5 ⓐ 已被回答"＝交编排者判（§⑧ G1 的续问，票面没覆盖）。
+
+| 形 | 谁受影响（全路径＋行号） | 今天有什么仪器看得见它 | 撤销代价 |
+|---|---|---|---|
+| **甲＝现在就加 `-H=windowsgui`** | 构建面：`scripts/build.ps1:103-110`＋`:123`（B1/B2）；产物面：`build/wisp.exe` 子系统 3→2（S3 现量今天＝`00000003 (Windows CUI)`），`build/SHA256SUMS` 必重生（`scripts/build.ps1:146-157`）；CI 面：`.github/workflows/ci.yml:453/550/613` 三枚步骤跟着变＋`scripts/slo-check.ps1:104` 的自动重建；**行为面（本腿最要紧的一条）**：任务源两枚调用者同时归零（`cmd/wisp/resident_task_source_windows.go:322`／`:363`，S5）、"允许"漏斗归零（`cmd/wisp/approval_reply.go:215`/`:259` 的两枚驱动者 `approval_reply.go:546`／`cmd/wisp/resident_task_source_windows.go:381`，S9/S10）、**停机源也归零**（`cmd/wisp/resident_windows.go:107` 的 `os.Interrupt` 是常驻腿唯一入口，`cmd/wisp/resident_ball_windows.go:253-257` 托盘 Exit 无执行者，§⑧ G2）；GUI 面：双击不再有黑框（票面 AC#2 ③ 那一形） | **零**（三把尺都指零：S8 无一枚测试碰 `attachParentConsole`/`AttachConsole`；B8 那四枚自跑 `go build` 的台件都不带 `-ldflags`（`cmd/wisp/secret_argv_windows_test.go:174` 等）⇒ 测试二进制永远 CUI、整包照绿；`scripts/build.ps1:163` 冒烟只判退出码）。⚠ 票 246 那族真机用例走 `WISP_ENV=test`＋注入位（`cmd/wisp/resident_task_source_live_246_windows_test.go:33-36` 逐字"The console path cannot be driven from a subprocess at all"）⇒ **甲形不会让任何一枚现有断言变红**，票面 AC#5 的判断我复认 | **最小**：删掉数组里那一枚元素即回到今天（`scripts/build.ps1:103-110` 单行级改动，无迁移、无数据、无契约）。⛔ 代价不在构建链、在**人**：一旦 owner 开始"双击用"，撤回＝把已承诺过的"没有黑框"再收回去 |
+| **乙＝等票 33（宿主）＋票 248（面板能举一发任务）之后再切** | 前置落地面：`go.mod:19`（`// indirect`→direct，**33-r1 正在写**，S13）、`internal/panel/composer_dispatch.go:106` 的 `Message` 槽位（今天装配为 nil：`cmd/wisp/panel_inbound.go:238`）、`internal/panel/pump.go:16` 那句"no WebView2 host (ticket 33 is unclaimed)"会跟着变假（归票 33 改口，`A489` 已点名同族 `cmd/wisp/approval_always.go:165`）；受影响面同甲（任务源／允许／停机三格都在切的那一刻归零）；额外一格：票 248 AC#10 已裁"常驻门建在会话账本之前 ⇒ `Grants` nil ⇒ 本会话内允许放行但不落盘"——本腿现量机制成立：`cmd/wisp/resident_approval_windows.go:109-113` 的 `approval.Options{}` **没有** `Grants` 字段，而 `cmd/wisp/run.go:592` 有 `Grants: grantWrite`（⛔ **裁定与账不属本腿**，出处 `A488` 第 2 条，我只补 file:line 与"两枚门的选项面确实不同"这一读数） | **甲那三把零全部照旧**（切的那一刻一样没仪器响）；乙形**新增**的可看见面＝票 33/248 自己的用例（`cmd/wisp/panel_inbound_33_test.go` 已在；WebView2 宿主那枚还不存在）。⚠ **没有任何一枚仪器断言"面板真能举一发任务"**——那是 248 落地腿要交的尺，不在本腿射程 | **中**：切之前所有前置都已落盘，撤 flag 本身仍是单行；多出来的代价是**面板侧已按"能举任务"的形状写过用例与文案**，撤 flag 会让"GUI 里没有控制台键盘"变永久状态，且 owner 已经看到面板能举卡（心理面） |
+| **丙＝永远不切** | 直接违反面：`docs/specs/SPEC-11-build-deploy-containerization.md:50` 逐字"CLI 与 GUI 同一二进制：无参 = GUI（`-H=windowsgui`）"（**已定要求**；票面 AC#0 具名"这是漏做、不是契约变更"）⇒ **丙形按票面口径要写"与规格冲突"**；不受影响面：任务源／允许／停机三格今天全部保持可达（S5/S6/S24，双击进程有真控制台缓冲）；但票面 AC#2 ③（双击不再有黑框）**永远不成立**，外观代价照 `A488` 那句"产品看起来像半成品" | **零**（这一形不产生新读数；`objdump -p build/wisp.exe` 会一直读回 `Subsystem 00000003 (Windows CUI)`，S3） | **最大且不可逆**：规格文字点名 `-H=windowsgui`，"永远不切"要么改 `docs/specs/**`（＝**人工批准**，`AGENTS.md` §0.2／§1.1 契约面），要么留一笔永久未登记的偏离。**唯一可能"不违反 SPEC-11 文字"的丙变体**＝保持 CUI 构建、启动后运行时 `FreeConsole()` 摘掉控制台——⛔ 现量：全仓 `FreeConsole`/`AllocConsole`/`GetConsoleWindow` **零命中**（唯一相邻声明＝`cmd/wisp/testdata/esclistener/main.go:60` 的 `ShowWindow`）⇒ 它是**新产码**，且**仍不满足 SPEC-11:50 的字面 flag**（规格点的是 `-H=windowsgui`）⇒ 按票面写"与规格冲突"，⛔ 我不自创合法化；要不要给这格开一格合法性＝§⑧ G4 |
+
+**owner 原话那一格怎么落（票面要我不照抄结论，只给读数）**：owner 09-30「算了不改方案了，还是用这个语音球吧」＋「形状算你过关……想把核心功能过了」⇒ 样式后置、后端主链在前。**与本腿读数的关系（不是建议）**：三形里唯一直接服务"核心功能主链"的事实是**"任务源＋允许源＋停机源在双击那条路上今天还在、切完立刻三格归零"**（S5/S6/S9/S10/S24）；`SPEC-11:50` 是已定要求 ⇒ "晚切"合法、"不切"要写冲突。KWS 那一支归第四条通道（票面 AC#5 末段已具名，本腿不揽）。
 
 ---
 
