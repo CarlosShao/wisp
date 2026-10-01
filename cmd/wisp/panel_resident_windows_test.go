@@ -30,13 +30,16 @@ package main
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"regexp"
 	"runtime"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
+	"unsafe"
 
 	"github.com/CarlosShao/wisp/internal/observe"
 	"github.com/CarlosShao/wisp/internal/panel"
@@ -335,6 +338,81 @@ func TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe(t *testing.T) {
 // (webview.go:381-383), so this test plants exactly the message the library plants.
 var postQuitProc = pnlModUser32.NewProc("PostQuitMessage")
 
+var t33r7EnumThreadWindows = pnlModUser32.NewProc("EnumThreadWindows")
+
+// t33r7WindowCount is the tally the EnumThreadWindows callback bumps. It is a
+// package-scope counter because the callback handle must outlive the call and
+// because carrying a pointer through LPARAM would be unsafe.Pointer misuse
+// (go vet says so, correctly).
+var t33r7WindowCount atomic.Int64
+
+var t33r7CountProc = windows.NewCallback(func(hwnd, lparam uintptr) uintptr {
+	t33r7WindowCount.Add(1)
+	return 1
+})
+
+// threadWindowCount is how many top-level windows the given Win32 thread owns. A
+// thread that owns a window a Go manager has already let go of is the thing that
+// makes the NEXT create on it fail (33-r7 ①), so the tests that release a thread
+// report this number instead of trusting their own bookkeeping.
+func threadWindowCount(tid uint32) int {
+	t33r7WindowCount.Store(0)
+	t33r7EnumThreadWindows.Call(uintptr(tid), uintptr(t33r7CountProc), 0)
+	return int(t33r7WindowCount.Load())
+}
+
+func currentThreadID() uint32 { return uint32(windows.GetCurrentThreadId()) }
+
+// pumpThreadToQuiet DISPATCHES (never drops) this thread's queued messages until
+// user32 reports the queue empty, bounded by limit. This is the owner-side repair
+// 33-r7 measured to be the only sound one: it tears the orphan window down for real
+// (thread windows 3 -> 0) and consumes the WM_QUIT the library's window procedure
+// posts on the way, which a filtered remove-only drain cannot even see
+// (docs/evidence/s1/33-panel-host-c27-r7.md ①, four shapes x3 runs).
+// Returning without reaching empty is a loud reading, not a silent one: the caller
+// asks threadQueueHead afterwards.
+func pumpThreadToQuiet(limit int) int {
+	pumped := 0
+	for pumped < limit {
+		var m pnlMsg
+		r, _, _ := pnlPeekMessageW.Call(uintptr(unsafe.Pointer(&m)), 0, 0, 0, pnlPmRemove)
+		if r == 0 {
+			return pumped
+		}
+		pnlTranslateMsg.Call(uintptr(unsafe.Pointer(&m)))
+		pnlDispatchMsgW.Call(uintptr(unsafe.Pointer(&m)))
+		pumped++
+	}
+	slog.Warn("test harness: thread pump hit its cap before the queue was empty", "cap", limit, "pumped", pumped)
+	return pumped
+}
+
+// threadQueueHead names the first message still queued on this thread, or "empty".
+// A PM_NOREMOVE peek, so asking the question never changes the answer.
+func threadQueueHead() string {
+	var m pnlMsg
+	r, _, _ := pnlPeekMessageW.Call(uintptr(unsafe.Pointer(&m)), 0, 0, 0, 0)
+	if r == 0 {
+		return "empty"
+	}
+	return fmt.Sprintf("msg 0x%X on hwnd 0x%X", m.message, uintptr(m.hwnd))
+}
+
+// releaseThreadClean is the duty of every test that pumps a real window on a locked
+// thread and then hands that thread back to the Go pool: destroy what it owns,
+// dispatch the queue to empty, and only then unlock. A thread released while it
+// still owns a window or carries a queued close is the poison that made AC#14 red in
+// full-package order while passing in isolation (33-r7 ①②), because the Go scheduler
+// may place the next panel-sta goroutine on that same OS thread.
+//
+// It returns the two readings the caller reports: what was pumped, and what is left.
+func releaseThreadClean() (int, int, string) {
+	pumped := pumpThreadToQuiet(4096)
+	left := threadWindowCount(currentThreadID())
+	head := threadQueueHead()
+	return pumped, left, head
+}
+
 // TestAC13BringUpSurvivesAReusedThreadQuit is the deterministic form of the red that
 // only appeared when a window-owning thread ran before AC13. The full-package shape
 // is a race (the Go scheduler has to hand AC13's panel-sta a pooled thread that an
@@ -354,15 +432,29 @@ var postQuitProc = pnlModUser32.NewProc("PostQuitMessage")
 // The reverse control: delete that one call from bringUp and this test fails on the
 // planted quit (NewWithOptions panics before the window exists), reported by name -
 // not by a 15-second timeout, because the panic is what is being pinned here.
+//
+// 33-r7 adds the other half, because the shipped version of this test WAS the poison:
+// it created a real window on this thread, called Destroy (which only POSTS WM_CLOSE),
+// and then unlocked, handing the Go pool a thread that still owned a live window and
+// still carried the close. That is what made AC#14 red in full-package order while
+// this test itself stayed green (docs/evidence/s1/33-panel-host-c27-r7.md ①②). So the
+// test now releases its thread clean and checks that it did: dispatch to empty, then
+// report what the OS says is left. Reverse control for THAT assertion: delete the
+// releaseThreadClean call and the two checks below go red on this thread, here, now -
+// not in whichever later test the scheduler happens to poison.
 func TestAC13BringUpSurvivesAReusedThreadQuit(t *testing.T) {
 	dataPath := filepath.Join(os.TempDir(), "wisp-33r6-reused-thread-quit")
 	disp := &panel.ComposerDispatch{Mode: &recordingModeHandler{}}
 	mgr := NewPanelManager(disp, builtinAssetsOrTestNil(t), dataPath)
 
 	type outcome struct {
-		err      error
-		panicked any
-		created  bool
+		err         error
+		panicked    any
+		created     bool
+		tid         uint32
+		pumped      int
+		leftWindows int
+		head        string
 	}
 	res := make(chan outcome, 1)
 	go func() {
@@ -380,11 +472,17 @@ func TestAC13BringUpSurvivesAReusedThreadQuit(t *testing.T) {
 		// Read the verdict BEFORE teardown clears it.
 		o.created = mgr.IsCreated()
 		mgr.Destroy()
+		// And now the duty this test used to skip: this thread owned a real WebView2
+		// window. Nothing may be left on it when it goes back to the pool.
+		o.tid = currentThreadID()
+		o.pumped, o.leftWindows, o.head = releaseThreadClean()
 	}()
 
 	o := <-res
 	t.Logf("AC#13 reused-thread root cause: planted one WM_QUIT on this locked thread, then ran bringUp - panicked=%v err=%v created=%v",
 		o.panicked, o.err, o.created)
+	t.Logf("AC#13 reused-thread release: tid=%d dispatched %d message(s) before unlocking; windows left on that thread=%d queue head=%s",
+		o.tid, o.pumped, o.leftWindows, o.head)
 	if o.panicked != nil {
 		t.Errorf("bringUp on a thread carrying a pending WM_QUIT %v (the recovered panic) instead of draining it and creating the window. This is ticket 33 AC#13's order-dependent red reproduced deterministically: the library's Embed loop (pkg/edge chromium.go:96-111) dequeued the quit and Init (chromium.go:131) dereferenced the nil control. Fix: bringUp must call drainStaleQuitBeforeCreate before NewWithOptions", o.panicked)
 	}
@@ -393,6 +491,99 @@ func TestAC13BringUpSurvivesAReusedThreadQuit(t *testing.T) {
 	}
 	if !o.created {
 		t.Errorf("bringUp reported success but no window was created on the reused thread (created=%v) - the panel would be blank for the user", o.created)
+	}
+	if o.leftWindows != 0 {
+		t.Errorf("this test is about to hand OS thread %d back to the Go pool while it still owns %d top-level window(s). A later bringUp that lands on it creates the panel on a thread with somebody else's window on it - the shape that killed AC#14 in full-package order (33-r7 ①). Destroy only POSTS WM_CLOSE; the queue has to be dispatched to empty first", o.tid, o.leftWindows)
+	}
+	if o.head != "empty" {
+		t.Errorf("this test is about to hand OS thread %d back to the pool with its queue non-empty (%s). A queued WM_CLOSE on that thread becomes a WM_QUIT inside the next create's own pump (webview.go:242-243 + 381-383): measured 3/3 panic, and no pre-create quit drain can see it while other messages are still queued", o.tid, o.head)
+	}
+}
+
+// TestAC13BringUpRefusesAThreadWithAQueuedClose is the deterministic nail for the
+// precondition 33-r7 put in bringUp, planted on ONE locked thread (no scheduler luck):
+// bring up a window, pump the thread to idle so the plant is unambiguous, Destroy (which
+// only POSTS WM_CLOSE), then ask bringUp to create again on that same thread.
+//
+// What the four measured shapes say (33-r7 ①): removing only WM_QUIT does not help
+// (the close is dispatched by the create's own pump and the quit it posts breaks
+// GetMessageW - 3/3 panic); dispatching the close and then running that same quit
+// drain does not help either (3/3 panic, because the quit is not visible to a filtered
+// peek while other messages are queued); purging the whole queue without dispatching
+// "works" only by leaving the prior owner's window alive (thread windows 3 -> 4) and
+// it hung 1 run in 3 inside that same GetMessageW. So bringUp neither cleans nor
+// retries: it checks, refuses, and names the window. That is also why this test asserts
+// the close is STILL queued after the refusal - if bringUp ever starts eating other
+// owners' messages, this is the case that says so.
+//
+// Reverse control: delete the staleCloseQueued check from bringUp and THIS test goes
+// red on the spot with the recovered nil-pointer panic (created=false, panicked!=nil),
+// not with a timeout.
+func TestAC13BringUpRefusesAThreadWithAQueuedClose(t *testing.T) {
+	dataPath := filepath.Join(os.TempDir(), "wisp-33r7-queued-close")
+	disp := &panel.ComposerDispatch{Mode: &recordingModeHandler{}}
+	mgr := NewPanelManager(disp, builtinAssetsOrTestNil(t), dataPath)
+	mgr2 := NewPanelManager(disp, builtinAssetsOrTestNil(t), dataPath+"-second")
+
+	type outcome struct {
+		err                error
+		panicked           any
+		created            bool
+		plantQueued        bool
+		plantHwnd          uintptr
+		afterRefusalQueued bool
+		pumpedToIdle       int
+		pumpedAtRelease    int
+		leftWindows        int
+		head               string
+		tid                uint32
+	}
+	res := make(chan outcome, 1)
+	go func() {
+		var o outcome
+		defer func() {
+			o.panicked = recover()
+			res <- o
+		}()
+		runtime.LockOSThread()
+		defer runtime.UnlockOSThread()
+		o.tid = currentThreadID()
+		if err := mgr.bringUp(context.Background()); err != nil {
+			o.err = fmt.Errorf("first bringUp (the control this plant needs): %w", err)
+			return
+		}
+		o.pumpedToIdle = pumpThreadToQuiet(4096)
+		mgr.Destroy()
+		o.plantQueued, o.plantHwnd = staleCloseQueued()
+		// The subject: bringUp must refuse this thread, not create on it.
+		o.err = mgr2.bringUp(context.Background())
+		o.created = mgr2.IsCreated()
+		// And refuse means refuse: the message that made it refuse is still there,
+		// untouched. bringUp neither removes nor dispatches another owner's queue.
+		o.afterRefusalQueued, _ = staleCloseQueued()
+		o.pumpedAtRelease, o.leftWindows, o.head = releaseThreadClean()
+	}()
+
+	o := <-res
+	t.Logf("AC#13 queued-close: tid=%d first bringUp ok, pumped %d to idle, Destroy left a queued close (hwnd 0x%X, plantQueued=%v), then bringUp#2 err=%v created=%v; the close was still queued after the refusal=%v; released with windows=%d queue head=%s",
+		o.tid, o.pumpedToIdle, o.plantHwnd, o.plantQueued, o.err, o.created, o.afterRefusalQueued, o.leftWindows, o.head)
+	if !o.plantQueued {
+		t.Fatalf("the plant did not take: no WM_CLOSE was queued on this thread before the second bringUp, so this run measured nothing about the refusal (first bringUp err=%v)", o.err)
+	}
+	if o.panicked != nil {
+		t.Errorf("bringUp on a thread carrying a queued WM_CLOSE %v instead of refusing it by name. The library's own create pump dispatches that close, its window procedure posts the quit (webview.go:242-243 + 381-383), GetMessageW ends with inited still 0 and Init (chromium.go:131) dereferences the nil control - 33-r7 ① measured this 3/3. Fix: bringUp must call staleCloseQueued before NewWithOptions and return an error", o.panicked)
+	}
+	if o.err == nil || !strings.Contains(o.err.Error(), "WM_CLOSE") {
+		t.Errorf("bringUp did not name the refusal: err=%v, want an error that says a WM_CLOSE is queued on this thread. A silent nil here would mean it created the window anyway", o.err)
+	}
+	if o.created {
+		t.Errorf("bringUp created a panel window on a thread that still owed somebody else a WM_CLOSE (created=true) - the half-initialised controller this refusal exists to prevent")
+	}
+	if !o.afterRefusalQueued {
+		t.Errorf("bringUp refused the thread but the queued WM_CLOSE is gone - it cleaned somebody else's queue on the way out, which is the remove-only shape 33-r7 ① measured leaking a window per create and hanging 1 run in 3 inside GetMessageW")
+	}
+	if o.leftWindows != 0 || o.head != "empty" {
+		t.Errorf("this test releases OS thread %d with windows=%d and queue head=%s; it refused to clean another owner's thread, so it must not leave one poisoned either", o.tid, o.leftWindows, o.head)
 	}
 }
 

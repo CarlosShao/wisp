@@ -224,27 +224,44 @@ func (m *PanelManager) bringUp(ctx context.Context) error {
 	}
 	m.mu.Unlock()
 
-	// The creating thread must not carry a WM_QUIT left by a prior window owner,
-	// or the library's Embed pump (pkg/edge chromium.go:96-111) dequeues that quit
-	// and breaks its GetMessageW loop with inited still 0 and e.webview nil, and
-	// Init (chromium.go:130-136, no guard on the nil) panics - the panic behind
-	// ticket 33's order-dependent AC#13 red. go-webview2 leaves the quit for free:
-	// its wndproc calls w.Terminate() on WM_DESTROY (webview.go:242-243) and
-	// Terminate is a bare PostQuitMessage (webview.go:381-383) onto whichever thread
-	// pumped the close. A thread that has hosted a now-destroyed panel window can
-	// therefore carry a pending quit into the next bring-up. The resident thread
-	// never reuses one (loop locks for life and the thread is destroyed on exit, so
-	// its quit dies with it) - but a test harness that returns a window thread to
-	// the Go pool does, and that is the trigger ticket 33's full-package red showed.
-	// This drain is the product-side half of the invariant "a thread that has pumped
-	// a panel window is quit-clean before it creates another"; it is deliberately
-	// NARROW (only WM_QUIT, only removed, never dispatched) - dispatching a stale
-	// close here would tear down a prior owner's window and re-post a fresh quit,
-	// and 33-r6 measured that purging the whole queue without dispatching leaves
-	// zombie WebView2 controllers that hang the NEXT create. The companion fix - the
-	// test harness keeping its window thread locked so it is destroyed, not pooled -
-	// is what stops WM_CLOSE-shaped poison from ever reaching the pool.
+	// PRECONDITION (33-r7): the thread that creates the panel window must have
+	// nothing left to dispatch. This is not belt-and-braces wording - it is the one
+	// thing four measured shapes agree on. Planting "a live window this thread owns
+	// plus one undispatched WM_CLOSE for it" on ONE locked thread and then running
+	// the product's own bringUp gives, three runs each
+	// (.scratch/wisp/probes/33/r7/modes-grid.txt, docs/evidence/s1/33-panel-host-c27-r7.md ①):
+	//   - remove only WM_QUIT before create (the 33-r6 narrow form, kept below): PANIC 3/3.
+	//     The close is dispatched by the create's own pump, the library posts the quit
+	//     it generates, and the quit is not yet visible to the filtered peek
+	//     (measured: removed=0, filtered found=false, next GetMessageW returns WM_QUIT).
+	//   - dispatch the close, then run that same quit drain: PANIC 3/3, same reading.
+	//   - purge the WHOLE queue without dispatching (the 33-r6 wide form, 4be1d3f1):
+	//     the prior owner's window stays alive (thread windows 3 -> 4, an unbounded
+	//     leak per create) and 1 of 3 runs HUNG in Embed's GetMessageW until the test
+	//     binary timed out (modes/wide-2.txt). The full-package reading of that form
+	//     is on disk too: purge hit its cap at 256 removed and the show never
+	//     completed (.scratch/wisp/probes/33/r6/fullpack2.log:640, 4be1d3f1, leg 33-r6's
+	//     log, not re-run by 33-r7).
+	//   - dispatch until the queue reports empty: create SUCCEEDS 3/3 and the orphan is
+	//     really gone (thread windows 3 -> 0).
+	// Only the last one is a repair, and it is not bringUp's to perform: reaching
+	// "empty" means DESTROYING a window whose Go owner is already gone, and only that
+	// owner knows which windows on this thread may die. So bringUp checks and refuses,
+	// by name, instead of creating on a thread it cannot make clean - the alternative
+	// measured here is a half-initialised controller, which on this box can take the
+	// whole process down (rc=139 reading in the evidence file's ①).
+	//
+	// The shipping topology satisfies the precondition by construction: the resident
+	// panel thread (cmd/wisp/panel_resident_windows.go) locks its OS thread for life,
+	// creates nothing before the first show, and is destroyed with its windows and its
+	// quit when loop returns - it never hands a used thread to anyone. That is also why
+	// the drain below stays, and why it is still narrow: an undispatched WM_QUIT with
+	// nothing else queued IS removable, 33-r6's nail pins that, and refusing for a
+	// latched quit we cannot even see would be a guess.
 	drainStaleQuitBeforeCreate()
+	if dirty, closedHwnd := staleCloseQueued(); dirty {
+		return fmt.Errorf("panel host: refusing to create the panel window: this thread still has an undispatched WM_CLOSE queued for hwnd 0x%X. The library's create pump would dispatch it before the control exists and end its own GetMessageW loop (pkg/edge chromium.go:96-111, webview.go:242-243 + 381-383); measured 3/3 panic on a planted thread. The thread's owner must dispatch its queue to empty - purging without dispatching leaks the prior window and can swallow this create's own completion message", closedHwnd)
+	}
 
 	w := webview2.NewWithOptions(webview2.WebViewOptions{
 		Debug:     false,
@@ -585,9 +602,13 @@ func pnlPumpOnce() {
 const (
 	// pnlWmQuit is WM_QUIT. The PeekMessage range filter is inclusive, so
 	// [pnlWmQuit, pnlWmQuit] matches only the quit message - a stale close or any
-	// other leftover is left untouched (dispatching them here is the zombie hazard
-	// 33-r6 measured).
+	// other leftover is left untouched (dispatching them here is the hazard the
+	// precondition comment in bringUp records with readings).
 	pnlWmQuit = 0x12
+	// pnlWmClose is WM_CLOSE, the message that turns a reused thread into a failed
+	// create: the create's own pump dispatches it, the library's window procedure
+	// destroys the window and posts a quit (webview.go:242-243 + 381-383).
+	pnlWmClose = 0x10
 	// pnlPmRemove is PeekMessage's PM_REMOVE flag; without it a message would be
 	// reported again on the next call and the drain would loop forever.
 	pnlPmRemove = 1
@@ -620,4 +641,27 @@ func drainStaleQuitBeforeCreate() int {
 	slog.Warn("panel host: pre-create quit-drain hit its cap before the queue was clean",
 		"cap", pnlQuitDrainCap, "removed", removed)
 	return removed
+}
+
+// staleCloseQueued reports whether the CALLING thread still holds an undispatched
+// WM_CLOSE, WITHOUT removing it (PM_NOREMOVE, filter [WM_CLOSE..WM_CLOSE]) and
+// without touching any other message. The second return value is the window the
+// queued close belongs to, so the refusal names the handle the thread's owner has
+// to deal with.
+//
+// Why presence is the right thing to ask for and liveness is not: a *queued* close
+// is a request someone already made against a window on this thread, and the next
+// pump - here, the library's own create pump - will carry it out. A create that has
+// not happened yet cannot make that request disappear, so bringUp neither removes
+// nor dispatches it; it says out loud that this thread is not its thread to create
+// on. 33-r7's four-shape reading (bringUp comment above, and
+// .scratch/wisp/probes/33/r7/modes-grid.txt) is what this function encodes.
+func staleCloseQueued() (bool, uintptr) {
+	var m pnlMsg
+	r, _, _ := pnlPeekMessageW.Call(
+		uintptr(unsafe.Pointer(&m)), 0, pnlWmClose, pnlWmClose, 0) // PM_NOREMOVE
+	if r == 0 {
+		return false, 0
+	}
+	return true, uintptr(m.hwnd)
 }
