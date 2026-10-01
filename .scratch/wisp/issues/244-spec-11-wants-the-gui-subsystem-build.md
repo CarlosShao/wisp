@@ -16,13 +16,17 @@
 | **构建链里根本没有这一维** | `scripts/build.ps1:103-110` 的 `$ldflags` 六枚**全是 `-X`（版本／commit／日期／环境／两个 DLL 版本）、零枚 `-H`**；全仓 `grep -rn '\-H[= ]' scripts/ .github/ tools/` 唯一命中是一枚二进制 blob（`scripts/spike/bin/goja-caps.exe`） | 我现读＋现跑 |
 | **两行注释声称相反的事实** | `cmd/wisp/console_other.go:7`「The Windows build **links as a GUI-subsystem binary** (ticket 07), which starts with no console at all」＋`cmd/wisp/console_windows.go:26`「the **windowsgui** subsystem (the final GUI build, ticket 07)」 | `sed` 我现读；⚠ `windowsgui` 在 Go 代码里**只出现在这两行注释里**（全仓尺同上） |
 
-## 要建什么（四格，顺序有讲究：AC#1 单独做完会留下一枚"看着对、其实没人验过"的产物）
+## 要建什么（六格；AC#5＝10-01 09:4x 编排者新补，排最前；顺序有讲究：AC#1 单独做完会留下一枚"看着对、其实没人验过"的产物）
 
 - [ ] **AC#0 先答"现在切还是等"**（归编排者排程，**不摆 owner**：SPEC-11:50 已经要求，这是**漏做**、不是契约变更）——⚠ 但要把**回归面**写清：切到 GUI 子系统之后，`wisp run`／`wisp doctor` 这些 CLI 腿**必须靠 `attachParentConsole` 才有输出**，而那条通路今天的真机凭据只有 `docs/BUILD.md:90` 那句**当时的临时构建**读数（＝过期读数，不可继承）。⇒ **AC#1 与 AC#2 不许拆成两批改**：只加 flag 不验 CLI＝把 CLI 那条腿盲切。
 - [ ] **AC#1 构建链真带 `-H=windowsgui`**：改后产物 PE 子系统必须是 `00000002 (Windows GUI)`。尺＝`objdump -p build/wisp.exe \| grep -i subsystem`，**改前读数 CUI(3) 与改后读数都要写在交件里**。⚠ 具名口径：`build/**` 被 `.gitignore` 掉 ⇒ 这枚产物是**中间态、不可再生**，所以交件必须带**产生它的那条命令与 flag 全文**，否则下一位只能读到"当时"、读不到"现在"（本仓为这一形付过学费）。
 - [ ] **AC#2 切换之后的 CLI 真机读数（本票的验收面，不许省）**：三条各一发真跑——① 在**父控制台里**跑 `wisp run "…"`，回复文本真出现在那个控制台；② `wisp doctor > out.txt` 重定向仍然有效（`BUILD.md:90` 当年自陈的一条）；③ **双击／`explorer` 拉起**（无父控制台）时**不再出现黑框**、且常驻腿照常起。⛔ 不许用"单测里 mock stdout"代替真机——那正是 `AGENTS.md` §1.3 禁的形状。
 - [ ] **AC#3 那两行注释改成带条件的事实句**：说清"今天构建链带不带 `-H`、因此 `attachParentConsole` 这条分支今天走不走得到"。⛔ 不许留"links as a GUI-subsystem binary"这种**切换一没发生就变假话**的绝对句（与票 228 AC#7、票 197 那枚 `run_mode101_test.go` 同族）；⛔ **不新增扫注释票号的词面型仪器**。
 - [ ] **AC#4 把"文档里的推迟"这一形报给票 225 那一族**（⚠ 本票不做，只登记）：票 225 查的是代码里的 `DEFERRED(D-xx)` 标记与 `SPEC-12 §5` 的双向 1:1；而 `docs/BUILD.md:87` 这种**写在文档正文里的"推迟到票 NN"**不在它的射程内——**票 07 一结案，那笔推迟就从盘上消失了**。⇒ 具名交回 225 的后续：**要不要一枚扫 `docs/**` 里"推迟到票 NN"并核 `-done` 的尺**（注意：这枚尺必须是**报表**，不能当门——票 243 AC#3 已证"交付动词＋指名处"这类句型判别是**抽样尺**，反例是 `internal/proc/boot_windows.go:46`：它引已结案的票 06，而那件活**真落地了**（`internal/proc/envfork.go:211 ApplyPortableOverride` 在场）⇒ 词面型门会把这条判反）。
+
+- [ ] **AC#5（新补，10-01 09:4x 编排者追加，来路＝`246-v2` §5 第 5 条 ⇒ 账 `A488`；这一格排在 AC#1 之前，不许绕过）**：**`-H=windowsgui` 一落地，票 246 AC#7 那条"真任务源"会静默关掉，而票 246 的仪器不会因此变红**。三把现量凭据（`246-v2` 自取，我复认成立）：① `objdump -p build/wisp.exe`＝`Subsystem 00000003 (Windows CUI)` ⇒ **今天**双击进程有真控制台输入缓冲，`interactiveStdin()`（`cmd/wisp/approval_reply_stdin_windows.go:41`）返回 `os.Stdin`，控制台那枚 `task <文本>` 动词（`resident_task_source_windows.go:363`）**今天是通的**；② `cmd/wisp/console_windows.go:33-43` 的 `attachParentConsole` 只会 `AttachConsole(ATTACH_PARENT_PROCESS)`＋重绑 std handle，**Explorer 拉起的 GUI 进程没有父控制台**，且函数开头 `if out != 0 { return }`；③ `docs/specs/SPEC-11-build-deployment-containerization.md:50` 逐字要求"无参＝GUI（`-H=windowsgui`）"。⇒ 切完之后 `interactiveStdin()` 在双击那条路上返回 nil，常驻腿**重新变成"有门、有球、没有东西举卡"**＝票 246 标题那句"永久之家"当场失效；而 AC#7 那族真机用例走的是 `WISP_ENV=test`＋注入位，**不会红**。
+  **本格的完成判据（两截，缺一格都不许切 AC#1）**：ⓐ **先答"GUI 进程的任务源从哪来"**（候选只有三条，都要具名：面板＝票 33＋248 那条路／托盘菜单＝票 228 AC#2 那四枚按钮／别的）——答案落进票面「Progress log」，⛔ 不许由实现腿自己选；ⓑ **必须有一枚尺在"常驻腿零任务生产者"这一形上响**：形状＝能力型正向依赖边（问 `submitTask` 的**非注入**产码调用者在切完之后是否仍可达），⛔ 不许用"注释里写着有"或"构建绿"当证据；**并自带正控**（把那枚调用者中和成 `var src *residentTaskSource` ⇒ 指名用例必须红，凭据形状照 `246-v2` §4 MUT-4 那一发：两枚真机用例立刻死）。
+  ⚠ 排程后果具名：**本格未答 ⓐ 之前，票 244 整票不许动构建链**（这不是"要不要做"的犹豫，是"切了会把刚接上的一跳又拆掉、而且没人看得见"）；顺序因此是 **票 33 → 票 248（至少到"面板能举一发任务"）→ 才轮到本票 AC#1**。owner 那句「算了不改方案了，还是用这个语音球吧」不受影响：KWS 那一支是第四条通道的归口，不在本格射程。
 
 ## 禁区
 
