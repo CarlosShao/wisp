@@ -264,3 +264,5 @@ declaration consumed by 37's native card.
 - **起手 4 枚 `internal/panel` 红逐名判归因＝非本程**（`approval_test.go:129`／`composer_test.go:74`／`frontend_hygiene_test.go:216`／`tokens_fourway_test.go:441`；第四枚落在**冻结件**上，红因＝`git status` 里那 16 枚 ` D` 的 `design/**`）⇒ 与任务 #109"推送前逐名比红名集合"同源，我按**已知常红**读，不据此判任何格。
 
 **排程（本轮定的序）**：`33-r3`（仪器腿，**只改 `cmd/wisp/*_test.go`**）→ `33-r2`（功能腿：接进常驻＋AC#13 那两发 `SetHtml`）→ 票 248 落地腿。⚠ `228-a2`（只读）此刻在飞、读面含 `cmd/wisp`／`internal/ball` ⇒ **要动 `resident_*.go` 的那一发必须等它交完**。
+
+- `agent=33-a2 did=只读普查（零产码／零跑）：①库侧线程要求逐处 file:line（pkg/edge/chromium.go:95-111 阻塞嵌套泵、:130-136 无 nil 判定；库根无 chromium.go、真身 pkg/edge/）②.scratch/wisp/probes/33/ 零该发 panic 工件（唯一栈＝33-panel-host-c27-r1.md:73 散文）③甲形射程＝internal/ball 现零导出投递面（staThread/PostTask/b.sta 全未导出），会被叫红的三族逐枚点名（observe 名册钉只乙形打红；hostThreadHarness 与球侧 PostTask 取数＝行为型钉）④第四形：仓内无第二枚独立泵线程（notify_windows.go 尚未读，已挂欠账） next=编排者裁 ⑦-A（panic／阻塞／乱序唯有真跑可定）与 ⑦-E/⑦-C。文件=.scratch/wisp/probes/33/a2/census.md`
