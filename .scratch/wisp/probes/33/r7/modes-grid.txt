@@ -1,0 +1,83 @@
+### mode=none iter=1 rc=0
+    zz_33r7_probe_windows_test.go:227: MODE none              panicked=runtime error: invalid memory address or nil pointer dereference created=false elapsed=0ms
+    zz_33r7_probe_windows_test.go:229:    | tid=21212
+    zz_33r7_probe_windows_test.go:229:    | bringUp#1 ok, pumped 0 message(s) to idle, thread windows=3
+    zz_33r7_probe_windows_test.go:229:    | after Destroy (undispatched): head=WM_CLOSE(0x10) hwnd=0x220EDE GetQueueStatus mask=0x0
+    zz_33r7_probe_windows_test.go:229:    | no purge (HEAD shape): bringUp runs its own WM_QUIT-only drain
+    zz_33r7_probe_windows_test.go:229:    | pre-create peek: filtered WM_QUIT found=false (msg=WM_NULL) | unfiltered head=WM_CLOSE(0x10) | thread windows=3
+### mode=none iter=2 rc=0
+    zz_33r7_probe_windows_test.go:227: MODE none              panicked=runtime error: invalid memory address or nil pointer dereference created=false elapsed=0ms
+    zz_33r7_probe_windows_test.go:229:    | tid=2468
+    zz_33r7_probe_windows_test.go:229:    | bringUp#1 ok, pumped 0 message(s) to idle, thread windows=3
+    zz_33r7_probe_windows_test.go:229:    | after Destroy (undispatched): head=WM_CLOSE(0x10) hwnd=0x1620B4C GetQueueStatus mask=0x0
+    zz_33r7_probe_windows_test.go:229:    | no purge (HEAD shape): bringUp runs its own WM_QUIT-only drain
+    zz_33r7_probe_windows_test.go:229:    | pre-create peek: filtered WM_QUIT found=false (msg=WM_NULL) | unfiltered head=WM_CLOSE(0x10) | thread windows=3
+### mode=none iter=3 rc=0
+    zz_33r7_probe_windows_test.go:227: MODE none              panicked=runtime error: invalid memory address or nil pointer dereference created=false elapsed=0ms
+    zz_33r7_probe_windows_test.go:229:    | tid=31848
+    zz_33r7_probe_windows_test.go:229:    | bringUp#1 ok, pumped 2 message(s) to idle, thread windows=3
+    zz_33r7_probe_windows_test.go:229:    | after Destroy (undispatched): head=WM_CLOSE(0x10) hwnd=0x320304 GetQueueStatus mask=0x0
+    zz_33r7_probe_windows_test.go:229:    | no purge (HEAD shape): bringUp runs its own WM_QUIT-only drain
+    zz_33r7_probe_windows_test.go:229:    | pre-create peek: filtered WM_QUIT found=false (msg=WM_NULL) | unfiltered head=WM_CLOSE(0x10) | thread windows=3
+### mode=wide iter=1 rc=0
+    zz_33r7_probe_windows_test.go:227: MODE wide              panicked=<nil> created=true elapsed=749ms
+    zz_33r7_probe_windows_test.go:229:    | tid=11736
+    zz_33r7_probe_windows_test.go:229:    | bringUp#1 ok, pumped 2 message(s) to idle, thread windows=3
+    zz_33r7_probe_windows_test.go:229:    | after Destroy (undispatched): head=WM_CLOSE(0x10) hwnd=0x70034E GetQueueStatus mask=0x0
+    zz_33r7_probe_windows_test.go:229:    | wide purge removed 1: WM_CLOSE(0x10) hwnd=0x70034E
+    zz_33r7_probe_windows_test.go:229:    | pre-create peek: filtered WM_QUIT found=false (msg=WM_NULL) | unfiltered head=empty | thread windows=3
+    zz_33r7_probe_windows_test.go:229:    | bringUp#2[wide]: err=<nil> created=true in 749ms thread windows now=4
+### mode=wide iter=2 rc=2
+### mode=wide iter=3 rc=0
+    zz_33r7_probe_windows_test.go:227: MODE wide              panicked=<nil> created=true elapsed=892ms
+    zz_33r7_probe_windows_test.go:229:    | tid=28344
+    zz_33r7_probe_windows_test.go:229:    | bringUp#1 ok, pumped 0 message(s) to idle, thread windows=3
+    zz_33r7_probe_windows_test.go:229:    | after Destroy (undispatched): head=WM_CLOSE(0x10) hwnd=0x2150288 GetQueueStatus mask=0x0
+    zz_33r7_probe_windows_test.go:229:    | wide purge removed 1: WM_CLOSE(0x10) hwnd=0x2150288
+    zz_33r7_probe_windows_test.go:229:    | pre-create peek: filtered WM_QUIT found=false (msg=WM_NULL) | unfiltered head=empty | thread windows=3
+    zz_33r7_probe_windows_test.go:229:    | bringUp#2[wide]: err=<nil> created=true in 892ms thread windows now=4
+### mode=dispatch iter=1 rc=0
+    zz_33r7_probe_windows_test.go:227: MODE dispatch          panicked=runtime error: invalid memory address or nil pointer dereference created=false elapsed=0ms
+    zz_33r7_probe_windows_test.go:229:    | tid=30652
+    zz_33r7_probe_windows_test.go:229:    | bringUp#1 ok, pumped 0 message(s) to idle, thread windows=3
+    zz_33r7_probe_windows_test.go:229:    | after Destroy (undispatched): head=WM_CLOSE(0x10) hwnd=0x13570660 GetQueueStatus mask=0x0
+    zz_33r7_probe_windows_test.go:229:    | dispatched 1 WM_CLOSE, then quit-drain removed 0; thread windows now=0
+    zz_33r7_probe_windows_test.go:229:    | pre-create peek: filtered WM_QUIT found=false (msg=WM_NULL) | unfiltered head=WM_USER+1(0x401) | thread windows=0
+### mode=dispatch iter=2 rc=0
+    zz_33r7_probe_windows_test.go:227: MODE dispatch          panicked=runtime error: invalid memory address or nil pointer dereference created=false elapsed=0ms
+    zz_33r7_probe_windows_test.go:229:    | tid=4720
+    zz_33r7_probe_windows_test.go:229:    | bringUp#1 ok, pumped 0 message(s) to idle, thread windows=3
+    zz_33r7_probe_windows_test.go:229:    | after Destroy (undispatched): head=WM_CLOSE(0x10) hwnd=0x135A0660 GetQueueStatus mask=0x0
+    zz_33r7_probe_windows_test.go:229:    | dispatched 1 WM_CLOSE, then quit-drain removed 0; thread windows now=0
+    zz_33r7_probe_windows_test.go:229:    | pre-create peek: filtered WM_QUIT found=false (msg=WM_NULL) | unfiltered head=WM_USER+1(0x401) | thread windows=0
+### mode=dispatch iter=3 rc=0
+    zz_33r7_probe_windows_test.go:227: MODE dispatch          panicked=runtime error: invalid memory address or nil pointer dereference created=false elapsed=0ms
+    zz_33r7_probe_windows_test.go:229:    | tid=7676
+    zz_33r7_probe_windows_test.go:229:    | bringUp#1 ok, pumped 0 message(s) to idle, thread windows=3
+    zz_33r7_probe_windows_test.go:229:    | after Destroy (undispatched): head=WM_CLOSE(0x10) hwnd=0x16D0B4C GetQueueStatus mask=0x0
+    zz_33r7_probe_windows_test.go:229:    | dispatched 1 WM_CLOSE, then quit-drain removed 0; thread windows now=0
+    zz_33r7_probe_windows_test.go:229:    | pre-create peek: filtered WM_QUIT found=false (msg=WM_NULL) | unfiltered head=WM_USER+1(0x401) | thread windows=0
+### mode=pumpAfterDestroy iter=1 rc=0
+    zz_33r7_probe_windows_test.go:227: MODE pumpAfterDestroy  panicked=<nil> created=true elapsed=850ms
+    zz_33r7_probe_windows_test.go:229:    | tid=29204
+    zz_33r7_probe_windows_test.go:229:    | bringUp#1 ok, pumped 2 message(s) to idle, thread windows=3
+    zz_33r7_probe_windows_test.go:229:    | after Destroy (undispatched): head=WM_CLOSE(0x10) hwnd=0x400866 GetQueueStatus mask=0x0
+    zz_33r7_probe_windows_test.go:229:    | pumped-and-dispatched 4 message(s) after Destroy; thread windows now=0
+    zz_33r7_probe_windows_test.go:229:    | pre-create peek: filtered WM_QUIT found=false (msg=WM_NULL) | unfiltered head=empty | thread windows=0
+    zz_33r7_probe_windows_test.go:229:    | bringUp#2[pumpAfterDestroy]: err=<nil> created=true in 850ms thread windows now=3
+### mode=pumpAfterDestroy iter=2 rc=0
+    zz_33r7_probe_windows_test.go:227: MODE pumpAfterDestroy  panicked=<nil> created=true elapsed=890ms
+    zz_33r7_probe_windows_test.go:229:    | tid=29768
+    zz_33r7_probe_windows_test.go:229:    | bringUp#1 ok, pumped 0 message(s) to idle, thread windows=3
+    zz_33r7_probe_windows_test.go:229:    | after Destroy (undispatched): head=WM_CLOSE(0x10) hwnd=0x3A0304 GetQueueStatus mask=0x0
+    zz_33r7_probe_windows_test.go:229:    | pumped-and-dispatched 3 message(s) after Destroy; thread windows now=0
+    zz_33r7_probe_windows_test.go:229:    | pre-create peek: filtered WM_QUIT found=false (msg=WM_NULL) | unfiltered head=empty | thread windows=0
+    zz_33r7_probe_windows_test.go:229:    | bringUp#2[pumpAfterDestroy]: err=<nil> created=true in 890ms thread windows now=3
+### mode=pumpAfterDestroy iter=3 rc=0
+    zz_33r7_probe_windows_test.go:227: MODE pumpAfterDestroy  panicked=<nil> created=true elapsed=1342ms
+    zz_33r7_probe_windows_test.go:229:    | tid=28060
+    zz_33r7_probe_windows_test.go:229:    | bringUp#1 ok, pumped 0 message(s) to idle, thread windows=3
+    zz_33r7_probe_windows_test.go:229:    | after Destroy (undispatched): head=WM_CLOSE(0x10) hwnd=0x7EF0850 GetQueueStatus mask=0x0
+    zz_33r7_probe_windows_test.go:229:    | pumped-and-dispatched 3 message(s) after Destroy; thread windows now=0
+    zz_33r7_probe_windows_test.go:229:    | pre-create peek: filtered WM_QUIT found=false (msg=WM_NULL) | unfiltered head=empty | thread windows=0
+    zz_33r7_probe_windows_test.go:229:    | bringUp#2[pumpAfterDestroy]: err=<nil> created=true in 1342ms thread windows now=3
