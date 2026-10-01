@@ -38,7 +38,7 @@
 - **⑤-17 我只跑了 `-stall 15`／`-deadline 20~25` 这几档**。⇒ "阻塞"那一支在我的读数里是**被排除**的（自然形都在 0.5s 级返回），而不是"我等了很久它没返回"。如果 `33-r5` 在真球上量到长阻塞，那不是我这两发否证过的形状（机器负载、D2D、托盘消息都可能参与）。
 - **⑤-18 我全程没有跑 `cmd/wisp` 的任何用例**，所以派单登记的两枚在册红（`TestAC4FocusReturnToPriorWindowGap33r2` 故意的红、`TestPanelHostRealWindowHopAndLifecycle` 负载敏感那一支）**与我无关，我也没复量**。桌面独占期我只开过探针自己的窗，一次一枚，`msedgewebview2` 枚数 14→14（R30）。
 - **⑤-19 我往票面 Progress log 追加那一行时，行内混用了 22 枚反引号**（引逐字读数用的），而那一节的行文惯例是**整条用一对反引号包住**（前人 33-a2 那三条内部是零反引号的）。⇒ **内容一字未丢、没有执行风险**（我用 Edit 工具落的盘，⛔ 没走未加引号的 heredoc——那才是会真执行反引号的那条路），但 Markdown 渲染会把那行的 code span 提前闭合。**处置＝不改**：这一枚是纯排版缺陷，而修它要么重写 5.7KB 的整行、要么对一枚跟踪文件跑原地重写工具——两种都比重排一行更可能伤到票面。⛔ 票面 AC 框与既有各行一字未动，尺＝`git diff --numstat -- .scratch/wisp/issues/33-panel-host-c27.md` ⇒ **1 insertion / 0 deletions**，复选框计数 **13 未勾／1 已勾**（与编排者 12:12 那节的现读一致）。⇒ 如果编排者介意渲染，改由他自己处理；我把这一格**先**登记在这里，而不是等 `33-v2` 来发现。
-- **⑤-20 我自己犯了一次「锚点吃掉整行」，并且是盘上那枚 numstat 说出来的真话抓的**（不是我发现得早）。给 ⑤ 追加 ⑤-19 那一发，我的 old_string 把 ⑤-18 **整行**连同它的换行吃进去了、new_string 里却没复带 ⑤-18 ⇒ 提交 `cf2d90ea` 里 `probe.md` 那栏是 **1 insertion / 1 deletion**，⑤-18 当场消失。处置＝**下一枚提交补回 ⑤-18 原文（不改写它任何一字）、⛔ 不 amend**，并把这一格留在 ⑤ 里不删。⇒ 复核尺：`git diff --numstat c9c3e323..HEAD -- .scratch/wisp/probes/33/p1/probe.md` 的删除列在我这最后一次修正里**必须是 0**。
+- **⑤-20 我自己犯了一次「锚点吃掉整行」，并且是盘上那枚 numstat 说出来的真话抓的**（不是我发现得早）。给 ⑤ 追加 ⑤-19 那一发，我的 old_string 把 ⑤-18 **整行**连同它的换行吃进去了、new_string 里却没复带 ⑤-18 ⇒ 提交 `cf2d90ea` 里 `probe.md` 那栏是 **1 insertion / 1 deletion**，⑤-18 当场消失。处置＝**下一枚提交补回 ⑤-18 原文（不改写它任何一字）、⛔ 不 amend**，并把这一格留在 ⑤ 里不删。⇒ 复核尺：`git show --numstat c8764a53` 里 `probe.md` 那栏＝**2 insertions / 0 deletions**（补回那一发没吃掉任何行）。⚠ 此后本文件还有**一处故意的改写**（不是锚点事故）＝收尾三把尺那 5 行里的数写完之后就成了过期数（名册 231→226、HEAD 从 `e7eee03e` 推进到 `c8764a53`、字节数自指），我把它们逐枚换成同发真值并另立一枚提交 ⇒ 那一枚的 `git diff --numstat` 会给出**少量删除行**，逐枚都在同一个 bullet 块内，且每一枚删除都在这一条里预告过。
 
 ---
 
@@ -249,11 +249,12 @@ R32（`-com mta`）：`Embed` 的 `:87` **在调用内部同步**收到环境完
 | ② 主交付文件体量 | `wc -l -c .scratch/wisp/probes/33/p1/probe.md` | 见下 |
 | ③ 占位符 | 尺＝`grep -nE -f .scratch/wisp/probes/33/p1/logs/placeholder-pattern.txt .scratch/wisp/probes/33/p1/probe.md`（那枚 pattern 存在**文件里**而不是写在这一行里——写在这一行会让这把自己命中，我第一发就中过，枚数 1→0 的差集就是这一行本身） | pattern 那族＝"骨架期括注 ＋ 四字母与 F 开头的两枚常见未完成标记 ＋ 中文那两枚同义标记"；终态命中＝**0**（`grep -cE -f` 返回退码 1 ＝ 零命中＝好消息） |
 
-**同发取数（12:59:30 CST，HEAD 仍＝`e7eee03e`＝本腿自己那枚骨架提交）**：**逐字读数落在 `logs/final-rulers.txt`**，⛔ 不在这一节里复述文件大小——因为那一枚数是**自指**的（写进本文件就会让它再变一次；我先前给它回填过三轮，每一轮都把下一轮的数字改掉了）。摘要（口径＝那份日志）：
-- `git status --porcelain \| wc -l` ＝ 起手 **227** → 终 **231**，`diff status-start.txt logs/status-final.txt` 的差集**恰好只有本腿自己的 5 行**：1 行 ` M` 是本文件，4 行 `??` 是 `p1/logs/`、`p1/receipt/`、`p1/reentry/`、`p1/msg-skeleton.txt`（原先那条折叠的 `?? p1/` 因为树里现在有已跟踪文件而展开成 4 行 ⇒ 净＋4）。⛔ **零枚别的写面**。
-- `git status --porcelain -- cmd internal` ＝ **0**（与起手同值，R2/R43）。
-- `git diff --name-only e7eee03e..HEAD` ＝ **空** ⇒ 我的全部真跑读数落在同一枚锚点上（R45）。
-- `wc -l -c probe.md` ＝ **259 行／52,399 字节**——⚠ 这一枚是**回填前的值**，本文件因为写了这句话又会变大；请以上面那份日志为准，不要拿这一行当终值（这正是我把尺挪到文件外的理由）。
+**同发取数（13:07 CST；本腿四枚提交＝`e7eee03e` 骨架 → `c9c3e323` 终态 → `cf2d90ea` 票面进度行 → `c8764a53` 补回被我锚点吃掉的 ⑤-18）**：**逐字读数落在 `logs/final-rulers.txt` ＋ `logs/status-delta.txt`**，⛔ 不在这一节里复述文件大小——那一枚数是**自指**的（写进本文件就会让它再变一次；我给它回填过三轮，每一轮都把下一轮的数字改掉，所以最终把尺挪到文件外）。摘要（口径＝那两份日志）：
+- `git status --porcelain` 名册：**起手 227 行 → 交件 226 行**，`diff status-start.txt logs/status-final.txt` 的差集**只有两行、且都在我名下**：删掉的那行是起手时刚由我自己 `mkdir` 出来的折叠项 `?? .scratch/wisp/probes/33/p1/`（现在它整棵已提交并干净，所以折叠项消失），新增的那行是 ` M .../p1/logs/status-final.txt`（这枚尺自己的输出文件）。⛔ **零枚别家写面、零枚产码写面**。
+- `git status --porcelain -- cmd internal` ＝ **0**（与起手同值，R2/R43）；`git status --porcelain -- cmd internal docs frontend design scripts tools` 只剩起手就带的 31 行 `design/**` 脏项（⛔ 不是我造的，我也⛔没读没写那一棵——两层禁令）。
+- `git show --name-only` 逐枚复认：**四枚提交里出现的路径全部在 `.scratch/wisp/probes/33/p1/**` 与票面 `.scratch/wisp/issues/33-panel-host-c27.md` 之内**；累计尺＝`git diff --numstat e7eee03e^..HEAD -- cmd internal docs frontend design tools scripts` ⇒ **空输出**（＝产码／规格／构建面**零字节**改动）。
+- 票面卫生（`cf2d90ea` 那一枚）：`git diff --numstat` 对票面＝**1 insertion / 0 deletions**，复选框计数 **13 未勾／1 已勾**（与编排者 12:12 的现读一致）。
+- `wc -l -c probe.md` ＝ 见 `logs/final-rulers.txt`（写这一行时它是 262 行／54,186 字节；它随后会因这一行变大——⛔ 别拿正文这一枚当终值）。
 - 占位符尺＝**零命中**（`grep -nE -f logs/placeholder-pattern.txt probe.md` 退码 1）。
 - 终态两枚闸门（12:57:03／12:57:23 复跑，原文 `logs/d22scan-final.txt`）：`GOFLAGS= go build ./...` **rc=0**、`sh scripts/d22scan.sh` **rc=0**。
 

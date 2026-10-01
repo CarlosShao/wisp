@@ -1,20 +1,36 @@
-# 33-p1 closing rulers, taken Thu Oct  1 12:59:30 CST 2026 at HEAD e7eee03e15ba5820ce8588e1d662235db4768017
+# 33-p1 closing rulers, taken Thu Oct  1 13:09:06 CST 2026 at HEAD c8764a53b01a99c062749fed05eefe147588aea4
 --- wc -l -c probe.md ---
-  259 52399 .scratch/wisp/probes/33/p1/probe.md
---- placeholder grep -nE -f placeholder-pattern.txt probe.md ---
+  263 55381 .scratch/wisp/probes/33/p1/probe.md
+--- placeholder grep (pattern in logs/placeholder-pattern.txt) ---
 grep-rc=1 (1 = zero hits = good)
---- git status --porcelain | wc -l (start was 227) ---
-231
+--- git status --porcelain | wc -l (start 227) ---
+230
 --- git status --porcelain -- cmd internal | wc -l ---
 0
---- git diff --name-only e7eee03e..HEAD ---
---- roster delta start vs final ---
-10a11
->  M .scratch/wisp/probes/33/p1/probe.md
-138c139,142
-< ?? .scratch/wisp/probes/33/p1/
----
-> ?? .scratch/wisp/probes/33/p1/logs/
-> ?? .scratch/wisp/probes/33/p1/msg-skeleton.txt
-> ?? .scratch/wisp/probes/33/p1/receipt/
-> ?? .scratch/wisp/probes/33/p1/reentry/
+--- paths appearing in my four commits (want only p1 + ticket) ---
+.scratch/wisp/issues/33-panel-host-c27.md
+.scratch/wisp/probes/33/p1/logs/d22scan-final.txt
+.scratch/wisp/probes/33/p1/logs/final-rulers.txt
+.scratch/wisp/probes/33/p1/logs/placeholder-pattern.txt
+.scratch/wisp/probes/33/p1/logs/receipt-run-1.txt
+.scratch/wisp/probes/33/p1/logs/receipt-selfpump-1.txt
+.scratch/wisp/probes/33/p1/logs/receipt-selfpump-evalcheck.txt
+.scratch/wisp/probes/33/p1/logs/reentry-baseline-1.txt
+.scratch/wisp/probes/33/p1/logs/reentry-baseline-mta.txt
+.scratch/wisp/probes/33/p1/logs/reentry-baseline-none.txt
+.scratch/wisp/probes/33/p1/logs/reentry-baseline-sta.txt
+.scratch/wisp/probes/33/p1/logs/reentry-quitduringcreate-sta.txt
+.scratch/wisp/probes/33/p1/logs/reentry-reentrant-none.txt
+.scratch/wisp/probes/33/p1/logs/reentry-reentrant-sta.txt
+.scratch/wisp/probes/33/p1/logs/reentry-skipcreate-sta.txt
+.scratch/wisp/probes/33/p1/logs/status-final.txt
+.scratch/wisp/probes/33/p1/msg-final.txt
+.scratch/wisp/probes/33/p1/msg-fix5-18.txt
+.scratch/wisp/probes/33/p1/msg-progress.txt
+.scratch/wisp/probes/33/p1/msg-skeleton.txt
+.scratch/wisp/probes/33/p1/probe.md
+.scratch/wisp/probes/33/p1/receipt/main.go
+.scratch/wisp/probes/33/p1/reentry/main.go
+.scratch/wisp/probes/33/p1/status-start.txt
+--- cumulative production/docs diff (want empty) ---
+[end]

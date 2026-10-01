@@ -1,0 +1,14 @@
+probe(33-p1) closing rulers: replace the five numbers that went stale under me
+
+The self-referential file-size and roster readings in the closing section were
+written before the last two commits, so they had already moved (roster 231 to
+226 to 230, HEAD still e7eee03e at the time). Each of those five lines is now
+replaced with a same-turn reading, and the ruler output itself lives in
+logs/final-rulers.txt plus logs/status-delta.txt so it cannot go stale again by
+being quoted in the file it measures. 5-20 predicted this deliberate rewrite.
+
+Verified at 13:09 CST:
+- git diff --numstat e7eee03e^..HEAD -- cmd internal docs frontend design tools scripts = EMPTY (zero bytes of production, spec, build, frontend, design)
+- commit path roster = only probes/33/p1 files and the ticket file
+- GOFLAGS= go build ./... rc=0 ; sh scripts/d22scan.sh rc=0 (clean)
+- git status --porcelain -- cmd internal = 0 ; placeholder ruler = 0 hits
