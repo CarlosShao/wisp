@@ -97,3 +97,17 @@
 **其余判语我照表收（不重裁，那是下一枚验收腿的活）**：② 失败支进程选型"响亮但不致命"**成立**（与本仓票 117 同腿先例／票 128 射程／不堵死联调三条相合，不判应拒绝启动）；③ `bootExit` 第二发是**被丢不是被打死**（甲形 5/5 exit 0、0xc000013a 零枚；乙形也不重复触发）＝F-4 具名未修；④ 0xc000013a **亲手复现两枚**且票 127 那枚钉**断言一字未放宽**；⑥ "零新增模块依赖"成立（`go.mod`/`go.sum` 四枚间 diff 空），**"零新增依赖边"要分开读**＝`cmd/wisp` 生产 import 集 16→17、新增恰好只有 `internal/ball` 一条（这正是 AC#1 的尺本身），唯一新协程在册名 `ui-sta` 走 `Registry.Spawn`。
 **它自己列的判不动／未做（我不替它补）**：winlive 只跑了那一枚未跑整包；未量句柄／RSS（235ms 只当空窗旁证，**不入性能账**）；F-6 在 CI 会不会响零读数；球的十枚手势一次没真按过（**不替 AC#2 背书**）；GitHub runner 有没有能建窗口的桌面＝判不动。
 **本票状态**：AC#1／AC#7 已勾，AC#2..AC#6 与新增 AC#8／AC#9 未勾 ⇒ **不加 `-done`**。队列不变：本票后续片排在 **245-r1 → 197-r3 → 224-r3 → 242 → 244** 之后。
+
+## Progress log（本小节由普查腿 `228-a2` 于本轮新增；此前票面无此节。⛔ 未改动任何 AC 复选框）
+
+- `228-a2`（只读普查腿，HEAD `0c8b9fddd2c3da647a76f0757fd466ef6767e6c1`，branch dev，起手尺 `date` 逐字读数见 census §⑤ R1）：
+  交付 `.scratch/wisp/probes/228/a2/census.md`。射程＝"托盘那一次点击导致十步有序退出"这一维今天能被哪几种仪器形状看见。
+  三条承重现量：① `internal/ball/tray_windows.go:101-106` 用 `TrackPopupMenu(TPM_RETURNCMD)` 的**同步返回值**取选择，
+  注释 `:15-16` 明写**不走 `WM_COMMAND`** ⇒ "PostMessage 一枚 `WM_COMMAND`＋id=4"这一支**在今天的码里不存在投递路径**；
+  ② 全仓 `grep -n 'shutdownRequest|stopRequest'` **零命中**，`RunEventLoop` 唯一定义 `internal/proc/boot_windows.go:127`，
+  其唯一输入 `:128` 的 `signal.NotifyContext(os.Interrupt, SIGTERM)` ⇒ AC#11 要加的位是**全新面**；
+  ③ `internal/ball/interaction_live_test.go:12` 逐字承认 winlive 族测不了托盘菜单（"needs a real mouse in the notification area"）。
+  十步审计侧结论：新加触发**不会**让 `internal/proc/shutdown_test.go:11` 自动变红（它手搓 `ShutdownHooks{}`，`shutdown.go:112` 签名不受影响）；
+  但真机侧今天**无任何台件读满 10 条 `StepRecord`**（只看 `residentShutdownRecord` 存在与相对位置）。
+  判不动的 5 格已按 甲／乙／不做 交裁：census §⑦ F1（托盘点击可注入面）、F2（哪一族能完整覆盖）、F3（空窗坑最小可测形状）、
+  F4（`buildWispForTest` 是否产 `-H=windowsgui` 第二产物，本腿未现读）、F5（要不要新增跨进程读 10 条记录的仪器）。
