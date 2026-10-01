@@ -71,7 +71,7 @@ PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" WISP33R7MODE=<mode> \
 宽形要么留下一扇没人认领的窗（每建一次多一扇）要么吃掉本次建窗自己要用的消息，
 唯一 sound 的那一形（泵到底）做的事是**把孤儿窗拆掉**——那是线程的 owner 才有的知识，不是 `bringUp` 的。
 
-### (b) 整包那一发里"谁先跑、留下什么"：TID 逐枚对上
+### (b) "谁先跑、留下什么"：家族 A/B 一发里 TID 逐枚对上（不是整包那发；整包那发的顺序在末尾引前人日志）
 
 `mutation-2-no-seal.txt`（＝本腿修法里把 owner 侧那道封（`releaseThreadClean`）拿掉、其余全在位，
 `-run 'TestAC13|TestAC14|TestPanelThread|TestBallPanelGestures' -count=3`）第 2 轮逐字：
@@ -183,7 +183,7 @@ PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" WISP33R7MODE=<mode> \
 PATH="$PWD/third_party/sherpa-onnx:$PWD/build:$PATH" GOFLAGS= go test ./cmd/wisp -count=1 -v -timeout 25m
 ```
 
-### 发 1（`.scratch/wisp/probes/33/r7/fullpack-1.txt`，1331 行＋尾块，16:18:31 起、16:21:55 终）
+### 发 1（`.scratch/wisp/probes/33/r7/fullpack-1.txt`，共 1347 行：`ok` 在 1329、`rc=0` 在 1330、尾 `date` 1331、1332-1347 是 tasklist 块；首枚日志行 `16:18:31`、尾行 `Thu Oct  1 16:21:55 CST 2026`，那发起手的 `date` 落进了任务 stdout 而非本文件）
 
 - **rc=0**，`ok  	github.com/CarlosShao/wisp/cmd/wisp	204.702s`
 - 三数（只认 `--- FAIL`/`--- PASS`/`--- SKIP` 行）：**PASS=240、FAIL=0、SKIP=0**
@@ -217,9 +217,80 @@ AC#13 reused-thread release: tid=7412 dispatched 3 message(s) before unlocking; 
 AC#13 queued-close: tid=13284 first bringUp ok, pumped 0 to idle, Destroy left a queued close (hwnd 0xFE0E82, plantQueued=true), then bringUp#2 err=panel host: refusing t...
 ```
 
-### 发 2（`.scratch/wisp/probes/33/r7/fullpack-2.txt`）
+### 发 2（`.scratch/wisp/probes/33/r7/fullpack-2.txt`）：**rc=1、两枚红，都不是本案那一形**
 
-（这一发是补的，因为本案的失败形状本来就是负载／顺序敏感的——"两发都绿"才敢说不是运气。读数见下面。）
+- 时刻：`Thu Oct  1 16:24:24 CST 2026`（文件首行 `date`）→ `Thu Oct  1 16:28:32 CST 2026`（`rc=1` 之后那行 `date`），
+  **rc=1**，`FAIL	github.com/CarlosShao/wisp/cmd/wisp	245.550s`（发 1 是 204.702s ⇒ 整包慢了两成）
+- 三数：**PASS=238、FAIL=2、SKIP=0**
+- 逐名红（红句逐字）：
+
+```
+--- FAIL: TestPanelHostRealWindowHopAndLifecycle (1.41s)
+    panel_host_windows_test.go:600: hot re-show 292.1 ms exceeds D32 panel hot budget 200 ms
+--- FAIL: TestPanelHostLatencyPercentilesAC2 (0.00s)
+    panel_host_windows_test.go:817: hot re-show P95 292.063 ms over 1 runs exceeds the D32 panel hot budget 200 ms
+```
+
+  同一发里的读数上下文：`cold bring-up measured on this box: 967.450 ms`、
+  `hot re-show measured on this box: 292.063 ms`（发 1 同一枚用例是 **60.854 ms**）、
+  `machine-wide msedgewebview2=19`（发 1 是 20，而这台机器 15:41 起手时是 6）。
+  两枚红是**同一个因**（同一枚 292 ms 的样本被两把尺各读一次），不是两件事。
+- **本案那一族在这发里全绿**（这就是为什么我说这两枚红跟毒无关）：
+
+```
+--- PASS: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (1.11s)
+--- PASS: TestAC13BringUpSurvivesAReusedThreadQuit (0.89s)
+--- PASS: TestAC13BringUpRefusesAThreadWithAQueuedClose (1.01s)
+--- PASS: TestAC14AwaitedBindingReplyReachesThePage (0.62s)
+--- PASS: TestAC14GoSideEvalPushReachesThePage (0.55s)
+--- PASS: TestPanelThreadIsSTAAndExitsCleanly (0.43s)
+--- PASS: TestPanelThreadNameIsNotInResidentRoster (0.00s)
+--- PASS: TestBallPanelGesturesReachThePanelThread (0.41s)
+--- PASS: TestAC4PriorFocusSurvivesARefusedPanelSample (0.51s)
+```
+
+- 我这发改的东西**不在热点路径上**（这是读码，不是读数）：`Show` 在 `created==true` 时直接跳过 `bringUp`
+  （`cmd/wisp/panel_host_windows.go:352` 那个 `if !created`），所以热重显既不走 quit 排干也不走 close 检查。
+- 复测（跑完后趁机器安静立刻单发定向，`latency-recheck.txt`，16:29:52，
+  `-run 'TestPanelHostRealWindowHopAndLifecycle|TestPanelHostLatencyPercentilesAC2' -count=3`）：
+  热重显 **37.089 / 36.387 / 40.290 ms**，两枚用例 3/3 `--- PASS`；冷建窗 730.309 / 403.401 / 323.014 ms。
+- 我的判读：**负载噪声**（同一枚尺、同一份码，安静时 37-40 ms，那一发 292 ms，且整包同时慢两成、
+  机器上 webview 进程从 6 涨到 19-20）。**但这枚红我不取消、不解释成"不算"**：阈值一字节没动、
+  断言一条没放宽，三发数都在这张表上，归口留给编排者（要按哪一发算 AC#2/D32 那一行不是写码腿的权）。
+- 发 3 是为此补的：见下。
+
+### 发 3（`.scratch/wisp/probes/33/r7/fullpack-3.txt`，共 1347 行；行号：1＝`Thu Oct  1 16:30:09 CST 2026`、1329＝`PASS`、1330＝`ok` 行、1331＝`rc=0`、1332＝`Thu Oct  1 16:33:34 CST 2026`、1333 起是 tasklist 块）
+
+- **rc=0**，`ok  	github.com/CarlosShao/wisp/cmd/wisp	201.376s`
+- 三数：**PASS=240、FAIL=0、SKIP=0**；**逐名红册＝空**
+  （`grep -cE '^--- FAIL|^    --- FAIL'` = 0）
+- 发 2 那两枚红的那一把尺，这一发回到帽内：`hot re-show measured on this box: 86.076 ms`（预算 200 ms）、
+  `cold bring-up measured on this box: 758.174 ms`（预算 1500 ms）、`our tree webview=7`、
+  `machine-wide msedgewebview2=19`——**同一发里机器并没有更安静**（19 枚与发 2 的 19 枚同级），
+  所以 86 ms vs 292 ms 的差别我只能说"那一发恰好挤了一下"，说不出是谁挤的
+- 本案那一族逐名：
+
+```
+--- PASS: TestPanelHostRealWindowHopAndLifecycle (1.00s)
+--- PASS: TestAC4FocusReturnToPriorWindowGap33r5 (0.52s)
+--- PASS: TestPanelHostLatencyPercentilesAC2 (0.00s)
+--- PASS: TestAC13ColdStartEndsOnTheEmbeddedEntryNotTheProbe (0.97s)
+--- PASS: TestAC13BringUpSurvivesAReusedThreadQuit (0.98s)
+--- PASS: TestAC13BringUpRefusesAThreadWithAQueuedClose (1.06s)
+--- PASS: TestAC14AwaitedBindingReplyReachesThePage (0.59s)
+--- PASS: TestAC14GoSideEvalPushReachesThePage (0.45s)
+--- PASS: TestPanelThreadIsSTAAndExitsCleanly (0.43s)
+--- PASS: TestPanelThreadNameIsNotInResidentRoster (0.00s)
+--- PASS: TestBallPanelGesturesReachThePanelThread (0.37s)
+--- PASS: TestAC4PriorFocusSurvivesARefusedPanelSample (0.48s)
+```
+
+- 桌面枚数：终态 12 枚，逐枚按 `--user-data-dir` 归属查过，**属于我这发的＝0 枚**
+  （`Get-CimInstance ... | grep -ci wisp` = 0；那 12 枚分属 `SearchHost` 与 owner 自己的 `clipsync-desktop`）。
+  发 1 终态里我那枚孤儿（PID 3112）已在 16:23 收掉，之后两发都没再留下带 `wisp*` 目录的进程。
+- 三发汇总：**发 1 rc=0／240-0-0**、**发 2 rc=1／238-2-0（两枚红＝同一枚 292 ms 的热重显被两把尺各读一次）**、
+  **发 3 rc=0／240-0-0**。判据④要的"rc=0 且红册为空"**达成过两发**；发 2 那两枚我不判成本案的回归，
+  理由与"如果错了后果"写在 ⑥(i)，归口留给编排者。
 
 ## ⑤ 门禁四数
 
@@ -236,8 +307,12 @@ AC#13 queued-close: tid=13284 first bringUp ok, pumped 0 to idle, Destroy left a
 - (a) **"整包那枚红的毒源＝`TestAC13BringUpSurvivesAReusedThreadQuit` 释放回池的那条线程"**：
   机制我用自己的台件复算过（同锁线程定植"活窗＋一枚没派的 `WM_CLOSE`"⇒ `bringUp` 3/3 panic，
   `.scratch/wisp/probes/33/r7/modes-grid.txt`），但"包内确实是这一枚用例把线程还了池、且 AC#14 落在它上面"
-  是**归因**，凭的是具名 A/B（拿掉泄漏者⇒AC#14 绿 / 留着⇒红）＋时刻相邻，不是 TID 逐枚对上的。
-  若错（真凶是别的还池点，或根本是 dataPath 复用/并发建窗），判据④仍会红，且我的修法（甲封点）不解决问题。
+  是**归因**。它有两枚凭据：一是 ①(b) 那发把 TID 逐枚对上了（泄漏者还池 `tid=16272`，下一条用例的第一次建窗
+  就落在 16272 并被产码具名拒绝、连 hwnd 都点了），二是③的反控 2 里同一形状 3/3 响。
+  **但"票上原先那发红也必然是这一枚用例造成的"这一句仍然只到"顺序相邻＋形状相同"级**——
+  我复跑的是 33-r6 那枚钉自己（前人整包日志我只读未复跑）。
+  若错（真凶是别的还池点，或根本是 dataPath 复用/并发建窗），判据④仍会红，且我的修法（甲封点）不解决问题；
+  实际三发名册里有两发整包红册为空，这一支就算不完整也不影响绿，但会影响"下一枚同类红该往哪儿找"。
 - (b) **"`WM_QUIT` 是闩锁（latched），过滤式 `PeekMessageW([WM_QUIT,WM_QUIT])` 在队列里还有别的消息时看不见它"**：
   读数支持（mode=dispatch 三发：drain removed=0、filtered found=false，紧接着的建窗照样 panic），
   但"闩锁"是**我对机制的命名**，不是 Win32 给我回的字段。若机制其实是别的
@@ -265,10 +340,17 @@ AC#13 queued-close: tid=13284 first bringUp ok, pumped 0 to idle, Destroy left a
   我写面外（⛔ 派单禁动 `internal/**`）。今天这一发整包没中它（红册为空），我说不出为什么没中——
   **别把"没中"读成"不会中"**。若它其实会毒到后来的 `panel-sta`，后果＝又一枚顺序依赖红，
   且我这发的两道修都拦不住它（close 检查看不见闩锁 quit，见 (b)）。归口在 ⑦，交编排者裁。
-- (h) **`releaseThreadClean` 之后还池的线程"必然干净"这件事只在这台机器上量过**：`nails-fix.txt` 3/3 是
+- (h) **`releaseThreadClean` 之后还池的线程"必然干净"这件事只在这台机器上量过**：
+  `nails-fix.txt` 3/3 是
   `windows left=0 queue head=empty`、`dispatched 3-4 message(s)`。若哪天 WebView2 在窗销毁后还继续异步投消息，
   泵到空这一步会撞 4096 的帽（撞帽会 `slog.Warn` 自陈）或把 `head` 留成非空 ⇒ 我新加的两条断言会红——
   红得对（那种线程本来就不该还池），但那是**新红**，不是回归，别把它当成"33-r7 把绿改坏了"。
+- (i) **发 2 那两枚红我判成"负载噪声"**：凭据是三样——同一发里本案那一族 9 枚全绿、
+  趁机器安静复测 `-count=3` 得 37.089/36.387/40.290 ms（`latency-recheck.txt`）、
+  以及读码说热点路径不经过我改的任何一处（`Show` 的 `if !created`）。
+  **如果这判错了**（真是我这发的东西把热重显推到 292 ms，比如我新建又拆掉的窗让 WebView2 运行时整体变慢），
+  后果＝D32 面板那一行的达标情况被我这句话掩盖了，而阈值与断言我都没动、也没有权去动 ⇒
+  这一格只能由编排者按发 3 与后续 CI 读数裁，我把三发数都留在 ④ 上、不替它挑一发好看的。
 
 ## ⑦ 判不动的地方（逐条：甲＝按我读数／乙＝别的形／不做 ＋现量＋为什么判不了）
 
