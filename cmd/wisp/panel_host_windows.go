@@ -224,19 +224,29 @@ func (m *PanelManager) bringUp(ctx context.Context) error {
 	}
 	m.mu.Unlock()
 
-	// The creating thread must have a quit-free message queue, or the library's
-	// Embed pump (pkg/edge chromium.go:96-111) dequeues a stale WM_QUIT, breaks
-	// its GetMessageW loop with inited still 0 and e.webview nil, and Init
-	// (chromium.go:130-136) dereferences that nil - the panic behind ticket 33's
-	// order-dependent AC#13 red. go-webview2's own wndproc posts WM_QUIT for free:
-	// webview.go:242-243 runs w.Terminate() on WM_DESTROY, and Terminate is a bare
-	// PostQuitMessage (webview.go:381-383) onto whatever thread pumped the close.
-	// So any thread that has hosted a now-destroyed panel window carries a pending
-	// quit into the next bring-up. The resident thread never reuses one (loop locks
-	// for life), but the recreate path (Destroy then a later Show) and any test that
-	// hands a window thread back to the Go pool do. Draining the queued quit here is
-	// the one place that covers both without touching the dependency.
-	drainStaleQuitBeforeCreate()
+	// The creating thread must have an empty message queue, or the library's
+	// Embed pump (pkg/edge chromium.go:96-111) dequeues a stale message first and
+	// breaks with inited still 0 and e.webview nil, and Init (chromium.go:130-136,
+	// no guard on the nil) panics - the panic behind ticket 33's order-dependent
+	// AC#13 / AC#14 reds. go-webview2 leaves two stale shapes on a thread that has
+	// already hosted a panel window:
+	//   (1) a queued WM_QUIT, and
+	//   (2) a queued WM_CLOSE that was never dispatched.
+	// Both come from the library's own teardown: its wndproc calls w.Terminate() on
+	// WM_DESTROY (webview.go:242-243) and Terminate is a bare PostQuitMessage
+	// (webview.go:381-383) onto whichever thread pumped the close. Shape (2) is the
+	// one that defeats a WM_QUIT-only drain - the fresh Embed pumps the stale
+	// WM_CLOSE, its wndproc destroys the old window and posts a NEW WM_QUIT mid
+	// create, and the next GetMessageW returns 0. The 33-r6 full-package reading hit
+	// exactly this: with a quit-only drain AC#13 went green but AC#14 came red one
+	// test later, because the scheduler had handed it the WM_CLOSE-shaped thread.
+	// So purge the WHOLE queue here, before any window exists on this thread -
+	// remove (never dispatch, so no wndproc can post a fresh quit) everything the
+	// prior owner left behind. The resident thread never reuses one (loop locks for
+	// life), but the recreate path (Destroy then a later Show) and any test that
+	// hands a window thread back to the Go pool do; this is the one place that
+	// covers both without touching the dependency.
+	drainStaleMessagesBeforeCreate()
 
 	w := webview2.NewWithOptions(webview2.WebViewOptions{
 		Debug:     false,
@@ -575,36 +585,35 @@ func pnlPumpOnce() {
 }
 
 const (
-	// pnlWmQuit is WM_QUIT. The message range filter in PeekMessageW is inclusive,
-	// so [pnlWmQuit, pnlWmQuit] matches only the quit message - stale window
-	// messages (mouse input, a re-show paint, ...) are left for the real pump.
-	pnlWmQuit = 0x12
-	// pnlPmRemove is PeekMessage's PM_REMOVE flag; without it the quit would be
-	// reported again on the next call and the drain would loop forever.
+	// pnlPmRemove is PeekMessage's PM_REMOVE flag; without it a message would be
+	// reported again on the next call and the purge would loop forever.
 	pnlPmRemove = 1
-	// pnlQuitDrainCap bounds the loop. More than this many WM_QUIT on one thread
-	// means several prior owners piled up; stop rather than trust the count, and
-	// say so out loud so a failed drain is a loud reading, not a silent green.
-	pnlQuitDrainCap = 64
+	// pnlMsgDrainCap bounds the loop. More than this many stale messages on one
+	// thread means several prior owners piled up; stop rather than trust the count,
+	// and say so out loud so a failed purge is a loud reading, not a silent green.
+	pnlMsgDrainCap = 256
 )
 
-// drainStaleQuitBeforeCreate removes any WM_QUIT already queued on the CALLING
-// thread so the library's Embed pump cannot dequeue it before the control exists.
-// It returns how many quits it removed. It is deliberately narrow (only WM_QUIT,
-// only this thread, only before a window is created) - see the comment at the top
-// of bringUp for why the panic it prevents is a real, reusable-thread hazard.
-func drainStaleQuitBeforeCreate() int {
+// drainStaleMessagesBeforeCreate removes every message still queued on the
+// CALLING thread so the library's Embed pump cannot touch a stale WM_QUIT or a
+// stale WM_CLOSE before the control exists. It returns how many it removed. It is
+// narrow by construction: only this thread, only before a window is created, and it
+// REMOVES without DISPATCHING so a leftover close cannot run the old wndproc and
+// post a fresh quit. See the comment at the top of bringUp for the two stale shapes
+// this prevents.
+func drainStaleMessagesBeforeCreate() int {
 	removed := 0
-	for removed < pnlQuitDrainCap {
+	for removed < pnlMsgDrainCap {
 		var m pnlMsg
+		// filter (0,0) = the whole queue; PM_REMOVE = drop it, do not dispatch it.
 		r, _, _ := pnlPeekMessageW.Call(
-			uintptr(unsafe.Pointer(&m)), 0, pnlWmQuit, pnlWmQuit, pnlPmRemove)
+			uintptr(unsafe.Pointer(&m)), 0, 0, 0, pnlPmRemove)
 		if r == 0 {
 			return removed
 		}
 		removed++
 	}
-	slog.Warn("panel host: quit-drain hit its cap before the queue was clean",
-		"cap", pnlQuitDrainCap, "removed", removed)
+	slog.Warn("panel host: pre-create message purge hit its cap before the queue was clean",
+		"cap", pnlMsgDrainCap, "removed", removed)
 	return removed
 }

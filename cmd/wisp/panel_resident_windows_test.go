@@ -349,7 +349,7 @@ var postQuitProc = pnlModUser32.NewProc("PostQuitMessage")
 // Embed loop (pkg/edge chromium.go:96-111) dequeues that quit from GetMessageW,
 // breaks with inited still 0 and e.webview never assigned, and Init
 // (chromium.go:130-136, no guard on the nil) panics with exactly the recovered string
-// in the ticket's log. The fix is drainStaleQuitBeforeCreate at the top of bringUp.
+// in the ticket's log. The fix is drainStaleMessagesBeforeCreate at the top of bringUp.
 //
 // The reverse control: delete that one call from bringUp and this test fails on the
 // planted quit (NewWithOptions panics before the window exists), reported by name -
@@ -386,13 +386,74 @@ func TestAC13BringUpSurvivesAReusedThreadQuit(t *testing.T) {
 	t.Logf("AC#13 reused-thread root cause: planted one WM_QUIT on this locked thread, then ran bringUp - panicked=%v err=%v created=%v",
 		o.panicked, o.err, o.created)
 	if o.panicked != nil {
-		t.Errorf("bringUp on a thread carrying a pending WM_QUIT %v (the recovered panic) instead of draining it and creating the window. This is ticket 33 AC#13's order-dependent red reproduced deterministically: the library's Embed loop (pkg/edge chromium.go:96-111) dequeued the quit and Init (chromium.go:131) dereferenced the nil control. Fix: bringUp must call drainStaleQuitBeforeCreate before NewWithOptions", o.panicked)
+		t.Errorf("bringUp on a thread carrying a pending WM_QUIT %v (the recovered panic) instead of purging it and creating the window. This is ticket 33 AC#13's order-dependent red reproduced deterministically: the library's Embed loop (pkg/edge chromium.go:96-111) dequeued the quit and Init (chromium.go:131) dereferenced the nil control. Fix: bringUp must call drainStaleMessagesBeforeCreate before NewWithOptions", o.panicked)
 	}
 	if o.err != nil {
-		t.Errorf("bringUp returned an error on the reused thread: %v (a created window is expected; with the drain in place a pre-existing quit is no reason to refuse to bring the panel up)", o.err)
+		t.Errorf("bringUp returned an error on the reused thread: %v (a created window is expected; with the purge in place a pre-existing quit is no reason to refuse to bring the panel up)", o.err)
 	}
 	if !o.created {
 		t.Errorf("bringUp reported success but no window was created on the reused thread (created=%v) - the panel would be blank for the user", o.created)
+	}
+}
+
+// TestAC13BringUpSurvivesAStaleCloseOnAReusedThread covers the SECOND stale shape,
+// the one a WM_QUIT-only purge misses and the 33-r6 full-package run surfaced: a
+// thread that still carries an undelivered WM_CLOSE for a panel window it owned.
+// It is reproduced deterministically by owning a window and destroying it on the
+// SAME locked thread without dispatching the close, then bring-up again. The
+// library's fresh Embed would otherwise pump that stale close, its wndproc destroys
+// the dead window and posts a NEW WM_QUIT mid create (webview.go:242-243 / 381-383),
+// and Init dereferences the nil control. bringUp's full pre-create purge removes the
+// stale close (and any quit it would have produced) so the second window comes up.
+// Reverse control: narrow the purge back to WM_QUIT-only and THIS test goes red while
+// the WM_QUIT test above stays green - which is exactly the pair of shapes the race
+// can hand whichever resident test the scheduler picks.
+func TestAC13BringUpSurvivesAStaleCloseOnAReusedThread(t *testing.T) {
+	dataPath := filepath.Join(os.TempDir(), "wisp-33r6-stale-close")
+	type outcome struct {
+		err1, err2 error
+		panicked   any
+		created2   bool
+	}
+	res := make(chan outcome, 1)
+	go func() {
+		// owner: test bring-up reuse on one locked thread; recover below.
+		var o outcome
+		defer func() {
+			o.panicked = recover()
+			res <- o
+		}()
+		runtime.LockOSThread()
+		defer runtime.UnlockOSThread()
+		m1 := NewPanelManager(&panel.ComposerDispatch{Mode: &recordingModeHandler{}}, builtinAssetsOrTestNil(t), dataPath)
+		o.err1 = m1.bringUp(context.Background())
+		if o.err1 != nil || !m1.IsCreated() {
+			// The first bring-up is the CONTROL: it must work for this test to say
+			// anything about the stale close. Fail loudly rather than silently pass.
+			res <- outcome{err1: fmt.Errorf("first bringUp err=%v created=%v - no stale close was planted", o.err1, m1.IsCreated())}
+			return
+		}
+		m1.Destroy() // posts WM_CLOSE for the live window; we do NOT pump it away
+		m2 := NewPanelManager(&panel.ComposerDispatch{Mode: &recordingModeHandler{}}, builtinAssetsOrTestNil(t), dataPath)
+		o.err2 = m2.bringUp(context.Background())
+		o.created2 = m2.IsCreated()
+		m2.Destroy()
+	}()
+
+	o := <-res
+	t.Logf("AC#13 stale-close root cause: first bringUp err=%v, then Destroy left a WM_CLOSE, second bringUp err=%v panicked=%v created=%v",
+		o.err1, o.err2, o.panicked, o.created2)
+	if o.panicked != nil {
+		t.Errorf("second bringUp on a thread carrying a stale WM_CLOSE %v instead of purging it before NewWithOptions - the fresh Embed dispatched the close, the library posted a fresh WM_QUIT (webview.go:242-243,381-383) and Init (chromium.go:131) hit the nil control", o.panicked)
+	}
+	if o.err1 != nil {
+		t.Fatalf("the first (control) bringUp failed: %v - the test cannot plant a stale close on a thread that never owned a window", o.err1)
+	}
+	if o.err2 != nil {
+		t.Errorf("second bringUp returned an error on the reused thread: %v", o.err2)
+	}
+	if !o.created2 {
+		t.Errorf("second bringUp reported success but created no window (created=%v) - the stale close still covered the create", o.created2)
 	}
 }
 

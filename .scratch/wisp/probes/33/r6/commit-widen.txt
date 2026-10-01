@@ -1,0 +1,14 @@
+33-r6 加宽修法：bringUp 建窗前清整条队列（WM_QUIT 形 + WM_CLOSE 形都治）+ 第二枚确定性钉
+
+整包复跑读数：修 WM_QUIT-only 后 AC13 转绿，但同一枚 race 被调度器分给了下一条用例
+TestAC14AwaitedBindingReplyReachesThePage（红句逐字：timed out after 15s waiting for the panel
+thread to finish Show @ :443），日志仍有一枚 Chromium).Init recovered panic。=> 毒还有第二形：
+一条线程留着未派的 WM_CLOSE（前主人泵之前退出），fresh Embed 自泵它→ wndproc DestroyWindow→
+WM_DESTROY→ Terminate→ 中途投新 WM_QUIT→ 下个 GetMessage==0→ Init nil 解引用。WM_QUIT-only 排干拦不住它。
+
+改：drainStaleQuitBeforeCreate → drainStaleMessagesBeforeCreate，PeekMessageW(0,0,PM_REMOVE)
+清整条队列、只删不派（不派免得旧 wndproc 又投新 quit），上限 256、命中即 slog.Warn 自陈。
+
+新增确定性钉 TestAC13BringUpSurvivesAStaleCloseOnAReusedThread：同锁线程 bringUp 起窗→Destroy 留
+WM_CLOSE 不泵→再 bringUp，须无 panic、created=true。反控＝把排干窄回 WM_QUIT-only，这枚红、
+上面 WM_QUIT 那枚仍绿（正是 race 能交给任一 resident 用例的两形）。未碰依赖/internal/go mod。
