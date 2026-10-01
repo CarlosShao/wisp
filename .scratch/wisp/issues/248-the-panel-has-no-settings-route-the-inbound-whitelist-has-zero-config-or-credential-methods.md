@@ -99,3 +99,5 @@ Status: OPEN（编排者 09-30 23:1x 立，来路＝owner 当场提的功能要�
 ## Progress log
 
 （追加式；每条 `- [YYYY-MM-DD HH:MM:SS +08] agent=… did=… next=…`，钟点由 `date` 的 stdout 插值，不手打。）
+
+- [2026-10-01 11:57:07 +08] agent=248-a2（只读普查腿，零产码/零测试/零构建） did=交件 `.scratch/wisp/probes/248/a2/census.md`：逐格分类 AC#1..AC#11（Go 侧可独立=AC#1/3/5/7/11；两栖=AC#2/8；要界面或票33宿主=AC#4/9；AC#6 交落地腿自跑；AC#10 选形交编排者）＋路由/写侧现量带 file:line＋撞钉预检点名 T1-T8。未答(标〔推〕)=whitelistMethodsFromSource/composerRouteLiterals 函数体未读、cmd/wisp T4/T7 断言原文未逐枚读、冻结件内部语义按禁令未引。next=编排者裁 §⑦-3（config.* 前缀是否惊动票181 git_test.go）与 §⑦-2（grant-door 探测器是否误判 config.set）
